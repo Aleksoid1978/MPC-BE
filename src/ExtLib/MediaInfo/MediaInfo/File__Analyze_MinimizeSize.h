@@ -421,6 +421,7 @@ public :
     #define Skip_BF8(Name) Element_Offset+=8
     #define Skip_B16(Name) Element_Offset+=16
     #define Skip_BFP4(Size, Name) Element_Offset+=4
+    #define Skip_Hexa(Bytes, Name) Element_Offset+=Bytes
     #define Info_B1(_INFO, _NAME)   Element_Offset++
     #define Info_B2(_INFO, _NAME)   Element_Offset+=2
     #define Info_B3(_INFO, _NAME)   Element_Offset+=3
@@ -1058,6 +1059,7 @@ public :
     #endif //SIZE_T_IS_LONG
     //Fill with datas
     void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring  &Value, bool Replace=false);
+    void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, ZtringList &Value, ZtringList& Id, bool Replace=false);
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const std::string &Value, bool Utf8=true, bool Replace=false) {if (Utf8) Fill(StreamKind, StreamPos, Parameter, Ztring().From_UTF8(Value.c_str(), Value.size())); else Fill(StreamKind, StreamPos, Parameter, Ztring().From_Local(Value.c_str(), Value.size()), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const char*    Value, size_t Value_Size=Unlimited, bool Utf8=true, bool Replace=false) {if (Utf8) Fill(StreamKind, StreamPos, Parameter, Ztring().From_UTF8(Value, Value_Size), Replace); else Fill(StreamKind, StreamPos, Parameter, Ztring().From_Local(Value, Value_Size), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const wchar_t* Value, size_t Value_Size=Unlimited, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring().From_Unicode(Value, Value_Size), Replace);}
@@ -1259,6 +1261,7 @@ protected :
     int64u Buffer_TotalBytes_FirstSynched_Max;
     int64u Buffer_TotalBytes_Fill_Max;
     friend class File__Tags_Helper;
+    friend class File_Mk;
     friend class File_Mpeg4;
 
     //***************************************************************************

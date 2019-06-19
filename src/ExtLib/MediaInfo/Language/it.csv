@@ -155,6 +155,7 @@ Actor;Attore
 Actor_Character;Personaggio
 Added_Date;Data
 Address;Indirizzo
+AdID;
 Advanced;Modalità avanzata
 Advanced mode;Modalità avanzata
 Album;Album
@@ -188,6 +189,8 @@ Author;Autore
 BarCode;Codice a barre
 Basic;Semplice
 Basic_Note;Nota: per maggiori informazioni seleziona Scheda, Albero....
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Profondità bit
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bit/(pixel*frame)
 BufferSize; Dim. buffer
 Cancel;Annulla
 Channel(s);Canali
+ChannelLayout;
 ChannelPositions;Posizione canali
 Chapter(s);Capitoli
 Chapters;Capitoli
@@ -218,7 +222,7 @@ Choose export format;Scegli il formato in cui esportare
 Choose file(s);Seleziona i file da aprire
 Choose filename;Inserire il nome del file
 Choose language;Scegli la lingua
-Choregrapher;Coreografo
+Choreographer;Coreografo
 Chroma;Croma
 ChromaSubsampling;Croma subsampling
 Close;Chiudi
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Impostazioni del codec, Packet bitstream
 Codec_Settings_QPel;Impostazioni del codec, QPel
 Codec_Settings_Sign;Impostazioni del codec, Sign
 Codec_Url;Sito dove scaricare il codec richiesto
+CodecConfigurationBox;
 CodecID;ID codec
 CodecID_Description;Descrizione del codec
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Commissionato da
 Compilation;Compilation
 CompleteName;Nome completo
 CompletionDate;
+ComplexityIndex;
 Composer;Compositore
 Compression_Mode;Modo compressione
 Compression_Mode_Lossless;Senza perdita
@@ -336,6 +342,7 @@ File_Modified_Date;Data ultima modifica
 File_Modified_Date_Local;Data ultima modifica (locale)
 FileExtension;Estensione file
 FileName;Nome
+FileNameExtension;
 FileSize;Dimensione
 Folder;Cartella
 Folder (R);Cartella (D)
@@ -348,9 +355,8 @@ Format_Commercial;Nome commerciale
 Format_Commercial_IfAny;Nome commereciale
 Format_Description;Descrizione formato
 Format_Info;Dettagli sui formati
-Format_Profile;Profilo formato
 Format_Level;
-Format_Tier;
+Format_Profile;Profilo formato
 Format_Settings;Impostazioni formato
 Format_Settings_BVOP;Impostazioni formato, BVOP
 Format_Settings_CABAC;Impostazioni formato, CABAC
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;Impostazioni formato, RefFrames
 Format_Settings_SBR;Impostazioni formato, SBR
 Format_Settings_Sign;Impostazioni formato, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Sito web formato
 Format_Version;Versione formato
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;Garage Rock
 Genre_191;Psybient
 Go to WebSite;Vai al sito internet
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h; o
+HDR_Format;
 Header file;Crea intestazione file
 Height;Altezza
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;E' disponibile una nuova versione (v%Version%). Scar
 NewVersion_Question_Title;E' stata rilasciata una nuova versione!
 No;No
 Not yet;Non ancora
+NumberOfDynamicObjects;
 NumColors;Numero colori
 OK;Ok
 One output file per input file;Un file destinazione per ogni file sorgente
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Esecutore
 Period;Periodo
-PodcastCategory;
 Phone;Telefono
 PictureRatio;
 PixelAspectRatio;Rapporto aspetto pixel
@@ -950,6 +958,7 @@ Played_Count;Visualizzato
 Played_First_Date;Riprodotto la prima volta
 Played_Last_Date;Riprodotto l'ultima volta
 PlayTime;Durata
+PodcastCategory;
 Position;Posizione
 Position_Total;Totale
 Preferences;Preferenze
@@ -1085,6 +1094,9 @@ Tree;Albero
 Tree & Text;Albero e testo
 Type;
 UniqueID;ID univoco
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Sconosciuto
 Url;URL
 Video;Video
@@ -1119,5 +1131,5 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;91
-ZZ_AutomaticLanguage_Percent;91
+ZZ_Automatic_Percent;90
+ZZ_AutomaticLanguage_Percent;90

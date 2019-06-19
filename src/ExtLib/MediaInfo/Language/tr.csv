@@ -155,6 +155,7 @@ Actor;Oyuncu
 Actor_Character;Oynayan karakter
 Added_Date;Eklenme tarihi
 Address;Adres
+AdID;
 Advanced;Gelişmiş
 Advanced mode;Gelişmiş kip
 Album;Albüm
@@ -188,6 +189,8 @@ Author;Hazırlayan
 BarCode;BarKod
 Basic;Temel
 Basic_Note;Not : Bu dosya hakkında daha fazla bilgi için farklı görünüm seçmelisiniz (Sayfa, Ağaç...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Bit yoğunluğu
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bit/(Piksel*Kare)
 BufferSize;Arabellek boyutu
 Cancel;İptal
 Channel(s);Kanal
+ChannelLayout;
 ChannelPositions;Kanal konumları
 Chapter(s);Bölüm
 Chapters;Bölüm
@@ -218,7 +222,7 @@ Choose export format;İstediğiniz dışarı aktarma biçimini seçin
 Choose file(s);Açmak için dosya seçin
 Choose filename;İstediğiniz dosya adını seçin
 Choose language;İstediğiniz dili seçin
-Choregrapher;Koreograf
+Choreographer;Koreograf
 Chroma;Krom
 ChromaSubsampling;Krom altörnekleme
 Close;Kapat
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Kodek ayarları, Paket bit akışı
 Codec_Settings_QPel;Kodek ayarları, QPel
 Codec_Settings_Sign;Kodek ayarları, Sign
 Codec_Url;Kodek için web bağlantısı
+CodecConfigurationBox;
 CodecID;Kodek ID
 CodecID_Description;Kodek açıklaması
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Görevlendiren
 Compilation;Derleme
 CompleteName;Tam isim
 CompletionDate;
+ComplexityIndex;
 Composer;Besteci
 Compression_Mode;Sıkıştırma kipi
 Compression_Mode_Lossless;Kayıpsız
@@ -336,6 +342,7 @@ File_Modified_Date;Dosya son değiştirme tarihi
 File_Modified_Date_Local;Dosya son değiştirme tarihi (yerel)
 FileExtension;Dosya uzantısı
 FileName;Dosya adı
+FileNameExtension;
 FileSize;Dosya boyutu
 Folder;Klasör
 Folder (R);Klasör (R)
@@ -372,7 +379,7 @@ Format_Settings_PictureStructure;
 Format_Settings_PS;Biçim ayarları, PS
 Format_Settings_Pulldown;Biçim ayarları, Pulldown
 Format_Settings_QPel;Biçim ayarları, QPel
-Format_Settings_RefFrames;Biçim ayarları,RefFrames
+Format_Settings_RefFrames;Biçim ayarları, RefFrames
 Format_Settings_SBR;Biçim ayarları, SBR
 Format_Settings_Sign;Biçim ayarları, Sign
 Format_Settings_Wrapping;
@@ -586,12 +593,13 @@ Genre_189;Dubstep
 Genre_190;Garage Rock
 Genre_191;Psybient
 Go to WebSite;Web sitesine git
-Grouping;
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
+Grouping;
 h; s
+HDR_Format;
 Header file;Üst bilgi dosyası oluştur
 Height;Yükseklik
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Yeni sürüm (s%Version%) mevcut, indirmek istiyor m
 NewVersion_Question_Title;Yeni bir sürüm yayımlandı!
 No;Hayır
 Not yet;Henüz değil
+NumberOfDynamicObjects;
 NumColors;Renk sayısı
 OK;TAMAM
 One output file per input file;Girdi dosyası başına bir çıktı dosyası
@@ -1085,6 +1094,9 @@ Tree;Ağaç
 Tree & Text;Ağaç ve Metin
 Type;Tür
 UniqueID;Eşsiz ID
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Bilinmiyor
 Url;Url
 Video;Görüntü
@@ -1119,5 +1131,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;91
+ZZ_Automatic_Percent;90
 ZZ_AutomaticLanguage_Percent;91

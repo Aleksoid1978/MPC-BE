@@ -66,6 +66,12 @@ private :
     int8u*  Descrambled_Buffer; //Used in case of scrambled bitstream
     int64u  GuardBand_Before_Initial;
     int64u  GuardBand_After_Initial;
+    struct description_text_value
+    {
+        string Previous;
+        string Current;
+    };
+    vector<description_text_value> description_text_Values;
 };
 
 } //NameSpace

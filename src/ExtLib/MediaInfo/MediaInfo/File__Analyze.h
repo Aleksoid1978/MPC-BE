@@ -608,6 +608,7 @@ public :
     void Skip_BF8 (               const char* Name);
     void Skip_BF10(               const char* Name);
     void Skip_BFP4(int8u Bits,                const char* Name);
+    void Skip_Hexa(int8u Bytes,   const char* Name);
     #define Info_B1(_INFO, _NAME)   int8u   _INFO; Get_B1  (_INFO, _NAME)
     #define Info_B2(_INFO, _NAME)   int16u  _INFO; Get_B2  (_INFO, _NAME)
     #define Info_B3(_INFO, _NAME)   int32u  _INFO; Get_B3  (_INFO, _NAME)
@@ -1134,6 +1135,7 @@ public :
     #endif //SIZE_T_IS_LONG
     //Fill with datas
     void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring  &Value, bool Replace=false);
+    void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, ZtringList &Value, ZtringList& Id, bool Replace=false);
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const std::string &Value, bool Utf8=true, bool Replace=false) {if (Utf8) Fill(StreamKind, StreamPos, Parameter, Ztring().From_UTF8(Value.c_str(), Value.size())); else Fill(StreamKind, StreamPos, Parameter, Ztring().From_Local(Value.c_str(), Value.size()), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const char*    Value, size_t Value_Size=Unlimited, bool Utf8=true, bool Replace=false) {if (Utf8) Fill(StreamKind, StreamPos, Parameter, Ztring().From_UTF8(Value, Value_Size), Replace); else Fill(StreamKind, StreamPos, Parameter, Ztring().From_Local(Value, Value_Size), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const wchar_t* Value, size_t Value_Size=Unlimited, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring().From_Unicode(Value, Value_Size), Replace);}
@@ -1334,7 +1336,9 @@ protected :
     int64u Buffer_TotalBytes_FirstSynched_Max;
     int64u Buffer_TotalBytes_Fill_Max;
     friend class File__Tags_Helper;
+    friend class File_Mk;
     friend class File_Mpeg4;
+    friend class File_Mk;
 
     //***************************************************************************
     // Helpers

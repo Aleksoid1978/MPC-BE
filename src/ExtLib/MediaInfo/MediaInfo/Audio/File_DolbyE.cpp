@@ -635,6 +635,13 @@ void File_DolbyE::Streams_Fill()
                 Fill_SetOptions(Stream_Audio, StreamPos_Last, "GuardBand_After/String", "N NT");
             }
         }
+
+        if (ProgramNumber<description_text_Values.size())
+        {
+            Fill(Stream_Audio, StreamPos_Last, Audio_Title, description_text_Values[ProgramNumber].Previous);
+            Fill(Stream_Audio, StreamPos_Last, "Title_FromStream", description_text_Values[ProgramNumber].Previous);
+            Fill_SetOptions(Stream_Audio, StreamPos_Last, "Title_FromStream", "N NT");
+        }
     }
     Fill(Stream_General, 0, General_OverallBitRate, Element_Size*8*Mpegv_frame_rate[FrameRate], 0);
 }
@@ -869,7 +876,7 @@ void File_DolbyE::Data_Parse()
             FrameInfo.DTS+=FrameInfo.DUR;
         if (FrameInfo.PTS!=(int64u)-1)
             FrameInfo.PTS+=FrameInfo.DUR;
-        if (!Status[IsFilled])
+        if (!Status[IsFilled] && (description_text_Values.empty() || Frame_Count>=32+1+1+32+1)) // max 32 chars (discarded) + ETX (discarded) + STX + max 32 chars + ETX
             Fill("Dolby E");
     FILLING_END();
     if (Frame_Count==0 && Buffer_TotalBytes>Buffer_TotalBytes_FirstSynched_Max)
@@ -983,6 +990,46 @@ void File_DolbyE::Block()
         //TimeCode
         if (SMPTE_time_code_StartTimecode==(int64u)-1)
             SMPTE_time_code_StartTimecode=TimeCode;
+    }
+    Element_End0();
+    Skip_S1( 8,                                                 "metadata_reserved_bits");
+    for (int8u Channel=0; Channel<DolbyE_Channels[ProgramConfiguration]; Channel++)
+        Skip_S2(10,                                             "channel_subsegment_size");
+    if (!Mpegv_frame_rate_type[FrameRate])
+        Skip_S1( 8,                                             "metadata_extension_segment_size");
+    Skip_S1( 8,                                                 "meter_segment_size");
+    for (int8u Program=0; Program<DolbyE_Programs[ProgramConfiguration]; Program++)
+    {
+        Element_Begin1("per program");
+        int8u description_text;
+        Get_S1 ( 8, description_text,                           "description_text"); Element_Info1(description_text);
+        Info_S1( 2, bandwidth_id,                               "bandwidth_id"); Element_Info1(bandwidth_id);
+        if (description_text && Program>=description_text_Values.size())
+            description_text_Values.resize(Program+1);
+        switch (description_text)
+        {
+            case 0x00: // No text
+                    if (Program<description_text_Values.size())
+                    {
+                        description_text_Values[Program].Previous.clear();
+                        description_text_Values[Program].Current.clear();
+                    }
+                    break;
+            case 0x02: // STX
+                    description_text_Values[Program].Current.clear();
+                    description_text_Values[Program].Current.push_back(description_text);
+                    break;
+            case 0x03: // ETX
+                    if (!description_text_Values[Program].Current.empty() && description_text_Values[Program].Current[0]==0x02)
+                        description_text_Values[Program].Previous= description_text_Values[Program].Current.substr(1);
+                    else
+                        description_text_Values[Program].Previous.clear();
+                    description_text_Values[Program].Current.clear();
+                    break;
+            default: if (description_text>=0x20 && description_text<=0x7E)
+                        description_text_Values[Program].Current.push_back(description_text);
+        }
+        Element_End0();
     }
 }
 

@@ -518,9 +518,10 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                             switch (Parameter)
                             {
                                 case Audio_SamplesPerFrame:
+                                case Audio_SamplingRate:
                                     if (Retrieve(Stream_Audio, StreamPos, Audio_FrameRate).empty())
                                     {
-                                        float64 SamplesPerFrame=Value.To_float64();
+                                        float64 SamplesPerFrame=Retrieve(Stream_Audio, StreamPos, Audio_SamplesPerFrame).To_float64();
                                         float64 SamplingRate=DBL_MAX;
                                         ZtringList SamplingRates;
                                         SamplingRates.Separator_Set(0, " / ");
@@ -1117,6 +1118,33 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
 }
 
 //---------------------------------------------------------------------------
+void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, ZtringList &Value, ZtringList& Id, bool Replace)
+{
+    //Test if not empty
+    size_t Value_Size=Value.size();
+    size_t i=0;
+    for (; i<Value_Size; i++)
+        if (!Value[i].empty())
+            break;
+    if (i==Value_Size)
+        return;
+
+    if (Value.size()!=Id.size())
+    {
+        Value.Separator_Set(0, __T(" / "));
+        Fill(StreamKind, StreamPos, Parameter, Value.Read());
+        return;
+    }
+
+    ZtringList List;
+    List.Separator_Set(0, __T(" / "));
+    for (size_t i=0; i<Value.size(); i++)
+        if (!Value[i].empty()) // Only if there is a content
+            List.push_back(Value[i]+(Id[i].empty()?Ztring():(__T(" (")+Id[i]+__T(')'))));
+    Fill(StreamKind, StreamPos, Parameter, List.Read());
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Fill_SetOptions(stream_t StreamKind, size_t StreamPos, const char* Parameter, const char* Options)
 {
     //Integrity
@@ -1466,7 +1494,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         Stream_Prepare(StreamKind);
 
     //Specific stuff
-    Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Num_Temp, FrameRate_Den_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, HDR_Temp[Video_HDR_Format_Compatibility-Video_HDR_Format+1], Channels_Temp, Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
+    Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Num_Temp, FrameRate_Den_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, HDR_Temp[Video_HDR_Format_Compatibility-Video_HDR_Format+1], Channels_Temp[4], Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
     if (StreamKind==Stream_Video)
     {
         Width_Temp=Retrieve(Stream_Video, StreamPos_To, Video_Width);
@@ -1484,7 +1512,10 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
     }
     if (StreamKind==Stream_Audio)
     {
-        Channels_Temp=Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_);
+        Channels_Temp[0]=Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_);
+        Channels_Temp[2]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelPositions);
+        Channels_Temp[3]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelPositions_String2);
+        Channels_Temp[1]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelLayout);
     }
     if (ToAdd.Retrieve(StreamKind, StreamPos_From, Fill_Parameter(StreamKind, Generic_Delay_Source))==__T("Container"))
     {
@@ -1512,6 +1543,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
     Source_Info_Temp=Retrieve(StreamKind, StreamPos_To, "Source_Info");
     Ztring BitRate_Temp=Retrieve(StreamKind, StreamPos_To, "BitRate");
     Ztring CodecID_Temp=Retrieve(StreamKind, StreamPos_To, "CodecID");
+    Ztring Title_Temp=Retrieve(StreamKind, StreamPos_To, "Title");
 
     //Merging
     size_t Size=ToAdd.Count_Get(StreamKind, StreamPos_From);
@@ -1639,29 +1671,43 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
     }
     if (StreamKind==Stream_Audio)
     {
-        if (!Channels_Temp.empty())
-        {
-            //Test with legacy streams information
-            bool IsOk=(Channels_Temp==Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_));
-            if (!IsOk)
+        bool IsOkGlobal=true;
+        static audio AudioField[4]={ Audio_Channel_s_, Audio_ChannelLayout, Audio_ChannelPositions, Audio_ChannelPositions_String2 };
+        for (size_t i=0; i<4; i++)
+            if (!Channels_Temp[i].empty())
             {
-                ZtringList Temp; Temp.Separator_Set(0, __T(" / "));
-                Temp.Write(Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_));
-                for (size_t Pos=0; Pos<Temp.size(); Pos++)
-                    if (Channels_Temp==Temp[Pos])
-                        IsOk=true;
+                //Test with legacy streams information
+                bool IsOk=(Channels_Temp[i]==Retrieve(Stream_Audio, StreamPos_To, AudioField[i]));
+                if (!IsOk)
+                {
+                    ZtringList Temp; Temp.Separator_Set(0, __T(" / "));
+                    Temp.Write(Retrieve(Stream_Audio, StreamPos_To, AudioField[i]));
+                    for (size_t Pos=0; Pos<Temp.size(); Pos++)
+                        if (Channels_Temp[i]==Temp[Pos])
+                            IsOk=true;
+                }
+
+                //Special case with AES3: wrong container information is accepted
+                if (!IsOk && Retrieve(Stream_Audio, StreamPos_To, Audio_MuxingMode).find(__T("SMPTE ST 337"))!=string::npos)
+                    IsOk=true;
+
+                if (!IsOk)
+                    IsOkGlobal=false;
             }
 
-            //Special case with AES3: wrong container information is accepted
-            if (!IsOk && Retrieve(Stream_Audio, StreamPos_To, Audio_MuxingMode).find(__T("SMPTE ST 337"))!=string::npos)
-                IsOk=true;
-
-            if (!IsOk)
-            {
-                Fill(Stream_Audio, StreamPos_To, Audio_Channel_s__Original, (*Stream)[Stream_Audio][StreamPos_To][Audio_Channel_s_], true);
-                Fill(Stream_Audio, StreamPos_To, Audio_Channel_s_, Channels_Temp, true);
-            }
-        }
+            if (!IsOkGlobal)
+                for (size_t i=0; i<4; i++)
+                    if (Channels_Temp[i]!=(*Stream)[Stream_Audio][StreamPos_To][AudioField[i]])
+                    {
+                        string Original=Retrieve_Const(Stream_Audio, StreamPos_To, AudioField[i], Info_Name).To_UTF8();
+                        size_t Original_Insert=Original.find('/');
+                        if (Original_Insert==(size_t)-1)
+                            Original_Insert=Original.size();
+                        Original.insert(Original_Insert, "_Original");
+                        Fill(Stream_Audio, StreamPos_To, Original.c_str(), (*Stream)[Stream_Audio][StreamPos_To][AudioField[i]], true);
+                        Fill_SetOptions(Stream_Audio, StreamPos_To, Original.c_str(), Retrieve_Const(Stream_Audio, StreamPos_To, AudioField[i], Info_Options).To_UTF8().c_str());
+                        Fill(Stream_Audio, StreamPos_To, AudioField[i], Channels_Temp[i], true);
+                    }
     }
     if (!Delay_Source_Temp.empty() && Delay_Source_Temp!=Retrieve(StreamKind, StreamPos_To, "Delay_Source"))
     {
@@ -1693,6 +1739,13 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
     if (!CodecID_Temp.empty() && !CodecID_New.empty() && CodecID_Temp!=CodecID_New && (Config->File_IsReferenced_Get() ^ !ToAdd.Config->File_IsReferenced_Get())) //TODO: better handling of merges, avoiding duplicate merges so we can remeove hack CodecID_Temp!=CodecID_New
     {
         Fill(StreamKind, StreamPos_To, "CodecID", CodecID_Temp+__T('-')+ToAdd.Retrieve(StreamKind, StreamPos_From, "CodecID"), true);
+    }
+    const Ztring& Title_New=ToAdd.Retrieve_Const(StreamKind, StreamPos_From, "Title");
+    if (StreamKind!=Stream_General && !Title_Temp.empty() && !Title_New.empty() && Title_Temp!=Title_New)
+    {
+        Title_Temp+=__T(" - ");
+        if (Title_New.compare(0, Title_Temp.size(), Title_Temp)) //For a master file with title referencing a essence file with title and stream title, we check that master file title is not the essence file title (not same due to stream title)
+            Fill(StreamKind, StreamPos_To, "Title", Title_Temp+Title_New, true);
     }
 
     Fill(StreamKind, StreamPos_To, (size_t)General_Count, Count_Get(StreamKind, StreamPos_To), 10, true);

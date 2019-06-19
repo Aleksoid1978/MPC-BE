@@ -349,6 +349,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Tak.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Tta.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_TwinVQ.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Usac.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Vorbis.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Wvpk.cpp" />
     <ClCompile Include="MediaInfo\Duplicate\File__Duplicate_MpegTs.cpp" />

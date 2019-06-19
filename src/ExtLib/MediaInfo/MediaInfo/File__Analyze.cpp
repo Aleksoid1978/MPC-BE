@@ -789,19 +789,19 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
             else
             #endif //MEDIAINFO_DEMUX
             {
-                if (Buffer_Temp!=NULL && Buffer_Temp_Size_Max<ToAdd_Size-Buffer_Offset)
+                if (Buffer_Temp!=NULL && Buffer_Temp_Size_Max<Buffer_Size-Buffer_Offset)
                 {
                     delete[] Buffer_Temp; Buffer_Temp=NULL; Buffer_Temp_Size=0; Buffer_Temp_Size_Max=0;
                 }
                 if (Buffer_Temp==NULL)
                 {
-                    size_t Buffer_Temp_Size_Max_ToAdd=ToAdd_Size-Buffer_Offset>32768?ToAdd_Size-Buffer_Offset:32768;
+                    size_t Buffer_Temp_Size_Max_ToAdd=Buffer_Size-Buffer_Offset>32768?Buffer_Size-Buffer_Offset:32768;
                     if (Buffer_Temp_Size_Max_ToAdd<Buffer_Temp_Size_Max) Buffer_Temp_Size_Max_ToAdd=Buffer_Temp_Size_Max;
                     Buffer_Temp_Size_Max=Buffer_Temp_Size_Max_ToAdd;
                     Buffer_Temp=new int8u[Buffer_Temp_Size_Max];
                 }
-                Buffer_Temp_Size=ToAdd_Size-Buffer_Offset;
-                memcpy_Unaligned_Unaligned(Buffer_Temp, ToAdd+Buffer_Offset, Buffer_Temp_Size);
+                Buffer_Temp_Size=Buffer_Size-Buffer_Offset;
+                memcpy_Unaligned_Unaligned(Buffer_Temp, Buffer+Buffer_Offset, Buffer_Temp_Size);
             }
         }
         else if (Buffer_Offset) //Already a copy, just moving it

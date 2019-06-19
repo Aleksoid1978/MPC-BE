@@ -155,6 +155,7 @@ Actor;Herec
 Actor_Character;Character played
 Added_Date;
 Address;Address
+AdID;
 Advanced;Pokročilé
 Advanced mode;Více detailů
 Album;Album
@@ -188,6 +189,8 @@ Author;Autor
 BarCode;BarCode
 Basic;Základní
 Basic_Note;Info : Pro více detailů vyberte jiný mód zobrazení(List, Strom...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BufferSize;
 Cancel;Zrušit
 Channel(s);Kanál(y)
+ChannelLayout;
 ChannelPositions;Channel positions
 Chapter(s);Kapitola(y)
 Chapters;Kapitoly
@@ -218,7 +222,7 @@ Choose export format;Vyberte požadovaný exportní formát
 Choose file(s);Vyberte soubor k otevření
 Choose filename;Choose your desired filename
 Choose language;Vybrat jazyk
-Choregrapher;Choregrapher
+Choreographer;Choreographer
 Chroma;Chroma
 ChromaSubsampling;
 Close;Zavřít
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;
 Codec_Settings_QPel;
 Codec_Settings_Sign;
 Codec_Url;Adresa pro stažení kodeku
+CodecConfigurationBox;
 CodecID;
 CodecID_Description;
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Commissioned by
 Compilation;
 CompleteName;Celý název a cesta
 CompletionDate;
+ComplexityIndex;
 Composer;Composer
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;
 File_Modified_Date_Local;
 FileExtension;Přípona souboru
 FileName;Název souboru
+FileNameExtension;
 FileSize;Velikost souboru
 Folder;Složka
 Folder (R);Složka (R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;
 Format_Info;
-Format_Profile;
 Format_Level;
-Format_Tier;
+Format_Profile;
 Format_Settings;
 Format_Settings_BVOP;
 Format_Settings_CABAC;
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;
 Format_Settings_SBR;
 Format_Settings_Sign;
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;
 Format_Version;
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;Web programu
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h; h
+HDR_Format;
 Header file;Create a header file
 Height;Výška
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;
 NewVersion_Question_Title;
 No;Ne
 Not yet;
+NumberOfDynamicObjects;
 NumColors;
 OK;OK
 One output file per input file;One output file per input file
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Performer
 Period;Period
-PodcastCategory;
 Phone;Phone
 PictureRatio;
 PixelAspectRatio;Poměr pixelů
@@ -950,6 +958,7 @@ Played_Count;
 Played_First_Date;
 Played_Last_Date;
 PlayTime;Hrací čas
+PodcastCategory;
 Position;Pozice
 Position_Total;
 Preferences;Předvolby
@@ -1085,6 +1094,9 @@ Tree;Strom
 Tree & Text;Tree & Text
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Neznámý
 Url;Url
 Video;Video
@@ -1120,4 +1132,4 @@ WrittenBy;Napsal
 Yes;Ano
 Your system;Instalované kodeky
 ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;75
+ZZ_AutomaticLanguage_Percent;74

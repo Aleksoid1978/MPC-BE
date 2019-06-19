@@ -155,6 +155,7 @@ Actor;Herec
 Actor_Character;Character played
 Added_Date;Dátum pridania
 Address;Adresa
+AdID;
 Advanced;Pokročilé
 Advanced mode;Viac detailov
 Album;Album
@@ -188,6 +189,8 @@ Author;Autor
 BarCode;BarCode
 Basic;Základné
 Basic_Note;Info : Pre viac detailov vyberte iný režim zobrazenia (List, Strom...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
 BufferSize;
 Cancel;Zrušiť
 Channel(s);Kanál(y)
+ChannelLayout;
 ChannelPositions;Channel positions
 Chapter(s);Kapitola(y)
 Chapters;Kapitoly
@@ -218,7 +222,7 @@ Choose export format;Vyberte požadovaný exportný formát
 Choose file(s);Vyberte súbor pre otvorenie
 Choose filename;Vyberte požadovaný názov súboru
 Choose language;Vybrať jazyk
-Choregrapher;Choreograf
+Choreographer;Choreograf
 Chroma;Chroma
 ChromaSubsampling;
 Close;Zatvoriť
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;
 Codec_Settings_QPel;
 Codec_Settings_Sign;
 Codec_Url;Adresa pre stiahnutie kodeku
+CodecConfigurationBox;
 CodecID;Označenie kodeku
 CodecID_Description;Popis kodeku
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Commissioned by
 Compilation;
 CompleteName;Celý názov a cesta
 CompletionDate;
+ComplexityIndex;
 Composer;Skladateľ
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;Dátum poslednej úpravy súboru
 File_Modified_Date_Local;Dátum (miestny) poslednej úpravy súboru
 FileExtension;Prípona súboru
 FileName;Názov súboru
+FileNameExtension;
 FileSize;Veľkosť súboru
 Folder;Adresár
 Folder (R);Adresár (R)
@@ -586,12 +593,13 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Web programu
-Grouping;
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
+Grouping;
 h; h
+HDR_Format;
 Header file;Create a header file
 Height;Výška
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;K dispozícii je nová verzia (v%Version%), chcete s
 NewVersion_Question_Title;Bola vydaná nová verzia!
 No;Nie
 Not yet;Ešte nie
+NumberOfDynamicObjects;
 NumColors;
 OK;OK
 One output file per input file;One output file per input file
@@ -1085,6 +1094,9 @@ Tree;Strom
 Tree & Text;Strom a text
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Neznámy
 Url;Url
 Video;Video
@@ -1119,5 +1131,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;74
+ZZ_Automatic_Percent;73
 ZZ_AutomaticLanguage_Percent;79

@@ -38,9 +38,12 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 extern const size_t Aac_sampling_frequency_Size=13;
-extern const int32u Aac_sampling_frequency[Aac_sampling_frequency_Size]=
+extern const size_t Aac_sampling_frequency_Size_Usac=31; // USAC expands Aac_sampling_frequency[]
+extern const int32u Aac_sampling_frequency[Aac_sampling_frequency_Size_Usac]=
 {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
- 16000, 12000, 11025,  8000,  7350};
+ 16000, 12000, 11025,  8000,  7350,     0,     0, 57600,
+ 51200, 40000, 38400, 34150, 28800, 25600, 20000, 19200,
+ 17075, 14400, 12800,  9600,     0,     0,     0};
 
 //---------------------------------------------------------------------------
 static const char* Aac_Adts_ID[]=
@@ -222,7 +225,7 @@ static const char* Aac_ChannelConfiguration2[]=
 };
 
 //---------------------------------------------------------------------------
-static const char* Aac_ChannelLayout[]=
+extern const char* const Aac_ChannelLayout[]=
 {
     "",
     "C",
@@ -363,6 +366,9 @@ void File_Aac::AudioSpecificConfig (size_t End)
         //~ case 41:
             //~ SymbolicMusicSpecificConfig(); //ISO/IEC 14496-23
             //~ break;
+        case 42:
+            UsacConfig();
+            break;
         default:
             Element_Begin1("not implemented part");
             Skip_BS(Data_BS_Remain()-((End==(size_t)-1)?0:End), "(Not implemented)");

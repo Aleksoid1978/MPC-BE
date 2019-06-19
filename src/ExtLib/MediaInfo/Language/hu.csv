@@ -155,6 +155,7 @@ Actor;Előadó
 Actor_Character;Szerep
 Added_Date;Hozzáadva
 Address;Cím
+AdID;
 Advanced;Bővített
 Advanced mode;Bővített mód
 Album;Album
@@ -188,6 +189,8 @@ Author;Szerző
 BarCode;Vonalkód
 Basic;Egyszerű
 Basic_Note;Megjegyzés: a többi nézet (Táblázat, Fa ...) bővebb adatokat mutat a fájlról
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bit/(képpont*képkocka)
 BufferSize;
 Cancel;Mégsem
 Channel(s);Csatornák száma
+ChannelLayout;
 ChannelPositions;Csatorna kiosztás
 Chapter(s);Fejezet
 Chapters;Fejezet
@@ -218,7 +222,7 @@ Choose export format;Adja meg a kívánt egyedi exportálási formátumot
 Choose file(s);Adja meg a megnyitni kívánt fájl nevét
 Choose filename;Adja meg a kívánt fájlnevet
 Choose language;Adja meg a használni kívánt nyelvet
-Choregrapher;Koreográfus
+Choreographer;Koreográfus
 Chroma;Szín
 ChromaSubsampling;
 Close;Bezárás
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Codec settings, Packet bitstream
 Codec_Settings_QPel;Kódek beállításai, QPel
 Codec_Settings_Sign;Kódek beállításai, Sign
 Codec_Url;Kódek weblapja
+CodecConfigurationBox;
 CodecID;Kódek azonosító
 CodecID_Description;Kódek leírás
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Megbízó
 Compilation;
 CompleteName;Teljes név
 CompletionDate;
+ComplexityIndex;
 Composer;Zeneszerző
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;Fájl módosításának dátuma
 File_Modified_Date_Local;
 FileExtension;Fájl kiterjesztés
 FileName;Fájlnév
+FileNameExtension;
 FileSize;Fájlméret
 Folder;Mappa
 Folder (R);Mappa (R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;Formátum leírás
 Format_Info;A kódek részletei
-Format_Profile;Formátum profil
 Format_Level;
-Format_Tier;
+Format_Profile;Formátum profil
 Format_Settings;Formátum beállítások
 Format_Settings_BVOP;Formátum beállítások, BVOP
 Format_Settings_CABAC;Formátum beállítások, CABAC
@@ -373,10 +379,11 @@ Format_Settings_PictureStructure;
 Format_Settings_PS;Formátum beállítások, PS
 Format_Settings_Pulldown;Formátum beállítások, Pulldown
 Format_Settings_QPel;Formátum beállítások, QPel
-Format_Settings_RefFrames;Formátum beállítások,RefFrames
+Format_Settings_RefFrames;Formátum beállítások, RefFrames
 Format_Settings_SBR;Formátum beállítások, SBR
 Format_Settings_Sign;Formátum beállítások, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Formátum weblapja
 Format_Version;Formátum változat
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;A weblap meglátogatása
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h; óra
+HDR_Format;
 Header file;Fejléc fájl létrehozása
 Height;Magasság
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Elérhető egy újabb (v%Version%) változat. Kívá
 NewVersion_Question_Title;Új változat jelent meg!
 No;nem
 Not yet;Még nincs
+NumberOfDynamicObjects;
 NumColors;Színek száma
 OK;OK
 One output file per input file;Bemeneti fájlonként egy kimeneti fájl
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Előadó
 Period;Korszak
-PodcastCategory;
 Phone;Telefon
 PictureRatio;
 PixelAspectRatio;Képpont arány
@@ -950,6 +958,7 @@ Played_Count;Lejátszások száma
 Played_First_Date;Első lejátszás dátuma
 Played_Last_Date;Utolsó lejátszás dátuma
 PlayTime;Játékidő
+PodcastCategory;
 Position;Helyzet
 Position_Total;
 Preferences;Beállítások
@@ -1085,6 +1094,9 @@ Tree;Fa
 Tree & Text;Fa és szöveg
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Ismeretlen
 Url;Url
 Video;Kép
@@ -1120,4 +1132,4 @@ WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
 ZZ_Automatic_Percent;76
-ZZ_AutomaticLanguage_Percent;86
+ZZ_AutomaticLanguage_Percent;85

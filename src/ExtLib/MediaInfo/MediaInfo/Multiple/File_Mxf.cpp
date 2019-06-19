@@ -3086,6 +3086,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         for (size_t StreamPos=1; StreamPos<(*Parser)->Count_Get(StreamKind_Last); StreamPos++) //If more than 1 stream, TODO: better way to do this
         {
             Stream_Prepare(StreamKind_Last);
+            Fill(StreamKind_Last, StreamPos_Last, "Title", Retrieve_Const(StreamKind_Last, StreamPos_Last-StreamPos, "Title"));
             Merge(*(*Parser), StreamKind_Last, StreamPos, StreamPos_Last);
             MergedStreams_Last.push_back(streamidentity(StreamKind_Last, StreamPos_Last));
         }
@@ -3304,7 +3305,10 @@ void File_Mxf::Streams_Finish_Essence_FillID(int32u EssenceUID, int128u TrackUID
         if (!Tracks[TrackUID].TrackName.empty())
         {
             for (size_t StreamPos=StreamPos_Last-((*Parser)->Count_Get(StreamKind_Last)?((*Parser)->Count_Get(StreamKind_Last)-1):0); StreamPos<=StreamPos_Last; StreamPos++) //If more than 1 stream
-                Fill(StreamKind_Last, StreamPos, "Title", Tracks[TrackUID].TrackName);
+            {
+                Ztring Title_Temp=Retrieve(StreamKind_Last, StreamPos, "Title");
+                Fill(StreamKind_Last, StreamPos, "Title", Title_Temp.empty()?Tracks[TrackUID].TrackName:(Tracks[TrackUID].TrackName+__T(" - ")+Title_Temp), true);
+            }
         }
     }
 }

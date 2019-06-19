@@ -155,6 +155,7 @@ Actor;Actor
 Actor_Character;Personaj
 Added_Date;
 Address;Adresa
+AdID;
 Advanced;Avansat
 Advanced mode;Mod avansat
 Album;Album
@@ -188,6 +189,8 @@ Author;Autor
 BarCode;Cod de bare
 Basic;Principal
 Basic_Note;Nota: pentru mai multe informatii despre acest fisier, tebuie sa selectati modul avansat
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);
 BufferSize;
 Cancel;Anulare
 Channel(s);Canal(e)
+ChannelLayout;
 ChannelPositions;Pozitia canalelor
 Chapter(s);Capitol(e)
 Chapters;Capitole
@@ -218,7 +222,7 @@ Choose export format;Selectati formatul de export particularizat
 Choose file(s);Deschideti fisierul
 Choose filename;Alegeti numele fisierului
 Choose language;Selectati limba dorita
-Choregrapher;Coregraf
+Choreographer;Coregraf
 Chroma;
 ChromaSubsampling;
 Close;Inchideti
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;
 Codec_Settings_QPel;
 Codec_Settings_Sign;
 Codec_Url;Legatira web pentru codec
+CodecConfigurationBox;
 CodecID;
 CodecID_Description;
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;
 Compilation;
 CompleteName;Nume complet
 CompletionDate;
+ComplexityIndex;
 Composer;Compositor
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;
 File_Modified_Date_Local;
 FileExtension;Extensia fisierului
 FileName;Numele fisierului
+FileNameExtension;
 FileSize;Dimensiunea fisierului
 Folder;Director
 Folder (R);Director (R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;
 Format_Info;
-Format_Profile;
 Format_Level;
-Format_Tier;
+Format_Profile;
 Format_Settings;
 Format_Settings_BVOP;
 Format_Settings_CABAC;
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;
 Format_Settings_SBR;
 Format_Settings_Sign;
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;
 Format_Version;
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Grouping
+Gop_OpenClosed_Open;
 Grouping;
 h; h
+HDR_Format;
 Header file;Generare header fisier
 Height;Inaltime
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;
 NewVersion_Question_Title;
 No;Nu
 Not yet;
+NumberOfDynamicObjects;
 NumColors;
 OK;OK
 One output file per input file;Un fisier destinatie pentru fiecare fisier sursa
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Cantaret
 Period;Perioada
-PodcastCategory;
 Phone;Telefon
 PictureRatio;
 PixelAspectRatio;Dimensiune pixel
@@ -950,6 +958,7 @@ Played_Count;
 Played_First_Date;
 Played_Last_Date;
 PlayTime;Durata redare
+PodcastCategory;
 Position;Pozitie
 Position_Total;
 Preferences;Preferinte
@@ -1085,6 +1094,9 @@ Tree;Arbore
 Tree & Text;Arbore si text
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Necunoscut
 Url;
 Video;Video

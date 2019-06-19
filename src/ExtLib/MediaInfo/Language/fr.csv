@@ -155,6 +155,7 @@ Actor;Acteur
 Actor_Character;Personnage joué
 Added_Date;Date d'ajout
 Address;Adresse
+AdID;
 Advanced;Avancée
 Advanced mode;Mode Avancé
 Album;Album
@@ -188,6 +189,8 @@ Author;Auteur / Réalisateur
 BarCode;Code-barre
 Basic;Basique
 Basic_Note;Note : pour plus d'informations sur ce fichier, vous devez utiliser une vue différente (Tableau, Arbre...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Profondeur des couleurs
 BitDepth_Detected;
 BitDepth_Stored;Profondeur stockée des couleurs
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bits/(Pixel*Image)
 BufferSize;Taille du buffer
 Cancel;Annuler
 Channel(s);Canaux
+ChannelLayout;
 ChannelPositions;Position des cannaux
 Chapter(s);Chapitre(s)
 Chapters;Chapitres
@@ -218,7 +222,7 @@ Choose export format;Choisissez le format d'exportation désiré
 Choose file(s);Choisissez le(s) fichier(s) à ouvrir
 Choose filename;Choisissez le nom du fichier
 Choose language;Choisissez la langue personnalisée
-Choregrapher;Responsable de la chorégraphie
+Choreographer;Responsable de la chorégraphie
 Chroma;Chrominance
 ChromaSubsampling;Sous-échantillonnage de la chrominance
 Close;Fermer
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Paramètres du codec, Packet bitstream
 Codec_Settings_QPel;Paramètres du codec, QPel
 Codec_Settings_Sign;Paramètres du codec, Signe
 Codec_Url;Lien Internet sur le codec
+CodecConfigurationBox;
 CodecID;Identifiant du codec
 CodecID_Description;Description du codec
 CoDirector;codirecteur
@@ -257,6 +262,7 @@ CommissionedBy;Commanditaire
 Compilation;Compilation
 CompleteName;Nom complet
 CompletionDate;
+ComplexityIndex;
 Composer;Compositeur
 Compression_Mode;Mode de compression
 Compression_Mode_Lossless;Sans perte
@@ -336,6 +342,7 @@ File_Modified_Date;Date de dernière modification du fichier
 File_Modified_Date_Local;Date de dernière modification du fichier
 FileExtension;Extension du fichier
 FileName;Nom du fichier
+FileNameExtension;
 FileSize;Taille du fichier
 Folder;Dossier
 Folder (R);Dossier (R)
@@ -348,9 +355,8 @@ Format_Commercial;Nom commercial
 Format_Commercial_IfAny;Nom commercial
 Format_Description;Description du format
 Format_Info;Infos sur le format
-Format_Profile;Profil du format
 Format_Level;
-Format_Tier;
+Format_Profile;Profil du format
 Format_Settings;Paramètres du format
 Format_Settings_BVOP;Paramètres du format, BVOP
 Format_Settings_CABAC;Paramètres du format, CABAC
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;Paramètres du format, RefFrames
 Format_Settings_SBR;Paramètres du format, SBR
 Format_Settings_Sign;Paramètres du format, Signe
 Format_Settings_Wrapping;Paramètres du format, mode d'empaquetage
+Format_Tier;
 Format_Url;Lien Internet sur le format
 Format_Version;Version du format
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;Aller sur le site Web
 Gop_OpenClosed;GOP, ouvert/fermé
-Gop_OpenClosed_Open;Ouvert
 Gop_OpenClosed_Closed;Fermé
 Gop_OpenClosed_FirstFrame;GOP, ouvert/fermé de la première imageGrouping
+Gop_OpenClosed_Open;Ouvert
 Grouping;Groupement
 h; h
+HDR_Format;
 Header file;Créer un fichier Header
 Height;Hauteur
 Height_CleanAperture;Hauteur, Clean Aperture
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Une nouvelle version (v%Version%) est disponible, so
 NewVersion_Question_Title;Une nouvelle version est sortie!
 No;Non
 Not yet;Pas encore
+NumberOfDynamicObjects;
 NumColors;Nombre de couleurs
 OK;OK
 One output file per input file;Erreur de lecture du fichier
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Interprète
 Period;Période
-PodcastCategory;
 Phone;Téléphone
 PictureRatio;
 PixelAspectRatio;Taille du pixel
@@ -950,6 +958,7 @@ Played_Count;Nombre de lectures
 Played_First_Date;Première lecture
 Played_Last_Date;Dernière lecture
 PlayTime;Durée
+PodcastCategory;
 Position;Position
 Position_Total;Total
 Preferences;Préférences
@@ -1085,6 +1094,9 @@ Tree;Arbre
 Tree & Text;Arbre & Texte
 Type;Type
 UniqueID;Identifiant unique
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Inconnu
 Url;Url
 Video;Vidéo
@@ -1119,5 +1131,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;93
+ZZ_Automatic_Percent;88
+ZZ_AutomaticLanguage_Percent;92

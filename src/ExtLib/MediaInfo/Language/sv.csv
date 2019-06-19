@@ -155,6 +155,7 @@ Actor;Skådespelare
 Actor_Character;Roll
 Added_Date;Tillagd
 Address;Adress
+AdID;
 Advanced;Avancerat
 Advanced mode;Avancerat läge
 Album;Album
@@ -188,6 +189,8 @@ Author;Författare
 BarCode;Streckkod
 Basic;Enkel
 Basic_Note;OBS! För mer information om den här filen, måste du välja en annan vy (Lista, Träd...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Bitdjup
 BitDepth_Detected;
 BitDepth_Stored;Lagrat 
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
 BufferSize;Buffertstorlek
 Cancel;Avbryt
 Channel(s);Kanal(er)
+ChannelLayout;
 ChannelPositions;Kanalpositioner
 Chapter(s);Kapitel
 Chapters;Kapitel
@@ -218,7 +222,7 @@ Choose export format;Välj ett anpassat exportformat
 Choose file(s);Välj filer att öppna
 Choose filename;Välj önskat filnamn
 Choose language;Välj önskat språk
-Choregrapher;Koreograf
+Choreographer;Koreograf
 Chroma;Kroma
 ChromaSubsampling;Kroma-delsampling
 Close;Stäng
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Kodekinställningar, Packet bitstream
 Codec_Settings_QPel;Kodekinställningar, QPel
 Codec_Settings_Sign;Kodekinställningar, Sign
 Codec_Url;Webblänk till kodek
+CodecConfigurationBox;
 CodecID;Kodek-ID
 CodecID_Description;Kodekbeskrivning
 CoDirector;Medregisör
@@ -257,6 +262,7 @@ CommissionedBy;På uppdrag av
 Compilation;Kompilering
 CompleteName;Fullständigt namn
 CompletionDate;Färdigställd
+ComplexityIndex;
 Composer;Kompositör
 Compression_Mode;Komprimeringsläge
 Compression_Mode_Lossless;Förlustfri
@@ -336,6 +342,7 @@ File_Modified_Date;Senast ändrad
 File_Modified_Date_Local;Senast ändrad (lokalt)
 FileExtension;Filändelse
 FileName;Filnamn
+FileNameExtension;
 FileSize;Filstorlek
 Folder;Mapp
 Folder (R);Mapp (R)
@@ -372,7 +379,7 @@ Format_Settings_PictureStructure;Formatinställningar, Bildstruktur
 Format_Settings_PS;Formatinställningar, PS
 Format_Settings_Pulldown;Formatinställningar, Pulldown
 Format_Settings_QPel;Formatinställningar, QPel
-Format_Settings_RefFrames;Formatinställningar,RefFrames
+Format_Settings_RefFrames;Formatinställningar, RefFrames
 Format_Settings_SBR;Formatinställningar, SBR
 Format_Settings_Sign;Formatinställningar, Sign
 Format_Settings_Wrapping;Formatinställningar, Omslagsläge
@@ -586,12 +593,13 @@ Genre_189;Dubstep
 Genre_190;Garagerock
 Genre_191;Psybient
 Go to WebSite;Besök hemsidan
-Grouping;Gruppering
 Gop_OpenClosed;GOP, Öppen/Stängd
-Gop_OpenClosed_Open;Öppen
 Gop_OpenClosed_Closed;Stängd
 Gop_OpenClosed_FirstFrame;GOP, Öppen/Stängd av första bildrutan
+Gop_OpenClosed_Open;Öppen
+Grouping;Gruppering
 h; h
+HDR_Format;
 Header file;Skapa en header-fil
 Height;Höjd
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;En ny version (v%Version%) finns tillgänglig. Vill 
 NewVersion_Question_Title;En ny version har släppts!
 No;Nej
 Not yet;Inte än
+NumberOfDynamicObjects;
 NumColors;Antal färger
 OK;OK
 One output file per input file;En utdatafil per indatafil
@@ -1085,6 +1094,9 @@ Tree;Träd
 Tree & Text;Träd & Text
 Type;Typ
 UniqueID;Unikt ID
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Okänd
 Url;URL
 Video;Video
@@ -1119,5 +1131,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;97
-ZZ_AutomaticLanguage_Percent;98
+ZZ_Automatic_Percent;96
+ZZ_AutomaticLanguage_Percent;97

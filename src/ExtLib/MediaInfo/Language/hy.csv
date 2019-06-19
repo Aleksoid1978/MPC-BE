@@ -155,6 +155,7 @@ Actor;Կատարողը
 Actor_Character;Դերը
 Added_Date;Ավելացման ամսաթիվը
 Address;Հասցեն
+AdID;
 Advanced;Լրացուցիչ
 Advanced mode;Ընդլայնված եղանակ
 Album;Ալբոմը
@@ -188,6 +189,8 @@ Author;Հեղինակը
 BarCode;Կոդը
 Basic;Կարճ
 Basic_Note;Ուշադր. լրացուցիչ տեղեկությունների համար ընտրեք այլ տարբերակ (աղյուսակ, ծառի տեսքով,...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Բիթայնությունը
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
 Channel(s);Ալիք(ներ)
+ChannelLayout;
 ChannelPositions;Դիրքը
 Chapter(s);Հոսքերը
 Chapters;Հոսքերը
@@ -218,7 +222,7 @@ Choose export format;Ընտրեք արտածման եղանակը
 Choose file(s);Ընտրեք ֆայլը
 Choose filename;Ընտրեք ֆայլի անունը
 Choose language;Ընտրեք լեզուն
-Choregrapher;Պարարվեստը
+Choreographer;Պարարվեստը
 Chroma;Գույնայնությունը
 ChromaSubsampling;Գույների ընտրություն
 Close;Փակել
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Կոդավորիչի տվյալների փաթե�
 Codec_Settings_QPel;QPel կոդավորիչի ցուցիչը
 Codec_Settings_Sign;Sign կոդավորիչի ցուցիչը
 Codec_Url;Կոդավորիչի հղումը
+CodecConfigurationBox;
 CodecID;Կոդավորիչի ID-ին
 CodecID_Description;Կոդավորիչի նկարագրությունը
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Երաշխավորող
 Compilation;
 CompleteName;Ամբողջական անունը
 CompletionDate;
+ComplexityIndex;
 Composer;Կոմպոզիտորը
 Compression_Mode;Սեղման եղանակը
 Compression_Mode_Lossless;Առանց կորստի
@@ -336,6 +342,7 @@ File_Modified_Date;Ֆայլի փոփոխման ամսաթիվը
 File_Modified_Date_Local;Ֆայլի փոփոխման ամսաթիվը (տեղային)
 FileExtension;Տեսակը
 FileName;Ֆայլի անունը
+FileNameExtension;
 FileSize;Ֆայլի չափը
 Folder;Թղթապանակը
 Folder (R);Թղթապանակը (R)
@@ -348,9 +355,8 @@ Format_Commercial;Կոմերցիոն անվանումը
 Format_Commercial_IfAny;
 Format_Description;Տեսակի նկարագրությունը
 Format_Info;Մանրամասն տեսակի մասին
-Format_Profile;Տեսակի պրոֆիլը
 Format_Level;
-Format_Tier;
+Format_Profile;Տեսակի պրոֆիլը
 Format_Settings;Տեսակի կարգավորումները
 Format_Settings_BVOP;BVOP տեսակի ցուցիչները
 Format_Settings_CABAC;CABAC տեսակի ցուցիչները
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;RefFrames տեսակի ցուցիչները
 Format_Settings_SBR;SBR տեսակի ցուցիչները
 Format_Settings_Sign;Sign տեսակի ցուցիչները
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Տեսակի հղումը
 Format_Version;Տեսակի տարբերակը
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;Բացել կայքը
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h; ժ.
+HDR_Format;
 Header file;Ստեղծել գլխագիրը
 Height;Բարձր-ը
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Հասանելի է նոր %Version% տարբերա�
 NewVersion_Question_Title;Հասանելի է նոր տարբերակ!
 No;Ոչ
 Not yet;Դեռ չկա
+NumberOfDynamicObjects;
 NumColors;Գույների քանակը
 OK;ԼԱՎ
 One output file per input file;Նոր ֆայլ յուրաքանչյուրի համար
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Կատարողը
 Period;Շրջանը
-PodcastCategory;
 Phone;Հեռախոս
 PictureRatio;
 PixelAspectRatio;Փիքսելների համամասնությունը
@@ -950,6 +958,7 @@ Played_Count;Վերարտադրվել է մեկ անգամ
 Played_First_Date;Առաջին վերարտադրումը
 Played_Last_Date;Վերջին վերարտադրումը
 PlayTime;Տևողությունը
+PodcastCategory;
 Position;Դիրքը
 Position_Total;Ընդամենը
 Preferences;Կարգավորումներ
@@ -1085,6 +1094,9 @@ Tree;Ծառի տեսքով
 Tree & Text;Ծառի տեսքով և տեքստ
 Type;
 UniqueID;Բացառիկ ID-ին
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Անհայտ է
 Url;Հղումը
 Video;Տեսանյութը
@@ -1120,4 +1132,4 @@ WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
 ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;89
+ZZ_AutomaticLanguage_Percent;88

@@ -450,7 +450,8 @@ namespace Elements
 void File_Riff::Data_Parse()
 {
     //Alignement specific
-    Element_Size-=Alignement_ExtraByte;
+    if (Alignement_ExtraByte<=Element_Size)
+        Element_Size-=Alignement_ExtraByte;
 
     DATA_BEGIN
     LIST(AIFC)

@@ -360,6 +360,10 @@ void File_Mpeg4::Streams_Finish()
             Stream_Prepare(Stream_Other);
             Fill(Stream_Other, StreamPos_Last, Other_Type, Ztring().From_CC4(Temp->second.hdlr_SubType));
         }
+        if (StreamKind_Last == Stream_Video && !DisplayAspectRatio.empty() && Retrieve_Const(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio).empty())
+        {
+            Fill(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio, DisplayAspectRatio);
+        }
 
         //if (Temp->second.stsz_StreamSize)
         //    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.stsz_StreamSize);
@@ -2810,6 +2814,8 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, const std::s
 {
          if (Meta=="com.apple.quicktime.copyright") Parameter="Copyright";
     else if (Meta=="com.apple.quicktime.displayname") Parameter="Title";
+    else if (Meta=="aspect_ratio") Parameter="DisplayAspectRatio";
+    else if (Meta=="date_recorded") Parameter="Recorded_Date";
     else if (Meta=="DATE") Parameter="Encoded_Date";
     else if (Meta=="iTunEXTC") Parameter="ContentRating";
     else if (Meta=="iTunMOVI") Parameter="iTunMOVI";

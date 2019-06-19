@@ -155,6 +155,7 @@ Actor;Actor
 Actor_Character;Character played
 Added_Date;
 Address;Διεύθυνση
+AdID;
 Advanced;Για προχωρημένους
 Advanced mode;Κατάσταση λειτουργίας για προχωρημένους
 Album;Album
@@ -188,6 +189,8 @@ Author;Author
 BarCode;BarCode
 Basic;Βασική
 Basic_Note;Σημείωση : για περισσότερες πληροφορίες σχετικά με το αρχείο, επιλέξτε διαφορετική προβολή (Φύλλο, Δένδρο...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
 BufferSize;
 Cancel;Άκυρο
 Channel(s);Κανάλι(α)
+ChannelLayout;
 ChannelPositions;Θέσεις καναλιών
 Chapter(s);Κεφάλαιο(α)
 Chapters;Κεφάλαια
@@ -218,7 +222,7 @@ Choose export format;Επιλέξτε your desired export format
 Choose file(s);Επιλέξτε το αρχείο για άνοιγμα
 Choose filename;Επιλέξτε το επιθυμητό όνομα αρχείου
 Choose language;Επιλέξτε την επιθυμητή γλώσσα
-Choregrapher;Χορογράφος
+Choreographer;Χορογράφος
 Chroma;Χρώμα
 ChromaSubsampling;
 Close;Κλείσιμο
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;
 Codec_Settings_QPel;
 Codec_Settings_Sign;
 Codec_Url;Σύνδεσμος συμπιεστή (url)
+CodecConfigurationBox;
 CodecID;
 CodecID_Description;
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Commissioned by
 Compilation;
 CompleteName;Πλήρες όνομα
 CompletionDate;
+ComplexityIndex;
 Composer;Composer
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;
 File_Modified_Date_Local;
 FileExtension;Επέκταση αρχείου
 FileName;Όνομα αρχείου
+FileNameExtension;
 FileSize;Μέγεθος αρχείου
 Folder;Φάκελος
 Folder (R);Φάκελος (R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;
 Format_Info;
-Format_Profile;
 Format_Level;
-Format_Tier;
+Format_Profile;
 Format_Settings;
 Format_Settings_BVOP;
 Format_Settings_CABAC;
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;
 Format_Settings_SBR;
 Format_Settings_Sign;
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;
 Format_Version;
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;Επίσκεψη του δυκτιακού τόπου
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Групаванне
+Gop_OpenClosed_Open;
 Grouping;
 h; h
+HDR_Format;
 Header file;Δημιουργήστε αρχείο κεφαλίδας
 Height;Ύψος
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;
 NewVersion_Question_Title;
 No;Όχι
 Not yet;
+NumberOfDynamicObjects;
 NumColors;
 OK;OK
 One output file per input file;Ένα αρχείο εξόδου για κάθε αρχείο εισόδου
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Performer
 Period;Περίοδος
-PodcastCategory;
 Phone;Τηλέφωνο
 PictureRatio;
 PixelAspectRatio;Λόγος εικονοστοιχείου
@@ -950,6 +958,7 @@ Played_Count;
 Played_First_Date;
 Played_Last_Date;
 PlayTime;Διάρκεια
+PodcastCategory;
 Position;Θέση
 Position_Total;
 Preferences;Επιλογές/Προτιμήσεις
@@ -1085,6 +1094,9 @@ Tree;Δένδρο
 Tree & Text;Δένδρο & Κείμενο
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Άγνωστο
 Url;Url
 Video;Video
@@ -1119,5 +1131,5 @@ Written_Location;Τοποθεσία καταγραφής
 WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
-ZZ_Automatic_Percent;68
+ZZ_Automatic_Percent;67
 ZZ_AutomaticLanguage_Percent;75

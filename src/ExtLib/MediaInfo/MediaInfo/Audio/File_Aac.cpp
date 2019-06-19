@@ -151,6 +151,15 @@ void File_Aac::Streams_Fill()
         frame_length_Multiplier=2;
     Fill(Stream_Audio, StreamPos_Last, Audio_SamplesPerFrame, frame_length*frame_length_Multiplier);
     }
+
+    if (!Retrieve_Const(Stream_Audio, 0, "DrcSets_Count").empty())
+        Fill_SetOptions(Stream_Audio, 0, "DrcSets_Count", "N NI"); // Hidden in text output
+    if (!Retrieve_Const(Stream_Audio, 0, "Loudness_Count").empty())
+        Fill_SetOptions(Stream_Audio, 0, "Loudness_Count", "N NI"); // Hidden in text output
+    if (!Retrieve_Const(Stream_Audio, 0, "Loudness_Count_Album").empty())
+        Fill_SetOptions(Stream_Audio, 0, "Loudness_Count_Album", "N NI"); // Hidden in text output
+    if (!Retrieve_Const(Stream_Audio, 0, "ConformanceCheck/Short").empty())
+        Fill_SetOptions(Stream_Audio, 0, "ConformanceCheck/Short", "N NT"); // Hidden in text output
 }
 
 //---------------------------------------------------------------------------

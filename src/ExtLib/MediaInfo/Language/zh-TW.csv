@@ -155,6 +155,7 @@ Actor;主演
 Actor_Character;主演角色
 Added_Date;加入時間
 Address;地址
+AdID;
 Advanced;進階
 Advanced mode;進階模式
 Album;專輯
@@ -188,6 +189,8 @@ Author;作者
 BarCode;條碼
 Basic;基本
 Basic_Note;注意: 想知道更多關於此檔案的資訊, 您得選擇不同的視點 (表格, 樹狀圖 ...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);位元/(像素*影格)
 BufferSize;
 Cancel;取消
 Channel(s);聲道數
+ChannelLayout;
 ChannelPositions;聲道位置
 Chapter(s);章節
 Chapters;章節
@@ -218,7 +222,7 @@ Choose export format;選擇你要的輸出格式
 Choose file(s);選擇你要開啟的檔案
 Choose filename;選擇你要的檔名
 Choose language;選擇你要的語系
-Choregrapher;動作指導
+Choreographer;動作指導
 Chroma;彩度
 ChromaSubsampling;
 Close;關閉
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;編解碼器設定, Packet bitstream
 Codec_Settings_QPel;編解碼器設定, QPel
 Codec_Settings_Sign;編解碼器設定, Sign
 Codec_Url;編解碼器的網址
+CodecConfigurationBox;
 CodecID;編解碼器識別字
 CodecID_Description;編解碼器描述
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;委託
 Compilation;
 CompleteName;完整檔名
 CompletionDate;
+ComplexityIndex;
 Composer;作曲者
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;最後編輯日期
 File_Modified_Date_Local;最後編輯日期 (本地時間)
 FileExtension;副檔名
 FileName;檔案
+FileNameExtension;
 FileSize;檔案大小
 Folder;資料夾
 Folder (R);資料夾 (R)
@@ -586,12 +593,13 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;前往網站
-Grouping;
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
+Grouping;
 h;時
+HDR_Format;
 Header file;建立標頭檔案
 Height;畫面高度
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;有新版本 (v%Version%) 了, 您想下載嗎?
 NewVersion_Question_Title;有新版本發布!
 No;否
 Not yet;還沒好
+NumberOfDynamicObjects;
 NumColors;色彩數
 OK;確認
 One output file per input file;一個輸入檔對應一個輸出檔
@@ -1085,6 +1094,9 @@ Tree;樹狀圖
 Tree & Text;樹狀圖與文字
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;未知
 Url;相關網址
 Video;視訊
@@ -1119,5 +1131,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;87

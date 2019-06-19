@@ -155,6 +155,7 @@ Actor;Actor
 Actor_Character;Personatge interpretat
 Added_Date;Data d'addició
 Address;Adreça
+AdID;
 Advanced;Avançat
 Advanced mode;Mode avançat
 Album;Àlbum
@@ -188,6 +189,8 @@ Author;Autor
 BarCode;Codi de barres
 Basic;Bàsic
 Basic_Note;Nota: Per a més informació quant aquest arxiu, has de triar una vista diferent (fulla, arbre...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Profunditat de bits
 BitDepth_Detected;
 BitDepth_Stored;Profunditat bits emmagatzemada
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bits/(píxel*fotograma)
 BufferSize;Mida búfer
 Cancel;Cancel·la
 Channel(s);Canal(s)
+ChannelLayout;
 ChannelPositions;Posicions dels canals
 Chapter(s);Capítol(s)
 Chapters;Capítols
@@ -218,7 +222,7 @@ Choose export format;Tria el format a exportar
 Choose file(s);Tria els arxius a obrir
 Choose filename;Tria el nom d'arxiu
 Choose language;Tria el teu idioma
-Choregrapher;Coreografia
+Choreographer;Coreografia
 Chroma;Croma
 ChromaSubsampling;Submostreig croma
 Close;Tanca
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Ajustos del còdec, Packet bitstream
 Codec_Settings_QPel;Ajustos del còdec, QPel
 Codec_Settings_Sign;Ajustos del còdec, Sign
 Codec_Url;Enllaç del còdec
+CodecConfigurationBox;
 CodecID;ID còdec
 CodecID_Description;Descripció del còdec
 CoDirector;Codirector
@@ -257,6 +262,7 @@ CommissionedBy;Commissionat per
 Compilation;Compilació
 CompleteName;Nom complet
 CompletionDate;Data completat
+ComplexityIndex;
 Composer;Compositor
 Compression_Mode;Mode compressió
 Compression_Mode_Lossless;Sense pèrdua
@@ -336,6 +342,7 @@ File_Modified_Date;Data última modificació
 File_Modified_Date_Local;Data última modificació (local)
 FileExtension;Extensió d'arxiu
 FileName;Nom de l'arxiu
+FileNameExtension;
 FileSize;Mida de l'arxiu
 Folder;Carpeta
 Folder (R);Carpeta (R)
@@ -348,9 +355,8 @@ Format_Commercial;Nom comercial
 Format_Commercial_IfAny;Nom comercial
 Format_Description;Descripció format
 Format_Info;Detalls del format
-Format_Profile;Perfil format
 Format_Level;
-Format_Tier;
+Format_Profile;Perfil format
 Format_Settings;Ajustos del perfil
 Format_Settings_BVOP;Ajustos del perfil, BVOP
 Format_Settings_CABAC;Ajustos del perfil, CABAC
@@ -373,10 +379,11 @@ Format_Settings_PictureStructure;Ajustos del perfil, picture structure
 Format_Settings_PS;Ajustos del perfil, PS
 Format_Settings_Pulldown;Ajustos del perfil, Pulldown
 Format_Settings_QPel;Ajustos del perfil, QPel
-Format_Settings_RefFrames;Ajustos del perfil,RefFrames
+Format_Settings_RefFrames;Ajustos del perfil, RefFrames
 Format_Settings_SBR;Ajustos del perfil, SBR
 Format_Settings_Sign;Ajustos del perfil, SBR
 Format_Settings_Wrapping;Ajustos del perfil, wrapping mode
+Format_Tier;
 Format_Url;Enllaç web format
 Format_Version;Versió format
 FpaManufacturer;Fabricant FPA
@@ -587,11 +594,12 @@ Genre_190;Rock de garatge
 Genre_191;
 Go to WebSite;Vés al lloc web
 Gop_OpenClosed;GOP, obert/tancat
-Gop_OpenClosed_Open;Obert
 Gop_OpenClosed_Closed;Tancat
 Gop_OpenClosed_FirstFrame;GOP, obert/tancat primer fotograma
+Gop_OpenClosed_Open;Obert
 Grouping;Agrupament
 h; h
+HDR_Format;
 Header file;Capçalera de l'arxiu
 Height;Alçada
 Height_CleanAperture;Alçada obertura neta
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Està disponible una nova versió (v%Version%), vols
 NewVersion_Question_Title;S'ha publicat una nova versió!
 No;No
 Not yet;Encara no
+NumberOfDynamicObjects;
 NumColors;Nombre de colors
 OK;D'acord
 One output file per input file;Un arxiu de sortida per arxiu d'entrada
@@ -939,7 +948,6 @@ PartNumber;Codi sèrie
 PartTotal;Codi publicació
 Performer;Intèrpret
 Period;Període
-PodcastCategory;
 Phone;Telèfon
 PictureRatio;Relació imatge
 PixelAspectRatio;Relació d'aspecte
@@ -950,6 +958,7 @@ Played_Count;Quantitat reproduccions
 Played_First_Date;Data de la primera reproducció
 Played_Last_Date;Darrera data de reproducció
 PlayTime;Duració
+PodcastCategory;
 Position;Posició
 Position_Total;Total
 Preferences;Preferències
@@ -1085,6 +1094,9 @@ Tree;Arbre
 Tree & Text;Arbre i text
 Type;Tipus
 UniqueID;ID únic
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Desconegut
 Url;URL
 Video;Vídeo
@@ -1119,5 +1131,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;95
-ZZ_AutomaticLanguage_Percent;98
+ZZ_Automatic_Percent;94
+ZZ_AutomaticLanguage_Percent;97

@@ -459,6 +459,28 @@ void File__Analyze::Skip_B16(const char* Name)
 }
 
 //---------------------------------------------------------------------------
+void File__Analyze::Skip_Hexa(int8u Bytes, const char* Name)
+{
+    INTEGRITY_SIZE_ATLEAST(Bytes);
+    if (Trace_Activated)
+    {
+        string ValueS;
+        ValueS.resize(Bytes*2);
+        const int8u* Buffer_Temp=Buffer+Buffer_Offset+(size_t)Element_Offset;
+        for (int8u i=0; i<Bytes; i++)
+        {
+            int8u Value=Buffer_Temp[i];
+            int8u Value0=Value>>4;
+            int8u Value1=Value&0xF;
+            ValueS[i*2  ]=Value0+(Value0>9?('A'-10):('0'));
+            ValueS[i*2+1]=Value1+(Value1>9?('A'-10):('0'));
+        }
+        Param(Name, ValueS);
+    }
+    Element_Offset+=Bytes;
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Skip_BF4(const char* Name)
 {
     INTEGRITY_SIZE_ATLEAST(4);

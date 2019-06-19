@@ -137,6 +137,9 @@ struct element_details
         Element_Node(const Element_Node& node);
         ~Element_Node();
 
+        // Move
+        void TakeChilrenFrom(Element_Node& node);
+
         int64u                           Pos;             // Position of the element in the file
         int64u                           Size;            // Size of the element (including header and sub-elements)
     private:

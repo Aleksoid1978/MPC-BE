@@ -1,43 +1,51 @@
   Language_ISO639;zh-CN
-Author_Email;weiq530@gmail.com
-Author_Name;weiq530
-Author_OldNames;chriszxl,erabbit
+  Author_Email;weiq530@gmail.com
+  Author_Name;weiq530
+  Author_OldNames;chriszxl, erabbit
   Language_Name;简体中文
   Config_Text_ColumnSize;40
   Config_Text_Separator; : 
   Config_Text_NumberTag; #
   Config_Text_FloatSeparator;.
   Config_Text_ThousandsSeparator; 
-audio stream2; 个音频流
-audio stream3; 个音频流
-bit2; 位
-bit3; 位
-BitDepth;位深
+ audio stream1; 音频流
+ audio stream2; 个音频流
+ audio stream3; 个音频流
+ bit1; 位
+ bit2; 位
+ bit3; 位
  bps; b/s
  Bps; B/s
-Byte2; 字节
-Byte3; 字节
-channel2; 声道
-channel3; 声道
-chapter2; 个章节
-chapter3; 个章节
-chapters stream2; 个章节流
-chapters stream3; 个章节流
-character2; 个字幕
-character3; 个字幕
-day2; 天
-day3; 天
+ Byte1; 字节
+ Byte2; 字节
+ Byte3; 字节
+ channel1; 声道
+ channel2; 声道
+ channel3; 声道
+ chapter1; 章节
+ chapter2; 个章节
+ chapter3; 个章节
+ chapters stream1; 章节流
+ chapters stream2; 个章节流
+ chapters stream3; 个章节流
+ character1; 字幕
+ character2; 个字幕
+ character3; 个字幕
+ day1; 天
+ day2; 天
+ day3; 天
  dB1; dB
  dB2; dB
  dB3; dB
-file2; 个文件
-file3; 个文件
-fps1; 帧/秒
-fps2; 帧/秒
-fps3; 帧/秒
-frame1; 帧
-frame2; 帧
-frame3; 帧
+ file1; 文件
+ file2; 个文件
+ file3; 个文件
+ fps1; 帧/秒
+ fps2; 帧/秒
+ fps3; 帧/秒
+ frame1; 帧
+ frame2; 帧
+ frame3; 帧
  GB; GB
  Gb; Gb
  Gbps; Gb/s
@@ -54,11 +62,13 @@ frame3; 帧
  GigaByte1; GigaByte
  GigaByte2; GigaBytes
  GigaByte3; GigaBytes
-hour2; 小时
-hour3; 小时
+ hour1; 小时
+ hour2; 小时
+ hour3; 小时
  Hz; Hz
-image stream2; 个图像流
-image stream3; 个图像流
+ image stream1; 图像流
+ image stream2; 个图像流
+ image stream3; 个图像流
  KB; kB
  Kb; kb
  KBps; kB/s
@@ -88,7 +98,6 @@ image stream3; 个图像流
  MebiByte1; MebiByte
  MebiByte2; MebiBytes
  MebiByte3; MebiBytes
-MediaInfo_About;MediaInfo 能轻松的读取音视频文件的编码和标签信息。支持多种格式的多媒体文件:\r\nMatroska,OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD,SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV,WMA)\r\nMicrosoft RIFF (包括 AVI,WAV)\r\n纯声音格式 (AC3,DTS,AAC,AU,AIFF…)
  MegaBit1; MegaBit
  MegaBit2; MegaBits
  MegaBit3; MegaBits
@@ -99,37 +108,40 @@ MediaInfo_About;MediaInfo 能轻松的读取音视频文件的编码和标签信
  MiB; MiB
  Mib; Mib
  MiBps; MiB/s
-millisecond1; 毫秒
-millisecond2; 毫秒
-millisecond3; 毫秒
-minute1; 分
-minute2; 分
-minute3; 分
-mn; 分
-month2; 月
-month3; 月
-pixel2; 像素
-pixel3; 像素
-PixelAspectRatio;像素画面比例
-second2; 秒
-second3; 秒
-text stream2; 个字幕
-text stream3; 个字幕
-Text streams;字幕流
-video frames1; 视频帧
-video frames2; 视频帧
-video frames3; 视频帧
-Video stream(s);视频流
-video stream2; 个视频
-video stream3; 个视频
-warppoint1; 跳跃点
-warppoint2; 跳跃点
-warppoint3; 跳跃点
-week2; 周
-week3; 周
-Width;宽度
-year2; 年
-year3; 年
+ millisecond1; 毫秒
+ millisecond2; 毫秒
+ millisecond3; 毫秒
+ minute1; 分
+ minute2; 分
+ minute3; 分
+ month1; 月
+ month2; 月
+ month3; 月
+ pixel1; 像素
+ pixel2; 像素
+ pixel3; 像素
+ second1; 秒
+ second2; 秒
+ second3; 秒
+ text stream1; 字幕
+ text stream2; 个字幕
+ text stream3; 个字幕
+ video frames1; 视频帧
+ video frames2; 视频帧
+ video frames3; 视频帧
+ video stream1; 视频
+ video stream2; 个视频
+ video stream3; 个视频
+ warppoint0; 无跳跃点
+ warppoint1; 跳跃点
+ warppoint2; 跳跃点
+ warppoint3; 跳跃点
+ week1; 周
+ week2; 周
+ week3; 周
+ year1; 年
+ year2; 年
+ year3; 年
 , ;, 
 : ;: 
 3D;3D
@@ -143,6 +155,7 @@ Actor;演员
 Actor_Character;角色
 Added_Date;附加数据
 Address;地址
+AdID;
 Advanced;高级
 Advanced mode;高级模式
 Album;专辑
@@ -158,11 +171,10 @@ Arranger;改编者
 ArtDirector;艺术指导
 AspectRatio;画面比例
 AssistantDirector;副导演
-At least one file;(至少要打开一个多媒体文件)
 at;于
+At least one file;(至少要打开一个多媒体文件)
 Audio;音频
 Audio stream(s);音频流
-audio stream1; 音频流
 Audio_Codec_List;音频编解码器
 Audio_No;没有音频
 Audio1;音频 1
@@ -177,7 +189,9 @@ Author;作者
 BarCode;条形码
 Basic;基本
 Basic_Note;注意: 要了解更多关于此文件的信息, 请选择不同的视图 (表格, 树状图 ...)
-bit1; 位
+BedChannelConfiguration;
+BedChannelCount;
+BitDepth;位深
 BitDepth_Detected;检测到的位深
 BitDepth_Stored;存储的位深
 BitRate;码率
@@ -190,20 +204,16 @@ BitRate_Mode_VBR;动态(VBR)
 BitRate_Nominal;额定码率
 Bits-(Pixel*Frame);数据密度【码率/(像素×帧率)】
 BufferSize;缓冲大小
-Byte1; 字节
 Cancel;取消
 Channel(s);声道
-channel1; 声道
+ChannelLayout;
 ChannelPositions;声道位置
 Chapter(s);章节
-chapter1; 章节
 Chapters;章节
 Chapters stream(s);章节流
-chapters stream1; 章节流
 Chapters_Codec_List;章节编解码器列表
 Chapters_No;没有章节
 ChaptersCount;章节流总数
-character1; 字幕
 CheckNewVersion;检查新版本
 Choose custom;自定义
 Choose custom sheet;选择自定义表格
@@ -212,7 +222,7 @@ Choose export format;选择输出格式
 Choose file(s);选择文件
 Choose filename;选择文件名
 Choose language;选择语言
-Choregrapher;动作指导
+Choreographer;动作指导
 Chroma;色度
 ChromaSubsampling;色度抽样
 Close;关闭
@@ -225,7 +235,7 @@ Codec_Description;编解码器描述
 Codec_Info;编解码器信息
 Codec_Profile;编码设置简介
 Codec_Settings;编解码器设置
-Codec_Settings_BVOP;编码设置,B帧
+Codec_Settings_BVOP;编码设置, B帧
 Codec_Settings_CABAC;编码设置, CABAC
 Codec_Settings_Endianness;编码设置, Endianness
 Codec_Settings_Firm;编码设置, Firm
@@ -233,11 +243,12 @@ Codec_Settings_Floor;编码设置, Floor
 Codec_Settings_GMC;编码设置, GMC
 Codec_Settings_ITU;编码设置, ITU
 Codec_Settings_Law;编码设置, Law
-Codec_Settings_Matrix;编码设置,矩阵
-Codec_Settings_PacketBitStream;编码设置,数据包比特流
+Codec_Settings_Matrix;编码设置, 矩阵
+Codec_Settings_PacketBitStream;编码设置, 数据包比特流
 Codec_Settings_QPel;编码设置, QPel
 Codec_Settings_Sign;编码设置, Sign
 Codec_Url;编解码器的网址
+CodecConfigurationBox;
 CodecID;编解码器ID
 CodecID_Description;编解码器描述
 CoDirector;合作导演
@@ -251,6 +262,7 @@ CommissionedBy;评论人
 Compilation;编辑
 CompleteName;完整名称
 CompletionDate;完整日期
+ComplexityIndex;
 Composer;作曲
 Compression_Mode;压缩模式
 Compression_Mode_Lossless;无损
@@ -276,7 +288,6 @@ Cropped;封面尺寸
 Custom;自定义
 Customize;自定义
 Date;日期
-day1; 天
 Debug;调试
 Decimal point;小数点
 Delay;延迟
@@ -329,9 +340,9 @@ File_Created_Date_Local;文件创建日期(本地)
 File_Hint;选择多媒体文件
 File_Modified_Date;最后修改日期
 File_Modified_Date_Local;最后修改日期(本地)
-file1; 文件
 FileExtension;扩展名
 FileName;文件名
+FileNameExtension;
 FileSize;文件大小
 Folder;文件夹
 Folder (R);文件夹 (R)
@@ -347,7 +358,7 @@ Format_Info;格式详情
 Format_Level;格式标准
 Format_Profile;格式概况
 Format_Settings;格式设置
-Format_Settings_BVOP;格式设置,B帧
+Format_Settings_BVOP;格式设置, B帧
 Format_Settings_CABAC;格式设置, CABAC
 Format_Settings_Emphasis;加强
 Format_Settings_Endianness;格式设置, Endianness
@@ -358,20 +369,20 @@ Format_Settings_GMC;格式设置, GMC
 Format_Settings_GOP;格式设置, GOP
 Format_Settings_ITU;格式设置, ITU
 Format_Settings_Law;格式设置, Law
-Format_Settings_Matrix;格式设置,矩阵
+Format_Settings_Matrix;格式设置, 矩阵
 Format_Settings_Matrix_Custom;自定义
 Format_Settings_Matrix_Default;默认
 Format_Settings_Mode;模式
 Format_Settings_ModeExtension;扩展模式
-Format_Settings_PacketBitStream;格式设置,数据包比特流
-Format_Settings_PictureStructure;格式设置,图像结构
+Format_Settings_PacketBitStream;格式设置, 数据包比特流
+Format_Settings_PictureStructure;格式设置, 图像结构
 Format_Settings_PS;格式设置, PS
 Format_Settings_Pulldown;格式设置, Pulldown
 Format_Settings_QPel;格式设置, QPel
-Format_Settings_RefFrames;格式设置,参考帧
+Format_Settings_RefFrames;格式设置, 参考帧
 Format_Settings_SBR;格式设置, SBR
 Format_Settings_Sign;格式设置, Sign
-Format_Settings_Wrapping;格式设置,封装模式
+Format_Settings_Wrapping;格式设置, 封装模式
 Format_Tier;格式等级
 Format_Url;格式网址
 Format_Version;格式版本
@@ -582,19 +593,19 @@ Genre_189;重音回响 (Dubstep)
 Genre_190;车库摇滚 (Garage Rock)
 Genre_191;心理环境 (Psybient)
 Go to WebSite;访问网站
+Gop_OpenClosed;GOP, 开启/闭合
+Gop_OpenClosed_Closed;闭合
+Gop_OpenClosed_FirstFrame;GOP, 开启/闭合第一帧
+Gop_OpenClosed_Open;开启
 Grouping;集团
 h; 小时
-Gop_OpenClosed;GOP,开启/闭合
-Gop_OpenClosed_Open;开启
-Gop_OpenClosed_Closed;闭合
-Gop_OpenClosed_FirstFrame;GOP,开启/闭合第一帧
+HDR_Format;
 Header file;创建头文件
 Height;高度
 Height_CleanAperture;清除采样高度
 Height_Original;原始高度
 Help;帮助
 Hint;提示信息
-hour1; 小时
 How many audio streams?;有多少个音频流?
 How many chapters streams?;有多少个章节流?
 How many text streams?;有多少个字幕流?
@@ -604,7 +615,6 @@ ID;ID
 IdentClockStart;标识时钟开始
 Image;图像
 Image stream(s);图像流
-image stream1; 图像流
 Image_Codec_List;图像编解码器列表
 ImageCount;图像数
 Info;信息
@@ -667,11 +677,11 @@ Language_dz;不丹语 (Dzongkha)
 Language_ee;埃维语 (Ewe)
 Language_el;希腊语 (Greek)
 Language_en;英语 (English)
-Language_en-gb;英语 (英国) (English,Great Britain)
-Language_en-us;英语 (美国) (English,United States)
+Language_en-gb;英语 (英国) (English, Great Britain)
+Language_en-us;英语 (美国) (English, United States)
 Language_eo;世界语 (Esperanto)
 Language_es;西班牙语 (Spanish)
-Language_es-419;西班牙语 (拉丁美洲) (Spanish,Latin America)
+Language_es-419;西班牙语 (拉丁美洲) (Spanish, Latin America)
 Language_et;爱沙尼亚语 (Estonian)
 Language_eu;巴斯克语 (Basque)
 Language_fa;波斯语 (Persian)
@@ -767,7 +777,7 @@ Language_pi;巴利语 (Pali)
 Language_pl;波兰语 (Polish)
 Language_ps;阿富汗语 (Pushto)
 Language_pt;葡萄牙语 (Portuguese)
-Language_pt-br;葡萄牙语 (巴西) (Portuguese,Brazil)
+Language_pt-br;葡萄牙语 (巴西) (Portuguese, Brazil)
 Language_qu;印加语 (Quechua)
 Language_rm;罗曼语 (Raeto-Romance)
 Language_rn;可兰地语 (Rundi)
@@ -820,8 +830,8 @@ Language_yi;意地绪语 (Yiddish)
 Language_yo;库哇语 (Yoruba)
 Language_za;壮语 (Zhuang)
 Language_zh;中文 (Chinese)
-Language_zh-cn;中文 (中国) (Chinese,China)
-Language_zh-tw;中文 (台湾) (Chinese,Taiwan)
+Language_zh-cn;中文 (中国) (Chinese, China)
+Language_zh-tw;中文 (台湾) (Chinese, Taiwan)
 Language_zu;祖鲁语 (Zulu)
 LawRating;分级
 LCCN;LCCN
@@ -841,6 +851,7 @@ matrix_coefficients;矩阵系数
 Matrix_Format;矩阵编码,格式
 MaxCLL;最大内容亮度等级
 MaxFALL;最大帧平均亮度等级
+MediaInfo_About;MediaInfo 能轻松的读取音视频文件的编码和标签信息。支持多种格式的多媒体文件:\r\nMatroska, OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD, SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV, WMA)\r\nMicrosoft RIFF (包括 AVI, WAV)\r\n纯声音格式 (AC3, DTS, AAC, AU, AIFF…)
 Menu;菜单
 Menu stream(s);菜单流
 Menu_Codec_List;菜单编解码器
@@ -848,7 +859,7 @@ Menu_Hint;更多选择
 Menu_No;没有菜单
 MenuCount;菜单流总数
 MenuID;菜单ID
-month1; 月
+mn; 分
 Mood;情绪
 More;更多
 Movie;电影名称
@@ -868,6 +879,7 @@ NewVersion_Question_Content;新版本 (v%Version%) 可用, 是否下载？
 NewVersion_Question_Title;新版本已发布!
 No;否
 Not yet;尚无
+NumberOfDynamicObjects;
 NumColors;色深
 OK;确定
 One output file per input file;一个输入文件对应一个输出文件
@@ -938,7 +950,7 @@ Performer;演员
 Period;时期
 Phone;电话
 PictureRatio;画面比率
-pixel1; 像素
+PixelAspectRatio;像素画面比例
 PixelAspectRatio_CleanAperture;清除采样像素画面比例
 PixelAspectRatio_Original;原始像素画面比例
 PlayCounter;播放计数器
@@ -986,7 +998,6 @@ ScanType_Original;原始扫描方式
 ScanType_StoreMethod;存储的扫描方式
 ScreenplayBy;编剧
 Season;季
-second1; 秒
 SecondaryAudioLanguage;第二音频语言
 see below;详见下述
 Send HeaderFile;发送头文件到: http://sourceforge.net/projects/mediainfo/
@@ -1053,7 +1064,7 @@ Text;文本
 Text - Custom;文本-自定义
 Text (HTML);文本(HTML)
 Text stream(s);字幕流
-text stream1; 字幕
+Text streams;字幕流
 Text_Codec_List;字幕编解码器
 Text_No;没有字幕
 Text1;字幕 1
@@ -1083,10 +1094,13 @@ Tree;树状图
 Tree & Text;树状图和文本
 Type;类型
 UniqueID;唯一ID
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;未知
 Url;网址
 Video;视频
-video stream1; 视频
+Video stream(s);视频流
 Video_Codec_List;视频编解码器
 Video_Delay;音频延迟
 Video_No;没有视频
@@ -1097,7 +1111,6 @@ VideoCount;视频流总数
 View;查看
 View_Hint;改变查看方式
 Warning : more streams in the files;注意：这个文件中还有更多的流
-warppoint0; 无跳跃点
 Web;网页
 WebSite_Audio;访问此音频编解码器的网站
 WebSite_Audio_More;访问网站 (%Url%) 查找此音频编解码器
@@ -1108,16 +1121,15 @@ WebSite_Text_More;访问网站 (%Url%) 查找此字幕编解码器
 WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;访问此视频编解码器的网站
 WebSite_Video_More;访问网站 (%Url%) 查找此视频编解码器
-week1; 周
+Width;宽度
 Width_CleanAperture;清除采样宽度
 Width_Original;原始宽度
 WriteMe;给作者写信
 WriteToTranslator;给译者写信
 Written_Date;写入日期
 Written_Location;写入位置
-WrittenBy;书写人:
-year1; 年
+WrittenBy;书写人: 
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;100
-ZZ_AutomaticLanguage_Percent;100
+ZZ_Automatic_Percent;98
+ZZ_AutomaticLanguage_Percent;98

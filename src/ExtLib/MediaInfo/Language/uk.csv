@@ -155,6 +155,7 @@ Actor;Актор
 Actor_Character;У ролі
 Added_Date;Дата додавання
 Address;Адреса
+AdID;
 Advanced;Додаткові
 Advanced mode;Розширений режим
 Album;Альбом
@@ -188,6 +189,8 @@ Author;Автор
 BarCode;Штрихкод
 Basic;Стисло
 Basic_Note;Примітка: Для додаткової інформації оберіть інший вигляд (Таблиця, Дерево,...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Бітова глибина
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Біт/(Пікселі*Кадри)
 BufferSize;Розмір буфера
 Cancel;Відміна
 Channel(s);Кількість каналів
+ChannelLayout;
 ChannelPositions;Позиції каналів
 Chapter(s);Розділ(-и)
 Chapters;Розділи
@@ -218,7 +222,7 @@ Choose export format;Оберіть формат для експорту інф�
 Choose file(s);Оберіть файл(-и)
 Choose filename;Оберіть ім'я файлу
 Choose language;Оберіть мову
-Choregrapher;Хореограф
+Choreographer;Хореограф
 Chroma;Хроматичність
 ChromaSubsampling;Субдискретизація хроматичності
 Close;Закрити
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Налаштування кодеку, Packet bit
 Codec_Settings_QPel;Налаштування кодеку, QPel
 Codec_Settings_Sign;Налаштування кодеку, Sign
 Codec_Url;Інтернет-адреса кодеку
+CodecConfigurationBox;
 CodecID;Ідентифікатор кодеку
 CodecID_Description;Опис кодеку
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Поручитель
 Compilation;Компіляція
 CompleteName;Повна назва
 CompletionDate;
+ComplexityIndex;
 Composer;Композитор
 Compression_Mode;Тип стиснення
 Compression_Mode_Lossless;Без втрат
@@ -336,6 +342,7 @@ File_Modified_Date;Дата останньої зміни файлу
 File_Modified_Date_Local;Остання зміна файлу (локально)
 FileExtension;Розширення файлу
 FileName;Назва файлу
+FileNameExtension;
 FileSize;Розмір файлу
 Folder;Каталог
 Folder (R);Каталог (R)
@@ -372,7 +379,7 @@ Format_Settings_PictureStructure;
 Format_Settings_PS;Налаштування формату, PS
 Format_Settings_Pulldown;Налаштування формату, Pulldown
 Format_Settings_QPel;Налаштування формату, QPel
-Format_Settings_RefFrames;Налаштування формату,RefFrames
+Format_Settings_RefFrames;Налаштування формату, RefFrames
 Format_Settings_SBR;Налаштування формату, SBR
 Format_Settings_Sign;Налаштування формату, Sign
 Format_Settings_Wrapping;
@@ -586,12 +593,13 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Перейти до сайту
-Grouping;
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
+Grouping;
 h; год.
+HDR_Format;
 Header file;Створити файл заголовку
 Height;Висота кадру
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Наявна нова версія (v%Version%) пр
 NewVersion_Question_Title;Випущено нову версію програми!
 No;Ні
 Not yet;Поки що ні
+NumberOfDynamicObjects;
 NumColors;Число кольорів
 OK;OK
 One output file per input file;Один вхідний на кожний вихідний файл
@@ -1085,6 +1094,9 @@ Tree;Дерево
 Tree & Text;Дерево і текст
 Type;
 UniqueID;Унікальний ID
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Невідомо
 Url;Посилання
 Video;Відео
@@ -1119,5 +1131,5 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;91
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;90

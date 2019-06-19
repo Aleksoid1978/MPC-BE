@@ -1749,6 +1749,8 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, const Stri
         return Get(StreamKind, StreamPos, __T("DisplayAspectRatio"), KindOfInfo, KindOfSearch);
     if (Parameter==__T("AspectRatio/String"))
         return Get(StreamKind, StreamPos, __T("DisplayAspectRatio/String"), KindOfInfo, KindOfSearch);
+    if (Parameter==__T("Choregrapher"))
+        return Get(StreamKind, StreamPos, __T("Choreographer"), KindOfInfo, KindOfSearch);
     if (Parameter==__T("Chroma"))
         return Get(StreamKind, StreamPos, __T("Colorimetry"), KindOfInfo, KindOfSearch);
     if (Parameter==__T("PlayTime"))

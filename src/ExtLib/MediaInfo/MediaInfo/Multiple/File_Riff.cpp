@@ -515,6 +515,21 @@ void File_Riff::Streams_Finish ()
             }
         }
 
+        if (StreamKind_Last==Stream_Audio && Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("MPEG Audio"))
+        {
+            Ztring Delay = Retrieve(Stream_Audio, StreamPos_Last, Audio_Delay);
+            Ztring Delay_Original = Retrieve(Stream_Audio, StreamPos_Last, Audio_Delay_Original);
+            if (!Delay.empty() && !Delay_Original.empty())
+            {
+                Fill(Stream_Audio, StreamPos_Last, Audio_Delay, Delay.To_float64()+ Delay_Original.To_float64(), 0, true);
+                Ztring Delay_Source = Retrieve(Stream_Audio, StreamPos_Last, Audio_Delay_Source);
+                Ztring Delay_Original_Source = Retrieve(Stream_Audio, StreamPos_Last, Audio_Delay_Original_Source);
+                Fill(Stream_Audio, StreamPos_Last, Audio_Delay_Source, Delay_Source+__T(" + ")+Delay_Original_Source, true);
+                Clear(Stream_Audio, StreamPos_Last, Audio_Delay_Original);
+                Clear(Stream_Audio, StreamPos_Last, Audio_Delay_Original_Source);
+            }
+        }
+
         ++Temp;
     }
 
@@ -938,7 +953,7 @@ void File_Riff::Header_Parse()
     }
 
     //Alignment
-    if (Size_Complete%2 && !IsNotWordAligned)
+    if (Size_Complete%2 && !IsNotWordAligned && File_Offset+Buffer_Offset+Element_Offset+Size_Complete<File_Size)
     {
         Size_Complete++; //Always 2-byte aligned
         Alignement_ExtraByte=1;
