@@ -1811,6 +1811,7 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 
 		m_list.SetRedraw(FALSE);
 
+		bool bWasPlaying = false;
 		std::list<CString> fns;
 
 		for (int i = (int)items.size() - 1; i >= 0; --i) {
@@ -1831,6 +1832,9 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 			}
 
 			if (curPlayList.RemoveAt(pos)) {
+				if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
+					bWasPlaying = true;
+				}
 				CloseMedia();
 			}
 			m_list.DeleteItem(items[i]);
@@ -1862,6 +1866,11 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 			shfoDelete.pFrom = filesToDelete;
 			shfoDelete.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO;
 			SHFileOperationW(&shfoDelete);
+
+			if (bWasPlaying) {
+				m_list.Invalidate();
+				m_pMainFrame->OpenCurPlaylistItem();
+			}
 		}
 	}
 }
