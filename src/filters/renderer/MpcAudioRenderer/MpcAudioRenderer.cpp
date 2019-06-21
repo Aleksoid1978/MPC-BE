@@ -3004,6 +3004,7 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 
 	m_pRenderer->WaitFinish();
 	m_pRenderer->StartReleaseTimer();
+	m_pRenderer->EndFlush();
 
 	return CRendererInputPin::EndOfStream();
 }
