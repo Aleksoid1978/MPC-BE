@@ -112,9 +112,11 @@ bool COggFile::ReadPages(OggPage& page)
 	bool bRet = Read(page);
 	if (!page.bComplete) {
 		for (;;) {
+			const auto pos = GetPos();
 			OggPage page_next;
 			bRet = Read(page_next);
-			if (!bRet) {
+			if (!bRet || page_next.m_hdr.number_page_segments != page.m_hdr.number_page_segments) {
+				Seek(pos);
 				break;
 			}
 			page.insert(page.cend(), page_next.cbegin(), page_next.cend());
