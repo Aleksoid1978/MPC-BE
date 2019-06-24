@@ -216,7 +216,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 	std::vector<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
-	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
+	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
 	if (!s.bKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
@@ -228,7 +228,13 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 		return;
 	}
 
-	m_mrucombo2.SetWindowTextW(fd.GetPathName());
+	std::list<CString> dubfns;
+	POSITION pos = fd.GetStartPosition();
+	while (pos) {
+		dubfns.push_back(fd.GetNextPathName(pos));
+	}
+	const CString path = Implode(dubfns, L'|');
+	m_mrucombo2.SetWindowTextW(path.GetString());
 }
 
 void COpenDlg::OnBnClickedOk()
@@ -239,10 +245,13 @@ void COpenDlg::OnBnClickedOk()
 	m_fns.push_back(m_path);
 
 	if (m_mrucombo2.IsWindowEnabled() && !m_path2.IsEmpty()) {
-		m_fns.push_back(m_path2);
-
-		if (::PathFileExistsW(m_path2)) {
-			AfxGetMainFrame()->AddAudioPathsAddons(m_path2.GetString());
+		std::list<CString> dubfns;
+		Explode(m_path2, dubfns, L'|');
+		for (const auto& fn : dubfns) {
+			m_fns.push_back(fn);
+		}
+		if (::PathFileExistsW(dubfns.front())) {
+			AfxGetMainFrame()->AddAudioPathsAddons(dubfns.front().GetString());
 		}
 	}
 
