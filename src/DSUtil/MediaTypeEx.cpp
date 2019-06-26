@@ -679,6 +679,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 			sl.emplace_back(str);
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
 				// http://msdn.microsoft.com/en-us/library/windows/desktop/ms698715%28v=vs.85%29.aspx
+				const LPCSTR chromasubsampling[] = { nullptr, "MPEG-1", nullptr, nullptr, nullptr, "MPEG-2", "PAL DV", "Cosited" };
 				const LPCSTR nominalrange[] = { nullptr, "0-255", "16-235", "48-208" };
 				const LPCSTR transfermatrix[] = { nullptr, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", nullptr, nullptr, "YCgCo" };
 				const LPCSTR lighting[] = { nullptr, "bright", "office", "dim", "dark" };
@@ -694,6 +695,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 				exfmt.value = vih2.dwControlFlags;
 
 				str.Format(L"- VideoChromaSubsampling: %u", exfmt.VideoChromaSubsampling);
+				ADD_PARAM_DESC(str, exfmt.VideoChromaSubsampling, chromasubsampling);
 				sl.emplace_back(str);
 
 				str.Format(L"- NominalRange          : %u", exfmt.NominalRange);
