@@ -1009,7 +1009,6 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 		}
 		audioframe->channels   = mp4a_channels[channel_index];
 		audioframe->samples    = ((buf[6] & 0x03) + 1) * 1024;
-		audioframe->param2     = 0;
 	}
 
 	return frame_size;
