@@ -504,7 +504,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 		h.version = BitRead(1);
 		h.layer = BitRead(2);
 		h.fcrc = BitRead(1);
-		h.profile = BitRead(2);
+		h.profile = BitRead(2) + 1;
 		h.freq = BitRead(4);
 		h.privatebit = BitRead(1);
 		h.channel_index = BitRead(3);
@@ -526,7 +526,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 			h.channels = channels[h.channel_index];
 		}
 
-		if (pmt && h.channel_index == 0 && h.profile == 1 && !h.no_raw_data_blocks_in_frame && len > (h.fcrc == 0 ? 9 : 7)) { // AAC LC only
+		if (pmt && h.channel_index == 0 && h.profile == 2 && !h.no_raw_data_blocks_in_frame && len > (h.fcrc == 0 ? 9 : 7)) { // AAC LC only
 			const __int64 adts_header_end = GetPos();
 			const BYTE element_type = BitRead(3);
 			if (element_type == 0x05) { // program config element
