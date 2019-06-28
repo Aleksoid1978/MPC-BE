@@ -2424,6 +2424,9 @@ static int decode_extension_payload(AACContext *ac, GetBitContext *gb, int cnt,
 {
     int crc_flag = 0;
     int res = cnt;
+    // ==> Start patch MPC
+    int ps = 0;
+    // ==> End patch MPC
     int type = get_bits(gb, 4);
 
     if (ac->avctx->debug & FF_DEBUG_STARTCODE)
@@ -2461,7 +2464,14 @@ static int decode_extension_payload(AACContext *ac, GetBitContext *gb, int cnt,
             ac->oc[1].m4ac.sbr = 1;
             ac->avctx->profile = FF_PROFILE_AAC_HE;
         }
+        // ==> Start patch MPC
+        ps = ac->oc[1].m4ac.ps;
         res = AAC_RENAME(ff_decode_sbr_extension)(ac, &che->sbr, gb, crc_flag, cnt, elem_type);
+        if (!ps && ac->oc[1].m4ac.ps == 1 && ac->avctx->channels == 1 && ac->avctx->profile == FF_PROFILE_AAC_HE_V2) {
+            output_configure(ac, ac->oc[1].layout_map, ac->oc[1].layout_map_tags,
+                             ac->oc[1].status, 1);
+        }
+        // ==> End patch MPC
         break;
     case EXT_DYNAMIC_RANGE:
         res = decode_dynamic_range(&ac->che_drc, gb);
