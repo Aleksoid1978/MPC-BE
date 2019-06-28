@@ -744,10 +744,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 
 							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
 							if (!d.Parse(tmp.GetString()).HasParseError()) {
-								const auto& t = d[L"t"];
-								if (t.IsString()) {
-									m_title = t.GetString();
-								}
+								m_title = (d.HasMember(L"t") && d[L"t"].IsString()) ? d[L"t"].GetString() : ((d.HasMember(L"title") && d[L"title"].IsString()) ? d[L"title"].GetString() : m_title);
 							}
 						}
 					}
