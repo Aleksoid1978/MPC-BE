@@ -1039,7 +1039,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		*phr = S_OK;
 	}
 
-	if (m_pOutput)	{
+	if (m_pOutput) {
 		delete m_pOutput;
 	}
 	m_pOutput = DNew CVideoDecOutputPin(L"CVideoDecOutputPin", this, phr, L"Output");
@@ -4095,6 +4095,8 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 
 	return *p;
 }
+
+// CVideoDecOutputPin
 
 CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CBaseVideoOutputPin(pObjectName, pFilter, phr, pName)
