@@ -568,8 +568,6 @@ void CMpeg2DecFilter::SetDeinterlaceMethod()
 		}
 	}
 
-	const CMediaType& mt = m_pOutput->CurrentMediaType();
-
 	if (m_fInterlaced) {
 		m_fb.di = DIWeave;
 	} else {
@@ -833,7 +831,7 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = nullptr;
-	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame))
+	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame, &m_dxvaExtFormat))
 			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
