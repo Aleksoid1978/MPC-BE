@@ -532,8 +532,10 @@ void CMpeg2DecFilter::InputTypeChanged()
 		pSequenceHeader = ((MPEG1VIDEOINFO*)mt.Format())->bSequenceHeader;
 		cbSequenceHeader = ((MPEG1VIDEOINFO*)mt.Format())->cbSequenceHeader;
 	} else if (mt.formattype == FORMAT_MPEG2_VIDEO) {
-		pSequenceHeader = (BYTE*)((MPEG2VIDEOINFO*)mt.Format())->dwSequenceHeader;
-		cbSequenceHeader = ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader;
+		MPEG2VIDEOINFO* m2vi = (MPEG2VIDEOINFO*)mt.Format();
+		pSequenceHeader = (BYTE*)m2vi->dwSequenceHeader;
+		cbSequenceHeader = m2vi->cbSequenceHeader;
+		m_dxvaExtFormat.value = m2vi->hdr.dwControlFlags;
 	}
 
 	m_dec->mpeg2_close();
