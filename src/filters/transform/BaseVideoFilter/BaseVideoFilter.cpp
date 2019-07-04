@@ -414,7 +414,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
 	}
 
-	if (m_dxvaExtFormat.value && pmt->subtype != MEDIASUBTYPE_RGB32) {
+	if (m_dxvaExtFormat.value && pmt->subtype != MEDIASUBTYPE_RGB32 && pmt->subtype != MEDIASUBTYPE_RGB48) {
 		vih2->dwControlFlags = m_dxvaExtFormat.value;
 	}
 
