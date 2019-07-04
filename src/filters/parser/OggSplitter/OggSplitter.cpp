@@ -1478,13 +1478,13 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 			CMediaType& mt = m_mts[0];
 			int size = p->size();
 			//ASSERT(size <= 0xffff);
-			MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.ReallocFormatBuffer(
+			MPEG2VIDEOINFO* m2vi = (MPEG2VIDEOINFO*)mt.ReallocFormatBuffer(
 								   FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) +
 								   ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader +
 								   2 + size);
-			*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size >> 8) | (size << 8);
-			memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->data(), size);
-			vih->cbSequenceHeader += 2 + size;
+			*(WORD*)((BYTE*)m2vi->dwSequenceHeader + m2vi->cbSequenceHeader) = (size >> 8) | (size << 8);
+			memcpy((BYTE*)m2vi->dwSequenceHeader + m2vi->cbSequenceHeader + 2, p->data(), size);
+			m2vi->cbSequenceHeader += 2 + size;
 
 			m_initpackets.emplace_back(p);
 		}

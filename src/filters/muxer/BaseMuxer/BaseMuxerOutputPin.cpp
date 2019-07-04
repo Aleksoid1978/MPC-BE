@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -145,12 +145,12 @@ void CBaseMuxerRawOutputPin::MuxHeader(const CMediaType& mt)
 	const BYTE utf8bom[3] = {0xef, 0xbb, 0xbf};
 
 	if ((mt.subtype == FOURCCMap('1CVA') || mt.subtype == FOURCCMap('1cva')) && mt.formattype == FORMAT_MPEG2_VIDEO) {
-		MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.Format();
+		MPEG2VIDEOINFO* m2vi = (MPEG2VIDEOINFO*)mt.Format();
 
-		for (DWORD i = 0; i < vih->cbSequenceHeader - 2; i += 2) {
+		for (DWORD i = 0; i < m2vi->cbSequenceHeader - 2; i += 2) {
 			pBitStream->BitWrite(0x00000001, 32);
-			WORD size = (((BYTE*)vih->dwSequenceHeader)[i + 0] << 8) | ((BYTE*)vih->dwSequenceHeader)[i + 1];
-			pBitStream->ByteWrite(&((BYTE*)vih->dwSequenceHeader)[i + 2], size);
+			WORD size = (((BYTE*)m2vi->dwSequenceHeader)[i + 0] << 8) | ((BYTE*)m2vi->dwSequenceHeader)[i + 1];
+			pBitStream->ByteWrite(&((BYTE*)m2vi->dwSequenceHeader)[i + 2], size);
 			i += size;
 		}
 	} else if (mt.subtype == MEDIASUBTYPE_UTF8) {
