@@ -2217,7 +2217,7 @@ CMediaType CMpaDecFilter::CreateMediaTypeHDMI(WORD type)
 	switch(type) {
 	case IEC61937_DTSHD:
 		wfex.Format.nChannels = m_DTSHDProfile == DCA_PROFILE_HD_HRA ? 2 : 8;
-		wfex.dwChannelMask    = KSAUDIO_SPEAKER_7POINT1_SURROUND;
+		wfex.dwChannelMask    = m_DTSHDProfile == DCA_PROFILE_HD_HRA ? KSAUDIO_SPEAKER_STEREO : KSAUDIO_SPEAKER_7POINT1_SURROUND;
 		subtype = KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD;
 		break;
 	case IEC61937_EAC3:
