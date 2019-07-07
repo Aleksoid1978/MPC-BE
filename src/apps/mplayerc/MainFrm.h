@@ -82,6 +82,7 @@ using namespace MediaInfoLib;
 class CFullscreenWnd;
 struct ID3DFullscreenControl;
 struct TunerScanData;
+class CComPropertySheet;
 
 enum PMODE {
 	PM_NONE,
@@ -1385,4 +1386,6 @@ protected:
 	bool		CanSwitchD3DFS();
 
 	bool		m_bAltDownClean = false;
+
+	CComPropertySheet* m_ps = nullptr;
 };

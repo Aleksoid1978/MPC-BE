@@ -8357,8 +8357,10 @@ void CMainFrame::OnPlayFilters(UINT nID)
 	}
 
 	if (ps.GetPageCount() > 0) {
+		m_ps = &ps;
 		ps.DoModal();
 		OpenSetupStatusBar();
+		m_ps = nullptr;
 	}
 }
 
@@ -16876,6 +16878,10 @@ bool CMainFrame::DisplayChange()
 
 void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 {
+	if (m_ps) {
+		m_ps->EndDialog(0);
+	}
+
 	if (m_eMediaLoadState == MLS_CLOSING || m_eMediaLoadState == MLS_CLOSED) {
 		return;
 	}
