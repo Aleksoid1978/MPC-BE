@@ -2901,7 +2901,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_MPEG1;
 			break;
 		case AVCHROMA_LOC_TOPLEFT:
-			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_DV_PAL;
+			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_Cosited;
 			break;
 	}
 
