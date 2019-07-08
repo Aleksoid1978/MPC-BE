@@ -7724,7 +7724,7 @@ void CMainFrame::OnPlayPause()
 	OAFilterState fs = GetMediaState();
 
 	if (m_eMediaLoadState == MLS_LOADED && fs == State_Stopped) {
-		MoveVideoWindow();
+		MoveVideoWindow(false, true);
 	}
 
 	if (m_eMediaLoadState == MLS_LOADED) {
