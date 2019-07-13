@@ -5563,19 +5563,6 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 		return;
 	}
 
-	if (m_wndPlaylistBar.IsWindowVisible()) {
-		if (slFiles.size() == 1) {
-			const CString& path = slFiles.front();
-			if (OpenYoutubePlaylist(path, TRUE)) {
-				return;
-			}
-		}
-		AddSimilarFiles(slFiles);
-
-		m_wndPlaylistBar.DropFiles(slFiles);
-		return;
-	}
-
 	BOOL bIsValidSubExtAll = TRUE;
 
 	for (const auto& fname : slFiles) {
@@ -5625,6 +5612,19 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 			}
 		}
 
+		return;
+	}
+
+	if (m_wndPlaylistBar.IsWindowVisible()) {
+		if (slFiles.size() == 1) {
+			const CString& path = slFiles.front();
+			if (OpenYoutubePlaylist(path, TRUE)) {
+				return;
+			}
+		}
+		AddSimilarFiles(slFiles);
+
+		m_wndPlaylistBar.DropFiles(slFiles);
 		return;
 	}
 
