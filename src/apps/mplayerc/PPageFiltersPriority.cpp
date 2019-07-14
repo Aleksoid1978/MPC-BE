@@ -120,7 +120,6 @@ void CPPageFiltersPriority::Init()
 	m_UDP.ResetContent();
 	m_UDP.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_UDP.SetCurSel(0);
-	m_UDP.EnableWindow(FALSE);
 
 	m_AVI.ResetContent();
 	m_AVI.AddString(ResStr(IDS_AG_DEFAULT_L));
