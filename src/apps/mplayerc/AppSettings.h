@@ -421,7 +421,7 @@ public:
 		SetDefault();
 	}
 	void SetDefault() {
-		static LPCWSTR formats[] = {L"http", L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
+		static LPCWSTR formats[] = {L"http", L"udp", L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
 
 		values.clear();
 		for (const auto& format : formats) {

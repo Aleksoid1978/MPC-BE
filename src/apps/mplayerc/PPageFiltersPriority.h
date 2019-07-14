@@ -38,7 +38,7 @@ public:
 
 	enum { IDD = IDD_PPAGEFILTERSPRIORITY };
 
-	CComboBox m_HTTP, m_AVI, m_MKV, m_MPEGTS, m_MPEG, m_MP4, m_FLV, m_WMV;
+	CComboBox m_HTTP, m_UDP, m_AVI, m_MKV, m_MPEGTS, m_MPEG, m_MP4, m_FLV, m_WMV;
 
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 
