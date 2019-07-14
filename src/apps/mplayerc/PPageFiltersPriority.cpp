@@ -41,13 +41,14 @@ void CPPageFiltersPriority::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO1, m_HTTP);
-	DDX_Control(pDX, IDC_COMBO2, m_AVI);
-	DDX_Control(pDX, IDC_COMBO3, m_MKV);
-	DDX_Control(pDX, IDC_COMBO4, m_MPEGTS);
-	DDX_Control(pDX, IDC_COMBO5, m_MPEG);
-	DDX_Control(pDX, IDC_COMBO6, m_MP4);
-	DDX_Control(pDX, IDC_COMBO7, m_FLV);
-	DDX_Control(pDX, IDC_COMBO8, m_WMV);
+	DDX_Control(pDX, IDC_COMBO2, m_UDP);
+	DDX_Control(pDX, IDC_COMBO3, m_AVI);
+	DDX_Control(pDX, IDC_COMBO4, m_MKV);
+	DDX_Control(pDX, IDC_COMBO5, m_MPEGTS);
+	DDX_Control(pDX, IDC_COMBO6, m_MPEG);
+	DDX_Control(pDX, IDC_COMBO7, m_MP4);
+	DDX_Control(pDX, IDC_COMBO8, m_FLV);
+	DDX_Control(pDX, IDC_COMBO9, m_WMV);
 }
 
 BEGIN_MESSAGE_MAP(CPPageFiltersPriority, CPPageBase)
@@ -78,6 +79,9 @@ BOOL CPPageFiltersPriority::OnApply()
 	s.FiltersPrioritySettings.SetDefault();
 	if (POSITION pos = (POSITION)m_HTTP.GetItemDataPtr(m_HTTP.GetCurSel())) {
 		s.FiltersPrioritySettings.values[L"http"] = m_pFilters.GetAt(pos)->clsid;
+	}
+	if (POSITION pos = (POSITION)m_UDP.GetItemDataPtr(m_UDP.GetCurSel())) {
+		s.FiltersPrioritySettings.values[L"udp"] = m_pFilters.GetAt(pos)->clsid;
 	}
 
 	if (POSITION pos = (POSITION)m_AVI.GetItemDataPtr(m_AVI.GetCurSel())) {
@@ -112,6 +116,11 @@ void CPPageFiltersPriority::Init()
 	m_HTTP.ResetContent();
 	m_HTTP.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_HTTP.SetCurSel(0);
+
+	m_UDP.ResetContent();
+	m_UDP.AddString(ResStr(IDS_AG_DEFAULT_L));
+	m_UDP.SetCurSel(0);
+	m_UDP.EnableWindow(FALSE);
 
 	m_AVI.ResetContent();
 	m_AVI.AddString(ResStr(IDS_AG_DEFAULT_L));
@@ -203,6 +212,12 @@ void CPPageFiltersPriority::Init()
 			m_HTTP.SetItemDataPtr(i, pos2);
 			if (s.FiltersPrioritySettings.values[L"http"] == clsid) {
 				m_HTTP.SetCurSel(i);
+			}
+
+			i = m_UDP.AddString(name);
+			m_UDP.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[L"udp"] == clsid) {
+				m_UDP.SetCurSel(i);
 			}
 		}
 
