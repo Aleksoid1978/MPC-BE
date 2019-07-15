@@ -61,7 +61,7 @@ HRESULT CFilter::Init(const double dRate, const WAVEFORMATEX* wfe)
 	Flush();
 
 	CheckPointer(wfe, E_FAIL);
-	if (dRate == 1.0) {
+	if (dRate == 1.0 || dRate < 0.25 || dRate > 100.0) {
 		return E_FAIL;
 	}
 
