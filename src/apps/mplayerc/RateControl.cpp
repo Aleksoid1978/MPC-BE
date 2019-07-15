@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "RateControl.h"
 
-const static double s_autorates[] = { 0.125, 0.25, 0.5, 1.0, 1.2, 1.5, 2.0, 4.0, 8.0 };
+const static double s_autorates[] = { 0.125, 0.25, 0.5, 1.0, 1.2, 1.5, 2.0, 4.0, 8.0, 16.0 };
 const static double s_dvdautorates[] = { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 };
 
 double GetNextRate(double rate, int step_pct) // 0..100%

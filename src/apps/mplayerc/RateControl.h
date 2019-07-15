@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #pragma once
 
 #define MINRATE 0.125
-#define MAXRATE 8.0
+#define MAXRATE 16.0
 
 #define MINDVDRATE -16.0
 #define MAXDVDRATE 16.0

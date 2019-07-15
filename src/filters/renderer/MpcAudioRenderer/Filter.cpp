@@ -127,7 +127,7 @@ HRESULT CFilter::Init(const double dRate, const WAVEFORMATEX* wfe)
 										m_pFilterGraph);
 	CheckRet(ret);
 
-	if (dRate < 0.5 || dRate > 2.0) {
+	if (dRate < 0.5) {
 		double _dRate = sqrt(dRate);
 
 		const AVFilter* atempo = avfilter_get_by_name("atempo");
