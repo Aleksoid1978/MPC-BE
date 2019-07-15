@@ -841,7 +841,7 @@ STDMETHODIMP CMpcAudioRenderer::SetRate(double dRate)
 {
 	CAutoLock cInterfaceLock(&m_InterfaceLock);
 
-	if (dRate < 0.25 || dRate > 4.0 || m_bIsBitstream) {
+	if (dRate < 0.25 || dRate > 16.0 || m_bIsBitstream) {
 		return VFW_E_UNSUPPORTED_AUDIO;
 	}
 
