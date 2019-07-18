@@ -408,7 +408,12 @@ static int fix_coding_method_array(int sb, int channels,
             }
             for (k = 0; k < run; k++) {
                 if (j + k < 128) {
-                    if (coding_method[ch][sb + (j + k) / 64][(j + k) % 64] > coding_method[ch][sb][j]) {
+                    int sbjk = sb + (j + k) / 64;
+                    if (sbjk > 29) {
+                        SAMPLES_NEEDED
+                        continue;
+                    }
+                    if (coding_method[ch][sbjk][(j + k) % 64] > coding_method[ch][sb][j]) {
                         if (k > 0) {
                             SAMPLES_NEEDED
                             //not debugged, almost never used
@@ -1284,6 +1289,10 @@ static void qdm2_fft_decode_tones(QDM2Context *q, int duration,
             }
             offset += (n - 2);
         } else {
+            if (local_int_10 <= 2) {
+                av_log(NULL, AV_LOG_ERROR, "qdm2_fft_decode_tones() stuck\n");
+                return;
+            }
             offset += qdm2_get_vlc(gb, &vlc_tab_fft_tone_offset[local_int_8], 1, 2);
             while (offset >= (local_int_10 - 1)) {
                 offset       += (1 - (local_int_10 - 1));
@@ -1695,12 +1704,18 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
     s->group_size = bytestream2_get_be32(&gb);
     s->fft_size = bytestream2_get_be32(&gb);
     s->checksum_size = bytestream2_get_be32(&gb);
-    if (s->checksum_size >= 1U << 28) {
-        av_log(avctx, AV_LOG_ERROR, "data block size too large (%u)\n", s->checksum_size);
+    if (s->checksum_size >= 1U << 28 || !s->checksum_size) {
+        av_log(avctx, AV_LOG_ERROR, "data block size invalid (%u)\n", s->checksum_size);
         return AVERROR_INVALIDDATA;
     }
 
     s->fft_order = av_log2(s->fft_size) + 1;
+
+    // Fail on unknown fft order
+    if ((s->fft_order < 7) || (s->fft_order > 9)) {
+        avpriv_request_sample(avctx, "Unknown FFT order %d", s->fft_order);
+        return AVERROR_PATCHWELCOME;
+    }
 
     // something like max decodable tones
     s->group_order = av_log2(s->group_size) + 1;
@@ -1735,11 +1750,6 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
     else
         s->coeff_per_sb_select = 2;
 
-    // Fail on unknown fft order
-    if ((s->fft_order < 7) || (s->fft_order > 9)) {
-        avpriv_request_sample(avctx, "Unknown FFT order %d", s->fft_order);
-        return AVERROR_PATCHWELCOME;
-    }
     if (s->fft_size != (1 << (s->fft_order - 1))) {
         av_log(avctx, AV_LOG_ERROR, "FFT size %d not power of 2.\n", s->fft_size);
         return AVERROR_INVALIDDATA;

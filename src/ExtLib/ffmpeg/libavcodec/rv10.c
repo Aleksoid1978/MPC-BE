@@ -388,9 +388,9 @@ static int rv20_decode_picture_header(RVDecContext *rv)
             // attempt to keep aspect during typical resolution switches
             if (!old_aspect.num)
                 old_aspect = (AVRational){1, 1};
-            if (2 * new_w * s->height == new_h * s->width)
+            if (2 * (int64_t)new_w * s->height == (int64_t)new_h * s->width)
                 s->avctx->sample_aspect_ratio = av_mul_q(old_aspect, (AVRational){2, 1});
-            if (new_w * s->height == 2 * new_h * s->width)
+            if ((int64_t)new_w * s->height == 2 * (int64_t)new_h * s->width)
                 s->avctx->sample_aspect_ratio = av_mul_q(old_aspect, (AVRational){1, 2});
 
             ret = ff_set_dimensions(s->avctx, new_w, new_h);
@@ -646,7 +646,7 @@ static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
 
         // Repeat the slice end check from ff_h263_decode_mb with our active
         // bitstream size
-        if (ret != SLICE_ERROR) {
+        if (ret != SLICE_ERROR && active_bits_size >= get_bits_count(&s->gb)) {
             int v = show_bits(&s->gb, 16);
 
             if (get_bits_count(&s->gb) + 16 > active_bits_size)
