@@ -708,12 +708,14 @@ void File_Riff::AIFF_COMM()
 
     int32u numSampleFrames;
     int16u numChannels, sampleSize;
-    float80 sampleRate;
+    float80 sampleRate80;
+    float64 sampleRate;
     //Parsing
     Get_B2 (numChannels,                                    "numChannels");
     Get_B4 (numSampleFrames,                                "numSampleFrames");
     Get_B2 (sampleSize,                                     "sampleSize");
-    Get_BF10(sampleRate,                                    "sampleRate");
+    Get_BF10(sampleRate80,                                  "sampleRate");
+    sampleRate=(float64)sampleRate80;
     if (Data_Remain()) //AIFC
     {
         int32u compressionType;

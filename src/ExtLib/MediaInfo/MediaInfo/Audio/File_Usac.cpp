@@ -969,6 +969,11 @@ void File_Aac::UsacConfigExtension()
         int32u usacConfigExtType, usacConfigExtLength;
         escapedValue(usacConfigExtType, 4, 8, 16,               "usacConfigExtType"); Param_Info1C(usacConfigExtType<UsacConfigExtension_usacConfigExtType_Size && UsacConfigExtension_usacConfigExtType[usacConfigExtType], UsacConfigExtension_usacConfigExtType[usacConfigExtType]);
         escapedValue(usacConfigExtLength, 4, 8, 16,             "usacExtElementConfigLength");
+        size_t End;
+        if (Data_BS_Remain()>usacConfigExtLength*8)
+            End=Data_BS_Remain()-usacConfigExtLength*8;
+        else
+            End=0; //Problem
 
         switch (usacConfigExtType)
         {
@@ -986,6 +991,15 @@ void File_Aac::UsacConfigExtension()
                 if (usacConfigExtLength)
                     Skip_BS(usacConfigExtLength *8,             "(Unknown)");
                 break;
+        }
+
+        if (Data_BS_Remain()>End)
+        {
+            size_t Size=Data_BS_Remain()-End;
+            int8u Padding=1;
+            if (Size<8)
+                Peek_S1((int8u)Size, Padding);
+            Skip_BS(Data_BS_Remain()-End,                           Padding?"(Unknown)":"Padding");
         }
         Element_End0();
     }

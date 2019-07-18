@@ -78,7 +78,7 @@ File_Png::File_Png()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //Temp
     Signature_Parsed=false;

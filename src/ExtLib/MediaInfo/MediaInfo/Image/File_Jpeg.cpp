@@ -260,7 +260,7 @@ File_Jpeg::File_Jpeg()
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     StreamKind=Stream_Image;

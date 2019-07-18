@@ -44,7 +44,7 @@ File_Vp8::File_Vp8()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE

@@ -53,7 +53,7 @@ File_Y4m::File_Y4m()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
     Frame_Count_NotParsedIncluded=0;
 
     //Temp

@@ -158,6 +158,7 @@
     <ClInclude Include="MediaInfo\Video\File_Aic.h" />
     <ClInclude Include="MediaInfo\Video\File_Av1.h" />
     <ClInclude Include="MediaInfo\Video\File_Canopus.h" />
+    <ClInclude Include="MediaInfo\Video\File_DolbyVisionMetadata.h" />
     <ClInclude Include="MediaInfo\Video\File_Ffv1.h" />
     <ClInclude Include="MediaInfo\Video\File_Hevc.h" />
     <ClInclude Include="MediaInfo\Video\File_HuffYuv.h" />
@@ -501,6 +502,7 @@
     <ClCompile Include="MediaInfo\Video\File_AvsV.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Canopus.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Dirac.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_DolbyVisionMetadata.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Ffv1.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Flic.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Fraps.cpp" />

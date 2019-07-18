@@ -394,7 +394,7 @@ File_Dts::File_Dts()
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=32*1024;
     PTS_DTS_Needed=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     Frame_Count_Valid=0;

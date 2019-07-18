@@ -175,7 +175,6 @@ protected :
     int16u  frameLength[128];
     int32u  MuxSlotLengthBytes[128];
     int32u  otherDataLenBits;
-    bool    otherDataPresent;
     bool    allStreamsSameTimeFraming;
     int8u   audioObjectType;
     int8u   extensionAudioObjectType;

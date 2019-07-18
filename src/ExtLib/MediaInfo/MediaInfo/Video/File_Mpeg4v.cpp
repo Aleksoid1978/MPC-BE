@@ -246,7 +246,7 @@ File_Mpeg4v::File_Mpeg4v()
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     Frame_Count_Valid=0;
@@ -390,11 +390,11 @@ void File_Mpeg4v::Synched_Init()
     //Default stream values
     Streams.resize(0x100);
     Streams[0x00].Searching_Payload=true; //video_object_start
-    if (!IsRawStream) //TODO: better detection in all cases. Currently there are too many false-positives if we test all files
+    if (StreamSource!=IsStream) //TODO: better detection in all cases. Currently there are too many false-positives if we test all files
         Streams[0x20].Searching_Payload=true; //video_object_layer_start
     Streams[0xB0].Searching_Payload=true; //visual_object_sequence_start
     NextCode_Add(0x00); //video_object_start
-    if (!IsRawStream) //TODO: better detection in all cases. Currently there are too many false-positives if we test all files
+    if (StreamSource!=IsStream) //TODO: better detection in all cases. Currently there are too many false-positives if we test all files
         NextCode_Add(0x20); //video_object_layer_start
     NextCode_Add(0xB0); //visual_object_sequence_start
     for (int8u Pos=0xFF; Pos>=0xB9; Pos--)

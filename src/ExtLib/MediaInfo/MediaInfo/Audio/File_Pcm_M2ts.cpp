@@ -99,7 +99,7 @@ File_Pcm_M2ts::File_Pcm_M2ts()
 {
     //Configuration
     ParserName="PCM M2TS";
-    IsRawStream=true;
+    StreamSource=IsStream;
     PTS_DTS_Needed=true;
 }
 

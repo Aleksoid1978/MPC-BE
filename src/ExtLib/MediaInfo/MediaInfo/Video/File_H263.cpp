@@ -130,7 +130,7 @@ File_H263::File_H263()
     #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     Frame_Count_Valid=0;

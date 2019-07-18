@@ -85,7 +85,7 @@ private :
     int8u   HVN;
     int8u   CLV;
     bool    CLF;
-    bool    SSC;
+    int8u   SSC;
     bool    CRCF;
     bool    SST;
     bool    VBR;

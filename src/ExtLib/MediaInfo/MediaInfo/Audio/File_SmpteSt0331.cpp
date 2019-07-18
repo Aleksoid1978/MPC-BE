@@ -55,7 +55,7 @@ File_SmpteSt0331::File_SmpteSt0331()
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
     PTS_DTS_Needed=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     QuantizationBits=0;

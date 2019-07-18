@@ -92,7 +92,7 @@ File_Av1::File_Av1()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     Frame_Count_Valid=0;

@@ -382,7 +382,7 @@ File_Mpeg4_Descriptors::File_Mpeg4_Descriptors()
         ParserIDs[0]=MediaInfo_Parser_Mpeg4_Desc;
         StreamIDs_Width[0]=0;
     #endif //MEDIAINFO_EVENTS
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     KindOfStream=Stream_Max;

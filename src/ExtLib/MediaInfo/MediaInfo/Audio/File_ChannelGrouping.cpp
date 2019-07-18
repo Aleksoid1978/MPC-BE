@@ -54,7 +54,7 @@ File_ChannelGrouping::File_ChannelGrouping()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(0); //Container1
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //In
     BitDepth=0;

@@ -156,7 +156,7 @@ void File__Analyze::Streams_Finish_Global()
     {
         if (Frame_Count_NotParsedIncluded!=(int64u)-1 && File_Offset+Buffer_Size==File_Size)
             Fill(Stream_Video, 0, Video_FrameCount, Frame_Count_NotParsedIncluded);
-        else if (Config->File_Names.size()>1 && IsRawStream)
+        else if (Config->File_Names.size()>1 && StreamSource==IsStream)
             Fill(Stream_Video, 0, Video_FrameCount, Config->File_Names.size());
         #if MEDIAINFO_IBIUSAGE
         else
@@ -343,7 +343,7 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
         return;
 
     Config->File_IsImageSequence=true;
-    if (IsRawStream)
+    if (StreamSource==IsStream)
         Frame_Count_NotParsedIncluded=Pos_Base;
     #if MEDIAINFO_DEMUX
         float64 Demux_Rate=Config->Demux_Rate_Get();
@@ -1196,7 +1196,7 @@ void File__Analyze::Streams_Finish_InterStreams()
         double TextBitRate_Ratio   =0.98;  //Default container overhead=2%
         int32u TextBitRate_Minus   =2000;  //2000 bps because of a "classic" stream overhead
         //Specific value depends of Container
-        if (IsRawStream)
+        if (StreamSource==IsStream)
         {
             GeneralBitRate_Ratio=1;
             GeneralBitRate_Minus=0;
@@ -1309,7 +1309,7 @@ void File__Analyze::Streams_Finish_InterStreams()
                 if (Duration)
                 {
                     int64u StreamSize=float64_int64s(VideoBitRate/8*Duration/1000);
-                    if (IsRawStream && File_Size!=(int64u)-1 && StreamSize>=File_Size*0.99)
+                    if (StreamSource==IsStream && File_Size!=(int64u)-1 && StreamSize>=File_Size*0.99)
                         StreamSize=File_Size;
                     Fill(Stream_Video, 0, Video_StreamSize, StreamSize);
                 }
@@ -1454,6 +1454,12 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
          && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num).empty()
          && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty())
             Fill(Stream_Video, StreamPos, Video_FrameRate_Original_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den)+__T(")"), __T(" fps")), true);
+        if (StreamKind==Stream_Other
+         && Parameter==Other_FrameRate
+         && !Retrieve(StreamKind, StreamPos, Other_FrameRate).empty()
+         && !Retrieve(StreamKind, StreamPos, Other_FrameRate_Num).empty()
+         && !Retrieve(StreamKind, StreamPos, Other_FrameRate_Den).empty())
+            Fill(Stream_Other, StreamPos, Other_FrameRate_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Other_FrameRate)+__T(" (")+Retrieve(StreamKind, StreamPos, Other_FrameRate_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Other_FrameRate_Den)+__T(")"), __T(" fps")), true);
     }
 
     //BitRate_Mode / OverallBitRate_Mode

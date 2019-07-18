@@ -50,7 +50,7 @@ File_Teletext::File_Teletext()
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
     PTS_DTS_Needed=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
     MustSynchronize=true;
 
     //In
