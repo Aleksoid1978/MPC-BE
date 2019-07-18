@@ -487,7 +487,7 @@ static void parse_bs_info(const uint32_t bs_info, unsigned int n,
 static int32_t decode_rice(GetBitContext *gb, unsigned int k)
 {
     int max = get_bits_left(gb) - k;
-    int q   = get_unary(gb, 0, max);
+    unsigned q = get_unary(gb, 0, max);
     int r   = k ? get_bits1(gb) : !(q & 1);
 
     if (k > 1) {
@@ -767,8 +767,8 @@ static int read_var_block_data(ALSDecContext *ctx, ALSBlockData *bd)
         if (*bd->use_ltp) {
             int r, c;
 
-            bd->ltp_gain[0]   = decode_rice(gb, 1) << 3;
-            bd->ltp_gain[1]   = decode_rice(gb, 2) << 3;
+            bd->ltp_gain[0]   = decode_rice(gb, 1) * 8;
+            bd->ltp_gain[1]   = decode_rice(gb, 2) * 8;
 
             r                 = get_unary(gb, 0, 4);
             c                 = get_bits(gb, 2);
@@ -779,8 +779,8 @@ static int read_var_block_data(ALSDecContext *ctx, ALSBlockData *bd)
 
             bd->ltp_gain[2]   = ltp_gain_values[r][c];
 
-            bd->ltp_gain[3]   = decode_rice(gb, 2) << 3;
-            bd->ltp_gain[4]   = decode_rice(gb, 1) << 3;
+            bd->ltp_gain[3]   = decode_rice(gb, 2) * 8;
+            bd->ltp_gain[4]   = decode_rice(gb, 1) * 8;
 
             *bd->ltp_lag      = get_bits(gb, ctx->ltp_lag_length);
             *bd->ltp_lag     += FFMAX(4, opt_order + 1);
@@ -789,14 +789,20 @@ static int read_var_block_data(ALSDecContext *ctx, ALSBlockData *bd)
 
     // read first value and residuals in case of a random access block
     if (bd->ra_block) {
+        start = FFMIN(opt_order, 3);
+        av_assert0(sb_length <= sconf->frame_length);
+        if (sb_length <= start) {
+            // opt_order or sb_length may be corrupted, either way this is unsupported and not well defined in the specification
+            av_log(avctx, AV_LOG_ERROR, "Sub block length smaller or equal start\n");
+            return AVERROR_PATCHWELCOME;
+        }
+
         if (opt_order)
             bd->raw_samples[0] = decode_rice(gb, avctx->bits_per_raw_sample - 4);
         if (opt_order > 1)
             bd->raw_samples[1] = decode_rice(gb, FFMIN(s[0] + 3, ctx->s_max));
         if (opt_order > 2)
             bd->raw_samples[2] = decode_rice(gb, FFMIN(s[0] + 1, ctx->s_max));
-
-        start = FFMIN(opt_order, 3);
     }
 
     // read all residuals
@@ -861,7 +867,7 @@ static int read_var_block_data(ALSDecContext *ctx, ALSBlockData *bd)
                     res >>= 1;
 
                     if (cur_k) {
-                        res  *= 1 << cur_k;
+                        res  *= 1U << cur_k;
                         res  |= get_bits_long(gb, cur_k);
                     }
                 }
@@ -1033,7 +1039,7 @@ static int decode_block(ALSDecContext *ctx, ALSBlockData *bd)
 
     if (*bd->shift_lsbs)
         for (smp = 0; smp < bd->block_length; smp++)
-            bd->raw_samples[smp] <<= *bd->shift_lsbs;
+            bd->raw_samples[smp] = (unsigned)bd->raw_samples[smp] << *bd->shift_lsbs;
 
     return 0;
 }
@@ -1378,6 +1384,9 @@ static SoftFloat_IEEE754 multiply(SoftFloat_IEEE754 a, SoftFloat_IEEE754 b) {
     // Multiply mantissa bits in a 64-bit register
     mantissa_temp = (uint64_t)a.mant * (uint64_t)b.mant;
     mask_64       = (uint64_t)0x1 << 47;
+
+    if (!mantissa_temp)
+        return FLOAT_0;
 
     // Count the valid bit count
     while (!(mantissa_temp & mask_64) && mask_64) {
@@ -1796,11 +1805,11 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
         if (!ctx->cs_switch) {                                                       \
             for (sample = 0; sample < ctx->cur_frame_length; sample++)               \
                 for (c = 0; c < avctx->channels; c++)                                \
-                    *dest++ = ctx->raw_samples[c][sample] << shift;                  \
+                    *dest++ = ctx->raw_samples[c][sample] * (1U << shift);            \
         } else {                                                                     \
             for (sample = 0; sample < ctx->cur_frame_length; sample++)               \
                 for (c = 0; c < avctx->channels; c++)                                \
-                    *dest++ = ctx->raw_samples[sconf->chan_pos[c]][sample] << shift; \
+                    *dest++ = ctx->raw_samples[sconf->chan_pos[c]][sample] * (1U << shift); \
         }                                                                            \
     }
 
@@ -1984,6 +1993,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     // allocate quantized parcor coefficient buffer
     num_buffers = sconf->mc_coding ? avctx->channels : 1;
+    if (num_buffers * (uint64_t)num_buffers > INT_MAX) // protect chan_data_buffer allocation
+        return AVERROR_INVALIDDATA;
 
     ctx->quant_cof        = av_malloc_array(num_buffers, sizeof(*ctx->quant_cof));
     ctx->lpc_cof          = av_malloc_array(num_buffers, sizeof(*ctx->lpc_cof));
@@ -2116,7 +2127,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
     return 0;
 
 fail:
-    decode_end(avctx);
     return ret;
 }
 
@@ -2142,4 +2152,5 @@ AVCodec ff_als_decoder = {
     .decode         = decode_frame,
     .flush          = flush,
     .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

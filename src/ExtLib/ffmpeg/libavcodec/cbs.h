@@ -297,7 +297,8 @@ int ff_cbs_write_fragment_data(CodedBitstreamContext *ctx,
 /**
  * Write the bitstream of a fragment to the extradata in codec parameters.
  *
- * This replaces any existing extradata in the structure.
+ * Modifies context and fragment as ff_cbs_write_fragment_data does and
+ * replaces any existing extradata in the structure.
  */
 int ff_cbs_write_extradata(CodedBitstreamContext *ctx,
                            AVCodecParameters *par,
@@ -305,6 +306,13 @@ int ff_cbs_write_extradata(CodedBitstreamContext *ctx,
 
 /**
  * Write the bitstream of a fragment to a packet.
+ *
+ * Modifies context and fragment as ff_cbs_write_fragment_data does.
+ *
+ * On success, the packet's buf is unreferenced and its buf, data and
+ * size fields are set to the corresponding values from the newly updated
+ * fragment; other fields are not touched.  On failure, the packet is not
+ * touched at all.
  */
 int ff_cbs_write_packet(CodedBitstreamContext *ctx,
                         AVPacket *pkt,
@@ -372,10 +380,12 @@ int ff_cbs_insert_unit_data(CodedBitstreamContext *ctx,
 
 /**
  * Delete a unit from a fragment and free all memory it uses.
+ *
+ * Requires position to be >= 0 and < frag->nb_units.
  */
-int ff_cbs_delete_unit(CodedBitstreamContext *ctx,
-                       CodedBitstreamFragment *frag,
-                       int position);
+void ff_cbs_delete_unit(CodedBitstreamContext *ctx,
+                        CodedBitstreamFragment *frag,
+                        int position);
 
 
 #endif /* AVCODEC_CBS_H */
