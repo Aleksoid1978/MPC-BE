@@ -457,7 +457,7 @@ File_Ffv1::File_Ffv1()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
 
     //use Ffv1_default_state_transition by default
     memcpy(state_transitions_table, Ffv1_default_state_transition,

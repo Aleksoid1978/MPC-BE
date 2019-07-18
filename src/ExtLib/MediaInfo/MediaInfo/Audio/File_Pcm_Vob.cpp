@@ -118,7 +118,7 @@ File_Pcm_Vob::File_Pcm_Vob()
 {
     //Configuration
     ParserName="PCM VOB";
-    IsRawStream=true;
+    StreamSource=IsStream;
     PTS_DTS_Needed=true;
 }
 

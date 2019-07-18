@@ -21,6 +21,7 @@
 #if defined(MEDIAINFO_ANCILLARY_YES)
     #include <MediaInfo/Multiple/File_Ancillary.h>
 #endif //defined(MEDIAINFO_ANCILLARY_YES)
+#include <MediaInfo/Video/File_DolbyVisionMetadata.h>
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/TimeCode.h"
 #include <vector>
@@ -81,7 +82,7 @@ protected :
     void Streams_Finish_Descriptor (const int128u DescriptorUID, const int128u PackageUID);
     void Streams_Finish_Locator (const int128u DescriptorUID, const int128u LocatorUID);
     void Streams_Finish_Component (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin);
-    void Streams_Finish_Component_ForTimeCode (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin, bool IsSourcePackage);
+    void Streams_Finish_Component_ForTimeCode (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin, bool IsSourcePackage, const Ztring& TrackName);
     void Streams_Finish_Component_ForAS11 (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin);
     void Streams_Finish_Identification (const int128u IdentificationUID);
     void Streams_Finish_CommercialNames ();
@@ -190,6 +191,7 @@ protected :
     void ClosedIncompleteBodyPartition();
     void OpenCompleteBodyPartition();
     void ClosedCompleteBodyPartition();
+    void GenericStreamPartition();
     void OpenIncompleteFooterPartition();
     void ClosedIncompleteFooterPartition();
     void OpenCompleteFooterPartition();
@@ -205,9 +207,12 @@ protected :
     void SDTI_ControlMetadataSet();
     void SystemScheme1();
     void DMScheme1();
+    void Application05_09_01();
     void AS11_AAF_Core();
     void AS11_AAF_Segmentation();
     void AS11_AAF_UKDPP();
+    void Dolby_PHDRImageMetadataItem();
+    void Dolby_PHDRMetadataTrackSubDescriptor();
     void Omneon_010201010100();
     void Omneon_010201020100();
 
@@ -536,6 +541,9 @@ protected :
     void AS11_UKDPP_ProgrammeTextLanguage();
     void AS11_UKDPP_ContactEmail();
     void AS11_UKDPP_ContactTelephoneNumber();
+    void Dolby_DataDefinition();
+    void Dolby_SourceTrackID();
+    void Dolby_SimplePayloadSID();
     void Omneon_010201010100_8001();                            //8001
     void Omneon_010201010100_8003();                            //8003
     void Omneon_010201020100_8002();                            //8002
@@ -1133,6 +1141,7 @@ protected :
     void           ChooseParser__Aaf_GC_Compound(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser__Avid(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser__Avid_Picture(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
+    void           ChooseParser__Dolby(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser__Sony(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser__Sony_Picture(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
@@ -1155,6 +1164,7 @@ protected :
     void           ChooseParser_SmpteSt0337(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Jpeg2000(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_ProRes(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
+    void           ChooseParser_DolbyVisionFrameData(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
 
     //Helpers
     int32u Vector(int32u ExpectedLength=(int32u)-1);
@@ -1309,6 +1319,11 @@ protected :
         AcquisitionMetadata_Sony_E201_Lists[Id]->push_back(acquisitionmetadata(Value));
     }
     int8u AcquisitionMetadata_Sony_CalibrationType;
+
+    // Extra metadata
+    int64u ExtraMetadata_Offset;
+    int32u ExtraMetadata_SID;
+    File_DolbyVisionMetadata* DolbyVisionMetadata;
 
     //Demux
     #if MEDIAINFO_DEMUX

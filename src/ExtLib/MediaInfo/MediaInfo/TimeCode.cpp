@@ -244,10 +244,7 @@ int64s TimeCode::ToMilliseconds()
     if (!FramesPerSecond)
         return 0;
 
-    int64s MS=(int64s(Hours)     *3600
-             + int64s(Minutes)   *  60
-             + int64s(Seconds)        )*1000
-             + float64_int64s((float64(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0)))*1000/(FramesPerSecond*(MustUseSecondField?2:1)));
+    int64s MS=float64_int64s(ToFrames()*1000*(DropFrame?1.001:1.000)/(FramesPerSecond*(MustUseSecondField?2:1)));
 
     return IsNegative?-MS:MS;
 }

@@ -457,7 +457,7 @@ File_Avc::File_Avc()
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
     Frame_Count_NotParsedIncluded=0;
 
     //In

@@ -47,7 +47,7 @@ File_ArriRaw::File_ArriRaw()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
 }
 
 //***************************************************************************

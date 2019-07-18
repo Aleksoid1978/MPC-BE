@@ -607,11 +607,8 @@ void File_Aac::AudioMuxElement()
             PayloadLengthInfo();
             PayloadMux();
         }
-        if (otherDataPresent)
-        {
-            for(int32u i=0; i<otherDataLenBits; i++)
-                Skip_SB(                                        "otherDataBit");
-        }
+        if (otherDataLenBits)
+            Skip_BS(otherDataLenBits,                           "otherData");
     }
     else
     {
@@ -714,7 +711,7 @@ void File_Aac::StreamMuxConfig()
                 }
             }
         }
-        bool crcCheckPresent;
+        bool otherDataPresent, crcCheckPresent;
         Get_SB (otherDataPresent,                               "otherDataPresent");
         if (otherDataPresent)
         {
@@ -735,6 +732,8 @@ void File_Aac::StreamMuxConfig()
                 while (otherDataLenEsc);
             }
         }
+        else
+            otherDataLenBits=0;
         Get_SB(crcCheckPresent,                                 "crcCheckPresent");
         if(crcCheckPresent)
             Skip_S1(8,                                          "crcCheckSum");

@@ -52,7 +52,7 @@ File_SmpteSt0302::File_SmpteSt0302()
         ParserIDs[0]=MediaInfo_Parser_Aes3;
     #endif //MEDIAINFO_EVENTS
     PTS_DTS_Needed=true;
-    IsRawStream=true;
+    StreamSource=IsStream;
 }
 
 //---------------------------------------------------------------------------

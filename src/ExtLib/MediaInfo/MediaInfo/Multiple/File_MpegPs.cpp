@@ -487,7 +487,7 @@ void File_MpegPs::Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Tem
             Fill(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay_Original_Settings), Retrieve(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay_Settings)), true);
             Clear(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay_Settings));
 
-            Fill(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay), ((float64)Temp.TimeStamp_Start.PTS.TimeStamp)/90, 3, true);
+            Fill(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay), ((float64)Temp.TimeStamp_Start.PTS.TimeStamp)/90, 6, true);
             Fill(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
         }
 

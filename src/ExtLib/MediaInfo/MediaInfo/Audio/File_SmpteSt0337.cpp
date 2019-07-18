@@ -1376,6 +1376,18 @@ void File_SmpteSt0337::Data_Parse()
         Skip_XX(Element_Size-Element_Offset,                    "Data");
     }
 
+    if (Save_Buffer)
+    {
+        delete[] Buffer;
+        Buffer=Save_Buffer;
+        Buffer_Offset=Save_Buffer_Offset;
+        Buffer_Size=Save_Buffer_Size;
+        File_Offset-=Buffer_Offset;
+    }
+
+    // Guard band
+    GuardBand_Before=0;
+
     FILLING_BEGIN();
         FrameSizes[IsSub?Buffer_Size:((GuardBand_Before+Element_Size)*Container_Bits/Stream_Bits)]++;
 
@@ -1395,18 +1407,6 @@ void File_SmpteSt0337::Data_Parse()
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFinished]))
             Finish("SMPTE ST 337");
     FILLING_END();
-
-    if (Save_Buffer)
-    {
-        delete[] Buffer;
-        Buffer=Save_Buffer;
-        Buffer_Offset=Save_Buffer_Offset;
-        Buffer_Size=Save_Buffer_Size;
-        File_Offset-=Buffer_Offset;
-    }
-
-    // Guard band
-    GuardBand_Before=0;
 }
 
 //***************************************************************************

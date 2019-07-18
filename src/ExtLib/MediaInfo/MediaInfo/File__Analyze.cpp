@@ -160,7 +160,7 @@ File__Analyze::File__Analyze ()
     Config_Demux=MediaInfoLib::Config.Demux_Get();
     Config_LineSeparator=MediaInfoLib::Config.LineSeparator_Get();
     IsSub=false;
-    IsRawStream=false;
+    StreamSource=IsContainer;
 
     //In
     #if MEDIAINFO_EVENTS
@@ -397,7 +397,7 @@ void File__Analyze::Open_Buffer_Init (int64u File_Size_)
         }
     #endif //MEDIAINFO_DEMUX
     #if MEDIAINFO_EVENTS
-        if (StreamIDs_Size && IsRawStream)
+        if (StreamIDs_Size && StreamSource==IsStream)
             StreamIDs[StreamIDs_Size-1]=(int64u)-1;
         if (!IsSub)
         {
@@ -408,7 +408,7 @@ void File__Analyze::Open_Buffer_Init (int64u File_Size_)
             if (!SubFile_IDs.empty())
             {
                 StreamIDs_Size=1+SubFile_IDs.size();
-                StreamIDs[SubFile_IDs.size()]=IsRawStream?(int64u)-1:StreamIDs[0];
+                StreamIDs[SubFile_IDs.size()]=StreamSource==IsStream?(int64u)-1:StreamIDs[0];
                 StreamIDs_Width[SubFile_IDs.size()]=StreamIDs_Width[0];
                 ParserIDs[SubFile_IDs.size()]=ParserIDs[0];
                 for (size_t Pos=0; Pos<SubFile_IDs.size(); Pos++)
@@ -1235,7 +1235,7 @@ void File__Analyze::Open_Buffer_Unsynch ()
     Buffer_Clear();
 
     //Some default values
-    if (IsRawStream && File_GoTo==0)
+    if (StreamSource==IsStream && File_GoTo==0)
     {
         FrameInfo.DTS=0;
         Frame_Count_NotParsedIncluded=0;
@@ -1751,16 +1751,16 @@ int64s gcd(int64s a, int64s b)
 //---------------------------------------------------------------------------
 void File__Analyze::TS_Set(int64s Ticks, ts_type Type)
 {
-    if (IsRawStream)
+    if (StreamSource==IsStream)
     {
         if (!Frequency_b)
             return;
 
         int64s divisor = gcd(1000000000, Frequency_b);
         if (Type&TS_PTS)
-            FrameInfo.PTS=Ticks*(1000000000/divisor)/(Frequency_b/divisor);
+            FrameInfo.PTS=float64_int64s((float64)Ticks*(1000000000/divisor)/(Frequency_b/divisor));
         if (Type&TS_DTS)
-            FrameInfo.DTS=Ticks*(1000000000/divisor)/(Frequency_b/divisor);
+            FrameInfo.DTS=float64_int64s((float64)Ticks*(1000000000/divisor)/(Frequency_b/divisor));
     }
     else
     {
@@ -1769,13 +1769,13 @@ void File__Analyze::TS_Set(int64s Ticks, ts_type Type)
 
         int64s divisor = gcd(1000000000, Frequency_c);
         if (Type&TS_PTS)
-            FrameInfo.PTS=Ticks*(1000000000/divisor)/(Frequency_c/divisor);
+            FrameInfo.PTS=float64_int64s((float64)Ticks*(1000000000/divisor)/(Frequency_c/divisor));
         if (Type&TS_DTS)
-            FrameInfo.DTS=Ticks*(1000000000/divisor)/(Frequency_c/divisor);
+            FrameInfo.DTS=float64_int64s((float64)Ticks*(1000000000/divisor)/(Frequency_c/divisor));
     }
 
 #if MEDIAINFO_ADVANCED2
-    if (IsRawStream)
+    if (StreamSource==IsStream)
     {
         if (!Frequency_b)
             return;
@@ -1830,7 +1830,7 @@ void File__Analyze::TS_Set(File__Analyze* Parser, ts_type Type)
 void File__Analyze::TS_Ajust(int64s Ticks)
 {
 #if MEDIAINFO_ADVANCED2
-    if (IsRawStream)
+    if (StreamSource==IsStream)
     {
         if (PTSb==NoTs)
         {
@@ -1854,7 +1854,7 @@ void File__Analyze::TS_Ajust(int64s Ticks)
 //---------------------------------------------------------------------------
 void File__Analyze::TS_Add(int64s Ticks, ts_type Type)
 {
-    if (IsRawStream)
+    if (StreamSource==IsStream)
     {
         //Coherency test
         if (!Frequency_b)
@@ -1918,7 +1918,7 @@ void File__Analyze::TS_Add(int64s Ticks, ts_type Type)
     if (Type&TS_DTS && FrameInfo.DTS!=(int64u)-1 && Frequency_b)
         FrameInfo.DTS+=FrameInfo.DUR;
     #if MEDIAINFO_ADVANCED2
-    if (IsRawStream)
+    if (StreamSource==IsStream)
     {
         if (Type&TS_PTS && PTSb!=NoTs)
             PTSb+=Ticks*(Frequency_c?Frequency_c:1);
@@ -3144,7 +3144,7 @@ void File__Analyze::ForceFinish ()
     Status[IsFinished]=true;
 
     //Real stream size
-    if (Config->ParseSpeed>=1 && IsRawStream && Buffer_TotalBytes)
+    if (Config->ParseSpeed>=1 && StreamSource==IsStream && Buffer_TotalBytes)
     {
         //Exception with text streams embedded in video
         if (StreamKind_Last==Stream_Text)
@@ -3154,7 +3154,7 @@ void File__Analyze::ForceFinish ()
     }
 
     //Frame count
-    if (Config->ParseSpeed>=1 && IsRawStream && Frame_Count && Frame_Count!=(int64u)-1 && Retrieve(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_FrameCount)).empty())
+    if (Config->ParseSpeed>=1 && StreamSource==IsStream && Frame_Count && Frame_Count!=(int64u)-1 && Retrieve(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_FrameCount)).empty())
         Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_FrameCount), Frame_Count);
 }
 

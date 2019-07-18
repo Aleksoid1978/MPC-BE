@@ -76,7 +76,7 @@ File_Pcm::File_Pcm()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
-    IsRawStream=true;
+    StreamSource=IsStream;
     PTS_DTS_Needed=true;
 
     //In

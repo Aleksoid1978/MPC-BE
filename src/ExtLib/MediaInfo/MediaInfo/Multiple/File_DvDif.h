@@ -17,6 +17,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/TimeCode.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -112,9 +113,8 @@ protected :
     Ztring Recorded_Date_Date;
     Ztring Recorded_Date_Time;
     Ztring Encoded_Library_Settings;
-    string TimeCode_FirstFrame;
+    TimeCode TimeCode_FirstFrame;
     int64u Duration;
-    int64u TimeCode_FirstFrame_ms;
     int64u FrameSize_Theory; //The size of a frame
     int8u  SCT;
     int8u  SCT_Old;

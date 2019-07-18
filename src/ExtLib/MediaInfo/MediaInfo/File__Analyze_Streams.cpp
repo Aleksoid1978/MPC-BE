@@ -28,6 +28,7 @@
 #include "ZenLib/BitStream_LE.h"
 #include <cmath>
 #include <cfloat>
+#include <cassert>
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -337,7 +338,7 @@ size_t File__Analyze::Stream_Erase (stream_t KindOfStream, size_t StreamPos)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-static bool ShowSource_IsInList(video Value)
+bool ShowSource_IsInList(video Value)
 {
     switch (Value)
     {
@@ -383,9 +384,16 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     }
 
     // Handling sources
-    if (StreamKind==Stream_Video && ShowSource_IsInList((video)Parameter) && Retrieve_Const(Stream_Video, StreamPos, Parameter+1).empty())
+    const char* SourceValue[StreamSource_Max] =
     {
-        Fill(Stream_Video, StreamPos, Parameter+1, IsRawStream?"Stream":"Container");
+        "Container",
+        "Stream",
+        "ContainerExtra",
+    };
+    assert(sizeof(SourceValue)==StreamSource_Max*sizeof(const char*));
+    if (StreamKind==Stream_Video && ShowSource_IsInList((video)Parameter) && StreamSource<StreamSource_Max && Retrieve_Const(Stream_Video, StreamPos, Parameter+1).empty())
+    {
+        Fill(Stream_Video, StreamPos, Parameter+1, SourceValue[StreamSource]);
     }
 
     //Format_Profile split (see similar code in MediaInfo_Inform.cpp, dedicated to MIXML)
@@ -504,8 +512,8 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         case Stream_Video:
                             switch (Parameter)
                             {
-                                case Video_Width:   if (IsRawStream) Fill(Stream_Video, StreamPos, Video_Sampled_Width, Value); break;
-                                case Video_Height:  if (IsRawStream) Fill(Stream_Video, StreamPos, Video_Sampled_Height, Value); break;
+                                case Video_Width:   if (StreamSource==IsStream) Fill(Stream_Video, StreamPos, Video_Sampled_Width, Value); break;
+                                case Video_Height:  if (StreamSource==IsStream) Fill(Stream_Video, StreamPos, Video_Sampled_Height, Value); break;
                                 case Video_DisplayAspectRatio:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width, Video_Height, Video_PixelAspectRatio, Video_DisplayAspectRatio); break;
                                 case Video_PixelAspectRatio:    PixelAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width, Video_Height, Video_PixelAspectRatio, Video_DisplayAspectRatio);   break;
                                 case Video_DisplayAspectRatio_CleanAperture:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width_CleanAperture, Video_Height_CleanAperture, Video_PixelAspectRatio_CleanAperture, Video_DisplayAspectRatio_CleanAperture); break;
@@ -988,7 +996,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 }
 
 //---------------------------------------------------------------------------
-void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float32 Value, int8u AfterComma, bool Replace)
+void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float64 Value, int8u AfterComma, bool Replace)
 {
     if (StreamKind==Stream_Video && Parameter==Video_FrameRate)
     {
@@ -997,17 +1005,39 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 
         if (Value)
         {
-            if (float32_int32s(Value) - Value*1.001000 > -0.000002
-             && float32_int32s(Value) - Value*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 32-bit float
+            if (float64_int64s(Value) - Value*1.001000 > -0.000002
+             && float64_int64s(Value) - Value*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 64-bit float
             {
                 Fill(StreamKind, StreamPos, Video_FrameRate_Num,  Value*1001, 0, Replace);
                 Fill(StreamKind, StreamPos, Video_FrameRate_Den,   1001, 10, Replace);
             }
-            if (float32_int32s(Value) - Value*1.001001 > -0.000002
-             && float32_int32s(Value) - Value*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 32-bit float
+            if (float64_int64s(Value) - Value*1.001001 > -0.000002
+             && float64_int64s(Value) - Value*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 64-bit float
             {
                 Fill(StreamKind, StreamPos, Video_FrameRate_Num,  Value*1000, 0, Replace);
                 Fill(StreamKind, StreamPos, Video_FrameRate_Den,   1000, 10, Replace);
+            }
+        }
+    }
+
+    if (StreamKind==Stream_Other && Parameter==Other_FrameRate)
+    {
+        Clear(StreamKind, StreamPos, Other_FrameRate_Num);
+        Clear(StreamKind, StreamPos, Other_FrameRate_Den);
+
+        if (Value)
+        {
+            if (float32_int32s(Value) - Value*1.001000 > -0.000002
+             && float32_int32s(Value) - Value*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 32-bit float
+            {
+                Fill(StreamKind, StreamPos, Other_FrameRate_Num,  Value*1001, 0, Replace);
+                Fill(StreamKind, StreamPos, Other_FrameRate_Den,   1001, 10, Replace);
+            }
+            if (float32_int32s(Value) - Value*1.001001 > -0.000002
+             && float32_int32s(Value) - Value*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 32-bit float
+            {
+                Fill(StreamKind, StreamPos, Other_FrameRate_Num,  Value*1000, 0, Replace);
+                Fill(StreamKind, StreamPos, Other_FrameRate_Den,   1000, 10, Replace);
             }
         }
     }

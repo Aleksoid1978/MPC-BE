@@ -236,7 +236,6 @@ File_DvDif::File_DvDif()
     //Temp
     FrameSize_Theory=0;
     Duration=0;
-    TimeCode_FirstFrame_ms=(int64u)-1;
     Synched_Test_Reset();
     DSF_IsValid=false;
     APT=0xFF; //Impossible
@@ -483,6 +482,12 @@ void File_DvDif::Streams_Fill()
             Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
         }
     }
+    else if (audio_locked && Retrieve(Stream_Video, 0, Video_Standard) == __T("PAL") && Retrieve(Stream_Video, 0, Video_ChromaSubsampling) == __T("4:2:0"))
+    {
+        Fill(Stream_General, 0, General_Format_Commercial_IfAny, "DVCAM");
+        Fill(Stream_Video, 0, Video_Format_Commercial_IfAny, "DVCAM");
+        Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
+    }
     else if (audio_locked || (Retrieve(Stream_Video, 0, Video_Standard)==__T("PAL") && Retrieve(Stream_Video, 0, Video_ChromaSubsampling)==__T("4:1:1")))
     {
         Fill(Stream_General, 0, General_Format_Commercial_IfAny, "DVCPRO");
@@ -493,13 +498,18 @@ void File_DvDif::Streams_Fill()
         Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
 
     //Delay
-    if (TimeCode_FirstFrame_ms!=(int64u)-1)
+    TimeCode_FirstFrame.FramesPerSecond=(system?25:30);
+    if (FrameRate_Multiplicator>=2)
+        TimeCode_FirstFrame.MustUseSecondField=true;
+    if (TimeCode_FirstFrame.IsValid())
     {
+        string TimeCode_FirstFrame_String=TimeCode_FirstFrame.ToString();
+        int64u TimeCode_FirstFrame_ms=TimeCode_FirstFrame.ToMilliseconds();
         Fill(Stream_Video, 0, Video_Delay, TimeCode_FirstFrame_ms);
-        if (TimeCode_FirstFrame.size()==11)
-            Fill(Stream_Video, 0, Video_Delay_DropFrame, TimeCode_FirstFrame[8]==';'?"Yes":"No");
+        if (TimeCode_FirstFrame_String.size()==11)
+            Fill(Stream_Video, 0, Video_Delay_DropFrame, TimeCode_FirstFrame_String[8]==';'?"Yes":"No");
         Fill(Stream_Video, 0, Video_Delay_Source, "Stream");
-        Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TimeCode_FirstFrame.c_str());
+        Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TimeCode_FirstFrame_String.c_str());
         Fill(Stream_Video, 0, Video_TimeCode_Source, "Subcode time code");
         for (size_t Pos=0; Pos<Count_Get(Stream_Audio); Pos++)
         {
@@ -1336,6 +1346,7 @@ void File_DvDif::timecode()
     int64u MilliSeconds=0;
     int8u  Frames=0;
     bool   DropFrame=false;
+    bool   FieldIndication;
     BS_Begin();
     Skip_SB(                                                    "CF - Color fame");
     if (!DSF_IsValid)
@@ -1350,11 +1361,11 @@ void File_DvDif::timecode()
     Frames+=Frames_Units;
 
     if (!DSF_IsValid)
-        Skip_SB(                                                "BGF0 or PC");
+        Get_SB(FieldIndication,                                 "BGF0 or PC");
     else if (DSF)    //625/50
-        Skip_SB(                                                "BGF0 - Binary group flag");
+        Get_SB(FieldIndication,                                 "BGF0 - Binary group flag");
     else        //525/60
-        Skip_SB(                                                "PC - Biphase mark polarity correction"); //0=even; 1=odd
+        Get_SB(FieldIndication,                                 "PC - Biphase mark polarity correction"); //0=even; 1=odd
     Get_S1 (3, Seconds_Tens,                                    "Seconds (Tens)");
     MilliSeconds+=Seconds_Tens*10*1000;
     Get_S1 (4, Seconds_Units,                                   "Seconds (Units)");
@@ -1385,24 +1396,16 @@ void File_DvDif::timecode()
     Element_Info1(Ztring().Duration_From_Milliseconds(MilliSeconds+((DSF_IsValid && Frames!=45)?((int64u)(Frames/(DSF?25.000:29.970)*1000)):0)));
     BS_End();
 
-    if (TimeCode_FirstFrame_ms==(int64u)-1 && MilliSeconds!=167185000) //if all bits are set to 1, this is not a valid timestamp
+    if (!TimeCode_FirstFrame.HasValue() && MilliSeconds!=167185000) //if all bits are set to 1, this is not a valid timestamp
     {
-        TimeCode_FirstFrame_ms=MilliSeconds;
-        if (DSF_IsValid && Frames!=45) //all bits are set to 1
-
-        TimeCode_FirstFrame_ms+=(int64u)(Frames/(DSF?25.000:29.970)*1000);
-
-        TimeCode_FirstFrame+=('0'+Hours_Tens);
-        TimeCode_FirstFrame+=('0'+Hours_Units);
-        TimeCode_FirstFrame+=':';
-        TimeCode_FirstFrame+=('0'+Minutes_Tens);
-        TimeCode_FirstFrame+=('0'+Minutes_Units);
-        TimeCode_FirstFrame+=':';
-        TimeCode_FirstFrame+=('0'+Seconds_Tens);
-        TimeCode_FirstFrame+=('0'+Seconds_Units);
-        TimeCode_FirstFrame+=DropFrame?';':':';
-        TimeCode_FirstFrame+=('0'+Frames_Tens);
-        TimeCode_FirstFrame+=('0'+Frames_Units);
+        TimeCode_FirstFrame=TimeCode(Hours_Tens  *10+Hours_Units,
+                                     Minutes_Tens*10+Minutes_Units,
+                                     Seconds_Tens*10+Seconds_Units,
+                                     (DSF_IsValid && Frames!=45)?(Frames_Tens*10+Frames_Units):0, //if all bits are set to 1, this is not a valid frame number
+                                     0, //Unknown
+                                     DropFrame,
+                                     false, //Unknown
+                                     false);
     }
 }
 

@@ -852,7 +852,7 @@ void File_Vc3::CodingControlB()
     BS_Begin();
 
     Info_SB(   FFE,                                             "FFE, Field/Frame Count"); Param_Info1(Vc3_FFE[FFE]);
-    Get_SB (   SSC,                                             "SSC, Sub Sampling Control"); Param_Info1(Vc3_SSC[SSC]);
+    Get_S1 (2, SSC,                                             "SSC, Sub Sampling Control"); Param_Info1(Vc3_SSC[SSC]);
     Mark_0();
     Mark_0();
     Get_S1 (2, CLV,                                             "CLR, Color Volume"); Param_Info1(Vc3_CLV[CLV]);

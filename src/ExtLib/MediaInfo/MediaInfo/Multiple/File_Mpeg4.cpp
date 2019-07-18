@@ -265,7 +265,7 @@ void File_Mpeg4::Streams_Accept()
 
     if (!IsSub && MajorBrand==0x6A703220) //"jp2 "
     {
-        IsRawStream=true; //TODO: do the difference between raw stream and sequence of files with file count being frame count
+        StreamSource=IsStream; //TODO: do the difference between raw stream and sequence of files with file count being frame count
         TestContinuousFileNames();
 
         Stream_Prepare((Config->File_Names.size()>1 || Config->File_IsReferenced_Get())?Stream_Video:Stream_Image);
