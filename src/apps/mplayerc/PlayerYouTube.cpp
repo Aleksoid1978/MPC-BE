@@ -130,6 +130,9 @@ namespace Youtube
 			LPCSTR pEnd = CStringA::StrTraits::StringFindString(pStart, pszMatchEnd);
 			if (pEnd) {
 				return CStringA(pStart, pEnd - pStart);
+			} else {
+				pEnd = pszBuff + CStringA::StrTraits::SafeStringLen(pszBuff);
+				return CStringA(pStart, pEnd - pStart);
 			}
 		}
 
@@ -416,11 +419,6 @@ namespace Youtube
 				const CStringA sts = RegExpParseA(data, "\"sts\"\\s*:\\s*(\\d+)");
 
 				free(data);
-
-				if (sts.IsEmpty()) {
-					InternetCloseHandle(hInet);
-					return false;
-				}
 
 				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
 				InternetReadData(hInet, link, &data, dataSize);
