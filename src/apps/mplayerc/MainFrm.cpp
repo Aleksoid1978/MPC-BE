@@ -4435,6 +4435,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		UnHookDirectXVideoDecoderService();
 		DXVAState::SetActiveState(GUID_NULL, L"Intel H.264(MVC 3D)");
 	}
+
+	m_wndPlaylistBar.SavePlaylist();
 }
 
 void CMainFrame::OnFilePostCloseMedia()
