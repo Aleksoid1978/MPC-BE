@@ -10885,7 +10885,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 						const double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
 
 						if (s.bNoSmallUpscale && factor > 1.0 && factor < 1.02
-								|| s.bNoSmallDownscale && factor > 0.99 && factor < 1.0) {
+								|| s.bNoSmallDownscale && factor > 0.937 && factor < 1.0) {
 							w = arxy.cx;
 							h = arxy.cy;
 						}
