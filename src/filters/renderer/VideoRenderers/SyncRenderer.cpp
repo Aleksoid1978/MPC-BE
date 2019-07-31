@@ -2750,10 +2750,10 @@ HRESULT CSyncAP::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType
 	ULARGE_INTEGER ui64AspectRatio;
 	m_pMediaType->GetUINT64(MF_MT_PIXEL_ASPECT_RATIO, &ui64AspectRatio.QuadPart);
 
-	CSize aspectRatio(LONG(ui64AspectRatio.HighPart * videoSize.cx), LONG(ui64AspectRatio.LowPart * videoSize.cy));
-	if (aspectRatio.cx > 0 && aspectRatio.cy > 0) {
-		ReduceDim(aspectRatio);
-	}
+	__int64 darx = (__int64)ui64AspectRatio.HighPart * videoSize.cx;
+	__int64 dary = (__int64)ui64AspectRatio.LowPart * videoSize.cy;
+	ReduceDim(darx, dary);
+	CSize aspectRatio((LONG)darx, (LONG)dary);
 
 	if (videoSize != m_nativeVideoSize || aspectRatio != m_aspectRatio) {
 		m_nativeVideoSize = videoSize;
