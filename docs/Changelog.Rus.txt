@@ -4,7 +4,7 @@
 =============================
 
 Обновлены библиотеки:
-	dav1d git-0.3.1-41-ga1e3f35;
+	dav1d git-0.3.1-80-gafee1ac;
 	ffmpeg git-n4.2-dev-2008-gab4795a085;
 	Little-CMS git-lcms2.9-32-g9632a05;
 	MediaInfo git-v19.07-gd7bdff86;
