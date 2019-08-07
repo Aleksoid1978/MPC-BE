@@ -6963,8 +6963,15 @@ void CMainFrame::OnUpdateViewCaptionmenu(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewControlBar(UINT nID)
 {
+	const auto& s = AfxGetAppSettings();
+
 	nID -= ID_VIEW_SEEKER;
 	ShowControls(AfxGetAppSettings().nCS ^ (1<<nID));
+
+	if (m_bFullScreen && s.nShowBarsWhenFullScreenTimeOut == 0) {
+		KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
+		SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, 2000, nullptr);
+	}
 }
 
 void CMainFrame::OnUpdateViewControlBar(CCmdUI* pCmdUI)
