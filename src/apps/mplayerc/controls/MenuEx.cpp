@@ -107,7 +107,7 @@ void CMenuEx::DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const boo
 							*rcElement = CRect(CPoint(x, y), CSize(m_CXMENUCHECK, m_CYMENUCHECK));
 						}
 					}
-				}	
+				}
 			}
 			::SelectObject(hdcMem, hbmPrev);
 		}
@@ -210,7 +210,7 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 	if (bSelected) {
 		GRADIENT_RECT gr[1] = { { 0, 1 } };
 		const CAppSettings& s = AfxGetAppSettings();
-		
+
 		if (bGrayed) {
 			pDC->SetTextColor(m_crTGL);
 		} else {
@@ -377,7 +377,7 @@ static CString GetModuleName(const HMODULE hModule)
 {
 	CString lpFileName;
 	lpFileName.ReleaseBuffer(::GetModuleFileNameW(hModule, lpFileName.GetBuffer(MAX_PATH), MAX_PATH));
-	
+
 	return lpFileName;
 }
 
@@ -499,7 +499,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 				::DeleteObject(hrgnPaint);
 
 				::FillRect(hDC, CRect(rc.left, rc.top, rc.left + (::GetSystemMetrics(SM_CXFRAME) - 1), rc.bottom), MenuInfo.hbrBack);
-				
+
 				CDC *pDC = CDC::FromHandle(hDC);
 				pDC->Draw3dRect(&rc, m_crBNL, m_crBND);
 
