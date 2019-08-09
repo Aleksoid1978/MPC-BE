@@ -92,7 +92,7 @@ void CFullscreenWnd::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_pMainFrame) {
 		if (m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnMouseMove(nFlags, point)) {
-			m_pMainFrame->KillTimer(CMainFrame::TIMER_FULLSCREENMOUSEHIDER);
+			m_pMainFrame->KillTimer(CMainFrame::TIMER_MOUSEHIDER);
 		} else {
 			m_pMainFrame->PostMessageW(WM_MOUSEMOVE, nFlags, MAKELPARAM(point.x, point.y));
 		}

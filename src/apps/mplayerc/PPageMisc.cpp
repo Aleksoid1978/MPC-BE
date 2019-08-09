@@ -102,8 +102,6 @@ BOOL CPPageMisc::OnInitDialog()
 	m_nUpdaterDelay = s.nUpdaterDelay;
 	m_updaterDelaySpin.SetRange32(1, 365);
 
-	GetDlgItem(IDC_CHECK5)->EnableWindow(FALSE); //TODO
-
 	UpdateData(FALSE);
 
 	return TRUE;
