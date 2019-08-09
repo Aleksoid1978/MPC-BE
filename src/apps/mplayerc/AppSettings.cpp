@@ -810,6 +810,7 @@ void CAppSettings::ResetSettings()
 
 	iShowOSD = OSD_ENABLE;
 	fFastSeek = true;
+	bHideWindowedMousePointer = false;
 	fMiniDump = false;
 	CMiniDump::SetState(fMiniDump);
 
@@ -1422,6 +1423,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, fMiniDump);
 	CMiniDump::SetState(fMiniDump);
 
@@ -1767,6 +1769,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, fMiniDump);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, fLCDSupport);

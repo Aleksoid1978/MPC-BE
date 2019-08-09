@@ -94,7 +94,7 @@ BOOL CPPageMisc::OnInitDialog()
 	m_bPauseMinimizedVideo = s.bPauseMinimizedVideo;
 	m_fDontUseSearchInFolder = s.fDontUseSearchInFolder;
 	m_fFastSeek = s.fFastSeek;
-	m_bHideWindowedMousePointer = FALSE; //TODO
+	m_bHideWindowedMousePointer = s.bHideWindowedMousePointer;
 	m_fLCDSupport = s.fLCDSupport;
 	m_fMiniDump = s.fMiniDump;
 
@@ -122,7 +122,7 @@ BOOL CPPageMisc::OnApply()
 	s.bPauseMinimizedVideo = !!m_bPauseMinimizedVideo;
 	s.fDontUseSearchInFolder = !!m_fDontUseSearchInFolder;
 	s.fFastSeek = !!m_fFastSeek;
-	//s.bHideWindowedMousePointer = !!m_bHideWindowedMousePointer; //TODO
+	s.bHideWindowedMousePointer = !!m_bHideWindowedMousePointer;
 	s.fLCDSupport = !!m_fLCDSupport;
 	s.fMiniDump = !!m_fMiniDump;
 	CMiniDump::SetState(s.fMiniDump);
