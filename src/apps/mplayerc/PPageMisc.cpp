@@ -35,6 +35,7 @@ CPPageMisc::CPPageMisc()
 	, m_fDontUseSearchInFolder(FALSE)
 	, m_fPreventMinimize(FALSE)
 	, m_bPauseMinimizedVideo(FALSE)
+	, m_bHideWindowedMousePointer(FALSE)
 	, m_fLCDSupport(FALSE)
 	, m_fMiniDump(FALSE)
 	, m_nUpdaterDelay(7)
@@ -56,6 +57,7 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK4, m_bPauseMinimizedVideo);
 	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
 	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
+	DDX_Check(pDX, IDC_CHECK5, m_bHideWindowedMousePointer);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
 	DDX_Check(pDX, IDC_CHECK2, m_fMiniDump);
 
@@ -92,12 +94,15 @@ BOOL CPPageMisc::OnInitDialog()
 	m_bPauseMinimizedVideo = s.bPauseMinimizedVideo;
 	m_fDontUseSearchInFolder = s.fDontUseSearchInFolder;
 	m_fFastSeek = s.fFastSeek;
+	m_bHideWindowedMousePointer = FALSE; //TODO
 	m_fLCDSupport = s.fLCDSupport;
 	m_fMiniDump = s.fMiniDump;
 
 	m_updaterAutoCheckCtrl.SetCheck(s.bUpdaterAutoCheck);
 	m_nUpdaterDelay = s.nUpdaterDelay;
 	m_updaterDelaySpin.SetRange32(1, 365);
+
+	GetDlgItem(IDC_CHECK5)->EnableWindow(FALSE); //TODO
 
 	UpdateData(FALSE);
 
@@ -117,6 +122,7 @@ BOOL CPPageMisc::OnApply()
 	s.bPauseMinimizedVideo = !!m_bPauseMinimizedVideo;
 	s.fDontUseSearchInFolder = !!m_fDontUseSearchInFolder;
 	s.fFastSeek = !!m_fFastSeek;
+	//s.bHideWindowedMousePointer = !!m_bHideWindowedMousePointer; //TODO
 	s.fLCDSupport = !!m_fLCDSupport;
 	s.fMiniDump = !!m_fMiniDump;
 	CMiniDump::SetState(s.fMiniDump);

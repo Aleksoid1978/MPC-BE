@@ -36,6 +36,7 @@ private:
 	BOOL m_fDontUseSearchInFolder;
 	BOOL m_fPreventMinimize;
 	BOOL m_bPauseMinimizedVideo;
+	BOOL m_bHideWindowedMousePointer;
 	BOOL m_fLCDSupport;
 	BOOL m_fMiniDump;
 
