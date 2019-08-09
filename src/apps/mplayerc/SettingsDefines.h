@@ -254,6 +254,7 @@
 #define IDS_RS_DVB_LAST_CHANNEL				L"LastChannel"
 
 #define IDS_RS_FASTSEEK_KEYFRAME			L"FastSeek"
+#define IDS_RS_HIDE_WINDOWED_MOUSE_POINTER	L"HideWindowedMousePointer"
 #define IDS_RS_MINI_DUMP					L"MiniDump"
 
 #define IDS_RS_LCD_SUPPORT					L"LcdSupport"

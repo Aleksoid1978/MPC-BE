@@ -774,6 +774,7 @@ public:
 	bool			bPauseMinimizedVideo;
 	bool			fLCDSupport;
 	bool			fFastSeek;
+	bool			bHideWindowedMousePointer;
 	bool			fMiniDump;
 	bool			bUpdaterAutoCheck;
 	int				nUpdaterDelay;
