@@ -6884,7 +6884,6 @@ void CMainFrame::OnD3DFullscreenToggle()
 void CMainFrame::OnFileClosePlaylist()
 {
 	SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-	RestoreDefaultWindowRect();
 }
 
 void CMainFrame::OnUpdateFileClose(CCmdUI* pCmdUI)
