@@ -6883,6 +6883,9 @@ void CMainFrame::OnD3DFullscreenToggle()
 void CMainFrame::OnFileClosePlaylist()
 {
 	SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+	if (m_bFullScreen && AfxGetAppSettings().fExitFullScreenAtTheEnd) {
+		OnViewFullscreen();
+	}
 }
 
 void CMainFrame::OnUpdateFileClose(CCmdUI* pCmdUI)
