@@ -328,22 +328,23 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 5		"Atlama uzaklıkları (ms olarak kısa, orta, uzun)"
 9		"Varsayılan"
 10		"Hızlı atlama (karede)"
 11		"Oynatma listesinde sadece bir öğe olduğunda 'Geri/İleri Git' komutlarındaki 'klasörde arama' özelliğini kullanma."
 13		"Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA komutunu engelle"
 15		"Küçültüğünde video oynatmayı duraklat"
-17		"Logitech LCD desteğini kullan"
-18		"MiniDump etkinleştir"
-19		"Güncelleme kontrolü"
-20		"Otomatik güncelleme kontrolünü aç"
-21		"Her kontrol arasındaki gecikme:"
-24		"gün"
-25		"Ayar yönetimi"
-26		"Sıfırla"
-27		"Ver"
+17		"Auto-hide the pointer during playback in windowed mode"
+19		"Logitech LCD desteğini kullan"
+20		"MiniDump etkinleştir"
+21		"Güncelleme kontrolü"
+22		"Otomatik güncelleme kontrolünü aç"
+23		"Her kontrol arasındaki gecikme:"
+26		"gün"
+27		"Ayar yönetimi"
+28		"Sıfırla"
+29		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

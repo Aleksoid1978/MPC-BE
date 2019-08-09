@@ -328,22 +328,23 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Prehľadávať"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Fast seek (on keyframe)"
 11		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
 13		"Prevent from MINIMIZE when Fullscreen on non default monitor"
 15		"Pause the video playback when minimized"
-17		"Enable Logitech LCD support"
-18		"Enable MiniDump"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Správa nastavení"
-26		"Reset"
-27		"Export"
+17		"Auto-hide the pointer during playback in windowed mode"
+19		"Enable Logitech LCD support"
+20		"Enable MiniDump"
+21		"Update check"
+22		"Enable automatic update check"
+23		"Delay between each check:"
+26		"day(s)"
+27		"Správa nastavení"
+28		"Reset"
+29		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

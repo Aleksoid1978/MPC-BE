@@ -328,22 +328,23 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
 10		"高速シーク (キーフレームに)"
 11		"プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない"
 13		"既定のモニター以外ではフルスクリーン時に 最小化 を禁止する"
 15		"最小化時にビデオ再生を一時停止させる"
-17		"Logitech (Logicool) LCD サポートを有効にする"
-18		"MiniDump を有効にする"
-19		"更新の確認"
-20		"更新を自動で確認する"
-21		"確認する間隔:"
-24		"日"
-25		"設定の管理"
-26		"リセット"
-27		"エクスポート"
+17		"Auto-hide the pointer during playback in windowed mode"
+19		"Logitech (Logicool) LCD サポートを有効にする"
+20		"MiniDump を有効にする"
+21		"更新の確認"
+22		"更新を自動で確認する"
+23		"確認する間隔:"
+26		"日"
+27		"設定の管理"
+28		"リセット"
+29		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
