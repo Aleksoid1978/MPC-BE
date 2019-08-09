@@ -289,7 +289,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_WINDOW_TO_PRIMARYSCREEN, OnMoveWindowToPrimaryScreen)
 
-	ON_UPDATE_COMMAND_UI(ID_VIEW_FULLSCREEN, OnUpdateViewFullscreen)
 	ON_COMMAND_RANGE(ID_VIEW_ZOOM_50, ID_VIEW_ZOOM_200, OnViewZoom)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_ZOOM_50, ID_VIEW_ZOOM_200, OnUpdateViewZoom)
 	ON_COMMAND(ID_VIEW_ZOOM_AUTOFIT, OnViewZoomAutoFit)
@@ -7122,12 +7121,6 @@ void CMainFrame::OnViewFullscreenSecondary()
 	} else {
 		ToggleFullscreen(true, false);
 	}
-}
-
-void CMainFrame::OnUpdateViewFullscreen(CCmdUI* pCmdUI)
-{
-	//pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly || m_bFullScreen);
-	//pCmdUI->SetCheck(m_bFullScreen);
 }
 
 void CMainFrame::OnMoveWindowToPrimaryScreen()

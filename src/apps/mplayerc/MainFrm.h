@@ -1027,14 +1027,12 @@ public:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 
-	afx_msg void OnUpdateViewFullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnViewZoom(UINT nID);
 	afx_msg void OnUpdateViewZoom(CCmdUI* pCmdUI);
 	afx_msg void OnViewZoomAutoFit();
 	afx_msg void OnViewDefaultVideoFrame(UINT nID);
 	afx_msg void OnUpdateViewDefaultVideoFrame(CCmdUI* pCmdUI);
 	afx_msg void OnViewSwitchVideoFrame();
-	afx_msg void OnUpdateViewSwitchVideoFrame(CCmdUI* pCmdUI);
 	afx_msg void OnViewKeepaspectratio();
 	afx_msg void OnUpdateViewKeepaspectratio(CCmdUI* pCmdUI);
 	afx_msg void OnViewCompMonDeskARDiff();
@@ -1064,7 +1062,6 @@ public:
 	afx_msg void OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI);
 
-	afx_msg void OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
 	afx_msg void OnViewVSync();
 	afx_msg void OnViewVSyncInternal();
@@ -1074,7 +1071,6 @@ public:
 	afx_msg void OnViewResetDefault();
 	afx_msg void OnUpdateViewReset(CCmdUI* pCmdUI);
 
-	afx_msg void OnViewFullscreenGUISupport();
 	afx_msg void OnViewEnableFrameTimeCorrection();
 	afx_msg void OnViewVSyncOffsetIncrease();
 	afx_msg void OnViewVSyncOffsetDecrease();
