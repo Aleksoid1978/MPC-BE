@@ -335,7 +335,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 11		"Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Mediendateien im Ordner durch ""Vorwärts/Rückwärts springen"" öffnen"
 13		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
 15		"Videowiedergabe pausieren, wenn minimiert"
-17		"Auto-hide the pointer during playback in windowed mode"
+17		"Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken"
 19		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
 20		"MiniDumps aktivieren"
 21		"Programm-Update"
