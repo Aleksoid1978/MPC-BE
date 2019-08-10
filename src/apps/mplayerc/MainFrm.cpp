@@ -4111,7 +4111,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 	GetCursorPos(&point);
 	pMenu->TrackPopupMenu(TPM_RIGHTBUTTON | TPM_NOANIMATION, point.x + 1, point.y + 1, this);
 
-	if (m_bFullScreen || AfxGetAppSettings().bHideWindowedMousePointer) {
+	if (m_bFullScreen || (AfxGetAppSettings().bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED)) {
 		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr); // need when working with menus and use the keyboard only
 	}
 
