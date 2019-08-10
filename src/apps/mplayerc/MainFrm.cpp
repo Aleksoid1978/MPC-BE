@@ -3486,10 +3486,6 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 		m_wndToolBar.Invalidate();
 	}
 
-	if (s.bHideWindowedMousePointer) {
-		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
-	}
-
 	return 0L;
 }
 
@@ -4444,6 +4440,10 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_wndPlaylistBar.SavePlaylist();
+
+	if (s.bHideWindowedMousePointer) {
+		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
+	}
 }
 
 void CMainFrame::OnFilePostCloseMedia()
