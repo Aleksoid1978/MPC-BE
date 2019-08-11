@@ -68,8 +68,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnUpdateTimeout(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateCheck13(CCmdUI* pCmdUI);
 	afx_msg void OnUpdatePos(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOSD(CCmdUI* pCmdUI);
 	afx_msg void OnKillFocusEdit1();
