@@ -10551,7 +10551,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	} else {
 		ModifyStyle(0, WS_MINIMIZEBOX, SWP_NOZORDER);
 		KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
-		if (!s.bHideWindowedMousePointer) {
+		if (!(s.bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED)) {
 			StopAutoHideCursor();
 		}
 		ShowControls(s.nCS);
