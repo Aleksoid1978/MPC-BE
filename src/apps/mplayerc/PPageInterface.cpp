@@ -336,7 +336,7 @@ void CPPageInterface::OnThemeChange()
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
 	}
 
-	if (AfxGetAppSettings().bDarkMenu) {
+	if (AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
 		pFrame->SetColorMenu();
 	}
 
