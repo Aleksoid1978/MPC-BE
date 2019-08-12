@@ -84,10 +84,12 @@ protected:
 	static inline COLORREF m_crTG;  // text grayed
 	static inline COLORREF m_crTGL; // text grayed lighten
 
-	static inline int m_CYEDGE = 0;
 	static inline int m_CYMENU = 0;
 	static inline int m_CXMENUCHECK = 0;
 	static inline int m_CYMENUCHECK = 0;
+
+	static const inline int m_separatorHeight = 7;
+	static const inline int m_itemHeightPadding = 7;
 
 	static inline bool m_bUseDrawHook = false;
 
