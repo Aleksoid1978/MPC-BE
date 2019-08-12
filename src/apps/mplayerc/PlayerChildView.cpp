@@ -52,6 +52,16 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+void CChildView::OnMouseLeave()
+{
+	m_bTrackingMouseLeave = false;
+
+	auto pFrame = AfxGetMainFrame();
+	pFrame->StopAutoHideCursor();
+
+	CWnd::OnMouseLeave();
+}
+
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!CWnd::PreCreateWindow(cs)) {
@@ -72,6 +82,13 @@ BOOL CChildView::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message >= WM_MOUSEFIRST && pMsg->message <= WM_MYMOUSELAST) {
+		if (pMsg->message == WM_MOUSEMOVE && !m_bTrackingMouseLeave) {
+			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, this->m_hWnd };
+			if (TrackMouseEvent(&tme)) {
+				m_bTrackingMouseLeave = true;
+			}
+		}
+
 		CWnd* pParent = GetParent();
 		CPoint point(pMsg->lParam);
 		::MapWindowPoints(pMsg->hwnd, pParent->m_hWnd, &point, 1);
@@ -149,6 +166,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_NCHITTEST()
 	ON_WM_NCLBUTTONDOWN()
 	ON_WM_CREATE()
+	ON_WM_MOUSELEAVE()
 END_MESSAGE_MAP()
 
 // CChildView message handlers

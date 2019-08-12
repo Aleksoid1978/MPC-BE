@@ -931,6 +931,9 @@ public:
 	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags);
 
+	afx_msg void OnEnterMenuLoop(BOOL bIsTrackPopupMenu);
+	afx_msg void OnExitMenuLoop(BOOL bIsTrackPopupMenu);
+
 	BOOL OnMenu(CMenu* pMenu);
 	afx_msg void OnMenuPlayerShort();
 	afx_msg void OnMenuPlayerLong();
@@ -1360,6 +1363,9 @@ public:
 	GUID		GetTimeFormat();
 
 	CColorControl	m_ColorCintrol;
+
+	void		StopAutoHideCursor();
+	void		StartAutoHideCursor();
 protected:
 	CDiskImage	m_DiskImage;
 	BOOL		m_bNeedUnmountImage = TRUE;

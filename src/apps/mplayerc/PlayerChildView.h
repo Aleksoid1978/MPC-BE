@@ -35,6 +35,7 @@ public:
 	virtual ~CChildView();
 
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnMouseLeave();
 
 	DECLARE_DYNAMIC(CChildView)
 
@@ -62,4 +63,6 @@ protected:
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 
 	DECLARE_MESSAGE_MAP()
+
+	bool m_bTrackingMouseLeave = false;
 };
