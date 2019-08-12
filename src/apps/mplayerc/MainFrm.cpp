@@ -4450,9 +4450,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	m_wndPlaylistBar.SavePlaylist();
 
-	if (s.bHideWindowedMousePointer) {
-		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
-	}
+	StartAutoHideCursor();
 }
 
 void CMainFrame::OnFilePostCloseMedia()
