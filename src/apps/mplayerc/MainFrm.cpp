@@ -214,6 +214,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_INITMENUPOPUP()
 	ON_WM_UNINITMENUPOPUP()
 
+	ON_WM_ENTERMENULOOP()
+	ON_WM_EXITMENULOOP()
+
 	ON_COMMAND(ID_MENU_PLAYER_SHORT, OnMenuPlayerShort)
 	ON_COMMAND(ID_MENU_PLAYER_LONG, OnMenuPlayerLong)
 	ON_COMMAND(ID_MENU_FILTERS, OnMenuFilters)
@@ -2521,23 +2524,26 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		}
 		break;
 		case TIMER_MOUSEHIDER: {
-			CPoint p;
-			GetCursorPos(&p);
+			if (!m_bInOptions) {
+				CPoint p;
+				GetCursorPos(&p);
 
-			CRect r;
-			GetWindowRect(r);
-			bool fCursorOutside = !r.PtInRect(p);
-			CWnd* pWnd = WindowFromPoint(p);
-			if (IsD3DFullScreenMode()) {
-				if (!m_bInOptions && *pWnd == *m_pFullscreenWnd) {
-					m_bHideCursor = true;
-					m_pFullscreenWnd->ShowCursor(false);
-				}
-				KillTimer(TIMER_MOUSEHIDER);
-			} else {
-				if (pWnd && !m_bInOptions && (m_wndView == *pWnd || m_wndView.IsChild(pWnd) || fCursorOutside)) {
-					m_bHideCursor = true;
-					SetCursor(nullptr);
+				CRect r;
+				GetWindowRect(r);
+				bool fCursorOutside = !r.PtInRect(p);
+				CWnd* pWnd = WindowFromPoint(p);
+
+				if (IsD3DFullScreenMode()) {
+					if (*pWnd == *m_pFullscreenWnd) {
+						StopAutoHideCursor();
+						m_pFullscreenWnd->ShowCursor(false);
+					}
+				} else {
+					if (pWnd && (m_wndView == *pWnd || m_wndView.IsChild(pWnd) || fCursorOutside)) {
+						m_bHideCursor = true;
+						SetCursor(nullptr);
+						KillTimer(TIMER_MOUSEHIDER);
+					}
 				}
 			}
 		}
@@ -3748,10 +3754,8 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-		m_bHideCursor = false;
+		StopAutoHideCursor();
 		m_pFullscreenWnd->ShowCursor(true);
-
-		KillTimer(TIMER_MOUSEHIDER);
 		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
 	} else if (m_bFullScreen && (abs(diff.cx) + abs(diff.cy)) >= 1) {
 		int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
@@ -3834,8 +3838,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 			SetTimer(TIMER_MOUSEHIDER, std::max(nTimeOut * 1000, 2000), nullptr);
 		}
 	} else if (s.bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-		m_bHideCursor = false;
-		KillTimer(TIMER_MOUSEHIDER);
+		StopAutoHideCursor();
 		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
 	}
 
@@ -4087,6 +4090,20 @@ void CMainFrame::OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags)
 	m_bLeftMouseDown = FALSE;
 }
 
+void CMainFrame::OnEnterMenuLoop(BOOL bIsTrackPopupMenu)
+{
+	__super::OnEnterMenuLoop(bIsTrackPopupMenu);
+
+	StopAutoHideCursor();
+}
+
+void CMainFrame::OnExitMenuLoop(BOOL bIsTrackPopupMenu)
+{
+	__super::OnExitMenuLoop(bIsTrackPopupMenu);
+
+	StartAutoHideCursor();
+}
+
 BOOL CMainFrame::OnMenu(CMenu* pMenu)
 {
 	CheckPointer(pMenu, FALSE);
@@ -4100,16 +4117,9 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 		return FALSE; // prevent crash when player closes with context menu open
 	}
 
-	KillTimer(TIMER_MOUSEHIDER);
-	m_bHideCursor = false;
-
 	CPoint point;
 	GetCursorPos(&point);
 	pMenu->TrackPopupMenu(TPM_RIGHTBUTTON | TPM_NOANIMATION, point.x + 1, point.y + 1, this);
-
-	if (m_bFullScreen || (AfxGetAppSettings().bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED)) {
-		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr); // need when working with menus and use the keyboard only
-	}
 
 	return TRUE;
 }
@@ -4453,8 +4463,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
 
-	KillTimer(TIMER_MOUSEHIDER);
-	m_bHideCursor = false;
+	StopAutoHideCursor();
 
 	KillTimer(TIMER_STATUSERASER);
 	m_playingmsg.Empty();
@@ -10541,8 +10550,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		ModifyStyle(0, WS_MINIMIZEBOX, SWP_NOZORDER);
 		KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
 		if (!s.bHideWindowedMousePointer) {
-			KillTimer(TIMER_MOUSEHIDER);
-			m_bHideCursor = false;
+			StopAutoHideCursor();
 		}
 		ShowControls(s.nCS);
 		if (GetPlaybackMode() == PM_CAPTURE && s.iDefaultCaptureDevice == 1) {
@@ -17158,9 +17166,8 @@ void CMainFrame::DestroyD3DWindow()
 		m_pFullscreenWnd->ShowWindow(SW_HIDE);
 		m_pFullscreenWnd->DestroyWindow();
 
-		KillTimer(TIMER_MOUSEHIDER);
+		StopAutoHideCursor();
 		KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
-		m_bHideCursor = false;
 
 		SetFocus();
 	}
@@ -19754,6 +19761,19 @@ void CMainFrame::ResetMenu()
 
 	if (enableDarkMenu) {
 		SetColorMenu();
+	}
+}
+
+void CMainFrame::StopAutoHideCursor()
+{
+	m_bHideCursor = false;
+	KillTimer(TIMER_MOUSEHIDER);
+}
+
+void CMainFrame::StartAutoHideCursor()
+{
+	if (m_bFullScreen || (AfxGetAppSettings().bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED)) {
+		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
 	}
 }
 
