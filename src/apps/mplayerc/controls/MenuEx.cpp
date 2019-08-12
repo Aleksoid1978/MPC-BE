@@ -43,8 +43,7 @@ void CMenuEx::ScaleFont()
 {
 	m_font.DeleteObject();
 
-	NONCLIENTMETRICS nm = { 0 };
-	nm.cbSize = sizeof(NONCLIENTMETRICS);
+	NONCLIENTMETRICSW nm = { sizeof(nm) };
 	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, nm.cbSize, &nm, 0));
 
 	if (SysVersion::IsWin8orLater()) {
@@ -53,12 +52,10 @@ void CMenuEx::ScaleFont()
 	m_font.CreateFontIndirectW(&nm.lfMenuFont);
 
 	if (SysVersion::IsWin8orLater()) {
-		m_CYEDGE = m_pMainFrame->GetSystemMetricsDPI(SM_CYEDGE);
 		m_CYMENU = m_pMainFrame->GetSystemMetricsDPI(SM_CYMENU);
 		m_CXMENUCHECK = m_pMainFrame->GetSystemMetricsDPI(SM_CXMENUCHECK);
 		m_CYMENUCHECK = m_pMainFrame->GetSystemMetricsDPI(SM_CYMENUCHECK);
 	} else {
-		m_CYEDGE = ::GetSystemMetrics(SM_CYEDGE);
 		m_CYMENU = ::GetSystemMetrics(SM_CYMENU);
 		m_CXMENUCHECK = ::GetSystemMetrics(SM_CXMENUCHECK);
 		m_CYMENUCHECK = ::GetSystemMetrics(SM_CYMENUCHECK);
@@ -321,9 +318,6 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 		CString strText(lpItem->strText);
 		strText.Remove(L'&');
 		VERIFY(::GetTextExtentPoint32W(dcScreen.GetSafeHdc(), strText.GetString(), strText.GetLength(), &size));
-		if (size.cy < m_CYMENU) {
-			size.cy = m_CYMENU;
-		}
 
 		dcScreen.RestoreDC(-1);
 		::ReleaseDC(nullptr, dcScreen.Detach());
@@ -340,10 +334,10 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 			}
 		}
 
-		lpMIS->itemHeight = size.cy + m_CYEDGE - 1;
+		lpMIS->itemHeight = size.cy + m_itemHeightPadding;
 	} else {
-		lpMIS->itemWidth = 1;
-		lpMIS->itemHeight = m_CYMENU / 2 - m_CYEDGE - 1;
+		lpMIS->itemWidth = 0;
+		lpMIS->itemHeight = m_separatorHeight;
 	}
 }
 
