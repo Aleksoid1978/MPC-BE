@@ -135,6 +135,8 @@ void CPPageWindowSize::OnRadioPlaybackClicked(UINT nID)
 
 void CPPageWindowSize::OnBtnCurrentSizeClicked()
 {
+	UpdateData(TRUE);
+
 	CRect rect;
 	AfxGetMainFrame()->GetWindowRect(&rect);
 	m_iWindowWidth = rect.Width();
