@@ -540,21 +540,22 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Интерпретаторы CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 27
-5		"Window size at startup"
-6		"Standard window size"
-7		"Remember last window size"
-8		"Set specified window size"
-9		"Set specified video area"
-14		"[ O ]"
-15		"After starting playback"
-16		"not change"
-17		"scale to video size"
-18		"fit window to screen"
-23		"Larger only"
-24		"Remember last window position"
-25		"Limit window proportions on resize"
-26		"Snap to desktop edges"
+BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
+5		"Размер окна при старте"
+6		"Стандартный размер окна"
+7		"Запоминать размер окна"
+8		"Задать размер окна"
+9		"Задать размер видео области"
+11		"×"
+13		"[ O ]"
+14		"После начала воспроизведения"
+15		"не менять"
+16		"масштабировать под размер видео"
+17		"подогнать окно к экрану"
+22		"Только большие"
+23		"Запоминать позицию окна"
+24		"Соотношение сторон по видеокадру"
+25		"Прилипать к границам экрана"
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
