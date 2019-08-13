@@ -540,20 +540,21 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Obsluha CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
+BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 27
 5		"Window size at startup"
 6		"Standard window size"
 7		"Remember last window size"
 8		"Set specified window size"
 9		"Set specified video area"
-14		"After starting playback"
-15		"not change"
-16		"scale to video size"
-17		"fit window to screen"
-22		"Larger only"
-23		"Remember last window position"
-24		"Limit window proportions on resize"
-25		"Snap to desktop edges"
+14		"[ O ]"
+15		"After starting playback"
+16		"not change"
+17		"scale to video size"
+18		"fit window to screen"
+23		"Larger only"
+24		"Remember last window position"
+25		"Limit window proportions on resize"
+26		"Snap to desktop edges"
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
