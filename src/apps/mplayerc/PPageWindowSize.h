@@ -30,12 +30,11 @@ class CPPageWindowSize : public CPPageBase
 	DECLARE_DYNAMIC(CPPageWindowSize)
 
 	int m_nRadioStartup = 0;
-	int m_iWindowWidth = 1280;
+	int m_iWindowWidth = 460;
 	CSpinButtonCtrl m_spnWindowWidth;
-	int m_iWindowHeigth = 720;
+	int m_iWindowHeigth = 390;
 	CSpinButtonCtrl m_spnWindowHeigth;
-
-	CButton m_chkRememberWindowPos;
+	CButton m_btnCurrentSize;
 
 	int m_nRadioPlayback = 0;
 	CComboBox m_cmbScaleLevel;
@@ -43,6 +42,7 @@ class CPPageWindowSize : public CPPageBase
 	CSpinButtonCtrl m_spnFitFactor;
 	CButton m_chkFitLargerOnly;
 
+	CButton m_chkRememberWindowPos;
 	CButton m_chkLimitWindowProportions;
 	CButton m_chkSnapToDesktopEdges;
 
@@ -62,4 +62,5 @@ protected:
 public:
 	afx_msg void OnRadioStartupClicked(UINT nID);
 	afx_msg void OnRadioPlaybackClicked(UINT nID);
+	afx_msg void OnBtnCurrentSizeClicked();
 };

@@ -43,6 +43,7 @@ void CPPageWindowSize::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN1, m_spnWindowWidth);
 	DDX_Text(pDX, IDC_EDIT2, m_iWindowHeigth);
 	DDX_Control(pDX, IDC_SPIN2, m_spnWindowHeigth);
+	DDX_Control(pDX, IDC_BUTTON1, m_btnCurrentSize);
 
 	DDX_Radio(pDX, IDC_RADIO5, m_nRadioPlayback);
 	DDX_Control(pDX, IDC_COMBO1, m_cmbScaleLevel);
@@ -91,6 +92,7 @@ BOOL CPPageWindowSize::OnApply()
 BEGIN_MESSAGE_MAP(CPPageWindowSize, CPPageBase)
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO4, OnRadioStartupClicked)
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO5, IDC_RADIO7, OnRadioPlaybackClicked)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBtnCurrentSizeClicked)
 END_MESSAGE_MAP()
 
 // CPPageWindowSize message handlers
@@ -102,11 +104,13 @@ void CPPageWindowSize::OnRadioStartupClicked(UINT nID)
 		GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
 		m_spnWindowWidth.EnableWindow(TRUE);
 		m_spnWindowHeigth.EnableWindow(TRUE);
+		m_btnCurrentSize.EnableWindow(TRUE);
 	} else {
 		GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT2)->EnableWindow(FALSE);
 		m_spnWindowWidth.EnableWindow(FALSE);
 		m_spnWindowHeigth.EnableWindow(FALSE);
+		m_btnCurrentSize.EnableWindow(FALSE);
 	}
 }
 
@@ -127,4 +131,14 @@ void CPPageWindowSize::OnRadioPlaybackClicked(UINT nID)
 		GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 		m_chkFitLargerOnly.EnableWindow(TRUE);
 	}
+}
+
+void CPPageWindowSize::OnBtnCurrentSizeClicked()
+{
+	CRect rect;
+	AfxGetMainFrame()->GetWindowRect(&rect);
+	m_iWindowWidth = rect.Width();
+	m_iWindowHeigth = rect.Height();
+
+	UpdateData(FALSE);
 }
