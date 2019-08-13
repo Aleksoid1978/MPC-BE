@@ -540,21 +540,22 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI-Handler (.ext1=Pfad1;.ext2=Pfad2;...):"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 27
+BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 5		"Fenstergröße bei Programmstart"
 6		"Standardfenstergröße"
 7		"Letzte Fenstergröße merken"
 8		"Fenstergröße festlegen"
 9		"Videobereich festlegen"
-14		"[ O ]"
-15		"Nach dem Start der Wiedergabe"
-16		"Nicht ändern"
-17		"Auf Videogröße skalieren"
-18		"Fenster an Bildschirm anpassen"
-23		"Nur größer"
-24		"Letzte Fensterposition merken"
-25		"Fensterproportionen bei der Größenänderung begrenzen"
-26		"An Desktoprand andocken"
+11		"×"
+13		"[ O ]"
+14		"Nach dem Start der Wiedergabe"
+15		"Nicht ändern"
+16		"Auf Videogröße skalieren"
+17		"Fenster an Bildschirm anpassen"
+22		"Nur größer"
+23		"Letzte Fensterposition merken"
+24		"Fensterproportionen bei der Größenänderung begrenzen"
+25		"An Desktoprand andocken"
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16

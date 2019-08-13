@@ -540,21 +540,22 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI 操作器:(.ext1＝路径1; .ext2＝路径2; ...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 27
+BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 5		"启动时的窗口大小"
 6		"标准窗口大小"
 7		"记住上次使用的窗口大小"
 8		"设置指定的窗口大小"
 9		"设置指定的视频区域"
-14		"[ O ]"
-15		"开始播放之后"
-16		"不变"
-17		"按照视频大小缩放"
-18		"自适应窗口到屏幕"
-23		"仅放大"
-24		"记住上次使用的窗口位置"
-25		"调整大小时限制窗口比例"
-26		"对齐至桌面边缘"
+11		"×"
+13		"[ O ]"
+14		"开始播放之后"
+15		"不变"
+16		"按照视频大小缩放"
+17		"自适应窗口到屏幕"
+22		"仅放大"
+23		"记住上次使用的窗口位置"
+24		"调整大小时限制窗口比例"
+25		"对齐至桌面边缘"
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16

@@ -40,9 +40,7 @@ void CPPageWindowSize::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Radio(pDX, IDC_RADIO1, m_nRadioStartup);
 	DDX_Text(pDX, IDC_EDIT1, m_iWindowWidth);
-	DDX_Control(pDX, IDC_SPIN1, m_spnWindowWidth);
 	DDX_Text(pDX, IDC_EDIT2, m_iWindowHeigth);
-	DDX_Control(pDX, IDC_SPIN2, m_spnWindowHeigth);
 	DDX_Control(pDX, IDC_BUTTON1, m_btnCurrentSize);
 
 	DDX_Radio(pDX, IDC_RADIO5, m_nRadioPlayback);
@@ -61,9 +59,6 @@ BOOL CPPageWindowSize::OnInitDialog()
 	__super::OnInitDialog();
 
 	CAppSettings& s = AfxGetAppSettings();
-
-	m_spnWindowWidth.SetRange(640, 3840);
-	m_spnWindowHeigth.SetRange(360, 2160);
 
 	m_cmbScaleLevel.AddString(L"50%");
 	m_cmbScaleLevel.AddString(L"100%");
@@ -103,14 +98,10 @@ void CPPageWindowSize::OnRadioStartupClicked(UINT nID)
 	if (nID == IDC_RADIO3) {
 		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
-		m_spnWindowWidth.EnableWindow(TRUE);
-		m_spnWindowHeigth.EnableWindow(TRUE);
 		m_btnCurrentSize.EnableWindow(TRUE);
 	} else {
 		GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT2)->EnableWindow(FALSE);
-		m_spnWindowWidth.EnableWindow(FALSE);
-		m_spnWindowHeigth.EnableWindow(FALSE);
 		m_btnCurrentSize.EnableWindow(FALSE);
 	}
 }

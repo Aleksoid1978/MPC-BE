@@ -31,9 +31,7 @@ class CPPageWindowSize : public CPPageBase
 
 	int m_nRadioStartup = 0;
 	int m_iWindowWidth = 460;
-	CSpinButtonCtrl m_spnWindowWidth;
 	int m_iWindowHeigth = 390;
-	CSpinButtonCtrl m_spnWindowHeigth;
 	CButton m_btnCurrentSize;
 
 	int m_nRadioPlayback = 0;

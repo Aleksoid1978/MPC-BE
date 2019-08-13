@@ -21,7 +21,7 @@
 
 #pragma once
 
-#define ENABLE_WINDOWSIZE_PAGE 0
+#define ENABLE_WINDOWSIZE_PAGE 1
 
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
