@@ -68,15 +68,15 @@ BOOL CPPageWindowSize::OnInitDialog()
 	m_cmbScaleLevel.AddString(L"50%");
 	m_cmbScaleLevel.AddString(L"100%");
 	m_cmbScaleLevel.AddString(L"200%");
-
 	m_cmbScaleLevel.SetCurSel(s.iZoomLevel);
+
 	m_nFitFactor = s.nAutoFitFactor;
 	m_spnFitFactor.SetRange(20, 80);
 
-	OnRadioStartupClicked(IDC_RADIO1);
-	OnRadioPlaybackClicked(IDC_RADIO5);
-
 	UpdateData(FALSE);
+
+	OnRadioStartupClicked(m_nRadioStartup + IDC_RADIO1);
+	OnRadioPlaybackClicked(m_nRadioPlayback + IDC_RADIO5);
 
 	return TRUE;
 }
@@ -84,7 +84,6 @@ BOOL CPPageWindowSize::OnInitDialog()
 BOOL CPPageWindowSize::OnApply()
 {
 	UpdateData();
-
 
 	return __super::OnApply();
 }
@@ -99,6 +98,8 @@ END_MESSAGE_MAP()
 
 void CPPageWindowSize::OnRadioStartupClicked(UINT nID)
 {
+	UpdateData();
+
 	if (nID == IDC_RADIO3) {
 		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
@@ -116,6 +117,8 @@ void CPPageWindowSize::OnRadioStartupClicked(UINT nID)
 
 void CPPageWindowSize::OnRadioPlaybackClicked(UINT nID)
 {
+	UpdateData();
+
 	m_cmbScaleLevel.EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
 	m_spnFitFactor.EnableWindow(FALSE);
@@ -126,7 +129,7 @@ void CPPageWindowSize::OnRadioPlaybackClicked(UINT nID)
 		m_cmbScaleLevel.EnableWindow(TRUE);
 	}
 	else if (nID == IDC_RADIO7) {
-		GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT3)->EnableWindow(TRUE);
 		m_spnFitFactor.EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 		m_chkFitLargerOnly.EnableWindow(TRUE);
@@ -135,8 +138,6 @@ void CPPageWindowSize::OnRadioPlaybackClicked(UINT nID)
 
 void CPPageWindowSize::OnBtnCurrentSizeClicked()
 {
-	UpdateData(TRUE);
-
 	CRect rect;
 	AfxGetMainFrame()->GetWindowRect(&rect);
 	m_iWindowWidth = rect.Width();
