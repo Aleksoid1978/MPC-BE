@@ -378,6 +378,9 @@
     <ClCompile Include="controls\ColorEdit.cpp">
       <Filter>controls</Filter>
     </ClCompile>
+    <ClCompile Include="PPageWindowSize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -748,6 +751,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageWindowSize.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

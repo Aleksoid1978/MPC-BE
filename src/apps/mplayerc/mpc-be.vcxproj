@@ -118,6 +118,7 @@
     <ClCompile Include="PPageFiltersPriority.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="PPageSoundProcessing.cpp" />
+    <ClCompile Include="PPageWindowSize.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
     <ClCompile Include="FakeFilterMapper2.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="PPageFiltersPriority.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="PPageSoundProcessing.h" />
+    <ClInclude Include="PPageWindowSize.h" />
     <ClInclude Include="PPageYouTube.h" />
     <ClInclude Include="DVBChannel.h" />
     <ClInclude Include="FakeFilterMapper2.h" />

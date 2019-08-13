@@ -540,6 +540,22 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI ハンドラー: (拡張子1=パス1; 拡張子2=パス2;...)"
 END
 
+BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
+5		"Window size at startup"
+6		"Standard window size"
+7		"Remember last window size"
+8		"Set specified window size"
+9		"Set specified video area"
+14		"After starting playback"
+15		"not change"
+16		"scale to video size"
+17		"fit window to screen"
+22		"Larger only"
+23		"Remember last window position"
+24		"Limit window proportions on resize"
+25		"Snap to desktop edges"
+END
+
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
 5		"YouTube"
 6		"内蔵のウェブ ページ パーサーを使用する"
@@ -1108,6 +1124,7 @@ STRING IDD_PPAGESUBTITLES		"字幕"
 STRING IDD_PPAGESYNC		"映像::フレーム同期"
 STRING IDD_PPAGEVIDEO		"映像"
 STRING IDD_PPAGEWEBSERVER		"プレーヤー::ウェブ インターフェイス"
+STRING IDD_PPAGEWINDOWSIZE		"プレーヤー::Window size"
 STRING IDD_PPAGEYOUTUBE		"再生::動画共有サービス"
 STRING IDF_LOGO1		"既定"
 STRING IDR_MAINFRAME		"MPC-BE"

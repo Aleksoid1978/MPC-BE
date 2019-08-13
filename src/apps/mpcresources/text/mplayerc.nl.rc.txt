@@ -540,6 +540,22 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI-handlers: (.ext1=path1;.ext2=path2;...)"
 END
 
+BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
+5		"Window size at startup"
+6		"Standard window size"
+7		"Remember last window size"
+8		"Set specified window size"
+9		"Set specified video area"
+14		"After starting playback"
+15		"not change"
+16		"scale to video size"
+17		"fit window to screen"
+22		"Larger only"
+23		"Remember last window position"
+24		"Limit window proportions on resize"
+25		"Snap to desktop edges"
+END
+
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
 5		"YouTube"
 6		"Ingebouwde webpaginaparser gebruiken"
@@ -1108,6 +1124,7 @@ STRING IDD_PPAGESUBTITLES		"Ondertiteling"
 STRING IDD_PPAGESYNC		"Video::Framesynchronisatie"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Speler::Webinterface"
+STRING IDD_PPAGEWINDOWSIZE		"Speler::Window size"
 STRING IDD_PPAGEYOUTUBE		"Weergave::Online-videodienst"
 STRING IDF_LOGO1		"Standaard"
 STRING IDR_MAINFRAME		"MPC-BE"
