@@ -612,6 +612,7 @@
 #define IDD_NAVIGATION                  10057
 #define IDD_PPAGEINTERFACE              10058
 #define IDD_PPAGEYOUTUBE                10059
+#define IDD_PPAGEWINDOWSIZE             10060
 #define IDD_PPAGEFILTERSPRIORITY        10061
 #define IDD_TUNER_SCAN                  10062
 #define IDD_NAVIGATION_DLG              10063

@@ -21,6 +21,8 @@
 
 #pragma once
 
+#define ENABLE_WINDOWSIZE_PAGE 0
+
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
 #include "PPageAccelTbl.h"
@@ -42,6 +44,9 @@
 #include "PPageSubStyle.h"
 #include "PPageSubRend.h"
 #include "PPageInterface.h"
+#if ENABLE_WINDOWSIZE_PAGE
+#include "PPageWindowSize.h"
+#endif
 #include "PPageMisc.h"
 #include "PPageCapture.h"
 #include <TreePropSheet/TreePropSheet.h>
@@ -75,6 +80,9 @@ private:
 	CPPageAccelTbl        m_acceltbl;
 	CPPageLogo            m_logo;
 	CPPageInterface       m_interface;
+#if ENABLE_WINDOWSIZE_PAGE
+	CPPageWindowSize      m_windowsize;
+#endif
 	CPPageWebServer       m_webserver;
 	CPPagePlayback        m_playback;
 	CPPageDVD             m_dvd;
