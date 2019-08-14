@@ -39,7 +39,6 @@ public:
 	int  m_nRecentFiles;
 	BOOL m_bRememberDVDPos;
 	BOOL m_bRememberFilePos;
-	BOOL m_bRememberWindowSize;
 	BOOL m_bSavePnSZoom;
 	BOOL m_bRememberPlaylistItems;
 	BOOL m_bTrayIcon;

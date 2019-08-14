@@ -213,6 +213,12 @@ enum : int {
 	TEXTBAR_FULLPATH,
 };
 
+enum : int {
+	STARTUPWND_DEFAULT = 0,
+	STARTUPWND_REMLAST,
+	STARTUPWND_SPECIFIED,
+};
+
 static const std::vector<int> s_CommonVideoHeights = { 240, 360, 480, 720, 1080, 1440, 2160, 2880, 4320 };
 
 struct ShaderC {
@@ -527,9 +533,6 @@ public:
 
 	bool				bPasteClipboardURL;
 
-	CSize sizeFixedWindow;
-	bool HasFixedWindowSize() const { return sizeFixedWindow.cx > 0 || sizeFixedWindow.cy > 0; }
-	//int			iFixedWidth, iFixedHeight;
 	int				iMonitor;
 
 	CString			ParseFileName(const CString& param);
@@ -543,8 +546,6 @@ public:
 	int				iMultipleInst;
 	bool			bTrayIcon;
 	int				iShowOSD;
-	bool			bLimitWindowProportions;
-	bool			bSnapToDesktopEdges;
 	bool			bHideCDROMsSubMenu;
 	DWORD			dwPriority;
 	int				iTitleBarTextStyle;
@@ -556,8 +557,6 @@ public:
 	bool			bRememberDVDPos;
 	bool			bRememberFilePos;
 	bool			bRememberPlaylistItems;
-	bool			bRememberWindowPos;
-	bool			bRememberWindowSize;
 	bool			bSavePnSZoom;
 	float			dZoomX;
 	float			dZoomY;
@@ -584,6 +583,18 @@ public:
 	int				nLogoId;
 	bool			bLogoExternal;
 	CString			strLogoFileName;
+
+	// Window size
+	int				nStartupWindowMode;
+	CSize			szSpecifiedWndSize;
+	bool			bRememberWindowPos;
+	CRect			rcLastWindowPos; // and size
+	UINT			nLastWindowType;
+	bool			bLimitWindowProportions;
+	bool			bSnapToDesktopEdges;
+
+	CSize sizeFixedWindow; // not saved. from command line
+	bool HasFixedWindowSize() const { return sizeFixedWindow.cx > 0 || sizeFixedWindow.cy > 0; }
 
 	// Web Inteface
 	bool			fEnableWebServer;
@@ -836,8 +847,6 @@ public:
 	CString			strLastOpenDir;
 	CString			strLastSavedPlaylistDir;
 
-	UINT			nLastWindowType;
-	CRect			rcLastWindowPos;
 	UINT			nLastUsedPage;
 	bool			fRemainingTime;
 
