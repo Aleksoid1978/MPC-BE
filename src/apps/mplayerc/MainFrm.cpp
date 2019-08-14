@@ -3187,7 +3187,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									m_pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
 								}
 								s.bNormalStartDVD = true;
-								if (s.bRememberZoomLevel && !m_bFullScreen && !IsD3DFullScreenMode()) { // Hack to the normal initial zoom for DVD + DXVA ...
+								if (s.nPlaybackWindowMode && !m_bFullScreen && !IsD3DFullScreenMode()) { // Hack to the normal initial zoom for DVD + DXVA ...
 									ZoomVideoWindow();
 								}
 							}
@@ -3320,7 +3320,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 				m_bAudioOnly = (size.cx <= 0 || size.cy <= 0);
 
-				if (s.bRememberZoomLevel
+				if (s.nPlaybackWindowMode
 						&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
 					ZoomVideoWindow();
 				} else {
@@ -4335,7 +4335,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		GetWindowPlacement(&wp);
 
 		// Workaround to avoid MadVR freezing when switching channels in PM_CAPTURE mode:
-		if (IsWindowVisible() && s.bRememberZoomLevel
+		if (IsWindowVisible() && s.nPlaybackWindowMode
 				&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)
 				&& GetPlaybackMode() == PM_CAPTURE && rs.iVideoRenderer == VIDRNDT_MADVR) {
 			ShowWindow(SW_MAXIMIZE);
@@ -4343,7 +4343,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		// restore magnification
-		if (IsWindowVisible() && s.bRememberZoomLevel
+		if (IsWindowVisible() && s.nPlaybackWindowMode
 				&& !(m_bFullScreen || IsD3DFullScreenMode()
 					|| wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
 			ZoomVideoWindow(false);
@@ -4368,7 +4368,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	SendNowPlayingToApi();
 
-	if (m_bFullScreen && s.bRememberZoomLevel) {
+	if (m_bFullScreen && s.nPlaybackWindowMode) {
 		m_bFirstFSAfterLaunchOnFullScreen = true;
 	}
 
@@ -4393,7 +4393,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	UpdateTitle();
 
 	// correct window size if "Limit window proportions on resize" enable.
-	if (!s.bRememberZoomLevel && s.bLimitWindowProportions) {
+	if (!s.nPlaybackWindowMode && s.bLimitWindowProportions) {
 		const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
 		if (bCtrl) {
 			keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
@@ -11076,12 +11076,15 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (scale <= 0) {
-		scale =
-			s.iZoomLevel == 0 ? 0.5 :
-			s.iZoomLevel == 1 ? 1.0 :
-			s.iZoomLevel == 2 ? 2.0 :
-			s.iZoomLevel >= 3 ? GetZoomAutoFitScale() :
-			1.0;
+		if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREEN || s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER) {
+			scale = GetZoomAutoFitScale();
+		} else {
+			scale =
+				s.iZoomLevel == 0 ? 0.5 :
+				s.iZoomLevel == 1 ? 1.0 :
+				s.iZoomLevel == 2 ? 2.0 :
+				1.0;
+		}
 	}
 
 	if (m_bFullScreen) {
@@ -11211,7 +11214,7 @@ double CMainFrame::GetZoomAutoFitScale()
 
 	double fitscale = s.nAutoFitFactor / 100.0 * std::min((double)m_rcDesktop.Width() / arxy.cx, (double)m_rcDesktop.Height() / arxy.cy);
 
-	if (s.iZoomLevel == 4 && fitscale > 1.0) {
+	if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER && fitscale > 1.0) {
 		fitscale = 1.0;
 	}
 

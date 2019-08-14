@@ -64,6 +64,14 @@ BOOL CPPageWindowSize::OnInitDialog()
 	m_iWindowWidth  = s.szSpecifiedWndSize.cx;
 	m_iWindowHeigth = s.szSpecifiedWndSize.cy;
 
+	if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER) {
+		m_nRadioPlayback = PLAYBACKWND_FITSCREEN;
+		m_chkFitLargerOnly.SetCheck(BST_CHECKED);
+	} else {
+		m_nRadioPlayback = s.nPlaybackWindowMode;
+		m_chkFitLargerOnly.SetCheck(BST_UNCHECKED);
+	}
+
 	m_cmbScaleLevel.AddString(L"50%");
 	m_cmbScaleLevel.AddString(L"100%");
 	m_cmbScaleLevel.AddString(L"200%");
@@ -93,6 +101,15 @@ BOOL CPPageWindowSize::OnApply()
 	s.nStartupWindowMode    = m_nRadioStartup;
 	s.szSpecifiedWndSize.cx = m_iWindowWidth;
 	s.szSpecifiedWndSize.cy = m_iWindowHeigth;
+
+	if (m_nRadioPlayback == PLAYBACKWND_FITSCREEN && m_chkFitLargerOnly.GetCheck()) {
+		s.nPlaybackWindowMode = PLAYBACKWND_FITSCREENLARGER;
+	} else {
+		s.nPlaybackWindowMode = m_nRadioPlayback;
+	}
+
+	s.iZoomLevel = m_cmbScaleLevel.GetCurSel();
+	s.nAutoFitFactor = m_nFitFactor = std::clamp(m_nFitFactor, 20, 80);
 
 	s.bRememberWindowPos      = !!m_chkRememberWindowPos.GetCheck();
 	s.bLimitWindowProportions = !!m_chkLimitWindowProportions.GetCheck();

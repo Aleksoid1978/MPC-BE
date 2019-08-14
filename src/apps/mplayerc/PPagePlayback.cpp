@@ -31,7 +31,6 @@ CPPagePlayback::CPPagePlayback()
 	, m_iLoopForever(0)
 	, m_nLoops(0)
 	, m_fRewind(FALSE)
-	, m_nAutoFitFactor(50)
 	, m_nVolume(0)
 	, m_nBalance(0)
 	, m_bAddSimilarFiles(FALSE)
@@ -64,11 +63,6 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
 
-	DDX_Control(pDX, IDC_CHECK5, m_chkRememberZoomLevel);
-	DDX_Control(pDX, IDC_COMBO1, m_cmbZoomLevel);
-	DDX_Text(pDX, IDC_EDIT4, m_nAutoFitFactor);
-	DDX_Control(pDX, IDC_SPIN1, m_spnAutoFitFactor);
-
 	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
 	DDX_Text(pDX, IDC_EDIT2, m_subtitlesLanguageOrder);
 	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
@@ -86,8 +80,6 @@ BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateLoopNum)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateTrackOrder)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT3, OnUpdateTrackOrder)
-	ON_BN_CLICKED(IDC_CHECK5, OnAutoZoomCheck)
-	ON_CBN_SELCHANGE(IDC_COMBO1, OnAutoZoomSelChange)
 	ON_STN_DBLCLK(IDC_STATIC_BALANCE, OnBalanceTextDblClk)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
@@ -129,17 +121,6 @@ BOOL CPPagePlayback::OnInitDialog()
 	AddStringData(m_nSpeedStepCtrl, L"1.0", 100);
 	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
 
-	m_chkRememberZoomLevel.SetCheck(s.bRememberZoomLevel);
-	m_cmbZoomLevel.AddString(L"50%");
-	m_cmbZoomLevel.AddString(L"100%");
-	m_cmbZoomLevel.AddString(L"200%");
-	m_cmbZoomLevel.AddString(ResStr(IDS_ZOOM_AUTOFIT));
-	m_cmbZoomLevel.AddString(ResStr(IDS_ZOOM_AUTOFITLARGE));
-	CorrectComboListWidth(m_cmbZoomLevel);
-	m_cmbZoomLevel.SetCurSel(s.iZoomLevel);
-	m_nAutoFitFactor = s.nAutoFitFactor;
-	m_spnAutoFitFactor.SetRange(20, 80);
-
 	m_fUseInternalSelectTrackLogic	= s.fUseInternalSelectTrackLogic;
 	m_subtitlesLanguageOrder		= s.strSubtitlesLanguageOrder;
 	m_audiosLanguageOrder			= s.strAudiosLanguageOrder;
@@ -155,9 +136,6 @@ BOOL CPPagePlayback::OnInitDialog()
 
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK4));
-
-	OnAutoZoomSelChange();
-	OnAutoZoomCheck();
 
 	UpdateData(FALSE);
 
@@ -175,9 +153,6 @@ BOOL CPPagePlayback::OnApply()
 	s.fLoopForever = !!m_iLoopForever;
 	s.nLoops = m_nLoops;
 	s.fRewind = !!m_fRewind;
-	s.iZoomLevel = m_cmbZoomLevel.GetCurSel();
-	s.bRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
-	s.nAutoFitFactor = m_nAutoFitFactor = std::clamp(m_nAutoFitFactor, 20, 80);
 	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
 	s.bAddSimilarFiles = !!m_bAddSimilarFiles;
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
@@ -222,40 +197,6 @@ void CPPagePlayback::OnUpdateLoopNum(CCmdUI* pCmdUI)
 void CPPagePlayback::OnUpdateTrackOrder(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK4));
-}
-
-void CPPagePlayback::OnAutoZoomCheck()
-{
-	if (m_chkRememberZoomLevel.GetCheck()) {
-		m_cmbZoomLevel.EnableWindow(TRUE);
-		if (m_cmbZoomLevel.GetCurSel() >= 3) {
-			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
-			GetDlgItem(IDC_EDIT4)->EnableWindow(TRUE);
-			m_spnAutoFitFactor.EnableWindow(TRUE);
-		}
-	} else{
-		m_cmbZoomLevel.EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
-		GetDlgItem(IDC_EDIT4)->EnableWindow(FALSE);
-		m_spnAutoFitFactor.EnableWindow(FALSE);
-	}
-
-	SetModified();
-}
-
-void CPPagePlayback::OnAutoZoomSelChange()
-{
-	if (m_cmbZoomLevel.GetCurSel() >= 3) {
-		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
-		GetDlgItem(IDC_EDIT4)->EnableWindow(TRUE);
-		m_spnAutoFitFactor.EnableWindow(TRUE);
-	} else {
-		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
-		GetDlgItem(IDC_EDIT4)->EnableWindow(FALSE);
-		m_spnAutoFitFactor.EnableWindow(FALSE);
-	}
-
-	SetModified();
 }
 
 void CPPagePlayback::OnBalanceTextDblClk()
