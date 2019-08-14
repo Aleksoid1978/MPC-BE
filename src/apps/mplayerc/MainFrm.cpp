@@ -10198,9 +10198,14 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 
 	if (s.HasFixedWindowSize()) {
 		windowSize = s.sizeFixedWindow;
-	} else if (s.bRememberWindowSize) {
+	}
+	else if (s.nStartupWindowMode == STARTUPWND_REMLAST) {
 		windowSize = rcLastWindowPos.Size();
-	} else {
+	}
+	else if (s.nStartupWindowMode == STARTUPWND_SPECIFIED) {
+		windowSize = s.szSpecifiedWndSize;
+	}
+	else {
 		CRect windowRect;
 		GetWindowRect(&windowRect);
 		CRect clientRect;
@@ -10245,7 +10250,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		SetWindowPos(nullptr, windowRect.left, windowRect.top, windowSize.cx, windowSize.cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
-	if (s.bRememberWindowSize && s.bRememberWindowPos) {
+	if (s.nStartupWindowMode == STARTUPWND_REMLAST && s.bRememberWindowPos) {
 		UINT lastWindowType = s.nLastWindowType;
 		if (lastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
@@ -10282,14 +10287,19 @@ void CMainFrame::RestoreDefaultWindowRect()
 {
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (!m_bFullScreen && !IsZoomed() && !IsIconic() && !s.bRememberWindowSize) {
+	if (!m_bFullScreen && !IsZoomed() && !IsIconic() && s.nStartupWindowMode != STARTUPWND_REMLAST) {
 		CSize windowSize;
 
 		if (s.HasFixedWindowSize()) {
 			windowSize = s.sizeFixedWindow;
-		} else if (s.bRememberWindowSize) {
+		}
+		else if (s.nStartupWindowMode == STARTUPWND_REMLAST) { // hmmm
 			windowSize = s.rcLastWindowPos.Size();
-		} else {
+		}
+		else if (s.nStartupWindowMode == STARTUPWND_SPECIFIED) {
+			windowSize = s.szSpecifiedWndSize;
+		}
+		else {
 			CRect windowRect;
 			GetWindowRect(&windowRect);
 			CRect clientRect;
@@ -10568,7 +10578,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	}
 
 	if (m_bFirstFSAfterLaunchOnFullScreen) { // Play started in Fullscreen
-		if (s.bRememberWindowSize || s.bRememberWindowPos) {
+		if (s.nStartupWindowMode == STARTUPWND_REMLAST || s.bRememberWindowPos) {
 			r = s.rcLastWindowPos;
 			if (!s.bRememberWindowPos) {
 				hm = MonitorFromPoint( CPoint( 0,0 ), MONITOR_DEFAULTTOPRIMARY );
@@ -10578,13 +10588,13 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				int top = m_r.top + (m_r.Height() - r.Height())/2;
 				r = CRect(left, top, left + r.Width(), top + r.Height());
 			}
-			if (!s.bRememberWindowSize) {
+			if (s.nStartupWindowMode != STARTUPWND_REMLAST) {
 				CSize vsize = GetVideoSize();
 				r = CRect(r.left, r.top, r.left + vsize.cx, r.top + vsize.cy);
 				ShowWindow(SW_HIDE);
 			}
 			SetWindowPos(nullptr, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
-			if (!s.bRememberWindowSize) {
+			if (s.nStartupWindowMode != STARTUPWND_REMLAST) {
 				ZoomVideoWindow();
 				ShowWindow(SW_SHOW);
 			}

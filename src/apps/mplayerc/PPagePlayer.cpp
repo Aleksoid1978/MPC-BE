@@ -34,7 +34,6 @@ CPPagePlayer::CPPagePlayer()
 	, m_nRecentFiles(APP_RECENTFILES_DEF)
 	, m_bRememberDVDPos(FALSE)
 	, m_bRememberFilePos(FALSE)
-	, m_bRememberWindowSize(FALSE)
 	, m_bSavePnSZoom(FALSE)
 	, m_bRememberPlaylistItems(FALSE)
 	, m_bTrayIcon(FALSE)
@@ -55,24 +54,23 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Radio(pDX, IDC_RADIO1, m_iMultipleInst);
+	DDX_Radio(pDX, IDC_RADIO1,   m_iMultipleInst);
 	DDX_Control(pDX, IDC_COMBO1, m_cbTitleBarPrefix);
 	DDX_Control(pDX, IDC_COMBO2, m_cbSeekBarText);
-	DDX_Check(pDX, IDC_CHECK3, m_bTrayIcon);
-	DDX_Check(pDX, IDC_CHECK7, m_bRememberWindowSize);
-	DDX_Check(pDX, IDC_CHECK11, m_bSavePnSZoom);
-	DDX_Check(pDX, IDC_CHECK8, m_bUseIni);
-	DDX_Check(pDX, IDC_CHECK1, m_bKeepHistory);
-	DDX_Check(pDX, IDC_CHECK10, m_bHideCDROMsSubMenu);
-	DDX_Check(pDX, IDC_CHECK9, m_bPriority);
+	DDX_Check(pDX, IDC_CHECK3,   m_bTrayIcon);
+	DDX_Check(pDX, IDC_CHECK11,  m_bSavePnSZoom);
+	DDX_Check(pDX, IDC_CHECK8,   m_bUseIni);
+	DDX_Check(pDX, IDC_CHECK1,   m_bKeepHistory);
+	DDX_Check(pDX, IDC_CHECK10,  m_bHideCDROMsSubMenu);
+	DDX_Check(pDX, IDC_CHECK9,   m_bPriority);
 	DDX_Check(pDX, IDC_SHOW_OSD, m_bShowOSD);
-	DDX_Check(pDX, IDC_CHECK14, m_bOSDFileName);
-	DDX_Check(pDX, IDC_CHECK15, m_bOSDSeekTime);
-	DDX_Check(pDX, IDC_DVD_POS, m_bRememberDVDPos);
+	DDX_Check(pDX, IDC_CHECK14,  m_bOSDFileName);
+	DDX_Check(pDX, IDC_CHECK15,  m_bOSDSeekTime);
+	DDX_Check(pDX, IDC_DVD_POS,  m_bRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
-	DDX_Check(pDX, IDC_CHECK2, m_bRememberPlaylistItems);
-	DDX_Text(pDX, IDC_EDIT1, m_nRecentFiles);
-	DDX_Control(pDX, IDC_SPIN1, m_RecentFilesCtrl);
+	DDX_Check(pDX, IDC_CHECK2,   m_bRememberPlaylistItems);
+	DDX_Text(pDX, IDC_EDIT1,     m_nRecentFiles);
+	DDX_Control(pDX, IDC_SPIN1,  m_RecentFilesCtrl);
 
 	m_nRecentFiles = std::clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 }
@@ -118,7 +116,6 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	m_iMultipleInst				= s.iMultipleInst;
 	m_bTrayIcon					= s.bTrayIcon;
-	m_bRememberWindowSize		= s.bRememberWindowSize;
 	m_bSavePnSZoom				= s.bSavePnSZoom;
 	m_bUseIni					= AfxGetProfile().IsIniValid();
 	m_bKeepHistory				= s.bKeepHistory;
@@ -173,7 +170,6 @@ BOOL CPPagePlayer::OnApply()
 	}
 
 	s.bTrayIcon = !!m_bTrayIcon;
-	s.bRememberWindowSize = !!m_bRememberWindowSize;
 	s.bSavePnSZoom = !!m_bSavePnSZoom;
 	s.bKeepHistory = !!m_bKeepHistory;
 	s.bHideCDROMsSubMenu = !!m_bHideCDROMsSubMenu;

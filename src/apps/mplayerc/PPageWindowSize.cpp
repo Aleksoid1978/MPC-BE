@@ -60,6 +60,10 @@ BOOL CPPageWindowSize::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	m_nRadioStartup = s.nStartupWindowMode;
+	m_iWindowWidth  = s.szSpecifiedWndSize.cx;
+	m_iWindowHeigth = s.szSpecifiedWndSize.cy;
+
 	m_cmbScaleLevel.AddString(L"50%");
 	m_cmbScaleLevel.AddString(L"100%");
 	m_cmbScaleLevel.AddString(L"200%");
@@ -85,6 +89,10 @@ BOOL CPPageWindowSize::OnApply()
 	UpdateData();
 
 	CAppSettings& s = AfxGetAppSettings();
+
+	s.nStartupWindowMode    = m_nRadioStartup;
+	s.szSpecifiedWndSize.cx = m_iWindowWidth;
+	s.szSpecifiedWndSize.cy = m_iWindowHeigth;
 
 	s.bRememberWindowPos      = !!m_chkRememberWindowPos.GetCheck();
 	s.bLimitWindowProportions = !!m_chkLimitWindowProportions.GetCheck();
