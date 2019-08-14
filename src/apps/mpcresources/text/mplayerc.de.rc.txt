@@ -534,14 +534,14 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
-5		"Fenstergröße bei Programmstart"
+5		"Bei Programmstart"
 6		"Standardfenstergröße"
 7		"Letzte Fenstergröße merken"
 8		"Fenstergröße festlegen"
 9		"Videobereich festlegen"
 11		"×"
-13		"Current size"
-14		"Nach dem Start der Wiedergabe"
+13		"Momentane Größe"
+14		"Nach Start der Wiedergabe"
 15		"Nicht ändern"
 16		"Auf Videogröße skalieren"
 17		"Fenster an Bildschirm anpassen"
