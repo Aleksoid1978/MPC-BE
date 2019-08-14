@@ -219,6 +219,13 @@ enum : int {
 	STARTUPWND_SPECIFIED,
 };
 
+enum : int {
+	PLAYBACKWND_NONE = 0,
+	PLAYBACKWND_SCALEVIDEO,
+	PLAYBACKWND_FITSCREEN,
+	PLAYBACKWND_FITSCREENLARGER,
+};
+
 static const std::vector<int> s_CommonVideoHeights = { 240, 360, 480, 720, 1080, 1440, 2160, 2880, 4320 };
 
 struct ShaderC {
@@ -592,6 +599,9 @@ public:
 	UINT			nLastWindowType;
 	bool			bLimitWindowProportions;
 	bool			bSnapToDesktopEdges;
+	int				nPlaybackWindowMode;
+	int				iZoomLevel;
+	int				nAutoFitFactor;
 
 	CSize sizeFixedWindow; // not saved. from command line
 	bool HasFixedWindowSize() const { return sizeFixedWindow.cx > 0 || sizeFixedWindow.cy > 0; }
@@ -616,9 +626,6 @@ public:
 	bool			fLoopForever;
 	bool			fRewind;
 	int				nSpeedStep;
-	bool			bRememberZoomLevel;
-	int				iZoomLevel;
-	int				nAutoFitFactor;
 	bool			fUseInternalSelectTrackLogic;
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;

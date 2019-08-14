@@ -563,8 +563,6 @@ void CAppSettings::ResetSettings()
 	nLoops = 1;
 	fLoopForever = false;
 	fRewind = false;
-	iZoomLevel = 1;
-	nAutoFitFactor = 50;
 	nVolumeStep = 5;
 	nSpeedStep = 0; // auto
 
@@ -592,7 +590,6 @@ void CAppSettings::ResetSettings()
 
 	iOnTop = 0;
 	bTrayIcon = false;
-	bRememberZoomLevel = false;
 	fShowBarsWhenFullScreen = true;
 	nShowBarsWhenFullScreenTimeOut = 0;
 
@@ -655,6 +652,9 @@ void CAppSettings::ResetSettings()
 	nLastWindowType = SIZE_RESTORED;
 	bLimitWindowProportions = false;
 	bSnapToDesktopEdges = false;
+	nPlaybackWindowMode = PLAYBACKWND_NONE;
+	iZoomLevel = 1;
+	nAutoFitFactor = 50;
 
 	bShufflePlaylistItems = false;
 	bRememberPlaylistItems = true;
@@ -922,8 +922,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel, 0, 4);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor, 20, 80);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep, 1, 10);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
 	nSpeedStep = discard(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
@@ -957,7 +955,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop, 0, 3);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, bRememberZoomLevel);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut, -1, 10);
 
@@ -1056,7 +1053,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	// Window size
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STARTUPWINDOWMODE, nStartupWindowMode, STARTUPWND_DEFAULT, STARTUPWND_SPECIFIED);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode, STARTUPWND_DEFAULT, STARTUPWND_SPECIFIED);
 	CSize wndSize;
 	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str) && swscanf_s(str, L"%d;%d", &wndSize.cx, &wndSize.cy) == 2) {
 		if (wndSize.cx >= 480 && wndSize.cx <= 3840 && wndSize.cy >= 240 && wndSize.cy <= 2160) {
@@ -1077,7 +1074,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, nLastWindowType);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
-
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODEPLAYBACK, nPlaybackWindowMode, PLAYBACKWND_NONE, PLAYBACKWND_FITSCREENLARGER);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel, 0, 2);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor, 20, 80);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, *(int*)&sizeAspectRatio.cx);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, *(int*)&sizeAspectRatio.cy);
@@ -1595,8 +1594,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
@@ -1604,7 +1601,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, bRememberZoomLevel);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
@@ -1648,7 +1644,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
 
 	// Window size
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_STARTUPWINDOWMODE, nStartupWindowMode);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode);
 	str.Format(L"%d;%d", szSpecifiedWndSize.cx, szSpecifiedWndSize.cy);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
@@ -1656,6 +1652,9 @@ void CAppSettings::SaveSettings()
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODEPLAYBACK, nPlaybackWindowMode);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor);
 
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
