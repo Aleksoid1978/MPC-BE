@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Indiquer les connexions échouées lors du rendu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Options d'ouverture"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Se souvenir de la position dans le DVD"
 20		"Se souvenir de la position dans le fichier"
-21		"Enregistrer la position de la fenêtre"
-22		"Enregistrer la taille de la fenêtre"
-23		"Se souvenir du recadrage (Pan && Scan)"
-24		"Remember last playlist"
-25		"Divers"
-26		"Icône dans la barre de notification"
-27		"Montrer l'OSD (nécessite un redémarrage)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Garder les proportions au redimensionnement"
-31		"Aimanter sur les bords du Bureau"
-32		"Store settings in the player folder"
-33		"Désactiver le menu 'Ouvrir le disque'"
-34		"Priorité supérieure à la normale"
+21		"Enregistrer la taille de la fenêtre"
+22		"Se souvenir du recadrage (Pan && Scan)"
+23		"Remember last playlist"
+24		"Divers"
+25		"Icône dans la barre de notification"
+26		"Montrer l'OSD (nécessite un redémarrage)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Désactiver le menu 'Ouvrir le disque'"
+31		"Priorité supérieure à la normale"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

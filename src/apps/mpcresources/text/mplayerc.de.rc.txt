@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Fehlerhafte Pins im Graph &melden"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Dateiaufruf"
 6		"Einzelnen Prozess des Players erzwingen"
 7		"Mediendateien mit dem aktuellen Player öffnen"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Anzahl der aufgelisteten Dateien:"
 19		"DVD/BD-Wiedergabeposition merken"
 20		"Datei-Wiedergabeposition merken"
-21		"Letzte Fensterposition merken"
-22		"Letzte Fenstergr&öße merken"
-23		"Letzten Pan&&Scan-Zoom merken"
-24		"Letzte Wiedergabeliste speichern"
-25		"Weitere Einstellungen"
-26		"&Taskleistensymbol anzeigen"
-27		"OSD anzeigen (Neustart notwendig)"
-28		"Name von Mediendatei anzeigen"
-29		"Suchzeit anzeigen"
-30		"Fenster-Seitenverhältnis fixieren"
-31		"Fenster an Desktoprand andocken"
-32		"Einstellungen als Datei (.ini) speichern"
-33		"Disc-Wiedergabe deaktivieren"
-34		"&Prozesspriorität höher als normal"
+21		"Letzte Fenstergr&öße merken"
+22		"Letzten Pan&&Scan-Zoom merken"
+23		"Letzte Wiedergabeliste speichern"
+24		"Weitere Einstellungen"
+25		"&Taskleistensymbol anzeigen"
+26		"OSD anzeigen (Neustart notwendig)"
+27		"Name von Mediendatei anzeigen"
+28		"Suchzeit anzeigen"
+29		"Einstellungen als Datei (.ini) speichern"
+30		"Disc-Wiedergabe deaktivieren"
+31		"&Prozesspriorität höher als normal"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

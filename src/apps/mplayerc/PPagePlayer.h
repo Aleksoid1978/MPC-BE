@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,7 +39,6 @@ public:
 	int  m_nRecentFiles;
 	BOOL m_bRememberDVDPos;
 	BOOL m_bRememberFilePos;
-	BOOL m_bRememberWindowPos;
 	BOOL m_bRememberWindowSize;
 	BOOL m_bSavePnSZoom;
 	BOOL m_bRememberPlaylistItems;
@@ -47,8 +46,6 @@ public:
 	BOOL m_bShowOSD;
 	BOOL m_bOSDFileName;
 	BOOL m_bOSDSeekTime;
-	BOOL m_bLimitWindowProportions;
-	BOOL m_bSnapToDesktopEdges;
 	BOOL m_bUseIni;
 	BOOL m_bHideCDROMsSubMenu;
 	BOOL m_bPriority;

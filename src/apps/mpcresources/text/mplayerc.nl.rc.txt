@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Rapporteer pins die niet renderen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Opties voor openen"
 6		"Forceer een enkel proces"
 7		"Gebruik hetzelfde proces voor elk bestand"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Aantal recente bestanden:"
 19		"Dvd-positie bewaren"
 20		"Bestandspositie bewaren"
-21		"Vensterpositie onthouden"
-22		"Vensterafmetingen onthouden"
-23		"Laatste Pan&&Scan-zoom onthouden"
-24		"Laatste afspeellijst onthouden"
-25		"Overige"
-26		"Pictogram in systeemvak"
-27		"Toon OSD (vereist herstart)"
-28		"Toon naam van mediabestand"
-29		"Toon gezochte tijd"
-30		"Begrens vensterverhouding bij herschalen"
-31		"Aan bureaubladrand aanpassen"
-32		"Instellingen in de map van MPC-BE opslaan"
-33		"Menu ""Schijf openen"" uitschakelen"
-34		"Procesprioriteit ""hoger dan normaal"""
+21		"Vensterafmetingen onthouden"
+22		"Laatste Pan&&Scan-zoom onthouden"
+23		"Laatste afspeellijst onthouden"
+24		"Overige"
+25		"Pictogram in systeemvak"
+26		"Toon OSD (vereist herstart)"
+27		"Toon naam van mediabestand"
+28		"Toon gezochte tijd"
+29		"Instellingen in de map van MPC-BE opslaan"
+30		"Menu ""Schijf openen"" uitschakelen"
+31		"Procesprioriteit ""hoger dan normaal"""
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

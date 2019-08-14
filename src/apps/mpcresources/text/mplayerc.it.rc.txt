@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Mostra i pin che falliscono il rendering"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 7		"Apri solo un'unica schermata per ogni file aperto."
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Numero di file recenti:"
 19		"Ricorda posizione DVD"
 20		"Ricorda posizione File"
-21		"Ricorda l'ultima posizione della finestra"
-22		"Ricorda le ultime dimensioni della finestra"
-23		"Ricorda l'ultimo zoom Pan&&Scan"
-24		"Ricorda l'ultima playlist"
-25		"Altre opzioni"
-26		"Icona nella traybar"
-27		"Attiva OSD (riavvio necessario)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Blocca proporzioni finestra"
-31		"Incolla ai bordi dello schermo"
-32		"Store settings in the player folder"
-33		"Disabilita il menù 'Apri disco'"
-34		"Priorità del processo sopra il normale"
+21		"Ricorda le ultime dimensioni della finestra"
+22		"Ricorda l'ultimo zoom Pan&&Scan"
+23		"Ricorda l'ultima playlist"
+24		"Altre opzioni"
+25		"Icona nella traybar"
+26		"Attiva OSD (riavvio necessario)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Disabilita il menù 'Apri disco'"
+31		"Priorità del processo sopra il normale"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

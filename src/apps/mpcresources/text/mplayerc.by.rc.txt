@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Справазд. аб памылках рэндэрынгу струменяў"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Адкрываць файлы выкарыст."
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Пры выхадзе запомніць пазіцыю DVD"
 20		"Пры выхадзе запомніць пазіцыю ў файле"
-21		"Запамінаць пазіцыю акна"
-22		"Запамінаць памер акна"
-23		"Remember last Pan-n-Scan Zoom"
-24		"Remember last playlist"
-25		"Іншае"
-26		"Значок у панэлі задач"
-27		"Паказаць OSD (патрабуецца перазапуск)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Суадносіны бакоў акна як у відэакадра"
-31		"Прыліпаць да межаў экрана"
-32		"Store settings in the player folder"
-33		"Disable 'Open Disc' menu"
-34		"Падвышаны прыярытэт працэсу"
+21		"Запамінаць памер акна"
+22		"Remember last Pan-n-Scan Zoom"
+23		"Remember last playlist"
+24		"Іншае"
+25		"Значок у панэлі задач"
+26		"Паказаць OSD (патрабуецца перазапуск)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Disable 'Open Disc' menu"
+31		"Падвышаны прыярытэт працэсу"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

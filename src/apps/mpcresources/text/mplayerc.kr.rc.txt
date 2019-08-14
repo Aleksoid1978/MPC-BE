@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"렌더링에 실패하면 핀 보고"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 7		"파일을 열때마다 같은 플레이어창 사용"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"DVD 위치 기억"
 20		"파일 위치 기억"
-21		"마지막 윈도우창위치 기억"
-22		"마지막 윈도우창크기 기억"
-23		"지난 Pan-n-Scan 줌 기억"
-24		"지난 재생목록 기억"
-25		"기타"
-26		"트레이에 아이콘 보이기"
-27		"OSD보이기 (재시작필요)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"리사이즈시 창비율 제한"
-31		"바탕화면 자석효과 사용"
-32		"실행파일 폴더에 설정 저장"
-33		"'디스크 열기' 메뉴 사용안함"
-34		"프로세스 우선순위 높이기"
+21		"마지막 윈도우창크기 기억"
+22		"지난 Pan-n-Scan 줌 기억"
+23		"지난 재생목록 기억"
+24		"기타"
+25		"트레이에 아이콘 보이기"
+26		"OSD보이기 (재시작필요)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"실행파일 폴더에 설정 저장"
+30		"'디스크 열기' 메뉴 사용안함"
+31		"프로세스 우선순위 높이기"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

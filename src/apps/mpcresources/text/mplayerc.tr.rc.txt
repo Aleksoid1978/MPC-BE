@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Çevrilemeyen ilişkilendirmeleri rapor et"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Açılış ayarları"
 6		"Tek oynatıcı için zorla"
 7		"Her dosya için benzer oynatıcı"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Son dosya sayısı:"
 19		"DVD yerleşimini hatırla"
 20		"Dosya yerleşimini hatırla"
-21		"Son pencere yerleşimini hatırla"
-22		"Son pencere boyutunu hatırla"
-23		"Son büyütme ayarlarını hatırla"
-24		"Son oynatma listesini hatırla"
-25		"Diğer"
-26		"Saat simgesinde göster"
-27		"OSD göster"
-28		"Dosya adını göster"
-29		"Atlama zamanını göster"
-30		"Boyutlandırırken pencere oranlarına sınırla"
-31		"Masaüstü kenarlarına yasla"
-32		"Ayarları oynatıcı klasöründe sakla"
-33		"Disk Açma özelliğini kapat"
-34		"İşlem önceliğini normalden yüksek tut"
+21		"Son pencere boyutunu hatırla"
+22		"Son büyütme ayarlarını hatırla"
+23		"Son oynatma listesini hatırla"
+24		"Diğer"
+25		"Saat simgesinde göster"
+26		"OSD göster"
+27		"Dosya adını göster"
+28		"Atlama zamanını göster"
+29		"Ayarları oynatıcı klasöründe sakla"
+30		"Disk Açma özelliğini kapat"
+31		"İşlem önceliğini normalden yüksek tut"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Zaznamenať piny, ktoré sa nevykreslia"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Otvoriť nastavenia"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Pamätať si pozíciu DVD"
 20		"Pamätať si pozíciu v súbore"
-21		"Zapamätať si poslednú pozíciu okna"
-22		"Zapamätať si veľkosť okna"
-23		"Zapamätať si posledné priblíženie Pan-n-Scan"
-24		"Remember last playlist"
-25		"Ostatné"
-26		"Ikona v lište nástrojov"
-27		"Zobraziť OSD (vyžaduje reštart)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Obmedziť rozmery okna pri zmene veľkosti"
-31		"Prichytiť k okrajom prac. plochy"
-32		"Store settings in the player folder"
-33		"Zablokovať menu 'Otvoriť disk'"
-34		"Vyššia priorita procesu"
+21		"Zapamätať si veľkosť okna"
+22		"Zapamätať si posledné priblíženie Pan-n-Scan"
+23		"Remember last playlist"
+24		"Ostatné"
+25		"Ikona v lište nástrojov"
+26		"Zobraziť OSD (vyžaduje reštart)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Zablokovať menu 'Otvoriť disk'"
+31		"Vyššia priorita procesu"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

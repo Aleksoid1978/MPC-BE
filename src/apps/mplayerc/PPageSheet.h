@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #pragma once
 
-#define ENABLE_WINDOWSIZE_PAGE 0
+#define ENABLE_WINDOWSIZE_PAGE 1
 
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
