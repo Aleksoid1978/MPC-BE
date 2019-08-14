@@ -72,10 +72,10 @@ BOOL CPPageWindowSize::OnInitDialog()
 		m_chkFitLargerOnly.SetCheck(BST_UNCHECKED);
 	}
 
-	m_cmbScaleLevel.AddString(L"50%");
-	m_cmbScaleLevel.AddString(L"100%");
-	m_cmbScaleLevel.AddString(L"200%");
-	m_cmbScaleLevel.SetCurSel(s.iZoomLevel);
+	AddStringData(m_cmbScaleLevel,  L"50%",  50);
+	AddStringData(m_cmbScaleLevel, L"100%", 100);
+	AddStringData(m_cmbScaleLevel, L"200%", 200);
+	SelectByItemData(m_cmbScaleLevel, s.nAutoScaleFactor);
 
 	m_nFitFactor = s.nAutoFitFactor;
 	m_spnFitFactor.SetRange(20, 80);
@@ -108,7 +108,7 @@ BOOL CPPageWindowSize::OnApply()
 		s.nPlaybackWindowMode = m_nRadioPlayback;
 	}
 
-	s.iZoomLevel = m_cmbScaleLevel.GetCurSel();
+	s.nAutoScaleFactor = GetCurItemData(m_cmbScaleLevel);
 	s.nAutoFitFactor = m_nFitFactor = std::clamp(m_nFitFactor, 20, 80);
 
 	s.bRememberWindowPos      = !!m_chkRememberWindowPos.GetCheck();
