@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Rapportera stift som misslyckas att rendera"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Öppna valmöjligheter"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Kom ihåg DVD positionen"
 20		"Kom ihåg Fil positionen"
-21		"Kom ihåg sista fönster positionen"
-22		"Kom ihåg sista fönster storleken"
-23		"Remember last Pan-n-Scan Zoom"
-24		"Remember last playlist"
-25		"Annat"
-26		"Visa ikon i systemfältet"
-27		"Visa OSD (omstart krävs)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Limit window proportions on resize"
-31		"Snäpp till skrivbords kanter"
-32		"Store settings in the player folder"
-33		"Disable 'Open Disc' menu"
-34		"Process prioritet högre än normal"
+21		"Kom ihåg sista fönster storleken"
+22		"Remember last Pan-n-Scan Zoom"
+23		"Remember last playlist"
+24		"Annat"
+25		"Visa ikon i systemfältet"
+26		"Visa OSD (omstart krävs)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Disable 'Open Disc' menu"
+31		"Process prioritet högre än normal"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

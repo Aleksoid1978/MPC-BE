@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Vypisovat podrobné informace o chybějících kodecích"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Možnosti otevírání"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Pamatovat si pozici u DVD"
 20		"Pamatovat si pozici u souborů"
-21		"Pamatovat si poslední pozici okna"
-22		"Pamatovat si poslední velikost okna"
-23		"Zapamatovat si zvětšení Pan-n-Scan"
-24		"Remember last playlist"
-25		"Ostatní"
-26		"Ikona v oznamovací oblasti"
-27		"Zobrazit OSD (vyžaduje restart)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Při změně velikosti zachovat poměr stran okna"
-31		"Přichytávat k okrajům obrazovky"
-32		"Store settings in the player folder"
-33		"Zakázat nabídku Otevřít disk"
-34		"Spouštět se zvýšenou prioritou"
+21		"Pamatovat si poslední velikost okna"
+22		"Zapamatovat si zvětšení Pan-n-Scan"
+23		"Remember last playlist"
+24		"Ostatní"
+25		"Ikona v oznamovací oblasti"
+26		"Zobrazit OSD (vyžaduje restart)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Zakázat nabídku Otevřít disk"
+31		"Spouštět se zvýšenou prioritou"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

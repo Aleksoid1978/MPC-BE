@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Reportar conectores que não queiram funcionar"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Opções de abertura"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Lembrar a posição do DVD"
 20		"Lembrar a posição do arquivo"
-21		"Lembrar posição da janela"
-22		"Lembrar tamanho da janela"
-23		"Remember last Pan-n-Scan Zoom"
-24		"Remember last playlist"
-25		"Outros"
-26		"Ícone na bandeja"
-27		"Mostrar OSD (precisa reiniciar)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Limitar proporçoes da janela ao redimensionar"
-31		"Ajustar as bordas da área de trabalho"
-32		"Store settings in the player folder"
-33		"Disable 'Open Disc' menu"
-34		"Prioridade do processo acima do normal"
+21		"Lembrar tamanho da janela"
+22		"Remember last Pan-n-Scan Zoom"
+23		"Remember last playlist"
+24		"Outros"
+25		"Ícone na bandeja"
+26		"Mostrar OSD (precisa reiniciar)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Disable 'Open Disc' menu"
+31		"Prioridade do processo acima do normal"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

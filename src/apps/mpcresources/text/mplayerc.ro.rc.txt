@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Raportează pinii care eșuează să randeze"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Opțiuni pentru deschidere"
 6		"Force a single process"
 7		"Folosește același player pentru fiecare fișier media"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Ține minte poziția pe DVD"
 20		"Ține minte poziția în fișier"
-21		"Ține minte ultima poziție a ferestrei"
-22		"Ține minte ultima dimensiune a ferestrei"
-23		"Ține minte ultima focalizare a Pan-n-Scan"
-24		"Ține minte ultima listă de redare"
-25		"Altele"
-26		"Pictogramă în zona de notificare"
-27		"Arată OSD (necesită repornire player)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Limitează proporțiile ferestrei la redimensionare"
-31		"Extinde până la marginile ecranului"
-32		"Store settings in the player folder"
-33		"Dezactivează meniul ""Deschide Disc"""
-34		"Prioritatea procesării peste normal"
+21		"Ține minte ultima dimensiune a ferestrei"
+22		"Ține minte ultima focalizare a Pan-n-Scan"
+23		"Ține minte ultima listă de redare"
+24		"Altele"
+25		"Pictogramă în zona de notificare"
+26		"Arată OSD (necesită repornire player)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Dezactivează meniul ""Deschide Disc"""
+31		"Prioritatea procesării peste normal"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

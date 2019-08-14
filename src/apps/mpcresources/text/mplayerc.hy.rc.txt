@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 32
 5		"Բացելու ընտրանքներ"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -389,20 +389,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 16		"Number of recent files:"
 19		"Հիշել DVD-ի դիրքը"
 20		"Հիշել ֆայլի դիրքը"
-21		"Հիշել դիրքը"
-22		"Հիշել չափը"
-23		"Հիշել վերջին Pan-n-Scan չափը"
-24		"Remember last playlist"
-25		"Այլ"
-26		"Պատկերակը առաջադրանքների վահանակ."
-27		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
-28		"Show name of media file"
-29		"Show seek time"
-30		"Համամասնությունը ինչպես որ կադրում"
-31		"Ամրացնել էկրանի սահմաններին"
-32		"Store settings in the player folder"
-33		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
-34		"Գործողության բարձր առաջնայնություն"
+21		"Հիշել չափը"
+22		"Հիշել վերջին Pan-n-Scan չափը"
+23		"Remember last playlist"
+24		"Այլ"
+25		"Պատկերակը առաջադրանքների վահանակ."
+26		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
+27		"Show name of media file"
+28		"Show seek time"
+29		"Store settings in the player folder"
+30		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
+31		"Գործողության բարձր առաջնայնություն"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

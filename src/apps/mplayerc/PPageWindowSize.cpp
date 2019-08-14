@@ -68,6 +68,10 @@ BOOL CPPageWindowSize::OnInitDialog()
 	m_nFitFactor = s.nAutoFitFactor;
 	m_spnFitFactor.SetRange(20, 80);
 
+	m_chkRememberWindowPos.SetCheck(s.bRememberWindowPos);
+	m_chkLimitWindowProportions.SetCheck(s.bLimitWindowProportions);
+	m_chkSnapToDesktopEdges.SetCheck(s.bSnapToDesktopEdges);
+
 	UpdateData(FALSE);
 
 	OnRadioStartupClicked(m_nRadioStartup + IDC_RADIO1);
@@ -79,6 +83,12 @@ BOOL CPPageWindowSize::OnInitDialog()
 BOOL CPPageWindowSize::OnApply()
 {
 	UpdateData();
+
+	CAppSettings& s = AfxGetAppSettings();
+
+	s.bRememberWindowPos      = !!m_chkRememberWindowPos.GetCheck();
+	s.bLimitWindowProportions = !!m_chkLimitWindowProportions.GetCheck();
+	s.bSnapToDesktopEdges     = !!m_chkSnapToDesktopEdges.GetCheck();
 
 	return __super::OnApply();
 }
