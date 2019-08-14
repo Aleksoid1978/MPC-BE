@@ -128,7 +128,10 @@ END_MESSAGE_MAP()
 
 void CPPageWindowSize::OnRadioStartupClicked(UINT nID)
 {
-	UpdateData();
+	if (nID != m_nRadioStartup + IDC_RADIO1) {
+		UpdateData();
+		SetModified();
+	}
 
 	if (nID == IDC_RADIO3) {
 		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);
@@ -143,7 +146,10 @@ void CPPageWindowSize::OnRadioStartupClicked(UINT nID)
 
 void CPPageWindowSize::OnRadioPlaybackClicked(UINT nID)
 {
-	UpdateData();
+	if (nID != m_nRadioPlayback + IDC_RADIO5) {
+		UpdateData();
+		SetModified();
+	}
 
 	m_cmbScaleLevel.EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
@@ -170,4 +176,5 @@ void CPPageWindowSize::OnBtnCurrentSizeClicked()
 	m_iWindowHeigth = rect.Height();
 
 	UpdateData(FALSE);
+	SetModified();
 }

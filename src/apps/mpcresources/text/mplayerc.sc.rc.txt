@@ -540,7 +540,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 8		"设置指定的窗口大小"
 9		"设置指定的视频区域"
 11		"×"
-13		"[ O ]"
+13		"Current size"
 14		"开始播放之后"
 15		"不变"
 16		"按照视频大小缩放"
