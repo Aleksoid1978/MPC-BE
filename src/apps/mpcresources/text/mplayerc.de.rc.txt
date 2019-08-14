@@ -540,7 +540,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 8		"Fenstergröße festlegen"
 9		"Videobereich festlegen"
 11		"×"
-13		"[ O ]"
+13		"Current size"
 14		"Nach dem Start der Wiedergabe"
 15		"Nicht ändern"
 16		"Auf Videogröße skalieren"
