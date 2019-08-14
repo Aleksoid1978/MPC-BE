@@ -86,7 +86,7 @@
 #define IDS_RS_LIMITWINDOWPROPORTIONS		L"LimitWindowProportions"
 #define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 #define IDS_RS_WINDOWMODEPLAYBACK			L"WindowModePlayback"
-#define IDS_RS_ZOOM							L"Zoom"
+#define IDS_RS_AUTOSCALEFACTOR				L"AutoScaleFactor"
 #define IDS_RS_AUTOFITFACTOR				L"AutoFitFactor"
 
 #define IDS_RS_D3DFULLSCREEN				L"D3DFullScreen"

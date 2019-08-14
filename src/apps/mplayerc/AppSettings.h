@@ -600,7 +600,7 @@ public:
 	bool			bLimitWindowProportions;
 	bool			bSnapToDesktopEdges;
 	int				nPlaybackWindowMode;
-	int				iZoomLevel;
+	int				nAutoScaleFactor;
 	int				nAutoFitFactor;
 
 	CSize sizeFixedWindow; // not saved. from command line

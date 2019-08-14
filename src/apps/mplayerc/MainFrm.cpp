@@ -11079,11 +11079,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREEN || s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER) {
 			scale = GetZoomAutoFitScale();
 		} else {
-			scale =
-				s.iZoomLevel == 0 ? 0.5 :
-				s.iZoomLevel == 1 ? 1.0 :
-				s.iZoomLevel == 2 ? 2.0 :
-				1.0;
+			scale = (double)s.nAutoScaleFactor / 100;
 		}
 	}
 
