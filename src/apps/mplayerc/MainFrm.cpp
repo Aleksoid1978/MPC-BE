@@ -2147,6 +2147,10 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 {
 	__super::OnActivateApp(bActive, dwThreadID);
 
+	if (bActive && !m_bHideCursor) {
+		StartAutoHideCursor();
+	}
+
 	if (m_bFullScreen) {
 		if (bActive) {
 			SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
