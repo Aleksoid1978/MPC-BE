@@ -6733,7 +6733,7 @@ void CMainFrame::OnViewResetDefault()
 
 void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
 {
-	const CRenderersSettings& rs = GetRenderersSettings();;
+	const CRenderersSettings& rs = GetRenderersSettings();
 	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 	pCmdUI->Enable(supported);
 }

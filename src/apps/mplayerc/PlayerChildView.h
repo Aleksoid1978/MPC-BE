@@ -30,6 +30,8 @@ class CChildView : public CWnd
 	CCritSec     m_csLogo;
 	CMPCPngImage m_logo;
 
+	HCURSOR m_hCursor = nullptr;
+
 public:
 	CChildView();
 	virtual ~CChildView();

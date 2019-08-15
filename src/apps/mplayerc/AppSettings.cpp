@@ -647,7 +647,7 @@ void CAppSettings::ResetSettings()
 	// Window size
 	nStartupWindowMode = STARTUPWND_DEFAULT;
 	szSpecifiedWndSize.SetSize(460, 390);
-	bRememberWindowPos = false;;
+	bRememberWindowPos = false;
 	rcLastWindowPos.SetRectEmpty();
 	nLastWindowType = SIZE_RESTORED;
 	bLimitWindowProportions = false;
