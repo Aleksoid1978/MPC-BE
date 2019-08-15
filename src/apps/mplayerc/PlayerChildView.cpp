@@ -27,6 +27,7 @@
 // CChildView
 
 CChildView::CChildView()
+	: m_hCursor(::LoadCursorW(nullptr, IDC_ARROW))
 {
 	LoadLogo();
 }
@@ -247,7 +248,7 @@ BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	auto pFrame = AfxGetMainFrame();
 
 	if (pFrame->m_bHideCursor) {
-		SetCursor(nullptr);
+		::SetCursor(nullptr);
 		return TRUE;
 	}
 
@@ -256,7 +257,7 @@ BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 			return FALSE;
 		}
 
-		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+		::SetCursor(m_hCursor);
 
 		return TRUE;
 	}
