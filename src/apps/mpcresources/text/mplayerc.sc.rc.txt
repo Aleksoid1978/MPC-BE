@@ -540,15 +540,15 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 8		"设置指定的窗口大小"
 9		"设置指定的视频区域"
 11		"×"
-13		"Current size"
+13		"当前大小"
 14		"开始播放之后"
 15		"不变"
 16		"按照视频大小缩放"
 17		"自适应窗口到屏幕"
 22		"仅放大"
 23		"记住上次使用的窗口位置"
-24		"调整大小时限制窗口比例"
-25		"对齐至桌面边缘"
+24		"调整大小时锁定窗口比例"
+25		"吸附对齐至桌面边缘"
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
