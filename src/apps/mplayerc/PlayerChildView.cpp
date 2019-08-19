@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,12 +55,20 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CChildView::OnMouseLeave()
 {
-	m_bTrackingMouseLeave = false;
+	POINT p;
+	GetCursorPos(&p);
+	ScreenToClient(&p);
 
-	auto pFrame = AfxGetMainFrame();
-	pFrame->StopAutoHideCursor();
+	CRect r;
+	GetClientRect(r);
+	if (!r.PtInRect(p)) {
+		m_bTrackingMouseLeave = false;
 
-	CWnd::OnMouseLeave();
+		auto pFrame = AfxGetMainFrame();
+		pFrame->StopAutoHideCursor();
+
+		CWnd::OnMouseLeave();
+	}
 }
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
@@ -83,15 +91,23 @@ BOOL CChildView::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message >= WM_MOUSEFIRST && pMsg->message <= WM_MYMOUSELAST) {
-		if (pMsg->message == WM_MOUSEMOVE && !m_bTrackingMouseLeave) {
-			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, this->m_hWnd };
-			if (TrackMouseEvent(&tme)) {
-				m_bTrackingMouseLeave = true;
+		CPoint point(pMsg->lParam);
+		if (pMsg->message == WM_MOUSEMOVE) {
+			if (m_lastMousePoint == point) {
+				return FALSE;
+			}
+
+			m_lastMousePoint = point;
+
+			if (!m_bTrackingMouseLeave) {
+				TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, this->m_hWnd };
+				if (TrackMouseEvent(&tme)) {
+					m_bTrackingMouseLeave = true;
+				}
 			}
 		}
 
 		CWnd* pParent = GetParent();
-		CPoint point(pMsg->lParam);
 		::MapWindowPoints(pMsg->hwnd, pParent->m_hWnd, &point, 1);
 
 		const bool fInteractiveVideo = AfxGetMainFrame()->IsInteractiveVideo();

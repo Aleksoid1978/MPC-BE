@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,6 +31,7 @@ class CChildView : public CWnd
 	CMPCPngImage m_logo;
 
 	HCURSOR m_hCursor = nullptr;
+	CPoint m_lastMousePoint{ -1, -1 };
 
 public:
 	CChildView();
