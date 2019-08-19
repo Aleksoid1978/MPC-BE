@@ -2149,6 +2149,8 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 
 	if (bActive && !m_bHideCursor) {
 		StartAutoHideCursor();
+	} else if (!bActive) {
+		StopAutoHideCursor();
 	}
 
 	if (m_bFullScreen) {
@@ -2336,16 +2338,16 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 				if (m_bFullScreen) {
 					// Get the position of the cursor outside the window in fullscreen mode
-					POINT m_pos;
-					GetCursorPos(&m_pos);
-					ScreenToClient(&m_pos);
+					POINT pos;
+					GetCursorPos(&pos);
+					ScreenToClient(&pos);
 					CRect r;
 					GetClientRect(r);
 
-					if (!r.PtInRect(m_pos) && (m_lastMouseMoveFullScreen.x != m_pos.x || m_lastMouseMoveFullScreen.y != m_pos.y)) {
-						m_lastMouseMoveFullScreen.x = m_pos.x;
-						m_lastMouseMoveFullScreen.y = m_pos.y;
-						OnMouseMove(0, m_pos);
+					if (!r.PtInRect(pos) && (m_lastMouseMoveFullScreen.x != pos.x || m_lastMouseMoveFullScreen.y != pos.y)) {
+						m_lastMouseMoveFullScreen.x = pos.x;
+						m_lastMouseMoveFullScreen.y = pos.y;
+						OnMouseMove(0, pos);
 					}
 				}
 
@@ -2529,9 +2531,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				CPoint p;
 				GetCursorPos(&p);
 
-				CRect r;
-				GetWindowRect(r);
-				bool fCursorOutside = !r.PtInRect(p);
 				CWnd* pWnd = WindowFromPoint(p);
 
 				if (IsD3DFullScreenMode()) {
@@ -2540,12 +2539,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						m_pFullscreenWnd->ShowCursor(false);
 					}
 				} else {
-					if (pWnd && (m_wndView == *pWnd || m_wndView.IsChild(pWnd) || fCursorOutside)) {
+					if (pWnd && (m_wndView == *pWnd || m_wndView.IsChild(pWnd))) {
 						m_bHideCursor = true;
 						SetCursor(nullptr);
-						KillTimer(TIMER_MOUSEHIDER);
 					}
 				}
+
+				KillTimer(TIMER_MOUSEHIDER);
 			}
 		}
 		break;
@@ -3568,6 +3568,10 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	if (!m_bHideCursor) {
+		StartAutoHideCursor();
+	}
+
 	ReleaseCapture();
 
 	if (m_bLeftMouseDownFullScreen) {
@@ -3718,7 +3722,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		m_lastMouseMove.y = point.y;
 	}
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	CWnd* w = GetCapture();
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON) && templclick) {
@@ -3753,95 +3757,97 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		m_pDVDC->SelectAtPosition(vp);
 	}
 
-	CSize diff = m_lastMouseMove - point;
+	const CSize diff = m_lastMouseMove - point;
 
-	if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-		StopAutoHideCursor();
-		m_pFullscreenWnd->ShowCursor(true);
-		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
-	} else if (m_bFullScreen && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-		int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
-
-		if (nTimeOut < 0) {
-			m_bHideCursor = false;
-			if (s.fShowBarsWhenFullScreen) {
-				ShowControls(s.nCS);
-				if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
-					m_wndNavigationBar.m_navdlg.UpdateElementList();
-					m_wndNavigationBar.ShowControls(this, TRUE);
-				}
-			}
-
-			KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
+	if ((abs(diff.cx) + abs(diff.cy)) >= 1) {
+		if (IsD3DFullScreenMode()) {
+			StopAutoHideCursor();
+			m_pFullscreenWnd->ShowCursor(true);
 			SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
-		} else if (nTimeOut == 0) {
-			CRect r;
-			GetClientRect(r);
-			r.top = r.bottom;
+		} else if (m_bFullScreen) {
+			int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
 
-			int i = 1;
-			for (const auto& pBar : m_bars) {
-				CSize size = pBar->CalcFixedLayout(FALSE, TRUE);
-				if (s.nCS&i) {
-					r.top -= size.cy;
-				}
-				i <<= 1;
-			}
-
-			// HACK: the controls would cover the menu too early hiding some buttons
-			if (GetPlaybackMode() == PM_DVD
-					&& (m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
-						|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu)) {
-				r.top = r.bottom - 10;
-			}
-
-			m_bHideCursor = false;
-
-			if (r.PtInRect(point)) {
+			if (nTimeOut < 0) {
+				m_bHideCursor = false;
 				if (s.fShowBarsWhenFullScreen) {
 					ShowControls(s.nCS);
-				}
-			} else {
-				if (s.fShowBarsWhenFullScreen) {
-					ShowControls(CS_NONE, false);
-				}
-			}
-
-			// PM_CAPTURE: Left Navigation panel for switching channels
-			if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
-				CRect rLeft;
-				GetClientRect(rLeft);
-				rLeft.right = rLeft.left;
-				CSize size = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
-				rLeft.right += size.cx;
-
-				m_bHideCursor = false;
-
-				if (rLeft.PtInRect(point)) {
-					if (s.fShowBarsWhenFullScreen) {
+					if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
 						m_wndNavigationBar.m_navdlg.UpdateElementList();
 						m_wndNavigationBar.ShowControls(this, TRUE);
 					}
+				}
+
+				KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
+				SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
+			} else if (nTimeOut == 0) {
+				CRect r;
+				GetClientRect(r);
+				r.top = r.bottom;
+
+				int i = 1;
+				for (const auto& pBar : m_bars) {
+					CSize size = pBar->CalcFixedLayout(FALSE, TRUE);
+					if (s.nCS & i) {
+						r.top -= size.cy;
+					}
+					i <<= 1;
+				}
+
+				// HACK: the controls would cover the menu too early hiding some buttons
+				if (GetPlaybackMode() == PM_DVD
+					&& (m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
+						|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu)) {
+					r.top = r.bottom - 10;
+				}
+
+				m_bHideCursor = false;
+
+				if (r.PtInRect(point)) {
+					if (s.fShowBarsWhenFullScreen) {
+						ShowControls(s.nCS);
+					}
 				} else {
 					if (s.fShowBarsWhenFullScreen) {
-						m_wndNavigationBar.ShowControls(this, FALSE);
+						ShowControls(CS_NONE, false);
 					}
 				}
-			}
 
+				// PM_CAPTURE: Left Navigation panel for switching channels
+				if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
+					CRect rLeft;
+					GetClientRect(rLeft);
+					rLeft.right = rLeft.left;
+					CSize size = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
+					rLeft.right += size.cx;
+
+					m_bHideCursor = false;
+
+					if (rLeft.PtInRect(point)) {
+						if (s.fShowBarsWhenFullScreen) {
+							m_wndNavigationBar.m_navdlg.UpdateElementList();
+							m_wndNavigationBar.ShowControls(this, TRUE);
+						}
+					} else {
+						if (s.fShowBarsWhenFullScreen) {
+							m_wndNavigationBar.ShowControls(this, FALSE);
+						}
+					}
+				}
+
+				SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
+			} else {
+				m_bHideCursor = false;
+				if (s.fShowBarsWhenFullScreen) {
+					ShowControls(s.nCS);
+				}
+
+				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, nullptr);
+				SetTimer(TIMER_MOUSEHIDER, std::max(nTimeOut * 1000, 2000), nullptr);
+			}
+		} else if (s.bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED) {
+			StopAutoHideCursor();
 			SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
-		} else {
-			m_bHideCursor = false;
-			if (s.fShowBarsWhenFullScreen) {
-				ShowControls(s.nCS);
-			}
-
-			SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, nullptr);
-			SetTimer(TIMER_MOUSEHIDER, std::max(nTimeOut * 1000, 2000), nullptr);
 		}
-	} else if (s.bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-		StopAutoHideCursor();
-		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
 	}
 
 	m_lastMouseMove = point;
@@ -10688,6 +10694,8 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 
 			MoveVideoWindow();
 			RecalcLayout();
+
+			StartAutoHideCursor();
 		} else {
 			// Set the fullscreen display mode
 			if (s.fullScreenModes.bEnabled == 1 && fSwitchScreenResWhenHasTo) {
@@ -19791,8 +19799,32 @@ void CMainFrame::StopAutoHideCursor()
 
 void CMainFrame::StartAutoHideCursor()
 {
-	if (m_bFullScreen || (AfxGetAppSettings().bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED)) {
-		SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
+	const auto& s = AfxGetAppSettings();
+	UINT nElapse = 0;
+	if ((m_bFullScreen || IsD3DFullScreenMode())) {
+		if (s.nShowBarsWhenFullScreenTimeOut > 0) {
+			nElapse = std::max(s.nShowBarsWhenFullScreenTimeOut * 1000, 2000);
+		} else {
+			nElapse = 2000;
+		}
+	} else if (s.bHideWindowedMousePointer && m_eMediaLoadState == MLS_LOADED) {
+		nElapse = 2000;
+	}
+
+	if (nElapse) {
+		CPoint p;
+		GetCursorPos(&p);
+
+		CWnd* pWnd = WindowFromPoint(p);
+		if (pWnd) {
+			if (IsD3DFullScreenMode()) {
+				if (*pWnd == *m_pFullscreenWnd) {
+					SetTimer(TIMER_MOUSEHIDER, nElapse, nullptr);
+				}
+			} else if (m_wndView == *pWnd || m_wndView.IsChild(pWnd)) {
+				SetTimer(TIMER_MOUSEHIDER, nElapse, nullptr);
+			}
+		}
 	}
 }
 
