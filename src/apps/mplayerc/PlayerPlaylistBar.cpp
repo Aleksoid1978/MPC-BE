@@ -3252,7 +3252,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 		CMenuEx::ChangeStyle(&m);
 	}
+
+	m_pMainFrame->StopAutoHideCursor();
 	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
+	m_pMainFrame->StartAutoHideCursor();
+
 	switch (nID) {
 		case M_OPEN:
 			if (TNavigate()) {
