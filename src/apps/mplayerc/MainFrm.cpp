@@ -4559,6 +4559,15 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetToolBarAudioButton();
 	SetToolBarSubtitleButton();
 
+	// close popup menus
+	SendMessageW(WM_CANCELMODE);
+	if (m_wndPlaylistBar.IsWindowVisible()) {
+		m_wndPlaylistBar.SendMessageW(WM_CANCELMODE);
+	}
+	if (m_wndToolBar.IsWindowVisible()) {
+		m_wndToolBar.SendMessageW(WM_CANCELMODE);
+	}
+
 	DLog(L"CMainFrame::OnFilePostCloseMedia() : end");
 }
 
