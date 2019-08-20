@@ -62,13 +62,12 @@ void CChildView::OnMouseLeave()
 	CRect r;
 	GetClientRect(r);
 	if (!r.PtInRect(p)) {
-		m_bTrackingMouseLeave = false;
-
 		auto pFrame = AfxGetMainFrame();
 		pFrame->StopAutoHideCursor();
-
-		CWnd::OnMouseLeave();
 	}
+
+	m_bTrackingMouseLeave = false;
+	CWnd::OnMouseLeave();
 }
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
