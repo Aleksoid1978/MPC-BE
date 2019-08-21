@@ -54,7 +54,7 @@ static void InitDSound()
 
 namespace AudioDevices
 {
-	HRESULT GetActiveAudioDevices(deviceList_t* deviceList/* = NULL*/, UINT* devicesCount/* = NULL*/, BOOL bIncludeDefault/* = TRUE*/)
+	HRESULT GetActiveAudioDevices(deviceList_t* deviceList/* = nullptr*/, UINT* devicesCount/* = nullptr*/, BOOL bIncludeDefault/* = TRUE*/)
 	{
 		HRESULT hr = E_FAIL;
 

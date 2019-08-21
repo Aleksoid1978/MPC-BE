@@ -47,8 +47,8 @@ public IUnknown {
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
 	STDMETHOD(SetDevicePeriod(INT nValue)) PURE;
 	STDMETHOD_(INT, GetDevicePeriod()) PURE;
-	STDMETHOD(SetDeviceId(const CString& pDeviceId)) PURE;
-	STDMETHOD_(CString, GetDeviceId()) PURE;
+	STDMETHOD(SetDeviceId(const CString& deviceId, const CString& deviceName)) PURE;
+	STDMETHOD(GetDeviceId(CString& deviceId, CString& deviceName)) PURE;
 	STDMETHOD_(UINT, GetMode()) PURE;
 	STDMETHOD(GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)) PURE;
 	STDMETHOD(SetBitExactOutput(BOOL bValue)) PURE;
