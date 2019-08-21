@@ -27,6 +27,6 @@ namespace AudioDevices
 	typedef std::pair<CString, CString> device_t;
 	typedef std::vector<device_t> deviceList_t;
 
-	HRESULT GetActiveAudioDevices(deviceList_t* deviceList = NULL, UINT* devicesCount = NULL, BOOL bIncludeDefault = TRUE);
+	HRESULT GetActiveAudioDevices(deviceList_t* deviceList = nullptr, UINT* devicesCount = nullptr, BOOL bIncludeDefault = TRUE);
 	HRESULT GetDefaultAudioDevice(device_t& device);
 }

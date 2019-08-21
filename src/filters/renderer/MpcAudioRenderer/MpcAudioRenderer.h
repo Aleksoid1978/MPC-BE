@@ -162,8 +162,8 @@ public:
 	STDMETHODIMP_(INT)            GetWasapiMode() override;
 	STDMETHODIMP                  SetDevicePeriod(INT nValue) override;
 	STDMETHODIMP_(INT)            GetDevicePeriod() override;
-	STDMETHODIMP                  SetDeviceId(const CString& pDeviceId) override;
-	STDMETHODIMP_(CString)        GetDeviceId() override;
+	STDMETHODIMP                  SetDeviceId(const CString& deviceId, const CString& deviceName) override;
+	STDMETHODIMP                  GetDeviceId(CString& deviceId, CString& deviceName) override;
 	STDMETHODIMP_(UINT)           GetMode() override;
 	STDMETHODIMP                  GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
 	STDMETHODIMP                  SetBitExactOutput(BOOL bValue) override;
@@ -229,6 +229,7 @@ private:
 	HMODULE            m_hAvrtLib;
 	DEVICE_MODE        m_DeviceMode;
 	CString            m_DeviceId;
+	CString            m_DeviceName;
 	IMMDevice          *m_pMMDevice;
 	IAudioClient       *m_pAudioClient;
 	IAudioRenderClient *m_pRenderClient;
