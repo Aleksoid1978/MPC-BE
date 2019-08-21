@@ -111,7 +111,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 				}
 			}
 
-			if (!bFound && !deviceId.IsEmpty()) {
+			if (!bFound && !deviceId.IsEmpty() && !deviceName.IsEmpty()) {
 				for (size_t i = 0; i < m_deviceList.size(); i++) {
 					if (m_deviceList[i].first == deviceName) {
 						idx = i;
