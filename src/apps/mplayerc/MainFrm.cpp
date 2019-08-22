@@ -15504,10 +15504,12 @@ void CMainFrame::CalcControlsSize(CSize& cSize)
 			}
 
 			if (bIsWindowVisible && !pDockingBar->IsFloating()) {
-				if (pDockingBar->IsHorzDocked()) {
-					cSize.cy += (pDockingBar->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER));
-				} else if (pDockingBar->IsVertDocked()) {
-					cSize.cx += (pDockingBar->CalcFixedLayout(TRUE, FALSE).cx - GetSystemMetrics(SM_CXBORDER));
+				const auto bHorz = pDockingBar->IsHorzDocked();
+				CSize size = pDockingBar->CalcFixedLayout(TRUE, bHorz);
+				if (bHorz) {
+					cSize.cy += (size.cy - 2);
+				} else {
+					cSize.cx += (cSize.cx ? size.cx - 2 : size.cx - 4);
 				}
 			}
 		}
