@@ -43,8 +43,19 @@ CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
 
 bool CTextFile::Open(LPCWSTR lpszFileName)
 {
-	if (!__super::Open(lpszFileName, modeRead | typeBinary | shareDenyNone)) {
-		return false;
+	CFileException fex;
+	for (unsigned attempt = 1;; attempt++) {
+		if (!__super::Open(lpszFileName, modeRead | typeBinary | shareDenyNone, &fex)) {
+			if (fex.m_cause == CFileException::sharingViolation) {
+				if (attempt <= 5) {
+					Sleep(20);
+					continue;
+				}
+			}
+			return false;
+		}
+
+		break;
 	}
 
 	m_offset = 0;
