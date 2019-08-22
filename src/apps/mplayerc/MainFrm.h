@@ -1313,12 +1313,13 @@ protected:
 	std::vector<CTime>    m_ExtSubFilesTime;
 	std::vector<CStringW> m_ExtSubPaths;
 
-	void              subChangeNotifySetupThread(std::vector<HANDLE>& handles);
+	void subChangeNotifyThreadStart();
+	void subChangeNotifySetupThread(std::vector<HANDLE>& handles);
 
-	CAMEvent          m_EventSubChangeStopNotify;
-	CAMEvent          m_EventSubChangeRefreshNotify;
-	std::thread       subChangeNotifyThread;
-	void              subChangeNotifyThreadFunction();
+	CAMEvent    m_EventSubChangeStopNotify;
+	CAMEvent    m_EventSubChangeRefreshNotify;
+	std::thread subChangeNotifyThread;
+	void        subChangeNotifyThreadFunction();
 
 	::CEvent m_hGraphThreadEventOpen;
 	::CEvent m_hGraphThreadEventClose;

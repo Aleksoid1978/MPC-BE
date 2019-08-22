@@ -108,8 +108,7 @@ BOOL CPPageSubtitles::OnApply()
 		auto pFrame = AfxGetMainFrame();
 		if (s.fAutoReloadExtSubtitles) {
 			if (!pFrame->subChangeNotifyThread.joinable()) {
-				pFrame->subChangeNotifyThread = std::thread([&] { pFrame->subChangeNotifyThreadFunction(); });
-				::SetThreadPriority(pFrame->subChangeNotifyThread.native_handle(), THREAD_PRIORITY_LOWEST);
+				pFrame->subChangeNotifyThreadStart();
 			}
 		} else {
 			if (pFrame->subChangeNotifyThread.joinable()) {

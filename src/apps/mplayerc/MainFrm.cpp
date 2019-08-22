@@ -849,8 +849,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_DiskImage.Init();
 
 	if (s.fAutoReloadExtSubtitles) {
-		subChangeNotifyThread = std::thread([this] { subChangeNotifyThreadFunction(); });
-		::SetThreadPriority(subChangeNotifyThread.native_handle(), THREAD_PRIORITY_LOWEST);
+		subChangeNotifyThreadStart();
 	}
 
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
@@ -19128,6 +19127,12 @@ const CString CMainFrame::GetAltFileName()
 	}
 
 	return ret;
+}
+
+void CMainFrame::subChangeNotifyThreadStart()
+{
+	subChangeNotifyThread = std::thread([this] { subChangeNotifyThreadFunction(); });
+	::SetThreadPriority(subChangeNotifyThread.native_handle(), THREAD_PRIORITY_LOWEST);
 }
 
 void CMainFrame::subChangeNotifySetupThread(std::vector<HANDLE>& handles)
