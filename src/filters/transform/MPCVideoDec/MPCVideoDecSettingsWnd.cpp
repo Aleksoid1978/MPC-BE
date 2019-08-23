@@ -69,6 +69,7 @@ bool CMPCVideoDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnk
 
 void CMPCVideoDecSettingsWnd::OnDisconnect()
 {
+	KillTimer(m_nTimerID);
 	m_pMDF.Release();
 }
 
@@ -308,7 +309,9 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 		m_pMDF->SetSwRefresh(refresh);
 
-		UpdateStatusInfo();
+		if (refresh == 2) {
+			SetTimer(m_nTimerID, 500, nullptr);
+		}
 
 		m_pMDF->SaveSettings();
 	}
@@ -322,6 +325,7 @@ BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
 	ON_BN_CLICKED(IDC_PP_SW_RGB32, OnBnClickedRGB32)
 	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 void CMPCVideoDecSettingsWnd::OnBnClickedYUY2()
@@ -395,6 +399,17 @@ BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *
 	}
 
 	return FALSE;
+}
+
+void CMPCVideoDecSettingsWnd::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == m_nTimerID) {
+		KillTimer(m_nTimerID);
+		UpdateStatusInfo();
+	}
+	else {
+		__super::OnTimer(nIDEvent);
+	}
 }
 
 // ====== Codec filter property page (for standalone filter only)
