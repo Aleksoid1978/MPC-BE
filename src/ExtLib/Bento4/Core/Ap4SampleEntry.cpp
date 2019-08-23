@@ -1089,6 +1089,19 @@ AP4_VisualSampleEntry::ReadFields(AP4_ByteStream& stream)
         }
         m_hasPalette = true;
     }
+	// MPC-BE custom code start
+	else if (m_Depth == 24) {
+		// fix for high bitdepth RAW video
+		switch (m_Type) {
+		case AP4_ATOM_TYPE_b48r:
+			m_Depth = 48;
+			break;
+		case AP4_ATOM_TYPE_b64a:
+			m_Depth = 64;
+			break;
+		}
+	}
+	// MPC-BE custom code end
 
     return AP4_SUCCESS;
 }
