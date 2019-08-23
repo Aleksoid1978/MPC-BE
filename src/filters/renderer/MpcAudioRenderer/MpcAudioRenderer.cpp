@@ -301,9 +301,16 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	}
 
 	if (SUCCEEDED(hr)) {
-		CComPtr<IMMDeviceEnumerator> enumerator;
-		if (SUCCEEDED(enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
-			enumerator->RegisterEndpointNotificationCallback(this);
+		HRESULT hr = m_pMMDeviceEnumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
+		if (FAILED(hr)) {
+			DLog(L"CMpcAudioRenderer::CMpcAudioRenderer() - IMMDeviceEnumerator::CoCreateInstance() failed: (0x%08x)", hr);
+			if (phr) {
+				*phr = hr;
+			}
+		}
+
+		if (SUCCEEDED(hr)) {
+			m_pMMDeviceEnumerator->RegisterEndpointNotificationCallback(this);
 		}
 	}
 }
@@ -312,10 +319,7 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 {
 	DLog(L"CMpcAudioRenderer::~CMpcAudioRenderer()");
 
-	CComPtr<IMMDeviceEnumerator> enumerator;
-	if (SUCCEEDED(enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
-		enumerator->UnregisterEndpointNotificationCallback(this);
-	}
+	m_pMMDeviceEnumerator->UnregisterEndpointNotificationCallback(this);
 
 	EndReleaseTimer();
 
@@ -896,14 +900,13 @@ STDMETHODIMP CMpcAudioRenderer::Count(DWORD* pcStreams)
 {
 	CheckPointer(pcStreams, E_POINTER);
 
-	return AudioDevices::GetActiveAudioDevices(nullptr, (UINT*)pcStreams, FALSE);
+	return AudioDevices::GetActiveAudioDevices(m_pMMDeviceEnumerator, nullptr, (UINT*)pcStreams, FALSE);
 }
 
 STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
 {
 	AudioDevices::deviceList_t deviceList;
-	if (S_OK != AudioDevices::GetActiveAudioDevices(&deviceList, nullptr, FALSE)
-			|| !deviceList.size()) {
+	if (FAILED(AudioDevices::GetActiveAudioDevices(m_pMMDeviceEnumerator, &deviceList, nullptr, FALSE))) {
 		return E_FAIL;
 	}
 
@@ -954,8 +957,7 @@ STDMETHODIMP CMpcAudioRenderer::Enable(long lIndex, DWORD dwFlags)
 	}
 
 	AudioDevices::deviceList_t deviceList;
-	if (S_OK != AudioDevices::GetActiveAudioDevices(&deviceList, nullptr, FALSE)
-			|| !deviceList.size()) {
+	if (FAILED(AudioDevices::GetActiveAudioDevices(m_pMMDeviceEnumerator, &deviceList, nullptr, FALSE))) {
 		return E_FAIL;
 	}
 
@@ -963,7 +965,7 @@ STDMETHODIMP CMpcAudioRenderer::Enable(long lIndex, DWORD dwFlags)
 		return S_FALSE;
 	}
 
-	return SetDeviceId(deviceList[lIndex].second, deviceList[lIndex].first);
+	return SetDeviceId(deviceList[lIndex].deviceId, deviceList[lIndex].deviceName);
 }
 
 // === ISpecifyPropertyPages2
@@ -1088,13 +1090,13 @@ STDMETHODIMP CMpcAudioRenderer::SetDeviceId(const CString& deviceId, const CStri
 	if (deviceIdSrc != deviceIdDst
 			&& (deviceIdSrc.IsEmpty() || deviceIdDst.IsEmpty())) {
 		AudioDevices::device_t device;
-		AudioDevices::GetDefaultAudioDevice(device);
+		AudioDevices::GetDefaultAudioDevice(m_pMMDeviceEnumerator, device);
 
 		if (deviceIdSrc.IsEmpty()) {
-			deviceIdSrc = device.second;
+			deviceIdSrc = device.deviceId;
 		}
 		if (deviceIdDst.IsEmpty()) {
-			deviceIdDst = device.second;
+			deviceIdDst = device.deviceId;
 		}
 	}
 
@@ -1595,127 +1597,50 @@ HRESULT CMpcAudioRenderer::GetAudioDevice(const BOOL bForceUseDefaultDevice)
 	m_strCurrentDeviceId.Empty();
 	m_strCurrentDeviceName.Empty();
 
-	CComPtr<IMMDeviceEnumerator> enumerator;
-	HRESULT hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
-	if (hr != S_OK) {
-		DLog(L"CMpcAudioRenderer::GetAudioDevice() - IMMDeviceEnumerator::CoCreateInstance() failed: (0x%08x)", hr);
-		return hr;
-	}
-
 	if (!bForceUseDefaultDevice && !m_DeviceId.IsEmpty()) {
-		CComPtr<IMMDeviceCollection> devices;
-		hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices);
-		if (hr != S_OK) {
-			DLog(L"CMpcAudioRenderer::GetAudioDevice() - IMMDeviceEnumerator::EnumAudioEndpoints() failed: (0x%08x)", hr);
-			return hr;
-		}
+		AudioDevices::deviceList_t deviceList;
+		if (SUCCEEDED(AudioDevices::GetActiveAudioDevices(m_pMMDeviceEnumerator, &deviceList, nullptr, FALSE))) {
+			DLog(L"CMpcAudioRenderer::GetAudioDevice() - trying by device id");
+			for (const auto& device : deviceList) {
+				if (m_DeviceId == device.deviceId) {
+					DLog(L"CMpcAudioRenderer::GetAudioDevice() - Using the device: '%s'/'%s'", device.deviceId, device.deviceName);
 
-		UINT count = 0;
-		hr = devices->GetCount(&count);
-		if (hr != S_OK) {
-			DLog(L"CMpcAudioRenderer::GetAudioDevice() - IMMDeviceCollection::GetCount() failed: (0x%08x)", hr);
-			return hr;
-		}
+					m_strCurrentDeviceId = device.deviceId;
+					m_strCurrentDeviceName = device.deviceName;
+					m_pMMDeviceEnumerator->GetDevice(m_strCurrentDeviceId, &m_pMMDevice);
 
-		DLog(L"CMpcAudioRenderer::GetAudioDevice() - trying by device id");
-		IMMDevice* endpoint = nullptr;
-		IPropertyStore* pProps = nullptr;
-		LPWSTR pwszID = nullptr;
-		PROPVARIANT varName;
-		PropVariantInit(&varName);
-
-		for (UINT i = 0; i < count; i++) {
-			if (SUCCEEDED(devices->Item(i, &endpoint))
-					&& SUCCEEDED(endpoint->GetId(&pwszID))
-					&& SUCCEEDED(endpoint->OpenPropertyStore(STGM_READ, &pProps))
-					&& SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-				if (m_DeviceId.Compare(pwszID) == 0) {
-					DLog(L"CMpcAudioRenderer::GetAudioDevice() - Using the device: '%s'/'%s'", pwszID, varName.pwszVal);
-
-					m_strCurrentDeviceId = pwszID;
-					m_strCurrentDeviceName = varName.pwszVal;
-
-					enumerator->GetDevice(pwszID, &m_pMMDevice);
-					CoTaskMemFree(pwszID);
-					PropVariantClear(&varName);
-					SAFE_RELEASE(endpoint);
-					SAFE_RELEASE(pProps);
 					return S_OK;
 				}
-
-				PropVariantClear(&varName);
 			}
 
-			SAFE_RELEASE(endpoint);
-			SAFE_RELEASE(pProps);
-			if (pwszID) {
-				CoTaskMemFree(pwszID);
-				pwszID = nullptr;
-			}
-		}
-
-		if (!m_DeviceName.IsEmpty()) {
 			DLog(L"CMpcAudioRenderer::GetAudioDevice() - trying by device name");
-			for (UINT i = 0; i < count; i++) {
-				if (SUCCEEDED(devices->Item(i, &endpoint))
-						&& SUCCEEDED(endpoint->GetId(&pwszID))
-						&& SUCCEEDED(endpoint->OpenPropertyStore(STGM_READ, &pProps))
-						&& SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-					if (m_DeviceName.Compare(varName.pwszVal)) {
-						DLog(L"CMpcAudioRenderer::GetAudioDevice() - Using the device: '%s'/'%s'", pwszID, varName.pwszVal);
+			for (const auto& device : deviceList) {
+				if (m_DeviceName == device.deviceName) {
+					DLog(L"CMpcAudioRenderer::GetAudioDevice() - Using the device: '%s'/'%s'", device.deviceId, device.deviceName);
 
-						m_strCurrentDeviceId = pwszID;
-						m_strCurrentDeviceName = varName.pwszVal;
+					m_strCurrentDeviceId = device.deviceId;
+					m_strCurrentDeviceName = device.deviceName;
+					m_pMMDeviceEnumerator->GetDevice(m_strCurrentDeviceId, &m_pMMDevice);
 
-						enumerator->GetDevice(pwszID, &m_pMMDevice);
-						CoTaskMemFree(pwszID);
-						PropVariantClear(&varName);
-						SAFE_RELEASE(endpoint);
-						SAFE_RELEASE(pProps);
-						return S_OK;
-					}
-
-					PropVariantClear(&varName);
-				}
-
-				SAFE_RELEASE(endpoint);
-				SAFE_RELEASE(pProps);
-				if (pwszID) {
-					CoTaskMemFree(pwszID);
-					pwszID = nullptr;
+					return S_OK;
 				}
 			}
 		}
 	}
 
 	m_bUseDefaultDevice = TRUE;
+	AudioDevices::device_t device;
+	if (SUCCEEDED(AudioDevices::GetDefaultAudioDevice(m_pMMDeviceEnumerator, device))) {
+		DLog(L"CMpcAudioRenderer::GetAudioDevice() - Using the default device: '%s'/'%s'", device.deviceId, device.deviceName);
 
-	hr = E_FAIL;
-	IPropertyStore* pProps = nullptr;
-	LPWSTR pwszID = nullptr;
-	PROPVARIANT varName;
-	PropVariantInit(&varName);
+		m_strCurrentDeviceId = device.deviceId;
+		m_strCurrentDeviceName = device.deviceName;
+		m_pMMDeviceEnumerator->GetDevice(m_strCurrentDeviceId, &m_pMMDevice);
 
-	if (SUCCEEDED(enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pMMDevice))
-			&& SUCCEEDED(m_pMMDevice->GetId(&pwszID))
-			&& SUCCEEDED(m_pMMDevice->OpenPropertyStore(STGM_READ, &pProps))
-			&& SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-		DLog(L"CMpcAudioRenderer::GetAudioDevice() - Using the default device: '%s'/'%s'", pwszID, varName.pwszVal);
-
-		m_strCurrentDeviceId = pwszID;
-		m_strCurrentDeviceName = varName.pwszVal;
-
-		PropVariantClear(&varName);
-
-		hr = S_OK;
+		return S_OK;
 	}
 
-	SAFE_RELEASE(pProps);
-	if (pwszID) {
-		CoTaskMemFree(pwszID);
-	}
-
-	return hr;
+	return E_FAIL;
 }
 
 HRESULT CMpcAudioRenderer::InitAudioClient()
