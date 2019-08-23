@@ -93,6 +93,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_btnReset;
 	CStatic		m_txtMPCVersion;
 
+	const UINT_PTR m_nTimerID = 1;
+
 	void		UpdateStatusInfo();
 
 public:
@@ -113,6 +115,7 @@ public:
 	afx_msg void OnBnClickedRGB32();
 	afx_msg void OnBnClickedReset();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 #ifdef REGISTER_FILTER
