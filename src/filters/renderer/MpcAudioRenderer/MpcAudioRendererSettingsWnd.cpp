@@ -92,9 +92,9 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	p.y += h20;
 	m_cbUseCrossFeed.Create(ResStr(IDS_ARS_CROSSFEED), WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_CROSSFEED);
 
-	AudioDevices::GetActiveAudioDevices(&m_deviceList, nullptr, TRUE);
+	AudioDevices::GetActiveAudioDevices(nullptr, &m_deviceList, nullptr, TRUE);
 	for (const auto& device : m_deviceList) {
-		m_cbSoundDevice.AddString(device.first);
+		m_cbSoundDevice.AddString(device.deviceName);
 	}
 
 	if (m_pMAR) {
@@ -104,7 +104,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 			CString deviceId, deviceName;
 			m_pMAR->GetDeviceId(deviceId, deviceName);
 			for (size_t i = 0; i < m_deviceList.size(); i++) {
-				if (m_deviceList[i].second == deviceId) {
+				if (m_deviceList[i].deviceId == deviceId) {
 					idx = i;
 					bFound = true;
 					break;
@@ -113,7 +113,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 			if (!bFound && !deviceId.IsEmpty() && !deviceName.IsEmpty()) {
 				for (size_t i = 0; i < m_deviceList.size(); i++) {
-					if (m_deviceList[i].first == deviceName) {
+					if (m_deviceList[i].deviceName == deviceName) {
 						idx = i;
 						break;
 					}
@@ -163,7 +163,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetCrossFeed(m_cbUseCrossFeed.GetCheck());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
-			m_pMAR->SetDeviceId(m_deviceList[idx].second, m_deviceList[idx].first);
+			m_pMAR->SetDeviceId(m_deviceList[idx].deviceId, m_deviceList[idx].deviceName);
 		}
 		m_pMAR->Apply();
 	}

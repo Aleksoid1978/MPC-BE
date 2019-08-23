@@ -248,6 +248,8 @@ private:
 	BOOL               m_bUseCrossFeed;
 	FILTER_STATE       m_filterState;
 
+	CComPtr<IMMDeviceEnumerator> m_pMMDeviceEnumerator;
+
 	typedef HANDLE (__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
 	typedef BOOL   (__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 	PTR_AvSetMmThreadCharacteristicsW	pfAvSetMmThreadCharacteristicsW;

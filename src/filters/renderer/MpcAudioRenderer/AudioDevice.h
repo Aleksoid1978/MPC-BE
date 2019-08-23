@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2018 see Authors.txt
+ * (C) 2015-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,13 +20,17 @@
 
 #pragma once
 
+#include <mmdeviceapi.h>
 #include <vector>
 
 namespace AudioDevices
 {
-	typedef std::pair<CString, CString> device_t;
+	struct device_t {
+		CString deviceName;
+		CString deviceId;
+	};
 	typedef std::vector<device_t> deviceList_t;
 
-	HRESULT GetActiveAudioDevices(deviceList_t* deviceList = nullptr, UINT* devicesCount = nullptr, BOOL bIncludeDefault = TRUE);
-	HRESULT GetDefaultAudioDevice(device_t& device);
+	HRESULT GetActiveAudioDevices(IMMDeviceEnumerator *pMMDeviceEnumerator, deviceList_t* deviceList, UINT* devicesCount, BOOL bIncludeDefault);
+	HRESULT GetDefaultAudioDevice(IMMDeviceEnumerator *pMMDeviceEnumerator, device_t& device);
 }

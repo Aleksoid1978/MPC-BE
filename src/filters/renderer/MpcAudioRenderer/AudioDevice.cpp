@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2018 see Authors.txt
+ * (C) 2015-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "AudioDevice.h"
-#include <mmdeviceapi.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
 #include "../../../DSUtil/DSUtil.h"
 
@@ -54,10 +53,8 @@ static void InitDSound()
 
 namespace AudioDevices
 {
-	HRESULT GetActiveAudioDevices(deviceList_t* deviceList/* = nullptr*/, UINT* devicesCount/* = nullptr*/, BOOL bIncludeDefault/* = TRUE*/)
+	HRESULT GetActiveAudioDevices(IMMDeviceEnumerator *pMMDeviceEnumerator, deviceList_t* deviceList, UINT* devicesCount, BOOL bIncludeDefault)
 	{
-		HRESULT hr = E_FAIL;
-
 		if (deviceList) {
 			deviceList->clear();
 		}
@@ -68,7 +65,7 @@ namespace AudioDevices
 				device_t device;
 				pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumCallback, (LPVOID)&device);
 
-				if (!device.first.IsEmpty()) {
+				if (!device.deviceName.IsEmpty()) {
 					if (deviceList) {
 						deviceList->emplace_back(device);
 					}
@@ -80,94 +77,83 @@ namespace AudioDevices
 			}
 		}
 
-		for (;;) {
-			CComPtr<IMMDeviceEnumerator> enumerator;
-			hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
-			if (FAILED(hr)) {
-				break;
-			}
-			CComPtr<IMMDeviceCollection> devices;
-			if (FAILED(hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices))) {
-				break;
-			}
-
-			UINT count = 0;
-			if (FAILED(hr = devices->GetCount(&count))) {
-				break;
-			}
-
-			if (devicesCount) {
-				*devicesCount += count;
-			}
-
-			if (deviceList) {
-				IMMDevice* endpoint = nullptr;
-				IPropertyStore* pProps = nullptr;
-				LPWSTR pwszID = nullptr;
-
-				for (UINT i = 0; i < count; i++) {
-					if (SUCCEEDED(hr = devices->Item(i, &endpoint))
-							&& SUCCEEDED(endpoint->GetId(&pwszID))
-							&& SUCCEEDED(hr = endpoint->OpenPropertyStore(STGM_READ, &pProps))) {
-						PROPVARIANT varName;
-						PropVariantInit(&varName);
-						if (SUCCEEDED(hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-							deviceList->emplace_back(varName.pwszVal, pwszID);
-
-							PropVariantClear(&varName);
-						}
-					}
-
-					SAFE_RELEASE(endpoint);
-					SAFE_RELEASE(pProps);
-					if (pwszID) {
-						CoTaskMemFree(pwszID);
-						pwszID = nullptr;
-					}
-				}
-			}
-
-			hr = S_OK;
-			break;
+		IMMDeviceEnumerator* deviceEnumerator = pMMDeviceEnumerator;
+		if (!deviceEnumerator && FAILED(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&deviceEnumerator)))) {
+			return E_FAIL;
 		}
 
-		return hr;
-	}
+		CComPtr<IMMDeviceCollection> deviceCollection;
+		deviceEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &deviceCollection);
 
-	HRESULT GetDefaultAudioDevice(device_t& device)
-	{
-		HRESULT hr = E_FAIL;
-
-		for (;;) {
-			CComPtr<IMMDeviceEnumerator> enumerator;
-			if (FAILED(hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
-				break;
+		UINT count = 0;
+		if (!deviceCollection || FAILED(deviceCollection->GetCount(&count))) {
+			if (!pMMDeviceEnumerator) {
+				deviceEnumerator->Release();
 			}
+			return E_FAIL;
+		}
 
-			CComPtr<IMMDevice> pMMDevice;
-			if (FAILED(hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pMMDevice))) {
-				break;
-			}
+		if (devicesCount) {
+			*devicesCount += count;
+		}
 
+		if (deviceList) {
+			IMMDevice* endpoint = nullptr;
+			IPropertyStore* pProps = nullptr;
 			LPWSTR pwszID = nullptr;
-			if ((hr = pMMDevice->GetId(&pwszID)) == S_OK) {
-				CComPtr<IPropertyStore> pProps;
-				if ((hr = pMMDevice->OpenPropertyStore(STGM_READ, &pProps)) == S_OK) {
-					PROPVARIANT varName;
-					PropVariantInit(&varName);
-					if ((hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName)) == S_OK) {
-						device = {varName.pwszVal, pwszID};
-					}
+			PROPVARIANT varName;
+			PropVariantInit(&varName);
 
+			for (UINT i = 0; i < count; i++) {
+				if (SUCCEEDED(deviceCollection->Item(i, &endpoint))
+						&& SUCCEEDED(endpoint->GetId(&pwszID))
+						&& SUCCEEDED(endpoint->OpenPropertyStore(STGM_READ, &pProps))
+						&& SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
+					deviceList->push_back({ varName.pwszVal, pwszID });
 					PropVariantClear(&varName);
+				}
+
+				SAFE_RELEASE(endpoint);
+				SAFE_RELEASE(pProps);
+				if (pwszID) {
+					CoTaskMemFree(pwszID);
+					pwszID = nullptr;
 				}
 			}
 
-			if (pwszID) {
-				CoTaskMemFree(pwszID);
+			if (!pMMDeviceEnumerator) {
+				deviceEnumerator->Release();
 			}
 
-			break;
+			return deviceList->empty() ? E_FAIL : S_OK;
+		}
+
+		return S_OK;
+	}
+
+	HRESULT GetDefaultAudioDevice(IMMDeviceEnumerator *pMMDeviceEnumerator, device_t& device)
+	{
+		HRESULT hr = E_FAIL;
+		IMMDevice* endpoint = nullptr;
+		IPropertyStore* pProps = nullptr;
+		LPWSTR pwszID = nullptr;
+		PROPVARIANT varName;
+		PropVariantInit(&varName);
+
+		if (SUCCEEDED(pMMDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &endpoint))
+				&& SUCCEEDED(endpoint->GetId(&pwszID))
+				&& SUCCEEDED(endpoint->OpenPropertyStore(STGM_READ, &pProps))
+				&& SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
+			device = { varName.pwszVal, pwszID };
+			PropVariantClear(&varName);
+
+			hr = S_OK;
+		}
+
+		SAFE_RELEASE(endpoint);
+		SAFE_RELEASE(pProps);
+		if (pwszID) {
+			CoTaskMemFree(pwszID);
 		}
 
 		return hr;
