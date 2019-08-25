@@ -156,4 +156,6 @@ namespace Youtube
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
 
 	bool Parse_URL(CString url, YoutubeFields& y_fields);
+
+	const YoutubeUrllistItem* GetAudioUrl(const yformat format, const YoutubeUrllist& youtubeAudioUrllist);
 }
