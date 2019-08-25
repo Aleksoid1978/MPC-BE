@@ -1596,7 +1596,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	while (f.ReadString(str)) {
 		str = str.Trim();
 
-		if (str.IsEmpty() || (str.Find(L"#EXTM3U") == 0)) {
+		if (str.IsEmpty() || (str.Left(7) == L"#EXTM3U")) {
 			continue;
 		}
 
@@ -1604,9 +1604,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			pli = DNew CPlaylistItem;
 		}
 
-		if (str.Find(L"#") == 0) {
-			if (str.Find(L"#EXTINF:") == 0) {
-				int k = str.Find(L"#EXTINF:") + CString(L"#EXTINF:").GetLength();
+		if (str.Left(1) == L"#") {
+			if (str.Left(8) == L"#EXTINF:") {
+				int k = 8;
 				str = str.Mid(k, str.GetLength() - k);
 
 				k = str.Find(L",");
@@ -1619,8 +1619,8 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					}
 				}
 				pli->m_label = str.Trim();
-			} else if (str.Find(L"#EXT-X-STREAM-INF:") == 0) {
-				int k = str.Find(L"#EXT-X-STREAM-INF:") + CString(L"#EXT-X-STREAM-INF:").GetLength();
+			} else if (str.Left(18) == L"#EXT-X-STREAM-INF:") {
+				int k = 18;
 				str = str.Mid(k, str.GetLength() - k);
 				pli->m_label = str.Trim();
 			}
