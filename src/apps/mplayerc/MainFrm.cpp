@@ -11788,8 +11788,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		});
 		if (it != m_youtubeUrllist.cend()) {
 			pOFD->fns.push_back(it->url);
+
 			if (it->profile->type == Youtube::y_video && !m_youtubeAudioUrllist.empty()) {
-				pOFD->fns.push_back(m_youtubeAudioUrllist.cbegin()->url);
+				const auto audio_item = Youtube::GetAudioUrl(it->profile->format, m_youtubeAudioUrllist);
+				pOFD->fns.push_back(audio_item->url);
 			}
 
 			pOFD->subs = m_lastOMD->subs;

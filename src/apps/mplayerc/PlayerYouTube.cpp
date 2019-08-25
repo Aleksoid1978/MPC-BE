@@ -889,23 +889,9 @@ namespace Youtube
 
 			CString final_audio_url;
 			if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
-				int fmt = final_item->profile->format;
-				final_item = nullptr;
-
-				// select audio stream
-				for (const auto& item : youtubeAudioUrllist) {
-					if (fmt == item.profile->format) {
-						final_item = &item;
-						break;
-					}
-				}
-				if (!final_item) {
-					final_item = &youtubeAudioUrllist[0];
-				}
-
-				final_audio_url = final_item->url;
-
-				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", final_item->title, final_item->url);
+				const auto audio_item = GetAudioUrl(final_item->profile->format, youtubeAudioUrllist);
+				final_audio_url = audio_item->url;
+				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", audio_item->title, audio_item->url);
 			}
 
 			if (!final_audio_url.IsEmpty()) {
@@ -1104,5 +1090,24 @@ namespace Youtube
 		}
 
 		return bRet;
+	}
+
+	const YoutubeUrllistItem* GetAudioUrl(const yformat format, const YoutubeUrllist& youtubeAudioUrllist)
+	{
+		const YoutubeUrllistItem* audio_item = nullptr;
+		if (!youtubeAudioUrllist.empty()) {
+			for (const auto& item : youtubeAudioUrllist) {
+				if (format == item.profile->format) {
+					audio_item = &item;
+					break;
+				}
+			}
+
+			if (!audio_item) {
+				audio_item = &youtubeAudioUrllist[0];
+			}
+		}
+
+		return audio_item;
 	}
 }
