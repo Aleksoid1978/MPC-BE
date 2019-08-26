@@ -637,6 +637,10 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
 {
+	if (m_bOpeningAborted) {
+		return E_ABORT;
+	}
+
 	DLog(L"FGM: AddSourceFilter() trying '%s'", pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())/*CStringFromGUID(pFGF->GetCLSID())*/);
 
 	CheckPointer(lpcwstrFileName, E_POINTER);
@@ -765,6 +769,10 @@ STDMETHODIMP CFGManager::ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MED
 {
 	if (!m_pUnkInner) {
 		return E_UNEXPECTED;
+	}
+
+	if (m_bOpeningAborted) {
+		return E_ABORT;
 	}
 
 	CAutoLock cAutoLock(this);
@@ -1191,6 +1199,8 @@ STDMETHODIMP CFGManager::Render(IPin* pPinOut)
 STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlayList)
 {
 	DLog(L"CFGManager::RenderFile() on thread: %u", GetCurrentThreadId());
+
+	m_bOpeningAborted = false;
 	CAutoLock cAutoLock(this);
 
 	m_streampath.clear();
@@ -1227,6 +1237,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			if (hr == 0xDEAD) {
 				; // TODO
 			} else if (SUCCEEDED(hr)) {
+				m_bOpeningAborted = false;
 				return hr;
 			}
 
@@ -1238,6 +1249,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 	}
 
 	m_deadends.Copy(deadends);
+	m_bOpeningAborted = false;
 
 	return hr;
 }
@@ -1279,6 +1291,8 @@ STDMETHODIMP CFGManager::Abort()
 	if (!m_pUnkInner) {
 		return E_UNEXPECTED;
 	}
+
+	m_bOpeningAborted = true;
 
 	CAutoLock cAutoLock(this);
 
@@ -1406,6 +1420,10 @@ static bool FindMT(IPin* pPin, const GUID majortype)
 
 HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 {
+	if (m_bOpeningAborted) {
+		return E_ABORT;
+	}
+
 	HRESULT hr = S_OK;
 
 	CComPtr<IBaseFilter> pBF;
@@ -1433,6 +1451,10 @@ HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 {
 	CAutoLock cAutoLock(this);
+
+	if (m_bOpeningAborted) {
+		return E_ABORT;
+	}
 
 	CheckPointer(pBF, E_POINTER);
 
@@ -2984,16 +3006,21 @@ public:
 
 STDMETHODIMP CFGManagerDVD::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayList)
 {
+	m_bOpeningAborted = false;
 	CAutoLock cAutoLock(this);
 
 	HRESULT hr;
 
 	CComPtr<IBaseFilter> pBF;
 	if (FAILED(hr = AddSourceFilter(lpcwstrFile, lpcwstrFile, &pBF))) {
+		m_bOpeningAborted = false;
 		return hr;
 	}
 
-	return ConnectFilter(pBF, nullptr);
+	hr = ConnectFilter(pBF, nullptr);
+	m_bOpeningAborted = false;
+
+	return hr;
 }
 
 STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppFilter)
