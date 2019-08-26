@@ -133,6 +133,8 @@ protected:
 
 	bool m_bIsPreview;
 
+	bool m_bOpeningAborted = false;
+
 public:
 	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
 	virtual ~CFGManager();
