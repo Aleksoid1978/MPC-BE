@@ -1588,6 +1588,8 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		base.RemoveFileSpec();
 	}
 
+	CFileItemList audio_fns;
+
 	std::vector<CPlaylistItem> playlist;
 	CPlaylistItem *pli = nullptr;
 
@@ -1606,23 +1608,42 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 
 		if (str.Left(1) == L"#") {
 			if (str.Left(8) == L"#EXTINF:") {
-				int k = 8;
-				str = str.Mid(k, str.GetLength() - k);
+				int pos = 8;
+				str = str.Mid(pos, str.GetLength() - pos);
 
-				k = str.Find(L",");
-				if (k > 0) {
-					CString tmp = str.Left(k);
+				pos = str.Find(L",");
+				if (pos > 0) {
+					const auto tmp = str.Left(pos);
 					int dur = 0;
 					if (swscanf_s(tmp, L"%dx", &dur) == 1) {
-						k++;
-						str = str.Mid(k, str.GetLength() - k);
+						pos++;
+						str = str.Mid(pos, str.GetLength() - pos);
 					}
 				}
 				pli->m_label = str.Trim();
 			} else if (str.Left(18) == L"#EXT-X-STREAM-INF:") {
-				int k = 18;
-				str = str.Mid(k, str.GetLength() - k);
+				const int pos = 18;
+				str = str.Mid(pos, str.GetLength() - pos);
 				pli->m_label = str.Trim();
+			} else if (str.Left(13) == L"#EXT-X-MEDIA:" && str.Find(L"TYPE=AUDIO") > 13) {
+				int pos = 13;
+				str = str.Mid(pos, str.GetLength() - pos);
+
+				std::list<CString> params;
+				Explode(str, params, L',');
+				for (const auto& param : params) {
+					pos = param.Find(L'=');
+					if (pos > 0) {
+						const auto key = param.Left(pos);
+						auto value = param.Mid(pos + 1);
+						if (key == L"URI") {
+							value.Trim(L'\"');
+							const auto path = MakePath(CombinePath(base, value));
+							audio_fns.push_back(path);
+							break;
+						}
+					}
+				}
 			}
 		} else {
 			const auto path = MakePath(CombinePath(base, str));
@@ -1656,6 +1677,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 			}
 			pli->m_fns.push_back(path);
+			if (!audio_fns.empty()) {
+				pli->m_fns.insert(pli->m_fns.end(), audio_fns.begin(), audio_fns.end());
+			}
 			playlist.push_back(*pli);
 
 			SAFE_DELETE(pli);
