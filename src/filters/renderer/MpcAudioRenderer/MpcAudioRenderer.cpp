@@ -2818,7 +2818,6 @@ void CMpcAudioRenderer::ReleaseDevice()
 		DLog(L"CMpcAudioRenderer::ReleaseDevice()");
 
 		m_bReleased = true;
-		m_eReleaseEvent.Set();
 
 		PauseRendererThread();
 		m_bIsAudioClientStarted = false;
@@ -2828,8 +2827,6 @@ void CMpcAudioRenderer::ReleaseDevice()
 		SAFE_RELEASE(m_pRenderClient);
 		SAFE_RELEASE(m_pAudioClock);
 		SAFE_RELEASE(m_pAudioClient);
-
-		m_eReleaseEvent.Reset();
 	}
 }
 

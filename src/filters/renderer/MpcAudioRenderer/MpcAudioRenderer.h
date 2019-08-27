@@ -92,7 +92,6 @@ public:
 	size_t WasapiQueueSize();
 	void WaitFinish();
 
-	CAMEvent m_eReleaseEvent{TRUE};
 	bool m_bReleased             = false;
 	HANDLE m_hReleaseTimerHandle = nullptr;
 
