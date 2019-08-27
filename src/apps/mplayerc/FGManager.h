@@ -134,6 +134,7 @@ protected:
 	bool m_bIsPreview;
 
 	bool m_bOpeningAborted = false;
+	std::mutex m_mutexRender;
 
 public:
 	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);

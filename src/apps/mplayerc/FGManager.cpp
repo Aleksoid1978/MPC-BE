@@ -676,9 +676,9 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 	}
 
 	// sometimes looping with AviSynth
-	if (FAILED(hr = pFSF->Load(lpcwstrFileName, pmt))) {
+	if (FAILED(hr = pFSF->Load(lpcwstrFileName, pmt)) || m_bOpeningAborted) {
 		RemoveFilter(pBF);
-		return hr;
+		return m_bOpeningAborted ? E_ABORT : hr;
 	}
 
 	// doh :P
@@ -769,10 +769,6 @@ STDMETHODIMP CFGManager::ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MED
 {
 	if (!m_pUnkInner) {
 		return E_UNEXPECTED;
-	}
-
-	if (m_bOpeningAborted) {
-		return E_ABORT;
 	}
 
 	CAutoLock cAutoLock(this);
@@ -1153,20 +1149,11 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				}
 			}
 
-			BOOL bIsEnd = FALSE;
-			if (pFGF->GetMerit() == MERIT64_HIGH) {
-				DLog(L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName());
-				bIsEnd = TRUE;
-			} else {
-				DLog(L"FGM: Connecting '%s' FAILED!", pFGF->GetName());
-			}
+			DLog(L"FGM: Connecting '%s' FAILED!", pFGF->GetName());
 
 			EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
+			pUnks.RemoveAll();
 			pBF.Release();
-
-			if (bIsEnd) {
-				return 0xDEAD;
-			}
 		}
 	}
 
@@ -1201,6 +1188,8 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 	DLog(L"CFGManager::RenderFile() on thread: %u", GetCurrentThreadId());
 
 	m_bOpeningAborted = false;
+	std::unique_lock<std::mutex> lock(m_mutexRender);
+
 	CAutoLock cAutoLock(this);
 
 	m_streampath.clear();
@@ -1234,9 +1223,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			m_deadends.RemoveAll();
 
 			hr = ConnectFilter(pBF, nullptr);
-			if (hr == 0xDEAD) {
-				; // TODO
-			} else if (SUCCEEDED(hr)) {
+			if (SUCCEEDED(hr)) {
 				m_bOpeningAborted = false;
 				return hr;
 			}
@@ -1245,6 +1232,9 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			RemoveFilter(pBF);
 
 			deadends.Append(m_deadends);
+		} else if (hr == E_ABORT) {
+			m_bOpeningAborted = false;
+			return hr;
 		}
 	}
 
@@ -1293,6 +1283,7 @@ STDMETHODIMP CFGManager::Abort()
 	}
 
 	m_bOpeningAborted = true;
+	std::unique_lock<std::mutex> lock(m_mutexRender);
 
 	CAutoLock cAutoLock(this);
 
@@ -1420,10 +1411,6 @@ static bool FindMT(IPin* pPin, const GUID majortype)
 
 HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 {
-	if (m_bOpeningAborted) {
-		return E_ABORT;
-	}
-
 	HRESULT hr = S_OK;
 
 	CComPtr<IBaseFilter> pBF;
@@ -1451,10 +1438,6 @@ HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 {
 	CAutoLock cAutoLock(this);
-
-	if (m_bOpeningAborted) {
-		return E_ABORT;
-	}
 
 	CheckPointer(pBF, E_POINTER);
 
@@ -1602,9 +1585,6 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 			if (!bInfPinTeeConnected) {
 				hr = Connect(pPin, pPinIn);
-				if (hr == 0xDEAD) {
-					return hr;
-				}
 			}
 
 			if (SUCCEEDED(hr)) {
@@ -3007,6 +2987,8 @@ public:
 STDMETHODIMP CFGManagerDVD::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayList)
 {
 	m_bOpeningAborted = false;
+	std::unique_lock<std::mutex> lock(m_mutexRender);
+
 	CAutoLock cAutoLock(this);
 
 	HRESULT hr;
