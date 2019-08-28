@@ -234,7 +234,7 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 		} else {
 			fourcc = FCC('H263');
 		}
-	break;
+		break;
 	// Motion-JPEG
 	case AP4_ATOM_TYPE_MJPG:
 	case AP4_ATOM_TYPE_AVDJ: // uncommon fourcc
@@ -250,6 +250,7 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	case AP4_ATOM_TYPE_OVC1:
 	case AP4_ATOM_TYPE_VC1:
 		fourcc = FCC('WVC1');
+		break;
 	// DV Video (http://msdn.microsoft.com/en-us/library/windows/desktop/dd388646%28v=vs.85%29.aspx)
 	case AP4_ATOM_TYPE_DVC:
 	case AP4_ATOM_TYPE_DVCP:
