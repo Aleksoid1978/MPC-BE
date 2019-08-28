@@ -321,6 +321,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	REFERENCE_TIME codecAvgTimePerFrame = 0;
 	BOOL bInterlaced = FALSE;
 
+	CString videoTrackName;
+
 	for (const auto& pT : m_pFile->m_segment.Tracks) {
 		for (const auto& pTE : pT->TrackEntries) {
 			bool isSub = false;
@@ -344,6 +346,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.SetSampleSize(1); // variable frame size?
 				mt.bFixedSizeSamples = FALSE; // most compressed video has a variable frame size
 				mt.bTemporalCompression = TRUE; // stream may contain P or B frames
+
+				videoTrackName = pTE->Name;
 
 				if (CodecID == "V_MS/VFW/FOURCC") {
 					mt.formattype = FORMAT_VideoInfo;
@@ -1597,7 +1601,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(L"stereo_subtitle_offset_ids", offsets);
 	}
 
-	CComBSTR title, date;
+	CComBSTR title;
+	if (!videoTrackName.IsEmpty()
+			&& (FAILED(GetProperty(L"TITL", &title)) || !title.Length())) {
+		SetProperty(L"TITL", videoTrackName);
+	}
+	title.Empty();
+
+	CComBSTR date;
 	if (SUCCEEDED(GetProperty(L"TITL", &title)) & SUCCEEDED(GetProperty(L"DATE", &date))
 			&& title.Length() && date.Length()) {
 		CString Title;
