@@ -108,7 +108,7 @@ AP4_Result
 AP4_SampleEntry::WriteFields(AP4_ByteStream& stream)
 {
     AP4_Result result;
-    
+
     // reserved1
     result = stream.Write(m_Reserved1, sizeof(m_Reserved1));
     if (AP4_FAILED(result)) return result;
@@ -116,7 +116,7 @@ AP4_SampleEntry::WriteFields(AP4_ByteStream& stream)
     // data reference index
     result = stream.WriteUI16(m_DataReferenceIndex);
     if (AP4_FAILED(result)) return result;
-    
+
     return result;
 }
 
@@ -198,7 +198,7 @@ AP4_SampleEntry::ToSampleDescription()
 /*----------------------------------------------------------------------
 |       AP4_MpegSampleEntry::AP4_MpegSampleEntry
 +---------------------------------------------------------------------*/
-AP4_MpegSampleEntry::AP4_MpegSampleEntry(AP4_Atom::Type    format, 
+AP4_MpegSampleEntry::AP4_MpegSampleEntry(AP4_Atom::Type    format,
                                          AP4_EsDescriptor* descriptor) :
     AP4_SampleEntry(format)
 {
@@ -228,7 +228,7 @@ AP4_MpegSampleEntry::AP4_MpegSampleEntry(AP4_Atom::Type   format,
 /*----------------------------------------------------------------------
 |       AP4_MpegSampleEntry::AP4_MpegSampleEntry
 +---------------------------------------------------------------------*/
-const AP4_DecoderConfigDescriptor* 
+const AP4_DecoderConfigDescriptor*
 AP4_MpegSampleEntry::GetDecoderConfigDescriptor()
 {
     AP4_Atom* child = GetChild(AP4_ATOM_TYPE_ESDS);
@@ -424,7 +424,7 @@ AP4_AudioSampleEntry::GetFieldsSize()
     } else if (m_QtVersion == 2) {
         size += 36+m_QtV2Extension.GetDataSize();
     }
-    
+
     return size;
 }
 
@@ -452,7 +452,7 @@ AP4_AudioSampleEntry::GetChannelCount()
     } else {
         return m_ChannelCount;
     }
-}  
+}
 
 /*----------------------------------------------------------------------
 |   AP4_AudioSampleEntry::ReadFields
@@ -520,7 +520,7 @@ AP4_AudioSampleEntry::ReadFields(AP4_ByteStream& stream)
     }
 
     m_SampleRateExtra = 0;
-    
+
     return AP4_SUCCESS;
 }
 
@@ -531,11 +531,11 @@ AP4_Result
 AP4_AudioSampleEntry::WriteFields(AP4_ByteStream& stream)
 {
     AP4_Result result;
-    
+
     // write the fields of the base class
     result = AP4_SampleEntry::WriteFields(stream);
 
-    // 
+    //
     result = stream.WriteUI16(m_QtVersion);
     if (AP4_FAILED(result)) return result;
     result = stream.WriteUI16(m_QtRevision);
@@ -546,8 +546,8 @@ AP4_AudioSampleEntry::WriteFields(AP4_ByteStream& stream)
     // channel count
     result = stream.WriteUI16(m_ChannelCount);
     if (AP4_FAILED(result)) return result;
-    
-    // sample size 
+
+    // sample size
     result = stream.WriteUI16(m_SampleSize);
     if (AP4_FAILED(result)) return result;
 
@@ -631,14 +631,14 @@ AP4_AudioSampleEntry::ToSampleDescription()
 /*----------------------------------------------------------------------
 |       AP4_Mp4aSampleEntry::AP4_Mp4aSampleEntry
 +---------------------------------------------------------------------*/
-AP4_Mp4aSampleEntry::AP4_Mp4aSampleEntry(AP4_UI32          sample_rate, 
+AP4_Mp4aSampleEntry::AP4_Mp4aSampleEntry(AP4_UI32          sample_rate,
                                          AP4_UI16          sample_size,
                                          AP4_UI16          channel_count,
                                          AP4_EsDescriptor* descriptor) :
-    AP4_AudioSampleEntry(AP4_ATOM_TYPE_MP4A, 
+    AP4_AudioSampleEntry(AP4_ATOM_TYPE_MP4A,
                          descriptor,
-                         sample_rate, 
-                         sample_size, 
+                         sample_rate,
+                         sample_size,
                          channel_count)
 {
 }
@@ -943,7 +943,7 @@ static const AP4_Byte qt_default_palette_256[256 * 3] = {
 |       AP4_VisualSampleEntry::AP4_VisualSampleEntry
 +---------------------------------------------------------------------*/
 AP4_VisualSampleEntry::AP4_VisualSampleEntry(
-    AP4_Atom::Type    format, 
+    AP4_Atom::Type    format,
     AP4_EsDescriptor* descriptor,
     AP4_UI16          width,
     AP4_UI16          height,
@@ -972,7 +972,7 @@ AP4_VisualSampleEntry::AP4_VisualSampleEntry(
 |       AP4_VisualSampleEntry::AP4_VisualSampleEntry
 +---------------------------------------------------------------------*/
 AP4_VisualSampleEntry::AP4_VisualSampleEntry(AP4_Atom::Type   format,
-                                             AP4_Size         size, 
+                                             AP4_Size         size,
                                              AP4_ByteStream&  stream,
                                              AP4_AtomFactory& atom_factory) :
     AP4_MpegSampleEntry(format, size)
@@ -1113,7 +1113,7 @@ AP4_Result
 AP4_VisualSampleEntry::WriteFields(AP4_ByteStream& stream)
 {
     AP4_Result result;
-        
+
     // write the fields of the base class
     result = AP4_SampleEntry::WriteFields(stream);
     if (AP4_FAILED(result)) return result;
@@ -1121,39 +1121,39 @@ AP4_VisualSampleEntry::WriteFields(AP4_ByteStream& stream)
     // predefined1
     result = stream.WriteUI16(m_Predefined1);
     if (AP4_FAILED(result)) return result;
-    
+
     // reserved2
     result = stream.WriteUI16(m_Reserved2);
     if (AP4_FAILED(result)) return result;
-    
+
     // predefined2
     result = stream.Write(m_Predefined2, sizeof(m_Predefined2));
     if (AP4_FAILED(result)) return result;
-    
+
     // width
     result = stream.WriteUI16(m_Width);
     if (AP4_FAILED(result)) return result;
-    
+
     // height
     result = stream.WriteUI16(m_Height);
     if (AP4_FAILED(result)) return result;
-    
+
     // horizontal resolution
     result = stream.WriteUI32(m_HorizResolution);
     if (AP4_FAILED(result)) return result;
-    
+
     // vertical resolution
     result = stream.WriteUI32(m_VertResolution);
     if (AP4_FAILED(result)) return result;
-    
+
     // reserved3
     result = stream.WriteUI32(m_Reserved3);
     if (AP4_FAILED(result)) return result;
-    
+
     // frame count
     result = stream.WriteUI16(m_FrameCount);
     if (AP4_FAILED(result)) return result;
-    
+
     // compressor name
     unsigned char compressor_name[32];
     unsigned int name_length = m_CompressorName.length();
@@ -1167,15 +1167,15 @@ AP4_VisualSampleEntry::WriteFields(AP4_ByteStream& stream)
     }
     result = stream.Write(compressor_name, 32);
     if (AP4_FAILED(result)) return result;
-    
+
     // depth
     result = stream.WriteUI16(m_Depth);
     if (AP4_FAILED(result)) return result;
-    
+
     // color table id
     result = stream.WriteUI16(m_ColorTableId);
     if (AP4_FAILED(result)) return result;
-    
+
     return result;
 }
 
@@ -1234,11 +1234,11 @@ AP4_Mp4vSampleEntry::AP4_Mp4vSampleEntry(AP4_UI16          width,
                                          AP4_UI16          depth,
                                          const char*       compressor_name,
                                          AP4_EsDescriptor* descriptor) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_MP4V, 
+    AP4_VisualSampleEntry(AP4_ATOM_TYPE_MP4V,
                           descriptor,
-                          width, 
-                          height, 
-                          depth, 
+                          width,
+                          height,
+                          depth,
                           compressor_name)
 {
 }
@@ -1274,7 +1274,7 @@ AP4_RtpHintSampleEntry::AP4_RtpHintSampleEntry(AP4_UI16 hint_track_version,
 +---------------------------------------------------------------------*/
 AP4_RtpHintSampleEntry::AP4_RtpHintSampleEntry(AP4_Size         size,
                                                AP4_ByteStream&  stream,
-                                               AP4_AtomFactory& atom_factory): 
+                                               AP4_AtomFactory& atom_factory):
     AP4_SampleEntry(AP4_ATOM_TYPE_RTP, size)
 {
     // read fields
@@ -1288,7 +1288,7 @@ AP4_RtpHintSampleEntry::AP4_RtpHintSampleEntry(AP4_Size         size,
 /*----------------------------------------------------------------------
 |       AP4_RtpHintSampleEntry::~AP4_RtpHintSampleEntry
 +---------------------------------------------------------------------*/
-AP4_RtpHintSampleEntry::~AP4_RtpHintSampleEntry() 
+AP4_RtpHintSampleEntry::~AP4_RtpHintSampleEntry()
 {
 }
 
@@ -1331,7 +1331,7 @@ AP4_RtpHintSampleEntry::WriteFields(AP4_ByteStream& stream)
     // sample entry
     AP4_Result result = AP4_SampleEntry::WriteFields(stream);
     if (AP4_FAILED(result)) return result;
-    
+
     // data
     result = stream.WriteUI16(m_HintTrackVersion);
     if (AP4_FAILED(result)) return result;
@@ -1351,12 +1351,12 @@ AP4_RtpHintSampleEntry::InspectFields(AP4_AtomInspector& inspector)
 {
     // sample entry
     AP4_SampleEntry::InspectFields(inspector);
-    
+
     // fields
     inspector.AddField("hint_track_version", m_HintTrackVersion);
     inspector.AddField("highest_compatible_version", m_HighestCompatibleVersion);
     inspector.AddField("max_packet_size", m_MaxPacketSize);
-    
+
     return AP4_SUCCESS;
 }
 
@@ -1365,7 +1365,7 @@ AP4_RtpHintSampleEntry::InspectFields(AP4_AtomInspector& inspector)
 +---------------------------------------------------------------------*/
 AP4_TextSampleEntry::AP4_TextSampleEntry(AP4_Size         size,
                                          AP4_ByteStream&  stream,
-                                         AP4_AtomFactory& atom_factory): 
+                                         AP4_AtomFactory& atom_factory):
     AP4_SampleEntry(AP4_ATOM_TYPE_TEXT, size)
 {
     // read fields
@@ -1375,7 +1375,7 @@ AP4_TextSampleEntry::AP4_TextSampleEntry(AP4_Size         size,
 /*----------------------------------------------------------------------
 |       AP4_TextSampleEntry::~AP4_TextSampleEntry
 +---------------------------------------------------------------------*/
-AP4_TextSampleEntry::~AP4_TextSampleEntry() 
+AP4_TextSampleEntry::~AP4_TextSampleEntry()
 {
 }
 
@@ -1433,7 +1433,7 @@ AP4_TextSampleEntry::WriteFields(AP4_ByteStream& stream)
     // sample entry
     AP4_Result result = AP4_SampleEntry::WriteFields(stream);
     if (AP4_FAILED(result)) return result;
-    
+
     // TODO: data
 
     return result;
@@ -1447,9 +1447,9 @@ AP4_TextSampleEntry::InspectFields(AP4_AtomInspector& inspector)
 {
     // sample entry
     AP4_SampleEntry::InspectFields(inspector);
-    
+
     // TODO: fields
-    
+
     return AP4_SUCCESS;
 }
 
@@ -1458,7 +1458,7 @@ AP4_TextSampleEntry::InspectFields(AP4_AtomInspector& inspector)
 +---------------------------------------------------------------------*/
 AP4_Tx3gSampleEntry::AP4_Tx3gSampleEntry(AP4_Size         size,
                                          AP4_ByteStream&  stream,
-                                         AP4_AtomFactory& atom_factory): 
+                                         AP4_AtomFactory& atom_factory):
     AP4_SampleEntry(AP4_ATOM_TYPE_TX3G, size)
 {
     // read fields
@@ -1472,7 +1472,7 @@ AP4_Tx3gSampleEntry::AP4_Tx3gSampleEntry(AP4_Size         size,
 /*----------------------------------------------------------------------
 |       AP4_Tx3gSampleEntry::~AP4_Tx3gSampleEntry
 +---------------------------------------------------------------------*/
-AP4_Tx3gSampleEntry::~AP4_Tx3gSampleEntry() 
+AP4_Tx3gSampleEntry::~AP4_Tx3gSampleEntry()
 {
 }
 
@@ -1537,7 +1537,7 @@ AP4_Tx3gSampleEntry::WriteFields(AP4_ByteStream& stream)
     // sample entry
     AP4_Result result = AP4_SampleEntry::WriteFields(stream);
     if (AP4_FAILED(result)) return result;
-    
+
     // TODO: data
 
     return result;
@@ -1551,9 +1551,9 @@ AP4_Tx3gSampleEntry::InspectFields(AP4_AtomInspector& inspector)
 {
     // sample entry
     AP4_SampleEntry::InspectFields(inspector);
-    
+
     // TODO: fields
-    
+
     return AP4_SUCCESS;
 }
 
@@ -1561,7 +1561,7 @@ AP4_Tx3gSampleEntry::InspectFields(AP4_AtomInspector& inspector)
 |       AP4_Tx3gSampleEntry::GetFontNameById
 +---------------------------------------------------------------------*/
 
-AP4_Result 
+AP4_Result
 AP4_Tx3gSampleEntry::GetFontNameById(AP4_Ordinal Id, AP4_String& Name)
 {
     if(AP4_FtabAtom* ftab = dynamic_cast<AP4_FtabAtom*>(GetChild(AP4_ATOM_TYPE_FTAB)))
@@ -1784,6 +1784,83 @@ AP4_FLACSampleEntry::ReadFields(AP4_ByteStream& stream)
 +---------------------------------------------------------------------*/
 AP4_Size
 AP4_FLACSampleEntry::GetFieldsSize()
+{
+    return AP4_AudioSampleEntry::GetFieldsSize() + m_ExtSize;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_MLPASampleEntry::AP4_MLPASampleEntry
++---------------------------------------------------------------------*/
+AP4_MLPASampleEntry::AP4_MLPASampleEntry(AP4_Size         size,
+                                         AP4_ByteStream&  stream,
+                                         AP4_AtomFactory& atom_factory) :
+    AP4_AudioSampleEntry(AP4_ATOM_TYPE_mlpa, size),
+    m_ExtSize(0)
+{
+    // read fields
+    ReadFields(stream);
+
+    AP4_Size fields_size = GetFieldsSize();
+
+    // read children atoms
+    ReadChildren(atom_factory, stream, size - AP4_ATOM_HEADER_SIZE - fields_size);
+}
+
+/*----------------------------------------------------------------------
+|       AP4_MLPASampleEntry::ReadFields
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_MLPASampleEntry::ReadFields(AP4_ByteStream& stream)
+{
+    static const AP4_SI32 truehd_samplerates[16] = {
+         48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 176400, 0, 0, 0, 0, 0
+    };
+    static const AP4_Byte thd_channel_count[13]  = {
+        //LR    C  LFE  LRs LRvh  LRc LRrs   Cs   Ts LRsd  LRw  Cvh LFE2
+           2,   1,   1,   2,   2,   2,   2,   1,   1,   2,   2,   1,   1
+    };
+
+    AP4_AudioSampleEntry::ReadFields(stream);
+
+    // SampleSize field from AudioSampleEntry shall be ignored
+    m_SampleSize = 0;
+
+    // MLPSpecificBox - 'dmlp' atom
+    AP4_UI32 size, atom;
+    stream.ReadUI32(size);
+    stream.ReadUI32(atom);
+    if (atom != AP4_ATOM_TYPE('d','m','l','p') || size < 10) {
+        AP4_Offset offset;
+        stream.Tell(offset);
+        stream.Seek(offset - 8);
+        return AP4_SUCCESS;
+    }
+
+    m_ExtSize = size;
+
+    AP4_UI32 format_info;
+    stream.ReadUI32(format_info);
+
+    const AP4_UI32 ratebits = (format_info >> 28) & 0xF;
+    m_SampleRateExtra = truehd_samplerates[ratebits];
+
+    const AP4_UI32 chanmap_substream_1 = (format_info >> 15) & 0x1F;
+    const AP4_UI32 chanmap_substream_2 = format_info & 0x1FFF;
+
+    const AP4_UI32 channel_map = chanmap_substream_2 ? chanmap_substream_2 : chanmap_substream_1;
+    m_ChannelCount = 0;
+    for (unsigned i = 0; i < 13; ++i) {
+        m_ChannelCount += thd_channel_count[i] * ((channel_map >> i) & 1);
+    }
+
+    return AP4_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_MLPASampleEntry::GetFieldsSize
++---------------------------------------------------------------------*/
+AP4_Size
+AP4_MLPASampleEntry::GetFieldsSize()
 {
     return AP4_AudioSampleEntry::GetFieldsSize() + m_ExtSize;
 }

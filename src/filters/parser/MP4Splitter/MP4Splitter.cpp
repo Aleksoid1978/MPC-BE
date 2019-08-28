@@ -1583,6 +1583,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if (type == AP4_ATOM_TYPE_MP2) {
 							SetTrackName(&TrackName, L"MP2");
 							fourcc = WAVE_FORMAT_MPEG;
+						} else if (type == AP4_ATOM_TYPE_mlpa) {
+							SetTrackName(&TrackName, L"TrueHD");
+							fourcc = WAVE_FORMAT_UNKNOWN;
 						}
 
 						if (type == AP4_ATOM_TYPE_NONE ||
@@ -1613,6 +1616,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
+						} else if (type == AP4_ATOM_TYPE_mlpa) {
+							mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
 						}
 
 						if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {

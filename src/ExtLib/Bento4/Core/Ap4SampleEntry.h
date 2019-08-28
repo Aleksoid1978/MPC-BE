@@ -468,4 +468,25 @@ protected:
     AP4_DataBuffer m_Data;
 };
 
+/*----------------------------------------------------------------------
+|       AP4_MLPASampleEntry
++---------------------------------------------------------------------*/
+class AP4_MLPASampleEntry : public AP4_AudioSampleEntry
+{
+ public:
+    // constructors
+    AP4_MLPASampleEntry(AP4_Size         size,
+                        AP4_ByteStream&  stream,
+                        AP4_AtomFactory& atom_factory);
+
+    virtual AP4_Result ReadFields(AP4_ByteStream& stream);
+    virtual AP4_Size   GetFieldsSize();
+
+    const AP4_DataBuffer* GetData() const { return &m_Data; }
+
+protected:
+    AP4_Size m_ExtSize;
+    AP4_DataBuffer m_Data;
+};
+
 #endif // _AP4_SAMPLE_ENTRY_H_
