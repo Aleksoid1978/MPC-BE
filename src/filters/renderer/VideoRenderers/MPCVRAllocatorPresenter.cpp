@@ -125,7 +125,6 @@ HRESULT CMPCVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 {
 	CheckPointer(m_pSubPicQueue, E_UNEXPECTED);
 
-	__super::SetPosition(viewportRect, croppedVideoRect);
 	if (!g_bExternalSubtitleTime) {
 		if (g_bExternalSubtitle && g_dRate != 0.0) {
 			const REFERENCE_TIME sampleTime = rtStart - g_tSegmentStart;
@@ -175,6 +174,8 @@ STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 	if (CComQIPtr<IVideoWindow> pVW = m_pMPCVR) {
 		pVW->SetWindowPosition(w.left, w.top, w.right - w.left, w.bottom - w.top);
 	}
+
+	__super::SetPosition(w, v);
 }
 
 STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
