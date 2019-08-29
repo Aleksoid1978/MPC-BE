@@ -2387,6 +2387,9 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			else if (sw == L"randomize") {
 				nCLSwitches |= CLSW_RANDOMIZE;
 			}
+			else if (sw == L"clipboard") {
+				nCLSwitches |= CLSW_CLIPBOARD;
+			}
 			else {
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;
 			}
