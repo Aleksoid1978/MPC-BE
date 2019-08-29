@@ -1014,7 +1014,8 @@
 #define IDS_CMD_FIXEDSIZE               32727
 #define IDS_CMD_MONITOR                 32728
 #define IDS_CMD_AUDIORENDERER           32729
-#define IDS_CMD_RESET                   32730
+#define IDS_CMD_CLIPBOARD               32730
+#define IDS_CMD_RESET                   32731
 #define IDS_SHADERS_TOGGLE              32771
 #define IDS_AG_CLOSE                    32830
 #define IDS_SHADEREDITORDLG_0           32831
