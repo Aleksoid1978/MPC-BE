@@ -213,9 +213,11 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 		s += ResStr(IDS_UNKNOWN_SWITCH) + Implode(sl, ' ') + L"\n\n";
 	}
 
-	s += ResStr(IDS_USAGE);
+	for (int i = IDS_CMD_USAGE; i <= IDS_CMD_RESET; i++) {
+		s.Append(ResStr(i));
+		s.AppendChar('\n');
+	}
 
-	//AfxMessageBox(s, MB_ICONINFORMATION | MB_OK);
 	CmdLineHelpDlg dlg(s);
 	dlg.DoModal();
 }
