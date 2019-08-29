@@ -5299,6 +5299,55 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		m_wndPlaylistBar.Open(sl, true);
 		applyRandomizeSwitch();
 		OpenCurPlaylistItem();
+	} else if (s.nCLSwitches & CLSW_CLIPBOARD) {
+		if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
+			if (HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT)) {
+				if (LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb)) {
+					CString text(pText);
+					if (!text.IsEmpty()) {
+						text.Remove(L'\r');
+
+						std::list<CString> sl;
+						std::list<CString> lines;
+						Explode(text, lines, L'\n');
+						for (const auto& line : lines) {
+							if (::PathIsURLW(line)
+									|| line.Left(12) == L"acestream://"
+									|| ::PathFileExistsW(line)) {
+								sl.push_back(line);
+							}
+						}
+
+						if (!sl.empty()) {
+							ParseDirs(sl);
+
+							if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
+								m_wndPlaylistBar.Append(sl, sl.size() > 1);
+								applyRandomizeSwitch();
+
+								if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
+									m_wndPlaylistBar.SetLast();
+									OpenCurPlaylistItem();
+								}
+							} else {
+								fSetForegroundWindow = true;
+
+								AddSimilarFiles(sl);
+
+								m_wndPlaylistBar.Open(sl, sl.size() > 1, &s.slSubs);
+								applyRandomizeSwitch();
+								OpenCurPlaylistItem();
+
+								s.nCLSwitches &= ~CLSW_STARTVALID;
+								s.rtStart = 0;
+							}
+						}
+					}
+					GlobalUnlock(hglb);
+				}
+			}
+			CloseClipboard();
+		}
 	} else if (!s.slFiles.empty()) {
 		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
 			;

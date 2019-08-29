@@ -58,6 +58,7 @@
 #define CLSW_CD					(1 << 12)
 #define CLSW_ADD				(1 << 13)
 #define CLSW_MINIMIZED			(1 << 14)
+#define CLSW_CLIPBOARD			(1 << 15)
 
 #define CLSW_REGEXTVID			(1 << 16)
 #define CLSW_REGEXTAUD			(1 << 17)
