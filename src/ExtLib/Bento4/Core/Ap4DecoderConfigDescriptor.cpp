@@ -68,11 +68,8 @@ AP4_DecoderConfigDescriptor::AP4_DecoderConfigDescriptor(
                    header_size, 
                    payload_size)
 {
-    // record the start position
-    AP4_Offset start;
-    stream.Tell(start);
-
     // read descriptor fields
+    if (payload_size < 13) return;
     stream.ReadUI08(m_ObjectTypeIndication);
     unsigned char bits;
     stream.ReadUI08(bits);
@@ -82,8 +79,12 @@ AP4_DecoderConfigDescriptor::AP4_DecoderConfigDescriptor(
     stream.ReadUI32(m_MaxBitrate);
     stream.ReadUI32(m_AverageBitrate);
 
+    payload_size -= 13;
+
     // read other descriptors
-    AP4_SubStream* substream = new AP4_SubStream(stream, start+13, payload_size-13);
+    AP4_Offset offset;
+    stream.Tell(offset);
+    AP4_SubStream* substream = new AP4_SubStream(stream, offset, payload_size);
     AP4_Descriptor* descriptor = NULL;
     while (AP4_DescriptorFactory::CreateDescriptorFromStream(*substream, 
                                                              descriptor) 
