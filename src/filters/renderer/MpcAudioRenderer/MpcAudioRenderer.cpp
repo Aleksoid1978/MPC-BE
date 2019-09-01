@@ -1380,7 +1380,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		const UINT32 nSilenceFrames    = TimeToSamples(rtSilence, m_pWaveFormatExOutput);
 		const UINT32 nSilenceBytes     = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-		DLog(L"CMpcAudioRenderer::Transform() - Pad silence %.2f ms to minimize slaving jitter", rtSilence / 10000.0);
+		DLog(L"CMpcAudioRenderer::Transform() - Pad silence %.2f ms to minimize slaving jitter", rtSilence / 10000.0f);
 #endif
 		CAutoPtr<CPacket> pSilence(DNew CPacket());
 		pSilence->rtStart = rtStart - rtSilence;
@@ -1569,7 +1569,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 				if (nSilenceFrames > 0) {
 					const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms before [%I64d(%I64d)]", rtSilence / 10000.0, p->rtStart, m_rtLastQueuedSampleTimeEnd);
+					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms before [%I64d(%I64d)]", rtSilence / 10000.0f, p->rtStart, m_rtLastQueuedSampleTimeEnd);
 #endif
 					CAutoPtr<CPacket> pSilence(DNew CPacket());
 					pSilence->rtStart = p->rtStart - rtSilence;
@@ -2104,15 +2104,15 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	REFERENCE_TIME hnsMinimumDevicePeriod = 0;
 	hr = m_pAudioClient->GetDevicePeriod(&hnsDefaultDevicePeriod, &hnsMinimumDevicePeriod);
 	if (SUCCEEDED(hr)) {
-		DLog(L"CMpcAudioRenderer::CreateRenderClient() - DefaultDevicePeriod = %.2f ms, MinimumDevicePeriod = %.2f ms", hnsDefaultDevicePeriod / 10000.0, hnsMinimumDevicePeriod / 10000.0);
+		DLog(L"CMpcAudioRenderer::CreateRenderClient() - DefaultDevicePeriod = %.2f ms, MinimumDevicePeriod = %.2f ms", hnsDefaultDevicePeriod / 10000.0f, hnsMinimumDevicePeriod / 10000.0f);
 	}
 
-	if (m_BufferDuration == 0 && hnsDefaultDevicePeriod != 0) {
-		m_hnsBufferDuration = hnsDefaultDevicePeriod;
+	if (m_BufferDuration == 0) {
+		m_hnsBufferDuration = hnsDefaultDevicePeriod > 0 ? hnsDefaultDevicePeriod : 500000LL;
 	} else {
 		m_hnsBufferDuration = m_BufferDuration * 10000LL;
 	}
-	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using period = %.2f ms", m_hnsBufferDuration / 10000.0);
+	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using period = %.2f ms", m_hnsBufferDuration / 10000.0f);
 
 	const AUDCLNT_SHAREMODE ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
 
@@ -2252,13 +2252,14 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	m_bReleased = false;
 
-	m_nMaxWasapiQueueSize = TimeToSamples(5000000LL, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign; // 500 ms
+	const auto buffer_duration = m_hnsBufferDuration < 1000000LL ? 2000000LL : 5000000LL;
+	m_nMaxWasapiQueueSize = TimeToSamples(buffer_duration, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign;
+	DLog(L"CMpcAudioRenderer::CreateRenderClient() - internal buffer duration = %.2f ms, size = %u", buffer_duration / 10000.0f, m_nMaxWasapiQueueSize);
 
 	hr = m_pAudioClient->SetEventHandle(m_hDataEvent);
 	EXIT_ON_ERROR(hr);
 
 	hr = StartRendererThread();
-	EXIT_ON_ERROR(hr);
 
 	return hr;
 }
@@ -2626,7 +2627,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				if (std::abs(rtTimeDelta) > 200) {
 					m_pSyncClock->OffsetAudioClock(rtTimeDelta);
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected, Correct reference clock by %.2f ms", rtTimeDelta / 10000.0);
+					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected, Correct reference clock by %.2f ms", rtTimeDelta / 10000.0f);
 #endif
 				}
 				m_rtNextRenderedSampleTime = m_CurrentPacket->rtStart + SamplesToTime(m_CurrentPacket->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
