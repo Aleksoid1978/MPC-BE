@@ -46,7 +46,7 @@ REFERENCE_TIME CAudioSyncClock::GetPrivateTime()
 #ifdef DEBUG
 	const REFERENCE_TIME counterOffsetDiff = m_counterOffset - oldCounterOffset;
 	if (std::abs(counterOffsetDiff) >= OneMillisecond * 5) {
-		DLog(L"CAudioSyncClock::GetPrivateTime() : jitter %.2f ms", counterOffsetDiff / 10000.0);
+		DLog(L"CAudioSyncClock::GetPrivateTime() : jitter %.2f ms", counterOffsetDiff / 10000.0f);
 	}
 #endif
 
