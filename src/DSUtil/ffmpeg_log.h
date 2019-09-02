@@ -41,9 +41,11 @@ inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 			return;
 		}
 		if (count > 0) {
-			DbgLog((LOG_CUSTOM1, level, L"FF_LOG :     Last message repeated %d times", count));
+			DLog(L"FF_LOG :     Last message repeated %d times", count);
 			count = 0;
 		}
+
+		strncpy_s(prev, line, _TRUNCATE);
 
 		const size_t len = strnlen_s(line, LOG_BUF_LEN);
 		if (len > 0 && line[len - 1] == '\n') {
@@ -51,8 +53,6 @@ inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 		}
 
 		DLog(L"FF_LOG : %S", line);
-
-		strncpy_s(prev, line, _TRUNCATE);
 	}
 }
 
