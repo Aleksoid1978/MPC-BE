@@ -3454,7 +3454,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 					m_closingmsg = aborted;
 				}
 
-				if (m_closingmsg != aborted) {
+				if (m_closingmsg != aborted && s.bPlaylistNextOnError) {
 					if (m_wndPlaylistBar.IsAtEnd()) {
 						m_nLoops++;
 					}
