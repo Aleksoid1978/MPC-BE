@@ -850,6 +850,7 @@ public:
 	bool			bHidePlaylistFullScreen;
 	bool			bShowPlaylistTooltip;
 	bool			bShowPlaylistSearchBar;
+	bool			bPlaylistNextOnError;
 
 	// OTHER STATES
 	CString			strLastOpenDir;

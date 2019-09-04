@@ -3210,7 +3210,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_MEDIAINFO,
 		M_SHOWTOOLTIP,
 		M_SHOWSEARCHBAR,
-		M_HIDEFULLSCREEN
+		M_HIDEFULLSCREEN,
+		M_NEXTONERROR
 	};
 
 	CAppSettings& s = AfxGetAppSettings();
@@ -3266,6 +3267,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistTooltip ? MF_CHECKED : MF_UNCHECKED), M_SHOWTOOLTIP, ResStr(IDS_PLAYLIST_SHOWTOOLTIP));
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistSearchBar ? MF_CHECKED : MF_UNCHECKED), M_SHOWSEARCHBAR, ResStr(IDS_PLAYLIST_SHOWSEARCHBAR));
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
+	m.AppendMenu(MF_SEPARATOR);
+	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bPlaylistNextOnError ? MF_CHECKED : MF_UNCHECKED), M_NEXTONERROR, ResStr(IDS_PLAYLIST_NEXTONERROR));
 
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		MENUINFO MenuInfo = { 0 };
@@ -3675,6 +3678,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_HIDEFULLSCREEN:
 			s.bHidePlaylistFullScreen = !s.bHidePlaylistFullScreen;
+			break;
+		case M_NEXTONERROR:
+			s.bPlaylistNextOnError = !s.bPlaylistNextOnError;
 			break;
 		default:
 			break;

@@ -661,6 +661,7 @@ void CAppSettings::ResetSettings()
 	bHidePlaylistFullScreen = false;
 	bShowPlaylistTooltip = true;
 	bShowPlaylistSearchBar = true;
+	bPlaylistNextOnError = true;
 	bFavRememberPos = true;
 	bFavRelativeDrive = false;
 
@@ -1091,6 +1092,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTTOOLTIP, bShowPlaylistTooltip);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTSEARCHBAR, bShowPlaylistSearchBar);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTNEXTONERROR, bPlaylistNextOnError);
 	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
@@ -1663,6 +1665,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTTOOLTIP, bShowPlaylistTooltip);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTSEARCHBAR, bShowPlaylistSearchBar);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTNEXTONERROR, bPlaylistNextOnError);
 	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 

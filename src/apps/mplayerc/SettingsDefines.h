@@ -187,6 +187,7 @@
 #define IDS_RS_HIDEPLAYLISTFULLSCREEN		L"HidePlaylistFullScreen"
 #define IDS_RS_SHOWPLAYLISTTOOLTIP			L"ShowPlaylistTooltip"
 #define IDS_RS_SHOWPLAYLISTSEARCHBAR		L"ShowPlaylistSearchBar"
+#define IDS_RS_PLAYLISTNEXTONERROR			L"PlaylistNextOnError"
 #define IDS_RS_ENABLEWEBSERVER				L"EnableWebServer"
 #define IDS_RS_WEBSERVERPORT				L"WebServerPort"
 #define IDS_RS_WEBSERVERQUALITY				L"WebServerQuality"
