@@ -347,7 +347,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 29		"Εξαγωγή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ήχος"
 6		"Ένταση"
 7		"Ελάχ."
@@ -372,6 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
 35		"Προσθήκη παρόμοιων αρχείων στη λίστα"
 36		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
 38		"Αναφορά pin που απέτυχαν να αποδοθούν"
+39		"Remember selected tracks when navigating a playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31

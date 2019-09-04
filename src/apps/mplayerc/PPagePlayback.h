@@ -55,6 +55,8 @@ public:
 	CString		m_subtitlesLanguageOrder;
 	CString		m_audiosLanguageOrder;
 
+	BOOL		m_bRememberSelectedTracks;
+
 	CComboBox	m_cbAudioWindowMode;
 	BOOL		m_bAddSimilarFiles;
 	BOOL		m_fEnableWorkerThreadForOpening;

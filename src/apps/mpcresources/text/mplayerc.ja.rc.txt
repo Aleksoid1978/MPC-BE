@@ -347,7 +347,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 29		"エクスポート"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音声"
 6		"音量"
 7		"最小"
@@ -372,6 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
 35		"類似ファイルをプレイリストに追加する"
 36		"ワーカー スレッドを使用してフィルター グラフを作成する"
 38		"レンダリングに失敗したピンを報告する"
+39		"Remember selected tracks when navigating a playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31

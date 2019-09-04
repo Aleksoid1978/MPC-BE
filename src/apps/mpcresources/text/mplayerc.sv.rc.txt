@@ -347,7 +347,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 29		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ljud"
 6		"Volym"
 7		"Min"
@@ -372,6 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
 35		"Add similar files to playlist"
 36		"Använd arbets tråd för att bygga filter diagrammet"
 38		"Rapportera stift som misslyckas att rendera"
+39		"Remember selected tracks when navigating a playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
