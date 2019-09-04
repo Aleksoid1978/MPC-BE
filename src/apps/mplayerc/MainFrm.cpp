@@ -214,9 +214,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_INITMENUPOPUP()
 	ON_WM_UNINITMENUPOPUP()
 
-	ON_WM_ENTERMENULOOP()
-	ON_WM_EXITMENULOOP()
-
 	ON_COMMAND(ID_MENU_PLAYER_SHORT, OnMenuPlayerShort)
 	ON_COMMAND(ID_MENU_PLAYER_LONG, OnMenuPlayerLong)
 	ON_COMMAND(ID_MENU_FILTERS, OnMenuFilters)
@@ -649,10 +646,18 @@ CMainFrame::CMainFrame() :
 	afxData.cyBorder2 = 0;
 
 	CMenuEx::Hook();
+
+	m_pThis = this;
+	m_MenuHook = ::SetWindowsHookExW(WH_CALLWNDPROC, MenuHookProc, nullptr, ::GetCurrentThreadId());
+	ASSERT(m_MenuHook);
 }
 
 CMainFrame::~CMainFrame()
 {
+	if (m_MenuHook) {
+		VERIFY(::UnhookWindowsHookEx(m_MenuHook));
+	}
+
 	CMenuEx::UnHook();
 	CMenuEx::FreeResource();
 
@@ -4096,20 +4101,6 @@ void CMainFrame::OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags)
 	PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE);
 
 	m_bLeftMouseDown = FALSE;
-}
-
-void CMainFrame::OnEnterMenuLoop(BOOL bIsTrackPopupMenu)
-{
-	__super::OnEnterMenuLoop(bIsTrackPopupMenu);
-
-	StopAutoHideCursor();
-}
-
-void CMainFrame::OnExitMenuLoop(BOOL bIsTrackPopupMenu)
-{
-	__super::OnExitMenuLoop(bIsTrackPopupMenu);
-
-	StartAutoHideCursor();
 }
 
 BOOL CMainFrame::OnMenu(CMenu* pMenu)
@@ -19893,6 +19884,20 @@ void CMainFrame::StartAutoHideCursor()
 			}
 		}
 	}
+}
+
+LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	if (nCode == HC_ACTION) {
+		auto pS = (PCWPSTRUCT)lParam;
+		if (pS->message == WM_CONTEXTMENU || pS->message == WM_ENTERMENULOOP) {
+			m_pThis->StopAutoHideCursor();
+		} else if (pS->message == WM_MENUSELECT && HIWORD(pS->wParam) == 0xFFFF && pS->lParam == NULL) {
+			m_pThis->StartAutoHideCursor();
+		}
+	}
+
+	return ::CallNextHookEx(m_MenuHook, nCode, wParam, lParam);
 }
 
 #pragma region GraphThread

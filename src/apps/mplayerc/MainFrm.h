@@ -931,9 +931,6 @@ public:
 	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags);
 
-	afx_msg void OnEnterMenuLoop(BOOL bIsTrackPopupMenu);
-	afx_msg void OnExitMenuLoop(BOOL bIsTrackPopupMenu);
-
 	BOOL OnMenu(CMenu* pMenu);
 	afx_msg void OnMenuPlayerShort();
 	afx_msg void OnMenuPlayerLong();
@@ -1391,4 +1388,8 @@ protected:
 	bool		m_bAltDownClean = false;
 
 	CComPropertySheet* m_ps = nullptr;
+
+	static inline CMainFrame* m_pThis = nullptr;
+	static inline HHOOK m_MenuHook = nullptr;
+	static LRESULT CALLBACK MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 };
