@@ -347,7 +347,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 29		"Експорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Аудіо"
 6		"Гучність"
 7		"Мін."
@@ -372,6 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 39
 35		"Додати схожі файли до списку відтворення"
 36		"Окремий потік для ланцюжка фільтрів"
 38		"Звіт про помилки рендерингу потоків"
+39		"Remember selected tracks when navigating a playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31

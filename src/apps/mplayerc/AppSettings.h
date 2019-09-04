@@ -630,6 +630,7 @@ public:
 	bool			fUseInternalSelectTrackLogic;
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;
+	bool			bRememberSelectedTracks;
 	int				nAudioWindowMode;
 	bool			bAddSimilarFiles;
 	bool			fEnableWorkerThreadForOpening;

@@ -163,6 +163,7 @@
 #define IDS_RS_SUBTITLESLANGORDER			L"SubtitlesLanguageOrder"
 #define IDS_RS_AUDIOSLANGORDER				L"AudiosLanguageOrder"
 #define IDS_RS_INTERNALSELECTTRACKLOGIC		L"UseInternalSelectTrackLogic"
+#define IDS_RS_REMEMBERSELECTEDTRACKS		L"RememberSelectedTracks"
 #define IDS_RS_SEARCHKEYFRAMES				L"SearchKeyframes"
 #define IDS_RS_ACCELTBL						L"AccelTbl"
 #define IDS_RS_WINLIRCADDR					L"WinLircAddr"
