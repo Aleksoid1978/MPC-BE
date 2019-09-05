@@ -1345,6 +1345,7 @@ private:
 
 	int			m_nAudioTrackStored    = -1;
 	int			m_nSubtitleTrackStored = -1;
+	bool		m_bRememberSelectedTracks = true;
 
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);
