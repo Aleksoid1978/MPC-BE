@@ -3444,6 +3444,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 	const auto& s = AfxGetAppSettings();
 
 	m_nAudioTrackStored = m_nSubtitleTrackStored = -1;
+	m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack = m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack = -1;
 	m_bRememberSelectedTracks = true;
 
 	if (!m_closingmsg.IsEmpty()) {
@@ -9997,9 +9998,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	REFERENCE_TIME rtime = 0;
 	StrToInt64(*it++, rtime);
 
-	int nAudioTrackStored = -1;
-	int nSubtitleTrackStored = -1;
-	if (swscanf_s(*it++, L"%d;%d", &nAudioTrackStored, &nSubtitleTrackStored) != 2) {
+	if (swscanf_s(*it++, L"%d;%d", &m_nAudioTrackStored, &m_nSubtitleTrackStored) != 2) {
 		return;
 	}
 
@@ -10015,12 +10014,12 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		}
 	}
 
+	m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack = m_nAudioTrackStored;
+	m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack = m_nSubtitleTrackStored;
+
 	if (!m_wndPlaylistBar.SelectFileInPlaylist(path)) {
 		m_wndPlaylistBar.Open(path);
 	}
-
-	m_nAudioTrackStored = nAudioTrackStored;
-	m_nSubtitleTrackStored = nSubtitleTrackStored;
 
 	if (GetPlaybackMode() == PM_FILE && path == m_lastOMD->title && !m_bEndOfStream) {
 		if (m_nAudioTrackStored != -1) {
@@ -13059,6 +13058,11 @@ void CMainFrame::OpenSetupAudioStream()
 		return;
 	}
 
+	if (m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack != -1) {
+		SetAudioTrackIdx(m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack);
+		return;
+	}
+
 	if (m_nAudioTrackStored != -1) {
 		SetAudioTrackIdx(m_nAudioTrackStored);
 		return;
@@ -13468,6 +13472,11 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		pos = m_pSubStreams.GetHeadPosition();
 		while (!subs.IsEmpty()) {
 			pos = m_pSubStreams.InsertBefore(pos, subs.RemoveTail());
+		}
+
+		if (m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack != -1) {
+			SetSubtitleTrackIdx(m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack);
+			return;
 		}
 
 		if (m_nSubtitleTrackStored != -1) {
@@ -13945,8 +13954,8 @@ void CMainFrame::CloseMediaPrivate()
 	}
 
 	if (s.bRememberSelectedTracks && m_bRememberSelectedTracks) {
-		m_nAudioTrackStored = GetAudioTrackIdx();
-		m_nSubtitleTrackStored = GetSubtitleTrackIdx();
+		m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack = GetAudioTrackIdx();
+		m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack = GetSubtitleTrackIdx();
 	}
 
 	m_ExternalSubstreams.clear();
