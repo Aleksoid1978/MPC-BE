@@ -3444,6 +3444,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 	const auto& s = AfxGetAppSettings();
 
 	m_nAudioTrackStored = m_nSubtitleTrackStored = -1;
+	m_bRememberSelectedTracks = true;
 
 	if (!m_closingmsg.IsEmpty()) {
 		CString aborted(ResStr(IDS_AG_ABORTED));
@@ -9996,9 +9997,9 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	REFERENCE_TIME rtime = 0;
 	StrToInt64(*it++, rtime);
 
-	m_nAudioTrackStored = -1;
-	m_nSubtitleTrackStored = -1;
-	if (swscanf_s(*it++, L"%d;%d", &m_nAudioTrackStored, &m_nSubtitleTrackStored) != 2) {
+	int nAudioTrackStored = -1;
+	int nSubtitleTrackStored = -1;
+	if (swscanf_s(*it++, L"%d;%d", &nAudioTrackStored, &nSubtitleTrackStored) != 2) {
 		return;
 	}
 
@@ -10018,7 +10019,17 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		m_wndPlaylistBar.Open(path);
 	}
 
+	m_nAudioTrackStored = nAudioTrackStored;
+	m_nSubtitleTrackStored = nSubtitleTrackStored;
+
 	if (GetPlaybackMode() == PM_FILE && path == m_lastOMD->title && !m_bEndOfStream) {
+		if (m_nAudioTrackStored != -1) {
+			SetAudioTrackIdx(m_nAudioTrackStored);
+		}
+		if (m_nSubtitleTrackStored != -1) {
+			SetSubtitleTrackIdx(m_nSubtitleTrackStored);
+		}
+
 		m_wndPlaylistBar.SetFirstSelected();
 		m_pMS->SetPositions(&rtime, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
 		OnPlayPlay();
@@ -13915,8 +13926,9 @@ void CMainFrame::CloseMediaPrivate()
 
 	KillTimer(TIMER_DM_AUTOCHANGING);
 
+	auto& s = AfxGetAppSettings();
+
 	if (!m_bGraphEventComplete && GetPlaybackMode() == PM_FILE) {
-		CAppSettings& s = AfxGetAppSettings();
 		if (s.bKeepHistory && s.bRememberFilePos) {
 			if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
 				REFERENCE_TIME rtDur;
@@ -13932,6 +13944,11 @@ void CMainFrame::CloseMediaPrivate()
 		}
 	}
 
+	if (s.bRememberSelectedTracks && m_bRememberSelectedTracks) {
+		m_nAudioTrackStored = GetAudioTrackIdx();
+		m_nSubtitleTrackStored = GetSubtitleTrackIdx();
+	}
+
 	m_ExternalSubstreams.clear();
 
 	m_PlaybackInfo.Clear();
@@ -13942,7 +13959,7 @@ void CMainFrame::CloseMediaPrivate()
 		m_youtubeFields.Empty();
 		m_youtubeUrllist.clear();
 		m_youtubeAudioUrllist.clear();
-		AfxGetAppSettings().iYoutubeTagSelected = 0;
+		s.iYoutubeTagSelected = 0;
 	}
 	m_bYoutubeOpened = false;
 

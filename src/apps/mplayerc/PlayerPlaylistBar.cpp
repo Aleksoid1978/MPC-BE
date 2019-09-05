@@ -1914,6 +1914,10 @@ void CPlayerPlaylistBar::Open(std::list<CString>& fns, bool fMulti, CSubtitleIte
 	curPlayList.m_nFocused_idx = TGetFocusedElement();
 	m_nCurPlayListIndex = 0;
 
+	m_pMainFrame->m_bRememberSelectedTracks = false;
+	m_pMainFrame->m_nAudioTrackStored = -1;
+	m_pMainFrame->m_nSubtitleTrackStored = -1;
+
 	TEnsureVisible(m_nCurPlayListIndex);
 	TSelectTab();
 
