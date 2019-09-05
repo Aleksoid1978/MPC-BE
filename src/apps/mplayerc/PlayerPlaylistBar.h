@@ -163,6 +163,9 @@ public:
 
 	int m_nSelected_idx = INT_MAX;
 	int m_nFocused_idx = 0;
+
+	int m_nSelectedAudioTrack = -1;
+	int m_nSelectedSubtitleTrack = -1;
 };
 
 class OpenMediaData;

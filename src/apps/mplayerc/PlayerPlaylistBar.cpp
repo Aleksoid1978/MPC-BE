@@ -1385,19 +1385,32 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 	CPath base(fn);
 	base.RemoveFileSpec();
 
+	curPlayList.m_nSelectedAudioTrack = curPlayList.m_nSelectedSubtitleTrack = -1;
+
 	while (f.ReadString(str)) {
 		std::list<CString> sl;
 		Explode(str, sl, L',', 3);
-		if (sl.size() != 3) {
+		if (sl.size() == 2) {
+			auto it = sl.cbegin();
+			const auto& key = (*it++);
+			int value = -1;
+			StrToInt32((*it), value);
+
+			if (key == L"audio") {
+				curPlayList.m_nSelectedAudioTrack = value;
+			} else if (key == L"subtitles") {
+				curPlayList.m_nSelectedSubtitleTrack = value;
+			}
+
+			continue;
+		} else if (sl.size() != 3) {
 			continue;
 		}
 
-		if (int i = _wtoi(sl.front())) {
-			sl.pop_front();
-			CString key = sl.front();
-			sl.pop_front();
-			CString value = sl.front();
-			sl.pop_front();
+		auto it = sl.cbegin();
+		if (int i = _wtoi(*it++)) {
+			const auto& key = (*it++);
+			auto value = (*it);
 
 			if (key == L"type") {
 				pli[i].m_type = (CPlaylistItem::type_t)_wtol(value);
@@ -1508,6 +1521,12 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 	}
 
 	f.WriteString(L"MPCPLAYLIST\n");
+
+	CString fmt;
+	fmt.Format(L"audio,%d\n", curPlayList.m_nSelectedAudioTrack);
+	f.WriteString(fmt);
+	fmt.Format(L"subtitles,%d\n", curPlayList.m_nSelectedSubtitleTrack);
+	f.WriteString(fmt);
 
 	POSITION cur_pos = curPlayList.GetPos();
 
@@ -1915,8 +1934,7 @@ void CPlayerPlaylistBar::Open(std::list<CString>& fns, bool fMulti, CSubtitleIte
 	m_nCurPlayListIndex = 0;
 
 	m_pMainFrame->m_bRememberSelectedTracks = false;
-	m_pMainFrame->m_nAudioTrackStored = -1;
-	m_pMainFrame->m_nSubtitleTrackStored = -1;
+	curPlayList.m_nSelectedAudioTrack = curPlayList.m_nSelectedSubtitleTrack = -1;
 
 	TEnsureVisible(m_nCurPlayListIndex);
 	TSelectTab();

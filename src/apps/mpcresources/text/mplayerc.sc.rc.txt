@@ -372,7 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 35		"于播放列表加入相似文件"
 36		"使用工作线程来创建筛选器图表"
 38		"报告渲染失败的接口(pin)"
-39		"Remember selected tracks when navigating a playlist"
+39		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
