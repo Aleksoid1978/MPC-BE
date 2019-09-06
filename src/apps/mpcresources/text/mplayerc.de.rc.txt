@@ -369,10 +369,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 31		"(Beispiel: eng jap swe)"
 32		"Aktionen beim Öffnen einer Datei"
 33		"Beim Öffnen einer Audiodatei,"
-35		"Ähnliche Dateien zu Wiedergabeliste hinzufügen"
+35		"Ähnliche Dateien zur Wiedergabeliste hinzufügen"
 36		"Filter-Graph in separatem &Thread erstellen"
 38		"Fehlerhafte Pins im Graph &melden"
-39		"Ausgewählte Titel beim Navigieren in einer Wiedergabeliste merken"
+39		"Ausgewählte Titel in der Wiedergabeliste merken"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
