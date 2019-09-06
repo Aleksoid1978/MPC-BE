@@ -19653,8 +19653,11 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 	const std::wregex replace_spec(LR"([\.\(\)\[\]\{\}\+])", std::wregex::icase);
 	std::wstring regExp = std::regex_replace(name.GetString(), replace_spec, L"\\$&");
 
-	const std::wregex replace_digit(LR"((\d+ *- *\d+|\d+))", std::wregex::icase);
+	const std::wregex replace_digit(LR"(\d+ *- *\d+|\d+)", std::wregex::icase);
 	regExp = std::regex_replace(regExp, replace_digit, L"(\\d+ *- *\\d+|\\d+)");
+
+	const std::wregex replace_a_p_m(LR"((a|p)\\.m\\.)", std::wregex::icase);
+	regExp = std::regex_replace(regExp, replace_a_p_m, L"((a|p)\\.m\\.)");
 
 	if (excludeWordsNum != -1) {
 		const auto& words = excludeWords[excludeWordsNum];
