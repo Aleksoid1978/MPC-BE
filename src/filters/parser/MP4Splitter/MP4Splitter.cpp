@@ -1468,23 +1468,22 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (AP4_DataInfoAtom* mdcv = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_MDCV))) {
 							const AP4_DataBuffer* mdcv_data = mdcv->GetData();
 							if (mdcv_data->GetDataSize() == 24) {
-#define CALC_HDR_VALUE(num, den) (num * (1.0 / den))
 								m_MasterDataHDR = DNew(MediaSideDataHDR);
 								ZeroMemory(m_MasterDataHDR, sizeof(MediaSideDataHDR));
 
 								auto data = mdcv_data->GetData();
 
-								m_MasterDataHDR->display_primaries_x[0] = CALC_HDR_VALUE(AV_RB16(data), 50000);
-								m_MasterDataHDR->display_primaries_y[0] = CALC_HDR_VALUE(AV_RB16(data + 2), 50000);
-								m_MasterDataHDR->display_primaries_x[1] = CALC_HDR_VALUE(AV_RB16(data + 4), 50000);
-								m_MasterDataHDR->display_primaries_y[1] = CALC_HDR_VALUE(AV_RB16(data + 6), 50000);
-								m_MasterDataHDR->display_primaries_x[2] = CALC_HDR_VALUE(AV_RB16(data + 8), 50000);
-								m_MasterDataHDR->display_primaries_y[2] = CALC_HDR_VALUE(AV_RB16(data + 10), 50000);
+								m_MasterDataHDR->display_primaries_x[0] = AV_RB16(data)     * (1.0/50000);
+								m_MasterDataHDR->display_primaries_y[0] = AV_RB16(data + 2) * (1.0/50000);
+								m_MasterDataHDR->display_primaries_x[1] = AV_RB16(data + 4) * (1.0/50000);
+								m_MasterDataHDR->display_primaries_y[1] = AV_RB16(data + 6) * (1.0/50000);
+								m_MasterDataHDR->display_primaries_x[2] = AV_RB16(data + 8) * (1.0/50000);
+								m_MasterDataHDR->display_primaries_y[2] = AV_RB16(data + 10)* (1.0/50000);
 
-								m_MasterDataHDR->white_point_x = CALC_HDR_VALUE(AV_RB16(data + 12), 50000);
-								m_MasterDataHDR->white_point_y = CALC_HDR_VALUE(AV_RB16(data + 14), 50000);
-								m_MasterDataHDR->max_display_mastering_luminance = CALC_HDR_VALUE(AV_RB32(data + 16), 10000);
-								m_MasterDataHDR->min_display_mastering_luminance = CALC_HDR_VALUE(AV_RB32(data + 20), 10000);
+								m_MasterDataHDR->white_point_x = AV_RB16(data + 12) * (1.0/50000);
+								m_MasterDataHDR->white_point_y = AV_RB16(data + 14) * (1.0/50000);
+								m_MasterDataHDR->max_display_mastering_luminance = AV_RB32(data + 16) * (1.0/10000);
+								m_MasterDataHDR->min_display_mastering_luminance = AV_RB32(data + 20) * (1.0/10000);
 							}
 						}
 

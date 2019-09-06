@@ -1241,7 +1241,6 @@ void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtSt
 	}
 }
 
-#define CALC_HDR_VALUE(value) (value.num * (1.0 / value.den))
 bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame)
 {
 	CheckPointer(pSample, false);
@@ -1257,20 +1256,20 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 
 				if (metadata->has_primaries) {
 					// export the display primaries in GBR order
-					hdr.display_primaries_x[0] = CALC_HDR_VALUE(metadata->display_primaries[1][0]);
-					hdr.display_primaries_y[0] = CALC_HDR_VALUE(metadata->display_primaries[1][1]);
-					hdr.display_primaries_x[1] = CALC_HDR_VALUE(metadata->display_primaries[2][0]);
-					hdr.display_primaries_y[1] = CALC_HDR_VALUE(metadata->display_primaries[2][1]);
-					hdr.display_primaries_x[2] = CALC_HDR_VALUE(metadata->display_primaries[0][0]);
-					hdr.display_primaries_y[2] = CALC_HDR_VALUE(metadata->display_primaries[0][1]);
+					hdr.display_primaries_x[0] = av_q2d(metadata->display_primaries[1][0]);
+					hdr.display_primaries_y[0] = av_q2d(metadata->display_primaries[1][1]);
+					hdr.display_primaries_x[1] = av_q2d(metadata->display_primaries[2][0]);
+					hdr.display_primaries_y[1] = av_q2d(metadata->display_primaries[2][1]);
+					hdr.display_primaries_x[2] = av_q2d(metadata->display_primaries[0][0]);
+					hdr.display_primaries_y[2] = av_q2d(metadata->display_primaries[0][1]);
 
-					hdr.white_point_x = CALC_HDR_VALUE(metadata->white_point[0]);
-					hdr.white_point_y = CALC_HDR_VALUE(metadata->white_point[1]);
+					hdr.white_point_x = av_q2d(metadata->white_point[0]);
+					hdr.white_point_y = av_q2d(metadata->white_point[1]);
 				}
 
 				if (metadata->has_luminance) {
-					hdr.max_display_mastering_luminance = CALC_HDR_VALUE(metadata->max_luminance);
-					hdr.min_display_mastering_luminance = CALC_HDR_VALUE(metadata->min_luminance);
+					hdr.max_display_mastering_luminance = av_q2d(metadata->max_luminance);
+					hdr.min_display_mastering_luminance = av_q2d(metadata->min_luminance);
 				}
 
 				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
