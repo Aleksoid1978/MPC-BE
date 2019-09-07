@@ -19629,37 +19629,29 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 		return FALSE;
 	};
 
-	const LPCWSTR excludeWords[][2] = {
-		{L"720p",  L"<seven_hundred_twenty>"},
-		{L"1080p", L"<thousand_and_eighty>"},
-		{L"1440p", L"<thousand_four_hundred_forty>"},
-		{L"2160p", L"<two_thousand_one_hundred_and_sixty>"},
-	};
-
-	int excludeWordsNum = -1;
-	for (int i = 0; i < _countof(excludeWords); i++) {
-		const auto& words = excludeWords[i];
-
-		CString tmp(name);
-		tmp.MakeLower();
-		const int n = tmp.Find(words[0]);
-		if (n >= 0) {
-			name.Replace(words[0], words[1]);
-			excludeWordsNum = i;
-			break;
-		}
-	}
-
 	std::wstring regExp = std::regex_replace(name.GetString(), std::wregex(LR"([\.\(\)\[\]\{\}\+])"), L"\\$&");
-	regExp = std::regex_replace(regExp, std::wregex(LR"(\d+ *- *\d+|\d+)"), LR"((\d+ *- *\d+|\d+))");
 	regExp = std::regex_replace(regExp, std::wregex(LR"((a|p)\\.m\\.)"), LR"(((a|p)\.m\.))");
 
-	if (excludeWordsNum != -1) {
-		const auto& words = excludeWords[excludeWordsNum];
-		CString tmp(regExp.c_str());
-		tmp.Replace(words[1], words[0]);
-		regExp = tmp;
-	}
+	auto replaceDigital = [](std::wstring const& input) {
+		std::wregex re(LR"((?:\b576|720|1080|1440|2160)[ip]\b|\d+ *- *\d+|\d+)");
+		std::wsregex_token_iterator
+			begin(input.cbegin(), input.end(), re, { -1, 0 }),
+			end;
+
+		std::wstring output;
+		std::for_each(begin, end, [&](std::wstring const& m) {
+			if (std::regex_match(m, std::wregex(L"(576|720|1080|1440|2160)[ip]"))) {
+				output += m;
+			} else if (std::regex_match(m, std::wregex(LR"(\d+ *- *\d+|\d+)"))) {
+				output += LR"((\d+ *- *\d+|\d+))";
+			} else {
+				output += m;
+			}
+		});
+		return output;
+	};
+
+	regExp = replaceDigital(regExp);
 
 	regExp += L".*";
 	if (!ext.IsEmpty()) {
