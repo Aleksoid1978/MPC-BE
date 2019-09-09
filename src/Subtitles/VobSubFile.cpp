@@ -2422,6 +2422,7 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 	p->tStart		= tStart;
 	p->tStop		= vsi.delay > 0 ? (tStart + 10000i64 * vsi.delay) : tStop;
 	p->bAnimated	= vsi.bAnimated;
+	p->bForced		= vsi.fForced;
 	if (p->tStop - p->tStart < UNITS/100) {
 		p->tStop	= _I64_MAX;
 	}
@@ -2474,6 +2475,9 @@ STDMETHODIMP_(POSITION) CVobSubStream::GetStartPosition(REFERENCE_TIME rt, doubl
 	for (; pos; m_subpics.GetPrev(pos)) {
 		SubPic* sp = m_subpics.GetAt(pos);
 		if (sp->tStart <= rt) {
+			if (g_bForcedSubtitle && !sp->bForced) {
+				continue;
+			}
 			if (sp->tStop <= rt) {
 				m_subpics.GetNext(pos);
 			}
@@ -2519,16 +2523,11 @@ STDMETHODIMP CVobSubStream::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 		SubPic* sp = m_subpics.GetAt(pos);
 		if (sp->tStart <= rt && rt < sp->tStop) {
 			if (m_img.iIdx != (int)pos || (sp->bAnimated && sp->tStart + m_img.tCurrent * 10000i64 <= rt)) {
-
 				BYTE* pData = sp->pData.GetData();
 				m_img.Decode(
 					pData, (pData[0] << 8) | pData[1], (pData[2] << 8) | pData[3], int((rt - sp->tStart) / 10000i64),
 					m_fCustomPal, m_tridx, m_orgpal, m_cuspal, true);
 				m_img.iIdx = (int)pos;
-			}
-
-			if (g_bForcedSubtitle && !m_img.fForced) {
-				return E_FAIL;
 			}
 
 			return __super::Render(spd, bbox);

@@ -174,6 +174,7 @@ class __declspec(uuid("D7FBFB45-2D13-494F-9B3D-FFC9557D5C45"))
 	struct SubPic {
 		REFERENCE_TIME tStart, tStop;
 		bool bAnimated;
+		bool bForced;
 		CAtlArray<BYTE> pData;
 	};
 	CAutoPtrList<SubPic> m_subpics;
