@@ -225,20 +225,30 @@ namespace Youtube
 
 		const HINTERNET hFile = InternetOpenUrlW(hInternet, url.GetString(), nullptr, 0, INTERNET_OPEN_FALGS, 0);
 		if (hFile) {
-			char buffer[16 * KILOBYTE] = { 0 };
-			const DWORD dwNumberOfBytesToRead = _countof(buffer);
+			const DWORD dwNumberOfBytesToRead = 16 * KILOBYTE;
+			auto buffer = DNew char[dwNumberOfBytesToRead];
 			DWORD dwBytesRead = 0;
 			for (;;) {
 				if (InternetReadFile(hFile, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE || dwBytesRead == 0) {
 					break;
 				}
 
-				*pData = (char*)realloc(*pData, dataSize + dwBytesRead + 1);
+				auto pTmp = (char*)realloc(*pData, dataSize + dwBytesRead + 1);
+				if (!pTmp) {
+					if (*pData) {
+						free(*pData);
+						*pData = nullptr;
+					}
+					dataSize = 0;
+					break;
+				}
+				*pData = pTmp;
 				memcpy(*pData + dataSize, buffer, dwBytesRead);
 				dataSize += dwBytesRead;
 				(*pData)[dataSize] = 0;
 			}
 
+			delete [] buffer;
 			InternetCloseHandle(hFile);
 		}
 	}
