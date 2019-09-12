@@ -296,6 +296,7 @@
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		L"YoutubeLoadPlaylist"
 
 #define IDS_RS_YDL_MAXHEIGHT				L"YDLMaxHeight"
+#define IDS_RS_YDL_MAXIMUM_QUALITY			L"YDLMaximumQuality"
 
 #define IDS_R_FILTERS_PRIORITY				L"Settings\\Filters Priority"
 

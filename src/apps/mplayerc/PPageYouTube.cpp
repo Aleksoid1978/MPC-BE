@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,6 +45,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_COMBO3, m_cbYDLMaxHeight);
+	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
@@ -102,6 +103,8 @@ BOOL CPPageYoutube::OnInitDialog()
 	}
 	SelectByItemData(m_cbYDLMaxHeight, s.iYDLMaxHeight);
 
+	m_chkYDLMaximumQuality.SetCheck(s.bYDLMaximumQuality ? BST_CHECKED : BST_UNCHECKED);
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -121,6 +124,7 @@ BOOL CPPageYoutube::OnApply()
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
+	s.bYDLMaximumQuality = !!m_chkYDLMaximumQuality.GetCheck();
 
 	return __super::OnApply();
 }

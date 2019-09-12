@@ -871,6 +871,7 @@ void CAppSettings::ResetSettings()
 	bYoutubeLoadPlaylist = false;
 
 	iYDLMaxHeight = 720;
+	bYDLMaximumQuality = false;
 
 	nLastFileInfoPage = 0;
 
@@ -1554,6 +1555,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(unsigned*)&nLastFileInfoPage);
 
@@ -1975,6 +1977,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 

@@ -552,7 +552,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 25		"Snap to desktop edges"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 5		"YouTube"
 6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
@@ -561,6 +561,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
 12		"Завантажити список відтворення"
 13		"youtube-dl (експериментально)"
 14		"Максимальна висота відео:"
+16		"Maximum quality"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

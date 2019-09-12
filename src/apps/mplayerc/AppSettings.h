@@ -901,6 +901,7 @@ public:
 	int				iYoutubeTagSelected = 0; // not saved
 
 	int				iYDLMaxHeight;
+	bool			bYDLMaximumQuality;
 
 	DWORD			nLastFileInfoPage;
 
