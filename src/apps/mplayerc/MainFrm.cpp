@@ -5164,9 +5164,13 @@ void CMainFrame::OnFileOpenMedia()
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
-	CString fn = dlg.m_fns.front();
+	auto& fn = dlg.m_fns.front();
 	if (OpenYoutubePlaylist(fn)) {
 		return;
+	}
+
+	if (dlg.m_fns.size() == 1 && std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
+		fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
 	}
 
 	if (AddSimilarFiles(dlg.m_fns)) {
