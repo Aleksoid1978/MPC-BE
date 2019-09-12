@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,6 +37,7 @@ private:
 	CButton m_chkLoadPlaylist;
 
 	CComboBox m_cbYDLMaxHeight;
+	CButton m_chkYDLMaximumQuality;
 
 public:
 	CPPageYoutube();

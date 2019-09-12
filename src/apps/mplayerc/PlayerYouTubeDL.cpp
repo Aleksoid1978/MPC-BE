@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 
 #define bufsize (2ul * KILOBYTE)
 
-bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, std::list<CString>& urls, Youtube::YoutubeFields& y_fields)
+bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, Youtube::YoutubeFields& y_fields)
 {
 	urls.clear();
 
@@ -187,7 +187,6 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 						maxHeight = _height;
 						bestUrl = url.GetString();
 						bVideoOnly = false;
-
 						const auto& acodec = format["acodec"];
 						if (acodec.IsString()) {
 							const CString _acodec = acodec.GetString();
@@ -200,6 +199,58 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 			}
 
 			if (!bestUrl.IsEmpty()) {
+				if (bMaximumQuality) {
+					float maxVideotbr = 0.0f;
+					int maxVideofps = 0;
+
+					for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
+						const auto& format = formats[i];
+						const auto& protocol = format["protocol"];
+						if (!protocol.IsString()) {
+							continue;
+						}
+						const CString _protocol(protocol.GetString());
+						if (_protocol != L"http" && _protocol != L"https" && _protocol.Left(4) != L"m3u8") {
+							continue;
+						}
+
+						const auto& url = format["url"];
+						if (!url.IsString()) {
+							continue;
+						}
+
+						const auto& height = format["height"];
+						if (height.IsInt() && height.GetInt() == maxHeight) {
+							const auto& tbr = format["tbr"];
+							const float _tbr = tbr.IsFloat() ? tbr.GetFloat() : 0.0f;
+
+							const auto& fps = format["fps"];
+							const int _fps = fps.IsInt() ? fps.GetInt() : 0;
+
+							bool bMaxQuality = false;
+							if (_fps > maxVideofps
+									|| (_fps == maxVideofps && _tbr > maxVideotbr)) {
+								bMaxQuality = true;
+							}
+
+							maxVideotbr = std::max(maxVideotbr, _tbr);
+							maxVideofps = std::max(maxVideofps, _fps);
+
+							if (bMaxQuality) {
+								bestUrl = url.GetString();
+								bVideoOnly = false;
+								const auto& acodec = format["acodec"];
+								if (acodec.IsString()) {
+									const CString _acodec = acodec.GetString();
+									if (_acodec == L"none") {
+										bVideoOnly = true;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				const auto& title = d["title"];
 				if (title.IsString()) {
 					y_fields.title = UTF8ToWStr(title.GetString());

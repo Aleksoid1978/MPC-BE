@@ -552,7 +552,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
 25		"Aan de bureaubladrand vastmaken"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 5		"YouTube"
 6		"Ingebouwde webpaginaparser gebruiken"
 7		"Voorkeursformaat:"
@@ -561,6 +561,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
 12		"Afspeellijst laden"
 13		"youtube-dl (experimenteel)"
 14		"Maximale videohoogte:"
+16		"Maximum quality"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
