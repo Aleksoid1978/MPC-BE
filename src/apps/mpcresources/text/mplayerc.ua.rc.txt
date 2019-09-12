@@ -559,9 +559,9 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 10		"60 кадрів\с"
 11		"HDR"
 12		"Завантажити список відтворення"
-13		"youtube-dl (експериментально)"
+13		"youtube-dl"
 14		"Максимальна висота відео:"
-16		"Maximum quality"
+16		"Select max fps or bitrate"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
