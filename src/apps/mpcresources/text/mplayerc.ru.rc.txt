@@ -535,7 +535,7 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 26
-5		"Размер окна при старте"
+5		"Размер окна при запуске плеера"
 6		"Стандартный размер окна"
 7		"Запоминать размер окна"
 8		"Задать размер окна"
