@@ -649,14 +649,15 @@ void CAppSettings::ResetSettings()
 	// Window size
 	nStartupWindowMode = STARTUPWND_DEFAULT;
 	szSpecifiedWndSize.SetSize(460, 390);
+	nPlaybackWindowMode = PLAYBACKWND_NONE;
+	nAutoScaleFactor = 100;
+	nAutoFitFactor = 50;
+	bResetWindowAfterClosingFile = false;
 	bRememberWindowPos = false;
 	rcLastWindowPos.SetRectEmpty();
 	nLastWindowType = SIZE_RESTORED;
 	bLimitWindowProportions = false;
 	bSnapToDesktopEdges = false;
-	nPlaybackWindowMode = PLAYBACKWND_NONE;
-	nAutoScaleFactor = 100;
-	nAutoFitFactor = 50;
 
 	bShufflePlaylistItems = false;
 	bRememberPlaylistItems = true;
@@ -1084,6 +1085,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUTOSCALEFACTOR, nAutoScaleFactor);
 	nAutoScaleFactor = discard(nAutoScaleFactor, 100, { 50, 100, 200 });
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor, 20, 80);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RESETWINDOWAFTERCLOSINGFILE, bResetWindowAfterClosingFile);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, *(int*)&sizeAspectRatio.cx);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, *(int*)&sizeAspectRatio.cy);
@@ -1664,7 +1666,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODEPLAYBACK, nPlaybackWindowMode);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUTOSCALEFACTOR, nAutoScaleFactor);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor);
-
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESETWINDOWAFTERCLOSINGFILE, bResetWindowAfterClosingFile);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);

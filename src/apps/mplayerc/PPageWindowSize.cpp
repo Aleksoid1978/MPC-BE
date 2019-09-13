@@ -48,6 +48,7 @@ void CPPageWindowSize::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_nFitFactor);
 	DDX_Control(pDX, IDC_SPIN3, m_spnFitFactor);
 	DDX_Control(pDX, IDC_CHECK1, m_chkFitLargerOnly);
+	DDX_Control(pDX, IDC_CHECK5, m_chkResetWindowAfterClosingFile);
 
 	DDX_Control(pDX, IDC_CHECK2, m_chkRememberWindowPos);
 	DDX_Control(pDX, IDC_CHECK3, m_chkLimitWindowProportions);
@@ -80,6 +81,7 @@ BOOL CPPageWindowSize::OnInitDialog()
 	m_nFitFactor = s.nAutoFitFactor;
 	m_spnFitFactor.SetRange(20, 80);
 
+	m_chkResetWindowAfterClosingFile.SetCheck(s.bResetWindowAfterClosingFile);
 	GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
 
 	m_chkRememberWindowPos.SetCheck(s.bRememberWindowPos);
@@ -112,6 +114,7 @@ BOOL CPPageWindowSize::OnApply()
 
 	s.nAutoScaleFactor = GetCurItemData(m_cmbScaleLevel);
 	s.nAutoFitFactor = m_nFitFactor = std::clamp(m_nFitFactor, 20, 80);
+	s.bResetWindowAfterClosingFile = !!m_chkResetWindowAfterClosingFile.GetCheck();
 
 	s.bRememberWindowPos      = !!m_chkRememberWindowPos.GetCheck();
 	s.bLimitWindowProportions = !!m_chkLimitWindowProportions.GetCheck();
