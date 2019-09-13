@@ -595,14 +595,15 @@ public:
 	// Window size
 	int				nStartupWindowMode;
 	CSize			szSpecifiedWndSize;
+	int				nPlaybackWindowMode;
+	int				nAutoScaleFactor;
+	int				nAutoFitFactor;
+	bool			bResetWindowAfterClosingFile;
 	bool			bRememberWindowPos;
 	CRect			rcLastWindowPos; // and size
 	UINT			nLastWindowType;
 	bool			bLimitWindowProportions;
 	bool			bSnapToDesktopEdges;
-	int				nPlaybackWindowMode;
-	int				nAutoScaleFactor;
-	int				nAutoFitFactor;
 
 	CSize sizeFixedWindow; // not saved. from command line
 	bool HasFixedWindowSize() const { return sizeFixedWindow.cx > 0 || sizeFixedWindow.cy > 0; }

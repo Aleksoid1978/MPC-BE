@@ -80,14 +80,15 @@
  // Window size
 #define IDS_RS_WINDOWMODESTARTUP			L"WindowModeStartup"
 #define IDS_RS_SPECIFIEDWINDOWSIZE			L"SpecifiedWindowSize"
+#define IDS_RS_WINDOWMODEPLAYBACK			L"WindowModePlayback"
+#define IDS_RS_AUTOSCALEFACTOR				L"AutoScaleFactor"
+#define IDS_RS_AUTOFITFACTOR				L"AutoFitFactor"
+#define IDS_RS_RESETWINDOWAFTERCLOSINGFILE	L"ResetWindowAfterClosingFile"
 #define IDS_RS_REMEMBERWINDOWPOS			L"RememberWindowPos"
 #define IDS_RS_LASTWINDOWRECT				L"LastWindowRect"
 #define IDS_RS_LASTWINDOWTYPE				L"LastWindowType"
 #define IDS_RS_LIMITWINDOWPROPORTIONS		L"LimitWindowProportions"
 #define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
-#define IDS_RS_WINDOWMODEPLAYBACK			L"WindowModePlayback"
-#define IDS_RS_AUTOSCALEFACTOR				L"AutoScaleFactor"
-#define IDS_RS_AUTOFITFACTOR				L"AutoFitFactor"
 
 #define IDS_RS_D3DFULLSCREEN				L"D3DFullScreen"
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"

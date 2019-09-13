@@ -39,6 +39,7 @@ class CPPageWindowSize : public CPPageBase
 	int m_nFitFactor = 50;
 	CSpinButtonCtrl m_spnFitFactor;
 	CButton m_chkFitLargerOnly;
+	CButton m_chkResetWindowAfterClosingFile;
 
 	CButton m_chkRememberWindowPos;
 	CButton m_chkLimitWindowProportions;
