@@ -82,7 +82,6 @@ BOOL CPPageWindowSize::OnInitDialog()
 	m_spnFitFactor.SetRange(20, 80);
 
 	m_chkResetWindowAfterClosingFile.SetCheck(s.bResetWindowAfterClosingFile);
-	GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
 
 	m_chkRememberWindowPos.SetCheck(s.bRememberWindowPos);
 	m_chkLimitWindowProportions.SetCheck(s.bLimitWindowProportions);
