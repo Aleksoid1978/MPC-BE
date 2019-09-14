@@ -96,6 +96,10 @@
 #define APP_BUFDURATION_DEF		 3000
 #define APP_BUFDURATION_MAX		15000
 
+#define APP_NETTIMEOUT_MIN		 2000
+#define APP_NETTIMEOUT_DEF		10000
+#define APP_NETTIMEOUT_MAX		20000
+
 #define APP_AUDIOLEVEL_MAX		 10.0
 #define APP_AUDIOLEVEL_MIN		-10.0
 #define APP_AUDIOGAIN_MAX		 10.0
@@ -716,6 +720,7 @@ public:
 	bool			VideoFilters[VDEC_COUNT];
 	bool			AudioFilters[ADEC_COUNT];
 	int				iBufferDuration;
+	int				iNetworkTimeout;
 
 	// Audio Switcher
 	bool			bAudioMixer;

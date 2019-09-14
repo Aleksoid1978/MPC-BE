@@ -13843,6 +13843,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (pIExFilterConfig = pBF) {
 					pIExFilterConfig->SetInt("queueDuration", s.iBufferDuration);
+					pIExFilterConfig->SetInt("networkTimeout", s.iNetworkTimeout);
 				}
 			}
 			EndEnumFilters;
