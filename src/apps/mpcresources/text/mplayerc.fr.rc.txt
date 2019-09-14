@@ -309,7 +309,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
-6		"If you would like to use the stand-alone version from these filters or a some other replacement, disable them here. Filters written in bold can be double-clicked to show their property pages."
+6		"If you would like to use the stand-alone version from these filters or a some other replacement, disable them here."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
 12		"Matroska Splitter\nconfiguration"
