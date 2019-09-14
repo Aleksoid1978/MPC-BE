@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,9 @@
 
 class CExFilterInfoImpl : public IExFilterInfo
 {
-	STDMETHODIMP GetInt   (LPCSTR field, int    *value)                  { return E_NOTIMPL; };
-	STDMETHODIMP GetString(LPCSTR field, LPWSTR *value, unsigned *chars) { return E_NOTIMPL; };
-	STDMETHODIMP GetBin   (LPCSTR field, LPVOID *value, unsigned *size ) { return E_NOTIMPL; };
+	STDMETHODIMP GetPropertyInt   (LPCSTR field, int    *value)                  { return E_NOTIMPL; };
+	STDMETHODIMP GetPropertyString(LPCSTR field, LPWSTR *value, unsigned *chars) { return E_NOTIMPL; };
+	STDMETHODIMP GetPropertyBin   (LPCSTR field, LPVOID *value, unsigned *size ) { return E_NOTIMPL; };
 };
 
 class CExFilterConfigImpl : public IExFilterConfig

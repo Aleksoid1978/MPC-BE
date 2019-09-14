@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,9 +25,9 @@ interface __declspec(uuid("3F56FEBC-633C-4C76-8455-0787FC62C8F8")) IExFilterInfo
 	// The memory for strings and binary data is allocated by the callee
 	// by using LocalAlloc. It is the caller's responsibility to release the
 	// memory by calling LocalFree.
-	STDMETHOD(GetInt   )(LPCSTR field, int    *value) PURE;
-	STDMETHOD(GetString)(LPCSTR field, LPWSTR *value, unsigned *chars) PURE;
-	STDMETHOD(GetBin   )(LPCSTR field, LPVOID *value, unsigned *size ) PURE;
+	STDMETHOD(GetPropertyInt   )(LPCSTR field, int    *value) PURE;
+	STDMETHOD(GetPropertyString)(LPCSTR field, LPWSTR *value, unsigned *chars) PURE;
+	STDMETHOD(GetPropertyBin   )(LPCSTR field, LPVOID *value, unsigned *size ) PURE;
 };
 // return values:
 // E_NOTIMPL    - method not implemented, any parameters will be ignored.

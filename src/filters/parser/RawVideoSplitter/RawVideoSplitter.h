@@ -71,7 +71,7 @@ public:
 	STDMETHODIMP SetBufferDuration(int duration);
 
 	// IExFilterInfo
-	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
+	STDMETHODIMP GetPropertyInt(LPCSTR field, int *value) override;
 };
 
 class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))

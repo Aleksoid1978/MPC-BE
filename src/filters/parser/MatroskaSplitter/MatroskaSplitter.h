@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -154,8 +154,8 @@ public:
 	STDMETHODIMP_(BOOL) GetCalcDuration();
 
 	// IExFilterInfo
-	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
-	STDMETHODIMP GetBin(LPCSTR field, LPVOID *value, unsigned *size) override;
+	STDMETHODIMP GetPropertyInt(LPCSTR field, int *value) override;
+	STDMETHODIMP GetPropertyBin(LPCSTR field, LPVOID *value, unsigned *size) override;
 };
 
 class __declspec(uuid("0A68C3B5-9164-4a54-AFAF-995B2FF0E0D4"))

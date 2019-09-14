@@ -2353,7 +2353,7 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 
 // IExFilterInfo
 
-STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
+STDMETHODIMP CMP4SplitterFilter::GetPropertyInt(LPCSTR field, int *value)
 {
 	CheckPointer(value, E_POINTER);
 
@@ -2378,7 +2378,7 @@ STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMP4SplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *size)
+STDMETHODIMP CMP4SplitterFilter::GetPropertyBin(LPCSTR field, LPVOID *value, unsigned *size)
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(size, E_POINTER);
