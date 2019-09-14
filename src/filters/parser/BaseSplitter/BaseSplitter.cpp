@@ -85,7 +85,7 @@ STDMETHODIMP CBaseSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void*
 		QI2(IAMExtendedSeeking)
 		QI(IKeyFrameInfo)
 		QI(IBufferInfo)
-		QI(IBufferControl)
+		QI(IExFilterConfig)
 		QI(IPropertyBag)
 		QI(IPropertyBag2)
 		QI(IDSMPropertyBag)
@@ -867,16 +867,31 @@ STDMETHODIMP_(DWORD) CBaseSplitterFilter::GetPriority()
 	return m_priority;
 }
 
-// IBufferControl
+// CExFilterConfig
 
-STDMETHODIMP CBaseSplitterFilter::SetBufferDuration(int duration)
+STDMETHODIMP CBaseSplitterFilter::GetInt(LPCSTR field, int *value)
 {
-	if (duration < BUFFER_DURATION_MIN || duration > BUFFER_DURATION_MAX) {
-		return E_INVALIDARG;
+	CheckPointer(value, E_POINTER);
+
+	if (strcmp(field, "queueDuration") == 0) {
+		*value = m_iBufferDuration;
+		return S_OK;
 	}
 
-	m_iBufferDuration = duration;
-	return S_OK;
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CBaseSplitterFilter::SetInt(LPCSTR field, int value)
+{
+	if (strcmp(field, "queueDuration") == 0) {
+		if (value < BUFFER_DURATION_MIN || value > BUFFER_DURATION_MAX) {
+			return E_INVALIDARG;
+		}
+		m_iBufferDuration = value;
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
 }
 
 void CBaseSplitterFilter::SortOutputPin()

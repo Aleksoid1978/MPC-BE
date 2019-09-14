@@ -123,23 +123,6 @@ STDMETHODIMP CRawVideoSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-STDMETHODIMP CRawVideoSplitterFilter::SetBufferDuration(int duration)
-{
-	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
-		return E_ABORT; // hack. hard-coded in CreateOutputs()
-	}
-	if (duration < BUFFER_DURATION_MIN || duration > BUFFER_DURATION_MAX) {
-		return E_INVALIDARG;
-	}
-	if (duration > 5000) {
-		// limit the maximum buffer, because RAW video has very large bitrates, and for single video streams there is no sense in a long queue.
-		duration = 5000;
-	}
-
-	m_iBufferDuration = duration;
-	return S_OK;
-}
-
 // IExFilterInfo
 
 STDMETHODIMP CRawVideoSplitterFilter::GetPropertyInt(LPCSTR field, int *value)
@@ -153,6 +136,30 @@ STDMETHODIMP CRawVideoSplitterFilter::GetPropertyInt(LPCSTR field, int *value)
 		case 'b': *value = 2; break;
 		default: return E_ABORT;
 		}
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+// IExFilterConfig
+
+STDMETHODIMP CRawVideoSplitterFilter::SetInt(LPCSTR field, int value)
+{
+	if (strcmp(field, "queueDuration") == 0) {
+		if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
+			return E_ABORT; // hack. hard-coded in CreateOutputs()
+		}
+		if (value < BUFFER_DURATION_MIN || value > BUFFER_DURATION_MAX) {
+			return E_INVALIDARG;
+		}
+		if (value > 5000) {
+			// limit the maximum buffer, because RAW video has very large bitrates, and for single video streams there is no sense in a long queue.
+			m_iBufferDuration = 5000;
+			return S_FALSE;
+		}
+
+		m_iBufferDuration = value;
 		return S_OK;
 	}
 

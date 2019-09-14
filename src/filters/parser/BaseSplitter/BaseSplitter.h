@@ -25,8 +25,8 @@
 #include <qnetwork.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
-#include <IBufferControl.h>
 #include <IBitRateInfo.h>
+#include "../../filters/FilterInterfacesImpl.h"
 #include "BaseSplitterFileEx.h"
 #include "BaseSplitterInputPin.h"
 #include "BaseSplitterOutputPin.h"
@@ -55,7 +55,7 @@ class CBaseSplitterFilter
 	, public IAMExtendedSeeking
 	, public IKeyFrameInfo
 	, public IBufferInfo
-	, public IBufferControl
+	, public CExFilterConfigImpl
 {
 	CCritSec m_csPinMap;
 	std::map<DWORD, CBaseSplitterOutputPin*> m_pPinMap;
@@ -220,9 +220,10 @@ public:
 	STDMETHODIMP GetStatus(int i, int& samples, int& size);
 	STDMETHODIMP_(DWORD) GetPriority();
 
-	// IBufferControl
+	// IExFilterConfig
 
-	STDMETHODIMP SetBufferDuration(int duration);
+	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
+	STDMETHODIMP SetInt(LPCSTR field, int value) override;
 
 public:
 	CComQIPtr<ISyncReader> m_pSyncReader;
