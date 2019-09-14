@@ -80,8 +80,8 @@ public:
 	STDMETHODIMP_(HRESULT) GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
 
 	// IExFilterInfo
-	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
-	STDMETHODIMP GetBin(LPCSTR field, LPVOID *value, unsigned *size) override;
+	STDMETHODIMP GetPropertyInt(LPCSTR field, int *value) override;
+	STDMETHODIMP GetPropertyBin(LPCSTR field, LPVOID *value, unsigned *size) override;
 };
 
 class __declspec(uuid("3CCC052E-BDEE-408a-BEA7-90914EF2964B"))

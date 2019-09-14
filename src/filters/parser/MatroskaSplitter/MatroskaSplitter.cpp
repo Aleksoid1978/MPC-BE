@@ -2639,7 +2639,7 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 
 // IExFilterInfo
 
-STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
+STDMETHODIMP CMatroskaSplitterFilter::GetPropertyInt(LPCSTR field, int *value)
 {
 	CheckPointer(value, E_POINTER);
 
@@ -2672,7 +2672,7 @@ STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *size)
+STDMETHODIMP CMatroskaSplitterFilter::GetPropertyBin(LPCSTR field, LPVOID *value, unsigned *size)
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(size, E_POINTER);

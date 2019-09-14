@@ -142,7 +142,7 @@ STDMETHODIMP CRawVideoSplitterFilter::SetBufferDuration(int duration)
 
 // IExFilterInfo
 
-STDMETHODIMP CRawVideoSplitterFilter::GetInt(LPCSTR field, int *value)
+STDMETHODIMP CRawVideoSplitterFilter::GetPropertyInt(LPCSTR field, int *value)
 {
 	CheckPointer(value, E_POINTER);
 
