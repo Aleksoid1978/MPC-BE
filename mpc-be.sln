@@ -163,7 +163,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\FilterInterfaces.h = include\FilterInterfaces.h
 		include\HighDPI.h = include\HighDPI.h
 		include\IBitRateInfo.h = include\IBitRateInfo.h
-		include\IBufferControl.h = include\IBufferControl.h
 		include\IBufferInfo.h = include\IBufferInfo.h
 		include\IChapterInfo.h = include\IChapterInfo.h
 		include\IFilterVersion.h = include\IFilterVersion.h

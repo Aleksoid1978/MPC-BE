@@ -68,5 +68,10 @@ interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConf
 	STDMETHOD(SetBin   )(LPCSTR field, LPVOID  value, int size ) PURE;
 };
 // available settings:
-// name          type   filter       mode    valid values
-// stereodownmix bool   MpaDecFilter set     true/false
+// name           type  filter            mode     valid values
+// stereodownmix  bool  MpaDecFilter      set      true/false
+// queueDuration  int   BaseSplitter      set/get  100...15000 milliseconds
+// statsEnable    bool  MpcVideoRenderer  set/get  true/false
+// cmd_redraw     bool  MpcVideoRenderer  set      true
+// playbackState  int   MpcVideoRenderer  get      0-State_Stopped, 1-State_Paused, 2-State_Running
+// rotation       int   MpcVideoRenderer  get      0, 90, 180, 270
