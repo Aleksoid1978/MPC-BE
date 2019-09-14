@@ -32,6 +32,10 @@
 #define BUFFER_DURATION_DEF  3000
 #define BUFFER_DURATION_MAX 15000
 
+#define NETWORK_TIMEOUT_MIN  2000
+#define NETWORK_TIMEOUT_DEF 10000
+#define NETWORK_TIMEOUT_MAX 20000
+
 class CBaseSplitterFilter;
 
 class CBaseSplitterOutputPin
