@@ -151,6 +151,7 @@
 #define IDS_RS_PANSCANZOOM					L"PanScanZoom"
 #define IDS_RS_AUDIOTIMESHIFT				L"AudioTimeShift"
 #define IDS_RS_BUFFERDURATION				L"BufferDuration"
+#define IDS_RS_NETWORKTIMEOUT				L"NetworkTimeout"
 #define IDS_RS_SUBDELAYINTERVAL				L"SubDelayInterval"
 #define IDS_RS_ENABLEAUDIOTIMESHIFT			L"EnableAudioTimeShift"
 #define IDS_RS_LOGOFILE						L"LogoFile"

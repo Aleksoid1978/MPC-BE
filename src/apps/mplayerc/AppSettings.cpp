@@ -698,6 +698,7 @@ void CAppSettings::ResetSettings()
 	iAudioTimeShift = 0;
 
 	iBufferDuration = APP_BUFDURATION_DEF;
+	iNetworkTimeout = APP_NETTIMEOUT_DEF;
 
 	bAudioMixer = false;
 	nAudioMixerLayout = SPK_STEREO;
@@ -1138,6 +1139,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift, -600000, 600000);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
 	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, str)) {
@@ -1738,6 +1740,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
 
 	// Multi-monitor code
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
