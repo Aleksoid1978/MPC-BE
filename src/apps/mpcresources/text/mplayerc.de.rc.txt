@@ -547,7 +547,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 16		"Auf Videogröße skalieren"
 17		"Fenster an Bildschirm anpassen"
 22		"Nur größer"
-23		"Return initial window position after closing file"
+23		"Fenster nach Schließen der Datei zurücksetzen"
 25		"Letzte Fensterposition merken"
 26		"Fensterproportionen bei der Größenänderung begrenzen"
 27		"An Desktoprand andocken"
