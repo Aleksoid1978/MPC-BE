@@ -211,17 +211,7 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_NULL_ANY,     IDS_PPAGE_OUTPUT_NULL_ANY);
 	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
-	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
-		if (m_iVideoRendererType == m_iDSVRTC.GetItemData(i)) {
-			if (SUCCEEDED(IsRendererAvailable(m_iVideoRendererType))) { // installed but may not be available
-				m_iDSVRTC.SetCurSel(i);
-				m_iVideoRendererType_store = m_iVideoRendererType;
-			} else {
-				m_iDSVRTC.SetCurSel(0);
-			}
-			break;
-		}
-	}
+	SelectByItemData(m_cbVideoRenderer, m_iVideoRendererType);
 
 	m_iDSVRTC.SetRedraw(TRUE);
 	m_iDSVRTC.Invalidate();
@@ -394,20 +384,6 @@ void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 void CPPageVideo::OnDSRendererChange()
 {
 	int CurrentVR = (int)GetCurItemData(m_cbVideoRenderer);
-
-	if (FAILED(IsRendererAvailable(CurrentVR))) { // not installed
-		AfxMessageBox(IDS_PPAGE_OUTPUT_UNAVAILABLEMSG, MB_ICONEXCLAMATION | MB_OK, 0);
-
-		// revert to the last saved renderer
-		m_cbVideoRenderer.SetCurSel(0);
-		for (int i = 0; i < m_cbVideoRenderer.GetCount(); ++i) {
-			if (m_iVideoRendererType_store == m_cbVideoRenderer.GetItemData(i)) {
-				m_cbVideoRenderer.SetCurSel(i);
-				CurrentVR = (int)m_cbVideoRenderer.GetItemData(i);
-				break;
-			}
-		}
-	}
 
 	CRenderersSettings& rs = GetRenderersSettings();
 
