@@ -574,7 +574,7 @@ static size_t cbs_av1_get_payload_bytes_left(GetBitContext *gbc)
 #define RWContext GetBitContext
 
 #define xf(width, name, var, range_min, range_max, subs, ...) do { \
-        uint32_t value = range_min; \
+        uint32_t value; \
         CHECK(ff_cbs_read_unsigned(ctx, rw, width, #name, \
                                    SUBSCRIPTS(subs, __VA_ARGS__), \
                                    &value, range_min, range_max)); \
@@ -582,7 +582,7 @@ static size_t cbs_av1_get_payload_bytes_left(GetBitContext *gbc)
     } while (0)
 
 #define xsu(width, name, var, subs, ...) do { \
-        int32_t value = 0; \
+        int32_t value; \
         CHECK(ff_cbs_read_signed(ctx, rw, width, #name, \
                                  SUBSCRIPTS(subs, __VA_ARGS__), &value, \
                                  MIN_INT_BITS(width), \
@@ -591,27 +591,27 @@ static size_t cbs_av1_get_payload_bytes_left(GetBitContext *gbc)
     } while (0)
 
 #define uvlc(name, range_min, range_max) do { \
-        uint32_t value = range_min; \
+        uint32_t value; \
         CHECK(cbs_av1_read_uvlc(ctx, rw, #name, \
                                 &value, range_min, range_max)); \
         current->name = value; \
     } while (0)
 
 #define ns(max_value, name, subs, ...) do { \
-        uint32_t value = 0; \
+        uint32_t value; \
         CHECK(cbs_av1_read_ns(ctx, rw, max_value, #name, \
                               SUBSCRIPTS(subs, __VA_ARGS__), &value)); \
         current->name = value; \
     } while (0)
 
 #define increment(name, min, max) do { \
-        uint32_t value = 0; \
+        uint32_t value; \
         CHECK(cbs_av1_read_increment(ctx, rw, min, max, #name, &value)); \
         current->name = value; \
     } while (0)
 
 #define subexp(name, max, subs, ...) do { \
-        uint32_t value = 0; \
+        uint32_t value; \
         CHECK(cbs_av1_read_subexp(ctx, rw, max, #name, \
                                   SUBSCRIPTS(subs, __VA_ARGS__), &value)); \
         current->name = value; \
@@ -629,7 +629,7 @@ static size_t cbs_av1_get_payload_bytes_left(GetBitContext *gbc)
     } while (0)
 
 #define leb128(name) do { \
-        uint64_t value = 0; \
+        uint64_t value; \
         CHECK(cbs_av1_read_leb128(ctx, rw, #name, &value)); \
         current->name = value; \
     } while (0)
@@ -829,7 +829,7 @@ static void cbs_av1_free_metadata(AV1RawMetadata *md)
     }
 }
 
-static void cbs_av1_free_obu(void *unit, uint8_t *content)
+static void cbs_av1_free_obu(void *opaque, uint8_t *content)
 {
     AV1RawOBU *obu = (AV1RawOBU*)content;
 

@@ -1024,7 +1024,7 @@ end:
 
     return ret;
 free_and_end:
-    if (avctx->codec &&
+    if (avctx->codec && avctx->codec->close &&
         (codec_init_ok ||
          (avctx->codec->caps_internal & FF_CODEC_CAP_INIT_CLEANUP)))
         avctx->codec->close(avctx);
@@ -1041,6 +1041,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     av_dict_free(&tmp);
     av_freep(&avctx->priv_data);
+    av_freep(&avctx->subtitle_header);
     if (avctx->internal) {
         av_frame_free(&avctx->internal->to_free);
         av_frame_free(&avctx->internal->compat_decode_frame);
