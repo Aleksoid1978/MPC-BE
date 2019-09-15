@@ -75,6 +75,8 @@
 #include "DiskImage.h"
 #include <AllocatorCommon.h>
 
+constexpr auto magnet_regex = LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))";
+
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
