@@ -119,7 +119,7 @@ protected:
 
 	CFFAudioDecoder m_FFAudioDec;
 
-	BOOL            m_bNeedCheck;
+	BOOL            m_bNeedBitstreamCheck;
 	BOOL            m_bHasVideo;
 
 	double          m_dRate;
