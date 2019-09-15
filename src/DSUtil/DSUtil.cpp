@@ -779,6 +779,31 @@ bool IsCLSIDRegistered(const CLSID& clsid)
 	return fRet;
 }
 
+HRESULT CheckFilterCLSID(const CLSID& clsid)
+{
+	LPOLESTR pStr = nullptr;
+	if (S_OK == StringFromCLSID(clsid, &pStr) && pStr) {
+		CString str_clsid(pStr);
+		CoTaskMemFree(pStr);
+
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\" + str_clsid, KEY_READ)) {
+			WCHAR buf[MAX_PATH] = {};
+			ULONG len = MAX_PATH;
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + str_clsid + L"\\InprocServer32", KEY_READ)
+					&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buf, &len)
+					&& ::PathFileExistsW(buf)) {
+
+				return S_OK; // installed and available
+			}
+
+			return S_FALSE; // installed but not available
+		}
+	}
+
+	return E_FAIL; // not installed
+}
+
 void CStringToBin(CString str, std::vector<BYTE>& data)
 {
 	str.Trim();

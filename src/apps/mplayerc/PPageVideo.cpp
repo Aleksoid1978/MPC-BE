@@ -29,21 +29,21 @@
 
 // CPPageVideo dialog
 
-static bool IsRenderTypeAvailable(int VideoRendererType, HWND hwnd)
+static HRESULT IsRendererAvailable(int VideoRendererType)
 {
 	switch (VideoRendererType) {
 		case VIDRNDT_EVR:
 		case VIDRNDT_EVR_CUSTOM:
 		case VIDRNDT_SYNC:
-			return IsCLSIDRegistered(CLSID_EnhancedVideoRenderer);
+			return CheckFilterCLSID(CLSID_EnhancedVideoRenderer);
 		case VIDRNDT_MPCVR:
-			return IsCLSIDRegistered(CLSID_MPCVR);
+			return CheckFilterCLSID(CLSID_MPCVR);
 		case VIDRNDT_DXR:
-			return IsCLSIDRegistered(CLSID_DXR);
+			return CheckFilterCLSID(CLSID_DXR);
 		case VIDRNDT_MADVR:
-			return IsCLSIDRegistered(CLSID_madVR);
+			return CheckFilterCLSID(CLSID_madVR);
 		default:
-		return true;
+		return S_OK;
 	}
 }
 
@@ -187,8 +187,11 @@ BOOL CPPageVideo::OnInitDialog()
 		}
 		CString sName = ResStr(nID);
 
-		if (!IsRenderTypeAvailable(iVR, m_hWnd)) {
+		HRESULT hr = IsRendererAvailable(iVR);
+		if (S_FALSE == hr) {
 			sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));
+		} else if (FAILED(hr)) {
+			sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_INSTALLED));
 		}
 
 		AddStringData(m_cbVideoRenderer, sName, iVR);
@@ -210,7 +213,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iVideoRendererType == m_iDSVRTC.GetItemData(i)) {
-			if (IsRenderTypeAvailable(m_iVideoRendererType, m_hWnd)) {
+			if (SUCCEEDED(IsRendererAvailable(m_iVideoRendererType))) { // installed but may not be available
 				m_iDSVRTC.SetCurSel(i);
 				m_iVideoRendererType_store = m_iVideoRendererType;
 			} else {
@@ -392,7 +395,7 @@ void CPPageVideo::OnDSRendererChange()
 {
 	int CurrentVR = (int)GetCurItemData(m_cbVideoRenderer);
 
-	if (!IsRenderTypeAvailable(CurrentVR, m_hWnd)) {
+	if (FAILED(IsRendererAvailable(CurrentVR))) { // not installed
 		AfxMessageBox(IDS_PPAGE_OUTPUT_UNAVAILABLEMSG, MB_ICONEXCLAMATION | MB_OK, 0);
 
 		// revert to the last saved renderer
