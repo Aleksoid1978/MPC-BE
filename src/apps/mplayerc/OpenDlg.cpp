@@ -117,7 +117,7 @@ BOOL COpenDlg::OnInitDialog()
 				if (AfxIsValidString(pText)
 						&& ((::PathIsURLW(pText) && url.CrackUrl(pText) && url.GetHostNameLength())
 							|| wcsstr(pText, L"acestream://") == pText
-							|| std::regex_match(pText, std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))")))) {
+							|| std::regex_match(pText, std::wregex(magnet_regex)))) {
 					m_mrucombo.SetWindowTextW(pText);
 				}
 				GlobalUnlock(hglb);

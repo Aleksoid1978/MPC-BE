@@ -5168,7 +5168,7 @@ void CMainFrame::OnFileOpenMedia()
 		return;
 	}
 
-	if (dlg.m_fns.size() == 1 && std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
+	if (dlg.m_fns.size() == 1 && std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
 		fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
 	}
 
@@ -5307,14 +5307,22 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 						std::list<CString> lines;
 						Explode(text, lines, L'\n');
 						for (const auto& line : lines) {
-							if (::PathIsURLW(line)
+							CUrl url;
+							if ((::PathIsURLW(line) && url.CrackUrl(line) && url.GetHostNameLength())
 									|| line.Left(12) == L"acestream://"
+									|| std::regex_match(line.GetString(), std::wregex(magnet_regex))
 									|| ::PathFileExistsW(line)) {
 								sl.push_back(line);
 							}
 						}
 
 						if (!sl.empty()) {
+							for (auto& fn : sl) {
+								if (std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
+									fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
+								}
+							}
+
 							ParseDirs(sl);
 
 							if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
@@ -5362,7 +5370,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			sl = s.slFiles;
 
 			for (auto& fn : sl) {
-				if (std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
+				if (std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
 					fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
 				}
 			}
