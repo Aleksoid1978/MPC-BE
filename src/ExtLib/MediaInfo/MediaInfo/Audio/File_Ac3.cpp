@@ -999,7 +999,7 @@ File_Ac3::File_Ac3()
     TimeStamp_IsPresent=false;
     TimeStamp_IsParsing=false;
     TimeStamp_Parsed=false;
-    TimeStamp_DropFrame_IsValid=false;
+    TimeStamp_Count=0;
     BigEndian=true;
     IgnoreCrc_Done=false;
 }
@@ -1120,7 +1120,6 @@ void File_Ac3::Streams_Fill()
             Fill(Stream_Audio, 0, Audio_Format, "AC-3");
             Fill(Stream_Audio, 0, Audio_Codec, "AC3");
         }
-        Fill(Stream_Audio, 0, Audio_BitDepth, 16);
 
         int32u Divider=bsid_Max==9?2:1; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
         if (Ztring::ToZtring(AC3_SamplingRate[fscod]/Divider)!=Retrieve(Stream_Audio, 0, Audio_SamplingRate))
@@ -1131,7 +1130,12 @@ void File_Ac3::Streams_Fill()
                 Fill(Stream_Audio, 0, Audio_BitRate, "Unknown");
             int32u BitRate=AC3_BitRate[frmsizecod/2]*1000;
             int32u Divider=bsid_Max==9?2:1; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
+            int32u TimeStamp_BitRate=0;
+            if (TimeStamp_Count==Frame_Count || TimeStamp_Count>Frame_Count/2) // In case of corrupted stream, check that there is a minimal count of timestamps 
+                TimeStamp_BitRate+=float32_int32s(AC3_SamplingRate[fscod]/Divider/12.0); // 12 = 1536 samples per frame / 128 bits per timestamp frame
             Fill(Stream_Audio, 0, Audio_BitRate, BitRate/Divider);
+            if (TimeStamp_BitRate)
+                Fill(Stream_Audio, 0, Audio_BitRate_Encoded, BitRate/Divider+TimeStamp_BitRate);
             if (CalculateDelay && Buffer_TotalBytes_FirstSynched>100 && BitRate>0)
             {
                 Fill(Stream_Audio, 0, Audio_Delay, (float)Buffer_TotalBytes_FirstSynched*8*1000/BitRate, 0);
@@ -1199,8 +1203,13 @@ void File_Ac3::Streams_Fill()
                     SamplingRate=AC3_SamplingRate[fscod];
                 else
                     SamplingRate=AC3_SamplingRate2[fscod2];
+                int32u TimeStamp_Size=0;
+                if (TimeStamp_Count==Frame_Count || TimeStamp_Count>Frame_Count/2) // In case of corrupted stream, check that there is a minimal count of timestamps 
+                    TimeStamp_Size=16;
                 Fill(Stream_Audio, 0, Audio_SamplingRate, SamplingRate);
                 Fill(Stream_Audio, 0, Audio_BitRate, ((int64u)frmsiz_Total)*SamplingRate/32/numblks);
+                if (TimeStamp_Size)
+                    Fill(Stream_Audio, 0, Audio_BitRate_Encoded, ((int64u)frmsiz_Total+TimeStamp_Size)*SamplingRate/32/numblks);
 
                 if (acmod_Max[Pos][1]!=(int8u)-1)
                 {
@@ -1327,10 +1336,20 @@ void File_Ac3::Streams_Fill()
     //TimeStamp
     if (TimeStamp_IsPresent)
     {
-        Fill(Stream_Audio, 0, Audio_Delay, TimeStamp_Content*1000, 0);
+        Ztring TimeCode_FrameRate=Ztring::ToZtring((float64)TimeStamp_FirstFrame.FramesPerSecond/((TimeStamp_FirstFrame.DropFrame|TimeStamp_FirstFrame.FramesPerSecond_Is1001)?1.001:1.000), 3);
+        if (TimeStamp_FirstFrame.MoreSamples)
+            TimeStamp_FirstFrame.MoreSamples_Frequency=Retrieve(Stream_Audio, 0, Audio_SamplingRate).To_int32s();
+        Fill(Stream_Audio, 0, "TimeCode_FirstFrame", TimeStamp_FirstFrame.ToString());
+        Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame", "N YCY");
+        Fill(Stream_Audio, 0, "TimeCode_FirstFrame/String", TimeStamp_FirstFrame.ToString()+" ("+TimeCode_FrameRate.To_UTF8()+" fps), embedded in stream");
+        Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame/String", "Y NTN");
+        Fill(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", TimeStamp_FirstFrame.ToString());
+        Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", "N YFY");
+        Fill(Stream_Audio, 0, "TimeCode_Source", "Stream");
+        Fill_SetOptions(Stream_Audio, 0, "TimeCode_Source", "N YTY");
+        Fill(Stream_Audio, 0, Audio_Delay, TimeStamp_FirstFrame.ToMilliseconds());
         Fill(Stream_Audio, 0, Audio_Delay_Source, "Stream");
-        if (TimeStamp_DropFrame_IsValid)
-            Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_DropFrame_Content?"drop_frame_flag=1":"drop_frame_flag=0");
+        Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_FirstFrame.DropFrame?"drop_frame_flag=1":"drop_frame_flag=0");
     }
 
     //Samples per frame
@@ -4421,6 +4440,7 @@ void File_Ac3::TimeStamp()
     // Format looks like a Sync word 0x0110 then SMPTE ST 339 Time stamp
     
     //Parsing
+    int16u SampleNumber;
     int8u H1, H2, M1, M2, S1, S2, F1, F2, FrameRate;
     bool DropFrame;
     Skip_B2(                                                    "Sync word");
@@ -4438,7 +4458,7 @@ void File_Ac3::TimeStamp()
     Get_SB (    DropFrame,                                      "Drop frame");
     Get_S1 ( 2, F1,                                             "F");
     Get_S1 ( 4, F2,                                             "F");
-    Skip_S2(16,                                                 "Sample number");
+    Get_S2 (16, SampleNumber,                                   "Sample number");
     Skip_S2( 9,                                                 "Unknown");
     Skip_SB(                                                    "Status");
     Get_S1 ( 4, FrameRate,                                      "Frame rate"); Param_Info1(Mpegv_frame_rate[FrameRate]);
@@ -4448,28 +4468,20 @@ void File_Ac3::TimeStamp()
     Skip_B2(                                                    "User private");
 
     FILLING_BEGIN();
-        float64 Temp=H1*10*60*60
-                   + H2   *60*60
-                   + M1   *10*60
-                   + M2      *60
-                   + S1      *10
-                   + S2;
-        if (Mpegv_frame_rate[FrameRate])
-            Temp+=(F1*10+F2)/Mpegv_frame_rate[FrameRate];
+        TimeCode Temp(H1*10+H2, M1*10+M2, S1*10+S2, F1*10+F2, (int8u)float64_int64s(Mpegv_frame_rate[FrameRate]), DropFrame);
+        if (float64_int64s(Mpegv_frame_rate[FrameRate])!=Mpegv_frame_rate[FrameRate])
+            Temp.FramesPerSecond_Is1001=true;
+        Temp.MoreSamples=SampleNumber;
         #ifdef MEDIAINFO_TRACE
-           Element_Info1(Ztring::ToZtring(H1)+Ztring::ToZtring(H2)+__T(':')
-                       + Ztring::ToZtring(M1)+Ztring::ToZtring(M2)+__T(':')
-                       + Ztring::ToZtring(S1)+Ztring::ToZtring(S2)+(DropFrame?__T(';'):__T(':'))
-                       + Ztring::ToZtring(F1)+Ztring::ToZtring(F2));
+           Element_Info1(Temp.ToString());
         #endif //MEDIAINFO_TRACE
-        if (Frame_Count==0)
+        if (TimeStamp_Count==0)
         {
-            TimeStamp_Content=Temp;
-            TimeStamp_DropFrame_IsValid=true;
-            TimeStamp_DropFrame_Content=DropFrame;
+            TimeStamp_FirstFrame=Temp;
         }
         TimeStamp_IsParsing=false;
         TimeStamp_Parsed=true;
+        TimeStamp_Count++;
     FILLING_END();
 }
 

@@ -408,6 +408,24 @@ private :
     void sei_message_user_data_unregistered_x264(int32u payloadSize);
     void sei_message_user_data_unregistered_bluray(int32u payloadSize);
     void sei_message_user_data_unregistered_bluray_MDPM(int32u payloadSize);
+    void sei_message_mastering_display_colour_volume();
+    void sei_message_light_level();
+
+    enum hdr_format
+    {
+        HdrFormat_EtsiTs103433,
+        HdrFormat_SmpteSt209440,
+        HdrFormat_SmpteSt2086,
+    };
+
+    typedef std::map<hdr_format, std::map<video, Ztring> > hdr;
+
+    hdr                                 HDR;
+
+
+    int16u  maximum_content_light_level;
+    int16u  maximum_frame_average_light_level;
+
     void consumer_camera_1();
     void consumer_camera_2();
     void sei_message_recovery_point();

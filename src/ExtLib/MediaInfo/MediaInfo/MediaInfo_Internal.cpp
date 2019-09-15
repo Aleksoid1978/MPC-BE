@@ -2082,6 +2082,11 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
             return Ztring::ToZtring((int64u)Inform_Cache.data()) + __T(':') + Ztring::ToZtring((int64u)Inform_Cache.size());
         }
     #endif //MEDIAINFO_ADVANCED
+    else if (OptionLower.find(__T("reset"))==0)
+    {
+        MediaInfoLib::Config.Init(true);
+        return Ztring();
+    }
     else if (OptionLower.find(__T("file_"))==0)
     {
         Ztring ToReturn2=Config.Option(Option, Value);

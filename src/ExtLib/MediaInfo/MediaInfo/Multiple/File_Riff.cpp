@@ -707,9 +707,9 @@ void File_Riff::Read_Buffer_Continue()
     if (Demux_Parser)
     {
         Open_Buffer_Continue(Demux_Parser, Buffer+Buffer_Offset, 0, false);
+        if (Config->Demux_EventWasSent)
+            return;
         Demux_Parser=NULL;
-        //if (Config->Demux_EventWasSent)
-        //    return;
     }
 }
 #endif //MEDIAINFO_DEMUX

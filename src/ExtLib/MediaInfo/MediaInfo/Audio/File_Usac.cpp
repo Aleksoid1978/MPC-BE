@@ -859,7 +859,6 @@ void File_Aac::drcInstructionsUniDrc(bool V1)
     }
 
     set<int8s> DrcChannelGroups=set<int8s>(gainSetIndex.begin(), gainSetIndex.end());
-    size_t nDrcChannelGroups=DrcChannelGroups.size();
 
     for (set<int8s>::iterator DrcChannelGroup=DrcChannelGroups.begin(); DrcChannelGroup!=DrcChannelGroups.end(); ++DrcChannelGroup)
     {

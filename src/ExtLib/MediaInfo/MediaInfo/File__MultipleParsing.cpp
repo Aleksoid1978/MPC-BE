@@ -182,6 +182,9 @@
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
 #endif
+#if defined(MEDIAINFO_AC4_YES)
+    #include "MediaInfo/Audio/File_Ac4.h"
+#endif
 #if defined(MEDIAINFO_ALS_YES)
     #include "MediaInfo/Audio/File_Als.h"
 #endif
@@ -573,6 +576,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_AC3_YES)
         Parser.push_back(new File_Ac3());
+    #endif
+    #if defined(MEDIAINFO_AC3_YES)
+        Parser.push_back(new File_Ac4());
     #endif
     #if defined(MEDIAINFO_SMPTEST0337_YES)
         Parser.push_back(new File_SmpteSt0337());

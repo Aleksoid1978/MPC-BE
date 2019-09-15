@@ -498,6 +498,12 @@ String MediaInfoList_Internal::Option (const String &Option, const String &Value
         else if (OptionLower.find(__T("file_inform_stringpointer")) == 0 && Info.size() == 1)
             return Info[0]->Option(Option, Value);
     #endif //MEDIAINFO_ADVANCED
+    else if (OptionLower.find(__T("reset"))==0)
+    {
+        Config_MediaInfo_Items.clear();
+        MediaInfoLib::Config.Init(true);
+        return Ztring();
+    }
     else if (OptionLower.find(__T("file_"))==0)
     {
         Config_MediaInfo_Items[Option]=Value;

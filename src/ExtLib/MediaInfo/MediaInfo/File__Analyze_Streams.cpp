@@ -360,6 +360,9 @@ bool ShowSource_IsInList(video Value)
 //---------------------------------------------------------------------------
 void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, const Ztring &Value, bool Replace)
 {
+    if (Parameter == Audio_Duration)
+        int a = 0;
+
     //MergedStreams
     if (FillAllMergedStreams)
     {

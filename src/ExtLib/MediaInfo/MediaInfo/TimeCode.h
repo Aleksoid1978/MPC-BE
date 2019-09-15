@@ -85,6 +85,9 @@ public:
     int8u Minutes;
     int8u Seconds;
     int8u Frames;
+    int32s MoreSamples;
+    int32s MoreSamples_Frequency;
+    bool  FramesPerSecond_Is1001;
     int8u FramesPerSecond;
     bool  DropFrame;
     bool  MustUseSecondField;
