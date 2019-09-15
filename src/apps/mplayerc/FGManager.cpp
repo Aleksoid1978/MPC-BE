@@ -2877,6 +2877,17 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// Renderers
 	if (!m_bIsPreview) {
+		 auto CheckAddRenderer = [&](const CLSID& clsidVR, const CLSID& clsidAP, const WCHAR* name) {
+			if (S_OK != CheckFilterCLSID(clsidVR)) {
+				CString msg_str;
+				msg_str.Format(ResStr(IDS_REND_UNAVAILABLEMSG), name, L"Enhanced Video Renderer");
+				AfxMessageBox(msg_str, MB_ICONEXCLAMATION | MB_OK);
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", m_vrmerit));
+			} else {
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, clsidAP, name, m_vrmerit));
+			}
+		};
+
 		switch (rs.iVideoRenderer) {
 			case VIDRNDT_VMR9WINDOWED:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
@@ -2891,13 +2902,13 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
 				break;
 			case VIDRNDT_MPCVR:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer", m_vrmerit));
+				CheckAddRenderer(CLSID_MPCVR, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer");
 				break;
 			case VIDRNDT_DXR:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_DXRAllocatorPresenter, L"Haali's Video Renderer", m_vrmerit));
+				CheckAddRenderer(CLSID_DXR, CLSID_DXRAllocatorPresenter, L"Haali's Video Renderer");
 				break;
 			case VIDRNDT_MADVR:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_madVRAllocatorPresenter, L"madVR Renderer", m_vrmerit));
+				CheckAddRenderer(CLSID_madVR, CLSID_madVRAllocatorPresenter, L"madVR Renderer");
 				break;
 			case VIDRNDT_NULL_ANY:
 				pFGF = DNew CFGFilterInternal<CNullVideoRenderer>(L"Null Video Renderer (Any)", MERIT64_ABOVE_DSHOW + 2);
