@@ -5361,6 +5361,12 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			std::list<CString> sl;
 			sl = s.slFiles;
 
+			for (auto& fn : sl) {
+				if (std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
+					fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
+				}
+			}
+
 			ParseDirs(sl);
 			bool fMulti = sl.size() > 1;
 
