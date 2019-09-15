@@ -39,8 +39,8 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 	, m_nFlag(0)
-	, m_iBufferDuration(BUFFER_DURATION_DEF)
-	, m_iNetworkTimeout(NETWORK_TIMEOUT_DEF)
+	, m_iQueueDuration(QUEUE_DURATION_DEF)
+	//, m_iNetworkTimeout(NETWORK_TIMEOUT_DEF)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -875,14 +875,14 @@ STDMETHODIMP CBaseSplitterFilter::GetInt(LPCSTR field, int *value)
 	CheckPointer(value, E_POINTER);
 
 	if (strcmp(field, "queueDuration") == 0) {
-		*value = m_iBufferDuration;
+		*value = m_iQueueDuration;
 		return S_OK;
 	}
 
-	if (strcmp(field, "networkTimeout") == 0) {
-		*value = m_iNetworkTimeout;
-		return S_OK;
-	}
+	//if (strcmp(field, "networkTimeout") == 0) {
+	//	*value = m_iNetworkTimeout;
+	//	return S_OK;
+	//}
 
 	return E_INVALIDARG;
 }
@@ -890,20 +890,20 @@ STDMETHODIMP CBaseSplitterFilter::GetInt(LPCSTR field, int *value)
 STDMETHODIMP CBaseSplitterFilter::SetInt(LPCSTR field, int value)
 {
 	if (strcmp(field, "queueDuration") == 0) {
-		if (value < BUFFER_DURATION_MIN || value > BUFFER_DURATION_MAX) {
+		if (value < QUEUE_DURATION_MIN || value > QUEUE_DURATION_MAX) {
 			return E_INVALIDARG;
 		}
-		m_iBufferDuration = value;
+		m_iQueueDuration = value;
 		return S_OK;
 	}
 
-	if (strcmp(field, "networkTimeout") == 0) {
-		if (value < NETWORK_TIMEOUT_MIN || value > NETWORK_TIMEOUT_MAX) {
-			return E_INVALIDARG;
-		}
-		m_iNetworkTimeout = value;
-		return S_OK;
-	}
+	//if (strcmp(field, "networkTimeout") == 0) {
+	//	if (value < NETWORK_TIMEOUT_MIN || value > NETWORK_TIMEOUT_MAX) {
+	//		return E_INVALIDARG;
+	//	}
+	//	m_iNetworkTimeout = value;
+	//	return S_OK;
+	//}
 
 	return E_INVALIDARG;
 }

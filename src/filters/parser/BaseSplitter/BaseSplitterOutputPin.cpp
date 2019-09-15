@@ -195,9 +195,9 @@ HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 	if (!ThreadExists()) {
 		return S_FALSE;
 	}
-	if (m_pSplitter->m_iBufferDuration >= BUFFER_DURATION_MIN && m_pSplitter->m_iBufferDuration <= BUFFER_DURATION_MAX) {
-		m_maxQueueDuration = m_pSplitter->m_iBufferDuration * 10000;
-		m_maxQueueCount = m_pSplitter->m_iBufferDuration * 12 / 10;
+	if (m_pSplitter->m_iQueueDuration >= QUEUE_DURATION_MIN && m_pSplitter->m_iQueueDuration <= QUEUE_DURATION_MAX) {
+		m_maxQueueDuration = m_pSplitter->m_iQueueDuration * 10000;
+		m_maxQueueCount = m_pSplitter->m_iQueueDuration * 12 / 10;
 	}
 	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
 	if (S_OK != hr) {
