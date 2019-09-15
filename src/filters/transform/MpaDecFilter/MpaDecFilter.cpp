@@ -297,7 +297,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bResync(FALSE)
 	, m_bResyncTimestamp(FALSE)
 	, m_buff(PADDING_SIZE)
-	, m_bNeedCheck(TRUE)
+	, m_bNeedBitstreamCheck(TRUE)
 	, m_bHasVideo(FALSE)
 	, m_dRate(1.0)
 	, m_bFlushing(FALSE)
@@ -471,9 +471,26 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	if (m_bNeedCheck) {
-		m_bNeedCheck = FALSE;
-		ZeroMemory(&m_bBitstreamSupported, sizeof(m_bBitstreamSupported));
+	AM_SAMPLE2_PROPERTIES* const pProps = m_pInput->SampleProps();
+	if (pProps->dwStreamId != AM_STREAM_MEDIA) {
+		return m_pOutput->Deliver(pIn);
+	}
+
+	AM_MEDIA_TYPE* pmt;
+	if (SUCCEEDED(pIn->GetMediaType(&pmt)) && pmt) {
+		CMediaType mt(*pmt);
+		m_pInput->SetMediaType(&mt);
+		if (m_Subtype != pmt->subtype) {
+			m_Subtype = pmt->subtype;
+			m_CodecId = FindCodec(m_Subtype);
+			m_bFallBackToPCM = false;
+		}
+		DeleteMediaType(pmt);
+		pmt = nullptr;
+	}
+
+	if (m_bNeedBitstreamCheck) {
+		m_bNeedBitstreamCheck = FALSE;
 
 		const auto wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
 
@@ -493,21 +510,27 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 					switch (m_CodecId) {
 						case AV_CODEC_ID_AC3:
 						case AV_CODEC_ID_DTS:
-							mtCheck = CreateMediaTypeSPDIF(wfe->nSamplesPerSec);
-							m_bBitstreamSupported[SPDIF] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							if (!m_bBitstreamSupported[SPDIF]) {
+								mtCheck = CreateMediaTypeSPDIF(wfe->nSamplesPerSec);
+								m_bBitstreamSupported[SPDIF] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							}
 
-							if (m_CodecId == AV_CODEC_ID_DTS) {
+							if (m_CodecId == AV_CODEC_ID_DTS && !m_bBitstreamSupported[DTSHD]) {
 								mtCheck = CreateMediaTypeHDMI(IEC61937_DTSHD);
 								m_bBitstreamSupported[DTSHD] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
 							}
 							break;
 						case AV_CODEC_ID_EAC3:
-							mtCheck = CreateMediaTypeHDMI(IEC61937_EAC3);
-							m_bBitstreamSupported[EAC3] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							if (!m_bBitstreamSupported[EAC3]) {
+								mtCheck = CreateMediaTypeHDMI(IEC61937_EAC3);
+								m_bBitstreamSupported[EAC3] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							}
 							break;
 						case AV_CODEC_ID_TRUEHD:
-							mtCheck = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-							m_bBitstreamSupported[TRUEHD] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							if (!m_bBitstreamSupported[TRUEHD]) {
+								mtCheck = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+								m_bBitstreamSupported[TRUEHD] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							}
 							break;
 					}
 
@@ -522,26 +545,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		}
 	}
 
-	HRESULT hr;
-
-	AM_SAMPLE2_PROPERTIES* const pProps = m_pInput->SampleProps();
-	if (pProps->dwStreamId != AM_STREAM_MEDIA) {
-		return m_pOutput->Deliver(pIn);
-	}
-
-	AM_MEDIA_TYPE* pmt;
-	if (SUCCEEDED(pIn->GetMediaType(&pmt)) && pmt) {
-		CMediaType mt(*pmt);
-		m_pInput->SetMediaType(&mt);
-		if (m_Subtype != pmt->subtype) {
-			m_Subtype = pmt->subtype;
-			m_CodecId = FindCodec(m_Subtype);
-			m_bFallBackToPCM = false;
-		}
-		DeleteMediaType(pmt);
-		pmt = nullptr;
-	}
-
+	HRESULT hr = S_OK;
 	BYTE* pDataIn = nullptr;
 	if (FAILED(hr = pIn->GetPointer(&pDataIn))) {
 		return hr;
@@ -648,7 +652,7 @@ HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePi
 		if (S_OK == pReceivePin->ConnectionMediaType(&mt)) {
 			m_Subtype = mt.subtype;
 			m_CodecId = FindCodec(m_Subtype);
-			m_bNeedCheck = TRUE;
+			m_bNeedBitstreamCheck = TRUE;
 		}
 	}
 
@@ -2497,7 +2501,9 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 				m_JitterLimit = MAX_JITTER;
 			}
 
-			m_bNeedCheck = TRUE;
+			if (nCodecId != m_CodecId) {
+				m_bNeedBitstreamCheck = TRUE;
+			}
 		} else {
 			m_faJitter.SetNumSamples(50);
 			m_JitterLimit = MAX_JITTER;
@@ -2513,7 +2519,7 @@ HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
 
 	if (dir == PINDIR_INPUT) {
 		m_FFAudioDec.StreamFinish();
-		m_bNeedCheck = TRUE;
+		m_bNeedBitstreamCheck = TRUE;
 	}
 
 	return __super::BreakConnect(dir);
