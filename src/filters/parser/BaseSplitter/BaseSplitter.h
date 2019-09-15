@@ -103,8 +103,8 @@ protected:
 
 	DWORD m_nFlag;
 
-	int m_iBufferDuration; //  100..15000 ms
-	int m_iNetworkTimeout; // 2000..20000 ms
+	int m_iQueueDuration;  //  100..15000 ms
+	//int m_iNetworkTimeout; // 2000..20000 ms
 
 	REFERENCE_TIME m_rtOffset = INVALID_TIME;
 

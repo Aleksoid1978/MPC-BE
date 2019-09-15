@@ -150,16 +150,16 @@ STDMETHODIMP CRawVideoSplitterFilter::SetInt(LPCSTR field, int value)
 		if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
 			return E_ABORT; // hack. hard-coded in CreateOutputs()
 		}
-		if (value < BUFFER_DURATION_MIN || value > BUFFER_DURATION_MAX) {
+		if (value < QUEUE_DURATION_MIN || value > QUEUE_DURATION_MAX) {
 			return E_INVALIDARG;
 		}
 		if (value > 5000) {
 			// limit the maximum buffer, because RAW video has very large bitrates, and for single video streams there is no sense in a long queue.
-			m_iBufferDuration = 5000;
+			m_iQueueDuration = 5000;
 			return S_FALSE;
 		}
 
-		m_iBufferDuration = value;
+		m_iQueueDuration = value;
 		return S_OK;
 	}
 
@@ -838,7 +838,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
-		m_iBufferDuration = 200; // hack. equivalent to 240 packets
+		m_iQueueDuration = 200; // hack. equivalent to 240 packets
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;

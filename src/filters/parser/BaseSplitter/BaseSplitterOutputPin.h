@@ -28,9 +28,9 @@
 #include "../../../DSUtil/Packet.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 
-#define BUFFER_DURATION_MIN   100
-#define BUFFER_DURATION_DEF  3000
-#define BUFFER_DURATION_MAX 15000
+#define QUEUE_DURATION_MIN    100
+#define QUEUE_DURATION_DEF   3000
+#define QUEUE_DURATION_MAX  15000
 
 #define NETWORK_TIMEOUT_MIN  2000
 #define NETWORK_TIMEOUT_DEF 10000
@@ -50,8 +50,8 @@ private:
 	bool			m_fFlushed			= false;
 	CAMEvent		m_eEndFlush			= TRUE;
 
-	REFERENCE_TIME	m_maxQueueDuration	= BUFFER_DURATION_DEF * 10000;
-	size_t			m_maxQueueCount		= BUFFER_DURATION_DEF * 12 / 10;
+	REFERENCE_TIME	m_maxQueueDuration	= QUEUE_DURATION_DEF * 10000;
+	size_t			m_maxQueueCount		= QUEUE_DURATION_DEF * 12 / 10;
 
 	REFERENCE_TIME	m_rtPrev			= INVALID_TIME;
 
