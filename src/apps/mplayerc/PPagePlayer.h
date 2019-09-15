@@ -22,7 +22,7 @@
 #pragma once
 
 #include "PPageBase.h"
-
+#include "controls/FloatEdit.h"
 
 // CPPagePlayer dialog
 
@@ -52,7 +52,10 @@ public:
 	CComboBox m_cbTitleBarPrefix;
 	CComboBox m_cbSeekBarText;
 
-	CSpinButtonCtrl m_RecentFilesCtrl;
+	CSpinButtonCtrl m_spnRecentFiles;
+
+	CIntEdit m_edtNetworkTimeout;
+	CSpinButtonCtrl m_spnNetworkTimeout;
 
 	enum { IDD = IDD_PPAGEPLAYER };
 

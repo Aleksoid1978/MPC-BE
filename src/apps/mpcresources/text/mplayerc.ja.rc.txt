@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 39		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"開くオプション"
 6		"複数起動を禁止する"
 7		"同じプレーヤーで開く"
@@ -397,6 +397,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
 28		"MPC-BE のフォルダー内に設定を保存する"
 29		"「ディスクを開く」のメニューを無効にする"
 30		"プロセスの優先度を 通常以上 にする"
+31		"Network timout*:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

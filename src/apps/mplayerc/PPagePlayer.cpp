@@ -70,7 +70,9 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2,   m_bRememberPlaylistItems);
 	DDX_Text(pDX, IDC_EDIT1,     m_nRecentFiles);
-	DDX_Control(pDX, IDC_SPIN1,  m_RecentFilesCtrl);
+	DDX_Control(pDX, IDC_SPIN1,  m_spnRecentFiles);
+	DDX_Control(pDX, IDC_EDIT2,  m_edtNetworkTimeout);
+	DDX_Control(pDX, IDC_SPIN2,  m_spnNetworkTimeout);
 
 	m_nRecentFiles = std::clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 }
@@ -129,16 +131,20 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
 
 	m_nRecentFiles = s.iRecentFilesNumber;
-	m_RecentFilesCtrl.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
-	m_RecentFilesCtrl.SetPos(m_nRecentFiles);
+	m_spnRecentFiles.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
+	m_spnRecentFiles.SetPos(m_nRecentFiles);
 	UDACCEL acc = {0, 5};
-	m_RecentFilesCtrl.SetAccel(1, &acc);
+	m_spnRecentFiles.SetAccel(1, &acc);
+
+	m_edtNetworkTimeout = std::clamp(s.iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX) / 1000;
+	m_edtNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN / 1000, APP_NETTIMEOUT_MAX / 1000);
+	m_spnNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN / 1000, APP_NETTIMEOUT_MAX / 1000);
 
 	UpdateData(FALSE);
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.bKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.bKeepHistory);
-	m_RecentFilesCtrl.EnableWindow(s.bKeepHistory);
+	m_spnRecentFiles.EnableWindow(s.bKeepHistory);
 
 	CString iniDirPath = GetProgramDir();
 	HANDLE hDir = CreateFileW(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
@@ -222,6 +228,8 @@ BOOL CPPagePlayer::OnApply()
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
+	s.iNetworkTimeout = m_edtNetworkTimeout * 1000;
+
 	// Check if the settings location needs to be changed
 	if (AfxGetProfile().IsIniValid() != !!m_bUseIni) {
 		pFrame->m_wndPlaylistBar.TDeleteAllPlaylists();
@@ -235,7 +243,7 @@ BOOL CPPagePlayer::OnApply()
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.bKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.bKeepHistory);
-	m_RecentFilesCtrl.EnableWindow(s.bKeepHistory);
+	m_spnRecentFiles.EnableWindow(s.bKeepHistory);
 
 	return __super::OnApply();
 }
