@@ -8053,21 +8053,6 @@ void File_Mxf::SoundfieldGroupLabelSubDescriptor()
     if (Descriptors[InstanceUID].Type==descriptor::Type_Unknown)
         Descriptors[InstanceUID].Type=descriptor::Type_SoundfieldGroupLabelSubDescriptor;
 
-    if (Code2>=0x8000)
-    {
-        // Not a short code
-        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
-        if (Primer_Value!=Primer_Values.end())
-        {
-            int32u Code_Compare1=Primer_Value->second.hi>>32;
-            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
-            int32u Code_Compare3=Primer_Value->second.lo>>32;
-            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
-            if(0);
-            ELEMENT_UUID(GroupOfSoundfieldGroupsLinkID,                 "Group Of Soundfield Groups Link ID")
-        }
-    }
-
     //switch(Code2)
     //{
     //    default:

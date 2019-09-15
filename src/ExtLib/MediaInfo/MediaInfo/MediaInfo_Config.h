@@ -80,7 +80,7 @@ class MediaInfo_Config
 public :
     //Constructor/Destructor
     MediaInfo_Config() {}
-    void Init(); //Must be called instead of constructor
+    void Init(bool Force=false); //Must be called instead of constructor
 
     //General
     Ztring Option (const String &Option, const String &Value=Ztring());

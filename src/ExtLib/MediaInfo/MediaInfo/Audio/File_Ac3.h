@@ -11,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/TimeCode.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -177,12 +178,11 @@ private :
     bool   TimeStamp_IsPresent;
     bool   TimeStamp_IsParsing;
     bool   TimeStamp_Parsed;
-    bool   TimeStamp_DropFrame_IsValid;
-    bool   TimeStamp_DropFrame_Content;
     bool   BigEndian;
     bool   IgnoreCrc_Done;
     bool   IgnoreCrc;
-    float64 TimeStamp_Content;
+    TimeCode TimeStamp_FirstFrame;
+    size_t TimeStamp_Count;
 };
 
 } //NameSpace

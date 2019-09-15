@@ -178,14 +178,124 @@ static Ztring Mpeg4_Encoded_Library(int32u Vendor)
 //---------------------------------------------------------------------------
 static Ztring Mpeg4_Language_Apple(int16u Language)
 {
-    switch (Language)
-    {
-        case  0 : return __T("en");
-        case  1 : return __T("fr");
-        case  2 : return __T("de");
-        case  6 : return __T("es");
-        default: return Ztring::ToZtring(Language);
-    }
+    static const int16u ListSize=106;
+    static const char* Languages[ListSize] = {
+        "en", // English
+        "fr", // French
+        "de", // German
+        "it", // Italian
+        "nl", // Dutch
+        "sv", // Swedish
+        "es", // Spanish
+        "da", // Danish
+        "pt", // Portuguese
+        "no", // Norwegian
+        "he", // Hebrew
+        "ja", // Japanese
+        "ar", // Arabic
+        "fi", // Finnish
+        "el", // Greek
+        "is", // Icelandic
+        "mt", // Maltese
+        "tr", // Turkish
+        "hr", // Croatian
+        "zh-tw", // Chinese (Taiwan)
+        "ur", // Urdu
+        "hi", // Hindi
+        "th", // Thai
+        "ko", // Korean
+        "lt", // Lithuanian
+        "pl", // Polish
+        "hu", // Hungarian
+        "et", // Estonian
+        "lv", // Latvian
+        "smi", // Sami
+        "fo", // Faroese
+        "fa", // Persian
+        "ru", // Russian
+        "zh-cn", // Chinese (China)
+        "nl-be", // Flemish
+        "ga", // Irish
+        "sq", // Albanian
+        "ro", // Romanian
+        "cs", // Czech
+        "sk", // Slovak
+        "sl", // Slovenian
+        "yi", // Yiddish
+        "sr", // Serbian
+        "mk", // Macedonian
+        "bg", // Bulgarian
+        "uk", // Ukrainian
+        "be", // Belarusian
+        "uz", // Uzbek
+        "kk", // Kazakh
+        "az", // Azerbaijani
+        "hy-az", // Armenian (Azerbaijani)
+        "hy", // Armenian
+        "ka", // Georgian
+        "mo", // Moldavian
+        "ky", // Kirghiz
+        "tg", // Tajik
+        "tk", // Turkmen
+        "mn-cn", // Mongolian (China)
+        "mn", // Mongolian
+        "ps", // Pushto
+        "ku", // Kurdish
+        "ks", // Kashmiri
+        "sd", // Sindhi
+        "bo", // Tibetan
+        "ne", // Nepali
+        "sa", // Sanskrit
+        "mr", // Marathi
+        "bn", // Bengali
+        "as", // Assamese
+        "gu", // Gujarati
+        "pa", // Panjabi
+        "or", // Oriya
+        "ml", // Malayalam
+        "kn", // Kannada
+        "ta", // Tamil
+        "te", // Telugu
+        "si", // Sinhala
+        "my", // Burmese
+        "km", // Khmer
+        "lo", // Lao
+        "vi", // Vietnamese
+        "id", // Indonesian
+        "tl", // Tagalog
+        "ms", // Malay
+        "ms-bn", // Malay (Brunei)
+        "am", // Amharic
+        "86", // Empty
+        "om", // Oromo
+        "so", // Somali
+        "sw", // Swahili
+        "rw", // Kinyarwanda
+        "rn", // Rundi
+        "ny", // Nyanja
+        "mg", // Malagasy
+        "eo", // Esperanto
+        // Gap 95-128
+        "cy", // Welsh
+        "eu", // Basque
+        "ca", // Catalan
+        "la", // Latin
+        "qu", // Quechua
+        "gn", // Guarani
+        "ay", // Aymara
+        "tt", // Tatar
+        "ug", // Uighur
+        "dz", // Dzongkha
+        "jv" // Javanese
+    };
+
+    if (Language>94)
+        Language-=(128-94); // Gap in the list
+
+    if (Language>=ListSize)
+        return Ztring::ToZtring(Language);
+
+    return Ztring().From_UTF8(Languages[Language]);
 }
 
 //---------------------------------------------------------------------------

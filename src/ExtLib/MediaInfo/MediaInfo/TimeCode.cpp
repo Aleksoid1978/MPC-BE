@@ -33,6 +33,9 @@ TimeCode::TimeCode ()
     Minutes((int8u)-1),
     Seconds((int8u)-1),
     Frames((int8u)-1),
+    MoreSamples(0),
+    MoreSamples_Frequency(0),
+    FramesPerSecond_Is1001(false),
     FramesPerSecond(0),
     DropFrame(false),
     MustUseSecondField(false),
@@ -47,6 +50,9 @@ TimeCode::TimeCode (int8u Hours_, int8u Minutes_, int8u Seconds_, int8u Frames_,
     Minutes(Minutes_),
     Seconds(Seconds_),
     Frames(Frames_),
+    MoreSamples(0),
+    MoreSamples_Frequency(0),
+    FramesPerSecond_Is1001(false),
     FramesPerSecond(FramesPerSecond_),
     DropFrame(DropFrame_),
     MustUseSecondField(MustUseSecondField_),
@@ -58,6 +64,9 @@ TimeCode::TimeCode (int8u Hours_, int8u Minutes_, int8u Seconds_, int8u Frames_,
 //---------------------------------------------------------------------------
 TimeCode::TimeCode (int64s Frames_, int8u FramesPerSecond_, bool DropFrame_, bool MustUseSecondField_, bool IsSecondField_)
 :   FramesPerSecond(FramesPerSecond_),
+    MoreSamples(0),
+    MoreSamples_Frequency(0),
+    FramesPerSecond_Is1001(false),
     DropFrame(DropFrame_),
     MustUseSecondField(MustUseSecondField_),
     IsSecondField(IsSecondField_)
@@ -210,6 +219,23 @@ string TimeCode::ToString()
     TC+=DropFrame?';':':';
     TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))/10);
     TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))%10);
+    if (MoreSamples && MoreSamples_Frequency)
+    {
+        if (MoreSamples>0)
+            TC += '+';
+        else
+        {
+            TC += '-';
+            MoreSamples = -MoreSamples;
+        }
+        stringstream s;
+        s<<MoreSamples;
+        TC+=s.str();
+        TC+='/';
+        s.str(string());
+        s<<MoreSamples_Frequency;
+        TC+=s.str();
+    }
 
     return TC;
 }

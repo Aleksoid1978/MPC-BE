@@ -70,6 +70,9 @@
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
 #endif
+#if defined(MEDIAINFO_AC4_YES)
+    #include "MediaInfo/Audio/File_Ac4.h"
+#endif
 #if defined(MEDIAINFO_SMPTEST0337_YES)
     #include "MediaInfo/Audio/File_ChannelGrouping.h"
 #endif
@@ -555,6 +558,31 @@ const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
     extern std::string DTS_HD_SpeakerActivityMask2 (int16u SpeakerActivityMask, bool AddCs=false, bool AddLrsRrs=false);
 #endif //defined(MEDIAINFO_DTS_YES)
 
+//---------------------------------------------------------------------------
+int8u File_Mpeg4_PcmSampleSizeFromCodecID(int32u CodecID)
+{
+    switch (CodecID)
+    {
+        case 0x72617720:
+            return 8;
+        case 0x00000000:
+        case 0x4E4F4E45:
+        case 0x74776F73:
+        case 0x736F7774:
+            return 16;
+        case 0x696E3234:
+            return 24;
+        case 0x666C3332:
+        case 0x696E3332:
+            return 32;
+        case 0x666C3634:
+        case 0x696E3634:
+            return 64;
+        default:
+            return 0;
+    }
+}
+
 //***************************************************************************
 // Constants
 //***************************************************************************
@@ -739,6 +767,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof=0x70726F66;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_d263=0x64323633;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dac3=0x64616333;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dac4=0x64616334;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_damr=0x64616D72;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dec3=0x64656333;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_ddts=0x64647473;
@@ -1120,6 +1149,7 @@ void File_Mpeg4::Data_Parse()
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_colr)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_d263)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dac3)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dac4)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_damr)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dec3)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_ddts)
@@ -3743,7 +3773,6 @@ void File_Mpeg4::moov_trak_mdia_hdlr()
     //Parsing
     Ztring Title;
     int32u Type, SubType, Manufacturer;
-    int8u Size;
     Get_C4 (Type,                                               "Component type");
     Get_C4 (SubType,                                            "Component subtype");
     Get_C4 (Manufacturer,                                       "Component manufacturer");
@@ -3751,24 +3780,63 @@ void File_Mpeg4::moov_trak_mdia_hdlr()
     Skip_B4(                                                    "Component flags mask");
     if (Element_Offset<Element_Size)
     {
-        Peek_B1(Size);
-        std::string TitleS;
-        if (Element_Offset+1+Size==Element_Size)
+        //Found 3 types, whatever is the ftyp:
+        //- copy of Type
+        //- QuickTime style
+        //- ISO style (with or without '\0')
+        //With sometimes sub-boxes
+
+        //If it is a copy of Type
+        bool NameIsParsed=false;
+        if (Element_Offset+4==Element_Size || (Element_Offset+4<Element_Size && Buffer[Buffer_Offset+(size_t)Element_Offset+4]=='\0'))
         {
-            Skip_B1(                                                "Component name size");
-            Get_String(Size, TitleS,                                "Component name");
+            int32u SubType2;
+            Peek_B4(SubType2);
+            if (SubType2==SubType)
+            {
+                Skip_C4(                                        "Component name");
+                NameIsParsed=true;
+            }
         }
-        else
+        //QuickTime style or ISO style
+        if (!NameIsParsed)
         {
-            Get_String(Element_Size-Element_Offset, TitleS,         "Component name");
+            //Looking for trailing nul
+            size_t Pos=(size_t)Element_Offset;
+            while (Pos<Element_Size && Buffer[Buffer_Offset+Pos]!='\0')
+                Pos++;
+
+            //Trying to guess if it is QuickTime style, with all invalid "flavors" found in files (lot of zeroes in the name, size includes the size byte...)
+            int8u Size;
+            Peek_B1(Size);
+            bool IsMacStyle;
+            if (Size<0x20 || Element_Offset+1+Size==Element_Size || Element_Offset+1+Size==Pos || (Pos+1<Element_Size && Element_Offset+2+Size==Pos))
+            {
+                IsMacStyle=true;
+                if (Element_Offset+Size==Element_Size)
+                    Size--;
+            }
+            else
+                IsMacStyle=false;
+
+            //Parsing
+            if (IsMacStyle)
+            {
+                Skip_B1(                                        IsQt()?"Component name size":"Component name size (not in specs)"); // This is an invalid stream if MP4
+                if (Element_Offset+Size<=Element_Size)
+                    Get_MacRoman(Size, Title,                   "Component name");
+                else
+                    Skip_XX(Element_Size-Element_Offset,        "Component name decoding issue, skiping");
+            }
+            else
+            {
+                Get_UTF8(Pos-Element_Offset, Title,             "Component name");
+                if (Element_Offset<Element_Size)
+                    Element_Offset++; // Skip trailing nul
+            }
         }
-        if (!TitleS.empty())
-        {
-            Title.From_UTF8(TitleS.c_str());
-            if (Title.empty())
-                Title.From_ISO_8859_1(TitleS.c_str()); //Trying ISO 8859-1...
-        }
-        if (Title.find(__T("Handler"))!=std::string::npos || Title.find(__T("handler"))!=std::string::npos || Title.find(__T("vide"))!=std::string::npos || Title.find(__T("soun"))!=std::string::npos || Title==Ztring().From_CC4(SubType))
+        
+        if (Title.find(__T("Handler"))!=string::npos || Title.find(__T(" handler"))!=string::npos || Title.find(__T("Gestionnaire "))==0 || Title.find(__T("Module "))==0 || Title.find(__T("Gestor "))==0 || Title.find(__T("Procedura "))==0)
             Title.clear(); //This is not a Title
     }
 
@@ -5060,17 +5128,23 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
     int64s SampleRate=0;
     int32u Channels=0, SampleSize=0, Flags=0;
     int16u Version=0, ID;
-    if (!IsQt() && Element_Code==0x6D703461) // like ISO MP4 and CodecID is mp4a
+    if (!IsQt()) // like ISO MP4
     {
-        int16u SampleRate16;
+        int16u Channels16, SampleSize16, SampleRate16;
         Skip_B4(                                                "reserved (0)");
         Skip_B4(                                                "reserved (0)");
-        Skip_B2(                                                "reserved (2)");
-        Skip_B2(                                                "reserved (16)");
-        Skip_B4(                                                "reserved (0)");
-        Get_B2 (SampleRate16,                                   "time-scale");
+        Get_B2 (Channels16,                                     "channelcount (2)");
+        Get_B2 (SampleSize16,                                   "samplesize (16)");
+        Skip_B2(                                                "pre_defined (0)");
         Skip_B2(                                                "reserved (0)");
-        SampleRate=SampleRate16;
+        Get_B2 (SampleRate16,                                   "samplerate");
+        Skip_B2(                                                "samplerate (0)");
+        if (MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("PCM"))
+        {
+            Channels=Channels16;
+            SampleSize=SampleSize16;
+            SampleRate=SampleRate16;
+        }
     }
     else
     {
@@ -5088,13 +5162,27 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
         Skip_B2(                                                "Reserved");
         if (Version>=1)
         {
-            Skip_B4(                                            "Samples per packet");
-            Skip_B4(                                            "Bytes per packet");
-            Skip_B4(                                            "Bytes per frame");
-            Skip_B4(                                            "Bytes per sample");
+            int32u SamplesPerPacket, BytesPerPacket, BytesPerFrame, BytesPerSample;
+            Get_B4 (SamplesPerPacket,                           "Samples per packet");
+            Get_B4 (BytesPerPacket,                             "Bytes per packet");
+            Get_B4 (BytesPerFrame,                              "Bytes per frame");
+            Get_B4 (BytesPerSample,                             "Bytes per sample");
+            if (SampleSize16==16)
+            {
+                //Sample size may be hard coded 16, we need to compute sample size from elsewhere
+                if (BytesPerFrame && Channels16 && MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("PCM"))
+                {
+                    SampleSize=BytesPerFrame*8/Channels16;
+                    if (SampleSize%8==0 && SampleSize/8!=BytesPerSample)
+                        SampleSize=0; // It is maybe not PCM, ignoring
+                }
+            }
+            else
+                SampleSize=SampleSize16;
         }
+        else
+            SampleSize=SampleSize16;
         Channels=Channels16;
-        SampleSize=SampleSize16;
         SampleRate=SampleRate16;
     }
     else if (Version==2)
@@ -5123,13 +5211,9 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
     }
     }
 
-    //Bug found in one file: sample size is 16 with a 24-bit CodecID ("in24")
-    if (Element_Code==0x696E3234 && SampleSize==16)
-        SampleSize=24; //Correcting the header
-    //Bug found in one file: sample size is 16 with a 32-bit CodecID ("fl32")
-    if (Element_Code==0x666C3332 && SampleSize==16)
-        SampleSize=32; //Correcting the header
-
+    if (SampleSize==0 && MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("PCM"))
+        SampleSize=File_Mpeg4_PcmSampleSizeFromCodecID((int32u)Element_Code);
+    
     if (moov_trak_mdia_minf_stbl_stsd_Pos)
         return; //Handling only the first description
 
@@ -6397,6 +6481,35 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dac3()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dac4()
+{
+    Element_Name("AC4SpecificBox");
+    Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, "", Unlimited, true, true); //Remove the value (is always wrong in the stsd atom)
+
+    //Parsing
+    if (moov_trak_mdia_minf_stbl_stsd_Pos>1)
+        return; //Handling only the first description
+
+    #ifdef MEDIAINFO_AC4_YES
+        if (Streams[moov_trak_tkhd_TrackID].Parsers.empty())
+        {
+            File_Ac4* Parser=new File_Ac4;
+            Open_Buffer_Init(Parser);
+            Parser->MustParse_dac4=true;
+            Parser->MustSynchronize=false;
+            Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+            mdat_MustParse=true; //Data is in MDAT
+
+            //Parsing
+            Open_Buffer_Continue(Parser);
+        }
+    #else
+        Skip_XX(Element_Size,                                   "AC-4 Data");
+
+        Fill(Stream_Audio, StreamKind_Last, Audio_Format, "AC-4");
+    #endif
+}
+//---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_damr()
 {
     Element_Name("AMR decode config");
@@ -6439,7 +6552,6 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dec3()
         {
             File_Ac3* Parser=new File_Ac3;
             Open_Buffer_Init(Parser);
-            Parser->Frame_Count_Valid=2;
             Parser->MustParse_dec3=true;
             Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
             mdat_MustParse=true; //Data is in MDAT

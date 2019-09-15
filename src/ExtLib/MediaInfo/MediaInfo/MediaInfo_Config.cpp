@@ -133,12 +133,145 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v19.07");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v19.09");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
 const ZtringListList EmptyZtringListList_Const; //Use it when we can't return a reference to a true ZtringListList, const version
 //---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+extern const int16u Ztring_MacRoman[128]=
+{
+    0x00C4,
+    0x00C5,
+    0x00C7,
+    0x00C9,
+    0x00D1,
+    0x00D6,
+    0x00DC,
+    0x00E1,
+    0x00E0,
+    0x00E2,
+    0x00E4,
+    0x00E3,
+    0x00E5,
+    0x00E7,
+    0x00E9,
+    0x00E8,
+    0x00EA,
+    0x00EB,
+    0x00ED,
+    0x00EC,
+    0x00EE,
+    0x00EF,
+    0x00F1,
+    0x00F3,
+    0x00F2,
+    0x00F4,
+    0x00F6,
+    0x00F5,
+    0x00FA,
+    0x00F9,
+    0x00FB,
+    0x00FC,
+    0x2020,
+    0x00B0,
+    0x00A2,
+    0x00A3,
+    0x00A7,
+    0x2022,
+    0x00B6,
+    0x00DF,
+    0x00AE,
+    0x00A9,
+    0x2122,
+    0x00B4,
+    0x00A8,
+    0x2260,
+    0x00C6,
+    0x00D8,
+    0x221E,
+    0x00B1,
+    0x2264,
+    0x2265,
+    0x00A5,
+    0x00B5,
+    0x2202,
+    0x2211,
+    0x220F,
+    0x03C0,
+    0x222B,
+    0x00AA,
+    0x00BA,
+    0x03A9,
+    0x00E6,
+    0x00F8,
+    0x00BF,
+    0x00A1,
+    0x00AC,
+    0x221A,
+    0x0192,
+    0x2248,
+    0x2206,
+    0x00AB,
+    0x00BB,
+    0x2026,
+    0x00A0,
+    0x00C0,
+    0x00C3,
+    0x00D5,
+    0x0152,
+    0x0153,
+    0x2013,
+    0x2014,
+    0x201C,
+    0x201D,
+    0x2018,
+    0x2019,
+    0x00F7,
+    0x25CA,
+    0x00FF,
+    0x0178,
+    0x2044,
+    0x20AC,
+    0x2039,
+    0x203A,
+    0xFB01,
+    0xFB02,
+    0x2021,
+    0x00B7,
+    0x201A,
+    0x201E,
+    0x2030,
+    0x00C2,
+    0x00CA,
+    0x00C1,
+    0x00CB,
+    0x00C8,
+    0x00CD,
+    0x00CE,
+    0x00CF,
+    0x00CC,
+    0x00D3,
+    0x00D4,
+    0xF8FF,
+    0x00D2,
+    0x00DA,
+    0x00DB,
+    0x00D9,
+    0x0131,
+    0x02C6,
+    0x02DC,
+    0x00AF,
+    0x02D8,
+    0x02D9,
+    0x02DA,
+    0x00B8,
+    0x02DD,
+    0x02DB,
+    0x02C7,
+};
 
 //---------------------------------------------------------------------------
 void MediaInfo_Config_CodecID_General_Mpeg4   (InfoMap &Info);
@@ -216,14 +349,64 @@ MediaInfo_Config Config;
 // Constructor/Destructor
 //***************************************************************************
 
-void MediaInfo_Config::Init()
+void MediaInfo_Config::Init(bool Force)
 {
     {
         CriticalSectionLocker CSL(CS);
     //We use Init() instead of COnstructor because for some backends (like WxWidgets...) does NOT like constructor of static object with Unicode conversion
 
     //Test
-    if (!LineSeparator.empty())
+    if (Force)
+    {
+        #if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES) || MEDIAINFO_ADVANCED
+            ExternalMetadata.clear();
+            ExternalMetaDataConfig.clear();
+        #endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES) || MEDIAINFO_ADVANCED
+        #ifdef MEDIAINFO_ADVANCED
+            ParseOnlyKnownExtensions.clear();
+        #endif
+        Trace_Layers.reset();
+        Trace_Modificators.clear();
+        Version.clear();
+        Version.clear();
+        ColumnSeparator.clear();
+        LineSeparator.clear();
+        TagSeparator.clear();
+        Quote.clear();
+        DecimalPoint.clear();
+        ThousandsPoint.clear();
+        CarriageReturnReplace.clear();
+        Language.clear();
+        Custom_View.clear();
+        Custom_View_Replace.clear();
+        Container.clear();
+        for (size_t Format=0; Format<InfoCodecID_Format_Max; Format++)
+            for (size_t StreamKind=0; StreamKind<Stream_Max; StreamKind++)
+                CodecID[Format][StreamKind].clear();
+        Format.clear();
+        Codec.clear();
+        for (size_t Format=0; Format<InfoLibrary_Format_Max; Format++)
+            Library[Format].clear();
+        Iso639_1.clear();
+        Iso639_2.clear();
+        for (size_t StreamKind=0; StreamKind<Stream_Max; StreamKind++)
+            Info[StreamKind].clear();
+        SubFile_Config.clear();
+        CustomMapping.clear();
+        #if defined(MEDIAINFO_LIBCURL_YES)
+            Ssh_PublicKeyFileName.clear();
+            Ssh_PrivateKeyFileName.clear();
+            Ssh_KnownHostsFileName.clear();
+            Ssl_CertificateFileName.clear();
+            Ssl_CertificateFormat.clear();
+            Ssl_PrivateKeyFileName.clear();
+            Ssl_PrivateKeyFormat.clear();
+            Ssl_CertificateAuthorityFileName.clear();
+            Ssl_CertificateAuthorityPath.clear();
+            Ssl_CertificateRevocationListFileName.clear();
+        #endif //defined(MEDIAINFO_LIBCURL_YES)
+    }
+    else if (!LineSeparator.empty())
     {
         return; //Already done
     }

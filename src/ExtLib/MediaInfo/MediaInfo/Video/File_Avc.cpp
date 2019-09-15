@@ -928,6 +928,57 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     Fill(Stream_Video, 0, Video_ChromaSubsampling, Avc_ChromaSubsampling_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
+
+    hdr::iterator EtsiTs103433 = HDR.find(HdrFormat_EtsiTs103433);
+    if (EtsiTs103433 != HDR.end())
+    {
+        for (std::map<video, Ztring>::iterator Item = EtsiTs103433->second.begin(); Item != EtsiTs103433->second.end(); ++Item)
+        {
+            Fill(Stream_Video, 0, Item->first, Item->second);
+        }
+    }
+    hdr::iterator SmpteSt209440 = HDR.find(HdrFormat_SmpteSt209440);
+    if (SmpteSt209440 != HDR.end())
+    {
+        for (std::map<video, Ztring>::iterator Item = SmpteSt209440->second.begin(); Item != SmpteSt209440->second.end(); ++Item)
+        {
+            switch (Item->first)
+            {
+            case Video_MasteringDisplay_ColorPrimaries:
+            case Video_MasteringDisplay_Luminance:
+                if (Retrieve_Const(Stream_Video, 0, Item->first) == Item->second)
+                    break;
+                // Fallthrough
+            default:
+                Fill(Stream_Video, 0, Item->first, Item->second);
+            }
+        }
+    }
+    hdr::iterator SmpteSt2086 = HDR.find(HdrFormat_SmpteSt2086);
+    if (SmpteSt2086 != HDR.end())
+    {
+        for (std::map<video, Ztring>::iterator Item = SmpteSt2086->second.begin(); Item != SmpteSt2086->second.end(); ++Item)
+        {
+            bool Ignore;
+            switch (Item->first)
+            {
+            case Video_HDR_Format:
+                Ignore = !Retrieve_Const(Stream_Video, 0, Item->first).empty();
+                break;
+            case Video_MasteringDisplay_ColorPrimaries:
+            case Video_MasteringDisplay_Luminance:
+                Ignore = Retrieve_Const(Stream_Video, 0, Item->first) == Item->second;
+                break;
+            }
+            if (!Ignore)
+                Fill(Stream_Video, 0, Item->first, Item->second);
+        }
+    }
+
+    if (maximum_content_light_level)
+        Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
+    if (maximum_frame_average_light_level)
+        Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
 }
 
 //---------------------------------------------------------------------------
@@ -1442,6 +1493,8 @@ void File_Avc::Synched_Init()
     FirstPFrameInGop_IsParsed=false;
     Config_IsRepeated=false;
     tc=0;
+    maximum_content_light_level=0;
+    maximum_frame_average_light_level=0;
 
     //Default values
     Streams.resize(0x100);
@@ -2648,6 +2701,8 @@ void File_Avc::sei_message(int32u &seq_parameter_set_id)
         case  6 :   sei_message_recovery_point(); break;
         case 32 :   sei_message_mainconcept(payloadSize); break;
         case 147:   sei_alternative_transfer_characteristics(); break;
+        case 137:   sei_message_mastering_display_colour_volume(); break;
+        case 144:   sei_message_light_level(); break;
         default :
                     Element_Info1("unknown");
                     Skip_XX(payloadSize,                        "data");
@@ -3387,6 +3442,30 @@ void File_Avc::consumer_camera_2()
     Info_S1(3, zoom_U,                                          "units of e-zoom");
     Info_S1(4, zoom_D,                                          "1/10 of e-zoom"); /*if (zoom_D!=0xF)*/ Param_Info1(__T("zoom=")+Ztring().From_Number(zoom_U+((float32)zoom_U)/10, 2));
     BS_End();
+}
+
+//---------------------------------------------------------------------------
+void File_Avc::sei_message_mastering_display_colour_volume()
+{
+    Element_Info1("mastering_display_colour_volume");
+
+    std::map<video, Ztring>& SmpteSt2086 = HDR[HdrFormat_SmpteSt2086];
+    Ztring& HDR_Format = SmpteSt2086[Video_HDR_Format];
+    if (HDR_Format.empty())
+    {
+        HDR_Format = __T("SMPTE ST 2086");
+        SmpteSt2086[Video_HDR_Format_Compatibility] = "HDR10";
+    }
+    Get_MasteringDisplayColorVolume(SmpteSt2086[Video_MasteringDisplay_ColorPrimaries], SmpteSt2086[Video_MasteringDisplay_Luminance]);
+}
+//---------------------------------------------------------------------------
+void File_Avc::sei_message_light_level()
+{
+    Element_Info1("light_level");
+
+    //Parsing
+    Get_B2(maximum_content_light_level, "maximum_content_light_level");
+    Get_B2(maximum_frame_average_light_level, "maximum_frame_average_light_level");
 }
 
 //---------------------------------------------------------------------------

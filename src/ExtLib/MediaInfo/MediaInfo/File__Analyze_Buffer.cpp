@@ -1869,11 +1869,37 @@ void File__Analyze::Get_ISO_8859_5(int64u Bytes, Ztring &Info, const char* Name)
 }
 
 //---------------------------------------------------------------------------
+extern const int16u Ztring_MacRoman[128];
+void File__Analyze::Get_MacRoman(int64u Bytes, Ztring& Info, const char* Name)
+{
+    INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
+
+    // Use From_MacRoman() after new ZenLib release
+    const int8u* Input=Buffer+Buffer_Offset+(size_t)Element_Offset;
+
+    wchar_t* Temp=new wchar_t[Bytes+1];
+
+    for (size_t Pos=0; Pos<=Bytes; Pos++)
+    {
+        if (Input[Pos]>=0x80)
+            Temp[Pos]=(wchar_t)Ztring_MacRoman[Input[Pos]-0x80];
+        else
+            Temp[Pos]=(wchar_t)Input[Pos];
+    }
+
+    Info.From_Unicode(Temp);
+    delete[] Temp;
+
+    if (Trace_Activated && Bytes) Param(Name, Info);
+    Element_Offset+=Bytes;
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Get_String(int64u Bytes, std::string &Info, const char* Name)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
     Info.assign((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes);
-    if (Trace_Activated && Bytes) Param(Name, Info);
+    if (Trace_Activated && Bytes) Param(Name, Ztring().From_ISO_8859_1((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes)); //Trying with the most commonly used charset
     Element_Offset+=Bytes;
 }
 
@@ -1960,11 +1986,7 @@ void File__Analyze::Skip_ISO_6937_2(int64u Bytes, const char* Name)
 void File__Analyze::Skip_String(int64u Bytes, const char* Name)
 {
     INTEGRITY_SIZE_ATLEAST(Bytes);
-    #ifdef WINDOWS
-    if (Trace_Activated && Bytes) Param(Name, Ztring().From_Local((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes));
-    #else //WINDOWS
-    if (Trace_Activated && Bytes) Param(Name, Ztring().From_ISO_8859_1((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes)); //Trying with the most commonly used charset before UTF8
-    #endif //WINDOWS
+    if (Trace_Activated && Bytes) Param(Name, Ztring().From_ISO_8859_1((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes)); //Trying with the most commonly used charset
     Element_Offset+=Bytes;
 }
 

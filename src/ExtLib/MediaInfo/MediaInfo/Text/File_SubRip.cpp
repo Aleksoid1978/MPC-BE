@@ -142,7 +142,9 @@ bool File_SubRip::FileHeader_Begin()
     }
     Temp.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
     Temp.FindAndReplace(__T("\r"), __T("\n"), 0, Ztring_Recursive);
+    List.Quote_Set(__T("\r")); // Should be empty string for indicating that there is no quote sepcial char, but old versions of ZenLib are buggy
     List.Write(Temp);
+    Temp = List.Read();
 
     if (List(0, 0)==__T("WEBVTT FILE") || List(0, 0)==__T("WEBVTT"))
         IsVTT=true;
@@ -151,12 +153,18 @@ bool File_SubRip::FileHeader_Begin()
     {
         size_t IsOk=0;
         size_t IsNok=0;
+        int64u Number=1;
         for (size_t Pos=0; Pos<List.size(); Pos++)
         {
-            if (List(Pos, 0).To_int64u()==Pos+1)
+            int64u NewNumber=List(Pos, 0).To_int64u();
+            if (NewNumber==Number)
                 IsOk++;
             else
+            {
                 IsNok++;
+                Number=NewNumber;
+            }
+            Number++;
 
             if (List(Pos, 1).size()>22 && List(Pos, 1)[2]==__T(':') && List(Pos, 1)[5]==__T(':') && List(Pos, 1).find(__T(" --> "))!=string::npos)
                 IsOk++;

@@ -404,6 +404,8 @@ void File_Pcm::Data_Parse()
         {
             Demux(Buffer+Buffer_Offset, (size_t)Element_Size, ContentType_MainStream);
         }
+        if (Frame_Count_NotParsedIncluded!=(int64u)-1 && !Demux_Items.empty())
+            Frame_Count_NotParsedIncluded+=Demux_Items.size()-1;
     #endif //MEDIAINFO_DEMUX
 
     //Parsing

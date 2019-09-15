@@ -129,6 +129,8 @@ void File_ProRes::Read_Buffer_Continue()
         Get_C4 (creatorID,                                      "creatorID");
         Get_B2 (frameWidth,                                     "frameWidth");
         Get_B2 (frameHeight,                                    "frameHeight");
+        if (Name==0x69637066) // icpf
+        {
         BS_Begin();
         Get_S1 (2, chrominance_factor,                          "chrominance factor"); Param_Info1(ProRes_chrominance_factor(chrominance_factor));
         Skip_S1(2,                                              "reserved");
@@ -153,6 +155,12 @@ void File_ProRes::Read_Buffer_Continue()
             Skip_XX(64,                                         "QMatLuma");
         if (chroma)
             Skip_XX(64,                                         "QMatChroma");
+        }
+        else
+        {
+            if (hdrSize>20)
+                Skip_XX(hdrSize-20,                             "Unknown");
+        }
     Element_End();
     if (Name==0x69637066 && Element_Offset!=8+(int32u)hdrSize) // Coherency test icpf
         IsOk=false;

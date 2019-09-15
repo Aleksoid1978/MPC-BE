@@ -25,6 +25,9 @@
 #ifdef MEDIAINFO_MPEG4_YES
     #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 #endif
+#ifdef MEDIAINFO_AC4_YES
+    #include "MediaInfo/Audio/File_Ac4.h"
+#endif
 #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
     #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
@@ -2830,6 +2833,7 @@ void File_Mpeg_Descriptors::Descriptor_7F()
     switch (descriptor_tag_extension)
     {
         case 0x0F : Descriptor_7F_0F(); break;
+        case 0x15 : Descriptor_7F_15(); break;
         default   : Skip_XX(Element_Size-Element_Offset,        "Unknown");
                     if (elementary_PID_IsValid)
                     {
@@ -2857,6 +2861,27 @@ void File_Mpeg_Descriptors::Descriptor_7F_0F()
     FILLING_END();
 }
 
+//---------------------------------------------------------------------------
+void File_Mpeg_Descriptors::Descriptor_7F_15()
+{
+    //Parsing
+    bool ac4_config_flag, ac4_toc_flag;
+    BS_Begin();
+    Get_SB (ac4_config_flag,                                    "ac4_config_flag");
+    Get_SB (ac4_toc_flag,                                       "ac4_toc_flag");
+    Skip_S1(6,                                                  "reserved");
+    if (Data_BS_Remain());
+        Skip_BS(Data_BS_Remain(),                               "additional_info_bytes");
+    BS_End();
+
+    FILLING_BEGIN();
+        if (elementary_PID_IsValid)
+        {
+            Complete_Stream->Streams[elementary_PID]->StreamKind_FromDescriptor=Stream_Audio;
+            Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("AC-4");
+        }
+    FILLING_END();
+}
 //---------------------------------------------------------------------------
 void File_Mpeg_Descriptors::Descriptor_81()
 {

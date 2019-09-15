@@ -1063,8 +1063,11 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
     {
         int64u Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_int64u();
         int64u BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_int64u();
+        int64u BitRate_Encoded=Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).To_int64u();
         if (Duration && BitRate)
             Fill(Stream_Audio, Pos, Audio_StreamSize, Duration*BitRate/8/1000);
+        if (Duration && BitRate_Encoded)
+            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, Duration*BitRate_Encoded/8/1000);
     }
 
     //CBR/VBR
@@ -1154,8 +1157,11 @@ void File__Analyze::Streams_Finish_InterStreams()
     }
 
     //OverallBitRate if we have one Audio stream with bitrate
-    if (Retrieve(Stream_General, 0, General_Duration).empty() && Retrieve(Stream_General, 0, General_OverallBitRate).empty() && Count_Get(Stream_Video)==0 && Count_Get(Stream_Audio)==1 && Retrieve(Stream_Audio, 0, Audio_BitRate).To_int64u()!=0 && (Retrieve(Stream_General, 0, General_Format)==Retrieve(Stream_Audio, 0, Audio_Format) || !Retrieve(Stream_General, 0, General_HeaderSize).empty()))
-        Fill(Stream_General, 0, General_OverallBitRate, Retrieve(Stream_Audio, 0, Audio_BitRate));
+    if (Retrieve(Stream_General, 0, General_Duration).empty() && Retrieve(Stream_General, 0, General_OverallBitRate).empty() && Count_Get(Stream_Video) == 0 && Count_Get(Stream_Audio) == 1 && Retrieve(Stream_Audio, 0, Audio_BitRate).To_int64u() != 0 && (Retrieve(Stream_General, 0, General_Format) == Retrieve(Stream_Audio, 0, Audio_Format) || !Retrieve(Stream_General, 0, General_HeaderSize).empty()))
+    {
+        const Ztring& EncodedBitRate=Retrieve_Const(Stream_Audio, 0, Audio_BitRate_Encoded);
+        Fill(Stream_General, 0, General_OverallBitRate, EncodedBitRate.empty()?Retrieve_Const(Stream_Audio, 0, Audio_BitRate):EncodedBitRate);
+    }
 
     //OverallBitRate if Duration
     if (Retrieve(Stream_General, 0, General_OverallBitRate).empty() && Retrieve(Stream_General, 0, General_Duration).To_int64u()!=0 && !Retrieve(Stream_General, 0, General_FileSize).empty())

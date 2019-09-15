@@ -203,6 +203,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_d263();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dac3();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_dac4();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_damr();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dec3();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ddts();
