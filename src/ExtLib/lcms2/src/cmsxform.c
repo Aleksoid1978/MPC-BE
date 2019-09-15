@@ -171,6 +171,23 @@ void CMSEXPORT cmsDeleteTransform(cmsHTRANSFORM hTransform)
     _cmsFree(p ->ContextID, (void *) p);
 }
 
+
+static
+cmsUInt32Number PixelSize(cmsUInt32Number Format)
+{
+    cmsUInt32Number fmt_bytes = T_BYTES(Format);
+
+    // For double, the T_BYTES field is zero
+    if (fmt_bytes == 0)
+        return sizeof(cmsUInt64Number);
+
+    // Otherwise, it is already correct for all formats
+    return fmt_bytes;
+}
+
+
+
+
 // Apply transform.
 void CMSEXPORT cmsDoTransform(cmsHTRANSFORM  Transform,
                               const void* InputBuffer,
@@ -183,8 +200,8 @@ void CMSEXPORT cmsDoTransform(cmsHTRANSFORM  Transform,
 
     stride.BytesPerLineIn = 0;  // Not used
     stride.BytesPerLineOut = 0;
-    stride.BytesPerPlaneIn = Size;
-    stride.BytesPerPlaneOut = Size;
+    stride.BytesPerPlaneIn = Size * PixelSize(p->InputFormat);
+    stride.BytesPerPlaneOut = Size * PixelSize(p->OutputFormat);
            
     p -> xform(p, InputBuffer, OutputBuffer, Size, 1, &stride);
 }
