@@ -19653,7 +19653,7 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 	if (std::regex_search(regExp.c_str(), match, std::wregex(LR"(\b(?:S\d+E\d+)(\S+)(?:\b576|720|1080|1440|2160)[ip]\b)"))
 			&& match.size() == 2
 			&& match[1].length() > 1) {
-		regExp.replace(regExp.find(match[1].first), match[1].length(), LR"((\S+))");
+		regExp.replace(match.position(1), match[1].length(), LR"((\S+))");
 	}
 
 	regExp = std::regex_replace(regExp, std::wregex(LR"((a|p)\\.m\\.)"), LR"(((a|p)\.m\.))");
