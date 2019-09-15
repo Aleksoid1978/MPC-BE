@@ -614,7 +614,7 @@ retry:
     if ((ret = ff_mpv_frame_start(s, avctx)) < 0)
         return ret;
 
-    if (!s->divx_packed)
+    if (!s->divx_packed && !avctx->hwaccel)
         ff_thread_finish_setup(avctx);
 
     if (avctx->hwaccel) {
@@ -746,6 +746,9 @@ const enum AVPixelFormat ff_h263_hwaccel_pixfmt_list_420[] = {
 const AVCodecHWConfigInternal *ff_h263_hw_config_list[] = {
 #if CONFIG_H263_VAAPI_HWACCEL
     HWACCEL_VAAPI(h263),
+#endif
+#if CONFIG_MPEG4_NVDEC_HWACCEL
+    HWACCEL_NVDEC(mpeg4),
 #endif
 #if CONFIG_MPEG4_VDPAU_HWACCEL
     HWACCEL_VDPAU(mpeg4),

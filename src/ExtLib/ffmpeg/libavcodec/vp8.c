@@ -501,14 +501,9 @@ static void fade(uint8_t *dst, ptrdiff_t dst_linesize,
     }
 }
 
-static int vp7_fade_frame(VP8Context *s, VP56RangeCoder *c)
+static int vp7_fade_frame(VP8Context *s, int alpha, int beta)
 {
-    int alpha = (int8_t) vp8_rac_get_uint(c, 8);
-    int beta  = (int8_t) vp8_rac_get_uint(c, 8);
     int ret;
-
-    if (c->end <= c->buffer && c->bits >= 0)
-        return AVERROR_INVALIDDATA;
 
     if (!s->keyframe && (alpha || beta)) {
         int width  = s->mb_width * 16;
@@ -549,6 +544,8 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
     int part1_size, hscale, vscale, i, j, ret;
     int width  = s->avctx->width;
     int height = s->avctx->height;
+    int alpha = 0;
+    int beta  = 0;
 
     if (buf_size < 4) {
         return AVERROR_INVALIDDATA;
@@ -661,12 +658,12 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
             s->fade_present = vp8_rac_get(c);
     }
 
-    if (c->end <= c->buffer && c->bits >= 0)
+    if (vpX_rac_is_end(c))
         return AVERROR_INVALIDDATA;
     /* E. Fading information for previous frame */
     if (s->fade_present && vp8_rac_get(c)) {
-        if ((ret = vp7_fade_frame(s ,c)) < 0)
-            return ret;
+        alpha = (int8_t) vp8_rac_get_uint(c, 8);
+        beta  = (int8_t) vp8_rac_get_uint(c, 8);
     }
 
     /* F. Loop filter type */
@@ -695,6 +692,12 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
         s->prob->last   = vp8_rac_get_uint(c, 8);
         vp78_update_pred16x16_pred8x8_mvc_probabilities(s, VP7_MVC_SIZE);
     }
+
+    if (vpX_rac_is_end(c))
+        return AVERROR_INVALIDDATA;
+
+    if ((ret = vp7_fade_frame(s, alpha, beta)) < 0)
+        return ret;
 
     return 0;
 }
@@ -2372,7 +2375,7 @@ static av_always_inline int decode_mb_row_no_filter(AVCodecContext *avctx, void 
         curframe->tf.f->data[2] +  8 * mb_y * s->uvlinesize
     };
 
-    if (c->end <= c->buffer && c->bits >= 0)
+    if (vpX_rac_is_end(c))
          return AVERROR_INVALIDDATA;
 
     if (mb_y == 0)
@@ -2403,7 +2406,7 @@ static av_always_inline int decode_mb_row_no_filter(AVCodecContext *avctx, void 
     td->mv_bounds.mv_max.x = ((s->mb_width - 1) << 6) + MARGIN;
 
     for (mb_x = 0; mb_x < s->mb_width; mb_x++, mb_xy++, mb++) {
-        if (c->end <= c->buffer && c->bits >= 0)
+        if (vpX_rac_is_end(c))
             return AVERROR_INVALIDDATA;
         // Wait for previous thread to read mb_x+2, and reach mb_y-1.
         if (prev_td != td) {

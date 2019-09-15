@@ -125,8 +125,8 @@ typedef struct APEPredictor {
     int32_t filterA[2];
     int32_t filterB[2];
 
-    int32_t coeffsA[2][4];  ///< adaption coefficients
-    int32_t coeffsB[2][5];  ///< adaption coefficients
+    uint32_t coeffsA[2][4];  ///< adaption coefficients
+    uint32_t coeffsB[2][5];  ///< adaption coefficients
     int32_t historybuffer[HISTORY_SIZE + PREDICTOR_SIZE];
 
     unsigned int sample_pos;
@@ -554,7 +554,7 @@ static inline int ape_decode_value_3990(APEContext *ctx, APERice *rice)
     overflow = range_get_symbol(ctx, counts_3980, counts_diff_3980);
 
     if (overflow == (MODEL_ELEMENTS - 1)) {
-        overflow  = range_decode_bits(ctx, 16) << 16;
+        overflow  = (unsigned)range_decode_bits(ctx, 16) << 16;
         overflow |= range_decode_bits(ctx, 16);
     }
 
@@ -589,7 +589,7 @@ static void decode_array_0000(APEContext *ctx, GetBitContext *gb,
                               int32_t *out, APERice *rice, int blockstodecode)
 {
     int i;
-    int ksummax, ksummin;
+    unsigned ksummax, ksummin;
 
     rice->ksum = 0;
     for (i = 0; i < FFMIN(blockstodecode, 5); i++) {
@@ -828,21 +828,21 @@ static av_always_inline int filter_fast_3320(APEPredictor *p,
         return decoded;
     }
 
-    predictionA = p->buf[delayA] * 2 - p->buf[delayA - 1];
-    p->lastA[filter] = decoded + (predictionA  * p->coeffsA[filter][0] >> 9);
+    predictionA = p->buf[delayA] * 2U - p->buf[delayA - 1];
+    p->lastA[filter] = decoded + ((int32_t)(predictionA  * p->coeffsA[filter][0]) >> 9);
 
     if ((decoded ^ predictionA) > 0)
         p->coeffsA[filter][0]++;
     else
         p->coeffsA[filter][0]--;
 
-    p->filterA[filter] += p->lastA[filter];
+    p->filterA[filter] += (unsigned)p->lastA[filter];
 
     return p->filterA[filter];
 }
 
 static av_always_inline int filter_3800(APEPredictor *p,
-                                        const int decoded, const int filter,
+                                        const unsigned decoded, const int filter,
                                         const int delayA,  const int delayB,
                                         const int start,   const int shift)
 {
@@ -859,9 +859,9 @@ static av_always_inline int filter_3800(APEPredictor *p,
         return predictionA;
     }
     d2 =  p->buf[delayA];
-    d1 = (p->buf[delayA] - p->buf[delayA - 1]) << 1;
-    d0 =  p->buf[delayA] + ((p->buf[delayA - 2] - p->buf[delayA - 1]) << 3);
-    d3 =  p->buf[delayB] * 2 - p->buf[delayB - 1];
+    d1 = (p->buf[delayA] - p->buf[delayA - 1]) * 2U;
+    d0 =  p->buf[delayA] + ((p->buf[delayA - 2] - p->buf[delayA - 1]) * 8U);
+    d3 =  p->buf[delayB] * 2U - p->buf[delayB - 1];
     d4 =  p->buf[delayB];
 
     predictionA = d0 * p->coeffsA[filter][0] +
@@ -881,7 +881,7 @@ static av_always_inline int filter_3800(APEPredictor *p,
     p->coeffsB[filter][1] -= (((d4 >> 30) & 2) - 1) * sign;
 
     p->filterB[filter] = p->lastA[filter] + (predictionB >> shift);
-    p->filterA[filter] = p->filterB[filter] + ((p->filterA[filter] * 31) >> 5);
+    p->filterA[filter] = p->filterB[filter] + ((int)(p->filterA[filter] * 31U) >> 5);
 
     return p->filterA[filter];
 }
@@ -902,7 +902,7 @@ static void long_filter_high_3800(int32_t *buffer, int order, int shift, int len
         dotprod = 0;
         sign = APESIGN(buffer[i]);
         for (j = 0; j < order; j++) {
-            dotprod += delay[j] * coeffs[j];
+            dotprod += delay[j] * (unsigned)coeffs[j];
             coeffs[j] += ((delay[j] >> 31) | 1) * sign;
         }
         buffer[i] -= dotprod >> shift;
@@ -1130,7 +1130,7 @@ static av_always_inline int predictor_update_filter(APEPredictor *p,
                   p->buf[delayA - 3] * p->coeffsA[filter][3];
 
     /*  Apply a scaled first-order filter compression */
-    p->buf[delayB]     = p->filterA[filter ^ 1] - ((p->filterB[filter] * 31) >> 5);
+    p->buf[delayB]     = p->filterA[filter ^ 1] - ((int)(p->filterB[filter] * 31U) >> 5);
     p->buf[adaptB]     = APESIGN(p->buf[delayB]);
     p->buf[delayB - 1] = p->buf[delayB] - p->buf[delayB - 1];
     p->buf[adaptB - 1] = APESIGN(p->buf[delayB - 1]);
@@ -1142,8 +1142,8 @@ static av_always_inline int predictor_update_filter(APEPredictor *p,
                   p->buf[delayB - 3] * p->coeffsB[filter][3] +
                   p->buf[delayB - 4] * p->coeffsB[filter][4];
 
-    p->lastA[filter] = decoded + ((predictionA + (predictionB >> 1)) >> 10);
-    p->filterA[filter] = p->lastA[filter] + ((p->filterA[filter] * 31) >> 5);
+    p->lastA[filter] = decoded + ((int)((unsigned)predictionA + (predictionB >> 1)) >> 10);
+    p->filterA[filter] = p->lastA[filter] + ((int)(p->filterA[filter] * 31U) >> 5);
 
     sign = APESIGN(decoded);
     p->coeffsA[filter][0] += p->buf[adaptA    ] * sign;
@@ -1229,7 +1229,7 @@ static void predictor_decode_mono_3950(APEContext *ctx, int count)
             p->buf = p->historybuffer;
         }
 
-        p->filterA[0] = currentA + ((p->filterA[0] * 31) >> 5);
+        p->filterA[0] = currentA + ((int)(p->filterA[0] * 31U) >> 5);
         *(decoded0++) = p->filterA[0];
     }
 
@@ -1266,7 +1266,7 @@ static void do_apply_filter(APEContext *ctx, int version, APEFilter *f,
                                                      f->delay - order,
                                                      f->adaptcoeffs - order,
                                                      order, APESIGN(*data));
-        res = (res + (1 << (fracbits - 1))) >> fracbits;
+        res = (int)(res + (1U << (fracbits - 1))) >> fracbits;
         res += *data;
         *data++ = res;
 
@@ -1376,7 +1376,7 @@ static void ape_unpack_mono(APEContext *ctx, int count)
 
 static void ape_unpack_stereo(APEContext *ctx, int count)
 {
-    int32_t left, right;
+    unsigned left, right;
     int32_t *decoded0 = ctx->decoded[0];
     int32_t *decoded1 = ctx->decoded[1];
 
@@ -1393,7 +1393,7 @@ static void ape_unpack_stereo(APEContext *ctx, int count)
 
     /* Decorrelate and scale to output depth */
     while (count--) {
-        left = *decoded1 - (*decoded0 / 2);
+        left = *decoded1 - (unsigned)(*decoded0 / 2);
         right = left + *decoded0;
 
         *(decoded0++) = left;
@@ -1451,7 +1451,8 @@ static int ape_decode_frame(AVCodecContext *avctx, void *data,
         if (s->fileversion >= 3900) {
             if (offset > 3) {
                 av_log(avctx, AV_LOG_ERROR, "Incorrect offset passed\n");
-                s->data = NULL;
+                av_freep(&s->data);
+                s->data_size = 0;
                 return AVERROR_INVALIDDATA;
             }
             if (s->data_end - s->ptr < offset) {
