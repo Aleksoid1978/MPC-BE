@@ -19642,16 +19642,24 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 	};
 
 	std::wstring regExp = std::regex_replace(name.GetString(), std::wregex(LR"([\.\(\)\[\]\{\}\+])"), L"\\$&");
+
+	std::wcmatch match;
+	if (std::regex_search(regExp.c_str(), match, std::wregex(LR"(\b(?:S\d+E\d+)(\S+)(?:\b576|720|1080|1440|2160)[ip]\b)"))
+			&& match.size() == 2
+			&& match[1].length() > 1) {
+		regExp.replace(regExp.find(match[1].first), match[1].length(), LR"((\S+))");
+	}
+
 	regExp = std::regex_replace(regExp, std::wregex(LR"((a|p)\\.m\\.)"), LR"(((a|p)\.m\.))");
 
-	auto replaceDigital = [](std::wstring const& input) {
+	auto replaceDigital = [](const std::wstring& input) {
 		std::wregex re(LR"((?:\b576|720|1080|1440|2160)[ip]\b|\d+ *- *\d+|\d+)");
 		std::wsregex_token_iterator
 			begin(input.cbegin(), input.end(), re, { -1, 0 }),
 			end;
 
 		std::wstring output;
-		std::for_each(begin, end, [&](std::wstring const& m) {
+		std::for_each(begin, end, [&](const std::wstring& m) {
 			if (std::regex_match(m, std::wregex(L"(576|720|1080|1440|2160)[ip]"))) {
 				output += m;
 			} else if (std::regex_match(m, std::wregex(LR"(\d+ *- *\d+|\d+)"))) {
