@@ -36,7 +36,6 @@ public:
 
 	int  m_iMultipleInst;
 	BOOL m_bKeepHistory;
-	int  m_nRecentFiles;
 	BOOL m_bRememberDVDPos;
 	BOOL m_bRememberFilePos;
 	BOOL m_bSavePnSZoom;
@@ -52,6 +51,7 @@ public:
 	CComboBox m_cbTitleBarPrefix;
 	CComboBox m_cbSeekBarText;
 
+	CIntEdit m_edtRecentFiles;
 	CSpinButtonCtrl m_spnRecentFiles;
 
 	CIntEdit m_edtNetworkTimeout;
@@ -69,6 +69,4 @@ protected:
 public:
 	afx_msg void OnUpdatePos(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOSD(CCmdUI* pCmdUI);
-	afx_msg void OnKillFocusEdit1();
-	afx_msg void OnChangeEdit1();
 };
