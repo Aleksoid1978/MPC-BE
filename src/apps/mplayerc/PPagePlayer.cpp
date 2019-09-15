@@ -31,7 +31,6 @@ CPPagePlayer::CPPagePlayer()
 	: CPPageBase(CPPagePlayer::IDD, CPPagePlayer::IDD)
 	, m_iMultipleInst(1)
 	, m_bKeepHistory(FALSE)
-	, m_nRecentFiles(APP_RECENTFILES_DEF)
 	, m_bRememberDVDPos(FALSE)
 	, m_bRememberFilePos(FALSE)
 	, m_bSavePnSZoom(FALSE)
@@ -69,12 +68,10 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DVD_POS,  m_bRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2,   m_bRememberPlaylistItems);
-	DDX_Text(pDX, IDC_EDIT1,     m_nRecentFiles);
+	DDX_Control(pDX, IDC_EDIT1, m_edtRecentFiles);
 	DDX_Control(pDX, IDC_SPIN1,  m_spnRecentFiles);
 	DDX_Control(pDX, IDC_EDIT2,  m_edtNetworkTimeout);
 	DDX_Control(pDX, IDC_SPIN2,  m_spnNetworkTimeout);
-
-	m_nRecentFiles = std::clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
@@ -84,8 +81,6 @@ BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK14, OnUpdateOSD)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK15, OnUpdateOSD)
-	ON_EN_CHANGE(IDC_EDIT1, OnChangeEdit1)
-	ON_EN_KILLFOCUS(IDC_EDIT1, OnKillFocusEdit1)
 END_MESSAGE_MAP()
 
 // CPPagePlayer message handlers
@@ -130,13 +125,14 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bRememberFilePos			= s.bRememberFilePos;
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
 
-	m_nRecentFiles = s.iRecentFilesNumber;
+	m_edtRecentFiles = s.iRecentFilesNumber;
+	m_edtRecentFiles.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	m_spnRecentFiles.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
-	m_spnRecentFiles.SetPos(m_nRecentFiles);
+	m_spnRecentFiles.SetPos(s.iRecentFilesNumber);
 	UDACCEL acc = {0, 5};
 	m_spnRecentFiles.SetAccel(1, &acc);
 
-	m_edtNetworkTimeout = std::clamp(s.iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX) / 1000;
+	m_edtNetworkTimeout = s.iNetworkTimeout / 1000;
 	m_edtNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN / 1000, APP_NETTIMEOUT_MAX / 1000);
 	m_spnNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN / 1000, APP_NETTIMEOUT_MAX / 1000);
 
@@ -224,7 +220,7 @@ BOOL CPPagePlayer::OnApply()
 		s.ClearFilePositions();
 	}
 
-	s.iRecentFilesNumber = m_nRecentFiles;
+	s.iRecentFilesNumber = m_edtRecentFiles;
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
@@ -260,22 +256,4 @@ void CPPagePlayer::OnUpdateOSD(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(!!m_bShowOSD);
-}
-
-void CPPagePlayer::OnKillFocusEdit1()
-{
-	m_nRecentFiles = std::clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX); // CSpinButtonCtrl.SetRange() does not affect the manual input
-
-	UpdateData(FALSE);
-}
-
-void CPPagePlayer::OnChangeEdit1()
-{
-	CString rString;
-	GetDlgItemTextW(IDC_EDIT1, rString);
-	if (rString.IsEmpty()) {
-		OnKillFocusEdit1();
-	}
-
-	SetModified();
 }
