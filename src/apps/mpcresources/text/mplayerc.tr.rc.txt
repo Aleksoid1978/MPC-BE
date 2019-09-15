@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 39		"Oynatma listesindeki seçili parçaları hatırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Açılış ayarları"
 6		"Tek oynatıcı için zorla"
 7		"Her dosya için benzer oynatıcı"
@@ -397,6 +397,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
 28		"Ayarları oynatıcı klasöründe sakla"
 29		"Disk Açma özelliğini kapat"
 30		"İşlem önceliğini normalden yüksek tut"
+31		"Network timout*:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

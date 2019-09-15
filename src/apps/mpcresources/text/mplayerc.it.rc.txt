@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 39		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 7		"Apri solo un'unica schermata per ogni file aperto."
@@ -397,6 +397,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
 28		"Store settings in the player folder"
 29		"Disabilita il menù 'Apri disco'"
 30		"Priorità del processo sopra il normale"
+31		"Network timout*:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 39		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"При відкритті файлів"
 6		"Примусовий одновіконний режим"
 7		"Використовувати один процес для усіх файлів"
@@ -397,6 +397,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
 28		"Зберігати налаштування в теці плеєра"
 29		"Заборонити меню 'Відкрити диск'"
 30		"Підвищений пріоритет процесу"
+31		"Network timout*:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

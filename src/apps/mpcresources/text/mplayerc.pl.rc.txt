@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 39		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Otwieranie"
 6		"Wymuś pojedyńcze okno"
 7		"Użyj tego samego okna dla każdego pliku"
@@ -397,6 +397,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 31
 28		"Przechowuj ustawienia w katalogu odtwarzacza"
 29		"Ukrywanie menu „Otwórz płytę”"
 30		"Priorytet programu powyżej normalnego"
+31		"Network timout*:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
