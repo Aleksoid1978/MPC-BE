@@ -98,6 +98,9 @@ extern void				ShowPPage(IUnknown* pUnknown, HWND hParentWnd);
 extern bool				IsCLSIDRegistered(LPCWSTR clsid);
 extern bool				IsCLSIDRegistered(const CLSID& clsid);
 
+// return S_OK if installed and available, S_FALSE if installed but not available, E_FAIL if not installed
+extern HRESULT			CheckFilterCLSID(const CLSID& clsid);
+
 extern void				CStringToBin(CString str, std::vector<BYTE>& data);
 extern CString			BinToCString(const BYTE* ptr, size_t len);
 
