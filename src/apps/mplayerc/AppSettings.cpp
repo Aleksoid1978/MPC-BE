@@ -1740,7 +1740,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
 
 	// Multi-monitor code
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
