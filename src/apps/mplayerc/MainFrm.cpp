@@ -7644,6 +7644,7 @@ void CMainFrame::OnViewOptions()
 	}
 
 	ShowOptions();
+	StartAutoHideCursor();
 }
 
 // play
