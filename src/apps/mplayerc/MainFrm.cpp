@@ -6936,13 +6936,12 @@ void CMainFrame::OnFileClosePlaylist()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (s.bResetWindowAfterClosingFile) {
-		RestoreDefaultWindowRect();
-		return;
-	}
-
 	if (m_bFullScreen && s.fExitFullScreenAtTheEnd) {
 		OnViewFullscreen();
+	}
+
+	if (s.bResetWindowAfterClosingFile) {
+		RestoreDefaultWindowRect();
 	}
 }
 
