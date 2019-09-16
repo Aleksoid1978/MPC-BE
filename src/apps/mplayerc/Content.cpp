@@ -148,7 +148,7 @@ namespace Content {
 			CString realPath(fn);
 			CorrectAceStream(realPath);
 
-			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, AfxGetAppSettings().iNetworkTimeout, L"Icy-MetaData: 1\r\n") == S_OK);
+			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, AfxGetAppSettings().iNetworkTimeout * 1000, L"Icy-MetaData: 1\r\n") == S_OK);
 			content.hdr = content.HTTPAsync->GetHeader();
 
 			GetData(content);

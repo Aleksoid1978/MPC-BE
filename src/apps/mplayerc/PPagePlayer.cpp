@@ -132,9 +132,9 @@ BOOL CPPagePlayer::OnInitDialog()
 	UDACCEL acc = {0, 5};
 	m_spnRecentFiles.SetAccel(1, &acc);
 
-	m_edtNetworkTimeout = s.iNetworkTimeout / 1000;
-	m_edtNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN / 1000, APP_NETTIMEOUT_MAX / 1000);
-	m_spnNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN / 1000, APP_NETTIMEOUT_MAX / 1000);
+	m_edtNetworkTimeout = s.iNetworkTimeout;
+	m_edtNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
+	m_spnNetworkTimeout.SetRange(APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
 
 	UpdateData(FALSE);
 
@@ -224,7 +224,7 @@ BOOL CPPagePlayer::OnApply()
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
-	s.iNetworkTimeout = m_edtNetworkTimeout * 1000;
+	s.iNetworkTimeout = m_edtNetworkTimeout;
 
 	// Check if the settings location needs to be changed
 	if (AfxGetProfile().IsIniValid() != !!m_bUseIni) {
