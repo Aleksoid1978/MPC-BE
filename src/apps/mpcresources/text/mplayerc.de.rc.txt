@@ -259,7 +259,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Dateien im V&ollbild öffnen"
 6		"Bedienelemente im &Vollbild anzeigen für"
-9		"s"
+9		"Sek."
 10		" 0: auto-verstecken | -1: nie verstecken"
 11		"Vollbild nach der Wiedergabe verlassen"
 13		"Vollbild beenden, wenn der Fokus verloren wurde"
@@ -270,7 +270,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"Nach oben"
 23		"Nach unten"
 24		"Verzögerung:"
-27		"s"
+27		"Sek."
 28		"Anzeigemodus vor Start der Wiedergabe ändern"
 30		"Standard-Anzeigemodus nach Beenden des Vollbilds verwenden"
 32		"Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen"
@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 16		"MPEG-2- und\nDVD-Decoder\nEinstellungen"
 17		"Audio-Decoder\nEinstellungen"
 18		"Pufferlänge:"
-21		"s"
+21		"Sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -397,8 +397,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Einstellungen als Datei (.ini) speichern"
 29		"Disc-Wiedergabe deaktivieren"
 30		"&Prozesspriorität höher als normal"
-31		"Network timout*:"
-34		"sec."
+31		"Netzwerk-Zeitüberschreitung:"
+34		"Sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
@@ -1861,7 +1861,7 @@ STRING IDS_RECORD_STOP		"Stopp"
 STRING IDS_REGAIN_VOLUME		"Lautstärke zurücksetzen"
 STRING IDS_REND_NOT_AVAILABLE		"**nicht verfügbar**"
 STRING IDS_REND_NOT_INSTALLED		"**nicht installiert**"
-STRING IDS_REND_UNAVAILABLEMSG		"%s is not available. %s will be used."
+STRING IDS_REND_UNAVAILABLEMSG		"%s ist nicht verfügbar. %s wird verwendet."
 STRING IDS_REPEAT_FOREVER		"Endloswiedergabe (Ein/Aus)"
 STRING IDS_REPEAT_FOREVER_OFF		"Endloswiedergabe: Aus"
 STRING IDS_REPEAT_FOREVER_ON		"Endloswiedergabe: Ein"

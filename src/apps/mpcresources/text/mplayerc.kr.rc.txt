@@ -397,7 +397,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"실행파일 폴더에 설정 저장"
 29		"'디스크 열기' 메뉴 사용안함"
 30		"프로세스 우선순위 높이기"
-31		"Network timout*:"
+31		"Network timеout*:"
 34		"sec."
 END
 
