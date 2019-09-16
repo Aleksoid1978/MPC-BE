@@ -397,7 +397,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"MPC-BE のフォルダー内に設定を保存する"
 29		"「ディスクを開く」のメニューを無効にする"
 30		"プロセスの優先度を 通常以上 にする"
-31		"Network timout*:"
+31		"Network timеout*:"
 34		"sec."
 END
 
