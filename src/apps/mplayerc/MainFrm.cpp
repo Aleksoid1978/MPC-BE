@@ -5296,61 +5296,30 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		applyRandomizeSwitch();
 		OpenCurPlaylistItem();
 	} else if (s.nCLSwitches & CLSW_CLIPBOARD) {
-		if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
-			if (HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT)) {
-				if (LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb)) {
-					CString text(pText);
-					if (!text.IsEmpty()) {
-						text.Remove(L'\r');
+		std::list<CString> sl;
+		if (GetFromClipboard(sl)) {
+			ParseDirs(sl);
 
-						std::list<CString> sl;
-						std::list<CString> lines;
-						Explode(text, lines, L'\n');
-						for (const auto& line : lines) {
-							CUrl url;
-							if ((::PathIsURLW(line) && url.CrackUrl(line) && url.GetHostNameLength())
-									|| line.Left(12) == L"acestream://"
-									|| std::regex_match(line.GetString(), std::wregex(magnet_regex))
-									|| ::PathFileExistsW(line)) {
-								sl.push_back(line);
-							}
-						}
+			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
+				m_wndPlaylistBar.Append(sl, sl.size() > 1);
+				applyRandomizeSwitch();
 
-						if (!sl.empty()) {
-							for (auto& fn : sl) {
-								if (std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
-									fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
-								}
-							}
-
-							ParseDirs(sl);
-
-							if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
-								m_wndPlaylistBar.Append(sl, sl.size() > 1);
-								applyRandomizeSwitch();
-
-								if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
-									m_wndPlaylistBar.SetLast();
-									OpenCurPlaylistItem();
-								}
-							} else {
-								fSetForegroundWindow = true;
-
-								AddSimilarFiles(sl);
-
-								m_wndPlaylistBar.Open(sl, sl.size() > 1, &s.slSubs);
-								applyRandomizeSwitch();
-								OpenCurPlaylistItem();
-
-								s.nCLSwitches &= ~CLSW_STARTVALID;
-								s.rtStart = 0;
-							}
-						}
-					}
-					GlobalUnlock(hglb);
+				if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
+					m_wndPlaylistBar.SetLast();
+					OpenCurPlaylistItem();
 				}
+			} else {
+				fSetForegroundWindow = true;
+
+				AddSimilarFiles(sl);
+
+				m_wndPlaylistBar.Open(sl, sl.size() > 1, &s.slSubs);
+				applyRandomizeSwitch();
+				OpenCurPlaylistItem();
+
+				s.nCLSwitches &= ~CLSW_STARTVALID;
+				s.rtStart = 0;
 			}
-			CloseClipboard();
 		}
 	} else if (!s.slFiles.empty()) {
 		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
@@ -19934,6 +19903,46 @@ void CMainFrame::StartAutoHideCursor()
 			}
 		}
 	}
+}
+
+const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
+{
+	sl.clear();
+
+	if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
+		if (HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT)) {
+			if (LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb)) {
+				CString text(pText);
+				if (!text.IsEmpty()) {
+					text.Remove(L'\r');
+
+					std::list<CString> lines;
+					Explode(text, lines, L'\n');
+					for (const auto& line : lines) {
+						CUrl url;
+						if ((::PathIsURLW(line) && url.CrackUrl(line) && url.GetHostNameLength())
+								|| line.Left(12) == L"acestream://"
+								|| std::regex_match(line.GetString(), std::wregex(magnet_regex))
+								|| ::PathFileExistsW(line)) {
+							sl.push_back(line);
+						}
+					}
+
+					if (!sl.empty()) {
+						for (auto& fn : sl) {
+							if (std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
+								fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
+							}
+						}
+					}
+				}
+				GlobalUnlock(hglb);
+			}
+		}
+		CloseClipboard();
+	}
+
+	return !sl.empty();
 }
 
 LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam)

@@ -1016,6 +1016,17 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					}
 				}
 				break;
+			case 'V':
+				if (curTab.type == EXPLORER) {
+					break;
+				}
+				if (GetKeyState(VK_CONTROL) < 0) {
+					std::list<CString> sl;
+					if (m_pMainFrame->GetFromClipboard(sl)) {
+						Append(sl, sl.size() > 1, nullptr);
+					}
+				}
+				break;
 			case VK_BACK:
 				if (curTab.type == EXPLORER) {
 					auto path = curPlayList.GetHead().m_fns.front().GetName();
