@@ -1367,6 +1367,8 @@ public:
 
 	void		StopAutoHideCursor();
 	void		StartAutoHideCursor();
+
+	const bool	GetFromClipboard(std::list<CString>& sl) const;
 protected:
 	CDiskImage	m_DiskImage;
 	BOOL		m_bNeedUnmountImage = TRUE;
