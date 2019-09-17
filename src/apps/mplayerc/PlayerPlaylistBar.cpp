@@ -25,6 +25,7 @@
 #include <IntShCut.h>
 #include <algorithm>
 #include <random>
+#include <regex>
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
@@ -1962,9 +1963,20 @@ void CPlayerPlaylistBar::Append(CString fn)
 	Append(fns, false);
 }
 
+static void CorrectPaths(std::list<CString>& fns)
+{
+	for (auto& fn : fns) {
+		if (std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
+			fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
+		}
+	}
+}
+
 void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
 {
 	const INT_PTR idx = curPlayList.GetCount();
+
+	CorrectPaths(fns);
 
 	if (curTab.type == EXPLORER) {
 		curPlayList.m_nFocused_idx = TGetFocusedElement();

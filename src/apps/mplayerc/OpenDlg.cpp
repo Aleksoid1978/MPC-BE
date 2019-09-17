@@ -23,7 +23,6 @@
 #include <atlpath.h>
 #include <shlobj.h>
 #include <dlgs.h>
-#include <regex>
 #include "OpenDlg.h"
 #include "MainFrm.h"
 #include "../../DSUtil/Filehandle.h"
@@ -113,11 +112,7 @@ BOOL COpenDlg::OnInitDialog()
 	if (m_bPasteClipboardURL && ::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
 		if (HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT)) {
 			if (LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb)) {
-				CUrl url;
-				if (AfxIsValidString(pText)
-						&& ((::PathIsURLW(pText) && url.CrackUrl(pText) && url.GetHostNameLength())
-							|| wcsstr(pText, L"acestream://") == pText
-							|| std::regex_match(pText, std::wregex(magnet_regex)))) {
+				if (AfxIsValidString(pText) && ::PathIsURLW(pText)) {
 					m_mrucombo.SetWindowTextW(pText);
 				}
 				GlobalUnlock(hglb);

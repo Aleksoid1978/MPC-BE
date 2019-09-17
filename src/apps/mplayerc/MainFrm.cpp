@@ -5168,10 +5168,6 @@ void CMainFrame::OnFileOpenMedia()
 		return;
 	}
 
-	if (dlg.m_fns.size() == 1 && std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
-		fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
-	}
-
 	if (AddSimilarFiles(dlg.m_fns)) {
 		dlg.m_bMultipleFiles = true;
 	}
@@ -5337,12 +5333,6 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		} else {
 			std::list<CString> sl;
 			sl = s.slFiles;
-
-			for (auto& fn : sl) {
-				if (std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
-					fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
-				}
-			}
 
 			ParseDirs(sl);
 			bool fMulti = sl.size() > 1;
@@ -19919,20 +19909,8 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 					std::list<CString> lines;
 					Explode(text, lines, L'\n');
 					for (const auto& line : lines) {
-						CUrl url;
-						if ((::PathIsURLW(line) && url.CrackUrl(line) && url.GetHostNameLength())
-								|| line.Left(12) == L"acestream://"
-								|| std::regex_match(line.GetString(), std::wregex(magnet_regex))
-								|| ::PathFileExistsW(line)) {
+						if (::PathIsURLW(line) || ::PathFileExistsW(line)) {
 							sl.push_back(line);
-						}
-					}
-
-					if (!sl.empty()) {
-						for (auto& fn : sl) {
-							if (std::regex_match(fn.GetString(), std::wregex(magnet_regex))) {
-								fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
-							}
 						}
 					}
 				}
