@@ -388,22 +388,21 @@ public:
 	bool Empty();
 	void Remove(const std::vector<int>& items, const bool bDelete);
 
-	void Open(CString fn);
-	void Open(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
-	void Append(CString fn);
-	void Append(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
-	void Append(CFileItemList& fis);
-	bool Replace(CString filename, std::list<CString>& fns);
+	void Open(const CString& fn);
+	void Open(std::list<CString>& fns, const bool bMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
+	void Append(const CString& fn);
+	void Append(std::list<CString>& fns, const bool bMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
+	void Append(const CFileItemList& fis);
 
-	void Open(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
-	void Append(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
+	void Open(const CStringW& vdn, const CStringW& adn, const int vinput, const int vchannel, const int ainput);
+	void Append(const CStringW& vdn, const CStringW& adn, const int vinput, const int vchannel, const int ainput);
 
 	OpenMediaData* GetCurOMD(REFERENCE_TIME rtStart = INVALID_TIME);
 
-	void LoadPlaylist(CString filename);
+	void LoadPlaylist(const CString& filename);
 	void SavePlaylist();
 
-	bool SelectFileInPlaylist(CString filename);
+	bool SelectFileInPlaylist(const CString& filename);
 
 	void DropFiles(std::list<CString>& slFiles);
 
