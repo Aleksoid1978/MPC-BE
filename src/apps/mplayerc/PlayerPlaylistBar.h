@@ -445,4 +445,8 @@ public:
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 
 	virtual void Invalidate() { m_list.Invalidate(); }
+
+protected:
+	void PasteFromClipboard();
+	void CopyToClipboard();
 };

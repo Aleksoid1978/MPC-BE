@@ -1017,15 +1017,17 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					}
 				}
 				break;
+			case 'C':
+				if (GetKeyState(VK_CONTROL) < 0) {
+					CopyToClipboard();
+				}
+				break;
 			case 'V':
 				if (curTab.type == EXPLORER) {
 					break;
 				}
 				if (GetKeyState(VK_CONTROL) < 0) {
-					std::list<CString> sl;
-					if (m_pMainFrame->GetFromClipboard(sl)) {
-						Append(sl, sl.size() > 1, nullptr);
-					}
+					PasteFromClipboard();
 				}
 				break;
 			case VK_BACK:
@@ -3212,7 +3214,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_REMOVE,
 		M_DELETE,
 		M_CLEAR,
-		M_CLIPBOARD,
+		M_TOCLIPBOARD,
+		M_FROMCLIPBOARD,
 		M_SAVEAS,
 		M_SORTBYNAME,
 		M_SORTBYPATH,
@@ -3244,7 +3247,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
 		m.AppendMenu(MF_SEPARATOR);
 	}
-	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
+	m.AppendMenu(MF_STRING | (m_list.GetSelectedCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_TOCLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD) + L"\tCltr+C");
 	if (bExplorer) {
 		const bool bReverse = !!(curTab.sort >> 8);
 		const auto sort = (SORT)(curTab.sort & 0xF);
@@ -3265,6 +3268,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_SEPARATOR);
 	}
 	else {
+		m.AppendMenu(MF_STRING | (::IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_FROMCLIPBOARD, ResStr(IDS_PLAYLIST_PASTEFROMCLIPBOARD) + L"\tCltr+V");
 		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
 		m.AppendMenu(MF_SEPARATOR);
 		CMenu submenu2;
@@ -3456,35 +3460,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			}
 			Randomize();
 			break;
-		case M_CLIPBOARD:
-			if (OpenClipboard() && EmptyClipboard()) {
-				CString str;
-
-				std::vector<int> items;
-				items.reserve(m_list.GetSelectedCount());
-				POSITION pos = m_list.GetFirstSelectedItemPosition();
-				while (pos) {
-					items.push_back(m_list.GetNextSelectedItem(pos));
-				}
-
-				for (const auto& item : items) {
-					CPlaylistItem &pli = curPlayList.GetAt(FindPos(item));
-					for (const auto& fi : pli.m_fns) {
-						str += L"\r\n" + fi.GetName();
-					}
-				}
-
-				str.Trim();
-
-				if (HGLOBAL h = GlobalAlloc(GMEM_MOVEABLE, (str.GetLength()+1)*sizeof(WCHAR))) {
-					if (WCHAR* s = (WCHAR*)GlobalLock(h)) {
-						wcscpy_s(s, str.GetLength() + 1, str);
-						GlobalUnlock(h);
-						SetClipboardData(CF_UNICODETEXT, h);
-					}
-				}
-				CloseClipboard();
-			}
+		case M_TOCLIPBOARD:
+			CopyToClipboard();
+			break;
+		case M_FROMCLIPBOARD:
+			PasteFromClipboard();
 			break;
 		case M_SAVEAS: {
 			if (bExplorer) {
@@ -4746,5 +4726,45 @@ void CPlayerPlaylistBar::CloseMedia() const
 {
 	if (m_nCurPlaybackListId == curTab.id) {
 		m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+	}
+}
+
+void CPlayerPlaylistBar::CopyToClipboard()
+{
+	if (OpenClipboard() && EmptyClipboard()) {
+		CString str;
+
+		std::vector<int> items;
+		items.reserve(m_list.GetSelectedCount());
+		POSITION pos = m_list.GetFirstSelectedItemPosition();
+		while (pos) {
+			items.push_back(m_list.GetNextSelectedItem(pos));
+		}
+
+		for (const auto& item : items) {
+			CPlaylistItem &pli = curPlayList.GetAt(FindPos(item));
+			for (const auto& fi : pli.m_fns) {
+				str += L"\r\n" + fi.GetName();
+			}
+		}
+
+		str.Trim();
+
+		if (HGLOBAL h = GlobalAlloc(GMEM_MOVEABLE, (str.GetLength() + 1) * sizeof(WCHAR))) {
+			if (WCHAR * s = (WCHAR*)GlobalLock(h)) {
+				wcscpy_s(s, str.GetLength() + 1, str);
+				GlobalUnlock(h);
+				SetClipboardData(CF_UNICODETEXT, h);
+			}
+		}
+		CloseClipboard();
+	}
+}
+
+void CPlayerPlaylistBar::PasteFromClipboard()
+{
+	std::list<CString> sl;
+	if (m_pMainFrame->GetFromClipboard(sl)) {
+		Append(sl, sl.size() > 1, nullptr);
 	}
 }
