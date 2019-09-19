@@ -5296,12 +5296,15 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		if (GetFromClipboard(sl)) {
 			ParseDirs(sl);
 
-			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
+			if (s.nCLSwitches & CLSW_ADD) {
+				const auto nCount = m_wndPlaylistBar.GetCount();
+
 				m_wndPlaylistBar.Append(sl, sl.size() > 1);
 				applyRandomizeSwitch();
 
-				if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
-					m_wndPlaylistBar.SetLast();
+				if ((s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) || !nCount) {
+					fSetForegroundWindow = true;
+					m_wndPlaylistBar.SetSelIdx(nCount, true);
 					OpenCurPlaylistItem();
 				}
 			} else {
@@ -5343,13 +5346,15 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
-				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
+			if (s.nCLSwitches & CLSW_ADD) {
+				const auto nCount = m_wndPlaylistBar.GetCount();
 
+				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
 				applyRandomizeSwitch();
 
-				if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
-					m_wndPlaylistBar.SetLast();
+				if ((s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) || !nCount) {
+					fSetForegroundWindow = true;
+					m_wndPlaylistBar.SetSelIdx(nCount, true);
 					OpenCurPlaylistItem();
 				}
 			} else {
