@@ -1969,7 +1969,7 @@ static void CorrectPaths(std::list<CString>& fns)
 {
 	for (auto& fn : fns) {
 		if (std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
-			fn.Format(L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true", fn.GetString());
+			fn.Format(AfxGetAppSettings().strTorrServerAddress, fn.GetString());
 		}
 	}
 }

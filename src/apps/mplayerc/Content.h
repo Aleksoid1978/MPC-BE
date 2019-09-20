@@ -23,7 +23,8 @@
 #include <afxadv.h>
 #include <atlstr.h>
 
-#define CorrectAceStream(path) { path.Replace(L"acestream://", L"http://127.0.0.1:6878/ace/getstream?id="); }
+// TODO: make function
+#define CorrectAceStream(path) if (path.Left(12) == L"acestream://") {path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12));}
 
 namespace Content {
 	namespace Online {

@@ -46,6 +46,8 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_COMBO3, m_cbYDLMaxHeight);
 	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
+	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
+	DDX_Control(pDX, IDC_EDIT2,  m_edTorrServerAddress);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
@@ -105,6 +107,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chkYDLMaximumQuality.SetCheck(s.bYDLMaximumQuality ? BST_CHECKED : BST_UNCHECKED);
 
+	m_edAceStreamAddress.SetWindowTextW(s.strAceStreamAddress);
+	m_edTorrServerAddress.SetWindowTextW(s.strTorrServerAddress);
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -125,6 +130,18 @@ BOOL CPPageYoutube::OnApply()
 
 	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
 	s.bYDLMaximumQuality = !!m_chkYDLMaximumQuality.GetCheck();
+
+	CString str;
+	m_edAceStreamAddress.GetWindowTextW(str);
+	if (::PathIsURLW(str)) {
+		s.strAceStreamAddress = str;
+	}
+
+	str.Empty();
+	m_edTorrServerAddress.GetWindowTextW(str);
+	if (::PathIsURLW(str)) {
+		s.strTorrServerAddress = str;
+	}
 
 	return __super::OnApply();
 }

@@ -300,6 +300,9 @@
 #define IDS_RS_YDL_MAXHEIGHT				L"YDLMaxHeight"
 #define IDS_RS_YDL_MAXIMUM_QUALITY			L"YDLMaximumQuality"
 
+#define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
+#define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
+
 #define IDS_R_FILTERS_PRIORITY				L"Settings\\Filters Priority"
 
 #define IDS_RS_LASTFILEINFOPAGE				L"LastFileInfoPage"

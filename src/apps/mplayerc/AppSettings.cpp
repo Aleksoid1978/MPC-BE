@@ -875,6 +875,9 @@ void CAppSettings::ResetSettings()
 	iYDLMaxHeight = 720;
 	bYDLMaximumQuality = false;
 
+	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
+	strTorrServerAddress = L"http://127.0.0.1:8090/torrent/play?link=%s&m3u=true";
+
 	nLastFileInfoPage = 0;
 
 	bUpdaterAutoCheck = false;
@@ -1561,6 +1564,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
 
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
+
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(unsigned*)&nLastFileInfoPage);
 
 	profile.ReadBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
@@ -1983,6 +1989,9 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
+
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
