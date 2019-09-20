@@ -270,13 +270,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		_wremove(m_Profile.GetIniPath());
 	}
 
-	CString newpath;
-	AfxGetMyApp()->GetAppSavePath(newpath);
-
-	if (!useIni && !::PathFileExistsW(newpath)) {
-		EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
-	}
-
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
@@ -287,6 +280,13 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 
 	// Write settings immediately
 	m_s.SaveSettings();
+
+	CString newpath;
+	AfxGetMyApp()->GetAppSavePath(newpath); // call it after saving the settings
+
+	if (!useIni && !::PathFileExistsW(newpath)) {
+		EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
+	}
 
 	if (oldpath.GetLength() > 0) {
 		// moving shader files
