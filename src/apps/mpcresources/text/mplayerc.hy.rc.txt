@@ -397,7 +397,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Store settings in the player folder"
 29		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
 30		"Գործողության բարձր առաջնայնություն"
-31		"Network timeout*:"
+31		"Network timeout:"
 34		"sec."
 END
 
@@ -555,7 +555,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Snap to desktop edges"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 21
 5		"YouTube"
 6		"Use the built-in web page parser"
 7		"Preferred format:"
@@ -565,6 +565,8 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 13		"youtube-dl"
 14		"Max video height:"
 16		"Select max fps or bitrate"
+17		"AceStream address*:"
+19		"TorrServer address*:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

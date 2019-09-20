@@ -39,6 +39,9 @@ private:
 	CComboBox m_cbYDLMaxHeight;
 	CButton m_chkYDLMaximumQuality;
 
+	CEdit m_edAceStreamAddress;
+	CEdit m_edTorrServerAddress;
+
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();

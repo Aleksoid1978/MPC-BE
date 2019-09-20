@@ -397,7 +397,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Τοποθέτηση ρυθμίσεων στο φάκελο του αναπ/γού"
 29		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
 30		"Προτεραιότητα διεργασίας πάνω από κανονική"
-31		"Network timeout*:"
+31		"Network timeout:"
 34		"sec."
 END
 
@@ -555,7 +555,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Snap to desktop edges"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 21
 5		"YouTube"
 6		"Χρήση ενσωματωμένης μορφής στην ιστοσελίδα"
 7		"Προτίμηση μορφής:"
@@ -565,6 +565,8 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 13		"youtube-dl"
 14		"Max video height:"
 16		"Select max fps or bitrate"
+17		"AceStream address*:"
+19		"TorrServer address*:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

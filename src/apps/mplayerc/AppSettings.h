@@ -909,6 +909,9 @@ public:
 	int				iYDLMaxHeight;
 	bool			bYDLMaximumQuality;
 
+	CString			strAceStreamAddress;
+	CString			strTorrServerAddress;
+
 	DWORD			nLastFileInfoPage;
 
 	bool			IsISRSelect() const;
