@@ -270,6 +270,13 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		_wremove(m_Profile.GetIniPath());
 	}
 
+	CString newpath;
+	AfxGetMyApp()->GetAppSavePath(newpath);
+
+	if (!useIni && !::PathFileExistsW(newpath)) {
+		EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
+	}
+
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
@@ -285,9 +292,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		// moving shader files
 		const CStringW shaderpath = oldpath + L"Shaders\\";
 		if (::PathFileExistsW(shaderpath)) {
-			CString newpath;
-			AfxGetMyApp()->GetAppSavePath(newpath);
-
 			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
 			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
 			wcscpy(pathFrom, shaderpath);
