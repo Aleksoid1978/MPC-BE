@@ -30,6 +30,7 @@ IMPLEMENT_DYNAMIC(CPPageFileInfoRes, CPPageBase)
 CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 	: CPPageBase(CPPageFileInfoRes::IDD, CPPageFileInfoRes::IDD)
 	, m_fn(fn)
+	, m_fullfn(fn)
 	, m_hIcon(nullptr)
 {
 	m_fn.TrimRight('/');
@@ -92,7 +93,7 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	m_hIcon = LoadIconW(m_fn, false);
+	m_hIcon = LoadIconW(m_fullfn, false);
 	if (m_hIcon) {
 		m_icon.SetIcon(m_hIcon);
 	}

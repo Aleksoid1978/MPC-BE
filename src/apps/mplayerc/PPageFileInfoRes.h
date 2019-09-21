@@ -39,6 +39,7 @@ private:
 
 	CStatic   m_icon;
 	CString   m_fn;
+	CString   m_fullfn;
 	CListCtrl m_list;
 
 public:
