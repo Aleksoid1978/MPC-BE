@@ -131,18 +131,18 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 	return ret;
 }
 
-HICON LoadIcon(CString fn, bool fSmall)
+HICON LoadIcon(const CString& fn, bool fSmall)
 {
 	if (fn.IsEmpty()) {
 		return nullptr;
 	}
 
-	CString ext = fn.Left(fn.Find(L"://")+1).TrimRight(':');
+	CString ext = fn.Left(fn.Find(L"://") + 1).TrimRight(':');
 	if (ext.IsEmpty() || !ext.CompareNoCase(L"file")) {
-		ext = L"." + fn.Mid(fn.ReverseFind('.')+1);
+		ext = L"." + fn.Mid(fn.ReverseFind('.') + 1);
 	}
 
-	CSize size(fSmall?16:32, fSmall?16:32);
+	CSize size(fSmall ? 16 : 32, fSmall ? 16 : 32);
 
 	if (!ext.CompareNoCase(L".ifo")) {
 		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDI_DVD), IMAGE_ICON, size.cx, size.cy, 0)) {
@@ -156,7 +156,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 	}
 
-	if ((CString(fn).MakeLower().Find(L"://")) >= 0) {
+	if (fn.Find(L"://") >= 0) {
 		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
@@ -164,14 +164,14 @@ HICON LoadIcon(CString fn, bool fSmall)
 		return nullptr;
 	}
 
-	WCHAR buff[MAX_PATH];
-	lstrcpyW(buff, fn.GetBuffer());
+	WCHAR buff[MAX_PATH] = {};
+	if (fn.GetLength() <= MAX_PATH) {
+		lstrcpyW(buff, fn.GetString());
 
-	SHFILEINFO sfi;
-	ZeroMemory(&sfi, sizeof(sfi));
-
-	if (SUCCEEDED(SHGetFileInfoW(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) |SHGFI_ICON)) && sfi.hIcon) {
-		return sfi.hIcon;
+		SHFILEINFO sfi = {};
+		if (SUCCEEDED(SHGetFileInfoW(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) | SHGFI_ICON)) && sfi.hIcon) {
+			return sfi.hIcon;
+		}
 	}
 
 	ULONG len;
@@ -243,7 +243,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 	return (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0);
 }
 
-bool LoadType(CString fn, CString& type)
+bool LoadType(const CString& fn, CString& type)
 {
 	bool found = false;
 

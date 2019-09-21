@@ -25,8 +25,8 @@ bool    ExploreToFile(CString path);
 BOOL    IsUserAdmin();
 CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw = GetLastError());
 
-HICON LoadIcon(CString fn, bool fSmall);
-bool  LoadType(CString fn, CString& type);
+HICON LoadIcon(const CString& fn, bool fSmall);
+bool  LoadType(const CString& fn, CString& type);
 bool  LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
