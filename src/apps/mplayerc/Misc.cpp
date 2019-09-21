@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "Misc.h"
+#include "../../DSUtil/FileHandle.h"
 
 bool SetPrivilege(LPCTSTR privilege, bool bEnable/* = true*/)
 {
@@ -137,10 +138,7 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 		return nullptr;
 	}
 
-	CString ext = fn.Left(fn.Find(L"://") + 1).TrimRight(':');
-	if (ext.IsEmpty() || !ext.CompareNoCase(L"file")) {
-		ext = L"." + fn.Mid(fn.ReverseFind('.') + 1);
-	}
+	auto ext = GetFileExt(fn).MakeLower();
 
 	CSize size(fSmall ? 16 : 32, fSmall ? 16 : 32);
 
@@ -156,16 +154,8 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 		}
 	}
 
-	if (fn.Find(L"://") >= 0) {
-		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
-			return hIcon;
-		}
-
-		return nullptr;
-	}
-
 	WCHAR buff[MAX_PATH] = {};
-	if (fn.GetLength() <= MAX_PATH) {
+	if (fn.GetLength() <= MAX_PATH && ::PathFileExistsW(fn)) {
 		lstrcpyW(buff, fn.GetString());
 
 		SHFILEINFO sfi = {};
@@ -239,6 +229,12 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 			return hIcon;
 		}
 	} while (0);
+
+	if (fn.Find(L"://") >= 0) {
+		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
+			return hIcon;
+		}
+	}
 
 	return (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0);
 }
