@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -389,7 +389,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	if (m_hFile) {
 		const QWORD pos = m_pos;                             // bytes
 		const clock_t time = (clock() - m_startTime);        // milliseconds
-		const long speed = time > 0 ? pos * 1000 / time : 0; // bytes per second
+		const long speed = m_SaveStats.AddValuesGetSpeed(pos, time);
 
 		double dPos = pos / 1024.0;
 		const unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
