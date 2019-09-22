@@ -433,9 +433,15 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		VIDEOINFOHEADER* vihInput = (VIDEOINFOHEADER*)mtInput.Format();
 
 		ASSERT(vih);
-		if (vihInput && (vihInput->rcSource.right != 0) && (vihInput->rcSource.bottom != 0)) {
+		if (vihInput) {
 			vih->rcSource = vihInput->rcSource;
 			vih->rcTarget = vihInput->rcTarget;
+
+			// fix the bad source rectangle
+			vih->rcSource.left   = std::clamp(vih->rcSource.left  , 0L, (LONG)m_win);
+			vih->rcSource.top    = std::clamp(vih->rcSource.top   , 0L, (LONG)m_hin);
+			vih->rcSource.right  = std::clamp(vih->rcSource.right , 0L, (LONG)m_win);
+			vih->rcSource.bottom = std::clamp(vih->rcSource.bottom, 0L, (LONG)m_hin);
 
 			if (m_bMVC_Output_TopBottom) {
 				vih->rcSource.bottom *= 2;
