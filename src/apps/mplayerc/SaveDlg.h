@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,6 +50,29 @@ private:
 	HANDLE  m_hFile     = INVALID_HANDLE_VALUE;
 	QWORD   m_len       = 0;
 	clock_t m_startTime = 0;
+
+	struct {
+		struct {
+			long time;
+			QWORD len;
+		} TimeLens[40] = {}; // about 8 seconds
+		unsigned pos = 0;
+
+		long AddValuesGetSpeed(const QWORD len, const long time) {
+			pos++;
+			if (pos >= std::size(TimeLens)) {
+				pos = 0;
+			}
+
+			long interval = time - TimeLens[pos].time;
+			long speed = interval > 0 ? (long)((len - TimeLens[pos].len) * 1000 / interval) : 0;
+
+			TimeLens[pos].time = time;
+			TimeLens[pos].len = len;
+
+			return speed;
+		}
+	} m_SaveStats;
 
 	std::thread        m_SaveThread;
 	std::atomic_ullong m_pos    = 0;
