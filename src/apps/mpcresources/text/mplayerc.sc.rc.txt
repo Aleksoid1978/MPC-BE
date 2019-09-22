@@ -119,7 +119,7 @@ END
 
 BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"打开"
-7		"请先输入视频或音频文件的地址( Internet 链接或本地电脑文件路径)随后播放器将会为您打开它。"
+7		"请先输入视频或音频文件的链接( Internet 链接或本地电脑文件路径)随后播放器将会为您打开它。"
 8		"打开"
 10		"浏览..."
 11		"音轨"
@@ -473,7 +473,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 13		"发现字幕改动後自动重加载文件"
 15		"启用字幕同步编辑器"
 16		"在线数据库"
-17		"在线字幕数据库的地址: "
+17		"在线字幕数据库的链接: "
 20		"测试"
 END
 
@@ -565,8 +565,8 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 21
 13		"youtube-dl"
 14		"最大视频高度："
 16		"选择最大帧率或比特率"
-17		"AceStream address*:"
-19		"TorrServer address*:"
+17		"AceStream链接:"
+19		"TorrServer链接:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1851,7 +1851,7 @@ STRING IDS_PPAGE_OUTPUT_SYS_DEF		"系统默认"
 STRING IDS_PPAGE_OUTPUT_UNAVAILABLEMSG		"未安装选定的渲染器。"
 STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"VMR-9(窗口)"
 STRING IDS_PPSDB_BADURL		"错误的 URL,无法定位字幕数据库！"
-STRING IDS_PPSDB_PROTOCOLERR		"协议版本不匹配,请升级您的播放器或选择一个不同的地址！"
+STRING IDS_PPSDB_PROTOCOLERR		"协议版本不匹配,请升级您的播放器或选择一个不同的链接！"
 STRING IDS_PPSDB_URLCORRECT		"URL 看上去正确！"
 STRING IDS_PROPERTIESFOR		"“%s” - 属性"
 STRING IDS_PROPSHEET_PROPERTIES		"属性"
