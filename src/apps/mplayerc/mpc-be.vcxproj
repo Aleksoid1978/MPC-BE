@@ -199,6 +199,7 @@
     </ClCompile>
     <ClCompile Include="SubtitleDlDlg.cpp" />
     <ClCompile Include="ThumbsTaskDlg.cpp" />
+    <ClCompile Include="TorrentInfo.cpp" />
     <ClCompile Include="TunerScanDlg.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="vkCodes.cpp" />
@@ -324,6 +325,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SubtitleDlDlg.h" />
     <ClInclude Include="ThumbsTaskDlg.h" />
+    <ClInclude Include="TorrentInfo.h" />
     <ClInclude Include="TunerScanDlg.h" />
     <ClInclude Include="..\..\..\include\Version.h" />
     <ClInclude Include="UpdateChecker.h" />

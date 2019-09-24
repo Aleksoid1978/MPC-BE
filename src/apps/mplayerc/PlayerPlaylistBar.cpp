@@ -36,6 +36,7 @@
 #include "PlaylistNameDlg.h"
 #include <coolsb/coolscroll.h>
 #include "./Controls/MenuEx.h"
+#include "TorrentInfo.h"
 
 static CString MakePath(CString path)
 {
@@ -1970,6 +1971,14 @@ static void CorrectPaths(std::list<CString>& fns)
 	for (auto& fn : fns) {
 		if (std::regex_match(fn.GetString(), std::wregex(LR"(magnet:\?xt=urn:btih:[0-9a-fA-F]+(?:&\S+|$))"))) {
 			fn.Format(AfxGetAppSettings().strTorrServerAddress, fn.GetString());
+		} else if (fn.Right(8) == L".torrent" && ::PathFileExistsW(fn)) {
+			CTorrentInfo torrentInfo;
+			if (torrentInfo.Read(fn)) {
+				const auto magnet = torrentInfo.Magnet();
+				if (!magnet.empty()) {
+					fn.Format(AfxGetAppSettings().strTorrServerAddress, magnet.c_str());
+				}
+			}
 		}
 	}
 }
