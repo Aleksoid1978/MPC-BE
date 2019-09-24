@@ -167,9 +167,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	////////// Format conversion //////////
 	p = CPoint(10 + width_s + 15, 10);
 	combo_w = ScaleX(85);
-	label_w = ScaleX(192);
+	label_w = ScaleX(196);
 	width_s = label_w + combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 11, ScaleY(170))), this, (UINT)IDC_STATIC);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(170))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
