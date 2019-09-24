@@ -61,7 +61,7 @@ static filter_t s_source_filters[] = {
 
 static filter_t s_video_decoders[] = {
 	// DXVA2 decoders
-	{L"DXVA2: H264/AVC",			DXVA_DECODER,  VDEC_DXVA_H264,		0},
+	{L"DXVA2: H.264/AVC",			DXVA_DECODER,  VDEC_DXVA_H264,		0},
 	{L"DXVA2: HEVC",				DXVA_DECODER,  VDEC_DXVA_HEVC,		0},
 	{L"DXVA2: MPEG-2 Video",		DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
 	{L"DXVA2: VC-1",				DXVA_DECODER,  VDEC_DXVA_VC1,		0},
@@ -80,9 +80,9 @@ static filter_t s_video_decoders[] = {
 	{L"DivX",						VIDEO_DECODER, VDEC_DIVX,			0},
 	{L"DV Video",					VIDEO_DECODER, VDEC_DV,				0},
 	{L"FLV1/4",						VIDEO_DECODER, VDEC_FLV,			0},
-	{L"H263",						VIDEO_DECODER, VDEC_H263,			0},
-	{L"H264/AVC",					VIDEO_DECODER, VDEC_H264,			0},
-	{L"H264 (MVC 3D)",				VIDEO_DECODER, VDEC_H264_MVC,		IDS_TRA_INTEL_MSDK},
+	{L"H.263",						VIDEO_DECODER, VDEC_H263,			0},
+	{L"H.264/AVC",					VIDEO_DECODER, VDEC_H264,			0},
+	{L"H.264 (MVC 3D)",				VIDEO_DECODER, VDEC_H264_MVC,		IDS_TRA_INTEL_MSDK},
 	{L"HEVC",						VIDEO_DECODER, VDEC_HEVC,			0},
 	{L"Indeo 3/4/5",				VIDEO_DECODER, VDEC_INDEO,			0},
 	{L"Lossless video (HuffYUV, FFV1, Lagarith, MagicYUV)", VIDEO_DECODER, VDEC_LOSSLESS, 0},

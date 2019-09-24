@@ -2588,7 +2588,7 @@ const wchar_t *StreamTypeToName(PES_STREAM_TYPE _Type)
 		case AUDIO_STREAM_MPEG2:
 				return L"MPEG-2";
 		case VIDEO_STREAM_H264:
-				return L"H264";
+				return L"H.264";
 		case AUDIO_STREAM_LPCM:
 				return L"LPCM";
 		case AUDIO_STREAM_AC3:

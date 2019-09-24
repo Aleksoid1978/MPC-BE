@@ -62,7 +62,7 @@ static const std::map<DWORD, LPCSTR> vfourcs = {
 	{FCC('VP60'), "On2 VP6"},
 	{FCC('SVQ3'), "SVQ3"},
 	{FCC('SVQ1'), "SVQ1"},
-	{FCC('H263'), "H263"},
+	{FCC('H263'), "H.263"},
 	{FCC('DRAC'), "Dirac"},
 	{FCC('WVC1'), "VC-1"},
 	{FCC('THEO'), "Theora"},
