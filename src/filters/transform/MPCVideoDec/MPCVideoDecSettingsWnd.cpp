@@ -169,7 +169,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	combo_w = ScaleX(85);
 	label_w = ScaleX(192);
 	width_s = label_w + combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(170))), this, (UINT)IDC_STATIC);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 11, ScaleY(170))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
@@ -445,12 +445,12 @@ static const struct {
 	ULONGLONG	CodecId;
 	LPCWSTR		CodeName;
 } mpc_codecs[] = {
-	{CODEC_H264_DXVA,	L"H.264/AVC (DXVA)"},
-	{CODEC_HEVC_DXVA,	L"HEVC (DXVA)"},
-	{CODEC_MPEG2_DXVA,	L"MPEG-2 (DXVA)"},
-	{CODEC_VC1_DXVA,	L"VC-1 (DXVA)"},
-	{CODEC_WMV3_DXVA,	L"WMV3 (DXVA)"},
-	{CODEC_VP9_DXVA,	L"VP9 (DXVA)"},
+	{CODEC_H264_DXVA,	L"DXVA: H.264/AVC"},
+	{CODEC_HEVC_DXVA,	L"DXVA: HEVC"},
+	{CODEC_MPEG2_DXVA,	L"DXVA: MPEG-2"},
+	{CODEC_VC1_DXVA,	L"DXVA: VC-1"},
+	{CODEC_WMV3_DXVA,	L"DXVA: WMV3"},
+	{CODEC_VP9_DXVA,	L"DXVA: VP9"},
 	{CODEC_AMVV,		L"AMV video"},
 	{CODEC_AV1,			L"AOMedia Video 1 (AV1)"},
 	{CODEC_PRORES,		L"Apple ProRes"},
@@ -465,7 +465,7 @@ static const struct {
 	{CODEC_FLASH,		L"FLV1/4"},
 	{CODEC_H263,		L"H.263"},
 	{CODEC_H264,		L"H.264/AVC (FFmpeg)"},
-	{CODEC_H264_MVC,	L"H264 (MVC 3D)"},
+	{CODEC_H264_MVC,	L"H.264 (MVC 3D)"},
 	{CODEC_HEVC,		L"HEVC"},
 	{CODEC_INDEO,		L"Indeo 3/4/5"},
 	{CODEC_LOSSLESS,	L"Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)"},

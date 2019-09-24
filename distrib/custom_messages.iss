@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2018 see Authors.txt
+; (C) 2009-2019 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -352,26 +352,26 @@ cz.PinToTaskBar=Pin to TaskBar
 ;German
 de.langid=00000002
 de.langcode=de
-de.comp_mpciconlib=Symbole für Mediendateien
-de.comp_mpcresources=Übersetzungen
-de.comp_mpcbeshellext=Alternative Shell-Erweiterung installieren
-de.comp_intel_msdk=H.264 MVC 3D Decoder (extra Download)
-de.msg_DeleteSettings=Wollen Sie auch die Einstellungen des MPC-BE löschen?%n%nWenn Sie den MPC-BE wieder installieren wollen, dann müssen Sie diese nicht unbedingt löschen.
-de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime June 2010 unabhängig von Ihrem Betriebssystem.
-de.msg_SetupIsRunningWarning=MPC-BE Setup wird bereits ausgeführt!
-de.msg_simd_sse2=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE2-Unterstützung.%n%nIhr Prozessor besitzt diese Eigenschaft nicht.
+de.comp_mpciconlib=Icon-Bibliothek
+de.comp_mpcresources=Übersetzungen (u.a. deutsch)
+de.comp_mpcbeshellext=Alternative Kontextmenü-Erweiterung
+de.comp_intel_msdk=H.264/MVC Decoder (extra Download)
+de.msg_DeleteSettings=Wollen Sie auch die Einstellungen von MPC-BE löschen?%n%nWenn Sie MPC-BE neu installieren möchten, müssen Sie diese Einstellungen nicht löschen.
+de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nLaden Sie die neueste DirectX-Runtime vom Juni 2010 herunter und installieren Sie sie, unabhängig von Ihrem Betriebssystem.
+de.msg_SetupIsRunningWarning=Das Installationsprogramm von MPC-BE wird bereits ausgeführt!
+de.msg_simd_sse2=Für diesen Build von MPC-BE ist eine CPU mit SSE2-Unterstützung erforderlich.%n%nIhre CPU unterstützt diese Befehlssatzerweiterung nicht.
 de.tsk_AllUsers=Für alle Benutzer
 de.tsk_CurrentUser=Für aktuellen Benutzer
-de.tsk_Other=Andere Aufgaben:
+de.tsk_Other=Weitere Aufgaben:
 de.tsk_ResetSettings=Einstellungen zurücksetzen
-de.types_DefaultInstallation=Standard Installation
+de.types_DefaultInstallation=Standard-Installation
 de.types_CustomInstallation=Benutzerdefinierte Installation
-de.ViewChangelog=Zeige Änderungsprotokoll
-de.AssociationFormatsAV=Verknüpfungen mit Video- und Audiodateien konfigurieren:
-de.AssociationFormats=Mit Video- und Audiodateien verknüpfen
-de.AssociationVideo=Mit Videodateien verknüpfen
-de.AssociationAudio=Mit Audiodateien verknüpfen
-de.AssociationPlaylist=Mit Playlisten verknüpfen
+de.ViewChangelog=Änderungsprotokoll anzeigen
+de.AssociationFormatsAV=Dateizuordungen für Video- und Audiodateien konfigurieren:
+de.AssociationFormats=Dateizuordungen für Video- und Audiodateien
+de.AssociationVideo=Dateizuordungen für Videodateien
+de.AssociationAudio=Dateizuordungen für Audiodateien
+de.AssociationPlaylist=Dateizuordungen für Wiedergabelisten
 de.AutoPlayType=AutoPlay:
 de.AssociationMPCPlayCDAudioOnArrivalF=Audio-CD wiedergeben
 de.AssociationMPCPlayCDAudioS=Audio-CD
