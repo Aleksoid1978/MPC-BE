@@ -2488,7 +2488,7 @@ void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, const BYTE table_id)
 						break;
 				}
 
-				for (const auto& [pid, codes] : iso_639_codes) {
+				for (const auto [pid, codes] : iso_639_codes) {
 					if (!m_streamData[pid].pmt.iso_639_codes[0]) {
 						strcpy_s(m_streamData[pid].pmt.iso_639_codes, codes);
 					}
