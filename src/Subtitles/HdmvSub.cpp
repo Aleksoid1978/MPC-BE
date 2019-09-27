@@ -94,6 +94,10 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, RE
 			USHORT            nUnitSize = SampleBuffer.ReadShort();
 			nLen -=3;
 
+			if (nLen <= 0) {
+				return S_OK;
+			}
+
 			switch (nSegType) {
 				case PALETTE :
 				case OBJECT :
