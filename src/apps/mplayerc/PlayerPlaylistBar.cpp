@@ -254,7 +254,7 @@ CString CPlaylistItem::GetLabel(int i)
 			if (::PathIsURLW(fn) && url.CrackUrl(fn)) {
 				str = fn.GetName();
 				if (url.GetUrlPathLength() > 1) {
-					str = url.GetUrlPath();
+					str = url.GetUrlPath(); str.TrimRight(L'/');
 					if (const int pos = str.ReverseFind(L'/'); pos != -1) {
 						str = str.Right(str.GetLength() - pos - 1);
 					}
