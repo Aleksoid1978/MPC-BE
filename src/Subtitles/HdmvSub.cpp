@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -93,10 +93,6 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, RE
 			HDMV_SEGMENT_TYPE nSegType  = (HDMV_SEGMENT_TYPE)SampleBuffer.ReadByte();
 			USHORT            nUnitSize = SampleBuffer.ReadShort();
 			nLen -=3;
-
-			if (nLen <= 0) {
-				return S_OK;
-			}
 
 			switch (nSegType) {
 				case PALETTE :
@@ -313,6 +309,10 @@ void CHdmvSub::UpdateTimeStamp(REFERENCE_TIME rtStop)
 
 void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME rtTime)
 {
+	if (pGBuffer->RemainingSize() < 11) {
+		return;
+	}
+
 	ParseVideoDescriptor(pGBuffer, &m_VideoDescriptor);
 
 	COMPOSITION_DESCRIPTOR CompositionDescriptor;
@@ -340,6 +340,10 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 	}
 
 	if (nObjectNumber > 0) {
+		if (pGBuffer->RemainingSize() < (nObjectNumber * 8)) {
+			return;
+		}
+
 		m_pCurrentWindow->m_nObjectNumber     = nObjectNumber;
 		m_pCurrentWindow->m_palette_id_ref    = (SHORT)palette_id_ref;
 		m_pCurrentWindow->m_compositionNumber = CompositionDescriptor.nNumber;
@@ -395,6 +399,10 @@ void CHdmvSub::ParseCompositionObject(CGolombBuffer* pGBuffer, CompositionObject
 	pCompositionObject->m_vertical_position   = pGBuffer->ReadShort();
 
 	if (pCompositionObject->m_object_cropped_flag) {
+		if (pGBuffer->RemainingSize() < 8) {
+			return;
+		}
+
 		pCompositionObject->m_cropping_horizontal_position = pGBuffer->ReadShort();
 		pCompositionObject->m_cropping_vertical_position   = pGBuffer->ReadShort();
 		pCompositionObject->m_cropping_width               = pGBuffer->ReadShort();
@@ -408,6 +416,10 @@ void CHdmvSub::ParseCompositionObject(CGolombBuffer* pGBuffer, CompositionObject
 
 void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 {
+	if (nSize <= 2) {
+		return;
+	}
+
 	BYTE palette_id             = pGBuffer->ReadByte();
 	BYTE palette_version_number = pGBuffer->ReadByte();
 	UNREFERENCED_PARAMETER(palette_version_number);
@@ -437,6 +449,10 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 
 void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 {
+	if (nUnitSize <= 4) {
+		return;
+	}
+
 	SHORT object_id = pGBuffer->ReadShort();
 	if (object_id > _countof(m_ParsedObjects)) {
 		TRACE_HDMVSUB(L"CHdmvSub::ParseObject() : FAILED, object_id - %d", object_id);
@@ -449,6 +465,10 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 	BYTE m_sequence_desc     = pGBuffer->ReadByte();
 
 	if (m_sequence_desc & 0x80) {
+		if (nUnitSize <= 8) {
+			return;
+		}
+
 		DWORD object_data_length = (DWORD)pGBuffer->BitRead(24);
 
 		pObject.m_width  = pGBuffer->ReadShort();
