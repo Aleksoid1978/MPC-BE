@@ -293,7 +293,7 @@ WNDPROC COpenFileDlg::m_wndProc = nullptr;
 IMPLEMENT_DYNAMIC(COpenFileDlg, CFileDialog)
 COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 						   DWORD dwFlags, LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE|OFN_NODEREFERENCELINKS, lpszFilter, pParentWnd, 0)
+	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
 	, m_mask(mask)
 {
 	m_fAllowDirSelection = fAllowDirSelection;
