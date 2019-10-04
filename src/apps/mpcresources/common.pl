@@ -310,12 +310,16 @@ sub writeFile {
 	open(OUTPUT, ">$filename")|| die "Cannot open $filename to write";
 
 	if ($encoding == 0) {
+		binmode(OUTPUT);
+		print OUTPUT chr(0xef);
+		print OUTPUT chr(0xbb);
+		print OUTPUT chr(0xbf);	#write UTF-8 bom
 		binmode(OUTPUT, ":raw:encoding(UTF8)");
 	}
 	elsif ($encoding == 1) {
 		binmode(OUTPUT);
 		print OUTPUT chr(0xff);
-		print OUTPUT chr(0xfe);	#write unicode bom
+		print OUTPUT chr(0xfe);	#write UTF-16LE bom
 		binmode(OUTPUT, ":raw:encoding(UTF16-LE)");
 	}
 	elsif ($encoding == 2) {
