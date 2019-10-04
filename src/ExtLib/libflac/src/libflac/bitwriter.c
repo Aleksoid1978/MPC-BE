@@ -410,6 +410,10 @@ inline FLAC__bool FLAC__bitwriter_write_byte_block(FLAC__BitWriter *bw, const FL
 {
 	uint32_t i;
 
+	/* grow capacity upfront to prevent constant reallocation during writes */
+	if(bw->capacity <= bw->words + nvals / (FLAC__BITS_PER_WORD / 8) + 1 && !bitwriter_grow_(bw, nvals * 8))
+		return false;
+
 	/* this could be faster but currently we don't need it to be since it's only used for writing metadata */
 	for(i = 0; i < nvals; i++) {
 		if(!FLAC__bitwriter_write_raw_uint32_nocheck(bw, (FLAC__uint32)(vals[i]), 8))

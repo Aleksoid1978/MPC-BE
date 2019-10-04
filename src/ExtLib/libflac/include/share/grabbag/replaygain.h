@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-extern const unsigned GRABBAG__REPLAYGAIN_MAX_TAG_SPACE_REQUIRED;
+extern const uint32_t GRABBAG__REPLAYGAIN_MAX_TAG_SPACE_REQUIRED;
 
 extern const FLAC__byte * const GRABBAG__REPLAYGAIN_TAG_REFERENCE_LOUDNESS; /* = "REPLAYGAIN_REFERENCE_LOUDNESS" */
 extern const FLAC__byte * const GRABBAG__REPLAYGAIN_TAG_TITLE_GAIN; /* = "REPLAYGAIN_TRACK_GAIN" */
@@ -42,12 +42,12 @@ extern const FLAC__byte * const GRABBAG__REPLAYGAIN_TAG_TITLE_PEAK; /* = "REPLAY
 extern const FLAC__byte * const GRABBAG__REPLAYGAIN_TAG_ALBUM_GAIN; /* = "REPLAYGAIN_ALBUM_GAIN" */
 extern const FLAC__byte * const GRABBAG__REPLAYGAIN_TAG_ALBUM_PEAK; /* = "REPLAYGAIN_ALBUM_PEAK" */
 
-FLAC__bool grabbag__replaygain_is_valid_sample_frequency(unsigned sample_frequency);
+FLAC__bool grabbag__replaygain_is_valid_sample_frequency(uint32_t sample_frequency);
 
-FLAC__bool grabbag__replaygain_init(unsigned sample_frequency);
+FLAC__bool grabbag__replaygain_init(uint32_t sample_frequency);
 
 /* 'bps' must be valid for FLAC, i.e. >=4 and <= 32 */
-FLAC__bool grabbag__replaygain_analyze(const FLAC__int32 * const input[], FLAC__bool is_stereo, unsigned bps, unsigned samples);
+FLAC__bool grabbag__replaygain_analyze(const FLAC__int32 * const input[], FLAC__bool is_stereo, uint32_t bps, uint32_t samples);
 
 void grabbag__replaygain_get_album(float *gain, float *peak);
 void grabbag__replaygain_get_title(float *gain, float *peak);
