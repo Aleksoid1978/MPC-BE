@@ -396,8 +396,10 @@ static FLAC__StreamDecoderInitStatus init_stream_internal_(
 #if FLAC__HAS_X86INTRIN && ! defined FLAC__INTEGER_ONLY_LIBRARY
 # if defined FLAC__SSE4_1_SUPPORTED
 		if (decoder->private_->cpuinfo.x86.sse41) {
+#  if !defined FLAC__HAS_NASM  /* these are not undoubtedly faster than their MMX ASM counterparts */
 			decoder->private_->local_lpc_restore_signal = FLAC__lpc_restore_signal_intrin_sse41;
 			decoder->private_->local_lpc_restore_signal_16bit = FLAC__lpc_restore_signal_16_intrin_sse41;
+#  endif
 			decoder->private_->local_lpc_restore_signal_64bit = FLAC__lpc_restore_signal_wide_intrin_sse41;
 		}
 # endif
@@ -3396,7 +3398,7 @@ FLAC__bool file_eof_callback_(const FLAC__StreamDecoder *decoder, void *client_d
 	return feof(decoder->private_->file)? true : false;
 }
 
-void *get_client_data_from_decoder(FLAC__StreamDecoder *decoder)
+FLAC_API const void *FLAC__get_decoder_client_data(FLAC__StreamDecoder *decoder)
 {
 	return decoder->private_->client_data;
 }

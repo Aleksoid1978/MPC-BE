@@ -119,8 +119,10 @@ static inline void crc16_update_word_(FLAC__BitReader *br, brword word)
 {
 	register uint32_t crc = br->read_crc16;
 
-	for( ; br->crc16_align < FLAC__BITS_PER_WORD; br->crc16_align += 8)
-		crc = FLAC__CRC16_UPDATE((uint32_t)((word >> (FLAC__BITS_PER_WORD-8-br->crc16_align)) & 0xff), crc);
+	for ( ; br->crc16_align < FLAC__BITS_PER_WORD ; br->crc16_align += 8) {
+		uint32_t shift = FLAC__BITS_PER_WORD - 8 - br->crc16_align ;
+		crc = FLAC__CRC16_UPDATE ((uint32_t) (shift < FLAC__BITS_PER_WORD ? (word >> shift) & 0xff : 0), crc);
+	}
 
 	br->read_crc16 = crc;
 	br->crc16_align = 0;
@@ -131,16 +133,19 @@ static inline void crc16_update_block_(FLAC__BitReader *br)
 	if(br->consumed_words > br->crc16_offset && br->crc16_align)
 		crc16_update_word_(br, br->buffer[br->crc16_offset++]);
 
+	/* Prevent OOB read due to wrap-around. */
+	if (br->consumed_words > br->crc16_offset) {
 #if FLAC__BYTES_PER_WORD == 4
-	br->read_crc16 = FLAC__crc16_update_words32(br->buffer + br->crc16_offset, br->consumed_words - br->crc16_offset, br->read_crc16);
+		br->read_crc16 = FLAC__crc16_update_words32(br->buffer + br->crc16_offset, br->consumed_words - br->crc16_offset, br->read_crc16);
 #elif FLAC__BYTES_PER_WORD == 8
-	br->read_crc16 = FLAC__crc16_update_words64(br->buffer + br->crc16_offset, br->consumed_words - br->crc16_offset, br->read_crc16);
+		br->read_crc16 = FLAC__crc16_update_words64(br->buffer + br->crc16_offset, br->consumed_words - br->crc16_offset, br->read_crc16);
 #else
-	unsigned i;
+		unsigned i;
 
-	for(i = br->crc16_offset; i < br->consumed_words; i++)
-		crc16_update_word_(br, br->buffer[i]);
+		for (i = br->crc16_offset; i < br->consumed_words; i++)
+			crc16_update_word_(br, br->buffer[i]);
 #endif
+	}
 
 	br->crc16_offset = 0;
 }
@@ -453,7 +458,7 @@ FLAC__bool FLAC__bitreader_read_raw_int32(FLAC__BitReader *br, FLAC__int32 *val,
 {
 	FLAC__uint32 uval, mask;
 	/* OPT: inline raw uint32 code here, or make into a macro if possible in the .h file */
-	if(!FLAC__bitreader_read_raw_uint32(br, &uval, bits))
+	if (bits < 1 || ! FLAC__bitreader_read_raw_uint32(br, &uval, bits))
 		return false;
 	/* sign-extend *val assuming it is currently bits wide. */
 	/* From: https://graphics.stanford.edu/~seander/bithacks.html#FixedSignExtend */

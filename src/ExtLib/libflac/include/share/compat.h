@@ -112,8 +112,12 @@
 #include <sys/utime.h> /* for utime() */
 #endif
 #else
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200809L)
+#include <fcntl.h>
+#else
 #include <sys/types.h> /* some flavors of BSD (like OS X) require this to get time_t */
 #include <utime.h> /* for utime() */
+#endif
 #endif
 
 #if defined _MSC_VER
@@ -160,11 +164,15 @@
 
 #define flac_fopen fopen
 #define flac_chmod chmod
-#define flac_utime utime
 #define flac_unlink unlink
 #define flac_rename rename
 #define flac_stat stat
 
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200809L)
+#define flac_utime(a, b) utimensat (AT_FDCWD, a, *b, 0)
+#else
+#define flac_utime utime
+#endif
 #endif
 
 #ifdef _WIN32
