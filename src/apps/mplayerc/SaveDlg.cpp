@@ -224,7 +224,7 @@ HRESULT CSaveDlg::InitFileCopy()
 				if (m_len) {
 					ULARGE_INTEGER usize = { 0 };
 					usize.QuadPart = m_len;
-					HANDLE hMapping = CreateFileMapping(m_hFile, nullptr, PAGE_READWRITE, usize.HighPart, usize.LowPart, nullptr);
+					HANDLE hMapping = CreateFileMappingW(m_hFile, nullptr, PAGE_READWRITE, usize.HighPart, usize.LowPart, nullptr);
 					if (hMapping != INVALID_HANDLE_VALUE) {
 						CloseHandle(hMapping);
 					}
@@ -376,6 +376,9 @@ void CSaveDlg::Save()
 
 			attempts = 0;
 		}
+
+		CloseHandle(m_hFile);
+		m_hFile = INVALID_HANDLE_VALUE;
 	}
 
 	ClickCommandControl(IDCANCEL);
@@ -386,7 +389,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
-	if (m_hFile) {
+	if (m_hFile != INVALID_HANDLE_VALUE) {
 		const QWORD pos = m_pos;                             // bytes
 		const clock_t time = (clock() - m_startTime);        // milliseconds
 		const long speed = m_SaveStats.AddValuesGetSpeed(pos, time);
