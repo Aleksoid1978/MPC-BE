@@ -5777,8 +5777,8 @@ void CMainFrame::OnFileSaveAs()
 	HRESULT hr;
 	CSaveDlg dlg(in, name, p, hr);
 	if (SUCCEEDED(hr)) {
-		dlg.DoModal();
-		if (!m_youtubeFields.fname.IsEmpty()) {
+		const auto ret = dlg.DoModal();
+		if (ret == IDOK && !m_youtubeFields.fname.IsEmpty()) {
 			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
 			if (pFileData && pFileData->fns.size() == 2) {
 				ext = p.GetExtension().MakeLower();
@@ -5788,15 +5788,13 @@ void CMainFrame::OnFileSaveAs()
 					p.RenameExtension(L".audio.mka");
 				}
 
-				if (pFileData->fns.size() >= 2) {
-					auto it = pFileData->fns.begin();
-					++it;
-					in = (*it).GetName();
+				auto it = pFileData->fns.begin();
+				++it;
+				in = (*it).GetName();
 
-					CSaveDlg dlg_second(in, name, p, hr);
-					if (SUCCEEDED(hr)) {
-						dlg_second.DoModal();
-					}
+				CSaveDlg dlg_second(in, name, p, hr);
+				if (SUCCEEDED(hr)) {
+					dlg_second.DoModal();
 				}
 			}
 		}

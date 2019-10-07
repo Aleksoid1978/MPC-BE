@@ -84,7 +84,6 @@ CSaveDlg::~CSaveDlg()
 		WSACleanup();
 	}
 
-
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		CloseHandle(m_hFile);
 	}
@@ -166,12 +165,9 @@ HRESULT CSaveDlg::InitFileCopy()
 				m_protocol = protocol::PROTOCOL_HTTP;
 			}
 		} else if (protocol == L"udp") {
-			WSADATA wsaData = { 0 };
+			WSADATA wsaData = {};
 			WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-			int addr_size = sizeof(m_addr);
-
-			memset(&m_addr, 0, addr_size);
 			m_addr.sin_family      = AF_INET;
 			m_addr.sin_port        = htons((u_short)url.GetPortNumber());
 			m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -192,7 +188,7 @@ HRESULT CSaveDlg::InitFileCopy()
 					m_UdpSocket = INVALID_SOCKET;
 				}
 
-				if (::bind(m_UdpSocket, (struct sockaddr*)&m_addr, addr_size) == SOCKET_ERROR) {
+				if (::bind(m_UdpSocket, (struct sockaddr*)&m_addr, sizeof(m_addr)) == SOCKET_ERROR) {
 					closesocket(m_UdpSocket);
 					m_UdpSocket = INVALID_SOCKET;
 				}
@@ -286,7 +282,12 @@ fail:
 	}
 
 	CComQIPtr<IBaseFilter> pDst;
-	pDst.CoCreateInstance(CLSID_FileWriter);
+	if (FAILED(pDst.CoCreateInstance(CLSID_FileWriter))) {
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
+		SetFooterText(ResStr(IDS_AG_ERROR));
+
+		return S_FALSE;
+	}
 	CComQIPtr<IFileSinkFilter2> pFSF = pDst;
 	pFSF->SetFileName(CStringW(m_out), nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
@@ -331,14 +332,14 @@ void CSaveDlg::Save()
 		m_startTime = clock();
 
 		const DWORD bufLen = 64 * KILOBYTE;
-		BYTE pBuffer[bufLen] = { 0 };
+		std::vector<BYTE> pBuffer(bufLen);
 
 		int attempts = 0;
 
 		while (!m_bAbort && attempts <= 20) {
 			DWORD dwSizeRead = 0;
 			if (m_protocol == protocol::PROTOCOL_HTTP) {
-				const HRESULT hr = m_HTTPAsync.Read(pBuffer, bufLen, &dwSizeRead);
+				const HRESULT hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, &dwSizeRead);
 				if (hr != S_OK) {
 					m_bAbort = true;
 					break;
@@ -348,7 +349,7 @@ void CSaveDlg::Save()
 				if (dwResult == WSA_WAIT_EVENT_0) {
 					WSAResetEvent(m_WSAEvent);
 					static int fromlen = sizeof(m_addr);
-					dwSizeRead = recvfrom(m_UdpSocket, (char*)pBuffer, bufLen, 0, (SOCKADDR*)&m_addr, &fromlen);
+					dwSizeRead = recvfrom(m_UdpSocket, (char*)pBuffer.data(), bufLen, 0, (SOCKADDR*)&m_addr, &fromlen);
 					if (dwSizeRead <= 0) {
 						const int wsaLastError = WSAGetLastError();
 						if (wsaLastError != WSAEWOULDBLOCK) {
@@ -363,14 +364,14 @@ void CSaveDlg::Save()
 			}
 
 			DWORD dwSizeWritten = 0;
-			if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer, dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
+			if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer.data(), dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
 				m_bAbort = true;
 				break;
 			}
 
 			m_pos += dwSizeRead;
 			if (m_len && m_len == m_pos) {
-				m_bAbort = true;
+				::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_OK_BUTTON), 0);
 				break;
 			}
 
@@ -380,8 +381,12 @@ void CSaveDlg::Save()
 		CloseHandle(m_hFile);
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
+}
 
-	ClickCommandControl(IDCANCEL);
+HRESULT CSaveDlg::OnInit()
+{
+	m_TaskDlgHwnd = ::GetActiveWindow();
+	return __super::OnInit();
 }
 
 HRESULT CSaveDlg::OnTimer(_In_ long lTime)
@@ -498,7 +503,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		SetProgressBarPosition(dur > 0 ? (int)(1000 * pos / dur) : 0);
 
 		if (dur && pos >= dur) {
-			ClickCommandControl(IDCANCEL);
+			::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_OK_BUTTON), 0);
 			return S_FALSE;
 		}
 	}
