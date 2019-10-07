@@ -57,18 +57,13 @@ static CString MakePath(CString path)
 }
 
 struct CUETrack {
-	REFERENCE_TIME m_rt;
-	UINT m_trackNum;
+	REFERENCE_TIME m_rt = _I64_MIN;
+	UINT m_trackNum = 0;
 	CString m_fn;
 	CString m_Title;
 	CString m_Performer;
 
-	CUETrack() {
-		m_rt		= _I64_MIN;
-		m_trackNum	= 0;
-	}
-
-	CUETrack(CString fn, REFERENCE_TIME rt, UINT trackNum, CString Title, CString Performer) {
+	CUETrack(const CString& fn, const REFERENCE_TIME rt, const UINT trackNum, const CString& Title, const CString& Performer) {
 		m_rt		= rt;
 		m_trackNum = trackNum;
 		m_fn		= fn;
@@ -76,6 +71,7 @@ struct CUETrack {
 		m_Performer	= Performer;
 	}
 };
+
 static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CString& Title, CString& Performer)
 {
 	CTextFile f(CTextFile::UTF8, CTextFile::ANSI);
@@ -115,12 +111,12 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 	UINT idx = 0;
 	f.Seek(0, CFile::SeekPosition::begin);
 	while (f.ReadString(cueLine)) {
-		CString cmd = GetCUECommand(cueLine);
+		const CString cmd = GetCUECommand(cueLine);
 
 		if (cmd == L"TRACK") {
 			if (rt != _I64_MIN) {
-				CString fName = bMultiple ? sFilesArray[idx++] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName;
-				CUETrackList.push_back(CUETrack(fName, rt, trackNum, sTitle, sPerformer));
+				const CString fName = bMultiple ? sFilesArray[idx++] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName;
+				CUETrackList.push_back({ fName, rt, trackNum, sTitle, sPerformer });
 			}
 			rt = _I64_MIN;
 			sFileName = sFileName2;
@@ -160,20 +156,18 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 			unsigned mm, ss, ff;
 			if (3 == swscanf_s(cueLine, L"01 %u:%u:%u", &mm, &ss, &ff) && fAudioTrack) {
 				// "INDEX 01" is required and denotes the start of the track
-				rt = UNITS * (mm * 60u + ss) + UNITS * ff / 75;
+				rt = UNITS * (mm * 60LL + ss) + UNITS * ff / 75;
 			}
 		}
 	}
 
 	if (rt != _I64_MIN) {
-		CString fName = bMultiple ? sFilesArray[idx] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName2;
-		CUETrackList.push_back(CUETrack(fName, rt, trackNum, sTitle, sPerformer));
+		const CString fName = bMultiple ? sFilesArray[idx] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName2;
+		CUETrackList.push_back({ fName, rt, trackNum, sTitle, sPerformer });
 	}
 
 	return CUETrackList.size() > 0;
 }
-
-UINT CPlaylistItem::m_globalid  = 0;
 
 CPlaylistItem::CPlaylistItem()
 	: m_type(file)
@@ -186,15 +180,6 @@ CPlaylistItem::CPlaylistItem()
 	, m_country(0)
 {
 	m_id = m_globalid++;
-}
-
-CPlaylistItem::~CPlaylistItem()
-{
-}
-
-CPlaylistItem::CPlaylistItem(const CPlaylistItem& pli)
-{
-	*this = pli;
 }
 
 CPlaylistItem& CPlaylistItem::operator = (const CPlaylistItem& pli)
@@ -515,15 +500,6 @@ void CPlaylistItem::AutoLoadFiles()
 			}
 		}
 	}
-}
-
-CPlaylist::CPlaylist()
-	: m_pos(nullptr)
-{
-}
-
-CPlaylist::~CPlaylist()
-{
 }
 
 bool CPlaylist::RemoveAll()

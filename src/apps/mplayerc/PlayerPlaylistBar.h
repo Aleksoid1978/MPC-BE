@@ -35,7 +35,9 @@ class CFileItem
 	ChaptersList m_ChaptersList;
 
 public:
-	CFileItem() {};
+	CFileItem() = default;
+	~CFileItem() = default;
+
 	CFileItem(const CString& str) {
 		m_fn = str;
 	}
@@ -102,7 +104,7 @@ typedef std::list<CFileItem> CFileItemList;
 
 class CPlaylistItem
 {
-	static UINT m_globalid;
+	static inline UINT m_globalid = 0;
 
 public:
 	UINT m_id;
@@ -125,9 +127,8 @@ public:
 
 public:
 	CPlaylistItem();
-	virtual ~CPlaylistItem();
+	~CPlaylistItem() = default;
 
-	CPlaylistItem(const CPlaylistItem& pli);
 	CPlaylistItem& operator = (const CPlaylistItem& pli);
 
 	bool FindFile(LPCTSTR path);
@@ -140,11 +141,11 @@ public:
 class CPlaylist : public CList<CPlaylistItem>
 {
 protected:
-	POSITION m_pos;
+	POSITION m_pos = nullptr;
 
 public:
-	CPlaylist();
-	virtual ~CPlaylist();
+	CPlaylist() = default;
+	~CPlaylist() = default;
 
 	bool RemoveAll();
 	bool RemoveAt(POSITION pos);
@@ -344,7 +345,7 @@ private:
 
 public:
 	CPlayerPlaylistBar(CMainFrame* pMainFrame);
-	virtual ~CPlayerPlaylistBar();
+	~CPlayerPlaylistBar();
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 
