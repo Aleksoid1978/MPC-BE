@@ -93,11 +93,8 @@ public:
 	typedef std::vector<SyncPoint> SyncPoints;
 
 	struct PlaylistItem {
-		PlaylistItem() {}
-
-		PlaylistItem(const PlaylistItem& pi) {
-			*this = pi;
-		}
+		PlaylistItem() = default;
+		~PlaylistItem() = default;
 
 		CString           m_strFileName;
 
@@ -160,7 +157,7 @@ public:
 	Stream*  FindStream(SHORT wPID);
 	Streams& GetStreams() { return !stn.m_Streams.empty() ? stn.m_Streams : m_Streams; }
 
-	HRESULT FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& Playlists);
+	HRESULT FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& Playlists);
 	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = nullptr);
 	HRESULT ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
