@@ -18575,11 +18575,10 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 	}
 
 	if (::PathIsDirectoryW(path + L"\\PLAYLIST") && ::PathIsDirectoryW(path + L"\\STREAM")) {
-		CHdmvClipInfo	ClipInfo;
-		CString			strPlaylistFile;
-		CHdmvClipInfo::CPlaylist MainPlaylist;
+		CHdmvClipInfo ClipInfo;
+		CString       strPlaylistFile;
 
-		if (SUCCEEDED(ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_BDPlaylists))) {
+		if (SUCCEEDED(ClipInfo.FindMainMovie(path, strPlaylistFile, m_BDPlaylists))) {
 			if (path.Right(5).MakeUpper() == L"\\BDMV") {
 				path.Truncate(path.GetLength() - 5);
 				CString infFile = path + L"\\disc.inf";

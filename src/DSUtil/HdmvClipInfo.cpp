@@ -1003,12 +1003,11 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 
 #define MIN_LIMIT 3
 
-HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& Playlists)
+HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& Playlists)
 {
 	HRESULT hr = E_FAIL;
-	CString strPath(strFolder);
+	const CString strPath(strFolder);
 
-	MainPlaylist.clear();
 	Playlists.clear();
 
 	WIN32_FIND_DATA fd = {0};
@@ -1031,7 +1030,6 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 					rtMax           = rtCurrent;
 					mpls_size_max   = Playlist.m_mpls_size;
 					max_video_res   = Playlist.m_max_video_res;
-					MainPlaylist    = Playlist;
 					strPlaylistFile = strCurrentPlaylist;
 					hr = S_OK;
 				}
