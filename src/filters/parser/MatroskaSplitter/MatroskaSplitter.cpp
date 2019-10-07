@@ -1697,10 +1697,14 @@ void CMatroskaSplitterFilter::InstallFonts()
 		for (const auto& pF : pA->AttachedFiles) {
 			if (pF->FileMimeType == "application/x-truetype-font" ||
 					pF->FileMimeType == "application/x-font-ttf" ||
-					pF->FileMimeType == "application/vnd.ms-opentype") {
+					pF->FileMimeType == "application/x-font" ||
+					pF->FileMimeType == "font/ttf" ||
+					pF->FileMimeType == "font/sfnt" ||
+					pF->FileMimeType == "application/vnd.ms-opentype" ||
+					pF->FileMimeType == "font/otf") {
 				// assume this is a font resource
 
-				if (BYTE* pData = DNew BYTE[(UINT)pF->FileDataLen]) {
+				if (BYTE* pData = new(std::nothrow) BYTE[pF->FileDataLen]) {
 					m_pFile->Seek(pF->FileDataPos);
 
 					if (SUCCEEDED(m_pFile->ByteRead(pData, pF->FileDataLen))) {
