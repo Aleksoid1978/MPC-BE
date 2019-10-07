@@ -80,15 +80,18 @@ private:
 
 	void Save();
 
-	SOCKET m_UdpSocket     = INVALID_SOCKET;
-	WSAEVENT m_WSAEvent    = nullptr;
-	sockaddr_in m_addr;
+	SOCKET m_UdpSocket  = INVALID_SOCKET;
+	WSAEVENT m_WSAEvent = nullptr;
+	sockaddr_in m_addr = {};
+
+	HWND m_TaskDlgHwnd = nullptr;
 
 public:
 	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr);
 	virtual ~CSaveDlg();
 
 protected:
+	virtual HRESULT OnInit();
 	virtual HRESULT OnTimer(_In_ long lTime);
 	virtual HRESULT OnCommandControlClick(_In_ int nCommandControlID);
 
