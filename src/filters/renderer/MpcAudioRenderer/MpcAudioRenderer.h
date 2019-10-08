@@ -227,6 +227,7 @@ private:
 	// WASAPI variables
 	HMODULE            m_hAvrtLib;
 	DEVICE_MODE        m_DeviceMode;
+	DEVICE_MODE        m_DeviceModeCurrent;
 	CString            m_DeviceId;
 	CString            m_DeviceName;
 	IMMDevice          *m_pMMDevice;

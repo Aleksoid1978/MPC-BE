@@ -122,8 +122,8 @@ static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 #define SamplesToTime(samples, wfex)    (FractionScale64(samples, UNITS, wfex->nSamplesPerSec))
 #define TimeToSamples(time, wfex)       (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
 
-#define IsExclusive(wfex)               (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
-#define IsExclusiveMode()               (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)
+#define IsExclusive(wfex)               (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
+#define IsExclusiveMode()               (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)
 
 #define GetChannelMask(wfex, nChannels) (IsWaveFormatExtensible(wfex) ? ((WAVEFORMATEXTENSIBLE*)wfex)->dwChannelMask : GetDefChannelMask(nChannels))
 
@@ -134,6 +134,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_pWaveFormatExInput(nullptr)
 	, m_pWaveFormatExOutput(nullptr)
 	, m_DeviceMode(MODE_WASAPI_SHARED)
+	, m_DeviceModeCurrent(MODE_WASAPI_SHARED)
 	, m_pMMDevice(nullptr)
 	, m_pAudioClient(nullptr)
 	, m_pRenderClient(nullptr)
@@ -242,6 +243,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	if (m_DeviceMode != MODE_WASAPI_EXCLUSIVE) {
 		m_DeviceMode = MODE_WASAPI_SHARED;
 	}
+	m_DeviceModeCurrent = m_DeviceMode;
 
 	m_BufferDuration = discard(m_BufferDuration, 50, { 0, 50, 100 });
 
@@ -1122,15 +1124,13 @@ STDMETHODIMP_(UINT) CMpcAudioRenderer::GetMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (!m_pGraph) {
-		return MODE_NONE;
-	}
+	CheckPointer(m_pGraph, MODE_NONE)
 
 	if (m_bIsBitstream) {
 		return MODE_WASAPI_EXCLUSIVE_BITSTREAM;
 	}
 
-	return (UINT)m_DeviceMode;
+	return (UINT)m_DeviceModeCurrent;
 }
 
 STDMETHODIMP CMpcAudioRenderer::GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)
@@ -1147,7 +1147,7 @@ STDMETHODIMP CMpcAudioRenderer::SetBitExactOutput(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_bUseBitExactOutput != bValue) {
+	if (m_pAudioClient && m_bUseBitExactOutput != bValue && IsExclusiveMode()) {
 		SetReinitializeAudioDevice();
 	}
 
@@ -1165,7 +1165,7 @@ STDMETHODIMP CMpcAudioRenderer::SetSystemLayoutChannels(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_bUseSystemLayoutChannels != bValue) {
+	if (m_pAudioClient && m_bUseSystemLayoutChannels != bValue && IsExclusiveMode()) {
 		SetReinitializeAudioDevice();
 	}
 
@@ -1803,6 +1803,8 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(const WAVEFORMATEX *pWaveFormatEx)
 
 	BOOL bForceUseDefaultDevice = FALSE;
 
+	m_DeviceModeCurrent = m_DeviceMode;
+
 again:
 	HRESULT hr = CreateAudioClient(bForceUseDefaultDevice);
 	if (FAILED(hr)) {
@@ -1927,7 +1929,7 @@ again:
 				PropVariantClear(&varConfig);
 				SAFE_RELEASE(pProps);
 			}
-		} else if (m_DeviceMode == MODE_WASAPI_SHARED) { // SHARED
+		} else if (m_DeviceModeCurrent == MODE_WASAPI_SHARED) { // SHARED
 			WAVEFORMATEX* pDeviceFormat = nullptr;
 			hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
 			if (SUCCEEDED(hr) && pDeviceFormat) {
@@ -1965,6 +1967,24 @@ again:
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format");
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 			return hr;
+		} else if (AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED == hr && (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE && !IsBitstream(pWaveFormatEx))) {
+			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI exclusive mode not allowed, trying shared");
+
+			if (m_pAudioClient) {
+				m_pSyncClock->UnSlave();
+
+				PauseRendererThread();
+				m_bIsAudioClientStarted = false;
+
+				SAFE_RELEASE(m_pRenderClient);
+				m_pSyncClock->UnSlave();
+				SAFE_RELEASE(m_pAudioClock);
+				SAFE_RELEASE(m_pAudioClient);
+			}
+
+			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
+			m_DeviceModeCurrent = MODE_WASAPI_SHARED;
+			goto again;
 		} else {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI failed: (0x%08x)", hr);
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
@@ -1980,9 +2000,9 @@ again:
 		SAFE_RELEASE(m_pRenderClient);
 		m_pSyncClock->UnSlave();
 		SAFE_RELEASE(m_pAudioClock);
-		hr = CreateRenderClient(m_pWaveFormatExOutput);
+		hr = CreateRenderClient(m_pWaveFormatExOutput, m_bCheckFormat);
 
-		if (hr == AUDCLNT_E_DEVICE_IN_USE && !m_bUseDefaultDevice) {
+		if (AUDCLNT_E_DEVICE_IN_USE == hr && !m_bUseDefaultDevice) {
 			SAFE_RELEASE(m_pRenderClient);
 			m_pSyncClock->UnSlave();
 			SAFE_RELEASE(m_pAudioClock);
@@ -1992,6 +2012,24 @@ again:
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 
 			bForceUseDefaultDevice = TRUE;
+			goto again;
+		} else if (AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED == hr && (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE && !IsBitstream(pWaveFormatEx))) {
+			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI exclusive mode not allowed, trying shared");
+
+			if (m_pAudioClient) {
+				m_pSyncClock->UnSlave();
+
+				PauseRendererThread();
+				m_bIsAudioClientStarted = false;
+
+				SAFE_RELEASE(m_pRenderClient);
+				m_pSyncClock->UnSlave();
+				SAFE_RELEASE(m_pAudioClock);
+				SAFE_RELEASE(m_pAudioClient);
+			}
+
+			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
+			m_DeviceModeCurrent = MODE_WASAPI_SHARED;
 			goto again;
 		}
 	}

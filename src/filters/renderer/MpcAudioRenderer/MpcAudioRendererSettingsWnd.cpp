@@ -27,7 +27,6 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 
-
 //
 // CMpcAudioRendererSettingsWnd
 //
