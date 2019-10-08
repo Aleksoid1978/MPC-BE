@@ -1480,6 +1480,7 @@ STRING IDS_FAVORITES_QUICKADD		"Быстро добавить в закладк�
 STRING IDS_FILE_FAV_ADDED		"Файл добавлен в закладки"
 STRING IDS_FILE_SAVE_THUMBNAILS		"Сохранить миниатюры"
 STRING IDS_FILTERS_AUDIO		"Аудио декодеры"
+STRING IDS_FILTERS_COPY_TO_CLIPBOARD		"&Копировать список фильтров в буфер"
 STRING IDS_FILTERS_SOURCE		"Фильтры источников"
 STRING IDS_FILTERS_VIDEO		"Видео декодеры"
 STRING IDS_FILTER_RESET_SETTINGS		"Сбросить настройки"

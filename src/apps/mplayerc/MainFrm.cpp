@@ -383,6 +383,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_RESETRATE, OnUpdatePlayResetRate)
 	ON_COMMAND_RANGE(ID_PLAY_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnPlayChangeAudDelay)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnUpdatePlayChangeAudDelay)
+	ON_COMMAND(ID_FILTERS_COPY_TO_CLIPBOARD, OnPlayFiltersCopyToClipboard)
 	ON_COMMAND_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnPlayFilters)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
 	ON_COMMAND_RANGE(ID_SHADERS_START, ID_SHADERS_END, OnPlayShaders)
@@ -8407,6 +8408,44 @@ void CMainFrame::OnUpdatePlayChangeAudDelay(CCmdUI* pCmdUI)
 	pCmdUI->Enable(!!m_pGB /*&& !!FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)*/);
 }
 
+void CMainFrame::OnPlayFiltersCopyToClipboard()
+{
+	// Don't translate that output since it's mostly for debugging purpose
+	CStringW filtersList = L"Filters currently loaded:\r\n";
+	// Skip the first two entries since they are the "Copy to clipboard" menu entry and a separator
+	for (int i = 2, count = m_filtersMenu.GetMenuItemCount(); i < count; i++) {
+		CStringW filterName;
+		m_filtersMenu.GetMenuString(i, filterName, MF_BYPOSITION);
+		filtersList.AppendFormat(L"  - %s\r\n", filterName.GetString());
+	}
+
+	// Allocate a global memory object for the text
+	int len = filtersList.GetLength() + 1;
+	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
+	if (hGlob) {
+		// Lock the handle and copy the text to the buffer
+		LPVOID pData = GlobalLock(hGlob);
+		if (pData) {
+			wcscpy_s((WCHAR*)pData, len, (LPCWSTR)filtersList);
+			GlobalUnlock(hGlob);
+
+			if (OpenClipboard()) {
+				// Place the handle on the clipboard, if the call succeeds
+				// the system will take care of the allocated memory
+				if (::EmptyClipboard() && ::SetClipboardData(CF_UNICODETEXT, hGlob)) {
+					hGlob = nullptr;
+				}
+
+				::CloseClipboard();
+			}
+		}
+
+		if (hGlob) {
+			GlobalFree(hGlob);
+		}
+	}
+}
+
 void CMainFrame::OnPlayFilters(UINT nID)
 {
 	//ShowPPage(m_spparray[nID - ID_FILTERS_SUBITEM_START], m_hWnd);
@@ -14476,6 +14515,11 @@ void CMainFrame::SetupFiltersSubMenu()
 			idf++;
 		}
 		EndEnumFilters;
+
+		if (submenu.GetMenuItemCount() > 0) {
+			VERIFY(submenu.InsertMenu(0, MF_STRING | MF_ENABLED | MF_BYPOSITION, ID_FILTERS_COPY_TO_CLIPBOARD, ResStr(IDS_FILTERS_COPY_TO_CLIPBOARD)));
+			VERIFY(submenu.InsertMenu(1, MF_SEPARATOR | MF_ENABLED | MF_BYPOSITION));
+		}
 	}
 }
 

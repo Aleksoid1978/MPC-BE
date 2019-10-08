@@ -1480,6 +1480,7 @@ STRING IDS_FAVORITES_QUICKADD		"Արագ ավելացնել ընտրյալներ
 STRING IDS_FILE_FAV_ADDED		"File added to favorites"
 STRING IDS_FILE_SAVE_THUMBNAILS		"Պահպանել մանրապատկերները"
 STRING IDS_FILTERS_AUDIO		"Audio Decoders"
+STRING IDS_FILTERS_COPY_TO_CLIPBOARD		"&Copy filters list to clipboard"
 STRING IDS_FILTERS_SOURCE		"Source Filters"
 STRING IDS_FILTERS_VIDEO		"Video Decoders"
 STRING IDS_FILTER_RESET_SETTINGS		"Reset"
