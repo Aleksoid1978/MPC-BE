@@ -410,6 +410,8 @@
 #define ID_SUBTITLES_STEREO_DONTUSE     1177
 #define ID_SUBTITLES_STEREO_SIDEBYSIDE  1178
 #define ID_SUBTITLES_STEREO_TOPBOTTOM   1179
+//
+#define ID_FILTERS_COPY_TO_CLIPBOARD    1999
 // ranges for menus
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099
@@ -1371,6 +1373,7 @@
 #define IDS_SEEKBEGIN                   33455
 #define IDS_RECORD_START                33456
 #define IDS_RECORD_STOP                 33457
+#define IDS_FILTERS_COPY_TO_CLIPBOARD   33458
 //
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501
