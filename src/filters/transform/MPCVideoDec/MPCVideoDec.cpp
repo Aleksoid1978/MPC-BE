@@ -4002,7 +4002,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_OutputFormat:
 			if (GUID* DxvaGuid = GetDXVADecoderGuid()) {
-				infostr.Format(L"DXVA (%s)", GetDXVAMode(*DxvaGuid));
+				infostr.Format(L"DXVA2 (%s)", GetDXVAMode(*DxvaGuid));
 				break;
 			}
 			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
