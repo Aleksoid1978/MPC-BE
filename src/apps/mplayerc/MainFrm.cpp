@@ -8411,7 +8411,8 @@ void CMainFrame::OnUpdatePlayChangeAudDelay(CCmdUI* pCmdUI)
 void CMainFrame::OnPlayFiltersCopyToClipboard()
 {
 	// Don't translate that output since it's mostly for debugging purpose
-	CStringW filtersList = L"Filters currently loaded:\r\n";
+	CStringW filtersList;
+	filtersList.Format(L"%s %s\r\nFilters currently loaded:\r\n", MPC_WND_CLASS_NAMEW, MPC_VERSION_SVN_WSTR);
 	// Skip the first two entries since they are the "Copy to clipboard" menu entry and a separator
 	for (int i = 2, count = m_filtersMenu.GetMenuItemCount(); i < count; i++) {
 		CStringW filterName;
