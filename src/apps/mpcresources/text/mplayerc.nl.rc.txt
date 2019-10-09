@@ -565,8 +565,8 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 21
 13		"youtube-dl"
 14		"Maximale videohoogte:"
 16		"Maximale fps of bitrate selecteren"
-17		"AceStream address*:"
-19		"TorrServer address*:"
+17		"Adres AceStream*:"
+19		"Adres TorrServer*:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1480,7 +1480,7 @@ STRING IDS_FAVORITES_QUICKADD		"Snel favoriet toevoegen"
 STRING IDS_FILE_FAV_ADDED		"Bestand aan favoriet toegevoegd"
 STRING IDS_FILE_SAVE_THUMBNAILS		"Miniatuurweergaven opslaan"
 STRING IDS_FILTERS_AUDIO		"Audiodecoders"
-STRING IDS_FILTERS_COPY_TO_CLIPBOARD		"&Copy filters list to clipboard"
+STRING IDS_FILTERS_COPY_TO_CLIPBOARD		"Lijst met filters naar klembord &kopiëren"
 STRING IDS_FILTERS_SOURCE		"Bronfilters"
 STRING IDS_FILTERS_VIDEO		"Videodecoders"
 STRING IDS_FILTER_RESET_SETTINGS		"Resetten"
