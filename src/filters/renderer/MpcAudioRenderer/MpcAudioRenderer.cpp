@@ -1930,11 +1930,20 @@ again:
 				SAFE_RELEASE(pProps);
 			}
 		} else if (m_DeviceModeCurrent == MODE_WASAPI_SHARED) { // SHARED
-			WAVEFORMATEX* pDeviceFormat = nullptr;
-			hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
-			if (SUCCEEDED(hr) && pDeviceFormat) {
-				CopyWaveFormat(pDeviceFormat, &m_pWaveFormatExOutput);
-				CoTaskMemFree(pDeviceFormat);
+			WAVEFORMATEX *pClosestMatch = nullptr;
+			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, m_pWaveFormatExOutput, &pClosestMatch);
+			if (SUCCEEDED(hr)) {
+				if (pClosestMatch) {
+					CopyWaveFormat(pClosestMatch, &m_pWaveFormatExOutput);
+					CoTaskMemFree(pClosestMatch);
+				}
+			} else {
+				WAVEFORMATEX* pDeviceFormat = nullptr;
+				hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
+				if (SUCCEEDED(hr) && pDeviceFormat) {
+					CopyWaveFormat(pDeviceFormat, &m_pWaveFormatExOutput);
+					CoTaskMemFree(pDeviceFormat);
+				}
 			}
 		}
 
@@ -1958,7 +1967,7 @@ again:
 			SAFE_RELEASE(m_pAudioClient);
 		}
 
-		if (S_OK == hr) {
+		if (SUCCEEDED(hr)) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client accepted the format");
 			if (bInitNeed) {
 				hr = InitAudioClient();
