@@ -1048,7 +1048,7 @@ STDMETHODIMP CMpcAudioRenderer::SetWasapiMode(INT nValue)
 		SetReinitializeAudioDevice();
 	}
 
-	m_DeviceMode = (DEVICE_MODE)nValue;
+	m_DeviceMode = m_DeviceModeCurrent = (DEVICE_MODE)nValue;
 	return S_OK;
 }
 
@@ -1803,8 +1803,6 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(const WAVEFORMATEX *pWaveFormatEx)
 
 	BOOL bForceUseDefaultDevice = FALSE;
 
-	m_DeviceModeCurrent = m_DeviceMode;
-
 again:
 	HRESULT hr = CreateAudioClient(bForceUseDefaultDevice);
 	if (FAILED(hr)) {
@@ -1818,6 +1816,21 @@ again:
 		}
 
 		return false;
+	};
+
+	auto ReleaseAudio = [this](const bool bFull = false) {
+		m_pSyncClock->UnSlave();
+
+		PauseRendererThread();
+		m_bIsAudioClientStarted = false;
+
+		SAFE_RELEASE(m_pRenderClient);
+		SAFE_RELEASE(m_pAudioClock);
+
+		if (bFull) {
+			SAFE_RELEASE(m_pAudioClient);
+			SAFE_RELEASE(m_pMMDevice);
+		}
 	};
 
 	BOOL bInitNeed = TRUE;
@@ -1856,42 +1869,34 @@ again:
 
 						CreateFormat(wfexAsIs, pWaveFormatEx->wBitsPerSample, nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec);
 
-						PauseRendererThread();
-						m_bIsAudioClientStarted = false;
+						ReleaseAudio();
 
-						SAFE_RELEASE(m_pRenderClient);
-						m_pSyncClock->UnSlave();
-						SAFE_RELEASE(m_pAudioClock);
-						SAFE_RELEASE(m_pAudioClient);
-						hr = InitAudioClient();
-						if (SUCCEEDED(hr)) {
 #ifdef DEBUG_OR_LOG
-							DLog(L"    Trying format:");
-							DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
+						DLog(L"    Trying format:");
+						DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
 #endif
-							hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
-							if (S_OK == hr) {
-								CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
-								bInitNeed = FALSE;
-							} else {
-								const WORD wBitsPerSampleValues[][2] = {
-									{ 32, 32 },
-									{ 32, 24 },
-									{ 24, 24 },
-									{ 16, 16 }
-								};
-								for (const auto& wBitsPerSample : wBitsPerSampleValues) {
-									CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[2]);
+						hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
+						if (S_OK == hr) {
+							CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
+							bInitNeed = FALSE;
+						} else {
+							const WORD wBitsPerSampleValues[][2] = {
+								{ 32, 32 },
+								{ 32, 24 },
+								{ 24, 24 },
+								{ 16, 16 }
+							};
+							for (const auto& wBitsPerSample : wBitsPerSampleValues) {
+								CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[2]);
 #ifdef DEBUG_OR_LOG
-									DLog(L"    Trying format:");
-									DumpWaveFormatEx((WAVEFORMATEX*)& wfexAsIs);
+								DLog(L"    Trying format:");
+								DumpWaveFormatEx((WAVEFORMATEX*)& wfexAsIs);
 #endif
-									hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
-									if (S_OK == hr) {
-										CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
-										bInitNeed = FALSE;
-										break;
-									}
+								hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
+								if (S_OK == hr) {
+									CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
+									bInitNeed = FALSE;
+									break;
 								}
 							}
 						}
@@ -1955,23 +1960,8 @@ again:
 		DumpWaveFormatEx(m_pWaveFormatExOutput);
 #endif
 
-		if (bInitNeed) {
-			m_pSyncClock->UnSlave();
-
-			PauseRendererThread();
-			m_bIsAudioClientStarted = false;
-
-			SAFE_RELEASE(m_pRenderClient);
-			m_pSyncClock->UnSlave();
-			SAFE_RELEASE(m_pAudioClock);
-			SAFE_RELEASE(m_pAudioClient);
-		}
-
 		if (SUCCEEDED(hr)) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client accepted the format");
-			if (bInitNeed) {
-				hr = InitAudioClient();
-			}
 		} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format");
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
@@ -1979,17 +1969,7 @@ again:
 		} else if (AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED == hr && (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE && !IsBitstream(pWaveFormatEx))) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI exclusive mode not allowed, trying shared");
 
-			if (m_pAudioClient) {
-				m_pSyncClock->UnSlave();
-
-				PauseRendererThread();
-				m_bIsAudioClientStarted = false;
-
-				SAFE_RELEASE(m_pRenderClient);
-				m_pSyncClock->UnSlave();
-				SAFE_RELEASE(m_pAudioClock);
-				SAFE_RELEASE(m_pAudioClient);
-			}
+			ReleaseAudio();
 
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 			m_DeviceModeCurrent = MODE_WASAPI_SHARED;
@@ -2000,42 +1980,30 @@ again:
 			return hr;
 		}
 	} else if (m_pRenderClient == nullptr) {
-		DLog(L"CMpcAudioRenderer::CheckAudioClient() - First initialization of the audio renderer");
+		DLog(L"CMpcAudioRenderer::CheckAudioClient() - initialization/initialization of the audio renderer");
 	} else {
 		return hr;
 	}
 
+	if (bInitNeed) {
+		ReleaseAudio();
+	}
+
 	if (SUCCEEDED(hr) && bInitNeed) {
-		SAFE_RELEASE(m_pRenderClient);
-		m_pSyncClock->UnSlave();
-		SAFE_RELEASE(m_pAudioClock);
 		hr = CreateRenderClient(m_pWaveFormatExOutput, m_bCheckFormat);
 
 		if (AUDCLNT_E_DEVICE_IN_USE == hr && !m_bUseDefaultDevice) {
-			SAFE_RELEASE(m_pRenderClient);
-			m_pSyncClock->UnSlave();
-			SAFE_RELEASE(m_pAudioClock);
-			SAFE_RELEASE(m_pAudioClient);
-			SAFE_RELEASE(m_pMMDevice);
+			DLog(L"CMpcAudioRenderer::CheckAudioClient() - device is used, trying default");
+
+			ReleaseAudio(true);
 
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
-
 			bForceUseDefaultDevice = TRUE;
 			goto again;
 		} else if (AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED == hr && (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE && !IsBitstream(pWaveFormatEx))) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI exclusive mode not allowed, trying shared");
 
-			if (m_pAudioClient) {
-				m_pSyncClock->UnSlave();
-
-				PauseRendererThread();
-				m_bIsAudioClientStarted = false;
-
-				SAFE_RELEASE(m_pRenderClient);
-				m_pSyncClock->UnSlave();
-				SAFE_RELEASE(m_pAudioClock);
-				SAFE_RELEASE(m_pAudioClient);
-			}
+			ReleaseAudio();
 
 			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 			m_DeviceModeCurrent = MODE_WASAPI_SHARED;
