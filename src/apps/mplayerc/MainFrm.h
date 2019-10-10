@@ -1334,7 +1334,10 @@ public:
 	BOOL OpenBD(CString path, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	BOOL CheckBD(CString path);
 
-	BOOL CheckDVD(CString path);
+	// TRUE if the file name is "VIDEO_TS.IFO"
+	BOOL IsDVDStartFile(const CString& path);
+	// DVD path can be supplemented with "VIDEO_TS.IFO" if necessary
+	BOOL CheckDVD(CString& path);
 
 	bool m_bUseReclock;
 
