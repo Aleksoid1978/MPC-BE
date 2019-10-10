@@ -881,7 +881,7 @@ cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 
 	if (GetDriveTypeW(path + L"\\") == DRIVE_CDROM) {
 		// CDROM_DVDVideo
-		FindFiles(path + L"\\VIDEO_TS\\video_ts.ifo", files);
+		FindFiles(path + L"\\VIDEO_TS\\VIDEO_TS.IFO", files);
 		if (files.size() > 0) {
 			return CDROM_DVDVideo;
 		}
@@ -895,10 +895,10 @@ cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 		// CDROM_VideoCD
 		FindFiles(path + L"\\mpegav\\avseq??.dat", files);
 		FindFiles(path + L"\\mpegav\\avseq??.mpg", files);
-		FindFiles(path + L"\\mpeg2\\avseq??.dat",  files);
-		FindFiles(path + L"\\mpeg2\\avseq??.mpg",  files);
 		FindFiles(path + L"\\mpegav\\music??.dat", files);
 		FindFiles(path + L"\\mpegav\\music??.mpg", files);
+		FindFiles(path + L"\\mpeg2\\avseq??.dat",  files);
+		FindFiles(path + L"\\mpeg2\\avseq??.mpg",  files);
 		FindFiles(path + L"\\mpeg2\\music??.dat",  files);
 		FindFiles(path + L"\\mpeg2\\music??.mpg",  files);
 		if (files.size() > 0) {
