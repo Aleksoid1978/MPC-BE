@@ -14347,6 +14347,7 @@ void CMainFrame::SetupOpenCDSubMenu()
 			CString str;
 			str.Format(L"%s (%c:)", label, drive);
 			if (!str.IsEmpty()) {
+				//UINT state = (m_DiskImage.GetDriveLetter() == drive) ? (MF_GRAYED) : MF_ENABLED; // hmm, don't work
 				submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, str);
 			}
 		}
@@ -19524,7 +19525,7 @@ BOOL CMainFrame::OpenIso(CString pathName, REFERENCE_TIME rtStart/* = INVALID_TI
 
 			if (::PathFileExistsW(CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO")) {
 				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-				p->path = CString(diskletter) + L":\\";
+				p->path = CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO";
 				p->bAddRecent = FALSE;
 				OpenMedia(p);
 
