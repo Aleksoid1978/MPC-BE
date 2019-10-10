@@ -103,6 +103,36 @@ struct channel_layout_t {
 
 static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 {
+	bool bFloat = false;
+	if (IsWaveFormatExtensible(pwfx)) {
+		const auto pwfex = (WAVEFORMATEXTENSIBLE*)pwfx;
+		bFloat = !!(pwfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
+	} else {
+		bFloat = !!(pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
+	}
+
+	CString format;
+	switch (pwfx->wBitsPerSample) {
+		case 8:
+			format = L"8 bit PCM";
+			break;
+		case 16:
+			format = L"16 bit PCM";
+			break;
+		case 24:
+			format = L"24 bit PCM";
+			break;
+		case 32:
+			format.Format(L"32 bit %s", bFloat ? L"Float" : L"PCM");
+			break;
+		case 64:
+			if (bFloat) {
+				format = L"64 bit Double";
+			}
+			break;
+	}
+
+	DLog(L"        => %s", format.GetString());
 	DLog(L"        => wFormatTag      = 0x%04x", pwfx->wFormatTag);
 	DLog(L"        => nChannels       = %d", pwfx->nChannels);
 	DLog(L"        => nSamplesPerSec  = %d", pwfx->nSamplesPerSec);
@@ -111,11 +141,11 @@ static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 	DLog(L"        => wBitsPerSample  = %d", pwfx->wBitsPerSample);
 	DLog(L"        => cbSize          = %d", pwfx->cbSize);
 	if (IsWaveFormatExtensible(pwfx)) {
-		WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)pwfx;
+		const auto pwfex = (WAVEFORMATEXTENSIBLE*)pwfx;
 		DLog(L"        WAVEFORMATEXTENSIBLE:");
-		DLog(L"            => wValidBitsPerSample = %d", wfe->Samples.wValidBitsPerSample);
-		DLog(L"            => dwChannelMask       = 0x%x", wfe->dwChannelMask);
-		DLog(L"            => SubFormat           = %s", CStringFromGUID(wfe->SubFormat));
+		DLog(L"            => wValidBitsPerSample = %d", pwfex->Samples.wValidBitsPerSample);
+		DLog(L"            => dwChannelMask       = 0x%x", pwfex->dwChannelMask);
+		DLog(L"            => SubFormat           = %s", CStringFromGUID(pwfex->SubFormat));
 	}
 }
 
@@ -2134,7 +2164,8 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	}
 	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using period = %.2f ms", m_hnsBufferDuration / 10000.0f);
 
-	const AUDCLNT_SHAREMODE ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
+	const auto ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
+	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using %s mode", ShareMode == MODE_WASAPI_SHARED ? L"Shared" : L"Exclusive");
 
 	if (bCheckFormat) {
 		WAVEFORMATEX *pClosestMatch = nullptr;
