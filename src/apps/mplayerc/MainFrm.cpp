@@ -5513,7 +5513,12 @@ void CMainFrame::OnFileOpenDVD()
 	}
 
 	if (!path.IsEmpty()) {
-		if (CheckBD(path) || CheckDVD(path)) {
+		if (CheckDVD(path)) {
+			s.strDVDPath = GetFolderOnly(path);
+			m_wndPlaylistBar.Open(path);
+			OpenCurPlaylistItem();
+		}
+		if (CheckBD(path)) {
 			s.strDVDPath = AddSlash(path);
 			m_wndPlaylistBar.Open(path);
 			OpenCurPlaylistItem();
@@ -12313,7 +12318,7 @@ void CMainFrame::SetupChapters()
 				&& SUCCEEDED(m_pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters))
 				&& ulNumOfChapters > 1) {
  			CStringW path;
-			path.Format(L"%s\\video_ts.IFO", buff);
+			path.Format(L"%s\\VIDEO_TS.IFO", buff);
 
 			ULONG VTSN, TTN;
 			if (::PathFileExistsW(path) && CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
@@ -12390,8 +12395,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	WCHAR buff[MAX_PATH] = { 0 };
 	ULONG len = 0;
 	if (SUCCEEDED(hr = m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
-		pODD->title = CString(buff);
-		pODD->title.TrimRight('\\');
+		pODD->title = CString(buff) + L"\\VIDEO_TS.IFO";
 		if (pODD->bAddRecent) {
 			AddRecent(pODD->title);
 		}
@@ -15393,14 +15397,22 @@ void CMainFrame::SetupRecentFilesSubMenu()
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (!MRU[i].IsEmpty()) {
 			CString path(MRU[i]);
-			if (PathIsURLW(path) || PathIsUNCW(path)) {
+
+			if (PathIsURLW(path)) {
 				EllipsisURL(path, 100);
-			} else {
+			}
+			else if (IsDVDStartFile(path)) {
+				path.Truncate(path.ReverseFind('\\'));
+				EllipsisPath(path, 100);
+				path.Insert(0, L"DVD - ");
+			}
+			else if (PathIsUNCW(path)) { // TODO: remove this condition
+				EllipsisURL(path, 100);
+			}
+			else {
 				EllipsisPath(path, 100);
 				if (CheckBD(MRU[i])) {
 					path.Insert(0, L"Blu-ray - ");
-				} else if (CheckDVD(MRU[i])) {
-					path.Insert(0, L"DVD - ");
 				}
 			}
 			path.Replace(L"&", L"&&");
@@ -18707,16 +18719,31 @@ BOOL CMainFrame::CheckBD(CString path)
 	return ::PathFileExistsW(path + L"\\index.bdmv");
 }
 
-BOOL CMainFrame::CheckDVD(CString path)
+BOOL CMainFrame::IsDVDStartFile(const CString& path)
 {
-	path.TrimRight('\\');
-	if (path.Right(13).MakeLower() == L"\\video_ts.ifo") {
-		path.Truncate(path.ReverseFind('\\'));
-	} else if (::PathIsDirectoryW(path + L"\\VIDEO_TS")) {
-		path += L"\\VIDEO_TS";
+	return (path.Right(13).MakeUpper() == L"\\VIDEO_TS.IFO");
+}
+
+BOOL CMainFrame::CheckDVD(CString& path)
+{
+	if (IsDVDStartFile(path) && ::PathFileExistsW(path)) {
+		return TRUE;
 	}
 
-	return ::PathFileExistsW(path + L"\\VIDEO_TS.IFO");
+	if (::PathIsDirectoryW(path)) {
+		if (::PathFileExistsW(path + L"\\VIDEO_TS.IFO")) {
+			path.TrimRight('\\');
+			path.Append(L"\\VIDEO_TS.IFO");
+			return TRUE;
+		}
+		if (::PathFileExistsW(path + L"\\VIDEO_TS\\VIDEO_TS.IFO")) {
+			path.TrimRight('\\');
+			path.Append(L"\\VIDEO_TS\\VIDEO_TS.IFO");
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
 void CMainFrame::SetStatusMessage(CString m_msg)

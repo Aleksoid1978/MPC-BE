@@ -3045,11 +3045,10 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 
 	WCHAR buff[MAX_PATH];
 	ULONG len;
-	if ((!fn.IsEmpty()
-			&& FAILED(hr = pDVDC->SetDVDDirectory(fn))
-			&& FAILED(hr = pDVDC->SetDVDDirectory(fn + L"VIDEO_TS"))
-			&& FAILED(hr = pDVDC->SetDVDDirectory(fn + L"\\VIDEO_TS")))
-			|| FAILED(hr = pDVDI->GetDVDDirectory(buff, _countof(buff), &len)) || len == 0) {
+	if (fn.IsEmpty()
+			|| FAILED(hr = pDVDC->SetDVDDirectory(fn))
+			|| FAILED(hr = pDVDI->GetDVDDirectory(buff, _countof(buff), &len))
+			|| len == 0) {
 		return E_INVALIDARG;
 	}
 
