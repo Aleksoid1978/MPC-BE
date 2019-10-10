@@ -110,6 +110,7 @@ enum cdrom_t {
 	CDROM_VideoCD,
 	CDROM_DVDVideo,
 	CDROM_BDVideo,
+	CDROM_DVDAudio,
 	CDROM_Unknown
 };
 extern cdrom_t			GetCDROMType(WCHAR drive, std::list<CString>& files);

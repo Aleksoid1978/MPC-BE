@@ -5592,6 +5592,7 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 			case CDROM_VideoCD:
 			case CDROM_DVDVideo:
 			case CDROM_BDVideo:
+			case CDROM_DVDAudio:
 				nID--;
 				break;
 			default:
@@ -14324,10 +14325,13 @@ void CMainFrame::SetupOpenCDSubMenu()
 					DiskType = L"(S)VCD";
 					break;
 				case CDROM_DVDVideo:
-					DiskType = L"DVD Video";
+					DiskType = L"DVD-Video";
 					break;
 				case CDROM_BDVideo:
 					DiskType = L"Blu-ray Disc";
+					break;
+				case CDROM_DVDAudio:
+					DiskType = L"DVD-Audio";
 					break;
 				default:
 					ASSERT(FALSE);
