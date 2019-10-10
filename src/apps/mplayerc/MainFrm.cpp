@@ -15393,7 +15393,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (!MRU[i].IsEmpty()) {
 			CString path(MRU[i]);
-			if (PathIsURLW(path)) {
+			if (PathIsURLW(path) || PathIsUNCW(path)) {
 				EllipsisURL(path, 100);
 			} else {
 				EllipsisPath(path, 100);
