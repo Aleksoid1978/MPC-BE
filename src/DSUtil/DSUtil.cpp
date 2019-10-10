@@ -859,7 +859,7 @@ static void FindFiles(CString fn, std::list<CString>& files)
 {
 	CString path = fn;
 	path.Replace('/', '\\');
-	path = path.Left(path.ReverseFind('\\')+1);
+	path.Truncate(path.ReverseFind('\\')+1);
 
 	WIN32_FIND_DATA findData;
 	HANDLE h = FindFirstFileW(fn, &findData);
@@ -884,6 +884,12 @@ cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 		FindFiles(path + L"\\VIDEO_TS\\VIDEO_TS.IFO", files);
 		if (files.size() > 0) {
 			return CDROM_DVDVideo;
+		}
+
+		// CDROM_DVDAudio
+		FindFiles(path + L"\\AUDIO_TS\\ATS_0?_0.IFO", files);
+		if (files.size() > 0) {
+			return CDROM_DVDAudio;
 		}
 
 		// CDROM_BD
