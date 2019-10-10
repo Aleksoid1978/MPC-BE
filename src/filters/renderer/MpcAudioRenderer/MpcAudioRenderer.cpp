@@ -1826,9 +1826,9 @@ again:
 
 		SAFE_RELEASE(m_pRenderClient);
 		SAFE_RELEASE(m_pAudioClock);
+		SAFE_RELEASE(m_pAudioClient);
 
 		if (bFull) {
-			SAFE_RELEASE(m_pAudioClient);
 			SAFE_RELEASE(m_pMMDevice);
 		}
 	};
@@ -1870,33 +1870,35 @@ again:
 						CreateFormat(wfexAsIs, pWaveFormatEx->wBitsPerSample, nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec);
 
 						ReleaseAudio();
-
+						hr = InitAudioClient();
+						if (SUCCEEDED(hr)) {
 #ifdef DEBUG_OR_LOG
-						DLog(L"    Trying format:");
-						DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
+							DLog(L"    Trying format:");
+							DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
 #endif
-						hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
-						if (S_OK == hr) {
-							CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
-							bInitNeed = FALSE;
-						} else {
-							const WORD wBitsPerSampleValues[][2] = {
-								{ 32, 32 },
-								{ 32, 24 },
-								{ 24, 24 },
-								{ 16, 16 }
-							};
-							for (const auto& wBitsPerSample : wBitsPerSampleValues) {
-								CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[2]);
+							hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
+							if (S_OK == hr) {
+								CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
+								bInitNeed = FALSE;
+							} else {
+								const WORD wBitsPerSampleValues[][2] = {
+									{ 32, 32 },
+									{ 32, 24 },
+									{ 24, 24 },
+									{ 16, 16 }
+								};
+								for (const auto& wBitsPerSample : wBitsPerSampleValues) {
+									CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[2]);
 #ifdef DEBUG_OR_LOG
-								DLog(L"    Trying format:");
-								DumpWaveFormatEx((WAVEFORMATEX*)& wfexAsIs);
+									DLog(L"    Trying format:");
+									DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
 #endif
-								hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
-								if (S_OK == hr) {
-									CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
-									bInitNeed = FALSE;
-									break;
+									hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
+									if (S_OK == hr) {
+										CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
+										bInitNeed = FALSE;
+										break;
+									}
 								}
 							}
 						}
@@ -1990,7 +1992,10 @@ again:
 	}
 
 	if (SUCCEEDED(hr) && bInitNeed) {
-		hr = CreateRenderClient(m_pWaveFormatExOutput, m_bCheckFormat);
+		hr = InitAudioClient();
+		if (SUCCEEDED(hr)) {
+			hr = CreateRenderClient(m_pWaveFormatExOutput, m_bCheckFormat);
+		}
 
 		if (AUDCLNT_E_DEVICE_IN_USE == hr && !m_bUseDefaultDevice) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - device is used, trying default");
