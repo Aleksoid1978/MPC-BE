@@ -9594,7 +9594,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
-		if (!m_BDPlaylists.empty() && id < m_BDPlaylists.size()) {
+		if (id < m_BDPlaylists.size()) {
 			UINT idx = 0;
 			for (const auto& item : m_BDPlaylists) {
 				if (idx == id && item.m_strFileName != m_strPlaybackRenderedPath) {
@@ -9926,6 +9926,9 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 
 		CString favstr;
 		favstr.Format(L"%s|%I64d|%d;%d|%s", favname, rtime, GetAudioTrackIdx(), GetSubtitleTrackIdx(), path);
+		if (m_BDPlaylists.size()) {
+			favstr.AppendFormat(L"|%s", GetFileOnly(m_strPlaybackRenderedPath));
+		}
 		s.AddFav(FAV_FILE, favstr);
 
 		osdMsg = ResStr(IDS_FILE_FAV_ADDED);
@@ -19475,7 +19478,13 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 CString CMainFrame::GetCurFileName()
 {
-	CString fn = !m_youtubeFields.fname.IsEmpty() ? m_wndPlaylistBar.GetCurFileName() : m_strPlaybackRenderedPath;
+	CString fn;
+	if (m_youtubeFields.fname.GetLength() || m_BDPlaylists.size()) {
+		fn = m_wndPlaylistBar.GetCurFileName();
+	} else {
+		fn = m_strPlaybackRenderedPath;
+	}
+
 	if (fn.IsEmpty() && m_pMainFSF) {
 		LPOLESTR pFN = nullptr;
 		AM_MEDIA_TYPE mt;
