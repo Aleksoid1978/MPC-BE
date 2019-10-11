@@ -1269,7 +1269,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		if (SearchFiles(fns.front(), sl, m_bSingleElement)) {
 			bool bDVD_BD = false;
 			for (const auto& fn : sl) {
-				if (m_pMainFrame->CheckBD(fn) || m_pMainFrame->IsDVDStartFile(fn) /*&& ::PathFileExistsW(fn)*/) {
+				if (m_pMainFrame->IsBDStartFile(fn) || m_pMainFrame->IsDVDStartFile(fn) /*&& ::PathFileExistsW(fn)*/) {
 					fns.clear();
 					fns.push_front(fn);
 					bDVD_BD = true;
@@ -1300,9 +1300,8 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			return;
 		}
 
-		if (m_pMainFrame->CheckBD(fn)) {
+		if (m_pMainFrame->IsBDStartFile(fn) /*&& ::PathFileExistsW(fn)*/) {
 			AddItem(fns, subs);
-
 			CString empty, label;
 			m_pMainFrame->MakeBDLabel(fn, empty, &label);
 			curPlayList.GetTail().m_label = label;
