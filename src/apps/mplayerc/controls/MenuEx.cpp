@@ -237,9 +237,15 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 	CString strR;
 	CString str = lpItem->strText;
 	if (bNoAccel) {
-		str.Replace(L"&&", L"{{amp}}");
-		str.Remove(L'&');
-		str.Replace(L"{{amp}}", L"&&");
+		// delete unpaired '&'
+		int pos = 0;
+		while ((pos = str.Find('&', pos)) >= 0) {
+			if (str.GetAt(pos + 1) != '&') {
+				str.SetAt(pos, 0x16); // empty symbol (SYN)
+			}
+			pos += 2;
+		}
+		str.Remove(0x16);
 	}
 	const int pos = str.Find('\t');
 	if (pos > 0) {
