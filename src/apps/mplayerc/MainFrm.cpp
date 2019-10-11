@@ -9927,7 +9927,8 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		CString favstr;
 		favstr.Format(L"%s|%I64d|%d;%d|%s", favname, rtime, GetAudioTrackIdx(), GetSubtitleTrackIdx(), path);
 		if (m_BDPlaylists.size()) {
-			favstr.AppendFormat(L"|%s", GetFileOnly(m_strPlaybackRenderedPath));
+			// TODO
+			//favstr.AppendFormat(L"|%s", GetFileOnly(m_strPlaybackRenderedPath));
 		}
 		s.AddFav(FAV_FILE, favstr);
 
