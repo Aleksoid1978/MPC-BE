@@ -20,14 +20,14 @@
 
 #pragma once
 
-typedef struct tagMENUITEM
+struct MENUITEM
 {
 	CString strText;
 	UINT    uID = 0;
 	bool    bMainMenu = false;
 	bool    bPopupMenu = false;
-} MENUITEM;
-typedef MENUITEM* LPMENUITEM;
+};
+using LPMENUITEM = MENUITEM*;
 
 class CMainFrame;
 

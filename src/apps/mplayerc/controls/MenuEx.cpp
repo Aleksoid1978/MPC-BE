@@ -237,7 +237,9 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 	CString strR;
 	CString str = lpItem->strText;
 	if (bNoAccel) {
-		str.Remove('&');
+		str.Replace(L"&&", L"{{amp}}");
+		str.Remove(L'&');
+		str.Replace(L"{{amp}}", L"&&");
 	}
 	const int pos = str.Find('\t');
 	if (pos > 0) {
@@ -314,10 +316,13 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 
 		dcScreen.SelectObject(&m_font);
 
-		SIZE size = {};
-		CString strText(lpItem->strText);
-		strText.Remove(L'&');
-		VERIFY(::GetTextExtentPoint32W(dcScreen.GetSafeHdc(), strText.GetString(), strText.GetLength(), &size));
+		const CString strText(lpItem->strText);
+		CRect r;
+		dcScreen.DrawTextW(L"W", &r, DT_SINGLELINE | DT_CALCRECT);
+		CSize height(r.Size());
+
+		dcScreen.DrawTextW(strText, &r, DT_SINGLELINE | DT_CALCRECT);
+		CSize size(r.Size());
 
 		dcScreen.RestoreDC(-1);
 		::ReleaseDC(nullptr, dcScreen.Detach());
@@ -334,7 +339,7 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 			}
 		}
 
-		lpMIS->itemHeight = size.cy + m_itemHeightPadding;
+		lpMIS->itemHeight = height.cy + m_itemHeightPadding;
 	} else {
 		lpMIS->itemWidth = 0;
 		lpMIS->itemHeight = m_separatorHeight;
