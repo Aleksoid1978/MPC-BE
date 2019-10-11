@@ -78,7 +78,7 @@ void CFavoriteOrganizeDlg::SaveList()
 		}
 
 		std::list<CString> args;
-		ExplodeEsc(*it, args, L'|');
+		ExplodeEsc(*it, args, L'|', 4);
 		args.front() = m_list.GetItemText(i, 0);
 
 		sl.push_back(ImplodeEsc(args, L'|'));
@@ -227,7 +227,7 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 		}
 
 		std::list<CString> args;
-		ExplodeEsc(*it, args, L'|');
+		ExplodeEsc(*it, args, L'|', 4);
 		if (args.size() < 4) {
 			ASSERT(0);
 			return;
@@ -467,7 +467,7 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	std::list<CString> args;
-	ExplodeEsc(*it, args, L'|');
+	ExplodeEsc(*it, args, L'|', 4);
 	if (args.size() < 4) {
 		ASSERT(0);
 		return;
