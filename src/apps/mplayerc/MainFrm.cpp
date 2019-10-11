@@ -9927,7 +9927,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		CString favstr;
 		favstr.Format(L"%s|%I64d|%d;%d|%s", favname, rtime, GetAudioTrackIdx(), GetSubtitleTrackIdx(), path);
 		if (m_BDPlaylists.size()) {
-			// TODO
+			// TODO BDPLS
 			//favstr.AppendFormat(L"|%s", GetFileOnly(m_strPlaybackRenderedPath));
 		}
 		s.AddFav(FAV_FILE, favstr);
@@ -10019,7 +10019,7 @@ void CMainFrame::OnFavoritesFile(UINT nID)
 void CMainFrame::PlayFavoriteFile(CString fav)
 {
 	std::list<CString> args;
-	ExplodeEsc(fav, args, L'|');
+	ExplodeEsc(fav, args, L'|', 4);
 	if (args.size() < 4) {
 		return;
 	}
@@ -10035,9 +10035,18 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	}
 
 	CString path = *it++;
+	CString pls; // TODO BDPLS
+	if (!::PathIsURLW(path)) {
+		int pos = path.Find(L'|');
+		if (pos >= 0) {
+			pls = path.Mid(pos + 1);
+			path.Truncate(pos);
+		}
+	}
 
-	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
-	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
+	// NOTE: This is just for the favorites but we could add a global settings that does this always when on.
+	//       Could be useful when using removable devices. All you have to do then is plug in your 500 gb drive,
+	//       full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
 	if (path.Left(3) == L"?:\\") {
 		CString exepath(GetProgramPath());
 
