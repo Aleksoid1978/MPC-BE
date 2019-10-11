@@ -5513,13 +5513,8 @@ void CMainFrame::OnFileOpenDVD()
 	}
 
 	if (!path.IsEmpty()) {
-		if (CheckDVD(path)) {
+		if (CheckDVD(path) || CheckBD(path)) {
 			s.strDVDPath = GetFolderOnly(path);
-			m_wndPlaylistBar.Open(path);
-			OpenCurPlaylistItem();
-		}
-		if (CheckBD(path)) {
-			s.strDVDPath = AddSlash(path);
 			m_wndPlaylistBar.Open(path);
 			OpenCurPlaylistItem();
 		} else {
@@ -14139,7 +14134,11 @@ void CMainFrame::CloseMediaPrivate()
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
 
-#define Check_BD_DVD_Path(path) (::PathFileExistsW(path + L"index.bdmv") || ::PathFileExistsW(path + L"VIDEO_TS.IFO"))
+inline bool Check_DVD_BD_Folder(const CString& path)
+{
+	return (::PathFileExistsW(path + L"\\VIDEO_TS.IFO") || ::PathFileExistsW(path + L"\\index.bdmv"));
+}
+
 
 static void RecurseAddDir(const CString& path, std::list<CString>& sl)
 {
@@ -14154,7 +14153,7 @@ static void RecurseAddDir(const CString& path, std::list<CString>& sl)
 				const CString fullpath = AddSlash(path + f_name);
 
 				sl.push_back(fullpath);
-				if (Check_BD_DVD_Path(fullpath)) {
+				if (Check_DVD_BD_Folder(fullpath)) {
 					break;
 				}
 				RecurseAddDir(fullpath, sl);
@@ -14173,7 +14172,7 @@ void CMainFrame::ParseDirs(std::list<CString>& sl)
 	for (auto fn : tmp) {
 		if (::PathIsDirectoryW(fn) && ::PathFileExistsW(fn)) {
 			fn = AddSlash(fn);
-			if (Check_BD_DVD_Path(fn)) {
+			if (Check_DVD_BD_Folder(fn)) {
 				continue;
 			}
 
@@ -15411,15 +15410,12 @@ void CMainFrame::SetupRecentFilesSubMenu()
 				EllipsisPath(path, 100);
 				path.Insert(0, L"DVD - ");
 			}
-			else if (PathIsUNCW(path)) { // TODO: remove this condition
-				EllipsisURL(path, 100);
-			}
-			else {
+			else if (IsBDStartFile(path)) {
+				path.Truncate(path.ReverseFind('\\'));
 				EllipsisPath(path, 100);
-				if (CheckBD(MRU[i])) {
-					path.Insert(0, L"Blu-ray - ");
-				}
+				path.Insert(0, L"Blu-ray - ");
 			}
+
 			path.Replace(L"&", L"&&");
 			submenu.AppendMenu(flags, id, path);
 		}
@@ -18625,25 +18621,20 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
 
-	const CString originalPath(path);
-
-	path.TrimRight('\\');
-	if (path.Right(5).MakeLower() == L".bdmv") {
-		path.Truncate(path.ReverseFind('\\'));
-	} else if (path.Right(5).MakeLower() == L".mpls") {
-		path.Truncate(path.Find(L"\\PLAYLIST"));
-	} else if (::PathIsDirectoryW(path + L"\\BDMV")) {
-		path += L"\\BDMV";
+	if (!CheckBD(path)) {
+		return FALSE;
 	}
 
-	if (::PathIsDirectoryW(path + L"\\PLAYLIST") && ::PathIsDirectoryW(path + L"\\STREAM")) {
+	const CString bdmv_folder = path.Left(path.ReverseFind('\\'));
+
+	if (::PathIsDirectoryW(bdmv_folder + L"\\PLAYLIST") && ::PathIsDirectoryW(bdmv_folder + L"\\STREAM")) {
 		CHdmvClipInfo ClipInfo;
 		CString       strPlaylistFile;
 
-		if (SUCCEEDED(ClipInfo.FindMainMovie(path, strPlaylistFile, m_BDPlaylists))) {
-			if (path.Right(5).MakeUpper() == L"\\BDMV") {
-				path.Truncate(path.GetLength() - 5);
-				CString infFile = path + L"\\disc.inf";
+		if (SUCCEEDED(ClipInfo.FindMainMovie(bdmv_folder, strPlaylistFile, m_BDPlaylists))) {
+			if (bdmv_folder.Right(5).MakeUpper() == L"\\BDMV") { // real BDMV folder
+				CString infFile = bdmv_folder.Left(bdmv_folder.GetLength() - 5) + L"\\disc.inf";
+
 				if (::PathFileExistsW(infFile)) {
 					CTextFile cf(CTextFile::UTF8, CTextFile::ANSI);
 					if (cf.Open(infFile)) {
@@ -18661,9 +18652,10 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 
 				if (m_BDLabel.IsEmpty()) {
 					const auto& lr = CMPlayerCApp::languageResources[AfxGetAppSettings().iCurrentLanguage];
-					CString bdmt_xml_file; bdmt_xml_file.Format(L"%s\\BDMV\\META\\DL\\bdmt_%s.xml", path, lr.iso6392);
+					CString bdmt_xml_file;
+					bdmt_xml_file.Format(L"%s\\META\\DL\\bdmt_%s.xml", bdmv_folder, lr.iso6392);
 					if (!::PathFileExistsW(bdmt_xml_file)) {
-						bdmt_xml_file = path + L"\\BDMV\\META\\DL\\bdmt_eng.xml";
+						bdmt_xml_file = bdmv_folder + L"\\META\\DL\\bdmt_eng.xml";
 					}
 					if (::PathFileExistsW(bdmt_xml_file)) {
 						CTextFile cf(CTextFile::UTF8, CTextFile::ANSI);
@@ -18691,14 +18683,14 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 			}
 
 			if (bAddRecent) {
-				AddRecent(originalPath.Right(5).MakeLower() == L".mpls" ? originalPath : path);
+				AddRecent(path);
 			}
 
 			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			m_bIsBDPlay = TRUE;
-			m_LastOpenBDPath = path;
+			m_LastOpenBDPath = bdmv_folder;
 
-			if (OpenFile(originalPath.Right(5).MakeLower() == L".mpls" ? originalPath : strPlaylistFile, rtStart, FALSE) == TRUE) {
+			if (OpenFile(strPlaylistFile, rtStart, FALSE) == TRUE) { // OpenFile(path, rtStart, FALSE) also work
 				return TRUE;
 			}
 		}
@@ -18710,18 +18702,37 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 	return FALSE;
 }
 
-BOOL CMainFrame::CheckBD(CString path)
+BOOL CMainFrame::IsBDStartFile(const CString& path)
 {
-	path.TrimRight('\\');
-	if (path.Right(5).MakeLower() == L".bdmv") {
-		path.Truncate(path.ReverseFind('\\'));
-	} else if (path.Right(5).MakeLower() == L".mpls") {
-		path.Truncate(path.Find(L"\\PLAYLIST"));
-	} else if (::PathIsDirectoryW(path + L"\\BDMV")) {
-		path += L"\\BDMV";
+	return (path.Right(11).MakeLower() == L"\\index.bdmv");
+}
+
+BOOL CMainFrame::CheckBD(CString& path)
+{
+	if (IsBDStartFile(path) && ::PathFileExistsW(path)) {
+		return TRUE;
 	}
 
-	return ::PathFileExistsW(path + L"\\index.bdmv");
+	if (::PathIsDirectoryW(path)) {
+		if (::PathFileExistsW(path + L"\\index.bdmv")) {
+			path.TrimRight('\\');
+			path.Append(L"\\index.bdmv");
+			return TRUE;
+		}
+		if (::PathFileExistsW(path + L"\\BDMV\\index.bdmv")) {
+			path.TrimRight('\\');
+			path.Append(L"\\BDMV\\index.bdmv");
+			return TRUE;
+		}
+	}
+
+	// additional check for "MovieObject.bdmv"
+	if (path.Right(17).MakeLower() == L"\\movieobject.bdmv" && ::PathFileExistsW(path.Left(path.GetLength()-17)+"\\index.bdmv")) {
+		path.Truncate(path.GetLength() - 17);
+		path.Append(L"\\index.bdmv");
+	}
+
+	return FALSE;
 }
 
 BOOL CMainFrame::IsDVDStartFile(const CString& path)

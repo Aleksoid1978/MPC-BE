@@ -1332,7 +1332,11 @@ public:
 	CHdmvClipInfo::CPlaylist m_BDPlaylists;
 	BOOL m_bIsBDPlay;
 	BOOL OpenBD(CString path, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
-	BOOL CheckBD(CString path);
+
+	// TRUE if the file name is "index.bdmv"
+	BOOL IsBDStartFile(const CString& path);
+	// BD path can be supplemented with "index.bdmv" if necessary
+	BOOL CheckBD(CString& path);
 
 	// TRUE if the file name is "VIDEO_TS.IFO"
 	BOOL IsDVDStartFile(const CString& path);
