@@ -10035,12 +10035,19 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	}
 
 	CString path = *it++;
-	CString pls; // TODO BDPLS
+	CString pls;
 	if (!::PathIsURLW(path)) {
-		ExplodeEsc(fav, args, L'|');
+		ExplodeEsc(path, args, L'|');
 		if (args.size() >= 2) {
+			it = args.cbegin();
 			path = *it++;
 			pls = *it++;
+
+			// TODO BDPLS
+			//if (IsBDStartFile(path)) {
+			//	path.Truncate(path.ReverseFind('\\')+1);
+			//	path.Append(L"PLAYLIST\\" + pls);
+			//}
 		}
 	}
 
