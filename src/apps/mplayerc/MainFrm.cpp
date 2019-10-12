@@ -15425,6 +15425,9 @@ void CMainFrame::SetupRecentFilesSubMenu()
 			}
 			else if (IsBDStartFile(path)) {
 				path.Truncate(path.ReverseFind('\\'));
+				if (path.Right(5).MakeUpper() == L"\\BDMV") { 
+					path.Truncate(path.GetLength() - 5);
+				}
 				EllipsisPath(path, 100);
 				path.Insert(0, L"Blu-ray - ");
 			}
