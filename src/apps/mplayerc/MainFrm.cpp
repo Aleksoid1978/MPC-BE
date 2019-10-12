@@ -10037,10 +10037,10 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	CString path = *it++;
 	CString pls; // TODO BDPLS
 	if (!::PathIsURLW(path)) {
-		int pos = path.Find(L'|');
-		if (pos >= 0) {
-			pls = path.Mid(pos + 1);
-			path.Truncate(pos);
+		ExplodeEsc(fav, args, L'|');
+		if (args.size() >= 2) {
+			path = *it++;
+			pls = *it++;
 		}
 	}
 
