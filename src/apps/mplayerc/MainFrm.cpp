@@ -10035,6 +10035,18 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	}
 
 	CString path = *it++;
+
+	// NOTE: This is just for the favorites but we could add a global settings that does this always when on.
+	//       Could be useful when using removable devices. All you have to do then is plug in your 500 gb drive,
+	//       full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
+	if (path.Left(3) == L"?:\\") {
+		CString exepath(GetProgramPath());
+
+		if (exepath.Mid(1, 2) == L":\\") {
+			path.SetAt(0, exepath[0]);
+		}
+	}
+
 	CString pls;
 	if (!::PathIsURLW(path)) {
 		ExplodeEsc(path, args, L'|');
@@ -10048,17 +10060,6 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 			//	path.Truncate(path.ReverseFind('\\')+1);
 			//	path.Append(L"PLAYLIST\\" + pls);
 			//}
-		}
-	}
-
-	// NOTE: This is just for the favorites but we could add a global settings that does this always when on.
-	//       Could be useful when using removable devices. All you have to do then is plug in your 500 gb drive,
-	//       full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
-	if (path.Left(3) == L"?:\\") {
-		CString exepath(GetProgramPath());
-
-		if (exepath.Mid(1, 2) == L":\\") {
-			path.SetAt(0, exepath[0]);
 		}
 	}
 
@@ -18639,7 +18640,7 @@ void CMainFrame::EnableShaders2(bool enable)
 	}
 }
 
-BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/, BOOL bAddRecent/* = TRUE*/)
+BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart, BOOL bAddRecent)
 {
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
@@ -18728,6 +18729,11 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 BOOL CMainFrame::IsBDStartFile(const CString& path)
 {
 	return (path.Right(11).MakeLower() == L"\\index.bdmv");
+}
+
+BOOL CMainFrame::IsBDPlsFile(const CString& path)
+{
+	return (path.Right(5).MakeLower() == ".mpls" && path.Mid(path.ReverseFind('\\') - 9, 9).MakeUpper() == "\\PLAYLIST");
 }
 
 BOOL CMainFrame::CheckBD(CString& path)
