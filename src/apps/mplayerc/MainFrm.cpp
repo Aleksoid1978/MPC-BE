@@ -9926,10 +9926,6 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 
 		CString favstr;
 		favstr.Format(L"%s|%I64d|%d;%d|%s", favname, rtime, GetAudioTrackIdx(), GetSubtitleTrackIdx(), path);
-		if (m_BDPlaylists.size()) {
-			// TODO BDPLS
-			//favstr.AppendFormat(L"|%s", GetFileOnly(m_strPlaybackRenderedPath));
-		}
 		s.AddFav(FAV_FILE, favstr);
 
 		osdMsg = ResStr(IDS_FILE_FAV_ADDED);
@@ -10047,19 +10043,11 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		}
 	}
 
-	CString pls;
 	if (!::PathIsURLW(path)) {
 		ExplodeEsc(path, args, L'|');
 		if (args.size() >= 2) {
 			it = args.cbegin();
 			path = *it++;
-			pls = *it++;
-
-			// TODO BDPLS
-			//if (IsBDStartFile(path)) {
-			//	path.Truncate(path.ReverseFind('\\')+1);
-			//	path.Append(L"PLAYLIST\\" + pls);
-			//}
 		}
 	}
 
@@ -18645,17 +18633,20 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart, BOOL bAddRecent)
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
 
-	if (!CheckBD(path)) {
+	CString bdmv_folder = path.Left(path.ReverseFind('\\'));
+	CString mpls_file;
+	if (IsBDPlsFile(path)) {
+		bdmv_folder.Truncate(bdmv_folder.ReverseFind('\\'));
+		mpls_file = path;
+	} else if (!IsBDStartFile(path)) {
 		return FALSE;
 	}
 
-	const CString bdmv_folder = path.Left(path.ReverseFind('\\'));
-
 	if (::PathIsDirectoryW(bdmv_folder + L"\\PLAYLIST") && ::PathIsDirectoryW(bdmv_folder + L"\\STREAM")) {
 		CHdmvClipInfo ClipInfo;
-		CString       strPlaylistFile;
+		CString main_mpls_file;
 
-		if (SUCCEEDED(ClipInfo.FindMainMovie(bdmv_folder, strPlaylistFile, m_BDPlaylists))) {
+		if (SUCCEEDED(ClipInfo.FindMainMovie(bdmv_folder, main_mpls_file, m_BDPlaylists))) {
 			if (bdmv_folder.Right(5).MakeUpper() == L"\\BDMV") { // real BDMV folder
 				CString infFile = bdmv_folder.Left(bdmv_folder.GetLength() - 5) + L"\\disc.inf";
 
@@ -18714,7 +18705,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart, BOOL bAddRecent)
 			m_bIsBDPlay = TRUE;
 			m_LastOpenBDPath = bdmv_folder;
 
-			if (OpenFile(strPlaylistFile, rtStart, FALSE) == TRUE) { // OpenFile(path, rtStart, FALSE) also work
+			if (OpenFile(mpls_file.GetLength() ? mpls_file : main_mpls_file, rtStart, FALSE) == TRUE) {
 				return TRUE;
 			}
 		}
