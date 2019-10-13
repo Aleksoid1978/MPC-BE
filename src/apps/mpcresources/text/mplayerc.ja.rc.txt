@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
 10		"高速シーク (キーフレームに)"
@@ -336,15 +336,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 13		"既定のモニター以外ではフルスクリーン時に 最小化 を禁止する"
 15		"最小化時にビデオ再生を一時停止させる"
 17		"ウィンドウ モードで再生中にポインターを自動で隠す"
-19		"Logitech (Logicool) LCD サポートを有効にする"
-20		"MiniDump を有効にする"
-21		"更新の確認"
-22		"更新を自動で確認する"
-23		"確認する間隔:"
-26		"日"
-27		"設定の管理"
-28		"リセット"
-29		"エクスポート"
+19		"Do not show 000xx.mpls shorter than"
+22		"min"
+23		"Logitech (Logicool) LCD サポートを有効にする"
+24		"MiniDump を有効にする"
+25		"更新の確認"
+26		"更新を自動で確認する"
+27		"確認する間隔:"
+30		"日"
+31		"設定の管理"
+32		"リセット"
+33		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40

@@ -1001,8 +1001,6 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 	return AmHresultFromWin32(GetLastError());
 }
 
-#define MIN_LIMIT 3
-
 HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& Playlists)
 {
 	HRESULT hr = E_FAIL;
@@ -1034,7 +1032,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 					hr = S_OK;
 				}
 
-				if (rtCurrent >= MIN_LIMIT * 600000000LL) {
+				if (rtCurrent >= 2 * UNITS) { // 2 seconds
 					// Search duplicate playlists ...
 					bool duplicate = false;
 					if (!Playlists.empty()) {

@@ -15018,8 +15018,13 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 	if (GetPlaybackMode() == PM_FILE) {
 		if (!m_BDPlaylists.empty()) {
+			const CAppSettings& s = AfxGetAppSettings();
 			int mline = 1;
 			for (const auto& Item : m_BDPlaylists) {
+				if (Item.m_strFileName != m_strPlaybackRenderedPath && Item.Duration() < s.nMinMPlsDuration * 60 * UNITS) {
+					continue;
+				}
+
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 				if (mline > MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;

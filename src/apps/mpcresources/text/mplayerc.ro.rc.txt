@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Răsfoire..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Intervale de sărire (mic, mediu, mare în ms)"
 9		"Implicit"
 10		"Căutare rapidă (la cadru cheie)"
@@ -336,15 +336,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 13		"Prevină minimizarea playerului din ecran complet pe un monitor care nu este implicit"
 15		"Pause the video playback when minimized"
 17		"Auto-hide the pointer during playback in windowed mode"
-19		"Activează suportul LCD pentru tastaturi Logitech"
-20		"Enable MiniDump"
-21		"Update check"
-22		"Enable automatic update check"
-23		"Delay between each check:"
-26		"day(s)"
-27		"Administrare setări"
-28		"Resetează"
-29		"Exportă"
+19		"Do not show 000xx.mpls shorter than"
+22		"min"
+23		"Activează suportul LCD pentru tastaturi Logitech"
+24		"Enable MiniDump"
+25		"Update check"
+26		"Enable automatic update check"
+27		"Delay between each check:"
+30		"day(s)"
+31		"Administrare setări"
+32		"Resetează"
+33		"Exportă"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40

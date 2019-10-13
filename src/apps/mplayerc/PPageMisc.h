@@ -32,11 +32,14 @@ private:
 	int m_nJumpDistS;
 	int m_nJumpDistM;
 	int m_nJumpDistL;
+
 	BOOL m_fFastSeek;
 	BOOL m_fDontUseSearchInFolder;
 	BOOL m_fPreventMinimize;
 	BOOL m_bPauseMinimizedVideo;
 	BOOL m_bHideWindowedMousePointer;
+	int  m_nMinMPlsDuration;
+	CSpinButtonCtrl m_spnMinMPlsDuration;
 	BOOL m_fLCDSupport;
 	BOOL m_fMiniDump;
 

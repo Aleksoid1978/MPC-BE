@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Sfoglia..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Intervalli di salto (piccolo, medio, grande in ms)"
 9		"Default"
 10		"Ricerca veloce sul fotogramma"
@@ -336,15 +336,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 13		"Evita che MPC-BE si minimizzi quando è a tutto schermo su un monitor non di default"
 15		"Pause the video playback when minimized"
 17		"Auto-hide the pointer during playback in windowed mode"
-19		"Abilita supporto Logitech LCD"
-20		"Abilita file 'MiniDump'"
-21		"Controllo aggiornamento"
-22		"Abilita controllo aggiornamento automatico"
-23		"Controlla ogni:"
-26		"giorno(i)"
-27		"Gestione impostazioni"
-28		"Reimposta"
-29		"Esporta"
+19		"Do not show 000xx.mpls shorter than"
+22		"min"
+23		"Abilita supporto Logitech LCD"
+24		"Abilita file 'MiniDump'"
+25		"Controllo aggiornamento"
+26		"Abilita controllo aggiornamento automatico"
+27		"Controlla ogni:"
+30		"giorno(i)"
+31		"Gestione impostazioni"
+32		"Reimposta"
+33		"Esporta"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
