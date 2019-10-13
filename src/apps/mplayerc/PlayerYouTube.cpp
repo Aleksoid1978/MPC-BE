@@ -54,6 +54,8 @@
 
 #define INTERNET_OPEN_FALGS         INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
+#define USER_AGENT                  L"MPC-BE"
+
 namespace Youtube
 {
 	static LPCWSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
@@ -345,7 +347,7 @@ namespace Youtube
 
 			CString videoId;
 
-			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
+			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
 
@@ -1002,7 +1004,7 @@ namespace Youtube
 				return false;
 			}
 
-			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
+			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			char* data = nullptr;
 			DWORD dataSize = 0;
 
@@ -1087,7 +1089,7 @@ namespace Youtube
 	{
 		bool bRet = false;
 		if (CheckURL(url)) {
-			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
+			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
 
