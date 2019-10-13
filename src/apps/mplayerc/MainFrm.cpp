@@ -18701,7 +18701,7 @@ BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRe
 			}
 
 			if (bAddRecent) {
-				AddRecent(path);
+				AddRecent(mpls_file == main_mpls_file ? bdmv_folder + L"\\index.bdmv" : path);
 			}
 
 			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
