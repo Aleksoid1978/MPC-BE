@@ -15421,7 +15421,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 			}
 			else if (IsBDStartFile(path)) {
 				path.Truncate(path.ReverseFind('\\'));
-				if (path.Right(5).MakeUpper() == L"\\BDMV") { 
+				if (path.Right(5).MakeUpper() == L"\\BDMV") {
 					path.Truncate(path.GetLength() - 5);
 				}
 				EllipsisPath(path, 100);
@@ -18631,7 +18631,7 @@ void CMainFrame::EnableShaders2(bool enable)
 	}
 }
 
-BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart, BOOL bAddRecent)
+BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRecent)
 {
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
@@ -19551,7 +19551,7 @@ GUID CMainFrame::GetTimeFormat()
 	return ret;
 }
 
-BOOL CMainFrame::OpenIso(CString pathName, REFERENCE_TIME rtStart/* = INVALID_TIME*/)
+BOOL CMainFrame::OpenIso(const CString& pathName, REFERENCE_TIME rtStart/* = INVALID_TIME*/)
 {
 	if (m_DiskImage.CheckExtension(pathName)) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
@@ -19598,7 +19598,7 @@ BOOL CMainFrame::OpenIso(CString pathName, REFERENCE_TIME rtStart/* = INVALID_TI
 	return FALSE;
 }
 
-void CMainFrame::AddRecent(CString pathName)
+void CMainFrame::AddRecent(const CString& pathName)
 {
 	auto& s = AfxGetAppSettings();
 	if (s.bKeepHistory) {

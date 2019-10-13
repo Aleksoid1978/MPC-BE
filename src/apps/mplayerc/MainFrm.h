@@ -1331,7 +1331,7 @@ public:
 
 	CHdmvClipInfo::CPlaylist m_BDPlaylists;
 	BOOL m_bIsBDPlay;
-	BOOL OpenBD(CString path, REFERENCE_TIME rtStart, BOOL bAddRecent);
+	BOOL OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRecent);
 
 	// TRUE if the file name is "index.bdmv"
 	BOOL IsBDStartFile(const CString& path);
@@ -1379,9 +1379,9 @@ public:
 protected:
 	CDiskImage	m_DiskImage;
 	BOOL		m_bNeedUnmountImage = TRUE;
-	BOOL		OpenIso(CString pathName, REFERENCE_TIME rtStart = INVALID_TIME);
+	BOOL		OpenIso(const CString& pathName, REFERENCE_TIME rtStart = INVALID_TIME);
 
-	void		AddRecent(CString pathName);
+	void		AddRecent(const CString& pathName);
 
 	CString		GetVidPos();
 	CString		CreateSnapShotFileName();
