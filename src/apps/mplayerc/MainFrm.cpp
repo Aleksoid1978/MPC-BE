@@ -19498,18 +19498,13 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 CString CMainFrame::GetCurFileName()
 {
-	CString fn;
-	if (m_youtubeFields.fname.GetLength() || m_BDPlaylists.size()) {
-		fn = m_wndPlaylistBar.GetCurFileName();
-	} else {
-		fn = m_strPlaybackRenderedPath;
-	}
+	CString fn = !m_youtubeFields.fname.IsEmpty() ? m_wndPlaylistBar.GetCurFileName() : m_strPlaybackRenderedPath;
 
 	if (fn.IsEmpty() && m_pMainFSF) {
 		LPOLESTR pFN = nullptr;
 		AM_MEDIA_TYPE mt;
 		if (SUCCEEDED(m_pMainFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-			fn = CString(pFN);
+			fn = pFN;
 			CoTaskMemFree(pFN);
 		}
 	}
