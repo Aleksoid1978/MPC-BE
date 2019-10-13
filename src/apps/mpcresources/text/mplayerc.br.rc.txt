@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Procurar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Fast seek (on keyframe)"
@@ -336,15 +336,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 13		"Prevent from MINIMIZE when Fullscreen on non default monitor"
 15		"Pause the video playback when minimized"
 17		"Auto-hide the pointer during playback in windowed mode"
-19		"Enable Logitech LCD support"
-20		"Enable MiniDump"
-21		"Update check"
-22		"Enable automatic update check"
-23		"Delay between each check:"
-26		"day(s)"
-27		"Settings management"
-28		"Reset"
-29		"Export"
+19		"Do not show 000xx.mpls shorter than"
+22		"min"
+23		"Enable Logitech LCD support"
+24		"Enable MiniDump"
+25		"Update check"
+26		"Enable automatic update check"
+27		"Delay between each check:"
+30		"day(s)"
+31		"Settings management"
+32		"Reset"
+33		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40

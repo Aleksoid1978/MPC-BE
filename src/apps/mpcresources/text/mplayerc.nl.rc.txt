@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bladeren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Verspring intervallen (kort, middel, lang in ms)"
 9		"Standaard"
 10		"Snel zoeken (op sleutelframe)"
@@ -336,15 +336,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 30
 13		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
 15		"Weergave pauseren als het venster geminimaliseerd is"
 17		"Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus"
-19		"Activeer Logitech LCD-ondersteuning"
-20		"Activeer MiniDump"
-21		"Op updates controleren"
-22		"Activeer automatische updatecontrole"
-23		"Controleer 1 keer per"
-26		"dag(en)"
-27		"Instellingen beheren"
-28		"Resetten"
-29		"Exporteren"
+19		"Do not show 000xx.mpls shorter than"
+22		"min"
+23		"Activeer Logitech LCD-ondersteuning"
+24		"Activeer MiniDump"
+25		"Op updates controleren"
+26		"Activeer automatische updatecontrole"
+27		"Controleer 1 keer per"
+30		"dag(en)"
+31		"Instellingen beheren"
+32		"Resetten"
+33		"Exporteren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40

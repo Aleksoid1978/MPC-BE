@@ -36,6 +36,7 @@ CPPageMisc::CPPageMisc()
 	, m_fPreventMinimize(FALSE)
 	, m_bPauseMinimizedVideo(FALSE)
 	, m_bHideWindowedMousePointer(FALSE)
+	, m_nMinMPlsDuration(3)
 	, m_fLCDSupport(FALSE)
 	, m_fMiniDump(FALSE)
 	, m_nUpdaterDelay(7)
@@ -58,9 +59,10 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
 	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
 	DDX_Check(pDX, IDC_CHECK5, m_bHideWindowedMousePointer);
+	DDX_Text(pDX, IDC_EDIT5, m_nMinMPlsDuration);
+	DDX_Control(pDX, IDC_SPIN2, m_spnMinMPlsDuration);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
 	DDX_Check(pDX, IDC_CHECK2, m_fMiniDump);
-
 	DDX_Control(pDX, IDC_CHECK3, m_updaterAutoCheckCtrl);
 	DDX_Control(pDX, IDC_EDIT4, m_updaterDelayCtrl);
 	DDX_Control(pDX, IDC_SPIN1, m_updaterDelaySpin);
@@ -95,6 +97,8 @@ BOOL CPPageMisc::OnInitDialog()
 	m_fDontUseSearchInFolder = s.fDontUseSearchInFolder;
 	m_fFastSeek = s.fFastSeek;
 	m_bHideWindowedMousePointer = s.bHideWindowedMousePointer;
+	m_nMinMPlsDuration = s.nMinMPlsDuration;
+	m_spnMinMPlsDuration.SetRange32(0, 20);
 	m_fLCDSupport = s.fLCDSupport;
 	m_fMiniDump = s.fMiniDump;
 
@@ -116,18 +120,19 @@ BOOL CPPageMisc::OnApply()
 	s.nJumpDistS = m_nJumpDistS;
 	s.nJumpDistM = m_nJumpDistM;
 	s.nJumpDistL = m_nJumpDistL;
-	s.fPreventMinimize = !!m_fPreventMinimize;
-	s.bPauseMinimizedVideo = !!m_bPauseMinimizedVideo;
-	s.fDontUseSearchInFolder = !!m_fDontUseSearchInFolder;
-	s.fFastSeek = !!m_fFastSeek;
+	
+	s.fPreventMinimize          = !!m_fPreventMinimize;
+	s.bPauseMinimizedVideo      = !!m_bPauseMinimizedVideo;
+	s.fDontUseSearchInFolder    = !!m_fDontUseSearchInFolder;
+	s.fFastSeek                 = !!m_fFastSeek;
 	s.bHideWindowedMousePointer = !!m_bHideWindowedMousePointer;
-	s.fLCDSupport = !!m_fLCDSupport;
-	s.fMiniDump = !!m_fMiniDump;
+	s.nMinMPlsDuration          = (m_nMinMPlsDuration = std::clamp(m_nMinMPlsDuration, 0, 20));
+	s.fLCDSupport               = !!m_fLCDSupport;
+	s.fMiniDump                 = !!m_fMiniDump;
 	CMiniDump::SetState(s.fMiniDump);
 
-	s.bUpdaterAutoCheck	= !!m_updaterAutoCheckCtrl.GetCheck();
-	m_nUpdaterDelay		= std::clamp(m_nUpdaterDelay, 1, 365);
-	s.nUpdaterDelay		= m_nUpdaterDelay;
+	s.bUpdaterAutoCheck = !!m_updaterAutoCheckCtrl.GetCheck();
+	s.nUpdaterDelay     = (m_nUpdaterDelay = std::clamp(m_nUpdaterDelay, 1, 365));
 
 	return __super::OnApply();
 }

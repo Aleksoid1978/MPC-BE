@@ -795,12 +795,13 @@ public:
 	int				nJumpDistS;
 	int				nJumpDistM;
 	int				nJumpDistL;
+	bool			fFastSeek;
 	bool			fDontUseSearchInFolder;
 	bool			fPreventMinimize;
 	bool			bPauseMinimizedVideo;
-	bool			fLCDSupport;
-	bool			fFastSeek;
 	bool			bHideWindowedMousePointer;
+	int				nMinMPlsDuration;
+	bool			fLCDSupport;
 	bool			fMiniDump;
 	bool			bUpdaterAutoCheck;
 	int				nUpdaterDelay;
