@@ -15426,6 +15426,9 @@ void CMainFrame::SetupRecentFilesSubMenu()
 				}
 				EllipsisPath(path, 100);
 				path.Insert(0, L"Blu-ray - ");
+			} else if (IsBDPlsFile(path)) {
+				EllipsisPath(path, 100);
+				path.Insert(0, L"Blu-ray - ");
 			}
 
 			path.Replace(L"&", L"&&");
