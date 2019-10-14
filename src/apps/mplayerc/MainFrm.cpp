@@ -19558,7 +19558,8 @@ BOOL CMainFrame::OpenIso(const CString& pathName, REFERENCE_TIME rtStart/* = INV
 
 		WCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 		if (diskletter) {
-			if (OpenBD(CString(diskletter) + L":\\", rtStart, FALSE)) {
+			if (::PathFileExistsW(CString(diskletter) + L":\\BDMV\\index.bdmv")) {
+				OpenBD(CString(diskletter) + L":\\BDMV\\index.bdmv", rtStart, FALSE);
 				AddRecent(pathName);
 				return TRUE;
 			}
