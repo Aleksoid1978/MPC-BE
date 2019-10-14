@@ -18727,7 +18727,7 @@ BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRe
 
 BOOL CMainFrame::IsBDStartFile(const CString& path)
 {
-	return (path.Right(11).MakeLower() == L"\\index.bdmv");
+	return (path.Right(11).MakeLower() == L"\\index.bdmv" || path.Right(17).MakeLower() == L"\\movieobject.bdmv");
 }
 
 BOOL CMainFrame::IsBDPlsFile(const CString& path)
@@ -18737,10 +18737,6 @@ BOOL CMainFrame::IsBDPlsFile(const CString& path)
 
 BOOL CMainFrame::CheckBD(CString& path)
 {
-	if (IsBDStartFile(path) && ::PathFileExistsW(path)) {
-		return TRUE;
-	}
-
 	if (::PathIsDirectoryW(path)) {
 		if (::PathFileExistsW(path + L"\\index.bdmv")) {
 			path.TrimRight('\\');
@@ -18754,12 +18750,6 @@ BOOL CMainFrame::CheckBD(CString& path)
 		}
 	}
 
-	// additional check for "MovieObject.bdmv"
-	if (path.Right(17).MakeLower() == L"\\movieobject.bdmv" && ::PathFileExistsW(path.Left(path.GetLength()-17)+"\\index.bdmv")) {
-		path.Truncate(path.GetLength() - 17);
-		path.Append(L"\\index.bdmv");
-	}
-
 	return FALSE;
 }
 
@@ -18770,10 +18760,6 @@ BOOL CMainFrame::IsDVDStartFile(const CString& path)
 
 BOOL CMainFrame::CheckDVD(CString& path)
 {
-	if (IsDVDStartFile(path) && ::PathFileExistsW(path)) {
-		return TRUE;
-	}
-
 	if (::PathIsDirectoryW(path)) {
 		if (::PathFileExistsW(path + L"\\VIDEO_TS.IFO")) {
 			path.TrimRight('\\');
