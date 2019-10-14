@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -138,6 +138,7 @@ public:
 		REFERENCE_TIME   m_rtTimestamp = 0;
 		SHORT            m_nEntryPID   = 0;
 		REFERENCE_TIME   m_rtDuration  = 0;
+		CString          m_strTitle;
 	};
 
 	class CPlaylist : public std::vector<PlaylistItem> {

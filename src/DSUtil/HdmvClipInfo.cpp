@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 #include "DSUtil.h"
 #include "GolombBuffer.h"
 #include <sys\stat.h>
+#include <regex>
 
 extern LCID	ISO6392ToLcid(LPCSTR code);
 
@@ -985,6 +986,51 @@ HRESULT CHdmvClipInfo::ReadChapters(const CString& strPlaylistFile, const CPlayl
 			}
 
 			Chapters.emplace_back(Chapter);
+		}
+
+		if (!Chapters.empty()) {
+			CString tnmt_xml_file = strPlaylistFile;
+			tnmt_xml_file.Replace(L"\\PLAYLIST\\", L"\\META\\TN\\tnmt_eng_");
+			tnmt_xml_file.Replace(L".mpls", L".xml");
+
+			HANDLE m_hXmlFile = CreateFileW(tnmt_xml_file, GENERIC_READ, dwShareMode, nullptr,
+											OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
+			if (m_hXmlFile != INVALID_HANDLE_VALUE) {
+				LARGE_INTEGER size = {};
+				GetFileSizeEx(m_hXmlFile, &size);
+				if (size.QuadPart > 0 && size.QuadPart <= 10 * KILOBYTE) {
+					char* xmlUtf8 = new(std::nothrow) char[size.QuadPart + 1];
+					if (xmlUtf8) {
+						DWORD dwRead;
+						if (ReadFile(m_hXmlFile, xmlUtf8, size.QuadPart, &dwRead, nullptr) && dwRead == size.QuadPart) {
+							xmlUtf8[size.QuadPart] = '\0';
+							const CString xml = UTF8ToWStr(xmlUtf8);
+							delete [] xmlUtf8;
+
+							if (!xml.IsEmpty()) {
+								std::vector<CString> names;
+
+								std::wcmatch match;
+								const wchar_t* start = xml.GetString();
+								const std::wregex regex(L"<name>([^<>\\n]+)</name>");
+								while (std::regex_search(start, match, regex) && match.size() == 2) {
+									start = match[1].second;
+									const CString name = CString(match[1].first, match[1].length());
+									names.emplace_back(name);
+								}
+
+								if (names.size() == Chapters.size()) {
+									for (size_t i = 0; i < Chapters.size(); i++) {
+										Chapters[i].m_strTitle = names[i];
+									}
+								}
+							}
+						}
+					}
+				}
+
+				CloseHandle(m_hXmlFile);
+			}
 		}
 
 		return CloseFile(S_OK);
