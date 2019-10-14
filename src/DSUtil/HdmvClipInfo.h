@@ -158,8 +158,8 @@ public:
 	Streams& GetStreams() { return !stn.m_Streams.empty() ? stn.m_Streams : m_Streams; }
 
 	HRESULT FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& Playlists);
-	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = nullptr);
-	HRESULT ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
+	HRESULT ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = nullptr);
+	HRESULT ReadChapters(const CString& strPlaylistFile, const CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
 private :
 	DWORD  ProgramInfo_start_address = 0;

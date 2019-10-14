@@ -547,17 +547,12 @@ HRESULT CHdmvClipInfo::ReadSTNInfo()
 	return S_OK;
 }
 
-HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension/* = FALSE*/, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = nullptr*/)
+HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension/* = FALSE*/, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = nullptr*/)
 {
-	CPath Path(strPlaylistFile);
 	rtDuration = 0;
 
 	m_Streams.clear();
 	stn.m_Streams.clear();
-
-	// Get BDMV folder
-	Path.RemoveFileSpec();
-	Path.RemoveFileSpec();
 
 	m_hFile = CreateFileW(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
 						  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
@@ -580,6 +575,11 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		Playlist.m_mpls_size = size.QuadPart;
 
 		DLog(L"CHdmvClipInfo::ReadPlaylist() : '%s'", strPlaylistFile);
+
+		// Get BDMV folder
+		CPath Path(strPlaylistFile);
+		Path.RemoveFileSpec();
+		Path.RemoveFileSpec();
 
 		LONGLONG playlistPos = 0;
 		LONGLONG extPos = 0;
@@ -931,15 +931,9 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	return AmHresultFromWin32(GetLastError());
 }
 
-HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters)
+HRESULT CHdmvClipInfo::ReadChapters(const CString& strPlaylistFile, const CPlaylist& PlaylistItems, CPlaylistChapter& Chapters)
 {
 	Chapters.clear();
-
-	CPath Path(strPlaylistFile);
-
-	// Get BDMV folder
-	Path.RemoveFileSpec();
-	Path.RemoveFileSpec();
 
 	m_hFile = CreateFileW(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
 						  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
@@ -958,11 +952,11 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 
 		std::vector<REFERENCE_TIME> rtOffsets;
 		rtOffsets.reserve(PlaylistItems.size());
-		REFERENCE_TIME rtSum = 0;
+		REFERENCE_TIME rtDuration = 0;
 
 		for (const auto& Item : PlaylistItems) {
-			rtOffsets.emplace_back(rtSum - Item.m_rtIn);
-			rtSum += Item.Duration();
+			rtOffsets.emplace_back(rtDuration - Item.m_rtIn);
+			rtDuration += Item.Duration();
 		}
 
 		ReadDword();                        // PlayList_start_address
@@ -986,16 +980,14 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 			Chapter.m_nEntryPID   = ReadShort();                                 // entry_ES_PID
 			Chapter.m_rtDuration  = REFERENCE_TIME(20000.0f * ReadDword() / 90); // duration
 
-			if (Chapter.m_rtTimestamp < 0 || Chapter.m_rtTimestamp > rtSum) {
+			if (Chapter.m_rtTimestamp < 0 || Chapter.m_rtTimestamp > rtDuration) {
 				continue;
 			}
 
 			Chapters.emplace_back(Chapter);
 		}
 
-		CloseFile(S_OK);
-
-		return S_OK;
+		return CloseFile(S_OK);
 	}
 
 	return AmHresultFromWin32(GetLastError());
