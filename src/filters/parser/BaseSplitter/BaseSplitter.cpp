@@ -487,7 +487,6 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	m_fn = pszFileName;
 	HRESULT hr = E_FAIL;
 	CComPtr<IAsyncReader> pAsyncReader;
-	CHdmvClipInfo::CPlaylistChapter Chapters;
 
 	if (BuildPlaylist(pszFileName, m_Items)) {
 		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(m_Items, hr);
@@ -504,13 +503,18 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 
 	SortOutputPin();
 
+	CHdmvClipInfo::CPlaylistChapter Chapters;
 	if (BuildChapters(pszFileName, m_Items, Chapters)) {
 		int i = 1;
 		for (const auto& chap : Chapters) {
 			CString str;
 			if (chap.m_nMarkType == CHdmvClipInfo::EntryMark) {
-				str.Format (L"Chapter %d", i);
-				ChapAppend (chap.m_rtTimestamp, str);
+				if (!chap.m_strTitle.IsEmpty()) {
+					str = chap.m_strTitle;
+				} else {
+					str.Format(L"Chapter %d", i);
+				}
+				ChapAppend(chap.m_rtTimestamp, str);
 				i++;
 			}
 		}
