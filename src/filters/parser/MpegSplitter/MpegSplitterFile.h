@@ -55,24 +55,20 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	};
 	std::map<DWORD, hevc_data> hevc_streams;
 
-	template<class T, int validCount = 5>
+	template<class T, BYTE validCount = 5>
 	class CValidStream {
-		BYTE m_nValidStream;
-		T m_val;
+		BYTE m_nValidStream = 0;
+		T m_val = {};
 	public:
-		CValidStream() {
-			m_nValidStream = 0;
-			memset(&m_val, 0, sizeof(m_val));
-		}
-		void Handle(T& val) {
+		void Handle(const T& val) {
 			if (m_val == val) {
 				m_nValidStream++;
 			} else {
 				m_nValidStream = 0;
+				memcpy(&m_val, &val, sizeof(val));
 			}
-			memcpy(&m_val, &val, sizeof(val));
 		}
-		BOOL IsValid() const { return m_nValidStream >= validCount; }
+		const bool IsValid() const { return m_nValidStream >= validCount; }
 	};
 
 	std::map<DWORD, CValidStream<latm_aachdr, 3>> m_aaclatmValid;
@@ -276,16 +272,16 @@ public:
 			sort();
 		}
 
-		const stream* GetStream(DWORD pid) {
+		const stream* GetStream(const DWORD pid) const {
 			const auto it = std::find(cbegin(), cend(), pid);
 			return (it != cend()) ? &(*it) : nullptr;
 		}
 
-		const bool Find(const stream& s) {
+		const bool Find(const stream& s) const {
 			return (std::find(cbegin(), cend(), s) != cend());
 		}
 
-		const bool Find(const WORD& pid) {
+		const bool Find(const WORD pid) const {
 			return (std::find(cbegin(), cend(), pid) != cend());
 		}
 
@@ -321,7 +317,7 @@ public:
 
 		CString name;
 
-		size_t streamCount(CStreamsList s) {
+		size_t streamCount(const CStreamsList& s) {
 			size_t cnt = 0;
 			for (const auto& stream : streams) {
 				for (int type = stream_type::video; type <= stream_type::subpic; type++) {
@@ -382,7 +378,7 @@ public:
 	struct programData {
 		BYTE table_id      = 0;
 		int section_length = 0;
-		BYTE crc_size       = 0;
+		BYTE crc_size      = 0;
 		bool bFinished     = false;
 		std::vector<BYTE> pData;
 
