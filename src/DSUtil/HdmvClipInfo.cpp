@@ -1115,9 +1115,5 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 		Playlists.clear();
 	}
 
-	std::sort(Playlists.begin(), Playlists.end(), [](const PlaylistItem& a, const PlaylistItem& b) {
-		return (a.Duration() > b.Duration() || (a.Duration() == b.Duration() && a.Size() > b.Size()));
-	});
-
 	return hr;
 }
