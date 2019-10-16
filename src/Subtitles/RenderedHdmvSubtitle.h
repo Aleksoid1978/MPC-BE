@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,7 @@ class __declspec(uuid("FCA68599-C83E-4ea5-94A3-C2E1B0E326B9"))
 {
 public:
 	CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nType, const CString& name, LCID lcid);
+	CRenderedHdmvSubtitle(CCritSec* pLock);
 	~CRenderedHdmvSubtitle(void);
 
 	DECLARE_IUNKNOWN
@@ -60,6 +61,8 @@ public:
 	HRESULT	NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT	EndOfStream();
 
+	bool Open(const CString& fn, const CString& name, const CString& videoName);
+
 private :
 	CString			m_name;
 	LCID			m_lcid;
@@ -68,4 +71,11 @@ private :
 	CCritSec		m_csCritSec;
 
 	SUBTITLE_TYPE	m_nType;
+
+	static const WORD PGS_SYNC_CODE = 'PG';
+
+	bool m_bStopParsing = false;
+	std::thread m_parsingThread;
+
+	void ParseFile(const CString& fn);
 };

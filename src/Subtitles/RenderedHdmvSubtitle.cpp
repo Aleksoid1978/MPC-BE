@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,12 @@
  */
 
 #include "stdafx.h"
+#include <array>
+#include <vector>
+#include "../DSUtil/GolombBuffer.h"
 #include "HdmvSub.h"
 #include "DVBSub.h"
+#include "SubtitleHelpers.h"
 #include "RenderedHdmvSubtitle.h"
 
 CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nType, const CString& name, LCID lcid)
@@ -40,13 +44,26 @@ CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nTyp
 			break;
 		default :
 			ASSERT(FALSE);
-			m_pSub = NULL;
+			m_pSub = nullptr;
 	}
+}
+
+CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock)
+	: CSubPicProviderImpl(pLock)
+	, m_lcid(0)
+	, m_nType(ST_HDMV)
+	, m_pSub(nullptr)
+{
 }
 
 CRenderedHdmvSubtitle::~CRenderedHdmvSubtitle(void)
 {
-	delete m_pSub;
+	m_bStopParsing = true;
+	if (m_parsingThread.joinable()) {
+		m_parsingThread.join();
+	}
+
+	SAFE_DELETE(m_pSub);
 }
 
 STDMETHODIMP CRenderedHdmvSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -202,4 +219,71 @@ HRESULT CRenderedHdmvSubtitle::EndOfStream()
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	return m_pSub->EndOfStream();
+}
+
+bool CRenderedHdmvSubtitle::Open(const CString& fn, const CString& name, const CString& videoName)
+{
+	CFile f;
+	if (!f.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
+		return false;
+	}
+
+	WORD wSyncCode = 0;
+	f.Read(&wSyncCode, sizeof(wSyncCode));
+	if (_byteswap_ushort(wSyncCode) != PGS_SYNC_CODE) {
+		return false;
+	}
+
+	if (name.IsEmpty()) {
+		m_name = Subtitle::GuessSubtitleName(fn, videoName);
+	} else {
+		m_name = name;
+	}
+	m_pSub = DNew CHdmvSub();
+
+	m_parsingThread = std::thread([this, fn] { ParseFile(fn); });
+
+	return true;
+}
+
+void CRenderedHdmvSubtitle::ParseFile(const CString& fn)
+{
+	CFile f;
+	if (!f.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
+		return;
+	}
+
+	// Header: Sync code | start time | stop time | segment type | segment size
+	std::array<BYTE, 2 + 2 * 4 + 1 + 2> header;
+	const unsigned nExtraSize = 1 + 2; // segment type + segment size
+	std::vector<BYTE> segBuff;
+
+	while (!m_bStopParsing && f.Read(header.data(), header.size()) == header.size()) {
+		// Parse the header
+		CGolombBuffer headerBuffer(header.data(), (int)header.size());
+
+		if (WORD(headerBuffer.ReadShort()) != PGS_SYNC_CODE) {
+			break;
+		}
+
+		const REFERENCE_TIME rtStart = REFERENCE_TIME(headerBuffer.ReadDword()) * 1000 / 9;
+		const REFERENCE_TIME rtStop = REFERENCE_TIME(headerBuffer.ReadDword()) * 1000 / 9;
+		headerBuffer.ReadByte(); // segment type
+		const WORD wLenSegment = (WORD)headerBuffer.ReadShort();
+
+		// Leave some room to add the segment type and size
+		unsigned nLenData = nExtraSize + wLenSegment;
+		if (nLenData > segBuff.size()) {
+			segBuff.resize(nLenData);
+		}
+		memcpy(segBuff.data(), &header[header.size() - nExtraSize], nExtraSize);
+
+		// Read the segment
+		if (wLenSegment && f.Read(&segBuff[nExtraSize], wLenSegment) != wLenSegment) {
+			break;
+		}
+
+		// Parse the data (even if the segment size is 0 because the header itself is important)
+		m_pSub->ParseSample(segBuff.data(), nLenData, rtStart, rtStop);
+	}
 }
