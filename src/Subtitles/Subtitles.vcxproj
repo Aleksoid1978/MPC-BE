@@ -67,7 +67,6 @@
     <ClCompile Include="STS.cpp" />
     <ClCompile Include="SubtitleHelpers.cpp" />
     <ClCompile Include="SubtitleInputPin.cpp" />
-    <ClCompile Include="SupSubFile.cpp" />
     <ClCompile Include="TextFile.cpp" />
     <ClCompile Include="USFSubtitles.cpp" />
     <ClCompile Include="VobSubFile.cpp" />
@@ -93,7 +92,6 @@
     <ClInclude Include="STS.h" />
     <ClInclude Include="SubtitleHelpers.h" />
     <ClInclude Include="SubtitleInputPin.h" />
-    <ClInclude Include="SupSubFile.h" />
     <ClInclude Include="TextFile.h" />
     <ClInclude Include="USFSubtitles.h" />
     <ClInclude Include="VobSubFile.h" />

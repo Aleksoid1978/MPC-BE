@@ -77,7 +77,6 @@
 #include "OpenImage.h"
 
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
-#include "../../Subtitles/SupSubFile.h"
 #include "../../Subtitles/XSUBSubtitle.h"
 #include "../../SubPic/MemSubPic.h"
 
@@ -15783,13 +15782,12 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 
 	// TMP: maybe this will catch something for those who get a runtime error dialog when opening subtitles from cds
 	try {
-
-		CString videoName = GetPlaybackMode() == PM_FILE ? GetCurFileName() : L"";
+		const CString videoName = GetPlaybackMode() == PM_FILE ? GetCurFileName() : L"";
 		if (!pSubStream) {
-			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
-			if (pSSF && GetFileExt(fname).MakeLower() == L".sup") {
-				if (pSSF->Open(fname, subItem.GetTitle(), videoName)) {
-					pSubStream = pSSF.Detach();
+			CAutoPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
+			if (pRHS && GetFileExt(fname).MakeLower() == L".sup") {
+				if (pRHS->Open(fname, subItem.GetTitle(), videoName)) {
+					pSubStream = pRHS.Detach();
 				}
 			}
 		}
@@ -15929,7 +15927,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 				}
 
 				pRTS->Deinit();
-			} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
+			} else if (clsid == __uuidof(CRenderedHdmvSubtitle)) {
 				s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
 			}
 
@@ -16077,8 +16075,7 @@ void CMainFrame::UpdateSubDefaultStyle()
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);
 		}
-	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)
-			|| dynamic_cast<CSupSubFile*>((ISubStream*)m_pCurrentSubStream)) {
+	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
 		s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
