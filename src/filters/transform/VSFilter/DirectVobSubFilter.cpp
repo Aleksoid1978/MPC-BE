@@ -35,6 +35,9 @@
 #include "../../../DSUtil/std_helper.h"
 #include "../../../SubPic/MemSubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
+#include "../../../Subtitles/VobSubFile.h"
+#include "../../../Subtitles/RTS.h"
+#include "../../../Subtitles/RenderedHdmvSubtitle.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1918,10 +1921,10 @@ bool CDirectVobSubFilter::Open()
 		CComPtr<ISubStream> pSubStream;
 
 		if (!pSubStream) {
-			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
-			if (pSSF && GetFileExt(sub_fn).MakeLower() == L".sup") {
-				if (pSSF->Open(sub_fn, L"", m_videoFileName)) {
-					pSubStream = pSSF.Detach();
+			CAutoPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
+			if (pRHS && GetFileExt(sub_fn).MakeLower() == L".sup") {
+				if (pRHS->Open(sub_fn, L"", m_videoFileName)) {
+					pSubStream = pRHS.Detach();
 				}
 			}
 		}
