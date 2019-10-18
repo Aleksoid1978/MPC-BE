@@ -486,6 +486,12 @@ IF /I "%x64_type%" == "amd64" (
 FOR /F "delims=" %%A IN (
   'REG QUERY "%U_%\Inno Setup 5_is1" /v "Inno Setup: App Path" 2^>Nul ^|FIND "REG_SZ"') DO (
   SET "InnoSetupPath=%%A" & CALL :SubInnoSetupPath %%InnoSetupPath:*Z=%%)
+
+IF NOT DEFINED InnoSetupPath (
+  FOR /F "delims=" %%A IN (
+    'REG QUERY "%U_%\Inno Setup 6_is1" /v "Inno Setup: App Path" 2^>Nul ^|FIND "REG_SZ"') DO (
+    SET "InnoSetupPath=%%A" & CALL :SubInnoSetupPath %%InnoSetupPath:*Z=%%)
+  )
 EXIT /B
 
 :SubDetectSevenzipPath
