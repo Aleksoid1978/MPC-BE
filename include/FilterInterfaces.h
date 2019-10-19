@@ -71,8 +71,9 @@ interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConf
 // name            type  filter            mode     valid values
 // stereodownmix   bool  MpaDecFilter      set      true/false
 // queueDuration   int   BaseSplitter      set/get   100...15000 milliseconds
-// networkTimeout  int   BaseSplitter      set/get  2000...20000 milliseconds
+// networkTimeout  int   BaseSplitter      set/get  2000...20000 milliseconds (reserved)
+// version         int64 MpcVideoRenderer  get      0.3.3.886 or newer
 // statsEnable     bool  MpcVideoRenderer  set/get  true/false
 // cmd_redraw      bool  MpcVideoRenderer  set      true
 // playbackState   int   MpcVideoRenderer  get      0-State_Stopped, 1-State_Paused, 2-State_Running
-// rotation        int   MpcVideoRenderer  get      0, 90, 180, 270
+// rotation        int   MpcVideoRenderer  get      0, 90, 180, 270 (reserved)
