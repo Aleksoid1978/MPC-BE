@@ -3489,6 +3489,8 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 		OnFilePostOpenMedia(pOMD);
 	}
 
+	Content::Online::Clear();
+
 	m_bNextIsOpened = FALSE;
 
 	m_flastnID = 0;
