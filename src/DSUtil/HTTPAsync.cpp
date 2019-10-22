@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -238,6 +238,23 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	if (InternetSetStatusCallbackW(m_hInstance, (INTERNET_STATUS_CALLBACK)&Callback) == INTERNET_INVALID_STATUS_CALLBACK) {
 		return E_FAIL;
+	}
+
+	static bool bSetMaxConnections = false;
+	if (!bSetMaxConnections) {
+		bSetMaxConnections = true;
+
+		DWORD value = 0;
+		DWORD size = sizeof(DWORD);
+		if (InternetQueryOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &value, &size) && value < 10) {
+			value = 10;
+			InternetSetOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &value, size);
+		}
+
+		if (InternetQueryOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &value, &size) && value < 10) {
+			value = 10;
+			InternetSetOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &value, size);
+		}
 	}
 
 	m_context = Context::CONTEXT_CONNECT;
