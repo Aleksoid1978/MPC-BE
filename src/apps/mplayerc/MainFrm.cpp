@@ -9336,16 +9336,37 @@ void CMainFrame::OnNavigateSkipFile(UINT nID)
 				return item.m_strFileName == m_strPlaybackRenderedPath;
 			});
 
+			const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
 			if (nID == ID_NAVIGATE_SKIPBACKFILE) {
 				if (it == m_BDPlaylists.cbegin()) {
 					return;
 				}
-				it--;
+				for (;;) {
+					it--;
+					if (it->Duration() < rtMinMPlsDuration) {
+						if (it == m_BDPlaylists.cbegin()) {
+							return;
+						}
+						continue;
+					}
+
+					break;
+				}
 			} else if (nID == ID_NAVIGATE_SKIPFORWARDFILE) {
 				if (it == std::prev(m_BDPlaylists.cend())) {
 					return;
 				}
-				it++;
+				for (;;) {
+					it++;
+					if (it->Duration() < rtMinMPlsDuration) {
+						if (it == std::prev(m_BDPlaylists.cend())) {
+							return;
+						}
+						continue;
+					}
+
+					break;
+				}
 			}
 
 			const CString fileName(it->m_strFileName);
@@ -9596,8 +9617,12 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
 		if (id < m_BDPlaylists.size()) {
+			const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
 			UINT idx = 0;
 			for (const auto& item : m_BDPlaylists) {
+				if (item.Duration() < rtMinMPlsDuration) {
+					continue;
+				}
 				if (idx == id && item.m_strFileName != m_strPlaybackRenderedPath) {
 					m_bNeedUnmountImage = FALSE;
 					SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
@@ -15019,10 +15044,10 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 	if (GetPlaybackMode() == PM_FILE) {
 		if (!m_BDPlaylists.empty()) {
-			const CAppSettings& s = AfxGetAppSettings();
+			const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
 			int mline = 1;
 			for (const auto& Item : m_BDPlaylists) {
-				if (Item.m_strFileName != m_strPlaybackRenderedPath && Item.Duration() < s.nMinMPlsDuration * 60 * UNITS) {
+				if (Item.m_strFileName != m_strPlaybackRenderedPath && Item.Duration() < rtMinMPlsDuration) {
 					continue;
 				}
 
