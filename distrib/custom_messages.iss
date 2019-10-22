@@ -85,8 +85,8 @@ it.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 it.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
 
 ;Japanese
-ja.WelcomeLabel2=このプログラムはあなたのコンピュータの上に[name]をインストールします。%n%nセットアップを続ける前に他のすべてのアプリを閉じることを推奨します。
-ja.WinVersionTooLowError=[name] を実行する為に Windows Vista 以降が必要です。
+ja.WelcomeLabel2=このプログラムはお使いのコンピューターに [name] をインストールします。%n%nセットアップを続行する前に他のすべてのアプリケーションを閉じることをお勧めします。
+ja.WinVersionTooLowError=[name] を実行するには Windows Vista 以降が必要です。
 
 ;Korean
 kr.WelcomeLabel2=이 설치프로그램은 [name] 를(을) 당신의 컴퓨터에 설치합니다.%n%n설치를 계속하기 전에 다른 모든 프로그램을 종료하는 것을 권장합니다.
@@ -629,34 +629,34 @@ ja.langid=00001041
 ja.langcode=ja
 ja.comp_mpciconlib=アイコン ライブラリー
 ja.comp_mpcresources=翻訳
-ja.comp_mpcbeshellext=Install the shell extension
-ja.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
-ja.msg_DeleteSettings=MPC-BE の設定を削除してもよろしいですか？%n%nMPC-BE を再度インストールする場合は、設定を削除する必要はありません。
-ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムはインストールされません！%n%nオペレーティングシステムにかかわらず最新の DirectX ランタイム June 2010 をダウンロードして、インストールしてください。
-ja.msg_SetupIsRunningWarning=MPC-BE のインストーラーは既に実行されています！
-ja.msg_simd_sse2=このバージョンの MPC-BE は CPU の SSE2 サポートが必要です。%n%nお使いの CPU はこの条件を満たしません。
-ja.tsk_AllUsers=全てのユーザーにインストールする。
-ja.tsk_CurrentUser=現在実行しているユーザーだけにインストールする。
-ja.tsk_Other=他のタスク :
+ja.comp_mpcbeshellext=シェル拡張のインストール
+ja.comp_intel_msdk=H.264 MVC 3D デコーダー (追加ダウンロード)
+ja.msg_DeleteSettings=MPC-BE の設定を削除しますか?%n%nMPC-BE を再度インストールする場合は、設定を削除する必要はありません。
+ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムはインストールされていません!%n%nオペレーティング システムに関係なく最新の DirectX ランタイム June 2010 をダウンロードしてインストールしてください。
+ja.msg_SetupIsRunningWarning=MPC-BE のインストーラーは既に実行されています!
+ja.msg_simd_sse2=このバージョンの MPC-BE には CPU の SSE2 サポートが必要です。%n%nお使いの CPU はこの条件を満たしていません。
+ja.tsk_AllUsers=すべてのユーザーにインストールする
+ja.tsk_CurrentUser=現在実行中のユーザーにのみインストールする
+ja.tsk_Other=他のタスク:
 ja.tsk_ResetSettings=設定を初期化する
-ja.types_DefaultInstallation=デフォルト インストール
+ja.types_DefaultInstallation=既定のインストール
 ja.types_CustomInstallation=カスタム インストール
-ja.ViewChangelog=変更履歴を見る
-ja.AssociationFormatsAV=Configuring associations with video and audio files:
-ja.AssociationFormats=Association with video and audio files
-ja.AssociationVideo=Association with video files
-ja.AssociationAudio=Association with audio files
-ja.AssociationPlaylist=Association with playlists
-ja.AutoPlayType=Auto play:
-ja.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-ja.AssociationMPCPlayCDAudioS=Audio CD
-ja.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-ja.AssociationMPCPlayDVDMovieS=DVD Movie
-ja.AssociationMPCPlayMusicFilesF=Play Music
-ja.AssociationMPCPlayMusicFilesS=Music Files
-ja.AssociationMPCPlayVideoFilesF=Play Video
-ja.AssociationMPCPlayVideoFilesS=Video Files
-ja.PinToTaskBar=Pin to TaskBar
+ja.ViewChangelog=変更履歴を表示する
+ja.AssociationFormatsAV=動画ファイルと音声ファイルとの関連付けを構成する:
+ja.AssociationFormats=動画ファイルと音声ファイルに関連付け
+ja.AssociationVideo=動画ファイルに関連付け
+ja.AssociationAudio=音声ファイルに関連付け
+ja.AssociationPlaylist=プレイリストに関連付け
+ja.AutoPlayType=自動再生:
+ja.AssociationMPCPlayCDAudioOnArrivalF=音声 CD の再生
+ja.AssociationMPCPlayCDAudioS=音声 CD
+ja.AssociationMPCPlayDVDMovieArrivalF=DVD ムービーの再生
+ja.AssociationMPCPlayDVDMovieS=DVD ムービー
+ja.AssociationMPCPlayMusicFilesF=音楽の再生
+ja.AssociationMPCPlayMusicFilesS=音楽ファイル
+ja.AssociationMPCPlayVideoFilesF=動画の再生
+ja.AssociationMPCPlayVideoFilesS=動画ファイル
+ja.PinToTaskBar=タスクバーにピン留めする
 
 
 ;Korean
