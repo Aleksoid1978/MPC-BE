@@ -2851,8 +2851,18 @@ void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 		m_DragIndexes.front() = m_nDragIndex;
 	}
 
-	CPoint p(0, 0);
+	const auto& s = AfxGetAppSettings();
+
+	if (s.bUseDarkTheme) {
+		m_list.ModifyStyle(LVS_OWNERDRAWFIXED, 0);
+	}
+
+	CPoint p;
 	m_pDragImage = m_list.CreateDragImageEx(&p);
+
+	if (s.bUseDarkTheme) {
+		m_list.ModifyStyle(0, LVS_OWNERDRAWFIXED);
+	}
 
 	CPoint p2 = ((LPNMLISTVIEW)pNMHDR)->ptAction;
 
