@@ -302,8 +302,8 @@ static av_cold int read_specific_config(ALSDecContext *ctx)
     if ((ret = init_get_bits8(&gb, avctx->extradata, avctx->extradata_size)) < 0)
         return ret;
 
-    config_offset = avpriv_mpeg4audio_get_config(&m4ac, avctx->extradata,
-                                                 avctx->extradata_size * 8, 1);
+    config_offset = avpriv_mpeg4audio_get_config2(&m4ac, avctx->extradata,
+                                                  avctx->extradata_size, 1, avctx);
 
     if (config_offset < 0)
         return AVERROR_INVALIDDATA;
@@ -1475,6 +1475,9 @@ static int read_diff_float_data(ALSDecContext *ctx, unsigned int ra_frame) {
         ff_mlz_flush_dict(ctx->mlz);
     }
 
+    if (avctx->channels * 8 > get_bits_left(gb))
+        return AVERROR_INVALIDDATA;
+
     for (c = 0; c < avctx->channels; ++c) {
         if (use_acf) {
             //acf_flag
@@ -1815,15 +1818,17 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
     #define INTERLEAVE_OUTPUT(bps)                                                   \
     {                                                                                \
         int##bps##_t *dest = (int##bps##_t*)frame->data[0];                          \
+        int channels = avctx->channels;                                              \
+        int32_t **raw_samples = ctx->raw_samples;                                    \
         shift = bps - ctx->avctx->bits_per_raw_sample;                               \
         if (!ctx->cs_switch) {                                                       \
             for (sample = 0; sample < ctx->cur_frame_length; sample++)               \
-                for (c = 0; c < avctx->channels; c++)                                \
-                    *dest++ = ctx->raw_samples[c][sample] * (1U << shift);            \
+                for (c = 0; c < channels; c++)                                       \
+                    *dest++ = raw_samples[c][sample] * (1U << shift);                \
         } else {                                                                     \
             for (sample = 0; sample < ctx->cur_frame_length; sample++)               \
-                for (c = 0; c < avctx->channels; c++)                                \
-                    *dest++ = ctx->raw_samples[sconf->chan_pos[c]][sample] * (1U << shift); \
+                for (c = 0; c < channels; c++)                                       \
+                    *dest++ = raw_samples[sconf->chan_pos[c]][sample] * (1U << shift);\
         }                                                                            \
     }
 

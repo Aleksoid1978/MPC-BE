@@ -215,14 +215,14 @@ static void lpc_prediction(int32_t *error_buffer, uint32_t *buffer_out,
         /* LPC prediction */
         for (j = 0; j < lpc_order; j++)
             val += (pred[j] - d) * lpc_coefs[j];
-        val = (val + (1 << (lpc_quant - 1))) >> lpc_quant;
+        val = (val + (1LL << (lpc_quant - 1))) >> lpc_quant;
         val += d + error_val;
         buffer_out[i] = sign_extend(val, bps);
 
         /* adapt LPC coefficients */
         error_sign = sign_only(error_val);
         if (error_sign) {
-            for (j = 0; j < lpc_order && (int)error_val * error_sign > 0; j++) {
+            for (j = 0; j < lpc_order && (int)(error_val * error_sign) > 0; j++) {
                 int sign;
                 val  = d - pred[j];
                 sign = sign_only(val) * error_sign;
@@ -397,13 +397,13 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
     case 20: {
         for (ch = 0; ch < channels; ch++) {
             for (i = 0; i < alac->nb_samples; i++)
-                alac->output_samples_buffer[ch][i] <<= 12;
+                alac->output_samples_buffer[ch][i] *= 1 << 12;
         }}
         break;
     case 24: {
         for (ch = 0; ch < channels; ch++) {
             for (i = 0; i < alac->nb_samples; i++)
-                alac->output_samples_buffer[ch][i] <<= 8;
+                alac->output_samples_buffer[ch][i] *= 1 << 8;
         }}
         break;
     }

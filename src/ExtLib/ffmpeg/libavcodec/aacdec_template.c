@@ -977,7 +977,7 @@ static int decode_audio_specific_config_gb(AACContext *ac,
     int i, ret;
     GetBitContext gbc = *gb;
 
-    if ((i = ff_mpeg4audio_get_config_gb(m4ac, &gbc, sync_extension)) < 0)
+    if ((i = ff_mpeg4audio_get_config_gb(m4ac, &gbc, sync_extension, avctx)) < 0)
         return AVERROR_INVALIDDATA;
 
     if (m4ac->sampling_index > 12) {
@@ -3261,9 +3261,15 @@ static int aac_decode_frame_int(AVCodecContext *avctx, void *data,
                     err = AVERROR_INVALIDDATA;
                     goto fail;
             }
-            while (elem_id > 0)
-                elem_id -= decode_extension_payload(ac, gb, elem_id, che_prev, che_prev_type);
-            err = 0; /* FIXME */
+            err = 0;
+            while (elem_id > 0) {
+                int ret = decode_extension_payload(ac, gb, elem_id, che_prev, che_prev_type);
+                if (ret < 0) {
+                    err = ret;
+                    break;
+                }
+                elem_id -= ret;
+            }
             break;
 
         default:

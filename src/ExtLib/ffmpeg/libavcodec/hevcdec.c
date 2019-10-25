@@ -519,7 +519,7 @@ static int hls_slice_header(HEVCContext *s)
     sh->first_slice_in_pic_flag = get_bits1(gb);
     if (s->ref && sh->first_slice_in_pic_flag) {
         av_log(s->avctx, AV_LOG_ERROR, "Two slices reporting being the first in the same frame.\n");
-        return 1; // This slice will be skiped later, do not corrupt state
+        return 1; // This slice will be skipped later, do not corrupt state
     }
 
     if ((IS_IDR(s) || IS_BLA(s)) && sh->first_slice_in_pic_flag) {
@@ -3355,6 +3355,8 @@ static av_cold int hevc_decode_free(AVCodecContext *avctx)
 
     ff_h2645_packet_uninit(&s->pkt);
 
+    ff_hevc_reset_sei(&s->sei);
+
     return 0;
 }
 
@@ -3548,6 +3550,7 @@ static void hevc_decode_flush(AVCodecContext *avctx)
 {
     HEVCContext *s = avctx->priv_data;
     ff_hevc_flush_dpb(s);
+    ff_hevc_reset_sei(&s->sei);
     s->max_ra = INT_MAX;
     s->eos = 1;
 }
