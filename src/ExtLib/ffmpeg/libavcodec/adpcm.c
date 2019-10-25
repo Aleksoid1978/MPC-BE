@@ -111,6 +111,10 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
     case AV_CODEC_ID_ADPCM_MTAF:
         min_channels = 2;
         max_channels = 8;
+        if (avctx->channels & 1) {
+            avpriv_request_sample(avctx, "channel count %d\n", avctx->channels);
+            return AVERROR_PATCHWELCOME;
+        }
         break;
     case AV_CODEC_ID_ADPCM_PSX:
         max_channels = 8;
@@ -1227,8 +1231,11 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                 return AVERROR_INVALIDDATA;
             }
         }
-        for (i=0; i<=st; i++)
+        for (i=0; i<=st; i++) {
             c->status[i].predictor  = bytestream2_get_le32u(&gb);
+            if (FFABS(c->status[i].predictor) > (1<<16))
+                return AVERROR_INVALIDDATA;
+        }
 
         for (n = nb_samples >> (1 - st); n > 0; n--) {
             int byte   = bytestream2_get_byteu(&gb);
@@ -1376,10 +1383,10 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
 
                     for (count2=0; count2<28; count2++) {
                         if (count2 & 1)
-                            next_sample = sign_extend(byte,    4) << shift;
+                            next_sample = (unsigned)sign_extend(byte,    4) << shift;
                         else {
                             byte = bytestream2_get_byte(&gb);
-                            next_sample = sign_extend(byte >> 4, 4) << shift;
+                            next_sample = (unsigned)sign_extend(byte >> 4, 4) << shift;
                         }
 
                         next_sample += (current_sample  * coeff1) +

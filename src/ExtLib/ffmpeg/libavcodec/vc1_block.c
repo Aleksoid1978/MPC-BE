@@ -846,7 +846,7 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
                 q2 = FFABS(q2) * 2 + ((q2 < 0) ? 0 : v->halfpq) - 1;
             if (q2 && q1 != q2) {
                 for (k = 1; k < 8; k++)
-                    block[k << sh] += (ac_val[k] * q2 * ff_vc1_dqscale[q1 - 1] + 0x20000) >> 18;
+                    block[k << sh] += (int)(ac_val[k] * (unsigned)q2 * ff_vc1_dqscale[q1 - 1] + 0x20000) >> 18;
             } else {
                 for (k = 1; k < 8; k++)
                     block[k << sh] += ac_val[k];
@@ -1481,7 +1481,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                     v->vc1dsp.vc1_inv_trans_8x8(v->block[v->cur_blk_idx][block_map[i]]);
                     if (v->rangeredfrm)
                         for (j = 0; j < 64; j++)
-                            v->block[v->cur_blk_idx][block_map[i]][j] <<= 1;
+                            v->block[v->cur_blk_idx][block_map[i]][j] *= 2;
                     block_cbp   |= 0xF << (i << 2);
                     block_intra |= 1 << i;
                 } else if (is_coded[i]) {
@@ -1997,7 +1997,7 @@ static int vc1_decode_b_mb(VC1Context *v)
             v->vc1dsp.vc1_inv_trans_8x8(s->block[i]);
             if (v->rangeredfrm)
                 for (j = 0; j < 64; j++)
-                    s->block[i][j] <<= 1;
+                    s->block[i][j] *= 2;
             s->idsp.put_signed_pixels_clamped(s->block[i],
                                               s->dest[dst_idx] + off,
                                               i & 4 ? s->uvlinesize

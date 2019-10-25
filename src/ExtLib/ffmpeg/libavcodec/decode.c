@@ -791,7 +791,7 @@ int attribute_align_arg avcodec_receive_frame(AVCodecContext *avctx, AVFrame *fr
         if (avctx->frame_number > 1) {
             changed = avci->initial_format != frame->format;
 
-           switch(avctx->codec_type) {
+            switch(avctx->codec_type) {
             case AVMEDIA_TYPE_VIDEO:
                 changed |= avci->initial_width  != frame->width ||
                            avci->initial_height != frame->height;
@@ -1928,6 +1928,11 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 
         if (frame->data[0] || frame->data[1] || frame->data[2] || frame->data[3]) {
             av_log(avctx, AV_LOG_ERROR, "pic->data[*]!=NULL in get_buffer_internal\n");
+            return AVERROR(EINVAL);
+        }
+    } else if (avctx->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (frame->nb_samples > avctx->max_samples) {
+            av_log(avctx, AV_LOG_ERROR, "samples per frame %d, exceeds max_samples %"PRId64"\n", frame->nb_samples, avctx->max_samples);
             return AVERROR(EINVAL);
         }
     }
