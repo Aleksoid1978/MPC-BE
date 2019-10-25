@@ -2870,7 +2870,7 @@ void File_Mpeg_Descriptors::Descriptor_7F_15()
     Get_SB (ac4_config_flag,                                    "ac4_config_flag");
     Get_SB (ac4_toc_flag,                                       "ac4_toc_flag");
     Skip_S1(6,                                                  "reserved");
-    if (Data_BS_Remain());
+    if (Data_BS_Remain())
         Skip_BS(Data_BS_Remain(),                               "additional_info_bytes");
     BS_End();
 

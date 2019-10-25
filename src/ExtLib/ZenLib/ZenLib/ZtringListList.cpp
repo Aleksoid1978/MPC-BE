@@ -323,7 +323,7 @@ void ZtringListList::Write(const Ztring &ToWrite)
     while (i<l)
     {
         //Quote
-        if (i+Quote_Size<=l)
+        if (Quote_Size && i+Quote_Size<=l)
         {
             bool IsQuote=true;
             for (size_t j=0; j<Quote_Size; j++)
@@ -409,7 +409,11 @@ void ZtringListList::Write(const Ztring &ToWrite)
             size_t PreviousSize=size();
             resize(y+1);
             for (size_t j=0; j<=y; j++)
+            {
                 operator[](j).Separator_Set(0, Separator[1]);
+                operator[](j).Quote_Set(Quote);
+                operator[](j).Max_Set(0, Max[1]);
+            }
         }
         ZtringList& Line=operator[](y);
         if (x>=Line.size())
@@ -600,7 +604,7 @@ ZtringListList ZtringListList::SubSheet (const Ztring &ToFind, size_type Pos1, s
 // Separator
 void ZtringListList::Separator_Set (size_type Level, const Ztring &NewSeparator)
 {
-    if (Level>1)
+    if (NewSeparator.empty() || Level>1)
         return;
 
     Separator[Level]=NewSeparator;
