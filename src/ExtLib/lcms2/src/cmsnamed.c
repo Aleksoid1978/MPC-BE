@@ -538,7 +538,7 @@ cmsNAMEDCOLORLIST* CMSEXPORT cmsAllocNamedColorList(cmsContext ContextID, cmsUIn
 
     while (v -> Allocated < n) {
         if (!GrowNamedColorList(v)) {
-            _cmsFree(ContextID, (void*) v);
+            cmsFreeNamedColorList(v);
             return NULL;
         }
     }
@@ -571,7 +571,11 @@ cmsNAMEDCOLORLIST* CMSEXPORT cmsDupNamedColorList(const cmsNAMEDCOLORLIST* v)
 
     // For really large tables we need this
     while (NewNC ->Allocated < v ->Allocated){
-        if (!GrowNamedColorList(NewNC)) return NULL;
+        if (!GrowNamedColorList(NewNC))
+        {
+            cmsFreeNamedColorList(NewNC);
+            return NULL;
+        }
     }
 
     memmove(NewNC ->Prefix, v ->Prefix, sizeof(v ->Prefix));

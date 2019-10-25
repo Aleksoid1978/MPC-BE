@@ -200,8 +200,7 @@ cmsPipeline* BuildGrayInputMatrixPipeline(cmsHPROFILE hProfile)
 
     return Lut;
 
-Error:
-    cmsFreeToneCurve(GrayTRC);
+Error:    
     cmsPipelineFree(Lut);
     return NULL;
 }
