@@ -1492,12 +1492,15 @@ void File_Eia708::Window_HasChanged()
             Event.Window=Streams[service_number]->WindowID;
             for (size_t Pos_Y=0; Pos_Y<Window->Minimal.CC.size(); Pos_Y++)
             {
-                for (size_t Pos_X=0; Pos_X<Window->Minimal.CC[Pos_Y].size(); Pos_X++)
+                size_t Width=Window->Minimal.CC[Pos_Y].size();
+                if (Width>32)
+                    Width=32; //TODO: this is a limitation of the event structure, hardcoded limit set to 32, and it should be replaced, without such limit
+                for (size_t Pos_X=0; Pos_X< Width; Pos_X++)
                 {
                     Event.Row_Values[Pos_Y][Pos_X]=Window->Minimal.CC[Pos_Y][Pos_X].Value;
                     Event.Row_Attributes[Pos_Y][Pos_X]=Window->Minimal.CC[Pos_Y][Pos_X].Attribute;
                 }
-                Event.Row_Values[Pos_Y][Window->Minimal.CC[Pos_Y].size()]=L'\0';
+                Event.Row_Values[Pos_Y][Width]=L'\0';
             }
             for (size_t Pos_Y=Window->Minimal.CC.size(); Pos_Y<15; Pos_Y++)
                 Event.Row_Values[Pos_Y][0]=L'\0';
