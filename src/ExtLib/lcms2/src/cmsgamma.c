@@ -888,7 +888,7 @@ void CMSEXPORT cmsFreeToneCurve(cmsToneCurve* Curve)
     if (Curve -> Evals)
         _cmsFree(ContextID, Curve -> Evals);
 
-    if (Curve) _cmsFree(ContextID, Curve);
+    _cmsFree(ContextID, Curve);
 }
 
 // Utility function, free 3 gamma tables
