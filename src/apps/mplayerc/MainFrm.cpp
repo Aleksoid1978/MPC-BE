@@ -17114,8 +17114,9 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 	DLog(L"CMainFrame::CloseMedia() : start");
 
 	if (m_ps) {
-		// m_ps->EndDialog(0); does not work immediately
-		m_ps->CloseWindow();
+		m_ps->EndDialog(0);
+		//m_ps->DestroyWindow();
+		m_ps = nullptr;
 	}
 
 	m_bNextIsOpened = bNextIsOpened;
