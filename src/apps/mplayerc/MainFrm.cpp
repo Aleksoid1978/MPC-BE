@@ -17107,16 +17107,16 @@ bool CMainFrame::DisplayChange()
 
 void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 {
-	if (m_ps) {
-		// m_ps->EndDialog(0); does not work immediately
-		m_ps->CloseWindow();
-	}
-
 	if (m_eMediaLoadState == MLS_CLOSING || m_eMediaLoadState == MLS_CLOSED) {
 		return;
 	}
 
 	DLog(L"CMainFrame::CloseMedia() : start");
+
+	if (m_ps) {
+		// m_ps->EndDialog(0); does not work immediately
+		m_ps->CloseWindow();
+	}
 
 	m_bNextIsOpened = bNextIsOpened;
 
