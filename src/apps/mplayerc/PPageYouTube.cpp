@@ -54,6 +54,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_COMMAND(IDC_CHECK2, OnCheckPageParser)
 	ON_COMMAND(IDC_CHECK3, OnCheck60fps)
+	ON_COMMAND(IDC_CHECK6, OnCheckYDLEnable)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -100,8 +101,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	OnCheck60fps();
 	OnCheckPageParser();
 
-	m_chkYDLEnable.SetCheck(BST_CHECKED);
-	m_chkYDLEnable.EnableWindow(FALSE); //TODO
+	m_chkYDLEnable.SetCheck(s.bYDLEnable ? BST_CHECKED : BST_UNCHECKED);
 
 	for (const auto& h : s_CommonVideoHeights) {
 		CString str;
@@ -133,6 +133,7 @@ BOOL CPPageYoutube::OnApply()
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
+	s.bYDLEnable = !!m_chkYDLEnable.GetCheck();
 	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
 	s.bYDLMaximumQuality = !!m_chkYDLMaximumQuality.GetCheck();
 
@@ -174,6 +175,19 @@ void CPPageYoutube::OnCheck60fps()
 	} else {
 		m_chkHdr.SetCheck(BST_UNCHECKED);
 		m_chkHdr.EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
+
+void CPPageYoutube::OnCheckYDLEnable()
+{
+	if (m_chkYDLEnable.GetCheck()) {
+		m_cbYDLMaxHeight.EnableWindow(TRUE);
+		m_chkYDLMaximumQuality.EnableWindow(TRUE);
+	} else {
+		m_cbYDLMaxHeight.EnableWindow(FALSE);
+		m_chkYDLMaximumQuality.EnableWindow(FALSE);
 	}
 
 	SetModified();

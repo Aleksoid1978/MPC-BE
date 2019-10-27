@@ -51,6 +51,7 @@ public:
 
 	afx_msg void OnCheckPageParser();
 	afx_msg void OnCheck60fps();
+	afx_msg void OnCheckYDLEnable();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

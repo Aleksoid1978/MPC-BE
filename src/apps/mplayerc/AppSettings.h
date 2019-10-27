@@ -907,6 +907,7 @@ public:
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeTagSelected = 0; // not saved
 
+	bool			bYDLEnable;
 	int				iYDLMaxHeight;
 	bool			bYDLMaximumQuality;
 
