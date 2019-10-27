@@ -2685,6 +2685,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	const CPlaylistItem& pli = curPlayList.GetAt(pos);
 
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
+	int oldDC = pDC->SaveDC();
 
 	int R, G, B, R2, G2, B2;
 	GRADIENT_RECT gr = { 0, 1 };
@@ -2701,6 +2702,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		}
 		else {
 			FillRect(pDC->m_hDC, rcItem, CBrush(0x00f1dacc));
+			pDC->SetBkColor(0x00f1dacc);
 			FrameRect(pDC->m_hDC, rcItem, CBrush(0xc56a31));
 		}
 	} else {
@@ -2714,8 +2716,16 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 			pDC->GradientFill(tvs, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 		}
 		else {
-			FillRect(pDC->m_hDC, rcItem, CBrush(RGB(255, 255, 255)));
+			const auto bgColor = RGB(255, 255, 255);
+			FillRect(pDC->m_hDC, rcItem, CBrush(bgColor));
+			pDC->SetBkColor(bgColor);
 		}
+	}
+
+	if (s.bUseDarkTheme && m_bDrawDragImage) {
+		const auto bgColor = ThemeRGB(10, 15, 20);
+		FillRect(pDC->m_hDC, rcItem, CBrush(bgColor));
+		pDC->SetBkColor(bgColor);
 	}
 
 	COLORREF textcolor = bSelected ? 0xff : 0;
@@ -2799,6 +2809,8 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		pDC->SetTextColor(textcolor);
 		pDC->TextOutW(rcItem.left + 3 + offset, (rcItem.top + rcItem.bottom - filesize.cy) / 2, file);
 	}
+
+	pDC->RestoreDC(oldDC);
 }
 
 BOOL CPlayerPlaylistBar::OnPlayPlay(UINT nID)
@@ -2853,16 +2865,10 @@ void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 
 	const auto& s = AfxGetAppSettings();
 
-	if (s.bUseDarkTheme) {
-		m_list.ModifyStyle(LVS_OWNERDRAWFIXED, 0);
-	}
-
+	m_bDrawDragImage = true;
 	CPoint p;
 	m_pDragImage = m_list.CreateDragImageEx(&p);
-
-	if (s.bUseDarkTheme) {
-		m_list.ModifyStyle(0, LVS_OWNERDRAWFIXED);
-	}
+	m_bDrawDragImage = false;
 
 	CPoint p2 = ((LPNMLISTVIEW)pNMHDR)->ptAction;
 

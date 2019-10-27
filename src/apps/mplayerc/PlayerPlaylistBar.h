@@ -450,4 +450,6 @@ public:
 protected:
 	void PasteFromClipboard();
 	void CopyToClipboard();
+
+	bool m_bDrawDragImage = false;
 };
