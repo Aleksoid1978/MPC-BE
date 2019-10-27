@@ -44,6 +44,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
+	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
 	DDX_Control(pDX, IDC_COMBO3, m_cbYDLMaxHeight);
 	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
 	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
@@ -62,6 +63,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+	CorrectCWndWidth(&m_chkYDLEnable);
 
 	const CAppSettings& s = AfxGetAppSettings();
 
@@ -97,6 +99,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	OnCheck60fps();
 	OnCheckPageParser();
+
+	m_chkYDLEnable.SetCheck(BST_CHECKED);
+	m_chkYDLEnable.EnableWindow(FALSE); //TODO
 
 	for (const auto& h : s_CommonVideoHeights) {
 		CString str;
