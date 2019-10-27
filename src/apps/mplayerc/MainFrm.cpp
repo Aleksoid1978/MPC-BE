@@ -11959,7 +11959,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 			}
 
-			if (bIsHtml) {
+			if (bIsHtml && s.bYDLEnable) {
 				std::list<CString> urls;
 				if (YoutubeDL::Parse_URL(fn, s.bYoutubeLoadPlaylist, s.iYDLMaxHeight, s.bYDLMaximumQuality, urls, m_youtubeFields)) {
 					youtubeUrl = fn;
