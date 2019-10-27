@@ -48,14 +48,13 @@ IDirect3D9* D3D9Helper::Direct3DCreate9()
 
 	static HMODULE hModule = LoadLibraryW(L"d3d9.dll");
 	static tpDirect3DCreate9 pDirect3DCreate9 = hModule ? (tpDirect3DCreate9)GetProcAddress(hModule, "Direct3DCreate9") : nullptr;
-	if (pDirect3DCreate9) {
-		IDirect3D9* pD3D9 = pDirect3DCreate9(D3D_SDK_VERSION);
+	static IDirect3D9* pD3D9 = nullptr;
+	if (pDirect3DCreate9 && !pD3D9) {
+		pD3D9 = pDirect3DCreate9(D3D_SDK_VERSION);
 		if (!pD3D9) {
 			pD3D9 = pDirect3DCreate9(D3D9b_SDK_VERSION);
 		}
-
-		return pD3D9;
 	}
 
-	return nullptr;
+	return pD3D9;
 }
