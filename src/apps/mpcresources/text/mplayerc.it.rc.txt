@@ -557,18 +557,18 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Snap to desktop edges"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 21
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
 5		"YouTube"
 6		"Use the built-in web page parser"
 7		"Formato preferito:"
 10		"60 fps"
 11		"HDR"
 12		"Carica playlist"
-13		"youtube-dl"
-14		"Max video height:"
-16		"Select max fps or bitrate"
-17		"AceStream address*:"
-19		"TorrServer address*:"
+14		"youtube-dl"
+15		"Max video height:"
+17		"Select max fps or bitrate"
+18		"AceStream address*:"
+20		"TorrServer address*:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

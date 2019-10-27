@@ -36,8 +36,9 @@ private:
 	CButton m_chkHdr;
 	CButton m_chkLoadPlaylist;
 
+	CButton   m_chkYDLEnable;
 	CComboBox m_cbYDLMaxHeight;
-	CButton m_chkYDLMaximumQuality;
+	CButton   m_chkYDLMaximumQuality;
 
 	CEdit m_edAceStreamAddress;
 	CEdit m_edTorrServerAddress;

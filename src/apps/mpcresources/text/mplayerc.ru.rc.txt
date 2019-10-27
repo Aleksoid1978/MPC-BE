@@ -557,18 +557,18 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Прилипать к границам экрана"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 21
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
 5		"YouTube"
 6		"Использовать встроенный парсер веб-страниц"
 7		"Предпочитаемый формат просмотра:"
 10		"60 fps"
 11		"HDR"
 12		"Загружать плейлист"
-13		"youtube-dl"
-14		"Максимальная высота видео:"
-16		"Выбрать максимальную частоту кадров или битрейт"
-17		"AceStream address*:"
-19		"TorrServer address*:"
+14		"youtube-dl"
+15		"Максимальная высота видео:"
+17		"Выбрать максимальную частоту кадров или битрейт"
+18		"AceStream address*:"
+20		"TorrServer address*:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
