@@ -11936,7 +11936,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 	}
 
-	if (pOFD->fns.size() == 1 && ::PathIsURL(pOFD->fns.front())
+	if (s.bYDLEnable
+			&& pOFD->fns.size() == 1 && ::PathIsURLW(pOFD->fns.front())
 			&& youtubeUrl.IsEmpty()
 			&& Content::Online::CheckConnect(pOFD->fns.front())) {
 		const CString fn = pOFD->fns.front().GetName();
@@ -11959,7 +11960,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 			}
 
-			if (bIsHtml && s.bYDLEnable) {
+			if (bIsHtml) {
 				std::list<CString> urls;
 				if (YoutubeDL::Parse_URL(fn, s.bYoutubeLoadPlaylist, s.iYDLMaxHeight, s.bYDLMaximumQuality, urls, m_youtubeFields)) {
 					youtubeUrl = fn;
