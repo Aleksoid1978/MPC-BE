@@ -3387,23 +3387,6 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 		ASSERT (SUCCEEDED (hr));
 	}
 
-	{
-		// get rotation flag
-		CComPtr<IBaseFilter> pBF;
-		if (SUCCEEDED(m_pOuterEVR->QueryInterface(IID_PPV_ARGS(&pBF)))) {
-			while (pBF = GetUpStreamFilter(pBF)) {
-				if (CComQIPtr<IPropertyBag> pPB = pBF) {
-					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, nullptr)) && var.vt == VT_BSTR) {
-						int rotation = _wtoi(var.bstrVal);
-						SetRotation(rotation);
-						break;
-					}
-				}
-			}
-		}
-	}
-
 	return hr;
 }
 
