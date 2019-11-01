@@ -336,7 +336,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 13		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
 15		"Weergave pauseren als het venster geminimaliseerd is"
 17		"Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus"
-19		"Do not show 000xx.mpls shorter than"
+19		"Toon 000xx.mpls niet, die korter zijn dan"
 22		"min"
 23		"Activeer Logitech LCD-ondersteuning"
 24		"Activeer MiniDump"
