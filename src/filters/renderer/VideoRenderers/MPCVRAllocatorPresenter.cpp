@@ -182,7 +182,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
 {
 	HRESULT hr = E_NOTIMPL;
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
-		hr = pIExFilterConfig->SetInt("rotate", rotation);
+		hr = pIExFilterConfig->SetInt("rotation", rotation);
 	}
 	return hr;
 }
