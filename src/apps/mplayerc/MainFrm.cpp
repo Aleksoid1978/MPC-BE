@@ -12679,14 +12679,6 @@ void CMainFrame::OpenCustomizeGraph()
 
 void CMainFrame::OpenSetupVideo()
 {
-	if (m_pMVRI) {
-		// get initial rotation value for madVR
-		int rotation;
-		if (S_OK == (m_pMVRI->GetInt("rotation", &rotation))) {
-			m_iDefRotation = rotation;
-		}
-	}
-
 	m_bAudioOnly = true;
 
 	if (m_pMFVDC) {// EVR
@@ -12735,6 +12727,7 @@ void CMainFrame::OpenSetupVideo()
 	}
 
 	if (m_pCAP) {
+		m_pCAP->SetRotation(m_iDefRotation);
 		SetShaders();
 	}
 
@@ -13902,6 +13895,25 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 			EndEnumFilters;
 			pIExFilterConfig.Release();
+		}
+
+		if (m_pCAP) {
+			CComQIPtr<ISubPicAllocatorPresenter3> pCap;
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (pCap = pBF) { // video renderer found
+					while (pBF = GetUpStreamFilter(pBF)) {
+						if (CComQIPtr<IPropertyBag> pPB = pBF) {
+							CComVariant var;
+							if (SUCCEEDED(pPB->Read(L"ROTATION", &var, nullptr)) && var.vt == VT_BSTR) {
+								m_iDefRotation = _wtoi(var.bstrVal);
+							}
+							var.Clear();
+						}
+					}
+					break;
+				}
+			}
+			EndEnumFilters;
 		}
 
 		OpenCustomizeGraph();

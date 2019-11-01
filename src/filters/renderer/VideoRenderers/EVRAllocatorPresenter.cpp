@@ -1522,11 +1522,6 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 			while (pBF = GetUpStreamFilter(pBF)) {
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, nullptr)) && var.vt == VT_BSTR) {
-						const int rotation = _wtoi(var.bstrVal);
-						SetRotation(rotation);
-					}
-					var.Clear();
 
 					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, nullptr)) && var.vt == VT_BSTR) {
 						CString mode(var.bstrVal); mode.MakeLower();
