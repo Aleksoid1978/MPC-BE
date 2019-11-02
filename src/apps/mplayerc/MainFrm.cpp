@@ -11331,6 +11331,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		MoveWindow(r);
 	}
 
+	ShowWindow(SW_SHOWNOACTIVATE);
+
 	MoveVideoWindow();
 }
 
