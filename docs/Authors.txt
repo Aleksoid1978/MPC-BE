@@ -27,6 +27,7 @@ Chinese (Traditional) - beter
 Dutch - beter
 German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus Luppert
 Greek - Lampros Zouloumis
+Hungarian - Kiegészítette mickey
 Italian - Lord Maius
 Korean - kuh3h3
 Polish - Volfield
