@@ -73,8 +73,8 @@ he.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 he.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
 
 ;Hungarian
-hu.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
-hu.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
+hu.ÜdvözöljükLabel2=Ez telepíteni fogja a [name] a számítógépére.%n%nA folytatás előtt javasoljuk, hogy zárjon be minden más alkalmazást.
+hu.WinVersionTooLowError=[name] futtatásához Windows Vista vagy újabb szükséges.
 
 ;Armenian
 hy.WelcomeLabel2=Սա կտեղակայի [name]-ը Ձեր համակարգչում։%n%nԽորհուրդ ենք տալիս փակել բոլոր մյուս ծրագրերը։
@@ -529,8 +529,8 @@ hu.langid=00001038
 hu.langcode=hu
 hu.comp_mpciconlib=Ikon Gyűjtemény
 hu.comp_mpcresources=Fordítások
-hu.comp_mpcbeshellext=Install the shell extension
-hu.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
+hu.comp_mpcbeshellext=Telepítse a shell extension-t
+hu.comp_intel_msdk=H.264 MVC 3D Decoder (extra letöltés)
 hu.msg_DeleteSettings=Az MPC-BE beállításokat is törölni szeretné?%n%nHa azt tervezi, hogy újratelepíti az MPC-BE-t, akkor nem kell törölnie őket.
 hu.msg_NoD3DX9DLL_found=A legújabb DirectX nincs telepítve!%n%nKérjük töltse le és telepítse a legújabb DirectX runtime June 2010 verziót függetlenül az operációs rendszerétől.
 hu.msg_SetupIsRunningWarning=Az MPC-BE telepítő már fut!
@@ -542,21 +542,21 @@ hu.tsk_ResetSettings=Beállítások alaphelyzetbe állítása
 hu.types_DefaultInstallation=Szokásos telepítés
 hu.types_CustomInstallation=Egyedi telepítés
 hu.ViewChangelog=Verziótörténet megtekintése
-hu.AssociationFormatsAV=Configuring associations with video and audio files:
-hu.AssociationFormats=Association with video and audio files
-hu.AssociationVideo=Association with video files
-hu.AssociationAudio=Association with audio files
-hu.AssociationPlaylist=Association with playlists
-hu.AutoPlayType=Auto play:
-hu.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+hu.AssociationFormatsAV=A video és audiofájlokkal való társítások konfigurálása:
+hu.AssociationFormats=Társítás video és audio fájlokkal
+hu.AssociationVideo=Társítás video fájlokkal
+hu.AssociationAudio=Társítás audio fájlokkal
+hu.AssociationPlaylist=Társítás a lejátszási listákkal
+hu.AutoPlayType=Automatikus lejátszás:
+hu.AssociationMPCPlayCDAudioOnArrivalF=Audio CD lejátszása
 hu.AssociationMPCPlayCDAudioS=Audio CD
-hu.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-hu.AssociationMPCPlayDVDMovieS=DVD Movie
-hu.AssociationMPCPlayMusicFilesF=Play Music
-hu.AssociationMPCPlayMusicFilesS=Music Files
-hu.AssociationMPCPlayVideoFilesF=Play Video
-hu.AssociationMPCPlayVideoFilesS=Video Files
-hu.PinToTaskBar=Pin to TaskBar
+hu.AssociationMPCPlayDVDMovieArrivalF=DVD film lejátszása
+hu.AssociationMPCPlayDVDMovieS=DVD film 
+hu.AssociationMPCPlayMusicFilesF=Zene Lejátszás
+hu.AssociationMPCPlayMusicFilesS=Zene Fájlok
+hu.AssociationMPCPlayVideoFilesF=Video Lejátszás
+hu.AssociationMPCPlayVideoFilesS=Video Fájlok
+hu.PinToTaskBar=Rögzítés a tálcához
 
 
 ;Armenian
