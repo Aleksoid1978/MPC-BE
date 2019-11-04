@@ -73,7 +73,7 @@ he.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 he.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
 
 ;Hungarian
-hu.ÜdvözöljükLabel2=Ez telepíteni fogja a [name] a számítógépére.%n%nA folytatás előtt javasoljuk, hogy zárjon be minden más alkalmazást.
+hu.WelcomeLabel2=Ez telepíteni fogja a [name] a számítógépére.%n%nA folytatás előtt javasoljuk, hogy zárjon be minden más alkalmazást.
 hu.WinVersionTooLowError=[name] futtatásához Windows Vista vagy újabb szükséges.
 
 ;Armenian
