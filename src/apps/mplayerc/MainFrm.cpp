@@ -11204,136 +11204,141 @@ void CMainFrame::HideVideoWindow(bool fHide)
 
 void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 {
-	if (m_eMediaLoadState != MLS_LOADED) {
+	if (m_eMediaLoadState != MLS_LOADED || IsD3DFullScreenMode()) {
 		return;
 	}
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	if (scale <= 0) {
-		if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREEN || s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER) {
-			scale = GetZoomAutoFitScale();
-		} else {
-			scale = (double)s.nAutoScaleFactor / 100;
-		}
-	}
+	const CAppSettings& s = AfxGetAppSettings();
 
 	if (m_bFullScreen) {
 		OnViewFullscreen();
 	}
 
-	MINMAXINFO mmi;
-	OnGetMinMaxInfo(&mmi);
+	if (!s.HasFixedWindowSize()) {
+		MINMAXINFO mmi = {};
+		OnGetMinMaxInfo(&mmi);
 
-	CRect r;
-	GetWindowRect(r);
+		CRect r;
+		GetWindowRect(r);
 
-	CSize videoSize = GetVideoSize();
-	if (m_bAudioOnly) {
-		scale = 1.0;
-		videoSize = m_wndView.GetLogoSize();
-		videoSize.cx = std::max(videoSize.cx, (LONG)DEFCLIENTW);
-		videoSize.cy = std::max(videoSize.cy, (LONG)DEFCLIENTH);
-	}
-
-	CSize videoTargetSize(int(videoSize.cx * scale + 0.5), int(videoSize.cy * scale + 0.5));
-
-	CRect decorationsRect;
-	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
-
-	/*
-	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
-		CSize r = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
-		videoTargetSize.cx += r.cx;
-	}
-	*/
-
-	CSize controlsSize;
-	CalcControlsSize(controlsSize);
-
-	CRect workRect;
-	CMonitors::GetNearestMonitor(this).GetWorkAreaRect(workRect);
-	if (workRect.Width() && workRect.Height()) {
-		if (SysVersion::IsWin10orLater()) {
-			workRect.InflateRect(GetInvisibleBorderSize());
-		}
-
-		// don't go larger than the current monitor working area and prevent black bars in this case
-		const CSize videoSpaceSize = workRect.Size() - controlsSize - decorationsRect.Size();
-
-		// Do not adjust window size for video frame aspect ratio when video size is independent from window size
-		const bool bAdjustWindowAR = !(m_iVideoSize == DVS_HALF || m_iVideoSize == DVS_NORMAL || m_iVideoSize == DVS_DOUBLE);
-		const double videoAR = videoSize.cx / (double)videoSize.cy;
-
-		if (videoTargetSize.cx > videoSpaceSize.cx) {
-			videoTargetSize.cx = videoSpaceSize.cx;
-			if (bAdjustWindowAR) {
-				videoTargetSize.cy = std::lround(videoSpaceSize.cx / videoAR);
+		CSize videoSize = GetVideoSize();
+		if (m_bAudioOnly) {
+			scale = 1.0;
+			videoSize = m_wndView.GetLogoSize();
+			videoSize.cx = std::max(videoSize.cx, (LONG)DEFCLIENTW);
+			videoSize.cy = std::max(videoSize.cy, (LONG)DEFCLIENTH);
+		} else {
+			if (scale <= 0) {
+				if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREEN || s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER) {
+					scale = GetZoomAutoFitScale();
+				} else {
+					scale = (double)s.nAutoScaleFactor / 100;
+				}
 			}
 		}
 
-		if (videoTargetSize.cy > videoSpaceSize.cy) {
-			videoTargetSize.cy = videoSpaceSize.cy;
-			if (bAdjustWindowAR) {
-				videoTargetSize.cx = std::lround(videoSpaceSize.cy * videoAR);
-			}
+		CSize videoTargetSize(int(videoSize.cx * scale + 0.5), int(videoSize.cy * scale + 0.5));
+
+		CRect decorationsRect;
+		VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
+
+		/*
+		if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
+			CSize r = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
+			videoTargetSize.cx += r.cx;
 		}
-	} else {
-		ASSERT(FALSE);
-	}
+		*/
 
-	CSize finalSize = videoTargetSize + controlsSize + decorationsRect.Size();
-	finalSize.cx = max(finalSize.cx, mmi.ptMinTrackSize.x);
-	finalSize.cy = max(finalSize.cy, mmi.ptMinTrackSize.y);
+		CSize controlsSize;
+		CalcControlsSize(controlsSize);
 
-	if (!s.bRememberWindowPos) {
-		bool isSnapped = false;
-
-		if (snap && s.bSnapToDesktopEdges && m_bWasSnapped) { // check if snapped to edges
-			isSnapped = (r.left == workRect.left) || (r.top == workRect.top)
-						|| (r.right == workRect.right) || (r.bottom == workRect.bottom);
-		}
-
-		if (isSnapped) { // prefer left, top snap to right, bottom snap
-			if (r.left == workRect.left) {}
-			else if (r.right == workRect.right) {
-				r.left = r.right - finalSize.cx;
+		CRect workRect;
+		CMonitors::GetNearestMonitor(this).GetWorkAreaRect(workRect);
+		if (workRect.Width() && workRect.Height()) {
+			if (SysVersion::IsWin10orLater()) {
+				workRect.InflateRect(GetInvisibleBorderSize());
 			}
 
-			if (r.top == workRect.top) {}
-			else if (r.bottom == workRect.bottom) {
-				r.top = r.bottom - finalSize.cy;
+			// don't go larger than the current monitor working area and prevent black bars in this case
+			const CSize videoSpaceSize = workRect.Size() - controlsSize - decorationsRect.Size();
+
+			// Do not adjust window size for video frame aspect ratio when video size is independent from window size
+			const bool bAdjustWindowAR = !(m_iVideoSize == DVS_HALF || m_iVideoSize == DVS_NORMAL || m_iVideoSize == DVS_DOUBLE);
+			const double videoAR = videoSize.cx / (double)videoSize.cy;
+
+			if (videoTargetSize.cx > videoSpaceSize.cx) {
+				videoTargetSize.cx = videoSpaceSize.cx;
+				if (bAdjustWindowAR) {
+					videoTargetSize.cy = std::lround(videoSpaceSize.cx / videoAR);
+				}
 			}
-		} else { // center window
-			r.left += r.Width()  / 2 - finalSize.cx / 2;
-			r.top  += r.Height() / 2 - finalSize.cy / 2;
-			m_bWasSnapped = false;
+
+			if (videoTargetSize.cy > videoSpaceSize.cy) {
+				videoTargetSize.cy = videoSpaceSize.cy;
+				if (bAdjustWindowAR) {
+					videoTargetSize.cx = std::lround(videoSpaceSize.cy * videoAR);
+				}
+			}
+		} else {
+			ASSERT(FALSE);
 		}
-	}
 
-	r.right = r.left + finalSize.cx;
-	r.bottom = r.top + finalSize.cy;
+		CSize finalSize = videoTargetSize + controlsSize + decorationsRect.Size();
+		finalSize.cx = max(finalSize.cx, mmi.ptMinTrackSize.x);
+		finalSize.cy = max(finalSize.cy, mmi.ptMinTrackSize.y);
 
-	if (r.right > workRect.right) {
-		r.OffsetRect(workRect.right - r.right, 0);
-	}
-	if (r.left < workRect.left) {
-		r.OffsetRect(workRect.left - r.left, 0);
-	}
-	if (r.bottom > workRect.bottom) {
-		r.OffsetRect(0, workRect.bottom - r.bottom);
-	}
-	if (r.top < workRect.top) {
-		r.OffsetRect(0, workRect.top - r.top);
-	}
+		if (!s.bRememberWindowPos) {
+			bool isSnapped = false;
 
-	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !IsD3DFullScreenMode()) {
-		MoveWindow(r);
+			if (snap && s.bSnapToDesktopEdges && m_bWasSnapped) { // check if snapped to edges
+				isSnapped = (r.left == workRect.left) || (r.top == workRect.top)
+							|| (r.right == workRect.right) || (r.bottom == workRect.bottom);
+			}
+
+			if (isSnapped) { // prefer left, top snap to right, bottom snap
+				if (r.left == workRect.left) {}
+				else if (r.right == workRect.right) {
+					r.left = r.right - finalSize.cx;
+				}
+
+				if (r.top == workRect.top) {}
+				else if (r.bottom == workRect.bottom) {
+					r.top = r.bottom - finalSize.cy;
+				}
+			} else { // center window
+				r.left += r.Width()  / 2 - finalSize.cx / 2;
+				r.top  += r.Height() / 2 - finalSize.cy / 2;
+				m_bWasSnapped = false;
+			}
+		}
+
+		r.right = r.left + finalSize.cx;
+		r.bottom = r.top + finalSize.cy;
+
+		if (r.right > workRect.right) {
+			r.OffsetRect(workRect.right - r.right, 0);
+		}
+		if (r.left < workRect.left) {
+			r.OffsetRect(workRect.left - r.left, 0);
+		}
+		if (r.bottom > workRect.bottom) {
+			r.OffsetRect(0, workRect.bottom - r.bottom);
+		}
+		if (r.top < workRect.top) {
+			r.OffsetRect(0, workRect.top - r.top);
+		}
+
+		WINDOWPLACEMENT wp = {};
+		if (GetWindowPlacement(&wp) && wp.showCmd == SW_SHOWMAXIMIZED) {
+			wp.showCmd = SW_SHOWNOACTIVATE;
+			wp.rcNormalPosition = r;
+			SetWindowPlacement(&wp);
+		} else {
+			MoveWindow(r);
+		}
+
+		MoveVideoWindow();
 	}
-
-	ShowWindow(SW_SHOWNOACTIVATE);
-
-	MoveVideoWindow();
 }
 
 double CMainFrame::GetZoomAutoFitScale()
