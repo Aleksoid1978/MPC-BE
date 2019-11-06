@@ -49,10 +49,11 @@ public:
     AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
 
     const AP4_DataBuffer* GetData() const { return &m_Data; }
+    const AP4_UI32 GetDataType() const { return m_DataType; }
 
 private:
-    AP4_UI32 m_Reserved1;
-    AP4_UI32 m_Reserved2;
+    AP4_UI32 m_DataType;
+    AP4_UI32 m_Reserved;
     AP4_DataBuffer m_Data;
 };
 

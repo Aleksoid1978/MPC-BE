@@ -1985,7 +1985,29 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					item;
 					item = item->GetNext()) {
 				if (AP4_ContainerAtom* atom = dynamic_cast<AP4_ContainerAtom*>(item->GetData())) {
-					if (AP4_DataAtom* data = dynamic_cast<AP4_DataAtom*>(atom->GetChild(AP4_ATOM_TYPE_DATA))) {
+					if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
+						for (AP4_List<AP4_Atom>::Item* itemChild = atom->GetChildren().FirstItem();
+							itemChild;
+							itemChild = itemChild->GetNext()) {
+							if (AP4_DataAtom* data = dynamic_cast<AP4_DataAtom*>(itemChild->GetData())) {
+								const AP4_DataBuffer* db = data->GetData();
+
+								if (db->GetDataSize() > 10) {
+									const auto dataType = data->GetDataType();
+									if (dataType == 0x1b) {
+										ResAppend(L"cover.bmp", L"cover", L"image/bmp", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+									} else {
+										DWORD sync = GETU32(db->GetData());
+										if ((sync & 0x00ffffff) == 0x00FFD8FF) { // SOI segment + first byte of next segment
+											ResAppend(L"cover.jpg", L"cover", L"image/jpeg", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+										} else if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
+											ResAppend(L"cover.png", L"cover", L"image/png", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+										}
+									}
+								}
+							}
+						}
+					} else if (AP4_DataAtom* data = dynamic_cast<AP4_DataAtom*>(atom->GetChild(AP4_ATOM_TYPE_DATA))) {
 						const AP4_DataBuffer* db = data->GetData();
 
 						if (atom->GetType() == AP4_ATOM_TYPE_TRKN) {
@@ -1995,16 +2017,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									track.Format(L"%02d", n);
 								} else if (n >= 100) {
 									track.Format(L"%d", n);
-								}
-							}
-						} else if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
-							if (db->GetDataSize() > 10) {
-								DWORD sync = GETU32(db->GetData());
-								if ((sync & 0x00ffffff) == 0x00FFD8FF) { // SOI segment + first byte of next segment
-									ResAppend(L"cover.jpg", L"cover", L"image/jpeg", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
-								}
-								else if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
-									ResAppend(L"cover.png", L"cover", L"image/png", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								}
 							}
 						} else {
