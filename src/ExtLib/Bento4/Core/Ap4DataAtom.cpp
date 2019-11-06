@@ -43,8 +43,8 @@ AP4_DataAtom::AP4_DataAtom(AP4_Size         size,
 {
     size -= AP4_ATOM_HEADER_SIZE;
 
-    stream.ReadUI32(m_Reserved1);
-    stream.ReadUI32(m_Reserved2);
+    stream.ReadUI32(m_DataType);
+    stream.ReadUI32(m_Reserved);
 
     size -= 8;
 
