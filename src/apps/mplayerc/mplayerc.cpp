@@ -294,10 +294,10 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		if (::PathFileExistsW(shaderpath)) {
 			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
 			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy(pathFrom, shaderpath);
+			wcscpy_s(pathFrom, shaderpath);
 
 			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy(pathTo, newpath);
+			wcscpy_s(pathTo, newpath);
 
 			SHFILEOPSTRUCTW sf = { 0 };
 			sf.wFunc = FO_MOVE;
