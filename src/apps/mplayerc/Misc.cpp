@@ -156,7 +156,7 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 
 	WCHAR buff[MAX_PATH] = {};
 	if (fn.GetLength() <= MAX_PATH && ::PathFileExistsW(fn)) {
-		lstrcpyW(buff, fn.GetString());
+		wcscpy_s(buff, fn);
 
 		SHFILEINFO sfi = {};
 		if (SUCCEEDED(SHGetFileInfoW(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) | SHGFI_ICON)) && sfi.hIcon) {

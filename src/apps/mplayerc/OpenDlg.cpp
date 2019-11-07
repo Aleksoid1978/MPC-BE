@@ -321,7 +321,7 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 	int size = std::max(1000, str.GetLength() + 1);
 	m_InitialDir = DNew WCHAR[size];
 	memset(m_InitialDir, 0, size * sizeof(WCHAR));
-	wcscpy(m_InitialDir, str);
+	wcscpy_s(m_InitialDir, size, str);
 	m_pOFN->lpstrInitialDir = m_InitialDir;
 
 	size = 100000;
@@ -418,7 +418,7 @@ BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 				wcscpy_s(buff, CString(s.cStr));
 				break;
 			case STRRET_WSTR:
-				wcscpy_s(buff, CString(s.pOleStr));
+				wcscpy_s(buff, s.pOleStr);
 				CoTaskMemFree(s.pOleStr);
 				break;
 			default:
