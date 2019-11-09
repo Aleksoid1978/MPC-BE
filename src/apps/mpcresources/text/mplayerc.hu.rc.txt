@@ -209,7 +209,7 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
-6		"Szűrő hozzáadása..."
+6		"Szűrőt hozzáad"
 7		"Eltávolítás"
 8		"Használat"
 9		"Tiltás"
@@ -689,7 +689,7 @@ BEGIN MENU IDR_MAINFRAME LINES 202
 56		"&100%\tAlt+2"
 57		"&200%\tAlt+3"
 58		"Automatikus illesztés\tAlt+4"
-61		"&Language"
+61		"&Nyelv (Language)"
 63		"Videó átalakító beállítások"
 65		"&Képszétválasztás teszt\tCtrl+T"
 66		"&Statisztika megjelenítése\tCtrl+J"
