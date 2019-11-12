@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 
 IMPLEMENT_DYNAMIC(CSaveImageDialog, CFileDialog)
 CSaveImageDialog::CSaveImageDialog(
-	int quality, int levelPNG, bool bSnapShotSubtitles,
+	const int quality, const int levelPNG, const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName,
@@ -50,14 +50,12 @@ CSaveImageDialog::CSaveImageDialog(
 		pfdc->AddEditBox(IDC_EDIT5, str);
 		pfdc->EndVisualGroup();
 
-		pfdc->AddCheckButton(IDS_SNAPSHOT_SUBTITLES, ResStr(IDS_SNAPSHOT_SUBTITLES), m_bSnapShotSubtitles);
+		if (bSubtitlesEnabled) {
+			pfdc->AddCheckButton(IDS_SNAPSHOT_SUBTITLES, ResStr(IDS_SNAPSHOT_SUBTITLES), m_bSnapShotSubtitles);
+		}
 
 		pfdc->Release();
 	}
-}
-
-CSaveImageDialog::~CSaveImageDialog()
-{
 }
 
 BOOL CSaveImageDialog::OnInitDialog()
@@ -68,8 +66,6 @@ BOOL CSaveImageDialog::OnInitDialog()
 
 	return TRUE;
 }
-
-// CSaveImageDialog message handlers
 
 BOOL CSaveImageDialog::OnFileNameOK()
 {
@@ -86,8 +82,9 @@ BOOL CSaveImageDialog::OnFileNameOK()
 		CoTaskMemFree(result);
 
 		BOOL bChecked;
-		pfdc->GetCheckButtonState(IDS_SNAPSHOT_SUBTITLES, &bChecked);
-		m_bSnapShotSubtitles = !!bChecked;
+		if (SUCCEEDED(pfdc->GetCheckButtonState(IDS_SNAPSHOT_SUBTITLES, &bChecked))) {
+			m_bSnapShotSubtitles = !!bChecked;
+		}
 
 		pfdc->Release();
 	}
@@ -141,10 +138,10 @@ void CSaveImageDialog::OnTypeChange()
 
 IMPLEMENT_DYNAMIC(CSaveThumbnailsDialog, CSaveImageDialog)
 CSaveThumbnailsDialog::CSaveThumbnailsDialog(
-	int rows, int cols, int width, int quality, int levelPNG, bool bSnapShotSubtitles,
+	const int rows, const int cols, const int width, const int quality, const int levelPNG, const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: CSaveImageDialog(quality, levelPNG, bSnapShotSubtitles,
+	: CSaveImageDialog(quality, levelPNG, bSnapShotSubtitles, bSubtitlesEnabled,
 					   lpszDefExt, lpszFileName,
 					   lpszFilter, pParentWnd)
 	, m_rows(rows)
@@ -174,12 +171,6 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 		pfdc->Release();
 	}
 }
-
-CSaveThumbnailsDialog::~CSaveThumbnailsDialog()
-{
-}
-
-// CSaveThumbnailsDialog message handlers
 
 BOOL CSaveThumbnailsDialog::OnFileNameOK()
 {

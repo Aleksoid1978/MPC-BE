@@ -6230,8 +6230,8 @@ void CMainFrame::OnFileSaveImage()
 	}
 
 	CSaveImageDialog fd(
-		s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles,
-		0, CreateSnapShotFileName(),
+		s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles, m_pCurrentSubStream != nullptr,
+		nullptr, CreateSnapShotFileName(),
 		L"BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png||", GetModalParent());
 
 	if (s.strSnapShotExt == L".bmp") {
@@ -6315,8 +6315,8 @@ void CMainFrame::OnFileSaveThumbnails()
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
 	CSaveThumbnailsDialog fd(
-		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles,
-		0, (LPCTSTR)psrc,
+		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles, m_pCurrentSubStream != nullptr,
+		nullptr, (LPCTSTR)psrc,
 		L"BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png||", GetModalParent());
 
 	if (s.strSnapShotExt == L".bmp") {

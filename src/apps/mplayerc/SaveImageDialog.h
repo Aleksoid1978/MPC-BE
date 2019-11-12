@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,10 +29,10 @@ class CSaveImageDialog : public CFileDialog
 
 public:
 	CSaveImageDialog(
-		int quality, int levelPNG, bool bSnapShotSubtitles,
-		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
-		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr);
-	virtual ~CSaveImageDialog();
+		const int quality, const int levelPNG, const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
+		LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+		LPCWSTR lpszFilter, CWnd* pParentWnd);
+	~CSaveImageDialog() = default;
 
 protected:
 	virtual BOOL OnInitDialog();
@@ -53,10 +53,10 @@ class CSaveThumbnailsDialog : public CSaveImageDialog
 
 public:
 	CSaveThumbnailsDialog(
-		int rows, int cols, int width, int quality, int levelPNG, bool bSnapShotSubtitles,
-		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
-		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr);
-	virtual ~CSaveThumbnailsDialog();
+		const int rows, const int cols, const int width, const int quality, const int levelPNG, const bool bSnapShotSubtitles, bool bSubtitlesEnabled,
+		LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+		LPCWSTR lpszFilter, CWnd* pParentWnd);
+	~CSaveThumbnailsDialog() = default;
 
 protected:
 	virtual BOOL OnFileNameOK();
