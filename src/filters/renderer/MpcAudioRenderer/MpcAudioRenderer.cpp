@@ -1416,7 +1416,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		pSilence->rtStart = rtStart - rtSilence;
 		pSilence->rtStop  = rtStart;
 		pSilence->SetCount(nSilenceBytes);
-		ZeroMemory(pSilence->data(), nSilenceBytes);
 
 		m_rtNextRenderedSampleTime = pSilence->rtStart;
 		m_rtEstimateSlavingJitter = 0;
@@ -1594,18 +1593,17 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 			const auto rtLastTimeEnd = std::max(m_rtLastQueuedSampleTimeEnd, m_rtNextRenderedSampleTime);
 			const auto rtLastStop = (!m_rtLastQueuedSampleTimeEnd && m_pSyncClock->IsSlave()) ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : rtLastTimeEnd;
 			const auto rtSilence = p->rtStart - rtLastStop;
-			if (rtSilence > 0 && rtSilence <= 60 * UNITS) {
+			if (rtSilence > 0 && rtSilence <= UNITS) {
 				const UINT32 nSilenceFrames = TimeToSamples(rtSilence, m_pWaveFormatExOutput);
 				if (nSilenceFrames > 0) {
 					const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms before [%I64d(%I64d)]", rtSilence / 10000.0f, p->rtStart, m_rtLastQueuedSampleTimeEnd);
+					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms [%I64d -> %I64d]", rtSilence / 10000.0f, rtLastStop, p->rtStart);
 #endif
 					CAutoPtr<CPacket> pSilence(DNew CPacket());
 					pSilence->rtStart = p->rtStart - rtSilence;
 					pSilence->rtStop = p->rtStart;
 					pSilence->SetCount(nSilenceBytes);
-					ZeroMemory(pSilence->data(), nSilenceBytes);
 
 					WasapiQueueAdd(pSilence);
 				}
@@ -2763,6 +2761,8 @@ HRESULT CMpcAudioRenderer::EndFlush()
 
 void CMpcAudioRenderer::NewSegment()
 {
+	DLog(L"CMpcAudioRenderer::NewSegment()");
+
 	m_rtNextRenderedSampleTime = 0;
 	m_rtLastReceivedSampleTimeEnd = 0;
 	m_rtEstimateSlavingJitter = 0;
