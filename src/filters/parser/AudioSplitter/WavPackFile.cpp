@@ -268,9 +268,14 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 	m_pFile = pFile;
 	m_pFile->Seek(0);
 
-	wv_context_t wv_ctx;
-	memset(&wv_ctx, 0, sizeof(wv_ctx));
+	BYTE data[10];
+	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK) {
+		return E_FAIL;
+	}
+	int start_offset = id3v2_match_len(data);
+	m_pFile->Seek(start_offset);
 
+	wv_context_t wv_ctx = {};
 	wv_ctx.block_parsed = 0;
 	for (;;) {
 		HRESULT hr = wv_read_block_header(&wv_ctx, m_pFile);
