@@ -2035,6 +2035,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_WAVPACK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,7776706B");               // 'wvpk'
+		pFGF->m_chkbytes.emplace_back(L"0,3,,494433");                 // 'ID3'
 		m_source.push_back(pFGF);
 	}
 

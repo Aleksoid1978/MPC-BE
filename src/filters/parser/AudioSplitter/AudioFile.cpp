@@ -111,6 +111,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 			pAudioFile = DNew CTTAFile();
 		} else if (*id == FCC('MAC ')) {
 			pAudioFile = DNew CAPEFile();
+		}  else if (*id == FCC('wvpk')) {
+			pAudioFile = DNew CWavPackFile();
 		} else {
 			return nullptr;
 		}
