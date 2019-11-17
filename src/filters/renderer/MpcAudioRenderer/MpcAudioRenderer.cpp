@@ -1591,7 +1591,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 			return S_OK;
 		} else if (p->rtStart > m_rtLastQueuedSampleTimeEnd) {
 			const auto rtLastTimeEnd = std::max(m_rtLastQueuedSampleTimeEnd, m_rtNextRenderedSampleTime);
-			const auto rtLastStop = (!m_rtLastQueuedSampleTimeEnd && m_pSyncClock->IsSlave()) ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : rtLastTimeEnd;
+			const auto rtLastStop = (!rtLastTimeEnd && m_pSyncClock->IsSlave()) ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : rtLastTimeEnd;
 			const auto rtSilence = p->rtStart - rtLastStop;
 			const auto rtMax = rtLastStop > 0 ? UNITS : 60 * UNITS;
 			if (rtSilence > 0 && rtSilence <= rtMax) {
@@ -1599,7 +1599,8 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 				if (nSilenceFrames > 0) {
 					const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms [%I64d -> %I64d]", rtSilence / 10000.0f, rtLastStop, p->rtStart);
+					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms [%I64d -> %I64d, %s -> %s]",
+						 rtSilence / 10000.0f, rtLastStop, p->rtStart, ReftimeToString(rtLastStop), ReftimeToString(p->rtStart));
 #endif
 					CAutoPtr<CPacket> pSilence(DNew CPacket());
 					pSilence->rtStart = p->rtStart - rtSilence;
