@@ -1593,7 +1593,8 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 			const auto rtLastTimeEnd = std::max(m_rtLastQueuedSampleTimeEnd, m_rtNextRenderedSampleTime);
 			const auto rtLastStop = (!m_rtLastQueuedSampleTimeEnd && m_pSyncClock->IsSlave()) ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : rtLastTimeEnd;
 			const auto rtSilence = p->rtStart - rtLastStop;
-			if (rtSilence > 0 && rtSilence <= UNITS) {
+			const auto rtMax = rtLastStop > 0 ? UNITS : 60 * UNITS;
+			if (rtSilence > 0 && rtSilence <= rtMax) {
 				const UINT32 nSilenceFrames = TimeToSamples(rtSilence, m_pWaveFormatExOutput);
 				if (nSilenceFrames > 0) {
 					const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
