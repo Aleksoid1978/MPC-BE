@@ -215,6 +215,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bFlushing(FALSE)
 	, m_bReal32bitSupport(FALSE)
 	, m_bs2b_active(false)
+	, m_bDVDPlayback(FALSE)
 {
 	DLog(L"CMpcAudioRenderer::CMpcAudioRenderer()");
 
@@ -536,6 +537,15 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 	m_BitstreamMode = BITSTREAM_NONE;
 
 	return CBaseRenderer::SetMediaType(pmt);
+}
+
+HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
+{
+	DLog(L"CMpcAudioRenderer::CompleteConnect()");
+
+	m_bDVDPlayback = FindFilter(CLSID_DVDNavigator, m_pGraph) != nullptr;
+
+	return CBaseRenderer::CompleteConnect(pReceivePin);
 }
 
 DWORD WINAPI CMpcAudioRenderer::RenderThreadEntryPoint(LPVOID lpParameter)
@@ -1593,8 +1603,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 			const auto rtLastTimeEnd = std::max(m_rtLastQueuedSampleTimeEnd, m_rtNextRenderedSampleTime);
 			const auto rtLastStop = (!rtLastTimeEnd && m_pSyncClock->IsSlave()) ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : rtLastTimeEnd;
 			const auto rtSilence = p->rtStart - rtLastStop;
-			const auto rtMax = rtLastStop > 0 ? UNITS : 60 * UNITS;
-			if (rtSilence > 0 && rtSilence <= rtMax) {
+			if (rtSilence > 0 && rtSilence <= 60 * UNITS) {
 				const UINT32 nSilenceFrames = TimeToSamples(rtSilence, m_pWaveFormatExOutput);
 				if (nSilenceFrames > 0) {
 					const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
@@ -2758,6 +2767,11 @@ HRESULT CMpcAudioRenderer::EndFlush()
 
 	m_FlushEvent.Reset();
 
+	if (m_bDVDPlayback && m_pAudioClock) {
+		CAutoLock cAutoLock(&m_csAudioClock);
+		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
+	}
+
 	return hr;
 }
 
@@ -2774,6 +2788,10 @@ void CMpcAudioRenderer::NewSegment()
 
 void CMpcAudioRenderer::Flush()
 {
+	if (m_bDVDPlayback) {
+		m_pSyncClock->UnSlave();
+	}
+
 	m_FlushEvent.Set();
 	m_bFlushing = TRUE;
 }

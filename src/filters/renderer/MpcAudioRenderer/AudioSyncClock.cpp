@@ -55,6 +55,8 @@ REFERENCE_TIME CAudioSyncClock::GetPrivateTime()
 
 void CAudioSyncClock::Slave(IAudioClock* pAudioClock, const REFERENCE_TIME audioStart)
 {
+	DLog(L"CAudioSyncClock::Slave()");
+
 	ASSERT(pAudioClock);
 
 	CAutoLock lock(this);
@@ -68,6 +70,8 @@ void CAudioSyncClock::Slave(IAudioClock* pAudioClock, const REFERENCE_TIME audio
 
 void CAudioSyncClock::UnSlave()
 {
+	DLog(L"CAudioSyncClock::UnSlave()");
+
 	CAutoLock lock(this);
 
 	m_pAudioClock = nullptr;
