@@ -73,6 +73,8 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	bs2b_base         m_bs2b;
 	bool              m_bs2b_active;
 
+	BOOL              m_bDVDPlayback;
+
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
 	~CMpcAudioRenderer();
@@ -82,6 +84,7 @@ public:
 	HRESULT Receive(IMediaSample* pSample) override;
 	HRESULT CheckMediaType(const CMediaType *pmt) override;
 	HRESULT SetMediaType(const CMediaType *pmt) override;
+	HRESULT CompleteConnect(IPin *pReceivePin) override;
 	HRESULT DoRenderSample(IMediaSample *pMediaSample) override { return E_NOTIMPL; }
 
 	HRESULT EndFlush() override;
