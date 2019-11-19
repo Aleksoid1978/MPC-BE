@@ -2130,6 +2130,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	SetID3TagProperties(this, m_pFile->m_pID3Tag);
+
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
