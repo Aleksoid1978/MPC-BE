@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,6 +36,7 @@ CMP4SplitterFile::CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr)
 
 CMP4SplitterFile::~CMP4SplitterFile()
 {
+	SAFE_DELETE(m_pID3Tag);
 	delete m_pAp4File;
 }
 
@@ -53,6 +54,30 @@ HRESULT CMP4SplitterFile::Init()
 
 	AP4_ByteStream* stream = DNew AP4_AsyncReaderStream(this);
 
+	AP4_Offset pos = 0;
+	if (BitRead(24) == 'ID3') {
+		const BYTE major = (BYTE)BitRead(8);
+		const BYTE revision = (BYTE)BitRead(8);
+		UNREFERENCED_PARAMETER(revision);
+
+		const BYTE flags = (BYTE)BitRead(8);
+
+		DWORD size = BitRead(32);
+		size = hexdec2uint(size);
+
+		if (major <= 4) {
+			BYTE* buf = DNew BYTE[size];
+			if (SUCCEEDED(ByteRead(buf, size))) {
+				m_pID3Tag = DNew CID3Tag(major, flags);
+				m_pID3Tag->ReadTagsV2(buf, size);
+			}
+			delete[] buf;
+		}
+
+		pos = size + 10;
+	}
+
+	stream->Seek(pos);
 	m_pAp4File = DNew AP4_File(*stream, IsURL());
 
 	AP4_Movie* movie = m_pAp4File->GetMovie();
