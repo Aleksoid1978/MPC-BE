@@ -2623,7 +2623,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	HRESULT hr = S_OK;
 
 	UINT32 numFramesPadding = 0;
-	if (m_DeviceMode == MODE_WASAPI_SHARED && !m_bIsBitstream) { // SHARED
+	if (m_DeviceModeCurrent == MODE_WASAPI_SHARED && !m_bIsBitstream) { // SHARED
 		m_pAudioClient->GetCurrentPadding(&numFramesPadding);
 		if (FAILED(hr)) {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1
