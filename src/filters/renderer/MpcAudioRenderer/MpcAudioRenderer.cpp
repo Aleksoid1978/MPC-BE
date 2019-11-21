@@ -301,7 +301,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_hRendererNeedMoreData  = CreateEventW(nullptr, TRUE, FALSE, nullptr);
 
 	HRESULT hr = S_OK;
-	m_pInputPin = DNew CMpcAudioRendererInputPin(this, &hr);
+	m_pInputPin = new(std::nothrow) CMpcAudioRendererInputPin(this, &hr);
 	if (!m_pInputPin) {
 		hr = E_OUTOFMEMORY;
 	}
@@ -313,7 +313,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	}
 
 	// CBaseRenderer is using a lazy initialization for the CRendererPosPassThru - we need it always
-	m_pPosition = DNew CRendererPosPassThru(L"CRendererPosPassThru", GetOwner(), &hr, m_pInputPin);
+	m_pPosition = new(std::nothrow) CRendererPosPassThru(L"CRendererPosPassThru", GetOwner(), &hr, m_pInputPin);
 	if (m_pPosition == nullptr) {
 		hr = E_OUTOFMEMORY;
 	} else if (FAILED(hr)) {
@@ -1927,7 +1927,7 @@ again:
 									{ 16, 16 }
 								};
 								for (const auto& wBitsPerSample : wBitsPerSampleValues) {
-									CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[2]);
+									CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[1]);
 #ifdef DEBUG_OR_LOG
 									DLog(L"    Trying format:");
 									DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
@@ -1947,7 +1947,7 @@ again:
 							&& SUCCEEDED(SelectFormat(pWaveFormatEx, wfexAsIs))) {
 						hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, nullptr);
 						if (S_OK == hr) {
-							pFormat = (WAVEFORMATEX*)&wfexAsIs;
+							CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &pFormat);
 						}
 					}
 				}
@@ -1964,7 +1964,7 @@ again:
 				}
 			}
 
-			if (bInitNeed) {
+			if (bInitNeed && pFormat) {
 				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pFormat, nullptr);
 				if (S_OK == hr) {
 					CopyWaveFormat(pFormat, &m_pWaveFormatExOutput);
@@ -2028,9 +2028,7 @@ again:
 
 	if (bInitNeed) {
 		ReleaseAudio();
-	}
 
-	if (SUCCEEDED(hr) && bInitNeed) {
 		hr = InitAudioClient();
 		if (SUCCEEDED(hr)) {
 			hr = CreateRenderClient(m_pWaveFormatExOutput, m_bCheckFormat);
@@ -2174,7 +2172,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using period = %.2f ms", m_hnsBufferDuration / 10000.0f);
 
 	const auto ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
-	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using %s mode", ShareMode == MODE_WASAPI_SHARED ? L"Shared" : L"Exclusive");
+	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using %s mode", ShareMode == AUDCLNT_SHAREMODE_SHARED ? L"Shared" : L"Exclusive");
 
 	if (bCheckFormat) {
 		WAVEFORMATEX *pClosestMatch = nullptr;
@@ -2702,14 +2700,12 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 			}
 			nWritenBytes += nFilledBytes;
 			m_nSampleOffset += nFilledBytes;
-		} while (nWritenBytes < nAvailableBytes && dwFlags != AUDCLNT_BUFFERFLAGS_SILENT);
+		} while (nWritenBytes < nAvailableBytes);
 
-		if (dwFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
-			if (!nWritenBytes) {
-				dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
-			} else if (nWritenBytes < nAvailableBytes) {
-				memset(&pData[nWritenBytes], 0, nAvailableBytes - nWritenBytes);
-			}
+		if (!nWritenBytes) {
+			dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+		} else if (nWritenBytes < nAvailableBytes) {
+			memset(&pData[nWritenBytes], 0, nAvailableBytes - nWritenBytes);
 		}
 
 		if (m_lVolume <= DSBVOLUME_MIN) {
