@@ -96,7 +96,7 @@ int GetLumaBits(AVPixelFormat av_pix_fmt)
 {
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 
-	return (pfdesc ? pfdesc->comp->depth : 0);
+	return (pfdesc ? pfdesc->comp[0].depth : 0);
 }
 
 MPCPixelFormat GetPixFormat(GUID& subtype)
