@@ -58,23 +58,23 @@ typedef struct tagANCHOR
  *  @{
  */
 	//! Anchor to the top-left corner
-	const ANCHOR TOP_LEFT(0, 0);
+	inline const ANCHOR TOP_LEFT(0, 0);
 	//! Anchor to the top edge and center horizontally
-	const ANCHOR TOP_CENTER(50, 0);
+	inline const ANCHOR TOP_CENTER(50, 0);
 	//! Anchor to the top-right corner
-	const ANCHOR TOP_RIGHT(100, 0);
+	inline const ANCHOR TOP_RIGHT(100, 0);
 	//! Anchor to the left edge and center vertically
-	const ANCHOR MIDDLE_LEFT(0, 50);
+	inline const ANCHOR MIDDLE_LEFT(0, 50);
 	//! Anchor to the center
-	const ANCHOR MIDDLE_CENTER(50, 50);
+	inline const ANCHOR MIDDLE_CENTER(50, 50);
 	//! Anchor to the right edge and center vertically
-	const ANCHOR MIDDLE_RIGHT(100, 50);
+	inline const ANCHOR MIDDLE_RIGHT(100, 50);
 	//! Anchor to the bottom-left corner
-	const ANCHOR BOTTOM_LEFT(0, 100);
+	inline const ANCHOR BOTTOM_LEFT(0, 100);
 	//! Anchor to the bottom edge and center horizontally
-	const ANCHOR BOTTOM_CENTER(50, 100);
+	inline const ANCHOR BOTTOM_CENTER(50, 100);
 	//! Anchor to the bottom-right corner
-	const ANCHOR BOTTOM_RIGHT(100, 100);
+	inline const ANCHOR BOTTOM_RIGHT(100, 100);
 // @}
 
 //! @brief Holds a control layout settings
@@ -207,7 +207,7 @@ protected:
 	//@{
 	//! @brief Add anchor points for all the remaining controls to the layout
 	void AddAllOtherAnchors(ANCHOR anchorTopLeft, ANCHOR anchorBottomRight);
-	
+
 	void AddAllOtherAnchors(ANCHOR anchor)
 	{
 		AddAllOtherAnchors(anchor, anchor);

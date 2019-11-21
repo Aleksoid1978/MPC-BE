@@ -465,7 +465,7 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 			uint8_t c = /*(primary_charset.g0_m29 != UNDEF) ? primary_charset.g0_m29 : */charset;
 			remap_g0_charset(c);
 		}
-	} else if ((m == MAGAZINE(m_nSuitablePage)) && (line >= 1) && (line <= 23) && (m_bReceivingData == YES)) {
+	} else if ((m == MAGAZINE(m_nSuitablePage)) && (line <= 23) && (m_bReceivingData == YES)) {
 		for (uint8_t i = 0; i < 40; i++) {
 			m_page_buffer.text[line][i] = telx_to_ucs2(packet->data[i]);
 		}

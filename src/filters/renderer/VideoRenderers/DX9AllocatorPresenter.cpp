@@ -2123,7 +2123,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		if (iDetailedStats > 1) {
 			if (m_pVideoTextures[0] || m_pVideoSurfaces[0]) {
-				D3DSURFACE_DESC desc;
+				D3DSURFACE_DESC desc = {};
 				if (m_pVideoTextures[0]) {
 					m_pVideoTextures[0]->GetLevelDesc(0, &desc);
 				} else if (m_pVideoSurfaces[0]) {

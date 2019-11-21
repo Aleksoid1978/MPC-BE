@@ -243,11 +243,11 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 
 			if (c < 0x80) { // 0xxxxxxx
 				Write(&c, 1);
-			} else if (0x80 <= c && c < 0x800) { // 110xxxxx 10xxxxxx
+			} else if (c < 0x800) { // 110xxxxx 10xxxxxx
 				c = 0xc080 | ((c << 2) & 0x1f00) | (c & 0x003f);
 				Write((BYTE*)&c + 1, 1);
 				Write(&c, 1);
-			} else if (0x800 <= c && c < 0xFFFF) { // 1110xxxx 10xxxxxx 10xxxxxx
+			} else if (c < 0xFFFF) { // 1110xxxx 10xxxxxx 10xxxxxx
 				c = 0xe08080 | ((c << 4) & 0x0f0000) | ((c << 2) & 0x3f00) | (c & 0x003f);
 				Write((BYTE*)&c + 2, 1);
 				Write((BYTE*)&c + 1, 1);
@@ -575,47 +575,44 @@ BOOL CTextFile::ReadString(CStringW& str)
 					m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
 				} else if (Utf8::isFirstOfMultibyte(m_buffer[m_posInBuffer])) {
 					int nContinuationBytes = Utf8::continuationBytes(m_buffer[m_posInBuffer]);
-					bValid = (nContinuationBytes <= 3);
+					bValid = true;
 
-					// We don't support characters wider than 16 bits
-					if (bValid) {
-						if (m_posInBuffer + nContinuationBytes >= m_nInBuffer) {
-							// If we are at the end of the file, the buffer won't be full
-							// and we won't be able to read any more continuation bytes.
-							bValid = (m_nInBuffer == TEXTFILE_BUFFER_SIZE);
-							break;
-						} else {
-							for (int j = 1; j <= nContinuationBytes; j++) {
-								if (!Utf8::isContinuation(m_buffer[m_posInBuffer + j])) {
-									bValid = false;
-								}
+					if (m_posInBuffer + nContinuationBytes >= m_nInBuffer) {
+						// If we are at the end of the file, the buffer won't be full
+						// and we won't be able to read any more continuation bytes.
+						bValid = (m_nInBuffer == TEXTFILE_BUFFER_SIZE);
+						break;
+					} else {
+						for (int j = 1; j <= nContinuationBytes; j++) {
+							if (!Utf8::isContinuation(m_buffer[m_posInBuffer + j])) {
+								bValid = false;
 							}
-
-							switch (nContinuationBytes) {
-								case 0: // 0xxxxxxx
-									m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
-									break;
-								case 1: // 110xxxxx 10xxxxxx
-									m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x1f) << 6 | (m_buffer[m_posInBuffer + 1] & 0x3f);
-									break;
-								case 2: // 1110xxxx 10xxxxxx 10xxxxxx
-									m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x0f) << 12 | (m_buffer[m_posInBuffer + 1] & 0x3f) << 6 | (m_buffer[m_posInBuffer + 2] & 0x3f);
-									break;
-								case 3: // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-									{
-										const auto* Z = &m_buffer[m_posInBuffer];
-										const auto u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t) * (Z + 3) & 0x3F);
-										if (u32 <= UINT16_MAX) {
-											m_wbuffer[nCharsRead] = (wchar_t)u32;
-										} else {
-											m_wbuffer[nCharsRead++] = (wchar_t)((((u32 - 0x010000) & 0x000FFC00) >> 10) | 0xD800);
-											m_wbuffer[nCharsRead]   = (wchar_t)((u32 & 0x000003FF) | 0xDC00);
-										}
-									}
-									break;
-							}
-							m_posInBuffer += nContinuationBytes;
 						}
+
+						switch (nContinuationBytes) {
+							case 0: // 0xxxxxxx
+								m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
+								break;
+							case 1: // 110xxxxx 10xxxxxx
+								m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x1f) << 6 | (m_buffer[m_posInBuffer + 1] & 0x3f);
+								break;
+							case 2: // 1110xxxx 10xxxxxx 10xxxxxx
+								m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x0f) << 12 | (m_buffer[m_posInBuffer + 1] & 0x3f) << 6 | (m_buffer[m_posInBuffer + 2] & 0x3f);
+								break;
+							case 3: // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+								{
+									const auto* Z = &m_buffer[m_posInBuffer];
+									const auto u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t) * (Z + 3) & 0x3F);
+									if (u32 <= UINT16_MAX) {
+										m_wbuffer[nCharsRead] = (wchar_t)u32;
+									} else {
+										m_wbuffer[nCharsRead++] = (wchar_t)((((u32 - 0x010000) & 0x000FFC00) >> 10) | 0xD800);
+										m_wbuffer[nCharsRead]   = (wchar_t)((u32 & 0x000003FF) | 0xDC00);
+									}
+								}
+								break;
+						}
+						m_posInBuffer += nContinuationBytes;
 					}
 				} else {
 					bValid = false;

@@ -235,7 +235,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 			pmt->SetVariableSize();
 
 			delete [] vi;
-		} else if (type == mpeg2) {
+		} else {
 			pmt->subtype					= MEDIASUBTYPE_MPEG2_VIDEO;
 			pmt->formattype					= FORMAT_MPEG2_VIDEO;
 			int len							= FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + int(shlen + shextlen);
@@ -2011,7 +2011,7 @@ bool CBaseSplitterFileEx::ReadDVDALPCMHdr(CMediaType* pmt)
 		static const DWORD samplerate[] = { 48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 1764000 };
 		static const WORD bitdepth[] = { 16, 20, 24 };
 
-		DVDALPCMFORMAT fmt;
+		DVDALPCMFORMAT fmt = {};
 		fmt.wfe.wFormatTag     = WAVE_FORMAT_UNKNOWN;
 		fmt.wfe.nChannels      = channels1[h.groupassignment] + channels2[h.groupassignment];
 		fmt.wfe.nSamplesPerSec = samplerate[h.samplerate1];
@@ -2029,7 +2029,9 @@ bool CBaseSplitterFileEx::ReadDVDALPCMHdr(CMediaType* pmt)
 			channels1[h.groupassignment] * fmt.wfe.nSamplesPerSec * fmt.wfe.wBitsPerSample +
 			channels2[h.groupassignment] * fmt.nSamplesPerSec2 * fmt.wBitsPerSample2) / 8;
 
-		fmt.wfe.nBlockAlign = 2 * fmt.wfe.nAvgBytesPerSec / fmt.wfe.nSamplesPerSec;
+		if (fmt.wfe.nSamplesPerSec) {
+			fmt.wfe.nBlockAlign = 2 * fmt.wfe.nAvgBytesPerSec / fmt.wfe.nSamplesPerSec;
+		}
 
 		pmt->majortype  = MEDIATYPE_Audio;
 		pmt->subtype    = MEDIASUBTYPE_DVD_LPCM_AUDIO;

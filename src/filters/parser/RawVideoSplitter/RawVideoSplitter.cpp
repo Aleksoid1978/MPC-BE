@@ -542,10 +542,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								continue;
 							}
 
-							if (rtStart == INVALID_TIME) {
-								rtStart = rt;
-								posMin  = pos;
-							}
+							rtStart = rt;
+							posMin  = pos;
 						}
 					}
 				}

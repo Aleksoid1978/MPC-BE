@@ -1958,9 +1958,7 @@ static int mp4_read_dec_config_descr(std::vector<BYTE>& dec_config_descr, CMpegS
 				wfe->nBlockAlign     = 1;
 				wfe->nAvgBytesPerSec = 0;
 				wfe->cbSize          = tag_len;
-				if (tag_len) {
-					memcpy((BYTE*)(wfe + 1), extra, tag_len);
-				}
+				memcpy((BYTE*)(wfe + 1), extra, tag_len);
 
 				pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
@@ -2707,7 +2705,7 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 			h.fpts = (BYTE)BitRead(1);
 			h.fdts = (BYTE)BitRead(1);
 		}
-	} else if (h.type == mpeg2) {
+	} else {
 		EXECUTE_ASSERT(BitRead(2) == mpeg2);
 		h.scrambling = (BYTE)BitRead(2);
 		h.priority = (BYTE)BitRead(1);
@@ -2723,9 +2721,6 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 		h.crc = (BYTE)BitRead(1);
 		h.extension = (BYTE)BitRead(1);
 		h.hdrlen = (BYTE)BitRead(8);
-	} else {
-		ASSERT(FALSE);
-		goto error;
 	}
 
 	if (h.fpts) {

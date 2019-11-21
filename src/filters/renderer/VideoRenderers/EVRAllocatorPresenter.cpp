@@ -559,9 +559,7 @@ STDMETHODIMP CEVRAllocatorPresenter::IsRateSupported(BOOL fThin, float flRate, f
 	}
 
 	// Return the nearest supported rate if the caller requested it.
-	if (pflNearestSupportedRate != nullptr) {
-		*pflNearestSupportedRate = fNearestRate;
-	}
+	*pflNearestSupportedRate = fNearestRate;
 
 	return hr;
 }
@@ -1242,7 +1240,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetCurrentImage(BITMAPINFOHEADER *pBih, BYT
 			|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
 			|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
 			|| (FAILED(hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
-		DLog(L"CEVRAllocatorPresenter::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+		DLog(L"CEVRAllocatorPresenter::GetCurrentImage filed : %s", GetWindowsErrorMessage(hr, m_hD3D9));
 		CoTaskMemFree(p);
 		return hr;
 	}
@@ -2047,8 +2045,6 @@ void CEVRAllocatorPresenter::RenderThread()
 								Paint(true);
 							} else {
 								LONGLONG TimePerFrame = (LONGLONG)(GetFrameTime() * 10000000.0);
-								LONGLONG DrawTime = m_PaintTime * 9 / 10 - 20000; // 2 ms offset (= m_PaintTime * 0.9 - 20000)
-								DrawTime = 0;
 
 								LONGLONG SyncOffset = 0;
 								LONGLONG VSyncTime = 0;
@@ -2187,7 +2183,6 @@ void CEVRAllocatorPresenter::RenderThread()
 									if (NextSleepTime < 0) {
 										NextSleepTime = 0;
 									}
-									NextSleepTime = 1;
 									//TRACE_EVR("EVR: Delay\n");
 								}
 

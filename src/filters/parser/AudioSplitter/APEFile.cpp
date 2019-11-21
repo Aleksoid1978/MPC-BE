@@ -232,9 +232,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		if (ape.fileversion < 3810) {
 			ape.bittable = (uint8_t*)malloc(ape.totalframes);
 			if (!ape.bittable) {
-				if (ape.seektable) {
-					free(ape.seektable);
-				}
+				free(ape.seektable);
 				return E_OUTOFMEMORY;
 			}
 			memset(ape.bittable, 0, ape.totalframes);
@@ -299,7 +297,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		free(ape.bittable);
 	}
 
-	int total_blocks = (ape.totalframes == 0) ? 0 : ((ape.totalframes - 1) * ape.blocksperframe) + ape.finalframeblocks;
+	int total_blocks = ((ape.totalframes - 1) * ape.blocksperframe) + ape.finalframeblocks;
 
 	int64_t pts = 0;
 	for (size_t i = 0; i < ape.totalframes; i++) {

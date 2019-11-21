@@ -765,9 +765,7 @@ static BOOL SetHeapOptions()
 #endif
 
 	const BOOL fRet = (pHsi)(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
-	if (hLib) {
-		FreeLibrary(hLib);
-	}
+	FreeLibrary(hLib);
 
 	return fRet;
 }

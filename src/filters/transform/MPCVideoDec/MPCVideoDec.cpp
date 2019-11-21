@@ -2331,7 +2331,7 @@ static void ReconstructH264Extra(BYTE *extra, unsigned& extralen, int NALSize)
 		const NALU_TYPE nalu_type = Nalu.GetType();
 		if (nalu_type == NALU_TYPE_PPS) {
 			pps_present = true;
-		} if (nalu_type == NALU_TYPE_SPS) {
+		} else if (nalu_type == NALU_TYPE_SPS) {
 			bNeedReconstruct = pps_present;
 			break;
 		}

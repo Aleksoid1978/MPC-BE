@@ -1211,9 +1211,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 															}
 															break;
 														case 1280:
-															data = (BYTE*)avci50_720p_extradata;
-															size = sizeof(avci50_720p_extradata);
-															break;
 														case  960:
 															data = (BYTE*)avci50_720p_extradata;
 															size = sizeof(avci50_720p_extradata);
@@ -1452,10 +1449,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												&& color_primaries != AVCOL_PRI_RESERVED0) {
 											m_ColorSpace->Primaries = color_primaries;
 										}
-										if (color_range != AVCOL_RANGE_UNSPECIFIED
-												&& color_range <= AVCOL_RANGE_JPEG) {
-											m_ColorSpace->Range = color_range;
-										}
+										m_ColorSpace->Range = color_range;
 										if (color_transfer_function != AVCOL_TRC_RESERVED
 												&& color_transfer_function != AVCOL_TRC_RESERVED0) {
 											m_ColorSpace->TransferCharacteristics = color_transfer_function;
@@ -1772,7 +1766,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							if (AP4_DataInfoAtom* dOpsAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_DOPS))) {
 								const AP4_DataBuffer* di = dOpsAtom->GetData();
-								if (di && di->GetDataSize() >= 11 && di->GetData()[0] == 0) {
+								if (di->GetDataSize() >= 11 && di->GetData()[0] == 0) {
 									const BYTE* src = di->GetData() + 1;
 									const size_t size = di->GetDataSize() + 8;
 									std::vector<BYTE> extradata;
@@ -1814,7 +1808,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (AP4_DataInfoAtom* WfexAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_WFEX))) {
 							const AP4_DataBuffer* di = WfexAtom->GetData();
-							if (di && di->GetDataSize()) {
+							if (di->GetDataSize()) {
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(di->GetDataSize());
 								memcpy(wfe, di->GetData(), di->GetDataSize());
 
@@ -1825,7 +1819,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (AP4_DataInfoAtom* glblAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_GLBL))) {
 							const AP4_DataBuffer* di = glblAtom->GetData();
-							if (di && di->GetDataSize()) {
+							if (di->GetDataSize()) {
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + di->GetDataSize());
 								wfe->cbSize = di->GetDataSize();
 								memcpy(wfe + 1, di->GetData(), di->GetDataSize());

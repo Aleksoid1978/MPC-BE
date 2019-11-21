@@ -304,11 +304,9 @@ bool CBinkSplitterFilter::DemuxLoop()
 
 						m_pFile->ByteRead(pa->data(), packet_size);
 
-						if (packet_size >= 4) {
-							const UINT32 samples_bytes = GETU32(pa->data());
-							m_audiotracks[i].pts += llMulDiv(samples_bytes / (m_audiotracks[i].channels * 2), UNITS, m_audiotracks[i].sample_rate, 0);
-							pa->rtStop = m_audiotracks[i].pts;
-						}
+						const UINT32 samples_bytes = GETU32(pa->data());
+						m_audiotracks[i].pts += llMulDiv(samples_bytes / (m_audiotracks[i].channels * 2), UNITS, m_audiotracks[i].sample_rate, 0);
+						pa->rtStop = m_audiotracks[i].pts;
 
 						hr = DeliverPacket(pa);
 					}

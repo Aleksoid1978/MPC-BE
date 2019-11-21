@@ -671,7 +671,7 @@ bool Rasterizer::CreateWidenedRegion(int rx, int ry)
 	m_pOutlineData->mWideBorder = std::max(rx, ry);
 
 	if (m_pEllipse) {
-		CreateWidenedRegionFast(rx, ry);
+		CreateWidenedRegionFast(ry);
 	} else if (ry > 0) {
 		// Do a half circle.
 		// _OverlapRegion mirrors this so both halves are done.
@@ -680,7 +680,7 @@ bool Rasterizer::CreateWidenedRegion(int rx, int ry)
 
 			_OverlapRegion(m_pOutlineData->mWideOutline, m_pOutlineData->mOutline, dx, dy);
 		}
-	} else if (ry == 0 && rx > 0) {
+	} else if (rx > 0) {
 		// There are artifacts if we don't make at least two overlaps of the line, even at same Y coord
 		_OverlapRegion(m_pOutlineData->mWideOutline, m_pOutlineData->mOutline, rx, 0);
 		_OverlapRegion(m_pOutlineData->mWideOutline, m_pOutlineData->mOutline, rx, 0);
@@ -691,7 +691,7 @@ bool Rasterizer::CreateWidenedRegion(int rx, int ry)
 	return true;
 }
 
-void Rasterizer::CreateWidenedRegionFast(int rx, int ry)
+void Rasterizer::CreateWidenedRegionFast(const int ry)
 {
 	CAtlList<CEllipseCenterGroup> centerGroups;
 	std::vector<SpanEndPoint> wideSpanEndPoints;

@@ -56,21 +56,16 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 	}
 }
 
-CSaveTextFileDialog::~CSaveTextFileDialog()
-{
-}
-
 BOOL CSaveTextFileDialog::OnFileNameOK()
 {
-	DWORD result;
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
+		DWORD result;
 		pfdc->GetSelectedControlItem(IDC_COMBO1, &result);
+		pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
 		pfdc->Release();
 		m_e = (CTextFile::enc)result;
 	}
-
-	pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
 
 	return __super::OnFileNameOK();
 }

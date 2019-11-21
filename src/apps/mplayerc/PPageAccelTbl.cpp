@@ -902,8 +902,6 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			m_list.ShowInPlaceComboBox(pItem->iItem, pItem->iSubItem, sl, nSel);
 			break;
 		case COL_RMCMD:
-			m_list.ShowInPlaceEdit(pItem->iItem, pItem->iSubItem);
-			break;
 		case COL_RMREPCNT:
 			m_list.ShowInPlaceEdit(pItem->iItem, pItem->iSubItem);
 			break;

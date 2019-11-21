@@ -687,8 +687,6 @@ HRESULT CBaseSplitterFilter::SetPositionsInternal(void* id, LONGLONG* pCurrent, 
 				rtCurrent = *pCurrent;
 				break;
 			case AM_SEEKING_RelativePositioning:
-				rtCurrent = rtCurrent + *pCurrent;
-				break;
 			case AM_SEEKING_IncrementalPositioning:
 				rtCurrent = rtCurrent + *pCurrent;
 				break;
