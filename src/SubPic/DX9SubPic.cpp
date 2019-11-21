@@ -81,7 +81,7 @@ STDMETHODIMP CDX9SubPic::GetDesc(SubPicDesc& spd)
 		d3dsd.Format == D3DFMT_A8R8G8B8 ? 32 :
 		d3dsd.Format == D3DFMT_A4R4G4B4 ? 16 : 0;
 	spd.pitch = 0;
-	spd.bits = NULL;
+	spd.bits = nullptr;
 	spd.vidrect = m_vidrect;
 
 	return S_OK;
@@ -138,7 +138,7 @@ STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 	if (SUCCEEDED(Lock(spd))) {
 		int h = m_rcDirty.Height();
 
-		BYTE* ptr = (BYTE*)spd.bits + spd.pitch*m_rcDirty.top + (m_rcDirty.left*spd.bpp>>3);
+		BYTE* ptr = spd.bits + spd.pitch*m_rcDirty.top + (m_rcDirty.left*spd.bpp>>3);
 
 		if (spd.bpp == 16) {
 			while (h-- > 0) {
@@ -187,7 +187,7 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 		d3dsd.Format == D3DFMT_A8R8G8B8 ? 32 :
 		d3dsd.Format == D3DFMT_A4R4G4B4 ? 16 : 0;
 	spd.pitch = LockedRect.Pitch;
-	spd.bits = LockedRect.pBits;
+	spd.bits = (BYTE*)LockedRect.pBits;
 	spd.vidrect = m_vidrect;
 
 	return S_OK;

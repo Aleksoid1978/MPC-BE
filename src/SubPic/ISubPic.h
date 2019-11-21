@@ -38,20 +38,12 @@ inline bool g_bForcedSubtitle = false;
 
 #pragma pack(push, 1)
 struct SubPicDesc {
-	int type;
-	int w, h, bpp, pitch, pitchUV;
-	void* bits;
-	BYTE* bitsU;
-	BYTE* bitsV;
-	RECT vidrect; // video rectangle
-
-	struct SubPicDesc() {
-		type = 0;
-		w = h = bpp = pitch = pitchUV = 0;
-		bits = NULL;
-		bitsU = bitsV = NULL;
-		vidrect = CRect(0, 0, 0, 0);
-	}
+	int type = 0;
+	int w = 0, h = 0, bpp = 0, pitch = 0, pitchUV = 0;
+	BYTE* bits = nullptr;
+	BYTE* bitsU = nullptr;
+	BYTE* bitsV = nullptr;
+	RECT vidrect{}; // video rectangle
 };
 #pragma pack(pop)
 

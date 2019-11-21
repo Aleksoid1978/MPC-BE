@@ -135,7 +135,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	spd.bits    = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
 
 	{
-		BYTE* p = (BYTE*)spd.bits;
+		BYTE* p = spd.bits;
 		for (int y = 0; y < spd.h; y++, p += spd.pitch) {
 			for (int x = 0; x < spd.w; x++) {
 				((DWORD*)p)[x] = 0x010101 * (0xe0 + 0x08 * y / spd.h + 0x18 * (spd.w - x) / spd.w);
@@ -230,7 +230,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 			srcPitch = -srcPitch;
 		}
 
-		BYTE* dst = (BYTE*)spd.bits + spd.pitch * r.top + r.left * 4;
+		BYTE* dst = spd.bits + spd.pitch * r.top + r.left * 4;
 		for (int y = 0; y < thumbsize.cy; y++, dst += spd.pitch, src += srcPitch) {
 			memcpy(dst, src, abs(srcPitch));
 		}

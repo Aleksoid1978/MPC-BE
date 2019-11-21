@@ -132,8 +132,8 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 	}
 
 	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
-	BYTE* s = (BYTE*)src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left * 4;
-	BYTE* d = (BYTE*)dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left * 4;
+	BYTE* s = src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left * 4;
+	BYTE* d = dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left * 4;
 
 	for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 		memcpy(d, s, w * 4);
@@ -148,7 +148,7 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect(DWORD color)
 		return S_FALSE;
 	}
 
-	BYTE* p = (BYTE*)m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*(m_spd.bpp>>3);
+	BYTE* p = m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*(m_spd.bpp>>3);
 	for (ptrdiff_t j = 0, h = m_rcDirty.Height(); j < h; j++, p += m_spd.pitch) {
 		int w = m_rcDirty.Width();
 #ifdef _WIN64
@@ -201,7 +201,7 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 	}
 
 	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
-	BYTE* top = (BYTE*)m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*4;
+	BYTE* top = m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*4;
 	BYTE* bottom = top + m_spd.pitch*h;
 
 	if (m_spd.type == MSP_RGB16) {
@@ -356,20 +356,20 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 
 	int w = rs.Width(), h = rs.Height();
-	BYTE* s = (BYTE*)src.bits + src.pitch * rs.top + ((rs.left * src.bpp) >> 3); //rs.left * 4;
-	BYTE* d = (BYTE*)dst.bits + dst.pitch * rd.top + ((rd.left * dst.bpp) >> 3);
+	BYTE* s = src.bits + src.pitch * rs.top + ((rs.left * src.bpp) >> 3); //rs.left * 4;
+	BYTE* d = dst.bits + dst.pitch * rd.top + ((rd.left * dst.bpp) >> 3);
 
 	if (rd.top > rd.bottom) {
 		if (dst.type == MSP_RGB32 || dst.type == MSP_RGB24
 				|| dst.type == MSP_RGB16 || dst.type == MSP_RGB15
 				|| dst.type == MSP_YUY2 || dst.type == MSP_AYUV) {
-			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + (rd.left * dst.bpp >> 3);
+			d = dst.bits + dst.pitch * (rd.top - 1) + (rd.left * dst.bpp >> 3);
 		} else if (dst.type == MSP_YV12 || dst.type == MSP_IYUV) {
-			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + (rd.left * 8 >> 3);
+			d = dst.bits + dst.pitch * (rd.top - 1) + (rd.left * 8 >> 3);
 		} else if (dst.type == MSP_NV12) {
-			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + rd.left;
+			d = dst.bits + dst.pitch * (rd.top - 1) + rd.left;
 		} else if (dst.type == MSP_P010 || dst.type == MSP_P016) {
-			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + rd.left * 2;
+			d = dst.bits + dst.pitch * (rd.top - 1) + rd.left * 2;
 		} else {
 			return E_NOTIMPL;
 		}
@@ -517,8 +517,8 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		// Source is UYxAVYxA.
 		int h2 = h / 2;
 
-		BYTE* ss = (BYTE*)src.bits + src.pitch * rs.top + rs.left * 4;
-		BYTE* dstUV = (BYTE*)dst.bits + dst.pitch * dst.h;
+		BYTE* ss = src.bits + src.pitch * rs.top + rs.left * 4;
+		BYTE* dstUV = dst.bits + dst.pitch * dst.h;
 
 		// Shift position to start of dirty rectangle. Need to divide dirty rectangle height
 		// by 2 because each row of UV values is 2 rows of pixels in the source.
@@ -564,11 +564,11 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		}
 
 		BYTE* ss[2];
-		ss[0] = (BYTE*)src.bits + src.pitch * rs.top + rs.left * 4;
+		ss[0] = src.bits + src.pitch * rs.top + rs.left * 4;
 		ss[1] = ss[0] + 4;
 
 		if (!dst.bitsU || !dst.bitsV) {
-			dst.bitsU = (BYTE*)dst.bits + dst.pitch * dst.h;
+			dst.bitsU = dst.bits + dst.pitch * dst.h;
 			dst.bitsV = dst.bitsU + dst.pitchUV * dst.h / 2;
 
 			if (dst.type == MSP_YV12) {
@@ -609,11 +609,11 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		int h2 = h/2;
 
 		BYTE* ss[2];
-		ss[0] = (BYTE*)src.bits + src.pitch * rs.top + rs.left * 4;
+		ss[0] = src.bits + src.pitch * rs.top + rs.left * 4;
 		ss[1] = ss[0] + 4;
 
 		if (!dst.bitsU) {
-			dst.bitsU = (BYTE*)dst.bits + dst.pitch * dst.h;
+			dst.bitsU = dst.bits + dst.pitch * dst.h;
 		}
 
 		BYTE* dd[2];
@@ -669,9 +669,9 @@ bool CMemSubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 	spd.w = m_maxsize.cx;
 	spd.h = m_maxsize.cy;
 	spd.bpp = 32;
-	spd.pitch = (spd.w*spd.bpp)>>3;
+	spd.pitch = (spd.w * spd.bpp) >> 3;
 	spd.type = m_type;
-	spd.bits = DNew BYTE[spd.pitch*spd.h];
+	spd.bits = new(std::nothrow) BYTE[spd.pitch * spd.h];
 	if (!spd.bits) {
 		return false;
 	}

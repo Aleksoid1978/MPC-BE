@@ -1750,7 +1750,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 	BYTE* srcBody = m_pOverlayData->mpOverlayBufferBody + m_pOverlayData->mOverlayPitch * yo + xo;
 	BYTE* srcBorder = m_pOverlayData->mpOverlayBufferBorder + m_pOverlayData->mOverlayPitch * yo + xo;
 	BYTE* alphaMask = pAlphaMask + spd.w * y + x;
-	BYTE* dst = (BYTE*)((DWORD*)((BYTE*)spd.bits + spd.pitch * y) + x);
+	BYTE* dst = (BYTE*)((DWORD*)(spd.bits + spd.pitch * y) + x);
 	BYTE* s = fBorder ? srcBorder : srcBody;
 
 	enum {
@@ -1822,6 +1822,6 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD lColor) const
 {
 	ASSERT(spd.w >= x + nWidth && spd.h >= y + nHeight);
-	BYTE* dst = (BYTE*)((DWORD*)((BYTE*)spd.bits + spd.pitch * y) + x);
+	BYTE* dst = (BYTE*)((DWORD*)(spd.bits + spd.pitch * y) + x);
 	DrawInternal(m_bUseAVX2, dst, spd.pitch, BYTE(0x40), nWidth, nHeight, lColor);
 }
