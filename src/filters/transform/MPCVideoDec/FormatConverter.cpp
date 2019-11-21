@@ -145,7 +145,7 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		return PFType_P010;
 	}
 
-	int lumabits = pfdesc->comp->depth;
+	int lumabits = pfdesc->comp[0].depth;
 
 	if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
 		return PFType_RGB;
