@@ -204,7 +204,7 @@ public:
 	{ \
 		for (CComPtr<IBaseFilter> pBaseFilter; S_OK == pEnumFilters->Next(1, &pBaseFilter, 0); pBaseFilter = nullptr) \
 		{ \
- 
+
 #define EndEnumFilters }}}
 
 #define BeginEnumCachedFilters(pGraphConfig, pEnumFilters, pBaseFilter) \
@@ -213,7 +213,7 @@ public:
 	{ \
 		for (CComPtr<IBaseFilter> pBaseFilter; S_OK == pEnumFilters->Next(1, &pBaseFilter, 0); pBaseFilter = nullptr) \
 		{ \
- 
+
 #define EndEnumCachedFilters }}}
 
 #define BeginEnumPins(pBaseFilter, pEnumPins, pPin) \
@@ -222,7 +222,7 @@ public:
 	{ \
 		for (CComPtr<IPin> pPin; S_OK == pEnumPins->Next(1, &pPin, 0); pPin = nullptr) \
 		{ \
- 
+
 #define EndEnumPins }}}
 
 #define BeginEnumMediaTypes(pPin, pEnumMediaTypes, pMediaType) \
@@ -232,7 +232,7 @@ public:
 		AM_MEDIA_TYPE* pMediaType = nullptr; \
 		for (; S_OK == pEnumMediaTypes->Next(1, &pMediaType, nullptr); DeleteMediaType(pMediaType), pMediaType = nullptr) \
 		{ \
- 
+
 #define EndEnumMediaTypes(pMediaType) } if (pMediaType) DeleteMediaType(pMediaType); }}
 
 #define BeginEnumSysDev(clsid, pMoniker) \
@@ -244,7 +244,7 @@ public:
 	{ \
 		for (CComPtr<IMoniker> pMoniker; pClassEnum4$##clsid->Next(1, &pMoniker, 0) == S_OK; pMoniker = nullptr) \
 		{ \
- 
+
 #define EndEnumSysDev }}}
 
 template <typename T> __inline void INITDDSTRUCT(T& dd)
@@ -257,7 +257,7 @@ template <class T>
 static CUnknown* WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT* phr)
 {
 	*phr = S_OK;
-	CUnknown* punk = DNew T(lpunk, phr);
+	CUnknown* punk = new(std::nothrow) T(lpunk, phr);
 	if (punk == nullptr) {
 		*phr = E_OUTOFMEMORY;
 	}
