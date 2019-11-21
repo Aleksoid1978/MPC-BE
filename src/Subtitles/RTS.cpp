@@ -121,7 +121,7 @@ bool CWord::Append(CWord* w)
 
 void CWord::Paint(const CPoint& p, const CPoint& org)
 {
-	if (!m_str) {
+	if (m_str.IsEmpty()) {
 		return;
 	}
 
@@ -2594,7 +2594,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CStringW str, STSStyle& style, const ST
 					style.shadowDepthX = style.shadowDepthY = wcstol(params[j], NULL, 10);
 				}
 
-				if (nColor >= 0 && nColor < 4) {
+				if (nColor >= 0) {
 					CString key = params[j].TrimLeft('#');
 					DWORD val;
 					if (g_colors.Lookup(key, val)) {
@@ -2631,7 +2631,7 @@ double CRenderedTextSubtitle::CalcAnimation(double dst, double src, bool fAnimat
 	if (fabs(dst-src) >= 0.0001 && fAnimate) {
 		if (m_time < s) {
 			dst = src;
-		} else if (s <= m_time && m_time < e) {
+		} else if (m_time < e) {
 			double t = pow(1.0 * (m_time - s) / (e - s), m_animAccel);
 			dst = (1 - t) * src + t * dst;
 		}
@@ -2920,7 +2920,7 @@ const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double 
 			if (auto pText = dynamic_cast<const CText*>(s->m_words.GetNext(pos))) {
 				const CString& s = pText->GetText();
 				line.Append(s);
-				if (pText->m_fLineBreak && line) {
+				if (pText->m_fLineBreak && !line.IsEmpty()) {
 					if (!text.IsEmpty()) {
 						text.Append(L"\r\n");
 					}
@@ -3115,7 +3115,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 						p = p1;
 					} else if (p1 == p2) {
 						p = p1;
-					} else if (t1 < m_time && m_time < t2) {
+					} else if (m_time < t2) {
 						double t = 1.0*(m_time-t1)/(t2-t1);
 						p.x = (int)((1-t)*p1.x + t*p2.x);
 						p.y = (int)((1-t)*p1.y + t*p2.y);
@@ -3152,15 +3152,15 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 					if (m_time < t1) {
 						alpha = s->m_effects[k]->param[0];
-					} else if (m_time >= t1 && m_time < t2) {
+					} else if (m_time < t2) {
 						double t = 1.0 * (m_time - t1) / (t2 - t1);
 						alpha = (int)(s->m_effects[k]->param[0]*(1-t) + s->m_effects[k]->param[1]*t);
-					} else if (m_time >= t2 && m_time < t3) {
+					} else if (m_time < t3) {
 						alpha = s->m_effects[k]->param[1];
-					} else if (m_time >= t3 && m_time < t4) {
+					} else if (m_time < t4) {
 						double t = 1.0 * (m_time - t3) / (t4 - t3);
 						alpha = (int)(s->m_effects[k]->param[1]*(1-t) + s->m_effects[k]->param[2]*t);
-					} else if (m_time >= t4) {
+					} else {
 						alpha = s->m_effects[k]->param[2];
 					}
 				}

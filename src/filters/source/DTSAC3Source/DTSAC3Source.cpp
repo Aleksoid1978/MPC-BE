@@ -529,8 +529,6 @@ HRESULT CDTSAC3Stream::CheckMediaType(const CMediaType* pmt)
 
 		if (pmt->subtype == MEDIASUBTYPE_DTS2 && wFmtTag == WAVE_FORMAT_DTS2) {
 			return S_OK;
-		} else if (pmt->subtype == MEDIASUBTYPE_DTS2 && wFmtTag == WAVE_FORMAT_DTS2) {
-			return S_OK;
 		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_AC3 && (wFmtTag == WAVE_FORMAT_UNKNOWN || wFmtTag == WAVE_FORMAT_DOLBY_AC3)) {
 			return S_OK;
 		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_DDPLUS && wFmtTag == WAVE_FORMAT_UNKNOWN) {

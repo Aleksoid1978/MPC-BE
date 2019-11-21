@@ -41,7 +41,7 @@ public:
 		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
 		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr,
 		BOOL bDisableExternalStyleCheckBox = TRUE, BOOL bSaveExternalStyleFile = FALSE);
-	virtual ~CSaveTextFileDialog();
+	~CSaveTextFileDialog() = default;
 
 	CComboBox m_encoding;
 

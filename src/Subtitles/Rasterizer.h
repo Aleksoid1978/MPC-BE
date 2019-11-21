@@ -170,7 +170,7 @@ private:
 	// The following function is templated and forcingly inlined for performance sake
 	template<int flag> __forceinline void _EvaluateLine(int x0, int y0, int x1, int y1);
 	static void _OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy);
-	void CreateWidenedRegionFast(int borderX, int borderY);
+	void CreateWidenedRegionFast(const int borderY);
 
 public:
 	Rasterizer();

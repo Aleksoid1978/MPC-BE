@@ -148,16 +148,19 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 									if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
 										DecompData.clear();
 										free(dst);
+										dst = nullptr;
 										break;
 									}
 								} while (0 == d_stream.avail_out && 0 != d_stream.avail_in && Z_STREAM_END != res);
 
 								inflateEnd(&d_stream);
 
-								DecompData.resize(d_stream.total_out);
-								memcpy(DecompData.data(), dst, DecompData.size());
+								if (dst) {
+									DecompData.resize(d_stream.total_out);
+									memcpy(DecompData.data(), dst, DecompData.size());
 
-								free(dst);
+									free(dst);
+								}
 
 								break;
 							}

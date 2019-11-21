@@ -2144,9 +2144,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Audio);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.push_back(pFGF);
-	}
 
-	if (!IsPreview) {
 		if (src[SRC_MUSEPACK]) {
 			pFGF = DNew CFGFilterInternal<CMusePackSplitter>(MusePackSplitterName, MERIT64_ABOVE_DSHOW);
 		} else {
@@ -2337,9 +2335,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SIPR_WAVE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RAAC);
 		m_transform.push_back(pFGF);
-	}
 
-	if (!IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_REAL]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_REAL]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2540,9 +2536,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DSD8);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DST);
 		m_transform.push_back(pFGF);
-	}
 
-	if (!IsPreview) {
 		pFGF = DNew CFGFilterInternal<CNullTextRenderer>(L"NullTextRenderer", MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Text, MEDIASUBTYPE_NULL);
 		pFGF->AddType(MEDIATYPE_ScriptCommand, MEDIASUBTYPE_NULL);

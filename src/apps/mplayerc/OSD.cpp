@@ -793,16 +793,14 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
-		if (m_pWnd) {
-			m_pWnd->KillTimer((UINT_PTR)this);
-			if (nDuration != -1) {
-				m_pWnd->SetTimer((UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
-			}
-
-			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-			//PostMessageW(WM_OSD_DRAW);
-			DrawWnd();
+		m_pWnd->KillTimer((UINT_PTR)this);
+		if (nDuration != -1) {
+			m_pWnd->SetTimer((UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 		}
+
+		SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		//PostMessageW(WM_OSD_DRAW);
+		DrawWnd();
 	}
 }
 

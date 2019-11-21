@@ -90,7 +90,7 @@ public:
 	STDMETHODIMP_(void) ClearErrors() { m_lOsError = 0; }
 	STDMETHODIMP_(void) SetPTSOffset(REFERENCE_TIME* rtPTSOffset) { m_pCurrentPTSOffset = rtPTSOffset; };
 	STDMETHODIMP_(int) GetSourceType() { return (int)m_sourcetype; }
-	STDMETHODIMP ReOpen(CHdmvClipInfo::CPlaylist& Items) { return OpenFiles(Items); }
+	STDMETHODIMP ReOpen(CHdmvClipInfo::CPlaylist& Items) { return OpenFiles(Items) ? S_OK : E_FAIL; }
 
 	// IFileHandle
 	STDMETHODIMP_(HANDLE) GetFileHandle() { return m_hFile; }

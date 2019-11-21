@@ -459,6 +459,7 @@ void CPPageCapture::FindAnalogDevices()
 			case AnalogVideo_SECAM_L:     standard = "SECAM L";     break;
 			case AnalogVideo_SECAM_L1:    standard = "SECAM L1";    break;
 			case AnalogVideo_PAL_N_COMBO: standard = "PAL N COMBO"; break;
+			default:                      standard = "";
 		}
 
 		CString str;

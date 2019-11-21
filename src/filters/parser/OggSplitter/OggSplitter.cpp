@@ -196,10 +196,10 @@ start:
 
 	OggPage page;
 	for (int i = 0; m_pFile->ReadPages(page) && i < 30; i++) {
-		BYTE* p = page.data();
-		if (!p) {
+		if (page.empty()) {
 			continue;
 		}
+		BYTE* p = page.data();
 
 		if (!(page.m_hdr.header_type_flag & OggPageHeader::continued)) {
 			if (!memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)) {
@@ -391,8 +391,8 @@ start:
 		for (int i = 0; m_pFile->Read(page) && i < 10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 			if (!pOggPin) {
-				BYTE* p = page.data();
-				if (!p || !memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)) {
+				const BYTE* p = page.data();
+				if (page.empty() || !memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)) {
 					start_pos2 = m_pFile->GetPos();
 					continue;
 				}

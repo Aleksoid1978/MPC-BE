@@ -55,7 +55,7 @@ public:
 	BOOL IsMonitor() const;
 
 	operator HMONITOR() const {
-		return this == nullptr ? nullptr : m_hMonitor;
+		return m_hMonitor;
 	}
 
 	BOOL operator ==( const CMonitor& monitor ) const {

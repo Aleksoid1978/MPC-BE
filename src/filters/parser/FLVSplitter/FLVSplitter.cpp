@@ -581,7 +581,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CString name;
 		CMediaType mt;
 
-		if (t.TagType == FLV_SCRIPTDATA && t.DataSize) {
+		if (t.TagType == FLV_SCRIPTDATA) {
 			BYTE type = m_pFile->BitRead(8);
 			SHORT length = m_pFile->BitRead(16);
 			if (type == AMF_DATA_TYPE_STRING && length <= 11) {
@@ -649,7 +649,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 			}
-		} else if (t.TagType == FLV_AUDIODATA && t.DataSize != 0 && fTypeFlagsAudio) {
+		} else if (t.TagType == FLV_AUDIODATA && fTypeFlagsAudio) {
 			UNREFERENCED_PARAMETER(at);
 			AudioTag at;
 			name = L"Audio";
@@ -762,7 +762,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mtAAC.subtype = FOURCCMap(wfeAAC->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 				}
 			}
-		} else if (t.TagType == FLV_VIDEODATA && t.DataSize != 0 && fTypeFlagsVideo) {
+		} else if (t.TagType == FLV_VIDEODATA && fTypeFlagsVideo) {
 			UNREFERENCED_PARAMETER(vt);
 			VideoTag vt;
 			if (ReadTag(vt) && vt.FrameType == 1) {
