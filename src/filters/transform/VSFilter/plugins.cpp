@@ -254,7 +254,7 @@ namespace Plugin
 				dst.h = fa->src.h;
 				dst.bpp = 32;
 				dst.pitch = fa->src.pitch;
-				dst.bits = (LPVOID)fa->src.data;
+				dst.bits = (BYTE*)fa->src.data;
 
 				Render(dst, 10000i64*fa->pfsi->lSourceFrameMS, (float)1000 / fa->pfsi->lMicrosecsPerFrame);
 
@@ -526,7 +526,7 @@ namespace Plugin
 				dst.h = fa->src.h;
 				dst.bpp = 32;
 				dst.pitch = fa->src.pitch;
-				dst.bits = (LPVOID)fa->src.data;
+				dst.bits = (BYTE*)fa->src.data;
 
 				Render(dst, 10000i64*fa->pfsi->lSourceFrameMS, (float)1000 / fa->pfsi->lMicrosecsPerFrame);
 
@@ -798,7 +798,7 @@ namespace Plugin
 				dst.w = vi.width;
 				dst.h = vi.height;
 				dst.pitch = frame->GetPitch();
-				dst.bits = (void**)frame->GetWritePtr();
+				dst.bits = frame->GetWritePtr();
 				dst.bpp = vi.BitsPerPixel();
 				dst.type =
 					vi.IsRGB32() ? ( env->GetVar("RGBA").AsBool() ? MSP_RGBA :MSP_RGB32) :
@@ -915,7 +915,7 @@ namespace Plugin
 				dst.h = vi.height;
 				dst.pitch = frame->GetPitch();
 				dst.pitchUV = frame->GetPitch(PLANAR_U);
-				dst.bits = (void**)frame->GetWritePtr();
+				dst.bits = frame->GetWritePtr();
 				dst.bitsU = frame->GetWritePtr(PLANAR_U);
 				dst.bitsV = frame->GetWritePtr(PLANAR_V);
 				dst.bpp = dst.pitch/dst.w*8; //vi.BitsPerPixel();

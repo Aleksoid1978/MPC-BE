@@ -1498,7 +1498,7 @@ static void StretchBlt(SubPicDesc& spd, CRect dstrect, CVobSubImage& src)
 	dh = dstrect.Height();
 
 	for (int y = dstrect.top; y < dstrect.bottom; y++, srcy += (srcdy<<1)) {
-		RGBQUAD* ptr = (RGBQUAD*)&((BYTE*)spd.bits)[y*spd.pitch] + dstrect.left;
+		RGBQUAD* ptr = (RGBQUAD*)&(spd.bits)[y*spd.pitch] + dstrect.left;
 		RGBQUAD* endptr = ptr + dw;
 
 		for (int sx = srcx; ptr < endptr; sx += (srcdx<<1), ptr++) {

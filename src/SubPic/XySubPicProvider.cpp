@@ -113,7 +113,7 @@ STDMETHODIMP CXySubPicProvider::Render(SubPicDesc& spd, REFERENCE_TIME rt, doubl
 	CRect rcDirty;
 	rcDirty.IntersectRect(CRect(p, sz), CRect(0, 0, spd.w, spd.h));
 	int w = rcDirty.Width(), h = rcDirty.Height();
-	BYTE* d = (BYTE*)spd.bits + spd.pitch * rcDirty.top + rcDirty.left * 4; // move pointer to dirty rect
+	BYTE* d = spd.bits + spd.pitch * rcDirty.top + rcDirty.left * 4; // move pointer to dirty rect
 	for (ptrdiff_t j = 0; j < h; j++, s += pitch, d += spd.pitch) {
 		memcpy(d, s, w * 4);
 	}

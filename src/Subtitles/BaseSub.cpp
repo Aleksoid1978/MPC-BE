@@ -46,13 +46,13 @@ void CBaseSub::InitSpd(SubPicDesc& spd, int nWidth, int nHeight)
 
 		m_pTempSpdBuff.Free();
 		m_pTempSpdBuff.Allocate(m_spd.pitch * m_spd.h);
-		m_spd.bits		= (void*)m_pTempSpdBuff;
+		m_spd.bits		= m_pTempSpdBuff;
 	}
 
 	if (!m_bResizedRender && (m_spd.w != spd.w || m_spd.h != spd.h)) {
 		m_bResizedRender = TRUE;
 
-		BYTE* p = (BYTE*)m_spd.bits;
+		BYTE* p = m_spd.bits;
 		for (int y = 0; y < m_spd.h; y++, p += m_spd.pitch) {
 			memsetd(p, 0xFF000000, m_spd.w * 4);
 		}
@@ -69,7 +69,7 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 
 		HRESULT hr = m_resample.SetParameters(spd.w, spd.h, m_spd.w, m_spd.h, filter, true);
 		if (S_OK == hr) {
-			hr = m_resample.Process((BYTE*)spd.bits, (BYTE*)m_spd.bits);
+			hr = m_resample.Process(spd.bits, m_spd.bits);
 		}
 		ASSERT(hr == S_OK);
 	}

@@ -490,7 +490,7 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		}
 	}
 
-	CopyBuffer(pDataOut, (BYTE*)spd.bits, spd.w, abs(spd.h)*(fFlip?-1:1), spd.pitch, mt.subtype);
+	CopyBuffer(pDataOut, spd.bits, spd.w, abs(spd.h)*(fFlip?-1:1), spd.pitch, mt.subtype);
 
 	{
 		// copy dwTypeSpecificFlags from input IMediaSample
@@ -937,7 +937,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	} else {
 		m_pTempPicBuff.Allocate(m_spd.pitch * m_spd.h);
 	}
-	m_spd.bits = (void*)m_pTempPicBuff;
+	m_spd.bits = m_pTempPicBuff;
 
 	CComPtr<ISubPicAllocator> pSubPicAllocator = DNew CMemSubPicAllocator(m_spd.type, CSize(m_wout, m_hout));
 
