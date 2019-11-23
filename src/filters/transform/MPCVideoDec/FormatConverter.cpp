@@ -523,5 +523,5 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 	return av_pfdesc_fmt1->log2_chroma_h != av_pfdesc_fmt2->log2_chroma_h
 			|| av_pfdesc_fmt1->log2_chroma_w != av_pfdesc_fmt2->log2_chroma_w
 			|| av_pfdesc_fmt1->nb_components != av_pfdesc_fmt2->nb_components
-			|| av_pfdesc_fmt1->comp->depth != av_pfdesc_fmt2->comp->depth;
+			|| av_pfdesc_fmt1->comp[0].depth != av_pfdesc_fmt2->comp[0].depth;
 }
