@@ -407,13 +407,6 @@ namespace Youtube
 			if (JSUrl.IsEmpty()) {
 				JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
 			}
-			if (!JSUrl.IsEmpty()) {
-				JSUrl.Replace(L"\\/", L"/");
-				if (JSUrl.Find(L"s.ytimg.com") == -1) {
-					JSUrl = L"//s.ytimg.com" + JSUrl;
-				}
-				JSUrl = L"https:" + JSUrl;
-			}
 
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
@@ -426,6 +419,13 @@ namespace Youtube
 				if (!data) {
 					InternetCloseHandle(hInet);
 					return false;
+				}
+
+				if (JSUrl.IsEmpty()) {
+					JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START, MATCH_END));
+				}
+				if (JSUrl.IsEmpty()) {
+					JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
 				}
 
 				const CStringA sts = RegExpParseA(data, "\"sts\"\\s*:\\s*(\\d+)");
@@ -511,6 +511,14 @@ namespace Youtube
 					}
 					strUrls.Replace("\\u0026", "&");
 				}
+			}
+
+			if (!JSUrl.IsEmpty()) {
+				JSUrl.Replace(L"\\/", L"/");
+				if (JSUrl.Find(L"s.ytimg.com") == -1) {
+					JSUrl = L"//s.ytimg.com" + JSUrl;
+				}
+				JSUrl = L"https:" + JSUrl;
 			}
 
 			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
