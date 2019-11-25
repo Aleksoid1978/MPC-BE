@@ -458,17 +458,15 @@ namespace Youtube
 
 				// url_encoded_fmt_stream_map
 				const CStringA stream_map = UrlDecode(GetEntry(data, MATCH_STREAM_MAP_START_2, MATCH_END_2));
-				if (stream_map.IsEmpty()) {
-					free(data);
-					InternetCloseHandle(hInet);
-					return false;
+				if (!stream_map.IsEmpty()) {
+					strUrls = stream_map;
 				}
 				// adaptive_fmts
 				const CStringA adaptive_fmts = UrlDecode(GetEntry(data, MATCH_ADAPTIVE_FMTS_START_2, MATCH_END_2));
-
-				strUrls = stream_map;
 				if (!adaptive_fmts.IsEmpty()) {
-					strUrls += ',';
+					if (!strUrls.IsEmpty()) {
+						strUrls += ',';
+					}
 					strUrls += adaptive_fmts;
 				}
 			} else {
@@ -584,10 +582,10 @@ namespace Youtube
 						// adaptive_fmts
 						const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
 						if (!adaptive_fmts.IsEmpty()) {
-							strUrls += ',';
+							if (!strUrls.IsEmpty()) {
+								strUrls += ',';
+							}
 							strUrls += adaptive_fmts;
-						} else {
-							strUrls == adaptive_fmts;
 						}
 						strUrls.Replace("\\u0026", "&");
 					}
