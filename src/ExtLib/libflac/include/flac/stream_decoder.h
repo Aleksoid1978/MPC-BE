@@ -1550,6 +1550,16 @@ FLAC_API FLAC__bool FLAC__stream_decoder_skip_single_frame(FLAC__StreamDecoder *
  */
 FLAC_API FLAC__bool FLAC__stream_decoder_seek_absolute(FLAC__StreamDecoder *decoder, FLAC__uint64 sample);
 
+/** Return client_data from decoder.
+ *  The data pointed to by the pointer should not be modified.
+ *
+ * \param  decoder  A decoder instance.
+ * \retval const void *
+ *    The callee's client data set through FLAC__stream_decoder_init_*().
+ *    Do not modify the contents.
+ */
+FLAC_API const void *FLAC__get_decoder_client_data(FLAC__StreamDecoder *decoder);
+
 /* \} */
 
 #ifdef __cplusplus
