@@ -234,8 +234,10 @@ static int decode_channel(RALFContext *ctx, GetBitContext *gb, int ch,
     int *dst = ctx->channel_data[ch];
 
     ctx->filter_params = get_vlc2(gb, set->filter_params.table, 9, 2);
-    ctx->filter_bits   = (ctx->filter_params - 2) >> 6;
-    ctx->filter_length = ctx->filter_params - (ctx->filter_bits << 6) - 1;
+    if (ctx->filter_params > 1) {
+        ctx->filter_bits   = (ctx->filter_params - 2) >> 6;
+        ctx->filter_length = ctx->filter_params - (ctx->filter_bits << 6) - 1;
+    }
 
     if (ctx->filter_params == FILTER_RAW) {
         for (i = 0; i < length; i++)
@@ -262,8 +264,8 @@ static int decode_channel(RALFContext *ctx, GetBitContext *gb, int ch,
             t = get_vlc2(gb, vlc[cmode].table, vlc[cmode].bits, 2);
             t = extend_code(gb, t, 21, add_bits);
             if (!cmode)
-                coeff -= 12 << add_bits;
-            coeff = t - coeff;
+                coeff -= 12U << add_bits;
+            coeff = (unsigned)t - coeff;
             ctx->filter[i] = coeff;
 
             cmode = coeff >> add_bits;
@@ -406,7 +408,7 @@ static int decode_block(AVCodecContext *avctx, GetBitContext *gb,
     case 4:
         for (i = 0; i < len; i++) {
             t  =   ch1[i] + ctx->bias[1];
-            t2 = ((ch0[i] + ctx->bias[0]) << 1) | (t & 1);
+            t2 = ((ch0[i] + ctx->bias[0]) * 2) | (t & 1);
             dst0[i] = (t2 + t) / 2;
             dst1[i] = (t2 - t) / 2;
         }
