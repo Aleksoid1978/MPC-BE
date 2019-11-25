@@ -5,7 +5,7 @@
 
 Updated libraries:
 	dav1d git-0.5.1-1-g07dab8c;
-	ffmpeg git-n4.3-dev-1171-g37d8ae9da8;
+	ffmpeg git-n4.3-dev-1509-gd07d1c1dd0;
 	Little-CMS git-lcms2.9-41-ge3beb54;
 	libflac git-1.3.3-44-gb02e1593;
 	MediaInfo git-v19.09-24-gbef2c931;

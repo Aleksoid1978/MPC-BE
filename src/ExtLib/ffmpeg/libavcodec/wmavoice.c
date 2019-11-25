@@ -433,6 +433,9 @@ static av_cold int wmavoice_decode_init(AVCodecContext *ctx)
         return AVERROR_INVALIDDATA;
     }
 
+    if (ctx->sample_rate >= INT_MAX / (256 * 37))
+        return AVERROR_INVALIDDATA;
+
     s->min_pitch_val    = ((ctx->sample_rate << 8)      /  400 + 50) >> 8;
     s->max_pitch_val    = ((ctx->sample_rate << 8) * 37 / 2000 + 50) >> 8;
     pitch_range         = s->max_pitch_val - s->min_pitch_val;
@@ -1520,7 +1523,7 @@ static int synth_frame(AVCodecContext *ctx, GetBitContext *gb, int frame_idx,
 
         /* "pitch-diff-per-sample" for calculation of pitch per sample */
         s->pitch_diff_sh16 =
-            ((cur_pitch_val - s->last_pitch_val) << 16) / MAX_FRAMESIZE;
+            (cur_pitch_val - s->last_pitch_val) * (1 << 16) / MAX_FRAMESIZE;
     }
 
     /* Global gain (if silence) and pitch-adaptive window coordinates */
