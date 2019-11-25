@@ -57,9 +57,4 @@ typedef struct FLAC__StreamDecoderProtected {
  */
 uint32_t FLAC__stream_decoder_get_input_bytes_unconsumed(const FLAC__StreamDecoder *decoder);
 
-/*
- * Return client_data from decoder. The data pointed to by the pointer should not be modified.
- */
-FLAC_API const void *FLAC__get_decoder_client_data(FLAC__StreamDecoder *decoder);
-
 #endif

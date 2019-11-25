@@ -39,21 +39,24 @@
 #include <sys/utime.h>
 #include "FLAC/ordinals.h"
 
+/***** FIXME: KLUDGE: export these syms for flac.exe, metaflac.exe, etc. *****/
+#include "FLAC/export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void flac_internal_set_utf8_filenames(FLAC__bool flag);
-FLAC__bool flac_internal_get_utf8_filenames(void);
+FLAC_API void flac_internal_set_utf8_filenames(FLAC__bool flag);
+FLAC_API FLAC__bool flac_internal_get_utf8_filenames(void);
 #define flac_set_utf8_filenames flac_internal_set_utf8_filenames
 #define flac_get_utf8_filenames flac_internal_get_utf8_filenames
 
-FILE* flac_internal_fopen_utf8(const char *filename, const char *mode);
-int flac_internal_stat64_utf8(const char *path, struct __stat64 *buffer);
-int flac_internal_chmod_utf8(const char *filename, int pmode);
-int flac_internal_utime_utf8(const char *filename, struct utimbuf *times);
-int flac_internal_unlink_utf8(const char *filename);
-int flac_internal_rename_utf8(const char *oldname, const char *newname);
+FLAC_API FILE* flac_internal_fopen_utf8(const char *filename, const char *mode);
+FLAC_API int flac_internal_stat64_utf8(const char *path, struct __stat64 *buffer);
+FLAC_API int flac_internal_chmod_utf8(const char *filename, int pmode);
+FLAC_API int flac_internal_utime_utf8(const char *filename, struct utimbuf *times);
+FLAC_API int flac_internal_unlink_utf8(const char *filename);
+FLAC_API int flac_internal_rename_utf8(const char *oldname, const char *newname);
 
 #ifdef __cplusplus
 } /* extern "C" */
