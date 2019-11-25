@@ -454,6 +454,22 @@ static const char* Mpeg4_chan_ChannelDescription_Layout (int32u ChannelLabel)
         case 0x1000D : return "Discrete-13";
         case 0x1000E : return "Discrete-14";
         case 0x1000F : return "Discrete-15";
+        case 0x10010 : return "Discrete-16";
+        case 0x10011 : return "Discrete-17";
+        case 0x10012 : return "Discrete-18";
+        case 0x10013 : return "Discrete-19";
+        case 0x10014 : return "Discrete-20";
+        case 0x10015 : return "Discrete-21";
+        case 0x10016 : return "Discrete-22";
+        case 0x10017 : return "Discrete-23";
+        case 0x10018 : return "Discrete-24";
+        case 0x10019 : return "Discrete-25";
+        case 0x1001A : return "Discrete-26";
+        case 0x1001B : return "Discrete-27";
+        case 0x1001C : return "Discrete-28";
+        case 0x1001D : return "Discrete-29";
+        case 0x1001E : return "Discrete-30";
+        case 0x1001F : return "Discrete-31";
         default  : return "?";
     }
 }

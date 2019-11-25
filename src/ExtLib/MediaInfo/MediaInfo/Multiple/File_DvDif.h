@@ -168,12 +168,14 @@ protected :
     int64u Speed_Contains_NULL;                         //Per Frame - Error 4
     int64u Speed_FrameCount_Arb_Incoherency;            //Global    - Error 5
     int64u Speed_FrameCount_Stts_Fluctuation;           //Global    - Error 6
+    int8u  SMP;
     int8u  QU;
     bool   QU_FSC; //Validity is with QU
     bool   QU_System; //Validity is with QU
     bool   REC_ST;
     bool   REC_END;
     bool   REC_IsValid;
+    std::bitset<8> audio_source_IsPresentInFrame;
     bool   System;
     bool   System_IsValid;
     bool   Frame_AtLeast1DIF;
@@ -242,6 +244,7 @@ protected :
     Ztring Speed_RecDateZ_Last;
     Ztring Speed_RecDateZ_Current;
     std::vector<size_t> Video_STA_Errors; //Per STA type
+    std::vector<size_t> Video_STA_Errors_ByDseq; //Per Dseq & STA type
     std::vector<size_t> Video_STA_Errors_Total; //Per STA type
     std::vector<size_t> Audio_Errors; //Per Dseq
     std::vector<bool> audio_source_IsPresent;

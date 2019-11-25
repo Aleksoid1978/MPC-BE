@@ -368,7 +368,6 @@ void MediaInfo_Config::Init(bool Force)
         Trace_Layers.reset();
         Trace_Modificators.clear();
         Version.clear();
-        Version.clear();
         ColumnSeparator.clear();
         LineSeparator.clear();
         TagSeparator.clear();

@@ -811,8 +811,8 @@ void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
             Fill(StreamKind_Last, StreamPos_Last, "ChromaSubsampling", DPX_Descriptors_ChromaSubsampling(Descriptor));
             Fill(StreamKind_Last, StreamPos_Last, "BitDepth", BitDephs);
             Fill(StreamKind_Last, StreamPos_Last, "colour_description_present", "Yes");
-            Fill(StreamKind_Last, StreamPos_Last, "colour_primaries", DPX_TransferCharacteristic(TransferCharacteristic));
-            Fill(StreamKind_Last, StreamPos_Last, "transfer_characteristics", DPX_ColorimetricSpecification(ColorimetricSpecification));
+            Fill(StreamKind_Last, StreamPos_Last, "colour_primaries", DPX_ColorimetricSpecification(ColorimetricSpecification));
+            Fill(StreamKind_Last, StreamPos_Last, "transfer_characteristics", DPX_TransferCharacteristic(TransferCharacteristic));
             if (ComponentDataPackingMethod<8)
             {
                 Fill(StreamKind_Last, StreamPos_Last, "Format_Settings", DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]);

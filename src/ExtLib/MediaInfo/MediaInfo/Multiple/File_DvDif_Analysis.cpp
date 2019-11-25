@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_DvDif.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include "MediaInfo/MediaInfo_Events_Internal.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -205,6 +206,11 @@ void File_DvDif::Read_Buffer_Continue()
                             System_IsValid=true;
                             video_source_Detected=true;
                         }
+                        //video_sourcecontrol
+                        if (PackType==0x61)
+                        {
+                            aspect=(Buffer[Buffer_Offset+3+Pos+2]&0x7);
+                        }
 
                         //video_recdate
                         if (PackType==0x62) //Pack type=0x62 (video_rectime)
@@ -281,12 +287,14 @@ void File_DvDif::Read_Buffer_Continue()
                               QU_System =(Buffer[Buffer_Offset+3+3]&0x20)?true:false; //50/60
 
                         int8u AUDIO_MODE=Buffer[Buffer_Offset+3+2]&0x0F;
+                              SMP       =(Buffer[Buffer_Offset+3+4]>>3)&0x07;
                               QU        =Buffer[Buffer_Offset+3+4]&0x07;
 
                         size_t Channel=(QU_FSC?2:0)+((Buffer[Buffer_Offset+1]>>4)>=(QU_System?6:5)?1:0); //If Dseq>=5 or 6
                         if (audio_source_IsPresent.empty())
                             audio_source_IsPresent.resize(8);
                         audio_source_IsPresent[Channel]=true;
+                        audio_source_IsPresentInFrame.set(Channel);
 
                         if (AUDIO_MODE==0x0F)
                         {
@@ -418,9 +426,16 @@ void File_DvDif::Read_Buffer_Continue()
                     {
                         if (video_source_Detected)
                         {
+                            int8u STA_Error=Buffer[Buffer_Offset+3]>>4;
+
                             if (Video_STA_Errors.empty())
                                 Video_STA_Errors.resize(16);
-                            Video_STA_Errors[Buffer[Buffer_Offset+3]>>4]++;
+                            Video_STA_Errors[STA_Error]++;
+
+                            if (Video_STA_Errors_ByDseq.empty())
+                                Video_STA_Errors_ByDseq.resize(16*16); // Per Dseq and STA
+                            uint8_t Dseq=Buffer[Buffer_Offset+1]>>4;
+                            Video_STA_Errors_ByDseq[(Dseq<<4)|STA_Error]++;
                         }
                     }
                 }
@@ -465,6 +480,65 @@ void File_DvDif::Errors_Stats_Update()
         bool Infos_AreDetected=false;
         bool Arb_AreDetected=false;
 
+        EVENT_BEGIN(DvDif, Change, 0)
+            Event.Width=720;
+            Event.Height=system?576:480;
+            if (!FSC_WasSet) //Original DV 25 Mbps
+            {
+                if (system==false) //NTSC
+                {
+                    switch (video_source_stype)
+                    {
+                        case  0 : Event.VideoChromaSubsampling=0; break; //NTSC 25 Mbps
+                        default : Event.VideoChromaSubsampling=(int32u)-1;
+                    }
+                }
+                else //PAL
+                {
+                    switch (video_source_stype)
+                    {
+                        case  0 : if (APT==0)
+                                    Event.VideoChromaSubsampling=1;      //PAL 25 Mbps (IEC 61834)
+                                  else
+                                    Event.VideoChromaSubsampling=0;      //PAL 25 Mbps (SMPTE 314M)
+                                  break;
+                        default : Event.VideoChromaSubsampling=(int32u)-1;
+                    }
+                }
+            }
+            else //DV 50 Mbps and 100 Mbps
+                Event.VideoChromaSubsampling=2;
+            Event.VideoScanType=(int32u)-1;
+            Event.VideoRatio_N=(aspect==0 || aspect==4)?4:16;
+            Event.VideoRatio_D=(aspect==0 || aspect==4)?3:9;
+            Event.VideoRate_N=system?25:30000;
+            Event.VideoRate_D=system?1:1001;
+            if (audio_source_IsPresentInFrame.count())
+            {
+                switch(SMP)
+                {
+                    case 0:Event.AudioRate_N=48000; break;
+                    case 1:Event.AudioRate_N=44100; break;
+                    case 2:Event.AudioRate_N=32000; break;
+                    default:Event.AudioRate_N=0;
+                }
+                Event.AudioRate_D=(SMP<=2)?1:0;
+                Event.AudioChannels=audio_source_IsPresentInFrame.count();
+                switch(QU)
+                {
+                    case 0:Event.AudioBitDepth=16; break;
+                    case 1:Event.AudioBitDepth=12; break;
+                    default:Event.AudioBitDepth=0;
+                }
+            }
+            else
+            {
+                Event.AudioRate_N=0;
+                Event.AudioRate_D=0;
+                Event.AudioChannels=0;
+                Event.AudioBitDepth=0;
+            }
+        EVENT_END()
         #if MEDIAINFO_EVENTS
             //Demux
             struct MediaInfo_Event_DvDif_Analysis_Frame_0 Event;
@@ -926,8 +1000,6 @@ void File_DvDif::Errors_Stats_Update()
         //Error 2: Audio errors
         if (QU!=(int8u)-1 && (!Audio_Invalids.empty() || !Audio_Errors.empty()))
         {
-            if (Audio_Errors.empty())
-                Audio_Errors.resize(16);
             bool ErrorsAreAlreadyDetected=false;
             for (size_t Channel=0; Channel<4; Channel++)
             {
@@ -941,7 +1013,7 @@ void File_DvDif::Errors_Stats_Update()
                     Pos_End=Pos_Begin; //Not here
                 for (size_t Pos=Pos_Begin; Pos<Pos_End; Pos++)
                 {
-                    if (Audio_Errors[Pos])
+                    if (!Audio_Errors.empty() && Audio_Errors[Pos])
                     {
                         Audio_Errors_Count+=Audio_Errors[Pos];
                         Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(Audio_Errors[Pos]);
@@ -1180,6 +1252,19 @@ void File_DvDif::Errors_Stats_Update()
                 Errors=Errors_Stats_Line_Details.To_Local();
                 Event.Errors=(char*)Errors.c_str();
             }
+            struct MediaInfo_Event_DvDif_Analysis_Frame_1 Event1;
+            Event1.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_DvDif, MediaInfo_Event_DvDif_Analysis_Frame, 1);
+            Event1.TimeCode=Event.TimeCode;
+            Event1.RecordedDateTime1=Event.RecordedDateTime1;
+            Event1.RecordedDateTime2=Event.RecordedDateTime2;
+            Event1.Arb=Event.Arb;
+            Event1.Verbosity=Event.Verbosity;
+            Event1.Errors=Event.Errors;
+            Event1.Video_STA_Errors_Count=Video_STA_Errors_ByDseq.size();
+            Event1.Video_STA_Errors=Video_STA_Errors_ByDseq.empty()?NULL:&Video_STA_Errors_ByDseq[0];
+            Event1.Audio_Data_Errors_Count=Audio_Errors.size();
+            Event1.Audio_Data_Errors=Audio_Errors.empty()?NULL:&Audio_Errors[0];
+            Config->Event_Send(NULL, (const int8u*)&Event1, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1));
             Config->Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0));
         #endif //MEDIAINFO_EVENTS
     }
@@ -1267,6 +1352,7 @@ void File_DvDif::Errors_Stats_Update()
     Speed_Arb_Current.Clear();
     Speed_FrameCount++;
     REC_IsValid=false;
+    audio_source_IsPresentInFrame.reset();
     Speed_Contains_NULL=0;
     Frame_AtLeast1DIF=true;
     if (Buffer_Offset+2>=Buffer_Size
@@ -1275,6 +1361,7 @@ void File_DvDif::Errors_Stats_Update()
       && Buffer[Buffer_Offset+2]==0x00))
         Frame_AtLeast1DIF=false;
     Video_STA_Errors.clear();
+    Video_STA_Errors_ByDseq.clear();
     Audio_Errors.clear();
     Audio_Invalids.clear();
     Stats_Total_AlreadyDetected=false;
