@@ -508,6 +508,40 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_0
     MediaInfo_int8u         Verbosity;
     char*                   Errors;
 };
+struct MediaInfo_Event_DvDif_Analysis_Frame_1
+{
+    MEDIAINFO_EVENT_GENERIC
+    MediaInfo_int32u        TimeCode;
+    MediaInfo_int32u        RecordedDateTime1;
+    MediaInfo_int16u        RecordedDateTime2;
+    MediaInfo_int8u         Arb;
+    MediaInfo_int8u         Verbosity;
+    char*                   Errors;
+    size_t                  Video_STA_Errors_Count;
+    size_t*                 Video_STA_Errors;
+    size_t                  Audio_Data_Errors_Count;
+    size_t*                 Audio_Data_Errors;
+};
+
+/*-------------------------------------------------------------------------*/
+/* Change in the stream config                                             */
+#define MediaInfo_Event_DvDif_Change 0xB002
+struct MediaInfo_Event_DvDif_Change_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    MediaInfo_int32u        Width;
+    MediaInfo_int32u        Height;
+    MediaInfo_int32u        VideoChromaSubsampling; // -1=unknown, 0=411, 1=420, 2=422
+    MediaInfo_int32u        VideoScanType; // -1=unknown
+    MediaInfo_int32u        VideoRatio_N;
+    MediaInfo_int32u        VideoRatio_D;
+    MediaInfo_int32u        VideoRate_N;
+    MediaInfo_int32u        VideoRate_D;
+    MediaInfo_int32u        AudioRate_N;
+    MediaInfo_int32u        AudioRate_D;
+    MediaInfo_int32u        AudioChannels;
+    MediaInfo_int32u        AudioBitDepth;
+};
 
 /***************************************************************************/
 /* CDXA                                                                    */

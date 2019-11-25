@@ -2998,7 +2998,7 @@ void File_Avc::sei_message_user_data_registered_itu_t_t35_GA94_03_Delayed(int32u
                         break;
                 if (seq_parameter_set_Item!=seq_parameter_sets.end())
                 {
-                    if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_info_present_flag)
+                    if (((*seq_parameter_set_Item)->vui_parameters) && ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_info_present_flag))
                     {
                         if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc<Avc_PixelAspectRatio_Size)
                             PixelAspectRatio=Avc_PixelAspectRatio[(*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc];

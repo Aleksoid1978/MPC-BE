@@ -268,6 +268,7 @@ File_DvDif::File_DvDif()
     Speed_FrameCount_Stts_Fluctuation=0;
     System_IsValid=false;
     Frame_AtLeast1DIF=false;
+    SMP=(int8u)-1;
     QU=(int8u)-1;
     CH_IsPresent.resize(8);
     Speed_TimeCode_IsValid=false;
@@ -641,6 +642,7 @@ bool File_DvDif::Synched_Test()
         return true;
 
     SCT =(Buffer[Buffer_Offset  ]&0xE0)>>5;
+    Dseq= Buffer[Buffer_Offset+1]>>4;
     DBN = Buffer[Buffer_Offset+2];
 
     //DIF Sequence Numbers
