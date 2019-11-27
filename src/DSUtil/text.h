@@ -145,8 +145,8 @@ T ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 
 extern DWORD    CharSetToCodePage(DWORD dwCharSet);
 extern CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet);
-extern CStringA UrlEncode(CStringA str_in, bool fArg = false);
-extern CStringA UrlDecode(CStringA str_in);
+extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
+extern CStringA UrlDecode(const CStringA& str_in);
 extern CString  ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 
@@ -161,7 +161,7 @@ void FixFilename(CStringW& str);
 void EllipsisURL(CStringW& url, const int maxlen);
 void EllipsisPath(CStringW& path, const int maxlen);
 
-CString FormatNumber(CString szNumber, bool bNoFractionalDigits = true);
+CString FormatNumber(const CString& szNumber, const bool bNoFractionalDigits = true);
 
 CStringW FourccToWStr(uint32_t fourcc);
 
