@@ -421,7 +421,7 @@ namespace Youtube
 				player_responce_jsonDocument.Parse(player_responce_jsonData);
 			}
 
-			using streamingDataFormat = std::tuple<int, CStringA, CString, CStringA>;
+			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 
 			CStringA strUrls;
@@ -870,7 +870,7 @@ namespace Youtube
 							CStringA signature_prefix = "signature";
 
 							std::list<CStringA> paramsA;
-							Explode((const CStringA)cipher, paramsA, '&');
+							Explode(cipher, paramsA, '&');
 
 							for (const auto& paramA : paramsA) {
 								const auto pos = paramA.Find('=');
