@@ -11900,7 +11900,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CString youtubeUrl;
 
 	if (!m_youtubeUrllist.empty()) {
-		youtubeUrl = (CString)pOFD->fns.front();
+		youtubeUrl = pOFD->fns.front().GetName();
 		Content::Online::Disconnect(youtubeUrl);
 
 		pOFD->fns.clear();
@@ -11927,9 +11927,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	} else if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
 		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
-			youtubeUrl = fn;
 			std::list<CString> urls;
 			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart)) {
+				youtubeUrl = fn;
 				Content::Online::Disconnect(fn);
 
 				pOFD->fns.clear();
