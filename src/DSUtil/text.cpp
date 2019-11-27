@@ -63,13 +63,13 @@ CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet)
 	return str;
 }
 
-CStringA UrlEncode(CStringA str_in, bool fArg)
+CStringA UrlEncode(const CStringA& str_in, const bool bArg/* = false*/)
 {
 	CStringA str_out;
 
 	for (int i = 0; i < str_in.GetLength(); i++) {
 		char c = str_in[i];
-		if (fArg && (c == '#' || c == '?' || c == '%' || c == '&' || c == '=')) {
+		if (bArg && (c == '#' || c == '?' || c == '%' || c == '&' || c == '=')) {
 			str_out.AppendFormat("%%%02x", (BYTE)c);
 		} else if (c > 0x20 && c < 0x7f) {
 			str_out += c;
@@ -81,7 +81,7 @@ CStringA UrlEncode(CStringA str_in, bool fArg)
 	return str_out;
 }
 
-CStringA UrlDecode(CStringA str_in)
+CStringA UrlDecode(const CStringA& str_in)
 {
 	CStringA str_out;
 
@@ -393,7 +393,7 @@ void EllipsisPath(CStringW& path, const int maxlen)
 	}
 }
 
-CString FormatNumber(CString szNumber, bool bNoFractionalDigits /*= true*/)
+CString FormatNumber(const CString& szNumber, const bool bNoFractionalDigits /*= true*/)
 {
 	CString ret;
 
