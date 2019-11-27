@@ -408,7 +408,7 @@ namespace Youtube
 				JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
 			}
 
-			CStringA player_responce_jsonData = UrlDecode(GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END));
+			CStringA player_responce_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
 			rapidjson::Document player_responce_jsonDocument;
 			if (!player_responce_jsonData.IsEmpty()) {
 				player_responce_jsonData += "}";
@@ -421,7 +421,7 @@ namespace Youtube
 				player_responce_jsonDocument.Parse(player_responce_jsonData);
 			}
 
-			using streamingDataFormat = std::tuple<int, CStringA, CStringA>;
+			using streamingDataFormat = std::tuple<int, CStringA, CString, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 
 			CStringA strUrls;
@@ -527,13 +527,19 @@ namespace Youtube
 											if (format.HasMember("qualityLabel")) {
 												const auto& qualityLabel = format["qualityLabel"];
 												if (qualityLabel.IsString()) {
-													std::get<2>(element) = qualityLabel.GetString();
+													std::get<3>(element) = qualityLabel.GetString();
 												}
 											}
 											if (format.HasMember("url")) {
 												const auto& url = format["url"];
 												if (url.IsString()) {
 													std::get<1>(element) = url.GetString();
+													streamingDataFormatList.emplace_back(element);
+												}
+											} else if (format.HasMember("cipher")) {
+												const auto& cipher = format["cipher"];
+												if (cipher.IsString()) {
+													std::get<2>(element) = cipher.GetString();
 													streamingDataFormatList.emplace_back(element);
 												}
 											}
@@ -556,13 +562,19 @@ namespace Youtube
 											if (adaptiveFormat.HasMember("qualityLabel")) {
 												const auto& qualityLabel = adaptiveFormat["qualityLabel"];
 												if (qualityLabel.IsString()) {
-													std::get<2>(element) = qualityLabel.GetString();
+													std::get<3>(element) = qualityLabel.GetString();
 												}
 											}
 											if (adaptiveFormat.HasMember("url")) {
 												const auto& url = adaptiveFormat["url"];
 												if (url.IsString()) {
 													std::get<1>(element) = url.GetString();
+													streamingDataFormatList.emplace_back(element);
+												}
+											} else if (adaptiveFormat.HasMember("cipher")) {
+												const auto& cipher = adaptiveFormat["cipher"];
+												if (cipher.IsString()) {
+													std::get<2>(element) = cipher.GetString();
 													streamingDataFormatList.emplace_back(element);
 												}
 											}
@@ -849,8 +861,40 @@ namespace Youtube
 			if (strUrlsLive.empty()) {
 				if (!streamingDataFormatList.empty()) {
 					for (const auto& element : streamingDataFormatList) {
-						const auto& [itag, url, quality_label] = element;
-						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
+						const auto& [itag, url, cipher, quality_label] = element;
+						if (!url.IsEmpty()) {
+							AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
+						} else {
+							CStringA url;
+							CStringA signature;
+							CStringA signature_prefix = "signature";
+
+							std::list<CStringA> paramsA;
+							Explode((const CStringA)cipher, paramsA, '&');
+
+							for (const auto& paramA : paramsA) {
+								const auto pos = paramA.Find('=');
+								if (pos > 0) {
+									const auto paramHeader = paramA.Left(pos);
+									const auto paramValue = paramA.Mid(pos + 1);
+
+									if (paramHeader == "url") {
+										url = UrlDecode(paramValue);
+									} else if (paramHeader == "s") {
+										signature = UrlDecode(paramValue);
+									} else if (paramHeader == "sp") {
+										signature_prefix = paramValue;
+									}
+								}
+							}
+
+							if (!url.IsEmpty()) {
+								const auto signature_format("&" + signature_prefix + "=%s");
+								SignatureDecode(url, signature, signature_format.GetString());
+
+								AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
+							}
+						}
 					}
 				} else {
 					std::list<CStringA> urlsList;
