@@ -506,6 +506,56 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
+		// MPEG-TS probe
+		m_pFile->Seek(0);
+		int count = 0;
+		int mpegts_packet_len = 0;
+
+		for (int i = 0; i < 192; i++) {
+			if (m_pFile->BitRead(8, true) == 0x47) {
+				auto bFound = false;
+				const auto pos = m_pFile->GetPos();
+				m_pFile->Seek(pos + 188);
+				if (m_pFile->BitRead(8, true) == 0x47) {
+					bFound = true;
+					if (mpegts_packet_len != 188) {
+						count = 0;
+					}
+					mpegts_packet_len = 188; // TS stream
+					if (count > 1) {
+						break;
+					}
+					count++;
+				} else {
+					m_pFile->Seek(pos + 192);
+					if (m_pFile->BitRead(8, true) == 0x47) {
+						bFound = true;
+						if (mpegts_packet_len != 192) {
+							count = 0;
+						}
+						mpegts_packet_len = 192; // M2TS stream
+						if (count > 1) {
+							break;
+						}
+						count++;
+					}
+				}
+
+				if (!bFound) {
+					m_pFile->Seek(pos + 1);
+				}
+			} else {
+				mpegts_packet_len = 0;
+				m_pFile->Skip(1);
+			}
+		}
+
+		if (mpegts_packet_len) {
+			return E_FAIL;
+		}
+	}
+
+	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
 		if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetLength()), &mt, false)) {
