@@ -39,14 +39,14 @@ using namespace MatroskaReader;
 	{ \
 		switch (pMN->m_id) \
 		{ \
- 
+
 #define EndChunk \
 		} \
 	} \
 	while (pMN->Next()); \
 \
 	return S_OK; \
- 
+
 static void bswap(BYTE* s, int len)
 {
 	for (BYTE* d = s + len - 1; s < d; s++, d--) {
@@ -919,6 +919,10 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			while (FramesInLaceLessOne--) {
 				DiffSize.Parse(pMN);
 				FrameSize += DiffSize;
+				if (FrameSize > (QWORD)INT_MAX) {
+					DLog(L"SimpleBlock::Parse() : EBML block size error 0x%016I64x at %I64u", FrameSize, pMN->GetPos());
+					return E_FAIL;
+				}
 				lens.push_back(FrameSize);
 				tlen += FrameSize;
 			}
