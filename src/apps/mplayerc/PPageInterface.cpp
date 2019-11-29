@@ -174,7 +174,7 @@ BOOL CPPageInterface::OnInitDialog()
 
 	CString str;
 
-	for (int i = 10; i < 26; ++i) {
+	for (int i = 8; i <= 25; ++i) {
 		str.Format(L"%d", i);
 		m_FontSize.AddString(str);
 
