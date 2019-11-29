@@ -919,7 +919,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			while (FramesInLaceLessOne--) {
 				DiffSize.Parse(pMN);
 				FrameSize += DiffSize;
-				if (FrameSize > (QWORD)INT_MAX) {
+				if ((FrameSize > (QWORD)INT_MAX) || (pMN->GetPos() + FrameSize > pMN->GetLength())) {
 					DLog(L"SimpleBlock::Parse() : invalid EBML block size %I64u at %I64u", FrameSize, pMN->GetPos());
 					return E_FAIL;
 				}
