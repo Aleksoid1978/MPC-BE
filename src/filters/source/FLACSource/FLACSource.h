@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -110,7 +110,7 @@ public:
 	HRESULT			CheckMediaType(const CMediaType* pMediaType);
 	HRESULT			GetMediaType(int iPosition, CMediaType* pmt);
 
-	void			UpdateFromMetadata (void* pBuffer);
+	void			UpdateFromMetadata(void* pBuffer);
 	inline CFile*	GetFile() {return &m_file;};
 
 	file_info_struct	GetInfo();

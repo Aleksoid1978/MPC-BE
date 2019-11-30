@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 #endif
 #include <uuids.h>
 #include <moreuuids.h>
+#include <algorithm>
 #include "FLACSource.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/CUE.h"
@@ -349,7 +350,7 @@ HRESULT CFLACStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, l
 	FLAC__uint64	llCurPos;
 	FLAC__uint64	llNextPos;
 
-	if (m_bDiscontinuity) {
+	if (m_bDiscontinuity && m_rtDuration) {
 		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, FLAC__uint64((1.0 * m_rtPosition * m_i64TotalNumSamples) / m_rtDuration));
 		// need calculate in double, because uint64 can give overflow
 	}
@@ -381,7 +382,7 @@ HRESULT CFLACStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, l
 		if ((FLAC_DECODER)->protected_->blocksize > 0 && (FLAC_DECODER)->protected_->sample_rate > 0) {
 			m_AvgTimePerFrame = (FLAC_DECODER)->protected_->blocksize * UNITS / (FLAC_DECODER)->protected_->sample_rate;
 		} else {
-			m_AvgTimePerFrame = m_rtDuration * len / (m_llFileSize - m_llOffset);
+			m_AvgTimePerFrame = std::max(1ULL, m_rtDuration * len / (m_llFileSize - m_llOffset));
 		}
 	}
 
@@ -449,52 +450,50 @@ static bool ParseVorbisTag(const CString field_name, const CString VorbisTag, CS
  */
 static int CalculateFLACFrameSize(UINT max_blocksize, UINT channels, UINT bits_per_sample)
 {
-	int count;
-
-	count = 16;										/* frame header */
-	count += channels * ((7+bits_per_sample+7)/8);	/* subframe headers */
+	int count = 16;                                      /* frame header */
+	count += channels * ((7 + bits_per_sample + 7) / 8); /* subframe headers */
 	if (channels == 2) {
 		/* for stereo, need to account for using decorrelation */
-		count += (( 2*bits_per_sample+1) * max_blocksize + 7) / 8;
+		count += ((2 * bits_per_sample + 1) * max_blocksize + 7) / 8;
 	} else {
-		count += ( channels*bits_per_sample * max_blocksize + 7) / 8;
+		count += (channels*bits_per_sample * max_blocksize + 7) / 8;
 	}
-	count += 2;										/* frame footer */
+	count += 2;                                          /* frame footer */
 
 	return count;
 }
 
-void CFLACStream::UpdateFromMetadata (void* pBuffer)
+void CFLACStream::UpdateFromMetadata(void* pBuffer)
 {
-	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*)pBuffer;
+	auto pMetadata = (const FLAC__StreamMetadata*)pBuffer;
 
 	if (pMetadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
-		const FLAC__StreamMetadata_StreamInfo *si = &pMetadata->data.stream_info;
+		const auto& si = pMetadata->data.stream_info;
 
-		m_nMaxFrameSize			= si->max_framesize;
+		m_nMaxFrameSize			= si.max_framesize;
 		if (!m_nMaxFrameSize) {
-			m_nMaxFrameSize		= CalculateFLACFrameSize(si->max_blocksize,
-														 si->channels,
-														 si->bits_per_sample);
+			m_nMaxFrameSize		= CalculateFLACFrameSize(si.max_blocksize,
+														 si.channels,
+														 si.bits_per_sample);
 		}
-		m_nSamplesPerSec		= si->sample_rate;
-		m_nChannels				= si->channels;
-		m_wBitsPerSample		= si->bits_per_sample;
-		m_i64TotalNumSamples	= si->total_samples;
+		m_nSamplesPerSec		= si.sample_rate;
+		m_nChannels				= si.channels;
+		m_wBitsPerSample		= si.bits_per_sample;
+		m_i64TotalNumSamples	= si.total_samples;
 		m_nAvgBytesPerSec		= (m_nChannels * (m_wBitsPerSample >> 3)) * m_nSamplesPerSec;
 
 		// === Init members from base classes
 		GetFileSizeEx (m_file.m_hFile, (LARGE_INTEGER*)&m_llFileSize);
 		m_rtDuration			= (m_i64TotalNumSamples * UNITS) / m_nSamplesPerSec;
-		m_rtStop				= m_rtDuration;
-		m_AvgTimePerFrame		= (m_nMaxFrameSize + si->min_framesize) * m_rtDuration / 2 / m_llFileSize;
+		m_rtStop				= !m_i64TotalNumSamples ? LONGLONG_MAX : m_rtDuration;
+		m_AvgTimePerFrame		= std::max(1ULL, (m_nMaxFrameSize + si.min_framesize) * m_rtDuration / 2 / m_llFileSize);
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
-		const FLAC__StreamMetadata_VorbisComment *vc = &pMetadata->data.vorbis_comment;
+		const auto& vc = pMetadata->data.vorbis_comment;
 
-		file_info.got_vorbis_comments = (vc->num_comments > 0);
-		for(unsigned i = 0; i < vc->num_comments; i++) {
+		file_info.got_vorbis_comments = (vc.num_comments > 0);
+		for(unsigned i = 0; i < vc.num_comments; i++) {
 			CString TagValue;
-			CString VorbisTag = AltUTF8ToWStr((LPCSTR)vc->comments[i].entry);
+			CString VorbisTag = AltUTF8ToWStr((LPCSTR)vc.comments[i].entry);
 			if (VorbisTag.GetLength() > 0) {
 				if (ParseVorbisTag(L"artist", VorbisTag, &TagValue)) {
 					file_info.artist = TagValue;
@@ -528,37 +527,37 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 			}
 		}
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_PICTURE) {
-		const FLAC__StreamMetadata_Picture *pic = &pMetadata->data.picture;
+		const auto& pic = pMetadata->data.picture;
 
-		if (m_Cover.empty() && pic->data_length) {
-			m_CoverMime = pic->mime_type;
-			m_Cover.resize(pic->data_length);
-			memcpy(m_Cover.data(), pic->data, pic->data_length);
+		if (m_Cover.empty() && pic.data_length) {
+			m_CoverMime = pic.mime_type;
+			m_Cover.resize(pic.data_length);
+			memcpy(m_Cover.data(), pic.data, pic.data_length);
 		}
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_CUESHEET) {
 		if (((CFLACSource*)m_pFilter)->ChapGetCount()) {
 			return;
 		}
 
-		const FLAC__StreamMetadata_CueSheet *cs = &pMetadata->data.cue_sheet;
+		const auto& cs = pMetadata->data.cue_sheet;
 
-		for(uint32_t i = 0; i < cs->num_tracks; ++i) {
-			FLAC__StreamMetadata_CueSheet_Track *track = &cs->tracks[i];
-			if (track->type || track->offset >= (FLAC__uint64)m_i64TotalNumSamples) {
+		for(uint32_t i = 0; i < cs.num_tracks; ++i) {
+			const auto& track = cs.tracks[i];
+			if (track.type || track.offset >= (FLAC__uint64)m_i64TotalNumSamples) {
 				continue;
 			}
 
-			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000*track->offset/m_nSamplesPerSec);
+			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000 * track.offset / m_nSamplesPerSec);
 			CString s;
-			s.Format(L"Track %02u", i+1);
+			s.Format(L"Track %02u", i + 1);
 			((CFLACSource*)m_pFilter)->ChapAppend(rt, s);
 
-			if (track->num_indices > 1) {
-				for (int j = 0; j < track->num_indices; ++j) {
-					FLAC__StreamMetadata_CueSheet_Index *index = &track->indices[j];
-					s.Format(L"+ INDEX %02d", index->number);
-					REFERENCE_TIME r = rt + MILLISECONDS_TO_100NS_UNITS(1000*index->offset/m_nSamplesPerSec);
-					((CFLACSource*)m_pFilter)->ChapAppend(r, s);
+			if (track.num_indices > 1) {
+				for (int j = 0; j < track.num_indices; ++j) {
+					const auto& index = track.indices[j];
+					s.Format(L"+ INDEX %02d", index.number);
+					const auto rtIndex = rt + MILLISECONDS_TO_100NS_UNITS(1000 * index.offset / m_nSamplesPerSec);
+					((CFLACSource*)m_pFilter)->ChapAppend(rtIndex, s);
 				}
 			}
 		}
