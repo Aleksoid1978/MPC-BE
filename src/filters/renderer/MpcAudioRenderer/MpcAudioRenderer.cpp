@@ -1883,8 +1883,6 @@ again:
 
 		if (IsExclusive(pWaveFormatEx)) { // EXCLUSIVE/BITSTREAM
 			WAVEFORMATEX *pFormat = nullptr;
-			IPropertyStore *pProps = nullptr;
-			PROPVARIANT varConfig;
 
 			if (IsBitstream(pWaveFormatEx)) {
 				pFormat = (WAVEFORMATEX*)pWaveFormatEx;
@@ -1953,13 +1951,19 @@ again:
 				}
 
 				if (!pFormat && bInitNeed) {
+					IPropertyStore *pProps = nullptr;
 					hr = m_pMMDevice->OpenPropertyStore(STGM_READ, &pProps);
 					if (SUCCEEDED(hr)) {
+						PROPVARIANT varConfig;
 						PropVariantInit(&varConfig);
 						hr = pProps->GetValue(PKEY_AudioEngine_DeviceFormat, &varConfig);
-						if (SUCCEEDED(hr) && varConfig.vt == VT_BLOB && varConfig.blob.pBlobData != nullptr) {
-							pFormat = (WAVEFORMATEX*)varConfig.blob.pBlobData;
+						if (SUCCEEDED(hr)) {
+							if (varConfig.vt == VT_BLOB && varConfig.blob.pBlobData != nullptr) {
+								CopyWaveFormat((WAVEFORMATEX*)varConfig.blob.pBlobData, &pFormat);
+							}
+							PropVariantClear(&varConfig);
 						}
+						pProps->Release();
 					}
 				}
 			}
@@ -1971,9 +1975,8 @@ again:
 				}
 			}
 
-			if (pProps) {
-				PropVariantClear(&varConfig);
-				SAFE_RELEASE(pProps);
+			if (!IsBitstream(pWaveFormatEx) && pFormat) {
+				delete pFormat;
 			}
 		} else if (m_DeviceModeCurrent == MODE_WASAPI_SHARED) { // SHARED
 			WAVEFORMATEX *pClosestMatch = nullptr;
