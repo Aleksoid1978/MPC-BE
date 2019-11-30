@@ -4,7 +4,7 @@
 =============================
 
 Updated Russian translation.
-Updated Deutsch translation (by Klaus1189).
+Updated German translation (by Klaus1189).
 Updated Ukrainian translation (by arestarh1986).
 Updated Japanese translation.
 Updated Chinese (Simplified) translation (by wushantao).
