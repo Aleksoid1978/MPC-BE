@@ -349,7 +349,7 @@ namespace Youtube
 
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
-				HandleURL(url);
+				HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
 
 				videoId = RegExpParse(url, videoIdRegExp);
 
