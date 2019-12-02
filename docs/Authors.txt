@@ -21,19 +21,19 @@ u_shell (Documentacion translator) - Russia
 
 Translators:
 -------------
-Basque - azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
-Chinese (Simplified) - insolo, beter, wushantao
-Chinese (Traditional) - beter
-Dutch - beter
-German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus Luppert
-Greek - Lampros Zouloumis
-Hungarian - Kiegészítette mickey
-Italian - Lord Maius
-Korean - kuh3h3
-Polish - Volfield
-Turkish - Thingol, cmhrky
-Ukrainian - arestarh1986
-Japanese - Gyeong, Socket774
+Basque                : azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
+Chinese (Simplified)  : insolo, beter, wushantao
+Chinese (Traditional) : beter
+Dutch                 : beter
+German                : Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus Luppert
+Greek                 : Lampros Zouloumis
+Hungarian             : Kleiber Tamás, mickey
+Italian               : Lord Maius
+Korean                : kuh3h3
+Polish                : Volfield
+Turkish               : Thingol, cmhrky
+Ukrainian             : arestarh1986
+Japanese              : Gyeong, Socket774
 
 Official Beta testers:
 ----------------------
