@@ -2299,7 +2299,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 			}
 			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastReceivedSampleTimeEnd - m_rtEstimateSlavingJitter);
 		} else {
-			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextRenderedSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
+			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtCurrentRenderedTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (rtEstimateSlavingJitter >= OneMillisecond
 					&& rtEstimateSlavingJitter <= UNITS) {
 				const DWORD dwMilliseconds = rtEstimateSlavingJitter / OneMillisecond;
@@ -2308,7 +2308,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 				Sleep(dwMilliseconds);
 #endif
 			}
-			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtCurrentRenderedTime);
 		}
 	}
 
