@@ -206,6 +206,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_rtLastReceivedSampleTimeEnd(0)
 	, m_rtLastQueuedSampleTimeEnd(0)
 	, m_rtEstimateSlavingJitter(0)
+	, m_rtCurrentRenderedTime(0)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
@@ -722,7 +723,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 
 	if (m_pAudioClock && !m_pSyncClock->IsSlave()) {
 		CAutoLock cAutoLock(&m_csAudioClock);
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
+		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtCurrentRenderedTime);
 	}
 
 	return CBaseRenderer::Run(rtStart);
@@ -2663,7 +2664,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 
 		if (!nWasapiQueueSize && m_filterState == State_Running && !bFlushing) {
-			m_rtNextRenderedSampleTime = m_rtLastReceivedSampleTimeEnd = std::max(m_rtNextRenderedSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + m_hnsBufferDuration);
+			const auto duration = SamplesToTime(numFramesAvailable, m_pWaveFormatExOutput);
+			m_rtNextRenderedSampleTime = m_rtLastReceivedSampleTimeEnd = std::max(m_rtNextRenderedSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + duration);
 			DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - internal buffer is empty, render silence to %I64d", m_rtNextRenderedSampleTime);
 		}
 	} else {
@@ -2692,6 +2694,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 #endif
 				}
 				m_rtNextRenderedSampleTime = m_CurrentPacket->rtStart + SamplesToTime(m_CurrentPacket->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+				m_rtCurrentRenderedTime = m_CurrentPacket->rtStart;
 			}
 
 			const UINT32 nFilledBytes = std::min((UINT32)m_CurrentPacket->size(), nAvailableBytes - nWritenBytes);
@@ -2703,6 +2706,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 			}
 			nWritenBytes += nFilledBytes;
 			m_nSampleOffset += nFilledBytes;
+
+			m_rtCurrentRenderedTime += SamplesToTime(nFilledBytes / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 		} while (nWritenBytes < nAvailableBytes);
 
 		if (!nWritenBytes) {
@@ -2768,7 +2773,7 @@ HRESULT CMpcAudioRenderer::EndFlush()
 
 	if (m_bDVDPlayback && m_pAudioClock) {
 		CAutoLock cAutoLock(&m_csAudioClock);
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
+		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtCurrentRenderedTime);
 	}
 
 	return hr;
@@ -2781,6 +2786,7 @@ void CMpcAudioRenderer::NewSegment()
 	m_rtNextRenderedSampleTime = 0;
 	m_rtLastReceivedSampleTimeEnd = 0;
 	m_rtEstimateSlavingJitter = 0;
+	m_rtCurrentRenderedTime = 0;
 
 	m_bFlushing = FALSE;
 }
