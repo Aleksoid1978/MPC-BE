@@ -49,11 +49,11 @@ static String mi_get_lang_file()
 				}
 
 				if (dstlen) {
-					WCHAR* wstr = DNew WCHAR[dstlen];
+					WCHAR* wstr = new(std::nothrow) WCHAR[dstlen];
 					if (wstr) {
 						MultiByteToWideChar(acp ? CP_ACP : CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, wstr, dstlen);
 						str = wstr;
-						delete[] wstr;
+						delete [] wstr;
 					}
 				}
 
@@ -73,14 +73,7 @@ IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
 CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
 	, m_fn(fn)
-	, m_pCFont(nullptr)
 {
-}
-
-CPPageFileMediaInfo::~CPPageFileMediaInfo()
-{
-	delete m_pCFont;
-	m_pCFont = nullptr;
 }
 
 void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
@@ -103,7 +96,6 @@ BOOL CPPageFileMediaInfo::PreTranslateMessage(MSG* pMsg)
 	return __super::PreTranslateMessage(pMsg);
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageFileMediaInfo, CPropertyPage)
 	ON_WM_SIZE()
 	ON_WM_SHOWWINDOW()
@@ -114,14 +106,6 @@ END_MESSAGE_MAP()
 BOOL CPPageFileMediaInfo::OnInitDialog()
 {
 	__super::OnInitDialog();
-
-	if (!m_pCFont) {
-		m_pCFont = DNew CFont;
-	}
-
-	if (!m_pCFont) {
-		return TRUE;
-	}
 
 	MediaInfo MI;
 
@@ -150,11 +134,11 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	do {
 		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
 		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
-		success = IsFontInstalled(MonospaceFonts[i]) && m_pCFont->CreateFontIndirectW(&lf);
+		success = IsFontInstalled(MonospaceFonts[i]) && m_font.CreateFontIndirectW(&lf);
 		i++;
 	} while (!success && i < _countof(MonospaceFonts));
 
-	m_mediainfo.SetFont(m_pCFont);
+	m_mediainfo.SetFont(&m_font);
 	m_mediainfo.SetWindowTextW(MI_Text);
 
 	m_mediainfo.EndPaint(&ps);
