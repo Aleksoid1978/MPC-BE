@@ -29,11 +29,11 @@ class CPPageFileMediaInfo : public CPropertyPage
 private:
 	CString m_fn;
 	CEdit m_mediainfo;
-	CFont* m_pCFont;
+	CFont m_font;
 
 public:
 	CPPageFileMediaInfo(CString fn);
-	virtual ~CPPageFileMediaInfo();
+	virtual ~CPPageFileMediaInfo() = default;
 
 	enum { IDD = IDD_FILEMEDIAINFO };
 	CString MI_Text;
