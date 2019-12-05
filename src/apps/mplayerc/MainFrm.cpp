@@ -861,11 +861,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-void CMainFrame::OnPaint()
-{
-	CPaintDC dc(this);
-}
-
 BOOL CMainFrame::OnEraseBkgnd(CDC* pDC)
 {
 	DrawSmallBorder();
@@ -1969,6 +1964,10 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
 		}
 		m_bWasPausedOnMinimizedVideo = false;
+	}
+
+	if (nType == SIZE_RESTORED) {
+		RepaintVideo();
 	}
 }
 
