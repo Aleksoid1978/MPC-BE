@@ -1144,6 +1144,7 @@ STDMETHODIMP CMpcAudioRenderer::SetDeviceId(const CString& deviceId, const CStri
 	}
 
 	if (deviceIdSrc != deviceIdDst) {
+		m_DeviceModeCurrent = m_DeviceMode;
 		SetReinitializeAudioDevice(TRUE);
 	}
 
