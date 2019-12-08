@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
+#include <regex>
 
 static CString FormatModeString(const dispmode& dmod)
 {
@@ -32,17 +33,6 @@ static CString FormatModeString(const dispmode& dmod)
 	strMode.Format(L"[ %d ]  @ %dx%d %s", dmod.freq, dmod.size.cx, dmod.size.cy, dmod.dmDisplayFlags & DM_INTERLACED ? L"i" : L"p");
 
 	return strMode;
-}
-
-static void GetMonitorNameId(const CString& str, CString& monitorName, CString& monitorId)
-{
-	if (str.GetLength() == 14) {
-		monitorName = str.Left(7);
-	} else if (str.GetLength() == 19) {
-		monitorName = str.Left(12);
-	}
-
-	monitorId = str.Right(7);
 }
 
 // CPPagePlayer dialog
@@ -59,10 +49,7 @@ CPPageFullscreen::CPPageFullscreen()
 	, m_bExitFullScreenAtFocusLost(FALSE)
 	, m_bRestoreResAfterExit(TRUE)
 	, m_list(0)
-{
-}
-
-CPPageFullscreen::~CPPageFullscreen()
+	, m_iMonitorType(0)
 {
 }
 
@@ -152,7 +139,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_iMonitorType = 0;
 
 	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
-	m_MonitorDisplayNames.push_back(L"Current");
+	m_monitors.push_back({ L"Current", L"" });
 	auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	CString strCurMon;
 	curmonitor.GetName(strCurMon);
@@ -167,24 +154,36 @@ BOOL CPPageFullscreen::OnInitDialog()
 		DWORD devMon = 0;
 		while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-				CString DeviceID(ddMon.DeviceID);
-				DeviceID = DeviceID.Mid(8, DeviceID.Find (L"\\", 9) - 8);
-				CString DeviceName(ddMon.DeviceName);
-				DeviceName = DeviceName.Left(12);
-				if (DeviceName == strCurMon) {
-					m_iMonitorTypeCtrl.AddString(DeviceName.Mid(4, 7) + L"( " + DeviceName.Right(1) + L" ) " + L"- [id: " + DeviceID + L" *" +  ResStr(IDS_FULLSCREENMONITOR_CURRENT) + L"] - " + ddMon.DeviceString);
-					m_MonitorDisplayNames[0] = L"Current" + DeviceID;
-				} else {
-					m_iMonitorTypeCtrl.AddString(DeviceName.Mid(4, 7) + L"( " + DeviceName.Right(1) + L" ) " + L"- [id: " + DeviceID + L"] - " + ddMon.DeviceString);
-				}
-				m_MonitorDisplayNames.push_back(DeviceName + DeviceID);
-				if (m_iMonitorType == 0 && m_strFullScreenMonitor == DeviceName) {
-					m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
+				auto RegExpParse = [](LPCTSTR szIn, LPCTSTR szRE) -> CString {
+					const std::wregex regex(szRE);
+					std::wcmatch match;
+					if (std::regex_search(szIn, match, regex) && match.size() == 2) {
+						return CString(match[1].first, match[1].length());
+					}
+
+					return L"";
+				};
+
+				const CString DeviceID(ddMon.DeviceID + 8, 7);
+				const CString DeviceName = RegExpParse(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
+
+				if (!DeviceID.IsEmpty() && !DeviceName.IsEmpty()) {
+					const CString DeviceNumber = RegExpParse(DeviceName, LR"(DISPLAY(\d+))");
+					if (DeviceName == strCurMon) {
+						m_iMonitorTypeCtrl.AddString(L"DISPLAY ( " + DeviceNumber + L" ) - [id: " + DeviceID + L" *" + ResStr(IDS_FULLSCREENMONITOR_CURRENT) + L"] - " + ddMon.DeviceString);
+						m_monitors[0].id = DeviceID;
+					} else {
+						m_iMonitorTypeCtrl.AddString(L"DISPLAY ( " + DeviceNumber + L" ) - [id: " + DeviceID + L"] - " + ddMon.DeviceString);
+					}
+					m_monitors.push_back({ DeviceName, DeviceID });
+					if (m_iMonitorType == 0 && m_strFullScreenMonitor == DeviceName) {
+						m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
+					}
 				}
 			}
-			devMon++;
 			ZeroMemory(&ddMon, sizeof(ddMon));
 			ddMon.cb = sizeof(ddMon);
+			devMon++;
 		}
 		ZeroMemory(&dd, sizeof(dd));
 		dd.cb = sizeof(dd);
@@ -247,8 +246,9 @@ BOOL CPPageFullscreen::OnApply()
 	m_fullScreenModes.bApplyDefault	= !!m_bSetDefault;
 	s.fLaunchfullscreen				= !!m_bLaunchFullScreen;
 
-	CString str = m_MonitorDisplayNames[m_iMonitorType];
-	GetMonitorNameId(str, m_strFullScreenMonitor, m_strFullScreenMonitorID);
+	const auto& monitor = m_monitors[m_iMonitorType];
+	m_strFullScreenMonitor = monitor.name;
+	m_strFullScreenMonitorID = monitor.id;
 
 	s.strFullScreenMonitor				= m_strFullScreenMonitor;
 	s.strFullScreenMonitorID			= m_strFullScreenMonitor == L"Current" ? L"" : m_strFullScreenMonitorID;
@@ -394,9 +394,8 @@ void CPPageFullscreen::OnUpdateStatic2(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::OnUpdateFullScrCombo()
 {
-	CString str, strCurMonID, strCurMon;
-	str = m_MonitorDisplayNames[m_iMonitorTypeCtrl.GetCurSel()];
-	GetMonitorNameId(str, m_strFullScreenMonitor, strCurMonID);
+	const auto& monitor = m_monitors[m_iMonitorType];
+	m_strFullScreenMonitor = monitor.name;
 
 	ModesUpdate();
 	SetModified();
@@ -417,8 +416,9 @@ void CPPageFullscreen::ModesUpdate()
 	m_bEnableAutoMode = m_fullScreenModes.bEnabled;
 	m_bBeforePlayback = m_fullScreenModes.bEnabled == 2;
 
-	CString str = m_MonitorDisplayNames[m_iMonitorType];
-	GetMonitorNameId(str, m_strFullScreenMonitor, m_strFullScreenMonitorID);
+	const auto& monitor = m_monitors[m_iMonitorType];
+	m_strFullScreenMonitor = monitor.name;
+	m_strFullScreenMonitorID = monitor.id;
 
 	m_list.DeleteAllItems();
 	m_dms.clear();
@@ -537,6 +537,7 @@ void CPPageFullscreen::ModesUpdate()
 		};
 
 		for (nItem = 0; nItem < _countof(vfr); nItem++) {
+			CString str;
 			str.Format(L"%02d", nItem + 1);
 			m_list.InsertItem(nItem + 1, str);
 
