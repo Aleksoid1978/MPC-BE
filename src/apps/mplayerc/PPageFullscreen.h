@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,12 @@ class CPPageFullscreen : public CPPageBase
 private:
 	std::vector<dispmode> m_dms;
 	std::list<CString> m_displayModesString;
-	std::vector<CString> m_MonitorDisplayNames;
+
+	struct monitor_t {
+		CString name;
+		CString id;
+	};
+	std::vector<monitor_t> m_monitors;
 
 	BOOL m_bLaunchFullScreen;
 
@@ -71,7 +76,7 @@ private:
 	void ModesUpdate();
 public:
 	CPPageFullscreen();
-	virtual ~CPPageFullscreen();
+	~CPPageFullscreen() = default;
 
 	enum { IDD = IDD_PPAGEFULLSCREEN };
 
