@@ -164,7 +164,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 					return L"";
 				};
 
-				const CString DeviceID(ddMon.DeviceID + 8, 7);
+				const CString DeviceID = RegExpParse(ddMon.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
 				const CString DeviceName = RegExpParse(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
 
 				if (!DeviceID.IsEmpty() && !DeviceName.IsEmpty()) {
@@ -422,32 +422,22 @@ void CPPageFullscreen::ModesUpdate()
 	m_displayModesString.clear();
 
 	dispmode dm;
-	for (int i = 0, m = 0, ModeExist = true;; i++) {
-		if (!CMainFrame::GetDispMode(i, dm, m_strFullScreenMonitor)) {
+	for (DWORD iModeNum = 0;; iModeNum++) {
+		if (!CMainFrame::GetDispMode(iModeNum, dm, m_strFullScreenMonitor)) {
 			break;
 		}
 		if (dm.bpp != 32 || dm.size.cx < 720 || dm.size.cy < 480) {
 			continue; // skip low resolution and non 32bpp mode
 		}
-
-		int j = 0;
-		while (j < m) {
-			if (dm == m_dms[j]) {
-				break;
-			}
-			j++;
+		if (std::find(m_dms.cbegin(), m_dms.cend(), dm) == m_dms.cend()) {
+			m_dms.push_back(dm);
 		}
-		if (j < m) {
-			continue;
-		}
-		m_dms.push_back(dm);
-		m++;
 	}
 
 	// sort display modes
 	std::sort(m_dms.begin(), m_dms.end());
 
-	CString strCur, strModes;
+	CString strCur;
 	GetCurDispModeString(strCur);
 
 	dispmode dCurMod;
