@@ -1965,10 +1965,6 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		}
 		m_bWasPausedOnMinimizedVideo = false;
 	}
-
-	if (nType == SIZE_RESTORED) {
-		RepaintVideo();
-	}
 }
 
 void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
