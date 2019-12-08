@@ -143,7 +143,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	CString strCurMon;
 	curmonitor.GetName(strCurMon);
-	if(m_strFullScreenMonitor.IsEmpty()) {
+	if (m_strFullScreenMonitor.IsEmpty()) {
 		m_strFullScreenMonitor = L"Current";
 	}
 
@@ -394,9 +394,6 @@ void CPPageFullscreen::OnUpdateStatic2(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::OnUpdateFullScrCombo()
 {
-	const auto& monitor = m_monitors[m_iMonitorType];
-	m_strFullScreenMonitor = monitor.name;
-
 	ModesUpdate();
 	SetModified();
 }
