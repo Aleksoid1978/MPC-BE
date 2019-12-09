@@ -174,15 +174,14 @@ BOOL CPPageInterface::OnInitDialog()
 
 	CString str;
 
-	for (int i = 8; i <= 25; ++i) {
+	for (int i = 8; i <= 26; ++i) {
 		str.Format(L"%d", i);
-		m_FontSize.AddString(str);
-
+		AddStringData(m_FontSize, str, i);
 		if (m_OSD_Size == i) {
 			iSel = i;
 		}
 	}
-	m_FontSize.SetCurSel(iSel - 10);
+	SelectByItemData(m_FontSize, iSel);
 
 	EnableToolTips(TRUE);
 
@@ -611,7 +610,7 @@ void CPPageInterface::OnChngOSDCombo()
 	auto pFrame = AfxGetMainFrame();
 	if (pFrame->m_OSD) {
 		CString str;
-		m_OSD_Size = m_FontSize.GetCurSel() + 10;
+		m_OSD_Size = GetCurItemData(m_FontSize);
 		m_FontType.GetLBText(m_FontType.GetCurSel(), str);
 
 		pFrame->m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_TEST), 2000, m_OSD_Size, str);

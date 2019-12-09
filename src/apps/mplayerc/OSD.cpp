@@ -748,11 +748,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			nDuration = -1;
 		}
 
-		m_FontSize = FontSize ? FontSize : s.nOSDSize;
-
-		if (m_FontSize < 10 || m_FontSize > 26) {
-			m_FontSize = 20;
-		}
+		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
 
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
@@ -785,11 +781,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			m_strMessage	= strMsg;
 		}
 
-		m_FontSize = FontSize ? FontSize : s.nOSDSize;
-
-		if (m_FontSize < 10 || m_FontSize > 26) {
-			m_FontSize = 20;
-		}
+		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
 
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
