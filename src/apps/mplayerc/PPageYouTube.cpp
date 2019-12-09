@@ -76,8 +76,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	static std::vector<int> resolutions;
 	if (resolutions.empty()) {
+		resolutions.reserve(std::size(Youtube::YProfiles));
 		for (const auto& profile : Youtube::YProfiles) {
-			resolutions.emplace_back(profile.quality);
+			resolutions.push_back(profile.quality);
 		}
 		// sort
 		std::sort(resolutions.begin(), resolutions.end(), std::greater<int>());
