@@ -23,6 +23,7 @@
 
 #include "stdafx.h"
 #include "MultiMonitor.h"
+#include "../../DSUtil/std_helper.h"
 
 CMonitor::CMonitor() : m_hMonitor( nullptr )
 {
@@ -102,13 +103,10 @@ void CMonitor::GetDeviceId( CString& string ) const
 	DWORD iDevNum = 0;
 	while (EnumDisplayDevicesW(mi.szDevice, iDevNum, &dd, 0)) {
 		if (dd.StateFlags & DISPLAY_DEVICE_ACTIVE && !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-			const CString DeviceID(dd.DeviceID);
-			string = DeviceID.Mid(8, DeviceID.Find(L"\\", 9) - 8);
+			string = RegExpParse<CString>(dd.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
 			return;
 		}
 		iDevNum++;
-		ZeroMemory(&dd, sizeof(dd));
-		dd.cb = sizeof(dd);
 	}
 }
 

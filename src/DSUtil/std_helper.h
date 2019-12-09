@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 
 //#include <list>
 //#include <guiddef.h>
+#include <regex>
 
 // this operator is needed to use GUID or CLSID as key in std::map
 inline bool operator < (const GUID & a, const GUID & b)
@@ -43,7 +44,6 @@ auto FindInListByPointer(std::list<T>& list, const T* p)
 	return it;
 }
 
-
 template <class T>
 bool Contains(std::list<T>& list, const T& item)
 {
@@ -55,3 +55,15 @@ bool Contains(std::vector<T>& vector, const T& item)
 {
 	return std::find(vector.cbegin(), vector.cend(), item) != vector.cend();
 }
+
+template <class StringT, class T>
+StringT RegExpParse(const T* szIn, const T* szRE)
+{
+	const std::basic_regex<T> regex(szRE);
+	std::match_results<const T*> match;
+	if (std::regex_search(szIn, match, regex) && match.size() == 2) {
+		return StringT(match[1].first, match[1].length());
+	}
+
+	return StringT();
+};
