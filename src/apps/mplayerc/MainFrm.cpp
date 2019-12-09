@@ -84,7 +84,6 @@
 #include <mvrInterfaces.h>
 
 #include <string>
-#include <regex>
 
 #include "ThumbsTaskDlg.h"
 #include "Content.h"
@@ -10866,21 +10865,15 @@ void CMainFrame::AutoChangeMonitorMode()
 			DWORD devMon = 0;
 			while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
 				if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-					CString DeviceID(ddMon.DeviceID);
-					DeviceID = DeviceID.Mid(8, DeviceID.Find(L"\\", 9) - 8);
+					const CString DeviceID = RegExpParse<CString>(ddMon.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
 					if (strFullScreenMonitorID == DeviceID) {
-						const CString DeviceName(ddMon.DeviceName);
-						strFullScreenMonitor = DeviceName.Left(12);
+						strFullScreenMonitor = RegExpParse<CString>(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
 						bMonValid = TRUE;
 						break;
 					}
 				}
 				devMon++;
-				ZeroMemory(&ddMon, sizeof(ddMon));
-				ddMon.cb = sizeof(ddMon);
  			}
-			ZeroMemory(&dd, sizeof(dd));
-			dd.cb = sizeof(dd);
 			dev++;
  		}
 	}

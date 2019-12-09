@@ -24,8 +24,8 @@
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
+#include "../../DSUtil/std_helper.h"
 #include "MultiMonitor.h"
-#include <regex>
 
 static CString FormatModeString(const dispmode& dmod)
 {
@@ -154,21 +154,11 @@ BOOL CPPageFullscreen::OnInitDialog()
 		DWORD devMon = 0;
 		while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-				auto RegExpParse = [](LPCTSTR szIn, LPCTSTR szRE) -> CString {
-					const std::wregex regex(szRE);
-					std::wcmatch match;
-					if (std::regex_search(szIn, match, regex) && match.size() == 2) {
-						return CString(match[1].first, match[1].length());
-					}
-
-					return L"";
-				};
-
-				const CString DeviceID = RegExpParse(ddMon.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
-				const CString DeviceName = RegExpParse(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
+				const CString DeviceID = RegExpParse<CString>(ddMon.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
+				const CString DeviceName = RegExpParse<CString>(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
 
 				if (!DeviceID.IsEmpty() && !DeviceName.IsEmpty()) {
-					const CString DeviceNumber = RegExpParse(DeviceName, LR"(DISPLAY(\d+))");
+					const CString DeviceNumber = RegExpParse<CString>(DeviceName.GetString(), LR"(DISPLAY(\d+))");
 					if (DeviceName == strCurMon) {
 						m_iMonitorTypeCtrl.AddString(L"DISPLAY ( " + DeviceNumber + L" ) - [id: " + DeviceID + L" *" + ResStr(IDS_FULLSCREENMONITOR_CURRENT) + L"] - " + ddMon.DeviceString);
 						m_monitors[0].id = DeviceID;
@@ -181,12 +171,8 @@ BOOL CPPageFullscreen::OnInitDialog()
 					}
 				}
 			}
-			ZeroMemory(&ddMon, sizeof(ddMon));
-			ddMon.cb = sizeof(ddMon);
 			devMon++;
 		}
-		ZeroMemory(&dd, sizeof(dd));
-		dd.cb = sizeof(dd);
 		dev++;
 	}
 
