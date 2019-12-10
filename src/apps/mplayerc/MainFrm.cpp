@@ -2089,6 +2089,11 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	CMenuEx::ScaleFont();
 	const auto& s = AfxGetAppSettings();
 	if (s.bUseDarkTheme && s.bDarkMenu) {
+		m_popupMenu.DestroyMenu();
+		m_popupMenu.LoadMenuW(IDR_POPUP);
+		m_popupMainMenu.DestroyMenu();
+		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+
 		CMenu defaultMenu;
 		defaultMenu.LoadMenuW(IDR_MAINFRAME);
 		CMenu* oldMenu = GetMenu();
