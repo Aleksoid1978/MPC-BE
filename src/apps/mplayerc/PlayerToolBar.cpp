@@ -946,7 +946,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		m_strTipText = ResStr(IDS_AG_STOP) + L" | " + ResStr(IDS_AG_CLOSE);
 		break;
 	case ID_PLAY_FRAMESTEP:
-		m_strTipText = ResStr(IDS_AG_STEP) + L" | " + ResStr(IDS_AG_JUMP_TO);
+		m_strTipText = ResStr(IDS_AG_STEP);
 		break;
 	case ID_VOLUME_MUTE:
 		{
