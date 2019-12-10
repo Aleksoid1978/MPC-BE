@@ -70,9 +70,10 @@ static String mi_get_lang_file()
 // CPPageFileMediaInfo dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
-CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn)
+CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn, CMainFrame* pMainFrame)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
 	, m_fn(fn)
+	, m_pMainFrame(pMainFrame)
 {
 }
 
@@ -121,9 +122,9 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 		MI_Text.Empty();
 	}
 
-	LOGFONT lf;
-	memset(&lf, 0, sizeof(lf));
+	LOGFONT lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+	lf.lfHeight = -m_pMainFrame->PointsToPixels(8);
 
 	UINT i = 0;
 	BOOL success;
@@ -133,7 +134,6 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	do {
 		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
-		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
 		success = IsFontInstalled(MonospaceFonts[i]) && m_font.CreateFontIndirectW(&lf);
 		i++;
 	} while (!success && i < _countof(MonospaceFonts));

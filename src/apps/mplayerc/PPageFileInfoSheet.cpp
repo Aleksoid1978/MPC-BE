@@ -39,7 +39,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
 	, m_res(fn, pMainFrame->m_pGB)
 	, m_pMainFrame(pMainFrame)
-	, m_mi(fn)
+	, m_mi(fn, pMainFrame)
 	, m_fn(fn)
 	, m_bNeedInit(TRUE)
 	, m_nMinCX(0)
