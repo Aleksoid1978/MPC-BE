@@ -888,6 +888,9 @@ void CAppSettings::ResetSettings()
 	tUpdaterLastCheck = 0;
 
 	bOSDRemainingTime = false;
+	bOSDLocalTime = false;
+	bOSDFileName = false;
+
 	bPasteClipboardURL = false;
 
 	strTabs.Empty();
@@ -1578,6 +1581,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt64(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, tUpdaterLastCheck);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FILE_NAME, bOSDFileName);
+
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {
@@ -2008,6 +2014,9 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt64(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, tUpdaterLastCheck);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FILE_NAME, bOSDFileName);
+
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
 	if (pApp->m_pszRegistryKey) {
