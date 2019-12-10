@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -194,6 +194,8 @@ private:
 	int SliderCursorWidth  = 0;
 	int SliderChapHeight   = 0;
 	int SliderChapWidth    = 0;
+
+	void CreateFontInternal();
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);

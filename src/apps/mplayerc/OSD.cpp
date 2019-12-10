@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -279,6 +279,8 @@ void COSD::Start(CWnd* pWnd)
 	m_pMVTO		= nullptr;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_GDI;
+
+	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
 
 	Reset();
 }
@@ -738,8 +740,8 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 
 	if (m_pMFVMB) {
 		if (nPos != OSD_DEBUG) {
-			m_nMessagePos	= nPos;
-			m_strMessage	= strMsg;
+			m_nMessagePos = nPos;
+			m_strMessage  = strMsg;
 		} else {
 			m_debugMessages.emplace_back(strMsg);
 			if (m_debugMessages.size() > 20) {
@@ -748,21 +750,20 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			nDuration = -1;
 		}
 
-		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
-
+		m_FontSize = PointsToPixels(FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize);
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
-		if (m_MainFont.GetSafeHandle()) {
-			m_MainFont.DeleteObject();
+		if (m_OSD_FontCashed != m_OSD_Font
+				|| m_FontSizeCashed != m_FontSize
+				|| m_bFontAACashed != s.fFontAA
+				|| !m_MainFont.GetSafeHandle()) {
+			CreateFontInternal();
 		}
 
-		LOGFONT lf = {};
-		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-		lf.lfHeight         = ScaleY(m_FontSize) * 10;
-		lf.lfQuality        = s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-		wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
+		m_OSD_FontCashed = m_OSD_Font;
+		m_FontSizeCashed = m_FontSize;
+		m_bFontAACashed = s.fFontAA;
 
-		m_MainFont.CreatePointFontIndirect(&lf, &m_MemDC);
 		m_MemDC.SelectObject(m_MainFont);
 
 		if (m_pWnd) {
@@ -777,12 +778,11 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 		m_pMVTO->OsdDisplayMessage(strMsg, nDuration);
 	} else if (m_pWnd) {
 		if (nPos != OSD_DEBUG) {
-			m_nMessagePos	= nPos;
-			m_strMessage	= strMsg;
+			m_nMessagePos = nPos;
+			m_strMessage  = strMsg;
 		}
 
-		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
-
+		m_FontSize = PointsToPixels(FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize);
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
 		m_pWnd->KillTimer((UINT_PTR)this);
@@ -899,11 +899,19 @@ void COSD::DrawWnd()
 	}
 
 	m_MainWndRectCashed = m_MainWndRect;
-	m_strMessageCashed  = m_strMessage;
+	m_strMessageCashed = m_strMessage;
 	m_nMessagePosCashed = m_nMessagePos;
-	m_OSD_FontCashed    = m_OSD_Font;
-	m_FontSizeCashed    = m_FontSize;
-	m_bFontAACashed     = s.fFontAA;
+
+	if (m_OSD_FontCashed != m_OSD_Font
+			|| m_FontSizeCashed != m_FontSize
+			|| m_bFontAACashed != s.fFontAA
+			|| !m_MainFont.GetSafeHandle()) {
+		CreateFontInternal();
+	}
+
+	m_OSD_FontCashed = m_OSD_Font;
+	m_FontSizeCashed = m_FontSize;
+	m_bFontAACashed = s.fFontAA;
 
 	CClientDC dc(this);
 
@@ -913,17 +921,6 @@ void COSD::DrawWnd()
 	temp_BM.CreateCompatibleBitmap(&temp_DC, m_MainWndRect.Width(), m_MainWndRect.Height());
 	CBitmap* temp_pOldBmt = temp_DC.SelectObject(&temp_BM);
 
-	if (m_MainFont.GetSafeHandle()) {
-		m_MainFont.DeleteObject();
-	}
-
-	LOGFONT lf = {};
-	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	lf.lfHeight         = ScaleY(m_FontSize) * 10;
-	lf.lfQuality        = s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
-
-	m_MainFont.CreatePointFontIndirect(&lf, &temp_DC);
 	temp_DC.SelectObject(m_MainFont);
 
 	LONG messageWidth = 0;
@@ -975,11 +972,6 @@ void COSD::DrawWnd()
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
 	mdc.SetBkMode(TRANSPARENT);
 
-	if (m_MainFont.GetSafeHandle()) {
-		m_MainFont.DeleteObject();
-	}
-
-	m_MainFont.CreatePointFontIndirect(&lf, &mdc);
 	mdc.SelectObject(m_MainFont);
 
 	GradientFill(&mdc, &rcBar);
@@ -1119,4 +1111,19 @@ void COSD::GradientFill(CDC* pDc, CRect* rc)
 		};
 		pDc->GradientFill(tv5, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 	}
+}
+
+void COSD::CreateFontInternal()
+{
+	if (m_MainFont.GetSafeHandle()) {
+		m_MainFont.DeleteObject();
+	}
+
+	LOGFONT lf = {};
+	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+	lf.lfHeight = -m_FontSize;
+	lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
+
+	m_MainFont.CreateFontIndirectW(&lf);
 }
