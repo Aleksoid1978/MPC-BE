@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,7 +70,7 @@ static String mi_get_lang_file()
 // CPPageFileMediaInfo dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
-CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn, CMainFrame* pMainFrame)
+CPPageFileMediaInfo::CPPageFileMediaInfo(const CString& fn, CMainFrame* pMainFrame)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
 	, m_fn(fn)
 	, m_pMainFrame(pMainFrame)

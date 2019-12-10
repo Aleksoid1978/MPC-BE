@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,7 +46,7 @@ private:
 	CEdit	m_desc;
 
 public:
-	CPPageFileInfoClip(CString fn, IFilterGraph* pFG);
+	CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG);
 	virtual ~CPPageFileInfoClip();
 
 	enum { IDD = IDD_FILEPROPCLIP };

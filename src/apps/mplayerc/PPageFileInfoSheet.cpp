@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,13 +33,13 @@ CMPCPropertySheet::CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT 
 // CPPageFileInfoSheet
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CMPCPropertySheet)
-CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI/* = false*/)
+CPPageFileInfoSheet::CPPageFileInfoSheet(const CString& fn, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI/* = false*/)
 	: CMPCPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
 	, m_clip(fn, pMainFrame->m_pGB)
 	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
 	, m_res(fn, pMainFrame->m_pGB)
-	, m_pMainFrame(pMainFrame)
 	, m_mi(fn, pMainFrame)
+	, m_pMainFrame(pMainFrame)
 	, m_fn(fn)
 	, m_bNeedInit(TRUE)
 	, m_nMinCX(0)

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,7 +47,7 @@ private:
 	void InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI);
 
 public:
-	CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISubPicAllocatorPresenter3* pCAP, IDvdInfo2* pDVDI);
+	CPPageFileInfoDetails(const CString& fn, IFilterGraph* pFG, ISubPicAllocatorPresenter3* pCAP, IDvdInfo2* pDVDI);
 	virtual ~CPPageFileInfoDetails();
 
 	enum { IDD = IDD_FILEPROPDETAILS };

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ private:
     CMainFrame* m_pMainFrame;
 
 public:
-	CPPageFileMediaInfo(CString fn, CMainFrame* pMainFrame);
+	CPPageFileMediaInfo(const CString& fn, CMainFrame* pMainFrame);
 	virtual ~CPPageFileMediaInfo() = default;
 
 	enum { IDD = IDD_FILEMEDIAINFO };
