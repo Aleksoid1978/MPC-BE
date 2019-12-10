@@ -750,7 +750,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			nDuration = -1;
 		}
 
-		m_FontSize = PointsToPixels(FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize);
+		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
 		if (m_OSD_FontCashed != m_OSD_Font
@@ -782,7 +782,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			m_strMessage  = strMsg;
 		}
 
-		m_FontSize = PointsToPixels(FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize);
+		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
 		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
 		m_pWnd->KillTimer((UINT_PTR)this);
@@ -1058,6 +1058,14 @@ void COSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 	}
 }
 
+void COSD::OverrideDPI(int dpix, int dpiy)
+{
+	CDPI::OverrideDPI(dpix, dpiy);
+
+	m_FontSizeCashed = 0;
+	DrawWnd();
+}
+
 void COSD::GradientFill(CDC* pDc, CRect* rc)
 {
 	const CAppSettings& s = AfxGetAppSettings();
@@ -1121,7 +1129,7 @@ void COSD::CreateFontInternal()
 
 	LOGFONT lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	lf.lfHeight = -m_FontSize;
+	lf.lfHeight = -PointsToPixels(m_FontSize);
 	lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
 
