@@ -31,8 +31,10 @@ private:
 	CEdit m_mediainfo;
 	CFont m_font;
 
+    CMainFrame* m_pMainFrame;
+
 public:
-	CPPageFileMediaInfo(CString fn);
+	CPPageFileMediaInfo(CString fn, CMainFrame* pMainFrame);
 	virtual ~CPPageFileMediaInfo() = default;
 
 	enum { IDD = IDD_FILEMEDIAINFO };
