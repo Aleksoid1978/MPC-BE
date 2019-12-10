@@ -95,6 +95,8 @@ public:
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
 
+	void OverrideDPI(int dpix, int dpiy);
+
 	DECLARE_DYNAMIC(COSD)
 
 private:

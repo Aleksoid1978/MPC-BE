@@ -2073,7 +2073,12 @@ void CMainFrame::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 {
-	OverrideDPI(LOWORD(wParam), HIWORD(wParam));
+	const int dpix = LOWORD(wParam);
+	const int dpiy = HIWORD(wParam);
+	OverrideDPI(dpix, dpiy);
+	if (m_OSD) {
+		m_OSD.OverrideDPI(dpix, dpiy);
+	}
 
 	m_wndToolBar.ScaleToolbar();
 	m_wndInfoBar.ScaleFont();
