@@ -589,8 +589,6 @@ CMainFrame::CMainFrame() :
 	m_pFullscreenWnd(nullptr),
 	m_pVideoWnd(nullptr),
 	m_pOSDWnd(nullptr),
-	m_bOSDLocalTime(false),
-	m_bOSDFileName(false),
 	m_nCurSubtitle(-1),
 	m_lSubtitleShift(0),
 	m_bToggleShader(false),
@@ -2447,14 +2445,14 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case TIMER_STREAMPOSPOLLER2:
 			if (m_eMediaLoadState == MLS_LOADED) {
-				if (AfxGetAppSettings().nCS < CS_STATUSBAR) {
-					AfxGetAppSettings().bStatusBarIsVisible = false;
+				auto& s = AfxGetAppSettings();
+				if (s.nCS < CS_STATUSBAR) {
+					s.bStatusBarIsVisible = false;
 				} else {
-					AfxGetAppSettings().bStatusBarIsVisible = true;
+					s.bStatusBarIsVisible = true;
 				}
 
 				if (GetPlaybackMode() == PM_FILE && !m_bGraphEventComplete) {
-					CAppSettings& s = AfxGetAppSettings();
 					if (s.bKeepHistory && s.bRememberFilePos) {
 						if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
 							REFERENCE_TIME rtDur;
@@ -2490,29 +2488,33 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 					m_wndStatusBar.SetStatusTimer(str);
 				} else {
-					CString str_temp;
-					bool bmadvr = (GetRenderersSettings().iVideoRenderer == VIDRNDT_MADVR);
+					auto FormatString = [](CString& strOSD, LPCWSTR message) {
+						if (strOSD.IsEmpty()) {
+							strOSD = message;
+						} else {
+							strOSD.AppendFormat(L"\n%s", message);
+						}
+					};
 
-					if (m_bOSDLocalTime) {
-						str_temp = GetSystemLocalTime();
+					CString strOSD;
+					if (s.bOSDLocalTime) {
+						FormatString(strOSD, GetSystemLocalTime());
 					}
 
-					if (AfxGetAppSettings().bOSDRemainingTime) {
-						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
+					if (s.bOSDRemainingTime) {
+						FormatString(strOSD, m_wndStatusBar.GetStatusTimer());
 					}
 
-					if (m_bOSDFileName) {
-						CString strOSD = m_PlaybackInfo.GetFileNameOrTitleOrPath();
-
-						str_temp.GetLength() > 0 ? str_temp += L"\n" + strOSD : str_temp = strOSD;
+					if (s.bOSDFileName) {
+						FormatString(strOSD, m_PlaybackInfo.GetFileNameOrTitleOrPath());
 					}
 
-					if (bmadvr) {
-						str_temp.Replace(L"\n", L" / "); // MadVR support only singleline OSD message
+					if (m_pBFmadVR) {
+						strOSD.Replace(L"\n", L" / "); // MadVR support only singleline OSD message
 					}
 
-					if (str_temp.GetLength() > 0) {
-						m_OSD.DisplayMessage(OSD_TOPLEFT, str_temp);
+					if (!strOSD.IsEmpty()) {
+						m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD);
 					}
 				}
 			}
@@ -6827,7 +6829,6 @@ void CMainFrame::OnViewRemainingTime()
 	OnTimer(TIMER_STREAMPOSPOLLER2);
 }
 
-
 CString CMainFrame::GetSystemLocalTime()
 {
 	CString strResult;
@@ -6842,14 +6843,15 @@ CString CMainFrame::GetSystemLocalTime()
 void CMainFrame::OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable((AfxGetAppSettings().iShowOSD & OSD_ENABLE) && m_eMediaLoadState != MLS_CLOSED);
-	pCmdUI->SetCheck(m_bOSDLocalTime);
+	pCmdUI->SetCheck(AfxGetAppSettings().bOSDLocalTime);
 }
 
 void CMainFrame::OnViewOSDLocalTime()
 {
-	m_bOSDLocalTime = !m_bOSDLocalTime;
+	CAppSettings& s = AfxGetAppSettings();
+	s.bOSDLocalTime = !s.bOSDLocalTime;
 
-	if (!m_bOSDLocalTime) {
+	if (!s.bOSDLocalTime) {
 		m_OSD.ClearMessage();
 	}
 
@@ -6859,14 +6861,15 @@ void CMainFrame::OnViewOSDLocalTime()
 void CMainFrame::OnUpdateViewOSDFileName(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable((AfxGetAppSettings().iShowOSD & OSD_ENABLE) && m_eMediaLoadState != MLS_CLOSED);
-	pCmdUI->SetCheck(m_bOSDFileName);
+	pCmdUI->SetCheck(AfxGetAppSettings().bOSDFileName);
 }
 
 void CMainFrame::OnViewOSDFileName()
 {
-	m_bOSDFileName = !m_bOSDFileName;
+	CAppSettings& s = AfxGetAppSettings();
+	s.bOSDFileName = !s.bOSDFileName;
 
-	if (!m_bOSDFileName) {
+	if (!s.bOSDFileName) {
 		m_OSD.ClearMessage();
 	}
 

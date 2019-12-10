@@ -233,6 +233,8 @@
 #define IDS_RS_OSD_TRANSPARENT				L"OSDTransparent"
 #define IDS_RS_OSD_BORDER					L"OSDBorder"
 #define IDS_RS_OSD_REMAINING_TIME			L"OSD_RemainingTime"
+#define IDS_RS_OSD_LOCAL_TIME				L"OSD_LocalTime"
+#define IDS_RS_OSD_FILE_NAME				L"OSD_FileName"
 #define IDS_RS_LAST_OPEN_DIR				L"LastOpenDir"
 #define IDS_RS_LAST_SAVED_PLAYLIST_DIR		L"LastSavedPlaylistDir"
 #define IDS_RS_ASSOCIATED_WITH_ICON			L"AssociatedWithIcon"

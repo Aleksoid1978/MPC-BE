@@ -1219,8 +1219,6 @@ public:
 	CFullscreenWnd*	m_pFullscreenWnd;
 	COSD		m_OSD;
 
-	bool		m_bOSDLocalTime;
-	bool		m_bOSDFileName;
 	CString		GetSystemLocalTime();
 	int			m_nCurSubtitle;
 	long		m_lSubtitleShift;

@@ -920,6 +920,8 @@ public:
 	bool			IsISRAutoLoadEnabled() const;
 
 	bool			bOSDRemainingTime;
+	bool			bOSDLocalTime;
+	bool			bOSDFileName;
 
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
