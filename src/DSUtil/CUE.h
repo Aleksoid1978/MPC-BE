@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2018 see Authors.txt
+ * (C) 2011-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,4 +29,4 @@ struct Chapters {
 
 CString GetCUECommand(CString& ln);
 void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT trackNum = UINT_MAX);
-bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer);
+bool ParseCUESheet(const CString& cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer);

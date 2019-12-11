@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2018 see Authors.txt
+ * (C) 2011-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,7 +53,7 @@ void MakeCUETitle(CString &Title, const CString& title, const CString& performer
 	}
 }
 
-bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer)
+bool ParseCUESheet(const CString& cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer)
 {
 	BOOL fAudioTrack;
 	int track_no = -1, /*index, */index_cnt = 0;

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include <list>
+#include <variant>
 #include <vector>
 #include "GolombBuffer.h"
 
@@ -30,11 +31,7 @@
 #define APE_TAG_FLAG_IS_HEADER (1 << 29)
 #define APE_TAG_FLAG_IS_BINARY (1 << 1)
 
-//
-// ApeTagItem class
-//
-
-class CApeTagItem
+class CAPETag
 {
 public:
 	enum ApeType {
@@ -42,52 +39,27 @@ public:
 		APE_TYPE_BINARY
 	};
 
-	CApeTagItem();
-
-	// load
-	bool Load(CGolombBuffer &gb);
-
-	CString GetKey()      const { return m_key; }
-	CString GetValue()    const { return m_value; }
-	const BYTE* GetData() const { return m_Data.data(); }
-	size_t GetDataLen()   const { return m_Data.size(); }
-	ApeType GetType()     const { return m_type; }
-
 protected:
-	CString           m_key;
+	size_t m_TagSize = 0;
+	size_t m_TagFields = 0;
 
-	// text value
-	CString           m_value;
+	using binary = std::vector<BYTE>;
+	using values = std::variant<CString, binary>;
+	using tagItem = std::tuple<ApeType, CString, values>;
 
-	// binary value
-	std::vector<BYTE> m_Data;
-
-	ApeType           m_type;
-};
-
-//
-// ApeTag class
-//
-
-class CAPETag
-{
-protected:
-	size_t m_TagSize;
-	size_t m_TagFields;
-
-public:
-	std::list<CApeTagItem*> TagItems;
-
-	CAPETag();
-	virtual ~CAPETag();
-
+	bool LoadItems(CGolombBuffer &gb);
 	void Clear();
 
-	// tag reading
+public:
+	CAPETag() = default;
+	~CAPETag() = default;
+
 	bool ReadFooter(BYTE *buf, const size_t len);
 	bool ReadTags(BYTE *buf, const size_t len);
 
 	size_t GetTagSize() const { return m_TagSize; }
+
+	std::list<tagItem> TagItems;
 };
 
 // additional functions
