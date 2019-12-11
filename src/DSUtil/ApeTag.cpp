@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,23 +23,15 @@
 #include "DSUtil.h"
 #include "CUE.h"
 #include "DSMPropertyBag.h"
+#include "FileHandle.h"
 
-//
-// ApeTagItem class
-//
-
-CApeTagItem::CApeTagItem()
-	: m_type(APE_TYPE_STRING)
-{
-}
-
-bool CApeTagItem::Load(CGolombBuffer &gb){
+bool CAPETag::LoadItems(CGolombBuffer &gb) {
 	if ((gb.GetSize() - gb.GetPos()) < 8) {
 		return false;
 	}
 
-	DWORD tag_size    = gb.ReadDwordLE(); /* field size */
-	const DWORD flags = gb.ReadDwordLE(); /* field flags */
+	DWORD tag_size = gb.ReadDwordLE(); // field size
+	const DWORD flags = gb.ReadDwordLE(); // field flags
 
 	CStringA key;
 	BYTE b = gb.ReadByte();
@@ -49,9 +41,7 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 	}
 
 	if (flags & APE_TAG_FLAG_IS_BINARY) {
-		m_type = APE_TYPE_BINARY;
-
-		key = "";
+		key.Empty();
 		b = gb.ReadByte();
 		tag_size--;
 		while (b && tag_size) {
@@ -61,44 +51,25 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		}
 
 		if (tag_size) {
-			m_key = key;
-			m_Data.resize(tag_size);
-			gb.ReadBuffer(m_Data.data(), tag_size);
+			binary data(tag_size);
+			gb.ReadBuffer(data.data(), tag_size);
+			TagItems.push_back(std::make_tuple(APE_TYPE_BINARY, CString(key), std::move(data)));
 		}
 	} else {
-		BYTE* value = DNew BYTE[tag_size + 1];
-		memset(value, 0, tag_size + 1);
-		gb.ReadBuffer(value, tag_size);
-		m_value = UTF8ToWStr((LPCSTR)value);
-		m_key   = key;
-		delete [] value;
+		auto data = std::make_unique<BYTE[]>(tag_size + 1);
+		if (!data) {
+			return false;
+		}
+		gb.ReadBuffer(data.get(), tag_size);
+		TagItems.push_back(std::make_tuple(APE_TYPE_STRING, CString(key), UTF8ToWStr((LPCSTR)data.get())));
 	}
 
 	return true;
 }
 
-//
-// ApeTag class
-//
-
-CAPETag::CAPETag()
-	: m_TagSize(0)
-	, m_TagFields(0)
-{
-}
-
-CAPETag::~CAPETag()
-{
-	Clear();
-}
-
 void CAPETag::Clear()
 {
-	for (auto& item : TagItems) {
-		SAFE_DELETE(item);
-	}
 	TagItems.clear();
-
 	m_TagSize = m_TagFields = 0;
 }
 
@@ -142,14 +113,10 @@ bool CAPETag::ReadTags(BYTE *buf, const size_t len)
 
 	CGolombBuffer gb(buf, len);
 	for (size_t i = 0; i < m_TagFields; i++) {
-		CApeTagItem *item = DNew CApeTagItem();
-		if (!item->Load(gb)) {
-			delete item;
+		if (!LoadItems(gb)) {
 			Clear();
 			return false;
 		}
-
-		TagItems.emplace_back(item);
 	}
 
 	return true;
@@ -163,64 +130,59 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 		return;
 	}
 
-	std::vector<BYTE> CoverData;
-	CString CoverMime, CoverFileName;
-
 	CString Artist, Comment, Title, Year, Album;
+	for (const auto& [type, key, value] : pAPETag->TagItems) {
+		CString tagKey(key); tagKey.MakeLower();
+		if (type == CAPETag::ApeType::APE_TYPE_BINARY) {
+			if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+				auto& tagValue = std::get<std::vector<BYTE>>(value);
+				if (!tagValue.empty()) {
+					CString CoverMime;
+					if (!tagKey.IsEmpty()) {
+						const auto ext = GetFileExt(tagKey);
+						if (ext == L".jpeg" || ext == L".jpg") {
+							CoverMime = L"image/jpeg";
+						} else if (ext == L".png") {
+							CoverMime = L"image/png";
+						}
+					}
 
-	for (const auto& item : pAPETag->TagItems) {
-		CString TagKey = item->GetKey().MakeLower();
-
-		if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
-			CoverMime.Empty();
-			if (!TagKey.IsEmpty()) {
-				CString ext = TagKey.Mid(TagKey.ReverseFind('.') + 1);
-				if (ext == L"jpeg" || ext == L"jpg") {
-					CoverMime = L"image/jpeg";
-				} else if (ext == L"png") {
-					CoverMime = L"image/png";
+					if (!CoverMime.IsEmpty()) {
+						pRB->ResAppend(key, L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
+					}
 				}
-			}
-
-			if (CoverData.empty() && CoverMime.GetLength() > 0) {
-				CoverFileName = TagKey;
-				CoverData.resize(item->GetDataLen());
-				memcpy(CoverData.data(), item->GetData(), item->GetDataLen());
 			}
 		} else {
 			CString sTitle, sPerformer;
+			auto& tagValue = std::get<CString>(value);
+			if (!tagValue.IsEmpty()) {
+				if (tagKey == L"cuesheet") {
+					std::list<Chapters> ChaptersList;
+					if (ParseCUESheet(tagValue, ChaptersList, sTitle, sPerformer)) {
+						if (!sTitle.IsEmpty() && Title.IsEmpty()) {
+							Title = sTitle;
+						}
+						if (!sPerformer.IsEmpty() && Artist.IsEmpty()) {
+							Artist = sPerformer;
+						}
 
-			CString TagValue = item->GetValue();
-			if (TagKey == L"cuesheet") {
-				std::list<Chapters> ChaptersList;
-				if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
-					if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
-						Title = sTitle;
-					}
-					if (sPerformer.GetLength() > 0 && Artist.IsEmpty()) {
-						Artist = sPerformer;
-					}
-
-					if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
-						pCB->ChapRemoveAll();
-						for (const auto& cp : ChaptersList) {
-							pCB->ChapAppend(cp.rt, cp.name);
+						if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+							pCB->ChapRemoveAll();
+							for (const auto& cp : ChaptersList) {
+								pCB->ChapAppend(cp.rt, cp.name);
+							}
 						}
 					}
-				}
-			}
-
-			if (TagValue.GetLength() > 0) {
-				if (TagKey == L"artist") {
-					Artist = TagValue;
-				} else if (TagKey == L"comment") {
-					Comment = TagValue;
-				} else if (TagKey == L"title") {
-					Title = TagValue;
-				} else if (TagKey == L"year") {
-					Year = TagValue;
-				} else if (TagKey == L"album") {
-					Album = TagValue;
+				} else if (tagKey == L"artist") {
+					Artist = tagValue;
+				} else if (tagKey == L"comment") {
+					Comment = tagValue;
+				} else if (tagKey == L"title") {
+					Title = tagValue;
+				} else if (tagKey == L"year") {
+					Year = tagValue;
+				} else if (tagKey == L"album") {
+					Album = tagValue;
 				}
 			}
 		}
@@ -232,11 +194,5 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 		pPB->SetProperty(L"TITL", Title);
 		pPB->SetProperty(L"YEAR", Year);
 		pPB->SetProperty(L"ALBUM", Album);
-	}
-
-	if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
-		if (CoverData.size()) {
-			pRB->ResAppend(CoverFileName, L"cover", CoverMime, CoverData.data(), (DWORD)CoverData.size(), 0);
-		}
 	}
 }
