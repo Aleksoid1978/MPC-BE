@@ -372,7 +372,7 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
 	return AmHresultFromWin32(GetLastError());
 }
 
-CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
+const CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 {
 	for (auto& stream : GetStreams()) {
 		if (stream.m_PID == wPID) {
