@@ -155,8 +155,8 @@ public:
 	HRESULT ReadInfo(LPCWSTR strFile, SyncPoints* sps = nullptr);
 	bool    IsHdmv() const { return !m_Streams.empty(); }
 
-	Stream*  FindStream(SHORT wPID);
-	Streams& GetStreams() { return !stn.m_Streams.empty() ? stn.m_Streams : m_Streams; }
+	const Stream* FindStream(SHORT wPID);
+	const Streams& GetStreams() { return !stn.m_Streams.empty() ? stn.m_Streams : m_Streams; }
 
 	HRESULT FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& Playlists);
 	HRESULT ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = nullptr);

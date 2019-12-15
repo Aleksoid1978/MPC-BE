@@ -1816,7 +1816,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 			}
 
 			CMpegSplitterFile::stream s = *it;
-			CHdmvClipInfo::Stream* pStream = m_ClipInfo.FindStream(s.pid);
+			const auto pStream = m_ClipInfo.FindStream(s.pid);
 
 			if (ppmt) {
 				*ppmt = CreateMediaType(&s.mts[0]);
