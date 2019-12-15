@@ -374,7 +374,7 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
 
 CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 {
-	for (auto& stream : m_Streams) {
+	for (auto& stream : GetStreams()) {
 		if (stream.m_PID == wPID) {
 			return &stream;
 		}
