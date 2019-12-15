@@ -891,6 +891,10 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		return s;
 	}
 
+	if (m_ClipInfo.IsHdmv() && !m_ClipInfo.FindStream(s.pid)) {
+		return s;
+	}
+
 	const __int64 start   = GetPos();
 	enum stream_type type = stream_type::unknown;
 
