@@ -29,6 +29,7 @@
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
+#include "../../DSUtil/std_helper.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "OpenDlg.h"
@@ -1597,7 +1598,8 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		base.RemoveFileSpec();
 	}
 
-	CFileItemList audio_fns;
+	std::map<CString, CFileItemList> audio_fns;
+	CString audioId;
 
 	std::vector<CPlaylistItem> playlist;
 	CPlaylistItem *pli = nullptr;
@@ -1634,23 +1636,15 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				const int pos = 18;
 				str = str.Mid(pos, str.GetLength() - pos);
 				pli->m_label = str.Trim();
-			} else if (str.Left(13) == L"#EXT-X-MEDIA:" && str.Find(L"TYPE=AUDIO") > 13) {
-				int pos = 13;
-				str = str.Mid(pos, str.GetLength() - pos);
 
-				std::list<CString> params;
-				Explode(str, params, L',');
-				for (const auto& param : params) {
-					pos = param.Find(L'=');
-					if (pos > 0) {
-						const auto key = param.Left(pos);
-						auto value = param.Mid(pos + 1);
-						if (key == L"URI") {
-							value.Trim(L'\"');
-							const auto path = MakePath(CombinePath(base, value));
-							audio_fns.push_back(path);
-							break;
-						}
+				audioId = RegExpParse<CString>(str.GetString(), LR"(AUDIO=\"(\S*?)\")");
+			} else if (str.Left(13) == L"#EXT-X-MEDIA:" && str.Find(L"TYPE=AUDIO") >= 13) {
+				const auto id = RegExpParse<CString>(str.GetString(), LR"(GROUP-ID=\"(\S*?)\")");
+				if (!id.IsEmpty()) {
+					const auto url = RegExpParse<CString>(str.GetString(), LR"(URI=\"(.*?)\")");
+					if (!url.IsEmpty()) {
+						auto& audio_items = audio_fns[id];
+						audio_items.emplace_back(url);
 					}
 				}
 			}
@@ -1686,8 +1680,13 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 			}
 			pli->m_fns.push_back(path);
-			if (!audio_fns.empty()) {
-				pli->m_fns.insert(pli->m_fns.end(), audio_fns.begin(), audio_fns.end());
+			if (!audioId.IsEmpty()) {
+				const auto it = audio_fns.find(audioId);
+				if (it != audio_fns.cend()) {
+					const auto& audio_items = it->second;
+					pli->m_fns.insert(pli->m_fns.end(), audio_items.begin(), audio_items.end());
+				}
+				audioId.Empty();
 			}
 			playlist.push_back(*pli);
 
