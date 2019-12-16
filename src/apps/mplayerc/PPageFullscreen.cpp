@@ -154,7 +154,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 		DWORD devMon = 0;
 		while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-				const CString DeviceID = RegExpParse<CString>(ddMon.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
+				const CString DeviceID = RegExpParse<CString>(ddMon.DeviceID, LR"(MONITOR\\(\S*?)\\)");
 				const CString DeviceName = RegExpParse<CString>(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
 
 				if (!DeviceID.IsEmpty() && !DeviceName.IsEmpty()) {
