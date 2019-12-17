@@ -50,7 +50,7 @@
 +---------------------------------------------------------------------*/
 AP4_Track::AP4_Track(Type             type,
                      AP4_SampleTable* sample_table,
-                     AP4_UI32         track_id, 
+                     AP4_UI32         track_id,
                      AP4_UI32         movie_time_scale,
                      AP4_UI32         media_time_scale,
                      AP4_UI64         media_duration,
@@ -61,8 +61,8 @@ AP4_Track::AP4_Track(Type             type,
     m_Type(type),
     m_SampleTable(sample_table),
     m_SampleTableIsOwned(false),
-    m_MovieTimeScale(movie_time_scale ? 
-                     movie_time_scale : 
+    m_MovieTimeScale(movie_time_scale ?
+                     movie_time_scale :
                      AP4_TRACK_DEFAULT_MOVIE_TIMESCALE),
     m_MediaTimeScale(media_time_scale)
 {
@@ -102,25 +102,25 @@ AP4_Track::AP4_Track(Type             type,
 
     // create a trak atom
     m_TrakAtom = new AP4_TrakAtom(sample_table,
-                                  hdlr_type, 
+                                  hdlr_type,
                                   hdlr_name,
-                                  track_id, 
-                                  0, 
-                                  0, 
+                                  track_id,
+                                  0,
+                                  0,
                                   track_duration,
                                   media_time_scale,
                                   media_duration,
-                                  volume, 
+                                  volume,
                                   language,
-                                  width, 
+                                  width,
                                   height);
 }
 
 /*----------------------------------------------------------------------
 |       AP4_Track::AP4_Track
 +---------------------------------------------------------------------*/
-AP4_Track::AP4_Track(AP4_TrakAtom&   atom, 
-                     AP4_ByteStream& sample_stream, 
+AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
+                     AP4_ByteStream& sample_stream,
                      AP4_UI32        movie_time_scale) :
     m_TrakAtom(&atom),
     m_TrakAtomIsOwned(false),
@@ -270,7 +270,7 @@ AP4_Track::GetSampleCount()
 /*----------------------------------------------------------------------
 |       AP4_Track::GetSample
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_Track::GetSample(AP4_Ordinal index, AP4_Sample& sample)
 {
     // delegate to the sample table
@@ -290,8 +290,8 @@ AP4_Track::GetSampleDescription(AP4_Ordinal index)
 /*----------------------------------------------------------------------
 |       AP4_Track::ReadSample
 +---------------------------------------------------------------------*/
-AP4_Result   
-AP4_Track::ReadSample(AP4_Ordinal     index, 
+AP4_Result
+AP4_Track::ReadSample(AP4_Ordinal     index,
                       AP4_Sample&     sample,
                       AP4_DataBuffer& data)
 {
@@ -308,7 +308,7 @@ AP4_Track::ReadSample(AP4_Ordinal     index,
 /*----------------------------------------------------------------------
 |       AP4_Track::GetSampleIndexForTimeStampMs
 +---------------------------------------------------------------------*/
-AP4_Result  
+AP4_Result
 AP4_Track::GetSampleIndexForTimeStampMs(AP4_TimeStamp ts, AP4_Ordinal& index)
 {
     // convert the ts in the timescale of the track's media
@@ -321,7 +321,7 @@ AP4_Track::GetSampleIndexForTimeStampMs(AP4_TimeStamp ts, AP4_Ordinal& index)
 /*----------------------------------------------------------------------
 |       AP4_Track::GetSampleIndexForRefTime
 +---------------------------------------------------------------------*/
-AP4_Result  
+AP4_Result
 AP4_Track::GetSampleIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index)
 {
     // MPC-BE custom code start
@@ -373,10 +373,10 @@ AP4_Track::SetMovieTimeScale(AP4_UI32 time_scale)
     if (m_MovieTimeScale == 0) return AP4_FAILURE;
 
     // convert from one time scale to the other
-    m_TrakAtom->SetDuration(AP4_ConvertTime(m_TrakAtom->GetDuration(), 
+    m_TrakAtom->SetDuration(AP4_ConvertTime(m_TrakAtom->GetDuration(),
                                             m_MovieTimeScale,
                                             time_scale));
-    
+
     // keep the new movie timescale
     m_MovieTimeScale = time_scale;
 
@@ -393,7 +393,7 @@ AP4_Track::GetMediaTimeScale()
 }
 
 // save the implementation for later
-#if 0 
+#if 0
 /*----------------------------------------------------------------------
 |       AP4_HintTrack::SetSdpText
 +---------------------------------------------------------------------*/
@@ -473,11 +473,12 @@ AP4_Track::CreateFragmentFromStdSamples()
 }
 
 /*----------------------------------------------------------------------
-|       AP4_Track::CreateFragmentFromStdSamples
+|       AP4_Track::CreateIndexFromFragment
 +---------------------------------------------------------------------*/
 AP4_Result
 AP4_Track::CreateIndexFromFragment()
 {
+    if (!m_FragmentSampleTable.GetSampleCount()) return AP4_FAILURE;
     m_IndexEntries.Clear();
     for (AP4_Cardinal index = 0; index < m_FragmentSampleTable.GetSampleCount(); index++) {
         AP4_Sample sample;
