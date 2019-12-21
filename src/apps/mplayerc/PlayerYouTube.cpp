@@ -386,21 +386,7 @@ namespace Youtube
 				JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
 			}
 
-			CStringA player_responce_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
-			rapidjson::Document player_responce_jsonDocument;
-			if (!player_responce_jsonData.IsEmpty()) {
-				player_responce_jsonData += "}";
-				player_responce_jsonData.Replace("\\u0026", "&");
-				player_responce_jsonData.Replace("\\/", "/");
-				player_responce_jsonData.Replace("\\\"", "\"");
-				player_responce_jsonData.Replace("\\\\\"", "\\\"");
-				player_responce_jsonData.Replace("\\&", "&");
-
-				player_responce_jsonDocument.Parse(player_responce_jsonData);
-			}
-
-			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
-			std::list<streamingDataFormat> streamingDataFormatList;
+			rapidjson::Document player_response_jsonDocument;
 
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
@@ -434,13 +420,20 @@ namespace Youtube
 					return false;
 				}
 
+				const CStringA strData = UrlDecode(data);
+
+				const auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonDocument.Parse(player_response_jsonData);
+				}
+
 				// url_encoded_fmt_stream_map
-				const CStringA stream_map = UrlDecode(GetEntry(data, MATCH_STREAM_MAP_START_2, MATCH_END_2));
+				const CStringA stream_map = GetEntry(strData, MATCH_STREAM_MAP_START_2, MATCH_END_2);
 				if (!stream_map.IsEmpty()) {
 					strUrls = stream_map;
 				}
 				// adaptive_fmts
-				const CStringA adaptive_fmts = UrlDecode(GetEntry(data, MATCH_ADAPTIVE_FMTS_START_2, MATCH_END_2));
+				CStringA adaptive_fmts = GetEntry(strData, MATCH_ADAPTIVE_FMTS_START_2, MATCH_END_2);
 				if (!adaptive_fmts.IsEmpty()) {
 					if (!strUrls.IsEmpty()) {
 						strUrls += ',';
@@ -486,98 +479,110 @@ namespace Youtube
 						return true;
 					}
 				} else {
-					if (!player_responce_jsonDocument.IsNull()) {
-						if (player_responce_jsonDocument.HasMember("streamingData")) {
-							const auto& streamingData = player_responce_jsonDocument["streamingData"];
-							if (streamingData.IsObject()) {
-								if (streamingData.HasMember("formats")) {
-									const auto& formats = streamingData["formats"];
-									if (formats.IsArray()) {
-										for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
-											const auto& format = formats[i];
-											streamingDataFormat element;
-											if (format.HasMember("itag")) {
-												const auto& itag = format["itag"];
-												if (itag.IsInt()) {
-													std::get<0>(element) = itag.GetInt();
-												}
-											}
-											if (format.HasMember("qualityLabel")) {
-												const auto& qualityLabel = format["qualityLabel"];
-												if (qualityLabel.IsString()) {
-													std::get<3>(element) = qualityLabel.GetString();
-												}
-											}
-											if (format.HasMember("url")) {
-												const auto& url = format["url"];
-												if (url.IsString()) {
-													std::get<1>(element) = url.GetString();
-													streamingDataFormatList.emplace_back(element);
-												}
-											} else if (format.HasMember("cipher")) {
-												const auto& cipher = format["cipher"];
-												if (cipher.IsString()) {
-													std::get<2>(element) = cipher.GetString();
-													streamingDataFormatList.emplace_back(element);
-												}
-											}
-										}
-									}
-								}
+					auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+					if (!player_response_jsonData.IsEmpty()) {
+						player_response_jsonData += "}";
+						player_response_jsonData.Replace("\\u0026", "&");
+						player_response_jsonData.Replace("\\/", "/");
+						player_response_jsonData.Replace("\\\"", "\"");
+						player_response_jsonData.Replace("\\\\\"", "\\\"");
+						player_response_jsonData.Replace("\\&", "&");
 
-								if (streamingData.HasMember("adaptiveFormats")) {
-									const auto& adaptiveFormats = streamingData["adaptiveFormats"];
-									if (adaptiveFormats.IsArray()) {
-										for (rapidjson::SizeType i = 0; i < adaptiveFormats.Size(); i++) {
-											const auto& adaptiveFormat = adaptiveFormats[i];
-											streamingDataFormat element;
-											if (adaptiveFormat.HasMember("itag")) {
-												const auto& itag = adaptiveFormat["itag"];
-												if (itag.IsInt()) {
-													std::get<0>(element) = itag.GetInt();
-												}
-											}
-											if (adaptiveFormat.HasMember("qualityLabel")) {
-												const auto& qualityLabel = adaptiveFormat["qualityLabel"];
-												if (qualityLabel.IsString()) {
-													std::get<3>(element) = qualityLabel.GetString();
-												}
-											}
-											if (adaptiveFormat.HasMember("url")) {
-												const auto& url = adaptiveFormat["url"];
-												if (url.IsString()) {
-													std::get<1>(element) = url.GetString();
-													streamingDataFormatList.emplace_back(element);
-												}
-											} else if (adaptiveFormat.HasMember("cipher")) {
-												const auto& cipher = adaptiveFormat["cipher"];
-												if (cipher.IsString()) {
-													std::get<2>(element) = cipher.GetString();
-													streamingDataFormatList.emplace_back(element);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
+						player_response_jsonDocument.Parse(player_response_jsonData);
 					}
 
-					if (streamingDataFormatList.empty()) {
-						// url_encoded_fmt_stream_map
-						const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
-						if (!stream_map.IsEmpty()) {
-							strUrls = stream_map;
+					// url_encoded_fmt_stream_map
+					const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
+					if (!stream_map.IsEmpty()) {
+						strUrls = stream_map;
+					}
+					// adaptive_fmts
+					const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+					if (!adaptive_fmts.IsEmpty()) {
+						if (!strUrls.IsEmpty()) {
+							strUrls += ',';
 						}
-						// adaptive_fmts
-						const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
-						if (!adaptive_fmts.IsEmpty()) {
-							if (!strUrls.IsEmpty()) {
-								strUrls += ',';
+						strUrls += adaptive_fmts;
+					}
+					strUrls.Replace("\\u0026", "&");
+				}
+			}
+
+			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
+			std::list<streamingDataFormat> streamingDataFormatList;
+			if (!player_response_jsonDocument.IsNull()) {
+				if (player_response_jsonDocument.HasMember("streamingData")) {
+					const auto& streamingData = player_response_jsonDocument["streamingData"];
+					if (streamingData.IsObject()) {
+						if (streamingData.HasMember("formats")) {
+							const auto& formats = streamingData["formats"];
+							if (formats.IsArray()) {
+								for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
+									const auto& format = formats[i];
+									streamingDataFormat element;
+									if (format.HasMember("itag")) {
+										const auto& itag = format["itag"];
+										if (itag.IsInt()) {
+											std::get<0>(element) = itag.GetInt();
+										}
+									}
+									if (format.HasMember("qualityLabel")) {
+										const auto& qualityLabel = format["qualityLabel"];
+										if (qualityLabel.IsString()) {
+											std::get<3>(element) = qualityLabel.GetString();
+										}
+									}
+									if (format.HasMember("url")) {
+										const auto& url = format["url"];
+										if (url.IsString()) {
+											std::get<1>(element) = url.GetString();
+											streamingDataFormatList.emplace_back(element);
+										}
+									} else if (format.HasMember("cipher")) {
+										const auto& cipher = format["cipher"];
+										if (cipher.IsString()) {
+											std::get<2>(element) = cipher.GetString();
+											streamingDataFormatList.emplace_back(element);
+										}
+									}
+								}
 							}
-							strUrls += adaptive_fmts;
 						}
-						strUrls.Replace("\\u0026", "&");
+
+						if (streamingData.HasMember("adaptiveFormats")) {
+							const auto& adaptiveFormats = streamingData["adaptiveFormats"];
+							if (adaptiveFormats.IsArray()) {
+								for (rapidjson::SizeType i = 0; i < adaptiveFormats.Size(); i++) {
+									const auto& adaptiveFormat = adaptiveFormats[i];
+									streamingDataFormat element;
+									if (adaptiveFormat.HasMember("itag")) {
+										const auto& itag = adaptiveFormat["itag"];
+										if (itag.IsInt()) {
+											std::get<0>(element) = itag.GetInt();
+										}
+									}
+									if (adaptiveFormat.HasMember("qualityLabel")) {
+										const auto& qualityLabel = adaptiveFormat["qualityLabel"];
+										if (qualityLabel.IsString()) {
+											std::get<3>(element) = qualityLabel.GetString();
+										}
+									}
+									if (adaptiveFormat.HasMember("url")) {
+										const auto& url = adaptiveFormat["url"];
+										if (url.IsString()) {
+											std::get<1>(element) = url.GetString();
+											streamingDataFormatList.emplace_back(element);
+										}
+									} else if (adaptiveFormat.HasMember("cipher")) {
+										const auto& cipher = adaptiveFormat["cipher"];
+										if (cipher.IsString()) {
+											std::get<2>(element) = cipher.GetString();
+											streamingDataFormatList.emplace_back(element);
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -1034,9 +1039,9 @@ namespace Youtube
 
 				if (!videoId.IsEmpty()) {
 					// subtitle
-					if (!player_responce_jsonDocument.IsNull()) {
-						const auto& root = player_responce_jsonDocument.FindMember("captions");
-						if (root != player_responce_jsonDocument.MemberEnd()) {
+					if (!player_response_jsonDocument.IsNull()) {
+						const auto& root = player_response_jsonDocument.FindMember("captions");
+						if (root != player_response_jsonDocument.MemberEnd()) {
 							const auto& iter = root->value.FindMember("playerCaptionsTracklistRenderer");
 							if (iter != root->value.MemberEnd()) {
 								const auto& captionTracks = iter->value.FindMember("captionTracks");
