@@ -3,6 +3,101 @@
 1.5.4 (beta)
 =============================
 
+Splitters:
+Instead of the IBufferControl interface, the more universal IExFilterConfig interface is now used.
+
+ShoutcastSource
+Improved support for JSON metadata.
+
+Flacsource
+Added support for files with an unspecified number of samples.
+
+AudioSplitter
+Added support with ID3Tag for WavPack.
+
+RawVideoSplitter
+Fixed accidental connection to "MPEG-TS".
+
+RoQSplitter
+Fixed freezing when opening some files.
+
+OggSplitter
+Fixed errors when opening some files.
+
+FLVSplitter
+Added support for the KUX container.
+
+MpegSplitter
+Improved support for corrupted MPEG-PS.
+Fixed display of tracks for the current Blu-ray playlist (.mpls).
+
+MatroskaSplitter
+Added support for new font mime-types.
+Fixed crash on some corrupted files.
+
+MP4Splitter
+Extended support for DV Video.
+Fixed calculation of aspect ratio for some files.
+Improved support for Opus audio tracks.
+Fixed opening files with VC-1 video.
+Added support for TrueHD audio.
+Added support for covers in the 'covr' atom.
+
+MpaDecFilter
+Improved bitstream capability check.
+Improved DTS bitstream.
+Improved support for AAC HE v2.
+
+RoQVideoDecoder
+Removed output support for 'I420', 'IYUV', ARGB32, RGB565, RGB555.
+
+RealVideoDecoder
+Removed output support for 'I420' and 'IYUV'.
+
+Mpeg2decfilter
+Removed output support for 'I420' and 'IYUV'.
+The obsolete option "Enable planar YUV media types (NV12, YV12)" has been removed.
+
+MPCVideoDec
+Added media types to support DV Video.
+Fixed calculation of SAR video frame.
+Improved AV1 decoding.
+Implemented updating the output format in status after changing the settings.
+
+MPCVideoConverter
+Added support for 'b48r' video.
+
+MpcAudioRenderer
+Fixed playback of audio data with a time delay.
+Fixed DVD playback.
+The size of the internal buffer is now set depending on the buffer of the device. This improves playback on some audio devices.
+Improved switching between audio devices.
+Increased maximum playback speed to 16x.
+The device is now remembered not only by identifier, but also by name.
+If the Exclusive mode is unavailable, the Shared mode will be used.
+Improved support for Shared mode on Windows 10. Added support for virtual 7.1 speakers when activating the "Windows Sonic for Headphones" mode.
+Improved performance when resuming playback after a pause.
+
+EVR-CP
+Fixed interpolation of DXVA2 / DXVA-HD after reconstituting Direct3D9 device.
+Added ability to use Flip / FlipEx mode.
+Fixed display of the line "Processing" in statistics.
+Fixed display of the frame after stopping playback and subsequent navigation.
+Fixed overflow when calculating Diplay Aspect Ratio.
+
+Subtitles
+Fixed a high load on the CPU when displaying VobSub subtitles and the active option "Only forced".
+Improved support for PGS subtitles in incomplete .sup files.
+
+Youtube
+Updated support for Youtube.
+Added support for multi-channel (5.1) audio tracks.
+Added option "Select maximum frame rate or bit rate" when using youtube-dl.
+Added the ability to not use the available youtube-dl.
+
+Player
+...
+
 Updated Russian translation.
 Updated German translation (by Klaus1189).
 Updated Ukrainian translation (by arestarh1986).
