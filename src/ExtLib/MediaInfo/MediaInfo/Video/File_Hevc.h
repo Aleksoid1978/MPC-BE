@@ -387,6 +387,10 @@ private :
     //Packets - Specific
     void VPS_SPS_PPS();
     void VPS_SPS_PPS_FromMatroska();
+    void EndOfxPS(const char* FlagName, const char* DataName);
+    void rbsp_trailing_bits();
+    size_t RiskCalculationN;
+    size_t RiskCalculationD;
 
     vector<stream_payload> Streams;
 
@@ -398,6 +402,7 @@ private :
     video_parameter_set_structs         video_parameter_sets;
     seq_parameter_set_structs           seq_parameter_sets;
     pic_parameter_set_structs           pic_parameter_sets;
+
 
     void Clean_Seq_Parameter();
 

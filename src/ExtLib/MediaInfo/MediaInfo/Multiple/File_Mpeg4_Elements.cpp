@@ -780,6 +780,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr=0x636F6C72;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_clcn=0x636C636E;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc=0x6E636C63;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclx=0x6E636C78;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof=0x70726F66;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_d263=0x64323633;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dac3=0x64616333;
@@ -6355,16 +6356,18 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr()
     {
         case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_clcn: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(true); break;
         case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(); break;
+        case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclx: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(false, true); break;
         case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof(); break;
         default                                                    : Skip_XX(Element_Size-Element_Offset, "Unknown");
     }
 }
 
 //---------------------------------------------------------------------------
-void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian)
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian, bool HasFlags)
 {
     //Parsing
     int16u  colour_primaries, transfer_characteristics, matrix_coefficients;
+    bool full_range_flag;
     if (LittleEndian)
         Get_L2 (colour_primaries,                               "Primaries index");
     else
@@ -6380,6 +6383,12 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian)
     else
         Get_B2 (matrix_coefficients,                            "Matrix index");
     Param_Info1(Mpegv_matrix_coefficients((int8u)matrix_coefficients));
+    if (HasFlags)
+    {
+        BS_Begin();
+        Get_SB (full_range_flag,                                "full_range_flag");
+        BS_End();
+    }
 
     FILLING_BEGIN();
         if (Retrieve(Stream_Video, StreamPos_Last, Video_colour_description_present).empty()) //Using only the first one met
@@ -6390,6 +6399,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian)
             Fill(Stream_Video, StreamPos_Last, Video_matrix_coefficients, Mpegv_matrix_coefficients((int8u)matrix_coefficients));
             if (matrix_coefficients!=2)
                 Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace((int8u)matrix_coefficients), Unlimited, true, true);
+            if (HasFlags)
+                Fill(Stream_Video, StreamPos_Last, Video_colour_range, full_range_flag?"Full":"Limited");
         }
     FILLING_END();
 }

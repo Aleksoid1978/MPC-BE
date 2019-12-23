@@ -197,6 +197,10 @@ File_Hevc::File_Hevc()
 
     //File specific
     lengthSizeMinusOne=(int8u)-1;
+
+    //Specific
+    RiskCalculationN=0;
+    RiskCalculationD=0;
 }
 
 //---------------------------------------------------------------------------
@@ -1268,7 +1272,14 @@ void File_Hevc::slice_segment_layer()
 
             //Filling only if not already done
             if (Frame_Count==1 && !Status[IsAccepted])
+            {
+                if (RiskCalculationD && RiskCalculationN*2>=RiskCalculationD) // Check if we trust or not the sync
+                {
+                    Reject("HEVC");
+                    return;
+                }
                 Accept("HEVC");
+            }
             if (!Status[IsFilled])
             {
                 if (IFrame_Count>=8)
@@ -1327,6 +1338,8 @@ void File_Hevc::video_parameter_set()
     if (vps_max_sub_layers_minus1>6)
     {
         Trusted_IsNot("vps_max_sub_layers_minus1 not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         BS_End();
         return; //Problem, not valid
     }
@@ -1353,6 +1366,8 @@ void File_Hevc::video_parameter_set()
     if (vps_num_layer_sets_minus1>=1024)
     {
         Trusted_IsNot("vps_num_layer_sets_minus1 not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         BS_End();
         return; //Problem, not valid
     }
@@ -1366,6 +1381,8 @@ void File_Hevc::video_parameter_set()
         if (vps_time_scale==0)
         {
             Trusted_IsNot("vps_time_scale not valid");
+            RiskCalculationN++;
+            RiskCalculationD++;
             Element_End0();
             BS_End();
             return; //Problem, not valid
@@ -1377,6 +1394,8 @@ void File_Hevc::video_parameter_set()
         if (vps_num_hrd_parameters>1024)
         {
             Trusted_IsNot("vps_num_hrd_parameters not valid");
+            RiskCalculationN++;
+            RiskCalculationD++;
             vps_num_hrd_parameters=0;
         }
         for (int32u HrdPos=0; HrdPos<vps_num_hrd_parameters; HrdPos++)
@@ -1398,14 +1417,7 @@ void File_Hevc::video_parameter_set()
             delete VCL; VCL=NULL;
         }
     TEST_SB_END();
-    TESTELSE_SB_SKIP(                                           "vps_extension_flag");
-        Skip_BS(Data_BS_Remain(),                               "vps_extension_data");
-        Trusted_IsNot("(Not supported)"); // Should be skipped, but the detection is too sensible in that case, do not remove it until the detection is adapted
-    TESTELSE_SB_ELSE(                                           "vps_extension_flag");
-        Mark_1();
-        while (Data_BS_Remain())
-            Mark_0();
-    TESTELSE_SB_END();
+    EndOfxPS(                                                   "vps_extension_flag", "vps_extension_data");
     BS_End();
 
     FILLING_BEGIN_PRECISE();
@@ -1449,6 +1461,8 @@ void File_Hevc::seq_parameter_set()
         //Not yet present
         Skip_BS(Data_BS_Remain(),                               "Data (video_parameter_set is missing)");
         BS_End();
+        RiskCalculationN++;
+        RiskCalculationD++;
         return;
     }
     Get_S1 (3, max_sub_layers_minus1,                           "sps_max_sub_layers_minus1");
@@ -1501,6 +1515,8 @@ void File_Hevc::seq_parameter_set()
     if (chroma_format_idc>=4)
     {
         Trusted_IsNot("chroma_format_idc not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         BS_End();
         return; //Problem, not valid
     }
@@ -1518,18 +1534,24 @@ void File_Hevc::seq_parameter_set()
     if (bit_depth_luma_minus8>6)
     {
         Trusted_IsNot("bit_depth_luma_minus8 not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         return; //Problem, not valid
     }
     Get_UE (   bit_depth_chroma_minus8,                         "bit_depth_chroma_minus8");
     if (bit_depth_chroma_minus8>6)
     {
         Trusted_IsNot("bit_depth_chroma_minus8 not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         return; //Problem, not valid
     }
     Get_UE (   log2_max_pic_order_cnt_lsb_minus4,               "log2_max_pic_order_cnt_lsb_minus4");
     if (log2_max_pic_order_cnt_lsb_minus4>12)
     {
         Trusted_IsNot("log2_max_pic_order_cnt_lsb_minus4 not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         return; //Problem, not valid
     }
     Get_SB (   sps_sub_layer_ordering_info_present_flag,        "sps_sub_layer_ordering_info_present_flag");
@@ -1568,6 +1590,8 @@ void File_Hevc::seq_parameter_set()
     {
         BS_End();
         Trusted_IsNot("num_short_term_ref_pic_sets not valid");
+        RiskCalculationN++;
+        RiskCalculationD++;
         return; //Problem, not valid
     }
     short_term_ref_pic_sets((int8u)num_short_term_ref_pic_sets);
@@ -1587,14 +1611,7 @@ void File_Hevc::seq_parameter_set()
     TEST_SB_SKIP(                                               "vui_parameters_present_flag");
         vui_parameters(video_parameter_set_Item, vui_parameters_Item);
     TEST_SB_END();
-    TESTELSE_SB_SKIP(                                           "sps_extension_flag");
-        Skip_BS(Data_BS_Remain(),                               "sps_extension_data");
-        Trusted_IsNot("(Not supported)"); // Should be skipped, but the detection is too sensible in that case, do not remove it until the detection is adapted
-    TESTELSE_SB_ELSE(                                           "sps_extension_flag");
-        Mark_1();
-        while (Data_BS_Remain())
-            Mark_0();
-    TESTELSE_SB_END();
+    EndOfxPS(                                                   "sps_extension_flag", "sps_extension_data");
     BS_End();
 
     FILLING_BEGIN_PRECISE();
@@ -1653,12 +1670,17 @@ void File_Hevc::pic_parameter_set()
     {
         Trusted_IsNot("pic_parameter_set_id not valid");
         BS_End();
+        RiskCalculationN++;
+        RiskCalculationD++;
         return; //Problem, not valid
     }
     Get_UE (    pps_seq_parameter_set_id,                       "pps_seq_parameter_set_id");
     if (pps_seq_parameter_set_id>=16)
     {
         Trusted_IsNot("seq_parameter_set_id not valid");
+        BS_End();
+        RiskCalculationN++;
+        RiskCalculationD++;
         return; //Problem, not valid
     }
     //std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item;
@@ -1667,6 +1689,8 @@ void File_Hevc::pic_parameter_set()
         //Not yet present
         Skip_BS(Data_BS_Remain(),                               "Data (seq_parameter_set is missing)");
         BS_End();
+        RiskCalculationN++;
+        RiskCalculationD++;
         return;
     }
     if (MustParse_VPS_SPS_PPS_FromFlv)
@@ -1765,14 +1789,7 @@ void File_Hevc::pic_parameter_set()
     Skip_SB(                                                    "lists_modification_present_flag");
     Skip_UE(                                                    "log2_parallel_merge_level_minus2");
     Skip_SB(                                                    "slice_segment_header_extension_present_flag");
-    TESTELSE_SB_SKIP(                                           "pps_extension_flag");
-        Skip_BS(Data_BS_Remain(),                               "pps_extension_data");
-        Trusted_IsNot("(Not supported)"); // Should be skipped, but the detection is too sensible in that case, do not remove it until the detection is adapted
-    TESTELSE_SB_ELSE(                                           "pps_extension_flag");
-        Mark_1();
-        while (Data_BS_Remain())
-            Mark_0();
-    TESTELSE_SB_END();
+    EndOfxPS(                                                   "pps_extension_flag", "pps_extension_data");
     BS_End();
 
     FILLING_BEGIN_PRECISE();
@@ -1835,7 +1852,14 @@ void File_Hevc::access_unit_delimiter()
     //Parsing
     BS_Begin();
     Info_S1( 3, pic_type,                                   "pic_type"); Param_Info1(Hevc_pic_type[pic_type]);
+    Mark_1();
     BS_End();
+
+    FILLING_BEGIN_PRECISE();
+    FILLING_ELSE();
+        RiskCalculationN++;
+    FILLING_END();
+    RiskCalculationD++;
 }
 
 //---------------------------------------------------------------------------
@@ -1877,10 +1901,21 @@ void File_Hevc::sei()
         Element_End0();
     }
     BS_Begin();
-    if (!Peek_SB())
+    if (!Data_BS_Remain() || !Peek_SB())
+    {
         Fill(Stream_Video, 0, "SEI_rbsp_stop_one_bit", "Missing", Unlimited, true, true);
-    Mark_1(                                                     );
+        RiskCalculationN++;
+        RiskCalculationD++;
+    }
+    else
+        rbsp_trailing_bits();
     BS_End();
+
+    FILLING_BEGIN_PRECISE();
+    FILLING_ELSE();
+        RiskCalculationN++;
+    FILLING_END();
+    RiskCalculationD++;
 }
 
 //---------------------------------------------------------------------------
@@ -1977,6 +2012,8 @@ void File_Hevc::sei_message_buffering_period(int32u &seq_parameter_set_id, int32
         //Not yet present
         Skip_BS(Data_BS_Remain(),                               "Data (seq_parameter_set is missing)");
         BS_End();
+        RiskCalculationN++;
+        RiskCalculationD++;
         return;
     }
     bool sub_pic_hrd_params_present_flag=false; //Default
@@ -2620,6 +2657,8 @@ void File_Hevc::slice_segment_header()
     if (slice_pic_parameter_set_id>=pic_parameter_sets.size() || (*(pic_parameter_set_Item=pic_parameter_sets.begin()+slice_pic_parameter_set_id))==NULL)
     {
         //Not yet present
+        RiskCalculationN++;
+        RiskCalculationD++;
         Skip_BS(Data_BS_Remain(),                               "Data (pic_parameter_set is missing)");
         Element_End0();
         slice_pic_parameter_set_id=(int32u)-1;
@@ -3327,6 +3366,53 @@ void File_Hevc::VPS_SPS_PPS_FromMatroska()
     FILLING_BEGIN_PRECISE();
         Accept("HEVC");
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Hevc::EndOfxPS(const char* FlagName, const char* DataName)
+{
+    TESTELSE_SB_SKIP(                                           FlagName);
+        Skip_BS(Data_BS_Remain(),                               DataName);
+        RiskCalculationN++; //xxx_extension_flag is set, we can not check the end of the content, so a bit risky
+        RiskCalculationD++;
+    TESTELSE_SB_ELSE(                                           FlagName);
+        rbsp_trailing_bits();
+    TESTELSE_SB_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Hevc::rbsp_trailing_bits()
+{
+    size_t IsRisky;
+    size_t Remain=Data_BS_Remain();
+    if (!Remain)
+        IsRisky=1; //rbsp_stop_one_bit is missing 
+    else if (Remain>8)
+        IsRisky=1+Remain/80; //there is lot of unexpected content, not normal, so highly risky (risk weight based on remaining content size)
+    else
+    {
+        int8u RealValue;
+        const int8u ExpectedValue=1<<(Remain-1);
+        Peek_S1(Remain, RealValue);
+        if (RealValue==ExpectedValue)
+        {
+            // Conform to specs
+            IsRisky=0;
+            Mark_1();
+            while (Data_BS_Remain())
+                Mark_0();
+        }
+        else
+            IsRisky=1; //there is some unexpected content, not normal, so highly risky
+    }
+    if (IsRisky)
+    {
+        Skip_BS(Remain,                                     "Unknown");
+        RiskCalculationN+=IsRisky;
+        RiskCalculationD+=IsRisky;
+    }
+    else
+        RiskCalculationD++;
 }
 
 } //NameSpace
