@@ -376,10 +376,10 @@ static OPJ_BOOL opj_pi_next_rpcl(opj_pi_iterator_t * pi)
         pi->poc.tx1 = pi->tx1;
     }
     for (pi->resno = pi->poc.resno0; pi->resno < pi->poc.resno1; pi->resno++) {
-        for (pi->y = pi->poc.ty0; pi->y < pi->poc.ty1;
-                pi->y += (OPJ_INT32)(pi->dy - (OPJ_UINT32)(pi->y % (OPJ_INT32)pi->dy))) {
-            for (pi->x = pi->poc.tx0; pi->x < pi->poc.tx1;
-                    pi->x += (OPJ_INT32)(pi->dx - (OPJ_UINT32)(pi->x % (OPJ_INT32)pi->dx))) {
+        for (pi->y = (OPJ_UINT32)pi->poc.ty0; pi->y < (OPJ_UINT32)pi->poc.ty1;
+                pi->y += (pi->dy - (pi->y % pi->dy))) {
+            for (pi->x = (OPJ_UINT32)pi->poc.tx0; pi->x < (OPJ_UINT32)pi->poc.tx1;
+                    pi->x += (pi->dx - (pi->x % pi->dx))) {
                 for (pi->compno = pi->poc.compno0; pi->compno < pi->poc.compno1; pi->compno++) {
                     OPJ_UINT32 levelno;
                     OPJ_INT32 trx0, try0;
@@ -508,10 +508,10 @@ static OPJ_BOOL opj_pi_next_pcrl(opj_pi_iterator_t * pi)
         pi->poc.ty1 = pi->ty1;
         pi->poc.tx1 = pi->tx1;
     }
-    for (pi->y = pi->poc.ty0; pi->y < pi->poc.ty1;
-            pi->y += (OPJ_INT32)(pi->dy - (OPJ_UINT32)(pi->y % (OPJ_INT32)pi->dy))) {
-        for (pi->x = pi->poc.tx0; pi->x < pi->poc.tx1;
-                pi->x += (OPJ_INT32)(pi->dx - (OPJ_UINT32)(pi->x % (OPJ_INT32)pi->dx))) {
+    for (pi->y = (OPJ_UINT32)pi->poc.ty0; pi->y < (OPJ_UINT32)pi->poc.ty1;
+            pi->y += (pi->dy - (pi->y % pi->dy))) {
+        for (pi->x = (OPJ_UINT32)pi->poc.tx0; pi->x < (OPJ_UINT32)pi->poc.tx1;
+                pi->x += (pi->dx - (pi->x % pi->dx))) {
             for (pi->compno = pi->poc.compno0; pi->compno < pi->poc.compno1; pi->compno++) {
                 comp = &pi->comps[pi->compno];
                 for (pi->resno = pi->poc.resno0;
@@ -639,10 +639,10 @@ static OPJ_BOOL opj_pi_next_cprl(opj_pi_iterator_t * pi)
             pi->poc.ty1 = pi->ty1;
             pi->poc.tx1 = pi->tx1;
         }
-        for (pi->y = pi->poc.ty0; pi->y < pi->poc.ty1;
-                pi->y += (OPJ_INT32)(pi->dy - (OPJ_UINT32)(pi->y % (OPJ_INT32)pi->dy))) {
-            for (pi->x = pi->poc.tx0; pi->x < pi->poc.tx1;
-                    pi->x += (OPJ_INT32)(pi->dx - (OPJ_UINT32)(pi->x % (OPJ_INT32)pi->dx))) {
+        for (pi->y = (OPJ_UINT32)pi->poc.ty0; pi->y < (OPJ_UINT32)pi->poc.ty1;
+                pi->y += (pi->dy - (pi->y % pi->dy))) {
+            for (pi->x = (OPJ_UINT32)pi->poc.tx0; pi->x < (OPJ_UINT32)pi->poc.tx1;
+                    pi->x += (pi->dx - (pi->x % pi->dx))) {
                 for (pi->resno = pi->poc.resno0;
                         pi->resno < opj_uint_min(pi->poc.resno1, comp->numresolutions); pi->resno++) {
                     OPJ_UINT32 levelno;

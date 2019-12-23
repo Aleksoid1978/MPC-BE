@@ -333,7 +333,7 @@ typedef struct opj_poc {
     OPJ_PROG_ORDER prg1, prg;
     /** Progression order string*/
     OPJ_CHAR progorder[5];
-    /** Tile number */
+    /** Tile number (starting at 1) */
     OPJ_UINT32 tile;
     /** Start and end values for Tile width and height*/
     OPJ_INT32 tx0, tx1, ty0, ty1;

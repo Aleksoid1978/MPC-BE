@@ -183,7 +183,7 @@ void opj_mct_decode(
     OPJ_INT32* OPJ_RESTRICT c2,
     OPJ_SIZE_T n)
 {
-    OPJ_UINT32 i;
+    OPJ_SIZE_T i;
     for (i = 0; i < n; ++i) {
         OPJ_INT32 y = c0[i];
         OPJ_INT32 u = c1[i];
@@ -361,7 +361,7 @@ void opj_mct_encode_real(
     OPJ_INT32* OPJ_RESTRICT c2,
     OPJ_SIZE_T n)
 {
-    OPJ_UINT32 i;
+    OPJ_SIZE_T i;
     for (i = 0; i < n; ++i) {
         OPJ_INT32 r = c0[i];
         OPJ_INT32 g = c1[i];
@@ -388,7 +388,7 @@ void opj_mct_decode_real(
     OPJ_FLOAT32* OPJ_RESTRICT c2,
     OPJ_SIZE_T n)
 {
-    OPJ_UINT32 i;
+    OPJ_SIZE_T i;
 #ifdef __SSE__
     __m128 vrv, vgu, vgv, vbu;
     vrv = _mm_set1_ps(1.402f);

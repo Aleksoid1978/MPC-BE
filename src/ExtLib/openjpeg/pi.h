@@ -102,9 +102,9 @@ typedef struct opj_pi_iterator {
     /** Components*/
     opj_pi_comp_t *comps;
     /** FIXME DOC*/
-    OPJ_INT32 tx0, ty0, tx1, ty1;
+    OPJ_UINT32 tx0, ty0, tx1, ty1;
     /** FIXME DOC*/
-    OPJ_INT32 x, y;
+    OPJ_UINT32 x, y;
     /** FIXME DOC*/
     OPJ_UINT32 dx, dy;
 } opj_pi_iterator_t;
