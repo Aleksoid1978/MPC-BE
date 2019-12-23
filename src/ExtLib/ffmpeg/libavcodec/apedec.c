@@ -496,6 +496,7 @@ static inline int ape_decode_value_3860(APEContext *ctx, GetBitContext *gb,
         x = (overflow << rice->k) + get_bits(gb, rice->k);
     } else {
         av_log(ctx->avctx, AV_LOG_ERROR, "Too many bits: %"PRIu32"\n", rice->k);
+        ctx->error = 1;
         return AVERROR_INVALIDDATA;
     }
     rice->ksum += x - (rice->ksum + 8 >> 4);
@@ -1234,7 +1235,7 @@ static void predictor_decode_mono_3950(APEContext *ctx, int count)
             p->buf = p->historybuffer;
         }
 
-        p->filterA[0] = currentA + ((int)(p->filterA[0] * 31U) >> 5);
+        p->filterA[0] = currentA + (unsigned)((int)(p->filterA[0] * 31U) >> 5);
         *(decoded0++) = p->filterA[0];
     }
 
@@ -1302,7 +1303,7 @@ static void do_apply_filter(APEContext *ctx, int version, APEFilter *f,
             else
                 *f->adaptcoeffs = 0;
 
-            f->avg += (absres - f->avg) / 16;
+            f->avg += (int)(absres - (unsigned)f->avg) / 16;
 
             f->adaptcoeffs[-1] >>= 1;
             f->adaptcoeffs[-2] >>= 1;

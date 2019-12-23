@@ -544,7 +544,7 @@ static av_cold int decode_init(WMAProDecodeCtx *s, AVCodecContext *avctx, int nu
     for (i = 0; i < WMAPRO_BLOCK_SIZES; i++)
         ff_mdct_init(&s->mdct_ctx[i], WMAPRO_BLOCK_MIN_BITS+1+i, 1,
                      1.0 / (1 << (WMAPRO_BLOCK_MIN_BITS + i - 1))
-                     / (1 << (s->bits_per_sample - 1)));
+                     / (1ll << (s->bits_per_sample - 1)));
 
     /** init MDCT windows: simple sine window */
     for (i = 0; i < WMAPRO_BLOCK_SIZES; i++) {
@@ -1565,9 +1565,9 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
         s->frame_offset = get_bits_count(gb) & 7;
         s->num_saved_bits = s->frame_offset;
         init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
-    }
-
-    buflen = (put_bits_count(&s->pb) + len + 8) >> 3;
+        buflen = (s->num_saved_bits      + len + 7) >> 3;
+    } else
+        buflen = (put_bits_count(&s->pb) + len + 7) >> 3;
 
     if (len <= 0 || buflen > MAX_FRAMESIZE) {
         avpriv_request_sample(s->avctx, "Too small input buffer");
@@ -1644,6 +1644,7 @@ static int decode_packet(AVCodecContext *avctx, WMAProDecodeCtx *s,
         if (avctx->codec_id == AV_CODEC_ID_WMAPRO && buf_size < avctx->block_align) {
             av_log(avctx, AV_LOG_ERROR, "Input packet too small (%d < %d)\n",
                    buf_size, avctx->block_align);
+            s->packet_loss = 1;
             return AVERROR_INVALIDDATA;
         }
 
@@ -1803,6 +1804,11 @@ static int xma_decode_packet(AVCodecContext *avctx, void *data,
     ret = decode_packet(avctx, &s->xma[s->current_stream], s->frames[s->current_stream],
                         &got_stream_frame_ptr, avpkt);
 
+    if (got_stream_frame_ptr && s->offset[s->current_stream] >= 64) {
+        got_stream_frame_ptr = 0;
+        ret = AVERROR_INVALIDDATA;
+    }
+
     /* copy stream samples (1/2ch) to sample buffer (Nch) */
     if (got_stream_frame_ptr) {
         int start_ch = s->start_channel[s->current_stream];
@@ -1930,6 +1936,8 @@ static av_cold int xma_decode_init(AVCodecContext *avctx)
         s->start_channel[i] = start_channels;
         start_channels += s->xma[i].nb_channels;
     }
+    if (start_channels != avctx->channels)
+        return AVERROR_INVALIDDATA;
 
     return ret;
 }

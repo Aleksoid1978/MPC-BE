@@ -23,6 +23,7 @@
 #include "av1_parse.h"
 #include "cbs.h"
 #include "cbs_av1.h"
+#include "internal.h"
 #include "parser.h"
 
 typedef struct AV1ParseContext {
@@ -100,6 +101,9 @@ static int av1_parser_parse(AVCodecParserContext *ctx,
         else
             continue;
 
+        if (obu->header.spatial_id > 0)
+            continue;
+
         if (frame->show_existing_frame) {
             AV1ReferenceFrameState *ref = &av1->ref[frame->frame_to_show_map_idx];
 
@@ -155,6 +159,12 @@ static int av1_parser_parse(AVCodecParserContext *ctx,
             break;
         }
         av_assert2(ctx->format != AV_PIX_FMT_NONE);
+
+        if (ctx->width != avctx->width || ctx->height != avctx->height) {
+            ret = ff_set_dimensions(avctx, ctx->width, ctx->height);
+            if (ret < 0)
+                goto end;
+        }
     }
 
     if (avctx->framerate.num)
