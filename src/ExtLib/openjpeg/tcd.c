@@ -2017,7 +2017,8 @@ static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
     opj_tcd_tile_t * l_tile = p_tcd->tcd_image->tiles;
     opj_tcp_t * l_tcp = p_tcd->tcp;
     opj_tcd_tilecomp_t * l_tile_comp = l_tile->comps;
-    OPJ_UINT32 l_samples, i;
+    OPJ_SIZE_T l_samples;
+    OPJ_UINT32 i;
 
     if (l_tcp->mct == 0 || p_tcd->used_component != NULL) {
         return OPJ_TRUE;
@@ -2030,8 +2031,8 @@ static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
         /* A bit inefficient: we process more data than needed if */
         /* resno_decoded < l_tile_comp->minimum_num_resolutions-1, */
         /* but we would need to take into account a stride then */
-        l_samples = (OPJ_UINT32)((res_comp0->x1 - res_comp0->x0) *
-                                 (res_comp0->y1 - res_comp0->y0));
+        l_samples = (OPJ_SIZE_T)(res_comp0->x1 - res_comp0->x0) *
+                    (OPJ_SIZE_T)(res_comp0->y1 - res_comp0->y0);
         if (l_tile->numcomps >= 3) {
             if (l_tile_comp->minimum_num_resolutions !=
                     l_tile->comps[1].minimum_num_resolutions ||
@@ -2065,8 +2066,8 @@ static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
         opj_tcd_resolution_t* res_comp0 = l_tile->comps[0].resolutions +
                                           p_tcd->image->comps[0].resno_decoded;
 
-        l_samples = (res_comp0->win_x1 - res_comp0->win_x0) *
-                    (res_comp0->win_y1 - res_comp0->win_y0);
+        l_samples = (OPJ_SIZE_T)(res_comp0->win_x1 - res_comp0->win_x0) *
+                    (OPJ_SIZE_T)(res_comp0->win_y1 - res_comp0->win_y0);
         if (l_tile->numcomps >= 3) {
             opj_tcd_resolution_t* res_comp1 = l_tile->comps[1].resolutions +
                                               p_tcd->image->comps[1].resno_decoded;

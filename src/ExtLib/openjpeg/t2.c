@@ -673,6 +673,14 @@ static OPJ_BOOL opj_t2_encode_packet(OPJ_UINT32 tileno,
     OPJ_BOOL packet_empty = OPJ_FALSE;
 #endif
 
+#ifdef DEBUG_VERBOSE
+    if (p_t2_mode == FINAL_PASS) {
+        fprintf(stderr,
+                "encode packet compono=%d, resno=%d, precno=%d, layno=%d\n",
+                compno, resno, precno, layno);
+    }
+#endif
+
     /* <SOP 0xff91> */
     if (tcp->csty & J2K_CP_CSTY_SOP) {
         if (length < 6) {
