@@ -1039,7 +1039,7 @@ CMSAPI long int          CMSEXPORT cmsfilelength(FILE* f);
 typedef struct _cmsContext_struct* cmsContext;
 
 CMSAPI cmsContext       CMSEXPORT cmsCreateContext(void* Plugin, void* UserData);
-CMSAPI void             CMSEXPORT cmsDeleteContext(cmsContext ContexID);
+CMSAPI void             CMSEXPORT cmsDeleteContext(cmsContext ContextID);
 CMSAPI cmsContext       CMSEXPORT cmsDupContext(cmsContext ContextID, void* NewUserData);
 CMSAPI void*            CMSEXPORT cmsGetContextUserData(cmsContext ContextID);
 
