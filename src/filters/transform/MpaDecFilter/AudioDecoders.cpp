@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,7 +70,7 @@ std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, 
 	const unsigned allsamples = blocks * 2 * channels;
 
 	dst_size = allsamples * (bitdepth <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
+	auto dst = std::make_unique<BYTE[]>(dst_size);
 	if (!dst) {
 		return nullptr;
 	}
@@ -109,7 +109,7 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 	const unsigned allsamples = blocks * 2 * channels;
 
 	dst_size = allsamples * (a.bitdepth1 <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
+	auto dst = std::make_unique<BYTE[]>(dst_size);
 	if (!dst) {
 		return nullptr;
 	}
@@ -308,7 +308,7 @@ std::unique_ptr<BYTE[]> DecodeHdmvLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 	const unsigned frames = src_size / framesize;
 
 	dst_size = frames * channels * (bitdepth <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
+	auto dst = std::make_unique<BYTE[]>(dst_size);
 	if (!dst) {
 		return nullptr;
 	}

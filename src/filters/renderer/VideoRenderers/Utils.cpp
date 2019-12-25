@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,7 +60,7 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 	}
 
 	unsigned len = desc.Width * desc.Height * 4;
-	std::unique_ptr<BYTE[]> dib(new(std::nothrow) BYTE[sizeof(BITMAPINFOHEADER) + len]);
+	auto dib = std::make_unique<BYTE[]>(sizeof(BITMAPINFOHEADER) + len);
 	if (!dib) {
 		return E_OUTOFMEMORY;
 	}
@@ -164,7 +164,7 @@ HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned wid
 	unsigned tablecolors = (pseudobitdepth == 8) ? 256 : 0;
 
 	unsigned len = width * height * pseudobitdepth / 8;
-	std::unique_ptr<BYTE[]> dib(new(std::nothrow) BYTE[sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len]);
+	auto dib = std::make_unique<BYTE[]>(sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len);
 	if (!dib) {
 		return E_OUTOFMEMORY;
 	}
