@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -143,7 +143,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		}
 	}
 
-	std::unique_ptr<BYTE[]> thumb(new(std::nothrow) BYTE[thumbsize.cx * thumbsize.cy * 4]);
+	auto thumb = std::make_unique<BYTE[]>(thumbsize.cx * thumbsize.cy * 4);
 	if (!thumb) {
 		m_iProgress = PROGRESS_E_MEMORY;
 		return;
