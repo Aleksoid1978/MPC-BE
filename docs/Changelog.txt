@@ -96,7 +96,50 @@ Added option "Select maximum frame rate or bit rate" when using youtube-dl.
 Added the ability to not use the available youtube-dl.
 
 Player
-...
+Fixed the taskbar icon.
+Fixed auto-switching of display frequency for interlace.
+Removed the ability to launch files from the playlist using the "Space" key.
+Fixed display of tooltips in the playlist.
+Fixed background color of the search bar in the playlist.
+A playlist of type "Explorer" is no longer created by default, because it can slow down the start of the player.
+Pressing the middle mouse button is now redirected to the main window.
+At the beginning of playback, the player now sends a command to wake up the display or turn off the screen saver.
+Added "Refresh" command in the context menu of the playlist.
+Added support for MPC Video Renderer.
+Added support for subtitles from external audio files.
+After deleting the file in the trash in the playlist, the player will go to the next file.
+Added the ability to select multiple external audio tracks when opening a video file.
+Added forced closing of the filter properties window after closing the media file.
+Added the ability to select a priority filter for UDP streams.
+Adding subtitles by the Dran'n'drop method now works when the playlist is active.
+The playlist is now saved after each opening of the media file or link.
+The range of the option "Do not scale at small frame size decreases" is increased to 6.3%.
+Added setting "Auto-hide the pointer during playback in windowed mode".
+Added "Window size" settings panel.
+Improved subtitle update after changes in an external editor.
+Improved support for loading .m3u(hls) playlists with audio tracks in separate streams.
+Added command line parameter "/ clipboard".
+Added option "Go to the next on error" in the playlist menu.
+Added option "Remember selected tracks in playlist".
+Added the ability to open magnet links and .torrent files with TorrServer.
+Added ability to specify AceStream and TorrServer addresses.
+Improved functionality for adding similar files.
+Redesigned the video renderer selection option. Added information about installed but inaccessible renderers.
+Added "Network timeout" setting for URL checking.
+Added the ability to paste paths from the clipboard into the playlist using Ctrl+V.
+The transfer of the "Shaders" folder from the player’s folder to the user profile has been fixed.
+Improved calculation of the speed of saving online streams.
+Fixed navigation on folder shortcuts in the file open dialog.
+Added the command "Copy filter list to clipboard".
+Paths in the "Recent files" are no longer checked before displaying the menu. The path to DVD-Video now points to the VIDEO_TS.IFO file. The path to the BD now points to the index.bdmv file or the selected * .mpls.
+Added option "Do not show 000xx.mpls shorter than N min."
+The "Open Disc" command can now open "DVD-Audio". If the disc is mixed, "DVD-Video" will open.
+Improved dark menu.
+Added error message about opening file in OSD.
+The OSD font size range has been increased to 8...26 (it was 10...25).
+Fixed selection of displays for full-screen playback.
+Fixed OSD font size when using Windows scaling.
+Added saving display state of system time and file name.
 
 Updated Russian translation.
 Updated German translation (by Klaus1189).
