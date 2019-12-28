@@ -244,6 +244,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_IMAGE, OnUpdateFileSaveImage)
 	ON_COMMAND(ID_FILE_AUTOSAVE_IMAGE, OnAutoSaveImage)
 	ON_COMMAND(ID_FILE_AUTOSAVE_DISPLAY, OnAutoSaveDisplay)
+	ON_COMMAND(ID_COPY_IMAGE, OnCopyImage)
 	ON_COMMAND(ID_FILE_SAVE_THUMBNAILS, OnFileSaveThumbnails)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_THUMBNAILS, OnUpdateFileSaveThumbnails)
 	ON_COMMAND(ID_FILE_LOAD_SUBTITLE, OnFileLoadSubtitle)
@@ -6080,8 +6081,35 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 	}
 
 	if (hr == S_OK) {
-		SaveDIB(fn, dib.data(), dib.size());
-		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
+		if (fn) {
+			SaveDIB(fn, dib.data(), dib.size());
+			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
+		} else {
+			// Allocate a global memory object for the DIB
+			HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, dib.size());
+			if (hGlob) {
+				// Lock the handle and copy the text to the buffer
+				LPVOID pData = GlobalLock(hGlob);
+				if (pData) {
+					memcpy(pData, dib.data(), dib.size());
+					GlobalUnlock(hGlob);
+
+					if (OpenClipboard()) {
+						// Place the handle on the clipboard, if the call succeeds
+						// the system will take care of the allocated memory
+						if (::EmptyClipboard() && ::SetClipboardData(CF_DIB, hGlob)) {
+							hGlob = nullptr;
+						}
+
+						::CloseClipboard();
+					}
+				}
+
+				if (hGlob) {
+					GlobalFree(hGlob);
+				}
+			}
+		}
 	}
 	else {
 		m_OSD.DisplayMessage(OSD_TOPLEFT, errmsg, 3000);
@@ -6297,6 +6325,15 @@ void CMainFrame::OnAutoSaveDisplay()
 	}
 
 	SaveImage(CreateSnapShotFileName(), true);
+}
+
+void CMainFrame::OnCopyImage()
+{
+	if (!IsRendererCompatibleWithSaveImage()) {
+		return;
+	}
+
+	SaveImage(nullptr, false);
 }
 
 void CMainFrame::OnFileSaveThumbnails()
