@@ -328,6 +328,7 @@
 #define ID_NORMALIZE                    994
 #define ID_PLAY_AUDIODELAY_ONOFF        995
 #define ID_FILE_AUTOSAVE_DISPLAY        996
+#define ID_COPY_IMAGE                   997
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002
@@ -1374,6 +1375,7 @@
 #define IDS_RECORD_START                33456
 #define IDS_RECORD_STOP                 33457
 #define IDS_FILTERS_COPY_TO_CLIPBOARD   33458
+#define IDS_AG_COPY_IMAGE               33459
 //
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501

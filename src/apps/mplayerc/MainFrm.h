@@ -980,6 +980,7 @@ public:
 	afx_msg void OnUpdateFileSaveImage(CCmdUI* pCmdUI);
 	afx_msg void OnAutoSaveImage();
 	afx_msg void OnAutoSaveDisplay();
+	afx_msg void OnCopyImage();
 	afx_msg void OnFileSaveThumbnails();
 	afx_msg void OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI);
 	afx_msg void OnFileLoadSubtitle();
