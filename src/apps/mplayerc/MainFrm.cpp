@@ -6088,7 +6088,7 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 			// Allocate a global memory object for the DIB
 			HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, dib.size());
 			if (hGlob) {
-				// Lock the handle and copy the text to the buffer
+				// Lock the handle and copy the DIB to the buffer
 				LPVOID pData = GlobalLock(hGlob);
 				if (pData) {
 					memcpy(pData, dib.data(), dib.size());
