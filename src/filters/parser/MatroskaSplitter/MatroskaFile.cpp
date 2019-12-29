@@ -251,6 +251,10 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	}
 
 	if (k != 31) {
+		if (Tracks.empty() && (pMN = pMN0->Child(MATROSKA_ID_TRACKS, false))) {
+			Tracks.Parse(pMN);
+		}
+
 		if (Cues.empty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
 			do {
 				Cues.Parse(pMN);
