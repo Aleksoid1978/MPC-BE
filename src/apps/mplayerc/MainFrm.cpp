@@ -6183,7 +6183,6 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 
 		WCHAR buff[256];
 		ULONG len = _countof(buff);
-		memset(buff, 0, len);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)) {
