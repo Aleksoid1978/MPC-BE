@@ -776,7 +776,6 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				/*
 				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(pszCurrentAssociation) + L"\\DefaultIcon"))
 				{
-					buff[0] = 0;
 					len = _countof(buff);
 					if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty())
 					{
@@ -822,7 +821,6 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			{
 				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, extoldreg + L"\\DefaultIcon"))
 				{
-					buff[0] = 0;
 					len = _countof(buff);
 					if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty())
 						extOldIcon = buff;

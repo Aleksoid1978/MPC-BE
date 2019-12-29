@@ -555,7 +555,6 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				if (it != m_CachedRegistryFilters.end() && ::PathFileExistsW((*it).second)) {
 					module = (*it).second;
 				} else {
-					buff[0] = 0;
 					len = _countof(buff);
 					if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 							&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)
