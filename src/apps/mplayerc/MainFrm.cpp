@@ -6005,7 +6005,7 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			const int height = bih->biHeight;
 
 			SubPicDesc spdRender;
-			spdRender.type    = MSP_RGBA;
+			spdRender.type    = MSP_RGB32;
 			spdRender.w       = width;
 			spdRender.h       = abs(height);
 			spdRender.bpp     = 32;
@@ -6023,7 +6023,7 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			hr = pSubPicProvider->Render(spdRender, rtNow, m_pCAP->GetFPS(), bbox);
 			if (S_OK == hr) {
 				SubPicDesc spdTarget;
-				spdTarget.type    = MSP_RGBA;
+				spdTarget.type    = MSP_RGB32;
 				spdTarget.w       = width;
 				spdTarget.h       = height;
 				spdTarget.bpp     = 32;
