@@ -114,7 +114,7 @@ After deleting the file in the trash in the playlist, the player will go to the 
 Added the ability to select multiple external audio tracks when opening a video file.
 Added forced closing of the filter properties window after closing the media file.
 Added the ability to select a priority filter for UDP streams.
-Adding subtitles by the Dran'n'drop method now works when the playlist is active.
+Adding subtitles by the Drag'n'drop method now works when the playlist is active.
 The playlist is now saved after each opening of the media file or link.
 The range of the option "Do not scale at small frame size decreases" is increased to 6.3%.
 Added setting "Auto-hide the pointer during playback in windowed mode".
