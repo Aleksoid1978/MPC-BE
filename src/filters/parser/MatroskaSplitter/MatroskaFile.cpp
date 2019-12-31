@@ -209,39 +209,40 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 		return S_FALSE;
 	}
 
-	unsigned int k = 0;
-
+	// read sequentially all the elements to the first cluster
 	do {
 		switch (pMN->m_id) {
 			case MATROSKA_ID_INFO:
 				SegmentInfo.Parse(pMN);
-				k |= (1 << 0);
 				break;
 			case MATROSKA_ID_SEEKHEAD:
 				MetaSeekInfo.Parse(pMN);
-				k |= (1 << 1);
 				break;
 			case MATROSKA_ID_TRACKS:
 				Tracks.Parse(pMN);
-				k |= (1 << 2);
 				break;
 			case MATROSKA_ID_CUES:
 				Cues.Parse(pMN);
-				k |= (1 << 3);
 				break;
 			case MATROSKA_ID_CHAPTERS:
 				Chapters.Parse(pMN);
-				k |= (1 << 4);
+				break;
+			case MATROSKA_ID_ATTACHMENTS:
+				Attachments.Parse(pMN);
+				break;
+			case MATROSKA_ID_TAGS:
+				Tags.Parse(pMN);
 				break;
 			default:
 				break;
 		}
-	} while (k != 31 && pMN->m_id != MATROSKA_ID_CLUSTER && pMN->Next());
+	} while (pMN->m_id != MATROSKA_ID_CLUSTER && pMN->Next());
 
 	if (!pMN->IsRandomAccess()) {
 		return S_OK;
 	}
 
+	// parse SeekHead (MetaSeekInfo) to get the position of the missing elements
 	while (QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
 		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) > pMN->GetLength()) {
@@ -250,28 +251,23 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 		MetaSeekInfo.Parse(pMN);
 	}
 
-	if (k != 31) {
-		if (Tracks.empty() && (pMN = pMN0->Child(MATROSKA_ID_TRACKS, false))) {
-			Tracks.Parse(pMN);
-		}
-
-		if (Cues.empty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
-			do {
-				Cues.Parse(pMN);
-			} while (pMN->Next(true));
-		}
-
-		if (Chapters.empty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
-			Chapters.Parse(pMN);
-		}
-
-		if (Attachments.empty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
-			Attachments.Parse(pMN);
-		}
-
-		if (Tags.empty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
-			Tags.Parse(pMN);
-		}
+	// trying to read items that have not been read before
+	if (Tracks.empty() && (pMN = pMN0->Child(MATROSKA_ID_TRACKS, false))) {
+		Tracks.Parse(pMN);
+	}
+	if (Cues.empty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
+		do {
+			Cues.Parse(pMN);
+		} while (pMN->Next(true));
+	}
+	if (Chapters.empty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
+		Chapters.Parse(pMN);
+	}
+	if (Attachments.empty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
+		Attachments.Parse(pMN);
+	}
+	if (Tags.empty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
+		Tags.Parse(pMN);
 	}
 
 	return S_OK;
@@ -1484,6 +1480,7 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 
 	return S_OK;
 }
+
 /*
 HRESULT CSignedLength::Parse(CMatroskaNode* pMN)
 {
@@ -1532,6 +1529,7 @@ HRESULT CSignedLength::Parse(CMatroskaNode* pMN)
 	return S_OK;
 }
 */
+
 template<class T>
 HRESULT CNode<T>::Parse(CMatroskaNode* pMN)
 {
