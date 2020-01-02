@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -7404,28 +7404,50 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 			break;
 	}
 
-	if (x > 0 && m_ZoomX < 3) {
-		m_ZoomX *= 1.02;
-	} else if (x < 0 && m_ZoomX > 0.2) {
-		m_ZoomX /= 1.02;
+	if (x) {
+		if (x > 0) {
+			m_ZoomX = std::min(m_ZoomX * 1.02, 5.0);
+		} else { // x < 0
+			m_ZoomX = std::max(m_ZoomX / 1.02, 0.2);
+		}
+		if (abs(m_ZoomX - 1) < 0.01) {
+			m_ZoomX = 1.0;
+		}
 	}
 
-	if (y > 0 && m_ZoomY < 3) {
-		m_ZoomY *= 1.02;
-	} else if (y < 0 && m_ZoomY > 0.2) {
-		m_ZoomY /= 1.02;
+	if (y) {
+		if (y > 0) {
+			m_ZoomY = std::min(m_ZoomY * 1.02, 5.0);
+		} else { // y < 0
+			m_ZoomY = std::max(m_ZoomY / 1.02, 0.2);
+		}
+		if (abs(m_ZoomY - 1) < 0.01) {
+			m_ZoomY = 1.0;
+		}
 	}
 
-	if (dx < 0 && m_PosX > 0) {
-		m_PosX = std::max(m_PosX - 0.005*m_ZoomX, 0.0);
-	} else if (dx > 0 && m_PosX < 1) {
-		m_PosX = std::min(m_PosX + 0.005*m_ZoomX, 1.0);
+	if (dx) {
+		double shift = 0.005*m_ZoomX;
+		if (dx < 0) {
+			m_PosX = std::max(m_PosX - shift, 0.0);
+		} else { // dx > 0
+			m_PosX = std::min(m_PosX + shift, 1.0);
+		}
+		if (abs(m_PosX - 0.5) * 2 < shift) {
+			m_PosX = 0.5;
+		}
 	}
 
-	if (dy < 0 && m_PosY > 0) {
-		m_PosY = std::max(m_PosY - 0.005*m_ZoomY, 0.0);
-	} else if (dy > 0 && m_PosY < 1) {
-		m_PosY = std::min(m_PosY + 0.005*m_ZoomY, 1.0);
+	if (dy) {
+		double shift = 0.005*m_ZoomY;
+		if (dy < 0) {
+			m_PosY = std::max(m_PosY - shift, 0.0);
+		} else { // dy > 0
+			m_PosY = std::min(m_PosY + shift, 1.0);
+		}
+		if (abs(m_PosY - 0.5) * 2 < shift) {
+			m_PosY = 0.5;
+		}
 	}
 
 	MoveVideoWindow(true);
@@ -7496,8 +7518,8 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 
 	m_PosX  = std::clamp(m_PosX, 0.0, 1.0);
 	m_PosY  = std::clamp(m_PosY, 0.0, 1.0);
-	m_ZoomX = std::clamp(m_ZoomX, 0.2, 3.0);
-	m_ZoomY = std::clamp(m_ZoomY, 0.2, 3.0);
+	m_ZoomX = std::clamp(m_ZoomX, 0.2, 5.0);
+	m_ZoomY = std::clamp(m_ZoomY, 0.2, 5.0);
 
 	MoveVideoWindow(true);
 }

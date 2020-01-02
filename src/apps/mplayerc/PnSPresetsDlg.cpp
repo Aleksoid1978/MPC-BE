@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -252,8 +252,8 @@ void CPnSPresetsDlg::OnUpdateButton1(CCmdUI* pCmdUI)
 				   && !m_label.IsEmpty() // && m_label.Find(',') < 0
 				   && m_PosX >= 0 && m_PosX <= 1
 				   && m_PosY >= 0 && m_PosY <= 1
-				   && m_ZoomX >= 0.2 && m_ZoomX <= 3.0
-				   && m_ZoomY >= 0.2 && m_ZoomY <= 3.0);
+				   && m_ZoomX >= 0.2 && m_ZoomX <= 5.0
+				   && m_ZoomY >= 0.2 && m_ZoomY <= 5.0);
 }
 
 void CPnSPresetsDlg::OnOK()

@@ -147,7 +147,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 18		"&Մերժել"
 19		"&Պահպանել"
 20		"Դիրքը. 0.0 -> 1.0"
-21		"Չափը. 0.2 -> 3.0"
+21		"Չափը. 0.2 -> 5.0"
 END
 
 BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
