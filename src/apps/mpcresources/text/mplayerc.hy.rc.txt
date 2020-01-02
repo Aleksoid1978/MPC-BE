@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Ծրագրի մասին"
 7		"MPC-BE"
-8		"Copyright © 2002-2019, նայեք Authors.txt ֆայլը"
+8		"Copyright © 2002-2020, նայեք Authors.txt ֆայլը"
 10		"Version :"
 11		"SVN Build :"
 12		"MPC-BE կազմարկիչ."
