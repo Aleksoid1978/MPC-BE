@@ -7426,8 +7426,9 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 		}
 	}
 
+	const double shift = 0.005;
+
 	if (dx) {
-		double shift = 0.005*m_ZoomX;
 		if (dx < 0) {
 			m_PosX = std::max(m_PosX - shift, 0.0);
 		} else { // dx > 0
@@ -7439,7 +7440,6 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 	}
 
 	if (dy) {
-		double shift = 0.005*m_ZoomY;
 		if (dy < 0) {
 			m_PosY = std::max(m_PosY - shift, 0.0);
 		} else { // dy > 0
