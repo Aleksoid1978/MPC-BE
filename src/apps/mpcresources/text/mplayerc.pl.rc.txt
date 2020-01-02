@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 16		"&Ustaw"
 18		"&Anuluj"
 19		"&Zapisz"
-20		"Położenie (0.0÷1.0):"
+20		"Położenie (0.1÷0.9):"
 21		"Proporcje (0.2÷3.0):"
 END
 

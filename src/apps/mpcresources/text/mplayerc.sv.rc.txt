@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 16		"&Ange"
 18		"&Avbryt"
 19		"&Spara"
-20		"Pos: 0.0 -> 1.0"
+20		"Pos: 0.1 -> 0.9"
 21		"Zoom: 0.2 -> 5.0"
 END
 

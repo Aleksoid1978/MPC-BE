@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 16		"&Ezarri"
 18		"E&zeztatu"
 19		"&Gorde"
-20		"Kokap: 0.0 -> 1.0"
+20		"Kokap: 0.1 -> 0.9"
 21		"Zooma: 0.2 -> 5.0"
 END
 

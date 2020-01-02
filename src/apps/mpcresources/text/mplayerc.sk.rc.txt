@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 16		"&Nastaviť"
 18		"&Storno"
 19		"&Uložiť"
-20		"Poz.: 0.0 -> 1.0"
+20		"Poz.: 0.1 -> 0.9"
 21		"Priblíženie: 0.2 -> 5.0"
 END
 
