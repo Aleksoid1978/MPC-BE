@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"אודות"
 7		"MPC-BE"
-8		"כל הזכויות שמורות © 2002-2019 קרא את קובץ היוצרים (Authors.txt)"
+8		"כל הזכויות שמורות © 2002-2020 קרא את קובץ היוצרים (Authors.txt)"
 10		"Version :"
 11		"SVN Build :"
 12		"מהדר MPC-BE :"

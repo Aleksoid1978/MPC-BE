@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Honi buruz"
 7		"MPC-BE"
-8		"Copyrighta © 2002-2019 Ikusi: Authors.txt"
+8		"Copyrighta © 2002-2020 Ikusi: Authors.txt"
 10		"Bertsioa :"
 11		"SVN Eraiketa :"
 12		"MPC-BE Biltzailea  :"
