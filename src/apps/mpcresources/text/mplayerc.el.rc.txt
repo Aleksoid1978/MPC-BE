@@ -147,7 +147,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 18		"Ά&κυρο"
 19		"Α&ποθήκευση"
 20		"Θέση: 0.0 -> 1.0"
-21		"Μεγέθυνση: 0.2->3.0"
+21		"Μεγέθυνση: 0.2->5.0"
 END
 
 BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15

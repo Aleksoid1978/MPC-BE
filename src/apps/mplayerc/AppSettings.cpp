@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1060,8 +1060,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str)
 			&& swscanf_s(str, L"%f,%f", &dZoomX, &dZoomY) == 2
-			&& dZoomX >= 0.196 && dZoomX <= 3.06  // 0.196 = 0.2 / 1.02
-			&& dZoomY >= 0.196 && dZoomY <= 3.06) { // 3.06 = 3 * 1.02
+			&& dZoomX >= 0.2 && dZoomX <= 5.0
+			&& dZoomY >= 0.2 && dZoomY <= 5.0) {
 		bSavePnSZoom = true;
 	} else {
 		bSavePnSZoom = false;
