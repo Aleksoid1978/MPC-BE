@@ -7434,7 +7434,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 		} else { // dx > 0
 			m_PosX = std::min(m_PosX + shift, 0.9);
 		}
-		if ((m_PosX - 0.5) * 2 < shift) {
+		if (abs(m_PosX - 0.5) * 2 < shift) {
 			m_PosX = 0.5;
 		}
 	}
@@ -7445,7 +7445,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 		} else { // dy > 0
 			m_PosY = std::min(m_PosY + shift, 0.9);
 		}
-		if ((m_PosY - 0.5) * 2 < shift) {
+		if (abs(m_PosY - 0.5) * 2 < shift) {
 			m_PosY = 0.5;
 		}
 	}
