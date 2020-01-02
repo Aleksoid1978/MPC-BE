@@ -11064,59 +11064,58 @@ void CMainFrame::SetDispMode(const dispmode& dm, const CString& DisplayName, con
 void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVideoRect/* = false*/)
 {
 	if (!m_bDelaySetOutputRect && !m_bFullScreenChangingMode && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
-		CRect wr;
+		CRect rWnd;
+		CRect rVid;
 
 		if (IsD3DFullScreenMode()) {
-			m_pFullscreenWnd->GetClientRect(&wr);
+			m_pFullscreenWnd->GetClientRect(&rWnd);
 		} else if (m_bFullScreen) {
-			GetWindowRect(&wr);
+			GetWindowRect(&rWnd);
 			CRect r;
 			m_wndView.GetWindowRect(&r);
-			wr -= r.TopLeft();
+			rWnd -= r.TopLeft();
 		} else {
-			m_wndView.GetClientRect(&wr);
+			m_wndView.GetClientRect(&rWnd);
 		}
-
-		CRect vr;
 
 		OAFilterState fs = GetMediaState();
 		if (fs != State_Stopped || bForcedSetVideoRect || (fs == State_Stopped && m_fShockwaveGraph)) {
-			const CSize arxy = GetVideoSize();
+			const CSize szVideo = GetVideoSize();
 
-			double w = wr.Width();
-			double h = wr.Height();
-			const long wy = wr.Width() * arxy.cy;
-			const long hx = wr.Height() * arxy.cx;
+			double w = rWnd.Width();
+			double h = rWnd.Height();
+			const long wy = rWnd.Width() * szVideo.cy;
+			const long hx = rWnd.Height() * szVideo.cx;
 
 			switch (m_iVideoSize) {
 			case DVS_HALF:
-				w = arxy.cx / 2;
-				h = arxy.cy / 2;
+				w = szVideo.cx / 2;
+				h = szVideo.cy / 2;
 				break;
 			case DVS_NORMAL:
-				w = arxy.cx;
-				h = arxy.cy;
+				w = szVideo.cx;
+				h = szVideo.cy;
 				break;
 			case DVS_DOUBLE:
-				w = arxy.cx * 2;
-				h = arxy.cy * 2;
+				w = szVideo.cx * 2;
+				h = szVideo.cy * 2;
 				break;
 			case DVS_FROMINSIDE:
 				if (!m_fShockwaveGraph) {
 					if (wy > hx) {
-						w = (double)hx / arxy.cy;
+						w = (double)hx / szVideo.cy;
 					} else {
-						h = (double)wy / arxy.cx;
+						h = (double)wy / szVideo.cx;
 					}
 
 					if (m_bFullScreen || IsD3DFullScreenMode()) {
 						const CAppSettings& s = AfxGetAppSettings();
-						const double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
+						const double factor = (wy > hx) ? w / szVideo.cx : h / szVideo.cy;
 
 						if (s.bNoSmallUpscale && factor > 1.0 && factor < 1.02
 								|| s.bNoSmallDownscale && factor > 0.937 && factor < 1.0) {
-							w = arxy.cx;
-							h = arxy.cy;
+							w = szVideo.cx;
+							h = szVideo.cy;
 						}
 					}
 				}
@@ -11124,67 +11123,63 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			case DVS_FROMOUTSIDE:
 				if (!m_fShockwaveGraph) {
 					if (wy < hx) {
-						w = (double)hx / arxy.cy;
+						w = (double)hx / szVideo.cy;
 					} else {
-						h = (double)wy / arxy.cx;
+						h = (double)wy / szVideo.cx;
 					}
 				}
 				break;
 			case DVS_ZOOM1:
 				if (!m_fShockwaveGraph) {
 					if (wy > hx) {
-						w = ((double)hx + (wy - hx) * 0.333) / arxy.cy;
-						h = w * arxy.cy / arxy.cx;
+						w = ((double)hx + (wy - hx) * 0.333) / szVideo.cy;
+						h = w * szVideo.cy / szVideo.cx;
 					} else {
-						h = ((double)wy + (hx - wy) * 0.333) / arxy.cx;
-						w = h * arxy.cx / arxy.cy;
+						h = ((double)wy + (hx - wy) * 0.333) / szVideo.cx;
+						w = h * szVideo.cx / szVideo.cy;
 					}
 				}
 				break;
 			case DVS_ZOOM2:
 				if (!m_fShockwaveGraph) {
 					if (wy > hx) {
-						w = ((double)hx + (wy - hx) * 0.667) / arxy.cy;
-						h = w * arxy.cy / arxy.cx;
+						w = ((double)hx + (wy - hx) * 0.667) / szVideo.cy;
+						h = w * szVideo.cy / szVideo.cx;
 					} else {
-						h = ((double)wy + (hx - wy) * 0.667) / arxy.cx;
-						w = h * arxy.cx / arxy.cy;
+						h = ((double)wy + (hx - wy) * 0.667) / szVideo.cx;
+						w = h * szVideo.cx / szVideo.cy;
 					}
 				}
 				break;
 			}
 
-			CSize size(m_ZoomX * w + 0.5, m_ZoomY * h + 0.5);
+			w *= m_ZoomX;
+			h *= m_ZoomY;
+			const double dLeft  = (rWnd.Width() - w)*0.5 + (m_PosX-0.5)*(rWnd.Width() + w);
+			const double dRight = (rWnd.Height() - h)*0.5 + (m_PosY-0.5)*(rWnd.Height() + h);
 
-			// HACK: remove jitter of frame width
-			if (abs(wr.Width() - size.cx) == 1) {
-				size.cx = wr.Width();
-			}
-
-			CPoint pos(m_PosX * (wr.Width() * 3.0 - m_ZoomX * w) - wr.Width(),
-					   m_PosY * (wr.Height() * 3.0 - m_ZoomY * h) - wr.Height());
-
-			vr = CRect(pos, size);
+			rVid.SetRect(std::round(dLeft), std::round(dRight), std::round(dLeft + w), std::round(dRight + h));
 		}
 
 		if (m_pCAP) {
-			m_pCAP->SetPosition(wr, vr);
+			m_pCAP->SetPosition(rWnd, rVid);
 		} else {
 			HRESULT hr;
 			hr = m_pBV->SetDefaultSourcePosition();
-			hr = m_pBV->SetDestinationPosition(vr.left, vr.top, vr.Width(), vr.Height());
-			hr = m_pVW->SetWindowPosition(wr.left, wr.top, wr.Width(), wr.Height());
+			hr = m_pBV->SetDestinationPosition(rVid.left, rVid.top, rVid.Width(), rVid.Height());
+			hr = m_pVW->SetWindowPosition(rWnd.left, rWnd.top, rWnd.Width(), rWnd.Height());
 
 			if (m_pMFVDC) {
-				m_pMFVDC->SetVideoPosition(nullptr, wr);
+				m_pMFVDC->SetVideoPosition(nullptr, rWnd);
 			}
 		}
 
-		m_wndView.SetVideoRect(wr);
+		m_wndView.SetVideoRect(rWnd);
 
-		if (bShowStats && vr.Height() > 0) {
+		if (bShowStats && rVid.Height() > 0) {
 			CString info;
-			info.Format(L"Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f", m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)vr.Width() / vr.Height());
+			info.Format(L"Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f",
+				m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)rVid.Width() / rVid.Height());
 			SendStatusMessage(info, 3000);
 		}
 	} else {
