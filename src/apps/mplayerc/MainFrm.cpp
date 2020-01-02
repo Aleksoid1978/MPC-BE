@@ -7430,22 +7430,22 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 
 	if (dx) {
 		if (dx < 0) {
-			m_PosX = std::max(m_PosX - shift, 0.0);
+			m_PosX = std::max(m_PosX - shift, 0.1);
 		} else { // dx > 0
-			m_PosX = std::min(m_PosX + shift, 1.0);
+			m_PosX = std::min(m_PosX + shift, 0.9);
 		}
-		if (abs(m_PosX - 0.5) * 2 < shift) {
+		if ((m_PosX - 0.5) * 2 < shift) {
 			m_PosX = 0.5;
 		}
 	}
 
 	if (dy) {
 		if (dy < 0) {
-			m_PosY = std::max(m_PosY - shift, 0.0);
+			m_PosY = std::max(m_PosY - shift, 0.1);
 		} else { // dy > 0
-			m_PosY = std::min(m_PosY + shift, 1.0);
+			m_PosY = std::min(m_PosY + shift, 0.9);
 		}
-		if (abs(m_PosY - 0.5) * 2 < shift) {
+		if ((m_PosY - 0.5) * 2 < shift) {
 			m_PosY = 0.5;
 		}
 	}
@@ -7516,8 +7516,8 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 		return;
 	}
 
-	m_PosX  = std::clamp(m_PosX, 0.0, 1.0);
-	m_PosY  = std::clamp(m_PosY, 0.0, 1.0);
+	m_PosX  = std::clamp(m_PosX, 0.1, 0.9);
+	m_PosY  = std::clamp(m_PosY, 0.1, 0.9);
 	m_ZoomX = std::clamp(m_ZoomX, 0.2, 5.0);
 	m_ZoomY = std::clamp(m_ZoomY, 0.2, 5.0);
 
@@ -11178,8 +11178,8 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		if (bShowStats && rVid.Height() > 0) {
 			CString info;
-			info.Format(L"Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f",
-				m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)rVid.Width() / rVid.Height());
+			info.Format(L"Pos %.3f %.3f, Zoom %.2f %.2f, AR %.2f",
+				m_PosX, m_PosY, m_ZoomX, m_ZoomY, (double)rVid.Width() / rVid.Height());
 			SendStatusMessage(info, 3000);
 		}
 	} else {

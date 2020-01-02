@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 16		"Nastavit"
 18		"Storno"
 19		"Uložit"
-20		"Pozice: 0.0 -> 1.0"
+20		"Pozice: 0.1 -> 0.9"
 21		"Velikost: 0.2 -> 5.0"
 END
 
