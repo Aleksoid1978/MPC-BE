@@ -333,14 +333,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringA CodecID = pTE->CodecID.ToString();
 
-			CString Name;
-			Name.Format(L"Output %I64u", (UINT64)pTE->TrackNumber);
-
+			CString outputDesc;
 			CMediaType mt;
 			std::vector<CMediaType> mts;
 
 			if (pTE->TrackType == TrackEntry::TypeVideo && !bHasVideo) {
-				Name.Format(L"Video %d", iVideo++);
+				outputDesc.Format(L"Video %d", iVideo++);
 
 				mt.majortype = MEDIATYPE_Video;
 				mt.SetSampleSize(1); // variable frame size?
@@ -976,7 +974,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeAudio) {
-				Name.Format(L"Audio %d", iAudio++);
+				outputDesc.Format(L"Audio %d", iAudio++);
 
 				mt.majortype = MEDIATYPE_Audio;
 				mt.formattype = FORMAT_WaveFormatEx;
@@ -1327,7 +1325,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.push_back(mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
-				Name.Format(L"Subtitle %d", iSubtitle++);
+				outputDesc.Format(L"Subtitle %d", iSubtitle++);
 
 				mt.SetSampleSize(1);
 
@@ -1380,6 +1378,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 				}
+			} else {
+				outputDesc.Format(L"Output %I64u", (UINT64)pTE->TrackNumber);
 			}
 
 			if (mts.empty()) {
@@ -1387,23 +1387,44 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
-			CString Language = CString(pTE->Language.IsEmpty() ? L"English" : CString(ISO6392ToLanguage(pTE->Language))).Trim();
+			CStringW pinName;
+			if (pTE->Language.GetLength()) {
+				pinName = ISO6392ToLanguage(pTE->Language).Trim();
+				CStringW lng(pTE->Language);
+				if (lng.CompareNoCase(pinName.Left(lng.GetLength())) != 0) {
+					pinName.AppendFormat(L" (%s)", lng);
+				}
+			}
+			else if (pTE->TrackType != TrackEntry::TypeVideo) {
+				pinName = L"unknown";
+			}
 
-			Name = Language
-				   + (pTE->Name.IsEmpty() ? L"" : (Language.IsEmpty() ? L"" : L", ") + pTE->Name)
-				   + (L" (" + Name + L")");
+			if (pTE->Name.GetLength()) {
+				if (pinName.IsEmpty()) {
+					pinName = pTE->Name;
+				} else {
+					pinName.AppendFormat(L", %s", pTE->Name);
+				}
+			}
+
+			if (pinName.IsEmpty()) {
+				pinName = outputDesc;
+			}
+			else if (pTE->TrackType != TrackEntry::TypeVideo /*&& pTE->TrackType != TrackEntry::TypeAudio*/) {
+				pinName.AppendFormat(L" (%s)", outputDesc);
+			}
 
 			if (pTE->FlagForced && pTE->FlagDefault) {
-				Name = Name + L" [Default, Forced]";
+				pinName += L" [Default, Forced]";
 			} else if (pTE->FlagForced) {
-				Name = Name + L" [Forced]";
+				pinName += L" [Forced]";
 			} else if (pTE->FlagDefault) {
-				Name = Name + L" [Default]";
+				pinName += L" [Default]";
 			}
 
 			HRESULT hr;
 
-			CMatroskaSplitterOutputPin* pPinOut = DNew CMatroskaSplitterOutputPin(mts, Name, this, this, &hr);
+			CMatroskaSplitterOutputPin* pPinOut = DNew CMatroskaSplitterOutputPin(mts, pinName, this, this, &hr);
 			if (!pTE->Name.IsEmpty()) {
 				pPinOut->SetProperty(L"NAME", pTE->Name);
 			}
