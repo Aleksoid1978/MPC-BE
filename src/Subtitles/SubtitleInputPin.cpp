@@ -123,6 +123,10 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 				dwOffset = psi->dwOffset;
 
 				name = ISO6392ToLanguage(psi->IsoLang);
+				CStringW lng(psi->IsoLang);
+				if (lng.CompareNoCase(name.Left(lng.GetLength())) != 0) {
+					name.AppendFormat(L" (%s)", lng);
+				}
 				lcid = ISO6392ToLcid(psi->IsoLang);
 
 				CString trackName(psi->TrackName);
