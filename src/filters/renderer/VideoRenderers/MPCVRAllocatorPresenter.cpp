@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -231,6 +231,34 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	HRESULT hr = E_NOTIMPL;
 	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR) {
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
+	}
+	return hr;
+}
+
+STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
+{
+	HRESULT hr = E_NOTIMPL;
+
+	if (TARGET_SCREEN == target) {
+		// experimental
+		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+			hr = pIExFilterConfig->SetBool("cmd_clearPostScaleShaders", true);
+		}
+	}
+	return hr;
+}
+
+STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+{
+	HRESULT hr = E_NOTIMPL;
+
+	int len = strlen(sourceCode);
+
+	if (len && TARGET_SCREEN == target) {
+		// experimental
+		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+			hr = pIExFilterConfig->SetBin("cmd_addPostScaleShader", (LPVOID)sourceCode, len+1);
+		}
 	}
 	return hr;
 }

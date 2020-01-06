@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -75,6 +75,8 @@ namespace DSObjects
 		STDMETHODIMP_(int) GetRotation() override;
 		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
+		STDMETHODIMP ClearPixelShaders(int target) override;
+		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) override;
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }
