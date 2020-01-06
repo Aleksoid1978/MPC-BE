@@ -4472,7 +4472,9 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
 
-	StopAutoHideCursor();
+	if (!m_bFullScreen) {
+		StopAutoHideCursor();
+	}
 
 	KillTimer(TIMER_STATUSERASER);
 	m_playingmsg.Empty();
