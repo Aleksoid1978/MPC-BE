@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2018 see Authors.txt
+ * (C) 2015-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -516,7 +516,7 @@ void CTeletext::Flush()
 	ZeroMemory(&m_page_buffer, sizeof(m_page_buffer));
 	m_bReceivingData = NO;
 
-	EraseOutput();
+	m_output.clear();
 }
 
 void CTeletext::SetLCID(const LCID lcid)
@@ -545,22 +545,10 @@ void CTeletext::SetLCID(const LCID lcid)
 	}
 }
 
-void CTeletext::GetOutput(std::vector<TeletextData>& output)
-{
-	output = m_output;
-}
-
-void CTeletext::EraseOutput()
-{
-	m_output.clear();
-}
-
-BOOL CTeletext::ProcessRemainingData()
+void CTeletext::ProcessRemainingData()
 {
 	if (m_page_buffer.tainted == YES) {
 		m_page_buffer.rtStop = m_page_buffer.rtStart + 10 * UNITS; // 10 seconds
 		ProcessTeletextPage();
 	}
-
-	return IsOutputPresent();
 }
