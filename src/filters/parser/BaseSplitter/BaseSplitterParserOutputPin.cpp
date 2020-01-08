@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -245,7 +245,7 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		BYTE* const base = m_p->data();					\
 		BYTE* start = m_p->data();						\
 		BYTE* end = start + m_p->size();				\
- 
+
 #define ENDDATA											\
 		if (start == end) {								\
 			m_p->clear();								\
@@ -254,7 +254,7 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			memmove(base, start, remaining);			\
 			m_p->resize(remaining);						\
 		}
- 
+
 HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 {
 	if (!m_p) {
@@ -1080,27 +1080,19 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 	}
 
 	HRESULT hr = S_OK;
-	std::vector<TeletextData> output;
-
 	if (m_bEndOfStream) {
-		if (m_teletext.ProcessRemainingData()) {
-			m_teletext.GetOutput(output);
-			m_teletext.EraseOutput();
-		}
+		m_teletext.ProcessRemainingData();
 	} else {
 		if (!p || p->size() <= 6) {
 			return S_OK;
 		}
 
 		m_teletext.ProcessData(p->data(), (uint16_t)p->size(), p->rtStart, p->Flag);
-		if (m_teletext.IsOutputPresent()) {
-			m_teletext.GetOutput(output);
-			m_teletext.EraseOutput();
-		}
 	}
 
-	if (!output.empty()) {
-		for (auto& tData : output) {
+	if (m_teletext.IsOutputPresent()) {
+		auto& output = m_teletext.GetOutput();
+		for (const auto& tData : output) {
 			const CStringA strA = WStrToUTF8(tData.str);
 
 			CAutoPtr<CPacket> p2(DNew CPacket());
@@ -1112,6 +1104,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 
 			hr = __super::DeliverPacket(p2);
 		}
+
+		m_teletext.ClearOutput();
 	}
 
 	return hr;

@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2018 see Authors.txt
+ * (C) 2015-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,8 +65,8 @@ public:
 	void SetLCID(const LCID lcid);
 
 	BOOL IsOutputPresent() const { return !m_output.empty(); }
-	void GetOutput(std::vector<TeletextData>& output);
-	void EraseOutput();
+	const std::vector<TeletextData>& GetOutput() const { return m_output; }
+	void ClearOutput() { m_output.clear(); }
 
-	BOOL ProcessRemainingData();
+	void ProcessRemainingData();
 };
