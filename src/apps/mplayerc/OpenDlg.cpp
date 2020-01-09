@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,7 +55,6 @@ void COpenDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_CBString(pDX, IDC_COMBO1, m_path);
 	DDX_Control(pDX, IDC_COMBO2, m_mrucombo2);
 	DDX_CBString(pDX, IDC_COMBO2, m_path2);
-	DDX_Control(pDX, IDC_STATIC1, m_label2);
 	DDX_Check(pDX, IDC_CHECK1, m_bAppendPlaylist);
 }
 
@@ -127,13 +126,18 @@ BOOL COpenDlg::OnInitDialog()
 	m_bMultipleFiles = false;
 	m_bAppendPlaylist = FALSE;
 
+	AddAnchor(IDC_MAINFRAME_ICON, TOP_LEFT);
 	AddAnchor(m_mrucombo, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(m_mrucombo2, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(IDC_BUTTON1, TOP_RIGHT);
 	AddAnchor(IDC_BUTTON2, TOP_RIGHT);
 	AddAnchor(IDOK, TOP_RIGHT);
 	AddAnchor(IDCANCEL, TOP_RIGHT);
-	AddAnchor(IDC_STATIC1, TOP_LEFT, TOP_RIGHT);
+	AddAnchor(IDC_STATIC, TOP_LEFT);
+	AddAnchor(IDC_STATIC1, TOP_LEFT);
+	AddAnchor(IDC_STATIC2, TOP_LEFT);
+	AddAnchor(IDC_CHECK1, TOP_LEFT);
+	AddAnchor(IDC_CHECK2, TOP_LEFT);
 
 	CRect r;
 	GetWindowRect(r);
@@ -148,6 +152,7 @@ BOOL COpenDlg::OnInitDialog()
 	return TRUE;
 }
 
+/*
 static CString GetFileName(CString str)
 {
 	CPath p = str;
@@ -155,6 +160,7 @@ static CString GetFileName(CString str)
 
 	return (LPCWSTR)p;
 }
+*/
 
 void COpenDlg::OnBnClickedBrowsebutton()
 {

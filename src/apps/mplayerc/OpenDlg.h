@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,10 +43,9 @@ public:
 	CString m_path;
 	CComboBox m_mrucombo2;
 	CString m_path2;
-	CStatic m_label2;
 	BOOL m_bAppendPlaylist;
 
-	HICON	m_hIcon;
+	HICON m_hIcon;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
