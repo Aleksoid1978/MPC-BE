@@ -257,7 +257,11 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCSTR sourceC
 	if (len && TARGET_SCREEN == target) {
 		// experimental
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
-			hr = pIExFilterConfig->SetBin("cmd_addPostScaleShader", (LPVOID)sourceCode, len+1);
+			int rtype = 0;
+			hr = pIExFilterConfig->GetInt("renderType", &rtype);
+			if (S_OK == hr && rtype == 9) { // Direct3D 9
+				hr = pIExFilterConfig->SetBin("cmd_addPostScaleShader", (LPVOID)sourceCode, len + 1);
+			}
 		}
 	}
 	return hr;
