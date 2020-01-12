@@ -237,7 +237,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 {
-	HRESULT hr = E_NOTIMPL;
+	HRESULT hr = E_FAIL;
 
 	if (TARGET_SCREEN == target) {
 		// experimental
@@ -248,22 +248,51 @@ STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 	return hr;
 }
 
+BYTE* WriteChunk(BYTE* dst, const uint32_t code, const int32_t size, BYTE* data)
+{
+	memcpy(dst, &code, 4);
+	dst += 4;
+	memcpy(dst, &size, 4);
+	dst += 4;
+	memcpy(dst, data, size);
+	dst += size;
+
+	return dst;
+}
+
 STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode)
 {
-	HRESULT hr = E_NOTIMPL;
+	HRESULT hr = E_FAIL;
 
-	int len = strlen(sourceCode);
+	const int namesize = wcslen(name) * sizeof(wchar_t);
+	const int codesize = strlen(sourceCode);
 
-	if (len && TARGET_SCREEN == target) {
+	if (codesize && TARGET_SCREEN == target) {
 		// experimental
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
 			int rtype = 0;
 			hr = pIExFilterConfig->GetInt("renderType", &rtype);
 			if (S_OK == hr && rtype == 9) { // Direct3D 9
-				hr = pIExFilterConfig->SetBin("cmd_addPostScaleShader", (LPVOID)sourceCode, len + 1);
+				int size = 8 + codesize;
+				if (namesize) {
+					size += 8 + namesize;
+				}
+
+				BYTE* pBuf = (BYTE*)LocalAlloc(LMEM_FIXED, size);
+				if (pBuf) {
+					BYTE* p = pBuf;
+					if (namesize) {
+						p = WriteChunk(p, FCC('NAME'), namesize, (BYTE*)name);
+					}
+					p = WriteChunk(p, FCC('CODE'), codesize, (BYTE*)sourceCode);
+
+					hr = pIExFilterConfig->SetBin("cmd_addPostScaleShader", (LPVOID)pBuf, size);
+					LocalFree(pBuf);
+				}
 			}
 		}
 	}
+
 	return hr;
 }
 
