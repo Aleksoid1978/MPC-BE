@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -193,7 +193,7 @@ public IUnknown {
 	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE;
 
 	STDMETHOD (ClearPixelShaders) (int target) PURE;
-	STDMETHOD (AddPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
+	STDMETHOD (AddPixelShader) (int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) PURE;
 
 	STDMETHOD_(bool, ResizeDevice) () PURE;
 	STDMETHOD_(bool, ResetDevice) () PURE;

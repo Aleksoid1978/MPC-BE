@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -284,7 +284,7 @@ namespace DSObjects
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP ClearPixelShaders(int target);
-		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
+		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode);
 		STDMETHODIMP_(bool) ResizeDevice();
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();

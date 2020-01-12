@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -246,7 +246,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::ClearPixelShaders(int target)
 	return hr;
 }
 
-STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode)
 {
 	ASSERT(TARGET_FRAME == ShaderStage_PreScale && TARGET_SCREEN == ShaderStage_PostScale);
 	HRESULT hr = E_NOTIMPL;
