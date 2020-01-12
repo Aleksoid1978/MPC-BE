@@ -1422,18 +1422,18 @@
 #define IDS_MFMT_FLV                    39011
 #define IDS_MFMT_OGM                    39012
 #define IDS_MFMT_RM                     39013
-#define IDS_MFMT_WMV                    39015
-#define IDS_MFMT_VIDEOCD                39016
-#define IDS_MFMT_BINK                   39018
-#define IDS_MFMT_FLIC                   39019
-#define IDS_MFMT_DSM                    39020
-#define IDS_MFMT_IVF                    39021
-#define IDS_MFMT_ROQ                    39022
-#define IDS_MFMT_RAW_VIDEO              39023
+#define IDS_MFMT_WMV                    39014
+#define IDS_MFMT_BINK                   39015
+#define IDS_MFMT_FLIC                   39016
+#define IDS_MFMT_ROQ                    39017
+#define IDS_MFMT_DSM                    39018
+#define IDS_MFMT_RAW_VIDEO              39019
+
 // other files
 #define IDS_MFMT_OTHER                  39401
+#define IDS_MFMT_OTHER_AUDIO            39402
 #define IDS_MFMT_SWF                    39403
-#define IDS_MFMT_OTHER_AUDIO            39404
+#define IDS_MFMT_AVISYNTH               39404
 // audio files
 #define IDS_MFMT_AC3                    39501
 #define IDS_MFMT_AIFF                   39502

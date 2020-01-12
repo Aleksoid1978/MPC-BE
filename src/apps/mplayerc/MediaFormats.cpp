@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -187,15 +187,16 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"flv",         ResStr(IDS_MFMT_FLV),         L"flv f4v"));
 		ADDFMT((L"ogm",         ResStr(IDS_MFMT_OGM),         L"ogm ogv"));
 		ADDFMT((L"rm",          ResStr(IDS_MFMT_RM),          L"rm ram rmm rmvb"));
-		ADDFMT((L"roq",         ResStr(IDS_MFMT_ROQ),         L"roq"));
 		ADDFMT((L"wmv",         ResStr(IDS_MFMT_WMV),         L"wmv wmp wm asf"));
-//		ADDFMT((L"videocd",     ResStr(IDS_MFMT_VIDEOCD),     L"dat")); // "dat" extension is no longer supported
-		ADDFMT((L"bink",        ResStr(IDS_MFMT_BINK),        L"smk bik", TVideo));
+		//ADDFMT((L"videocd",     ResStr(IDS_MFMT_VIDEOCD),     L"dat")); // "dat" extension is no longer supported
+		ADDFMT((L"bink",        ResStr(IDS_MFMT_BINK),        L"smk bik"));
 		ADDFMT((L"flic",        ResStr(IDS_MFMT_FLIC),        L"fli flc flic"));
+		ADDFMT((L"roq",         ResStr(IDS_MFMT_ROQ),         L"roq"));
 		ADDFMT((L"dsm",         ResStr(IDS_MFMT_DSM),         L"dsm dsv dsa dss"));
 		ADDFMT((L"swf",         ResStr(IDS_MFMT_SWF),         L"swf", TVideo, L"ShockWave ActiveX control"));
-		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
 		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc"));
+		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
+		ADDFMT((L"avisynth",    ResStr(IDS_MFMT_AVISYNTH),    L"avs", TScript)); // use TScript to exclude automatic association
 		// audio files
 		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3 eac3", TAudio));
 		ADDFMT((L"dts",         ResStr(IDS_MFMT_DTS),         L"dts dtshd dtsma", TAudio));

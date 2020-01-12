@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,8 @@
 enum filetype_t {
 	TVideo = 0,
 	TAudio,
-	TPlaylist
+	TPlaylist,
+	TScript
 };
 
 class CMediaFormatCategory
@@ -32,7 +33,7 @@ class CMediaFormatCategory
 protected:
 	CString m_label, m_description, m_specreqnote;
 	std::list<CString> m_exts, m_backupexts;
-	filetype_t	m_filetype;
+	filetype_t m_filetype;
 
 public:
 	CMediaFormatCategory();
