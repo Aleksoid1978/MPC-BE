@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -455,6 +455,8 @@ void CShaderEditorDlg::OnBnClickedApply()
 
 	int i = m_cbLabels.GetCurSel();
 	if (i >= 0) {
+		CString label;
+		m_cbLabels.GetLBText(i, label);
 		CString str;
 		m_cbProfile.GetLBText(m_cbProfile.GetCurSel(), str);
 		CStringA profile(str);
@@ -477,7 +479,7 @@ void CShaderEditorDlg::OnBnClickedApply()
 				errmsg += disasm;
 
 				if (pFrame->m_pCAP) {
-					hr = pFrame->m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile); // and add shader to the end of list
+					hr = pFrame->m_pCAP->AddPixelShader(TARGET_FRAME, label, profile, srcdata); // and add shader to the end of list
 				}
 			}
 

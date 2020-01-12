@@ -76,7 +76,7 @@ namespace DSObjects
 		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP ClearPixelShaders(int target) override;
-		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) override;
+		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) override;
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }

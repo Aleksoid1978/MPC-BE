@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2398,7 +2398,7 @@ STDMETHODIMP CDX9AllocatorPresenter::ClearPixelShaders(int target)
 	return ClearCustomPixelShaders(target);
 }
 
-STDMETHODIMP CDX9AllocatorPresenter::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+STDMETHODIMP CDX9AllocatorPresenter::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode)
 {
 	CAutoLock cRenderLock(&m_RenderLock);
 

@@ -248,7 +248,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 	return hr;
 }
 
-STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode)
 {
 	HRESULT hr = E_NOTIMPL;
 

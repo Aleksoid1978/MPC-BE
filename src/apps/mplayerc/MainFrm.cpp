@@ -11598,14 +11598,13 @@ void CMainFrame::SetShaders()
 		for (const auto& shader : s.ShaderList) {
 			ShaderC* pShader = GetShader(shader);
 			if (pShader) {
+				CStringW label   = pShader->label;
 				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
 
-				HRESULT hr = m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile);
+				HRESULT hr = m_pCAP->AddPixelShader(TARGET_FRAME, label, profile, srcdata);
 				if (FAILED(hr)) {
-					m_pCAP->ClearPixelShaders(TARGET_FRAME); // ???
-					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
-					return; // ???
+					SendStatusMessage(ResStr(IDS_MAINFRM_73) + label, 3000);
 				}
 			}
 		}
@@ -11615,14 +11614,13 @@ void CMainFrame::SetShaders()
 		for (const auto& shader : s.ShaderListScreenSpace) {
 			ShaderC* pShader = GetShader(shader);
 			if (pShader) {
+				CStringW label   = pShader->label;
 				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
 
-				HRESULT hr = m_pCAP->AddPixelShader(TARGET_SCREEN, srcdata, profile);
+				HRESULT hr = m_pCAP->AddPixelShader(TARGET_SCREEN, label, profile, srcdata);
 				if (FAILED(hr)) {
-					m_pCAP->ClearPixelShaders(TARGET_SCREEN); // ???
-					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
-					return; // ???
+					SendStatusMessage(ResStr(IDS_MAINFRM_73) + label, 3000);
 				}
 			}
 		}
