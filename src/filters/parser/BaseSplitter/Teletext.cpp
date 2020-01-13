@@ -247,6 +247,9 @@ static uint16_t telx_to_ucs2(uint8_t c)
 // extracts magazine number from teletext page
 #define MAGAZINE(p) ((p >> 8) & 0xf)
 
+// extracts page number from teletext page
+#define PAGE(p) (p & 0xff)
+
 enum bool_t {
 	YES = 1,
 	NO = 0,
@@ -416,7 +419,7 @@ void CTeletext::ProcessTeletextPage()
 	}
 }
 
-void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE_TIME rtStart)
+void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE_TIME rtStart, data_unit data_unit_id)
 {
 	// variable names conform to ETS 300 706, chapter 7.1.2
 	uint8_t address, m, line;
@@ -438,9 +441,32 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 			DLog(L"ProcessTeletextPacket() - No teletext page specified, first received suitable page is %03x, not guaranteed", m_nSuitablePage);
 		}
 
-		// Page transmission is terminated, however now we are waiting for our new page
-		if (page_number != m_nSuitablePage) {
+		// ETS 300 706, chapter 9.3.1.3:
+		// When set to '1' the service is designated to be in Serial mode and the transmission of a page is terminated
+		// by the next page header with a different page number.
+		// When set to '0' the service is designated to be in Parallel mode and the transmission of a page is terminated
+		// by the next page header with a different page number but the same magazine number.
+		// The same setting shall be used for all page headers in the service.
+		// ETS 300 706, chapter 7.2.1: Page is terminated by and excludes the next page header packet
+		// having the same magazine address in parallel transmission mode, or any magazine address in serial transmission mode.
+		const auto t_mode = (transmission_mode)(unham_8_4(packet->data[7]) & 0x01);
+
+		if ((t_mode == TRANSMISSION_MODE_PARALLEL)
+				&& (data_unit_id != DATA_UNIT_EBU_TELETEXT_SUBTITLE) && !(m_packetCntFlagOn && flag_subtitle && m_bReceivingData == YES)) {
+			return;
+		}
+
+		if ((m_bReceivingData == YES)
+				&& (((t_mode == TRANSMISSION_MODE_SERIAL) && (PAGE(page_number) != PAGE(m_nSuitablePage))) ||
+					((t_mode == TRANSMISSION_MODE_PARALLEL) && (PAGE(page_number) != PAGE(m_nSuitablePage)) && (m == MAGAZINE(m_nSuitablePage))))) {
 			m_bReceivingData = NO;
+			if (!(m_packetCntFlagOn && flag_subtitle)) {
+				return;
+			}
+		}
+
+		// Page transmission is terminated, however now we are waiting for our new page
+		if (page_number != m_nSuitablePage && !(m_packetCntFlagOn && flag_subtitle && m_bReceivingData == YES)) {
 			return;
 		}
 
@@ -448,6 +474,8 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 		if (m_page_buffer.tainted == YES) {
 			m_page_buffer.rtStop = rtStart;
 			ProcessTeletextPage();
+
+			m_packetCntFlagOn = 0;
 		}
 
 		m_page_buffer.rtStart = rtStart == INVALID_TIME ? 0 : rtStart;
@@ -470,16 +498,9 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 			m_page_buffer.text[line][i] = telx_to_ucs2(packet->data[i]);
 		}
 		m_page_buffer.tainted = YES;
+		--m_packetCntFlagOn;
 	}
 }
-
-enum data_unit {
-	DATA_UNIT_EBU_TELETEXT_NONSUBTITLE = 0x02,
-	DATA_UNIT_EBU_TELETEXT_SUBTITLE = 0x03,
-	DATA_UNIT_EBU_TELETEXT_INVERTED = 0x0c,
-	DATA_UNIT_VPS = 0xc3,
-	DATA_UNIT_CLOSED_CAPTIONS = 0xc5
-};
 
 CTeletext::CTeletext()
 {
@@ -503,7 +524,7 @@ void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtSta
 						buffer[i + j] = REVERSE_8[buffer[i + j]];
 					}
 
-					ProcessTeletextPacket((teletext_packet_payload *)&buffer[i], rtStart);
+					ProcessTeletextPacket((teletext_packet_payload *)&buffer[i], rtStart, (data_unit)data_unit_id);
 				}
 			}
 			i += data_unit_len;
