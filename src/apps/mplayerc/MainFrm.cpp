@@ -5278,7 +5278,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		fSetForegroundWindow = true;
 
 		CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-		if (p) {
+		if (p && CheckDVD(s.slFiles.front())) {
 			p->path = s.slFiles.front();
 			p->subs = s.slSubs;
 		}
@@ -5336,7 +5336,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 	} else if (!s.slFiles.empty()) {
 		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
 			;
-		} else if (s.slFiles.size() == 1 && ::PathIsDirectoryW(s.slFiles.front() + L"\\VIDEO_TS")) {
+		} else if (s.slFiles.size() == 1 && CheckDVD(s.slFiles.front())) {
 			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
 
