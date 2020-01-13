@@ -50,13 +50,27 @@ class CTeletext
 		uint8_t tainted;       // 1 = text variable contains any data
 	} m_page_buffer;
 
+	enum transmission_mode {
+		TRANSMISSION_MODE_PARALLEL = 0,
+		TRANSMISSION_MODE_SERIAL = 1
+	};
+
+	enum data_unit {
+		DATA_UNIT_EBU_TELETEXT_NONSUBTITLE = 0x02,
+		DATA_UNIT_EBU_TELETEXT_SUBTITLE = 0x03,
+		DATA_UNIT_EBU_TELETEXT_INVERTED = 0x0c,
+		DATA_UNIT_VPS = 0xc3,
+		DATA_UNIT_CLOSED_CAPTIONS = 0xc5
+	};
+
 	BOOL m_bReceivingData = FALSE;
 	uint16_t m_nSuitablePage = 0;
+	int m_packetCntFlagOn = 0; // a keeps count of packets with flag subtitle ON and data packets
 
 	std::vector<TeletextData> m_output;
 
 	void ProcessTeletextPage();
-	void ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE_TIME rtStart);
+	void ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE_TIME rtStart, data_unit data_unit_id);
 public:
 	CTeletext();
 
