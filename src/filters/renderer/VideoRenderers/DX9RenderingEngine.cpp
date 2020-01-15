@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -612,15 +612,15 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 	}
 	DLog(L"InitializeDXVA2VP: start");
 
-	HRESULT (WINAPI *pDXVA2CreateVideoService)(IDirect3DDevice9* pDD, REFIID riid, void** ppService);
-	(FARPROC &)pDXVA2CreateVideoService = GetProcAddress(m_hDxva2Lib, "DXVA2CreateVideoService");
-	if (!pDXVA2CreateVideoService) {
+	HRESULT (WINAPI *pfDXVA2CreateVideoService)(IDirect3DDevice9* pDD, REFIID riid, void** ppService);
+	(FARPROC &)pfDXVA2CreateVideoService = GetProcAddress(m_hDxva2Lib, "DXVA2CreateVideoService");
+	if (!pfDXVA2CreateVideoService) {
 		return FALSE;
 	}
 
 	HRESULT hr = S_OK;
 	// Create DXVA2 Video Processor Service.
-	hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVA2_VPService);
+	hr = pfDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVA2_VPService);
 	if (FAILED(hr)) {
 		DLog(L"DXVA2CreateVideoService failed with error 0x%x.", hr);
 		return FALSE;
