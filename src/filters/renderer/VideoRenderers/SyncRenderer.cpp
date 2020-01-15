@@ -2234,7 +2234,11 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	m_hEvrLib = LoadLibraryW(L"evr.dll");
 	if (m_hEvrLib) {
 		pfMFCreateVideoSampleFromSurface = (PTR_MFCreateVideoSampleFromSurface)GetProcAddress(m_hEvrLib, "MFCreateVideoSampleFromSurface");
-		pfMFCreateVideoMediaType         = (PTR_MFCreateVideoMediaType)GetProcAddress(m_hEvrLib, "MFCreateVideoMediaType");
+	}
+
+	m_hMfplatLib = LoadLibraryW(L"Mfplat.dll");
+	if (m_hMfplatLib) {
+		pfMFCreateVideoMediaType = (PTR_MFCreateVideoMediaType)GetProcAddress(m_hMfplatLib, "MFCreateVideoMediaType");
 	}
 
 	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
@@ -2298,6 +2302,9 @@ CSyncAP::~CSyncAP(void)
 
 	if (m_hAvrtLib) {
 		FreeLibrary(m_hAvrtLib);
+	}
+	if (m_hMfplatLib) {
+		FreeLibrary(m_hMfplatLib);
 	}
 	if (m_hEvrLib) {
 		FreeLibrary(m_hEvrLib);
