@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -286,16 +286,10 @@ namespace DSObjects
 		HRESULT									GetMixerMediaTypeMerit(IMFMediaType* pType, int& merit);
 		LPCWSTR									GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
 
-		// === Functions pointers on Vista / .Net3 specifics library
+		// === Functions pointers
 		PTR_DXVA2CreateDirect3DDeviceManager9	pfDXVA2CreateDirect3DDeviceManager9;
 		PTR_MFCreateVideoSampleFromSurface		pfMFCreateVideoSampleFromSurface;
 		PTR_MFCreateVideoMediaType				pfMFCreateVideoMediaType;
-
-#if 0
-		HRESULT (__stdcall *pMFCreateMediaType)(__deref_out IMFMediaType**  ppMFType);
-		HRESULT (__stdcall *pMFInitMediaTypeFromAMMediaType)(__in IMFMediaType *pMFType, __in const AM_MEDIA_TYPE *pAMType);
-		HRESULT (__stdcall *pMFInitAMMediaTypeFromMFMediaType)(__in IMFMediaType *pMFType, __in GUID guidFormatBlockType, __inout AM_MEDIA_TYPE *pAMType);
-#endif
 
 		PTR_AvSetMmThreadCharacteristicsW		pfAvSetMmThreadCharacteristicsW;
 		PTR_AvSetMmThreadPriority				pfAvSetMmThreadPriority;

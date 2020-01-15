@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -141,24 +141,11 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 			_Error += L"Could not find MFCreateVideoSampleFromSurface (evr.dll)\n";
 		}
 		if (!pfMFCreateVideoMediaType) {
-			_Error += L"Could not find MFCreateVideoMediaType (evr.dll)\n";
+			_Error += L"Could not find MFCreateVideoMediaType (Mfplat.dll)\n";
 		}
 		hr = E_FAIL;
 		return;
 	}
-
-	// Load mfplat fuctions
-#if 0
-	HMODULE hLib = LoadLibraryW(L"mfplat.dll");
-	(FARPROC &)pMFCreateMediaType = GetProcAddress(hLib, "MFCreateMediaType");
-	(FARPROC &)pMFInitMediaTypeFromAMMediaType = GetProcAddress(hLib, "MFInitMediaTypeFromAMMediaType");
-	(FARPROC &)pMFInitAMMediaTypeFromMFMediaType = GetProcAddress(hLib, "MFInitAMMediaTypeFromMFMediaType");
-
-	if (!pMFCreateMediaType || !pMFInitMediaTypeFromAMMediaType || !pMFInitAMMediaTypeFromMFMediaType) {
-		hr = E_FAIL;
-		return;
-	}
-#endif
 
 	// Load Vista specifics DLLs
 	m_hAvrtLib = LoadLibraryW(L"avrt.dll");
