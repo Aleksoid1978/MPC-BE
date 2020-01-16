@@ -223,7 +223,7 @@ void CShaderEditorDlg::UpdateShaderList(const bool bD3D11)
 	m_edSrcdata.SetWindowTextW(L"");
 	m_edOutput.SetWindowTextW(L"");
 
-	m_cbProfile.Clear();
+	m_cbProfile.ResetContent();
 	if (m_bD3D11) {
 		m_cbProfile.AddString(L"ps_4_0");
 		m_cbProfile.SetCurSel(0);
