@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -56,6 +56,7 @@ private:
 	bool m_fSplitterGrabbed;
 	CPixelShaderCompiler* m_pPSC;
 	ShaderC* m_pShader;
+	bool m_bD3D11;
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
 	CComboBox m_cbLabels;
@@ -69,7 +70,7 @@ private:
 	void DeleteShader();
 
 public:
-	CShaderEditorDlg();
+	CShaderEditorDlg(bool bD3D11);
 	virtual ~CShaderEditorDlg();
 
 	BOOL Create(CWnd* pParent = nullptr);

@@ -11455,7 +11455,12 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 	if (!pShader) {
 		CString path;
 		if (AfxGetMyApp()->GetAppSavePath(path)) {
-			path.AppendFormat(L"Shaders\\%s.hlsl", label);
+			if (m_bD3D11Shaders) {
+				path.AppendFormat(L"Shaders11\\%s.hlsl", label);
+			} else {
+				path.AppendFormat(L"Shaders\\%s.hlsl", label);
+			}
+
 			if (::PathFileExistsW(path)) {
 				CStdioFile file;
 				if (file.Open(path, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
@@ -11471,10 +11476,13 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 						file.SeekToBegin();
 					}
 
-					if (shader.profile == L"ps_3_sw") {
+					if (m_bD3D11Shaders) {
+						shader.profile = L"ps_4_0";
+					}
+					else if (shader.profile == L"ps_3_sw") {
 						shader.profile = L"ps_3_0";
 					}
-					if (shader.profile != L"ps_2_0"
+					else if (shader.profile != L"ps_2_0"
 							&& shader.profile != L"ps_2_a"
 							&& shader.profile != L"ps_2_b"
 							&& shader.profile != L"ps_3_0") {
@@ -11508,7 +11516,11 @@ bool CMainFrame::SaveShaderFile(ShaderC* shader)
 {
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path.AppendFormat(L"Shaders\\%s.hlsl", shader->label);
+		if (m_bD3D11Shaders) {
+			path.AppendFormat(L"Shaders11\\%s.hlsl", shader->label);
+		} else {
+			path.AppendFormat(L"Shaders\\%s.hlsl", shader->label);
+		}
 
 		CStdioFile file;
 		if (file.Open(path, CFile::modeWrite  | CFile::shareExclusive | CFile::typeText)) {
@@ -11539,7 +11551,11 @@ bool CMainFrame::DeleteShaderFile(LPCWSTR label)
 {
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path.AppendFormat(L"Shaders\\%s.hlsl", label);
+		if (m_bD3D11Shaders) {
+			path.AppendFormat(L"Shaders11\\%s.hlsl", label);
+		} else {
+			path.AppendFormat(L"Shaders\\%s.hlsl", label);
+		}
 
 		if (!::PathFileExistsW(path) || ::DeleteFileW(path)) {
 			// if the file is missing or deleted successfully, then remove it from the cache
@@ -11563,7 +11579,13 @@ void CMainFrame::TidyShaderCashe()
 	}
 
 	for (auto it = m_ShaderCashe.cbegin(); it != m_ShaderCashe.cend(); ) {
-		CString path (appsavepath + L"Shaders\\" + (*it).label + L".hlsl");
+		CString path(appsavepath);
+		if (m_bD3D11Shaders) {
+			path += L"Shaders11\\";
+		} else {
+			path += L"Shaders\\";
+		}
+		path += (*it).label + L".hlsl";
 
 		CFile file;
 		if (file.Open(path, CFile::modeRead | CFile::modeCreate | CFile::shareDenyNone)) {

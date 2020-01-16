@@ -171,11 +171,12 @@ void CShaderEdit::OnTimer(UINT_PTR nIDEvent)
 
 // CShaderEditorDlg dialog
 
-CShaderEditorDlg::CShaderEditorDlg()
+CShaderEditorDlg::CShaderEditorDlg(bool bD3D11)
 	: CResizableDialog(CShaderEditorDlg::IDD, nullptr)
 	, m_fSplitterGrabbed(false)
 	, m_pPSC(nullptr)
 	, m_pShader(nullptr)
+	, m_bD3D11(bD3D11)
 {
 }
 
@@ -215,10 +216,18 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	SetMinTrackSize(CSize(250, 40));
 
-	m_cbProfile.AddString(L"ps_2_0");
-	m_cbProfile.AddString(L"ps_2_a");
-	m_cbProfile.AddString(L"ps_2_b");
-	m_cbProfile.AddString(L"ps_3_0");
+	if (m_bD3D11) {
+		m_cbProfile.AddString(L"ps_4_0");
+		m_cbProfile.SetCurSel(0);
+		m_cbProfile.EnableWindow(FALSE);
+	}
+	else {
+		m_cbProfile.AddString(L"ps_2_0");
+		m_cbProfile.AddString(L"ps_2_a");
+		m_cbProfile.AddString(L"ps_2_b");
+		m_cbProfile.AddString(L"ps_3_0");
+	}
+
 
 	return TRUE;
 }
@@ -231,7 +240,11 @@ void CShaderEditorDlg::UpdateShaderList()
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path += L"Shaders\\";
+		if (m_bD3D11) {
+			path += L"Shaders11\\";
+		} else {
+			path += L"Shaders\\";
+		}
 		if (::PathFileExistsW(path)) {
 			WIN32_FIND_DATAW wfd;
 			HANDLE hFile = FindFirstFileW(path + L"*.hlsl", &wfd);
@@ -294,7 +307,11 @@ void CShaderEditorDlg::NewShader()
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path.AppendFormat(L"Shaders\\%s.hlsl", dlg.m_Name);
+		if (m_bD3D11) {
+			path.AppendFormat(L"Shaders11\\%s.hlsl", dlg.m_Name);
+		} else {
+			path.AppendFormat(L"Shaders\\%s.hlsl", dlg.m_Name);
+		}
 
 		CStdioFile file;
 		if (file.Open(path, CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeBinary)) {
@@ -440,7 +457,11 @@ void CShaderEditorDlg::OnBnClickedMenu()
 		{
 			CString path;
 			if (AfxGetMyApp()->GetAppSavePath(path)) {
-				path.Append(L"Shaders");
+				if (m_bD3D11) {
+					path.Append(L"Shaders11");
+				} else {
+					path.Append(L"Shaders");
+				}
 				ShellExecuteW(nullptr, L"open", path, nullptr, nullptr, SW_RESTORE);
 			}
 		}

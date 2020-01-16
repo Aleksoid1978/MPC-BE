@@ -267,12 +267,20 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	const int namesize = wcslen(name) * sizeof(wchar_t);
 	const int codesize = strlen(sourceCode);
 
+	int iProfile = 0;
+	if (!strcmp(profile, "ps_2_0") || !strcmp(profile, "ps_2_a") || !strcmp(profile, "ps_2_b") || !strcmp(profile, "ps_3_0")) {
+		iProfile = 3;
+	}
+	else if (!strcmp(profile, "ps_4_0")) {
+		iProfile = 4;
+	}
+
 	if (codesize && TARGET_SCREEN == target) {
 		// experimental
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
 			int rtype = 0;
 			hr = pIExFilterConfig->GetInt("renderType", &rtype);
-			if (S_OK == hr && rtype == 9) { // Direct3D 9
+			if (S_OK == hr && (rtype == 9 && iProfile == 3 || rtype == 11 && iProfile == 4)) {
 				int size = 8 + codesize;
 				if (namesize) {
 					size += 8 + namesize;
