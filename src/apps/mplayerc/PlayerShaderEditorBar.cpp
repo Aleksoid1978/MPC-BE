@@ -28,7 +28,6 @@
 IMPLEMENT_DYNAMIC(CPlayerShaderEditorBar, CPlayerBar)
 
 CPlayerShaderEditorBar::CPlayerShaderEditorBar()
-	: m_dlg(false)
 {
 }
 
