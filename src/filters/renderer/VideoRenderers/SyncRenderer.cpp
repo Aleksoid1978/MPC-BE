@@ -2249,7 +2249,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 			_Error += L"Could not find MFCreateVideoSampleFromSurface (evr.dll)\n";
 		}
 		if (!pfMFCreateVideoMediaType) {
-			_Error += L"Could not find MFCreateVideoMediaType (evr.dll)\n";
+			_Error += L"Could not find MFCreateVideoMediaType (Mfplat.dll)\n";
 		}
 		hr = E_FAIL;
 		return;

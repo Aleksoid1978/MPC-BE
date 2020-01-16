@@ -1992,8 +1992,8 @@ void CEVRAllocatorPresenter::RenderThread()
 						m_pCurrentDisplaydSample = pMFSample;
 
 						bool bValidSampleTime = true;
-						HRESULT hGetSampleTime = pMFSample->GetSampleTime (&nsSampleTime);
-						if (hGetSampleTime != S_OK || nsSampleTime == 0) {
+						HRESULT hrGetSampleTime = pMFSample->GetSampleTime(&nsSampleTime);
+						if (hrGetSampleTime != S_OK || nsSampleTime == 0) {
 							bValidSampleTime = false;
 						}
 						// We assume that all samples have the same duration
