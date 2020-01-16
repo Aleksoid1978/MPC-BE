@@ -53,10 +53,10 @@ class CPixelShaderCompiler;
 class CShaderEditorDlg : public CResizableDialog
 {
 private:
-	bool m_fSplitterGrabbed;
-	CPixelShaderCompiler* m_pPSC;
-	ShaderC* m_pShader;
-	bool m_bD3D11;
+	bool m_fSplitterGrabbed      = false;
+	CPixelShaderCompiler* m_pPSC = nullptr;
+	ShaderC* m_pShader           = nullptr;
+	bool m_bD3D11                = false;
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
 	CComboBox m_cbLabels;
@@ -70,11 +70,11 @@ private:
 	void DeleteShader();
 
 public:
-	CShaderEditorDlg(bool bD3D11);
+	CShaderEditorDlg();
 	virtual ~CShaderEditorDlg();
 
 	BOOL Create(CWnd* pParent = nullptr);
-	void UpdateShaderList();
+	void UpdateShaderList(const bool bD3D11);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

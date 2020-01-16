@@ -171,12 +171,8 @@ void CShaderEdit::OnTimer(UINT_PTR nIDEvent)
 
 // CShaderEditorDlg dialog
 
-CShaderEditorDlg::CShaderEditorDlg(bool bD3D11)
+CShaderEditorDlg::CShaderEditorDlg()
 	: CResizableDialog(CShaderEditorDlg::IDD, nullptr)
-	, m_fSplitterGrabbed(false)
-	, m_pPSC(nullptr)
-	, m_pShader(nullptr)
-	, m_bD3D11(bD3D11)
 {
 }
 
@@ -216,6 +212,18 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	SetMinTrackSize(CSize(250, 40));
 
+	return TRUE;
+}
+
+void CShaderEditorDlg::UpdateShaderList(const bool bD3D11)
+{
+	m_bD3D11 = bD3D11;
+
+	m_cbLabels.ResetContent();
+	m_edSrcdata.SetWindowTextW(L"");
+	m_edOutput.SetWindowTextW(L"");
+
+	m_cbProfile.Clear();
 	if (m_bD3D11) {
 		m_cbProfile.AddString(L"ps_4_0");
 		m_cbProfile.SetCurSel(0);
@@ -226,17 +234,8 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 		m_cbProfile.AddString(L"ps_2_a");
 		m_cbProfile.AddString(L"ps_2_b");
 		m_cbProfile.AddString(L"ps_3_0");
+		m_cbProfile.EnableWindow(TRUE);
 	}
-
-
-	return TRUE;
-}
-
-void CShaderEditorDlg::UpdateShaderList()
-{
-	m_cbLabels.ResetContent();
-	m_edSrcdata.SetWindowTextW(L"");
-	m_edOutput.SetWindowTextW(L"");
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {

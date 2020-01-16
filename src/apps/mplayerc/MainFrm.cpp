@@ -7148,7 +7148,7 @@ void CMainFrame::OnViewShaderEditor()
 	if (m_wndShaderEditorBar.IsWindowVisible()) {
 		SetShaders(); // reset shaders
 	} else {
-		m_wndShaderEditorBar.m_dlg.UpdateShaderList();
+		m_wndShaderEditorBar.m_dlg.UpdateShaderList(m_bD3D11Shaders);
 	}
 	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
 }
