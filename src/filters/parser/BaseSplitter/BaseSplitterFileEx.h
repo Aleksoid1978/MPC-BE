@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -187,6 +187,18 @@ public:
 		}
 	};
 
+	struct ac4hdr
+	{
+		WORD sync;
+		BYTE bitstream_version : 2;
+
+		bool operator == (const struct ac4hdr& h) const {
+			return (sync == h.sync
+					&& bitstream_version == h.bitstream_version);
+		}
+
+	};
+
 	struct dtshdr
 	{
 		DWORD sync;
@@ -306,6 +318,7 @@ public:
 	bool Read(aachdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true, bool AC3CoreOnly = true);
+	bool Read(ac4hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(dtshdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(dtslbr_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(mlphdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = false);
@@ -333,7 +346,7 @@ public:
 
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(pcm_law_hdr& h, bool bAlaw, CMediaType* pmt = nullptr);
-	bool Read(opus_ts_hdr& h, int len, std::vector<BYTE>& extradata, CMediaType* pmt = nullptr);
+	bool Read(opus_ts_hdr& h, int len, const std::vector<BYTE>& extradata, CMediaType* pmt = nullptr);
 
 	// LPCM
 	bool ReadDVDLPCMHdr(CMediaType* pmt = nullptr);

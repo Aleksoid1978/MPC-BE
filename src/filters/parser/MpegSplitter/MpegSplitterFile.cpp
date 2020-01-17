@@ -794,8 +794,9 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define OPUS_AUDIO        (1ULL << 13)
 #define DTS_EXPRESS_AUDIO (1ULL << 14)
 #define MPEG4_VIDEO       (1ULL << 15)
+#define AC4_AUDIO         (1ULL << 16)
 
-#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO)
+#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO | AC4_AUDIO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -825,6 +826,8 @@ static const struct StreamType {
 	{ AUDIO_STREAM_LPCM,					LPCM_AUDIO	},
 	// Opus Audio
 	{ PES_PRIVATE,							OPUS_AUDIO	},
+	// AC-4 Audio
+	{ PES_PRIVATE,							AC4_AUDIO   },
 	// MPEG2 Video
 	{ VIDEO_STREAM_MPEG2,					MPEG2_VIDEO	},
 	{ VIDEO_STREAM_MPEG2_ADDITIONAL_VIEW,	MPEG2_VIDEO	},
@@ -891,6 +894,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		return s;
 	}
 
+	// ignore pids
+	if (std::find(m_ignore_pids.cbegin(), m_ignore_pids.cend(), pid) != m_ignore_pids.cend()) {
+		return s;
+	}
+
 	if (m_ClipInfo.IsHdmv() && !m_ClipInfo.FindStream(s.pid)) {
 		return s;
 	}
@@ -914,10 +922,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		}
 	}
 
-	streamData& _streamData = m_streamData[s];
+	const auto& _streamData = m_streamData[s];
 	if (_streamData.codec != stream_codec::NONE) {
-		// skip AC-4 stream
 		if (_streamData.codec == stream_codec::AC4) {
+			// skip AC-4 stream
+			m_ignore_pids.push_back(pid);
 			return s;
 		}
 		for (const auto& streamDesc : StreamDesc) {
@@ -1102,6 +1111,21 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 	if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::subpic].Find(s)) {
+				// AC-4
+				if (type == stream_type::unknown && (stream_type & AC4_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
+					Seek(start);
+					ac4hdr h;
+					if (Read(h, len, &s.mt)) {
+						m_ac4Valid[s].Handle(h);
+						if (m_ac4Valid[s].IsValid()) {
+							// type = stream_type::audio;
+							// skip AC-4 stream
+							m_ignore_pids.push_back(pid);
+							return s;
+						}
+					}
+				}
+
 				// AAC_LATM
 				if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
 					Seek(start);
