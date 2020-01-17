@@ -1,8 +1,5 @@
 // $MinimumShaderProfile: ps_4_0
 
-sampler s0 : register(s0);
-float4 p0 :  register(c0);
-
 Texture2D tex : register(t0);
 SamplerState samp : register(s0);
 
