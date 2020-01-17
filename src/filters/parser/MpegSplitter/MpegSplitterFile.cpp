@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -916,6 +916,10 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 
 	streamData& _streamData = m_streamData[s];
 	if (_streamData.codec != stream_codec::NONE) {
+		// skip AC-4 stream
+		if (_streamData.codec == stream_codec::AC4) {
+			return s;
+		}
 		for (const auto& streamDesc : StreamDesc) {
 			if (streamDesc.codec == _streamData.codec) {
 				if (stream_type == PES_STREAM_TYPE_ANY) {
@@ -2111,26 +2115,33 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, const WORD pid)
 				case 0x7f: // DVB extension descriptor
 					{
 						const BYTE ext_desc_tag = gb.BitRead(8); descriptor_length -= 1;
-						if (ext_desc_tag == 0x80) {
-							int channel_config_code = gb.BitRead(8); descriptor_length -= 1;
-							if (channel_config_code >= 0 && channel_config_code <= 0x8) {
-								std::vector<BYTE>& extradata = _streamData.pmt.extraData;
-								if (extradata.size() != sizeof(opus_default_extradata)) {
-									extradata.resize(sizeof(opus_default_extradata));
-									memcpy(extradata.data(), &opus_default_extradata, sizeof(opus_default_extradata));
+						switch (ext_desc_tag) {
+							case 0x15:
+								_streamData.codec = stream_codec::AC4;
+								break;
+							case 0x80:
+								{
+									int channel_config_code = gb.BitRead(8); descriptor_length -= 1;
+									if (channel_config_code >= 0 && channel_config_code <= 0x8) {
+										std::vector<BYTE>& extradata = _streamData.pmt.extraData;
+										if (extradata.size() != sizeof(opus_default_extradata)) {
+											extradata.resize(sizeof(opus_default_extradata));
+											memcpy(extradata.data(), &opus_default_extradata, sizeof(opus_default_extradata));
 
-									BYTE channels = 0;
-									extradata[9]  = channels = channel_config_code ? channel_config_code : 2;
-									extradata[18] = channel_config_code ? (channels > 2) : 255;
-									extradata[19] = opus_stream_cnt[channel_config_code];
-									extradata[20] = opus_coupled_stream_cnt[channel_config_code];
-									if (channels >= 1) {
-										memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+											BYTE channels = 0;
+											extradata[9] = channels = channel_config_code ? channel_config_code : 2;
+											extradata[18] = channel_config_code ? (channels > 2) : 255;
+											extradata[19] = opus_stream_cnt[channel_config_code];
+											extradata[20] = opus_coupled_stream_cnt[channel_config_code];
+											if (channels >= 1) {
+												memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+											}
+
+											_streamData.codec = stream_codec::OPUS;
+										}
 									}
-
-									_streamData.codec = stream_codec::OPUS;
 								}
-							}
+								break;
 						}
 						if (descriptor_length) {
 							gb.SkipBytes(descriptor_length);
