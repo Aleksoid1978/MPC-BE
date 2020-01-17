@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,10 +25,11 @@
 
 // CShaderCombineDlg dialog
 
-CShaderCombineDlg::CShaderCombineDlg(CWnd* pParent)
+CShaderCombineDlg::CShaderCombineDlg(CWnd* pParent, const bool bD3D11)
 	: CCmdUIDialog(CShaderCombineDlg::IDD, pParent)
 	, m_fcheck1(FALSE)
 	, m_fcheck2(FALSE)
+	, m_bD3D11(bD3D11)
 {
 }
 
@@ -82,7 +83,12 @@ BOOL CShaderCombineDlg::OnInitDialog()
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path += L"Shaders\\";
+		if (m_bD3D11) {
+			path += L"Shaders11\\";
+		} else {
+			path += L"Shaders\\";
+		}
+
 		if (::PathFileExistsW(path)) {
 			WIN32_FIND_DATAW wfd;
 			HANDLE hFile = FindFirstFileW(path + L"*.hlsl", &wfd);

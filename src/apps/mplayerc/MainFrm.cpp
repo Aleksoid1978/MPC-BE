@@ -8557,7 +8557,7 @@ enum {
 void CMainFrame::OnPlayShaders(UINT nID)
 {
 	if (nID == ID_SHADERS_SELECT) {
-		if (IDOK != CShaderCombineDlg(GetModalParent()).DoModal()) {
+		if (IDOK != CShaderCombineDlg(GetModalParent(), m_bD3D11Shaders).DoModal()) {
 			return;
 		}
 	}

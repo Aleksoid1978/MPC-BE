@@ -36,6 +36,7 @@ class CShaderCombineDlg : public CCmdUIDialog
 	CComboBox m_combo;
 
 	BOOL m_fcheck1, m_fcheck2;
+	bool m_bD3D11 = false;
 
 	bool m_oldcheck1;
 	bool m_oldcheck2;
@@ -45,7 +46,7 @@ class CShaderCombineDlg : public CCmdUIDialog
 	void UpdateShaders(unsigned char type = SHADERS);
 
 public:
-	CShaderCombineDlg(CWnd* pParent);
+	CShaderCombineDlg(CWnd* pParent, const bool bD3D11);
 	virtual ~CShaderCombineDlg();
 
 	enum { IDD = IDD_SHADERCOMBINE_DLG };
