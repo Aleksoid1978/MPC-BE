@@ -74,7 +74,10 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	std::map<DWORD, CValidStream<latm_aachdr, 3>> m_aaclatmValid;
 	std::map<DWORD, CValidStream<aachdr>>         m_aacValid;
 	std::map<DWORD, CValidStream<ac3hdr>>         m_ac3Valid;
+	std::map<DWORD, CValidStream<ac4hdr>>         m_ac4Valid;
 	std::map<DWORD, CValidStream<mpahdr>>         m_mpaValid;
+
+	std::vector<WORD> m_ignore_pids;
 
 	BOOL m_bOpeningCompleted;
 

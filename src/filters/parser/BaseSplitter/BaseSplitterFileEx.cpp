@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -729,6 +729,23 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		pmt->formattype = FORMAT_WaveFormatEx;
 		pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
 	}
+
+	return true;
+}
+
+bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt)
+{
+	memset(&h, 0, sizeof(h));
+
+	h.sync = BitRead(16);
+	if (!(h.sync == 0xAC40 || h.sync == 0xAC41)) {
+		return false;
+	}
+	const int16_t frame_size = BitRead(16);
+	if (frame_size == 0xFFFF) {
+		Skip(3);
+	}
+	h.bitstream_version = BitRead(2);
 
 	return true;
 }
@@ -1876,7 +1893,7 @@ bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, bool bAlaw, CMediaType* pmt)
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, std::vector<BYTE>& extradata, CMediaType* pmt/* = nullptr*/)
+bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, const std::vector<BYTE>& extradata, CMediaType* pmt/* = nullptr*/)
 {
 	if (len < 2 || extradata.size() != 30) {
 		return false;
@@ -1887,7 +1904,7 @@ bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, std::vector<BYTE>& extra
 	}
 
 	if (pmt) {
-		BYTE* buf = extradata.data();
+		const BYTE* buf = extradata.data();
 		const size_t nCount = extradata.size();
 		CGolombBuffer Buffer(buf + 8, nCount - 8); // skip "OpusHead"
 
