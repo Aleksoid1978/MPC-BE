@@ -28,12 +28,13 @@
 
 class CShaderCombineDlg : public CCmdUIDialog
 {
-#define SHADER1 1
-#define SHADER2 2
-#define SHADERS (SHADER1 | SHADER2)
+#define SHADER1      (1 << 0)
+#define SHADER2      (1 << 1)
+#define SHADER11_2   (1 << 3)
 
-	bool m_bD3D11 = false;
+	const bool m_bEnableD3D11;
 
+	int m_iLastSel = -1; // 0 - DX9, 1 - DX11
 	CComboBox m_cbDXNum;
 	CComboBox m_cbShaders;
 
@@ -48,7 +49,9 @@ class CShaderCombineDlg : public CCmdUIDialog
 	std::list<CString> m_oldlabels1;
 	std::list<CString> m_oldlabels2;
 
-	void UpdateShaders(unsigned char type = SHADERS);
+	CString m_AppSavePath;
+
+	void UpdateShaders(unsigned type);
 
 public:
 	CShaderCombineDlg(CWnd* pParent, const bool bD3D11);
@@ -67,6 +70,7 @@ protected:
 	virtual void OnCancel();
 
 public:
+	afx_msg void OnSelChangeDXNum();
 	afx_msg void OnUpdateCheck1();
 	afx_msg void OnSetFocusList1();
 	afx_msg void OnUpdateCheck2();

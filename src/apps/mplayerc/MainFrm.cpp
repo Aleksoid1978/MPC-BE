@@ -8557,7 +8557,9 @@ enum {
 void CMainFrame::OnPlayShaders(UINT nID)
 {
 	if (nID == ID_SHADERS_SELECT) {
-		if (IDOK != CShaderCombineDlg(GetModalParent(), m_bD3D11Shaders).DoModal()) {
+		const bool bEnableD3D11 = IsWindows8OrGreater() && AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR;
+
+		if (IDOK != CShaderCombineDlg(GetModalParent(), bEnableD3D11).DoModal()) {
 			return;
 		}
 	}
