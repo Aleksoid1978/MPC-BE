@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Cancelar"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Shader Combiner"
-7		"&Agregar"
-9		"Enable pre-resize pixel shaders"
-11		"Enable post-resize pixel shaders"
-13		"&Eliminar"
-14		"&Subir"
-15		"&Bajar"
-16		"Aceptar"
-17		"Cancelar"
+8		"&Agregar"
+10		"Enable pre-resize pixel shaders"
+12		"Enable post-resize pixel shaders"
+14		"&Eliminar"
+15		"&Subir"
+16		"&Bajar"
+17		"Aceptar"
+18		"Cancelar"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

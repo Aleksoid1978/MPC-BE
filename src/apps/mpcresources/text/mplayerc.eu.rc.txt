@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Ezeztatu"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Itzal Nahaslea"
-7		"Ge&hitu"
-9		"Gaitu aurre-birneurritze pixel itzalak"
-11		"Gaitu birneurritze-ondorengo pixel itzalak"
-13		"&Kendu"
-14		"Mugitu &Gora"
-15		"Mugitu &Behera"
-16		"Ongi"
-17		"Ezeztatu"
+8		"Ge&hitu"
+10		"Gaitu aurre-birneurritze pixel itzalak"
+12		"Gaitu birneurritze-ondorengo pixel itzalak"
+14		"&Kendu"
+15		"Mugitu &Gora"
+16		"Mugitu &Behera"
+17		"Ongi"
+18		"Ezeztatu"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

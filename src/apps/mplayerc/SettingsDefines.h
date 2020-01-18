@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,6 +100,7 @@
 #define IDS_RS_COLOR_SATURATION				L"VideoSaturation"
 #define IDS_RS_SHADERLIST					L"ShaderList"
 #define IDS_RS_SHADERLISTSCREENSPACE		L"ShaderListScreenSpace"
+#define IDS_RS_SHADERS11POSTSCALE			L"Shaders11PostScale"
 #define IDS_RS_TITLEBARTEXTTITLE			L"TitleBarTextTitle"
 #define IDS_RS_REWIND						L"Rewind"
 #define IDS_RS_VOLUME_STEP					L"VolumeStep"

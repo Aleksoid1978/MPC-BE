@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Άκυρο"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Συνδυασμός σκιάσεων"
-7		"Π&ροσθήκη"
-9		"Ενεργ. προμεγεθυμένων pixel shaders"
-11		"Ενεργ. μεταμεγεθυμένων pixel shaders"
-13		"&Αφαίρεση"
-14		"Μετακ. &πάνω"
-15		"Μετακ. &κάτω"
-16		"Εντάξει"
-17		"Άκυρο"
+8		"Π&ροσθήκη"
+10		"Ενεργ. προμεγεθυμένων pixel shaders"
+12		"Ενεργ. μεταμεγεθυμένων pixel shaders"
+14		"&Αφαίρεση"
+15		"Μετακ. &πάνω"
+16		"Μετακ. &κάτω"
+17		"Εντάξει"
+18		"Άκυρο"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,11 +32,16 @@ class CShaderCombineDlg : public CCmdUIDialog
 #define SHADER2 2
 #define SHADERS (SHADER1 | SHADER2)
 
-	CListBox m_list1, m_list2;
-	CComboBox m_combo;
-
-	BOOL m_fcheck1, m_fcheck2;
 	bool m_bD3D11 = false;
+
+	CComboBox m_cbDXNum;
+	CComboBox m_cbShaders;
+
+	CButton   m_chEnable1;
+	CButton   m_chEnable2;
+
+	CListBox  m_cbList1;
+	CListBox  m_cbList2;
 
 	bool m_oldcheck1;
 	bool m_oldcheck2;

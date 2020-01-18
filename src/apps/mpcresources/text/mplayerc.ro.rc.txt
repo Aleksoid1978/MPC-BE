@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Renunță"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Combinare shadere"
-7		"&Adaugă"
-9		"Activează shadere pixel pre-redimensionare"
-11		"Activează shadere pixel post-redimensionare"
-13		"&Elimină"
-14		"Mută în &sus"
-15		"Mută în &jos"
-16		"OK"
-17		"Renunță"
+8		"&Adaugă"
+10		"Activează shadere pixel pre-redimensionare"
+12		"Activează shadere pixel post-redimensionare"
+14		"&Elimină"
+15		"Mută în &sus"
+16		"Mută în &jos"
+17		"OK"
+18		"Renunță"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"取消"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"着色混合器"
-7		"添加(&A)"
-9		"启用预调整大小像素着色器"
-11		"启用后调整大小像素着色器"
-13		"删除(&R)"
-14		"上移(&U)"
-15		"下移(&D)"
-16		"确定"
-17		"取消"
+8		"添加(&A)"
+10		"启用预调整大小像素着色器"
+12		"启用后调整大小像素着色器"
+14		"删除(&R)"
+15		"上移(&U)"
+16		"下移(&D)"
+17		"确定"
+18		"取消"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

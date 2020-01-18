@@ -27,8 +27,6 @@
 
 CShaderCombineDlg::CShaderCombineDlg(CWnd* pParent, const bool bD3D11)
 	: CCmdUIDialog(CShaderCombineDlg::IDD, pParent)
-	, m_fcheck1(FALSE)
-	, m_fcheck2(FALSE)
 	, m_bD3D11(bD3D11)
 {
 }
@@ -41,13 +39,14 @@ void CShaderCombineDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Check(pDX, IDC_CHECK1, m_fcheck1);
-	DDX_Control(pDX, IDC_LIST1, m_list1);
+	DDX_Control(pDX, IDC_COMBO2, m_cbDXNum);
+	DDX_Control(pDX, IDC_COMBO1, m_cbShaders);
 
-	DDX_Check(pDX, IDC_CHECK2, m_fcheck2);
-	DDX_Control(pDX, IDC_LIST2, m_list2);
+	DDX_Control(pDX, IDC_CHECK1, m_chEnable1);
+	DDX_Control(pDX, IDC_LIST1,  m_cbList1);
 
-	DDX_Control(pDX, IDC_COMBO1, m_combo);
+	DDX_Control(pDX, IDC_CHECK2, m_chEnable2);
+	DDX_Control(pDX, IDC_LIST2,  m_cbList2);
 }
 
 BEGIN_MESSAGE_MAP(CShaderCombineDlg, CCmdUIDialog)
@@ -76,10 +75,40 @@ BOOL CShaderCombineDlg::OnInitDialog()
 
 	// remember the initial state
 	auto pFrame = AfxGetMainFrame();
-	m_fcheck1 = m_oldcheck1 = pFrame->m_bToggleShader;
-	m_fcheck2 = m_oldcheck2 = pFrame->m_bToggleShaderScreenSpace;
-	m_oldlabels1 = s.ShaderList;
-	m_oldlabels2 = s.ShaderListScreenSpace;
+	m_oldcheck1 = pFrame->m_bToggleShader;
+	m_oldcheck2 = pFrame->m_bToggleShaderScreenSpace;
+
+	m_chEnable1.SetCheck(m_oldcheck1 ? BST_CHECKED : BST_UNCHECKED);
+	m_chEnable2.SetCheck(m_oldcheck2 ? BST_CHECKED : BST_UNCHECKED);
+
+	m_cbDXNum.EnableWindow(FALSE);
+	m_cbDXNum.AddString(L"DX9");
+	m_cbDXNum.AddString(L"DX11");
+	if (m_bD3D11) {
+		m_cbDXNum.SetCurSel(1);
+		m_cbList1.EnableWindow(FALSE);
+		m_oldlabels2 = s.Shaders11PostScale;
+
+		for (const auto& shader : s.Shaders11PostScale) {
+			m_cbList2.AddString(shader);
+		}
+		m_cbList2.AddString(L"");
+	}
+	else {
+		m_cbDXNum.SetCurSel(0);
+		m_oldlabels1 = s.ShaderList;
+		m_oldlabels2 = s.ShaderListScreenSpace;
+
+		for (const auto& shader : s.ShaderList) {
+			m_cbList1.AddString(shader);
+		}
+		m_cbList1.AddString(L"");
+
+		for (const auto& shader : s.ShaderListScreenSpace) {
+			m_cbList2.AddString(shader);
+		}
+		m_cbList2.AddString(L"");
+	}
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
@@ -96,29 +125,23 @@ BOOL CShaderCombineDlg::OnInitDialog()
 				do {
 					CString filename(wfd.cFileName);
 					filename.Truncate(filename.GetLength() - 5);
-					m_combo.AddString(filename);
+					m_cbShaders.AddString(filename);
 				} while (FindNextFileW(hFile, &wfd));
 				FindClose(hFile);
 			}
 		}
 	}
 
-	if (m_combo.GetCount()) {
-		m_combo.SetCurSel(0);
-		CorrectComboListWidth(m_combo);
+	if (m_cbShaders.GetCount()) {
+		m_cbShaders.SetCurSel(0);
+		CorrectComboListWidth(m_cbShaders);
 	}
 
-	for (const auto& shader : s.ShaderList) {
-		m_list1.AddString(shader);
+	if (m_bD3D11) {
+		m_cbList2.SetFocus();
+	} else {
+		m_cbList1.SetFocus();
 	}
-	m_list1.AddString(L"");
-
-	for (const auto& shader : s.ShaderListScreenSpace) {
-		m_list2.AddString(shader);
-	}
-	m_list2.AddString(L"");
-
-	m_list1.SetFocus();
 
 	UpdateData(FALSE);
 
@@ -148,57 +171,57 @@ void CShaderCombineDlg::OnUpdateCheck1()
 {
 	UpdateData();
 
-	AfxGetMainFrame()->EnableShaders1(!!m_fcheck1);
+	AfxGetMainFrame()->EnableShaders1(!!m_chEnable1.GetCheck());
 }
 
 void CShaderCombineDlg::OnUpdateCheck2()
 {
 	UpdateData();
 
-	AfxGetMainFrame()->EnableShaders2(!!m_fcheck2);
+	AfxGetMainFrame()->EnableShaders2(!!m_chEnable2.GetCheck());
 }
 
 void CShaderCombineDlg::OnSetFocusList1()
 {
-	m_list2.SetCurSel(-1);
+	m_cbList2.SetCurSel(-1);
 
-	if (m_list1.GetCurSel() < 0) {
-		m_list1.SetCurSel(m_list1.GetCount()-1);
+	if (m_cbList1.GetCurSel() < 0) {
+		m_cbList1.SetCurSel(m_cbList1.GetCount()-1);
 	}
 }
 
 void CShaderCombineDlg::OnSetFocusList2()
 {
-	m_list1.SetCurSel(-1);
+	m_cbList1.SetCurSel(-1);
 
-	if (m_list2.GetCurSel() < 0) {
-		m_list2.SetCurSel(m_list2.GetCount()-1);
+	if (m_cbList2.GetCurSel() < 0) {
+		m_cbList2.SetCurSel(m_cbList2.GetCount()-1);
 	}
 }
 
 void CShaderCombineDlg::OnBnClickedAdd()
 {
-	int i = m_combo.GetCurSel();
+	int i = m_cbShaders.GetCurSel();
 
 	if (i < 0) {
 		return;
 	}
 
 	CString label;
-	m_combo.GetLBText(i, label);
+	m_cbShaders.GetLBText(i, label);
 
-	i = m_list1.GetCurSel();
+	i = m_cbList1.GetCurSel();
 
 	if (i >= 0) {
-		m_list1.InsertString(i, label);
+		m_cbList1.InsertString(i, label);
 		UpdateShaders(SHADER1);
 		return;
 	}
 
-	i = m_list2.GetCurSel();
+	i = m_cbList2.GetCurSel();
 
 	if (i >= 0) {
-		m_list2.InsertString(i, label);
+		m_cbList2.InsertString(i, label);
 		UpdateShaders(SHADER2);
 		//return;
 	}
@@ -206,31 +229,31 @@ void CShaderCombineDlg::OnBnClickedAdd()
 
 void CShaderCombineDlg::OnBnClickedDel()
 {
-	int i = m_list1.GetCurSel();
+	int i = m_cbList1.GetCurSel();
 
-	if (i >= 0 && i < m_list1.GetCount()-1) {
-		m_list1.DeleteString(i);
+	if (i >= 0 && i < m_cbList1.GetCount()-1) {
+		m_cbList1.DeleteString(i);
 
-		if (i == m_list1.GetCount()-1 && i > 0) {
+		if (i == m_cbList1.GetCount()-1 && i > 0) {
 			i--;
 		}
 
-		m_list1.SetCurSel(i);
+		m_cbList1.SetCurSel(i);
 
 		UpdateShaders(SHADER1);
 		return;
 	}
 
-	i = m_list2.GetCurSel();
+	i = m_cbList2.GetCurSel();
 
-	if (i >= 0 && i < m_list2.GetCount()-1) {
-		m_list2.DeleteString(i);
+	if (i >= 0 && i < m_cbList2.GetCount()-1) {
+		m_cbList2.DeleteString(i);
 
-		if (i == m_list2.GetCount()-1 && i > 0) {
+		if (i == m_cbList2.GetCount()-1 && i > 0) {
 			i--;
 		}
 
-		m_list2.SetCurSel(i);
+		m_cbList2.SetCurSel(i);
 
 		UpdateShaders(SHADER2);
 		//return;
@@ -239,29 +262,29 @@ void CShaderCombineDlg::OnBnClickedDel()
 
 void CShaderCombineDlg::OnBnClickedUp()
 {
-	int i = m_list1.GetCurSel();
+	int i = m_cbList1.GetCurSel();
 
-	if (i >= 1 && i < m_list1.GetCount()-1) {
+	if (i >= 1 && i < m_cbList1.GetCount()-1) {
 		CString label;
-		m_list1.GetText(i, label);
-		m_list1.DeleteString(i);
+		m_cbList1.GetText(i, label);
+		m_cbList1.DeleteString(i);
 		i--;
-		m_list1.InsertString(i, label);
-		m_list1.SetCurSel(i);
+		m_cbList1.InsertString(i, label);
+		m_cbList1.SetCurSel(i);
 
 		UpdateShaders(SHADER1);
 		return;
 	}
 
-	i = m_list2.GetCurSel();
+	i = m_cbList2.GetCurSel();
 
-	if (i >= 1 && i < m_list2.GetCount()-1) {
+	if (i >= 1 && i < m_cbList2.GetCount()-1) {
 		CString label;
-		m_list2.GetText(i, label);
-		m_list2.DeleteString(i);
+		m_cbList2.GetText(i, label);
+		m_cbList2.DeleteString(i);
 		i--;
-		m_list2.InsertString(i, label);
-		m_list2.SetCurSel(i);
+		m_cbList2.InsertString(i, label);
+		m_cbList2.SetCurSel(i);
 
 		UpdateShaders(SHADER2);
 		//return;
@@ -270,29 +293,29 @@ void CShaderCombineDlg::OnBnClickedUp()
 
 void CShaderCombineDlg::OnBnClickedDown()
 {
-	int i = m_list1.GetCurSel();
+	int i = m_cbList1.GetCurSel();
 
-	if (i >= 0 && i < m_list1.GetCount()-2) {
+	if (i >= 0 && i < m_cbList1.GetCount()-2) {
 		CString label;
-		m_list1.GetText(i, label);
-		m_list1.DeleteString(i);
+		m_cbList1.GetText(i, label);
+		m_cbList1.DeleteString(i);
 		i++;
-		m_list1.InsertString(i, label);
-		m_list1.SetCurSel(i);
+		m_cbList1.InsertString(i, label);
+		m_cbList1.SetCurSel(i);
 
 		UpdateShaders(SHADER1);
 		return;
 	}
 
-	i = m_list2.GetCurSel();
+	i = m_cbList2.GetCurSel();
 
-	if (i >= 0 && i < m_list2.GetCount()-2) {
+	if (i >= 0 && i < m_cbList2.GetCount()-2) {
 		CString label;
-		m_list2.GetText(i, label);
-		m_list2.DeleteString(i);
+		m_cbList2.GetText(i, label);
+		m_cbList2.DeleteString(i);
 		i++;
-		m_list2.InsertString(i, label);
-		m_list2.SetCurSel(i);
+		m_cbList2.InsertString(i, label);
+		m_cbList2.SetCurSel(i);
 
 		UpdateShaders(SHADER2);
 		//return;
@@ -309,24 +332,24 @@ void CShaderCombineDlg::UpdateShaders(unsigned char type)
 	if (type & SHADER1) {
 		s.ShaderList.clear();
 
-		for (int i = 0, j = m_list1.GetCount()-1; i < j; i++) {
+		for (int i = 0, j = m_cbList1.GetCount()-1; i < j; i++) {
 			CString label;
-			m_list1.GetText(i, label);
+			m_cbList1.GetText(i, label);
 			s.ShaderList.push_back(label);
 		}
 
-		pFrame->EnableShaders1(!!m_fcheck1);
+		pFrame->EnableShaders1(!!m_chEnable1.GetCheck());
 	}
 
 	if (type & SHADER2) {
 		s.ShaderListScreenSpace.clear();
 
-		for (int m = 0, n = m_list2.GetCount()-1; m < n; m++) {
+		for (int m = 0, n = m_cbList2.GetCount()-1; m < n; m++) {
 			CString label;
-			m_list2.GetText(m, label);
+			m_cbList2.GetText(m, label);
 			s.ShaderListScreenSpace.push_back(label);
 		}
 
-		pFrame->EnableShaders2(!!m_fcheck2);
+		pFrame->EnableShaders2(!!m_chEnable2.GetCheck());
 	}
 }
