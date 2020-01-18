@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Annuler"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Combinaison de shaders"
-7		"&Ajouter"
-9		"Activer les shaders pré-redimensionnement"
-11		"Activer les shaders post-redimensionnement"
-13		"&Enlever"
-14		"Vers le &haut"
-15		"Vers le &bas"
-16		"OK"
-17		"Annuler"
+8		"&Ajouter"
+10		"Activer les shaders pré-redimensionnement"
+12		"Activer les shaders post-redimensionnement"
+14		"&Enlever"
+15		"Vers le &haut"
+16		"Vers le &bas"
+17		"OK"
+18		"Annuler"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

@@ -1447,6 +1447,15 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				token = str.Tokenize(L"|", curPos);
 			}
 		}
+
+		if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERS11POSTSCALE, str)) {
+			curPos = 0;
+			token = str.Tokenize(L"|", curPos);
+			while (token.GetLength()) {
+				Shaders11PostScale.push_back(token);
+				token = str.Tokenize(L"|", curPos);
+			}
+		}
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);
@@ -1813,6 +1822,12 @@ void CAppSettings::SaveSettings()
 			str += shader + "|";
 		}
 		profile.WriteString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, str);
+
+		str.Empty();
+		for (const auto& shader : Shaders11PostScale) {
+			str += shader + "|";
+		}
+		profile.WriteString(IDS_R_SETTINGS, IDS_RS_SHADERS11POSTSCALE, str);
 	}
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);

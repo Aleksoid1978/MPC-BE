@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Storno"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Kombinátor shaderov"
-7		"&Pridať"
-9		"Zapnúť pixel shadery pre predbežnú zmenu veľkosti"
-11		"Zapnúť pixel shader pre následnú zmenu veľkosti"
-13		"&Odstrániť"
-14		"Presunúť &hore"
-15		"Presunúť &dole"
-16		"OK"
-17		"Storno"
+8		"&Pridať"
+10		"Zapnúť pixel shadery pre predbežnú zmenu veľkosti"
+12		"Zapnúť pixel shader pre následnú zmenu veľkosti"
+14		"&Odstrániť"
+15		"Presunúť &hore"
+16		"Presunúť &dole"
+17		"OK"
+18		"Storno"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

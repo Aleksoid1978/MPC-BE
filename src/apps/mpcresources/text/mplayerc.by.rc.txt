@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Адмена"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Камбінаванне шэйдараў"
-7		"&Дадаць"
-9		"Enable pre-resize pixel shaders"
-11		"Enable post-resize pixel shaders"
-13		"&Прыбраць"
-14		"&Вышэй"
-15		"&Ніжэй"
-16		"OK"
-17		"Адмена"
+8		"&Дадаць"
+10		"Enable pre-resize pixel shaders"
+12		"Enable post-resize pixel shaders"
+14		"&Прыбраць"
+15		"&Вышэй"
+16		"&Ніжэй"
+17		"OK"
+18		"Адмена"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

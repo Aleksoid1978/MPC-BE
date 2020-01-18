@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"キャンセル"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"シェーダーの合成"
-7		"追加(&A)"
-9		"リサイズ前のピクセル シェーダーを有効にする"
-11		"リサイズ後のピクセル シェーダーを有効にする"
-13		"消去(&R)"
-14		"上へ移動(&U)"
-15		"下へ移動(&D)"
-16		"OK"
-17		"キャンセル"
+8		"追加(&A)"
+10		"リサイズ前のピクセル シェーダーを有効にする"
+12		"リサイズ後のピクセル シェーダーを有効にする"
+14		"消去(&R)"
+15		"上へ移動(&U)"
+16		"下へ移動(&D)"
+17		"OK"
+18		"キャンセル"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

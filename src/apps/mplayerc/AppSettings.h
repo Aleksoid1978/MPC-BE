@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -853,6 +853,7 @@ public:
 	bool			bToggleShaderScreenSpace;
 	std::list<CString> ShaderList;
 	std::list<CString> ShaderListScreenSpace;
+	std::list<CString> Shaders11PostScale;
 	// Playlist (contex menu)
 	bool			bShufflePlaylistItems;
 	bool			bHidePlaylistFullScreen;

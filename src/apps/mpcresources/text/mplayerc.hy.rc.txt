@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Մերժել"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Շեյդերների կոմբինացում"
-7		"&Ավելացնել"
-9		"Միացնել փիքսելի շեյդերների նախաչափումը"
-11		"Միացնել փիքսելի շեյդերների հետաչափումը"
-13		"&Հանել"
-14		"&Վեր"
-15		"&Վար"
-16		"ԼԱՎ"
-17		"Մերժել"
+8		"&Ավելացնել"
+10		"Միացնել փիքսելի շեյդերների նախաչափումը"
+12		"Միացնել փիքսելի շեյդերների հետաչափումը"
+14		"&Հանել"
+15		"&Վեր"
+16		"&Վար"
+17		"ԼԱՎ"
+18		"Մերժել"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"ביטול"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"מחבר המצלילים"
-7		"הוסף"
-9		"Enable pre-resize pixel shaders"
-11		"Enable post-resize pixel shaders"
-13		"הסר"
-14		"הזז למעלה"
-15		"הזז למטה"
-16		"אישור"
-17		"ביטול"
+8		"הוסף"
+10		"Enable pre-resize pixel shaders"
+12		"Enable post-resize pixel shaders"
+14		"הסר"
+15		"הזז למעלה"
+16		"הזז למטה"
+17		"אישור"
+18		"ביטול"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12

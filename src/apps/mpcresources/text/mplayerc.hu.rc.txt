@@ -595,16 +595,16 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 8		"Mégse"
 END
 
-BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
+BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Árnyékoló kombináló (Shader Combiner)"
-7		"&Hozzáadás"
-9		"Engedélyezze a pixel árnyékolók előméretezését"
-11		"Engedélyezze a pixel árnyékolók utánméretezését"
-13		"&Eltávolítás"
-14		"Mozgatás &fel"
-15		"Mozgatás &le"
-16		"OK"
-17		"Mégse"
+8		"&Hozzáadás"
+10		"Engedélyezze a pixel árnyékolók előméretezését"
+12		"Engedélyezze a pixel árnyékolók utánméretezését"
+14		"&Eltávolítás"
+15		"Mozgatás &fel"
+16		"Mozgatás &le"
+17		"OK"
+18		"Mégse"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12
