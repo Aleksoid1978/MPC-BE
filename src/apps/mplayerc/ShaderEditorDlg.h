@@ -59,6 +59,7 @@ private:
 	bool m_bD3D11                = false;
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
+	CComboBox m_cbDXNum;
 	CComboBox m_cbLabels;
 	CComboBox m_cbProfile;
 	CShaderEdit m_edSrcdata;

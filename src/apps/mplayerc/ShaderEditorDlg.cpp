@@ -200,6 +200,7 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 		}
 	}
 
+	AddAnchor(IDC_COMBO3, TOP_LEFT);
 	AddAnchor(IDC_COMBO1, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(IDC_COMBO2, BOTTOM_RIGHT);
 	AddAnchor(IDC_EDIT1, TOP_LEFT, BOTTOM_RIGHT);
@@ -212,12 +213,22 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	SetMinTrackSize(CSize(250, 40));
 
+	m_cbDXNum.AddString(L"DX9");
+	m_cbDXNum.AddString(L"DX11");
+
 	return TRUE;
 }
 
 void CShaderEditorDlg::UpdateShaderList(const bool bD3D11)
 {
 	m_bD3D11 = bD3D11;
+
+	m_cbDXNum.EnableWindow(FALSE);
+	if (m_bD3D11) {
+		m_cbDXNum.SetCurSel(1);
+	} else {
+		m_cbDXNum.SetCurSel(0);
+	}
 
 	m_cbLabels.ResetContent();
 	m_edSrcdata.SetWindowTextW(L"");
@@ -264,6 +275,7 @@ void CShaderEditorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
+	DDX_Control(pDX, IDC_COMBO3, m_cbDXNum);
 	DDX_Control(pDX, IDC_COMBO1, m_cbLabels);
 	DDX_Control(pDX, IDC_COMBO2, m_cbProfile);
 	DDX_Control(pDX, IDC_EDIT1, m_edSrcdata);
