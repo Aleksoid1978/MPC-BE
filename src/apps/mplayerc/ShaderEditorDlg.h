@@ -56,9 +56,10 @@ private:
 	bool m_fSplitterGrabbed      = false;
 	CPixelShaderCompiler* m_pPSC = nullptr;
 	ShaderC* m_pShader           = nullptr;
-	bool m_bD3D11                = false;
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
+
+	bool m_bD3D11 = false;
 	CComboBox m_cbDXNum;
 	CComboBox m_cbLabels;
 	CComboBox m_cbProfile;
@@ -75,7 +76,7 @@ public:
 	virtual ~CShaderEditorDlg();
 
 	BOOL Create(CWnd* pParent = nullptr);
-	void UpdateShaderList(const bool bD3D11);
+	void UpdateShaderList();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

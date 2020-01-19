@@ -772,13 +772,12 @@ public:
 	int  GetAudioTrackIdx();
 	int  GetSubtitleTrackIdx();
 
-	bool m_bD3D11Shaders = false;
 	bool m_bToggleShader;
 	bool m_bToggleShaderScreenSpace;
 	std::list<ShaderC> m_ShaderCashe;
-	ShaderC* GetShader(LPCWSTR label);
-	bool SaveShaderFile(ShaderC* shader);
-	bool DeleteShaderFile(LPCWSTR label);
+	ShaderC* GetShader(LPCWSTR label, bool bD3D11);
+	bool SaveShaderFile(ShaderC* shader, bool bD3D11);
+	bool DeleteShaderFile(LPCWSTR label, bool bD3D11);
 	void TidyShaderCashe();
 	void SetShaders();
 	void UpdateShaders(CString label);

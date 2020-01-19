@@ -7148,7 +7148,7 @@ void CMainFrame::OnViewShaderEditor()
 	if (m_wndShaderEditorBar.IsWindowVisible()) {
 		SetShaders(); // reset shaders
 	} else {
-		m_wndShaderEditorBar.m_dlg.UpdateShaderList(m_bD3D11Shaders);
+		m_wndShaderEditorBar.m_dlg.UpdateShaderList();
 	}
 	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
 }
@@ -11443,7 +11443,7 @@ void CMainFrame::RepaintVideo()
 	}
 }
 
-ShaderC* CMainFrame::GetShader(LPCWSTR label)
+ShaderC* CMainFrame::GetShader(LPCWSTR label, bool bD3D11)
 {
 	ShaderC* pShader = nullptr;
 
@@ -11457,7 +11457,7 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 	if (!pShader) {
 		CString path;
 		if (AfxGetMyApp()->GetAppSavePath(path)) {
-			if (m_bD3D11Shaders) {
+			if (bD3D11) {
 				path.AppendFormat(L"Shaders11\\%s.hlsl", label);
 			} else {
 				path.AppendFormat(L"Shaders\\%s.hlsl", label);
@@ -11478,7 +11478,7 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 						file.SeekToBegin();
 					}
 
-					if (m_bD3D11Shaders) {
+					if (bD3D11) {
 						shader.profile = L"ps_4_0";
 					}
 					else if (shader.profile == L"ps_3_sw") {
@@ -11514,11 +11514,11 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 	return pShader;
 }
 
-bool CMainFrame::SaveShaderFile(ShaderC* shader)
+bool CMainFrame::SaveShaderFile(ShaderC* shader, bool bD3D11)
 {
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		if (m_bD3D11Shaders) {
+		if (bD3D11) {
 			path.AppendFormat(L"Shaders11\\%s.hlsl", shader->label);
 		} else {
 			path.AppendFormat(L"Shaders\\%s.hlsl", shader->label);
@@ -11549,11 +11549,11 @@ bool CMainFrame::SaveShaderFile(ShaderC* shader)
 	return false;
 }
 
-bool CMainFrame::DeleteShaderFile(LPCWSTR label)
+bool CMainFrame::DeleteShaderFile(LPCWSTR label, bool bD3D11)
 {
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		if (m_bD3D11Shaders) {
+		if (bD3D11) {
 			path.AppendFormat(L"Shaders11\\%s.hlsl", label);
 		} else {
 			path.AppendFormat(L"Shaders\\%s.hlsl", label);
@@ -11582,7 +11582,7 @@ void CMainFrame::TidyShaderCashe()
 
 	for (auto it = m_ShaderCashe.cbegin(); it != m_ShaderCashe.cend(); ) {
 		CString path(appsavepath);
-		if (m_bD3D11Shaders) {
+		if ((*it).profile == "ps_4_0") {
 			path += L"Shaders11\\";
 		} else {
 			path += L"Shaders\\";
@@ -11613,40 +11613,43 @@ void CMainFrame::SetShaders()
 		return;
 	}
 
+	const int PShaderMode = m_pCAP->GetPixelShaderMode();
+	if (PShaderMode != 9 && PShaderMode != 11) {
+		return;
+	}
+
 	CAppSettings& s = AfxGetAppSettings();
+	const bool bD3D11 = PShaderMode == 11;
 
 	m_pCAP->ClearPixelShaders(TARGET_FRAME);
 	m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 
-	if (m_bToggleShader) {
-		for (const auto& shader : s.ShaderList) {
-			ShaderC* pShader = GetShader(shader);
+	auto AddPixelShader = [this, bD3D11](std::list<CString>& list, int target) {
+		for (const auto& shader : list) {
+			ShaderC* pShader = GetShader(shader, bD3D11);
 			if (pShader) {
 				CStringW label   = pShader->label;
 				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
 
-				HRESULT hr = m_pCAP->AddPixelShader(TARGET_FRAME, label, profile, srcdata);
+				HRESULT hr = m_pCAP->AddPixelShader(target, label, profile, srcdata);
 				if (FAILED(hr)) {
 					SendStatusMessage(ResStr(IDS_MAINFRM_73) + label, 3000);
 				}
 			}
 		}
+	};
+
+	if (m_bToggleShader) {
+		AddPixelShader(s.ShaderList, TARGET_FRAME);
 	}
 
 	if (m_bToggleShaderScreenSpace) {
-		for (const auto& shader : s.ShaderListScreenSpace) {
-			ShaderC* pShader = GetShader(shader);
-			if (pShader) {
-				CStringW label   = pShader->label;
-				CStringA profile = pShader->profile;
-				CStringA srcdata = pShader->srcdata;
-
-				HRESULT hr = m_pCAP->AddPixelShader(TARGET_SCREEN, label, profile, srcdata);
-				if (FAILED(hr)) {
-					SendStatusMessage(ResStr(IDS_MAINFRM_73) + label, 3000);
-				}
-			}
+		if (bD3D11) {
+			AddPixelShader(s.Shaders11PostScale, TARGET_SCREEN);
+		}
+		else {
+			AddPixelShader(s.ShaderListScreenSpace, TARGET_SCREEN);
 		}
 	}
 }
@@ -18751,7 +18754,9 @@ void CMainFrame::EnableShaders1(bool enable)
 
 void CMainFrame::EnableShaders2(bool enable)
 {
-	if (enable && !AfxGetAppSettings().ShaderListScreenSpace.empty()) {
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (enable && (!s.ShaderListScreenSpace.empty() || !s.Shaders11PostScale.empty())) {
 		m_bToggleShaderScreenSpace = true;
 		SetShaders();
 	} else {

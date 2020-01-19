@@ -27,7 +27,7 @@
 
 CShaderCombineDlg::CShaderCombineDlg(CWnd* pParent, const bool bD3D11)
 	: CCmdUIDialog(CShaderCombineDlg::IDD, pParent)
-	, m_bEnableD3D11(0 && bD3D11) //TODO
+	, m_bEnableD3D11(bD3D11)
 {
 	AfxGetMyApp()->GetAppSavePath(m_AppSavePath);
 }
@@ -125,6 +125,7 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 	}
 
 	m_iLastSel = iSel;
+	m_bD3D11 = (iSel == 1);
 	CAppSettings& s = AfxGetAppSettings();
 
 	CString path(m_AppSavePath);
@@ -132,24 +133,7 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 	m_cbList1.ResetContent();
 	m_cbList2.ResetContent();
 
-	if (iSel == 0) {
-		m_oldlabels1 = s.ShaderList;
-		m_oldlabels2 = s.ShaderListScreenSpace;
-
-		for (const auto& shader : s.ShaderList) {
-			m_cbList1.AddString(shader);
-		}
-		m_cbList1.AddString(L"");
-
-		for (const auto& shader : s.ShaderListScreenSpace) {
-			m_cbList2.AddString(shader);
-		}
-		m_cbList2.AddString(L"");
-
-		path += L"Shaders\\";
-		m_cbList1.SetFocus();
-	}
-	else if (iSel == 1) {
+	if (m_bD3D11) {
 		m_oldlabels1.clear();
 		m_oldlabels2 = s.Shaders11PostScale;
 
@@ -164,7 +148,22 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 		m_cbList2.SetFocus();
 	}
 	else {
-		return;
+		m_oldlabels1 = s.ShaderList;
+		m_oldlabels2 = s.ShaderListScreenSpace;
+
+		m_cbList1.EnableWindow(TRUE);
+		for (const auto& shader : s.ShaderList) {
+			m_cbList1.AddString(shader);
+		}
+		m_cbList1.AddString(L"");
+
+		for (const auto& shader : s.ShaderListScreenSpace) {
+			m_cbList2.AddString(shader);
+		}
+		m_cbList2.AddString(L"");
+
+		path += L"Shaders\\";
+		m_cbList1.SetFocus();
 	}
 
 	if (::PathFileExistsW(path)) {
@@ -241,7 +240,7 @@ void CShaderCombineDlg::OnBnClickedAdd()
 
 	if (i >= 0) {
 		m_cbList2.InsertString(i, label);
-		UpdateShaders(SHADER2);
+		UpdateShaders(m_bD3D11 ? SHADER11_2 : SHADER2);
 		//return;
 	}
 }
@@ -274,7 +273,7 @@ void CShaderCombineDlg::OnBnClickedDel()
 
 		m_cbList2.SetCurSel(i);
 
-		UpdateShaders(SHADER2);
+		UpdateShaders(m_bD3D11 ? SHADER11_2 : SHADER2);
 		//return;
 	}
 }
@@ -305,7 +304,7 @@ void CShaderCombineDlg::OnBnClickedUp()
 		m_cbList2.InsertString(i, label);
 		m_cbList2.SetCurSel(i);
 
-		UpdateShaders(SHADER2);
+		UpdateShaders(m_bD3D11 ? SHADER11_2 : SHADER2);
 		//return;
 	}
 }
@@ -336,7 +335,7 @@ void CShaderCombineDlg::OnBnClickedDown()
 		m_cbList2.InsertString(i, label);
 		m_cbList2.SetCurSel(i);
 
-		UpdateShaders(SHADER2);
+		UpdateShaders(m_bD3D11 ? SHADER11_2 : SHADER2);
 		//return;
 	}
 }
@@ -381,7 +380,6 @@ void CShaderCombineDlg::UpdateShaders(unsigned type)
 			s.Shaders11PostScale.push_back(label);
 		}
 
-		// TODO
-		//pFrame->EnableShaders2(!!m_chEnable2.GetCheck());
+		pFrame->EnableShaders2(!!m_chEnable2.GetCheck());
 	}
 }
