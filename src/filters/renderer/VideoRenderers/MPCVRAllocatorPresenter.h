@@ -75,6 +75,7 @@ namespace DSObjects
 		STDMETHODIMP_(int) GetRotation() override;
 		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
+		STDMETHODIMP_(int) GetPixelShaderMode() override;
 		STDMETHODIMP ClearPixelShaders(int target) override;
 		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) override;
 		STDMETHODIMP_(bool) IsRendering() override;
