@@ -1644,7 +1644,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					const auto url = RegExpParse<CString>(str.GetString(), LR"(URI=\"(.*?)\")");
 					if (!url.IsEmpty()) {
 						auto& audio_items = audio_fns[id];
-						audio_items.emplace_back(url);
+						audio_items.emplace_back(MakePath(CombinePath(base, url)));
 					}
 				}
 			}
