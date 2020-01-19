@@ -219,10 +219,8 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	return TRUE;
 }
 
-void CShaderEditorDlg::UpdateShaderList(const bool bD3D11)
+void CShaderEditorDlg::UpdateShaderList()
 {
-	m_bD3D11 = bD3D11;
-
 	m_cbDXNum.EnableWindow(FALSE);
 	if (m_bD3D11) {
 		m_cbDXNum.SetCurSel(1);
@@ -349,7 +347,7 @@ void CShaderEditorDlg::DeleteShader()
 
 		auto pFrame = AfxGetMainFrame();
 
-		if (pFrame->DeleteShaderFile(label)) {
+		if (pFrame->DeleteShaderFile(label, m_bD3D11)) {
 			m_cbLabels.DeleteString(i);
 			m_cbLabels.SetCurSel(-1);
 
@@ -402,7 +400,7 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 		CString label;
 		m_cbLabels.GetLBText(i, label);
 
-		ShaderC* pShader = pFrame->GetShader(label);
+		ShaderC* pShader = pFrame->GetShader(label, m_bD3D11);
 
 		m_cbProfile.SelectString(0, pShader->profile);
 
@@ -426,7 +424,7 @@ void CShaderEditorDlg::OnBnClickedSave()
 		m_edSrcdata.GetWindowTextW(shader.srcdata);
 		shader.srcdata.Remove('\r');
 
-		bool ret = AfxGetMainFrame()->SaveShaderFile(&shader);
+		bool ret = AfxGetMainFrame()->SaveShaderFile(&shader, m_bD3D11);
 	}
 }
 

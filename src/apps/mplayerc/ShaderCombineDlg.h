@@ -33,8 +33,9 @@ class CShaderCombineDlg : public CCmdUIDialog
 #define SHADER11_2   (1 << 3)
 
 	const bool m_bEnableD3D11;
+	bool m_bD3D11 = false;
 
-	int m_iLastSel = -1; // 0 - DX9, 1 - DX11
+	int m_iLastSel = -1;
 	CComboBox m_cbDXNum;
 	CComboBox m_cbShaders;
 
