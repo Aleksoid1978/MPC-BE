@@ -235,6 +235,17 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return hr;
 }
 
+STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetPixelShaderMode()
+{
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		int rtype = 0;
+		if (S_OK == pIExFilterConfig->GetInt("renderType", &rtype)) {
+			return rtype;
+		}
+	}
+	return -1;
+}
+
 STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 {
 	HRESULT hr = E_FAIL;

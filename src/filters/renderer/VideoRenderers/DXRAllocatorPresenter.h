@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -88,12 +88,12 @@ namespace DSObjects
 			int left, int top, int right, int bottom, int width, int height);
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
-		STDMETHODIMP_(SIZE) GetVideoSize();
-		STDMETHODIMP_(SIZE) GetVideoSizeAR();
-		STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
-		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
-		STDMETHODIMP_(bool) IsRendering() {
+		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(SIZE) GetVideoSize() override;
+		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
+		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
+		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
+		STDMETHODIMP_(bool) IsRendering() override {
 			return true; // We don't know so we always pretend to be rendering
 		}
 	};

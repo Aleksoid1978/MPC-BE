@@ -192,6 +192,7 @@ public IUnknown {
 
 	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE;
 
+	STDMETHOD_(int, GetPixelShaderMode) () PURE;
 	STDMETHOD (ClearPixelShaders) (int target) PURE;
 	STDMETHOD (AddPixelShader) (int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) PURE;
 

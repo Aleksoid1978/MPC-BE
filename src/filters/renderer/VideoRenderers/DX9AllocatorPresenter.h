@@ -281,14 +281,15 @@ namespace DSObjects
 		~CDX9AllocatorPresenter();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP_(bool) Paint(bool fAll);
-		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
-		STDMETHODIMP ClearPixelShaders(int target);
-		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode);
-		STDMETHODIMP_(bool) ResizeDevice();
-		STDMETHODIMP_(bool) ResetDevice();
-		STDMETHODIMP_(bool) DisplayChange();
-		STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
+		STDMETHODIMP_(bool) Paint(bool fAll) override;
+		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
+		STDMETHODIMP_(int) GetPixelShaderMode() override { return 9; }
+		STDMETHODIMP ClearPixelShaders(int target) override;
+		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) override;
+		STDMETHODIMP_(bool) ResizeDevice() override;
+		STDMETHODIMP_(bool) ResetDevice() override;
+		STDMETHODIMP_(bool) DisplayChange() override;
+		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
 
 		// ID3DFullscreenControl
 		STDMETHODIMP SetD3DFullscreen(bool fEnabled);

@@ -85,6 +85,7 @@ public:
 	STDMETHODIMP_(void) SetSubPicProvider(ISubPicProvider* pSubPicProvider);
 	STDMETHODIMP_(void) Invalidate(REFERENCE_TIME rtInvalidate = -1);
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
+	STDMETHODIMP_(int) GetPixelShaderMode() { return 0; }
 	STDMETHODIMP ClearPixelShaders(int target) { return E_NOTIMPL; }
 	STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) { return E_NOTIMPL; }
 	STDMETHODIMP_(bool) ResizeDevice() { return false; }
