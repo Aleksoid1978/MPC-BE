@@ -5,10 +5,10 @@ SamplerState samp : register(s0);
 
 cbuffer PS_CONSTANTS : register(b0)
 {
+	float2 pxy;
 	float2 wh;
 	uint   counter;
 	float  clock;
-	float2 dxy;
 };
 
 float4 main(float4 pos : SV_POSITION, float2 coord : TEXCOORD) : SV_Target
