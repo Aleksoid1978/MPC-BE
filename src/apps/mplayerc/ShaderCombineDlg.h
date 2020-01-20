@@ -49,6 +49,7 @@ class CShaderCombineDlg : public CCmdUIDialog
 	bool m_oldcheck2;
 	std::list<CString> m_oldlabels1;
 	std::list<CString> m_oldlabels2;
+	std::list<CString> m_oldlabels11_2;
 
 	CString m_AppSavePath;
 

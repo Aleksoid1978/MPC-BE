@@ -811,6 +811,7 @@ void CAppSettings::ResetSettings()
 
 	ShaderList.clear();
 	ShaderListScreenSpace.clear();
+	Shaders11PostScale.clear();
 	bToggleShader = false;
 	bToggleShaderScreenSpace = false;
 
