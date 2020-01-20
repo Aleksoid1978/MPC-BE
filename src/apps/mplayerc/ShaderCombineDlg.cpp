@@ -80,6 +80,9 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	auto pFrame = AfxGetMainFrame();
 	m_oldcheck1 = pFrame->m_bToggleShader;
 	m_oldcheck2 = pFrame->m_bToggleShaderScreenSpace;
+	m_oldlabels1    = s.ShaderList;
+	m_oldlabels2    = s.ShaderListScreenSpace;
+	m_oldlabels11_2 = s.Shaders11PostScale;
 
 	m_chEnable1.SetCheck(m_oldcheck1 ? BST_CHECKED : BST_UNCHECKED);
 	m_chEnable2.SetCheck(m_oldcheck2 ? BST_CHECKED : BST_UNCHECKED);
@@ -112,6 +115,7 @@ void CShaderCombineDlg::OnCancel()
 	pFrame->EnableShaders1(m_oldcheck1);
 
 	s.ShaderListScreenSpace = m_oldlabels2;
+	s.Shaders11PostScale    = m_oldlabels11_2;
 	pFrame->EnableShaders2(m_oldcheck2);
 
 	__super::OnCancel();
@@ -134,9 +138,6 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 	m_cbList2.ResetContent();
 
 	if (m_bD3D11) {
-		m_oldlabels1.clear();
-		m_oldlabels2 = s.Shaders11PostScale;
-
 		m_cbList1.EnableWindow(FALSE);
 
 		for (const auto& shader : s.Shaders11PostScale) {
@@ -148,9 +149,6 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 		m_cbList2.SetFocus();
 	}
 	else {
-		m_oldlabels1 = s.ShaderList;
-		m_oldlabels2 = s.ShaderListScreenSpace;
-
 		m_cbList1.EnableWindow(TRUE);
 		for (const auto& shader : s.ShaderList) {
 			m_cbList1.AddString(shader);

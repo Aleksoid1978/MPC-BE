@@ -6928,7 +6928,9 @@ void CMainFrame::OnUpdateShaderToggle1(CCmdUI* pCmdUI)
 
 void CMainFrame::OnUpdateShaderToggle2(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().ShaderListScreenSpace.empty()) {
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (s.ShaderListScreenSpace.empty() && s.Shaders11PostScale.empty()) {
 		pCmdUI->Enable(FALSE);
 		m_bToggleShaderScreenSpace = false;
 		pCmdUI->SetCheck(0);
@@ -11640,15 +11642,14 @@ void CMainFrame::SetShaders()
 		}
 	};
 
-	if (m_bToggleShader) {
+	if (m_bToggleShader && !bD3D11) {
 		AddPixelShader(s.ShaderList, TARGET_FRAME);
 	}
 
 	if (m_bToggleShaderScreenSpace) {
 		if (bD3D11) {
 			AddPixelShader(s.Shaders11PostScale, TARGET_SCREEN);
-		}
-		else {
+		} else {
 			AddPixelShader(s.ShaderListScreenSpace, TARGET_SCREEN);
 		}
 	}
