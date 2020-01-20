@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -133,7 +133,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 	m_bResetDevice = s.m_VRSettings.bResetDevice;
 
-	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
+	auto pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
 		WCHAR strGUID[50] = {};
 		CString cstrGUID;
@@ -164,6 +164,8 @@ BOOL CPPageVideo::OnInitDialog()
 				}
 			}
 		}
+
+		pD3D9->Release();
 	}
 
 	CorrectComboListWidth(m_cbD3D9RenderDevice);
