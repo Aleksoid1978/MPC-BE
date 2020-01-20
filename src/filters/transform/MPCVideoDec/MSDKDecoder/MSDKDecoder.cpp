@@ -1,5 +1,5 @@
 /*
-*      Copyright (C) 2010-2019 Hendrik Leppkes
+*      Copyright (C) 2010-2020 Hendrik Leppkes
 *      http://www.1f0.de
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -118,15 +118,18 @@ CMSDKDecoder::~CMSDKDecoder()
 
 static UINT GetIntelAdapterIdD3D9()
 {
-  CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
+  auto pD3D9 = D3D9Helper::Direct3DCreate9();
   if (pD3D9) {
     D3DADAPTER_IDENTIFIER9 adIdentifier;
     for (UINT adp = 0, num_adp = pD3D9->GetAdapterCount(); adp < num_adp; ++adp) {
       if (SUCCEEDED(pD3D9->GetAdapterIdentifier(adp, 0, &adIdentifier))
           && adIdentifier.VendorId == PCIV_Intel) {
+        pD3D9->Release();
         return adp;
       }
     }
+
+    pD3D9->Release();
   }
 
   return UINT_MAX;

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1176,7 +1176,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 	m_nPCIDevice         = 0;
 	m_VideoDriverVersion = 0;
 
-	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
+	auto pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
 		D3DADAPTER_IDENTIFIER9 AdapID9 = {};
 		if (pD3D9->GetAdapterIdentifier(D3D9Helper::GetAdapter(pD3D9, hWnd), 0, &AdapID9) == S_OK) {
@@ -1189,6 +1189,8 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 			}
 			m_strDeviceDescription.Format(L"%S (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
 		}
+
+		pD3D9->Release();
 	}
 }
 
