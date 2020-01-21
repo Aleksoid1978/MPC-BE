@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2019 see Authors.txt
+ * (C) 2011-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,3 +36,6 @@ CStringW GetModulePath(HMODULE hModule);
 CStringW GetProgramPath();
 // Get programm directory with slash
 CStringW GetProgramDir();
+
+int CopyDir(LPCWSTR source_folder, LPCWSTR target_folder);
+int MoveDir(LPCWSTR source_folder, LPCWSTR target_folder);

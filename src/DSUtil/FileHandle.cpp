@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2019 see Authors.txt
+ * (C) 2011-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -177,3 +177,52 @@ CStringW GetProgramDir()
 
 	return path;
 }
+
+int CopyDir(LPCWSTR source_folder, LPCWSTR target_folder)
+{
+	CStringW new_sf(source_folder);
+	new_sf.Append(L"\\*");
+
+	WCHAR sf[MAX_PATH+1];
+	WCHAR tf[MAX_PATH+1];
+
+	wcscpy_s(sf, MAX_PATH, new_sf);
+	wcscpy_s(tf, MAX_PATH, target_folder);
+
+	// set double null-terminated string
+	sf[lstrlenW(sf)+1] = 0;
+	tf[lstrlenW(tf)+1] = 0;
+
+	SHFILEOPSTRUCTW s = { 0 };
+	s.wFunc = FO_COPY;
+	s.pTo = tf;
+	s.pFrom = sf;
+	s.fFlags = FOF_NO_UI;
+
+	return SHFileOperationW(&s);
+}
+
+int MoveDir(LPCWSTR source_folder, LPCWSTR target_folder)
+{
+	CStringW new_sf(source_folder);
+	new_sf.Append(L"\\");
+
+	WCHAR sf[MAX_PATH+1];
+	WCHAR tf[MAX_PATH+1];
+
+	wcscpy_s(sf, MAX_PATH, new_sf);
+	wcscpy_s(tf, MAX_PATH, target_folder);
+
+	// set double null-terminated string
+	sf[lstrlenW(sf)+1] = 0;
+	tf[lstrlenW(tf)+1] = 0;
+
+	SHFILEOPSTRUCTW s = { 0 };
+	s.wFunc = FO_MOVE;
+	s.pTo = tf;
+	s.pFrom = sf;
+	s.fFlags = FOF_NO_UI;
+
+	return SHFileOperationW(&s);
+}
+
