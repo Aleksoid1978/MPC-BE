@@ -13,10 +13,9 @@ float4 main(float2 tex : TEXCOORD0) : COLOR {
 	// original pixel
 	float4 c0 = tex2D(s0, tex);
 
-	// ATI driver only looks at the height
-	if (height >= 720) {
-		return c0;
-	} else {
+	if (width <= 1024 && height <= 576) {
 		return ((c0 - const_1) * const_2);
+	} else {
+		return c0;
 	}
 }
