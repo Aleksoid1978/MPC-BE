@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1331,26 +1331,18 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 	AddItem(fns, subs);
 }
 
-static CString CombinePath(CPath p, CString fn)
+static CString CombinePath(CPath p, const CString& fn)
 {
-	if (fn.Find(':') >= 0 || fn.Find(L"\\") == 0) {
+	if (fn.Find(L":\\") == 1 || fn.Find(L"\\") == 0) {
 		return fn;
 	}
 
-	if (fn.Find(L"/") != -1) {
-		CString url;
-		if (fn.Find(L"//") == 0) {
-			url = L"http:" + fn;
-		} else {
-			url = L"http://" + fn;
-		}
-		CUrl cUrl;
-		if (cUrl.CrackUrl(url) && cUrl.GetHostNameLength()) {
-			return url;
-		}
+	CUrl cUrl;
+	if (cUrl.CrackUrl(fn) && cUrl.GetHostNameLength()) {
+		return fn;
 	}
 
-	p.Append(CPath(fn));
+	p.Append(fn);
 	CString out(p);
 	if (out.Find(L"://")) {
 		out.Replace('\\', '/');
