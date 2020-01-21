@@ -290,22 +290,21 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 
 	if (oldpath.GetLength() > 0) {
 		// moving shader files
-		const CStringW shaderpath = oldpath + L"Shaders\\";
+		CStringW shaderpath = oldpath + L"Shaders\\";
 		if (::PathFileExistsW(shaderpath)) {
 			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy_s(pathFrom, shaderpath);
-
-			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy_s(pathTo, newpath);
-
-			SHFILEOPSTRUCTW sf = { 0 };
-			sf.wFunc = FO_MOVE;
-			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
-			sf.pFrom = pathFrom;
-			sf.pTo = pathTo;
-			if (SHFileOperationW(&sf) != 0) {
+			int ret = MoveDir(shaderpath, newpath);
+			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
+		}
+
+		shaderpath = oldpath + L"Shaders11\\";
+		if (::PathFileExistsW(shaderpath)) {
+			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			int ret = MoveDir(shaderpath, newpath);
+			if (ret != 0) {
+				MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 	}
@@ -1012,43 +1011,46 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	CString shaderpath;
-	GetAppSavePath(shaderpath);
-	shaderpath.Append(L"Shaders");
-	if (!::PathFileExistsW(shaderpath)) {
-		// restore shaders if the "Shaders" folder is missing only
-		CString shaderstorage;
-		SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, shaderstorage.GetBuffer(MAX_PATH));
-		shaderstorage.ReleaseBuffer();
-		shaderstorage.Append(L"\\MPC-BE\\Shaders");
-
-		if (::PathFileExistsW(shaderstorage)) {
-			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy(pathFrom, shaderstorage);
-
-			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy(pathTo, shaderpath);
-
-			SHFILEOPSTRUCTW sf = { 0 };
-			sf.wFunc = FO_COPY;
-			sf.hwnd = 0;
-			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
-			sf.pFrom = pathFrom;
-			sf.pTo = pathTo;
-			int ret = SHFileOperationW(&sf);
-			if (ret == 0) {
-				DLog(L"CMPlayerCApp::InitInstance(): default shaders restored");
-			} else {
-				DLog(L"CMPlayerCApp::InitInstance(): default shaders are not copied. Error: %x", ret);
-			}
-		}
-	}
-
 	if (!m_Profile.IsIniValid()) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 			CString path = GetProgramPath();
 			key.SetStringValue(L"ExePath", path);
+		}
+
+		// checking for the existence of the Shader and Shaders11 folders
+		CString shaderpath;
+		GetAppSavePath(shaderpath);
+		shaderpath.Append(L"Shaders");
+		CString shaderpath11(shaderpath + L"11");
+
+		BOOL bShaderDirExists = ::PathFileExistsW(shaderpath);
+		BOOL bShader11DirExists = ::PathFileExistsW(shaderpath11);
+
+		// restore shaders if the shader folders is missing only, existing folders do not overwrite
+		if (!bShaderDirExists || !bShader11DirExists) {
+			CString shaderstorage;
+			SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, shaderstorage.GetBuffer(MAX_PATH));
+			shaderstorage.ReleaseBuffer();
+			shaderstorage.Append(L"\\MPC-BE\\Shaders");
+
+			if (!bShaderDirExists) {
+				int ret = CopyDir(shaderstorage, shaderpath);
+				if (ret == 0) {
+					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder restored");
+				} else {
+					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder are not copied. Error: %x", ret);
+				}
+			}
+
+			if (!bShader11DirExists) {
+				int ret = CopyDir(shaderstorage + L"11", shaderpath11);
+				if (ret == 0) {
+					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder restored");
+				} else {
+					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder are not copied. Error: %x", ret);
+				}
+			}
 		}
 	}
 
