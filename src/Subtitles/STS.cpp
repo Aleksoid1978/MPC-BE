@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 #include "RealTextParser.h"
 #include "USFSubtitles.h"
 #include "../DSUtil/WinAPIUtils.h"
+#include "../DSUtil/std_helper.h"
 
 using std::wstring;
 
@@ -583,13 +584,11 @@ static CString WebVTT2SSA(CString str)
 		L"<c"
 	};
 
-	int pos = -1;
-	int end = -1;
-	for (size_t i = 0; i < _countof(tags2remove); i++) {
+	for (const auto& tag : tags2remove) {
 		for (;;) {
-			pos = str.Find(tags2remove[i]);
+			const auto pos = str.Find(tag);
 			if (pos >= 0) {
-				end = str.Find(L'>', pos);
+				const auto end = str.Find(L'>', pos);
 				if (end > pos) {
 					str.Delete(pos, end - pos + 1);
 				} else {
@@ -601,11 +600,11 @@ static CString WebVTT2SSA(CString str)
 		}
 	}
 
-	pos = 0;
+	int pos = 0;
 	for (;;) {
 		pos = str.Find('<', pos);
 		if (pos >= 0) {
-			end = str.Find(L'>', pos);
+			const auto end = str.Find(L'>', pos);
 			if (end > pos) {
 				const CString tmp = str.Mid(pos, end - pos + 1);
 				int hour, minute, seconds, msesonds;
@@ -746,6 +745,151 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	for (const auto& line : lrc_lines) {
 		if (line.text.GetLength() && line.start < line.end) {
 			ret.Add(line.text, file->IsUnicode(), line.start, line.end);
+		}
+	}
+
+	return !ret.IsEmpty();
+}
+
+static CString TTML2SSA(CString str)
+{
+	str = SubRipper2SSA(str);
+	str.Replace(L"&nbsp;", L" ");
+	str.Replace(L"&quot;", L"\"");
+	str.Replace(L"</span>", L"");
+
+	static LPCWSTR tags2remove[] = {
+		L"<span"
+	};
+
+	for (const auto& tag : tags2remove) {
+		for (;;) {
+			const auto pos = str.Find(tag);
+			if (pos >= 0) {
+				const auto end = str.Find(L'>', pos);
+				if (end > pos) {
+					str.Delete(pos, end - pos + 1);
+				} else {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+
+	str = std::regex_replace(str.GetString(), std::wregex(LR"((<br[ ]*?\/>))"), L"\n\r").c_str();
+
+	return str;
+}
+
+static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+{
+	CString buff;
+
+	if (!file->ReadString(buff)) {
+		return false;
+	}
+	FastTrim(buff);
+	if (buff.Find(L"<?xml") != 0) {
+		return false;
+	}
+
+	if (buff.Find(L"<tt ") == -1) {
+		for (unsigned line = 0; line < 10 && file->ReadString(buff); ++line) {
+			FastTrim(buff);
+			if (buff.IsEmpty()) {
+				continue;
+			}
+
+			if (buff.Find(L"<tt ") == -1) {
+				continue;
+			}
+
+			break;
+		}
+	}
+
+	if (buff.Find(L"<tt ") != -1) {
+		CString tmp(buff);
+
+		while (file->ReadString(buff)) {
+			FastTrim(buff);
+			if (buff.IsEmpty()) {
+				continue;
+			}
+
+			tmp.Append(buff);
+		}
+
+		if (tmp.Find(L"</tt>") != -1) {
+			const auto body = RegExpParse<CString>(tmp.GetString(), LR"(<body[^>]*?>(.*)</body>)");
+			if (!body.IsEmpty()) {
+				const std::wregex regex(LR"(<p(.*?)</p>)");
+
+				std::wcmatch match;
+				auto body_text = body.GetString();
+				while (std::regex_search(body_text, match, regex)) {
+					if (match.size() == 2) {
+						CString line(match[1].first, match[1].length());
+
+						auto ParseTime = [](LPCWSTR buffer, LPCWSTR regexp) {
+							int time = -1;
+
+							const std::wregex regex(regexp);
+							std::wcmatch match;
+							if (std::regex_search(buffer, match, regex)) {
+								if (match.size() == 5) {
+									int hh = match[1].matched ? _wtoi(match[1].first) : 0;
+									int mm = match[2].matched ? _wtoi(match[2].first) : 0;
+									int ss = match[3].matched ? _wtoi(match[3].first) : 0;
+									int ms = match[3].matched ? _wtoi(match[4].first) : 0;
+
+									time = (((hh * 60 + mm) * 60) + ss) * 1000 + ms;
+								} else if (match.size() == 3) {
+									int ss = match[1].matched ? _wtoi(match[1].first) : 0;
+									int ms = match[2].matched ? _wtoi(match[2].first) : 0;
+
+									time = ss * 1000 + ms;
+								}
+							}
+
+							return time;
+						};
+
+						int time_end = -1;
+						int time_begin = ParseTime(line.GetString(), LR"(begin=\"(\d{2}):(\d{2}):(\d{2}).(\d{2,3})\")");
+						if (time_begin != -1) {
+							time_end = ParseTime(line.GetString(), LR"(end=\"(\d{2}):(\d{2}):(\d{2}).(\d{2,3})\")");
+							if (time_end == -1) {
+								int time_duration = ParseTime(line.GetString(), LR"(dur=\"(\d{2}):(\d{2}):(\d{2}).(\d{2,3})\")");
+								if (time_duration != -1) {
+									time_end = time_begin + time_duration;
+								}
+							}
+						} else {
+							time_begin = ParseTime(line.GetString(), LR"(begin=\"(\d+)\.?(\d{1,3})?s\")");
+							if (time_begin != -1) {
+								time_end = ParseTime(line.GetString(), LR"(end=\"(\d+)\.?(\d{1,3})?s\")");
+								if (time_end == -1) {
+									int time_duration = ParseTime(line.GetString(), LR"(dur=\"(\d+)\.?(\d{1,3})?s\")");
+									if (time_duration != -1) {
+										time_end = time_begin + time_duration;
+									}
+								}
+							}
+						}
+						if (time_begin != -1 && time_end > time_begin) {
+							auto text = RegExpParse<CString>(line.GetString(), LR"(>(.+))");
+							if (!text.IsEmpty()) {
+								ret.Add(TTML2SSA(text), file->IsUnicode(), time_begin, time_end);
+							}
+						}
+					}
+
+					body_text = match[0].second;
+				}
+			}
 		}
 	}
 
@@ -2028,19 +2172,20 @@ struct OpenFunctStruct {
 };
 
 const static OpenFunctStruct s_OpenFuncts[] = {
-	Subtitle::SSA, TIME,  OpenSubStationAlpha,
-	Subtitle::SRT, TIME,  OpenSubRipper,
-	Subtitle::SRT, TIME,  OpenOldSubRipper,
-	Subtitle::SRT, TIME,  OpenWebVTT,
-	Subtitle::SRT, TIME,  OpenLRC,
-	Subtitle::SUB, TIME,  OpenSubViewer,
-	Subtitle::SSA, FRAME, OpenMicroDVD,
-	Subtitle::SMI, TIME,  OpenSami,
-	Subtitle::SRT, TIME,  OpenVPlayer,
-	Subtitle::XSS, TIME,  OpenXombieSub,
-	Subtitle::USF, TIME,  OpenUSF,
-	Subtitle::SRT, TIME,  OpenMPL2,
-	Subtitle::RT,  TIME,  OpenRealText,
+	Subtitle::SSA,  TIME,  OpenSubStationAlpha,
+	Subtitle::SRT,  TIME,  OpenSubRipper,
+	Subtitle::SRT,  TIME,  OpenOldSubRipper,
+	Subtitle::VTT,  TIME,  OpenWebVTT,
+	Subtitle::LRC,  TIME,  OpenLRC,
+	Subtitle::TTML, TIME,  OpenTTML,
+	Subtitle::SUB,  TIME,  OpenSubViewer,
+	Subtitle::SSA,  FRAME, OpenMicroDVD,
+	Subtitle::SMI,  TIME,  OpenSami,
+	Subtitle::SRT,  TIME,  OpenVPlayer,
+	Subtitle::XSS,  TIME,  OpenXombieSub,
+	Subtitle::USF,  TIME,  OpenUSF,
+	Subtitle::SRT,  TIME,  OpenMPL2,
+	Subtitle::RT,   TIME,  OpenRealText,
 };
 
 //
