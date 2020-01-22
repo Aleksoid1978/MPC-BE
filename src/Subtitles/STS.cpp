@@ -791,7 +791,7 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		return false;
 	}
 	FastTrim(buff);
-	if (buff.Find(L"<?xml") != 0) {
+	if (buff.Find(L"<?xml") != 0 && buff.Find(L"<tt ") != 0) {
 		return false;
 	}
 
@@ -851,6 +851,8 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 									int ms = match[2].matched ? _wtoi(match[2].first) : 0;
 
 									time = ss * 1000 + ms;
+								} else if (match.size() == 2) {
+									time = match[1].matched ? _wtoi(match[1].first) / 10000 : -1;
 								}
 							}
 
@@ -867,12 +869,25 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 									time_end = time_begin + time_duration;
 								}
 							}
-						} else {
+						}
+						if (time_begin == -1) {
 							time_begin = ParseTime(line.GetString(), LR"(begin=\"(\d+)\.?(\d{1,3})?s\")");
 							if (time_begin != -1) {
 								time_end = ParseTime(line.GetString(), LR"(end=\"(\d+)\.?(\d{1,3})?s\")");
 								if (time_end == -1) {
 									int time_duration = ParseTime(line.GetString(), LR"(dur=\"(\d+)\.?(\d{1,3})?s\")");
+									if (time_duration != -1) {
+										time_end = time_begin + time_duration;
+									}
+								}
+							}
+						}
+						if (time_begin == -1) {
+							time_begin = ParseTime(line.GetString(), LR"(begin=\"(\d+)t\")");
+							if (time_begin != -1) {
+								time_end = ParseTime(line.GetString(), LR"(end=\"(\d+)t\")");
+								if (time_end == -1) {
+									int time_duration = ParseTime(line.GetString(), LR"(dur=\"(\d+)t\")");
 									if (time_duration != -1) {
 										time_end = time_begin + time_duration;
 									}
