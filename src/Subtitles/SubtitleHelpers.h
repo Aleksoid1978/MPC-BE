@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@ namespace Subtitle
 	static const LPCWSTR s_SubFileExts[] = {
 		L"srt", L"ass", L"ssa", L"sub", L"idx",
 		L"smi", L"sup", L"usf", L"vtt", L"psb",
-		L"xss", L"rt",  L"mks", L"lrc"
+		L"xss", L"rt",  L"mks", L"lrc", L"ttml"
 	};
 
 	enum SubType {
@@ -46,7 +46,8 @@ namespace Subtitle
 		XSS,
 		RT,
 		MKS,
-		LRC
+		LRC,
+		TTML
 	};
 
 	LPCWSTR GetSubtitleFileExt(SubType type);
