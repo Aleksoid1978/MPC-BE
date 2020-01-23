@@ -361,6 +361,7 @@
 #define ID_OSD_LOCAL_TIME               1036
 #define ID_OSD_FILE_NAME                1037
 #define ID_WINDOW_TO_PRIMARYSCREEN      1038
+#define ID_SHADERS_SELECT               1039
 #define ID_VIEW_RESETSTATS              1040
 #define ID_VIEW_TEARING_TEST            1041
 #define ID_VIEW_DISPLAYSTATS            1042

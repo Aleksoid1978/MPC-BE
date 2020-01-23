@@ -780,7 +780,6 @@ public:
 	bool DeleteShaderFile(LPCWSTR label, bool bD3D11);
 	void TidyShaderCashe();
 	void SetShaders();
-	void UpdateShaders(CString label);
 
 	// capturing
 	bool m_fCapturing;
@@ -1113,7 +1112,7 @@ public:
 	afx_msg void OnPlayFiltersCopyToClipboard();
 	afx_msg void OnPlayFilters(UINT nID);
 	afx_msg void OnUpdatePlayFilters(CCmdUI* pCmdUI);
-	afx_msg void OnPlayShaders(UINT nID);
+	afx_msg void OnSelectShaders();
 
 	afx_msg void OnMenuAudioOption();
 	afx_msg void OnMenuSubtitlesOption();
