@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -502,7 +502,7 @@ public:
 		m_overridePlacement.SetSize(lHorPos, lVerPos);
 	}
 
-	void SetName(const CString name);
+	void SetName(const CString& name);
 
 	const bool GetText(const REFERENCE_TIME rt, const double fps, CString& text);
 
