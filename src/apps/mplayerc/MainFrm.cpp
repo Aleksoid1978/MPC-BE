@@ -385,7 +385,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_FILTERS_COPY_TO_CLIPBOARD, OnPlayFiltersCopyToClipboard)
 	ON_COMMAND_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnPlayFilters)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
-	ON_COMMAND_RANGE(ID_SHADERS_START, ID_SHADERS_END, OnPlayShaders)
+	ON_COMMAND(ID_SHADERS_SELECT, OnSelectShaders)
 	ON_COMMAND(ID_MENU_NAVIGATE_AUDIO, OnMenuNavAudio)
 	ON_COMMAND(ID_MENU_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
 	ON_COMMAND(ID_MENU_NAVIGATE_JUMPTO, OnMenuNavJumpTo)
@@ -6950,8 +6950,11 @@ void CMainFrame::OnShaderToggle1()
 		if (m_pCAP) {
 			m_pCAP->ClearPixelShaders(TARGET_FRAME);
 		}
-		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_66));
+	}
+
+	if (m_pCAP) {
+		RepaintVideo();
 	}
 }
 
@@ -6965,8 +6968,11 @@ void CMainFrame::OnShaderToggle2()
 		if (m_pCAP) {
 			m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 		}
-		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPOFFSCR));
+	}
+
+	if (m_pCAP) {
+		RepaintVideo();
 	}
 }
 
@@ -8551,22 +8557,13 @@ void CMainFrame::OnUpdatePlayFilters(CCmdUI* pCmdUI)
 	pCmdUI->Enable(!m_fCapturing);
 }
 
-enum {
-	ID_SHADERS_SELECT = ID_SHADERS_START,
-	ID_SHADERS_SELECT_SCREENSPACE
-};
-
-void CMainFrame::OnPlayShaders(UINT nID)
+void CMainFrame::OnSelectShaders()
 {
-	if (nID == ID_SHADERS_SELECT) {
-		const bool bEnableD3D11 = IsWindows8OrGreater() && AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR;
+	const bool bEnableD3D11 = IsWindows8OrGreater() && AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR;
 
-		if (IDOK != CShaderCombineDlg(GetModalParent(), bEnableD3D11).DoModal()) {
-			return;
-		}
+	if (IDOK != CShaderCombineDlg(GetModalParent(), bEnableD3D11).DoModal()) {
+		return;
 	}
-
-	SetShaders();
 }
 
 void CMainFrame::OnMenuAudioOption()
@@ -11652,36 +11649,6 @@ void CMainFrame::SetShaders()
 		} else {
 			AddPixelShader(s.ShaderListScreenSpace, TARGET_SCREEN);
 		}
-	}
-}
-
-void CMainFrame::UpdateShaders(CString label)
-{
-	auto& shaders = AfxGetAppSettings().ShaderList;
-
-	if (!m_pCAP) {
-		return;
-	}
-
-	if (shaders.size() <= 1) {
-		shaders.clear();
-	}
-
-	if (shaders.empty() && !label.IsEmpty()) {
-		shaders.push_back(label);
-	}
-
-	bool fUpdate = shaders.empty();
-
-	for (const auto& shader : shaders) {
-		if (label == shader) {
-			fUpdate = true;
-			break;
-		}
-	}
-
-	if (fUpdate) {
-		SetShaders();
 	}
 }
 
