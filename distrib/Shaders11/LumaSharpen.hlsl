@@ -3,7 +3,7 @@
 /* --- Settings --- */
 
 // -- Sharpening --
-#define sharp_strength 0.65   //[0.10 to 3.00] Strength of the sharpening
+#define sharp_strength 1.25   //[0.10 to 3.00] Strength of the sharpening
 #define sharp_clamp    0.035  //[0.000 to 1.000] Limits maximum amount of sharpening a pixel recieves - Default is 0.035
 
 // -- Advanced sharpening settings --
