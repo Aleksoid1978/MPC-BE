@@ -1,5 +1,7 @@
 // $MinimumShaderProfile: ps_4_0
 
+// Run this shader before scaling.
+
 Texture2D tex : register(t0);
 SamplerState samp : register(s0);
 
