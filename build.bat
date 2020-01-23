@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2019 see Authors.txt
+REM (C) 2009-2020 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -399,6 +399,7 @@ IF NOT EXIST "%PCKG_NAME%" MD "%PCKG_NAME%"
 IF /I "%NAME%" == "MPC-BE" (
   IF NOT EXIST "%PCKG_NAME%\Lang" MD "%PCKG_NAME%\Lang"
   IF NOT EXIST "%PCKG_NAME%\Shaders" MD "%PCKG_NAME%\Shaders"
+  IF NOT EXIST "%PCKG_NAME%\Shaders11" MD "%PCKG_NAME%\Shaders11"
   IF /I "%ARCH%" == "x64" (
     COPY /Y /V "%~1_%ARCH%\mpc-be64.exe"                     "%PCKG_NAME%\mpc-be64.exe" >NUL
     COPY /Y /V "%~1_%ARCH%\MPCBEShellExt64.dll"              "%PCKG_NAME%\MPCBEShellExt64.dll" >NUL
@@ -413,6 +414,7 @@ IF /I "%NAME%" == "MPC-BE" (
   COPY /Y /V "%~1_%ARCH%\mpciconlib.dll"           "%PCKG_NAME%\*.dll" >NUL
   COPY /Y /V "%~1_%ARCH%\Lang\mpcresources.??.dll" "%PCKG_NAME%\Lang\mpcresources.??.dll" >NUL
   COPY /Y /V "..\distrib\Shaders\*.hlsl"           "%PCKG_NAME%\Shaders\*.hlsl" >NUL
+  COPY /Y /V "..\distrib\Shaders11\*.hlsl"         "%PCKG_NAME%\Shaders11\*.hlsl" >NUL
 ) ELSE (
   COPY /Y /V "%~1_%ARCH%\*.ax"           "%PCKG_NAME%\*.ax" >NUL
   COPY /Y /V "%~1_%ARCH%\VSFilter.dll"   "%PCKG_NAME%\VSFilter.dll" >NUL
