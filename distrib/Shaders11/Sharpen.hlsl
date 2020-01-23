@@ -5,9 +5,9 @@ SamplerState samp : register(s0);
 
 cbuffer PS_CONSTANTS : register(b0)
 {
-	float2 pxy;
-	float  width;
-	float  height;
+	float  px;
+	float  py;
+	float2 wh;
 	uint   counter;
 	float  clock;
 };
@@ -18,8 +18,8 @@ cbuffer PS_CONSTANTS : register(b0)
 
 float4 main(float4 pos : SV_POSITION, float2 coord : TEXCOORD) : SV_Target
 {
-	float dx = effect_width / width;
-	float dy = effect_width / height;
+	float dx = effect_width * px;
+	float dy = effect_width * py;
 
 	float4 c1 = tex.Sample(samp, coord + float2(-dx, -dy)) * val1;
 	float4 c2 = tex.Sample(samp, coord + float2(  0, -dy)) * val1;
