@@ -28,7 +28,8 @@ float4 p1 :  register(c1);
 #define Sharpen_val0 2
 #define Sharpen_val1 ((Sharpen_val0 - 1) / 8.0)
 
-float4 main(float2 tex : TEXCOORD0) : COLOR {
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
 	// get original pixel
 	float4 orig = tex2D(s0, tex);
 

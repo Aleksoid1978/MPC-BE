@@ -1,12 +1,20 @@
-// $MinimumShaderProfile: ps_2_0
+// $MinimumShaderProfile: ps_4_0
 
-sampler s0 : register(s0);
-float4 p0 :  register(c0);
+Texture2D tex : register(t0);
+SamplerState samp : register(s0);
 
-#define clock (p0[3])
+cbuffer PS_CONSTANTS : register(b0)
+{
+	float2 pxy;
+	float2 wh;
+	uint   counter;
+	float  clock;
+};
+
 #define PI acos(-1)
 
-float4 main(float2 tex : TEXCOORD0) : COLOR {
+float4 main(float4 pos : SV_POSITION, float2 coord : TEXCOORD) : SV_Target
+{
 	// - this is a very simple raytracer, one sphere only
 	// - no reflection or refraction, yet (my ati 9800 has a 64 + 32 instruction limit...)
 
@@ -17,7 +25,7 @@ float4 main(float2 tex : TEXCOORD0) : COLOR {
 	float3 ps = float3(0, 0, 0.5); // sphere pos
 	float r = 0.65; // sphere radius
 
-	float3 pd = normalize(float3(tex.x - 0.5, tex.y - 0.5, 0) - pc);
+	float3 pd = normalize(float3(coord.x - 0.5, coord.y - 0.5, 0) - pc);
 
 	float A = 1;
 	float B = 2 * dot(pd, pc - ps);
@@ -40,13 +48,13 @@ float4 main(float2 tex : TEXCOORD0) : COLOR {
 		float3 l = normalize(pl - p);
 
 		// mapping the image onto the sphere
-		tex = acos(-n) / PI;
+		coord = acos(-n) / PI;
 
 		// rotate it
-		tex.x = frac(tex.x + frac(clock / 10));
+		coord.x = frac(coord.x + frac(clock / 10));
 
 		// diffuse + specular
-		c0 = tex2D(s0, tex) * dot(n, l) + cl * pow(max(dot(l, reflect(pd, n)), 0), 50);
+		c0 = tex.Sample(samp, coord) * dot(n, l) + cl * pow(max(dot(l, reflect(pd, n)), 0), 50);
 	}
 
 	return c0;
