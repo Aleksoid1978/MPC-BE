@@ -233,6 +233,8 @@ Source: "..\docs\Changelog.Rus.txt";       DestDir: "{app}";                    
 Source: "..\docs\Readme.txt";              DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "Shaders\*.hlsl";                  DestDir: "{commonappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main;
 Source: "Shaders\*.hlsl";                  DestDir: "{app}\Shaders";                     Flags: ignoreversion; Components: main; Check: IniUsed()
+Source: "Shaders11\*.hlsl";                DestDir: "{commonappdata}\{#app_name}\Shaders11"; Flags: ignoreversion; Components: main;
+Source: "Shaders11\*.hlsl";                DestDir: "{app}\Shaders11";                   Flags: ignoreversion; Components: main; Check: IniUsed()
 
 [Icons]
 #ifdef x64Build
@@ -266,6 +268,7 @@ Type: files; Name: "{app}\ChangeLog";                 Check: IsUpgrade()
 Type: files; Name: "{app}\ChangeLogRus";              Check: IsUpgrade()
 Type: files; Name: "{app}\COPYING";                   Check: IsUpgrade()
 Type: filesandordirs; Name: "{commonappdata}\{#app_name}\Shaders"; Tasks: reset_settings
+Type: filesandordirs; Name: "{commonappdata}\{#app_name}\Shaders11"; Tasks: reset_settings
 #ifdef localize
 ; remove the old language dlls when upgrading
 Type: files; Name: "{app}\mpcresources.??.dll"
@@ -533,6 +536,10 @@ begin
       DelTree(ExpandConstant('{app}\Shaders\*.psh'), False, True, False);
       DelTree(ExpandConstant('{app}\Shaders\*.hlsl'), False, True, False);
       RemoveDir(ExpandConstant('{app}\Shaders'));
+      DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders11\*.hlsl'), False, True, False);
+      RemoveDir(ExpandConstant('{userappdata}\{#app_name}\Shaders11'));
+      DelTree(ExpandConstant('{app}\Shaders11\*.hlsl'), False, True, False);
+      RemoveDir(ExpandConstant('{app}\Shaders11'));
       CleanUpSettingsAndFiles();
     end;
   end;
