@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,14 +42,14 @@
 	CComQIPtr<IMediaSeeking> _pMS((IUnknown*)(INonDelegatingUnknown*)m_pGraph); \
 	LONGLONG _rtNow = 0; \
 	if(_pMS) _hr = _pMS->GetCurrentPosition(&_rtNow); \
- 
+
 #define ResumeGraph \
 	if(SUCCEEDED(_hr) && _pMS && _fs != State_Stopped) \
 		_hr = _pMS->SetPositions(&_rtNow, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning); \
  \
 	if(_fs == State_Running && _pMS) \
 		_pMC->Run(); \
- 
+
 
 //
 // CStreamSwitcherPassThru
@@ -98,12 +98,12 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 	CComPtr<IMediaSeeking> pMS; \
 	if(FAILED(GetPeer(m_pFilter, &pMS))) return E_NOTIMPL; \
 	return pMS->##call; \
- 
+
 #define CallPeer(call) \
 	CComPtr<IMediaPosition> pMP; \
 	if(FAILED(GetPeer(m_pFilter, &pMP))) return E_NOTIMPL; \
 	return pMP->##call; \
- 
+
 #define CallPeerSeekingAll(call) \
 	HRESULT hr = E_NOTIMPL; \
 	for (const auto& pPin : m_pFilter->m_pInputs) \
@@ -119,7 +119,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 		} \
 	} \
 	return hr; \
- 
+
 #define CallPeerAll(call) \
 	HRESULT hr = E_NOTIMPL; \
 	for (const auto& pPin : m_pFilter->m_pInputs) \
@@ -135,7 +135,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 		} \
 	} \
 	return hr; \
- 
+
 
 // IMediaSeeking
 
@@ -1484,6 +1484,7 @@ HRESULT CStreamSwitcherFilter::DeliverEndFlush()
 
 HRESULT CStreamSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
+	m_dRate = dRate > 0.0 ? dRate : 1.0;
 	return m_pOutput ? m_pOutput->DeliverNewSegment(tStart, tStop, dRate) : E_FAIL;
 }
 

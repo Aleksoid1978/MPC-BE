@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -233,8 +233,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if (audio_sampleformat == SAMPLE_FMT_NONE) {
 		REFERENCE_TIME start, stop;
 		if (SUCCEEDED(pIn->GetTime(&start, &stop))) {
-			start += m_rtAudioTimeShift;
-			stop  += m_rtAudioTimeShift;
+			start += m_rtAudioTimeShift / m_dRate;
+			stop  += m_rtAudioTimeShift / m_dRate;
 			pOut->SetTime(&start, &stop);
 		}
 		return __super::Transform(pIn, pOut);
@@ -378,8 +378,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 	m_rtNextStart = rtStop;
 
-	rtStart += m_rtAudioTimeShift;
-	rtStop  += m_rtAudioTimeShift;
+	rtStart += m_rtAudioTimeShift / m_dRate;
+	rtStop  += m_rtAudioTimeShift / m_dRate;
 	pOut->SetTime(&rtStart, &rtStop);
 
 	return S_OK;
