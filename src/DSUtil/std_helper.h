@@ -66,6 +66,7 @@ StringT RegExpParse(const T* szIn, const T* szRE)
 			return StringT(match[1].first, match[1].length());
 		}
 	} catch (const std::regex_error& e) {
+		UNREFERENCED_PARAMETER(e);
 		DLog(L"RegExpParse(): regex error - '%S'", e.what());
 		ASSERT(FALSE);
 	}
