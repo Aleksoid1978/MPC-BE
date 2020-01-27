@@ -234,11 +234,15 @@ enum : int {
 inline const std::vector<int> s_CommonVideoHeights = { 240, 360, 480, 720, 1080, 1440, 2160, 2880, 4320 };
 
 struct ShaderC {
-	CString		label;
-	CString		profile;
-	CString		srcdata;
-	ULONGLONG	length = 0;
-	FILETIME	ftwrite = {0,0};
+	CString   label;
+	CString   profile;
+	CString   srcdata;
+	ULONGLONG length = 0;
+	FILETIME  ftwrite = {0,0};
+
+	bool Match(LPCWSTR _label, const bool _bD3D11) const {
+		return (label.CompareNoCase(_label) == 0 && (_bD3D11 == (profile == "ps_4_0")));
+	}
 };
 
 #pragma pack(push, 1)
