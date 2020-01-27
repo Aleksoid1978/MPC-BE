@@ -11447,7 +11447,7 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label, bool bD3D11)
 	ShaderC* pShader = nullptr;
 
 	for (auto& shader : m_ShaderCashe) {
-		if (shader.label.CompareNoCase(label) == 0) {
+		if (shader.Match(label, bD3D11)) {
 			pShader = &shader;
 			break;
 		}
@@ -11536,7 +11536,7 @@ bool CMainFrame::SaveShaderFile(ShaderC* shader, bool bD3D11)
 
 			// delete out-of-date data from the cache
 			for (auto it = m_ShaderCashe.begin(), end = m_ShaderCashe.end(); it != end; ++it) {
-				if ((*it).label.CompareNoCase(shader->label) == 0) {
+				if (it->Match(shader->label, bD3D11)) {
 					m_ShaderCashe.erase(it);
 					break;
 				}
@@ -11561,7 +11561,7 @@ bool CMainFrame::DeleteShaderFile(LPCWSTR label, bool bD3D11)
 		if (!::PathFileExistsW(path) || ::DeleteFileW(path)) {
 			// if the file is missing or deleted successfully, then remove it from the cache
 			for (auto it = m_ShaderCashe.begin(), end = m_ShaderCashe.end(); it != end; ++it) {
-				if ((*it).label.CompareNoCase(label) == 0) {
+				if (it->Match(label, bD3D11)) {
 					m_ShaderCashe.erase(it);
 					return true;
 				}
