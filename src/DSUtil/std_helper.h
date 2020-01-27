@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2019 see Authors.txt
+ * (C) 2018-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,10 +59,15 @@ bool Contains(std::vector<T>& vector, const T& item)
 template <class StringT, class T>
 StringT RegExpParse(const T* szIn, const T* szRE)
 {
-	const std::basic_regex<T> regex(szRE);
-	std::match_results<const T*> match;
-	if (std::regex_search(szIn, match, regex) && match.size() == 2) {
-		return StringT(match[1].first, match[1].length());
+	try {
+		const std::basic_regex<T> regex(szRE);
+		std::match_results<const T*> match;
+		if (std::regex_search(szIn, match, regex) && match.size() == 2) {
+			return StringT(match[1].first, match[1].length());
+		}
+	} catch (const std::regex_error& e) {
+		DLog(L"RegExpParse(): regex error - '%S'", e.what());
+		ASSERT(FALSE);
 	}
 
 	return StringT();
