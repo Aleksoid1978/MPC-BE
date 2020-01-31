@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2019 see Authors.txt
+ * (C) 2009-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -163,6 +163,8 @@ public:
 	STDMETHODIMP                  Apply() override;
 	STDMETHODIMP                  SetWasapiMode(INT nValue) override;
 	STDMETHODIMP_(INT)            GetWasapiMode() override;
+	STDMETHODIMP                  SetWasapiMethod(INT nValue) override;
+	STDMETHODIMP_(INT)            GetWasapiMethod() override;
 	STDMETHODIMP                  SetDevicePeriod(INT nValue) override;
 	STDMETHODIMP_(INT)            GetDevicePeriod() override;
 	STDMETHODIMP                  SetDeviceId(const CString& deviceId, const CString& deviceName) override;
@@ -232,6 +234,7 @@ private:
 	HMODULE            m_hAvrtLib;
 	DEVICE_MODE        m_DeviceMode;
 	DEVICE_MODE        m_DeviceModeCurrent;
+	WASAPI_METHOD      m_WasapiMethod;
 	CString            m_DeviceId;
 	CString            m_DeviceName;
 	IMMDevice          *m_pMMDevice;

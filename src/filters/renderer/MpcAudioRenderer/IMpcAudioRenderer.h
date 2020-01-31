@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2019 see Authors.txt
+ * (C) 2010-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,6 +38,11 @@ enum BITSTREAM_MODE {
 	BITSTREAM_DTSHD
 };
 
+enum WASAPI_METHOD {
+	EVENT,
+	PUSH
+};
+
 interface __declspec(uuid("495D2C66-D430-439b-9DEE-40F9B7929BBA"))
 IMpcAudioRendererFilter :
 public IUnknown {
@@ -45,6 +50,8 @@ public IUnknown {
 
 	STDMETHOD(SetWasapiMode(INT nValue)) PURE;
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
+	STDMETHOD(SetWasapiMethod(INT nValue)) PURE;
+	STDMETHOD_(INT, GetWasapiMethod()) PURE;
 	STDMETHOD(SetDevicePeriod(INT nValue)) PURE;
 	STDMETHOD_(INT, GetDevicePeriod()) PURE;
 	STDMETHOD(SetDeviceId(const CString& deviceId, const CString& deviceName)) PURE;

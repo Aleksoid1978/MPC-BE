@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2018 see Authors.txt
+ * (C) 2010-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,6 +36,8 @@ private :
 	CButton		m_output_group;
 	CStatic		m_txtWasapiMode;
 	CComboBox	m_cbWasapiMode;
+	CStatic		m_txtWasapiMethod;
+	CComboBox	m_cbWasapiMethod;
 	CStatic		m_txtDevicePeriod;
 	CComboBox	m_cbDevicePeriod;
 
@@ -51,6 +53,7 @@ private :
 	enum {
 		IDC_PP_SOUND_DEVICE = 10000,
 		IDC_PP_WASAPI_MODE,
+		IDC_PP_WASAPI_METHOD,
 		IDC_PP_WASAPI_DEVICE_PERIOD,
 		IDC_PP_USE_BITEXACT_OUTPUT,
 		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS,
