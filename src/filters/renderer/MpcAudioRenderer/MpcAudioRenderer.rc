@@ -91,6 +91,7 @@ BEGIN
     IDS_ARS_WASAPI_MODE            "WASAPI mode:"
     IDS_ARS_EXCLUSIVE              "Exclusive"
     IDS_ARS_SHARED                 "Shared"
+    IDS_ARS_WASAPI_METHOD          "WASAPI method:"
     IDS_ARS_BITEXACT_OUTPUT        "Allow bit-exact output"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Use system layout channels"
     IDS_ARS_CHECK_FORMAT           "Do not check format support"

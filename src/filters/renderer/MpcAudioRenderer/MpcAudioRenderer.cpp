@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2019 see Authors.txt
+ * (C) 2009-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,6 +40,7 @@
 #define OPT_REGKEY_AudRend          L"Software\\MPC-BE Filters\\MPC Audio Renderer"
 #define OPT_SECTION_AudRend         L"Filters\\MPC Audio Renderer"
 #define OPT_DeviceMode              L"DeviceMode"
+#define OPT_WasapiMethod            L"WasapiMethod"
 #define OPT_BufferDuration          L"BufferDuration"
 #define OPT_AudioDeviceId           L"SoundDeviceId"
 #define OPT_AudioDeviceName         L"SoundDeviceName"
@@ -165,6 +166,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_pWaveFormatExOutput(nullptr)
 	, m_DeviceMode(MODE_WASAPI_SHARED)
 	, m_DeviceModeCurrent(MODE_WASAPI_SHARED)
+	, m_WasapiMethod(WASAPI_METHOD::EVENT)
 	, m_pMMDevice(nullptr)
 	, m_pAudioClient(nullptr)
 	, m_pRenderClient(nullptr)
@@ -230,6 +232,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DeviceMode, dw)) {
 			m_DeviceMode = (DEVICE_MODE)dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_WasapiMethod, dw)) {
+			m_WasapiMethod = (DEVICE_MODE)dw;
+		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_BufferDuration, dw)) {
 			m_BufferDuration = dw;
 		}
@@ -262,6 +267,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_DeviceMode, *(int*)&m_DeviceMode);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_WasapiMethod, *(int*)&m_WasapiMethod);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_BufferDuration, m_BufferDuration);
 	profile.ReadString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	profile.ReadString(OPT_SECTION_AudRend, OPT_AudioDeviceName, m_DeviceName);
@@ -636,10 +642,21 @@ DWORD CMpcAudioRenderer::RenderThread()
 	while (!bExit) {
 		CheckBufferStatus();
 
-		const DWORD result = WaitForMultipleObjects(3, renderHandles, FALSE, 1000);
+		DWORD result = -1;
+		if (m_WasapiMethod == WASAPI_METHOD::PUSH) {
+			HRESULT hr = RenderWasapiBuffer();
+			if (hr == AUDCLNT_E_DEVICE_INVALIDATED) {
+				SetReinitializeAudioDevice(TRUE);
+			}
+
+			result = WaitForMultipleObjects(std::size(renderHandles) - 1, renderHandles, FALSE, m_hnsBufferDuration / 10000 / 2);
+		} else {
+			result = WaitForMultipleObjects(std::size(renderHandles), renderHandles, FALSE, 1000);
+		}
+
 		switch (result) {
 			case WAIT_TIMEOUT: // timed out after a 1 second wait
-				if (m_pRenderClient) {
+				if (m_WasapiMethod == WASAPI_METHOD::EVENT && m_pRenderClient) {
 					SetReinitializeAudioDevice(TRUE);
 				}
 				break;
@@ -655,7 +672,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 					ResetEvent(m_hResumeEvent);
 					SetEvent(m_hWaitPauseEvent);
 
-					const DWORD resultResume = WaitForMultipleObjects(2, resumeHandles, FALSE, INFINITE);
+					const DWORD resultResume = WaitForMultipleObjects(std::size(resumeHandles), resumeHandles, FALSE, INFINITE);
 					switch (resultResume) {
 						case WAIT_OBJECT_0: // exit event
 							DLog(L"CMpcAudioRenderer::RenderThread() - exit events");
@@ -1056,6 +1073,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AudRend)) {
 		key.SetDWORDValue(OPT_DeviceMode, (DWORD)m_DeviceMode);
+		key.SetDWORDValue(OPT_WasapiMethod, (DWORD)m_WasapiMethod);
 		key.SetDWORDValue(OPT_BufferDuration, (DWORD)m_BufferDuration);
 		key.SetStringValue(OPT_AudioDeviceId, m_DeviceId);
 		key.SetStringValue(OPT_AudioDeviceName, m_DeviceName);
@@ -1068,6 +1086,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_DeviceMode);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_WasapiMethod, (int)m_WasapiMethod);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_BufferDuration, m_BufferDuration);
 	profile.WriteString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	profile.WriteString(OPT_SECTION_AudRend, OPT_AudioDeviceName, m_DeviceName);
@@ -1097,6 +1116,24 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return (INT)m_DeviceMode;
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetWasapiMethod(INT nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	if (m_pAudioClient && m_WasapiMethod != nValue) {
+		SetReinitializeAudioDevice();
+	}
+
+	m_WasapiMethod = (WASAPI_METHOD)nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMethod()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return (INT)m_WasapiMethod;
 }
 
 STDMETHODIMP CMpcAudioRenderer::SetDevicePeriod(INT nValue)
@@ -2202,12 +2239,19 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 		}
 	}
 
-	CalcBitstreamBufferPeriod(pWaveFormatEx, &m_hnsBufferDuration);
-	const REFERENCE_TIME hnsPeriodicity = IsExclusive(pWaveFormatEx) ? m_hnsBufferDuration : 0;
+	if (m_WasapiMethod == WASAPI_METHOD::EVENT) {
+		CalcBitstreamBufferPeriod(pWaveFormatEx, &m_hnsBufferDuration);
+	}
+
+	DWORD StreamFlags = AUDCLNT_STREAMFLAGS_NOPERSIST;
+	if (m_WasapiMethod == WASAPI_METHOD::EVENT) {
+		StreamFlags |= AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
+	}
 
 	if (SUCCEEDED(hr)) {
+		const REFERENCE_TIME hnsPeriodicity = (IsExclusive(pWaveFormatEx) && m_WasapiMethod == WASAPI_METHOD::EVENT) ? m_hnsBufferDuration : 0;
 		hr = m_pAudioClient->Initialize(ShareMode,
-										AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+										StreamFlags,
 										m_hnsBufferDuration,
 										hnsPeriodicity,
 										pWaveFormatEx, nullptr);
@@ -2237,10 +2281,11 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 		DLog(L"CMpcAudioRenderer::CreateRenderClient() - Trying again with periodicity of %I64d hundred-nanoseconds, or %u frames.", m_hnsBufferDuration, m_nFramesInBuffer);
 		if (SUCCEEDED(hr)) {
+			const REFERENCE_TIME hnsPeriodicity = m_WasapiMethod == WASAPI_METHOD::EVENT ? m_hnsBufferDuration : 0;
 			hr = m_pAudioClient->Initialize(ShareMode,
-											AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+											StreamFlags,
 											m_hnsBufferDuration,
-											m_hnsBufferDuration,
+											hnsPeriodicity,
 											pWaveFormatEx, nullptr);
 		}
 	}
@@ -2319,8 +2364,17 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	m_nMaxWasapiQueueSize = TimeToSamples(buffer_duration, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign;
 	DLog(L"CMpcAudioRenderer::CreateRenderClient() - internal buffer duration = %.2f ms, size = %u", buffer_duration / 10000.0f, m_nMaxWasapiQueueSize);
 
-	hr = m_pAudioClient->SetEventHandle(m_hDataEvent);
-	EXIT_ON_ERROR(hr);
+#ifdef DEBUG_OR_LOG
+	REFERENCE_TIME hnsLatency = 0;
+	if (SUCCEEDED(m_pAudioClient->GetStreamLatency(&hnsLatency))) {
+		DLog(L"CMpcAudioRenderer::CreateRenderClient() - stream latency = %.2f ms", hnsLatency / 10000.0f);
+	}
+#endif
+
+	if (m_WasapiMethod == WASAPI_METHOD::EVENT) {
+		hr = m_pAudioClient->SetEventHandle(m_hDataEvent);
+		EXIT_ON_ERROR(hr);
+	}
 
 	hr = StartRendererThread();
 
@@ -2626,7 +2680,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	HRESULT hr = S_OK;
 
 	UINT32 numFramesPadding = 0;
-	if (m_DeviceModeCurrent == MODE_WASAPI_SHARED && !m_bIsBitstream) { // SHARED
+	if ((m_DeviceModeCurrent == MODE_WASAPI_SHARED && !m_bIsBitstream) || m_WasapiMethod == WASAPI_METHOD::PUSH) {
 		m_pAudioClient->GetCurrentPadding(&numFramesPadding);
 		if (FAILED(hr)) {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1

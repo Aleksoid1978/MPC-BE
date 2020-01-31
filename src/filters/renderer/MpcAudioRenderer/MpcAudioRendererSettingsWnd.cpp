@@ -75,6 +75,11 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbWasapiMode.AddString(ResStr(IDS_ARS_SHARED));
 	m_cbWasapiMode.AddString(ResStr(IDS_ARS_EXCLUSIVE));
 	p.y += h25;
+	m_txtWasapiMethod.Create(ResStr(IDS_ARS_WASAPI_METHOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbWasapiMethod.Create(WS_VISIBLE | WS_CHILD | WS_TABSTOP | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(ScaleX(200), -4), CSize(ScaleX(120), 200)), this, IDC_PP_WASAPI_METHOD);
+	m_cbWasapiMethod.AddString(L"Event");
+	m_cbWasapiMethod.AddString(L"Push");
+	p.y += h25;
 	m_txtDevicePeriod.Create(ResStr(IDS_ARS_DEVICE_PERIOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbDevicePeriod.Create(WS_VISIBLE | WS_CHILD | WS_TABSTOP | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(ScaleX(200), -4), CSize(ScaleX(120), 200)), this, IDC_PP_WASAPI_DEVICE_PERIOD);
 	AddStringData(m_cbDevicePeriod, ResStr(IDS_AG_DEFAULT), 0);
@@ -122,6 +127,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 			m_cbSoundDevice.SetCurSel(idx);
 		}
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
+		m_cbWasapiMethod.SetCurSel(m_pMAR->GetWasapiMethod());
 		SelectByItemData(m_cbDevicePeriod, m_pMAR->GetDevicePeriod());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
@@ -154,6 +160,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 
 	if (m_pMAR) {
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
+		m_pMAR->SetWasapiMethod(m_cbWasapiMethod.GetCurSel());
 		m_pMAR->SetDevicePeriod(GetCurItemData(m_cbDevicePeriod));
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
@@ -203,35 +210,46 @@ void CMpcAudioRendererStatusWnd::UpdateStatus()
 		m_edtDevice.SetWindowTextW(m_pMAR->GetCurrentDeviceName());
 
 		UINT status = m_pMAR->GetMode();
+		CString modeStr;
 		switch (status) {
-		case MODE_NONE:
-		default:
-			m_edtMode.SetWindowTextW(L"");
-			break;
-		case MODE_WASAPI_SHARED:
-			m_edtMode.SetWindowTextW(L"WASAPI Shared");
-			break;
-		case MODE_WASAPI_EXCLUSIVE:
-			m_edtMode.SetWindowTextW(L"WASAPI Exclusive");
-			break;
-		case MODE_WASAPI_EXCLUSIVE_BITSTREAM:
-			CString btMode_str;
-			BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
-			switch (btMode) {
-			case BITSTREAM_AC3:    btMode_str = L"AC-3";    break;
-			case BITSTREAM_DTS:    btMode_str = L"DTS";    break;
-			case BITSTREAM_EAC3:   btMode_str = L"E-AC-3";  break;
-			case BITSTREAM_TRUEHD: btMode_str = L"TrueHD"; break;
-			case BITSTREAM_DTSHD:  btMode_str = L"DTS-HD"; break;
-			}
+			case MODE_WASAPI_SHARED:
+				modeStr = L"WASAPI Shared";
+				break;
+			case MODE_WASAPI_EXCLUSIVE:
+				modeStr = L"WASAPI Exclusive";
+				break;
+			case MODE_WASAPI_EXCLUSIVE_BITSTREAM:
+				CString btModeStr;
+				BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
+				switch (btMode) {
+					case BITSTREAM_AC3:    btModeStr = L"AC-3";   break;
+					case BITSTREAM_DTS:    btModeStr = L"DTS";    break;
+					case BITSTREAM_EAC3:   btModeStr = L"E-AC-3"; break;
+					case BITSTREAM_TRUEHD: btModeStr = L"TrueHD"; break;
+					case BITSTREAM_DTSHD:  btModeStr = L"DTS-HD"; break;
+				}
 
-			CString msg = L"WASAPI Exclusive, Bitstream";
-			if (!btMode_str.IsEmpty()) {
-				msg.AppendFormat(L" [%s]", btMode_str);
-			}
-			m_edtMode.SetWindowTextW(msg);
-			break;
+				CString msg = L"WASAPI Exclusive, Bitstream";
+				if (!btModeStr.IsEmpty()) {
+					msg.AppendFormat(L" [%s]", btModeStr);
+				}
+				modeStr = msg;
+				break;
 		}
+
+		if (!modeStr.IsEmpty()) {
+			auto method = m_pMAR->GetWasapiMethod();
+			CString method_str;
+			switch (method) {
+				case WASAPI_METHOD::EVENT: method_str = L"Event"; break;
+				case WASAPI_METHOD::PUSH:  method_str = L"Push";  break;
+			}
+			if (!method_str.IsEmpty()) {
+				modeStr.AppendFormat(L", %s", method_str);
+			}
+		}
+
+		m_edtMode.SetWindowTextW(modeStr);
 
 		if (status == MODE_WASAPI_EXCLUSIVE_BITSTREAM) {
 			m_InputFormatText.SetWindowTextW(L"Bitstream");
