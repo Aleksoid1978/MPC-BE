@@ -233,7 +233,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 			m_DeviceMode = (DEVICE_MODE)dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_WasapiMethod, dw)) {
-			m_WasapiMethod = (DEVICE_MODE)dw;
+			m_WasapiMethod = (WASAPI_METHOD)dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_BufferDuration, dw)) {
 			m_BufferDuration = dw;
@@ -282,6 +282,10 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		m_DeviceMode = MODE_WASAPI_SHARED;
 	}
 	m_DeviceModeCurrent = m_DeviceMode;
+
+	if (m_WasapiMethod != WASAPI_METHOD::PUSH) {
+		m_WasapiMethod = WASAPI_METHOD::EVENT;
+	}
 
 	m_BufferDuration = discard(m_BufferDuration, 50, { 0, 50, 100 });
 
