@@ -367,7 +367,6 @@ namespace GothSync
 	private:
 		HMODULE m_hDxva2Lib = nullptr;
 		HMODULE m_hEvrLib = nullptr;
-		HMODULE m_hMfplatLib = nullptr;
 		HMODULE m_hAvrtLib = nullptr;
 
 	public:
