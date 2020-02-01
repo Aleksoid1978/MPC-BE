@@ -31,8 +31,6 @@ namespace DSObjects
 
 	// evr.dll
 	typedef HRESULT (__stdcall *PTR_MFCreateVideoSampleFromSurface)(IUnknown* pUnkSurface, IMFSample** ppSample);
-
-	// Mfplat.dll
 	typedef HRESULT (__stdcall *PTR_MFCreateVideoMediaType)(const MFVIDEOFORMAT* pVideoFormat, IMFVideoMediaType** ppIVideoMediaType);
 
 	// AVRT.dll
@@ -62,7 +60,6 @@ namespace DSObjects
 	{
 	private:
 		HMODULE m_hEvrLib = nullptr;
-		HMODULE m_hMfplatLib = nullptr;
 		HMODULE m_hAvrtLib = nullptr;
 
 	public:
