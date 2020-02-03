@@ -412,6 +412,8 @@ public:
 
 	void ScaleFont();
 
+	bool IsShuffle() const;
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

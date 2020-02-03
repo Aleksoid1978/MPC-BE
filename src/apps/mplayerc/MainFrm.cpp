@@ -2970,7 +2970,7 @@ bool CMainFrame::GraphEventComplete()
 			m_nLoops++;
 		}
 
-		if (s.fLoopForever || m_nLoops < s.nLoops) {
+		if (s.fLoopForever || m_nLoops < s.nLoops || m_wndPlaylistBar.IsShuffle()) {
 			int nLoops = m_nLoops;
 			SendMessageW(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
 			m_nLoops = nLoops;

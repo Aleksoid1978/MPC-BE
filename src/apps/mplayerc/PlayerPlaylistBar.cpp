@@ -856,6 +856,11 @@ void CPlayerPlaylistBar::ScaleFont()
 	TCalcREdit();
 }
 
+bool CPlayerPlaylistBar::IsShuffle() const
+{
+	return AfxGetAppSettings().bShufflePlaylistItems && curPlayList.GetCount() > 2 && curTab.type == PLAYLIST;
+}
+
 BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!CSizingControlBarG::PreCreateWindow(cs)) {
