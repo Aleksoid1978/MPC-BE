@@ -950,98 +950,100 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 
-		if (pMsg->message == WM_SYSKEYDOWN
+		if (!m_bEdit) {
+			if (pMsg->message == WM_SYSKEYDOWN
 				&& pMsg->wParam == VK_RETURN && (HIWORD(pMsg->lParam) & KF_ALTDOWN)) {
-			m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
-			return TRUE;
-		}
-
-		if (pMsg->message == WM_KEYDOWN) {
-			switch (pMsg->wParam) {
-			case VK_ESCAPE:
-				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+				m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 				return TRUE;
-			case VK_RETURN:
-				if (GetKeyState(VK_CONTROL) < 0) {
+			}
+
+			if (pMsg->message == WM_KEYDOWN) {
+				switch (pMsg->wParam) {
+				case VK_ESCAPE:
+					GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+					return TRUE;
+				case VK_RETURN:
+					if (GetKeyState(VK_CONTROL) < 0) {
+						m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+						return TRUE;
+					}
+					if (m_list.GetSelectedCount() == 1) {
+						if (TNavigate()) {
+							break;// return FALSE;
+						}
+						const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
+						curPlayList.SetPos(FindPos(item));
+						m_pMainFrame->OpenCurPlaylistItem();
+
+						return TRUE;
+					}
+					break;
+				case 'A':
+					if (curTab.type == EXPLORER) {
+						break;
+					}
+					if (GetKeyState(VK_CONTROL) < 0) {
+						m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
+					}
+					break;
+				case 'I':
+					if (curTab.type == EXPLORER) {
+						break;
+					}
+					if (GetKeyState(VK_CONTROL) < 0) {
+						for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
+							m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
+						}
+					}
+					break;
+				case 'C':
+					if (GetKeyState(VK_CONTROL) < 0) {
+						CopyToClipboard();
+					}
+					break;
+				case 'V':
+					if (curTab.type == EXPLORER) {
+						break;
+					}
+					if (GetKeyState(VK_CONTROL) < 0) {
+						PasteFromClipboard();
+					}
+					break;
+				case VK_BACK:
+					if (curTab.type == EXPLORER) {
+						auto path = curPlayList.GetHead().m_fns.front().GetName();
+						if (path.Right(1) == L"<") {
+							auto oldPath = path;
+							oldPath.TrimRight(L"\\<");
+
+							path.TrimRight(L"\\<");
+							path = GetFolderOnly(path);
+							if (path.Right(1) == L":") {
+								path = (L".");
+							}
+							path = AddSlash(path);
+
+							curPlayList.RemoveAll();
+							TParseFolder(path);
+							Refresh();
+
+							TSelectFolder(oldPath);
+						}
+					}
+					break;
+				case VK_UP:
+				case VK_DOWN:
+				case VK_HOME:
+				case VK_END:
+				case VK_PRIOR:
+				case VK_NEXT:
+				case VK_DELETE:
+				case VK_APPS: // "Menu key"
+					break;
+				default:
 					m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 					return TRUE;
 				}
-				if (m_list.GetSelectedCount() == 1) {
-					if (TNavigate()) {
-						break;// return FALSE;
-					}
-					const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
-					curPlayList.SetPos(FindPos(item));
-					m_pMainFrame->OpenCurPlaylistItem();
-
-					return TRUE;
-				}
-				break;
-			case 'A':
-				if (curTab.type == EXPLORER) {
-					break;
-				}
-				if (GetKeyState(VK_CONTROL) < 0) {
-					m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
-				}
-				break;
-			case 'I':
-				if (curTab.type == EXPLORER) {
-					break;
-				}
-				if (GetKeyState(VK_CONTROL) < 0) {
-					for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
-						m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
-					}
-				}
-				break;
-			case 'C':
-				if (GetKeyState(VK_CONTROL) < 0) {
-					CopyToClipboard();
-				}
-				break;
-			case 'V':
-				if (curTab.type == EXPLORER) {
-					break;
-				}
-				if (GetKeyState(VK_CONTROL) < 0) {
-					PasteFromClipboard();
-				}
-				break;
-			case VK_BACK:
-				if (curTab.type == EXPLORER) {
-					auto path = curPlayList.GetHead().m_fns.front().GetName();
-					if (path.Right(1) == L"<") {
-						auto oldPath = path;
-						oldPath.TrimRight(L"\\<");
-
-						path.TrimRight(L"\\<");
-						path = GetFolderOnly(path);
-						if (path.Right(1) == L":") {
-							path = (L".");
-						}
-						path = AddSlash(path);
-
-						curPlayList.RemoveAll();
-						TParseFolder(path);
-						Refresh();
-
-						TSelectFolder(oldPath);
-					}
-				}
-				break;
-			case VK_UP:
-			case VK_DOWN:
-			case VK_HOME:
-			case VK_END:
-			case VK_PRIOR:
-			case VK_NEXT:
-			case VK_DELETE:
-			case VK_APPS: // "Menu key"
-				break;
-			default:
-				m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
-				return TRUE;
 			}
 		}
 
@@ -2452,6 +2454,7 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT, 0, 0xFFFF, OnToolTipNotify)
 	ON_WM_TIMER()
 	ON_WM_CONTEXTMENU()
+	ON_NOTIFY(LVN_BEGINLABELEDIT, IDC_PLAYLIST, OnLvnBeginlabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PLAYLIST, OnLvnEndlabeleditList)
 	ON_WM_MEASUREITEM()
 	ON_WM_SETFOCUS()
@@ -2612,7 +2615,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = CDRF_DODEFAULT;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
-		if (SysVersion::IsWin7orLater()) { // under WinXP cause the hang
+		if (!m_bEdit && SysVersion::IsWin7orLater()) { // under WinXP cause the hang
 			ResizeListColumn();
 		}
 
@@ -3673,6 +3676,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	}
 }
 
+void CPlayerPlaylistBar::OnLvnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	m_bEdit = true;
+}
+
 void CPlayerPlaylistBar::OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
@@ -3682,6 +3690,7 @@ void CPlayerPlaylistBar::OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		pli.m_label = pDispInfo->item.pszText;
 		m_list.SetItemText(pDispInfo->item.iItem, 0, pDispInfo->item.pszText);
 	}
+	m_bEdit = false;
 
 	*pResult = 0;
 }
