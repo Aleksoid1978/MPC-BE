@@ -271,8 +271,7 @@ void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(AfxGetAppSettings().GetFileEngine(m_path) == DirectShow
-				   && !::PathIsURLW(m_path));
+	pCmdUI->Enable(AfxGetAppSettings().GetFileEngine(m_path) == DirectShow);
 }
 
 void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
