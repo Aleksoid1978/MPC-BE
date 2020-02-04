@@ -667,14 +667,32 @@ void CPlaylist::SetPos(POSITION pos)
 	m_pos = pos;
 }
 
+void CPlaylist::CalcCountFiles()
+{
+	m_nFilesCount = 0;
+	POSITION pos = GetHeadPosition();
+	while (pos) {
+		const auto& playlist = GetNext(pos);
+		if (!playlist.m_bDirectory) {
+			m_nFilesCount++;
+		}
+	}
+}
+
+INT_PTR CPlaylist::GetCountInternal()
+{
+	return m_nFilesCount != -1 ? m_nFilesCount : GetCount();
+}
+
 POSITION CPlaylist::Shuffle()
 {
-	ASSERT(GetCount() > 2);
+	const auto CountInternal = GetCountInternal();
+	ASSERT(CountInternal > 2);
 
 	static INT_PTR idx = 0;
 	static INT_PTR count = 0;
 	static std::vector<POSITION> a;
-	const auto Count = m_pos ? GetCount() - 1 : GetCount();
+	const auto Count = m_pos ? CountInternal - 1 : CountInternal;
 
 	if (count != Count || idx >= Count) {
 		// insert or remove items in playlist, or index out of bounds then recalculate
@@ -683,7 +701,7 @@ POSITION CPlaylist::Shuffle()
 		a.reserve(count = Count);
 
 		for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
-			if (pos != m_pos) {
+			if (pos != m_pos && !GetAt(pos).m_bDirectory) {
 				a.emplace_back(pos);
 			}
 		}
@@ -696,7 +714,7 @@ POSITION CPlaylist::Shuffle()
 
 CPlaylistItem& CPlaylist::GetNextWrap(POSITION& pos)
 {
-	if (AfxGetAppSettings().bShufflePlaylistItems && GetCount() > 2) {
+	if (AfxGetAppSettings().bShufflePlaylistItems && GetCountInternal() > 2) {
 		pos = Shuffle();
 	} else {
 		GetNext(pos);
@@ -858,7 +876,7 @@ void CPlayerPlaylistBar::ScaleFont()
 
 bool CPlayerPlaylistBar::IsShuffle() const
 {
-	return AfxGetAppSettings().bShufflePlaylistItems && curPlayList.GetCount() > 2 && curTab.type == PLAYLIST;
+	return AfxGetAppSettings().bShufflePlaylistItems && curPlayList.GetCountInternal() > 2;
 }
 
 BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
@@ -2114,16 +2132,7 @@ POSITION CPlayerPlaylistBar::FindPos(int i)
 int CPlayerPlaylistBar::GetCount(const bool bOnlyFiles/* = false*/)
 {
 	if (bOnlyFiles && curTab.type == EXPLORER) {
-		int count = 0;
-		POSITION pos = curPlayList.GetHeadPosition();
-		while (pos) {
-			const auto& playlist = curPlayList.GetNext(pos);
-			if (!playlist.m_bDirectory) {
-				count++;
-			}
-		}
-
-		return count;
+		return curPlayList.m_nFilesCount;
 	}
 
 	return curPlayList.GetCount();
@@ -3265,6 +3274,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 		m.AppendMenu(MF_STRING | MF_ENABLED, M_REFRESH, ResStr(IDS_PLAYLIST_EXPLORER_REFRESH));
 		m.AppendMenu(MF_SEPARATOR);
+		m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShufflePlaylistItems ? MF_CHECKED : MF_UNCHECKED), M_SHUFFLE, ResStr(IDS_PLAYLIST_SHUFFLE));
+		m.AppendMenu(MF_SEPARATOR);
 	}
 	else {
 		m.AppendMenu(MF_STRING | (::IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_FROMCLIPBOARD, ResStr(IDS_PLAYLIST_PASTEFROMCLIPBOARD) + L"\tCltr+V");
@@ -3615,9 +3626,6 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		}
 		break;
 		case M_SHUFFLE:
-			if (bExplorer) {
-				return;
-			}
 			s.bShufflePlaylistItems = !s.bShufflePlaylistItems;
 			break;
 		case M_REFRESH:
@@ -4225,6 +4233,8 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 			nPos++;
 		}
 
+		curPlayList.CalcCountFiles();
+
 		return;
 	}
 
@@ -4374,6 +4384,8 @@ void CPlayerPlaylistBar::TFillPlaylist(const bool bFirst/* = false*/)
 			}
 		}
 	}
+
+	curPlayList.CalcCountFiles();
 
 	if (!bFirst) {
 		Refresh();
