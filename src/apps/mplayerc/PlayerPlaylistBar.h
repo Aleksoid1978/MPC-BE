@@ -160,7 +160,11 @@ public:
 	CPlaylistItem& GetNextWrap(POSITION& pos);
 	CPlaylistItem& GetPrevWrap(POSITION& pos);
 
+	void CalcCountFiles();
+	INT_PTR GetCountInternal();
 	POSITION Shuffle();
+
+	INT_PTR m_nFilesCount = -1;
 
 	int m_nSelected_idx = INT_MAX;
 	int m_nFocused_idx = 0;
