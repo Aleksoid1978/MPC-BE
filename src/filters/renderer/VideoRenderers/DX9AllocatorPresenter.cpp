@@ -587,14 +587,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 				g_szClassName,
 				nullptr,
 				WS_VISIBLE | WS_DISABLED | WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-				CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+				0, 0, 1, 1,
 				m_hWnd,
 				nullptr,
 				AfxGetApp()->m_hInstance,
 				nullptr
 			);
 
-			if (m_hWndVR) {
+			if (m_hWndVR && !m_windowRect.IsRectEmpty()) {
 				SetWindowPos(m_hWndVR, nullptr, m_windowRect.left, m_windowRect.top, m_windowRect.Width(), m_windowRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 			}
 		}
