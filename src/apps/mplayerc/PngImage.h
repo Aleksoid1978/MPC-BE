@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,25 +37,27 @@ enum IMG_TYPE {
 class CMPCPngImage : public CImage
 {
 	// External Gradient
-	BYTE*		m_pExtGradientDATA;
-	HBITMAP		m_ExtGradientHB;
-	int			m_width, m_height, m_bpp;
-	IMG_TYPE	m_type;
+	BYTE*    m_pExtGradientDATA;
+	HBITMAP  m_ExtGradientHB;
+	int      m_width, m_height, m_bpp;
+	IMG_TYPE m_type;
 
-	bool	DecompressPNG(struct png_t* png);
+	bool DecompressPNG(struct png_t* png);
 public:
 	CMPCPngImage();
 	~CMPCPngImage();
 
-	bool	LoadFromResource(UINT id);
+	bool LoadFromResource(UINT id);
 
-	static bool		FileExists(CString& fn, bool bInclJPEG = false);
-	static BYTE*	BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
-	static HBITMAP	TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br = -1, int rc = -1, int gc = -1, int bc = -1);
-	static HBITMAP	LoadExternalImage(CString fn, int resid, IMG_TYPE type, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+	static bool FileExists(CString& fn);
+	static bool FileExists(const CString& fn);
 
-	bool	LoadExternalGradient(CString fn);
-	bool	PaintExternalGradient(CDC* dc, CRect r, int ptop, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+	static BYTE* BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
+	static HBITMAP TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+	static HBITMAP LoadExternalImage(const CString& fn, int resid, IMG_TYPE type, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+
+	bool LoadExternalGradient(const CString& fn);
+	bool PaintExternalGradient(CDC* dc, CRect r, int ptop, int br = -1, int rc = -1, int gc = -1, int bc = -1);
 
 	const bool IsExtGradiendLoading() { return m_ExtGradientHB && m_width && m_height && m_bpp; };
 

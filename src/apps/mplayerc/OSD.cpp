@@ -77,7 +77,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	BITMAP bm = { 0 };
 	::GetObjectW(hBmp, sizeof(bm), &bm);
 
-	if (CMPCPngImage::FileExists(CString(L"flybar")) && bm.bmWidth != bm.bmHeight * 25) {
+	if (CMPCPngImage::FileExists(L"flybar") && bm.bmWidth != bm.bmHeight * 25) {
 		hBmp = CMPCPngImage::LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 		::GetObjectW(hBmp, sizeof(bm), &bm);
 	}
