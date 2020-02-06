@@ -142,7 +142,7 @@ void CChildView::LoadLogo()
 	CString logoFName = L"logo";
 	HBITMAP hbm = nullptr;
 
-	if (m_logo.FileExists(logoFName, true) && (hbm = OpenImage(logoFName))) {
+	if (m_logo.FileExists(logoFName) && (hbm = OpenImage(logoFName))) {
 		m_logo.Attach(hbm);
 	} else {
 		if (s.bLogoExternal && (hbm = OpenImage(s.strLogoFileName))) {

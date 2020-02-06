@@ -42,10 +42,10 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (m_BackGroundbm.FileExists(CString(L"background"))) {
+	if (m_BackGroundbm.FileExists(L"background")) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
 	}
-	if (m_Volumebm.FileExists(CString(L"volume"))) {
+	if (m_Volumebm.FileExists(L"volume")) {
 		m_Volumebm.LoadExternalGradient(L"volume");
 	}
 

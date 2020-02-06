@@ -95,7 +95,7 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	if (m_BackGroundbm.FileExists(CString(L"background"))) {
+	if (m_BackGroundbm.FileExists(L"background")) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
 	}
 

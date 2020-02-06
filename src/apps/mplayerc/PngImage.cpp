@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -113,18 +113,31 @@ bool CMPCPngImage::LoadFromResource(UINT id) {
 	return ret;
 }
 
-bool CMPCPngImage::FileExists(CString& fn, bool bInclJPEG)
+bool CMPCPngImage::FileExists(CString& fn)
 {
-	CString path = GetProgramDir();
+	const CString fullPath = GetProgramDir() + fn;
 
-	if (::PathFileExistsW(path + fn + L".png")) {
-		fn = path + fn + L".png";
+	if (::PathFileExistsW(fullPath + L".png")) {
+		fn = fullPath + L".png";
 		return true;
-	} else if (::PathFileExistsW(path + fn + L".bmp")) {
-		fn = path + fn + L".bmp";
+	} else if (::PathFileExistsW(fullPath + L".bmp")) {
+		fn = fullPath + L".bmp";
 		return true;
-	} else if (bInclJPEG && ::PathFileExistsW(path + fn + L".jpg")) {
-		fn = path + fn + L".jpg";
+	} else if (::PathFileExistsW(fullPath + L".jpg")) {
+		fn = fullPath + L".jpg";
+		return true;
+	}
+
+	return false;
+}
+
+bool CMPCPngImage::FileExists(const CString& fn)
+{
+	const CString fullPath = GetProgramDir() + fn;
+
+	if (::PathFileExistsW(fullPath + L".png")) {
+		return true;
+	} else if (::PathFileExistsW(fullPath + L".bmp")) {
 		return true;
 	}
 
@@ -279,7 +292,7 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 	return hbm;
 }
 
-HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
+HBITMAP CMPCPngImage::LoadExternalImage(const CString& fn, int resid, IMG_TYPE type, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
 	CString path = GetProgramDir();
 
@@ -309,7 +322,7 @@ HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, in
 	return nullptr;
 }
 
-bool CMPCPngImage::LoadExternalGradient(CString fn)
+bool CMPCPngImage::LoadExternalGradient(const CString& fn)
 {
 	CString path = GetProgramDir();
 

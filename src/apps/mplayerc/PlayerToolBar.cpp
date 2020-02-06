@@ -160,7 +160,7 @@ void CPlayerToolBar::SwitchTheme()
 
 	// load toolbar image
 	HBITMAP hBmp = nullptr;
-	bool fp = CMPCPngImage::FileExists(CString(L"toolbar"));
+	bool fp = CMPCPngImage::FileExists(L"toolbar");
 	if (s.bUseDarkTheme && !fp) {
 		/*
 		int col = s.clrFaceABGR;
@@ -240,7 +240,7 @@ void CPlayerToolBar::SwitchTheme()
 		}
 
 		hBmp = nullptr;
-		fp = CMPCPngImage::FileExists(CString(L"gpu"));
+		fp = CMPCPngImage::FileExists(L"gpu");
 		BITMAP bm = { 0 };
 		if (fp) {
 			hBmp = CMPCPngImage::LoadExternalImage(L"gpu", 0, IMG_TYPE::UNDEF);
@@ -342,7 +342,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		   TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | TBSTYLE_AUTOSIZE | TBSTYLE_CUSTOMERASE,
 		   WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM | CBRS_TOOLTIPS));
 
-	if (m_BackGroundbm.FileExists(CString(L"background"))) {
+	if (m_BackGroundbm.FileExists(L"background")) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
 	}
 
