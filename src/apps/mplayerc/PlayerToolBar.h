@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,12 +42,9 @@ private:
 	LONG		m_nDXVAIconWidth;
 	LONG		m_nDXVAIconHeight;
 
-	bool		m_bDisableImgListRemap;
-
 	CMPCPngImage m_BackGroundbm;
-	CImageList*	m_pButtonsImages;
-	CImageList	m_reImgListActive;
-	CImageList	m_reImgListDisabled;
+	CImageList	m_imgListActive;
+	CImageList	m_imgListDisabled;
 
 	int			m_nWidthIncrease = 0;
 
@@ -76,8 +73,6 @@ private:
 	bool IsMuted();
 	void SetMute(bool fMute = true);
 	int getHitButtonIdx(CPoint point);
-	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);
-	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

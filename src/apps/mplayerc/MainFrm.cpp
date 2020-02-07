@@ -4542,7 +4542,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	UnloadExternalObjects();
 
 	SetAudioPicture(FALSE);
-	m_wndToolBar.SwitchTheme();
 
 	if (m_bNeedUnmountImage) {
 		m_DiskImage.UnmountDiskImage();
