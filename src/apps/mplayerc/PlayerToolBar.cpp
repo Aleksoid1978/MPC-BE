@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,8 @@
 #include "PlayerToolBar.h"
 #include "../../DSUtil/DXVAState.h"
 
+#include <cmath>
+
 // CPlayerToolBar
 
 typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList);
@@ -32,8 +34,6 @@ IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
 
 CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_bDisableImgListRemap(false)
-	, m_pButtonsImages(nullptr)
 	, m_hDXVAIcon(nullptr)
 	, m_nDXVAIconWidth(0)
 	, m_nDXVAIconHeight(0)
@@ -42,14 +42,79 @@ CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 
 CPlayerToolBar::~CPlayerToolBar()
 {
-	if (m_pButtonsImages) {
-		delete m_pButtonsImages;
-	}
-
 	if (m_hDXVAIcon) {
 		DestroyIcon(m_hDXVAIcon);
 	}
 }
+
+struct HLS {
+	double H, L, S;
+
+	HLS(const RGBQUAD& rgb) {
+		double R = rgb.rgbRed / 255.0;
+		double G = rgb.rgbGreen / 255.0;
+		double B = rgb.rgbBlue / 255.0;
+		double max = std::max({ R, G, B });
+		double min = std::min({ R, G, B });
+
+		L = (max + min) / 2.0;
+
+		if (max == min) {
+			S = H = 0.0;
+		} else {
+			double d = max - min;
+
+			S = (L < 0.5) ? (d / (max + min)) : (d / (2.0 - max - min));
+
+			if (R == max) {
+				H = (G - B) / d;
+			} else if (G == max) {
+				H = 2.0 + (B - R) / d;
+			} else { // if (B == max)
+				H = 4.0 + (R - G) / d;
+			}
+			H /= 6.0;
+			if (H < 0.0) {
+				H += 1.0;
+			}
+		}
+	}
+
+	RGBQUAD toRGBQUAD() {
+		RGBQUAD rgb;
+		rgb.rgbReserved = 255;
+
+		if (S == 0.0) {
+			rgb.rgbRed = rgb.rgbGreen = rgb.rgbBlue = BYTE(L * 255);
+		} else {
+			auto hue2rgb = [](double p, double q, double h) {
+				if (h < 0.0) {
+					h += 1.0;
+				} else if (h > 1.0) {
+					h -= 1.0;
+				}
+
+				if (h < 1.0 / 6.0) {
+					return p + (q - p) * 6.0 * h;
+				} else if (h < 0.5) {
+					return q;
+				} else if (h < 2.0 / 3.0) {
+					return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
+				}
+				return p;
+			};
+
+			double q = (L < 0.5) ? (L * (1 + S)) : (L + S - L * S);
+			double p = 2 * L - q;
+
+			rgb.rgbRed = BYTE(hue2rgb(p, q, H + 1.0 / 3.0) * 255);
+			rgb.rgbGreen = BYTE(hue2rgb(p, q, H) * 255);
+			rgb.rgbBlue = BYTE(hue2rgb(p, q, H - 1.0 / 3.0) * 255);
+		}
+
+		return rgb;
+	}
+};
 
 void CPlayerToolBar::SwitchTheme()
 {
@@ -57,6 +122,14 @@ void CPlayerToolBar::SwitchTheme()
 
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	m_nButtonHeight = 16;
+
+	if (m_imgListActive.GetSafeHandle()) {
+		m_imgListActive.DeleteImageList();
+	}
+
+	if (m_imgListDisabled.GetSafeHandle()) {
+		m_imgListDisabled.DeleteImageList();
+	}
 
 	if (m_nUseDarkTheme != (int)s.bUseDarkTheme) {
 		VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
@@ -99,12 +172,9 @@ void CPlayerToolBar::SwitchTheme()
 			FreeLibrary(h);
 		}
 
-		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);// 0 Remap Active
-
-		COLORSCHEME cs;
-		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= 0x0046413c;
-		cs.clrBtnShadow		= 0x0037322d;
+		COLORSCHEME cs = { sizeof(COLORSCHEME) };
+		cs.clrBtnHighlight = 0x0046413c;
+		cs.clrBtnShadow    = 0x0037322d;
 
 		tb.SetColorScheme(&cs);
 		tb.SetIndent(5);
@@ -119,22 +189,19 @@ void CPlayerToolBar::SwitchTheme()
 			FreeLibrary(h);
 		}
 
-		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
-
-		COLORSCHEME cs;
-		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
-		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
+		COLORSCHEME cs = { sizeof(COLORSCHEME) };
+		cs.clrBtnHighlight = GetSysColor(COLOR_BTNFACE);
+		cs.clrBtnShadow    = GetSysColor(COLOR_BTNSHADOW);
 
 		tb.SetColorScheme(&cs);
 		tb.SetIndent(0);
 	}
 
 	const int dpiScalePercent = m_pMainFrame->GetDPIScalePercent();
-	const int imageDpiScalePercent[] = {
+	static const int imageDpiScalePercent[] = {
 		350, 300, 250, 225, 200, 175, 150, 125
 	};
-	const int toolbarImageResId[] = {
+	static const int toolbarImageResId[] = {
 		IDB_PLAYERTOOLBAR_PNG_350,
 		IDB_PLAYERTOOLBAR_PNG_300,
 		IDB_PLAYERTOOLBAR_PNG_250,
@@ -146,7 +213,7 @@ void CPlayerToolBar::SwitchTheme()
 	};
 
 	int imageDpiScalePercentIndex = -1;
-	for (int i = 0; i < _countof(imageDpiScalePercent); i++) {
+	for (size_t i = 0; i < std::size(imageDpiScalePercent); i++) {
 		if (dpiScalePercent >= imageDpiScalePercent[i]) {
 			imageDpiScalePercentIndex = i;
 			break;
@@ -190,28 +257,62 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	if (nullptr != hBmp) {
-		CBitmap *bmp = DNew CBitmap();
-		bmp->Attach(hBmp);
+		CBitmap bmp;
+		bmp.Attach(hBmp);
 
-		SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
-
-		SAFE_DELETE(m_pButtonsImages);
-
-		m_pButtonsImages = DNew CImageList();
+		SetSizes({ bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6 }, { bitmapBmp.bmHeight, bitmapBmp.bmHeight });
 
 		if (32 == bitmapBmp.bmBitsPixel) {
-			m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+			VERIFY(m_imgListActive.Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0));
+			VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
 		} else {
-			m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0);
-			m_pButtonsImages->Add(bmp, RGB(255, 0, 255));
+			VERIFY(m_imgListActive.Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0));
+			VERIFY(m_imgListActive.Add(&bmp, RGB(255, 0, 255)) != -1);
 		}
 
 		m_nButtonHeight = bitmapBmp.bmHeight;
-		tb.SetImageList(m_pButtonsImages);
-		m_bDisableImgListRemap = true;
 
-		delete bmp;
+		if (32 == bitmapBmp.bmBitsPixel) {
+			BYTE* bmpBuffer = (BYTE*)GlobalAlloc(GMEM_FIXED, bitmapBmp.bmWidthBytes * bitmapBmp.bmHeight);
+			if (bmpBuffer) {
+				DWORD dwValue = bmp.GetBitmapBits(bitmapBmp.bmWidthBytes * bitmapBmp.bmHeight, bmpBuffer);
+				if (dwValue) {
+					auto adjustBrightness = [](BYTE c, double p) {
+						int cAdjusted;
+						if (c == 0 && p > 1.0) {
+							cAdjusted = std::lround((p - 1.0) * 255);
+						} else {
+							cAdjusted = std::lround(c * p);
+						}
+
+						return BYTE(std::min(cAdjusted, 255));
+					};
+
+					BYTE* bits = bmpBuffer;
+					for (int y = 0; y < bitmapBmp.bmHeight; y++, bits += bitmapBmp.bmWidthBytes) {
+						RGBQUAD* p = reinterpret_cast<RGBQUAD*>(bits);
+						for (int x = 0; x < bitmapBmp.bmWidth; x++) {
+							HLS hls(p[x]);
+							hls.S = 0.0; // Make the color gray
+
+							RGBQUAD rgb = hls.toRGBQUAD();
+							p[x].rgbRed = BYTE(adjustBrightness(rgb.rgbRed, 0.55) * p[x].rgbReserved / 255);
+							p[x].rgbGreen = BYTE(adjustBrightness(rgb.rgbGreen, 0.55) * p[x].rgbReserved / 255);
+							p[x].rgbBlue = BYTE(adjustBrightness(rgb.rgbBlue, 0.55) * p[x].rgbReserved / 255);
+						}
+					}
+
+					CBitmap bmpDisabled;
+					bmpDisabled.CreateBitmap(bitmapBmp.bmWidth, bitmapBmp.bmHeight, bitmapBmp.bmPlanes, bitmapBmp.bmBitsPixel, bmpBuffer);
+
+					VERIFY(m_imgListDisabled.Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0));
+					VERIFY(m_imgListDisabled.Add(&bmpDisabled, nullptr) != 1);
+				}
+
+				GlobalFree((HGLOBAL)bmpBuffer);
+			}
+		}
+
 		DeleteObject(hBmp);
 	}
 
@@ -300,22 +401,31 @@ void CPlayerToolBar::SwitchTheme()
 		}
 	}
 
-	if (s.bUseDarkTheme) {
-		if (!m_bDisableImgListRemap) {
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);// 0 Remap Active
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);// 1 Remap Disabled
-		}
-	} else {
-		m_bDisableImgListRemap = true;
+	if (!s.bUseDarkTheme && !m_imgListActive.GetSafeHandle()) {
+		static COLORMAP cmActive[] = {
+			0x00c0c0c0, 0x00ff00ff //background = transparency mask
+		};
 
-		if (false == fp) {
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
+		static COLORMAP cmDisabled[] = {
+			0x00000000, 0x00A0A0A0, //button_face -> black to gray
+			0x00c0c0c0, 0x00ff00ff  //background = transparency mask
+		};
 
-			if (!m_bDisableImgListRemap) {
-				SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);// 3 Undo  Disabled
-			}
-		}
+		auto CreateImageList = [](CImageList& imageList, LPCOLORMAP colorMap, const int mapSize) {
+			CBitmap bm;
+			VERIFY(bm.LoadMappedBitmap(IDB_PLAYERTOOLBAR, CMB_MASKED, colorMap, mapSize));
+			BITMAP bmInfo;
+			VERIFY(bm.GetBitmap(&bmInfo));
+			VERIFY(imageList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));
+			VERIFY(imageList.Add(&bm, RGB(255, 0, 255)) != -1);
+		};
+
+		CreateImageList(m_imgListActive, cmActive, std::size(cmActive));
+		CreateImageList(m_imgListDisabled, cmDisabled, std::size(cmDisabled));
 	}
+
+	tb.SetImageList(&m_imgListActive);
+	tb.SetDisabledImageList(&m_imgListDisabled);
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
 		m_volctrl.Invalidate();
@@ -365,77 +475,6 @@ BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 	m_dwStyle &= ~CBRS_BORDER_BOTTOM;
 
 	return TRUE;
-}
-
-void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList)
-{
-	CAppSettings& s = AfxGetAppSettings();
-	CBitmap bm;
-
-	COLORMAP cmActive[] = {
-		0x00000000, s.clrFaceABGR,
-		0x00808080, s.clrOutlineABGR,
-		0x00c0c0c0, 0x00ff00ff//background = transparency mask
-	};
-
-	COLORMAP cmDisabled[] = {
-		0x00000000, 0x00ff00ff,//button_face -> transparency mask
-		0x00808080, s.clrOutlineABGR,
-		0x00c0c0c0, 0x00ff00ff//background = transparency mask
-	};
-
-	COLORMAP cmUndoActive[] = {
-		0x00c0c0c0, 0x00ff00ff//background = transparency mask
-	};
-
-	COLORMAP cmUndoDisabled[] = {
-		0x00000000, 0x00A0A0A0,//button_face -> black to gray
-		0x00c0c0c0, 0x00ff00ff//background = transparency mask
-	};
-
-	switch (nRemapState) {
-		default:
-		case 0:
-			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmActive, 3);
-			break;
-		case 1:
-			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmDisabled, 3);
-			break;
-		case 2:
-			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmUndoActive, 1);
-			break;
-		case 3:
-			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmUndoDisabled, 2);
-			break;
-	}
-
-	BITMAP bmInfo;
-	VERIFY(bm.GetBitmap(&bmInfo));
-	VERIFY(reImgList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));
-	VERIFY(reImgList.Add(&bm, 0x00ff00ff) != -1);
-}
-
-void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
-{
-	CToolBarCtrl& tb = GetToolBarCtrl();
-
-	if (nRemapState == 0 || nRemapState == 2) {
-		if (m_reImgListActive.GetSafeHandle()) {
-			m_reImgListActive.DeleteImageList();
-		}
-
-		CreateRemappedImgList(bmID, nRemapState, m_reImgListActive);
-		ASSERT(m_reImgListActive.GetSafeHandle());
-		tb.SetImageList(&m_reImgListActive);
-	} else {
-		if (m_reImgListDisabled.GetSafeHandle()) {
-			m_reImgListDisabled.DeleteImageList();
-		}
-
-		CreateRemappedImgList(bmID, nRemapState, m_reImgListDisabled);
-		ASSERT(m_reImgListDisabled.GetSafeHandle());
-		tb.SetDisabledImageList(&m_reImgListDisabled);
-	}
 }
 
 void CPlayerToolBar::SetMute(bool fMute)
