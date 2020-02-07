@@ -43,6 +43,9 @@ class CMPCPngImage : public CImage
 	IMG_TYPE m_type;
 
 	bool DecompressPNG(struct png_t* png);
+
+	BYTE* BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
+	static BYTE* SwapPNG(BYTE* lpBits, int width, int height, int bpp);
 public:
 	CMPCPngImage();
 	~CMPCPngImage();
@@ -52,7 +55,6 @@ public:
 	static bool FileExists(CString& fn);
 	static bool FileExists(const CString& fn);
 
-	static BYTE* BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
 	static HBITMAP TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br = -1, int rc = -1, int gc = -1, int bc = -1);
 	static HBITMAP LoadExternalImage(const CString& fn, int resid, IMG_TYPE type, int br = -1, int rc = -1, int gc = -1, int bc = -1);
 

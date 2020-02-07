@@ -208,6 +208,18 @@ BYTE* CMPCPngImage::BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int he
 	return lpBits;
 }
 
+BYTE* CMPCPngImage::SwapPNG(BYTE* lpBits, int width, int height, int bpp)
+{
+	int k = bpp / 8;
+	int size = width * height * k;
+
+	for (int i = 0; i < size; i += k) {
+		std::swap(lpBits[i], lpBits[i + 2]);
+	}
+
+	return lpBits;
+}
+
 HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
 	HBITMAP hbm = nullptr;
@@ -274,13 +286,13 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 	if (type == IMG_TYPE::BMP) {
 
 		int hsize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-		memcpy(*pData, BrightnessRGB(type, bmp, *width, *height, *bpp, br, rc, gc, bc) + hsize, memWidth * (*height));
+		memcpy(*pData, /*BrightnessRGB(type, bmp, *width, *height, *bpp, br, rc, gc, bc)*/bmp + hsize, memWidth * (*height));
 		free(bmp);
 
 	} else if (type == IMG_TYPE::PNG) {
 
 		for (int i = 0; i < *height; i++) {
-			memcpy((*pData) + memWidth * i, BrightnessRGB(type, (BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc), memWidth);
+			memcpy((*pData) + memWidth * i, /*BrightnessRGB(type, (BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc)*/SwapPNG((BYTE*)row_pointers[i], *width, 1, *bpp), memWidth);
 		}
 		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 	}
@@ -357,7 +369,7 @@ bool CMPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = 
 	if (IsExtGradiendLoading()) {
 		size_t size = m_width * m_height * m_bpp >> 3;
 		BYTE* pData = DNew BYTE[size];
-		memcpy(pData, BrightnessRGB(IMG_TYPE::BMP, m_pExtGradientDATA, m_width, m_height, m_bpp, br, rc, gc, bc), size);
+		memcpy(pData, /*BrightnessRGB(IMG_TYPE::BMP, m_pExtGradientDATA, m_width, m_height, m_bpp, br, rc, gc, bc)*/m_pExtGradientDATA, size);
 
 		GRADIENT_RECT gr = {0, 1};
 
