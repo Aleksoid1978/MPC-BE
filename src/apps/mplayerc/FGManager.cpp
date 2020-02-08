@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -601,7 +601,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 					CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
 					pFGF->AddType(majortype, subtype);
-					fl.Insert(pFGF, 7);
+					fl.Insert(pFGF, 9);
 				}
 			}
 		}
