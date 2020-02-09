@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,13 +29,14 @@ class CChildView : public CWnd
 
 	CCritSec     m_csLogo;
 	CMPCPngImage m_logo;
+	CImage       m_resizedImg;
 
 	HCURSOR m_hCursor = nullptr;
 	CPoint m_lastMousePoint{ -1, -1 };
 
 public:
 	CChildView();
-	virtual ~CChildView();
+	~CChildView() = default;
 
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnMouseLeave();
@@ -50,6 +51,8 @@ public:
 
 	void LoadLogo();
 	CSize GetLogoSize() const;
+
+	void ClearResizedImage();
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

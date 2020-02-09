@@ -956,6 +956,7 @@ void CMainFrame::OnClose()
 	if (m_ThumbCashedBitmap) {
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
+	m_wndView.ClearResizedImage();
 
 	for (const auto& tmpFile : s.slTMPFilesList) {
 		if (::PathFileExistsW(tmpFile)) {
@@ -19172,6 +19173,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		}
 	}
 
+	m_wndView.ClearResizedImage();
 	m_wndView.Invalidate();
 
 	return S_OK;

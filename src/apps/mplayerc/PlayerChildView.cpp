@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,16 +24,14 @@
 #include "PlayerChildView.h"
 #include "OpenImage.h"
 
+#include <cmath>
+
 // CChildView
 
 CChildView::CChildView()
 	: m_hCursor(::LoadCursorW(nullptr, IDC_ARROW))
 {
 	LoadLogo();
-}
-
-CChildView::~CChildView()
-{
 }
 
 int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -138,6 +136,7 @@ void CChildView::LoadLogo()
 	CAutoLock cAutoLock(&m_csLogo);
 
 	m_logo.Destroy();
+	m_resizedImg.Destroy();
 
 	CString logoFName = L"logo";
 	HBITMAP hbm = nullptr;
@@ -170,6 +169,11 @@ void CChildView::LoadLogo()
 CSize CChildView::GetLogoSize() const
 {
 	return m_logo.GetSize();
+}
+
+void CChildView::ClearResizedImage()
+{
+	m_resizedImg.Destroy();
 }
 
 IMPLEMENT_DYNAMIC(CChildView, CWnd)
@@ -219,25 +223,27 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	if (!img.IsNull()) {
 		BITMAP bm = { 0 };
 		if (GetObjectW(img, sizeof(bm), &bm)) {
-			BLENDFUNCTION bf;
-			bf.AlphaFormat = AC_SRC_ALPHA;
-			bf.BlendFlags = 0;
-			bf.BlendOp = AC_SRC_OVER;
-			bf.SourceConstantAlpha = 0xFF;
-
 			int h = std::min(abs(bm.bmHeight), (LONG)r.Height());
 			int w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
 			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
-			int x = (r.Width() - w) / 2;
-			int y = (r.Height() - h) / 2;
+			int x = std::lround(((double)r.Width() - w) / 2.0);
+			int y = std::lround(((double)r.Height() - h) / 2.0);
 			r = CRect(CPoint(x, y), CSize(w, h));
 
-			int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
-			img.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
-			pDC->SetStretchBltMode(oldmode);
-			pDC->AlphaBlend(x, y, w, h, pDC, x, y, w, h, bf);
+			if (!r.IsRectEmpty()) {
+				if (m_resizedImg.IsNull() || r.Width() != m_resizedImg.GetWidth() || r.Height() != m_resizedImg.GetHeight() || img.GetBPP() != m_resizedImg.GetBPP()) {
+					m_resizedImg.Destroy();
+					m_resizedImg.Create(r.Width(), r.Height(), img.GetBPP());
 
-			pDC->ExcludeClipRect(r);
+					HDC hDC = m_resizedImg.GetDC();
+					SetStretchBltMode(hDC, STRETCH_HALFTONE);
+					img.StretchBlt(hDC, 0, 0, r.Width(), r.Height(), SRCCOPY);
+					m_resizedImg.ReleaseDC();
+				}
+
+				m_resizedImg.BitBlt(*pDC, r.TopLeft());
+				pDC->ExcludeClipRect(r);
+			}
 		}
 		img.Detach();
 	}
