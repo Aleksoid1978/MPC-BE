@@ -975,7 +975,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 		if (!m_bEdit) {
 			if (pMsg->message == WM_SYSKEYDOWN
-				&& pMsg->wParam == VK_RETURN && (HIWORD(pMsg->lParam) & KF_ALTDOWN)) {
+					&& pMsg->wParam == VK_RETURN && (HIWORD(pMsg->lParam) & KF_ALTDOWN)) {
 				m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 				return TRUE;
 			}
@@ -1060,6 +1060,10 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				case VK_END:
 				case VK_PRIOR:
 				case VK_NEXT:
+					if (GetKeyState(VK_CONTROL) < 0) {
+						m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+						return TRUE;
+					}
 				case VK_DELETE:
 				case VK_APPS: // "Menu key"
 					break;
