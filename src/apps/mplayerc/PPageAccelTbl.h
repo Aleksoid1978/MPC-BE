@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,6 +47,13 @@ private:
 
 	int m_counter;
 
+	struct ITEMDATA
+	{
+		size_t index = 0;
+		DWORD flag = 0;
+	};
+	std::vector<ITEMDATA*> m_pItemsData;
+
 public:
 	CPPageAccelTbl();
 	virtual ~CPPageAccelTbl();
@@ -71,6 +78,10 @@ public:
 	CStaticLink m_UIceLink;
 	BOOL m_bGlobalMedia;
 
+	UINT_PTR m_nStatusTimerID, m_nFilterTimerID;
+
+	CEdit m_FilterEdit;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
@@ -78,6 +89,10 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnSetActive();
 	virtual BOOL OnKillActive();
+
+	void ClearItemsData();
+	void SetupList();
+	void FilterList();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -90,6 +105,8 @@ public:
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnCustomdrawList(NMHDR*, LRESULT*);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	afx_msg void OnChangeFilterEdit();
 
 	virtual void OnCancel();
 };
