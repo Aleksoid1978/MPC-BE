@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"缩放: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"全局媒体按键"
-13		"全选"
-14		"重置已选项"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"全局媒体按键"
+15		"全选"
+16		"重置已选项"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"导出"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音频"
 6		"音量"
 7		"小"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"控制"
 21		"音量步进:"
 23		"速度步进:"
-26		"缺省设置"
-27		"字幕"
-29		"音轨:"
-31		"(例如: eng jap swe)"
-32		"打开设置"
-33		"开启音频文件时，"
-35		"于播放列表加入相似文件"
-36		"使用工作线程来创建筛选器图表"
-38		"报告渲染失败的接口(pin)"
-39		"记住播放列表中的选定曲目"
+27		"缺省设置"
+28		"字幕"
+30		"音轨:"
+32		"(例如: eng jap swe)"
+33		"打开设置"
+34		"开启音频文件时，"
+36		"于播放列表加入相似文件"
+37		"使用工作线程来创建筛选器图表"
+39		"报告渲染失败的接口(pin)"
+40		"记住播放列表中的选定曲目"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

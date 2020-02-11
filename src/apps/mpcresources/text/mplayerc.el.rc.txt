@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Μεγέθυνση: 0.2->5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Διεθνή πλήκτρα πολυμέσων"
-13		"Επιλογή όλων"
-14		"Επαναφορά επιλεγμένων"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Διεθνή πλήκτρα πολυμέσων"
+15		"Επιλογή όλων"
+16		"Επαναφορά επιλεγμένων"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Εξαγωγή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ήχος"
 6		"Ένταση"
 7		"Ελάχ."
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Έλεγχος"
 21		"Βήμα έντασης:"
 23		"Βήμα ταχύτητας:"
-26		"Προεπιλογή προτιμώμενων ιχνών"
-27		"Υπότιτλοι:"
-29		"Ήχος:"
-31		"(Παράδειγμα: ell eng fre)"
-32		"Ρυθμίσεις ανοίγματος"
-33		"Όταν ανοίγει ένα αρχείο ήχου,"
-35		"Προσθήκη παρόμοιων αρχείων στη λίστα"
-36		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
-38		"Αναφορά pin που απέτυχαν να αποδοθούν"
-39		"Remember selected tracks in playlist"
+27		"Προεπιλογή προτιμώμενων ιχνών"
+28		"Υπότιτλοι:"
+30		"Ήχος:"
+32		"(Παράδειγμα: ell eng fre)"
+33		"Ρυθμίσεις ανοίγματος"
+34		"Όταν ανοίγει ένα αρχείο ήχου,"
+36		"Προσθήκη παρόμοιων αρχείων στη λίστα"
+37		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
+39		"Αναφορά pin που απέτυχαν να αποδοθούν"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

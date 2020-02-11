@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"縮放：0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"全域媒體鍵"
-13		"選取全部項目"
-14		"重設已選項目"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"全域媒體鍵"
+15		"選取全部項目"
+16		"重設已選項目"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"匯出"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音訊"
 6		"音量"
 7		"小"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"控制"
 21		"音量步進幅度："
 23		"速度步進幅度："
-26		"預設軌道"
-27		"字幕"
-29		"音訊"
-31		"（範例：eng jap swe）"
-32		"開啟設定"
-33		"開啟音訊檔案時，"
-35		"於播放清單加入相似檔案"
-36		"使用工作執行緒建立篩選器圖 (Filter Graph)"
-38		"回報繪製失敗的 Pin"
-39		"記住播放清單中選定的項目"
+27		"預設軌道"
+28		"字幕"
+30		"音訊"
+32		"（範例：eng jap swe）"
+33		"開啟設定"
+34		"開啟音訊檔案時，"
+36		"於播放清單加入相似檔案"
+37		"使用工作執行緒建立篩選器圖 (Filter Graph)"
+39		"回報繪製失敗的 Pin"
+40		"記住播放清單中選定的項目"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

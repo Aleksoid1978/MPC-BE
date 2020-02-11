@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Velikost: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Globální mediální klávesy"
-13		"Označit vše"
-14		"Výchozí (označené)"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Globální mediální klávesy"
+15		"Označit vše"
+16		"Výchozí (označené)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportovat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Zvuk"
 6		"Hlasitost"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Preferované výchozí stopy"
-27		"Titulky:"
-29		"Zvuk:"
-31		"(Příklad: eng jap swe)"
-32		"Otevírání souborů"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Filtry načítat v samostatném podprocesu"
-38		"Vypisovat podrobné informace o chybějících kodecích"
-39		"Remember selected tracks in playlist"
+27		"Preferované výchozí stopy"
+28		"Titulky:"
+30		"Zvuk:"
+32		"(Příklad: eng jap swe)"
+33		"Otevírání souborů"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Filtry načítat v samostatném podprocesu"
+39		"Vypisovat podrobné informace o chybějících kodecích"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

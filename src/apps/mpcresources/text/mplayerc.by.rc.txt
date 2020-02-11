@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Машт: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Глабальныя мультымедыйныя клавішы"
-13		"Абраць усё"
-14		"Скінуць абраныя"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Глабальныя мультымедыйныя клавішы"
+15		"Абраць усё"
+16		"Скінуць абраныя"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Экспарт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Аўдыё"
 6		"Гучнасць"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Парадак загрузкі гуку"
-27		"Субтытры:"
-29		"Аўдыё:"
-31		"(Напрыклад: eng jap swe)"
-32		"Налады адкрыцця файлаў"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Прац. струмень для пабудовы ланцуга фільтраў"
-38		"Справазд. аб памылках рэндэрынгу струменяў"
-39		"Remember selected tracks in playlist"
+27		"Парадак загрузкі гуку"
+28		"Субтытры:"
+30		"Аўдыё:"
+32		"(Напрыклад: eng jap swe)"
+33		"Налады адкрыцця файлаў"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Прац. струмень для пабудовы ланцуга фільтраў"
+39		"Справазд. аб памылках рэндэрынгу струменяў"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

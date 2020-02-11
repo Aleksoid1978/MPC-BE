@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"拡大率: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"グローバル メディア キー"
-13		"すべて選択"
-14		"選択項目をリセット"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"グローバル メディア キー"
+15		"すべて選択"
+16		"選択項目をリセット"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"エクスポート"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音声"
 6		"音量"
 7		"最小"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"コントロール"
 21		"音量調節の刻み幅:"
 23		"速度調節の刻み幅:"
-26		"既定のトラック設定"
-27		"字幕"
-29		"音声:"
-31		"(例: eng jap swe)"
-32		"開く設定"
-33		"音声ファイルを開く時に、"
-35		"類似ファイルをプレイリストに追加する"
-36		"ワーカー スレッドを使用してフィルター グラフを作成する"
-38		"レンダリングに失敗したピンを報告する"
-39		"プレイリストで選択されたトラックを記憶する"
+27		"既定のトラック設定"
+28		"字幕"
+30		"音声:"
+32		"(例: eng jap swe)"
+33		"開く設定"
+34		"音声ファイルを開く時に、"
+36		"類似ファイルをプレイリストに追加する"
+37		"ワーカー スレッドを使用してフィルター グラフを作成する"
+39		"レンダリングに失敗したピンを報告する"
+40		"プレイリストで選択されたトラックを記憶する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

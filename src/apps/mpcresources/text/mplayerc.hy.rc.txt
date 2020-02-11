@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Չափը. 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Գլոբալ բազմամիջավայրային կոճակ."
-13		"Ընտրել բոլորը"
-14		"Ետարկել ընտրումը"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Գլոբալ բազմամիջավայրային կոճակ."
+15		"Ընտրել բոլորը"
+16		"Ետարկել ընտրումը"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Արտածել"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ձայնը"
 6		"Բարձրությունը"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Շավիղի կարգավորումներ"
-27		"Տողագրերի"
-29		"Ձայնի"
-31		"(Օրինակ՝ eng jap swe)"
-32		"Ֆայլերի բացման կարգավորում"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Ֆիլտրերի շարքի կառուցման հոսք"
-38		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
-39		"Remember selected tracks in playlist"
+27		"Շավիղի կարգավորումներ"
+28		"Տողագրերի"
+30		"Ձայնի"
+32		"(Օրինակ՝ eng jap swe)"
+33		"Ֆայլերի բացման կարգավորում"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Ֆիլտրերի շարքի կառուցման հոսք"
+39		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

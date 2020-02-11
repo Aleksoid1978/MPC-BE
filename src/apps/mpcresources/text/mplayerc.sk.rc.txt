@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Priblíženie: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Globálne mediálne klávesy"
-13		"Vybrať všetko"
-14		"Obnoviť vybrané"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Globálne mediálne klávesy"
+15		"Vybrať všetko"
+16		"Obnoviť vybrané"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Zvuk"
 6		"Hlasitosť"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Uprednostnenie predvolenej stopy"
-27		"Titulky"
-29		"zvuk"
-31		"(príklad: eng jap swe)"
-32		"Nastavenia otvárania súborov"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Pri vytváraní grafu filtra otvoriť iné vlákno"
-38		"Zaznamenať piny, ktoré sa nevykreslia"
-39		"Remember selected tracks in playlist"
+27		"Uprednostnenie predvolenej stopy"
+28		"Titulky"
+30		"zvuk"
+32		"(príklad: eng jap swe)"
+33		"Nastavenia otvárania súborov"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Pri vytváraní grafu filtra otvoriť iné vlákno"
+39		"Zaznamenať piny, ktoré sa nevykreslia"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

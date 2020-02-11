@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zoom: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Globale mediatoetsen"
-13		"Alles selecteren"
-14		"Selectie(s) resetten"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Globale mediatoetsen"
+15		"Alles selecteren"
+16		"Selectie(s) resetten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exporteren"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Bediening"
 21		"Volumestap:"
 23		"Snelheidsstap:"
-26		"Voorkeursspoor in standaard"
-27		"Ondertiteling"
-29		"Audio"
-31		"(Bijv.: nl eng jap )"
-32		"Opties voor openen"
-33		"Wanneer een audio-bestand is geopend,"
-35		"Dergelijke bestanden aan afspeellijst toevoegen"
-36		"Filtergraph in aparte CPU-thread samenstellen"
-38		"Rapporteer pins die niet renderen"
-39		"Onthoud geselecteerde items in de afspeellijst"
+27		"Voorkeursspoor in standaard"
+28		"Ondertiteling"
+30		"Audio"
+32		"(Bijv.: nl eng jap )"
+33		"Opties voor openen"
+34		"Wanneer een audio-bestand is geopend,"
+36		"Dergelijke bestanden aan afspeellijst toevoegen"
+37		"Filtergraph in aparte CPU-thread samenstellen"
+39		"Rapporteer pins die niet renderen"
+40		"Onthoud geselecteerde items in de afspeellijst"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

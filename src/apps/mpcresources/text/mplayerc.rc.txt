@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zoom: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Global Media Keys"
-13		"Select All"
-14		"Reset Selected"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Global Media Keys"
+15		"Select All"
+16		"Reset Selected"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Default track preference"
-27		"Subtitles:"
-29		"Audio:"
-31		"(Example: eng jap swe)"
-32		"Open settings"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Use worker thread to construct the filter graph"
-38		"Report pins which fail to render"
-39		"Remember selected tracks in playlist"
+27		"Default track preference"
+28		"Subtitles:"
+30		"Audio:"
+32		"(Example: eng jap swe)"
+33		"Open settings"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Use worker thread to construct the filter graph"
+39		"Report pins which fail to render"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
