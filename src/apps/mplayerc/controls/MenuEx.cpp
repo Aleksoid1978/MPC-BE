@@ -399,6 +399,11 @@ void CMenuEx::EnableHook(const bool bEnable)
 	m_bUseDrawHook = bEnable;
 }
 
+void CMenuEx::RemoveMenuProc()
+{
+	m_hMenuLast = nullptr;
+}
+
 LPCTSTR g_pszOldMenuProc = L"OldPopupMenuProc";
 
 LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
