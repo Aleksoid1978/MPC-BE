@@ -656,7 +656,6 @@ CMainFrame::~CMainFrame()
 	}
 
 	CMenuEx::UnHook();
-	CMenuEx::FreeResource();
 
 	if (m_hMainMenuBrush) {
 		::DeleteObject(m_hMainMenuBrush);

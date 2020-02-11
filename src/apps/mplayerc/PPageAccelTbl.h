@@ -52,11 +52,11 @@ private:
 		size_t index = 0;
 		DWORD flag = 0;
 	};
-	std::vector<ITEMDATA*> m_pItemsData;
+	std::vector<std::unique_ptr<ITEMDATA>> m_pItemsData;
 
 public:
 	CPPageAccelTbl();
-	virtual ~CPPageAccelTbl();
+	virtual ~CPPageAccelTbl() = default;
 
 	static CString MakeAccelModLabel(BYTE fVirt);
 	static CString MakeAccelShortcutLabel(UINT id);
@@ -90,7 +90,6 @@ protected:
 	virtual BOOL OnSetActive();
 	virtual BOOL OnKillActive();
 
-	void ClearItemsData();
 	void SetupList();
 	void FilterList();
 

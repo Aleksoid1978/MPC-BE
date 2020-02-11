@@ -129,11 +129,6 @@ CPPageAccelTbl::CPPageAccelTbl()
 {
 }
 
-CPPageAccelTbl::~CPPageAccelTbl()
-{
-	ClearItemsData();
-}
-
 BOOL CPPageAccelTbl::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN
@@ -682,10 +677,10 @@ BOOL CPPageAccelTbl::OnInitDialog()
 		for (size_t i = 0; i < m_wmcmds.size(); i++) {
 			const wmcmd& wc = m_wmcmds[i];
 			int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
-			auto itemData = DNew ITEMDATA;
+			auto itemData = std::make_unique<ITEMDATA>();
 			itemData->index = i;
-			m_pItemsData.push_back(itemData);
-			m_list.SetItemData(row, (DWORD_PTR)itemData);
+			m_list.SetItemData(row, (DWORD_PTR)itemData.get());
+			m_pItemsData.push_back(std::move(itemData));
 		}
 
 		SetupList();
@@ -1068,15 +1063,6 @@ void CPPageAccelTbl::OnCancel()
 	__super::OnCancel();
 }
 
-void CPPageAccelTbl::ClearItemsData()
-{
-	for (auto& item : m_pItemsData) {
-		SAFE_DELETE(item);
-	}
-
-	m_pItemsData.clear();
-}
-
 void CPPageAccelTbl::SetupList()
 {
 	for (int row = 0; row < m_list.GetItemCount(); row++) {
@@ -1121,16 +1107,16 @@ void CPPageAccelTbl::FilterList()
 
 	m_list.SetRedraw(false);
 	m_list.DeleteAllItems();
-	ClearItemsData();
+	m_pItemsData.clear();
 
 	if (filter.IsEmpty()) {
 		for (size_t i = 0; i < m_wmcmds.size(); i++) {
 			const wmcmd& wc = m_wmcmds[i];
 			int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
-			auto itemData = DNew ITEMDATA;
+			auto itemData = std::make_unique<ITEMDATA>();
 			itemData->index = i;
-			m_pItemsData.push_back(itemData);
-			m_list.SetItemData(row, (DWORD_PTR)itemData);
+			m_list.SetItemData(row, (DWORD_PTR)itemData.get());
+			m_pItemsData.push_back(std::move(itemData));
 		}
 	} else {
 		auto LowerCase = [](CString& str) {
@@ -1152,10 +1138,10 @@ void CPPageAccelTbl::FilterList()
 
 			if (sname.Find(filter) != -1 || hotkey.Find(filter) != -1 || id.Find(filter) != -1) {
 				int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
-				auto itemData = DNew ITEMDATA;
+				auto itemData = std::make_unique<ITEMDATA>();
 				itemData->index = i;
-				m_pItemsData.push_back(itemData);
-				m_list.SetItemData(row, (DWORD_PTR)itemData);
+				m_list.SetItemData(row, (DWORD_PTR)itemData.get());
+				m_pItemsData.push_back(std::move(itemData));
 			}
 		}
 	}
