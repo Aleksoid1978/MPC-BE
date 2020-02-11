@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zoom: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Taste media globale"
-13		"Selectează toate"
-14		"Resetează selectate"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Taste media globale"
+15		"Selectează toate"
+16		"Resetează selectate"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportă"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volum"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Preferința pentru pistă implicită"
-27		"Subtitrări:"
-29		"Audio:"
-31		"(Exemplu: rum eng jap swe)"
-32		"Setări pentru deschidere"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
-38		"Raportează pinii care eșuează să randeze"
-39		"Remember selected tracks in playlist"
+27		"Preferința pentru pistă implicită"
+28		"Subtitrări:"
+30		"Audio:"
+32		"(Exemplu: rum eng jap swe)"
+33		"Setări pentru deschidere"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
+39		"Raportează pinii care eșuează să randeze"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

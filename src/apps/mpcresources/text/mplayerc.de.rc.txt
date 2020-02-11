@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zoom: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Globale Multimediatasten "
-13		"&Alle markieren"
-14		"Markierte &zurücksetzen"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Globale Multimediatasten "
+15		"&Alle markieren"
+16		"Markierte &zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportieren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Lautstärke"
 7		"Min."
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Steuerung"
 21		"Lautstärkestufen:"
 23		"Geschwindigkeitstufen:"
-26		"Bevorzugte Spuren"
-27		"Untertitel:"
-29		"Audio:"
-31		"(Beispiel: eng jap swe)"
-32		"Aktionen beim Öffnen einer Datei"
-33		"Beim Öffnen einer Audiodatei,"
-35		"Ähnliche Dateien zur Wiedergabeliste hinzufügen"
-36		"Filter-Graph in separatem &Thread erstellen"
-38		"Fehlerhafte Pins im Graph &melden"
-39		"Ausgewählte Titel in der Wiedergabeliste merken"
+27		"Bevorzugte Spuren"
+28		"Untertitel:"
+30		"Audio:"
+32		"(Beispiel: eng jap swe)"
+33		"Aktionen beim Öffnen einer Datei"
+34		"Beim Öffnen einer Audiodatei,"
+36		"Ähnliche Dateien zur Wiedergabeliste hinzufügen"
+37		"Filter-Graph in separatem &Thread erstellen"
+39		"Fehlerhafte Pins im Graph &melden"
+40		"Ausgewählte Titel in der Wiedergabeliste merken"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

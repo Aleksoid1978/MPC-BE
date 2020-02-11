@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"זום: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"מקשי מדיה גלובליים"
-13		"בחר הכל"
-14		"אפס נבחר"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"מקשי מדיה גלובליים"
+15		"בחר הכל"
+16		"אפס נבחר"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"יצוא"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"שמע"
 6		"עצמת קול"
 7		"מינימום"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"תעדוף ברירת מחדל"
-27		"כתוביות:"
-29		"שמע:"
-31		"(דוגמה: eng jap swe)"
-32		"פתח הגדרות"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
-38		"דווח על תקעים שלא מתנגנים"
-39		"Remember selected tracks in playlist"
+27		"תעדוף ברירת מחדל"
+28		"כתוביות:"
+30		"שמע:"
+32		"(דוגמה: eng jap swe)"
+33		"פתח הגדרות"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
+39		"דווח על תקעים שלא מתנגנים"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

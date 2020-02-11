@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"확대: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"멀티미디어기능 키보드"
-13		"모두 선택"
-14		"선택 초기화"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"멀티미디어기능 키보드"
+15		"모두 선택"
+16		"선택 초기화"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"내보내기"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"오디오"
 6		"볼륨"
 7		"최소"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"기본 선호 트랙"
-27		"자막언어"
-29		"오디오언어"
-31		"(예: eng kor jap)"
-32		"열기 설정"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"필터그래프를 생성하는 작업자 쓰레드 사용"
-38		"렌더링에 실패하면 핀 보고"
-39		"Remember selected tracks in playlist"
+27		"기본 선호 트랙"
+28		"자막언어"
+30		"오디오언어"
+32		"(예: eng kor jap)"
+33		"열기 설정"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"필터그래프를 생성하는 작업자 쓰레드 사용"
+39		"렌더링에 실패하면 핀 보고"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

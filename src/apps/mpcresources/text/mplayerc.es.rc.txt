@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zoom: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Claves de Medios Globales"
-13		"Sel. Todos"
-14		"Reiniciar Sel."
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Claves de Medios Globales"
+15		"Sel. Todos"
+16		"Reiniciar Sel."
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Vol."
 7		"Mín"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Default track preference"
-27		"Subtítulos"
-29		"Audio"
-31		"(Ejemplo: eng jap swe)"
-32		"Opciones de apertura"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Usar proceso funcional para construir extr. de filtros"
-38		"Reportar conectores que no quieran funcionar"
-39		"Remember selected tracks in playlist"
+27		"Default track preference"
+28		"Subtítulos"
+30		"Audio"
+32		"(Ejemplo: eng jap swe)"
+33		"Opciones de apertura"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Usar proceso funcional para construir extr. de filtros"
+39		"Reportar conectores que no quieran funcionar"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

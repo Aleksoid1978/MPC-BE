@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zooma: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Multimedia Tekla Orokorrak"
-13		"Hautatu Denak"
-14		"Berrezarri Hautatutakoa"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Multimedia Tekla Orokorrak"
+15		"Hautatu Denak"
+16		"Berrezarri Hautatutakoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Esportatu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audioa"
 6		"Bolumena"
 7		"Gutx"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Kontrola"
 21		"Bolumen urratsa:"
 23		"Abiadura urratsa:"
-26		"Berezko bide hobespena"
-27		"Azpidatziak:"
-29		"Audioa:"
-31		"(Azpidatziak: eng jap baq)"
-32		"Ireki ezarpenak"
-33		"Audio agiri bat irekitzerakoan,"
-35		"Gehitu antzeko agiriak irakur-zerrendara"
-36		"Erabili langile hariak iragazki grafika eraikitzeko"
-38		"Jakinarazi aurkezlean huts egiten duten pin-ak"
-39		"Remember selected tracks in playlist"
+27		"Berezko bide hobespena"
+28		"Azpidatziak:"
+30		"Audioa:"
+32		"(Azpidatziak: eng jap baq)"
+33		"Ireki ezarpenak"
+34		"Audio agiri bat irekitzerakoan,"
+36		"Gehitu antzeko agiriak irakur-zerrendara"
+37		"Erabili langile hariak iragazki grafika eraikitzeko"
+39		"Jakinarazi aurkezlean huts egiten duten pin-ak"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

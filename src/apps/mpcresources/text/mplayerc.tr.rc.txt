@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Büyüt: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Genel Medya Tuşları"
-13		"Tümünü Seç"
-14		"Seçimi Sıfırla"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Genel Medya Tuşları"
+15		"Tümünü Seç"
+16		"Seçimi Sıfırla"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Ver"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ses"
 6		"Ses"
 7		"Alçak"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Kontrol"
 21		"Ses adımı:"
 23		"Hız adımı:"
-26		"Varsayılan parça seçimi"
-27		"Altyazı:"
-29		"Ses:"
-31		"(Örnek: tur türkçe İngilizce eng jap)"
-32		"Açma Ayarları"
-33		"Bir ses dosyası açıldığında,"
-35		"Benzer dosyaları oynatma listesine ekle"
-36		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
-38		"Çevrilemeyen ilişkilendirmeleri rapor et"
-39		"Oynatma listesindeki seçili parçaları hatırla"
+27		"Varsayılan parça seçimi"
+28		"Altyazı:"
+30		"Ses:"
+32		"(Örnek: tur türkçe İngilizce eng jap)"
+33		"Açma Ayarları"
+34		"Bir ses dosyası açıldığında,"
+36		"Benzer dosyaları oynatma listesine ekle"
+37		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
+39		"Çevrilemeyen ilişkilendirmeleri rapor et"
+40		"Oynatma listesindeki seçili parçaları hatırla"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35

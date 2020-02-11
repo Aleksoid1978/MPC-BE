@@ -150,12 +150,13 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 21		"Zoom: 0.2 -> 5.0"
 END
 
-BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 16
-7		"WinLIRC:"
-10		"uICE:"
-12		"Tasti multimediali globali"
-13		"Seleziona tutto"
-14		"Reimposta selezionati"
+BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
+5		"Filter:"
+9		"WinLIRC:"
+12		"uICE:"
+14		"Tasti multimediali globali"
+15		"Seleziona tutto"
+16		"Reimposta selezionati"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -349,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Esporta"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -365,16 +366,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
-26		"Preferenze traccia predefinita"
-27		"Sottotitoli"
-29		"Audio"
-31		"(Esempio: ita eng)"
-32		"Impostazioni all'apertura"
-33		"When opening an audio file,"
-35		"Add similar files to playlist"
-36		"Usa il worker thread per costruire il grafico filtri"
-38		"Mostra i pin che falliscono il rendering"
-39		"Remember selected tracks in playlist"
+27		"Preferenze traccia predefinita"
+28		"Sottotitoli"
+30		"Audio"
+32		"(Esempio: ita eng)"
+33		"Impostazioni all'apertura"
+34		"When opening an audio file,"
+36		"Add similar files to playlist"
+37		"Usa il worker thread per costruire il grafico filtri"
+39		"Mostra i pin che falliscono il rendering"
+40		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
