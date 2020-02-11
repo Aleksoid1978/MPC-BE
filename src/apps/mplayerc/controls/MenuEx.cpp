@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2019 see Authors.txt
+ * (C) 2018-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,16 +23,7 @@
 #include "../MainFrm.h"
 #include "../../../DSUtil/SysVersion.h"
 
-std::vector<MENUITEM*> m_pMenuItems;
-
-void CMenuEx::FreeResource()
-{
-	for (auto& item : m_pMenuItems) {
-		SAFE_DELETE(item);
-	}
-
-	m_pMenuItems.clear();
-}
+std::vector<std::unique_ptr<MENUITEM>> m_pMenuItems;
 
 void CMenuEx::SetMain(CMainFrame* pMainFrame)
 {
@@ -275,15 +266,16 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 		const auto uID = mii.wID;
 
 		LPMENUITEM lpItem = nullptr;
-		auto it = std::find_if(m_pMenuItems.begin(), m_pMenuItems.end(), [&](const MENUITEM* item) {
+		auto it = std::find_if(m_pMenuItems.begin(), m_pMenuItems.end(), [&](const std::unique_ptr<MENUITEM>& item) {
 			return item->uID == uID && item->bMainMenu == bMainMenu;
 		});
 
 		if (it != m_pMenuItems.end()) {
-			lpItem = *it;
+			lpItem = it->get();
 		} else {
-			lpItem = DNew MENUITEM;
-			m_pMenuItems.push_back(lpItem);
+			auto itemPtr = std::make_unique<MENUITEM>();
+			lpItem = itemPtr.get();
+			m_pMenuItems.push_back(std::move(itemPtr));
 		}
 
 		lpItem->uID = uID;
