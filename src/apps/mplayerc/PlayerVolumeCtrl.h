@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,22 +30,26 @@ class CVolumeCtrl : public CSliderCtrl
 	DECLARE_DYNAMIC(CVolumeCtrl)
 
 private:
-	bool	m_bSelfDrawn;
-	bool	m_bItemRedraw;
-
-	CBitmap	m_bmUnderCtrl;
+	bool m_bSelfDrawn;
+	bool m_bItemRedraw = false;
 
 	CMPCPngImage m_BackGroundbm;
 	CMPCPngImage m_Volumebm;
 
-	int		m_nThemeBrightness;
-	int		m_nThemeRed;
-	int		m_nThemeGreen;
-	int		m_nThemeBlue;
+	int m_nThemeBrightness = -1;
+	int m_nThemeRed = -1;
+	int m_nThemeGreen = -1;
+	int m_nThemeBlue = -1;
+
+	CBitmap m_bmUnderCtrl;
+
+	CImage m_cashedImage;
+	bool m_bRedraw = true;
+	bool m_bMute = false;
 
 public:
 	CVolumeCtrl(bool bSelfDrawn = true);
-	virtual ~CVolumeCtrl();
+	virtual ~CVolumeCtrl() = default;
 
 	bool Create(CWnd* pParentWnd);
 
