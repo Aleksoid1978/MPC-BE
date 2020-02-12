@@ -566,6 +566,7 @@ void CAppSettings::ResetSettings()
 	fRewind = false;
 	nVolumeStep = 5;
 	nSpeedStep = 0; // auto
+	bSpeedNotReset = false;
 
 	strAudioRendererDisplayName.Empty();
 	strSecondAudioRendererDisplayName.Empty();
@@ -941,6 +942,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep, 1, 10);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
 	nSpeedStep = discard(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SPEED_NOTRESET, bSpeedNotReset);
 
 	m_VRSettings.Load();
 
@@ -1636,6 +1638,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SPEED_NOTRESET, bSpeedNotReset);
+
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle);

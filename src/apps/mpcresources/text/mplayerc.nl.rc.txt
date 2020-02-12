@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Bediening"
 21		"Volumestap:"
 23		"Snelheidsstap:"
+25		"Do not reset speed for session"
 27		"Voorkeursspoor in standaard"
 28		"Ondertiteling"
 30		"Audio"

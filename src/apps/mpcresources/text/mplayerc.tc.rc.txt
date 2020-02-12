@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"控制"
 21		"音量步進幅度："
 23		"速度步進幅度："
+25		"Do not reset speed for session"
 27		"預設軌道"
 28		"字幕"
 30		"音訊"

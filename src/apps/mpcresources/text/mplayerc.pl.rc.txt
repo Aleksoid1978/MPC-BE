@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Kontrola"
 21		"Zm. głosności co:"
 23		"Zm. prędkości co:"
+25		"Do not reset speed for session"
 27		"Preferowane"
 28		"napisy:"
 30		"audio:"

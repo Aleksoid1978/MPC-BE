@@ -636,6 +636,7 @@ public:
 	bool			fLoopForever;
 	bool			fRewind;
 	int				nSpeedStep;
+	bool			bSpeedNotReset;
 	bool			fUseInternalSelectTrackLogic;
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;

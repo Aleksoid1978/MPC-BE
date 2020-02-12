@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Kontrola"
 21		"Bolumen urratsa:"
 23		"Abiadura urratsa:"
+25		"Do not reset speed for session"
 27		"Berezko bide hobespena"
 28		"Azpidatziak:"
 30		"Audioa:"
