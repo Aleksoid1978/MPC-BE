@@ -591,22 +591,19 @@ void CPlayerToolBar::OnUpdateSubtitle(CCmdUI* pCmdUI)
 
 void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	//UpdateButonState(ID_NAVIGATE_SUBTITLES, FALSE);
+	LPNMTBCUSTOMDRAW pTBCD = reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
+	LRESULT lr = CDRF_DODEFAULT;
 
-	LPNMTBCUSTOMDRAW pTBCD	= reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
-	LRESULT lr				= CDRF_DODEFAULT;
-
-	CAppSettings& s	= AfxGetAppSettings();
-	bool bGPU		= (m_pMainFrame->GetMediaState() != -1) && DXVAState::GetState();
+	const auto& s = AfxGetAppSettings();
+	const auto bGPU = (m_pMainFrame->GetMediaState() != -1) && DXVAState::GetState() && m_hDXVAIcon;
 
 	int R, G, B, R2, G2, B2;
 
 	GRADIENT_RECT gr = {0, 1};
 
-	int sep[] = {2, 7, 10, 11};
+	static const int sep[] = {2, 7, 10, 11};
 
 	if (s.bUseDarkTheme) {
-
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
 		case CDDS_PREERASE:
@@ -616,8 +613,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 		case CDDS_PREPAINT: {
 				CDC dc;
 				dc.Attach(pTBCD->nmcd.hdc);
-				CRect r;
 
+				CRect r;
 				GetClientRect(&r);
 
 				if (m_BackGroundbm.IsExtGradiendLoading()) {
@@ -638,8 +635,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPREPAINT:
-			lr = CDRF_DODEFAULT;
-
 			lr |= TBCDRF_NOETCHEDEFFECT;
 			lr |= TBCDRF_NOBACKGROUND;
 			lr |= TBCDRF_NOEDGES;
@@ -649,52 +644,49 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPOSTPAINT:
-			lr = CDRF_DODEFAULT;
-
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
-			CRect r;
-			CopyRect(&r,&pTBCD->nmcd.rc);
 
-			CRect rGlassLike(0, 0, 8, 8);
-			int nW = rGlassLike.Width(), nH = rGlassLike.Height();
-			CDC memdc;
-			memdc.CreateCompatibleDC(&dc);
-			CBitmap *bmOld, bmGlassLike;
-			bmGlassLike.CreateCompatibleBitmap(&dc, nW, nH);
-			bmOld = memdc.SelectObject(&bmGlassLike);
-
-			TRIVERTEX tv[2] = {
-				{0, 0, 255 * 256, 255 * 256, 255 * 256, 255 * 256},
-				{nW, nH, 0, 0, 0, 0},
-			};
-			memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
-
-			BLENDFUNCTION bf;
-			bf.AlphaFormat			= AC_SRC_ALPHA;
-			bf.BlendFlags			= 0;
-			bf.BlendOp				= AC_SRC_OVER;
-			bf.SourceConstantAlpha	= 90;
-
-			CPen penFrHot(PS_SOLID, 0, 0x00e9e9e9);//clr_resFace
-			CPen *penSaved		= dc.SelectObject(&penFrHot);
-			CBrush *brushSaved	= (CBrush*)dc.SelectStockObject(NULL_BRUSH);
-
-			//CDIS_SELECTED,CDIS_GRAYED,CDIS_DISABLED,CDIS_CHECKED,CDIS_FOCUS,CDIS_DEFAULT,CDIS_HOT,CDIS_MARKED,CDIS_INDETERMINATE
+			CRect r(pTBCD->nmcd.rc);
 
 			if (CDIS_HOT == pTBCD->nmcd.uItemState || CDIS_CHECKED + CDIS_HOT == pTBCD->nmcd.uItemState) {
-				dc.SelectObject(&penFrHot);
+				const int gWidth  = 8;
+				const int gHeight = 8;
+
+				CDC memdc;
+				memdc.CreateCompatibleDC(&dc);
+
+				CBitmap *bmOld, bmGlassLike;
+				bmGlassLike.CreateCompatibleBitmap(&dc, gWidth, gHeight);
+				bmOld = memdc.SelectObject(&bmGlassLike);
+
+				TRIVERTEX tv[2] = {
+					{0, 0, 255 * 256, 255 * 256, 255 * 256, 255 * 256},
+					{gWidth, gHeight, 0, 0, 0, 0},
+				};
+				memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+
+				BLENDFUNCTION bf;
+				bf.AlphaFormat         = AC_SRC_ALPHA;
+				bf.BlendFlags          = 0;
+				bf.BlendOp             = AC_SRC_OVER;
+				bf.SourceConstantAlpha = 90;
+
+				CBrush* brushSaved = (CBrush*)dc.SelectStockObject(NULL_BRUSH);
+				CPen penFrHot(PS_SOLID, 0, 0x00e9e9e9);
+				CPen* penSaved = dc.SelectObject(&penFrHot);
+
 				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
-				AlphaBlend(dc.m_hDC, r.left + 2, r.top + 2, r.Width() - 4, 0.7 * r.Height() - 2, memdc, 0, 0, nW, nH, bf);
+				AlphaBlend(dc.m_hDC, r.left + 2, r.top + 2, r.Width() - 4, 0.7 * r.Height() - 2, memdc, 0, 0, gWidth, gHeight, bf);
+
+				dc.SelectObject(&penSaved);
+				dc.SelectObject(&brushSaved);
+
+				DeleteObject(memdc.SelectObject(bmOld));
+				memdc.DeleteDC();
 			}
-			/*
-			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
-				CPen penFrChecked(PS_SOLID,0,0x00808080);//clr_resDark
-				dc.SelectObject(&penFrChecked);
-				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
-			}
-			*/
-			for (int j = 0; j < _countof(sep); j++) {
+
+			for (size_t j = 0; j < std::size(sep); j++) {
 				GetItemRect(sep[j], &r);
 
 				if (m_BackGroundbm.IsExtGradiendLoading()) {
@@ -710,23 +702,21 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 				}
 			}
-			CRect r10; //SUB
-			GetItemRect(10, &r10);
 
-			CRect r12; //MUTE
-			GetItemRect(12, &r12);
+			if (bGPU) {
+				CRect rSub;
+				GetItemRect(10, &rSub);
 
-			if (bGPU && m_hDXVAIcon) {
-				if (r10.right < r12.left - m_nDXVAIconWidth) {
-					DrawIconEx(dc.m_hDC, r12.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2 + 1), m_hDXVAIcon, 0, 0, 0, nullptr, DI_NORMAL);
+				CRect rVolume;
+				GetItemRect(12, &rVolume);
+
+				if (rSub.right < rVolume.left - m_nDXVAIconWidth) {
+					DrawIconEx(dc.m_hDC, rVolume.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2 + 1), m_hDXVAIcon, 0, 0, 0, nullptr, DI_NORMAL);
 				}
 			}
 
-			dc.SelectObject(&penSaved);
-			dc.SelectObject(&brushSaved);
 			dc.Detach();
-			DeleteObject(memdc.SelectObject(bmOld));
-			memdc.DeleteDC();
+
 			lr |= CDRF_SKIPDEFAULT;
 			break;
 		}
@@ -748,25 +738,21 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPREPAINT:
-			lr = CDRF_DODEFAULT;
-
 			lr |= CDRF_NOTIFYPOSTPAINT;
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPOSTPAINT:
-			lr = CDRF_DODEFAULT;
-
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 
-			for (int j = 0; j < _countof(sep); j++) {
+			for (size_t j = 0; j < std::size(sep); j++) {
 				GetItemRect(sep[j], &r);
-
 				dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
 			}
 
 			dc.Detach();
+
 			lr |= CDRF_SKIPDEFAULT;
 			break;
 		}
