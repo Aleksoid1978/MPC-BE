@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,15 +32,11 @@ CVolumeCtrl::CVolumeCtrl(bool bSelfDrawn/* = true*/)
 {
 }
 
-CVolumeCtrl::~CVolumeCtrl()
-{
-}
-
 bool CVolumeCtrl::Create(CWnd* pParentWnd)
 {
-	VERIFY(CSliderCtrl::Create(WS_CHILD | WS_VISIBLE | TBS_NOTICKS | TBS_HORZ | TBS_TOOLTIPS, CRect(0,0,0,0), pParentWnd, IDC_SLIDER1));
+	VERIFY(CSliderCtrl::Create(WS_CHILD | WS_VISIBLE | TBS_NOTICKS | TBS_HORZ | TBS_TOOLTIPS, CRect(), pParentWnd, IDC_SLIDER1));
 
-	CAppSettings& s = AfxGetAppSettings();
+	const auto& s = AfxGetAppSettings();
 
 	if (m_BackGroundbm.FileExists(L"background")) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
@@ -55,18 +51,20 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
-	m_nUseDarkTheme		= (int)s.bUseDarkTheme + 1;
+	m_nUseDarkTheme = (int)s.bUseDarkTheme + 1;
 
-	m_nThemeBrightness	= s.nThemeBrightness;
-	m_nThemeRed			= s.nThemeRed;
-	m_nThemeGreen		= s.nThemeGreen;
-	m_nThemeBlue		= s.nThemeBlue;
+	m_nThemeBrightness = s.nThemeBrightness;
+	m_nThemeRed        = s.nThemeRed;
+	m_nThemeGreen      = s.nThemeGreen;
+	m_nThemeBlue       = s.nThemeBlue;
 
 	return TRUE;
 }
 
 void CVolumeCtrl::SetPosInternal(int pos)
 {
+	m_bRedraw = true;
+
 	SetPos(pos);
 
 	GetParent()->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
@@ -106,7 +104,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	LRESULT lr = CDRF_DODEFAULT;
-	CAppSettings& s = AfxGetAppSettings();
+	const auto& s = AfxGetAppSettings();
 
 	int R, G, B, R2, G2, B2;
 
@@ -123,10 +121,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						|| m_nThemeBlue != s.nThemeBlue)) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
+
 					CRect r;
 					GetClientRect(&r);
 					InvalidateRect(&r);
-					CDC memdc;
 
 					if (m_BackGroundbm.IsExtGradiendLoading()) {
 						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
@@ -141,6 +139,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 					}
 
+					CDC memdc;
 					memdc.CreateCompatibleDC(&dc);
 
 					if (m_bmUnderCtrl.GetSafeHandle() != nullptr) {
@@ -161,6 +160,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					memdc.DeleteDC();
 
 					m_bItemRedraw = true;
+					m_bRedraw = true;
 				}
 
 				lr = CDRF_NOTIFYITEMDRAW;
@@ -172,98 +172,117 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 			case CDDS_ITEMPREPAINT:
 			case CDDS_POSTPAINT:
 				if (s.bUseDarkTheme && m_bmUnderCtrl.GetSafeHandle() != nullptr) {
-					CDC dc;
-					dc.Attach(pNMCD->hdc);
 					CRect rc;
 					GetClientRect(&rc);
 					InvalidateRect(&rc);
-					CDC memdc;
-					memdc.CreateCompatibleDC(&dc);
 
-					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
+					if (m_bRedraw
+							|| m_nThemeBrightness != s.nThemeBrightness
+							|| m_nThemeRed != s.nThemeRed
+							|| m_nThemeGreen != s.nThemeGreen
+							|| m_nThemeBlue != s.nThemeBlue
+							|| m_bMute != s.fMute) {
+						m_bRedraw = false;
 
-					if (m_nUseDarkTheme == 0) {
-						m_nUseDarkTheme++;
-					}
+						m_nThemeBrightness = s.nThemeBrightness;
+						m_nThemeRed = s.nThemeRed;
+						m_nThemeGreen = s.nThemeGreen;
+						m_nThemeBlue = s.nThemeBlue;
+						m_bMute = s.fMute;
 
-					m_nThemeBrightness	= s.nThemeBrightness;
-					m_nThemeRed			= s.nThemeRed;
-					m_nThemeGreen		= s.nThemeGreen;
-					m_nThemeBlue		= s.nThemeBlue;
+						m_cashedImage.Destroy();
+						m_cashedImage.Create(rc.Width(), rc.Height(), 32);
 
-					const COLORREF p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
-					int nVolume = GetPos();
+						CDC dc;
+						dc.Attach(m_cashedImage.GetDC());
 
-					if (nVolume <= GetPageSize()) {
-						nVolume = 0;
-					}
+						CDC memdc;
+						memdc.CreateCompatibleDC(&dc);
 
-					const CRect DeflateRect(4, 2 + 1, 9, 6 + 5);
+						CBitmap* bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-					CRect r_volume(rc);
-					r_volume.DeflateRect(&DeflateRect);
-					const int width_volume = r_volume.Width() - 9;
-					const int nVolPos = rc.left + (nVolume * width_volume / 100) + 4;
-
-					if (m_Volumebm.IsExtGradiendLoading()) {
-						m_Volumebm.PaintExternalGradient(&dc, rc, 0);
-					} else {
-						const COLOR16 ir1 = (p1 * 256);
-						const COLOR16 ig1 = (p1 >> 8) * 256;
-						const COLOR16 ib1 = (p1 >> 16) * 256;
-						const COLOR16 ir2 = (p2 * 256);
-						const COLOR16 ig2 = (p2 >> 8) * 256;
-						const COLOR16 ib2 = (p2 >> 16) * 256;
-						const COLOR16 pa  = (255 * 256);
-
-						TRIVERTEX tv[2] = {
-							{rc.left, rc.top, ir1, ig1, ib1, pa},
-							{r_volume.Width(), 1, ir2, ig2, ib2, pa},
-						};
-						dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
-					}
-
-					const COLORREF p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);
-					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
-
-					dc.BitBlt(0, 0, rc.Width(), rc.Height(), &memdc, 0, 0, SRCCOPY);
-
-					DeleteObject(memdc.SelectObject(bmOld));
-					memdc.DeleteDC();
-
-					rc.DeflateRect(&DeflateRect);
-					CopyRect(&pNMCD->rc, &rc);
-
-					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
-					CPen *penOld = dc.SelectObject(&penRight);
-
-					int nposx, nposy;
-					const int width = rc.Width() - 9;
-					const int step = width / 10;
-
-					int i = 4;
-					while (i <= width) {
-						nposx = rc.left + i;
-						nposy = rc.bottom - (rc.Height() * i) / (rc.Width() + 6);
-
-						i < nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
-
-						dc.MoveTo(nposx, nposy);			// top_left
-						dc.LineTo(nposx + 2, nposy);		// top_right
-						dc.LineTo(nposx + 2, rc.bottom);	// bottom_right
-						dc.LineTo(nposx, rc.bottom);		// bottom_left
-						dc.LineTo(nposx, nposy);			// top_left
-
-						if (!s.fMute) {
-							dc.MoveTo(nposx + 1, nposy - 1);		// top_middle
-							dc.LineTo(nposx + 1, rc.bottom + 2);	// bottom_middle
+						if (m_nUseDarkTheme == 0) {
+							m_nUseDarkTheme++;
 						}
 
-						i += step;
+						const COLORREF p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
+						int nVolume = GetPos();
+
+						if (nVolume <= GetPageSize()) {
+							nVolume = 0;
+						}
+
+						const CRect DeflateRect(4, 2 + 1, 9, 6 + 5);
+
+						CRect r_volume(rc);
+						r_volume.DeflateRect(&DeflateRect);
+						const int width_volume = r_volume.Width() - 9;
+						const int nVolPos = rc.left + (nVolume * width_volume / 100) + 4;
+
+						if (m_Volumebm.IsExtGradiendLoading()) {
+							m_Volumebm.PaintExternalGradient(&dc, rc, 0);
+						} else {
+							const COLOR16 ir1 = (p1 * 256);
+							const COLOR16 ig1 = (p1 >> 8) * 256;
+							const COLOR16 ib1 = (p1 >> 16) * 256;
+							const COLOR16 ir2 = (p2 * 256);
+							const COLOR16 ig2 = (p2 >> 8) * 256;
+							const COLOR16 ib2 = (p2 >> 16) * 256;
+							const COLOR16 pa = (255 * 256);
+
+							TRIVERTEX tv[2] = {
+								{rc.left, rc.top, ir1, ig1, ib1, pa},
+								{r_volume.Width(), 1, ir2, ig2, ib2, pa},
+							};
+							dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
+						}
+
+						const COLORREF p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);
+						CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
+
+						dc.BitBlt(0, 0, rc.Width(), rc.Height(), &memdc, 0, 0, SRCCOPY);
+
+						DeleteObject(memdc.SelectObject(bmOld));
+						memdc.DeleteDC();
+
+						rc.DeflateRect(&DeflateRect);
+						CopyRect(&pNMCD->rc, &rc);
+
+						CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
+						CPen* penOld = dc.SelectObject(&penRight);
+
+						int nposx, nposy;
+						const int width = rc.Width() - 9;
+						const int step = width / 10;
+
+						int i = 4;
+						while (i <= width) {
+							nposx = rc.left + i;
+							nposy = rc.bottom - (rc.Height() * i) / (rc.Width() + 6);
+
+							i < nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
+
+							dc.MoveTo(nposx, nposy);         // top_left
+							dc.LineTo(nposx + 2, nposy);     // top_right
+							dc.LineTo(nposx + 2, rc.bottom); // bottom_right
+							dc.LineTo(nposx, rc.bottom);     // bottom_left
+							dc.LineTo(nposx, nposy);         // top_left
+
+							if (!s.fMute) {
+								dc.MoveTo(nposx + 1, nposy - 1);     // top_middle
+								dc.LineTo(nposx + 1, rc.bottom + 2); // bottom_middle
+							}
+
+							i += step;
+						}
+
+						dc.SelectObject(penOld);
+						dc.Detach();
+
+						m_cashedImage.ReleaseDC();
 					}
 
-					dc.SelectObject(penOld);
-					dc.Detach();
+					m_cashedImage.BitBlt(pNMCD->hdc, 0, 0);
 
 					lr = CDRF_SKIPDEFAULT;
 					m_bItemRedraw = false;
