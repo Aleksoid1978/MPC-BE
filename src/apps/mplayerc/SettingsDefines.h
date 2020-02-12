@@ -105,6 +105,7 @@
 #define IDS_RS_REWIND						L"Rewind"
 #define IDS_RS_VOLUME_STEP					L"VolumeStep"
 #define IDS_RS_SPEED_STEP					L"SpeedStep"
+#define IDS_RS_SPEED_NOTRESET				L"SpeedNotReset"
 #define IDS_RS_MULTIINST					L"MultipleInstances"
 #define IDS_RS_ALWAYSONTOP					L"AlwaysOnTop"
 #define IDS_RS_DVDPATH						L"DVDPath"

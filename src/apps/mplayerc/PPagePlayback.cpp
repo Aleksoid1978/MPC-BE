@@ -37,6 +37,7 @@ CPPagePlayback::CPPagePlayback()
 	, m_fEnableWorkerThreadForOpening(FALSE)
 	, m_fReportFailedPins(FALSE)
 	, m_nVolumeStep(1)
+	, m_bSpeedNotReset(FALSE)
 	, m_fUseInternalSelectTrackLogic(TRUE)
 	, m_bRememberSelectedTracks(FALSE)
 {
@@ -63,6 +64,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBOVOLUME, m_nVolumeStep);
 	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
+	DDX_Check(pDX, IDC_CHECK9, m_bSpeedNotReset);
 
 	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
 	DDX_Text(pDX, IDC_EDIT2, m_subtitlesLanguageOrder);
@@ -125,6 +127,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	AddStringData(m_nSpeedStepCtrl, L"0.5",  50);
 	AddStringData(m_nSpeedStepCtrl, L"1.0", 100);
 	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
+	m_bSpeedNotReset = s.bSpeedNotReset;
 
 	m_fUseInternalSelectTrackLogic	= s.fUseInternalSelectTrackLogic;
 	m_subtitlesLanguageOrder		= s.strSubtitlesLanguageOrder;
@@ -169,6 +172,7 @@ BOOL CPPagePlayback::OnApply()
 	AfxGetMainFrame()->m_wndToolBar.m_volctrl.SetPageSize(s.nVolumeStep);
 
 	s.nSpeedStep = GetCurItemData(m_nSpeedStepCtrl);
+	s.bSpeedNotReset = !!m_bSpeedNotReset;
 
 	s.fUseInternalSelectTrackLogic = !!m_fUseInternalSelectTrackLogic;
 

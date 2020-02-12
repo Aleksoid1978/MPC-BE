@@ -50,6 +50,7 @@ public:
 	int			m_nVolumeStep;
 	CComboBox	m_nVolumeStepCtrl;
 	CComboBox	m_nSpeedStepCtrl;
+	BOOL		m_bSpeedNotReset;
 
 	BOOL		m_fUseInternalSelectTrackLogic;
 	CString		m_subtitlesLanguageOrder;

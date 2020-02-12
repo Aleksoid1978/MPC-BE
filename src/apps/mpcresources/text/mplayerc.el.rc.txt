@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Έλεγχος"
 21		"Βήμα έντασης:"
 23		"Βήμα ταχύτητας:"
+25		"Do not reset speed for session"
 27		"Προεπιλογή προτιμώμενων ιχνών"
 28		"Υπότιτλοι:"
 30		"Ήχος:"

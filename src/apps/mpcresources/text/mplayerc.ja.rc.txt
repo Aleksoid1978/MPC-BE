@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"コントロール"
 21		"音量調節の刻み幅:"
 23		"速度調節の刻み幅:"
+25		"Do not reset speed for session"
 27		"既定のトラック設定"
 28		"字幕"
 30		"音声:"

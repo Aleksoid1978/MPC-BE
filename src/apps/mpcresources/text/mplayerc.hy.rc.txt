@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
+25		"Do not reset speed for session"
 27		"Շավիղի կարգավորումներ"
 28		"Տողագրերի"
 30		"Ձայնի"

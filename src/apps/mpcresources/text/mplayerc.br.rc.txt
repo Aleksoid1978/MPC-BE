@@ -366,6 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Control"
 21		"Volume step:"
 23		"Speed step:"
+25		"Do not reset speed for session"
 27		"Preferência de faixa padrão"
 28		"Legenda"
 30		"Áudio"
