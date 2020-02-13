@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Steuerung"
 21		"Lautstärkestufen:"
 23		"Geschwindigkeitstufen:"
-25		"Do not reset speed for session"
+25		"Geschwindigkeit in einer Sitzung nicht zurücksetzen"
 27		"Bevorzugte Spuren"
 28		"Untertitel:"
 30		"Audio:"
