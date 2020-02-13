@@ -1812,6 +1812,7 @@ STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Копіювати до ""буферу о
 STRING IDS_PLAYLIST_DELETE		"&Видалити до кошика"
 STRING IDS_PLAYLIST_DELETE_CURRENT		"Видалити список відтворення"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Ви впевнені, що хочете видалити файл(и) до кошика ?"
+STRING IDS_PLAYLIST_DETERMINEDURATION		"Determine duration when adding"
 STRING IDS_PLAYLIST_EXPLORER_NAME		"Провідник"
 STRING IDS_PLAYLIST_EXPLORER_REFRESH		"Оновити"
 STRING IDS_PLAYLIST_HIDEFS		"Приховувати якщо 'На весь екран'"

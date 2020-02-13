@@ -147,6 +147,8 @@ public:
 	CPlaylist() = default;
 	~CPlaylist() = default;
 
+	POSITION Append(CPlaylistItem& item, const bool bParseDuration);
+
 	bool RemoveAll();
 	bool RemoveAt(POSITION pos);
 

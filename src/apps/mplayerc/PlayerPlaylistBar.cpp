@@ -503,6 +503,25 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 }
 
+POSITION CPlaylist::Append(CPlaylistItem& item, const bool bParseDuration)
+{
+	if (bParseDuration && !item.m_duration && !item.m_fns.empty()) {
+		const auto& fn = item.m_fns.front().GetName();
+		if (!::PathIsURLW(item.m_fns.front()) && ::PathFileExistsW(item.m_fns.front())) {
+			MediaInfo MI;
+			MI.Option(L"ParseSpeed", L"0");
+			if (MI.Open(fn.GetString())) {
+				CString duration = MI.Get(Stream_General, 0, L"Duration", Info_Text, Info_Name).c_str();
+				if (!duration.IsEmpty() && StrToInt64(duration.GetString(), item.m_duration)) {
+					item.m_duration *= 10000LL;
+				}
+			}
+		}
+	}
+
+	return AddTail(item);
+}
+
 bool CPlaylist::RemoveAll()
 {
 	__super::RemoveAll();
@@ -1164,7 +1183,7 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 		}
 	}
 
-	curPlayList.AddTail(pli);
+	curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
 }
 
 static bool SearchFiles(CString path, std::list<CString>& sl, bool bSingleElement)
@@ -1468,7 +1487,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 	std::sort(idx.begin(), idx.end());
 
 	for (size_t i = 0; i < idx.size(); i++) {
-		curPlayList.AddTail(pli[idx[i]]);
+		curPlayList.Append(pli[idx[i]], AfxGetAppSettings().bPlaylistDetermineDuration && curTab.type == PLAYLIST);
 	}
 
 	if (curTab.type == EXPLORER) {
@@ -1734,12 +1753,12 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	}
 
 	if (!bNeedParse) {
-		for (const auto& pli : playlist) {
+		for (auto& pli : playlist) {
 			const auto& fn = pli.m_fns.front();
 			if (::PathIsURLW(fn) && m_pMainFrame->OpenYoutubePlaylist(fn, TRUE)) {
 				continue;
 			}
-			curPlayList.AddTail(pli);
+			curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
 		}
 	}
 
@@ -1829,7 +1848,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 
 			pli.m_fns.push_front(fi);
 
-			curPlayList.AddTail(pli);
+			curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
 		}
 	}
 
@@ -2030,7 +2049,7 @@ void CPlayerPlaylistBar::Append(const CFileItemList& fis)
 		CPlaylistItem pli;
 		pli.m_fns.push_front(fi.GetName());
 		pli.m_label = fi.GetTitle();
-		curPlayList.AddTail(pli);
+		curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
 	}
 
 	Refresh();
@@ -3243,7 +3262,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SHOWTOOLTIP,
 		M_SHOWSEARCHBAR,
 		M_HIDEFULLSCREEN,
-		M_NEXTONERROR
+		M_NEXTONERROR,
+		M_DURATION
 	};
 
 	CAppSettings& s = AfxGetAppSettings();
@@ -3304,6 +3324,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bPlaylistNextOnError ? MF_CHECKED : MF_UNCHECKED), M_NEXTONERROR, ResStr(IDS_PLAYLIST_NEXTONERROR));
+
+	if (!bExplorer) {
+		m.AppendMenu(MF_SEPARATOR);
+		m.AppendMenu(MF_STRING | MF_ENABLED | (s.bPlaylistDetermineDuration ? MF_CHECKED : MF_UNCHECKED), M_DURATION, ResStr(IDS_PLAYLIST_DETERMINEDURATION));
+	}
 
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		MENUINFO MenuInfo = { 0 };
@@ -3687,6 +3712,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_NEXTONERROR:
 			s.bPlaylistNextOnError = !s.bPlaylistNextOnError;
+			break;
+		case M_DURATION:
+			s.bPlaylistDetermineDuration = !s.bPlaylistDetermineDuration;
 			break;
 		default:
 			break;

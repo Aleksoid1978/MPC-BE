@@ -865,6 +865,7 @@ public:
 	bool			bShowPlaylistTooltip;
 	bool			bShowPlaylistSearchBar;
 	bool			bPlaylistNextOnError;
+	bool			bPlaylistDetermineDuration;
 
 	// OTHER STATES
 	CString			strLastOpenDir;
