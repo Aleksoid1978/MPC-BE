@@ -379,9 +379,10 @@ void CVolumeCtrl::OnSetFocus(CWnd* pOldWnd)
 
 void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
+	m_bRedraw = true;
 	AfxGetAppSettings().nVolume = GetPos();
-	CFrameWnd* pFrame = GetParentFrame();
 
+	CFrameWnd* pFrame = GetParentFrame();
 	if (pFrame && pFrame != GetParent()) {
 		pFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
 	}
