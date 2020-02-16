@@ -13650,6 +13650,7 @@ void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 {
 	ASSERT(m_eMediaLoadState == MLS_LOADING);
+	CAppSettings& s = AfxGetAppSettings();
 
 	SetAudioPicture(FALSE);
 
@@ -13665,7 +13666,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_ExtSubPaths.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
-	m_PlaybackRate = 1.0;
+	if (GetPlaybackMode() != PM_FILE || !s.bSpeedNotReset) {
+		m_PlaybackRate = 1.0;
+	}
 	m_iDefRotation = 0;
 
 	DXVAState::ClearState();
@@ -13683,8 +13686,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			DLog(L"    %s", fi.GetName());
 		}
 	}
-
-	CAppSettings& s = AfxGetAppSettings();
 
 	CString mi_fn;
 	for (;;) {

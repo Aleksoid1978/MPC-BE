@@ -97,8 +97,6 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	GetDlgItem(IDC_CHECK9)->ShowWindow(SW_HIDE); // TODO
-
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_volumectrl.SetRange(0, 100);
