@@ -13666,7 +13666,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_ExtSubPaths.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
-	if (GetPlaybackMode() != PM_FILE || !s.bSpeedNotReset) {
+	if (!s.bSpeedNotReset) {
 		m_PlaybackRate = 1.0;
 	}
 	m_iDefRotation = 0;
