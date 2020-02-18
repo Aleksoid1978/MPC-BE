@@ -2309,20 +2309,34 @@ void CPlayerPlaylistBar::SetLast()
 
 void CPlayerPlaylistBar::SetCurValid(const bool bValid)
 {
-	POSITION pos = curPlayList.GetPos();
-	if (pos) {
-		curPlayList.GetAt(pos).m_bInvalid = !bValid;
+	for (size_t i = 0; i < m_tabs.size(); i++) {
+		if (m_nCurPlaybackListId == m_tabs[i].id) {
+			POSITION pos = m_pls[i]->GetPos();
+			if (pos) {
+				m_pls[i]->GetAt(pos).m_bInvalid = !bValid;
+				if (i == m_nCurPlayListIndex) {
+					UpdateList();
+				}
+			}
+			break;
+		}
 	}
-	UpdateList();
 }
 
 void CPlayerPlaylistBar::SetCurLabel(CString label)
 {
-	POSITION pos = curPlayList.GetPos();
-	if (pos) {
-		curPlayList.GetAt(pos).m_label = label;
+	for (size_t i = 0; i < m_tabs.size(); i++) {
+		if (m_nCurPlaybackListId == m_tabs[i].id) {
+			POSITION pos = m_pls[i]->GetPos();
+			if (pos) {
+				m_pls[i]->GetAt(pos).m_label = label;
+				if (i == m_nCurPlayListIndex) {
+					UpdateList();
+				}
+			}
+			break;
+		}
 	}
-	UpdateList();
 }
 
 void CPlayerPlaylistBar::Randomize()
@@ -2335,13 +2349,21 @@ void CPlayerPlaylistBar::Randomize()
 
 void CPlayerPlaylistBar::SetCurTime(REFERENCE_TIME rt)
 {
-	POSITION pos = curPlayList.GetPos();
-	if (pos) {
-		CPlaylistItem& pli = curPlayList.GetAt(pos);
-		pli.m_duration = rt;
-		m_list.SetItemText(FindItem(pos), COL_TIME, pli.GetLabel(1));
+	for (size_t i = 0; i < m_tabs.size(); i++) {
+		if (m_nCurPlaybackListId == m_tabs[i].id) {
+			POSITION pos = m_pls[i]->GetPos();
+			if (pos) {
+				m_pls[i]->GetAt(pos).m_duration = rt;
+				if (i == m_nCurPlayListIndex) {
+					UpdateList();
+					//CPlaylistItem& pli = curPlayList.GetAt(pos);
+					//pli.m_duration = rt;
+					//m_list.SetItemText(FindItem(pos), COL_TIME, pli.GetLabel(1));
+				}
+			}
+			break;
+		}
 	}
-	UpdateList();
 }
 
 OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
