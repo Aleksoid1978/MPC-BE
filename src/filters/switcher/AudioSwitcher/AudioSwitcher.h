@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,9 +59,15 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	bool	m_bInt32;
 	bool	m_bFloat;
 
+	bool m_bInt24Support = true;
+	bool m_bInt32Support = true;
+	bool m_bFloatSupport = true;
+
 	REFERENCE_TIME m_rtAudioTimeShift;
 
 	REFERENCE_TIME m_rtNextStart;
+
+	void CheckSupportedOutputMediaType() override;
 
 public:
 	CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr);
@@ -69,7 +75,7 @@ public:
 
 	HRESULT CheckMediaType(const CMediaType* pmt) override;
 	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut) override;
-	void TransformMediaType(CMediaType& mt) override;
+	void TransformMediaType(CMediaType& mt, const bool bForce16Bit = false) override;
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

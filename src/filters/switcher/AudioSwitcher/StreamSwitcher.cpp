@@ -452,16 +452,18 @@ HRESULT CStreamSwitcherInputPin::QueryAcceptDownstream(const AM_MEDIA_TYPE* pmt)
 	HRESULT hr = S_OK;
 
 	CStreamSwitcherOutputPin* pOut = m_pSSF->GetOutputPin();
-
 	if (pOut && pOut->IsConnected()) {
+		CMediaType tmp(*pmt);
+		(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(tmp);
+
 		if (CComPtr<IPinConnection> pPC = pOut->CurrentPinConnection()) {
-			hr = pPC->DynamicQueryAccept(pmt);
+			hr = pPC->DynamicQueryAccept(&tmp);
 			if (hr == S_OK) {
 				return S_OK;
 			}
 		}
 
-		hr = pOut->GetConnected()->QueryAccept(pmt);
+		hr = pOut->GetConnected()->QueryAccept(&tmp);
 	}
 
 	return hr;
@@ -872,7 +874,6 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		m_pSSF->m_bOutputFormatChanged = false;
 	}
 
-
 	if (bFormatChanged || cbBuffer > actual.cbBuffer) {
 		DLog(L"CStreamSwitcherInputPin::Receive(): %s", bFormatChanged ? L"input or output media type changed" : L"cbBuffer > actual.cbBuffer");
 
@@ -990,6 +991,7 @@ STDMETHODIMP CStreamSwitcherInputPin::NewSegment(REFERENCE_TIME tStart, REFERENC
 
 CStreamSwitcherOutputPin::CStreamSwitcherOutputPin(CStreamSwitcherFilter* pFilter, HRESULT* phr)
 	: CBaseOutputPin(L"CStreamSwitcherOutputPin", pFilter, &pFilter->m_csState, phr, L"Out")
+	, m_pSSF(static_cast<CStreamSwitcherFilter*>(m_pFilter))
 {
 	//m_bCanReconnectWhenActive = true;
 }
@@ -1029,7 +1031,7 @@ HRESULT CStreamSwitcherOutputPin::QueryAcceptUpstream(const AM_MEDIA_TYPE* pmt)
 {
 	HRESULT hr = S_FALSE;
 
-	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
+	CStreamSwitcherInputPin* pIn = m_pSSF->GetInputPin();
 
 	if (pIn && pIn->IsConnected() && (pIn->IsUsingOwnAllocator() || pIn->CurrentMediaType() == *pmt)) {
 		if (CComQIPtr<IPin> pPinTo = pIn->GetConnected()) {
@@ -1048,7 +1050,7 @@ HRESULT CStreamSwitcherOutputPin::QueryAcceptUpstream(const AM_MEDIA_TYPE* pmt)
 
 HRESULT CStreamSwitcherOutputPin::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties)
 {
-	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
+	CStreamSwitcherInputPin* pIn = m_pSSF->GetInputPin();
 	if (!pIn || !pIn->IsConnected()) {
 		return E_UNEXPECTED;
 	}
@@ -1126,11 +1128,11 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 	m_pPinConnection = CComQIPtr<IPinConnection>(pReceivePin);
 	HRESULT hr = __super::CompleteConnect(pReceivePin);
 
-	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
+	CStreamSwitcherInputPin* pIn = m_pSSF->GetInputPin();
 	CMediaType mt;
 	if (SUCCEEDED(hr) && pIn && pIn->IsConnected()
 			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt))) {
-		(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(mt);
+		m_pSSF->TransformMediaType(mt, m_bForce16Bit);
 		if (m_mt != mt) {
 			if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
 				hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
@@ -1138,6 +1140,11 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 				hr = VFW_E_TYPE_NOT_ACCEPTED;
 			}
 		}
+	}
+
+	if (SUCCEEDED(hr)) {
+		m_bForce16Bit = false;
+		m_pSSF->CompleteConnect(PINDIR_OUTPUT, this, pReceivePin);
 	}
 
 	return hr;
@@ -1150,19 +1157,19 @@ HRESULT CStreamSwitcherOutputPin::SetMediaType(const CMediaType *pmt)
 		return hr;
 	}
 
-	(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(m_mt);
+	m_pSSF->TransformMediaType(m_mt, m_bForce16Bit);
 
 	return NOERROR;
 }
 
 HRESULT CStreamSwitcherOutputPin::CheckMediaType(const CMediaType* pmt)
 {
-	return (static_cast<CStreamSwitcherFilter*>(m_pFilter))->CheckMediaType(pmt);
+	return m_pSSF->CheckMediaType(pmt);
 }
 
 HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 {
-	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
+	CStreamSwitcherInputPin* pIn = m_pSSF->GetInputPin();
 	if (!pIn || !pIn->IsConnected()) {
 		return E_UNEXPECTED;
 	}
@@ -1178,20 +1185,35 @@ HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 
 	AM_MEDIA_TYPE* tmp = nullptr;
 	if (S_OK != pEM->Next(1, &tmp, nullptr) || !tmp) {
+		if (mtLastFormat.IsValid()) {
+			m_bForce16Bit = true;
+			*pmt = mtLastFormat;
+
+			FreeMediaType(mtLastFormat);
+			mtLastFormat.InitMediaType();
+			m_pSSF->TransformMediaType(*pmt, true);
+
+			return S_OK;
+		}
+
 		return VFW_S_NO_MORE_ITEMS;
 	}
+
+	m_bForce16Bit = false;
 
 	CopyMediaType(pmt, tmp);
 	DeleteMediaType(tmp);
 
-	(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(*pmt);
+	m_pSSF->TransformMediaType(*pmt);
 
-	/*
-		if(iPosition < 0) return E_INVALIDARG;
-		if(iPosition > 0) return VFW_S_NO_MORE_ITEMS;
+	if (pmt && pmt->pbFormat && !IsConnected()) {
+		auto wfe = (const WAVEFORMATEX*)pmt->pbFormat;
+		const auto sampleformat = GetSampleFormat(wfe);
+		if (sampleformat != SAMPLE_FMT_NONE && sampleformat != SAMPLE_FMT_S16) {
+			mtLastFormat = *pmt;
+		}
+	}
 
-		CopyMediaType(pmt, &pIn->CurrentMediaType());
-	*/
 	return S_OK;
 }
 
@@ -1211,7 +1233,7 @@ STDMETHODIMP CStreamSwitcherOutputPin::QueryAccept(const AM_MEDIA_TYPE* pmt)
 
 STDMETHODIMP CStreamSwitcherOutputPin::Notify(IBaseFilter* pSender, Quality q)
 {
-	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
+	CStreamSwitcherInputPin* pIn = m_pSSF->GetInputPin();
 	if (!pIn || !pIn->IsConnected()) {
 		return VFW_E_NOT_CONNECTED;
 	}
@@ -1401,6 +1423,8 @@ HRESULT CStreamSwitcherFilter::CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin
 			}
 			m_pInputs.push_back(pInputPin);
 		}
+	} else if (dir == PINDIR_OUTPUT) {
+		CheckSupportedOutputMediaType();
 	}
 
 	return S_OK;
