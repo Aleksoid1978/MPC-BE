@@ -174,12 +174,18 @@ public:
 
 class CStreamSwitcherOutputPin : public CBaseOutputPin, public IStreamBuilder
 {
+	CStreamSwitcherFilter* m_pSSF;
+
 	CComPtr<IUnknown> m_pStreamSwitcherPassThru;
 	CComPtr<IPinConnection> m_pPinConnection;
+
+	CMediaType mtLastFormat;
 
 	HRESULT QueryAcceptUpstream(const AM_MEDIA_TYPE* pmt);
 
 public:
+	bool m_bForce16Bit = false;
+
 	CStreamSwitcherOutputPin(CStreamSwitcherFilter* pFilter, HRESULT* phr);
 
 	DECLARE_IUNKNOWN
@@ -227,6 +233,8 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin, IPin* pReceivePin);
 	bool m_bInputPinChanged;
 
+	virtual void CheckSupportedOutputMediaType() PURE;
+
 protected:
 	double m_dRate = 1.0;
 
@@ -251,7 +259,7 @@ public:
 	// override these
 	virtual HRESULT CheckMediaType(const CMediaType* pmt) PURE;
 	virtual HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
-	virtual void TransformMediaType(CMediaType& mt) PURE;
+	virtual void TransformMediaType(CMediaType& mt, const bool bForce16Bit = false) PURE;
 
 	// and maybe these
 	virtual HRESULT DeliverEndOfStream();
