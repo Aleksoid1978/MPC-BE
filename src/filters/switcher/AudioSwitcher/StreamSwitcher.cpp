@@ -1186,14 +1186,18 @@ HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 	AM_MEDIA_TYPE* tmp = nullptr;
 	if (S_OK != pEM->Next(1, &tmp, nullptr) || !tmp) {
 		if (mtLastFormat.IsValid()) {
-			m_bForce16Bit = true;
-			*pmt = mtLastFormat;
+			if (!IsConnected()) {
+				m_bForce16Bit = true;
+				*pmt = mtLastFormat;
 
+				FreeMediaType(mtLastFormat);
+				mtLastFormat.InitMediaType();
+				m_pSSF->TransformMediaType(*pmt, true);
+
+				return S_OK;
+			}
 			FreeMediaType(mtLastFormat);
 			mtLastFormat.InitMediaType();
-			m_pSSF->TransformMediaType(*pmt, true);
-
-			return S_OK;
 		}
 
 		return VFW_S_NO_MORE_ITEMS;
