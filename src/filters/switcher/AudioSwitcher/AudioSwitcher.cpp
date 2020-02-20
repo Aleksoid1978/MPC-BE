@@ -566,6 +566,7 @@ void CAudioSwitcherFilter::CheckSupportedOutputMediaType()
 	};
 
 	m_bInt24Support = m_bInt32Support = m_bFloatSupport = true;
+	m_bOutputFormatChanged = true;
 
 	CComPtr<IPin> pPinTo;
 	if (SUCCEEDED(GetOutputPin()->ConnectedTo(&pPinTo)) && pPinTo) {
@@ -581,10 +582,6 @@ void CAudioSwitcherFilter::CheckSupportedOutputMediaType()
 			m_bFloatSupport = pPinTo->QueryAccept(&mtCheck) == S_OK;
 
 			pPinTo->QueryAccept(&mtOutput);
-
-			if (!m_bInt24Support || !m_bInt32Support || !m_bFloatSupport) {
-				m_bOutputFormatChanged = true;
-			}
 
 			DLog(L"CAudioSwitcherFilter::CheckSupportedOutputMediaType() : 24bit - %d, 32bit - %d, float - %d", m_bInt24Support, m_bInt32Support, m_bFloatSupport);
 		}
