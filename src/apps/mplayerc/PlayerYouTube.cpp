@@ -262,6 +262,9 @@ namespace Youtube
 					}
 					if (snippet["description"].IsString()) {
 						y_fields.content = UTF8ToWStr(snippet["description"].GetString());
+						if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
+							y_fields.content.Replace(L"\n", L"\r\n");
+						}
 					}
 					if (snippet["publishedAt"].IsString()) {
 						WORD y, m, d;
@@ -1033,7 +1036,65 @@ namespace Youtube
 			if (!final_video_url.IsEmpty()) {
 				final_video_url.Replace(L"http://", L"https://");
 
-				ParseMetadata(hInet, videoId, y_fields);
+				bool bParseMetadata = false;
+				if (!player_response_jsonDocument.IsNull()) {
+					if (player_response_jsonDocument.HasMember("videoDetails")) {
+						const auto& videoDetails = player_response_jsonDocument["videoDetails"];
+						if (videoDetails.IsObject()) {
+							bParseMetadata = true;
+
+							if (videoDetails.HasMember("title")) {
+								const auto& title = videoDetails["title"];
+								if (title.IsString()) {
+									y_fields.title = FixHtmlSymbols(AltUTF8ToWStr(title.GetString()));
+								}
+							}
+							if (videoDetails.HasMember("author")) {
+								const auto& author = videoDetails["author"];
+								if (author.IsString()) {
+									y_fields.author = UTF8ToWStr(author.GetString());
+								}
+							}
+							if (videoDetails.HasMember("shortDescription")) {
+								const auto& shortDescription = videoDetails["shortDescription"];
+								if (shortDescription.IsString()) {
+									y_fields.content = UTF8ToWStr(shortDescription.GetString());
+									if (y_fields.content.Find('\\n') && y_fields.content.Find(L"\\r\\n") == -1) {
+										y_fields.content.Replace(L"\\n", L"\r\n");
+									}
+								}
+							}
+							if (videoDetails.HasMember("lengthSeconds")) {
+								const auto& lengthSeconds = videoDetails["lengthSeconds"];
+								if (lengthSeconds.IsString()) {
+									y_fields.duration = atoi(lengthSeconds.GetString()) * UNITS;
+								}
+							}
+						}
+					}
+
+					if (player_response_jsonDocument.HasMember("microformat")) {
+						const auto& microformat = player_response_jsonDocument["microformat"];
+						if (microformat.IsObject() && microformat.HasMember("playerMicroformatRenderer")) {
+							const auto& playerMicroformatRenderer = microformat["playerMicroformatRenderer"];
+							if (playerMicroformatRenderer.IsObject() && playerMicroformatRenderer.HasMember("publishDate")) {
+								const auto& publishDate = playerMicroformatRenderer["publishDate"];
+								if (publishDate.IsString()) {
+									WORD y, m, d;
+									if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
+										y_fields.dtime.wYear = y;
+										y_fields.dtime.wMonth = m;
+										y_fields.dtime.wDay = d;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (!bParseMetadata) {
+					ParseMetadata(hInet, videoId, y_fields);
+				}
 
 				y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_video_profile->quality, final_video_profile->ext);
 				FixFilename(y_fields.fname);
