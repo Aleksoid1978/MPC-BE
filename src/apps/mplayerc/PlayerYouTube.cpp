@@ -444,6 +444,18 @@ namespace Youtube
 					strUrls += adaptive_fmts;
 				}
 			} else {
+				auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonData += "}";
+					player_response_jsonData.Replace("\\u0026", "&");
+					player_response_jsonData.Replace("\\/", "/");
+					player_response_jsonData.Replace("\\\"", "\"");
+					player_response_jsonData.Replace("\\\\\"", "\\\"");
+					player_response_jsonData.Replace("\\&", "&");
+
+					player_response_jsonDocument.Parse(player_response_jsonData);
+				}
+
 				// live streaming
 				CStringA live_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
 				if (live_url.IsEmpty()) {
@@ -482,18 +494,6 @@ namespace Youtube
 						return true;
 					}
 				} else {
-					auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
-					if (!player_response_jsonData.IsEmpty()) {
-						player_response_jsonData += "}";
-						player_response_jsonData.Replace("\\u0026", "&");
-						player_response_jsonData.Replace("\\/", "/");
-						player_response_jsonData.Replace("\\\"", "\"");
-						player_response_jsonData.Replace("\\\\\"", "\\\"");
-						player_response_jsonData.Replace("\\&", "&");
-
-						player_response_jsonDocument.Parse(player_response_jsonData);
-					}
-
 					// url_encoded_fmt_stream_map
 					const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
 					if (!stream_map.IsEmpty()) {
