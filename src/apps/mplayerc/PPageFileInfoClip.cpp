@@ -184,21 +184,26 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 
 		if (pMainFrame->m_youtubeFields.dtime.wYear) {
-			m_descText.Format(ResStr(IDS_PUBLISHED) + L"%04hu-%02hu-%02hu %02hu:%02hu:%02hu\r\n\r\n",
-							  pMainFrame->m_youtubeFields.dtime.wYear,
-							  pMainFrame->m_youtubeFields.dtime.wMonth,
-							  pMainFrame->m_youtubeFields.dtime.wDay,
-							  pMainFrame->m_youtubeFields.dtime.wHour,
-							  pMainFrame->m_youtubeFields.dtime.wMinute,
-							  pMainFrame->m_youtubeFields.dtime.wSecond);
+			if (!pMainFrame->m_youtubeFields.dtime.wHour
+					&& !pMainFrame->m_youtubeFields.dtime.wMinute
+					&& !pMainFrame->m_youtubeFields.dtime.wSecond) {
+				m_descText.Format(ResStr(IDS_PUBLISHED) + L"%04hu-%02hu-%02hu\r\n\r\n",
+								  pMainFrame->m_youtubeFields.dtime.wYear,
+								  pMainFrame->m_youtubeFields.dtime.wMonth,
+								  pMainFrame->m_youtubeFields.dtime.wDay);
+			} else {
+				m_descText.Format(ResStr(IDS_PUBLISHED) + L"%04hu-%02hu-%02hu %02hu:%02hu:%02hu\r\n\r\n",
+								  pMainFrame->m_youtubeFields.dtime.wYear,
+								  pMainFrame->m_youtubeFields.dtime.wMonth,
+								  pMainFrame->m_youtubeFields.dtime.wDay,
+								  pMainFrame->m_youtubeFields.dtime.wHour,
+								  pMainFrame->m_youtubeFields.dtime.wMinute,
+								  pMainFrame->m_youtubeFields.dtime.wSecond);
+			}
 		}
 
 		if (!pMainFrame->m_youtubeFields.content.IsEmpty()) {
-			CString content = pMainFrame->m_youtubeFields.content;
-			if (content.Find('\n') && content.Find(L"\r\n") == -1) {
-				content.Replace(L"\n", L"\r\n");
-			}
-			m_descText.Append(content);
+			m_descText.Append(pMainFrame->m_youtubeFields.content);
 		}
 	}
 
