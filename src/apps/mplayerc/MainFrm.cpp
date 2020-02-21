@@ -12017,7 +12017,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (bIsHtml) {
 				std::list<CString> urls;
-				if (YoutubeDL::Parse_URL(fn, s.bYoutubeLoadPlaylist, s.iYDLMaxHeight, s.bYDLMaximumQuality, urls, m_youtubeFields)) {
+				if (YoutubeDL::Parse_URL(fn, s.bYoutubeLoadPlaylist, s.iYDLMaxHeight, s.bYDLMaximumQuality, urls, pOFD->subs, m_youtubeFields)) {
 					youtubeUrl = fn;
 					Content::Online::Disconnect(youtubeUrl);
 

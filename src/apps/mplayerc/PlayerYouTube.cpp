@@ -233,7 +233,32 @@ namespace Youtube
 		}
 	}
 
-	static bool ParseMetadata(HINTERNET& hInet, const CString videoId, YoutubeFields& y_fields)
+	template <typename T>
+	static bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T& value)
+	{
+		if (const auto& it = jsonValue.FindMember(name); it != jsonValue.MemberEnd()) {
+			if constexpr (std::is_same_v<T, int>) {
+				if (it->value.IsInt()) {
+					value = it->value.GetInt();
+					return true;
+				}
+			} else if constexpr (std::is_same_v<T, CStringA>) {
+				if (it->value.IsString()) {
+					value = it->value.GetString();
+					return true;
+				}
+			} else if constexpr (std::is_same_v<T, CString>) {
+				if (it->value.IsString()) {
+					value = UTF8ToWStr(it->value.GetString());
+					return true;
+				}
+			}
+		}
+
+		return false;
+	};
+
+	static bool ParseMetadata(HINTERNET& hInet, const CString& videoId, YoutubeFields& y_fields)
 	{
 		if (hInet && !videoId.IsEmpty()) {
 			CString url;
@@ -253,51 +278,56 @@ namespace Youtube
 						return false;
 					}
 
-					const rapidjson::Value& snippet = items->value[0]["snippet"];
-					if (snippet["title"].IsString()) {
-						y_fields.title = FixHtmlSymbols(AltUTF8ToWStr(snippet["title"].GetString()));
-					}
-					if (snippet["channelTitle"].IsString()) {
-						y_fields.author = UTF8ToWStr(snippet["channelTitle"].GetString());
-					}
-					if (snippet["description"].IsString()) {
-						y_fields.content = UTF8ToWStr(snippet["description"].GetString());
-						if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
-							y_fields.content.Replace(L"\n", L"\r\n");
+					const auto& value0 = items->value[0];
+					if (const auto& snippet = value0.FindMember("snippet"); snippet != value0.MemberEnd() && snippet->value.IsObject()) {
+						if (getJsonValue(snippet->value, "title", y_fields.title)) {
+							y_fields.title = FixHtmlSymbols(y_fields.title);
 						}
-					}
-					if (snippet["publishedAt"].IsString()) {
-						WORD y, m, d;
-						WORD hh, mm, ss;
-						if (sscanf_s(snippet["publishedAt"].GetString(), "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
-							y_fields.dtime.wYear   = y;
-							y_fields.dtime.wMonth  = m;
-							y_fields.dtime.wDay    = d;
-							y_fields.dtime.wHour   = hh;
-							y_fields.dtime.wMinute = mm;
-							y_fields.dtime.wSecond = ss;
+
+						getJsonValue(snippet->value, "channelTitle", y_fields.author);
+
+						if (getJsonValue(snippet->value, "description", y_fields.content)) {
+							if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
+								y_fields.content.Replace(L"\n", L"\r\n");
+							}
+						}
+
+						CStringA publishedAt;
+						if (getJsonValue(snippet->value, "publishedAt", publishedAt)) {
+							WORD y, m, d;
+							WORD hh, mm, ss;
+							if (sscanf_s(publishedAt.GetString(), "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
+								y_fields.dtime.wYear   = y;
+								y_fields.dtime.wMonth  = m;
+								y_fields.dtime.wDay    = d;
+								y_fields.dtime.wHour   = hh;
+								y_fields.dtime.wMinute = mm;
+								y_fields.dtime.wSecond = ss;
+							}
 						}
 					}
 
-					const rapidjson::Value& duration = items->value[0]["contentDetails"]["duration"];
-					if (duration.IsString()) {
-						const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
-						std::cmatch match;
-						if (std::regex_search(duration.GetString(), match, regex) && match.size() == 4) {
-							int h = 0;
-							int m = 0;
-							int s = 0;
-							if (match[1].matched) {
-								h = atoi(match[1].first);
-							}
-							if (match[2].matched) {
-								m = atoi(match[2].first);
-							}
-							if (match[3].matched) {
-								s = atoi(match[3].first);
-							}
+					if (const auto& contentDetails = value0.FindMember("contentDetails"); contentDetails != value0.MemberEnd() && contentDetails->value.IsObject()) {
+						CStringA duration;
+						if (getJsonValue(contentDetails->value, "duration", duration)) {
+							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
+							std::cmatch match;
+							if (std::regex_search(duration.GetString(), match, regex) && match.size() == 4) {
+								int h = 0;
+								int m = 0;
+								int s = 0;
+								if (match[1].matched) {
+									h = atoi(match[1].first);
+								}
+								if (match[2].matched) {
+									m = atoi(match[2].first);
+								}
+								if (match[3].matched) {
+									s = atoi(match[3].first);
+								}
 
-							y_fields.duration = (h * 3600 + m * 60 + s) * UNITS;
+								y_fields.duration = (h * 3600 + m * 60 + s) * UNITS;
+							}
 						}
 					}
 				}
@@ -514,76 +544,31 @@ namespace Youtube
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 			if (!player_response_jsonDocument.IsNull()) {
-				if (player_response_jsonDocument.HasMember("streamingData")) {
-					const auto& streamingData = player_response_jsonDocument["streamingData"];
-					if (streamingData.IsObject()) {
-						if (streamingData.HasMember("formats")) {
-							const auto& formats = streamingData["formats"];
-							if (formats.IsArray()) {
-								for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
-									const auto& format = formats[i];
-									streamingDataFormat element;
-									if (format.HasMember("itag")) {
-										const auto& itag = format["itag"];
-										if (itag.IsInt()) {
-											std::get<0>(element) = itag.GetInt();
-										}
-									}
-									if (format.HasMember("qualityLabel")) {
-										const auto& qualityLabel = format["qualityLabel"];
-										if (qualityLabel.IsString()) {
-											std::get<3>(element) = qualityLabel.GetString();
-										}
-									}
-									if (format.HasMember("url")) {
-										const auto& url = format["url"];
-										if (url.IsString()) {
-											std::get<1>(element) = url.GetString();
-											streamingDataFormatList.emplace_back(element);
-										}
-									} else if (format.HasMember("cipher")) {
-										const auto& cipher = format["cipher"];
-										if (cipher.IsString()) {
-											std::get<2>(element) = cipher.GetString();
-											streamingDataFormatList.emplace_back(element);
-										}
-									}
-								}
+				if (const auto& streamingData = player_response_jsonDocument.FindMember("streamingData"); streamingData != player_response_jsonDocument.MemberEnd() && streamingData->value.IsObject()) {
+					if (const auto& formats = streamingData->value.FindMember("formats"); formats != streamingData->value.MemberEnd() && formats->value.IsArray()) {
+						for (const auto& format : formats->value.GetArray()) {
+							streamingDataFormat element;
+
+							getJsonValue(format, "itag", std::get<0>(element));
+							getJsonValue(format, "qualityLabel", std::get<3>(element));
+							if (getJsonValue(format, "url", std::get<1>(element))) {
+								streamingDataFormatList.emplace_back(element);
+							} else if (getJsonValue(format, "cipher", std::get<2>(element))) {
+								streamingDataFormatList.emplace_back(element);
 							}
 						}
+					}
 
-						if (streamingData.HasMember("adaptiveFormats")) {
-							const auto& adaptiveFormats = streamingData["adaptiveFormats"];
-							if (adaptiveFormats.IsArray()) {
-								for (rapidjson::SizeType i = 0; i < adaptiveFormats.Size(); i++) {
-									const auto& adaptiveFormat = adaptiveFormats[i];
-									streamingDataFormat element;
-									if (adaptiveFormat.HasMember("itag")) {
-										const auto& itag = adaptiveFormat["itag"];
-										if (itag.IsInt()) {
-											std::get<0>(element) = itag.GetInt();
-										}
-									}
-									if (adaptiveFormat.HasMember("qualityLabel")) {
-										const auto& qualityLabel = adaptiveFormat["qualityLabel"];
-										if (qualityLabel.IsString()) {
-											std::get<3>(element) = qualityLabel.GetString();
-										}
-									}
-									if (adaptiveFormat.HasMember("url")) {
-										const auto& url = adaptiveFormat["url"];
-										if (url.IsString()) {
-											std::get<1>(element) = url.GetString();
-											streamingDataFormatList.emplace_back(element);
-										}
-									} else if (adaptiveFormat.HasMember("cipher")) {
-										const auto& cipher = adaptiveFormat["cipher"];
-										if (cipher.IsString()) {
-											std::get<2>(element) = cipher.GetString();
-											streamingDataFormatList.emplace_back(element);
-										}
-									}
-								}
+					if (const auto& adaptiveFormats = streamingData->value.FindMember("adaptiveFormats"); adaptiveFormats != streamingData->value.MemberEnd() && adaptiveFormats->value.IsArray()) {
+						for (const auto& adaptiveFormat : adaptiveFormats->value.GetArray()) {
+							streamingDataFormat element;
+
+							getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
+							getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
+							if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))) {
+								streamingDataFormatList.emplace_back(element);
+							} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element))) {
+								streamingDataFormatList.emplace_back(element);
 							}
 						}
 					}
@@ -1038,54 +1023,36 @@ namespace Youtube
 
 				bool bParseMetadata = false;
 				if (!player_response_jsonDocument.IsNull()) {
-					if (player_response_jsonDocument.HasMember("videoDetails")) {
-						const auto& videoDetails = player_response_jsonDocument["videoDetails"];
-						if (videoDetails.IsObject()) {
-							bParseMetadata = true;
+					if (const auto& videoDetails = player_response_jsonDocument.FindMember("videoDetails"); videoDetails != player_response_jsonDocument.MemberEnd() && videoDetails->value.IsObject()) {
+						bParseMetadata = true;
 
-							if (videoDetails.HasMember("title")) {
-								const auto& title = videoDetails["title"];
-								if (title.IsString()) {
-									y_fields.title = FixHtmlSymbols(AltUTF8ToWStr(title.GetString()));
-								}
+						if (getJsonValue(videoDetails->value, "title", y_fields.title)) {
+							y_fields.title = FixHtmlSymbols(y_fields.title);
+						}
+
+						getJsonValue(videoDetails->value, "author", y_fields.author);
+
+						if (getJsonValue(videoDetails->value, "shortDescription", y_fields.content)) {
+							if (y_fields.content.Find('\\n') && y_fields.content.Find(L"\\r\\n") == -1) {
+								y_fields.content.Replace(L"\\n", L"\r\n");
 							}
-							if (videoDetails.HasMember("author")) {
-								const auto& author = videoDetails["author"];
-								if (author.IsString()) {
-									y_fields.author = UTF8ToWStr(author.GetString());
-								}
-							}
-							if (videoDetails.HasMember("shortDescription")) {
-								const auto& shortDescription = videoDetails["shortDescription"];
-								if (shortDescription.IsString()) {
-									y_fields.content = UTF8ToWStr(shortDescription.GetString());
-									if (y_fields.content.Find('\\n') && y_fields.content.Find(L"\\r\\n") == -1) {
-										y_fields.content.Replace(L"\\n", L"\r\n");
-									}
-								}
-							}
-							if (videoDetails.HasMember("lengthSeconds")) {
-								const auto& lengthSeconds = videoDetails["lengthSeconds"];
-								if (lengthSeconds.IsString()) {
-									y_fields.duration = atoi(lengthSeconds.GetString()) * UNITS;
-								}
-							}
+						}
+
+						CStringA lengthSeconds;
+						if (getJsonValue(videoDetails->value, "lengthSeconds", lengthSeconds)) {
+							y_fields.duration = atoi(lengthSeconds.GetString()) * UNITS;
 						}
 					}
 
-					if (player_response_jsonDocument.HasMember("microformat")) {
-						const auto& microformat = player_response_jsonDocument["microformat"];
-						if (microformat.IsObject() && microformat.HasMember("playerMicroformatRenderer")) {
-							const auto& playerMicroformatRenderer = microformat["playerMicroformatRenderer"];
-							if (playerMicroformatRenderer.IsObject() && playerMicroformatRenderer.HasMember("publishDate")) {
-								const auto& publishDate = playerMicroformatRenderer["publishDate"];
-								if (publishDate.IsString()) {
-									WORD y, m, d;
-									if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
-										y_fields.dtime.wYear = y;
-										y_fields.dtime.wMonth = m;
-										y_fields.dtime.wDay = d;
-									}
+					if (const auto& microformat = player_response_jsonDocument.FindMember("microformat"); microformat != player_response_jsonDocument.MemberEnd() && microformat->value.IsObject()) {
+						if (const auto& playerMicroformatRenderer = microformat->value.FindMember("playerMicroformatRenderer"); playerMicroformatRenderer != microformat->value.MemberEnd() && playerMicroformatRenderer->value.IsObject()) {
+							CStringA publishDate;
+							if (getJsonValue(playerMicroformatRenderer->value, "publishDate", publishDate)) {
+								WORD y, m, d;
+								if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
+									y_fields.dtime.wYear = y;
+									y_fields.dtime.wMonth = m;
+									y_fields.dtime.wDay = d;
 								}
 							}
 						}
@@ -1100,46 +1067,29 @@ namespace Youtube
 				FixFilename(y_fields.fname);
 
 				if (!videoId.IsEmpty()) {
-					// subtitle
+					// subtitles
 					if (!player_response_jsonDocument.IsNull()) {
-						const auto& root = player_response_jsonDocument.FindMember("captions");
-						if (root != player_response_jsonDocument.MemberEnd()) {
-							const auto& iter = root->value.FindMember("playerCaptionsTracklistRenderer");
-							if (iter != root->value.MemberEnd()) {
-								const auto& captionTracks = iter->value.FindMember("captionTracks");
-								if (captionTracks != iter->value.MemberEnd() && captionTracks->value.IsArray()) {
-									for (auto elem = captionTracks->value.Begin(); elem != captionTracks->value.End(); ++elem) {
-										const auto& kind = elem->FindMember("kind");
-										if (kind != elem->MemberEnd() && kind->value.IsString()) {
-											const CStringA kind_value = kind->value.GetString();
-											if (kind_value == "asr") {
-												continue;
-											}
+						if (const auto& captions = player_response_jsonDocument.FindMember("captions"); captions != player_response_jsonDocument.MemberEnd() && captions->value.IsObject()) {
+							if (const auto& trackList = captions->value.FindMember("playerCaptionsTracklistRenderer"); trackList != captions->value.MemberEnd() && trackList->value.IsObject()) {
+								if (const auto& captionTracks = trackList->value.FindMember("captionTracks"); captionTracks != trackList->value.MemberEnd() && captionTracks->value.IsArray()) {
+									for (const auto& elem : captionTracks->value.GetArray()) {
+										CStringA kind;
+										if (getJsonValue(elem, "kind", kind) && kind == "asr") {
+											continue;
 										}
 
-										CString url, name;
-
-										const auto& baseUrl = elem->FindMember("baseUrl");
-										if (baseUrl != elem->MemberEnd() && baseUrl->value.IsString()) {
-											const CStringA urlA = baseUrl->value.GetString();
-											if (!urlA.IsEmpty()) {
-												url = UTF8ToWStr(urlA) + L"&fmt=vtt";
-											}
+										CString sub_url;
+										if (getJsonValue(elem, "baseUrl", sub_url)) {
+											sub_url += L"&fmt=vtt";
 										}
 
-										const auto& nameObject = elem->FindMember("name");
-										if (nameObject != elem->MemberEnd()) {
-											const auto& simpleText = nameObject->value.FindMember("simpleText");
-											if (simpleText != nameObject->value.MemberEnd() && simpleText->value.IsString()) {
-												const CStringA nameA = simpleText->value.GetString();
-												if (!nameA.IsEmpty()) {
-													name = UTF8ToWStr(nameA);
-												}
-											}
+										CString sub_name;
+										if (const auto& name = elem.FindMember("name"); name != elem.MemberEnd() && name->value.IsObject()) {
+											getJsonValue(name->value, "simpleText", sub_name);
 										}
 
-										if (!url.IsEmpty() && !name.IsEmpty()) {
-											subs.push_back(CSubtitleItem(url, name));
+										if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
+											subs.push_back({ sub_url, sub_name });
 										}
 									}
 								}
@@ -1169,7 +1119,7 @@ namespace Youtube
 	{
 		idx_CurrentPlay = 0;
 		if (CheckPlaylist(url)) {
-			const CString videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
+			const CString videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
 			const CString playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
 			if (playlistId.IsEmpty()) {
 				return false;
@@ -1200,38 +1150,33 @@ namespace Youtube
 
 				rapidjson::Document d;
 				if (!d.Parse(data).HasParseError()) {
-					const auto& items = d["items"];
-					if (!items.IsArray()) {
+					const auto& items = d.FindMember("items");
+					if (items == d.MemberEnd()
+							|| !items->value.IsArray()
+							|| items->value.Empty()) {
 						free(data);
 						InternetCloseHandle(hInet);
 						return false;
 					}
 
-					const auto& nextPageToken = d["nextPageToken"];
-					if (nextPageToken.IsString()) {
-						nextToken = UTF8ToWStr(nextPageToken.GetString());
-					}
+					getJsonValue(d, "nextPageToken", nextToken);
 
-					for (rapidjson::SizeType i = 0; i < items.Size(); i++) {
-						const auto& snippet = items[i]["snippet"];
-						if (snippet.IsObject()) {
-							const auto& resourceId = snippet["resourceId"];
-							if (resourceId.IsObject()) {
-								const auto& vid_id = resourceId["videoId"];
-								if (vid_id.IsString()) {
-									CString url, title;
-									const CString videoIdStr = UTF8ToWStr(vid_id.GetString());
-									url.Format(L"https://www.youtube.com/watch?v=%s", videoIdStr.GetString());
+					for (const auto& item : items->value.GetArray()) {
+						if (const auto& snippet = item.FindMember("snippet"); snippet != item.MemberEnd() && snippet->value.IsObject()) {
+							if (const auto& resourceId = snippet->value.FindMember("resourceId"); resourceId != snippet->value.MemberEnd() && resourceId->value.IsObject()) {
+								CString videoId;
+								if (getJsonValue(resourceId->value, "videoId", videoId)) {
+									CString url;
+									url.Format(L"https://www.youtube.com/watch?v=%s", videoId.GetString());
 
-									const auto& vid_title = snippet["title"];
-									if (vid_title.IsString()) {
-										title = FixHtmlSymbols(AltUTF8ToWStr(vid_title.GetString()));
+									CString title;
+									if (getJsonValue(resourceId->value, "title", title)) {
+										title = FixHtmlSymbols(title);
 									}
 
-									const YoutubePlaylistItem item(url, title);
-									youtubePlaylist.emplace_back(item);
+									youtubePlaylist.push_back({ url, title });
 
-									if (videoId == videoIdStr) {
+									if (videoIdCurrent == videoId) {
 										idx_CurrentPlay = youtubePlaylist.size() - 1;
 									}
 								}

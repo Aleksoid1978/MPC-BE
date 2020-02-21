@@ -485,7 +485,7 @@ public:
 		return m_fn;
 	}
 
-	void SetName(CString name) {
+	void SetName(const CString& name) {
 		m_fn = name;
 	}
 
@@ -494,7 +494,7 @@ public:
 	};
 
 	// Title
-	void SetTitle(CString title) {
+	void SetTitle(const CString& title) {
 		m_title = title;
 	}
 

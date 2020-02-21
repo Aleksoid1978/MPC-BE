@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2019 see Authors.txt
+ * (C) 2018-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,37 @@
 
 #define bufsize (2ul * KILOBYTE)
 
-bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, Youtube::YoutubeFields& y_fields)
+template <typename T>
+static bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T& value)
+{
+	if (const auto& it = jsonValue.FindMember(name); it != jsonValue.MemberEnd()) {
+		if constexpr (std::is_same_v<T, int>) {
+			if (it->value.IsInt()) {
+				value = it->value.GetInt();
+				return true;
+			}
+		} else if constexpr (std::is_same_v<T, float>) {
+			if (it->value.IsFloat()) {
+				value = it->value.GetFloat();
+				return true;
+			}
+		} else if constexpr (std::is_same_v<T, CStringA>) {
+			if (it->value.IsString()) {
+				value = it->value.GetString();
+				return true;
+			}
+		} else if constexpr (std::is_same_v<T, CString>) {
+			if (it->value.IsString()) {
+				value = UTF8ToWStr(it->value.GetString());
+				return true;
+			}
+		}
+	}
+
+	return false;
+};
+
+bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields)
 {
 	urls.clear();
 
@@ -54,7 +84,7 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 	if (!bPlaylist) {
 		args.Append(L" --no-playlist");
 	}
-	args.Append(L" -J -- \"" + url + "\"");
+	args.Append(L" -J --all-subs --sub-format vtt \"" + url + "\"");
 	PROCESS_INFORMATION proc_info = {};
 	const bool bSuccess = CreateProcessW(nullptr, args.GetBuffer(), nullptr, nullptr, true, 0,
 										 nullptr, nullptr, &startup_info, &proc_info);
@@ -124,150 +154,155 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 	CloseHandle(hStderr_r);
 
 	if (!exitcode && buf_out.GetLength()) {
-
 		rapidjson::Document d;
 		if (!d.Parse(buf_out.GetString()).HasParseError()) {
-			const auto& formats = d["formats"];
-			if (!formats.IsArray()) {
-				return false;
-			}
+			if (const auto& formats = d.FindMember("formats"); formats != d.MemberEnd() && formats->value.IsArray() && !formats->value.Empty()) {
+				int maxHeight = 0;
+				bool bVideoOnly = false;
 
-			int maxHeight = 0;
-			CString bestUrl;
-			bool bVideoOnly = false;
+				float maxtbr = 0.0f;
+				CStringA bestAudioUrl;
 
-			float maxtbr = 0.0f;
-			CString bestAudioUrl;
+				CStringA bestUrl;
+				getJsonValue(d, "url", bestUrl);
 
-			const auto& url = d["url"];
-			if (url.IsString()) {
-				bestUrl = url.GetString();
-			}
-
-			for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
-				const auto& format = formats[i];
-				const auto& protocol = format["protocol"];
-				if (!protocol.IsString()) {
-					continue;
-				}
-				const CString _protocol(protocol.GetString());
-				if (_protocol != L"http" && _protocol != L"https" && _protocol.Left(4) != L"m3u8") {
-					continue;
-				}
-
-				const auto& url = format["url"];
-				if (!url.IsString()) {
-					continue;
-				}
-
-				const auto& vcodec = format["vcodec"];
-				if (vcodec.IsString()) {
-					const CString _vcodec = vcodec.GetString();
-					if (_vcodec == L"none") {
-						const auto& tbr = format["tbr"];
-						if (tbr.IsFloat()) {
-							const float _tbr = tbr.GetFloat();
-							if ((_tbr > maxtbr)
-									|| (_tbr == maxtbr && _protocol.Left(4) == L"http")) {
-								maxtbr = _tbr;
-								bestAudioUrl = url.GetString();
-							}
-						}
-					}
-				}
-
-				const auto& height = format["height"];
-				if (height.IsInt()) {
-					const int _height = height.GetInt();
-					if (_height > maxHeightOptions) {
+				for (const auto& format : formats->value.GetArray()) {
+					CStringA protocol;
+					if (!getJsonValue(format, "protocol", protocol)
+							|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
 						continue;
 					}
-					if ((_height > maxHeight)
-							|| (_height == maxHeight && _protocol.Left(4) == L"http")) {
-						maxHeight = _height;
-						bestUrl = url.GetString();
-						bVideoOnly = false;
-						const auto& acodec = format["acodec"];
-						if (acodec.IsString()) {
-							const CString _acodec = acodec.GetString();
-							if (_acodec == L"none") {
-								bVideoOnly = true;
+
+					CStringA url;
+					if (!getJsonValue(format, "url", url)) {
+						continue;
+					}
+
+					CStringA vcodec;
+					if (getJsonValue(format, "vcodec", vcodec)) {
+						if (vcodec == "none") {
+							float tbr = .0f;
+							if (getJsonValue(format, "tbr", tbr)) {
+								if ((tbr > maxtbr)
+										|| (tbr == maxtbr && protocol.Left(4) == "http")) {
+									maxtbr = tbr;
+									bestAudioUrl = url;
+								}
 							}
 						}
 					}
-				}
-			}
 
-			if (!bestUrl.IsEmpty()) {
-				if (bMaximumQuality) {
-					float maxVideotbr = 0.0f;
-					int maxVideofps = 0;
-
-					for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
-						const auto& format = formats[i];
-						const auto& protocol = format["protocol"];
-						if (!protocol.IsString()) {
+					int height = 0;
+					if (getJsonValue(format, "height", height)) {
+						if (height > maxHeightOptions) {
 							continue;
 						}
-						const CString _protocol(protocol.GetString());
-						if (_protocol != L"http" && _protocol != L"https" && _protocol.Left(4) != L"m3u8") {
-							continue;
-						}
+						if ((height > maxHeight)
+								|| (height == maxHeight && protocol.Left(4) == "http")) {
+							maxHeight = height;
+							bestUrl = url;
+							bVideoOnly = false;
 
-						const auto& url = format["url"];
-						if (!url.IsString()) {
-							continue;
-						}
-
-						const auto& height = format["height"];
-						if (height.IsInt() && height.GetInt() == maxHeight) {
-							const auto& tbr = format["tbr"];
-							const float _tbr = tbr.IsFloat() ? tbr.GetFloat() : 0.0f;
-
-							const auto& fps = format["fps"];
-							const int _fps = fps.IsInt() ? fps.GetInt() : 0;
-
-							bool bMaxQuality = false;
-							if (_fps > maxVideofps
-									|| (_fps == maxVideofps && _tbr > maxVideotbr)) {
-								bMaxQuality = true;
-							}
-
-							maxVideotbr = std::max(maxVideotbr, _tbr);
-							maxVideofps = std::max(maxVideofps, _fps);
-
-							if (bMaxQuality) {
-								bestUrl = url.GetString();
-								bVideoOnly = false;
-								const auto& acodec = format["acodec"];
-								if (acodec.IsString()) {
-									const CString _acodec = acodec.GetString();
-									if (_acodec == L"none") {
-										bVideoOnly = true;
-									}
+							CStringA acodec;
+							if (getJsonValue(format, "acodec", acodec)) {
+								if (acodec == L"none") {
+									bVideoOnly = true;
 								}
 							}
 						}
 					}
 				}
 
-				const auto& title = d["title"];
-				if (title.IsString()) {
-					y_fields.title = UTF8ToWStr(title.GetString());
+				if (!bestUrl.IsEmpty()) {
+					if (bMaximumQuality) {
+						float maxVideotbr = 0.0f;
+						int maxVideofps = 0;
 
-					const auto& ext = d["ext"];
-					if (ext.IsString()) {
-						y_fields.fname.Format(L"%s.%S", y_fields.title, ext.GetString());
+						for (const auto& format : formats->value.GetArray()) {
+							CStringA protocol;
+							if (!getJsonValue(format, "protocol", protocol)
+								|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
+								continue;
+							}
+
+							CStringA url;
+							if (!getJsonValue(format, "url", url)) {
+								continue;
+							}
+
+							int height = 0;
+							if (getJsonValue(format, "height", height) && height == maxHeight) {
+								float tbr = .0f;
+								getJsonValue(format, "tbr", tbr);
+
+								int fps = 0;
+								getJsonValue(format, "fps", fps);
+
+								bool bMaxQuality = false;
+								if (fps > maxVideofps
+										|| (fps == maxVideofps && tbr > maxVideotbr)) {
+									bMaxQuality = true;
+								}
+
+								maxVideotbr = std::max(maxVideotbr, tbr);
+								maxVideofps = std::max(maxVideofps, fps);
+
+								if (bMaxQuality) {
+									bestUrl = url;
+									bVideoOnly = false;
+
+									CStringA acodec;
+									if (getJsonValue(format, "acodec", acodec)) {
+										if (acodec == L"none") {
+											bVideoOnly = true;
+										}
+									}
+								}
+							}
+						}
 					}
-				}
-				const auto& description = d["description"];
-				if (description.IsString()) {
-					y_fields.content = UTF8ToWStr(description.GetString());
-				}
 
-				urls.push_back(bestUrl);
-				if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
-					urls.push_back(bestAudioUrl);
+					if (getJsonValue(d, "title", y_fields.title)) {
+						CStringA ext;
+						if (getJsonValue(d, "ext", ext)) {
+							y_fields.fname.Format(L"%s.%S", y_fields.title.GetString(), ext.GetString());
+						}
+					}
+
+					getJsonValue(d, "uploader", y_fields.author);
+
+					getJsonValue(d, "description", y_fields.content);
+					if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
+						y_fields.content.Replace(L"\n", L"\r\n");
+					}
+
+					CStringA upload_date;
+					if (getJsonValue(d, "upload_date", upload_date)) {
+						WORD y, m, d;
+						if (sscanf_s(upload_date.GetString(), "%04hu%02hu%02hu", &y, &m, &d) == 3) {
+							y_fields.dtime.wYear = y;
+							y_fields.dtime.wMonth = m;
+							y_fields.dtime.wDay = d;
+						}
+					}
+
+					urls.push_back(CString(bestUrl));
+					if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
+						urls.push_back(CString(bestAudioUrl));
+					}
+
+					// subtitles
+					if (const auto& requested_subtitles = d.FindMember("requested_subtitles"); requested_subtitles != d.MemberEnd() && requested_subtitles->value.IsObject()) {
+						for (const auto& subtitle : requested_subtitles->value.GetObject()) {
+							CString sub_url;
+							getJsonValue(subtitle.value, "url", sub_url);
+							CString sub_lang = UTF8ToWStr(subtitle.name.GetString());
+
+							if (!sub_url.IsEmpty() && !sub_lang.IsEmpty()) {
+								subs.push_back({ sub_url, sub_lang });
+							}
+						}
+					}
 				}
 			}
 		}
