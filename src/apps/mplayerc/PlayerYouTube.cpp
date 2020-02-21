@@ -58,7 +58,11 @@
 
 namespace Youtube
 {
-	static LPCWSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+#if __has_include("..\..\my_google_api_key.h")
+#include "..\..\my_google_api_key.h"
+#else
+	static LPCWSTR strGoogleApiKey = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+#endif
 
 	static LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
 
@@ -262,7 +266,7 @@ namespace Youtube
 	{
 		if (hInet && !videoId.IsEmpty()) {
 			CString url;
-			url.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, GOOGLE_API_KEY);
+			url.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, strGoogleApiKey);
 			char* data = nullptr;
 			DWORD dataSize = 0;
 			InternetReadData(hInet, url, &data, dataSize);
@@ -1134,7 +1138,7 @@ namespace Youtube
 			for (;;) {
 				if (hInet) {
 					CString link;
-					link.Format(L"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=%s&key=%s&maxResults=50", playlistId.GetString(), GOOGLE_API_KEY);
+					link.Format(L"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=%s&key=%s&maxResults=50", playlistId.GetString(), strGoogleApiKey);
 					if (!nextToken.IsEmpty()) {
 						link.AppendFormat(L"&pageToken=%s", nextToken.GetString());
 						nextToken.Empty();
