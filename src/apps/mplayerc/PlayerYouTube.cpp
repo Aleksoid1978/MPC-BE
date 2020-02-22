@@ -61,7 +61,7 @@ namespace Youtube
 #if __has_include("..\..\my_google_api_key.h")
 #include "..\..\my_google_api_key.h"
 #else
-	static LPCWSTR strGoogleApiKey = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+	static LPCWSTR strGoogleApiKey = L"AIzaSyDsuXgZVQnozbJ6wHw2y6V-ZImJprDK90g";
 #endif
 
 	static LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
@@ -1174,7 +1174,7 @@ namespace Youtube
 									url.Format(L"https://www.youtube.com/watch?v=%s", videoId.GetString());
 
 									CString title;
-									if (getJsonValue(resourceId->value, "title", title)) {
+									if (getJsonValue(snippet->value, "title", title)) {
 										title = FixHtmlSymbols(title);
 									}
 
