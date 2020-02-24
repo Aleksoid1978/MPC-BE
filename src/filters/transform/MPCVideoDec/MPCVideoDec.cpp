@@ -2258,20 +2258,6 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 				OutList = YUV420_8;
 			}
 
-			// swap NV12 and YV12 for the Intel GPU.
-			MPCPixelFormat IntelOutList[PixFmt_count];
-			if (m_nPCIVendor == PCIV_Intel) {
-				memcpy(IntelOutList, OutList, sizeof(IntelOutList));
-				for (int i = 1; i < PixFmt_count; i++) {
-					if (IntelOutList[i-1] == PixFmt_NV12 && IntelOutList[i] == PixFmt_YV12) {
-						IntelOutList[i-1] = PixFmt_YV12;
-						IntelOutList[i] = PixFmt_NV12;
-						OutList = IntelOutList;
-						break;
-					}
-				}
-			}
-
 			for (int i = 0; i < PixFmt_count; i++) {
 				int index = OutList[i];
 				if (m_fPixFmts[index]) {
