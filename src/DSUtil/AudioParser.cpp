@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2019 see Authors.txt
+ * (C) 2011-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -332,16 +332,17 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  ac3_halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
 	static const BYTE  ac3_lfeon[8]     = { 0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01 };
 
-	if (GETU16(buf) != AC3_SYNCWORD) { // syncword
+	const auto sync = GETU16(buf);
+	if (sync != AC3_SYNCWORD && sync != AC3_SYNCWORD_LE) { // syncword
 		return 0;
 	}
 
-	BYTE bsid = buf[5] >> 3; // bsid
+	BYTE bsid = buf[sync == AC3_SYNCWORD ? 5 : 4] >> 3; // bsid
 	if (bsid > 10) {
 		return 0;
 	}
 
-	int frmsizecod = buf[4] & 0x3F;
+	int frmsizecod = buf[sync == AC3_SYNCWORD ? 4 : 5] & 0x3F;
 	if (frmsizecod >= 38) {
 		return 0;
 	}
@@ -350,7 +351,7 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	int samplerate;
 	int half = ac3_halfrate[bsid];
 	int rate = ac3_rates[frmsizecod >> 1];
-	switch (buf[4] & 0xc0) {
+	switch (buf[sync == AC3_SYNCWORD ? 4 : 5] & 0xc0) {
 		case 0:
 			samplerate = 48000 >> half;
 			frame_size  = 4 * rate;
@@ -371,8 +372,9 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 		audioframe->size       = frame_size;
 		audioframe->samplerate = samplerate;
 
-		BYTE acmod = buf[6] >> 5;
-		BYTE flags = ((((buf[6] & 0xf8) == 0x50) ? AC3_DOLBY : acmod) | ((buf[6] & ac3_lfeon[acmod]) ? AC3_LFE : 0));
+		const auto buf6 = buf[sync == AC3_SYNCWORD ? 6 : 7];
+		BYTE acmod = buf6 >> 5;
+		BYTE flags = ((((buf6 & 0xf8) == 0x50) ? AC3_DOLBY : acmod) | ((buf6 & ac3_lfeon[acmod]) ? AC3_LFE : 0));
 		switch (flags & AC3_CHANNEL_MASK) {
 			case AC3_MONO:
 				audioframe->channels = 1;
