@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -86,6 +86,10 @@ STDAPI DllRegisterServer()
 	SetRegKeyValue(
 		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
 		L"1", L"0,2,,0B77"); // AC3, E-AC3
+
+	SetRegKeyValue(
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"1", L"0,2,,770B"); // AC3 LE
 
 	SetRegKeyValue(
 		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",

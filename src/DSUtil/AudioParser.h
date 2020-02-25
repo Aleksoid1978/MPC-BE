@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2018 see Authors.txt
+ * (C) 2011-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 #include "GolombBuffer.h"
 
 #define AC3_SYNCWORD                 0x770B
+#define AC3_SYNCWORD_LE              0x0B77
 #define AAC_ADTS_SYNCWORD            0xF0FF
 #define AAC_LATM_SYNCWORD             0x2B7
 

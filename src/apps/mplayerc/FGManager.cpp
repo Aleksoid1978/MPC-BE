@@ -1987,6 +1987,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_AC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDTSAC3Source>(DTSAC3SourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,2,,0B77");                   // AC3, E-AC3
+		pFGF->m_chkbytes.emplace_back(L"0,2,,770B");                   // AC3 LE
 		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBB");               // MLP
 		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBA");               // TrueHD
 		pFGF->m_extensions.emplace_back(L".ac3");
