@@ -4570,6 +4570,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	if (m_wndToolBar.IsWindowVisible()) {
 		m_wndToolBar.SendMessageW(WM_CANCELMODE);
 	}
+	m_wndToolBar.SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
 	DLog(L"CMainFrame::OnFilePostCloseMedia() : end");
 }
