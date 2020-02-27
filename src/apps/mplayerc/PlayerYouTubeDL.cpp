@@ -163,6 +163,8 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 				float maxtbr = 0.0f;
 				CStringA bestAudioUrl;
 
+				std::map<CStringA, CStringA> audioUrls;
+
 				CStringA bestUrl;
 				getJsonValue(d, "url", bestUrl);
 
@@ -187,6 +189,15 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 										|| (tbr == maxtbr && protocol.Left(4) == "http")) {
 									maxtbr = tbr;
 									bestAudioUrl = url;
+								}
+							} else if (bestAudioUrl.IsEmpty()) {
+								bestAudioUrl = url;
+							}
+
+							CStringA language;
+							if (getJsonValue(format, "language", language)) {
+								if (const auto it = audioUrls.find(language); it == audioUrls.cend()) {
+									audioUrls[language] = url;
 								}
 							}
 						}
@@ -287,8 +298,14 @@ bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int ma
 					}
 
 					urls.push_back(CString(bestUrl));
-					if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
-						urls.push_back(CString(bestAudioUrl));
+					if (bVideoOnly) {
+						if (audioUrls.size() > 1) {
+							for (const auto& [language, audioUrl] : audioUrls) {
+								urls.push_back(CString(audioUrl));
+							}
+						} else if (!bestAudioUrl.IsEmpty()) {
+							urls.push_back(CString(bestAudioUrl));
+						}
 					}
 
 					// subtitles
