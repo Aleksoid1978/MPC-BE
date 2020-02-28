@@ -255,7 +255,7 @@ CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext)
 	ext.TrimLeft('.');
 
 	if (!ext.IsEmpty()) {
-		const auto it = std::find_if(begin(), end(), [ext](const CMediaFormatCategory& mfc){
+		const auto it = std::find_if(begin(), end(), [&ext](const CMediaFormatCategory& mfc){
 			return mfc.FindExt(ext);
 		});
 		if (it != cend()) {
