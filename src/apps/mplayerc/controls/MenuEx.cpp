@@ -266,7 +266,7 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 		const auto uID = mii.wID;
 
 		LPMENUITEM lpItem = nullptr;
-		auto it = std::find_if(m_pMenuItems.begin(), m_pMenuItems.end(), [&](const std::unique_ptr<MENUITEM>& item) {
+		auto it = std::find_if(m_pMenuItems.begin(), m_pMenuItems.end(), [uID, bMainMenu](const std::unique_ptr<MENUITEM>& item) {
 			return item->uID == uID && item->bMainMenu == bMainMenu;
 		});
 

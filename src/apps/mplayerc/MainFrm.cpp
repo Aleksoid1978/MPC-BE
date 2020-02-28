@@ -10690,7 +10690,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				curmonitor.GetDeviceId(strFullScreenMonitorID);
 			}
 
-			auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
+			auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&strFullScreenMonitorID](const fullScreenRes& item) {
 				return item.monitorId == strFullScreenMonitorID;
 			});
 
@@ -10865,7 +10865,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 					curmonitor.GetDeviceId(strFullScreenMonitorID);
 				}
 
-				auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
+				auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&strFullScreenMonitorID](const fullScreenRes& item) {
 					return item.monitorId == strFullScreenMonitorID;
 				});
 
@@ -10971,7 +10971,7 @@ void CMainFrame::AutoChangeMonitorMode()
 			return;
 		}
 
-		auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
+		auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&strFullScreenMonitorID](const fullScreenRes& item) {
 			return item.monitorId == strFullScreenMonitorID;
 		});
 
@@ -11954,7 +11954,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		pOFD->fns.clear();
 
-		const auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&](const Youtube::YoutubeUrllistItem& item) {
+		auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&s](const Youtube::YoutubeUrllistItem& item) {
 			return item.profile->iTag == s.iYoutubeTagSelected;
 		});
 		if (it != m_youtubeUrllist.cend()) {
