@@ -374,7 +374,7 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
 
 const CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 {
-	for (auto& stream : GetStreams()) {
+	for (const auto& stream : GetStreams()) {
 		if (stream.m_PID == wPID) {
 			return &stream;
 		}
@@ -782,24 +782,40 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 
 			for (auto& Item : Playlist) {
 				SHORT lenght = ReadShort();
-				BYTE* buf = DNew BYTE[lenght];
-				ReadBuffer(buf, lenght);
-				CGolombBuffer gb(buf, lenght);
+				auto buf = std::make_unique<BYTE[]>(lenght);
+				ReadBuffer(buf.get(), lenght);
+				CGolombBuffer gb(buf.get(), lenght);
 
 				int Fixed_offset_during_PopUp_flag = gb.BitRead(1);
 				gb.BitRead(15); // reserved
 
 				for (BYTE i = 0; i < Item.m_num_video; i++) {
+					Stream s;
+
 					// stream_entry
 					BYTE slen = gb.ReadByte();
+					gb.SkipBytes(3);
+					s.m_PID = gb.ReadShort();
+					slen -= 5;
 					gb.SkipBytes(slen);
 
 					// stream_attributes_ss
 					slen = gb.ReadByte();
+					s.m_Type = (PES_STREAM_TYPE)gb.ReadByte();
+					s.m_VideoFormat = (BDVM_VideoFormat)gb.BitRead(4);
+					s.m_FrameRate = (BDVM_FrameRate)gb.BitRead(4);
+					slen -= 2;
 					gb.SkipBytes(slen);
 
 					gb.BitRead(10); // reserved
 					gb.BitRead(6);  // number_of_offset_sequences
+
+					auto it = std::find_if(stn.m_Streams.cbegin(), stn.m_Streams.cend(), [&s](const Stream& stream) {
+						return stream.m_PID == s.m_PID;
+					});
+					if (it == stn.m_Streams.cend()) {
+						stn.m_Streams.emplace_back(s);
+					}
 				}
 
 				for (auto& id : Item.m_pg_offset_sequence_id) {
@@ -865,8 +881,6 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 						gb.ReadByte(); // PG offset
 					}
 				}
-
-				SAFE_DELETE_ARRAY(buf);
 			}
 		}
 
