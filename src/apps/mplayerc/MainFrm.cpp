@@ -13111,7 +13111,7 @@ void CMainFrame::UpdateWindowTitle()
 
 BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
 {
-	CharLower(pattern.GetBuffer());
+	CharLowerW(pattern.GetBuffer());
 	pattern.Replace(L"[fc]", L"forced");
 	pattern.Replace(L"[def]", L"default");
 	if (pattern.Find(L"forced") == -1) {
@@ -13132,25 +13132,24 @@ BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, 
 			}
 
 			CString name(Tracks[iIndex].Name);
-			CharLower(name.GetBuffer());
+			CharLowerW(name.GetBuffer());
 
 			std::list<CString> sl;
 			Explode(lang, sl, L'|');
 
-			int nLangMatch = 0;
+			size_t nLangMatch = 0;
 			for (CString subPattern : sl) {
-				if ((Tracks[iIndex].forced && subPattern == L"forced") || (Tracks[iIndex].def && subPattern == L"default")) {
-					nLangMatch++;
-					continue;
-				}
-
+				bool bSkip = false;
 				if (subPattern[0] == '!') {
 					subPattern.Delete(0, 1);
-					if (name.Find(subPattern) == -1) {
+					bSkip = true;
+				}
+
+				if ((Tracks[iIndex].forced && subPattern == L"forced") || (Tracks[iIndex].def && subPattern == L"default")
+						|| name.Find(subPattern) >= 0) {
+					if (!bSkip) {
 						nLangMatch++;
 					}
-				} else if (name.Find(subPattern) >= 0) {
-					nLangMatch++;
 				}
 			}
 
@@ -13450,14 +13449,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					if (dwGroup == 2) {
 						subIndex++;
 
-						CString lang;
-						if (lcid == 0) {
-							lang = pName;
-						} else {
-							int len = GetLocaleInfoW(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-							lang.ReleaseBufferSetLength(max(len - 1, 0));
-						}
-
 						UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 						if (dwFlags) {
 							checkedsplsub = subIndex;
@@ -13469,7 +13460,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.Index		= i;
 
 						bool Forced, Def;
-						SubFlags(lang, Forced, Def);
+						SubFlags(pName, Forced, Def);
 
 						substream.Name		= pName;
 						substream.forced	= Forced;
@@ -13503,21 +13494,13 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
 					cntintsub++;
 
-					CString lang;
-					if (lcid == 0) {
-						lang = CString(pName);
-					} else {
-						int len = GetLocaleInfoW(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-						lang.ReleaseBufferSetLength(max(len - 1, 0));
-					}
-
 					substream.Ext		= false;
 					substream.Filter	= 2;
 					substream.Num		= iNum++;
 					substream.Index		= tPos;
 
 					bool Forced, Def;
-					SubFlags(lang, Forced, Def);
+					SubFlags(pName, Forced, Def);
 
 					substream.Name		= pName;
 					substream.forced	= Forced;
@@ -13560,17 +13543,15 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				WCHAR* pName = nullptr;
 				LCID lcid;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
-					CString name(pName);
-
 					substream.Ext		= true;
 					substream.Filter	= 2;
 					substream.Num		= iNum++;
 					substream.Index		= tPos + (extcnt < 0 ? 0 : extcnt + 1);
 
 					bool Forced, Def;
-					SubFlags(name, Forced, Def);
+					SubFlags(pName, Forced, Def);
 
-					substream.Name		= name;
+					substream.Name		= pName;
 					substream.forced	= Forced;
 					substream.def		= Def;
 
