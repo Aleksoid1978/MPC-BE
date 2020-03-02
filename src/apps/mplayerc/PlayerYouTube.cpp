@@ -565,6 +565,12 @@ namespace Youtube
 
 					if (const auto& adaptiveFormats = streamingData->value.FindMember("adaptiveFormats"); adaptiveFormats != streamingData->value.MemberEnd() && adaptiveFormats->value.IsArray()) {
 						for (const auto& adaptiveFormat : adaptiveFormats->value.GetArray()) {
+							CStringA type;
+							if (getJsonValue(adaptiveFormat, "type", type) && type == L"FORMAT_STREAM_TYPE_OTF") {
+								// fragmented url
+								continue;
+							}
+
 							streamingDataFormat element;
 
 							getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
