@@ -1747,6 +1747,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("MidiVid Archive Codec"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_CDTOONS,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "cdtoons",
+        .long_name = NULL_IF_CONFIG_SMALL("CDToons video"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
 
     /* various PCM "codecs" */
     {
@@ -1867,13 +1874,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "pcm_s24daud",
         .long_name = NULL_IF_CONFIG_SMALL("PCM D-Cinema audio signed 24-bit"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
-    },
-    {
-        .id        = AV_CODEC_ID_PCM_ZORK,
-        .type      = AVMEDIA_TYPE_AUDIO,
-        .name      = "pcm_zork",
-        .long_name = NULL_IF_CONFIG_SMALL("PCM Zork"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
     {
         .id        = AV_CODEC_ID_PCM_S16LE_PLANAR,
@@ -2295,6 +2295,34 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "adpcm_agm",
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM AmuseGraphics Movie AGM"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_ARGO,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_argo",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Argonaut Games"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_SSI,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_ssi",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Simon & Schuster Interactive"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_ZORK,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_zork",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Zork"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_APM,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_apm",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Ubisoft APM"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 
@@ -3022,6 +3050,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "mpegh_3d_audio",
         .long_name = NULL_IF_CONFIG_SMALL("MPEG-H 3D Audio"),
         .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_SIREN,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "siren",
+        .long_name = NULL_IF_CONFIG_SMALL("Siren"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 
     /* subtitle codecs */

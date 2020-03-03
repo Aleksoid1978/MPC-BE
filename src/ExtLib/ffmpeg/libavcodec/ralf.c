@@ -60,7 +60,7 @@ typedef struct RALFContext {
     int     filter_bits;     ///< filter precision for the current channel data
     int32_t filter[64];
 
-    int     bias[2];         ///< a constant value added to channel data after filtering
+    unsigned bias[2];        ///< a constant value added to channel data after filtering
 
     int num_blocks;          ///< number of blocks inside the frame
     int sample_offset;
@@ -330,7 +330,7 @@ static void apply_lpc(RALFContext *ctx, int ch, int length, int bits)
             acc = (acc + bias - 1) >> ctx->filter_bits;
             acc = FFMAX(acc, min_clip);
         } else {
-            acc = (acc + bias) >> ctx->filter_bits;
+            acc = ((unsigned)acc + bias) >> ctx->filter_bits;
             acc = FFMIN(acc, max_clip);
         }
         audio[i] += acc;

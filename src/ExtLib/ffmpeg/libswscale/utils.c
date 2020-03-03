@@ -86,7 +86,7 @@ const char *swscale_configuration(void)
 const char *swscale_license(void)
 {
 #define LICENSE_PREFIX "libswscale license: "
-    return LICENSE_PREFIX FFMPEG_LICENSE + sizeof(LICENSE_PREFIX) - 1;
+    return &LICENSE_PREFIX FFMPEG_LICENSE[sizeof(LICENSE_PREFIX) - 1];
 }
 
 typedef struct FormatEntry {
@@ -95,7 +95,7 @@ typedef struct FormatEntry {
     uint8_t is_supported_endianness :1;
 } FormatEntry;
 
-static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
+static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_YUV420P]     = { 1, 1 },
     [AV_PIX_FMT_YUYV422]     = { 1, 1 },
     [AV_PIX_FMT_RGB24]       = { 1, 1 },
@@ -266,23 +266,24 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_YUVA444P12LE] = { 1, 1 },
     [AV_PIX_FMT_NV24]        = { 1, 1 },
     [AV_PIX_FMT_NV42]        = { 1, 1 },
+    [AV_PIX_FMT_Y210LE]      = { 1, 0 },
 };
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)
 {
-    return (unsigned)pix_fmt < AV_PIX_FMT_NB ?
+    return (unsigned)pix_fmt < FF_ARRAY_ELEMS(format_entries) ?
            format_entries[pix_fmt].is_supported_in : 0;
 }
 
 int sws_isSupportedOutput(enum AVPixelFormat pix_fmt)
 {
-    return (unsigned)pix_fmt < AV_PIX_FMT_NB ?
+    return (unsigned)pix_fmt < FF_ARRAY_ELEMS(format_entries) ?
            format_entries[pix_fmt].is_supported_out : 0;
 }
 
 int sws_isSupportedEndiannessConversion(enum AVPixelFormat pix_fmt)
 {
-    return (unsigned)pix_fmt < AV_PIX_FMT_NB ?
+    return (unsigned)pix_fmt < FF_ARRAY_ELEMS(format_entries) ?
            format_entries[pix_fmt].is_supported_endianness : 0;
 }
 
@@ -1502,6 +1503,7 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         ff_free_filters(c2);
         if (ff_init_filters(c2) < 0) {
             sws_freeContext(c2);
+            c->cascaded_context[1] = NULL;
             return -1;
         }
 
