@@ -1645,9 +1645,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	CPlaylistItem *pli = nullptr;
 
 	INT_PTR c = curPlayList.GetCount();
-	CString str;
+	CString str, title, album;
 	while (f.ReadString(str)) {
-		str = str.Trim();
+		FastTrim(str);
 
 		if (str.IsEmpty() || (str.Left(7) == L"#EXTM3U")) {
 			continue;
@@ -1658,24 +1658,34 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		}
 
 		if (str.Left(1) == L"#") {
-			if (str.Left(8) == L"#EXTINF:") {
-				int pos = 8;
+			auto DeleteLeft = [](const auto pos, auto& str) {
 				str = str.Mid(pos, str.GetLength() - pos);
+				str.TrimLeft();
+			};
 
-				pos = str.Find(L",");
+			if (str.Left(8) == L"#EXTINF:") {
+				DeleteLeft(8, str);
+
+				int pos = str.Find(L",");
 				if (pos > 0) {
 					const auto tmp = str.Left(pos);
 					int dur = 0;
 					if (swscanf_s(tmp, L"%dx", &dur) == 1) {
 						pos++;
 						str = str.Mid(pos, str.GetLength() - pos);
+
+						if (dur > 0) {
+							pli->m_duration = UNITS * dur;
+						}
 					}
 				}
-				pli->m_label = str.Trim();
+				title = str.TrimLeft();
+			} else if (str.Left(8) == L"#EXTALB:") {
+				DeleteLeft(8, str);
+				album = str;
 			} else if (str.Left(18) == L"#EXT-X-STREAM-INF:") {
-				const int pos = 18;
-				str = str.Mid(pos, str.GetLength() - pos);
-				pli->m_label = str.Trim();
+				DeleteLeft(18, str);
+				title = str;
 
 				audioId = RegExpParse<CString>(str.GetString(), LR"(AUDIO=\"(\S*?)\")");
 			} else if (str.Left(13) == L"#EXT-X-MEDIA:" && str.Find(L"TYPE=AUDIO") >= 13) {
@@ -1728,9 +1738,23 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 				audioId.Empty();
 			}
+
+			if (!title.IsEmpty()) {
+				if (!album.IsEmpty()) {
+					pli->m_label = album + L" - " + title;
+				} else {
+					pli->m_label = title;
+				}
+			} else if (!album.IsEmpty()) {
+				pli->m_label = album;
+			}
+
 			playlist.push_back(*pli);
 
 			SAFE_DELETE(pli);
+
+			title.Empty();
+			album.Empty();
 		}
 	}
 
