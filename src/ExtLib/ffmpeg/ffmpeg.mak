@@ -797,7 +797,8 @@ SRCS_YASM_LS = \
 	libswscale/x86/input.asm \
 	libswscale/x86/output.asm \
 	libswscale/x86/rgb_2_rgb.asm \
-	libswscale/x86/scale.asm
+	libswscale/x86/scale.asm \
+	libswscale/x86/yuv_2_rgb.asm
 
 OBJS_LC = \
 	$(SRCS_LC:%.c=$(OBJ_DIR)%.o) \

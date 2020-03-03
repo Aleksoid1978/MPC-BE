@@ -476,7 +476,7 @@ static int ivi_dec_tile_data_size(GetBitContext *gb)
     if (get_bits1(gb)) {
         len = get_bits(gb, 8);
         if (len == 255)
-            len = get_bits_long(gb, 24);
+            len = get_bits(gb, 24);
     }
 
     /* align the bitstream reader on the byte boundary */
@@ -1193,7 +1193,7 @@ int ff_ivi_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         left = get_bits_count(&ctx->gb) & 0x18;
         skip_bits_long(&ctx->gb, 64 - left);
         if (get_bits_left(&ctx->gb) > 18 &&
-            show_bits_long(&ctx->gb, 21) == 0xBFFF8) { // syncheader + inter type
+            show_bits(&ctx->gb, 21) == 0xBFFF8) { // syncheader + inter type
             AVPacket pkt;
             pkt.data = avpkt->data + (get_bits_count(&ctx->gb) >> 3);
             pkt.size = get_bits_left(&ctx->gb) >> 3;

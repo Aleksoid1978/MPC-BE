@@ -69,6 +69,12 @@
  */
 #define FF_CODEC_CAP_SLICE_THREAD_HAS_MF    (1 << 5)
 
+/**
+ * AVCodec.codec_tags termination value
+ */
+#define FF_CODEC_TAGS_END -1
+
+
 #ifdef TRACE
 #   define ff_tlog(ctx, ...) av_log(ctx, AV_LOG_TRACE, __VA_ARGS__)
 #else
@@ -395,6 +401,8 @@ AVCPBProperties *ff_add_cpb_side_data(AVCodecContext *avctx);
 
 int ff_side_data_set_encoder_stats(AVPacket *pkt, int quality, int64_t *error, int error_count, int pict_type);
 
+int ff_side_data_set_prft(AVPacket *pkt, int64_t timestamp);
+
 /**
  * Check AVFrame for A53 side data and allocate and fill SEI message with A53 info
  *
@@ -427,6 +435,8 @@ int64_t ff_guess_coded_bitrate(AVCodecContext *avctx);
  */
 int ff_int_from_list_or_default(void *ctx, const char * val_name, int val,
                                 const int * array_valid_values, int default_value);
+
+void ff_dvdsub_parse_palette(uint32_t *palette, const char *p);
 
 #if defined(_WIN32) && CONFIG_SHARED && !defined(BUILDING_avcodec)
 #    define av_export_avcodec __declspec(dllimport)

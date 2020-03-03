@@ -373,7 +373,9 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
  * @param GET_BYTE Expression reading one byte from the input.
  *                 Evaluated up to 7 times (4 for the currently
  *                 assigned Unicode range).  With a memory buffer
- *                 input, this could be *ptr++.
+ *                 input, this could be *ptr++, or if you want to make sure
+ *                 that *ptr stops at the end of a NULL terminated string then
+ *                 *ptr ? *ptr++ : 0
  * @param ERROR    Expression to be evaluated on invalid input,
  *                 typically a goto statement.
  *
@@ -387,11 +389,11 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
     {\
         uint32_t top = (val & 128) >> 1;\
         if ((val & 0xc0) == 0x80 || val >= 0xFE)\
-            ERROR\
+            {ERROR}\
         while (val & top) {\
-            int tmp= (GET_BYTE) - 128;\
+            unsigned int tmp = (GET_BYTE) - 128;\
             if(tmp>>6)\
-                ERROR\
+                {ERROR}\
             val= (val<<6) + tmp;\
             top <<= 5;\
         }\
@@ -408,13 +410,13 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
  *                  typically a goto statement.
  */
 #define GET_UTF16(val, GET_16BIT, ERROR)\
-    val = GET_16BIT;\
+    val = (GET_16BIT);\
     {\
         unsigned int hi = val - 0xD800;\
         if (hi < 0x800) {\
-            val = GET_16BIT - 0xDC00;\
+            val = (GET_16BIT) - 0xDC00;\
             if (val > 0x3FFU || hi > 0x3FFU)\
-                ERROR\
+                {ERROR}\
             val += (hi<<10) + 0x10000;\
         }\
     }\

@@ -53,6 +53,7 @@ Communication
 website                                 Deby Barbara Lepage
 fate.ffmpeg.org                         Timothy Gu
 Trac bug tracker                        Alexander Strasser, Michael Niedermayer, Carl Eugen Hoyos
+Patchwork                               Andriy Gelman
 mailing lists                           Baptiste Coudurier
 Google+                                 Paul B Mahol, Michael Niedermayer, Alexander Strasser
 Twitter                                 Lou Logan, Reynaldo H. Verdejo Pinochet
@@ -450,7 +451,7 @@ Muxers/Demuxers:
   mpegtsenc.c                           Baptiste Coudurier
   msnwc_tcp.c                           Ramiro Polla
   mtv.c                                 Reynaldo H. Verdejo Pinochet
-  mxf*                                  Baptiste Coudurier
+  mxf*                                  Baptiste Coudurier, Tomas Härdin
   nistspheredec.c                       Paul B Mahol
   nsvdec.c                              Francois Revol
   nut*                                  Michael Niedermayer
@@ -506,6 +507,7 @@ Protocols:
   ftp.c                                 Lukasz Marek
   http.c                                Ronald S. Bultje
   libssh.c                              Lukasz Marek
+  libzmq.c                              Andriy Gelman
   mms*.c                                Ronald S. Bultje
   udp.c                                 Luca Abeni
   icecast.c                             Marvin Scholz

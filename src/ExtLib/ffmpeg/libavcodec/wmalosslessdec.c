@@ -189,6 +189,13 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
 
+    av_assert0(avctx->channels >= 0);
+    if (avctx->channels > WMALL_MAX_CHANNELS) {
+        avpriv_request_sample(avctx,
+                              "More than " AV_STRINGIFY(WMALL_MAX_CHANNELS) " channels");
+        return AVERROR_PATCHWELCOME;
+    }
+
     s->max_frame_size = MAX_FRAMESIZE * avctx->channels;
     s->frame_data = av_mallocz(s->max_frame_size + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!s->frame_data)
@@ -265,16 +272,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
         for (mask = 1; mask < 16; mask <<= 1)
             if (channel_mask & mask)
                 ++s->lfe_channel;
-    }
-
-    if (s->num_channels < 0) {
-        av_log(avctx, AV_LOG_ERROR, "invalid number of channels %"PRId8"\n",
-               s->num_channels);
-        return AVERROR_INVALIDDATA;
-    } else if (s->num_channels > WMALL_MAX_CHANNELS) {
-        avpriv_request_sample(avctx,
-                              "More than %d channels", WMALL_MAX_CHANNELS);
-        return AVERROR_PATCHWELCOME;
     }
 
     s->frame = av_frame_alloc();
@@ -535,7 +532,8 @@ static int decode_channel_residues(WmallDecodeCtx *s, int ch, int tile_size)
         i++;
     }
     for (; i < tile_size; i++) {
-        int quo = 0, rem, rem_bits, residue;
+        int rem, rem_bits;
+        unsigned quo = 0, residue;
         while(get_bits1(&s->gb)) {
             quo++;
             if (get_bits_left(&s->gb) <= 0)
@@ -774,7 +772,7 @@ static void revert_cdlms ## bits (WmallDecodeCtx *s, int ch, \
                                                         s->cdlms[ch][ilms].recent, \
                                                         FFALIGN(s->cdlms[ch][ilms].order, ROUND), \
                                                         WMASIGN(residue)); \
-            input = residue + (pred >> s->cdlms[ch][ilms].scaling); \
+            input = residue + (unsigned)(pred >> s->cdlms[ch][ilms].scaling); \
             lms_update ## bits(s, ch, ilms, input); \
             s->channel_residues[ch][icoef] = input; \
         } \
@@ -825,8 +823,11 @@ static void revert_acfilter(WmallDecodeCtx *s, int tile_size)
             pred >>= scaling;
             s->channel_residues[ich][i] += (unsigned)pred;
         }
-        for (j = 0; j < order; j++)
-            prevvalues[j] = s->channel_residues[ich][tile_size - j - 1];
+        for (j = order - 1; j >= 0; j--)
+            if (tile_size <= j) {
+                prevvalues[j] = prevvalues[j - tile_size];
+            }else
+                prevvalues[j] = s->channel_residues[ich][tile_size - j - 1];
     }
 }
 
@@ -979,7 +980,7 @@ static int decode_subframe(WmallDecodeCtx *s)
         if (s->quant_stepsize != 1)
             for (i = 0; i < s->num_channels; i++)
                 for (j = 0; j < subframe_len; j++)
-                    s->channel_residues[i][j] *= s->quant_stepsize;
+                    s->channel_residues[i][j] *= (unsigned)s->quant_stepsize;
     }
 
     /* Write to proper output buffer depending on bit-depth */
@@ -991,7 +992,7 @@ static int decode_subframe(WmallDecodeCtx *s)
             if (s->bits_per_sample == 16) {
                 *s->samples_16[c]++ = (int16_t) s->channel_residues[c][j] * (1 << padding_zeroes);
             } else {
-                *s->samples_32[c]++ = s->channel_residues[c][j] * (256 << padding_zeroes);
+                *s->samples_32[c]++ = s->channel_residues[c][j] * (256U << padding_zeroes);
             }
         }
     }

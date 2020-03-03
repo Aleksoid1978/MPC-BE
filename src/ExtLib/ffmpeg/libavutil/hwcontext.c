@@ -59,6 +59,9 @@ static const HWContextType * const hw_table[] = {
 #if CONFIG_MEDIACODEC
     &ff_hwcontext_type_mediacodec,
 #endif
+#if CONFIG_VULKAN
+    &ff_hwcontext_type_vulkan,
+#endif
     NULL,
 };
 
@@ -73,6 +76,7 @@ static const char *const hw_type_names[] = {
     [AV_HWDEVICE_TYPE_VDPAU]  = "vdpau",
     [AV_HWDEVICE_TYPE_VIDEOTOOLBOX] = "videotoolbox",
     [AV_HWDEVICE_TYPE_MEDIACODEC] = "mediacodec",
+    [AV_HWDEVICE_TYPE_VULKAN] = "vulkan",
 };
 
 enum AVHWDeviceType av_hwdevice_find_type_by_name(const char *name)
@@ -444,21 +448,54 @@ int av_hwframe_transfer_data(AVFrame *dst, const AVFrame *src, int flags)
     if (!dst->buf[0])
         return transfer_data_alloc(dst, src, flags);
 
-    if (src->hw_frames_ctx) {
-        ctx = (AVHWFramesContext*)src->hw_frames_ctx->data;
+    /*
+     * Hardware -> Hardware Transfer.
+     * Unlike Software -> Hardware or Hardware -> Software, the transfer
+     * function could be provided by either the src or dst, depending on
+     * the specific combination of hardware.
+     */
+    if (src->hw_frames_ctx && dst->hw_frames_ctx) {
+        AVHWFramesContext *src_ctx =
+            (AVHWFramesContext*)src->hw_frames_ctx->data;
+        AVHWFramesContext *dst_ctx =
+            (AVHWFramesContext*)dst->hw_frames_ctx->data;
 
-        ret = ctx->internal->hw_type->transfer_data_from(ctx, dst, src);
+        if (src_ctx->internal->source_frames) {
+            av_log(src_ctx, AV_LOG_ERROR,
+                   "A device with a derived frame context cannot be used as "
+                   "the source of a HW -> HW transfer.");
+            return AVERROR(ENOSYS);
+        }
+
+        if (dst_ctx->internal->source_frames) {
+            av_log(src_ctx, AV_LOG_ERROR,
+                   "A device with a derived frame context cannot be used as "
+                   "the destination of a HW -> HW transfer.");
+            return AVERROR(ENOSYS);
+        }
+
+        ret = src_ctx->internal->hw_type->transfer_data_from(src_ctx, dst, src);
+        if (ret == AVERROR(ENOSYS))
+            ret = dst_ctx->internal->hw_type->transfer_data_to(dst_ctx, dst, src);
         if (ret < 0)
             return ret;
-    } else if (dst->hw_frames_ctx) {
-        ctx = (AVHWFramesContext*)dst->hw_frames_ctx->data;
+    } else {
+        if (src->hw_frames_ctx) {
+            ctx = (AVHWFramesContext*)src->hw_frames_ctx->data;
 
-        ret = ctx->internal->hw_type->transfer_data_to(ctx, dst, src);
-        if (ret < 0)
-            return ret;
-    } else
-        return AVERROR(ENOSYS);
+            ret = ctx->internal->hw_type->transfer_data_from(ctx, dst, src);
+            if (ret < 0)
+                return ret;
+        } else if (dst->hw_frames_ctx) {
+            ctx = (AVHWFramesContext*)dst->hw_frames_ctx->data;
 
+            ret = ctx->internal->hw_type->transfer_data_to(ctx, dst, src);
+            if (ret < 0)
+                return ret;
+        } else {
+            return AVERROR(ENOSYS);
+        }
+    }
     return 0;
 }
 
