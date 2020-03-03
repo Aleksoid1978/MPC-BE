@@ -173,14 +173,13 @@ namespace Youtube
 
 	bool CheckURL(CString url)
 	{
-		CString tmp_fn(url);
-		tmp_fn.MakeLower();
+		url.MakeLower();
 
-		if (tmp_fn.Find(YOUTUBE_URL) != -1
-				|| tmp_fn.Find(YOUTUBE_URL_A) != -1
-				|| tmp_fn.Find(YOUTUBE_URL_V) != -1
-				|| tmp_fn.Find(YOUTUBE_URL_EMBED) != -1
-				|| tmp_fn.Find(YOUTU_BE_URL) != -1) {
+		if (url.Find(YOUTUBE_URL) != -1
+				|| url.Find(YOUTUBE_URL_A) != -1
+				|| url.Find(YOUTUBE_URL_V) != -1
+				|| url.Find(YOUTUBE_URL_EMBED) != -1
+				|| url.Find(YOUTU_BE_URL) != -1) {
 			return true;
 		}
 
@@ -189,13 +188,12 @@ namespace Youtube
 
 	bool CheckPlaylist(CString url)
 	{
-		CString tmp_fn(url);
-		tmp_fn.MakeLower();
+		url.MakeLower();
 
-		if (tmp_fn.Find(YOUTUBE_PL_URL) != -1
-				|| (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(L"&list=") != -1)
-				|| (tmp_fn.Find(YOUTUBE_URL_A) != -1 && tmp_fn.Find(L"/watch_videos?video_ids") != -1)
-				|| ((tmp_fn.Find(YOUTUBE_URL_V) != -1 || tmp_fn.Find(YOUTUBE_URL_EMBED) != -1) && tmp_fn.Find(L"list=") != -1)) {
+		if (url.Find(YOUTUBE_PL_URL) != -1
+				|| (url.Find(YOUTUBE_URL) != -1 && url.Find(L"&list=") != -1)
+				|| (url.Find(YOUTUBE_URL_A) != -1 && url.Find(L"/watch_videos?video_ids") != -1)
+				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1) && url.Find(L"list=") != -1)) {
 			return true;
 		}
 
