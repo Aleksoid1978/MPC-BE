@@ -3317,7 +3317,7 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 					}
 					left_pos = pos;
 				}
-				else if(this_frame_sample > target_sample) {
+				else {
 					right_sample = this_frame_sample;
 					/* sanity check to avoid infinite loop */
 					if (right_pos == pos) {
