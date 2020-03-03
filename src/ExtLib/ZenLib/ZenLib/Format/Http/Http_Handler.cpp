@@ -18,7 +18,6 @@
 //---------------------------------------------------------------------------
 #include "ZenLib/Format/Http/Http_Handler.h"
 #include "ZenLib/Ztring.h"
-#include <sstream>
 using namespace std;
 //---------------------------------------------------------------------------
 

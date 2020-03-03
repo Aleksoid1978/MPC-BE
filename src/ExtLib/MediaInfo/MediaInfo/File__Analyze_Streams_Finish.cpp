@@ -709,20 +709,41 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
     if (Retrieve(Stream_Video, Pos, Video_FrameCount).empty())
     {
         int64s Duration=Retrieve(Stream_Video, Pos, Video_Duration).To_int64s();
+        bool DurationFromGeneral;
         if (Duration==0)
+        {
             Duration=Retrieve(Stream_General, 0, General_Duration).To_int64s();
+            DurationFromGeneral=true;
+        }
+        else
+            DurationFromGeneral=false;
         float64 FrameRate=Retrieve(Stream_Video, Pos, Video_FrameRate).To_float64();
         if (Duration && FrameRate)
-           Fill(Stream_Video, Pos, Video_FrameCount, Duration*FrameRate/1000, 0);
+        {
+            Fill(Stream_Video, Pos, Video_FrameCount, Duration*FrameRate/1000, 0);
+            if (DurationFromGeneral)
+            {
+                Fill(Stream_Video, Pos, "FrameCount_Source", "General_Duration");
+                //Fill_SetOptions(Stream_Video, Pos, "FrameCount_Source", "N NTN");
+            }
+        }
     }
 
     //Duration from FrameCount and FrameRate
     if (Retrieve(Stream_Video, Pos, Video_Duration).empty())
     {
         int64u FrameCount=Retrieve(Stream_Video, Pos, Video_FrameCount).To_int64u();
-        float64 FrameRate=Retrieve(Stream_Video, Pos, "FrameRate").To_float64();
+        float64 FrameRate=Retrieve(Stream_Video, Pos, Video_FrameRate).To_float64();
         if (FrameCount && FrameRate)
-           Fill(Stream_Video, Pos, Video_Duration, FrameCount/FrameRate*1000, 0);
+        {
+            Fill(Stream_Video, Pos, Video_Duration, FrameCount/FrameRate*1000, 0);
+            Ztring Source=Retrieve(Stream_Video, Pos, "FrameCount_Source");
+            if (!Source.empty())
+            {
+                Fill(Stream_Video, Pos, "Duration_Source", Source);
+                //Fill_SetOptions(Stream_Video, Pos, "Duration_Source", "N NTN");
+            }
+        }
     }
 
     //FrameRate from FrameCount and Duration
@@ -994,11 +1015,24 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
     if (Retrieve(Stream_Audio, Pos, Audio_SamplingCount).empty())
     {
         int64s Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_int64s();
+        bool DurationFromGeneral; 
         if (Duration==0)
+        {
             Duration=Retrieve(Stream_General, 0, General_Duration).To_int64s();
+            DurationFromGeneral=true;
+        }
+        else
+            DurationFromGeneral=false;
         float SamplingRate=Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_float32();
         if (Duration && SamplingRate)
+        {
             Fill(Stream_Audio, Pos, Audio_SamplingCount, ((float64)Duration)/1000*SamplingRate, 0);
+            if (DurationFromGeneral)
+            {
+                Fill(Stream_Audio, Pos, "SamplingCount_Source", "General_Duration");
+                //Fill_SetOptions(Stream_Audio, Pos, "SamplingCount_Source", "N NTN");
+            }
+        }
     }
 
     //Frame count
@@ -1055,7 +1089,15 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
     {
         int64u Duration=Retrieve(Stream_Audio, Pos, Audio_SamplingCount).To_int64u()*1000/Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_int64u();
         if (Duration)
-           Fill(Stream_Audio, Pos, Audio_Duration, Duration);
+        {
+            Fill(Stream_Audio, Pos, Audio_Duration, Duration);
+            Ztring Source=Retrieve(Stream_Audio, Pos, "SamplingCount_Source");
+            if (!Source.empty())
+            {
+                Fill(Stream_Audio, Pos, "Duration_Source", Source);
+                //Fill_SetOptions(Stream_Audio, Pos, "Duration_Source", "N NTN");
+            }
+        }
     }
 
     //Stream size

@@ -225,6 +225,7 @@ Choose language;選擇你要的語系
 Choreographer;動作指導
 Chroma;彩度
 ChromaSubsampling;
+ClearList;
 Close;關閉
 Close all before open;開啟前關閉其它檔案
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;封面類型
 Cropped;裁切維度
 Custom;自訂
 Customize;自訂
+DarkMode;
 Date;日期
 Debug;偵錯
 Decimal point;小數點
+Default_Setting;
 Delay;延遲
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;編碼者
 EPG_Positions;EPG 電子節目表位置 (內部)
 EpisodeTitleNumber;
 Error_File;讀取檔案錯誤
+Error_File_Write;
 ExecutiveProducer;監製
 Exit;離開
 Exit_Hint;退出此程式
 Export;匯出
 Export_Hint;以自訂格式匯出
 Extensions;格式副檔名
+External_Media_NotMounted;
 Family;族系
 Fax;傳真
 File;檔案
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;支援非常詳盡的多媒體檔案資訊:\r\nMatroska, OGG (包含 OGM)\r\nMPEG-1 (包含 VCD)\r\nMPEG-2 (包含 DVD, SVCD)\r\nMPEG-4 (包含 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包含 WMV, WMA)\r\nMicrosoft RIFF (包含 AVI, WAV)\r\n純聲音格式 (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;選單
 Menu stream(s);選單串流
 Menu_Codec_List;選單編解碼器
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;順序
 Position_Total;總數
 Preferences;偏好設定
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;製作
 ProductionDesigner;美術指導
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;此串流的比例
 Subject;主題
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;子音軌
 Summary;摘要
 Supported formats;支援格式
 Supported?;是否支援?
+SupportUs_Android;
 Synopsis;摘要
 SystemId;識別字
 Tagged_Application;標記程式
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;音軌
 Track_Count;音軌數
 transfer_characteristics;傳輸特性
+Translate_Reports;
 Translator;翻譯
 Tree;樹狀圖
 Tree & Text;樹狀圖與文字
@@ -1112,6 +1126,7 @@ View;檢視
 View_Hint;改變檢視資訊的方法
 Warning : more streams in the files;注意: 檔案中還有更多串流
 Web;網頁
+WebSite;
 WebSite_Audio;前往此音訊編解碼器的網站
 WebSite_Audio_More;前往網站 (%Url%) 找尋此音訊編解碼器
 WebSite_General;前往此播放程式的網站
@@ -1131,5 +1146,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;86

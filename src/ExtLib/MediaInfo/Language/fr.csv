@@ -225,6 +225,7 @@ Choose language;Choisissez la langue personnalisée
 Choreographer;Responsable de la chorégraphie
 Chroma;Chrominance
 ChromaSubsampling;Sous-échantillonnage de la chrominance
+ClearList;Vider la liste
 Close;Fermer
 Close all before open;Tout fermer avant d'ouvrir
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Couverture, origine
 Cropped;Dimensions du retaillage
 Custom;Partie personnalisée
 Customize;Personnaliser
+DarkMode;Mode sombre
 Date;Date
 Debug;Debug
 Decimal point;Point décimal
+Default_Setting;Par défaut
 Delay;Délai
 Delay_Source;Délai, origine
 Delay_Source_Container;Conteneur
@@ -324,12 +327,14 @@ EncodedBy;Encodé par
 EPG_Positions;Positions de l'EPG (interne)
 EpisodeTitleNumber;
 Error_File;Erreur lors de la lecture du fichier
+Error_File_Write;Erreur lors de l'écriture du fichier
 ExecutiveProducer;Producteur éxécutif
 Exit;Quitter
 Exit_Hint;Quitte le programme
 Export;Exporte
 Export_Hint;Exporte dans un format personnalisé
 Extensions;Extensions généralement utilisées
+External_Media_NotMounted;Le stockage externe n'est pas accessible
 Family;Famille
 Fax;Fax
 File;Fichier
@@ -852,6 +857,7 @@ Matrix_Format;Encodage matriciel, format
 MaxCLL;
 MaxFALL;
 MediaInfo_About;MediaInfo fournit des informations techniques et les tags à propos de vos fichiers video et audio.\r\nExcepté l'interface graphique du Mac App Store, c'est un logiciel libre, ce qui signifie qu'il est gratuit pour l'utilisateur final et que les développeurs on la liberté de l'étudier, l'améliorer et le redistribuer (licence BSD)
+MediaInfo_About_About;MediaInfo v%MI_VERSION% basé sur MediaInfoLib v%MIL_VERSION%
 Menu;Menu
 Menu stream(s);Piste(s) menu
 Menu_Codec_List;Codecs Menu
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Position
 Position_Total;Total
 Preferences;Préférences
+Premium;Premium
+Premium_Summary;Fonctionnalités pour les abonnés premium
 PrimaryAudioLanguage;
 Producer;Producteur
 ProductionDesigner;Directeur artistique
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Taille du flux encodé
 StreamSize_Proportion;Proportion de ce flux
 Subject;Sujet
+Subscribe;S'abonner
+Subscribe_Manage;Gérer l'abonnement
+Subscription_Android;%PRICE% par an avec une période d'essai gratuite de 3 jours.
+Subscription_Thanks;Abonnement détecté. Merci pour votre soutien !
 SubTrack;Sous-piste
 Summary;Résumé
 Supported formats;Formats supportés
 Supported?;Supporté?
+SupportUs_Android;Soutenez-nous. Obtenez le thème sombre et d'autres fonctionnalités à venir.
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;Application de marquage
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Piste
 Track_Count;Nombre de pistes
 transfer_characteristics;Caractéristiques du transfert
+Translate_Reports;Traduire les rapports
 Translator;Traducteur
 Tree;Arbre
 Tree & Text;Arbre & Texte
@@ -1112,6 +1126,7 @@ View;Vue
 View_Hint;Change la façon de voir les informations
 Warning : more streams in the files;Attention : il y a davantage de flux dans les fichiers!
 Web;Web
+WebSite;Site web
 WebSite_Audio;Aller sur le site web du codec audio
 WebSite_Audio_More;Aller sur le site web (%Url%) du codec audio
 WebSite_General;Aller sur le site web d'un lecteur pour ce fichier
@@ -1131,5 +1146,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;88
+ZZ_Automatic_Percent;89
 ZZ_AutomaticLanguage_Percent;92

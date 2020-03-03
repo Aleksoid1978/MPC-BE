@@ -225,6 +225,7 @@ Choose language;Hautatu gogoko duzun hizkuntza
 Choreographer;Dantza-musikaria
 Chroma;Margoa
 ChromaSubsampling;Margo azpilaginketa
+ClearList;
 Close;Itxi
 Close all before open;Itxi dena ireki aurretik
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Azal mota
 Cropped;Mozketa neurriak
 Custom;Egilea
 Customize;Norbereratu
+DarkMode;
 Date;Eguna
 Debug;Garbiketa
 Decimal point;Hamarren puntua
+Default_Setting;
 Delay;Atzerapena
 Delay_Source;Atzerapena, jatorria
 Delay_Source_Container;Edukiontzia
@@ -324,12 +327,14 @@ EncodedBy;Kodeatzailea
 EPG_Positions;EPG kokapenak (barnean)
 EpisodeTitleNumber;
 Error_File;Akatsa agiria irakurtzerakoan
+Error_File_Write;
 ExecutiveProducer;Ekintza ekoizlea
 Exit;Irten
 Exit_Hint;Utzi programa
 Export;Esportatu
 Export_Hint;Esportatu norbere heuskarri batean
 Extensions;Arrunt erabilitako hedapenak
+External_Media_NotMounted;
 Family;Sendia
 Fax;Faxa
 File;Agiria
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;MediaInfo-k sarbide erraza eskaintzen du bideo eta audio agirien argibide teknikoetara eta etiketara.\r\nSoftware askea da, honek esanahi du dohainekoa dela erabiltzaileentzat eta garatzaileek askatasuna dutela ikertzeko, hobetzeko eta programa birbanatzeko (BSD baimena)
+MediaInfo_About_About;
 Menu;Menua
 Menu stream(s);Menu jarioak
 Menu_Codec_List;Menu kodekak
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Kokapena
 Position_Total;Guztira
 Preferences;Hobespenak
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Ekoizlea
 ProductionDesigner;Ekoizpen diseinatzailea
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Kodeaketa jario neurria
 StreamSize_Proportion;Jario honen proporzioa
 Subject;Gaia
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Azpibidea
 Summary;Laburpena
 Supported formats;Sostengatutako heuskarriak
 Supported?;Sostengatua?
+SupportUs_Android;
 Synopsis;Laburpena
 SystemId;Id-a
 Tagged_Application;Aplikazio etiketatzea
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Bide izena
 Track_Count;Bide zenbatekoa
 transfer_characteristics;Eskualdaketa ezaugarriak
+Translate_Reports;
 Translator;Itzultzailea
 Tree;Zuhaitza
 Tree & Text;Zuhaitza eta Idazkia
@@ -1112,6 +1126,7 @@ View;Ikusi
 View_Hint;Aldatu argibideak ikusteko modua
 Warning : more streams in the files;Kontuz : jario gehiago daude agirietan
 Web;Webgunea
+WebSite;
 WebSite_Audio;Joan audio kodek honen webgunera
 WebSite_Audio_More;Joan webgunera (%Url%) audio kodek hau bilatzeko
 WebSite_General;Joan agiri honentzako irakurgailu webgunera
@@ -1131,5 +1146,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;89

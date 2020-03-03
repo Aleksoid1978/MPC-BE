@@ -225,6 +225,7 @@ Choose language;Elige tu idioma
 Choreographer;Coreógrafo
 Chroma;Croma
 ChromaSubsampling;Submuestreo croma
+ClearList;
 Close;Cerrar
 Close all before open;Cerrar todo antes de abrir
 ClosedCaptionsLanguage;Idioma subtítulos
@@ -287,9 +288,11 @@ Cover_Type;Tipo de portada
 Cropped;Dimensiones de recorte
 Custom;Personalizado
 Customize;Personalizar
+DarkMode;
 Date;Fecha
 Debug;Depurar
 Decimal point;Punto decimal
+Default_Setting;
 Delay;Retraso
 Delay_Source;Retraso, origen
 Delay_Source_Container;Contenedor
@@ -324,12 +327,14 @@ EncodedBy;Codificado por
 EPG_Positions;Posiciones EPG (internas)
 EpisodeTitleNumber;Número título episodio
 Error_File;Error al leer el archivo
+Error_File_Write;
 ExecutiveProducer;Productor ejecutivo
 Exit;Salir
 Exit_Hint;Salir del programa
 Export;Exportar
 Export_Hint;Exportar a un formato personalizado
 Extensions;Extensiones usadas habitualmente
+External_Media_NotMounted;
 Family;Familia
 Fax;Fax
 File;Archivo
@@ -852,6 +857,7 @@ Matrix_Format;Codificación matriz, formato
 MaxCLL;Nivel ligero contenido máximo
 MaxFALL;Nivel ligero fotograma medio máximo
 MediaInfo_About;MediaInfo muestra información detallada de archivos multimedia:\r\nExcepto la interfaz gráfica de la Mac App Store, es software libre, lo que significa que es gratis para los usuarios y los desarrolladores tienen libertad para estudiar, mejorar y redistribuir el programa (licencia BSD)
+MediaInfo_About_About;
 Menu;Menú
 Menu stream(s);Pistas de menú
 Menu_Codec_List;Códecs de menú
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Posición
 Position_Total;Total
 Preferences;Preferencias
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;Idioma primario audio
 Producer;Productor
 ProductionDesigner;Diseño de producción
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Tamaño pista codificada
 StreamSize_Proportion;Proporción de esta pista
 Subject;Asunto
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Subpista
 Summary;Sumario
 Supported formats;Formatos compatibles
 Supported?;¿Compatible?
+SupportUs_Android;
 Synopsis;Sinopsis
 SystemId;Id
 Tagged_Application;Aplicación etiquetado
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;Duración total programa
 Track;Nombre de pista
 Track_Count;Número de pista
 transfer_characteristics;Características transferencia
+Translate_Reports;
 Translator;Traductor
 Tree;Árbol
 Tree & Text;Árbol de texto
@@ -1112,6 +1126,7 @@ View;Ver
 View_Hint;Cambiar el modo en que se ve la información
 Warning : more streams in the files;Advertencia: Hay más pistas en los archivos
 Web;Web
+WebSite;
 WebSite_Audio;Ir al sitio web  de este códec de audio
 WebSite_Audio_More;Ir al sitio web (%Url%) para buscar este códec de audio
 WebSite_General;Ir al sito web de un reproductor para este archivo
@@ -1131,5 +1146,5 @@ Written_Location;Escrito en
 WrittenBy;Escrito por
 Yes;Sí
 Your system;Tu sistema
-ZZ_Automatic_Percent;86
-ZZ_AutomaticLanguage_Percent;97
+ZZ_Automatic_Percent;85
+ZZ_AutomaticLanguage_Percent;96

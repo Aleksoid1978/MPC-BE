@@ -225,6 +225,7 @@ Choose language;Vybrat jazyk
 Choreographer;Choreographer
 Chroma;Chroma
 ChromaSubsampling;
+ClearList;
 Close;Zavřít
 Close all before open;Zavřít vše před otevřením nového
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;
 Cropped;
 Custom;Vlastní
 Customize;Přizpůsobit
+DarkMode;
 Date;Datum
 Debug;Pokročilé
 Decimal point;Decimal point
+Default_Setting;
 Delay;Delay
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Enkódoval
 EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Error while reading file
+Error_File_Write;
 ExecutiveProducer;Executive producer
 Exit;Konec
 Exit_Hint;Ukončit program
 Export;Exportovat
 Export_Hint;Exportovat do vybraného formátu
 Extensions;Extensions usually used
+External_Media_NotMounted;
 Family;
 Fax;Fax
 File;Soubor
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menu
 Menu stream(s);Menu streams
 Menu_Codec_List;
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Pozice
 Position_Total;
 Preferences;Předvolby
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Producer
 ProductionDesigner;ProductionDesigner
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subject
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;SubTrack
 Summary;Summary
 Supported formats;Supported formats
 Supported?;Supported?
+SupportUs_Android;
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Název stopy
 Track_Count;Track count
 transfer_characteristics;
+Translate_Reports;
 Translator;Přeložil
 Tree;Strom
 Tree & Text;Tree & Text
@@ -1112,6 +1126,7 @@ View;Zobrazit
 View_Hint;Zobrazit
 Warning : more streams in the files;Warning : there are more streams in the files
 Web;Web
+WebSite;
 WebSite_Audio;Go to the web site of this audio codec
 WebSite_Audio_More;Go to the web site (%Url%) to find this audio codec
 WebSite_General;Go to the web site of a player for this file
@@ -1131,5 +1146,5 @@ Written_Location;Written location
 WrittenBy;Napsal
 Yes;Ano
 Your system;Instalované kodeky
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;74
+ZZ_Automatic_Percent;66
+ZZ_AutomaticLanguage_Percent;73

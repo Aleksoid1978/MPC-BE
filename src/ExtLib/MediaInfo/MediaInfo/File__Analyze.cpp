@@ -140,6 +140,29 @@ extern const wchar_t ISO_6937_2_Tables[] = // ISO 6937-2 to Unicode
     L'\x0000', L'\x0000', L'\x0159', L'\x0161', L'\x0165', L'\x0000', L'\x0000', L'\x0000', L'\x0000', L'\x0000', L'\x017E', L'\x0000', L'\x0000', L'\x0000', L'\x0000', L'\x0000', //7
 };
 
+//---------------------------------------------------------------------------
+// Do not use int128::toString(), it is not thread-safe
+string uint128toString(uint128 ii, int radix)
+{
+    if (!ii)
+        return string(1, '0');
+    if (radix < 2 || radix > 37)
+        return string();
+
+    char sz[256];
+    memset(sz, 0, 256);
+
+    uint128 r;
+    int i = 255;
+
+    while (!!ii && i) {
+        ii = ii.div(radix, r);
+        sz[--i] = (char)(r.toUint() + ((r.toUint() > 9) ? 'A' - 10 : '0'));
+    };
+
+    return string(&sz[i]);
+}
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************

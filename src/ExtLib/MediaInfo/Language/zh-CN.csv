@@ -225,6 +225,7 @@ Choose language;选择语言
 Choreographer;动作指导
 Chroma;色度
 ChromaSubsampling;色度抽样
+ClearList;
 Close;关闭
 Close all before open;打开新文件前关闭其他文件
 ClosedCaptionsLanguage;隐藏式字幕语言
@@ -287,9 +288,11 @@ Cover_Type;封面类型
 Cropped;封面尺寸
 Custom;自定义
 Customize;自定义
+DarkMode;
 Date;日期
 Debug;调试
 Decimal point;小数点
+Default_Setting;
 Delay;延迟
 Delay_Source;延迟, 初始值
 Delay_Source_Container;容器
@@ -324,12 +327,14 @@ EncodedBy;编码者
 EPG_Positions;EPG 位置(内部)
 EpisodeTitleNumber;每集标题数字
 Error_File;读取文件时出错
+Error_File_Write;
 ExecutiveProducer;监制
 Exit;退出
 Exit_Hint;退出程序
 Export;导出
 Export_Hint;以自定义格式导出
 Extensions;扩展名
+External_Media_NotMounted;
 Family;系列
 Fax;传真
 File;文件
@@ -852,6 +857,7 @@ Matrix_Format;矩阵编码,格式
 MaxCLL;最大内容亮度等级
 MaxFALL;最大帧平均亮度等级
 MediaInfo_About;MediaInfo 能轻松的读取音视频文件的编码和标签信息。支持多种格式的多媒体文件:\r\nMatroska, OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD, SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV, WMA)\r\nMicrosoft RIFF (包括 AVI, WAV)\r\n纯声音格式 (AC3, DTS, AAC, AU, AIFF…)
+MediaInfo_About_About;
 Menu;菜单
 Menu stream(s);菜单流
 Menu_Codec_List;菜单编解码器
@@ -962,6 +968,8 @@ PodcastCategory;播客类别
 Position;位置
 Position_Total;总计
 Preferences;参数设置
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;主音频语言
 Producer;制片人
 ProductionDesigner;美术指导
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;解复用器流大小
 StreamSize_Encoded;编码的流大小
 StreamSize_Proportion;流属性
 Subject;主题
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;副标道
 Summary;摘要
 Supported formats;支持的格式
 Supported?;支持？
+SupportUs_Android;
 Synopsis;系统摘要
 SystemId;系统ID
 Tagged_Application;标记软件
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;节目时长总计
 Track;音轨名
 Track_Count;音轨数
 transfer_characteristics;传输特质
+Translate_Reports;
 Translator;翻译
 Tree;树状图
 Tree & Text;树状图和文本
@@ -1112,6 +1126,7 @@ View;查看
 View_Hint;改变查看方式
 Warning : more streams in the files;注意：这个文件中还有更多的流
 Web;网页
+WebSite;
 WebSite_Audio;访问此音频编解码器的网站
 WebSite_Audio_More;访问网站 (%Url%) 查找此音频编解码器
 WebSite_General;访问此播放程序的网站
@@ -1131,5 +1146,5 @@ Written_Location;写入位置
 WrittenBy;书写人: 
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;98
-ZZ_AutomaticLanguage_Percent;98
+ZZ_Automatic_Percent;97
+ZZ_AutomaticLanguage_Percent;97

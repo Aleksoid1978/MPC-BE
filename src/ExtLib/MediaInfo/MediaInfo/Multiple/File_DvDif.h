@@ -150,7 +150,6 @@ protected :
 
     #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
     bool Analyze_Activated;
-    bool video_source_Detected;
 
     void Errors_Stats_Update();
     void Errors_Stats_Update_Finnish();
@@ -160,6 +159,7 @@ protected :
     Ztring Errors_Stats_10;
     Ztring Date;
     Ztring Time;
+    int64u Speed_FrameCount_StartOffset;
     int64u Speed_FrameCount;                            //Global    - Total
     int64u Speed_FrameCount_Video_STA_Errors;           //Global    - Error 1
     std::vector<int64u> Speed_FrameCount_Audio_Errors;  //Global    - Error 2
@@ -176,9 +176,6 @@ protected :
     bool   REC_END;
     bool   REC_IsValid;
     std::bitset<8> audio_source_IsPresentInFrame;
-    bool   System;
-    bool   System_IsValid;
-    bool   Frame_AtLeast1DIF;
     struct dvdate
     {
         int8u  Days;

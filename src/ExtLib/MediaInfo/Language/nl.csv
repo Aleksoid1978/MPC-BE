@@ -225,6 +225,7 @@ Choose language;Kies uw gewenste taal
 Choreographer;Choreograaf
 Chroma;Chroma
 ChromaSubsampling;
+ClearList;
 Close;Sluiten
 Close all before open;Sluit alle alvorens te openen
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Coversoort
 Cropped;Cropafmetingen
 Custom;Aangepast
 Customize;Aanpassen
+DarkMode;
 Date;Datum
 Debug;Debug
 Decimal point;Decimale punt
+Default_Setting;
 Delay;Vertraging
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Gecodeerd door
 EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Fout tijdens lezen bestand
+Error_File_Write;
 ExecutiveProducer;Uitvoerend producent
 Exit;Afsluiten
 Exit_Hint;Beëindig het programma
 Export;Exporteren
 Export_Hint;Exporteren in aangepast formaat
 Extensions;Gebruikelijke extensies
+External_Media_NotMounted;
 Family;Familie
 Fax;Fax
 File;Bestand
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Levert zeer gedetailleerde informatie\r\nover multimediabestanden:\r\nMatroska, OGG (inclusief OGM)\r\nMPEG1 (inclusief VCD)\r\nMPEG2 (inclusief DVD en SVCD)\r\nMPEG4 (inclusief Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inclusief WMV, WMA)\r\nMicrosoft RIFF (inclusief AVI, WAV)\r\nGeluidsformaten (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menu
 Menu stream(s);Menustromen
 Menu_Codec_List;Menucodecs
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Positie
 Position_Total;Totaal
 Preferences;Voorkeuren
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Producent
 ProductionDesigner;Productieontwerper
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Proporties van deze stroom
 Subject;Onderwerp
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Ondertiteling
 Summary;Samenvatting
 Supported formats;Ondersteunde formaten
 Supported?;Ondersteund?
+SupportUs_Android;
 Synopsis;Samenvatting
 SystemId;Id
 Tagged_Application;Tagapplicatie
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Tracknaam
 Track_Count;Tracktelling
 transfer_characteristics;
+Translate_Reports;
 Translator;Vertaler
 Tree;Boomstructuur
 Tree & Text;Boomstructuur & Tekst
@@ -1112,6 +1126,7 @@ View;Beeld
 View_Hint;Verander de weergave van informatie
 Warning : more streams in the files;Waarschuwing : er zijn meer stromen in de bestanden
 Web;Web
+WebSite;
 WebSite_Audio;Ga naar de website van deze audiocodec
 WebSite_Audio_More;Ga naar de website (%Url%) om deze audiocodec te vinden
 WebSite_General;Ga naar de website van een speler voor dit bestand
@@ -1131,5 +1146,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;81
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;84

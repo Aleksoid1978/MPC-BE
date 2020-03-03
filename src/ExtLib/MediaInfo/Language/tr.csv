@@ -225,6 +225,7 @@ Choose language;İstediğiniz dili seçin
 Choreographer;Koreograf
 Chroma;Krom
 ChromaSubsampling;Krom altörnekleme
+ClearList;
 Close;Kapat
 Close all before open;Açmadan önce tümünü kapat
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Kapak türü
 Cropped;Kırpma boyutları
 Custom;Özel
 Customize;Özelleştir
+DarkMode;
 Date;Tarih
 Debug;Hata Ayıklama
 Decimal point;Ondalık ayırıcı
+Default_Setting;
 Delay;Gecikme
 Delay_Source;Gecikme, kaynağı
 Delay_Source_Container;Kalıp
@@ -324,12 +327,14 @@ EncodedBy;Kodlayan
 EPG_Positions;EPG konumu (dahili)
 EpisodeTitleNumber;
 Error_File;Dosya okunurken hata
+Error_File_Write;
 ExecutiveProducer;İdari yapımcı
 Exit;Çıkış
 Exit_Hint;Programdan çıkış
 Export;Dışarı Aktar
 Export_Hint;Özelleştirilmiş biçimde dışarı aktarır
 Extensions;Genellikle kullanılan uzantılar
+External_Media_NotMounted;
 Family;Aile
 Fax;Faks
 File;Dosya
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Çok ayrıntılı bilgi sağlanan çokluortam\r\ndosyaları:\r\nMatroska, OGG (OGM dahil)\r\nMPEG1 (VCD dahil)\r\nMPEG2 (DVD ve SVCD dahil)\r\nMPEG4 (Itunes M4A dahil)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA dahil)\r\nMicrosoft RIFF (AVI, WAV dahil)\r\nSadece-ses biçimleri (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menü
 Menu stream(s);Menü akışları
 Menu_Codec_List;Menü kodekleri
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Konum
 Position_Total;Toplam
 Preferences;Tercihler
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Yapımcı
 ProductionDesigner;Üretim tasarımcısı
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Kodlanmış akış boyutu
 StreamSize_Proportion;Bu akışın oranı
 Subject;Konu
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Altİz
 Summary;Özet
 Supported formats;Desteklenen biçimler
 Supported?;Desteklenen?
+SupportUs_Android;
 Synopsis;Özet
 SystemId;Id
 Tagged_Application;Etiketleme uygulaması
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Parça adı
 Track_Count;Parça sayısı
 transfer_characteristics;Aktarım nitelikleri
+Translate_Reports;
 Translator;Çevirmen
 Tree;Ağaç
 Tree & Text;Ağaç ve Metin
@@ -1112,6 +1126,7 @@ View;Görünüm
 View_Hint;Görünüm bilgilerinin anlamını değiştirir
 Warning : more streams in the files;Uyarı : Dosyalarda fazla akış var
 Web;Web
+WebSite;
 WebSite_Audio;Bu ses kodek'inin web sitesine git
 WebSite_Audio_More;Bu ses kodek'ini bulmak için (%Url%) web sitesine git
 WebSite_General;Bu dosya için oynatıcının sitesine git
@@ -1131,5 +1146,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;91
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;89

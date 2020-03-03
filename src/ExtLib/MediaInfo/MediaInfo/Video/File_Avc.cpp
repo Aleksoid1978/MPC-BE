@@ -2592,13 +2592,15 @@ void File_Avc::pred_weight_table(int32u num_ref_idx_l0_active_minus1, int32u num
             Skip_SE(                                            "luma_weight_l0");
             Skip_SE(                                            "luma_offset_l0");
         TEST_SB_END();
-    }
-    if (ChromaArrayType)
-    {
-        TEST_SB_SKIP(                                           "chroma_weight_l0_flag");
-            Skip_SE(                                            "chroma_weight_l0");
-            Skip_SE(                                            "chroma_offset_l0");
-        TEST_SB_END();
+		if (ChromaArrayType)
+		{
+			TEST_SB_SKIP(                                       "chroma_weight_l0_flag");
+				Skip_SE(                                        "chroma_weight_l0");
+				Skip_SE(                                        "chroma_offset_l0");
+				Skip_SE(                                        "chroma_weight_l0");
+				Skip_SE(                                        "chroma_offset_l0");
+			TEST_SB_END();
+		}
     }
 }
 

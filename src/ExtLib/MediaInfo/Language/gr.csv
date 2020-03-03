@@ -225,6 +225,7 @@ Choose language;Επιλέξτε την επιθυμητή γλώσσα
 Choreographer;Χορογράφος
 Chroma;Χρώμα
 ChromaSubsampling;
+ClearList;
 Close;Κλείσιμο
 Close all before open;Κλείστε όλα τα ανοιχτά αρχεία πριν το άνοιγμα νέων
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;
 Cropped;
 Custom;Προσαρμοσμένη
 Customize;Προσαρμόστε
+DarkMode;
 Date;Ημερομηνία
 Debug;Αποσφαλμάτωση
 Decimal point;Decimal point
+Default_Setting;
 Delay;Καθυστέρηση
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Κωδικοποιημένο από
 EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Παρουσιάστηκε σφάλμα κατά το διάβασμα του αρχείου
+Error_File_Write;
 ExecutiveProducer;Executive producer
 Exit;Έξοδος
 Exit_Hint;Κλείνει το πρόγραμμα
 Export;Εξαγωγή
 Export_Hint;Εξαγωγή σε custom format
 Extensions;Συνήθεις επεκτάσεις
+External_Media_NotMounted;
 Family;
 Fax;Fax
 File;Αρχείο
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Παρέχει λεπτομερείς πληροφορίες\r\nγια αρχεία πολυμέσων:\r\nMatroska, OGG (συμπεριλαμβάνεται OGM)\r\nMPEG1 (συμπεριλαμβάνεται VCD)\r\nMPEG2 (συμπεριλαμβάνεται DVD και SVCD)\r\nMPEG4 (συμπεριλαμβάνεται Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (συμπεριλαμβάνεται WMV, WMA)\r\nMicrosoft RIFF (συμπεριλαμβάνεται AVI, WAV)\r\nΜορφοποιήσεις ήχου (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Μενού
 Menu stream(s);Ροές μενού
 Menu_Codec_List;Συμπιεστές μενού
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Θέση
 Position_Total;
 Preferences;Επιλογές/Προτιμήσεις
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Παραγωγός
 ProductionDesigner;ProductionDesigner
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subject
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;SubTrack
 Summary;Περίληψη
 Supported formats;Υποστηριζόμενες μορφοποιήσεις
 Supported?;Υποστηρίζεται?
+SupportUs_Android;
 Synopsis;Σύνοψη
 SystemId;Id
 Tagged_Application;
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Track name
 Track_Count;Track count
 transfer_characteristics;
+Translate_Reports;
 Translator;Μεταφραστής
 Tree;Δένδρο
 Tree & Text;Δένδρο & Κείμενο
@@ -1112,6 +1126,7 @@ View;Προβολή
 View_Hint;Αλλάζει τον τρόπο προβολής πληροφοριών
 Warning : more streams in the files;Προειδοποίηση : υπάρχουν περισσότερες ροές στα αρχεία
 Web;Διαδύκτιο
+WebSite;
 WebSite_Audio;Πήγαινε στην ιστοσελίδα αυτού του συμπιεστή ήχου
 WebSite_Audio_More;Πήγαινε στην ιστοσελίδα (%Url%) to find this audio codec
 WebSite_General;Go to the web site of a player for this file
@@ -1131,5 +1146,5 @@ Written_Location;Τοποθεσία καταγραφής
 WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;75
+ZZ_Automatic_Percent;66
+ZZ_AutomaticLanguage_Percent;74

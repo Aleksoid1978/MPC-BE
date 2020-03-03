@@ -225,6 +225,7 @@ Choose language;Ընտրեք լեզուն
 Choreographer;Պարարվեստը
 Chroma;Գույնայնությունը
 ChromaSubsampling;Գույների ընտրություն
+ClearList;
 Close;Փակել
 Close all before open;Բացելուց առաջ փակել բոլորը
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Կազմի տեսակը
 Cropped;Կտրման չափերը
 Custom;Ընտրված
 Customize;Կարգավորում
+DarkMode;
 Date;Ամսաթիվը
 Debug;Փոխադրիչ
 Decimal point;Տասնորդական կետ
+Default_Setting;
 Delay;Հապաղում
 Delay_Source;Հապաղում օրիգինալում
 Delay_Source_Container;Փաթեթը
@@ -324,12 +327,14 @@ EncodedBy;Կոդավորիչը
 EPG_Positions;EPG-ի դիրքը (ներքին)
 EpisodeTitleNumber;
 Error_File;Սխալ ֆայլում
+Error_File_Write;
 ExecutiveProducer;Ռեժիսորի օգնականը
 Exit;Ելք
 Exit_Hint;Ելք ծրագրից
 Export;Արտածել
 Export_Hint;Արտածել տվյալները
 Extensions;Օգտագործվում է՝
+External_Media_NotMounted;
 Family;Խումբը
 Fax;Ֆաքս
 File;Ֆայլ
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
+MediaInfo_About_About;
 Menu;Ընտրացանկը
 Menu stream(s);Հոսքերի ընտրացանկը
 Menu_Codec_List;Կոդավորիչների ընտրացանկը
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Դիրքը
 Position_Total;Ընդամենը
 Preferences;Կարգավորումներ
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Պրոդյուսերը
 ProductionDesigner;Դիզայնի մշակողը
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Հոսքի համամասնությունը
 Subject;Թեման
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Ենթահոսքը
 Summary;Համառոտ
 Supported formats;Աջակցվող տեսակները
 Supported?;Աջակցվու՞մ է
+SupportUs_Android;
 Synopsis;Համառոտ
 SystemId;ID-ին
 Tagged_Application;Նշված ծրագիրը
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Շավիղը
 Track_Count;Շավիղների ք-ը
 transfer_characteristics;Փոխանցման բնութագրումը
+Translate_Reports;
 Translator;Hrant Ohanyan
 Tree;Ծառի տեսքով
 Tree & Text;Ծառի տեսքով և տեքստ
@@ -1112,6 +1126,7 @@ View;Տեսքը
 View_Hint;Պատկերման եղանակը
 Warning : more streams in the files;Ուշադրություն. ֆայլում դեռ կան հոսքեր
 Web;Կայքը
+WebSite;
 WebSite_Audio;Կոդավորիչի կայքը
 WebSite_Audio_More;Բացել (%Url%) կայքը՝ կոդավորիչը փնտրելու համար
 WebSite_General;Բացել այս ֆայլի վերարտադրման համար ծրագրի կայքը
@@ -1131,5 +1146,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;87

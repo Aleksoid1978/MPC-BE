@@ -225,6 +225,7 @@ Choose language;Selectati limba dorita
 Choreographer;Coregraf
 Chroma;
 ChromaSubsampling;
+ClearList;
 Close;Inchideti
 Close all before open;Inchideti tot inainte de a deschide
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;
 Cropped;
 Custom;Particularizat
 Customize;Particularizare
+DarkMode;
 Date;Data
 Debug;Depanare
 Decimal point;Punct zecimal
+Default_Setting;
 Delay;Intarziere
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Codificat de
 EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Eroare la citirea fisierului
+Error_File_Write;
 ExecutiveProducer;Director executiv
 Exit;Iesire
 Exit_Hint;Parasire program
 Export;Export
 Export_Hint;Export in format particularizat
 Extensions;Extensia folosita in mod curent
+External_Media_NotMounted;
 Family;
 Fax;Fax
 File;Fisier
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Furnizeaza informatii foarte detaliate\r\n despre un fisier multimedia
+MediaInfo_About_About;
 Menu;Meniu
 Menu stream(s);
 Menu_Codec_List;
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Pozitie
 Position_Total;
 Preferences;Preferinte
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Producator
 ProductionDesigner;Director productie
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subiect
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Sub-pista
 Summary;Sumar
 Supported formats;Formate acceptate
 Supported?;Acceptat?
+SupportUs_Android;
 Synopsis;
 SystemId;
 Tagged_Application;
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Nume pista
 Track_Count;Numar piste
 transfer_characteristics;
+Translate_Reports;
 Translator;Traducator
 Tree;Arbore
 Tree & Text;Arbore si text
@@ -1112,6 +1126,7 @@ View;Vizualizare
 View_Hint;Modificati modul de vizualizare a informatiilor
 Warning : more streams in the files;Atentie: acest fisier contine mai multe fluxuri
 Web;
+WebSite;
 WebSite_Audio;Accestai site-ul web al acestui codec audio
 WebSite_Audio_More;Accesati site-ul web (%Url%) pentru a gasii acest codec audio
 WebSite_General;Accesati site-ul web pentru un player pentru acest fisier
@@ -1131,5 +1146,5 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
-ZZ_Automatic_Percent;30
-ZZ_AutomaticLanguage_Percent;67
+ZZ_Automatic_Percent;29
+ZZ_AutomaticLanguage_Percent;66

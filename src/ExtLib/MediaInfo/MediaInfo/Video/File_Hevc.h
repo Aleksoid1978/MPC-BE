@@ -30,6 +30,7 @@ public :
     bool   MustParse_VPS_SPS_PPS_FromMatroska;
     bool   MustParse_VPS_SPS_PPS_FromFlv;
     bool   SizedBlocks;
+    size_t SizedBlocks_FileThenStream;
 
     //Constructor/Destructor
     File_Hevc();

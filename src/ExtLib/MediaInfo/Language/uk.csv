@@ -225,6 +225,7 @@ Choose language;Оберіть мову
 Choreographer;Хореограф
 Chroma;Хроматичність
 ChromaSubsampling;Субдискретизація хроматичності
+ClearList;
 Close;Закрити
 Close all before open;Закривати все перед відкриттям
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Тип обкладинки
 Cropped;Розміри обрізки
 Custom;Користувацький
 Customize;Формат виведення
+DarkMode;
 Date;Дата
 Debug;Відлагодження
 Decimal point;Десятковий роздільник
+Default_Setting;
 Delay;Затримка
 Delay_Source;Затримка, початкова
 Delay_Source_Container;Контейнер
@@ -324,12 +327,14 @@ EncodedBy;Закодовано
 EPG_Positions;EPG положення (внутрішні)
 EpisodeTitleNumber;
 Error_File;Помилка при читанні файлу
+Error_File_Write;
 ExecutiveProducer;Виконавчий продюсер
 Exit;Вихід
 Exit_Hint;Вихід з програми
 Export;Експорт
 Export_Hint;Експорт у обраний формат
 Extensions;Розширення, що використ.
+External_Media_NotMounted;
 Family;Родина
 Fax;Факс
 File;Файл
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Відображає докладну інформацію \r\nпро медіафайли:\r\nMatroska, OGG (включаючи OGM)\r\nMPEG1 (включаючи VCD)\r\nMPEG2 (включаючи DVD and SVCD)\r\nMPEG4 (включаючи Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включаючи WMV, WMA)\r\nMicrosoft RIFF (включаючи AVI, WAV)\r\nАудіоформати (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Меню
 Menu stream(s);Меню потоків
 Menu_Codec_List;Меню кодеків
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Положення
 Position_Total;Загальне
 Preferences;Налаштування
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Продюсер
 ProductionDesigner;Виконавчий дизайнер
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Розмір кодованого потоку
 StreamSize_Proportion;Відносний розмір потоку
 Subject;Тема
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Підпотік
 Summary;Підсумок
 Supported formats;Формати, що підтримуються
 Supported?;Підтримується?
+SupportUs_Android;
 Synopsis;Короткий огляд
 SystemId;ID
 Tagged_Application;Додаток редагув. тегів
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Назва доріжки
 Track_Count;Кількість доріжок
 transfer_characteristics;Характеристики трансферу
+Translate_Reports;
 Translator;Перекладач
 Tree;Дерево
 Tree & Text;Дерево і текст
@@ -1112,6 +1126,7 @@ View;Вигляд
 View_Hint;Змінити спосіб перегляду інформації
 Warning : more streams in the files;Увага: файл має ще потоки
 Web;Веб-сторінка
+WebSite;
 WebSite_Audio;Перейти на сайт цього аудіокодеку
 WebSite_Audio_More;Перейти на сайт (%Url%) цього аудіокодеку
 WebSite_General;Перейти на сайт плеєра для цього файлу
@@ -1131,5 +1146,5 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;88

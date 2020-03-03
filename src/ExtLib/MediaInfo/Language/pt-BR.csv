@@ -225,6 +225,7 @@ Choose language;Escolha o idioma
 Choreographer;Coreógrafo
 Chroma;Saturação
 ChromaSubsampling;
+ClearList;
 Close;Close
 Close all before open;Fechar tudo antes de abrir
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Tipo de Capa
 Cropped;Dimensões de corte
 Custom;Personalizado
 Customize;Personalizar
+DarkMode;
 Date;Data
 Debug;Depurar
 Decimal point;Ponto decimal
+Default_Setting;
 Delay;Atraso
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Codificado por
 EPG_Positions;Porções EGP (interno)
 EpisodeTitleNumber;
 Error_File;Erro na leitura do arquivo
+Error_File_Write;
 ExecutiveProducer;Produtor Executivo
 Exit;Sair
 Exit_Hint;Fechar o programa
 Export;Exportar
 Export_Hint;Exportar em um formato personalizado
 Extensions;Extensões populares
+External_Media_NotMounted;
 Family;Família
 Fax;Fax
 File;Arquivo
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Proporciona informações detalhadas\r\nsobre um arquivo multimídia:\r\nMatroska, OGG (incluíndo OGM)\r\nMPEG1 (incluíndo VCD)\r\nMPEG2 (incluíndo DVD e SVCD)\r\nMPEG4 (incluíndo iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindows Media (incluíndo WMV, WMA)\r\nMicrosoft RIFF (incluíndo AVI, WAV)\r\nArquivos de som (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menu
 Menu stream(s);Faixa(s) de menu
 Menu_Codec_List;Codecs de menu
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Posição
 Position_Total;Total
 Preferences;Preferências
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Produtor
 ProductionDesigner;Designer de Produção
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Proporção dessa faixa
 Subject;Assunto
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Sub-Faixa
 Summary;Sumário
 Supported formats;Formatos suportados
 Supported?;Suportado?
+SupportUs_Android;
 Synopsis;Sinopse
 SystemId;Id
 Tagged_Application;Programa Alvo
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Nome da faixa
 Track_Count;Número da faixa
 transfer_characteristics;
+Translate_Reports;
 Translator;Tradutor
 Tree;Raiz
 Tree & Text;Raiz & Texto
@@ -1112,6 +1126,7 @@ View;Exibir
 View_Hint;Mudar o modo de exibição das informações
 Warning : more streams in the files;Aviso : mais de uma faixa nos arquivos
 Web;Web
+WebSite;
 WebSite_Audio;Ir até o site deste codec de áudio
 WebSite_Audio_More;No site (%Url%) você encontra este codec de áudio
 WebSite_General;Ir até o site que oferece um reprodutor para esse arquivo
@@ -1131,5 +1146,5 @@ Written_Location;Local da escrita
 WrittenBy;Escrito por
 Yes;Sim
 Your system;Seu sistema
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85

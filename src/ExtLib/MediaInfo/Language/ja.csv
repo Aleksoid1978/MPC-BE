@@ -225,6 +225,7 @@ Choose language;言語を選択してください
 Choreographer;コアグラファー
 Chroma;クローマ
 ChromaSubsampling;
+ClearList;
 Close;閉じる
 Close all before open;すべて閉じて開く
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;カバーの種類
 Cropped;クロップ
 Custom;カスタム
 Customize;カスタマイズ
+DarkMode;
 Date;日付
 Debug;デバッグ
 Decimal point;箇条
+Default_Setting;
 Delay;遅延
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;エンコード者
 EPG_Positions;EPG 位置
 EpisodeTitleNumber;
 Error_File;ファイル読み込みエラー
+Error_File_Write;
 ExecutiveProducer;製作総指揮
 Exit;終了
 Exit_Hint;プログラムの終了
 Export;エクスポート
 Export_Hint;カスタム形式でエクスポート
 Extensions;使用する拡張子
+External_Media_NotMounted;
 Family;ファミリ
 Fax;Fax
 File;ファイル
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About; 詳細情報提供者 \r\n マルチメディア ファイル:\r\n Matroska, OGG ( OGM を含む)\r\n MPEG1 ( VCD を含む)\r\n MPEG2 ( DVD , SVCD を含む)\r\n MPEG4 (iTunes の M4A を含む)\r\n Quicktime\r\n RealMedia\r\n WindowsMedia ( WMV , WMA を含む)\r\n Microsoft RIFF ( AVI , WAV を含む)\r\n 音声のみ (AC3 , DTS , AAC , AU , AIFF ...)
+MediaInfo_About_About;
 Menu;メニュー
 Menu stream(s);メニューストリーム
 Menu_Codec_List;メニューコーデック
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;ポジション
 Position_Total;合計
 Preferences;設定
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;プロデューサー
 ProductionDesigner;プロダクション
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;サイズ整形
 Subject;件名
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;サブトラック
 Summary;サマリー
 Supported formats;対応フォーマット
 Supported?;サポート？
+SupportUs_Android;
 Synopsis;Synopsis
 SystemId;システム Id
 Tagged_Application;タギングツール
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;トラック名
 Track_Count;トラック数
 transfer_characteristics;
+Translate_Reports;
 Translator;翻訳者
 Tree;ツリー
 Tree & Text;ツリーとテキスト
@@ -1112,6 +1126,7 @@ View;表示
 View_Hint;ヒントを表示する
 Warning : more streams in the files;警告 : このファイルにはさらなるストリームが含まれています
 Web;Web
+WebSite;
 WebSite_Audio;このオーディオコーデックについて
 WebSite_Audio_More; (%Url%) へ移動してこのオーディオコーデックを探す
 WebSite_General;このファイルを再生可能なプレイヤー
@@ -1131,5 +1146,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85
