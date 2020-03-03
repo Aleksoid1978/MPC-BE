@@ -194,6 +194,7 @@ File_Hevc::File_Hevc()
     MustParse_VPS_SPS_PPS_FromMatroska=false;
     MustParse_VPS_SPS_PPS_FromFlv=false;
     SizedBlocks=false;
+    SizedBlocks_FileThenStream=0;
 
     //File specific
     lengthSizeMinusOne=(int8u)-1;
@@ -552,20 +553,43 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
             Size+=lengthSizeMinusOne+1;
 
             //Coherency checking
-            if (Size==0 || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+lengthSizeMinusOne+1>Buffer_Size))
+            if (Size<lengthSizeMinusOne+1+2 || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+lengthSizeMinusOne+1>Buffer_Size))
                 Size=Buffer_Size-Buffer_Offset;
+            size_t Buffer_Offset_Temp=Buffer_Offset+lengthSizeMinusOne+1;
+
+            //In case there are more than 1 NAL in the block (in Stream format), trying to find the first NAL being a slice
+            size_t Buffer_Offset_Temp_Max=Buffer_Offset+Size;
+            if (!RandomAccess && Buffer_Offset_Temp<Buffer_Offset_Temp_Max && (Buffer[Buffer_Offset_Temp]&0x40)!=0) //Is not a slice
+            {
+                while (Buffer_Offset_Temp+3<=Buffer_Offset+Size)
+                {
+                    if (CC3(Buffer+Buffer_Offset_Temp)==0x000001)
+                    {
+                        if (!RandomAccess && Buffer_Offset+Buffer_Offset_Temp+3<Buffer_Size && (Buffer[Buffer_Offset+Buffer_Offset_Temp+3]&0x40)==0) //Is a slice
+                        {
+                            Buffer_Offset_Temp+=3;
+                            break;
+                        }
+                    }
+                    Buffer_Offset_Temp+=2;
+                    while (Buffer_Offset_Temp<Buffer_Offset_Temp_Max && Buffer[Buffer_Offset_Temp]!=0x00)
+                        Buffer_Offset_Temp+=2;
+                    if (Buffer_Offset_Temp>=Buffer_Offset_Temp_Max || Buffer[Buffer_Offset_Temp]==0x00)
+                        Buffer_Offset_Temp--;
+                }
+            }
 
             //Random access check
-            if (!RandomAccess && Buffer_Offset+lengthSizeMinusOne+1<Buffer_Size && (Buffer[Buffer_Offset+lengthSizeMinusOne+1]&0x40)==0) //Is a slice
+            if (!RandomAccess && Buffer_Offset_Temp+2<Buffer_Size && (Buffer[Buffer_Offset_Temp]&0x40)==0) //Is a slice
             {
-                Element_Offset=lengthSizeMinusOne+1+2;
-                Element_Size=Size;
+                Element_Offset=Buffer_Offset_Temp+2-Buffer_Offset;
+                Element_Size=Size-Buffer_Offset_Temp;
 
                 BS_Begin();
                 Get_SB (   first_slice_segment_in_pic_flag,                 "first_slice_segment_in_pic_flag");
                 if (first_slice_segment_in_pic_flag)
                 {
-                    Element_Code=(Buffer[Buffer_Offset+lengthSizeMinusOne+1]&0x3E)>>1; //nal_unit_type
+                    Element_Code=(Buffer[Buffer_Offset_Temp]&0x3E)>>1; //nal_unit_type
                     RapPicFlag=Element_Code>=16 && Element_Code<=23;
                     if (RapPicFlag)
                         Skip_SB(                                                "no_output_of_prior_pics_flag");
@@ -901,7 +925,7 @@ void File_Hevc::Header_Parse()
 
     //Parsing
     int8u nal_unit_type, nuh_temporal_id_plus1;
-    if (!SizedBlocks)
+    if (!SizedBlocks || SizedBlocks_FileThenStream)
     {
         if (Buffer[Buffer_Offset+2]==0x00)
             Skip_B1(                                            "zero_byte");
@@ -921,6 +945,14 @@ void File_Hevc::Header_Parse()
 
         //if (nuh_temporal_id_plus1==0) // Found 1 stream with nuh_temporal_id_plus1==0, lets disable this coherency test for the moment
         //    Trusted_IsNot("nuh_temporal_id_plus1");
+
+        //In case there are more than 1 NAL in the block (in Stream format), trying to find the first NAL being a slice
+        if (SizedBlocks_FileThenStream && Element[Element_Level-1].Next>=SizedBlocks_FileThenStream)
+        {
+            if (Element[Element_Level-1].Next>SizedBlocks_FileThenStream)
+                Header_Fill_Size(SizedBlocks_FileThenStream-(File_Offset+Buffer_Offset));
+            SizedBlocks_FileThenStream=0; //TODO: more integrity tests, handling of first element size of first element (wrong in the trace)
+        }
     }
     else
     {
@@ -950,6 +982,33 @@ void File_Hevc::Header_Parse()
             default:    Trusted_IsNot("No size of NALU defined");
                         Size=(int32u)(Buffer_Size-Buffer_Offset);
         }
+        Size+=lengthSizeMinusOne+1;
+
+        //Coherency checking
+        if (Size<lengthSizeMinusOne+1+2 || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+lengthSizeMinusOne+1>Buffer_Size))
+            Size=Buffer_Size-Buffer_Offset;
+
+        //In case there are more than 1 NAL in the block (in Stream format), trying to find the first NAL being a slice
+        size_t Buffer_Offset_Temp=Buffer_Offset+lengthSizeMinusOne+1;
+        size_t Buffer_Offset_Temp_Max=Buffer_Offset+Size;
+        while (Buffer_Offset_Temp+3<=Buffer_Offset+Size)
+        {
+            if (CC3(Buffer+Buffer_Offset_Temp)==0x000001 || CC3(Buffer+Buffer_Offset_Temp)==0x000000)
+            {
+                break;
+            }
+            Buffer_Offset_Temp+=2;
+            while (Buffer_Offset_Temp<Buffer_Offset_Temp_Max && Buffer[Buffer_Offset_Temp]!=0x00)
+                Buffer_Offset_Temp+=2;
+            if (Buffer_Offset_Temp>=Buffer_Offset_Temp_Max || Buffer[Buffer_Offset_Temp]==0x00)
+                Buffer_Offset_Temp--;
+        }
+        if (Buffer_Offset_Temp+3<=Buffer_Offset+Size)
+        {
+            SizedBlocks_FileThenStream=File_Offset+Buffer_Offset+Size;
+            Size=Buffer_Offset_Temp-Buffer_Offset;
+        }
+
         BS_Begin();
         Mark_0 ();
         Get_S1 (6, nal_unit_type,                               "nal_unit_type");
@@ -961,7 +1020,7 @@ void File_Hevc::Header_Parse()
         //    Trusted_IsNot("nuh_temporal_id_plus1");
 
         FILLING_BEGIN();
-            Header_Fill_Size(Size?(Element_Offset-2+Size):(Buffer_Size-Buffer_Offset)); //If Size is 0, it is not normal, we skip the complete frame
+            Header_Fill_Size(Size);
         FILLING_END();
     }
 

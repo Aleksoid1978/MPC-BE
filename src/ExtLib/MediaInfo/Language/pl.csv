@@ -225,6 +225,7 @@ Choose language;Wybierz preferowany język
 Choreographer;Choreograf
 Chroma;Chrominancja
 ChromaSubsampling;
+ClearList;
 Close;Zamknij
 Close all before open;Zamykaj wszystko przed otwarciem pliku
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Typ okładki
 Cropped;Wymiary spadu
 Custom;Własne szablony
 Customize;Dostosowanie
+DarkMode;
 Date;Data
 Debug;Odpluskwianie
 Decimal point;Punkt dziesiętny
+Default_Setting;
 Delay;Opóźnienie
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Kodowane przez
 EPG_Positions;Pozycje EPG (wewnętrzne)
 EpisodeTitleNumber;
 Error_File;Błąd przy odczycie pliku
+Error_File_Write;
 ExecutiveProducer;Kierownik produkcji
 Exit;Wyjście
 Exit_Hint;Wyjście z programu
 Export;Eksport
 Export_Hint;Eksport we wałsnym  formacie
 Extensions;Zwykle używane rozszerzenia
+External_Media_NotMounted;
 Family;Rodzina
 Fax;Fax
 File;Plik
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Dostarcza bardzo szczegółowe informacje\r\no pliku multimedialnym:\r\nMatroska, OGG (wraz z OGM)\r\nMPEG1 (wraz z VCD)\r\nMPEG2 (wraz z DVD i SVCD)\r\nMPEG4 (wraz z iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (wraz z  WMV, WMA)\r\nMicrosoft RIFF (wraz z AVI, WAV)\r\nFormaty dźwiekowe (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menu
 Menu stream(s);Strumienie menu
 Menu_Codec_List;Kodeki menu
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Numer
 Position_Total;Nagrań
 Preferences;Preferencje
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Producent
 ProductionDesigner;Dekoracje
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Proporcje strumienia
 Subject;Temat
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Podnagranie
 Summary;Podsumowanie
 Supported formats;Obsługiwane formaty
 Supported?;Obsługiwane?
+SupportUs_Android;
 Synopsis;Streszczenie
 SystemId;ID
 Tagged_Application;Znakująca aplikacja
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Tytuł nagrania
 Track_Count;Liczba nagrań
 transfer_characteristics;
+Translate_Reports;
 Translator;Tłumacz
 Tree;Drzewo
 Tree & Text;Drzewo i tekst
@@ -1112,6 +1126,7 @@ View;Widok
 View_Hint;Zmienia sposób wyświetlania informacji
 Warning : more streams in the files;Ostrzeżenie: Jest więcej strumieni w pliku
 Web;Sieć
+WebSite;
 WebSite_Audio;Odwiedź witrynę tego kodeka audio
 WebSite_Audio_More;Odwiedź witrynę (%Url%) aby poszukać kodeka audio
 WebSite_General;Odwiedź witrynę odtwarzacza dla tego pliku
@@ -1131,5 +1146,5 @@ Written_Location;Lokalizacja
 WrittenBy;Napisał
 Yes;Tak
 Your system;System
-ZZ_Automatic_Percent;74
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;73
+ZZ_AutomaticLanguage_Percent;85

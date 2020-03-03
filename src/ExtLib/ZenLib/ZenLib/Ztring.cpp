@@ -1306,7 +1306,16 @@ Ztring& Ztring::Date_From_Seconds_1970 (const int32s Value)
 Ztring& Ztring::Date_From_Seconds_1970 (const int64s Value)
 {
     time_t Time=(time_t)Value;
+    #if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _BSD_SOURCE || _SVID_SOURCE || _POSIX_SOURCE
+    struct tm Gmt_Temp;
+    struct tm *Gmt=gmtime_r(&Time, &Gmt_Temp);
+    #elif defined(_WIN32)
+    struct tm Gmt_Temp;
+    errno_t gmtime_s_Result=gmtime_s(&Gmt_Temp , &Time);
+    struct tm* Gmt=gmtime_s_Result?NULL:&Gmt_Temp;
+    #else
     struct tm *Gmt=gmtime(&Time);
+    #endif
     if (!Gmt)
     {
         clear();
@@ -1337,7 +1346,16 @@ Ztring& Ztring::Date_From_Seconds_1970 (const int64s Value)
 Ztring& Ztring::Date_From_Seconds_1970_Local (const int32u Value)
 {
     time_t Time=(time_t)Value;
+    #if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _BSD_SOURCE || _SVID_SOURCE || _POSIX_SOURCE
+    struct tm Gmt_Temp;
+    struct tm *Gmt=localtime_r(&Time, &Gmt_Temp);
+    #elif defined(_WIN32)
+    struct tm Gmt_Temp;
+    errno_t localtime_s_Result=localtime_s(&Gmt_Temp , &Time);
+    struct tm* Gmt=localtime_s_Result?NULL:&Gmt_Temp;
+    #else
     struct tm *Gmt=localtime(&Time);
+    #endif
     Ztring DateT;
     Ztring Date;
     Date+=Ztring::ToZtring((Gmt->tm_year+1900));

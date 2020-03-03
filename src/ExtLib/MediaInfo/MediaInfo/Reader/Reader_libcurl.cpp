@@ -76,15 +76,13 @@ namespace Http
             Input           = Input.substr(Begin, Input.size() - Begin);
         }
     }
-    static void CutTail(std::string &Input, std::string &Output, const std::string &Delimiter, bool KeepDelimiter=false)
+    static void CutTail(std::string &Input, std::string &Output, const std::string &Delimiter)
     {
         // Remove the delimiter and everything that follows
         size_t Delimiter_Pos = Input.find(Delimiter);
         if (Delimiter_Pos != std::string::npos)
         {
-            size_t Begin    = Delimiter_Pos;
-            if (!KeepDelimiter)
-                Begin+=Delimiter.size();
+            size_t Begin    = Delimiter_Pos + Delimiter.size();
             size_t End      = Input.size() - Begin;
             Output          = Input.substr(Begin, End);
             Input           = Input.substr(0, Delimiter_Pos);
@@ -98,11 +96,36 @@ namespace Http
             : Host(In)
         {
             CutHead (Host,  Protocol,   "://"   );
-            CutTail (Host,  Search,     "?"     );
+            CutTail (Host,  Query,      "?"     );
+            CutTail (Query, Fragment,   "#"     );
             CutHead (Host,  User,       "@"     );
-            CutTail (Host,  Path,       "/",    true);
+            CutTail (Host,  Path,       "/"     );
             CutTail (User,  Password,   ":"     );
             CutTail (Host,  Port,       ":"     );
+            if (User.find('/')!=(size_t)-1 && Password.empty() && Path.empty())
+            {
+                // Something was weird, trying another method
+                Host=In;
+                CutHead (Host,  Protocol,   "://"   );
+                CutTail (Host,  Query,      "?"     );
+                CutTail (Query, Fragment,   "#"     );
+                CutTail (Host,  Path,       "/"     );
+                CutHead (Host,  User,       "@"     );
+                CutTail (User,  Password,   ":"     );
+                CutTail (Host,  Port,       ":"     );
+                if (Port.find_first_not_of("0123456789")!=(size_t)-1)
+                {
+                    // Format not understood, putting all in Protocol
+                    Protocol=In;
+                    User.clear();
+                    Password.clear();
+                    Host.clear();
+                    Port.clear();
+                    Path.clear();
+                    Query.clear();
+                    Fragment.clear();
+                }
+            }
 
             std::transform(Protocol.begin(), Protocol.end(), Protocol.begin(), ::tolower);
         }
@@ -118,8 +141,11 @@ namespace Http
             if (!User.empty() || !Password.empty())
             {
                 ToReturn += User;
-                ToReturn += ':';
-                ToReturn += Password;
+                if (!Password.empty())
+                {
+                    ToReturn += ':';
+                    ToReturn += Password;
+                }
                 ToReturn += '@';
             }
             ToReturn += Host;
@@ -128,13 +154,19 @@ namespace Http
                 ToReturn += ':';
                 ToReturn += Port;
             }
-            if (!Path.empty() || !Search.empty())
+            if (!Path.empty() || !Query.empty() || !Fragment.empty())
             {
+                ToReturn += '/';
                 ToReturn += Path;
-                if (!Search.empty())
+                if (!Query.empty())
                 {
                     ToReturn += '?';
-                    ToReturn += Search;
+                    ToReturn += Query;
+                }
+                if (!Fragment.empty())
+                {
+                    ToReturn += '#';
+                    ToReturn += Fragment;
                 }
             }
             return ToReturn;
@@ -147,8 +179,148 @@ namespace Http
         std::string Host;
         std::string Port;
         std::string Path;
-        std::string Search;
+        std::string Query;
+        std::string Fragment;
     };
+}
+
+//---------------------------------------------------------------------------
+inline void PercentEncode_Add(string& In, char Char)
+{
+    unsigned char v=(unsigned char)Char;
+    unsigned char h=v>>4;
+    unsigned char l=v&0xF;
+    In+='%';
+    In+=(char)((h>=10?'A'-10:'0')+h);
+    In+=(char)((l>=10?'A'-10:'0')+l);
+}
+string PercentEncode(const string& In)
+{
+    string Result;
+    for (string::size_type i=0; i<In.size(); i++)
+    {
+        char C=In[i];
+        if ((C>='0' && C<='9')
+         || (C>='A' && C<='Z')
+         || (C>='a' && C<='z')
+         || C=='/' // Directory separator
+         || C=='-'
+         || C=='.'
+         || C=='_'
+         || C=='~')
+            Result+=In[i];
+        else
+            PercentEncode_Add(Result, C);
+    }
+    return Result;
+}
+string PercentDecode(const string& In)
+{
+    string Result;
+    Result.reserve(In.size());
+    for (string::size_type i=0; i<In.size(); i++)
+    {
+        char C=In[i];
+        switch (C)
+        {
+            case '%':
+            {
+                if (i+2>In.size())
+                    return In;
+                char C1=In[++i];
+                if (!((C1>='0' && C1<='9')
+                   || (C1>='A' && C1<='F')
+                   || (C1>='a' && C1<='f')))
+                    return In;
+                char C2=In[++i];
+                if (!((C2>='0' && C2<='9')
+                   || (C2>='A' && C2<='F')
+                   || (C2>='a' && C2<='f')))
+                    return In;
+                if (C1>='a')
+                    C1-='a'-10;
+                else if (C1>='A')
+                    C1-='A'-10;
+                else
+                    C1-='0';
+                if (C2>='a')
+                    C2-='a'-10;
+                else if (C2>='A')
+                    C2-='A'-10;
+                else
+                    C2-='0';
+                Result+=(const char)((C1<<4)|C2);
+                continue;
+            }
+            default:
+                Result+=C;
+        }
+    }
+    return Result;
+}
+MediaInfo_Config::urlencode DetectPercentEncode(const string& In, bool AcceptSlash=false)
+{
+    MediaInfo_Config::urlencode Result=MediaInfo_Config::URLEncode_Guess;
+    for (string::size_type i=0; i<In.size(); i++)
+    {
+        char C=In[i];
+        switch (C)
+        {
+            case '%':
+            {
+                if (i+2>In.size())
+                    return MediaInfo_Config::URLEncode_No;
+                char C1=In[++i];
+                if (!((C1>='0' && C1<='9')
+                   || (C1>='A' && C1<='F')
+                   || (C1>='a' && C1<='f')))
+                    return MediaInfo_Config::URLEncode_No;
+                char C2=In[++i];
+                if (!((C2>='0' && C2<='9')
+                   || (C2>='A' && C2<='F')
+                   || (C2>='a' && C2<='f')))
+                    return MediaInfo_Config::URLEncode_No;
+                Result=MediaInfo_Config::URLEncode_Yes;
+                continue;
+            }
+            case '+': // Often used as space separator
+            case '\'':
+            case '!':
+            case '(':
+            case ')':
+            case '*':
+                continue;
+            case ';':
+            case ':':
+            case '@':
+            case '&':
+            case '=':
+            case '$':
+            case ',':
+            case '?':
+            case '#':
+            case '[':
+            case ']':
+                return MediaInfo_Config::URLEncode_No;
+            case '/':
+                if (AcceptSlash)
+                    continue;
+                return MediaInfo_Config::URLEncode_No;
+            default:
+                if (!((C>='0' && C<='9')
+                   || (C>='A' && C<='Z')
+                   || (C>='a' && C<='z')
+                   || C=='-'
+                   || C=='.'
+                   || C=='_'
+                   || C=='~'))
+                {
+                    if (Result!=MediaInfo_Config::URLEncode_Yes)
+                        Result=MediaInfo_Config::URLEncode_No;
+                }
+        }
+    }
+    return Result;
 }
 
 Ztring Reader_libcurl_FileNameWithoutPassword(const Ztring &FileName)
@@ -299,12 +471,24 @@ void Amazon_AWS_Sign(MediaInfoLib::String &File_Name, struct curl_slist* &HttpHe
 
     //CanonicalRequest
     string CanonicalRequest;
-    CanonicalRequest+="GET\n";
-    CanonicalRequest+=File_URL.Path+'\n';
-    if (!File_URL.Search.empty())
+    CanonicalRequest+="GET\n/";
+    for (size_t i=0;;)
     {
-        CanonicalRequest+=File_URL.Search;
-        if (File_URL.Search[File_URL.Search.size()-1]!='=')
+        size_t j=File_URL.Path.find_first_of("!$&\'()*+,;=:@", i); //We need to percent-encode these chars as AWS provides them in their UI but requests percent-encode chars in the signature
+        CanonicalRequest+=File_URL.Path.substr(i, j-i);
+        if (j==(size_t)-1)
+            break;
+        char C=File_URL.Path[j];
+        if (C=='+')
+            C=' '; // "+" must be considered as " " in AWS
+        PercentEncode_Add(CanonicalRequest, C);
+        i=j+1;
+    }
+    CanonicalRequest+='\n';
+    if (!File_URL.Query.empty())
+    {
+        CanonicalRequest+=File_URL.Query;
+        if (File_URL.Query[File_URL.Query.size()-1]!='=')
             CanonicalRequest+='=';
     }
     CanonicalRequest+='\n';
@@ -367,7 +551,7 @@ string Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName,
     Http::Url File_URL2=File_URL;
     File_URL2.Host.erase(0, bucketName.size()+1);
     File_URL2.Path='/'+bucketName;
-    File_URL2.Search="location";
+    File_URL2.Query="location";
 
     //Send a location request
     Reader_libcurl_curl_data_getregion Curl_Data2;
@@ -764,25 +948,46 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
                 Curl_Data->HttpHeader=curl_slist_append(Curl_Data->HttpHeader, HttpHeaderStrings[Pos].To_Local().c_str());
     }
 
+    // URL encoding
+    Http::Url File_URL=Http::Url(Ztring(Curl_Data->File_Name).To_UTF8());
+    MediaInfo_Config::urlencode UrlEncode=Config.URLEncode_Get();
+    if (UrlEncode==MediaInfo_Config::URLEncode_Guess)
+    {
+        UrlEncode=DetectPercentEncode(File_URL.Path, true);
+        if (UrlEncode!=MediaInfo_Config::URLEncode_No && DetectPercentEncode(File_URL.Host)==MediaInfo_Config::URLEncode_No)
+            UrlEncode=MediaInfo_Config::URLEncode_No;
+        if (UrlEncode!=MediaInfo_Config::URLEncode_No && DetectPercentEncode(File_URL.Query)==MediaInfo_Config::URLEncode_No)
+            UrlEncode=MediaInfo_Config::URLEncode_No;
+        if (UrlEncode!=MediaInfo_Config::URLEncode_No && DetectPercentEncode(File_URL.Fragment)==MediaInfo_Config::URLEncode_No)
+            UrlEncode=MediaInfo_Config::URLEncode_No;
+    }
+    if (UrlEncode==MediaInfo_Config::URLEncode_No)
+    {
+        File_URL.User=PercentEncode(File_URL.User);
+        File_URL.Password=PercentEncode(File_URL.Password);
+        File_URL.Host=PercentEncode(File_URL.Host);
+        File_URL.Path=PercentEncode(File_URL.Path);
+        File_URL.Query=PercentEncode(File_URL.Query);
+        File_URL.Fragment=PercentEncode(File_URL.Fragment);
+        Curl_Data->File_Name=Ztring().From_UTF8(File_URL.ToString());
+        UrlEncode=MediaInfo_Config::URLEncode_Yes;
+    }
+
     //Special cases
-    Http::Url File_URL=Http::Url(Ztring(File_Name).To_UTF8());
     if (!File_URL.Protocol.empty())
     {
-        // URL encoding
-        MediaInfo_Config::urlencode ShouldUrlEncode=Config.URLEncode_Get();
-        if (ShouldUrlEncode==MediaInfo_Config::URLEncode_Guess)
-        {
-            if (File_URL.Path.find(' '))
-                ShouldUrlEncode=MediaInfo_Config::URLEncode_Yes;
-        }
-        if (ShouldUrlEncode==MediaInfo_Config::URLEncode_Yes)
-            File_URL.Path=ZenLib::Format::Http::URL_Encoded_Encode(File_URL.Path);
-
         // Amazon S3 specific credentials
         if ((File_URL.Protocol=="http" || File_URL.Protocol=="https") && !File_URL.User.empty())
         {
             if (File_URL.Host.find(".amazonaws.com")+14==File_URL.Host.size())
+            {
+                if (UrlEncode==MediaInfo_Config::URLEncode_Yes)
+                {
+                    File_URL.User=PercentDecode(File_URL.User);
+                    File_URL.Password=PercentDecode(File_URL.Password);
+                }
                 Amazon_AWS_Manage(File_URL, Curl_Data, HttpHeaderStrings);
+            }
         }
 
         if (File_URL.Protocol=="sftp" || File_URL.Protocol=="scp")
@@ -920,6 +1125,7 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
         }
     }
     string FileName_String=Ztring(Curl_Data->File_Name).To_UTF8();
+    Curl_Data->File_Name=File_Name;
     curl_easy_setopt(Curl_Data->Curl, CURLOPT_URL, FileName_String.c_str());
     curl_easy_setopt(Curl_Data->Curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(Curl_Data->Curl, CURLOPT_MAXREDIRS, 3);

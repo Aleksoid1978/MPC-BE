@@ -225,6 +225,7 @@ Choose language;Adja meg a használni kívánt nyelvet
 Choreographer;Koreográfus
 Chroma;Szín
 ChromaSubsampling;
+ClearList;
 Close;Bezárás
 Close all before open;Mindent bezár megnyitás előtt
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Borító típusa
 Cropped;Méretek
 Custom;Egyedi
 Customize;Testreszabás
+DarkMode;
 Date;Dátum
 Debug;Hibakeresés
 Decimal point;Tizedesjel
+Default_Setting;
 Delay;Késleltetés
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Kódolta
 EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Fájlolvasási hiba
+Error_File_Write;
 ExecutiveProducer;Gyártó
 Exit;Kilépés
 Exit_Hint;Kilépés a programból
 Export;Exportálás
 Export_Hint;Exportálás egyedi formátumba
 Extensions;Általában használatos kiterjesztések
+External_Media_NotMounted;
 Family;Család
 Fax;fax
 File;Fájl
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Igen részletes adatok az alábbi\r\nmultimédia fájlokról:\r\nMatroska, OGG (OGM is)\r\nMPEG1 (VCD is)\r\nMPEG2 (DVD és SVCD is)\r\nMPEG4 (Itunes M4A is)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA is)\r\nMicrosoft RIFF (AVI, WAV is)\r\nCsak hangot tartalmazó fájlok (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menü
 Menu stream(s);Menüsáv
 Menu_Codec_List;Menükódek lista
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Helyzet
 Position_Total;
 Preferences;Beállítások
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Gyártó
 ProductionDesigner;Tervező
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Adatofolyam aránya
 Subject;Tárgy
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Alsáv
 Summary;Kivonat
 Supported formats;Támogatott formátumok
 Supported?;Támogatott?
+SupportUs_Android;
 Synopsis;Áttekintés
 SystemId;Azonosító
 Tagged_Application;Jelölő alkalmazás
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Sáv
 Track_Count;Sávok száma
 transfer_characteristics;
+Translate_Reports;
 Translator;Fordító
 Tree;Fa
 Tree & Text;Fa és szöveg
@@ -1112,6 +1126,7 @@ View;Nézet
 View_Hint;Megtekintési adatok megváltoztatása
 Warning : more streams in the files;Figyelem: ebben a fájlban több sáv van
 Web;Web
+WebSite;
 WebSite_Audio;A hangkódek weblapjának meglátogatása
 WebSite_Audio_More;Látogassa meg a hangkódek weblapját (%Url%)
 WebSite_General;A fájl lejátszó weblapjának meglátogatása
@@ -1131,5 +1146,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;76
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;75
+ZZ_AutomaticLanguage_Percent;84

@@ -225,6 +225,7 @@ Choose language;Välj önskat språk
 Choreographer;Koreograf
 Chroma;Kroma
 ChromaSubsampling;Kroma-delsampling
+ClearList;
 Close;Stäng
 Close all before open;Stäng alla före öppna
 ClosedCaptionsLanguage;Undertextspråk
@@ -287,9 +288,11 @@ Cover_Type;Omslagstyp
 Cropped;Beskärningsstorlek
 Custom;Anpassad
 Customize;Anpassa
+DarkMode;
 Date;Datum
 Debug;Felsök
 Decimal point;Decimalpunkt
+Default_Setting;
 Delay;Fördröjning
 Delay_Source;Fördröjning, orig.
 Delay_Source_Container;Behållare
@@ -324,12 +327,14 @@ EncodedBy;Kodad av
 EPG_Positions;EPG-positioner (interna)
 EpisodeTitleNumber;Episodnummer
 Error_File;Fel vid inläsning av fil
+Error_File_Write;
 ExecutiveProducer;Verkställande producent
 Exit;Avsluta
 Exit_Hint;Stäng programmet
 Export;Exportera
 Export_Hint;Exportera i ett anpassat format
 Extensions;Vanliga filändelser
+External_Media_NotMounted;
 Family;Familj
 Fax;Fax
 File;Fil
@@ -852,6 +857,7 @@ Matrix_Format;Matriskodning, format
 MaxCLL;
 MaxFALL;
 MediaInfo_About;MediaInfo tillhandahåller enkel tillgång till teknisk information, och tagginformation, om video- och ljudfiler.\r\nFörutom Mac App Stores grafiska användargränsnitt, är mjukvaran öppen källkod. Det innebär att den är kostnadsfri för slutanvändaren och att andra utvecklare tillåts studera, förbättra och återdistribuera programmet (BSD-licens).
+MediaInfo_About_About;
 Menu;Meny
 Menu stream(s);Menyströmmar
 Menu_Codec_List;Menykodekar
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Position
 Position_Total;Totalt
 Preferences;Inställningar
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;Primärt ljudspråk
 Producer;Producent
 ProductionDesigner;Produktionsdesigner
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Kodad strömstorlek
 StreamSize_Proportion;Strömproportioner
 Subject;Ämne
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Underspår
 Summary;Sammanfattning
 Supported formats;Format som stöds
 Supported?;Stöd?
+SupportUs_Android;
 Synopsis;Sammandrag
 SystemId;Id
 Tagged_Application;Taggningsprogram
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;Totalt programvaraktighet
 Track;Spårnamn
 Track_Count;Antal spår
 transfer_characteristics;Överföringsegenskaper
+Translate_Reports;
 Translator;Översättare
 Tree;Träd
 Tree & Text;Träd & Text
@@ -1112,6 +1126,7 @@ View;Visa
 View_Hint;Ändra hur informationen skall visas
 Warning : more streams in the files;Varning! Det finns fler strömmar i filerna!
 Web;Webb
+WebSite;
 WebSite_Audio;Gå till hemsidan för denna ljudkodek
 WebSite_Audio_More;Gå till webbsidan (%Url%) för att hitta denna ljudkodek
 WebSite_General;Gå till webbsidan för en spelare till denna fil
@@ -1131,5 +1146,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;97
+ZZ_Automatic_Percent;95
+ZZ_AutomaticLanguage_Percent;95

@@ -225,6 +225,7 @@ Choose language;원하는 언어를 선택하세요
 Choreographer;안무가
 Chroma;색차
 ChromaSubsampling;
+ClearList;
 Close;닫기
 Close all before open;열기 전에 모두 닫기
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;표지 타입
 Cropped;자른 영역
 Custom;커스텀
 Customize;커스터마이즈
+DarkMode;
 Date;날짜
 Debug;디버그
 Decimal point;소수점
+Default_Setting;
 Delay;딜레이
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;인코딩
 EPG_Positions;EPG 포지션 (내부)
 EpisodeTitleNumber;
 Error_File;파일을 읽는 중 에러
+Error_File_Write;
 ExecutiveProducer;제작 감독
 Exit;종료
 Exit_Hint;프로그램을 종료합니다
 Export;내보내기
 Export_Hint;원하는 형식으로 내보냅니다
 Extensions;일반적인 확장자
+External_Media_NotMounted;
 Family;가족
 Fax;팩스
 File;파일
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;미디어 파일에 대한\r\n상세한 정보를 제공:\r\nMatroska, OGG (OGM 포함)\r\nMPEG1 (VCD 포함)\r\nMPEG2 (DVD와 SVCD 포함)\r\nMPEG4 (Itunes M4A 포함)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA 포함)\r\nMicrosoft RIFF (AVI, WAV 포함)\r\n음악 포맷 (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;메뉴
 Menu stream(s);메뉴 스트림
 Menu_Codec_List;메뉴 코덱
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;위치
 Position_Total;전체
 Preferences;환경 설정
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;제작자
 ProductionDesigner;프로덕션
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;이 스트림의 비율
 Subject;제목
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;서브트랙
 Summary;요약
 Supported formats;지원하는 포맷
 Supported?;지원?
+SupportUs_Android;
 Synopsis;시놉시스
 SystemId;Id
 Tagged_Application;태깅 어플리케이션
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;트랙 이름
 Track_Count;트랙 개수
 transfer_characteristics;
+Translate_Reports;
 Translator;번역
 Tree;트리
 Tree & Text;트리 & 텍스트
@@ -1112,6 +1126,7 @@ View;보기
 View_Hint;정보를 보는 방식을 변경합니다.
 Warning : more streams in the files;경고 : 파일에 더 많은 스트림이 있습니다
 Web;웹
+WebSite;
 WebSite_Audio;이 오디오 코덱의 웹사이트로 가기
 WebSite_Audio_More;이 오디오 코덱을 찾기 위한 웹사이트(%Url%)로 가기
 WebSite_General;이 파일을 재생하기 위한 플레이어의 웹사이트로 가기
@@ -1131,5 +1146,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85

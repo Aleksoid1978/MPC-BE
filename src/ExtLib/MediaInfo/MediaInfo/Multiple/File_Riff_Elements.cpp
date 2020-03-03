@@ -2455,7 +2455,7 @@ void File_Riff::AVI__MD5_()
         int128u MD5Stored;
         Get_L16   (MD5Stored,                                   "MD5");
         Ztring MD5_PerItem;
-        MD5_PerItem.From_Number(MD5Stored, 16);
+        MD5_PerItem.From_UTF8(uint128toString(MD5Stored, 16));
         while (MD5_PerItem.size()<32)
             MD5_PerItem.insert(MD5_PerItem.begin(), '0'); //Padding with 0, this must be a 32-byte string
         MD5_PerItem.MakeLowerCase();
@@ -3696,9 +3696,9 @@ void File_Riff::WAVE_bext()
         }
         if (Version>=1 && UMID1 != 0 && UMID2 != 0)
         {
-            Ztring UMID=__T("0x")+Ztring().From_Number(UMID1, 16)+Ztring().From_Number(UMID2, 16);
+            Ztring UMID=__T("0x")+Ztring().From_UTF8(uint128toString(UMID1, 16))+Ztring().From_UTF8(uint128toString(UMID2, 16));
             if ((UMID1.lo&0xFF000000)==0x33000000)
-                UMID+=Ztring().From_Number(UMID3, 16)+Ztring().From_Number(UMID4, 16);
+                UMID+=Ztring().From_UTF8(uint128toString(UMID3, 16))+Ztring().From_UTF8(uint128toString(UMID4, 16));
             Fill(Stream_General, 0, "UMID", UMID);
         }
         if (Version>=2)

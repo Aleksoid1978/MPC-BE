@@ -73,6 +73,8 @@ static inline int8u ReverseBits(int8u c)
     return c;
 }
 
+string uint128toString(uint128 Value, int radix);
+
 #if !MEDIAINFO_TRACE
     #include "MediaInfo/File__Analyze_MinimizeSize.h"
 #else
@@ -1344,6 +1346,7 @@ protected :
     friend class File__Tags_Helper;
     friend class File_Mk;
     friend class File_Mpeg4;
+    friend class File_Hevc;
 
     //***************************************************************************
     // Helpers

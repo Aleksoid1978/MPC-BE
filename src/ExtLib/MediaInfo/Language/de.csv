@@ -225,6 +225,7 @@ Choose language;Gewünschte Sprache auswählen
 Choreographer;Choreograph
 Chroma;Chroma
 ChromaSubsampling;
+ClearList;
 Close;Schließen
 Close all before open;Vor dem Öffnen alle anderen schließen
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Cover-Typ
 Cropped;Schnitt-Dimensionen
 Custom;Benutzerdefiniert
 Customize;Anpassen
+DarkMode;
 Date;Datum
 Debug;Debug
 Decimal point;Dezimalpunkt
+Default_Setting;
 Delay;Verzögerung
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Kodiert von
 EPG_Positions;EPG Positionen (inter)
 EpisodeTitleNumber;
 Error_File;Fehler beim Lesen der Datei
+Error_File_Write;
 ExecutiveProducer;Ausführender Produzent
 Exit;Beenden
 Exit_Hint;Beendet das Programm
 Export;Exportieren
 Export_Hint;Exportiert in ein benutzerdefinierten Format
 Extensions;gebräuchliche File-Extension
+External_Media_NotMounted;
 Family;Familie
 Fax;Fax
 File;Datei
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Liefert sehr detaillierte Informationen\r\nüber Multimedia-Dateien:\r\nMatroska, OGG (einschließlich OGM)\r\nMPEG1 (einschließlich VCD)\r\nMPEG2 (einschließlich DVD and SVCD)\r\nMPEG4 (einschließlich Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (einschließlich WMV, WMA)\r\nMicrosoft RIFF (einschließlich AVI, WAV)\r\nAudio-Formate (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menü
 Menu stream(s);Menü-Streams
 Menu_Codec_List;Menü-Codecs
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Position
 Position_Total;total
 Preferences;Voreinstellungen
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Produzent
 ProductionDesigner;Produktionsdesigner
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Proportionen dieses Streams
 Subject;Inhalt
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Sub-Track
 Summary;Zusammenfassung
 Supported formats;Unterstützte Formate
 Supported?;Unterstützt?
+SupportUs_Android;
 Synopsis;Fazit
 SystemId;ID
 Tagged_Application;Tagging-Anwendung
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Track-Name
 Track_Count;Anzahl der Tracks
 transfer_characteristics;
+Translate_Reports;
 Translator;Übersetzer
 Tree;Baumstruktur
 Tree & Text;Baumstruktur & Text
@@ -1112,6 +1126,7 @@ View;Ansicht
 View_Hint;Ändert die Darstellung der angezeigten Informationen
 Warning : more streams in the files;Achtung! Es befinden sich mehr Streams in den Dateien
 Web;Internet
+WebSite;
 WebSite_Audio;Lade die Webseite dieses Audio-Codecs
 WebSite_Audio_More;Lade dier Webseite (%Url%) um diesen Audio-Codec zu finden
 WebSite_General;Zur Webseite eines Players für diese Datei gehen
@@ -1131,5 +1146,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85

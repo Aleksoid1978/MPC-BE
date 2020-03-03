@@ -574,10 +574,10 @@ std::ostream& operator<<(std::ostream& os, const element_details::Element_Node_D
           break;
 
       case element_details::Element_Node_Data::ELEMENT_NODE_INT128U:
-          os << Ztring::ToZtring(*v.val.i128u).To_UTF8();
+          os << uint128toString(*v.val.i128u, 10);
           if (v.format_out == element_details::Element_Node_Data::Format_Tree)
           {
-              std::string str = Ztring::ToZtring(*v.val.i128u, 16).To_UTF8();
+              std::string str = uint128toString(*v.val.i128u, 16);
               element_details::Element_Node_Data::get_hexa_from_deci_limited_by_bits(str, v.Option, 128);
               os << " (0x" << str << ")";
           }

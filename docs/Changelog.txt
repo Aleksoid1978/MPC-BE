@@ -5,6 +5,8 @@
 Updated libraries:
 	dav1d git-0.5.2-80-ge4208e8;
 	ffmpeg git-n4.3-dev-2519-g70209000fd;
+	MediaInfo git-v19.09-49-g3d49372b;
+	ZenLib git-v0.4.37-58-g28af233;
 
 1.5.4
 =============================

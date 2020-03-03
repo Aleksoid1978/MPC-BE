@@ -47,29 +47,43 @@ void File_DvDif::Read_Buffer_Continue()
     //Errors stats
     while (Buffer_Offset+80<=Buffer_Size)
     {
-        if ((Buffer[Buffer_Offset]&0xE0)==0x00  //SCT=0 (Header)
-         && !(Buffer[Buffer_Offset  ]==0x00
-           && Buffer[Buffer_Offset+1]==0x00
-           && Buffer[Buffer_Offset+2]==0x00))
-        {
-            Frame_AtLeast1DIF=true;
-
-            if (!DSF_IsValid)
-            {
-                DSF=(Buffer[Buffer_Offset+3]&0x80)?true:false;
-                DSF_IsValid=true;
-                Dseq_Old=DSF?11:9;
-            }
-        }
-
         //Quick search depends of SCT
         switch(Buffer[Buffer_Offset]&0xE0)
         {
+            case 0x00 : //SCT=0 (Header)
+                {
+                    if (!(Buffer[Buffer_Offset  ]==0x00
+                       && Buffer[Buffer_Offset+1]==0x00
+                       && Buffer[Buffer_Offset+2]==0x00)) // Ignore NULL
+                    {
+                        if ((Buffer[Buffer_Offset+1]&0xF0)==0x00) //Dseq=0
+                        {
+                            if ((Buffer[Buffer_Offset+1]&0x08)==0x00) //FSC=0
+                            {
+                                if ((Buffer[Buffer_Offset+1]&0x04)==0x04) //FSP=1
+                                {
+                                    //Errors stats update
+                                    if (Speed_FrameCount_StartOffset!=(int64u)-1)
+                                        Errors_Stats_Update();
+                                    Speed_FrameCount_StartOffset=File_Offset+Buffer_Offset;
+
+                                    APT=Buffer[Buffer_Offset+4]&0x07;
+                                    DSF=(Buffer[Buffer_Offset+3]&0x80)?true:false;
+                                    Dseq_Old=DSF?11:9;
+                                }
+                                else
+                                    FSP_WasNotSet=true;
+                            }
+                            else
+                                FSC_WasSet=true;
+                        }
+                    }
+                }
             case 0x20 : //SCT=1 (Subcode)
                 {
-                    Frame_AtLeast1DIF=true;
-
-                    for (size_t Pos=3*8; Pos<40; Pos+=2*8)
+                    if (!FSC && ssyb_AP3!=(int8u)-1)
+                        ssyb_AP3=(Buffer[Buffer_Offset+3]>>4)&0x7;
+                    for (size_t Pos=0; Pos<48; Pos+=8)
                     {
                         int8u PackType=Buffer[Buffer_Offset+3+Pos+3];
                         //dv_timecode
@@ -194,17 +208,14 @@ void File_DvDif::Read_Buffer_Continue()
 
             case 0x40 : //SCT=2 (VAUX)
                 {
-                    Frame_AtLeast1DIF=true;
-
                     for (size_t Pos=0; Pos<15*5; Pos+=5)
                     {
                         int8u PackType=Buffer[Buffer_Offset+3+Pos];
                         //video_source
-                        if (PackType==0x60 && !System_IsValid) //Pack type=0x60 (video_source)
+                        if (PackType==0x60) //Pack type=0x60 (video_source)
                         {
-                            System=(Buffer[Buffer_Offset+3+Pos+3]&0x20)==0x20?true:false;
-                            System_IsValid=true;
-                            video_source_Detected=true;
+                            system=(Buffer[Buffer_Offset+3+Pos+3]&0x20)==0x20?true:false;
+                            video_source_stype=Buffer[Buffer_Offset+3+Pos+3]&0x1F;
                         }
                         //video_sourcecontrol
                         if (PackType==0x61)
@@ -424,7 +435,7 @@ void File_DvDif::Read_Buffer_Continue()
                     //STA
                     if (Buffer[Buffer_Offset+3]&0xF0)
                     {
-                        if (video_source_Detected)
+                        if (video_source_stype!=(int8u)-1)
                         {
                             int8u STA_Error=Buffer[Buffer_Offset+3]>>4;
 
@@ -441,13 +452,6 @@ void File_DvDif::Read_Buffer_Continue()
                 }
                 break;
         }
-
-        //Errors stats
-        if (Frame_AtLeast1DIF &&
-            (Buffer[Buffer_Offset  ]&0xE0)==0x00  //SCT=0 (Header)
-         && (Buffer[Buffer_Offset+1]&0xF0)==0x00  //Dseq=0
-         && (Buffer[Buffer_Offset+1]&0x08)==0x00) //FSC=0
-            Errors_Stats_Update();
 
         //Coherency test
         if (Buffer[Buffer_Offset  ]==0x00
@@ -474,45 +478,109 @@ void File_DvDif::Errors_Stats_Update()
     }
 
     Ztring Errors_Stats_Line;
-    if (Speed_FrameCount) //We must have at least one complete frame
     {
         bool Errors_AreDetected=false;
         bool Infos_AreDetected=false;
         bool Arb_AreDetected=false;
 
         EVENT_BEGIN(DvDif, Change, 0)
-            Event.Width=720;
-            Event.Height=system?576:480;
-            if (!FSC_WasSet) //Original DV 25 Mbps
+            Event.StreamOffset=Speed_FrameCount_StartOffset;
+            switch (video_source_stype)
             {
-                if (system==false) //NTSC
-                {
-                    switch (video_source_stype)
-                    {
-                        case  0 : Event.VideoChromaSubsampling=0; break; //NTSC 25 Mbps
-                        default : Event.VideoChromaSubsampling=(int32u)-1;
-                    }
-                }
-                else //PAL
-                {
-                    switch (video_source_stype)
-                    {
-                        case  0 : if (APT==0)
-                                    Event.VideoChromaSubsampling=1;      //PAL 25 Mbps (IEC 61834)
-                                  else
-                                    Event.VideoChromaSubsampling=0;      //PAL 25 Mbps (SMPTE 314M)
-                                  break;
-                        default : Event.VideoChromaSubsampling=(int32u)-1;
-                    }
-                }
+                case 0x00 :
+                case 0x04 :
+                            Event.Width=720;
+                            Event.Height=system?576:480;
+                            break;
+                case 0x14 :
+                case 0x15 :
+                            Event.Width=system?1440:1280;
+                            Event.Height=video_source_stype==0x14?1080:1035;
+                            break;
+                case 0x18 :
+                            Event.Width=960;
+                            Event.Height=720;
+                            break;
+                default   : 
+                            Event.Width=0;
+                            Event.Height=0;
             }
-            else //DV 50 Mbps and 100 Mbps
-                Event.VideoChromaSubsampling=2;
+            if (video_source_stype!=(int8u)-1)
+            {
+                if (!FSC_WasSet) //Original DV 25 Mbps
+                {
+                    if (system==false) //NTSC
+                    {
+                        switch (video_source_stype)
+                        {
+                            case  0 : Event.VideoChromaSubsampling=0; break; //NTSC 25 Mbps
+                            default : Event.VideoChromaSubsampling=(int32u)-1;
+                        }
+                    }
+                    else //PAL
+                    {
+                        switch (video_source_stype)
+                        {
+                            case  0 : if (APT==0)
+                                        Event.VideoChromaSubsampling=1;      //PAL 25 Mbps (IEC 61834)
+                                      else
+                                        Event.VideoChromaSubsampling=0;      //PAL 25 Mbps (SMPTE 314M)
+                                      break;
+                            default : Event.VideoChromaSubsampling=(int32u)-1;
+                        }
+                    }
+                }
+                else //DV 50 Mbps and 100 Mbps
+                    Event.VideoChromaSubsampling=2;
+            }
+            else
+                Event.VideoChromaSubsampling=(int32u)-1;
             Event.VideoScanType=(int32u)-1;
-            Event.VideoRatio_N=(aspect==0 || aspect==4)?4:16;
-            Event.VideoRatio_D=(aspect==0 || aspect==4)?3:9;
-            Event.VideoRate_N=system?25:30000;
-            Event.VideoRate_D=system?1:1001;
+            switch (aspect)
+            {
+                case 0 :
+                case 4 :
+                        Event.VideoRatio_N=4;
+                        Event.VideoRatio_D=3;
+                        break;
+                case 1 :
+                case 2 :
+                        Event.VideoRatio_N=16;
+                        Event.VideoRatio_D=9;
+                        break;
+                case 7 :
+                        switch (ssyb_AP3)
+                            {
+                                case 0 :
+                                case 4 :
+                                        Event.VideoRatio_N=16;
+                                        Event.VideoRatio_D=9;
+                                        break;
+                                case 1 :
+                                case 2 :
+                                        Event.VideoRatio_N=4;
+                                        Event.VideoRatio_D=3;
+                                        break;
+                                default: ;
+                                        Event.VideoRatio_N=0;
+                                        Event.VideoRatio_D=0;
+                            }
+                default: ;
+                        Event.VideoRatio_N=0;
+                        Event.VideoRatio_D=0;
+            }
+            if (video_source_stype!=(int8u)-1)
+            {
+                Event.VideoRate_N=system?25:30000;
+                if (video_source_stype==0x18)
+                    Event.VideoRate_N*=2;
+                Event.VideoRate_D=system?1:1001;
+            }
+            else
+            {
+                Event.VideoRate_N=0;
+                Event.VideoRate_D=0;
+            }
             if (audio_source_IsPresentInFrame.count())
             {
                 switch(SMP)
@@ -553,24 +621,22 @@ void File_DvDif::Errors_Stats_Update()
 
         //Framerate computing
         float64 FrameRate=29.970;
-        if (System_IsValid)
-            FrameRate=System?25.000:29.970;
-        else if (DSF_IsValid)
-            FrameRate=DSF?25.000:29.970;
+        if (video_source_stype!=(int8u)-1)
+            FrameRate=system?25.000:29.970;
         else
-            FrameRate=29.970;
+            FrameRate=DSF?25.000:29.970;
         if (FrameRate==29.970 && Speed_TimeCode_Current.IsValid && !Speed_TimeCode_Current.Time.DropFrame)
             FrameRate=30.000;
 
         //Frame number
-        Ztring Frame_Number_Padded=Ztring::ToZtring(Speed_FrameCount-1);
+        Ztring Frame_Number_Padded=Ztring::ToZtring(Speed_FrameCount);
         if (Frame_Number_Padded.size()<8)
             Frame_Number_Padded.insert(0, 8-Frame_Number_Padded.size(), __T(' '));
         Errors_Stats_Line+=Frame_Number_Padded;
         Errors_Stats_Line+=__T('\t');
 
         //Time Offset
-        float64 Time_Offset=(Speed_FrameCount-1)*1000/FrameRate;
+        float64 Time_Offset=(Speed_FrameCount)*1000/FrameRate;
         Errors_Stats_Line+=Ztring().Duration_From_Milliseconds((int64u)Time_Offset);
         Errors_Stats_Line+=__T('\t');
 
@@ -658,9 +724,9 @@ void File_DvDif::Errors_Stats_Update()
         {
             size_t Speed_TimeCodeZ_Pos=Speed_TimeCodeZ.size();
             Speed_TimeCodeZ.resize(Speed_TimeCodeZ_Pos+1);
-            Speed_TimeCodeZ[Speed_TimeCodeZ_Pos].First.FramePos=Speed_FrameCount-1;
+            Speed_TimeCodeZ[Speed_TimeCodeZ_Pos].First.FramePos=Speed_FrameCount;
             Speed_TimeCodeZ[Speed_TimeCodeZ_Pos].First.TimeCode=Speed_TimeCodeZ_Current;
-            Speed_TimeCodeZ[Speed_TimeCodeZ_Pos-1].Last.FramePos=Speed_FrameCount-1;
+            Speed_TimeCodeZ[Speed_TimeCodeZ_Pos-1].Last.FramePos=Speed_FrameCount;
             Speed_TimeCodeZ[Speed_TimeCodeZ_Pos-1].Last.TimeCode=Speed_TimeCodeZ_Last;
 
             Errors_Stats_Line+=__T('N');
@@ -743,12 +809,10 @@ void File_DvDif::Errors_Stats_Update()
             if (Speed_RecTime_Current.Time.Frames!=45)
             {
                 int32u Milliseconds;
-                if (System_IsValid)
-                    Milliseconds=Speed_RecTime_Current.Time.Frames*(System?40:33);
-                else if (DSF_IsValid)
-                    Milliseconds=Speed_RecTime_Current.Time.Frames*(DSF?40:33);
+                if (video_source_stype!=(int8u)-1)
+                    Milliseconds=Speed_RecTime_Current.Time.Frames*(system?40:33);
                 else
-                    Milliseconds=Speed_RecTime_Current.Time.Frames*33;
+                    Milliseconds=Speed_RecTime_Current.Time.Frames*(DSF?40:33);
                 Speed_RecTimeZ_Current+=__T('.');
                 Speed_RecTimeZ_Current+=__T('0')+(Char)(Milliseconds/100);
                 Speed_RecTimeZ_Current+=__T('0')+(Char)((Milliseconds%100)/10);
@@ -803,10 +867,10 @@ void File_DvDif::Errors_Stats_Update()
         {
             size_t Speed_RecZ_Pos=Speed_RecZ.size();
             Speed_RecZ.resize(Speed_RecZ_Pos+1);
-            Speed_RecZ[Speed_RecZ_Pos].First.FramePos=Speed_FrameCount-1;
+            Speed_RecZ[Speed_RecZ_Pos].First.FramePos=Speed_FrameCount;
             Speed_RecZ[Speed_RecZ_Pos].First.Date=Speed_RecDateZ_Current;
             Speed_RecZ[Speed_RecZ_Pos].First.Time=Speed_RecTimeZ_Current;
-            Speed_RecZ[Speed_RecZ_Pos-1].Last.FramePos=Speed_FrameCount-1;
+            Speed_RecZ[Speed_RecZ_Pos-1].Last.FramePos=Speed_FrameCount;
             Speed_RecZ[Speed_RecZ_Pos-1].Last.Date=Speed_RecDateZ_Last;
             Speed_RecZ[Speed_RecZ_Pos-1].Last.Time=Speed_RecTimeZ_Last;
 
@@ -908,11 +972,11 @@ void File_DvDif::Errors_Stats_Update()
         {
             size_t Speed_TimeStampsZ_Pos=Speed_TimeStampsZ.size();
             Speed_TimeStampsZ.resize(Speed_TimeStampsZ_Pos+1);
-            Speed_TimeStampsZ[Speed_TimeStampsZ_Pos].First.FramePos=Speed_FrameCount-1;
+            Speed_TimeStampsZ[Speed_TimeStampsZ_Pos].First.FramePos=Speed_FrameCount;
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos].First.TimeCode=Speed_TimeCodeZ_Current;
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos].First.Date=Speed_RecDateZ_Current;
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos].First.Time=Speed_RecTimeZ_Current;
-            Speed_TimeStampsZ[Speed_TimeStampsZ_Pos-1].Last.FramePos=Speed_FrameCount-1;
+            Speed_TimeStampsZ[Speed_TimeStampsZ_Pos-1].Last.FramePos=Speed_FrameCount;
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos-1].Last.TimeCode=Speed_TimeCodeZ_Last;
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos-1].Last.Date=Speed_RecDateZ_Last;
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos-1].Last.Time=Speed_RecTimeZ_Last;
@@ -982,7 +1046,7 @@ void File_DvDif::Errors_Stats_Update()
             }
             if (Video_STA_Errors_Details.size()>2)
             {
-                Ztring Video_STA_Errors_Count_Padded=Ztring::ToZtring(((float)Video_STA_Errors_Count)*100/((DSF_IsValid && DSF)?1500:1350)*(QU_FSC?2:1), 2);
+                Ztring Video_STA_Errors_Count_Padded=Ztring::ToZtring(((float)Video_STA_Errors_Count)*100/(DSF?1500:1350)*(QU_FSC?2:1), 2);
                 if (Video_STA_Errors_Count_Padded.size()<5)
                     Video_STA_Errors_Count_Padded.insert(0, 5-Video_STA_Errors_Count_Padded.size(), __T(' '));
                 Errors_Stats_Line_Details+=Video_STA_Errors_Count_Padded+__T("%");
@@ -1046,7 +1110,7 @@ void File_DvDif::Errors_Stats_Update()
                         Errors_Stats_Line+=__T('2');
                     }
 
-                    Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(((float)Audio_Errors_Count)*100/((DSF_IsValid && DSF)?54:45)*(QU_FSC?2:1), 2);
+                    Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(((float)Audio_Errors_Count)*100/(DSF?54:45)*(QU_FSC?2:1), 2);
                     if (Audio_Errors_Count_Padded.size()<2)
                         Audio_Errors_Count_Padded.insert(0, 2-Audio_Errors_Count_Padded.size(), __T(' '));
                     if (ErrorsAreAlreadyDetected)
@@ -1146,7 +1210,7 @@ void File_DvDif::Errors_Stats_Update()
         Errors_Stats_Line_Details+=__T('\t');
 
         //Error 6:
-        if (Mpeg4_stts && Mpeg4_stts_Pos<Mpeg4_stts->size() && Speed_FrameCount-1>=Mpeg4_stts->at(Mpeg4_stts_Pos).Pos_Begin && Speed_FrameCount-1<Mpeg4_stts->at(Mpeg4_stts_Pos).Pos_End)
+        if (Mpeg4_stts && Mpeg4_stts_Pos<Mpeg4_stts->size() && Speed_FrameCount>=Mpeg4_stts->at(Mpeg4_stts_Pos).Pos_Begin && Speed_FrameCount<Mpeg4_stts->at(Mpeg4_stts_Pos).Pos_End)
         {
             if (!Stats_Total_AlreadyDetected)
             {
@@ -1197,7 +1261,7 @@ void File_DvDif::Errors_Stats_Update()
                 Event.Verbosity=10;
             #endif //MEDIAINFO_EVENTS
         }
-        if (Speed_FrameCount==1
+        if (Speed_FrameCount==0
          || Status[IsFinished]
          || Errors_AreDetected
          || Infos_AreDetected
@@ -1213,7 +1277,7 @@ void File_DvDif::Errors_Stats_Update()
                 Event.Verbosity=9;
             #endif //MEDIAINFO_EVENTS
 
-            if (Speed_FrameCount==1
+            if (Speed_FrameCount==0
              || Status[IsFinished]
              || Errors_AreDetected
              || Infos_AreDetected)
@@ -1228,7 +1292,7 @@ void File_DvDif::Errors_Stats_Update()
                     Event.Verbosity=5;
                 #endif //MEDIAINFO_EVENTS
 
-                if (Speed_FrameCount==1
+                if (Speed_FrameCount==0
                  || Status[IsFinished]
                  || Errors_AreDetected)
                 {
@@ -1253,7 +1317,9 @@ void File_DvDif::Errors_Stats_Update()
                 Event.Errors=(char*)Errors.c_str();
             }
             struct MediaInfo_Event_DvDif_Analysis_Frame_1 Event1;
+            Event_Prepare((struct MediaInfo_Event_Generic*)&Event1);
             Event1.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_DvDif, MediaInfo_Event_DvDif_Analysis_Frame, 1);
+            Event1.StreamOffset=Speed_FrameCount_StartOffset;
             Event1.TimeCode=Event.TimeCode;
             Event1.RecordedDateTime1=Event.RecordedDateTime1;
             Event1.RecordedDateTime2=Event.RecordedDateTime2;
@@ -1275,12 +1341,10 @@ void File_DvDif::Errors_Stats_Update()
     if (Speed_TimeCode_Current_Theory.IsValid)
     {
         int8u Frames_Max;
-        if (System_IsValid)
-            Frames_Max=System?25:30;
-        else if (DSF_IsValid)
-            Frames_Max=DSF?25:30;
+        if (video_source_stype!=(int8u)-1)
+            Frames_Max=system?25:30;
         else
-            Frames_Max=30;
+            Frames_Max=DSF?25:30;
 
         Speed_TimeCode_Current_Theory.Time.Frames++;
         if (Speed_TimeCode_Current_Theory.Time.Frames>=Frames_Max)
@@ -1342,6 +1406,11 @@ void File_DvDif::Errors_Stats_Update()
         }
     }
 
+    FSC_WasSet=false;
+    FSP_WasNotSet=false;
+    video_source_stype=(int8u)-1;
+    aspect=(int8u)-1;
+    ssyb_AP3=(int8u)-1;
     Speed_TimeCode_Last=Speed_TimeCode_Current;
     Speed_TimeCode_Current.Clear();
     Speed_RecDate_Current.IsValid=false;
@@ -1354,12 +1423,6 @@ void File_DvDif::Errors_Stats_Update()
     REC_IsValid=false;
     audio_source_IsPresentInFrame.reset();
     Speed_Contains_NULL=0;
-    Frame_AtLeast1DIF=true;
-    if (Buffer_Offset+2>=Buffer_Size
-     || (Buffer[Buffer_Offset  ]==0x00
-      && Buffer[Buffer_Offset+1]==0x00
-      && Buffer[Buffer_Offset+2]==0x00))
-        Frame_AtLeast1DIF=false;
     Video_STA_Errors.clear();
     Video_STA_Errors_ByDseq.clear();
     Audio_Errors.clear();
@@ -1376,9 +1439,9 @@ void File_DvDif::Errors_Stats_Update_Finnish()
         else
             return;
     }
+    Errors_Stats_Update();
 
     //Preparing next frame
-    Speed_FrameCount--;
     Ztring Errors_Stats_End_03;
     Ztring Errors_Stats_End_05;
     Ztring Errors_Stats_End_Lines;
@@ -1514,12 +1577,10 @@ void File_DvDif::Errors_Stats_Update_Finnish()
 
             //Framerate computing
             float64 FrameRate=29.970;
-            if (System_IsValid)
-                FrameRate=System?25.000:29.970;
-            else if (DSF_IsValid)
-                FrameRate=DSF?25.000:29.970;
+            if (video_source_stype!=(int8u)-1)
+                FrameRate=system?25.000:29.970;
             else
-                FrameRate=29.970;
+                FrameRate=DSF?25.000:29.970;
             if (FrameRate==29.970 && Speed_TimeCode_Current.IsValid && !Speed_TimeCode_Current.Time.DropFrame)
                 FrameRate=30.000;
 

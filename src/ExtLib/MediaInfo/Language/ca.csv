@@ -225,6 +225,7 @@ Choose language;Tria el teu idioma
 Choreographer;Coreografia
 Chroma;Croma
 ChromaSubsampling;Submostreig croma
+ClearList;
 Close;Tanca
 Close all before open;Tanca tot abans d'obrir
 ClosedCaptionsLanguage;Idioma subtítols incrustats
@@ -287,9 +288,11 @@ Cover_Type;Tipus de portada
 Cropped;Mida retallat
 Custom;Personalitzat
 Customize;Personalitza
+DarkMode;
 Date;Data
 Debug;Depuració
 Decimal point;Punt decimal
+Default_Setting;
 Delay;Retard
 Delay_Source;Retard, origen
 Delay_Source_Container;Contenidor
@@ -324,12 +327,14 @@ EncodedBy;Codificat per
 EPG_Positions;Posicions EPG (internes)
 EpisodeTitleNumber;Número títol episodi
 Error_File;Error en llegir l'arxiu
+Error_File_Write;
 ExecutiveProducer;Productor executiu
 Exit;Surt
 Exit_Hint;Tanca el programa
 Export;Exporta
 Export_Hint;Exporta en format personalitzat
 Extensions;Extensions emprades generalment
+External_Media_NotMounted;
 Family;Família
 Fax;Fax
 File;Arxiu
@@ -852,6 +857,7 @@ Matrix_Format;Codificació matriu, format
 MaxCLL;Nivell leuger contingut màxim
 MaxFALL;Nivell leuger mitjana fotogrames màxim
 MediaInfo_About;MediaInfo proporciona informació tècnica d'arxius de vídeo i àudio.\r\nExcepte la interfaç gràfica a la Mac App Store, és de codi obert, el que significa que és gratuït per als usuaris i els desenvolupadors tenen accés lliure per a estudiar-lo, millorar-lo i redistribuir-lo (llicència BSD)
+MediaInfo_About_About;
 Menu;Menú
 Menu stream(s);Menú de pistes
 Menu_Codec_List;Menú de codecs
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Posició
 Position_Total;Total
 Preferences;Preferències
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;Idioma àudio primari
 Producer;Productor
 ProductionDesigner;Disseny de producció
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Mida pista codificada
 StreamSize_Proportion;Proporció d'aquesta pista
 Subject;Subjecte
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Subpista
 Summary;Resum
 Supported formats;Formats compatibles
 Supported?;Compatible?
+SupportUs_Android;
 Synopsis;Sinopsi
 SystemId;Id
 Tagged_Application;Aplicació d'etiquetatge
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;Duració total programa
 Track;Nom de la pista
 Track_Count;Total de pistes
 transfer_characteristics;Característiques transferència
+Translate_Reports;
 Translator;Traductor
 Tree;Arbre
 Tree & Text;Arbre i text
@@ -1112,6 +1126,7 @@ View;Visualitza
 View_Hint;Canvia la manera de visualitzar la informació
 Warning : more streams in the files;Atenció: Hi ha més pistes als arxius
 Web;Web
+WebSite;
 WebSite_Audio;Visita el web d'aquest còdec d'àudio
 WebSite_Audio_More;Vés al web (%Url%) per trobar aquest còdec d'àudio
 WebSite_General;Vés al web d'un reproductor d'aquest arxiu
@@ -1131,5 +1146,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;94
-ZZ_AutomaticLanguage_Percent;97
+ZZ_Automatic_Percent;93
+ZZ_AutomaticLanguage_Percent;96

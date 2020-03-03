@@ -225,6 +225,7 @@ Choose language;Абярыце мову
 Choreographer;Харэограф
 Chroma;Каляровасць
 ChromaSubsampling;
+ClearList;
 Close;Зачыніць
 Close all before open;Закрыць усё перад адкрыццём
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Тып вокладкі
 Cropped;Памеры падрэзкі
 Custom;Выбаркова
 Customize;Фармат вываду
+DarkMode;
 Date;Дата
 Debug;Адладка
 Decimal point;Дзесятковая кропка
+Default_Setting;
 Delay;Затрымка
 Delay_Source;Затрымка ў арыгінале
 Delay_Source_Container;Кантэйнер
@@ -324,12 +327,14 @@ EncodedBy;Кадаваў
 EPG_Positions;EPG пазіцыіі (унутр)
 EpisodeTitleNumber;
 Error_File;Памылка ў файле
+Error_File_Write;
 ExecutiveProducer;Выканаўчы прадзюсар
 Exit;Выхад
 Exit_Hint;Выхад з праграмы
 Export;Экспарт
 Export_Hint;Экспарт дадзеных у розных фарматах
 Extensions;Выкарыстоўваецца ў
+External_Media_NotMounted;
 Family;Сямейства
 Fax;Факс
 File;Файл
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Адлюстроўвае дэталёвую інфармацыю\r\nпра мультымедыя-файлы Matroska, OGG (уключаючы OGM)\r\nMPEG1 (уключаючы VCD), MPEG2 (уключаючы DVD і SVCD), MPEG4 (уключаючы iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (уключаючы WMV, WMA)\r\nMicrosoft RIFF (уключаючы AVI, WAV, DivX)\r\nгукавыя фарматы (AC3, DTS, SSC, AU, AIFF)
+MediaInfo_About_About;
 Menu;Меню
 Menu stream(s);Меню струменяў
 Menu_Codec_List;Меню кодэкаў
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Пазіцыя
 Position_Total;Усяго
 Preferences;Налады
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Прадзюсар
 ProductionDesigner;Распрацоўнік афармлення
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Прапорцыі струменя
 Subject;Тэма
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Падпаток
 Summary;Зводка
 Supported formats;Падтрымліваемыя фарматы
 Supported?;Падтрымліваецца?
+SupportUs_Android;
 Synopsis;Коратка
 SystemId;Ідэнтыфікатар
 Tagged_Application;Праграма, якая пазначыла
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Сцежка
 Track_Count;Коль-ць дарожак
 transfer_characteristics;Характарыстыкі трансферу
+Translate_Reports;
 Translator;Перакладчык
 Tree;Дрэва
 Tree & Text;Дрэва і тэкст
@@ -1112,6 +1126,7 @@ View;Прагляд
 View_Hint;Прагляд
 Warning : more streams in the files;Увага: у файле ёсць яшчэ струмені
 Web;Сайт
+WebSite;
 WebSite_Audio;Сайт аўдыёкодэка
 WebSite_Audio_More;Перайсці на сайт (%Url%) для пошуку гэтага аўдыёкодэка
 WebSite_General;Перайсці на сайт прайгравальніка для гэтага файла
@@ -1131,5 +1146,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;87

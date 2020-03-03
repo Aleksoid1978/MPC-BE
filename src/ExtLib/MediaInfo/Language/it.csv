@@ -225,6 +225,7 @@ Choose language;Scegli la lingua
 Choreographer;Coreografo
 Chroma;Croma
 ChromaSubsampling;Croma subsampling
+ClearList;
 Close;Chiudi
 Close all before open;Chiudi tutto prima di aprire
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Tipo di copertina
 Cropped;Dimenzioni ritaglio
 Custom;Vista personalizzata
 Customize;Personalizza
+DarkMode;
 Date;Data
 Debug;Debug
 Decimal point;Separatore decimale
+Default_Setting;
 Delay;Ritardo
 Delay_Source;Ritardo sorgente
 Delay_Source_Container;Contenitore
@@ -324,12 +327,14 @@ EncodedBy;Compresso da
 EPG_Positions;Posizioni EPG (interne)
 EpisodeTitleNumber;
 Error_File;Errore nella lettura del file
+Error_File_Write;
 ExecutiveProducer;Produttore esecutivo
 Exit;Esci
 Exit_Hint;Esci dal programma
 Export;Esporta
 Export_Hint;Esporta in un formato personalizzato
 Extensions;Estensione generalmente usata
+External_Media_NotMounted;
 Family;Famiglia
 Fax;Fax
 File;File
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;MediaInfo fornisce un accesso veloce alle informazioni tecniche ed ai tag dei file audio e video.\r\nAd eccezione dell'interfaccia grafica Mac APp Store, è un software open-source, ciò significa che il programma è gratuito per l'utente finale e che lo sviluppatore è libero di studiare, migliorare e ridistribuire (licenza LGPL).
+MediaInfo_About_About;
 Menu;Menu
 Menu stream(s);Flussi del menu
 Menu_Codec_List;Codec dei menu
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Posizione
 Position_Total;Totale
 Preferences;Preferenze
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Produttore
 ProductionDesigner;Production Designer
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;Dim. traccia codificata
 StreamSize_Proportion;Proprorzioni traccia
 Subject;Soggetto
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;Sottotitolo
 Summary;Riassunto
 Supported formats;Formati supportati
 Supported?;Supportato?
+SupportUs_Android;
 Synopsis;Sommario
 SystemId;ID sistema
 Tagged_Application;Applicazione utilizzata
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Traccia
 Track_Count;Numero tracce
 transfer_characteristics;Caratteristiche trasferimento
+Translate_Reports;
 Translator;Traduttore
 Tree;Albero
 Tree & Text;Albero e testo
@@ -1112,6 +1126,7 @@ View;Visualizza
 View_Hint;Visualizza suggerimenti
 Warning : more streams in the files;Attenzione: ci sono diverse tracce nei file
 Web;Web
+WebSite;
 WebSite_Audio;Vai al sito internet di questo codec audio
 WebSite_Audio_More;Vai al sito internet (%Url%) per info su questo codec audio
 WebSite_General;Vai al sito internet del player per questo file
@@ -1131,5 +1146,5 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;89

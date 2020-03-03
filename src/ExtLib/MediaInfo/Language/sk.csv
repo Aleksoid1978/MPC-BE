@@ -225,6 +225,7 @@ Choose language;Vybrať jazyk
 Choreographer;Choreograf
 Chroma;Chroma
 ChromaSubsampling;
+ClearList;
 Close;Zatvoriť
 Close all before open;Zatvoriť všetko pred otvorením nového
 ClosedCaptionsLanguage;
@@ -287,9 +288,11 @@ Cover_Type;Typ obalu
 Cropped;
 Custom;Vlastné
 Customize;Prispôsobiť
+DarkMode;
 Date;Dátum
 Debug;Pokročilé
 Decimal point;Decimal point
+Default_Setting;
 Delay;Delay
 Delay_Source;
 Delay_Source_Container;
@@ -324,12 +327,14 @@ EncodedBy;Zakódoval
 EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Zlyhalo načítavanie súboru
+Error_File_Write;
 ExecutiveProducer;Executive producer
 Exit;Koniec
 Exit_Hint;Ukončiť program
 Export;Exportovať
 Export_Hint;Exportovať do vybraného formátu
 Extensions;Všeobecne používaná koncovka
+External_Media_NotMounted;
 Family;
 Fax;Fax
 File;Súbor
@@ -852,6 +857,7 @@ Matrix_Format;
 MaxCLL;
 MaxFALL;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
 Menu;Menu
 Menu stream(s);Menu streams
 Menu_Codec_List;
@@ -962,6 +968,8 @@ PodcastCategory;
 Position;Pozícia
 Position_Total;Celkom
 Preferences;Predvoľby
+Premium;
+Premium_Summary;
 PrimaryAudioLanguage;
 Producer;Producent
 ProductionDesigner;ProductionDesigner
@@ -1049,10 +1057,15 @@ StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subjekt
+Subscribe;
+Subscribe_Manage;
+Subscription_Android;
+Subscription_Thanks;
 SubTrack;SubTrack
 Summary;Summary
 Supported formats;Podporované formáty
 Supported?;Podporovaný?
+SupportUs_Android;
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;
@@ -1089,6 +1102,7 @@ TotalProgrammeDuration;
 Track;Názov stopy
 Track_Count;Počet stôp
 transfer_characteristics;
+Translate_Reports;
 Translator;Preložil
 Tree;Strom
 Tree & Text;Strom a text
@@ -1112,6 +1126,7 @@ View;Zobraziť
 View_Hint;Zobraziť
 Warning : more streams in the files;Pozor: v súboroch je viacero streamov !
 Web;Web
+WebSite;
 WebSite_Audio;Navštív webstránku tohoto audiokodeku
 WebSite_Audio_More;Vyhľadaj tento audiokodek na webstránke (%Url%)
 WebSite_General;Go to the web site of a player for this file
@@ -1131,5 +1146,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;79
+ZZ_Automatic_Percent;72
+ZZ_AutomaticLanguage_Percent;78

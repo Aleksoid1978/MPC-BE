@@ -241,6 +241,7 @@ File_DvDif::File_DvDif()
     APT=0xFF; //Impossible
     video_source_stype=0xFF;
     audio_source_stype=0xFF;
+    aspect=0xFF;
     ssyb_AP3=0xFF;
     TF1=false; //Valid by default, for direct analyze
     TF2=false; //Valid by default, for direct analyze
@@ -257,7 +258,7 @@ File_DvDif::File_DvDif()
 
     #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
     Analyze_Activated=false;
-    video_source_Detected=false;
+    Speed_FrameCount_StartOffset=(int64u)-1;
     Speed_FrameCount=0;
     Speed_FrameCount_Video_STA_Errors=0;
     Speed_FrameCount_Audio_Errors.resize(8);
@@ -266,8 +267,6 @@ File_DvDif::File_DvDif()
     Speed_Contains_NULL=0;
     Speed_FrameCount_Arb_Incoherency=0;
     Speed_FrameCount_Stts_Fluctuation=0;
-    System_IsValid=false;
-    Frame_AtLeast1DIF=false;
     SMP=(int8u)-1;
     QU=(int8u)-1;
     CH_IsPresent.resize(8);
@@ -557,7 +556,6 @@ void File_DvDif::Streams_Finish()
         {
             //Errors stats
             Status[IsFinished]=true; //We need to fill it before the call to Errors_Stats_Update
-            Errors_Stats_Update();
             Errors_Stats_Update_Finnish();
         }
     #endif //MEDIAINFO_DVDIF_ANALYZE_YES
