@@ -2139,6 +2139,10 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 
 	__super::OnSysCommand(nID, lParam);
+
+	if ((nID & 0xFFF0) == SC_RESTORE) {
+		StartAutoHideCursor();
+	}
 }
 
 BOOL CMainFrame::OnNcActivate(BOOL bActive)
