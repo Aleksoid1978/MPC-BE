@@ -107,7 +107,7 @@ END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
 4		"Figyelem"
-7		"A MPC-BE nem tudta megjeleníteni a grafika néhány elemét mert lehet, hogy nincsenek telepítve a szükséges kodekek vagy szűrők."
+7		"A MPC-BE nem tudta megjeleníteni a gráf néhány elemét mert lehet, hogy nincsenek telepítve a szükséges kodekek vagy szűrők."
 8		"A következő csatlakozó(k) nem talált(ak) csatlakoztatható szűrőt:"
 11		"Bezárás"
 END
@@ -374,7 +374,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 33		"Megnyitási beállítások"
 34		"Amikor megnyit egy hangfájlt,"
 36		"Hasonló fájlok hozzáadása a lejátszási listához"
-37		"Szűrő-Gráf felépítése külön eljárással"
+37		"Használjon szálat a szűrő gráf felépítéséhez"
 39		"Hibás, nem átalakítható csatlakozók jelentése"
 40		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
 END
@@ -407,7 +407,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"Csatornakeverő"
-6		"Keverje a csatornákat a:"
+6		"Keverje a csatornákat:"
 8		"Kérjen sztereót a dekódertől"
 9		"Átirányítsa a basszust a LFE-nek"
 14		"Hangerőszabályozó"
@@ -1593,7 +1593,7 @@ STRING IDS_MAINFRM_69		"Képméretarány: Alapértelmezés"
 STRING IDS_MAINFRM_70		"Audió késleltetés: %I64dms"
 STRING IDS_MAINFRM_73		"Árnyékoló nem betölthető: "
 STRING IDS_MAINFRM_77		"Hiba: Flash az IE-hez szükséges"
-STRING IDS_MAINFRM_80		"Nem sikerült létrehozni a szűrő-gráf objektumot"
+STRING IDS_MAINFRM_80		"Nem sikerült létrehozni a szűrő gráf objektumot"
 STRING IDS_MAINFRM_81		"Érvénytelen változó"
 STRING IDS_MAINFRM_82		"Megnyitás elvetve"
 STRING IDS_MAINFRM_83		"Nem sikerült megjeleníteni a fájlt"
@@ -1610,7 +1610,7 @@ STRING IDS_MAINFRM_93		"Nem található a DVD mappa"
 STRING IDS_MAINFRM_94		"Nem lehet létrehozni a DVD Navigátor szűrőt"
 STRING IDS_MAINFRM_96		"Nem lehet létrehozni a videó rögzítő szűrőt"
 STRING IDS_MAINFRM_98		"Nincsenek rögzítő szűrők"
-STRING IDS_MAINFRM_99		"Nem lehet létrehozni rögzítő-gráf építő objektumot"
+STRING IDS_MAINFRM_99		"Nem lehet létrehozni rögzítő gráf építő objektumot"
 STRING IDS_MAINFRM_DIR_CHECK		"Almappákkal együtt"
 STRING IDS_MAINFRM_DIR_TITLE		"Mappa kiválasztása"
 STRING IDS_MAINFRM_PPOFFSCR		"Után méretezés Pixel Árnyékolók: ki"
