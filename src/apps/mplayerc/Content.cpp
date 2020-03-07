@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,16 +53,14 @@ static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 
 	CStringA lpMultiByteStr((LPCSTR)pData, size);
 	if (bUTF8) {
-		CString str = UTF8ToWStr(lpMultiByteStr);
-		return str;
+		return UTF8ToWStr(lpMultiByteStr);
 	}
 
-	CString str = UTF8orLocalToWStr(lpMultiByteStr);
-	return str;
+	return UTF8orLocalToWStr(lpMultiByteStr);
 }
 
 namespace Content {
-	static void GetContentTypeByExt(CString path, CString& ct)
+	static void GetContentTypeByExt(const CString& path, CString& ct)
 	{
 		const CString ext = GetFileExt(path).MakeLower();
 
@@ -86,6 +84,8 @@ namespace Content {
 			ct = L"application/x-bdmv-playlist";
 		} else if (ext == L".cue") {
 			ct = L"application/x-cue-metadata";
+		} else if (ext == L".swf") {
+			ct = L"application/x-shockwave-flash";
 		}
 	}
 
@@ -407,20 +407,6 @@ namespace Content {
 			}
 		} else if (!fn.IsEmpty()) {
 			GetContentTypeByExt(fn, ct);
-
-			FILE* f = nullptr;
-			if (_wfopen_s(&f, fn, L"rb") == 0) {
-				CStringA str;
-				str.ReleaseBufferSetLength(fread(str.GetBuffer(3), 1, 3, f));
-				body = AToT(str);
-				fclose(f);
-			}
-		}
-
-		if (body.GetLength() >= 3) { // here only those which cannot be opened through dshow
-			if (!wcsncmp(body, L"FWS", 3) || !wcsncmp(body, L"CWS", 3) || !wcsncmp(body, L"ZWS", 3)) {
-				return L"application/x-shockwave-flash";
-			}
 		}
 
 		if (redir && !ct.IsEmpty()) {
