@@ -1902,6 +1902,7 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 {
 	if (!items.empty()) {
 		if (bDelete && (MessageBoxW(ResStr(IDS_PLAYLIST_DELETE_QUESTION), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON1) == IDNO)) {
+			SetFocus();
 			return;
 		}
 
@@ -1968,6 +1969,8 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 				m_pMainFrame->OpenCurPlaylistItem();
 			}
 		}
+
+		SetFocus();
 	}
 }
 
