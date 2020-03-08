@@ -3,7 +3,7 @@
 1.5.5 (beta)
 =============================
 Updated libraries:
-	dav1d git-0.5.2-80-ge4208e8;
+	dav1d git-0.6.0-10-gecc5078;
 	ffmpeg git-n4.3-dev-2519-g70209000fd;
 	libflac git-1.3.3-54-gcffe3890;
 	MediaInfo git-v19.09-49-g3d49372b;
