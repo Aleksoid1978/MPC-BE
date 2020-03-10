@@ -3772,7 +3772,10 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 void CPlayerPlaylistBar::OnLvnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	m_bEdit = true;
+	auto hwnd = (HWND)m_list.SendMessage(LVM_GETEDITCONTROL);
+	if (::IsWindow(hwnd)) {
+		m_bEdit = true;
+	}
 }
 
 void CPlayerPlaylistBar::OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
