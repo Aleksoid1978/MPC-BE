@@ -148,15 +148,20 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	CheckPointer(ppRenderer, E_POINTER);
 	ASSERT(!m_pMPCVR);
 
-	HRESULT hr = S_FALSE;
-
-	CHECK_HR(m_pMPCVR.CoCreateInstance(CLSID_MPCVR, GetOwner()));
+	HRESULT hr = m_pMPCVR.CoCreateInstance(CLSID_MPCVR, GetOwner());
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	if (CComQIPtr<ISubRender> pSR = m_pMPCVR) {
 		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
+
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		pIExFilterConfig->SetBool("lessRedraws", true);
+	}
 
 	CComQIPtr<IBaseFilter> pBF = m_pMPCVR;
 	HookNewSegmentAndReceive(GetFirstPin(pBF), true);
