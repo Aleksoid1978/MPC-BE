@@ -241,40 +241,43 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 	m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
-	Cluster c;
-	c.ParseTimeCode(m_pCluster);
-
-	if (!m_pBlock) {
-		m_pBlock = m_pCluster->GetFirstBlock();
-	}
-
 	do {
-		CBlockGroupNode bgn;
-
-		if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-			bgn.Parse(m_pBlock, true);
+		if (!m_pBlock) {
+			m_pBlock = m_pCluster->GetFirstBlock();
 		}
-		else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-			CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-			bg->Block.Parse(m_pBlock, true);
-			bgn.emplace_back(bg);
+		if (!m_pBlock) {
+			continue;
 		}
 
-		for (const auto& bg : bgn) {
-			if (bg->Block.TrackNumber != pTE->TrackNumber) {
-				continue;
+		do {
+			CBlockGroupNode bgn;
+
+			if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+				bgn.Parse(m_pBlock, true);
+			} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+				bg->Block.Parse(m_pBlock, true);
+				bgn.emplace_back(bg);
 			}
 
-			for (const auto& pb : bg->Block.BlockData) {
-				pTE->Expand(*pb, ContentEncoding::AllFrameContents);
-				pData.insert(pData.end(), pb->cbegin(), pb->cend());
+			for (const auto& bg : bgn) {
+				if (bg->Block.TrackNumber != pTE->TrackNumber) {
+					continue;
+				}
+
+				for (const auto& pb : bg->Block.BlockData) {
+					pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+					pData.insert(pData.end(), pb->cbegin(), pb->cend());
+				}
+
+				break;
 			}
+		} while (m_pBlock->NextBlock() && !CheckRequest(nullptr) && pData.empty());
 
-			break;
-		}
-	} while (m_pBlock->NextBlock() && !CheckRequest(nullptr) && pData.empty());
+		m_pBlock.Free();
+	} while (m_pFile->GetPos() < (__int64)std::min(m_pFile->m_segment.pos + m_pFile->m_segment.len, 1024ULL * MEGABYTE)
+		&& m_pCluster->Next(true) && !CheckRequest(nullptr) && pData.empty());
 
-	m_pBlock.Free();
 	m_pCluster.Free();
 
 	m_pFile->Seek(pos);
