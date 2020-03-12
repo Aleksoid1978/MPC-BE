@@ -660,12 +660,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							if (mt.subtype == MEDIASUBTYPE_AV01) {
-								std::vector<BYTE> pData;
-								if (ReadFirtsBlock(pData, pTE)) {
-									const auto size = pData.size();
-									pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + size);
-									memcpy(pvih + 1, pData.data(), size);
+								if (pTE->CodecPrivate.size() >= 4 && pTE->CodecPrivate.front() == 0x81) { // marker = 1(1), version = 1(7)
+									pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size() + 4);
+									BYTE* extra = (BYTE*)(pvih + 1);
+									memcpy(extra, "av1C", 4);
+									memcpy(extra + 4, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
+
 									mts.insert(mts.cbegin(), mt);
+								} else {
+									std::vector<BYTE> pData;
+									if (ReadFirtsBlock(pData, pTE)) {
+										const auto size = pData.size();
+										pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + size);
+										memcpy(pvih + 1, pData.data(), size);
+										mts.insert(mts.cbegin(), mt);
+									}
 								}
 							} else if (mt.subtype == MEDIASUBTYPE_VP90) {
 								std::vector<BYTE> pData;
