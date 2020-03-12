@@ -585,10 +585,13 @@ namespace Youtube
 
 			if (!JSUrl.IsEmpty()) {
 				JSUrl.Replace(L"\\/", L"/");
-				if (JSUrl.Find(L"s.ytimg.com") == -1) {
-					JSUrl = L"//s.ytimg.com" + JSUrl;
+				JSUrl.Trim();
+
+				if (JSUrl.Left(2) == L"//") {
+					JSUrl = L"https:" + JSUrl;
+				} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
+					JSUrl = L"https://www.youtube.com" + JSUrl;
 				}
-				JSUrl = L"https:" + JSUrl;
 			}
 
 			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
