@@ -2466,29 +2466,99 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 		} else if (m_nCodecId == AV_CODEC_ID_VP9) {
 			// use code from LAV
 			// read custom vpcC headers
-			if (extralen >= 16) {
-				if (AV_RB32(extra) == 'vpcC' && AV_RB8(extra + 4) == 1) {
-					m_pAVCtx->profile = AV_RB8(extra + 8);
-					m_pAVCtx->color_primaries = (AVColorPrimaries)AV_RB8(extra + 11);
-					m_pAVCtx->color_trc = (AVColorTransferCharacteristic)AV_RB8(extra + 12);
-					m_pAVCtx->colorspace = (AVColorSpace)AV_RB8(extra + 13);
+			if (extralen >= 16
+					&& AV_RB32(extra) == 'vpcC' && AV_RB8(extra + 4) == 1) {
+				m_pAVCtx->profile = AV_RB8(extra + 8);
+				m_pAVCtx->color_primaries = (AVColorPrimaries)AV_RB8(extra + 11);
+				m_pAVCtx->color_trc = (AVColorTransferCharacteristic)AV_RB8(extra + 12);
+				m_pAVCtx->colorspace = (AVColorSpace)AV_RB8(extra + 13);
 
-					m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-					int bitdepth = AV_RB8(extra + 10) >> 4;
-					if (m_pAVCtx->profile == FF_PROFILE_VP9_2) {
-						if (bitdepth == 10) {
-							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10;
-						} else if (bitdepth == 12) {
-							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P12;
-						}
-					} else if (m_pAVCtx->profile == FF_PROFILE_VP9_3) {
-						if (bitdepth == 10) {
-							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
-						} else if (bitdepth == 12) {
-							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P12;
-						}
+				m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+				int bitdepth = AV_RB8(extra + 10) >> 4;
+				if (m_pAVCtx->profile == FF_PROFILE_VP9_2) {
+					if (bitdepth == 10) {
+						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10;
+					} else if (bitdepth == 12) {
+						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P12;
+					}
+				} else if (m_pAVCtx->profile == FF_PROFILE_VP9_3) {
+					if (bitdepth == 10) {
+						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
+					} else if (bitdepth == 12) {
+						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P12;
 					}
 				}
+
+				av_freep(&extra);
+				extralen = 0;
+			}
+		} else if (m_nCodecId == AV_CODEC_ID_AV1) {
+			if (extralen >= 8
+					&& AV_RB32(extra) == 'av1C' && AV_RB8(extra + 4) == 0x81) {
+				CGolombBuffer gb(extra + 5, extralen - 5);
+				const unsigned seq_profile = gb.BitRead(3);
+				gb.BitRead(5); // seq_level_idx
+				gb.BitRead(1); // seq_tier
+				const unsigned high_bitdepth = gb.BitRead(1);
+				const unsigned twelve_bit = gb.BitRead(1);
+				const unsigned monochrome = gb.BitRead(1);
+				const unsigned chroma_subsampling_x = gb.BitRead(1);
+				const unsigned chroma_subsampling_y = gb.BitRead(1);
+
+				enum Dav1dPixelLayout {
+					DAV1D_PIXEL_LAYOUT_I400, ///< monochrome
+					DAV1D_PIXEL_LAYOUT_I420, ///< 4:2:0 planar
+					DAV1D_PIXEL_LAYOUT_I422, ///< 4:2:2 planar
+					DAV1D_PIXEL_LAYOUT_I444, ///< 4:4:4 planar
+				};
+
+				enum Dav1dBitDepth {
+					DAV1D_8BIT,
+					DAV1D_10BIT,
+					DAV1D_12BIT,
+				};
+
+				static const enum AVPixelFormat pix_fmts[][3] = {
+					{ AV_PIX_FMT_GRAY8,   AV_PIX_FMT_GRAY10,    AV_PIX_FMT_GRAY12    },
+					{ AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV420P12 },
+					{ AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV422P12 },
+					{ AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV444P12 },
+				};
+
+				Dav1dBitDepth bitdepth_index = DAV1D_8BIT;
+				Dav1dPixelLayout layout = DAV1D_PIXEL_LAYOUT_I420;
+
+				switch (seq_profile) {
+					case FF_PROFILE_AV1_MAIN:
+						bitdepth_index = high_bitdepth ? DAV1D_10BIT : DAV1D_8BIT;
+						layout = monochrome ? DAV1D_PIXEL_LAYOUT_I400 : DAV1D_PIXEL_LAYOUT_I420;
+						break;
+					case FF_PROFILE_AV1_HIGH:
+						bitdepth_index = high_bitdepth ? DAV1D_10BIT : DAV1D_8BIT;
+						layout = DAV1D_PIXEL_LAYOUT_I444;
+						break;
+					case FF_PROFILE_AV1_PROFESSIONAL:
+						bitdepth_index = high_bitdepth ? (twelve_bit ? DAV1D_12BIT : DAV1D_10BIT) : DAV1D_8BIT;
+						if (monochrome) {
+							layout = DAV1D_PIXEL_LAYOUT_I400;
+						} else {
+							if (bitdepth_index < DAV1D_12BIT) {
+								layout = DAV1D_PIXEL_LAYOUT_I422;
+							} else {
+								if (chroma_subsampling_x && chroma_subsampling_y) {
+									layout = DAV1D_PIXEL_LAYOUT_I420;
+								} else if (chroma_subsampling_x && !chroma_subsampling_y) {
+									layout = DAV1D_PIXEL_LAYOUT_I422;
+								} else if (!chroma_subsampling_x && !chroma_subsampling_y) {
+									layout = DAV1D_PIXEL_LAYOUT_I444;
+								}
+							}
+						}
+						break;
+				}
+
+				m_pAVCtx->profile = seq_profile;
+				m_pAVCtx->pix_fmt = pix_fmts[layout][bitdepth_index];
 
 				av_freep(&extra);
 				extralen = 0;
