@@ -2141,6 +2141,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	__super::OnSysCommand(nID, lParam);
 
 	if ((nID & 0xFFF0) == SC_RESTORE) {
+		RepaintVideo();
 		StartAutoHideCursor();
 	}
 }
@@ -4309,7 +4310,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	OpenSetupCaptureBar();
 
 	if (GetPlaybackMode() == PM_CAPTURE) {
-		ShowControlBar(&m_wndSubresyncBar, FALSE, TRUE);
+		ShowControlBarInternal(&m_wndSubresyncBar, FALSE);
 	}
 
 	m_nCurSubtitle   = -1;
@@ -4513,12 +4514,12 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_wndStatusBar.Relayout();
 
 	if (IsWindow(m_wndSubresyncBar.m_hWnd)) {
-		ShowControlBar(&m_wndSubresyncBar, FALSE, TRUE);
+		ShowControlBarInternal(&m_wndSubresyncBar, FALSE);
 	}
 	SetSubtitle(nullptr);
 
 	if (IsWindow(m_wndCaptureBar.m_hWnd)) {
-		ShowControlBar(&m_wndCaptureBar, FALSE, TRUE);
+		ShowControlBarInternal(&m_wndCaptureBar, FALSE);
 		m_wndCaptureBar.m_capdlg.SetupVideoControls(L"", nullptr, nullptr, nullptr);
 		m_wndCaptureBar.m_capdlg.SetupAudioControls(L"", nullptr, CInterfaceArray<IAMAudioInputMixer>());
 	}
@@ -5148,7 +5149,7 @@ void CMainFrame::OnFileOpenQuick()
 	m_wndPlaylistBar.Open(fns, bMultipleFiles);
 
 	if (m_wndPlaylistBar.GetCount() == 1 && m_wndPlaylistBar.IsWindowVisible() && !m_wndPlaylistBar.IsFloating()) {
-		//ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
+		//ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
 	}
 
 	OpenCurPlaylistItem();
@@ -5573,7 +5574,7 @@ void CMainFrame::OnFileOpenDevice()
 
 	ShowWindow(SW_SHOW);
 
-	ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
+	ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
 	m_wndPlaylistBar.Empty();
 
 	CAutoPtr<OpenDeviceData> p(DNew OpenDeviceData());
@@ -5584,7 +5585,7 @@ void CMainFrame::OnFileOpenDevice()
 	OpenMedia(p);
 	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && m_eMediaLoadState == MLS_LOADED && s.iDefaultCaptureDevice == 1) {
 		m_wndNavigationBar.m_navdlg.UpdateElementList();
-		ShowControlBar(&m_wndNavigationBar, !s.fHideNavigation, TRUE);
+		ShowControlBarInternal(&m_wndNavigationBar, !s.fHideNavigation);
 	}
 }
 
@@ -7106,7 +7107,7 @@ void CMainFrame::OnUpdateViewControlBar(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewSubresync()
 {
-	ShowControlBar(&m_wndSubresyncBar, !m_wndSubresyncBar.IsWindowVisible(), TRUE);
+	ShowControlBarInternal(&m_wndSubresyncBar, !m_wndSubresyncBar.IsWindowVisible());
 }
 
 void CMainFrame::OnUpdateViewSubresync(CCmdUI* pCmdUI)
@@ -7117,7 +7118,7 @@ void CMainFrame::OnUpdateViewSubresync(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewPlaylist()
 {
-	ShowControlBar(&m_wndPlaylistBar, !m_wndPlaylistBar.IsWindowVisible(), TRUE);
+	ShowControlBarInternal(&m_wndPlaylistBar, !m_wndPlaylistBar.IsWindowVisible());
 	m_wndPlaylistBar.SetFocus();
 }
 
@@ -7133,7 +7134,7 @@ void CMainFrame::OnViewNavigation()
 	s.fHideNavigation = !s.fHideNavigation;
 	m_wndNavigationBar.m_navdlg.UpdateElementList();
 	if (GetPlaybackMode() == PM_CAPTURE) {
-		ShowControlBar(&m_wndNavigationBar, !s.fHideNavigation, TRUE);
+		ShowControlBarInternal(&m_wndNavigationBar, !s.fHideNavigation);
 	}
 }
 
@@ -7146,7 +7147,7 @@ void CMainFrame::OnUpdateViewNavigation(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewCapture()
 {
-	ShowControlBar(&m_wndCaptureBar, !m_wndCaptureBar.IsWindowVisible(), TRUE);
+	ShowControlBarInternal(&m_wndCaptureBar, !m_wndCaptureBar.IsWindowVisible());
 }
 
 void CMainFrame::OnUpdateViewCapture(CCmdUI* pCmdUI)
@@ -7162,7 +7163,7 @@ void CMainFrame::OnViewShaderEditor()
 	} else {
 		m_wndShaderEditorBar.m_dlg.UpdateShaderList();
 	}
-	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
+	ShowControlBarInternal(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible());
 }
 
 void CMainFrame::OnUpdateViewShaderEditor(CCmdUI* pCmdUI)
@@ -10546,7 +10547,7 @@ void CMainFrame::SetPlaybackMode(PMODE eNewStatus)
 {
 	m_ePlaybackMode = eNewStatus;
 	if (m_wndNavigationBar.IsWindowVisible() && GetPlaybackMode() != PM_CAPTURE) {
-		ShowControlBar(&m_wndNavigationBar, !m_wndNavigationBar.IsWindowVisible(), TRUE);
+		ShowControlBarInternal(&m_wndNavigationBar, !m_wndNavigationBar.IsWindowVisible());
 	}
 }
 
@@ -10646,7 +10647,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	if (!m_bFullScreen) {
 		if (s.bHidePlaylistFullScreen && m_wndPlaylistBar.IsVisible()) {
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(true);
-			ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
+			ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
 		}
 
 		if (!m_bFirstFSAfterLaunchOnFullScreen) {
@@ -10710,7 +10711,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 		if (s.bHidePlaylistFullScreen && m_wndPlaylistBar.IsHiddenDueToFullscreen()) {
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(false);
-			ShowControlBar(&m_wndPlaylistBar, TRUE, TRUE);
+			ShowControlBarInternal(&m_wndPlaylistBar, TRUE);
 		}
 	}
 
@@ -10748,14 +10749,14 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
 			if (nTimeOut == 0) {
 				ShowControls(CS_NONE, false);
-				ShowControlBar(&m_wndNavigationBar, false, TRUE);
+				ShowControlBarInternal(&m_wndNavigationBar, FALSE);
 			} else if (nTimeOut > 0) {
 				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, nullptr);
 				SetTimer(TIMER_MOUSEHIDER, max(nTimeOut * 1000, 2000), nullptr);
 			}
 		} else {
 			ShowControls(CS_NONE, false);
-			ShowControlBar(&m_wndNavigationBar, false, TRUE);
+			ShowControlBarInternal(&m_wndNavigationBar, FALSE);
 		}
 
 		if (s.fPreventMinimize) {
@@ -10771,7 +10772,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		}
 		ShowControls(s.nCS);
 		if (GetPlaybackMode() == PM_CAPTURE && s.iDefaultCaptureDevice == 1) {
-			ShowControlBar(&m_wndNavigationBar, !s.fHideNavigation, TRUE);
+			ShowControlBarInternal(&m_wndNavigationBar, !s.fHideNavigation);
 		}
 	}
 
@@ -11439,7 +11440,9 @@ void CMainFrame::RepaintVideo()
 {
 	if (!m_bDelaySetOutputRect && GetMediaState() != State_Running) {
 		if (m_pCAP) {
-			m_pCAP->Paint(false);
+			if (!IsD3DFullScreenMode()) {
+				m_pCAP->Paint(false);
+			}
 		} else if (m_pMFVDC) {
 			m_pMFVDC->RepaintVideo();
 		}
@@ -15701,6 +15704,8 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 	}
 
 	RecalcLayout();
+
+	RepaintVideo();
 }
 
 void CMainFrame::CalcControlsSize(CSize& cSize)
@@ -20104,6 +20109,15 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 	}
 
 	return !sl.empty();
+}
+
+
+void CMainFrame::ShowControlBarInternal(CControlBar* pBar, BOOL bShow)
+{
+	ShowControlBar(pBar, bShow, FALSE);
+	if (!bShow) {
+		RepaintVideo();
+	}
 }
 
 LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam)

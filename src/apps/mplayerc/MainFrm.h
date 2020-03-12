@@ -1373,6 +1373,8 @@ public:
 	void		StartAutoHideCursor();
 
 	const bool	GetFromClipboard(std::list<CString>& sl) const;
+
+	void		ShowControlBarInternal(CControlBar* pBar, BOOL bShow);
 protected:
 	CDiskImage	m_DiskImage;
 	BOOL		m_bNeedUnmountImage = TRUE;

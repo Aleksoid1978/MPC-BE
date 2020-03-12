@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -112,7 +112,7 @@ BOOL CPlayerSubresyncBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
 		if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
-			GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+			m_pMainFrame->ShowControlBarInternal(this, FALSE);
 			return TRUE;
 		}
 
