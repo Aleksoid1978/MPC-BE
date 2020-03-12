@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,7 +123,7 @@ void CPlayerNavigationBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
 
 void CPlayerNavigationBar::ShowControls(CWnd* pMainfrm, bool bShow)
 {
-	((CMainFrame*)pMainfrm)->ShowControlBar(this, bShow, TRUE);
+	((CMainFrame*)pMainfrm)->ShowControlBarInternal(this, bShow);
 
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);

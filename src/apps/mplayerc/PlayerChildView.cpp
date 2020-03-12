@@ -179,7 +179,6 @@ void CChildView::ClearResizedImage()
 IMPLEMENT_DYNAMIC(CChildView, CWnd)
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
-	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_WM_SETCURSOR()
@@ -190,12 +189,6 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 END_MESSAGE_MAP()
 
 // CChildView message handlers
-
-void CChildView::OnPaint()
-{
-	CPaintDC dc(this);
-	AfxGetMainFrame()->RepaintVideo();
-}
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {

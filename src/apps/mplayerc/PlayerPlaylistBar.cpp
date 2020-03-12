@@ -1002,7 +1002,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			if (pMsg->message == WM_KEYDOWN) {
 				switch (pMsg->wParam) {
 				case VK_ESCAPE:
-					GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+					m_pMainFrame->ShowControlBarInternal(this, FALSE);
 					return TRUE;
 				case VK_RETURN:
 					if (GetKeyState(VK_CONTROL) < 0) {
