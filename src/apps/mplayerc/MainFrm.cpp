@@ -11440,9 +11440,7 @@ void CMainFrame::RepaintVideo()
 {
 	if (!m_bDelaySetOutputRect && GetMediaState() != State_Running) {
 		if (m_pCAP) {
-			if (!IsD3DFullScreenMode()) {
-				m_pCAP->Paint(false);
-			}
+			m_pCAP->Paint(false);
 		} else if (m_pMFVDC) {
 			m_pMFVDC->RepaintVideo();
 		}
