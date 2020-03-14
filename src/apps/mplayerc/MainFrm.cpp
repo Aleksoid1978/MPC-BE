@@ -5916,16 +5916,25 @@ HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
 	errmsg.Empty();
 	HRESULT hr;
 
-	if (m_pMFVDC) {
+	if (m_pCAP) {
+		LPVOID dibImage = nullptr;
+		hr = m_pCAP->GetDisplayedImage(&dibImage);
+
+		if (S_OK == hr && dibImage) {
+			const BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dibImage;
+			dib.resize(sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+			memcpy(dib.data(), dibImage, sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+			LocalFree(dibImage);
+		}
+	}
+	else if (m_pMFVDC) {
 		hr = GetVideoDisplayControlFrame(m_pMFVDC, dib);
-	} else if (m_pMVRFG) {
-		hr = GetMadVRFrameGrabberFrame(m_pMVRFG, dib, true);
 	} else {
 		hr = E_NOINTERFACE;
 	}
 
 	if (FAILED(hr)) {
-		errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, 0x%08x", hr);
+		errmsg.Format(L"CMainFrame::GetCurrentImage() failed, 0x%08x", hr);
 	}
 
 	return hr;
@@ -6087,7 +6096,7 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 		}
 	}
 
-	if (hr == S_OK) {
+	if (hr == S_OK && dib.size()) {
 		if (fn) {
 			SaveDIB(fn, dib.data(), dib.size());
 			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
@@ -6326,7 +6335,7 @@ void CMainFrame::OnAutoSaveImage()
 void CMainFrame::OnAutoSaveDisplay()
 {
 	// Check if a compatible renderer is being used
-	if (!m_pMFVDC && !m_pMVRFG) {
+	if (!m_pCAP && !m_pMFVDC) {
 		return;
 	}
 

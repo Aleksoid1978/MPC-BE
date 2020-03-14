@@ -2198,6 +2198,8 @@ STDMETHODIMP CBaseAP::GetDisplayedImage(LPVOID* dibImage)
 		return hr;
 	}
 
+	*dibImage = p;
+
 	return S_OK;
 }
 
