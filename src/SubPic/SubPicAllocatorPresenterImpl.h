@@ -86,7 +86,7 @@ public:
 	STDMETHODIMP_(void) Invalidate(REFERENCE_TIME rtInvalidate = -1);
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
 	STDMETHODIMP GetVideoFrame(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
-	STDMETHODIMP GetDisplayedImage(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
+	STDMETHODIMP GetDisplayedImage(LPVOID* dibImage) { return E_NOTIMPL; }
 	STDMETHODIMP_(int) GetPixelShaderMode() { return 0; }
 	STDMETHODIMP ClearPixelShaders(int target) { return E_NOTIMPL; }
 	STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) { return E_NOTIMPL; }

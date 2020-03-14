@@ -235,6 +235,17 @@ STDMETHODIMP CmadVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return hr;
 }
 
+STDMETHODIMP CmadVRAllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
+{
+	if (CComQIPtr<IMadVRFrameGrabber> pMadVRFrameGrabber = m_pMVR) {
+		HRESULT hr = pMadVRFrameGrabber->GrabFrame(ZOOM_PLAYBACK_SIZE, 0, 0, 0, 0, 0, dibImage, 0);
+
+		return hr;
+	}
+
+	return E_FAIL;
+}
+
 STDMETHODIMP CmadVRAllocatorPresenter::ClearPixelShaders(int target)
 {
 	ASSERT(TARGET_FRAME == ShaderStage_PreScale && TARGET_SCREEN == ShaderStage_PostScale);

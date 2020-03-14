@@ -240,6 +240,18 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return hr;
 }
 
+STDMETHODIMP CMPCVRAllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
+{
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		unsigned size = 0;
+		HRESULT hr = pIExFilterConfig->GetBin("displayedImage", dibImage, &size);
+
+		return hr;
+	}
+
+	return E_FAIL;
+}
+
 STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetPixelShaderMode()
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
