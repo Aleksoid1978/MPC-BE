@@ -190,7 +190,9 @@ public IUnknown {
 	STDMETHOD_(void, SetSubPicProvider) (ISubPicProvider* pSubPicProvider) PURE;
 	STDMETHOD_(void, Invalidate) (REFERENCE_TIME rtInvalidate = -1) PURE;
 
-	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE;
+	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE; // may be deleted in the future
+	STDMETHOD (GetVideoFrame) (BYTE* lpDib, DWORD* size) PURE;
+	STDMETHOD (GetDisplayedImage) (BYTE* lpDib, DWORD* size) PURE;
 
 	STDMETHOD_(int, GetPixelShaderMode) () PURE;
 	STDMETHOD (ClearPixelShaders) (int target) PURE;
