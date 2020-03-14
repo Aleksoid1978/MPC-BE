@@ -83,8 +83,12 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-	int bit = 24, width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
-	int stride = (width * bit + 31) / 32 * bpp, sih = sizeof(BITMAPINFOHEADER);
+	int bit = 24;
+	int width = bih->biWidth;
+	int height = abs(bih->biHeight);
+	int bpp = bih->biBitCount / 8;
+	int stride = (width * bit + 31) / 32 * bpp;
+	int sih = sizeof(BITMAPINFOHEADER);
 	DWORD len = stride * height;
 
 	BYTE *src = pData + sih, *rgb = (BYTE*)malloc(len);
