@@ -2391,6 +2391,62 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return S_OK;
 }
 
+STDMETHODIMP CDX9AllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
+{
+	CheckPointer(m_pD3DDevEx, E_ABORT);
+
+	// use the back buffer, because the display profile is applied to the front buffer
+	CComPtr<IDirect3DSurface9> pBackBuffer;
+	HRESULT hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	const UINT width  = m_windowRect.Width();
+	const UINT height = m_windowRect.Height();
+	CComPtr<IDirect3DSurface9> pDestSurface;
+	hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	const UINT len = width * height * 4 + sizeof(BITMAPINFOHEADER);
+	BYTE* p = (BYTE*)LocalAlloc(LMEM_FIXED, len); // only this allocator can be used
+	if (!p) {
+		return E_OUTOFMEMORY;
+	}
+
+	BITMAPINFOHEADER* pBIH = (BITMAPINFOHEADER*)p;
+	ZeroMemory(pBIH, sizeof(BITMAPINFOHEADER));
+	pBIH->biSize      = sizeof(BITMAPINFOHEADER);
+	pBIH->biWidth     = width;
+	pBIH->biHeight    = height;
+	pBIH->biBitCount  = 32;
+	pBIH->biPlanes    = 1;
+	pBIH->biSizeImage = DIBSIZE(*pBIH);
+
+	D3DLOCKED_RECT r;
+	hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY);
+	if (S_OK == hr) {
+		RetrieveBitmapData(width, height, 32, (BYTE*)(pBIH + 1), (BYTE*)r.pBits, r.Pitch);
+		hr = pDestSurface->UnlockRect();
+	}
+
+	if (FAILED(hr)) {
+		LocalFree(p);
+		return hr;
+	}
+
+	*dibImage = p;
+
+	return S_OK;
+}
+
 STDMETHODIMP CDX9AllocatorPresenter::ClearPixelShaders(int target)
 {
 	CAutoLock cRenderLock(&m_RenderLock);

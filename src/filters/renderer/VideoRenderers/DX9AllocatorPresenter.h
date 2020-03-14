@@ -283,6 +283,7 @@ namespace DSObjects
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(bool) Paint(bool fAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
+		STDMETHODIMP GetDisplayedImage(LPVOID* dibImage) override;
 		STDMETHODIMP_(int) GetPixelShaderMode() override { return 9; }
 		STDMETHODIMP ClearPixelShaders(int target) override;
 		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) override;
