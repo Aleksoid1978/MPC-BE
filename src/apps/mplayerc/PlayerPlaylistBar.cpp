@@ -4826,7 +4826,7 @@ int CPlayerPlaylistBar::TGetFocusedElement() const
 void CPlayerPlaylistBar::CloseMedia() const
 {
 	if (m_nCurPlaybackListId == curTab.id) {
-		m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+		m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
 	}
 }
 
