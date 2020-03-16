@@ -15673,6 +15673,10 @@ void CMainFrame::SetupShadersSubMenu()
 
 void CMainFrame::ShowControls(int nCS, bool fSave)
 {
+	if (nCS == CS_NONE && !m_pLastBar && !fSave) {
+		return;
+	}
+
 	auto& s = AfxGetAppSettings();
 	int nCSprev = s.nCS;
 	int hbefore = 0, hafter = 0;
