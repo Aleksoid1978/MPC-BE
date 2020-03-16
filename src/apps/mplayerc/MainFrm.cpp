@@ -10867,7 +10867,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 			if (m_pMFVDC) {
 				m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
 			} else {
-				m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
+				m_pVW->put_Owner((OAHWND)m_pVideoWnd->m_hWnd);
 			}
 
 			if (s.fullScreenModes.bEnabled == 1 && s.fullScreenModes.bApplyDefault) {
@@ -10920,7 +10920,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 			if (m_pMFVDC) {
 				m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
 			} else {
-				m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
+				m_pVW->put_Owner((OAHWND)m_pVideoWnd->m_hWnd);
 			}
 
 			if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
@@ -13897,8 +13897,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pMVRC  = m_pCAP;
 		m_pMVRI  = m_pCAP;
 		m_pMVRFG = m_pCAP;
+		m_pMVTO  = m_pCAP;
 
-		m_pMVTO = m_pCAP;
+		m_pD3DFS = m_pCAP;
 
 		SetupVMR9ColorControl();
 
@@ -13913,7 +13914,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
 			m_pMFVDC->SetVideoPosition(nullptr, &Rect);
 
-			m_pD3DFS = m_pMFVDC;
 			m_pPlaybackNotify = m_pMFVDC;
 		}
 
