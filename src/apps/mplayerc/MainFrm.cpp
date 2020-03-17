@@ -930,6 +930,10 @@ void CMainFrame::OnClose()
 	m_wndPlaylistBar.SavePlaylist();
 
 	if (!s.bResetSettings) {
+		for (const auto& pDockingBar : m_dockingbarsVisible) {
+			ShowControlBar(pDockingBar, TRUE, FALSE);
+		}
+
 		SaveControlBars();
 	}
 
@@ -1129,6 +1133,11 @@ LRESULT CMainFrame::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 			CreateThumbnailToolbar();
 			MoveVideoWindow();
 			SetForegroundWindow();
+
+			for (const auto& pDockingBar : m_dockingbarsVisible) {
+				ShowControlBar(pDockingBar, TRUE, FALSE);
+			}
+			m_dockingbarsVisible.clear();
 			break;
 
 		case WM_LBUTTONDBLCLK:
@@ -2122,6 +2131,14 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_bTrayIcon) {
 		if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
+		}
+
+		m_dockingbarsVisible.clear();
+		for (const auto& pDockingBar : m_dockingbars) {
+			if (IsWindow(pDockingBar->m_hWnd) && pDockingBar->IsFloating() && pDockingBar->IsWindowVisible()) {
+				ShowControlBar(pDockingBar, FALSE, FALSE);
+				m_dockingbarsVisible.push_back(pDockingBar);
+			}
 		}
 		ShowWindow(SW_HIDE);
 		return;
