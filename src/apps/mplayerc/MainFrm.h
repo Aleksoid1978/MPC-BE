@@ -833,6 +833,8 @@ protected:  // control bar embedded members
 	CPlayerShaderEditorBar m_wndShaderEditorBar;
 	std::vector<CSizingControlBar*> m_dockingbars;
 
+	std::vector<CSizingControlBar*> m_dockingbarsVisible;
+
 	CFileDropTarget m_fileDropTarget;
 	// TODO
 	DROPEFFECT OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
