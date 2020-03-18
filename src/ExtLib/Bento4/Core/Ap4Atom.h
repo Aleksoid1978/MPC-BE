@@ -523,6 +523,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_Opus = AP4_ATOM_TYPE('O','p','u','s');
 const AP4_Atom::Type AP4_ATOM_TYPE_DOPS = AP4_ATOM_TYPE('d','O','p','s');
 // TrueHD
 const AP4_Atom::Type AP4_ATOM_TYPE_mlpa = AP4_ATOM_TYPE('m','l','p','a');
+// TSC2(TechSmith Camtasia)
+const AP4_Atom::Type AP4_ATOM_TYPE_tsc2 = AP4_ATOM_TYPE('t','s','c','2');
 
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');

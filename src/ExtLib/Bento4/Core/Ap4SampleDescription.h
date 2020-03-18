@@ -256,6 +256,7 @@ const AP4_MpegSampleDescription::OTI AP4_MPEG2_PART3_AUDIO_OTI    = 0x69;
 const AP4_MpegSampleDescription::OTI AP4_MPEG1_VISUAL_OTI         = 0x6A;
 const AP4_MpegSampleDescription::OTI AP4_MPEG1_AUDIO_OTI          = 0x6B;
 const AP4_MpegSampleDescription::OTI AP4_JPEG_OTI                 = 0x6C;
+const AP4_MpegSampleDescription::OTI AP4_TSC2_OTI                 = 0xD0;
 
 const AP4_MpegSampleDescription::OTI AP4_DTSC_AUDIO_OTI           = 0xA9;
 const AP4_MpegSampleDescription::OTI AP4_DTSH_AUDIO_OTI           = 0xAA;
