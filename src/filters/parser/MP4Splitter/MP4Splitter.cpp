@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -580,6 +580,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mt = mt2;
 								}
 							}
+							mts.push_back(mt);
+							break;
+						case AP4_TSC2_OTI:
+							vih2->bmiHeader.biCompression = FCC('TSC2');
+							mt.subtype = MEDIASUBTYPE_TSCC2;
 							mts.push_back(mt);
 							break;
 					}

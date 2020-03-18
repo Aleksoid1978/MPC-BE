@@ -619,6 +619,8 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_HapY:
         // MPEG-4
         case AP4_ATOM_TYPE_FMP4:
+        // TSC2(TechSmith Camtasia)
+        case AP4_ATOM_TYPE_tsc2:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 
