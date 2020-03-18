@@ -2116,7 +2116,9 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 		SetColorMenu();
 	}
 
-	MoveWindow(reinterpret_cast<RECT*>(lParam));
+	if (!m_bFullScreenChangingMode) {
+		MoveWindow(reinterpret_cast<RECT*>(lParam));
+	}
 	RecalcLayout();
 
 	return 0;
