@@ -712,6 +712,39 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 
 	CString reloadtime(L"0"); // TODO
 
+	CString HDR(L"n/a");
+	if (fs != -1) {
+		BeginEnumFilters(m_pMainFrame->m_pGB, pEF, pBF) {
+			// Checks if any Video Renderer is in the graph
+			if (IsVideoRenderer(pBF)) {
+				BeginEnumPins(pBF, pEP, pPin) {
+					CMediaType mt;
+					if (SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
+						if (mt.majortype == MEDIATYPE_Video && (mt.formattype == FORMAT_VideoInfo2 || mt.formattype == FORMAT_MPEG2_VIDEO) && mt.pbFormat) {
+							const auto vih2 = (VIDEOINFOHEADER2*)mt.pbFormat;
+							HDR = L"Unknown";
+							if (vih2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+								DXVA2_ExtendedFormat exfmt;
+								exfmt.value = vih2->dwControlFlags;
+								switch (exfmt.VideoTransferFunction) {
+									case VIDEOTRANSFUNC_2084: HDR = L"HDR";      break;
+									case VIDEOTRANSFUNC_HLG:  HDR = L"HDR(HLG)"; break;
+									default:                  HDR = L"SDR";      break;
+								}
+							}
+
+							break;
+						}
+					}
+				}
+				EndEnumPins;
+
+				break;
+			}
+		}
+		EndEnumFilters;
+	}
+
 	m_pWebServer->LoadPage(IDR_HTML_VARIABLES, body, m_path);
 	body.Replace("[file]", UTF8(file));
 	body.Replace("[filepatharg]", UTF8Arg(path));
@@ -729,6 +762,7 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	body.Replace("[playbackrate]", UTF8(playbackrate));
 	body.Replace("[size]", UTF8(sizestring));
 	body.Replace("[reloadtime]", UTF8(reloadtime));
+	body.Replace("[hdr]", UTF8(HDR));
 	body.Replace("[version]", UTF8(MPC_VERSION_SVN_WSTR));
 
 	return true;
