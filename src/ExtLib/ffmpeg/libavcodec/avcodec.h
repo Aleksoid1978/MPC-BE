@@ -552,6 +552,8 @@ enum AVCodecID {
     AV_CODEC_ID_ADPCM_IMA_SSI,
     AV_CODEC_ID_ADPCM_ZORK,
     AV_CODEC_ID_ADPCM_IMA_APM,
+    AV_CODEC_ID_ADPCM_IMA_ALP,
+    AV_CODEC_ID_ADPCM_IMA_MTF,
 
     /* AMR */
     AV_CODEC_ID_AMR_NB = 0x12000,
@@ -569,6 +571,7 @@ enum AVCodecID {
 
     AV_CODEC_ID_SDX2_DPCM = 0x14800,
     AV_CODEC_ID_GREMLIN_DPCM,
+    AV_CODEC_ID_DERF_DPCM,
 
     /* audio codecs */
     AV_CODEC_ID_MP2 = 0x15000,
@@ -665,6 +668,7 @@ enum AVCodecID {
     AV_CODEC_ID_ACELP_KELVIN,
     AV_CODEC_ID_MPEGH_3D_AUDIO,
     AV_CODEC_ID_SIREN,
+    AV_CODEC_ID_HCA,
 
     /* subtitle codecs */
     AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
@@ -1449,6 +1453,12 @@ enum AVPacketSideDataType {
      * AVCodecContext export_side_data field).
      */
     AV_PKT_DATA_PRFT,
+
+    /**
+     * ICC profile data consisting of an opaque octet buffer following the
+     * format described by ISO 15076-1.
+     */
+    AV_PKT_DATA_ICC_PROFILE,
 
     /**
      * The number of side data types.
@@ -5037,7 +5047,7 @@ int avcodec_receive_frame(AVCodecContext *avctx, AVFrame *frame);
  *      AVERROR(EINVAL):   codec not opened, refcounted_frames not set, it is a
  *                         decoder, or requires flush
  *      AVERROR(ENOMEM):   failed to add packet to internal queue, or similar
- *      other errors: legitimate decoding errors
+ *      other errors: legitimate encoding errors
  */
 int avcodec_send_frame(AVCodecContext *avctx, const AVFrame *frame);
 
@@ -5053,8 +5063,8 @@ int avcodec_send_frame(AVCodecContext *avctx, const AVFrame *frame);
  *                         must try to send input
  *      AVERROR_EOF:       the encoder has been fully flushed, and there will be
  *                         no more output packets
- *      AVERROR(EINVAL):   codec not opened, or it is an encoder
- *      other errors: legitimate decoding errors
+ *      AVERROR(EINVAL):   codec not opened, or it is a decoder
+ *      other errors: legitimate encoding errors
  */
 int avcodec_receive_packet(AVCodecContext *avctx, AVPacket *avpkt);
 

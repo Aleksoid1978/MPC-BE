@@ -2325,6 +2325,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Ubisoft APM"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_ALP,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_alp",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA High Voltage Software ALP"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_MTF,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_mtf",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Capcom's MT Framework"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
 
     /* AMR */
     {
@@ -2399,6 +2413,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "gremlin_dpcm",
         .long_name = NULL_IF_CONFIG_SMALL("DPCM Gremlin"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_DERF_DPCM,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "derf_dpcm",
+        .long_name = NULL_IF_CONFIG_SMALL("DPCM Xilam DERF"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 
@@ -3056,6 +3077,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "siren",
         .long_name = NULL_IF_CONFIG_SMALL("Siren"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_HCA,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "hca",
+        .long_name = NULL_IF_CONFIG_SMALL("CRI HCA"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 
