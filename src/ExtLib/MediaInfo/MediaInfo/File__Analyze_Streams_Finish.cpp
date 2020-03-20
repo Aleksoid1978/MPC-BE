@@ -813,13 +813,6 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
     }
     else if (!Retrieve_Const(Stream_Video, Pos, Video_HDR_Format_Compatibility).empty())
     {
-        ZtringList HDR_Format_Compatibility;
-        HDR_Format_Compatibility.Separator_Set(0, __T(" / "));
-        HDR_Format_Compatibility.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
-        for (size_t j=0; j<HDR_Format_Compatibility.size(); j++)
-            if (HDR_Format_Compatibility[j].find(__T("HDR10"))==0)
-                HDR_Format_Compatibility[j].clear();
-        Fill(Stream_Video, Pos, Video_HDR_Format_Compatibility, HDR_Format_Compatibility.Read(), true);
     }
     if (Retrieve(Stream_Video, Pos, Video_HDR_Format_String).empty())
     {
@@ -833,9 +826,6 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
             HDR_Format_Compatibility.Separator_Set(0, __T(" / "));
             HDR_Format_Compatibility.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
             HDR_Format_Compatibility.resize(Summary.size());
-            for (size_t j=0; j<Summary.size(); j++)
-                if (HDR_Format_Compatibility[j].empty())
-                    HDR_Format_Compatibility[j]=Summary[j];
             ZtringList ToAdd;
             ToAdd.Separator_Set(0, __T(" / "));
             for (size_t i=Video_HDR_Format_String+1; i<=Video_HDR_Format_Settings; i++)
@@ -857,7 +847,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
                 }
             }
             for (size_t j=0; j<Summary.size(); j++)
-                if (HDR_Format_Compatibility[j].find(__T("HDR10"))==0) // We add for info the HDR10/HDR10+ compatibility in the displayable part
+                if (!HDR_Format_Compatibility[j].empty())
                 {
                     Summary[j]+=__T(", ")+HDR_Format_Compatibility[j]+__T(" compatible");
                     Commercial[j]=HDR_Format_Compatibility[j].substr(0, HDR_Format_Compatibility[j].find(__T(' ')));
