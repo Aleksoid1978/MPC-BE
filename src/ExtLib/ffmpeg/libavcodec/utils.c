@@ -1478,6 +1478,7 @@ int av_get_exact_bits_per_sample(enum AVCodecID codec_id)
     case AV_CODEC_ID_PCM_S8_PLANAR:
     case AV_CODEC_ID_PCM_U8:
     case AV_CODEC_ID_SDX2_DPCM:
+    case AV_CODEC_ID_DERF_DPCM:
         return 8;
     case AV_CODEC_ID_PCM_S16BE:
     case AV_CODEC_ID_PCM_S16BE_PLANAR:
@@ -1980,6 +1981,11 @@ AVCPBProperties *ff_add_cpb_side_data(AVCodecContext *avctx)
     AVPacketSideData *tmp;
     AVCPBProperties  *props;
     size_t size;
+    int i;
+
+    for (i = 0; i < avctx->nb_coded_side_data; i++)
+        if (avctx->coded_side_data[i].type == AV_PKT_DATA_CPB_PROPERTIES)
+            return (AVCPBProperties *)avctx->coded_side_data[i].data;
 
     props = av_cpb_properties_alloc(&size);
     if (!props)
