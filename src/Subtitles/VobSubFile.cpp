@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -778,12 +778,9 @@ bool CVobSubFile::ReadRar(CString fn)
 	RARCloseArchive CloseArchive = (RARCloseArchive)GetProcAddress(h, "RARCloseArchive");
 	RARReadHeaderEx ReadHeaderEx = (RARReadHeaderEx)GetProcAddress(h, "RARReadHeaderEx");
 	RARProcessFile ProcessFile = (RARProcessFile)GetProcAddress(h, "RARProcessFile");
-	RARSetChangeVolProc SetChangeVolProc = (RARSetChangeVolProc)GetProcAddress(h, "RARSetChangeVolProc");
 	RARSetProcessDataProc SetProcessDataProc = (RARSetProcessDataProc)GetProcAddress(h, "RARSetProcessDataProc");
-	RARSetPassword SetPassword = (RARSetPassword)GetProcAddress(h, "RARSetPassword");
 
-	if (!(OpenArchiveEx && CloseArchive && ReadHeaderEx && ProcessFile
-			&& SetChangeVolProc && SetProcessDataProc && SetPassword)) {
+	if (!(OpenArchiveEx && CloseArchive && ReadHeaderEx && ProcessFile && SetProcessDataProc)) {
 		FreeLibrary(h);
 		return false;
 	}
