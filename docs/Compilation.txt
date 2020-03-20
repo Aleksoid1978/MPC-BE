@@ -7,6 +7,14 @@
      * Visual C++ ATL support
      * MFC and ATL support
      * Windows 8.1 SDK".
+ 
+ Visual Studio 2019
+  1. Install Visual Studio 2019 (any edition will work fine). During installation, you must select the following components: 
+   * Desktop development with C++
+     * MSVC v142 - VS2019 C++ Build Tools
+     * Visual C++ ATL support
+     * MFC and ATL support
+     * SDK for Windows 10(latest).
 
   Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
