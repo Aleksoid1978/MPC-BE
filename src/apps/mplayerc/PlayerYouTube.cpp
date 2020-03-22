@@ -1047,11 +1047,8 @@ namespace Youtube
 						getJsonValue(videoDetails->value, "author", y_fields.author);
 
 						if (getJsonValue(videoDetails->value, "shortDescription", y_fields.content)) {
-							if (y_fields.content.Find('\\n') != -1 && y_fields.content.Find(L"\\r\\n") == -1) {
-								y_fields.content.Replace(L"\\n", L"\r\n");
-							} else if (y_fields.content.Find(L"\\r\\n") != -1) {
-								y_fields.content.Replace(L"\\r\\n", L"\r\n");
-							}
+							y_fields.content.Replace(L"\\r\\n", L"\r\n");
+							y_fields.content.Replace(L"\\n", L"\r\n");
 						}
 
 						CStringA lengthSeconds;
