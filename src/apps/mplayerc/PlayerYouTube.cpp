@@ -292,9 +292,9 @@ namespace Youtube
 						getJsonValue(snippet->value, "channelTitle", y_fields.author);
 
 						if (getJsonValue(snippet->value, "description", y_fields.content)) {
-							if (y_fields.content.Find('\n') != -1 && y_fields.content.Find(L"\r\n") == -1) {
-								y_fields.content.Replace(L"\n", L"\r\n");
-							}
+							std::wregex rgx(LR"(\r\n|\r|\n)");
+							std::wstring wstr = std::regex_replace(y_fields.content.GetString(), rgx, L"\r\n");
+							y_fields.content = wstr.c_str();
 						}
 
 						CStringA publishedAt;
@@ -1132,6 +1132,7 @@ namespace Youtube
 	{
 		idx_CurrentPlay = 0;
 		if (CheckPlaylist(url)) {
+#if 1
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
 				char* data = nullptr;
@@ -1198,7 +1199,7 @@ namespace Youtube
 				return !youtubePlaylist.empty();
 			}
 
-			/*
+#else
 			const CString videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
 			const CString playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
 			if (playlistId.IsEmpty()) {
@@ -1276,7 +1277,7 @@ namespace Youtube
 			if (!youtubePlaylist.empty()) {
 				return true;
 			}
-			*/
+#endif
 		}
 
 		return false;
