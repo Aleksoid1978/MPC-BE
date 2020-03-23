@@ -61,10 +61,14 @@
 
 namespace Youtube
 {
+#define USE_GOOGLE_API 0
+
+#if USE_GOOGLE_API
 #if __has_include("..\..\my_google_api_key.h")
 #include "..\..\my_google_api_key.h"
 #else
-	static LPCWSTR strGoogleApiKey = L"AIzaSyDsuXgZVQnozbJ6wHw2y6V-ZImJprDK90g";
+	static LPCWSTR strGoogleApiKey = L"place_your_google_api_key_here";
+#endif
 #endif
 
 	static LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
@@ -263,9 +267,84 @@ namespace Youtube
 		return false;
 	};
 
+	static bool ParseResponseJson(rapidjson::Document& json, YoutubeFields& y_fields, const bool bReplacePlus)
+	{
+		bool bParse = false;
+		if (!json.IsNull()) {
+			if (const auto& videoDetails = json.FindMember("videoDetails"); videoDetails != json.MemberEnd() && videoDetails->value.IsObject()) {
+				bParse = true;
+
+				if (getJsonValue(videoDetails->value, "title", y_fields.title)) {
+					y_fields.title = FixHtmlSymbols(y_fields.title);
+					if (bReplacePlus) {
+						y_fields.title.Replace('+', ' ');
+					}
+				}
+
+				getJsonValue(videoDetails->value, "author", y_fields.author);
+				if (bReplacePlus) {
+					y_fields.author.Replace('+', ' ');
+				}
+
+				if (getJsonValue(videoDetails->value, "shortDescription", y_fields.content)) {
+					y_fields.content.Replace(L"\\r\\n", L"\r\n");
+					y_fields.content.Replace(L"\\n", L"\r\n");
+					if (bReplacePlus) {
+						y_fields.content.Replace('+', ' ');
+					}
+				}
+
+				CStringA lengthSeconds;
+				if (getJsonValue(videoDetails->value, "lengthSeconds", lengthSeconds)) {
+					y_fields.duration = atoi(lengthSeconds.GetString()) * UNITS;
+				}
+			}
+
+			if (const auto& microformat = json.FindMember("microformat"); microformat != json.MemberEnd() && microformat->value.IsObject()) {
+				if (const auto& playerMicroformatRenderer = microformat->value.FindMember("playerMicroformatRenderer"); playerMicroformatRenderer != microformat->value.MemberEnd() && playerMicroformatRenderer->value.IsObject()) {
+					CStringA publishDate;
+					if (getJsonValue(playerMicroformatRenderer->value, "publishDate", publishDate)) {
+						WORD y, m, d;
+						if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
+							y_fields.dtime.wYear = y;
+							y_fields.dtime.wMonth = m;
+							y_fields.dtime.wDay = d;
+						}
+					}
+				}
+			}
+		}
+
+		return bParse;
+	}
+
 	static bool ParseMetadata(HINTERNET& hInet, const CString& videoId, YoutubeFields& y_fields)
 	{
 		if (hInet && !videoId.IsEmpty()) {
+#if !USE_GOOGLE_API
+			bool bParse = false;
+
+			CString url;
+			url.Format(L"https://www.youtube.com/get_video_info?video_id=%s", videoId);
+			char* data = nullptr;
+			DWORD dataSize = 0;
+			InternetReadData(hInet, url, &data, dataSize);
+
+			if (dataSize) {
+				const CStringA strData = UrlDecode(data);
+				free(data);
+
+				const auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
+				if (!player_response_jsonData.IsEmpty()) {
+					rapidjson::Document player_response_jsonDocument;
+					player_response_jsonDocument.Parse(player_response_jsonData);
+
+					bParse = ParseResponseJson(player_response_jsonDocument, y_fields, true);
+				}
+			}
+
+			return bParse;
+#else
 			CString url;
 			url.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, strGoogleApiKey);
 			char* data = nullptr;
@@ -341,6 +420,7 @@ namespace Youtube
 
 				return true;
 			}
+#endif
 		}
 
 		return false;
@@ -425,10 +505,13 @@ namespace Youtube
 			}
 
 			rapidjson::Document player_response_jsonDocument;
+			bool bReplacePlus = false;
 
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
 			if (strstr(data, MATCH_AGE_RESTRICTION)) {
+				bReplacePlus = true;
+
 				free(data);
 
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
@@ -1035,43 +1118,7 @@ namespace Youtube
 			if (!final_video_url.IsEmpty()) {
 				final_video_url.Replace(L"http://", L"https://");
 
-				bool bParseMetadata = false;
-				if (!player_response_jsonDocument.IsNull()) {
-					if (const auto& videoDetails = player_response_jsonDocument.FindMember("videoDetails"); videoDetails != player_response_jsonDocument.MemberEnd() && videoDetails->value.IsObject()) {
-						bParseMetadata = true;
-
-						if (getJsonValue(videoDetails->value, "title", y_fields.title)) {
-							y_fields.title = FixHtmlSymbols(y_fields.title);
-						}
-
-						getJsonValue(videoDetails->value, "author", y_fields.author);
-
-						if (getJsonValue(videoDetails->value, "shortDescription", y_fields.content)) {
-							y_fields.content.Replace(L"\\r\\n", L"\r\n");
-							y_fields.content.Replace(L"\\n", L"\r\n");
-						}
-
-						CStringA lengthSeconds;
-						if (getJsonValue(videoDetails->value, "lengthSeconds", lengthSeconds)) {
-							y_fields.duration = atoi(lengthSeconds.GetString()) * UNITS;
-						}
-					}
-
-					if (const auto& microformat = player_response_jsonDocument.FindMember("microformat"); microformat != player_response_jsonDocument.MemberEnd() && microformat->value.IsObject()) {
-						if (const auto& playerMicroformatRenderer = microformat->value.FindMember("playerMicroformatRenderer"); playerMicroformatRenderer != microformat->value.MemberEnd() && playerMicroformatRenderer->value.IsObject()) {
-							CStringA publishDate;
-							if (getJsonValue(playerMicroformatRenderer->value, "publishDate", publishDate)) {
-								WORD y, m, d;
-								if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
-									y_fields.dtime.wYear = y;
-									y_fields.dtime.wMonth = m;
-									y_fields.dtime.wDay = d;
-								}
-							}
-						}
-					}
-				}
-
+				const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields, bReplacePlus);
 				if (!bParseMetadata) {
 					ParseMetadata(hInet, videoId, y_fields);
 				}
@@ -1132,7 +1179,7 @@ namespace Youtube
 	{
 		idx_CurrentPlay = 0;
 		if (CheckPlaylist(url)) {
-#if 1
+#if !USE_GOOGLE_API
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
 				char* data = nullptr;
