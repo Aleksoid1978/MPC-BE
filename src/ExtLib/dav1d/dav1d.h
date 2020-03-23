@@ -49,7 +49,7 @@ typedef struct Dav1dRef Dav1dRef;
 typedef struct Dav1dLogger {
     void *cookie; ///< Custom data to pass to the callback.
     /**
-     * Logger callback.
+     * Logger callback. May be NULL to disable logging.
      *
      * @param cookie Custom pointer passed to all calls.
      * @param format The vprintf compatible format string.
@@ -67,7 +67,7 @@ typedef struct Dav1dSettings {
     unsigned frame_size_limit; ///< maximum frame size, in pixels (0 = unlimited)
     uint8_t reserved[32]; ///< reserved for future use
     Dav1dPicAllocator allocator; ///< Picture allocator callback.
-    Dav1dLogger logger; ///< Logger callback. May be set to NULL to disable logging.
+    Dav1dLogger logger; ///< Logger callback.
 } Dav1dSettings;
 
 /**
