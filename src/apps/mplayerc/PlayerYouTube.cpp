@@ -28,6 +28,8 @@
 #include <rapidjson/include/rapidjson/document.h>
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
+#define YOUTUBE_USER_URL            L"youtube.com/user/"
+#define YOUTUBE_CHANNEL_URL         L"youtube.com/channel/"
 #define YOUTUBE_URL                 L"youtube.com/watch?"
 #define YOUTUBE_URL_A               L"www.youtube.com/attribution_link"
 #define YOUTUBE_URL_V               L"youtube.com/v/"
@@ -198,6 +200,8 @@ namespace Youtube
 		url.MakeLower();
 
 		if (url.Find(YOUTUBE_PL_URL) != -1
+				|| url.Find(YOUTUBE_USER_URL) != -1
+				|| url.Find(YOUTUBE_CHANNEL_URL) != -1
 				|| (url.Find(YOUTUBE_URL) != -1 && url.Find(L"&list=") != -1)
 				|| (url.Find(YOUTUBE_URL_A) != -1 && url.Find(L"/watch_videos?video_ids") != -1)
 				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1) && url.Find(L"list=") != -1)) {
@@ -1182,6 +1186,31 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
+				auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/user)/([-a-zA-Z0-9_]+)");
+				if (!channelId.IsEmpty()) {
+					if (url.Find(YOUTUBE_USER_URL) != -1) {
+						url.Format(L"https://www.youtube.com/user/%s", channelId);
+						DLog(L"Youtube::Parse_Playlist() : downloading user page '%s'", url);
+
+						char* data = nullptr;
+						DWORD dataSize = 0;
+						InternetReadData(hInet, url, &data, dataSize);
+						if (data) {
+							channelId = UTF8ToWStr(GetEntry(data, R"(content="https://www.youtube.com/channel/)", R"(")"));
+							free(data);
+						}
+					}
+
+					if (!channelId.IsEmpty()) {
+						if (channelId.Left(2) == L"UC") {
+							const CString playlistId = L"UU" + channelId.Right(channelId.GetLength() - 2);
+							url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
+						} else {
+							DLog(L"Youtube::Parse_Playlist() : unsupported user/channel page '%s'", url);
+						}
+					}
+				}
+
 				const auto videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
 				const auto playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
 				if (playlistId.IsEmpty()) {
