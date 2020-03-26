@@ -1182,24 +1182,46 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
+				const auto videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
+				const auto playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
+				if (playlistId.IsEmpty()) {
+					return false;
+				}
+
+				const auto extract_mix = playlistId.Left(2) == L"RD" || playlistId.Left(2) == L"UL" || playlistId.Left(2) == L"PU";
+				if (extract_mix) {
+					DLog(L"Youtube::Parse_Playlist() : mixed playlist");
+				} else {
+					url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
+				}
+
 				char* data = nullptr;
+				CStringA dataStr, moreStr;
 				DWORD dataSize = 0;
 
-				HandleURL(url);
+				unsigned index = 0;
+				DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
 				InternetReadData(hInet, url, &data, dataSize);
-				InternetCloseHandle(hInet);
 				if (data) {
+					dataStr = data; free(data);
+					if (!extract_mix) {
+						moreStr = dataStr;
+					}
+				}
+
+				while (!dataStr.IsEmpty()) {
+					CString lastvideoId;
+
 					LPCSTR sMatch = nullptr;
-					if (strstr(data, MATCH_PLAYLIST_ITEM_START)) {
+					if (strstr(dataStr.GetString(), MATCH_PLAYLIST_ITEM_START)) {
 						sMatch = MATCH_PLAYLIST_ITEM_START;
-					} else if (strstr(data, MATCH_PLAYLIST_ITEM_START2)) {
+					} else if (strstr(dataStr.GetString(), MATCH_PLAYLIST_ITEM_START2)) {
 						sMatch = MATCH_PLAYLIST_ITEM_START2;
 					} else {
-						free(data);
-						return false;
+						break;
 					}
 
-					LPCSTR block = data;
+					LPCSTR block = dataStr.GetString();
 					while ((block = strstr(block, sMatch)) != nullptr) {
 						const CStringA blockEntry = GetEntry(block, sMatch, ">");
 						if (blockEntry.IsEmpty()) {
@@ -1210,7 +1232,6 @@ namespace Youtube
 						CString item = UTF8ToWStr(blockEntry);
 						CString videoId;
 						CString title;
-						bool bCurrentPlay = (item.Find(L"currently-playing") != -1);
 
 						const std::wregex regex(L"([a-z-]+)=\"([^\"]+)\"");
 						std::wcmatch match;
@@ -1232,16 +1253,58 @@ namespace Youtube
 
 						if (!videoId.IsEmpty()) {
 							CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
-							youtubePlaylist.push_back({ url, title });
+							auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
+								return item.url == url;
+							});
+							if (it == youtubePlaylist.cend()) {
+								lastvideoId = videoId;
+								youtubePlaylist.push_back({ url, title });
 
-							if (bCurrentPlay) {
-								idx_CurrentPlay = youtubePlaylist.size() - 1;
+								if (videoId == videoIdCurrent) {
+									idx_CurrentPlay = youtubePlaylist.size() - 1;
+								}
 							}
 						}
 					}
 
-					free(data);
+					dataStr.Empty();
+
+					if (extract_mix) {
+						if (lastvideoId.IsEmpty()) {
+							break;
+						}
+
+						url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", lastvideoId, playlistId);
+						DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+						InternetReadData(hInet, url, &data, dataSize);
+						if (data) {
+							dataStr = data; free(data);
+						}
+
+						continue;
+					} else {
+						auto moreUrl = UrlDecode(RegExpParse<CStringA>(moreStr.GetString(), R"(data-uix-load-more-href="/?([^"]+)\")"));
+						moreStr.Empty();
+						if (!moreUrl.IsEmpty()) {
+							moreUrl.Replace("&amp;", "&"); moreUrl += "&disable_polymer=true";
+							url.Format(L"https://www.youtube.com/%S", moreUrl);
+
+							DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+							InternetReadData(hInet, url, &data, dataSize);
+							if (data) {
+								rapidjson::Document json;
+								if (!json.Parse(data).HasParseError()) {
+									getJsonValue(json, "content_html", dataStr);
+									getJsonValue(json, "load_more_widget_html", moreStr);
+								}
+
+								free(data);
+							}
+						}
+					}
 				}
+
+				InternetCloseHandle(hInet);
 
 				return !youtubePlaylist.empty();
 			}
