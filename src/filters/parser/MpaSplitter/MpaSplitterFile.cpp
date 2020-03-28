@@ -163,7 +163,7 @@ HRESULT CMpaSplitterFile::Init()
 
 	__int64 startpos = m_startpos;
 
-	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
+	const __int64 limit = IsRandomAccess() && !IsURL() ? MEGABYTE : 64 * KILOBYTE;
 	const __int64 size = std::min(endpos - m_startpos, limit);
 	BYTE* buffer = DNew BYTE[size];
 
