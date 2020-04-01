@@ -585,7 +585,7 @@ begin
     Result := False;
   end else
   begin
-    Result :=  True;
+    Result := True;
   end;
 end;
 
@@ -594,13 +594,19 @@ Var
   DeltaY : Integer;
   Page: TWizardPage;
 begin
+#if VER < EncodeVer(6,0,0)
   DeltaY := ScaleY(10);
+#endif
+  DeltaY := ScaleY(1);
+
 #if VER < EncodeVer(6,0,0)
   WizardForm.Height := WizardForm.Height + DeltaY;
   WizardForm.NextButton.Top := WizardForm.NextButton.Top + DeltaY;
   WizardForm.BackButton.Top := WizardForm.BackButton.Top + DeltaY;
   WizardForm.CancelButton.Top := WizardForm.CancelButton.Top + DeltaY;
+#endif
   WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height + DeltaY;
+#if VER < EncodeVer(6,0,0)
   WizardForm.OuterNotebook.Height := WizardForm.OuterNotebook.Height + DeltaY;
   WizardForm.InnerNotebook.Height := WizardForm.InnerNotebook.Height + DeltaY;
   WizardForm.Bevel.Top := WizardForm.Bevel.Top + DeltaY;
