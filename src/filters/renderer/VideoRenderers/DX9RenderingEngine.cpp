@@ -489,10 +489,6 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 	}
 
-
-	CSize srcSize = srcRect.Size();
-	CSize dstSize = destRect.Size();
-
 	hr = Resize(pVideoTexture, srcRect, destRect);
 
 	src = 0;
