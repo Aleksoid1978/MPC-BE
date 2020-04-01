@@ -2503,18 +2503,21 @@ void CPlayerPlaylistBar::LoadPlaylist(const CString& filename)
 
 void CPlayerPlaylistBar::SavePlaylist()
 {
+	const CAppSettings& s = AfxGetAppSettings();
+
 	CString base;
 	if (AfxGetMyApp()->GetAppSavePath(base)) {
 		CString file = base + curTab.fn;
 
-		if (AfxGetAppSettings().bRememberPlaylistItems) {
-			// Only create this folder when needed
+		if (m_nCurPlayListIndex > 0 || s.bRememberPlaylistItems) {
+			// create this folder when needed only
 			if (!::PathFileExistsW(base)) {
 				::CreateDirectoryW(base, nullptr);
 			}
 
 			SaveMPCPlayList(file, CTextFile::UTF8, false);
-		} else if (::PathFileExistsW(file)) {
+		}
+		else if (::PathFileExistsW(file)) {
 			::DeleteFileW(file);
 		}
 	}
