@@ -101,13 +101,18 @@ bool IsStreamEnd(IBaseFilter* pBF)
 
 bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 {
-	// All popular video decoders includes in the name the "video"
-	CString filterName = GetFilterName(pBF).MakeLower();
+	const CLSID clsid = GetCLSID(pBF);
+	if (clsid == CLSID_SmartTee) {
+		return false;
+	}
+
+	const CString filterName = GetFilterName(pBF).MakeLower();
 
 	if (filterName.Find(L"directvobsub") == 0) {
 		return true;
 	}
 	if (filterName.Find(L"video") < 0) {
+		// All popular video decoders includes in the name the "video"
 		return false;
 	}
 
