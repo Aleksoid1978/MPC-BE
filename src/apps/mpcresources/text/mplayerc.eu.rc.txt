@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Gogoratu DVD-aren kokapena"
 20		"Gogoratu Agiriaren kokapena"
 21		"Gogoratu azken Pan-eta-Scan Zooma"
-22		"Gogoratu azken irakur-zerrenda"
+22		"Remember main playlist"
 23		"Beste"
 24		"Erretilu ikurra"
 25		"Erakutsi IGE (beharrezkoa berrabiaratzea)"

@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"DVD 위치 기억"
 20		"파일 위치 기억"
 21		"지난 Pan-n-Scan 줌 기억"
-22		"지난 재생목록 기억"
+22		"Remember main playlist"
 23		"기타"
 24		"트레이에 아이콘 보이기"
 25		"OSD보이기 (재시작필요)"

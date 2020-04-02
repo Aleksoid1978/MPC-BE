@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Ține minte poziția pe DVD"
 20		"Ține minte poziția în fișier"
 21		"Ține minte ultima focalizare a Pan-n-Scan"
-22		"Ține minte ultima listă de redare"
+22		"Remember main playlist"
 23		"Altele"
 24		"Pictogramă în zona de notificare"
 25		"Arată OSD (necesită repornire player)"

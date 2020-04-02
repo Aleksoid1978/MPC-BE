@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Se souvenir de la position dans le DVD"
 20		"Se souvenir de la position dans le fichier"
 21		"Se souvenir du recadrage (Pan && Scan)"
-22		"Remember last playlist"
+22		"Remember main playlist"
 23		"Divers"
 24		"Icône dans la barre de notification"
 25		"Montrer l'OSD (nécessite un redémarrage)"

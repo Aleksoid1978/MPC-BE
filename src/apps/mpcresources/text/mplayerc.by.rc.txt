@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Пры выхадзе запомніць пазіцыю DVD"
 20		"Пры выхадзе запомніць пазіцыю ў файле"
 21		"Remember last Pan-n-Scan Zoom"
-22		"Remember last playlist"
+22		"Remember main playlist"
 23		"Іншае"
 24		"Значок у панэлі задач"
 25		"Паказаць OSD (патрабуецца перазапуск)"

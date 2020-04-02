@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Kom ihåg DVD positionen"
 20		"Kom ihåg Fil positionen"
 21		"Remember last Pan-n-Scan Zoom"
-22		"Remember last playlist"
+22		"Remember main playlist"
 23		"Annat"
 24		"Visa ikon i systemfältet"
 25		"Visa OSD (omstart krävs)"

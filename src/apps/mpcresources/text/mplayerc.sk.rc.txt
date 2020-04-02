@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Pamätať si pozíciu DVD"
 20		"Pamätať si pozíciu v súbore"
 21		"Zapamätať si posledné priblíženie Pan-n-Scan"
-22		"Remember last playlist"
+22		"Remember main playlist"
 23		"Ostatné"
 24		"Ikona v lište nástrojov"
 25		"Zobraziť OSD (vyžaduje reštart)"
