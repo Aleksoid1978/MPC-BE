@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"DVD の再生位置を記憶する"
 20		"ファイルの再生位置を記憶する"
 21		"終了時の PnS 拡大率を記憶する"
-22		"終了時のプレイリストを記憶する"
+22		"Remember main playlist"
 23		"その他"
 24		"タスクトレイ アイコン"
 25		"OSD を表示する"

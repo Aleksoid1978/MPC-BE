@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Dvd-positie bewaren"
 20		"Bestandspositie bewaren"
 21		"Laatste Pan&&Scan-zoom onthouden"
-22		"Laatste afspeellijst onthouden"
+22		"Remember main playlist"
 23		"Overige"
 24		"Pictogram in systeemvak"
 25		"Toon OSD (vereist herstart)"

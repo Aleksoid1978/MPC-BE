@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Recordar la posición del DVD"
 20		"Recordar la posición del Archivo"
 21		"Remember last Pan-n-Scan Zoom"
-22		"Remember last playlist"
+22		"Remember main playlist"
 23		"Otros"
 24		"Icono de bandeja"
 25		"Mostrar OSD (requiere reinicio)"

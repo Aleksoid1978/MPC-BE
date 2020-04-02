@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"Pamiętanie położenia nagrania DVD"
 20		"Pamiętanie położenia nagrania pliku"
 21		"Pamiętanie ustawień skalowania i kadrowania"
-22		"Pamiętaj ostatnią listę odtwarzania"
+22		"Remember main playlist"
 23		"Inne"
 24		"Ikona obszaru powiadomień"
 25		"Menu ekranowe - OSD (wymagany restart)"

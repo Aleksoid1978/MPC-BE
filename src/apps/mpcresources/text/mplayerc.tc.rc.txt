@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"記住 DVD 位置"
 20		"記住檔案位置"
 21		"記住上次的平移掃描縮放"
-22		"記住上次的播放清單"
+22		"Remember main playlist"
 23		"其他選項"
 24		"系統列（通知區域）圖示"
 25		"顯示 OSD （需要重新啟動）"

@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"DVD-pozíció megjegyzése"
 20		"Fájlpozíció megjegyzése"
 21		"Emlékezzen az utolsó Pan-n-Scan Zoomra"
-22		"Emlékezzen az utolsó lejátszási listára"
+22		"Remember main playlist"
 23		"Egyéb"
 24		"Legyen tálca ikon"
 25		"OSD megjelenítése (újraindítást igényel)"
