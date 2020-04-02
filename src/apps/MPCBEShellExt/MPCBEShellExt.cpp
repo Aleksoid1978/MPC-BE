@@ -38,9 +38,9 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 		return E_FAIL;
 	}
 
-	// ѕровер€ем - надо ли показывать диалог выбора
+	// Checking whether to show the selection dialog
 	CRegKey key;
-	WCHAR path_buff[MAX_PATH] = { 0 };
+	WCHAR path_buff[MAX_PATH] = {};
 	ULONG len = sizeof(path_buff);
 	unsigned count = 0;
 
@@ -61,15 +61,14 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 		key.Close();
 	}
 #endif
-	//
 
 	if (count == 2) {
 		CConfigDlg dlg;
 		dlg.DoModal();
 		return S_OK;
 	} else {
-		memset(path_buff, 0, sizeof(path_buff));
 		len = sizeof(path_buff);
+		ZeroMemory(path_buff, len);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
@@ -111,11 +110,11 @@ static CString GetFileOnly(LPCTSTR Path)
 static CString GetKeyName()
 {
 	CString KeyName;
-	WCHAR path_buff[MAX_PATH] = { 0 };
-	ULONG len = sizeof(path_buff);
 
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		WCHAR path_buff[MAX_PATH] = {};
+		ULONG len = sizeof(path_buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			KeyName = GetFileOnly(path_buff);
 			KeyName.Truncate(KeyName.GetLength() - 4);
@@ -144,7 +143,7 @@ static BOOL GetKeyValue(const CString& value)
 #define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
 {
-	OLECHAR strWideCLSID[50] = { 0 };
+	OLECHAR strWideCLSID[50] = {};
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
@@ -161,32 +160,31 @@ STDAPI DllRegisterServer(void)
 				key.SetValue(HKEY_CLASSES_ROOT, L"directory\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\", strWideCLSID);
 			}
 
-			if (GetKeyValue(L"ShowFiles")) {
-				CRegKey reg;
-				if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
-					DWORD dwIndex = 0;
-					DWORD cbName = IS_KEY_LEN;
-					WCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
-					LONG lRet;
+			const auto bShowFiles = GetKeyValue(L"ShowFiles");
+			CRegKey reg;
+			if (reg.Open(HKEY_CLASSES_ROOT, nullptr, KEY_READ) == ERROR_SUCCESS) {
+				DWORD dwIndex = 0;
+				DWORD cbName = IS_KEY_LEN;
+				WCHAR szSubKeyName[IS_KEY_LEN] = {};
+				LONG lRet;
 
-					while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
-						if (lRet == ERROR_SUCCESS) {
-							CString key_name = szSubKeyName;
-							if (!key_name.Find(KeyName)) {
-								CString full_key_name = key_name + L"\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\";
-								key.SetValue(HKEY_CLASSES_ROOT, full_key_name, strWideCLSID);
+				while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
+					if (lRet == ERROR_SUCCESS) {
+						CString key_name = szSubKeyName;
+						if (!key_name.Find(KeyName)) {
+							if (bShowFiles) {
+								key.SetValue(HKEY_CLASSES_ROOT, key_name + L"\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\", strWideCLSID);
+							}
 
-								full_key_name = key_name + L"\\shell\\open\\DropTarget";
-								if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, full_key_name)) {
-									key.SetStringValue(L"CLSID", strWideCLSID);
-								}
+							if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, key_name + L"\\shell\\open\\DropTarget")) {
+								key.SetStringValue(L"CLSID", strWideCLSID);
 							}
 						}
-						dwIndex++;
-						cbName = IS_KEY_LEN;
 					}
-					reg.Close();
+					dwIndex++;
+					cbName = IS_KEY_LEN;
 				}
+				reg.Close();
 			}
 		}
 	}
@@ -212,7 +210,7 @@ STDAPI DllUnregisterServer(void)
 		}
 
 		CRegKey reg;
-		if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
+		if (reg.Open(HKEY_CLASSES_ROOT, nullptr, KEY_READ) == ERROR_SUCCESS) {
 			DWORD dwIndex = 0;
 			DWORD cbName = IS_KEY_LEN;
 			WCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
@@ -246,23 +244,23 @@ STDAPI DllUnregisterServer(void)
 //              per machine.
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
-    HRESULT hr = E_FAIL;
-    static const wchar_t szUserSwitch[] = L"user";
+	HRESULT hr = E_FAIL;
+	static const wchar_t szUserSwitch[] = L"user";
 
-    if (pszCmdLine != NULL) {
-    	if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0) {
-    		AtlSetPerUserRegistration(true);
-    	}
-    }
+	if (pszCmdLine != nullptr) {
+		if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0) {
+			AtlSetPerUserRegistration(true);
+		}
+	}
 
-    if (bInstall) {
-    	hr = DllRegisterServer();
-    	if (FAILED(hr)) {
-    		DllUnregisterServer();
-    	}
-    } else {
-    	hr = DllUnregisterServer();
-    }
+	if (bInstall) {
+		hr = DllRegisterServer();
+		if (FAILED(hr)) {
+			DllUnregisterServer();
+		}
+	} else {
+		hr = DllUnregisterServer();
+	}
 
-    return hr;
+	return hr;
 }
