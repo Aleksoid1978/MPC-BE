@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -126,7 +126,7 @@ static CString GetKeyName()
 	return KeyName;
 }
 
-static BOOL GetKeyValue(CString value)
+static BOOL GetKeyValue(const CString& value)
 {
 	BOOL bValue = TRUE;
 	CRegKey key;
@@ -173,8 +173,13 @@ STDAPI DllRegisterServer(void)
 						if (lRet == ERROR_SUCCESS) {
 							CString key_name = szSubKeyName;
 							if (!key_name.Find(KeyName)) {
-								key_name.Append(L"\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\");
-								key.SetValue(HKEY_CLASSES_ROOT, key_name, strWideCLSID);
+								CString full_key_name = key_name + L"\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\";
+								key.SetValue(HKEY_CLASSES_ROOT, full_key_name, strWideCLSID);
+
+								full_key_name = key_name + L"\\shell\\open\\DropTarget";
+								if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, full_key_name)) {
+									key.SetStringValue(L"CLSID", strWideCLSID);
+								}
 							}
 						}
 						dwIndex++;
@@ -220,14 +225,11 @@ STDAPI DllUnregisterServer(void)
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
 							key.RecurseDeleteKey(L"shellex");
 						}
-						/*
-						key_name.Append(L"\\shellex\\ContextMenuHandlers\\");
 
+						key_name.Append(L"\\shell\\open");
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
-							key.DeleteValue(NULL);
-							key.DeleteSubKey(L"MPCBEShellExt");
+							key.RecurseDeleteKey(L"DropTarget");
 						}
-						*/
 					}
 				}
 				dwIndex++;
@@ -241,7 +243,7 @@ STDAPI DllUnregisterServer(void)
 }
 
 // DllInstall - Adds/Removes entries to the system registry per user
-//              per machine.	
+//              per machine.
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
     HRESULT hr = E_FAIL;
@@ -253,9 +255,9 @@ STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
     	}
     }
 
-    if (bInstall) {	
+    if (bInstall) {
     	hr = DllRegisterServer();
-    	if (FAILED(hr)) {	
+    	if (FAILED(hr)) {
     		DllUnregisterServer();
     	}
     } else {

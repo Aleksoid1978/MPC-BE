@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@
 static HBITMAP TransparentBitmap(HBITMAP hBmp)
 {
 	HBITMAP RetBmp = NULL;
-	if (hBmp) {	
+	if (hBmp) {
 		HDC BufferDC = CreateCompatibleDC(NULL);	// DC for Source Bitmap
 		if (BufferDC) {
 
@@ -52,7 +52,7 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 				GetObject(hBmp, sizeof(bm), &bm);
 
 				// create a BITMAPINFO for the CreateDIBSection
-				BITMAPINFO RGB32BitsBITMAPINFO = { 0 }; 
+				BITMAPINFO RGB32BitsBITMAPINFO = { 0 };
 				RGB32BitsBITMAPINFO.bmiHeader.biSize      = sizeof(BITMAPINFOHEADER);
 				RGB32BitsBITMAPINFO.bmiHeader.biWidth     = bm.bmWidth;
 				RGB32BitsBITMAPINFO.bmiHeader.biHeight    = bm.bmHeight;
@@ -61,12 +61,12 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 				RGB32BitsBITMAPINFO.bmiHeader.biSizeImage = bm.bmWidth * bm.bmHeight * 4;
 
 				// pointer used for direct Bitmap pixels access
-				UINT* ptPixels;	
+				UINT* ptPixels;
 
-				HBITMAP DirectBitmap = CreateDIBSection(DirectDC, 
-														&RGB32BitsBITMAPINFO, 
+				HBITMAP DirectBitmap = CreateDIBSection(DirectDC,
+														&RGB32BitsBITMAPINFO,
 														DIB_RGB_COLORS,
-														(void **)&ptPixels, 
+														(void **)&ptPixels,
 														NULL, 0);
 				if (DirectBitmap) {
 					// here DirectBitmap!=NULL so ptPixels!=NULL no need to test
@@ -76,7 +76,7 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 						   BufferDC, 0, 0,
 						   SRCCOPY);
 
-					// Don't delete the result of SelectObject because it's 
+					// Don't delete the result of SelectObject because it's
 					// our modified bitmap (DirectBitmap)
 
 					SelectObject(DirectDC,PreviousObject);
@@ -86,7 +86,7 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 				}
 				// clean up
 				DeleteDC(DirectDC);
-			}			
+			}
 			SelectObject(BufferDC,PreviousBufferObject);
 
 			// BufferDC is now useless
@@ -113,7 +113,97 @@ CMPCBEContextMenu::~CMPCBEContextMenu()
 	}
 }
 
-// CMPCBEShellContextMenu IContextMenu methods
+static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CString>& fileNames)
+{
+	FORMATETC fmte = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+	STGMEDIUM stg = { TYMED_HGLOBAL };
+	UINT      uNumFiles = 0;
+	WCHAR     strFilePath[MAX_PATH] = { 0 };
+
+	fileNames.clear();
+
+	// No data object
+	if (!lpdobj) {
+		return E_INVALIDARG;
+	}
+
+	// Use the given IDataObject to get a list of filenames (CF_HDROP).
+	if (FAILED(lpdobj->GetData(&fmte, &stg))) {
+		return E_INVALIDARG;
+	}
+
+	// Get a pointer to the actual data.
+	HDROP hDrop = (HDROP)GlobalLock(stg.hGlobal);
+
+	// Make sure it worked.
+	if (!hDrop) {
+		ReleaseStgMedium(&stg);
+		return E_INVALIDARG;
+	}
+
+	// Make sure HDROP contains at least one file.
+	if ((uNumFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0)) >= 1) {
+		for (UINT i = 0; i < uNumFiles; i++) {
+			DragQueryFileW(hDrop, i, strFilePath, MAX_PATH);
+			if (GetFileAttributesW(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
+				size_t nLen = wcslen(strFilePath);
+				if (strFilePath[nLen - 1] != L'\\') {
+					wcscat_s(strFilePath, L"\\");
+				}
+			}
+			// Add the file name to the list
+			fileNames.emplace_back(strFilePath);
+		}
+
+		// sort list by path
+		static HMODULE h = LoadLibraryW(L"Shlwapi.dll");
+		if (h) {
+			typedef int (WINAPI* StrCmpLogicalW)(_In_ PCWSTR psz1, _In_ PCWSTR psz2);
+			static StrCmpLogicalW pStrCmpLogicalW = (StrCmpLogicalW)GetProcAddress(h, "StrCmpLogicalW");
+			if (pStrCmpLogicalW) {
+				std::sort(fileNames.begin(), fileNames.end(), [](const CString& a, const CString& b) {
+					return pStrCmpLogicalW(a, b) < 0;
+				});
+			}
+		}
+	}
+
+	// Release the data.
+	GlobalUnlock(stg.hGlobal);
+	ReleaseStgMedium(&stg);
+
+	return fileNames.empty() ? E_INVALIDARG : S_OK;
+}
+
+// IShellExtInit
+
+STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID)
+{
+	return DragFiles(lpdobj, m_fileNames);
+}
+
+// IContextMenu
+
+STDMETHODIMP CMPCBEContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
+{
+	if (0 != HIWORD(lpici->lpVerb)) {
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr = S_OK;
+	switch (LOWORD(lpici->lpVerb)) {
+		case ID_MPCBE_PLAY:
+			SendData(false);
+			break;
+		case ID_MPCBE_PLAY + 1:
+			SendData(true);
+			break;
+		default:
+			hr = E_INVALIDARG;
+	}
+
+	return hr;
+}
 
 STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
@@ -144,110 +234,47 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 		key.Close();
 	}
 
+	::InsertMenuW(hmenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
-	::InsertMenu(hmenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
-
-	::InsertMenu(hmenu, indexMenu, MF_STRING | MF_BYPOSITION, idCmdFirst + ID_MPCBE_PLAY, PLAY_MPC);
+	::InsertMenuW(hmenu, indexMenu, MF_STRING | MF_BYPOSITION, idCmdFirst + ID_MPCBE_PLAY, PLAY_MPC);
 	if (NULL != m_hPlayBmp) {
 		::SetMenuItemBitmaps(hmenu, indexMenu, MF_BYPOSITION, m_hPlayBmp, NULL);
 	}
 	indexMenu++;
 
-	::InsertMenu(hmenu, indexMenu, MF_STRING | MF_BYPOSITION, idCmdFirst + ID_MPCBE_PLAY + 1, ADDTO_MPC);
+	::InsertMenuW(hmenu, indexMenu, MF_STRING | MF_BYPOSITION, idCmdFirst + ID_MPCBE_PLAY + 1, ADDTO_MPC);
 	if (NULL != m_hAddBmp) {
 		::SetMenuItemBitmaps(hmenu, indexMenu, MF_BYPOSITION, m_hAddBmp, NULL);
 	}
 	indexMenu++;
 
-	::InsertMenu(hmenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
+	::InsertMenuW(hmenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
+
 	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, (ID_MPCBE_PLAY + 2));
 }
 
-// CMPCBEShellContextMenu IShellExtInit methods
-STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID)
+// IDropTarget
+
+STDMETHODIMP CMPCBEContextMenu::DragEnter(LPDATAOBJECT lpdobj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
 {
-	HRESULT   hr        = E_INVALIDARG;
-	FORMATETC fmte      = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-	STGMEDIUM stg       = { TYMED_HGLOBAL };
-	UINT      uNumFiles = 0;
-	WCHAR     strFilePath[MAX_PATH] = { 0 };
-
-	// No data object
-	if (!lpdobj) {
-		return hr;
-	}
-
-	// Use the given IDataObject to get a list of filenames (CF_HDROP).
-	if (FAILED(hr = lpdobj->GetData(&fmte, &stg))) {
-		return E_INVALIDARG;
-	}
-
-	// Get a pointer to the actual data.
-	HDROP hDrop = (HDROP)GlobalLock(stg.hGlobal);
-
-	// Make sure it worked.
-	if (!hDrop) {
-		ReleaseStgMedium(&stg);
-		return E_INVALIDARG;
-	}
-
-	// Make sure HDROP contains at least one file.
-	if ((uNumFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0)) >= 1) {
-		for (UINT i = 0; i < uNumFiles; i++) {
-			DragQueryFileW(hDrop, i, strFilePath, MAX_PATH);
-			if (GetFileAttributesW(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
-				size_t nLen = wcslen(strFilePath);
-				if (strFilePath[nLen - 1] != L'\\') {
-					wcscat_s(strFilePath, L"\\");
-				}
-			}
-			// Add the file name to the list
-			m_fileNames.emplace_back(strFilePath);
-		}
-		hr = S_OK;
-		
-		// sort list by path
-		static HMODULE h = LoadLibraryW(L"Shlwapi.dll");
-		if (h) {
-			typedef int (WINAPI *StrCmpLogicalW)(_In_ PCWSTR psz1, _In_ PCWSTR psz2);
-			static StrCmpLogicalW pStrCmpLogicalW = (StrCmpLogicalW)GetProcAddress(h, "StrCmpLogicalW");
-			if (pStrCmpLogicalW) {
-				std::sort(m_fileNames.begin(), m_fileNames.end(), [](const CString& a, const CString& b) {
-					return pStrCmpLogicalW(a, b) < 0;
-				});
-			}
-		}
+	auto hr = DragFiles(lpdobj, m_fileNames);
+	if (hr == S_OK) {
+		*pdwEffect = DROPEFFECT_COPY;
 	} else {
-		hr = E_INVALIDARG;
+		*pdwEffect = DROPEFFECT_NONE;
 	}
-
-	// Release the data.
-	GlobalUnlock(stg.hGlobal);
-	ReleaseStgMedium(&stg);
 
 	return hr;
 }
 
-STDMETHODIMP CMPCBEContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
+STDMETHODIMP CMPCBEContextMenu::Drop(LPDATAOBJECT lpdobj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
 {
-	if (0 != HIWORD(lpici->lpVerb)) {
-		return E_INVALIDARG;
-	}
+	SendData(false);
 
-	HRESULT hr = S_OK;
-	switch (LOWORD(lpici->lpVerb)) {
-		case ID_MPCBE_PLAY:
-			SendData(false);
-			break;
-		case ID_MPCBE_PLAY + 1:
-			SendData(true);
-			break;
-		default:
-			hr = E_INVALIDARG;
-	}
-
-	return hr;
+	*pdwEffect = DROPEFFECT_COPY;
+	return S_OK;
 }
+
 
 void CMPCBEContextMenu::SendData(bool add_pl)
 {
@@ -268,7 +295,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 
 	BYTE* p = buff.data();
 
-	*(DWORD*)p = (DWORD)m_fileNames.size(); 
+	*(DWORD*)p = (DWORD)m_fileNames.size();
 	p += sizeof(DWORD);
 
 	for (const auto& item : m_fileNames) {
@@ -288,7 +315,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 		WCHAR path_buff[MAX_PATH] = { 0 };
 		ULONG len = sizeof(path_buff);
 		CString mpc_path;
-		
+
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 			if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 				mpc_path = path_buff;
@@ -336,7 +363,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 					cds.cbData = (DWORD)bufflen;
 					cds.lpData = buff.data();
 					SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
-				} 
+				}
 			}
 		}
 	}

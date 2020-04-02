@@ -9,5 +9,5 @@ HKCR
         val ThreadingModel = s 'Apartment'
       }
     }
-  }	
+  }
 }

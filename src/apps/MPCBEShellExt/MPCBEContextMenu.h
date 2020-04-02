@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,8 @@ class ATL_NO_VTABLE CMPCBEContextMenu :
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<CMPCBEContextMenu, &CLSID_MPCBEContextMenu>,
 	public IContextMenu,
-	public IShellExtInit
+	public IShellExtInit,
+	public IDropTarget
 {
 public:
 
@@ -44,11 +45,17 @@ public:
 
 	// IShellExtInit
 	STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
-	
+
 	// IContextMenu
 	STDMETHODIMP GetCommandString(UINT_PTR idCmd, UINT, UINT*, LPSTR, UINT) { return E_NOTIMPL; }
 	STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO);
 	STDMETHODIMP QueryContextMenu(HMENU, UINT, UINT, UINT, UINT);
+
+	// IDropTarget
+	STDMETHODIMP DragEnter(LPDATAOBJECT, DWORD, POINTL, DWORD*);
+	STDMETHODIMP DragOver(DWORD, POINTL, DWORD*) { return E_NOTIMPL; }
+	STDMETHODIMP DragLeave() { return S_OK; }
+	STDMETHODIMP Drop(LPDATAOBJECT, DWORD, POINTL, DWORD*);
 
 	DECLARE_REGISTRY_RESOURCEID(IDR_MPCBECONTEXTMENU)
 	DECLARE_NOT_AGGREGATABLE(CMPCBEContextMenu)
@@ -56,6 +63,7 @@ public:
 	BEGIN_COM_MAP(CMPCBEContextMenu)
 		COM_INTERFACE_ENTRY(IContextMenu)
 		COM_INTERFACE_ENTRY(IShellExtInit)
+		COM_INTERFACE_ENTRY(IDropTarget)
 	END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
