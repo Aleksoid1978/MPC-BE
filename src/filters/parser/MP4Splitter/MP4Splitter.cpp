@@ -628,11 +628,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										|| objectType == AOT_PS) {
 									CMP4AudioDecoderConfig MP4AudioDecoderConfig;
 									if (MP4AudioDecoderConfig.Parse(di->GetData(), di->GetDataSize())) {
-										if (MP4AudioDecoderConfig.m_ChannelCount > wfe->nChannels) {
+										if (MP4AudioDecoderConfig.m_ChannelCount != wfe->nChannels) {
 											wfe->nChannels = MP4AudioDecoderConfig.m_ChannelCount;
 											wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
 										}
-										if (MP4AudioDecoderConfig.m_SamplingFrequency > wfe->nSamplesPerSec) {
+										if (MP4AudioDecoderConfig.m_SamplingFrequency != wfe->nSamplesPerSec) {
 											wfe->nSamplesPerSec = MP4AudioDecoderConfig.m_SamplingFrequency;
 										}
 									}
