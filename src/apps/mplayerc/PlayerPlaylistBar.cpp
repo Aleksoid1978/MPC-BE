@@ -2463,6 +2463,8 @@ bool CPlayerPlaylistBar::SelectFileInPlaylist(const CString& filename)
 
 void CPlayerPlaylistBar::LoadPlaylist(const CString& filename)
 {
+	const CAppSettings& s = AfxGetAppSettings();
+
 	int curpl = m_nCurPlayListIndex;
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		m_nCurPlayListIndex = i;
@@ -2471,7 +2473,7 @@ void CPlayerPlaylistBar::LoadPlaylist(const CString& filename)
 			base.Append(m_tabs[i].fn);
 
 			if (::PathFileExistsW(base)) {
-				if (AfxGetAppSettings().bRememberPlaylistItems) {
+				if (m_nCurPlayListIndex > 0 || s.bRememberPlaylistItems) {
 					ParseMPCPlayList(base);
 				}
 				else {
