@@ -5201,7 +5201,7 @@ void CMainFrame::OnFileOpenMedia()
 	SetForegroundWindow();
 
 	auto& fn = dlg.m_fns.front();
-	if (OpenYoutubePlaylist(fn)) {
+	if (OpenYoutubePlaylist(fn, dlg.m_bAppendPlaylist)) {
 		return;
 	}
 
@@ -5331,35 +5331,37 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 	} else if (s.nCLSwitches & CLSW_CLIPBOARD) {
 		std::list<CString> sl;
 		if (GetFromClipboard(sl)) {
-			ParseDirs(sl);
-
-			if (s.nCLSwitches & CLSW_ADD) {
-				const auto nCount = m_wndPlaylistBar.GetCount();
-
-				m_wndPlaylistBar.Append(sl, sl.size() > 1);
-				applyRandomizeSwitch();
-
-				if ((s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) || !nCount) {
-					fSetForegroundWindow = true;
-					m_wndPlaylistBar.SetSelIdx(nCount, true);
-					OpenCurPlaylistItem();
-				}
+			if (sl.size() == 1 && OpenYoutubePlaylist(sl.front())) {
 			} else {
-				fSetForegroundWindow = true;
+				ParseDirs(sl);
 
-				AddSimilarFiles(sl);
+				if (s.nCLSwitches & CLSW_ADD) {
+					const auto nCount = m_wndPlaylistBar.GetCount();
 
-				m_wndPlaylistBar.Open(sl, sl.size() > 1, &s.slSubs);
-				applyRandomizeSwitch();
-				OpenCurPlaylistItem();
+					m_wndPlaylistBar.Append(sl, sl.size() > 1);
+					applyRandomizeSwitch();
 
-				s.nCLSwitches &= ~CLSW_STARTVALID;
-				s.rtStart = 0;
+					if ((s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) || !nCount) {
+						fSetForegroundWindow = true;
+						m_wndPlaylistBar.SetSelIdx(nCount, true);
+						OpenCurPlaylistItem();
+					}
+				} else {
+					fSetForegroundWindow = true;
+
+					AddSimilarFiles(sl);
+
+					m_wndPlaylistBar.Open(sl, sl.size() > 1, &s.slSubs);
+					applyRandomizeSwitch();
+					OpenCurPlaylistItem();
+
+					s.nCLSwitches &= ~CLSW_STARTVALID;
+					s.rtStart = 0;
+				}
 			}
 		}
 	} else if (!s.slFiles.empty()) {
 		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
-			;
 		} else if (s.slFiles.size() == 1 && CheckDVD(s.slFiles.front())) {
 			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
@@ -5713,11 +5715,8 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 	}
 
 	if (m_wndPlaylistBar.IsWindowVisible()) {
-		if (slFiles.size() == 1) {
-			const CString& path = slFiles.front();
-			if (OpenYoutubePlaylist(path, TRUE)) {
-				return;
-			}
+		if (slFiles.size() == 1 && OpenYoutubePlaylist(slFiles.front(), TRUE)) {
+			return;
 		}
 		AddSimilarFiles(slFiles);
 
@@ -5729,8 +5728,7 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 		return;
 	}
 
-	if (slFiles.size() == 1
-			&& OpenYoutubePlaylist(slFiles.front())) {
+	if (slFiles.size() == 1 && OpenYoutubePlaylist(slFiles.front())) {
 		return;
 	}
 
@@ -19772,7 +19770,7 @@ REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 	return refAvgTimePerFrame;
 }
 
-BOOL CMainFrame::OpenYoutubePlaylist(CString url, BOOL bOnlyParse/* = FALSE*/)
+BOOL CMainFrame::OpenYoutubePlaylist(const CString& url, BOOL bOnlyParse/* = FALSE*/)
 {
 	if (AfxGetAppSettings().bYoutubeLoadPlaylist && Youtube::CheckPlaylist(url)) {
 		Youtube::YoutubePlaylist youtubePlaylist;

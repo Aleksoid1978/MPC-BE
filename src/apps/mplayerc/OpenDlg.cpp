@@ -65,7 +65,6 @@ BEGIN_MESSAGE_MAP(COpenDlg, CResizableDialog)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateDub)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO2, OnUpdateDub)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateDub)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK1, OnUpdateAppendToPlaylist)
 	ON_UPDATE_COMMAND_UI(IDOK, OnUpdateOk)
 END_MESSAGE_MAP()
 
@@ -272,13 +271,6 @@ void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(AfxGetAppSettings().GetFileEngine(m_path) == DirectShow);
-}
-
-void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
-{
-	UpdateData();
-
-	pCmdUI->Enable(!Youtube::CheckPlaylist(m_path));
 }
 
 void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
