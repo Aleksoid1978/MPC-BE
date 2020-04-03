@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,7 +103,7 @@ bool ff_wv_parse_header(wv_header_t* wvh, const uint8_t* data)
 
 HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 {
-	int rate, bpp, chan;
+	int rate, rate_x, bpp, chan;
 	uint32_t chmask, flags;
 
 	wvc->pos = pFile->GetPos();
@@ -122,11 +122,6 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	if (wvc->header.flags & WV_DSD) {
-		DLog(L"wv_read_block_header : Unsupported WV DSD");
-		return E_FAIL;
-	}
-
 	if (wvc->header.version < 0x402 || wvc->header.version > 0x410) {
 		DLog(L"wv_read_block_header : Unsupported version %03X", wvc->header.version);
 		return E_FAIL;
@@ -139,7 +134,8 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 
 	// parse flags
 	flags  = wvc->header.flags;
-	bpp    = ((flags & 3) + 1) << 3;
+	rate_x = (flags & WV_DSD) ? 4 : 1;
+	bpp    = (flags & WV_DSD) ? 0 : ((flags & 3) + 1) << 3;
 	chan   = 1 + !(flags & WV_MONO);
 	chmask = flags & WV_MONO ? SPEAKER_FRONT_CENTER : SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
 	rate   = wv_rates[(flags >> 23) & 0xF];
@@ -148,7 +144,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 		chan   = wvc->chan;
 		chmask = wvc->chmask;
 	}
-	if ((rate == -1 || !chan) && !wvc->block_parsed) {
+	if ((rate == -1 || !chan || flags & WV_DSD) && !wvc->block_parsed) {
 		int64_t block_end = pFile->GetPos() + wvc->header.blocksize;
 		while (pFile->GetPos() < block_end) {
 			uint8_t id;
@@ -185,14 +181,33 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 				case 3:
 					pFile->ByteRead((BYTE*)&chmask, 4);
 					break;
-				case 5:
+				case 4:
 					pFile->Seek(pFile->GetPos() + 1);
 					pFile->ByteRead((BYTE*)&chan + 1, 1);
 					pFile->ByteRead((BYTE*)&chmask, 3);
 					break;
+				case 5:
+					pFile->Seek(pFile->GetPos() + 1);
+					pFile->ByteRead((BYTE*)&chan + 1, 1);
+					pFile->ByteRead((BYTE*)&chmask, 4);
+					break;
 				default:
 					DLog(L"wv_read_block_header : Invalid channel info size %d", size);
 					return E_FAIL;
+				}
+				break;
+			case 0xE:
+				if (size <= 1) {
+					DLog(L"wv_read_block_header :Invalid DSD block\n");
+					return E_FAIL;
+				}
+				{
+					uint32_t shift = 0;
+					pFile->ByteRead((BYTE*)&shift, 1);
+					rate_x = 1U << shift;
+				}
+				if (size) {
+					pFile->Seek(pFile->GetPos() + size-1);
 				}
 				break;
 			case 0x27:
@@ -219,7 +234,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 	if (!wvc->chmask)
 		wvc->chmask = chmask;
 	if (!wvc->rate)
-		wvc->rate   = rate;
+		wvc->rate   = rate * rate_x;
 
 	if (flags && bpp != wvc->bpp) {
 		DLog(L"wv_read_block_header : Bits per sample differ, this block: %d, header block: %d", bpp, wvc->bpp);
@@ -229,7 +244,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 		DLog(L"wv_read_block_header : Channels differ, this block: %d, header block: %d", chan, wvc->chan);
 		return E_FAIL;
 	}
-	if (flags && rate != -1 && rate != wvc->rate) {
+	if (flags && rate != -1 && !(flags & WV_DSD) && rate * rate_x != wvc->rate) {
 		DLog(L"wv_read_block_header : Sampling rate differ, this block: %d, header block: %d", rate, wvc->rate);
 		return E_FAIL;
 	}
