@@ -52,7 +52,7 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 protected:
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;
-	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
+	MPC_SCAN_TYPE							m_nScanType;
 	int										m_nARMode;
 	int										m_nDiscardMode;
 	int										m_nDXVACheckCompatibility;
@@ -244,8 +244,8 @@ public:
 	STDMETHODIMP_(int) GetThreadNumber();
 	STDMETHODIMP SetDiscardMode(int nValue);
 	STDMETHODIMP_(int) GetDiscardMode();
-	STDMETHODIMP SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue);
-	STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) GetDeinterlacing();
+	STDMETHODIMP SetScanType(MPC_SCAN_TYPE nValue);
+	STDMETHODIMP_(MPC_SCAN_TYPE) GetScanType();
 	STDMETHODIMP SetARMode(int nValue);
 	STDMETHODIMP_(int) GetARMode();
 

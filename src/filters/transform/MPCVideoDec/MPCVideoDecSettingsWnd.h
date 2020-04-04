@@ -57,8 +57,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_grpDecoder;
 	CStatic		m_txtThreadNumber;
 	CComboBox	m_cbThreadNumber;
-	CStatic		m_txtDeinterlacing;
-	CComboBox	m_cbDeinterlacing;
+	CStatic		m_txtScanType;
+	CComboBox	m_cbScanType;
 	CButton		m_chARMode;
 	CButton		m_chSkipBFrames;
 
