@@ -81,7 +81,7 @@ private:
 	HBITMAP m_hPlayBmp, m_hAddBmp;
 	std::vector<CString> m_fileNames;
 
-	void SendData(bool add_pl = false);
+	void SendData(const bool bAddPlaylist, const bool bCheckMultipleInstances = false);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MPCBEContextMenu), CMPCBEContextMenu)
