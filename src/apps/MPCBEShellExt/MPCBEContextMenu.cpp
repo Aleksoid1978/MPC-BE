@@ -269,92 +269,115 @@ STDMETHODIMP CMPCBEContextMenu::DragEnter(LPDATAOBJECT lpdobj, DWORD grfKeyState
 
 STDMETHODIMP CMPCBEContextMenu::Drop(LPDATAOBJECT lpdobj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
 {
-	SendData(false);
+	SendData(false, true);
 
 	*pdwEffect = DROPEFFECT_COPY;
 	return S_OK;
 }
 
-
-void CMPCBEContextMenu::SendData(bool add_pl)
+static CString GetMPCPath()
 {
-	if (add_pl) {
-		m_fileNames.emplace_back(L"/add");
+	CRegKey key;
+	WCHAR buff[MAX_PATH] = {};
+	ULONG len = sizeof(buff);
+	CString mpcPath;
+
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", buff, &len) && ::PathFileExistsW(buff)) {
+			mpcPath = buff; mpcPath.Trim();
+		}
+		key.Close();
 	}
 
-	size_t bufflen = sizeof(DWORD);
-
-	for (const auto& item : m_fileNames) {
-		bufflen += (item.GetLength() + 1) * sizeof(WCHAR);
-	}
-
-	std::vector<BYTE> buff(bufflen);
-	if (buff.empty()) {
-		return;
-	}
-
-	BYTE* p = buff.data();
-
-	*(DWORD*)p = (DWORD)m_fileNames.size();
-	p += sizeof(DWORD);
-
-	for (const auto& item : m_fileNames) {
-		const size_t len = (item.GetLength() + 1) * sizeof(WCHAR);
-		memcpy(p, item, len);
-		p += len;
-	}
-
-	if (HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, NULL)) {
-		COPYDATASTRUCT cds;
-		cds.dwData = 0x6ABE51;
-		cds.cbData = (DWORD)bufflen;
-		cds.lpData = buff.data();
-		SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
-	} else {
-		CRegKey key;
-		WCHAR path_buff[MAX_PATH] = { 0 };
-		ULONG len = sizeof(path_buff);
-		CString mpc_path;
-
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-			if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-				mpc_path = path_buff;
+	if (mpcPath.IsEmpty()) {
+		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+			len = sizeof(buff);
+			ZeroMemory(buff, len);
+			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", buff, &len) && ::PathFileExistsW(buff)) {
+				mpcPath = buff; mpcPath.Trim();
 			}
 			key.Close();
 		}
-
-		if (mpc_path.Trim().IsEmpty()) {
-			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
-				memset(path_buff, 0, sizeof(path_buff));
-				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-					mpc_path = path_buff;
-				}
-				key.Close();
-			}
-		}
+	}
 
 #ifdef _WIN64
-		if (mpc_path.Trim().IsEmpty()) {
-			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
-				memset(path_buff, 0, sizeof(path_buff));
-				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-					mpc_path = path_buff;
-				}
-				key.Close();
+	if (mpcPath.IsEmpty()) {
+		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
+			len = sizeof(buff);
+			ZeroMemory(buff, len);
+			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", buff, &len) && ::PathFileExistsW(buff)) {
+				mpcPath = buff; mpcPath.Trim();
 			}
+			key.Close();
 		}
+	}
 #endif
 
-		if (!mpc_path.Trim().IsEmpty()) {
-			if (HINSTANCE(HINSTANCE_ERROR) < ShellExecute(NULL, L"", path_buff, NULL, 0, SW_SHOWDEFAULT)) {
+	return mpcPath;
+}
+
+void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMultipleInstances/* = false*/)
+{
+	bool bMultipleInstances = false;
+	if (bCheckMultipleInstances) {
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+			DWORD dwValue = 0;
+			if (ERROR_SUCCESS == key.QueryDWORDValue(L"MultipleInstances", dwValue)) {
+				bMultipleInstances = (dwValue == 2);
+			}
+		}
+	}
+
+	if (bMultipleInstances) {
+		CString mpcPath = GetMPCPath();
+		for (auto item : m_fileNames) {
+			item = L'\"' + item + L'\"';
+			ShellExecuteW(nullptr, nullptr, mpcPath.GetString(), item.GetString(), 0, SW_SHOWDEFAULT);
+		}
+
+	} else {
+		if (bAddPlaylist) {
+			m_fileNames.emplace_back(L"/add");
+		}
+
+		size_t bufflen = sizeof(DWORD);
+
+		for (const auto& item : m_fileNames) {
+			bufflen += (item.GetLength() + 1) * sizeof(WCHAR);
+		}
+
+		std::vector<BYTE> buff(bufflen);
+		if (buff.empty()) {
+			return;
+		}
+
+		BYTE* p = buff.data();
+
+		*(DWORD*)p = (DWORD)m_fileNames.size();
+		p += sizeof(DWORD);
+
+		for (const auto& item : m_fileNames) {
+			const size_t len = (item.GetLength() + 1) * sizeof(WCHAR);
+			memcpy(p, item, len);
+			p += len;
+		}
+
+		if (HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr)) {
+			COPYDATASTRUCT cds;
+			cds.dwData = 0x6ABE51;
+			cds.cbData = (DWORD)bufflen;
+			cds.lpData = buff.data();
+			SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+		} else {
+			CString mpcPath = GetMPCPath();
+			if (!mpcPath.IsEmpty() && HINSTANCE(HINSTANCE_ERROR) < ShellExecuteW(nullptr, nullptr, mpcPath.GetString(), nullptr, 0, SW_SHOWDEFAULT)) {
 				Sleep(100);
 				int wait_count = 0;
-				HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, NULL);
+				HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr);
 				while (!hWnd && (wait_count++ < 200)) {
 					Sleep(100);
-					hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, NULL);
+					hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr);
 				}
 
 				if (hWnd && (wait_count < 200)) {
