@@ -21,71 +21,6 @@
 #include "stdafx.h"
 #include "MPCBEShellExt_i.h"
 #include "dllmain.h"
-#include "ConfigDlg.h"
-
-// config & dialog
-extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
-{
-	if (lpszPath) {
-		if (::PathFileExistsW(lpszPath)) {
-			CRegKey key;
-			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-				key.SetStringValue(L"MpcPath", lpszPath);
-				key.Close();
-				return S_OK;
-			}
-		}
-		return E_FAIL;
-	}
-
-	// Checking whether to show the selection dialog
-	CRegKey key;
-	WCHAR path_buff[MAX_PATH] = {};
-	ULONG len = sizeof(path_buff);
-	unsigned count = 0;
-
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
-		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-			count++;
-		}
-		key.Close();
-	}
-#ifdef _WIN64
-	// x86 application on x64 system
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
-		len = sizeof(path_buff);
-		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-			count++;
-		}
-		key.Close();
-	}
-#endif
-
-	if (count == 2) {
-		CConfigDlg dlg;
-		dlg.DoModal();
-		return S_OK;
-	} else {
-		len = sizeof(path_buff);
-		ZeroMemory(path_buff, len);
-
-		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
-			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-				CString path(path_buff);
-				key.Close();
-
-				if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-					key.SetStringValue(L"MpcPath", path);
-					key.Close();
-					return S_OK;
-				}
-			}
-		}
-	}
-
-	return E_FAIL;
-}
 
 // Used to determine whether the DLL can be unloaded by OLE
 STDAPI DllCanUnloadNow(void)
@@ -147,8 +82,6 @@ STDAPI DllRegisterServer(void)
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
-		//DllConfig(nullptr);
-
 		CString KeyName = GetKeyName();
 		if (KeyName.IsEmpty()) {
 			return hr;
