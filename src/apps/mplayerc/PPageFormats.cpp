@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -424,19 +424,18 @@ void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
 	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 }
 
-typedef HRESULT (*_DllConfigFunc)(LPCTSTR);
-typedef HRESULT (*_DllRegisterServer)(void);
-typedef HRESULT (*_DllUnRegisterServer)(void);
+typedef HRESULT (WINAPI *tpDllRegisterServer)();
+typedef HRESULT (WINAPI *tpDllUnRegisterServer)();
 bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 {
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		key.SetStringValue(L"MpcPath", GetProgramPath());
+	}
+
 	HINSTANCE hDLL = LoadLibraryW(lpszLibrary);
 	if (hDLL == nullptr) {
 		if (::PathFileExistsW(lpszLibrary)) {
-			CRegKey key;
-			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-				key.SetStringValue(L"MpcPath", GetProgramPath());
-			}
-
 			CString strParameters;
 			strParameters.Format(L" /s \"%s\"", lpszLibrary);
 			Execute(L"regsvr32.exe", strParameters);
@@ -446,20 +445,13 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 		return false;
 	}
 
-	_DllConfigFunc _dllConfigFunc         = (_DllConfigFunc)GetProcAddress(hDLL, "DllConfig");
-	_DllRegisterServer _dllRegisterServer = (_DllRegisterServer)GetProcAddress(hDLL, "DllRegisterServer");
-	if (_dllConfigFunc == nullptr || _dllRegisterServer == nullptr) {
+	auto pDllRegisterServer = (tpDllRegisterServer)GetProcAddress(hDLL, "DllRegisterServer");
+	if (pDllRegisterServer == nullptr) {
 		FreeLibrary(hDLL);
 		return false;
 	}
 
-	HRESULT hr = _dllConfigFunc(GetProgramPath());
-	if (FAILED(hr)) {
-		FreeLibrary(hDLL);
-		return false;
-	}
-
-	hr = _dllRegisterServer();
+	HRESULT hr = pDllRegisterServer();
 
 	FreeLibrary(hDLL);
 
@@ -480,13 +472,13 @@ bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
 		return false;
 	}
 
-	_DllUnRegisterServer _dllUnRegisterServer = (_DllRegisterServer)GetProcAddress(hDLL, "DllUnregisterServer");
-	if (_dllUnRegisterServer == nullptr) {
+	auto pDllUnRegisterServer = (tpDllUnRegisterServer)GetProcAddress(hDLL, "DllUnregisterServer");
+	if (pDllUnRegisterServer == nullptr) {
 		FreeLibrary(hDLL);
 		return false;
 	}
 
-	HRESULT hr = _dllUnRegisterServer();
+	HRESULT hr = pDllUnRegisterServer();
 
 	FreeLibrary(hDLL);
 
