@@ -392,7 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 19		"记住 DVD 位置"
 20		"记住文件位置"
 21		"记住上次的平移和扫描缩放"
-22		"Remember main playlist"
+22		"记住主播放列表"
 23		"其它"
 24		"托盘图标"
 25		"显示 OSD (需要重新启动播放器)"
