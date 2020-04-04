@@ -349,7 +349,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
 void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 {
 	m_cbThreadNumber.SetCurSel(0);
-	m_cbScanType.SetCurSel(AUTO);
+	m_cbScanType.SetCurSel(SCAN_AUTO);
 	m_chARMode.SetCheck(BST_INDETERMINATE);
 	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 

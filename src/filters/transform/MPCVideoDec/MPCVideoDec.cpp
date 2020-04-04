@@ -995,7 +995,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(L"MPC - Video decoder", lpunk, phr, __uuidof(this))
 	, m_nThreadNumber(0)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
-	, m_nScanType(AUTO)
+	, m_nScanType(SCAN_AUTO)
 	, m_nARMode(2)
 	, m_nDXVACheckCompatibility(1)
 	, m_nDXVA_SD(0)
@@ -1131,8 +1131,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_nDXVACheckCompatibility = std::clamp(m_nDXVACheckCompatibility, 0, 3);
 
-	if (m_nScanType > PROGRESSIVE) {
-		m_nScanType = AUTO;
+	if (m_nScanType > SCAN_PROGRESSIVE) {
+		m_nScanType = SCAN_AUTO;
 	}
 	if (m_nSwRGBLevels != 1) {
 		m_nSwRGBLevels = 0;
@@ -2784,7 +2784,7 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			props.dwTypeSpecificFlags &= ~0x7f;
 
 			switch (m_nScanType) {
-				case AUTO :
+				case SCAN_AUTO :
 					if (m_nCodecId == AV_CODEC_ID_HEVC) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 					} else if (m_FilterInfo.interlaced != -1) {
@@ -2808,10 +2808,10 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 						}
 					}
 					break;
-				case PROGRESSIVE :
+				case SCAN_PROGRESSIVE :
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 					break;
-				case TOPFIELD :
+				case SCAN_TOPFIELD :
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
 					break;
 			}
