@@ -381,6 +381,17 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 				}
 
 				if (hWnd && (wait_count < 200)) {
+					if (!bAddPlaylist) {
+						DWORD dwProcessId = 0;
+						if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
+							AllowSetForegroundWindow(dwProcessId);
+						}
+
+						if (IsIconic(hWnd)) {
+							ShowWindow(hWnd, SW_RESTORE);
+						}
+					}
+
 					COPYDATASTRUCT cds;
 					cds.dwData = 0x6ABE51;
 					cds.cbData = (DWORD)bufflen;
