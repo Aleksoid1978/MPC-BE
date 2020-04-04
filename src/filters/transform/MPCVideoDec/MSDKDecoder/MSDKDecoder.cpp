@@ -490,7 +490,7 @@ void CMSDKDecoder::SetTypeSpecificFlags(IMediaSample* pSample)
     if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
       props.dwTypeSpecificFlags &= ~0x7f;
 
-      switch (m_pFilter->m_nDeinterlacing) {
+      switch (m_pFilter->m_nScanType) {
         case AUTO :
         case PROGRESSIVE :
           props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;

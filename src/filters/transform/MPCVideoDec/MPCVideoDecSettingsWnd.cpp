@@ -110,12 +110,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Deinterlacing
-	m_txtDeinterlacing.Create(ResStr(IDS_VDF_SCANTYPE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DEINTERLACING);
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_AUTO));
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_SCANTYPE_TOP));
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_SCANTYPE_BOTTOM));
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_SCANTYPE_PROGRESSIVE));
+	m_txtScanType.Create(ResStr(IDS_VDF_SCANTYPE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbScanType.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DEINTERLACING);
+	m_cbScanType.AddString (ResStr(IDS_VDF_AUTO));
+	m_cbScanType.AddString (ResStr(IDS_VDF_SCANTYPE_TOP));
+	m_cbScanType.AddString (ResStr(IDS_VDF_SCANTYPE_BOTTOM));
+	m_cbScanType.AddString (ResStr(IDS_VDF_SCANTYPE_PROGRESSIVE));
 	p.y += h25;
 
 	// Read AR from stream
@@ -217,12 +217,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
-	CorrectComboListWidth(m_cbDeinterlacing);
+	CorrectComboListWidth(m_cbScanType);
 	CorrectComboListWidth(m_cbDXVACompatibilityCheck);
 
 	if (m_pMDF) {
-		m_cbThreadNumber.SetCurSel		(m_pMDF->GetThreadNumber());
-		m_cbDeinterlacing.SetCurSel		((int)m_pMDF->GetDeinterlacing());
+		m_cbThreadNumber.SetCurSel(m_pMDF->GetThreadNumber());
+		m_cbScanType.SetCurSel((int)m_pMDF->GetScanType());
 
 		m_chARMode.SetCheck(m_pMDF->GetARMode());
 		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
@@ -274,7 +274,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 	if (m_pMDF) {
 		m_pMDF->SetThreadNumber(m_cbThreadNumber.GetCurSel());
-		m_pMDF->SetDeinterlacing((MPC_DEINTERLACING_FLAGS)m_cbDeinterlacing.GetCurSel());
+		m_pMDF->SetScanType((MPC_SCAN_TYPE)m_cbScanType.GetCurSel());
 
 		m_pMDF->SetARMode(m_chARMode.GetCheck());
 		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
@@ -349,7 +349,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
 void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 {
 	m_cbThreadNumber.SetCurSel(0);
-	m_cbDeinterlacing.SetCurSel(AUTO);
+	m_cbScanType.SetCurSel(AUTO);
 	m_chARMode.SetCheck(BST_INDETERMINATE);
 	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 

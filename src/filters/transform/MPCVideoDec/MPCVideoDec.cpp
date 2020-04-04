@@ -71,7 +71,7 @@ extern "C" {
 #define OPT_SECTION_VideoDec L"Filters\\MPC Video Decoder"
 #define OPT_ThreadNumber     L"ThreadNumber"
 #define OPT_DiscardMode      L"DiscardMode"
-#define OPT_Deinterlacing    L"Deinterlacing"
+#define OPT_ScanType         L"ScanType"
 #define OPT_ARMode           L"ARMode"
 #define OPT_DXVACheck        L"DXVACheckCompatibility"
 #define OPT_DisableDXVA_SD   L"DisableDXVA_SD"
@@ -995,7 +995,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(L"MPC - Video decoder", lpunk, phr, __uuidof(this))
 	, m_nThreadNumber(0)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
-	, m_nDeinterlacing(AUTO)
+	, m_nScanType(AUTO)
 	, m_nARMode(2)
 	, m_nDXVACheckCompatibility(1)
 	, m_nDXVA_SD(0)
@@ -1075,8 +1075,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DiscardMode, dw)) {
 			m_nDiscardMode = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Deinterlacing, dw)) {
-			m_nDeinterlacing = (MPC_DEINTERLACING_FLAGS)dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ScanType, dw)) {
+			m_nScanType = (MPC_SCAN_TYPE)dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ARMode, dw)) {
 			m_nARMode = dw;
@@ -1112,7 +1112,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber, 0, 16);
-	profile.ReadInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, *(int*)&m_nDeinterlacing);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ScanType, *(int*)&m_nScanType);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
@@ -1131,8 +1131,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_nDXVACheckCompatibility = std::clamp(m_nDXVACheckCompatibility, 0, 3);
 
-	if (m_nDeinterlacing > PROGRESSIVE) {
-		m_nDeinterlacing = AUTO;
+	if (m_nScanType > PROGRESSIVE) {
+		m_nScanType = AUTO;
 	}
 	if (m_nSwRGBLevels != 1) {
 		m_nSwRGBLevels = 0;
@@ -2783,7 +2783,7 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
 			props.dwTypeSpecificFlags &= ~0x7f;
 
-			switch (m_nDeinterlacing) {
+			switch (m_nScanType) {
 				case AUTO :
 					if (m_nCodecId == AV_CODEC_ID_HEVC) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
@@ -3764,7 +3764,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VideoDec)) {
 		key.SetDWORDValue(OPT_ThreadNumber, m_nThreadNumber);
 		key.SetDWORDValue(OPT_DiscardMode, m_nDiscardMode);
-		key.SetDWORDValue(OPT_Deinterlacing, (int)m_nDeinterlacing);
+		key.SetDWORDValue(OPT_ScanType, (int)m_nScanType);
 		key.SetDWORDValue(OPT_ARMode, m_nARMode);
 		key.SetDWORDValue(OPT_DXVACheck, m_nDXVACheckCompatibility);
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
@@ -3788,7 +3788,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 	CProfile& profile = AfxGetProfile();
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
-	profile.WriteInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, (int)m_nDeinterlacing);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ScanType, (int)m_nScanType);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
@@ -3840,17 +3840,17 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetDiscardMode()
 	return m_nDiscardMode;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)
+STDMETHODIMP CMPCVideoDecFilter::SetScanType(MPC_SCAN_TYPE nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_nDeinterlacing = nValue;
+	m_nScanType = nValue;
 	return S_OK;
 }
 
-STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) CMPCVideoDecFilter::GetDeinterlacing()
+STDMETHODIMP_(MPC_SCAN_TYPE) CMPCVideoDecFilter::GetScanType()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_nDeinterlacing;
+	return m_nScanType;
 }
 
 STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
