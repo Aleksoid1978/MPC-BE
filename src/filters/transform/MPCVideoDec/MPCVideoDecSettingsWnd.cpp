@@ -110,12 +110,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Deinterlacing
-	m_txtDeinterlacing.Create(ResStr(IDS_VDF_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtDeinterlacing.Create(ResStr(IDS_VDF_SCANTYPE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DEINTERLACING);
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_AUTO));
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_TOP));
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_BOTTOM));
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_PROGRESSIVE));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_SCANTYPE_TOP));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_SCANTYPE_BOTTOM));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_SCANTYPE_PROGRESSIVE));
 	p.y += h25;
 
 	// Read AR from stream
