@@ -2224,12 +2224,12 @@ start:
 				continue;
 			}
 
-			const REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * tp.second.ts);
+			const REFERENCE_TIME rt = FractionScale64(tp.second.ts, UNITS, track->GetMediaTimeScale());
 
 			if (tp.second.index < track->GetSampleCount()) {
 				if (!pNext
-						|| (llabs(rtNext - rt) <= UNITS && tp.second.offset < nextOffset)
-						|| (llabs(rtNext - rt) > UNITS && rt < rtNext)) {
+						|| (llabs(rtNext - rt) <= UNITS * 2 && tp.second.offset < nextOffset)
+						|| (llabs(rtNext - rt) > UNITS * 2 && rt < rtNext)) {
 					pNext = &tp;
 					nextOffset = tp.second.offset;
 					rtNext = rt;
