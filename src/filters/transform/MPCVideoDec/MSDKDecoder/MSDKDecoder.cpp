@@ -491,11 +491,11 @@ void CMSDKDecoder::SetTypeSpecificFlags(IMediaSample* pSample)
       props.dwTypeSpecificFlags &= ~0x7f;
 
       switch (m_pFilter->m_nScanType) {
-        case AUTO :
-        case PROGRESSIVE :
+        case SCAN_AUTO :
+        case SCAN_PROGRESSIVE :
           props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
           break;
-        case TOPFIELD :
+        case SCAN_TOPFIELD :
           props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
           break;
       }
