@@ -610,9 +610,11 @@ int av_packet_ref(AVPacket *dst, const AVPacket *src)
 {
     int ret;
 
+    dst->buf = NULL;
+
     ret = av_packet_copy_props(dst, src);
     if (ret < 0)
-        return ret;
+        goto fail;
 
     if (!src->buf) {
         ret = packet_alloc(&dst->buf, src->size);
@@ -636,7 +638,7 @@ int av_packet_ref(AVPacket *dst, const AVPacket *src)
 
     return 0;
 fail:
-    av_packet_free_side_data(dst);
+    av_packet_unref(dst);
     return ret;
 }
 

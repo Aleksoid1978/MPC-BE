@@ -45,8 +45,6 @@ void av_bsf_free(AVBSFContext **pctx)
     if (ctx->filter->priv_class && ctx->priv_data)
         av_opt_free(ctx->priv_data);
 
-    av_opt_free(ctx);
-
     if (ctx->internal)
         av_packet_free(&ctx->internal->buffer_pkt);
     av_freep(&ctx->internal);
@@ -66,12 +64,18 @@ static void *bsf_child_next(void *obj, void *prev)
     return NULL;
 }
 
+static const char *bsf_to_name(void *bsf)
+{
+    return ((AVBSFContext *)bsf)->filter->name;
+}
+
 static const AVClass bsf_class = {
     .class_name       = "AVBSFContext",
-    .item_name        = av_default_item_name,
+    .item_name        = bsf_to_name,
     .version          = LIBAVUTIL_VERSION_INT,
     .child_next       = bsf_child_next,
     .child_class_next = ff_bsf_child_class_next,
+    .category         = AV_CLASS_CATEGORY_BITSTREAM_FILTER,
 };
 
 const AVClass *av_bsf_get_class(void)
@@ -111,8 +115,6 @@ int av_bsf_alloc(const AVBitStreamFilter *filter, AVBSFContext **pctx)
         ret = AVERROR(ENOMEM);
         goto fail;
     }
-
-    av_opt_set_defaults(ctx);
 
     /* allocate priv data and init private options */
     if (filter->priv_data_size) {

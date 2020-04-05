@@ -4648,10 +4648,11 @@ void av_packet_free_side_data(AVPacket *pkt);
  *
  * @see av_packet_unref
  *
- * @param dst Destination packet
+ * @param dst Destination packet. Will be completely overwritten.
  * @param src Source packet
  *
- * @return 0 on success, a negative AVERROR on error.
+ * @return 0 on success, a negative AVERROR on error. On error, dst
+ *         will be blank (as if returned by av_packet_alloc()).
  */
 int av_packet_ref(AVPacket *dst, const AVPacket *src);
 
