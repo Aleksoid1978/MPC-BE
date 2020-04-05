@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2017 Marti Maria Saguer
+//  Copyright (c) 1998-2020 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.10alpha
+// Version 2.10
 //
 
 #ifndef _lcms2_H
@@ -61,7 +61,7 @@
 // Uncomment this for special windows mutex initialization (see lcms2_internal.h)
 // #define CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
 
-// Uncomment this to remove the "CMSREGISTER" storage class
+// Uncomment this to remove the "register" storage class
 // #define CMS_NO_REGISTER_KEYWORD 1
 
 // ********** End of configuration toggles ******************************
