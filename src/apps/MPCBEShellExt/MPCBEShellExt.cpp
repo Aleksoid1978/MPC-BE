@@ -62,18 +62,20 @@ static CString GetKeyName()
 
 static BOOL GetKeyValue(const CString& value)
 {
-	BOOL bValue = TRUE;
+	BOOL bValue = FALSE;
+
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-		DWORD dw = 0;
-		if (ERROR_SUCCESS == key.QueryDWORDValue(value, dw)) {
-			bValue = !!dw;
+		DWORD dwValue = 0;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(value, dwValue)) {
+			bValue = !!dwValue;
 		}
 		key.Close();
 	}
 
 	return bValue;
 }
+
 // DllRegisterServer - Adds entries to the system registry
 #define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
