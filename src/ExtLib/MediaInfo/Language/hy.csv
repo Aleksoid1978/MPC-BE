@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Առանց կորստի
 Compression_Mode_Lossy;Կորստով
 Compression_Ratio;Սեղման աստիճանը
 Conductor;Դիրիժորը
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Ընդհանուր տեղեկությունը
@@ -311,6 +312,8 @@ DistributedBy;Տարածողը
 Distributor;
 Donate;Օժանդակություն
 DotsPerInch;Կետեր դյույմի վրա
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Տևողությունը
 Duration_End;Ավարտվելու ժ-ը
 Duration_Start;Սկսվելու ժ-ը
@@ -358,6 +361,7 @@ FolderName;Թղթապանակի անունը
 Format;Տեսակը
 Format_Commercial;Կոմերցիոն անվանումը
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;Տեսակի նկարագրությունը
 Format_Info;Մանրամասն տեսակի մասին
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Croatian
 Language_ht;Haitian
 Language_hu;Hungarian
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Auxiliary Language Association
 Language_id;Indonesian
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;Լեզուն, լրացուցիչ
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Մի քանի լեզու
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Dutch
+Language_nl-be;
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;Շտեմարանը
 Lightness;Պայծառությունը
 LineUpStart;
 List;Ցանկը
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Երգի տեքստը
 Lyrics;Երգերի տեքստը
 Mastered_Date;Օրիգինալի ամսաթիվը
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Ձայնի կարգավորիչ
 ReplayGain_Peak;Ձայնի կարգավորման գագաթը
 Resolution;Լուծաչափը
 s; վայր.
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Նմուշների քանակը
 SamplingRate;Հաճախականությունը
@@ -1049,6 +1078,7 @@ Stream;Հոսքը
 Stream_MoreInfo;Լր. տեղեկություններ հոսքի մասին
 StreamCount;Այս տեսակի հոսքերի ք-ը
 StreamID;Հոսքի ID-ին
+streamIdentifier;
 StreamKind;Հոսքի տեսակը
 StreamKindID;Հոսքի տեսակ ID-ին
 StreamKindPos;Հոսքի տեսակ ID-ի դիրքը
@@ -1065,7 +1095,7 @@ SubTrack;Ենթահոսքը
 Summary;Համառոտ
 Supported formats;Աջակցվող տեսակները
 Supported?;Աջակցվու՞մ է
-SupportUs_Android;
+SupportUs;
 Synopsis;Համառոտ
 SystemId;ID-ին
 Tagged_Application;Նշված ծրագիրը
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Hrant Ohanyan
 Tree;Ծառի տեսքով
 Tree & Text;Ծառի տեսքով և տեքստ
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;Բացառիկ ID-ին
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85

@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Kayıpsız
 Compression_Mode_Lossy;Kayıplı
 Compression_Ratio;Sıkıştırma oranı
 Conductor;Orkestra şefi
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Kalıp ve genel bilgi
@@ -311,6 +312,8 @@ DistributedBy;Dağıtan
 Distributor;
 Donate;Bağış
 DotsPerInch;İnç başına nokta
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Süre
 Duration_End;Bitiş zamanı
 Duration_Start;Başlangıç zamanı
@@ -358,6 +361,7 @@ FolderName;Klasör adı
 Format;Biçim
 Format_Commercial;Ticari adı
 Format_Commercial_IfAny;Ticari adı
+Format_Compression;
 Format_Description;Biçim açıklaması
 Format_Info;Biçim için ayrıntılar
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Hırvatça
 Language_ht;Haitice
 Language_hu;Macarca
 Language_hy;Ermenice
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Yardımcı  Dil Derneği
 Language_id;Endonezca
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;Dil, daha fazla bilgi
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Çoklu diller
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Flemenkçe
+Language_nl-be;
 Language_nn;Norveççe Bokmal
 Language_no;Norveççe
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhalaca
 Language_sk;Slovakça
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somalica
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;Çoklama kütüphanesi
 Lightness;Canlılık
 LineUpStart;
 List;Liste
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Söz yazarı
 Lyrics;Şarkı Sözleri
 Mastered_Date;Sahip olma tarihi
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Tekrar oynatma kazancı
 ReplayGain_Peak;Tekrar oynatma kazancı ucu
 Resolution;Çözünürlük
 s;s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Örnek sayısı
 SamplingRate;Örnekleme oranı
@@ -1049,6 +1078,7 @@ Stream;Akış
 Stream_MoreInfo;Akış hakkında daha fazla bilgi
 StreamCount;Bu çeşidin akış sayısı
 StreamID;Akış ID
+streamIdentifier;
 StreamKind;Akış çeşidi
 StreamKindID;Akış tanımlayıcısı
 StreamKindPos;Akış tanımlayıcısı
@@ -1065,7 +1095,7 @@ SubTrack;Altİz
 Summary;Özet
 Supported formats;Desteklenen biçimler
 Supported?;Desteklenen?
-SupportUs_Android;
+SupportUs;
 Synopsis;Özet
 SystemId;Id
 Tagged_Application;Etiketleme uygulaması
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Çevirmen
 Tree;Ağaç
 Tree & Text;Ağaç ve Metin
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;Tür
 UniqueID;Eşsiz ID
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;87
+ZZ_AutomaticLanguage_Percent;87

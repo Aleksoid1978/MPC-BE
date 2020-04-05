@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Compressieverhouding
 Conductor;Dirigent
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Container en algemene informatie
@@ -311,6 +312,8 @@ DistributedBy;Gedistribueerd door
 Distributor;
 Donate;Doneren
 DotsPerInch;Punten per inch
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Duur
 Duration_End;
 Duration_Start;
@@ -358,6 +361,7 @@ FolderName;Mapnaam
 Format;Formaat
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;Formaatbeschrijving
 Format_Info;Details over formaat
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Kroatisch
 Language_ht;Haïtiaans
 Language_hu;Hongaars
 Language_hy;Armeens
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Interlingua
 Language_id;Indonesisch
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonisch
 Language_ml;Malayalam
 Language_mn;Mongools
+Language_mn-cn;
 Language_mo;Moldavisch
 Language_More;Taal, meer info
 Language_mr;Marathi
 Language_ms;Maleis
+Language_ms-bn;
 Language_mt;Maltees
 Language_mul;Meerdere talen
 Language_my;Burmees
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepalees
 Language_ng;Ndonga
 Language_nl;Nederlands
+Language_nl-be;
 Language_nn;Noors Bokmal
 Language_no;Noors
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slowaaks
 Language_sl;Sloveens
 Language_sm;Samoaans
+Language_smi;
 Language_sn;Shona
 Language_so;Somalisch
 Language_sq;Albanees
@@ -844,6 +853,24 @@ Library;Muxingbibliotheek
 Lightness;Helderheid
 LineUpStart;
 List;Lijst
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Tekstschrijver
 Lyrics;Tekst
 Mastered_Date;Datum van master
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain piek
 Resolution;Resolutie
 s;s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;Samplerate
@@ -1049,6 +1078,7 @@ Stream;Stroom
 Stream_MoreInfo;Meer informatie over de stroom
 StreamCount;Telling van dit soort stromen
 StreamID;Stroom-ID
+streamIdentifier;
 StreamKind;Soort stroom
 StreamKindID;Stroomidentifier
 StreamKindPos;Stroomidentifier
@@ -1065,7 +1095,7 @@ SubTrack;Ondertiteling
 Summary;Samenvatting
 Supported formats;Ondersteunde formaten
 Supported?;Ondersteund?
-SupportUs_Android;
+SupportUs;
 Synopsis;Samenvatting
 SystemId;Id
 Tagged_Application;Tagapplicatie
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Vertaler
 Tree;Boomstructuur
 Tree & Text;Boomstructuur & Tekst
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;80
-ZZ_AutomaticLanguage_Percent;84
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;82

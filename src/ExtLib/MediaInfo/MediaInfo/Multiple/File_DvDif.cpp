@@ -235,7 +235,6 @@ File_DvDif::File_DvDif()
 
     //Temp
     FrameSize_Theory=0;
-    Duration=0;
     Synched_Test_Reset();
     DSF_IsValid=false;
     APT=0xFF; //Impossible
@@ -269,7 +268,6 @@ File_DvDif::File_DvDif()
     Speed_FrameCount_Stts_Fluctuation=0;
     SMP=(int8u)-1;
     QU=(int8u)-1;
-    CH_IsPresent.resize(8);
     Speed_TimeCode_IsValid=false;
     Speed_Arb_IsValid=false;
     Mpeg4_stts=NULL;
@@ -548,8 +546,18 @@ void File_DvDif::Streams_Finish()
             Stream_Prepare(Stream_General);
         Fill(Stream_General, 0, General_Recorded_Date, Recorded_Date, true);
     }
-    if (!IsSub && Duration)
-        Fill(Stream_General, 0, General_Duration, Duration);
+
+    float64 OverallBitRate=Retrieve_Const(Stream_General, 0, General_OverallBitRate).To_float64();
+    if (OverallBitRate && File_Size && File_Size!=(int64u)-1)
+    {
+        float64 Duration=File_Size/OverallBitRate*8*1000;
+        if (Duration)
+        {
+            for (size_t StreamKind=0; StreamKind<Stream_Max; StreamKind++)
+                for (size_t StreamPos=0; StreamPos<Count_Get((stream_t)StreamKind); StreamPos++)
+                    Fill((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration), Duration, 0);
+        }
+    }
 
     #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
         if (Config->File_DvDif_Analysis_Get())

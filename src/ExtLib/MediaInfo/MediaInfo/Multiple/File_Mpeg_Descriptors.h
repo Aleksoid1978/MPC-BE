@@ -755,7 +755,7 @@ private :
     void Descriptor_3F_05() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_3F_06() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_3F_07() {Skip_XX(Element_Size-Element_Offset, "Data");};
-    void Descriptor_3F_08() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_08();
     void Descriptor_3F_09() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_3F_0A() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_3F_0B() {Skip_XX(Element_Size-Element_Offset, "Data");};
@@ -828,8 +828,10 @@ private :
     void Descriptor_7D() {Skip_XX(Element_Size, "Data");};
     void Descriptor_7E() {Skip_XX(Element_Size, "Data");};
     void Descriptor_7F();
+    void Descriptor_7F_06();
     void Descriptor_7F_0F();
     void Descriptor_7F_15();
+    void Descriptor_7F_19();
     void Descriptor_80() {Skip_XX(Element_Size, "Data");};
     void Descriptor_81();
     void Descriptor_86();

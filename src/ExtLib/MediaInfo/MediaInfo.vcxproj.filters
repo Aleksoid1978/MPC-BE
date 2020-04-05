@@ -728,6 +728,9 @@
     <ClInclude Include="MediaInfo\Audio\File_Ac4.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Mpegh3da.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1400,6 +1403,9 @@
       <Filter>Source Files\Video</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_Ac4.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Mpegh3da.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>

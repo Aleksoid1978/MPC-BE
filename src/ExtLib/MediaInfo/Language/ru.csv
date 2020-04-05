@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Без потерь
 Compression_Mode_Lossy;С потерями
 Compression_Ratio;Степень сжатия
 Conductor;Дирижёр
+ConformanceCheck;
 ContactEmail;Контактный почтовый адрес
 ContactTelephoneNumber;Контактный телефон
 Container and general information;Общая информация
@@ -311,6 +312,8 @@ DistributedBy;Распространитель
 Distributor;Распространитель
 Donate;Сделать пожертвование
 DotsPerInch;Точек на дюйм
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Продолжительность
 Duration_End;Время окончания
 Duration_Start;Время начала
@@ -358,6 +361,7 @@ FolderName;Имя папки
 Format;Формат
 Format_Commercial;Коммерческое название
 Format_Commercial_IfAny;Коммерческое название
+Format_Compression;
 Format_Description;Описание формата
 Format_Info;Подробно о формате
 Format_Level;
@@ -489,7 +493,7 @@ Genre_080;Folk
 Genre_081;Folk-Rock
 Genre_082;National Folk
 Genre_083;Swing
-Genre_084;Fast-Fusion
+Genre_084;Fast Fusion
 Genre_085;Bebop
 Genre_086;Latin
 Genre_087;Revival
@@ -710,6 +714,7 @@ Language_hr;Croatian
 Language_ht;Haitian
 Language_hu;Hungarian
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Auxiliary Language Association
 Language_id;Indonesian
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;Язык, дополнительно
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Несколько языков
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Dutch
+Language_nl-be;
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;Библиотека смешивания
 Lightness;Якрость
 LineUpStart;Начало построения
 List;Список
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Поэт-песенник
 Lyrics;Текст песен
 Mastered_Date;Дата мастеринга
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Нормализатор звука
 ReplayGain_Peak;Пик нормализатор звука
 Resolution;Разрешение
 s; с.
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Количество образцов
 SamplingRate;Частота
@@ -1049,6 +1078,7 @@ Stream;Поток
 Stream_MoreInfo;Дополнительная информация о потоке
 StreamCount;Количество потоков такого типа
 StreamID;Идентификатор потока
+streamIdentifier;
 StreamKind;Тип потока
 StreamKindID;Идентификатор типа потока
 StreamKindPos;Позиция идентификатора типа потока
@@ -1065,7 +1095,7 @@ SubTrack;Подпоток
 Summary;Сводка
 Supported formats;Поддерживаемые форматы
 Supported?;Поддерживается?
-SupportUs_Android;
+SupportUs;
 Synopsis;Сводка
 SystemId;Идентификатор
 Tagged_Application;Пометившая программа
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Переводчик
 Tree;Дерево
 Tree & Text;Дерево и текст
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;Тип
 UniqueID;Уникальный идентификатор
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;95
-ZZ_AutomaticLanguage_Percent;95
+ZZ_Automatic_Percent;93
+ZZ_AutomaticLanguage_Percent;93

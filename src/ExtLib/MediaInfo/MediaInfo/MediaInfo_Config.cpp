@@ -133,7 +133,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v19.09");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v20.03");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -2150,7 +2150,7 @@ void MediaInfo_Config::Language_Set (const ZtringListList &NewValue)
         for (size_t Pos=0; Pos<NewValue.size(); Pos++)
             if (NewValue[Pos].size()>=2)
                 Language.Write(NewValue[Pos][0], NewValue[Pos][1]);
-            else if (NewValue[Pos].size()==1)
+            else if (NewValue[Pos].size()==1 && NewValue[0]==__T("  Config_Text_ThousandsSeparator")) // Only the thousands separator is authorized to be empty, else empty content means keeping default value
                 Language.Write(NewValue[Pos][0], Ztring());
     }
 
@@ -2245,13 +2245,9 @@ Ztring MediaInfo_Config::Language_Get (const Ztring &Count, const Ztring &Value,
         return Count;
 
     //Different Plurals are available or not?
-    if (Language_Get(Value+__T("1")).empty())
-    {
-        //if (Count==__T("0") || Count==__T("1"))
-            return Count+Language_Get(Value);
-        //else
-            //return Count+Language_Get(Value+__T("s"));
-    }
+    Ztring Value1=Value+__T('1');
+    if (!ValueIsAlwaysSame && Language_Get(Value1)==Value1)
+        ValueIsAlwaysSame=true;
 
     //Detecting plural form for multiple plurals
     int8u  Form=(int8u)-1;
@@ -2321,6 +2317,8 @@ Ztring MediaInfo_Config::Language_Get (const Ztring &Count, const Ztring &Value,
         ToReturn.FindAndReplace(DecimalPoint, Language_Get(__T("  Config_Text_FloatSeparator")), DotPos);
     else
         DotPos=ToReturn.size();
+    if (DotPos>3 && ToReturn[0]==__T('-'))
+        DotPos--;
     if (DotPos>3)
         ToReturn.insert(DotPos-3, Language_Get(__T("  Config_Text_ThousandsSeparator")));
 

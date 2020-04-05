@@ -150,6 +150,8 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     Audio_MergeMonoStreams=false;
     File_Demux_Interleave=false;
     File_ID_OnlyRoot=false;
+    File_ExpandSubs_Backup=NULL;
+    File_ExpandSubs_Source=NULL;
     #if MEDIAINFO_ADVANCED
         File_IgnoreSequenceFileSize=false;
         File_IgnoreSequenceFilesCount=false;
@@ -299,6 +301,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
 MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
 {
     delete[] File_Buffer; //File_Buffer=NULL;
+    delete (std::vector<std::vector<ZtringListList> >*)File_ExpandSubs_Backup; //File_ExpandSubs_Backup=NULL
 
     #if MEDIAINFO_EVENTS
         for (events_delayed::iterator Event=Events_Delayed.begin(); Event!=Events_Delayed.end(); ++Event)
@@ -439,6 +442,11 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     else if (Option_Lower==__T("file_id_onlyroot"))
     {
         File_ID_OnlyRoot_Set(!(Value==__T("0") || Value.empty()));
+        return __T("");
+    }
+    else if (Option_Lower==__T("file_expandsubs"))
+    {
+        File_ExpandSubs_Set(!(Value==__T("0") || Value.empty()));
         return __T("");
     }
     else if (Option_Lower==__T("file_id_onlyroot_get"))
@@ -1452,6 +1460,199 @@ bool MediaInfo_Config_MediaInfo::File_ID_OnlyRoot_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return File_ID_OnlyRoot;
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::File_ExpandSubs_Set (bool NewValue)
+{
+    { //for CSL
+        CriticalSectionLocker CSL(CS);
+        if ((File_ExpandSubs_Backup && NewValue) || (!File_ExpandSubs_Backup && !NewValue))
+            return; //No change
+        if (File_ExpandSubs_Backup)
+        {
+            //We want the default
+            if (File_ExpandSubs_Source)
+            {
+                //Config has the backup, Source has the expanded one
+                std::vector<std::vector<ZtringListList> >* Stream_More=(std::vector<std::vector<ZtringListList> >*)File_ExpandSubs_Source;
+                std::vector<std::vector<ZtringListList> >* Backup=(std::vector<std::vector<ZtringListList> >*)File_ExpandSubs_Backup;
+                *Stream_More=*Backup;
+                Backup->clear();
+            }
+            delete (std::vector<std::vector<ZtringListList> > *)File_ExpandSubs_Backup;
+            File_ExpandSubs_Backup=NULL;
+        }
+        else
+        {
+            //We want the expanded subs
+            File_ExpandSubs_Backup=new std::vector<std::vector<ZtringListList> >;
+        }
+    }
+
+    File_ExpandSubs_Update(NULL);
+}
+
+bool MediaInfo_Config_MediaInfo::File_ExpandSubs_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_ExpandSubs_Backup?true:false;
+}
+
+void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
+{
+    CriticalSectionLocker CSL(CS);
+    if (Source)
+        File_ExpandSubs_Source=*Source;
+    if (!File_ExpandSubs_Source)
+        return;
+    std::vector<std::vector<ZtringListList> >* Stream_More=(std::vector<std::vector<ZtringListList> >*)File_ExpandSubs_Source;
+    std::vector<std::vector<ZtringListList> >* Backup=(std::vector<std::vector<ZtringListList> >*)File_ExpandSubs_Backup;
+
+    //Reset if needed
+    if (File_ExpandSubs_Backup && !Backup->empty())
+    {
+        *Stream_More=*Backup;
+        Backup->clear();
+    }
+    
+    if (File_ExpandSubs_Backup)
+    {
+        //Backup
+        *Backup=*Stream_More;
+
+        //Sub-elements
+        const Char* UpSuffix=__T("_Pos");
+        const Char* HideSuffix=__T("_Pos/String");
+        //for (set<string>::iterator File_ExpandSubs_Item=File_ExpandSubs_Items.begin(); File_ExpandSubs_Item!=File_ExpandSubs_Items.end(); ++File_ExpandSubs_Item)
+        for (size_t i=0; i<3; i++)
+        {
+            //const Ztring Sub=Ztring().From_UTF8(*File_ExpandSubs_Item);
+            for (size_t StreamKind=Stream_General; StreamKind<Stream_Max; StreamKind++)
+                for (size_t StreamPos=0; StreamPos<(*Stream_More)[StreamKind].size(); StreamPos++)
+                {
+                    ZtringListList Temp;
+                    size_t Pos_Max=(*Stream_More)[StreamKind][StreamPos].size();
+                    for (size_t Pos=0; Pos<Pos_Max; Pos++)
+                        if ((*Stream_More)[StreamKind][StreamPos][Pos].size()>Info_Name_Text)
+                        {
+                            Ztring& Name=(*Stream_More)[StreamKind][StreamPos][Pos][Info_Name];
+
+                            // Tree
+                            size_t Up_Pos=Name.find(__T(" LinkedTo_"));
+                            size_t Up_Pos_End;
+                            if (Up_Pos!=string::npos)
+                                Up_Pos_End=Name.find(__T("_Pos"), Up_Pos);
+                            if (Up_Pos!=string::npos && Up_Pos_End==Name.size()-4)
+                            {
+                                Ztring Up=Name.substr(Up_Pos);
+
+                                //Hide
+                                Ztring ToHide=Name+__T("/String");
+                                for (size_t j=Pos+1; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
+                                {
+                                    if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToHide)
+                                    {
+                                        ZtringList& ToHideList=(*Stream_More)[StreamKind][StreamPos][j];
+                                        ToHideList[Info_Options]=__T("N NT");
+                                        break;
+                                    }
+                                }
+
+                                //Expand
+                                size_t SpacesCount=1;
+                                size_t SpacesTestPos=Name.size()-Up.size();
+                                while (SpacesTestPos && (SpacesTestPos=Name.rfind(__T(' '), SpacesTestPos-1))!=string::npos)
+                                    SpacesCount++;
+                                ZtringList L;
+                                L.Separator_Set(0, __T(" + "));
+                                L.Write((*Stream_More)[StreamKind][StreamPos][Pos][Info_Text]);
+                                for (size_t i=0; i<L.size(); i++)
+                                {
+                                    Ztring ToSearch=Up.substr(10, Up.find('_', 10)-10)+L[i];
+                                    for (size_t j=Pos+1; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
+                                    {
+                                        if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch)
+                                        {
+                                            while (j<(*Stream_More)[StreamKind][StreamPos].size() && (*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, ToSearch.size())==0)
+                                            {
+                                                Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
+                                                Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
+                                                j++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                                Temp.push_back((*Stream_More)[StreamKind][StreamPos][Pos]);
+
+                        }
+                    (*Stream_More)[StreamKind][StreamPos]=Temp;
+                }
+        }
+    }
+
+    //Sub-elements
+    for (size_t StreamKind=Stream_General; StreamKind<Stream_Max; StreamKind++)
+        for (size_t StreamPos=0; StreamPos<(*Stream_More)[StreamKind].size(); StreamPos++)
+        {
+            const ZtringListList& Track=(*Stream_More)[StreamKind][StreamPos];
+            for (size_t Pos=0; Pos<Track.size(); Pos++)
+            {
+                const ZtringList& Field=Track[Pos];
+                if (Field.size()>Info_Name_Text)
+                {
+                    // Text
+                    Ztring Name=Field[Info_Name];
+                    size_t Spaces=0;
+                    size_t i=0;
+                    for (;;)
+                    {
+                        size_t j=Name.find(__T(' '), i);
+                        if (j==(size_t)-1)
+                            break;
+                        i=j+1;
+                        Spaces++;
+                    }
+                    //if (Spaces)
+                    {
+                        size_t j;
+                        if (i>=2 && Pos && i-2==Track[Pos-1][Info_Name].size())
+                            j=2;
+                        else
+                            j=1;
+                        int Nested=Spaces && Pos && i && i-j<=Track[Pos-1][Info_Name].size() && Name.substr(0, i-j)==Track[Pos-1][Info_Name].substr(0, i-j) && Info_Name_Text<Track[Pos-1].size() && Spaces-1<=Track[Pos-1][Info_Name_Text].find_first_not_of(__T(' '));
+                        if (Nested)
+                            Name.erase(0, i);
+                        size_t Number=0;
+                        if (!Name.empty() && Pos+1<Track.size())
+                        {
+                            const ZtringList& Field1=Track[Pos+1];
+                            const Ztring& Name1=Field1[Info_Name];
+                            size_t Name1_SpacePos=i+Name.size();
+                            if (Name1_SpacePos<Name1.size() && Name1[Name1_SpacePos]==__T(' ') && Name==Name1.substr(i, Name.size()))
+                            {
+                                size_t Text_End=Name.find_last_not_of(__T("0123456789"))+1;
+                                if (Text_End!=Name.size())
+                                {
+                                    Number=Ztring(Name.substr(Text_End)).To_int64u()+1;
+                                    Name.resize(Text_End);
+                                }
+                            }
+                        }
+                        Ztring TranslatedName=MediaInfoLib::Config.Language_Get(Name);
+                        if (!TranslatedName.empty())
+                            Name=TranslatedName;
+                        if (Nested)
+                            Name.insert(0, Spaces, __T(' '));
+                        if (Number)
+                            Name+= MediaInfoLib::Config.Language_Get(__T("  Config_Text_NumberTag"))+Ztring::ToZtring(Number);
+                        (*Stream_More)[StreamKind][StreamPos][Pos][Info_Name_Text]=Name;
+                    }
+                }
+            }
+        }
 }
 
 //---------------------------------------------------------------------------

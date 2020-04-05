@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
 Conductor;
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Container si informatii generale
@@ -311,6 +312,8 @@ DistributedBy;Distribuit de
 Distributor;
 Donate;Donatii
 DotsPerInch;
+DrcSets_Count;
+DrcSets_Effects;
 Duration;
 Duration_End;
 Duration_Start;
@@ -358,6 +361,7 @@ FolderName;Numele directorului
 Format;Format
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;
 Format_Info;
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;
 Language_ht;
 Language_hu;
 Language_hy;
+Language_hy-az;
 Language_hz;
 Language_ia;
 Language_id;
@@ -754,10 +759,12 @@ Language_mi;
 Language_mk;
 Language_ml;
 Language_mn;
+Language_mn-cn;
 Language_mo;
 Language_More;
 Language_mr;
 Language_ms;
+Language_ms-bn;
 Language_mt;
 Language_mul;Mai multe traduceri
 Language_my;
@@ -767,6 +774,7 @@ Language_nd;
 Language_ne;
 Language_ng;
 Language_nl;
+Language_nl-be;
 Language_nn;
 Language_no;
 Language_nr;
@@ -798,6 +806,7 @@ Language_si;
 Language_sk;
 Language_sl;
 Language_sm;
+Language_smi;
 Language_sn;
 Language_so;
 Language_sq;
@@ -844,6 +853,24 @@ Library;Biblioteca muxing
 Lightness;
 LineUpStart;
 List;
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Textier
 Lyrics;
 Mastered_Date;Data realizarii
@@ -992,6 +1019,8 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Rezolutie
 s;s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;
@@ -1049,6 +1078,7 @@ Stream;Flux
 Stream_MoreInfo;Mai multe informatii despre flux
 StreamCount;Numara fluxurile de acest tip
 StreamID;ID flux
+streamIdentifier;
 StreamKind;Tipul fluxului
 StreamKindID;
 StreamKindPos;
@@ -1065,7 +1095,7 @@ SubTrack;Sub-pista
 Summary;Sumar
 Supported formats;Formate acceptate
 Supported?;Acceptat?
-SupportUs_Android;
+SupportUs;
 Synopsis;
 SystemId;
 Tagged_Application;
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Traducator
 Tree;Arbore
 Tree & Text;Arbore si text
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
-ZZ_Automatic_Percent;29
-ZZ_AutomaticLanguage_Percent;66
+ZZ_Automatic_Percent;28
+ZZ_AutomaticLanguage_Percent;64

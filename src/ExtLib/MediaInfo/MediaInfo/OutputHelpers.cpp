@@ -258,15 +258,24 @@ string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
             if (!Cur_Node.Childs[Pos2])
                 continue;
 
-            Result+=(Indent?string(Level+1, '\t'):string())+"{";
-            Result+=To_JSON_Attributes(*Cur_Node.Childs[Pos2], Level+2, Indent);
-            Result+=To_JSON_Elements(*Cur_Node.Childs[Pos2], Level+2, Indent);
-            Result+="\n";
+            if (Cur_Node.Childs[Pos2]->Attrs.empty() && Cur_Node.Childs[Pos2]->Childs.empty() && !Cur_Node.Childs[Pos2]->Multiple)
+            {
+                if (Cur_Node.Childs[Pos2]->Value.empty())
+                    Result+="null";
+                else
+                    Result+="\""+JSON_Encode(Cur_Node.Childs[Pos2]->Value)+"\"";
+            }
+            else
+            {
+                Result+=(Indent?string(Level+1, '\t'):string())+"{";
+                Result+=To_JSON_Attributes(*Cur_Node.Childs[Pos2], Level+2, Indent);
+                Result+=To_JSON_Elements(*Cur_Node.Childs[Pos2], Level+2, Indent);
+                Result+="\n";
 
-            if(!Cur_Node.Childs[Pos2]->Value.empty())
-                Result+=(Indent?string(Level+2, '\t'):string())+"\"#value\": \""+JSON_Encode(Cur_Node.Childs[Pos2]->Value)+"\"\n";
-            Result+=(Indent?string(Level+1, '\t'):string())+"}";
-
+                if(!Cur_Node.Childs[Pos2]->Value.empty())
+                    Result+=(Indent?string(Level+2, '\t'):string())+"\"#value\": \""+JSON_Encode(Cur_Node.Childs[Pos2]->Value)+"\"\n";
+                Result+=(Indent?string(Level+1, '\t'):string())+"}";
+            }
             if (Pos2<Cur_Node.Childs.size()-1 && Cur_Node.Childs[Pos2]->Name==Cur_Node.Childs[Pos2+1]->Name)
                 Result+=",";
 

@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Förlustfri
 Compression_Mode_Lossy;Förstörande
 Compression_Ratio;Komprimeringsförhållande
 Conductor;Dirigent
+ConformanceCheck;
 ContactEmail;E-postkontakt
 ContactTelephoneNumber;Telefonkontakt
 Container and general information;Behållare och allmän information
@@ -311,6 +312,8 @@ DistributedBy;Distribuerad av
 Distributor;Distributör
 Donate;Donera
 DotsPerInch;Punkter per inch
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Varaktighet
 Duration_End;Sluttid
 Duration_Start;Starttid
@@ -358,6 +361,7 @@ FolderName;Mappnamn
 Format;Format
 Format_Commercial;Kommersiellt namn
 Format_Commercial_IfAny;Kommersiellt namn
+Format_Compression;
 Format_Description;Formatbeskrivning
 Format_Info;Formatdetaljer
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Kroatiska
 Language_ht;Haitian
 Language_hu;Ungerska
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Behjälplig språkassociation
 Language_id;Indonesiska
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;Språk, mer info
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Multipla språk
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Nederländska
+Language_nl-be;
 Language_nn;Norska Bokmal
 Language_no;Norska
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenska
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanska
@@ -844,6 +853,24 @@ Library;Muxningsbibliotek
 Lightness;Ljus
 LineUpStart;
 List;Lista
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Texter från
 Lyrics;Texter
 Mastered_Date;Master-datum
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain peak
 Resolution;Upplösning
 s; sek
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Antal samplingar
 SamplingRate;Samplingsfrekvens
@@ -1049,6 +1078,7 @@ Stream;Ström
 Stream_MoreInfo;Mer information om strömmen
 StreamCount;Antal strömmar av den här typen
 StreamID;Ström-ID
+streamIdentifier;
 StreamKind;Strömtyp
 StreamKindID;Strömidentifierare
 StreamKindPos;Strömidentifierare
@@ -1065,7 +1095,7 @@ SubTrack;Underspår
 Summary;Sammanfattning
 Supported formats;Format som stöds
 Supported?;Stöd?
-SupportUs_Android;
+SupportUs;
 Synopsis;Sammandrag
 SystemId;Id
 Tagged_Application;Taggningsprogram
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Översättare
 Tree;Träd
 Tree & Text;Träd & Text
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;Typ
 UniqueID;Unikt ID
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;95
-ZZ_AutomaticLanguage_Percent;95
+ZZ_Automatic_Percent;93
+ZZ_AutomaticLanguage_Percent;93

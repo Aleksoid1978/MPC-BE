@@ -1877,9 +1877,9 @@ void File__Analyze::Get_MacRoman(int64u Bytes, Ztring& Info, const char* Name)
     // Use From_MacRoman() after new ZenLib release
     const int8u* Input=Buffer+Buffer_Offset+(size_t)Element_Offset;
 
-    wchar_t* Temp=new wchar_t[Bytes+1];
+    wchar_t* Temp=new wchar_t[Bytes];
 
-    for (size_t Pos=0; Pos<=Bytes; Pos++)
+    for (size_t Pos=0; Pos<Bytes; Pos++)
     {
         if (Input[Pos]>=0x80)
             Temp[Pos]=(wchar_t)Ztring_MacRoman[Input[Pos]-0x80];
@@ -1887,7 +1887,7 @@ void File__Analyze::Get_MacRoman(int64u Bytes, Ztring& Info, const char* Name)
             Temp[Pos]=(wchar_t)Input[Pos];
     }
 
-    Info.From_Unicode(Temp);
+    Info.From_Unicode(Temp, Bytes);
     delete[] Temp;
 
     if (Trace_Activated && Bytes) Param(Name, Info);

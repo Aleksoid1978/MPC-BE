@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Tömörítési arány
 Conductor;Vezényel
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Gyűjtő és általános adatok
@@ -311,6 +312,8 @@ DistributedBy;Terjesztő
 Distributor;
 Donate;Adomány
 DotsPerInch;
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Időtartam
 Duration_End;
 Duration_Start;
@@ -358,6 +361,7 @@ FolderName;Mappanév
 Format;Formátum
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;Formátum leírás
 Format_Info;A kódek részletei
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;horvát
 Language_ht;haiti
 Language_hu;magyar
 Language_hy;örmény
+Language_hy-az;
 Language_hz;herero
 Language_ia;interlingua
 Language_id;indonéz
@@ -754,10 +759,12 @@ Language_mi;maori 
 Language_mk;macedón
 Language_ml;malajziai
 Language_mn;mongol
+Language_mn-cn;
 Language_mo;moldáv
 Language_More;Nyelv, további adatok
 Language_mr;marathi
 Language_ms;maláj
+Language_ms-bn;
 Language_mt;máltai
 Language_mul;Többnyelvű
 Language_my;burmai
@@ -767,6 +774,7 @@ Language_nd; 
 Language_ne;nepáli
 Language_ng; 
 Language_nl;holland
+Language_nl-be;
 Language_nn;norvég bokmál
 Language_no;norvég
 Language_nr; 
@@ -798,6 +806,7 @@ Language_si;szingaléz
 Language_sk;szlovák
 Language_sl;szlovén
 Language_sm;szamoai
+Language_smi;
 Language_sn; 
 Language_so;szomáli
 Language_sq;albán
@@ -844,6 +853,24 @@ Library;Keverőkönyvtár
 Lightness;Fényesség
 LineUpStart;
 List;Lista
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Szövegíró
 Lyrics;Dalszöveg
 Mastered_Date;Mesterpéldány kelte
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Visszajátszás erősítése
 ReplayGain_Peak;Visszajátszás csúcserősítése
 Resolution;Felbontás
 s; mp
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;Mintavételezési gyakoriság
@@ -1049,6 +1078,7 @@ Stream;Sáv
 Stream_MoreInfo;Több adat a sávról
 StreamCount;A hasonló fajtájú sávok száma
 StreamID;Sávazonosító
+streamIdentifier;
 StreamKind;Sáv fajtája
 StreamKindID;Sáv fajta azonosító
 StreamKindPos;Sáv fajta sorszáma
@@ -1065,7 +1095,7 @@ SubTrack;Alsáv
 Summary;Kivonat
 Supported formats;Támogatott formátumok
 Supported?;Támogatott?
-SupportUs_Android;
+SupportUs;
 Synopsis;Áttekintés
 SystemId;Azonosító
 Tagged_Application;Jelölő alkalmazás
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Fordító
 Tree;Fa
 Tree & Text;Fa és szöveg
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;84
+ZZ_Automatic_Percent;73
+ZZ_AutomaticLanguage_Percent;82

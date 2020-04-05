@@ -297,26 +297,17 @@ void File_DvDif::Read_Buffer_Continue()
                               QU_FSC    =(Buffer[Buffer_Offset+1  ]&0x08)?true:false; //FSC
                               QU_System =(Buffer[Buffer_Offset+3+3]&0x20)?true:false; //50/60
 
+                        uint8_t Dseq    =Buffer[Buffer_Offset+1]>>4;
                         int8u AUDIO_MODE=Buffer[Buffer_Offset+3+2]&0x0F;
                               SMP       =(Buffer[Buffer_Offset+3+4]>>3)&0x07;
                               QU        =Buffer[Buffer_Offset+3+4]&0x07;
 
-                        size_t Channel=(QU_FSC?2:0)+((Buffer[Buffer_Offset+1]>>4)>=(QU_System?6:5)?1:0); //If Dseq>=5 or 6
-                        if (audio_source_IsPresent.empty())
-                            audio_source_IsPresent.resize(8);
-                        audio_source_IsPresent[Channel]=true;
-                        audio_source_IsPresentInFrame.set(Channel);
-
-                        if (AUDIO_MODE==0x0F)
-                        {
-                            if (Audio_Invalids.empty())
-                            {
-                                Audio_Invalids.resize(8);
-                                for (size_t Pos=0; Pos<8; Pos++)
-                                    Audio_Invalids[Pos].resize(16);
-                            }
-                            Audio_Invalids[Channel][Buffer[Buffer_Offset+1]>>4]+=9;
-                        }
+                        size_t ChannelGroup=(QU_FSC?1:0);
+                        if (ChannelGroup>=audio_source_mode.size())
+                            audio_source_mode.resize(ChannelGroup+1);
+                        if (audio_source_mode[ChannelGroup].empty())
+                            audio_source_mode[ChannelGroup].resize(Dseq_Count, (int8u)-1);
+                        audio_source_mode[ChannelGroup][Dseq]=AUDIO_MODE;
                     }
 
                     //audio_source_control
@@ -393,14 +384,34 @@ void File_DvDif::Read_Buffer_Continue()
                     //Audio errors
                     if (Buffer[Buffer_Offset+8]==0x80)
                     {
-                        if ((QU==0 && Buffer[Buffer_Offset+ 9]==0x00)  //16-bit 0x8000
-                         || (QU==1 && Buffer[Buffer_Offset+10]==0x00)  //12-bit 0x800
-                         || (QU==(int8u)-1 && ((Buffer[Buffer_Offset+ 9]==0x00 && Buffer[Buffer_Offset+10]==0x80 && Buffer[Buffer_Offset+11]==0x00)
-                                            || (Buffer[Buffer_Offset+ 9]==0x80 && Buffer[Buffer_Offset+10]==0x00)))) //In case of QU is not already detected
+                        bool Contains_8000=true;
+                        bool Contains_800800=true;
+                        for (size_t i=8; i<80; i+=2)
+                            if (Buffer[Buffer_Offset+i]  !=0x80
+                             || Buffer[Buffer_Offset+i+1]!=0x00)
+                            {
+                                Contains_8000=false;
+                                break;
+                            }
+                        for (size_t i=8; i<80; i+=3)
+                            if (Buffer[Buffer_Offset+i]  !=0x80
+                             || Buffer[Buffer_Offset+i+1]!=0x80
+                             || Buffer[Buffer_Offset+i+2]!=0x00)
+                            {
+                                Contains_800800=false;
+                                break;
+                            }
+                        if ((/*QU==0 &&*/ Contains_8000)    //16-bit 0x8000
+                         || (QU==1 && Contains_800800)  //12-bit 0x800
+                         || (QU==(int8u)-1 && (Contains_8000 || Contains_800800))) //In case of QU is not already detected
                         {
-                            if (Audio_Errors.empty())
-                                Audio_Errors.resize(16);
-                            Audio_Errors[Buffer[Buffer_Offset+1]>>4]++;
+                            uint8_t Channel=(Buffer[Buffer_Offset+1]&0x08)?1:0; //FSC
+                            uint8_t Dseq=Buffer[Buffer_Offset+1]>>4;
+                            if (Channel>=Audio_Errors.size())
+                                Audio_Errors.resize(Channel+1);
+                            if (Audio_Errors[Channel].empty())
+                                Audio_Errors[Channel].resize(Dseq_Count);
+                            Audio_Errors[Channel][Dseq]++;
                         }
                     }
                 }
@@ -482,6 +493,45 @@ void File_DvDif::Errors_Stats_Update()
         bool Errors_AreDetected=false;
         bool Infos_AreDetected=false;
         bool Arb_AreDetected=false;
+
+        bitset<ChannelGroup_Count*2> NewChannelInfo;
+        if (QU!=(int8u)-1)
+        {
+            const size_t DseqSpan=QU_System?6:5;
+            for (size_t ChannelGroup=0; ChannelGroup<ChannelGroup_Count; ChannelGroup++)
+            {
+                /* // To be used if we want detect CH1 vs CH2 (especially for 12-bit)
+                for (size_t Channel=0; Channel<2; Channel++)
+                {
+                    const size_t Dseq_Begin=Channel?DseqSpan:0;
+                    const size_t Dseq_End=Dseq_Begin+DseqSpan;
+                    for (int8u Dseq=Dseq_Begin; Dseq<Dseq_End; Dseq++)
+                    {
+                        if (ChannelGroup<audio_source_mode.size() && !audio_source_mode[ChannelGroup].empty() && audio_source_mode[ChannelGroup][Dseq]!=(int8u)-1)
+                        {
+                            NewAudioChannelCount++;
+                            break;
+                        }
+                    }
+                }
+                */
+                const size_t Dseq_Begin=0;
+                const size_t Dseq_End=Dseq_Begin+DseqSpan*2;
+                for (int8u Dseq=Dseq_Begin; Dseq<Dseq_End; Dseq++)
+                {
+                    if (ChannelGroup<audio_source_mode.size() && !audio_source_mode[ChannelGroup].empty() && audio_source_mode[ChannelGroup][Dseq]!=(int8u)-1)
+                    {
+                        NewChannelInfo.set(ChannelGroup*2);
+                        NewChannelInfo.set(ChannelGroup*2+1);
+                        break;
+                    }
+                }
+            }
+            
+            // Update channel count only if we not 0 and if we find no error
+            if (NewChannelInfo.count())
+                ChannelInfo=NewChannelInfo;
+        }
 
         EVENT_BEGIN(DvDif, Change, 0)
             Event.StreamOffset=Speed_FrameCount_StartOffset;
@@ -581,7 +631,7 @@ void File_DvDif::Errors_Stats_Update()
                 Event.VideoRate_N=0;
                 Event.VideoRate_D=0;
             }
-            if (audio_source_IsPresentInFrame.count())
+            if (ChannelInfo.count())
             {
                 switch(SMP)
                 {
@@ -590,13 +640,21 @@ void File_DvDif::Errors_Stats_Update()
                     case 2:Event.AudioRate_N=32000; break;
                     default:Event.AudioRate_N=0;
                 }
-                Event.AudioRate_D=(SMP<=2)?1:0;
-                Event.AudioChannels=audio_source_IsPresentInFrame.count();
+                Event.AudioRate_D=Event.AudioRate_N?1:0;
+                ;
                 switch(QU)
                 {
-                    case 0:Event.AudioBitDepth=16; break;
-                    case 1:Event.AudioBitDepth=12; break;
-                    default:Event.AudioBitDepth=0;
+                    case 0:
+                            Event.AudioChannels=ChannelInfo.count();
+                            Event.AudioBitDepth=16;
+                            break;
+                    case 1:
+                            Event.AudioChannels=ChannelInfo.count()*2;
+                            Event.AudioBitDepth=12;
+                            break;
+                    default:
+                            Event.AudioChannels=0;
+                            Event.AudioBitDepth=0;
                 }
             }
             else
@@ -982,36 +1040,6 @@ void File_DvDif::Errors_Stats_Update()
             Speed_TimeStampsZ[Speed_TimeStampsZ_Pos-1].Last.Time=Speed_RecTimeZ_Last;
         }
 
-        //Channels
-        for (size_t Channel=0; Channel<8; Channel++)
-        {
-            if (!audio_source_IsPresent.empty() && audio_source_IsPresent[Channel])
-            {
-                if (Channel<4 && (!Audio_Invalids.empty() || !Audio_Errors.empty()))
-                {
-                    size_t Audio_Errors_Count=0;
-                    size_t Pos_Begin=(Channel%2)*(QU_System?6:5);
-                    size_t Pos_End=(Channel%2+1)*(QU_System?6:5);
-                    if ((Channel>=2 && !QU_FSC)
-                     || (Channel< 2 &&  QU_FSC))
-                        Pos_End=Pos_Begin; //Not here
-                    if (!Audio_Invalids.empty())
-                        for (size_t Pos=Pos_Begin; Pos<Pos_End; Pos++)
-                            if (Audio_Invalids[Channel][Pos])
-                                Audio_Errors_Count+=Audio_Invalids[Channel][Pos];
-                    if (!Audio_Errors.empty())
-                        for (size_t Pos=Pos_Begin; Pos<Pos_End; Pos++)
-                            if (Audio_Errors[Pos])
-                                Audio_Errors_Count+=Audio_Errors[Pos];
-                    if (Audio_Errors_Count>=(size_t)((QU_System?6:5)*9))
-                        audio_source_IsPresent[Channel]=false;
-                    else
-                        CH_IsPresent[Channel]=true;
-                }
-            }
-        }
-
-
         //Error 1: Video errors
         Ztring Errors_Stats_Line_Details;
         if (!Video_STA_Errors.empty())
@@ -1062,78 +1090,87 @@ void File_DvDif::Errors_Stats_Update()
         Errors_Stats_Line_Details+=__T('\t');
 
         //Error 2: Audio errors
-        if (QU!=(int8u)-1 && (!Audio_Invalids.empty() || !Audio_Errors.empty()))
+        if (QU!=(int8u)-1)
         {
             bool ErrorsAreAlreadyDetected=false;
-            for (size_t Channel=0; Channel<4; Channel++)
+            const size_t DseqSpan=QU_System?6:5;
+            for (size_t ChannelGroup=0; ChannelGroup<ChannelGroup_Count; ChannelGroup++)
             {
-                size_t Audio_Errors_Count=0;
-                Ztring Audio_Errors_Details;
-                size_t Pos_Begin=(Channel%2)*(QU_System?6:5);
-                size_t Pos_End=(Channel%2+1)*(QU_System?6:5);
-                if ((Channel>=2 && !QU_FSC)
-                 || (Channel< 2 &&  QU_FSC)
-                 || !CH_IsPresent[Channel])
-                    Pos_End=Pos_Begin; //Not here
-                for (size_t Pos=Pos_Begin; Pos<Pos_End; Pos++)
+                for (size_t Channel=0; Channel<2; Channel++)
                 {
-                    if (!Audio_Errors.empty() && Audio_Errors[Pos])
+                    size_t ChannelTotalPos=ChannelGroup*2+Channel;
+                    size_t Audio_Errors_PerChannel=0;
+                    Ztring Audio_Errors_PerChannel_Details;
+                    size_t Dseq_Begin=Channel?DseqSpan:0;
+                    size_t Dseq_End=Dseq_Begin+DseqSpan;
+                    for (int8u Dseq=Dseq_Begin; Dseq<Dseq_End; Dseq++)
                     {
-                        Audio_Errors_Count+=Audio_Errors[Pos];
-                        Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(Audio_Errors[Pos]);
+                        size_t Audio_Errors_PerDseq=0;
+                        if (ChannelGroup<audio_source_mode.size() && !audio_source_mode[ChannelGroup].empty() && audio_source_mode[ChannelGroup][Dseq]&0xF==0xF)
+                            Audio_Errors_PerDseq=9; //We consider all audio blocks as invalid if audio mode is 0xF (15)
+                        if (!Audio_Errors_PerDseq && audio_source_mode.empty() && ChannelInfo[ChannelGroup*2+Channel])
+                            Audio_Errors_PerDseq=9; //We consider all audio blocks as invalid if the frame has no audio_source for this channel but had it in the previous frames
+                        if (!Audio_Errors_PerDseq && ChannelGroup<Audio_Errors.size() && !Audio_Errors[ChannelGroup].empty())
+                            Audio_Errors_PerDseq=Audio_Errors[ChannelGroup][Dseq];
+                        if (Audio_Errors_PerDseq)
+                        {
+                            Audio_Errors_PerChannel+=Audio_Errors_PerDseq;
+                            Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(Audio_Errors_PerDseq);
+                            if (Audio_Errors_Count_Padded.size()<2)
+                                Audio_Errors_Count_Padded.insert(0, 2-Audio_Errors_Count_Padded.size(), __T(' '));
+                            Audio_Errors_PerChannel_Details+=Audio_Errors_Count_Padded;
+                            Audio_Errors_PerChannel_Details+=__T(" Dseq=");
+                            Audio_Errors_PerChannel_Details+=Ztring::ToZtring(Dseq, 16);
+                            Audio_Errors_PerChannel_Details+=__T(", ");
+                            if (Audio_Errors_TotalPerChannel.empty())
+                            {
+                                Audio_Errors_TotalPerChannel.resize(4);
+                                for (size_t Audio_Errors_Pos=0; Audio_Errors_Pos<4; Audio_Errors_Pos++)
+                                    Audio_Errors_TotalPerChannel[Audio_Errors_Pos].resize(16);
+                            }
+                            Audio_Errors_TotalPerChannel[ChannelTotalPos][Dseq]+=Audio_Errors_PerDseq;
+                        }
+                    }
+                    if (Audio_Errors_PerChannel)
+                    {
+                        if (!ErrorsAreAlreadyDetected)
+                        {
+                            if (!Stats_Total_AlreadyDetected)
+                            {
+                                Stats_Total_AlreadyDetected=true;
+                                Stats_Total++;
+                                Stats_Total_WithoutArb++;
+                            }
+                            Stats[2]++;
+                            Errors_Stats_Line+=__T('2');
+                        }
+
+                        Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(((float)Audio_Errors_PerChannel)*100/(DSF?54:45)*(QU_FSC?2:1), 2);
                         if (Audio_Errors_Count_Padded.size()<2)
                             Audio_Errors_Count_Padded.insert(0, 2-Audio_Errors_Count_Padded.size(), __T(' '));
-                        Audio_Errors_Details+=Audio_Errors_Count_Padded;
-                        Audio_Errors_Details+=__T(" Dseq=");
-                        Audio_Errors_Details+=Ztring::ToZtring(Pos, 16);
-                        Audio_Errors_Details+=__T(", ");
-                        if (Audio_Errors_Total.empty())
+                        if (ErrorsAreAlreadyDetected)
+                            Errors_Stats_Line_Details+=__T(", ");
+                        if (Audio_Errors_PerChannel<(size_t)(QU_System?54:45))
                         {
-                            Audio_Errors_Total.resize(8);
-                            for (size_t Audio_Errors_Pos=0; Audio_Errors_Pos<8; Audio_Errors_Pos++)
-                                Audio_Errors_Total[Audio_Errors_Pos].resize(16);
+                            Errors_Stats_Line_Details+=__T("CH")+Ztring::ToZtring(ChannelTotalPos+1)+__T(": ")+Audio_Errors_Count_Padded+__T("%");
+                            Audio_Errors_PerChannel_Details.resize(Audio_Errors_PerChannel_Details.size()-2);
+                            Errors_Stats_Line_Details+=__T(" (")+Audio_Errors_PerChannel_Details+__T(")");
                         }
-                        Audio_Errors_Total[Channel][Pos]+=Audio_Errors[Pos];
+                        else
+                            Errors_Stats_Line_Details+=__T("CH")+Ztring::ToZtring(ChannelTotalPos+1)+__T(": no valid DIF");
+
+                        Speed_FrameCount_Audio_Errors[ChannelTotalPos]++;
+                        ErrorsAreAlreadyDetected=true;
+                        Errors_AreDetected=true;
                     }
                 }
-                if (Audio_Errors_Count)
-                {
-                    if (!ErrorsAreAlreadyDetected)
-                    {
-                        if (!Stats_Total_AlreadyDetected)
-                        {
-                            Stats_Total_AlreadyDetected=true;
-                            Stats_Total++;
-                            Stats_Total_WithoutArb++;
-                        }
-                        Stats[2]++;
-                        Errors_Stats_Line+=__T('2');
-                    }
-
-                    Ztring Audio_Errors_Count_Padded=Ztring::ToZtring(((float)Audio_Errors_Count)*100/(DSF?54:45)*(QU_FSC?2:1), 2);
-                    if (Audio_Errors_Count_Padded.size()<2)
-                        Audio_Errors_Count_Padded.insert(0, 2-Audio_Errors_Count_Padded.size(), __T(' '));
-                    if (ErrorsAreAlreadyDetected)
-                        Errors_Stats_Line_Details+=__T(", ");
-                    if (Audio_Errors_Count<(size_t)((QU_System?6:5)*9))
-                    {
-                        Errors_Stats_Line_Details+=__T("CH")+Ztring::ToZtring(Channel+1)+__T(": ")+Audio_Errors_Count_Padded+__T("%");
-                        Audio_Errors_Details.resize(Audio_Errors_Details.size()-2);
-                        Errors_Stats_Line_Details+=__T(" (")+Audio_Errors_Details+__T(")");
-                    }
-                    else
-                        Errors_Stats_Line_Details+=__T("CH")+Ztring::ToZtring(Channel+1)+__T(": no valid DIF");
-
-                    Speed_FrameCount_Audio_Errors[Channel]++;
-                    ErrorsAreAlreadyDetected=true;
-                    Errors_AreDetected=true;
-                }
+                if (!ErrorsAreAlreadyDetected)
+                    Errors_Stats_Line+=__T(' ');
             }
-            if (!ErrorsAreAlreadyDetected)
-                Errors_Stats_Line+=__T(' ');
         }
         else
             Errors_Stats_Line+=__T(' ');
+
         Errors_Stats_Line+=__T('\t');
         Errors_Stats_Line_Details+=__T('\t');
 
@@ -1328,8 +1365,21 @@ void File_DvDif::Errors_Stats_Update()
             Event1.Errors=Event.Errors;
             Event1.Video_STA_Errors_Count=Video_STA_Errors_ByDseq.size();
             Event1.Video_STA_Errors=Video_STA_Errors_ByDseq.empty()?NULL:&Video_STA_Errors_ByDseq[0];
-            Event1.Audio_Data_Errors_Count=Audio_Errors.size();
-            Event1.Audio_Data_Errors=Audio_Errors.empty()?NULL:&Audio_Errors[0];
+            if (Audio_Errors.empty())
+            {
+                Event1.Audio_Data_Errors_Count=0;
+                Event1.Audio_Data_Errors=NULL;
+            }
+            else
+            {
+                size_t Audio_Errors_PerDseq[16]; //Per Dseq
+                memset(Audio_Errors_PerDseq, 0, sizeof(Audio_Errors_PerDseq));
+                for (size_t ChannelGroup=0; ChannelGroup<Audio_Errors.size(); ChannelGroup++)
+                    for (size_t Dseq=0; Dseq<Dseq_Count; Dseq++)
+                        Audio_Errors_PerDseq[Dseq]+=Audio_Errors[ChannelGroup][Dseq];
+                Event1.Audio_Data_Errors_Count=16;
+                Event1.Audio_Data_Errors=Audio_Errors_PerDseq;
+            }
             Config->Event_Send(NULL, (const int8u*)&Event1, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1));
             Config->Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0));
         #endif //MEDIAINFO_EVENTS
@@ -1421,12 +1471,11 @@ void File_DvDif::Errors_Stats_Update()
     Speed_Arb_Current.Clear();
     Speed_FrameCount++;
     REC_IsValid=false;
-    audio_source_IsPresentInFrame.reset();
+    audio_source_mode.clear();
     Speed_Contains_NULL=0;
     Video_STA_Errors.clear();
     Video_STA_Errors_ByDseq.clear();
     Audio_Errors.clear();
-    Audio_Invalids.clear();
     Stats_Total_AlreadyDetected=false;
 }
 
@@ -1492,9 +1541,9 @@ void File_DvDif::Errors_Stats_Update_Finnish()
     }
 
     //Error 2: Audio error code
-    if (!Audio_Errors_Total.empty())
+    if (!Audio_Errors_TotalPerChannel.empty())
     {
-        for (size_t Channel=0; Channel<8; Channel++)
+        for (size_t Channel=0; Channel<4; Channel++)
         {
             if (Speed_FrameCount_Audio_Errors[Channel])
                 Errors_Stats_End_Lines+=__T("Frame count with CH")+Ztring::ToZtring(Channel+1)+__T(" audio error code: ")+Ztring::ToZtring(Speed_FrameCount_Audio_Errors[Channel])+__T(" frames &");
@@ -1503,10 +1552,10 @@ void File_DvDif::Errors_Stats_Update_Finnish()
             size_t Errors_Count=0;
             for (size_t Pos=0; Pos<16; Pos++)
             {
-                if (Audio_Errors_Total[Channel][Pos])
+                if (Audio_Errors_TotalPerChannel[Channel][Pos])
                 {
-                    Errors_Count+=Audio_Errors_Total[Channel][Pos];
-                    Ztring Errors_Count_Padded=Ztring::ToZtring(Audio_Errors_Total[Channel][Pos]);
+                    Errors_Count+=Audio_Errors_TotalPerChannel[Channel][Pos];
+                    Ztring Errors_Count_Padded=Ztring::ToZtring(Audio_Errors_TotalPerChannel[Channel][Pos]);
                     if (Errors_Count_Padded.size()<8)
                         Errors_Count_Padded.insert(0, 8-Errors_Count_Padded.size(), __T(' '));
                     Errors_Details+=Errors_Count_Padded;

@@ -111,6 +111,8 @@ const char* Mpeg_Psi_stream_type_Format(int8u stream_type, int32u format_identif
         case 0x20 : return "AVC";
         case 0x24 :
         case 0x27 : return "HEVC";
+        case 0x2D : return "MPEG-H 3D Audio";
+        case 0x2E : return "MPEG-H 3D Audio";
         default :
             switch (format_identifier)
             {
@@ -246,6 +248,8 @@ stream_t Mpeg_Psi_stream_type_StreamKind(int32u stream_type, int32u format_ident
         case 0x0F :
         case 0x11 :
         case 0x1C :
+        case 0x2D :
+        case 0x2E :
                     return Stream_Audio;
         case 0x1D :
                     return Stream_Text;
@@ -345,6 +349,8 @@ const char* Mpeg_Psi_stream_type_Info(int8u stream_type, int32u format_identifie
         case 0x20 : return "MVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex H of ITU-T Rec. H.264 | ISO/IEC 14496-10";
         case 0x24 :
         case 0x27 : return "ITU-T Rec. H.265 | ISO/IEC 23008-2 MPEG-H Part 2 / HEVC video stream";
+        case 0x2D : return "MPEG-H 3D Audio (main)";
+        case 0x2E : return "MPEG-H 3D Audio (auxilary)";
         case 0x7F : return "IPMP stream";
         default :
             if (stream_type<=0x7F) return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 reserved";

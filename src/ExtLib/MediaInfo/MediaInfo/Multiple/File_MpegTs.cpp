@@ -825,10 +825,67 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
             //TS info
             for (std::map<std::string, ZenLib::Ztring>::iterator Info=Temp->Infos.begin(); Info!=Temp->Infos.end(); ++Info)
             {
-                if (Retrieve((stream_t)StreamKind, StreamPos, Info->first.c_str()).empty())
+                //Special case: Preselections
+                string First=Info->first;
+                if ((stream_t)StreamKind==Stream_Audio && First.rfind("Preselection", 12)==0 && Retrieve_Const((stream_t)Stream_Audio, StreamPos, Audio_Format)==__T("AC-4"))
+                {
+                    const ZtringListList& More=(*Stream_More)[Stream_Audio][StreamPos];
+                    size_t Count=More.size();
+                    map<int32u, int32u> ID_Mappings;
+                    int32u First_ID=Ztring().From_UTF8(First.substr(12)).To_int32u();
+                    First="Presentation"+Info->first.substr(12);
+                    size_t First_Space=First.find(' ');
+                    if (First_Space!=string::npos)
+                    {
+                        string First_AfterSpace=First.substr(First_Space+1);
+                        if (First_AfterSpace=="ID")
+                            First=First.substr(0, First_Space+1)+"PresentationID";
+                    }
+                    else
+                    {
+                        //Look for ID in descriptor
+                        std::map<std::string, ZenLib::Ztring>::iterator Info_ID=Temp->Infos.find(Info->first+" ID");
+                        if (Info_ID!=Temp->Infos.end())
+                            ID_Mappings[First_ID]=Info_ID->second.To_int32u();
+                    }
+
+                    //
+                    map<int32u, int32u>::iterator ID_Mapping=ID_Mappings.find(First_ID);
+                    if (ID_Mapping!=ID_Mappings.end())
+                        First_ID=ID_Mapping->second;
+
+                    //Look for PresentationID in descriptor
+                    size_t Pos=0;
+                    bool Pos_FoundInID=false;
+                    for (;;)
+                    {
+                        Ztring LookingFor=__T("Presentation")+Ztring::ToZtring(Pos);
+                        bool PreselectionIsFound=false;
+                        for (size_t Parameter=0; Parameter<Count; Parameter++)
+                            if (Info_Name<More[Parameter].size() && More[Parameter][Info_Name]==LookingFor)
+                            {
+                                PreselectionIsFound=true;
+                                if (Parameter+3<Count && Info_Text<More[Parameter+3].size() && More[Parameter+3][Info_Name]==LookingFor+__T(" PresentationID") && More[Parameter+3][Info_Text]==Ztring::ToZtring(First_ID))
+                                {
+                                    if (First_Space!=string::npos)
+                                        First=First.substr(First_Space);
+                                    else
+                                        First.clear();
+                                    First.insert(0, LookingFor.To_UTF8());
+                                    PreselectionIsFound=false;
+                                    break;
+                                }
+                            }
+                        if (!PreselectionIsFound)
+                            break;    
+                        Pos++;
+                    }
+                }
+
+                if (Retrieve((stream_t)StreamKind, StreamPos, First.c_str()).empty())
                 {
                     //Special case : DTS Neural
-                    if ((stream_t)StreamKind==Stream_Audio && Info->first=="Matrix_ChannelPositions" && Info->second.find(__T("DTS Neural Audio "))==0)
+                    if ((stream_t)StreamKind==Stream_Audio && First=="Matrix_ChannelPositions" && Info->second.find(__T("DTS Neural Audio "))==0)
                     {
                         int8u Channels=Retrieve(Stream_Audio, StreamPos, Audio_Channel_s_).To_int8u();
                         if (Channels)
@@ -846,10 +903,10 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                     }
                     else
                     {
-                        Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second, true);
-                        std::map<std::string, ZenLib::Ztring>::iterator Option=Temp->Infos_Option.find(Info->first.c_str());
+                        Fill((stream_t)StreamKind, StreamPos, First.c_str(), Info->second, true);
+                        std::map<std::string, ZenLib::Ztring>::iterator Option=Temp->Infos_Option.find(First.c_str());
                         if (Option!=Temp->Infos_Option.end())
-                            Fill_SetOptions((stream_t)StreamKind, StreamPos, Info->first.c_str(), Option->second.To_UTF8().c_str());
+                            Fill_SetOptions((stream_t)StreamKind, StreamPos, First.c_str(), Option->second.To_UTF8().c_str());
                     }
                 }
                 else if (Info->first=="CodecID")
@@ -1364,7 +1421,7 @@ void File_MpegTs::Streams_Finish()
         File__Duplicate_Streams_Finish();
     #endif //MEDIAINFO_DUPLICATE
 
-    #if MEDIAINFO_IBICREATE
+    #if MEDIAINFO_IBIUSAGE
         if (!IsSub && Config_Ibi_Create)
         {
             for (ibi::streams::iterator IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); ++IbiStream_Temp)

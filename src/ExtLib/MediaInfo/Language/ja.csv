@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;圧縮解像度
 Conductor;コンダクター
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;コンテナと全般情報
@@ -311,6 +312,8 @@ DistributedBy;ディストリビュート by
 Distributor;
 Donate;寄付
 DotsPerInch;ドット/インチ
+DrcSets_Count;
+DrcSets_Effects;
 Duration;ながさ
 Duration_End;終了時間
 Duration_Start;開始時間
@@ -358,6 +361,7 @@ FolderName;フォルダー名
 Format;フォーマット
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;詳細
 Format_Info;情報
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Croatian
 Language_ht;Haitian
 Language_hu;Hungarian
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Auxiliary Language Association
 Language_id;Indonesian
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;さらに
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;複数言語
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;オランダ語
+Language_nl-be;
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;ライブラリ
 Lightness;明るさ
 LineUpStart;
 List;リスト
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;作詞
 Lyrics;歌詞
 Mastered_Date;マスタリング日
@@ -992,6 +1019,8 @@ ReplayGain_Gain;リプレイゲイン ゲイン
 ReplayGain_Peak;リプレイ ゲイン ピーク
 Resolution;解像度
 s;秒
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;サンプルレート
@@ -1049,6 +1078,7 @@ Stream;ストリーム
 Stream_MoreInfo;このストリームの詳細情報
 StreamCount;この種類のストリーム数
 StreamID;ストリーム ID
+streamIdentifier;
 StreamKind;ストリーム種
 StreamKindID;ID
 StreamKindPos;ポジション
@@ -1065,7 +1095,7 @@ SubTrack;サブトラック
 Summary;サマリー
 Supported formats;対応フォーマット
 Supported?;サポート？
-SupportUs_Android;
+SupportUs;
 Synopsis;Synopsis
 SystemId;システム Id
 Tagged_Application;タギングツール
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;翻訳者
 Tree;ツリー
 Tree & Text;ツリーとテキスト
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;81
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;79
+ZZ_AutomaticLanguage_Percent;83

@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Без страт
 Compression_Mode_Lossy;Са стратамі
 Compression_Ratio;Ступень сціску
 Conductor;Дырыжор
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Агульная інфармацыя
@@ -311,6 +312,8 @@ DistributedBy;Распаўсюджвальнік
 Distributor;
 Donate;Ахвяраваць
 DotsPerInch;Кропак на дзюйм
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Працягласць
 Duration_End;Час канчатку
 Duration_Start;Час пачатку
@@ -358,6 +361,7 @@ FolderName;Імя тэчкі
 Format;Фармат
 Format_Commercial;Камерцыйная назва
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;Апісанне фармату
 Format_Info;Падрабязна аб фармаце
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Croatian
 Language_ht;Haitian
 Language_hu;Hungarian
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Auxiliary Language Association
 Language_id;Indonesian
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;Яшчэ мовы
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Шматмоўнасць
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Dutch
+Language_nl-be;
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;Бібліятэка
 Lightness;Яркасць
 LineUpStart;
 List;Спіс
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Паэт-песеннік
 Lyrics;Тэкст песен
 Mastered_Date;Дата майстарынгу
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Нармалізатар гука
 ReplayGain_Peak;Пік нармалізатара гука
 Resolution;Вырашальнасць (Resolution)
 s;с
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Колькасць узораў
 SamplingRate;Частата
@@ -1049,6 +1078,7 @@ Stream;Струмень
 Stream_MoreInfo;Дадатковая інфармацыя аб струмені
 StreamCount;Коль-ць струменяў
 StreamID;Ідэнтыфікатар струменя
+streamIdentifier;
 StreamKind;Тып струменя
 StreamKindID;Ідэнтыфікатар струменя
 StreamKindPos;Ідэнтыфікатар струменя
@@ -1065,7 +1095,7 @@ SubTrack;Падпаток
 Summary;Зводка
 Supported formats;Падтрымліваемыя фарматы
 Supported?;Падтрымліваецца?
-SupportUs_Android;
+SupportUs;
 Synopsis;Коратка
 SystemId;Ідэнтыфікатар
 Tagged_Application;Праграма, якая пазначыла
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Перакладчык
 Tree;Дрэва
 Tree & Text;Дрэва і тэкст
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;Унікальны ідэнтыфікатар
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85

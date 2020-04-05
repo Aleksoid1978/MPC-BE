@@ -506,6 +506,8 @@ String MediaInfoList_Internal::Option (const String &Option, const String &Value
     }
     else if (OptionLower.find(__T("file_"))==0)
     {
+        for (size_t i=0; i<Info.size(); i++) //Applies to both past and future items
+            Info[i]->Option(Option, Value);
         Config_MediaInfo_Items[Option]=Value;
         return __T("");
     }
