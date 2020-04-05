@@ -363,12 +363,27 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 			p += len;
 		}
 
-		if (HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr)) {
+		auto SendData = [&](HWND hWnd) {
 			COPYDATASTRUCT cds;
 			cds.dwData = 0x6ABE51;
 			cds.cbData = (DWORD)bufflen;
 			cds.lpData = buff.data();
 			SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+		};
+
+		if (HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr)) {
+			if (!bAddPlaylist) {
+				DWORD dwProcessId = 0;
+				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
+					AllowSetForegroundWindow(dwProcessId);
+				}
+
+				if (IsIconic(hWnd)) {
+					ShowWindow(hWnd, SW_RESTORE);
+				}
+			}
+
+			SendData(hWnd);
 		} else {
 			CString mpcPath = GetMPCPath();
 			if (!mpcPath.IsEmpty() && HINSTANCE(HINSTANCE_ERROR) < ShellExecuteW(nullptr, nullptr, mpcPath.GetString(), nullptr, 0, SW_SHOWDEFAULT)) {
@@ -380,23 +395,8 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 					hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr);
 				}
 
-				if (hWnd && (wait_count < 200)) {
-					if (!bAddPlaylist) {
-						DWORD dwProcessId = 0;
-						if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
-							AllowSetForegroundWindow(dwProcessId);
-						}
-
-						if (IsIconic(hWnd)) {
-							ShowWindow(hWnd, SW_RESTORE);
-						}
-					}
-
-					COPYDATASTRUCT cds;
-					cds.dwData = 0x6ABE51;
-					cds.cbData = (DWORD)bufflen;
-					cds.lpData = buff.data();
-					SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+				if (hWnd) {
+					SendData(hWnd);
 				}
 			}
 		}
