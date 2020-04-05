@@ -2228,8 +2228,8 @@ start:
 
 			if (tp.second.index < track->GetSampleCount()) {
 				if (!pNext
-						|| (llabs(rtNext - rt) <= UNITS * 2 && tp.second.offset < nextOffset)
-						|| (llabs(rtNext - rt) > UNITS * 2 && rt < rtNext)) {
+						|| (llabs(rtNext - rt) <= UNITS && tp.second.offset < nextOffset)
+						|| (llabs(rtNext - rt) > UNITS && rt < rtNext)) {
 					pNext = &tp;
 					nextOffset = tp.second.offset;
 					rtNext = rt;
