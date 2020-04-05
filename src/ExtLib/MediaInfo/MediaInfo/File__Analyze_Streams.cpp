@@ -1046,6 +1046,25 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 }
 
 //---------------------------------------------------------------------------
+void File__Analyze::Fill_Dup(stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring& Value, bool Replace)
+{
+    const Ztring& OldValue=Retrieve_Const(StreamKind, StreamPos, Parameter);
+    if (Value!=OldValue)
+        Fill(StreamKind, StreamPos, Parameter, Value, Replace);
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::Fill_Measure(stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring& Value, const Ztring& Measure, bool Replace)
+{
+    string Parameter_String(Parameter);
+    Parameter_String+="/String";
+    Fill(Stream_Audio, 0, Parameter, Value, Replace);
+    Fill_SetOptions(Stream_Audio, 0, Parameter, "N NFY");
+    Fill(Stream_Audio, 0, Parameter_String.c_str(), MediaInfoLib::Config.Language_Get(Value, Measure), Replace);
+    Fill_SetOptions(Stream_Audio, 0, Parameter_String.c_str(), "Y NFN");
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring &Value, bool Replace)
 {
     //Integrity
@@ -1131,6 +1150,24 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
     }
     else
     {
+        size_t Space=Parameter_ISO.find(__T(' '));
+        size_t LastFound=(size_t)-1;
+        if (Space!=string::npos)
+        {
+            Ztring ToSearch=Parameter_ISO.substr(0, Space);
+            for (size_t i=0; i<Stream_More_Item.size(); i++)
+            {
+                if (Stream_More_Item(i, Info_Name).rfind(ToSearch, ToSearch.size())==0 && (Stream_More_Item(i, Info_Name).size()==ToSearch.size() || Stream_More_Item(i, Info_Name)[ToSearch.size()]==__T(' ')))
+                    LastFound=i;
+            }
+            if (LastFound!=(size_t)-1)
+            {
+                ZtringList ToInsert;
+                ToInsert(Info_Name)=Parameter_ISO;
+                Stream_More_Item.insert(Stream_More_Item.begin()+LastFound+1, ToInsert);
+            }
+        }
+
         Ztring &Target= Stream_More_Item(Parameter_ISO, Info_Text);
         if (Target.empty() || Replace)
         {
@@ -1206,7 +1243,18 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
     if (StreamKind>=Stream_Max
      || StreamPos>=(*Stream)[StreamKind].size()
      || Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size()+(*Stream_More)[StreamKind][StreamPos].size())
+    {
+        if (StreamKind<sizeof(Fill_Temp)/sizeof(vector<fill_temp_item>))
+        {
+            Ztring Parameter_Local;
+            Parameter_Local.From_Number(Parameter);
+            for (size_t Pos=0; Pos<Fill_Temp[StreamKind].size(); Pos++)
+                if (Fill_Temp[StreamKind][Pos].Parameter==Parameter_Local)
+                    return Fill_Temp[StreamKind][Pos].Value;
+        }
+
         return MediaInfoLib::Config.EmptyString_Get();
+    }
 
     if (Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size())
     {
@@ -1219,7 +1267,7 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
 
-    if (Parameter>=(*Stream)[StreamKind][StreamPos].size())
+    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter>=(*Stream)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter);
 }
@@ -1244,7 +1292,7 @@ Ztring File__Analyze::Retrieve (stream_t StreamKind, size_t StreamPos, size_t Pa
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
 
-    if (Parameter>=(*Stream)[StreamKind][StreamPos].size())
+    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter>=(*Stream)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter);
 }
@@ -1254,7 +1302,6 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
 {
     //Integrity
     if (StreamKind>=Stream_Max
-     || StreamPos>=(*Stream)[StreamKind].size()
      || Parameter==NULL
      || Parameter[0]=='\0')
         return MediaInfoLib::Config.EmptyString_Get();
@@ -1265,11 +1312,21 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
     size_t Parameter_Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Parameter_Local);
     if (Parameter_Pos==Error)
     {
+        if (StreamPos==(*Stream)[StreamKind].size())
+        {
+            for (size_t Pos=0; Pos<Fill_Temp[StreamKind].size(); Pos++)
+                if (Fill_Temp[StreamKind][Pos].Parameter==Parameter_Local)
+                    return Fill_Temp[StreamKind][Pos].Value;
+        }
+        if (StreamPos>=(*Stream)[StreamKind].size())
+            return MediaInfoLib::Config.EmptyString_Get();
         Parameter_Pos=(*Stream_More)[StreamKind][StreamPos].Find(Parameter_Local);
         if (Parameter_Pos==Error)
             return MediaInfoLib::Config.EmptyString_Get();
         return (*Stream_More)[StreamKind][StreamPos](Parameter_Pos, 1);
     }
+    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter_Pos>=(*Stream)[StreamKind][StreamPos].size())
+        return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter_Pos);
 }
 
@@ -1294,6 +1351,8 @@ Ztring File__Analyze::Retrieve (stream_t StreamKind, size_t StreamPos, const cha
             return MediaInfoLib::Config.EmptyString_Get();
         return (*Stream_More)[StreamKind][StreamPos](Parameter_Pos, 1);
     }
+    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter_Pos>=(*Stream)[StreamKind][StreamPos].size())
+        return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter_Pos);
 }
 
@@ -2460,6 +2519,18 @@ void File__Analyze::Value_Value123(stream_t StreamKind, size_t StreamPos, size_t
     {
         //Filling
         List2.push_back(MediaInfoLib::Config.Language_Get(List[Pos], MediaInfoLib::Config.Info_Get(StreamKind).Read(Parameter, Info_Measure)));
+
+        //Special case : Audio Channels with ChannelMode
+        if (StreamKind==Stream_Audio && Parameter==Audio_Channel_s_)
+        {
+            const Ztring& ChannelMode=Retrieve_Const(Stream_Audio, StreamPos, "ChannelMode");
+            if (ChannelMode.size()>3 || (ChannelMode.size()==3 && ChannelMode[2]!=__T('0')))
+            {
+                List2[List2.size()-1]+=__T(" (");
+                List2[List2.size()-1]+=ChannelMode;
+                List2[List2.size()-1]+=__T(")");
+            }
+        }
     }
 
     //Special case : audio with samples per frames

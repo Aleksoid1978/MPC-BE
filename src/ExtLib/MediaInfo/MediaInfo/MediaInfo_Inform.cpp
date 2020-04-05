@@ -466,6 +466,16 @@ Ztring MediaInfo_Internal::Inform()
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_TEXT_YES) || defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_CSV_YES) || defined(MEDIAINFO_CUSTOM_YES)
+#if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
+namespace
+{
+struct nested
+{
+    std::vector<Node*>* Target;
+    Ztring Name;
+};
+}
+#endif //MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
 Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool IsDirect)
 {
     //Integrity
@@ -521,13 +531,18 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
              Text=false;
         #endif //defined(MEDIAINFO_CSV_YES)
         #endif //defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_CSV_YES))
-        size_t Size=Count_Get(StreamKind, StreamPos);
-        bool IsExtra=false;
 
         #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
         std::vector<Node*> Fields;
+        std::vector<Node*>* Fields_Current=&Fields;
+        std::vector<Node*>* Extra=NULL;
+        std::vector<nested> Nested;
+        bool ExpandSub=Config.File_ExpandSubs_Get();
+        if ((XML_0_7_78 || JSON) && ExpandSub)
+            Config.File_ExpandSubs_Set(false);
         #endif //MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
 
+        size_t Size = Count_Get(StreamKind, StreamPos);
         for (size_t Champ_Pos=0; Champ_Pos<Size; Champ_Pos++)
         {
             //Pour chaque champ
@@ -557,11 +572,11 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
             {
                 #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
                 //Extra
-                if ((XML_0_7_78 || JSON) && !IsExtra && Champ_Pos>=Stream[StreamKind][StreamPos].size())
+                if ((XML_0_7_78 || JSON) && !Extra && Champ_Pos>=Stream[StreamKind][StreamPos].size())
                 {
-                     IsExtra=true;
-                     Node* Node_Extra=new Node("extra");
-                     Fields.push_back(Node_Extra);
+                    Node* Node_Extra=new Node("extra");
+                    Fields.push_back(Node_Extra);
+                    Fields_Current=Extra=&Node_Extra->Childs;
                 }
                 #endif //defined(MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
 
@@ -573,6 +588,60 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 #endif //MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
 
                     Nom=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Name); //Texte n'existe pas
+
+                //Subs
+                #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
+                if (XML || JSON)
+                {
+                    const Ztring& NextName=Get((stream_t)StreamKind, StreamPos, Champ_Pos+1, Info_Name);
+                    size_t Nom_ToErase=0;
+
+                    if (!Nested.empty())
+                    {
+                        nested& LastNested=Nested[Nested.size()-1];
+                        while(!Nested.empty()
+                         && !(Nom.size()>LastNested.Name.size() && !Nom.rfind(LastNested.Name, LastNested.Name.size()) && Nom[LastNested.Name.size()]==__T(' ')))
+                        {
+                            Fields_Current=LastNested.Target;
+                            Nested.pop_back();
+                            if (Nested.empty())
+                                break;
+                            LastNested=Nested[Nested.size()-1];
+                        }
+                        if (Nested.empty())
+                        {
+                            if (Extra)
+                                Fields_Current=Extra;
+                            else
+                                Fields_Current=&Fields;
+                        }
+                        else
+                            Nom_ToErase=LastNested.Name.size()+1;
+                    }
+
+                    if (NextName.size()>Nom.size() && !NextName.rfind(Nom, Nom.size()) && NextName[Nom.size()]==__T(' '))
+                    {
+                        string SubName=Nom.To_UTF8();
+                        size_t Space=SubName.rfind(' ');
+                        if (Space!=(size_t)-1)
+                            SubName.erase(0, Space+1);
+                        size_t NumbersPos=SubName.find_last_not_of("0123456789");
+                        if (NumbersPos!=(size_t)-1)
+                            SubName.resize(NumbersPos+1);
+                        bool IsArray=(NextName.size()==Nom.size()+4 && NextName.find(__T(" Pos"), Nom.size())==Nom.size());
+                        Node* Node_Sub=new Node(SubName.c_str(), IsArray);
+                        Fields_Current->push_back(Node_Sub);
+                        Nested.resize(Nested.size()+1);
+                        nested& LastNested=Nested[Nested.size()-1];
+                        LastNested.Name=Nom;
+                        LastNested.Target=Fields_Current;
+                        Fields_Current=&Node_Sub->Childs;
+                        continue;
+                    }
+                    Nom.erase(0, Nom_ToErase);
+                }
+                #endif // defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
+
                 #if defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES) || defined(MEDIAINFO_CSV_YES))
                 if (Text)
                 #endif //defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES) || defined(MEDIAINFO_CSV_YES))
@@ -614,8 +683,13 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 #if defined(MEDIAINFO_HTML_YES)
                 if (HTML)
                 {
+                    size_t Level=Nom.find_first_not_of(__T(" "));
+                    Ztring Prefix;
+                    for (size_t Pos=0; Pos<Level; Pos++)
+                        Prefix+=__T("&nbsp;");
+
                     Retour+=__T("  <tr>\n    <td><i>");
-                    Retour+=Nom;
+                    Retour+=Prefix+Nom.TrimLeft();
                     Retour+=__T(" :</i></td>\n    <td colspan=\"3\">");
                     Retour+=Valeur;
                     Retour+=__T("</td>\n  </tr>");
@@ -663,7 +737,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                         Node_Current->Value="(Binary data)";
                     else
                         Node_Current->Value=Valeur.To_UTF8();
-                    IsExtra?Fields.back()->Childs.push_back(Node_Current):Fields.push_back(Node_Current);
+                    Fields_Current->push_back(Node_Current);
 
                     if (!Format_Profile_More.empty())
                     {
@@ -673,14 +747,14 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                         if (SeparatorPos!=string::npos)
                         {
                             Node_Current=new Node("Format_Level", Ztring(Format_Profile_More.substr(0, SeparatorPos)).To_UTF8());
-                            IsExtra?Fields.back()->Childs.push_back(Node_Current):Fields.push_back(Node_Current);
+                            Fields_Current->push_back(Node_Current);
                             Node_Current=new Node("Format_Tier", Ztring(Format_Profile_More.substr(SeparatorPos+1)).To_UTF8());
-                            IsExtra?Fields.back()->Childs.push_back(Node_Current):Fields.push_back(Node_Current);
+                            Fields_Current->push_back(Node_Current);
                         }
                         else
                         {
                             Node_Current=new Node("Format_Level", Format_Profile_More.To_UTF8());
-                            IsExtra?Fields.back()->Childs.push_back(Node_Current):Fields.push_back(Node_Current);
+                            Fields_Current->push_back(Node_Current);
                         }
                     }
                 }
@@ -705,29 +779,16 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
             }
         }
         #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
+        if (ExpandSub)
+            Config.File_ExpandSubs_Set(true);
         for (size_t Field=0; Field < Fields.size(); Field++)
         {
-            if (Fields[Field]->Name == "extra")
-            {   std::string TmpRetour;
-                for (size_t Field2=0; Field2 < Fields[Field]->Childs.size(); Field2++)
-                    if (XML)
-                        TmpRetour+=To_XML(*(Fields[Field]->Childs[Field2]), 1, false, false);
-                    else if (JSON)
-                        TmpRetour+=To_JSON(*(Fields[Field]->Childs[Field2]), 1, false, false)+(Field2<Fields[Field]->Childs.size()-1?",\n":"");
-
-                Fields[Field]->Childs.clear();
-                Node* Node_Raw=new Node();
-                Node_Raw->RawContent=TmpRetour;
-                Fields[Field]->Childs.push_back(Node_Raw);
-            }
-
             if (XML)
                 Retour+=Ztring().From_UTF8(To_XML(*(Fields[Field]), 1, false, false));
             else if (JSON)
                 Retour+=Ztring().From_UTF8(To_JSON(*(Fields[Field]), 1, false, false)+(Field<Fields.size()-1?",\n":""));
             delete Fields[Field];
         }
-
         #endif //defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
         ConvertRetour(Retour);
 

@@ -116,6 +116,8 @@ static const char* Xml_Extra_N_NIY[] =
 {
     "BedChannelCount",
     "BitRate_Instantaneous",
+    "Pos",
+    "Index",
     "page_id",
     "region_depth",
     "region_height",
@@ -200,6 +202,15 @@ static const extra_array Xml_Extra_Array[] =
     { Xml_Extra_N_NT,                   "N NT" },
     { NULL, NULL },
 };
+
+namespace 
+{
+    struct nested
+{
+    XMLElement* Target;
+    string Name;
+};
+}
 
 //***************************************************************************
 // Constructor/Destructor
@@ -326,22 +337,47 @@ bool File_MiXml::FileHeader_Begin()
                                         else
                                         {
                                             XMLElement* Extra = Element->FirstChildElement();
+                                            map<string, size_t> Nested_Pos;
+                                            vector<nested> Nested;
+                                            Nested.resize(1);
+                                            nested* LastNested = &Nested[0];
+                                            LastNested->Target = Extra;
+
                                             while (Extra)
                                             {
+                                                // Nested elements
+                                                if (!Extra->GetText())
+                                                {
+                                                    LastNested->Target = Extra;
+                                                    Nested.resize(Nested.size() + 1);
+                                                    LastNested = &Nested[Nested.size() - 1];
+                                                    LastNested->Name = Extra->Name();
+                                                    Extra = Extra->FirstChildElement();
+                                                    if (Nested.size() >= 2)
+                                                        LastNested->Name.insert(0, Nested[Nested.size() - 2].Name);
+                                                    if (Extra && !strcmp(Extra->Name(), "Pos") && Extra->GetText())
+                                                        LastNested->Name += Extra->GetText();
+                                                    Fill(StreamKind_Last, StreamPos_Last, LastNested->Name.c_str(), "Yes", Unlimited, true, true);
+                                                    LastNested->Name += ' ';
+                                                    LastNested->Target = NULL;
+                                                    Nested_Pos[LastNested->Name]++;
+                                                    continue;
+                                                }
+
                                                 if (strstr(Extra->Name(), "_String"))
                                                 {
                                                     Extra = Extra->NextSiblingElement();
                                                     continue;
                                                 }
 
-                                                Fill(StreamKind_Last, StreamPos_Last, Extra->Name(), Extra->GetText(), Unlimited, true, true);
+                                                Fill(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name()).c_str(), Extra->GetText(), Unlimited, true, true);
 
                                                 bool HasString=false;
                                                 for (size_t i=0; Xml_Extra_String[i].Names; i++)
                                                     for (size_t j=0; Xml_Extra_String[i].Names[j]; j++)
                                                         if (!strcmp(Extra->Name(), Xml_Extra_String[i].Names[j]))
                                                         {
-                                                            Fill(StreamKind_Last, StreamPos_Last, (string(Extra->Name())+"/String").c_str(), MediaInfoLib::Config.Language_Get(Extra->GetText(), Ztring().From_UTF8(Xml_Extra_String[i].ToAdd)), true);
+                                                            Fill(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name() + "/String").c_str(), MediaInfoLib::Config.Language_Get(Extra->GetText(), Ztring().From_UTF8(Xml_Extra_String[i].ToAdd)), true);
                                                             HasString=true;
                                                             break;
                                                         }
@@ -350,7 +386,7 @@ bool File_MiXml::FileHeader_Begin()
                                                     for (size_t j=0; Xml_Extra_Array[i].Names[j]; j++)
                                                         if (!strcmp(Extra->Name(), Xml_Extra_Array[i].Names[j]))
                                                         {
-                                                            Fill_SetOptions(StreamKind_Last, StreamPos_Last, Extra->Name(), Xml_Extra_Array[i].Options);
+                                                            Fill_SetOptions(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name()).c_str(), Xml_Extra_Array[i].Options);
                                                             if (HasString)
                                                             {
                                                                 string Options(Xml_Extra_Array[i].Options);
@@ -365,7 +401,7 @@ bool File_MiXml::FileHeader_Begin()
                                                                     }
                                                                 Options[InfoOption_ShowInInform]=Show;
                                                                 Options[InfoOption_ShowInXml]='N';
-                                                                Fill_SetOptions(StreamKind_Last, StreamPos_Last, (string(Extra->Name())+"/String").c_str(), Options.c_str());
+                                                                Fill_SetOptions(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name() + "/String").c_str(), Options.c_str());
                                                             }
                                                             break;
                                                         }
@@ -375,8 +411,8 @@ bool File_MiXml::FileHeader_Begin()
                                                     size_t dsurmod=Ztring().From_UTF8(Extra->GetText()).To_int32u();
                                                     if (dsurmod<4)
                                                     {
-                                                        Fill(StreamKind_Last, StreamPos_Last, "dsurmod/String", AC3_Surround[dsurmod]);
-                                                        Fill_SetOptions(StreamKind_Last, StreamPos_Last, "dsurmod/String", "N NTN");
+                                                        Fill(StreamKind_Last, StreamPos_Last, (LastNested->Name + "dsurmod/String").c_str(), AC3_Surround[dsurmod]);
+                                                        Fill_SetOptions(StreamKind_Last, StreamPos_Last, (LastNested->Name + "dsurmod/String").c_str(), "N NTN");
                                                     }
                                                 }
 
@@ -386,12 +422,38 @@ bool File_MiXml::FileHeader_Begin()
                                                     for (int8u i=0; i<8; i++)
                                                         if (!strcmp(ServiceKind, AC3_Mode[i]))
                                                         {
-                                                            Fill(Stream_Audio, 0, Audio_ServiceKind_String, AC3_Mode_String[i]);
+                                                            Fill(Stream_Audio, 0, (LastNested->Name + "ServiceKind/String").c_str(), AC3_Mode_String[i]);
                                                             break;
                                                         }
                                                 }
 
+                                                if (!strncmp(Extra->Name(), "LinkedTo_", 9))
+                                                {
+                                                    string Name=Extra->Name();
+                                                    if (Name.find("_Pos", Name.size() - 4) == Name.size() - 4)
+                                                    {
+                                                        ZtringList List;
+                                                        List.Separator_Set(0, __T(" + "));
+                                                        List.Write(Ztring().From_UTF8(Extra->GetText()));
+                                                        for (size_t i = 0; i < List.size(); i++)
+                                                            if (!List[i].empty() && List[i].find_first_not_of(__T("0123456789")) == string::npos)
+                                                                List[i].From_Number(List[i].To_int64u() + 1);
+                                                        Fill_SetOptions(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name()).c_str(), "N NTY");
+                                                        Fill(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name() + "/String").c_str(), List.Read());
+                                                        Fill_SetOptions(StreamKind_Last, StreamPos_Last, (LastNested->Name + Extra->Name() + "/String").c_str(), "Y NTN");
+                                                    }
+                                                }
+
                                                 Extra = Extra->NextSiblingElement();
+                                                if (!Extra && !Nested.empty())
+                                                {
+                                                    Nested.pop_back();
+                                                    if (!Nested.empty())
+                                                    {
+                                                        LastNested = &Nested[Nested.size() - 1];
+                                                        Extra = LastNested->Target->NextSiblingElement();
+                                                    }
+                                                }
                                             }
                                         }
 

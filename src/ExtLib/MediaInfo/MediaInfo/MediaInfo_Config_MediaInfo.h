@@ -120,6 +120,10 @@ public :
     void          File_ID_OnlyRoot_Set (bool NewValue);
     bool          File_ID_OnlyRoot_Get ();
 
+    void          File_ExpandSubs_Set(bool NewValue);
+    bool          File_ExpandSubs_Get();
+    void          File_ExpandSubs_Update(void** Source);
+
     #if MEDIAINFO_ADVANCED
         void          File_IgnoreSequenceFileSize_Set (bool NewValue);
         bool          File_IgnoreSequenceFileSize_Get ();
@@ -437,6 +441,8 @@ private :
     bool                    Audio_MergeMonoStreams;
     bool                    File_Demux_Interleave;
     bool                    File_ID_OnlyRoot;
+    void*                   File_ExpandSubs_Backup;
+    void*                   File_ExpandSubs_Source;
     #if MEDIAINFO_ADVANCED
         bool                File_IgnoreSequenceFileSize;
         bool                File_IgnoreSequenceFilesCount;

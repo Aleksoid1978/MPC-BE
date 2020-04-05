@@ -25,6 +25,57 @@
 namespace MediaInfoLib
 {
 
+//---------------------------------------------------------------------------
+enum Aac_OutputChannel
+{
+    //USAC
+    CH_M_L030,
+    CH_M_R030,
+    CH_M_000,
+    CH_LFE,
+    CH_M_L110,
+    CH_M_R110,
+    CH_M_L022,
+    CH_M_R022,
+    CH_M_L135,
+    CH_M_R135,
+    CH_M_180,
+    CH_M_LSD,
+    CH_M_RSD,
+    CH_M_L090,
+    CH_M_R090,
+    CH_M_L060,
+    CH_M_R060,
+    CH_U_L030,
+    CH_U_R030,
+    CH_U_000,
+    CH_U_L135,
+    CH_U_R135,
+    CH_U_180,
+    CH_U_L090,
+    CH_U_R090,
+    CH_T_000,
+    CH_LFE2,
+    CH_L_L045,
+    CH_L_R045,
+    CH_L_000,
+    CH_U_L110,
+    CH_U_R110,
+    //MPEG-H 3D Audio
+    CH_U_L045,
+    CH_U_R045,
+    CH_M_L045,
+    CH_M_R045,
+    CH_LFE3,
+    CH_M_LSCR,
+    CH_M_RSCR,
+    CH_M_LSCH,
+    CH_M_RSCH,
+    CH_M_L150,
+    CH_M_R150,
+    CH_MAX
+};
+
 //***************************************************************************
 // Class File_Aac
 //***************************************************************************
@@ -416,7 +467,11 @@ protected :
     std::map<Ztring, drc_info>      drcInstructionsUniDrc_Data; // By id
     std::map<Ztring, loudness_info> loudnessInfo_Data[2]; // By non-album/album then by id
     int8u                           baseChannelCount;
-    int8u                           targetChannelCount;
+    struct downmix_instruction
+    {
+        int8u                       targetChannelCount;
+    };
+    std::map<int8u, downmix_instruction> downmixInstructions_Data;
     struct gain_set
     {
         int8u                       bandCount;

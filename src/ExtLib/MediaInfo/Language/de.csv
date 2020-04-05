@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Kompressions-Verhältnis
 Conductor;Leiter
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Containerformat und allgemeine Informationen
@@ -311,6 +312,8 @@ DistributedBy;Vertrieb durch
 Distributor;
 Donate;MediaInfo unterstützen
 DotsPerInch;DPI
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Dauer
 Duration_End;Endzeit
 Duration_Start;Anfangszeit
@@ -358,6 +361,7 @@ FolderName;Verzeichnisname
 Format;Format
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;Format-Beschreibung
 Format_Info;Format-Details
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Kroatisch
 Language_ht;Haitianisch
 Language_hu;Ungarisch
 Language_hy;Armenisch
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Interlingua
 Language_id;Indonesisch
@@ -754,10 +759,12 @@ Language_mi;Maorisch
 Language_mk;Mazedonisch
 Language_ml;Malajalam
 Language_mn;Mongolisch
+Language_mn-cn;
 Language_mo;Moldauisch
 Language_More;Sprache, nähere Info
 Language_mr;Marathi
 Language_ms;Malaiisch
+Language_ms-bn;
 Language_mt;Maltesisch
 Language_mul;mehrere Sprachen
 Language_my;Birmanisch
@@ -767,6 +774,7 @@ Language_nd;Nord-Ndebele
 Language_ne;Nepalesisch
 Language_ng;Ndongo
 Language_nl;Niederländisch/Holländisch
+Language_nl-be;
 Language_nn;Norwegisch Nynorsk
 Language_no;Norwegisch
 Language_nr;Süd-Ndebele
@@ -798,6 +806,7 @@ Language_si;Singhalesisch
 Language_sk;Slowakisch
 Language_sl;Slowenisch
 Language_sm;Samoanisch
+Language_smi;
 Language_sn;Shona
 Language_so;Somalisch
 Language_sq;Albanisch
@@ -844,6 +853,24 @@ Library;Muxing-Bibliothek
 Lightness;Helligkeit
 LineUpStart;
 List;Liste
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Liedtexter
 Lyrics;Liedtext
 Mastered_Date;Mastering-Datum
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Wiedergabe-Verstärkung
 ReplayGain_Peak;Wiedergabe-Verstärkung, Spitze
 Resolution;Auflösung
 s;s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;Samplingrate
@@ -1049,6 +1078,7 @@ Stream;Stream
 Stream_MoreInfo;Mehr Informationen über den Stream
 StreamCount;Anzahl der Streams dieser Art
 StreamID;Stream-ID
+streamIdentifier;
 StreamKind;Art des Streams
 StreamKindID;ID des Stream-Identifiers
 StreamKindPos;Position des Stream-Identifiers
@@ -1065,7 +1095,7 @@ SubTrack;Sub-Track
 Summary;Zusammenfassung
 Supported formats;Unterstützte Formate
 Supported?;Unterstützt?
-SupportUs_Android;
+SupportUs;
 Synopsis;Fazit
 SystemId;ID
 Tagged_Application;Tagging-Anwendung
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Übersetzer
 Tree;Baumstruktur
 Tree & Text;Baumstruktur & Text
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;81
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;79
+ZZ_AutomaticLanguage_Percent;83

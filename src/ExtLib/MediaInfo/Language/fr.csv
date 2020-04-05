@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Sans perte
 Compression_Mode_Lossy;Avec perte
 Compression_Ratio;Taux de compression
 Conductor;Chef d'orchestre
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Conteneur et informations générales
@@ -311,6 +312,8 @@ DistributedBy;Distribué par
 Distributor;
 Donate;Faire un don
 DotsPerInch;Point par pouce
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Durée
 Duration_End;Heure de fin
 Duration_Start;Heure de début
@@ -358,6 +361,7 @@ FolderName;Nom du dossier
 Format;Format
 Format_Commercial;Nom commercial
 Format_Commercial_IfAny;Nom commercial
+Format_Compression;
 Format_Description;Description du format
 Format_Info;Infos sur le format
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Croate
 Language_ht;Haïtien
 Language_hu;Hongrois
 Language_hy;Arménien
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Langue auxiliaire internationale
 Language_id;Indonésien
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macédonien
 Language_ml;Malayalam
 Language_mn;Mongol
+Language_mn-cn;
 Language_mo;Moldave
 Language_More;Langue, plus d'info
 Language_mr;Marathe
 Language_ms;Malais
+Language_ms-bn;
 Language_mt;Maltais
 Language_mul;Langues multiples
 Language_my;Birman
@@ -767,6 +774,7 @@ Language_nd;Ndébélé du Nord
 Language_ne;Népalais
 Language_ng;Ndonga
 Language_nl;Néerlandais
+Language_nl-be;
 Language_nn;Norvégien Bokmål
 Language_no;Norvégien
 Language_nr;Ndébélé du Sud
@@ -798,6 +806,7 @@ Language_si;Singhalais
 Language_sk;Slovaque
 Language_sl;Slovène
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanais
@@ -844,6 +853,24 @@ Library;Bibliotheque utilisée
 Lightness;Luminosité
 LineUpStart;
 List;Liste
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Parolier
 Lyrics;Paroles
 Mastered_Date;Date de création
@@ -990,8 +1017,12 @@ Released_Date;Date de première diffusion
 RemixedBy;Remixé par
 ReplayGain_Gain;Gain en lecture
 ReplayGain_Peak;Crête de gain en lecture
+Renew;Renouveler
+Report;Rapport
 Resolution;Résolution
 s;s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Nombre d'échantillons
 SamplingRate;Echantillonnage
@@ -1049,6 +1080,7 @@ Stream;Type de flux
 Stream_MoreInfo;Plus d'information au sujet de ce flux
 StreamCount;Nombre de pistes de ce type
 StreamID;ID de flux
+streamIdentifier;
 StreamKind;Type de flux
 StreamKindID;Identifiant du flux
 StreamKindPos;Identifiant du flux
@@ -1058,14 +1090,23 @@ StreamSize_Encoded;Taille du flux encodé
 StreamSize_Proportion;Proportion de ce flux
 Subject;Sujet
 Subscribe;S'abonner
+Subscribe_Button;S'abonner (%PRICE% pour un an)
+Subscribe_Failed;Achat annulé ou échoué
 Subscribe_Manage;Gérer l'abonnement
+Subscribe_Renew;Renouveler l'abonnement ?
+Subscribe_Renew_Price;Renouveler l'abonnement (%PRICE% pour un an)
+Subscribe_Unaviable;Impossible de récupérer les details de l'abonnement.
+Subscribe_Waiting;Abonnement en attente d'autorisation parentale
+Subscription_Active;Abonnement actif jusqu'au %DATE%
 Subscription_Android;%PRICE% par an avec une période d'essai gratuite de 3 jours.
+Subscription_Ended;Votre abonnement vient de se terminer.
+Subscription_Expired;Abonnement expiré depuis le %DATE%
 Subscription_Thanks;Abonnement détecté. Merci pour votre soutien !
 SubTrack;Sous-piste
 Summary;Résumé
 Supported formats;Formats supportés
 Supported?;Supporté?
-SupportUs_Android;Soutenez-nous. Obtenez le thème sombre et d'autres fonctionnalités à venir.
+SupportUs;Soutenez-nous. Obtenez le thème sombre et d'autres fonctionnalités à venir.
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;Application de marquage
@@ -1106,6 +1147,8 @@ Translate_Reports;Traduire les rapports
 Translator;Traducteur
 Tree;Arbre
 Tree & Text;Arbre & Texte
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;Type
 UniqueID;Identifiant unique
 UniversalAdID;
@@ -1123,6 +1166,7 @@ Video1;Première piste Vidéo
 VideoComments;
 VideoCount;Nombre de pistes vidéo
 View;Vue
+Views;Vues
 View_Hint;Change la façon de voir les informations
 Warning : more streams in the files;Attention : il y a davantage de flux dans les fichiers!
 Web;Web
@@ -1146,5 +1190,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;86
+ZZ_AutomaticLanguage_Percent;90

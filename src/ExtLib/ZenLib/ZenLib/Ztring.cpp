@@ -744,6 +744,9 @@ Ztring& Ztring::From_CC4 (const int32u S)
         int32u Value=(S&(0xFF<<i))>>i;
         if (Value<0x20)
         {
+            if (!i || (i!=24  && !(S&(0xFFFFFFFF>>(32-i)))))
+                return *this; // Trailing 0 are fine
+
             // Not valid, using 0x as fallback
             clear();
             append(__T("0x"));
@@ -766,6 +769,9 @@ Ztring& Ztring::From_CC3 (const int32u S)
         int32u Value=(S&(0xFF<<i))>>i;
         if (Value<0x20)
         {
+            if (!i || (i!=16  && !(S&(0xFFFFFF>>(24-i)))))
+                return *this; // Trailing 0 are fine
+
             // Not valid, using 0x as fallback
             clear();
             append(__T("0x"));

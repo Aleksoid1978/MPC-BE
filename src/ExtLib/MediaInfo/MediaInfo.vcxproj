@@ -105,6 +105,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Mpc.h" />
     <ClInclude Include="MediaInfo\Audio\File_MpcSv8.h" />
     <ClInclude Include="MediaInfo\Audio\File_Mpega.h" />
+    <ClInclude Include="MediaInfo\Audio\File_Mpegh3da.h" />
     <ClInclude Include="MediaInfo\Audio\File_OpenMG.h" />
     <ClInclude Include="MediaInfo\Audio\File_Opus.h" />
     <ClInclude Include="MediaInfo\Audio\File_Pcm.h" />
@@ -337,6 +338,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Mpc.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_MpcSv8.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Mpega.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Mpegh3da.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_OpenMG.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Opus.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Pcm.cpp" />

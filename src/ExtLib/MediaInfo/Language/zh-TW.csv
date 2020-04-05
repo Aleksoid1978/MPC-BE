@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;壓縮比
 Conductor;指揮
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;容器格式與一般訊息
@@ -311,6 +312,8 @@ DistributedBy;發布者
 Distributor;
 Donate;贊助
 DotsPerInch;每吋點數 (DPI)
+DrcSets_Count;
+DrcSets_Effects;
 Duration;時間長度
 Duration_End;結束時間
 Duration_Start;開始時間
@@ -358,6 +361,7 @@ FolderName;資料夾
 Format;格式
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;格式敘述
 Format_Info;格式詳細資訊
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;克羅埃西亞語 (Croatian)
 Language_ht;海地語 (Haitian)
 Language_hu;匈牙利語 (Hungarian)
 Language_hy;亞美尼亞語 (Armenian)
+Language_hy-az;
 Language_hz;赫雷羅語 (Herero)
 Language_ia;國際語 (Auxiliary Language Association)
 Language_id;印尼語 (Indonesian)
@@ -754,10 +759,12 @@ Language_mi;毛利語 (Maori)
 Language_mk;馬其頓語 (Macedonian)
 Language_ml;馬拉雅拉姆語 (Malayalam)
 Language_mn;蒙古語 (Mongolian)
+Language_mn-cn;
 Language_mo;摩達維亞語 (Moldavian)
 Language_More;語系, 詳細資訊
 Language_mr;馬拉塔語 (Marathi)
 Language_ms;馬來語 (Malay)
+Language_ms-bn;
 Language_mt;馬爾他語 (Maltese)
 Language_mul;多重語系
 Language_my;緬甸語 (Burmese)
@@ -767,6 +774,7 @@ Language_nd;北恩德貝勒語 (Ndebele)
 Language_ne;尼泊爾語 (Nepali)
 Language_ng;恩東加語 (Ndonga)
 Language_nl;荷蘭語 (Dutch)
+Language_nl-be;
 Language_nn;新挪威語 (Norwegian Bokmal)
 Language_no;挪威語 (Norwegian)
 Language_nr;南恩德貝勒語 (Ndebele)
@@ -798,6 +806,7 @@ Language_si;錫蘭語 (Sinhala)
 Language_sk;斯洛伐克語 (Slovak)
 Language_sl;斯洛維尼亞語 (Slovenian)
 Language_sm;薩摩亞語 (Samoan)
+Language_smi;
 Language_sn;紹納語 (Shona)
 Language_so;索馬利語 (Somali)
 Language_sq;阿爾巴尼亞語 (Albanian)
@@ -844,6 +853,24 @@ Library;合成函式庫
 Lightness;亮度
 LineUpStart;
 List;清單
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;作詞者
 Lyrics;歌詞
 Mastered_Date;後製日期
@@ -992,6 +1019,8 @@ ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益尖峰值
 Resolution;顏色深度
 s;秒
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;取樣率
@@ -1049,6 +1078,7 @@ Stream;串流
 Stream_MoreInfo;更多有關此串流的資訊
 StreamCount;此串流數量
 StreamID;串流ID
+streamIdentifier;
 StreamKind;串流類型
 StreamKindID;串流識別字
 StreamKindPos;串流識別字
@@ -1065,7 +1095,7 @@ SubTrack;子音軌
 Summary;摘要
 Supported formats;支援格式
 Supported?;是否支援?
-SupportUs_Android;
+SupportUs;
 Synopsis;摘要
 SystemId;識別字
 Tagged_Application;標記程式
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;翻譯
 Tree;樹狀圖
 Tree & Text;樹狀圖與文字
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;79
+ZZ_AutomaticLanguage_Percent;84

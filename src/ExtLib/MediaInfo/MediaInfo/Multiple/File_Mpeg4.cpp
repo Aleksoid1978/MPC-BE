@@ -720,7 +720,8 @@ void File_Mpeg4::Streams_Finish()
         //Fragments
         if (IsFragmented)
         {
-            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Temp->second.stts_Duration/((float)Temp->second.mdhd_TimeScale)*1000, 0, true);
+            if (Temp->second.mdhd_TimeScale)
+                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Temp->second.stts_Duration/((float)Temp->second.mdhd_TimeScale)*1000, 0, true);
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount), Temp->second.stts_FrameCount, 10, true);
         }
 
@@ -1310,7 +1311,7 @@ void File_Mpeg4::Streams_Finish()
                 CodecConfigurationBoxInfo+=__T('+');
             CodecConfigurationBoxInfo+=Ztring().From_CC4(Temp->second.CodecConfigurationBoxInfo[i]);
         }
-        Fill(StreamKind_Last, StreamPos_Last, "Codec configuration box", CodecConfigurationBoxInfo);
+        Fill(StreamKind_Last, StreamPos_Last, "CodecConfigurationBox", CodecConfigurationBoxInfo);
 
         //ES_ID
         for (File_Mpeg4_Descriptors::es_id_infos::iterator ES_ID_Info=ES_ID_Infos.begin(); ES_ID_Info!=ES_ID_Infos.end(); ES_ID_Info++)

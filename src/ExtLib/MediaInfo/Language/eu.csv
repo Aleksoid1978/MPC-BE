@@ -270,6 +270,7 @@ Compression_Mode_Lossless;Galeragabe
 Compression_Mode_Lossy;Galerakin
 Compression_Ratio;Konpresio maila
 Conductor;Gidaria
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Edukiontzia eta argibide orokorrak
@@ -311,6 +312,8 @@ DistributedBy;Banatzailea
 Distributor;
 Donate;Eman dirulaguntza bat
 DotsPerInch;Puntu hatzbeteko
+DrcSets_Count;
+DrcSets_Effects;
 Duration;Iraupena
 Duration_End;Amaiera denbora
 Duration_Start;Hasiera denbora
@@ -358,6 +361,7 @@ FolderName;Agiritegi izena
 Format;Heuskarria
 Format_Commercial;Merkatal izena
 Format_Commercial_IfAny;Merkatal izena
+Format_Compression;
 Format_Description;Heuskarriaren azalpena
 Format_Info;Heuskarriaren xehatasunak
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Kroaziera
 Language_ht;Haitiera
 Language_hu;Hungariera
 Language_hy;Armeniera
+Language_hy-az;
 Language_hz;Hereroera
 Language_ia;Hizkuntza Elkarte Laguntzailea
 Language_id;Indonesiera
@@ -754,10 +759,12 @@ Language_mi;Maoriera
 Language_mk;Mazedoniera
 Language_ml;Malayalamera
 Language_mn;Mongoliera
+Language_mn-cn;
 Language_mo;Moldabiera
 Language_More;Hizkuntza, argibide gehiago
 Language_mr;Marathiera
 Language_ms;Malaiera
+Language_ms-bn;
 Language_mt;Maltaera
 Language_mul;Hizkuntza anitz
 Language_my;Burmesera
@@ -767,6 +774,7 @@ Language_nd;Ndebelera
 Language_ne;Nepaliera
 Language_ng;Ndongaera
 Language_nl;Herbeherera
+Language_nl-be;
 Language_nn;Norbegiera Nynorsk
 Language_no;Norbegiera
 Language_nr;Ndebelera
@@ -798,6 +806,7 @@ Language_si;Sinhalaera
 Language_sk;Eslobakiera
 Language_sl;Eslobeniera
 Language_sm;Samoera
+Language_smi;
 Language_sn;Shonaera
 Language_so;Somaliera
 Language_sq;Albaniera
@@ -844,6 +853,24 @@ Library;Nahasketa liburutegia
 Lightness;Argitasuna
 LineUpStart;
 List;Zerrenda
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Abestidazlea
 Lyrics;Abestidatziak
 Mastered_Date;Masterizatze eguna
@@ -992,6 +1019,8 @@ ReplayGain_Gain;Berrirakurkea irabazia
 ReplayGain_Peak;Berrirakurkea irabazi gailurra
 Resolution;Bereizmena
 s;s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Lagin zenbatekoa
 SamplingRate;Laginketa neurria
@@ -1049,6 +1078,7 @@ Stream;Jarioa
 Stream_MoreInfo;Jarioari buruzko argibide gehiago
 StreamCount;Mota honetako jario zenbatekoa
 StreamID;Jario ID-a
+streamIdentifier;
 StreamKind;Jario Mota
 StreamKindID;Jario ezagutarazlea
 StreamKindPos;Jario ezagutarazlea
@@ -1065,7 +1095,7 @@ SubTrack;Azpibidea
 Summary;Laburpena
 Supported formats;Sostengatutako heuskarriak
 Supported?;Sostengatua?
-SupportUs_Android;
+SupportUs;
 Synopsis;Laburpena
 SystemId;Id-a
 Tagged_Application;Aplikazio etiketatzea
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Itzultzailea
 Tree;Zuhaitza
 Tree & Text;Zuhaitza eta Idazkia
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;Mota
 UniqueID;ID bakarra
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;86
+ZZ_AutomaticLanguage_Percent;87

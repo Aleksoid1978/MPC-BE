@@ -17460,6 +17460,8 @@ void File_Mxf::Subsampling_Compute(descriptors::iterator Descriptor)
 //---------------------------------------------------------------------------
 void File_Mxf::ColorLevels_Compute(descriptors::iterator Descriptor, bool Force, int32u BitDepth)
 {
+    if (Descriptor == Descriptors.end())
+        return;
     // BitDepth check
     std::map<std::string, Ztring>::iterator Info=Descriptor->second.Infos.find("BitDepth");
     if (Info!=Descriptor->second.Infos.end())
@@ -17486,7 +17488,7 @@ void File_Mxf::ColorLevels_Compute(descriptors::iterator Descriptor, bool Force,
         }
     }
 
-    if (Descriptor==Descriptors.end() || (!Force && (Descriptor->second.MinRefLevel==(int32u)-1 || Descriptor->second.MaxRefLevel==(int32u)-1) || (Descriptor->second.Type!=descriptor::Type_RGBA && Descriptor->second.ColorRange==(int32u)-1)))
+    if (!Force && (Descriptor->second.MinRefLevel==(int32u)-1 || Descriptor->second.MaxRefLevel==(int32u)-1) || (Descriptor->second.Type!=descriptor::Type_RGBA && Descriptor->second.ColorRange==(int32u)-1))
         return;
 
     // Listing values

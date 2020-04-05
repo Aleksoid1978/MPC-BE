@@ -1058,6 +1058,11 @@ public :
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, size_t         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     #endif //SIZE_T_IS_LONG
     //Fill with datas
+    void Fill_Dup (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring  &Value, bool Replace=false);
+    void Fill_Measure (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring  &Value, const Ztring& Measure, bool Replace=false);
+    inline void Fill_Measure(stream_t StreamKind, size_t StreamPos, const char* Parameter, const string&  Value, const Ztring& Measure, bool Utf8=true, bool Replace=false) {Fill_Measure(StreamKind, StreamPos, Parameter, Ztring().From_UTF8(Value.c_str(), Value.size()), Measure, Replace);}
+    inline void Fill_Measure(stream_t StreamKind, size_t StreamPos, const char* Parameter, int            Value, const Ztring& Measure, int8u Radix=10, bool Replace=false) {Fill_Measure(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Measure, Replace);}
+    inline void Fill_Measure(stream_t StreamKind, size_t StreamPos, const char* Parameter, float64        Value, const Ztring& Measure, int8u AfterComma=3, bool Replace=false) {Fill_Measure(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, AfterComma), Measure, Replace);}
     void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring  &Value, bool Replace=false);
     void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, ZtringList &Value, ZtringList& Id, bool Replace=false);
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const std::string &Value, bool Utf8=true, bool Replace=false) {if (Utf8) Fill(StreamKind, StreamPos, Parameter, Ztring().From_UTF8(Value.c_str(), Value.size())); else Fill(StreamKind, StreamPos, Parameter, Ztring().From_Local(Value.c_str(), Value.size()), Replace);}

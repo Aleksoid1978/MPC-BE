@@ -59,6 +59,9 @@
 #if defined(MEDIAINFO_MPEGA_YES)
     #include "MediaInfo/Audio/File_Mpega.h"
 #endif
+#if defined(MEDIAINFO_MPEGH3DA_YES)
+    #include "MediaInfo/Audio/File_Mpegh3da.h"
+#endif
 #if defined(MEDIAINFO_PCM_YES)
     #include "MediaInfo/Audio/File_Pcm_M2ts.h"
 #endif
@@ -3003,6 +3006,8 @@ File__Analyze* File_MpegPs::private_stream_1_ChooseParser()
                                             return ChooseParser_AC3(); //AC3/AC3+
                                         else if (Element_Size>4 && CC4(Buffer+Buffer_Offset)==0x7FFE8001)
                                             return ChooseParser_DTS(); //DTS
+                                        else if (Element_Size>4 && CC3(Buffer+Buffer_Offset)==0xC001A5)
+                                            return ChooseParser_Mpegh3da(); //MPEG-H 3D Audio
                                         else
                                             return NULL;
                         }
@@ -4507,6 +4512,29 @@ File__Analyze* File_MpegPs::ChooseParser_Mpega()
                         Parser->Fill(Stream_Audio, 0, Audio_Format_Version, "Version 2"); break;
             default   : Parser->Fill(Stream_Audio, 0, Audio_Codec,  "MPEG-A"); break;
         }
+    #endif
+    return Parser;
+}
+
+//---------------------------------------------------------------------------
+File__Analyze* File_MpegPs::ChooseParser_Mpegh3da()
+{
+    //Filling
+    #if defined(MEDIAINFO_MPEGH3DA_YES)
+        File_Mpegh3da* Parser=new File_Mpegh3da;
+        #if MEDIAINFO_DEMUX
+            if (Config->Demux_Unpacketize_Get())
+            {
+                Demux_Level=4; //Intermediate
+                Parser->Demux_Level=2; //Container
+            }
+        #endif //MEDIAINFO_DEMUX
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Audio);
+        Parser->Fill(Stream_Audio, 0, Audio_Format, "MPEG-H 3D Audio");
     #endif
     return Parser;
 }

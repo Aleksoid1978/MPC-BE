@@ -734,6 +734,9 @@
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_MPEGA_NO) && !defined(MEDIAINFO_MPEGA_YES)
     #define MEDIAINFO_MPEGA_YES
 #endif
+#if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_MPEGHA_NO) && !defined(MEDIAINFO_MPEGH3DA_YES)
+    #define MEDIAINFO_MPEGH3DA_YES
+#endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_OPENMG_NO) && !defined(MEDIAINFO_OPENMG_YES)
     #define MEDIAINFO_OPENMG_YES
 #endif

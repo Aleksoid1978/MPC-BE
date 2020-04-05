@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;압축률
 Conductor;지휘자
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;컨테이너와 일반 정보
@@ -311,6 +312,8 @@ DistributedBy;배포
 Distributor;
 Donate;기부하기
 DotsPerInch;인치당 도트
+DrcSets_Count;
+DrcSets_Effects;
 Duration;길이
 Duration_End;종료 시간
 Duration_Start;시작 시간
@@ -358,6 +361,7 @@ FolderName;폴더명
 Format;포맷
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;포맷 설명
 Format_Info;포맷 정보
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Croatian
 Language_ht;Haitian
 Language_hu;Hungarian
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Auxiliary Language Association
 Language_id;Indonesian
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;언어, 추가 정보
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Multiple languages
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Dutch
+Language_nl-be;
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;Muxing 라이브러리
 Lightness;밝기
 LineUpStart;
 List;목록
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;작사가
 Lyrics;가사
 Mastered_Date;마스터 날짜
@@ -992,6 +1019,8 @@ ReplayGain_Gain;재생 게인
 ReplayGain_Peak;재생 게인 피크
 Resolution;해상도
 s;초
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;샘플링레이트
@@ -1049,6 +1078,7 @@ Stream;스트림
 Stream_MoreInfo;이 스트림에 대한 자세한 정보
 StreamCount;이 종류의 스트림 개수
 StreamID;스트림 ID
+streamIdentifier;
 StreamKind;스트림 종류
 StreamKindID;스트림 ID
 StreamKindPos;스트림 ID
@@ -1065,7 +1095,7 @@ SubTrack;서브트랙
 Summary;요약
 Supported formats;지원하는 포맷
 Supported?;지원?
-SupportUs_Android;
+SupportUs;
 Synopsis;시놉시스
 SystemId;Id
 Tagged_Application;태깅 어플리케이션
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;번역
 Tree;트리
 Tree & Text;트리 & 텍스트
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;81
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;79
+ZZ_AutomaticLanguage_Percent;83

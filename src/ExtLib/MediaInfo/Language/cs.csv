@@ -270,6 +270,7 @@ Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
 Conductor;Conductor
+ConformanceCheck;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Hlavní informace
@@ -311,6 +312,8 @@ DistributedBy;Distributed by
 Distributor;
 Donate;Zaslat finanční dar
 DotsPerInch;
+DrcSets_Count;
+DrcSets_Effects;
 Duration;
 Duration_End;
 Duration_Start;
@@ -358,6 +361,7 @@ FolderName;Název složky
 Format;Formát
 Format_Commercial;
 Format_Commercial_IfAny;
+Format_Compression;
 Format_Description;
 Format_Info;
 Format_Level;
@@ -710,6 +714,7 @@ Language_hr;Croatian
 Language_ht;Haitian
 Language_hu;Hungarian
 Language_hy;Armenian
+Language_hy-az;
 Language_hz;Herero
 Language_ia;Auxiliary Language Association
 Language_id;Indonesian
@@ -754,10 +759,12 @@ Language_mi;Maori
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
+Language_mn-cn;
 Language_mo;Moldavian
 Language_More;
 Language_mr;Marathi
 Language_ms;Malay
+Language_ms-bn;
 Language_mt;Maltese
 Language_mul;Multiple languages
 Language_my;Burmese
@@ -767,6 +774,7 @@ Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
 Language_nl;Dutch
+Language_nl-be;
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
@@ -798,6 +806,7 @@ Language_si;Sinhala
 Language_sk;Slovak
 Language_sl;Slovenian
 Language_sm;Samoan
+Language_smi;
 Language_sn;Shona
 Language_so;Somali
 Language_sq;Albanian
@@ -844,6 +853,24 @@ Library;Muxing library
 Lightness;
 LineUpStart;
 List;
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
 Lyricist;Lyricist
 Lyrics;
 Mastered_Date;Mastered date
@@ -992,6 +1019,8 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Rozlišení
 s; s
+SamplePeakLevel;
+SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
 SamplingRate;Sampling rate
@@ -1049,6 +1078,7 @@ Stream;Datový stream
 Stream_MoreInfo;More information about the stream
 StreamCount;Count of stream of this kind
 StreamID;Stream ID
+streamIdentifier;
 StreamKind;Kind of stream
 StreamKindID;
 StreamKindPos;
@@ -1065,7 +1095,7 @@ SubTrack;SubTrack
 Summary;Summary
 Supported formats;Supported formats
 Supported?;Supported?
-SupportUs_Android;
+SupportUs;
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;
@@ -1106,6 +1136,8 @@ Translate_Reports;
 Translator;Přeložil
 Tree;Strom
 Tree & Text;Tree & Text
+TruePeakLevel;
+TruePeakLevel_Album;
 Type;
 UniqueID;
 UniversalAdID;
@@ -1146,5 +1178,5 @@ Written_Location;Written location
 WrittenBy;Napsal
 Yes;Ano
 Your system;Instalované kodeky
-ZZ_Automatic_Percent;66
-ZZ_AutomaticLanguage_Percent;73
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;72
