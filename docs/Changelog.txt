@@ -2,6 +2,14 @@
 
 1.5.5 (beta)
 =============================
+
+Updated German translation (by Klaus1189).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Turkish translation (by cmhrky).
+Updated Chinese (Traditional) and Dutch translation (by beter).
+Updated Ukrainian translation (by arestarh1986).
+Updated Hungarian translation (by mickey).
+
 Updated libraries:
 	dav1d git-0.6.0-21-g0c0b9ef;
 	ffmpeg git-n4.3-dev-2815-gda44bbefaa;
