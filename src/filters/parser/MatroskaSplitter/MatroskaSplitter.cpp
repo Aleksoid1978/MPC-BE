@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2019,23 +2019,6 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	}
 }
 
-#define SetBlockTime																\
-	REFERENCE_TIME duration = 0;													\
-	if (p->bg->BlockDuration.IsValid()) {											\
-		duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);				\
-	} else if (pTE->DefaultDuration) {												\
-		duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.size();	\
-	}																				\
-	if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {					\
-		duration = 1;																\
-	}																				\
-	\
-	p->rtStart = clusterTime + s.GetRefTime(p->bg->Block.TimeCode);					\
-	p->rtStop = p->rtStart + duration;												\
-	\
-	p->rtStart -= rtOffset;															\
-	p->rtStop -= rtOffset;															\
-
 bool CMatroskaSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
@@ -2047,6 +2030,24 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
 	const auto& s = m_pFile->m_segment;
+
+	auto SetBlockTime = [&](CMatroskaPacket* p, TrackEntry* pTE, const REFERENCE_TIME& clusterTime, const REFERENCE_TIME& rtOffset) {
+		REFERENCE_TIME duration = 0;
+		if (p->bg->BlockDuration.IsValid()) {
+			duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);
+		}
+		else if (pTE->DefaultDuration) {
+			duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.size();
+		}
+		if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {
+			duration = 1;
+		}
+		p->rtStart = clusterTime + s.GetRefTime(p->bg->Block.TimeCode);
+		p->rtStop = p->rtStart + duration;
+
+		p->rtStart -= rtOffset;
+		p->rtStop -= rtOffset;
+	};
 
 	if (m_Cluster_seek_rt > 0 && m_bSupportSubtitlesCueDuration) {
 		CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
@@ -2131,7 +2132,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 								}
 								TrackEntry* pTE = (*it).second;
 
-								SetBlockTime;
+								SetBlockTime(p.m_p, pTE, clusterTime, rtOffset);
 
 								if (p->rtStart >= m_Cluster_seek_rt || p->rtStop < m_Cluster_seek_rt) {
 									continue;
@@ -2190,7 +2191,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				}
 				TrackEntry* pTE = (*it).second;
 
-				SetBlockTime;
+				SetBlockTime(p.m_p, pTE, clusterTime, rtOffset);
 
 				hr = DeliverMatroskaPacket(pTE, p);
 
