@@ -569,12 +569,9 @@ namespace Youtube
 				auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
 				if (!player_response_jsonData.IsEmpty()) {
 					player_response_jsonData += "}";
-					player_response_jsonData.Replace("\\u0026", "&");
-					player_response_jsonData.Replace("\\/", "/");
-					player_response_jsonData.Replace("\\\"", "\"");
-					player_response_jsonData.Replace("\\\\\"", "\\\"");
-					player_response_jsonData.Replace("\\&", "&");
-
+					player_response_jsonData.Replace(R"(\/)", "/");
+					player_response_jsonData.Replace(R"(\")", R"(")");
+					player_response_jsonData.Replace(R"(\\)", R"(\)");
 					player_response_jsonDocument.Parse(player_response_jsonData);
 				}
 
