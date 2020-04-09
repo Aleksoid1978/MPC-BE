@@ -129,30 +129,27 @@ int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPAR
 	isdb_subtitle* rSub = (isdb_subtitle*)defps->m_list->GetItemData(nRight);
 	CString left  = defps->m_list->GetItemText(nLeft, COL_LANGUAGE);
 	CString right = defps->m_list->GetItemText(nRight, COL_LANGUAGE);
+
 	// user-provided sort order
-	int lpos, rpos;
-	if (auto it = defps->m_langPos.find(CString(lSub->iso639_2)); it != defps->m_langPos.end()) {
-		lpos = rpos = (*it).second;
-	} else {
-		if (auto it = defps->m_langPos.find(left); it != defps->m_langPos.end()) {
-			lpos = (*it).second;
-		} else {
-			lpos = INT_MAX;
+	auto GetLangPos = [](const CString& iso639_2, const CString& language, const std::map<CString, int>& langPos) {
+		int pos = INT_MAX;
+		if (auto it = langPos.find(iso639_2); it != langPos.end()) {
+			pos = (*it).second;
+		} else if (auto it = langPos.find(language); it != langPos.end()) {
+			pos = (*it).second;
 		}
 
-		if (auto it = defps->m_langPos.find(right); it != defps->m_langPos.end()) {
-			rpos = (*it).second;
-		} else {
-			rpos = INT_MAX;
-		}
-	}
+		return pos;
+	};
+
+	int lpos = GetLangPos(CString(lSub->iso639_2), left, defps->m_langPos);
+	int rpos = GetLangPos(CString(rSub->iso639_2), right, defps->m_langPos);
 
 	if (lpos < rpos) {
 		return -1;
 	} else if (lpos > rpos) {
 		return 1;
-	} else if (lpos == INT_MAX && rpos == INT_MAX) {
-		// lexicographical order
+	} else if (lpos == rpos) {
 		int res = wcscmp(left, right);
 		if (res != 0) {
 			return res;
@@ -160,7 +157,7 @@ int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPAR
 	}
 
 	// sort by filename
-	left  = defps->m_list->GetItemText(nLeft, COL_FILENAME);
+	left = defps->m_list->GetItemText(nLeft, COL_FILENAME);
 	right = defps->m_list->GetItemText(nRight, COL_FILENAME);
 	size_t lmatch = StrMatchW(defps->m_filename, left);
 	size_t rmatch = StrMatchW(defps->m_filename, right);
@@ -180,6 +177,7 @@ int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPAR
 	} else if (llen > rlen) {
 		return 1;
 	}
+
 	return 0;
 }
 
