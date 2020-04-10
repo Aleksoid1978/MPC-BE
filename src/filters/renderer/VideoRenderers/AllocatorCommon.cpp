@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -246,4 +246,32 @@ const wchar_t* D3DFormatToString(D3DFORMAT format)
 const wchar_t* GetD3DFormatStr(D3DFORMAT Format)
 {
 	return D3DFormatToString(Format) + 7;
+}
+
+HRESULT LoadSurfaceFromMemory(IDirect3DSurface9* pDestSurface, LPCVOID pSrcMemory, UINT SrcPitch, UINT SrcHeight)
+{
+	if (!pDestSurface || !pSrcMemory) {
+		return E_POINTER;
+	}
+
+	D3DLOCKED_RECT r;
+	HRESULT hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_DISCARD);
+	if (S_OK == hr) {
+		if (SrcPitch == r.Pitch) {
+			memcpy(r.pBits, pSrcMemory, SrcPitch*SrcHeight);
+		}
+		else {
+			BYTE* src = (BYTE*)pSrcMemory;
+			BYTE* dst = (BYTE*)r.pBits;
+			UINT linesize = std::min(SrcPitch, (UINT)r.Pitch);
+			for (UINT y = 0; y < SrcHeight; ++y) {
+				memcpy(dst, src, linesize);
+				src += SrcPitch;
+				dst += r.Pitch;
+			}
+		}
+		hr = pDestSurface->UnlockRect();
+	}
+
+	return hr;
 }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,8 @@ HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module);
 const wchar_t* D3DFormatToString(D3DFORMAT format);
 const wchar_t* GetD3DFormatStr(D3DFORMAT Format);
+
+HRESULT LoadSurfaceFromMemory(IDirect3DSurface9* pDestSurface, LPCVOID pSrcMemory, UINT SrcPitch, UINT SrcHeight);
 
 // Set and query D3DFullscreen mode.
 interface __declspec(uuid("8EA1E899-B77D-4777-9F0E-66421BEA50F8"))
