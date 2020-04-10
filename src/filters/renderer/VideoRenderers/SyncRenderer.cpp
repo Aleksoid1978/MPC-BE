@@ -96,13 +96,11 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	}
 
 	HINSTANCE hDll;
-	m_pD3DXLoadSurfaceFromMemory = nullptr;
 	m_pD3DXCreateLine = nullptr;
 	m_pD3DXCreateFontW = nullptr;
 	m_pD3DXCreateSprite = nullptr;
 	hDll = GetD3X9Dll();
 	if (hDll) {
-		(FARPROC &)m_pD3DXLoadSurfaceFromMemory = GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
 		(FARPROC &)m_pD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 		(FARPROC &)m_pD3DXCreateFontW = GetProcAddress(hDll, "D3DXCreateFontW");
 		(FARPROC &)m_pD3DXCreateSprite = GetProcAddress(hDll, "D3DXCreateSprite");
@@ -1515,13 +1513,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		m_pOSDTexture.Release();
 		m_pOSDSurface.Release();
 		if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0 && (BYTE *)m_MFVAlphaBitmapData) {
-			if ( (m_pD3DXLoadSurfaceFromMemory != nullptr) &&
-					SUCCEEDED(hr = m_pD3DDevEx->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1,
-								   D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
-								   D3DPOOL_DEFAULT, &m_pOSDTexture, nullptr)) ) {
-				if (SUCCEEDED (hr = m_pOSDTexture->GetSurfaceLevel(0, &m_pOSDSurface))) {
-					hr = m_pD3DXLoadSurfaceFromMemory (m_pOSDSurface, nullptr, nullptr, (BYTE *)m_MFVAlphaBitmapData, D3DFMT_A8R8G8B8, m_MFVAlphaBitmapWidthBytes,
-													   nullptr, &m_MFVAlphaBitmapRect, D3DX_FILTER_NONE, m_MFVAlphaBitmap.params.clrSrcKey);
+			hr = m_pD3DDevEx->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pOSDTexture, nullptr);
+			if (SUCCEEDED(hr)) {
+				hr = m_pOSDTexture->GetSurfaceLevel(0, &m_pOSDSurface);
+				if (SUCCEEDED(hr)) {
+					hr = LoadSurfaceFromMemory(m_pOSDSurface, m_MFVAlphaBitmapData, m_MFVAlphaBitmapWidthBytes, m_MFVAlphaBitmapRect.Height());
 				}
 				if (FAILED (hr)) {
 					m_pOSDTexture.Release();
