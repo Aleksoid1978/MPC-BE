@@ -50,10 +50,10 @@ class AP4_SampleDescription;
 +---------------------------------------------------------------------*/
 class AP4_SampleEntry : public AP4_ContainerAtom
 {
- public: 
+ public:
     // methods
     AP4_SampleEntry(AP4_Atom::Type format, AP4_UI16 data_ref_index = 1);
-    AP4_SampleEntry(AP4_Atom::Type   format, 
+    AP4_SampleEntry(AP4_Atom::Type   format,
                     AP4_Size         size,
                     AP4_ByteStream&  stream,
                     AP4_AtomFactory& atom_factory);
@@ -89,7 +89,7 @@ protected:
     // constructor
     AP4_MpegSampleEntry(AP4_Atom::Type format);
     AP4_MpegSampleEntry(AP4_Atom::Type format, AP4_Size size);
-    AP4_MpegSampleEntry(AP4_Atom::Type    format, 
+    AP4_MpegSampleEntry(AP4_Atom::Type    format,
                         AP4_EsDescriptor* descriptor);
     AP4_MpegSampleEntry(AP4_Atom::Type   format,
                         AP4_Size         size,
@@ -134,7 +134,7 @@ class AP4_AudioSampleEntry : public AP4_MpegSampleEntry
                          AP4_AtomFactory&  atom_factory);
     AP4_AudioSampleEntry(AP4_Atom::Type    format,
                          AP4_Size          size);
-    
+
     // accessors
     AP4_UI32 GetSampleRate();
 //  AP4_UI16 GetSampleSize() { return m_SampleSize; }
@@ -164,7 +164,7 @@ class AP4_AudioSampleEntry : public AP4_MpegSampleEntry
         }
         return m_SampleSize;
     }
-    AP4_UI16 GetEndian() 
+    AP4_UI16 GetEndian()
     {
         /*if (m_QtVersion == 2) {
             if (m_QtV2FormatSpecificFlags & 2) {
@@ -173,7 +173,7 @@ class AP4_AudioSampleEntry : public AP4_MpegSampleEntry
                 return ENDIAN_LITTLE;
             }
         }*/
-        return m_Endian; 
+        return m_Endian;
     }
     AP4_UI32 GetFormatSpecificFlags() { return m_QtV2FormatSpecificFlags; }
 
@@ -197,8 +197,8 @@ protected:
     AP4_UI16 m_QtVersion;       // 0, 1 or 2
     AP4_UI16 m_QtRevision;      // 0
     AP4_UI32 m_QtVendor;        // 0
-    AP4_UI16 m_ChannelCount; 
-    AP4_UI16 m_SampleSize; 
+    AP4_UI16 m_ChannelCount;
+    AP4_UI16 m_SampleSize;
     AP4_UI16 m_QtCompressionId; // 0 or -2
     AP4_UI16 m_QtPacketSize;    // always 0
     AP4_UI32 m_SampleRate;      // 16.16 fixed point
@@ -233,7 +233,7 @@ class AP4_Mp4aSampleEntry : public AP4_AudioSampleEntry
     AP4_Mp4aSampleEntry(AP4_Size         size,
                         AP4_ByteStream&  stream,
                         AP4_AtomFactory& atom_factory);
-    AP4_Mp4aSampleEntry(AP4_UI32          sample_rate, 
+    AP4_Mp4aSampleEntry(AP4_UI32          sample_rate,
                         AP4_UI16          sample_size,
                         AP4_UI16          channel_count,
                         AP4_EsDescriptor* descriptor);
@@ -246,7 +246,7 @@ class AP4_VisualSampleEntry : public AP4_MpegSampleEntry
 {
  public:
     // methods
-    AP4_VisualSampleEntry(AP4_Atom::Type    format, 
+    AP4_VisualSampleEntry(AP4_Atom::Type    format,
                           AP4_EsDescriptor* descriptor,
                           AP4_UI16          width,
                           AP4_UI16          height,
@@ -287,7 +287,7 @@ protected:
     AP4_UI32   m_VertResolution;  // = 0x00480000 (72 dpi)
     AP4_UI32   m_Reserved3;       // = 0
     AP4_UI16   m_FrameCount;      // = 1
-    AP4_String m_CompressorName;       
+    AP4_String m_CompressorName;
     AP4_UI16   m_Depth;           // = 0x0018
     AP4_UI16   m_ColorTableId;    // = 0
 
@@ -326,7 +326,7 @@ public:
                            AP4_ByteStream&  stream,
                            AP4_AtomFactory& atom_factory);
     virtual ~AP4_RtpHintSampleEntry();
-    
+
 protected:
     // methods
     virtual AP4_Size   GetFieldsSize();
@@ -351,7 +351,7 @@ public:
                         AP4_ByteStream&  stream,
                         AP4_AtomFactory& atom_factory);
     virtual ~AP4_TextSampleEntry();
-    
+
     struct AP4_TextDescription
     {
         AP4_UI32 DisplayFlags;
@@ -385,7 +385,7 @@ public:
                         AP4_ByteStream&  stream,
                         AP4_AtomFactory& atom_factory);
     virtual ~AP4_Tx3gSampleEntry();
-    
+
     struct AP4_Tx3gDescription
     {
         AP4_UI32 DisplayFlags;
@@ -418,7 +418,8 @@ class AP4_AC3SampleEntry : public AP4_AudioSampleEntry
 {
  public:
     // constructors
-    AP4_AC3SampleEntry(AP4_Size         size,
+    AP4_AC3SampleEntry(AP4_Atom::Type   format,
+                       AP4_Size         size,
                        AP4_ByteStream&  stream,
                        AP4_AtomFactory& atom_factory);
 

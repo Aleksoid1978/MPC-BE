@@ -293,7 +293,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_FL64 = AP4_ATOM_TYPE('f','l','6','4');
 //LPCM
 const AP4_Atom::Type AP4_ATOM_TYPE_LPCM = AP4_ATOM_TYPE('l','p','c','m');
 // AC-3,E-AC3
-const AP4_Atom::Type AP4_ATOM_TYPE__AC3 = AP4_ATOM_TYPE('a','c','-','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_ac_3 = AP4_ATOM_TYPE('a','c','-','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_AC_3 = AP4_ATOM_TYPE('A','C','-','3');
 const AP4_Atom::Type AP4_ATOM_TYPE_SAC3 = AP4_ATOM_TYPE('s','a','c','3');
 const AP4_Atom::Type AP4_ATOM_TYPE_EAC3 = AP4_ATOM_TYPE('e','c','-','3');
 // AAC

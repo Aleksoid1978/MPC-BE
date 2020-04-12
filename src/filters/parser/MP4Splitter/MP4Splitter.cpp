@@ -1520,14 +1520,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if (type == AP4_ATOM_TYPE__MP3) {
 							SetTrackName(&TrackName, L"MPEG Audio (MP3)");
 							fourcc = WAVE_FORMAT_MPEGLAYER3;
-						} else if ((type == AP4_ATOM_TYPE__AC3) || (type == AP4_ATOM_TYPE_SAC3) || (type == AP4_ATOM_TYPE_EAC3)) {
-							if (type == AP4_ATOM_TYPE_EAC3) {
-								SetTrackName(&TrackName, L"Enhanced AC-3 audio");
-								fourcc = WAVE_FORMAT_UNKNOWN;
-							} else {
-								fourcc = WAVE_FORMAT_DOLBY_AC3;
-								SetTrackName(&TrackName, L"AC-3 Audio");
-							}
+						} else if (type == AP4_ATOM_TYPE_ac_3 || type == AP4_ATOM_TYPE_AC_3 || type == AP4_ATOM_TYPE_SAC3) {
+							fourcc = WAVE_FORMAT_DOLBY_AC3;
+							SetTrackName(&TrackName, L"AC-3 Audio");
+						} else if (type == AP4_ATOM_TYPE_EAC3) {
+							SetTrackName(&TrackName, L"Enhanced AC-3 audio");
+							fourcc = WAVE_FORMAT_UNKNOWN;
 						} else if (type == AP4_ATOM_TYPE_MP4A) {
 							fourcc = WAVE_FORMAT_RAW_AAC1;
 							SetTrackName(&TrackName, L"MPEG-2 Audio AAC");
