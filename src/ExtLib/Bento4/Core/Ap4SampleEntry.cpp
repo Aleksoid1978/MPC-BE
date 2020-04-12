@@ -1587,10 +1587,11 @@ static int channels[] = { 2, 1, 2, 3, 3, 4, 4, 5 };
 /*----------------------------------------------------------------------
 |       AP4_AC3SampleEntry::AP4_AC3SampleEntry
 +---------------------------------------------------------------------*/
-AP4_AC3SampleEntry::AP4_AC3SampleEntry(AP4_Size         size,
+AP4_AC3SampleEntry::AP4_AC3SampleEntry(AP4_Atom::Type   format,
+                                       AP4_Size         size,
                                        AP4_ByteStream&  stream,
                                        AP4_AtomFactory& atom_factory) :
-    AP4_AudioSampleEntry(AP4_ATOM_TYPE__AC3, size),
+    AP4_AudioSampleEntry(format, size),
     m_ExtSize(0)
 {
     // read fields
