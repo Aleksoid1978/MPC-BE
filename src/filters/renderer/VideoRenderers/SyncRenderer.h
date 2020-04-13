@@ -222,10 +222,10 @@ namespace GothSync
 		);
 
 		long m_nTearingPos;
-		MFVideoAlphaBitmap   m_MFVAlphaBitmap;
-		CAutoVectorPtr<BYTE> m_MFVAlphaBitmapData;
-		CRect                m_MFVAlphaBitmapRect;
-		int                  m_MFVAlphaBitmapWidthBytes;
+
+		bool                       m_bAlphaBitmapEnable = false;
+		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;
+		MFVideoAlphaBitmapParams   m_AlphaBitmapParams = {};
 
 		unsigned m_nSurfaces; // Total number of DX Surfaces
 		UINT32 m_iCurSurface; // Surface currently displayed
@@ -309,8 +309,6 @@ namespace GothSync
 		CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CBaseAP();
 
-		CCritSec m_MFVAlphaBitmapLock;
-		void UpdateAlphaBitmap();
 		void ResetStats();
 
 		// ISubPicAllocatorPresenter3
