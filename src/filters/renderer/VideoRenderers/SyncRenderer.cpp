@@ -135,7 +135,9 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		return;
 	}
 
-	ZeroMemory(&m_MFVAlphaBitmap, sizeof(m_MFVAlphaBitmap));
+	m_bAlphaBitmapEnable = false;
+	m_pAlphaBitmapTexture.Release();
+	m_AlphaBitmapParams = {};
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	if (rs.bDisableDesktopComposition) {
@@ -186,6 +188,8 @@ CBaseAP::~CBaseAP()
 
 	m_pFont = nullptr;
 	m_pLine = nullptr;
+	m_pAlphaBitmapTexture.Release();
+
 	m_pD3DDevEx = nullptr;
 	m_pPSC.Free();
 	m_pD3DEx = nullptr;
@@ -1144,31 +1148,6 @@ void CBaseAP::SyncOffsetStats(LONGLONG syncOffset)
 	m_fSyncOffsetStdDev = StdDev;
 }
 
-void CBaseAP::UpdateAlphaBitmap()
-{
-	m_MFVAlphaBitmapData.Free();
-	m_pOSDTexture.Release();
-	m_pOSDSurface.Release();
-
-	if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0) {
-		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(m_MFVAlphaBitmap.bitmap.hdc, OBJ_BITMAP);
-		if (!hBitmap) {
-			return;
-		}
-		DIBSECTION info = {0};
-		if (!::GetObject(hBitmap, sizeof( DIBSECTION ), &info )) {
-			return;
-		}
-
-		m_MFVAlphaBitmapRect = CRect(0, 0, info.dsBm.bmWidth, info.dsBm.bmHeight);
-		m_MFVAlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
-
-		if (m_MFVAlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
-			memcpy((BYTE *)m_MFVAlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
-		}
-	}
-}
-
 // Present a sample (frame) using DirectX.
 STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 {
@@ -1507,31 +1486,12 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	AlphaBltSubPic(rDstPri, rDstVid);
 
-	if (m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_UPDATE) {
-		CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-		CRect rcSrc(m_MFVAlphaBitmap.params.rcSrc);
-		m_pOSDTexture.Release();
-		m_pOSDSurface.Release();
-		if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0 && (BYTE *)m_MFVAlphaBitmapData) {
-			hr = m_pD3DDevEx->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pOSDTexture, nullptr);
-			if (SUCCEEDED(hr)) {
-				hr = m_pOSDTexture->GetSurfaceLevel(0, &m_pOSDSurface);
-				if (SUCCEEDED(hr)) {
-					hr = LoadSurfaceFromMemory(m_pOSDSurface, m_MFVAlphaBitmapData, m_MFVAlphaBitmapWidthBytes, m_MFVAlphaBitmapRect.Height());
-				}
-				if (FAILED (hr)) {
-					m_pOSDTexture.Release();
-					m_pOSDSurface.Release();
-				}
-			}
-		}
-		m_MFVAlphaBitmap.params.dwFlags ^= MFVBITMAP_UPDATE;
-	}
 	if (rs.iDisplayStats) {
 		DrawStats();
 	}
-	if (m_pOSDTexture) {
-		AlphaBlt(rSrcPri, rDstPri, m_pOSDTexture);
+
+	if (m_bAlphaBitmapEnable && m_pAlphaBitmapTexture) {
+		AlphaBlt(rSrcPri, rDstPri, m_pAlphaBitmapTexture);
 	}
 
 	m_pD3DDevEx->EndScene();
@@ -3275,37 +3235,103 @@ STDMETHODIMP CSyncAP::GetFullscreen(BOOL *pfFullscreen)
 // IMFVideoMixerBitmap
 STDMETHODIMP CSyncAP::ClearAlphaBitmap()
 {
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_DISABLE;
-	UpdateAlphaBitmap();
+	CAutoLock cRenderLock(&m_allocatorLock);
+	m_bAlphaBitmapEnable = false;
+
 	return S_OK;
 }
 
 STDMETHODIMP CSyncAP::GetAlphaBitmapParameters(MFVideoAlphaBitmapParams *pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	memcpy(pBmpParms, &m_MFVAlphaBitmap.params, sizeof(MFVideoAlphaBitmapParams));
-	return S_OK;
+	CAutoLock cRenderLock(&m_allocatorLock);
+
+	if (m_bAlphaBitmapEnable && m_pAlphaBitmapTexture) {
+		*pBmpParms = m_AlphaBitmapParams; // formal implementation, don't believe it
+		return S_OK;
+	} else {
+		return MF_E_NOT_INITIALIZED;
+	}
 }
 
 STDMETHODIMP CSyncAP::SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	memcpy(&m_MFVAlphaBitmap, pBmpParms, sizeof(MFVideoAlphaBitmap));
-	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
-	UpdateAlphaBitmap();
-	return S_OK;
+	CAutoLock cRenderLock(&m_allocatorLock);
+
+	CheckPointer(m_pD3DDevEx, E_ABORT);
+	HRESULT hr = S_OK;
+
+	if (pBmpParms->GetBitmapFromDC && pBmpParms->bitmap.hdc) {
+		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(pBmpParms->bitmap.hdc, OBJ_BITMAP);
+		if (!hBitmap) {
+			return E_INVALIDARG;
+		}
+		DIBSECTION info = { 0 };
+		if (!::GetObjectW(hBitmap, sizeof(DIBSECTION), &info)) {
+			return E_INVALIDARG;
+		}
+		BITMAP& bm = info.dsBm;
+		if (!bm.bmWidth || !bm.bmHeight || bm.bmBitsPixel != 32 || !bm.bmBits) {
+			return E_INVALIDARG;
+		}
+
+		if (m_pAlphaBitmapTexture) {
+			D3DSURFACE_DESC desc = {};
+			m_pAlphaBitmapTexture->GetLevelDesc(0, &desc);
+			if (bm.bmWidth != desc.Width || bm.bmHeight != desc.Height) {
+				m_pAlphaBitmapTexture.Release();
+			}
+		}
+
+		if (!m_pAlphaBitmapTexture) {
+			hr = m_pD3DDevEx->CreateTexture(bm.bmWidth, bm.bmHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pAlphaBitmapTexture, nullptr);
+		}
+
+		if (SUCCEEDED(hr)) {
+			CComPtr<IDirect3DSurface9> pSurface;
+			hr = m_pAlphaBitmapTexture->GetSurfaceLevel(0, &pSurface);
+			if (SUCCEEDED(hr)) {
+				D3DLOCKED_RECT lr;
+				hr = pSurface->LockRect(&lr, nullptr, D3DLOCK_DISCARD);
+				if (S_OK == hr) {
+					if (bm.bmWidthBytes == lr.Pitch) {
+						memcpy(lr.pBits, bm.bmBits, bm.bmWidthBytes * bm.bmHeight);
+					}
+					else {
+						LONG linesize = std::min(bm.bmWidthBytes, (LONG)lr.Pitch);
+						BYTE* src = (BYTE*)bm.bmBits;
+						BYTE* dst = (BYTE*)lr.pBits;
+						for (LONG y = 0; y < bm.bmHeight; ++y) {
+							memcpy(dst, src, linesize);
+							src += bm.bmWidthBytes;
+							dst += lr.Pitch;
+						}
+					}
+					hr = pSurface->UnlockRect();
+				}
+			}
+		}
+	} else {
+		return E_INVALIDARG;
+	}
+
+	m_bAlphaBitmapEnable = SUCCEEDED(hr) && m_pAlphaBitmapTexture;
+
+	if (m_bAlphaBitmapEnable) {
+		hr = UpdateAlphaBitmapParameters(&pBmpParms->params);
+	}
+
+	return hr;
 }
 
 STDMETHODIMP CSyncAP::UpdateAlphaBitmapParameters(const MFVideoAlphaBitmapParams *pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	memcpy(&m_MFVAlphaBitmap.params, pBmpParms, sizeof(MFVideoAlphaBitmapParams));
-	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
-	UpdateAlphaBitmap();
+	CAutoLock cRenderLock(&m_allocatorLock);
+
+	m_AlphaBitmapParams = *pBmpParms; // formal implementation, don't believe it
+
 	return S_OK;
 }
 
