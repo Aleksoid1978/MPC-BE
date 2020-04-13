@@ -166,6 +166,8 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	m_pD3DDevEx.Release();
 	m_pD3DDevExRefresh.Release();
 
+	m_pAlphaBitmapTexture.Release();
+
 	CleanupRenderingEngine();
 
 	m_pD3DEx.Release();
@@ -490,8 +492,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	ZeroMemory(m_TimeChangeHistory, sizeof(m_TimeChangeHistory));
 	ZeroMemory(m_ClockChangeHistory, sizeof(m_ClockChangeHistory));
 
-	ZeroMemory(&m_MFVAlphaBitmap, sizeof(m_MFVAlphaBitmap));
-
 	m_DetectedFrameRate				= 0.0;
 	m_DetectedFrameTime				= 0.0;
 	m_DetectedFrameTimeStdDev		= 0.0;
@@ -554,6 +554,10 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_pFont.Release();
 	m_pSprite.Release();
 	m_pLine.Release();
+
+	m_bAlphaBitmapEnable = false;
+	m_pAlphaBitmapTexture.Release();
+	ZeroMemory(&m_AlphaBitmapParams, sizeof(m_AlphaBitmapParams));
 
 	CleanupRenderingEngine();
 
@@ -1291,31 +1295,6 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
 	}
 }
 
-void CDX9AllocatorPresenter::UpdateAlphaBitmap()
-{
-	m_MFVAlphaBitmapData.Free();
-	m_pOSDTexture.Release();
-	m_pOSDSurface.Release();
-
-	if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0) {
-		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(m_MFVAlphaBitmap.bitmap.hdc, OBJ_BITMAP);
-		if (!hBitmap) {
-			return;
-		}
-		DIBSECTION info = {0};
-		if (!::GetObject(hBitmap, sizeof( DIBSECTION ), &info )) {
-			return;
-		}
-
-		m_MFVAlphaBitmapRect = CRect(0, 0, info.dsBm.bmWidth, info.dsBm.bmHeight);
-		m_MFVAlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
-
-		if (m_MFVAlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
-			memcpy((BYTE *)m_MFVAlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
-		}
-	}
-}
-
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 {
 	if (m_bPendingResetDevice) {
@@ -1410,31 +1389,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 	AlphaBltSubPic(rSrcPri, rDstVid, xOffsetInPixels);
 
-	// Casimir666 : show OSD
-	if (m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_UPDATE) {
-		CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
 
-		m_pOSDTexture.Release();
-		m_pOSDSurface.Release();
-
-		CRect rcSrc(m_MFVAlphaBitmap.params.rcSrc);
-		if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0 && (BYTE *)m_MFVAlphaBitmapData) {
-			hr = m_pD3DDevEx->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pOSDTexture, nullptr);
-			if (SUCCEEDED(hr)) {
-				hr = m_pOSDTexture->GetSurfaceLevel(0, &m_pOSDSurface);
-				if (SUCCEEDED(hr)) {
-					hr = LoadSurfaceFromMemory(m_pOSDSurface, m_MFVAlphaBitmapData, m_MFVAlphaBitmapWidthBytes, m_MFVAlphaBitmapRect.Height());
-				}
-				if (FAILED (hr)) {
-					m_pOSDTexture.Release();
-					m_pOSDSurface.Release();
-				}
-			}
-		}
-		m_MFVAlphaBitmap.params.dwFlags ^= MFVBITMAP_UPDATE;
-	}
-
-	if (m_pOSDTexture) {
+	if (m_bAlphaBitmapEnable && m_pAlphaBitmapTexture) {
 		const int xOffsetInPixels = 4;
 
 		CRect rcDst(rSrcPri);
@@ -1443,7 +1399,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			rcTemp.right -= rcTemp.Width() / 2;
 			rcTemp.OffsetRect(-xOffsetInPixels, 0);
 
-			AlphaBlt(rSrcPri, rcTemp, m_pOSDTexture);
+			AlphaBlt(rSrcPri, rcTemp, m_pAlphaBitmapTexture);
 
 			rcDst.left += rcDst.Width() / 2;
 			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
@@ -1452,13 +1408,13 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			rcTemp.bottom -= rcTemp.Height() / 2;
 			rcTemp.OffsetRect(-xOffsetInPixels, 0);
 
-			AlphaBlt(rSrcPri, rcTemp, m_pOSDTexture);
+			AlphaBlt(rSrcPri, rcTemp, m_pAlphaBitmapTexture);
 
 			rcDst.top += rcDst.Height() / 2;
 			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
 		}
 
-		AlphaBlt(rSrcPri, rcDst, m_pOSDTexture);
+		AlphaBlt(rSrcPri, rcDst, m_pAlphaBitmapTexture);
 	}
 
 	if (bStereo3DTransform) {

@@ -32,9 +32,6 @@
 #include <vector>
 #include <MediaOffset3D.h>
 
-#define MFVBITMAP_DISABLE 0x40000000 // TODO remake without it
-#define MFVBITMAP_UPDATE  0x80000000
-
 #define NB_JITTER        126
 
 class CFocusThread;
@@ -46,10 +43,6 @@ namespace DSObjects
 		: public CDX9RenderingEngine
 		, public ID3DFullscreenControl
 	{
-	public:
-		CCritSec	m_MFVAlphaBitmapLock;
-		void		UpdateAlphaBitmap();
-
 	protected:
 		UINT	m_CurrentAdapter;
 		UINT	m_AdapterCount;
@@ -76,11 +69,13 @@ namespace DSObjects
 
 		CCritSec m_RenderLock;
 
-		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
-		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
-		CComPtr<ID3DXLine>			m_pLine;
-		CComPtr<ID3DXFont>			m_pFont;
-		CComPtr<ID3DXSprite>		m_pSprite;
+		CComPtr<ID3DXLine>   m_pLine;
+		CComPtr<ID3DXFont>   m_pFont;
+		CComPtr<ID3DXSprite> m_pSprite;
+
+		bool                       m_bAlphaBitmapEnable = false;
+		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;
+		MFVideoAlphaBitmapParams   m_AlphaBitmapParams = {};
 
 		bool SettingsNeedResetDevice();
 
@@ -115,10 +110,6 @@ namespace DSObjects
 		double GetFrameRate();
 
 		long					m_nTearingPos;
-		MFVideoAlphaBitmap		m_MFVAlphaBitmap;
-		CAutoVectorPtr<BYTE>	m_MFVAlphaBitmapData;
-		CRect					m_MFVAlphaBitmapRect;
-		int						m_MFVAlphaBitmapWidthBytes;
 
 		HRESULT (__stdcall *m_pD3DXCreateLine)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,

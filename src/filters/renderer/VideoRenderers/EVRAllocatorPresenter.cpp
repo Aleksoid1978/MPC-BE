@@ -1283,38 +1283,103 @@ STDMETHODIMP CEVRAllocatorPresenter::GetFullscreen(BOOL *pfFullscreen)
 // IMFVideoMixerBitmap
 STDMETHODIMP CEVRAllocatorPresenter::ClearAlphaBitmap()
 {
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_DISABLE;
-	UpdateAlphaBitmap();
+	CAutoLock cRenderLock(&m_RenderLock);
+	m_bAlphaBitmapEnable = false;
+
 	return S_OK;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::GetAlphaBitmapParameters(MFVideoAlphaBitmapParams *pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	memcpy(pBmpParms, &m_MFVAlphaBitmap.params, sizeof(MFVideoAlphaBitmapParams));
-	return S_OK;
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	if (m_bAlphaBitmapEnable && m_pAlphaBitmapTexture) {
+		*pBmpParms = m_AlphaBitmapParams; // formal implementation, don't believe it
+		return S_OK;
+	} else {
+		return MF_E_NOT_INITIALIZED;
+	}
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	memcpy(&m_MFVAlphaBitmap, pBmpParms, sizeof(MFVideoAlphaBitmap));
-	m_MFVAlphaBitmap.params.dwFlags &= ~MFVBITMAP_DISABLE;
-	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
-	UpdateAlphaBitmap();
-	return S_OK;
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	CheckPointer(m_pD3DDevEx, E_ABORT);
+	HRESULT hr = S_OK;
+
+	if (pBmpParms->GetBitmapFromDC && pBmpParms->bitmap.hdc) {
+		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(pBmpParms->bitmap.hdc, OBJ_BITMAP);
+		if (!hBitmap) {
+			return E_INVALIDARG;
+		}
+		DIBSECTION info = { 0 };
+		if (!::GetObjectW(hBitmap, sizeof(DIBSECTION), &info)) {
+			return E_INVALIDARG;
+		}
+		BITMAP& bm = info.dsBm;
+		if (!bm.bmWidth || !bm.bmHeight || bm.bmBitsPixel != 32 || !bm.bmBits) {
+			return E_INVALIDARG;
+		}
+
+		if (m_pAlphaBitmapTexture) {
+			D3DSURFACE_DESC desc = {};
+			m_pAlphaBitmapTexture->GetLevelDesc(0, &desc);
+			if (bm.bmWidth != desc.Width || bm.bmHeight != desc.Height) {
+				m_pAlphaBitmapTexture.Release();
+			}
+		}
+
+		if (!m_pAlphaBitmapTexture) {
+			hr = m_pD3DDevEx->CreateTexture(bm.bmWidth, bm.bmHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pAlphaBitmapTexture, nullptr);
+		}
+
+		if (SUCCEEDED(hr)) {
+			CComPtr<IDirect3DSurface9> pSurface;
+			hr = m_pAlphaBitmapTexture->GetSurfaceLevel(0, &pSurface);
+			if (SUCCEEDED(hr)) {
+				D3DLOCKED_RECT lr;
+				hr = pSurface->LockRect(&lr, nullptr, D3DLOCK_DISCARD);
+				if (S_OK == hr) {
+					if (bm.bmWidthBytes == lr.Pitch) {
+						memcpy(lr.pBits, bm.bmBits, bm.bmWidthBytes * bm.bmHeight);
+					}
+					else {
+						LONG linesize = std::min(bm.bmWidthBytes, (LONG)lr.Pitch);
+						BYTE* src = (BYTE*)bm.bmBits;
+						BYTE* dst = (BYTE*)lr.pBits;
+						for (LONG y = 0; y < bm.bmHeight; ++y) {
+							memcpy(dst, src, linesize);
+							src += bm.bmWidthBytes;
+							dst += lr.Pitch;
+						}
+					}
+					hr = pSurface->UnlockRect();
+				}
+			}
+		}
+	} else {
+		return E_INVALIDARG;
+	}
+
+	m_bAlphaBitmapEnable = SUCCEEDED(hr) && m_pAlphaBitmapTexture;
+
+	if (m_bAlphaBitmapEnable) {
+		hr = UpdateAlphaBitmapParameters(&pBmpParms->params);
+	}
+
+	return hr;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::UpdateAlphaBitmapParameters(const MFVideoAlphaBitmapParams *pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
-	memcpy(&m_MFVAlphaBitmap.params, pBmpParms, sizeof(MFVideoAlphaBitmapParams));
-	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
-	UpdateAlphaBitmap();
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	m_AlphaBitmapParams = *pBmpParms; // formal implementation, don't believe it
+
 	return S_OK;
 }
 
