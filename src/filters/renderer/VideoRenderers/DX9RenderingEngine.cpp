@@ -28,7 +28,7 @@
 #include "DX9RenderingEngine.h"
 #include "../../../apps/mplayerc/resource.h"
 
-#define NULL_PTR_ARRAY(a) for (size_t i = 0; i < _countof(a); i++) { a[i] = nullptr; }
+#define RELEASE_PTR_ARRAY(a) for (auto& item : a) { item.Release(); }
 
 #pragma pack(push, 1)
 template<unsigned texcoords>
@@ -206,22 +206,22 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 {
 	m_pPSC.Free();
 
-	NULL_PTR_ARRAY(m_pResizerPixelShaders);
+	RELEASE_PTR_ARRAY(m_pResizerPixelShaders);
 
 	CleanupFinalPass();
 
 	for (auto& Shader : m_pCustomScreenSpacePixelShaders) {
-		Shader.m_pPixelShader = nullptr;
+		Shader.m_pPixelShader.Release();
 	}
 
 	for (auto& Shader : m_pCustomPixelShaders) {
-		Shader.m_pPixelShader = nullptr;
+		Shader.m_pPixelShader.Release();
 	}
 
-	m_pRotateTexture = nullptr;
-	NULL_PTR_ARRAY(m_pFrameTextures)
-	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
-	m_pResizeTexture = nullptr;
+	m_pRotateTexture.Release();
+	RELEASE_PTR_ARRAY(m_pFrameTextures);
+	RELEASE_PTR_ARRAY(m_pScreenSpaceTextures);
+	m_pResizeTexture.Release();
 
 	m_pPSCorrection.Release();
 	m_pConvertToInterlacePixelShader.Release();
@@ -235,8 +235,8 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	FreeVideoSurfaces();
 
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
-	NULL_PTR_ARRAY(m_pFrameTextures);
-	m_pRotateTexture = nullptr;
+	RELEASE_PTR_ARRAY(m_pFrameTextures);
+	m_pRotateTexture.Release();
 
 	if (m_D3D9VendorId == PCIV_Intel) {
 		// on Intel EVR-Mixer can work with X8R8G8B8 surface only
@@ -272,14 +272,14 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 void CDX9RenderingEngine::FreeVideoSurfaces()
 {
 	for (unsigned i = 0; i < m_nSurfaces; i++) {
-		m_pVideoTextures[i] = nullptr;
-		m_pVideoSurfaces[i] = nullptr;
+		m_pVideoTextures[i].Release();
+		m_pVideoSurfaces[i].Release();
 	}
 }
 
 void CDX9RenderingEngine::FreeScreenTextures()
 {
-	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
+	RELEASE_PTR_ARRAY(m_pScreenSpaceTextures);
 }
 
 HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect)
@@ -392,7 +392,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			{1.0f / VideoSize.cx, 1.0f / VideoSize.cy, 0, 0},
 		};
 #endif
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 		for (auto& Shader : m_pCustomPixelShaders) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
@@ -511,7 +511,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			{1.0f / m_ScreenSpaceTexWidth, 1.0f / m_ScreenSpaceTexHeight, 0, 0},
 		};
 
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 		if (m_pCustomScreenSpacePixelShaders.size()) {
 			const auto it_last = --m_pCustomScreenSpacePixelShaders.end();
@@ -585,7 +585,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 				{ (float)m_ScreenSpaceTexWidth, (float)m_ScreenSpaceTexHeight, 0, 0 },
 				{ (float)destRect.left / m_ScreenSpaceTexWidth, (float)destRect.top / m_ScreenSpaceTexHeight, (float)destRect.right / m_ScreenSpaceTexWidth, (float)destRect.bottom / m_ScreenSpaceTexHeight },
 			};
-			hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+			hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 			hr = m_pD3DDevEx->SetPixelShader(m_pConvertToInterlacePixelShader);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 			hr = TextureCopy(m_pScreenSpaceTextures[m_iScreenTex]);
@@ -1118,8 +1118,8 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 	if (m_iRotation == 180 || !m_iRotation && m_bFlip) {
 		count++;
 	}
-	if (count > _countof(m_pFrameTextures)) {
-		count = _countof(m_pFrameTextures);
+	if (count > std::size(m_pFrameTextures)) {
+		count = std::size(m_pFrameTextures);
 	}
 
 	for (size_t i = 0; i < count; i++) {
@@ -1130,7 +1130,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 
 			if (FAILED(hr)) {
 				// Free all textures
-				NULL_PTR_ARRAY(m_pFrameTextures);
+				RELEASE_PTR_ARRAY(m_pFrameTextures);
 
 				return hr;
 			}
@@ -1138,8 +1138,8 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 	}
 
 	// Free unnecessary textures
-	for (size_t i = count; i < _countof(m_pFrameTextures); i++) {
-		m_pFrameTextures[i] = nullptr;
+	for (size_t i = count; i < std::size(m_pFrameTextures); i++) {
+		m_pFrameTextures[i].Release();
 	}
 
 	if (m_iRotation == 90 || m_iRotation == 270) {
@@ -1151,7 +1151,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 		}
 	}
 	else {
-		m_pRotateTexture = nullptr;
+		m_pRotateTexture.Release();
 	}
 
 	return hr;
@@ -1160,8 +1160,8 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 {
 	HRESULT hr = S_OK;
-	if (count > _countof(m_pScreenSpaceTextures)) {
-		count = _countof(m_pScreenSpaceTextures);
+	if (count > std::size(m_pScreenSpaceTextures)) {
+		count = std::size(m_pScreenSpaceTextures);
 	}
 
 	m_ScreenSpaceTexWidth = std::min(m_ScreenSize.cx, (LONG)m_Caps.MaxTextureWidth);
@@ -1175,7 +1175,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 
 			if (FAILED(hr)) {
 				// Free all textures
-				NULL_PTR_ARRAY(m_pScreenSpaceTextures);
+				RELEASE_PTR_ARRAY(m_pScreenSpaceTextures);
 
 				return hr;
 			}
@@ -1183,8 +1183,8 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 	}
 
 	// Free unnecessary textures
-	for (unsigned i = count; i < _countof(m_pScreenSpaceTextures); i++) {
-		m_pScreenSpaceTextures[i] = nullptr;
+	for (unsigned i = count; i < std::size(m_pScreenSpaceTextures); i++) {
+		m_pScreenSpaceTextures[i].Release();
 	}
 
 	return hr;
@@ -1270,8 +1270,8 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 	}
 	if (FAILED(hr)) {
 		ASSERT(0);
-		m_pResizerPixelShaders[iShader] = nullptr;
-		m_pResizerPixelShaders[iShader + 1] = nullptr;
+		m_pResizerPixelShaders[iShader].Release();
+		m_pResizerPixelShaders[iShader + 1].Release();
 		return hr;
 	}
 
@@ -1338,7 +1338,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, co
 		{ scale_x, scale_y, 0, 0 },
 		{ steps_x, steps_y, 0, 0 },
 	};
-	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
@@ -1486,7 +1486,7 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 
 		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
 			if (texWidth != desc.Width || texHeight != desc.Height) {
-				m_pResizeTexture = nullptr; // need new texture
+				m_pResizeTexture.Release(); // need new texture
 			}
 		}
 
@@ -1496,7 +1496,7 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 				D3DFMT_A16B16G16R16F, // use only float textures here
 				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
 			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-				m_pResizeTexture = nullptr;
+				m_pResizeTexture.Release();
 				return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 			}
 		}
@@ -1573,8 +1573,8 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	m_strFinalPass.Empty();
 
 	// Initial cleanup
-	m_pLut3DTexture = nullptr;
-	m_pFinalPixelShader = nullptr;
+	m_pLut3DTexture.Release();
+	m_pFinalPixelShader.Release();
 
 	if (bDither && !m_pDitherTexture) {
 		// Create the dither texture
@@ -1765,9 +1765,9 @@ void CDX9RenderingEngine::CleanupFinalPass()
 	m_bDither = false;
 	m_bFinalPass = false;
 	m_bColorManagement = false;
-	m_pDitherTexture = nullptr;
-	m_pLut3DTexture = nullptr;
-	m_pFinalPixelShader = nullptr;
+	m_pDitherTexture.Release();
+	m_pLut3DTexture.Release();
+	m_pFinalPixelShader.Release();
 	m_strFinalPass.Empty();
 }
 
@@ -1783,14 +1783,14 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 
 		videoSystem = VIDEO_SYSTEM_HDTV; // default
 
-		for (unsigned i = 0; i < _countof(ntscSizes); i++) {
+		for (unsigned i = 0; i < std::size(ntscSizes); i++) {
 			if (m_nativeVideoSize.cx == ntscSizes[i][0] && m_nativeVideoSize.cy == ntscSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_NTSC;
 				break;
 			}
 		}
 
-		for (unsigned i = 0; i < _countof(palSizes); i++) {
+		for (unsigned i = 0; i < std::size(palSizes); i++) {
 			if (m_nativeVideoSize.cx == palSizes[i][0] && m_nativeVideoSize.cy == palSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_PAL;
 				break;
@@ -2014,7 +2014,7 @@ HRESULT CDX9RenderingEngine::FinalPass(IDirect3DTexture9* pTexture)
 	float fConstData[][4] = {
 		{w / DITHER_MATRIX_SIZE, h / DITHER_MATRIX_SIZE, 0.0f, 0.0f}
 	};
-	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
 
@@ -2103,7 +2103,7 @@ HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_
 		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
 	};
 
-	for (unsigned i = 0; i < _countof(v); i++) {
+	for (unsigned i = 0; i < std::size(v); i++) {
 		v[i].x -= 0.5f;
 		v[i].y -= 0.5f;
 	}

@@ -169,9 +169,9 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
 {
 	StopWorkerThreads(); // If not already done...
-	m_pMediaType  = nullptr;
-	m_pClock      = nullptr;
-	m_pD3DManager = nullptr;
+	m_pMediaType.Release();
+	m_pClock.Release();
+	m_pD3DManager.Release();
 
 	if (m_hAvrtLib) {
 		FreeLibrary(m_hAvrtLib);
@@ -1990,7 +1990,7 @@ void CEVRAllocatorPresenter::RenderThread()
 	while (!bQuit) {
 		LONGLONG llPerf = GetPerfCounter();
 		UNREFERENCED_PARAMETER(llPerf);
-		dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, std::max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
+		dwObject = WaitForMultipleObjects(std::size(hEvts), hEvts, FALSE, std::max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
 		if (m_hEvtRenegotiate) {
 			CAutoLock Lock(&m_csExternalMixerLock);
 			CAutoLock cRenderLock(&m_RenderLock);
@@ -2039,7 +2039,7 @@ void CEVRAllocatorPresenter::RenderThread()
 
 				//TRACE_EVR("EVR: RenderThread ==>> Waiting buffer\n");
 
-				//if (WaitForMultipleObjects(_countof(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
+				//if (WaitForMultipleObjects(std::size(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
 				{
 					CComPtr<IMFSample> pMFSample;
 					LONGLONG	llPerf = GetPerfCounter();
@@ -2717,7 +2717,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, const bool 
 
 				std::map<double, unsigned> Map;
 
-				for (unsigned i = 0; i < _countof(m_DetectedFrameTimeHistoryHistory); ++i) {
+				for (unsigned i = 0; i < std::size(m_DetectedFrameTimeHistoryHistory); ++i) {
 					++Map[m_DetectedFrameTimeHistoryHistory[i]];
 				}
 

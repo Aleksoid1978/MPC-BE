@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,9 +51,9 @@ CDXRAllocatorPresenter::~CDXRAllocatorPresenter()
 	}
 
 	// the order is important here
-	m_pSubPicQueue = nullptr;
-	m_pAllocator = nullptr;
-	m_pDXR = nullptr;
+	m_pSubPicQueue.Release();
+	m_pAllocator.Release();
+	m_pDXR.Release();
 }
 
 STDMETHODIMP CDXRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -149,13 +149,13 @@ STDMETHODIMP CDXRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	CComQIPtr<ISubRender> pSR = m_pDXR;
 	if (!pSR) {
-		m_pDXR = nullptr;
+		m_pDXR.Release();
 		return E_FAIL;
 	}
 
 	m_pSRCB = DNew CSubRenderCallback(this);
 	if (FAILED(pSR->SetCallback(m_pSRCB))) {
-		m_pDXR = nullptr;
+		m_pDXR.Release();
 		return E_FAIL;
 	}
 

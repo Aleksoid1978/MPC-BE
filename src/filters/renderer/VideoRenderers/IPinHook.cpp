@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -278,7 +278,7 @@ static void LOG(LPCTSTR fmt, ...)
 	//int   nCount = _vsctprintf(fmt, args) + 1;
 	WCHAR buff[3000];
 	FILE* f;
-	vswprintf_s(buff, _countof(buff), fmt, args);
+	vswprintf_s(buff, std::size(buff), fmt, args);
 	if (_wfopen_s(&f, LOG_FILE_DXVA, L"at") == 0) {
 		fseek(f, 0, 2);
 		fwprintf_s(f, L"%s\n", buff);
