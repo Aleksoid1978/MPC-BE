@@ -3488,7 +3488,7 @@ void CSyncAP::MixerThread()
 	dwUser = timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
-		DWORD dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, 1);
+		DWORD dwObject = WaitForMultipleObjects(std::size(hEvts), hEvts, FALSE, 1);
 		switch (dwObject) {
 			case WAIT_OBJECT_0 :
 				bQuit = true;
@@ -3650,7 +3650,7 @@ void CSyncAP::RenderThread()
 			}
 		}
 		// Wait for the next presentation time (m_lNextSampleWait) or some other event.
-		dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, (DWORD)m_lNextSampleWait);
+		dwObject = WaitForMultipleObjects(std::size(hEvts), hEvts, FALSE, (DWORD)m_lNextSampleWait);
 		switch (dwObject) {
 			case WAIT_OBJECT_0: // Quit
 				bQuit = true;

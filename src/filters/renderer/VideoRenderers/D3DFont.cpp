@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -75,8 +75,8 @@ inline FONT3DVERTEX InitFont3DVertex( const DirectX::XMFLOAT3& p, const DirectX:
 //-----------------------------------------------------------------------------
 CD3DFont::CD3DFont( const WCHAR* strFontName, DWORD dwHeight, DWORD dwFlags )
 {
-	wcsncpy_s( m_strFontName, strFontName, _countof(m_strFontName) );
-	m_strFontName[_countof(m_strFontName) - 1] = '\0';
+	wcsncpy_s(m_strFontName, strFontName, std::size(m_strFontName) );
+	m_strFontName[std::size(m_strFontName) - 1] = '\0';
 	m_dwFontHeight         = dwHeight;
 	m_dwFontFlags          = dwFlags;
 	m_dwSpacing            = 0;
