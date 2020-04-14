@@ -186,13 +186,13 @@ CBaseAP::~CBaseAP()
 		}
 	}
 
-	m_pFont = nullptr;
-	m_pLine = nullptr;
+	m_pFont.Release();
+	m_pLine.Release();
 	m_pAlphaBitmapTexture.Release();
 
-	m_pD3DDevEx = nullptr;
+	m_pD3DDevEx.Release();
 	m_pPSC.Free();
-	m_pD3DEx = nullptr;
+	m_pD3DEx.Release();
 	if (m_hDWMAPI) {
 		FreeLibrary(m_hDWMAPI);
 		m_hDWMAPI = nullptr;
@@ -201,7 +201,7 @@ CBaseAP::~CBaseAP()
 		FreeLibrary(m_hD3D9);
 		m_hD3D9 = nullptr;
 	}
-	m_pAudioStats = nullptr;
+	m_pAudioStats.Release();
 	SAFE_DELETE(m_pGenlock);
 
 	if (m_FocusThread) {
@@ -379,30 +379,30 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_LastAffectingSettings.Fill(rs);
 	HRESULT hr = E_FAIL;
 
-	m_pFont = nullptr;
-	m_pSprite = nullptr;
-	m_pLine = nullptr;
+	m_pFont.Release();
+	m_pSprite.Release();
+	m_pLine.Release();
 
 	m_pPSC.Free();
-	m_pD3DDevEx = nullptr;
+	m_pD3DDevEx.Release();
 
-	for (unsigned i = 0; i < _countof(m_pResizerPixelShaders); i++) {
-		m_pResizerPixelShaders[i] = nullptr;
+	for (unsigned i = 0; i < std::size(m_pResizerPixelShaders); i++) {
+		m_pResizerPixelShaders[i].Release();
 	}
 
 	for (auto& Shader : m_pPixelShadersScreenSpace) {
-		Shader.m_pPixelShader = nullptr;
+		Shader.m_pPixelShader.Release();
 	}
 
 	for (auto& Shader : m_pPixelShaders) {
-		Shader.m_pPixelShader = nullptr;
+		Shader.m_pPixelShader.Release();
 	}
 
 	UINT currentAdapter = GetAdapter(m_pD3DEx, m_hWnd);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
 	if (!bTryToReset) {
-		m_pD3DDevEx = nullptr;
+		m_pD3DDevEx.Release();
 		m_CurrentAdapter = currentAdapter;
 	}
 
@@ -479,7 +479,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&pp, &DisplayMode));
 
 		if (!bTryToReset) {
-			m_pD3DDevEx = nullptr;
+			m_pD3DDevEx.Release();
 
 			hr = m_pD3DEx->CreateDeviceEx(
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
@@ -523,7 +523,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&pp, nullptr));
 
 		if (!bTryToReset) {
-			m_pD3DDevEx = nullptr;
+			m_pD3DDevEx.Release();
 
 			hr = m_pD3DEx->CreateDeviceEx(
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
@@ -621,14 +621,14 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	for (unsigned i = 0; i < m_nSurfaces+2; i++) {
-		m_pVideoTextures[i] = nullptr;
-		m_pVideoSurfaces[i] = nullptr;
+		m_pVideoTextures[i].Release();
+		m_pVideoSurfaces[i].Release();
 	}
-	m_pRotateTexture = nullptr;
-	m_pRotateSurface = nullptr;
-	m_pResizeTexture = nullptr;
-	m_pScreenSizeTextures[0] = nullptr;
-	m_pScreenSizeTextures[1] = nullptr;
+	m_pRotateTexture.Release();
+	m_pRotateSurface.Release();
+	m_pResizeTexture.Release();
+	m_pScreenSizeTextures[0].Release();
+	m_pScreenSizeTextures[1].Release();
 	m_SurfaceFmt = Format;
 	m_strMixerOutputFmt.Format(L"Mixer output : %s", GetD3DFormatStr(m_SurfaceFmt));
 
@@ -665,12 +665,12 @@ void CBaseAP::DeleteSurfaces()
 	CAutoLock cRenderLock(&m_allocatorLock);
 
 	for (unsigned i = 0; i < m_nSurfaces+2; i++) {
-		m_pVideoTextures[i] = nullptr;
-		m_pVideoSurfaces[i] = nullptr;
+		m_pVideoTextures[i].Release();
+		m_pVideoSurfaces[i].Release();
 	}
-	m_pRotateTexture = nullptr;
-	m_pRotateSurface = nullptr;
-	m_pResizeTexture = nullptr;
+	m_pRotateTexture.Release();
+	m_pRotateSurface.Release();
+	m_pResizeTexture.Release();
 }
 
 // ISubPicAllocatorPresenter3
@@ -864,7 +864,7 @@ HRESULT CBaseAP::TextureCopy(IDirect3DTexture9* pTexture)
 		{0, h, 0.5f, 2.0f, 0, 1},
 		{w, h, 0.5f, 2.0f, 1, 1},
 	};
-	for (unsigned i = 0; i < _countof(v); i++) {
+	for (unsigned i = 0; i < std::size(v); i++) {
 		v[i].x -= 0.5;
 		v[i].y -= 0.5;
 	}
@@ -881,7 +881,7 @@ HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, Color},
 		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
 	};
-	for (unsigned i = 0; i < _countof(v); i++) {
+	for (unsigned i = 0; i < std::size(v); i++) {
 		v[i].x -= 0.5;
 		v[i].y -= 0.5;
 	}
@@ -942,7 +942,7 @@ HRESULT CBaseAP::TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& s
 	};
 
 	float fConstData[][4] = { { dx, dy, 0, 0 },{ rx, ry, 0, 0 } };
-	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
@@ -970,7 +970,7 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRe
 
 		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
 			if (texWidth != desc.Width || texHeight != desc.Height) {
-				m_pResizeTexture = nullptr; // need new texture
+				m_pResizeTexture.Release(); // need new texture
 			}
 		}
 
@@ -980,7 +980,7 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRe
 				D3DFMT_A16B16G16R16F, // use only float textures here
 				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
 			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-				m_pResizeTexture = nullptr;
+				m_pResizeTexture.Release();
 				return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 			}
 		}
@@ -1249,7 +1249,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 					{1.0f / desc.Width, 1.0f / desc.Height, 0, 0},
 				};
-				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 				for (auto& Shader : m_pPixelShaders) {
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
@@ -1348,8 +1348,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 							D3DPOOL_DEFAULT, &m_pScreenSizeTextures[1], nullptr)) {
 					ASSERT(0);
-					m_pScreenSizeTextures[0] = nullptr;
-					m_pScreenSizeTextures[1] = nullptr;
+					m_pScreenSizeTextures[0].Release();
+					m_pScreenSizeTextures[1].Release();
 					bScreenSpacePixelShaders = false; // will do 1 pass then
 				}
 			}
@@ -1437,8 +1437,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 					{1.0f / desc.Width, 1.0f / desc.Height, 0, 0},
 				};
-
-				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 				int src = 1, dst = 0;
 
@@ -2042,7 +2041,7 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	CComPtr<IDirect3DSurface9> pSurface = m_pVideoSurfaces[m_iCurSurface];
 	D3DLOCKED_RECT r;
 	if (FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
-		pSurface = nullptr;
+		pSurface = nullptr; // WTF?
 		if (FAILED(hr = m_pD3DDevEx->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, nullptr))
 				|| FAILED(hr = m_pD3DDevEx->GetRenderTargetData(m_pVideoSurfaces[m_iCurSurface], pSurface))
 				|| FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
@@ -2304,9 +2303,9 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 CSyncAP::~CSyncAP(void)
 {
 	StopWorkerThreads();
-	m_pMediaType = nullptr;
-	m_pClock = nullptr;
-	m_pD3DManager = nullptr;
+	m_pMediaType.Release();
+	m_pClock.Release();
+	m_pD3DManager.Release();
 
 	if (m_hAvrtLib) {
 		FreeLibrary(m_hAvrtLib);
@@ -2682,7 +2681,7 @@ STDMETHODIMP CSyncAP::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulPar
 
 		case MFVP_MESSAGE_ENDSTREAMING:
 			m_pGenlock->ResetTiming();
-			m_pRefClock = nullptr;
+			m_pRefClock.Release();
 			break;
 
 		case MFVP_MESSAGE_FLUSH:
@@ -2868,9 +2867,9 @@ HRESULT CSyncAP::RenegotiateMediaType()
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
-		pMixerType  = nullptr;
-		pType = nullptr;
-		m_pMediaType = nullptr;
+		pMixerType.Release();
+		pType.Release();
+		m_pMediaType.Release();
 
 		// Step 1. Get the next media type supported by mixer.
 		hr = m_pMixer->GetOutputAvailableType(0, iTypeIndex++, &pMixerType);
@@ -2925,8 +2924,9 @@ HRESULT CSyncAP::RenegotiateMediaType()
 		}
 	}
 
-	pMixerType = nullptr;
-	pType = nullptr;
+	pMixerType.Release();
+	pType.Release();
+
 	return hr;
 }
 
@@ -3018,9 +3018,9 @@ STDMETHODIMP CSyncAP::InitServicePointers(__in IMFTopologyServiceLookup *pLookup
 STDMETHODIMP CSyncAP::ReleaseServicePointers()
 {
 	StopWorkerThreads();
-	m_pMixer = nullptr;
-	m_pSink = nullptr;
-	m_pClock = nullptr;
+	m_pMixer.Release();
+	m_pSink.Release();
+	m_pClock.Release();
 	return S_OK;
 }
 
@@ -3529,7 +3529,7 @@ void CSyncAP::RenderThread()
 	DWORD dwUser = 0;
 	DWORD dwObject;
 	int nSamplesLeft;
-	CComPtr<IMFSample>pNewSample = nullptr; // The sample next in line to be presented
+	CComPtr<IMFSample>pNewSample; // The sample next in line to be presented
 
 	// Tell Vista Multimedia Class Scheduler we are doing threaded playback (increase priority)
 	HANDLE hAvrt = 0;
@@ -3545,7 +3545,7 @@ void CSyncAP::RenderThread()
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
 	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	dwUser = timeBeginPeriod(dwResolution);
-	pNewSample = nullptr;
+	pNewSample.Release();
 
 	auto SubPicSetTime = [&] {
 		if (!g_bExternalSubtitleTime) {
@@ -3573,7 +3573,7 @@ void CSyncAP::RenderThread()
 				} else if (SUCCEEDED(pNewSample->GetSampleTime(&m_llSampleTime))) { // Get zero-based sample due time
 					if (m_llLastSampleTime == m_llSampleTime) { // In the rare case there are duplicate frames in the movie. There really shouldn't be but it happens.
 						MoveToFreeList(pNewSample, true);
-						pNewSample = nullptr;
+						pNewSample.Release();
 						m_lNextSampleWait = 0;
 					} else {
 						m_pClock->GetCorrelatedTime(0, &llRefClockTime, &llSystemTime); // Get zero-based reference clock time. llSystemTime is not used for anything here
@@ -3660,7 +3660,7 @@ void CSyncAP::RenderThread()
 				if (pNewSample) {
 					MoveToFreeList(pNewSample, true);
 				}
-				pNewSample = nullptr;
+				pNewSample.Release();
 				FlushSamples();
 				m_bEvtFlush = false;
 				ResetEvent(m_hEvtFlush);
@@ -3682,7 +3682,7 @@ void CSyncAP::RenderThread()
 					if (pNewSample) {
 						MoveToFreeList(pNewSample, true);
 					}
-					pNewSample = nullptr;
+					pNewSample.Release();
 					FlushSamples();
 					RenegotiateMediaType();
 					m_bPendingRenegotiate = false;
@@ -3692,7 +3692,7 @@ void CSyncAP::RenderThread()
 					if (pNewSample) {
 						MoveToFreeList(pNewSample, true);
 					}
-					pNewSample = nullptr;
+					pNewSample.Release();
 					SendResetRequest();
 				} else if (m_nStepCount < 0) {
 					m_nStepCount = 0;
@@ -3716,12 +3716,12 @@ void CSyncAP::RenderThread()
 		} // switch
 		if (pNewSample && stepForward) {
 			MoveToFreeList(pNewSample, true);
-			pNewSample = nullptr;
+			pNewSample.Release();
 		}
 	} // while
 	if (pNewSample) {
 		MoveToFreeList(pNewSample, true);
-		pNewSample = nullptr;
+		pNewSample.Release();
 	}
 	timeEndPeriod (dwResolution);
 	if (pfAvRevertMmThreadCharacteristics) {
@@ -4091,7 +4091,7 @@ CGenlock::~CGenlock()
 	ResetTiming();
 	SAFE_DELETE_ARRAY(syncOffsetFifo);
 	SAFE_DELETE_ARRAY(frameCycleFifo);
-	syncClock = nullptr;
+	syncClock.Release();
 };
 
 BOOL CGenlock::PowerstripRunning()
