@@ -2039,12 +2039,19 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	*size = required;
 
 	CComPtr<IDirect3DSurface9> pSurface = m_pVideoSurfaces[m_iCurSurface];
+
 	D3DLOCKED_RECT r;
-	if (FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
-		pSurface = nullptr; // WTF?
-		if (FAILED(hr = m_pD3DDevEx->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, nullptr))
-				|| FAILED(hr = m_pD3DDevEx->GetRenderTargetData(m_pVideoSurfaces[m_iCurSurface], pSurface))
-				|| FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
+	hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY);
+	if (FAILED(hr)) {
+		pSurface.Release();
+		hr = m_pD3DDevEx->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, nullptr);
+		if (SUCCEEDED(hr)) {
+			hr = m_pD3DDevEx->GetRenderTargetData(m_pVideoSurfaces[m_iCurSurface], pSurface);
+			if (SUCCEEDED(hr)) {
+				hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY);
+			}
+		}
+		if (FAILED(hr)) {
 			return hr;
 		}
 	}
