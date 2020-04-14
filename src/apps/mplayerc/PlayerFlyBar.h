@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,6 +45,8 @@ private:
 	CImageList *m_pButtonsImages;
 
 	int bt_idx;
+
+	bool m_bTrackingMouseLeave = false;
 
 public:
 	CFlyBar(CMainFrame* pMainFrame);
