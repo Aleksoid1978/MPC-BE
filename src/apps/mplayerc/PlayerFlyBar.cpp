@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -206,21 +206,19 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 {
 	SetCursor(LoadCursorW(nullptr, IDC_HAND));
 
-	TRACKMOUSEEVENT tme;
-	tme.cbSize		= sizeof(tme);
-	tme.hwndTrack	= GetSafeHwnd();
-	tme.dwFlags		= TME_LEAVE;
-	TrackMouseEvent(&tme);
+	if (!m_bTrackingMouseLeave) {
+		TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, GetSafeHwnd() };
+		if (TrackMouseEvent(&tme)) {
+			m_bTrackingMouseLeave = true;
+		}
+	}
 
 	UpdateWnd(point);
-	//CWnd::OnMouseMove(nFlags, point);
 }
 
 void CFlyBar::OnMouseLeave()
 {
-	CPoint point;
-	GetCursorPos(&point);
-	UpdateWnd(point);
+	m_bTrackingMouseLeave = false;
 }
 
 void CFlyBar::UpdateWnd(CPoint point)
