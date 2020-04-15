@@ -1358,11 +1358,11 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 									const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
 									REFERENCE_TIME rtNewPos = rtPos + rtDiff;
 									rtNewPos = std::clamp(rtNewPos, 0LL, stop);
-									const bool bHighPrecision = !!m_wndSubresyncBar.IsWindowVisible();
+									const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
 
-									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bHighPrecision, GetTimeFormat());
+									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bShowMilliSecs, GetTimeFormat());
 									m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1000);
-									m_wndStatusBar.SetStatusTimer(rtPos, stop, bHighPrecision, GetTimeFormat());
+									m_wndStatusBar.SetStatusTimer(rtPos, stop, bShowMilliSecs, GetTimeFormat());
 								}
 							}
 						}
@@ -2403,8 +2403,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 							m_nCurSubtitle   = -1;
 							m_lSubtitleShift = 0;
 						}
-
-						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
+						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 						break;
 					case PM_DVD:
 						g_bExternalSubtitleTime = true;
@@ -2427,7 +2426,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 								}
 							}
 						}
-						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
+						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 						break;
 					case PM_CAPTURE:
 						g_bExternalSubtitleTime = true;
@@ -8005,7 +8004,8 @@ void CMainFrame::OnPlayStop()
 			__int64 stop;
 			m_wndSeekBar.GetRange(stop);
 			if (GetPlaybackMode() != PM_CAPTURE) {
-				m_wndStatusBar.SetStatusTimer(m_wndSeekBar.GetPosReal(), stop, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
+				const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
+				m_wndStatusBar.SetStatusTimer(m_wndSeekBar.GetPosReal(), stop, bShowMilliSecs, GetTimeFormat());
 			}
 
 			SetAlwaysOnTop(AfxGetAppSettings().iOnTop);
@@ -16373,7 +16373,8 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 		if (rtPos > stop) {
 			rtPos = stop;
 		}
-		m_wndStatusBar.SetStatusTimer(rtPos, stop, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
+		const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
+		m_wndStatusBar.SetStatusTimer(rtPos, stop, bShowMilliSecs, GetTimeFormat());
 		if (bShowOSD && stop > 0 && (AfxGetAppSettings().iShowOSD & OSD_SEEKTIME)) {
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
 		}

@@ -2078,6 +2078,7 @@ STRING ID_PLAY_INCRATE		"Увеличить скорость\nУвеличить
 STRING ID_PLAY_PAUSE		"Пауза\nПауза"
 STRING ID_PLAY_PLAY		"Воспроизведение\nВоспроизведение"
 STRING ID_PLAY_STOP		"Стоп\nСтоп"
+STRING ID_SHOW_MILLISECONDS		"Показывать миллисекунды"
 STRING ID_VOLUME_MUTE		"Отключить звук\nОтключить звук"
 STRING ID_VOLUME_MUTE_DISABLED		"Без звука\nБез звука"
 STRING ID_VOLUME_MUTE_OFF		"Включить звук\nВключить звук"

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,6 +47,8 @@ private:
 
 	CFont m_font;
 
+	CMenu m_TimeMenu;
+
 public:
 	CPlayerStatusBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerStatusBar();
@@ -56,7 +58,7 @@ public:
 	void SetStatusBitmap(UINT id);
 	void SetStatusMessage(CString str);
 	void SetStatusTimer(CString str);
-	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID& timeFormat = TIME_FORMAT_MEDIA_TIME);
+	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool bShowMilliSecs, const GUID& timeFormat);
 
 	CString GetStatusTimer();
 	CString GetStatusMessage();
@@ -80,6 +82,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 
 	void ScaleFontInternal();

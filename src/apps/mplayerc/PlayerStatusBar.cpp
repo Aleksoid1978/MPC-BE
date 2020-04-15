@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,6 +38,9 @@ CPlayerStatusBar::CPlayerStatusBar(CMainFrame* pMainFrame)
 	, m_time_rect2(-1, -1, -1, -1)
 {
 	m_font.m_hObject = nullptr;
+
+	m_TimeMenu.CreatePopupMenu();
+	m_TimeMenu.AppendMenu(MF_STRING | MF_UNCHECKED, ID_SHOW_MILLISECONDS, ResStr(ID_SHOW_MILLISECONDS));
 }
 
 CPlayerStatusBar::~CPlayerStatusBar()
@@ -239,7 +242,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 	}
 }
 
-void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID& timeFormat/* = TIME_FORMAT_MEDIA_TIME*/)
+void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool bShowMilliSecs, const GUID& timeFormat)
 {
 	CString str;
 	CString posstr, durstr, rstr;
@@ -247,7 +250,7 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
 		DVD_HMSF_TIMECODE tcNow, tcDur, tcRt;
 
-		if (fHighPrecision) {
+		if (bShowMilliSecs) {
 			tcNow = RT2HMSF(rtNow);
 			tcDur = RT2HMSF(rtDur);
 			tcRt  = RT2HMSF(rtDur - rtNow);
@@ -257,27 +260,11 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 			tcRt  = RT2HMS_r(rtDur - rtNow);
 		}
 
-#if 0
-		if (tcDur.bHours > 0 || (rtNow >= rtDur && tcNow.bHours > 0)) {
-			posstr.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-			rstr.Format(L"%02u:%02u:%02u", tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
-		} else {
-			posstr.Format(L"%02u:%02u", tcNow.bMinutes, tcNow.bSeconds);
-			rstr.Format(L"%02u:%02u", tcRt.bMinutes, tcRt.bSeconds);
-		}
-
-		if (tcDur.bHours > 0) {
-			durstr.Format(L"%02u:%02u:%02u", tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
-		} else {
-			durstr.Format(L"%02u:%02u", tcDur.bMinutes, tcDur.bSeconds);
-		}
-#else
 		posstr.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 		rstr.Format(L"%02u:%02u:%02u", tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
 		durstr.Format(L"%02u:%02u:%02u", tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
-#endif
 
-		if (fHighPrecision) {
+		if (bShowMilliSecs) {
 			posstr.AppendFormat(L".%03d", (rtNow / 10000) % 1000);
 			durstr.AppendFormat(L".%03d", (rtDur / 10000) % 1000);
 			rstr.AppendFormat(L".%03d", ((rtDur - rtNow) / 10000) % 1000);
@@ -312,6 +299,7 @@ BEGIN_MESSAGE_MAP(CPlayerStatusBar, CDialogBar)
 	ON_WM_SIZE()
 	ON_WM_CREATE()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_RBUTTONDOWN()
 	ON_WM_SETCURSOR()
 	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
@@ -497,6 +485,30 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 							HTCAPTION,
 							MAKELPARAM(point.x, point.y));
 	}
+}
+
+void CPlayerStatusBar::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(wp);
+	m_pMainFrame->GetWindowPlacement(&wp);
+
+	if (m_time_rect.PtInRect(point) || m_time_rect2.PtInRect(point)) {
+		m_TimeMenu.CheckMenuItem(ID_SHOW_MILLISECONDS, m_pMainFrame->m_bShowMilliSecs ? MF_CHECKED : MF_UNCHECKED);
+
+		CPoint p = point;
+		::MapWindowPoints(m_hWnd, HWND_DESKTOP, &p, 1);
+
+		UINT id = m_TimeMenu.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
+
+		if (id == ID_SHOW_MILLISECONDS) {
+			m_pMainFrame->m_bShowMilliSecs = !m_pMainFrame->m_bShowMilliSecs;
+		}
+
+		return;
+	}
+
+	__super::OnRButtonDown(nFlags, point);
 }
 
 BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
