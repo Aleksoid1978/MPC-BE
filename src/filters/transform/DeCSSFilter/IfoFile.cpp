@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -602,7 +602,7 @@ __int64 CIfoFile::GetChapterPos(UINT ChapterNumber) const
 	return 2048i64 * (m_pChapters[ChapterNumber].first_sector - m_pChapters[0].first_sector);
 }
 
-bool CIfoFile::GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN, ULONG& TTN)
+bool CIfoFile::GetTitleInfo(LPCWSTR fn, ULONG nTitleNum, ULONG& VTSN, ULONG& TTN)
 {
 	CFile ifoFile;
 	if (!ifoFile.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {

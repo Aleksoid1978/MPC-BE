@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,7 +69,7 @@ const SW_OUT_FMT* GetSWOF(int pixfmt)
 	return &s_sw_formats[pixfmt];
 }
 
-LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
+LPCWSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
 {
 	int h_shift, v_shift;
 
