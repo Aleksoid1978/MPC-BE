@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2019 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,14 +20,14 @@
 
 #pragma once
 
-bool    SetPrivilege(LPCTSTR privilege, bool bEnable = true);
+bool    SetPrivilege(LPCWSTR privilege, bool bEnable = true);
 bool    ExploreToFile(CString path);
 BOOL    IsUserAdmin();
-CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw = GetLastError());
+CString GetLastErrorMsg(LPWSTR lpszFunction, DWORD dw = GetLastError());
 
 HICON LoadIcon(const CString& fn, bool fSmall);
 bool  LoadType(const CString& fn, CString& type);
-bool  LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
+bool  LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
 void SetAudioRenderer(int AudioDevNo);

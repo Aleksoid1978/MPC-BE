@@ -69,9 +69,9 @@ void CPlayerSubresyncBar::ReloadTranslatableResources()
 	CHeaderCtrl* pHeaderCtrl = m_list.GetHeaderCtrl();
 	if (pHeaderCtrl && pHeaderCtrl->GetItemCount() > 4) {
 		auto setColumnHeaderText = [pHeaderCtrl](int nPos, CString str) {
-			HDITEM item;
+			HDITEMW item;
 			item.mask = HDI_TEXT;
-			item.pszText = (LPTSTR)(LPCTSTR)str;
+			item.pszText = (LPWSTR)(LPCWSTR)str;
 			item.cchTextMax = str.GetLength() + 1;
 			VERIFY(pHeaderCtrl->SetItem(nPos, &item));
 		};
@@ -663,8 +663,8 @@ static bool ParseTime(CString str, int& ret, bool fWarn = true)
 
 void CPlayerSubresyncBar::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -683,8 +683,8 @@ void CPlayerSubresyncBar::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPlayerSubresyncBar::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -705,8 +705,8 @@ void CPlayerSubresyncBar::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 

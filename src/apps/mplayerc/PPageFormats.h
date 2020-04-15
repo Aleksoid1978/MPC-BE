@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,8 +73,8 @@ public:
 	static bool		RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool SetContextFiles = false, bool setAssociatedWithIcon = true);
 	static bool		UnRegisterExt(CString ext);
 	static HRESULT	RegisterUI();
-	static bool		RegisterShellExt(LPCTSTR lpszLibrary);
-	static bool		UnRegisterShellExt(LPCTSTR lpszLibrary);
+	static bool		RegisterShellExt(LPCWSTR lpszLibrary);
+	static bool		UnRegisterShellExt(LPCWSTR lpszLibrary);
 
 	static LPCWSTR	GetRegisteredAppName()	{return L"MPC-BE";}
 	static LPCWSTR	GetOldAssoc()			{return L"PreviousRegistration";}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -855,7 +855,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 	}
 
 	if (!m_pMainFrame->CanPreviewUse()) {
-		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
+		m_ti.lpszText = (LPWSTR)(LPCWSTR)tooltipText;
 		m_tooltip.SendMessageW(TTM_SETTOOLINFOW, 0, (LPARAM)&m_ti);
 	} else {
 		m_pMainFrame->m_wndPreView.SetWindowTextW(tooltipText);

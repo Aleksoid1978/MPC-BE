@@ -44,7 +44,7 @@ namespace Youtube
 		yformat format;
 		ytype   type;
 		int     quality;
-		LPCTSTR ext;
+		LPCWSTR ext;
 		bool    fps60;
 		bool    hdr;
 		bool    live;

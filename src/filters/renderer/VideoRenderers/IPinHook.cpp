@@ -253,7 +253,7 @@ bool HookNewSegmentAndReceive(IPin* pPin, const bool bMadVR)
 }
 
 #if defined(_DEBUG) && DXVA_LOGFILE_A
-static void LOG_TOFILE(LPCTSTR FileName, LPCTSTR fmt, ...)
+static void LOG_TOFILE(LPCWSTR FileName, LPCWSTR fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
@@ -271,7 +271,7 @@ static void LOG_TOFILE(LPCTSTR FileName, LPCTSTR fmt, ...)
 	va_end(args);
 }
 
-static void LOG(LPCTSTR fmt, ...)
+static void LOG(LPCWSTR fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);

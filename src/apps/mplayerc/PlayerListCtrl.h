@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -192,6 +192,6 @@ public:
 	afx_msg BOOL OnHdnItemchanging(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 
-	int InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeading,
+	int InsertColumn(_In_ int nCol, _In_z_ LPCWSTR lpszColumnHeading,
 		_In_ int nFormat = LVCFMT_LEFT, _In_ int nWidth = -1, _In_ int nSubItem = -1, _In_ int nMinWidth = 20);
 };

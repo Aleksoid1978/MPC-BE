@@ -1030,7 +1030,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 		FORMATETC fmt = { cfFormat, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(cfFormat, &fmt)) {
 			LPVOID LockData = GlobalLock(hGlobal);
-			auto pUnicodeText = (LPCTSTR)LockData;
+			auto pUnicodeText = (LPCWSTR)LockData;
 			auto pAnsiText = (LPCSTR)LockData;
 			if (bUnicode ? AfxIsValidString(pUnicodeText) : AfxIsValidString(pAnsiText)) {
 				CString text = bUnicode ? pUnicodeText : CString(pAnsiText);
@@ -1079,7 +1079,7 @@ DROPEFFECT CMainFrame::OnDragScroll(DWORD dwKeyState, CPoint point)
 	return DROPEFFECT_NONE;
 }
 
-LPCTSTR CMainFrame::GetRecentFile()
+LPCWSTR CMainFrame::GetRecentFile()
 {
 	CRecentFileList& MRU = AfxGetAppSettings().MRU;
 	MRU.ReadList();
@@ -4018,7 +4018,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		} else if (itemID == ID_VIDEOSTREAMS) {
 			CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
 			mii.fMask = MIIM_STRING;
-			mii.dwTypeData = (LPTSTR)(LPCTSTR)menu_str;
+			mii.dwTypeData = (LPWSTR)(LPCWSTR)menu_str;
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 			SetupVideoStreamsSubMenu();
 			pSubMenu = &m_VideoStreamsMenu;
@@ -6191,7 +6191,7 @@ void CMainFrame::SaveThumbnails(LPCWSTR fn)
 	}
 }
 
-static CString MakeSnapshotFileName(LPCTSTR prefix)
+static CString MakeSnapshotFileName(LPCWSTR prefix)
 {
 	CTime t = CTime::GetCurrentTime();
 	CString fn;
@@ -6390,7 +6390,7 @@ void CMainFrame::OnFileSaveThumbnails()
 
 	CSaveThumbnailsDialog fd(
 		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles, m_pCurrentSubStream != nullptr,
-		nullptr, (LPCTSTR)psrc,
+		nullptr, (LPCWSTR)psrc,
 		L"BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png||", GetModalParent());
 
 	if (s.strSnapShotExt == L".bmp") {
@@ -17514,7 +17514,7 @@ void CMainFrame::SetClosedCaptions(bool enable)
 	}
 }
 
-LPCTSTR CMainFrame::GetDVDAudioFormatName(DVD_AudioAttributes& ATR) const
+LPCWSTR CMainFrame::GetDVDAudioFormatName(DVD_AudioAttributes& ATR) const
 {
 	switch (ATR.AudioFormat) {
 		case DVD_AudioFormat_AC3:

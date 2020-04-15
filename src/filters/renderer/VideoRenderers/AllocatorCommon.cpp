@@ -154,8 +154,8 @@ CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module)
 	CString errmsg;
 	LPVOID lpMsgBuf;
 	if (FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|FORMAT_MESSAGE_FROM_HMODULE,
-					  _Module, _Error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, nullptr)) {
-		errmsg = (LPCTSTR)lpMsgBuf;
+					  _Module, _Error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpMsgBuf, 0, nullptr)) {
+		errmsg = (LPCWSTR)lpMsgBuf;
 		LocalFree(lpMsgBuf);
 	}
 	CString Temp;

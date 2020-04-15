@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,14 +70,14 @@ void CInPlaceWinHotkey::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFO dispinfo;
+	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDIT;
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPWSTR((LPCWSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
@@ -169,14 +169,14 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFO dispinfo;
+	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDIT;
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPWSTR((LPCWSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
@@ -337,14 +337,14 @@ void CInPlaceComboBox::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFO dispinfo;
+	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDIT;
 	dispinfo.item.mask = LVIF_TEXT|LVIF_PARAM;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPWSTR((LPCWSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	dispinfo.item.lParam = GetCurSel();
 	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
@@ -444,14 +444,14 @@ void CInPlaceListBox::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFO dispinfo;
+	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDIT;
 	dispinfo.item.mask = LVIF_TEXT|LVIF_PARAM;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPWSTR((LPCWSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	dispinfo.item.lParam = GetCurSel();
 	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
@@ -916,7 +916,7 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	} else if (m_nItemClicked == nItemClickedNow /*&& m_nSubItemClicked == m_nSubItemClickedNow*/) {
 		m_nSubItemClicked = nSubItemClickedNow;
 
-		LV_DISPINFO dispinfo;
+		LV_DISPINFOW dispinfo;
 		dispinfo.hdr.hwndFrom = m_hWnd;
 		dispinfo.hdr.idFrom = GetDlgCtrlID();
 		dispinfo.hdr.code = LVN_BEGINLABELEDIT;
@@ -947,7 +947,7 @@ void CPlayerListCtrl::OnTimer(UINT_PTR nIDEvent)
 
 		UINT flag = LVIS_FOCUSED;
 		if ((GetItemState(m_nItemClicked, flag) & flag) == flag && m_nSubItemClicked >= 0) {
-			LV_DISPINFO dispinfo;
+			LV_DISPINFOW dispinfo;
 			dispinfo.hdr.hwndFrom = m_hWnd;
 			dispinfo.hdr.idFrom = GetDlgCtrlID();
 			dispinfo.hdr.code = LVN_DOLABELEDIT;
@@ -1091,7 +1091,7 @@ BOOL CPlayerListCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	return GetParent()->SendMessageW(WM_NOTIFY, id, (LPARAM)pNMHDR);
 }
 
-int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeading,
+int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCWSTR lpszColumnHeading,
 		_In_ int nFormat, _In_ int nWidth, _In_ int nSubItem, _In_ int nMinWidth)
 {
 	nCol = __super::InsertColumn(nCol, lpszColumnHeading, nFormat, nWidth, nSubItem);

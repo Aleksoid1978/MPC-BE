@@ -908,7 +908,7 @@ namespace Youtube
 						free(dashmpd);
 						const std::wregex regex(L"<Representation(.*?)</Representation>");
 						std::wcmatch match;
-						LPCTSTR text = xml.GetBuffer();
+						LPCWSTR text = xml.GetBuffer();
 						while (std::regex_search(text, match, regex)) {
 							if (match.size() == 2) {
 								const CString xmlElement(match[1].first, match[1].length());

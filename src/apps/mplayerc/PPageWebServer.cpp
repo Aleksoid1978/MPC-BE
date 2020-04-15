@@ -165,7 +165,7 @@ CString CPPageWebServer::GetCurWebRoot()
 
 	CPath path;
 	path.Combine(GetProgramDir(), WebRoot);
-	return path.IsDirectory() ? (LPCTSTR)path : L"";
+	return path.IsDirectory() ? (LPCWSTR)path : L"";
 }
 
 static int __stdcall BrowseCtrlCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
@@ -237,7 +237,7 @@ void CPPageWebServer::OnBnClickedButton1()
 		CPath path;
 
 		if (path.RelativePathTo(GetProgramDir(), FILE_ATTRIBUTE_DIRECTORY, dir, FILE_ATTRIBUTE_DIRECTORY)) {
-			dir = (LPCTSTR)path;
+			dir = (LPCWSTR)path;
 		}
 
 		m_WebRoot = dir;

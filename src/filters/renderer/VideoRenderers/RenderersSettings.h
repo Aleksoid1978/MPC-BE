@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -202,6 +202,6 @@ public:
 
 extern CRenderersSettings&	GetRenderersSettings();
 
-extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
+extern bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 
 HINSTANCE GetD3X9Dll();
