@@ -847,8 +847,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 	GUID timeFormat = m_pMainFrame->GetTimeFormat();
 	CString tooltipText;
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
-		DVD_HMSF_TIMECODE tcNow = RT2HMS_r(m_tooltipPos);
-		tooltipText.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+		tooltipText = ReftimeToString2(m_tooltipPos);
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
 		tooltipText.Format(L"%I64d", m_tooltipPos);
 	} else {
@@ -857,7 +856,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 	if (!m_pMainFrame->CanPreviewUse()) {
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
-		m_tooltip.SendMessageW(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
+		m_tooltip.SendMessageW(TTM_SETTOOLINFOW, 0, (LPARAM)&m_ti);
 	} else {
 		m_pMainFrame->m_wndPreView.SetWindowTextW(tooltipText);
 	}

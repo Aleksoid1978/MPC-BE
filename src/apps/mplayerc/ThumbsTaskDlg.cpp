@@ -160,7 +160,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 	for (int i = 1, pics = cols * rows; i <= pics; i++) {
 		const REFERENCE_TIME rt = duration * i / (pics + 1);
-		const DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rt);
+		const CString strTime = ReftimeToString2(rt);
 
 		m_pMainFrm->SeekTo(rt, false);
 
@@ -192,8 +192,8 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		str.Format(L"{\\an7\\1c&Hffffff&\\4a&Hb0&\\bord1\\shad4\\be1}{\\p1}m %d %d l %d %d %d %d %d %d{\\p}",
 				   r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
 		rts.Add(str, true, 0, 1, L"thumbs");
-		str.Format(L"{\\an3\\1c&Hffffff&\\3c&H000000&\\alpha&H80&\\fs16\\b1\\bord2\\shad0\\pos(%d,%d)}%02d:%02d:%02d",
-				   r.right - 5, r.bottom - 3, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+		str.Format(L"{\\an3\\1c&Hffffff&\\3c&H000000&\\alpha&H80&\\fs16\\b1\\bord2\\shad0\\pos(%d,%d)}%s",
+				   r.right - 5, r.bottom - 3, strTime);
 		rts.Add(str, true, 1, 2, L"thumbs");
 
 		rts.Render(spd, 0, 25, bbox);
