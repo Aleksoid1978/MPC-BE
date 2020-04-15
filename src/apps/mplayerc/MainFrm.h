@@ -437,6 +437,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	bool m_bWasPausedOnMinimizedVideo = false;
 
+	bool m_bBeginCapture = false;
+	CPoint m_beginCapturePoint;
+
 public:
 	enum {
 		TIMER_STREAMPOSPOLLER = 1,
@@ -899,8 +902,6 @@ public:
 	afx_msg void SaveAppSettings();
 
 	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
-
-	bool templclick;
 
 	afx_msg void OnEnterSizeMove();
 	afx_msg void ClipRectToMonitor(LPRECT prc);
