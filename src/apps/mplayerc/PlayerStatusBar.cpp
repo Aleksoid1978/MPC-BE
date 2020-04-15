@@ -244,41 +244,32 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 
 void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool bShowMilliSecs, const GUID& timeFormat)
 {
-	CString str;
-	CString posstr, durstr, rstr;
+	CAppSettings& s = AfxGetAppSettings();
+	REFERENCE_TIME rt = s.fRemainingTime ? rtDur - rtNow : rtNow;
+	CString strPos, strDur;
 
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
-		DVD_HMSF_TIMECODE tcNow, tcDur, tcRt;
-
 		if (bShowMilliSecs) {
-			tcNow = RT2HMSF(rtNow);
-			tcDur = RT2HMSF(rtDur);
-			tcRt  = RT2HMSF(rtDur - rtNow);
+			strPos = ReftimeToString(rt);
+			strDur = ReftimeToString(rtDur);
 		} else {
-			tcNow = RT2HMS_r(rtNow);
-			tcDur = RT2HMS_r(rtDur);
-			tcRt  = RT2HMS_r(rtDur - rtNow);
-		}
-
-		posstr.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-		rstr.Format(L"%02u:%02u:%02u", tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
-		durstr.Format(L"%02u:%02u:%02u", tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
-
-		if (bShowMilliSecs) {
-			posstr.AppendFormat(L".%03d", (rtNow / 10000) % 1000);
-			durstr.AppendFormat(L".%03d", (rtDur / 10000) % 1000);
-			rstr.AppendFormat(L".%03d", ((rtDur - rtNow) / 10000) % 1000);
+			strPos = ReftimeToString2(rt);
+			strDur = ReftimeToString2(rtDur);
 		}
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
-		posstr.Format(L"%I64d", rtNow);
-		durstr.Format(L"%I64d", rtDur);
-		rstr.Format(L"%I64d", rtDur - rtNow);
+		strPos.Format(L"%I64d", rt);
+		strDur.Format(L"%I64d", rtDur);
 	}
 
-	if (!AfxGetAppSettings().fRemainingTime) {
-		str = ((rtDur <= 0) || (rtDur < rtNow)) ? posstr : posstr + L" / " + durstr;
+	CString str;
+	if (rtDur > 0 && rtNow < rtDur) {
+		if (s.fRemainingTime) {
+			str = L"- " + strPos + L" / " + strDur;
+		} else {
+			str = strPos + L" / " + strDur;
+		}
 	} else {
-		str = ((rtDur <= 0) || (rtDur < rtNow)) ? posstr : L"- " + rstr + L" / " + durstr;
+		str = strPos;
 	}
 
 	SetStatusTimer(str);
