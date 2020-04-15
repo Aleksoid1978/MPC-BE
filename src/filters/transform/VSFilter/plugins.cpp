@@ -1064,10 +1064,10 @@ UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lPar
 		case WM_INITDIALOG: {
 			SetWindowLongPtrW(hDlg, GWLP_USERDATA, lParam);
 
-			for (ptrdiff_t i = 0; i < CharSetLen; i++) {
+			for (int i = 0; i < CharSetLen; i++) {
 				CString s;
 				s.Format(L"%s (%d)", CharSetNames[i], CharSetList[i]);
-				SendMessageW(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LONG)(LPCTSTR)s);
+				SendMessageW(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)(LPCWSTR)s);
 				if (CharSetList[i] == (int)((OPENFILENAME*)lParam)->lCustData) {
 					SendMessageW(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, i, 0);
 				}
