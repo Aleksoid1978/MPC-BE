@@ -3757,7 +3757,7 @@ void CMainFrame::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// Waffs : ignore mousemoves when entering fullscreen
+	// ignore mousemoves when entering fullscreen
 	if (m_lastMouseMove.x == -1 && m_lastMouseMove.y == -1) {
 		m_lastMouseMove.x = point.x;
 		m_lastMouseMove.y = point.y;
@@ -3798,8 +3798,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		m_pDVDC->SelectAtPosition(vp);
 	}
 
-	const CSize diff = m_lastMouseMove - point;
-	if ((abs(diff.cx) + abs(diff.cy)) >= 1) {
+	if (m_lastMouseMove != point) {
 		if (IsD3DFullScreenMode()) {
 			StopAutoHideCursor();
 			m_pFullscreenWnd->ShowCursor(true);
