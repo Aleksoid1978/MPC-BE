@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2492,7 +2492,7 @@ CString ReftimeToString(const REFERENCE_TIME& rtVal)
 	int			lSecond   = (llTotalMs /  1000) % 60;
 	int			lMillisec = llTotalMs  %  1000;
 
-	strTemp.Format(L"%02d:%02d:%02d,%03d", lHour, lMinute, lSecond, lMillisec);
+	strTemp.Format(L"%02d:%02d:%02d.%03d", lHour, lMinute, lSecond, lMillisec);
 	return strTemp;
 }
 
