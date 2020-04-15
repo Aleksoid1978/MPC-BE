@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -119,8 +119,8 @@ extern CString			GetDriveLabel(WCHAR drive);
 extern DVD_HMSF_TIMECODE	RT2HMSF(REFERENCE_TIME rt, double fps = 0); // use to remember the current position
 extern DVD_HMSF_TIMECODE	RT2HMS_r(REFERENCE_TIME rt);                // use only for information (for display on the screen)
 extern REFERENCE_TIME		HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps = 0);
-extern CString				ReftimeToString(const REFERENCE_TIME& rtVal);
-extern CString				ReftimeToString2(const REFERENCE_TIME& rtVal);
+extern CString				ReftimeToString(const REFERENCE_TIME& rtVal);  // hour, minute, second, millisec
+extern CString				ReftimeToString2(const REFERENCE_TIME& rtVal); // hour, minute, second (round)
 extern CString				DVDtimeToString(const DVD_HMSF_TIMECODE& rtVal, bool bAlwaysShowHours=false);
 extern REFERENCE_TIME		StringToReftime(LPCWSTR strVal);
 extern REFERENCE_TIME		StringToReftime2(LPCWSTR strVal);
