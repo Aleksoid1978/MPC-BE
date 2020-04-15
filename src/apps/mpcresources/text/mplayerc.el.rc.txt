@@ -2078,6 +2078,7 @@ STRING ID_PLAY_INCRATE		"Αύξηση ταχύτητας\nΑύξηση ταχύ�
 STRING ID_PLAY_PAUSE		"Παύση\nΠαύση"
 STRING ID_PLAY_PLAY		"Αναπαραγωγή\nΑναπαραγωγή"
 STRING ID_PLAY_STOP		"Διακοπή\nΔιακοπή"
+STRING ID_SHOW_MILLISECONDS		"Show milliseconds"
 STRING ID_VOLUME_MUTE		"Σίγαση\nΣίγαση"
 STRING ID_VOLUME_MUTE_DISABLED		"Χωρίς ήχο\nΧωρίς ήχο"
 STRING ID_VOLUME_MUTE_OFF		"Με ήχο\nΜε ήχο"

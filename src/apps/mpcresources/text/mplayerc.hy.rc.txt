@@ -2078,6 +2078,7 @@ STRING ID_PLAY_INCRATE		"Մեծացնել արագությունը\nՄեծացն
 STRING ID_PLAY_PAUSE		"Դադար\Դադար"
 STRING ID_PLAY_PLAY		"Վերարտադրում\nՎերարտադրում"
 STRING ID_PLAY_STOP		"Կանգնեցնել\nԿանգնեցնել"
+STRING ID_SHOW_MILLISECONDS		"Show milliseconds"
 STRING ID_VOLUME_MUTE		"Անձայն\nԱնձայն"
 STRING ID_VOLUME_MUTE_DISABLED		"Առանց ձայնի\nԱռանց ձայնի"
 STRING ID_VOLUME_MUTE_OFF		"Unmute\nUnmute"

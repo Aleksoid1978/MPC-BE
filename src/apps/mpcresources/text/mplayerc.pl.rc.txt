@@ -2066,6 +2066,7 @@ STRING ID_PLAY_INCRATE		"Zwiększono tempo odtwarzania\nZwiększa tempo odtwarza
 STRING ID_PLAY_PAUSE		"Wstrzymano\nWstrzymuje odtwarzanie"
 STRING ID_PLAY_PLAY		"Odtwarzanie\nRozpoczyna odtwarzanie"
 STRING ID_PLAY_STOP		"Zatrzymano\nZatrzymuje odtwarzanie"
+STRING ID_SHOW_MILLISECONDS		"Show milliseconds"
 STRING ID_VOLUME_MUTE		"Wycisz\nWycisza dźwięk"
 STRING ID_VOLUME_MUTE_DISABLED		"Brak audio\nBrak ścieżki dźwiękowej"
 STRING ID_VOLUME_MUTE_OFF		"Zgłośnij\nZgłosnij"
