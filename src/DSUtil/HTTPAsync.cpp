@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2019 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -138,8 +138,8 @@ static CString FormatErrorMessage(DWORD dwError)
 					   FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE,
 					   GetModuleHandleW(L"wininet"), dwError,
 					   MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-					   (LPTSTR)&lpMsgBuf, 0, nullptr) > 0) {
-		errMsg = (LPTSTR)lpMsgBuf;
+					   (LPWSTR)&lpMsgBuf, 0, nullptr) > 0) {
+		errMsg = (LPWSTR)lpMsgBuf;
 		errMsg.TrimRight(L"\r\n");
 		LocalFree(lpMsgBuf);
 	}

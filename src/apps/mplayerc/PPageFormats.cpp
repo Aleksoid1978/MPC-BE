@@ -171,8 +171,8 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	return !!bIsDefault;
 }
 
-typedef int (*GetIconIndexFunc)(LPCTSTR);
-static int GetIconIndex(LPCTSTR ext)
+typedef int (*GetIconIndexFunc)(LPCWSTR);
+static int GetIconIndex(LPCWSTR ext)
 {
 	int iconindex = -1;
 
@@ -407,7 +407,7 @@ HRESULT CPPageFormats::RegisterUI()
 	return hr;
 }
 
-void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
+void Execute(LPCWSTR lpszCommand, LPCWSTR lpszParameters)
 {
 	SHELLEXECUTEINFOW ShExecInfo = {0};
 	ShExecInfo.cbSize		= sizeof(SHELLEXECUTEINFOW);
@@ -426,7 +426,7 @@ void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
 
 typedef HRESULT (WINAPI *tpDllRegisterServer)();
 typedef HRESULT (WINAPI *tpDllUnRegisterServer)();
-bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
+bool CPPageFormats::RegisterShellExt(LPCWSTR lpszLibrary)
 {
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
@@ -458,7 +458,7 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 	return SUCCEEDED(hr);
 }
 
-bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
+bool CPPageFormats::UnRegisterShellExt(LPCWSTR lpszLibrary)
 {
 	HINSTANCE hDLL = LoadLibraryW(lpszLibrary);
 	if (hDLL == nullptr) {
@@ -1046,8 +1046,8 @@ void CPPageFormats::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CPPageFormats::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -1060,8 +1060,8 @@ void CPPageFormats::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFormats::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -1074,8 +1074,8 @@ void CPPageFormats::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFormats::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 

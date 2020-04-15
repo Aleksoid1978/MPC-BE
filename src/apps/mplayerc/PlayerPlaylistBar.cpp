@@ -202,7 +202,7 @@ CPlaylistItem& CPlaylistItem::operator = (const CPlaylistItem& pli)
 	return(*this);
 }
 
-bool CPlaylistItem::FindFile(LPCTSTR path)
+bool CPlaylistItem::FindFile(LPCWSTR path)
 {
 	for (const auto& fi : m_fns) {
 		if (fi.GetName().CompareNoCase(path) == 0) {
@@ -213,7 +213,7 @@ bool CPlaylistItem::FindFile(LPCTSTR path)
 	return false;
 }
 
-bool CPlaylistItem::FindFolder(LPCTSTR path) const
+bool CPlaylistItem::FindFolder(LPCWSTR path) const
 {
 	for (const auto& fi : m_fns) {
 		CString str = fi.GetName();
@@ -1591,7 +1591,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 				if (bRemovePath) {
 					CPath p(fn);
 					p.StripPath();
-					fn = (LPCTSTR)p;
+					fn = (LPCWSTR)p;
 				}
 				f.WriteString(idx + L",filename," + fn + L"\n");
 			}
@@ -1601,7 +1601,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 				if (bRemovePath) {
 					CPath p(fn);
 					p.StripPath();
-					fn = (LPCTSTR)p;
+					fn = (LPCWSTR)p;
 				}
 				f.WriteString(idx + L",subtitle," + fn + L"\n");
 			}
@@ -3125,7 +3125,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 	}
 
 	WCHAR szLabel[MAX_PATH];
-	LV_ITEM lvi = {};
+	LV_ITEMW lvi = {};
 	lvi.stateMask = LVIS_DROPHILITED | LVIS_FOCUSED | LVIS_SELECTED;
 	lvi.pszText = szLabel;
 	lvi.cchTextMax = MAX_PATH;
@@ -3153,7 +3153,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 		// copy data from other columns
 		for (int col = 1; col < nColumnCount; col++) {
 			lvi.mask = LVIF_TEXT;
-			wcscpy_s(lvi.pszText, MAX_PATH, (LPCTSTR)(m_list.GetItemText(dragIdx, col)));
+			wcscpy_s(lvi.pszText, MAX_PATH, (LPCWSTR)(m_list.GetItemText(dragIdx, col)));
 			lvi.iSubItem = col;
 			m_list.SetItem(&lvi);
 		}
@@ -3604,7 +3604,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 			CPath p(path);
 			p.RemoveFileSpec();
-			CString base = (LPCTSTR)p;
+			CString base = (LPCWSTR)p;
 
 			pos = curPlayList.GetHeadPosition();
 			while (pos && fRemovePath) {
@@ -3619,7 +3619,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 						CPath p(fn);
 						p.RemoveFileSpec();
-						if (base != (LPCTSTR)p) {
+						if (base != (LPCWSTR)p) {
 							fRemovePath = false;
 						}
 					}
@@ -3630,7 +3630,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 						CPath p(fn);
 						p.RemoveFileSpec();
-						if (base != (LPCTSTR)p) {
+						if (base != (LPCWSTR)p) {
 							fRemovePath = false;
 						}
 					}
@@ -3672,7 +3672,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 							{
 								CPath p(path);
 								p.StripPath();
-								fn = (LPCTSTR)p;
+								fn = (LPCWSTR)p;
 							}
 				*/
 

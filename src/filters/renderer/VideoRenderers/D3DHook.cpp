@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2019 see Authors.txt
+ * (C) 2017-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -158,7 +158,7 @@ namespace D3DHook {
 				if (!lpszKeyName.IsEmpty()) {
 					CRegKey regkey;
 					if (ERROR_SUCCESS == regkey.Open(HKEY_LOCAL_MACHINE, lpszKeyName, KEY_READ)) {
-						LPCTSTR pszValueName = L"UserModeDriverName";
+						LPCWSTR pszValueName = L"UserModeDriverName";
 #ifndef _WIN64
 						if (SysVersion::IsW64()) {
 							pszValueName = L"UserModeDriverNameWoW";
@@ -166,7 +166,7 @@ namespace D3DHook {
 #endif
 						ULONG nChars = 0;
 						if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, nullptr, &nChars) && nChars > 0) {
-							LPTSTR pszValue = DNew WCHAR[nChars];
+							LPWSTR pszValue = DNew WCHAR[nChars];
 							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue, &nChars)) {
 								// we need only the first value
 								driverDll = pszValue; driverDll.Trim();

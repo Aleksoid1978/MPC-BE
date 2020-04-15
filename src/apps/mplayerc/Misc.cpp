@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2019 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #include "Misc.h"
 #include "../../DSUtil/FileHandle.h"
 
-bool SetPrivilege(LPCTSTR privilege, bool bEnable/* = true*/)
+bool SetPrivilege(LPCWSTR privilege, bool bEnable/* = true*/)
 {
 	SetThreadExecutionState(ES_CONTINUOUS);
 
@@ -34,7 +34,7 @@ bool SetPrivilege(LPCTSTR privilege, bool bEnable/* = true*/)
 
 	TOKEN_PRIVILEGES tkp;
 	// Get the LUID for the privilege.
-	LookupPrivilegeValue(nullptr, privilege, &tkp.Privileges[0].Luid);
+	LookupPrivilegeValueW(nullptr, privilege, &tkp.Privileges[0].Luid);
 
 	tkp.PrivilegeCount = 1;  // one privilege to set
 	tkp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
@@ -99,7 +99,7 @@ from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).a
 }
 
 // from http://msdn.microsoft.com/ru-RU/library/windows/desktop/ms680582(v=vs.85).aspx
-CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
+CString GetLastErrorMsg(LPWSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 {
 	LPVOID lpMsgBuf;
 	LPVOID lpDisplayBuf;
@@ -112,13 +112,13 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 		dw,
 		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
 		//MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default system language
-		(LPTSTR)&lpMsgBuf,
+		(LPWSTR)&lpMsgBuf,
 		0, nullptr);
 
 	// Format the error message
 
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-		(lstrlenW((LPCWSTR)lpMsgBuf) + lstrlen((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
+		(lstrlenW((LPCWSTR)lpMsgBuf) + lstrlenW((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
 	StringCchPrintfW((LPWSTR)lpDisplayBuf,
 		LocalSize(lpDisplayBuf) / sizeof(WCHAR),
 		L"Function '%s' failed with error %d: %s",
@@ -301,7 +301,7 @@ bool LoadType(const CString& fn, CString& type)
 	return found;
 }
 
-bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype)
+bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype)
 {
 	str.Empty();
 	HRSRC hrsrc = FindResourceW(AfxGetApp()->m_hInstance, MAKEINTRESOURCEW(resid), restype);

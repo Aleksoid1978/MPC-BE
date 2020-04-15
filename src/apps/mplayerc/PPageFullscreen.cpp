@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -276,8 +276,8 @@ BOOL CPPageFullscreen::OnApply()
 
 void CPPageFullscreen::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 	*pResult = FALSE;
 	if (pItem->iItem < 0) {
 		return;
@@ -287,8 +287,8 @@ void CPPageFullscreen::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFullscreen::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 	if (pItem->iItem < 0) {
@@ -313,8 +313,8 @@ void CPPageFullscreen::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFullscreen::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-	LV_ITEM* pItem = &pDispInfo->item;
+	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	LV_ITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 	if (!m_list.m_fInPlaceDirty) {

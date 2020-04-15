@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -264,7 +264,7 @@ bool CWebServer::ToLocalPath(CString& path, CString& redir)
 		}
 
 		if (wcslen(p) > wcslen(m_webroot) && p.FileExists()) {
-			path = (LPCTSTR)p;
+			path = (LPCWSTR)p;
 			return true;
 		}
 	}
@@ -578,8 +578,8 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		CString str;
 
 		std::list<CString> env;
-		for (LPTSTR lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable += wcslen(lpszVariable)+1)
-			if (lpszVariable != (LPTSTR)lpvEnv) {
+		for (LPWSTR lpszVariable = (LPWSTR)lpvEnv; *lpszVariable; lpszVariable += wcslen(lpszVariable)+1)
+			if (lpszVariable != (LPWSTR)lpvEnv) {
 				env.emplace_back(lpszVariable);
 			}
 
@@ -627,7 +627,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		str = Implode(env, '\0');
 		envstr = CStringA(str, str.GetLength());
 
-		FreeEnvironmentStrings((LPTSTR)lpvEnv);
+		FreeEnvironmentStringsW((LPWSTR)lpvEnv);
 	}
 
 	WCHAR* cmdln = DNew WCHAR[32768];

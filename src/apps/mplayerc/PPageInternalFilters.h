@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ enum {
 };
 
 struct filter_t {
-	LPCTSTR label;
+	LPCWSTR label;
 	int type;
 	int flag;
 	UINT nHintID;

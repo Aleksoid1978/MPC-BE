@@ -852,7 +852,7 @@ protected:  // control bar embedded members
 	const UINT CF_URLW = RegisterClipboardFormatW(CFSTR_INETURLW);
 	void DropFiles(std::list<CString>& slFiles);
 
-	LPCTSTR GetRecentFile();
+	LPCWSTR GetRecentFile();
 
 	void RestoreControlBars();
 	void SaveControlBars();
@@ -1245,7 +1245,7 @@ public:
 	void		SetupVMR9ColorControl();
 	void		SetColorControl(DWORD flags, int& brightness, int& contrast, int& hue, int& saturation);
 	void		SetClosedCaptions(bool enable);
-	LPCTSTR		GetDVDAudioFormatName(DVD_AudioAttributes& ATR) const;
+	LPCWSTR		GetDVDAudioFormatName(DVD_AudioAttributes& ATR) const;
 	void		SetAudioDelay(REFERENCE_TIME rtShift);
 	void		SetSubtitleDelay(int delay_ms);
 	//void		AutoSelectTracks();

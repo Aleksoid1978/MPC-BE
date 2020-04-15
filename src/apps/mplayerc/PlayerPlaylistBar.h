@@ -66,7 +66,7 @@ public:
 		return m_fn;
 	}
 
-	operator LPCTSTR() const {
+	operator LPCWSTR() const {
 		return m_fn;
 	}
 
@@ -131,8 +131,8 @@ public:
 
 	CPlaylistItem& operator = (const CPlaylistItem& pli);
 
-	bool FindFile(LPCTSTR path);
-	bool FindFolder(LPCTSTR path) const;
+	bool FindFile(LPCWSTR path);
+	bool FindFolder(LPCWSTR path) const;
 	void AutoLoadFiles();
 
 	CString GetLabel(int i = 0);
