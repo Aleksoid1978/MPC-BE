@@ -3599,8 +3599,9 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-	templclick = false;
 	SetCapture();
+	m_bBeginCapture = true;
+	m_beginCapturePoint = point;
 
 	__super::OnLButtonDown(nFlags, point);
 }
@@ -3611,6 +3612,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		StartAutoHideCursor();
 	}
 
+	m_bBeginCapture = false;
 	ReleaseCapture();
 
 	if (m_bLeftMouseDownFullScreen) {
@@ -3763,8 +3765,9 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	CWnd* w = GetCapture();
-	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON) && templclick) {
+	if (m_bBeginCapture && m_beginCapturePoint != point) {
+		m_bBeginCapture = false;
+		m_bLeftMouseDown = FALSE;
 		ReleaseCapture();
 
 		if (s.iCaptionMenuMode == MODE_BORDERLESS) {
@@ -3779,9 +3782,8 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 			}
 		}
 
-		SendMessageW(WM_NCLBUTTONDOWN, HTCAPTION, 0);
- 	}
-	templclick = true;
+		SendMessageW(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(m_beginCapturePoint.x, m_beginCapturePoint.y));
+	}
 
 	if (GetPlaybackMode() == PM_DVD) {
 		CRect vid_rect = m_wndView.GetVideoRect();
@@ -3797,7 +3799,6 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 	}
 
 	const CSize diff = m_lastMouseMove - point;
-
 	if ((abs(diff.cx) + abs(diff.cy)) >= 1) {
 		if (IsD3DFullScreenMode()) {
 			StopAutoHideCursor();
