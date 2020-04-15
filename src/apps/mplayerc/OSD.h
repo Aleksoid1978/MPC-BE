@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -71,8 +71,8 @@ public:
 	void Start(CWnd* pWnd);
 	void Stop();
 
-	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = L"");
-	void DebugMessage(LPCTSTR format, ...);
+	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = L"");
+	void DebugMessage(LPCWSTR format, ...);
 	void ClearMessage(bool hide = false);
 
 	void HideMessage(bool hide);

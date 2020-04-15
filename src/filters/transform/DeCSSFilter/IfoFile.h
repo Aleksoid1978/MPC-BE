@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,7 +54,7 @@ public:
 	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }
 	fraction_t		GetAspectRatio() const { return m_Aspect; }
 
-	static bool GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN /* out */, ULONG& TTN /* out */); // video_ts.ifo
+	static bool GetTitleInfo(LPCWSTR fn, ULONG nTitleNum, ULONG& VTSN /* out */, ULONG& TTN /* out */); // video_ts.ifo
 
 private:
 	CFile		m_ifoFile;

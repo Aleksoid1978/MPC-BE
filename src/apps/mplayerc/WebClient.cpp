@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -441,7 +441,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 				for (const auto& str : cmdln) {
 					len = (str.GetLength()+1)*sizeof(WCHAR);
-					memcpy(p, (LPCTSTR)str, len);
+					memcpy(p, (LPCWSTR)str, len);
 					p += len;
 				}
 
@@ -454,7 +454,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 			CPath p(path);
 			p.RemoveFileSpec();
-			path = (LPCTSTR)p;
+			path = (LPCWSTR)p;
 		}
 	} else {
 		path = m_pMainFrame->m_wndPlaylistBar.GetCurFileName();
@@ -462,7 +462,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
 			CPath p(path);
 			p.RemoveFileSpec();
-			path = (LPCTSTR)p;
+			path = (LPCWSTR)p;
 		}
 	}
 
@@ -475,7 +475,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 		p.Canonicalize();
 		p.MakePretty();
 		p.AddBackslash();
-		path = (LPCTSTR)p;
+		path = (LPCWSTR)p;
 	}
 
 	CStringA files;
@@ -499,7 +499,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 			CPath p(path + "..");
 			p.Canonicalize();
 			p.AddBackslash();
-			parent = (LPCTSTR)p;
+			parent = (LPCWSTR)p;
 		}
 
 		files += "<tr class=\"dir\">\r\n";
@@ -584,7 +584,7 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 	if (!path.IsEmpty()) {
 		CPath p(path);
 		p.RemoveFileSpec();
-		dir = (LPCTSTR)p;
+		dir = (LPCWSTR)p;
 	}
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
@@ -775,7 +775,7 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 	if (!path.IsEmpty()) {
 		CPath p(path);
 		p.RemoveFileSpec();
-		dir = (LPCTSTR)p;
+		dir = (LPCWSTR)p;
 	}
 	path.Replace(L"'", L"\\'");
 	dir.Replace(L"'", L"\\'");

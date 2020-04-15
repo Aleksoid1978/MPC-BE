@@ -481,7 +481,7 @@ public:
 		return m_fn;
 	}
 
-	operator LPCTSTR() const {
+	operator LPCWSTR() const {
 		return m_fn;
 	}
 

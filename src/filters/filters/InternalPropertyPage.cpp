@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -67,7 +67,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 
 	m_pPageSite = pPageSite;
 
-	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
+	LPCWSTR wc = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
 	if (!CreateEx(0, wc, L"CInternalPropertyPageWnd", WS_CHILDWINDOW, *pRect, pParentWnd, 0)) {
 		return FALSE;
 	}

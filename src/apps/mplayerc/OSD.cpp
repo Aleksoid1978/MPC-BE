@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -730,7 +730,7 @@ void COSD::ClearMessage(bool hide)
 	}
 }
 
-void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
+void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
 {
 	if (!m_bShowMessage) {
 		return;
@@ -796,7 +796,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 	}
 }
 
-void COSD::DebugMessage(LPCTSTR format, ...)
+void COSD::DebugMessage(LPCWSTR format, ...)
 {
 	CString tmp;
 	va_list argList;
