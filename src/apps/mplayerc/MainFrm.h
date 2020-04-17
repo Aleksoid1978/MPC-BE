@@ -767,6 +767,7 @@ public:
 	void ReplaceSubtitle(ISubStream* pSubStreamOld, ISubStream* pSubStreamNew);
 	void InvalidateSubtitle(DWORD_PTR nSubtitleId = -1, REFERENCE_TIME rtInvalidate = -1);
 	void ReloadSubtitle();
+	void ToggleSubtitleOnOff(bool bDisplayMessage = false);
 
 	void UpdateSubDefaultStyle();
 

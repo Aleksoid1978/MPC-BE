@@ -4978,57 +4978,11 @@ void CMainFrame::OnStreamSubOnOff()
 		return;
 	}
 
-	if (GetPlaybackMode() == PM_FILE && m_pDVS) {
-		int nLangs;
-		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-			bool fHideSubtitles = false;
-			m_pDVS->get_HideSubtitles(&fHideSubtitles);
-			fHideSubtitles = !fHideSubtitles;
-			m_pDVS->put_HideSubtitles(fHideSubtitles);
 
-			if (fHideSubtitles) {
-				m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_SUBTITLE_STREAM_OFF));
-			} else {
-				int iSelected = 0;
-				m_pDVS->get_SelectedLanguage(&iSelected);
-				WCHAR* pName = nullptr;
-				m_pDVS->get_LanguageName(iSelected, &pName);
-
-				CString	strMessage;
-				strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
-				m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-				CoTaskMemFree(pName);
-			}
-		}
-
-		return;
-	}
-
-	int cnt = 0;
-	POSITION pos = m_pSubStreams.GetHeadPosition();
-	while (pos) {
-		cnt += m_pSubStreams.GetNext(pos)->GetStreamCount();
-	}
-
-	if (cnt > 0) {
-		if (m_iSubtitleSel == -1) {
-			m_iSubtitleSel = 0;
-		} else {
-			m_iSubtitleSel ^= 0x80000000;
-		}
-		UpdateSubtitle(true);
-		SetFocus();
-		AfxGetAppSettings().fEnableSubtitles = !(m_iSubtitleSel & 0x80000000);
-
-		return;
-	}
-
-	if (GetPlaybackMode() == PM_DVD && m_pDVDI && m_pDVDC) {
-		ULONG ulStreamsAvailable, ulCurrentStream;
-		BOOL bIsDisabled;
-		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
-			m_pDVDC->SetSubpictureState(bIsDisabled, DVD_CMD_FLAG_Block, nullptr);
-		}
+	if ((GetPlaybackMode() == PM_DVD && m_pDVDI)
+			|| m_pDVS
+			|| !m_pSubStreams.IsEmpty()) {
+		ToggleSubtitleOnOff(true);
 	}
 }
 
@@ -8609,33 +8563,7 @@ void CMainFrame::OnMenuSubtitlesOption()
 
 void CMainFrame::OnMenuSubtitlesEnable()
 {
-	if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
-		ULONG ulStreamsAvailable, ulCurrentStream;
-		BOOL bIsDisabled;
-		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
-			m_pDVDC->SetSubpictureState(bIsDisabled, DVD_CMD_FLAG_Block, nullptr);
-		}
-	}
-	else if (m_pDVS) {
-		bool fHideSubtitles = false;
-		m_pDVS->get_HideSubtitles(&fHideSubtitles);
-		fHideSubtitles = !fHideSubtitles;
-		m_pDVS->put_HideSubtitles(fHideSubtitles);
-		return;
-	}
-	else {
-		auto& s = AfxGetAppSettings();
-		s.fEnableSubtitles = !s.fEnableSubtitles;
-
-		if (s.fEnableSubtitles) {
-			m_iSubtitleSel = m_nSelSub2;
-		} else {
-			m_nSelSub2 = m_iSubtitleSel;
-			m_iSubtitleSel = -1;
-		}
-
-		UpdateSubtitle();
-	}
+	ToggleSubtitleOnOff();
 }
 
 void CMainFrame::OnUpdateSubtitlesEnable(CCmdUI* pCmdUI)
@@ -16175,6 +16103,53 @@ void CMainFrame::ReloadSubtitle()
 
 	if (AfxGetAppSettings().fUseSybresync) {
 		m_wndSubresyncBar.ReloadSubtitle();
+	}
+}
+
+void CMainFrame::ToggleSubtitleOnOff(bool bDisplayMessage/* = false*/)
+{
+	if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
+		ULONG ulStreamsAvailable, ulCurrentStream;
+		BOOL bIsDisabled;
+		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
+			m_pDVDC->SetSubpictureState(bIsDisabled, DVD_CMD_FLAG_Block, nullptr);
+		}
+	} else if (m_pDVS) {
+		bool bHideSubtitles = false;
+		m_pDVS->get_HideSubtitles(&bHideSubtitles);
+		bHideSubtitles = !bHideSubtitles;
+		m_pDVS->put_HideSubtitles(bHideSubtitles);
+
+		if (bDisplayMessage) {
+			int nLangs;
+			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+				if (bHideSubtitles) {
+					m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_SUBTITLE_STREAM_OFF));
+				} else {
+					int iSelected = 0;
+					m_pDVS->get_SelectedLanguage(&iSelected);
+					WCHAR* pName = nullptr;
+					m_pDVS->get_LanguageName(iSelected, &pName);
+
+					CString	strMessage;
+					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
+					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+					CoTaskMemFree(pName);
+				}
+			}
+		}
+	} else {
+		auto& s = AfxGetAppSettings();
+		s.fEnableSubtitles = !s.fEnableSubtitles;
+
+		if (s.fEnableSubtitles) {
+			m_iSubtitleSel = m_nSelSub2;
+		} else {
+			m_nSelSub2 = m_iSubtitleSel;
+			m_iSubtitleSel = -1;
+		}
+
+		UpdateSubtitle(bDisplayMessage);
 	}
 }
 
