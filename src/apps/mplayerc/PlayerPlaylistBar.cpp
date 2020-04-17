@@ -2816,7 +2816,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	COLORREF textcolor = bSelected ? 0xff : 0;
 
 	if (s.bUseDarkTheme) {
-		textcolor = bSelected ? s.clrFaceABGR : (!!m_list.GetItemState(nItem, LVIS_SELECTED) ? ThemeRGB(165, 170, 175) : ThemeRGB(135, 140, 145));
+		textcolor = bSelected ? ThemeRGB(0xFF, 0xFF, 0xFF) : (!!m_list.GetItemState(nItem, LVIS_SELECTED) ? ThemeRGB(165, 170, 175) : ThemeRGB(135, 140, 145));
 	}
 
 	if (pli.m_bInvalid) {
@@ -4689,7 +4689,7 @@ void CPlayerPlaylistBar::TSetColor()
 
 		m_crTN = TColorBrightness(+60, m_crBN);    // text normal
 		m_crTH = TColorBrightness(+80, m_crTN);    // text normal lighten
-		m_crTS = AfxGetAppSettings().clrFaceABGR;  // text selected
+		m_crTS = ThemeRGB(0xFF, 0xFF, 0xFF);       // text selected
 	}
 	else {
 		m_crBkBar = GetSysColor(COLOR_BTNFACE);    // background tab bar

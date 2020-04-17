@@ -229,13 +229,6 @@ void CPlayerToolBar::SwitchTheme()
 	HBITMAP hBmp = nullptr;
 	bool fp = CMPCPngImage::FileExists(L"toolbar");
 	if (s.bUseDarkTheme && !fp) {
-		/*
-		int col = s.clrFaceABGR;
-		int r, g, b, R, G, B;
-		r = col & 0xFF;
-		g = (col >> 8) & 0xFF;
-		b = col >> 16;
-		*/
 		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", resid, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
 		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", 0, IMG_TYPE::UNDEF);

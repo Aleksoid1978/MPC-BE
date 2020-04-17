@@ -19958,13 +19958,14 @@ void CMainFrame::SetColorMenu()
 	const COLORREF crTNL   = ColorBrightness(+80, crTN);		// text normal lighten
 	const COLORREF crTG    = ColorBrightness(-80, crTN);		// text grayed
 	const COLORREF crTGL   = ColorBrightness(-60, crTN);		// text grayed lighten
+	const COLORREF crTS    = ThemeRGB(0xFF, 0xFF, 0xFF);		// text selected
 
 	CMenuEx::SetColorMenu(
 		crBkBar,
 		crBN, crBNL, crBND,
 		crBR, crBRL, crBRD,
 		crBS, crBSL, crBSD,
-		crTN, crTNL, crTG, crTGL);
+		crTN, crTNL, crTG, crTGL, crTS);
 
 	if (m_hMainMenuBrush) {
 		::DeleteObject(m_hMainMenuBrush);

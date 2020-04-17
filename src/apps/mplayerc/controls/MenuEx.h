@@ -54,7 +54,7 @@ public:
 				const COLORREF crBN, const COLORREF crBNL, const COLORREF crBND,
 				const COLORREF crBR, const COLORREF crBRL, const COLORREF crBRD,
 				const COLORREF crSR, const COLORREF crSRL, const COLORREF crSRD,
-				const COLORREF crTN, const COLORREF crTNL, const COLORREF crTG, const COLORREF crTGL);
+				const COLORREF crTN, const COLORREF crTNL, const COLORREF crTG, const COLORREF crTGL, const COLORREF crTS);
 
 	static void SetMain(CMainFrame* pMainFrame);
 	static void ScaleFont();
@@ -84,6 +84,7 @@ protected:
 	static inline COLORREF m_crTNL; // text normal lighten
 	static inline COLORREF m_crTG;  // text grayed
 	static inline COLORREF m_crTGL; // text grayed lighten
+	static inline COLORREF m_crTS;  // text selected
 
 	static inline int m_CYMENU = 0;
 	static inline int m_CXMENUCHECK = 0;
