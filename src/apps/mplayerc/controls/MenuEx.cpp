@@ -75,8 +75,7 @@ void CMenuEx::DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const boo
 					HBITMAP hbmPrevMask = (HBITMAP)::SelectObject(hdcMask, hbmMask);
 					if (hbmPrevMask) {
 						// Set the colour of the check mark to white
-						const CAppSettings& s = AfxGetAppSettings();
-						bGrayed ? SetBkColor(hdcMask, m_crTGL) : (bSelected ? SetBkColor(hdcMask, s.clrFaceABGR) : SetBkColor(hdcMask, m_crTN));
+						bGrayed ? SetBkColor(hdcMask, m_crTGL) : (bSelected ? SetBkColor(hdcMask, m_crTS) : SetBkColor(hdcMask, m_crTN));
 						::BitBlt(hdcMask, 0, 0, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, PATCOPY);
 
 						// Invert the check mark bitmap
@@ -202,7 +201,7 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 		if (bGrayed) {
 			pDC->SetTextColor(m_crTGL);
 		} else {
-			pDC->SetTextColor(s.clrFaceABGR);
+			pDC->SetTextColor(m_crTS);
 		}
 
 		if (lpItem->bMainMenu) {
@@ -349,7 +348,7 @@ void CMenuEx::SetColorMenu(
 	const COLORREF crBN, const COLORREF crBNL, const COLORREF crBND,
 	const COLORREF crBR, const COLORREF crBRL, const COLORREF crBRD,
 	const COLORREF crBS, const COLORREF crBSL, const COLORREF crBSD,
-	const COLORREF crTN, const COLORREF crTNL, const COLORREF crTG, const COLORREF crTGL)
+	const COLORREF crTN, const COLORREF crTNL, const COLORREF crTG, const COLORREF crTGL, const COLORREF crTS)
 {
 	m_crBkBar = crBkBar;
 	m_crBN  = crBN;
@@ -368,6 +367,7 @@ void CMenuEx::SetColorMenu(
 	m_crTNL = crTNL;
 	m_crTG = crTG;
 	m_crTGL = crTGL;
+	m_crTS = crTS;
 }
 
 static CString GetModuleName(const HMODULE hModule)
