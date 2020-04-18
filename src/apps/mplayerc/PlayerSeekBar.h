@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,6 +59,8 @@ private:
 
 	CPoint          m_CurrentPoint;
 
+	CFont           m_font;
+
 	REFERENCE_TIME CalculatePosition(const CPoint point);
 
 	void MoveThumb(const CPoint point);
@@ -75,7 +77,7 @@ private:
 
 public:
 	CPlayerSeekBar(CMainFrame* pMainFrame);
-	virtual ~CPlayerSeekBar();
+	virtual ~CPlayerSeekBar() = default;
 
 	void Enable(bool bEnable);
 
@@ -99,6 +101,8 @@ public:
 	BOOL OnPlayStop(UINT nID);
 
 	void PreviewWindowShow();
+
+	void ScaleFont();
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

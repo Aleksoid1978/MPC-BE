@@ -88,8 +88,8 @@ void CPlayerStatusBar::ScaleFontInternal()
 	m_font.DeleteObject();
 
 	m_font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
-					  L"Tahoma");
+					   OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+					   L"Tahoma");
 }
 
 int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)

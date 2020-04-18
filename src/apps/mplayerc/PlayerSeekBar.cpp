@@ -35,10 +35,6 @@ CPlayerSeekBar::CPlayerSeekBar(CMainFrame* pMainFrame)
 {
 }
 
-CPlayerSeekBar::~CPlayerSeekBar()
-{
-}
-
 BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 {
 	VERIFY(CDialogBar::Create(pParentWnd, IDD_PLAYERSEEKBAR, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM, IDD_PLAYERSEEKBAR));
@@ -66,6 +62,8 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	if (m_BackGroundbm.FileExists(L"background")) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
 	}
+
+	ScaleFont();
 
 	return TRUE;
 }
@@ -415,11 +413,7 @@ void CPlayerSeekBar::OnPaint()
 		if (seekbartext.GetLength() || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
 			memdc.SetTextColor(ThemeRGB(135, 140, 145));
 
-			CFont font;
-			font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-							OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma");
-
-			CFont* pOldFont = memdc.SelectObject(&font);
+			memdc.SelectObject(&m_font);
 			SetBkMode(memdc, TRANSPARENT);
 
 			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
@@ -741,6 +735,14 @@ void CPlayerSeekBar::PreviewWindowShow()
 		}
 		m_pMainFrame->PreviewWindowShow(m_pos_preview);
 	}
+}
+
+void CPlayerSeekBar::ScaleFont()
+{
+	m_font.DeleteObject();
+	m_font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+					   OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+					   L"Tahoma");
 }
 
 void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
