@@ -776,7 +776,7 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	CAppSettings& s = AfxGetAppSettings();
 	m_bUseDarkTheme = s.bUseDarkTheme;
 
-	TSetColor();
+	SetColor();
 	TGetSettings();
 }
 
@@ -2712,37 +2712,11 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		CRect r;
 		GetClientRect(&r);
-		FillRect(pLVCD->nmcd.hdc, &r, CBrush(AfxGetAppSettings().bUseDarkTheme ? ThemeRGB(10, 15, 20) : RGB(255, 255, 255)));
+		FillRect(pLVCD->nmcd.hdc, &r, CBrush(m_crBackground));
 
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
 
 	}
-	/* else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage) {
-
-		pLVCD->nmcd.uItemState &= ~CDIS_SELECTED;
-		pLVCD->nmcd.uItemState &= ~CDIS_FOCUS;
-
-		if (!s.bUseDarkTheme) {
-			pLVCD->clrTextBk = m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) ? 0xf1dacc : CLR_DEFAULT;
-		}
-
-		*pResult = CDRF_NOTIFYPOSTPAINT;
-
-	} else if (CDDS_ITEMPOSTPAINT == pLVCD->nmcd.dwDrawStage) {
-
-		if (m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED)) {
-
-			int nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
-			CRect r;
-			m_list.GetItemRect(nItem, &r, LVIR_BOUNDS);
-
-			if (!s.bUseDarkTheme) {
-				FrameRect(pLVCD->nmcd.hdc, &r, CBrush(0xc56a31));
-			}
-		}
-
-		*pResult = CDRF_SKIPDEFAULT;
-	}*/
 }
 
 void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
@@ -2772,51 +2746,41 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 	int oldDC = pDC->SaveDC();
 
-	int R, G, B, R2, G2, B2;
-	GRADIENT_RECT gr = { 0, 1 };
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
 		if (s.bUseDarkTheme) {
-			ThemeRGB(60, 65, 70, R, G, B);
-			ThemeRGB(50, 55, 60, R2, G2, B2);
-			TRIVERTEX tv[2] = {
-				{rcItem.left, rcItem.top, R * 256, G * 256, B * 256, 255 * 256},
-				{rcItem.right, rcItem.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
-			};
-			pDC->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
-			pDC->Draw3dRect(rcItem, ThemeRGB(80, 85, 90), ThemeRGB(30, 35, 40));
+			GRADIENT_RECT gr = { 0, 1 };
+			tvSelected[0].x = rcItem.left; tvSelected[0].y = rcItem.top;
+			tvSelected[1].x = rcItem.right; tvSelected[1].y = rcItem.bottom;
+			pDC->GradientFill(tvSelected, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+			pDC->Draw3dRect(rcItem, m_crAvtiveItem3dRectTopLeft, m_crAvtiveItem3dRectBottomRight);
 		}
 		else {
-			FillRect(pDC->m_hDC, rcItem, CBrush(0x00f1dacc));
-			pDC->SetBkColor(0x00f1dacc);
-			FrameRect(pDC->m_hDC, rcItem, CBrush(0xc56a31));
+			FillRect(pDC->m_hDC, rcItem, CBrush(0x00F1DACC));
+			pDC->SetBkColor(0x00F1DACC);
+			FrameRect(pDC->m_hDC, rcItem, CBrush(0xC56A31));
 		}
 	} else {
 		if (s.bUseDarkTheme) {
-			ThemeRGB(10, 15, 20, R, G, B);
-			ThemeRGB(10, 15, 20, R2, G2, B2);
-			TRIVERTEX tvs[2] = {
-				{rcItem.left, rcItem.top, R * 256, G * 256, B * 256, 255 * 256},
-				{rcItem.right, rcItem.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
-			};
-			pDC->GradientFill(tvs, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+			GRADIENT_RECT gr = { 0, 1 };
+			tvNormal[0].x = rcItem.left; tvNormal[0].y = rcItem.top;
+			tvNormal[1].x = rcItem.right; tvNormal[1].y = rcItem.bottom;
+			pDC->GradientFill(tvNormal, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 		}
 		else {
-			const auto bgColor = RGB(255, 255, 255);
-			FillRect(pDC->m_hDC, rcItem, CBrush(bgColor));
-			pDC->SetBkColor(bgColor);
+			FillRect(pDC->m_hDC, rcItem, CBrush(m_crBackground));
+			pDC->SetBkColor(m_crBackground);
 		}
 	}
 
 	if (s.bUseDarkTheme && m_bDrawDragImage) {
-		const auto bgColor = ThemeRGB(10, 15, 20);
-		FillRect(pDC->m_hDC, rcItem, CBrush(bgColor));
-		pDC->SetBkColor(bgColor);
+		FillRect(pDC->m_hDC, rcItem, CBrush(m_crDragImage));
+		pDC->SetBkColor(m_crDragImage);
 	}
 
-	COLORREF textcolor = bSelected ? 0xff : 0;
+	COLORREF textcolor = bSelected ? 0xFF : 0;
 
 	if (s.bUseDarkTheme) {
-		textcolor = bSelected ? ThemeRGB(0xFF, 0xFF, 0xFF) : (!!m_list.GetItemState(nItem, LVIS_SELECTED) ? ThemeRGB(165, 170, 175) : ThemeRGB(135, 140, 145));
+		textcolor = bSelected ? m_crActiveItem : (!!m_list.GetItemState(nItem, LVIS_SELECTED) ? m_crSelectedItem : m_crNormalItem);
 	}
 
 	if (pli.m_bInvalid) {
@@ -4657,7 +4621,7 @@ int CPlayerPlaylistBar::TGetFirstVisible()
 	return idx;
 }
 
-static COLORREF TColorBrightness(const int lSkale, const COLORREF color)
+static COLORREF ColorBrightness(const int lSkale, const COLORREF color)
 {
 	const int R = std::clamp(GetRValue(color) + lSkale, 0, 255);
 	const int G = std::clamp(GetGValue(color) + lSkale, 0, 255);
@@ -4666,53 +4630,74 @@ static COLORREF TColorBrightness(const int lSkale, const COLORREF color)
 	return RGB(R, G, B);
 }
 
-void CPlayerPlaylistBar::TSetColor()
+void CPlayerPlaylistBar::SetColor()
 {
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		m_crBkBar = ThemeRGB(45, 50, 55);          // background tab bar
+		m_crBkBar = ThemeRGB(45, 50, 55);           // background tab bar
 
-		m_crBN = m_crBkBar;                        // backgroung normal
-		m_crBNL = TColorBrightness(+15, m_crBN);   // backgroung normal lighten (for light edge)
-		m_crBND = TColorBrightness(-15, m_crBN);   // backgroung normal darken (for dark edge)
+		m_crBN = m_crBkBar;                         // backgroung normal
+		m_crBNL = ColorBrightness(+15, m_crBN);     // backgroung normal lighten (for light edge)
+		m_crBND = ColorBrightness(-15, m_crBN);     // backgroung normal darken (for dark edge)
 
-		m_crBS = TColorBrightness(-15, m_crBN);    // backgroung selected background
-		m_crBSL = TColorBrightness(+30, m_crBS);   // backgroung selected lighten (for light edge)
-		m_crBSD = TColorBrightness(-15, m_crBS);   // backgroung selected darken (for dark edge)
+		m_crBS = ColorBrightness(-15, m_crBN);      // backgroung selected background
+		m_crBSL = ColorBrightness(+30, m_crBS);     // backgroung selected lighten (for light edge)
+		m_crBSD = ColorBrightness(-15, m_crBS);     // backgroung selected darken (for dark edge)
 
-		m_crBH = TColorBrightness(+20, m_crBN);    // backgroung highlighted background
-		m_crBHL = TColorBrightness(+15, m_crBH);   // backgroung highlighted lighten (for light edge)
-		m_crBHD = TColorBrightness(-30, m_crBH);   // backgroung highlighted darken (for dark edge)
+		m_crBH = ColorBrightness(+20, m_crBN);      // backgroung highlighted background
+		m_crBHL = ColorBrightness(+15, m_crBH);     // backgroung highlighted lighten (for light edge)
+		m_crBHD = ColorBrightness(-30, m_crBH);     // backgroung highlighted darken (for dark edge)
 
-		m_crBSH = TColorBrightness(-20, m_crBN);   // backgroung selected highlighted background
-		m_crBSHL = TColorBrightness(+40, m_crBSL); // backgroung selected highlighted lighten (for light edge)
-		m_crBSHD = TColorBrightness(-0, m_crBSH);  // backgroung selected highlighted darken (for dark edge)
+		m_crBSH = ColorBrightness(-20, m_crBN);     // backgroung selected highlighted background
+		m_crBSHL = ColorBrightness(+40, m_crBSL);   // backgroung selected highlighted lighten (for light edge)
+		m_crBSHD = ColorBrightness(-0, m_crBSH);    // backgroung selected highlighted darken (for dark edge)
 
-		m_crTN = TColorBrightness(+60, m_crBN);    // text normal
-		m_crTH = TColorBrightness(+80, m_crTN);    // text normal lighten
-		m_crTS = ThemeRGB(0xFF, 0xFF, 0xFF);       // text selected
+		m_crTN = ColorBrightness(+60, m_crBN);      // text normal
+		m_crTH = ColorBrightness(+80, m_crTN);      // text normal lighten
+		m_crTS = ThemeRGB(0xFF, 0xFF, 0xFF);        // text selected
+
+		m_crBackground = ThemeRGB(10, 15, 20);      // background
+		m_crDragImage = m_crBackground;             // drag'n'drop image
+		m_crActiveItem = m_crTS;                    // active item
+		m_crSelectedItem = ThemeRGB(165, 170, 175); // selected item
+		m_crNormalItem = ThemeRGB(135, 140, 145);   // normal item
+
+		m_crAvtiveItem3dRectTopLeft = ThemeRGB(80, 85, 90);
+		m_crAvtiveItem3dRectBottomRight = ThemeRGB(30, 35, 40);
+
+		// gradients
+		int R, G, B;
+		ThemeRGB(60, 65, 70, R, G, B);
+		tvSelected[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+		ThemeRGB(50, 55, 60, R, G, B);
+		tvSelected[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+
+		ThemeRGB(10, 15, 20, R, G, B);
+		tvNormal[0] = tvNormal[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
 	}
 	else {
-		m_crBkBar = GetSysColor(COLOR_BTNFACE);    // background tab bar
+		m_crBkBar = GetSysColor(COLOR_BTNFACE);   // background tab bar
 
-		m_crBN = m_crBkBar;                        // backgroung normal
-		m_crBNL = TColorBrightness(+15, m_crBN);   // backgroung normal lighten (for light edge)
-		m_crBND = TColorBrightness(-15, m_crBN);   // backgroung normal darken (for dark edge)
+		m_crBN = m_crBkBar;                       // backgroung normal
+		m_crBNL = ColorBrightness(+15, m_crBN);   // backgroung normal lighten (for light edge)
+		m_crBND = ColorBrightness(-15, m_crBN);   // backgroung normal darken (for dark edge)
 
-		m_crBS = 0x00f1dacc;                       // backgroung selected background
-		m_crBSL = 0xc56a31;                        // backgroung selected lighten (for light edge)
-		m_crBSD = TColorBrightness(-15, m_crBS);   // backgroung selected darken (for dark edge)
+		m_crBS = 0x00f1dacc;                      // backgroung selected background
+		m_crBSL = 0xc56a31;                       // backgroung selected lighten (for light edge)
+		m_crBSD = ColorBrightness(-15, m_crBS);   // backgroung selected darken (for dark edge)
 
-		m_crBH = 0x00f1dacc;                       // backgroung highlighted background
-		m_crBHL = TColorBrightness(+15, m_crBH);   // backgroung highlighted lighten (for light edge)
-		m_crBHD = TColorBrightness(-30, m_crBH);   // backgroung highlighted darken (for dark edge)
+		m_crBH = 0x00f1dacc;                      // backgroung highlighted background
+		m_crBHL = ColorBrightness(+15, m_crBH);   // backgroung highlighted lighten (for light edge)
+		m_crBHD = ColorBrightness(-30, m_crBH);   // backgroung highlighted darken (for dark edge)
 
-		m_crBSH = TColorBrightness(+20, m_crBS);   // backgroung selected highlighted background
-		m_crBSHL =TColorBrightness(-20, m_crBSL);  // backgroung selected highlighted lighten (for light edge)
-		m_crBSHD = TColorBrightness(-0, m_crBSH);  // backgroung selected highlighted darken (for dark edge)
+		m_crBSH = ColorBrightness(+20, m_crBS);   // backgroung selected highlighted background
+		m_crBSHL =ColorBrightness(-20, m_crBSL);  // backgroung selected highlighted lighten (for light edge)
+		m_crBSHD = ColorBrightness(-0, m_crBSH);  // backgroung selected highlighted darken (for dark edge)
 
-		m_crTN = RGB(50, 50, 50);                  // text normal
-		m_crTH = RGB(0, 0, 0);                     // text normal lighten
-		m_crTS = 0xff;                             // text selected
+		m_crTN = RGB(50, 50, 50);                 // text normal
+		m_crTH = RGB(0, 0, 0);                    // text normal lighten
+		m_crTS = 0xff;                            // text selected
+
+		m_crBackground = RGB(255, 255, 255);      // background
 	}
 
 	if (IsWindow(m_REdit.GetSafeHwnd())) {
