@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -259,7 +259,7 @@ BOOL CPPageInterface::OnApply()
 	pFrame->m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 
 	pFrame->m_wndPlaylistBar.m_bUseDarkTheme = s.bUseDarkTheme;
-	pFrame->m_wndPlaylistBar.TSetColor();
+	pFrame->m_wndPlaylistBar.SetColor();
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
@@ -329,7 +329,7 @@ void CPPageInterface::OnThemeChange()
 		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
 
-	pFrame->m_wndPlaylistBar.TSetColor();
+	pFrame->m_wndPlaylistBar.SetColor();
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);

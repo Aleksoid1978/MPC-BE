@@ -347,7 +347,18 @@ private:
 	COLORREF m_crTN;
 	COLORREF m_crTH;
 	COLORREF m_crTS;
-	//COLORREF m_crTSL;
+
+	COLORREF m_crBackground;
+	COLORREF m_crDragImage;
+	COLORREF m_crActiveItem;
+	COLORREF m_crSelectedItem;
+	COLORREF m_crNormalItem;
+
+	COLORREF m_crAvtiveItem3dRectTopLeft;
+	COLORREF m_crAvtiveItem3dRectBottomRight;
+
+	TRIVERTEX tvSelected[2];
+	TRIVERTEX tvNormal[2];
 
 public:
 	CPlayerPlaylistBar(CMainFrame* pMainFrame);
@@ -370,7 +381,8 @@ public:
 	}
 #define curPlayList GetCurPlayList()
 
-	void TSetColor();
+	void SetColor();
+
 	void TDeleteAllPlaylists();
 	void TSaveAllPlaylists();
 
