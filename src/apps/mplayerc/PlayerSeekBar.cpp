@@ -64,6 +64,7 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	}
 
 	ScaleFont();
+	SetColor();
 
 	return TRUE;
 }
@@ -274,7 +275,6 @@ void CPlayerSeekBar::OnPaint()
 	const bool bEnabled = m_bEnabled && m_stop > 0;
 
 	if (s.bUseDarkTheme) {
-		CString seekbartext = m_pMainFrame->GetTextForBar(s.iSeekBarTextStyle);
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r;
@@ -284,21 +284,13 @@ void CPlayerSeekBar::OnPaint()
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
 		GRADIENT_RECT gr = {0, 1};
-		int pa = 255 * 256;
-
-		int R, G, B, R2, G2, B2;
 
 		if (m_BackGroundbm.IsExtGradiendLoading()) {
-			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-			m_BackGroundbm.PaintExternalGradient(&memdc, r, 0, s.nThemeBrightness, R, G, B);
+			m_BackGroundbm.PaintExternalGradient(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 		} else {
-			ThemeRGB(0, 5, 10, R, G, B);
-			ThemeRGB(15, 20, 25, R2, G2, B2);
-			TRIVERTEX tv[2] = {
-				{r.left, r.top, R * 256, G * 256, B * 256, pa},
-				{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, pa},
-			};
-			memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+			tvBackground[0].x = r.left; tvBackground[0].y = r.top;
+			tvBackground[1].x = r.right; tvBackground[1].y = r.bottom;
+			memdc.GradientFill(tvBackground, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 		}
 
 		memdc.SetBkMode(TRANSPARENT);
@@ -307,13 +299,11 @@ void CPlayerSeekBar::OnPaint()
 		const int nposx = GetThumbRect().right - 2;
 		const int nposy = r.top;
 
-		CPen penPlayed1(PS_SOLID, 0, ThemeRGB(30, 35, 40));
-		memdc.SelectObject(&penPlayed1);
+		memdc.SelectObject(&m_penPlayed1);
 		memdc.MoveTo(rc.left, rc.top);
 		memdc.LineTo(rc.right, rc.top);
 
-		CPen penPlayed2(PS_SOLID, 0, ThemeRGB(80, 85, 90));
-		memdc.SelectObject(&penPlayed2);
+		memdc.SelectObject(&m_penPlayed2);
 		memdc.MoveTo(rc.left - 1, rc.bottom - 1);
 		memdc.LineTo(rc.right + 2, rc.bottom - 1);
 
@@ -323,14 +313,12 @@ void CPlayerSeekBar::OnPaint()
 		if (m_pMainFrame->GetBufferingProgress(&Progress)) {
 			m_rLock = r;
 			const int r_right = r.Width() / 100 * Progress;
-			ThemeRGB(45, 55, 60, R, G, B);
-				ThemeRGB(65, 70, 75, R2, G2, B2);
-				TRIVERTEX tvb[2] = {
-					{r.left, r.top, R * 256, G * 256, B * 256, pa},
-					{r_right, r.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
-				};
-				memdc.GradientFill(tvb, 2, &gr, 1, GRADIENT_FILL_RECT_V);
-				m_rLock.left = r_right;
+
+			tvBufferingProgress[0].x = r.left; tvBufferingProgress[0].y = r.top;
+			tvBufferingProgress[1].x = r_right; tvBufferingProgress[1].y = r.bottom;
+			memdc.GradientFill(tvBufferingProgress, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+
+			m_rLock.left = r_right;
 		}
 
 		if (bEnabled) {
@@ -340,18 +328,13 @@ void CPlayerSeekBar::OnPaint()
 				rc.top = rc.top + 1;
 				rc.bottom = rc.bottom - 2;
 
-				ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-				m_BackGroundbm.PaintExternalGradient(&memdc, r, 0, s.nThemeBrightness, R, G, B);
+				m_BackGroundbm.PaintExternalGradient(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 
 				rc = GetChannelRect();
 			} else {
-				ThemeRGB(0, 5, 10, R, G, B);
-				ThemeRGB(105, 110, 115, R2, G2, B2);
-				TRIVERTEX tv[2] = {
-					{rc.left, rc.top, R * 256, G * 256, B * 256, pa},
-					{nposx, rc.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
-				};
-				memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+				tvBackgroundEnabledLeft[0].x = rc.left; tvBackgroundEnabledLeft[0].y = rc.top;
+				tvBackgroundEnabledLeft[1].x = nposx; tvBackgroundEnabledLeft[1].y = rc.bottom - 3;
+				memdc.GradientFill(tvBackgroundEnabledLeft, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
 				CRect rc2;
 				rc2.left = nposx - 5;
@@ -359,18 +342,13 @@ void CPlayerSeekBar::OnPaint()
 				rc2.top = rc.top;
 				rc2.bottom = rc.bottom;
 
-				ThemeRGB(0, 5, 10, R, G, B);
-				ThemeRGB(205, 210, 215, R2, G2, B2);
-				TRIVERTEX tv2[2] = {
-					{rc2.left, rc2.top, R * 256, G * 256, B * 256, pa},
-					{rc2.right, rc.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
-				};
-				memdc.GradientFill(tv2, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+				tvBackgroundEnabledRight[0].x = rc2.left; tvBackgroundEnabledRight[0].y = rc2.top;
+				tvBackgroundEnabledRight[1].x = rc2.right; tvBackgroundEnabledRight[1].y = rc.bottom - 3;
+				memdc.GradientFill(tvBackgroundEnabledRight, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
-			CPen penPlayed3(PS_SOLID, 0, ThemeRGB(80, 85, 90));
-			memdc.SelectObject(&penPlayed3);
-			memdc.MoveTo(rc.left, rc.top);//active_top
+			memdc.SelectObject(&m_penPlayed2);
+			memdc.MoveTo(rc.left, rc.top);
 			memdc.LineTo(nposx, rc.top);
 
 			// draw chapter markers
@@ -381,8 +359,7 @@ void CPlayerSeekBar::OnPaint()
 				if (stop > 0 && m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 					const CRect rc2 = rc;
 					const CRect r = GetChannelRect();
-					CPen penPlayed2(PS_SOLID, 0, ThemeRGB(255, 255, 255));
-					memdc.SelectObject(&penPlayed2);
+					memdc.SelectObject(&m_penChapters);
 
 					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
 						REFERENCE_TIME rt;
@@ -410,9 +387,8 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
+		CString seekbartext = m_pMainFrame->GetTextForBar(s.iSeekBarTextStyle);
 		if (seekbartext.GetLength() || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
-			memdc.SetTextColor(ThemeRGB(135, 140, 145));
-
 			memdc.SelectObject(&m_font);
 			SetBkMode(memdc, TRANSPARENT);
 
@@ -428,10 +404,11 @@ void CPlayerSeekBar::OnPaint()
 				rt.left  += 6;
 				rt.top   -= 2;
 				rt.right -= xt;
+				memdc.SetTextColor(m_crText);
 				memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 
-				// highlights string
-				memdc.SetTextColor(ThemeRGB(205, 210, 215));
+				// Highlighted text
+				memdc.SetTextColor(m_crHighlightedText);
 				if (nposx > rt.right - 15) {
 					memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 				} else {
@@ -446,7 +423,7 @@ void CPlayerSeekBar::OnPaint()
 				rt.left  -= xt - 10;
 				rt.top   -= 2;
 				rt.right -= 6;
-				memdc.SetTextColor(ThemeRGB(200, 205, 210));
+				memdc.SetTextColor(m_crTimeText);
 				memdc.DrawText(str, str.GetLength(), &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 			}
 		}
@@ -743,6 +720,51 @@ void CPlayerSeekBar::ScaleFont()
 	m_font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 					   OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 					   L"Tahoma");
+}
+
+void CPlayerSeekBar::SetColor()
+{
+	const auto& s = AfxGetAppSettings();
+	if (s.bUseDarkTheme) {
+		int R, G, B;
+
+		if (m_BackGroundbm.IsExtGradiendLoading()) {
+			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, m_crBackground.R, m_crBackground.G, m_crBackground.B);
+		} else {
+			ThemeRGB(0, 5, 10, R, G, B);
+			tvBackground[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+			ThemeRGB(15, 20, 25, R, G, B);
+			tvBackground[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+		}
+
+		m_penPlayed1.DeleteObject();
+		m_penPlayed1.CreatePen(PS_SOLID, 0, ThemeRGB(30, 35, 40));
+
+		m_penPlayed2.DeleteObject();
+		m_penPlayed2.CreatePen(PS_SOLID, 0, ThemeRGB(80, 85, 90));
+
+		m_penChapters.DeleteObject();
+		m_penChapters.CreatePen(PS_SOLID, 0, ThemeRGB(255, 255, 255));
+
+		ThemeRGB(45, 55, 60, R, G, B);
+		tvBufferingProgress[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+		ThemeRGB(65, 70, 75, R, G, B);
+		tvBufferingProgress[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+
+		ThemeRGB(0, 5, 10, R, G, B);
+		tvBackgroundEnabledLeft[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+		ThemeRGB(105, 110, 115, R, G, B);
+		tvBackgroundEnabledLeft[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+
+		ThemeRGB(0, 5, 10, R, G, B);
+		tvBackgroundEnabledRight[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+		ThemeRGB(205, 210, 215, R, G, B);
+		tvBackgroundEnabledRight[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+
+		m_crText = ThemeRGB(135, 140, 145);
+		m_crHighlightedText = ThemeRGB(205, 210, 215);
+		m_crTimeText = ThemeRGB(200, 205, 210);
+	}
 }
 
 void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)

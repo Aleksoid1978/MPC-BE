@@ -20126,6 +20126,12 @@ void CMainFrame::ShowControlBarInternal(CControlBar* pBar, BOOL bShow)
 	}
 }
 
+void CMainFrame::SetColor()
+{
+	m_wndPlaylistBar.SetColor();
+	m_wndSeekBar.SetColor();
+}
+
 LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (nCode == HC_ACTION) {
