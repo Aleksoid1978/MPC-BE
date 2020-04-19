@@ -325,11 +325,11 @@ void CPPageInterface::OnThemeChange()
 {
 	const auto pFrame = AfxGetMainFrame();
 
+	pFrame->SetColor();
+
 	if (::IsWindow(pFrame->m_hWnd_toolbar)) {
 		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
-
-	pFrame->SetColor();
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);

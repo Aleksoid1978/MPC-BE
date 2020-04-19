@@ -48,6 +48,14 @@ private:
 
 	int			m_nWidthIncrease = 0;
 
+	struct t_color {
+		int R, G, B;
+	};
+
+	t_color m_crBackground;
+	TRIVERTEX tvBackground[2];
+	CPen m_penFrHot;
+
 public:
 	LONG		m_nButtonHeight;
 	CVolumeCtrl	m_volctrl;
@@ -68,6 +76,8 @@ public:
 	__declspec(property(get=GetVolume, put=SetVolume)) int Volume;
 
 	void ScaleToolbar();
+
+	void SetColor();
 
 private:
 	bool IsMuted();
