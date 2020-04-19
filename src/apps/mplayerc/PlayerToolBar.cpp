@@ -456,6 +456,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_bMute = false;
 
 	SwitchTheme();
+	SetColor();
 
 	return TRUE;
 }
@@ -545,6 +546,26 @@ void CPlayerToolBar::ScaleToolbar()
 	}
 }
 
+void CPlayerToolBar::SetColor()
+{
+	const auto& s = AfxGetAppSettings();
+	if (s.bUseDarkTheme) {
+		int R, G, B;
+
+		if (m_BackGroundbm.IsExtGradiendLoading()) {
+			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, m_crBackground.R, m_crBackground.G, m_crBackground.B);
+		} else {
+			ThemeRGB(50, 55, 60, R, G, B);
+			tvBackground[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+			ThemeRGB(20, 25, 30, R, G, B);
+			tvBackground[1] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };
+		}
+
+		m_penFrHot.DeleteObject();
+		m_penFrHot.CreatePen(PS_SOLID, 0, 0x00E9E9E9);
+	}
+}
+
 BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDraw)
 	ON_WM_SIZE()
@@ -590,13 +611,11 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	const auto& s = AfxGetAppSettings();
 	const auto bGPU = (m_pMainFrame->GetMediaState() != -1) && DXVAState::GetState() && m_hDXVAIcon;
 
-	int R, G, B, R2, G2, B2;
-
-	GRADIENT_RECT gr = {0, 1};
-
 	static const int sep[] = {2, 7, 10, 11};
 
 	if (s.bUseDarkTheme) {
+		GRADIENT_RECT gr = { 0, 1 };
+
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
 		case CDDS_PREERASE:
@@ -611,16 +630,11 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				GetClientRect(&r);
 
 				if (m_BackGroundbm.IsExtGradiendLoading()) {
-					ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, R, G, B);
+					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 				} else {
-					ThemeRGB(50, 55, 60, R, G, B);
-					ThemeRGB(20, 25, 30, R2, G2, B2);
-					TRIVERTEX tv[2] = {
-						{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
-						{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
-					};
-					dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+					tvBackground[0].x = r.left; tvBackground[0].y = r.top;
+					tvBackground[1].x = r.right; tvBackground[1].y = r.bottom;
+					dc.GradientFill(tvBackground, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 				}
 
 				dc.Detach();
@@ -666,8 +680,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				bf.SourceConstantAlpha = 90;
 
 				CBrush* brushSaved = (CBrush*)dc.SelectStockObject(NULL_BRUSH);
-				CPen penFrHot(PS_SOLID, 0, 0x00e9e9e9);
-				CPen* penSaved = dc.SelectObject(&penFrHot);
+				CPen* penSaved = dc.SelectObject(&m_penFrHot);
 
 				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
 				AlphaBlend(dc.m_hDC, r.left + 2, r.top + 2, r.Width() - 4, 0.7 * r.Height() - 2, memdc, 0, 0, gWidth, gHeight, bf);
@@ -683,16 +696,11 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				GetItemRect(sep[j], &r);
 
 				if (m_BackGroundbm.IsExtGradiendLoading()) {
-					ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, R, G, B);
+					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 				} else {
-					ThemeRGB(50, 55, 60, R, G, B);
-					ThemeRGB(20, 25, 30, R2, G2, B2);
-					TRIVERTEX tv[2] = {
-						{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
-						{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
-					};
-					dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+					tvBackground[0].x = r.left; tvBackground[0].y = r.top;
+					tvBackground[1].x = r.right; tvBackground[1].y = r.bottom;
+					dc.GradientFill(tvBackground, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 				}
 			}
 

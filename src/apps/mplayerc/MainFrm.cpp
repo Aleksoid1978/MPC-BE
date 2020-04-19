@@ -20128,6 +20128,7 @@ void CMainFrame::ShowControlBarInternal(CControlBar* pBar, BOOL bShow)
 
 void CMainFrame::SetColor()
 {
+	m_wndToolBar.SetColor();
 	m_wndPlaylistBar.SetColor();
 	m_wndSeekBar.SetColor();
 }
