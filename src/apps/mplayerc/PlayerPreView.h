@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,9 +40,19 @@ private:
 	CWnd	m_view;
 	CRect	m_videorect;
 
+	CFont m_font;
+
+	struct t_color {
+		int R1, G1, B1;
+		int R2, G2, B2;
+	};
+	t_color m_cr1, m_cr2, m_cr3, m_cr4, m_cr5, m_cr6, m_cr7, m_cr8, m_cr9;
+
+	COLORREF m_crText;
+
 public:
 	CPreView(CMainFrame* pMainFrame);
-	virtual ~CPreView();
+	virtual ~CPreView() = default;
 
 	virtual BOOL SetWindowTextW(LPCWSTR lpString);
 
@@ -51,6 +61,9 @@ public:
 	HWND GetVideoHWND();
 
 	void SetWindowSize();
+
+	void ScaleFont();
+	void SetColor();
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
