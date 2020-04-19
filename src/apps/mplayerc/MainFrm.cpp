@@ -2094,6 +2094,7 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	m_wndSeekBar.ScaleFont();
 	m_wndPlaylistBar.ScaleFont();
 	m_wndStatusBar.ScaleFont();
+	m_wndPreView.ScaleFont();
 
 	CMenuEx::ScaleFont();
 	const auto& s = AfxGetAppSettings();
@@ -20131,6 +20132,7 @@ void CMainFrame::SetColor()
 	m_wndToolBar.SetColor();
 	m_wndPlaylistBar.SetColor();
 	m_wndSeekBar.SetColor();
+	m_wndPreView.SetColor();
 }
 
 LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam)

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,15 +31,10 @@ static COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, i
 	return RGB(r, g, b);
 }
 
-
 // CPrevView
 
 CPreView::CPreView(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-{
-}
-
-CPreView::~CPreView()
 {
 }
 
@@ -110,6 +105,9 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
+	ScaleFont();
+	SetColor();
+
 	return 0;
 }
 
@@ -128,151 +126,60 @@ void CPreView::OnPaint()
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
 	mdc.SetBkMode(TRANSPARENT);
 
-	int r1, g1, b1, r2, g2, b2, i, k;
-	COLORREF bg = GetSysColor(COLOR_BTNFACE);
-	COLORREF light = RGB(255,255,255);
-	COLORREF shadow = GetSysColor(COLOR_BTNSHADOW);
+	int i, k;
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	if (s.bUseDarkTheme) {
-		ThemeRGB(95, 100, 105, r1, g1, b1);
-		ThemeRGB(25, 30, 35, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(bg);
-		g1 = g2 = GetGValue(bg);
-		b1 = b2 = GetBValue(bg);
-	}
 	k = rcBar.Height();
-	for(i=0; i < k; i++) {
-		mdc.FillSolidRect(0, i, rcBar.Width(), 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = 0; i < k; i++) {
+		mdc.FillSolidRect(0, i, rcBar.Width(), 1, RGBFill(m_cr1.R1, m_cr1.G1, m_cr1.B1, m_cr1.R2, m_cr1.G2, m_cr1.B2, i, k));
 	}
 
-	if (s.bUseDarkTheme) {
-		ThemeRGB(145, 140, 145, r1, g1, b1);
-		ThemeRGB(115, 120, 125, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(light);
-		g1 = g2 = GetGValue(light);
-		b1 = b2 = GetBValue(light);
-	}
-	k = rcBar.Width();
-	for(i=0; i < k; i++) {
-		mdc.FillSolidRect(i, 0, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
-	}
-
-	if (s.bUseDarkTheme) {
-		ThemeRGB(15, 20, 25, r1, g1, b1);
-		ThemeRGB(55, 60, 65, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(shadow);
-		g1 = g2 = GetGValue(shadow);
-		b1 = b2 = GetBValue(shadow);
-	}
-	k = rcBar.Width();
-	for(i = rcBar.left + m_border; i < k - m_border; i++) {
-		mdc.FillSolidRect(i, m_caption, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
-	}
-
-	if (s.bUseDarkTheme) {
-		ThemeRGB(35, 40, 45, r1, g1, b1);
-		ThemeRGB(55, 60, 65, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(light);
-		g1 = g2 = GetGValue(light);
-		b1 = b2 = GetBValue(light);
-	}
-	k = rcBar.Width();
-	for(i = rcBar.left + m_border; i < k-m_border; i++) {
-		mdc.FillSolidRect(i, rcBar.bottom - m_border - 1, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
-	}
-
-	if (s.bUseDarkTheme) {
-		ThemeRGB(0, 5, 10, r1, g1, b1);
-		ThemeRGB(10, 15, 20, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(shadow);
-		g1 = g2 = GetGValue(shadow);
-		b1 = b2 = GetBValue(shadow);
-	}
 	k = rcBar.Width();
 	for(i = 0; i < k; i++) {
-		mdc.FillSolidRect(i, rcBar.bottom - 1, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+		mdc.FillSolidRect(i, 0, 1, 1, RGBFill(m_cr2.R1, m_cr2.G1, m_cr2.B1, m_cr2.R2, m_cr2.G2, m_cr2.B2, i, k));
 	}
 
-	if (s.bUseDarkTheme) {
-		ThemeRGB(145, 150, 155, r1, g1, b1);
-		ThemeRGB(45, 50, 55, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(light);
-		g1 = g2 = GetGValue(light);
-		b1 = b2 = GetBValue(light);
+	k = rcBar.Width();
+	for(i = rcBar.left + m_border; i < k - m_border; i++) {
+		mdc.FillSolidRect(i, m_caption, 1, 1, RGBFill(m_cr3.R1, m_cr3.G1, m_cr3.B1, m_cr3.R2, m_cr3.G2, m_cr3.B2, i, k));
 	}
+
+	k = rcBar.Width();
+	for(i = rcBar.left + m_border; i < k - m_border; i++) {
+		mdc.FillSolidRect(i, rcBar.bottom - m_border - 1, 1, 1, RGBFill(m_cr4.R1, m_cr4.G1, m_cr4.B1, m_cr4.R2, m_cr4.G2, m_cr4.B2, i, k));
+	}
+
+	k = rcBar.Width();
+	for(i = 0; i < k; i++) {
+		mdc.FillSolidRect(i, rcBar.bottom - 1, 1, 1, RGBFill(m_cr5.R1, m_cr5.G1, m_cr5.B1, m_cr5.R2, m_cr5.G2, m_cr5.B2, i, k));
+	}
+
 	k = rcBar.Height();
 	for(i = 0; i < k - 1; i++) {
-		mdc.FillSolidRect(0, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+		mdc.FillSolidRect(0, i, 1, 1, RGBFill(m_cr6.R1, m_cr6.G1, m_cr6.B1, m_cr6.R2, m_cr6.G2, m_cr6.B2, i, k));
 	}
 
-	if (s.bUseDarkTheme) {
-		ThemeRGB(55, 60, 65, r1, g1, b1);
-		ThemeRGB(15, 20, 25, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(shadow);
-		g1 = g2 = GetGValue(shadow);
-		b1 = b2 = GetBValue(shadow);
-	}
 	k = rcBar.Height();
 	for(i = m_caption; i < k - m_border; i++) {
-		mdc.FillSolidRect(m_border, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+		mdc.FillSolidRect(m_border, i, 1, 1, RGBFill(m_cr7.R1, m_cr7.G1, m_cr7.B1, m_cr7.R2, m_cr7.G2, m_cr7.B2, i, k));
 	}
 
-	if (s.bUseDarkTheme) {
-		ThemeRGB(105, 110, 115, r1, g1, b1);
-		ThemeRGB(55, 60, 65, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(light);
-		g1 = g2 = GetGValue(light);
-		b1 = b2 = GetBValue(light);
-	}
 	k = rcBar.Height();
 	for(i = m_caption; i < k - m_border; i++) {
-		mdc.FillSolidRect(rcBar.right - m_border - 1, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+		mdc.FillSolidRect(rcBar.right - m_border - 1, i, 1, 1, RGBFill(m_cr8.R1, m_cr8.G1, m_cr8.B1, m_cr8.R2, m_cr8.G2, m_cr8.B2, i, k));
 	}
 
-	if (s.bUseDarkTheme) {
-		ThemeRGB(65, 70, 75, r1, g1, b1);
-		ThemeRGB(5, 10, 15, r2, g2, b2);
-	} else {
-		r1 = r2 = GetRValue(shadow);
-		g1 = g2 = GetGValue(shadow);
-		b1 = b2 = GetBValue(shadow);
-	}
 	k = rcBar.Height();
-	for(i =0 ; i < k; i++) {
-		mdc.FillSolidRect(rcBar.right - 1, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = 0 ; i < k; i++) {
+		mdc.FillSolidRect(rcBar.right - 1, i, 1, 1, RGBFill(m_cr9.R1, m_cr9.G1, m_cr9.B1, m_cr9.R2, m_cr9.G2, m_cr9.B2, i, k));
 	}
 
-	// text (time)
-	CFont font;
-
-	if (s.bUseDarkTheme) {
-		ThemeRGB(255, 255, 255, r1, g1, b1);
-	} else {
-		r1 = GetRValue(0);
-		g1 = GetGValue(0);
-		b1 = GetBValue(0);
-	}
-
-	mdc.SetTextColor(RGB(r1,g1,b1));
-
-	font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
-					 OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN, L"Tahoma");
-
-	mdc.SelectObject(&font);
-	CRect rtime = rcBar;
+	// text
+	mdc.SelectObject(&m_font);
+	CRect rtime(rcBar);
 	rtime.top = 0;
 	rtime.bottom = m_caption;
-	mdc.DrawText(m_tooltipstr, m_tooltipstr.GetLength(), &rtime, DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+	mdc.SetTextColor(m_crText);
+	mdc.DrawTextW(m_tooltipstr, m_tooltipstr.GetLength(), &rtime, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	dc.ExcludeClipRect(m_videorect);
 	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
@@ -318,4 +225,104 @@ void CPreView::SetWindowSize()
 
 		m_view.SetWindowPos(nullptr, 0, 0, m_videorect.Width(), m_videorect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
+}
+
+void CPreView::ScaleFont()
+{
+	m_font.DeleteObject();
+	m_font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
+					   OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN,
+					   L"Tahoma");
+}
+
+void CPreView::SetColor()
+{
+	const COLORREF bg = GetSysColor(COLOR_BTNFACE);
+	const COLORREF light = RGB(255, 255, 255);
+	const COLORREF shadow = GetSysColor(COLOR_BTNSHADOW);
+
+	const auto bUseDarkTheme = AfxGetAppSettings().bUseDarkTheme;
+
+	if (bUseDarkTheme) {
+		ThemeRGB(95, 100, 105, m_cr1.R1, m_cr1.G1, m_cr1.B1);
+		ThemeRGB(25, 30, 35, m_cr1.R2, m_cr1.G2, m_cr1.B2);
+	} else {
+		m_cr1.R1 = m_cr1.R2 = GetRValue(bg);
+		m_cr1.G1 = m_cr1.G2 = GetGValue(bg);
+		m_cr1.B1 = m_cr1.B2 = GetBValue(bg);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(145, 140, 145, m_cr2.R1, m_cr2.G1, m_cr2.B1);
+		ThemeRGB(115, 120, 125, m_cr2.R2, m_cr2.G2, m_cr2.B2);
+	} else {
+		m_cr2.R1 = m_cr2.R2 = GetRValue(light);
+		m_cr2.G1 = m_cr2.G2 = GetGValue(light);
+		m_cr2.B1 = m_cr2.B2 = GetBValue(light);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(15, 20, 25, m_cr3.R1, m_cr3.G1, m_cr3.B1);
+		ThemeRGB(55, 60, 65, m_cr3.R2, m_cr3.G2, m_cr3.B2);
+	} else {
+		m_cr3.R1 = m_cr3.R2 = GetRValue(shadow);
+		m_cr3.G1 = m_cr3.G2 = GetGValue(shadow);
+		m_cr3.B1 = m_cr3.B2 = GetBValue(shadow);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(35, 40, 45, m_cr4.R1, m_cr4.G1, m_cr4.B1);
+		ThemeRGB(55, 60, 65, m_cr4.R2, m_cr4.G2, m_cr4.B2);
+	} else {
+		m_cr4.R1 = m_cr4.R2 = GetRValue(light);
+		m_cr4.G1 = m_cr4.G2 = GetGValue(light);
+		m_cr4.B1 = m_cr4.B2 = GetBValue(light);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(0, 5, 10, m_cr5.R1, m_cr5.G1, m_cr5.B1);
+		ThemeRGB(10, 15, 20, m_cr5.R2, m_cr5.G2, m_cr5.B2);
+	} else {
+		m_cr5.R1 = m_cr5.R2 = GetRValue(shadow);
+		m_cr5.G1 = m_cr5.G2 = GetGValue(shadow);
+		m_cr5.B1 = m_cr5.B2 = GetBValue(shadow);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(145, 150, 155, m_cr6.R1, m_cr6.G1, m_cr6.B1);
+		ThemeRGB(45, 50, 55, m_cr6.R2, m_cr6.G2, m_cr6.B2);
+	} else {
+		m_cr6.R1 = m_cr6.R2 = GetRValue(light);
+		m_cr6.G1 = m_cr6.G2 = GetGValue(light);
+		m_cr6.B1 = m_cr6.B2 = GetBValue(light);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(55, 60, 65, m_cr7.R1, m_cr7.G1, m_cr7.B1);
+		ThemeRGB(15, 20, 25, m_cr7.R2, m_cr7.G2, m_cr7.B2);
+	} else {
+		m_cr7.R1 = m_cr7.R2 = GetRValue(shadow);
+		m_cr7.G1 = m_cr7.G2 = GetGValue(shadow);
+		m_cr7.B1 = m_cr7.B2 = GetBValue(shadow);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(105, 110, 115, m_cr8.R1, m_cr8.G1, m_cr8.B1);
+		ThemeRGB(55, 60, 65, m_cr8.R2, m_cr8.G2, m_cr8.B2);
+	} else {
+		m_cr8.R1 = m_cr8.R2 = GetRValue(light);
+		m_cr8.G1 = m_cr8.G2 = GetGValue(light);
+		m_cr8.B1 = m_cr8.B2 = GetBValue(light);
+	}
+
+	if (bUseDarkTheme) {
+		ThemeRGB(65, 70, 75, m_cr9.R1, m_cr9.G1, m_cr9.B1);
+		ThemeRGB(5, 10, 15, m_cr9.R2, m_cr9.G2, m_cr9.B2);
+	} else {
+		m_cr9.R1 = m_cr9.R2 = GetRValue(shadow);
+		m_cr9.G1 = m_cr9.G2 = GetGValue(shadow);
+		m_cr9.B1 = m_cr9.B2 = GetBValue(shadow);
+	}
+
+	m_crText = bUseDarkTheme ? ThemeRGB(255, 255, 255) : 0;
 }
