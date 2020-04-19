@@ -75,6 +75,24 @@ private:
 	CRect GetThumbRect();
 	CRect GetInnerThumbRect();
 
+	struct t_color {
+		int R,G,B;
+	};
+
+	t_color m_crBackground;
+	TRIVERTEX tvBackground[2];
+
+	CPen m_penPlayed1, m_penPlayed2, m_penChapters;
+
+	TRIVERTEX tvBufferingProgress[2];
+
+	TRIVERTEX tvBackgroundEnabledLeft[2];
+	TRIVERTEX tvBackgroundEnabledRight[2];
+
+	COLORREF m_crText;
+	COLORREF m_crHighlightedText;
+	COLORREF m_crTimeText;
+
 public:
 	CPlayerSeekBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerSeekBar() = default;
@@ -103,6 +121,8 @@ public:
 	void PreviewWindowShow();
 
 	void ScaleFont();
+
+	void SetColor();
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
