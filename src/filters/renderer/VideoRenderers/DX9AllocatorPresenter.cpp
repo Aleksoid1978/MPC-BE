@@ -139,8 +139,9 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	wc.hInstance = AfxGetApp()->m_hInstance;
 	wc.lpszClassName = g_szClassName;
 	if (!RegisterClassExW(&wc)) {
+		DWORD dwError = GetLastError();
+		hr = AmHresultFromWin32(dwError);
 		_Error += L"Failed to RegisterClass\n";
-		hr = E_FAIL;
 		return;
 	}
 
