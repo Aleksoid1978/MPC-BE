@@ -81,6 +81,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bDisplayChanged(false)
 	, m_bResizingDevice(false)
 {
+	DLog(L"CDX9AllocatorPresenter::CDX9AllocatorPresenter()");
+
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
 		return;
@@ -140,7 +142,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	wc.lpszClassName = g_szClassName;
 	if (!RegisterClassExW(&wc)) {
 		DWORD dwError = GetLastError();
-		hr = AmHresultFromWin32(dwError);
+		hr = HRESULT_FROM_WIN32(dwError);
 		_Error += L"Failed to RegisterClass\n";
 		return;
 	}
@@ -150,6 +152,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 {
+	DLog(L"CDX9AllocatorPresenter::~CDX9AllocatorPresenter()");
+
 	if (SysVersion::IsWin8orLater()) {
 		D3DHook::UnHook();
 	}
@@ -182,7 +186,7 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	}
 
 	if (m_FocusThread) {
-		m_FocusThread->PostThreadMessage(WM_QUIT, 0, 0);
+		m_FocusThread->PostThreadMessageW(WM_QUIT, 0, 0);
 		if (WaitForSingleObject(m_FocusThread->m_hThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT(FALSE);
 			TerminateThread(m_FocusThread->m_hThread, 0xDEAD);

@@ -205,7 +205,7 @@ CBaseAP::~CBaseAP()
 	SAFE_DELETE(m_pGenlock);
 
 	if (m_FocusThread) {
-		m_FocusThread->PostThreadMessage(WM_QUIT, 0, 0);
+		m_FocusThread->PostThreadMessageW(WM_QUIT, 0, 0);
 		if (WaitForSingleObject(m_FocusThread->m_hThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT(FALSE);
 			TerminateThread(m_FocusThread->m_hThread, 0xDEAD);
