@@ -1527,8 +1527,6 @@ void CMainFrame::Dump(CDumpContext& dc) const
 // CMainFrame message handlers
 void CMainFrame::OnSetFocus(CWnd* pOldWnd)
 {
-	SetAlwaysOnTop(AfxGetAppSettings().iOnTop);
-
 	// forward focus to the view window
 	if (IsWindow(m_wndView.m_hWnd)) {
 		m_wndView.SetFocus();
@@ -10600,6 +10598,8 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	CMonitors monitors;
 
+	const CWnd* pInsertAfter = nullptr;
+
 	if (!m_bFullScreen) {
 		if (s.bHidePlaylistFullScreen && m_wndPlaylistBar.IsVisible()) {
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(true);
@@ -10640,6 +10640,8 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			GetDesktopWindow()->GetWindowRect(&r);
 		}
 
+		pInsertAfter = &wndTopMost;
+
 		SetMenuBarVisibility(AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
 	} else {
 		if (s.fullScreenModes.bEnabled == 1 && s.fullScreenModes.bApplyDefault) {
@@ -10669,6 +10671,8 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(false);
 			ShowControlBarInternal(&m_wndPlaylistBar, TRUE);
 		}
+
+		pInsertAfter = &wndNoTopMost;
 	}
 
 	m_lastMouseMove.x = m_lastMouseMove.y = -1;
@@ -10739,6 +10743,8 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 							 AFX_MBV_KEEPVISIBLE : AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
 	}
 
+	const UINT nFlags = m_bFullScreen ? SWP_NOSENDCHANGING : SWP_NOSENDCHANGING | SWP_NOACTIVATE;
+
 	if (m_bFirstFSAfterLaunchOnFullScreen) { // Play started in Fullscreen
 		if (s.nStartupWindowMode == STARTUPWND_REMLAST || s.bRememberWindowPos) {
 			r = s.rcLastWindowPos;
@@ -10755,7 +10761,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				r = CRect(r.left, r.top, r.left + vsize.cx, r.top + vsize.cy);
 				ShowWindow(SW_HIDE);
 			}
-			SetWindowPos(nullptr, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
+			SetWindowPos(pInsertAfter, r.left, r.top, r.Width(), r.Height(), nFlags);
 			if (s.nStartupWindowMode != STARTUPWND_REMLAST) {
 				ZoomVideoWindow();
 				ShowWindow(SW_SHOW);
@@ -10765,7 +10771,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				GetMonitorInfoW(m_LastWindow_HM, &mi);
 				r = mi.rcMonitor;
 				ShowWindow(SW_HIDE);
-				SetWindowPos(nullptr, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
+				SetWindowPos(pInsertAfter, r.left, r.top, r.Width(), r.Height(), nFlags);
 			}
 
 			if (m_eMediaLoadState == MLS_LOADED) {
@@ -10780,7 +10786,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		}
 		m_bFirstFSAfterLaunchOnFullScreen = false;
 	} else {
-		SetWindowPos(nullptr, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
+		SetWindowPos(pInsertAfter, r.left, r.top, r.Width(), r.Height(), nFlags);
 	}
 
 	SetAlwaysOnTop(s.iOnTop);
@@ -15724,8 +15730,6 @@ void CMainFrame::SetAlwaysOnTop(int i)
 		if (pInsertAfter) {
 			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		}
-	} else if (m_bFullScreen && !(GetWindowLongPtrW(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-		SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	} else if (bD3DOnMain) {
 		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	}
