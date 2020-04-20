@@ -66,7 +66,7 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 			Error += L"\n";
 			Error += GetWindowsErrorMessage(hr, nullptr);
 
-			MessageBox(hWnd, Error, L"Error creating DX9 allocation presenter", MB_OK | MB_ICONERROR);
+			MessageBoxW(hWnd, Error, L"Error creating DX9 allocation presenter", MB_OK | MB_ICONERROR);
 		}
 		bIsErrorShowing = true;
 		(*ppAP)->Release();
@@ -74,7 +74,7 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 	}
 	else if (!Error.IsEmpty()) {
 		if (!bIsWarningShowing) {
-			MessageBox(hWnd, Error, L"Warning creating DX9 allocation presenter", MB_OK | MB_ICONWARNING);
+			MessageBoxW(hWnd, Error, L"Warning creating DX9 allocation presenter", MB_OK | MB_ICONWARNING);
 		}
 		bIsWarningShowing = true;
 	} else {
@@ -89,21 +89,21 @@ HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 	HRESULT hr = E_FAIL;
 	if (clsid == CLSID_EVRAllocatorPresenter) {
 		CString Error;
-		*ppAP	= DNew DSObjects::CEVRAllocatorPresenter(hWnd, bFullscreen, hr, Error);
+		*ppAP = DNew DSObjects::CEVRAllocatorPresenter(hWnd, bFullscreen, hr, Error);
 		(*ppAP)->AddRef();
 
 		if (FAILED(hr)) {
 			if (!bIsErrorShowing) {
 				Error += L"\n";
 				Error += GetWindowsErrorMessage(hr, nullptr);
-				MessageBox(hWnd, Error, L"Error creating EVR Custom renderer", MB_OK | MB_ICONERROR);
+				MessageBoxW(hWnd, Error, L"Error creating EVR Custom renderer", MB_OK | MB_ICONERROR);
 			}
 			bIsErrorShowing = true;
 			(*ppAP)->Release();
 			*ppAP = nullptr;
 		} else if (!Error.IsEmpty()) {
 			if (!bIsWarningShowing) {
-				MessageBox(hWnd, Error, L"Warning creating EVR Custom renderer", MB_OK | MB_ICONWARNING);
+				MessageBoxW(hWnd, Error, L"Warning creating EVR Custom renderer", MB_OK | MB_ICONWARNING);
 			}
 			bIsWarningShowing = true;
 		} else {

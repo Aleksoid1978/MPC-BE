@@ -3902,11 +3902,11 @@ HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISub
 		if (FAILED(hr)) {
 			Error += L"\n";
 			Error += GetWindowsErrorMessage(hr, nullptr);
-			MessageBox(hWnd, Error, L"Error creating EVR Sync", MB_OK | MB_ICONERROR);
+			MessageBoxW(hWnd, Error, L"Error creating EVR Sync", MB_OK | MB_ICONERROR);
 			(*ppAP)->Release();
 			*ppAP = nullptr;
 		} else if (!Error.IsEmpty()) {
-			MessageBox(hWnd, Error, L"Warning creating EVR Sync", MB_OK|MB_ICONWARNING);
+			MessageBoxW(hWnd, Error, L"Warning creating EVR Sync", MB_OK|MB_ICONWARNING);
 		}
 	}
 	return hr;
