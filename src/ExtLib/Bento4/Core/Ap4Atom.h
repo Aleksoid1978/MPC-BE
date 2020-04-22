@@ -490,6 +490,11 @@ const AP4_Atom::Type AP4_ATOM_TYPE_CUVC = AP4_ATOM_TYPE('C','U','V','C');
 const AP4_Atom::Type AP4_ATOM_TYPE_CHQX = AP4_ATOM_TYPE('C','H','Q','X');
 // CineForm
 const AP4_Atom::Type AP4_ATOM_TYPE_CFHD = AP4_ATOM_TYPE('C','F','H','D');
+// UtVideo
+const AP4_Atom::Type AP4_ATOM_TYPE_ULRA = AP4_ATOM_TYPE('U','L','R','A');
+const AP4_Atom::Type AP4_ATOM_TYPE_ULRG = AP4_ATOM_TYPE('U','L','R','G');
+const AP4_Atom::Type AP4_ATOM_TYPE_ULY0 = AP4_ATOM_TYPE('U','L','Y','0');
+const AP4_Atom::Type AP4_ATOM_TYPE_ULY2 = AP4_ATOM_TYPE('U','L','Y','2');
 // MagicYUV
 const AP4_Atom::Type AP4_ATOM_TYPE_M8RG = AP4_ATOM_TYPE('M','8','R','G');
 const AP4_Atom::Type AP4_ATOM_TYPE_M8RA = AP4_ATOM_TYPE('M','8','R','A');
