@@ -565,6 +565,11 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_DVH6:
 		case AP4_ATOM_TYPE_DVHP:
 		case AP4_ATOM_TYPE_DVHQ:
+		// UtVideo
+		case AP4_ATOM_TYPE_ULRA:
+		case AP4_ATOM_TYPE_ULRG:
+		case AP4_ATOM_TYPE_ULY0:
+		case AP4_ATOM_TYPE_ULY2:
         // MagicYUV
         case AP4_ATOM_TYPE_M8RG:
         case AP4_ATOM_TYPE_M8RA:
