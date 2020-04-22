@@ -2177,10 +2177,15 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 {
 	__super::OnActivateApp(bActive, dwThreadID);
 
-	if (bActive && !m_bHideCursor) {
-		StartAutoHideCursor();
-	} else if (!bActive) {
-		StopAutoHideCursor();
+	if (bActive) {
+		if (!m_bHideCursor) {
+			StartAutoHideCursor();
+		}
+		m_lastMouseMove.x = m_lastMouseMove.y = -1;
+	} else {
+		if (!m_bHideCursor) {
+			StopAutoHideCursor();
+		}
 	}
 
 	if (m_bFullScreen) {
@@ -20067,7 +20072,7 @@ void CMainFrame::StartAutoHideCursor()
 {
 	const auto& s = AfxGetAppSettings();
 	UINT nElapse = 0;
-	if ((m_bFullScreen || IsD3DFullScreenMode())) {
+	if (m_bFullScreen || IsD3DFullScreenMode()) {
 		if (s.nShowBarsWhenFullScreenTimeOut > 0) {
 			nElapse = std::max(s.nShowBarsWhenFullScreenTimeOut * 1000, 2000);
 		} else {
