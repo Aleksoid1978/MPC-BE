@@ -1198,6 +1198,16 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtDuration = metaDataDuration;
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
+	// validating indexes
+	if (m_sps.size() > 1) {
+		const auto indexPos = m_sps[0].fp;
+		m_pFile->Seek(indexPos);
+		__int64 syncPos = indexPos;
+		if (!Sync(syncPos) || syncPos != indexPos - 4) {
+			m_sps.clear();
+		}
+	}
+
 	m_pFile->Seek(m_DataOffset);
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
