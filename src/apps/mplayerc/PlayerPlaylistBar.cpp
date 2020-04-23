@@ -994,7 +994,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 		if (!m_bEdit) {
 			if (pMsg->message == WM_SYSKEYDOWN
-					&& pMsg->wParam == VK_RETURN && (HIWORD(pMsg->lParam) & KF_ALTDOWN)) {
+					&& (HIWORD(pMsg->lParam) & KF_ALTDOWN)) {
 				m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 				return TRUE;
 			}
