@@ -2022,6 +2022,15 @@ again:
 				delete pFormat;
 			}
 		} else if (m_DeviceModeCurrent == MODE_WASAPI_SHARED) { // SHARED
+			WAVEFORMATEX* pDeviceFormat = nullptr;
+			if (SUCCEEDED(m_pAudioClient->GetMixFormat(&pDeviceFormat)) && pDeviceFormat) {
+				if (m_pWaveFormatExOutput->nSamplesPerSec != pDeviceFormat->nSamplesPerSec) {
+					m_pWaveFormatExOutput->nSamplesPerSec = pDeviceFormat->nSamplesPerSec;
+					m_pWaveFormatExOutput->nAvgBytesPerSec = m_pWaveFormatExOutput->nSamplesPerSec * m_pWaveFormatExOutput->nBlockAlign;
+				}
+				CoTaskMemFree(pDeviceFormat);
+			}
+
 			WAVEFORMATEX *pClosestMatch = nullptr;
 			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, m_pWaveFormatExOutput, &pClosestMatch);
 			if (SUCCEEDED(hr)) {
