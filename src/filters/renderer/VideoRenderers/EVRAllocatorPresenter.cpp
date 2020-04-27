@@ -181,6 +181,47 @@ CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
 	}
 }
 
+STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	HRESULT hr;
+	if (riid == __uuidof(IMFClockStateSink)) {
+		hr = GetInterface((IMFClockStateSink*)this, ppv);
+	} else if (riid == __uuidof(IMFVideoPresenter)) {
+		hr = GetInterface((IMFVideoPresenter*)this, ppv);
+	} else if (riid == __uuidof(IMFTopologyServiceLookupClient)) {
+		hr = GetInterface((IMFTopologyServiceLookupClient*)this, ppv);
+	} else if (riid == __uuidof(IMFVideoDeviceID)) {
+		hr = GetInterface((IMFVideoDeviceID*)this, ppv);
+	} else if (riid == __uuidof(IMFGetService)) {
+		hr = GetInterface((IMFGetService*)this, ppv);
+	} else if (riid == __uuidof(IMFAsyncCallback)) {
+		hr = GetInterface((IMFAsyncCallback*)this, ppv);
+	} else if (riid == __uuidof(IMFVideoDisplayControl)) {
+		hr = GetInterface((IMFVideoDisplayControl*)this, ppv);
+	} else if (riid == __uuidof(IMFVideoMixerBitmap)) {
+		hr = GetInterface((IMFVideoMixerBitmap*)this, ppv);
+	} else if (riid == __uuidof(IEVRTrustedVideoPlugin)) {
+		hr = GetInterface((IEVRTrustedVideoPlugin*)this, ppv);
+	} else if (riid == IID_IQualProp) {
+		hr = GetInterface((IQualProp*)this, ppv);
+	} else if (riid == __uuidof(IMFRateSupport)) {
+		hr = GetInterface((IMFRateSupport*)this, ppv);
+	} else if (riid == __uuidof(IDirect3DDeviceManager9)) {
+		//hr = GetInterface((IDirect3DDeviceManager9*)this, ppv);
+		hr = m_pD3DManager->QueryInterface(__uuidof(IDirect3DDeviceManager9), (void**) ppv);
+	} else if (riid == __uuidof(ID3DFullscreenControl)) {
+		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
+	} else if (riid == __uuidof(IMediaSideData)) {
+		hr = GetInterface((IMediaSideData*)this, ppv);
+	} else if (riid == __uuidof(IPlaybackNotify)) {
+		hr = GetInterface((IPlaybackNotify*)this, ppv);
+	} else {
+		hr = __super::NonDelegatingQueryInterface(riid, ppv);
+	}
+
+	return hr;
+}
+
 void CEVRAllocatorPresenter::ResetStats()
 {
 	m_pcFrames			= 0;
@@ -257,6 +298,8 @@ void CEVRAllocatorPresenter::StopWorkerThreads()
 	m_nRenderState = Shutdown;
 }
 
+// ISubPicAllocatorPresenter3
+
 STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
 	CheckPointer(ppRenderer, E_POINTER);
@@ -311,48 +354,58 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	return hr;
 }
 
-STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResizeDevice()
 {
-	HRESULT hr;
-	if (riid == __uuidof(IMFClockStateSink)) {
-		hr = GetInterface((IMFClockStateSink*)this, ppv);
-	} else if (riid == __uuidof(IMFVideoPresenter)) {
-		hr = GetInterface((IMFVideoPresenter*)this, ppv);
-	} else if (riid == __uuidof(IMFTopologyServiceLookupClient)) {
-		hr = GetInterface((IMFTopologyServiceLookupClient*)this, ppv);
-	} else if (riid == __uuidof(IMFVideoDeviceID)) {
-		hr = GetInterface((IMFVideoDeviceID*)this, ppv);
-	} else if (riid == __uuidof(IMFGetService)) {
-		hr = GetInterface((IMFGetService*)this, ppv);
-	} else if (riid == __uuidof(IMFAsyncCallback)) {
-		hr = GetInterface((IMFAsyncCallback*)this, ppv);
-	} else if (riid == __uuidof(IMFVideoDisplayControl)) {
-		hr = GetInterface((IMFVideoDisplayControl*)this, ppv);
-	} else if (riid == __uuidof(IMFVideoMixerBitmap)) {
-		hr = GetInterface((IMFVideoMixerBitmap*)this, ppv);
-	} else if (riid == __uuidof(IEVRTrustedVideoPlugin)) {
-		hr = GetInterface((IEVRTrustedVideoPlugin*)this, ppv);
-	} else if (riid == IID_IQualProp) {
-		hr = GetInterface((IQualProp*)this, ppv);
-	} else if (riid == __uuidof(IMFRateSupport)) {
-		hr = GetInterface((IMFRateSupport*)this, ppv);
-	} else if (riid == __uuidof(IDirect3DDeviceManager9)) {
-		//hr = GetInterface((IDirect3DDeviceManager9*)this, ppv);
-		hr = m_pD3DManager->QueryInterface(__uuidof(IDirect3DDeviceManager9), (void**) ppv);
-	} else if (riid == __uuidof(ID3DFullscreenControl)) {
-		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
-	} else if (riid == __uuidof(IMediaSideData)) {
-		hr = GetInterface((IMediaSideData*)this, ppv);
-	} else if (riid == __uuidof(IPlaybackNotify)) {
-		hr = GetInterface((IPlaybackNotify*)this, ppv);
-	} else {
-		hr = __super::NonDelegatingQueryInterface(riid, ppv);
+	CAutoLock lock(this);
+	CAutoLock lock2(&m_ImageProcessingLock);
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	return __super::ResizeDevice();
+}
+
+STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
+{
+	DLog(L"CEVRAllocatorPresenter::ResetDevice()");
+
+	StopWorkerThreads();
+
+	CAutoLock lock(this);
+	CAutoLock lock2(&m_ImageProcessingLock);
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	RemoveAllSamples();
+
+	bool bResult = __super::ResetDevice();
+
+	for (unsigned i = 0; i < m_nSurfaces; i++) {
+		CComPtr<IMFSample> pMFSample;
+		HRESULT hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
+
+		if (SUCCEEDED(hr)) {
+			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
+			m_FreeSamples.emplace_back(pMFSample);
+		}
+		ASSERT(SUCCEEDED(hr));
 	}
 
-	return hr;
+	if (bResult) {
+		StartWorkerThreads();
+	}
+
+	return bResult;
+}
+
+STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
+{
+	CAutoLock lock(this);
+	CAutoLock lock2(&m_ImageProcessingLock);
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	return __super::DisplayChange();
 }
 
 // IMFClockStateSink
+
 STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLONG llClockStartOffset)
 {
 	TRACE_EVR("EVR: OnClockStart  hnsSystemTime = %I64d,   llClockStartOffset = %I64d\n", hnsSystemTime, llClockStartOffset);
@@ -433,6 +486,7 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockSetRate(MFTIME hnsSystemTime, float 
 }
 
 // IBaseFilter delegate
+
 bool CEVRAllocatorPresenter::GetState( DWORD dwMilliSecsTimeout, FILTER_STATE *State, HRESULT &_ReturnValue)
 {
 	CAutoLock lock(&m_SampleQueueLock);
@@ -450,6 +504,7 @@ bool CEVRAllocatorPresenter::GetState( DWORD dwMilliSecsTimeout, FILTER_STATE *S
 }
 
 // IQualProp
+
 STDMETHODIMP CEVRAllocatorPresenter::get_FramesDroppedInRenderer(int *pcFrames)
 {
 	*pcFrames = m_pcFrames;
@@ -1085,6 +1140,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetService(/* [in] */ __RPC__in REFGUID gui
 }
 
 // IMFAsyncCallback
+
 STDMETHODIMP CEVRAllocatorPresenter::GetParameters(/* [out] */ __RPC__out DWORD *pdwFlags, /* [out] */ __RPC__out DWORD *pdwQueue)
 {
 	return E_NOTIMPL;
@@ -1096,6 +1152,7 @@ STDMETHODIMP CEVRAllocatorPresenter::Invoke(/* [in] */ __RPC__in_opt IMFAsyncRes
 }
 
 // IMFVideoDisplayControl
+
 STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo)
 {
 	if (pszVideo) {
@@ -1479,6 +1536,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetSideData(GUID guidType, const BYTE **pDa
 }
 
 // IPlaybackNotify
+
 STDMETHODIMP CEVRAllocatorPresenter::Stop()
 {
 	for (unsigned i = 0; i < m_nSurfaces; i++) {
@@ -1489,6 +1547,7 @@ STDMETHODIMP CEVRAllocatorPresenter::Stop()
 
 	return S_OK;
 }
+
 
 STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight)
 {
@@ -1898,56 +1957,6 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		m_bSyncStatsAvailable = true;
 		m_fSyncOffsetStdDev = StdDev;
 	}
-}
-
-STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResizeDevice()
-{
-	CAutoLock lock(this);
-	CAutoLock lock2(&m_ImageProcessingLock);
-	CAutoLock cRenderLock(&m_RenderLock);
-
-	return __super::ResizeDevice();
-}
-
-STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
-{
-	DLog(L"CEVRAllocatorPresenter::ResetDevice()");
-
-	StopWorkerThreads();
-
-	CAutoLock lock(this);
-	CAutoLock lock2(&m_ImageProcessingLock);
-	CAutoLock cRenderLock(&m_RenderLock);
-
-	RemoveAllSamples();
-
-	bool bResult = __super::ResetDevice();
-
-	for (unsigned i = 0; i < m_nSurfaces; i++) {
-		CComPtr<IMFSample> pMFSample;
-		HRESULT hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
-
-		if (SUCCEEDED(hr)) {
-			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
-			m_FreeSamples.emplace_back(pMFSample);
-		}
-		ASSERT(SUCCEEDED(hr));
-	}
-
-	if (bResult) {
-		StartWorkerThreads();
-	}
-
-	return bResult;
-}
-
-STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
-{
-	CAutoLock lock(this);
-	CAutoLock lock2(&m_ImageProcessingLock);
-	CAutoLock cRenderLock(&m_RenderLock);
-
-	return __super::DisplayChange();
 }
 
 void CEVRAllocatorPresenter::RenderThread()
