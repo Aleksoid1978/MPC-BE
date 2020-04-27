@@ -62,6 +62,80 @@ namespace DSObjects
 		HMODULE m_hEvrLib = nullptr;
 		HMODULE m_hAvrtLib = nullptr;
 
+		CCritSec							m_csExternalMixerLock;
+
+		enum RENDER_STATE {
+			Stopped		= State_Stopped,
+			Paused		= State_Paused,
+			Started		= State_Running,
+			Shutdown	= State_Running + 1
+		};
+		RENDER_STATE						m_nRenderState;
+
+		HANDLE								m_hRenderThread;
+		HANDLE								m_hGetMixerThread;
+		HANDLE								m_hVSyncThread;
+
+		HANDLE								m_hEvtQuit;			// Stop rendering thread event
+		bool								m_bEvtQuit;
+		HANDLE								m_hEvtFlush;		// Discard all buffers
+		bool								m_bEvtFlush;
+		HANDLE								m_hEvtRenegotiate;
+
+		COuterEVR*							m_pOuterEVR;
+		CComPtr<IMFClock>					m_pClock;
+		CComPtr<IDirect3DDeviceManager9>	m_pD3DManager;
+		CComPtr<IMFTransform>				m_pMixer;
+		CComPtr<IMediaEventSink>			m_pSink;
+		CComPtr<IMFVideoMediaType>			m_pMediaType;
+		MFVideoAspectRatioMode				m_dwVideoAspectRatioMode;
+		MFVideoRenderPrefs					m_dwVideoRenderPrefs;
+		COLORREF							m_BorderColor;
+
+		bool								m_fUseInternalTimer;
+		int									m_LastSetOutputRange;
+		bool								m_bPendingMediaFinished;
+
+		CCritSec							m_SampleQueueLock;
+		CCritSec							m_ImageProcessingLock;
+
+		std::deque<CComPtr<IMFSample>>		m_FreeSamples;
+		std::deque<CComPtr<IMFSample>>		m_ScheduledSamples;
+		IMFSample*							m_pCurrentDisplaydSample;
+		bool								m_bWaitingSample;
+		bool								m_bLastSampleOffsetValid;
+		LONGLONG							m_LastScheduledSampleTime;
+		double								m_LastScheduledSampleTimeFP;
+		LONGLONG							m_LastScheduledUncorrectedSampleTime;
+		LONGLONG							m_MaxSampleDuration;
+		LONGLONG							m_LastSampleOffset;
+		LONGLONG							m_VSyncOffsetHistory[5];
+		LONGLONG							m_LastPredictedSync;
+		unsigned							m_VSyncOffsetHistoryPos;
+
+		UINT								m_nResetToken;
+		int									m_nStepCount;
+
+		bool								m_bSignaledStarvation;
+		LONGLONG							m_StarvationClock;
+
+		// Stats variable for IQualProp
+		UINT									m_pcFrames;
+		UINT									m_nDroppedUpdate;
+		UINT									m_pcFramesDrawn;	// Retrieves the number of frames drawn since streaming started
+		UINT									m_piAvg;
+		UINT									m_piDev;
+
+		BOOL									m_bStreamChanged;
+
+		bool									m_bChangeMT;
+
+		double			m_ModeratedTime;
+		LONGLONG		m_ModeratedTimeLast;
+		LONGLONG		m_ModeratedClockLast;
+		LONGLONG		m_ModeratedTimer;
+		MFCLOCK_STATE	m_LastClockState;
+
 	public:
 		CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CEVRAllocatorPresenter(void);
@@ -170,85 +244,10 @@ namespace DSObjects
 		// IPlaybackNotify
 		STDMETHODIMP Stop();
 
-	protected :
+	private:
 		void			OnResetDevice();
 		virtual void	OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter);
-
-		double			m_ModeratedTime;
-		LONGLONG		m_ModeratedTimeLast;
-		LONGLONG		m_ModeratedClockLast;
-		LONGLONG		m_ModeratedTimer;
-		MFCLOCK_STATE	m_LastClockState;
 		LONGLONG		GetClockTime(LONGLONG PerformanceCounter);
-
-	private :
-		CCritSec                                m_csExternalMixerLock;
-
-		enum RENDER_STATE {
-			Stopped		= State_Stopped,
-			Paused		= State_Paused,
-			Started		= State_Running,
-			Shutdown	= State_Running + 1
-		};
-		RENDER_STATE							m_nRenderState;
-
-		HANDLE									m_hRenderThread;
-		HANDLE									m_hGetMixerThread;
-		HANDLE									m_hVSyncThread;
-
-		HANDLE									m_hEvtQuit;			// Stop rendering thread event
-		bool									m_bEvtQuit;
-		HANDLE									m_hEvtFlush;		// Discard all buffers
-		bool									m_bEvtFlush;
-		HANDLE									m_hEvtRenegotiate;
-
-		COuterEVR*								m_pOuterEVR;
-		CComPtr<IMFClock>						m_pClock;
-		CComPtr<IDirect3DDeviceManager9>		m_pD3DManager;
-		CComPtr<IMFTransform>					m_pMixer;
-		CComPtr<IMediaEventSink>				m_pSink;
-		CComPtr<IMFVideoMediaType>				m_pMediaType;
-		MFVideoAspectRatioMode					m_dwVideoAspectRatioMode;
-		MFVideoRenderPrefs						m_dwVideoRenderPrefs;
-		COLORREF								m_BorderColor;
-
-		bool									m_fUseInternalTimer;
-		int										m_LastSetOutputRange;
-		bool									m_bPendingMediaFinished;
-
-		CCritSec								m_SampleQueueLock;
-		CCritSec								m_ImageProcessingLock;
-
-		std::deque<CComPtr<IMFSample>>			m_FreeSamples;
-		std::deque<CComPtr<IMFSample>>			m_ScheduledSamples;
-		IMFSample*								m_pCurrentDisplaydSample;
-		bool									m_bWaitingSample;
-		bool									m_bLastSampleOffsetValid;
-		LONGLONG								m_LastScheduledSampleTime;
-		double									m_LastScheduledSampleTimeFP;
-		LONGLONG								m_LastScheduledUncorrectedSampleTime;
-		LONGLONG								m_MaxSampleDuration;
-		LONGLONG								m_LastSampleOffset;
-		LONGLONG								m_VSyncOffsetHistory[5];
-		LONGLONG								m_LastPredictedSync;
-		unsigned								m_VSyncOffsetHistoryPos;
-
-		UINT									m_nResetToken;
-		int										m_nStepCount;
-
-		bool									m_bSignaledStarvation;
-		LONGLONG								m_StarvationClock;
-
-		// Stats variable for IQualProp
-		UINT									m_pcFrames;
-		UINT									m_nDroppedUpdate;
-		UINT									m_pcFramesDrawn;	// Retrieves the number of frames drawn since streaming started
-		UINT									m_piAvg;
-		UINT									m_piDev;
-
-		BOOL									m_bStreamChanged;
-
-		bool									m_bChangeMT;
 
 		void									GetMixerThread();
 		static DWORD WINAPI						GetMixerThreadStatic(LPVOID lpParam);
@@ -291,5 +290,4 @@ namespace DSObjects
 		PTR_AvSetMmThreadPriority				pfAvSetMmThreadPriority;
 		PTR_AvRevertMmThreadCharacteristics		pfAvRevertMmThreadCharacteristics;
 	};
-
 }
