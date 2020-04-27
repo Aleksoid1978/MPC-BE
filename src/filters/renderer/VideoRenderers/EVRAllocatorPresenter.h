@@ -143,7 +143,6 @@ namespace DSObjects
 		DECLARE_IUNKNOWN;
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		STDMETHODIMP        GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight);
 		STDMETHODIMP        InitializeDevice(IMFMediaType* pMediaType);
 
 		// ISubPicAllocatorPresenter3
