@@ -311,11 +311,6 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	return hr;
 }
 
-STDMETHODIMP_(bool) CEVRAllocatorPresenter::Paint(bool fAll)
-{
-	return __super::Paint(fAll);
-}
-
 STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	HRESULT hr;
