@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,17 +30,6 @@
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CUnknown(L"CSubPicAllocatorPresenterImpl", NULL)
 	, m_hWnd(hWnd)
-	, m_maxSubtitleTextureSize(0, 0)
-	, m_nativeVideoSize(0, 0)
-	, m_aspectRatio(0, 0)
-	, m_videoRect(0, 0, 0, 0)
-	, m_windowRect(0, 0, 0, 0)
-	, m_fps(25.0)
-	, m_refreshRate(0)
-	, m_rtSubtitleDelay(0)
-	, m_bDeviceResetRequested(false)
-	, m_bPendingResetDevice(false)
-	, m_rtNow(0)
 {
 	if (!IsWindow(m_hWnd)) {
 		hr = E_INVALIDARG;

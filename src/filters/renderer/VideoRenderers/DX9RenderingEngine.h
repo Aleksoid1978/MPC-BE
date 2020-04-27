@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,6 +74,9 @@ namespace DSObjects
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevExRefresh;
+
+		bool m_bDeviceResetRequested = false;
+		bool m_bPendingResetDevice   = false;
 
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
