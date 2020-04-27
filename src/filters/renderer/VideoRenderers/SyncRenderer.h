@@ -137,6 +137,9 @@ namespace GothSync
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 
+		bool m_bDeviceResetRequested = false;
+		bool m_bPendingResetDevice   = false;
+
 		UINT						m_CurrentAdapter;
 		D3DCAPS9					m_Caps;
 		D3DFORMAT					m_SurfaceFmt;

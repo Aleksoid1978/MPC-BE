@@ -36,26 +36,24 @@ private:
 
 protected:
 	HWND m_hWnd;
-	REFERENCE_TIME m_rtSubtitleDelay;
+	REFERENCE_TIME m_rtSubtitleDelay = 0;
 
 	CSize m_maxSubtitleTextureSize;
 	CSize m_nativeVideoSize;
 	CSize m_aspectRatio;
 	CRect m_videoRect;
 	CRect m_windowRect;
+	bool  m_bOtherTransform = false;
 
-	REFERENCE_TIME m_rtNow;
-	double m_fps;
-	UINT m_refreshRate;
+	REFERENCE_TIME m_rtNow = 0;
+	double m_fps           = 25.0;
+	UINT m_refreshRate     = 0;
 
 	CMediaType m_inputMediaType;
 
 	CComPtr<ISubPicProvider> m_pSubPicProvider;
 	CComPtr<ISubPicAllocator> m_pAllocator;
 	CComPtr<ISubPicQueue> m_pSubPicQueue;
-
-	bool m_bDeviceResetRequested;
-	bool m_bPendingResetDevice;
 
 	void InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize);
 	HRESULT AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
