@@ -180,11 +180,21 @@ STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 
 STDMETHODIMP CmadVRAllocatorPresenter::SetRotation(int rotation)
 {
-	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR) {
-		hr = pMVRC->SendCommandInt("rotate", rotation);
+	if (ÀngleStep90(rotation)) {
+		HRESULT hr = E_NOTIMPL;
+		int curRotation = rotation;
+		if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
+			pMVRI->GetInt("rotation", &curRotation);
+		}
+		if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR) {
+			hr = pMVRC->SendCommandInt("rotate", rotation);
+			if (SUCCEEDED(hr) && curRotation != rotation) {
+				hr = pMVRC->SendCommand("redraw");
+			}
+		}
+		return hr;
 	}
-	return hr;
+	return E_INVALIDARG;
 }
 
 STDMETHODIMP_(int) CmadVRAllocatorPresenter::GetRotation()
