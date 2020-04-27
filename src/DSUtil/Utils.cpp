@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2019 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -167,6 +167,18 @@ double DecreaseFloatByGrid(double value, const int step)
 	}
 
 	return value;
+}
+
+bool ÀngleStep90(int& angle)
+{
+	if (angle % 90 == 0) {
+		angle %= 360;
+		if (angle < 0) {
+			angle += 360;
+		}
+		return true;
+	}
+	return false;
 }
 
 bool StrToInt32(const wchar_t* str, int32_t& value)

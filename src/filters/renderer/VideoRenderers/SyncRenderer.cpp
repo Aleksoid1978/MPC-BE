@@ -699,12 +699,7 @@ STDMETHODIMP_(SIZE) CBaseAP::GetVideoSizeAR()
 
 STDMETHODIMP CBaseAP::SetRotation(int rotation)
 {
-	if (rotation % 90 == 0) {
-		rotation %= 360;
-		if (rotation < 0) {
-			rotation += 360;
-		}
-
+	if (ÀngleStep90(rotation)) {
 		if (rotation != m_iRotation) {
 			m_iRotation = rotation;
 			m_bOtherTransform = true;

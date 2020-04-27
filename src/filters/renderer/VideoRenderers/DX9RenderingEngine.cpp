@@ -2338,12 +2338,7 @@ STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSizeAR()
 
 STDMETHODIMP CDX9RenderingEngine::SetRotation(int rotation)
 {
-	if (rotation % 90 == 0) {
-		rotation %= 360;
-		if (rotation < 0) {
-			rotation += 360;
-		}
-
+	if (ÀngleStep90(rotation)) {
 		if (rotation != m_iRotation) {
 			m_iRotation = rotation;
 			m_bOtherTransform = true;
@@ -2352,7 +2347,7 @@ STDMETHODIMP CDX9RenderingEngine::SetRotation(int rotation)
 		return S_OK;
 	}
 
-	return  E_INVALIDARG;
+	return E_INVALIDARG;
 }
 
 STDMETHODIMP_(int) CDX9RenderingEngine::GetRotation()
