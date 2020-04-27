@@ -1548,27 +1548,6 @@ STDMETHODIMP CEVRAllocatorPresenter::Stop()
 	return S_OK;
 }
 
-
-STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight)
-{
-	// This function should be called...
-	ASSERT(FALSE);
-
-	if (lpWidth) {
-		*lpWidth	= m_nativeVideoSize.cx;
-	}
-	if (lpHeight) {
-		*lpHeight	= m_nativeVideoSize.cy;
-	}
-	if (lpARWidth) {
-		*lpARWidth	= m_aspectRatio.cx;
-	}
-	if (lpARHeight) {
-		*lpARHeight	= m_aspectRatio.cy;
-	}
-	return S_OK;
-}
-
 STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 {
 	HRESULT hr;
