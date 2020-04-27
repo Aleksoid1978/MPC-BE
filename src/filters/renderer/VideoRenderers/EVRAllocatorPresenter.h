@@ -143,8 +143,6 @@ namespace DSObjects
 		DECLARE_IUNKNOWN;
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		STDMETHODIMP        InitializeDevice(IMFMediaType* pMediaType);
-
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP        CreateRenderer(IUnknown** ppRenderer) override;
 		STDMETHODIMP_(bool) ResizeDevice() override;
@@ -244,41 +242,43 @@ namespace DSObjects
 		STDMETHODIMP Stop();
 
 	private:
-		void			OnResetDevice();
-		virtual void	OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter);
-		LONGLONG		GetClockTime(LONGLONG PerformanceCounter);
+		STDMETHODIMP		InitializeDevice(IMFMediaType* pMediaType);
+		void				OnResetDevice();
 
-		void									GetMixerThread();
-		static DWORD WINAPI						GetMixerThreadStatic(LPVOID lpParam);
+		virtual void		OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter);
+		LONGLONG			GetClockTime(LONGLONG PerformanceCounter);
 
-		bool									GetImageFromMixer();
-		void									RenderThread();
-		static DWORD WINAPI						PresentThread(LPVOID lpParam);
-		void									ResetStats();
-		void									StartWorkerThreads();
-		void									StopWorkerThreads();
-		HRESULT									CheckShutdown() const;
-		void									CompleteFrameStep(bool bCancel);
-		void									CheckWaitingSampleFromMixer();
-		static DWORD WINAPI						VSyncThreadStatic(LPVOID lpParam);
-		void									VSyncThread();
+		void				GetMixerThread();
+		static DWORD WINAPI	GetMixerThreadStatic(LPVOID lpParam);
 
-		void									RemoveAllSamples();
-		HRESULT									GetFreeSample(IMFSample** ppSample);
-		HRESULT									GetScheduledSample(IMFSample** ppSample, int &_Count);
-		void									MoveToFreeList(IMFSample* pSample, const bool bBack);
-		void									MoveToScheduledList(IMFSample* pSample, const bool bSorted);
-		void									FlushSamples();
-		void									FlushSamplesInternal();
+		bool				GetImageFromMixer();
+		void				RenderThread();
+		static DWORD WINAPI	PresentThread(LPVOID lpParam);
+		void				ResetStats();
+		void				StartWorkerThreads();
+		void				StopWorkerThreads();
+		HRESULT				CheckShutdown() const;
+		void				CompleteFrameStep(bool bCancel);
+		void				CheckWaitingSampleFromMixer();
+		static DWORD WINAPI	VSyncThreadStatic(LPVOID lpParam);
+		void				VSyncThread();
+
+		void				RemoveAllSamples();
+		HRESULT				GetFreeSample(IMFSample** ppSample);
+		HRESULT				GetScheduledSample(IMFSample** ppSample, int &_Count);
+		void				MoveToFreeList(IMFSample* pSample, const bool bBack);
+		void				MoveToScheduledList(IMFSample* pSample, const bool bSorted);
+		void				FlushSamples();
+		void				FlushSamplesInternal();
 
 		// === Media type negotiation functions
-		HRESULT									RenegotiateMediaType();
-		HRESULT									IsMediaTypeSupported(IMFMediaType* pMixerType);
-		HRESULT									CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType* pMixerInputType, IMFMediaType** pType);
-		HRESULT									SetMediaType(IMFMediaType* pType);
-		HRESULT									GetMediaTypeD3DFormat(IMFMediaType* pType, D3DFORMAT& d3dformat);
-		HRESULT									GetMixerMediaTypeMerit(IMFMediaType* pType, int& merit);
-		LPCWSTR									GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
+		HRESULT				RenegotiateMediaType();
+		HRESULT				IsMediaTypeSupported(IMFMediaType* pMixerType);
+		HRESULT				CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType* pMixerInputType, IMFMediaType** pType);
+		HRESULT				SetMediaType(IMFMediaType* pType);
+		HRESULT				GetMediaTypeD3DFormat(IMFMediaType* pType, D3DFORMAT& d3dformat);
+		HRESULT				GetMixerMediaTypeMerit(IMFMediaType* pType, int& merit);
+		LPCWSTR				GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
 
 		// === Functions pointers
 		PTR_DXVA2CreateDirect3DDeviceManager9	pfDXVA2CreateDirect3DDeviceManager9;
