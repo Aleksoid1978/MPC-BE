@@ -69,16 +69,15 @@ namespace DSObjects
 		DECLARE_IUNKNOWN;
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		STDMETHODIMP        CreateRenderer(IUnknown** ppRenderer);
-		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP        GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight);
 		STDMETHODIMP        InitializeDevice(IMFMediaType* pMediaType);
-		STDMETHODIMP_(bool) ResizeDevice();
-		STDMETHODIMP_(bool) ResetDevice();
-		STDMETHODIMP_(bool) DisplayChange();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP_(bool) IsRendering() { return (m_nRenderState == Started); }
+		STDMETHODIMP        CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(bool) ResizeDevice() override;
+		STDMETHODIMP_(bool) ResetDevice() override;
+		STDMETHODIMP_(bool) DisplayChange() override;
+		STDMETHODIMP_(bool) IsRendering() override { return (m_nRenderState == Started); }
 
 		// IMFClockStateSink
 		STDMETHODIMP OnClockStart(/* [in] */ MFTIME hnsSystemTime, /* [in] */ LONGLONG llClockStartOffset);
