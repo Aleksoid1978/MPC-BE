@@ -184,7 +184,7 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 		}
 	}
 
-	if (bWindowPosChanged || bVideoRectChanged) {
+	if (bWindowPosChanged || bVideoRectChanged || m_bOtherTransform) {
 		Paint(false);
 	}
 }

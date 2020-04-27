@@ -2343,7 +2343,11 @@ STDMETHODIMP CDX9RenderingEngine::SetRotation(int rotation)
 		if (rotation < 0) {
 			rotation += 360;
 		}
-		m_iRotation = rotation;
+
+		if (rotation != m_iRotation) {
+			m_iRotation = rotation;
+			m_bOtherTransform = true;
+		}
 
 		return S_OK;
 	}
@@ -2358,7 +2362,10 @@ STDMETHODIMP_(int) CDX9RenderingEngine::GetRotation()
 
 STDMETHODIMP CDX9RenderingEngine::SetFlip(bool flip)
 {
-	m_bFlip = flip;
+	if (flip != m_bFlip) {
+		m_bFlip = flip;
+		m_bOtherTransform = true;
+	}
 
 	return S_OK;
 }
