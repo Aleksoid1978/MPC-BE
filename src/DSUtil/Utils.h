@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2019 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,6 +85,8 @@ double IncreaseFloatByGrid(double value, const int step);
 // steps < 0  mean 1.0/(-step)
 double DecreaseFloatByGrid(double value, const int step);
 
+// checks the multiplicity of the angle of 90 degrees and brings it to the values of 0, 90, 270
+bool ÀngleStep90(int& angle);
 
 // Functions to convert strings to numeric values. On error, the current value does not change and false is returned.
 
