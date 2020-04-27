@@ -51,7 +51,9 @@ using namespace D3D9Helper;
 //#undef DLog
 //#define DLog(...) Log2File(__VA_ARGS__)
 
+//
 // CBaseAP
+//
 
 CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
@@ -3894,6 +3896,10 @@ HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISub
 	return hr;
 }
 
+//
+// CSyncRenderer
+//
+
 CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
 {
 	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
@@ -4049,37 +4055,27 @@ STDMETHODIMP CSyncAP::Stop()
 	return S_OK;
 }
 
+//
 // CGenlock
+//
 
-CGenlock::CGenlock(double target, double limit, int lineD, int colD, double clockD, UINT mon):
-	targetSyncOffset(target), // Target sync offset, typically around 10 ms
-	controlLimit(limit), // How much sync offset is allowed to drift from target sync offset before control kicks in
-	lineDelta(lineD), // Number of rows used in display frequency adjustment, typically 1 (one)
-	columnDelta(colD),  // Number of columns used in display frequency adjustment, typically 1 - 2
-	cycleDelta(clockD),  // Delta used in clock speed adjustment. In fractions of 1.0. Typically around 0.001
-	monitor(mon) // The monitor to be adjusted if the display refresh rate is the controlled parameter
+CGenlock::CGenlock(double target, double limit, int lineD, int colD, double clockD, UINT mon)
+	: targetSyncOffset(target) // Target sync offset, typically around 10 ms
+	, controlLimit(limit)      // How much sync offset is allowed to drift from target sync offset before control kicks in
+	, lowSyncOffset(target - limit)
+	, highSyncOffset(target + limit)
+	, lineDelta(lineD)         // Number of rows used in display frequency adjustment, typically 1 (one)
+	, columnDelta(colD)        // Number of columns used in display frequency adjustment, typically 1 - 2
+	, cycleDelta(clockD)       // Delta used in clock speed adjustment. In fractions of 1.0. Typically around 0.001
+	, monitor(mon)             // The monitor to be adjusted if the display refresh rate is the controlled parameter
+	, syncOffsetFifo(64)
+	, frameCycleFifo(4)
 {
-	lowSyncOffset = targetSyncOffset - controlLimit;
-	highSyncOffset = targetSyncOffset + controlLimit;
-	adjDelta = 0;
-	displayAdjustmentsMade = 0;
-	clockAdjustmentsMade = 0;
-	displayFreqCruise = 0;
-	displayFreqFaster = 0;
-	displayFreqSlower = 0;
-	curDisplayFreq = 0;
-	psWnd = nullptr;
-	liveSource = FALSE;
-	powerstripTimingExists = FALSE;
-	syncOffsetFifo = DNew MovingAverage(64);
-	frameCycleFifo = DNew MovingAverage(4);
 }
 
 CGenlock::~CGenlock()
 {
 	ResetTiming();
-	SAFE_DELETE_ARRAY(syncOffsetFifo);
-	SAFE_DELETE_ARRAY(frameCycleFifo);
 	syncClock.Release();
 };
 
@@ -4292,10 +4288,10 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 	WPARAM wParam = monitor;
 	ATOM setTiming;
 
-	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
+	syncOffsetAvg = syncOffsetFifo.Average(syncOffset);
 	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
 
-	frameCycleAvg = frameCycleFifo->Average(frameCycle);
+	frameCycleAvg = frameCycleFifo.Average(frameCycle);
 	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
 
 	if (!PowerstripRunning() || !powerstripTimingExists) {
@@ -4348,10 +4344,10 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 // Todo: check so that we don't have a live source
 HRESULT CGenlock::ControlClock(double syncOffset, double frameCycle)
 {
-	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
+	syncOffsetAvg = syncOffsetFifo.Average(syncOffset);
 	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
 
-	frameCycleAvg = frameCycleFifo->Average(frameCycle);
+	frameCycleAvg = frameCycleFifo.Average(frameCycle);
 	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
 
 	if (!syncClock) {
@@ -4387,10 +4383,10 @@ HRESULT CGenlock::ControlClock(double syncOffset, double frameCycle)
 // Don't adjust anything, just update the syncOffset stats
 HRESULT CGenlock::UpdateStats(double syncOffset, double frameCycle)
 {
-	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
+	syncOffsetAvg = syncOffsetFifo.Average(syncOffset);
 	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
 
-	frameCycleAvg = frameCycleFifo->Average(frameCycle);
+	frameCycleAvg = frameCycleFifo.Average(frameCycle);
 	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
 
 	return S_OK;

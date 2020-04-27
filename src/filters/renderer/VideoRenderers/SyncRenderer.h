@@ -366,15 +366,13 @@ namespace GothSync
 		DECLARE_IUNKNOWN;
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP InitializeDevice(AM_MEDIA_TYPE* pMediaType);
-		STDMETHODIMP_(bool) ResetDevice();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP_(bool) IsRendering() {
-			return (m_nRenderState == Started);
-		}
+		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(bool) ResetDevice() override;
+		STDMETHODIMP_(bool) IsRendering() override { return (m_nRenderState == Started); }
 
 		// IMFClockStateSink
 		STDMETHODIMP OnClockStart(MFTIME hnsSystemTime, LONGLONG llClockStartOffset);
@@ -600,20 +598,15 @@ namespace GothSync
 		class MovingAverage
 		{
 		private:
-			int fifoSize;
-			double fifo[MAX_FIFO_SIZE];
-			int oldestSample;
-			double sum;
+			std::vector<double> fifo;
+			unsigned oldestSample = 0;
+			double   sum          = 0;
 
 		public:
 			MovingAverage(int size)
-				: fifoSize(std::max(size, MAX_FIFO_SIZE))
-				, oldestSample(0)
-				, sum(0)
 			{
-				for (unsigned i = 0; i < MAX_FIFO_SIZE; i++) {
-					fifo[i] = 0;
-				}
+				size = std::clamp(size, 1, MAX_FIFO_SIZE);
+				fifo.resize(size);
 			}
 
 			double Average(double sample)
@@ -621,10 +614,10 @@ namespace GothSync
 				sum = sum + sample - fifo[oldestSample];
 				fifo[oldestSample] = sample;
 				oldestSample++;
-				if (oldestSample == fifoSize) {
+				if (oldestSample == fifo.size()) {
 					oldestSample = 0;
 				}
-				return sum / fifoSize;
+				return sum / fifo.size();
 			}
 		};
 
@@ -650,37 +643,39 @@ namespace GothSync
 		HRESULT UpdateStats(double syncOffset, double frameCycle); // Don't adjust anything, just update the syncOffset stats
 
 	public:
-		BOOL powerstripTimingExists; // TRUE if display timing has been got through Powerstrip
-		int adjDelta; // -1 for display slower in relation to video, 0 for keep, 1 for faster
-		UINT displayAdjustmentsMade; // The number of adjustments made to display refresh rate
-		UINT clockAdjustmentsMade; // The number of adjustments made to clock frequency
-		double minSyncOffset, maxSyncOffset;
+		BOOL   powerstripTimingExists = FALSE; // TRUE if display timing has been got through Powerstrip
+		int    adjDelta               = 0; // -1 for display slower in relation to video, 0 for keep, 1 for faster
+		UINT   displayAdjustmentsMade = 0; // The number of adjustments made to display refresh rate
+		UINT   clockAdjustmentsMade   = 0; // The number of adjustments made to clock frequency
+		double minSyncOffset;
+		double maxSyncOffset;
 		double syncOffsetAvg; // Average of the above
-		double minFrameCycle, maxFrameCycle;
+		double minFrameCycle;
+		double maxFrameCycle;
 		double frameCycleAvg;
-		double curDisplayFreq; // Current (adjusted) display frequency
+		double curDisplayFreq = 0; // Current (adjusted) display frequency
 
 	private:
-		BOOL liveSource; // TRUE if live source -> display sync is the only option
+		BOOL liveSource = FALSE; // TRUE if live source -> display sync is the only option
 		int lineDelta; // The number of rows added or subtracted when adjusting display fps
 		int columnDelta; // The number of colums added or subtracted when adjusting display fps
 		double cycleDelta; // Adjustment factor for cycle time as fraction of nominal value
 
 		UINT totalLines, totalColumns; // Including the porches and sync widths
 		UINT visibleLines, visibleColumns; // The nominal resolution
-		MovingAverage *syncOffsetFifo;
-		MovingAverage *frameCycleFifo;
+		MovingAverage syncOffsetFifo;
+		MovingAverage frameCycleFifo;
 
 		UINT pixelClock; // In pixels/s
-		double displayFreqCruise;  // Nominal display frequency in frames/s
-		double displayFreqSlower;
-		double displayFreqFaster;
+		double displayFreqCruise = 0;  // Nominal display frequency in frames/s
+		double displayFreqSlower = 0;
+		double displayFreqFaster = 0;
 
 		double controlLimit; // How much the sync offset is allowed to drift from target sync offset
 		UINT monitor; // The monitor to be controlled. 0-based.
 		CComPtr<ISyncClock> syncClock; // Interface to an adjustable reference clock
 
-		HWND psWnd; // PowerStrip window
+		HWND psWnd = nullptr; // PowerStrip window
 		const static int TIMING_PARAM_CNT = 10;
 		const static int MAX_LOADSTRING = 100;
 		UINT displayTiming[TIMING_PARAM_CNT]; // Display timing parameters
