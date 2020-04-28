@@ -24,5 +24,6 @@
 
 namespace YoutubeDL
 {
-	bool Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields);
+	bool Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields, Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist);
+	void Clear();
 }

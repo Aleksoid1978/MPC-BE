@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 namespace Youtube
 {
 	enum yformat {
+		y_unknown,
 		y_mp4,
 		y_webm,
 		y_mp4_av1,
@@ -44,7 +45,7 @@ namespace Youtube
 		yformat format;
 		ytype   type;
 		int     quality;
-		LPCWSTR ext;
+		CString ext;
 		bool    fps60;
 		bool    hdr;
 		bool    live;
