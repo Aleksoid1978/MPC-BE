@@ -11990,7 +11990,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (bIsHtml) {
 				std::list<CString> urls;
-				if (YoutubeDL::Parse_URL(fn, s.bYoutubeLoadPlaylist, s.iYDLMaxHeight, s.bYDLMaximumQuality, urls, pOFD->subs, m_youtubeFields)) {
+				if (YoutubeDL::Parse_URL(fn, s.bYoutubeLoadPlaylist, s.iYDLMaxHeight, s.bYDLMaximumQuality, urls, pOFD->subs, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist)) {
 					youtubeUrl = fn;
 					Content::Online::Disconnect(youtubeUrl);
 
@@ -14057,6 +14057,8 @@ void CMainFrame::CloseMediaPrivate()
 		m_youtubeUrllist.clear();
 		m_youtubeAudioUrllist.clear();
 		s.iYoutubeTagSelected = 0;
+
+		YoutubeDL::Clear();
 	}
 	m_bYoutubeOpened = false;
 

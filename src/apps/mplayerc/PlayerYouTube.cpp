@@ -1442,15 +1442,17 @@ namespace Youtube
 	{
 		const YoutubeUrllistItem* audio_item = nullptr;
 		if (!youtubeAudioUrllist.empty()) {
-			for (const auto& item : youtubeAudioUrllist) {
-				if (format == item.profile->format) {
-					audio_item = &item;
-					break;
+			if (youtubeAudioUrllist.size() > 1) {
+				for (const auto& item : youtubeAudioUrllist) {
+					if (format == item.profile->format) {
+						audio_item = &item;
+						break;
+					}
 				}
 			}
 
 			if (!audio_item) {
-				audio_item = &youtubeAudioUrllist[0];
+				audio_item = &youtubeAudioUrllist.front();
 			}
 		}
 
