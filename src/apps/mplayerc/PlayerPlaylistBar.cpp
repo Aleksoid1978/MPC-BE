@@ -1699,7 +1699,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 			}
 		} else {
-			const auto path = MakePath(CombinePath(base, str));
+			const auto path = MakePath(::PathIsURLW(str) ? str : CombinePath(base, str));
 			if (!fn.CompareNoCase(path)) {
 				SAFE_DELETE(pli);
 				continue;
@@ -1729,6 +1729,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					}
 				}
 			}
+
 			pli->m_fns.push_back(path);
 			if (!audioId.IsEmpty()) {
 				const auto it = audio_fns.find(audioId);
