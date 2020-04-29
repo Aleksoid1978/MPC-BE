@@ -1381,12 +1381,8 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 
 static CString CombinePath(CPath p, const CString& fn)
 {
-	if (fn.Find(L":\\") == 1 || fn.Find(L"\\") == 0) {
-		return fn;
-	}
-
-	CUrl cUrl;
-	if (cUrl.CrackUrl(fn) && cUrl.GetHostNameLength()) {
+	if (fn.Find(L":\\") == 1 || fn.Find(L"\\") == 0
+			|| ::PathIsURLW(fn)) {
 		return fn;
 	}
 
@@ -1699,7 +1695,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 			}
 		} else {
-			const auto path = MakePath(::PathIsURLW(str) ? str : CombinePath(base, str));
+			const auto path = MakePath(CombinePath(base, str));
 			if (!fn.CompareNoCase(path)) {
 				SAFE_DELETE(pli);
 				continue;
