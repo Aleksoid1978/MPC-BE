@@ -20085,19 +20085,7 @@ void CMainFrame::StartAutoHideCursor()
 	}
 
 	if (nElapse) {
-		CPoint p;
-		GetCursorPos(&p);
-
-		CWnd* pWnd = WindowFromPoint(p);
-		if (pWnd) {
-			if (IsD3DFullScreenMode()) {
-				if (*pWnd == *m_pFullscreenWnd) {
-					SetTimer(TIMER_MOUSEHIDER, nElapse, nullptr);
-				}
-			} else if (m_wndView == *pWnd || m_wndView.IsChild(pWnd)) {
-				SetTimer(TIMER_MOUSEHIDER, nElapse, nullptr);
-			}
-		}
+		SetTimer(TIMER_MOUSEHIDER, nElapse, nullptr);
 	}
 }
 
