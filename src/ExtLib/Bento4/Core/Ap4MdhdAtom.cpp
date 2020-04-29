@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - mdhd Atoms 
+|    AP4 - mdhd Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -53,6 +53,28 @@ AP4_MdhdAtom::AP4_MdhdAtom(AP4_UI64    creation_time,
     m_Language[2] = language[2];
 }
 
+static const char mdhd_language_map[][4] = {
+    /* 0-9 */
+    "eng", "fra", "ger", "ita", "dut", "sve", "spa", "dan", "por", "nor",
+    "heb", "jpn", "ara", "fin", "gre", "ice", "mlt", "tur", "hr "/*scr*/, "chi"/*ace?*/,
+    "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav",    "",
+    "fo ",    "", "rus", "chi",    "", "iri", "alb", "ron", "ces", "slk",
+    "slv", "yid", "sr ", "mac", "bul", "ukr", "bel", "uzb", "kaz", "aze",
+    /*?*/
+    "aze", "arm", "geo", "mol", "kir", "tgk", "tuk", "mon",    "", "pus",
+    "kur", "kas", "snd", "tib", "nep", "san", "mar", "ben", "asm", "guj",
+    "pa ", "ori", "mal", "kan", "tam", "tel",    "", "bur", "khm", "lao",
+    /*                   roman? arabic? */
+    "vie", "ind", "tgl", "may", "may", "amh", "tir", "orm", "som", "swa",
+    /*==rundi?*/
+       "", "run",    "", "mlg", "epo",    "",    "",    "",    "",    "",
+       /* 100 */
+       "",    "",    "",    "",    "",    "",    "",    "",    "",    "",
+       "",    "",    "",    "",    "",    "",    "",    "",    "",    "",
+       "",    "",    "",    "",    "",    "",    "",    "", "wel", "baq",
+    "cat", "lat", "que", "grn", "aym", "tat", "uig", "dzo", "jav"
+};
+
 /*----------------------------------------------------------------------
 |       AP4_MdhdAtom::AP4_MdhdAtom
 +---------------------------------------------------------------------*/
@@ -63,9 +85,7 @@ AP4_MdhdAtom::AP4_MdhdAtom(AP4_Size size, AP4_ByteStream& stream) :
     m_TimeScale(0),
     m_Duration(0)
 {
-    m_Language[0] = 0;
-    m_Language[1] = 0;
-    m_Language[2] = 0;
+    memset(m_Language, sizeof(m_Language), 0);
 
     if (m_Version == 0) {
         AP4_UI32 tmp = 0;
@@ -78,23 +98,28 @@ AP4_MdhdAtom::AP4_MdhdAtom(AP4_Size size, AP4_ByteStream& stream) :
         stream.ReadUI64(m_ModificationTime);
         stream.ReadUI32(m_TimeScale);
         stream.ReadUI64(m_Duration);
+    }
+
+    AP4_UI16 lang;
+    stream.ReadUI16(lang);
+    if (lang < _countof(mdhd_language_map)) {
+        if (mdhd_language_map[lang][0]) {
+            memcpy(m_Language, mdhd_language_map[lang], 3);
+        }
     } else {
-        // TODO
-    }
-    
-    unsigned char lang[2];
-    stream.Read(lang, 2, NULL);
-    char l0 = ((lang[0]>>2)&0x1F);
-    char l1 = (((lang[0]&0x3)<<3) | ((lang[1]>>5)&0x7));
-    char l2 = ((lang[1]&0x1F));
-    if (l0) {
-        m_Language[0] = l0+0x60;
-    }
-    if (l1) {
-        m_Language[1] = l1+0x60;
-    }
-    if (l2) {
-        m_Language[2] = l2+0x60;
+        char l0 = (lang >> 10 & 0x1F);
+        char l1 = (lang >> 5  & 0x1F);
+        char l2 = (lang >> 0  & 0x1F);
+
+        if (l0) {
+            m_Language[0] = l0 + 0x60;
+        }
+        if (l1) {
+            m_Language[1] = l1 + 0x60;
+        }
+        if (l2) {
+            m_Language[2] = l2 + 0x60;
+        }
     }
 }
 
@@ -161,8 +186,8 @@ AP4_MdhdAtom::InspectFields(AP4_AtomInspector& inspector)
     inspector.AddField("duration", (AP4_UI32)m_Duration); // TODO
     inspector.AddField("duration(ms)", GetDurationMs());
     char language[4];
-    AP4_StringFormat(language, sizeof(language), 
-        "%c%c%c", 
+    AP4_StringFormat(language, sizeof(language),
+        "%c%c%c",
         m_Language[0] ? m_Language[0]:'-',
         m_Language[1] ? m_Language[1]:'-',
         m_Language[2] ? m_Language[2]:'-');
