@@ -431,6 +431,20 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
+				if (AP4_DataInfoAtom* clef = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("tapt/clef"))) {
+					const AP4_DataBuffer* clef_data = clef->GetData();
+					if (clef_data->GetDataSize() == 12) { // 20 bytes(size) - 8 bytes(header)
+						const uint32_t* data = (uint32_t*)clef_data->GetData();
+						if (data[1] && data[2]) {
+							double num = (double)_byteswap_ulong(data[1]) * height;
+							double den = (double)_byteswap_ulong(data[2]) * width;
+							if (num > 0 && den > 0) {
+								Aspect = ReduceDim(num / den);
+							}
+						}
+					}
+				}
+
 				AvgTimePerFrame = track->GetSampleCount() ? REFERENCE_TIME(track->GetDurationHighPrecision() * 10000.0 / (track->GetSampleCount())) : 0;
 				if (AP4_SttsAtom* stts = dynamic_cast<AP4_SttsAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stts"))) {
 					AP4_Duration totalDuration = stts->GetTotalDuration();
@@ -1412,9 +1426,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									const double y = ((double)vse->GetHeight() - apertureHeight)/2 + vertOff;
 									for (auto& item : mts) {
 										if (item.formattype == FORMAT_VideoInfo
-											|| item.formattype == FORMAT_VideoInfo2
-											|| item.formattype == FORMAT_MPEG2Video
-											|| item.formattype == FORMAT_MPEGVideo) {
+												|| item.formattype == FORMAT_VideoInfo2
+												|| item.formattype == FORMAT_MPEG2Video
+												|| item.formattype == FORMAT_MPEGVideo) {
 											auto vih = (VIDEOINFOHEADER*)item.Format();
 											vih->rcSource = vih->rcTarget = {
 												(LONG)std::round(x),

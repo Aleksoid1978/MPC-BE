@@ -274,6 +274,9 @@ const AP4_Atom::Type AP4_ATOM_TYPE_FIEL = AP4_ATOM_TYPE('f','i','e','l');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_CLAP = AP4_ATOM_TYPE('c','l','a','p');
 
+const AP4_Atom::Type AP4_ATOM_TYPE_TAPT = AP4_ATOM_TYPE('t','a','p','t');
+const AP4_Atom::Type AP4_ATOM_TYPE_CLEF = AP4_ATOM_TYPE('c','l','e','f');
+
 const AP4_Atom::Type AP4_ATOM_TYPE_COLR = AP4_ATOM_TYPE('c','o','l','r');
 const AP4_Atom::Type AP4_ATOM_TYPE_MDCV = AP4_ATOM_TYPE('m','d','c','v');
 const AP4_Atom::Type AP4_ATOM_TYPE_CLLI = AP4_ATOM_TYPE('c','l','l','i');
