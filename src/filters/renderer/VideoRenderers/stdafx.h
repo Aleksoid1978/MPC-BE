@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,10 +27,8 @@
 
 #include <afxdisp.h>
 #include <afxole.h>
-#include <crtdefs.h>
 #include <BaseClasses/streams.h>
 #include <dvdmedia.h>
-#include <mpconfig.h>
 #include <memory>
 #include <algorithm>
 
