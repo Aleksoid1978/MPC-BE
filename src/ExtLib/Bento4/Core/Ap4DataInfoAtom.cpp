@@ -22,5 +22,5 @@ AP4_DataInfoAtom::AP4_DataInfoAtom(Type             type,
 {
     size -= AP4_ATOM_HEADER_SIZE;
     m_Data.SetDataSize(size);
-    stream.Read(m_Data.UseData(), size);    
+    stream.Read(m_Data.UseData(), size);
 }
