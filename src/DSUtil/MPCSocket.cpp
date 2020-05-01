@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MPCSocket.h"
 #include "text.h"
+#include "UrlParser.h"
 
 #define PROXY_TIMEOUT_FACTOR 0
 
@@ -62,25 +63,19 @@ CMPCSocket::CMPCSocket()
 	}
 }
 
-BOOL CMPCSocket::Connect(CString url, BOOL bConnectOnly)
+BOOL CMPCSocket::Connect(const CString& url, const BOOL bConnectOnly/* = FALSE*/)
 {
-	CUrl Url;
+	CUrlParser urlParser;
 
-	return (Url.CrackUrl(url) && Connect(Url, bConnectOnly));
+	return (urlParser.Parse(url.GetString()) && Connect(urlParser, bConnectOnly));
 }
 
-BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
+BOOL CMPCSocket::Connect(const CUrlParser& urlParser, const BOOL bConnectOnly/* = FALSE*/)
 {
 	m_Hdr.Empty();
 
-	if (url.GetScheme() != ATL_URL_SCHEME_HTTP) {
+	if (urlParser.GetScheme() != INTERNET_SCHEME_HTTP) {
 		return FALSE;
-	}
-	if (url.GetUrlPathLength() == 0) {
-		url.SetUrlPath(L"/");
-	}
-	if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
-		url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
 	}
 
 #if PROXY_TIMEOUT_FACTOR
@@ -95,8 +90,8 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 	}
 
 	if (!__super::Connect(
-			m_bProxyEnable ? m_sProxyServer : url.GetHostName(),
-			m_bProxyEnable ? m_nProxyPort : url.GetPortNumber())) {
+			m_bProxyEnable ? m_sProxyServer : urlParser.GetHostName(),
+			m_bProxyEnable ? m_nProxyPort : urlParser.GetPortNumber())) {
 		KillTimeOut();
 		return FALSE;
 	}
@@ -105,20 +100,11 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 		KillTimeOut();
 	}
 
-	m_url = url;
-
-	CStringA host = CStringA(url.GetHostName());
-	CStringA path = CStringA(url.GetUrlPath()) + CStringA(url.GetExtraInfo());
+	CStringA host = CStringA(urlParser.GetHostName());
+	CStringA path = CStringA(urlParser.GetUrlPath()) + CStringA(urlParser.GetExtraInfo());
 
 	if (m_bProxyEnable) {
-		DWORD dwUrlLen	= url.GetUrlLength() + 1;
-		WCHAR* szUrl	= new WCHAR[dwUrlLen];
-
-		// Retrieve the contents of the CUrl object
-		url.CreateUrl(szUrl, &dwUrlLen);
-		path = CStringA(szUrl);
-
-		delete [] szUrl;
+		path = urlParser.GetUrl();
 	}
 
 	CStringA sAddHeader;
@@ -138,7 +124,7 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 		m_sUserAgent,
 		m_bProxyEnable ? "Proxy-Connection: Keep-Alive\r\n" : "",
 		sAddHeader,
-		host, url.GetPortNumber());
+		host, urlParser.GetPortNumber());
 
 	if (!bConnectOnly || m_bProxyEnable) {
 		if (!SendRequest()) {
@@ -167,13 +153,13 @@ BOOL CMPCSocket::OnMessagePending()
 	return __super::OnMessagePending();
 }
 
-void CMPCSocket::SetTimeOut(UINT uConnectTimeOut, UINT uReceiveTimeOut)
+void CMPCSocket::SetTimeOut(const UINT uConnectTimeOut, const UINT uReceiveTimeOut)
 {
 	m_uConnectTimeOut = uConnectTimeOut;
 	m_uReceiveTimeOut = uReceiveTimeOut;
 }
 
-BOOL CMPCSocket::SetTimeOut(UINT uTimeOut)
+BOOL CMPCSocket::SetTimeOut(const UINT uTimeOut)
 {
 	m_nTimerID = SetTimer(nullptr, 0, uTimeOut, nullptr);
 	return (m_nTimerID != 0);
@@ -206,27 +192,6 @@ BOOL CMPCSocket::SendRequest()
 		m_Hdr.Replace("\r\n\r\n", "");
 	}
 
-#if (SOCKET_DUMPLOGFILE)
-	{
-		DWORD dwUrlLen	= m_url.GetUrlLength() + 1;
-		WCHAR* szUrl	= new WCHAR[dwUrlLen];
-		// Retrieve the contents of the CUrl object
-		m_url.CreateUrl(szUrl, &dwUrlLen);
-		CString path = szUrl;
-		delete [] szUrl;
-
-		Logger::Log2File(L"===");
-		Logger::Log2File(L"Request URL = %s", path);
-		Logger::Log2File(L"Header:");
-		std::list<CStringA> sl;
-		CStringA hdr = GetHeader();
-		Explode(hdr, sl, '\n');
-		for (const auto& hdrline : sl) {
-			Logger::Log2File(L"%s", CString(hdrline));
-		}
-	}
-#endif
-
 	if (m_uReceiveTimeOut) {
 		KillTimeOut();
 	}
@@ -234,7 +199,7 @@ BOOL CMPCSocket::SendRequest()
 	return ret;
 }
 
-void CMPCSocket::SetProxy(CString ProxyServer, DWORD ProxyPort)
+void CMPCSocket::SetProxy(const CString& ProxyServer, const DWORD ProxyPort)
 {
 	if (!ProxyServer.IsEmpty() && ProxyPort) {
 		m_bProxyEnable	= TRUE;
@@ -243,12 +208,12 @@ void CMPCSocket::SetProxy(CString ProxyServer, DWORD ProxyPort)
 	}
 }
 
-void CMPCSocket::SetUserAgent(CStringA UserAgent)
+void CMPCSocket::SetUserAgent(const CStringA& UserAgent)
 {
 	m_sUserAgent = UserAgent;
 }
 
-void CMPCSocket::AddHeaderParams(CStringA sHeaderParam)
+void CMPCSocket::AddHeaderParams(const CStringA& sHeaderParam)
 {
 	m_AddHeaderParams.push_back(sHeaderParam);
 }

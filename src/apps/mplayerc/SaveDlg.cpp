@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,7 @@
 #include "MainFrm.h"
 #include "SaveDlg.h"
 #include "../../DSUtil/FileHandle.h"
+#include "../../DSUtil/UrlParser.h"
 #include "../../filters/filters.h"
 
 static unsigned int AdaptUnit(double& val, size_t unitsNb)
@@ -142,10 +143,8 @@ HRESULT CSaveDlg::InitFileCopy()
 	CComPtr<IFileSourceFilter> pReader;
 
 	if (::PathIsURLW(fn)) {
-		CUrl url;
-		url.CrackUrl(fn);
-		CString protocol = url.GetSchemeName();
-		protocol.MakeLower();
+		CUrlParser urlParser(fn.GetString());
+		const CString protocol = urlParser.GetSchemeName();
 		if (protocol == L"http" || protocol == L"https") {
 			CComPtr<IUnknown> pUnk;
 			pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
@@ -169,11 +168,11 @@ HRESULT CSaveDlg::InitFileCopy()
 			WSAStartup(MAKEWORD(2, 2), &wsaData);
 
 			m_addr.sin_family      = AF_INET;
-			m_addr.sin_port        = htons((u_short)url.GetPortNumber());
+			m_addr.sin_port        = htons((u_short)urlParser.GetPortNumber());
 			m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 			ip_mreq imr = { 0 };
-			if (InetPton(AF_INET, url.GetHostName(), &imr.imr_multiaddr.s_addr) != 1) {
+			if (InetPton(AF_INET, urlParser.GetHostName(), &imr.imr_multiaddr.s_addr) != 1) {
 				goto fail;
 			}
 			imr.imr_interface.s_addr = INADDR_ANY;

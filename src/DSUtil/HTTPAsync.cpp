@@ -23,8 +23,6 @@
 #include "Log.h"
 #include "Version.h"
 
-#pragma comment(lib, "WinInet.Lib")
-
 void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt DWORD_PTR dwContext,
 								   __in DWORD dwInternetStatus,
@@ -187,13 +185,12 @@ void CHTTPAsync::Close()
 	SAFE_INTERNET_CLOSE_HANDLE(m_hConnect);
 	SAFE_INTERNET_CLOSE_HANDLE(m_hInstance);
 
-	m_url.Clear();
 	m_url_str.Empty();
 	m_host.Empty();
 	m_path.Empty();
 
-	m_nPort   = INTERNET_DEFAULT_HTTP_PORT;
-	m_nScheme = ATL_URL_SCHEME_HTTP;
+	m_nPort   = 0;
+	m_nScheme = INTERNET_SCHEME_HTTP;
 
 	m_header.Empty();
 	m_contentType.Empty();
@@ -206,26 +203,19 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 {
 	Close();
 
-	if (!m_url.CrackUrl(lpszURL)) {
+	CUrlParser urlParser;
+	if (!urlParser.Parse(lpszURL)) {
 		return E_INVALIDARG;
 	}
-	if (m_url.GetScheme() != ATL_URL_SCHEME_HTTP && m_url.GetScheme() != ATL_URL_SCHEME_HTTPS) {
+	if (urlParser.GetScheme() != INTERNET_SCHEME_HTTP && urlParser.GetScheme() != INTERNET_SCHEME_HTTPS) {
 		return E_FAIL;
-	}
-	if (m_url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
-		m_url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
 	}
 
 	m_url_str = lpszURL;
-	if (m_url.GetUrlPathLength() == 0) {
-		m_url.SetUrlPath(L"/");
-		m_url_str += L'/';
-	}
-
-	m_host    = m_url.GetHostName();
-	m_path    = CString(m_url.GetUrlPath()) + CString(m_url.GetExtraInfo());
-	m_nPort   = m_url.GetPortNumber();
-	m_nScheme = m_url.GetScheme();
+	m_host    = urlParser.GetHostName();
+	m_path    = CString(urlParser.GetUrlPath()) + CString(urlParser.GetExtraInfo());
+	m_nPort   = urlParser.GetPortNumber();
+	m_nScheme = urlParser.GetScheme();
 
 	CString lpszAgent;
 	lpszAgent.Format(L"MPCBE.%S", MPC_VERSION_SVN_STR);
@@ -262,8 +252,8 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_hConnect = InternetConnectW(m_hInstance,
 								  m_host,
 								  m_nPort,
-								  m_url.GetUserNameW(),
-								  m_url.GetPassword(),
+								  urlParser.GetUserName(),
+								  urlParser.GetPassword(),
 								  INTERNET_SERVICE_HTTP,
 								  INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
 								  (DWORD_PTR)this);
@@ -317,7 +307,7 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 	m_context = Context::CONTEXT_REQUEST;
 
 	DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_KEEP_CONNECTION;
-	if (m_nScheme == ATL_URL_SCHEME_HTTPS) {
+	if (m_nScheme == INTERNET_SCHEME_HTTPS) {
 		dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
 	}
 

@@ -22,11 +22,11 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlutil.h>
 #include <afxinet.h>
 #include <afxsock.h>
 #include <qnetwork.h>
 #include "../../../DSUtil/MPCSocket.h"
+#include "../../../DSUtil/UrlParser.h"
 #include "../../parser/BaseSplitter/BaseSplitter.h"
 
 #define ShoutcastSourceName   L"MPC ShoutCast Source"
@@ -169,7 +169,7 @@ class CShoutcastStream : public CSourceStream
 
 		CString m_title, m_url, m_description;
 
-		bool Connect(CUrl& url, CString& redirectUrl);
+		bool Connect(const CUrlParser& urlParser, CString& redirectUrl);
 		bool FindSync();
 
 		CShoutcastSocket& operator = (const CShoutcastSocket& soc) {
@@ -194,7 +194,7 @@ class CShoutcastStream : public CSourceStream
 	HANDLE m_hSocketThread;
 	SOCKET m_hSocket;
 
-	CUrl m_url;
+	CUrlParser m_urlParser;
 
 	bool m_fBuffering;
 	CString m_title, m_description;
@@ -223,7 +223,6 @@ public:
 	HRESULT OnThreadCreate();
 	HRESULT OnThreadDestroy();
 	HRESULT Inactive();
-	HRESULT Pause();
 
 	HRESULT SetName(LPCWSTR pName);
 };

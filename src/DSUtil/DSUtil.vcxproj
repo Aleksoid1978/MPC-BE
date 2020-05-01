@@ -78,6 +78,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="text.cpp" />
+    <ClCompile Include="UrlParser.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="vd.cpp" />
     <ClCompile Include="vd_asm.cpp">
@@ -124,6 +125,8 @@
     <ClInclude Include="std_helper.h" />
     <ClInclude Include="SysVersion.h" />
     <ClInclude Include="text.h" />
+    <ClInclude Include="CUrl.h" />
+    <ClInclude Include="UrlParser.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="vd.h" />
     <ClInclude Include="vd_asm.h" />

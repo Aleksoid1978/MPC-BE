@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,6 +26,7 @@
 #include "UDPStream.h"
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/UrlParser.h"
 
 #define MAXSTORESIZE  2 * MEGABYTE // The maximum size of a buffer for storing the received information is 2 Mb
 #define MAXBUFSIZE   16 * KILOBYTE // The maximum packet size is 16 Kb
@@ -118,17 +119,17 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	Clear();
 
 	m_url_str = CString(fnw);
+	CUrlParser urlParser;
 	CString str_protocol;
 
 	if (m_url_str.Find(L"pipe:") == 0) {
 		str_protocol = L"pipe";
 	} else {
-		if (!m_url.CrackUrl(m_url_str)) {
+		if (!urlParser.Parse(fnw)) {
 			return false;
 		}
 
-		str_protocol = m_url.GetSchemeName();
-		str_protocol.MakeLower();
+		str_protocol = urlParser.GetSchemeName();
 	}
 
 	if (str_protocol == L"udp") {
@@ -141,11 +142,11 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 		memset(&m_addr, 0, m_addr_size);
 		m_addr.sin_family      = AF_INET;
-		m_addr.sin_port        = htons((u_short)m_url.GetPortNumber());
+		m_addr.sin_port        = htons((u_short)urlParser.GetPortNumber());
 		m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 		ip_mreq imr;
-		if (InetPton(AF_INET, m_url.GetHostName(), &imr.imr_multiaddr.s_addr) != 1) {
+		if (InetPton(AF_INET, urlParser.GetHostName(), &imr.imr_multiaddr.s_addr) != 1) {
 			return false;
 		}
 		imr.imr_interface.s_addr = INADDR_ANY;

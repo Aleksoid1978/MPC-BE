@@ -24,6 +24,7 @@
 #include "Content.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/HTTPAsync.h"
+#include "../../DSUtil/UrlParser.h"
 
 static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 {
@@ -246,7 +247,7 @@ namespace Content {
 	const std::wregex ref_html_meta_refresh(L"<meta\\s+http-equiv\\s*=\\s*([\"'])refresh\\1\\s+content\\s*=\\s*([\"'])\\d+;\\s*url=((?!\2)[\"']?)([^\"'\\n]+?)\\3\\2\\s*/?>", std::regex_constants::icase);
 	                                                                                                    // <meta http-equiv="refresh" content="0; url='...'">
 
-	static const bool FindRedir(const CUrl& src, const CString& body, std::list<CString>& urls, const int playlist_type)
+	static const bool FindRedir(const CUrlParser& src, const CString& body, std::list<CString>& urls, const int playlist_type)
 	{
 		std::wregex rgx;
 
@@ -277,17 +278,11 @@ namespace Content {
 				url.Replace('/', '\\');
 			}
 
-			CUrl dst;
-			dst.CrackUrl(url);
+			CUrlParser dst;
+			dst.Parse(url);
 
 			if (url.Find(L"://") < 0) {
-				DWORD dwUrlLen = src.GetUrlLength() + 1;
-				WCHAR* szUrl = new WCHAR[dwUrlLen];
-
-				// Retrieve the contents of the CUrl object
-				src.CreateUrl(szUrl, &dwUrlLen);
-				CString path(szUrl);
-				delete[] szUrl;
+				CString path = src.GetUrl();
 
 				int pos = path.ReverseFind('/');
 				if (pos > 0) {
@@ -299,7 +294,7 @@ namespace Content {
 				}
 
 				url = path + url;
-				dst.CrackUrl(url);
+				dst.Parse(url);
 			}
 
 			if (_wcsicmp(src.GetSchemeName(), dst.GetSchemeName())
@@ -375,20 +370,19 @@ namespace Content {
 
 	const CString GetType(CString fn, std::list<CString>* redir)
 	{
-		CUrl url;
+		CUrlParser urlParser;
 		CString ct, body;
 
 		CString realPath(fn);
 		CorrectAceStream(realPath);
 
-		if (::PathIsURLW(realPath) && url.CrackUrl(realPath)) {
-			CString schemeName = url.GetSchemeName();
-			schemeName.MakeLower();
-			if (schemeName == L"pnm") {
+		if (::PathIsURLW(realPath) && urlParser.Parse(realPath)) {
+			auto schemeName = urlParser.GetSchemeName();
+			if (_wcsicmp(schemeName, L"pnm") == 0) {
 				return L"audio/x-pn-realaudio";
 			}
 
-			if (schemeName == L"mms") {
+			if (_wcsicmp(schemeName, L"mms") == 0) {
 				return L"video/x-ms-asf";
 			}
 
@@ -430,7 +424,7 @@ namespace Content {
 
 			if (!body.IsEmpty()) {
 				if (fn.Find(L"://") >= 0) {
-					FindRedir(url, body, *redir, playlist_type);
+					FindRedir(urlParser, body, *redir, playlist_type);
 				} else {
 					FindRedir(fn, *redir, playlist_type);
 				}
@@ -446,10 +440,10 @@ namespace Content {
 			CString realPath(fn);
 			CorrectAceStream(realPath);
 
-			CUrl url;
+			CUrlParser urlParser;
 			if (::PathIsURLW(realPath)
-					&& url.CrackUrl(realPath)
-					&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
+					&& urlParser.Parse(realPath)
+					&& (urlParser.GetScheme() == INTERNET_SCHEME_HTTP || urlParser.GetScheme() == INTERNET_SCHEME_HTTPS)) {
 				return Connect(fn);
 			}
 

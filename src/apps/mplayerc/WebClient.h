@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,7 +46,7 @@ public:
 	CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame);
 	virtual ~CWebClientSocket();
 
-	bool SetCookie(CString name, CString value = L"", __time64_t expire = -1, CString path = L"/", CString domain = L"");
+	bool SetCookie(const CString& name, const CString& value = L"", __time64_t expire = -1, const CString& path = L"/", const CString& domain = L"");
 
 	CString m_sessid;
 	CString m_cmd, m_path, m_query, m_ver;

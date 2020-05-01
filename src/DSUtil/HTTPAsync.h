@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,9 +21,8 @@
 #pragma once
 
 #include <wininet.h>
-#include <atlutil.h>
-
 #include <mutex>
+#include "UrlParser.h"
 
 class CHTTPAsync
 {
@@ -46,13 +45,12 @@ protected:
 	HINTERNET m_hConnect  = nullptr;
 	HINTERNET m_hRequest  = nullptr;
 
-	CUrl m_url;
 	CString m_url_str;
 	CString m_host;
 	CString m_path;
 
-	ATL_URL_PORT m_nPort     = INTERNET_DEFAULT_HTTP_PORT;
-	ATL_URL_SCHEME m_nScheme = ATL_URL_SCHEME_HTTP;
+	INTERNET_PORT m_nPort     = 0;
+	INTERNET_SCHEME m_nScheme = INTERNET_SCHEME_HTTP;
 
 	CString m_header;
 	CString m_contentType;

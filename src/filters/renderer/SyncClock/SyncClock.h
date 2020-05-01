@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2014 see Authors.txt
+ * (C) 2009-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlutil.h>
 #include "ISyncClock.h"
 
 class CSyncClockFilter;

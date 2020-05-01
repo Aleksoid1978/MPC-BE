@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <atlutil.h>
 #include "MainFrm.h"
 #include "Misc.h"
 #include "../../Subtitles/TextFile.h"
@@ -37,7 +38,7 @@ CWebClientSocket::~CWebClientSocket()
 {
 }
 
-bool CWebClientSocket::SetCookie(CString name, CString value, __time64_t expire, CString path, CString domain)
+bool CWebClientSocket::SetCookie(const CString& name, const CString& value, __time64_t expire, const CString& path, const CString& domain)
 {
 	if (name.IsEmpty()) {
 		return false;
