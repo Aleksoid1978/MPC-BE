@@ -3193,6 +3193,12 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 		if (pli.m_ainput >= 0) {
 			strTipText.AppendFormat(L"\nAudio Input %d", pli.m_ainput);
 		}
+	} else {
+		if (PathIsURLW(strTipText)) {
+			EllipsisURL(strTipText, 300);
+		} else {
+			EllipsisPath(strTipText, 300);
+		}
 	}
 
 	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
