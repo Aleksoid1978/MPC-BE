@@ -1017,7 +1017,6 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		return FALSE;
 	}
 
-	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
 	pTTT->lpszText = m_strTipText.GetBuffer();
 	*pResult = 0;
 
