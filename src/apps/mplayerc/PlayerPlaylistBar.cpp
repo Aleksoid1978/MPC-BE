@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlutil.h>
 #include <atlpath.h>
 #include <IntShCut.h>
 #include <algorithm>
@@ -30,6 +29,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include "../../DSUtil/std_helper.h"
+#include "../../DSUtil/UrlParser.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "OpenDlg.h"
@@ -236,11 +236,11 @@ CString CPlaylistItem::GetLabel(int i)
 			str = m_label;
 		} else if (!m_fns.empty()) {
 			const auto& fn = m_fns.front();
-			CUrl url;
-			if (::PathIsURLW(fn) && url.CrackUrl(fn)) {
+			CUrlParser urlParser;
+			if (::PathIsURLW(fn) && urlParser.Parse(fn)) {
 				str = fn.GetName();
-				if (url.GetUrlPathLength() > 1) {
-					str = url.GetUrlPath(); str.TrimRight(L'/');
+				if (urlParser.GetUrlPathLength() > 1) {
+					str = urlParser.GetUrlPath(); str.TrimRight(L'/');
 					if (const int pos = str.ReverseFind(L'/'); pos != -1) {
 						str = str.Right(str.GetLength() - pos - 1);
 					}
@@ -1381,8 +1381,12 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 
 static CString CombinePath(CPath p, const CString& fn)
 {
-	if (fn.Find(L":\\") == 1 || fn.Find(L"\\") == 0
-			|| ::PathIsURLW(fn)) {
+	if (fn.Find(L":\\") == 1 || fn.Find(L"\\") == 0) {
+		return fn;
+	}
+
+	CUrlParser urlParser(fn.GetString());
+	if (urlParser.IsValid()) {
 		return fn;
 	}
 

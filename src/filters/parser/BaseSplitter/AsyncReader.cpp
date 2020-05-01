@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "AsyncReader.h"
+#include "../../../DSUtil/UrlParser.h"
 
 //
 // CAsyncFileReader
@@ -57,9 +58,9 @@ STDMETHODIMP CAsyncFileReader::NonDelegatingQueryInterface(REFIID riid, void** p
 BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 {
 	if (::PathIsURLW(lpszFileName)) {
-		CUrl url;
+		CUrlParser urlParser;
 		if (m_bSupportURL
-				&& url.CrackUrl(lpszFileName)
+				&& urlParser.Parse(lpszFileName)
 				&& m_HTTPAsync.Connect(lpszFileName, 10000) == S_OK) {
 			const QWORD ContentLength = m_HTTPAsync.GetLenght();
 			if (ContentLength == 0) {

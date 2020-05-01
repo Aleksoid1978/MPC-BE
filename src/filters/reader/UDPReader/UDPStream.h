@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,7 +55,6 @@ private:
 	CCritSec           m_csLock;
 	CCritSec           m_csPacketsLock;
 
-	CUrl               m_url;
 	CString            m_url_str;
 	protocol           m_protocol   = protocol::PR_NONE;
 	GUID               m_subtype    = MEDIASUBTYPE_NULL;

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,11 +21,9 @@
 #pragma once
 
 #include <afxsock.h>
-#include <atlutil.h>
 #include "Log.h"
+#include "UrlParser.h"
 #include <list>
-
-#define SOCKET_DUMPLOGFILE 0
 
 class CMPCSocket : public CSocket
 {
@@ -36,7 +34,6 @@ protected:
 	CString		m_sProxyServer;
 	DWORD		m_nProxyPort;
 
-	CUrl		m_url;
 	CStringA	m_sUserAgent;
 
 	CStringA	m_RequestHdr;
@@ -56,27 +53,26 @@ public:
 		KillTimeOut();
 	}
 
-	BOOL Connect(CString url, BOOL bConnectOnly = FALSE);
-	BOOL Connect(CUrl url, BOOL bConnectOnly = FALSE);
+	BOOL Connect(const CString& url, const BOOL bConnectOnly = FALSE);
+	BOOL Connect(const CUrlParser& urlParser, const BOOL bConnectOnly = FALSE);
 
-	void SetTimeOut(UINT uConnectTimeOut, UINT uReceiveTimeOut);
-	BOOL SetTimeOut(UINT uTimeOut);
+	void SetTimeOut(const UINT uConnectTimeOut, const UINT uReceiveTimeOut);
+	BOOL SetTimeOut(const UINT uTimeOut);
 	BOOL KillTimeOut();
 
 	BOOL SendRequest();
 	CStringA GetHeader() { return m_Hdr; };
 
-	void SetProxy(CString ProxyServer, DWORD ProxyPort);
-	void SetUserAgent(CStringA UserAgent);
+	void SetProxy(const CString& ProxyServer, const DWORD ProxyPort);
+	void SetUserAgent(const CStringA& UserAgent);
 
-	void AddHeaderParams(CStringA sHeaderParam);
+	void AddHeaderParams(const CStringA& sHeaderParam);
 	void ClearHeaderParams();
 
 	CMPCSocket& operator = (const CMPCSocket& soc) {
 		m_bProxyEnable	= soc.m_bProxyEnable;
 		m_sProxyServer	= soc.m_sProxyServer;
 		m_nProxyPort	= soc.m_nProxyPort;
-		m_url			= soc.m_url;
 		m_sUserAgent	= soc.m_sUserAgent;
 		m_RequestHdr	= soc.m_RequestHdr;
 

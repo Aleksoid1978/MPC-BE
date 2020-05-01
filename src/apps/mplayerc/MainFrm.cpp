@@ -32,6 +32,7 @@
 #include "../../DSUtil/FileVersion.h"
 #include "../../DSUtil/DXVAState.h"
 #include "../../DSUtil/std_helper.h"
+#include "../../DSUtil/UrlParser.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"
@@ -5716,10 +5717,9 @@ void CMainFrame::OnFileSaveAs()
 		} else {
 			CString fname = L"streaming_saved";
 
-			CUrl url;
-			url.CrackUrl(out);
-			if (url.GetUrlPathLength() > 1) {
-				fname = url.GetUrlPath();
+			CUrlParser urlParser(out.GetString());
+			if (urlParser.GetUrlPathLength() > 1) {
+				fname = urlParser.GetUrlPath();
 			}
 
 			out = fname.Mid(fname.ReverseFind('/') + 1);

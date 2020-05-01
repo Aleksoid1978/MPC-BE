@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -248,7 +248,7 @@ CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, 
 	int redirectTry = 0;
 redirect:
 
-	if (!m_url.CrackUrl(fn)) {
+	if (!m_urlParser.Parse(fn.GetString())) {
 		*phr = E_FAIL;
 		return;
 	}
@@ -261,7 +261,7 @@ redirect:
 	m_socket.SetUserAgent("MPC ShoutCast Source");
 
 	CString redirectUrl;
-	if (!m_socket.Connect(m_url, redirectUrl)) {
+	if (!m_socket.Connect(m_urlParser, redirectUrl)) {
 		int nError = GetLastError();
 		if (nError == WSAEINTR) {
 			DLog(L"CShoutcastStream(): failed connect for TimeOut!");
@@ -498,7 +498,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	if (m_hSocket == INVALID_SOCKET) {
 		CString redirectUrl;
-		if (!m_socket.Create() || !m_socket.Connect(m_url, redirectUrl)) {
+		if (!m_socket.Create() || !m_socket.Connect(m_urlParser, redirectUrl)) {
 			return 1;
 		}
 
@@ -530,7 +530,7 @@ UINT CShoutcastStream::SocketThreadProc()
 		if (len == SOCKET_ERROR) {
 			soc.Close();
 			CString redirectUrl;
-			if (!soc.Create() || !soc.Connect(m_url, redirectUrl)) {
+			if (!soc.Create() || !soc.Connect(m_urlParser, redirectUrl)) {
 				break;
 			}
 
@@ -813,14 +813,14 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 	return len;
 }
 
-bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl)
+bool CShoutcastStream::CShoutcastSocket::Connect(const CUrlParser& urlParser, CString& redirectUrl)
 {
 	redirectUrl.Empty();
 
 	ClearHeaderParams();
 	AddHeaderParams("Icy-MetaData:1");
 
-	if (!__super::Connect(url)) {
+	if (!__super::Connect(urlParser)) {
 		return false;
 	}
 
