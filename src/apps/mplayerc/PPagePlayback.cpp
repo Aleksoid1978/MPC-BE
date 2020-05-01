@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -86,7 +86,7 @@ BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateTrackOrder)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT3, OnUpdateTrackOrder)
 	ON_STN_DBLCLK(IDC_STATIC_BALANCE, OnBalanceTextDblClk)
-	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // CPPagePlayback message handlers
@@ -222,7 +222,7 @@ void CPPagePlayback::OnBalanceTextDblClk()
 
 BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 {
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
 
 	UINT_PTR nID = pNMHDR->idFrom;
 

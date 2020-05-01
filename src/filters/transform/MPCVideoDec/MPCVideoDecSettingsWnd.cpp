@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -324,7 +324,7 @@ BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
 	ON_BN_CLICKED(IDC_PP_SW_YUY2, OnBnClickedYUY2)
 	ON_BN_CLICKED(IDC_PP_SW_RGB32, OnBnClickedRGB32)
 	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
-	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
@@ -369,11 +369,11 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 
 BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 {
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
 	static CString strTipText;
 	UINT_PTR nID = pNMHDR->idFrom;
 
-	if (pNMHDR->code == TTN_NEEDTEXT && (pTTT->uFlags & TTF_IDISHWND)) {
+	if (pNMHDR->code == TTN_NEEDTEXTW && (pTTT->uFlags & TTF_IDISHWND)) {
 
 		CToolTipCtrl* pToolTip = AfxGetModuleThreadState()->m_pToolTip;
 		if (pToolTip) {
