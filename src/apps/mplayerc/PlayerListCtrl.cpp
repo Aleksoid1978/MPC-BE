@@ -852,7 +852,7 @@ BEGIN_MESSAGE_MAP(CPlayerListCtrl, CListCtrl)
 	ON_LBN_SELCHANGE(IDC_LIST1, OnLbnSelChangeList1)
 	ON_NOTIFY_EX(HDN_ITEMCHANGINGA, 0, OnHdnItemchanging)
 	ON_NOTIFY_EX(HDN_ITEMCHANGINGW, 0, OnHdnItemchanging)
-	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT, 0, 0xFFFF, OnToolTipNotify)
+	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // CPlayerListCtrl message handlers
@@ -1029,9 +1029,9 @@ void CPlayerListCtrl::OnLbnSelChangeList1()
 
 BOOL CPlayerListCtrl::OnHdnItemchanging(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
+	LPNMHEADERW phdr = reinterpret_cast<LPNMHEADERW>(pNMHDR);
 	UNREFERENCED_PARAMETER(phdr);
-	//	SetFocus();
+	//SetFocus();
 	*pResult = 0;
 	return FALSE;
 }
@@ -1071,7 +1071,7 @@ INT_PTR CPlayerListCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 
 BOOL CPlayerListCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
 
 	UINT_PTR nID = pNMHDR->idFrom;
 

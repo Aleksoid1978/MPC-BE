@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -179,13 +179,13 @@ INT_PTR CPPageInternalFiltersListBox::OnToolHitTest(CPoint point, TOOLINFO* pTI)
 }
 
 BEGIN_MESSAGE_MAP(CPPageInternalFiltersListBox, CCheckListBox)
-	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT, 0, 0xFFFF, OnToolTipNotify)
+	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipNotify)
 	ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
 BOOL CPPageInternalFiltersListBox::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
 
 	filter_t* f = (filter_t*)GetItemDataPtr(static_cast<int>(pNMHDR->idFrom));
 

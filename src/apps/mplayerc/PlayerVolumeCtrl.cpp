@@ -90,7 +90,7 @@ BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)
 	ON_WM_HSCROLL_REFLECT()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_SETCURSOR()
-	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // CVolumeCtrl message handlers
@@ -410,7 +410,7 @@ BOOL CVolumeCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	TOOLTIPTEXT *pTTT = reinterpret_cast<LPTOOLTIPTEXT>(pNMHDR);
+	TOOLTIPTEXTW *pTTT = reinterpret_cast<LPTOOLTIPTEXTW>(pNMHDR);
 	CString str;
 
 	str.AppendFormat(L"%d%%", GetPos());

@@ -961,7 +961,7 @@ int CPlayerToolBar::getHitButtonIdx(CPoint point)
 
 BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
 	static CString m_strTipText;
 
 	switch (pNMHDR->idFrom) {
