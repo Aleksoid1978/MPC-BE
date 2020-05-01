@@ -31,9 +31,8 @@ CUrlParser::CUrlParser(LPCWSTR lpszUrl)
 
 BOOL CUrlParser::Parse(LPCWSTR lpszUrl)
 {
-	CheckPointer(lpszUrl, FALSE);
-
 	Clear();
+	CheckPointer(lpszUrl, FALSE);
 
 	URL_COMPONENTSW components = { sizeof(components) };
 	components.dwSchemeLength = (DWORD)-1;
