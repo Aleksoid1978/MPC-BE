@@ -135,7 +135,7 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVer
 		m_text.Format(IDS_USING_NEWER_VERSION, VersionStr);
 		break;
 	case UPDATER_NEW_VERSION_IS_AVAILABLE:
-		VersionStr.Format(L"v%u.%u.%u (build %u)", UpdateVersion.major, UpdateVersion.minor, UpdateVersion.patch, UpdateVersion.revision);
+		VersionStr.Format(L"%u.%u.%u (build %u)", UpdateVersion.major, UpdateVersion.minor, UpdateVersion.patch, UpdateVersion.revision);
 		m_text.Format(IDS_NEW_UPDATE_AVAILABLE, VersionStr);
 		m_latestURL = UpdateURL;
 		break;
