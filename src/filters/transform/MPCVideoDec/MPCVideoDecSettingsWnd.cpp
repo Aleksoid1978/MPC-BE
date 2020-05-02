@@ -88,6 +88,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	const int h20 = ScaleY(20);
 	const int h25 = ScaleY(25);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
+	CString str;
 
 	int label_w = ScaleX(225);
 	int combo_w = ScaleX(110);
@@ -102,10 +103,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_THREAD_NUMBER);
 	m_cbThreadNumber.AddString (ResStr (IDS_VDF_AUTO));
-	CString ThreadNumberStr;
 	for (int i = 1; i <= 16; i++) {
-		ThreadNumberStr.Format(L"%d", i);
-		m_cbThreadNumber.AddString(ThreadNumberStr);
+		str.Format(L"%d", i);
+		m_cbThreadNumber.AddString(str);
 	}
 	p.y += h25;
 
@@ -211,7 +211,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y = 10 + ScaleY(115) + 5 + ScaleY(65) + 5 + ScaleY(85) - m_fontheight;
 	int btn_w = ScaleX(75);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
-	m_txtMPCVersion.Create(L"", WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtVersion.Create(WS_CHILD|WS_VISIBLE|ES_READONLY|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -245,7 +245,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
 
-		m_txtMPCVersion.SetWindowTextW(m_pMDF->GetInformation(INFO_MPCVersion));
+		str.Format(L"MPC Video Decoder %s", m_pMDF->GetInformation(INFO_MPCVersion));
+		m_txtVersion.SetWindowTextW(str);
 
 		UpdateStatusInfo();
 	}

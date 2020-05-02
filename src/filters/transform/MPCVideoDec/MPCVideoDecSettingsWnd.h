@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -91,7 +91,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CComboBox   m_cbSwRGBLevels;
 
 	CButton		m_btnReset;
-	CStatic		m_txtMPCVersion;
+	CEdit		m_txtVersion;
 
 	const UINT_PTR m_nTimerID = 1;
 
