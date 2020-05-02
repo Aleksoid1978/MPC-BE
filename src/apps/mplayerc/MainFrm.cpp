@@ -2210,6 +2210,8 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 				return;
 			}
 
+			Sleep(100);
+
 			if (CWnd* pActiveWnd = GetForegroundWindow()) {
 				bool bExitFullscreen = s.fExitFullScreenAtFocusLost;
 				if (bExitFullscreen) {
