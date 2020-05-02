@@ -63,7 +63,7 @@ BOOL CAboutDlg::OnInitDialog()
 		#error Compiler is not supported!
 	#endif
 #elif defined(_MSC_VER)
-	m_MPCCompiler.Format(L"MSVC v%.2d.%.2d.%.5d", _MSC_VER / 100, _MSC_VER % 100, _MSC_FULL_VER % 100000);
+	m_MPCCompiler.Format(L"MSVC %.2d.%.2d.%.5d", _MSC_VER / 100, _MSC_VER % 100, _MSC_FULL_VER % 100000);
 	#if _MSC_BUILD
 		m_MPCCompiler.AppendFormat(L".%.2d", _MSC_BUILD);
 	#endif
