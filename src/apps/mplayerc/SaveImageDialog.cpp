@@ -164,7 +164,7 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 
 		pfdc->StartVisualGroup(IDS_THUMB_IMAGE_WIDTH, ResStr(IDS_THUMB_IMAGE_WIDTH));
 		pfdc->AddText(IDS_THUMB_PIXELS, ResStr(IDS_THUMB_PIXELS));
-		str.Format(L"%d", std::clamp(m_width, 256, 2560));
+		str.Format(L"%d", std::clamp(m_width, 256, 3840));
 		pfdc->AddEditBox(IDC_EDIT3, str);
 		pfdc->EndVisualGroup();
 
