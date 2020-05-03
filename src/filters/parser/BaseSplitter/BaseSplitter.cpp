@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 #include "../../../DSUtil/std_helper.h"
+#include "Version.h"
 #include "BaseSplitter.h"
 
 //
@@ -885,6 +886,21 @@ STDMETHODIMP CBaseSplitterFilter::GetInt(LPCSTR field, int *value)
 	//	*value = m_iNetworkTimeout;
 	//	return S_OK;
 	//}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CBaseSplitterFilter::GetInt64(LPCSTR field, __int64 *value)
+{
+	CheckPointer(value, E_POINTER);
+
+	if (!strcmp(field, "version")) {
+		*value  = ((uint64_t)MPC_VERSION_MAJOR << 48)
+			| ((uint64_t)MPC_VERSION_MINOR << 32)
+			| ((uint64_t)MPC_VERSION_PATCH << 16)
+			| ((uint64_t)MPC_VERSION_REV);
+		return S_OK;
+	}
 
 	return E_INVALIDARG;
 }

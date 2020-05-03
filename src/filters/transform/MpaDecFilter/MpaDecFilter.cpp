@@ -2906,6 +2906,21 @@ STDMETHODIMP CMpaDecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
 
 // IExFilterConfig
 
+STDMETHODIMP CMpaDecFilter::GetInt64(LPCSTR field, __int64 *value)
+{
+	CheckPointer(value, E_POINTER);
+
+	if (!strcmp(field, "version")) {
+		*value  = ((uint64_t)MPC_VERSION_MAJOR << 48)
+			| ((uint64_t)MPC_VERSION_MINOR << 32)
+			| ((uint64_t)MPC_VERSION_PATCH << 16)
+			| ((uint64_t)MPC_VERSION_REV);
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
 STDMETHODIMP CMpaDecFilter::SetBool(LPCSTR field, bool value)
 {
 	if (strcmp(field, "stereodownmix") == 0) {
