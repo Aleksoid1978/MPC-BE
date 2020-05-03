@@ -236,5 +236,6 @@ public:
 	STDMETHODIMP_(CString) GetInformation(MPCAInfo index);
 
 	// IExFilterConfig
+	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
 	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
 };
