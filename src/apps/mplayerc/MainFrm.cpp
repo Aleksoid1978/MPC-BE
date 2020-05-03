@@ -2209,25 +2209,35 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 				return;
 			}
 
-			Sleep(100);
+			const auto GetForegroundCWnd = []() -> CWnd* {
+				for (unsigned i = 0; i < 20; i++) {
+					if (auto pActiveCWnd = GetForegroundWindow()) {
+						return pActiveCWnd;
+					}
 
-			if (CWnd* pActiveWnd = GetForegroundWindow()) {
+					Sleep(10);
+				}
+
+				return nullptr;
+			};
+
+			if (auto pActiveCWnd = GetForegroundCWnd()) {
 				bool bExitFullscreen = s.fExitFullScreenAtFocusLost;
 				if (bExitFullscreen) {
 					HMONITOR hMonitor1 = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-					HMONITOR hMonitor2 = MonitorFromWindow(pActiveWnd->m_hWnd, MONITOR_DEFAULTTONEAREST);
+					HMONITOR hMonitor2 = MonitorFromWindow(pActiveCWnd->m_hWnd, MONITOR_DEFAULTTONEAREST);
 					if (hMonitor1 && hMonitor2 && hMonitor1 != hMonitor2) {
 						bExitFullscreen = false;
 					}
 				}
 
 				CString title;
-				pActiveWnd->GetWindowTextW(title);
+				pActiveCWnd->GetWindowTextW(title);
 
 				CString module;
 
 				DWORD pid;
-				GetWindowThreadProcessId(pActiveWnd->m_hWnd, &pid);
+				GetWindowThreadProcessId(pActiveCWnd->m_hWnd, &pid);
 
 				if (HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid)) {
 					HMODULE hModule;
