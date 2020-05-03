@@ -9,6 +9,7 @@ Updated Turkish translation (by cmhrky).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 Updated Ukrainian translation (by arestarh1986).
 Updated Hungarian translation (by mickey).
+Updated Greek translation (by George).
 
 Updated libraries:
 	dav1d git-0.6.0-21-g0c0b9ef;
