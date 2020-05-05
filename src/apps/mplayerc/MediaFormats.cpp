@@ -193,10 +193,11 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"flic",        ResStr(IDS_MFMT_FLIC),        L"fli flc flic"));
 		ADDFMT((L"roq",         ResStr(IDS_MFMT_ROQ),         L"roq"));
 		ADDFMT((L"dsm",         ResStr(IDS_MFMT_DSM),         L"dsm dsv dsa dss"));
-		ADDFMT((L"swf",         ResStr(IDS_MFMT_SWF),         L"swf", TVideo, L"ShockWave ActiveX control"));
 		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc"));
 		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
-		ADDFMT((L"avisynth",    ResStr(IDS_MFMT_AVISYNTH),    L"avs", TScript)); // use TScript to exclude automatic association
+		// special files. used TScript to exclude automatic association
+		ADDFMT((L"swf",         ResStr(IDS_MFMT_SWF),         L"swf", TScript, L"ShockWave ActiveX control"));
+		ADDFMT((L"avisynth",    ResStr(IDS_MFMT_AVISYNTH),    L"avs", TScript));
 		// audio files
 		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3 eac3", TAudio));
 		ADDFMT((L"dts",         ResStr(IDS_MFMT_DTS),         L"dts dtshd dtsma", TAudio));
