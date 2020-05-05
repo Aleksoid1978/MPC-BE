@@ -21,6 +21,7 @@
 #pragma once
 
 #include <vector>
+#include "../../DSUtil/CUE.h"
 
 namespace Youtube
 {
@@ -128,6 +129,7 @@ namespace Youtube
 		CString        fname;
 		SYSTEMTIME     dtime    = { 0 };
 		REFERENCE_TIME duration = 0;
+		std::vector<Chapters> chaptersList;
 
 		void Empty() {
 			author.Empty();
@@ -136,6 +138,7 @@ namespace Youtube
 			fname.Empty();
 			dtime = { 0 };
 			duration = 0;
+			chaptersList.clear();
 		}
 	};
 

@@ -62,6 +62,7 @@ namespace YoutubeDL
 
 	bool Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields, Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist)
 	{
+		y_fields.Empty();
 		YoutubeProfiles.clear();
 		urls.clear();
 
@@ -383,6 +384,17 @@ namespace YoutubeDL
 
 								if (!sub_url.IsEmpty() && !sub_lang.IsEmpty()) {
 									subs.push_back({ sub_url, sub_lang });
+								}
+							}
+						}
+
+						// chapters
+						if (const auto& chapters = d.FindMember("chapters"); chapters != d.MemberEnd() && chapters->value.IsArray()) {
+							for (const auto& chapter : chapters->value.GetArray()) {
+								float start_time = 0.0f;
+								CString title;
+								if (getJsonValue(chapter, "title", title) && getJsonValue(chapter, "start_time", start_time)) {
+									y_fields.chaptersList.push_back({ title, REFERENCE_TIME(start_time * UNITS) });
 								}
 							}
 						}
