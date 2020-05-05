@@ -6385,7 +6385,7 @@ void CMainFrame::OnFileSaveThumbnails()
 
 	s.iThumbRows         = std::clamp(fd.m_rows, 1, 20);
 	s.iThumbCols         = std::clamp(fd.m_cols, 1, 10);
-	s.iThumbWidth        = std::clamp(fd.m_width, 256, 3840);
+	s.iThumbWidth        = std::clamp(fd.m_width, APP_THUMBWIDTH_MIN, APP_THUMBWIDTH_MAX);
 	s.iThumbQuality      = std::clamp(fd.m_quality, 10, 100);
 	s.iThumbLevelPNG     = std::clamp(fd.m_levelPNG, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;

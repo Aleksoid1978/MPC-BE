@@ -105,6 +105,9 @@
 #define APP_AUDIOGAIN_MAX		 10.0
 #define APP_AUDIOGAIN_MIN		 -3.0
 
+#define APP_THUMBWIDTH_MIN		256
+#define APP_THUMBWIDTH_MAX		5120
+
 #define OSD_ENABLE		(1 << 0)
 #define OSD_FILENAME	(1 << 1)
 #define OSD_SEEKTIME	(1 << 2)
