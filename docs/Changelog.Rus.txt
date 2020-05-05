@@ -33,6 +33,7 @@ Youtube
 Расширена поддержка потоков в формате AV1.
 Плеер больше не использует Google API.
 Добавлена возможность открытия некоторых страниц типа https://www.youtube.com/user/ и https://www.youtube.com/channel/ как плейлист.
+Добавлена поддержка глав(chapters)
 
 MPCVideoDec
 Добавлена поддержка "AV1 Codec Configuration Box".

@@ -12018,6 +12018,32 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 	}
 
+	auto AddCustomChapters = [&](const auto& chaplist) {
+		CComQIPtr<IDSMChapterBag> pCB;
+
+		BeginEnumFilters(m_pGB, pE, pBF) {
+			if (CComQIPtr<IDSMChapterBag> pCB2 = pBF) {
+				pCB = pBF;
+				break;
+			}
+		}
+		EndEnumFilters;
+
+		if (!pCB) {
+			ChaptersSouce* pCS = DNew ChaptersSouce;
+			m_pGB->AddFilter(pCS, L"Chapters");
+			pCB = pCS;
+		}
+
+		if (pCB) {
+			pCB->ChapRemoveAll();
+
+			for (const auto& chap : chaplist) {
+				pCB->ChapAppend(chap.rt, chap.name);
+			}
+		}
+	};
+
 	for (auto& fi : pOFD->fns) {
 		CString fn = fi.GetName();
 
@@ -12205,31 +12231,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			if (fi.GetChapterCount()) {
-				CComQIPtr<IDSMChapterBag> pCB;
+				ChaptersList chaplist;
+				fi.GetChapters(chaplist);
 
-				BeginEnumFilters(m_pGB, pE, pBF) {
-					if (CComQIPtr<IDSMChapterBag> pCB2 = pBF) {
-						pCB = pBF;
-						break;
-					}
-				}
-				EndEnumFilters;
-
-				if (!pCB) {
-					ChaptersSouce* pCS = DNew ChaptersSouce;
-					m_pGB->AddFilter(pCS, L"Chapters");
-					pCB = pCS;
-				}
-
-				if (pCB) {
-					pCB->ChapRemoveAll();
-
-					ChaptersList chaplist;
-					fi.GetChapters(chaplist);
-					for (size_t i = 0; i < chaplist.size(); i++) {
-						pCB->ChapAppend(chaplist[i].rt, chaplist[i].name);
-					}
-				}
+				AddCustomChapters(chaplist);
 			}
 		}
 
@@ -12238,6 +12243,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (m_fCustomGraph) {
 			break;
 		}
+	}
+
+	if (!m_youtubeFields.chaptersList.empty()) {
+		AddCustomChapters(m_youtubeFields.chaptersList);
 	}
 
 	if (!pOFD->fns.empty()) {

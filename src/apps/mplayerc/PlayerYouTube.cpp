@@ -926,6 +926,29 @@ namespace Youtube
 				}
 			}
 
+			CStringA chaptersStr = GetEntry(data, R"({\"chapteredPlayerBarRenderer\":)", "]");
+			if (!chaptersStr.IsEmpty()) {
+				chaptersStr.Replace(R"(\")", R"(")");
+				chaptersStr += "]}";
+
+				rapidjson::Document d;
+				if (!d.Parse(chaptersStr).HasParseError()) {
+					if (const auto& chapters = d.FindMember("chapters"); chapters != d.MemberEnd() && chapters->value.IsArray()) {
+						for (const auto& chapter : chapters->value.GetArray()) {
+							if (const auto& chapterRenderer = chapter.FindMember("chapterRenderer"); chapterRenderer != chapter.MemberEnd() && chapterRenderer->value.IsObject()) {
+								if (const auto& title = chapterRenderer->value.FindMember("title"); title != chapterRenderer->value.MemberEnd() && title->value.IsObject()) {
+									int timeRangeStartMillis;
+									CString simpleText;
+									if (getJsonValue(title->value, "simpleText", simpleText) && getJsonValue(chapterRenderer->value, "timeRangeStartMillis", timeRangeStartMillis)) {
+										y_fields.chaptersList.push_back({ simpleText, 10000LL * timeRangeStartMillis });
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			free(data);
 
 			if (strUrlsLive.empty()) {
@@ -1021,6 +1044,7 @@ namespace Youtube
 			}
 
 			if (youtubeUrllist.empty()) {
+				y_fields.Empty();
 				return false;
 			}
 
