@@ -928,7 +928,9 @@ namespace Youtube
 
 			CStringA chaptersStr = GetEntry(data, R"({\"chapteredPlayerBarRenderer\":)", "]");
 			if (!chaptersStr.IsEmpty()) {
+				chaptersStr.Replace(R"(\/)", "/");
 				chaptersStr.Replace(R"(\")", R"(")");
+				chaptersStr.Replace(R"(\\)", R"(\)");
 				chaptersStr += "]}";
 
 				rapidjson::Document d;
