@@ -443,7 +443,6 @@ public:
         exclusiveMaximum_(false),
         defaultValueLength_(0)
     {
-        typedef typename SchemaDocumentType::ValueType ValueType;
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
         typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
@@ -899,7 +898,7 @@ public:
                 }
         }
 
-        SizeType index;
+        SizeType index  = 0;
         if (FindPropertyIndex(ValueType(str, len).Move(), &index)) {
             if (context.patternPropertiesSchemaCount > 0) {
                 context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = properties_[index].schema;

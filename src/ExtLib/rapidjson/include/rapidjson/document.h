@@ -24,6 +24,9 @@
 #include "encodedstream.h"
 #include <new>      // placement new
 #include <limits>
+#ifdef __cpp_lib_three_way_comparison
+#include <compare>
+#endif
 
 RAPIDJSON_DIAG_PUSH
 #ifdef __clang__
@@ -55,6 +58,48 @@ class GenericValue;
 
 template <typename Encoding, typename Allocator, typename StackAllocator>
 class GenericDocument;
+
+/*! \def RAPIDJSON_DEFAULT_ALLOCATOR
+    \ingroup RAPIDJSON_CONFIG
+    \brief Allows to choose default allocator.
+
+    User can define this to use CrtAllocator or MemoryPoolAllocator.
+*/
+#ifndef RAPIDJSON_DEFAULT_ALLOCATOR
+#define RAPIDJSON_DEFAULT_ALLOCATOR MemoryPoolAllocator<CrtAllocator>
+#endif
+
+/*! \def RAPIDJSON_DEFAULT_STACK_ALLOCATOR
+    \ingroup RAPIDJSON_CONFIG
+    \brief Allows to choose default stack allocator for Document.
+
+    User can define this to use CrtAllocator or MemoryPoolAllocator.
+*/
+#ifndef RAPIDJSON_DEFAULT_STACK_ALLOCATOR
+#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR CrtAllocator
+#endif
+
+/*! \def RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY
+    \ingroup RAPIDJSON_CONFIG
+    \brief User defined kDefaultObjectCapacity value.
+
+    User can define this as any natural number.
+*/
+#ifndef RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY
+// number of objects that rapidjson::Value allocates memory for by default
+#define RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY 16
+#endif
+
+/*! \def RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY
+    \ingroup RAPIDJSON_CONFIG
+    \brief User defined kDefaultArrayCapacity value.
+
+    User can define this as any natural number.
+*/
+#ifndef RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY
+// number of array elements that rapidjson::Value allocates memory for by default
+#define RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY 16
+#endif
 
 //! Name-value pair in a JSON object value.
 /*!
@@ -205,12 +250,16 @@ public:
 
     //! @name relations
     //@{
-    bool operator==(ConstIterator that) const { return ptr_ == that.ptr_; }
-    bool operator!=(ConstIterator that) const { return ptr_ != that.ptr_; }
-    bool operator<=(ConstIterator that) const { return ptr_ <= that.ptr_; }
-    bool operator>=(ConstIterator that) const { return ptr_ >= that.ptr_; }
-    bool operator< (ConstIterator that) const { return ptr_ < that.ptr_; }
-    bool operator> (ConstIterator that) const { return ptr_ > that.ptr_; }
+    template <bool Const_> bool operator==(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ == that.ptr_; }
+    template <bool Const_> bool operator!=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ != that.ptr_; }
+    template <bool Const_> bool operator<=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ <= that.ptr_; }
+    template <bool Const_> bool operator>=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ >= that.ptr_; }
+    template <bool Const_> bool operator< (const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ < that.ptr_; }
+    template <bool Const_> bool operator> (const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ > that.ptr_; }
+
+#ifdef __cpp_lib_three_way_comparison
+    template <bool Const_> std::strong_ordering operator<=>(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ <=> that.ptr_; }
+#endif
     //@}
 
     //! @name dereference
@@ -604,7 +653,7 @@ template <bool, typename> class GenericObject;
     \tparam Encoding    Encoding of the value. (Even non-string values need to have the same encoding in a document)
     \tparam Allocator   Allocator type for allocating memory of object, array and string.
 */
-template <typename Encoding, typename Allocator = MemoryPoolAllocator<> > 
+template <typename Encoding, typename Allocator = RAPIDJSON_DEFAULT_ALLOCATOR >
 class GenericValue {
 public:
     //! Name-value pair in an object.
@@ -1969,8 +2018,8 @@ private:
         kTypeMask = 0x07
     };
 
-    static const SizeType kDefaultArrayCapacity = 16;
-    static const SizeType kDefaultObjectCapacity = 16;
+    static const SizeType kDefaultArrayCapacity = RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY;
+    static const SizeType kDefaultObjectCapacity = RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY;
 
     struct Flag {
 #if RAPIDJSON_48BITPOINTER_OPTIMIZATION
@@ -2150,7 +2199,7 @@ typedef GenericValue<UTF8<> > Value;
     \tparam StackAllocator Allocator for allocating memory for stack during parsing.
     \warning Although GenericDocument inherits from GenericValue, the API does \b not provide any virtual functions, especially no virtual destructor.  To avoid memory leaks, do not \c delete a GenericDocument object via a pointer to a GenericValue.
 */
-template <typename Encoding, typename Allocator = MemoryPoolAllocator<>, typename StackAllocator = CrtAllocator>
+template <typename Encoding, typename Allocator = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator = RAPIDJSON_DEFAULT_STACK_ALLOCATOR >
 class GenericDocument : public GenericValue<Encoding, Allocator> {
 public:
     typedef typename Encoding::Ch Ch;                       //!< Character type derived from Encoding.
@@ -2534,6 +2583,7 @@ private:
 
 //! GenericDocument with UTF8 encoding
 typedef GenericDocument<UTF8<> > Document;
+
 
 //! Helper class for accessing Value of array type.
 /*!
