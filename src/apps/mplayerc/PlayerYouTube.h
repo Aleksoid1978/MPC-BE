@@ -85,6 +85,7 @@ namespace Youtube
 		{247, y_webm, y_video,  720, L"webm", false, false},
 		{244, y_webm, y_video,  480, L"webm", false, false},
 		{ 43, y_webm, y_media,  360, L"webm", false, false}, // VP8 + Vorbis
+		{243, y_webm, y_video,  360, L"webm", false, false},
 		{242, y_webm, y_video,  240, L"webm", false, false},
 		// MP4 (AV1)
 		{571, y_mp4_av1,  y_video, 4320, L"mp4",  false, false},
