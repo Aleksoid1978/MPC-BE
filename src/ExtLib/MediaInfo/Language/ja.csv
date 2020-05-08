@@ -1015,8 +1015,10 @@ Recorded_Date;録音日
 Recorded_Location;録音した場所
 Released_Date;リリース日
 RemixedBy;リミックス by
+Renew;
 ReplayGain_Gain;リプレイゲイン ゲイン
 ReplayGain_Peak;リプレイ ゲイン ピーク
+Report;
 Resolution;解像度
 s;秒
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;サイズ整形
 Subject;件名
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;サブトラック
 Summary;サマリー
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;ビデオストリーム数
 View;表示
 View_Hint;ヒントを表示する
+Views;
 Warning : more streams in the files;警告 : このファイルにはさらなるストリームが含まれています
 Web;Web
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;79
-ZZ_AutomaticLanguage_Percent;83
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;82

@@ -370,10 +370,11 @@ Ztring MediaInfo_Internal::Inform()
             Node* Node_Current=NULL;
             if (XML || XML_0_7_78_MA || XML_0_7_78_MI || JSON) Node_Current=Node_MI?Node_MI->Add_Child("track", true):Node_Main->Add_Child("track", true);
             #endif //defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
-            Ztring A=Get((stream_t)StreamKind, StreamPos, __T("StreamKind/String"));
             Ztring B=Get((stream_t)StreamKind, StreamPos, __T("StreamKindPos"));
             if (!XML && !XML_0_7_78_MA && !XML_0_7_78_MI && !JSON)
             {
+                Ztring A=Get((stream_t)StreamKind, StreamPos, __T("StreamKind/String"));
+
                 if (!B.empty())
                 {
                     if (CSV)
@@ -388,6 +389,8 @@ Ztring MediaInfo_Internal::Inform()
             #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
             if (XML || XML_0_7_78_MA || XML_0_7_78_MI || JSON)
             {
+                Ztring A=Get((stream_t)StreamKind, StreamPos, __T("StreamKind"));
+
                 Node_Current->Add_Attribute("type", A);
                 if (!B.empty()) Node_Current->Add_Attribute("typeorder", B);
                 Node* Track=new Node();
@@ -598,15 +601,15 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
 
                     if (!Nested.empty())
                     {
-                        nested& LastNested=Nested[Nested.size()-1];
+                        nested* LastNested=&Nested[Nested.size()-1];
                         while(!Nested.empty()
-                         && !(Nom.size()>LastNested.Name.size() && !Nom.rfind(LastNested.Name, LastNested.Name.size()) && Nom[LastNested.Name.size()]==__T(' ')))
+                         && !(Nom.size()>LastNested->Name.size() && !Nom.rfind(LastNested->Name, LastNested->Name.size()) && Nom[LastNested->Name.size()]==__T(' ')))
                         {
-                            Fields_Current=LastNested.Target;
+                            Fields_Current=LastNested->Target;
                             Nested.pop_back();
                             if (Nested.empty())
                                 break;
-                            LastNested=Nested[Nested.size()-1];
+                            LastNested=&Nested[Nested.size()-1];
                         }
                         if (Nested.empty())
                         {
@@ -616,7 +619,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                                 Fields_Current=&Fields;
                         }
                         else
-                            Nom_ToErase=LastNested.Name.size()+1;
+                            Nom_ToErase=LastNested->Name.size()+1;
                     }
 
                     if (NextName.size()>Nom.size() && !NextName.rfind(Nom, Nom.size()) && NextName[Nom.size()]==__T(' '))

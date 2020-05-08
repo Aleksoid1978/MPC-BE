@@ -17,9 +17,9 @@ Updated libraries:
 	libflac git-1.3.3-54-gcffe3890;
 	libpng git-v1.6.37-16-g6dd99ca9c;
 	Little-CMS git-lcms2.9-80-gfc0fa79;
-	MediaInfo git-v20.03-g4d746dc;
+	MediaInfo git-v20.03-18-gdd72870b;
 	rapidjson git-v1.1.0-549-g8f4c021f;
-	ZenLib git-v0.4.38-g96a020a;
+	ZenLib git-v0.4.38-4-gf48c9f1;
 
 1.5.4
 =============================

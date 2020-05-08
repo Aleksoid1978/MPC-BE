@@ -1015,8 +1015,10 @@ Recorded_Date;Rögzítés dátuma
 Recorded_Location;Rögzítés helye
 Released_Date;Kiadás dátuma
 RemixedBy;Újrakeverte
+Renew;
 ReplayGain_Gain;Visszajátszás erősítése
 ReplayGain_Peak;Visszajátszás csúcserősítése
+Report;
 Resolution;Felbontás
 s; mp
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;Adatofolyam aránya
 Subject;Tárgy
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Alsáv
 Summary;Kivonat
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Képsávok száma
 View;Nézet
 View_Hint;Megtekintési adatok megváltoztatása
+Views;
 Warning : more streams in the files;Figyelem: ebben a fájlban több sáv van
 Web;Web
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;82
+ZZ_Automatic_Percent;72
+ZZ_AutomaticLanguage_Percent;81

@@ -1015,8 +1015,10 @@ Recorded_Date;Дата запису
 Recorded_Location;Місце запису
 Released_Date;Дата випуску
 RemixedBy;Ремікс створено
+Renew;
 ReplayGain_Gain;Вирівнювання гучності
 ReplayGain_Peak;Пік вирівнювання гучності
+Report;
 Resolution;Роздільна здатність
 s; сек.
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;Розмір кодованого потоку
 StreamSize_Proportion;Відносний розмір потоку
 Subject;Тема
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Підпотік
 Summary;Підсумок
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Кількість відеопотоків
 View;Вигляд
 View_Hint;Змінити спосіб перегляду інформації
+Views;
 Warning : more streams in the files;Увага: файл має ще потоки
 Web;Веб-сторінка
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;80
+ZZ_Automatic_Percent;79
 ZZ_AutomaticLanguage_Percent;86

@@ -113,7 +113,8 @@ TimeCode::TimeCode (int64s Frames_, int8u FramesPerSecond_, bool DropFrame_, boo
     Frames  =    Frames_ % FramesPerSecond_;
     Seconds =   (Frames_ / FramesPerSecond_) % 60;
     Minutes =  ((Frames_ / FramesPerSecond_) / 60) % 60;
-    Hours   = (((Frames_ / FramesPerSecond_) / 60) / 60) % 24;
+    int64s Temp = (((Frames_ / FramesPerSecond_) / 60) / 60);
+    Hours = (Temp>99 || Temp<-99)?(Temp%24):Temp;
 }
 
 //***************************************************************************

@@ -1015,8 +1015,10 @@ Recorded_Date;Aufnahmedatum
 Recorded_Location;Aufnahmeort
 Released_Date;Veröffentlichungsdatum
 RemixedBy;Remixed von
+Renew;
 ReplayGain_Gain;Wiedergabe-Verstärkung
 ReplayGain_Peak;Wiedergabe-Verstärkung, Spitze
+Report;
 Resolution;Auflösung
 s;s
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;Proportionen dieses Streams
 Subject;Inhalt
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Sub-Track
 Summary;Zusammenfassung
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Anzahl der Video-Streams
 View;Ansicht
 View_Hint;Ändert die Darstellung der angezeigten Informationen
+Views;
 Warning : more streams in the files;Achtung! Es befinden sich mehr Streams in den Dateien
 Web;Internet
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;79
-ZZ_AutomaticLanguage_Percent;83
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;82

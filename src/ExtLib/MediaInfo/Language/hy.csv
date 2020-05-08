@@ -1015,8 +1015,10 @@ Recorded_Date;Գրելու ամսաթիվը
 Recorded_Location;Գրելու տեղը
 Released_Date;Թողարկման ամսաթիվը
 RemixedBy;Ռեմիքսը՝
+Renew;
 ReplayGain_Gain;Ձայնի կարգավորիչ
 ReplayGain_Peak;Ձայնի կարգավորման գագաթը
+Report;
 Resolution;Լուծաչափը
 s; վայր.
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;Հոսքի համամասնությունը
 Subject;Թեման
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Ենթահոսքը
 Summary;Համառոտ
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Տեսահոսքերի ք-ը
 View;Տեսքը
 View_Hint;Պատկերման եղանակը
+Views;
 Warning : more streams in the files;Ուշադրություն. ֆայլում դեռ կան հոսքեր
 Web;Կայքը
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;81
+ZZ_Automatic_Percent;80
 ZZ_AutomaticLanguage_Percent;85

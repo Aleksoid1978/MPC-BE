@@ -1015,8 +1015,10 @@ Recorded_Date;Opnamedatum
 Recorded_Location;Opnamelocatie
 Released_Date;Releasedatum
 RemixedBy;Geremixed door
+Renew;
 ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain piek
+Report;
 Resolution;Resolutie
 s;s
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;Proporties van deze stroom
 Subject;Onderwerp
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Ondertiteling
 Summary;Samenvatting
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Telling van videostromen
 View;Beeld
 View_Hint;Verander de weergave van informatie
+Views;
 Warning : more streams in the files;Waarschuwing : er zijn meer stromen in de bestanden
 Web;Web
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;78
-ZZ_AutomaticLanguage_Percent;82
+ZZ_Automatic_Percent;77
+ZZ_AutomaticLanguage_Percent;81

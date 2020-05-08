@@ -304,6 +304,10 @@ private :
     void SMV0_xxxx ();
     void WAVE ();
     void WAVE__pmx ();
+    void WAVE_adtl();
+    void WAVE_adtl_labl();
+    void WAVE_adtl_ltxt();
+    void WAVE_adtl_note();
     void WAVE_aXML ();
     void WAVE_bext ();
     void WAVE_cue_ ();

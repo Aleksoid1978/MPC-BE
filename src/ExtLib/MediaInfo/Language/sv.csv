@@ -1015,8 +1015,10 @@ Recorded_Date;Inspelningsdatum
 Recorded_Location;Inspelningsort
 Released_Date;Publiceringsdatum
 RemixedBy;Remix av
+Renew;
 ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain peak
+Report;
 Resolution;Upplösning
 s; sek
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;Kodad strömstorlek
 StreamSize_Proportion;Strömproportioner
 Subject;Ämne
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Underspår
 Summary;Sammanfattning
@@ -1156,6 +1167,7 @@ VideoComments;Videokommentarer
 VideoCount;Antal videoströmmar
 View;Visa
 View_Hint;Ändra hur informationen skall visas
+Views;
 Warning : more streams in the files;Varning! Det finns fler strömmar i filerna!
 Web;Webb
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;93
-ZZ_AutomaticLanguage_Percent;93
+ZZ_Automatic_Percent;92
+ZZ_AutomaticLanguage_Percent;92

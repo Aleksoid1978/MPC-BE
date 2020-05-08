@@ -1015,8 +1015,10 @@ Recorded_Date;录制日期
 Recorded_Location;录制地点
 Released_Date;发行日期
 RemixedBy;混音者
+Renew;续订
 ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益峰值
+Report;报告
 Resolution;分辨率
 s; 秒
 SamplePeakLevel;采样峰值等级
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;编码后流大小
 StreamSize_Proportion;流属性
 Subject;主题
 Subscribe;订阅
+Subscribe_Button;订购 (%PRICE% 一年)
+Subscribe_Failed;购买被取消或失败
 Subscribe_Manage;管理订阅
+Subscribe_Renew;续订？
+Subscribe_Renew_Price;续订 (%PRICE% 一年)
+Subscribe_Unaviable;无法检索订购详细信息。
+Subscribe_Waiting;购买等待家长批准
+Subscription_Active;订阅有效期至 %DATE%
 Subscription_Android;%PRICE%/年（免费试用 3 天）
+Subscription_Ended;你的订购刚刚到期。
+Subscription_Expired;订购过期时间 %DATE%
 Subscription_Thanks;已检测到订阅。感谢您的支持！
 SubTrack;副轨道
 Summary;摘要
@@ -1156,6 +1167,7 @@ VideoComments;视频注释
 VideoCount;视频流总数
 View;视图
 View_Hint;改变查看方式
+Views;查看
 Warning : more streams in the files;注意: 此文件中还有更多的流
 Web;网页
 WebSite;网站
@@ -1178,5 +1190,5 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;96
+ZZ_Automatic_Percent;100
+ZZ_AutomaticLanguage_Percent;100
