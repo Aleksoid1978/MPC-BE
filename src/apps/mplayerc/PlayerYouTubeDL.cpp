@@ -21,40 +21,9 @@
 #include "stdafx.h"
 #include "PlayerYouTubeDL.h"
 
-#define RAPIDJSON_SSE2
-#include <rapidjson/include/rapidjson/document.h>
+#include <rapidjson/include/rapidjsonHelper.h>
 
 #define bufsize (2ul * KILOBYTE)
-
-template <typename T>
-static bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T& value)
-{
-	if (const auto& it = jsonValue.FindMember(name); it != jsonValue.MemberEnd()) {
-		if constexpr (std::is_same_v<T, int>) {
-			if (it->value.IsInt()) {
-				value = it->value.GetInt();
-				return true;
-			}
-		} else if constexpr (std::is_same_v<T, float>) {
-			if (it->value.IsFloat()) {
-				value = it->value.GetFloat();
-				return true;
-			}
-		} else if constexpr (std::is_same_v<T, CStringA>) {
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-				return true;
-			}
-		} else if constexpr (std::is_same_v<T, CString>) {
-			if (it->value.IsString()) {
-				value = UTF8ToWStr(it->value.GetString());
-				return true;
-			}
-		}
-	}
-
-	return false;
-};
 
 namespace YoutubeDL
 {
@@ -163,7 +132,7 @@ namespace YoutubeDL
 			rapidjson::Document d;
 			if (!d.Parse(buf_out.GetString()).HasParseError()) {
 				int iTag = 1;
-				if (const auto& formats = d.FindMember("formats"); formats != d.MemberEnd() && formats->value.IsArray() && !formats->value.Empty()) {
+				if (isJsonArray(formats, d, "formats")) {
 					int maxHeight = 0;
 					bool bVideoOnly = false;
 
@@ -376,7 +345,7 @@ namespace YoutubeDL
 						}
 
 						// subtitles
-						if (const auto& requested_subtitles = d.FindMember("requested_subtitles"); requested_subtitles != d.MemberEnd() && requested_subtitles->value.IsObject()) {
+						if (isJsonObject(requested_subtitles, d, "requested_subtitles")) {
 							for (const auto& subtitle : requested_subtitles->value.GetObject()) {
 								CString sub_url;
 								getJsonValue(subtitle.value, "url", sub_url);
@@ -389,7 +358,7 @@ namespace YoutubeDL
 						}
 
 						// chapters
-						if (const auto& chapters = d.FindMember("chapters"); chapters != d.MemberEnd() && chapters->value.IsArray()) {
+						if (isJsonArray(chapters, d, "chapters")) {
 							for (const auto& chapter : chapters->value.GetArray()) {
 								float start_time = 0.0f;
 								CString title;

@@ -24,8 +24,7 @@
 #include "../../DSUtil/std_helper.h"
 #include "PlayerYouTube.h"
 
-#define RAPIDJSON_SSE2
-#include <rapidjson/include/rapidjson/document.h>
+#include <rapidjson/include/rapidjsonHelper.h>
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_USER_URL            L"youtube.com/user/"
@@ -246,36 +245,11 @@ namespace Youtube
 		}
 	}
 
-	template <typename T>
-	static bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T& value)
-	{
-		if (const auto& it = jsonValue.FindMember(name); it != jsonValue.MemberEnd()) {
-			if constexpr (std::is_same_v<T, int>) {
-				if (it->value.IsInt()) {
-					value = it->value.GetInt();
-					return true;
-				}
-			} else if constexpr (std::is_same_v<T, CStringA>) {
-				if (it->value.IsString()) {
-					value = it->value.GetString();
-					return true;
-				}
-			} else if constexpr (std::is_same_v<T, CString>) {
-				if (it->value.IsString()) {
-					value = UTF8ToWStr(it->value.GetString());
-					return true;
-				}
-			}
-		}
-
-		return false;
-	};
-
 	static bool ParseResponseJson(rapidjson::Document& json, YoutubeFields& y_fields, const bool bReplacePlus)
 	{
 		bool bParse = false;
 		if (!json.IsNull()) {
-			if (const auto& videoDetails = json.FindMember("videoDetails"); videoDetails != json.MemberEnd() && videoDetails->value.IsObject()) {
+			if (isJsonObject(videoDetails, json, "videoDetails")) {
 				bParse = true;
 
 				if (getJsonValue(videoDetails->value, "title", y_fields.title)) {
@@ -304,8 +278,8 @@ namespace Youtube
 				}
 			}
 
-			if (const auto& microformat = json.FindMember("microformat"); microformat != json.MemberEnd() && microformat->value.IsObject()) {
-				if (const auto& playerMicroformatRenderer = microformat->value.FindMember("playerMicroformatRenderer"); playerMicroformatRenderer != microformat->value.MemberEnd() && playerMicroformatRenderer->value.IsObject()) {
+			if (isJsonObject(microformat, json, "microformat")) {
+				if (isJsonObject(playerMicroformatRenderer, microformat->value, "playerMicroformatRenderer")) {
 					CStringA publishDate;
 					if (getJsonValue(playerMicroformatRenderer->value, "publishDate", publishDate)) {
 						WORD y, m, d;
@@ -367,7 +341,7 @@ namespace Youtube
 					}
 
 					const auto& value0 = items->value[0];
-					if (const auto& snippet = value0.FindMember("snippet"); snippet != value0.MemberEnd() && snippet->value.IsObject()) {
+					if (isJsonObject(snippet, value0, "snippet")) {
 						if (getJsonValue(snippet->value, "title", y_fields.title)) {
 							y_fields.title = FixHtmlSymbols(y_fields.title);
 						}
@@ -395,7 +369,7 @@ namespace Youtube
 						}
 					}
 
-					if (const auto& contentDetails = value0.FindMember("contentDetails"); contentDetails != value0.MemberEnd() && contentDetails->value.IsObject()) {
+					if (isJsonObject(contentDetails, value0, "contentDetails")) {
 						CStringA duration;
 						if (getJsonValue(contentDetails->value, "duration", duration)) {
 							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
@@ -633,8 +607,8 @@ namespace Youtube
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 			if (!player_response_jsonDocument.IsNull()) {
-				if (const auto& streamingData = player_response_jsonDocument.FindMember("streamingData"); streamingData != player_response_jsonDocument.MemberEnd() && streamingData->value.IsObject()) {
-					if (const auto& formats = streamingData->value.FindMember("formats"); formats != streamingData->value.MemberEnd() && formats->value.IsArray()) {
+				if (isJsonObject(streamingData, player_response_jsonDocument, "streamingData")) {
+					if (isJsonArray(formats, streamingData->value, "formats")) {
 						for (const auto& format : formats->value.GetArray()) {
 							streamingDataFormat element;
 
@@ -648,7 +622,7 @@ namespace Youtube
 						}
 					}
 
-					if (const auto& adaptiveFormats = streamingData->value.FindMember("adaptiveFormats"); adaptiveFormats != streamingData->value.MemberEnd() && adaptiveFormats->value.IsArray()) {
+					if (isJsonArray(adaptiveFormats, streamingData->value, "adaptiveFormats")) {
 						for (const auto& adaptiveFormat : adaptiveFormats->value.GetArray()) {
 							CStringA type;
 							if (getJsonValue(adaptiveFormat, "type", type) && type == L"FORMAT_STREAM_TYPE_OTF") {
@@ -935,10 +909,10 @@ namespace Youtube
 
 				rapidjson::Document d;
 				if (!d.Parse(chaptersStr).HasParseError()) {
-					if (const auto& chapters = d.FindMember("chapters"); chapters != d.MemberEnd() && chapters->value.IsArray()) {
+					if (isJsonArray(chapters, d, "chapters")) {
 						for (const auto& chapter : chapters->value.GetArray()) {
-							if (const auto& chapterRenderer = chapter.FindMember("chapterRenderer"); chapterRenderer != chapter.MemberEnd() && chapterRenderer->value.IsObject()) {
-								if (const auto& title = chapterRenderer->value.FindMember("title"); title != chapterRenderer->value.MemberEnd() && title->value.IsObject()) {
+							if (isJsonObject(chapterRenderer, chapter, "chapterRenderer")) {
+								if (isJsonObject(title, chapterRenderer->value, "title")) {
 									int timeRangeStartMillis;
 									CString simpleText;
 									if (getJsonValue(title->value, "simpleText", simpleText) && getJsonValue(chapterRenderer->value, "timeRangeStartMillis", timeRangeStartMillis)) {
@@ -1156,9 +1130,9 @@ namespace Youtube
 				if (!videoId.IsEmpty()) {
 					// subtitles
 					if (!player_response_jsonDocument.IsNull()) {
-						if (const auto& captions = player_response_jsonDocument.FindMember("captions"); captions != player_response_jsonDocument.MemberEnd() && captions->value.IsObject()) {
-							if (const auto& trackList = captions->value.FindMember("playerCaptionsTracklistRenderer"); trackList != captions->value.MemberEnd() && trackList->value.IsObject()) {
-								if (const auto& captionTracks = trackList->value.FindMember("captionTracks"); captionTracks != trackList->value.MemberEnd() && captionTracks->value.IsArray()) {
+						if (isJsonObject(captions, player_response_jsonDocument, "captions")) {
+							if (isJsonObject(trackList, captions->value, "playerCaptionsTracklistRenderer")) {
+								if (isJsonArray(captionTracks, trackList->value, "captionTracks")) {
 									for (const auto& elem : captionTracks->value.GetArray()) {
 										CStringA kind;
 										if (getJsonValue(elem, "kind", kind) && kind == "asr") {
@@ -1171,7 +1145,7 @@ namespace Youtube
 										}
 
 										CString sub_name;
-										if (const auto& name = elem.FindMember("name"); name != elem.MemberEnd() && name->value.IsObject()) {
+										if (isJsonObject(name, elem, "name")) {
 											getJsonValue(name->value, "simpleText", sub_name);
 										}
 
@@ -1405,8 +1379,8 @@ namespace Youtube
 					getJsonValue(d, "nextPageToken", nextToken);
 
 					for (const auto& item : items->value.GetArray()) {
-						if (const auto& snippet = item.FindMember("snippet"); snippet != item.MemberEnd() && snippet->value.IsObject()) {
-							if (const auto& resourceId = snippet->value.FindMember("resourceId"); resourceId != snippet->value.MemberEnd() && resourceId->value.IsObject()) {
+						if (isJsonObject(snippet, item, "snippet")) {
+							if (isJsonObject(resourceId, snippet->value, "resourceId")) {
 								CString videoId;
 								if (getJsonValue(resourceId->value, "videoId", videoId)) {
 									CString url;
