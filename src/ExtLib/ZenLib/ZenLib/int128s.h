@@ -137,7 +137,7 @@ class int128 {
         bool    bit (unsigned int n) const throw ();
         void    bit (unsigned int n, bool val) throw ();
 }
-#ifdef __GNUC__
+#if defined(__GNUC__)  && !defined(__ANDROID_API__)
     __attribute__ ((__aligned__ (16), __packed__))
 #endif
 ;

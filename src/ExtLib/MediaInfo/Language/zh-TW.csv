@@ -1015,8 +1015,10 @@ Recorded_Date;錄製日期
 Recorded_Location;錄製地點
 Released_Date;發行日期
 RemixedBy;重混者
+Renew;
 ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益尖峰值
+Report;
 Resolution;顏色深度
 s;秒
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;此串流的比例
 Subject;主題
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;子音軌
 Summary;摘要
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;視訊串流數
 View;檢視
 View_Hint;改變檢視資訊的方法
+Views;
 Warning : more streams in the files;注意: 檔案中還有更多串流
 Web;網頁
 WebSite;
@@ -1179,4 +1191,4 @@ WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
 ZZ_Automatic_Percent;79
-ZZ_AutomaticLanguage_Percent;84
+ZZ_AutomaticLanguage_Percent;83

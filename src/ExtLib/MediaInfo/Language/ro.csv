@@ -1015,8 +1015,10 @@ Recorded_Date;Data inregistrarii
 Recorded_Location;Locul inregistrarii
 Released_Date;Data lansarii
 RemixedBy;Rearanjat de
+Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
+Report;
 Resolution;Rezolutie
 s;s
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subiect
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Sub-pista
 Summary;Sumar
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Numarul de fluxuri video
 View;Vizualizare
 View_Hint;Modificati modul de vizualizare a informatiilor
+Views;
 Warning : more streams in the files;Atentie: acest fisier contine mai multe fluxuri
 Web;
 WebSite;

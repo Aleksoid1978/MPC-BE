@@ -672,6 +672,12 @@ void File_Avc::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item)
 {
+    if (Count_Get(Stream_Video))
+        return;
+    Stream_Prepare(Stream_Video);
+    Fill(Stream_Video, 0, Video_Format, "AVC");
+    Fill(Stream_Video, 0, Video_Codec, "AVC");
+
     //Calculating - Pixels
     int32u Width =((*seq_parameter_set_Item)->pic_width_in_mbs_minus1       +1)*16;
     int32u Height=((*seq_parameter_set_Item)->pic_height_in_map_units_minus1+1)*16*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag);
@@ -699,7 +705,7 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
             if (!(*seq_parameter_set_Item)->vui_parameters->fixed_frame_rate_flag)
                 Fill(Stream_Video, StreamPos_Last, Video_FrameRate_Mode, "VFR");
             else if ((*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag && (*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
-                Fill(Stream_Video, StreamPos_Last, Video_FrameRate, (float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick/((*seq_parameter_set_Item)->frame_mbs_only_flag?2:((*seq_parameter_set_Item)->pic_order_cnt_type==2?1:2))/FrameRate_Divider);
+                Fill(Stream_Video, StreamPos_Last, Video_FrameRate, (float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick/((*seq_parameter_set_Item)->frame_mbs_only_flag?2:(((*seq_parameter_set_Item)->pic_order_cnt_type==2 && Structure_Frame/2>Structure_Field)?1:2))/FrameRate_Divider);
         }
 
         //Colour description
@@ -768,11 +774,6 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
                 Fill(Stream_Video, 0, cbr_flag?Video_BitRate_Nominal:Video_BitRate_Maximum, bit_rate_value);
         }
     }
-
-    if (Count_Get(Stream_Video)==0)
-        Stream_Prepare(Stream_Video);
-    Fill(Stream_Video, 0, Video_Format, "AVC");
-    Fill(Stream_Video, 0, Video_Codec, "AVC");
 
     Ztring Profile=Ztring().From_UTF8(Avc_profile_idc((*seq_parameter_set_Item)->profile_idc));
     switch ((*seq_parameter_set_Item)->profile_idc)
@@ -897,7 +898,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     Fill(Stream_Video, 0, Video_Encoded_Library_Name, Encoded_Library_Name);
     Fill(Stream_Video, 0, Video_Encoded_Library_Version, Encoded_Library_Version);
     Fill(Stream_Video, 0, Video_Encoded_Library_Settings, Encoded_Library_Settings);
-    Fill(Stream_Video, 0, Video_BitRate_Nominal, BitRate_Nominal);
+    if (Retrieve_Const(Stream_Video, 0, Video_BitRate_Nominal).empty()) // SPS has priority over other metadata
+        Fill(Stream_Video, 0, Video_BitRate_Nominal, BitRate_Nominal);
     Fill(Stream_Video, 0, Video_MuxingMode, MuxingMode);
     for (std::vector<pic_parameter_set_struct*>::iterator pic_parameter_set_Item=pic_parameter_sets.begin(); pic_parameter_set_Item!=pic_parameter_sets.end(); ++pic_parameter_set_Item)
         if (*pic_parameter_set_Item && (*pic_parameter_set_Item)->seq_parameter_set_id==seq_parameter_set_Item-(seq_parameter_sets.empty()?subset_seq_parameter_sets.begin():seq_parameter_sets.begin()))
@@ -2356,6 +2358,8 @@ void File_Avc::slice_header()
 
             TemporalReferences_Offset_pic_order_cnt_lsb_Diff=(int32s)((int32s)(TemporalReferences_Offset+pic_order_cnt)-TemporalReferences_Offset_pic_order_cnt_lsb_Last);
             TemporalReferences_Offset_pic_order_cnt_lsb_Last=(size_t)(TemporalReferences_Offset+pic_order_cnt);
+            if (field_pic_flag && (*seq_parameter_set_Item)->pic_order_cnt_type==2 && TemporalReferences_Offset_pic_order_cnt_lsb_Last<TemporalReferences.size() && TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last])
+                TemporalReferences_Offset_pic_order_cnt_lsb_Last++;
             if (TemporalReferences_Max<=TemporalReferences_Offset_pic_order_cnt_lsb_Last)
                 TemporalReferences_Max=TemporalReferences_Offset_pic_order_cnt_lsb_Last+((*seq_parameter_set_Item)->frame_mbs_only_flag?2:1);
             if (TemporalReferences_Min>TemporalReferences_Offset_pic_order_cnt_lsb_Last)

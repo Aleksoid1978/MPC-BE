@@ -793,6 +793,7 @@ void File_Mk::Streams_Finish()
                     {
                         Ztring Hutc = Retrieve(Stream_General, 0, "Encoded_Date");
                         Hutc.FindAndReplace(__T("UTC "), Ztring());
+                        Hutc = Hutc.substr(0, Hutc.find(__T(" / "), 0)); // leave only the first date in a "UTC date1 / UTC date2" field
                         Ztring App, Utc;
                         Item2=Item->second.find(__T("_STATISTICS_WRITING_APP"));
                         if (Item2!=Item->second.end())

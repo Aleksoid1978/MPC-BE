@@ -1015,8 +1015,10 @@ Recorded_Date;Dátum nahrávania
 Recorded_Location;Lokalita nahrávania
 Released_Date;Dátum vydania
 RemixedBy;Remixoval/-a
+Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
+Report;
 Resolution;Rozlíšenie
 s; sek.
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subjekt
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;SubTrack
 Summary;Summary
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Počet video streamov
 View;Zobraziť
 View_Hint;Zobraziť
+Views;
 Warning : more streams in the files;Pozor: v súboroch je viacero streamov !
 Web;Web
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;70
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;69
+ZZ_AutomaticLanguage_Percent;75

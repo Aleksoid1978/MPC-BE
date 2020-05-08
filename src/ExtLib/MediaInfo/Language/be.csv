@@ -1015,8 +1015,10 @@ Recorded_Date;Дата запісу
 Recorded_Location;Месца запісу
 Released_Date;Дата выпуску
 RemixedBy;Рэмікс ад
+Renew;
 ReplayGain_Gain;Нармалізатар гука
 ReplayGain_Peak;Пік нармалізатара гука
+Report;
 Resolution;Вырашальнасць (Resolution)
 s;с
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;Прапорцыі струменя
 Subject;Тэма
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Падпаток
 Summary;Зводка
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Коль-ць відэаструменяў
 View;Прагляд
 View_Hint;Прагляд
+Views;
 Warning : more streams in the files;Увага: у файле ёсць яшчэ струмені
 Web;Сайт
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;81
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;84

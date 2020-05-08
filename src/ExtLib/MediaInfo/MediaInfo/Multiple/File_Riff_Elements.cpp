@@ -415,6 +415,10 @@ namespace Elements
     const int32u SMV0_xxxx=0x534D563A;
     const int32u WAVE=0x57415645;
     const int32u WAVE__pmx=0x20786D70;
+    const int32u WAVE_adtl=0x6164746C;
+    const int32u WAVE_adtl_labl=0x6C61626C;
+    const int32u WAVE_adtl_ltxt=0x6C747874;
+    const int32u WAVE_adtl_note=0x6E6F7465;
     const int32u WAVE_aXML=0x61584D4C;
     const int32u WAVE_bext=0x62657874;
     const int32u WAVE_cue_=0x63756520;
@@ -604,6 +608,12 @@ void File_Riff::Data_Parse()
         ATOM_BEGIN
         ATOM(WAVE__pmx)
         ATOM(WAVE_aXML)
+        LIST(WAVE_adtl)
+            ATOM_BEGIN
+            ATOM(WAVE_adtl_labl)
+            ATOM(WAVE_adtl_ltxt)
+            ATOM(WAVE_adtl_note)
+            ATOM_END
         ATOM(WAVE_bext)
         LIST(WAVE_data)
             break;
@@ -3598,6 +3608,48 @@ void File_Riff::WAVE_aXML()
 
     //Parsing
     Skip_UTF8(Element_Size,                                     "XML data");
+}
+
+//---------------------------------------------------------------------------
+void File_Riff::WAVE_adtl()
+{
+    Element_Name("Associated Data List");
+}
+
+//---------------------------------------------------------------------------
+void File_Riff::WAVE_adtl_labl()
+{
+    Element_Name("Label");
+
+    //Parsing
+    Skip_L4(                                                    "Cue Point ID");
+    Skip_UTF8(Element_Size-Element_Offset,                      "Text");
+}
+
+//---------------------------------------------------------------------------
+void File_Riff::WAVE_adtl_ltxt()
+{
+    Element_Name("Labeled Text");
+
+    //Parsing
+    Skip_L4(                                                    "Cue Point ID");
+    Skip_L4(                                                    "Sample Length");
+    Skip_C4(                                                    "Purpose ID");
+    Skip_L2(                                                    "Country");
+    Skip_L2(                                                    "Language");
+    Skip_L2(                                                    "Dialect");
+    Skip_L2(                                                    "Code Page");
+    Skip_UTF8(Element_Size-Element_Offset,                      "Text");
+}
+
+//---------------------------------------------------------------------------
+void File_Riff::WAVE_adtl_note()
+{
+    Element_Name("Note");
+
+    //Parsing
+    Skip_L4(                                                    "Cue Point ID");
+    Skip_UTF8(Element_Size-Element_Offset,                      "Text");
 }
 
 //---------------------------------------------------------------------------

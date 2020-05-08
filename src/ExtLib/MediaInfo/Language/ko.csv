@@ -1015,8 +1015,10 @@ Recorded_Date;기록일
 Recorded_Location;기록 장소
 Released_Date;개봉일
 RemixedBy;리믹스
+Renew;
 ReplayGain_Gain;재생 게인
 ReplayGain_Peak;재생 게인 피크
+Report;
 Resolution;해상도
 s;초
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;이 스트림의 비율
 Subject;제목
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;서브트랙
 Summary;요약
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;비디오 스트림 개수
 View;보기
 View_Hint;정보를 보는 방식을 변경합니다.
+Views;
 Warning : more streams in the files;경고 : 파일에 더 많은 스트림이 있습니다
 Web;웹
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;79
-ZZ_AutomaticLanguage_Percent;83
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;82

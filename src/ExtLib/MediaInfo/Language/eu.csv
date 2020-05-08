@@ -1015,8 +1015,10 @@ Recorded_Date;Grabaketa eguna
 Recorded_Location;Grabaketa helbidea
 Released_Date;Argitaratze eguna
 RemixedBy;Bernahastzailea
+Renew;
 ReplayGain_Gain;Berrirakurkea irabazia
 ReplayGain_Peak;Berrirakurkea irabazi gailurra
+Report;
 Resolution;Bereizmena
 s;s
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;Kodeaketa jario neurria
 StreamSize_Proportion;Jario honen proporzioa
 Subject;Gaia
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Azpibidea
 Summary;Laburpena
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Bideo jario zenbatekoa
 View;Ikusi
 View_Hint;Aldatu argibideak ikusteko modua
+Views;
 Warning : more streams in the files;Kontuz : jario gehiago daude agirietan
 Web;Webgunea
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;86
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;85
+ZZ_AutomaticLanguage_Percent;86

@@ -1015,8 +1015,10 @@ Recorded_Date;Ημερομηνία εγγραφής
 Recorded_Location;Τοποθεσία εγγραφής
 Released_Date;Ημερομηνία Έκδοσης
 RemixedBy;Remixed by
+Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
+Report;
 Resolution;Ανάλυση
 s;s
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subject
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;SubTrack
 Summary;Περίληψη
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Αριθμός των ροών video
 View;Προβολή
 View_Hint;Αλλάζει τον τρόπο προβολής πληροφοριών
+Views;
 Warning : more streams in the files;Προειδοποίηση : υπάρχουν περισσότερες ροές στα αρχεία
 Web;Διαδύκτιο
 WebSite;
@@ -1179,4 +1191,4 @@ WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
 ZZ_Automatic_Percent;64
-ZZ_AutomaticLanguage_Percent;72
+ZZ_AutomaticLanguage_Percent;71

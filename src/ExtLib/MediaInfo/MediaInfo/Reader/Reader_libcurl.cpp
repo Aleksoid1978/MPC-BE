@@ -956,8 +956,16 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
         UrlEncode=DetectPercentEncode(File_URL.Path, true);
         if (UrlEncode!=MediaInfo_Config::URLEncode_No && DetectPercentEncode(File_URL.Host)==MediaInfo_Config::URLEncode_No)
             UrlEncode=MediaInfo_Config::URLEncode_No;
-        if (UrlEncode!=MediaInfo_Config::URLEncode_No && DetectPercentEncode(File_URL.Query)==MediaInfo_Config::URLEncode_No)
-            UrlEncode=MediaInfo_Config::URLEncode_No;
+        if (UrlEncode!=MediaInfo_Config::URLEncode_No)
+        {
+            ZtringListList List;
+            List.Separator_Set(0, "&");
+            List.Separator_Set(1, "=");
+            for (size_t i=0; i<List.size(); i++)
+                for (size_t j=0; j<List[i].size(); j++)
+                    if (DetectPercentEncode(File_URL.Query)==MediaInfo_Config::URLEncode_No)
+                        UrlEncode=MediaInfo_Config::URLEncode_No;
+        }
         if (UrlEncode!=MediaInfo_Config::URLEncode_No && DetectPercentEncode(File_URL.Fragment)==MediaInfo_Config::URLEncode_No)
             UrlEncode=MediaInfo_Config::URLEncode_No;
     }

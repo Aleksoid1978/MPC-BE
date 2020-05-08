@@ -1015,8 +1015,10 @@ Recorded_Date;Data de gravação
 Recorded_Location;Local de gravação
 Released_Date;Data de lançamento
 RemixedBy;Remixado por
+Renew;
 ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Pico do replay gain
+Report;
 Resolution;Resolução
 s;s
 SamplePeakLevel;
@@ -1088,8 +1090,17 @@ StreamSize_Encoded;
 StreamSize_Proportion;Proporção dessa faixa
 Subject;Assunto
 Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
 Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
 Subscription_Thanks;
 SubTrack;Sub-Faixa
 Summary;Sumário
@@ -1156,6 +1167,7 @@ VideoComments;
 VideoCount;Número de faixas de vídeo
 View;Exibir
 View_Hint;Mudar o modo de exibição das informações
+Views;
 Warning : more streams in the files;Aviso : mais de uma faixa nos arquivos
 Web;Web
 WebSite;
@@ -1178,5 +1190,5 @@ Written_Location;Local da escrita
 WrittenBy;Escrito por
 Yes;Sim
 Your system;Seu sistema
-ZZ_Automatic_Percent;79
-ZZ_AutomaticLanguage_Percent;83
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;82
