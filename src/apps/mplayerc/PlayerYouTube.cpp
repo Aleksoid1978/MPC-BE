@@ -923,6 +923,43 @@ namespace Youtube
 						}
 					}
 				}
+			} else {
+				const std::regex regex(R"((?:^|<br\s*\/>)([^<]*<a[^>]+onclick=["\']yt\.www\.watch\.player\.seekTo[^>]+>(\d{1,2}:\d{1,2}(?::\d{1,2})?)<\/a>[^>]*)(?=$|<br\s*\/>))");
+				std::cmatch match;
+				LPCSTR text = data;
+				while (std::regex_search(text, match, regex)) {
+					if (match.size() == 3) {
+						CStringA entries(match[1].first, match[1].length());
+						CStringA time(match[2].first, match[2].length());
+
+						auto pos = entries.Find("</a>");
+						if (pos > 0) {
+							entries.Delete(0, pos + 4);
+							entries.TrimLeft("- ");
+						}
+
+						if (!entries.IsEmpty()) {
+							REFERENCE_TIME rt = INVALID_TIME;
+							int t1 = 0;
+							int t2 = 0;
+							int t3 = 0;
+
+							if (const auto ret = sscanf_s(time.GetString(), "%02d:%02d:%02d", &t1, &t2, &t3)) {
+								if (ret == 3) {
+									rt = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
+								} else if (ret == 2) {
+									rt = ((60LL * t1) + t2) * UNITS;
+								}
+							}
+
+							if (rt != INVALID_TIME) {
+								y_fields.chaptersList.push_back({ UTF8ToWStr(entries.GetString()), rt });
+							}
+						}
+					}
+
+					text = match[0].second;
+				}
 			}
 
 			free(data);
