@@ -2119,11 +2119,11 @@ PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
 
 #if PNG_ARM_NEON_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void,
-                      png_riffle_palette_rgba8,
+                      png_riffle_palette_neon,
                       (png_structrp),
                       PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_neon_rgba8,
+                      png_do_expand_palette_rgba8_neon,
                       (png_structrp,
                        png_row_infop,
                        png_const_bytep,
@@ -2131,7 +2131,7 @@ PNG_INTERNAL_FUNCTION(int,
                        const png_bytepp),
                       PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_neon_rgb8,
+                      png_do_expand_palette_rgb8_neon,
                       (png_structrp,
                        png_row_infop,
                        png_const_bytep,

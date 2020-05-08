@@ -14,8 +14,9 @@ Updated Greek translation (by George).
 Updated libraries:
 	dav1d git-0.6.0-80-g114e8f0;
 	ffmpeg git-n4.3-dev-3299-gff4da60fb8;
-	Little-CMS git-lcms2.9-50-gd37b094;
 	libflac git-1.3.3-54-gcffe3890;
+	libpng git-v1.6.37-16-g6dd99ca9c;
+	Little-CMS git-lcms2.9-50-gd37b094;
 	MediaInfo git-v20.03-g4d746dc;
 	rapidjson git-v1.1.0-549-g8f4c021f;
 	ZenLib git-v0.4.38-g96a020a;
