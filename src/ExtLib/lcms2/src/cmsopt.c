@@ -1084,6 +1084,7 @@ cmsBool OptimizeByComputingLinearization(cmsPipeline** Lut, cmsUInt32Number Inte
     {
         cmsStage* last = cmsPipelineGetPtrToLastStage(OriginalLut);
 
+        if (last == NULL) goto Error;
         if (cmsStageType(last) == cmsSigCurveSetElemType) {
 
             _cmsStageToneCurvesData* Data = (_cmsStageToneCurvesData*)cmsStageData(last);

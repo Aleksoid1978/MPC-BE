@@ -1,5 +1,15 @@
 
 -----------------------
+2.10 Featured release
+-----------------------
+Added a compilation toggle to remove "register" keyword in API. 
+Previously commercial, fast_float plug-in is now released as open source under GPL3 license.
+MD5 functions are now accesible through plug-in API.
+Added support for Visual Studio 2019
+Bug fixing.
+
+
+-----------------------
 2.9 Maintenance release
 -----------------------
 Several fixes related with security, and therefore not detailed here.
