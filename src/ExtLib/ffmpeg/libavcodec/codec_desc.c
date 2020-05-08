@@ -23,7 +23,9 @@
 
 #include "libavutil/common.h"
 #include "libavutil/internal.h"
-#include "avcodec.h"
+
+#include "codec_id.h"
+#include "codec_desc.h"
 #include "profiles.h"
 #include "version.h"
 
@@ -1754,6 +1756,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("CDToons video"),
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
+    {
+        .id        = AV_CODEC_ID_MV30,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "mv30",
+        .long_name = NULL_IF_CONFIG_SMALL("MidiVid 3.0"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* various PCM "codecs" */
     {
@@ -2337,6 +2346,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "adpcm_ima_mtf",
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Capcom's MT Framework"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_CUNNING,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_cunning",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Cunning Developments"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 

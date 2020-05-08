@@ -68,6 +68,11 @@
  * Codec initializes slice-based threading with a main function
  */
 #define FF_CODEC_CAP_SLICE_THREAD_HAS_MF    (1 << 5)
+/*
+ * The codec supports frame threading and has inter-frame dependencies, so it
+ * uses ff_thread_report/await_progress().
+ */
+#define FF_CODEC_CAP_ALLOCATE_PROGRESS      (1 << 6)
 
 /**
  * AVCodec.codec_tags termination value
@@ -103,34 +108,10 @@
 #   define STRIDE_ALIGN 8
 #endif
 
-typedef struct FramePool {
-    /**
-     * Pools for each data plane. For audio all the planes have the same size,
-     * so only pools[0] is used.
-     */
-    AVBufferPool *pools[4];
-
-    /*
-     * Pool parameters
-     */
-    int format;
-    int width, height;
-    int stride_align[AV_NUM_DATA_POINTERS];
-    int linesize[4];
-    int planes;
-    int channels;
-    int samples;
-} FramePool;
-
 typedef struct DecodeSimpleContext {
     AVPacket *in_pkt;
     AVFrame  *out_frame;
 } DecodeSimpleContext;
-
-typedef struct DecodeFilterContext {
-    AVBSFContext **bsfs;
-    int         nb_bsfs;
-} DecodeFilterContext;
 
 typedef struct AVCodecInternal {
     /**
@@ -142,21 +123,6 @@ typedef struct AVCodecInternal {
     int is_copy;
 
     /**
-     * Whether to allocate progress for frame threading.
-     *
-     * The codec must set it to 1 if it uses ff_thread_await/report_progress(),
-     * then progress will be allocated in ff_thread_get_buffer(). The frames
-     * then MUST be freed with ff_thread_release_buffer().
-     *
-     * If the codec does not need to call the progress functions (there are no
-     * dependencies between the frames), it should leave this at 0. Then it can
-     * decode straight to the user-provided frames (which the user will then
-     * free with av_frame_unref()), there is no need to call
-     * ff_thread_release_buffer().
-     */
-    int allocate_progress;
-
-    /**
      * An audio frame with less than required samples has been submitted and
      * padded with silence. Reject all subsequent frames.
      */
@@ -164,12 +130,12 @@ typedef struct AVCodecInternal {
 
     AVFrame *to_free;
 
-    FramePool *pool;
+    AVBufferRef *pool;
 
     void *thread_ctx;
 
     DecodeSimpleContext ds;
-    DecodeFilterContext filter;
+    AVBSFContext *bsf;
 
     /**
      * Properties (timestamps+side data) extracted from the last packet passed

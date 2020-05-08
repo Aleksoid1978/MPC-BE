@@ -23,7 +23,7 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
-#include "hwaccel.h"
+#include "hwconfig.h"
 #include "internal.h"
 #include "profiles.h"
 #include "thread.h"
@@ -804,6 +804,7 @@ static int decode_frame_header(AVCodecContext *avctx,
 
     /* check reference frames */
     if (!s->s.h.keyframe && !s->s.h.intraonly) {
+        int valid_ref_frame = 0;
         for (i = 0; i < 3; i++) {
             AVFrame *ref = s->s.refs[s->s.h.refidx[i]].f;
             int refw = ref->width, refh = ref->height;
@@ -817,17 +818,25 @@ static int decode_frame_header(AVCodecContext *avctx,
             } else if (refw == w && refh == h) {
                 s->mvscale[i][0] = s->mvscale[i][1] = 0;
             } else {
+                /* Check to make sure at least one of frames that */
+                /* this frame references has valid dimensions     */
                 if (w * 2 < refw || h * 2 < refh || w > 16 * refw || h > 16 * refh) {
-                    av_log(avctx, AV_LOG_ERROR,
+                    av_log(avctx, AV_LOG_WARNING,
                            "Invalid ref frame dimensions %dx%d for frame size %dx%d\n",
                            refw, refh, w, h);
-                    return AVERROR_INVALIDDATA;
+                    s->mvscale[i][0] = s->mvscale[i][1] = REF_INVALID_SCALE;
+                    continue;
                 }
                 s->mvscale[i][0] = (refw << 14) / w;
                 s->mvscale[i][1] = (refh << 14) / h;
                 s->mvstep[i][0] = 16 * s->mvscale[i][0] >> 14;
                 s->mvstep[i][1] = 16 * s->mvscale[i][1] >> 14;
             }
+            valid_ref_frame++;
+        }
+        if (!valid_ref_frame) {
+            av_log(avctx, AV_LOG_ERROR, "No valid reference frame is found, bitstream not supported\n");
+            return AVERROR_INVALIDDATA;
         }
     }
 
@@ -1216,17 +1225,14 @@ static av_cold int vp9_decode_free(AVCodecContext *avctx)
     int i;
 
     for (i = 0; i < 3; i++) {
-        if (s->s.frames[i].tf.f->buf[0])
-            vp9_frame_unref(avctx, &s->s.frames[i]);
+        vp9_frame_unref(avctx, &s->s.frames[i]);
         av_frame_free(&s->s.frames[i].tf.f);
     }
     av_buffer_pool_uninit(&s->frame_extradata_pool);
     for (i = 0; i < 8; i++) {
-        if (s->s.refs[i].f->buf[0])
-            ff_thread_release_buffer(avctx, &s->s.refs[i]);
+        ff_thread_release_buffer(avctx, &s->s.refs[i]);
         av_frame_free(&s->s.refs[i].f);
-        if (s->next_refs[i].f->buf[0])
-            ff_thread_release_buffer(avctx, &s->next_refs[i]);
+        ff_thread_release_buffer(avctx, &s->next_refs[i]);
         av_frame_free(&s->next_refs[i].f);
     }
 
@@ -1625,6 +1631,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
             s->td[i].eob = s->td[i].eob_base;
             s->td[i].uveob[0] = s->td[i].uveob_base[0];
             s->td[i].uveob[1] = s->td[i].uveob_base[1];
+            s->td[i].error_info = 0;
         }
 
 #if HAVE_THREADS
@@ -1680,6 +1687,12 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
     } while (s->pass++ == 1);
     ff_thread_report_progress(&s->s.frames[CUR_FRAME].tf, INT_MAX, 0);
+
+    if (s->td->error_info < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Failed to decode tile data\n");
+        s->td->error_info = 0;
+        return AVERROR_INVALIDDATA;
+    }
 
 finish:
     // ref frame setup
@@ -1745,7 +1758,6 @@ static av_cold int vp9_decode_init(AVCodecContext *avctx)
 {
     VP9Context *s = avctx->priv_data;
 
-    avctx->internal->allocate_progress = 1;
     s->last_bpp = 0;
     s->s.h.filter.sharpness = -1;
 
@@ -1753,11 +1765,6 @@ static av_cold int vp9_decode_init(AVCodecContext *avctx)
 }
 
 #if HAVE_THREADS
-static av_cold int vp9_decode_init_thread_copy(AVCodecContext *avctx)
-{
-    return init_frames(avctx);
-}
-
 static int vp9_decode_update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
 {
     int i, ret;
@@ -1814,9 +1821,9 @@ AVCodec ff_vp9_decoder = {
     .close                 = vp9_decode_free,
     .decode                = vp9_decode_frame,
     .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal         = FF_CODEC_CAP_SLICE_THREAD_HAS_MF,
+    .caps_internal         = FF_CODEC_CAP_SLICE_THREAD_HAS_MF |
+                             FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = vp9_decode_flush,
-    .init_thread_copy      = ONLY_IF_THREADS_ENABLED(vp9_decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(vp9_decode_update_thread_context),
     .profiles              = NULL_IF_CONFIG_SMALL(ff_vp9_profiles),
     .bsfs                  = "vp9_superframe_split",

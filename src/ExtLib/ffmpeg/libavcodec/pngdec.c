@@ -415,7 +415,7 @@ static int png_decode_idat(PNGDecContext *s, int length)
 {
     int ret;
     s->zstream.avail_in = FFMIN(length, bytestream2_get_bytes_left(&s->gb));
-    s->zstream.next_in  = (unsigned char *)s->gb.buffer;
+    s->zstream.next_in  = s->gb.buffer;
     bytestream2_skip(&s->gb, length);
 
     /* decode one line if possible */
@@ -454,7 +454,7 @@ static int decode_zbuf(AVBPrint *bp, const uint8_t *data,
     zstream.opaque = NULL;
     if (inflateInit(&zstream) != Z_OK)
         return AVERROR_EXTERNAL;
-    zstream.next_in  = (unsigned char *)data;
+    zstream.next_in  = data;
     zstream.avail_in = data_end - data;
     av_bprint_init(bp, 0, AV_BPRINT_SIZE_UNLIMITED);
 
@@ -1286,8 +1286,10 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
         case MKTAG('s', 'T', 'E', 'R'): {
             int mode = bytestream2_get_byte(&s->gb);
             AVStereo3D *stereo3d = av_stereo3d_create_side_data(p);
-            if (!stereo3d)
+            if (!stereo3d) {
+                ret = AVERROR(ENOMEM);
                 goto fail;
+            }
 
             if (mode == 0 || mode == 1) {
                 stereo3d->type  = AV_STEREO3D_SIDEBYSIDE;
@@ -1300,7 +1302,7 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
             break;
         }
         case MKTAG('i', 'C', 'C', 'P'): {
-            if (decode_iccp_chunk(s, length, p) < 0)
+            if ((ret = decode_iccp_chunk(s, length, p)) < 0)
                 goto fail;
             break;
         }
@@ -1771,10 +1773,7 @@ static av_cold int png_dec_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     }
 
-    if (!avctx->internal->is_copy) {
-        avctx->internal->allocate_progress = 1;
-        ff_pngdsp_init(&s->dsp);
-    }
+    ff_pngdsp_init(&s->dsp);
 
     return 0;
 }
@@ -1809,10 +1808,10 @@ AVCodec ff_apng_decoder = {
     .init           = png_dec_init,
     .close          = png_dec_end,
     .decode         = decode_frame_apng,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(png_dec_init),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
 #endif
 
@@ -1826,10 +1825,10 @@ AVCodec ff_png_decoder = {
     .init           = png_dec_init,
     .close          = png_dec_end,
     .decode         = decode_frame_png,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(png_dec_init),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/,
-    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
 #endif
 
@@ -1845,6 +1844,7 @@ AVCodec ff_lscr_decoder = {
     .decode         = decode_frame_lscr,
     .flush          = decode_flush,
     .capabilities   = AV_CODEC_CAP_DR1 /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/,
-    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
 #endif

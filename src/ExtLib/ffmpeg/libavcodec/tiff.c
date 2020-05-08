@@ -393,7 +393,7 @@ static int tiff_uncompress(uint8_t *dst, unsigned long *len, const uint8_t *src,
     z_stream zstream = { 0 };
     int zret;
 
-    zstream.next_in   = (uint8_t *)src;
+    zstream.next_in   = src;
     zstream.avail_in  = size;
     zstream.next_out  = dst;
     zstream.avail_out = *len;
@@ -589,7 +589,7 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
         av_assert0(s->bpp == 24);
     }
     if (s->is_bayer) {
-        width = (s->bpp * s->width + 7) >> 3;
+        av_assert0(width == (s->bpp * s->width + 7) >> 3);
     }
     if (p->format == AV_PIX_FMT_GRAY12) {
         av_fast_padded_malloc(&s->yuv_line, &s->yuv_line_size, width);
@@ -704,18 +704,20 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
 
             /* Color processing for DNG images with uncompressed strips (non-tiled) */
             if (is_dng) {
-                int is_u16, pixel_size_bytes, pixel_size_bits;
+                int is_u16, pixel_size_bytes, pixel_size_bits, elements;
 
                 is_u16 = (s->bpp > 8);
                 pixel_size_bits = (is_u16 ? 16 : 8);
                 pixel_size_bytes = (is_u16 ? sizeof(uint16_t) : sizeof(uint8_t));
 
+                elements = width / pixel_size_bytes * pixel_size_bits / s->bpp * s->bppcount; // need to account for [1, 16] bpp
+                av_assert0 (elements * pixel_size_bytes <= FFABS(stride));
                 dng_blit(s,
                          dst,
                          0, // no stride, only 1 line
                          dst,
                          0, // no stride, only 1 line
-                         width / pixel_size_bytes * pixel_size_bits / s->bpp * s->bppcount, // need to account for [1, 16] bpp
+                         elements,
                          1,
                          0, // single-component variation is only preset in JPEG-encoded DNGs
                          is_u16);
@@ -1858,6 +1860,8 @@ again:
     }
 
     if (is_dng) {
+        int bps;
+
         if (s->white_level == 0)
             s->white_level = (1 << s->bpp) - 1; /* Default value as per the spec */
 
@@ -1866,6 +1870,14 @@ again:
                 s->black_level, s->white_level);
             return AVERROR_INVALIDDATA;
         }
+
+        if (s->bpp % s->bppcount)
+            return AVERROR_INVALIDDATA;
+        bps = s->bpp / s->bppcount;
+        if (bps < 8 || bps > 32)
+            return AVERROR_INVALIDDATA;
+        if (s->planar)
+            return AVERROR_PATCHWELCOME;
     }
 
     if (!s->is_tiled && !s->strippos && !s->stripoff) {
@@ -2165,7 +2177,6 @@ AVCodec ff_tiff_decoder = {
     .init           = tiff_init,
     .close          = tiff_end,
     .decode         = decode_frame,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(tiff_init),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .priv_class     = &tiff_decoder_class,
