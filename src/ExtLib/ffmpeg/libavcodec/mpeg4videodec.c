@@ -26,7 +26,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "error_resilience.h"
-#include "hwaccel.h"
+#include "hwconfig.h"
 #include "idctdsp.h"
 #include "internal.h"
 #include "mpegutils.h"
@@ -3460,7 +3460,33 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
     if (ret < 0)
         return ret;
 
-    memcpy(((uint8_t*)s) + sizeof(MpegEncContext), ((uint8_t*)s1) + sizeof(MpegEncContext), sizeof(Mpeg4DecContext) - sizeof(MpegEncContext));
+    // copy all the necessary fields explicitly
+    s->time_increment_bits       = s1->time_increment_bits;
+    s->shape                     = s1->shape;
+    s->vol_sprite_usage          = s1->vol_sprite_usage;
+    s->sprite_brightness_change  = s1->sprite_brightness_change;
+    s->num_sprite_warping_points = s1->num_sprite_warping_points;
+    s->rvlc                      = s1->rvlc;
+    s->resync_marker             = s1->resync_marker;
+    s->t_frame                   = s1->t_frame;
+    s->new_pred                  = s1->new_pred;
+    s->enhancement_type          = s1->enhancement_type;
+    s->scalability               = s1->scalability;
+    s->use_intra_dc_vlc          = s1->use_intra_dc_vlc;
+    s->intra_dc_threshold        = s1->intra_dc_threshold;
+    s->divx_version              = s1->divx_version;
+    s->divx_build                = s1->divx_build;
+    s->xvid_build                = s1->xvid_build;
+    s->lavc_build                = s1->lavc_build;
+    s->showed_packed_warning     = s1->showed_packed_warning;
+    s->vol_control_parameters    = s1->vol_control_parameters;
+    s->cplx_estimation_trash_i   = s1->cplx_estimation_trash_i;
+    s->cplx_estimation_trash_p   = s1->cplx_estimation_trash_p;
+    s->cplx_estimation_trash_b   = s1->cplx_estimation_trash_b;
+    s->rgb                       = s1->rgb;
+
+    memcpy(s->sprite_shift, s1->sprite_shift, sizeof(s1->sprite_shift));
+    memcpy(s->sprite_traj,  s1->sprite_traj,  sizeof(s1->sprite_traj));
 
     if (CONFIG_MPEG4_DECODER && !init && s1->xvid_build >= 0)
         ff_xvid_idct_init(&s->m.idsp, dst);
@@ -3524,7 +3550,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
     ctx->time_increment_bits = 4; /* default value for broken headers */
 
     avctx->chroma_sample_location = AVCHROMA_LOC_LEFT;
-    avctx->internal->allocate_progress = 1;
 
     return 0;
 }
@@ -3534,13 +3559,11 @@ static av_cold int decode_end(AVCodecContext *avctx)
     Mpeg4DecContext *ctx = avctx->priv_data;
     int i;
 
-    if (!avctx->internal->is_copy) {
-        for (i = 0; i < 12; i++)
-            ff_free_vlc(&ctx->studio_intra_tab[i]);
+    for (i = 0; i < 12; i++)
+        ff_free_vlc(&ctx->studio_intra_tab[i]);
 
-        ff_free_vlc(&ctx->studio_luma_dc);
-        ff_free_vlc(&ctx->studio_chroma_dc);
-    }
+    ff_free_vlc(&ctx->studio_luma_dc);
+    ff_free_vlc(&ctx->studio_chroma_dc);
 
     return ff_h263_decode_end(avctx);
 }
@@ -3570,7 +3593,8 @@ AVCodec ff_mpeg4_decoder = {
     .capabilities          = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
                              AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal         = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
+    .caps_internal         = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM |
+                             FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = ff_mpeg_flush,
     .max_lowres            = 3,
     .pix_fmts              = ff_h263_hwaccel_pixfmt_list_420,

@@ -826,8 +826,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
     if ((ret = ff_ffv1_init_slice_contexts(f)) < 0)
         return ret;
 
-    avctx->internal->allocate_progress = 1;
-
     return 0;
 }
 
@@ -979,34 +977,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
     return buf_size;
 }
 
-#if HAVE_THREADS
-static int init_thread_copy(AVCodecContext *avctx)
-{
-    FFV1Context *f = avctx->priv_data;
-    int i, ret;
-
-    f->picture.f      = NULL;
-    f->last_picture.f = NULL;
-    f->sample_buffer  = NULL;
-    f->max_slice_count = 0;
-    f->slice_count = 0;
-
-    for (i = 0; i < f->quant_table_count; i++) {
-        av_assert0(f->version > 1);
-        f->initial_states[i] = av_memdup(f->initial_states[i],
-                                         f->context_count[i] * sizeof(*f->initial_states[i]));
-    }
-
-    f->picture.f      = av_frame_alloc();
-    f->last_picture.f = av_frame_alloc();
-
-    if ((ret = ff_ffv1_init_slice_contexts(f)) < 0)
-        return ret;
-
-    return 0;
-}
-#endif
-
 static void copy_fields(FFV1Context *fsdst, FFV1Context *fssrc, FFV1Context *fsrc)
 {
     fsdst->version             = fsrc->version;
@@ -1090,9 +1060,8 @@ AVCodec ff_ffv1_decoder = {
     .init           = decode_init,
     .close          = ff_ffv1_close,
     .decode         = decode_frame,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/ |
                       AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };

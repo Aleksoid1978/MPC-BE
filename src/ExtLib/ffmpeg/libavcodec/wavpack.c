@@ -20,6 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/buffer.h"
 #include "libavutil/channel_layout.h"
 
 #define BITSTREAM_READER_LE
@@ -109,7 +110,10 @@ typedef struct WavpackContext {
     AVFrame *frame;
     ThreadFrame curr_frame, prev_frame;
     Modulation modulation;
+
+    AVBufferRef *dsd_ref;
     DSDContext *dsdctx;
+    int dsd_channels;
 } WavpackContext;
 
 #define LEVEL_DECAY(a)  (((a) + 0x80) >> 8)
@@ -978,21 +982,33 @@ static av_cold int wv_alloc_frame_context(WavpackContext *c)
     return 0;
 }
 
-#if HAVE_THREADS
-static int init_thread_copy(AVCodecContext *avctx)
+static int wv_dsd_reset(WavpackContext *s, int channels)
 {
-    WavpackContext *s = avctx->priv_data;
-    s->avctx = avctx;
+    int i;
 
-    s->curr_frame.f = av_frame_alloc();
-    s->prev_frame.f = av_frame_alloc();
+    s->dsdctx = NULL;
+    s->dsd_channels = 0;
+    av_buffer_unref(&s->dsd_ref);
 
-    if (!s->curr_frame.f || !s->prev_frame.f)
+    if (!channels)
+        return 0;
+
+    if (channels > INT_MAX / sizeof(*s->dsdctx))
+        return AVERROR(EINVAL);
+
+    s->dsd_ref = av_buffer_allocz(channels * sizeof(*s->dsdctx));
+    if (!s->dsd_ref)
         return AVERROR(ENOMEM);
+    s->dsdctx = (DSDContext*)s->dsd_ref->data;
+    s->dsd_channels = channels;
+
+    for (i = 0; i < channels; i++)
+        memset(s->dsdctx[i].buf, 0x69, sizeof(s->dsdctx[i].buf));
 
     return 0;
 }
 
+#if HAVE_THREADS
 static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
 {
     WavpackContext *fsrc = src->priv_data;
@@ -1008,6 +1024,17 @@ static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
             return ret;
     }
 
+    av_buffer_unref(&fdst->dsd_ref);
+    fdst->dsdctx = NULL;
+    fdst->dsd_channels = 0;
+    if (fsrc->dsd_ref) {
+        fdst->dsd_ref = av_buffer_ref(fsrc->dsd_ref);
+        if (!fdst->dsd_ref)
+            return AVERROR(ENOMEM);
+        fdst->dsdctx = (DSDContext*)fdst->dsd_ref->data;
+        fdst->dsd_channels = fsrc->dsd_channels;
+    }
+
     return 0;
 }
 #endif
@@ -1020,19 +1047,11 @@ static av_cold int wavpack_decode_init(AVCodecContext *avctx)
 
     s->fdec_num = 0;
 
-    avctx->internal->allocate_progress = 1;
-
     s->curr_frame.f = av_frame_alloc();
     s->prev_frame.f = av_frame_alloc();
 
-    // the DSD to PCM context is shared (and used serially) between all decoding threads
-    s->dsdctx = av_calloc(avctx->channels, sizeof(DSDContext));
-
-    if (!s->curr_frame.f || !s->prev_frame.f || !s->dsdctx)
+    if (!s->curr_frame.f || !s->prev_frame.f)
         return AVERROR(ENOMEM);
-
-    for (int i = 0; i < avctx->channels; i++)
-        memset(s->dsdctx[i].buf, 0x69, sizeof(s->dsdctx[i].buf));
 
     ff_init_dsd_data();
 
@@ -1053,8 +1072,7 @@ static av_cold int wavpack_decode_end(AVCodecContext *avctx)
     ff_thread_release_buffer(avctx, &s->prev_frame);
     av_frame_free(&s->prev_frame.f);
 
-    if (!avctx->internal->is_copy)
-        av_freep(&s->dsdctx);
+    av_buffer_unref(&s->dsd_ref);
 
     return 0;
 }
@@ -1065,6 +1083,7 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
     WavpackContext *wc = avctx->priv_data;
     WavpackFrameContext *s;
     GetByteContext gb;
+    enum AVSampleFormat sample_fmt;
     void *samples_l = NULL, *samples_r = NULL;
     int ret;
     int got_terms   = 0, got_weights = 0, got_samples = 0,
@@ -1102,7 +1121,15 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
         return AVERROR_INVALIDDATA;
     }
     s->frame_flags = bytestream2_get_le32(&gb);
-    bpp            = av_get_bytes_per_sample(avctx->sample_fmt);
+
+    if (s->frame_flags & (WV_FLOAT_DATA | WV_DSD_DATA))
+        sample_fmt = AV_SAMPLE_FMT_FLTP;
+    else if ((s->frame_flags & 0x03) <= 1)
+        sample_fmt = AV_SAMPLE_FMT_S16P;
+    else
+        sample_fmt          = AV_SAMPLE_FMT_S32P;
+
+    bpp            = av_get_bytes_per_sample(sample_fmt);
     orig_bpp       = ((s->frame_flags & 0x03) + 1) << 3;
     multiblock     = (s->frame_flags & WV_SINGLE_BLOCK) != WV_SINGLE_BLOCK;
 
@@ -1332,7 +1359,10 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
                 bytestream2_skip(&gb, ssize);
                 continue;
             }
-            rate_x = 1 << bytestream2_get_byte(&gb);
+            rate_x = bytestream2_get_byte(&gb);
+            if (rate_x > 30)
+                return AVERROR_INVALIDDATA;
+            rate_x = 1 << rate_x;
             dsd_mode = bytestream2_get_byte(&gb);
             if (dsd_mode && dsd_mode != 1 && dsd_mode != 3) {
                 av_log(avctx, AV_LOG_ERROR, "Invalid DSD encoding mode: %d\n",
@@ -1436,11 +1466,11 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
             av_log(avctx, AV_LOG_ERROR, "Hybrid config not found\n");
             return AVERROR_INVALIDDATA;
         }
-        if (!got_float && avctx->sample_fmt == AV_SAMPLE_FMT_FLTP) {
+        if (!got_float && sample_fmt == AV_SAMPLE_FMT_FLTP) {
             av_log(avctx, AV_LOG_ERROR, "Float information not found\n");
             return AVERROR_INVALIDDATA;
         }
-        if (s->got_extra_bits && avctx->sample_fmt != AV_SAMPLE_FMT_FLTP) {
+        if (s->got_extra_bits && sample_fmt != AV_SAMPLE_FMT_FLTP) {
             const int size   = get_bits_left(&s->gb_extra_bits);
             const int wanted = s->samples * s->extra_bits << s->stereo_in;
             if (size < wanted) {
@@ -1462,26 +1492,57 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
     }
 
     if (!wc->ch_offset) {
+        int      new_channels = avctx->channels;
+        uint64_t new_chmask   = avctx->channel_layout;
+        int new_samplerate;
         int sr = (s->frame_flags >> 23) & 0xf;
         if (sr == 0xf) {
             if (!sample_rate) {
                 av_log(avctx, AV_LOG_ERROR, "Custom sample rate missing.\n");
                 return AVERROR_INVALIDDATA;
             }
-            avctx->sample_rate = sample_rate * rate_x;
+            new_samplerate = sample_rate;
         } else
-            avctx->sample_rate = wv_rates[sr] * rate_x;
+            new_samplerate = wv_rates[sr];
+
+        if (new_samplerate * (uint64_t)rate_x > INT_MAX)
+            return AVERROR_INVALIDDATA;
+        new_samplerate *= rate_x;
 
         if (multiblock) {
             if (chan)
-                avctx->channels = chan;
+                new_channels = chan;
             if (chmask)
-                avctx->channel_layout = chmask;
+                new_chmask = chmask;
         } else {
-            avctx->channels       = s->stereo ? 2 : 1;
-            avctx->channel_layout = s->stereo ? AV_CH_LAYOUT_STEREO :
-                                                AV_CH_LAYOUT_MONO;
+            new_channels = s->stereo ? 2 : 1;
+            new_chmask   = s->stereo ? AV_CH_LAYOUT_STEREO :
+                                       AV_CH_LAYOUT_MONO;
         }
+
+        if (new_chmask &&
+            av_get_channel_layout_nb_channels(new_chmask) != new_channels) {
+            av_log(avctx, AV_LOG_ERROR, "Channel mask does not match the channel count\n");
+            return AVERROR_INVALIDDATA;
+        }
+
+        /* clear DSD state if stream properties change */
+        if (new_channels   != wc->dsd_channels      ||
+            new_chmask     != avctx->channel_layout ||
+            new_samplerate != avctx->sample_rate    ||
+            !!got_dsd      != !!wc->dsdctx) {
+            ret = wv_dsd_reset(wc, got_dsd ? new_channels : 0);
+            if (ret < 0) {
+                av_log(avctx, AV_LOG_ERROR, "Error reinitializing the DSD context\n");
+                return ret;
+            }
+            ff_thread_release_buffer(avctx, &wc->curr_frame);
+        }
+        avctx->channels            = new_channels;
+        avctx->channel_layout      = new_chmask;
+        avctx->sample_rate         = new_samplerate;
+        avctx->sample_fmt          = sample_fmt;
+        avctx->bits_per_raw_sample = orig_bpp;
 
         ff_thread_release_buffer(avctx, &wc->prev_frame);
         FFSWAP(ThreadFrame, wc->curr_frame, wc->prev_frame);
@@ -1546,10 +1607,7 @@ static void wavpack_decode_flush(AVCodecContext *avctx)
 {
     WavpackContext *s = avctx->priv_data;
 
-    if (!avctx->internal->is_copy) {
-        for (int i = 0; i < avctx->channels; i++)
-            memset(s->dsdctx[i].buf, 0x69, sizeof(s->dsdctx[i].buf));
-    }
+    wv_dsd_reset(s, 0);
 }
 
 static int dsd_channel(AVCodecContext *avctx, void *frmptr, int jobnr, int threadnr)
@@ -1589,15 +1647,6 @@ static int wavpack_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     s->modulation = (frame_flags & WV_DSD_DATA) ? MODULATION_DSD : MODULATION_PCM;
-
-    if (frame_flags & (WV_FLOAT_DATA | WV_DSD_DATA)) {
-        avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
-    } else if ((frame_flags & 0x03) <= 1) {
-        avctx->sample_fmt = AV_SAMPLE_FMT_S16P;
-    } else {
-        avctx->sample_fmt          = AV_SAMPLE_FMT_S32P;
-        avctx->bits_per_raw_sample = ((frame_flags & 0x03) + 1) << 3;
-    }
 
     while (buf_size > WV_HEADER_SIZE) {
         frame_size = AV_RL32(buf + 4) - 12;
@@ -1658,8 +1707,8 @@ AVCodec ff_wavpack_decoder = {
     .close          = wavpack_decode_end,
     .decode         = wavpack_decode_frame,
     .flush          = wavpack_decode_flush,
-    .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
-                      AV_CODEC_CAP_SLICE_THREADS
+                      AV_CODEC_CAP_SLICE_THREADS,
+    .caps_internal  = FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };
