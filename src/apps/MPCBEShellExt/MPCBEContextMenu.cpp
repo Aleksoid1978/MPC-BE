@@ -333,7 +333,7 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 		CString mpcPath = GetMPCPath();
 		for (auto item : m_fileNames) {
 			item = L'\"' + item + L'\"';
-			ShellExecuteW(nullptr, nullptr, mpcPath.GetString(), item.GetString(), 0, SW_SHOWDEFAULT);
+			ShellExecuteW(GetForegroundWindow(), nullptr, mpcPath.GetString(), item.GetString(), 0, SW_SHOWDEFAULT);
 		}
 
 	} else {
@@ -386,7 +386,7 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 			SendData(hWnd);
 		} else {
 			CString mpcPath = GetMPCPath();
-			if (!mpcPath.IsEmpty() && HINSTANCE(HINSTANCE_ERROR) < ShellExecuteW(nullptr, nullptr, mpcPath.GetString(), nullptr, 0, SW_SHOWDEFAULT)) {
+			if (!mpcPath.IsEmpty() && HINSTANCE(HINSTANCE_ERROR) < ShellExecuteW(GetForegroundWindow(), nullptr, mpcPath.GetString(), nullptr, 0, SW_SHOWDEFAULT)) {
 				Sleep(100);
 				int wait_count = 0;
 				HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr);
