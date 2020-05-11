@@ -464,7 +464,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::DeliverFrame(REFERENCE_TIME start, R
 	HRESULT hr = E_FAIL;
 
 	if (CComQIPtr<IXyCompatProvider> pXyProvider = m_pSubPicProvider) {
-		hr = pXyProvider->DeliverFrame(start, stop, context, subtitleFrame);
+		hr = pXyProvider->DeliverFrame(start + m_rtSubtitleDelay, stop + m_rtSubtitleDelay, context, subtitleFrame);
 	}
 
 	return hr;
