@@ -602,7 +602,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		int CurrentSize = std::min(m_ScreenSize.cx, MinSize);
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
-		m_pD3DXCreateFontW(m_pD3DDevEx, (int)(-24.0*Scale), (UINT)(-11.0*Scale), CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
+		m_pD3DXCreateFontW(m_pD3DDevEx, 24.0 * Scale, 11.0 * Scale, CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
 						   DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
 	}
 	if (m_pD3DXCreateSprite) {
