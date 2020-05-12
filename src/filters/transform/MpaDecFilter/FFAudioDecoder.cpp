@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -149,19 +149,21 @@ static const struct {
 	// A-law/mu-law
 	{ &MEDIASUBTYPE_ALAW,              AV_CODEC_ID_PCM_ALAW  },
 	{ &MEDIASUBTYPE_MULAW,             AV_CODEC_ID_PCM_MULAW },
+	// AES3
+	{ &MEDIASUBTYPE_AES3,              AV_CODEC_ID_S302M },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };
 
 enum AVCodecID FindCodec(const GUID subtype)
 {
-	static int index = _countof(ffAudioCodecs) - 1;
+	static auto index = std::size(ffAudioCodecs) - 1;
 
 	if (subtype == *ffAudioCodecs[index].clsMinorType) {
-		return ffAudioCodecs[index].nFFCodec;;
+		return ffAudioCodecs[index].nFFCodec;
 	}
 
-	for (int i = 0; i < _countof(ffAudioCodecs); i++) {
+	for (unsigned i = 0; i < std::size(ffAudioCodecs); i++) {
 		if (subtype == *ffAudioCodecs[i].clsMinorType) {
 			index = i;
 			return ffAudioCodecs[i].nFFCodec;

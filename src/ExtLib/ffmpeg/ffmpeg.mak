@@ -428,6 +428,7 @@ SRCS_LC_B = \
 	libavcodec/rv34dsp.c \
 	libavcodec/rv40.c \
 	libavcodec/rv40dsp.c \
+	libavcodec/s302m.c \
 	libavcodec/sbrdsp.c \
 	libavcodec/shorten.c \
 	libavcodec/simple_idct.c \

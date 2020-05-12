@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -352,6 +352,8 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				Infos.emplace_back(L"Dolby TrueHD");
 			} else if (pMediaType->subtype == MEDIASUBTYPE_MLP) {
 				Infos.emplace_back(L"MLP");
+			} else if (pMediaType->subtype == MEDIASUBTYPE_AES3) {
+				Infos.emplace_back(L"SMPTE 302M");
 			} else {
 				switch (pInfo->wFormatTag) {
 					case WAVE_FORMAT_PS2_PCM: {
