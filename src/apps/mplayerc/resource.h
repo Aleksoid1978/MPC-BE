@@ -1439,6 +1439,7 @@
 #define IDS_MFMT_OTHER_AUDIO            39402
 #define IDS_MFMT_SWF                    39403
 #define IDS_MFMT_AVISYNTH               39404
+#define IDS_MFMT_VAPOURSYNTH            39405
 // audio files
 #define IDS_MFMT_AC3                    39501
 #define IDS_MFMT_AIFF                   39502
