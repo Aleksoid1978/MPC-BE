@@ -795,8 +795,9 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define DTS_EXPRESS_AUDIO (1ULL << 14)
 #define MPEG4_VIDEO       (1ULL << 15)
 #define AC4_AUDIO         (1ULL << 16)
+#define AES3_AUDIO        (1ULL << 17)
 
-#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO | AC4_AUDIO)
+#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO | AC4_AUDIO | AES3_AUDIO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -828,6 +829,8 @@ static const struct StreamType {
 	{ PES_PRIVATE,							OPUS_AUDIO	},
 	// AC-4 Audio
 	{ PES_PRIVATE,							AC4_AUDIO   },
+	// AES3 (SMPTE 302M)
+	{ PES_PRIVATE,							AES3_AUDIO  },
 	// MPEG2 Video
 	{ VIDEO_STREAM_MPEG2,					MPEG2_VIDEO	},
 	{ VIDEO_STREAM_MPEG2_ADDITIONAL_VIEW,	MPEG2_VIDEO	},
@@ -865,7 +868,8 @@ static const struct {
 	{ 'EAC3', CMpegSplitterFile::stream_codec::EAC3,  AC3_AUDIO   },
 	{ 'HEVC', CMpegSplitterFile::stream_codec::HEVC,  HEVC_VIDEO  },
 	{ 'VC-1', CMpegSplitterFile::stream_codec::VC1,   VC1_VIDEO   },
-	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  }
+	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  },
+	{ 'BSSD', CMpegSplitterFile::stream_codec::AES3,  AES3_AUDIO  },
 };
 
 DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id, const DWORD len, const BOOL bAddStream/* = TRUE*/)
@@ -931,11 +935,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		}
 		for (const auto& streamDesc : StreamDesc) {
 			if (streamDesc.codec == _streamData.codec) {
-				if (stream_type == PES_STREAM_TYPE_ANY) {
-					stream_type = streamDesc.stream_type;
-				} else {
-					stream_type |= streamDesc.stream_type;
-				}
+				stream_type = streamDesc.stream_type;
 				break;
 			}
 		}
@@ -1185,6 +1185,15 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					Seek(start);
 					opus_ts_hdr h;
 					if (Read(h, len, _streamData.pmt.extraData, &s.mt)) {
+						type = stream_type::audio;
+					}
+				}
+
+				// AES3
+				if (type == stream_type::unknown && stream_type & AES3_AUDIO) {
+					Seek(start);
+					aes3_ts_hdr h;
+					if (Read(h, len, &s.mt)) {
 						type = stream_type::audio;
 					}
 				}

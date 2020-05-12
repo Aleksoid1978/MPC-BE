@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -215,6 +215,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// A-law/mu-law
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ALAW},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MULAW},
+	// AES3
+	{ &MEDIATYPE_Audio,				&MEDIASUBTYPE_AES3 },
 };
 
 #ifdef REGISTER_FILTER

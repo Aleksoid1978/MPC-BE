@@ -2407,6 +2407,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADPCM_SWF);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA_AMV);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADX_ADPCM);
+		// AES3
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_AES3);
 		m_transform.push_back(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(

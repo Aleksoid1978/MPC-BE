@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -193,6 +193,7 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_TAK,             "TAK"},
 	{MEDIASUBTYPE_BINKA_DCT,       "BINK"},
 	{MEDIASUBTYPE_BINKA_RDFT,      "BINK"},
+	{MEDIASUBTYPE_AES3,            "AES3"},
 	{MEDIASUBTYPE_DOLBY_AC3_SPDIF, "S/PDIF"},
 };
 

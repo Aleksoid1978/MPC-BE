@@ -1933,6 +1933,38 @@ bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, const std::vector<BYTE>&
 	return true;
 }
 
+bool CBaseSplitterFileEx::Read(aes3_ts_hdr& h, int len, CMediaType* pmt/* = nullptr*/)
+{
+	if (len < 4) {
+		return false;
+	}
+
+	Skip(2); // audio packet size
+	const WORD nChannels = (1 + BitRead(2)) * 2;
+	BitRead(8); // channel identification
+	const WORD wBitsPerSample = (4 + BitRead(2)) * 4;
+
+	if (nChannels > 8 || wBitsPerSample > 24) {
+		return false;
+	}
+
+	if (pmt) {
+		pmt->majortype = MEDIATYPE_Audio;
+		pmt->subtype = MEDIASUBTYPE_AES3;
+		pmt->formattype = FORMAT_WaveFormatEx;
+
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+		memset(wfe, 0, sizeof(WAVEFORMATEX));
+		wfe->nChannels = nChannels;
+		wfe->nSamplesPerSec = 48000;
+		wfe->wBitsPerSample = wBitsPerSample;
+		wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample >> 3;
+		wfe->nAvgBytesPerSec = wfe->nBlockAlign * wfe->nSamplesPerSec;
+	}
+
+	return true;
+}
+
 // LPCM
 
 bool CBaseSplitterFileEx::ReadDVDLPCMHdr(CMediaType* pmt)
