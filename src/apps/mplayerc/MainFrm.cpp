@@ -3616,9 +3616,11 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-	SetCapture();
-	m_bBeginCapture = true;
-	m_beginCapturePoint = point;
+	if (!IsZoomed()) {
+		SetCapture();
+		m_bBeginCapture = true;
+		m_beginCapturePoint = point;
+	}
 
 	__super::OnLButtonDown(nFlags, point);
 }
