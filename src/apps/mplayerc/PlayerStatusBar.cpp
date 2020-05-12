@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "PlayerStatusBar.h"
 #include "OpenImage.h"
+#include "./Controls/MenuEx.h"
 #include "../../DSUtil/SysVersion.h"
 
 // CPlayerStatusBar
@@ -36,14 +37,6 @@ CPlayerStatusBar::CPlayerStatusBar(CMainFrame* pMainFrame)
 	, m_bmid(0)
 	, m_time_rect(-1, -1, -1, -1)
 	, m_time_rect2(-1, -1, -1, -1)
-{
-	m_font.m_hObject = nullptr;
-
-	m_TimeMenu.CreatePopupMenu();
-	m_TimeMenu.AppendMenu(MF_STRING | MF_UNCHECKED, ID_SHOW_MILLISECONDS, ResStr(ID_SHOW_MILLISECONDS));
-}
-
-CPlayerStatusBar::~CPlayerStatusBar()
 {
 }
 
@@ -83,6 +76,16 @@ void CPlayerStatusBar::ScaleFont()
 	ScaleFontInternal();
 }
 
+void CPlayerStatusBar::SetMenu()
+{
+	m_TimeMenu.DestroyMenu();
+
+	m_TimeMenu.CreatePopupMenu();
+	m_TimeMenu.AppendMenu(MF_STRING | MF_UNCHECKED, ID_SHOW_MILLISECONDS, ResStr(ID_SHOW_MILLISECONDS));
+
+	m_pMainFrame->SetColorMenu(m_TimeMenu);
+}
+
 void CPlayerStatusBar::ScaleFontInternal()
 {
 	m_font.DeleteObject();
@@ -111,6 +114,8 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_time.Create(L"", WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
 
 	Relayout();
+
+	SetMenu();
 
 	return 0;
 }
@@ -293,6 +298,8 @@ BEGIN_MESSAGE_MAP(CPlayerStatusBar, CDialogBar)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_SETCURSOR()
 	ON_WM_CTLCOLOR()
+	ON_WM_DRAWITEM()
+	ON_WM_MEASUREITEM()
 END_MESSAGE_MAP()
 
 // CPlayerStatusBar message handlers
@@ -528,6 +535,27 @@ BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 	return CDialogBar::OnSetCursor(pWnd, nHitTest, message);
 }
+
+void CPlayerStatusBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (!nIDCtl && lpDrawItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
+		CMenuEx::DrawItem(lpDrawItemStruct);
+		return;
+	}
+
+	__super::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+
+void CPlayerStatusBar::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	if (!nIDCtl && lpMeasureItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
+		CMenuEx::MeasureItem(lpMeasureItemStruct);
+		return;
+	}
+
+	__super::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+}
+
 
 HBRUSH CPlayerStatusBar::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {

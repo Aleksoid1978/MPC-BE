@@ -207,6 +207,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CPPagePlayback;
 	friend class CPPageSoundProcessing;
 	friend class CPPagePlayer;
+	friend class CPPageInterface;
 	friend class CMPlayerCApp;
 	friend class CPlayerPlaylistBar;
 
@@ -454,6 +455,7 @@ public:
 
 	void DrawSmallBorder(); // draw line under mainmenubar
 	void SetColorMenu();
+	void SetColorMenu(CMenu& menu);
 
 	void StartWebServer(int nPort);
 	void StopWebServer();

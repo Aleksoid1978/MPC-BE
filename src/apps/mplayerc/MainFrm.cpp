@@ -20002,6 +20002,20 @@ void CMainFrame::SetColorMenu()
 	}
 }
 
+void CMainFrame::SetColorMenu(CMenu& menu)
+{
+	const auto& s = AfxGetAppSettings();
+	if (s.bUseDarkTheme && s.bDarkMenu) {
+		MENUINFO MenuInfo = { 0 };
+		MenuInfo.cbSize = sizeof(MenuInfo);
+		MenuInfo.hbrBack = m_hPopupMenuBrush;
+		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
+		SetMenuInfo(menu.GetSafeHmenu(), &MenuInfo);
+
+		CMenuEx::ChangeStyle(&menu);
+	}
+}
+
 void CMainFrame::DrawSmallBorder()
 {
 	// To eliminate small border between menu and client rect
