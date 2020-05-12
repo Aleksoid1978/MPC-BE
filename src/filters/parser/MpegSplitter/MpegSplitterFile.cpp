@@ -797,7 +797,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define AC4_AUDIO         (1ULL << 16)
 #define AES3_AUDIO        (1ULL << 17)
 
-#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO | AC4_AUDIO | AES3_AUDIO)
+#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
