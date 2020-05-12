@@ -461,17 +461,13 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	WINDOWPLACEMENT wp;
-	wp.length = sizeof(wp);
-	m_pMainFrame->GetWindowPlacement(&wp);
-
 	if (m_time_rect.PtInRect(point) || m_time_rect2.PtInRect(point)) {
 		s.fRemainingTime = !s.fRemainingTime;
 		m_pMainFrame->OnTimer(2);
 		return;
 	}
 
-	if (!m_pMainFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
+	if (!m_pMainFrame->m_bFullScreen && !m_pMainFrame->IsZoomed()) {
 		CRect r;
 		GetClientRect(r);
 		CPoint p = point;
@@ -479,7 +475,7 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 		MapWindowPoints(m_pMainFrame, &point, 1);
 
 		m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN,
-							(p.x >= r.Width()-r.Height() && !m_pMainFrame->IsCaptionHidden()) ? HTBOTTOMRIGHT :
+							(p.x >= r.Width() - r.Height() && !m_pMainFrame->IsCaptionHidden()) ? HTBOTTOMRIGHT :
 							HTCAPTION,
 							MAKELPARAM(point.x, point.y));
 	}

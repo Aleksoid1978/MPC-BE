@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -229,7 +229,7 @@ void CPlayerInfoBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerInfoBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (!m_pMainFrame->m_bFullScreen) {
+	if (!m_pMainFrame->m_bFullScreen && !m_pMainFrame->IsZoomed()) {
 		MapWindowPoints(m_pMainFrame, &point, 1);
 		m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 	}
