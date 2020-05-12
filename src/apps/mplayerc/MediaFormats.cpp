@@ -198,6 +198,7 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		// special files. used TScript to exclude automatic association
 		ADDFMT((L"swf",         ResStr(IDS_MFMT_SWF),         L"swf", TScript, L"ShockWave ActiveX control"));
 		ADDFMT((L"avisynth",    ResStr(IDS_MFMT_AVISYNTH),    L"avs", TScript));
+		ADDFMT((L"vapoursynth", ResStr(IDS_MFMT_VAPOURSYNTH), L"vpy", TScript));
 		// audio files
 		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3 eac3", TAudio));
 		ADDFMT((L"dts",         ResStr(IDS_MFMT_DTS),         L"dts dtshd dtsma", TAudio));
