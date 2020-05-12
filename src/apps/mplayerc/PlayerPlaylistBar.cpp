@@ -3355,15 +3355,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_STRING | MF_ENABLED | (s.bPlaylistDetermineDuration ? MF_CHECKED : MF_UNCHECKED), M_DURATION, ResStr(IDS_PLAYLIST_DETERMINEDURATION));
 	}
 
-	if (s.bUseDarkTheme && s.bDarkMenu) {
-		MENUINFO MenuInfo = { 0 };
-		MenuInfo.cbSize = sizeof(MenuInfo);
-		MenuInfo.hbrBack = m_pMainFrame->m_hPopupMenuBrush;
-		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
-		SetMenuInfo(m.GetSafeHmenu(), &MenuInfo);
-
-		CMenuEx::ChangeStyle(&m);
-	}
+	m_pMainFrame->SetColorMenu(m);
 
 	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
 
@@ -4044,15 +4036,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
 		, id++, ResStr(IDS_PLAYLIST_DELETE_CURRENT));
 
-	if (s.bUseDarkTheme && s.bDarkMenu) {
-		MENUINFO MenuInfo = { 0 };
-		MenuInfo.cbSize = sizeof(MenuInfo);
-		MenuInfo.hbrBack = m_pMainFrame->m_hPopupMenuBrush;
-		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
-		SetMenuInfo(menu.GetSafeHmenu(), &MenuInfo);
-
-		CMenuEx::ChangeStyle(&menu);
-	}
+	m_pMainFrame->SetColorMenu(menu);
 
 	CString strDefName;
 	CString strGetName;

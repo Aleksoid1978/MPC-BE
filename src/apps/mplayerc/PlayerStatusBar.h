@@ -51,7 +51,7 @@ private:
 
 public:
 	CPlayerStatusBar(CMainFrame* pMainFrame);
-	virtual ~CPlayerStatusBar();
+	virtual ~CPlayerStatusBar() = default;
 
 	void Clear();
 
@@ -70,6 +70,7 @@ public:
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
 
 	void ScaleFont();
+	void SetMenu();
 
 	CStatusLabel m_status;
 	void Relayout();
@@ -84,6 +85,8 @@ protected:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
+	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 
 	void ScaleFontInternal();
 

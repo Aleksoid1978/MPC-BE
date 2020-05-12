@@ -267,6 +267,7 @@ BOOL CPPageInterface::OnApply()
 	}
 
 	pFrame->ResetMenu();
+	pFrame->m_wndStatusBar.SetMenu();
 	pFrame->Invalidate();
 
 	m_nThemeBrightness_Old	= s.nThemeBrightness;
