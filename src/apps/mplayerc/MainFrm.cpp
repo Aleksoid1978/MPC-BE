@@ -19900,12 +19900,15 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 	}
 
 	if (!files.empty()) {
-		bool bFoundCurFile = false;
-		for (const auto& fn : files) {
-			if (bFoundCurFile) {
-				fns.push_back(path + fn);
-			} else {
-				bFoundCurFile = (fn == fname);
+		std::sort(files.begin(), files.end(), [](const CString& a, const CString& b) {
+			return (StrCmpLogicalW(a, b) < 0);
+		});
+
+		auto it = std::find(files.cbegin(), files.cend(), fname);
+		if (it != files.cend()) {
+			it++;
+			for (auto it_cur = it; it_cur < files.cend(); it_cur++) {
+				fns.push_back(path + (*it_cur));
 			}
 		}
 	}
