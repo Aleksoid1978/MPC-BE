@@ -432,6 +432,8 @@ public:
 
 	bool IsShuffle() const;
 
+	void SelectDefaultPlaylist();
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
