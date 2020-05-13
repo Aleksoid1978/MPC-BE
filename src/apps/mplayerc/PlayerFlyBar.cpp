@@ -177,11 +177,13 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_EXIT);
 	} else if (r_MinIcon.PtInRect(p)) {
 		m_pMainFrame->m_bTrayIcon ? m_pMainFrame->SendMessageW(WM_SYSCOMMAND, SC_MINIMIZE, -1) : m_pMainFrame->ShowWindow(SW_SHOWMINIMIZED);
+		m_pMainFrame->RepaintVideo();
 	} else if (r_RestoreIcon.PtInRect(p)) {
 		if (m_pMainFrame->m_bFullScreen) {
 			m_pMainFrame->ToggleFullscreen(true, true);
 		}
 		m_pMainFrame->ShowWindow(m_pMainFrame->IsZoomed() ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
+		m_pMainFrame->RepaintVideo();
 		Invalidate();
 	} else if (r_SettingsIcon.PtInRect(p)) {
 		m_pMainFrame->PostMessageW(WM_COMMAND, ID_VIEW_OPTIONS);
