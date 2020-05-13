@@ -7071,6 +7071,7 @@ void CMainFrame::OnViewCaptionmenu()
 		}
 	}
 	VERIFY(SetWindowPos(nullptr, windowRect.left, windowRect.top, windowRect.Width(), windowRect.Height(), uFlags));
+	RepaintVideo();
 
 	FlyBarSetPos();
 	OSDBarSetPos();
