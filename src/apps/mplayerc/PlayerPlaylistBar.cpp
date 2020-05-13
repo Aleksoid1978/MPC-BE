@@ -861,7 +861,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
 
 	auto& lf = ncm.lfMessageFont;
-	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight) * AfxGetAppSettings().iPlsFontPercent / 100;
+	lf.lfHeight = MulDiv(m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight), AfxGetAppSettings().iPlsFontPercent, 100);
 	m_iTFontSize = abs(lf.lfHeight);
 
 	m_font.DeleteObject();
@@ -882,7 +882,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	m_fakeImageList.Create(1, std::abs(lf.lfHeight) + m_pMainFrame->ScaleY(4), ILC_COLOR4, 10, 10);
 	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
 
-	m_nSearchBarHeight = m_pMainFrame->ScaleY(20);
+	m_nSearchBarHeight = m_pMainFrame->ScaleY(MulDiv(20, AfxGetAppSettings().iPlsFontPercent, 100));
 }
 
 void CPlayerPlaylistBar::ScaleFont()
