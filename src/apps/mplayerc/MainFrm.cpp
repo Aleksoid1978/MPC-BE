@@ -5568,6 +5568,8 @@ void CMainFrame::OnFileOpenDevice()
 	ShowWindow(SW_SHOW);
 
 	ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
+
+	m_wndPlaylistBar.SelectDefaultPlaylist();
 	m_wndPlaylistBar.Empty();
 
 	CAutoPtr<OpenDeviceData> p(DNew OpenDeviceData());

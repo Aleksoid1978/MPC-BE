@@ -898,6 +898,18 @@ bool CPlayerPlaylistBar::IsShuffle() const
 	return AfxGetAppSettings().bShufflePlaylistItems && curPlayList.GetCountInternal() > 2;
 }
 
+void CPlayerPlaylistBar::SelectDefaultPlaylist()
+{
+	curPlayList.m_nFocused_idx = TGetFocusedElement();
+	m_nCurPlayListIndex = 0;
+
+	m_pMainFrame->m_bRememberSelectedTracks = false;
+	curPlayList.m_nSelectedAudioTrack = curPlayList.m_nSelectedSubtitleTrack = -1;
+
+	TEnsureVisible(m_nCurPlayListIndex);
+	TSelectTab();
+}
+
 BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!CSizingControlBarG::PreCreateWindow(cs)) {
@@ -1987,14 +1999,7 @@ void CPlayerPlaylistBar::Open(const CString& fn)
 
 void CPlayerPlaylistBar::Open(std::list<CString>& fns, const bool bMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
 {
-	curPlayList.m_nFocused_idx = TGetFocusedElement();
-	m_nCurPlayListIndex = 0;
-
-	m_pMainFrame->m_bRememberSelectedTracks = false;
-	curPlayList.m_nSelectedAudioTrack = curPlayList.m_nSelectedSubtitleTrack = -1;
-
-	TEnsureVisible(m_nCurPlayListIndex);
-	TSelectTab();
+	SelectDefaultPlaylist();
 
 	Empty();
 	ResolveLinkFiles(fns);
