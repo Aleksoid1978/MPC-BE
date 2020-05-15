@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,6 @@
 #include "parser/MP4Splitter/MP4Splitter.h"
 #include "parser/MpaSplitter/MpaSplitter.h"
 #include "parser/MpegSplitter/MpegSplitter.h"
-#include "parser/MusePackSplitter/MusePackSplitter.h"
 #include "parser/OggSplitter/OggSplitter.h"
 #include "parser/RawVideoSplitter/RawVideoSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"

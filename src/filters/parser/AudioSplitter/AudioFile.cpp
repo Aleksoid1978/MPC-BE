@@ -25,6 +25,7 @@
 #include "DFFFile.h"
 #include "DSFFile.h"
 #include "DTSHDFile.h"
+#include "MPC8File.h"
 #include "TAKFile.h"
 #include "TTAFile.h"
 #include "WavPackFile.h"
@@ -100,6 +101,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	}
 	else if (*id == FCC('DSD ') && data[4] == 0x1C) {
 		pAudioFile = DNew CDSFFile();
+	} else if (*id == FCC('MPCK')) {
+		pAudioFile = DNew CMPC8File();
 	}
 	else if (int id3v2_size = id3v2_match_len(data)) {
 		// skip ID3V2 metadata for formats that can contain it

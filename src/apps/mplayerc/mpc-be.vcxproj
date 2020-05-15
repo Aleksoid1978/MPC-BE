@@ -455,9 +455,6 @@
     <ProjectReference Include="..\..\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\parser\MusePackSplitter\MusePackSplitter.vcxproj">
-      <Project>{3ff8d24a-877c-4957-b377-f20a1527f423}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\RawVideoSplitter\RawVideoSplitter.vcxproj">
       <Project>{e73d2ff6-5738-4e17-b895-7d206fba9de2}</Project>
     </ProjectReference>
