@@ -54,6 +54,9 @@
     <ClCompile Include="DTSHDFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MPC8File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="AudioSplitter.def">
@@ -101,6 +104,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DTSHDFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MPC8File.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

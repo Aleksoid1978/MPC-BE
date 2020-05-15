@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,19 +73,35 @@ void CAPETag::Clear()
 	m_TagSize = m_TagFields = 0;
 }
 
-bool CAPETag::ReadFooter(BYTE *buf, const size_t len)
+bool CAPETag::ReadFooter(BYTE *buf, const size_t len, const bool bSkipHeader/* = false*/)
 {
 	m_TagSize = m_TagFields = 0;
 
-	if (len < APE_TAG_FOOTER_BYTES) {
-		return false;
+	if (bSkipHeader) {
+		if (len < APE_TAG_FOOTER_BYTES - 8) {
+			return false;
+		}
+
+		if (memcmp(buf + 16, "\0\0\0\0\0\0\0\0", 8)) {
+			return false;
+		}
+
+	} else {
+		if (len < APE_TAG_FOOTER_BYTES) {
+			return false;
+		}
+
+		if (memcmp(buf, "APETAGEX", 8) || memcmp(buf + 24, "\0\0\0\0\0\0\0\0", 8)) {
+			return false;
+		}
 	}
 
-	if (memcmp(buf, "APETAGEX", 8) || memcmp(buf + 24, "\0\0\0\0\0\0\0\0", 8)) {
-		return false;
+	auto start = buf;
+	if (!bSkipHeader) {
+		start += 8;
 	}
 
-	CGolombBuffer gb((BYTE*)buf + 8, APE_TAG_FOOTER_BYTES - 8);
+	CGolombBuffer gb(start, APE_TAG_FOOTER_BYTES - 8);
 	const DWORD ver = gb.ReadDwordLE();
 	if (ver != APE_TAG_VERSION) {
 		return false;
@@ -95,7 +111,11 @@ bool CAPETag::ReadFooter(BYTE *buf, const size_t len)
 	const DWORD fields   = gb.ReadDwordLE();
 	const DWORD flags    = gb.ReadDwordLE();
 
-	if ((fields > 65536) || (flags & APE_TAG_FLAG_IS_HEADER)) {
+	if (fields > 65536) {
+		return false;
+	}
+
+	if (!bSkipHeader && !(flags & APE_TAG_FLAG_IS_HEADER)) {
 		return false;
 	}
 

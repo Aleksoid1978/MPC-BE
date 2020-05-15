@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,7 +54,7 @@ public:
 	CAPETag() = default;
 	~CAPETag() = default;
 
-	bool ReadFooter(BYTE *buf, const size_t len);
+	bool ReadFooter(BYTE* buf, const size_t len, const bool bSkipHeader = false);
 	bool ReadTags(BYTE *buf, const size_t len);
 
 	size_t GetTagSize() const { return m_TagSize; }

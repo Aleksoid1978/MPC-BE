@@ -608,25 +608,18 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	}
 
 	if (hFile != INVALID_HANDLE_VALUE) {
-		const CAppSettings& s = AfxGetAppSettings();
-		if (ext == L".mpc" && s.SrcFilters[SRC_MUSEPACK]) { // hack for internal Splitter without Source - add File Source (Async) with high merit
-			CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
-			pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-			fl.Insert(pFGF, 3);
-		} else {
-			BOOL bIsBlocked = FALSE;
-			for (const auto& pFGF : m_override) {
-				if (pFGF->GetCLSID() == CLSID_AsyncReader && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
-					bIsBlocked = TRUE;
-					break;
-				}
+		BOOL bIsBlocked = FALSE;
+		for (const auto& pFGF : m_override) {
+			if (pFGF->GetCLSID() == CLSID_AsyncReader && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+				bIsBlocked = TRUE;
+				break;
 			}
+		}
 
-			if (!bIsBlocked) {
-				CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
-				pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-				fl.Insert(pFGF, 9);
-			}
+		if (!bIsBlocked) {
+			CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
+			pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
+			fl.Insert(pFGF, 9);
 		}
 
 		CloseHandle(hFile);
@@ -2060,6 +2053,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.push_back(pFGF);
 	}
 
+	if (src[SRC_MUSEPACK] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
+		pFGF->m_chkbytes.emplace_back(L"0,4,,4d50434b"); // MPCK
+		m_source.push_back(pFGF);
+	}
+
 	if (src[SRC_DVR] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDVRSourceFilter>(DVRSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
@@ -2143,15 +2142,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			pFGF = DNew CFGFilterInternal<CMpaSplitterFilter>(LowMerit(MpaSplitterName), MERIT64_DO_USE);
 		}
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Audio);
-		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-		m_transform.push_back(pFGF);
-
-		if (src[SRC_MUSEPACK]) {
-			pFGF = DNew CFGFilterInternal<CMusePackSplitter>(MusePackSplitterName, MERIT64_ABOVE_DSHOW);
-		} else {
-			pFGF = DNew CFGFilterInternal<CMusePackSplitter>(LowMerit(MusePackSplitterName), MERIT64_DO_USE);
-		}
-		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MUSEPACK_Stream);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.push_back(pFGF);
 	}
