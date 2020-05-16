@@ -64,7 +64,7 @@ private:
 
 public:
 	CPPageFormats();
-	virtual ~CPPageFormats();
+	~CPPageFormats() = default;
 
 	enum {COL_CATEGORY};
 

@@ -56,6 +56,7 @@ CPPageFormats::CPPageFormats()
 	: CPPageBase(CPPageFormats::IDD, CPPageFormats::IDD)
 	, m_list(0)
 	, m_bInsufficientPrivileges(false)
+	, m_bFileExtChanged(false)
 {
 	if (!m_pAAR && !SysVersion::IsWin10orLater()) {
 		// Default manager (requires at least Vista)
@@ -65,10 +66,6 @@ CPPageFormats::CPPageFormats()
 									  IID_PPV_ARGS(&m_pAAR));
 		UNREFERENCED_PARAMETER(hr);
 	}
-}
-
-CPPageFormats::~CPPageFormats()
-{
 }
 
 void CPPageFormats::DoDataExchange(CDataExchange* pDX)
@@ -858,20 +855,13 @@ void GetUnRegisterExts(CString saved_ext, CString new_ext, std::list<CString>& U
 		std::list<CString> new_exts;
 		Explode(new_ext, new_exts, L' ');
 
-		for (const auto& ext1 : saved_exts) {
-			saved_ext = ext1;
-			bool bMatch = false;
+		for (const auto& ext : saved_exts) {
+			auto it = std::find_if(new_exts.cbegin(), new_exts.cend(), [&ext](const CString& item) {
+				return (item.CompareNoCase(ext) == 0);
+			});
 
-			for (const auto& ext2 : new_exts) {
-				new_ext = ext2;
-				if (new_ext.CompareNoCase(saved_ext) == 0) {
-					bMatch = true;
-					continue;
-				}
-			}
-
-			if (!bMatch) {
-				UnRegisterExts.push_back(saved_ext);
+			if (it == new_exts.cend()) {
+				UnRegisterExts.push_back(L"." + ext);
 			}
 		}
 	}
@@ -893,9 +883,7 @@ BOOL CPPageFormats::OnApply()
 			i = (int)m_list.GetItemData(i);
 		}
 		if (i >= 0) {
-			if (i > 0) {
-				GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
-			}
+			GetUnRegisterExts(mf[i].GetExts(), m_exts, m_lUnRegisterExts);
 			mf[i].SetExts(m_exts);
 			m_exts = mf[i].GetExts();
 			UpdateData(FALSE);
@@ -1166,7 +1154,7 @@ void CPPageFormats::OnBnClickedDefault()
 		auto& mfc = AfxGetAppSettings().m_Formats[i];
 
 		mfc.RestoreDefaultExts();
-		GetUnRegisterExts(m_exts, mfc.GetExtsWithPeriod(), m_lUnRegisterExts);
+		GetUnRegisterExts(m_exts, mfc.GetExts(), m_lUnRegisterExts);
 		m_exts = mfc.GetExts();
 
 		CString label;
@@ -1192,7 +1180,7 @@ void CPPageFormats::OnBnClickedSet()
 		DWORD_PTR i = m_list.GetItemData(iItem);
 		auto& mfc = AfxGetAppSettings().m_Formats[i];
 
-		GetUnRegisterExts(mfc.GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
+		GetUnRegisterExts(mfc.GetExts(), m_exts, m_lUnRegisterExts);
 		mfc.SetExts(m_exts);
 		m_exts = mfc.GetExts();
 
