@@ -136,9 +136,7 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 	m_frames.resize(m_frames_cnt);
 
 	uint32_t stream_curbits = 8;
-	for (unsigned i = 0; i < m_frames_cnt; i++) {
-		auto& frame = m_frames[i];
-
+	for (auto& frame : m_frames) {
 		const auto pos = m_pFile->GetPos();
 		uint32_t tmp, size2, curbits;
 		if (m_pFile->ByteRead((BYTE*)&tmp, 4) != S_OK) {
