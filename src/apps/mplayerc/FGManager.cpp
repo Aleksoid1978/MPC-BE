@@ -2056,6 +2056,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_MUSEPACK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,4d50434b"); // MPCK
+		pFGF->m_chkbytes.emplace_back(L"0,3,,4d502b");   // MP+
 		m_source.push_back(pFGF);
 	}
 
