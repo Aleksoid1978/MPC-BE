@@ -21,47 +21,31 @@
 #pragma once
 
 #include "AudioFile.h"
+#include "../../../DSUtil/ID3Tag.h"
 
-class CMPC8File : public CAudioFile
+class CMPC7File : public CAudioFile
 {
-	struct chunk_t {
-		uint16_t id = 0;
-		uint64_t pos = 0;
-		uint64_t size = 0;
+	struct mpc_frame_t {
+		uint64_t pos    = 0;
+		uint32_t size   = 0;
+		uint8_t curbits = 0;
 	};
+	std::vector<mpc_frame_t> m_frames;
 
-	uint64_t m_header_pos = 0;
-	uint64_t m_samples = 0;
-
-	uint32_t m_block_pwr = 0;
-	uint32_t m_seek_pwr = 0;
-
+	uint32_t m_frames_cnt = 0;
 	uint32_t m_currentframe = 0;
-	uint32_t m_framesamples = 0;
-
-	std::vector<uint64_t> m_index;
 
 	CAPETag* m_APETag = nullptr;
-
-	std::vector<Chapters> m_chapters;
-
-	bool ReadChunkHeader(chunk_t& chunk);
-
-	uint64_t ReadVarLen();
-	int32_t ReadGolomb(const int bits);
-
-	bool ReadStreamHeader();
-	bool ReadSeekTable();
-	void ReadChapter(const uint64_t size);
+	CID3Tag* m_ID3Tag = nullptr;
 
 public:
-	CMPC8File();
-	~CMPC8File();
+	CMPC7File();
+	~CMPC7File();
 
 	void SetProperties(IBaseFilter* pBF);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
 	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"MusePack 8"; };
+	CString GetName() const { return L"MusePack 7"; };
 };

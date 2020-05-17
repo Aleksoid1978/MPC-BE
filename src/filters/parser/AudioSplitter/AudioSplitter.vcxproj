@@ -203,6 +203,7 @@
     <ClCompile Include="DFFFile.cpp" />
     <ClCompile Include="DSFFile.cpp" />
     <ClCompile Include="DTSHDFile.cpp" />
+    <ClCompile Include="MPC7File.cpp" />
     <ClCompile Include="MPC8File.cpp" />
     <ClCompile Include="TAKFile.cpp" />
     <ClCompile Include="AudioSplitter.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="DFFFile.h" />
     <ClInclude Include="DSFFile.h" />
     <ClInclude Include="DTSHDFile.h" />
+    <ClInclude Include="MPC7File.h" />
     <ClInclude Include="MPC8File.h" />
     <ClInclude Include="TAKFile.h" />
     <ClInclude Include="AudioSplitter.h" />

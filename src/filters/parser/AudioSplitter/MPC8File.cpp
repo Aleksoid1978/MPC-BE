@@ -38,7 +38,6 @@ static constexpr auto MPCTAG_AUDIOPACKET = MPCTAG('A', 'P');
 
 CMPC8File::CMPC8File()
 	: CAudioFile()
-	, m_APETag(nullptr)
 {
 	m_bitdepth = 16;
 	m_subtype = MEDIASUBTYPE_MPC8;
