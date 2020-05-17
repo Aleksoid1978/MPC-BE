@@ -194,6 +194,7 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_BINKA_DCT,       "BINK"},
 	{MEDIASUBTYPE_BINKA_RDFT,      "BINK"},
 	{MEDIASUBTYPE_AES3,            "AES3"},
+	{MEDIASUBTYPE_MPC7,            "MPC7"},
 	{MEDIASUBTYPE_MPC8,            "MPC8"},
 	{MEDIASUBTYPE_DOLBY_AC3_SPDIF, "S/PDIF"},
 };

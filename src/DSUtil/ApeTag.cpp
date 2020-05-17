@@ -115,7 +115,7 @@ bool CAPETag::ReadFooter(BYTE *buf, const size_t len, const bool bSkipHeader/* =
 		return false;
 	}
 
-	if (!bSkipHeader && !(flags & APE_TAG_FLAG_IS_HEADER)) {
+	if (!bSkipHeader && (flags & APE_TAG_FLAG_IS_HEADER)) {
 		return false;
 	}
 
