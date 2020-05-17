@@ -325,8 +325,7 @@ REFERENCE_TIME CMPC8File::Seek(REFERENCE_TIME rt)
 	}
 
 	const auto pos = llMulDiv(rt, m_samplerate, UNITS, 0);
-	auto currentframe = pos / m_framesamples;
-	auto index = currentframe >> (m_seek_pwr - m_block_pwr);
+	uint32_t index = (pos / m_framesamples) >> (m_seek_pwr - m_block_pwr);
 	if (index >= m_index.size()) {
 		index = m_index.size() - 1;
 	}
