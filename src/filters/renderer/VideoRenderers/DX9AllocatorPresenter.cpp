@@ -576,7 +576,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	UINT currentAdapter = GetAdapter(m_pD3DEx);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
-	if (m_bNeedCreateWindow) {
+	if (m_bNeedCreateWindow || !bTryToReset) {
 		m_bNeedCreateWindow = false;
 
 		if (m_hWndVR) {
