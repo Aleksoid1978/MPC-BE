@@ -258,24 +258,9 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 
 CWavPackFile::CWavPackFile()
 	: CAudioFile()
-	, m_block_idx_start(0)
-	, m_block_idx_end(0)
-	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_WAVPACK4;
 	m_wFormatTag = 0x5756;
-}
-
-CWavPackFile::~CWavPackFile()
-{
-	SAFE_DELETE(m_APETag);
-}
-
-void CWavPackFile::SetProperties(IBaseFilter* pBF)
-{
-	if (m_APETag) {
-		SetAPETagProperties(pBF, m_APETag);
-	}
 }
 
 HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
@@ -322,28 +307,9 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 		}
 
 		if (m_startpos + WV_HEADER_SIZE + APE_TAG_FOOTER_BYTES < m_endpos) {
-			BYTE buf[APE_TAG_FOOTER_BYTES];
-			memset(buf, 0, sizeof(buf));
-
-			m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-			if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-				m_APETag = DNew CAPETag;
-				size_t tag_size = 0;
-				if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-					tag_size = m_APETag->GetTagSize();
-					m_pFile->Seek(m_endpos - tag_size);
-					BYTE *p = DNew BYTE[tag_size];
-					if (m_pFile->ByteRead(p, tag_size) == S_OK) {
-						m_APETag->ReadTags(p, tag_size);
-					}
-					delete[] p;
-				}
-
+			size_t tag_size;
+			if (ReadApeTag(tag_size)) {
 				m_endpos -= tag_size;
-
-				if (m_APETag->TagItems.empty()) {
-					SAFE_DELETE(m_APETag);
-				}
 			}
 		}
 

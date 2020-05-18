@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,20 +24,16 @@
 
 class CTTAFile : public CAudioFile
 {
-	int m_totalframes;
-	int m_currentframe;
-	int m_framesamples;
-	int m_last_framesamples;
+	int m_totalframes = 0;
+	int m_currentframe = 0;
+	int m_framesamples = 0;
+	int m_last_framesamples = 0;
 
 	std::vector<__int64> m_index;
 
-	CAPETag* m_APETag;
-
 public:
 	CTTAFile();
-	~CTTAFile();
-
-	void SetProperties(IBaseFilter* pBF);
+	~CTTAFile() = default;
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

@@ -41,8 +41,6 @@ class CMPC8File : public CAudioFile
 
 	std::vector<uint64_t> m_index;
 
-	CAPETag* m_APETag = nullptr;
-
 	std::vector<Chapters> m_chapters;
 
 	bool ReadChunkHeader(chunk_t& chunk);
@@ -56,7 +54,7 @@ class CMPC8File : public CAudioFile
 
 public:
 	CMPC8File();
-	~CMPC8File();
+	~CMPC8File() = default;
 
 	void SetProperties(IBaseFilter* pBF);
 

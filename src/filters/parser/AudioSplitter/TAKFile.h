@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,19 +24,15 @@
 
 class CTAKFile : public CAudioFile
 {
-	__int64		m_samples;
-	int			m_framelen;
-	int			m_totalframes;
-
-	CAPETag*	m_APETag;
+	__int64 m_samples = 0;
+	int     m_framelen = 0;
+	int     m_totalframes = 0;
 
 	bool ParseTAKStreamInfo(BYTE* buf, int size);
 
 public:
 	CTAKFile();
-	~CTAKFile();
-
-	void SetProperties(IBaseFilter* pBF);
+	~CTAKFile() = default;
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

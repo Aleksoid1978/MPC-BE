@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,16 +32,12 @@ class CAPEFile : public CAudioFile
 		int64_t pts;
 	};
 
-	size_t m_curentframe;
+	size_t m_curentframe = 0;
 	std::vector<APEFrame> m_frames;
-
-	CAPETag* m_APETag;
 
 public:
 	CAPEFile();
-	~CAPEFile();
-
-	void SetProperties(IBaseFilter* pBF);
+	~CAPEFile() = default;
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

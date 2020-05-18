@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,23 +74,9 @@ struct APEContext {
 
 CAPEFile::CAPEFile()
 	: CAudioFile()
-	, m_curentframe(0)
-	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_APE;
 	m_wFormatTag = 0x5041;
-}
-
-CAPEFile::~CAPEFile()
-{
-	SAFE_DELETE(m_APETag);
-}
-
-void CAPEFile::SetProperties(IBaseFilter* pBF)
-{
-	if (m_APETag) {
-		SetAPETagProperties(pBF, m_APETag);
-	}
 }
 
 HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
@@ -336,32 +322,10 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			}
 		}
 
-		if (m_frames[ape.totalframes - 1].pos + APE_TAG_FOOTER_BYTES <= m_endpos) {
-			BYTE buf[APE_TAG_FOOTER_BYTES];
-			memset(buf, 0, sizeof(buf));
-
-			m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-			if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-				m_APETag = DNew CAPETag;
-				size_t tag_size = 0;
-				if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-					tag_size = m_APETag->GetTagSize();
-					m_pFile->Seek(m_endpos - tag_size);
-					BYTE *p = DNew BYTE[tag_size];
-					if (m_pFile->ByteRead(p, tag_size) == S_OK) {
-						m_APETag->ReadTags(p, tag_size);
-					}
-
-					delete[] p;
-				}
-
-				if (m_frames[ape.totalframes - 1].size > (int)tag_size) {
-					m_endpos -= tag_size;
-				}
-
-				if (m_APETag->TagItems.empty()) {
-					SAFE_DELETE(m_APETag);
-				}
+		if (m_frames[ape.totalframes - 1].pos + APE_TAG_FOOTER_BYTES < m_endpos) {
+			size_t tag_size;
+			if (ReadApeTag(tag_size) && m_frames[ape.totalframes - 1].size > (int)tag_size) {
+				m_endpos -= tag_size;
 			}
 		}
 	}

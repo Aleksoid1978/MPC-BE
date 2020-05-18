@@ -21,7 +21,6 @@
 #pragma once
 
 #include "AudioFile.h"
-#include "../../../DSUtil/ID3Tag.h"
 
 class CMPC7File : public CAudioFile
 {
@@ -35,8 +34,7 @@ class CMPC7File : public CAudioFile
 	uint32_t m_frames_cnt = 0;
 	uint32_t m_currentframe = 0;
 
-	CAPETag* m_APETag = nullptr;
-	CID3Tag* m_ID3Tag = nullptr;
+	CID3Tag* m_pID3Tag = nullptr;
 
 public:
 	CMPC7File();
