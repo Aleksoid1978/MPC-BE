@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,26 +36,9 @@ struct tta_header_t {
 
 CTTAFile::CTTAFile()
 	: CAudioFile()
-	, m_totalframes(0)
-	, m_currentframe(0)
-	, m_framesamples(0)
-	, m_last_framesamples(0)
-	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_TTA1;
 	m_wFormatTag = 0x77a1;
-}
-
-CTTAFile::~CTTAFile()
-{
-	SAFE_DELETE(m_APETag);
-}
-
-void CTTAFile::SetProperties(IBaseFilter* pBF)
-{
-	if (m_APETag) {
-		SetAPETagProperties(pBF, m_APETag);
-	}
 }
 
 HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
@@ -129,29 +112,9 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_startpos = m_pFile->GetPos();
 	m_endpos   = std::min(m_index[m_totalframes - 1], m_pFile->GetLength());
 
-	const __int64 file_size = m_pFile->GetLength();
-	if (m_endpos + APE_TAG_FOOTER_BYTES < file_size) {
-		BYTE buf[APE_TAG_FOOTER_BYTES];
-		memset(buf, 0, sizeof(buf));
-
-		m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
-		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-			m_APETag = DNew CAPETag;
-			size_t tag_size = 0;
-			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-				tag_size = m_APETag->GetTagSize();
-				m_pFile->Seek(file_size - tag_size);
-				BYTE *p = DNew BYTE[tag_size];
-				if (m_pFile->ByteRead(p, tag_size) == S_OK) {
-					m_APETag->ReadTags(p, tag_size);
-				}
-				delete [] p;
-			}
-
-			if (m_APETag->TagItems.empty()) {
-				SAFE_DELETE(m_APETag);
-			}
-		}
+	if (m_endpos + APE_TAG_FOOTER_BYTES < m_pFile->GetLength()) {
+		size_t tag_size;
+		ReadApeTag(tag_size);
 	}
 
 	m_samplerate	= tta.samplerate;

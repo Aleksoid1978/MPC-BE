@@ -37,25 +37,10 @@
 // CAudioFile
 //
 
-CAudioFile::CAudioFile()
-	: m_pFile(nullptr)
-	, m_startpos(0)
-	, m_endpos(0)
-	, m_samplerate(0)
-	, m_bitdepth(0)
-	, m_channels(0)
-	, m_layout(0)
-	, m_rtduration(0)
-	, m_subtype(GUID_NULL)
-	, m_wFormatTag(0)
-	, m_extradata(nullptr)
-	, m_extrasize(0)
-	, m_nAvgBytesPerSec(0)
-{
-}
-
 CAudioFile::~CAudioFile()
 {
+	SAFE_DELETE(m_pAPETag);
+
 	if (m_extradata) {
 		free(m_extradata);
 	}
@@ -156,4 +141,44 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	}
 
 	return true;
+}
+
+void CAudioFile::SetProperties(IBaseFilter* pBF)
+{
+	if (m_pAPETag) {
+		SetAPETagProperties(pBF, m_pAPETag);
+	}
+}
+
+bool CAudioFile::ReadApeTag(size_t& size)
+{
+	size = 0;
+
+	if (m_pFile->GetLength() > APE_TAG_FOOTER_BYTES) {
+		BYTE buf[APE_TAG_FOOTER_BYTES] = {};
+		const auto end_pos = m_pFile->GetLength();
+		m_pFile->Seek(end_pos - APE_TAG_FOOTER_BYTES);
+		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
+			SAFE_DELETE(m_pAPETag);
+			m_pAPETag = DNew CAPETag;
+			if (m_pAPETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_pAPETag->GetTagSize()) {
+				size = m_pAPETag->GetTagSize();
+				if (size < end_pos) {
+					m_pFile->Seek(end_pos - size);
+					std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
+					if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
+						m_pAPETag->ReadTags(ptr.get(), size);
+					}
+				}
+			}
+
+			if (m_pAPETag->TagItems.empty()) {
+				SAFE_DELETE(m_pAPETag);
+			} else {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

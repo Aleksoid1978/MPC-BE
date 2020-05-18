@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../DSUtil/ApeTag.h"
-#include "../DSUtil/ID3Tag.h"
+#include "../../../DSUtil/ApeTag.h"
+#include "../../../DSUtil/ID3Tag.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 #include <stdint.h>
@@ -30,28 +30,29 @@
 class CAudioFile
 {
 protected:
-	CBaseSplitterFile* m_pFile;
+	CBaseSplitterFile* m_pFile = nullptr;
 
-	__int64			m_startpos;
-	__int64			m_endpos;
+	__int64 m_startpos = 0;
+	__int64 m_endpos = 0;
 
-	int				m_samplerate;
-	int				m_bitdepth;
-	int				m_channels;
-	DWORD			m_layout;
+	int   m_samplerate = 0;
+	int   m_bitdepth = 0;
+	int   m_channels = 0;
+	DWORD m_layout = 0;
+	GUID  m_subtype = GUID_NULL;
+	WORD  m_wFormatTag = 0;
 
-	//__int64			m_totalsamples;
-	REFERENCE_TIME	m_rtduration;
+	REFERENCE_TIME m_rtduration;
 
-	GUID			m_subtype;
-	WORD			m_wFormatTag;
-	BYTE*			m_extradata;
-	int				m_extrasize;
+	BYTE* m_extradata = nullptr;
+	int   m_extrasize = 0;
 
-	DWORD			m_nAvgBytesPerSec;
+	DWORD m_nAvgBytesPerSec = 0;
+
+	CAPETag* m_pAPETag = nullptr;
 
 public:
-	CAudioFile();
+	CAudioFile() = default;
 	virtual ~CAudioFile();
 
 	static CAudioFile* CreateFilter(CBaseSplitterFile* m_pFile);
@@ -60,10 +61,12 @@ public:
 	__int64 GetEndPos() const { return m_endpos; }
 	REFERENCE_TIME GetDuration() const { return m_rtduration;}
 	virtual bool SetMediaType(CMediaType& mt);
-	virtual void SetProperties(IBaseFilter* pBF) {};
+	virtual void SetProperties(IBaseFilter* pBF);
 
 	virtual HRESULT Open(CBaseSplitterFile* pFile) PURE;
 	virtual REFERENCE_TIME Seek(REFERENCE_TIME rt) PURE;
 	virtual int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart) PURE;
 	virtual CString GetName() const PURE;
+
+	bool ReadApeTag(size_t& size);
 };

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,16 +24,12 @@
 
 class CWavPackFile : public CAudioFile
 {
-	uint32_t m_block_idx_start;
-	uint32_t m_block_idx_end;
-
-	CAPETag* m_APETag;
+	uint32_t m_block_idx_start = 0;
+	uint32_t m_block_idx_end = 0;
 
 public:
 	CWavPackFile();
-	~CWavPackFile();
-
-	void SetProperties(IBaseFilter* pBF);
+	~CWavPackFile() = default;
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

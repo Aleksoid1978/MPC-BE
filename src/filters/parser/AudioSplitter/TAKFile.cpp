@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -131,24 +131,8 @@ static int GetTAKFrameNumber(BYTE* buf, int size)
 
 CTAKFile::CTAKFile()
 	: CAudioFile()
-	, m_samples(0)
-	, m_framelen(0)
-	, m_totalframes(0)
-	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_TAK;
-}
-
-CTAKFile::~CTAKFile()
-{
-	SAFE_DELETE(m_APETag);
-}
-
-void CTAKFile::SetProperties(IBaseFilter* pBF)
-{
-	if (m_APETag) {
-		SetAPETagProperties(pBF, m_APETag);
-	}
 }
 
 bool CTAKFile::ParseTAKStreamInfo(BYTE* buf, int size)
@@ -291,30 +275,10 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 					m_endpos += m_pFile->GetPos();
 
 					// parse APE Tag Header
-					BYTE buf[APE_TAG_FOOTER_BYTES];
-					memset(buf, 0, sizeof(buf));
 					__int64 cur_pos = m_pFile->GetPos();
-					__int64 file_size = m_pFile->GetLength();
-
-					if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
-						m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
-						if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-							m_APETag = DNew CAPETag;
-							if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-								size_t tag_size = m_APETag->GetTagSize();
-								m_pFile->Seek(file_size - tag_size);
-								BYTE *p = DNew BYTE[tag_size];
-								if (m_pFile->ByteRead(p, tag_size) == S_OK) {
-									m_APETag->ReadTags(p, tag_size);
-								}
-
-								delete [] p;
-							}
-
-							if (m_APETag->TagItems.empty()) {
-								SAFE_DELETE(m_APETag);
-							}
-						}
+					if (cur_pos + APE_TAG_FOOTER_BYTES < m_pFile->GetLength()) {
+						size_t tag_size;
+						ReadApeTag(tag_size);
 
 						m_pFile->Seek(cur_pos);
 					}

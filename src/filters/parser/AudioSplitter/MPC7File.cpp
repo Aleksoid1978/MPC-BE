@@ -39,16 +39,14 @@ CMPC7File::CMPC7File()
 
 CMPC7File::~CMPC7File()
 {
-	SAFE_DELETE(m_APETag);
-	SAFE_DELETE(m_ID3Tag);
+	SAFE_DELETE(m_pID3Tag);
 }
 
 void CMPC7File::SetProperties(IBaseFilter* pBF)
 {
-	if (m_APETag) {
-		SetAPETagProperties(pBF, m_APETag);
-	} else if (m_ID3Tag) {
-		SetID3TagProperties(pBF, m_ID3Tag);
+	__super::SetProperties(pBF);
+	if (!m_pAPETag && m_pID3Tag) {
+		SetID3TagProperties(pBF, m_pID3Tag);
 	}
 }
 
@@ -89,45 +87,24 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 	m_startpos = m_pFile->GetPos();
 	m_endpos = m_pFile->GetLength();
 
-	if (m_startpos + APE_TAG_FOOTER_BYTES < m_endpos) {
-		BYTE buf[APE_TAG_FOOTER_BYTES] = {};
-
-		m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-			m_APETag = DNew CAPETag;
-			size_t tag_size = 0;
-			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-				tag_size = m_APETag->GetTagSize();
-				m_pFile->Seek(m_endpos - tag_size);
-				std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[tag_size]);
-				if (ptr && m_pFile->ByteRead(ptr.get(), tag_size) == S_OK) {
-					m_APETag->ReadTags(ptr.get(), tag_size);
-				}
-			}
-
-			m_endpos -= tag_size;
-
-			if (m_APETag->TagItems.empty()) {
-				SAFE_DELETE(m_APETag);
-			}
-		}
-	}
-
-	if (!m_APETag && (m_startpos + ID3v1_TAG_SIZE < m_endpos)) {
+	size_t tag_size;
+	if (ReadApeTag(tag_size)) {
+		m_endpos -= tag_size;
+	} else if (m_startpos + ID3v1_TAG_SIZE < m_endpos) {
 		m_pFile->Seek(m_endpos - ID3v1_TAG_SIZE);
 
 		if (m_pFile->BitRead(24) == 'TAG') {
-			m_ID3Tag = DNew CID3Tag();
-			const size_t tag_size = ID3v1_TAG_SIZE - 3;
+			m_pID3Tag = DNew CID3Tag();
+			tag_size = ID3v1_TAG_SIZE - 3;
 			std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[tag_size]);
 			if (ptr && m_pFile->ByteRead(ptr.get(), tag_size) == S_OK) {
-				m_ID3Tag->ReadTagsV1(ptr.get(), tag_size);
+				m_pID3Tag->ReadTagsV1(ptr.get(), tag_size);
 			}
 
 			m_endpos -= ID3v1_TAG_SIZE;
 
-			if (m_ID3Tag->TagItems.empty()) {
-				SAFE_DELETE(m_ID3Tag);
+			if (m_pID3Tag->TagItems.empty()) {
+				SAFE_DELETE(m_pID3Tag);
 			}
 		}
 	}

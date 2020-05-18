@@ -44,16 +44,9 @@ CMPC8File::CMPC8File()
 	m_wFormatTag = 0x504D;
 }
 
-CMPC8File::~CMPC8File()
-{
-	SAFE_DELETE(m_APETag);
-}
-
 void CMPC8File::SetProperties(IBaseFilter* pBF)
 {
-	if (m_APETag) {
-		SetAPETagProperties(pBF, m_APETag);
-	}
+	__super::SetProperties(pBF);
 
 	if (!m_chapters.empty()) {
 		if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
@@ -120,28 +113,9 @@ HRESULT CMPC8File::Open(CBaseSplitterFile* pFile)
 
 	m_endpos = m_pFile->GetLength();
 
-	if (m_startpos + APE_TAG_FOOTER_BYTES < m_endpos) {
-		BYTE buf[APE_TAG_FOOTER_BYTES] = {};
-
-		m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-			m_APETag = DNew CAPETag;
-			size_t tag_size = 0;
-			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-				tag_size = m_APETag->GetTagSize();
-				m_pFile->Seek(m_endpos - tag_size);
-				std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[tag_size]);
-				if (ptr && m_pFile->ByteRead(ptr.get(), tag_size) == S_OK) {
-					m_APETag->ReadTags(ptr.get(), tag_size);
-				}
-			}
-
-			m_endpos -= tag_size;
-
-			if (m_APETag->TagItems.empty()) {
-				SAFE_DELETE(m_APETag);
-			}
-		}
+	size_t tag_size;
+	if (ReadApeTag(tag_size)) {
+		m_endpos -= tag_size;
 	}
 
 	m_pFile->Seek(seek_table_pos);
