@@ -817,6 +817,10 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		DLog(L"    => CreateDeviceEx(m_pD3DDevExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
 	}
 
+	if (!bTryToReset) {
+		OnResetDevice();
+	}
+
 	return S_OK;
 }
 
@@ -1712,7 +1716,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 		m_bDeviceResetRequested = false;
 		return false;
 	}
-	OnResetDevice();
 	m_bDeviceResetRequested = false;
 	m_bPendingResetDevice = false;
 
