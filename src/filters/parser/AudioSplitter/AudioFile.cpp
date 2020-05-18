@@ -163,7 +163,7 @@ bool CAudioFile::ReadApeTag(size_t& size)
 			m_pAPETag = DNew CAPETag;
 			if (m_pAPETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_pAPETag->GetTagSize()) {
 				size = m_pAPETag->GetTagSize();
-				if (size < end_pos) {
+				if (size < (size_t)end_pos) {
 					m_pFile->Seek(end_pos - size);
 					std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
 					if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
