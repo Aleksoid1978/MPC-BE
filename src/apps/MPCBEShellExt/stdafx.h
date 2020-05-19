@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,3 +30,5 @@
 #include <atlctl.h>
 
 #include "resource.h"
+
+inline constexpr auto shellExtKeyName = L"Software\\MPC-BE.ShellExt";
