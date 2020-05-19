@@ -28,6 +28,8 @@
 #define ShellExt   GetProgramDir() + L"MPCBEShellExt.dll"
 #define ShellExt64 GetProgramDir() + L"MPCBEShellExt64.dll"
 
+inline constexpr auto shellExtKeyName = L"Software\\MPC-BE.ShellExt";
+
 // CPPageFormats dialog
 
 class CPPageFormats : public CPPageBase

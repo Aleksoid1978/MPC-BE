@@ -26,6 +26,7 @@
 #include "MiniDump.h"
 #include "Misc.h"
 #include "PlayerYouTube.h"
+#include "PPageFormats.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
@@ -1646,7 +1647,7 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 		key.SetDWORDValue(IDS_RS_MULTIINST, iMultipleInst);
 	}
 

@@ -426,7 +426,7 @@ typedef HRESULT (WINAPI *tpDllUnRegisterServer)();
 bool CPPageFormats::RegisterShellExt(LPCWSTR lpszLibrary)
 {
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 		key.SetStringValue(L"MpcPath", GetProgramPath());
 	}
 
@@ -926,7 +926,7 @@ BOOL CPPageFormats::OnApply()
 			|| !!m_chContextFiles.GetCheck() != s.bSetContextFiles
 			|| !!m_chContextDir.GetCheck() != s.bSetContextDir) {
 		CRegKey key;
-		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));
 			key.SetStringValue(L"Add", ResStr(IDS_ADD_TO_PLAYLIST));
 

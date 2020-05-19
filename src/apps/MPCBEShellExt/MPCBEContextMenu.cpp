@@ -217,7 +217,7 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 	CString ADDTO_MPC = (GetUserDefaultUILanguage() == 1049) ? ADDTO_MPC_RU	: ADDTO_MPC_EN;
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
 		WCHAR path_buff[MAX_PATH] = { 0 };
 		ULONG len = sizeof(path_buff);
 
@@ -282,7 +282,7 @@ static CString GetMPCPath()
 	ULONG len = sizeof(buff);
 	CString mpcPath;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", buff, &len) && ::PathFileExistsW(buff)) {
 			mpcPath = buff; mpcPath.Trim();
 		}
@@ -321,7 +321,7 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 	bool bMultipleInstances = false;
 	if (bCheckMultipleInstances) {
 		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
 			DWORD dwValue = 0;
 			if (ERROR_SUCCESS == key.QueryDWORDValue(L"MultipleInstances", dwValue)) {
 				bMultipleInstances = (dwValue == 2);

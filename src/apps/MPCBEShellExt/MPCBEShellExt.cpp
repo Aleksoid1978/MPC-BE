@@ -47,7 +47,7 @@ static CString GetKeyName()
 	CString KeyName;
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
 		WCHAR path_buff[MAX_PATH] = {};
 		ULONG len = sizeof(path_buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
@@ -60,12 +60,12 @@ static CString GetKeyName()
 	return KeyName;
 }
 
-static BOOL GetKeyValue(const CString& value)
+static BOOL GetKeyValue(LPCTSTR value)
 {
 	BOOL bValue = FALSE;
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
 		DWORD dwValue = 0;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(value, dwValue)) {
 			bValue = !!dwValue;
