@@ -836,10 +836,6 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 {
 	DLog(L"CDX9AllocatorPresenter::ResetD3D9Device()");
 
-	if (m_CurrentAdapter != GetAdapter(m_pD3DEx)) {
-		return E_FAIL;
-	}
-
 	CAutoLock cRenderLock(&m_RenderLock);
 
 	CSize backBufferSize;
@@ -868,6 +864,13 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 		m_d3dpp.BackBufferHeight = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cy : m_windowRect.Height();
 
 		hr = m_pD3DDevEx->ResetEx(&m_d3dpp, nullptr);
+	}
+
+	DLog(L"    => ResetEx() return : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+
+	while (hr == D3DERR_DEVICELOST) {
+		DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");
+		hr = m_pD3DDevEx->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
 	}
 
 	if (SUCCEEDED(hr)) {
