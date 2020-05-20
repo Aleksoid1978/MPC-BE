@@ -1403,14 +1403,16 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringW pinName;
 			if (pTE->Language.GetLength()) {
-				pinName = ISO6392ToLanguage(pTE->Language).Trim();
-				CStringW lng(pTE->Language);
-				if (lng.CompareNoCase(pinName.Left(lng.GetLength())) != 0) {
-					pinName.AppendFormat(L" (%s)", lng);
+				if (pTE->Language != "und") {
+					pinName = ISO6392ToLanguage(pTE->Language).Trim();
+					CStringW lng(pTE->Language);
+					if (lng.CompareNoCase(pinName.Left(lng.GetLength())) != 0) {
+						pinName.AppendFormat(L" (%s)", lng);
+					}
 				}
 			}
 			else if (pTE->TrackType != TrackEntry::TypeVideo) {
-				pinName = L"unknown";
+				pinName = L"Unknown";
 			}
 
 			if (pTE->Name.GetLength()) {
@@ -1442,7 +1444,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (!pTE->Name.IsEmpty()) {
 				pPinOut->SetProperty(L"NAME", pTE->Name);
 			}
-			if (pTE->Language.GetLength() == 3) {
+			if (pTE->Language.GetLength() == 3 && pTE->Language != "und") {
 				pPinOut->SetProperty(L"LANG", CString(pTE->Language));
 			}
 
