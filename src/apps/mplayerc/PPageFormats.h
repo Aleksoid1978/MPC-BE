@@ -78,9 +78,7 @@ public:
 	static bool		RegisterShellExt(LPCWSTR lpszLibrary);
 	static bool		UnRegisterShellExt(LPCWSTR lpszLibrary);
 
-	static LPCWSTR	GetRegisteredAppName()	{return L"MPC-BE";}
-	static LPCWSTR	GetOldAssoc()			{return L"PreviousRegistration";}
-	static LPCWSTR	GetRegisteredKey()		{return L"Software\\Clients\\Media\\MPC-BE\\Capabilities";}
+	static BOOL		ShellExtExists();
 
 	CPlayerListCtrl m_list;
 	CString m_exts;

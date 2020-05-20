@@ -30,16 +30,11 @@
 #include <atlimage.h>
 #include <HighDPI.h>
 
+static constexpr auto previousRegistration = L"PreviousRegistration";
+static constexpr auto registeredAppName    = L"MPC-BE";
+static constexpr auto registeredKey        = L"Software\\Clients\\Media\\MPC-BE\\Capabilities";
+
 // CPPageFormats dialog
-
-static BOOL ShellExtExists()
-{
-	if (SysVersion::IsW64()) {
-		return ::PathFileExistsW(ShellExt64);
-	}
-
-	return ::PathFileExistsW(ShellExt);
-}
 
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 
@@ -120,11 +115,11 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 
 	if (m_pAAR) {
 		// The Vista/7/8 way
-		m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, GetRegisteredAppName(), &bIsDefault);
+		m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, registeredAppName, &bIsDefault);
 	} else {
 		// The 2000/XP/10 way
 		CRegKey key;
-		WCHAR   buff[MAX_PATH] = { 0 };
+		WCHAR   buff[MAX_PATH] = {};
 		ULONG   len = _countof(buff);
 
 		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
@@ -141,7 +136,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	// Check if association is for this instance of MPC
 	if (bIsDefault) {
 		CRegKey key;
-		WCHAR   buff[MAX_PATH] = { 0 };
+		WCHAR   buff[MAX_PATH] = {};
 		ULONG   len = _countof(buff);
 
 		bIsDefault = FALSE;
@@ -155,7 +150,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 
 	if (bIsDefault && SysVersion::IsWin10orLater() && bCheckProgId) {
 		CRegKey key;
-		WCHAR   buff[MAX_PATH] = { 0 };
+		WCHAR   buff[MAX_PATH] = {};
 		ULONG   len = _countof(buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\UserChoice"), KEY_READ)) {
@@ -196,9 +191,9 @@ bool CPPageFormats::RegisterApp()
 	CRegKey key;
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\RegisteredApplications")) {
-		key.SetStringValue(L"MPC-BE", GetRegisteredKey());
+		key.SetStringValue(L"MPC-BE", registeredKey);
 
-		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, GetRegisteredKey())) {
+		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, registeredKey)) {
 			return false;
 		}
 
@@ -275,7 +270,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		return false;
 	}
 
-	if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations")) {
+	if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, CString(registeredKey) + L"\\FileAssociations")) {
 		return false;
 	}
 	if (ERROR_SUCCESS != key.SetStringValue(ext, strProgID)) {
@@ -351,7 +346,7 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 	key.RecurseDeleteKey(strProgID);
 	key.Close();
 
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations")) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, CString(registeredKey) + L"\\FileAssociations")) {
 		key.DeleteValue(ext);
 	}
 
@@ -396,7 +391,7 @@ HRESULT CPPageFormats::RegisterUI()
 							  IID_PPV_ARGS(&pUI));
 
 		if (SUCCEEDED(hr) && pUI) {
-			hr = pUI->LaunchAdvancedAssociationUI(CPPageFormats::GetRegisteredAppName());
+			hr = pUI->LaunchAdvancedAssociationUI(registeredAppName);
 			pUI->Release();
 		}
 	}
@@ -425,6 +420,10 @@ typedef HRESULT (WINAPI *tpDllRegisterServer)();
 typedef HRESULT (WINAPI *tpDllUnRegisterServer)();
 bool CPPageFormats::RegisterShellExt(LPCWSTR lpszLibrary)
 {
+	if (!::PathFileExistsW(lpszLibrary)) {
+		return false;
+	}
+
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 		key.SetStringValue(L"MpcPath", GetProgramPath());
@@ -457,6 +456,10 @@ bool CPPageFormats::RegisterShellExt(LPCWSTR lpszLibrary)
 
 bool CPPageFormats::UnRegisterShellExt(LPCWSTR lpszLibrary)
 {
+	if (!::PathFileExistsW(lpszLibrary)) {
+		return false;
+	}
+
 	HINSTANCE hDLL = LoadLibraryW(lpszLibrary);
 	if (hDLL == nullptr) {
 		if (::PathFileExistsW(lpszLibrary)) {
@@ -480,6 +483,15 @@ bool CPPageFormats::UnRegisterShellExt(LPCWSTR lpszLibrary)
 	FreeLibrary(hDLL);
 
 	return SUCCEEDED(hr);
+}
+
+BOOL CPPageFormats::ShellExtExists()
+{
+	if (SysVersion::IsW64()) {
+		return ::PathFileExistsW(ShellExt64);
+	}
+
+	return ::PathFileExistsW(ShellExt);
 }
 
 static struct {
@@ -557,7 +569,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 		return false;
 	}
 
-	WCHAR buff[MAX_PATH] = { 0 };
+	WCHAR buff[MAX_PATH] = {};
 	ULONG len = _countof(buff);
 
 	CString exe = GetProgramPath();
@@ -739,7 +751,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	CString extoldreg, extOldIcon;
 	CRegKey key;
 	HRESULT hr = S_OK;
-	WCHAR   buff[MAX_PATH] = { 0 };
+	WCHAR   buff[MAX_PATH] = {};
 	ULONG   len = _countof(buff);
 
 	if (m_pAAR) {
@@ -759,7 +771,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 					return false;
 				}
 
-				key.SetStringValue(GetOldAssoc(), pszCurrentAssociation);
+				key.SetStringValue(previousRegistration, pszCurrentAssociation);
 
 				// Get current icon for file type
 				/*
@@ -775,13 +787,13 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				*/
 				CoTaskMemFree(pszCurrentAssociation);
 			}
-			strNewApp = GetRegisteredAppName();
+			strNewApp = registeredAppName;
 		} else {
 			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
 
-			if (ERROR_SUCCESS == key.QueryStringValue(GetOldAssoc(), buff, &len)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(previousRegistration, buff, &len)) {
 				strNewApp = buff;
 			}
 
@@ -821,7 +833,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
-			key.SetStringValue(GetOldAssoc(), extoldreg);
+			key.SetStringValue(previousRegistration, extoldreg);
 
 			/*
 			if (!extOldIcon.IsEmpty() && (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon")))
@@ -832,7 +844,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
-			if (ERROR_SUCCESS == key.QueryStringValue(GetOldAssoc(), buff, &len) && !CString(buff).Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(previousRegistration, buff, &len) && !CString(buff).Trim().IsEmpty()) {
 				extoldreg = buff;
 			}
 
@@ -922,9 +934,9 @@ BOOL CPPageFormats::OnApply()
 		}
 	}
 
-	if (m_bFileExtChanged
+	if ((m_bFileExtChanged
 			|| !!m_chContextFiles.GetCheck() != s.bSetContextFiles
-			|| !!m_chContextDir.GetCheck() != s.bSetContextDir) {
+			|| !!m_chContextDir.GetCheck() != s.bSetContextDir) && ShellExtExists()) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));

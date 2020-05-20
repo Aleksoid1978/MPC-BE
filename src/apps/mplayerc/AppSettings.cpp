@@ -1646,9 +1646,11 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SPEED_NOTRESET, bSpeedNotReset);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
-	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
-		key.SetDWORDValue(IDS_RS_MULTIINST, iMultipleInst);
+	if (CPPageFormats::ShellExtExists()) {
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
+			key.SetDWORDValue(IDS_RS_MULTIINST, iMultipleInst);
+		}
 	}
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle);
