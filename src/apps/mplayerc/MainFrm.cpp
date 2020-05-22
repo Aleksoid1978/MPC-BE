@@ -166,6 +166,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_WINDOWPOSCHANGING()
 
 	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
+	ON_MESSAGE(WM_DWMCOMPOSITIONCHANGED, OnDwmCompositionChanged)
 
 	ON_WM_SYSCOMMAND()
 	ON_WM_NCACTIVATE()
@@ -623,7 +624,9 @@ CMainFrame::CMainFrame() :
 	m_DwmSetIconicThumbnailFnc(nullptr),
 	m_DwmSetIconicLivePreviewBitmapFnc(nullptr),
 	m_DwmInvalidateIconicBitmapsFnc(nullptr),
+	m_DwmIsCompositionEnabled(nullptr),
 	m_OSD(this),
+	m_wndView(this),
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
 	m_wndInfoBar(this),
@@ -828,16 +831,21 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	s.strFSMonOnLaunch = s.strFullScreenMonitor;
 	GetCurDispMode(s.dmFSMonOnLaunch, s.strFSMonOnLaunch);
 
-	if (SysVersion::IsWin7orLater()) {
-		m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
-		if (m_hDWMAPI) {
-			if (SysVersion::IsWin10orLater()) {
-				(FARPROC &)m_DwmGetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
-			} else {
-				(FARPROC &)m_DwmSetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
-				(FARPROC &)m_DwmSetIconicThumbnailFnc         = GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
-				(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc = GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
-				(FARPROC &)m_DwmInvalidateIconicBitmapsFnc    = GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
+	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
+	if (m_hDWMAPI) {
+		if (SysVersion::IsWin10orLater()) {
+			(FARPROC &)m_DwmGetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
+		} else {
+			(FARPROC &)m_DwmSetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
+			(FARPROC &)m_DwmSetIconicThumbnailFnc         = GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
+			(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc = GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
+			(FARPROC &)m_DwmInvalidateIconicBitmapsFnc    = GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
+		}
+
+		if (!SysVersion::IsWin8orLater()) {
+			(FARPROC&)m_DwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
+			if (m_DwmIsCompositionEnabled) {
+				m_DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
 			}
 		}
 	}
@@ -2124,6 +2132,15 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT CMainFrame::OnDwmCompositionChanged(WPARAM wParam, LPARAM lParam)
+{
+	if (m_DwmIsCompositionEnabled) {
+		m_DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
+	}
+
+	return 0;
+}
+
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	// Only stop screensaver if video playing; allow for audio only
@@ -2182,6 +2199,7 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 			StartAutoHideCursor();
 		}
 		m_lastMouseMove.x = m_lastMouseMove.y = -1;
+		RepaintVideo();
 	} else {
 		if (!m_bHideCursor) {
 			StopAutoHideCursor();
