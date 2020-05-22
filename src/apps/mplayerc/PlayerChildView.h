@@ -23,6 +23,8 @@
 
 #include "PngImage.h"
 
+class CMainFrame;
+
 class CChildView : public CWnd
 {
 	CRect m_vrect;
@@ -34,8 +36,10 @@ class CChildView : public CWnd
 	HCURSOR m_hCursor = nullptr;
 	CPoint m_lastMousePoint{ -1, -1 };
 
+	CMainFrame* m_pMainFrame = nullptr;
+
 public:
-	CChildView();
+	CChildView(CMainFrame* pMainFrame);
 	~CChildView() = default;
 
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -61,6 +65,7 @@ protected:
 
 	virtual BOOL OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput);
 
+	afx_msg void OnPaint();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);

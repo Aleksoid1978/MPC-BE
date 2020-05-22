@@ -885,6 +885,7 @@ public:
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDwmCompositionChanged(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg BOOL OnNcActivate(BOOL bActive);
@@ -1281,6 +1282,8 @@ public:
 	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)(HWND hwnd, HBITMAP hbmp, DWORD dwSITFlags);
 	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt POINT *pptClient, DWORD dwSITFlags);
 	HRESULT		(__stdcall * m_DwmInvalidateIconicBitmapsFnc)(HWND hwnd);
+	HRESULT		(__stdcall * m_DwmIsCompositionEnabled)(__out BOOL* pfEnabled);
+	BOOL		m_bDesktopCompositionEnabled = TRUE;
 
 	HBITMAP		m_CaptureWndBitmap;
 	bool		isWindowMinimized;
@@ -1348,8 +1351,6 @@ public:
 	// DVD path can be supplemented with "VIDEO_TS.IFO" if necessary
 	BOOL CheckDVD(CString& path);
 
-	bool m_bUseReclock;
-
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
@@ -1359,6 +1360,8 @@ private:
 	int			m_nAudioTrackStored    = -1;
 	int			m_nSubtitleTrackStored = -1;
 	bool		m_bRememberSelectedTracks = true;
+
+	bool		m_bUseReclock = false;
 
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);

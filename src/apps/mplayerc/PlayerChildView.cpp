@@ -28,8 +28,9 @@
 
 // CChildView
 
-CChildView::CChildView()
+CChildView::CChildView(CMainFrame* pMainFrame)
 	: m_hCursor(::LoadCursorW(nullptr, IDC_ARROW))
+	, m_pMainFrame(pMainFrame)
 {
 	LoadLogo();
 }
@@ -60,8 +61,7 @@ void CChildView::OnMouseLeave()
 	CRect r;
 	GetClientRect(r);
 	if (!r.PtInRect(p)) {
-		auto pFrame = AfxGetMainFrame();
-		pFrame->StopAutoHideCursor();
+		m_pMainFrame->StopAutoHideCursor();
 	}
 
 	m_bTrackingMouseLeave = false;
@@ -82,7 +82,7 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CChildView::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput)
 {
-	return AfxGetMainFrame()->OnTouchInput(pt, nInputNumber, nInputsCount, pInput);
+	return m_pMainFrame->OnTouchInput(pt, nInputNumber, nInputsCount, pInput);
 }
 
 BOOL CChildView::PreTranslateMessage(MSG* pMsg)
@@ -107,7 +107,7 @@ BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 		CWnd* pParent = GetParent();
 		::MapWindowPoints(pMsg->hwnd, pParent->m_hWnd, &point, 1);
 
-		const bool fInteractiveVideo = AfxGetMainFrame()->IsInteractiveVideo();
+		const bool fInteractiveVideo = m_pMainFrame->IsInteractiveVideo();
 		if (fInteractiveVideo &&
 				(pMsg->message == WM_LBUTTONDOWN || pMsg->message == WM_LBUTTONUP || pMsg->message == WM_MOUSEMOVE)) {
 			if (pMsg->message == WM_MOUSEMOVE) {
@@ -179,6 +179,7 @@ void CChildView::ClearResizedImage()
 IMPLEMENT_DYNAMIC(CChildView, CWnd)
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
+	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_WM_SETCURSOR()
@@ -190,6 +191,15 @@ END_MESSAGE_MAP()
 
 // CChildView message handlers
 
+void CChildView::OnPaint()
+{
+	CPaintDC dc(this);
+
+	if (!m_pMainFrame->m_bDesktopCompositionEnabled) {
+		m_pMainFrame->RepaintVideo();
+	}
+}
+
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
 	CAutoLock cAutoLock(&m_csLogo);
@@ -197,14 +207,12 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	CRect r;
 	GetClientRect(r);
 
-	auto pFrame = AfxGetMainFrame();
-
 	COLORREF bkcolor = 0;
 	CImage img;
-	if (pFrame->IsD3DFullScreenMode() ||
-			((pFrame->m_eMediaLoadState != MLS_LOADED || pFrame->m_bAudioOnly) && !pFrame->m_bNextIsOpened)) {
-		if (!pFrame->m_InternalImage.IsNull()) {
-			img.Attach(pFrame->m_InternalImage);
+	if (m_pMainFrame->IsD3DFullScreenMode() ||
+			((m_pMainFrame->m_eMediaLoadState != MLS_LOADED || m_pMainFrame->m_bAudioOnly) && !m_pMainFrame->m_bNextIsOpened)) {
+		if (!m_pMainFrame->m_InternalImage.IsNull()) {
+			img.Attach(m_pMainFrame->m_InternalImage);
 		} else if (!m_logo.IsNull()) {
 			img.Attach(m_logo);
 			bkcolor = m_logo.GetPixel(0,0);
@@ -251,22 +259,19 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
-	auto pFrame = AfxGetMainFrame();
-	pFrame->MoveVideoWindow();
-	pFrame->UpdateThumbnailClip();
+	m_pMainFrame->MoveVideoWindow();
+	m_pMainFrame->UpdateThumbnailClip();
 }
 
 BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
-	auto pFrame = AfxGetMainFrame();
-
-	if (pFrame->m_bHideCursor) {
+	if (m_pMainFrame->m_bHideCursor) {
 		::SetCursor(nullptr);
 		return TRUE;
 	}
 
-	if (pFrame->IsSomethingLoaded() && (nHitTest == HTCLIENT)) {
-		if (pFrame->GetPlaybackMode() == PM_DVD) {
+	if (m_pMainFrame->IsSomethingLoaded() && (nHitTest == HTCLIENT)) {
+		if (m_pMainFrame->GetPlaybackMode() == PM_DVD) {
 			return FALSE;
 		}
 
@@ -282,12 +287,10 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 {
 	UINT nHitTest = CWnd::OnNcHitTest(point);
 
-	auto pFrame = AfxGetMainFrame();
-
 	WINDOWPLACEMENT wp;
-	pFrame->GetWindowPlacement(&wp);
+	m_pMainFrame->GetWindowPlacement(&wp);
 
-	if (!pFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS) {
+	if (!m_pMainFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS) {
 		CRect rcClient, rcFrame;
 		GetWindowRect(&rcFrame);
 		rcClient = rcFrame;
@@ -327,10 +330,9 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 
 void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
-	auto pFrame = AfxGetMainFrame();
 	bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN);
 
-	if (!pFrame->m_bFullScreen && (pFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
+	if (!m_pMainFrame->m_bFullScreen && (m_pMainFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
 		BYTE bFlag = 0;
 		switch (nHitTest) {
 			case HTTOP:
@@ -360,7 +362,7 @@ void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 		}
 
 		if (bFlag) {
-			pFrame->PostMessageW(WM_SYSCOMMAND, (SC_SIZE | bFlag), (LPARAM)POINTTOPOINTS(point));
+			m_pMainFrame->PostMessageW(WM_SYSCOMMAND, (SC_SIZE | bFlag), (LPARAM)POINTTOPOINTS(point));
 		} else {
 			CWnd::OnNcLButtonDown(nHitTest, point);
 		}
