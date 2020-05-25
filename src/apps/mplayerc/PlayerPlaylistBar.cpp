@@ -2953,11 +2953,12 @@ void CPlayerPlaylistBar::OnMouseMove(UINT nFlags, CPoint point)
 		m_pDragImage->DragMove(m_ptDropPoint);
 		m_pDragImage->DragShowNolock(FALSE);
 
-		WindowFromPoint(m_ptDropPoint)->ScreenToClient(&m_ptDropPoint);
+		const auto CWnd = WindowFromPoint(m_ptDropPoint);
+		if (CWnd && CWnd->GetSafeHwnd() == m_list.GetSafeHwnd()) {
+			CWnd->ScreenToClient(&m_ptDropPoint);
 
-		m_pDragImage->DragShowNolock(TRUE);
+			m_pDragImage->DragShowNolock(TRUE);
 
-		{
 			int iOverItem = m_list.HitTest(m_ptDropPoint);
 			int iTopItem = m_list.GetTopIndex();
 			int iBottomItem = m_list.GetBottomIndex();
@@ -2968,11 +2969,15 @@ void CPlayerPlaylistBar::OnMouseMove(UINT nFlags, CPoint point)
 				KillTimer(1);
 			}
 
-			if (iOverItem >= iBottomItem && iBottomItem != (m_list.GetItemCount() - 1)) { // bottom of list
+			if ((iOverItem >= iBottomItem && iBottomItem != (m_list.GetItemCount() - 1))) { // bottom of list
 				SetTimer(2, 100, nullptr);
 			} else {
 				KillTimer(2);
 			}
+		} else {
+			m_pDragImage->DragShowNolock(TRUE);
+			KillTimer(1);
+			KillTimer(2);
 		}
 	}
 
