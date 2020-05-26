@@ -2291,12 +2291,12 @@ CString ConvertDVBString(const BYTE* pBuffer, int nLength)
 		28591, // 0d - reserved
 		28591, // 0e - reserved
 		28591, // 0f - reserved
-		0,      // 10 - See codepages10 array
+		0,     // 10 - See codepages10 array
 		28591, // 11 - ??? - ISO/IEC 10646 - Basic Multilingual Plane (BMP)
 		28591, // 12 - ??? - KSX1001-2004 - Korean Character Set
 		20936, // 13 - Chinese Simplified (GB2312-80)
 		950,   // 14 - Chinese Traditional (Big5)
-		28591, // 15 - ??? - UTF-8 encoding of ISO/IEC 10646 - Basic Multilingual Plane (BMP)
+		65001, // 15 - ??? - UTF-8 encoding of ISO/IEC 10646 - Basic Multilingual Plane (BMP)
 		28591, // 16 - reserved
 		28591, // 17 - reserved
 		28591, // 18 - reserved
