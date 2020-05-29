@@ -616,7 +616,7 @@ namespace Youtube
 							getJsonValue(format, "qualityLabel", std::get<3>(element));
 							if (getJsonValue(format, "url", std::get<1>(element))) {
 								streamingDataFormatList.emplace_back(element);
-							} else if (getJsonValue(format, "cipher", std::get<2>(element))) {
+							} else if (getJsonValue(format, "cipher", std::get<2>(element)) || getJsonValue(format, "signatureCipher", std::get<2>(element))) {
 								streamingDataFormatList.emplace_back(element);
 							}
 						}
@@ -636,7 +636,7 @@ namespace Youtube
 							getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
 							if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))) {
 								streamingDataFormatList.emplace_back(element);
-							} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element))) {
+							} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
 								streamingDataFormatList.emplace_back(element);
 							}
 						}
