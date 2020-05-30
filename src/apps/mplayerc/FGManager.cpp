@@ -1108,22 +1108,22 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						m_pUnks.AddTail(pVMRMC9);
 					}
 
-					if (CComQIPtr<IMFVideoMixerBitmap> pMFVMB = pBF) { // get custom EVR-CP or EVR-Sync interface
+					CComQIPtr<IMFVideoMixerBitmap> pMFVMB = pBF; // get custom EVR-CP or EVR-Sync interface
+					if (pMFVMB) {
 						m_pUnks.AddTail(pMFVMB);
 					}
 
 					if (CComQIPtr<IMFGetService> pMFGS = pBF) {
 						CComPtr<IMFVideoDisplayControl>	pMFVDC;
-						//CComPtr<IMFVideoMixerBitmap>	pMFVMB;
 						CComPtr<IMFVideoProcessor>		pMFVP;
 
 						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
 							m_pUnks.AddTail(pMFVDC);
 						}
 
-						//if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFVMB)))) { // get EVR-Mixer interface
-						//	m_pUnks.AddTail(pMFVMB);
-						//}
+						if (!pMFVMB && SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFVMB)))) {
+							m_pUnks.AddTail(pMFVMB);
+						}
 
 						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFVP)))) {
 							m_pUnks.AddTail(pMFVP);
