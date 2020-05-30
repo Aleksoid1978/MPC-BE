@@ -120,7 +120,7 @@ MPCBEShellExt (расширение проводника)
 Обновлен греческий перевод (автор George).
 
 Обновлены библиотеки:
-	dav1d git-0.6.0-80-g114e8f0;
+	dav1d git-0.7.0-4-ged39e8f;
 	ffmpeg git-n4.3-dev-3299-gff4da60fb8;
 	libflac git-1.3.3-54-gcffe3890;
 	libpng git-v1.6.37-16-g6dd99ca9c;
