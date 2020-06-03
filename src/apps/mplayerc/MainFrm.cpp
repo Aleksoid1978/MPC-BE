@@ -4271,7 +4271,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	SetLoadState(MLS_LOADED);
 
 	// destroy invisible top-level d3dfs window if there is no video renderer
-	if (IsD3DFullScreenMode() && !m_pMFVDC && !m_pVMRWC) {
+	if (IsD3DFullScreenMode() && !m_pD3DFS) {
 		DestroyD3DWindow();
 		m_bStartInD3DFullscreen = true;
 	}
