@@ -10777,6 +10777,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bAudioOnly = fAudioOnly;
 
+	SetMenuBarState(AFX_MBS_HIDDEN);
 	if (!m_bFullScreen) {
 		SetMenuBarVisibility(s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU ?
 							 AFX_MBV_KEEPVISIBLE : AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
