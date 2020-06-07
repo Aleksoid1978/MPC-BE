@@ -525,68 +525,8 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 /////////////////////////////////////////////////////////////////////////////
 // CMPlayerCApp initialization
 
-BOOL (__stdcall * Real_IsDebuggerPresent)(void)
-	= IsDebuggerPresent;
-
-LONG (__stdcall * Real_ChangeDisplaySettingsExA)(LPCSTR a0,
-		LPDEVMODEA a1,
-		HWND a2,
-		DWORD a3,
-		LPVOID a4)
-	= ChangeDisplaySettingsExA;
-
-LONG (__stdcall * Real_ChangeDisplaySettingsExW)(LPCWSTR a0,
-		LPDEVMODEW a1,
-		HWND a2,
-		DWORD a3,
-		LPVOID a4)
-	= ChangeDisplaySettingsExW;
-
-HANDLE (__stdcall * Real_CreateFileA)(LPCSTR a0,
-									  DWORD a1,
-									  DWORD a2,
-									  LPSECURITY_ATTRIBUTES a3,
-									  DWORD a4,
-									  DWORD a5,
-									  HANDLE a6)
-	= CreateFileA;
-
-HANDLE (__stdcall * Real_CreateFileW)(LPCWSTR a0,
-									  DWORD a1,
-									  DWORD a2,
-									  LPSECURITY_ATTRIBUTES a3,
-									  DWORD a4,
-									  DWORD a5,
-									  HANDLE a6)
-	= CreateFileW;
-
-BOOL (__stdcall * Real_DeviceIoControl)(HANDLE a0,
-										DWORD a1,
-										LPVOID a2,
-										DWORD a3,
-										LPVOID a4,
-										DWORD a5,
-										LPDWORD a6,
-										LPOVERLAPPED a7)
-	= DeviceIoControl;
-
-MMRESULT  (__stdcall * Real_mixerSetControlDetails)( HMIXEROBJ hmxobj,
-		LPMIXERCONTROLDETAILS pmxcd,
-		DWORD fdwDetails)
-	= mixerSetControlDetails;
-
-typedef NTSTATUS (WINAPI *FUNC_NTQUERYINFORMATIONPROCESS)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
-static FUNC_NTQUERYINFORMATIONPROCESS		Real_NtQueryInformationProcess = nullptr;
-
-/*
-NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
-											 PROCESSINFOCLASS	ProcessInformationClass,
-											 PVOID				ProcessInformation,
-											 ULONG				ProcessInformationLength,
-											 PULONG				ReturnLength)
-	= nullptr;
-*/
-
+// This hook prevents the program from reporting that a debugger is attached
+BOOL (__stdcall * Real_IsDebuggerPresent)() = IsDebuggerPresent;
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
 #ifdef _DEBUG
@@ -596,6 +536,12 @@ BOOL WINAPI Mine_IsDebuggerPresent()
 	return FALSE;
 }
 
+// This hook prevents the program from reporting that a debugger is attached
+typedef NTSTATUS(WINAPI *FUNC_NTQUERYINFORMATIONPROCESS)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
+static FUNC_NTQUERYINFORMATIONPROCESS		Real_NtQueryInformationProcess = nullptr;
+/*
+NTSTATUS(WINAPI* Real_NtQueryInformationProcess)(HANDLE, PROCESSINFOCLASS, PVOID, ULONG, PULONG) = nullptr;
+*/
 NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength)
 {
 	NTSTATUS nRet;
@@ -603,16 +549,15 @@ NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFO
 	nRet = Real_NtQueryInformationProcess(ProcessHandle, ProcessInformationClass, ProcessInformation, ProcessInformationLength, ReturnLength);
 
 	if (ProcessInformationClass == ProcessBasicInformation) {
-		PROCESS_BASIC_INFORMATION*		pbi = (PROCESS_BASIC_INFORMATION*)ProcessInformation;
-		PEB_NT*							pPEB;
-		PEB_NT							PEB;
+		PROCESS_BASIC_INFORMATION* pbi = (PROCESS_BASIC_INFORMATION*)ProcessInformation;
+		PEB_NT* pPEB = (PEB_NT*)pbi->PebBaseAddress;
+		PEB_NT PEB;
 
-		pPEB = (PEB_NT*)pbi->PebBaseAddress;
 		ReadProcessMemory(ProcessHandle, pPEB, &PEB, sizeof(PEB), nullptr);
 		PEB.BeingDebugged = 0;
 		WriteProcessMemory(ProcessHandle, pPEB, &PEB, sizeof(PEB), nullptr);
 	} else if (ProcessInformationClass == 7) { // ProcessDebugPort
-		BOOL*		pDebugPort = (BOOL*)ProcessInformation;
+		BOOL* pDebugPort = (BOOL*)ProcessInformation;
 		*pDebugPort = FALSE;
 	}
 
@@ -621,7 +566,7 @@ NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFO
 
 LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 {
-	if (dwFlags&CDS_VIDEOPARAMETERS) {
+	if (dwFlags & CDS_VIDEOPARAMETERS) {
 		VIDEOPARAMETERS* vp = (VIDEOPARAMETERS*)lParam;
 
 		if (vp->Guid == GUIDFromCString(L"{02C62061-1097-11d1-920F-00A024DF156E}")
@@ -642,28 +587,23 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 	return ret;
 }
 
+// These two hooks prevent the program from requesting Macrovision checks
+LONG (__stdcall * Real_ChangeDisplaySettingsExA)(LPCSTR, LPDEVMODEA, HWND, DWORD, LPVOID) = ChangeDisplaySettingsExA;
+LONG (__stdcall * Real_ChangeDisplaySettingsExW)(LPCWSTR, LPDEVMODEW, HWND, DWORD, LPVOID) = ChangeDisplaySettingsExW;
 LONG WINAPI Mine_ChangeDisplaySettingsExA(LPCSTR lpszDeviceName, LPDEVMODEA lpDevMode, HWND hwnd, DWORD dwFlags, LPVOID lParam)
 {
-	return Mine_ChangeDisplaySettingsEx(
-			   Real_ChangeDisplaySettingsExA(lpszDeviceName, lpDevMode, hwnd, dwFlags, lParam),
-			   dwFlags,
-			   lParam);
+	return Mine_ChangeDisplaySettingsEx(Real_ChangeDisplaySettingsExA(lpszDeviceName, lpDevMode, hwnd, dwFlags, lParam), dwFlags, lParam);
 }
 
 LONG WINAPI Mine_ChangeDisplaySettingsExW(LPCWSTR lpszDeviceName, LPDEVMODEW lpDevMode, HWND hwnd, DWORD dwFlags, LPVOID lParam)
 {
-	return Mine_ChangeDisplaySettingsEx(
-			   Real_ChangeDisplaySettingsExW(lpszDeviceName, lpDevMode, hwnd, dwFlags, lParam),
-			   dwFlags,
-			   lParam);
+	return Mine_ChangeDisplaySettingsEx(Real_ChangeDisplaySettingsExW(lpszDeviceName, lpDevMode, hwnd, dwFlags, lParam), dwFlags, lParam);
 }
 
+// This hook forces files to open even if they are currently being written
+HANDLE (__stdcall * Real_CreateFileA)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE) = CreateFileA;
 HANDLE WINAPI Mine_CreateFileA(LPCSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIBUTES p4, DWORD p5, DWORD p6, HANDLE p7)
 {
-	//CStringA fn(p1);
-	//fn.MakeLower();
-	//int i = fn.Find(".part");
-	//if (i > 0 && i == fn.GetLength() - 5)
 	p3 |= FILE_SHARE_WRITE;
 
 	return Real_CreateFileA(p1, p2, p3, p4, p5, p6, p7);
@@ -671,11 +611,11 @@ HANDLE WINAPI Mine_CreateFileA(LPCSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIBU
 
 BOOL CreateFakeVideoTS(LPCWSTR strIFOPath, LPWSTR strFakeFile, size_t nFakeFileSize)
 {
-	BOOL	bRet = FALSE;
-	WCHAR	szTempPath[MAX_PATH];
-	WCHAR	strFileName[_MAX_FNAME];
-	WCHAR	strExt[_MAX_EXT];
-	CIfo	Ifo;
+	BOOL  bRet = FALSE;
+	WCHAR szTempPath[MAX_PATH];
+	WCHAR strFileName[_MAX_FNAME];
+	WCHAR strExt[_MAX_EXT];
+	CIfo  Ifo;
 
 	if (!GetTempPathW(MAX_PATH, szTempPath)) {
 		return FALSE;
@@ -684,24 +624,25 @@ BOOL CreateFakeVideoTS(LPCWSTR strIFOPath, LPWSTR strFakeFile, size_t nFakeFileS
 	_wsplitpath_s(strIFOPath, nullptr, 0, nullptr, 0, strFileName, _countof(strFileName), strExt, _countof(strExt));
 	_snwprintf_s(strFakeFile, nFakeFileSize, _TRUNCATE, L"%sMPC%s%s", szTempPath, strFileName, strExt);
 
-	if (Ifo.OpenFile (strIFOPath) &&
-			Ifo.RemoveUOPs()  &&
-			Ifo.SaveFile (strFakeFile)) {
+	if (Ifo.OpenFile(strIFOPath) && Ifo.RemoveUOPs() && Ifo.SaveFile(strFakeFile)) {
 		bRet = TRUE;
 	}
 
 	return bRet;
 }
 
+// This hook forces files to open even if they are currently being written and hijacks
+// IFO file opening so that a modified IFO with no forbidden operations is opened instead.
+HANDLE (__stdcall * Real_CreateFileW)(LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE) = CreateFileW;
 HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIBUTES p4, DWORD p5, DWORD p6, HANDLE p7)
 {
-	HANDLE	hFile = INVALID_HANDLE_VALUE;
-	WCHAR	strFakeFile[MAX_PATH];
-	int		nLen  = wcslen(p1);
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	size_t nLen = wcslen(p1);
 
 	p3 |= FILE_SHARE_WRITE;
 
-	if (nLen>=4 && _wcsicmp (p1 + nLen-4, L".ifo") == 0) {
+	if (nLen >= 4 && _wcsicmp(p1 + nLen - 4, L".ifo") == 0) {
+		WCHAR strFakeFile[MAX_PATH];
 		if (CreateFakeVideoTS(p1, strFakeFile, _countof(strFakeFile))) {
 			hFile = Real_CreateFileW(strFakeFile, p2, p3, p4, p5, p6, p7);
 
@@ -723,25 +664,27 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 	return hFile;
 }
 
-MMRESULT WINAPI Mine_mixerSetControlDetails(HMIXEROBJ hmxobj, LPMIXERCONTROLDETAILS pmxcd, DWORD fdwDetails)
-{
-	if (fdwDetails == (MIXER_OBJECTF_HMIXER|MIXER_SETCONTROLDETAILSF_VALUE)) {
-		return MMSYSERR_NOERROR;    // don't touch the mixer, kthx
-	}
-	return Real_mixerSetControlDetails(hmxobj, pmxcd, fdwDetails);
-}
-
+// This hooks disables the DVD version check
+BOOL (__stdcall * Real_DeviceIoControl)(HANDLE, DWORD, LPVOID, DWORD, LPVOID, DWORD, LPDWORD, LPOVERLAPPED) = DeviceIoControl;
 BOOL WINAPI Mine_DeviceIoControl(HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped)
 {
 	BOOL ret = Real_DeviceIoControl(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, lpOverlapped);
 
-	if (IOCTL_DVD_GET_REGION == dwIoControlCode && lpOutBuffer
-			&& lpBytesReturned && *lpBytesReturned == sizeof(DVD_REGION)) {
+	if (IOCTL_DVD_GET_REGION == dwIoControlCode && lpOutBuffer && lpBytesReturned && *lpBytesReturned == sizeof(DVD_REGION)) {
 		DVD_REGION* pDVDRegion = (DVD_REGION*)lpOutBuffer;
 		pDVDRegion->SystemRegion = ~pDVDRegion->RegionData;
 	}
 
 	return ret;
+}
+
+MMRESULT (__stdcall * Real_mixerSetControlDetails)(HMIXEROBJ, LPMIXERCONTROLDETAILS, DWORD) = mixerSetControlDetails;
+MMRESULT WINAPI Mine_mixerSetControlDetails(HMIXEROBJ hmxobj, LPMIXERCONTROLDETAILS pmxcd, DWORD fdwDetails)
+{
+	if (fdwDetails == (MIXER_OBJECTF_HMIXER | MIXER_SETCONTROLDETAILSF_VALUE)) {
+		return MMSYSERR_NOERROR;    // don't touch the mixer, kthx
+	}
+	return Real_mixerSetControlDetails(hmxobj, pmxcd, fdwDetails);
 }
 
 static BOOL SetHeapOptions()
@@ -798,7 +741,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	HMODULE hNTDLL = LoadLibraryW(L"ntdll.dll");
 
-#ifndef _DEBUG	// Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
+#ifndef _DEBUG // Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
 	if (hNTDLL) {
 		Real_NtQueryInformationProcess = (FUNC_NTQUERYINFORMATIONPROCESS)GetProcAddress (hNTDLL, "NtQueryInformationProcess");
 
