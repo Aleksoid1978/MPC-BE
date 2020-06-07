@@ -220,7 +220,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetFlip(bool flip)
 		bool curFlip = false;
 		hr = pIExFilterConfig->GetBool("flip", &curFlip);
 		if (SUCCEEDED(hr) && flip != curFlip) {
-			hr = pIExFilterConfig->SetInt("flip", flip);
+			hr = pIExFilterConfig->SetBool("flip", flip);
 			if (SUCCEEDED(hr)) {
 				m_bOtherTransform = true;
 			}
