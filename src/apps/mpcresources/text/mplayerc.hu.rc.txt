@@ -431,8 +431,8 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 18		"Textúra beállítások (nyissa meg újra a videót, hogy láthassa a különbségeket)"
 19		"Előre olvasandó feliratképek száma:"
 22		"Legnagyobb textúra felbontás:"
-24		"Animálás engedélyezése előre olvasáskor"
-26		"Engedd meg, hogy várjon néhány alképet, ha a sor késik"
+24		"Animáció engedélyezése pufferelés közben"
+26		"Engedje meg, hogy várjon néhány alképet, ha a sor késik"
 28		"Figyelmeztetés"
 29		"Ha felülbírálva engedélyezi a videokártyája beállításainál a teljes képernyős vonalsimítást, a feliratok akkor sem lesznek szebbek, viszont a processzorát teljesen leterheli vele."
 END
