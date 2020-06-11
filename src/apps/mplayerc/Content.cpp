@@ -422,9 +422,11 @@ namespace Content {
 				playlist_type = PLAYLIST_HTML_META_REFRESH;
 			}
 
-			if (!body.IsEmpty()) {
+			if (playlist_type != PLAYLIST_NONE) {
 				if (fn.Find(L"://") >= 0) {
-					FindRedir(urlParser, body, *redir, playlist_type);
+					if (!body.IsEmpty()) {
+						FindRedir(urlParser, body, *redir, playlist_type);
+					}
 				} else {
 					FindRedir(fn, *redir, playlist_type);
 				}
