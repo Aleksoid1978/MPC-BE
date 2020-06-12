@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -151,7 +151,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	return Flags;
 }
 
-void FillAVCodecProps(struct AVCodecContext* pAVCtx)
+void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 {
 	// fill "Pixel format" properties
 	if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
@@ -206,7 +206,11 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			break;
 		case AV_CODEC_ID_PNG:
 		case AV_CODEC_ID_JPEG2000:
-			pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+			if (pBMI->biBitCount > 32) {
+				pAVCtx->pix_fmt = AV_PIX_FMT_RGB48BE;
+			} else {
+				pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+			}
 			break;
 		case AV_CODEC_ID_HQ_HQA:
 			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
