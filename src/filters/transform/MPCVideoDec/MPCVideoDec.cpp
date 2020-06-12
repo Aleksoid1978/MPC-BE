@@ -2014,7 +2014,7 @@ redo:
 		}
 	}
 
-	FillAVCodecProps(m_pAVCtx);
+	FillAVCodecProps(m_pAVCtx, pBMI);
 
 	if (pFilter) {
 		CComPtr<IExFilterInfo> pIExFilterInfo;
