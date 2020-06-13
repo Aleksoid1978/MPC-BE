@@ -2630,13 +2630,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// palm demuxer crashes (even crashes graphedit when dropping an .ac3 onto it)
 	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{BE2CF8A7-08CE-4A2C-9A25-FD726A999196}"), MERIT64_DO_NOT_USE));
 
-	// DCDSPFilter (early versions crash mpc)
-	{
+	{ // DCDSPFilter (early versions crash mpc)
 		CRegKey key;
-
 		WCHAR buff[256] = { 0 };
 		ULONG len = _countof(buff);
-
 		CString clsid = L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}";
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
@@ -2648,6 +2645,11 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// mainconcept color space converter
 	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{272D77A0-A852-4851-ADA4-9091FEAD4C86}"), MERIT64_DO_NOT_USE));
+
+	// Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
+	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{4C4CD9E1-F876-11D2-962F-00500471FDDC}"), MERIT64_DO_NOT_USE));
+
+	// Subtitle renderers
 
 	bool VRwithSR =
 		rs.iVideoRenderer == VIDRNDT_MADVR ||
@@ -2699,9 +2701,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			break;
 #endif
 	}
-
-	// Blacklist Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
-	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{4C4CD9E1-F876-11D2-962F-00500471FDDC}"), MERIT64_DO_NOT_USE));
 
 	// Overrides
 	WORD merit_low = 1;
