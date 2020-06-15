@@ -369,15 +369,6 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	return hr;
 }
 
-STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::DisplayChange()
-{
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
-		return SUCCEEDED(pIExFilterConfig->SetBool("displayChange", true));
-	}
-
-	return false;
-}
-
 STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
