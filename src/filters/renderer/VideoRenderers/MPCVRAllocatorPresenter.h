@@ -81,7 +81,6 @@ namespace DSObjects
 		STDMETHODIMP_(int) GetPixelShaderMode() override;
 		STDMETHODIMP ClearPixelShaders(int target) override;
 		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) override;
-		STDMETHODIMP_(bool) DisplayChange() override;
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }
