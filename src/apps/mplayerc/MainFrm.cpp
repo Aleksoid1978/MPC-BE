@@ -138,9 +138,13 @@ public:
 
 #define WM_HANDLE_CMDLINE (WM_USER + 300)
 
+#define WM_MPCVR_SWITCH_FULLSCREEN (WM_APP + 0x1000)
+
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
+	ON_MESSAGE(WM_MPCVR_SWITCH_FULLSCREEN, OnMPCVRSwitchFullscreen)
+
 	ON_MESSAGE(WM_HANDLE_CMDLINE, HandleCmdLine)
 
 	ON_WM_CREATE()
@@ -610,7 +614,6 @@ CMainFrame::CMainFrame() :
 	m_bUseSmartSeek(false),
 	m_flastnID(0),
 	m_bfirstPlay(false),
-	IsMadVRExclusiveMode(false),
 	m_pBFmadVR(nullptr),
 	m_hDWMAPI(0),
 	m_hWtsLib(0),
@@ -1635,7 +1638,7 @@ bool CMainFrame::FlyBarSetPos()
 		return false;
 	}
 
-	if (IsMadVRExclusiveMode || !m_wndView.IsWindowVisible()) {
+	if (IsMadVRExclusiveMode || IsMPCVRExclusiveMode || !m_wndView.IsWindowVisible()) {
 		if (m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
@@ -5215,6 +5218,30 @@ void CMainFrame::OnUpdateFileOpen(CCmdUI* pCmdUI)
 	if (pCmdUI->m_nID == ID_FILE_OPENISO && pCmdUI->m_pMenu != nullptr && !m_DiskImage.DriveAvailable()) {
 		pCmdUI->m_pMenu->DeleteMenu(pCmdUI->m_nID, MF_BYCOMMAND);
 	}
+}
+
+LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
+{
+	const auto& s = AfxGetAppSettings();
+	IsMPCVRExclusiveMode = static_cast<bool>(wParam);
+
+	m_OSD.Stop();
+	if (IsMPCVRExclusiveMode) {
+		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
+			if (m_pMFVMB) {
+				m_OSD.Start(m_pVideoWnd, m_pMFVMB);
+			}
+		}
+	} else {
+		if (s.iShowOSD & OSD_ENABLE) {
+			m_OSD.Start(m_pOSDWnd);
+		}
+	}
+
+	FlyBarSetPos();
+	OSDBarSetPos();
+
+	return 0;
 }
 
 LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
@@ -14134,6 +14161,7 @@ void CMainFrame::CloseMediaPrivate()
 		m_pBFmadVR.Release();
 	}
 	IsMadVRExclusiveMode = false;
+	IsMPCVRExclusiveMode = false;
 
 	m_fLiveWM = false;
 	m_bEndOfStream = false;

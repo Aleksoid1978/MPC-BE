@@ -967,6 +967,8 @@ public:
 	afx_msg void OnFileOpenMedia();
 	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
 
+	LRESULT OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam);
+
 	std::mutex m_mutex_cmdLineQueue;
 	std::deque<std::vector<BYTE>> m_cmdLineQueue;
 	LRESULT HandleCmdLine(WPARAM wParam, LPARAM lParam);
@@ -1210,7 +1212,8 @@ public:
 	CFlyBar				m_wndFlyBar;
 	CPreView			m_wndPreView; // SmartSeek
 
-	bool			IsMadVRExclusiveMode;
+	bool IsMadVRExclusiveMode = false;
+	bool IsMPCVRExclusiveMode = false;
 
 	void CreateFlyBar();
 	bool FlyBarSetPos();
