@@ -271,7 +271,7 @@ BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	}
 
 	if (m_pMainFrame->IsSomethingLoaded() && (nHitTest == HTCLIENT)) {
-		if (m_pMainFrame->GetPlaybackMode() == PM_DVD) {
+		if (m_pMainFrame->m_bIsMPCVRExclusiveMode || m_pMainFrame->GetPlaybackMode() == PM_DVD) {
 			return FALSE;
 		}
 

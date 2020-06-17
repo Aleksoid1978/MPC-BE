@@ -1638,7 +1638,7 @@ bool CMainFrame::FlyBarSetPos()
 		return false;
 	}
 
-	if (IsMadVRExclusiveMode || IsMPCVRExclusiveMode || !m_wndView.IsWindowVisible()) {
+	if (m_bIsMadVRExclusiveMode || m_bIsMPCVRExclusiveMode || !m_wndView.IsWindowVisible()) {
 		if (m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
@@ -3616,6 +3616,10 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetFocus();
 
+	if (m_bIsMPCVRExclusiveMode && m_OSD.OnLButtonDown(nFlags, point)) {
+		return;
+	}
+
 	if (GetPlaybackMode() == PM_DVD) {
 		CRect vid_rect = m_wndView.GetVideoRect();
 		m_wndView.MapWindowPoints(this, &vid_rect);
@@ -3648,6 +3652,10 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	if (m_bIsMPCVRExclusiveMode && m_OSD.OnLButtonUp(nFlags, point)) {
+		return;
+	}
+
 	if (!m_bHideCursor) {
 		StartAutoHideCursor();
 	}
@@ -3843,6 +3851,15 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 			StopAutoHideCursor();
 			m_pFullscreenWnd->ShowCursor(true);
 			SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
+		} else if (m_bIsMPCVRExclusiveMode) {
+			StopAutoHideCursor();
+			SetTimer(TIMER_MOUSEHIDER, 2000, nullptr);
+
+			if (m_OSD.OnMouseMove(nFlags, point)) {
+				KillTimer(TIMER_MOUSEHIDER);
+			} else {
+				SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+			}
 		} else if (m_bFullScreen) {
 			int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
 
@@ -5223,10 +5240,10 @@ void CMainFrame::OnUpdateFileOpen(CCmdUI* pCmdUI)
 LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
 {
 	const auto& s = AfxGetAppSettings();
-	IsMPCVRExclusiveMode = static_cast<bool>(wParam);
+	m_bIsMPCVRExclusiveMode = static_cast<bool>(wParam);
 
 	m_OSD.Stop();
-	if (IsMPCVRExclusiveMode) {
+	if (m_bIsMPCVRExclusiveMode) {
 		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
 			if (m_pMFVMB) {
 				m_OSD.Start(m_pVideoWnd, m_pMFVMB);
@@ -13664,9 +13681,9 @@ void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 
 	CMainFrame* pFrame = (CMainFrame*)context;
 	if (event == ExclusiveModeIsAboutToBeEntered) {
-		pFrame->IsMadVRExclusiveMode = true;
+		pFrame->m_bIsMadVRExclusiveMode = true;
 	} else if (event == ExclusiveModeIsAboutToBeLeft) {
-		pFrame->IsMadVRExclusiveMode = false;
+		pFrame->m_bIsMadVRExclusiveMode = false;
 	}
 	pFrame->FlyBarSetPos();
 }
@@ -14045,7 +14062,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		IsMadVRExclusiveMode = false;
+		m_bIsMadVRExclusiveMode = false;
 		// madVR - register Callback function for detect Entered to ExclusiveMode
 		m_pBFmadVR = FindFilter(CLSID_madVR, m_pGB);
 		if (m_pBFmadVR) {
@@ -14160,8 +14177,8 @@ void CMainFrame::CloseMediaPrivate()
 		}
 		m_pBFmadVR.Release();
 	}
-	IsMadVRExclusiveMode = false;
-	IsMPCVRExclusiveMode = false;
+	m_bIsMadVRExclusiveMode = false;
+	m_bIsMPCVRExclusiveMode = false;
 
 	m_fLiveWM = false;
 	m_bEndOfStream = false;

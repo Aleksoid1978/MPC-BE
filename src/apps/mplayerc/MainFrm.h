@@ -1212,8 +1212,8 @@ public:
 	CFlyBar				m_wndFlyBar;
 	CPreView			m_wndPreView; // SmartSeek
 
-	bool IsMadVRExclusiveMode = false;
-	bool IsMPCVRExclusiveMode = false;
+	bool m_bIsMadVRExclusiveMode = false;
+	bool m_bIsMPCVRExclusiveMode = false;
 
 	void CreateFlyBar();
 	bool FlyBarSetPos();
