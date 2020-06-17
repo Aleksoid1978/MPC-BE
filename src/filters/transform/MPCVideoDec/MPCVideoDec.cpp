@@ -2634,6 +2634,10 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 			if (FAILED(hr)) {
 				CleanDXVAVariable();
+				CleanupD3DResources();
+				SAFE_DELETE(m_pDXVADecoder);
+				m_nDecoderMode = MODE_SOFTWARE;
+				DXVAState::ClearState();
 			}
 		}
 
