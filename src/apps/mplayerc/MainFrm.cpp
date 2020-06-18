@@ -3614,11 +3614,11 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	SetFocus();
-
 	if (m_bIsMPCVRExclusiveMode && m_OSD.OnLButtonDown(nFlags, point)) {
 		return;
 	}
+
+	SetFocus();
 
 	if (GetPlaybackMode() == PM_DVD) {
 		CRect vid_rect = m_wndView.GetVideoRect();
@@ -5244,6 +5244,10 @@ LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
 
 	m_OSD.Stop();
 	if (m_bIsMPCVRExclusiveMode) {
+		if (m_wndPlaylistBar.IsVisible()) {
+			m_wndPlaylistBar.SetHiddenDueToFullscreen(true);
+			ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
+		}
 		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
 			if (m_pMFVMB) {
 				m_OSD.Start(m_pVideoWnd, m_pMFVMB);
@@ -5252,6 +5256,10 @@ LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
 	} else {
 		if (s.iShowOSD & OSD_ENABLE) {
 			m_OSD.Start(m_pOSDWnd);
+		}
+		if (m_wndPlaylistBar.IsHiddenDueToFullscreen()) {
+			m_wndPlaylistBar.SetHiddenDueToFullscreen(false);
+			ShowControlBarInternal(&m_wndPlaylistBar, TRUE);
 		}
 	}
 
@@ -15728,6 +15736,10 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 		return;
 	}
 
+	if (nCS != CS_NONE && m_bFullScreen && m_bIsMPCVRExclusiveMode) {
+		return;
+	}
+
 	auto& s = AfxGetAppSettings();
 	int nCSprev = s.nCS;
 	int hbefore = 0, hafter = 0;
@@ -20228,6 +20240,10 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 
 void CMainFrame::ShowControlBarInternal(CControlBar* pBar, BOOL bShow)
 {
+	if (bShow && m_bFullScreen && m_bIsMPCVRExclusiveMode) {
+		return;
+	}
+
 	ShowControlBar(pBar, bShow, FALSE);
 	if (!bShow) {
 		RepaintVideo();
