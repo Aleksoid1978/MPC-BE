@@ -406,8 +406,7 @@ CAppSettings::~CAppSettings()
 
 bool CAppSettings::IsD3DFullscreen() const
 {
-	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CUSTOM
-			|| m_VRSettings.iVideoRenderer == VIDRNDT_SYNC) {
+	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
 		return fD3DFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
 	}
 

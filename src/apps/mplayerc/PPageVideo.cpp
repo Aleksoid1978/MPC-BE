@@ -461,8 +461,6 @@ void CPPageVideo::OnDSRendererChange()
 			m_spnEvrBuffers.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
-			m_chkD3DFullscreen.EnableWindow(TRUE);
-			m_chk10bitOutput.EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 
 			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);

@@ -6819,7 +6819,7 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	const CRenderersSettings& rs = s.m_VRSettings;
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM);
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(s.fD3DFullscreen);
