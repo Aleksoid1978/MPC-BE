@@ -2470,8 +2470,8 @@ STDMETHODIMP CSyncAP::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		hr = m_pD3DManager->QueryInterface (__uuidof(IDirect3DDeviceManager9), (void**) ppv);
 	} else if (riid == __uuidof(ISyncClockAdviser)) {
 		hr = GetInterface((ISyncClockAdviser*)this, ppv);
-	} else if (riid == __uuidof(ID3DFullscreenControl)) {
-		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
+	//} else if (riid == __uuidof(ID3DFullscreenControl)) {
+	//	hr = GetInterface((ID3DFullscreenControl*)this, ppv);
 	} else if (riid == __uuidof(IPlaybackNotify)) {
 		hr = GetInterface((IPlaybackNotify*)this, ppv);
 	} else {
