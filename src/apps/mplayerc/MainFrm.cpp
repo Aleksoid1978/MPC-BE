@@ -10403,6 +10403,7 @@ void CMainFrame::OnSubCopyClipboard()
 		if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
 			REFERENCE_TIME rtNow = 0;
 			m_pMS->GetCurrentPosition(&rtNow);
+			rtNow -= 10000i64 * m_pCAP->GetSubtitleDelay();
 
 			CString text;
 			if (pRTS->GetText(rtNow, m_pCAP->GetFPS(), text)) {
