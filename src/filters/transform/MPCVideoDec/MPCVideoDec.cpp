@@ -3355,7 +3355,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	hr = pIn->GetTime(&rtStart, &rtStop);
 	if (FAILED(hr)) {
 		rtStart = rtStop = INVALID_TIME;
-		DLogIf(!m_bDecodingStart, L"CMPCVideoDecFilter::Transform(): input sample without timestamps!")
+		DLogIf(!m_bDecodingStart, L"CMPCVideoDecFilter::Transform(): input sample without timestamps!");
 	} else if (hr == VFW_S_NO_STOP_TIME || rtStop - 1 <= rtStart) {
 		rtStop = INVALID_TIME;
 	}
