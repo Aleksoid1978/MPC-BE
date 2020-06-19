@@ -3107,6 +3107,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			rtStopIn = INVALID_TIME;
 		}
 
+		bool bSampleTime = !(m_nCodecId == AV_CODEC_ID_MJPEG && rtStartIn == INVALID_TIME);
 		UpdateFrameTime(rtStartIn, rtStopIn);
 
 		if (bPreroll || rtStartIn < 0) {
@@ -3146,7 +3147,9 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			m_FormatConverter.Converting(pDataOut, m_pFrame);
 		}
 
-		pOut->SetTime(&rtStartIn, &rtStopIn);
+		if (bSampleTime) {
+			pOut->SetTime(&rtStartIn, &rtStopIn);
+		}
 		pOut->SetMediaTime(nullptr, nullptr);
 		SetTypeSpecificFlags(pOut);
 
