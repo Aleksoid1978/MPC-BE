@@ -840,9 +840,9 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		return VFW_E_ALREADY_CONNECTED;
 	}
 
-	// skip Audio output Pin for preview mode;
-	if (m_bIsPreview) {
-		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
+	BeginEnumMediaTypes(pPinOut, pEM, pmt) {
+		// skip Audio output Pin for preview mode;
+		if (m_bIsPreview) {
 			// Allow only video
 			if (pmt->majortype == MEDIATYPE_Audio
 				|| pmt->majortype == MEDIATYPE_AUXLine21Data
@@ -850,40 +850,29 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				|| CMediaTypeEx(*pmt).ValidateSubtitle()) {
 				return S_FALSE;
 			}
-
 			// DVD
 			if (pmt->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && pmt->subtype != MEDIASUBTYPE_MPEG2_VIDEO) {
 				return S_FALSE;
 			}
 		}
-		EndEnumMediaTypes(pmt)
-	}
 
-	BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 		// DVR-MS Caption (WTV Subtitle)/MPEG2_SECTIONS pin - disable
 		if (pmt->majortype == MEDIATYPE_MSTVCaption || pmt->majortype == MEDIATYPE_MPEG2_SECTIONS) {
 			return S_FALSE;
 		}
+
+		if (m_bOnlySub && !CMediaTypeEx(*pmt).ValidateSubtitle()) {
+			return S_FALSE;
+		}
+
+		if (m_bOnlyAudio
+				&& pmt->majortype != MEDIATYPE_Audio
+				&& pmt->majortype != MEDIATYPE_Stream
+				&& !CMediaTypeEx(*pmt).ValidateSubtitle()) {
+			return S_FALSE;
+		}
 	}
 	EndEnumMediaTypes(pmt)
-
-	if (m_bOnlySub) {
-		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
-			if (!CMediaTypeEx(*pmt).ValidateSubtitle()) {
-				return S_FALSE;
-			}
-		}
-		EndEnumMediaTypes(pmt)
-	}
-
-	if (m_bOnlyAudio) {
-		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
-			if (pmt->majortype != MEDIATYPE_Audio && pmt->majortype != MEDIATYPE_Stream && !CMediaTypeEx(*pmt).ValidateSubtitle()) {
-				return S_FALSE;
-			}
-		}
-		EndEnumMediaTypes(pmt)
-	}
 
 	bool fDeadEnd = true;
 
