@@ -1202,32 +1202,29 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 
 REFERENCE_TIME CMPCVideoDecFilter::GetFrameDuration()
 {
-	REFERENCE_TIME AvgTimePerFrame = m_rtAvrTimePerFrame;
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO) {
-		if (m_pAVCtx->time_base.den && m_pAVCtx->time_base.num) {
-			AvgTimePerFrame = (UNITS * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * m_pAVCtx->ticks_per_frame;
+		if (m_pAVCtx->time_base.num && m_pAVCtx->time_base.den) {
+			REFERENCE_TIME frame_duration = (UNITS * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * m_pAVCtx->ticks_per_frame;
+			return frame_duration;
 		}
 	}
 
-	return AvgTimePerFrame;
+	return m_rtAvrTimePerFrame;
 }
 
 void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	const REFERENCE_TIME AvgTimePerFrame = GetFrameDuration();
-
 	if (rtStart == INVALID_TIME) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
 
-	if (m_bCalculateStopTime) {
-		rtStop = INVALID_TIME;
-	}
-
-	if (rtStop == INVALID_TIME) {
-		const REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame && m_pFrame->repeat_pict ? 3 : 2) / 2;
-		rtStop = rtStart + (rtFrameDuration / m_dRate);
+	if (rtStop == INVALID_TIME || m_bCalculateStopTime) {
+		REFERENCE_TIME frame_duration = GetFrameDuration();
+		if (m_pFrame && m_pFrame->repeat_pict) {
+			frame_duration = frame_duration * 3 / 2;
+		}
+		rtStop = rtStart + (frame_duration / m_dRate);
 	}
 
 	m_rtLastStop = rtStop;
