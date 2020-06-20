@@ -4857,6 +4857,8 @@ void CPlayerPlaylistBar::PasteFromClipboard()
 {
 	std::list<CString> sl;
 	if (m_pMainFrame->GetFromClipboard(sl)) {
-		Append(sl, sl.size() > 1, nullptr);
+		if (!(sl.size() == 1 && m_pMainFrame->OpenYoutubePlaylist(sl.front(), TRUE))) {
+			Append(sl, sl.size() > 1, nullptr);
+		}
 	}
 }
