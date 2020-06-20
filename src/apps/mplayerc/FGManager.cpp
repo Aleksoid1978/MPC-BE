@@ -2638,6 +2638,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
 	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{4C4CD9E1-F876-11D2-962F-00500471FDDC}"), MERIT64_DO_NOT_USE));
 
+	// Morgan Stream Switcher (mmswitch.ax)
+	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}"), MERIT64_DO_NOT_USE));
+
 	// Subtitle renderers
 
 	bool VRwithSR =
@@ -2847,9 +2850,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_HIGHEST);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 		m_transform.push_back(pFGF);
-
-		// morgan stream switcher
-		m_transform.push_back(DNew CFGFilterRegistry(CLSID_MorganSwitcher, MERIT64_DO_NOT_USE));
 	}
 
 	// Renderers
@@ -3051,9 +3051,6 @@ CFGManagerCapture::CFGManagerCapture(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	CFGFilter* pFGF = DNew CFGFilterInternal<CDeinterlacerFilter>(L"Deinterlacer", MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 	m_transform.push_back(pFGF);
-
-	// morgan stream switcher
-	m_transform.push_back(DNew CFGFilterRegistry(CLSID_MorganSwitcher, MERIT64_DO_NOT_USE));
 }
 
 //
