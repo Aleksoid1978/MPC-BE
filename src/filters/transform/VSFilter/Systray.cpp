@@ -242,8 +242,6 @@ LRESULT CSystrayWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 			popup.CreatePopupMenu();
 
 			for (size_t j = 0; j < pStreams.GetCount(); j++) {
-				bool fMMSwitcher = !names[j].Compare(L"Morgan Stream Switcher");
-
 				DWORD cStreams = 0;
 				pStreams[j]->Count(&cStreams);
 
@@ -254,10 +252,6 @@ LRESULT CSystrayWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 
 					if (S_OK == pStreams[j]->Info(i, 0, &flags, 0, &group, &pName, 0, 0)) {
 						if (prevgroup != group && i > 1) {
-							if (fMMSwitcher) {
-								cStreams = i;
-								break;
-							}
 							popup.AppendMenu(MF_SEPARATOR);
 						}
 						prevgroup = group;
