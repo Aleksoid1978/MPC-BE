@@ -2794,57 +2794,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	CAppSettings& s = AfxGetAppSettings();
 	const CRenderersSettings& rs = s.m_VRSettings;
 
-	UINT64 vrmerit = MERIT64_PREFERRED;
-	UINT64 armerit = MERIT64_PREFERRED;
-
-	if (m_pFM) {
-		CComPtr<IEnumMoniker> pEM;
-
-		GUID guids[] = {MEDIATYPE_Video, MEDIASUBTYPE_NULL};
-
-		if (SUCCEEDED(m_pFM->EnumMatchingFilters(&pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-					  TRUE, 1, guids, nullptr, nullptr, TRUE, FALSE, 0, nullptr, nullptr, nullptr))) {
-			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
-				CFGFilterRegistry f(pMoniker);
-				// RDP DShow Redirection Filter's merit is so high that it flaws the graph building process so we ignore it.
-				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
-				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
-				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
-					vrmerit = std::max(vrmerit, f.GetMerit());
-				}
-			}
-		}
-
-		vrmerit += 0x100;
-	}
-
-	if (m_pFM) {
-		CComPtr<IEnumMoniker> pEM;
-
-		GUID guids[] = {MEDIATYPE_Audio, MEDIASUBTYPE_NULL};
-
-		if (SUCCEEDED(m_pFM->EnumMatchingFilters(&pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-					  TRUE, 1, guids, nullptr, nullptr, TRUE, FALSE, 0, nullptr, nullptr, nullptr))) {
-			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
-				CFGFilterRegistry f(pMoniker);
-				// RDP DShow Redirection Filter's merit is so high that it flaws the graph building process so we ignore it.
-				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
-				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
-				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
-					armerit = std::max(armerit, f.GetMerit());
-				}
-			}
-		}
-
-		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-			CFGFilterRegistry f(pMoniker);
-			armerit = std::max(armerit, f.GetMerit());
-		}
-		EndEnumSysDev
-
-		armerit += 0x100;
-	}
-
 	if (!m_bIsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_HIGHEST);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
@@ -2853,6 +2802,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// Renderers
 	if (!m_bIsPreview) {
+		const UINT64 vrmerit = MERIT64_RENDERER;
+
 		 auto CheckAddRenderer = [&](const CLSID& clsidVR, const CLSID& clsidAP, const WCHAR* name) {
 			if (S_OK != CheckFilterCLSID(clsidVR)) {
 				CString msg_str;
@@ -2902,8 +2853,18 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (!m_bIsPreview) {
+		UINT64 armerit = MERIT64_RENDERER;
+
+		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
+			CFGFilterRegistry f(pMoniker);
+			if (f.GetMerit() > armerit) {
+				armerit = f.GetMerit() + 0x100;
+			}
+		}
+		EndEnumSysDev
+
 		CString SelAudioRenderer = s.SelectedAudioRenderer();
-		armerit += 0x1000;
+		armerit += 0x100; // for the first audio output give higher priority
 
 		for (int ar = 0; ar < (s.fDualAudioOutput ? 2 : 1); ar++) {
 			if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
@@ -2925,6 +2886,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				m_transform.push_back(pFGF);
 			}
 
+			// second audio output
 			SelAudioRenderer = s.strSecondAudioRendererDisplayName;
 			armerit -= 0x100;
 		}
