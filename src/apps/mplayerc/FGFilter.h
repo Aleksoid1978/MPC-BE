@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,15 +21,16 @@
 
 #pragma once
 
-#define MERIT64(merit)      (((UINT64)(merit)) << 16)
-#define MERIT64_DO_NOT_USE  (MERIT64(MERIT_DO_NOT_USE))
-#define MERIT64_DO_USE      (MERIT64(MERIT_DO_NOT_USE + 1))
-#define MERIT64_UNLIKELY    (MERIT64(MERIT_UNLIKELY))
-#define MERIT64_NORMAL      (MERIT64(MERIT_NORMAL))
-#define MERIT64_PREFERRED   (MERIT64(MERIT_PREFERRED))
-#define MERIT64_ABOVE_DSHOW (MERIT64(1) << 32)
-#define MERIT64_HIGH        (MERIT64_ABOVE_DSHOW << 5)
-#define MERIT64_HIGHEST     (MERIT64_ABOVE_DSHOW << 10)
+#define MERIT64(merit)             (((UINT64)(merit)) << 16)
+#define MERIT64_DO_NOT_USE         (MERIT64(MERIT_DO_NOT_USE))
+#define MERIT64_DO_USE             (MERIT64(MERIT_DO_NOT_USE + 1))
+#define MERIT64_UNLIKELY           (MERIT64(MERIT_UNLIKELY))
+#define MERIT64_NORMAL             (MERIT64(MERIT_NORMAL))
+#define MERIT64_PREFERRED          (MERIT64(MERIT_PREFERRED))
+#define MERIT64_ABOVE_DSHOW        (MERIT64(1) << 32)
+#define MERIT64_EXT_FILTERS_PREFER (MERIT64_ABOVE_DSHOW + 0x2000)
+#define MERIT64_HIGH               (MERIT64_ABOVE_DSHOW << 5)
+#define MERIT64_HIGHEST            (MERIT64_ABOVE_DSHOW << 10)
 
 class CFGFilter
 {

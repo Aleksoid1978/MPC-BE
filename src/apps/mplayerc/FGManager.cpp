@@ -40,8 +40,6 @@
 #include "Content.h"
 #include <IPinHook.h>
 
-#define MERIT64_EXT_FILTERS_PREFER (MERIT64_ABOVE_DSHOW + 0x2000)
-
 class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
 {
 	bool	m_bIsPreview;
@@ -2789,14 +2787,15 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 
 CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CFGManagerCustom(pName, pUnk, hWnd, IsPreview)
-	, m_vrmerit(MERIT64_PREFERRED)
-	, m_armerit(MERIT64_PREFERRED)
 {
 	DLog(L"CFGManagerPlayer::CFGManagerPlayer() on thread: %u", GetCurrentThreadId());
 	CFGFilter* pFGF;
 
 	CAppSettings& s = AfxGetAppSettings();
 	const CRenderersSettings& rs = s.m_VRSettings;
+
+	UINT64 vrmerit = MERIT64_PREFERRED;
+	UINT64 armerit = MERIT64_PREFERRED;
 
 	if (m_pFM) {
 		CComPtr<IEnumMoniker> pEM;
@@ -2811,12 +2810,12 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
 				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
 				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
-					m_vrmerit = std::max(m_vrmerit, f.GetMerit());
+					vrmerit = std::max(vrmerit, f.GetMerit());
 				}
 			}
 		}
 
-		m_vrmerit += 0x100;
+		vrmerit += 0x100;
 	}
 
 	if (m_pFM) {
@@ -2832,18 +2831,18 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
 				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
 				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
-					m_armerit = std::max(m_armerit, f.GetMerit());
+					armerit = std::max(armerit, f.GetMerit());
 				}
 			}
 		}
 
 		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
 			CFGFilterRegistry f(pMoniker);
-			m_armerit = std::max(m_armerit, f.GetMerit());
+			armerit = std::max(armerit, f.GetMerit());
 		}
 		EndEnumSysDev
 
-		m_armerit += 0x100;
+		armerit += 0x100;
 	}
 
 	if (!m_bIsPreview) {
@@ -2859,24 +2858,24 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				CString msg_str;
 				msg_str.Format(ResStr(IDS_REND_UNAVAILABLEMSG), name, L"Enhanced Video Renderer");
 				AfxMessageBox(msg_str, MB_ICONEXCLAMATION | MB_OK);
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", vrmerit));
 			} else {
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, clsidAP, name, m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, clsidAP, name, vrmerit));
 			}
 		};
 
 		switch (rs.iVideoRenderer) {
 			case VIDRNDT_VMR9WINDOWED:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", vrmerit));
 				break;
 			case VIDRNDT_EVR:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", vrmerit));
 				break;
 			case VIDRNDT_EVR_CUSTOM:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"Enhanced Video Renderer (custom presenter)", m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"Enhanced Video Renderer (custom presenter)", vrmerit));
 				break;
 			case VIDRNDT_SYNC:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", vrmerit));
 				break;
 			case VIDRNDT_MPCVR:
 				CheckAddRenderer(CLSID_MPCVR, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer");
@@ -2904,30 +2903,30 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (!m_bIsPreview) {
 		CString SelAudioRenderer = s.SelectedAudioRenderer();
-		m_armerit += 0x1000;
+		armerit += 0x1000;
 
 		for (int ar = 0; ar < (s.fDualAudioOutput ? 2 : 1); ar++) {
 			if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
-				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, m_armerit);
+				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.push_back(pFGF);
 			} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
-				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, m_armerit);
+				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.push_back(pFGF);
 			} else if (SelAudioRenderer == AUDRNDT_MPC) {
-				pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, m_armerit);
+				pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);
 				m_transform.push_back(pFGF);
 			} else if (SelAudioRenderer.GetLength() > 0) {
-				pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
+				pFGF = DNew CFGFilterRegistry(SelAudioRenderer, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.push_back(pFGF);
 			}
 
 			SelAudioRenderer = s.strSecondAudioRendererDisplayName;
-			m_armerit -= 0x100;
+			armerit -= 0x100;
 		}
 	}
 }
