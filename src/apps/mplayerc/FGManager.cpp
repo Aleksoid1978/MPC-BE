@@ -3001,11 +3001,8 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 	CheckPointer(ppFilter, E_POINTER);
 
 	HRESULT hr;
-
 	CStringW fn = CStringW(lpcwstrFileName).TrimLeft();
-	CStringW ext = CPathW(fn).GetExtension().MakeLower();
-
-	GUID clsid = ext == L".ratdvd" ? CLSID_RatDVDNavigator : CLSID_DVDNavigator;
+	GUID clsid = CLSID_DVDNavigator;
 
 	CComPtr<IBaseFilter> pBF;
 	if (FAILED(hr = pBF.CoCreateInstance(clsid))
