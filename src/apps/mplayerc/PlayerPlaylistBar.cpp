@@ -2416,8 +2416,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 
 	m_nCurPlaybackListId = curTab.id;
 
-	if (fn.Find(L"video_ts.ifo") >= 0
-			|| fn.Find(L".ratdvd") >= 0) {
+	if (fn.Find(L"video_ts.ifo") >= 0) {
 		if (OpenDVDData* p = DNew OpenDVDData()) {
 			p->path = pli->m_fns.front().GetName();
 			p->subs = pli->m_subs;
