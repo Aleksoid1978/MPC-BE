@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 20		"Szabályzás"
 21		"Hangerő léptetés:"
 23		"Sebesség léptetés:"
-25		"Do not reset speed for session"
+25		"Ne állítsa vissza a munkamenet sebességét"
 27		"Alapértelmezett lejátszási preferencia"
 28		"Feliratok:"
 30		"Audió:"
