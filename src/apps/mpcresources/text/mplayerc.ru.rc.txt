@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Режим вывода:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Слушать порт:"
 7		"Качество изображения %:"
 11		"Использовать сжатие"
 12		"Разрешить доступ только с локального компьютера"
-13		"Выводить отладочную информацию"
-14		"Запустить в web-браузере..."
-16		"Брать страницы из:"
-18		"Выбрать..."
-19		"Выгрузить..."
-20		"Начальная страница:"
-22		"Интерпретаторы CGI: (.ext1=path1;.ext2=path2;...)"
+13		"Включить предпросмотр"
+14		"Выводить отладочную информацию"
+15		"Запустить в web-браузере..."
+17		"Брать страницы из:"
+19		"Выбрать..."
+20		"Выгрузить..."
+21		"Начальная страница:"
+23		"Интерпретаторы CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Громкость: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Громкость: %d%% [Выкл.]"
 STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"Вы должны применить новые настройки перед их использованием"
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Предпросмотр в настоящее время отключен. Вы можете включить его в настройках MPC-BE."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Вписать"

@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Naslouchat na portu:"
 7		"Image quality %:"
 11		"Povolit kompresi"
 12		"Povolit pouze lokální přístup"
-13		"Vkládat do stránek ladicí informace"
-14		"Otevřít v prohlížeči..."
-16		"Odesílat stránky z:"
-18		"Procházet..."
-19		"Uložit..."
-20		"Výchozí stránka:"
-22		"Obsluha CGI: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"Vkládat do stránek ladicí informace"
+15		"Otevřít v prohlížeči..."
+17		"Odesílat stránky z:"
+19		"Procházet..."
+20		"Uložit..."
+21		"Výchozí stránka:"
+23		"Obsluha CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Hlasitost: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Mute]"
 STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"Než budete moci nová nastavení vyzkoušet, musíte je aplikovat."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Roztáhnout 1"
 STRING IDS_ZOOM2		"Roztáhnout 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"

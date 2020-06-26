@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"表示モード:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"待機するポート:"
 7		"イメージ品質(%):"
 11		"圧縮を有効にする"
 12		"ローカルホストからの接続のみを許可する"
-13		"デバッグ情報を表示する"
-14		"ウェブ ブラウザーで開く..."
-16		"サーバーのルート ディレクトリ:"
-18		"参照..."
-19		"展開..."
-20		"既定のページ:"
-22		"CGI ハンドラー: (拡張子1=パス1; 拡張子2=パス2;...)"
+13		"Enable preview"
+14		"デバッグ情報を表示する"
+15		"ウェブ ブラウザーで開く..."
+17		"サーバーのルート ディレクトリ:"
+19		"参照..."
+20		"展開..."
+21		"既定のページ:"
+23		"CGI ハンドラー: (拡張子1=パス1; 拡張子2=パス2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"音量: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"音量: %d%% [ミュート]"
 STRING IDS_VTSREADER_LOAD_PGC		"タイトルの選択を有効にする"
 STRING IDS_WEBSERVER_ERROR_TEST		"それらをテストする前に新しい設定を適用してください。"
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"拡大 1"
 STRING IDS_ZOOM2		"拡大 2"
 STRING IDS_ZOOM_AUTOFIT		"自動調整"

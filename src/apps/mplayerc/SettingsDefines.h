@@ -207,6 +207,7 @@
 #define IDS_RS_ISDB							L"ISDb"
 #define IDS_RS_WEBROOT						L"WebRoot"
 #define IDS_RS_WEBSERVERLOCALHOSTONLY		L"WebServerLocalhostOnly"
+#define IDS_RS_WEBUI_ENABLE_PREVIEW			L"WebUIEnablePreview"
 #define IDS_RS_ASPECTRATIO_X				L"AspectRatioX"
 #define IDS_RS_ASPECTRATIO_Y				L"AspectRatioY"
 #define IDS_RS_WEBSERVERCGI					L"WebServerCGI"

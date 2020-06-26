@@ -839,13 +839,18 @@ bool CWebClientSocket::OnError404(CStringA& hdr, CStringA& body, CStringA& mime)
 bool CWebClientSocket::OnPlayer(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	m_pWebServer->LoadPage(IDR_HTML_PLAYER, body, m_path);
-
+	if (AfxGetAppSettings().bWebUIEnablePreview) {
+		body.Replace("[preview]",
+					 "<img src=\"logo.png\" id=\"snapshot\" alt=\"snapshot\" onload=\"OnLoadSnapShot()\" onabort=\"OnAbortErrorSnapShot()\" onerror=\"OnAbortErrorSnapShot()\">");
+	} else {
+		body.Replace("[preview]", UTF8(ResStr(IDS_WEBUI_DISABLED_PREVIEW_MSG)));
+	}
 	return true;
 }
 
 bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& mime)
 {
-	bool fRet = false;
+	bool bRet = false;
 
 	BYTE *jpeg = nullptr;
 	long size = 0;
@@ -853,7 +858,10 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 
 	std::vector<BYTE> dib;
 	CString errmsg;
-	if (S_OK == m_pMainFrame->GetDisplayedImage(dib, errmsg) || S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
+	if (!AfxGetAppSettings().bWebUIEnablePreview) {
+		hdr = "HTTP/1.0 403 Forbidden\r\n";
+		bRet = true;
+	} else if (S_OK == m_pMainFrame->GetDisplayedImage(dib, errmsg) || S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
 		if (BMPDIB(0, dib.data(), L"image/jpeg", AfxGetAppSettings().nWebServerQuality, 1, &jpeg, &jpeg_size)) {
 			hdr +=
 				"Expires: Thu, 19 Nov 1981 08:52:00 GMT\r\n"
@@ -861,9 +869,9 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 				"Pragma: no-cache\r\n";
 			body = CStringA((char*)jpeg, jpeg_size);
 			mime = "image/jpeg";
-			fRet = true;
+			bRet = true;
 		}
 	}
 
-	return fRet;
+	return bRet;
 }

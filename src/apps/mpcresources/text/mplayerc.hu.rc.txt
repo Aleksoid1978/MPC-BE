@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Bemutató mód:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Port figyelése:"
 7		"Képminőség %:"
 11		"Tömörítés engedélyezése"
 12		"Hozzáférés engedélyezése csak localhost számára"
-13		"Hibakeresési információ (debug info) megjelenítése"
-14		"Indítás Web böngészőben..."
-16		"Oldalak kiszolgálása erről a helyről:"
-18		"Tallózás..."
-19		"Letárolás..."
-20		"Alapértelmezett oldal:"
-22		"CGI kezelők: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"Hibakeresési információ (debug info) megjelenítése"
+15		"Indítás Web böngészőben..."
+17		"Oldalak kiszolgálása erről a helyről:"
+19		"Tallózás..."
+20		"Letárolás..."
+21		"Alapértelmezett oldal:"
+23		"CGI kezelők: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Hang: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Hangerő: %d%% [Néma]"
 STRING IDS_VTSREADER_LOAD_PGC		"Engedélyezze a cím választását"
 STRING IDS_WEBSERVER_ERROR_TEST		"Tesztelés előtt alkalmaznia kell az új beállításokat."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Automatikus illesztés"

@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Aditze ataka:"
 7		"Irudi ontasuna %:"
 11		"Gaitu konpresioa"
 12		"Ahalbidetu sarbidea tokiko-hostalaritik bakarrik"
-13		"Irarkitu garbiketa argibideak"
-14		"Abiarazi web nabigatzailean..."
-16		"Zerbitzatu orrialdeak hemendik:"
-18		"Bilatu..."
-19		"Hedatu..."
-20		"Berezkoa orrialdea:"
-22		"CGI kudeatzaileak: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"Irarkitu garbiketa argibideak"
+15		"Abiarazi web nabigatzailean..."
+17		"Zerbitzatu orrialdeak hemendik:"
+19		"Bilatu..."
+20		"Hedatu..."
+21		"Berezkoa orrialdea:"
+23		"CGI kudeatzaileak: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Bolumena: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Bolumena: %d%% [Mututu]"
 STRING IDS_VTSREADER_LOAD_PGC		"Gaitu Izenburu hautapena"
 STRING IDS_WEBSERVER_ERROR_TEST		"Ezarpen berriak ezarri behar dituzu aztertu aurretik."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Zooma 1"
 STRING IDS_ZOOM2		"Zooma 2"
 STRING IDS_ZOOM_AUTOFIT		"Berez finkatu"

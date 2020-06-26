@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Sunum modu:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Bağlantı noktasını dinle:"
 7		"Resim kalitesi %:"
 11		"Sıkıştırmayı etkinleştir"
 12		"Sadece yerel ağ erişimine izin ver"
-13		"Hata bilgisini yazdır"
-14		"İnternet tarayıcısında çalıştır..."
-16		"Sunulacak sayfalar:"
-18		"Gözat..."
-19		"Çıkart..."
-20		"Varsayılan sayfa:"
-22		"CGI komutları: (.uzantı1=yol1;.uzantı2=yol2;...)"
+13		"Enable preview"
+14		"Hata bilgisini yazdır"
+15		"İnternet tarayıcısında çalıştır..."
+17		"Sunulacak sayfalar:"
+19		"Gözat..."
+20		"Çıkart..."
+21		"Varsayılan sayfa:"
+23		"CGI komutları: (.uzantı1=yol1;.uzantı2=yol2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Ses: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Ses: %d%% [Sessiz]"
 STRING IDS_VTSREADER_LOAD_PGC		"Başlık seçimini etkinleştir"
 STRING IDS_WEBSERVER_ERROR_TEST		"Önce yeni ayarları uygulamanız gerekmektedir."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Yakınlaştırma 1"
 STRING IDS_ZOOM2		"Yakınlaştırma 2"
 STRING IDS_ZOOM_AUTOFIT		"Oto Sığdır"
