@@ -537,11 +537,7 @@ BOOL WINAPI Mine_IsDebuggerPresent()
 }
 
 // This hook prevents the program from reporting that a debugger is attached
-typedef NTSTATUS(WINAPI *FUNC_NTQUERYINFORMATIONPROCESS)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
-static FUNC_NTQUERYINFORMATIONPROCESS		Real_NtQueryInformationProcess = nullptr;
-/*
 NTSTATUS(WINAPI* Real_NtQueryInformationProcess)(HANDLE, PROCESSINFOCLASS, PVOID, ULONG, PULONG) = nullptr;
-*/
 NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength)
 {
 	NTSTATUS nRet;
@@ -743,7 +739,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 #ifndef _DEBUG // Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
 	if (hNTDLL) {
-		Real_NtQueryInformationProcess = (FUNC_NTQUERYINFORMATIONPROCESS)GetProcAddress (hNTDLL, "NtQueryInformationProcess");
+		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress (hNTDLL, "NtQueryInformationProcess");
 
 		if (Real_NtQueryInformationProcess) {
 			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
