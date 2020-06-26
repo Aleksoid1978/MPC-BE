@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Port nasłuchu:"
 7		"Jakość obrazu %:"
 11		"Kompresja"
 12		"Dostęp tylko z lokalnego komputera"
-13		"Wyświetlanie informacji debugowania"
-14		"Uruchom w przeglądarce internetowej"
-16		"Obsługiwanie stron z położenia:"
-18		"Przeglądaj..."
-19		"Rozmieść..."
-20		"Domyślna strona:"
-22		"Obsługa interfejsu CGI: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"Wyświetlanie informacji debugowania"
+15		"Uruchom w przeglądarce internetowej"
+17		"Obsługiwanie stron z położenia:"
+19		"Przeglądaj..."
+20		"Rozmieść..."
+21		"Domyślna strona:"
+23		"Obsługa interfejsu CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2055,6 +2056,7 @@ STRING IDS_VOLUME_OSD		"Głośność: %d %%"
 STRING IDS_VOLUME_OSD_MUTE		"Głośność: %d%% [Wyciszony]"
 STRING IDS_VTSREADER_LOAD_PGC		"Włącz wybieranie tytułów"
 STRING IDS_WEBSERVER_ERROR_TEST		"Musisz zastosować nowe ustawienia zanim je przetestujesz."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Skala 1"
 STRING IDS_ZOOM2		"Skala 2"
 STRING IDS_ZOOM_AUTOFIT		"Automatyczne dopasowanie"

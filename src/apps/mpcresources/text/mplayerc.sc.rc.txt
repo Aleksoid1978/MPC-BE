@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"输出模式:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"监听端口: "
 7		"图像品质 %:"
 11		"开启压缩"
 12		"仅允许访问本地用户"
-13		"显示调试信息"
-14		"在网页浏览器中打开..."
-16		"服务页面来自: "
-18		"浏览..."
-19		"部署..."
-20		"默认页: "
-22		"CGI 操作器:(.ext1＝路径1; .ext2＝路径2; ...)"
+13		"Enable preview"
+14		"显示调试信息"
+15		"在网页浏览器中打开..."
+17		"服务页面来自: "
+19		"浏览..."
+20		"部署..."
+21		"默认页: "
+23		"CGI 操作器:(.ext1＝路径1; .ext2＝路径2; ...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"音量: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"音量: %d%% [静音]"
 STRING IDS_VTSREADER_LOAD_PGC		"启用标题选择"
 STRING IDS_WEBSERVER_ERROR_TEST		"在测试新的设置之前你需要先应用他们。"
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"缩放 1"
 STRING IDS_ZOOM2		"缩放 2"
 STRING IDS_ZOOM_AUTOFIT		"自动调整"

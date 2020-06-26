@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Режим виводу:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Використовувати порт:"
 7		"Якість зображень %:"
 11		"Використовувати стиснення"
 12		"Дозволити доступ лише з локального комп'ютера"
-13		"Виводити відлагоджувальну інформацію"
-14		"Запустити в web-оглядачі..."
-16		"Брати сторінки з:"
-18		"Вибрати..."
-19		"Вивантажити"
-20		"Початкова сторінка:"
-22		"Інтерпретація CGI: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"Виводити відлагоджувальну інформацію"
+15		"Запустити в web-оглядачі..."
+17		"Брати сторінки з:"
+19		"Вибрати..."
+20		"Вивантажити"
+21		"Початкова сторінка:"
+23		"Інтерпретація CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Гучн.: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Гучн.: %d%% [Без звуку]"
 STRING IDS_VTSREADER_LOAD_PGC		"Ввімкнути вибір Головного Меню"
 STRING IDS_WEBSERVER_ERROR_TEST		"Вам необхідно застосувати нові налаштування перед тим, як їх тестувати."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Збільшення 1"
 STRING IDS_ZOOM2		"Збільшення 2"
 STRING IDS_ZOOM_AUTOFIT		"Вписати"

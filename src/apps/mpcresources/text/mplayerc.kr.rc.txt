@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"사용할 포트:"
 7		"이미지 품질 %:"
 11		"압축기능 사용"
 12		"로컬호스트로만 접속허용"
-13		"디버그 정보 인쇄"
-14		"웹 브라우저로 실행..."
-16		"다음을 서버 루트로 사용:"
-18		"찾아보기..."
-19		"배치..."
-20		"기본 페이지:"
-22		"CGI 핸들러: (.확장명1=경로1;.확장명2=경로2;...)"
+13		"Enable preview"
+14		"디버그 정보 인쇄"
+15		"웹 브라우저로 실행..."
+17		"다음을 서버 루트로 사용:"
+19		"찾아보기..."
+20		"배치..."
+21		"기본 페이지:"
+23		"CGI 핸들러: (.확장명1=경로1;.확장명2=경로2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"볼륨: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"볼륨: %d%% [음소거]"
 STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"설정들을 테스트해보려면 설정들을 적용시켜야 합니다."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"줌 1"
 STRING IDS_ZOOM2		"줌 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"

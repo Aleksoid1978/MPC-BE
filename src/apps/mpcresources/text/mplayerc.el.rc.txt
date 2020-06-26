@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Λειτουργία παρουσίασης:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Ακρόαση στη θύρα:"
 7		"Ποιότητα εικόνας %:"
 11		"Ενεργοποίηση συμπίεσης"
 12		"Επιτρέπεται η πρόσβαση μόνο από τοπικό υπολογιστή"
-13		"Εκτύπωση πληροφοριών αποσφαλμάτωσης"
-14		"Εκκίνηση σε περιηγητή διαδικτύου..."
-16		"Εξυπηρέτηση σελίδων από:"
-18		"Εύρεση..."
-19		"Ανάπτυξη..."
-20		"Προεπιλεγμένη σελίδα:"
-22		"Δείκτες χειρισμού CGI: (.ext1=κατάλογος1, .ext2=κατάλογος2, ...)"
+13		"Enable preview"
+14		"Εκτύπωση πληροφοριών αποσφαλμάτωσης"
+15		"Εκκίνηση σε περιηγητή διαδικτύου..."
+17		"Εξυπηρέτηση σελίδων από:"
+19		"Εύρεση..."
+20		"Ανάπτυξη..."
+21		"Προεπιλεγμένη σελίδα:"
+23		"Δείκτες χειρισμού CGI: (.ext1=κατάλογος1, .ext2=κατάλογος2, ...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Ένταση: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Ένταση: %d%% [Σίγαση]"
 STRING IDS_VTSREADER_LOAD_PGC		"Ενεργοποίηση επιλογής τίτλου"
 STRING IDS_WEBSERVER_ERROR_TEST		"Πρέπει να κάνετε εφαρμογή των νέων ρυθμίσεων πριν από τη δοκιμή τους."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Μεγέθυνση 1"
 STRING IDS_ZOOM2		"Μεγέθυνση 2"
 STRING IDS_ZOOM_AUTOFIT		"Αυτόματη προσαρμογή"

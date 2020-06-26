@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Escuchar en puerto"
 7		"Image quality %:"
 11		"Activar compresión"
 12		"Permitir acceso solo desde el host local"
-13		"Imprimir información de depuración"
-14		"Lanzar en explorador web..."
-16		"Servir páginas desde:"
-18		"Explorar..."
-19		"Desplegar..."
-20		"Página predeterminada:"
-22		"Tratantes de CGI: (.ext1=ruta1;.ext2=ruta2;...)"
+13		"Enable preview"
+14		"Imprimir información de depuración"
+15		"Lanzar en explorador web..."
+17		"Servir páginas desde:"
+19		"Explorar..."
+20		"Desplegar..."
+21		"Página predeterminada:"
+23		"Tratantes de CGI: (.ext1=ruta1;.ext2=ruta2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Vol: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Mute]"
 STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"You need to apply the new settings before testing them."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"

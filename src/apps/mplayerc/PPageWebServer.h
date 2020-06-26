@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,6 +49,7 @@ public:
 	BOOL m_fWebServerPrintDebugInfo;
 	BOOL m_fWebServerUseCompression;
 	BOOL m_fWebServerLocalhostOnly;
+	BOOL m_bWebUIEnablePreview;
 	BOOL m_fWebRoot;
 	CString m_WebRoot;
 	CString m_WebServerCGI;

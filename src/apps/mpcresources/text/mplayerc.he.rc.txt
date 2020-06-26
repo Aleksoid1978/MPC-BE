@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"האזן לפורט"
 7		"Image quality %:"
 11		"אפשר כיווץ מידע"
 12		"אפשר גישה מהמחשב הנוכחי בלבד"
-13		"הדפס מידע לניפוי באגים"
-14		"הפעל בדפדפן..."
-16		"הגש דפים מ:"
-18		"עיין..."
-19		"פרוס..."
-20		"דף ברירת המחדל:"
-22		"מטפלי CGI: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"הדפס מידע לניפוי באגים"
+15		"הפעל בדפדפן..."
+17		"הגש דפים מ:"
+19		"עיין..."
+20		"פרוס..."
+21		"דף ברירת המחדל:"
+23		"מטפלי CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"עצמת שמע: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Mute]"
 STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"אתה צריך להחיל את ההגדרות החדשות לפני שאתה מנסה אותן."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"זום 1"
 STRING IDS_ZOOM2		"זום 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"

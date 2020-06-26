@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentatiemodus:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Poortnummer:"
 7		"Beeldkwaliteit %:"
 11		"Activeer compressie"
 12		"Geef alleen toegang via localhost"
-13		"Print debuginformatie af"
-14		"In webbrowser openen..."
-16		"Geef HTML-pagina's van:"
-18		"Bladeren..."
-19		"Toepassen..."
-20		"Startpagina:"
-22		"CGI-handlers: (.ext1=path1;.ext2=path2;...)"
+13		"Enable preview"
+14		"Print debuginformatie af"
+15		"In webbrowser openen..."
+17		"Geef HTML-pagina's van:"
+19		"Bladeren..."
+20		"Toepassen..."
+21		"Startpagina:"
+23		"CGI-handlers: (.ext1=path1;.ext2=path2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Volume: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Volume: %d%% [Gedempt]"
 STRING IDS_VTSREADER_LOAD_PGC		"Activeer een keuze van titel"
 STRING IDS_WEBSERVER_ERROR_TEST		"U moet de nieuwe instellingen toepassen voordat u hen testen."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Autom. passend"

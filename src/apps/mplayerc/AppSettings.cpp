@@ -776,6 +776,7 @@ void CAppSettings::ResetSettings()
 	fWebServerPrintDebugInfo = false;
 	fWebServerUseCompression = true;
 	fWebServerLocalhostOnly = false;
+	bWebUIEnablePreview = false;
 	strWebRoot = L"*./webroot";
 	strWebDefIndex = L"index.html;index.php";
 	strWebServerCGI.Empty();
@@ -1392,6 +1393,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBUI_ENABLE_PREVIEW, bWebUIEnablePreview);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);
@@ -2005,6 +2007,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBUI_ENABLE_PREVIEW, bWebUIEnablePreview);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);

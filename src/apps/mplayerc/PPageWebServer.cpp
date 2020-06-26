@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,6 +39,7 @@ CPPageWebServer::CPPageWebServer()
 	, m_fWebServerUseCompression(FALSE)
 	, m_fWebRoot(FALSE)
 	, m_fWebServerLocalhostOnly(FALSE)
+	, m_bWebUIEnablePreview(FALSE)
 {
 }
 
@@ -60,6 +61,7 @@ void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK4, m_fWebRoot);
 	DDX_Text(pDX, IDC_EDIT2, m_WebRoot);
 	DDX_Check(pDX, IDC_CHECK5, m_fWebServerLocalhostOnly);
+	DDX_Check(pDX, IDC_CHECK6, m_bWebUIEnablePreview);
 	DDX_Text(pDX, IDC_EDIT3, m_WebServerCGI);
 	DDX_Text(pDX, IDC_EDIT9, m_WebDefIndex);
 
@@ -97,6 +99,7 @@ BOOL CPPageWebServer::OnInitDialog()
 	m_nWebServerQuality = s.nWebServerQuality;
 	m_fWebServerPrintDebugInfo = s.fWebServerPrintDebugInfo;
 	m_fWebServerLocalhostOnly = s.fWebServerLocalhostOnly;
+	m_bWebUIEnablePreview = s.bWebUIEnablePreview;
 	m_fWebServerUseCompression = s.fWebServerUseCompression;
 	m_fWebRoot = s.strWebRoot.Find('*') < 0;
 	m_WebRoot = s.strWebRoot;
@@ -136,6 +139,7 @@ BOOL CPPageWebServer::OnApply()
 	s.nWebServerQuality = m_nWebServerQuality;
 	s.fWebServerPrintDebugInfo = !!m_fWebServerPrintDebugInfo;
 	s.fWebServerLocalhostOnly = !!m_fWebServerLocalhostOnly;
+	s.bWebUIEnablePreview = !!m_bWebUIEnablePreview;
 	s.fWebServerUseCompression = !!m_fWebServerUseCompression;
 	s.strWebRoot = NewWebRoot;
 	s.strWebDefIndex = m_WebDefIndex;

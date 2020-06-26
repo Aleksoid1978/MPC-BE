@@ -526,18 +526,19 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 35		"Presentation mode:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
+BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Ecouter le port :"
 7		"Image quality %:"
 11		"Activer la compression"
 12		"Autoriser l'accès uniquement depuis localhost"
-13		"Imprimer les informations de débogage"
-14		"Lancer dans le navigateur Internet..."
-16		"Servir les pages depuis :"
-18		"Parcourir..."
-19		"Déployer..."
-20		"Page par défaut :"
-22		"Gestionnaires CGI : (.ext1=dossier1;.ext2=dossier2;...)"
+13		"Enable preview"
+14		"Imprimer les informations de débogage"
+15		"Lancer dans le navigateur Internet..."
+17		"Servir les pages depuis :"
+19		"Parcourir..."
+20		"Déployer..."
+21		"Page par défaut :"
+23		"Gestionnaires CGI : (.ext1=dossier1;.ext2=dossier2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -2067,6 +2068,7 @@ STRING IDS_VOLUME_OSD		"Volume : %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Mute]"
 STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"Il est nécessaire d'appliquer les changements avant de pouvoir les tester."
+STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Preview is currently disabled. You can enable it in MPC-BE's options."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"
