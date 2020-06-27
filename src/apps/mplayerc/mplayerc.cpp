@@ -737,6 +737,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	HMODULE hNTDLL = LoadLibraryW(L"ntdll.dll");
 
+#if 0
 #ifndef _DEBUG // Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
 	if (hNTDLL) {
 		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress (hNTDLL, "NtQueryInformationProcess");
@@ -745,6 +746,7 @@ BOOL CMPlayerCApp::InitInstance()
 			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
 		}
 	}
+#endif
 #endif
 
 	CFilterMapper2::Init();
