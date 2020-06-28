@@ -531,7 +531,7 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 7		"图像品质 %:"
 11		"开启压缩"
 12		"仅允许访问本地用户"
-13		"Enable preview"
+13		"启用预览"
 14		"显示调试信息"
 15		"在网页浏览器中打开..."
 17		"服务页面来自: "
