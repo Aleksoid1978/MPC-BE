@@ -63,8 +63,6 @@ public:
 	static void UnHook();
 	static void EnableHook(const bool bEnable);
 
-	static void RemoveMenuProc();
-
 protected:
 	static inline COLORREF m_crBkBar; // background system menu bar
 

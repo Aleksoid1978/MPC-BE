@@ -25,7 +25,6 @@
 #include <dlgs.h>
 #include "OpenDlg.h"
 #include "MainFrm.h"
-#include "./Controls/MenuEx.h"
 #include "../../DSUtil/Filehandle.h"
 
 // COpenDlg dialog
@@ -294,8 +293,6 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
 	, m_mask(mask)
 {
-	CMenuEx::RemoveMenuProc();
-
 	m_fAllowDirSelection = fAllowDirSelection;
 
 	CString str(lpszFileName);

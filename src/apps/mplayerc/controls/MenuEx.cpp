@@ -399,11 +399,6 @@ void CMenuEx::EnableHook(const bool bEnable)
 	m_bUseDrawHook = bEnable;
 }
 
-void CMenuEx::RemoveMenuProc()
-{
-	m_hMenuLast = nullptr;
-}
-
 LPCTSTR g_pszOldMenuProc = L"OldPopupMenuProc";
 
 LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -412,7 +407,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 	switch (Msg) {
 		case WM_DESTROY:
 			{
-				::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pfnOldProc);
+				::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)pfnOldProc);
 				::RemovePropW(hWnd, g_pszOldMenuProc);
 				m_hMenuLast = nullptr;
 			}
@@ -538,7 +533,7 @@ LRESULT CALLBACK CMenuEx::CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 				WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtr(hWnd, GWLP_WNDPROC);
 
 				::SetPropW(hWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
-				::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
+				::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
 
 				// Force menu window to repaint frame.
 				::SetWindowPos(hWnd, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
@@ -556,6 +551,8 @@ LRESULT CALLBACK CMenuEx::MSGProc(int nCode, WPARAM wParam, LPARAM lParam)
 		PCWPSTRUCT pS = (PCWPSTRUCT)lParam;
 		if (pS->message == WM_INITMENUPOPUP) {
 			m_hMenuLast = (HMENU)pS->wParam;
+		} else if (pS->message == WM_COMMAND && m_hMenuLast) {
+			m_hMenuLast = nullptr;
 		}
 	}
 

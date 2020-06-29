@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "PPageSheet.h"
 #include <HighDPI.h>
-#include "./Controls/MenuEx.h"
 
 // CPPageSheet
 
@@ -32,8 +31,6 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	: CTreePropSheet(pszCaption, pParentWnd, 0)
 	, m_bLockPage(false)
 {
-	CMenuEx::RemoveMenuProc();
-
 	int nWidth = 210;
 
 	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
