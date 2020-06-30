@@ -20233,11 +20233,23 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 			}
 		}
 		CloseClipboard();
+	} else if (::IsClipboardFormatAvailable(CF_HDROP) && ::OpenClipboard(m_hWnd)) {
+		if (HGLOBAL hglb = ::GetClipboardData(CF_HDROP)) {
+			if (HDROP hDrop = (HDROP)::GlobalLock(hglb)) {
+				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
+				for (UINT iFile = 0; iFile < nFiles; iFile++) {
+					CString fn;
+					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
+					sl.push_back(fn);
+				}
+				GlobalUnlock(hglb);
+			}
+		}
+		CloseClipboard();
 	}
 
 	return !sl.empty();
 }
-
 
 void CMainFrame::ShowControlBarInternal(CControlBar* pBar, BOOL bShow)
 {
