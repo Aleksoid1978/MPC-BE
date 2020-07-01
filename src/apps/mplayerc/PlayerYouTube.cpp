@@ -900,7 +900,7 @@ namespace Youtube
 				}
 			}
 
-			CStringA chaptersStr = GetEntry(data, R"({\"chapteredPlayerBarRenderer\":)", "]");
+			CStringA chaptersStr = GetEntry(data, R"({"chapteredPlayerBarRenderer":)", "]");
 			if (!chaptersStr.IsEmpty()) {
 				chaptersStr.Replace(R"(\/)", "/");
 				chaptersStr.Replace(R"(\")", R"(")");
