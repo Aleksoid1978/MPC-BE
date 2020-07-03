@@ -210,12 +210,12 @@ namespace Youtube
 		return false;
 	}
 
-	static void InternetReadData(HINTERNET& hInternet, const CString& url, char** pData, DWORD& dataSize)
+	static void InternetReadData(HINTERNET& hInternet, const CString& url, char** pData, DWORD& dataSize, const CString& header = L"")
 	{
 		dataSize = 0;
 		*pData = nullptr;
 
-		const HINTERNET hFile = InternetOpenUrlW(hInternet, url.GetString(), nullptr, 0, INTERNET_OPEN_FALGS, 0);
+		const HINTERNET hFile = InternetOpenUrlW(hInternet, url.GetString(), header.GetString(), header.GetLength(), INTERNET_OPEN_FALGS, 0);
 		if (hFile) {
 			const DWORD dwNumberOfBytesToRead = 16 * KILOBYTE;
 			auto buffer = DNew char[dwNumberOfBytesToRead];
@@ -1255,7 +1255,7 @@ namespace Youtube
 				if (extract_mix) {
 					DLog(L"Youtube::Parse_Playlist() : mixed playlist");
 				} else {
-					url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
+					url.Format(L"https://www.youtube.com/playlist?list=%s&disable_polymer=true", playlistId);
 				}
 
 				char* data = nullptr;
@@ -1353,7 +1353,7 @@ namespace Youtube
 							url.Format(L"https://www.youtube.com/%S", moreUrl);
 
 							DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
-							InternetReadData(hInet, url, &data, dataSize);
+							InternetReadData(hInet, url, &data, dataSize, L"x-youtube-client-name: 1\r\nx-youtube-client-version: 1.20200609.04.02\r\n");
 							if (data) {
 								rapidjson::Document json;
 								if (!json.Parse(data).HasParseError()) {
