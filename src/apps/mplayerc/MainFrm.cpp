@@ -5248,6 +5248,7 @@ LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(true);
 			ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
 		}
+		ShowControls(CS_NONE, false);
 		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
 			if (m_pMFVMB) {
 				m_OSD.Start(m_pVideoWnd, m_pMFVMB);
