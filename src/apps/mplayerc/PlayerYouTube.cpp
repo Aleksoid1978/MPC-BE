@@ -1254,6 +1254,7 @@ namespace Youtube
 				const auto extract_mix = playlistId.Left(2) == L"RD" || playlistId.Left(2) == L"UL" || playlistId.Left(2) == L"PU";
 				if (extract_mix) {
 					DLog(L"Youtube::Parse_Playlist() : mixed playlist");
+					url.Format(L"https://www.youtube.com/watch?v=%s&list=%s&disable_polymer=true", videoIdCurrent, playlistId);
 				} else {
 					url.Format(L"https://www.youtube.com/playlist?list=%s&disable_polymer=true", playlistId);
 				}
@@ -1337,7 +1338,7 @@ namespace Youtube
 							break;
 						}
 
-						url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", lastvideoId, playlistId);
+						url.Format(L"https://www.youtube.com/watch?v=%s&list=%s&disable_polymer=true", lastvideoId, playlistId);
 						DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
 						InternetReadData(hInet, url, &data, dataSize);
 						if (data) {
