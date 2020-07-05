@@ -1557,6 +1557,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if ((type == AP4_ATOM_TYPE_NONE || type == AP4_ATOM_TYPE_RAW) && bitspersample == 8 ||
 								    type == AP4_ATOM_TYPE_SOWT && bitspersample == 16 ||
 								   (type == AP4_ATOM_TYPE_IN24 || type == AP4_ATOM_TYPE_IN32) && ase->GetEndian()==ENDIAN_LITTLE) {
+							if (type == AP4_ATOM_TYPE_IN24) {
+								bitspersample = 24;
+							} else if (type == AP4_ATOM_TYPE_IN32) {
+								bitspersample = 32;
+							}
 							fourcc = type = WAVE_FORMAT_PCM;
 						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian()==ENDIAN_LITTLE) {
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
