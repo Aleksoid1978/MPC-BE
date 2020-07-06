@@ -1987,15 +1987,21 @@ redo:
 
 	AllocExtradata(pmt);
 
-	avcodec_lock;
-	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr);
-	avcodec_unlock;
-	if (ret < 0) {
-		return VFW_E_INVALIDMEDIATYPE;
+	AVDictionary* options = nullptr;
+	if (m_nCodecId == AV_CODEC_ID_H264 && x264_build != -1) {
+		av_dict_set_int(&options, "x264_build", x264_build, 0);
 	}
 
-	if (m_nCodecId == AV_CODEC_ID_H264 && x264_build != -1) {
-		av_opt_set_int(m_pAVCtx->priv_data, "x264_build", x264_build, 0);
+	avcodec_lock;
+	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, &options);
+	avcodec_unlock;
+
+	if (options) {
+		av_dict_free(&options);
+	}
+
+	if (ret < 0) {
+		return VFW_E_INVALIDMEDIATYPE;
 	}
 
 	if (m_nCodecId == AV_CODEC_ID_AV1 && m_pAVCtx->extradata) {
