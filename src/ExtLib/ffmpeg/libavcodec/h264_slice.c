@@ -446,6 +446,22 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
     return err;
 }
 
+// ==> Start patch MPC
+int ff_h264_update_thread_context_for_user(AVCodecContext *dst,
+                                           const AVCodecContext *src)
+{
+    H264Context *h = dst->priv_data, *h1 = src->priv_data;
+    int err = 0;
+
+    if (dst == src)
+        return 0;
+
+    h->x264_build = h1->x264_build;
+
+    return err;
+}
+// ==> End patch MPC
+
 static int h264_frame_start(H264Context *h)
 {
     H264Picture *pic;

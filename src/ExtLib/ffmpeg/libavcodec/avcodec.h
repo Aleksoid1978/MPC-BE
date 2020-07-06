@@ -2658,6 +2658,12 @@ typedef struct AVCodec {
      * dst and src will (rarely) point to the same context, in which case memcpy should be skipped.
      */
     int (*update_thread_context)(AVCodecContext *dst, const AVCodecContext *src);
+// ==> Start patch MPC
+    /**
+     * Copy variables back to the user-facing context
+     */
+    int (*update_thread_context_for_user)(AVCodecContext *dst, const AVCodecContext *src);
+// ==> End patch MPC
     /** @} */
 
     /**
