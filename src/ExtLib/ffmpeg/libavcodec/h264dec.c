@@ -1094,6 +1094,9 @@ AVCodec ff_h264_decoder = {
                              FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = h264_decode_flush,
     .update_thread_context = ONLY_IF_THREADS_ENABLED(ff_h264_update_thread_context),
+// ==> Start patch MPC
+    .update_thread_context_for_user = ONLY_IF_THREADS_ENABLED(ff_h264_update_thread_context_for_user),
+// ==> End patch MPC
     .profiles              = NULL_IF_CONFIG_SMALL(ff_h264_profiles),
     .priv_class            = &h264_class,
 };
