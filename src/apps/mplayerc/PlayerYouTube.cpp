@@ -1191,7 +1191,7 @@ namespace Youtube
 										}
 
 										if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
-											subs.push_back({ sub_url, sub_name });
+											subs.emplace_back(sub_url, sub_name);
 										}
 									}
 								}
@@ -1329,7 +1329,7 @@ namespace Youtube
 											});
 											if (it == youtubePlaylist.cend()) {
 												lastvideoId = videoId;
-												youtubePlaylist.push_back({ url, simpleText, duration });
+												youtubePlaylist.emplace_back(url, simpleText, duration);
 
 												if (videoId == videoIdCurrent) {
 													idx_CurrentPlay = youtubePlaylist.size() - 1;
@@ -1430,7 +1430,7 @@ namespace Youtube
 							});
 							if (it == youtubePlaylist.cend()) {
 								lastvideoId = videoId;
-								youtubePlaylist.push_back({ url, title });
+								youtubePlaylist.emplace_back(url, title);
 
 								if (videoId == videoIdCurrent) {
 									idx_CurrentPlay = youtubePlaylist.size() - 1;
@@ -1537,7 +1537,7 @@ namespace Youtube
 										title = FixHtmlSymbols(title);
 									}
 
-									youtubePlaylist.push_back({ url, title });
+									youtubePlaylist.emplace_back(url, title);
 
 									if (videoIdCurrent == videoId) {
 										idx_CurrentPlay = youtubePlaylist.size() - 1;
