@@ -267,6 +267,10 @@ namespace Youtube
 				if (getJsonValue(videoDetails->value, "shortDescription", y_fields.content)) {
 					y_fields.content.Replace(L"\\r\\n", L"\r\n");
 					y_fields.content.Replace(L"\\n", L"\r\n");
+
+					std::wstring wstr = std::regex_replace(y_fields.content.GetString(), std::wregex(LR"(\r\n|\r|\n)"), L"\r\n");
+					y_fields.content = wstr.c_str();
+
 					if (bReplacePlus) {
 						y_fields.content.Replace('+', ' ');
 					}
