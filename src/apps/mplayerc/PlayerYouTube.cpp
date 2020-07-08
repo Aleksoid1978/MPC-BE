@@ -1216,6 +1216,7 @@ namespace Youtube
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)
 	{
 		idx_CurrentPlay = 0;
+		youtubePlaylist.clear();
 		if (CheckPlaylist(url)) {
 #if !USE_GOOGLE_API
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
@@ -1254,16 +1255,119 @@ namespace Youtube
 				const auto extract_mix = playlistId.Left(2) == L"RD" || playlistId.Left(2) == L"UL" || playlistId.Left(2) == L"PU";
 				if (extract_mix) {
 					DLog(L"Youtube::Parse_Playlist() : mixed playlist");
-					url.Format(L"https://www.youtube.com/watch?v=%s&list=%s&disable_polymer=true", videoIdCurrent, playlistId);
+					url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", videoIdCurrent, playlistId);
 				} else {
-					url.Format(L"https://www.youtube.com/playlist?list=%s&disable_polymer=true", playlistId);
+					url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
 				}
 
 				char* data = nullptr;
-				CStringA dataStr, moreStr;
+				CStringA dataStr;
 				DWORD dataSize = 0;
 
 				unsigned index = 0;
+				DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+				InternetReadData(hInet, url, &data, dataSize);
+				if (data) {
+					dataStr = data; free(data);
+				}
+
+				if (dataStr.IsEmpty()) {
+					InternetCloseHandle(hInet);
+					return false;
+				}
+
+				while (!dataStr.IsEmpty()) {
+					CStringA jsonEntry = GetEntry(dataStr.GetString(), R"({"responseContext":)", "};");
+					dataStr.Empty();
+					if (!jsonEntry.IsEmpty()) {
+						jsonEntry = R"({"responseContext":)" + jsonEntry + "}";
+
+						rapidjson::Document json;
+						if (!json.Parse(jsonEntry).HasParseError()) {
+							auto contents = GetValueByPointer(json, "/contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents/0/playlistVideoListRenderer/contents");
+							if (!contents) {
+								contents = GetValueByPointer(json, "/contents/twoColumnWatchNextResults/playlist/playlist/contents");
+							}
+
+							CString lastvideoId;
+							auto ParseJsonObject = [&](const auto& object) {
+								CString videoId;
+								getJsonValue(object, "videoId", videoId);
+
+								if (!videoId.IsEmpty()) {
+									CString simpleText;
+									if (isJsonObject(title, object, "title")) {
+										if (getJsonValue(title->value, "simpleText", simpleText)) {
+											REFERENCE_TIME duration = 0;
+											CString lengthSeconds;
+											if (getJsonValue(object, "lengthSeconds", lengthSeconds)) {
+												duration = UNITS * _wtoi(lengthSeconds);
+											} else if (isJsonObject(lengthText, object, "lengthText")) {
+												CString simpleText;
+												if (getJsonValue(lengthText->value, "simpleText", simpleText)) {
+													int t1 = 0;
+													int t2 = 0;
+													int t3 = 0;
+
+													if (const auto ret = swscanf_s(simpleText.GetString(), L"%02d:%02d:%02d", &t1, &t2, &t3)) {
+														if (ret == 3) {
+															duration = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
+														} else if (ret == 2) {
+															duration = ((60LL * t1) + t2) * UNITS;
+														}
+													}
+												}
+											}
+
+											CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
+											auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
+												return item.url == url;
+											});
+											if (it == youtubePlaylist.cend()) {
+												lastvideoId = videoId;
+												youtubePlaylist.push_back({ url, simpleText, duration });
+
+												if (videoId == videoIdCurrent) {
+													idx_CurrentPlay = youtubePlaylist.size() - 1;
+												}
+											}
+										}
+									}
+								}
+							};
+
+							if (contents && contents->IsArray()) {
+								for (const auto& item : contents->GetArray()) {
+									if (isJsonObject(playlistPanelVideoRenderer, item, "playlistPanelVideoRenderer")) {
+										ParseJsonObject(playlistPanelVideoRenderer->value);
+									} else if (isJsonObject(playlistVideoRenderer, item, "playlistVideoRenderer")) {
+										ParseJsonObject(playlistVideoRenderer->value);
+									}
+								}
+							}
+
+							if (!lastvideoId.IsEmpty()) {
+								url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", lastvideoId, playlistId);
+								DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+								InternetReadData(hInet, url, &data, dataSize);
+								if (data) {
+									dataStr = data; free(data);
+								}
+							}
+						}
+					}
+				}
+
+				if (!youtubePlaylist.empty()) {
+					InternetCloseHandle(hInet);
+					return true;
+				}
+
+				CStringA moreStr;
+				dataStr.Empty();
+
+				index = 0;
+				url += L"&disable_polymer=true";
 				DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
 				InternetReadData(hInet, url, &data, dataSize);
 				if (data) {

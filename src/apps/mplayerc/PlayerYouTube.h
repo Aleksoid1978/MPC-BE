@@ -143,11 +143,13 @@ namespace Youtube
 
 	struct YoutubePlaylistItem {
 		CString url, title;
+		REFERENCE_TIME duration = 0;
 
-		YoutubePlaylistItem() {};
-		YoutubePlaylistItem(CString _url, CString _title)
+		YoutubePlaylistItem() = default;
+		YoutubePlaylistItem(const CString& _url, const CString& _title, const REFERENCE_TIME _duration = 0)
 			: url(_url)
-			, title(_title) {};
+			, title(_title)
+			, duration(_duration) {};
 	};
 	typedef std::vector<YoutubePlaylistItem> YoutubePlaylist;
 

@@ -19875,8 +19875,8 @@ BOOL CMainFrame::OpenYoutubePlaylist(const CString& url, BOOL bOnlyParse/* = FAL
 			}
 
 			CFileItemList fis;
-			for(auto item = youtubePlaylist.begin(); item != youtubePlaylist.end(); ++item) {
-				CFileItem fi(item->url, item->title);
+			for (const auto& item : youtubePlaylist) {
+				CFileItem fi(item.url, item.title, item.duration);
 				fis.push_back(fi);
 			}
 			m_wndPlaylistBar.Append(fis);

@@ -2076,17 +2076,21 @@ void CPlayerPlaylistBar::Append(const CFileItemList& fis)
 		TSelectTab();
 	}
 
-	const INT_PTR idx = curPlayList.GetCount();
+	INT_PTR idx = curPlayList.GetCount();
+	if (idx != 0) {
+		idx++;
+	}
 
 	for (const auto& fi : fis) {
 		CPlaylistItem pli;
 		pli.m_fns.push_front(fi.GetName());
 		pli.m_label = fi.GetTitle();
+		pli.m_duration = fi.GetDuration();
 		curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
 	}
 
 	Refresh();
-	EnsureVisible(curPlayList.FindIndex(idx + 1));
+	EnsureVisible(curPlayList.FindIndex(idx));
 	SavePlaylist();
 
 	UpdateList();
@@ -3221,6 +3225,10 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 
 void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 {
+	if (bTMenuPopup) {
+		return;
+	}
+
 	CRect rcBar;
 	GetClientRect(&rcBar);
 	rcBar.bottom = rcBar.top + m_rcTPage.Height() + 2;
@@ -4009,6 +4017,7 @@ void CPlayerPlaylistBar::TDrawSearchBar()
 void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 {
 	m_button_idx = -1;
+	bTMenuPopup = true;
 
 	CPoint p;
 	if (bUnderCursor) {
@@ -4052,6 +4061,8 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 
 	int nID = (int)menu.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
 	int size = m_tabs.size();
+
+	bTMenuPopup = false;
 
 	bool bNewExplorer = false;
 
