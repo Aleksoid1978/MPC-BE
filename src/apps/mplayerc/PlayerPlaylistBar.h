@@ -280,7 +280,9 @@ private:
 		std::vector<file_data_t> files;
 	};
 	std::vector<tab_t> m_tabs;
-#define curTab m_tabs[m_nCurPlayListIndex]
+	inline tab_t& GetCurTab() {
+		return m_tabs[m_nCurPlayListIndex];
+	}
 
 	enum {
 		LEFT,
