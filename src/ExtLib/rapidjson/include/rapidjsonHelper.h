@@ -22,6 +22,7 @@
 
 #define RAPIDJSON_SSE2
 #include "./rapidjson/document.h"
+#include "./rapidjson/pointer.h"
 
 template <typename T>
 inline bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T& value)

@@ -34,6 +34,8 @@ class CFileItem
 	CString m_Title;
 	ChaptersList m_ChaptersList;
 
+	REFERENCE_TIME m_duration = 0;
+
 public:
 	CFileItem() = default;
 	~CFileItem() = default;
@@ -41,9 +43,10 @@ public:
 	CFileItem(const CString& str) {
 		m_fn = str;
 	}
-	CFileItem(const CString& strFn, const CString& strTitle) {
+	CFileItem(const CString& strFn, const CString& strTitle, const REFERENCE_TIME duration = 0) {
 		m_fn = strFn;
 		m_Title = strTitle;
+		m_duration = duration;
 	}
 	CFileItem(const WCHAR* str) {
 		m_fn = str;
@@ -72,6 +75,10 @@ public:
 
 	CString GetName() const {
 		return m_fn;
+	};
+
+	REFERENCE_TIME GetDuration() const {
+		return m_duration;
 	};
 
 	// Title
@@ -308,6 +315,8 @@ private:
 	void TOnMenu(bool bUnderCurcor = false);
 	void TSetOffset(bool toRight = false);
 	void TEnsureVisible(int idx);
+
+	bool bTMenuPopup = false;
 
 	CRect m_rcTPage;
 	size_t m_cntOffset;
