@@ -1418,7 +1418,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 	int selected_idx = -1;
 
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
-	if (!f.Open(fn) || !f.ReadString(str) || str != L"MPCPLAYLIST" || f.GetLength() > MEGABYTE) {
+	if (!f.Open(fn) || f.GetLength() > 50 * MEGABYTE || !f.ReadString(str) || str != L"MPCPLAYLIST") {
 		if (curTab.type == EXPLORER) {
 			TParseFolder(L".\\");
 		}
