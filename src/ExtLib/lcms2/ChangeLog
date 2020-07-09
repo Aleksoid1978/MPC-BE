@@ -1,5 +1,13 @@
 
 -----------------------
+2.11 Maintenance release
+-----------------------
+Fixed __cpuid() on fast float plugin to allow gnu gcc
+Fixed copy alpha bounds check
+Fixed data race condition on contexts pool
+Fixed LUT16 write matrix on multichannel V2 profiles
+
+-----------------------
 2.10 Featured release
 -----------------------
 Added a compilation toggle to remove "register" keyword in API. 
@@ -52,7 +60,7 @@ Added a flag  to clip negative values in unbounded transforms (only gray, rgb, c
 Move unused var suppresor before the `return` statements.
 Remove dead code.
 Add missing comma in CGATS parser    
-utils/jpgicc/iccjpeg.c: Fix check if unsigned variable 'total_length'… …
+utils/jpgicc/iccjpeg.c: Fix check if unsigned variable 'total_length'â€¦ â€¦
 Some maintenance fixes
 Remove unused vcproj files
 Added a function to retrieve the iohandler of a given profile object
