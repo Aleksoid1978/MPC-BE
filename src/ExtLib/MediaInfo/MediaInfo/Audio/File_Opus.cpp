@@ -37,9 +37,9 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-static const char*  Opus_ChannelPositions[]=
+static const size_t Opus_ChannelLayout_Max=8;
+static const char*  Opus_ChannelPositions[Opus_ChannelLayout_Max]=
 {
-    "",
     "Front: C",
     "Front: L R",
     "Front: L C R",
@@ -51,28 +51,27 @@ static const char*  Opus_ChannelPositions[]=
 };
 
 //---------------------------------------------------------------------------
-static const char*  Opus_ChannelPositions2[]=
+static const char*  Opus_ChannelPositions2[Opus_ChannelLayout_Max]=
 {
-    "",
     "1/0/0",
     "2/0/0",
-    "2/1/0",
-    "2/2/0",
-    "3/2/0",
-    "3/2/1",
-    "3/2/2",
-    "3/2/3",
+    "3/0/0",
+    "2/0/2",
+    "3/0/2",
+    "3/0/2.1",
+    "3/2/1.1",
+    "3/2/2.1",
 };
 
 //---------------------------------------------------------------------------
-static const char*  Opus_ChannelLayout[]=
+static const char*  Opus_ChannelLayout[Opus_ChannelLayout_Max]=
 {
-    "",
     "C",
     "L R",
     "L R C",
     "L R BL BR",
-    "L R C SL SR LFE",
+    "L R BL BR LFE",
+    "L R C BL BR LFE",
     "L R C SL SR BC LFE",
     "L R C SL SR BL BR LFE",
 };
@@ -163,10 +162,11 @@ void File_Opus::Identification()
                         break; // Not in spec
                     // else it is as Vorbis specs, no break
             case 1 : // Vorbis order
+                    if (ch_count && ch_count<=Opus_ChannelLayout_Max)
                     {
-                    Ztring ChannelPositions; ChannelPositions.From_UTF8(Opus_ChannelPositions[ch_count]);
-                    Ztring ChannelPositions2; ChannelPositions2.From_UTF8(Opus_ChannelPositions2[ch_count]);
-                    Ztring ChannelLayout2; ChannelLayout2.From_UTF8(Opus_ChannelLayout[ch_count]);
+                    Ztring ChannelPositions; ChannelPositions.From_UTF8(Opus_ChannelPositions[ch_count-1]);
+                    Ztring ChannelPositions2; ChannelPositions2.From_UTF8(Opus_ChannelPositions2[ch_count-1]);
+                    Ztring ChannelLayout2; ChannelLayout2.From_UTF8(Opus_ChannelLayout[ch_count-1]);
                     if (ChannelPositions!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions))
                         Fill(Stream_Audio, 0, Audio_ChannelPositions, ChannelPositions);
                     if (ChannelPositions2!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2))

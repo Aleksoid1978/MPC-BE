@@ -342,7 +342,7 @@ public :
     Ztring SubString (const tstring &Begin, const tstring &End, size_type Pos=0, ztring_t Options=Ztring_Nothing) const;
         /// @brief replace a string by another one
         /// @param ToFind string to find
-        /// @param ToReplace string wich replace the string found
+        /// @param ReplaceBy string wich replace the string found
         /// @param Pos Position to begin to scan string
         /// @param Options Options for searching \n
         ///                Available : Ztring_CaseSensitive, Ztring_Recursive

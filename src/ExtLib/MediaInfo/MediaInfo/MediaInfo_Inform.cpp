@@ -569,7 +569,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
             }
             else
             #endif //defined(MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
-            if ((MediaInfoLib::Config.Complete_Get() || Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options)[InfoOption_ShowInInform]==__T('Y')))
+            if (Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options)[InfoOption_ShowInInform]==__T('Y'))
+                Shouldshow=true;
+            if (!Shouldshow && MediaInfoLib::Config.Complete_Get())
                 Shouldshow=true;
             if (Shouldshow && !Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Text).empty())
             {
