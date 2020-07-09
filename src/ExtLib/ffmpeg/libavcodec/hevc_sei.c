@@ -213,6 +213,32 @@ static int decode_registered_user_data_closed_caption(HEVCSEIA53Caption *s, GetB
     return 0;
 }
 
+static int decode_nal_sei_user_data_unregistered(HEVCSEIUnregistered *s, GetBitContext *gb,
+                                                      int size)
+{
+    AVBufferRef *buf_ref, **tmp;
+
+    if (size < 16 || size >= INT_MAX - 1)
+       return AVERROR_INVALIDDATA;
+
+    tmp = av_realloc_array(s->buf_ref, s->nb_buf_ref + 1, sizeof(*s->buf_ref));
+    if (!tmp)
+        return AVERROR(ENOMEM);
+    s->buf_ref = tmp;
+
+    buf_ref = av_buffer_alloc(size + 1);
+    if (!buf_ref)
+        return AVERROR(ENOMEM);
+
+    for (int i = 0; i < size; i++)
+        buf_ref->data[i] = get_bits(gb, 8);
+    buf_ref->data[size] = 0;
+    buf_ref->size = size;
+    s->buf_ref[s->nb_buf_ref++] = buf_ref;
+
+    return 0;
+}
+
 static int decode_nal_sei_user_data_registered_itu_t_t35(HEVCSEI *s, GetBitContext *gb,
                                                          int size)
 {
@@ -280,6 +306,53 @@ static int decode_nal_sei_alternative_transfer(HEVCSEIAlternativeTransfer *s, Ge
     return 0;
 }
 
+static int decode_nal_sei_timecode(HEVCSEITimeCode *s, GetBitContext *gb)
+{
+    s->num_clock_ts = get_bits(gb, 2);
+
+    for (int i = 0; i < s->num_clock_ts; i++) {
+        s->clock_timestamp_flag[i] =  get_bits(gb, 1);
+
+        if (s->clock_timestamp_flag[i]) {
+            s->units_field_based_flag[i] = get_bits(gb, 1);
+            s->counting_type[i]          = get_bits(gb, 5);
+            s->full_timestamp_flag[i]    = get_bits(gb, 1);
+            s->discontinuity_flag[i]     = get_bits(gb, 1);
+            s->cnt_dropped_flag[i]       = get_bits(gb, 1);
+
+            s->n_frames[i]               = get_bits(gb, 9);
+
+            if (s->full_timestamp_flag[i]) {
+                s->seconds_value[i]      = av_clip(get_bits(gb, 6), 0, 59);
+                s->minutes_value[i]      = av_clip(get_bits(gb, 6), 0, 59);
+                s->hours_value[i]        = av_clip(get_bits(gb, 5), 0, 23);
+            } else {
+                s->seconds_flag[i] = get_bits(gb, 1);
+                if (s->seconds_flag[i]) {
+                    s->seconds_value[i] = av_clip(get_bits(gb, 6), 0, 59);
+                    s->minutes_flag[i]  = get_bits(gb, 1);
+                    if (s->minutes_flag[i]) {
+                        s->minutes_value[i] = av_clip(get_bits(gb, 6), 0, 59);
+                        s->hours_flag[i] =  get_bits(gb, 1);
+                        if (s->hours_flag[i]) {
+                            s->hours_value[i] = av_clip(get_bits(gb, 5), 0, 23);
+                        }
+                    }
+                }
+            }
+
+            s->time_offset_length[i] = get_bits(gb, 5);
+            if (s->time_offset_length[i] > 0) {
+                s->time_offset_value[i] = get_bits(gb, s->time_offset_length[i]);
+            }
+        }
+    }
+
+    s->present = 1;
+    return 0;
+}
+
+
 static int decode_nal_sei_prefix(GetBitContext *gb, void *logctx, HEVCSEI *s,
                                  const HEVCParamSets *ps, int type, int size)
 {
@@ -300,8 +373,12 @@ static int decode_nal_sei_prefix(GetBitContext *gb, void *logctx, HEVCSEI *s,
         return decode_nal_sei_active_parameter_sets(s, gb, logctx);
     case HEVC_SEI_TYPE_USER_DATA_REGISTERED_ITU_T_T35:
         return decode_nal_sei_user_data_registered_itu_t_t35(s, gb, size);
+    case HEVC_SEI_TYPE_USER_DATA_UNREGISTERED:
+        return decode_nal_sei_user_data_unregistered(&s->unregistered, gb, size);
     case HEVC_SEI_TYPE_ALTERNATIVE_TRANSFER_CHARACTERISTICS:
         return decode_nal_sei_alternative_transfer(&s->alternative_transfer, gb);
+    case HEVC_SEI_TYPE_TIME_CODE:
+        return decode_nal_sei_timecode(&s->timecode, gb);
     default:
         av_log(logctx, AV_LOG_DEBUG, "Skipped PREFIX SEI %d\n", type);
         skip_bits_long(gb, 8 * size);
@@ -371,4 +448,9 @@ int ff_hevc_decode_nal_sei(GetBitContext *gb, void *logctx, HEVCSEI *s,
 void ff_hevc_reset_sei(HEVCSEI *s)
 {
     av_buffer_unref(&s->a53_caption.buf_ref);
+
+    for (int i = 0; i < s->unregistered.nb_buf_ref; i++)
+        av_buffer_unref(&s->unregistered.buf_ref[i]);
+    s->unregistered.nb_buf_ref = 0;
+    av_freep(&s->unregistered.buf_ref);
 }

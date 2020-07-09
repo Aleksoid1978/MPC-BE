@@ -1406,6 +1406,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
+        .id        = AV_CODEC_ID_PGX,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "pgx",
+        .long_name = NULL_IF_CONFIG_SMALL("PGX (JPEG2000 Test Format)"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
         .id        = AV_CODEC_ID_Y41P,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "y41p",
@@ -1762,6 +1769,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "mv30",
         .long_name = NULL_IF_CONFIG_SMALL("MidiVid 3.0"),
         .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_NOTCHLC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "notchlc",
+        .long_name = NULL_IF_CONFIG_SMALL("NotchLC"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_PFM,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "pfm",
+        .long_name = NULL_IF_CONFIG_SMALL("PFM (Portable FloatMap) image"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
 
     /* various PCM "codecs" */
@@ -2883,7 +2904,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "tak",
         .long_name = NULL_IF_CONFIG_SMALL("TAK (Tom's lossless Audio Kompressor)"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+        .props     = AV_CODEC_PROP_LOSSLESS,
     },
     {
         .id        = AV_CODEC_ID_METASOUND,

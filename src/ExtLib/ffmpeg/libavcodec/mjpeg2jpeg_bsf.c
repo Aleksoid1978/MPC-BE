@@ -29,8 +29,8 @@
 #include "libavutil/error.h"
 #include "libavutil/intreadwrite.h"
 
-#include "avcodec.h"
 #include "bsf.h"
+#include "bsf_internal.h"
 #include "jpegtables.h"
 #include "mjpeg.h"
 

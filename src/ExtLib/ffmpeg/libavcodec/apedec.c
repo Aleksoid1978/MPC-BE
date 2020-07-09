@@ -24,6 +24,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
+#include "libavutil/crc.h"
 #include "libavutil/opt.h"
 #include "lossless_audiodsp.h"
 #include "avcodec.h"
@@ -147,7 +148,8 @@ typedef struct APEContext {
     int fset;                                ///< which filter set to use (calculated from compression level)
     int flags;                               ///< global decoder flags
 
-    uint32_t CRC;                            ///< frame CRC
+    uint32_t CRC;                            ///< signalled frame CRC
+    uint32_t CRC_state;                      ///< accumulated CRC
     int frameflags;                          ///< frame flags
     APEPredictor predictor;                  ///< predictor used for final reconstruction
 
@@ -260,9 +262,8 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
     for (i = 0; i < APE_FILTER_LEVELS; i++) {
         if (!ape_filter_orders[s->fset][i])
             break;
-        FF_ALLOC_OR_GOTO(avctx, s->filterbuf[i],
-                         (ape_filter_orders[s->fset][i] * 3 + HISTORY_SIZE) * 4,
-                         filter_alloc_fail);
+        if (!(s->filterbuf[i] = av_malloc((ape_filter_orders[s->fset][i] * 3 + HISTORY_SIZE) * 4)))
+            return AVERROR(ENOMEM);
     }
 
     if (s->fileversion < 3860) {
@@ -298,9 +299,6 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
     avctx->channel_layout = (avctx->channels==2) ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_MONO;
 
     return 0;
-filter_alloc_fail:
-    ape_decode_close(avctx);
-    return AVERROR(ENOMEM);
 }
 
 /**
@@ -750,6 +748,7 @@ static int init_entropy_decoder(APEContext *ctx)
 
     /* Read the frame flags if they exist */
     ctx->frameflags = 0;
+    ctx->CRC_state = UINT32_MAX;
     if ((ctx->fileversion > 3820) && (ctx->CRC & 0x80000000)) {
         ctx->CRC &= ~0x80000000;
 
@@ -1570,12 +1569,33 @@ static int ape_decode_frame(AVCodecContext *avctx, void *data,
         for (ch = 0; ch < s->channels; ch++) {
             sample24 = (int32_t *)frame->data[ch];
             for (i = 0; i < blockstodecode; i++)
-                *sample24++ = s->decoded[ch][i] * 256;
+                *sample24++ = s->decoded[ch][i] * 256U;
         }
         break;
     }
 
     s->samples -= blockstodecode;
+
+    if (avctx->err_recognition & AV_EF_CRCCHECK &&
+        s->fileversion >= 3900 && s->bps < 24) {
+        uint32_t crc = s->CRC_state;
+        const AVCRC *crc_tab = av_crc_get_table(AV_CRC_32_IEEE_LE);
+        for (i = 0; i < blockstodecode; i++) {
+            for (ch = 0; ch < s->channels; ch++) {
+                uint8_t *smp = frame->data[ch] + (i*(s->bps >> 3));
+                crc = av_crc(crc_tab, crc, smp, s->bps >> 3);
+            }
+        }
+
+        if (!s->samples && (~crc >> 1) ^ s->CRC) {
+            av_log(avctx, AV_LOG_ERROR, "CRC mismatch! Previously decoded "
+                   "frames may have been affected as well.\n");
+            if (avctx->err_recognition & AV_EF_EXPLODE)
+                return AVERROR_INVALIDDATA;
+        }
+
+        s->CRC_state = crc;
+    }
 
     *got_frame_ptr = 1;
 
@@ -1614,6 +1634,7 @@ AVCodec ff_ape_decoder = {
     .decode         = ape_decode_frame,
     .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY |
                       AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .flush          = ape_flush,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                       AV_SAMPLE_FMT_S16P,

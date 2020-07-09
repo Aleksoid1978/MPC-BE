@@ -162,11 +162,18 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
         }
         break;
     case AV_CODEC_ID_ADPCM_IMA_APM:
-        if (avctx->extradata && avctx->extradata_size >= 16) {
-            c->status[0].predictor  = AV_RL32(avctx->extradata +  0);
-            c->status[0].step_index = av_clip(AV_RL32(avctx->extradata +  4), 0, 88);
-            c->status[1].predictor  = AV_RL32(avctx->extradata +  8);
-            c->status[1].step_index = av_clip(AV_RL32(avctx->extradata + 12), 0, 88);
+        if (avctx->extradata) {
+            if (avctx->extradata_size >= 28) {
+                c->status[0].predictor  = av_clip_intp2(AV_RL32(avctx->extradata + 16), 18);
+                c->status[0].step_index = av_clip(AV_RL32(avctx->extradata + 20), 0, 88);
+                c->status[1].predictor  = av_clip_intp2(AV_RL32(avctx->extradata + 4), 18);
+                c->status[1].step_index = av_clip(AV_RL32(avctx->extradata + 8), 0, 88);
+            } else if (avctx->extradata_size >= 16) {
+                c->status[0].predictor  = av_clip_intp2(AV_RL32(avctx->extradata +  0), 18);
+                c->status[0].step_index = av_clip(AV_RL32(avctx->extradata +  4), 0, 88);
+                c->status[1].predictor  = av_clip_intp2(AV_RL32(avctx->extradata +  8), 18);
+                c->status[1].step_index = av_clip(AV_RL32(avctx->extradata + 12), 0, 88);
+            }
         }
         break;
     case AV_CODEC_ID_ADPCM_IMA_WS:
@@ -559,6 +566,10 @@ static int xa_decode(AVCodecContext *avctx, int16_t *out0, int16_t *out1,
             avpriv_request_sample(avctx, "unknown XA-ADPCM filter %d", filter);
             filter=0;
         }
+        if (shift < 0) {
+            avpriv_request_sample(avctx, "unknown XA-ADPCM shift %d", shift);
+            shift = 0;
+        }
         f0 = xa_adpcm_table[filter][0];
         f1 = xa_adpcm_table[filter][1];
 
@@ -584,9 +595,13 @@ static int xa_decode(AVCodecContext *avctx, int16_t *out0, int16_t *out1,
 
         shift  = 12 - (in[5+i*2] & 15);
         filter = in[5+i*2] >> 4;
-        if (filter >= FF_ARRAY_ELEMS(xa_adpcm_table)) {
+        if (filter >= FF_ARRAY_ELEMS(xa_adpcm_table) || shift < 0) {
             avpriv_request_sample(avctx, "unknown XA-ADPCM filter %d", filter);
             filter=0;
+        }
+        if (shift < 0) {
+            avpriv_request_sample(avctx, "unknown XA-ADPCM shift %d", shift);
+            shift = 0;
         }
 
         f0 = xa_adpcm_table[filter][0];
@@ -1853,8 +1868,8 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
                 int byte = bytestream2_get_byteu(&gb);
                 int index = (byte >> 4) & 7;
                 unsigned int exp = byte & 0x0F;
-                int factor1 = table[ch][index * 2];
-                int factor2 = table[ch][index * 2 + 1];
+                int64_t factor1 = table[ch][index * 2];
+                int64_t factor2 = table[ch][index * 2 + 1];
 
                 /* Decode 14 samples.  */
                 for (n = 0; n < 14 && (i * 14 + n < nb_samples); n++) {

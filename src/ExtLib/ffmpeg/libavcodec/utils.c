@@ -50,6 +50,7 @@
 #include "thread.h"
 #include "frame_thread_encoder.h"
 #include "internal.h"
+#include "put_bits.h"
 #include "raw.h"
 #include "bytestream.h"
 #include "version.h"
@@ -93,7 +94,7 @@ void av_fast_padded_mallocz(void *ptr, unsigned int *size, size_t min_size)
 
 int av_codec_is_encoder(const AVCodec *codec)
 {
-    return codec && (codec->encode_sub || codec->encode2 ||codec->send_frame);
+    return codec && (codec->encode_sub || codec->encode2 || codec->receive_packet);
 }
 
 int av_codec_is_decoder(const AVCodec *codec)
@@ -585,13 +586,16 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
 
     avci->to_free = av_frame_alloc();
     avci->compat_decode_frame = av_frame_alloc();
+    avci->compat_encode_packet = av_packet_alloc();
     avci->buffer_frame = av_frame_alloc();
     avci->buffer_pkt = av_packet_alloc();
+    avci->es.in_frame = av_frame_alloc();
     avci->ds.in_pkt = av_packet_alloc();
     avci->last_pkt_props = av_packet_alloc();
-    if (!avci->to_free      || !avci->compat_decode_frame ||
+    if (!avci->compat_decode_frame || !avci->compat_encode_packet ||
         !avci->buffer_frame || !avci->buffer_pkt          ||
-        !avci->ds.in_pkt    || !avci->last_pkt_props) {
+        !avci->es.in_frame  || !avci->ds.in_pkt           ||
+        !avci->to_free      || !avci->last_pkt_props) {
         ret = AVERROR(ENOMEM);
         goto free_and_end;
     }
@@ -1041,11 +1045,13 @@ FF_ENABLE_DEPRECATION_WARNINGS
         av_frame_free(&avci->to_free);
         av_frame_free(&avci->compat_decode_frame);
         av_frame_free(&avci->buffer_frame);
+        av_packet_free(&avci->compat_encode_packet);
         av_packet_free(&avci->buffer_pkt);
         av_packet_free(&avci->last_pkt_props);
 
         av_packet_free(&avci->ds.in_pkt);
-        ff_decode_bsfs_uninit(avctx);
+        av_frame_free(&avci->es.in_frame);
+        av_bsf_free(&avci->bsf);
 
         av_buffer_unref(&avci->pool);
     }
@@ -1053,6 +1059,51 @@ FF_ENABLE_DEPRECATION_WARNINGS
     avctx->internal = NULL;
     avctx->codec = NULL;
     goto end;
+}
+
+void avcodec_flush_buffers(AVCodecContext *avctx)
+{
+    AVCodecInternal *avci = avctx->internal;
+
+    if (av_codec_is_encoder(avctx->codec)) {
+        int caps = avctx->codec->capabilities;
+
+        if (!(caps & AV_CODEC_CAP_ENCODER_FLUSH)) {
+            // Only encoders that explicitly declare support for it can be
+            // flushed. Otherwise, this is a no-op.
+            av_log(avctx, AV_LOG_WARNING, "Ignoring attempt to flush encoder "
+                   "that doesn't support it\n");
+            return;
+        }
+
+        // We haven't implemented flushing for frame-threaded encoders.
+        av_assert0(!(caps & AV_CODEC_CAP_FRAME_THREADS));
+    }
+
+    avci->draining      = 0;
+    avci->draining_done = 0;
+    avci->nb_draining_errors = 0;
+    av_frame_unref(avci->buffer_frame);
+    av_frame_unref(avci->compat_decode_frame);
+    av_packet_unref(avci->compat_encode_packet);
+    av_packet_unref(avci->buffer_pkt);
+
+    av_frame_unref(avci->es.in_frame);
+    av_packet_unref(avci->ds.in_pkt);
+
+    if (HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME)
+        ff_thread_flush(avctx);
+    else if (avctx->codec->flush)
+        avctx->codec->flush(avctx);
+
+    avctx->pts_correction_last_pts =
+    avctx->pts_correction_last_dts = INT64_MIN;
+
+    if (av_codec_is_decoder(avctx->codec))
+        av_bsf_flush(avci->bsf);
+
+    if (!avctx->refcounted_frames)
+        av_frame_unref(avci->to_free);
 }
 
 void avsubtitle_free(AVSubtitle *sub)
@@ -1095,10 +1146,12 @@ av_cold int avcodec_close(AVCodecContext *avctx)
         av_frame_free(&avctx->internal->to_free);
         av_frame_free(&avctx->internal->compat_decode_frame);
         av_frame_free(&avctx->internal->buffer_frame);
+        av_packet_free(&avctx->internal->compat_encode_packet);
         av_packet_free(&avctx->internal->buffer_pkt);
         av_packet_free(&avctx->internal->last_pkt_props);
 
         av_packet_free(&avctx->internal->ds.in_pkt);
+        av_frame_free(&avctx->internal->es.in_frame);
 
         av_buffer_unref(&avctx->internal->pool);
 
@@ -1106,7 +1159,7 @@ av_cold int avcodec_close(AVCodecContext *avctx)
             avctx->hwaccel->uninit(avctx);
         av_freep(&avctx->internal->hwaccel_priv_data);
 
-        ff_decode_bsfs_uninit(avctx);
+        av_bsf_free(&avctx->internal->bsf);
 
         av_freep(&avctx->internal);
     }
@@ -1431,6 +1484,7 @@ int av_get_exact_bits_per_sample(enum AVCodecID codec_id)
     case AV_CODEC_ID_ADPCM_IMA_EA_SEAD:
     case AV_CODEC_ID_ADPCM_IMA_OKI:
     case AV_CODEC_ID_ADPCM_IMA_WS:
+    case AV_CODEC_ID_ADPCM_IMA_SSI:
     case AV_CODEC_ID_ADPCM_G722:
     case AV_CODEC_ID_ADPCM_YAMAHA:
     case AV_CODEC_ID_ADPCM_AICA:
@@ -2187,6 +2241,68 @@ int ff_alloc_a53_sei(const AVFrame *frame, size_t prefix_len,
     memcpy(sei_data + 10, side_data->data, side_data->size);
 
     sei_data[side_data->size+10] = 255;
+
+    return 0;
+}
+
+static unsigned bcd2uint(uint8_t bcd)
+{
+    unsigned low  = bcd & 0xf;
+    unsigned high = bcd >> 4;
+    if (low > 9 || high > 9)
+        return 0;
+    return low + 10*high;
+}
+
+int ff_alloc_timecode_sei(const AVFrame *frame, size_t prefix_len,
+                     void **data, size_t *sei_size)
+{
+    AVFrameSideData *sd = NULL;
+    uint8_t *sei_data;
+    PutBitContext pb;
+    uint32_t *tc;
+    int m;
+
+    if (frame)
+        sd = av_frame_get_side_data(frame, AV_FRAME_DATA_S12M_TIMECODE);
+
+    if (!sd) {
+        *data = NULL;
+        return 0;
+    }
+    tc =  (uint32_t*)sd->data;
+    m  = tc[0] & 3;
+
+    *sei_size = sizeof(uint32_t) * 4;
+    *data = av_mallocz(*sei_size + prefix_len);
+    if (!*data)
+        return AVERROR(ENOMEM);
+    sei_data = (uint8_t*)*data + prefix_len;
+
+    init_put_bits(&pb, sei_data, *sei_size);
+    put_bits(&pb, 2, m); // num_clock_ts
+
+    for (int j = 1; j <= m; j++) {
+        uint32_t tcsmpte = tc[j];
+        unsigned hh   = bcd2uint(tcsmpte     & 0x3f);    // 6-bit hours
+        unsigned mm   = bcd2uint(tcsmpte>>8  & 0x7f);    // 7-bit minutes
+        unsigned ss   = bcd2uint(tcsmpte>>16 & 0x7f);    // 7-bit seconds
+        unsigned ff   = bcd2uint(tcsmpte>>24 & 0x3f);    // 6-bit frames
+        unsigned drop = tcsmpte & 1<<30 && !0;  // 1-bit drop if not arbitrary bit
+
+        put_bits(&pb, 1, 1); // clock_timestamp_flag
+        put_bits(&pb, 1, 1); // units_field_based_flag
+        put_bits(&pb, 5, 0); // counting_type
+        put_bits(&pb, 1, 1); // full_timestamp_flag
+        put_bits(&pb, 1, 0); // discontinuity_flag
+        put_bits(&pb, 1, drop);
+        put_bits(&pb, 9, ff);
+        put_bits(&pb, 6, ss);
+        put_bits(&pb, 6, mm);
+        put_bits(&pb, 5, hh);
+        put_bits(&pb, 5, 0);
+    }
+    flush_put_bits(&pb);
 
     return 0;
 }

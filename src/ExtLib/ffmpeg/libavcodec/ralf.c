@@ -344,7 +344,8 @@ static int decode_block(AVCodecContext *avctx, GetBitContext *gb,
     int len, ch, ret;
     int dmode, mode[2], bits[2];
     int *ch0, *ch1;
-    int i, t, t2;
+    int i;
+    unsigned int t, t2;
 
     len = 12 - get_unary(gb, 0, 6);
 
@@ -409,8 +410,8 @@ static int decode_block(AVCodecContext *avctx, GetBitContext *gb,
         for (i = 0; i < len; i++) {
             t  =   ch1[i] + ctx->bias[1];
             t2 = ((ch0[i] + ctx->bias[0]) * 2) | (t & 1);
-            dst0[i] = (t2 + t) / 2;
-            dst1[i] = (t2 - t) / 2;
+            dst0[i] = (int)(t2 + t) / 2;
+            dst1[i] = (int)(t2 - t) / 2;
         }
         break;
     }
@@ -481,6 +482,8 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
     init_get_bits(&gb, src + 2, table_size);
     ctx->num_blocks = 0;
     while (get_bits_left(&gb) > 0) {
+        if (ctx->num_blocks >= FF_ARRAY_ELEMS(ctx->block_size))
+            return AVERROR_INVALIDDATA;
         ctx->block_size[ctx->num_blocks] = get_bits(&gb, 13 + avctx->channels);
         if (get_bits1(&gb)) {
             ctx->block_pts[ctx->num_blocks] = get_bits(&gb, 9);

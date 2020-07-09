@@ -292,6 +292,46 @@ static av_always_inline int av_sat_dsub32_c(int a, int b)
 }
 
 /**
+ * Add two signed 64-bit values with saturation.
+ *
+ * @param  a one value
+ * @param  b another value
+ * @return sum with signed saturation
+ */
+static av_always_inline int64_t av_sat_add64_c(int64_t a, int64_t b) {
+#if (!defined(__INTEL_COMPILER) && AV_GCC_VERSION_AT_LEAST(5,1)) || AV_HAS_BUILTIN(__builtin_add_overflow)
+    int64_t tmp;
+    return !__builtin_add_overflow(a, b, &tmp) ? tmp : (tmp < 0 ? INT64_MAX : INT64_MIN);
+#else
+    if (b >= 0 && a >= INT64_MAX - b)
+        return INT64_MAX;
+    if (b <= 0 && a <= INT64_MIN - b)
+        return INT64_MIN;
+    return a + b;
+#endif
+}
+
+/**
+ * Subtract two signed 64-bit values with saturation.
+ *
+ * @param  a one value
+ * @param  b another value
+ * @return difference with signed saturation
+ */
+static av_always_inline int64_t av_sat_sub64_c(int64_t a, int64_t b) {
+#if (!defined(__INTEL_COMPILER) && AV_GCC_VERSION_AT_LEAST(5,1)) || AV_HAS_BUILTIN(__builtin_sub_overflow)
+    int64_t tmp;
+    return !__builtin_sub_overflow(a, b, &tmp) ? tmp : (tmp < 0 ? INT64_MAX : INT64_MIN);
+#else
+    if (b <= 0 && a >= INT64_MAX + b)
+        return INT64_MAX;
+    if (b >= 0 && a <= INT64_MIN + b)
+        return INT64_MIN;
+    return a - b;
+#endif
+}
+
+/**
  * Clip a float value into the amin-amax range.
  * @param a value to clip
  * @param amin minimum value of the clip range
@@ -331,7 +371,7 @@ static av_always_inline av_const double av_clipd_c(double a, double amin, double
  */
 static av_always_inline av_const int av_ceil_log2_c(int x)
 {
-    return av_log2((x - 1) << 1);
+    return av_log2((x - 1U) << 1);
 }
 
 /**
@@ -544,6 +584,12 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
 #endif
 #ifndef av_sat_dsub32
 #   define av_sat_dsub32    av_sat_dsub32_c
+#endif
+#ifndef av_sat_add64
+#   define av_sat_add64     av_sat_add64_c
+#endif
+#ifndef av_sat_sub64
+#   define av_sat_sub64     av_sat_sub64_c
 #endif
 #ifndef av_clipf
 #   define av_clipf         av_clipf_c

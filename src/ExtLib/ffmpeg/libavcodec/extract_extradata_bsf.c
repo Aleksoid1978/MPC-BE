@@ -23,10 +23,10 @@
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 
-#include "avcodec.h"
 #include "av1.h"
 #include "av1_parse.h"
 #include "bsf.h"
+#include "bsf_internal.h"
 #include "bytestream.h"
 #include "h2645_parse.h"
 #include "h264.h"
