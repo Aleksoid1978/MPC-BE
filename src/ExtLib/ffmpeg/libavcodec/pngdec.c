@@ -23,6 +23,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/bprint.h"
+#include "libavutil/crc.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/stereo3d.h"
@@ -983,6 +984,11 @@ static int decode_fctl_chunk(AVCodecContext *avctx, PNGDecContext *s,
         return AVERROR_INVALIDDATA;
     }
 
+    if (s->pic_state & PNG_IDAT) {
+        av_log(avctx, AV_LOG_ERROR, "fctl after IDAT\n");
+        return AVERROR_INVALIDDATA;
+    }
+
     s->last_w = s->cur_w;
     s->last_h = s->cur_h;
     s->last_x_offset = s->x_offset;
@@ -1179,6 +1185,7 @@ static int handle_p_frame_apng(AVCodecContext *avctx, PNGDecContext *s,
 static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
                                AVFrame *p, AVPacket *avpkt)
 {
+    const AVCRC *crc_tab = av_crc_get_table(AV_CRC_32_IEEE_LE);
     AVDictionary **metadatap = NULL;
     uint32_t tag, length;
     int decode_next_dat = 0;
@@ -1212,6 +1219,21 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
             av_log(avctx, AV_LOG_ERROR, "chunk too big\n");
             ret = AVERROR_INVALIDDATA;
             goto fail;
+        }
+        if (avctx->err_recognition & (AV_EF_CRCCHECK | AV_EF_IGNORE_ERR)) {
+            uint32_t crc_sig = AV_RB32(s->gb.buffer + length + 4);
+            uint32_t crc_cal = ~av_crc(crc_tab, UINT32_MAX, s->gb.buffer, length + 4);
+            if (crc_sig ^ crc_cal) {
+                av_log(avctx, AV_LOG_ERROR, "CRC mismatch in chunk");
+                if (avctx->err_recognition & AV_EF_EXPLODE) {
+                    av_log(avctx, AV_LOG_ERROR, ", quitting\n");
+                    ret = AVERROR_INVALIDDATA;
+                    goto fail;
+                }
+                av_log(avctx, AV_LOG_ERROR, ", skipping\n");
+                bytestream2_skip(&s->gb, 4); /* tag */
+                goto skip_tag;
+            }
         }
         tag = bytestream2_get_le32(&s->gb);
         if (avctx->debug & FF_DEBUG_STARTCODE)
@@ -1252,7 +1274,7 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
         case MKTAG('f', 'd', 'A', 'T'):
             if (!CONFIG_APNG_DECODER || avctx->codec_id != AV_CODEC_ID_APNG)
                 goto skip_tag;
-            if (!decode_next_dat) {
+            if (!decode_next_dat || length < 4) {
                 ret = AVERROR_INVALIDDATA;
                 goto fail;
             }

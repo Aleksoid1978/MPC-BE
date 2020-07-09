@@ -655,6 +655,7 @@ SRCS_LU = \
 	libavutil/time.c \
 	libavutil/timecode.c \
 	libavutil/utils.c \
+	libavutil/video_enc_params.c \
 	\
 	libavutil/x86/cpu.c \
 	libavutil/x86/fixed_dsp_init.c \

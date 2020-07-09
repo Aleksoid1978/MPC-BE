@@ -9,8 +9,8 @@
 
 * libavcodec/aacdec_template.c
 * libavcodec/aacsbr_template.c
-* libavcodec/avcodec.h
 * libavcodec/bsf_list.c
+* libavcodec/codec.h
 * libavcodec/codec_list.c
 * libavcodec/decode.c
 * libavcodec/dxva2.c

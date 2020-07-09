@@ -679,6 +679,9 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
         return 0;
     }
 
+    if (is_dng && stride == 0)
+        return AVERROR_INVALIDDATA;
+
     for (line = 0; line < lines; line++) {
         if (src - ssrc > size) {
             av_log(s->avctx, AV_LOG_ERROR, "Source data overread\n");
@@ -856,8 +859,11 @@ static void dng_blit(TiffContext *s, uint8_t *dst, int dst_stride,
             }
         } else {
             for (line = 0; line < height; line++) {
+                uint8_t *dst_u8 = dst;
+                const uint8_t *src_u8 = src;
+
                 for (col = 0; col < width; col++)
-                    *dst++ = dng_process_color8(*src++, s->dng_lut, s->black_level, scale_factor);
+                    *dst_u8++ = dng_process_color8(*src_u8++, s->dng_lut, s->black_level, scale_factor);
 
                 dst += dst_stride;
                 src += src_stride;
@@ -905,12 +911,23 @@ static int dng_decode_jpeg(AVCodecContext *avctx, AVFrame *frame,
             return 0;
     }
 
+    is_u16 = (s->bpp > 8);
+
     /* Copy the outputted tile's pixels from 'jpgframe' to 'frame' (final buffer) */
 
     /* See dng_blit for explanation */
-    is_single_comp = (s->avctx_mjpeg->width == w * 2 && s->avctx_mjpeg->height == h / 2);
+    if (s->avctx_mjpeg->width  == w * 2 &&
+        s->avctx_mjpeg->height == h / 2 &&
+        s->avctx_mjpeg->pix_fmt == AV_PIX_FMT_GRAY16LE) {
+        is_single_comp = 1;
+    } else if (s->avctx_mjpeg->width  == w &&
+               s->avctx_mjpeg->height == h &&
+               s->avctx_mjpeg->pix_fmt == (is_u16 ? AV_PIX_FMT_GRAY16 : AV_PIX_FMT_GRAY8)
+              ) {
+        is_single_comp = 0;
+    } else
+        return AVERROR_INVALIDDATA;
 
-    is_u16 = (s->bpp > 8);
     pixel_size = (is_u16 ? sizeof(uint16_t) : sizeof(uint8_t));
 
     if (is_single_comp && !is_u16) {
@@ -1758,6 +1775,7 @@ static int decode_frame(AVCodecContext *avctx,
     GetByteContext stripdata;
     int retry_for_subifd, retry_for_page;
     int is_dng;
+    int has_tile_bits, has_strip_bits;
 
     bytestream2_init(&s->gb, avpkt->data, avpkt->size);
 
@@ -1882,6 +1900,14 @@ again:
 
     if (!s->is_tiled && !s->strippos && !s->stripoff) {
         av_log(avctx, AV_LOG_ERROR, "Image data is missing\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    has_tile_bits  = s->is_tiled || s->tile_byte_counts_offset || s->tile_offsets_offset || s->tile_width || s->tile_length || s->tile_count;
+    has_strip_bits = s->strippos || s->strips || s->stripoff || s->rps || s->sot || s->sstype || s->stripsize || s->stripsizesoff;
+
+    if (has_tile_bits && has_strip_bits) {
+        av_log(avctx, AV_LOG_ERROR, "Tiled TIFF is not allowed to strip\n");
         return AVERROR_INVALIDDATA;
     }
 

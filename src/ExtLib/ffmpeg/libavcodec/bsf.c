@@ -25,8 +25,10 @@
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
 
-#include "avcodec.h"
 #include "bsf.h"
+#include "bsf_internal.h"
+#include "codec_desc.h"
+#include "codec_par.h"
 
 #define IS_EMPTY(pkt) (!(pkt)->data && !(pkt)->side_data_elems)
 
@@ -77,7 +79,10 @@ static const AVClass bsf_class = {
     .item_name        = bsf_to_name,
     .version          = LIBAVUTIL_VERSION_INT,
     .child_next       = bsf_child_next,
+#if FF_API_CHILD_CLASS_NEXT
     .child_class_next = ff_bsf_child_class_next,
+#endif
+    .child_class_iterate = ff_bsf_child_class_iterate,
     .category         = AV_CLASS_CATEGORY_BITSTREAM_FILTER,
 };
 

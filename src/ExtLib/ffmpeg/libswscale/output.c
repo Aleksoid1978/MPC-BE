@@ -180,7 +180,8 @@ yuv2planeX_16_c_template(const int16_t *filter, int filterSize,
     }
 }
 
-static void yuv2p016cX_c(SwsContext *c, const int16_t *chrFilter, int chrFilterSize,
+static void yuv2p016cX_c(enum AVPixelFormat dstFormat, const uint8_t *chrDither,
+                         const int16_t *chrFilter, int chrFilterSize,
                          const int16_t **chrUSrc, const int16_t **chrVSrc,
                          uint8_t *dest8, int chrDstW)
 {
@@ -188,7 +189,7 @@ static void yuv2p016cX_c(SwsContext *c, const int16_t *chrFilter, int chrFilterS
     const int32_t **uSrc = (const int32_t **)chrUSrc;
     const int32_t **vSrc = (const int32_t **)chrVSrc;
     int shift = 15;
-    int big_endian = c->dstFormat == AV_PIX_FMT_P016BE;
+    int big_endian = dstFormat == AV_PIX_FMT_P016BE;
     int i, j;
 
     for (i = 0; i < chrDstW; i++) {
@@ -402,12 +403,11 @@ static void yuv2plane1_8_c(const int16_t *src, uint8_t *dest, int dstW,
     }
 }
 
-static void yuv2nv12cX_c(SwsContext *c, const int16_t *chrFilter, int chrFilterSize,
-                        const int16_t **chrUSrc, const int16_t **chrVSrc,
-                        uint8_t *dest, int chrDstW)
+static void yuv2nv12cX_c(enum AVPixelFormat dstFormat, const uint8_t *chrDither,
+                         const int16_t *chrFilter, int chrFilterSize,
+                         const int16_t **chrUSrc, const int16_t **chrVSrc,
+                         uint8_t *dest, int chrDstW)
 {
-    enum AVPixelFormat dstFormat = c->dstFormat;
-    const uint8_t *chrDither = c->chrDither8;
     int i;
 
     if (dstFormat == AV_PIX_FMT_NV12 ||
@@ -477,13 +477,14 @@ static void yuv2p010lX_c(const int16_t *filter, int filterSize,
     }
 }
 
-static void yuv2p010cX_c(SwsContext *c, const int16_t *chrFilter, int chrFilterSize,
+static void yuv2p010cX_c(enum AVPixelFormat dstFormat, const uint8_t *chrDither,
+                         const int16_t *chrFilter, int chrFilterSize,
                          const int16_t **chrUSrc, const int16_t **chrVSrc,
                          uint8_t *dest8, int chrDstW)
 {
     uint16_t *dest = (uint16_t*)dest8;
     int shift = 17;
-    int big_endian = c->dstFormat == AV_PIX_FMT_P010BE;
+    int big_endian = dstFormat == AV_PIX_FMT_P010BE;
     int i, j;
 
     for (i = 0; i < chrDstW; i++) {
@@ -1602,6 +1603,13 @@ yuv2rgb_write(uint8_t *_dest, int i, int Y1, int Y2,
 
         dest[i * 2 + 0] = r[Y1 + dr1] + g[Y1 + dg1] + b[Y1 + db1];
         dest[i * 2 + 1] = r[Y2 + dr2] + g[Y2 + dg2] + b[Y2 + db2];
+    } else if (target == AV_PIX_FMT_X2RGB10) {
+        uint32_t *dest = (uint32_t *) _dest;
+        const uint32_t *r = (const uint32_t *) _r;
+        const uint32_t *g = (const uint32_t *) _g;
+        const uint32_t *b = (const uint32_t *) _b;
+        dest[i * 2 + 0] = r[Y1] + g[Y1] + b[Y1];
+        dest[i * 2 + 1] = r[Y2] + g[Y2] + b[Y2];
     } else /* 8/4 bits */ {
         uint8_t *dest = (uint8_t *) _dest;
         const uint8_t *r = (const uint8_t *) _r;
@@ -1839,6 +1847,7 @@ YUV2RGBWRAPPER(yuv2rgb,,  12,    AV_PIX_FMT_RGB444,    0)
 YUV2RGBWRAPPER(yuv2rgb,,   8,    AV_PIX_FMT_RGB8,      0)
 YUV2RGBWRAPPER(yuv2rgb,,   4,    AV_PIX_FMT_RGB4,      0)
 YUV2RGBWRAPPER(yuv2rgb,,   4b,   AV_PIX_FMT_RGB4_BYTE, 0)
+YUV2RGBWRAPPER(yuv2, rgb, x2rgb10, AV_PIX_FMT_X2RGB10, 0)
 
 static av_always_inline void yuv2rgb_write_full(SwsContext *c,
     uint8_t *dest, int i, int Y, int A, int U, int V,
@@ -2973,6 +2982,12 @@ av_cold void ff_sws_init_output_funcs(SwsContext *c,
             *yuv2packed1 = yuv2rgb4b_1_c;
             *yuv2packed2 = yuv2rgb4b_2_c;
             *yuv2packedX = yuv2rgb4b_X_c;
+            break;
+        case AV_PIX_FMT_X2RGB10LE:
+        case AV_PIX_FMT_X2RGB10BE:
+            *yuv2packed1 = yuv2x2rgb10_1_c;
+            *yuv2packed2 = yuv2x2rgb10_2_c;
+            *yuv2packedX = yuv2x2rgb10_X_c;
             break;
         }
     }

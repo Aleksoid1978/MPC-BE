@@ -21,6 +21,8 @@
 #ifndef AVCODEC_CODEC_ID_H
 #define AVCODEC_CODEC_ID_H
 
+#include "libavutil/avutil.h"
+
 /**
  * @addtogroup lavc_core
  * @{
@@ -239,6 +241,7 @@ enum AVCodecID {
     AV_CODEC_ID_SCREENPRESSO,
     AV_CODEC_ID_RSCC,
     AV_CODEC_ID_AVS2,
+    AV_CODEC_ID_PGX,
 
     AV_CODEC_ID_Y41P = 0x8000,
     AV_CODEC_ID_AVRP,
@@ -291,6 +294,8 @@ enum AVCodecID {
     AV_CODEC_ID_MVHA,
     AV_CODEC_ID_CDTOONS,
     AV_CODEC_ID_MV30,
+    AV_CODEC_ID_NOTCHLC,
+    AV_CODEC_ID_PFM,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -555,6 +560,16 @@ enum AVCodecID {
     AV_CODEC_ID_WRAPPED_AVFRAME = 0x21001, ///< Passthrough codec, AVFrames wrapped in AVPacket
 };
 
+/**
+ * Get the type of the given codec.
+ */
+enum AVMediaType avcodec_get_type(enum AVCodecID codec_id);
+
+/**
+ * Get the name of a codec.
+ * @return  a static string identifying the codec; never NULL
+ */
+const char *avcodec_get_name(enum AVCodecID id);
 
 /**
  * @}

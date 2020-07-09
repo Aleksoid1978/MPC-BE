@@ -110,8 +110,11 @@
 
 typedef struct DecodeSimpleContext {
     AVPacket *in_pkt;
-    AVFrame  *out_frame;
 } DecodeSimpleContext;
+
+typedef struct EncodeSimpleContext {
+    AVFrame *in_frame;
+} EncodeSimpleContext;
 
 typedef struct AVCodecInternal {
     /**
@@ -151,6 +154,8 @@ typedef struct AVCodecInternal {
 
     void *frame_thread_encoder;
 
+    EncodeSimpleContext es;
+
     /**
      * Number of audio samples to skip at the start of the next decoded frame
      */
@@ -170,11 +175,8 @@ typedef struct AVCodecInternal {
      * buffers for using new encode/decode API through legacy API
      */
     AVPacket *buffer_pkt;
-    int buffer_pkt_valid; // encoding: packet without data can be valid
     AVFrame *buffer_frame;
     int draining_done;
-    /* set to 1 when the caller is using the old decoding API */
-    int compat_decode;
     int compat_decode_warned;
     /* this variable is set by the decoder internals to signal to the old
      * API compat wrappers the amount of data consumed from the last packet */
@@ -183,6 +185,7 @@ typedef struct AVCodecInternal {
      * of the packet (that should be submitted in the next decode call */
     size_t compat_decode_partial_size;
     AVFrame *compat_decode_frame;
+    AVPacket *compat_encode_packet;
 
     int showed_multi_packet_warning;
 
@@ -251,8 +254,6 @@ void ff_color_frame(AVFrame *frame, const int color[4]);
  * @return        non negative on success, negative error code on failure
  */
 int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size, int64_t min_size);
-
-attribute_deprecated int ff_alloc_packet(AVPacket *avpkt, int size);
 
 /**
  * Rescale from sample rate to AVCodecContext.time_base.
@@ -365,10 +366,6 @@ int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
  */
 AVCPBProperties *ff_add_cpb_side_data(AVCodecContext *avctx);
 
-int ff_side_data_set_encoder_stats(AVPacket *pkt, int quality, int64_t *error, int error_count, int pict_type);
-
-int ff_side_data_set_prft(AVPacket *pkt, int64_t timestamp);
-
 /**
  * Check AVFrame for A53 side data and allocate and fill SEI message with A53 info
  *
@@ -382,6 +379,21 @@ int ff_side_data_set_prft(AVPacket *pkt, int64_t timestamp);
  * @return           Zero on success, negative error code on failure
  */
 int ff_alloc_a53_sei(const AVFrame *frame, size_t prefix_len,
+                     void **data, size_t *sei_size);
+
+/**
+ * Check AVFrame for S12M timecode side data and allocate and fill TC SEI message with timecode info
+ *
+ * @param frame      Raw frame to get S12M timecode side data from
+ * @param prefix_len Number of bytes to allocate before SEI message
+ * @param data       Pointer to a variable to store allocated memory
+ *                   Upon return the variable will hold NULL on error or if frame has no S12M timecode info.
+ *                   Otherwise it will point to prefix_len uninitialized bytes followed by
+ *                   *sei_size SEI message
+ * @param sei_size   Pointer to a variable to store generated SEI message length
+ * @return           Zero on success, negative error code on failure
+ */
+int ff_alloc_timecode_sei(const AVFrame *frame, size_t prefix_len,
                      void **data, size_t *sei_size);
 
 /**

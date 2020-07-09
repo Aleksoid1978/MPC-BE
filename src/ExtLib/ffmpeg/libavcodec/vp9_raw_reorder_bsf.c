@@ -22,6 +22,7 @@
 #include "libavutil/mem.h"
 
 #include "bsf.h"
+#include "bsf_internal.h"
 #include "get_bits.h"
 #include "put_bits.h"
 

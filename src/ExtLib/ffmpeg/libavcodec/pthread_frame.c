@@ -246,7 +246,7 @@ static int update_context_from_thread(AVCodecContext *dst, AVCodecContext *src, 
 {
     int err = 0;
 
-    if (dst != src && (for_user || !(src->codec_descriptor->props & AV_CODEC_PROP_INTRA_ONLY))) {
+    if (dst != src && (for_user || src->codec->update_thread_context)) {
         dst->time_base = src->time_base;
         dst->framerate = src->framerate;
         dst->width     = src->width;
@@ -310,7 +310,6 @@ static int update_context_from_thread(AVCodecContext *dst, AVCodecContext *src, 
     }
 
     if (for_user) {
-        dst->delay       = src->thread_count - 1;
 #if FF_API_CODED_FRAME
 FF_DISABLE_DEPRECATION_WARNINGS
         dst->coded_frame = src->coded_frame;
@@ -794,6 +793,9 @@ int ff_frame_thread_init(AVCodecContext *avctx)
     fctx->async_lock = 1;
     fctx->delaying = 1;
 
+    if (codec->type == AVMEDIA_TYPE_VIDEO)
+        avctx->delay = src->thread_count - 1;
+
     for (i = 0; i < thread_count; i++) {
         AVCodecContext *copy = av_malloc(sizeof(AVCodecContext));
         PerThreadContext *p  = &fctx->threads[i];
@@ -830,6 +832,8 @@ int ff_frame_thread_init(AVCodecContext *avctx)
         *copy->internal = *src->internal;
         copy->internal->thread_ctx = p;
         copy->internal->last_pkt_props = &p->avpkt;
+
+        copy->delay = avctx->delay;
 
         if (codec->priv_data_size) {
             copy->priv_data = av_mallocz(codec->priv_data_size);

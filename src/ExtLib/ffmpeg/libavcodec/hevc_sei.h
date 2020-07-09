@@ -91,6 +91,11 @@ typedef struct HEVCSEIA53Caption {
     AVBufferRef *buf_ref;
 } HEVCSEIA53Caption;
 
+typedef struct HEVCSEIUnregistered {
+    AVBufferRef **buf_ref;
+    int nb_buf_ref;
+} HEVCSEIUnregistered;
+
 typedef struct HEVCSEIMasteringDisplay {
     int present;
     uint16_t display_primaries[3][2];
@@ -110,16 +115,38 @@ typedef struct HEVCSEIAlternativeTransfer {
     int preferred_transfer_characteristics;
 } HEVCSEIAlternativeTransfer;
 
+typedef struct HEVCSEITimeCode {
+    int      present;
+    uint8_t  num_clock_ts;
+    uint8_t  clock_timestamp_flag[3];
+    uint8_t  units_field_based_flag[3];
+    uint8_t  counting_type[3];
+    uint8_t  full_timestamp_flag[3];
+    uint8_t  discontinuity_flag[3];
+    uint8_t  cnt_dropped_flag[3];
+    uint16_t n_frames[3];
+    uint8_t  seconds_value[3];
+    uint8_t  minutes_value[3];
+    uint8_t  hours_value[3];
+    uint8_t  seconds_flag[3];
+    uint8_t  minutes_flag[3];
+    uint8_t  hours_flag[3];
+    uint8_t  time_offset_length[3];
+    int32_t  time_offset_value[3];
+} HEVCSEITimeCode;
+
 typedef struct HEVCSEI {
     HEVCSEIPictureHash picture_hash;
     HEVCSEIFramePacking frame_packing;
     HEVCSEIDisplayOrientation display_orientation;
     HEVCSEIPictureTiming picture_timing;
     HEVCSEIA53Caption a53_caption;
+    HEVCSEIUnregistered unregistered;
     HEVCSEIMasteringDisplay mastering_display;
     HEVCSEIContentLight content_light;
     int active_seq_parameter_set_id;
     HEVCSEIAlternativeTransfer alternative_transfer;
+    HEVCSEITimeCode timecode;
 } HEVCSEI;
 
 struct HEVCParamSets;

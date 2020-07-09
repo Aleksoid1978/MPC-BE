@@ -243,6 +243,15 @@ static int alloc_picture(H264Context *h, H264Picture *pic)
         pic->ref_index[i]  = pic->ref_index_buf[i]->data;
     }
 
+    pic->pps_buf = av_buffer_ref(h->ps.pps_ref);
+    if (!pic->pps_buf)
+        goto fail;
+    pic->pps = (const PPS*)pic->pps_buf->data;
+
+    pic->mb_width  = h->mb_width;
+    pic->mb_height = h->mb_height;
+    pic->mb_stride = h->mb_stride;
+
     return 0;
 fail:
     ff_h264_unref_picture(h, pic);
@@ -1317,8 +1326,21 @@ static int h264_export_frame_props(H264Context *h)
         h->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
+    for (int i = 0; i < h->sei.unregistered.nb_buf_ref; i++) {
+        H264SEIUnregistered *unreg = &h->sei.unregistered;
+
+        if (unreg->buf_ref[i]) {
+            AVFrameSideData *sd = av_frame_new_side_data_from_buf(cur->f,
+                    AV_FRAME_DATA_SEI_UNREGISTERED,
+                    unreg->buf_ref[i]);
+            if (!sd)
+                av_buffer_unref(&unreg->buf_ref[i]);
+            unreg->buf_ref[i] = NULL;
+        }
+    }
+    h->sei.unregistered.nb_buf_ref = 0;
+
     if (h->sei.picture_timing.timecode_cnt > 0) {
-        uint32_t tc = 0;
         uint32_t *tc_sd;
 
         AVFrameSideData *tcside = av_frame_new_side_data(cur->f,
@@ -1331,33 +1353,13 @@ static int h264_export_frame_props(H264Context *h)
         tc_sd[0] = h->sei.picture_timing.timecode_cnt;
 
         for (int i = 0; i < tc_sd[0]; i++) {
-            uint32_t frames;
+            int drop = h->sei.picture_timing.timecode[i].dropframe;
+            int   hh = h->sei.picture_timing.timecode[i].hours;
+            int   mm = h->sei.picture_timing.timecode[i].minutes;
+            int   ss = h->sei.picture_timing.timecode[i].seconds;
+            int   ff = h->sei.picture_timing.timecode[i].frame;
 
-            /* For SMPTE 12-M timecodes, frame count is a special case if > 30 FPS.
-               See SMPTE ST 12-1:2014 Sec 12.1 for more info. */
-            if (av_cmp_q(h->avctx->framerate, (AVRational) {30, 1}) == 1) {
-                frames = h->sei.picture_timing.timecode[i].frame / 2;
-                if (h->sei.picture_timing.timecode[i].frame % 2 == 1) {
-                    if (av_cmp_q(h->avctx->framerate, (AVRational) {50, 1}) == 0)
-                        tc |= (1 << 7);
-                    else
-                        tc |= (1 << 23);
-                }
-            } else {
-                frames = h->sei.picture_timing.timecode[i].frame;
-            }
-
-            tc |= h->sei.picture_timing.timecode[i].dropframe << 30;
-            tc |= (frames / 10) << 28;
-            tc |= (frames % 10) << 24;
-            tc |= (h->sei.picture_timing.timecode[i].seconds / 10) << 20;
-            tc |= (h->sei.picture_timing.timecode[i].seconds % 10) << 16;
-            tc |= (h->sei.picture_timing.timecode[i].minutes / 10) << 12;
-            tc |= (h->sei.picture_timing.timecode[i].minutes % 10) << 8;
-            tc |= (h->sei.picture_timing.timecode[i].hours / 10) << 4;
-            tc |= (h->sei.picture_timing.timecode[i].hours % 10);
-
-            tc_sd[i + 1] = tc;
+            tc_sd[i + 1] = av_timecode_get_smpte(h->avctx->framerate, drop, hh, mm, ss, ff);
         }
         h->sei.picture_timing.timecode_cnt = 0;
     }

@@ -224,6 +224,7 @@ extern AVCodec ff_mvdv_decoder;
 extern AVCodec ff_mvha_decoder;
 extern AVCodec ff_mwsc_decoder;
 extern AVCodec ff_mxpeg_decoder;
+extern AVCodec ff_notchlc_decoder;
 extern AVCodec ff_nuv_decoder;
 extern AVCodec ff_paf_video_decoder;
 extern AVCodec ff_pam_encoder;
@@ -232,10 +233,12 @@ extern AVCodec ff_pbm_encoder;
 extern AVCodec ff_pbm_decoder;
 extern AVCodec ff_pcx_encoder;
 extern AVCodec ff_pcx_decoder;
+extern AVCodec ff_pfm_decoder;
 extern AVCodec ff_pgm_encoder;
 extern AVCodec ff_pgm_decoder;
 extern AVCodec ff_pgmyuv_encoder;
 extern AVCodec ff_pgmyuv_decoder;
+extern AVCodec ff_pgx_decoder;
 extern AVCodec ff_pictor_decoder;
 extern AVCodec ff_pixlet_decoder;
 extern AVCodec ff_png_encoder;
@@ -618,6 +621,7 @@ extern AVCodec ff_adpcm_ima_qt_encoder;
 extern AVCodec ff_adpcm_ima_qt_decoder;
 extern AVCodec ff_adpcm_ima_rad_decoder;
 extern AVCodec ff_adpcm_ima_ssi_decoder;
+extern AVCodec ff_adpcm_ima_ssi_encoder;
 extern AVCodec ff_adpcm_ima_smjpeg_decoder;
 extern AVCodec ff_adpcm_ima_wav_encoder;
 extern AVCodec ff_adpcm_ima_wav_decoder;
@@ -751,12 +755,15 @@ extern AVCodec ff_idf_decoder;
 
 /* external libraries, that shouldn't be used by default if one of the
  * above is available */
+extern AVCodec ff_aac_mf_encoder;
+extern AVCodec ff_ac3_mf_encoder;
 extern AVCodec ff_h263_v4l2m2m_encoder;
 extern AVCodec ff_libaom_av1_decoder;
 extern AVCodec ff_libopenh264_encoder;
 extern AVCodec ff_libopenh264_decoder;
 extern AVCodec ff_h264_amf_encoder;
 extern AVCodec ff_h264_cuvid_decoder;
+extern AVCodec ff_h264_mf_encoder;
 extern AVCodec ff_h264_nvenc_encoder;
 extern AVCodec ff_h264_omx_encoder;
 extern AVCodec ff_h264_qsv_encoder;
@@ -771,6 +778,7 @@ extern AVCodec ff_nvenc_hevc_encoder;
 extern AVCodec ff_hevc_amf_encoder;
 extern AVCodec ff_hevc_cuvid_decoder;
 extern AVCodec ff_hevc_mediacodec_decoder;
+extern AVCodec ff_hevc_mf_encoder;
 extern AVCodec ff_hevc_nvenc_encoder;
 extern AVCodec ff_hevc_qsv_encoder;
 extern AVCodec ff_hevc_v4l2m2m_encoder;
@@ -781,6 +789,7 @@ extern AVCodec ff_mjpeg_cuvid_decoder;
 extern AVCodec ff_mjpeg_qsv_encoder;
 extern AVCodec ff_mjpeg_qsv_decoder;
 extern AVCodec ff_mjpeg_vaapi_encoder;
+extern AVCodec ff_mp3_mf_encoder;
 extern AVCodec ff_mpeg1_cuvid_decoder;
 extern AVCodec ff_mpeg2_cuvid_decoder;
 extern AVCodec ff_mpeg2_qsv_encoder;
@@ -804,6 +813,7 @@ extern AVCodec ff_vp9_qsv_encoder;
 // The iterate API is not usable with ossfuzz due to the excessive size of binaries created
 #if CONFIG_OSSFUZZ
 AVCodec * codec_list[] = {
+    NULL,
     NULL,
     NULL
 };
