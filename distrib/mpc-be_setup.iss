@@ -283,6 +283,9 @@ Type: files; Name: {app}\{#msdk_dll}
 ;[Registry]
 ;Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
+[Registry]
+Root: HKLM; Subkey: "SOFTWARE\Clients\Media\MPC-BE"; Flags: dontcreatekey uninsdeletekey
+
 [Code]
 function IsProcessorFeaturePresent(Feature: Integer): Boolean;
 external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
