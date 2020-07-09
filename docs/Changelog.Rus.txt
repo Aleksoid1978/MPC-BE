@@ -124,7 +124,7 @@ MPCBEShellExt (расширение проводника)
 	ffmpeg git-n4.4-dev-362-g3adffab073;
 	libflac git-1.3.3-54-gcffe3890;
 	libpng git-v1.6.37-16-g6dd99ca9c;
-	Little-CMS git-lcms2.9-80-gfc0fa79;
+	Little-CMS git-2.11-6-g279f82d;
 	MediaInfo git-v20.03-18-gdd72870b;
 	rapidjson git-v1.1.0-549-g8f4c021f;
 	ZenLib git-v0.4.38-4-gf48c9f1;

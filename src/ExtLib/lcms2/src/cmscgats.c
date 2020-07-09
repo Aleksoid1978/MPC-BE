@@ -2165,66 +2165,48 @@ void CookPointers(cmsIT8* it8)
 
         if (cmsstrcasecmp(Fld, "SAMPLE_ID") == 0) {
 
-            t -> SampleID = idField;
-
-            for (i=0; i < t -> nPatches; i++) {
-
-                char *Data = GetData(it8, i, idField);
-                if (Data) {
-                    char Buffer[256];
-
-                    strncpy(Buffer, Data, 255);
-                    Buffer[255] = 0;
-
-                    if (strlen(Buffer) <= strlen(Data))
-                        strcpy(Data, Buffer);
-                    else
-                        SetData(it8, i, idField, Buffer);
-
-                }
-            }
-
+            t -> SampleID = idField;            
         }
 
         // "LABEL" is an extension. It keeps references to forward tables
 
-        if ((cmsstrcasecmp(Fld, "LABEL") == 0) || Fld[0] == '$' ) {
+        if ((cmsstrcasecmp(Fld, "LABEL") == 0) || Fld[0] == '$') {
 
-                    // Search for table references...
-                    for (i=0; i < t -> nPatches; i++) {
+            // Search for table references...
+            for (i = 0; i < t->nPatches; i++) {
 
-                            char *Label = GetData(it8, i, idField);
+                char* Label = GetData(it8, i, idField);
 
-                            if (Label) {
+                if (Label) {
 
-                                cmsUInt32Number k;
+                    cmsUInt32Number k;
 
-                                // This is the label, search for a table containing
-                                // this property
+                    // This is the label, search for a table containing
+                    // this property
 
-                                for (k=0; k < it8 ->TablesCount; k++) {
+                    for (k = 0; k < it8->TablesCount; k++) {
 
-                                    TABLE* Table = it8 ->Tab + k;
-                                    KEYVALUE* p;
+                        TABLE* Table = it8->Tab + k;
+                        KEYVALUE* p;
 
-                                    if (IsAvailableOnList(Table->HeaderList, Label, NULL, &p)) {
+                        if (IsAvailableOnList(Table->HeaderList, Label, NULL, &p)) {
 
-                                        // Available, keep type and table
-                                        char Buffer[256];
+                            // Available, keep type and table
+                            char Buffer[256];
 
-                                        char *Type  = p ->Value;
-                                        int  nTable = (int) k;
+                            char* Type = p->Value;
+                            int  nTable = (int)k;
 
-                                        snprintf(Buffer, 255, "%s %d %s", Label, nTable, Type );
+                            snprintf(Buffer, 255, "%s %d %s", Label, nTable, Type);
 
-                                        SetData(it8, i, idField, Buffer);
-                                    }
-                                }
-
-
-                            }
-
+                            SetData(it8, i, idField, Buffer);
+                        }
                     }
+
+
+                }
+
+            }
 
 
         }

@@ -1203,25 +1203,28 @@ cmsBool SaveTags(_cmsICCPROFILE* Icc, _cmsICCPROFILE* FileOrig)
             // In this case a blind copy of the block data is performed
             if (FileOrig != NULL && Icc -> TagOffsets[i]) {
 
-                cmsUInt32Number TagSize   = FileOrig -> TagSizes[i];
-                cmsUInt32Number TagOffset = FileOrig -> TagOffsets[i];
-                void* Mem;
+                if (FileOrig->IOhandler != NULL)
+                {
+                    cmsUInt32Number TagSize = FileOrig->TagSizes[i];
+                    cmsUInt32Number TagOffset = FileOrig->TagOffsets[i];
+                    void* Mem;
 
-                if (!FileOrig ->IOhandler->Seek(FileOrig ->IOhandler, TagOffset)) return FALSE;
+                    if (!FileOrig->IOhandler->Seek(FileOrig->IOhandler, TagOffset)) return FALSE;
 
-                Mem = _cmsMalloc(Icc ->ContextID, TagSize);
-                if (Mem == NULL) return FALSE;
+                    Mem = _cmsMalloc(Icc->ContextID, TagSize);
+                    if (Mem == NULL) return FALSE;
 
-                if (FileOrig ->IOhandler->Read(FileOrig->IOhandler, Mem, TagSize, 1) != 1) return FALSE;
-                if (!io ->Write(io, TagSize, Mem)) return FALSE;
-                _cmsFree(Icc ->ContextID, Mem);
+                    if (FileOrig->IOhandler->Read(FileOrig->IOhandler, Mem, TagSize, 1) != 1) return FALSE;
+                    if (!io->Write(io, TagSize, Mem)) return FALSE;
+                    _cmsFree(Icc->ContextID, Mem);
 
-                Icc -> TagSizes[i] = (io ->UsedSpace - Begin);
+                    Icc->TagSizes[i] = (io->UsedSpace - Begin);
 
 
-                // Align to 32 bit boundary.
-                if (! _cmsWriteAlignment(io))
-                    return FALSE;
+                    // Align to 32 bit boundary.
+                    if (!_cmsWriteAlignment(io))
+                        return FALSE;
+                }
             }
 
             continue;

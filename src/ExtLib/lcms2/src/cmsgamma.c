@@ -300,7 +300,8 @@ cmsToneCurve* AllocateToneCurveStruct(cmsContext ContextID, cmsUInt32Number nEnt
         return p;
 
 Error:
-    if (p -> Segments) _cmsFree(ContextID, p ->Segments);
+    if (p -> SegInterp) _cmsFree(ContextID, p -> SegInterp);
+    if (p -> Segments) _cmsFree(ContextID, p -> Segments);
     if (p -> Evals) _cmsFree(ContextID, p -> Evals);
     if (p ->Table16) _cmsFree(ContextID, p ->Table16);
     _cmsFree(ContextID, p);
@@ -1430,4 +1431,15 @@ cmsFloat64Number CMSEXPORT cmsEstimateGamma(const cmsToneCurve* t, cmsFloat64Num
         return -1.0;
 
     return (sum / n);   // The mean
+}
+
+
+// Retrieve parameters on one-segment tone curves
+
+cmsFloat64Number* CMSEXPORT cmsGetToneCurveParams(const cmsToneCurve* t)
+{
+    _cmsAssert(t != NULL);
+
+    if (t->nSegments != 1) return NULL;
+    return t->Segments[0].Params;
 }
