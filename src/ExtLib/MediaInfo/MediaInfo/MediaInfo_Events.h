@@ -506,7 +506,7 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_0
     MediaInfo_int16u        RecordedDateTime2;
     MediaInfo_int8u         Arb;
     MediaInfo_int8u         Verbosity;
-    char*                   Errors;
+    const char*             Errors;
 };
 struct MediaInfo_Event_DvDif_Analysis_Frame_1
 {
@@ -516,11 +516,12 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_1
     MediaInfo_int16u        RecordedDateTime2;
     MediaInfo_int8u         Arb;
     MediaInfo_int8u         Verbosity;
-    char*                   Errors;
+    const char*             Errors;
     size_t                  Video_STA_Errors_Count;
     size_t*                 Video_STA_Errors;
     size_t                  Audio_Data_Errors_Count;
     size_t*                 Audio_Data_Errors;
+    MediaInfo_int32u        Captions_Errors; // bit 0 = parity issue
 };
 
 /*-------------------------------------------------------------------------*/
@@ -541,6 +542,7 @@ struct MediaInfo_Event_DvDif_Change_0
     MediaInfo_int32u        AudioRate_D;
     MediaInfo_int32u        AudioChannels;
     MediaInfo_int32u        AudioBitDepth;
+    MediaInfo_int32u        Captions_Flags; // bit 0 = present
 };
 
 /***************************************************************************/

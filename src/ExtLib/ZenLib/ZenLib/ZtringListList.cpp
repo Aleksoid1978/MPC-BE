@@ -406,7 +406,6 @@ void ZtringListList::Write(const Ztring &ToWrite)
 
         if (y>=size())
         {
-            size_t PreviousSize=size();
             resize(y+1);
             for (size_t j=0; j<=y; j++)
             {

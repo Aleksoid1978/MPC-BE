@@ -1138,8 +1138,10 @@ void File_Wm::Header_ExtendedContentDescription()
                 Fill(Stream_General, 0, General_Album, Value);
             else if (Name==__T("WM/AlbumArtist"))
             {
-                Fill(Stream_General, 0, General_Performer, "");
-                Fill(Stream_General, 0, General_Performer, Value, true); //Clear last value, like Author (Content Description)
+                const Ztring& Previous=Retrieve(Stream_General, 0, General_Performer);
+                if (!Previous.empty() && Previous != Value)
+                    Fill(Stream_General, 0, General_Accompaniment, Previous); // Microsoft "Contributing artists"
+                Fill(Stream_General, 0, General_Performer, Value, true);
             }
             else if (Name==__T("WM/ArtistSortOrder"))
                 Fill(Stream_General, 0, General_Performer_Sort, Value);

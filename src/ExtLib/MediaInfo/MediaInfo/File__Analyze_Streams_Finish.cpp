@@ -743,7 +743,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
             if (!Source.empty())
             {
                 Fill(Stream_Video, Pos, "Duration_Source", Source);
-                //Fill_SetOptions(Stream_Video, Pos, "Duration_Source", "N NTN");
+                Fill_SetOptions(Stream_Video, Pos, "Duration_Source", "N NTN");
             }
         }
     }
@@ -1087,7 +1087,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
             if (!Source.empty())
             {
                 Fill(Stream_Audio, Pos, "Duration_Source", Source);
-                //Fill_SetOptions(Stream_Audio, Pos, "Duration_Source", "N NTN");
+                Fill_SetOptions(Stream_Audio, Pos, "Duration_Source", "N NTN");
             }
         }
     }

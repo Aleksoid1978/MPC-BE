@@ -489,6 +489,9 @@ void File_Dpx::Header_Parse()
     }
     else
         Header_Fill_Size(Sizes[Sizes_Pos]);
+
+    if (Sizes_Pos==Pos_ImageData)
+        DataMustAlwaysBeComplete=false; //We actually don't need to load the whole ImageData, as we don't parse it
 }
 
 //---------------------------------------------------------------------------

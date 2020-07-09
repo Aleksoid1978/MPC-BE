@@ -2791,7 +2791,7 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
     {
         MediaInfo_Event_Generic* Event=(MediaInfo_Event_Generic*)Data_Content;
 
-        if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_MpegTs && Event->ParserIDs[1]==MediaInfo_Parser_MpegPs)
+        if (Event->StreamIDs_Size>=2 && Event->EventCode!=(MediaInfo_Parser_DvDif<<24 | MediaInfo_Event_DvDif_Analysis_Frame<<8) &&  Event->ParserIDs[0]==MediaInfo_Parser_MpegTs && Event->ParserIDs[1]==MediaInfo_Parser_MpegPs)
         {
             //Catching reference stream
             if (Event->StreamIDs[1]==0xE0 && Events_TimestampShift_Reference_ID==(int64u)-1)

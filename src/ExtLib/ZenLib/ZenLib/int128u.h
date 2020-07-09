@@ -95,7 +95,7 @@ class uint128 {
         uint128 & operator ^= (const uint128 & b) throw ();
 
         // Inline simple operators
-        inline const uint128 & operator + () const throw () { return *this; };
+        inline const uint128 & operator + () const throw () { return *this; }
 
         // Rest of inline operators
         inline uint128 & operator -= (const uint128 & b) throw () {
@@ -113,9 +113,9 @@ class uint128 {
 
         // Common methods
         unsigned int toUint () const throw () {
-            return (unsigned int) this->lo; };
+            return (unsigned int) this->lo; }
         int64u toUint64 () const throw () {
-            return (int64u) this->lo; };
+            return (int64u) this->lo; }
         const char * toString (unsigned int radix = 10) const throw ();
         float toFloat () const throw ();
         double toDouble () const throw ();
@@ -144,36 +144,36 @@ bool operator && (const uint128 & a, const uint128 & b) throw ();
 // GLOBAL OPERATOR INLINES
 
 inline uint128 operator + (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) += b; };
+    return uint128 (a) += b; }
 inline uint128 operator - (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) -= b; };
+    return uint128 (a) -= b; }
 inline uint128 operator * (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) *= b; };
+    return uint128 (a) *= b; }
 inline uint128 operator / (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) /= b; };
+    return uint128 (a) /= b; }
 inline uint128 operator % (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) %= b; };
+    return uint128 (a) %= b; }
 
 inline uint128 operator >> (const uint128 & a, unsigned int n) throw () {
-    return uint128 (a) >>= n; };
+    return uint128 (a) >>= n; }
 inline uint128 operator << (const uint128 & a, unsigned int n) throw () {
-    return uint128 (a) <<= n; };
+    return uint128 (a) <<= n; }
 
 inline uint128 operator & (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) &= b; };
+    return uint128 (a) &= b; }
 inline uint128 operator | (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) |= b; };
+    return uint128 (a) |= b; }
 inline uint128 operator ^ (const uint128 & a, const uint128 & b) throw () {
-    return uint128 (a) ^= b; };
+    return uint128 (a) ^= b; }
 
 inline bool operator >  (const uint128 & a, const uint128 & b) throw () {
-    return   b < a; };
+    return   b < a; }
 inline bool operator <= (const uint128 & a, const uint128 & b) throw () {
-    return !(b < a); };
+    return !(b < a); }
 inline bool operator >= (const uint128 & a, const uint128 & b) throw () {
-    return !(a < b); };
+    return !(a < b); }
 inline bool operator != (const uint128 & a, const uint128 & b) throw () {
-    return !(a == b); };
+    return !(a == b); }
 
 
 // MISC

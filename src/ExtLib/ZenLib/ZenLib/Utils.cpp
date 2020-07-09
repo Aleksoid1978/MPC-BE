@@ -982,7 +982,7 @@ int32s float32_int32s (float32 F, bool Rounded)
         return (int32s)F;
     //Rounded
     int I1=(int)F;
-    if (F-I1>=0.5)
+    if (F-I1>=0.5f)
         return I1+1;
     else
         return I1;
@@ -1001,7 +1001,7 @@ int64s float32_int64s (float32 F, bool Rounded)
         return (int64s)F;
     //Rounded
     int I1=(int)F;
-    if (F-I1>=0.5)
+    if (F-I1>=0.5f)
         return I1+1;
     else
         return I1;

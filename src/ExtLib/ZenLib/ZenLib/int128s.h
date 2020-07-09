@@ -153,36 +153,36 @@ bool operator && (const int128 & a, const int128 & b) throw ();
 // GLOBAL OPERATOR INLINES
 
 inline int128 operator + (const int128 & a, const int128 & b) throw () {
-    return int128 (a) += b; };
+    return int128 (a) += b; }
 inline int128 operator - (const int128 & a, const int128 & b) throw () {
-    return int128 (a) -= b; };
+    return int128 (a) -= b; }
 inline int128 operator * (const int128 & a, const int128 & b) throw () {
-    return int128 (a) *= b; };
+    return int128 (a) *= b; }
 inline int128 operator / (const int128 & a, const int128 & b) throw () {
-    return int128 (a) /= b; };
+    return int128 (a) /= b; }
 inline int128 operator % (const int128 & a, const int128 & b) throw () {
-    return int128 (a) %= b; };
+    return int128 (a) %= b; }
 
 inline int128 operator >> (const int128 & a, unsigned int n) throw () {
-    return int128 (a) >>= n; };
+    return int128 (a) >>= n; }
 inline int128 operator << (const int128 & a, unsigned int n) throw () {
-    return int128 (a) <<= n; };
+    return int128 (a) <<= n; }
 
 inline int128 operator & (const int128 & a, const int128 & b) throw () {
-    return int128 (a) &= b; };
+    return int128 (a) &= b; }
 inline int128 operator | (const int128 & a, const int128 & b) throw () {
-    return int128 (a) |= b; };
+    return int128 (a) |= b; }
 inline int128 operator ^ (const int128 & a, const int128 & b) throw () {
-    return int128 (a) ^= b; };
+    return int128 (a) ^= b; }
 
 inline bool operator >  (const int128 & a, const int128 & b) throw () {
-    return   b < a; };
+    return   b < a; }
 inline bool operator <= (const int128 & a, const int128 & b) throw () {
-    return !(b < a); };
+    return !(b < a); }
 inline bool operator >= (const int128 & a, const int128 & b) throw () {
-    return !(a < b); };
+    return !(a < b); }
 inline bool operator != (const int128 & a, const int128 & b) throw () {
-    return !(a == b); };
+    return !(a == b); }
 
 
 // MISC
