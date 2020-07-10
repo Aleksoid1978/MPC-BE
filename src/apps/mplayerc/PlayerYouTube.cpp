@@ -249,22 +249,22 @@ namespace Youtube
 	{
 		bool bParse = false;
 		if (!json.IsNull()) {
-			if (isJsonObject(videoDetails, json, "videoDetails")) {
+			if (auto videoDetails = GetJsonObject(json, "videoDetails")) {
 				bParse = true;
 
-				if (getJsonValue(videoDetails->value, "title", y_fields.title)) {
+				if (getJsonValue(*videoDetails, "title", y_fields.title)) {
 					y_fields.title = FixHtmlSymbols(y_fields.title);
 					if (bReplacePlus) {
 						y_fields.title.Replace('+', ' ');
 					}
 				}
 
-				getJsonValue(videoDetails->value, "author", y_fields.author);
+				getJsonValue(*videoDetails, "author", y_fields.author);
 				if (bReplacePlus) {
 					y_fields.author.Replace('+', ' ');
 				}
 
-				if (getJsonValue(videoDetails->value, "shortDescription", y_fields.content)) {
+				if (getJsonValue(*videoDetails, "shortDescription", y_fields.content)) {
 					y_fields.content.Replace(L"\\r\\n", L"\r\n");
 					y_fields.content.Replace(L"\\n", L"\r\n");
 
@@ -277,21 +277,19 @@ namespace Youtube
 				}
 
 				CStringA lengthSeconds;
-				if (getJsonValue(videoDetails->value, "lengthSeconds", lengthSeconds)) {
+				if (getJsonValue(*videoDetails, "lengthSeconds", lengthSeconds)) {
 					y_fields.duration = atoi(lengthSeconds.GetString()) * UNITS;
 				}
 			}
 
-			if (isJsonObject(microformat, json, "microformat")) {
-				if (isJsonObject(playerMicroformatRenderer, microformat->value, "playerMicroformatRenderer")) {
-					CStringA publishDate;
-					if (getJsonValue(playerMicroformatRenderer->value, "publishDate", publishDate)) {
-						WORD y, m, d;
-						if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
-							y_fields.dtime.wYear = y;
-							y_fields.dtime.wMonth = m;
-							y_fields.dtime.wDay = d;
-						}
+			if (auto playerMicroformatRenderer = GetValueByPointer(json, "/playerMicroformatRenderer/publishDate"); playerMicroformatRenderer && playerMicroformatRenderer->IsObject()) {
+				CStringA publishDate;
+				if (getJsonValue(*playerMicroformatRenderer, "publishDate", publishDate)) {
+					WORD y, m, d;
+					if (sscanf_s(publishDate.GetString(), "%04hu-%02hu-%02hu", &y, &m, &d) == 3) {
+						y_fields.dtime.wYear = y;
+						y_fields.dtime.wMonth = m;
+						y_fields.dtime.wDay = d;
 					}
 				}
 			}
@@ -611,9 +609,9 @@ namespace Youtube
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 			if (!player_response_jsonDocument.IsNull()) {
-				if (isJsonObject(streamingData, player_response_jsonDocument, "streamingData")) {
-					if (isJsonArray(formats, streamingData->value, "formats")) {
-						for (const auto& format : formats->value.GetArray()) {
+				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+					if (auto formats = GetJsonArray(*streamingData, "formats")) {
+						for (const auto& format : formats->GetArray()) {
 							streamingDataFormat element;
 
 							getJsonValue(format, "itag", std::get<0>(element));
@@ -626,8 +624,8 @@ namespace Youtube
 						}
 					}
 
-					if (isJsonArray(adaptiveFormats, streamingData->value, "adaptiveFormats")) {
-						for (const auto& adaptiveFormat : adaptiveFormats->value.GetArray()) {
+					if (auto adaptiveFormats = GetJsonArray(*streamingData, "adaptiveFormats")) {
+						for (const auto& adaptiveFormat : adaptiveFormats->GetArray()) {
 							CStringA type;
 							if (getJsonValue(adaptiveFormat, "type", type) && type == L"FORMAT_STREAM_TYPE_OTF") {
 								// fragmented url
@@ -913,13 +911,13 @@ namespace Youtube
 
 				rapidjson::Document d;
 				if (!d.Parse(chaptersStr).HasParseError()) {
-					if (isJsonArray(chapters, d, "chapters")) {
-						for (const auto& chapter : chapters->value.GetArray()) {
-							if (isJsonObject(chapterRenderer, chapter, "chapterRenderer")) {
-								if (isJsonObject(title, chapterRenderer->value, "title")) {
+					if (auto chapters = GetJsonArray(d, "chapters")) {
+						for (const auto& chapter : chapters->GetArray()) {
+							if (auto chapterRenderer = GetJsonObject(chapter, "chapterRenderer")) {
+								if (auto title = GetJsonObject(*chapterRenderer, "title")) {
 									int timeRangeStartMillis;
 									CString simpleText;
-									if (getJsonValue(title->value, "simpleText", simpleText) && getJsonValue(chapterRenderer->value, "timeRangeStartMillis", timeRangeStartMillis)) {
+									if (getJsonValue(*title, "simpleText", simpleText) && getJsonValue(*chapterRenderer, "timeRangeStartMillis", timeRangeStartMillis)) {
 										y_fields.chaptersList.push_back({ simpleText, 10000LL * timeRangeStartMillis });
 									}
 								}
@@ -1171,29 +1169,25 @@ namespace Youtube
 				if (!videoId.IsEmpty()) {
 					// subtitles
 					if (!player_response_jsonDocument.IsNull()) {
-						if (isJsonObject(captions, player_response_jsonDocument, "captions")) {
-							if (isJsonObject(trackList, captions->value, "playerCaptionsTracklistRenderer")) {
-								if (isJsonArray(captionTracks, trackList->value, "captionTracks")) {
-									for (const auto& elem : captionTracks->value.GetArray()) {
-										CStringA kind;
-										if (getJsonValue(elem, "kind", kind) && kind == "asr") {
-											continue;
-										}
+						if (auto captionTracks = GetValueByPointer(player_response_jsonDocument, "/captions/playerCaptionsTracklistRenderer/captionTracks"); captionTracks && captionTracks->IsArray()) {
+							for (const auto& elem : captionTracks->GetArray()) {
+								CStringA kind;
+								if (getJsonValue(elem, "kind", kind) && kind == "asr") {
+									continue;
+								}
 
-										CString sub_url;
-										if (getJsonValue(elem, "baseUrl", sub_url)) {
-											sub_url += L"&fmt=vtt";
-										}
+								CString sub_url;
+								if (getJsonValue(elem, "baseUrl", sub_url)) {
+									sub_url += L"&fmt=vtt";
+								}
 
-										CString sub_name;
-										if (isJsonObject(name, elem, "name")) {
-											getJsonValue(name->value, "simpleText", sub_name);
-										}
+								CString sub_name;
+								if (auto name = GetJsonObject(elem, "name")) {
+									getJsonValue(*name, "simpleText", sub_name);
+								}
 
-										if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
-											subs.emplace_back(sub_url, sub_name);
-										}
-									}
+								if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
+									subs.emplace_back(sub_url, sub_name);
 								}
 							}
 						}
@@ -1300,15 +1294,15 @@ namespace Youtube
 
 								if (!videoId.IsEmpty()) {
 									CString simpleText;
-									if (isJsonObject(title, object, "title")) {
-										if (getJsonValue(title->value, "simpleText", simpleText)) {
+									if (auto title = GetJsonObject(object, "title")) {
+										if (getJsonValue(*title, "simpleText", simpleText)) {
 											REFERENCE_TIME duration = 0;
 											CString lengthSeconds;
 											if (getJsonValue(object, "lengthSeconds", lengthSeconds)) {
 												duration = UNITS * _wtoi(lengthSeconds);
-											} else if (isJsonObject(lengthText, object, "lengthText")) {
+											} else if (auto lengthText = GetJsonObject(object, "lengthText")) {
 												CString simpleText;
-												if (getJsonValue(lengthText->value, "simpleText", simpleText)) {
+												if (getJsonValue(*lengthText, "simpleText", simpleText)) {
 													int t1 = 0;
 													int t2 = 0;
 													int t3 = 0;
@@ -1342,10 +1336,10 @@ namespace Youtube
 
 							if (contents && contents->IsArray()) {
 								for (const auto& item : contents->GetArray()) {
-									if (isJsonObject(playlistPanelVideoRenderer, item, "playlistPanelVideoRenderer")) {
-										ParseJsonObject(playlistPanelVideoRenderer->value);
-									} else if (isJsonObject(playlistVideoRenderer, item, "playlistVideoRenderer")) {
-										ParseJsonObject(playlistVideoRenderer->value);
+									if (auto playlistPanelVideoRenderer = GetJsonObject(item, "playlistPanelVideoRenderer")) {
+										ParseJsonObject(*playlistPanelVideoRenderer);
+									} else if (auto playlistVideoRenderer = GetJsonObject(item, "playlistVideoRenderer")) {
+										ParseJsonObject(*playlistVideoRenderer);
 									}
 								}
 							}

@@ -132,7 +132,7 @@ namespace YoutubeDL
 			rapidjson::Document d;
 			if (!d.Parse(buf_out.GetString()).HasParseError()) {
 				int iTag = 1;
-				if (isJsonArray(formats, d, "formats")) {
+				if (auto formats = GetJsonArray(d, "formats")) {
 					int maxHeight = 0;
 					bool bVideoOnly = false;
 
@@ -144,7 +144,7 @@ namespace YoutubeDL
 					CStringA bestUrl;
 					getJsonValue(d, "url", bestUrl);
 
-					for (const auto& format : formats->value.GetArray()) {
+					for (const auto& format : formats->GetArray()) {
 						CStringA protocol;
 						if (!getJsonValue(format, "protocol", protocol)
 								|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
@@ -239,7 +239,7 @@ namespace YoutubeDL
 							float maxVideotbr = 0.0f;
 							int maxVideofps = 0;
 
-							for (const auto& format : formats->value.GetArray()) {
+							for (const auto& format : formats->GetArray()) {
 								CStringA protocol;
 								if (!getJsonValue(format, "protocol", protocol)
 										|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
@@ -345,8 +345,8 @@ namespace YoutubeDL
 						}
 
 						// subtitles
-						if (isJsonObject(requested_subtitles, d, "requested_subtitles")) {
-							for (const auto& subtitle : requested_subtitles->value.GetObject()) {
+						if (auto requested_subtitles = GetJsonObject(d, "requested_subtitles")) {
+							for (const auto& subtitle : requested_subtitles->GetObject()) {
 								CString sub_url;
 								getJsonValue(subtitle.value, "url", sub_url);
 								CString sub_lang = UTF8ToWStr(subtitle.name.GetString());
@@ -358,8 +358,8 @@ namespace YoutubeDL
 						}
 
 						// chapters
-						if (isJsonArray(chapters, d, "chapters")) {
-							for (const auto& chapter : chapters->value.GetArray()) {
+						if (auto chapters = GetJsonArray(d, "chapters")) {
+							for (const auto& chapter : chapters->GetArray()) {
 								float start_time = 0.0f;
 								CString title;
 								if (getJsonValue(chapter, "title", title) && getJsonValue(chapter, "start_time", start_time)) {

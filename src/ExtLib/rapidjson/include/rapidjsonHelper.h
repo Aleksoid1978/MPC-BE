@@ -54,5 +54,22 @@ inline bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T&
 	return false;
 };
 
-#define isJsonArray(jsonArray, jsonValue, name)   const auto& jsonArray = jsonValue.FindMember(name); jsonArray != jsonValue.MemberEnd() && jsonArray->value.IsArray() && !jsonArray->value.Empty()
-#define isJsonObject(jsonObject, jsonValue, name) const auto& jsonObject = jsonValue.FindMember(name); jsonObject != jsonValue.MemberEnd() && jsonObject->value.IsObject()
+inline const rapidjson::Value* GetJsonObject(const rapidjson::Value& jsonValue, const char* name)
+{
+	const auto& jsonObject = jsonValue.FindMember(name);
+	if (jsonObject != jsonValue.MemberEnd() && jsonObject->value.IsObject()) {
+		return &jsonObject->value;
+	}
+
+	return nullptr;
+}
+
+inline const rapidjson::Value* GetJsonArray(const rapidjson::Value& jsonValue, const char* name)
+{
+	const auto& jsonArray = jsonValue.FindMember(name);
+	if (jsonArray != jsonValue.MemberEnd() && jsonArray->value.IsArray() && !jsonArray->value.Empty()) {
+		return &jsonArray->value;
+	}
+
+	return nullptr;
+}
