@@ -311,14 +311,14 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"Ha szeretné használni a szűrők önálló verzióját vagy valamely más helyettesítőt, itt tiltsa le őket."
-10		"AVI Splitter\nconfiguration"
-11		"MPEG Splitter\nconfiguration"
-12		"Matroska Splitter\nconfiguration"
-13		"CDDA Reader\nconfiguration"
-14		"VTS(IFO) Reader\nconfiguration"
-15		"Video decoder\nconfiguration"
-16		"MPEG-2/DVD\ndecoder\nconfiguration"
-17		"Audio decoder\nconfiguration"
+10		"AVI Splitter\nkonfiguráció"
+11		"MPEG Splitter\nkonfiguráció"
+12		"Matroska Splitter\nkonfiguráció"
+13		"CDDA Reader\nkonfiguráció"
+14		"VTS(IFO) Reader\nkonfiguráció"
+15		"Video decoder\nkonfiguráció"
+16		"MPEG-2/DVD\ndecoder\nkonfiguráció"
+17		"Audio decoder\nkonfiguráció"
 18		"Puffer hossza:"
 21		"mp."
 END
