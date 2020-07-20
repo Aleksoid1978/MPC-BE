@@ -168,6 +168,7 @@ namespace Youtube
 			if (url.Find(YOUTU_BE_URL) != -1) {
 				url.Replace(YOUTU_BE_URL, YOUTUBE_URL);
 				url.Replace(L"watch?", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
 			} else if (url.Find(YOUTUBE_URL_V) != -1) {
 				url.Replace(L"v/", L"watch?v=");
 				url.Replace(L"?list=", L"&list=");
@@ -202,7 +203,7 @@ namespace Youtube
 				|| url.Find(YOUTUBE_CHANNEL_URL) != -1
 				|| (url.Find(YOUTUBE_URL) != -1 && url.Find(L"&list=") != -1)
 				|| (url.Find(YOUTUBE_URL_A) != -1 && url.Find(L"/watch_videos?video_ids") != -1)
-				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1) && url.Find(L"list=") != -1)) {
+				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1 || url.Find(YOUTU_BE_URL) != -1) && url.Find(L"list=") != -1)) {
 			return true;
 		}
 
@@ -1219,6 +1220,8 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
 			if (hInet) {
+				HandleURL(url);
+
 				auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/user)/([-a-zA-Z0-9_]+)");
 				if (!channelId.IsEmpty()) {
 					if (url.Find(YOUTUBE_USER_URL) != -1) {
