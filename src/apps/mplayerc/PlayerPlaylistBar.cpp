@@ -3672,22 +3672,32 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 							}
 				*/
 
-				if (idx == 3 && !pli.m_label.IsEmpty()) { // M3U
-					str.Format(L"#EXTINF:%I64d,%s\n",
-						pli.m_duration > 0 ? (pli.m_duration + UNITS/2) / UNITS : -1LL,
-						pli.m_label.GetString());
-					f.WriteString(str.GetString());
-				}
-
 				switch (idx) {
 					case 2:
 						str.Format(L"File%d=%s\n", i + 1, fn.GetString());
+						if (!pli.m_label.IsEmpty()) {
+							str.AppendFormat(L"Title%d=%s\n", i + 1, pli.m_label.GetString());
+						}
+						if (pli.m_duration > 0) {
+							str.AppendFormat(L"Length%d=%I64d\n", i + 1, (pli.m_duration + UNITS / 2) / UNITS);
+						}
 						break;
 					case 3:
-						str.Format(L"%s\n", fn.GetString());
+						str.Empty();
+						if (!pli.m_label.IsEmpty() || pli.m_duration > 0) {
+							str.AppendFormat(L"#EXTINF:%I64d,%s\n",
+								pli.m_duration > 0 ? (pli.m_duration + UNITS / 2) / UNITS : -1LL,
+								pli.m_label.GetString());
+						}
+						str.AppendFormat(L"%s\n", fn.GetString());
 						break;
 					case 4:
-						str.Format(L"<Entry><Ref href = \"%s\"/></Entry>\n", fn.GetString());
+						str = L"<Entry>";
+						if (!pli.m_label.IsEmpty()) {
+							str.AppendFormat(L"<title>%s</title>", pli.m_label.GetString());
+						}
+						str.AppendFormat(L"<Ref href = \"%s\"/>", fn.GetString());
+						str.Append(L"</Entry>\n");
 						break;
 					default:
 						break;
