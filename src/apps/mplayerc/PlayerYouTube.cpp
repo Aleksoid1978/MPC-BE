@@ -47,7 +47,6 @@
 #define MATCH_PLAYLIST_ITEM_START   "<li class=\"yt-uix-scroller-scroll-unit "
 #define MATCH_PLAYLIST_ITEM_START2  "<tr class=\"pl-video yt-uix-tile "
 
-#define MATCH_AGE_RESTRICTION       "player-age-gate-content\">"
 #define MATCH_STREAM_MAP_START_2    "url_encoded_fmt_stream_map="
 #define MATCH_ADAPTIVE_FMTS_START_2 "adaptive_fmts="
 #define MATCH_JS_START_2            "'PREFETCH_JS_RESOURCES': [\""
@@ -489,7 +488,71 @@ namespace Youtube
 
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
-			if (strstr(data, MATCH_AGE_RESTRICTION)) {
+
+			auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+			if (!player_response_jsonData.IsEmpty()) {
+				player_response_jsonData += "}";
+				player_response_jsonData.Replace(R"(\/)", "/");
+				player_response_jsonData.Replace(R"(\")", R"(")");
+				player_response_jsonData.Replace(R"(\\)", R"(\)");
+				player_response_jsonDocument.Parse(player_response_jsonData);
+			}
+
+			// live streaming
+			CStringA live_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
+			if (live_url.IsEmpty()) {
+				live_url = GetEntry(data, MATCH_HLSMANIFEST_START, MATCH_END);
+			}
+			if (!live_url.IsEmpty()) {
+				url = UrlDecode(UrlDecode(live_url));
+				url.Replace(L"\\/", L"/");
+				DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
+				char* m3u8 = nullptr;
+				DWORD m3u8Size = 0;
+				InternetReadData(hInet, url, &m3u8, m3u8Size);
+				if (m3u8Size) {
+					CStringA m3u8Str(m3u8);
+					free(m3u8);
+
+					m3u8Str.Replace("\r\n", "\n");
+					std::list<CStringA> lines;
+					Explode(m3u8Str, lines, '\n');
+					for (auto& line : lines) {
+						line.Trim();
+						if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+							continue;
+						}
+
+						line.Replace("/keepalive/yes/", "/");
+						strUrlsLive.emplace_back(line);
+					}
+				}
+
+				if (strUrlsLive.empty()) {
+					urls.push_front(url);
+
+					free(data);
+					InternetCloseHandle(hInet);
+					return true;
+				}
+			} else {
+				// url_encoded_fmt_stream_map
+				const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
+				if (!stream_map.IsEmpty()) {
+					strUrls = stream_map;
+				}
+				// adaptive_fmts
+				const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+				if (!adaptive_fmts.IsEmpty()) {
+					if (!strUrls.IsEmpty()) {
+						strUrls += ',';
+					}
+					strUrls += adaptive_fmts;
+				}
+				strUrls.Replace("\\u0026", "&");
+			}
+
+			if (strUrlsLive.empty() && player_response_jsonDocument.IsNull() && strUrls.IsEmpty()) {
 				bReplacePlus = true;
 
 				free(data);
@@ -540,69 +603,6 @@ namespace Youtube
 						strUrls += ',';
 					}
 					strUrls += adaptive_fmts;
-				}
-			} else {
-				auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonData += "}";
-					player_response_jsonData.Replace(R"(\/)", "/");
-					player_response_jsonData.Replace(R"(\")", R"(")");
-					player_response_jsonData.Replace(R"(\\)", R"(\)");
-					player_response_jsonDocument.Parse(player_response_jsonData);
-				}
-
-				// live streaming
-				CStringA live_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
-				if (live_url.IsEmpty()) {
-					live_url = GetEntry(data, MATCH_HLSMANIFEST_START, MATCH_END);
-				}
-				if (!live_url.IsEmpty()) {
-					url = UrlDecode(UrlDecode(live_url));
-					url.Replace(L"\\/", L"/");
-					DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
-					char* m3u8 = nullptr;
-					DWORD m3u8Size = 0;
-					InternetReadData(hInet, url, &m3u8, m3u8Size);
-					if (m3u8Size) {
-						CStringA m3u8Str(m3u8);
-						free(m3u8);
-
-						m3u8Str.Replace("\r\n", "\n");
-						std::list<CStringA> lines;
-						Explode(m3u8Str, lines, '\n');
-						for (auto& line : lines) {
-							line.Trim();
-							if (line.IsEmpty() || (line.GetAt(0) == '#')) {
-								continue;
-							}
-
-							line.Replace("/keepalive/yes/", "/");
-							strUrlsLive.emplace_back(line);
-						}
-					}
-
-					if (strUrlsLive.empty()) {
-						urls.push_front(url);
-
-						free(data);
-						InternetCloseHandle(hInet);
-						return true;
-					}
-				} else {
-					// url_encoded_fmt_stream_map
-					const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
-					if (!stream_map.IsEmpty()) {
-						strUrls = stream_map;
-					}
-					// adaptive_fmts
-					const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
-					if (!adaptive_fmts.IsEmpty()) {
-						if (!strUrls.IsEmpty()) {
-							strUrls += ',';
-						}
-						strUrls += adaptive_fmts;
-					}
-					strUrls.Replace("\\u0026", "&");
 				}
 			}
 
