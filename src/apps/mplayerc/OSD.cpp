@@ -142,7 +142,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 
 	const CAppSettings& s = AfxGetAppSettings();
 	SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
-	if (s.iShowOSD & OSD_ENABLE) {
+	if (s.ShowOSD.Enable) {
 		Start(pWnd);
 	}
 

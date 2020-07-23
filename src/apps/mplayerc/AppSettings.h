@@ -108,10 +108,6 @@
 #define APP_THUMBWIDTH_MIN		256
 #define APP_THUMBWIDTH_MAX		5120
 
-#define OSD_ENABLE		(1 << 0)
-#define OSD_FILENAME	(1 << 1)
-#define OSD_SEEKTIME	(1 << 2)
-
 enum {
 	MODE_SHOWCAPTIONMENU,
 	MODE_HIDEMENU,
@@ -564,7 +560,15 @@ public:
 	// Player
 	int				iMultipleInst;
 	bool			bTrayIcon;
-	int				iShowOSD;
+	union {
+		struct{
+			UINT Enable : 1;
+			UINT FileName : 1;
+			UINT SeekTime : 1;
+		};
+		UINT value;
+	} ShowOSD;
+
 	bool			bHideCDROMsSubMenu;
 	DWORD			dwPriority;
 	int				iTitleBarTextStyle;

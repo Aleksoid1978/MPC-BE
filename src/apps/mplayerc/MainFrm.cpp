@@ -1351,7 +1351,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						}
 					} else if (m_eMediaLoadState == MLS_LOADED
 							&& IsMoveX(pt.x, point.x_start, pt.y, point.y_start)
-							&& AfxGetAppSettings().iShowOSD & OSD_SEEKTIME) {
+							&& AfxGetAppSettings().ShowOSD.SeekTime) {
 
 						REFERENCE_TIME stop;
 						m_wndSeekBar.GetRange(stop);
@@ -4570,7 +4570,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	s.nCLSwitches &= CLSW_OPEN | CLSW_PLAY | CLSW_AFTERPLAYBACK_MASK | CLSW_NOFOCUS;
 	s.ResetPositions();
 
-	if (s.iShowOSD & OSD_ENABLE) {
+	if (s.ShowOSD.Enable) {
 		m_OSD.Start(m_pOSDWnd);
 	}
 
@@ -5249,13 +5249,13 @@ LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
 			ShowControlBarInternal(&m_wndPlaylistBar, FALSE);
 		}
 		ShowControls(CS_NONE, false);
-		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
+		if (s.ShowOSD.Enable || s.bShowDebugInfo) {
 			if (m_pMFVMB) {
 				m_OSD.Start(m_pVideoWnd, m_pMFVMB);
 			}
 		}
 	} else {
-		if (s.iShowOSD & OSD_ENABLE) {
+		if (s.ShowOSD.Enable) {
 			m_OSD.Start(m_pOSDWnd);
 		}
 		if (m_wndPlaylistBar.IsHiddenDueToFullscreen()) {
@@ -6955,7 +6955,7 @@ CString CMainFrame::GetSystemLocalTime()
 
 void CMainFrame::OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable((AfxGetAppSettings().iShowOSD & OSD_ENABLE) && m_eMediaLoadState != MLS_CLOSED);
+	pCmdUI->Enable(AfxGetAppSettings().ShowOSD.Enable && m_eMediaLoadState != MLS_CLOSED);
 	pCmdUI->SetCheck(AfxGetAppSettings().bOSDLocalTime);
 }
 
@@ -6973,7 +6973,7 @@ void CMainFrame::OnViewOSDLocalTime()
 
 void CMainFrame::OnUpdateViewOSDFileName(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable((AfxGetAppSettings().iShowOSD & OSD_ENABLE) && m_eMediaLoadState != MLS_CLOSED);
+	pCmdUI->Enable(AfxGetAppSettings().ShowOSD.Enable && m_eMediaLoadState != MLS_CLOSED);
 	pCmdUI->SetCheck(AfxGetAppSettings().bOSDFileName);
 }
 
@@ -7805,10 +7805,9 @@ void CMainFrame::OnPlayPlay()
 		return;
 	}
 
-	CString strOSD;
-	int OSD_Flag = OSD_FILENAME;
-
 	const auto& s = AfxGetAppSettings();
+	bool bShowOSD = s.ShowOSD.Enable && s.ShowOSD.FileName;
+	CString strOSD;
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE) {
@@ -7844,7 +7843,7 @@ void CMainFrame::OnPlayPlay()
 				pAMTuner->get_VideoFrequency(&lFreq);
 
 				strOSD.Format(ResStr(IDS_CAPTURE_CHANNEL_FREQ), lChannel, lFreq / 1000000.0);
-				OSD_Flag = OSD_ENABLE;
+				bShowOSD = s.ShowOSD.Enable;
 			}
 		}
 
@@ -7931,15 +7930,15 @@ void CMainFrame::OnPlayPlay()
 	}
 
 	if (strOSD.IsEmpty()) {
-		OSD_Flag = OSD_ENABLE;
 		strOSD = ResStr(ID_PLAY_PLAY);
 		int i = strOSD.Find('\n');
 		if (i > 0) {
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
+		bShowOSD = s.ShowOSD.Enable;
 	}
 
-	if (s.iShowOSD & OSD_Flag) {
+	if (bShowOSD) {
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 	}
 }
@@ -10935,7 +10934,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 				}
 			}
 
-			if (s.iShowOSD & OSD_ENABLE) {
+			if (s.ShowOSD.Enable) {
 				m_OSD.Start(m_pOSDWnd);
 			}
 
@@ -10970,7 +10969,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 				m_pVW->put_Owner((OAHWND)m_pVideoWnd->m_hWnd);
 			}
 
-			if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
+			if (s.ShowOSD.Enable || s.bShowDebugInfo) {
 				if (m_pMFVMB) {
 					m_OSD.Start(m_pVideoWnd, m_pMFVMB);
 				}
@@ -14034,7 +14033,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) { // Force OSD on when the debug switch is used
+		if (s.ShowOSD.Enable || s.bShowDebugInfo) { // Force OSD on when the debug switch is used
 			m_OSD.Stop();
 
 			if (IsD3DFullScreenMode() && !m_bAudioOnly) {
@@ -16468,7 +16467,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 		}
 		const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
 		m_wndStatusBar.SetStatusTimer(rtPos, stop, bShowMilliSecs, GetTimeFormat());
-		if (bShowOSD && stop > 0 && (AfxGetAppSettings().iShowOSD & OSD_SEEKTIME)) {
+		if (bShowOSD && stop > 0 && AfxGetAppSettings().ShowOSD.SeekTime) {
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
 		}
 	}
@@ -16929,7 +16928,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 			m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
 		}
 
-		if (s.iShowOSD & OSD_ENABLE || s.bShowDebugInfo) {
+		if (s.ShowOSD.Enable || s.bShowDebugInfo) {
 			if (pMFVMB) {
 				m_OSD.Start(m_pVideoWnd, pMFVMB);
 			}
