@@ -118,9 +118,9 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bKeepHistory				= s.bKeepHistory;
 	m_bHideCDROMsSubMenu		= s.bHideCDROMsSubMenu;
 	m_bPriority					= s.dwPriority != NORMAL_PRIORITY_CLASS;
-	m_bShowOSD					= !!(s.iShowOSD & OSD_ENABLE);
-	m_bOSDFileName				= !!(s.iShowOSD & OSD_FILENAME);
-	m_bOSDSeekTime				= !!(s.iShowOSD & OSD_SEEKTIME);
+	m_bShowOSD					= s.ShowOSD.Enable;
+	m_bOSDFileName				= s.ShowOSD.FileName;
+	m_bOSDSeekTime				= s.ShowOSD.SeekTime;
 	m_bRememberDVDPos			= s.bRememberDVDPos;
 	m_bRememberFilePos			= s.bRememberFilePos;
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
@@ -176,13 +176,13 @@ BOOL CPPagePlayer::OnApply()
 	s.bKeepHistory = !!m_bKeepHistory;
 	s.bHideCDROMsSubMenu = !!m_bHideCDROMsSubMenu;
 	s.dwPriority = !m_bPriority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
-	BOOL bShowOSDChanged = ((s.iShowOSD & OSD_ENABLE) != !!m_bShowOSD);
+	BOOL bShowOSDChanged = s.ShowOSD.Enable != m_bShowOSD;
 
-	s.iShowOSD = m_bShowOSD ? OSD_ENABLE : 0;
-	if (m_bOSDFileName) { s.iShowOSD |= OSD_FILENAME; }
-	if (m_bOSDSeekTime) { s.iShowOSD |= OSD_SEEKTIME; }
+	s.ShowOSD.Enable   = m_bShowOSD ? 1 : 0;
+	s.ShowOSD.FileName = m_bOSDFileName ? 1 : 0;
+	s.ShowOSD.SeekTime = m_bOSDSeekTime ? 1 : 0;
 	if (bShowOSDChanged) {
-		if (m_bShowOSD & OSD_ENABLE) {
+		if (s.ShowOSD.Enable) {
 			pFrame->m_OSD.Start(pFrame->m_pOSDWnd);
 			pFrame->OSDBarSetPos();
 			pFrame->m_OSD.ClearMessage(false);

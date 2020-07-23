@@ -819,7 +819,7 @@ void CAppSettings::ResetSettings()
 	bToggleShader = false;
 	bToggleShaderScreenSpace = false;
 
-	iShowOSD = OSD_ENABLE;
+	ShowOSD.Enable = 1;
 	fFastSeek = true;
 	bHideWindowedMousePointer = false;
 	nMinMPlsDuration = 3;
@@ -1469,7 +1469,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, ShowOSD.value);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MIN_MPLS_DURATION, nMinMPlsDuration, 0, 20);
@@ -1852,7 +1852,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, ShowOSD.value);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
