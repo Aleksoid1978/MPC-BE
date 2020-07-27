@@ -1942,6 +1942,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	m_Cluster_seek_rt = INVALID_TIME;
 	m_Cluster_seek_pos = 0;
 
+	REFERENCE_TIME cues_rt = INVALID_TIME;
+
 	if (rt > 0) {
 		Segment& s = m_pFile->m_segment;
 
@@ -1964,6 +1966,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			const REFERENCE_TIME seek_rt = clusterTime - rtOffset;
 			if (seek_rt <= rt) {
 				DLog(L"CMatroskaSplitterFilter::DemuxSeek() : plan A - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+				cues_rt = it->rt;
 				goto end;
 			}
 		}
@@ -2018,6 +2021,53 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		const auto rtOffset = (m_Cluster_seek_rt >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 		m_Cluster_seek_pos = m_pCluster->m_filepos;
 		DLog(L"CMatroskaSplitterFilter::DemuxSeek() : Final(Cluster timecode) - %s => %s, [%10I64d - %10I64d], pos - %I64d", ReftimeToString(rt), ReftimeToString(m_Cluster_seek_rt - rtOffset), rt, m_Cluster_seek_rt - rtOffset, m_Cluster_seek_pos);
+
+		if (cues_rt != INVALID_TIME) {
+			const auto masterTrackNumber = s.GetMasterTrack();
+			m_pBlock = m_pCluster->GetFirstBlock();
+			auto bFound = false;
+			QWORD block_pos = 0;
+
+			do {
+				CBlockGroupNode bgn;
+				if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+					bgn.Parse(m_pBlock, true);
+				} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+					CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+					bg->Block.Parse(m_pBlock, true);
+					bgn.emplace_back(bg);
+				}
+
+				for (const auto& bg : bgn) {
+					if (bg->Block.TrackNumber != masterTrackNumber) {
+						continue;
+					}
+
+					const auto timeStamp = m_Cluster_seek_rt + s.GetRefTime(bg->Block.TimeCode);
+					if (timeStamp == cues_rt) {
+						bFound = true;
+						break;
+					} else if (timeStamp > cues_rt) {
+						if (block_pos) {
+							m_pBlock->SeekTo(block_pos);
+							m_pBlock->Parse();
+						} else {
+							m_pBlock.Free();
+							m_pCluster->SeekTo(m_Cluster_seek_pos);
+						}
+						bFound = true;
+						break;
+					}
+
+					block_pos = m_pBlock->m_filepos;
+				}
+			} while (!bFound && m_pBlock->NextBlock());
+
+			if (!bFound) {
+				m_pBlock.Free();
+				m_pCluster->SeekTo(m_Cluster_seek_pos);
+			}
+		}
 	}
 }
 
@@ -2033,7 +2083,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 	const auto& s = m_pFile->m_segment;
 
-	auto SetBlockTime = [&](CMatroskaPacket* p, TrackEntry* pTE, const REFERENCE_TIME& clusterTime, const REFERENCE_TIME& rtOffset) {
+	auto SetBlockTime = [&](CMatroskaPacket* p, TrackEntry* pTE, const REFERENCE_TIME clusterTime, const REFERENCE_TIME rtOffset) {
 		REFERENCE_TIME duration = 0;
 		if (p->bg->BlockDuration.IsValid()) {
 			duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);
