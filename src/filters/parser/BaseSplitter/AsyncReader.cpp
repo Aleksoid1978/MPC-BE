@@ -108,11 +108,11 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 		for (;;) {
 			if (m_pos != llPosition) {
 				if (llPosition > m_pos && (llPosition - m_pos) <= 64 * KILOBYTE) {
-					static BYTE pBufferTmp[64 * KILOBYTE] = { 0 };
+					static std::vector<BYTE> pBufferTmp(64 * KILOBYTE);
 					const DWORD lenght = llPosition - m_pos;
 
 					DWORD dwSizeRead = 0;
-					HRESULT hr = m_HTTPAsync.Read(pBufferTmp, lenght, &dwSizeRead);
+					HRESULT hr = m_HTTPAsync.Read(pBufferTmp.data(), lenght, &dwSizeRead);
 					if (hr != S_OK || dwSizeRead != lenght) {
 						if (RetryOnError()) {
 							continue;
