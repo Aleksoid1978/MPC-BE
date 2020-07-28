@@ -234,7 +234,12 @@ namespace Youtube
 			}
 		}
 
-		return !pData.empty();
+		if (!pData.empty()) {
+			pData.push_back('\0');
+			return true;
+		}
+
+		return false;
 	}
 
 	static bool ParseResponseJson(rapidjson::Document& json, YoutubeFields& y_fields, const bool bReplacePlus)
