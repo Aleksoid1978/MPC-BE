@@ -273,7 +273,9 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	m_header = QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF);
 	m_header.Trim(L"\r\n ");
+#if 0
 	DLog(L"CHTTPAsync::Connect() : return header:\n%s", m_header);
+#endif
 
 	m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE);
 
@@ -405,7 +407,7 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 		*dwSizeRead = InetBuff.dwBufferLength;
 	}
 
-	return S_OK;
+	return InetBuff.dwBufferLength ? S_OK : S_FALSE;
 }
 
 CString CHTTPAsync::GetHeader() const
