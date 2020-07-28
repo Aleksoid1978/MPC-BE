@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include <afxinet.h>
+#include "../../DSUtil/HTTPAsync.h"
 #include "../../DSUtil/text.h"
 #include "../../DSUtil/std_helper.h"
 #include "PlayerYouTube.h"
@@ -54,10 +54,6 @@
 
 #define MATCH_PLAYER_RESPONSE       "\"player_response\":\""
 #define MATCH_PLAYER_RESPONSE_END   "}\""
-
-#define INTERNET_OPEN_FALGS         INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
-
-#define USER_AGENT                  L"MPC-BE"
 
 namespace Youtube
 {
@@ -210,39 +206,35 @@ namespace Youtube
 		return false;
 	}
 
-	static void InternetReadData(HINTERNET& hInternet, const CString& url, char** pData, DWORD& dataSize, const CString& header = L"")
+	using urlData = std::vector<char>;
+	static bool URLReadData(LPCWSTR url, urlData& pData, LPCWSTR header = L"")
 	{
-		dataSize = 0;
-		*pData = nullptr;
+		pData.clear();
 
-		const HINTERNET hFile = InternetOpenUrlW(hInternet, url.GetString(), header.GetString(), header.GetLength(), INTERNET_OPEN_FALGS, 0);
-		if (hFile) {
-			const DWORD dwNumberOfBytesToRead = 16 * KILOBYTE;
-			auto buffer = DNew char[dwNumberOfBytesToRead];
-			DWORD dwBytesRead = 0;
-			for (;;) {
-				if (InternetReadFile(hFile, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE || dwBytesRead == 0) {
-					break;
-				}
-
-				auto pTmp = (char*)realloc(*pData, dataSize + dwBytesRead + 1);
-				if (!pTmp) {
-					if (*pData) {
-						free(*pData);
-						*pData = nullptr;
-					}
-					dataSize = 0;
-					break;
-				}
-				*pData = pTmp;
-				memcpy(*pData + dataSize, buffer, dwBytesRead);
-				dataSize += dwBytesRead;
-				(*pData)[dataSize] = 0;
-			}
-
-			delete [] buffer;
-			InternetCloseHandle(hFile);
+		CHTTPAsync HTTPAsync;
+		if (FAILED(HTTPAsync.Connect(url, 10000, header))) {
+			return false;
 		}
+		const auto contentLength = HTTPAsync.GetLenght();
+		if (contentLength) {
+			pData.resize(contentLength);
+			DWORD dwSizeRead = 0;
+			if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, &dwSizeRead) || dwSizeRead != contentLength) {
+				pData.clear();
+			}
+		} else {
+			static std::vector<char> tmp(16 * KILOBYTE);
+			for (;;) {
+				DWORD dwSizeRead = 0;
+				if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), &dwSizeRead)) {
+					break;
+				}
+
+				pData.insert(pData.end(), tmp.begin(), tmp.begin() + dwSizeRead);
+			}
+		}
+
+		return !pData.empty();
 	}
 
 	static bool ParseResponseJson(rapidjson::Document& json, YoutubeFields& y_fields, const bool bReplacePlus)
@@ -298,21 +290,17 @@ namespace Youtube
 		return bParse;
 	}
 
-	static bool ParseMetadata(HINTERNET& hInet, const CString& videoId, YoutubeFields& y_fields)
+	static bool ParseMetadata(const CString& videoId, YoutubeFields& y_fields)
 	{
-		if (hInet && !videoId.IsEmpty()) {
+		if (!videoId.IsEmpty()) {
 #if !USE_GOOGLE_API
 			bool bParse = false;
 
 			CString url;
 			url.Format(L"https://www.youtube.com/get_video_info?video_id=%s", videoId);
-			char* data = nullptr;
-			DWORD dataSize = 0;
-			InternetReadData(hInet, url, &data, dataSize);
-
-			if (dataSize) {
-				const CStringA strData = UrlDecode(data);
-				free(data);
+			urlData data;
+			if (URLReadData(url.GetString(), data)) {
+				const CStringA strData = UrlDecode(data.data());
 
 				const auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
 				if (!player_response_jsonData.IsEmpty()) {
@@ -327,37 +315,33 @@ namespace Youtube
 #else
 			CString url;
 			url.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, strGoogleApiKey);
-			char* data = nullptr;
-			DWORD dataSize = 0;
-			InternetReadData(hInet, url, &data, dataSize);
-
-			if (dataSize) {
+			urlData data;
+			if (URLReadData(url.GetString(), data)) {
 				rapidjson::Document d;
-				if (!d.Parse(data).HasParseError()) {
+				if (!d.Parse(data.data()).HasParseError()) {
 					const auto& items = d.FindMember("items");
 					if (items == d.MemberEnd()
 							|| !items->value.IsArray()
 							|| items->value.Empty()) {
-						free(data);
 						return false;
 					}
 
 					const auto& value0 = items->value[0];
-					if (isJsonObject(snippet, value0, "snippet")) {
-						if (getJsonValue(snippet->value, "title", y_fields.title)) {
+					if (auto snippet = GetJsonObject(value0, "snippet")) {
+						if (getJsonValue(*snippet, "title", y_fields.title)) {
 							y_fields.title = FixHtmlSymbols(y_fields.title);
 						}
 
-						getJsonValue(snippet->value, "channelTitle", y_fields.author);
+						getJsonValue(*snippet, "channelTitle", y_fields.author);
 
-						if (getJsonValue(snippet->value, "description", y_fields.content)) {
+						if (getJsonValue(*snippet, "description", y_fields.content)) {
 							std::wregex rgx(LR"(\r\n|\r|\n)");
 							std::wstring wstr = std::regex_replace(y_fields.content.GetString(), rgx, L"\r\n");
 							y_fields.content = wstr.c_str();
 						}
 
 						CStringA publishedAt;
-						if (getJsonValue(snippet->value, "publishedAt", publishedAt)) {
+						if (getJsonValue(*snippet, "publishedAt", publishedAt)) {
 							WORD y, m, d;
 							WORD hh, mm, ss;
 							if (sscanf_s(publishedAt.GetString(), "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
@@ -371,9 +355,9 @@ namespace Youtube
 						}
 					}
 
-					if (isJsonObject(contentDetails, value0, "contentDetails")) {
+					if (auto contentDetails = GetJsonObject(value0, "contentDetails")) {
 						CStringA duration;
-						if (getJsonValue(contentDetails->value, "duration", duration)) {
+						if (getJsonValue(*contentDetails, "duration", duration)) {
 							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
 							std::cmatch match;
 							if (std::regex_search(duration.GetString(), match, regex) && match.size() == 4) {
@@ -396,8 +380,6 @@ namespace Youtube
 					}
 				}
 
-				free(data);
-
 				return true;
 			}
 #endif
@@ -418,70 +400,57 @@ namespace Youtube
 		if (CheckURL(url)) {
 			DLog(L"Youtube::Parse_URL() : \"%s\"", url);
 
-			char* data = nullptr;
-			DWORD dataSize = 0;
+			HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
 
-			CString videoId;
+			CString videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
 
-			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
-			if (hInet) {
-				HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
+			if (rtStart <= 0) {
+				BOOL bMatch = FALSE;
 
-				videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
-
-				if (rtStart <= 0) {
-					BOOL bMatch = FALSE;
-
-					const std::wregex regex(L"t=(\\d+h)?(\\d{1,2}m)?(\\d{1,2}s)?", std::regex_constants::icase);
-					std::wcmatch match;
-					if (std::regex_search(url.GetBuffer(), match, regex) && match.size() == 4) {
-						int h = 0;
-						int m = 0;
-						int s = 0;
-						if (match[1].matched) {
-							h = _wtoi(match[1].first);
-							bMatch = TRUE;
-						}
-						if (match[2].matched) {
-							m = _wtoi(match[2].first);
-							bMatch = TRUE;
-						}
-						if (match[3].matched) {
-							s = _wtoi(match[3].first);
-							bMatch = TRUE;
-						}
-
-						rtStart = (h * 3600 + m * 60 + s) * UNITS;
+				const std::wregex regex(L"t=(\\d+h)?(\\d{1,2}m)?(\\d{1,2}s)?", std::regex_constants::icase);
+				std::wcmatch match;
+				if (std::regex_search(url.GetBuffer(), match, regex) && match.size() == 4) {
+					int h = 0;
+					int m = 0;
+					int s = 0;
+					if (match[1].matched) {
+						h = _wtoi(match[1].first);
+						bMatch = TRUE;
+					}
+					if (match[2].matched) {
+						m = _wtoi(match[2].first);
+						bMatch = TRUE;
+					}
+					if (match[3].matched) {
+						s = _wtoi(match[3].first);
+						bMatch = TRUE;
 					}
 
-					if (!bMatch) {
-						const CString timeStart = RegExpParse<CString>(url.GetString(), L"(?:t|time_continue)=([0-9]+)");
-						if (!timeStart.IsEmpty()) {
-							rtStart = _wtol(timeStart) * UNITS;
-						}
-					}
+					rtStart = (h * 3600 + m * 60 + s) * UNITS;
 				}
 
-				InternetReadData(hInet, url, &data, dataSize);
+				if (!bMatch) {
+					const CString timeStart = RegExpParse<CString>(url.GetString(), L"(?:t|time_continue)=([0-9]+)");
+					if (!timeStart.IsEmpty()) {
+						rtStart = _wtol(timeStart) * UNITS;
+					}
+				}
 			}
 
-			if (!data) {
-				if (hInet) {
-					InternetCloseHandle(hInet);
-				}
-
+			urlData data;
+			if (!URLReadData(url.GetString(), data)) {
 				return false;
 			}
 
-			const CString Title = AltUTF8ToWStr(GetEntry(data, "<title>", "</title>"));
+			const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
 			std::vector<youtubeFuncType> JSFuncs;
 			std::vector<int> JSFuncArgs;
 			BOOL bJSParsed = FALSE;
-			CString JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START, MATCH_END));
+			CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
 			if (JSUrl.IsEmpty()) {
-				JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
+				JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
 			}
 
 			rapidjson::Document player_response_jsonDocument;
@@ -490,7 +459,7 @@ namespace Youtube
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
 
-			auto player_response_jsonData = GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+			auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
 			if (!player_response_jsonData.IsEmpty()) {
 				player_response_jsonData += "}";
 				player_response_jsonData.Replace(R"(\/)", "/");
@@ -500,20 +469,17 @@ namespace Youtube
 			}
 
 			// live streaming
-			CStringA live_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
+			CStringA live_url = GetEntry(data.data(), MATCH_HLSVP_START, MATCH_END);
 			if (live_url.IsEmpty()) {
-				live_url = GetEntry(data, MATCH_HLSMANIFEST_START, MATCH_END);
+				live_url = GetEntry(data.data(), MATCH_HLSMANIFEST_START, MATCH_END);
 			}
 			if (!live_url.IsEmpty()) {
 				url = UrlDecode(UrlDecode(live_url));
 				url.Replace(L"\\/", L"/");
 				DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
-				char* m3u8 = nullptr;
-				DWORD m3u8Size = 0;
-				InternetReadData(hInet, url, &m3u8, m3u8Size);
-				if (m3u8Size) {
-					CStringA m3u8Str(m3u8);
-					free(m3u8);
+				urlData m3u8Data;
+				if (URLReadData(url.GetString(), m3u8Data)) {
+					CStringA m3u8Str(m3u8Data.data());
 
 					m3u8Str.Replace("\r\n", "\n");
 					std::list<CStringA> lines;
@@ -531,19 +497,16 @@ namespace Youtube
 
 				if (strUrlsLive.empty()) {
 					urls.push_front(url);
-
-					free(data);
-					InternetCloseHandle(hInet);
 					return true;
 				}
 			} else {
 				// url_encoded_fmt_stream_map
-				const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
+				const CStringA stream_map = GetEntry(data.data(), MATCH_STREAM_MAP_START, MATCH_END);
 				if (!stream_map.IsEmpty()) {
 					strUrls = stream_map;
 				}
 				// adaptive_fmts
-				const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+				const CStringA adaptive_fmts = GetEntry(data.data(), MATCH_ADAPTIVE_FMTS_START, MATCH_END);
 				if (!adaptive_fmts.IsEmpty()) {
 					if (!strUrls.IsEmpty()) {
 						strUrls += ',';
@@ -556,36 +519,26 @@ namespace Youtube
 			if (strUrlsLive.empty() && player_response_jsonDocument.IsNull() && strUrls.IsEmpty()) {
 				bReplacePlus = true;
 
-				free(data);
-
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
-				InternetReadData(hInet, link, &data, dataSize);
-
-				if (!data) {
-					InternetCloseHandle(hInet);
+				if (!URLReadData(link.GetString(), data)) {
 					return false;
 				}
 
 				if (JSUrl.IsEmpty()) {
-					JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START, MATCH_END));
+					JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
 				}
 				if (JSUrl.IsEmpty()) {
-					JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
+					JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
 				}
 
-				const CStringA sts = RegExpParse<CStringA>(data, "\"sts\"\\s*:\\s*(\\d+)");
-
-				free(data);
+				const CStringA sts = RegExpParse<CStringA>(data.data(), "\"sts\"\\s*:\\s*(\\d+)");
 
 				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
-				InternetReadData(hInet, link, &data, dataSize);
-
-				if (!data) {
-					InternetCloseHandle(hInet);
+				if (!URLReadData(link.GetString(), data)) {
 					return false;
 				}
 
-				const CStringA strData = UrlDecode(data);
+				const CStringA strData = UrlDecode(data.data());
 
 				const auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
 				if (!player_response_jsonData.IsEmpty()) {
@@ -712,10 +665,8 @@ namespace Youtube
 				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 					if (!bJSParsed) {
 						bJSParsed = TRUE;
-						char* data = nullptr;
-						DWORD dataSize = 0;
-						InternetReadData(hInet, JSUrl, &data, dataSize);
-						if (dataSize) {
+						urlData jsData;
+						if (URLReadData(JSUrl.GetString(), jsData)) {
 							static LPCSTR signatureRegExps[] = {
 								R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
 								R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
@@ -732,14 +683,14 @@ namespace Youtube
 							};
 							CStringA funcName;
 							for (const auto& sigRegExp : signatureRegExps) {
-								funcName = RegExpParse<CStringA>(data, sigRegExp);
+								funcName = RegExpParse<CStringA>(jsData.data(), sigRegExp);
 								if (!funcName.IsEmpty()) {
 									break;
 								}
 							}
 							if (!funcName.IsEmpty()) {
 								CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
-								const CStringA funcBody = RegExpParse<CStringA>(data, funcRegExp.GetString());
+								const CStringA funcBody = RegExpParse<CStringA>(jsData.data(), funcRegExp.GetString());
 								if (!funcBody.IsEmpty()) {
 									CStringA funcGroup;
 									std::list<CStringA> funcList;
@@ -766,7 +717,7 @@ namespace Youtube
 
 									if (!funcGroup.IsEmpty()) {
 										CStringA tmp; tmp.Format("var %s={", funcGroup);
-										tmp = GetEntry(data, tmp, "};");
+										tmp = GetEntry(jsData.data(), tmp, "};");
 										if (!tmp.IsEmpty()) {
 											tmp.Remove('\n');
 											Explode(tmp, funcCodeList, "},");
@@ -816,8 +767,6 @@ namespace Youtube
 									}
 								}
 							}
-
-							free(data);
 						}
 					}
 				}
@@ -864,7 +813,7 @@ namespace Youtube
 			};
 
 			if (strUrlsLive.empty()) {
-				CString dashmpdUrl = UTF8ToWStr(GetEntry(data, MATCH_MPD_START, MATCH_END));
+				CString dashmpdUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_MPD_START, MATCH_END));
 				if (!dashmpdUrl.IsEmpty()) {
 					dashmpdUrl.Replace(L"\\/", L"/");
 					if (dashmpdUrl.Find(L"/s/") > 0) {
@@ -877,12 +826,9 @@ namespace Youtube
 					}
 
 					DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
-					char* dashmpd = nullptr;
-					DWORD dashmpdSize = 0;
-					InternetReadData(hInet, dashmpdUrl, &dashmpd, dashmpdSize);
-					if (dashmpdSize) {
-						CString xml = UTF8ToWStr(dashmpd);
-						free(dashmpd);
+					urlData dashmpdData;
+					if (URLReadData(dashmpdUrl.GetString(), dashmpdData)) {
+						CString xml = UTF8ToWStr(dashmpdData.data());
 						const std::wregex regex(L"<Representation(.*?)</Representation>");
 						std::wcmatch match;
 						LPCWSTR text = xml.GetBuffer();
@@ -903,7 +849,7 @@ namespace Youtube
 				}
 			}
 
-			CStringA chaptersStr = GetEntry(data, R"({"chapteredPlayerBarRenderer":)", "]");
+			CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "]");
 			if (!chaptersStr.IsEmpty()) {
 				chaptersStr.Replace(R"(\/)", "/");
 				chaptersStr.Replace(R"(\")", R"(")");
@@ -929,7 +875,7 @@ namespace Youtube
 			} else {
 				const std::regex regex(R"((?:^|<br\s*\/>)([^<]*<a[^>]+onclick=["\']yt\.www\.watch\.player\.seekTo[^>]+>(\d{1,2}:\d{1,2}(?::\d{1,2})?)<\/a>[^>]*)(?=$|<br\s*\/>))");
 				std::cmatch match;
-				LPCSTR text = data;
+				LPCSTR text = data.data();
 				while (std::regex_search(text, match, regex)) {
 					if (match.size() == 3) {
 						CStringA entries(match[1].first, match[1].length());
@@ -964,8 +910,6 @@ namespace Youtube
 					text = match[0].second;
 				}
 			}
-
-			free(data);
 
 			if (strUrlsLive.empty()) {
 				if (!streamingDataFormatList.empty()) {
@@ -1161,7 +1105,7 @@ namespace Youtube
 
 				const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields, bReplacePlus);
 				if (!bParseMetadata) {
-					ParseMetadata(hInet, videoId, y_fields);
+					ParseMetadata(videoId, y_fields);
 				}
 
 				y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_video_profile->quality, final_video_profile->ext);
@@ -1195,8 +1139,6 @@ namespace Youtube
 					}
 				}
 
-				InternetCloseHandle(hInet);
-
 				if (!final_video_url.IsEmpty()) {
 					urls.push_front(final_video_url);
 
@@ -1218,265 +1160,243 @@ namespace Youtube
 		youtubePlaylist.clear();
 		if (CheckPlaylist(url)) {
 #if !USE_GOOGLE_API
-			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
-			if (hInet) {
-				HandleURL(url);
+			HandleURL(url);
 
-				auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/user)/([-a-zA-Z0-9_]+)");
+			auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/user)/([-a-zA-Z0-9_]+)");
+			if (!channelId.IsEmpty()) {
+				if (url.Find(YOUTUBE_USER_URL) != -1) {
+					url.Format(L"https://www.youtube.com/user/%s", channelId);
+					DLog(L"Youtube::Parse_Playlist() : downloading user page '%s'", url);
+
+					urlData data;
+					if (URLReadData(url.GetString(), data)) {
+						channelId = UTF8ToWStr(GetEntry(data.data(), R"(content="https://www.youtube.com/channel/)", R"(")"));
+					}
+				}
+
 				if (!channelId.IsEmpty()) {
-					if (url.Find(YOUTUBE_USER_URL) != -1) {
-						url.Format(L"https://www.youtube.com/user/%s", channelId);
-						DLog(L"Youtube::Parse_Playlist() : downloading user page '%s'", url);
-
-						char* data = nullptr;
-						DWORD dataSize = 0;
-						InternetReadData(hInet, url, &data, dataSize);
-						if (data) {
-							channelId = UTF8ToWStr(GetEntry(data, R"(content="https://www.youtube.com/channel/)", R"(")"));
-							free(data);
-						}
-					}
-
-					if (!channelId.IsEmpty()) {
-						if (channelId.Left(2) == L"UC") {
-							const CString playlistId = L"UU" + channelId.Right(channelId.GetLength() - 2);
-							url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
-						} else {
-							DLog(L"Youtube::Parse_Playlist() : unsupported user/channel page '%s'", url);
-						}
+					if (channelId.Left(2) == L"UC") {
+						const CString playlistId = L"UU" + channelId.Right(channelId.GetLength() - 2);
+						url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
+					} else {
+						DLog(L"Youtube::Parse_Playlist() : unsupported user/channel page '%s'", url);
 					}
 				}
+			}
 
-				const auto videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
-				const auto playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
-				if (playlistId.IsEmpty()) {
-					return false;
-				}
+			const auto videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
+			const auto playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
+			if (playlistId.IsEmpty()) {
+				return false;
+			}
 
-				const auto extract_mix = playlistId.Left(2) == L"RD" || playlistId.Left(2) == L"UL" || playlistId.Left(2) == L"PU";
-				if (extract_mix) {
-					DLog(L"Youtube::Parse_Playlist() : mixed playlist");
-					url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", videoIdCurrent, playlistId);
-				} else {
-					url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
-				}
+			const auto extract_mix = playlistId.Left(2) == L"RD" || playlistId.Left(2) == L"UL" || playlistId.Left(2) == L"PU";
+			if (extract_mix) {
+				DLog(L"Youtube::Parse_Playlist() : mixed playlist");
+				url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", videoIdCurrent, playlistId);
+			} else {
+				url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
+			}
 
-				char* data = nullptr;
-				CStringA dataStr;
-				DWORD dataSize = 0;
+			unsigned index = 0;
+			DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
 
-				unsigned index = 0;
-				DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
-				InternetReadData(hInet, url, &data, dataSize);
-				if (data) {
-					dataStr = data; free(data);
-				}
+			urlData data;
+			if (!URLReadData(url.GetString(), data)) {
+				return false;
+			}
+			CStringA dataStr = data.data();
 
-				if (dataStr.IsEmpty()) {
-					InternetCloseHandle(hInet);
-					return false;
-				}
+			while (!dataStr.IsEmpty()) {
+				CStringA jsonEntry = GetEntry(dataStr.GetString(), R"({"responseContext":)", "};");
+				dataStr.Empty();
+				if (!jsonEntry.IsEmpty()) {
+					jsonEntry = R"({"responseContext":)" + jsonEntry + "}";
 
-				while (!dataStr.IsEmpty()) {
-					CStringA jsonEntry = GetEntry(dataStr.GetString(), R"({"responseContext":)", "};");
-					dataStr.Empty();
-					if (!jsonEntry.IsEmpty()) {
-						jsonEntry = R"({"responseContext":)" + jsonEntry + "}";
+					rapidjson::Document json;
+					if (!json.Parse(jsonEntry).HasParseError()) {
+						auto contents = GetValueByPointer(json, "/contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents/0/playlistVideoListRenderer/contents");
+						if (!contents) {
+							contents = GetValueByPointer(json, "/contents/twoColumnWatchNextResults/playlist/playlist/contents");
+						}
 
-						rapidjson::Document json;
-						if (!json.Parse(jsonEntry).HasParseError()) {
-							auto contents = GetValueByPointer(json, "/contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents/0/playlistVideoListRenderer/contents");
-							if (!contents) {
-								contents = GetValueByPointer(json, "/contents/twoColumnWatchNextResults/playlist/playlist/contents");
-							}
+						CString lastvideoId;
+						auto ParseJsonObject = [&](const auto& object) {
+							CString videoId;
+							getJsonValue(object, "videoId", videoId);
 
-							CString lastvideoId;
-							auto ParseJsonObject = [&](const auto& object) {
-								CString videoId;
-								getJsonValue(object, "videoId", videoId);
+							if (!videoId.IsEmpty()) {
+								CString simpleText;
+								if (auto title = GetJsonObject(object, "title")) {
+									if (getJsonValue(*title, "simpleText", simpleText)) {
+										REFERENCE_TIME duration = 0;
+										CString lengthSeconds;
+										if (getJsonValue(object, "lengthSeconds", lengthSeconds)) {
+											duration = UNITS * _wtoi(lengthSeconds);
+										} else if (auto lengthText = GetJsonObject(object, "lengthText")) {
+											CString simpleText;
+											if (getJsonValue(*lengthText, "simpleText", simpleText)) {
+												int t1 = 0;
+												int t2 = 0;
+												int t3 = 0;
 
-								if (!videoId.IsEmpty()) {
-									CString simpleText;
-									if (auto title = GetJsonObject(object, "title")) {
-										if (getJsonValue(*title, "simpleText", simpleText)) {
-											REFERENCE_TIME duration = 0;
-											CString lengthSeconds;
-											if (getJsonValue(object, "lengthSeconds", lengthSeconds)) {
-												duration = UNITS * _wtoi(lengthSeconds);
-											} else if (auto lengthText = GetJsonObject(object, "lengthText")) {
-												CString simpleText;
-												if (getJsonValue(*lengthText, "simpleText", simpleText)) {
-													int t1 = 0;
-													int t2 = 0;
-													int t3 = 0;
-
-													if (const auto ret = swscanf_s(simpleText.GetString(), L"%02d:%02d:%02d", &t1, &t2, &t3)) {
-														if (ret == 3) {
-															duration = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
-														} else if (ret == 2) {
-															duration = ((60LL * t1) + t2) * UNITS;
-														}
+												if (const auto ret = swscanf_s(simpleText.GetString(), L"%02d:%02d:%02d", &t1, &t2, &t3)) {
+													if (ret == 3) {
+														duration = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
+													} else if (ret == 2) {
+														duration = ((60LL * t1) + t2) * UNITS;
 													}
 												}
 											}
+										}
 
-											CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
-											auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
-												return item.url == url;
-											});
-											if (it == youtubePlaylist.cend()) {
-												lastvideoId = videoId;
-												youtubePlaylist.emplace_back(url, simpleText, duration);
+										CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
+										auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
+											return item.url == url;
+										});
+										if (it == youtubePlaylist.cend()) {
+											lastvideoId = videoId;
+											youtubePlaylist.emplace_back(url, simpleText, duration);
 
-												if (videoId == videoIdCurrent) {
-													idx_CurrentPlay = youtubePlaylist.size() - 1;
-												}
+											if (videoId == videoIdCurrent) {
+												idx_CurrentPlay = youtubePlaylist.size() - 1;
 											}
 										}
 									}
 								}
-							};
+							}
+						};
 
-							if (contents && contents->IsArray()) {
-								for (const auto& item : contents->GetArray()) {
-									if (auto playlistPanelVideoRenderer = GetJsonObject(item, "playlistPanelVideoRenderer")) {
-										ParseJsonObject(*playlistPanelVideoRenderer);
-									} else if (auto playlistVideoRenderer = GetJsonObject(item, "playlistVideoRenderer")) {
-										ParseJsonObject(*playlistVideoRenderer);
-									}
+						if (contents && contents->IsArray()) {
+							for (const auto& item : contents->GetArray()) {
+								if (auto playlistPanelVideoRenderer = GetJsonObject(item, "playlistPanelVideoRenderer")) {
+									ParseJsonObject(*playlistPanelVideoRenderer);
+								} else if (auto playlistVideoRenderer = GetJsonObject(item, "playlistVideoRenderer")) {
+									ParseJsonObject(*playlistVideoRenderer);
 								}
 							}
+						}
 
-							if (!lastvideoId.IsEmpty()) {
-								url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", lastvideoId, playlistId);
-								DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
-								InternetReadData(hInet, url, &data, dataSize);
-								if (data) {
-									dataStr = data; free(data);
-								}
+						if (!lastvideoId.IsEmpty()) {
+							url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", lastvideoId, playlistId);
+							DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+							if (URLReadData(url.GetString(), data)) {
+								dataStr = data.data();
 							}
 						}
 					}
 				}
+			}
 
-				if (!youtubePlaylist.empty()) {
-					InternetCloseHandle(hInet);
-					return true;
+			if (!youtubePlaylist.empty()) {
+				return true;
+			}
+
+			CStringA moreStr;
+			dataStr.Empty();
+
+			index = 0;
+			url += L"&disable_polymer=true";
+			DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+			if (URLReadData(url.GetString(), data)) {
+				dataStr = data.data();
+				if (!extract_mix) {
+					moreStr = dataStr;
+				}
+			}
+
+			while (!dataStr.IsEmpty()) {
+				CString lastvideoId;
+
+				LPCSTR sMatch = nullptr;
+				if (strstr(dataStr.GetString(), MATCH_PLAYLIST_ITEM_START)) {
+					sMatch = MATCH_PLAYLIST_ITEM_START;
+				} else if (strstr(dataStr.GetString(), MATCH_PLAYLIST_ITEM_START2)) {
+					sMatch = MATCH_PLAYLIST_ITEM_START2;
+				} else {
+					break;
 				}
 
-				CStringA moreStr;
-				dataStr.Empty();
-
-				index = 0;
-				url += L"&disable_polymer=true";
-				DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
-				InternetReadData(hInet, url, &data, dataSize);
-				if (data) {
-					dataStr = data; free(data);
-					if (!extract_mix) {
-						moreStr = dataStr;
-					}
-				}
-
-				while (!dataStr.IsEmpty()) {
-					CString lastvideoId;
-
-					LPCSTR sMatch = nullptr;
-					if (strstr(dataStr.GetString(), MATCH_PLAYLIST_ITEM_START)) {
-						sMatch = MATCH_PLAYLIST_ITEM_START;
-					} else if (strstr(dataStr.GetString(), MATCH_PLAYLIST_ITEM_START2)) {
-						sMatch = MATCH_PLAYLIST_ITEM_START2;
-					} else {
+				LPCSTR block = dataStr.GetString();
+				while ((block = strstr(block, sMatch)) != nullptr) {
+					const CStringA blockEntry = GetEntry(block, sMatch, ">");
+					if (blockEntry.IsEmpty()) {
 						break;
 					}
 
-					LPCSTR block = dataStr.GetString();
-					while ((block = strstr(block, sMatch)) != nullptr) {
-						const CStringA blockEntry = GetEntry(block, sMatch, ">");
-						if (blockEntry.IsEmpty()) {
-							break;
-						}
+					block += blockEntry.GetLength();
+					CString item = UTF8ToWStr(blockEntry);
+					CString videoId;
+					CString title;
 
-						block += blockEntry.GetLength();
-						CString item = UTF8ToWStr(blockEntry);
-						CString videoId;
-						CString title;
+					const std::wregex regex(L"([a-z-]+)=\"([^\"]+)\"");
+					std::wcmatch match;
+					LPCWSTR text = item.GetString();
+					while (std::regex_search(text, match, regex)) {
+						if (match.size() == 3) {
+							const CString propHeader(match[1].first, match[1].length());
+							const CString propValue(match[2].first, match[2].length());
 
-						const std::wregex regex(L"([a-z-]+)=\"([^\"]+)\"");
-						std::wcmatch match;
-						LPCWSTR text = item.GetString();
-						while (std::regex_search(text, match, regex)) {
-							if (match.size() == 3) {
-								const CString propHeader(match[1].first, match[1].length());
-								const CString propValue(match[2].first, match[2].length());
-
-								if (propHeader == L"data-video-id") {
-									videoId = propValue;
-								} else if (propHeader == L"data-video-title" || propHeader == L"data-title") {
-									title = FixHtmlSymbols(propValue);
-								}
-							}
-
-							text = match[0].second;
-						}
-
-						if (!videoId.IsEmpty()) {
-							CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
-							auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
-								return item.url == url;
-							});
-							if (it == youtubePlaylist.cend()) {
-								lastvideoId = videoId;
-								youtubePlaylist.emplace_back(url, title);
-
-								if (videoId == videoIdCurrent) {
-									idx_CurrentPlay = youtubePlaylist.size() - 1;
-								}
+							if (propHeader == L"data-video-id") {
+								videoId = propValue;
+							} else if (propHeader == L"data-video-title" || propHeader == L"data-title") {
+								title = FixHtmlSymbols(propValue);
 							}
 						}
+
+						text = match[0].second;
 					}
 
-					dataStr.Empty();
+					if (!videoId.IsEmpty()) {
+						CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
+						auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
+							return item.url == url;
+						});
+						if (it == youtubePlaylist.cend()) {
+							lastvideoId = videoId;
+							youtubePlaylist.emplace_back(url, title);
 
-					if (extract_mix) {
-						if (lastvideoId.IsEmpty()) {
-							break;
-						}
-
-						url.Format(L"https://www.youtube.com/watch?v=%s&list=%s&disable_polymer=true", lastvideoId, playlistId);
-						DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
-						InternetReadData(hInet, url, &data, dataSize);
-						if (data) {
-							dataStr = data; free(data);
-						}
-
-						continue;
-					} else {
-						auto moreUrl = UrlDecode(RegExpParse<CStringA>(moreStr.GetString(), R"(data-uix-load-more-href="/?([^"]+)\")"));
-						moreStr.Empty();
-						if (!moreUrl.IsEmpty()) {
-							moreUrl.Replace("&amp;", "&"); moreUrl += "&disable_polymer=true";
-							url.Format(L"https://www.youtube.com/%S", moreUrl);
-
-							DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
-							InternetReadData(hInet, url, &data, dataSize, L"x-youtube-client-name: 1\r\nx-youtube-client-version: 1.20200609.04.02\r\n");
-							if (data) {
-								rapidjson::Document json;
-								if (!json.Parse(data).HasParseError()) {
-									getJsonValue(json, "content_html", dataStr);
-									getJsonValue(json, "load_more_widget_html", moreStr);
-								}
-
-								free(data);
+							if (videoId == videoIdCurrent) {
+								idx_CurrentPlay = youtubePlaylist.size() - 1;
 							}
 						}
 					}
 				}
 
-				InternetCloseHandle(hInet);
+				dataStr.Empty();
 
-				return !youtubePlaylist.empty();
+				if (extract_mix) {
+					if (lastvideoId.IsEmpty()) {
+						break;
+					}
+
+					url.Format(L"https://www.youtube.com/watch?v=%s&list=%s&disable_polymer=true", lastvideoId, playlistId);
+					DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+					if (URLReadData(url.GetString(), data)) {
+						dataStr = data.data();
+					}
+
+					continue;
+				} else {
+					auto moreUrl = UrlDecode(RegExpParse<CStringA>(moreStr.GetString(), R"(data-uix-load-more-href="/?([^"]+)\")"));
+					moreStr.Empty();
+					if (!moreUrl.IsEmpty()) {
+						moreUrl.Replace("&amp;", "&"); moreUrl += "&disable_polymer=true";
+						url.Format(L"https://www.youtube.com/%S", moreUrl);
+
+						DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
+						if (URLReadData(url.GetString(), data, L"x-youtube-client-name: 1\r\nx-youtube-client-version: 1.20200609.04.02\r\n")) {
+							rapidjson::Document json;
+							if (!json.Parse(data.data()).HasParseError()) {
+								getJsonValue(json, "content_html", dataStr);
+								getJsonValue(json, "load_more_widget_html", moreStr);
+							}
+						}
+					}
+				}
 			}
+
+			return !youtubePlaylist.empty();
 
 #else
 			const CString videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
@@ -1485,52 +1405,42 @@ namespace Youtube
 				return false;
 			}
 
-			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
-			char* data = nullptr;
-			DWORD dataSize = 0;
-
 			CString nextToken;
+			urlData data;
 
 			for (;;) {
-				if (hInet) {
-					CString link;
-					link.Format(L"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=%s&key=%s&maxResults=50", playlistId.GetString(), strGoogleApiKey);
-					if (!nextToken.IsEmpty()) {
-						link.AppendFormat(L"&pageToken=%s", nextToken.GetString());
-						nextToken.Empty();
-					}
-
-					InternetReadData(hInet, link, &data, dataSize);
+				CString link;
+				link.Format(L"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=%s&key=%s&maxResults=50", playlistId.GetString(), strGoogleApiKey);
+				if (!nextToken.IsEmpty()) {
+					link.AppendFormat(L"&pageToken=%s", nextToken.GetString());
+					nextToken.Empty();
 				}
 
-				if (!data) {
-					InternetCloseHandle(hInet);
+				if (!URLReadData(link.GetString(), data)) {
 					return false;
 				}
 
 				rapidjson::Document d;
-				if (!d.Parse(data).HasParseError()) {
+				if (!d.Parse(data.data()).HasParseError()) {
 					const auto& items = d.FindMember("items");
 					if (items == d.MemberEnd()
 							|| !items->value.IsArray()
 							|| items->value.Empty()) {
-						free(data);
-						InternetCloseHandle(hInet);
 						return false;
 					}
 
 					getJsonValue(d, "nextPageToken", nextToken);
 
 					for (const auto& item : items->value.GetArray()) {
-						if (isJsonObject(snippet, item, "snippet")) {
-							if (isJsonObject(resourceId, snippet->value, "resourceId")) {
+						if (auto snippet = GetJsonObject(item, "snippet")) {
+							if (auto resourceId = GetJsonObject(*snippet, "resourceId")) {
 								CString videoId;
-								if (getJsonValue(resourceId->value, "videoId", videoId)) {
+								if (getJsonValue(*resourceId, "videoId", videoId)) {
 									CString url;
 									url.Format(L"https://www.youtube.com/watch?v=%s", videoId.GetString());
 
 									CString title;
-									if (getJsonValue(snippet->value, "title", title)) {
+									if (getJsonValue(*snippet, "title", title)) {
 										title = FixHtmlSymbols(title);
 									}
 
@@ -1545,10 +1455,7 @@ namespace Youtube
 					}
 				}
 
-				free(data);
-
 				if (nextToken.IsEmpty()) {
-					InternetCloseHandle(hInet);
 					break;
 				}
 			}
@@ -1566,16 +1473,10 @@ namespace Youtube
 	{
 		bool bRet = false;
 		if (CheckURL(url)) {
-			HINTERNET hInet = InternetOpenW(USER_AGENT, 0, nullptr, nullptr, 0);
-			if (hInet) {
-				HandleURL(url);
+			HandleURL(url);
+			const CString videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
 
-				const CString videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
-
-				bRet = ParseMetadata(hInet, videoId, y_fields);
-
-				InternetCloseHandle(hInet);
-			}
+			bRet = ParseMetadata(videoId, y_fields);
 		}
 
 		return bRet;
