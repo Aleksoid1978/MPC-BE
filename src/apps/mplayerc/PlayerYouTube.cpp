@@ -450,8 +450,7 @@ namespace Youtube
 			const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
-			std::vector<youtubeFuncType> JSFuncs;
-			std::vector<int> JSFuncArgs;
+			std::vector<std::tuple<youtubeFuncType, int>> JSFuncs;
 			BOOL bJSParsed = FALSE;
 			CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
 			if (JSUrl.IsEmpty()) {
@@ -749,7 +748,7 @@ namespace Youtube
 											CStringA funcName = GetEntry(func, funcGroup, "(");
 											funcName += ":function";
 
-											youtubeFuncType funcType = youtubeFuncType::funcNONE;
+											auto funcType = youtubeFuncType::funcNONE;
 
 											for (const auto& funcCode : funcCodeList) {
 												if (funcCode.Find(funcName) >= 0) {
@@ -765,8 +764,7 @@ namespace Youtube
 											}
 
 											if (funcType != youtubeFuncType::funcNONE) {
-												JSFuncs.push_back(funcType);
-												JSFuncArgs.push_back(funcArg);
+												JSFuncs.emplace_back(funcType, funcArg);
 											}
 										}
 									}
@@ -797,15 +795,13 @@ namespace Youtube
 						}
 					};
 
-					for (size_t i = 0; i < JSFuncs.size(); i++) {
-						const youtubeFuncType func = JSFuncs[i];
-						const int arg = JSFuncArgs[i];
-						switch (func) {
+					for (const auto [funcType, funcArg] : JSFuncs) {
+						switch (funcType) {
 							case youtubeFuncType::funcDELETE:
-								Delete(signature, arg);
+								Delete(signature, funcArg);
 								break;
 							case youtubeFuncType::funcSWAP:
-								Swap(signature, arg);
+								Swap(signature, funcArg);
 								break;
 							case youtubeFuncType::funcREVERSE:
 								Reverse(signature);
