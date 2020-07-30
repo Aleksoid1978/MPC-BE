@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,6 +32,7 @@ private:
 	double  m_center_level;
 	double  m_surround_level;
 	bool    m_normalize_matrix;
+	bool    m_dummy_channels;
 	bool    m_ActualContext;
 
 	SampleFormat m_in_sf;
@@ -52,7 +53,7 @@ private:
 	bool Init();
 
 public:
-	void SetOptions(double center_level, double suround_level, bool normalize_matrix);
+	void SetOptions(double center_level, double suround_level, bool normalize_matrix, bool dummy_channels);
 	void UpdateInput (SampleFormat  in_sf, DWORD  in_layout, int  in_samplerate = 48000);
 	void UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate = 48000);
 

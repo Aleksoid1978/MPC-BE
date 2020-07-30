@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,6 +39,7 @@ CMixer::CMixer()
 	, m_center_level(1.0)
 	, m_surround_level(1.0)
 	, m_normalize_matrix(false)
+	, m_dummy_channels(false)
 	, m_ActualContext(false)
 	, m_in_sf(SAMPLE_FMT_NONE)
 	, m_out_sf(SAMPLE_FMT_NONE)
@@ -92,8 +93,22 @@ bool CMixer::Init()
 	const int out_ch = av_popcount(m_out_layout);
 	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
 
+	// special mode that adds empty channels to existing channels
+	if (m_dummy_channels && (m_out_layout & m_in_layout) == m_in_layout) {
+		int olayout = m_out_layout;
+		for (int j = 0; j < out_ch; j++) {
+			const int och = olayout & (-olayout);
+			int ilayout = m_in_layout;
+			for (int i = 0; i < in_ch; i++) {
+				const int ich = ilayout & (-ilayout);
+				m_matrix_dbl[j * in_ch + i] = (ich == och) ? 1.0 : 0.0;
+				ilayout &= ~ich;
+			}
+			olayout &= ~och;
+		}
+	}
 	// expand mono to front left and front right channels
-	if (m_in_layout == AV_CH_LAYOUT_MONO && m_out_layout & (AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT)) {
+	else if (m_in_layout == AV_CH_LAYOUT_MONO && m_out_layout & (AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT)) {
 		int i = 0;
 		m_matrix_dbl[i++] = 1.0;
 		m_matrix_dbl[i++] = 1.0;
@@ -256,12 +271,14 @@ bool CMixer::Init()
 	return true;
 }
 
-void CMixer::SetOptions(double center_level, double suround_level, bool normalize_matrix)
+void CMixer::SetOptions(double center_level, double suround_level, bool normalize_matrix, bool dummy_channels)
 {
-	if (center_level != m_center_level || suround_level != m_surround_level || normalize_matrix != m_normalize_matrix) {
+	if (center_level != m_center_level || suround_level != m_surround_level
+			|| normalize_matrix != m_normalize_matrix || dummy_channels != m_dummy_channels) {
 		m_center_level = center_level;
 		m_surround_level = suround_level;
 		m_normalize_matrix = normalize_matrix;
+		m_dummy_channels = dummy_channels;
 		m_ActualContext = false;
 	}
 }

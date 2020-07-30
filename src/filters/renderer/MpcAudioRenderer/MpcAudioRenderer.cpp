@@ -1519,7 +1519,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 
 			CAutoLock cResamplerLock(&m_csResampler);
 
-			//m_Resampler.SetOptions(true);
+			//m_Resampler.SetOptions(1.0, 1.0, false, false);
 			m_Resampler.UpdateInput(m_input_params.sf, m_input_params.layout, m_input_params.samplerate);
 			m_Resampler.UpdateOutput(m_output_params.sf, m_output_params.layout, m_output_params.samplerate);
 			out_samples = m_Resampler.CalcOutSamples(in_samples);

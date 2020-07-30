@@ -628,7 +628,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB, double dSur
 	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, AUDIO_LEVEL_MIN, AUDIO_LEVEL_MAX);
 	m_dSurroundLevel = decibel2factor(dSurroundLevel_dB);
 
-	m_Mixer.SetOptions(m_dCenterLevel, m_dSurroundLevel, false);
+	m_Mixer.SetOptions(m_dCenterLevel, m_dSurroundLevel, false, false);
 
 	return S_OK;
 }
