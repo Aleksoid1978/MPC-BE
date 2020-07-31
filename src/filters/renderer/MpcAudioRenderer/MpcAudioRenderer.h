@@ -184,6 +184,8 @@ public:
 	STDMETHODIMP_(CString)        GetCurrentDeviceId() override;
 	STDMETHODIMP                  SetCrossFeed(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)           GetCrossFeed() override;
+	STDMETHODIMP                  SetDummyChannels(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)           GetDummyChannels() override;
 
 	// CMpcAudioRenderer
 private:
@@ -253,6 +255,7 @@ private:
 	BOOL               m_bCheckFormat;
 	BOOL               m_bReleaseDeviceIdle;
 	BOOL               m_bUseCrossFeed;
+	BOOL               m_bDummyChannels;
 	FILTER_STATE       m_filterState;
 
 	CComPtr<IMMDeviceEnumerator> m_pMMDeviceEnumerator;

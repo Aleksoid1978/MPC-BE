@@ -98,6 +98,7 @@ BEGIN
     IDS_ARS_SOUND_DEVICE           "Sound Device:"
     IDS_ARS_RELEASE_DEVICE_IDLE    "Release device when idle"
     IDS_ARS_CROSSFEED              "Enable stereo crossfeed (for headphones)"
+    IDS_ARS_DUMMY_CHANNELS         "Don't fill channels when upmixing"
     IDS_ARS_DEVICE_PERIOD          "Device buffer:"
     IDS_ARS_STATUS                 "Status"
     IDS_ARS_DEVICE                 "Device:"

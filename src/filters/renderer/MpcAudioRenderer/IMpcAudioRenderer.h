@@ -71,4 +71,6 @@ public IUnknown {
 	STDMETHOD_(CString, GetCurrentDeviceId()) PURE;
 	STDMETHOD(SetCrossFeed(BOOL bValue)) PURE;
 	STDMETHOD_(BOOL, GetCrossFeed()) PURE;
+	STDMETHOD(SetDummyChannels(BOOL bValue)) PURE;
+	STDMETHOD_(BOOL, GetDummyChannels()) PURE;
 };

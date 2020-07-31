@@ -22,6 +22,7 @@
 #define IDS_ARS_SAMPLERATE              7616
 #define IDS_ARS_CHANNELS                7617
 #define IDS_ARS_WASAPI_METHOD           7618
+#define IDS_ARS_DUMMY_CHANNELS          7619
 #define IDS_AG_DEFAULT                  33000
 
 // Next default values for new objects

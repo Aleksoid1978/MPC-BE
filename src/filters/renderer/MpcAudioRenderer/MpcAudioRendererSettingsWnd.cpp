@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2019 see Authors.txt
+ * (C) 2010-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,6 +95,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbReleaseDeviceIdle.Create(ResStr(IDS_ARS_RELEASE_DEVICE_IDLE), WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_FREE_DEVICE_INACTIVE);
 	p.y += h20;
 	m_cbUseCrossFeed.Create(ResStr(IDS_ARS_CROSSFEED), WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_CROSSFEED);
+	p.y += h20;
+	m_cbDummyChannels.Create(ResStr(IDS_ARS_DUMMY_CHANNELS), WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_DUMMY_CHANNELS);
 
 	AudioDevices::GetActiveAudioDevices(nullptr, &m_deviceList, nullptr, TRUE);
 	for (const auto& device : m_deviceList) {
@@ -134,6 +136,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		m_cbCheckFormat.SetCheck(!m_pMAR->GetCheckFormat());
 		m_cbReleaseDeviceIdle.SetCheck(m_pMAR->GetReleaseDeviceIdle());
 		m_cbUseCrossFeed.SetCheck(m_pMAR->GetCrossFeed());
+		m_cbDummyChannels.SetCheck(m_pMAR->GetDummyChannels());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -167,6 +170,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetCheckFormat(!m_cbCheckFormat.GetCheck());
 		m_pMAR->SetReleaseDeviceIdle(m_cbReleaseDeviceIdle.GetCheck());
 		m_pMAR->SetCrossFeed(m_cbUseCrossFeed.GetCheck());
+		m_pMAR->SetDummyChannels(m_cbDummyChannels.GetCheck());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
 			m_pMAR->SetDeviceId(m_deviceList[idx].deviceId, m_deviceList[idx].deviceName);

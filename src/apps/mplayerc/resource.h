@@ -559,6 +559,7 @@
 #define IDS_ARS_SAMPLERATE              7616
 #define IDS_ARS_CHANNELS                7617
 #define IDS_ARS_WASAPI_METHOD           7618
+#define IDS_ARS_DUMMY_CHANNELS          7619
 // matroska splitter
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
 #define IDS_MKVSPLT_CALC_DURATION       7701
