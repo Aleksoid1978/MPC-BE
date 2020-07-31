@@ -49,6 +49,7 @@
 #define OPT_CheckFormat             L"CheckFormat"
 #define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
 #define OPT_UseCrossFeed            L"CrossFeed"
+#define OPT_DummyChannels           L"DummyChannels"
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log
@@ -212,6 +213,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
+	, m_bDummyChannels(FALSE)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
@@ -263,6 +265,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseCrossFeed, dw)) {
 			m_bUseCrossFeed = !!dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DummyChannels, dw)) {
+			m_bDummyChannels = !!dw;
+		}
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -276,6 +281,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_CheckFormat, m_bCheckFormat);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
 #endif
 
 	if (m_DeviceMode != MODE_WASAPI_EXCLUSIVE) {
@@ -1086,6 +1092,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_CheckFormat, m_bCheckFormat);
 		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
+		key.SetDWORDValue(OPT_DummyChannels, m_bDummyChannels);
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -1099,6 +1106,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_CheckFormat, m_bCheckFormat);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
 #endif
 
 	return S_OK;
@@ -1336,6 +1344,19 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetCrossFeed()
 	return m_bUseCrossFeed;
 }
 
+STDMETHODIMP CMpcAudioRenderer::SetDummyChannels(BOOL bValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bDummyChannels = bValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetDummyChannels()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bDummyChannels;
+}
+
 void CMpcAudioRenderer::SetBalanceMask(const DWORD output_layout)
 {
 	m_dwBalanceMask = 0;
@@ -1519,7 +1540,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 
 			CAutoLock cResamplerLock(&m_csResampler);
 
-			//m_Resampler.SetOptions(1.0, 1.0, false, false);
+			m_Resampler.SetOptions(1.0, 1.0, false, !!m_bDummyChannels);
 			m_Resampler.UpdateInput(m_input_params.sf, m_input_params.layout, m_input_params.samplerate);
 			m_Resampler.UpdateOutput(m_output_params.sf, m_output_params.layout, m_output_params.samplerate);
 			out_samples = m_Resampler.CalcOutSamples(in_samples);

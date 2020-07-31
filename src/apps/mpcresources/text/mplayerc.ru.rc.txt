@@ -1328,6 +1328,7 @@ STRING IDS_ARS_CHECK_FORMAT		"Не проверять поддержку фор�
 STRING IDS_ARS_CROSSFEED		"Включить стерео crossfeed (для наушников)"
 STRING IDS_ARS_DEVICE		"Устройство:"
 STRING IDS_ARS_DEVICE_PERIOD		"Буфер устройства:"
+STRING IDS_ARS_DUMMY_CHANNELS		"Не заполнять каналы при апмиксе"
 STRING IDS_ARS_EXCLUSIVE		"Exclusive"
 STRING IDS_ARS_FORMAT		"Формат:"
 STRING IDS_ARS_INPUT		"Вход"

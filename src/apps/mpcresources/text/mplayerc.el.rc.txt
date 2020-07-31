@@ -1328,6 +1328,7 @@ STRING IDS_ARS_CHECK_FORMAT		"Να μην γίνει έλεγχος υποστή
 STRING IDS_ARS_CROSSFEED		"Ενεργοποίηση στερεοφωνικής πολλαπλής τροφοδοσίας (για ακουστικά)"
 STRING IDS_ARS_DEVICE		"Συσκευή:"
 STRING IDS_ARS_DEVICE_PERIOD		"Buffer συσκευής:"
+STRING IDS_ARS_DUMMY_CHANNELS		"Don't fill channels when upmixing"
 STRING IDS_ARS_EXCLUSIVE		"Αποκλειστικό"
 STRING IDS_ARS_FORMAT		"Μορφή:"
 STRING IDS_ARS_INPUT		"Εισόδου"
