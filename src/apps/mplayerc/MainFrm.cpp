@@ -6669,7 +6669,7 @@ void CMainFrame::OnFileSaveSubtitle()
 				s.bSubSaveExternalStyleFile = !!fd.GetSaveExternalStyleFile();
 
 				CAutoLock cAutoLock(&m_csSubLock);
-				pRTS->SaveAs(fd.GetPathName(), types[fd.m_ofn.nFilterIndex - 1], m_pCAP->GetFPS(), 0, fd.GetEncoding(), s.bSubSaveExternalStyleFile);
+				pRTS->SaveAs(fd.GetPathName(), types[fd.m_ofn.nFilterIndex - 1], m_pCAP->GetFPS(), m_pCAP->GetSubtitleDelay(), fd.GetEncoding(), s.bSubSaveExternalStyleFile);
 			}
 
 			return;
