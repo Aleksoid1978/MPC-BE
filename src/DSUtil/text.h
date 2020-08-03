@@ -25,7 +25,7 @@
 #include <list>
 
 template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	static_assert(sizeof(SEP) <= 2); // SEP must be char or wchar_t
@@ -49,7 +49,7 @@ Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 }
 
 template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	sl.clear();
@@ -73,7 +73,7 @@ Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 }
 
 template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	Explode(str, sl, sep, limit);
@@ -92,7 +92,7 @@ ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0
 }
 
 template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 {
 	sl.clear();
@@ -127,7 +127,7 @@ ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 }
 
 template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 Implode(const std::list<T>& sl, const SEP sep)
 {
 	T ret;
@@ -142,7 +142,7 @@ Implode(const std::list<T>& sl, const SEP sep)
 }
 
 template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 {
 	T ret;
