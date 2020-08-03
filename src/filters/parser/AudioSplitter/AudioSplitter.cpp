@@ -71,13 +71,11 @@ STDAPI DllRegisterServer()
 		L"0,12,,445344201C00000000000000", // 'DSD ...'
 		L"0,4,,46524D38,12,4,,44534420",   // 'FRM8........DSD '
 		L"0,8,,4454534844484452",          // 'DTSHDHDR'
+		L"0,4,,4D50434B",                  // 'MPCK'
+		L"0,3,,4D502B",                    // 'MP+'
 	};
 
-	RegisterSourceFilter(
-		CLSID_AsyncReader,
-		MEDIASUBTYPE_WAVE,
-		chkbytes,
-		nullptr);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_WAVE, chkbytes, nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
