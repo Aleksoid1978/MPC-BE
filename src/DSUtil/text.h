@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,19 +25,23 @@
 #include <list>
 
 template<class T, typename SEP>
-T Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
+std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	static_assert(sizeof(SEP) <= 2); // SEP must be char or wchar_t
 	sl.RemoveAll();
+	if (str.IsEmpty()) {
+		return T();
+	}
 
-	for (int i = 0, j = 0; ; i = j+1) {
+	for (int i = 0, j = 0; ; i = j + 1) {
 		j = str.Find(sep, i);
 
-		if (j < 0 || sl.GetCount() == limit-1) {
+		if (j < 0 || sl.GetCount() == limit - 1) {
 			sl.AddTail(str.Mid(i).Trim());
 			break;
 		} else {
-			sl.AddTail(str.Mid(i, j-i).Trim());
+			sl.AddTail(str.Mid(i, j - i).Trim());
 		}
 	}
 
@@ -45,9 +49,14 @@ T Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
+std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	sl.clear();
+	if (str.IsEmpty()) {
+		return T();
+	}
+
 	const int sep_len = T(sep).GetLength();
 	for (int i = 0, j = 0; ; i = j + sep_len) {
 		j = str.Find(sep, i);
@@ -64,7 +73,8 @@ T Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
+std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	Explode(str, sl, sep, limit);
 	for (auto it = sl.cbegin(); it != sl.cend(); ) {
@@ -75,16 +85,20 @@ T ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit =
 		}
 	}
 	if (sl.empty()) {
-		sl.push_back(T());    // eh
+		return T();
 	}
 
 	return sl.front();
 }
 
 template<class T, typename SEP>
-T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
+std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 {
 	sl.clear();
+	if (str.IsEmpty()) {
+		return T();
+	}
 
 	int split = 0;
 	for (int i = 0, j = 0; ; i = j + 1) {
@@ -113,7 +127,8 @@ T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 }
 
 template<class T, typename SEP>
-T Implode(const std::list<T>& sl, const SEP sep)
+std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+Implode(const std::list<T>& sl, const SEP sep)
 {
 	T ret;
 	auto it = sl.begin();
@@ -127,7 +142,8 @@ T Implode(const std::list<T>& sl, const SEP sep)
 }
 
 template<class T, typename SEP>
-T ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
+std::enable_if_t<(std::is_same_v<T, CString> || std::is_same_v<T, CStringA>), T>
+ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 {
 	T ret;
 	T escsep = T(esc) + T(sep);
