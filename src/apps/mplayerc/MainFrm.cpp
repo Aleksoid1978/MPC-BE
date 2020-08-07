@@ -84,6 +84,7 @@
 #include "MultiMonitor.h"
 #include <mvrInterfaces.h>
 
+#include <random>
 #include <string>
 
 #include "ThumbsTaskDlg.h"
@@ -13178,7 +13179,7 @@ void CMainFrame::UpdateWindowTitle()
 	}
 }
 
-BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
+BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx)
 {
 	CharLowerW(pattern.GetBuffer());
 	pattern.Replace(L"[fc]", L"forced");
@@ -13191,16 +13192,52 @@ BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, 
 	}
 	pattern.Trim();
 
+	auto random_string = [](const int length) {
+		constexpr wchar_t characters[] = L"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+		std::random_device random_device;
+		std::mt19937 generator(random_device());
+		std::uniform_int_distribution<> distribution(0, std::size(characters) - 2);
+
+		CString random_string; random_string.Preallocate(length);
+		for (int i = 0; i < length; i++) {
+			random_string.AppendChar(characters[distribution(generator)]);
+		}
+
+		return random_string;
+	};
+
+	std::map<CString, CString> replace_data;
+	auto bFound = false;
+	do {
+		bFound = false;
+		auto posStart = pattern.Find(L'"');
+		if (posStart != -1) {
+			auto posEnd = pattern.Find(L'"', posStart + 1);
+			if (posEnd != -1) {
+				const auto length = posEnd - posStart + 1;
+				const auto randomStr = random_string(length);
+				CString matchStr(pattern.GetString() + posStart, length);
+				pattern.Replace(matchStr.GetString(), randomStr.GetString());
+
+				matchStr.Replace(L"\"", L"");
+				replace_data.emplace(randomStr, matchStr);
+				bFound = true;
+			}
+		}
+	} while (bFound);
+
 	nIdx = 0;
 	int tPos = 0;
 	CString lang = pattern.Tokenize(L",; ", tPos);
 	while (tPos != -1) {
-		for (size_t iIndex = 0; iIndex < Tracks.size(); iIndex++) {
-			if (bExtPrior && !Tracks[iIndex].Ext) {
+		size_t iIndex = 0;
+		for (const auto& track : Tracks) {
+			if (bExtPrior && !track.Ext) {
 				continue;
 			}
 
-			CString name(Tracks[iIndex].Name);
+			CString name(track.Name);
 			CharLowerW(name.GetBuffer());
 
 			std::list<CString> sl;
@@ -13208,13 +13245,20 @@ BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, 
 
 			size_t nLangMatch = 0;
 			for (CString subPattern : sl) {
+				if (!replace_data.empty()) {
+					const auto it = replace_data.find(subPattern);
+					if (it != replace_data.cend()) {
+						subPattern = it->second;
+					}
+				}
+
 				bool bSkip = false;
 				if (subPattern[0] == '!') {
 					subPattern.Delete(0, 1);
 					bSkip = true;
 				}
 
-				if ((Tracks[iIndex].forced && subPattern == L"forced") || (Tracks[iIndex].def && subPattern == L"default")
+				if ((track.forced && subPattern == L"forced") || (track.def && subPattern == L"default")
 						|| name.Find(subPattern) >= 0) {
 					if (!bSkip) {
 						nLangMatch++;
@@ -13226,6 +13270,8 @@ BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, 
 				nIdx = iIndex;
 				return TRUE;
 			}
+
+			iIndex++;
 		}
 
 		lang = pattern.Tokenize(L",; ", tPos);
