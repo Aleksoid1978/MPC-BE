@@ -13241,7 +13241,7 @@ BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pat
 			CharLowerW(name.GetBuffer());
 
 			std::list<CString> sl;
-			Explode(lang, sl, L'|');
+			Explode(lang, sl, L'+');
 
 			size_t nLangMatch = 0;
 			for (CString subPattern : sl) {
