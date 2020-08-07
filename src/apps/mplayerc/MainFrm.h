@@ -372,7 +372,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 		CString Name;
 	};
 
-	BOOL SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx);
+	BOOL SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx);
 
 	std::vector<Stream> subarray;
 	void SubFlags(CString strname, bool& forced, bool& def);
