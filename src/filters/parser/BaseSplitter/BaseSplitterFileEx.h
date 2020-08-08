@@ -38,7 +38,7 @@ class CBaseSplitterFileEx : public CBaseSplitterFile
 
 public:
 	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
-	virtual ~CBaseSplitterFileEx();
+	~CBaseSplitterFileEx() = default;
 
 	bool NextMpegStartCode(BYTE& b, __int64 len = 65536);
 
@@ -73,6 +73,7 @@ public:
 			BYTE lowdelay:1;
 			// misc
 			LONG arx, ary;
+			BYTE picture_structure:2;
 		} hdr;
 		//
 		std::vector<BYTE> data;

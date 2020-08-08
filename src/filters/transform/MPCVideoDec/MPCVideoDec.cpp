@@ -1933,20 +1933,27 @@ redo:
 	CheckPointer(m_pFrame, E_POINTER);
 
 	BITMAPINFOHEADER *pBMI = nullptr;
+	bool bInterlacedFieldPerSample = false;
 	if (pmt->formattype == FORMAT_VideoInfo) {
 		VIDEOINFOHEADER* vih	= (VIDEOINFOHEADER*)pmt->pbFormat;
 		pBMI					= &vih->bmiHeader;
 	} else if (pmt->formattype == FORMAT_VideoInfo2) {
 		VIDEOINFOHEADER2* vih2	= (VIDEOINFOHEADER2*)pmt->pbFormat;
 		pBMI					= &vih2->bmiHeader;
+		bInterlacedFieldPerSample = vih2->dwInterlaceFlags & AMINTERLACE_IsInterlaced && vih2->dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
 	} else if (pmt->formattype == FORMAT_MPEGVideo) {
 		MPEG1VIDEOINFO* mpgv	= (MPEG1VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpgv->hdr.bmiHeader;
 	} else if (pmt->formattype == FORMAT_MPEG2Video) {
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
+		bInterlacedFieldPerSample = mpg2v->hdr.dwInterlaceFlags & AMINTERLACE_IsInterlaced && mpg2v->hdr.dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
 	} else {
 		return VFW_E_INVALIDMEDIATYPE;
+	}
+
+	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO && bInterlacedFieldPerSample && m_nPCIVendor == PCIV_ATI) {
+		m_bUseDXVA = false;
 	}
 
 	if (bChangeType) {
