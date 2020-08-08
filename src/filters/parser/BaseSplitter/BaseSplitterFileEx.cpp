@@ -38,12 +38,6 @@ CBaseSplitterFileEx::CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int
 {
 }
 
-CBaseSplitterFileEx::~CBaseSplitterFileEx()
-{
-}
-
-//
-
 bool CBaseSplitterFileEx::NextMpegStartCode(BYTE& code, __int64 len)
 {
 	BitByteAlign();
@@ -57,8 +51,6 @@ bool CBaseSplitterFileEx::NextMpegStartCode(BYTE& code, __int64 len)
 	code = (BYTE)(dw & 0xff);
 	return true;
 }
-
-//
 
 bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sync)
 {
@@ -133,6 +125,9 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 		shextpos = gb.GetPos() - 4;
 
 		h.hdr.startcodeid = gb.BitRead(4);
+		if (h.hdr.startcodeid != 0x01) {
+			return false;
+		}
 		h.hdr.profile_levelescape = gb.BitRead(1); // reserved, should be 0
 		h.hdr.profile = gb.BitRead(3);
 		h.hdr.level = gb.BitRead(4);
@@ -157,6 +152,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 
 		type = mpeg2;
 
+		BYTE found = 0;
 		while (!gb.IsEOF()) {
 			if (gb.NextMpegStartCode(id)) {
 				if (id != 0xb5) {
@@ -164,7 +160,6 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 				}
 
 				if (gb.RemainingSize() >= 5) {
-
 					BYTE startcodeid = gb.BitRead(4);
 					if (startcodeid == 0x02) {
 						BYTE video_format = gb.BitRead(3);
@@ -187,8 +182,18 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 							h.hdr.ary *= aspect.cy;
 						}
 
-						break;
+						found++;
+					} else if (startcodeid == 0x08) {
+						gb.BitRead(16);
+						gb.BitRead(2);
+						h.hdr.picture_structure = gb.BitRead(2);
+
+						found++;
 					}
+				}
+
+				if (found == 2) {
+					break;
 				}
 			}
 		}
@@ -245,6 +250,9 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 			vi->hdr.AvgTimePerFrame			= h.hdr.ifps;
 			vi->hdr.dwPictAspectRatioX		= h.hdr.arx;
 			vi->hdr.dwPictAspectRatioY		= h.hdr.ary;
+			if (h.hdr.picture_structure == 1 || h.hdr.picture_structure == 2) {
+				vi->hdr.dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_1FieldPerSample;
+			}
 			vi->hdr.bmiHeader.biSize		= sizeof(vi->hdr.bmiHeader);
 			vi->hdr.bmiHeader.biWidth		= h.hdr.width;
 			vi->hdr.bmiHeader.biHeight		= h.hdr.height;
