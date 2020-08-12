@@ -1477,12 +1477,12 @@ static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
 
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_VIDEO: {
-        uint8_t *data[4];
         int linesize[4];
-        int size[4] = { 0 };
         int w = frame->width;
         int h = frame->height;
-        int tmpsize, unaligned;
+        int unaligned;
+        ptrdiff_t linesize1[4];
+        size_t size[4];
 
         avcodec_align_dimensions2(avctx, &w, &h, pool->stride_align);
 
@@ -1500,20 +1500,19 @@ static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
                 unaligned |= linesize[i] % pool->stride_align[i];
         } while (unaligned);
 
-        tmpsize = av_image_fill_pointers(data, avctx->pix_fmt, h,
-                                         NULL, linesize);
-        if (tmpsize < 0) {
-            ret = tmpsize;
+        for (i = 0; i < 4; i++)
+            linesize1[i] = linesize[i];
+        ret = av_image_fill_plane_sizes(size, avctx->pix_fmt, h, linesize1);
+        if (ret < 0)
             goto fail;
-        }
-
-        for (i = 0; i < 3 && data[i + 1]; i++)
-            size[i] = data[i + 1] - data[i];
-        size[i] = tmpsize - (data[i] - data[0]);
 
         for (i = 0; i < 4; i++) {
             pool->linesize[i] = linesize[i];
             if (size[i]) {
+                if (size[i] > INT_MAX - (16 + STRIDE_ALIGN - 1)) {
+                    ret = AVERROR(EINVAL);
+                    goto fail;
+                }
                 pool->pools[i] = av_buffer_pool_init(size[i] + 16 + STRIDE_ALIGN - 1,
                                                      CONFIG_MEMORY_POISONING ?
                                                         NULL :
@@ -1705,6 +1704,7 @@ int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame)
         { AV_PKT_DATA_CONTENT_LIGHT_LEVEL,        AV_FRAME_DATA_CONTENT_LIGHT_LEVEL },
         { AV_PKT_DATA_A53_CC,                     AV_FRAME_DATA_A53_CC },
         { AV_PKT_DATA_ICC_PROFILE,                AV_FRAME_DATA_ICC_PROFILE },
+        { AV_PKT_DATA_S12M_TIMECODE,              AV_FRAME_DATA_S12M_TIMECODE },
     };
 
     if (pkt) {
