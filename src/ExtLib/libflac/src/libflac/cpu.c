@@ -54,7 +54,9 @@
 #endif
 
 #if defined FLAC__CPU_PPC
+#if defined(__linux__) || (defined(__FreeBSD__) && (__FreeBSD__ >= 12))
 #include <sys/auxv.h>
+#endif
 #endif
 
 #if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && (defined FLAC__HAS_NASM || FLAC__HAS_X86INTRIN) && !defined FLAC__NO_ASM
@@ -251,18 +253,23 @@ ppc_cpu_info (FLAC__CPUInfo *info)
 	} else if (getauxval(AT_HWCAP2) & PPC_FEATURE2_ARCH_2_07) {
 		info->ppc.arch_2_07 = true;
 	}
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) && (__FreeBSD__ >= 12)
 	long hwcaps;
+	/* elf_aux_info() appeared in FreeBSD 12.0 */
 	elf_aux_info(AT_HWCAP2, &hwcaps, sizeof(hwcaps));
-#else
-#error Unsupported platform! Please add support for reading ppc hwcaps.
-#endif
-
 	if (hwcaps & PPC_FEATURE2_ARCH_3_00) {
 		info->ppc.arch_3_00 = true;
 	} else if (hwcaps & PPC_FEATURE2_ARCH_2_07) {
 		info->ppc.arch_2_07 = true;
 	}
+#elif defined(__APPLE__)
+	/* no Mac OS X version supports CPU with Power AVI v2.07 or better */
+	info->ppc.arch_2_07 = false;
+	info->ppc.arch_3_00 = false;
+#else
+#error Unsupported platform! Please add support for reading ppc hwcaps.
+#endif
+
 #else
 	info->ppc.arch_2_07 = false;
 	info->ppc.arch_3_00 = false;
