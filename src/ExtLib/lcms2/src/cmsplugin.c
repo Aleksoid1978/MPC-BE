@@ -498,7 +498,7 @@ cmsBool CMSEXPORT _cmsIOPrintf(cmsIOHANDLER* io, const char* frm, ...)
     int len;
     cmsUInt8Number Buffer[2048];
     cmsBool rc;
-    char* ptr;
+    cmsUInt8Number* ptr;
 
     _cmsAssert(io != NULL);
     _cmsAssert(frm != NULL);
