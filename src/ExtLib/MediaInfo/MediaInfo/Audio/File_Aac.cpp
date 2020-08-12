@@ -40,7 +40,7 @@ extern const size_t Aac_sampling_frequency_Size;
 
 //---------------------------------------------------------------------------
 File_Aac::File_Aac()
-:File__Analyze(), File__Tags_Helper()
+:File_Usac(), File__Tags_Helper()
 {
     //Config
     #if MEDIAINFO_EVENTS
@@ -67,10 +67,7 @@ File_Aac::File_Aac()
 
     audioObjectType=(int8u)-1;
     extensionAudioObjectType=(int8u)-1;
-    channelConfiguration=(int8u)-1;
     frame_length=1024;
-    sampling_frequency_index=(int8u)-1;
-    extension_sampling_frequency_index=(int8u)-1;
     extension_sampling_frequency=(int32u)-1;
     aacSpectralDataResilienceFlag=false;
     aacSectionDataResilienceFlag=false;
@@ -151,15 +148,6 @@ void File_Aac::Streams_Fill()
         frame_length_Multiplier=2;
     Fill(Stream_Audio, StreamPos_Last, Audio_SamplesPerFrame, frame_length*frame_length_Multiplier);
     }
-
-    if (!Retrieve_Const(Stream_Audio, 0, "DrcSets_Count").empty())
-        Fill_SetOptions(Stream_Audio, 0, "DrcSets_Count", "N NI"); // Hidden in text output
-    if (!Retrieve_Const(Stream_Audio, 0, "Loudness_Count").empty())
-        Fill_SetOptions(Stream_Audio, 0, "Loudness_Count", "N NI"); // Hidden in text output
-    if (!Retrieve_Const(Stream_Audio, 0, "Loudness_Count_Album").empty())
-        Fill_SetOptions(Stream_Audio, 0, "Loudness_Count_Album", "N NI"); // Hidden in text output
-    if (!Retrieve_Const(Stream_Audio, 0, "ConformanceCheck/Short").empty())
-        Fill_SetOptions(Stream_Audio, 0, "ConformanceCheck/Short", "N NT"); // Hidden in text output
 }
 
 //---------------------------------------------------------------------------

@@ -2299,7 +2299,10 @@ void File__Analyze::Skip_BS(size_t Bits, const char* Name)
     if (Trace_Activated)
     {
         if (Bits<=32) //TODO: in BitStream.h, handle >32 bit gets
+        {
             Param(Name, BS->Get4((int8u)Bits), Bits);
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
         else
         {
             Param(Name, "(Data)");

@@ -17,11 +17,11 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_AAC_YES)
+#if defined(MEDIAINFO_AAC_YES) || defined(MEDIAINFO_MPEGH3DA_YES)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/Audio/File_Aac.h"
+#include "MediaInfo/Audio/File_Usac.h"
 #include <algorithm>
 using namespace std;
 //---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ extern const int32u Aac_sampling_frequency[];
 extern string Aac_Channels_GetString(int8u ChannelLayout);
 extern string Aac_ChannelConfiguration_GetString(int8u ChannelLayout);
 extern string Aac_ChannelConfiguration2_GetString(int8u ChannelLayout);
-extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=false);
+extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegH=false);
 extern string Aac_OutputChannelPosition_GetString(int8u OutputChannelPosition);
 
 //---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ extern coreSbrFrameLengthIndex_mapping coreSbrFrameLengthIndex_Mapping[coreSbrFr
 };
 
 //---------------------------------------------------------------------------
-static const size_t LoudnessMeaning_Size=8;
+static const size_t LoudnessMeaning_Size=9;
 static const char* LoudnessMeaning[LoudnessMeaning_Size]=
 {
     "Loudness_Program",
@@ -71,14 +71,33 @@ static const char* LoudnessMeaning[LoudnessMeaning_Size]=
     "Loudness_Range",
     "Loudness_ProductionMixingLevel",
     "Loudness_RoomType",
+    "Loudness_ShortTerm",
 };
+
+//***************************************************************************
+// Constructor/Destructor
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+File_Usac::File_Usac()
+:File__Analyze()
+{
+    channelConfiguration=(int8u)-1;
+    sampling_frequency_index=(int8u)-1;
+    extension_sampling_frequency_index=(int8u)-1;
+}
+
+//---------------------------------------------------------------------------
+File_Usac::~File_Usac()
+{
+}
 
 //***************************************************************************
 // Elements - USAC
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void File_Aac::UsacConfig()
+void File_Usac::UsacConfig()
 {
     // Init
     loudnessInfoSet_Present=false;
@@ -86,7 +105,7 @@ void File_Aac::UsacConfig()
     Element_Begin1("UsacConfig");
     int8u coreSbrFrameLengthIndex;
     bool usacConfigExtensionPresent;
-    Get_S1 (5, sampling_frequency_index,                        "usacSamplingFrequencyIndex"); Param_Info1C(sampling_frequency_index<Aac_sampling_frequency_Size_Usac, Aac_sampling_frequency[sampling_frequency_index]);
+    Get_S1 (5, sampling_frequency_index,                        "usacSamplingFrequencyIndex"); Param_Info1C(sampling_frequency_index<Aac_sampling_frequency_Size_Usac && Aac_sampling_frequency[sampling_frequency_index], Aac_sampling_frequency[sampling_frequency_index]);
     if (sampling_frequency_index==Aac_sampling_frequency_Size_Usac)
     {
         int32u samplingFrequency;
@@ -121,22 +140,60 @@ void File_Aac::UsacConfig()
 
     // Filling
     Fill(Stream_Audio, 0, Audio_SamplesPerFrame, coreSbrFrameLengthIndex_Mapping[coreSbrFrameLengthIndex].outputFrameLengthDivided256 << 8, true);
+    Fill_DRC();
+    Fill_Loudness();
+}
+
+//---------------------------------------------------------------------------
+void File_Usac::Fill_DRC(const char* Prefix)
+{
     if (!drcInstructionsUniDrc_Data.empty())
     {
-        Fill(Stream_Audio, 0, "DrcSets_Count", drcInstructionsUniDrc_Data.size());
-        ZtringList Ids, Data;
-        for (std::map<Ztring, drc_info>::iterator Item=drcInstructionsUniDrc_Data.begin(); Item!=drcInstructionsUniDrc_Data.end(); ++Item)
+        string FieldPrefix;
+        if (Prefix)
         {
-            Ids.push_back(Item->first);
+            FieldPrefix+=Prefix;
+            FieldPrefix += ' ';
+        }
+
+        Fill(Stream_Audio, 0, (FieldPrefix+"DrcSets_Count").c_str(), drcInstructionsUniDrc_Data.size());
+        Fill_SetOptions(Stream_Audio, 0, (FieldPrefix + "DrcSets_Count").c_str(), "N NI"); // Hidden in text output
+        ZtringList Ids, Data;
+        for (std::map<int16u, drc_info>::iterator Item=drcInstructionsUniDrc_Data.begin(); Item!=drcInstructionsUniDrc_Data.end(); ++Item)
+        {
+            int8u drcSetId=Item->first>>8;
+            int8u downmixId=Item->first&((1<<8)-1);
+            Ztring Id;
+            if (drcSetId || downmixId)
+                Id=Ztring::ToZtring(drcSetId)+=__T('-')+Ztring::ToZtring(downmixId);
+            Ids.push_back(Id);
             Data.push_back(Ztring().From_UTF8(Item->second.drcSetEffectTotal));
         }
-        Fill(Stream_Audio, 0, "DrcSets_Effects", Data, Ids);
+        Fill(Stream_Audio, 0, (FieldPrefix+"DrcSets_Effects").c_str(), Data, Ids);
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Usac::Fill_Loudness(const char* Prefix, bool NoConCh)
+{
+    string FieldPrefix;
+    if (Prefix)
+    {
+        FieldPrefix+=Prefix;
+        FieldPrefix += ' ';
+    }
+    string FieldSuffix;
+
     bool DefaultIdPresent=false;
     for (int8u i=0; i<2; i++)
     {
+        if (i)
+            FieldSuffix="_Album";
         if (!loudnessInfo_Data[i].empty())
-            Fill(Stream_Audio, 0, i?"Loudness_Count_Album":"Loudness_Count", loudnessInfo_Data[i].size());
+        {
+            Fill(Stream_Audio, 0, (FieldPrefix+"Loudness_Count"+FieldSuffix).c_str(), loudnessInfo_Data[i].size());
+            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+"Loudness_Count"+FieldSuffix).c_str(), "N NI"); // Hidden in text output
+        }
         ZtringList Ids;
         ZtringList SamplePeakLevel;
         ZtringList TruePeakLevel;
@@ -156,45 +213,47 @@ void File_Aac::UsacConfig()
             if (Ids.size()==1)
                 Ids.clear();
         }
-        Fill(Stream_Audio, 0, i?"SamplePeakLevel_Album":"SamplePeakLevel",SamplePeakLevel, Ids);
-        Fill(Stream_Audio, 0, i?"TruePeakLevel_Album":"TruePeakLevel", TruePeakLevel, Ids);
+        Fill(Stream_Audio, 0, (FieldPrefix+"SamplePeakLevel"+FieldSuffix).c_str(), SamplePeakLevel, Ids);
+        Fill(Stream_Audio, 0, (FieldPrefix+"TruePeakLevel"+FieldSuffix).c_str(), TruePeakLevel, Ids);
         for (int8u j=1; j<16; j++)
         {
             string Field;
-            if (j<LoudnessMeaning_Size)
+            if (j<=LoudnessMeaning_Size)
                 Field=LoudnessMeaning[j-1];
             else
                 Field="LoudnessMeaning"+Ztring::ToZtring(j).To_UTF8();
-            if (i)
-                Field+="_Album";
-            Fill(Stream_Audio, 0, Field.c_str(), Measurements[j], Ids);
+            Fill(Stream_Audio, 0, (FieldPrefix+Field+FieldSuffix).c_str(), Measurements[j], Ids);
         }
-
     }
+
+    if (NoConCh)
+        return;
     if (!loudnessInfoSet_Present)
     {
-        Fill(Stream_Audio, 0, "ConformanceCheck", "Invalid: loudnessInfoSet is missing");
+        Fill(Stream_Audio, 0, (FieldPrefix+"ConformanceCheck").c_str(), "Invalid: loudnessInfoSet is missing");
         Fill(Stream_Audio, 0, "ConformanceCheck/Short", "Invalid: loudnessInfoSet missing");
     }
     else if (loudnessInfo_Data[0].empty())
     {
-        Fill(Stream_Audio, 0, "ConformanceCheck", "Invalid: loudnessInfoSet is empty");
+        Fill(Stream_Audio, 0, (FieldPrefix+"ConformanceCheck").c_str(), "Invalid: loudnessInfoSet is empty");
         Fill(Stream_Audio, 0, "ConformanceCheck/Short", "Invalid: loudnessInfoSet empty");
     }
     else if (!DefaultIdPresent)
     {
-        Fill(Stream_Audio, 0, "ConformanceCheck", "Invalid: Default loudnessInfo is missing");
-        Fill(Stream_Audio, 0, "ConformanceCheck/Short", "Invalid: Default loudnessInfoSet missing");
+        Fill(Stream_Audio, 0, (FieldPrefix+"ConformanceCheck").c_str(), "Invalid: Default loudnessInfo is missing");
+        Fill(Stream_Audio, 0, "ConformanceCheck/Short", "Invalid: Default loudnessInfo missing");
     }
     else if (loudnessInfo_Data[0].begin()->second.Measurements.Values[1].empty() && loudnessInfo_Data[0].begin()->second.Measurements.Values[2].empty())
     {
-        Fill(Stream_Audio, 0, "ConformanceCheck", "Invalid: None of program loudness or anchor loudness is present in default loudnessInfo");
+        Fill(Stream_Audio, 0, (FieldPrefix+"ConformanceCheck").c_str(), "Invalid: None of program loudness or anchor loudness is present in default loudnessInfo");
         Fill(Stream_Audio, 0, "ConformanceCheck/Short", "Invalid: Default loudnessInfo incomplete");
     }
+    if (!Retrieve_Const(Stream_Audio, 0, "ConformanceCheck/Short").empty())
+        Fill_SetOptions(Stream_Audio, 0, "ConformanceCheck/Short", "N NT"); // Hidden in text output
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::UsacDecoderConfig(int8u coreSbrFrameLengthIndex)
+void File_Usac::UsacDecoderConfig(int8u coreSbrFrameLengthIndex)
 {
     Element_Begin1("UsacDecoderConfig");
     int32u numElements;
@@ -227,7 +286,7 @@ void File_Aac::UsacDecoderConfig(int8u coreSbrFrameLengthIndex)
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::UsacSingleChannelElementConfig(int8u coreSbrFrameLengthIndex)
+void File_Usac::UsacSingleChannelElementConfig(int8u coreSbrFrameLengthIndex)
 {
     Element_Begin1("UsacSingleChannelElementConfig");
 
@@ -239,7 +298,7 @@ void File_Aac::UsacSingleChannelElementConfig(int8u coreSbrFrameLengthIndex)
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::UsacChannelPairElementConfig(int8u coreSbrFrameLengthIndex)
+void File_Usac::UsacChannelPairElementConfig(int8u coreSbrFrameLengthIndex)
 {
     Element_Begin1("UsacChannelPairElementConfig");
 
@@ -257,7 +316,7 @@ void File_Aac::UsacChannelPairElementConfig(int8u coreSbrFrameLengthIndex)
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::UsacLfeElementConfig()
+void File_Usac::UsacLfeElementConfig()
 {
     // Nothing here
 }
@@ -272,7 +331,7 @@ static const char* UsacExtElementConfig_usacExtElementType[UsacExtElementConfig_
     "AUDIOPREROLL",
     "UNI_DRC",
 };
-void File_Aac::UsacExtElementConfig()
+void File_Usac::UsacExtElementConfig()
 {
     Element_Begin1("UsacExtElementConfig");
 
@@ -318,7 +377,7 @@ void File_Aac::UsacExtElementConfig()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::UsacCoreConfig()
+void File_Usac::UsacCoreConfig()
 {
     Element_Begin1("UsacCoreConfig");
 
@@ -329,7 +388,7 @@ void File_Aac::UsacCoreConfig()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::SbrConfig()
+void File_Usac::SbrConfig()
 {
     Element_Begin1("SbrConfig");
 
@@ -342,7 +401,7 @@ void File_Aac::SbrConfig()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::SbrDlftHeader()
+void File_Usac::SbrDlftHeader()
 {
     Element_Begin1("SbrDlftHeader");
 
@@ -369,7 +428,7 @@ void File_Aac::SbrDlftHeader()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::Mps212Config(int8u StereoConfigindex)
+void File_Usac::Mps212Config(int8u StereoConfigindex)
 {
     Element_Begin1("Mps212Config");
 
@@ -400,7 +459,7 @@ void File_Aac::Mps212Config(int8u StereoConfigindex)
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::uniDrcConfig()
+void File_Usac::uniDrcConfig()
 {
     downmixInstructions_Data.clear();
     drcInstructionsUniDrc_Data.clear();
@@ -443,7 +502,7 @@ void File_Aac::uniDrcConfig()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::uniDrcConfigExtension()
+void File_Usac::uniDrcConfigExtension()
 {
     Element_Begin1("uniDrcConfigExtension");
 
@@ -533,7 +592,7 @@ void File_Aac::uniDrcConfigExtension()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::downmixInstructions(bool V1)
+void File_Usac::downmixInstructions(bool V1)
 {
     Element_Begin1("downmixInstructionsV1");
 
@@ -556,7 +615,7 @@ void File_Aac::downmixInstructions(bool V1)
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::drcCoefficientsBasic()
+void File_Usac::drcCoefficientsBasic()
 {
     Element_Begin1("drcCoefficientsBasic");
 
@@ -567,7 +626,7 @@ void File_Aac::drcCoefficientsBasic()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::drcCoefficientsUniDrc(bool V1)
+void File_Usac::drcCoefficientsUniDrc(bool V1)
 {
     Element_Begin1(V1?"drcCoefficientsUniDrcV1":"drcCoefficientsUniDrc");
 
@@ -734,7 +793,7 @@ void File_Aac::drcCoefficientsUniDrc(bool V1)
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::drcInstructionsBasic()
+void File_Usac::drcInstructionsBasic()
 {
     Element_Begin1("drcInstructionsBasic");
 
@@ -783,7 +842,7 @@ static const char* drcSetEffect_List[drcSetEffect_List_Size] =
 };
 
 //---------------------------------------------------------------------------
-void File_Aac::drcInstructionsUniDrc(bool V1)
+bool File_Usac::drcInstructionsUniDrc(bool V1, bool NoV0)
 {
     Element_Begin1(V1?"drcInstructionsUniDrcV1":"drcInstructionsUniDrc");
 
@@ -808,13 +867,15 @@ void File_Aac::drcInstructionsUniDrc(bool V1)
             Get_SB (   drcApplyToDownmix,                       "drcApplyToDownmix");
         else
             drcApplyToDownmix=downmixId?true:false;
-        TEST_SB_SKIP(                                           "additionalDownmixIdPresent");
-            int8u additionalDownmixIdCount;
+        int8u additionalDownmixIdCount;
+        TESTELSE_SB_SKIP(                                       "additionalDownmixIdPresent");
             Get_S1 (3, additionalDownmixIdCount,                "additionalDownmixIdCount");
             for (int8u i=0; i<additionalDownmixIdCount; i++)
                 Skip_S1(7,                                      "additionalDownmixId");
-        TEST_SB_END();
-        if ((!V1 || drcApplyToDownmix) && downmixId && downmixId != 0x7F)
+        TESTELSE_SB_ELSE(                                       "additionalDownmixIdPresent");
+            additionalDownmixIdCount=0;
+        TESTELSE_SB_END();
+        if ((!V1 || drcApplyToDownmix) && downmixId && downmixId!=0x7F && !additionalDownmixIdCount)
         {
             std::map<int8u, downmix_instruction>::iterator downmixInstruction_Data=downmixInstructions_Data.find(downmixId);
             if (downmixInstruction_Data!=downmixInstructions_Data.end())
@@ -822,18 +883,27 @@ void File_Aac::drcInstructionsUniDrc(bool V1)
             else
                 channelCount=1;
         }
-        else if (downmixId==0x7F)
+        else if ((!V1 || drcApplyToDownmix) && (downmixId==0x7F || additionalDownmixIdCount))
             channelCount=1;
     }
     else
         downmixId=0; // 0 is default
     Get_S2 (16, drcSetEffect,                                   "drcSetEffect");
+    bool IsNOK=false;
+    if (drcSetEffect>>drcSetEffect_List_Size)
+    {
+        Param_Info1("(Unknown)");
+        Fill(Stream_Audio, 0, "TEMP_drcSetEffect", drcSetEffect, 16); //TEMP
+        IsNOK=true;
+    }
     if ((drcSetEffect & (3<<10)) == 0)
     {
         TEST_SB_SKIP(                                           "limiterPeakTargetPresent");
             Skip_S1(8,                                          "bsLimiterPeakTarget");
         TEST_SB_END();
     }
+    else
+        channelCount=baseChannelCount; // TEMP
     TEST_SB_SKIP(                                               "drcSetTargetLoudnessPresent");
         Skip_S1(6,                                              "bsDrcSetTargetLoudnessValueUpper");
         TEST_SB_SKIP(                                           "drcSetTargetLoudnessValueLowerPresent");
@@ -873,6 +943,8 @@ void File_Aac::drcInstructionsUniDrc(bool V1)
 
     for (set<int8s>::iterator DrcChannelGroup=DrcChannelGroups.begin(); DrcChannelGroup!=DrcChannelGroups.end(); ++DrcChannelGroup)
     {
+        if (!*DrcChannelGroup || (drcSetEffect & (3<<10)))
+            continue; // 0 means not present
         Element_Begin1("DrcChannel");
         int8s gainSetIndex=*DrcChannelGroup-1;
         int8u bandCount=V1?(gainSetIndex<gainSets.size()?gainSets[gainSetIndex].bandCount:0):1;
@@ -909,7 +981,7 @@ void File_Aac::drcInstructionsUniDrc(bool V1)
 
     Element_End0();
 
-    if (V1) //We want to display only V1 information
+    if (V1 || NoV0) //We want to display only V1 information
     {
         string Value;
         for (int8u i=0; i<16; i++)
@@ -927,15 +999,15 @@ void File_Aac::drcInstructionsUniDrc(bool V1)
                 }
             }
 
-        Ztring Id=Ztring::ToZtring(drcSetId)+=__T('-')+Ztring::ToZtring(downmixId);
-        if (Id==__T("0-0"))
-            Id.clear();
+        int16u Id=drcSetId<<8|downmixId;
         drcInstructionsUniDrc_Data[Id].drcSetEffectTotal=Value;
     }
+
+    return false;
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::channelLayout()
+void File_Usac::channelLayout()
 {
     Element_Begin1("channelLayout");
 
@@ -971,7 +1043,7 @@ static const char* UsacConfigExtension_usacConfigExtType[UsacConfigExtension_usa
     NULL,
     "STREAM_ID",
 };
-void File_Aac::UsacConfigExtension()
+void File_Usac::UsacConfigExtension()
 {
     Element_Begin1("UsacConfigExtension");
 
@@ -1023,7 +1095,7 @@ void File_Aac::UsacConfigExtension()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::loudnessInfoSet(bool V1)
+void File_Usac::loudnessInfoSet(bool V1)
 {
     Element_Begin1(V1?"loudnessInfoSetV1":"loudnessInfoSet");
     loudnessInfoSet_Present=true;
@@ -1052,7 +1124,7 @@ static const int8u methodDefinition_Format[methodDefinition_Format_Size]=
 {
     8, 8, 8, 8, 8, 8, 8, 5, 2, 8,
 };
-void File_Aac::loudnessInfo(bool FromAlbum, bool V1)
+bool File_Usac::loudnessInfo(bool FromAlbum, bool V1)
 {
     Element_Begin1(V1?"loudnessInfoV1":"loudnessInfo");
 
@@ -1076,13 +1148,18 @@ void File_Aac::loudnessInfo(bool FromAlbum, bool V1)
         Skip_S1( 2,                                             "reliability");
     }
     Get_S1 (4, measurementCount,                                "measurementCount");
+    bool IsNOK=false;
     for (int8u i=0; i<measurementCount; i++)
     {
         int8u methodDefinition, methodValue;
         Get_S1 (4, methodDefinition,                            "methodDefinition");
+        int8u Size;
         if (methodDefinition>=methodDefinition_Format_Size)
         {
-            Skip_BS(Data_BS_Remain(),                           "(Unsupported)");
+            Param_Info1("(Unsupported)");
+            Measurements.Values[methodDefinition].From_UTF8("(Unsupported)");
+            IsNOK=true;
+            break;
         }
         Get_S1 (methodDefinition_Format[methodDefinition], methodValue, "methodValue");
         Skip_S1(4,                                              "measurementSystem");
@@ -1152,10 +1229,12 @@ void File_Aac::loudnessInfo(bool FromAlbum, bool V1)
     loudnessInfo_Data[FromAlbum][Id].TruePeakLevel=((truePeakLevelPresent && bsTruePeakLevel)?(Ztring::ToZtring(20-((double)bsTruePeakLevel)/32)+__T(" dBTP")):Ztring());
     loudnessInfo_Data[FromAlbum][Id].Measurements=Measurements;
     Element_End0();
+
+    return IsNOK;
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::loudnessInfoSetExtension()
+void File_Usac::loudnessInfoSetExtension()
 {
     Element_Begin1("loudnessInfoSetExtension");
 
@@ -1186,7 +1265,7 @@ void File_Aac::loudnessInfoSetExtension()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::streamId()
+void File_Usac::streamId()
 {
     Element_Begin1("streamId");
 
@@ -1198,7 +1277,7 @@ void File_Aac::streamId()
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::escapedValue(int32u &Value, int8u nBits1, int8u nBits2, int8u nBits3, const char* Name)
+void File_Usac::escapedValue(int32u &Value, int8u nBits1, int8u nBits2, int8u nBits3, const char* Name)
 {
     Element_Begin1(Name);
     Get_S4(nBits1, Value,                                       "nBits1");
@@ -1207,7 +1286,7 @@ void File_Aac::escapedValue(int32u &Value, int8u nBits1, int8u nBits2, int8u nBi
         int32u ValueAdd;
         Get_S4(nBits2, ValueAdd,                                "nBits2");
         Value+=ValueAdd;
-        if (nBits3 && Value==((1<<nBits2)-1))
+        if (nBits3 && ValueAdd==((1<<nBits2)-1))
         {
             Get_S4(nBits3, ValueAdd,                            "nBits3");
             Value+=ValueAdd;
@@ -1223,4 +1302,4 @@ void File_Aac::escapedValue(int32u &Value, int8u nBits1, int8u nBits2, int8u nBi
 
 } //NameSpace
 
-#endif //MEDIAINFO_AAC_YES
+#endif //defined(MEDIAINFO_AAC_YES) || defined(MEDIAINFO_MPEGH3DA_YES)

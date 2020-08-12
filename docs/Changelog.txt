@@ -18,7 +18,7 @@ Updated libraries:
 	libogg git-v1.3.4-13-g0bbcba4;
 	libpng git-v1.6.37-16-g6dd99ca9c;
 	Little-CMS git-2.11-12-g29b0d79;
-	MediaInfo git-v20.03-60-g76b56a3f;
+	MediaInfo git-v20.08-g84d951c0;
 	rapidjson git-v1.1.0-549-g8f4c021f;
 	ZenLib git-v0.4.38-13-g54d2f0d;
 

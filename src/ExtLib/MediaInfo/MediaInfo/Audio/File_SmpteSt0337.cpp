@@ -1052,6 +1052,14 @@ void File_SmpteSt0337::Data_Parse()
 
                 Element_Offset+=6;
             }
+            if (Element_Offset+3<=Element_Size)
+            {
+                size_t Buffer_Pos=Buffer_Offset+(size_t)Element_Offset;
+
+                *(Info_Temp++)= Buffer[Buffer_Pos+2]                                    ;
+                *(Info_Temp++)= Buffer[Buffer_Pos+1]                                    ;
+                *(Info_Temp++)=(Buffer[Buffer_Pos  ]&0xF0)                              ;
+            }
         }
 
         if (Endianness=='L' && Container_Bits==24 && Stream_Bits==24)

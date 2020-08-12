@@ -121,6 +121,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Tak.h" />
     <ClInclude Include="MediaInfo\Audio\File_Tta.h" />
     <ClInclude Include="MediaInfo\Audio\File_TwinVQ.h" />
+    <ClInclude Include="MediaInfo\Audio\File_Usac.h" />
     <ClInclude Include="MediaInfo\Audio\File_Vorbis.h" />
     <ClInclude Include="MediaInfo\Audio\File_Wvpk.h" />
     <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />

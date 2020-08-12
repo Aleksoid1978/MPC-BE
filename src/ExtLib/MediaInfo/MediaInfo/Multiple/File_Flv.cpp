@@ -1519,7 +1519,7 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                 else if (StringDataModified=="audiosamplesize") {ToFill="BitDepth"; StreamKind=Stream_Audio; if (Value>0) ValueS.From_Number(Value, 0);}
                 else if (StringDataModified=="totalduration") {ToFill="Duration"; StreamKind=Stream_General; ValueS.From_Number(Value*1000, 0);}
                 else if (StringDataModified=="totaldatarate") {ToFill="OverallBitRate"; StreamKind=Stream_General; ValueS.From_Number(Value*1000, 0);}
-                else if (StringDataModified=="totalframes") {ToFill="FrameCount"; StreamKind=Stream_Video; ValueS.From_Number(Value*1000, 0);}
+                else if (StringDataModified=="totalframes") {ToFill="FrameCount"; StreamKind=Stream_Video; ValueS.From_Number(Value, 0);}
                 else if (StringDataModified=="bytelength") {if (File_Size!=Value) MetaData_NotTrustable=true;}
                 else if (!(StringDataModified=="datasize"
                        || StringDataModified=="lasttimestamp"
