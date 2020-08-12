@@ -20,6 +20,7 @@
     #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 #endif
 #include "MediaInfo/Tag/File__Tags.h"
+#include "MediaInfo/Audio/File_Usac.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -117,7 +118,7 @@ struct ps_handler
 
 typedef const int8s (*sbr_huffman)[2];
 
-class File_Aac : public File__Analyze, public File__Tags_Helper
+class File_Aac : public File_Usac, public File__Tags_Helper
 {
 public :
     //In
@@ -229,10 +230,7 @@ protected :
     bool    allStreamsSameTimeFraming;
     int8u   audioObjectType;
     int8u   extensionAudioObjectType;
-    int8u   channelConfiguration;
     int16u  frame_length;
-    int8u   sampling_frequency_index;
-    int8u   extension_sampling_frequency_index;
     int32u  extension_sampling_frequency;
     bool    aacScalefactorDataResilienceFlag;
     bool    aacSectionDataResilienceFlag;
@@ -319,32 +317,6 @@ protected :
     //Elements - Enhanced Low Delay Codec
     void ELDSpecificConfig                  ();
     void ld_sbr_header                      ();
-
-    //Elements - USAC
-    void UsacConfig                         ();
-    void UsacDecoderConfig                  (int8u coreSbrFrameLengthIndex);
-    void UsacSingleChannelElementConfig     (int8u coreSbrFrameLengthIndex);
-    void UsacChannelPairElementConfig       (int8u coreSbrFrameLengthIndex);
-    void UsacLfeElementConfig               ();
-    void UsacExtElementConfig               ();
-    void UsacCoreConfig                     ();
-    void SbrConfig                          ();
-    void SbrDlftHeader                      ();
-    void Mps212Config                       (int8u StereoConfigindex);
-    void uniDrcConfig                       ();
-    void uniDrcConfigExtension              ();
-    void downmixInstructions                (bool V1=false);
-    void drcCoefficientsBasic               ();
-    void drcCoefficientsUniDrc              (bool V1=false);
-    void drcInstructionsBasic               ();
-    void drcInstructionsUniDrc              (bool V1=false);
-    void channelLayout                      ();
-    void UsacConfigExtension                ();
-    void loudnessInfoSet                    (bool V1=false);
-    void loudnessInfo                       (bool FromAlbum, bool V1=false);
-    void loudnessInfoSetExtension           ();
-    void streamId                           ();
-    void escapedValue                       (int32u &Value, int8u nBits1, int8u nBits2, int8u nBits3, const char* Name);
 
     //Helpers
     void hcod                               (int8u sect_cb, const char* Name);
@@ -445,39 +417,6 @@ protected :
     std::map<std::string, Ztring>   Infos;
     std::map<std::string, Ztring>   Infos_AudioSpecificConfig;
     bool                            CanFill;
-
-    //***********************************************************************
-    // Temp USAC
-    //***********************************************************************
-
-    struct drc_info
-    {
-        string                      drcSetEffectTotal;
-    };
-    struct loudness_info
-    {
-        struct measurements
-        {
-            Ztring                  Values[16];
-        };
-        Ztring                      SamplePeakLevel;
-        Ztring                      TruePeakLevel;
-        measurements                Measurements;
-    };
-    std::map<Ztring, drc_info>      drcInstructionsUniDrc_Data; // By id
-    std::map<Ztring, loudness_info> loudnessInfo_Data[2]; // By non-album/album then by id
-    int8u                           baseChannelCount;
-    struct downmix_instruction
-    {
-        int8u                       targetChannelCount;
-    };
-    std::map<int8u, downmix_instruction> downmixInstructions_Data;
-    struct gain_set
-    {
-        int8u                       bandCount;
-    };
-    std::vector<gain_set>           gainSets;
-    bool                            loudnessInfoSet_Present;
 
 private :
     void FillInfosHEAACv2(const Ztring& Format_Settings);

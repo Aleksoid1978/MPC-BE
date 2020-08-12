@@ -731,6 +731,9 @@
     <ClInclude Include="MediaInfo\Audio\File_Mpegh3da.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Usac.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">

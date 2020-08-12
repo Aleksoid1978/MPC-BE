@@ -2360,7 +2360,7 @@ bool File_Mpeg4::BookMark_Needed()
             //Limit the detection
             #if defined(MEDIAINFO_SMPTEST0337_YES) && defined(MEDIAINFO_PCM_YES)
                 if (Temp->second.IsPcm && Temp->second.Parsers.size()>=2 && !Temp->second.stsc.empty() && Temp->second.stsc[0].SamplesPerChunk>=48000/4) // 1/4 of second is enough for detection
-                    ((File_Pcm*)Temp->second.Parsers[Temp->second.Parsers.size()-1])->Frame_Count_Valid=2; //2 for checking the PCM block after this one (next track)
+                    ((File_Pcm*)Temp->second.Parsers[Temp->second.Parsers.size()-1])->Frame_Count_Valid=3; //3 for checking the PCM block after this one (next track) + Some files have 2 consecutive packets before the next stream, and we want to catch the channel grouping
             #endif //defined(MEDIAINFO_PCM_YES)
 
             //PCM split

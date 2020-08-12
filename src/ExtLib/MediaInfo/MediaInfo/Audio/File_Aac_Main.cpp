@@ -419,6 +419,8 @@ extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=f
 }
 extern string Aac_ChannelLayout_GetString(const vector<Aac_OutputChannel>& OutputChannels)
 {
+    if (OutputChannels.empty())
+        return string();
     return Aac_ChannelLayout_GetString(&*OutputChannels.begin(), OutputChannels.size());
 }
 
@@ -528,6 +530,8 @@ extern string Aac_ChannelMode_GetString(int8u ChannelLayout, bool IsMpegh3da=fal
 }
 extern string Aac_ChannelMode_GetString(const vector<Aac_OutputChannel>& OutputChannels)
 {
+    if (OutputChannels.empty())
+        return string();
     return Aac_ChannelMode_GetString(&*OutputChannels.begin(), OutputChannels.size());
 }
 

@@ -1569,16 +1569,62 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                                 L.Write((*Stream_More)[StreamKind][StreamPos][Pos][Info_Text]);
                                 for (size_t i=0; i<L.size(); i++)
                                 {
-                                    Ztring ToSearch=Up.substr(10, Up.find('_', 10)-10)+L[i];
+                                    Ztring ID=L[i];
+                                    size_t ID_DashPos=ID.find(__T('-'));
+                                    Ztring ID2;
+                                    if (ID_DashPos!=(size_t)-1)
+                                    {
+                                        ID2=ID.substr(ID_DashPos+1);
+                                        ID.resize(ID_DashPos);
+                                    }
+                                    Ztring ToSearch=Up.substr(10, Up.find('_', 10)-10)+ID;
+                                    Ztring ToSearch2=ToSearch;
+                                    if (!ID2.empty())
+                                    {
+                                        ToSearch2+=__T(" Alt");
+                                        ToSearch2+=ID2;
+                                    }
                                     for (size_t j=Pos+1; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
                                     {
-                                        if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch)
+                                        if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch2)
                                         {
-                                            while (j<(*Stream_More)[StreamKind][StreamPos].size() && (*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, ToSearch.size())==0)
+                                            while (j<(*Stream_More)[StreamKind][StreamPos].size())
                                             {
-                                                Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
-                                                Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
-                                                j++;
+                                                if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch2, ToSearch2.size())==0)
+                                                {
+                                                    Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
+                                                    Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
+                                                    if (!ID2.empty())
+                                                    {
+                                                        size_t k=Temp.back()[Info_Name].find(__T(" Alt"));
+                                                        if (k!=(size_t)-1)
+                                                        {
+                                                            if (Temp.back()[Info_Name].find(__T(' '), k+1)==(size_t)-1)
+                                                            {
+                                                                size_t ValueFirstField=(*Stream_More)[StreamKind][StreamPos].Find(Temp.back()[Info_Name].substr(SpacesCount, k-SpacesCount));
+                                                                if (ValueFirstField!=(size_t)-1)
+                                                                {
+                                                                    if (Temp.back()[Info_Text]==__T("Yes"))
+                                                                        Temp.back()[Info_Text].clear();
+                                                                    if (!Temp.back()[Info_Text].empty())
+                                                                        Temp.back()[Info_Text].insert(0, 1, __T(' '));
+                                                                    Temp.back()[Info_Text].insert(0, (*Stream_More)[StreamKind][StreamPos][ValueFirstField][Info_Text]);
+                                                                }
+                                                            }
+                                                            Temp.back()[Info_Name][k]=__T('-');
+                                                        }
+                                                    }
+                                                    j++;
+                                                }
+                                                else if (j<(*Stream_More)[StreamKind][StreamPos].size() && (*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, ToSearch.size())==0)
+                                                {
+                                                    Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
+                                                    Temp.back()[Info_Name].insert(ToSearch.size(), __T("-Alt")+ID2);
+                                                    Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
+                                                    j++;
+                                                }
+                                                else
+                                                    break;
                                             }
                                         }
                                     }
@@ -1607,9 +1653,12 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                     Ztring Name=Field[Info_Name];
                     size_t Spaces=0;
                     size_t i=0;
+                    bool Nested=false;
                     for (;;)
                     {
                         size_t j=Name.find(__T(' '), i);
+                        if (!j)
+                            Nested=true;
                         if (j==(size_t)-1)
                             break;
                         i=j+1;
@@ -1622,10 +1671,12 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                             j=2;
                         else
                             j=1;
-                        int Nested=Spaces && Pos && i && i-j<=Track[Pos-1][Info_Name].size() && Name.substr(0, i-j)==Track[Pos-1][Info_Name].substr(0, i-j) && Info_Name_Text<Track[Pos-1].size() && Spaces-1<=Track[Pos-1][Info_Name_Text].find_first_not_of(__T(' '));
+                        if (!Nested && Spaces && Pos && i && i-j<=Track[Pos-1][Info_Name].size() && Name.substr(0, i-j)==Track[Pos-1][Info_Name].substr(0, i-j) && Info_Name_Text<Track[Pos-1].size() && Spaces-1<=Track[Pos-1][Info_Name_Text].find_first_not_of(__T(' ')))
+                            Nested=true;
                         if (Nested)
                             Name.erase(0, i);
-                        size_t Number=0;
+                        ZtringList Names;
+                        vector<size_t> Numbers;
                         if (!Name.empty() && Pos+1<Track.size())
                         {
                             const ZtringList& Field1=Track[Pos+1];
@@ -1633,22 +1684,38 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                             size_t Name1_SpacePos=i+Name.size();
                             if (Name1_SpacePos<Name1.size() && Name1[Name1_SpacePos]==__T(' ') && Name==Name1.substr(i, Name.size()))
                             {
-                                size_t Text_End=Name.find_last_not_of(__T("0123456789"))+1;
-                                if (Text_End!=Name.size())
+                                ZtringList List;
+                                List.Separator_Set(0, __T("-"));
+                                List.Write(Name);
+                                for (size_t i=0; i<List.size(); i++)
                                 {
-                                    Number=Ztring(Name.substr(Text_End)).To_int64u()+1;
-                                    Name.resize(Text_End);
+                                    size_t Text_End=List[i].find_last_not_of(__T("0123456789"))+1;
+                                    if (Text_End!=List[i].size())
+                                    {
+                                        Numbers.push_back(Ztring(List[i].substr(Text_End)).To_int64u()+1);
+                                        Names.push_back(List[i].substr(0, Text_End));
+                                    }
                                 }
                             }
                         }
-                        Ztring TranslatedName=MediaInfoLib::Config.Language_Get(Name);
-                        if (!TranslatedName.empty())
-                            Name=TranslatedName;
-                        if (Nested)
-                            Name.insert(0, Spaces, __T(' '));
-                        if (Number)
-                            Name+= MediaInfoLib::Config.Language_Get(__T("  Config_Text_NumberTag"))+Ztring::ToZtring(Number);
-                        (*Stream_More)[StreamKind][StreamPos][Pos][Info_Name_Text]=Name;
+                        if (Names.empty())
+                        {
+                            Names.push_back(Name);
+                            Numbers.push_back(0);
+                        }
+                        for (size_t i=0; i<Names.size(); i++)
+                        {
+                            Ztring TranslatedName=MediaInfoLib::Config.Language_Get(Names[i]);
+                            if (!TranslatedName.empty())
+                                Names[i]=TranslatedName;
+                            if (Nested && !i)
+                                Names[i].insert(0, Spaces, __T(' '));
+                            if (Numbers[i])
+                                Names[i]+=MediaInfoLib::Config.Language_Get(__T("  Config_Text_NumberTag"))+Ztring::ToZtring(Numbers[i]);
+                        }
+                        Names.Separator_Set(0, __T(" "));
+                        Names.Quote_Set(__T(""));
+                        (*Stream_More)[StreamKind][StreamPos][Pos][Info_Name_Text]=Names.Read();
                     }
                 }
             }

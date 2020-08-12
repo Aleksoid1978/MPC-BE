@@ -2850,13 +2850,11 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
                 if (Segment_Seeks[Pos].SeekPosition>File_Offset+Buffer_Offset+Element_Size)
                 {
                     JumpTo(Segment_Seeks[Pos].SeekPosition);
-                    Open_Buffer_Unsynch();
                     break;
                 }
             if (File_GoTo==(int64u)-1)
             {
                 JumpTo(Segment_Offset_End);
-                Open_Buffer_Unsynch();
             }
         }
 
@@ -4797,6 +4795,7 @@ void File_Mk::JumpTo (int64u GoToValue)
     CRC32Compute.clear();
 
     //GoTo
+    Open_Buffer_Unsynch();
     GoTo(GoToValue);
 }
 

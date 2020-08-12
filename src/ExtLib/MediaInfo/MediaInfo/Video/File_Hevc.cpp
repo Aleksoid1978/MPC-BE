@@ -292,6 +292,8 @@ void File_Hevc::Streams_Fill()
                 case Video_MasteringDisplay_Luminance:
                     Ignore=Retrieve_Const(Stream_Video, 0, Item->first)==Item->second;
                     break;
+                default:
+                    Ignore=false;
             }
             if (!Ignore)
                 Fill(Stream_Video, 0, Item->first, Item->second);
