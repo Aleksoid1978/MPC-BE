@@ -3000,6 +3000,9 @@ void *Type_ColorantTable_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER
     }
 
     List = cmsAllocNamedColorList(self ->ContextID, Count, 0, "", "");
+    if (List == NULL)           
+        return NULL; 
+        
     for (i=0; i < Count; i++) {
 
         if (io ->Read(io, Name, 32, 1) != 1) goto Error;
