@@ -209,10 +209,10 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 	}
 
 	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-		pPB->SetProperty(L"AUTH", Artist);
-		pPB->SetProperty(L"DESC", Comment);
-		pPB->SetProperty(L"TITL", Title);
-		pPB->SetProperty(L"YEAR", Year);
-		pPB->SetProperty(L"ALBUM", Album);
+		if (!Artist.IsEmpty())  pPB->SetProperty(L"AUTH", Artist);
+		if (!Comment.IsEmpty()) pPB->SetProperty(L"DESC", Comment);
+		if (!Title.IsEmpty())   pPB->SetProperty(L"TITL", Title);
+		if (!Year.IsEmpty())    pPB->SetProperty(L"YEAR", Year);
+		if (!Album.IsEmpty())   pPB->SetProperty(L"ALBUM", Album);
 	}
 }
