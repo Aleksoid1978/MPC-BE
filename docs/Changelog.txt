@@ -2,6 +2,64 @@
 
 1.5.5 (beta)
 =============================
+Windows 10 SDK version 10.0.17763.0 is now required to build in Visual Studio 2017.
+
+
+AudioSplitter
+Added support for DSD streams in WavPack (.wv) files.
+Added support for MusePack 7/8.
+
+FLVSplitter
+Fixed playback of files with incorrect indexes.
+
+MpegSplitter
+Added definition of AC-4 audio streams to be ignored.
+Added support for SMPTE 302M AES3 audio streams.
+Improved 3D Blu-ray support.
+Added information about MPEG-2 streams with separate fields in the output pin.
+
+MP4Splitter
+Added support for "AV1 Codec Configuration Box".
+Added support for TSC2 codec (TechSmith Camtasia).
+Fixed reading of parameters for some tracks in AAC format.
+Expanded support for tracks in AC-3 format.
+Added support for UtVideo.
+Added additional language codes.
+Fixed playing of some PCM tracks.
+
+MatroskaSplitter
+Added support for files with atypical block locations in the segment.
+A language code has been added to the track language name if the initials of the code differ from the name.
+Removed "Video N" label for named video tracks.
+Fixed crash when opening files with HEVC video and empty CodecPrivate block.
+Added support for "AV1 Codec Configuration Box".
+Improved search for the desired block.
+
+MPCVideoDec
+Added support for "AV1 Codec Configuration Box".
+Changed the calculation of the number of threads for multithreaded decoding.
+Fixed connection to Smart Tee Filter output.
+Fixed the name of the "Deinterlacing" setting to "Scan Type".
+Added support for UtVideo Pro with UQY0 code.
+Fixed order of output formats for PNG48.
+Improved DXVA decoder creation error handling.
+Improved support for Motion-JPEG streams after webcams.
+Fixed support for some older H.264 videos.
+DXVA decoder is no longer used for MPEG-2 streams with separate fields on AMD video cards.
+
+AudioSwitcher
+Fixed support for playback speed when applying delay.
+Added check for supported output formats.
+
+MpcAudioRenderer
+Added the ability to select a way to work with data "Event" or "Push".
+Fixed initialization of Shared mode for Windows Sonic.
+Added option "Don't fill channels when upmixing".
+
+...
+
+MPCBEShellExt (explorer extension)
+Added support for IDropTarget interface.
 
 Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
@@ -10,6 +68,7 @@ Updated Chinese (Traditional) and Dutch translation (by beter).
 Updated Ukrainian translation (by arestarh1986).
 Updated Hungarian translation (by mickey).
 Updated Greek translation (by George).
+Updated Japanese translation.
 
 Updated libraries:
 	dav1d git-0.7.1-14-g5fe20ec;
