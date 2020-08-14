@@ -56,7 +56,81 @@ Added the ability to select a way to work with data "Event" or "Push".
 Fixed initialization of Shared mode for Windows Sonic.
 Added option "Don't fill channels when upmixing".
 
-...
+VideoRenderers
+Added support for PostScale shaders for MPC Video Renderer.
+Added support for "ps_4_0" (Direct3D11) shaders for MPC Video Renderer.
+Fixed memory leaks when using Direct3D9.
+Fixed bug with creating EVR-CP when using Flip/FlipEx mode when the main window is minimized.
+Removed special priority YV12 over NV12 for Intel graphics cards.
+Added support for "lessRedraws" command for MPC Video Renderer.
+Added the ability to get the displayed image for MPC Video Renderer.
+Fixed resetting the frame state on pause for the case of rotation by 180 degrees and frame reflection.
+Fixed frame rotation on pause for madVR.
+Disabled support for exclusive full screen for SyncRenderer.
+
+Subtitles
+Improved support for Teletext subtitles.
+Added basic support for TTML (Timed Text Markup Language) subtitles.
+Fixed missing subtitles when setting a delay and using XySubFilter.
+
+Youtube
+Updated Youtube support.
+Expanded support for streams in the AV1 format.
+The player no longer uses the Google API.
+Added the ability to open some pages like https://www.youtube.com/user/ and https://www.youtube.com/channel/ as a playlist.
+Added selection of possible formats when the video is opened with youtube-dl.
+Added support for chapters.
+Added the ability to open a Youtube playlist when pasting from the clipboard.
+Fixed loading of some playlists.
+Added information about the duration of the playlist items.
+
+Player
+Added the command "Copy Image to Clipboard".
+Fixed saving image with some subtitles.
+PnS maximum scale increased from 3x to 5x.
+Fixed moving when scaling.
+Frame shift is limited to 0.1..0.9 range so that the frame does not disappear from view at all.
+Fixed auto-hide cursor when moving from one file to another.
+Added the ability to manually associate the .avs (AviSynth script) and .vpy (VapourSynth script) extensions.
+Fixed opening DVD-Video from the command line.
+Various shader changes in the Shaders folder.
+Added shaders "ps_4_0" (Direct3D11) to the Shaders11 folder.
+Added support for DX11 shaders in the "Shader Combiner" window.
+Minor changes to the Web interface.
+Returned the ability to rename items in the playlist.
+Removed the limitation of adding dubbing only for local files.
+Fixed work of the playlist with the "Shuffle" setting.
+The "Shuffle" setting is now available for the "Explorer" playlist.
+Optimized control panel and logo rendering.
+System registration of a file extension filter now has no special priority over system registration of a filter by signature (check bytes).
+Improved player control when playlist is active.
+Added filtering of the list of hotkeys.
+Added setting "Do not reset speed for session".
+Fixed issues when switching between playlists.
+When the player crashes, a .stacktrace.txt file will be created in addition to MiniDump.
+Fixed window size after exiting full screen mode on monitors with different DPI.
+The "Remember playlist" setting now works only for the main playlist and has been renamed to "Remember main playlist".
+Fixed sorting in the subtitle download dialog, now according to "Default track preference".
+Fixed incorrect display of control panel tips over video in some situations.
+Fixed incorrect handling of pressing the left mouse button in the main window in some situations.
+Added the ability to enable displaying milliseconds in the status bar during the session.
+Fixed rendering of the playlist.
+Pressing the "Alt + Key" key combination in the playlist is now transferred to the main window.
+Fixed URL opening inside M3U files.
+Fixed opening too long URLs (more than 2000 characters).
+Increased the width of the thumbnail image to 5120.
+Improved MPC Video Renderer support.
+Fixed opening of some types of local playlists.
+Added support for MBSE MultiChannel ASIO Renderer.
+The specified delay is applied when saving and copying subtitles to the clipboard.
+Morgan Stream Switcher and RatDVD are no longer supported.
+Added the ability to disable the display of the current frame in the Web interface.
+Fixed debugging of external filters with the release version of the player.
+Fixed the skipback and skipforward commands in the WEB interface.
+Removed unwanted dark frames on some system menus when using the dark menu in the player.
+Added support for pasting files and folders from the clipboard that were copied in Explorer.
+The limit for MPCPL playlists has been increased to 10 MB.
+Changed the way of setting the priority of tracks. Added support for quotes, "+" for multiple matches, and negation for Default and Forced.
 
 MPCBEShellExt (explorer extension)
 Added support for IDropTarget interface.
