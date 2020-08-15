@@ -24,7 +24,7 @@
 #include "DX9AllocatorPresenter.h"
 #include <InitGuid.h>
 #include <utility>
-#include <moreuuids.h>
+#include <clsids.h>
 #include <LAVVideoSettings.h>
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"

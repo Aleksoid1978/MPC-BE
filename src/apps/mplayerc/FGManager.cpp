@@ -35,7 +35,9 @@
 #include <evr9.h>
 #include <vmr9.h>
 #include <ksproxy.h>
+#include <clsids.h>
 #include <moreuuids.h>
+#include <mvrInterfaces.h>
 #include "MediaFormats.h"
 #include "Content.h"
 #include <IPinHook.h>

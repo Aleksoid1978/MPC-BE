@@ -33,7 +33,7 @@
 #include <cmath>
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
-#include <moreuuids.h>
+#include <clsids.h>
 #include "MacrovisionKicker.h"
 #include "IPinHook.h"
 #include "PixelShaderCompiler.h"

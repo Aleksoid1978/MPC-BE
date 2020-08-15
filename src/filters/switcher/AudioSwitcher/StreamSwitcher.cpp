@@ -27,7 +27,8 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
-#include <moreuuids.h>
+#include <clsids.h>
+//#include <moreuuids.h>
 
 #define BLOCKSTREAM
 

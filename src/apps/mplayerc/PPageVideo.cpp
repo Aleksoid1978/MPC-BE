@@ -21,7 +21,8 @@
 
 #include "stdafx.h"
 #include <d3d9.h>
-#include <moreuuids.h>
+#include <clsids.h>
+#include <mvrInterfaces.h>
 #include "../../DSUtil/D3D9Helper.h"
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"

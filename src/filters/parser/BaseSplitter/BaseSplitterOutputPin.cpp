@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <clsids.h>
 #include <moreuuids.h>
 #include "../../switcher/AudioSwitcher/StreamSwitcher.h" // for IStreamSwitcherInputPin
 #include "BaseSplitterOutputPin.h"

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 #include "MainFrm.h"
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
+#include <clsids.h>
 #include <moreuuids.h>
 
 //
