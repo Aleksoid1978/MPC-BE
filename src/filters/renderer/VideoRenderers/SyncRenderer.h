@@ -371,6 +371,7 @@ namespace GothSync
 
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(CLSID) GetAPCLSID() override;
 		STDMETHODIMP_(bool) ResetDevice() override;
 		STDMETHODIMP_(bool) IsRendering() override { return (m_nRenderState == Started); }
 

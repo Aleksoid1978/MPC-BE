@@ -169,6 +169,11 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	return S_OK;
 }
 
+STDMETHODIMP_(CLSID) CMPCVRAllocatorPresenter::GetAPCLSID()
+{
+	return CLSID_MPCVRAllocatorPresenter;
+}
+
 STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 {
 	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR) {

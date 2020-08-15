@@ -28,6 +28,7 @@
 #include "Variables.h"
 #include "Utils.h"
 #include <IMediaSideData.h>
+#include <clsids.h>
 
 #if (0)		// Set to 1 to activate EVR traces
 	#define TRACE_EVR	TRACE
@@ -352,6 +353,11 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	} while (0);
 
 	return hr;
+}
+
+STDMETHODIMP_(CLSID) CEVRAllocatorPresenter::GetAPCLSID()
+{
+	return CLSID_EVRAllocatorPresenter;
 }
 
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResizeDevice()

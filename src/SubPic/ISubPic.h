@@ -173,6 +173,8 @@ ISubPicAllocatorPresenter3 :
 public IUnknown {
 	STDMETHOD (CreateRenderer) (IUnknown** ppRenderer) PURE;
 
+	STDMETHOD_(CLSID, GetAPCLSID) () PURE;
+
 	STDMETHOD_(SIZE, GetVideoSize) () PURE;
 	STDMETHOD_(SIZE, GetVideoSizeAR) () PURE;
 	STDMETHOD_(void, SetPosition) (RECT w, RECT v) PURE;

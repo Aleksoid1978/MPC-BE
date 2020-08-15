@@ -157,6 +157,11 @@ STDMETHODIMP CDXRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	return S_OK;
 }
 
+STDMETHODIMP_(CLSID) CDXRAllocatorPresenter::GetAPCLSID()
+{
+	return CLSID_DXRAllocatorPresenter;
+}
+
 STDMETHODIMP_(void) CDXRAllocatorPresenter::SetPosition(RECT w, RECT v)
 {
 	if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {

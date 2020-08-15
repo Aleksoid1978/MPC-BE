@@ -2435,6 +2435,11 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 	return hr;
 }
 
+STDMETHODIMP_(CLSID) CSyncAP::GetAPCLSID()
+{
+	return CLSID_SyncAllocatorPresenter;
+}
+
 STDMETHODIMP_(bool) CSyncAP::Paint(bool fAll)
 {
 	return __super::Paint(fAll);
