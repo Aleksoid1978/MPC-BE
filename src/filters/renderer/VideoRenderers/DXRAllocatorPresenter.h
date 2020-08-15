@@ -89,6 +89,7 @@ namespace DSObjects
 
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(CLSID) GetAPCLSID() override;
 		STDMETHODIMP_(SIZE) GetVideoSize() override;
 		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;

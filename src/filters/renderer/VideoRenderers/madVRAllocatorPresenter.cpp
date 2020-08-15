@@ -24,7 +24,7 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "RenderersSettings.h"
 #include "Variables.h"
-#include <moreuuids.h>
+#include <clsids.h>
 #include <mvrInterfaces.h>
 #include "IPinHook.h"
 
@@ -164,6 +164,11 @@ STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	HookNewSegmentAndReceive(GetFirstPin(pBF), true);
 
 	return S_OK;
+}
+
+STDMETHODIMP_(CLSID) CmadVRAllocatorPresenter::GetAPCLSID()
+{
+	return CLSID_madVRAllocatorPresenter;
 }
 
 STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)

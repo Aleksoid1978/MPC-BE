@@ -68,6 +68,7 @@ public:
 
 	// ISubPicAllocatorPresenter3
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) { return E_NOTIMPL; }
+	STDMETHODIMP_(CLSID) GetAPCLSID() { return GUID_NULL; }
 	STDMETHODIMP_(SIZE) GetVideoSize();
 	STDMETHODIMP_(SIZE) GetVideoSizeAR();
 	STDMETHODIMP_(void) SetPosition(RECT w, RECT v);

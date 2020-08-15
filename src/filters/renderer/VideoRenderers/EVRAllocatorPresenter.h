@@ -144,7 +144,8 @@ namespace DSObjects
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP        CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(CLSID) GetAPCLSID() override;
 		STDMETHODIMP_(bool) ResizeDevice() override;
 		STDMETHODIMP_(bool) ResetDevice() override;
 		STDMETHODIMP_(bool) DisplayChange() override;
