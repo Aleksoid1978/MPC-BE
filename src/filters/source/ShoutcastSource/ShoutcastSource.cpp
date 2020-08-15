@@ -21,9 +21,6 @@
 
 #include "stdafx.h"
 #include <regex>
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include "ShoutcastSource.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,10 +28,6 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "RealMediaSplitter.h"
 #include "../../../Subtitles/SubtitleInputPin.h"
-
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <moreuuids.h>
 
 template<typename T>

@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2018 see Authors.txt
+ * (C) 2013-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,9 +22,6 @@
 #include "../../../DSUtil/CUE.h"
 #include <atlpath.h>
 #include <MMReg.h>
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <moreuuids.h>
 #include "AudioSplitter.h"
 

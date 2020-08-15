@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,9 +22,6 @@
 #include "stdafx.h"
 #include "CDXAReader.h"
 #include "../../../DSUtil/DSUtil.h"
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <uuids.h>
 #include <moreuuids.h>
 

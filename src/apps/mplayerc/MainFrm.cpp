@@ -55,7 +55,6 @@
 #include <ksmedia.h>
 #include <dvdevcod.h>
 #include <dsound.h>
-#include <InitGuid.h>
 #include <uuids.h>
 #include <clsids.h>
 #include <qnetwork.h>

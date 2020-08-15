@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "RenderersSettings.h"
 #include "DX9AllocatorPresenter.h"
-#include <InitGuid.h>
 #include <utility>
 #include <clsids.h>
 #include <LAVVideoSettings.h>

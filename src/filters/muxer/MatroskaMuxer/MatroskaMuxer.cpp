@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,10 +23,6 @@
 #include <MMReg.h>
 #include "MatroskaMuxer.h"
 #include "../../../DSUtil/DSUtil.h"
-
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <moreuuids.h>
 
 using namespace MatroskaWriter;

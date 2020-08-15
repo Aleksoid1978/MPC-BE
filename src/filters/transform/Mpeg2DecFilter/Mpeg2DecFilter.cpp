@@ -32,10 +32,6 @@
 
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
-
-#ifdef REGISTER_FILTER
-	#include <InitGuid.h>
-#endif
 #include <clsids.h>
 #include <moreuuids.h>
 #include <mvrInterfaces.h>

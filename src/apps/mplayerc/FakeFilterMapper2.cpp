@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "FakeFilterMapper2.h"
 #include <MacrovisionKicker.h>
-#include <InitGuid.h>
 #include <detours/detours.h>
 
 HRESULT (__stdcall * Real_CoCreateInstance)(CONST IID& a0,

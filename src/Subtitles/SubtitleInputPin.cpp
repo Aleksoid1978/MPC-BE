@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,6 @@
 #include "RTS.h"
 #include "RenderedHdmvSubtitle.h"
 #include "XSUBSubtitle.h"
-#include <InitGuid.h>
 #include <uuids.h>
 #include <moreuuids.h>
 #include <basestruct.h>
