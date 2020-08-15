@@ -6793,18 +6793,6 @@ void CMainFrame::OnViewDisplayStatsSC()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 
-	if (rs.iVideoRenderer == VIDRNDT_MPCVR) {
-		CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP;
-		if (pIExFilterConfig) {
-			bool statsEnable = 0;
-			if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
-				statsEnable = !statsEnable;
-				pIExFilterConfig->SetBool("statsEnable", statsEnable);
-			}
-		}
-		return;
-	}
-
 	if (!rs.iDisplayStats) {
 		rs.bResetStats = true; // to Reset statistics on first call ...
 	}
@@ -6812,6 +6800,18 @@ void CMainFrame::OnViewDisplayStatsSC()
 	++rs.iDisplayStats;
 	if (rs.iDisplayStats > 3) {
 		rs.iDisplayStats = 0;
+	}
+
+	// for MPC Video Renderer
+	CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP;
+	if (pIExFilterConfig) {
+		bool statsEnable = 0;
+		if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
+			statsEnable = !statsEnable;
+			pIExFilterConfig->SetBool("statsEnable", statsEnable);
+		}
+		rs.iDisplayStats = statsEnable ? 1 : 0;
+		return;
 	}
 
 	RepaintVideo();
