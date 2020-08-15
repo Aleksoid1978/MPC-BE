@@ -266,6 +266,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IMadVRTextOsd>			m_pMVTO;
 
 	CComPtr<ISubPicAllocatorPresenter3>	m_pCAP;
+	CLSID m_clsidCAP = GUID_NULL;
 
 	CComPtr<IMadVRSubclassReplacement> m_pMVRSR;
 	CComPtr<IMadVRSettings> m_pMVRS;
@@ -1078,7 +1079,7 @@ public:
 	afx_msg void OnViewD3DFullScreen();
 	afx_msg void OnViewDisableDesktopComposition();
 	afx_msg void OnViewResetDefault();
-	afx_msg void OnUpdateViewReset(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewResetDefault(CCmdUI* pCmdUI);
 
 	afx_msg void OnViewEnableFrameTimeCorrection();
 	afx_msg void OnViewVSyncOffsetIncrease();
