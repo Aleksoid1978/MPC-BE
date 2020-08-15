@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <InitGuid.h>
 #include <moreuuids.h>
 #include "../../../DSUtil/std_helper.h"
 #include "Version.h"

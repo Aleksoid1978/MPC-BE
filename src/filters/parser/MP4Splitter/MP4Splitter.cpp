@@ -26,9 +26,6 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MP4AudioDecoderConfig.h"
 
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <cmath>

@@ -30,9 +30,6 @@
 #include "../../../DSUtil/std_helper.h"
 #include <IMediaSideData.h>
 
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <cmath>

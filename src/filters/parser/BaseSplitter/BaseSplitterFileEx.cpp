@@ -25,7 +25,6 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/MP4AudioDecoderConfig.h"
-#include <InitGuid.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 

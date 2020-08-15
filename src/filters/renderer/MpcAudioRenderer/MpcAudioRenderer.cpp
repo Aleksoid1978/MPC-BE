@@ -20,11 +20,6 @@
 
 #include "stdafx.h"
 #include <map>
-
-#ifdef REGISTER_FILTER
-	#include <InitGuid.h>
-#endif
-
 #include <moreuuids.h>
 #include <math.h>
 #include "../../../DSUtil/DSUtil.h"

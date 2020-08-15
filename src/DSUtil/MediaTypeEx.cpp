@@ -25,7 +25,6 @@
 #include "AudioParser.h"
 
 #include <MMReg.h>
-#include <InitGuid.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <d3d9types.h>

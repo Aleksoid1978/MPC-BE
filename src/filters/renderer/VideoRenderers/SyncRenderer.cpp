@@ -23,7 +23,6 @@
 #include "../SyncClock/ISyncClock.h"
 #include <strsafe.h> // Required in CGenlock
 #include <videoacc.h>
-#include <InitGuid.h>
 #include <d3d9.h>
 #include <dx/d3dx9.h>
 #include <evr9.h>

@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <InitGuid.h>
 #include "AllocatorCommon.h"
 #include <clsids.h>
 

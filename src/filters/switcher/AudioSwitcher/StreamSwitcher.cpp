@@ -23,12 +23,7 @@
 #include "../../../AudioTools/AudioHelper.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "StreamSwitcher.h"
-
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <clsids.h>
-//#include <moreuuids.h>
 
 #define BLOCKSTREAM
 

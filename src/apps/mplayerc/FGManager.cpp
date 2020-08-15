@@ -29,7 +29,6 @@
 #include "../../DSUtil/FileVersion.h"
 #include "../../DSUtil/std_helper.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
-#include <InitGuid.h>
 #include <dmodshow.h>
 #include <evr.h>
 #include <evr9.h>

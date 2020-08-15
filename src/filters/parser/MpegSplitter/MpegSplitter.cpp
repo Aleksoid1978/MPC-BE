@@ -23,9 +23,6 @@
 #include <MMReg.h>
 #include <ks.h>
 #include <ksmedia.h>
-#ifdef REGISTER_FILTER
-#include <InitGuid.h>
-#endif
 #include <dmodshow.h>
 #include <list>
 #include "MpegSplitter.h"

@@ -21,11 +21,6 @@
 #include "stdafx.h"
 #include <atlbase.h>
 #include <MMReg.h>
-
-#ifdef REGISTER_FILTER
-	#include <InitGuid.h>
-#endif
-
 #include "MPCVideoDec.h"
 #include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"
