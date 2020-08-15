@@ -337,7 +337,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
 
 	ON_COMMAND(ID_VIEW_RESET_DEFAULT, OnViewResetDefault)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_RESET_DEFAULT, OnUpdateViewReset)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_RESET_DEFAULT, OnUpdateViewResetDefault)
 
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_INCREASE, OnViewVSyncOffsetIncrease)
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_DECREASE, OnViewVSyncOffsetDecrease)
@@ -6760,11 +6760,15 @@ void CMainFrame::OnRepeatForever()
 
 void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 {
-	const CRenderersSettings& rs = GetRenderersSettings();
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
+	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
+		pCmdUI->Enable(TRUE);
+		pCmdUI->SetCheck(GetRenderersSettings().bTearingTest);
 
-	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-	pCmdUI->SetCheck(rs.bTearingTest);
+		return;
+	}
+
+	pCmdUI->Enable(FALSE);
+	pCmdUI->SetCheck(0);
 }
 
 void CMainFrame::OnViewTearingTest()
@@ -6775,11 +6779,28 @@ void CMainFrame::OnViewTearingTest()
 
 void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 {
-	const CRenderersSettings& rs = GetRenderersSettings();
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC || rs.iVideoRenderer == VIDRNDT_MPCVR);
+	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
+		pCmdUI->Enable(TRUE);
+		pCmdUI->SetCheck(GetRenderersSettings().iDisplayStats > 0);
 
-	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-	pCmdUI->SetCheck(supported && rs.iDisplayStats);
+		return;
+	}
+
+	if (m_clsidCAP == CLSID_MPCVRAllocatorPresenter) {
+		CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP;
+		if (pIExFilterConfig) {
+			bool statsEnable = 0;
+			if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
+				pCmdUI->Enable(TRUE);
+				pCmdUI->SetCheck(statsEnable);
+
+				return;
+			}
+		}
+	}
+
+	pCmdUI->Enable(FALSE);
+	pCmdUI->SetCheck(0);
 }
 
 void CMainFrame::OnViewResetStats()
@@ -6789,60 +6810,68 @@ void CMainFrame::OnViewResetStats()
 
 void CMainFrame::OnViewDisplayStatsSC()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-
-	if (!rs.iDisplayStats) {
-		rs.bResetStats = true; // to Reset statistics on first call ...
-	}
-
-	++rs.iDisplayStats;
-	if (rs.iDisplayStats > 3) {
-		rs.iDisplayStats = 0;
-	}
-
-	// for MPC Video Renderer
-	CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP;
-	if (pIExFilterConfig) {
-		bool statsEnable = 0;
-		if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
-			statsEnable = !statsEnable;
-			pIExFilterConfig->SetBool("statsEnable", statsEnable);
+	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
+		CRenderersSettings& rs = GetRenderersSettings();
+		if (!rs.iDisplayStats) {
+			rs.bResetStats = true; // to Reset statistics on first call ...
 		}
-		rs.iDisplayStats = statsEnable ? 1 : 0;
-		return;
-	}
 
-	RepaintVideo();
+		++rs.iDisplayStats;
+		if (rs.iDisplayStats > 3) {
+			rs.iDisplayStats = 0;
+		}
+
+		RepaintVideo();
+	}
+	else if (m_clsidCAP == CLSID_MPCVRAllocatorPresenter) {
+		CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP;
+		if (pIExFilterConfig) {
+			bool statsEnable = 0;
+			if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
+				statsEnable = !statsEnable;
+				pIExFilterConfig->SetBool("statsEnable", statsEnable);
+			}
+		}
+	}
 }
 
 void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	const CRenderersSettings& rs = s.m_VRSettings;
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM);
+	if (m_clsidCAP == CLSID_EVRAllocatorPresenter) {
+		pCmdUI->Enable(TRUE);
+		pCmdUI->SetCheck(AfxGetAppSettings().fD3DFullscreen);
 
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(s.fD3DFullscreen);
+		return;
+	}
+
+	pCmdUI->Enable(FALSE);
+	pCmdUI->SetCheck(0);
 }
 
 void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 {
-	const CRenderersSettings& rs = GetRenderersSettings();
-	bool supported = ((rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					   rs.iVideoRenderer == VIDRNDT_SYNC) &&
-					  (!SysVersion::IsWin8orLater()));
+	if (!SysVersion::IsWin8orLater() && (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter)) {
+		pCmdUI->Enable(TRUE);
+		pCmdUI->SetCheck(GetRenderersSettings().bDisableDesktopComposition);
 
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(rs.bDisableDesktopComposition);
+		return;
+	}
+
+	pCmdUI->Enable(FALSE);
+	pCmdUI->SetCheck(0);
 }
 
 void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 {
-	const CRenderersSettings& rs = GetRenderersSettings();
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM);
+	if (m_clsidCAP == CLSID_EVRAllocatorPresenter) {
+		pCmdUI->Enable(TRUE);
+		pCmdUI->SetCheck(GetRenderersSettings().bEVRFrameTimeCorrection);
 
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(rs.bEVRFrameTimeCorrection);
+		return;
+	}
+
+	pCmdUI->Enable(FALSE);
+	pCmdUI->SetCheck(0);
 }
 
 void CMainFrame::OnViewVSync()
@@ -6889,11 +6918,16 @@ void CMainFrame::OnViewResetDefault()
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_DEFAULT));
 }
 
-void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateViewResetDefault(CCmdUI* pCmdUI)
 {
-	const CRenderersSettings& rs = GetRenderersSettings();
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
-	pCmdUI->Enable(supported);
+	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
+		pCmdUI->Enable(TRUE);
+
+		return;
+	}
+
+	pCmdUI->Enable(FALSE);
+	pCmdUI->SetCheck(0);
 }
 
 void CMainFrame::OnViewEnableFrameTimeCorrection()
@@ -6907,8 +6941,9 @@ void CMainFrame::OnViewEnableFrameTimeCorrection()
 
 void CMainFrame::OnViewVSyncOffsetIncrease()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.iVideoRenderer == VIDRNDT_SYNC) {
+	
+	if (m_clsidCAP == CLSID_SyncAllocatorPresenter) {
+		CRenderersSettings& rs = GetRenderersSettings();
 		CString strOSD;
 		rs.dTargetSyncOffset = rs.dTargetSyncOffset - 0.5; // Yeah, it should be a "-"
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
@@ -6919,8 +6954,8 @@ void CMainFrame::OnViewVSyncOffsetIncrease()
 
 void CMainFrame::OnViewVSyncOffsetDecrease()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.iVideoRenderer == VIDRNDT_SYNC) {
+	if (m_clsidCAP == CLSID_SyncAllocatorPresenter) {
+		CRenderersSettings& rs = GetRenderersSettings();
 		CString strOSD;
 		rs.dTargetSyncOffset = rs.dTargetSyncOffset + 0.5;
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
@@ -13986,9 +14021,13 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		m_pCAP = nullptr;
+		m_pCAP.Release();
+		m_clsidCAP = GUID_NULL;
 
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
+		if (m_pCAP) {
+			m_clsidCAP = m_pCAP->GetAPCLSID();
+		}
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE); // might have IVMRMixerBitmap9, but not IVMRWindowlessControl9
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pMVRSR = m_pCAP;
@@ -14256,6 +14295,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMVRI.Release();
 	m_pMVRFG.Release();
 	m_pCAP.Release();
+	m_clsidCAP = GUID_NULL;
 	m_pVMRWC.Release();
 	m_pVMRMC9.Release();
 	m_pMVTO.Release();
@@ -16943,6 +16983,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 
 		m_OSD.Stop();
 		m_pCAP.Release();
+		m_clsidCAP = GUID_NULL;
 		m_pVMRWC.Release();
 		m_pVMRMC9.Release();
 		m_pMFVP.Release();
@@ -16952,6 +16993,9 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 		m_pGB->Render(pVidPrevPin);
 
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
+		if (m_pCAP) {
+			m_clsidCAP = m_pCAP->GetAPCLSID();
+		}
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE);
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pGB->FindInterface(IID_PPV_ARGS(&pVMB), TRUE);
