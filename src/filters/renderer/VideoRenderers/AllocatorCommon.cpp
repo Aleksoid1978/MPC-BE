@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include <InitGuid.h>
 #include "AllocatorCommon.h"
-#include <moreuuids.h>
+#include <clsids.h>
 
 #include "DXRAllocatorPresenter.h"
 #include "madVRAllocatorPresenter.h"

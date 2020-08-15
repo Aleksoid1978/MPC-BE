@@ -24,7 +24,7 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "RenderersSettings.h"
 #include "Variables.h"
-#include <moreuuids.h>
+#include <clsids.h>
 #include "IPinHook.h"
 #include <FilterInterfaces.h>
 

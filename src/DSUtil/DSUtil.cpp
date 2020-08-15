@@ -26,13 +26,15 @@
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
 #include "AudioParser.h"
+#include <clsids.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <emmintrin.h>
 #include <math.h>
 #include <InitGuid.h>
-#include <d3d9types.h>
+#include <d3d9.h>
 #include <dxva2api.h>
+#include <mvrInterfaces.h>
 
 int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC)
 {

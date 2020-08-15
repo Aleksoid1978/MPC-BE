@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1231
 MinimumVisualStudioVersion = 15.0.27130.2036
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{A21F07E6-A891-479C-98EA-EDB58CE4EFAB}"
 EndProject
@@ -158,6 +158,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA3670A9-FD3E-413C-99DD-DF79E42CE0AC}"
 	ProjectSection(SolutionItems) = preProject
 		include\basestruct.h = include\basestruct.h
+		include\clsids.h = include\clsids.h
 		include\FilterInterfaces.h = include\FilterInterfaces.h
 		include\HighDPI.h = include\HighDPI.h
 		include\IBitRateInfo.h = include\IBitRateInfo.h

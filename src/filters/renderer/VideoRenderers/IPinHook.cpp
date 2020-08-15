@@ -24,6 +24,7 @@
 #include <d3d9.h>
 #include <dxva.h>
 #include <dxva2api.h>
+#include <clsids.h>
 #include <moreuuids.h>
 
 #include "IPinHook.h"

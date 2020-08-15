@@ -29,7 +29,8 @@
 #include <MMReg.h>
 #include <Ks.h>
 #include <KsMedia.h>
-#include <moreuuids.h>
+#include <clsids.h>
+//#include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/AudioParser.h"

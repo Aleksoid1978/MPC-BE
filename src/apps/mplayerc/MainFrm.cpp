@@ -57,7 +57,7 @@
 #include <dsound.h>
 #include <InitGuid.h>
 #include <uuids.h>
-#include <moreuuids.h>
+#include <clsids.h>
 #include <qnetwork.h>
 #include <psapi.h>
 
@@ -82,7 +82,6 @@
 #include "../../SubPic/MemSubPic.h"
 
 #include "MultiMonitor.h"
-#include <mvrInterfaces.h>
 
 #include <random>
 #include <string>

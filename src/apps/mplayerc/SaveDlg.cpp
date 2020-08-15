@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include <afxglobals.h>
+#include <clsids.h>
 #include "MainFrm.h"
 #include "SaveDlg.h"
 #include "../../DSUtil/FileHandle.h"

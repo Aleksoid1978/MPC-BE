@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <initguid.h>
 #include <MMReg.h>
 #include "DVRSplitter.h"
 #include <moreuuids.h>
