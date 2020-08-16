@@ -4428,7 +4428,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		// Workaround to avoid MadVR freezing when switching channels in PM_CAPTURE mode:
 		if (IsWindowVisible() && s.nPlaybackWindowMode
 				&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)
-				&& GetPlaybackMode() == PM_CAPTURE && rs.iVideoRenderer == VIDRNDT_MADVR) {
+				&& GetPlaybackMode() == PM_CAPTURE && m_clsidCAP == CLSID_madVRAllocatorPresenter) {
 			ShowWindow(SW_MAXIMIZE);
 			wp.showCmd = SW_SHOWMAXIMIZED;
 		}
@@ -6243,17 +6243,17 @@ static CString MakeSnapshotFileName(LPCWSTR prefix)
 	return fn;
 }
 
-BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
+bool CMainFrame::IsRendererCompatibleWithSaveImage()
 {
-	BOOL result = TRUE;
+	BOOL result = true;
 	const CRenderersSettings& rs = GetRenderersSettings();
 
 	if (m_fShockwaveGraph) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_SHOCKWAVE), MB_ICONEXCLAMATION | MB_OK);
-		result = FALSE;
+		result = false;
 	}
 	// the latest madVR build v0.84.0 now supports screenshots.
-	else if (rs.iVideoRenderer == VIDRNDT_MADVR) {
+	else if (m_clsidCAP == CLSID_madVRAllocatorPresenter) {
 		CRegKey key;
 		CString clsid = L"{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}";
 
@@ -6265,7 +6265,7 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 
 			const FileVersion::Ver madVR_ver = FileVersion::GetVer(buff);
 			if (madVR_ver.value < FileVersion::Ver(0, 84, 0, 0).value) {
-				result = FALSE;
+				result = false;
 			}
 
 			key.Close();
