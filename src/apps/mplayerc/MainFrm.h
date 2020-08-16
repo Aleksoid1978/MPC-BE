@@ -426,7 +426,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	HRESULT GetOriginalFrame(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT RenderCurrentSubtitles(BYTE* pData);
 	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
-	BOOL IsRendererCompatibleWithSaveImage();
+	bool IsRendererCompatibleWithSaveImage();
 	void SaveImage(LPCWSTR fn, bool displayed);
 	void SaveThumbnails(LPCWSTR fn);
 
