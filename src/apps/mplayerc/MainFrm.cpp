@@ -6245,7 +6245,7 @@ static CString MakeSnapshotFileName(LPCWSTR prefix)
 
 bool CMainFrame::IsRendererCompatibleWithSaveImage()
 {
-	BOOL result = true;
+	bool result = true;
 	const CRenderersSettings& rs = GetRenderersSettings();
 
 	if (m_fShockwaveGraph) {
