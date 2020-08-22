@@ -630,7 +630,7 @@
 #define IDD_SHADERNEW_DLG               10067
 #define IDD_CMD_LINE_HELP               10068
 #define IDD_PLAYLISTNAME                10069
-// controls
+// nameless controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
 #define IDC_STATIC3                     10203
@@ -643,7 +643,6 @@
 #define IDC_STATIC10                    10210
 #define IDC_STATIC11                    10211
 #define IDC_STATIC12                    10212
-#define IDC_STATIC_PLAYLISTNAME         10213
 //
 #define IDC_CHECK1                      10221
 #define IDC_CHECK2                      10222
@@ -698,7 +697,6 @@
 #define IDC_EDIT8                       10288
 #define IDC_EDIT9                       10289
 #define IDC_EDIT10                      10290
-#define IDC_EDIT_PLAYLISTNAME           10291
 //
 #define IDC_BUTTON1                     10301
 #define IDC_BUTTON2                     10302
@@ -739,7 +737,7 @@
 #define IDTB_BUTTON3                    10373
 #define IDTB_BUTTON4                    10374
 #define IDTB_BUTTON5                    10375
-//
+// named controls
 #define IDC_SLI_BRIGHTNESS              10501
 #define IDC_SLI_CONTRAST                10502
 #define IDC_SLI_HUE                     10503
