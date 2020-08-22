@@ -31,8 +31,8 @@ CPlaylistNameDlg::CPlaylistNameDlg(const CString& str, CWnd* pParent/* = nullptr
 void CPlaylistNameDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_EDIT_PLAYLISTNAME, m_name);
-	DDX_Control(pDX, IDC_EDIT_PLAYLISTNAME, m_namectrl);
+	DDX_Text(pDX, IDC_EDIT1, m_name);
+	DDX_Control(pDX, IDC_EDIT1, m_namectrl);
 }
 
 BOOL CPlaylistNameDlg::OnInitDialog()
