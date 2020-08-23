@@ -1,9 +1,8 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.5.5 (beta)
+1.5.5
 =============================
 Windows 10 SDK version 10.0.17763.0 is now required to build in Visual Studio 2017.
-
 
 AudioSplitter
 Added support for DSD streams in WavPack (.wv) files.
@@ -67,6 +66,7 @@ Added the ability to get the displayed image for MPC Video Renderer.
 Fixed resetting the frame state on pause for the case of rotation by 180 degrees and frame reflection.
 Fixed frame rotation on pause for madVR.
 Disabled support for exclusive full screen for SyncRenderer.
+Fixed work of menus and commands for active video renderer.
 
 Subtitles
 Improved support for Teletext subtitles.
