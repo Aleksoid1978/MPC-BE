@@ -330,32 +330,84 @@
     <ClCompile Include="MediaFormats.cpp">
       <Filter>Player config</Filter>
     </ClCompile>
-    <ClCompile Include="ColorControl.cpp" />
-    <ClCompile Include="Content.cpp" />
-    <ClCompile Include="DiskImage.cpp" />
-    <ClCompile Include="DVBChannel.cpp" />
-    <ClCompile Include="FileDropTarget.cpp" />
-    <ClCompile Include="FullscreenWnd.cpp" />
-    <ClCompile Include="Ifo.cpp" />
-    <ClCompile Include="ISDb.cpp" />
-    <ClCompile Include="LcdSupport.cpp" />
-    <ClCompile Include="MainFrm.cpp" />
-    <ClCompile Include="MiniDump.cpp" />
-    <ClCompile Include="Misc.cpp" />
-    <ClCompile Include="Mpeg2SectionData.cpp" />
-    <ClCompile Include="mplayerc.cpp" />
-    <ClCompile Include="MultiMonitor.cpp" />
-    <ClCompile Include="OSD.cpp" />
-    <ClCompile Include="PlayerChildView.cpp" />
-    <ClCompile Include="PlayerListCtrl.cpp" />
-    <ClCompile Include="PlayerPreView.cpp" />
-    <ClCompile Include="PngImage.cpp" />
-    <ClCompile Include="RateControl.cpp" />
-    <ClCompile Include="SelectMediaType.cpp" />
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="TorrentInfo.cpp" />
-    <ClCompile Include="UpdateChecker.cpp" />
-    <ClCompile Include="vkCodes.cpp" />
+    <ClCompile Include="ColorControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Content.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DVBChannel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileDropTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ifo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ISDb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LcdSupport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniDump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mpeg2SectionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mplayerc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerChildView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerListCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPreView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PngImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RateControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectMediaType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TorrentInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vkCodes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -732,6 +784,9 @@
     </ClInclude>
     <ClInclude Include="FilterEnum.h">
       <Filter>Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="WicUtis.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
