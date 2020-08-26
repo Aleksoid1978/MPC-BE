@@ -549,7 +549,7 @@ DWORD CSubPicQueue::ThreadProc()
 				}
 
 				REFERENCE_TIME rtCurrent = std::max(rtStart, rtStartRendering);
-				if (rtCurrent > m_rtNow) {
+				if (rtCurrent > m_rtNow && rtTimePerFrame <= rtStop - rtStart) {
 					// Round current time to the next estimated video frame timing
 					REFERENCE_TIME rtCurrentRounded = (rtCurrent / rtTimePerFrame) * rtTimePerFrame;
 					if (rtCurrentRounded < rtCurrent) {
