@@ -2052,6 +2052,12 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, const bool bMulti, CSub
 		TSelectTab();
 	}
 
+	for (auto& fn : fns) {
+		if (::PathIsURLW(fn)) {
+			fn = UrlDecode(fn);
+		}
+	}
+
 	if (bMulti) {
 		ASSERT(subs == nullptr || subs->size() == 0);
 
