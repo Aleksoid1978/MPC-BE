@@ -163,6 +163,7 @@ extern DWORD    CharSetToCodePage(DWORD dwCharSet);
 extern CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet);
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
+extern CString  UrlDecode(LPCWSTR lpWideCharStr);
 extern CString  ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 
