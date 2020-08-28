@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,7 +65,7 @@ static HBITMAP OpenImage(CString fn)
 		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 		Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
 
-		Bitmap *bm = new Bitmap(s);
+		Gdiplus::Bitmap *bm = new Gdiplus::Bitmap(s);
 
 		bm->GetHBITMAP(0, &hB);
 

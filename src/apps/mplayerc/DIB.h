@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,10 +22,10 @@
 
 #include <libpng/png.h>
 
-using namespace Gdiplus;
-
 static int GetEncoderClsid(CStringW format, CLSID* pClsid)
 {
+	using namespace Gdiplus;
+
 	UINT num = 0, size = 0;
 	GetImageEncodersSize(&num, &size);
 	if (size == 0) {
@@ -44,8 +44,10 @@ static int GetEncoderClsid(CStringW format, CLSID* pClsid)
 	return -1;
 }
 
-static void GdiplusConvert(Bitmap* bm, CStringW fn, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
+static void GdiplusConvert(Gdiplus::Bitmap* bm, CStringW fn, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
 {
+	using namespace Gdiplus;
+
 	CLSID encoderClsid = CLSID_NULL;
 	GetEncoderClsid(format, &encoderClsid);
 
@@ -121,6 +123,8 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 
 		IStream *s;
 		::CreateStreamOnHGlobal(hG, 1, &s);
+
+		using namespace Gdiplus;
 
 		ULONG_PTR gdiplusToken;
 		GdiplusStartupInput gdiplusStartupInput;

@@ -74,7 +74,7 @@
 #include <comdef.h>
 #include <dwmapi.h>
 
-#include "OpenImage.h"
+#include "DIB.h"
 
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
 #include "../../Subtitles/XSUBSubtitle.h"
@@ -1584,7 +1584,7 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		for (UINT uItem = 0; ::GetMenuItemRect(m_hWnd, mbi.hMenu, uItem, &r); uItem++) {
 			x += r.Width();
 		}
-		lpMMI->ptMinTrackSize.x = max(lpMMI->ptMinTrackSize.x, x);
+		lpMMI->ptMinTrackSize.x = std::max(lpMMI->ptMinTrackSize.x, x);
 	}
 
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
@@ -1853,8 +1853,8 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	// prc->left   = max(rcWork.left, min(rcWork.right-w, cur_pos.x - (double)((rnp.right-rnp.left)/((double)(rcWork.right-rcWork.left)/cur_pos.x))));
 	// prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (double)((rnp.bottom-rnp.top)/((double)(rcWork.bottom-rcWork.top)/cur_pos.y))));
 
-	prc->left   = max(rcWork.left, min(rcWork.right-w, cur_pos.x - (w/2)));
-	prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (h/2)));
+	prc->left   = std::max(rcWork.left, std::min(rcWork.right-w, cur_pos.x - (w/2)));
+	prc->top    = std::max(rcWork.top,  std::min(rcWork.bottom-h, cur_pos.y - (h/2)));
 	prc->right  = prc->left + w;
 	prc->bottom = prc->top  + h;
 
@@ -2806,7 +2806,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					CString lang;
 					if (AATR.Language) {
 						int len = GetLocaleInfoW(AATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-						lang.ReleaseBufferSetLength(max(len-1, 0));
+						lang.ReleaseBufferSetLength(std::max(len-1, 0));
 					} else {
 						lang.Format(ResStr(IDS_AG_UNKNOWN), ulCurrent+1);
 					}
@@ -2858,7 +2858,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						&& SUCCEEDED(m_pDVDI->GetSubpictureAttributes(ulCurrent, &SATR))) {
 					CString lang;
 					int len = GetLocaleInfoW(SATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-					lang.ReleaseBufferSetLength(max(len-1, 0));
+					lang.ReleaseBufferSetLength(std::max(len-1, 0));
 
 					switch (SATR.LanguageExtension) {
 						case DVD_SP_EXT_NotSpecified:
@@ -4727,7 +4727,7 @@ void CMainFrame::OnStreamAudio(UINT nID)
 				CString	strMessage;
 				if (AATR.Language) {
 					int len = GetLocaleInfoW(AATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-					lang.ReleaseBufferSetLength(max(len - 1, 0));
+					lang.ReleaseBufferSetLength(std::max(len - 1, 0));
 				}
 				else {
 					lang.Format(ResStr(IDS_AG_UNKNOWN), nNextStream + 1);
@@ -5018,7 +5018,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 					CString lang;
 					CString	strMessage;
 					int len = GetLocaleInfoW(SATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-					lang.ReleaseBufferSetLength(max(len - 1, 0));
+					lang.ReleaseBufferSetLength(std::max(len - 1, 0));
 					lang += FAILED(hr) ? L" [" + ResStr(IDS_AG_ERROR) + L"] " : L"";
 					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), lang);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
@@ -10531,7 +10531,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 
 		MINMAXINFO mmi;
 		OnGetMinMaxInfo(&mmi);
-		CRect windowRect(0, 0, max(windowSize.cx, mmi.ptMinTrackSize.x), max(windowSize.cy, mmi.ptMinTrackSize.y));
+		CRect windowRect(0, 0, std::max(windowSize.cx, mmi.ptMinTrackSize.x), std::max(windowSize.cy, mmi.ptMinTrackSize.y));
 		monitor.CenterRectToMonitor(windowRect, TRUE);
 		SetWindowPos(nullptr, windowRect.left, windowRect.top, windowSize.cx, windowSize.cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	}
@@ -10838,7 +10838,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				ShowControlBarInternal(&m_wndNavigationBar, FALSE);
 			} else if (nTimeOut > 0) {
 				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, nullptr);
-				SetTimer(TIMER_MOUSEHIDER, max(nTimeOut * 1000, 2000), nullptr);
+				SetTimer(TIMER_MOUSEHIDER, std::max(nTimeOut * 1000, 2000), nullptr);
 			}
 		} else {
 			ShowControls(CS_NONE, false);
@@ -11435,8 +11435,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		}
 
 		CSize finalSize = videoTargetSize + controlsSize + decorationsRect.Size();
-		finalSize.cx = max(finalSize.cx, mmi.ptMinTrackSize.x);
-		finalSize.cy = max(finalSize.cy, mmi.ptMinTrackSize.y);
+		finalSize.cx = std::max(finalSize.cx, mmi.ptMinTrackSize.x);
+		finalSize.cy = std::max(finalSize.cy, mmi.ptMinTrackSize.y);
 
 		if (!s.bRememberWindowPos) {
 			bool isSnapped = false;
@@ -14948,7 +14948,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 			CString str;
 			if (Language) {
 				int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
-				str.ReleaseBufferSetLength(max(len - 1, 0));
+				str.ReleaseBufferSetLength(std::max(len - 1, 0));
 			} else {
 				str.Format(ResStr(IDS_AG_UNKNOWN), i + 1);
 			}
@@ -15576,7 +15576,7 @@ void CMainFrame::SetupAudioTracksSubMenu()
 			CString str;
 			if (Language) {
 				int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
-				str.ReleaseBufferSetLength(max(len-1, 0));
+				str.ReleaseBufferSetLength(std::max(len-1, 0));
 			} else {
 				str.Format(ResStr(IDS_AG_UNKNOWN), i+1);
 			}
@@ -18213,7 +18213,7 @@ void CMainFrame::SendSubtitleTracksToApi()
 				CString name;
 				if (Language) {
 					int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, name.GetBuffer(256), 256);
-					name.ReleaseBufferSetLength(max(len - 1, 0));
+					name.ReleaseBufferSetLength(std::max(len - 1, 0));
 				} else {
 					name.Format(ResStr(IDS_AG_UNKNOWN), i + 1);
 				}
@@ -18334,7 +18334,7 @@ void CMainFrame::SendAudioTracksToApi()
 				CString name;
 				if (Language) {
 					int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, name.GetBuffer(256), 256);
-					name.ReleaseBufferSetLength(max(len-1, 0));
+					name.ReleaseBufferSetLength(std::max(len-1, 0));
 				} else {
 					name.Format(ResStr(IDS_AG_UNKNOWN), i+1);
 				}
@@ -19400,7 +19400,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 			BITMAP bm;
 			GetObjectW(m_InternalImageSmall, sizeof(bm), &bm);
 
-			int h = min(abs(bm.bmHeight), nHeight);
+			int h = std::min(abs(bm.bmHeight), nHeight);
 			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
 			h     = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 
@@ -20113,9 +20113,9 @@ void CMainFrame::SetToolBarSubtitleButton()
 
 COLORREF CMainFrame::ColorBrightness(int lSkale, COLORREF color)
 {
-	int red = lSkale > 0 ? min(GetRValue(color) + lSkale, 255) : max(0, GetRValue(color) + lSkale);
-	int green = lSkale > 0 ? min(GetGValue(color) + lSkale, 255) : max(0, GetGValue(color) + lSkale);
-	int blue = lSkale > 0 ? min(GetBValue(color) + lSkale, 255) : max(0, GetBValue(color) + lSkale);
+	int red   = lSkale > 0 ? std::min(GetRValue(color) + lSkale, 255) : std::max(0, GetRValue(color) + lSkale);
+	int green = lSkale > 0 ? std::min(GetGValue(color) + lSkale, 255) : std::max(0, GetGValue(color) + lSkale);
+	int blue  = lSkale > 0 ? std::min(GetBValue(color) + lSkale, 255) : std::max(0, GetBValue(color) + lSkale);
 
 	return RGB(red, green, blue);
 }
