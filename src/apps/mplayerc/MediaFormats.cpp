@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "MediaFormats.h"
-#include "OpenImage.h"
 
 //
 // CMediaFormatCategory

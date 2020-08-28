@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerStatusBar.h"
-#include "OpenImage.h"
 #include "./Controls/MenuEx.h"
 #include "../../DSUtil/SysVersion.h"
 
