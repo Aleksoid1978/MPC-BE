@@ -225,7 +225,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 		BITMAP bm = { 0 };
 		if (GetObjectW(img, sizeof(bm), &bm)) {
 			int h = std::min(abs(bm.bmHeight), (LONG)r.Height());
-			int w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
+			int w = std::min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
 			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 			int x = std::lround(((double)r.Width() - w) / 2.0);
 			int y = std::lround(((double)r.Height() - h) / 2.0);
