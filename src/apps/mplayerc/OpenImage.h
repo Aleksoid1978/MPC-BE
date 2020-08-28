@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "DIB.h"
 #include "../../DSUtil/Filehandle.h"
 
 static LPCWSTR extimages[] = { L".bmp", L".jpg", L".jpeg", L".png", L".gif" };
