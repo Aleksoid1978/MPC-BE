@@ -101,9 +101,6 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 		DeleteObject(hBmp);
 	}
-
-	// GDI+ handling
-	// Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, nullptr);
 }
 
 COSD::~COSD()
@@ -118,9 +115,6 @@ COSD::~COSD()
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
 	}
-
-	// GDI+ handling
-	// Gdiplus::GdiplusShutdown(m_gdiplusToken);
 }
 
 HRESULT COSD::Create(CWnd* pWnd)
@@ -997,49 +991,6 @@ void COSD::DrawWnd()
 
 	mdc.SetTextColor(s.clrFontABGR);
 	mdc.DrawText(m_strMessage, &r, uFormat);
-
-	/*
-	// GDI+ handling
-
-	using namespace Gdiplus;
-	Graphics graphics(mdc.GetSafeHdc());
-	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-	graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
-
-	CString ss(message);
-	CString f(m_OSD_Font);
-	Font font(mdc);
-
-	FontFamily fontFamily;
-	font.GetFamily(&fontFamily);
-
-	StringFormat strformat;
-	//strformat.SetAlignment((StringAlignment) 0);
-	//strformat.SetLineAlignment(StringAlignmentCenter);
-	strformat.SetFormatFlags(StringFormatFlagsNoWrap);
-	strformat.SetTrimming(StringTrimmingEllipsisCharacter);//SetFormatFlags(StringFormatFlagsLineLimit );
-	RectF p(r.left+10, r.top, r.Width(), r.Height());
-
-	REAL enSize = font.GetSize();
-
-	GraphicsPath path;
-	path.AddString(ss.AllocSysString(), ss.GetLength(), &fontFamily, FontStyleRegular, enSize, p, &strformat);
-
-	Pen pen(Color(76,80,86), 5);
-	pen.SetLineJoin(LineJoinRound);
-	graphics.DrawPath(&pen, &path);
-
-	//for(int i=1; i<8; ++i)
-	//{
-	//	Pen pen(Color(32, 32, 28, 30), i);
-	//	pen.SetLineJoin(LineJoinRound);
-	//	graphics.DrawPath(&pen, &path);
-	//}
-
-
-	LinearGradientBrush brush(Gdiplus::Rect(r.left, r.top, r.Width(), r.Height()), Color(255, 255, 255), Color(217, 229, 247), LinearGradientModeVertical);
-	graphics.FillPath(&brush, &path);
-	*/
 
 	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
 
