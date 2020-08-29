@@ -6941,7 +6941,7 @@ void CMainFrame::OnViewEnableFrameTimeCorrection()
 
 void CMainFrame::OnViewVSyncOffsetIncrease()
 {
-	
+
 	if (m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		CRenderersSettings& rs = GetRenderersSettings();
 		CString strOSD;
@@ -13267,6 +13267,7 @@ BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pat
 		size_t iIndex = 0;
 		for (const auto& track : Tracks) {
 			if (bExtPrior && !track.Ext) {
+				iIndex++;
 				continue;
 			}
 
