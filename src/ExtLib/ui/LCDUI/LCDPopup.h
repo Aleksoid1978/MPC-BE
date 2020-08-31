@@ -23,7 +23,6 @@
 #include "LCDPage.h"
 #include "LCDText.h"
 #include "LCDBitmap.h"
-#include <gdiplus.h>
 
 
 //************************************************************************

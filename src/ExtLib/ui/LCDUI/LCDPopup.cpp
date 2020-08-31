@@ -18,6 +18,7 @@
 //************************************************************************
 
 #include "LCDUI.h"
+#include <gdiplus.h>
 #include "LCDPopup.h"
 
 // This uses GDI+
