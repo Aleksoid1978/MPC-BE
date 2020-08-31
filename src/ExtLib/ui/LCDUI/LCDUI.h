@@ -32,7 +32,6 @@
 #include <vector>
 #include <queue>
 #include <Vfw.h>
-#include <GdiPlus.h>
 
 
 //************************************************************************
