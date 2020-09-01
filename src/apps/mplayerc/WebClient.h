@@ -35,6 +35,8 @@ class CWebClientSocket : public CAsyncSocket
 	};
 	std::map<CString, cookie_attribs> m_cookieattribs;
 
+	std::vector<NoInitByte> m_SnapShotData;
+
 	void Clear();
 	void Header();
 

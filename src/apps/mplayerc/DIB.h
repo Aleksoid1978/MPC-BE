@@ -21,81 +21,28 @@
 #pragma once
 
 #include <libpng/png.h>
+#include "WicUtils.h"
 
-static int GetEncoderClsid(CStringW format, CLSID* pClsid)
-{
-	using namespace Gdiplus;
-
-	UINT num = 0, size = 0;
-	GetImageEncodersSize(&num, &size);
-	if (size == 0) {
-		return -1;
-	}
-	ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)malloc(size);
-	GetImageEncoders(num, size, pImageCodecInfo);
-	for (UINT j = 0; j < num; j++) {
-		if (!wcscmp(pImageCodecInfo[j].MimeType, format)) {
-			*pClsid = pImageCodecInfo[j].Clsid;
-			free(pImageCodecInfo);
-			return j;
-		}
-	}
-	free(pImageCodecInfo);
-	return -1;
-}
-
-static void GdiplusConvert(Gdiplus::Bitmap* bm, CStringW fn, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
-{
-	using namespace Gdiplus;
-
-	CLSID encoderClsid = CLSID_NULL;
-	GetEncoderClsid(format, &encoderClsid);
-
-	EncoderParameters encoderParameters;
-	encoderParameters.Count = 1;
-	encoderParameters.Parameter[0].NumberOfValues = 1;
-	encoderParameters.Parameter[0].Value = &quality;
-	encoderParameters.Parameter[0].Guid = EncoderQuality;
-	encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
-
-	if (type) {
-		LARGE_INTEGER lOfs;
-		ULARGE_INTEGER lSize;
-		IStream *pS;
-		::CreateStreamOnHGlobal(0, 1, &pS);
-		bm->Save(pS, &encoderClsid, &encoderParameters);
-
-		lOfs.QuadPart = 0;
-		pS->Seek(lOfs, STREAM_SEEK_END, &lSize);
-
-		lOfs.QuadPart = 0;
-		pS->Seek(lOfs, STREAM_SEEK_SET, 0);
-
-		*pSize = (ULONG)((DWORD_PTR)lSize.QuadPart);
-		*pBuf = (BYTE*)malloc(*pSize);
-
-		pS->Read(*pBuf, (ULONG)*pSize, 0);
-		pS->Release();
-	} else {
-		bm->Save(fn, &encoderClsid, &encoderParameters);
-	}
-}
-
-static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
+static bool BMPDIB(LPCWSTR filename, BYTE* pData)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-	int bit = 24;
 	int width = bih->biWidth;
 	int height = abs(bih->biHeight);
 	int bpp = bih->biBitCount / 8;
-	int stride = (width * bit + 31) / 32 * bpp;
 	int sih = sizeof(BITMAPINFOHEADER);
+	BYTE *src = pData + sih;
+
+	int bit = 24;
+	int stride = (width * bit + 31) / 32 * bpp;
 	DWORD len = stride * height;
 
-	BYTE *src = pData + sih, *rgb = (BYTE*)malloc(len);
+	std::unique_ptr<BYTE[]> rgb(new(std::nothrow) BYTE[len]);
+	if (!rgb) {
+		return false;
+	}
 
-	BitBltFromRGBToRGB(width, height, rgb, stride, bit, src, width * bpp, bih->biBitCount);
+	BitBltFromRGBToRGB(width, height, rgb.get(), stride, bit, src, width * bpp, bih->biBitCount);
 
 	BITMAPFILEHEADER bfh;
 	bfh.bfType = 0x4d42;
@@ -105,55 +52,28 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 
 	BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
 
-	if (format == L"") {
-		FILE* fp;
-		if (_wfopen_s(&fp, fn, L"wb") == 0) {
-			fwrite(&bfh, sizeof(bfh), 1, fp);
-			fwrite(&bi.bmiHeader, sih, 1, fp);
-			fwrite(rgb, len, 1, fp);
-			fclose(fp);
-		}
-	} else {
-		HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, bfh.bfOffBits + len);
-		BYTE* lpBits = (BYTE*)::GlobalLock(hG);
+	FILE* fp;
+	if (_wfopen_s(&fp, filename, L"wb") == 0) {
+		fwrite(&bfh, sizeof(bfh), 1, fp);
+		fwrite(&bi.bmiHeader, sih, 1, fp);
+		fwrite(rgb.get(), len, 1, fp);
+		fclose(fp);
 
-		memcpy(lpBits, &bfh, sizeof(bfh));
-		memcpy(lpBits + sizeof(bfh), &bi.bmiHeader, sih);
-		memcpy(lpBits + bfh.bfOffBits, rgb, len);
-
-		IStream *s;
-		::CreateStreamOnHGlobal(hG, 1, &s);
-
-		using namespace Gdiplus;
-
-		ULONG_PTR gdiplusToken;
-		GdiplusStartupInput gdiplusStartupInput;
-		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
-		Bitmap *bm = new Bitmap(s);
-
-		GdiplusConvert(bm, fn, format, quality, type, pBuf, pSize);
-
-		delete bm;
-		GdiplusShutdown(gdiplusToken);
-
-		s->Release();
-		::GlobalUnlock(hG);
-		::GlobalFree(hG);
+		return true;
 	}
 
-	free(rgb);
-	return 1;
+	return false;
 }
 
-static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
+static bool PNGDIB(LPCWSTR filename, BYTE* pData, int level)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 	if (bih->biCompression != BI_RGB || bih->biWidth <= 0 || abs(bih->biHeight) == 0 || bih->biBitCount % 8) {
-		return;
+		return false;
 	}
 
 	FILE* fp;
-	if (_wfopen_s(&fp, fn, L"wb") == 0) {
+	if (_wfopen_s(&fp, filename, L"wb") == 0) {
 		const unsigned width = bih->biWidth;
 		const unsigned height = abs(bih->biHeight);
 		const int bit_depth = (bih->biBitCount == 48 || bih->biBitCount == 64) ? 16 : 8; // bits per channel
@@ -201,5 +121,52 @@ static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 		fclose(fp);
 		free(row_ptr);
 		png_destroy_write_struct(&png_ptr, &info_ptr);
+
+		return true;
 	}
+
+	return false;
+}
+
+static bool WICDIB(LPCWSTR filename, BYTE* pData, int quality, BYTE* output, size_t& outLen)
+{
+	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
+
+	const WICPixelFormatGUID format = (bih->biBitCount == 32) ? GUID_WICPixelFormat32bppBGR : GUID_WICPixelFormat24bppBGR;
+	const UINT pitch = bih->biWidth * bih->biBitCount / 8;
+	BYTE* src = pData + sizeof(BITMAPINFOHEADER) + bih->biClrUsed * 4;
+
+	if (bih->biHeight > 0) {
+		const UINT len = pitch * bih->biHeight;
+		BYTE* const data = new(std::nothrow) BYTE[len];
+		if (!data) {
+			return false;
+		}
+
+		src += len - pitch;
+		BYTE* dst = data;
+		UINT y = bih->biHeight;
+
+		while (y--) {
+			memcpy(dst, src, pitch);
+			src -= pitch;
+			dst += pitch;
+		}
+
+		src = data;
+	}
+
+	HRESULT hr = WicSaveImage(
+		src, pitch, 
+		bih->biWidth, abs(bih->biHeight),
+		format, quality,
+		filename,
+		output, outLen
+	);
+
+	if (bih->biHeight > 0) {
+		delete[] src;
+	}
+
+	return SUCCEEDED(hr);
 }

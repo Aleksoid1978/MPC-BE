@@ -408,6 +408,9 @@
     <ClCompile Include="vkCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WicUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -480,9 +483,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ColorControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DIB.h">
@@ -785,7 +785,7 @@
     <ClInclude Include="FilterEnum.h">
       <Filter>Graph</Filter>
     </ClInclude>
-    <ClInclude Include="WicUtis.h">
+    <ClInclude Include="WicUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

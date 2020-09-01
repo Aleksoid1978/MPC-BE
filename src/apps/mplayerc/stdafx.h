@@ -42,6 +42,7 @@
 #include "../../../include/stdafx_common_dshow.h"
 
 #include <algorithm>
+#include <memory>
 
  // Workaround compilation errors when including GDI+ with NOMINMAX defined
 namespace Gdiplus
