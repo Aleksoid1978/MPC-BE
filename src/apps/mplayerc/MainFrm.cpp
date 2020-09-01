@@ -6121,11 +6121,12 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 
 	const CString ext = GetFileExt(fn).MakeLower();
 	if (ext == L".bmp") {
-		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
+		BMPDIB(fn, pData);
 	} else if (ext == L".png") {
 		PNGDIB(fn, pData, std::clamp(s.iThumbLevelPNG, 1, 9));
-	} else if (ext == L".jpg") {
-		BMPDIB(fn, pData, L"image/jpeg", s.iThumbQuality, 0, 0, 0);
+	} else {
+		size_t dstLen = 0;
+		WICDIB(fn, pData, s.iThumbQuality, nullptr, dstLen);
 	}
 
 	CString fName(fn);

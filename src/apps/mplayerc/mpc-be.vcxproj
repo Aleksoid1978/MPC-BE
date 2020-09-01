@@ -205,6 +205,7 @@
     <ClCompile Include="vkCodes.cpp" />
     <ClCompile Include="WebClient.cpp" />
     <ClCompile Include="WebServer.cpp" />
+    <ClCompile Include="WicUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
@@ -232,7 +233,6 @@
     <ClInclude Include="filters\TextPassThruFilter.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="OpenImage.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerFlyBar.h" />
@@ -332,6 +332,7 @@
     <ClInclude Include="vkCodes.h" />
     <ClInclude Include="WebClient.h" />
     <ClInclude Include="WebServer.h" />
+    <ClInclude Include="WicUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\icon.ico">

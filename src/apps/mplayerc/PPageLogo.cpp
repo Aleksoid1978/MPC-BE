@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageLogo.h"
-#include "OpenImage.h"
+#include "WicUtils.h"
 
 // CPPageLogo dialog
 
@@ -119,8 +119,10 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_author.Empty();
 	m_logobm.Destroy();
 
-	if (m_logofn.GetLength()) {
-		m_logobm.Attach(OpenImage(m_logofn));
+	HBITMAP hBitmap = nullptr;
+	HRESULT hr = WicOpenImage(hBitmap, m_logofn.GetString());
+	if (SUCCEEDED(hr)) {
+		m_logobm.Attach(hBitmap);
 		if (m_logobm) {
 			m_logopreview.SetBitmap(m_logobm);
 		}

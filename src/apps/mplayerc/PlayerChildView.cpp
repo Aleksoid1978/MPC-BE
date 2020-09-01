@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerChildView.h"
-#include "OpenImage.h"
+#include "WicUtils.h"
 
 #include <cmath>
 
@@ -139,13 +139,13 @@ void CChildView::LoadLogo()
 	m_resizedImg.Destroy();
 
 	CString logoFName = L"logo";
-	HBITMAP hbm = nullptr;
+	HBITMAP hBitmap = nullptr;
 
-	if (m_logo.FileExists(logoFName) && (hbm = OpenImage(logoFName))) {
-		m_logo.Attach(hbm);
+	if (m_logo.FileExists(logoFName) && SUCCEEDED(WicOpenImage(hBitmap, logoFName.GetString()))) {
+		m_logo.Attach(hBitmap);
 	} else {
-		if (s.bLogoExternal && (hbm = OpenImage(s.strLogoFileName))) {
-			m_logo.Attach(hbm);
+		if (s.bLogoExternal && SUCCEEDED(WicOpenImage(hBitmap, s.strLogoFileName.GetString()))) {
+			m_logo.Attach(hBitmap);
 			if (m_logo) {
 				bHaveLogo = true;
 			}
