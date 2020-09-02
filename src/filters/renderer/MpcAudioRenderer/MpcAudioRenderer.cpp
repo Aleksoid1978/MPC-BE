@@ -2353,6 +2353,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	if (!m_bReleased) {
 		WasapiFlush();
+		m_rtLastQueuedSampleTimeEnd = 0;
 	}
 
 	auto GetAudioPosition = [&] {
@@ -2749,8 +2750,13 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 		if (!nWasapiQueueSize && m_filterState == State_Running && !bFlushing) {
 			const auto duration = SamplesToTime(numFramesAvailable, m_pWaveFormatExOutput);
-			m_rtNextRenderedSampleTime = m_rtLastReceivedSampleTimeEnd = std::max(m_rtNextRenderedSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + duration);
-			DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - internal buffer is empty, render silence to %I64d", m_rtNextRenderedSampleTime);
+			if (m_bDVDPlayback) {
+				m_rtLastQueuedSampleTimeEnd = std::max(m_rtLastQueuedSampleTimeEnd, m_pSyncClock->GetPrivateTime() - m_rtStartTime + duration);
+				DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - internal buffer is empty, render silence %.2f ms to %I64d", duration / 10000.0f, m_rtLastQueuedSampleTimeEnd);
+			} else {
+				m_rtNextRenderedSampleTime = m_rtLastReceivedSampleTimeEnd = std::max(m_rtNextRenderedSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + duration);
+				DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - internal buffer is empty, render silence  %.2f ms to %I64d", duration / 10000.0f, m_rtNextRenderedSampleTime);
+			}
 		}
 	} else {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1
@@ -2839,7 +2845,9 @@ void CMpcAudioRenderer::WasapiFlush()
 	m_WasapiQueue.RemoveAll();
 	m_CurrentPacket.Free();
 
-	m_rtLastQueuedSampleTimeEnd = 0;
+	if (!m_bDVDPlayback) {
+		m_rtLastQueuedSampleTimeEnd = 0;
+	}
 	m_nSampleOffset = 0;
 
 	CAutoLock cResamplerLock(&m_csResampler);
