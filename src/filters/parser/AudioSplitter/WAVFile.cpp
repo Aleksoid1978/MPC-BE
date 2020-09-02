@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -201,6 +201,15 @@ void CWAVFile::SetProperties(IBaseFilter* pBF)
 	if (m_ID3Tag) {
 		SetID3TagProperties(pBF, m_ID3Tag);
 	}
+
+	if (!m_chapters.empty()) {
+		if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+			pCB->ChapRemoveAll();
+			for (const auto& chap : m_chapters) {
+				pCB->ChapAppend(chap.rt, chap.name);
+			}
+		}
+	}
 }
 
 HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
@@ -265,6 +274,12 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		case FCC('id3 '):
 			ReadID3Tag(Chunk.size);
 			break;
+		case FCC('list'):
+			ReadADTLTag(Chunk.size);
+			break;
+		case FCC('cue '):
+			ReadCueTag(Chunk.size);
+			break;
 		default:
 			for (int i = 0; i < sizeof(Chunk.id); i++) {
 				BYTE ch = Chunk.data[i];
@@ -277,9 +292,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			// 'fact'
 			// 'JUNK'
 			// 'PAD '
-			// 'cue '
 			// 'plst'
-			// 'list' (contains 'labl', 'note' and 'ltxt' subchunks)
 			// 'PEAK'
 			// 'smpl'
 			// 'inst'
@@ -354,12 +367,11 @@ HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 	m_info.clear();
 	DWORD id = 0;
 
-	const __int64 chunk_pos = m_pFile->GetPos();
-
 	if (chunk_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('INFO')) {
 		return E_FAIL;
 	}
 
+	const __int64 chunk_pos = m_pFile->GetPos();
 	const __int64 end = chunk_pos + chunk_size;
 	chunk_t Chunk;
 
@@ -399,6 +411,81 @@ HRESULT CWAVFile::ReadID3Tag(const DWORD chunk_size)
 			m_ID3Tag = DNew CID3Tag(major, flags);
 			m_ID3Tag->ReadTagsV2(buf, size);
 			delete [] buf;
+
+			return S_OK;
+		}
+	}
+
+	return E_FAIL;
+}
+
+HRESULT CWAVFile::ReadADTLTag(const DWORD chunk_size)
+{
+	DWORD id = 0;
+
+	if (m_chapters.empty() || chunk_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('adtl')) {
+		return E_FAIL;
+	}
+
+	const __int64 chunk_pos = m_pFile->GetPos();
+	const __int64 end = chunk_pos + chunk_size;
+	chunk_t Chunk;
+
+	while (m_pFile->GetPos() + 8 < end && m_pFile->ByteRead(Chunk.data, sizeof(Chunk)) == S_OK && m_pFile->GetPos() + Chunk.size <= end) {
+		__int64 pos = m_pFile->GetPos();
+
+		if (Chunk.size >= 5 && Chunk.id == FCC('labl')) {
+			if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK) {
+				return S_FALSE;
+			}
+			CStringA value;
+			if (S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(Chunk.size - 4), Chunk.size - 4)) {
+				return S_FALSE;
+			}
+			m_pFile->Skip(m_pFile->GetPos() & 1);
+
+			for (auto& chap : m_chapters) {
+				if (chap.id == id) {
+					chap.name = UTF8ToWStr(value);
+				}
+			}
+		}
+
+		m_pFile->Seek(pos + Chunk.size);
+	}
+
+	return S_OK;
+}
+
+HRESULT CWAVFile::ReadCueTag(const DWORD chunk_size)
+{
+	if (!m_fmtdata || m_fmtsize < sizeof(WAVEFORMATEX)) {
+		return E_FAIL;
+	}
+
+	const auto wfe = (WAVEFORMATEX*)m_fmtdata;
+	if (chunk_size > 4 && wfe->nSamplesPerSec) {
+		const auto& samplerate = wfe->nSamplesPerSec;
+		unsigned cues;
+		if (m_pFile->ByteRead((BYTE*)&cues, 4) != S_OK) {
+			return S_FALSE;
+		}
+
+		if (chunk_size >= cues * 24UL + 4UL) {
+			for (unsigned i = 0; i < cues; i++) {
+				DWORD id;
+				if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK) {
+					return S_FALSE;
+				}
+				m_pFile->Skip(16);
+				DWORD offset;
+				if (m_pFile->ByteRead((BYTE*)&offset, 4) != S_OK) {
+					return S_FALSE;
+				}
+
+				const auto rt = llMulDiv(offset, UNITS, samplerate, 0);
+				m_chapters.push_back({ L"", rt, id });
+			}
 
 			return S_OK;
 		}

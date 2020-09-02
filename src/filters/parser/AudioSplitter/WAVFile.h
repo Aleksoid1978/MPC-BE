@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,9 +37,18 @@ protected:
 
 	std::map<DWORD, CStringA> m_info;
 
+	struct RiffChapters : public Chapters {
+		DWORD id = 0;
+	};
+	std::vector<RiffChapters> m_chapters;
+
 	bool ProcessWAVEFORMATEX();
 	HRESULT ReadRIFFINFO(const DWORD chunk_size);
 	HRESULT ReadID3Tag(const DWORD chunk_size);
+
+	HRESULT ReadADTLTag(const DWORD chunk_size);
+	HRESULT ReadCueTag(const DWORD chunk_size);
+
 	bool CheckDTSAC3CD();
 
 public:
