@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2019 see Authors.txt
+ * (C) 2015-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,6 +57,10 @@ namespace AudioDevices
 	{
 		if (deviceList) {
 			deviceList->clear();
+		}
+
+		if (devicesCount) {
+			*devicesCount = 0;
 		}
 
 		if (bIncludeDefault) {
