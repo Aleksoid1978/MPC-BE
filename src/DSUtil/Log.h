@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,10 @@
 #pragma once
 
 #include <mutex>
+
+//#define _DEBUG_LOGFILE // Allow output to the log file
+
+#ifdef _DEBUG_LOGFILE
 #include <Shlobj.h>
 
 static const CString GetLogFileName()
@@ -49,53 +53,45 @@ static const CString GetLocalTime()
 namespace Logger
 {
 	static std::mutex log_mutex;
-
 	static const CString logFileName = GetLogFileName();
 
-	inline void Log2File(LPCWSTR fmt, ...)
+	template<typename ... Args>
+	inline void Log2File(LPCWSTR fmt, Args ... args)
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, logFileName, L"a, ccs=UTF-8") == 0) {
-
-			va_list args;
-			va_start(args, fmt);
-			size_t len = _vscwprintf(fmt, args) + 1;
-			WCHAR* buff = DNew WCHAR[len];
-			vswprintf_s(buff, len, fmt, args);
-
-			fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buff);
-
-			delete [] buff;
-			va_end(args);
-
+			const auto size = _scwprintf(fmt, args ...) + 1;
+			if (size > 0) {
+				std::unique_ptr<wchar_t[]> buf(new(std::nothrow) wchar_t[size]);
+				if (buf) {
+					_snwprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
+					fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buf.get());
+				}
+			}
 			fclose(f);
 		}
 	}
 
-	inline void Log2File(LPCSTR fmt, ...)
+	template<typename ... Args>
+	inline void Log2File(LPCSTR fmt, Args ... args)
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, logFileName, L"a, ccs=UTF-8") == 0) {
-
-			va_list args;
-			va_start(args, fmt);
-			size_t len = _vscprintf(fmt, args) + 1;
-			CHAR* buff = DNew CHAR[len];
-			vsprintf_s(buff, len, fmt, args);
-
-			fwprintf_s(f, L"%s : %S\n", GetLocalTime(), buff);
-
-			delete [] buff;
-			va_end(args);
-
+			const auto size = _scprintf(fmt, args ...) + 1;
+			if (size > 0) {
+				std::unique_ptr<char[]> buf(new(std::nothrow) char[size]);
+				if (buf) {
+					_snprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
+					fwprintf_s(f, L"%s : %S\n", GetLocalTime(), buf.get());
+				}
+			}
 			fclose(f);
 		}
 	}
 }
-
-//#define _DEBUG_LOGFILE // Allow output to the log file
+#endif
 
 #ifndef DEBUG_OR_LOG
 	#if defined(_DEBUG_LOGFILE) || defined(_DEBUG)
@@ -117,7 +113,7 @@ namespace Logger
 	#define DLogError(...) __noop
 #endif
 
-inline void HexDump(CString fileName, BYTE* buf, int size)
+inline void HexDump(const CString& fileName, BYTE* buf, int size)
 {
 	if (size <= 0) {
 		return;
