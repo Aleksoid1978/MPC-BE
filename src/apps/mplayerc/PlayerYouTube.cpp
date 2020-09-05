@@ -28,8 +28,8 @@
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_USER_URL            L"youtube.com/user/"
+#define YOUTUBE_USER_SHORT_URL      L"youtube.com/c/"
 #define YOUTUBE_CHANNEL_URL         L"youtube.com/channel/"
-#define YOUTUBE_CHANNEL_SHORT_URL   L"youtube.com/c/"
 #define YOUTUBE_URL                 L"youtube.com/watch?"
 #define YOUTUBE_URL_A               L"www.youtube.com/attribution_link"
 #define YOUTUBE_URL_V               L"youtube.com/v/"
@@ -151,7 +151,7 @@ namespace Youtube
 
 	static void HandleURL(CString& url)
 	{
-		url = UrlDecode(CStringA(url));
+		url = UrlDecode(url);
 
 		int pos = url.Find(L"youtube.com/");
 		if (pos == -1) {
@@ -198,7 +198,7 @@ namespace Youtube
 		if (url.Find(YOUTUBE_PL_URL) != -1
 				|| url.Find(YOUTUBE_USER_URL) != -1
 				|| url.Find(YOUTUBE_CHANNEL_URL) != -1
-				|| url.Find(YOUTUBE_CHANNEL_SHORT_URL) != -1
+				|| url.Find(YOUTUBE_USER_SHORT_URL) != -1
 				|| (url.Find(YOUTUBE_URL) != -1 && url.Find(L"&list=") != -1)
 				|| (url.Find(YOUTUBE_URL_A) != -1 && url.Find(L"/watch_videos?video_ids") != -1)
 				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1 || url.Find(YOUTU_BE_URL) != -1) && url.Find(L"list=") != -1)) {
@@ -1165,10 +1165,9 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			HandleURL(url);
 
-			auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/c|/user)/([-a-zA-Z0-9_]+)");
+			auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/c|/user)/([^/]+)");
 			if (!channelId.IsEmpty()) {
-				if (channelId.Left(2) != L"UC") {
-					url.Format(L"https://www.youtube.com/user/%s", channelId);
+				if (url.Find(YOUTUBE_CHANNEL_URL) == -1) {
 					DLog(L"Youtube::Parse_Playlist() : downloading user page '%s'", url);
 
 					urlData data;
