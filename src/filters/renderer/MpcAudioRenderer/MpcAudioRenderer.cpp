@@ -998,7 +998,7 @@ STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* p
 		*plcid = 0;
 	}
 	if (pdwGroup) {
-		*pdwGroup = 0;
+		*pdwGroup = 0xFF;
 	}
 	if (ppObject) {
 		*ppObject = nullptr;
