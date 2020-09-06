@@ -3079,11 +3079,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 		hr = m_pME->FreeEventParams(evCode, evParam1, evParam2);
 
 		switch (evCode) {
-			case EC_COMPLETE:
-				if (!GraphEventComplete()) {
-					return hr;
-				}
-				break;
 			case EC_ERRORABORT:
 				DLog(L"OnGraphNotify: EC_ERRORABORT -> hr = %08x", (HRESULT)evParam1);
 				break;
@@ -3092,6 +3087,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 				m_fBuffering = ((HRESULT)evParam1 != S_OK);
 				break;
+			case EC_COMPLETE:
+				if (!GraphEventComplete()) {
+					return hr;
+				}
+				// no break here. need to reset m_fFrameSteppingActive
 			case EC_STEP_COMPLETE:
 				if (m_fFrameSteppingActive) {
 					m_nStepForwardCount++;
