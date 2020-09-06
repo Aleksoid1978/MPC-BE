@@ -3091,7 +3091,8 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				if (!GraphEventComplete()) {
 					return hr;
 				}
-				// no break here. need to reset m_fFrameSteppingActive
+				// No break here. Need to check and reset m_fFrameSteppingActive.
+				// This is necessary in cases where the video ends earlier than other tracks.
 			case EC_STEP_COMPLETE:
 				if (m_fFrameSteppingActive) {
 					m_nStepForwardCount++;
