@@ -6365,9 +6365,9 @@ void CMainFrame::OnFileSaveImage()
 		s.strSnapShotExt = L".png";
 	}
 
-	s.iThumbQuality      = std::clamp(fd.m_quality, 10, 100);
-	s.iThumbLevelPNG     = std::clamp(fd.m_levelPNG, 1, 9);
-	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;
+	s.iThumbQuality      = std::clamp(fd.m_JpegQuality, 70, 100);
+	s.iThumbLevelPNG     = std::clamp(fd.m_PngCompression, 1, 9);
+	s.bSnapShotSubtitles = fd.m_bDrawSubtitles;
 
 	CString pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
@@ -6462,9 +6462,9 @@ void CMainFrame::OnFileSaveThumbnails()
 	s.iThumbRows         = std::clamp(fd.m_rows, 1, 20);
 	s.iThumbCols         = std::clamp(fd.m_cols, 1, 10);
 	s.iThumbWidth        = std::clamp(fd.m_width, APP_THUMBWIDTH_MIN, APP_THUMBWIDTH_MAX);
-	s.iThumbQuality      = std::clamp(fd.m_quality, 10, 100);
-	s.iThumbLevelPNG     = std::clamp(fd.m_levelPNG, 1, 9);
-	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;
+	s.iThumbQuality      = std::clamp(fd.m_JpegQuality, 70, 100);
+	s.iThumbLevelPNG     = std::clamp(fd.m_PngCompression, 1, 9);
+	s.bSnapShotSubtitles = fd.m_bDrawSubtitles;
 
 	CString pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
