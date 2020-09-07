@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,14 +35,14 @@ public:
 	~CSaveImageDialog() = default;
 
 protected:
-	virtual BOOL OnInitDialog();
-	virtual BOOL OnFileNameOK();
-	virtual void OnTypeChange();
+	virtual BOOL OnInitDialog() override;
+	virtual BOOL OnFileNameOK() override;
+	virtual void OnTypeChange() override;
 
 public:
-	int m_quality, m_levelPNG;
-	bool m_bSnapShotSubtitles;
-	CSpinButtonCtrl m_qualityctrl;
+	int  m_JpegQuality;
+	int  m_PngCompression;
+	bool m_bDrawSubtitles;
 };
 
 // CSaveThumbnailsDialog
@@ -53,15 +53,18 @@ class CSaveThumbnailsDialog : public CSaveImageDialog
 
 public:
 	CSaveThumbnailsDialog(
-		const int rows, const int cols, const int width, const int quality, const int levelPNG, const bool bSnapShotSubtitles, bool bSubtitlesEnabled,
+		const int rows, const int cols, const int width,
+		const int quality, const int levelPNG,
+		const bool bSnapShotSubtitles, bool bSubtitlesEnabled,
 		LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 		LPCWSTR lpszFilter, CWnd* pParentWnd);
 	~CSaveThumbnailsDialog() = default;
 
 protected:
-	virtual BOOL OnFileNameOK();
+	virtual BOOL OnFileNameOK() override;
 
 public:
-	int m_rows, m_cols, m_width;
-	CSpinButtonCtrl m_rowsctrl, m_colsctrl, m_widthctrl;
+	int m_rows;
+	int m_cols;
+	int m_width;
 };

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,32 +26,33 @@
 
 IMPLEMENT_DYNAMIC(CSaveImageDialog, CFileDialog)
 CSaveImageDialog::CSaveImageDialog(
-	const int quality, const int levelPNG, const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
+	const int quality, const int levelPNG,
+	const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName,
 				  OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 				  lpszFilter, pParentWnd)
-	, m_quality(quality)
-	, m_levelPNG(levelPNG)
-	, m_bSnapShotSubtitles(bSnapShotSubtitles)
+	, m_JpegQuality(std::clamp(quality, 70, 100))
+	, m_PngCompression(std::clamp(levelPNG, 1, 9))
+	, m_bDrawSubtitles(bSnapShotSubtitles)
 {
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
 		CString str;
 
-		pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
+		pfdc->StartVisualGroup(IDS_AG_OPTIONS, ResStr(IDS_AG_OPTIONS));
 		pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
-		str.Format(L"%d", std::clamp(m_quality, 70, 100));
+		str.Format(L"%d", m_JpegQuality);
 		pfdc->AddEditBox(IDC_EDIT1, str);
 
 		pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
-		str.Format(L"%d", std::clamp(m_levelPNG, 1, 9));
+		str.Format(L"%d", m_PngCompression);
 		pfdc->AddEditBox(IDC_EDIT5, str);
 		pfdc->EndVisualGroup();
 
 		if (bSubtitlesEnabled) {
-			pfdc->AddCheckButton(IDS_SNAPSHOT_SUBTITLES, ResStr(IDS_SNAPSHOT_SUBTITLES), m_bSnapShotSubtitles);
+			pfdc->AddCheckButton(IDS_SNAPSHOT_SUBTITLES, ResStr(IDS_SNAPSHOT_SUBTITLES), m_bDrawSubtitles);
 		}
 
 		pfdc->Release();
@@ -74,23 +75,23 @@ BOOL CSaveImageDialog::OnFileNameOK()
 		WCHAR* result;
 
 		pfdc->GetEditBoxText(IDC_EDIT1, &result);
-		m_quality = _wtoi(result);
+		m_JpegQuality = _wtoi(result);
 		CoTaskMemFree(result);
 
 		pfdc->GetEditBoxText(IDC_EDIT5, &result);
-		m_levelPNG = _wtoi(result);
+		m_PngCompression = _wtoi(result);
 		CoTaskMemFree(result);
 
 		BOOL bChecked;
 		if (SUCCEEDED(pfdc->GetCheckButtonState(IDS_SNAPSHOT_SUBTITLES, &bChecked))) {
-			m_bSnapShotSubtitles = !!bChecked;
+			m_bDrawSubtitles = !!bChecked;
 		}
 
 		pfdc->Release();
 	}
 
-	m_levelPNG = std::clamp(m_levelPNG, 1, 9);
-	m_quality = std::clamp(m_quality, 70, 100);
+	m_JpegQuality = std::clamp(m_JpegQuality, 70, 100);
+	m_PngCompression = std::clamp(m_PngCompression, 1, 9);
 
 	return __super::OnFileNameOK();
 }
@@ -103,7 +104,7 @@ void CSaveImageDialog::OnTypeChange()
 	if (pfdc) {
 		switch (m_pOFN->nFilterIndex) {
 			case 1:
-				pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_INACTIVE);
+				pfdc->SetControlState(IDS_AG_OPTIONS, CDCS_INACTIVE);
 				pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
 				pfdc->SetControlState(IDC_EDIT1, CDCS_INACTIVE);
 
@@ -111,7 +112,7 @@ void CSaveImageDialog::OnTypeChange()
 				pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
 				break;
 			case 2:
-				pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDS_AG_OPTIONS, CDCS_ENABLEDVISIBLE);
 				pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_ENABLEDVISIBLE);
 				pfdc->SetControlState(IDC_EDIT1, CDCS_ENABLEDVISIBLE);
 
@@ -119,7 +120,7 @@ void CSaveImageDialog::OnTypeChange()
 				pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
 				break;
 			case 3:
-				pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDS_AG_OPTIONS, CDCS_ENABLEDVISIBLE);
 				pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
 				pfdc->SetControlState(IDC_EDIT1, CDCS_INACTIVE);
 
@@ -138,7 +139,9 @@ void CSaveImageDialog::OnTypeChange()
 
 IMPLEMENT_DYNAMIC(CSaveThumbnailsDialog, CSaveImageDialog)
 CSaveThumbnailsDialog::CSaveThumbnailsDialog(
-	const int rows, const int cols, const int width, const int quality, const int levelPNG, const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
+	const int rows, const int cols, const int width,
+	const int quality, const int levelPNG,
+	const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CSaveImageDialog(quality, levelPNG, bSnapShotSubtitles, bSubtitlesEnabled,
