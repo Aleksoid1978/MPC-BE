@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2019 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,16 +37,18 @@ protected:
 	int             m_buffersize;
 	int             m_framesize;
 
+	void StreamFinish();
+
 public:
 	CAC3Encoder();
+	~CAC3Encoder();
 
 	bool    Init(int sample_rate, DWORD channel_layout);
 	HRESULT Encode(std::vector<float>& BuffIn, std::vector<BYTE>& BuffOut);
 	void    FlushBuffers();
-	void    StreamFinish();
 
 	DWORD   SelectLayout(DWORD layout);
 	DWORD   SelectSamplerate(DWORD samplerate);
 
-	bool OK() { return (m_pAVCtx != nullptr); }
+	bool OK() const { return (m_pAVCtx != nullptr); }
 };

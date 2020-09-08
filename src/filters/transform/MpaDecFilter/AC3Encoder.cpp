@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,6 +49,11 @@ CAC3Encoder::CAC3Encoder()
 #endif
 
 	m_pAVCodec = avcodec_find_encoder(AV_CODEC_ID_AC3); // AC-3
+}
+
+CAC3Encoder::~CAC3Encoder()
+{
+	StreamFinish();
 }
 
 bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
