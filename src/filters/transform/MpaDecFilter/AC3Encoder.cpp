@@ -79,6 +79,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	}
 	m_pFrame->nb_samples     = m_pAVCtx->frame_size;
 	m_pFrame->format         = m_pAVCtx->sample_fmt;
+	m_pFrame->channels       = m_pAVCtx->channels;
 	m_pFrame->channel_layout = m_pAVCtx->channel_layout;
 
 	// the codec gives us the frame size, in samples,
