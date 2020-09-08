@@ -84,7 +84,6 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	}
 	m_pFrame->nb_samples     = m_pAVCtx->frame_size;
 	m_pFrame->format         = m_pAVCtx->sample_fmt;
-	m_pFrame->channels       = m_pAVCtx->channels;
 	m_pFrame->channel_layout = m_pAVCtx->channel_layout;
 
 	// the codec gives us the frame size, in samples,
@@ -98,6 +97,11 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 		return false;
 	}
 	/* setup the data pointers in the AVFrame */
+	ret = av_frame_get_buffer(m_pFrame, 0);
+	if (ret < 0) {
+		DLog(L"CAC3Encoder::Init() : av_frame_get_buffer() failed");
+		return false;
+	}
 	ret = avcodec_fill_audio_frame(m_pFrame, m_pAVCtx->channels, m_pAVCtx->sample_fmt, (const uint8_t*)m_pSamples, m_buffersize, 0);
 	if (ret < 0) {
 		DLog(L"CAC3Encoder::Init() : avcodec_fill_audio_frame() failed");
