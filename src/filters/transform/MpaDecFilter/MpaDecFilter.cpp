@@ -2481,6 +2481,9 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
 			m_FFAudioDec.StreamFinish();
 		}
+		if (m_AC3Enc.OK()) {
+			m_AC3Enc.StreamFinish();
+		}
 
 		enum AVCodecID nCodecId = FindCodec(pmt->subtype);
 		if (nCodecId != AV_CODEC_ID_NONE) {

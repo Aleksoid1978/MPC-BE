@@ -37,8 +37,6 @@ protected:
 	int             m_buffersize;
 	int             m_framesize;
 
-	void StreamFinish();
-
 public:
 	CAC3Encoder();
 	~CAC3Encoder();
@@ -46,6 +44,7 @@ public:
 	bool    Init(int sample_rate, DWORD channel_layout);
 	HRESULT Encode(std::vector<float>& BuffIn, std::vector<BYTE>& BuffOut);
 	void    FlushBuffers();
+	void    StreamFinish();
 
 	DWORD   SelectLayout(DWORD layout);
 	DWORD   SelectSamplerate(DWORD samplerate);
