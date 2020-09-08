@@ -308,13 +308,21 @@ HRESULT WicSaveImage(
 	}
 	if (SUCCEEDED(hr)) {
 		if (containerFormat == GUID_ContainerFormatJpeg) {
-			PROPBAG2 Property = {};
-			Property.pstrName = L"ImageQuality";
-			VARIANT vQuality;
-			VariantInit(&vQuality);
-			vQuality.vt = VT_R4;
-			vQuality.fltVal = quality / 100.0f;
-			hr = pPropertyBag2->Write(1, &Property, &vQuality);
+			PROPBAG2 option = {};
+			option.pstrName = L"ImageQuality";
+			VARIANT varValue;
+			VariantInit(&varValue);
+			varValue.vt = VT_R4;
+			varValue.fltVal = quality / 100.0f;
+			hr = pPropertyBag2->Write(1, &option, &varValue);
+#if 0
+			if (1/*jpegSubsamplingOff*/) {
+				option.pstrName = L"JpegYCrCbSubsampling";
+				varValue.vt = VT_UI1;
+				varValue.bVal = WICJpegYCrCbSubsampling444;
+				hr = pPropertyBag2->Write(1, &option, &varValue);
+			}
+#endif
 		}
 		hr = pFrame->Initialize(pPropertyBag2);
 	}
