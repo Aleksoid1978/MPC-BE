@@ -488,6 +488,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	if (m_bNeedBitstreamCheck) {
 		m_bNeedBitstreamCheck = FALSE;
+		m_bSPDIFForce48K = false;
 
 		const auto wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
 
@@ -534,6 +535,10 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 					if (!m_bBitstreamSupported[SPDIF] && m_CodecId != AV_CODEC_ID_AC3 && m_CodecId != AV_CODEC_ID_DTS && wfe->nChannels > 2) {
 						mtCheck = CreateMediaTypeSPDIF(wfe->nSamplesPerSec);
 						m_bBitstreamSupported[SPDIF] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+						if (!m_bBitstreamSupported[SPDIF] && wfe->nSamplesPerSec % 11025 == 0) {
+							mtCheck = CreateMediaTypeSPDIF(48000);
+							m_bSPDIFForce48K = m_bBitstreamSupported[SPDIF] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+						}
 					}
 
 					pPinRenderer->QueryAccept(&mtRenderer);
@@ -2045,7 +2050,7 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, const size_t size, REFERENCE_TIME 
 {
 	DWORD new_layout     = m_AC3Enc.SelectLayout(dwChannelMask);
 	WORD  new_channels   = av_popcount(new_layout);
-	DWORD new_samplerate = m_AC3Enc.SelectSamplerate(nSamplesPerSec);
+	DWORD new_samplerate = m_bSPDIFForce48K ? 48000 : m_AC3Enc.SelectSamplerate(nSamplesPerSec);
 
 	if (!m_AC3Enc.OK()) {
 		m_AC3Enc.Init(new_samplerate, new_layout);
