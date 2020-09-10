@@ -161,17 +161,20 @@ HRESULT CMpaSplitterFile::Init()
 	__int64 startpos = m_startpos;
 
 	const __int64 limit = IsRandomAccess() && !IsURL() ? MEGABYTE : 64 * KILOBYTE;
-	const __int64 size = std::min(endpos - m_startpos, limit);
-	BYTE* buffer = DNew BYTE[size];
+	const __int64 size = IsRandomAccess() ? std::min(endpos - m_startpos, limit) : limit;
+	std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[size]);
+	if (!buffer) {
+		return E_FAIL;
+	}
 
 	int valid_cnt = 0;
-	if (S_OK == ByteRead(buffer, size)) {
-		BYTE* start     = buffer;
+	if (S_OK == ByteRead(buffer.get(), size)) {
+		BYTE* start     = buffer.get();
 		const BYTE* end = start + size;
 		while (m_mode != mode::mpa) {
 			MOVE_TO_MPA_START_CODE(start, end);
 			if (start < end - MPA_HEADER_SIZE) {
-				startpos = m_startpos + (start - buffer);
+				startpos = m_startpos + (start - buffer.get());
 				int frame_size = ParseMPAHeader(start);
 				if (frame_size == 0) {
 					start++;
@@ -208,12 +211,12 @@ HRESULT CMpaSplitterFile::Init()
 		}
 
 		if (m_mode == mode::none) {
-			BYTE* start     = buffer;
+			BYTE* start     = buffer.get();
 			const BYTE* end = start + size;
 			while (m_mode != mode::mp4a) {
 				MOVE_TO_AAC_START_CODE(start, end);
 				if (start < end - ADTS_HEADER_SIZE) {
-					startpos = m_startpos + (start - buffer);
+					startpos = m_startpos + (start - buffer.get());
 					int frame_size = ParseADTSAACHeader(start);
 					if (frame_size == 0) {
 						start++;
@@ -250,8 +253,6 @@ HRESULT CMpaSplitterFile::Init()
 			}
 		}
 	}
-
-	delete [] buffer;
 
 	if (m_mode == mode::none) {
 		return E_FAIL;
