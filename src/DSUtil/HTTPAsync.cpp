@@ -166,7 +166,7 @@ static CString FormatErrorMessage(DWORD dwError)
 { \
 	const DWORD dwError = GetLastError(); \
 	if (dwError != ERROR_IO_PENDING) { \
-		DLog(L"CHTTPAsync() error : Function '%s' failed with error %d - '%s', line %i", CString(lpszFunction), dwError, FormatErrorMessage(dwError), __LINE__); \
+		DLog(L"CHTTPAsync() error : Function '%s' failed with error %d - '%s', line %i", lpszFunction, dwError, FormatErrorMessage(dwError).GetString(), __LINE__); \
 		return (ret); \
 	} \
 } \
@@ -384,30 +384,42 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 		return S_FALSE;
 	}
 
-	INTERNET_BUFFERS InetBuff = { sizeof(InetBuff) };
-	InetBuff.lpvBuffer        = pBuffer;
-	InetBuff.dwBufferLength   = dwSizeToRead;
-
 	m_context = Context::CONTEXT_REQUEST;
 
-	if (!InternetReadFileExW(m_hRequest,
-							 &InetBuff,
-							 IRF_ASYNC,
-							 (DWORD_PTR)this)) {
-		CheckLastError(L"InternetReadFileExW()", E_FAIL);
+	DWORD _dwSizeRead = 0;
+	DWORD _dwSizeToRead = dwSizeToRead;
 
-		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DLog(L"CHTTPAsync::Read() : InternetReadFileExW() - %u ms time out reached, exit", dwTimeOut);
-			m_bRequestComplete = FALSE;
-			return S_FALSE;
+	while (_dwSizeToRead) {
+		INTERNET_BUFFERS InetBuff = { sizeof(InetBuff) };
+		InetBuff.lpvBuffer = &pBuffer[_dwSizeRead];
+		InetBuff.dwBufferLength = _dwSizeToRead;
+
+		if (!InternetReadFileExW(m_hRequest,
+			&InetBuff,
+			IRF_ASYNC,
+			(DWORD_PTR)this)) {
+			CheckLastError(L"InternetReadFileExW()", E_FAIL);
+
+			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
+				DLog(L"CHTTPAsync::Read() : InternetReadFileExW() - %u ms time out reached, exit", dwTimeOut);
+				m_bRequestComplete = FALSE;
+				return S_FALSE;
+			}
 		}
-	}
+
+		if (!InetBuff.dwBufferLength) {
+			break;
+		}
+
+		_dwSizeRead += InetBuff.dwBufferLength;
+		_dwSizeToRead -= InetBuff.dwBufferLength;
+	};
 
 	if (dwSizeRead) {
-		*dwSizeRead = InetBuff.dwBufferLength;
+		*dwSizeRead = _dwSizeRead;
 	}
 
-	return InetBuff.dwBufferLength ? S_OK : S_FALSE;
+	return _dwSizeRead ? S_OK : S_FALSE;
 }
 
 CString CHTTPAsync::GetHeader() const
