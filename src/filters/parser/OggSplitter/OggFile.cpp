@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,7 +51,7 @@ bool COggFile::Sync(HANDLE hBreak)
 	__int64 start = GetPos();
 
 	DWORD dw;
-	for (__int64 i = 0, j = hBreak ? GetLength() - start : MAX_PAGE_SIZE;
+	for (__int64 i = 0, j = (hBreak && IsRandomAccess()) ? GetLength() - start : MAX_PAGE_SIZE;
 			i < j && S_OK == ByteRead((BYTE*)&dw, sizeof(dw))
 			&& ((i&0xffff) || !hBreak || WaitForSingleObject(hBreak, 0) != WAIT_OBJECT_0);
 			i++, Seek(start + i)) {
