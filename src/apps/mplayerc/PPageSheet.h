@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,8 +20,6 @@
  */
 
 #pragma once
-
-#define ENABLE_WINDOWSIZE_PAGE 1
 
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
@@ -44,9 +42,7 @@
 #include "PPageSubStyle.h"
 #include "PPageSubRend.h"
 #include "PPageInterface.h"
-#if ENABLE_WINDOWSIZE_PAGE
 #include "PPageWindowSize.h"
-#endif
 #include "PPageMisc.h"
 #include "PPageCapture.h"
 #include <TreePropSheet/TreePropSheet.h>
@@ -80,9 +76,7 @@ private:
 	CPPageAccelTbl        m_acceltbl;
 	CPPageLogo            m_logo;
 	CPPageInterface       m_interface;
-#if ENABLE_WINDOWSIZE_PAGE
 	CPPageWindowSize      m_windowsize;
-#endif
 	CPPageWebServer       m_webserver;
 	CPPagePlayback        m_playback;
 	CPPageDVD             m_dvd;

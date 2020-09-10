@@ -49,9 +49,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	AddPage(&m_acceltbl);
 	AddPage(&m_logo);
 	AddPage(&m_interface);
-#if ENABLE_WINDOWSIZE_PAGE
 	AddPage(&m_windowsize);
-#endif
 	AddPage(&m_webserver);
 	AddPage(&m_playback);
 	AddPage(&m_dvd);
