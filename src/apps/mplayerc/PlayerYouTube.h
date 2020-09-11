@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <vector>
 #include "../../DSUtil/CUE.h"
 
 namespace Youtube

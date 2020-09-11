@@ -43,6 +43,10 @@
 
 #include <algorithm>
 #include <memory>
+#include <vector>
+#include <list>
+#include <map>
+#include <regex>
 
  // Workaround compilation errors when including GDI+ with NOMINMAX defined
 namespace Gdiplus
