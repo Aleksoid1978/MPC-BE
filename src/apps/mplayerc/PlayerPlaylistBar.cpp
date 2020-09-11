@@ -22,9 +22,7 @@
 #include "stdafx.h"
 #include <atlpath.h>
 #include <IntShCut.h>
-#include <algorithm>
 #include <random>
-#include <regex>
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"

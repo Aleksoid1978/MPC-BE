@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include <list>
-#include <map>
 #include "SettingsDefines.h"
+#include "FakeFilterMapper2.h"
 #include "FilterEnum.h"
 #include "../../filters/renderer/VideoRenderers/RenderersSettings.h"
 #include "../../Subtitles/STS.h"

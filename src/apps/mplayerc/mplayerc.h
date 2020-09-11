@@ -27,13 +27,9 @@
 
 #include <afxadv.h>
 #include <atlsync.h>
-#include <ShlObj.h>
 #include "../../DSUtil/Profile.h"
-#include "FakeFilterMapper2.h"
 #include "AppSettings.h"
-#include "../../../Include/Version.h"
 
-#include <map>
 #include <mutex>
 
 #define DEF_LOGO IDF_LOGO1

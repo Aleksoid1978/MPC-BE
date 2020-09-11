@@ -25,7 +25,6 @@
 #include "PlayerListCtrl.h"
 #include "controls/ColorEdit.h"
 #include "../../DSUtil/CUE.h"
-#include <vector>
 
 typedef std::vector<Chapters> ChaptersList;
 class CFileItem

@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include <atlutil.h>
-#include <regex>
 #include "Content.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/HTTPAsync.h"
