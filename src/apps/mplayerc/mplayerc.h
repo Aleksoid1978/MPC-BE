@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,6 @@
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"
 #include <afxadv.h>
 #include <atlsync.h>
 #include <ShlObj.h>
