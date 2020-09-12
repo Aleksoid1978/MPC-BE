@@ -1,5 +1,5 @@
 /*
- * (C) 2007-2017 see Authors.txt
+ * (C) 2007-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,5 +29,9 @@
 #include <evr.h>
 #include <mfapi.h>
 #include <Mferror.h>
+
 #include <algorithm>
 #include <vector>
+#include <list>
+#include <deque>
+#include <map>

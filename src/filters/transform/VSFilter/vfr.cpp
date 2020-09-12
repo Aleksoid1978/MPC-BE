@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,6 @@
 #include "vfr.h"
 #include <stdio.h>
 #include <string.h>
-#include <vector>
 
 // Work with seconds per frame (spf) here instead of fps since that's more natural for the translation we're doing
 

@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <map>
-
 #include <IMediaSideData.h>
 
 struct SideDataGUIDComparer
