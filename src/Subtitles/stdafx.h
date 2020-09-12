@@ -34,7 +34,13 @@
 #include <afxwin.h>			// MFC core and standard components
 
 #include <BaseClasses/streams.h>
-#include <algorithm>
+
 #include <cmath>
+#include <algorithm>
+#include <memory>
+#include <vector>
+#include <list>
+#include <map>
+#include <string>
 
 #include "../DSUtil/DSUtil.h"
