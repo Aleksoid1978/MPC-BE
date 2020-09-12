@@ -83,7 +83,6 @@
 #include "MultiMonitor.h"
 
 #include <random>
-#include <string>
 
 #include "ThumbsTaskDlg.h"
 #include "Content.h"

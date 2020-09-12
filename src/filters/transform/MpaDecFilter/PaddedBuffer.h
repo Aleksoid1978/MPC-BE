@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #pragma once
 
 #include <basestruct.h>
-#include <vector>
 
 // A dynamic buffer with a guaranteed padded block at the end and no member initialization.
 class CPaddedBuffer

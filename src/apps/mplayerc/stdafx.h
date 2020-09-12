@@ -46,6 +46,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <string>
 #include <regex>
 
  // Workaround compilation errors when including GDI+ with NOMINMAX defined

@@ -26,7 +26,6 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include <psapi.h>
-#include <string>
 #include <atlimage.h>
 #include <HighDPI.h>
 

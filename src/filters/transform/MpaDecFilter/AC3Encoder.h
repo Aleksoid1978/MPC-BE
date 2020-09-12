@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <vector>
-
 struct AVCodec;
 struct AVCodecContext;
 struct AVFrame;

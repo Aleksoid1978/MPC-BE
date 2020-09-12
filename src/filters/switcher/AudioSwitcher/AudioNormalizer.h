@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,6 @@
  */
 
 #pragma once
-
-#include <vector>
 
 class CAudioNormalizer
 {

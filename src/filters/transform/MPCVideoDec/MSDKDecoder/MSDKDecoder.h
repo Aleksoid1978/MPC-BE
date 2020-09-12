@@ -27,9 +27,6 @@
 #include "./include/mfxmvc.h"
 #include "growarray.h"
 
-#include <deque>
-#include <vector>
-
 #define ASYNC_DEPTH 8
 #define ASYNC_QUEUE_SIZE (ASYNC_DEPTH + 2)
 

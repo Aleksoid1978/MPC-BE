@@ -34,7 +34,6 @@
 #include "Version.h"
 #include <moreuuids.h>
 #include <basestruct.h>
-#include <vector>
 
 #include <ffmpeg/libavcodec/avcodec.h>
 #include "AudioDecoders.h"
