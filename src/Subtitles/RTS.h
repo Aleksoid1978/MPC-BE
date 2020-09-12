@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
 #include <mutex>
 #include "STS.h"
 #include "Rasterizer.h"

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <vector>
 #include "RealTextParser.h"
 
 using std::vector;
