@@ -28,14 +28,13 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/UrlParser.h"
 
+#define RAPIDJSON_SSE2
+#include <rapidjson/include/rapidjson/document.h>
+
 #define MAXSTORESIZE  2 * MEGABYTE // The maximum size of a buffer for storing the received information is 2 Mb
 #define MAXBUFSIZE   16 * KILOBYTE // The maximum packet size is 16 Kb
 
 // CUDPStream
-
-CUDPStream::CUDPStream()
-{
-}
 
 CUDPStream::~CUDPStream()
 {
@@ -80,6 +79,95 @@ void CUDPStream::Append(const BYTE* buff, UINT len)
 	if (m_SizeComplete && m_len >= m_SizeComplete) {
 		m_EventComplete.Set();
 	}
+}
+
+static CString ConvertStr(LPCSTR s)
+{
+	CString str = AltUTF8ToWStr(s);
+	if (str.IsEmpty()) {
+		str = ConvertToWStr(s, CP_ACP);
+	}
+
+	return str;
+}
+
+HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
+{
+	if (m_protocol == protocol::PR_HTTP) {
+		if (m_icydata.metaint == 0) {
+			return m_HTTPAsync.Read(pBuffer, dwSizeToRead, dwSizeRead, dwTimeOut);
+		}
+
+		if (m_nBytesRead + dwSizeToRead > m_icydata.metaint) {
+			dwSizeToRead = m_icydata.metaint - m_nBytesRead;
+		}
+
+		HRESULT hr = m_HTTPAsync.Read(pBuffer, dwSizeToRead, dwSizeRead, dwTimeOut);
+		EXIT_ON_ERROR(hr);
+
+		if ((m_nBytesRead += *dwSizeRead) == m_icydata.metaint) {
+			m_nBytesRead = 0;
+
+			static BYTE buff[255 * 16], b = 0;
+			ZeroMemory(buff, sizeof(buff));
+
+			DWORD _dwSizeRead = 0;
+			if (S_OK == m_HTTPAsync.Read(&b, 1, &_dwSizeRead) && _dwSizeRead == 1 && b) {
+				if (S_OK == m_HTTPAsync.Read(buff, b * 16, &_dwSizeRead) && _dwSizeRead == b * 16) {
+					CString str = ConvertStr((LPCSTR)buff);
+
+					DbgLog((LOG_TRACE, 3, L"CUDPStream::HTTPRead(): Metainfo: %s", str));
+
+					int i = str.Find(L"StreamTitle='");
+					if (i >= 0) {
+						i += 13;
+						int j = str.Find(L"';", i);
+						if (!j) {
+							j = str.ReverseFind('\'');
+						}
+						if (j > i) {
+							m_icydata.name = str.Mid(i, j - i);
+
+							// special code for 101.ru - it's use json format in MetaInfo
+							if (!m_icydata.name.IsEmpty() && m_icydata.name.Left(1) == L"{") {
+								CString tmp(m_icydata.name);
+								const auto pos = tmp.ReverseFind(L'}');
+								if (pos > 0) {
+									tmp.Delete(pos + 1, tmp.GetLength() - pos);
+
+									rapidjson::GenericDocument<rapidjson::UTF16<>> d;
+									if (!d.Parse(tmp.GetString()).HasParseError()) {
+										m_icydata.name = (d.HasMember(L"t") && d[L"t"].IsString()) ? d[L"t"].GetString() : ((d.HasMember(L"title") && d[L"title"].IsString()) ? d[L"title"].GetString() : m_icydata.name);
+									}
+								}
+							}
+						}
+					} else {
+						DbgLog((LOG_TRACE, 3, L"CUDPStream::HTTPRead(): StreamTitle is missing"));
+					}
+
+					i = str.Find(L"StreamUrl='");
+					if (i >= 0) {
+						i += 11;
+						int j = str.Find(L"';", i);
+						if (!j) {
+							j = str.ReverseFind('\'');
+						}
+						if (j > i) {
+							str = str.Mid(i, j - i);
+							if (!str.IsEmpty()) {
+								m_icydata.url = str;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return S_OK;
+	}
+
+	return E_FAIL;
 }
 
 static void GetType(BYTE* buf, int size, GUID& subtype)
@@ -212,8 +300,45 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = protocol::PR_HTTP;
 		BOOL bConnected = FALSE;
-		if (m_HTTPAsync.Connect(m_url_str, 10000) == S_OK
+		if (m_HTTPAsync.Connect(m_url_str, 10000, L"Icy-MetaData:1\r\n") == S_OK
 				&& !m_HTTPAsync.GetLenght()) { // only streams without content length
+			const CString hdr = m_HTTPAsync.GetHeader();
+#ifdef DEBUG
+			DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%S", hdr));
+#endif
+
+			BOOL bIcyFound = FALSE;
+
+			CAtlList<CString> sl;
+			Explode(hdr, sl, '\n');
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				CString& hdrline = sl.GetNext(pos);
+
+				CString param, value;
+				int k = hdrline.Find(':');
+				if (k > 0 && k + 1 < hdrline.GetLength()) {
+					param = hdrline.Left(k).Trim().MakeLower();
+					value = hdrline.Mid(k + 1).Trim();
+				}
+
+				if (!bIcyFound && param.Find(L"icy-") == 0) {
+					bIcyFound = TRUE;
+				}
+
+				if (param == "icy-metaint") {
+					m_icydata.metaint = static_cast<DWORD>(_wtol(value));
+				} else if (param == "icy-name") {
+					m_icydata.name = value;
+				} else if (param == "icy-genre") {
+					m_icydata.genre = value;
+				} else if (param == "icy-url") {
+					m_icydata.url = value;
+				} else if (param == "icy-description") {
+					m_icydata.description = value;
+				}
+			}
+
 			bConnected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
@@ -222,7 +347,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 					|| contentType.IsEmpty()) {
 				BYTE buf[1024] = {};
 				DWORD dwSizeRead = 0;
-				if (m_HTTPAsync.Read(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
+				if (HTTPRead(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
@@ -236,7 +361,9 @@ bool CUDPStream::Load(const WCHAR* fnw)
 				m_subtype = MEDIASUBTYPE_MP4;
 			} else if (contentType == L"video/x-flv") {
 				m_subtype = MEDIASUBTYPE_FLV;
-			} else { // other ...
+			} else if (contentType.Find(L"audio/") == 0) {
+				m_subtype = MEDIASUBTYPE_MPEG1Audio;
+			} else if (!bIcyFound) { // other ...
 					// not supported content-type
 				bConnected = FALSE;
 			}
@@ -336,7 +463,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	while (it != m_packets.cend() && len > 0) {
 		const CPacket* p = *it++;
 
-		DLogIf(m_pos < p->m_start, L"CUDPStream::Read(): requested data is no longer available");
+		DLogIf(m_pos < p->m_start, L"CUDPStream::Read(): requested data is no longer available, %llu - %llu", m_pos, p->m_start);
 		if (p->m_start <= m_pos && m_pos < p->m_end) {
 			const DWORD size = (DWORD)std::min((ULONGLONG)len, p->m_end - m_pos);
 			memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
@@ -395,9 +522,11 @@ void CUDPStream::CheckBuffer()
 	if (m_RequestCmd == CMD::CMD_RUN) {
 		CAutoLock cPacketLock(&m_csPacketsLock);
 
-		while (!m_packets.empty() && m_packets.front()->m_start < m_pos - 256 * KILOBYTE) {
-			delete m_packets.front();
-			m_packets.pop_front();
+		if (m_pos > 256 * KILOBYTE) {
+			while (!m_packets.empty() && m_packets.front()->m_start < m_pos - 256 * KILOBYTE) {
+				delete m_packets.front();
+				m_packets.pop_front();
+			}
 		}
 	}
 }
@@ -480,7 +609,7 @@ DWORD CUDPStream::ThreadProc()
 						}
 					} else if (m_protocol == protocol::PR_HTTP) {
 						DWORD dwSizeRead = 0;
-						HRESULT hr = m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
+						const HRESULT hr = HTTPRead(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
 						if (FAILED(hr)) {
 							attempts += 50;
 							continue;
