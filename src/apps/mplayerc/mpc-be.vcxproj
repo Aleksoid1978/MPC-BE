@@ -117,6 +117,7 @@
     <ClCompile Include="PPageColor.cpp" />
     <ClCompile Include="PPageFiltersPriority.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
+    <ClCompile Include="PPageMouse.cpp" />
     <ClCompile Include="PPageSoundProcessing.cpp" />
     <ClCompile Include="PPageWindowSize.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="PPageColor.h" />
     <ClInclude Include="PPageFiltersPriority.h" />
     <ClInclude Include="PPageInterface.h" />
+    <ClInclude Include="PPageMouse.h" />
     <ClInclude Include="PPageSoundProcessing.h" />
     <ClInclude Include="PPageWindowSize.h" />
     <ClInclude Include="PPageYouTube.h" />

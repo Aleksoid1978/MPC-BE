@@ -350,6 +350,19 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Export"
 END
 
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 23
+5		"Left button"
+6		"Click"
+8		"Double click"
+10		"Middle button"
+12		"Right button"
+14		"X-button 1"
+16		"X-button 2"
+18		"Wheel"
+20		"H-wheel"
+22		"This is a test panel of settings. These settings don't work.\nTranslation into another language does not need to be done now."
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Vol."
