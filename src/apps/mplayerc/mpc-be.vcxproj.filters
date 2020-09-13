@@ -411,6 +411,9 @@
     <ClCompile Include="WicUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PPageMouse.cpp">
+      <Filter>Player Options</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -787,6 +790,9 @@
     </ClInclude>
     <ClInclude Include="WicUtils.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageMouse.h">
+      <Filter>Player Options</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
