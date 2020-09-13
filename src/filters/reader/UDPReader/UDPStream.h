@@ -76,8 +76,18 @@ private:
 	volatile ULONGLONG m_SizeComplete = 0;
 	volatile BOOL      m_bEndOfStream = FALSE;
 
+	struct {
+		DWORD metaint = 0;
+		CString name;
+		CString genre;
+		CString description;
+		CString url;
+	} m_icydata;
+	DWORD m_nBytesRead = 0;
+
 	void Clear();
 	void Append(const BYTE* buff, UINT len);
+	HRESULT HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	inline const ULONGLONG GetPacketsSize();
 	void CheckBuffer();
@@ -86,7 +96,7 @@ private:
 	DWORD ThreadProc();
 
 public:
-	CUDPStream();
+	CUDPStream() = default;
 	virtual ~CUDPStream();
 
 	enum CMD {
@@ -108,4 +118,7 @@ public:
 
 	GUID GetSubtype() const { return m_subtype; }
 	protocol GetProtocol() const { return m_protocol; }
+
+	CString GetTitle() const { return m_icydata.name.IsEmpty() ? m_icydata.url : m_icydata.name; }
+	CString GetDescription() const { return m_icydata.description; }
 };

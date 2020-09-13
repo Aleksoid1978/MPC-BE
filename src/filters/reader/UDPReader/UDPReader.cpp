@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -77,16 +77,13 @@ CUDPReader::CUDPReader(IUnknown* pUnk, HRESULT* phr)
 	}
 }
 
-CUDPReader::~CUDPReader()
-{
-}
-
 STDMETHODIMP CUDPReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
 
 	return
 		QI(IFileSourceFilter)
+		QI2(IAMMediaContent)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -147,4 +144,30 @@ STDMETHODIMP CUDPReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 	wcscpy_s(*ppszFileName, nCount, m_fn);
 
 	return S_OK;
+}
+
+// IAMMediaContent
+
+STDMETHODIMP CUDPReader::get_Title(BSTR* pbstrTitle)
+{
+	CheckPointer(pbstrTitle, E_POINTER);
+
+	if (!m_stream.GetTitle().IsEmpty()) {
+		*pbstrTitle = m_stream.GetTitle().AllocSysString();
+		return S_OK;
+	}
+
+	return E_UNEXPECTED;
+}
+
+STDMETHODIMP CUDPReader::get_Description(BSTR* pbstrDescription)
+{
+	CheckPointer(pbstrDescription, E_POINTER);
+
+	if (!m_stream.GetDescription().IsEmpty()) {
+		*pbstrDescription = m_stream.GetDescription().AllocSysString();
+		return S_OK;
+	}
+
+	return E_UNEXPECTED;
 }
