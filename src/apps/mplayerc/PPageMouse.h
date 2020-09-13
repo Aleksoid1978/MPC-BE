@@ -35,8 +35,10 @@ class CPPageMouse : public CPPageBase
 	CComboBox m_cmbRightBotton;
 	CComboBox m_cmbXButton1;
 	CComboBox m_cmbXButton2;
-	CComboBox m_cmbWheel;
-	CComboBox m_cmbWheelTilt;
+	CComboBox m_cmbWheelUp;
+	CComboBox m_cmbWheelDown;
+	CComboBox m_cmbWheelLeft;
+	CComboBox m_cmbWheelRight;
 
 public:
 	CPPageMouse();
@@ -52,7 +54,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnRadioStartupClicked(UINT nID);
-	afx_msg void OnRadioPlaybackClicked(UINT nID);
-	afx_msg void OnBtnCurrentSizeClicked();
+	afx_msg void OnWheelUpChange();
+	afx_msg void OnWheelLeftChange();
 };
