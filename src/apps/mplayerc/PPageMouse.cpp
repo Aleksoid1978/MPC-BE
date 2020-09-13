@@ -44,8 +44,10 @@ void CPPageMouse::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO4, m_cmbRightBotton);
 	DDX_Control(pDX, IDC_COMBO5, m_cmbXButton1);
 	DDX_Control(pDX, IDC_COMBO6, m_cmbXButton2);
-	DDX_Control(pDX, IDC_COMBO7, m_cmbWheel);
-	DDX_Control(pDX, IDC_COMBO8, m_cmbWheelTilt);
+	DDX_Control(pDX, IDC_COMBO7, m_cmbWheelUp);
+	DDX_Control(pDX, IDC_COMBO8, m_cmbWheelDown);
+	DDX_Control(pDX, IDC_COMBO9, m_cmbWheelLeft);
+	DDX_Control(pDX, IDC_COMBO10, m_cmbWheelRight);
 }
 
 BOOL CPPageMouse::OnInitDialog()
@@ -65,6 +67,7 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbMiddleBotton, L"---", 0);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
+	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_TOGGLE_PLAYLIST), ID_VIEW_PLAYLIST);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_BOSS_KEY), ID_BOSS);
 	m_cmbMiddleBotton.SetCurSel(0);
 
@@ -85,15 +88,21 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
 	SelectByItemData(m_cmbXButton2, ID_NAVIGATE_SKIPFORWARD);
 
-	AddStringData(m_cmbWheel, L"---", 0);
-	AddStringData(m_cmbWheel, ResStr(IDS_AG_VOLUME_UP) + L" / " + ResStr(IDS_AG_VOLUME_DOWN), ID_VOLUME_UP); // and ID_VOLUME_DOWN
-	AddStringData(m_cmbWheel, ResStr(IDS_MPLAYERC_25) + L" / " + ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED); // and ID_PLAY_SEEKFORWARDMED
-	SelectByItemData(m_cmbWheel, ID_VOLUME_UP);
+	AddStringData(m_cmbWheelUp, L"---", 0);
+	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_VOLUME_UP), ID_VOLUME_UP);
+	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_VOLUME_DOWN), ID_VOLUME_DOWN);
+	AddStringData(m_cmbWheelUp, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
+	AddStringData(m_cmbWheelUp, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
+	SelectByItemData(m_cmbWheelUp, ID_VOLUME_UP);
 
-	AddStringData(m_cmbWheelTilt, L"---", 0);
-	AddStringData(m_cmbWheelTilt, ResStr(IDS_AG_VOLUME_UP) + L" / " + ResStr(IDS_AG_VOLUME_DOWN), ID_VOLUME_UP);
-	AddStringData(m_cmbWheelTilt, ResStr(IDS_AG_INCREASE_RATE) + L" / " + ResStr(IDS_AG_DECREASE_RATE), ID_PLAY_INCRATE);
-	m_cmbWheelTilt.SetCurSel(0);
+	OnWheelUpChange();
+
+	AddStringData(m_cmbWheelLeft, L"---", 0);
+	AddStringData(m_cmbWheelLeft, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
+	AddStringData(m_cmbWheelLeft, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
+	m_cmbWheelLeft.SetCurSel(0);
+
+	OnWheelLeftChange();
 
 	return TRUE;
 }
@@ -104,21 +113,73 @@ BOOL CPPageMouse::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	unsigned v;
-	v = GetCurItemData(m_cmbLeftBottonClick);
-	v = GetCurItemData(m_cmbLeftBottonDblClick);
-	v = GetCurItemData(m_cmbMiddleBotton);
-	v = GetCurItemData(m_cmbXButton1);
-	v = GetCurItemData(m_cmbXButton2);
-	v = GetCurItemData(m_cmbWheel);
-	v = GetCurItemData(m_cmbWheelTilt);
+	unsigned cmd;
+	cmd = GetCurItemData(m_cmbLeftBottonClick);
+	cmd = GetCurItemData(m_cmbLeftBottonDblClick);
+	cmd = GetCurItemData(m_cmbMiddleBotton);
+	cmd = GetCurItemData(m_cmbXButton1);
+	cmd = GetCurItemData(m_cmbXButton2);
+	cmd = GetCurItemData(m_cmbWheelUp);
+	cmd = GetCurItemData(m_cmbWheelDown);
+	cmd = GetCurItemData(m_cmbWheelLeft);
+	cmd = GetCurItemData(m_cmbWheelRight);
 
 	return __super::OnApply();
 }
 
 BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
-
+	ON_CBN_SELCHANGE(IDC_COMBO7, OnWheelUpChange)
+	ON_CBN_SELCHANGE(IDC_COMBO9, OnWheelLeftChange)
 END_MESSAGE_MAP()
 
 // CPPageMouse message handlers
 
+void CPPageMouse::OnWheelUpChange()
+{
+	UpdateData();
+
+	m_cmbWheelDown.ResetContent();
+
+	unsigned cmd = GetCurItemData(m_cmbWheelUp);
+	switch (cmd) {
+	case ID_VOLUME_UP:
+		AddStringData(m_cmbWheelDown, ResStr(IDS_AG_VOLUME_DOWN), ID_VOLUME_DOWN);
+		break;
+	case ID_VOLUME_DOWN:
+		AddStringData(m_cmbWheelDown, ResStr(IDS_AG_VOLUME_UP), ID_VOLUME_UP);
+		break;
+	case ID_PLAY_SEEKBACKWARDMED:
+		AddStringData(m_cmbWheelDown, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
+		break;
+	case ID_PLAY_SEEKFORWARDMED:
+		AddStringData(m_cmbWheelDown, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
+		break;
+	default:
+		AddStringData(m_cmbWheelDown, L"---", 0);
+	}
+	m_cmbWheelDown.SetCurSel(0);
+
+	SetModified();
+}
+
+void CPPageMouse::OnWheelLeftChange()
+{
+	UpdateData();
+
+	m_cmbWheelRight.ResetContent();
+
+	unsigned cmd = GetCurItemData(m_cmbWheelLeft);
+	switch (cmd) {
+	case ID_NAVIGATE_SKIPFORWARDFILE:
+		AddStringData(m_cmbWheelRight, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
+		break;
+	case ID_NAVIGATE_SKIPBACKFILE:
+		AddStringData(m_cmbWheelRight, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
+		break;
+	default:
+		AddStringData(m_cmbWheelRight, L"---", 0);
+	}
+	m_cmbWheelRight.SetCurSel(0);
+
+	SetModified();
+}
