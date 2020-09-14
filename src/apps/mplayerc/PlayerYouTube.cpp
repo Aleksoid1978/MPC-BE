@@ -1007,6 +1007,8 @@ namespace Youtube
 			}
 
 			if (youtubeUrllist.empty()) {
+				DLog(L"Youtube::Parse_URL() : no output video format found");
+
 				y_fields.Empty();
 				return false;
 			}
@@ -1051,40 +1053,63 @@ namespace Youtube
 
 			// select video stream
 			const YoutubeUrllistItem* final_item = nullptr;
-			size_t k;
-			for (k = 0; k < youtubeUrllist.size(); k++) {
-				if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
-					final_item = &youtubeUrllist[k];
-					break;
+			for (;;) {
+				if (youtubeUrllist.empty()) {
+					DLog(L"Youtube::Parse_URL() : no output video format found");
+
+					y_fields.Empty();
+					return false;
 				}
-			}
-			if (!final_item) {
-				final_item = &youtubeUrllist[0];
-				k = 0;
-				DLog(L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == y_webm ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4");
-			}
 
-			for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
-				const auto profile = youtubeUrllist[i].profile;
-
-				if (final_item->profile->format == profile->format) {
-					if (profile->quality == final_item->profile->quality) {
-						if (profile->fps60 != s.YoutubeFormat.fps60) {
-							// same resolution as that of the previous, but not suitable fps
-							continue;
-						}
-						if (profile->hdr != s.YoutubeFormat.hdr) {
-							// same resolution as that of the previous, but not suitable HDR
-							continue;
-						}
-					}
-
-					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
+				final_item = nullptr;
+				size_t k;
+				for (k = 0; k < youtubeUrllist.size(); k++) {
+					if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
+						final_item = &youtubeUrllist[k];
 						break;
 					}
-
-					final_item = &youtubeUrllist[i];
 				}
+				if (!final_item) {
+					final_item = &youtubeUrllist[0];
+					k = 0;
+					DLog(L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == y_webm ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4");
+				}
+
+				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
+					const auto profile = youtubeUrllist[i].profile;
+
+					if (final_item->profile->format == profile->format) {
+						if (profile->quality == final_item->profile->quality) {
+							if (profile->fps60 != s.YoutubeFormat.fps60) {
+								// same resolution as that of the previous, but not suitable fps
+								continue;
+							}
+							if (profile->hdr != s.YoutubeFormat.hdr) {
+								// same resolution as that of the previous, but not suitable HDR
+								continue;
+							}
+						}
+
+						if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
+							break;
+						}
+
+						final_item = &youtubeUrllist[i];
+					}
+				}
+
+				const auto& url = final_item->url;
+				CHTTPAsync HTTPAsync;
+				if (FAILED(HTTPAsync.Connect(url, 10000))) {
+					DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
+					auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(), [&url](const YoutubeUrllistItem& item) {
+						return item.url == url;
+					});
+					youtubeUrllist.erase(it);
+					continue;
+				}
+
+				break;
 			}
 
 			DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
