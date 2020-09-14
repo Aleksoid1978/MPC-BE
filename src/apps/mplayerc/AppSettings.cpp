@@ -725,6 +725,17 @@ void CAppSettings::ResetSettings()
 	bUIce = false;
 	bGlobalMedia = true;
 
+	// Mouse
+	m_MouseLeftClick    = ID_PLAY_PLAYPAUSE;
+	m_MouseLeftDblClick = ID_VIEW_FULLSCREEN;
+	m_MouseMiddleClick  = 0;
+	m_MouseX1Click      = ID_NAVIGATE_SKIPBACK;
+	m_MouseX2Click      = ID_NAVIGATE_SKIPFORWARD;
+	m_MouseWheelUp      = ID_VOLUME_UP;
+	m_MouseWheelDown    = ID_VOLUME_DOWN;
+	m_MouseWheelLeft    = 0;
+	m_MouseWheelRight   = 0;
+
 	bUseDarkTheme = true;
 	nThemeBrightness = 15;
 	nThemeRed = 256;
