@@ -948,6 +948,8 @@ public:
 	bool			bOSDLocalTime;
 	bool			bOSDFileName;
 
+	void			SavePlaylistTabSetting();
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;
@@ -980,7 +982,6 @@ public:
 	int				GetMultiInst();
 	engine_t		GetFileEngine(CString path);
 
-public:
 	CFiltersPrioritySettings	FiltersPrioritySettings;
 
 	std::list<CString>			slSubtitlePathsAddons;

@@ -4540,6 +4540,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 	}
 
 	AfxGetAppSettings().strTabs = str;
+	AfxGetAppSettings().SavePlaylistTabSetting();
 }
 
 void CPlayerPlaylistBar::TGetSettings()

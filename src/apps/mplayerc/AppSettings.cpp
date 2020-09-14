@@ -1738,7 +1738,7 @@ void CAppSettings::SaveSettings()
 
 	m_VRSettings.Save();
 
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_PLAYLISTTABSSETTINGS, strTabs);
+	SavePlaylistTabSetting();
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
@@ -2595,6 +2595,11 @@ bool CAppSettings::IsISRAutoLoadEnabled() const
 #else
 	return iSubtitleRenderer == SUBRNDT_ISR && IsISRSelect();
 #endif
+}
+
+void CAppSettings::SavePlaylistTabSetting()
+{
+	AfxGetProfile().WriteString(IDS_R_SETTINGS, IDS_RS_PLAYLISTTABSSETTINGS, strTabs);
 }
 
 // Settings::CRecentFileAndURLList
