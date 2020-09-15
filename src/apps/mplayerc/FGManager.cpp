@@ -1926,7 +1926,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_FLAC] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CFLACSource>(FlacSourceName);
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,664C6143");
 		pFGF->m_extensions.emplace_back(L".flac");
 		m_source.push_back(pFGF);

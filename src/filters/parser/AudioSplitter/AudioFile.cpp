@@ -25,6 +25,7 @@
 #include "DFFFile.h"
 #include "DSFFile.h"
 #include "DTSHDFile.h"
+#include "FLACFile.h"
 #include "MPC7File.h"
 #include "MPC8File.h"
 #include "TAKFile.h"
@@ -91,6 +92,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		pAudioFile = DNew CMPC8File();
 	} else if ((*id & 0x00ffffff) == FCC('MP+\0') && (data[3] & 0x0f) == 0x7) {
 		pAudioFile = DNew CMPC7File();
+	} else if (*id == FCC('fLaC')) {
+		pAudioFile = DNew CFLACFile();
 	}
 	else if (int id3v2_size = id3v2_match_len(data)) {
 		// skip ID3V2 metadata for formats that can contain it
@@ -104,6 +107,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 			pAudioFile = DNew CAPEFile();
 		}  else if (*id == FCC('wvpk')) {
 			pAudioFile = DNew CWavPackFile();
+		} else if (*id == FCC('fLaC')) {
+			pAudioFile = DNew CFLACFile();
 		} else {
 			return nullptr;
 		}

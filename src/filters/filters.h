@@ -50,7 +50,6 @@
 #include "renderer/SyncClock/SyncClock.h"
 
 #include "source/DTSAC3Source/DTSAC3Source.h"
-#include "source/FLACSource/FLACSource.h"
 #include "source/FLICSource/FLICSource.h"
 #include "source/ShoutcastSource/ShoutcastSource.h"
 #include "source/SubtitleSource/SubtitleSource.h"
