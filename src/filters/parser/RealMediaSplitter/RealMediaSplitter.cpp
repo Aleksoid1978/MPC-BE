@@ -25,10 +25,11 @@
 #include <MMReg.h>
 #include <ks.h>
 #include <ksmedia.h>
-#include "../../../DSUtil/DSUtil.h"
-#include "RealMediaSplitter.h"
-#include "../../../Subtitles/SubtitleInputPin.h"
 #include <moreuuids.h>
+#include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/vd.h"
+#include "../../../Subtitles/SubtitleInputPin.h"
+#include "RealMediaSplitter.h"
 
 template<typename T>
 static void bswap(T& var)

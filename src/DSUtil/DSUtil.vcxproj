@@ -84,6 +84,7 @@
     <ClCompile Include="vd_asm.cpp">
       <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="vd_math.cpp" />
     <ClCompile Include="VideoParser.cpp" />
     <ClCompile Include="WinAPIUtils.cpp" />
   </ItemGroup>
@@ -130,6 +131,7 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="vd.h" />
     <ClInclude Include="vd_asm.h" />
+    <ClInclude Include="vd_math.h" />
     <ClInclude Include="VideoParser.h" />
     <ClInclude Include="WinAPIUtils.h" />
   </ItemGroup>

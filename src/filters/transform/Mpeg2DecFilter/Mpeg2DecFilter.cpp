@@ -32,6 +32,7 @@
 
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../../DSUtil/vd.h"
 #include <clsids.h>
 #include <moreuuids.h>
 #include <mvrInterfaces.h>

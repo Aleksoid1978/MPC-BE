@@ -20,8 +20,9 @@
 
 #include "stdafx.h"
 #include <MMReg.h>
-#include "RawVideoSplitter.h"
 #include <moreuuids.h>
+#include "../../../DSUtil/vd_math.h"
+#include "RawVideoSplitter.h"
 
 #ifdef REGISTER_FILTER
 

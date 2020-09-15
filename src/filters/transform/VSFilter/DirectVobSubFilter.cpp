@@ -32,6 +32,7 @@
 #include "../../../DSUtil/FileVersion.h"
 #include "../../../DSUtil/WinAPIUtils.h"
 #include "../../../DSUtil/std_helper.h"
+#include "../../../DSUtil/vd.h"
 #include "../../../SubPic/MemSubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "../../../Subtitles/VobSubFile.h"
