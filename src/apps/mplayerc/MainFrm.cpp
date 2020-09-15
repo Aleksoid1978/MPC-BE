@@ -33,6 +33,7 @@
 #include "../../DSUtil/DXVAState.h"
 #include "../../DSUtil/std_helper.h"
 #include "../../DSUtil/UrlParser.h"
+#include "../../DSUtil/NullRenderers.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"

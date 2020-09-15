@@ -26,6 +26,7 @@
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
 #include "AudioParser.h"
+#include "NullRenderers.h"
 #include <clsids.h>
 #include <moreuuids.h>
 #include <basestruct.h>

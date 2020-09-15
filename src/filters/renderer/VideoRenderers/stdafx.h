@@ -29,8 +29,9 @@
 #include <afxole.h>
 #include <BaseClasses/streams.h>
 #include <dvdmedia.h>
-#include <memory>
+
 #include <algorithm>
+#include <memory>
 
 #include "../../../DSUtil/DSUtil.h"
 

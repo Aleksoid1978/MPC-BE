@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,7 @@
 #include "../../../../include/stdafx_common.h"
 #include <afxwin.h>                         // MFC core and standard components
 #include "../../../../include/stdafx_common_dshow.h"
-#include "../../../DSUtil/DSUtil.h"
 
 #include <algorithm>
+
+#include "../../../DSUtil/DSUtil.h"
