@@ -70,6 +70,7 @@ STDAPI DllRegisterServer()
 		L"0,8,,4454534844484452",          // 'DTSHDHDR'
 		L"0,4,,4D50434B",                  // 'MPCK'
 		L"0,3,,4D502B",                    // 'MP+'
+		L"0,4,,664C6143",                  // 'fLaC'
 	};
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_WAVE, chkbytes, nullptr);
