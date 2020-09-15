@@ -151,18 +151,8 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder)
 	return hr;
 }
 
-HRESULT WicOpenImage(HBITMAP& hBitmap, const std::wstring_view& filename)
+HRESULT WicDecodeImage(HBITMAP& hBitmap, IWICBitmapDecoder* pDecoder)
 {
-	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
-	if (!pWICFactory) {
-		return E_NOINTERFACE;
-	}
-
-	if (hBitmap != nullptr || !filename.length()) {
-		return E_INVALIDARG;
-	}
-
-	CComPtr<IWICBitmapDecoder> pDecoder;
 	CComPtr<IWICBitmapFrameDecode> pFrameDecode;
 	CComPtr<IWICBitmapSource> pBitmapSource;
 
@@ -170,16 +160,7 @@ HRESULT WicOpenImage(HBITMAP& hBitmap, const std::wstring_view& filename)
 	UINT width = 0;
 	UINT height = 0;
 
-	HRESULT hr = pWICFactory->CreateDecoderFromFilename(
-		filename.data(),
-		nullptr,
-		GENERIC_READ,
-		WICDecodeMetadataCacheOnLoad,
-		&pDecoder
-	);
-	if (SUCCEEDED(hr)) {
-		hr = pDecoder->GetFrame(0, &pFrameDecode);
-	}
+	HRESULT hr = pDecoder->GetFrame(0, &pFrameDecode);
 	if (SUCCEEDED(hr)) {
 		hr = pFrameDecode->GetPixelFormat(&pixelFormat);
 	}
@@ -215,13 +196,68 @@ HRESULT WicOpenImage(HBITMAP& hBitmap, const std::wstring_view& filename)
 	return hr;
 }
 
+HRESULT WicLoadImage(HBITMAP& hBitmap, const std::wstring_view& filename)
+{
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return E_NOINTERFACE;
+	}
+
+	if (hBitmap != nullptr || filename.empty()) {
+		return E_INVALIDARG;
+	}
+
+	CComPtr<IWICBitmapDecoder> pDecoder;
+
+	HRESULT hr = pWICFactory->CreateDecoderFromFilename(
+		filename.data(),
+		nullptr,
+		GENERIC_READ,
+		WICDecodeMetadataCacheOnLoad,
+		&pDecoder
+	);
+	if (SUCCEEDED(hr)) {
+		hr = WicDecodeImage(hBitmap, pDecoder);
+	}
+
+	return hr;
+}
+
+HRESULT WicLoadImage(HBITMAP& hBitmap, BYTE* input, const size_t size)
+{
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return E_NOINTERFACE;
+	}
+
+	if (hBitmap != nullptr || !input || !size) {
+		return E_INVALIDARG;
+	}
+
+	CComPtr <IWICStream> pStream;
+	CComPtr<IWICBitmapDecoder> pDecoder;
+
+	HRESULT hr = pWICFactory->CreateStream(&pStream);
+	if (SUCCEEDED(hr)) {
+		hr = pStream->InitializeFromMemory(input, size);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = WicDecodeImage(hBitmap, pDecoder);
+	}
+
+	return hr;
+}
+
 HRESULT WicSaveImage(
 	BYTE* src, const UINT pitch,
 	const UINT width, const UINT height,
 	const WICPixelFormatGUID pixelFormat,
 	const int quality,
 	const std::wstring_view& filename,
-	WICInProcPointer output, size_t& outLen)
+	BYTE* output, size_t& outLen)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
