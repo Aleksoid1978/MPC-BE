@@ -20,9 +20,9 @@
  */
 
 #include "stdafx.h"
-#include "DeinterlacerFilter.h"
-//#include "../../DSUtil/MediaTypes.h"
 #include <moreuuids.h>
+#include "../../../DSUtil/vd.h"
+#include "DeinterlacerFilter.h"
 
 CDeinterlacerFilter::CDeinterlacerFilter(LPUNKNOWN punk, HRESULT* phr)
 	: CTransformFilter(L"CDeinterlacerFilter", punk, __uuidof(CDeinterlacerFilter))

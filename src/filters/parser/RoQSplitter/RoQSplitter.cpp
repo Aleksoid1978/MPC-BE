@@ -20,8 +20,9 @@
  */
 
 #include "stdafx.h"
-#include "RoQSplitter.h"
 #include <moreuuids.h>
+#include "../../../DSUtil/vd.h"
+#include "RoQSplitter.h"
 
 #define RoQ_INFO           0x1001
 #define RoQ_QUAD_CODEBOOK  0x1002

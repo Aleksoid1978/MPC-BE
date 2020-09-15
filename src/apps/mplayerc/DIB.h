@@ -21,6 +21,7 @@
 #pragma once
 
 #include <libpng/png.h>
+#include "../../../DSUtil/vd.h"
 #include "WicUtils.h"
 
 static bool BMPDIB(LPCWSTR filename, BYTE* pData)

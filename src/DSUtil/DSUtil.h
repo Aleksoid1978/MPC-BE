@@ -27,7 +27,6 @@
 #include "H264Nalu.h"
 #include "MediaTypeEx.h"
 #include "MFCHelper.h"
-#include "vd.h"
 #include "text.h"
 #include "Log.h"
 #include <basestruct.h>

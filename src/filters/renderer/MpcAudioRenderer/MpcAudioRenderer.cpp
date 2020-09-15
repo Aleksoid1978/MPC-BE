@@ -27,6 +27,7 @@
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/std_helper.h"
+#include "../../../DSUtil/vd_math.h"
 #include "AudioHelper.h"
 #include "AudioDevice.h"
 #include "MpcAudioRenderer.h"

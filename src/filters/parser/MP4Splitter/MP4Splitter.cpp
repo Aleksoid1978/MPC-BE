@@ -21,14 +21,14 @@
 
 #include "stdafx.h"
 #include <MMreg.h>
-#include "MP4Splitter.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/MP4AudioDecoderConfig.h"
-
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <cmath>
+#include "../../../DSUtil/GolombBuffer.h"
+#include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/MP4AudioDecoderConfig.h"
+#include "../../../DSUtil/vd_math.h"
+#include "MP4Splitter.h"
 
 #include <Bento4/Core/Ap4.h>
 #include <Bento4/Core/Ap4File.h>
