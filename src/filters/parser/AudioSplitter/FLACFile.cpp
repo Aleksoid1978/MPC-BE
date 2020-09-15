@@ -312,14 +312,14 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000 * track.offset / m_samplerate);
 			CString s;
 			s.Format(L"Track %02u", i + 1);
-			m_chapters.push_back({ s, rt });
+			m_chapters.emplace_back(s, rt);
 
 			if (track.num_indices > 1) {
 				for (int j = 0; j < track.num_indices; ++j) {
 					const auto& index = track.indices[j];
 					s.Format(L"+ INDEX %02d", index.number);
 					const auto rtIndex = rt + MILLISECONDS_TO_100NS_UNITS(1000 * index.offset / m_samplerate);
-					m_chapters.push_back({ s, rtIndex });
+					m_chapters.emplace_back(s, rtIndex);
 				}
 			}
 		}

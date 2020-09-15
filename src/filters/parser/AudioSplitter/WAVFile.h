@@ -39,6 +39,11 @@ protected:
 
 	struct RiffChapters : public Chapters {
 		DWORD id = 0;
+
+		RiffChapters::RiffChapters(const CString& _name, const REFERENCE_TIME _rt, DWORD _id)
+			: Chapters(_name, _rt)
+			, id(_id)
+		{}
 	};
 	std::vector<RiffChapters> m_chapters;
 

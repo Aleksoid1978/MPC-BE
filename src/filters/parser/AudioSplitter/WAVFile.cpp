@@ -484,7 +484,7 @@ HRESULT CWAVFile::ReadCueTag(const DWORD chunk_size)
 				}
 
 				const auto rt = llMulDiv(offset, UNITS, samplerate, 0);
-				m_chapters.push_back({ L"", rt, id });
+				m_chapters.emplace_back(L"", rt, id);
 			}
 
 			return S_OK;
