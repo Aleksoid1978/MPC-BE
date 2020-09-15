@@ -554,9 +554,6 @@
     <ProjectReference Include="..\..\filters\source\DTSAC3Source\DTSAC3Source.vcxproj">
       <Project>{30d48874-899f-41c6-9b26-a40c96c91102}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\source\FLACSource\FLACSource.vcxproj">
-      <Project>{916d0fc1-1d86-487a-82de-37fbee43fb34}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\filters\source\FLICSource\FLICSource.vcxproj">
       <Project>{431dd5b6-3f2f-47ee-a23f-514bc044b704}</Project>
     </ProjectReference>

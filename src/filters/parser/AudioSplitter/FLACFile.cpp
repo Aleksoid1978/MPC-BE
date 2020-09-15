@@ -1,0 +1,402 @@
+/*
+ * (C) 2020 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "stdafx.h"
+#include "FLACFile.h"
+#include <libflac/src/libflac/include/protected/stream_decoder.h>
+
+#define FLAC_DECODER (FLAC__StreamDecoder*)m_pDecoder
+
+ // Declaration for FLAC callbacks
+static FLAC__StreamDecoderReadStatus   StreamDecoderRead(const FLAC__StreamDecoder* decoder, FLAC__byte buffer[], size_t* bytes, void* client_data);
+static FLAC__StreamDecoderSeekStatus   StreamDecoderSeek(const FLAC__StreamDecoder* decoder, FLAC__uint64 absolute_byte_offset, void* client_data);
+static FLAC__StreamDecoderTellStatus   StreamDecoderTell(const FLAC__StreamDecoder* decoder, FLAC__uint64* absolute_byte_offset, void* client_data);
+static FLAC__StreamDecoderLengthStatus StreamDecoderLength(const FLAC__StreamDecoder* decoder, FLAC__uint64* stream_length, void* client_data);
+static FLAC__bool                      StreamDecoderEof(const FLAC__StreamDecoder* decoder, void* client_data);
+static FLAC__StreamDecoderWriteStatus  StreamDecoderWrite(const FLAC__StreamDecoder* decoder, const FLAC__Frame* frame, const FLAC__int32* const buffer[], void* client_data);
+static void                            StreamDecoderError(const FLAC__StreamDecoder* decoder, FLAC__StreamDecoderErrorStatus status, void* client_data);
+static void                            StreamDecoderMetadata(const FLAC__StreamDecoder* decoder, const FLAC__StreamMetadata* metadata, void* client_data);
+
+//
+// CFLACFile
+//
+
+CFLACFile::CFLACFile()
+	: CAudioFile()
+{
+	m_subtype = MEDIASUBTYPE_FLAC_FRAMED;
+	m_wFormatTag = WAVE_FORMAT_FLAC;
+}
+
+CFLACFile::~CFLACFile()
+{
+	SAFE_DELETE(m_ID3Tag);
+
+	if (m_pDecoder) {
+		FLAC__stream_decoder_delete(FLAC_DECODER);
+		m_pDecoder = nullptr;
+	}
+}
+
+void CFLACFile::SetProperties(IBaseFilter* pBF)
+{
+	if (m_info.got_vorbis_comments) {
+		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
+			CString title = m_info.title;
+			if (!title.IsEmpty() && !m_info.year.IsEmpty()) {
+				title += L" (" + m_info.year + L")";
+			}
+
+			pPB->SetProperty(L"TITL", title);
+			pPB->SetProperty(L"AUTH", m_info.artist);
+			pPB->SetProperty(L"DESC", m_info.comment);
+			pPB->SetProperty(L"ALBUM", m_info.album);
+		}
+	}
+
+	if (!m_chapters.empty()) {
+		if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+			pCB->ChapRemoveAll();
+			for (const auto& chap : m_chapters) {
+				pCB->ChapAppend(chap.rt, chap.name);
+			}
+		}
+	}
+
+	if (m_cover.size()) {
+		if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+			CString cover; cover.Format(L"cover.%s", m_covermime == L"image/png" ? L"png" : L"jpg");
+			pRB->ResAppend(cover, L"cover", m_covermime, m_cover.data(), (DWORD)m_cover.size(), 0);
+		}
+	}
+
+	if (m_ID3Tag) {
+		SetID3TagProperties(pBF, m_ID3Tag);
+	}
+}
+
+HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
+{
+	m_pFile = pFile;
+	m_pFile->Seek(0);
+
+	if (m_pFile->BitRead(24) == 'ID3') {
+		BYTE major = (BYTE)m_pFile->BitRead(8);
+		BYTE revision = (BYTE)m_pFile->BitRead(8);
+		UNREFERENCED_PARAMETER(revision);
+
+		BYTE flags = (BYTE)m_pFile->BitRead(8);
+
+		DWORD size = m_pFile->BitRead(32);
+		size = hexdec2uint(size);
+
+		if (major <= 4) {
+			std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
+			if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
+				m_ID3Tag = DNew CID3Tag(major, flags);
+				m_ID3Tag->ReadTagsV2(ptr.get(), size);
+			}
+		}
+	}
+
+	if (!m_ID3Tag) {
+		m_pFile->Seek(0);
+	}
+
+	DWORD id = 0;
+	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('fLaC')) {
+		return E_FAIL;
+	}
+
+	m_pFile->Seek(0);
+
+	m_pDecoder = FLAC__stream_decoder_new();
+	CheckPointer(m_pDecoder, E_FAIL);
+
+	FLAC__stream_decoder_set_metadata_respond(FLAC_DECODER, FLAC__METADATA_TYPE_VORBIS_COMMENT);
+	FLAC__stream_decoder_set_metadata_respond(FLAC_DECODER, FLAC__METADATA_TYPE_PICTURE);
+	FLAC__stream_decoder_set_metadata_respond(FLAC_DECODER, FLAC__METADATA_TYPE_CUESHEET);
+
+	if (FLAC__STREAM_DECODER_INIT_STATUS_OK != FLAC__stream_decoder_init_stream(FLAC_DECODER,
+			StreamDecoderRead,
+			StreamDecoderSeek,
+			StreamDecoderTell,
+			StreamDecoderLength,
+			StreamDecoderEof,
+			StreamDecoderWrite,
+			StreamDecoderMetadata,
+			StreamDecoderError,
+			this)) {
+		return E_FAIL;
+	}
+
+	if (!FLAC__stream_decoder_process_until_end_of_metadata(FLAC_DECODER)) {
+		return E_FAIL;
+	}
+
+	FLAC__uint64 metadataend = 0;
+	if (!FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &metadataend)) {
+		return E_FAIL;
+	}
+	if (metadataend) {
+		m_extrasize = metadataend;
+		m_extradata = (BYTE*)malloc(m_extrasize);
+		m_pFile->Seek(0);
+		if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
+			return E_FAIL;
+		}
+	}
+
+	if (!FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0)) {
+		return E_FAIL;
+	}
+
+	if (!FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &m_offset)) {
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+REFERENCE_TIME CFLACFile::Seek(REFERENCE_TIME rt)
+{
+	if (rt <= 0) {
+		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0);
+		return 0;
+	}
+
+	if (m_rtduration) {
+		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, FLAC__uint64((1.0 * rt * m_totalsamples) / m_rtduration));
+	}
+
+	return rt;
+}
+
+int CFLACFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
+{
+	FLAC__uint64 curpos;
+	FLAC__uint64 nextpos;
+
+	FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &curpos);
+	FLAC__stream_decoder_skip_single_frame(FLAC_DECODER);
+	FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &nextpos);
+
+	if (nextpos <= curpos) {
+		return 0;
+	}
+
+	auto pos = m_pFile->GetPos();
+	const auto size = nextpos - curpos;
+	m_pFile->Seek(curpos);
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
+		return 0;
+	}
+
+	packet->rtStart = rtStart;
+	REFERENCE_TIME nAvgTimePerFrame;
+	const auto protected_ = (FLAC_DECODER)->protected_;
+	if (protected_->blocksize > 0 && protected_->sample_rate > 0) {
+		nAvgTimePerFrame = llMulDiv(protected_->blocksize, UNITS, protected_->sample_rate, 0);
+	} else {
+		nAvgTimePerFrame = std::max(1LL, llMulDiv(m_rtduration, size, m_pFile->GetLength() - m_offset, 0));
+	}
+	packet->rtStop = rtStart + nAvgTimePerFrame;
+
+	m_pFile->Seek(pos);
+
+	return size;
+}
+
+void CFLACFile::UpdateFromMetadata(void* pBuffer)
+{
+	auto pMetadata = (const FLAC__StreamMetadata*)pBuffer;
+
+	if (pMetadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
+		const auto& si = pMetadata->data.stream_info;
+
+		m_samplerate   = si.sample_rate;
+		m_channels     = si.channels;
+		m_bitdepth     = si.bits_per_sample;
+		m_totalsamples = si.total_samples;
+		m_rtduration   = (m_totalsamples * UNITS) / m_samplerate;
+	} else if (pMetadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
+		const auto ParseVorbisTag = [](const CString& field_name, const CString& VorbisTag, CString& TagValue) {
+			TagValue.Empty();
+
+			CString vorbis_data(VorbisTag);
+			vorbis_data.MakeLower().Trim();
+			if (vorbis_data.Find(field_name + L'=') != 0) {
+				return false;
+			}
+
+			vorbis_data = VorbisTag;
+			vorbis_data.Delete(0, vorbis_data.Find(L'=') + 1);
+			TagValue = vorbis_data;
+
+			return true;
+		};
+
+		const auto& vc = pMetadata->data.vorbis_comment;
+
+		m_info.got_vorbis_comments = (vc.num_comments > 0);
+		for (unsigned i = 0; i < vc.num_comments; i++) {
+			CString TagValue;
+			CString VorbisTag = AltUTF8ToWStr((LPCSTR)vc.comments[i].entry);
+			if (VorbisTag.GetLength() > 0) {
+				if (ParseVorbisTag(L"artist", VorbisTag, TagValue)) {
+					m_info.artist = TagValue;
+				} else if (ParseVorbisTag(L"title", VorbisTag, TagValue)) {
+					m_info.title = TagValue;
+				} else if (ParseVorbisTag(L"description", VorbisTag, TagValue)) {
+					m_info.comment = TagValue;
+				} else if (ParseVorbisTag(L"comment", VorbisTag, TagValue)) {
+					m_info.comment = TagValue;
+				} else if (ParseVorbisTag(L"date", VorbisTag, TagValue)) {
+					m_info.year = TagValue;
+				} else if (ParseVorbisTag(L"album", VorbisTag, TagValue)) {
+					m_info.album = TagValue;
+				} else if (ParseVorbisTag(L"cuesheet", VorbisTag, TagValue)) {
+					CString Title, Performer;
+					std::list<Chapters> chapters;
+					if (ParseCUESheet(TagValue, chapters, Title, Performer)) {
+						m_chapters = chapters;
+
+						if (!Title.IsEmpty() && m_info.title.IsEmpty()) {
+							m_info.title = Title;
+						}
+						if (!Performer.IsEmpty() && m_info.artist.IsEmpty()) {
+							m_info.artist = Performer;
+						}
+					}
+				}
+			}
+		}
+	} else if (pMetadata->type == FLAC__METADATA_TYPE_PICTURE) {
+		const auto& pic = pMetadata->data.picture;
+
+		if (m_cover.empty() && pic.data_length) {
+			m_covermime = pic.mime_type;
+			m_cover.resize(pic.data_length);
+			memcpy(m_cover.data(), pic.data, pic.data_length);
+		}
+	} else if (pMetadata->type == FLAC__METADATA_TYPE_CUESHEET) {
+		if (!m_chapters.empty()) {
+			return;
+		}
+
+		const auto& cs = pMetadata->data.cue_sheet;
+
+		for (uint32_t i = 0; i < cs.num_tracks; ++i) {
+			const auto& track = cs.tracks[i];
+			if (track.type || track.offset >= m_totalsamples) {
+				continue;
+			}
+
+			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000 * track.offset / m_samplerate);
+			CString s;
+			s.Format(L"Track %02u", i + 1);
+			m_chapters.push_back({ s, rt });
+
+			if (track.num_indices > 1) {
+				for (int j = 0; j < track.num_indices; ++j) {
+					const auto& index = track.indices[j];
+					s.Format(L"+ INDEX %02d", index.number);
+					const auto rtIndex = rt + MILLISECONDS_TO_100NS_UNITS(1000 * index.offset / m_samplerate);
+					m_chapters.push_back({ s, rtIndex });
+				}
+			}
+		}
+	}
+}
+
+FLAC__StreamDecoderReadStatus StreamDecoderRead(const FLAC__StreamDecoder* decoder, FLAC__byte buffer[], size_t* bytes, void* client_data)
+{
+	if (*bytes > 0) {
+		auto pThis = static_cast<CFLACFile*>(client_data);
+		auto pFile = pThis->GetFile();
+		const auto len = std::min(pFile->GetRemaining(), (__int64)*bytes);
+		const auto hr = pFile->ByteRead(buffer, len);
+
+		pThis->m_bIsEOF = (FAILED(hr) || *bytes != len);
+		*bytes = FAILED(hr) ? 0 : len;
+
+		if (FAILED(hr)) {
+			return FLAC__STREAM_DECODER_READ_STATUS_ABORT;
+		} else if (pThis->m_bIsEOF) {
+			return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
+		}
+		return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+	}
+
+	return FLAC__STREAM_DECODER_READ_STATUS_ABORT;
+}
+
+FLAC__StreamDecoderSeekStatus StreamDecoderSeek(const FLAC__StreamDecoder* decoder, FLAC__uint64 absolute_byte_offset, void* client_data)
+{
+	auto pThis = static_cast<CFLACFile*>(client_data);
+	pThis->m_bIsEOF = false;
+	pThis->GetFile()->Seek(absolute_byte_offset);
+
+	return FLAC__STREAM_DECODER_SEEK_STATUS_OK;
+}
+
+FLAC__StreamDecoderTellStatus StreamDecoderTell(const FLAC__StreamDecoder* decoder, FLAC__uint64* absolute_byte_offset, void* client_data)
+{
+	auto pThis = static_cast<CFLACFile*>(client_data);
+	*absolute_byte_offset = pThis->GetFile()->GetPos();
+
+	return FLAC__STREAM_DECODER_TELL_STATUS_OK;
+}
+
+FLAC__StreamDecoderLengthStatus StreamDecoderLength(const FLAC__StreamDecoder* decoder, FLAC__uint64* stream_length, void* client_data)
+{
+	auto pThis = static_cast<CFLACFile*>(client_data);
+	auto pFile = pThis->GetFile();
+
+	*stream_length = pFile->GetLength();
+	return FLAC__STREAM_DECODER_LENGTH_STATUS_OK;
+}
+
+FLAC__bool StreamDecoderEof(const FLAC__StreamDecoder* decoder, void* client_data)
+{
+	auto pThis = static_cast<CFLACFile*>(client_data);
+
+	return pThis->m_bIsEOF;
+}
+
+FLAC__StreamDecoderWriteStatus StreamDecoderWrite(const FLAC__StreamDecoder* decoder, const FLAC__Frame* frame, const FLAC__int32* const buffer[], void* client_data)
+{
+	auto pThis = static_cast<CFLACFile*>(client_data);
+	UNREFERENCED_PARAMETER(pThis);
+
+	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+}
+
+void StreamDecoderError(const FLAC__StreamDecoder* decoder, FLAC__StreamDecoderErrorStatus status, void* client_data)
+{
+	DLog(L"StreamDecoderError() : %S", FLAC__StreamDecoderErrorStatusString[status]);
+}
+
+void StreamDecoderMetadata(const FLAC__StreamDecoder* decoder, const FLAC__StreamMetadata* metadata, void* client_data)
+{
+	auto pThis = static_cast<CFLACFile*>(client_data);
+	pThis->UpdateFromMetadata((void*)metadata);
+}
+
