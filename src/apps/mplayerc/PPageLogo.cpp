@@ -120,7 +120,7 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_logobm.Destroy();
 
 	HBITMAP hBitmap = nullptr;
-	HRESULT hr = WicOpenImage(hBitmap, m_logofn.GetString());
+	HRESULT hr = WicLoadImage(hBitmap, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
 		m_logobm.Attach(hBitmap);
 		if (m_logobm) {

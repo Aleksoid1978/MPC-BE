@@ -52,7 +52,8 @@ struct WICCodecInfo_t {
 
 HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder);
 
-HRESULT WicOpenImage(HBITMAP& hBitmap, const std::wstring_view& filename);
+HRESULT WicLoadImage(HBITMAP& hBitmap, const std::wstring_view& filename);
+HRESULT WicLoadImage(HBITMAP& hBitmap, BYTE* input, const size_t size);
 
 HRESULT WicSaveImage(
 	BYTE* src, const UINT pitch,
@@ -60,5 +61,5 @@ HRESULT WicSaveImage(
 	const WICPixelFormatGUID pixelFormat,
 	const int quality, // for JPEG
 	const std::wstring_view& filename,
-	WICInProcPointer output, size_t& outLen
+	BYTE* output, size_t& outLen
 );

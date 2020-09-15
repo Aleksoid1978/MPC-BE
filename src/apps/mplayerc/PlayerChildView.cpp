@@ -141,10 +141,10 @@ void CChildView::LoadLogo()
 	CString logoFName = L"logo";
 	HBITMAP hBitmap = nullptr;
 
-	if (m_logo.FileExists(logoFName) && SUCCEEDED(WicOpenImage(hBitmap, logoFName.GetString()))) {
+	if (m_logo.FileExists(logoFName) && SUCCEEDED(WicLoadImage(hBitmap, logoFName.GetString()))) {
 		m_logo.Attach(hBitmap);
 	} else {
-		if (s.bLogoExternal && SUCCEEDED(WicOpenImage(hBitmap, s.strLogoFileName.GetString()))) {
+		if (s.bLogoExternal && SUCCEEDED(WicLoadImage(hBitmap, s.strLogoFileName.GetString()))) {
 			m_logo.Attach(hBitmap);
 			if (m_logo) {
 				bHaveLogo = true;
