@@ -28,6 +28,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersion.h"
 #include "../../DSUtil/std_helper.h"
+#include "../../DSUtil/NullRenderers.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <dmodshow.h>
 #include <evr.h>

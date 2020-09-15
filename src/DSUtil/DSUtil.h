@@ -23,7 +23,7 @@
 
 #include <vector>
 #include <list>
-#include "NullRenderers.h"
+#include <BaseClasses/streams.h>
 #include "H264Nalu.h"
 #include "MediaTypeEx.h"
 #include "MFCHelper.h"
