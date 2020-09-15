@@ -868,7 +868,7 @@ namespace Youtube
 									int timeRangeStartMillis;
 									CString simpleText;
 									if (getJsonValue(*title, "simpleText", simpleText) && getJsonValue(*chapterRenderer, "timeRangeStartMillis", timeRangeStartMillis)) {
-										y_fields.chaptersList.push_back({ simpleText, 10000LL * timeRangeStartMillis });
+										y_fields.chaptersList.emplace_back(simpleText, 10000LL * timeRangeStartMillis);
 									}
 								}
 							}
@@ -905,7 +905,7 @@ namespace Youtube
 							}
 
 							if (rt != INVALID_TIME) {
-								y_fields.chaptersList.push_back({ UTF8ToWStr(entries.GetString()), rt });
+								y_fields.chaptersList.emplace_back(UTF8ToWStr(entries.GetString()), rt);
 							}
 						}
 					}

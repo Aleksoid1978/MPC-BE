@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -295,7 +295,7 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 		chapterName = element;
 	}
 
-	ChaptersList.emplace_back(Chapters{chapterName, MILLISECONDS_TO_100NS_UNITS(start)});
+	ChaptersList.emplace_back(chapterName, MILLISECONDS_TO_100NS_UNITS(start));
 }
 
 #define ID3v2_FLAG_DATALEN 0x0001

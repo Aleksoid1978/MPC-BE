@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2019 see Authors.txt
+ * (C) 2011-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,7 +53,7 @@ void MakeCUETitle(CString &Title, const CString& title, const CString& performer
 	}
 }
 
-bool ParseCUESheet(const CString& cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer)
+bool ParseCUESheet(const CString& cueData, std::list<Chapters>& ChaptersList, CString& Title, CString& Performer)
 {
 	BOOL fAudioTrack;
 	int track_no = -1, /*index, */index_cnt = 0;
@@ -80,7 +80,7 @@ bool ParseCUESheet(const CString& cueData, std::list<Chapters> &ChaptersList, CS
 			if (rt != _I64_MIN && track_no != -1 && index_cnt) {
 				MakeCUETitle(TrackTitle, title, performer, track_no);
 				if (!TrackTitle.IsEmpty()) {
-					ChaptersList.push_back(Chapters{TrackTitle, rt});
+					ChaptersList.emplace_back(TrackTitle, rt);
 				}
 			}
 			rt = _I64_MIN;
@@ -119,7 +119,7 @@ bool ParseCUESheet(const CString& cueData, std::list<Chapters> &ChaptersList, CS
 	if (rt != _I64_MAX && track_no != -1 && index_cnt) {
 		MakeCUETitle(TrackTitle, title, performer, track_no);
 		if (!TrackTitle.IsEmpty()) {
-			ChaptersList.push_back(Chapters{TrackTitle, rt});
+			ChaptersList.emplace_back(TrackTitle, rt);
 		}
 	}
 

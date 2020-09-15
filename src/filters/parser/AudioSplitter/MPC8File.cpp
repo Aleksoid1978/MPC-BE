@@ -281,7 +281,7 @@ void CMPC8File::ReadChapter(const uint64_t size)
 
 				if (!chapterTitle.IsEmpty()) {
 					const auto rt = llMulDiv(UNITS, offset, m_samplerate, 0);
-					m_chapters.push_back({ chapterTitle, rt });
+					m_chapters.emplace_back(chapterTitle, rt);
 				}
 			}
 		}
