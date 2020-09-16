@@ -30,8 +30,8 @@ class CChildView : public CWnd
 	CRect m_vrect;
 
 	CCritSec     m_csLogo;
-	CMPCPngImage m_logo;
-	CImage       m_resizedImg;
+	CMPCPngImage m_logo;       // TODO: replace it with WIC components
+	CImage       m_resizedImg; // TODO: replace it with WIC components
 
 	HCURSOR m_hCursor = nullptr;
 	CPoint m_lastMousePoint{ -1, -1 };

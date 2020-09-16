@@ -138,15 +138,19 @@ void CChildView::LoadLogo()
 	m_logo.Destroy();
 	m_resizedImg.Destroy();
 
-	HBITMAP hBitmap = nullptr;
 	bool bLogoLoaded = false;
 
 	if (s.bLogoExternal) {
 		// load external logo
-		HRESULT hr = WicLoadImage(hBitmap, s.strLogoFileName.GetString());
+		CComPtr<IWICBitmapSource> pBitmapSource;
+		HRESULT hr = WicLoadImage(&pBitmapSource, s.strLogoFileName.GetString());
 		if (SUCCEEDED(hr)) {
-			m_logo.Attach(hBitmap);
-			bLogoLoaded = true;
+			HBITMAP hBitmap = nullptr;
+			hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+			if (SUCCEEDED(hr)) {
+				m_logo.Attach(hBitmap);
+				bLogoLoaded = true;
+			}
 		}
 	}
 
@@ -171,10 +175,15 @@ void CChildView::LoadLogo()
 					const CStringW ext = filename.Mid(filename.ReverseFind('.') + 1).MakeLower();
 
 					if (std::find(logoExts.cbegin(), logoExts.cend(), ext) != logoExts.cend()) {
-						HRESULT hr = WicLoadImage(hBitmap, (path+filename).GetString());
+						CComPtr<IWICBitmapSource> pBitmapSource;
+						HRESULT hr = WicLoadImage(&pBitmapSource, (path+filename).GetString());
 						if (SUCCEEDED(hr)) {
-							m_logo.Attach(hBitmap);
-							bLogoLoaded = true;
+							HBITMAP hBitmap = nullptr;
+							hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+							if (SUCCEEDED(hr)) {
+								m_logo.Attach(hBitmap);
+								bLogoLoaded = true;
+							}
 						}
 					}
 
