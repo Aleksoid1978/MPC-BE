@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ class CPPageLogo : public CPPageBase
 private:
 	std::vector<UINT> m_logoids;
 	int m_logoidpos;
-	CMPCPngImage m_logobm;
+	CMPCPngImage m_logobm; // TODO: replace it with WIC components
 	void GetDataFromRes();
 
 public:

@@ -174,59 +174,39 @@ HRESULT WicCheckComponent(const GUID guid)
 	return hr;
 }
 
-HRESULT WicDecodeImage(HBITMAP& hBitmap, IWICBitmapDecoder* pDecoder)
+HRESULT WicDecodeImage(IWICBitmapSource** ppBitmapSource, IWICBitmapDecoder* pDecoder)
 {
 	CComPtr<IWICBitmapFrameDecode> pFrameDecode;
-	CComPtr<IWICBitmapSource> pBitmapSource;
 
 	WICPixelFormatGUID pixelFormat = {};
-	UINT width = 0;
-	UINT height = 0;
 
 	HRESULT hr = pDecoder->GetFrame(0, &pFrameDecode);
 	if (SUCCEEDED(hr)) {
 		hr = pFrameDecode->GetPixelFormat(&pixelFormat);
 	}
 	if (SUCCEEDED(hr)) {
-		hr = pFrameDecode->GetSize(&width, &height);
-	}
-	if (SUCCEEDED(hr)) {
 		// need premultiplied alpha
 		if (IsEqualGUID(pixelFormat, GUID_WICPixelFormat32bppPBGRA)) {
-			pBitmapSource = pFrameDecode;
+			*ppBitmapSource = pFrameDecode;
+			(*ppBitmapSource)->AddRef();
 		}
 		else {
-			hr = WICConvertBitmapSource(GUID_WICPixelFormat32bppPBGRA, pFrameDecode, &pBitmapSource);
+			hr = WICConvertBitmapSource(GUID_WICPixelFormat32bppPBGRA, pFrameDecode, ppBitmapSource);
 		}
 		pFrameDecode.Release();
-	}
-	if (SUCCEEDED(hr)) {
-		const UINT bitmapsize = width * height * 4;
-		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[bitmapsize]);
-		if (!buffer) {
-			return E_OUTOFMEMORY;
-		}
-
-		hr = pBitmapSource->CopyPixels(nullptr, width * 4, bitmapsize, buffer.get());
-		if (SUCCEEDED(hr)) {
-			hBitmap = CreateBitmap(width, height, 1, 32, buffer.get());
-			if (!hBitmap) {
-				return E_FAIL;
-			}
-		}
 	}
 
 	return hr;
 }
 
-HRESULT WicLoadImage(HBITMAP& hBitmap, const std::wstring_view& filename)
+HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const std::wstring_view& filename)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
 		return E_NOINTERFACE;
 	}
 
-	if (hBitmap != nullptr || filename.empty()) {
+	if (filename.empty()) {
 		return E_INVALIDARG;
 	}
 
@@ -240,20 +220,20 @@ HRESULT WicLoadImage(HBITMAP& hBitmap, const std::wstring_view& filename)
 		&pDecoder
 	);
 	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(hBitmap, pDecoder);
+		hr = WicDecodeImage(ppBitmapSource, pDecoder);
 	}
 
 	return hr;
 }
 
-HRESULT WicLoadImage(HBITMAP& hBitmap, BYTE* input, const size_t size)
+HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, BYTE* input, const size_t size)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
 		return E_NOINTERFACE;
 	}
 
-	if (hBitmap != nullptr || !input || !size) {
+	if (!input || !size) {
 		return E_INVALIDARG;
 	}
 
@@ -268,7 +248,36 @@ HRESULT WicLoadImage(HBITMAP& hBitmap, BYTE* input, const size_t size)
 		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
 	}
 	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(hBitmap, pDecoder);
+		hr = WicDecodeImage(ppBitmapSource, pDecoder);
+	}
+
+	return hr;
+}
+
+HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
+{
+	if (hBitmap != nullptr || !pBitmapSource) {
+		return E_INVALIDARG;
+	}
+
+	UINT width = 0;
+	UINT height = 0;
+
+	HRESULT hr = pBitmapSource->GetSize(&width, &height);
+	if (SUCCEEDED(hr)) {
+		const UINT bitmapsize = width * height * 4;
+		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[bitmapsize]);
+		if (!buffer) {
+			return E_OUTOFMEMORY;
+		}
+
+		hr = pBitmapSource->CopyPixels(nullptr, width * 4, bitmapsize, buffer.get());
+		if (SUCCEEDED(hr)) {
+			hBitmap = CreateBitmap(width, height, 1, 32, buffer.get());
+			if (!hBitmap) {
+				return E_FAIL;
+			}
+		}
 	}
 
 	return hr;

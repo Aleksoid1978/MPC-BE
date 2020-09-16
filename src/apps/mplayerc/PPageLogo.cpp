@@ -119,12 +119,16 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_author.Empty();
 	m_logobm.Destroy();
 
-	HBITMAP hBitmap = nullptr;
-	HRESULT hr = WicLoadImage(hBitmap, m_logofn.GetString());
+	CComPtr<IWICBitmapSource> pBitmapSource;
+	HRESULT hr = WicLoadImage(&pBitmapSource, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
-		m_logobm.Attach(hBitmap);
-		if (m_logobm) {
-			m_logopreview.SetBitmap(m_logobm);
+		HBITMAP hBitmap = nullptr;
+		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+		if (SUCCEEDED(hr)) {
+			m_logobm.Attach(hBitmap);
+			if (m_logobm) {
+				m_logopreview.SetBitmap(m_logobm);
+			}
 		}
 	}
 
