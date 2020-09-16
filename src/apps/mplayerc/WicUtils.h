@@ -22,6 +22,9 @@
 
 #include <wincodec.h>
 
+DEFINE_GUID(CLSID_WICHeifDecoder, 0xE9A4A80A, 0x44FE, 0x4DE4, 0x89, 0x71, 0x71, 0x50, 0xB1, 0x0A, 0x51, 0x99);
+DEFINE_GUID(CLSID_WICWebpDecoder, 0x7693E886, 0x51C9, 0x4070, 0x84, 0x19, 0x9F, 0x70, 0x73, 0x8E, 0xC8, 0xFA);
+
 class CWICImagingFactory
 {
 // http://www.nuonsoft.com/blog/2011/10/17/introduction-to-wic-how-to-use-wic-to-load-an-image-and-draw-it-with-gdi/
@@ -51,6 +54,8 @@ struct WICCodecInfo_t {
 };
 
 HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder);
+
+HRESULT WicCheckComponent(const GUID guid);
 
 HRESULT WicLoadImage(HBITMAP& hBitmap, const std::wstring_view& filename);
 HRESULT WicLoadImage(HBITMAP& hBitmap, BYTE* input, const size_t size);

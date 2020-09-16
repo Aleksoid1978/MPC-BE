@@ -151,6 +151,29 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder)
 	return hr;
 }
 
+HRESULT WicCheckComponent(const GUID guid)
+{
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return E_NOINTERFACE;
+	}
+
+	CComPtr<IWICComponentInfo> pComponentInfo;
+	HRESULT hr = pWICFactory->CreateComponentInfo(guid, &pComponentInfo);
+
+#if _DEBUG && 0
+	std::wstring name;
+	UINT cbActual = 0;
+	HRESULT hr2 = pComponentInfo->GetFriendlyName(0, nullptr, &cbActual);
+	if (SUCCEEDED(hr2) && cbActual) {
+		name.resize(cbActual);
+		hr2 = pComponentInfo->GetFriendlyName(name.size(), name.data(), &cbActual);
+	}
+#endif // DEBUG
+
+	return hr;
+}
+
 HRESULT WicDecodeImage(HBITMAP& hBitmap, IWICBitmapDecoder* pDecoder)
 {
 	CComPtr<IWICBitmapFrameDecode> pFrameDecode;
