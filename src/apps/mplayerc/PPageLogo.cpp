@@ -161,7 +161,14 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CPPageLogo::OnBnClickedButton2()
 {
-	CString formats = L"*.bmp;*.jpg;*.jpeg;*.png;*.gif";
+	CString formats(L"*.bmp;*.jpg;*.jpeg;*.png;*.gif");
+
+	if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
+		formats.Append(L";*.heif;*.heic");
+	}
+	if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) {
+		formats.Append(L";*.webp");
+	}
 
 	CFileDialog dlg(TRUE, nullptr, m_logofn,
 					OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR,

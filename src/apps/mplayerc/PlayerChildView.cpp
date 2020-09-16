@@ -20,11 +20,11 @@
  */
 
 #include "stdafx.h"
-#include "MainFrm.h"
-#include "PlayerChildView.h"
-#include "WicUtils.h"
-
 #include <cmath>
+#include "MainFrm.h"
+#include "WicUtils.h"
+#include "../../DSUtil/FileHandle.h"
+#include "PlayerChildView.h"
 
 // CChildView
 
@@ -138,27 +138,58 @@ void CChildView::LoadLogo()
 	m_logo.Destroy();
 	m_resizedImg.Destroy();
 
-	CString logoFName = L"logo";
 	HBITMAP hBitmap = nullptr;
+	bool bLogoLoaded = false;
 
-	if (m_logo.FileExists(logoFName) && SUCCEEDED(WicLoadImage(hBitmap, logoFName.GetString()))) {
-		m_logo.Attach(hBitmap);
-	} else {
-		if (s.bLogoExternal && SUCCEEDED(WicLoadImage(hBitmap, s.strLogoFileName.GetString()))) {
+	if (s.bLogoExternal) {
+		// load external logo
+		HRESULT hr = WicLoadImage(hBitmap, s.strLogoFileName.GetString());
+		if (SUCCEEDED(hr)) {
 			m_logo.Attach(hBitmap);
-			if (m_logo) {
-				bHaveLogo = true;
-			}
+			bLogoLoaded = true;
 		}
+	}
 
-		if (!bHaveLogo) {
-			s.bLogoExternal = false;
-			s.strLogoFileName.Empty();
-
-			if (!m_logo.LoadFromResource(s.nLogoId)) {
-				m_logo.LoadFromResource(s.nLogoId = DEF_LOGO);
-			}
+	if (!bLogoLoaded) {
+		// load logo from program folder
+		std::vector<LPCWSTR> logoExts = { L"png", L"bmp", L"jpg", L"jpeg", L"gif" };
+		if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
+			logoExts.emplace_back(L"heif");
+			logoExts.emplace_back(L"heic");
 		}
+		if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) {
+			logoExts.emplace_back(L"webp");
+		}
+		const CStringW path = GetProgramDir();
+
+		WIN32_FIND_DATAW wfd;
+		HANDLE hFile = FindFirstFileW(path + L"logo.*", &wfd);
+		if (hFile != INVALID_HANDLE_VALUE) {
+			do {
+				if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+					const CStringW filename = wfd.cFileName;
+					const CStringW ext = filename.Mid(filename.ReverseFind('.') + 1).MakeLower();
+
+					if (std::find(logoExts.cbegin(), logoExts.cend(), ext) != logoExts.cend()) {
+						HRESULT hr = WicLoadImage(hBitmap, (path+filename).GetString());
+						if (SUCCEEDED(hr)) {
+							m_logo.Attach(hBitmap);
+							bLogoLoaded = true;
+						}
+					}
+
+				}
+			} while (!bLogoLoaded && FindNextFileW(hFile, &wfd));
+			FindClose(hFile);
+		}
+	}
+
+	if (!bLogoLoaded) {
+		// load internal logo
+		if (!m_logo.LoadFromResource(s.nLogoId)) {
+			m_logo.LoadFromResource(s.nLogoId = DEF_LOGO);
+		}
+		bLogoLoaded = true;
 	}
 
 	if (m_hWnd) {
