@@ -30,10 +30,18 @@ protected:
 	WORD m_block_align = 0;
 	int  m_block_size = 0;
 
+	std::map<DWORD, CString> m_info;
+	CID3Tag* m_ID3Tag = nullptr;
+
 	HRESULT ReadCommonTag(const DWORD chunk_size);
+	HRESULT ReadMetadataTag(const DWORD chunk_id, const DWORD chunk_size);
+	HRESULT ReadID3Tag(const DWORD chunk_size);
+
 public:
 	CAIFFFile();
-	virtual ~CAIFFFile() = default;
+	virtual ~CAIFFFile();
+
+	void SetProperties(IBaseFilter* pBF);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

@@ -41,6 +41,39 @@ CAIFFFile::CAIFFFile()
 	m_subtype = MEDIASUBTYPE_PCM_TWOS;
 }
 
+CAIFFFile::~CAIFFFile()
+{
+	SAFE_DELETE(m_ID3Tag);
+}
+
+void CAIFFFile::SetProperties(IBaseFilter* pBF)
+{
+	if (!m_info.empty()) {
+		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
+			for (const auto& [tag, value] : m_info) {
+				switch (tag) {
+				case FCC('NAME'):
+					pPB->SetProperty(L"TITL", value);
+					break;
+				case FCC('AUTH'):
+					pPB->SetProperty(L"AUTH", value);
+					break;
+				case FCC('(c) '):
+					pPB->SetProperty(L"CPYR", value);
+					break;
+				case FCC('ANNO'):
+					pPB->SetProperty(L"DESC", value);
+					break;
+				}
+			}
+		}
+	}
+
+	if (m_ID3Tag) {
+		SetID3TagProperties(pBF, m_ID3Tag);
+	}
+}
+
 HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
@@ -61,7 +94,7 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 	chunk_t Chunk;
 
 	while (m_pFile->ByteRead(Chunk.data, sizeof(Chunk)) == S_OK && m_pFile->GetPos() < end) {
-		__int64 pos = m_pFile->GetPos();
+		const auto pos = m_pFile->GetPos();
 		Chunk.size = _byteswap_ulong(Chunk.size);
 
 		DLog(L"CAIFFFile::Open() : found '%c%c%c%c' chunk, size - %lu",
@@ -84,9 +117,14 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 			m_pFile->Skip(4);
 			m_startpos += m_pFile->GetPos();
 			break;
-		}
-
-		if (m_samplerate && m_startpos) {
+		case FCC('(c) '):
+		case FCC('ANNO'):
+		case FCC('AUTH'):
+		case FCC('NAME'):
+			ReadMetadataTag(Chunk.id, Chunk.size);
+			break;
+		case FCC('ID3 '):
+			ReadID3Tag(Chunk.size);
 			break;
 		}
 
@@ -98,7 +136,7 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 	m_length = m_endpos - m_startpos;
 	m_rtduration = SCALE64(UNITS, m_length, m_nAvgBytesPerSec);
 
-	return m_startpos ? S_OK : E_FAIL;
+	return (m_startpos && m_samplerate) ? S_OK : E_FAIL;
 }
 
 REFERENCE_TIME CAIFFFile::Seek(REFERENCE_TIME rt)
@@ -155,4 +193,51 @@ HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 	m_block_size -= m_block_size % m_block_align;
 
 	return S_OK;
+}
+
+HRESULT CAIFFFile::ReadMetadataTag(const DWORD chunk_id, const DWORD chunk_size)
+{
+	CStringA value;
+	if (m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(chunk_size), chunk_size) == S_OK) {
+		auto ConvertToWstr = [](LPCSTR s) {
+			CString str = AltUTF8ToWStr(s);
+			if (str.IsEmpty()) {
+				str = ConvertToWStr(s, CP_ACP);
+			}
+
+			return str;
+		};
+
+		m_info[chunk_id] = ConvertToWstr(value);
+
+		return S_OK;
+	}
+
+	return E_FAIL;
+}
+
+HRESULT CAIFFFile::ReadID3Tag(const DWORD chunk_size)
+{
+	if (m_pFile->BitRead(24) == 'ID3') {
+		const BYTE major = (BYTE)m_pFile->BitRead(8);
+		const BYTE revision = (BYTE)m_pFile->BitRead(8);
+		UNREFERENCED_PARAMETER(revision);
+
+		const BYTE flags = (BYTE)m_pFile->BitRead(8);
+
+		DWORD size = m_pFile->BitRead(32);
+		size = hexdec2uint(size);
+
+		if (chunk_size >= size + 10 && major <= 4) {
+			std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
+			if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
+				m_ID3Tag = DNew CID3Tag(major, flags);
+				m_ID3Tag->ReadTagsV2(ptr.get(), size);
+
+				return S_OK;
+			}
+		}
+	}
+
+	return E_FAIL;
 }
