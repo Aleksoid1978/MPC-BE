@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,17 +25,6 @@
 // CDSFFile
 //
 
-
-CDSFFile::CDSFFile()
-	: CAudioFile()
-{
-}
-
-CDSFFile::~CDSFFile()
-{
-	SAFE_DELETE(m_ID3Tag);
-}
-
 HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
@@ -60,26 +49,7 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	if (id3pos && m_pFile->IsRandomAccess()) {
 		__int64 pos = m_pFile->GetPos();
 		m_pFile->Seek(id3pos);
-
-		if (m_pFile->BitRead(24) == 'ID3') {
-			BYTE major = (BYTE)m_pFile->BitRead(8);
-			BYTE revision = (BYTE)m_pFile->BitRead(8);
-			UNREFERENCED_PARAMETER(revision);
-
-			BYTE flags = (BYTE)m_pFile->BitRead(8);
-
-			DWORD size = m_pFile->BitRead(32);
-			size = hexdec2uint(size);
-
-			if (major <= 4) {
-				BYTE* buf = DNew BYTE[size];
-				m_pFile->ByteRead(buf, size);
-
-				m_ID3Tag = DNew CID3Tag(major, flags);
-				m_ID3Tag->ReadTagsV2(buf, size);
-				delete [] buf;
-			}
-		}
+		ReadID3Tag(m_pFile->GetRemaining());
 
 		m_pFile->Seek(pos);
 	}
@@ -189,14 +159,6 @@ bool CDSFFile::SetMediaType(CMediaType& mt)
 
 	return true;
 }
-
-void CDSFFile::SetProperties(IBaseFilter* pBF)
-{
-	if (m_ID3Tag) {
-		SetID3TagProperties(pBF, m_ID3Tag);
-	}
-}
-
 
 REFERENCE_TIME CDSFFile::Seek(REFERENCE_TIME rt)
 {

@@ -50,6 +50,7 @@ protected:
 	DWORD m_nAvgBytesPerSec = 0;
 
 	CAPETag* m_pAPETag = nullptr;
+	CID3Tag* m_pID3Tag = nullptr;
 
 public:
 	CAudioFile() = default;
@@ -69,4 +70,5 @@ public:
 	virtual CString GetName() const PURE;
 
 	bool ReadApeTag(size_t& size);
+	bool ReadID3Tag(const int64_t size);
 };

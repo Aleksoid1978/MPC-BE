@@ -41,11 +41,6 @@ CAIFFFile::CAIFFFile()
 	m_subtype = MEDIASUBTYPE_PCM_TWOS;
 }
 
-CAIFFFile::~CAIFFFile()
-{
-	SAFE_DELETE(m_ID3Tag);
-}
-
 void CAIFFFile::SetProperties(IBaseFilter* pBF)
 {
 	if (!m_info.empty()) {
@@ -69,9 +64,7 @@ void CAIFFFile::SetProperties(IBaseFilter* pBF)
 		}
 	}
 
-	if (m_ID3Tag) {
-		SetID3TagProperties(pBF, m_ID3Tag);
-	}
+	__super::SetProperties(pBF);
 }
 
 HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
@@ -211,32 +204,6 @@ HRESULT CAIFFFile::ReadMetadataTag(const DWORD chunk_id, const DWORD chunk_size)
 		m_info[chunk_id] = ConvertToWstr(value);
 
 		return S_OK;
-	}
-
-	return E_FAIL;
-}
-
-HRESULT CAIFFFile::ReadID3Tag(const DWORD chunk_size)
-{
-	if (m_pFile->BitRead(24) == 'ID3') {
-		const BYTE major = (BYTE)m_pFile->BitRead(8);
-		const BYTE revision = (BYTE)m_pFile->BitRead(8);
-		UNREFERENCED_PARAMETER(revision);
-
-		const BYTE flags = (BYTE)m_pFile->BitRead(8);
-
-		DWORD size = m_pFile->BitRead(32);
-		size = hexdec2uint(size);
-
-		if (chunk_size >= size + 10 && major <= 4) {
-			std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
-			if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
-				m_ID3Tag = DNew CID3Tag(major, flags);
-				m_ID3Tag->ReadTagsV2(ptr.get(), size);
-
-				return S_OK;
-			}
-		}
 	}
 
 	return E_FAIL;
