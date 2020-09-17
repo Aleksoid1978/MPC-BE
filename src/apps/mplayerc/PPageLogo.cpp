@@ -117,20 +117,16 @@ void CPPageLogo::OnBnClickedRadio2()
 	UpdateData();
 
 	m_author.Empty();
-	m_logobm.Destroy();
+	HBITMAP hBitmap = nullptr;
 
 	CComPtr<IWICBitmapSource> pBitmapSource;
 	HRESULT hr = WicLoadImage(&pBitmapSource, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
-		HBITMAP hBitmap = nullptr;
 		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
-		if (SUCCEEDED(hr)) {
-			m_logobm.Attach(hBitmap);
-			if (m_logobm) {
-				m_logopreview.SetBitmap(m_logobm);
-			}
-		}
 	}
+
+	hBitmap = m_logopreview.SetBitmap(hBitmap);
+	DeleteObject(hBitmap);
 
 	Invalidate();
 
@@ -189,16 +185,26 @@ void CPPageLogo::OnBnClickedButton2()
 void CPPageLogo::GetDataFromRes()
 {
 	m_author.Empty();
+	HBITMAP hBitmap = nullptr;
 
-	m_logobm.Destroy();
 	UINT id = m_logoids[m_logoidpos];
 
 	if (IDF_LOGO0 != id) {
-		m_logobm.LoadFromResource(id);
+		BYTE* data;
+		UINT size;
+		bool ret = LoadResourceFile(id, &data, size);
+		if (ret) {
+			CComPtr<IWICBitmapSource> pBitmapSource;
+			HRESULT hr = WicLoadImage(&pBitmapSource, data, size);
+			if (SUCCEEDED(hr)) {
+				hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+			}
+		}
 		if (!m_author.LoadString(id)) {
 			m_author = ResStr(IDS_LOGO_AUTHOR);
 		}
 	}
 
-	m_logopreview.SetBitmap(m_logobm);
+	hBitmap = m_logopreview.SetBitmap(hBitmap);
+	DeleteObject(hBitmap);
 }
