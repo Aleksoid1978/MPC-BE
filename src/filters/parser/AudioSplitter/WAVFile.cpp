@@ -36,15 +36,9 @@ typedef union {
 // CWAVFile
 //
 
-CWAVFile::CWAVFile()
-	: CAudioFile()
-{
-}
-
 CWAVFile::~CWAVFile()
 {
 	SAFE_DELETE_ARRAY(m_fmtdata);
-	SAFE_DELETE(m_ID3Tag);
 }
 
 bool CWAVFile::ProcessWAVEFORMATEX()
@@ -198,9 +192,7 @@ void CWAVFile::SetProperties(IBaseFilter* pBF)
 		}
 	}
 
-	if (m_ID3Tag) {
-		SetID3TagProperties(pBF, m_ID3Tag);
-	}
+	__super::SetProperties(pBF);
 
 	if (!m_chapters.empty()) {
 		if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
@@ -390,33 +382,6 @@ HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 	}
 
 	return S_OK;
-}
-
-HRESULT CWAVFile::ReadID3Tag(const DWORD chunk_size)
-{
-	if (m_pFile->BitRead(24) == 'ID3') {
-		const BYTE major    = (BYTE)m_pFile->BitRead(8);
-		const BYTE revision = (BYTE)m_pFile->BitRead(8);
-		UNREFERENCED_PARAMETER(revision);
-
-		const BYTE flags = (BYTE)m_pFile->BitRead(8);
-
-		DWORD size = m_pFile->BitRead(32);
-		size = hexdec2uint(size);
-
-		if (chunk_size >= size + 10 && major <= 4) {
-			BYTE* buf = DNew BYTE[size];
-			m_pFile->ByteRead(buf, size);
-
-			m_ID3Tag = DNew CID3Tag(major, flags);
-			m_ID3Tag->ReadTagsV2(buf, size);
-			delete [] buf;
-
-			return S_OK;
-		}
-	}
-
-	return E_FAIL;
 }
 
 HRESULT CWAVFile::ReadADTLTag(const DWORD chunk_size)

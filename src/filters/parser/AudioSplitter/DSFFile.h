@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,14 +27,11 @@ class CDSFFile : public CAudioFile
 	UINT64 m_length		= 0;
 	UINT32 m_block_size	= 0;
 
-	CID3Tag* m_ID3Tag	= nullptr;
-
 public:
-	CDSFFile();
-	~CDSFFile();
+	CDSFFile() = default;
+	~CDSFFile() = default;
 
 	bool SetMediaType(CMediaType& mt);
-	void SetProperties(IBaseFilter* pBF);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

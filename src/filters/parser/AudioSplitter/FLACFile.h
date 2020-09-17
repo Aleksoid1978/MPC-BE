@@ -43,8 +43,6 @@ class CFLACFile : public CAudioFile
 	std::vector<BYTE> m_cover;
 	CString           m_covermime;
 
-	CID3Tag* m_ID3Tag = nullptr;
-
 public:
 	CFLACFile();
 	~CFLACFile();

@@ -42,6 +42,7 @@
 CAudioFile::~CAudioFile()
 {
 	SAFE_DELETE(m_pAPETag);
+	SAFE_DELETE(m_pID3Tag);
 
 	if (m_extradata) {
 		free(m_extradata);
@@ -156,6 +157,10 @@ void CAudioFile::SetProperties(IBaseFilter* pBF)
 	if (m_pAPETag) {
 		SetAPETagProperties(pBF, m_pAPETag);
 	}
+
+	if (m_pID3Tag) {
+		SetID3TagProperties(pBF, m_pID3Tag);
+	}
 }
 
 bool CAudioFile::ReadApeTag(size_t& size)
@@ -183,6 +188,32 @@ bool CAudioFile::ReadApeTag(size_t& size)
 			if (m_pAPETag->TagItems.empty()) {
 				SAFE_DELETE(m_pAPETag);
 			} else {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool CAudioFile::ReadID3Tag(const int64_t size)
+{
+	if (m_pFile->BitRead(24) == 'ID3') {
+		const BYTE major = (BYTE)m_pFile->BitRead(8);
+		const BYTE revision = (BYTE)m_pFile->BitRead(8);
+		UNREFERENCED_PARAMETER(revision);
+
+		const BYTE flags = (BYTE)m_pFile->BitRead(8);
+
+		DWORD tagsize = m_pFile->BitRead(32);
+		tagsize = hexdec2uint(tagsize);
+
+		if (size >= tagsize + 10 && major <= 4) {
+			std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[tagsize]);
+			if (ptr && m_pFile->ByteRead(ptr.get(), tagsize) == S_OK) {
+				m_pID3Tag = DNew CID3Tag(major, flags);
+				m_pID3Tag->ReadTagsV2(ptr.get(), tagsize);
+
 				return true;
 			}
 		}

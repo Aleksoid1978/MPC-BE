@@ -33,8 +33,6 @@ protected:
 	WORD     m_nBlockAlign = 0;
 	int      m_blocksize   = 0;
 
-	CID3Tag* m_ID3Tag      = nullptr;
-
 	std::map<DWORD, CStringA> m_info;
 
 	struct RiffChapters : public Chapters {
@@ -49,7 +47,6 @@ protected:
 
 	bool ProcessWAVEFORMATEX();
 	HRESULT ReadRIFFINFO(const DWORD chunk_size);
-	HRESULT ReadID3Tag(const DWORD chunk_size);
 
 	HRESULT ReadADTLTag(const DWORD chunk_size);
 	HRESULT ReadCueTag(const DWORD chunk_size);
@@ -57,7 +54,7 @@ protected:
 	bool CheckDTSAC3CD();
 
 public:
-	CWAVFile();
+	CWAVFile() = default;
 	virtual ~CWAVFile();
 
 	bool SetMediaType(CMediaType& mt);

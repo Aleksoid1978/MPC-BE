@@ -31,15 +31,13 @@ protected:
 	int  m_block_size = 0;
 
 	std::map<DWORD, CString> m_info;
-	CID3Tag* m_ID3Tag = nullptr;
 
 	HRESULT ReadCommonTag(const DWORD chunk_size);
 	HRESULT ReadMetadataTag(const DWORD chunk_id, const DWORD chunk_size);
-	HRESULT ReadID3Tag(const DWORD chunk_size);
 
 public:
 	CAIFFFile();
-	virtual ~CAIFFFile();
+	virtual ~CAIFFFile() = default;
 
 	void SetProperties(IBaseFilter* pBF);
 

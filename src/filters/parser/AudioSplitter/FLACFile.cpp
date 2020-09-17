@@ -47,8 +47,6 @@ CFLACFile::CFLACFile()
 
 CFLACFile::~CFLACFile()
 {
-	SAFE_DELETE(m_ID3Tag);
-
 	if (m_pDecoder) {
 		FLAC__stream_decoder_delete(FLAC_DECODER);
 		m_pDecoder = nullptr;
@@ -87,9 +85,7 @@ void CFLACFile::SetProperties(IBaseFilter* pBF)
 		}
 	}
 
-	if (m_ID3Tag) {
-		SetID3TagProperties(pBF, m_ID3Tag);
-	}
+	__super::SetProperties(pBF);
 }
 
 HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
@@ -97,26 +93,7 @@ HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
 	m_pFile = pFile;
 	m_pFile->Seek(0);
 
-	if (m_pFile->BitRead(24) == 'ID3') {
-		BYTE major = (BYTE)m_pFile->BitRead(8);
-		BYTE revision = (BYTE)m_pFile->BitRead(8);
-		UNREFERENCED_PARAMETER(revision);
-
-		BYTE flags = (BYTE)m_pFile->BitRead(8);
-
-		DWORD size = m_pFile->BitRead(32);
-		size = hexdec2uint(size);
-
-		if (major <= 4) {
-			std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
-			if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
-				m_ID3Tag = DNew CID3Tag(major, flags);
-				m_ID3Tag->ReadTagsV2(ptr.get(), size);
-			}
-		}
-	}
-
-	if (!m_ID3Tag) {
+	if (!ReadID3Tag(m_pFile->GetRemaining())) {
 		m_pFile->Seek(0);
 	}
 
