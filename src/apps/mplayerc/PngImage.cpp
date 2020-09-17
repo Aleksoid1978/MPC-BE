@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include "Misc.h"
 #include "../../DSUtil/FileHandle.h"
 #include "PngImage.h"
 
@@ -101,11 +102,12 @@ bool CMPCPngImage::DecompressPNG(struct png_t* png)
 bool CMPCPngImage::LoadFromResource(UINT id) {
 	bool ret = false;
 
-	CStringA str;
-	if (LoadResource(id, str, L"FILE") || LoadResource(id, str, L"PNG")) {
+	BYTE* data;
+	UINT size;
+	if (LoadResourceFile(id, &data, size)) {
 		struct png_t png;
-		png.data = (unsigned char*)(LPCSTR)str;
-		png.size = str.GetLength();
+		png.data = data;
+		png.size = size;
 
 		ret = DecompressPNG(&png);
 	}
@@ -252,7 +254,7 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 		if (fp) {
 			png_init_io(png_ptr, fp);
 		} else {
-			HRSRC hRes = FindResourceW(nullptr, MAKEINTRESOURCEW(resid), L"PNG");
+			HRSRC hRes = FindResourceW(nullptr, MAKEINTRESOURCEW(resid), L"FILE");
 			HANDLE lRes = LoadResource(nullptr, hRes);
 
 			struct png_t png;

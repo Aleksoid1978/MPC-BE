@@ -147,7 +147,7 @@ HRESULT CreateShaderFromResource(IDirect3DDevice9* pD3DDev, IDirect3DPixelShader
 		return E_POINTER;
 	}
 
-	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCEW(resid), L"SHADER");
+	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCEW(resid), L"FILE");
 	if (!hrsrc) {
 		return E_INVALIDARG;
 	}
