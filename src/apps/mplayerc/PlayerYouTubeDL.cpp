@@ -29,7 +29,7 @@ namespace YoutubeDL
 {
 	std::vector<std::unique_ptr<Youtube::YoutubeProfile>> YoutubeProfiles;
 
-	bool Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields, Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist)
+	bool Parse_URL(const CString& url, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields, Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist)
 	{
 		y_fields.Empty();
 		YoutubeProfiles.clear();
@@ -55,11 +55,7 @@ namespace YoutubeDL
 		startup_info.wShowWindow = SW_HIDE;
 		startup_info.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 
-		CStringW args(L"youtube-dl.exe");
-		if (!bPlaylist) {
-			args.Append(L" --no-playlist");
-		}
-		args.Append(L" -J --all-subs --sub-format vtt \"" + url + "\"");
+		CStringW args(L"youtube-dl.exe -j --all-subs --sub-format vtt \"" + url + "\"");
 		PROCESS_INFORMATION proc_info = {};
 		const bool bSuccess = CreateProcessW(nullptr, args.GetBuffer(), nullptr, nullptr, true, 0,
 			nullptr, nullptr, &startup_info, &proc_info);
