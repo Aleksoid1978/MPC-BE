@@ -27,6 +27,7 @@
 
 static filter_t s_source_filters[] = {
 	{L"AC3",						SOURCE_FILTER, SRC_AC3,				0},
+	{L"AIFF",						SOURCE_FILTER, SRC_AIFF,			0},
 	{L"AMR",						SOURCE_FILTER, SRC_AMR,				0},
 	{L"AVI",						SOURCE_FILTER, SRC_AVI,				IDS_SRC_AVI},
 	{L"APE",						SOURCE_FILTER, SRC_APE,				0},

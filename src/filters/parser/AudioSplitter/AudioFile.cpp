@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AudioFile.h"
+#include "AIFFFile.h"
 #include "AMRFile.h"
 #include "APEFile.h"
 #include "DFFFile.h"
@@ -94,6 +95,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		pAudioFile = DNew CMPC7File();
 	} else if (*id == FCC('fLaC')) {
 		pAudioFile = DNew CFLACFile();
+	}  else if (*id == FCC('FORM') && GETU32(data + 8) == FCC('AIFF')) {
+		pAudioFile = DNew CAIFFFile();
 	}
 	else if (int id3v2_size = id3v2_match_len(data)) {
 		// skip ID3V2 metadata for formats that can contain it

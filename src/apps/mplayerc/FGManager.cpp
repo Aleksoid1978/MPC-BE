@@ -2032,13 +2032,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_DSD] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,12,,445344201C00000000000000"); // 'DSD..."
-		pFGF->m_chkbytes.emplace_back(L"0,4,,46524D38,12,4,,44534420"); // 'FRM8........DSD '
+		pFGF->m_chkbytes.emplace_back(L"0,4,,46524D38,12,4,,44534420");   // 'FRM8........DSD '
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_DTS] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.emplace_back(L"0,8,,4454534844484452");       // DTSHDHDR
+		pFGF->m_chkbytes.emplace_back(L"0,8,,4454534844484452"); // DTSHDHDR
 		m_source.push_back(pFGF);
 	}
 
@@ -2053,6 +2053,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CDVRSourceFilter>(DVRSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
+		m_source.push_back(pFGF);
+	}
+
+	if (src[SRC_AIFF] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
+		pFGF->m_chkbytes.emplace_back(L"0,4,,464F524D,8,4,,41494646"); // 'FORM....AIFF'
 		m_source.push_back(pFGF);
 	}
 

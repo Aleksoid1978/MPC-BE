@@ -111,6 +111,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_WAVPACK]				= L"src_wavpack";
 	SrcFiltersKeys[SRC_UDP]					= L"src_udp";
 	SrcFiltersKeys[SRC_DVR]					= L"src_dvr";
+	SrcFiltersKeys[SRC_AIFF]				= L"src_aiff";
 
 	// Internal DXVA decoders
 	DXVAFiltersKeys[VDEC_DXVA_H264]			= L"vdec_dxva_h264";

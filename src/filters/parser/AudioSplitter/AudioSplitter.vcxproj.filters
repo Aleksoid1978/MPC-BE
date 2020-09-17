@@ -63,6 +63,9 @@
     <ClCompile Include="FLACFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AIFFFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="AudioSplitter.def">
@@ -119,6 +122,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FLACFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AIFFFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
