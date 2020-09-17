@@ -201,6 +201,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AIFFFile.cpp" />
     <ClCompile Include="AMRFile.cpp" />
     <ClCompile Include="APEFile.cpp" />
     <ClCompile Include="AudioFile.cpp" />
@@ -224,6 +225,7 @@
     <None Include="AudioSplitter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIFFFile.h" />
     <ClInclude Include="AMRFile.h" />
     <ClInclude Include="APEFile.h" />
     <ClInclude Include="AudioFile.h" />
