@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "PngImage.h"
-
-
 // CPPageLogo dialog
 
 class CPPageLogo : public CPPageBase
@@ -33,7 +30,6 @@ class CPPageLogo : public CPPageBase
 private:
 	std::vector<UINT> m_logoids;
 	int m_logoidpos;
-	CMPCPngImage m_logobm; // TODO: replace it with WIC components
 	void GetDataFromRes();
 
 public:
