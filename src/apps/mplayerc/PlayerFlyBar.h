@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "PngImage.h"
-
 class CMainFrame;
 
 // CFlyBar

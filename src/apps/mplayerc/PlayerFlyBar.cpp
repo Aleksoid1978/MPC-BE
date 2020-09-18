@@ -20,6 +20,8 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
+#include "../../DSUtil/FileHandle.h"
+#include "WicUtils.h"
 #include "PlayerFlyBar.h"
 
 // CPrevView
@@ -29,29 +31,40 @@ CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 	, bt_idx(-1)
 	, m_pButtonsImages(nullptr)
 {
-	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
-	BITMAP bm = { 0 };
-	::GetObjectW(hBmp, sizeof(bm), &bm);
+	CComPtr<IWICBitmapSource> pBitmapSource;
+	HBITMAP hBitmap = nullptr;
+	UINT width, height;
 
-	if (CMPCPngImage::FileExists(L"flybar") && bm.bmWidth != bm.bmHeight * 25) {
-		hBmp = CMPCPngImage::LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
-		::GetObjectW(hBmp, sizeof(bm), &bm);
+	HRESULT hr = WicLoadImage(&pBitmapSource, (::GetProgramDir()+L"flybar.png").GetString());
+
+	if (FAILED(hr)) {
+		BYTE* data;
+		UINT size;
+		hr = LoadResourceFile(IDB_PLAYERFLYBAR_PNG, &data, size) ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr)) {
+			hr = WicLoadImage(&pBitmapSource, data, size);
+		}
 	}
 
-	if (nullptr != hBmp) {
-		CBitmap *bmp = DNew CBitmap();
-		bmp->Attach(hBmp);
+	if (SUCCEEDED(hr)) {
+		hr = pBitmapSource->GetSize(&width, &height);
+	}
+	if (SUCCEEDED(hr) && width == height * 25) {
+		hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+	}
 
-		if (bm.bmWidth == bm.bmHeight * 25) {
-			m_pButtonsImages = DNew CImageList();
-			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+	if (SUCCEEDED(hr)) {
+		CBitmap *bitmap = DNew CBitmap();
+		bitmap->Attach(hBitmap);
 
-			iw = bm.bmHeight;
-		}
+		m_pButtonsImages = DNew CImageList();
+		m_pButtonsImages->Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0);
+		m_pButtonsImages->Add(bitmap, nullptr);
 
-		delete bmp;
-		DeleteObject(hBmp);
+		iw = height;
+
+		delete bitmap;
+		DeleteObject(hBitmap);
 	}
 }
 
