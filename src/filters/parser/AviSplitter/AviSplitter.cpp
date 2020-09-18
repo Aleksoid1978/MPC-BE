@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -383,6 +383,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";
+				case FCC('av01'):
+					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('AV01'));
 				default:
 					mt.subtype = FOURCCMap(pbmi->biCompression);
 			}
