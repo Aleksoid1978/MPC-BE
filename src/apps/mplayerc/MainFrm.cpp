@@ -18549,31 +18549,33 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
 	if (SUCCEEDED(hr)) {
-		CMPCPngImage mpc_png;
-		BYTE* pData;
-		int width, height, bpp;
-
-		HBITMAP hB = mpc_png.TypeLoadImage(IMG_TYPE::PNG, &pData, &width, &height, &bpp, nullptr, IDB_W7_TOOLBAR, 0, 0, 0, 0);
-		if (!hB) {
-			m_pTaskbarList->Release();
-			return E_FAIL;
+		CComPtr<IWICBitmapSource> pBitmapSource;
+		HBITMAP hBitmap = nullptr;
+		UINT width, height;
+		BYTE* data;
+		UINT size;
+		HRESULT hr = LoadResourceFile(IDB_W7_TOOLBAR, &data, size) ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr)) {
+			hr = WicLoadImage(&pBitmapSource, data, size);
+		}
+		if (SUCCEEDED(hr)) {
+			hr = pBitmapSource->GetSize(&width, &height);
+		}
+		if (SUCCEEDED(hr)) {
+			hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
 		}
 
-		// Check dimensions
-		BITMAP bi = {0};
-		GetObjectW((HANDLE)hB, sizeof(bi), &bi);
-		if (bi.bmHeight == 0) {
-			DeleteObject(hB);
+		if (FAILED(hr)) {
 			m_pTaskbarList->Release();
-			return E_FAIL;
+			return hr;
 		}
 
-		int nI = bi.bmWidth/bi.bmHeight;
-		HIMAGELIST himl = ImageList_Create(bi.bmHeight, bi.bmHeight, ILC_COLOR32, nI, 0);
+		UINT nI = width / height;
+		HIMAGELIST himl = ImageList_Create(height, height, ILC_COLOR32, nI, 0);
 
 		// Add the bitmap
-		ImageList_Add(himl, hB, 0);
-		DeleteObject(hB);
+		ImageList_Add(himl, hBitmap, 0);
+		DeleteObject(hBitmap);
 		hr = m_pTaskbarList->ThumbBarSetImageList(m_hWnd, himl);
 
 		if (SUCCEEDED(hr)) {
