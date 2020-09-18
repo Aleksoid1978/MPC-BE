@@ -80,14 +80,14 @@ COSD::COSD(CMainFrame* pMainFrame)
 	HBITMAP hBitmap = nullptr;
 	UINT width, height;
 
-	HRESULT hr = WicLoadImage(&pBitmapSource, (::GetProgramDir()+L"flybar.png").GetString());
+	HRESULT hr = WicLoadImage(&pBitmapSource, true, (::GetProgramDir()+L"flybar.png").GetString());
 
 	if (FAILED(hr)) {
 		BYTE* data;
 		UINT size;
 		hr = LoadResourceFile(IDB_PLAYERFLYBAR_PNG, &data, size) ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmapSource, data, size);
+			hr = WicLoadImage(&pBitmapSource, true, data, size);
 		}
 	}
 

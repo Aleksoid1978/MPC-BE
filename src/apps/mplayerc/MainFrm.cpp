@@ -18556,7 +18556,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		UINT size;
 		HRESULT hr = LoadResourceFile(IDB_W7_TOOLBAR, &data, size) ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmapSource, data, size);
+			hr = WicLoadImage(&pBitmapSource, true, data, size);
 		}
 		if (SUCCEEDED(hr)) {
 			hr = pBitmapSource->GetSize(&width, &height);
