@@ -21,8 +21,10 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "PlayerToolBar.h"
 #include "../../DSUtil/DXVAState.h"
+#include "../../DSUtil/FileHandle.h"
+#include "WicUtils.h"
+#include "PlayerToolBar.h"
 
 #include <cmath>
 
@@ -226,49 +228,47 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	// load toolbar image
-	HBITMAP hBmp = nullptr;
-	bool fp = CMPCPngImage::FileExists(L"toolbar");
-	if (s.bUseDarkTheme && !fp) {
-		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", resid, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
-	} else if (fp) {
-		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", 0, IMG_TYPE::UNDEF);
-	}
+	CComPtr<IWICBitmapSource> pBitmapSource;
+	HBITMAP hBitmap = nullptr;
+	UINT width, height;
 
-	BITMAP bitmapBmp;
-	if (nullptr != hBmp) {
-		::GetObjectW(hBmp, sizeof(bitmapBmp), &bitmapBmp);
+	// don't use premultiplied alpha here
+	HRESULT hr = WicLoadImage(&pBitmapSource, false, (::GetProgramDir()+L"toolbar.png").GetString());
 
-		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
-			if (s.bUseDarkTheme) {
-				hBmp = CMPCPngImage::LoadExternalImage(L"", resid, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
-				::GetObjectW(hBmp, sizeof(bitmapBmp), &bitmapBmp);
-			} else {
-				DeleteObject(hBmp);
-				hBmp = nullptr;
-			}
+	if (FAILED(hr)) {
+		BYTE* data;
+		UINT size;
+		hr = LoadResourceFile(resid, &data, size) ? S_OK : E_FAIL;
+		if (SUCCEEDED(hr)) {
+			hr = WicLoadImage(&pBitmapSource, false, data, size);
 		}
 	}
 
-	if (nullptr != hBmp) {
+	if (SUCCEEDED(hr)) {
+		hr = pBitmapSource->GetSize(&width, &height);
+	}
+	if (SUCCEEDED(hr) && width == height * 15) {
+		hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+	}
+	pBitmapSource.Release();
+
+	if (SUCCEEDED(hr)) {
 		CBitmap bmp;
-		bmp.Attach(hBmp);
+		bmp.Attach(hBitmap);
 
-		SetSizes({ bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6 }, { bitmapBmp.bmHeight, bitmapBmp.bmHeight });
+		SetSizes({ (LONG)height + 7, (LONG)height + 6 }, SIZE{ (LONG)height, (LONG)height });
 
-		if (32 == bitmapBmp.bmBitsPixel) {
-			VERIFY(m_imgListActive.Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0));
-			VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
-		} else {
-			VERIFY(m_imgListActive.Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0));
-			VERIFY(m_imgListActive.Add(&bmp, RGB(255, 0, 255)) != -1);
-		}
+		VERIFY(m_imgListActive.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
+		VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
 
-		m_nButtonHeight = bitmapBmp.bmHeight;
+		m_nButtonHeight = height;
 
-		if (32 == bitmapBmp.bmBitsPixel) {
-			BYTE* bmpBuffer = (BYTE*)GlobalAlloc(GMEM_FIXED, bitmapBmp.bmWidthBytes * bitmapBmp.bmHeight);
+		if (32 == 32) {
+			const UINT bitmapsize = width * height * 4;
+
+			BYTE* bmpBuffer = (BYTE*)GlobalAlloc(GMEM_FIXED, bitmapsize);
 			if (bmpBuffer) {
-				DWORD dwValue = bmp.GetBitmapBits(bitmapBmp.bmWidthBytes * bitmapBmp.bmHeight, bmpBuffer);
+				DWORD dwValue = bmp.GetBitmapBits(bitmapsize, bmpBuffer);
 				if (dwValue) {
 					auto adjustBrightness = [](BYTE c, double p) {
 						int cAdjusted;
@@ -282,9 +282,9 @@ void CPlayerToolBar::SwitchTheme()
 					};
 
 					BYTE* bits = bmpBuffer;
-					for (int y = 0; y < bitmapBmp.bmHeight; y++, bits += bitmapBmp.bmWidthBytes) {
+					for (UINT y = 0; y < height; y++, bits += width*4) {
 						RGBQUAD* p = reinterpret_cast<RGBQUAD*>(bits);
-						for (int x = 0; x < bitmapBmp.bmWidth; x++) {
+						for (UINT x = 0; x < width; x++) {
 							HLS hls(p[x]);
 							hls.S = 0.0; // Make the color gray
 
@@ -296,9 +296,9 @@ void CPlayerToolBar::SwitchTheme()
 					}
 
 					CBitmap bmpDisabled;
-					bmpDisabled.CreateBitmap(bitmapBmp.bmWidth, bitmapBmp.bmHeight, bitmapBmp.bmPlanes, bitmapBmp.bmBitsPixel, bmpBuffer);
+					bmpDisabled.CreateBitmap(width, height, 1, 32, bmpBuffer);
 
-					VERIFY(m_imgListDisabled.Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0));
+					VERIFY(m_imgListDisabled.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
 					VERIFY(m_imgListDisabled.Add(&bmpDisabled, nullptr) != 1);
 				}
 
@@ -306,7 +306,8 @@ void CPlayerToolBar::SwitchTheme()
 			}
 		}
 
-		DeleteObject(hBmp);
+		DeleteObject(hBitmap);
+		hBitmap = nullptr;
 	}
 
 	// load GPU/DXVA indicator
@@ -317,80 +318,79 @@ void CPlayerToolBar::SwitchTheme()
 		}
 		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
 
-		const int gpuImageResId[] = {
-			IDB_DXVA_INDICATOR_350,
-			IDB_DXVA_INDICATOR_300,
-			IDB_DXVA_INDICATOR_250,
-			IDB_DXVA_INDICATOR_225,
-			IDB_DXVA_INDICATOR_200,
-			IDB_DXVA_INDICATOR_175,
-			IDB_DXVA_INDICATOR_150,
-			IDB_DXVA_INDICATOR_125
+		const struct {
+			int resid;
+			int height;
+		} gpuImageResId[] = {
+			{IDB_DXVA_INDICATOR_350, 56 },
+			{IDB_DXVA_INDICATOR_300, 48 },
+			{IDB_DXVA_INDICATOR_250, 40 },
+			{IDB_DXVA_INDICATOR_225, 36 },
+			{IDB_DXVA_INDICATOR_200, 32 },
+			{IDB_DXVA_INDICATOR_175, 28 },
+			{IDB_DXVA_INDICATOR_150, 24 },
+			{IDB_DXVA_INDICATOR_125, 20 }
 		};
 
 		resid = IDB_DXVA_INDICATOR;
 		if (imageDpiScalePercentIndex != -1) {
-			resid = gpuImageResId[imageDpiScalePercentIndex];
+			resid = gpuImageResId[imageDpiScalePercentIndex].resid;
 		}
 
-		hBmp = nullptr;
-		fp = CMPCPngImage::FileExists(L"gpu");
-		BITMAP bm = { 0 };
-		if (fp) {
-			hBmp = CMPCPngImage::LoadExternalImage(L"gpu", 0, IMG_TYPE::UNDEF);
-			if (hBmp) {
-				::GetObjectW(hBmp, sizeof(bm), &bm);
+		// don't use premultiplied alpha here
+		HRESULT hr = WicLoadImage(&pBitmapSource, false, (::GetProgramDir()+L"gpu.png").GetString());
+
+		if (SUCCEEDED(hr)) {
+			hr = pBitmapSource->GetSize(&width, &height);
+			if (SUCCEEDED(hr) && (LONG)height >= m_nButtonHeight) {
+				hr = E_ABORT;
+				pBitmapSource.Release();
 			}
 		}
-		if (!hBmp || bm.bmHeight >= m_nButtonHeight) {
-			hBmp = CMPCPngImage::LoadExternalImage(L"", resid, IMG_TYPE::PNG);
-			if (hBmp) {
-				::GetObjectW(hBmp, sizeof(bm), &bm);
-				if (bm.bmHeight >= m_nButtonHeight) {
-					DeleteObject(hBmp);
-					hBmp = nullptr;
 
-					for (int i = 0; i < _countof(gpuImageResId); i++) {
-						const int gpuresid = gpuImageResId[i];
-						if (gpuresid < resid) {
-							hBmp = CMPCPngImage::LoadExternalImage(L"", gpuresid, IMG_TYPE::PNG);
-							if (hBmp) {
-								::GetObjectW(hBmp, sizeof(bm), &bm);
-								if (bm.bmHeight < m_nButtonHeight) {
-									break;
-								}
-
-								DeleteObject(hBmp);
-								hBmp = nullptr;
-							}
-						}
-					}
-
-					if (!hBmp) {
-						hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_DXVA_INDICATOR, IMG_TYPE::PNG);
-					}
+		if (FAILED(hr)) {
+			for (int i = 0; i < _countof(gpuImageResId); i++) {
+				const int gpuresid = gpuImageResId[i].resid;
+				if (gpuresid < resid && (LONG)height < m_nButtonHeight) {
+					resid = gpuresid;
+					break;
 				}
 			}
-		}
-		if (hBmp) {
-			::GetObjectW(hBmp, sizeof(bm), &bm);
 
-			CBitmap *bmp = DNew CBitmap();
-			bmp->Attach(hBmp);
+			BYTE* data;
+			UINT size;
+			hr = LoadResourceFile(resid, &data, size) ? S_OK : E_FAIL;
+			if (SUCCEEDED(hr)) {
+				hr = WicLoadImage(&pBitmapSource, false, data, size);
+			}
+			if (SUCCEEDED(hr)) {
+				hr = pBitmapSource->GetSize(&width, &height);
+			}
+		}
+
+		if (SUCCEEDED(hr)) {
+			hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+		}
+
+		if (SUCCEEDED(hr)) {
+			BOOL ret = TRUE;
+
+			CBitmap *bitmap = DNew CBitmap();
+			ret = bitmap->Attach(hBitmap);
 
 			CImageList *pButtonDXVA = DNew CImageList();
-			pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-			pButtonDXVA->Add(bmp, static_cast<CBitmap*>(nullptr));
+			ret = pButtonDXVA->Create(width, height, ILC_COLOR32 | ILC_MASK, 1, 0);
+			ret = pButtonDXVA->Add(bitmap, nullptr);
 
 			m_hDXVAIcon = pButtonDXVA->ExtractIconW(0);
 
 			delete pButtonDXVA;
-			delete bmp;
+			delete bitmap;
 
-			m_nDXVAIconWidth  = bm.bmWidth;
-			m_nDXVAIconHeight = bm.bmHeight;
+			m_nDXVAIconWidth  = width;
+			m_nDXVAIconHeight = height;
 
-			DeleteObject(hBmp);
+			DeleteObject(hBitmap);
 		}
 	}
 
