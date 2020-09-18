@@ -143,7 +143,7 @@ void CChildView::LoadLogo()
 	if (s.bLogoExternal) {
 		// load external logo
 		CComPtr<IWICBitmapSource> pBitmapSource;
-		HRESULT hr = WicLoadImage(&pBitmapSource, s.strLogoFileName.GetString());
+		HRESULT hr = WicLoadImage(&pBitmapSource, true, s.strLogoFileName.GetString());
 		if (SUCCEEDED(hr)) {
 			HBITMAP hBitmap = nullptr;
 			hr = WicCreateHBitmap(hBitmap, false, pBitmapSource);
@@ -176,7 +176,7 @@ void CChildView::LoadLogo()
 
 					if (std::find(logoExts.cbegin(), logoExts.cend(), ext) != logoExts.cend()) {
 						CComPtr<IWICBitmapSource> pBitmapSource;
-						HRESULT hr = WicLoadImage(&pBitmapSource, (path+filename).GetString());
+						HRESULT hr = WicLoadImage(&pBitmapSource, true, (path+filename).GetString());
 						if (SUCCEEDED(hr)) {
 							HBITMAP hBitmap = nullptr;
 							hr = WicCreateHBitmap(hBitmap, false, pBitmapSource);

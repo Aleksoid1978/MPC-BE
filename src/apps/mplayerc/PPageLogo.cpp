@@ -120,7 +120,7 @@ void CPPageLogo::OnBnClickedRadio2()
 	HBITMAP hBitmap = nullptr;
 
 	CComPtr<IWICBitmapSource> pBitmapSource;
-	HRESULT hr = WicLoadImage(&pBitmapSource, m_logofn.GetString());
+	HRESULT hr = WicLoadImage(&pBitmapSource, true, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
 		hr = WicCreateHBitmap(hBitmap, false, pBitmapSource);
 	}
@@ -195,7 +195,7 @@ void CPPageLogo::GetDataFromRes()
 		bool ret = LoadResourceFile(id, &data, size);
 		if (ret) {
 			CComPtr<IWICBitmapSource> pBitmapSource;
-			HRESULT hr = WicLoadImage(&pBitmapSource, data, size);
+			HRESULT hr = WicLoadImage(&pBitmapSource, true, data, size);
 			if (SUCCEEDED(hr)) {
 				hr = WicCreateHBitmap(hBitmap, false, pBitmapSource);
 			}
