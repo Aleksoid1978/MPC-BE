@@ -254,7 +254,7 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, BYTE* input, const size_
 	return hr;
 }
 
-HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
+HRESULT WicCreateHBitmap(HBITMAP& hBitmap, const bool bDibSecton, IWICBitmapSource* pBitmapSource)
 {
 	if (hBitmap != nullptr || !pBitmapSource) {
 		return E_INVALIDARG;
@@ -266,16 +266,29 @@ HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
 	HRESULT hr = pBitmapSource->GetSize(&width, &height);
 	if (SUCCEEDED(hr)) {
 		const UINT bitmapsize = width * height * 4;
-		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[bitmapsize]);
-		if (!buffer) {
-			return E_OUTOFMEMORY;
-		}
 
-		hr = pBitmapSource->CopyPixels(nullptr, width * 4, bitmapsize, buffer.get());
-		if (SUCCEEDED(hr)) {
-			hBitmap = CreateBitmap(width, height, 1, 32, buffer.get());
+		if (bDibSecton) {
+			const BITMAPINFO bminfo = { sizeof(BITMAPINFOHEADER), width, -(LONG)height, 1, 32, BI_RGB, };
+			BYTE* data;
+			hBitmap = CreateDIBSection(nullptr, &bminfo, DIB_RGB_COLORS, (void**)&data, 0, 0);
 			if (!hBitmap) {
 				return E_FAIL;
+			}
+			hr = pBitmapSource->CopyPixels(nullptr, width * 4, bitmapsize, data);
+		}
+		else {
+			std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[bitmapsize]);
+			if (!buffer) {
+				return E_OUTOFMEMORY;
+			}
+
+			hr = pBitmapSource->CopyPixels(nullptr, width * 4, bitmapsize, buffer.get());
+
+			if (SUCCEEDED(hr)) {
+				hBitmap = CreateBitmap(width, height, 1, 32, buffer.get());
+				if (!hBitmap) {
+					return E_FAIL;
+				}
 			}
 		}
 	}
