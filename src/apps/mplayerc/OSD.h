@@ -25,7 +25,6 @@
 #include <evr9.h>
 #include <mvrInterfaces.h>
 #include <HighDPI.h>
-#include "PngImage.h"
 #include "../../DSUtil/DSMPropertyBag.h"
 
 #define WM_HIDE			(WM_USER + 1001)
