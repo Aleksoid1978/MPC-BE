@@ -248,7 +248,7 @@ void CPlayerToolBar::SwitchTheme()
 		hr = pBitmapSource->GetSize(&width, &height);
 	}
 	if (SUCCEEDED(hr) && width == height * 15) {
-		hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
 	}
 	pBitmapSource.Release();
 
@@ -369,7 +369,7 @@ void CPlayerToolBar::SwitchTheme()
 		}
 
 		if (SUCCEEDED(hr)) {
-			hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+			hr = WicCreateHBitmap(hBitmap, pBitmapSource);
 		}
 
 		if (SUCCEEDED(hr)) {

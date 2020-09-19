@@ -50,7 +50,7 @@ CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 		hr = pBitmapSource->GetSize(&width, &height);
 	}
 	if (SUCCEEDED(hr) && width == height * 25) {
-		hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
 	}
 
 	if (SUCCEEDED(hr)) {

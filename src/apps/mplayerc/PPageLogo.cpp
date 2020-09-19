@@ -122,7 +122,7 @@ void CPPageLogo::OnBnClickedRadio2()
 	CComPtr<IWICBitmapSource> pBitmapSource;
 	HRESULT hr = WicLoadImage(&pBitmapSource, true, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
-		hr = WicCreateHBitmap(hBitmap, false, pBitmapSource);
+		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
 	}
 
 	hBitmap = m_logopreview.SetBitmap(hBitmap);
@@ -197,7 +197,7 @@ void CPPageLogo::GetDataFromRes()
 			CComPtr<IWICBitmapSource> pBitmapSource;
 			HRESULT hr = WicLoadImage(&pBitmapSource, true, data, size);
 			if (SUCCEEDED(hr)) {
-				hr = WicCreateHBitmap(hBitmap, false, pBitmapSource);
+				hr = WicCreateHBitmap(hBitmap, pBitmapSource);
 			}
 		}
 		if (!m_author.LoadString(id)) {
