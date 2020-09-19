@@ -136,7 +136,7 @@ void CChildView::LoadLogo()
 
 	m_resizedImg.Destroy();
 
-	HRESULT hr = S_FALSE;
+	HRESULT hr = E_FAIL;
 
 	if (s.bLogoExternal) {
 		// load external logo
