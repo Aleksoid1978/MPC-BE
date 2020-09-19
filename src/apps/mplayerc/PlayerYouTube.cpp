@@ -1251,9 +1251,15 @@ namespace Youtube
 							getJsonValue(object, "videoId", videoId);
 
 							if (!videoId.IsEmpty()) {
-								CString simpleText;
 								if (auto title = GetJsonObject(object, "title")) {
-									if (getJsonValue(*title, "simpleText", simpleText)) {
+									CString simpleText;
+									if (!getJsonValue(*title, "simpleText", simpleText)) {
+										auto text = GetValueByPointer(*title, "/runs/0/text");
+										if (text && text->IsString()) {
+											simpleText = UTF8ToWStr(text->GetString());
+										}
+									}
+									if (!simpleText.IsEmpty()) {
 										REFERENCE_TIME duration = 0;
 										CString lengthSeconds;
 										if (getJsonValue(object, "lengthSeconds", lengthSeconds)) {
