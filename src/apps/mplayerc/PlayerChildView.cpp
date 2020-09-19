@@ -131,30 +131,20 @@ void CChildView::SetVideoRect(CRect r)
 void CChildView::LoadLogo()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	bool bHaveLogo = false;
 
 	CAutoLock cAutoLock(&m_csLogo);
 
-	m_logo.Destroy();
 	m_resizedImg.Destroy();
 
-	bool bLogoLoaded = false;
+	HRESULT hr = S_FALSE;
 
 	if (s.bLogoExternal) {
 		// load external logo
-		CComPtr<IWICBitmapSource> pBitmapSource;
-		HRESULT hr = WicLoadImage(&pBitmapSource, true, s.strLogoFileName.GetString());
-		if (SUCCEEDED(hr)) {
-			HBITMAP hBitmap = nullptr;
-			hr = WicCreateDibSecton(hBitmap, pBitmapSource);
-			if (SUCCEEDED(hr)) {
-				m_logo.Attach(hBitmap);
-				bLogoLoaded = true;
-			}
-		}
+		m_pBitmapSource.Release();
+		hr = WicLoadImage(&m_pBitmapSource, true, s.strLogoFileName.GetString());
 	}
 
-	if (!bLogoLoaded) {
+	if (FAILED(hr)) {
 		// load logo from program folder
 		std::vector<LPCWSTR> logoExts = { L"png", L"bmp", L"jpg", L"jpeg", L"gif" };
 		if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
@@ -175,30 +165,29 @@ void CChildView::LoadLogo()
 					const CStringW ext = filename.Mid(filename.ReverseFind('.') + 1).MakeLower();
 
 					if (std::find(logoExts.cbegin(), logoExts.cend(), ext) != logoExts.cend()) {
-						CComPtr<IWICBitmapSource> pBitmapSource;
-						HRESULT hr = WicLoadImage(&pBitmapSource, true, (path+filename).GetString());
-						if (SUCCEEDED(hr)) {
-							HBITMAP hBitmap = nullptr;
-							hr = WicCreateDibSecton(hBitmap, pBitmapSource);
-							if (SUCCEEDED(hr)) {
-								m_logo.Attach(hBitmap);
-								bLogoLoaded = true;
-							}
-						}
+						m_pBitmapSource.Release();
+						hr = WicLoadImage(&m_pBitmapSource, true, (path+filename).GetString());
 					}
-
 				}
-			} while (!bLogoLoaded && FindNextFileW(hFile, &wfd));
+			} while (FAILED(hr) && FindNextFileW(hFile, &wfd));
 			FindClose(hFile);
 		}
 	}
 
-	if (!bLogoLoaded) {
+	if (FAILED(hr)) {
 		// load internal logo
-		if (!m_logo.LoadFromResource(s.nLogoId)) {
-			m_logo.LoadFromResource(s.nLogoId = DEF_LOGO);
+		BYTE* data;
+		UINT size;
+		HRESULT hr = LoadResourceFile(s.nLogoId, &data, size) ? S_OK : E_FAIL;
+		if (FAILED(hr)) {
+			s.nLogoId = DEF_LOGO;
+			hr = LoadResourceFile(s.nLogoId, &data, size) ? S_OK : E_FAIL;
 		}
-		bLogoLoaded = true;
+
+		if (SUCCEEDED(hr)) {
+			m_pBitmapSource.Release();
+			hr = WicLoadImage(&m_pBitmapSource, true, data, size);
+		}
 	}
 
 	if (m_hWnd) {
@@ -208,7 +197,17 @@ void CChildView::LoadLogo()
 
 CSize CChildView::GetLogoSize() const
 {
-	return m_logo.GetSize();
+	SIZE size = { 0, 0 };
+
+	if (m_pBitmapSource) {
+		UINT w, h;
+		HRESULT hr = m_pBitmapSource->GetSize(&w, &h);
+		if (SUCCEEDED(hr)) {
+			size = { (LONG)w, (LONG)h };
+		}
+	}
+
+	return size;
 }
 
 void CChildView::ClearResizedImage()
@@ -253,9 +252,15 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			((m_pMainFrame->m_eMediaLoadState != MLS_LOADED || m_pMainFrame->m_bAudioOnly) && !m_pMainFrame->m_bNextIsOpened)) {
 		if (!m_pMainFrame->m_InternalImage.IsNull()) {
 			img.Attach(m_pMainFrame->m_InternalImage);
-		} else if (!m_logo.IsNull()) {
-			img.Attach(m_logo);
-			bkcolor = m_logo.GetPixel(0,0);
+		} else if (m_pBitmapSource) {
+			HBITMAP hBitmap = nullptr;
+			HRESULT hr = WicCreateDibSecton(hBitmap, m_pBitmapSource);
+			if (SUCCEEDED(hr)) {
+				img.Attach(hBitmap);
+				const WICRect wicrect = { 0,0,1,1 };
+				hr = m_pBitmapSource->CopyPixels(&wicrect, 4, 4, (BYTE*)&bkcolor);
+				bkcolor &= 0x00FFFFFF;
+			}
 		}
 	} else {
 		pDC->ExcludeClipRect(m_vrect);
