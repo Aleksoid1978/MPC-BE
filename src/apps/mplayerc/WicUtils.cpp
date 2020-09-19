@@ -255,6 +255,34 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* in
 	return hr;
 }
 
+HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, IStream* pIStream)
+{
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return E_NOINTERFACE;
+	}
+
+	if (!pIStream) {
+		return E_POINTER;
+	}
+
+	CComPtr <IWICStream> pStream;
+	CComPtr<IWICBitmapDecoder> pDecoder;
+
+	HRESULT hr = pWICFactory->CreateStream(&pStream);
+	if (SUCCEEDED(hr)) {
+		hr = pStream->InitializeFromIStream(pIStream);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = WicDecodeImage(ppBitmapSource, pma, pDecoder);
+	}
+
+	return hr;
+}
+
 HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
 {
 	if (hBitmap != nullptr || !pBitmapSource) {
@@ -315,6 +343,37 @@ HRESULT WicCreateDibSecton(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
 	BYTE* pData = nullptr;
 
 	return WicCreateDibSecton(hBitmap, &pData, pBitmapSource);
+}
+
+HRESULT WicCreateBitmap(IWICBitmap** ppBitmap, IWICBitmapSource* pBitmapSource)
+{
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return E_NOINTERFACE;
+	}
+
+	HRESULT hr = pWICFactory->CreateBitmapFromSource(pBitmapSource, WICBitmapCacheOnLoad, ppBitmap);
+
+	return hr;
+}
+
+HRESULT WicCreateBitmapScaled(IWICBitmap** ppBitmap, UINT width, UINT height, IWICBitmapSource* pBitmapSource)
+{
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return E_NOINTERFACE;
+	}
+
+	CComPtr<IWICBitmapScaler> pScaler;
+	HRESULT hr = pWICFactory->CreateBitmapScaler(&pScaler);
+	if (SUCCEEDED(hr)) {
+		hr = pScaler->Initialize(pBitmapSource, width, height, WICBitmapInterpolationModeFant);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pWICFactory->CreateBitmapFromSource(pScaler, WICBitmapCacheOnLoad, ppBitmap);
+	}
+
+	return hr;
 }
 
 HRESULT WicSaveImage(

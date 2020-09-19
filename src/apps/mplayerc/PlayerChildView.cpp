@@ -250,8 +250,12 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	CImage img;
 	if (m_pMainFrame->IsD3DFullScreenMode() ||
 			((m_pMainFrame->m_eMediaLoadState != MLS_LOADED || m_pMainFrame->m_bAudioOnly) && !m_pMainFrame->m_bNextIsOpened)) {
-		if (!m_pMainFrame->m_InternalImage.IsNull()) {
-			img.Attach(m_pMainFrame->m_InternalImage);
+		if (m_pMainFrame->m_pMainBitmapSource) {
+			HBITMAP hBitmap = nullptr;
+			HRESULT hr = WicCreateDibSecton(hBitmap, m_pMainFrame->m_pMainBitmapSource);
+			if (SUCCEEDED(hr)) {
+				img.Attach(hBitmap);
+			}
 		} else if (m_pBitmapSource) {
 			HBITMAP hBitmap = nullptr;
 			HRESULT hr = WicCreateDibSecton(hBitmap, m_pBitmapSource);

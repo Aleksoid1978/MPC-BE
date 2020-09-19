@@ -62,10 +62,14 @@ HRESULT WicCheckComponent(const GUID guid);
 
 HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, const std::wstring_view& filename);
 HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* input, const size_t size);
+HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, IStream* pIStream);
 
 HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource);
 HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, IWICBitmapSource* pBitmapSource);
 HRESULT WicCreateDibSecton(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource);
+
+HRESULT WicCreateBitmap(IWICBitmap** ppBitmap, IWICBitmapSource* pBitmapSource);
+HRESULT WicCreateBitmapScaled(IWICBitmap** ppBitmap, UINT width, UINT height, IWICBitmapSource* pBitmapSource);
 
 HRESULT WicSaveImage(
 	BYTE* src, const UINT pitch,
