@@ -122,7 +122,7 @@ void CPPageLogo::OnBnClickedRadio2()
 	CComPtr<IWICBitmapSource> pBitmapSource;
 	HRESULT hr = WicLoadImage(&pBitmapSource, true, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
-		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+		hr = WicCreateDibSecton(hBitmap, pBitmapSource);
 	}
 
 	hBitmap = m_logopreview.SetBitmap(hBitmap);

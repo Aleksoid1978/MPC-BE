@@ -146,7 +146,7 @@ void CChildView::LoadLogo()
 		HRESULT hr = WicLoadImage(&pBitmapSource, true, s.strLogoFileName.GetString());
 		if (SUCCEEDED(hr)) {
 			HBITMAP hBitmap = nullptr;
-			hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+			hr = WicCreateDibSecton(hBitmap, pBitmapSource);
 			if (SUCCEEDED(hr)) {
 				m_logo.Attach(hBitmap);
 				bLogoLoaded = true;
@@ -179,7 +179,7 @@ void CChildView::LoadLogo()
 						HRESULT hr = WicLoadImage(&pBitmapSource, true, (path+filename).GetString());
 						if (SUCCEEDED(hr)) {
 							HBITMAP hBitmap = nullptr;
-							hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+							hr = WicCreateDibSecton(hBitmap, pBitmapSource);
 							if (SUCCEEDED(hr)) {
 								m_logo.Attach(hBitmap);
 								bLogoLoaded = true;
