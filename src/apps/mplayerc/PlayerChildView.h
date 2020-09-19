@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "PngImage.h"
+
 class CMainFrame;
 
 class CChildView : public CWnd

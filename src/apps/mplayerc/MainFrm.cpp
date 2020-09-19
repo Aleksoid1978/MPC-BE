@@ -964,8 +964,8 @@ void CMainFrame::OnClose()
 		FreeLibrary(m_hDWMAPI);
 	}
 
-	m_InternalImage.Destroy();
-	m_InternalImageSmall.Destroy();
+	m_pMainBitmapSource.Release();
+	m_pMainBitmapSourceSmall.Release();
 	if (m_ThumbCashedBitmap) {
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
@@ -19280,14 +19280,13 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
 
-	m_InternalImage.Destroy();
-	if (m_InternalImageSmall) {
-		m_InternalImageSmall.Detach();
-	}
+	m_pMainBitmapSource.Release();
+	m_pMainBitmapSourceSmall.Release();
 
 	if (m_bAudioOnly && IsSomethingLoaded() && show) {
-
+		HRESULT hr = S_FALSE;
 		bool bLoadRes = false;
+
 		if (s.nAudioWindowMode == 1) {
 			// load image from DSMResource to show in preview & logo;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
@@ -19309,11 +19308,13 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 										ASSERT(lpResBuffer != nullptr);
 										memcpy(lpResBuffer, pData, len);
 
-										IStream* pStream = nullptr;
-										if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pStream))) {
-											m_InternalImage.Load(pStream);
-											pStream->Release();
-											bLoadRes = true;
+										IStream* pIStream = nullptr;
+										if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pIStream))) {
+											hr = WicLoadImage(&m_pMainBitmapSource, true, pIStream);
+											if (SUCCEEDED(hr)) {
+												bLoadRes = true;
+											}
+											pIStream->Release();
 										}
 
 										::GlobalUnlock(hBlock);
@@ -19332,7 +19333,8 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 				CString img_fname = GetCoverImgFromPath(m_strPlaybackRenderedPath);
 
 				if (!img_fname.IsEmpty()) {
-					if (SUCCEEDED(m_InternalImage.Load(img_fname))) {
+					hr = WicLoadImage(&m_pMainBitmapSource, true, img_fname.GetString());
+					if (SUCCEEDED(hr)) {
 						bLoadRes = true;
 					}
 				}
@@ -19340,39 +19342,35 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		}
 
 		if (!bLoadRes) {
-			m_InternalImage.LoadFromResource(IDB_W7_AUDIO);
-			m_InternalImageSmall.Attach(m_InternalImage);
+			BYTE* data;
+			UINT size;
+			hr = LoadResourceFile(IDB_W7_AUDIO, &data, size) ? S_OK : E_FAIL;
+			if (SUCCEEDED(hr)) {
+				hr = WicLoadImage(&m_pMainBitmapSource, true, data, size);
+			}
+			if (SUCCEEDED(hr)) {
+				m_pMainBitmapSourceSmall.Attach(m_pMainBitmapSource);
+			}
 		} else {
-			BITMAP bm;
-			if (GetObjectW(m_InternalImage, sizeof(bm), &bm) && bm.bmWidth) {
-				const int nWidth = 256;
-				if ((abs(bm.bmHeight) <= nWidth) && (bm.bmWidth <= nWidth)) {
-					m_InternalImageSmall.Attach(m_InternalImage);
+			if (m_pMainBitmapSource) {
+				UINT width, height;
+				m_pMainBitmapSource->GetSize(&width, &height);
+
+				const UINT maxSize = 256;
+				if (width <= maxSize && height <= maxSize) {
+					m_pMainBitmapSourceSmall.Attach(m_pMainBitmapSource);
 				} else {
 					// Resize image to improve speed of show TaskBar preview
 
-					int h = std::min(abs(bm.bmHeight), (long)nWidth);
-					int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
-					h     = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+					int h = std::min(height, maxSize);
+					int w = MulDiv(h, width, height);
+					h     = MulDiv(w, height, width);
 
-					CDC *screenDC = GetDC();
-					CDC *pMDC = DNew CDC;
-					pMDC->CreateCompatibleDC(screenDC);
-
-					CBitmap *pb = DNew CBitmap;
-					pb->CreateCompatibleBitmap(screenDC, w, h);
-
-					CBitmap *pob = pMDC->SelectObject(pb);
-					SetStretchBltMode(pMDC->m_hDC, STRETCH_HALFTONE);
-					m_InternalImage.StretchBlt(pMDC->m_hDC, 0, 0, w, h, 0, 0, bm.bmWidth, abs(bm.bmHeight), SRCCOPY);
-					pMDC->SelectObject(pob);
-
-					m_InternalImageSmall.Attach((HBITMAP)(pb->Detach()));
-					pb->DeleteObject();
-					ReleaseDC(screenDC);
-
-					delete pMDC;
-					delete pb;
+					CComPtr<IWICBitmap> pBitmap;
+					hr = WicCreateBitmapScaled(&pBitmap, w, h, m_pMainBitmapSource);
+					if (SUCCEEDED(hr)) {
+						m_pMainBitmapSourceSmall.Attach(pBitmap);
+					}
 				}
 			}
 		}
@@ -19386,54 +19384,35 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 {
-	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_DwmSetIconicThumbnailFnc || !m_InternalImageSmall) {
+	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_DwmSetIconicThumbnailFnc || !m_pMainBitmapSourceSmall) {
 		return 0;
 	}
 
-	long nWidth  = HIWORD(lParam);
-	long nHeight = LOWORD(lParam);
+	UINT nWidth  = HIWORD(lParam);
+	UINT nHeight = LOWORD(lParam);
+	HRESULT hr = S_FALSE;
 
 	if (m_ThumbCashedBitmap && m_ThumbCashedSize != CSize(nWidth, nHeight)) {
 		::DeleteObject(m_ThumbCashedBitmap);
 		m_ThumbCashedBitmap = nullptr;
 	}
 
-	if (!m_ThumbCashedBitmap) {
-		HDC hdcMem = CreateCompatibleDC(nullptr);
+	if (!m_ThumbCashedBitmap && m_pMainBitmapSourceSmall) {
+		UINT width, height;
+		hr = m_pMainBitmapSourceSmall->GetSize(&width, &height);
+		
+		if (SUCCEEDED(hr)) {
+			int h = std::min(height, nHeight);
+			int w = MulDiv(h, width, height);
+			h = MulDiv(w, height, width);
 
-		if (hdcMem) {
-			BITMAP bm;
-			GetObjectW(m_InternalImageSmall, sizeof(bm), &bm);
-
-			int h = std::min(abs(bm.bmHeight), nHeight);
-			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
-			h     = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
-
-			BITMAPINFO bmi = {};
-			bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-			bmi.bmiHeader.biWidth       = nWidth;
-			bmi.bmiHeader.biHeight      = -nHeight;
-			bmi.bmiHeader.biPlanes      = 1;
-			bmi.bmiHeader.biBitCount    = 32;
-
-			VOID* pvBits = nullptr;
-			m_ThumbCashedBitmap = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, &pvBits, nullptr, 0);
-			if (m_ThumbCashedBitmap) {
-				SelectObject(hdcMem, m_ThumbCashedBitmap);
-
-				int x = nWidth / 2  - w / 2;
-				int y = nHeight / 2 - h / 2;
-				CRect r = CRect(CPoint(x, y), CSize(w, h));
-
-				SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
-				m_InternalImageSmall.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			CComPtr<IWICBitmap> pBitmap;
+			hr = WicCreateBitmapScaled(&pBitmap, w, h, m_pMainBitmapSource);
+			if (SUCCEEDED(hr)) {
+				hr = WicCreateDibSecton(m_ThumbCashedBitmap, pBitmap);
 			}
-
-			DeleteDC(hdcMem);
 		}
 	}
-
-	HRESULT hr = E_FAIL;
 
 	if (m_ThumbCashedBitmap) {
 		hr = m_DwmSetIconicThumbnailFnc(m_hWnd, m_ThumbCashedBitmap, 0);

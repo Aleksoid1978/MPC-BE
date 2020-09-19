@@ -24,7 +24,6 @@
 #include <atlbase.h>
 
 #include "Misc.h"
-#include "PngImage.h"
 #include "PlayerChildView.h"
 #include "PlayerPreView.h"
 #include "PlayerFlyBar.h"
@@ -1296,7 +1295,8 @@ public:
 
 
 	HRESULT			SetAudioPicture(BOOL show = TRUE);
-	CMPCPngImage	m_InternalImage, m_InternalImageSmall;
+	CComPtr<IWICBitmapSource> m_pMainBitmapSource;
+	CComPtr<IWICBitmapSource> m_pMainBitmapSourceSmall;
 
 	HBITMAP			m_ThumbCashedBitmap;
 	CSize			m_ThumbCashedSize;
