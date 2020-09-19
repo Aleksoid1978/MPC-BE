@@ -18562,7 +18562,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 			hr = pBitmapSource->GetSize(&width, &height);
 		}
 		if (SUCCEEDED(hr)) {
-			hr = WicCreateHBitmap(hBitmap, true, pBitmapSource);
+			hr = WicCreateHBitmap(hBitmap, pBitmapSource);
 		}
 
 		if (FAILED(hr)) {
