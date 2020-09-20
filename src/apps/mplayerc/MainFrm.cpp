@@ -19202,62 +19202,46 @@ bool CMainFrame::CanPreviewUse()
 			&& AfxGetAppSettings().fSmartSeek);
 }
 
-bool CheckCoverImgExist(CString &path, CString name) {
-	CPath coverpath;
-	coverpath.Combine(path, name);
-
-	if (coverpath.FileExists() ||
-			(coverpath.RenameExtension(L".jpeg") && coverpath.FileExists()) ||
-			(coverpath.RenameExtension(L".png")  && coverpath.FileExists()) ||
-			(coverpath.RenameExtension(L".bmp")  && coverpath.FileExists())) {
-		path.SetString(coverpath);
-		return true;
-	}
-
-	return false;
-}
-
-CString GetCoverImgFromPath(CString fullfilename)
+CStringW GetCoverImgFromPath(CString fullfilename)
 {
-	CString path = fullfilename.Left(fullfilename.ReverseFind('\\') + 1);
+	CPath path(fullfilename);
+	path.RemoveExtension();
 
-	if (CheckCoverImgExist(path, L"cover.jpg")) {
-		return path;
+	const CStringW filename = path.m_strPath.Mid(path.FindFileName());
+	
+	path.RemoveFileSpec();
+
+	const CStringW foldername = path.m_strPath.Mid(path.FindFileName());
+
+	path.AddBackslash();
+
+	const std::vector<CStringW> coverNames = {
+		L"cover",
+		L"folder",
+		foldername,
+		L"front",
+		filename,
+		L"cover\\front",
+		L"covers\\front",
+		L"box"
+	};
+
+	std::vector<LPCWSTR> coverExts = { L".jpg", L".jpeg", L".png", L".bmp" };
+	if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
+		coverExts.emplace_back(L".heif");
+		coverExts.emplace_back(L".heic");
+	}
+	if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) {
+		coverExts.emplace_back(L".webp");
 	}
 
-	if (CheckCoverImgExist(path, L"folder.jpg")) {
-		return path;
-	}
-
-	CPath dir(path);
-	dir.RemoveBackslash();
-	int k = dir.FindFileName();
-	if (k >= 0) {
-		if (CheckCoverImgExist(path, CString(dir).Right(k) + L".jpg")) {
-			return path;
+	for (const auto& coverName : coverNames) {
+		for (const auto& coverExt : coverExts) {
+			CStringW coverPath = path.m_strPath + coverName + coverExt;
+			if (::PathFileExistsW(coverPath)) {
+				return coverPath;
+			}
 		}
-	}
-
-	if (CheckCoverImgExist(path, L"front.jpg")) {
-		return path;
-	}
-
-	CString fname = fullfilename.Mid(path.GetLength());
-	fname = fname.Left(fname.ReverseFind('.'));
-	if (CheckCoverImgExist(path, fname + L".jpg")) {
-		return path;
-	}
-
-	if (CheckCoverImgExist(path, L"cover\\front.jpg")) {
-		return path;
-	}
-
-	if (CheckCoverImgExist(path, L"covers\\front.jpg")) {
-		return path;
-	}
-
-	if (CheckCoverImgExist(path, L"box.jpg")) {
-		return path;
 	}
 
 	return L"";
