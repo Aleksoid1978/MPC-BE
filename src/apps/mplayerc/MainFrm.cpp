@@ -964,7 +964,7 @@ void CMainFrame::OnClose()
 		FreeLibrary(m_hDWMAPI);
 	}
 
-	m_pMainBitmapSource.Release();
+	m_pMainBitmap.Release();
 	m_pMainBitmapSmall.Release();
 	if (m_ThumbCashedBitmap) {
 		::DeleteObject(m_ThumbCashedBitmap);
@@ -18549,20 +18549,20 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
 	if (SUCCEEDED(hr)) {
-		CComPtr<IWICBitmapSource> pBitmapSource;
+		CComPtr<IWICBitmap> pBitmap;
 		HBITMAP hBitmap = nullptr;
 		UINT width, height;
 		BYTE* data;
 		UINT size;
 		HRESULT hr = LoadResourceFile(IDB_W7_TOOLBAR, &data, size) ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmapSource, true, data, size);
+			hr = WicLoadImage(&pBitmap, true, data, size);
 		}
 		if (SUCCEEDED(hr)) {
-			hr = pBitmapSource->GetSize(&width, &height);
+			hr = pBitmap->GetSize(&width, &height);
 		}
 		if (SUCCEEDED(hr)) {
-			hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+			hr = WicCreateHBitmap(hBitmap, pBitmap);
 		}
 
 		if (FAILED(hr)) {
@@ -19264,7 +19264,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
 
-	m_pMainBitmapSource.Release();
+	m_pMainBitmap.Release();
 	m_pMainBitmapSmall.Release();
 
 	if (m_bAudioOnly && IsSomethingLoaded() && show) {
@@ -19292,7 +19292,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 								};
 
 								if (std::find(mimeStrins.cbegin(), mimeStrins.cend(), mimeStr) != mimeStrins.cend()) {
-									hr = WicLoadImage(&m_pMainBitmapSource, true, pData, len);
+									hr = WicLoadImage(&m_pMainBitmap, true, pData, len);
 									if (SUCCEEDED(hr)) {
 										bLoadRes = true;
 									}
@@ -19310,7 +19310,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 				CString img_fname = GetCoverImgFromPath(m_strPlaybackRenderedPath);
 
 				if (!img_fname.IsEmpty()) {
-					hr = WicLoadImage(&m_pMainBitmapSource, true, img_fname.GetString());
+					hr = WicLoadImage(&m_pMainBitmap, true, img_fname.GetString());
 					if (SUCCEEDED(hr)) {
 						bLoadRes = true;
 					}
@@ -19323,19 +19323,19 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 			UINT size;
 			hr = LoadResourceFile(IDB_W7_AUDIO, &data, size) ? S_OK : E_FAIL;
 			if (SUCCEEDED(hr)) {
-				hr = WicLoadImage(&m_pMainBitmapSource, true, data, size);
+				hr = WicLoadImage(&m_pMainBitmap, true, data, size);
 			}
 			if (SUCCEEDED(hr)) {
-				hr = WicCreateBitmap(&m_pMainBitmapSmall, m_pMainBitmapSource);
+				hr = WicCreateBitmap(&m_pMainBitmapSmall, m_pMainBitmap);
 			}
 		} else {
-			if (m_pMainBitmapSource) {
+			if (m_pMainBitmap) {
 				UINT width, height;
-				m_pMainBitmapSource->GetSize(&width, &height);
+				m_pMainBitmap->GetSize(&width, &height);
 
 				const UINT maxSize = 256;
 				if (width <= maxSize && height <= maxSize) {
-					hr = WicCreateBitmap(&m_pMainBitmapSmall, m_pMainBitmapSource);
+					hr = WicCreateBitmap(&m_pMainBitmapSmall, m_pMainBitmap);
 				} else {
 					// Resize image to improve speed of show TaskBar preview
 
@@ -19343,8 +19343,9 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 					int w = MulDiv(h, width, height);
 					h     = MulDiv(w, height, width);
 
-					hr = WicCreateBitmapScaled(&m_pMainBitmapSmall, w, h, m_pMainBitmapSource);
+					hr = WicCreateBitmapScaled(&m_pMainBitmapSmall, w, h, m_pMainBitmap);
 				}
+				ASSERT(SUCCEEDED(hr));
 			}
 		}
 	}
@@ -19380,7 +19381,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 			h = MulDiv(w, height, width);
 
 			CComPtr<IWICBitmap> pBitmap;
-			hr = WicCreateBitmapScaled(&pBitmap, w, h, m_pMainBitmapSource);
+			hr = WicCreateBitmapScaled(&pBitmap, w, h, m_pMainBitmap);
 			if (SUCCEEDED(hr)) {
 				hr = WicCreateDibSecton(m_ThumbCashedBitmap, pBitmap);
 			}

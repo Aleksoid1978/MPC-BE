@@ -119,10 +119,10 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_author.Empty();
 	HBITMAP hBitmap = nullptr;
 
-	CComPtr<IWICBitmapSource> pBitmapSource;
-	HRESULT hr = WicLoadImage(&pBitmapSource, true, m_logofn.GetString());
+	CComPtr<IWICBitmap> pBitmap;
+	HRESULT hr = WicLoadImage(&pBitmap, true, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
-		hr = WicCreateDibSecton(hBitmap, pBitmapSource);
+		hr = WicCreateDibSecton(hBitmap, pBitmap);
 	}
 
 	hBitmap = m_logopreview.SetBitmap(hBitmap);
@@ -194,10 +194,10 @@ void CPPageLogo::GetDataFromRes()
 		UINT size;
 		bool ret = LoadResourceFile(id, &data, size);
 		if (ret) {
-			CComPtr<IWICBitmapSource> pBitmapSource;
-			HRESULT hr = WicLoadImage(&pBitmapSource, true, data, size);
+			CComPtr<IWICBitmap> pBitmap;
+			HRESULT hr = WicLoadImage(&pBitmap, true, data, size);
 			if (SUCCEEDED(hr)) {
-				hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+				hr = WicCreateHBitmap(hBitmap, pBitmap);
 			}
 		}
 		if (!m_author.LoadString(id)) {

@@ -1295,7 +1295,7 @@ public:
 
 
 	HRESULT			SetAudioPicture(BOOL show = TRUE);
-	CComPtr<IWICBitmapSource> m_pMainBitmapSource;
+	CComPtr<IWICBitmap> m_pMainBitmap;
 	CComPtr<IWICBitmap> m_pMainBitmapSmall;
 
 	HBITMAP			m_ThumbCashedBitmap;
