@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "PngImage.h"
-
 class CMainFrame;
 
 class CChildView : public CWnd
@@ -30,10 +28,8 @@ class CChildView : public CWnd
 	CRect m_vrect;
 
 	CCritSec     m_csLogo;
-	CImage       m_resizedImg; // TODO: replace it with WIC components
-
 	CComPtr<IWICBitmapSource> m_pBitmapSource;
-	//TODO: CComPtr<IWICBitmapSource> m_pBitmapResized;
+	CComPtr<IWICBitmap> m_pBitmapResized;
 
 	HCURSOR m_hCursor = nullptr;
 	CPoint m_lastMousePoint{ -1, -1 };
