@@ -19281,30 +19281,23 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 							BYTE* pData = nullptr;
 							DWORD len = 0;
 							if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
-								CString mimeStr(mime); mimeStr.Trim();
-								if (mimeStr == L"image/jpeg"
-										|| mimeStr == L"image/jpg"
-										|| mimeStr == L"image/png"
-										|| mimeStr == L"image/bmp") {
-									HGLOBAL hBlock = ::GlobalAlloc(GMEM_MOVEABLE, len);
-									if (hBlock != nullptr) {
-										LPVOID lpResBuffer = ::GlobalLock(hBlock);
-										ASSERT(lpResBuffer != nullptr);
-										memcpy(lpResBuffer, pData, len);
+								CString mimeStr(mime);
+								mimeStr.Trim();
 
-										IStream* pIStream = nullptr;
-										if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pIStream))) {
-											hr = WicLoadImage(&m_pMainBitmapSource, true, pIStream);
-											if (SUCCEEDED(hr)) {
-												bLoadRes = true;
-											}
-											pIStream->Release();
-										}
+								std::vector<LPCWSTR> mimeStrins = {
+									L"image/jpeg",
+									L"image/jpg",
+									L"image/png",
+									L"image/bmp"
+								};
 
-										::GlobalUnlock(hBlock);
-										::GlobalFree(hBlock);
+								if (std::find(mimeStrins.cbegin(), mimeStrins.cend(), mimeStr) != mimeStrins.cend()) {
+									hr = WicLoadImage(&m_pMainBitmapSource, true, pData, len);
+									if (SUCCEEDED(hr)) {
+										bLoadRes = true;
 									}
 								}
+
 								CoTaskMemFree(pData);
 							}
 						}
