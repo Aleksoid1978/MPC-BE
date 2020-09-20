@@ -28,7 +28,7 @@ class CChildView : public CWnd
 	CRect m_vrect;
 
 	CCritSec     m_csLogo;
-	CComPtr<IWICBitmapSource> m_pBitmapSource;
+	CComPtr<IWICBitmap> m_pBitmap;
 	CComPtr<IWICBitmap> m_pBitmapResized;
 
 	HCURSOR m_hCursor = nullptr;

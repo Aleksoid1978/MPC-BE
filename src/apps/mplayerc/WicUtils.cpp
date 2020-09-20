@@ -174,12 +174,13 @@ HRESULT WicCheckComponent(const GUID guid)
 	return hr;
 }
 
-HRESULT WicDecodeImage(IWICBitmapSource** ppBitmapSource, const bool pma, IWICBitmapDecoder* pDecoder)
+HRESULT WicDecodeImage(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap, const bool pma, IWICBitmapDecoder* pDecoder)
 {
 	CComPtr<IWICBitmapFrameDecode> pFrameDecode;
 
 	const WICPixelFormatGUID dstPixelFormat = pma ? GUID_WICPixelFormat32bppPBGRA : GUID_WICPixelFormat32bppBGRA;
 	WICPixelFormatGUID pixelFormat = {};
+	CComPtr<IWICBitmapSource> pBitmapSource;
 
 	HRESULT hr = pDecoder->GetFrame(0, &pFrameDecode);
 	if (SUCCEEDED(hr)) {
@@ -188,19 +189,20 @@ HRESULT WicDecodeImage(IWICBitmapSource** ppBitmapSource, const bool pma, IWICBi
 	if (SUCCEEDED(hr)) {
 		// need premultiplied alpha
 		if (IsEqualGUID(pixelFormat, dstPixelFormat)) {
-			*ppBitmapSource = pFrameDecode;
-			(*ppBitmapSource)->AddRef();
+			pBitmapSource = pFrameDecode;
 		}
 		else {
-			hr = WICConvertBitmapSource(dstPixelFormat, pFrameDecode, ppBitmapSource);
+			hr = WICConvertBitmapSource(dstPixelFormat, pFrameDecode, &pBitmapSource);
 		}
-		pFrameDecode.Release();
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pWICFactory->CreateBitmapFromSource(pBitmapSource, WICBitmapCacheOnLoad, ppBitmap);
 	}
 
 	return hr;
 }
 
-HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, const std::wstring_view& filename)
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view& filename)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
@@ -221,13 +223,13 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, const st
 		&pDecoder
 	);
 	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(ppBitmapSource, pma, pDecoder);
+		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
 	}
 
 	return hr;
 }
 
-HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* input, const size_t size)
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, BYTE* input, const size_t size)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
@@ -238,7 +240,7 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* in
 		return E_INVALIDARG;
 	}
 
-	CComPtr <IWICStream> pStream;
+	CComPtr<IWICStream> pStream;
 	CComPtr<IWICBitmapDecoder> pDecoder;
 
 	HRESULT hr = pWICFactory->CreateStream(&pStream);
@@ -249,13 +251,13 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* in
 		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
 	}
 	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(ppBitmapSource, pma, pDecoder);
+		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
 	}
 
 	return hr;
 }
 
-HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, IStream* pIStream)
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, IStream* pIStream)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
@@ -277,7 +279,7 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, IStream*
 		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
 	}
 	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(ppBitmapSource, pma, pDecoder);
+		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
 	}
 
 	return hr;

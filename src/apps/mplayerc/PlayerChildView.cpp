@@ -140,8 +140,8 @@ void CChildView::LoadLogo()
 
 	if (s.bLogoExternal) {
 		// load external logo
-		m_pBitmapSource.Release();
-		hr = WicLoadImage(&m_pBitmapSource, true, s.strLogoFileName.GetString());
+		m_pBitmap.Release();
+		hr = WicLoadImage(&m_pBitmap, true, s.strLogoFileName.GetString());
 	}
 
 	if (FAILED(hr)) {
@@ -165,8 +165,8 @@ void CChildView::LoadLogo()
 					const CStringW ext = filename.Mid(filename.ReverseFind('.') + 1).MakeLower();
 
 					if (std::find(logoExts.cbegin(), logoExts.cend(), ext) != logoExts.cend()) {
-						m_pBitmapSource.Release();
-						hr = WicLoadImage(&m_pBitmapSource, true, (path+filename).GetString());
+						m_pBitmap.Release();
+						hr = WicLoadImage(&m_pBitmap, true, (path+filename).GetString());
 					}
 				}
 			} while (FAILED(hr) && FindNextFileW(hFile, &wfd));
@@ -185,8 +185,8 @@ void CChildView::LoadLogo()
 		}
 
 		if (SUCCEEDED(hr)) {
-			m_pBitmapSource.Release();
-			hr = WicLoadImage(&m_pBitmapSource, true, data, size);
+			m_pBitmap.Release();
+			hr = WicLoadImage(&m_pBitmap, true, data, size);
 		}
 	}
 
@@ -199,9 +199,9 @@ CSize CChildView::GetLogoSize() const
 {
 	SIZE size = { 0, 0 };
 
-	if (m_pBitmapSource) {
+	if (m_pBitmap) {
 		UINT w, h;
-		HRESULT hr = m_pBitmapSource->GetSize(&w, &h);
+		HRESULT hr = m_pBitmap->GetSize(&w, &h);
 		if (SUCCEEDED(hr)) {
 			size = { (LONG)w, (LONG)h };
 		}
@@ -255,14 +255,14 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	if (m_pMainFrame->IsD3DFullScreenMode() ||
 			((m_pMainFrame->m_eMediaLoadState != MLS_LOADED || m_pMainFrame->m_bAudioOnly) && !m_pMainFrame->m_bNextIsOpened)) {
 
-		if (m_pMainFrame->m_pMainBitmapSource) {
-			pBitmapSource = m_pMainFrame->m_pMainBitmapSource;
+		if (m_pMainFrame->m_pMainBitmap) {
+			pBitmapSource = m_pMainFrame->m_pMainBitmap;
 		}
-		else if (m_pBitmapSource) {
+		else if (m_pBitmap) {
 			const WICRect wicrect = { 0,0,1,1 };
-			hr = m_pBitmapSource->CopyPixels(&wicrect, 4, 4, (BYTE*)&bkcolor);
+			hr = m_pBitmap->CopyPixels(&wicrect, 4, 4, (BYTE*)&bkcolor);
 			bkcolor &= 0x00FFFFFF;
-			pBitmapSource = m_pBitmapSource;
+			pBitmapSource = m_pBitmap;
 		}
 	} else {
 		pDC->ExcludeClipRect(m_vrect);

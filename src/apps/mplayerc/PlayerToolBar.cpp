@@ -228,29 +228,29 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	// load toolbar image
-	CComPtr<IWICBitmapSource> pBitmapSource;
+	CComPtr<IWICBitmap> pBitmap;
 	HBITMAP hBitmap = nullptr;
 	UINT width, height;
 
 	// don't use premultiplied alpha here
-	HRESULT hr = WicLoadImage(&pBitmapSource, false, (::GetProgramDir()+L"toolbar.png").GetString());
+	HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir()+L"toolbar.png").GetString());
 
 	if (FAILED(hr)) {
 		BYTE* data;
 		UINT size;
 		hr = LoadResourceFile(resid, &data, size) ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmapSource, false, data, size);
+			hr = WicLoadImage(&pBitmap, false, data, size);
 		}
 	}
 
 	if (SUCCEEDED(hr)) {
-		hr = pBitmapSource->GetSize(&width, &height);
+		hr = pBitmap->GetSize(&width, &height);
 	}
 	if (SUCCEEDED(hr) && width == height * 15) {
-		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+		hr = WicCreateHBitmap(hBitmap, pBitmap);
 	}
-	pBitmapSource.Release();
+	pBitmap.Release();
 
 	if (SUCCEEDED(hr)) {
 		CBitmap bmp;
@@ -338,13 +338,13 @@ void CPlayerToolBar::SwitchTheme()
 		}
 
 		// don't use premultiplied alpha here
-		HRESULT hr = WicLoadImage(&pBitmapSource, false, (::GetProgramDir()+L"gpu.png").GetString());
+		HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir()+L"gpu.png").GetString());
 
 		if (SUCCEEDED(hr)) {
-			hr = pBitmapSource->GetSize(&width, &height);
+			hr = pBitmap->GetSize(&width, &height);
 			if (SUCCEEDED(hr) && (LONG)height >= m_nButtonHeight) {
 				hr = E_ABORT;
-				pBitmapSource.Release();
+				pBitmap.Release();
 			}
 		}
 
@@ -361,15 +361,15 @@ void CPlayerToolBar::SwitchTheme()
 			UINT size;
 			hr = LoadResourceFile(resid, &data, size) ? S_OK : E_FAIL;
 			if (SUCCEEDED(hr)) {
-				hr = WicLoadImage(&pBitmapSource, false, data, size);
+				hr = WicLoadImage(&pBitmap, false, data, size);
 			}
 			if (SUCCEEDED(hr)) {
-				hr = pBitmapSource->GetSize(&width, &height);
+				hr = pBitmap->GetSize(&width, &height);
 			}
 		}
 
 		if (SUCCEEDED(hr)) {
-			hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+			hr = WicCreateHBitmap(hBitmap, pBitmap);
 		}
 
 		if (SUCCEEDED(hr)) {

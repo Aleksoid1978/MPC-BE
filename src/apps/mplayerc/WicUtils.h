@@ -60,9 +60,9 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder);
 
 HRESULT WicCheckComponent(const GUID guid);
 
-HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, const std::wstring_view& filename);
-HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* input, const size_t size);
-HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, IStream* pIStream);
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view& filename);
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, BYTE* input, const size_t size);
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, IStream* pIStream);
 
 HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource);
 HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, BITMAPINFO& bminfo, IWICBitmapSource* pBitmapSource);

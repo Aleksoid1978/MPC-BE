@@ -31,26 +31,26 @@ CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 	, bt_idx(-1)
 	, m_pButtonsImages(nullptr)
 {
-	CComPtr<IWICBitmapSource> pBitmapSource;
+	CComPtr<IWICBitmap> pBitmap;
 	HBITMAP hBitmap = nullptr;
 	UINT width, height;
 
-	HRESULT hr = WicLoadImage(&pBitmapSource, true, (::GetProgramDir()+L"flybar.png").GetString());
+	HRESULT hr = WicLoadImage(&pBitmap, true, (::GetProgramDir()+L"flybar.png").GetString());
 
 	if (FAILED(hr)) {
 		BYTE* data;
 		UINT size;
 		hr = LoadResourceFile(IDB_PLAYERFLYBAR_PNG, &data, size) ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmapSource, true, data, size);
+			hr = WicLoadImage(&pBitmap, true, data, size);
 		}
 	}
 
 	if (SUCCEEDED(hr)) {
-		hr = pBitmapSource->GetSize(&width, &height);
+		hr = pBitmap->GetSize(&width, &height);
 	}
 	if (SUCCEEDED(hr) && width == height * 25) {
-		hr = WicCreateHBitmap(hBitmap, pBitmapSource);
+		hr = WicCreateHBitmap(hBitmap, pBitmap);
 	}
 
 	if (SUCCEEDED(hr)) {
