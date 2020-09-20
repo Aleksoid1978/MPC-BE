@@ -65,7 +65,7 @@ HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, BYTE* in
 HRESULT WicLoadImage(IWICBitmapSource** ppBitmapSource, const bool pma, IStream* pIStream);
 
 HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource);
-HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, IWICBitmapSource* pBitmapSource);
+HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, BITMAPINFO& bminfo, IWICBitmapSource* pBitmapSource);
 HRESULT WicCreateDibSecton(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource);
 
 HRESULT WicCreateBitmap(IWICBitmap** ppBitmap, IWICBitmapSource* pBitmapSource);

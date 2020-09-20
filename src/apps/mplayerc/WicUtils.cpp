@@ -314,7 +314,7 @@ HRESULT WicCreateHBitmap(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
 	return hr;
 }
 
-HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, IWICBitmapSource* pBitmapSource)
+HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, BITMAPINFO& bminfo, IWICBitmapSource* pBitmapSource)
 {
 	if (hBitmap != nullptr || !pBitmapSource) {
 		return E_INVALIDARG;
@@ -327,7 +327,7 @@ HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, IWICBitmapSource* pB
 	if (SUCCEEDED(hr)) {
 		const UINT bitmapsize = width * height * 4;
 
-		const BITMAPINFO bminfo = { sizeof(BITMAPINFOHEADER), width, -(LONG)height, 1, 32, BI_RGB, };
+		bminfo = { sizeof(BITMAPINFOHEADER), (LONG)width, -(LONG)height, 1, 32, BI_RGB };
 		hBitmap = CreateDIBSection(nullptr, &bminfo, DIB_RGB_COLORS, (void**)ppData, 0, 0);
 		if (!hBitmap) {
 			return E_FAIL;
@@ -341,8 +341,9 @@ HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, IWICBitmapSource* pB
 HRESULT WicCreateDibSecton(HBITMAP& hBitmap, IWICBitmapSource* pBitmapSource)
 {
 	BYTE* pData = nullptr;
+	BITMAPINFO bminfo;
 
-	return WicCreateDibSecton(hBitmap, &pData, pBitmapSource);
+	return WicCreateDibSecton(hBitmap, &pData, bminfo, pBitmapSource);
 }
 
 HRESULT WicCreateBitmap(IWICBitmap** ppBitmap, IWICBitmapSource* pBitmapSource)
