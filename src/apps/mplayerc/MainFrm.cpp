@@ -965,7 +965,7 @@ void CMainFrame::OnClose()
 	}
 
 	m_pMainBitmapSource.Release();
-	m_pMainBitmapSourceSmall.Release();
+	m_pMainBitmapSmall.Release();
 	if (m_ThumbCashedBitmap) {
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
@@ -19281,7 +19281,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 	}
 
 	m_pMainBitmapSource.Release();
-	m_pMainBitmapSourceSmall.Release();
+	m_pMainBitmapSmall.Release();
 
 	if (m_bAudioOnly && IsSomethingLoaded() && show) {
 		HRESULT hr = S_FALSE;
@@ -19349,7 +19349,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 				hr = WicLoadImage(&m_pMainBitmapSource, true, data, size);
 			}
 			if (SUCCEEDED(hr)) {
-				m_pMainBitmapSourceSmall.Attach(m_pMainBitmapSource);
+				hr = WicCreateBitmap(&m_pMainBitmapSmall, m_pMainBitmapSource);
 			}
 		} else {
 			if (m_pMainBitmapSource) {
@@ -19358,7 +19358,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 				const UINT maxSize = 256;
 				if (width <= maxSize && height <= maxSize) {
-					m_pMainBitmapSourceSmall.Attach(m_pMainBitmapSource);
+					hr = WicCreateBitmap(&m_pMainBitmapSmall, m_pMainBitmapSource);
 				} else {
 					// Resize image to improve speed of show TaskBar preview
 
@@ -19366,11 +19366,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 					int w = MulDiv(h, width, height);
 					h     = MulDiv(w, height, width);
 
-					CComPtr<IWICBitmap> pBitmap;
-					hr = WicCreateBitmapScaled(&pBitmap, w, h, m_pMainBitmapSource);
-					if (SUCCEEDED(hr)) {
-						m_pMainBitmapSourceSmall.Attach(pBitmap);
-					}
+					hr = WicCreateBitmapScaled(&m_pMainBitmapSmall, w, h, m_pMainBitmapSource);
 				}
 			}
 		}
@@ -19384,7 +19380,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 {
-	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_DwmSetIconicThumbnailFnc || !m_pMainBitmapSourceSmall) {
+	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_DwmSetIconicThumbnailFnc || !m_pMainBitmapSmall) {
 		return 0;
 	}
 
@@ -19397,9 +19393,9 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 		m_ThumbCashedBitmap = nullptr;
 	}
 
-	if (!m_ThumbCashedBitmap && m_pMainBitmapSourceSmall) {
+	if (!m_ThumbCashedBitmap && m_pMainBitmapSmall) {
 		UINT width, height;
-		hr = m_pMainBitmapSourceSmall->GetSize(&width, &height);
+		hr = m_pMainBitmapSmall->GetSize(&width, &height);
 		
 		if (SUCCEEDED(hr)) {
 			int h = std::min(height, nHeight);

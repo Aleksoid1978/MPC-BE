@@ -134,7 +134,7 @@ void CChildView::LoadLogo()
 
 	CAutoLock cAutoLock(&m_csLogo);
 
-	m_resizedImg.Destroy();
+	m_pBitmapResized.Release();
 
 	HRESULT hr = E_FAIL;
 
@@ -212,7 +212,9 @@ CSize CChildView::GetLogoSize() const
 
 void CChildView::ClearResizedImage()
 {
-	m_resizedImg.Destroy();
+	CAutoLock cAutoLock(&m_csLogo);
+
+	m_pBitmapResized.Release();
 }
 
 IMPLEMENT_DYNAMIC(CChildView, CWnd)
@@ -247,55 +249,59 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	GetClientRect(r);
 
 	COLORREF bkcolor = 0;
-	CImage img;
+	HRESULT hr = S_FALSE;
+	CComPtr<IWICBitmapSource> pBitmapSource;
+
 	if (m_pMainFrame->IsD3DFullScreenMode() ||
 			((m_pMainFrame->m_eMediaLoadState != MLS_LOADED || m_pMainFrame->m_bAudioOnly) && !m_pMainFrame->m_bNextIsOpened)) {
+
 		if (m_pMainFrame->m_pMainBitmapSource) {
-			HBITMAP hBitmap = nullptr;
-			HRESULT hr = WicCreateDibSecton(hBitmap, m_pMainFrame->m_pMainBitmapSource);
-			if (SUCCEEDED(hr)) {
-				img.Attach(hBitmap);
-			}
-		} else if (m_pBitmapSource) {
-			HBITMAP hBitmap = nullptr;
-			HRESULT hr = WicCreateDibSecton(hBitmap, m_pBitmapSource);
-			if (SUCCEEDED(hr)) {
-				img.Attach(hBitmap);
-				const WICRect wicrect = { 0,0,1,1 };
-				hr = m_pBitmapSource->CopyPixels(&wicrect, 4, 4, (BYTE*)&bkcolor);
-				bkcolor &= 0x00FFFFFF;
-			}
+			pBitmapSource = m_pMainFrame->m_pMainBitmapSource;
+		}
+		else if (m_pBitmapSource) {
+			const WICRect wicrect = { 0,0,1,1 };
+			hr = m_pBitmapSource->CopyPixels(&wicrect, 4, 4, (BYTE*)&bkcolor);
+			bkcolor &= 0x00FFFFFF;
+			pBitmapSource = m_pBitmapSource;
 		}
 	} else {
 		pDC->ExcludeClipRect(m_vrect);
 	}
 
-	if (!img.IsNull()) {
-		BITMAP bm = { 0 };
-		if (GetObjectW(img, sizeof(bm), &bm)) {
-			int h = std::min(abs(bm.bmHeight), (LONG)r.Height());
-			int w = std::min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
-			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+	if (pBitmapSource) {
+		UINT width, height;
+		hr = pBitmapSource->GetSize(&width, &height);
+
+		if (SUCCEEDED(hr)) {
+			int h = std::min((int)height, r.Height());
+			int w = std::min(r.Width(), MulDiv(h, width, height));
+			h = MulDiv(w, height, width);
 			int x = std::lround(((double)r.Width() - w) / 2.0);
 			int y = std::lround(((double)r.Height() - h) / 2.0);
 			r = CRect(CPoint(x, y), CSize(w, h));
 
 			if (!r.IsRectEmpty()) {
-				if (m_resizedImg.IsNull() || r.Width() != m_resizedImg.GetWidth() || r.Height() != m_resizedImg.GetHeight() || img.GetBPP() != m_resizedImg.GetBPP()) {
-					m_resizedImg.Destroy();
-					m_resizedImg.Create(r.Width(), r.Height(), img.GetBPP());
-
-					HDC hDC = m_resizedImg.GetDC();
-					SetStretchBltMode(hDC, STRETCH_HALFTONE);
-					img.StretchBlt(hDC, 0, 0, r.Width(), r.Height(), SRCCOPY);
-					m_resizedImg.ReleaseDC();
+				UINT rwidth, rheight;
+				if (m_pBitmapResized) {
+					hr = m_pBitmapResized->GetSize(&rwidth, &rheight);
 				}
 
-				m_resizedImg.BitBlt(*pDC, r.TopLeft());
-				pDC->ExcludeClipRect(r);
+				if (!m_pBitmapResized || w != (int)rwidth || h != (int)rheight) {
+					m_pBitmapResized.Release();
+
+					hr = WicCreateBitmapScaled(&m_pBitmapResized, w, h, pBitmapSource);
+				}
+
+				if (SUCCEEDED(hr)) {
+					HBITMAP hBitmap = nullptr;
+					BYTE* data = nullptr;
+					BITMAPINFO bminfo;
+					hr = WicCreateDibSecton(hBitmap, &data, bminfo, m_pBitmapResized);
+					::SetDIBitsToDevice(*pDC, x, y, w, h, 0, 0, 0, h, data, &bminfo, DIB_RGB_COLORS);
+					pDC->ExcludeClipRect(r);
+				}
 			}
 		}
-		img.Detach();
 	}
 
 	GetClientRect(r);
