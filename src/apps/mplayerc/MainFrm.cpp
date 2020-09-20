@@ -19226,7 +19226,7 @@ CStringW GetCoverImgFromPath(CString fullfilename)
 		L"box"
 	};
 
-	std::vector<LPCWSTR> coverExts = { L".jpg", L".jpeg", L".png", L".bmp" };
+	std::list<LPCWSTR> coverExts = { L".jpg", L".jpeg", L".png", L".bmp" };
 	if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
 		coverExts.emplace_back(L".heif");
 		coverExts.emplace_back(L".heic");
@@ -19284,12 +19284,19 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 								CString mimeStr(mime);
 								mimeStr.Trim();
 
-								std::vector<LPCWSTR> mimeStrins = {
+								std::list<LPCWSTR> mimeStrins = {
 									L"image/jpeg",
-									L"image/jpg",
+									L"image/jpg", // non-standard?
 									L"image/png",
 									L"image/bmp"
 								};
+								if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) { // for the future
+									mimeStrins.emplace_back(L"image/heif");
+									mimeStrins.emplace_back(L"image/heic");
+								}
+								if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) { // for the future
+									mimeStrins.emplace_back(L"image/webp");
+								}
 
 								if (std::find(mimeStrins.cbegin(), mimeStrins.cend(), mimeStr) != mimeStrins.cend()) {
 									hr = WicLoadImage(&m_pMainBitmap, true, pData, len);
