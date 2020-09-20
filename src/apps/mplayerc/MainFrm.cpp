@@ -19273,6 +19273,20 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 		if (s.nAudioWindowMode == 1) {
 			// load image from DSMResource to show in preview & logo;
+			std::list<LPCWSTR> mimeStrins = {
+				L"image/jpeg",
+				L"image/jpg", // non-standard?
+				L"image/png",
+				L"image/bmp"
+			};
+			if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) { // for the future
+				mimeStrins.emplace_back(L"image/heif");
+				mimeStrins.emplace_back(L"image/heic");
+			}
+			if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) { // for the future
+				mimeStrins.emplace_back(L"image/webp");
+			}
+
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (CComQIPtr<IDSMResourceBag> pRB = pBF)
 					if (pRB && CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
@@ -19283,20 +19297,6 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 							if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
 								CString mimeStr(mime);
 								mimeStr.Trim();
-
-								std::list<LPCWSTR> mimeStrins = {
-									L"image/jpeg",
-									L"image/jpg", // non-standard?
-									L"image/png",
-									L"image/bmp"
-								};
-								if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) { // for the future
-									mimeStrins.emplace_back(L"image/heif");
-									mimeStrins.emplace_back(L"image/heic");
-								}
-								if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) { // for the future
-									mimeStrins.emplace_back(L"image/webp");
-								}
 
 								if (std::find(mimeStrins.cbegin(), mimeStrins.cend(), mimeStr) != mimeStrins.cend()) {
 									hr = WicLoadImage(&m_pMainBitmap, true, pData, len);
