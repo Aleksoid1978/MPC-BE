@@ -146,7 +146,7 @@ void CChildView::LoadLogo()
 
 	if (FAILED(hr)) {
 		// load logo from program folder
-		std::vector<LPCWSTR> logoExts = { L"png", L"bmp", L"jpg", L"jpeg", L"gif" };
+		std::list<LPCWSTR> logoExts = { L"png", L"bmp", L"jpg", L"jpeg", L"gif" };
 		if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
 			logoExts.emplace_back(L"heif");
 			logoExts.emplace_back(L"heic");
