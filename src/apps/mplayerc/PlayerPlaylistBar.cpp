@@ -114,8 +114,8 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 
 		if (cmd == L"TRACK") {
 			if (rt != _I64_MIN) {
-				const CString fName = bMultiple ? sFilesArray[idx++] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName;
-				CUETrackList.push_back({ fName, rt, trackNum, sTitle, sPerformer });
+				const CString& fName = bMultiple ? sFilesArray[idx++] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName;
+				CUETrackList.emplace_back(fName, rt, trackNum, sTitle, sPerformer);
 			}
 			rt = _I64_MIN;
 			sFileName = sFileName2;
@@ -123,7 +123,7 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 				sPerformer = Performer;
 			}
 
-			WCHAR type[256] = { 0 };
+			WCHAR type[256] = {};
 			trackNum = 0;
 			fAudioTrack = FALSE;
 			if (2 == swscanf_s(cueLine, L"%u %s", &trackNum, type, _countof(type))) {
@@ -161,8 +161,8 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 	}
 
 	if (rt != _I64_MIN) {
-		const CString fName = bMultiple ? sFilesArray[idx] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName2;
-		CUETrackList.push_back({ fName, rt, trackNum, sTitle, sPerformer });
+		const CString& fName = bMultiple ? sFilesArray[idx] : sFilesArray.size() == 1 ? sFilesArray[0] : sFileName2;
+		CUETrackList.emplace_back(fName, rt, trackNum, sTitle, sPerformer);
 	}
 
 	return CUETrackList.size() > 0;
