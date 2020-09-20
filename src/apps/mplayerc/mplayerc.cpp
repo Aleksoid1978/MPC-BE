@@ -438,9 +438,16 @@ void CMPlayerCApp::ExportSettings()
 	CString ext_list;
 	ext_list.Format(L"Export files (*.%s)|*.%s|", ext, ext);
 
-	CFileDialog fileSaveDialog(FALSE, 0, L"mpc-be-settings." + ext,
-							   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-							   ext_list);
+	CFileDialog fileSaveDialog(
+		FALSE, 0,
+#ifdef _WIN64
+		L"mpc-be64-settings." + ext,
+#else
+		L"mpc-be-settings." + ext,
+#endif
+		OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		 ext_list
+	);
 
 	if (fileSaveDialog.DoModal() == IDOK) {
 		CString savePath = fileSaveDialog.GetPathName();
