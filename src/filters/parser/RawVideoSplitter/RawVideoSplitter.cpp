@@ -85,14 +85,14 @@ static const BYTE FRAME_[6]			= {'F', 'R', 'A', 'M', 'E', 0x0A};
 static const BYTE SHORT_START_CODE[3] = {0x00, 0x00, 0x01};
 static const BYTE LONG_START_CODE[4]  = {0x00, 0x00, 0x00, 0x01};
 
-class CBitWriter
+class CBitsWriter
 {
 	uint8_t* m_buffer = nullptr;
 	size_t m_bufferSize = 0;
 
 	size_t m_bitPosition = 0;
 public:
-	CBitWriter(uint8_t* buf, const size_t size)
+	CBitsWriter(uint8_t* buf, const size_t size)
 		: m_buffer(buf)
 		, m_bufferSize(size)
 	{}
@@ -944,7 +944,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				BYTE* extra = (BYTE*)(vih2 + 1);
 				memcpy(extra, "av1C", 4);
 
-				CBitWriter bw(extra + 4, 4);
+				CBitsWriter bw(extra + 4, 4);
 				bw.writeBits(1, 1); // marker
 				bw.writeBits(7, 1); // version
 				bw.writeBits(3, seq_params.profile);
