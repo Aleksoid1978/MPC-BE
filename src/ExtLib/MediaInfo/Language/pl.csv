@@ -196,7 +196,7 @@ BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Przepływność bitów
 BitRate_Encoded;
-BitRate_Maximum;Przwpływność maksymalna
+BitRate_Maximum;Przepływność maksymalna
 BitRate_Minimum;Przepływność minimalna
 BitRate_Mode;Rodzaj przepływności
 BitRate_Mode_CBR;Stała

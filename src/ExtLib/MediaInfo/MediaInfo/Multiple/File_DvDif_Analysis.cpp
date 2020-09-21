@@ -1395,6 +1395,7 @@ void File_DvDif::Errors_Stats_Update()
             Event1.Errors=Event.Errors;
             Event1.Video_STA_Errors_Count=Video_STA_Errors_ByDseq.size();
             Event1.Video_STA_Errors=Video_STA_Errors_ByDseq.empty()?NULL:&Video_STA_Errors_ByDseq[0];
+            size_t Audio_Errors_PerDseq[16]; //Per Dseq
             if (Audio_Errors.empty())
             {
                 Event1.Audio_Data_Errors_Count=0;
@@ -1402,7 +1403,6 @@ void File_DvDif::Errors_Stats_Update()
             }
             else
             {
-                size_t Audio_Errors_PerDseq[16]; //Per Dseq
                 memset(Audio_Errors_PerDseq, 0, sizeof(Audio_Errors_PerDseq));
                 for (size_t ChannelGroup=0; ChannelGroup<Audio_Errors.size(); ChannelGroup++)
                     for (size_t Dseq=0; Dseq<Dseq_Count; Dseq++)

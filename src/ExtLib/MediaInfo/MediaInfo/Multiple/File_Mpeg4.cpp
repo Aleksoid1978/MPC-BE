@@ -952,11 +952,10 @@ void File_Mpeg4::Streams_Finish()
                     if (Temp->second.Parsers[0]->Retrieve(Stream_General, 0, General_Format)==__T("ChannelGrouping"))
                     {
                         //Channel coupling, removing the 2 corresponding streams
-                        NewPos1=(StreamPos_Last/2)*2;
-                        size_t NewPos2=NewPos1+1;
-                        ID=Retrieve(StreamKind_Last, NewPos1, General_ID)+__T(" / ")+Retrieve(StreamKind_Last, NewPos2, General_ID);
+                        NewPos1=StreamPos_Last-1;
+                        ID=Retrieve(StreamKind_Last, NewPos1, General_ID)+__T(" / ")+Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
 
-                        Stream_Erase(NewKind, NewPos2);
+                        Stream_Erase(NewKind, StreamPos_Last);
                         Stream_Erase(NewKind, NewPos1);
 
                         streams::iterator NextStream=Temp;
@@ -986,8 +985,10 @@ void File_Mpeg4::Streams_Finish()
                     {
                         Stream_Prepare(NewKind, NewPos1+StreamPos);
                         Merge(*Temp->second.Parsers[0], StreamKind_Last, StreamPos, StreamPos_Last);
-                        Ztring Parser_ID=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
-                        Fill(StreamKind_Last, StreamPos_Last, General_ID, ID+__T("-")+Parser_ID, true);
+                        Ztring Parser_ID=ID+__T('-')+Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
+                        if (ID.size()+1==Parser_ID.size())
+                            Parser_ID.resize(ID.size());
+                        Fill(StreamKind_Last, StreamPos_Last, General_ID, Parser_ID, true);
                         for (size_t Pos=0; Pos<StreamSave.size(); Pos++)
                             if (Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
                                 Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
@@ -1035,14 +1036,28 @@ void File_Mpeg4::Streams_Finish()
                             }
                         }
                         Merge(*Temp->second.Parsers[0], StreamKind_Last, Parser_StreamPos, StreamPos_Last);
-                        const Ztring& Parser_ID=Temp->second.Parsers[0]->Retrieve(StreamKind_Last, Parser_StreamPos, General_ID);
+                        Ztring Parser_ID=Temp->second.Parsers[0]->Retrieve(StreamKind_Last, Parser_StreamPos, General_ID);
                         if (!Parser_ID.empty())
+                        {
+                            if (Parser_ID.find(__T(" / "))!=string::npos)
+                            {
+                                Parser_ID.insert(0, 1, __T('('));
+                                size_t End=Parser_ID.find(__T('-'));
+                                if (End==string::npos)
+                                    End=Parser_ID.size();
+                                Parser_ID.insert(End, 1, __T(')'));
+                            }
                             Fill(StreamKind_Last, StreamPos_Last, General_ID, ID + __T('-') + Parser_ID, true);
+                        }
                         if (Parser_StreamPos)
                         {
                             for (size_t Pos=0; Pos<StreamSave.size(); Pos++)
+                            {
+                                if (StreamKind_Last==Stream_Audio && Pos==Audio_Channel_s_)
+                                    continue;
                                 if (Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
                                     Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
+                            }
                             for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
                                 Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, 1));
                         }

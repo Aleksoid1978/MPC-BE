@@ -92,6 +92,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Caf.h" />
     <ClInclude Include="MediaInfo\Audio\File_Celt.h" />
     <ClInclude Include="MediaInfo\Audio\File_ChannelGrouping.h" />
+    <ClInclude Include="MediaInfo\Audio\File_ChannelSplitting.h" />
     <ClInclude Include="MediaInfo\Audio\File_DolbyE.h" />
     <ClInclude Include="MediaInfo\Audio\File_Dsdiff.h" />
     <ClInclude Include="MediaInfo\Audio\File_Dsf.h" />
@@ -326,6 +327,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Caf.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Celt.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_ChannelGrouping.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_ChannelSplitting.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_DolbyE.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Dsdiff.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Dsf.cpp" />

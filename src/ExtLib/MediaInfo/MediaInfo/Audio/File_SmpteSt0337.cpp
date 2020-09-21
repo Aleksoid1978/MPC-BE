@@ -374,7 +374,7 @@ bool File_SmpteSt0337::Synchronize()
     // Synchronizing
     while (Buffer_Offset+16<=Buffer_Size)
     {
-        if (!Status[IsAccepted] && !IsSub && File_Offset_FirstSynched==(int64u)-1 && Buffer_TotalBytes+Buffer_Offset>=Buffer_TotalBytes_FirstSynched_Max)
+        if (!Status[IsAccepted] && File_Offset_FirstSynched==(int64u)-1 && Buffer_TotalBytes+Buffer_Offset>=Buffer_TotalBytes_FirstSynched_Max)
         {
             Reject();
             return false;
@@ -1391,6 +1391,7 @@ void File_SmpteSt0337::Data_Parse()
         Buffer_Offset=Save_Buffer_Offset;
         Buffer_Size=Save_Buffer_Size;
         File_Offset-=Buffer_Offset;
+        Element_Size=Save_Element_Size;
     }
 
     // Guard band

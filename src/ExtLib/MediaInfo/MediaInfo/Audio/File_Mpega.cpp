@@ -336,6 +336,7 @@ File_Mpega::File_Mpega()
     Xing_Scale=0;
     BitRate=0;
     MpegPsPattern_Count=0;
+    VBR_Frames_IsCbr=false;
 }
 
 //***************************************************************************
@@ -464,8 +465,8 @@ void File_Mpega::Streams_Finish()
         else
             Divider=1152/8;
         if (ID<4 && sampling_frequency<4)
-            BitRate=(int32u)(FrameLength*Mpega_SamplingRate[ID][sampling_frequency]/Divider);
-        BitRate_Mode=__T("VBR");
+            BitRate=float32_int32s(FrameLength*Mpega_SamplingRate[ID][sampling_frequency]/Divider);
+        BitRate_Mode=(VBR_Frames_IsCbr?__T("CBR"):__T("VBR"));
     }
     //if (BitRate_Count.size()>1)
     //{
@@ -1279,7 +1280,10 @@ bool File_Mpega::Header_Xing()
 
             //Parsing
             if (FrameCount)
+            {
                 Get_B4 (VBR_Frames,                             "FrameCount"); //FrameCount exclude this frame
+                VBR_Frames_IsCbr=(CC4(Xing_Header)==CC4("Info"));
+            }
             if (FileSize)
             {
                 int32u VBR_FileSize_Temp;

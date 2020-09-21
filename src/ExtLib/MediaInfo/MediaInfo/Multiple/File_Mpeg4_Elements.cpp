@@ -76,6 +76,9 @@
 #if defined(MEDIAINFO_SMPTEST0337_YES)
     #include "MediaInfo/Audio/File_ChannelGrouping.h"
 #endif
+#if defined(MEDIAINFO_SMPTEST0337_YES)
+    #include "MediaInfo/Audio/File_ChannelSplitting.h"
+#endif
 #if defined(MEDIAINFO_AMR_YES)
     #include "MediaInfo/Audio/File_Amr.h"
 #endif
@@ -5356,6 +5359,22 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
                 File_SmpteSt0337* Parser=new File_SmpteSt0337;
                 Parser->Container_Bits=(int8u)SampleSize;
                 Parser->Endianness=(Flags&0x02)?'B':'L';
+                Parser->ShouldContinueParsing=true;
+                #if MEDIAINFO_DEMUX
+                    if (Config->Demux_Unpacketize_Get())
+                    {
+                        Parser->Demux_Level=2; //Container
+                        Parser->Demux_UnpacketizeContainer=true;
+                    }
+                #endif //MEDIAINFO_DEMUX
+                Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+            }
+            if (Channels>2 && SampleSize<=32 && SampleRate==48000) //Some SMPTE ST 337 streams are hidden in PCM stream
+            {
+                File_ChannelSplitting* Parser=new File_ChannelSplitting;
+                Parser->BitDepth=(int8u)SampleSize;
+                Parser->Endianness=(Flags&0x02)?'B':'L';
+                Parser->Channel_Total=(int8u)Channels;
                 Parser->ShouldContinueParsing=true;
                 #if MEDIAINFO_DEMUX
                     if (Config->Demux_Unpacketize_Get())

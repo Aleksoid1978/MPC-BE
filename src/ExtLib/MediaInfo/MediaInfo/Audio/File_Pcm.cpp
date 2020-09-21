@@ -80,7 +80,7 @@ File_Pcm::File_Pcm()
     PTS_DTS_Needed=true;
 
     //In
-    Frame_Count_Valid=4;
+    Frame_Count_Valid=16;
     BitDepth=0;
     BitDepth_Significant=0;
     Channels=0;

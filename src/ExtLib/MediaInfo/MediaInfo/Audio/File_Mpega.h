@@ -93,6 +93,7 @@ private :
     bool   padding_bit;
     bool   copyright;
     bool   original_home;
+    bool   VBR_Frames_IsCbr;
     size_t MpegPsPattern_Count;
 
     //Helpers

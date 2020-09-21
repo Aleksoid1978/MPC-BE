@@ -1420,7 +1420,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
         CodecID+=MI->Retrieve(StreamKind_Last, StreamPos_To, MI->Fill_Parameter(StreamKind_Last, Generic_CodecID));
         MI->Fill(StreamKind_Last, StreamPos_To, MI->Fill_Parameter(StreamKind_Last, Generic_CodecID), CodecID, true);
     }
-    if (!Sequences[Sequences_Current]->IsMain && Sequences[Sequences_Current]->MI->Count_Get(Stream_Video)+Sequences[Sequences_Current]->MI->Count_Get(Stream_Audio)>1 && Sequences[Sequences_Current]->MI->Get(Stream_Video, 0, Video_Format)!=__T("DV"))
+    if (!Sequences[Sequences_Current]->IsMain && Sequences[Sequences_Current]->MI->Count_Get(Stream_Video)+Sequences[Sequences_Current]->MI->Count_Get(Stream_Audio)>1 && Sequences[Sequences_Current]->MI->Get(Stream_Video, 0, Video_Format)!=__T("DV") && Sequences[Sequences_Current]->MI->Get(Stream_Audio, 0, Audio_Format)!=__T("Dolby E"))
     {
         if (StreamKind_Last==Stream_Menu)
         {
