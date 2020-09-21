@@ -2053,6 +2053,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CDVRSourceFilter>(DVRSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,6C756F20");                // 'luo '
 		m_source.push_back(pFGF);
 	}
 
