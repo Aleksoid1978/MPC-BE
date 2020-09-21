@@ -85,6 +85,49 @@ static const BYTE FRAME_[6]			= {'F', 'R', 'A', 'M', 'E', 0x0A};
 static const BYTE SHORT_START_CODE[3] = {0x00, 0x00, 0x01};
 static const BYTE LONG_START_CODE[4]  = {0x00, 0x00, 0x00, 0x01};
 
+class CBitWriter
+{
+	uint8_t* m_buffer = nullptr;
+	size_t m_bufferSize = 0;
+
+	size_t m_bitPosition = 0;
+public:
+	CBitWriter(uint8_t* buf, const size_t size)
+		: m_buffer(buf)
+		, m_bufferSize(size)
+	{}
+
+	bool writeBits(size_t numBits, uint64_t value) {
+		if (numBits > 64 || (m_bitPosition + numBits) > m_bufferSize * 8) {
+			return false;
+		}
+
+		auto bytePos = m_bitPosition >> 3;
+		auto bitOffset = 8 - (m_bitPosition & 7);
+
+		m_bitPosition += numBits;
+
+		for (; numBits > bitOffset; bitOffset = 8) {
+			auto bitMask = (1ull << bitOffset) - 1;
+			m_buffer[bytePos] &= ~bitMask;
+			m_buffer[bytePos++] |= (value >> (numBits - bitOffset)) & bitMask;
+
+			numBits -= bitOffset;
+		}
+		if (numBits == bitOffset) {
+			auto bitMask = (1ull << bitOffset) - 1;
+			m_buffer[bytePos] &= ~bitMask;
+			m_buffer[bytePos] |= value & bitMask;
+		} else {
+			auto bitMask = (1ull << numBits) - 1;
+			m_buffer[bytePos] &= ~(bitMask << (bitOffset - numBits));
+			m_buffer[bytePos] |= (value & bitMask) << (bitOffset - numBits);
+		}
+
+		return true;
+	}
+};
+
 //
 // CRawVideoSplitterFilter
 //
@@ -871,6 +914,59 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	if (m_RAWType == RAW_NONE) {
+		m_pFile->Seek(0);
+
+		auto size = std::min((__int64)64 * KILOBYTE, m_pFile->GetLength());
+		std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
+		if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
+			AV1Parser::AV1SequenceParameters seq_params;
+			std::vector<uint8_t> obu_sequence_header;
+			if (AV1Parser::ParseOBU(ptr.get(), size, seq_params, obu_sequence_header)) {
+				mt.SetTemporalCompression(TRUE);
+				mt.SetVariableSize();
+				mt.majortype = MEDIATYPE_Video;
+				mt.subtype = MEDIASUBTYPE_AV01;
+				mt.formattype = FORMAT_VIDEOINFO2;
+
+				VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 8 + obu_sequence_header.size());
+				memset(vih2, 0, mt.FormatLength());
+				vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+				vih2->bmiHeader.biWidth = seq_params.width;
+				vih2->bmiHeader.biHeight = seq_params.height;
+				vih2->bmiHeader.biPlanes = 1;
+				vih2->bmiHeader.biBitCount = 24;
+				vih2->bmiHeader.biCompression = FCC('AV01');
+				vih2->bmiHeader.biSizeImage = DIBSIZE(vih2->bmiHeader);
+				vih2->dwInterlaceFlags = 0;
+				vih2->rcSource = vih2->rcTarget = { 0, 0, (LONG)seq_params.width, (LONG)seq_params.height };
+
+				BYTE* extra = (BYTE*)(vih2 + 1);
+				memcpy(extra, "av1C", 4);
+
+				CBitWriter bw(extra + 4, 4);
+				bw.writeBits(1, 1); // marker
+				bw.writeBits(7, 1); // version
+				bw.writeBits(3, seq_params.profile);
+				bw.writeBits(5, seq_params.level);
+				bw.writeBits(1, seq_params.tier);
+				bw.writeBits(1, seq_params.bitdepth > 8);
+				bw.writeBits(1, seq_params.bitdepth == 12);
+				bw.writeBits(1, seq_params.monochrome);
+				bw.writeBits(1, seq_params.chroma_subsampling_x);
+				bw.writeBits(1, seq_params.chroma_subsampling_y);
+				bw.writeBits(2, seq_params.chroma_sample_position);
+				bw.writeBits(8, 0); // padding
+
+				memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+
+				mts.push_back(mt);
+				m_RAWType = RAW_AV1_OBU;
+				pName = L"AV1 Video Output";
+			}
+		}
+	}
+
 	if (m_RAWType != RAW_NONE) {
 		for (size_t i = 0; i < mts.size(); i++) {
 			VIDEOINFOHEADER2 *vih2 = (VIDEOINFOHEADER2*)mts[i].Format();
@@ -883,7 +979,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 	}
 
-	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
+	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC || m_RAWType == RAW_AV1_OBU) {
 		m_iQueueDuration = 200; // hack. equivalent to 240 packets
 	}
 
@@ -1002,6 +1098,34 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			continue;
 		}
 
+		if (m_RAWType == RAW_AV1_OBU) {
+			auto ParseObuHeader = [](CBaseSplitterFileEx* pFile) -> int64_t {
+				const auto pos = pFile->GetPos();
+
+				constexpr int64_t MAX_OBU_HEADER_SIZE = 2 + 8;
+				static BYTE buf[MAX_OBU_HEADER_SIZE] = {};
+				if (pFile->ByteRead(buf, MAX_OBU_HEADER_SIZE) != S_OK) {
+					return -1;
+				}
+				pFile->Seek(pos);
+
+				return AV1Parser::ParseOBUHeaderSize(buf, MAX_OBU_HEADER_SIZE);
+			};
+
+			auto size = ParseObuHeader(m_pFile);
+			if (size == -1) {
+				break;
+			} else {
+				CAutoPtr<CPacket> p(DNew CPacket());
+				p->resize(size);
+				if ((hr = m_pFile->ByteRead(p->data(), size)) != S_OK) {
+					break;
+				}
+
+				hr = DeliverPacket(p);
+			}
+			continue;
+		}
 
 		if (const size_t size = std::min(64LL * KILOBYTE, m_pFile->GetRemaining())) {
 			CAutoPtr<CPacket> p(DNew CPacket());

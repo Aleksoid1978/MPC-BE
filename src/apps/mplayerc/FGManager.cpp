@@ -2077,6 +2077,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.emplace_back(L"0,4,,434D5331,20,4,,50445652"); // 'CMS1................PDVR'
 		pFGF->m_chkbytes.emplace_back(L"0,5,,3236344456");              // '264DV'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,FFFFFF88");
+		pFGF->m_extensions.emplace_back(L".obu");
 		m_source.push_back(pFGF);
 	}
 

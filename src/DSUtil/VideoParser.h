@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include <basestruct.h>
+#include <vector>
 
 static const byte pixel_aspect[17][2]= {
 	{  0,   1 },
@@ -70,7 +71,7 @@ bool ParseDiracHeader(const BYTE* data, const int size, vc_params_t& params);
 
 namespace AVCParser {
 	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_t& params);
-} // namespace H264Parser
+} // namespace AVCParser
 
 namespace HEVCParser {
 	void CreateSequenceHeaderAVC(const BYTE* data, const int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
@@ -82,3 +83,26 @@ namespace HEVCParser {
 	bool ParseAVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const int flv_hm = 0);
 	bool ParseHEVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const bool parseSPS);
 } // namespace HEVCParser
+
+namespace AV1Parser {
+	struct AV1SequenceParameters {
+		uint8_t profile                        = 0;
+		uint8_t level                          = 0;
+		uint8_t tier                           = 0;
+		uint8_t bitdepth                       = 0;
+		uint8_t monochrome                     = 0;
+		uint8_t chroma_subsampling_x           = 0;
+		uint8_t chroma_subsampling_y           = 0;
+		uint8_t chroma_sample_position         = 0;
+		uint8_t color_description_present_flag = 0;
+		uint8_t color_primaries                = 0;
+		uint8_t transfer_characteristics       = 0;
+		uint8_t matrix_coefficients            = 0;
+		uint8_t color_range                    = 0;
+		uint32_t width                         = 0;
+		uint32_t height                        = 0;
+	};
+
+	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size);
+	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header);
+} // namespace AV1Parser

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1156,3 +1156,305 @@ namespace HEVCParser {
 		return true;
 	}
 } // namespace HEVCParser
+
+
+namespace AV1Parser {
+	constexpr auto AV1_OBU_SEQUENCE_HEADER  = 1;
+	constexpr auto AV1_OBU_FRAME_HEADER     = 3;
+	constexpr auto AV1_OBU_FRAME            = 6;
+
+	constexpr auto PROFILE_AV1_MAIN         = 0;
+	constexpr auto PROFILE_AV1_HIGH         = 1;
+	constexpr auto PROFILE_AV1_PROFESSIONAL = 2;
+
+	constexpr auto AVCOL_PRI_BT709          = 1;
+	constexpr auto AVCOL_PRI_UNSPECIFIED    = 2;
+
+	constexpr auto AVCOL_TRC_UNSPECIFIED    = 2;
+	constexpr auto AVCOL_TRC_IEC61966_2_1   = 13;
+
+	constexpr auto AVCOL_SPC_RGB            = 0;
+	constexpr auto AVCOL_SPC_UNSPECIFIED    = 2;
+
+	constexpr auto MAX_OBU_HEADER_SIZE      = 2 + 8;
+
+	bool ParseSequenceHeader(AV1SequenceParameters& seq_params, const BYTE* buf, const int buf_size) {
+		auto uvlc = [](CGolombBuffer& gb) {
+			auto leading_zeros = 0u;
+
+			while (!gb.BitRead(1)) {
+				++leading_zeros;
+			}
+
+			if (leading_zeros >= 32) {
+				return (1llu << 32) - 1;
+			}
+
+			auto value = gb.BitRead(leading_zeros);
+			return value + (1llu << leading_zeros) - 1;
+		};
+
+		auto ParseColorConfig = [](CGolombBuffer& gb, AV1SequenceParameters& seq_params) {
+			uint8_t twelve_bit = 0;
+			uint8_t high_bitdepth = gb.BitRead(1);
+			if (seq_params.profile == PROFILE_AV1_PROFESSIONAL && high_bitdepth) {
+				twelve_bit = gb.BitRead(1);
+			}
+
+			seq_params.bitdepth = 8 + (high_bitdepth * 2) + (twelve_bit * 2);
+
+			if (seq_params.profile != PROFILE_AV1_HIGH) {
+				seq_params.monochrome = gb.BitRead(1);
+			}
+
+			seq_params.color_description_present_flag = gb.BitRead(1);
+			if (seq_params.color_description_present_flag) {
+				seq_params.color_primaries = gb.BitRead(8);
+				seq_params.transfer_characteristics = gb.BitRead(8);
+				seq_params.matrix_coefficients = gb.BitRead(8);
+			} else {
+				seq_params.color_primaries = AVCOL_PRI_UNSPECIFIED;
+				seq_params.transfer_characteristics = AVCOL_TRC_UNSPECIFIED;
+				seq_params.matrix_coefficients = AVCOL_SPC_UNSPECIFIED;
+			}
+
+			if (seq_params.monochrome) {
+				seq_params.color_range = gb.BitRead(1);
+				seq_params.chroma_subsampling_x = 1;
+				seq_params.chroma_subsampling_y = 1;
+				seq_params.chroma_sample_position = 0;
+				return;
+			} else if (seq_params.color_primaries == AVCOL_PRI_BT709 &&
+				seq_params.transfer_characteristics == AVCOL_TRC_IEC61966_2_1 &&
+				seq_params.matrix_coefficients == AVCOL_SPC_RGB) {
+			} else {
+				seq_params.color_range = gb.BitRead(1);
+
+				if (seq_params.profile == PROFILE_AV1_MAIN) {
+					seq_params.chroma_subsampling_x = 1;
+					seq_params.chroma_subsampling_y = 1;
+				} else if (seq_params.profile == PROFILE_AV1_HIGH) {
+					seq_params.chroma_subsampling_x = 0;
+					seq_params.chroma_subsampling_y = 0;
+				} else {
+					if (twelve_bit) {
+						seq_params.chroma_subsampling_x = gb.BitRead(1);
+						if (seq_params.chroma_subsampling_x) {
+							seq_params.chroma_subsampling_y = gb.BitRead(1);
+						} else {
+							seq_params.chroma_subsampling_y = 0;
+						}
+					} else {
+						seq_params.chroma_subsampling_x = 1;
+						seq_params.chroma_subsampling_y = 0;
+					}
+				}
+				if (seq_params.chroma_subsampling_x && seq_params.chroma_subsampling_y) {
+					seq_params.chroma_sample_position = gb.BitRead(2);
+				}
+			}
+
+			gb.BitRead(1); // separate_uv_delta_q
+		};
+
+		CGolombBuffer gb(buf, buf_size);
+
+		seq_params.profile = gb.BitRead(3);
+		gb.BitRead(1); // still_picture
+		bool reduced_still_picture_header = gb.BitRead(1);
+
+		if (reduced_still_picture_header) {
+			seq_params.level = gb.BitRead(5);
+		} else {
+			uint8_t buffer_delay_length_minus_1;
+			bool decoder_model_info_present_flag = false;
+
+			if (gb.BitRead(1)) { // timing_info_present_flag
+				gb.BitRead(32); // num_units_in_display_tick
+				gb.BitRead(32); // time_scale
+
+				if (gb.BitRead(1)) { // equal_picture_interval
+					uvlc(gb); // num_ticks_per_picture_minus_1
+				}
+
+				decoder_model_info_present_flag = gb.BitRead(1);
+				if (decoder_model_info_present_flag) {
+					buffer_delay_length_minus_1 = gb.BitRead(5);
+					gb.BitRead(32); // num_units_in_decoding_tick
+					gb.BitRead(10); // buffer_removal_time_length_minus_1 (5)
+									// frame_presentation_time_length_minus_1 (5)
+				}
+			}
+
+			bool initial_display_delay_present_flag = gb.BitRead(1);
+
+			uint8_t operating_points_cnt_minus_1 = gb.BitRead(5);
+			for (uint8_t i = 0; i <= operating_points_cnt_minus_1; i++) {
+				gb.BitRead(12); // operating_point_idc
+				uint8_t seq_level_idx = gb.BitRead(5);
+				uint8_t seq_tier = seq_level_idx > 7 ? gb.BitRead(1) : 0;
+
+				if (decoder_model_info_present_flag) {
+					if (gb.BitRead(1)) { // decoder_model_present_for_this_op
+						gb.BitRead(buffer_delay_length_minus_1 + 1); // decoder_buffer_delay
+						gb.BitRead(buffer_delay_length_minus_1 + 1); // encoder_buffer_delay
+						gb.BitRead(1); // low_delay_mode_flag
+					}
+				}
+
+				if (initial_display_delay_present_flag) {
+					if (gb.BitRead(1)) // initial_display_delay_present_for_this_op
+						gb.BitRead(4); // initial_display_delay_minus_1
+				}
+
+				if (i == 0) {
+					seq_params.level = seq_level_idx;
+					seq_params.tier = seq_tier;
+				}
+			}
+		}
+
+		uint8_t frame_width_bits_minus_1 = gb.BitRead(4);
+		uint8_t frame_height_bits_minus_1 = gb.BitRead(4);
+
+		seq_params.width = gb.BitRead(frame_width_bits_minus_1 + 1) + 1;
+		seq_params.height = gb.BitRead(frame_height_bits_minus_1 + 1) + 1;
+
+		if (!seq_params.width || !seq_params.height) {
+			return false;
+		}
+
+		if (!reduced_still_picture_header) {
+			if (gb.BitRead(1)) { // frame_id_numbers_present_flag
+				gb.BitRead(7); // delta_frame_id_length_minus_2 (4), additional_frame_id_length_minus_1 (3)
+			}
+		}
+
+		gb.BitRead(3); // use_128x128_superblock (1), enable_filter_intra (1), enable_intra_edge_filter (1)
+
+		if (!reduced_still_picture_header) {
+			gb.BitRead(4); // enable_interintra_compound (1), enable_masked_compound (1)
+						   // enable_warped_motion (1), enable_dual_filter (1)
+
+			bool enable_order_hint = gb.BitRead(1);
+			if (enable_order_hint) {
+				gb.BitRead(2); // enable_jnt_comp (1), enable_ref_frame_mvs (1)
+			}
+
+			uint8_t seq_force_screen_content_tools = gb.BitRead(1) ? 2 : gb.BitRead(1);
+
+			if (seq_force_screen_content_tools) {
+				if (!gb.BitRead(1)) { // seq_choose_integer_mv
+					gb.BitRead(1); // seq_force_integer_mv
+				}
+			}
+
+			if (enable_order_hint) {
+				gb.BitRead(3); // order_hint_bits_minus_1
+			}
+		}
+
+		gb.BitRead(3); // enable_superres (1), enable_cdef (1), enable_restoration (1)
+
+		ParseColorConfig(gb, seq_params);
+
+		gb.BitRead(1); // film_grain_params_present
+
+		return true;
+	};
+
+	static int64_t ParseOBUHeader(const BYTE* buf, const int buf_size, int64_t& obu_size, int& start_pos, int& type)
+	{
+		auto leb128 = [](CGolombBuffer& gb) {
+			int64_t ret = 0;
+
+			for (int i = 0; i < 8; i++) {
+				uint8_t byte = gb.BitRead(8);
+				ret |= (int64_t)(byte & 0x7f) << (i * 7);
+				if (!(byte & 0x80)) {
+					break;
+				}
+			}
+			return ret;
+		};
+
+		CGolombBuffer gb(buf, std::min(buf_size, MAX_OBU_HEADER_SIZE));
+		if (gb.BitRead(1) != 0) { // obu_forbidden_bit
+			return -1;
+		}
+		type = gb.BitRead(4);
+		bool extension_flag = gb.BitRead(1);
+		bool has_size_flag = gb.BitRead(1);
+		if (!has_size_flag) {
+			return -1;
+		}
+		gb.BitRead(1); // obu_reserved_1bit
+
+		if (extension_flag) {
+			gb.BitRead(3); // temporal_id
+			gb.BitRead(2); // spatial_id
+			gb.BitRead(3); // extension_header_reserved_3bits
+		}
+
+		obu_size = leb128(gb);
+		start_pos = gb.GetPos();
+
+		return obu_size + start_pos;
+	};
+
+	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size)
+	{
+		int64_t obu_size;
+		int start_pos, type;
+		return ParseOBUHeader(buf, buf_size, obu_size, start_pos, type);
+	}
+
+	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header)
+	{
+		const BYTE* seq = nullptr;
+		int seq_size = 0;
+		bool b_frame_found = false;
+
+		const BYTE* seq_obu = nullptr;
+		int seq_obu_size = 0;
+
+		auto buf = data;
+		while (size > 0) {
+			int64_t obu_size = 0;
+			int start_pos = 0;
+			int type = 0;
+			auto len = ParseOBUHeader(buf, size, obu_size, start_pos, type);
+			if (len < 0) {
+				break;
+			}
+
+			if (type == AV1_OBU_SEQUENCE_HEADER) {
+				seq = buf + start_pos;
+				seq_size = obu_size;
+
+				seq_obu = buf;
+				seq_obu_size = len;
+			} else if (type == AV1_OBU_FRAME_HEADER || type == AV1_OBU_FRAME) {
+				b_frame_found = true;
+			}
+
+			if (seq && b_frame_found) {
+				break;
+			}
+
+			size -= len;
+			buf += len;
+		}
+
+		if (seq && b_frame_found) {
+			auto ret = ParseSequenceHeader(seq_params, seq, seq_size);
+			if (ret) {
+				obu_sequence_header.resize(seq_obu_size);
+				obu_sequence_header.assign(seq_obu, seq_obu + seq_obu_size);
+				return ret;
+			}
+		}
+
+		return false;
+	}
+} // namespace AV1Parser

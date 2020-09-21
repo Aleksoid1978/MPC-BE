@@ -192,7 +192,7 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"flic",        ResStr(IDS_MFMT_FLIC),        L"fli flc flic"));
 		ADDFMT((L"roq",         ResStr(IDS_MFMT_ROQ),         L"roq"));
 		ADDFMT((L"dsm",         ResStr(IDS_MFMT_DSM),         L"dsm dsv dsa dss"));
-		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc"));
+		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc obu"));
 		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
 		// special files. used TScript to exclude automatic association
 		ADDFMT((L"swf",         ResStr(IDS_MFMT_SWF),         L"swf", TScript, L"ShockWave ActiveX control"));
