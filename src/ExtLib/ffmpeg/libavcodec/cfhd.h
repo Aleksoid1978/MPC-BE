@@ -29,6 +29,7 @@
 #include "bytestream.h"
 #include "get_bits.h"
 #include "vlc.h"
+#include "cfhddsp.h"
 
 enum CFHDParam {
     SampleType       =   1,
@@ -82,10 +83,14 @@ enum CFHDParam {
     Precision        =  70,
     InputFormat      =  71,
     BandCodingFlags  =  72,
+    PeakLevel        =  74,
+    PeakOffsetLow    =  75,
+    PeakOffsetHigh   =  76,
     Version          =  79,
     BandSecondPass   =  82,
     PrescaleTable    =  83,
     EncodedFormat    =  84,
+    DisplayHeight    =  85,
     ChannelWidth     = 104,
     ChannelHeight    = 105,
 };
@@ -178,6 +183,8 @@ typedef struct CFHDContext {
     uint8_t prescale_table[8];
     Plane plane[4];
     Peak peak;
+
+    CFHDDSPContext dsp;
 } CFHDContext;
 
 int ff_cfhd_init_vlcs(CFHDContext *s);

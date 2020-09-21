@@ -19,6 +19,7 @@
 static int FUNC(obu_header)(CodedBitstreamContext *ctx, RWContext *rw,
                             AV1RawOBUHeader *current)
 {
+    CodedBitstreamAV1Context *priv = ctx->priv_data;
     int err;
 
     HEADER("OBU header");
@@ -35,7 +36,13 @@ static int FUNC(obu_header)(CodedBitstreamContext *ctx, RWContext *rw,
         fb(3, temporal_id);
         fb(2, spatial_id);
         fc(3, extension_header_reserved_3bits, 0, 0);
+    } else {
+        infer(temporal_id, 0);
+        infer(spatial_id, 0);
     }
+
+    priv->temporal_id = current->temporal_id;
+    priv->spatial_id  = current->spatial_id;
 
     return 0;
 }
@@ -366,7 +373,7 @@ static int FUNC(set_frame_refs)(CodedBitstreamContext *ctx, RWContext *rw,
     for (i = 0; i < AV1_NUM_REF_FRAMES; i++)
         shifted_order_hints[i] = cur_frame_hint +
                                  cbs_av1_get_relative_dist(seq, priv->ref[i].order_hint,
-                                                           current->order_hint);
+                                                           priv->order_hint);
 
     latest_order_hint = shifted_order_hints[current->last_frame_idx];
     earliest_order_hint = shifted_order_hints[current->golden_frame_idx];
@@ -485,13 +492,13 @@ static int FUNC(frame_size)(CodedBitstreamContext *ctx, RWContext *rw,
     if (current->frame_size_override_flag) {
         fb(seq->frame_width_bits_minus_1 + 1,  frame_width_minus_1);
         fb(seq->frame_height_bits_minus_1 + 1, frame_height_minus_1);
-
-        priv->frame_width  = current->frame_width_minus_1  + 1;
-        priv->frame_height = current->frame_height_minus_1 + 1;
     } else {
-        priv->frame_width  = seq->max_frame_width_minus_1  + 1;
-        priv->frame_height = seq->max_frame_height_minus_1 + 1;
+        infer(frame_width_minus_1,  seq->max_frame_width_minus_1);
+        infer(frame_height_minus_1, seq->max_frame_height_minus_1);
     }
+
+    priv->frame_width  = current->frame_width_minus_1  + 1;
+    priv->frame_height = current->frame_height_minus_1 + 1;
 
     CHECK(FUNC(superres_params)(ctx, rw, current));
 
@@ -509,13 +516,13 @@ static int FUNC(render_size)(CodedBitstreamContext *ctx, RWContext *rw,
     if (current->render_and_frame_size_different) {
         fb(16, render_width_minus_1);
         fb(16, render_height_minus_1);
-
-        priv->render_width  = current->render_width_minus_1  + 1;
-        priv->render_height = current->render_height_minus_1 + 1;
     } else {
-        priv->render_width  = priv->upscaled_width;
-        priv->render_height = priv->frame_height;
+        infer(render_width_minus_1,  current->frame_width_minus_1);
+        infer(render_height_minus_1, current->frame_height_minus_1);
     }
+
+    priv->render_width  = current->render_width_minus_1  + 1;
+    priv->render_height = current->render_height_minus_1 + 1;
 
     return 0;
 }
@@ -540,8 +547,13 @@ static int FUNC(frame_size_with_refs)(CodedBitstreamContext *ctx, RWContext *rw,
                 return AVERROR_INVALIDDATA;
             }
 
+            infer(frame_width_minus_1,   ref->upscaled_width - 1);
+            infer(frame_height_minus_1,  ref->frame_height - 1);
+            infer(render_width_minus_1,  ref->render_width - 1);
+            infer(render_height_minus_1, ref->render_height - 1);
+
             priv->upscaled_width = ref->upscaled_width;
-            priv->frame_width    = ref->frame_width;
+            priv->frame_width    = priv->upscaled_width;
             priv->frame_height   = ref->frame_height;
             priv->render_width   = ref->render_width;
             priv->render_height  = ref->render_height;
@@ -623,6 +635,15 @@ static int FUNC(tile_info)(CodedBitstreamContext *ctx, RWContext *rw,
         tile_height_sb = (sb_rows + (1 << current->tile_rows_log2) - 1) >>
             current->tile_rows_log2;
         current->tile_rows = (sb_rows + tile_height_sb - 1) / tile_height_sb;
+
+        for (i = 0; i < current->tile_cols - 1; i++)
+            infer(width_in_sbs_minus_1[i], tile_width_sb - 1);
+        infer(width_in_sbs_minus_1[i],
+              sb_cols - (current->tile_cols - 1) * tile_width_sb - 1);
+        for (i = 0; i < current->tile_rows - 1; i++)
+            infer(height_in_sbs_minus_1[i], tile_height_sb - 1);
+        infer(height_in_sbs_minus_1[i],
+              sb_rows - (current->tile_rows - 1) * tile_height_sb - 1);
 
     } else {
         int widest_tile_sb, start_sb, size_sb, max_width, max_height;
@@ -919,7 +940,7 @@ static int FUNC(lr_params)(CodedBitstreamContext *ctx, RWContext *rw,
     for (i = 0; i < priv->num_planes; i++) {
         fbs(2, lr_type[i], 1, i);
 
-        if (current->lr_type[i] != 0) {
+        if (current->lr_type[i] != AV1_RESTORE_NONE) {
             uses_lr = 1;
             if (i > 0)
                 uses_chroma_lr = 1;
@@ -993,7 +1014,7 @@ static int FUNC(skip_mode_params)(CodedBitstreamContext *ctx, RWContext *rw,
         for (i = 0; i < AV1_REFS_PER_FRAME; i++) {
             ref_hint = priv->ref[current->ref_frame_idx[i]].order_hint;
             dist = cbs_av1_get_relative_dist(seq, ref_hint,
-                                             current->order_hint);
+                                             priv->order_hint);
             if (dist < 0) {
                 if (forward_idx < 0 ||
                     cbs_av1_get_relative_dist(seq, ref_hint,
@@ -1261,10 +1282,17 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
         flag(show_existing_frame);
 
         if (current->show_existing_frame) {
-            AV1ReferenceFrameState *frame;
+            AV1ReferenceFrameState *ref;
 
             fb(3, frame_to_show_map_idx);
-            frame = &priv->ref[current->frame_to_show_map_idx];
+            ref = &priv->ref[current->frame_to_show_map_idx];
+
+            if (!ref->valid) {
+                av_log(ctx->log_ctx, AV_LOG_ERROR, "Missing reference frame needed for "
+                       "show_existing_frame (frame_to_show_map_idx = %d).\n",
+                       current->frame_to_show_map_idx);
+                return AVERROR_INVALIDDATA;
+            }
 
             if (seq->decoder_model_info_present_flag &&
                 !seq->timing_info.equal_picture_interval) {
@@ -1275,12 +1303,29 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
             if (seq->frame_id_numbers_present_flag)
                 fb(id_len, display_frame_id);
 
-            if (frame->frame_type == AV1_FRAME_KEY)
+            infer(frame_type, ref->frame_type);
+            if (current->frame_type == AV1_FRAME_KEY) {
                 infer(refresh_frame_flags, all_frames);
-            else
+
+                // Section 7.21
+                infer(current_frame_id, ref->frame_id);
+                priv->upscaled_width  = ref->upscaled_width;
+                priv->frame_width     = ref->frame_width;
+                priv->frame_height    = ref->frame_height;
+                priv->render_width    = ref->render_width;
+                priv->render_height   = ref->render_height;
+                priv->bit_depth       = ref->bit_depth;
+                priv->order_hint      = ref->order_hint;
+            } else
                 infer(refresh_frame_flags, 0);
 
-            return 0;
+            infer(frame_width_minus_1,   ref->upscaled_width - 1);
+            infer(frame_height_minus_1,  ref->frame_height - 1);
+            infer(render_width_minus_1,  ref->render_width - 1);
+            infer(render_height_minus_1, ref->render_height - 1);
+
+            // Section 7.20
+            goto update_refs;
         }
 
         fb(2, frame_type);
@@ -1366,6 +1411,7 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
         fb(order_hint_bits, order_hint);
     else
         infer(order_hint, 0);
+    priv->order_hint = current->order_hint;
 
     if (frame_is_intra || current->error_resilient_mode)
         infer(primary_ref_frame, AV1_PRIMARY_REF_NONE);
@@ -1381,7 +1427,7 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
                     int in_temporal_layer = (op_pt_idc >>  priv->temporal_id    ) & 1;
                     int in_spatial_layer  = (op_pt_idc >> (priv->spatial_id + 8)) & 1;
                     if (seq->operating_point_idc[i] == 0 ||
-                        in_temporal_layer || in_spatial_layer) {
+                        (in_temporal_layer && in_spatial_layer)) {
                         fbs(seq->decoder_model_info.buffer_removal_time_length_minus_1 + 1,
                             buffer_removal_time[i], 1, i);
                     }
@@ -1541,6 +1587,16 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
 
     CHECK(FUNC(film_grain_params)(ctx, rw, current));
 
+    av_log(ctx->log_ctx, AV_LOG_DEBUG, "Frame %d:  size %dx%d  "
+           "upscaled %d  render %dx%d  subsample %dx%d  "
+           "bitdepth %d  tiles %dx%d.\n", priv->order_hint,
+           priv->frame_width, priv->frame_height, priv->upscaled_width,
+           priv->render_width, priv->render_height,
+           seq->color_config.subsampling_x + 1,
+           seq->color_config.subsampling_y + 1, priv->bit_depth,
+           priv->tile_rows, priv->tile_cols);
+
+update_refs:
     for (i = 0; i < AV1_NUM_REF_FRAMES; i++) {
         if (current->refresh_frame_flags & (1 << i)) {
             priv->ref[i] = (AV1ReferenceFrameState) {
@@ -1555,19 +1611,10 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
                 .subsampling_x  = seq->color_config.subsampling_x,
                 .subsampling_y  = seq->color_config.subsampling_y,
                 .bit_depth      = priv->bit_depth,
-                .order_hint     = current->order_hint,
+                .order_hint     = priv->order_hint,
             };
         }
     }
-
-    av_log(ctx->log_ctx, AV_LOG_DEBUG, "Frame %d:  size %dx%d  "
-           "upscaled %d  render %dx%d  subsample %dx%d  "
-           "bitdepth %d  tiles %dx%d.\n", current->order_hint,
-           priv->frame_width, priv->frame_height, priv->upscaled_width,
-           priv->render_width, priv->render_height,
-           seq->color_config.subsampling_x + 1,
-           seq->color_config.subsampling_y + 1, priv->bit_depth,
-           priv->tile_rows, priv->tile_cols);
 
     return 0;
 }

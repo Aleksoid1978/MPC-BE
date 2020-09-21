@@ -118,14 +118,6 @@ struct AVFilterPad {
     int (*config_props)(AVFilterLink *link);
 
     /**
-     * The filter expects a fifo to be inserted on its input link,
-     * typically because it has a delay.
-     *
-     * input pads only.
-     */
-    int needs_fifo;
-
-    /**
      * The filter expects writable frames from its input link,
      * duplicating data buffers if needed.
      *
@@ -178,28 +170,6 @@ int ff_parse_pixel_format(enum AVPixelFormat *ret, const char *arg, void *log_ct
  */
 av_warn_unused_result
 int ff_parse_sample_rate(int *ret, const char *arg, void *log_ctx);
-
-/**
- * Parse a time base.
- *
- * @param ret unsigned AVRational pointer to where the value should be written
- * @param arg string to parse
- * @param log_ctx log context
- * @return >= 0 in case of success, a negative AVERROR code on error
- */
-av_warn_unused_result
-int ff_parse_time_base(AVRational *ret, const char *arg, void *log_ctx);
-
-/**
- * Parse a sample format name or a corresponding integer representation.
- *
- * @param ret integer pointer to where the value should be written
- * @param arg string to parse
- * @param log_ctx log context
- * @return >= 0 in case of success, a negative AVERROR code on error
- */
-av_warn_unused_result
-int ff_parse_sample_format(int *ret, const char *arg, void *log_ctx);
 
 /**
  * Parse a channel layout or a corresponding integer representation.

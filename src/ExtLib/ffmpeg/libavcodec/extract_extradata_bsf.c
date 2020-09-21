@@ -103,7 +103,6 @@ static int extract_extradata_av1(AVBSFContext *ctx, AVPacket *pkt,
             av_buffer_unref(&filtered_buf);
             return AVERROR(ENOMEM);
         }
-        memset(extradata + extradata_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         *data = extradata;
         *size = extradata_size;
@@ -198,7 +197,6 @@ static int extract_extradata_h2645(AVBSFContext *ctx, AVPacket *pkt,
             av_buffer_unref(&filtered_buf);
             return AVERROR(ENOMEM);
         }
-        memset(extradata + extradata_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         *data = extradata;
         *size = extradata_size;
@@ -254,7 +252,6 @@ static int extract_extradata_vc1(AVBSFContext *ctx, AVPacket *pkt,
             return AVERROR(ENOMEM);
 
         memcpy(*data, pkt->data, extradata_size);
-        memset(*data + extradata_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
         *size = extradata_size;
 
         if (s->remove) {
@@ -278,19 +275,16 @@ static int extract_extradata_mpeg12(AVBSFContext *ctx, AVPacket *pkt,
         if (state == 0x1B3)
             found = 1;
         else if (found && state != 0x1B5 && state < 0x200 && state >= 0x100) {
-            if (i > 3) {
-                *size = i - 3;
-                *data = av_malloc(*size + AV_INPUT_BUFFER_PADDING_SIZE);
-                if (!*data)
-                    return AVERROR(ENOMEM);
+            *size = i - 3;
+            *data = av_malloc(*size + AV_INPUT_BUFFER_PADDING_SIZE);
+            if (!*data)
+                return AVERROR(ENOMEM);
 
-                memcpy(*data, pkt->data, *size);
-                memset(*data + *size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+            memcpy(*data, pkt->data, *size);
 
-                if (s->remove) {
-                    pkt->data += *size;
-                    pkt->size -= *size;
-                }
+            if (s->remove) {
+                pkt->data += *size;
+                pkt->size -= *size;
             }
             break;
         }
@@ -315,7 +309,6 @@ static int extract_extradata_mpeg4(AVBSFContext *ctx, AVPacket *pkt,
                     return AVERROR(ENOMEM);
 
                 memcpy(*data, pkt->data, *size);
-                memset(*data + *size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
                 if (s->remove) {
                     pkt->data += *size;
@@ -377,6 +370,7 @@ static int extract_extradata_filter(AVBSFContext *ctx, AVPacket *pkt)
         goto fail;
 
     if (extradata) {
+        memset(extradata + extradata_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
         ret = av_packet_add_side_data(pkt, AV_PKT_DATA_NEW_EXTRADATA,
                                       extradata, extradata_size);
         if (ret < 0) {

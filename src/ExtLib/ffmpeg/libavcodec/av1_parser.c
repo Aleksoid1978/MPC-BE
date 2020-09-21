@@ -99,7 +99,6 @@ static int av1_parser_parse(AVCodecParserContext *ctx,
         CodedBitstreamUnit *unit = &td->units[i];
         AV1RawOBU *obu = unit->content;
         AV1RawFrameHeader *frame;
-        int frame_type;
 
         if (unit->type == AV1_OBU_FRAME)
             frame = &obu->obu.frame.header;
@@ -111,30 +110,15 @@ static int av1_parser_parse(AVCodecParserContext *ctx,
         if (obu->header.spatial_id > 0)
             continue;
 
-        if (frame->show_existing_frame) {
-            AV1ReferenceFrameState *ref = &av1->ref[frame->frame_to_show_map_idx];
-
-            if (!ref->valid) {
-                av_log(avctx, AV_LOG_ERROR, "Invalid reference frame\n");
-                goto end;
-            }
-
-            ctx->width  = ref->frame_width;
-            ctx->height = ref->frame_height;
-            frame_type  = ref->frame_type;
-
-            ctx->key_frame = 0;
-        } else if (!frame->show_frame) {
+        if (!frame->show_frame && !frame->show_existing_frame)
             continue;
-        } else {
-            ctx->width  = av1->frame_width;
-            ctx->height = av1->frame_height;
-            frame_type  = frame->frame_type;
 
-            ctx->key_frame = frame_type == AV1_FRAME_KEY;
-        }
+        ctx->width  = frame->frame_width_minus_1 + 1;
+        ctx->height = frame->frame_height_minus_1 + 1;
 
-        switch (frame_type) {
+        ctx->key_frame = frame->frame_type == AV1_FRAME_KEY && !frame->show_existing_frame;
+
+        switch (frame->frame_type) {
         case AV1_FRAME_KEY:
         case AV1_FRAME_INTRA_ONLY:
             ctx->pict_type = AV_PICTURE_TYPE_I;
@@ -171,8 +155,6 @@ static int av1_parser_parse(AVCodecParserContext *ctx,
         color->transfer_characteristics  == AVCOL_TRC_IEC61966_2_1)
         ctx->format = pix_fmts_rgb[color->high_bitdepth + color->twelve_bit];
 
-    avctx->pix_fmt = ctx->format;
-
     avctx->profile = seq->seq_profile;
     avctx->level   = seq->seq_level_idx[0];
 
@@ -180,12 +162,6 @@ static int av1_parser_parse(AVCodecParserContext *ctx,
     avctx->color_primaries = (enum AVColorPrimaries) color->color_primaries;
     avctx->color_trc = (enum AVColorTransferCharacteristic) color->transfer_characteristics;
     avctx->color_range = color->color_range ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
-
-    if (ctx->width != avctx->width || ctx->height != avctx->height) {
-        ret = ff_set_dimensions(avctx, ctx->width, ctx->height);
-        if (ret < 0)
-            goto end;
-    }
 
     if (avctx->framerate.num)
         avctx->time_base = av_inv_q(av_mul_q(avctx->framerate, (AVRational){avctx->ticks_per_frame, 1}));
