@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,6 +41,7 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_Y4M,
 		RAW_MPEG4,
 		RAW_IVF,
+		RAW_AV1_OBU,
 	} m_RAWType = RAW_NONE;
 
 	int y4m_interl = -1;
