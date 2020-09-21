@@ -39,6 +39,7 @@ CDVRSplitterFilter : public CBaseSplitterFilter
 
 	bool m_bHXVS = false;
 	bool m_bDHAV = false;
+	bool m_bCCTV = false;
 
 	struct HXVSHeader {
 		DWORD sync, size, pts, dummy;
@@ -75,6 +76,26 @@ CDVRSplitterFilter : public CBaseSplitterFilter
 	bool DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt = false);
 
 	std::vector<SyncPoint> m_sps;
+
+#pragma pack(push, 1)
+	struct CCTVHeader {
+		uint32_t sync;
+		uint32_t stream_id;
+		uint32_t width;
+		uint32_t height;
+		uint32_t fps;
+		uint8_t unknown1[16];
+		uint32_t key;
+		uint8_t unknown2[4 + 4 + 4];
+		uint64_t frame_num;
+		uint32_t size;
+		uint8_t unknown3[60];
+		uint32_t end_sync;
+	};
+#pragma pack(pop)
+
+	bool CCTVSync(__int64& pos);
+	bool CCTVReadHeader(CCTVHeader& hdr);
 
 protected:
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);

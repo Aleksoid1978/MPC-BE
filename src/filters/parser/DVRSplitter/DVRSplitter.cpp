@@ -55,6 +55,7 @@ STDAPI DllRegisterServer()
 	const std::list<CString> chkbytes = {
 		L"0,4,,48585653,16,4,,48585646", // 'HXVS............HXVF'
 		L"0,4,,44484156",                // 'DHAV'
+		L"0,4,,6C756F20",                // 'luo '
 	};
 
 	return AMovieDllRegisterServer2(TRUE);
@@ -93,6 +94,9 @@ CFilterApp theApp;
 #define DHAV_HeaderSize 24
 #define DHAV_FooterSize  8
 
+constexpr auto CCTV_PACKET_HEADER_SYNC     = FCC('liu ');
+constexpr auto CCTV_PACKET_HEADER_END_SYNC = FCC(' uil');
+
 CDVRSplitterFilter::CDVRSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"CDVRSplitterFilter", pUnk, phr, __uuidof(this))
 {
@@ -127,9 +131,22 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	} else if (GETU32(buf) == DHAV_SYNC_START
 			&& (buf[4] == 0xf0 || buf[4] == 0xf1 || buf[4] == 0xfc || buf[4] == 0xfd)) {
 		m_bDHAV = true;
+	} else if (GETU32(buf) == FCC('luo ') && m_pFile->GetLength() >= 0x2080) {
+		m_pFile->Seek(0x1ffc);
+		if (SUCCEEDED(m_pFile->ByteRead(buf, 8))) {
+			if (memcmp(buf, " oulliu ", 8) == 0) {
+				m_pFile->Seek(0x207c);
+				if (SUCCEEDED(m_pFile->ByteRead(buf, 4))) {
+					if (memcmp(buf, " uil", 4) == 0) {
+						m_bCCTV = true;
+						m_startpos = 0x2000;
+					}
+				}
+			}
+		}
 	}
 
-	if (!m_bHXVS && !m_bDHAV) {
+	if (!m_bHXVS && !m_bDHAV && !m_bCCTV) {
 		m_pFile.Free();
 		return E_FAIL;
 	}
@@ -260,7 +277,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(1, pPinOut)));
 		}
-	} else {
+	} else if (m_bDHAV) {
 		m_startpos = 0;
 		m_endpos   = m_pFile->GetLength();
 		m_pFile->Seek(m_startpos);
@@ -293,7 +310,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_startpos = m_pFile->GetPos() - DHAV_HeaderSize - hdr.ext_size;
 					bVideoFound = true;
-				
+
 					BITMAPINFOHEADER pbmi = {};
 					pbmi.biSize      = sizeof(pbmi);
 					pbmi.biWidth     = (LONG)hdr.video.width;
@@ -462,6 +479,72 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		}
+	} else if (m_bCCTV) {
+		m_endpos = m_pFile->GetLength();
+		m_pFile->Seek(m_startpos);
+
+		CCTVHeader hdr;
+		if (CCTVReadHeader(hdr)) {
+			m_AvgTimePerFrame = UNITS / hdr.fps;
+			m_rtOffsetVideo = hdr.frame_num * m_AvgTimePerFrame;
+
+			BITMAPINFOHEADER pbmi = {};
+			pbmi.biSize = sizeof(pbmi);
+			pbmi.biWidth = hdr.width;
+			pbmi.biHeight = hdr.height;
+			pbmi.biPlanes = 1;
+			pbmi.biBitCount = 24;
+			pbmi.biCompression = FCC('H264');
+			pbmi.biSizeImage = DIBSIZE(pbmi);
+
+			CSize aspect(pbmi.biWidth, pbmi.biHeight);
+			ReduceDim(aspect);
+
+			mt.InitMediaType();
+			mt.SetTemporalCompression(TRUE);
+			CreateMPEG2VISimple(&mt, &pbmi, m_AvgTimePerFrame, aspect, nullptr, 0u);
+
+			mts.clear();
+			mts.push_back(mt);
+
+			std::vector<BYTE> pData(hdr.size);
+			if (m_pFile->ByteRead(pData.data(), hdr.size) == S_OK) {
+				CBaseSplitterFileEx::avchdr h;
+				if (m_pFile->Read(h, pData, &mt)) {
+					mts.insert(mts.begin(), mt);
+				}
+			}
+
+			for (auto& mt : mts) {
+				auto vih2 = (VIDEOINFOHEADER2*)mt.Format();
+				if (!vih2->AvgTimePerFrame) {
+					vih2->AvgTimePerFrame = m_AvgTimePerFrame;
+				}
+			}
+
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(hdr.stream_id, pPinOut)));
+
+			m_rtNewStart = m_rtCurrent = 0;
+			m_rtNewStop = m_rtStop = m_rtDuration = 0;
+
+			// find end PTS
+			m_pFile->Seek(m_endpos - std::min((__int64)MEGABYTE, m_endpos));
+
+			const auto stream_id = hdr.stream_id;
+			const auto frame_num_start = hdr.frame_num;
+			uint64_t frame_num_end = 0;
+			while (CCTVReadHeader(hdr)) {
+				if (hdr.stream_id == stream_id) {
+					frame_num_end = hdr.frame_num;
+				}
+				m_pFile->Skip(hdr.size);
+			}
+
+			if (frame_num_end > frame_num_start) {
+				m_rtNewStop = m_rtStop = m_rtDuration = (frame_num_end - frame_num_start) * m_AvgTimePerFrame;
+			}
+		}
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
@@ -543,6 +626,21 @@ void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				m_pFile->Seek(m_pFile->GetPos() - HXVS_HeaderSize);
 				return;
 			}
+		} else if (m_bCCTV) {
+			CCTVHeader hdr;
+			while (CCTVReadHeader(hdr)) {
+				if (GetOutputPin(hdr.stream_id)) {
+					rtSeek = hdr.frame_num * m_AvgTimePerFrame;
+					break;
+				}
+
+				m_pFile->Skip(hdr.size);
+			}
+
+			if (rtmin <= rtSeek && rtSeek <= rtmax) {
+				m_pFile->Seek(m_pFile->GetPos() - sizeof(hdr));
+				return;
+			}
 		}
 
 		REFERENCE_TIME dt = rtSeek - rtmax;
@@ -619,7 +717,7 @@ bool CDVRSplitterFilter::DemuxLoop()
 		if (vp) {
 			DeliverPacket(vp);
 		}
-	} else {
+	} else if (m_bDHAV) {
 		WORD video_pts_prev = WORD_MAX;
 		WORD audio_pts_prev = WORD_MAX;
 
@@ -672,6 +770,28 @@ bool CDVRSplitterFilter::DemuxLoop()
 					}
 				} else {
 					m_pFile->Skip(hdr.size + DHAV_FooterSize);
+				}
+			} else {
+				break;
+			}
+		}
+	} else if (m_bCCTV) {
+		while (SUCCEEDED(hr) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
+			CCTVHeader hdr;
+			if (CCTVReadHeader(hdr) && hdr.size <= m_pFile->GetRemaining()) {
+				if (GetOutputPin(hdr.stream_id)) {
+					CAutoPtr<CPacket> p(DNew CPacket());
+					p->TrackNumber = hdr.stream_id;
+					p->bSyncPoint = hdr.key == 1;
+					p->rtStart = hdr.frame_num * m_AvgTimePerFrame - m_rtOffsetVideo;
+					p->rtStop = p->rtStart + m_AvgTimePerFrame;
+
+					p->resize(hdr.size);
+					if ((hr = m_pFile->ByteRead(p->data(), hdr.size)) == S_OK) {
+						hr = DeliverPacket(p);
+					}
+				} else {
+					m_pFile->Skip(hdr.size);
 				}
 			} else {
 				break;
@@ -854,6 +974,39 @@ bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* 
 		}
 
 		return ret;
+	}
+
+	return false;
+}
+
+bool CDVRSplitterFilter::CCTVSync(__int64& pos)
+{
+	const __int64 start = pos = m_pFile->GetPos();
+	DWORD sync;
+	for (__int64 i = 0, j = m_endpos - start - 128;
+		i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+		i++, m_pFile->Seek(start + i)) {
+		if (sync == CCTV_PACKET_HEADER_SYNC) {
+			pos = start + i;
+			m_pFile->Seek(pos);
+			return true;
+		}
+	}
+
+	m_pFile->Seek(start);
+	return false;
+}
+
+bool CDVRSplitterFilter::CCTVReadHeader(CCTVHeader& hdr)
+{
+	__int64 sync_pos = 0;
+	if (CCTVSync(sync_pos) && m_pFile->GetRemaining() >= sizeof(hdr)) {
+		m_pFile->Seek(sync_pos);
+		if (FAILED(m_pFile->ByteRead((BYTE*)&hdr, sizeof(hdr))) || hdr.end_sync != CCTV_PACKET_HEADER_END_SYNC) {
+			return false;
+		}
+
+		return (hdr.width && hdr.height && hdr.fps && hdr.size);
 	}
 
 	return false;
