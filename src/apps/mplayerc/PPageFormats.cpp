@@ -20,14 +20,13 @@
  */
 
 #include "stdafx.h"
-#include "PPageFormats.h"
 #include "Misc.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include <psapi.h>
-#include <atlimage.h>
 #include <HighDPI.h>
+#include "PPageFormats.h"
 
 static constexpr auto previousRegistration = L"PreviousRegistration";
 static constexpr auto registeredAppName    = L"MPC-BE";
@@ -666,18 +665,18 @@ BOOL CPPageFormats::OnInitDialog()
 		delete pDpi;
 	}
 
-	CImage onoff;
+	CBitmap onoff;
 	if (dpiY >= 192) {
-		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_192);
+		onoff.LoadBitmap(IDB_ONOFF_192);
 		m_onoff.Create(24, 24, ILC_COLOR4 | ILC_MASK, 0, 3);
 	} else if (dpiY >= 144) {
-		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_144);
+		onoff.LoadBitmap(IDB_ONOFF_144);
 		m_onoff.Create(18, 18, ILC_COLOR4 | ILC_MASK, 0, 3);
 	} else {
-		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_96);
+		onoff.LoadBitmap(IDB_ONOFF_96);
 		m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
 	}
-	m_onoff.Add(CBitmap::FromHandle(onoff), 0xffffff);
+	m_onoff.Add(&onoff, 0xffffff);
 	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
