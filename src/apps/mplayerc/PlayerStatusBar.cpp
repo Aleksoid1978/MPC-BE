@@ -21,9 +21,9 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "PlayerStatusBar.h"
 #include "./Controls/MenuEx.h"
 #include "../../DSUtil/SysVersion.h"
+#include "PlayerStatusBar.h"
 
 // CPlayerStatusBar
 
@@ -190,9 +190,7 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 	}
 
 	if (id) {
-		CImage img;
-		img.LoadFromResource(AfxGetInstanceHandle(), id);
-		m_bm.Attach(img.Detach());
+		EXECUTE_ASSERT(m_bm.LoadBitmap(id));
 	}
 
 	m_bmid = id;
