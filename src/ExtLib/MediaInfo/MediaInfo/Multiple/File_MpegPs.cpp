@@ -405,7 +405,7 @@ void File_MpegPs::Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindo
             Fill(Stream_Audio, StreamPos_Last, Audio_MuxingMode, "SL");
     #endif //MEDIAINFO_MPEG4_YES
 
-    if (Counts[StreamKind_Last]+Count==Count_Get(StreamKind_Last)) //Old method
+    if (StreamKind_Last<Stream_Max && Counts[StreamKind_Last]+Count==Count_Get(StreamKind_Last)) //Old method
         Streams_Fill_PerStream_PerKind(StreamID, Temp, KindOfStream, Count);
     else
     {

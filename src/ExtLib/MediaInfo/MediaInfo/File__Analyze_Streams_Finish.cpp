@@ -1006,19 +1006,19 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
     //SamplingCount
     if (Retrieve(Stream_Audio, Pos, Audio_SamplingCount).empty())
     {
-        int64s Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_int64s();
+        float64 Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_float64();
         bool DurationFromGeneral; 
         if (Duration==0)
         {
-            Duration=Retrieve(Stream_General, 0, General_Duration).To_int64s();
+            Duration=Retrieve(Stream_General, 0, General_Duration).To_float64();
             DurationFromGeneral=Retrieve(Stream_General, 0, General_Format)!=Retrieve(Stream_Audio, Pos, Audio_Format);
         }
         else
             DurationFromGeneral=false;
-        float SamplingRate=Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_float32();
+        float64 SamplingRate=Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_float64();
         if (Duration && SamplingRate)
         {
-            Fill(Stream_Audio, Pos, Audio_SamplingCount, ((float64)Duration)/1000*SamplingRate, 0);
+            Fill(Stream_Audio, Pos, Audio_SamplingCount, Duration/1000*SamplingRate, 0);
             if (DurationFromGeneral && Retrieve_Const(Stream_Audio, Pos, Audio_Format)!=Retrieve_Const(Stream_General, 0, General_Format))
             {
                 Fill(Stream_Audio, Pos, "SamplingCount_Source", "General_Duration");
@@ -1077,31 +1077,35 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
     }
 
     //Duration
-    if (Retrieve(Stream_Audio, Pos, Audio_Duration).empty() && Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_int64u()!=0)
+    if (Retrieve(Stream_Audio, Pos, Audio_Duration).empty())
     {
-        int64u Duration=Retrieve(Stream_Audio, Pos, Audio_SamplingCount).To_int64u()*1000/Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_int64u();
-        if (Duration)
+        float64 SamplingRate=Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_float64();
+        if (SamplingRate)
         {
-            Fill(Stream_Audio, Pos, Audio_Duration, Duration);
-            Ztring Source=Retrieve(Stream_Audio, Pos, "SamplingCount_Source");
-            if (!Source.empty())
+            float64 Duration=Retrieve(Stream_Audio, Pos, Audio_SamplingCount).To_float64()*1000/SamplingRate;
+            if (Duration)
             {
-                Fill(Stream_Audio, Pos, "Duration_Source", Source);
-                Fill_SetOptions(Stream_Audio, Pos, "Duration_Source", "N NTN");
+                Fill(Stream_Audio, Pos, Audio_Duration, Duration, 0);
+                Ztring Source=Retrieve(Stream_Audio, Pos, "SamplingCount_Source");
+                if (!Source.empty())
+                {
+                    Fill(Stream_Audio, Pos, "Duration_Source", Source);
+                    Fill_SetOptions(Stream_Audio, Pos, "Duration_Source", "N NTN");
+                }
             }
         }
     }
 
     //Stream size
-    if (Retrieve(Stream_Audio, Pos, Audio_StreamSize).empty() && !Retrieve(Stream_Audio, Pos, Audio_BitRate).empty() && !Retrieve(Stream_Audio, Pos, Audio_Duration).empty() && Retrieve(Stream_Audio, Pos, Audio_BitRate_Mode)==__T("CBR"))
+    if (Retrieve(Stream_Audio, Pos, Audio_StreamSize).empty() && Retrieve(Stream_Audio, Pos, Audio_BitRate_Mode)==__T("CBR"))
     {
-        int64u Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_int64u();
-        int64u BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_int64u();
-        int64u BitRate_Encoded=Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).To_int64u();
+        int64u Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_float64();
+        int64u BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_float64();
+        int64u BitRate_Encoded=Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).To_float64();
         if (Duration && BitRate)
             Fill(Stream_Audio, Pos, Audio_StreamSize, Duration*BitRate/8/1000);
         if (Duration && BitRate_Encoded)
-            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, Duration*BitRate_Encoded/8/1000);
+            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, Duration*BitRate_Encoded/8/1000, 10, true);
     }
 
     //CBR/VBR

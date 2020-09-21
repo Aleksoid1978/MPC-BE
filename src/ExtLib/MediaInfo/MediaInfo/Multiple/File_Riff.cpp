@@ -105,8 +105,8 @@ File_Riff::File_Riff()
     Interleaved1_10=0;
 
     //Temp
-    WAVE_data_Size=0xFFFFFFFF;
-    WAVE_fact_samplesCount=0xFFFFFFFF;
+    WAVE_data_Size=(int64u)-1;
+    WAVE_fact_samplesCount=(int64u)-1;
     Buffer_DataToParse_Begin=(int64u)-1;
     Buffer_DataToParse_End=0;
     #if MEDIAINFO_DEMUX
@@ -121,6 +121,7 @@ File_Riff::File_Riff()
     SMV_BlockSize=0;
     SamplesPerSec=0;
     stream_Count=0;
+    BlockAlign=0;
     rec__Present=false;
     NeedOldIndex=true;
     IsBigEndian=false;
@@ -772,7 +773,15 @@ bool File_Riff::Header_Begin()
             default        : AVI__movi_xxxx();
         }
 
+        bool ShouldStop=false;
         if (Config->ParseSpeed<1.0 && File_Offset+Buffer_Offset+Element_Offset-Buffer_DataToParse_Begin>=256*1024)
+        {
+            ShouldStop=true;
+            for (std::map<int32u, stream>::iterator StreamItem=Stream.begin(); StreamItem!=Stream.end(); ++StreamItem)
+                if (StreamItem->second.Parsers.size()>1 || (!StreamItem->second.Parsers.empty() && !StreamItem->second.Parsers[0]->Status[IsFilled]))
+                    ShouldStop=false;
+        }
+        if (ShouldStop)
         {
             File_GoTo=Buffer_DataToParse_End;
             Buffer_Offset=Buffer_Size;

@@ -850,6 +850,7 @@ Language_zu;Zoulou
 LawRating;Classé
 LCCN;LCCN
 Library;Bibliotheque utilisée
+Lifetime_Subscribe_Button;S'abonner à vie pour %PRICE%
 Lightness;Luminosité
 LineUpStart;
 List;Liste
@@ -1015,11 +1016,12 @@ Recorded_Date;Date d'enregistrement
 Recorded_Location;Lieu d'enregistrement
 Released_Date;Date de première diffusion
 RemixedBy;Remixé par
+Renew;Renouveler
 ReplayGain_Gain;Gain en lecture
 ReplayGain_Peak;Crête de gain en lecture
-Renew;Renouveler
 Report;Rapport
 Resolution;Résolution
+RestoreLifetimeSubscription;Restaurer l'abonnement à vie
 s;s
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1098,9 +1100,10 @@ Subscribe_Renew_Price;Renouveler l'abonnement (%PRICE% pour un an)
 Subscribe_Unaviable;Impossible de récupérer les details de l'abonnement.
 Subscribe_Waiting;Abonnement en attente d'autorisation parentale
 Subscription_Active;Abonnement actif jusqu'au %DATE%
-Subscription_Android;%PRICE% par an avec une période d'essai gratuite de 3 jours.
+Subscription_Android;Période d'essai gratuite de 3 jours.
 Subscription_Ended;Votre abonnement vient de se terminer.
 Subscription_Expired;Abonnement expiré depuis le %DATE%
+Subscription_Lifetime;Abonnement à vie detecté
 Subscription_Thanks;Abonnement détecté. Merci pour votre soutien !
 SubTrack;Sous-piste
 Summary;Résumé
@@ -1166,8 +1169,8 @@ Video1;Première piste Vidéo
 VideoComments;
 VideoCount;Nombre de pistes vidéo
 View;Vue
-Views;Vues
 View_Hint;Change la façon de voir les informations
+Views;Vues
 Warning : more streams in the files;Attention : il y a davantage de flux dans les fichiers!
 Web;Web
 WebSite;Site web

@@ -1158,6 +1158,7 @@ protected :
     void           ChooseParser_Ac3(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Alaw(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_ChannelGrouping(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
+    void           ChooseParser_ChannelSplitting(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Mpega(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Pcm(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_SmpteSt0331(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
