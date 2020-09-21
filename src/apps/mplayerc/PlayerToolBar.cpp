@@ -445,10 +445,6 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		   TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | TBSTYLE_AUTOSIZE | TBSTYLE_CUSTOMERASE,
 		   WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM | CBRS_TOOLTIPS));
 
-	if (m_BackGroundbm.FileExists(L"background")) {
-		m_BackGroundbm.LoadExternalGradient(L"background");
-	}
-
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
 
@@ -552,7 +548,7 @@ void CPlayerToolBar::SetColor()
 	if (s.bUseDarkTheme) {
 		int R, G, B;
 
-		if (m_BackGroundbm.IsExtGradiendLoading()) {
+		if (m_pMainFrame->m_BackGroundGradient.Size()) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 		} else {
 			ThemeRGB(50, 55, 60, R, G, B);
@@ -629,8 +625,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				CRect r;
 				GetClientRect(&r);
 
-				if (m_BackGroundbm.IsExtGradiendLoading()) {
-					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
+				if (m_pMainFrame->m_BackGroundGradient.Size()) {
+					m_pMainFrame->m_BackGroundGradient.Paint(&dc, r, 21, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 				} else {
 					tvBackground[0].x = r.left; tvBackground[0].y = r.top;
 					tvBackground[1].x = r.right; tvBackground[1].y = r.bottom;
@@ -695,8 +691,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			for (size_t j = 0; j < std::size(sep); j++) {
 				GetItemRect(sep[j], &r);
 
-				if (m_BackGroundbm.IsExtGradiendLoading()) {
-					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
+				if (m_pMainFrame->m_BackGroundGradient.Size()) {
+					m_pMainFrame->m_BackGroundGradient.Paint(&dc, r, 21, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 				} else {
 					tvBackground[0].x = r.left; tvBackground[0].y = r.top;
 					tvBackground[1].x = r.right; tvBackground[1].y = r.bottom;

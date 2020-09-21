@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "PngImage.h"
+#include <atlimage.h>
 
 // CVolumeCtrl
 
@@ -33,8 +33,8 @@ private:
 	bool m_bSelfDrawn;
 	bool m_bItemRedraw = false;
 
-	CMPCPngImage m_BackGroundbm;
-	CMPCPngImage m_Volumebm;
+	CMPCGradient m_BackGroundGradient;
+	CMPCGradient m_VolumeGradient;
 
 	int m_nThemeBrightness = -1;
 	int m_nThemeRed = -1;

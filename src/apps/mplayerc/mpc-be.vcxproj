@@ -157,7 +157,6 @@
     <ClCompile Include="PlayerSubresyncBar.cpp" />
     <ClCompile Include="PlayerToolBar.cpp" />
     <ClCompile Include="PlayerVolumeCtrl.cpp" />
-    <ClCompile Include="PngImage.cpp" />
     <ClCompile Include="PnSPresetsDlg.cpp" />
     <ClCompile Include="PPageAccelTbl.cpp" />
     <ClCompile Include="PPageAudio.cpp" />
@@ -285,7 +284,6 @@
     <ClInclude Include="PlayerSubresyncBar.h" />
     <ClInclude Include="PlayerToolBar.h" />
     <ClInclude Include="PlayerVolumeCtrl.h" />
-    <ClInclude Include="PngImage.h" />
     <ClInclude Include="PnSPresetsDlg.h" />
     <ClInclude Include="PPageAccelTbl.h" />
     <ClInclude Include="PPageAudio.h" />

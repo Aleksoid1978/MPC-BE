@@ -1206,6 +1206,8 @@ public:
 	CWnd*			m_pVideoWnd;
 	CWnd*			m_pOSDWnd;
 
+	CMPCGradient m_BackGroundGradient; // used in some toolbars
+
 	CPlayerToolBar		m_wndToolBar;
 	CPlayerListCtrl		m_wndListCtrl;
 	CPlayerPlaylistBar	m_wndPlaylistBar;

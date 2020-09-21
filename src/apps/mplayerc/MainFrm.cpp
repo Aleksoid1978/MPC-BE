@@ -718,6 +718,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 	}
 
+	CComPtr<IWICBitmap> pBitmap;
+	HRESULT hr = WicLoadImage(&pBitmap, false, (GetProgramDir() + L"background.png").GetString());
+	if (SUCCEEDED(hr)) {
+		m_BackGroundGradient.Create(pBitmap);
+	}
+
 	// static bars
 	BOOL bResult = m_wndStatusBar.Create(this);
 	if (bResult) {

@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "PngImage.h"
 #include "PlayerVolumeCtrl.h"
 
 // CPlayerToolBar
@@ -42,7 +41,6 @@ private:
 	LONG		m_nDXVAIconWidth;
 	LONG		m_nDXVAIconHeight;
 
-	CMPCPngImage m_BackGroundbm;
 	CImageList	m_imgListActive;
 	CImageList	m_imgListDisabled;
 
