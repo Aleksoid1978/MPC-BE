@@ -158,8 +158,8 @@ typedef struct AV1RawFrameHeader {
     uint8_t  use_superres;
     uint8_t  coded_denom;
     uint8_t  render_and_frame_size_different;
-    uint8_t  render_width_minus_1;
-    uint8_t  render_height_minus_1;
+    uint16_t render_width_minus_1;
+    uint16_t render_height_minus_1;
 
     uint8_t found_ref[AV1_REFS_PER_FRAME];
 
@@ -284,8 +284,8 @@ typedef struct AV1RawFrameHeader {
 
 typedef struct AV1RawTileData {
     uint8_t     *data;
-    size_t       data_size;
     AVBufferRef *data_ref;
+    size_t       data_size;
 } AV1RawTileData;
 
 typedef struct AV1RawTileGroup {
@@ -346,8 +346,8 @@ typedef struct AV1RawMetadataITUTT35 {
     uint8_t itu_t_t35_country_code_extension_byte;
 
     uint8_t     *payload;
-    size_t       payload_size;
     AVBufferRef *payload_ref;
+    size_t       payload_size;
 } AV1RawMetadataITUTT35;
 
 typedef struct AV1RawMetadataTimecode {
@@ -379,8 +379,8 @@ typedef struct AV1RawMetadata {
 
 typedef struct AV1RawPadding {
     uint8_t     *payload;
-    size_t       payload_size;
     AVBufferRef *payload_ref;
+    size_t       payload_size;
 } AV1RawPadding;
 
 
@@ -429,6 +429,7 @@ typedef struct CodedBitstreamAV1Context {
     int operating_point_idc;
 
     int bit_depth;
+    int order_hint;
     int frame_width;
     int frame_height;
     int upscaled_width;

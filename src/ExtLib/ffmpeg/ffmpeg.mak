@@ -129,6 +129,7 @@ SRCS_LC = \
 	libavcodec/atrac3plus.c \
 	libavcodec/atrac3plusdec.c \
 	libavcodec/atrac3plusdsp.c \
+	libavcodec/atsc_a53.c \
 	libavcodec/audiodsp.c \
 	libavcodec/av1_parse.c \
 	libavcodec/av1_parser.c \
@@ -154,6 +155,7 @@ SRCS_LC = \
 	libavcodec/celp_math.c \
 	libavcodec/cfhd.c \
 	libavcodec/cfhddata.c \
+	libavcodec/cfhddsp.c \
 	libavcodec/chomp_bsf.c \
 	libavcodec/cinepak.c \
 	libavcodec/cllc.c \
@@ -532,6 +534,7 @@ SRCS_LC_B = \
 	libavcodec/x86/audiodsp_init.c \
 	libavcodec/x86/blockdsp_init.c \
 	libavcodec/x86/bswapdsp_init.c \
+	libavcodec/x86/cfhddsp_init.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
 	libavcodec/x86/dct_init.c \
@@ -708,6 +711,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/audiodsp.asm \
 	libavcodec/x86/blockdsp.asm \
 	libavcodec/x86/bswapdsp.asm \
+	libavcodec/x86/cfhddsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/dirac_dwt.asm \

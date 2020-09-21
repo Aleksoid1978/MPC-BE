@@ -4,6 +4,7 @@
 =============================
 
 Updated libraries:
+	ffmpeg git-n4.4-dev-607-g1ead176d87;
 	MediaInfo git-v20.08-23-g702d6b20;
 
 1.5.5

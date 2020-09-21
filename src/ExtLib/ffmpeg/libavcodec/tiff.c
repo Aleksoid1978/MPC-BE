@@ -79,6 +79,7 @@ typedef struct TiffContext {
     int fill_order;
     uint32_t res[4];
     int is_thumbnail;
+    unsigned last_tag;
 
     int is_bayer;
     uint8_t pattern[4];
@@ -709,7 +710,7 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
             if (is_dng) {
                 int is_u16, pixel_size_bytes, pixel_size_bits, elements;
 
-                is_u16 = (s->bpp > 8);
+                is_u16 = (s->bpp / s->bppcount > 8);
                 pixel_size_bits = (is_u16 ? 16 : 8);
                 pixel_size_bytes = (is_u16 ? sizeof(uint16_t) : sizeof(uint8_t));
 
@@ -917,6 +918,11 @@ static int dng_decode_jpeg(AVCodecContext *avctx, AVFrame *frame,
     is_u16 = (s->bpp > 8);
 
     /* Copy the outputted tile's pixels from 'jpgframe' to 'frame' (final buffer) */
+
+    if (s->jpgframe->width  != s->avctx_mjpeg->width  ||
+        s->jpgframe->height != s->avctx_mjpeg->height ||
+        s->jpgframe->format != s->avctx_mjpeg->pix_fmt)
+        return AVERROR_INVALIDDATA;
 
     /* See dng_blit for explanation */
     if (s->avctx_mjpeg->width  == w * 2 &&
@@ -1252,6 +1258,12 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
     if (ret < 0) {
         goto end;
     }
+    if (tag <= s->last_tag)
+        return AVERROR_INVALIDDATA;
+
+    // We ignore TIFF_STRIP_SIZE as it is sometimes in the logic but wrong order around TIFF_STRIP_OFFS
+    if (tag != TIFF_STRIP_SIZE)
+        s->last_tag = tag;
 
     off = bytestream2_tell(&s->gb);
     if (count == 1) {
@@ -1434,7 +1446,9 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
             s->sub_ifd = ff_tget(&s->gb, TIFF_LONG, s->le); /** Only get the first SubIFD */
         break;
     case DNG_LINEARIZATION_TABLE:
-        for (int i = 0; i < FFMIN(count, 1 << s->bpp); i++)
+        if (count > FF_ARRAY_ELEMS(s->dng_lut))
+            return AVERROR_INVALIDDATA;
+        for (int i = 0; i < count; i++)
             s->dng_lut[i] = ff_tget(&s->gb, type, s->le);
         break;
     case DNG_BLACK_LEVEL:
@@ -1668,9 +1682,6 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
         }
         break;
     case TIFF_ICC_PROFILE:
-        if (type != TIFF_UNDEFINED)
-            return AVERROR_INVALIDDATA;
-
         gb_temp = s->gb;
         bytestream2_seek(&gb_temp, SEEK_SET, off);
 
@@ -1805,6 +1816,7 @@ again:
     s->is_tiled    = 0;
     s->is_jpeg     = 0;
     s->cur_page    = 0;
+    s->last_tag    = 0;
 
     for (i = 0; i < 65536; i++)
         s->dng_lut[i] = i;
@@ -1883,8 +1895,14 @@ again:
     if (is_dng) {
         int bps;
 
+        if (s->bpp % s->bppcount)
+            return AVERROR_INVALIDDATA;
+        bps = s->bpp / s->bppcount;
+        if (bps < 8 || bps > 32)
+            return AVERROR_INVALIDDATA;
+
         if (s->white_level == 0)
-            s->white_level = (1 << s->bpp) - 1; /* Default value as per the spec */
+            s->white_level = (1LL << bps) - 1; /* Default value as per the spec */
 
         if (s->white_level <= s->black_level) {
             av_log(avctx, AV_LOG_ERROR, "BlackLevel (%"PRId32") must be less than WhiteLevel (%"PRId32")\n",
@@ -1892,11 +1910,6 @@ again:
             return AVERROR_INVALIDDATA;
         }
 
-        if (s->bpp % s->bppcount)
-            return AVERROR_INVALIDDATA;
-        bps = s->bpp / s->bppcount;
-        if (bps < 8 || bps > 32)
-            return AVERROR_INVALIDDATA;
         if (s->planar)
             return AVERROR_PATCHWELCOME;
     }

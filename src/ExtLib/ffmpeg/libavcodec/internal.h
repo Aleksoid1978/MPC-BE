@@ -145,6 +145,8 @@ typedef struct AVCodecInternal {
      * for decoding.
      */
     AVPacket *last_pkt_props;
+    AVPacketList *pkt_props;
+    AVPacketList *pkt_props_tail;
 
     /**
      * temporary buffer used for encoders to store their bitstream
@@ -357,34 +359,15 @@ int ff_side_data_update_matrix_encoding(AVFrame *frame,
 int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt);
 
 /**
- * Set various frame properties from the codec context / packet data.
- */
-int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
-
-/**
  * Add a CPB properties side data to an encoding context.
  */
 AVCPBProperties *ff_add_cpb_side_data(AVCodecContext *avctx);
 
 /**
- * Check AVFrame for A53 side data and allocate and fill SEI message with A53 info
- *
- * @param frame      Raw frame to get A53 side data from
- * @param prefix_len Number of bytes to allocate before SEI message
- * @param data       Pointer to a variable to store allocated memory
- *                   Upon return the variable will hold NULL on error or if frame has no A53 info.
- *                   Otherwise it will point to prefix_len uninitialized bytes followed by
- *                   *sei_size SEI message
- * @param sei_size   Pointer to a variable to store generated SEI message length
- * @return           Zero on success, negative error code on failure
- */
-int ff_alloc_a53_sei(const AVFrame *frame, size_t prefix_len,
-                     void **data, size_t *sei_size);
-
-/**
  * Check AVFrame for S12M timecode side data and allocate and fill TC SEI message with timecode info
  *
  * @param frame      Raw frame to get S12M timecode side data from
+ * @param rate       The frame rate
  * @param prefix_len Number of bytes to allocate before SEI message
  * @param data       Pointer to a variable to store allocated memory
  *                   Upon return the variable will hold NULL on error or if frame has no S12M timecode info.
@@ -393,7 +376,7 @@ int ff_alloc_a53_sei(const AVFrame *frame, size_t prefix_len,
  * @param sei_size   Pointer to a variable to store generated SEI message length
  * @return           Zero on success, negative error code on failure
  */
-int ff_alloc_timecode_sei(const AVFrame *frame, size_t prefix_len,
+int ff_alloc_timecode_sei(const AVFrame *frame, AVRational rate, size_t prefix_len,
                      void **data, size_t *sei_size);
 
 /**
