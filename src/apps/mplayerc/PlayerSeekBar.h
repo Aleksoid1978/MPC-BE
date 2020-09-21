@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "PngImage.h"
 #include "../../DSUtil/DSMPropertyBag.h"
 
 // CPlayerSeekBar
@@ -49,7 +48,6 @@ private:
 
 	TOOLINFO        m_ti            = {};
 	CToolTipCtrl    m_tooltip;
-	CMPCPngImage    m_BackGroundbm;
 	CCritSec        m_CBLock;
 	CComPtr<IDSMChapterBag> m_pChapterBag;
 	CString         m_strChap;

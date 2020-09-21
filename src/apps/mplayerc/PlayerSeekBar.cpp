@@ -59,10 +59,6 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 
 	m_tooltip.SendMessageW(TTM_ADDTOOLW, 0, (LPARAM)&m_ti);
 
-	if (m_BackGroundbm.FileExists(L"background")) {
-		m_BackGroundbm.LoadExternalGradient(L"background");
-	}
-
 	ScaleFont();
 	SetColor();
 
@@ -285,8 +281,8 @@ void CPlayerSeekBar::OnPaint()
 
 		GRADIENT_RECT gr = {0, 1};
 
-		if (m_BackGroundbm.IsExtGradiendLoading()) {
-			m_BackGroundbm.PaintExternalGradient(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
+		if (m_pMainFrame->m_BackGroundGradient.Size()) {
+			m_pMainFrame->m_BackGroundGradient.Paint(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 		} else {
 			tvBackground[0].x = r.left; tvBackground[0].y = r.top;
 			tvBackground[1].x = r.right; tvBackground[1].y = r.bottom;
@@ -322,13 +318,13 @@ void CPlayerSeekBar::OnPaint()
 		}
 
 		if (bEnabled) {
-			if (m_BackGroundbm.IsExtGradiendLoading()) {
+			if (m_pMainFrame->m_BackGroundGradient.Size()) {
 				rc.right = nposx;
 				rc.left = rc.left + 1;
 				rc.top = rc.top + 1;
 				rc.bottom = rc.bottom - 2;
 
-				m_BackGroundbm.PaintExternalGradient(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
+				m_pMainFrame->m_BackGroundGradient.Paint(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 
 				rc = GetChannelRect();
 			} else {
@@ -728,7 +724,7 @@ void CPlayerSeekBar::SetColor()
 	if (s.bUseDarkTheme) {
 		int R, G, B;
 
-		if (m_BackGroundbm.IsExtGradiendLoading()) {
+		if (m_pMainFrame->m_BackGroundGradient.Size()) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 		} else {
 			ThemeRGB(0, 5, 10, R, G, B);

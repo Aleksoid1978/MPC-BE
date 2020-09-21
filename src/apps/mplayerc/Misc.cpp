@@ -459,3 +459,87 @@ bool IsFontInstalled(LPCWSTR lpszFont)
 
 	return lParam ? true : false;
 }
+
+//
+// CMPCGradient
+//
+
+UINT CMPCGradient::Size()
+{
+	return (UINT)m_data.size();
+}
+
+void CMPCGradient::Clear()
+{
+	m_data.clear();
+	m_width = 0;
+	m_height = 0;
+}
+
+HRESULT CMPCGradient::Create(IWICBitmapSource* pBitmapSource)
+{
+	if (!pBitmapSource) {
+		return E_POINTER;
+	}
+
+	WICPixelFormatGUID pixelFormat;
+
+	HRESULT hr = pBitmapSource->GetPixelFormat(&pixelFormat);
+
+	if (SUCCEEDED(hr)) {
+		if (pixelFormat != GUID_WICPixelFormat32bppBGRA && pixelFormat != GUID_WICPixelFormat32bppPBGRA) {
+			return E_INVALIDARG;
+		}
+		hr = pBitmapSource->GetSize(&m_width, &m_height);
+	}
+
+	if (SUCCEEDED(hr)) {
+		UINT size = m_width * m_height * 4;
+		m_data.resize(size);
+		hr = pBitmapSource->CopyPixels(nullptr, m_width * 4, size, (BYTE*)m_data.data());
+
+	}
+
+	if (FAILED(hr)) {
+		Clear();
+	}
+
+	return hr;
+}
+
+bool CMPCGradient::Paint(CDC* dc, CRect r, int ptop, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
+{
+	if (m_data.size()) {
+		BYTE* pData = (BYTE*)m_data.data();
+
+		// code from removed CMPCPngImage::PaintExternalGradient
+		GRADIENT_RECT gr = {0, 1};
+
+		int bt = 4, st = 2, pa = 255 * 256;
+		int sp = bt * ptop, hs = bt * st;
+
+		if (m_width > m_height) {
+			for (int k = sp, t = 0; t < r.right; k += hs, t += st) {
+				TRIVERTEX tv[2] = {
+					{t, 0, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
+					{t + st, 1, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
+				};
+				dc->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
+			}
+		} else {
+			for (int k = sp, t = 0; t < r.bottom; k += hs, t += st) {
+				TRIVERTEX tv[2] = {
+					{r.left, t, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
+					{r.right, t + st, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
+				};
+				dc->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+			}
+		}
+
+		delete [] pData;
+
+		return true;
+	}
+
+	return false;
+}

@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "PngImage.h"
 #include "controls/StatusLabel.h"
 
 class CMainFrame;
@@ -39,8 +38,6 @@ private:
 	CStatusLabel m_time;
 	CBitmap m_bm;
 	UINT m_bmid;
-
-	CMPCPngImage m_BackGroundbm;
 
 	CRect m_time_rect;
 	CRect m_time_rect2;

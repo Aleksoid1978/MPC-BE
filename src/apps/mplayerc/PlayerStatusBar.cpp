@@ -100,10 +100,6 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	if (m_BackGroundbm.FileExists(L"background")) {
-		m_BackGroundbm.LoadExternalGradient(L"background");
-	}
-
 	CRect r;
 	r.SetRectEmpty();
 
@@ -373,9 +369,9 @@ void CPlayerStatusBar::OnPaint()
 		// background
 		int R, G, B;
 
-		if (m_BackGroundbm.IsExtGradiendLoading()) {
+		if (m_pMainFrame->m_BackGroundGradient.Size()) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-			m_BackGroundbm.PaintExternalGradient(&dc, r, 55, s.nThemeBrightness, R, G, B);
+			m_pMainFrame->m_BackGroundGradient.Paint(&dc, r, 55, s.nThemeBrightness, R, G, B);
 		} else {
 			int R2, G2, B2;
 			ThemeRGB(30, 35, 40, R, G, B);

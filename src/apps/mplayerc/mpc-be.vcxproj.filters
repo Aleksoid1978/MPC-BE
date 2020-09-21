@@ -387,9 +387,6 @@
     <ClCompile Include="PlayerPreView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PngImage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RateControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -459,9 +456,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerListCtrl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PngImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SelectMediaType.h">

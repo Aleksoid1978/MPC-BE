@@ -37,3 +37,20 @@ COLORREF ThemeRGB(const int iR, const int iG, const int iB);
 
 const LPCWSTR MonospaceFonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
 bool IsFontInstalled(LPCWSTR lpszFont);
+
+//
+// CMPCGradient
+//
+
+class CMPCGradient
+{
+	std::vector<NoInitByte> m_data;
+	UINT m_width = 0;
+	UINT m_height = 0;
+
+public:
+	UINT Size();
+	void Clear();
+	HRESULT Create(IWICBitmapSource* pBitmapSource);
+	bool Paint(CDC* dc, CRect r, int ptop, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+};

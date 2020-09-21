@@ -21,6 +21,8 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
+#include "../../DSUtil/FileHandle.h"
+#include "WicUtils.h"
 #include "PlayerVolumeCtrl.h"
 
 // CVolumeCtrl
@@ -38,11 +40,16 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 
 	const auto& s = AfxGetAppSettings();
 
-	if (m_BackGroundbm.FileExists(L"background")) {
-		m_BackGroundbm.LoadExternalGradient(L"background");
+	CComPtr<IWICBitmap> pBitmap;
+	HRESULT hr = WicLoadImage(&pBitmap, false, (GetProgramDir() + L"background.png").GetString());
+	if (SUCCEEDED(hr)) {
+		m_BackGroundGradient.Create(pBitmap);
 	}
-	if (m_Volumebm.FileExists(L"volume")) {
-		m_Volumebm.LoadExternalGradient(L"volume");
+
+	pBitmap.Release();
+	hr = WicLoadImage(&pBitmap, false, (GetProgramDir() + L"volume.png").GetString());
+	if (SUCCEEDED(hr)) {
+		m_VolumeGradient.Create(pBitmap);
 	}
 
 	EnableToolTips(TRUE);
@@ -126,9 +133,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					GetClientRect(&r);
 					InvalidateRect(&r);
 
-					if (m_BackGroundbm.IsExtGradiendLoading()) {
+					if (m_BackGroundGradient.Size()) {
 						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-						m_BackGroundbm.PaintExternalGradient(&dc, r, 22, s.nThemeBrightness, R, G, B);
+						m_BackGroundGradient.Paint(&dc, r, 22, s.nThemeBrightness, R, G, B);
 					} else {
 						ThemeRGB(50, 55, 60, R, G, B);
 						ThemeRGB(20, 25, 30, R2, G2, B2);
@@ -219,8 +226,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						const int width_volume = r_volume.Width() - 9;
 						const int nVolPos = rc.left + (nVolume * width_volume / 100) + 4;
 
-						if (m_Volumebm.IsExtGradiendLoading()) {
-							m_Volumebm.PaintExternalGradient(&dc, rc, 0);
+						if (m_VolumeGradient.Size()) {
+							m_VolumeGradient.Paint(&dc, rc, 0);
 						} else {
 							const COLOR16 ir1 = (p1 * 256);
 							const COLOR16 ig1 = (p1 >> 8) * 256;
