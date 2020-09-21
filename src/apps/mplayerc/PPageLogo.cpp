@@ -192,10 +192,10 @@ void CPPageLogo::GetDataFromRes()
 	if (IDF_LOGO0 != id) {
 		BYTE* data;
 		UINT size;
-		bool ret = LoadResourceFile(id, &data, size);
-		if (ret) {
+		HRESULT hr = LoadResourceFile(id, &data, size);
+		if (SUCCEEDED(hr)) {
 			CComPtr<IWICBitmap> pBitmap;
-			HRESULT hr = WicLoadImage(&pBitmap, true, data, size);
+			hr = WicLoadImage(&pBitmap, true, data, size);
 			if (SUCCEEDED(hr)) {
 				hr = WicCreateHBitmap(hBitmap, pBitmap);
 			}

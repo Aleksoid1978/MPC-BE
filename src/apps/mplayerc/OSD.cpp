@@ -85,7 +85,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	if (FAILED(hr)) {
 		BYTE* data;
 		UINT size;
-		hr = LoadResourceFile(IDB_PLAYERFLYBAR_PNG, &data, size) ? S_OK : E_FAIL;
+		hr = LoadResourceFile(IDB_PLAYERFLYBAR_PNG, &data, size);
 		if (SUCCEEDED(hr)) {
 			hr = WicLoadImage(&pBitmap, true, data, size);
 		}

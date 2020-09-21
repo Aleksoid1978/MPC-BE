@@ -104,7 +104,7 @@ bool CMPCPngImage::LoadFromResource(UINT id) {
 
 	BYTE* data;
 	UINT size;
-	if (LoadResourceFile(id, &data, size)) {
+	if (S_OK == LoadResourceFile(id, &data, size)) {
 		struct png_t png;
 		png.data = data;
 		png.size = size;

@@ -320,26 +320,26 @@ bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype)
 	return true;
 }
 
-bool LoadResourceFile(UINT resid, BYTE** ppData, UINT& size)
+HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size)
 {
 	HRSRC hrsrc = FindResourceW(AfxGetApp()->m_hInstance, MAKEINTRESOURCEW(resid), L"FILE");
 	if (!hrsrc) {
-		return false;
+		return E_INVALIDARG;
 	}
 	HGLOBAL hGlobal = LoadResource(AfxGetApp()->m_hInstance, hrsrc);
 	if (!hGlobal) {
-		return false;
+		return E_FAIL;
 	}
 	size = SizeofResource(AfxGetApp()->m_hInstance, hrsrc);
 	if (!size) {
-		return false;
+		return E_FAIL;
 	}
 	*ppData = (BYTE*)LockResource(hGlobal);
 	if (!*ppData) {
-		return false;
+		return E_FAIL;
 	}
 
-	return true;
+	return S_OK;
 }
 
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen/* = false*/, bool bCheckMouse/* = true*/)

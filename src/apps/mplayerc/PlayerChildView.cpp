@@ -178,10 +178,10 @@ void CChildView::LoadLogo()
 		// load internal logo
 		BYTE* data;
 		UINT size;
-		HRESULT hr = LoadResourceFile(s.nLogoId, &data, size) ? S_OK : E_FAIL;
+		HRESULT hr = LoadResourceFile(s.nLogoId, &data, size);
 		if (FAILED(hr)) {
 			s.nLogoId = DEF_LOGO;
-			hr = LoadResourceFile(s.nLogoId, &data, size) ? S_OK : E_FAIL;
+			hr = LoadResourceFile(s.nLogoId, &data, size);
 		}
 
 		if (SUCCEEDED(hr)) {
