@@ -238,7 +238,7 @@ void CPlayerToolBar::SwitchTheme()
 	if (FAILED(hr)) {
 		BYTE* data;
 		UINT size;
-		hr = LoadResourceFile(resid, &data, size) ? S_OK : E_FAIL;
+		hr = LoadResourceFile(resid, &data, size);
 		if (SUCCEEDED(hr)) {
 			hr = WicLoadImage(&pBitmap, false, data, size);
 		}
@@ -359,7 +359,7 @@ void CPlayerToolBar::SwitchTheme()
 
 			BYTE* data;
 			UINT size;
-			hr = LoadResourceFile(resid, &data, size) ? S_OK : E_FAIL;
+			hr = LoadResourceFile(resid, &data, size);
 			if (SUCCEEDED(hr)) {
 				hr = WicLoadImage(&pBitmap, false, data, size);
 			}

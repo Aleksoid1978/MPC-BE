@@ -28,7 +28,7 @@ CString GetLastErrorMsg(LPWSTR lpszFunction, DWORD dw = GetLastError());
 HICON LoadIcon(const CString& fn, bool fSmall);
 bool  LoadType(const CString& fn, CString& type);
 bool  LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
-bool  LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
+HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
 
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
 void SetAudioRenderer(int AudioDevNo);

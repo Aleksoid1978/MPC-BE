@@ -18554,7 +18554,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		UINT width, height;
 		BYTE* data;
 		UINT size;
-		HRESULT hr = LoadResourceFile(IDB_W7_TOOLBAR, &data, size) ? S_OK : E_FAIL;
+		HRESULT hr = LoadResourceFile(IDB_W7_TOOLBAR, &data, size);
 		if (SUCCEEDED(hr)) {
 			hr = WicLoadImage(&pBitmap, true, data, size);
 		}
@@ -19328,7 +19328,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		if (!bLoadRes) {
 			BYTE* data;
 			UINT size;
-			hr = LoadResourceFile(IDB_W7_AUDIO, &data, size) ? S_OK : E_FAIL;
+			hr = LoadResourceFile(IDB_W7_AUDIO, &data, size);
 			if (SUCCEEDED(hr)) {
 				hr = WicLoadImage(&m_pMainBitmap, true, data, size);
 			}
