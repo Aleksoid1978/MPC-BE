@@ -120,9 +120,34 @@ void CPPageLogo::OnBnClickedRadio2()
 	HBITMAP hBitmap = nullptr;
 
 	CComPtr<IWICBitmap> pBitmap;
+	CComPtr<IWICBitmap> pBitmapScaled;
+	UINT bm_w, bm_h;
+
 	HRESULT hr = WicLoadImage(&pBitmap, true, m_logofn.GetString());
 	if (SUCCEEDED(hr)) {
-		hr = WicCreateDibSecton(hBitmap, pBitmap);
+		hr = pBitmap->GetSize(&bm_w, &bm_h);
+	}
+	if (SUCCEEDED(hr)) {
+		CRect rect = {};
+		m_logopreview.GetClientRect(&rect);
+		UINT w = rect.Width();
+		UINT h = rect.Height();
+
+		if (bm_w > w || bm_h > w) {
+			UINT wy = w * bm_h;
+			UINT hx = h * bm_w;
+			if (wy > hx) {
+				w = hx / bm_w;
+			} else {
+				h = wy / bm_h;
+			}
+
+			hr = WicCreateBitmapScaled(&pBitmapScaled, w, h, pBitmap);
+			pBitmap.Release();
+		}
+	}
+	if (SUCCEEDED(hr)) {
+		hr = WicCreateDibSecton(hBitmap, pBitmapScaled ? pBitmapScaled : pBitmap);
 	}
 
 	hBitmap = m_logopreview.SetBitmap(hBitmap);
