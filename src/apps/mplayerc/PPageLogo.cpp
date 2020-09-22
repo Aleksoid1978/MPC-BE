@@ -137,9 +137,9 @@ void CPPageLogo::OnBnClickedRadio2()
 			UINT wy = w * bm_h;
 			UINT hx = h * bm_w;
 			if (wy > hx) {
-				w = hx / bm_w;
+				w = hx / bm_h;
 			} else {
-				h = wy / bm_h;
+				h = wy / bm_w;
 			}
 
 			hr = WicCreateBitmapScaled(&pBitmapScaled, w, h, pBitmap);
