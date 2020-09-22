@@ -182,6 +182,17 @@ Modify the packet iterator to point to the next packet
 @return Returns false if pi pointed to the last packet or else returns true
 */
 OPJ_BOOL opj_pi_next(opj_pi_iterator_t * pi);
+
+/**
+ * Return the number of packets in the tile.
+ * @param   image       the image being encoded.
+ * @param cp Coding parameters
+ * @param tileno Number that identifies the tile.
+ */
+OPJ_UINT32 opj_get_encoding_packet_count(const opj_image_t *p_image,
+        const opj_cp_t *p_cp,
+        OPJ_UINT32 p_tile_no);
+
 /* ----------------------------------------------------------------------- */
 /*@}*/
 

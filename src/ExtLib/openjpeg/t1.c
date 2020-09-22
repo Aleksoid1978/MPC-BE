@@ -1658,7 +1658,21 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
     t1 = (opj_t1_t*) opj_tls_get(tls, OPJ_TLS_KEY_T1);
     if (t1 == NULL) {
         t1 = opj_t1_create(OPJ_FALSE);
-        opj_tls_set(tls, OPJ_TLS_KEY_T1, t1, opj_t1_destroy_wrapper);
+        if (t1 == NULL) {
+            opj_event_msg(job->p_manager, EVT_ERROR,
+                          "Cannot allocate Tier 1 handle\n");
+            *(job->pret) = OPJ_FALSE;
+            opj_free(job);
+            return;
+        }
+        if (!opj_tls_set(tls, OPJ_TLS_KEY_T1, t1, opj_t1_destroy_wrapper)) {
+            opj_event_msg(job->p_manager, EVT_ERROR,
+                          "Unable to set t1 handle as TLS\n");
+            opj_t1_destroy(t1);
+            *(job->pret) = OPJ_FALSE;
+            opj_free(job);
+            return;
+        }
     }
     t1->mustuse_cblkdatabuffer = job->mustuse_cblkdatabuffer;
 
