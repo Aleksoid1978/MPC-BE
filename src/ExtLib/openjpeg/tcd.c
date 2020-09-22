@@ -182,6 +182,7 @@ static OPJ_BOOL opj_tcd_t2_encode(opj_tcd_t *p_tcd,
                                   OPJ_UINT32 * p_data_written,
                                   OPJ_UINT32 p_max_dest_size,
                                   opj_codestream_info_t *p_cstr_info,
+                                  opj_tcd_marker_info_t* p_marker_info,
                                   opj_event_mgr_t *p_manager);
 
 static OPJ_BOOL opj_tcd_rate_allocate_encode(opj_tcd_t *p_tcd,
@@ -573,9 +574,10 @@ OPJ_BOOL opj_tcd_rateallocate(opj_tcd_t *tcd,
                 opj_tcd_makelayer(tcd, layno, thresh, 0);
 
                 if (cp->m_specific_param.m_enc.m_fixed_quality) {       /* fixed_quality */
-                    if (OPJ_IS_CINEMA(cp->rsiz)) {
+                    if (OPJ_IS_CINEMA(cp->rsiz) || OPJ_IS_IMF(cp->rsiz)) {
                         if (! opj_t2_encode_packets(t2, tcd->tcd_tileno, tcd_tile, layno + 1, dest,
-                                                    p_data_written, maxlen, cstr_info, tcd->cur_tp_num, tcd->tp_pos, tcd->cur_pino,
+                                                    p_data_written, maxlen, cstr_info, NULL, tcd->cur_tp_num, tcd->tp_pos,
+                                                    tcd->cur_pino,
                                                     THRESH_CALC, p_manager)) {
 
                             lo = thresh;
@@ -605,7 +607,8 @@ OPJ_BOOL opj_tcd_rateallocate(opj_tcd_t *tcd,
                     }
                 } else {
                     if (! opj_t2_encode_packets(t2, tcd->tcd_tileno, tcd_tile, layno + 1, dest,
-                                                p_data_written, maxlen, cstr_info, tcd->cur_tp_num, tcd->tp_pos, tcd->cur_pino,
+                                                p_data_written, maxlen, cstr_info, NULL, tcd->cur_tp_num, tcd->tp_pos,
+                                                tcd->cur_pino,
                                                 THRESH_CALC, p_manager)) {
                         /* TODO: what to do with l ??? seek / tell ??? */
                         /* opj_event_msg(tcd->cinfo, EVT_INFO, "rate alloc: len=%d, max=%d\n", l, maxlen); */
@@ -905,8 +908,24 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
             /* p. 64, B.6, ISO/IEC FDIS15444-1 : 2000 (18 august 2000)  */
             l_tl_prc_x_start = opj_int_floordivpow2(l_res->x0, (OPJ_INT32)l_pdx) << l_pdx;
             l_tl_prc_y_start = opj_int_floordivpow2(l_res->y0, (OPJ_INT32)l_pdy) << l_pdy;
-            l_br_prc_x_end = opj_int_ceildivpow2(l_res->x1, (OPJ_INT32)l_pdx) << l_pdx;
-            l_br_prc_y_end = opj_int_ceildivpow2(l_res->y1, (OPJ_INT32)l_pdy) << l_pdy;
+            {
+                OPJ_UINT32 tmp = ((OPJ_UINT32)opj_int_ceildivpow2(l_res->x1,
+                                  (OPJ_INT32)l_pdx)) << l_pdx;
+                if (tmp > (OPJ_UINT32)INT_MAX) {
+                    opj_event_msg(manager, EVT_ERROR, "Integer overflow\n");
+                    return OPJ_FALSE;
+                }
+                l_br_prc_x_end = (OPJ_INT32)tmp;
+            }
+            {
+                OPJ_UINT32 tmp = ((OPJ_UINT32)opj_int_ceildivpow2(l_res->y1,
+                                  (OPJ_INT32)l_pdy)) << l_pdy;
+                if (tmp > (OPJ_UINT32)INT_MAX) {
+                    opj_event_msg(manager, EVT_ERROR, "Integer overflow\n");
+                    return OPJ_FALSE;
+                }
+                l_br_prc_y_end = (OPJ_INT32)tmp;
+            }
             /*fprintf(stderr, "\t\t\tprc_x_start=%d, prc_y_start=%d, br_prc_x_end=%d, br_prc_y_end=%d \n", l_tl_prc_x_start, l_tl_prc_y_start, l_br_prc_x_end ,l_br_prc_y_end );*/
 
             l_res->pw = (l_res->x0 == l_res->x1) ? 0U : (OPJ_UINT32)((
@@ -1354,6 +1373,7 @@ OPJ_BOOL opj_tcd_encode_tile(opj_tcd_t *p_tcd,
                              OPJ_UINT32 * p_data_written,
                              OPJ_UINT32 p_max_length,
                              opj_codestream_info_t *p_cstr_info,
+                             opj_tcd_marker_info_t* p_marker_info,
                              opj_event_mgr_t *p_manager)
 {
 
@@ -1433,7 +1453,7 @@ OPJ_BOOL opj_tcd_encode_tile(opj_tcd_t *p_tcd,
     /* FIXME _ProfStart(PGROUP_T2); */
 
     if (! opj_tcd_t2_encode(p_tcd, p_dest, p_data_written, p_max_length,
-                            p_cstr_info, p_manager)) {
+                            p_cstr_info, p_marker_info, p_manager)) {
         return OPJ_FALSE;
     }
     /* FIXME _ProfStop(PGROUP_T2); */
@@ -2333,7 +2353,7 @@ static void opj_tcd_code_block_enc_deallocate(opj_tcd_precinct_t * p_precinct)
     }
 }
 
-OPJ_SIZE_T opj_tcd_get_encoded_tile_size(opj_tcd_t *p_tcd)
+OPJ_SIZE_T opj_tcd_get_encoder_input_buffer_size(opj_tcd_t *p_tcd)
 {
     OPJ_UINT32 i;
     OPJ_SIZE_T l_data_size = 0;
@@ -2525,6 +2545,7 @@ static OPJ_BOOL opj_tcd_t2_encode(opj_tcd_t *p_tcd,
                                   OPJ_UINT32 * p_data_written,
                                   OPJ_UINT32 p_max_dest_size,
                                   opj_codestream_info_t *p_cstr_info,
+                                  opj_tcd_marker_info_t* p_marker_info,
                                   opj_event_mgr_t *p_manager)
 {
     opj_t2_t * l_t2;
@@ -2543,6 +2564,7 @@ static OPJ_BOOL opj_tcd_t2_encode(opj_tcd_t *p_tcd,
                 p_data_written,
                 p_max_dest_size,
                 p_cstr_info,
+                p_marker_info,
                 p_tcd->tp_num,
                 p_tcd->tp_pos,
                 p_tcd->cur_pino,
@@ -2601,7 +2623,7 @@ OPJ_BOOL opj_tcd_copy_tile_data(opj_tcd_t *p_tcd,
     OPJ_UINT32 l_size_comp, l_remaining;
     OPJ_SIZE_T l_nb_elem;
 
-    l_data_size = opj_tcd_get_encoded_tile_size(p_tcd);
+    l_data_size = opj_tcd_get_encoder_input_buffer_size(p_tcd);
     if (l_data_size != p_src_length) {
         return OPJ_FALSE;
     }
@@ -2803,3 +2825,29 @@ static OPJ_BOOL opj_tcd_is_whole_tilecomp_decoding(opj_tcd_t *p_tcd,
               (((OPJ_UINT32)tilec->x1 - tcx1) >> shift) == 0 &&
               (((OPJ_UINT32)tilec->y1 - tcy1) >> shift) == 0)));
 }
+
+/* ----------------------------------------------------------------------- */
+
+opj_tcd_marker_info_t* opj_tcd_marker_info_create(OPJ_BOOL need_PLT)
+{
+    opj_tcd_marker_info_t *l_tcd_marker_info =
+        (opj_tcd_marker_info_t*) opj_calloc(1, sizeof(opj_tcd_marker_info_t));
+    if (!l_tcd_marker_info) {
+        return NULL;
+    }
+
+    l_tcd_marker_info->need_PLT = need_PLT;
+
+    return l_tcd_marker_info;
+}
+
+/* ----------------------------------------------------------------------- */
+
+void opj_tcd_marker_info_destroy(opj_tcd_marker_info_t *p_tcd_marker_info)
+{
+    if (p_tcd_marker_info) {
+        opj_free(p_tcd_marker_info->p_packet_size);
+    }
+}
+
+/* ----------------------------------------------------------------------- */

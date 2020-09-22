@@ -224,6 +224,7 @@ OPJ_BOOL opj_t2_encode_packets(opj_t2_t* p_t2,
                                OPJ_UINT32 * p_data_written,
                                OPJ_UINT32 p_max_len,
                                opj_codestream_info_t *cstr_info,
+                               opj_tcd_marker_info_t* p_marker_info,
                                OPJ_UINT32 p_tp_num,
                                OPJ_INT32 p_tp_pos,
                                OPJ_UINT32 p_pino,
@@ -310,6 +311,20 @@ OPJ_BOOL opj_t2_encode_packets(opj_t2_t* p_t2,
             opj_pi_destroy(l_pi, l_nb_pocs);
             return OPJ_FALSE;
         }
+
+        if (p_marker_info && p_marker_info->need_PLT) {
+            /* One time use intended */
+            assert(p_marker_info->packet_count == 0);
+            assert(p_marker_info->p_packet_size == NULL);
+
+            p_marker_info->p_packet_size = (OPJ_UINT32*) opj_malloc(
+                                               opj_get_encoding_packet_count(l_image, l_cp, p_tile_no) * sizeof(OPJ_UINT32));
+            if (p_marker_info->p_packet_size == NULL) {
+                opj_pi_destroy(l_pi, l_nb_pocs);
+                return OPJ_FALSE;
+            }
+        }
+
         while (opj_pi_next(l_current_pi)) {
             if (l_current_pi->layno < p_maxlayers) {
                 l_nb_bytes = 0;
@@ -325,6 +340,11 @@ OPJ_BOOL opj_t2_encode_packets(opj_t2_t* p_t2,
                 p_max_len -= l_nb_bytes;
 
                 * p_data_written += l_nb_bytes;
+
+                if (p_marker_info && p_marker_info->need_PLT) {
+                    p_marker_info->p_packet_size[p_marker_info->packet_count] = l_nb_bytes;
+                    p_marker_info->packet_count ++;
+                }
 
                 /* INDEX >> */
                 if (cstr_info) {
