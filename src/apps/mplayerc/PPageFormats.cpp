@@ -665,18 +665,24 @@ BOOL CPPageFormats::OnInitDialog()
 		delete pDpi;
 	}
 
-	CBitmap onoff;
+	int bm_id, bm_size;
 	if (dpiY >= 192) {
-		onoff.LoadBitmap(IDB_ONOFF_192);
-		m_onoff.Create(24, 24, ILC_COLOR4 | ILC_MASK, 0, 3);
+		bm_id = IDB_ONOFF_192;
+		bm_size = 24;
 	} else if (dpiY >= 144) {
-		onoff.LoadBitmap(IDB_ONOFF_144);
-		m_onoff.Create(18, 18, ILC_COLOR4 | ILC_MASK, 0, 3);
+		bm_id = IDB_ONOFF_144;
+		bm_size = 18;
 	} else {
-		onoff.LoadBitmap(IDB_ONOFF_96);
-		m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
+		bm_id = IDB_ONOFF_96;
+		bm_size = 12;
 	}
+
+	CBitmap onoff;
+	onoff.Attach(::LoadBitmapW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(bm_id)));
+
+	m_onoff.Create(bm_size, bm_size, ILC_COLOR4 | ILC_MASK, 0, 3);
 	m_onoff.Add(&onoff, 0xffffff);
+
 	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
