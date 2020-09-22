@@ -190,7 +190,7 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 	}
 
 	if (id) {
-		EXECUTE_ASSERT(m_bm.LoadBitmap(id));
+		m_bm.Attach(::LoadBitmapW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(id)));
 	}
 
 	m_bmid = id;
