@@ -81,16 +81,6 @@ void CUDPStream::Append(const BYTE* buff, UINT len)
 	}
 }
 
-static CString ConvertStr(LPCSTR s)
-{
-	CString str = AltUTF8ToWStr(s);
-	if (str.IsEmpty()) {
-		str = ConvertToWStr(s, CP_ACP);
-	}
-
-	return str;
-}
-
 HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
 	if (m_protocol == protocol::PR_HTTP) {
@@ -114,7 +104,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 			DWORD _dwSizeRead = 0;
 			if (S_OK == m_HTTPAsync.Read(&b, 1, &_dwSizeRead) && _dwSizeRead == 1 && b) {
 				if (S_OK == m_HTTPAsync.Read(buff, b * 16, &_dwSizeRead) && _dwSizeRead == b * 16) {
-					CString str = ConvertStr((LPCSTR)buff);
+					CString str = UTF8orLocalToWStr((LPCSTR)buff);
 
 					DbgLog((LOG_TRACE, 3, L"CUDPStream::HTTPRead(): Metainfo: %s", str));
 
