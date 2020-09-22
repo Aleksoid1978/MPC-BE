@@ -200,11 +200,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						m_cashedImage.Destroy();
 						m_cashedImage.Create(rc.Width(), rc.Height(), 32);
 
-						CDC dc;
-						dc.Attach(m_cashedImage.GetDC());
+						CDC imageDC;
+						imageDC.Attach(m_cashedImage.GetDC());
 
 						CDC memdc;
-						memdc.CreateCompatibleDC(&dc);
+						memdc.CreateCompatibleDC(&imageDC);
 
 						CBitmap* bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
@@ -227,7 +227,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						const int nVolPos = rc.left + (nVolume * width_volume / 100) + 4;
 
 						if (m_VolumeGradient.Size()) {
-							m_VolumeGradient.Paint(&dc, rc, 0);
+							m_VolumeGradient.Paint(&imageDC, rc, 0);
 						} else {
 							const COLOR16 ir1 = (p1 * 256);
 							const COLOR16 ig1 = (p1 >> 8) * 256;
@@ -241,13 +241,13 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 								{rc.left, rc.top, ir1, ig1, ib1, pa},
 								{r_volume.Width(), 1, ir2, ig2, ib2, pa},
 							};
-							dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
+							imageDC.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
 						}
 
-						const COLORREF p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);
+						const COLORREF p3 = nVolPos > 30 ? imageDC.GetPixel(nVolPos, 0) : imageDC.GetPixel(30, 0);
 						CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
-						dc.BitBlt(0, 0, rc.Width(), rc.Height(), &memdc, 0, 0, SRCCOPY);
+						imageDC.BitBlt(0, 0, rc.Width(), rc.Height(), &memdc, 0, 0, SRCCOPY);
 
 						DeleteObject(memdc.SelectObject(bmOld));
 						memdc.DeleteDC();
@@ -256,7 +256,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						CopyRect(&pNMCD->rc, &rc);
 
 						CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
-						CPen* penOld = dc.SelectObject(&penRight);
+						CPen* penOld = imageDC.SelectObject(&penRight);
 
 						int nposx, nposy;
 						const int width = rc.Width() - 9;
@@ -267,24 +267,24 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 							nposx = rc.left + i;
 							nposy = rc.bottom - (rc.Height() * i) / (rc.Width() + 6);
 
-							i < nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
+							i < nVolPos ? imageDC.SelectObject(penLeft) : imageDC.SelectObject(penRight);
 
-							dc.MoveTo(nposx, nposy);         // top_left
-							dc.LineTo(nposx + 2, nposy);     // top_right
-							dc.LineTo(nposx + 2, rc.bottom); // bottom_right
-							dc.LineTo(nposx, rc.bottom);     // bottom_left
-							dc.LineTo(nposx, nposy);         // top_left
+							imageDC.MoveTo(nposx, nposy);         // top_left
+							imageDC.LineTo(nposx + 2, nposy);     // top_right
+							imageDC.LineTo(nposx + 2, rc.bottom); // bottom_right
+							imageDC.LineTo(nposx, rc.bottom);     // bottom_left
+							imageDC.LineTo(nposx, nposy);         // top_left
 
 							if (!s.fMute) {
-								dc.MoveTo(nposx + 1, nposy - 1);     // top_middle
-								dc.LineTo(nposx + 1, rc.bottom + 2); // bottom_middle
+								imageDC.MoveTo(nposx + 1, nposy - 1);     // top_middle
+								imageDC.LineTo(nposx + 1, rc.bottom + 2); // bottom_middle
 							}
 
 							i += step;
 						}
 
-						dc.SelectObject(penOld);
-						dc.Detach();
+						imageDC.SelectObject(penOld);
+						imageDC.Detach();
 
 						m_cashedImage.ReleaseDC();
 					}
