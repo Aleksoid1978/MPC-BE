@@ -50,15 +50,6 @@ void CPPageLogo::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_AUTHOR, m_author);
 }
 
-BEGIN_MESSAGE_MAP(CPPageLogo, CPPageBase)
-	ON_BN_CLICKED(IDC_RADIO1, OnBnClickedRadio1)
-	ON_BN_CLICKED(IDC_RADIO2, OnBnClickedRadio2)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, OnDeltaposSpin1)
-	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
-END_MESSAGE_MAP()
-
-// CPPageLogo message handlers
-
 BOOL CPPageLogo::OnInitDialog()
 {
 	__super::OnInitDialog();
@@ -100,6 +91,42 @@ BOOL CPPageLogo::OnApply()
 
 	return __super::OnApply();
 }
+
+void CPPageLogo::GetDataFromRes()
+{
+	m_author.Empty();
+	HBITMAP hBitmap = nullptr;
+
+	UINT id = m_logoids[m_logoidpos];
+
+	if (IDF_LOGO0 != id) {
+		BYTE* data;
+		UINT size;
+		HRESULT hr = LoadResourceFile(id, &data, size);
+		if (SUCCEEDED(hr)) {
+			CComPtr<IWICBitmap> pBitmap;
+			hr = WicLoadImage(&pBitmap, true, data, size);
+			if (SUCCEEDED(hr)) {
+				hr = WicCreateHBitmap(hBitmap, pBitmap);
+			}
+		}
+		if (!m_author.LoadString(id)) {
+			m_author = ResStr(IDS_LOGO_AUTHOR);
+		}
+	}
+
+	hBitmap = m_logopreview.SetBitmap(hBitmap);
+	DeleteObject(hBitmap);
+}
+
+BEGIN_MESSAGE_MAP(CPPageLogo, CPPageBase)
+	ON_BN_CLICKED(IDC_RADIO1, OnBnClickedRadio1)
+	ON_BN_CLICKED(IDC_RADIO2, OnBnClickedRadio2)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, OnDeltaposSpin1)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
+END_MESSAGE_MAP()
+
+// CPPageLogo message handlers
 
 void CPPageLogo::OnBnClickedRadio1()
 {
@@ -205,31 +232,4 @@ void CPPageLogo::OnBnClickedButton2()
 		UpdateData(FALSE);
 		OnBnClickedRadio2();
 	}
-}
-
-void CPPageLogo::GetDataFromRes()
-{
-	m_author.Empty();
-	HBITMAP hBitmap = nullptr;
-
-	UINT id = m_logoids[m_logoidpos];
-
-	if (IDF_LOGO0 != id) {
-		BYTE* data;
-		UINT size;
-		HRESULT hr = LoadResourceFile(id, &data, size);
-		if (SUCCEEDED(hr)) {
-			CComPtr<IWICBitmap> pBitmap;
-			hr = WicLoadImage(&pBitmap, true, data, size);
-			if (SUCCEEDED(hr)) {
-				hr = WicCreateHBitmap(hBitmap, pBitmap);
-			}
-		}
-		if (!m_author.LoadString(id)) {
-			m_author = ResStr(IDS_LOGO_AUTHOR);
-		}
-	}
-
-	hBitmap = m_logopreview.SetBitmap(hBitmap);
-	DeleteObject(hBitmap);
 }

@@ -30,28 +30,27 @@ class CPPageLogo : public CPPageBase
 private:
 	std::vector<UINT> m_logoids;
 	int m_logoidpos;
-	void GetDataFromRes();
+	int m_intext;
+	CString m_logofn;
+	CStatic m_logopreview;
+	CString m_author;
 
 public:
 	CPPageLogo();
 	virtual ~CPPageLogo();
 
 	enum { IDD = IDD_PPAGELOGO };
-	int m_intext;
-	CString m_logofn;
-	CStatic m_logopreview;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
+	void GetDataFromRes();
 
 	DECLARE_MESSAGE_MAP()
-
 public:
 	afx_msg void OnBnClickedRadio1();
 	afx_msg void OnBnClickedRadio2();
 	afx_msg void OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedButton2();
-	CString m_author;
 };
