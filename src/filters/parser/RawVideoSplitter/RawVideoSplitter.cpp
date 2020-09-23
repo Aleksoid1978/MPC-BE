@@ -1099,31 +1099,51 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 		}
 
 		if (m_RAWType == RAW_AV1_OBU) {
-			auto ParseObuHeader = [](CBaseSplitterFileEx* pFile) -> int64_t {
+			auto ParseObuHeader = [](CBaseSplitterFileEx* pFile, uint8_t& obu_type) -> int64_t {
 				const auto pos = pFile->GetPos();
 
-				constexpr int64_t MAX_OBU_HEADER_SIZE = 2 + 8;
-				static BYTE buf[MAX_OBU_HEADER_SIZE] = {};
-				if (pFile->ByteRead(buf, MAX_OBU_HEADER_SIZE) != S_OK) {
+				static BYTE buf[AV1Parser::MAX_OBU_HEADER_SIZE] = {};
+				if (pFile->ByteRead(buf, AV1Parser::MAX_OBU_HEADER_SIZE) != S_OK) {
 					return -1;
 				}
 				pFile->Seek(pos);
 
-				return AV1Parser::ParseOBUHeaderSize(buf, MAX_OBU_HEADER_SIZE);
+				return AV1Parser::ParseOBUHeaderSize(buf, AV1Parser::MAX_OBU_HEADER_SIZE, obu_type);
 			};
 
-			auto size = ParseObuHeader(m_pFile);
-			if (size == -1) {
-				break;
-			} else {
+			const auto pos = m_pFile->GetPos();
+			int64_t len = 0;
+			for (;;) {
+				uint8_t obu_type = 0;
+				const auto size = ParseObuHeader(m_pFile, obu_type);
+				if (size == -1) {
+					len = 0;
+					break;
+				}
+
+				len += size;
+
+				if (obu_type == AV1Parser::AV1_OBU_Type::AV1_OBU_FRAME_HEADER || obu_type == AV1Parser::AV1_OBU_Type::AV1_OBU_FRAME) {
+					break;
+				}
+
+				m_pFile->Skip(size);
+			}
+
+			if (len) {
+				m_pFile->Seek(pos);
+
 				CAutoPtr<CPacket> p(DNew CPacket());
-				p->resize(size);
-				if ((hr = m_pFile->ByteRead(p->data(), size)) != S_OK) {
+				p->resize(len);
+				if ((hr = m_pFile->ByteRead(p->data(), len)) != S_OK) {
 					break;
 				}
 
 				hr = DeliverPacket(p);
+			} else {
+				break;
 			}
+
 			continue;
 		}
 

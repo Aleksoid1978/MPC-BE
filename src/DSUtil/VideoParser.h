@@ -85,6 +85,22 @@ namespace HEVCParser {
 } // namespace HEVCParser
 
 namespace AV1Parser {
+	inline enum AV1_OBU_Type {
+		// 0 reserved.
+		AV1_OBU_SEQUENCE_HEADER = 1,
+		AV1_OBU_TEMPORAL_DELIMITER = 2,
+		AV1_OBU_FRAME_HEADER = 3,
+		AV1_OBU_TILE_GROUP = 4,
+		AV1_OBU_METADATA = 5,
+		AV1_OBU_FRAME = 6,
+		AV1_OBU_REDUNDANT_FRAME_HEADER = 7,
+		AV1_OBU_TILE_LIST = 8,
+		// 9-14 reserved.
+		AV1_OBU_PADDING = 15,
+	} AV1_OBU_Type;
+
+	constexpr auto MAX_OBU_HEADER_SIZE = 2 + 8;
+
 	struct AV1SequenceParameters {
 		uint8_t profile                        = 0;
 		uint8_t level                          = 0;
@@ -103,6 +119,6 @@ namespace AV1Parser {
 		uint32_t height                        = 0;
 	};
 
-	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size);
+	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size, uint8_t& obu_type);
 	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header);
 } // namespace AV1Parser
