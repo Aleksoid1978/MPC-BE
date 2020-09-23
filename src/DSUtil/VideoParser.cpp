@@ -1159,10 +1159,6 @@ namespace HEVCParser {
 
 
 namespace AV1Parser {
-	constexpr auto AV1_OBU_SEQUENCE_HEADER  = 1;
-	constexpr auto AV1_OBU_FRAME_HEADER     = 3;
-	constexpr auto AV1_OBU_FRAME            = 6;
-
 	constexpr auto PROFILE_AV1_MAIN         = 0;
 	constexpr auto PROFILE_AV1_HIGH         = 1;
 	constexpr auto PROFILE_AV1_PROFESSIONAL = 2;
@@ -1175,8 +1171,6 @@ namespace AV1Parser {
 
 	constexpr auto AVCOL_SPC_RGB            = 0;
 	constexpr auto AVCOL_SPC_UNSPECIFIED    = 2;
-
-	constexpr auto MAX_OBU_HEADER_SIZE      = 2 + 8;
 
 	bool ParseSequenceHeader(AV1SequenceParameters& seq_params, const BYTE* buf, const int buf_size) {
 		auto uvlc = [](CGolombBuffer& gb) {
@@ -1363,7 +1357,7 @@ namespace AV1Parser {
 		return true;
 	};
 
-	static int64_t ParseOBUHeader(const BYTE* buf, const int buf_size, int64_t& obu_size, int& start_pos, int& type)
+	static int64_t ParseOBUHeader(const BYTE* buf, const int buf_size, int64_t& obu_size, int& start_pos, uint8_t& obu_type)
 	{
 		auto leb128 = [](CGolombBuffer& gb) {
 			int64_t ret = 0;
@@ -1382,7 +1376,7 @@ namespace AV1Parser {
 		if (gb.BitRead(1) != 0) { // obu_forbidden_bit
 			return -1;
 		}
-		type = gb.BitRead(4);
+		obu_type = gb.BitRead(4);
 		bool extension_flag = gb.BitRead(1);
 		bool has_size_flag = gb.BitRead(1);
 		if (!has_size_flag) {
@@ -1402,11 +1396,11 @@ namespace AV1Parser {
 		return obu_size + start_pos;
 	};
 
-	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size)
+	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size, uint8_t& obu_type)
 	{
 		int64_t obu_size;
-		int start_pos, type;
-		return ParseOBUHeader(buf, buf_size, obu_size, start_pos, type);
+		int start_pos;
+		return ParseOBUHeader(buf, buf_size, obu_size, start_pos, obu_type);
 	}
 
 	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header)
@@ -1422,7 +1416,7 @@ namespace AV1Parser {
 		while (size > 0) {
 			int64_t obu_size = 0;
 			int start_pos = 0;
-			int type = 0;
+			uint8_t type = 0;
 			auto len = ParseOBUHeader(buf, size, obu_size, start_pos, type);
 			if (len < 0) {
 				break;
