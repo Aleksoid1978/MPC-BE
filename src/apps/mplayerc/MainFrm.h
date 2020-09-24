@@ -313,6 +313,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void ZoomVideoWindow(bool snap = true, double scale = -1);
 	double GetZoomAutoFitScale();
 	CRect GetInvisibleBorderSize() const;
+	void ClampWindowRect(RECT& windowRect);
 
 	void SetAlwaysOnTop(int i);
 

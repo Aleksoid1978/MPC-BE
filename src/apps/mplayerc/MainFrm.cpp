@@ -2031,6 +2031,8 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 		pRect->top = pRect->bottom - h;
 	}
 
+	ClampWindowRect(*pRect);
+
 	FlyBarSetPos();
 	OSDBarSetPos();
 
@@ -10519,27 +10521,11 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		windowSize.cy += cSize.cy;
 	}
 
-	auto SetMaxRectSize = [&](CRect& windowRect) {
-		const auto monitor = CMonitors::GetNearestMonitor(windowRect);
-		CRect rcWork;
-		monitor.GetWorkAreaRect(&rcWork);
-		if (SysVersion::IsWin10orLater()) {
-			rcWork.InflateRect(GetInvisibleBorderSize());
-		}
-
-		if (windowRect.right > rcWork.right) {
-			windowRect.right = rcWork.right;
-		}
-		if (windowRect.bottom > rcWork.bottom) {
-			windowRect.bottom = rcWork.bottom;
-		}
-	};
-
 	bool bRestoredWindowPosition = false;
 	if (s.bRememberWindowPos) {
 		CRect windowRect(rcLastWindowPos.TopLeft(), windowSize);
 		if (CMonitors::IsOnScreen(windowRect)) {
-			SetMaxRectSize(windowRect);
+			ClampWindowRect(windowRect);
 			MoveWindow(windowRect);
 			bRestoredWindowPosition = true;
 		}
@@ -10557,7 +10543,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		MINMAXINFO mmi;
 		OnGetMinMaxInfo(&mmi);
 		CRect windowRect(0, 0, std::max(windowSize.cx, mmi.ptMinTrackSize.x), std::max(windowSize.cy, mmi.ptMinTrackSize.y));
-		SetMaxRectSize(windowRect);
+		ClampWindowRect(windowRect);
 
 		monitor.CenterRectToMonitor(windowRect, TRUE, GetInvisibleBorderSize());
 		SetWindowPos(nullptr, windowRect.left, windowRect.top, windowRect.Width(), windowRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
@@ -11551,6 +11537,23 @@ CRect CMainFrame::GetInvisibleBorderSize() const
 
 	return invisibleBorders;
 }
+
+void CMainFrame::ClampWindowRect(RECT& windowRect)
+{
+	const auto monitor = CMonitors::GetNearestMonitor(&windowRect);
+	CRect rcWork;
+	monitor.GetWorkAreaRect(&rcWork);
+	if (SysVersion::IsWin10orLater()) {
+		rcWork.InflateRect(GetInvisibleBorderSize());
+	}
+
+	if (windowRect.right > rcWork.right) {
+		windowRect.right = rcWork.right;
+	}
+	if (windowRect.bottom > rcWork.bottom) {
+		windowRect.bottom = rcWork.bottom;
+	}
+};
 
 void CMainFrame::RepaintVideo()
 {
