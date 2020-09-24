@@ -166,7 +166,7 @@ void CMonitor::GetWorkAreaRect( LPRECT lprc ) const
 	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
 }
 
-void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect ) const
+void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect, const CRect& inflateRect) const
 {
 	int  w = lprc->right - lprc->left;
 	int  h = lprc->bottom - lprc->top;
@@ -177,6 +177,8 @@ void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect ) co
 	} else {
 		GetMonitorRect( &rect );
 	}
+
+	rect.InflateRect(inflateRect);
 
 	// Added rounding to get exactly the same rect as the CWnd::CenterWindow method returns.
 	lprc->left = lround(rect.left + ( rect.Width() - w ) / 2.0);

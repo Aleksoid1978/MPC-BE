@@ -34,7 +34,7 @@ public:
 	HMONITOR Detach();
 
 	void ClipRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect = FALSE ) const;
-	void CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect = FALSE ) const;
+	void CenterRectToMonitor(LPRECT lprc, const BOOL UseWorkAreaRect = FALSE, const CRect& inflateRect = {}) const;
 	void CenterWindowToMonitor( CWnd* const pWnd, const BOOL UseWorkAreaRect = FALSE ) const;
 
 	HDC CreateDC() const;

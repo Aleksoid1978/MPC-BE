@@ -1956,8 +1956,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 			CRect wr(mi.rcWork);
 			if (s.iCaptionMenuMode == MODE_FRAMEONLY && SysVersion::IsWin10orLater()) {
-				CRect invisibleBorders = GetInvisibleBorderSize();
-				wr.InflateRect(invisibleBorders);
+				wr.InflateRect(GetInvisibleBorderSize());
 			}
 			SetWindowPos(nullptr, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 		}
@@ -7362,8 +7361,9 @@ void CMainFrame::OnMoveWindowToPrimaryScreen()
 	if (!IsD3DFullScreenMode()) {
 		CRect windowRect;
 		GetWindowRect(&windowRect);
+
 		CMonitor monitor = CMonitors::GetPrimaryMonitor();
-		monitor.CenterRectToMonitor(windowRect, TRUE);
+		monitor.CenterRectToMonitor(windowRect, TRUE, GetInvisibleBorderSize());
 		SetWindowPos(nullptr, windowRect.left, windowRect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 }
@@ -10488,7 +10488,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	}
 
 	CSize windowSize;
-	const CRect rcLastWindowPos = s.rcLastWindowPos;
+	const CRect& rcLastWindowPos = s.rcLastWindowPos;
 
 	if (s.HasFixedWindowSize()) {
 		windowSize = s.sizeFixedWindow;
@@ -10519,10 +10519,27 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		windowSize.cy += cSize.cy;
 	}
 
+	auto SetMaxRectSize = [&](CRect& windowRect) {
+		const auto monitor = CMonitors::GetNearestMonitor(windowRect);
+		CRect rcWork;
+		monitor.GetWorkAreaRect(&rcWork);
+		if (SysVersion::IsWin10orLater()) {
+			rcWork.InflateRect(GetInvisibleBorderSize());
+		}
+
+		if (windowRect.right > rcWork.right) {
+			windowRect.right = rcWork.right;
+		}
+		if (windowRect.bottom > rcWork.bottom) {
+			windowRect.bottom = rcWork.bottom;
+		}
+	};
+
 	bool bRestoredWindowPosition = false;
 	if (s.bRememberWindowPos) {
 		CRect windowRect(rcLastWindowPos.TopLeft(), windowSize);
 		if (CMonitors::IsOnScreen(windowRect)) {
+			SetMaxRectSize(windowRect);
 			MoveWindow(windowRect);
 			bRestoredWindowPosition = true;
 		}
@@ -10540,8 +10557,10 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		MINMAXINFO mmi;
 		OnGetMinMaxInfo(&mmi);
 		CRect windowRect(0, 0, std::max(windowSize.cx, mmi.ptMinTrackSize.x), std::max(windowSize.cy, mmi.ptMinTrackSize.y));
-		monitor.CenterRectToMonitor(windowRect, TRUE);
-		SetWindowPos(nullptr, windowRect.left, windowRect.top, windowSize.cx, windowSize.cy, SWP_NOZORDER | SWP_NOACTIVATE);
+		SetMaxRectSize(windowRect);
+
+		monitor.CenterRectToMonitor(windowRect, TRUE, GetInvisibleBorderSize());
+		SetWindowPos(nullptr, windowRect.left, windowRect.top, windowRect.Width(), windowRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
 	if (s.nStartupWindowMode == STARTUPWND_REMLAST && s.bRememberWindowPos) {
@@ -19214,7 +19233,7 @@ CStringW GetCoverImgFromPath(CString fullfilename)
 	path.RemoveExtension();
 
 	const CStringW filename = path.m_strPath.Mid(path.FindFileName());
-	
+
 	path.RemoveFileSpec();
 
 	const CStringW foldername = path.m_strPath.Mid(path.FindFileName());
@@ -19387,7 +19406,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 	if (!m_ThumbCashedBitmap && m_pMainBitmapSmall) {
 		UINT width, height;
 		hr = m_pMainBitmapSmall->GetSize(&width, &height);
-		
+
 		if (SUCCEEDED(hr)) {
 			int h = std::min(height, nHeight);
 			int w = MulDiv(h, width, height);
