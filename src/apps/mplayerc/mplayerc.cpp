@@ -1010,11 +1010,15 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 	pFrame->RestoreControlBars();
-	pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0);
 	pFrame->SetDefaultFullscreenState();
 	pFrame->SetIcon(AfxGetApp()->LoadIconW(IDR_MAINFRAME), TRUE);
 	pFrame->DragAcceptFiles();
+
+	const auto rcLastWindowPos = m_s.rcLastWindowPos;
 	pFrame->ShowWindow((m_s.nCLSwitches & CLSW_MINIMIZED) ? SW_SHOWMINIMIZED : SW_SHOW);
+	m_s.rcLastWindowPos = rcLastWindowPos;
+	pFrame->SetDefaultWindowRect((m_s.nCLSwitches& CLSW_MONITOR) ? m_s.iMonitor : 0);
+
 	pFrame->UpdateWindow();
 	pFrame->m_hAccelTable = m_s.hAccel;
 	m_s.WinLircClient.SetHWND(m_pMainWnd->m_hWnd);
