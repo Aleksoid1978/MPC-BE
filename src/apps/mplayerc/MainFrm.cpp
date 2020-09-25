@@ -2031,8 +2031,6 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 		pRect->top = pRect->bottom - h;
 	}
 
-	ClampWindowRect(*pRect);
-
 	FlyBarSetPos();
 	OSDBarSetPos();
 
@@ -4501,6 +4499,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		CRect r;
 		GetWindowRect(&r);
 		OnSizing(WMSZ_LEFT, r);
+
+		ClampWindowRect(r);
 		MoveWindow(r);
 	}
 
