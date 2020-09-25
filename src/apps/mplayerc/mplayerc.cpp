@@ -1015,8 +1015,10 @@ BOOL CMPlayerCApp::InitInstance()
 	pFrame->DragAcceptFiles();
 
 	const auto rcLastWindowPos = m_s.rcLastWindowPos;
+	const auto nLastWindowType = m_s.nLastWindowType;
 	pFrame->ShowWindow((m_s.nCLSwitches & CLSW_MINIMIZED) ? SW_SHOWMINIMIZED : SW_SHOW);
 	m_s.rcLastWindowPos = rcLastWindowPos;
+	m_s.nLastWindowType = nLastWindowType;
 	pFrame->SetDefaultWindowRect((m_s.nCLSwitches& CLSW_MONITOR) ? m_s.iMonitor : 0);
 
 	pFrame->UpdateWindow();

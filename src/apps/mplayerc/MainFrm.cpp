@@ -10478,6 +10478,7 @@ void CMainFrame::OnSubCopyClipboard()
 void CMainFrame::SetDefaultWindowRect(int iMonitor)
 {
 	const CAppSettings& s = AfxGetAppSettings();
+	const auto nLastWindowType = s.nLastWindowType;
 
 	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
@@ -10550,10 +10551,9 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	}
 
 	if (s.nStartupWindowMode == STARTUPWND_REMLAST && s.bRememberWindowPos) {
-		UINT lastWindowType = s.nLastWindowType;
-		if (lastWindowType == SIZE_MAXIMIZED) {
+		if (nLastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
-		} else if (lastWindowType == SIZE_MINIMIZED) {
+		} else if (nLastWindowType == SIZE_MINIMIZED) {
 			ShowWindow(SW_MINIMIZE);
 		}
 	}
