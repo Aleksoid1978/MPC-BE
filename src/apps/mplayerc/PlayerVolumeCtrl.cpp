@@ -189,6 +189,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CRect rc;
 					GetClientRect(&rc);
 					InvalidateRect(&rc);
+					const CSize sz = rc.Size();
 
 					if (m_bRedraw
 							|| m_nThemeBrightness != s.nThemeBrightness
@@ -204,15 +205,12 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						m_nThemeBlue = s.nThemeBlue;
 						m_bMute = s.fMute;
 
-						m_cashedBitmap.DeleteObject();
-						m_cashedBitmap.CreateCompatibleBitmap(&dc, rc.Width(), rc.Height());
+						if (m_cashedBitmap.GetSafeHandle() != nullptr) {
+							m_cashedBitmap.DeleteObject();
+						}
+						m_cashedBitmap.CreateCompatibleBitmap(&dc, sz.cx, sz.cy);
 
 						pOldBitmap = imageDC.SelectObject(&m_cashedBitmap);
-
-						CDC memdc;
-						memdc.CreateCompatibleDC(&dc);
-
-						CBitmap* bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 						if (m_nUseDarkTheme == 0) {
 							m_nUseDarkTheme++;
@@ -253,10 +251,17 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						const COLORREF p3 = nVolPos > 30 ? imageDC.GetPixel(nVolPos, 0) : imageDC.GetPixel(30, 0);
 						CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
-						imageDC.BitBlt(0, 0, rc.Width(), rc.Height(), &memdc, 0, 0, SRCCOPY);
+						{
+							CDC memdc;
+							memdc.CreateCompatibleDC(&dc);
 
-						DeleteObject(memdc.SelectObject(bmOld));
-						memdc.DeleteDC();
+							CBitmap* bmOld = memdc.SelectObject(&m_bmUnderCtrl);
+
+							imageDC.BitBlt(0, 0, sz.cx, sz.cy, &memdc, 0, 0, SRCCOPY);
+
+							DeleteObject(memdc.SelectObject(bmOld));
+							memdc.DeleteDC();
+						}
 
 						rc.DeflateRect(&DeflateRect);
 						CopyRect(&pNMCD->rc, &rc);
@@ -295,7 +300,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						pOldBitmap = imageDC.SelectObject(&m_cashedBitmap);
 					}
 
-					dc.BitBlt(0, 0, rc.Width(), rc.Height(), &imageDC, 0, 0, SRCCOPY);
+					dc.BitBlt(0, 0, sz.cx, sz.cy, &imageDC, 0, 0, SRCCOPY);
 
 					imageDC.SelectObject(pOldBitmap);
 					imageDC.DeleteDC();
