@@ -179,6 +179,13 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 			case CDDS_ITEMPREPAINT:
 			case CDDS_POSTPAINT:
 				if (s.bUseDarkTheme && m_bmUnderCtrl.GetSafeHandle() != nullptr) {
+					CDC dc;
+					dc.Attach(pNMCD->hdc);
+
+					CDC imageDC;
+					imageDC.CreateCompatibleDC(&dc);
+					CBitmap* pOldBitmap = nullptr;
+
 					CRect rc;
 					GetClientRect(&rc);
 					InvalidateRect(&rc);
@@ -197,14 +204,13 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						m_nThemeBlue = s.nThemeBlue;
 						m_bMute = s.fMute;
 
-						m_cashedImage.Destroy();
-						m_cashedImage.Create(rc.Width(), rc.Height(), 32);
+						m_cashedBitmap.DeleteObject();
+						m_cashedBitmap.CreateCompatibleBitmap(&dc, rc.Width(), rc.Height());
 
-						CDC imageDC;
-						imageDC.Attach(m_cashedImage.GetDC());
+						pOldBitmap = imageDC.SelectObject(&m_cashedBitmap);
 
 						CDC memdc;
-						memdc.CreateCompatibleDC(&imageDC);
+						memdc.CreateCompatibleDC(&dc);
 
 						CBitmap* bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
@@ -284,12 +290,16 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						}
 
 						imageDC.SelectObject(penOld);
-						imageDC.Detach();
-
-						m_cashedImage.ReleaseDC();
+					}
+					else {
+						pOldBitmap = imageDC.SelectObject(&m_cashedBitmap);
 					}
 
-					m_cashedImage.BitBlt(pNMCD->hdc, 0, 0);
+					dc.BitBlt(0, 0, rc.Width(), rc.Height(), &imageDC, 0, 0, SRCCOPY);
+
+					imageDC.SelectObject(pOldBitmap);
+					imageDC.DeleteDC();
+					dc.Detach();
 
 					lr = CDRF_SKIPDEFAULT;
 					m_bItemRedraw = false;
