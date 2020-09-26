@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <atlimage.h>
-
 // CVolumeCtrl
 
 class CVolumeCtrl : public CSliderCtrl
@@ -42,8 +40,8 @@ private:
 	int m_nThemeBlue = -1;
 
 	CBitmap m_bmUnderCtrl;
+	CBitmap m_cashedBitmap;
 
-	CImage m_cashedImage;
 	bool m_bRedraw = true;
 	bool m_bMute = false;
 
