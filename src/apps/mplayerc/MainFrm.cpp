@@ -10479,6 +10479,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 {
 	const CAppSettings& s = AfxGetAppSettings();
 	const auto nLastWindowType = s.nLastWindowType;
+	const auto rcLastWindowPos = s.rcLastWindowPos;
 
 	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
@@ -10491,8 +10492,6 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	}
 
 	CSize windowSize;
-	const CRect& rcLastWindowPos = s.rcLastWindowPos;
-
 	if (s.HasFixedWindowSize()) {
 		windowSize = s.sizeFixedWindow;
 	}
