@@ -394,11 +394,28 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CSize Aspect(0, 0);
-			AP4_UI32 width = 0;
-			AP4_UI32 height = 0;
+			auto GetTrackName = [&]() {
+				const auto name = track->GetTrackName();
+				auto TrackNameUTF8 = AltUTF8ToWStr(name.c_str());
+				if (auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"))) {
+					auto name_data = nameAtom->GetData();
+					if (name_data->GetDataSize() > 0) {
+						CStringA tmp((char*)name_data->GetData(), name_data->GetDataSize());
+						auto TrackNameUTF8_UDTA = AltUTF8ToWStr(tmp);
+						if (!TrackNameUTF8_UDTA.IsEmpty()) {
+							if (TrackNameUTF8.IsEmpty()) {
+								TrackNameUTF8 = TrackNameUTF8_UDTA;
+							} else {
+								TrackNameUTF8.Append(L" / " + TrackNameUTF8_UDTA);
+							}
+						}
+					}
+				}
 
-			CString TrackName = UTF8orLocalToWStr(track->GetTrackName().c_str());
+				return TrackNameUTF8.IsEmpty() ? ConvertToWStr(name.c_str(), CP_ACP) : TrackNameUTF8;
+			};
+
+			CString TrackName = GetTrackName();
 			if (TrackName.GetLength() && TrackName[0] < 0x20) {
 				TrackName.Delete(0);
 			}
@@ -406,6 +423,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
 
+			CSize Aspect;
+			AP4_UI32 width = 0;
+			AP4_UI32 height = 0;
 			REFERENCE_TIME AvgTimePerFrame = 0;
 			if (track->GetType() == AP4_Track::TYPE_VIDEO) {
 				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
