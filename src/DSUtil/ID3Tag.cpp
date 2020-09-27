@@ -182,11 +182,16 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 	size--;
 
 	if (tag == 'APIC' || tag == '\0PIC') {
-		WCHAR mime[64];
-		memset(&mime, 0 ,64);
-
+		WCHAR mime[64] = {};
 		int mime_len = 0;
-		while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0);
+
+		while (size-- && mime_len < std::size(mime) && (mime[mime_len++] = gbData.BitRead(8)) != 0);
+
+		if (mime_len == std::size(mime)) {
+			gbData.SkipBytes(size);
+			size = 0;
+			return;
+		}
 
 		BYTE pict_type = (BYTE)gbData.BitRead(8);
 		size--;
