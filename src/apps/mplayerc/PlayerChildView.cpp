@@ -299,6 +299,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 					hr = WicCreateDibSecton(hBitmap, &data, bminfo, m_pBitmapResized);
 					::SetDIBitsToDevice(*pDC, x, y, w, h, 0, 0, 0, h, data, &bminfo, DIB_RGB_COLORS);
 					pDC->ExcludeClipRect(r);
+					DeleteObject(hBitmap);
 				}
 			}
 		}
