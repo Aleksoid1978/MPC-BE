@@ -697,10 +697,9 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 		else
 		{
-			BYTE* tmp;
-			tmp = m_y[0]; m_y[0] = m_y[1]; m_y[1] = tmp;
-			tmp = m_u[0]; m_u[0] = m_u[1]; m_u[1] = tmp;
-			tmp = m_v[0]; m_v[0] = m_v[1]; m_v[1] = tmp;
+			std::swap(m_y[0], m_y[1]);
+			std::swap(m_u[0], m_u[1]);
+			std::swap(m_v[0], m_v[1]);
 		}
 	}
 	else
