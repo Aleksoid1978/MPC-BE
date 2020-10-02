@@ -372,6 +372,8 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	CalcHueSat(m_UTbl, m_VTbl, m_hue, m_sat);
 	m_rate.Rate = 10000;
 	m_rate.StartTime = 0;
+
+	VDCPUTest();
 }
 
 CMpeg2DecFilter::~CMpeg2DecFilter()

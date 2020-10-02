@@ -104,6 +104,8 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	memset(&m_CurrentVIH2, 0, sizeof(VIDEOINFOHEADER2));
 
 	m_hEvtTransform = CreateEventW(nullptr, FALSE, TRUE, nullptr);
+
+	VDCPUTest();
 }
 
 CDirectVobSubFilter::~CDirectVobSubFilter()
