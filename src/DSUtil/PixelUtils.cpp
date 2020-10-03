@@ -87,3 +87,51 @@ void BlendPlane(BYTE* dst, BYTE* src, UINT w, UINT h, UINT dstpitch, UINT srcpit
 {
 	BlendPlane(dst, dstpitch, src, srcpitch, w, h);
 }
+
+void CopyOddLines(UINT h, BYTE* dst, UINT dst_pitch, BYTE* src, UINT src_pitch)
+{
+	const UINT linesize = std::min(src_pitch, dst_pitch);
+
+	h /= 2;
+	src_pitch *= 2;
+	dst_pitch *= 2;
+
+	for (UINT y = 0; y < h; ++y) {
+		memcpy(dst, src, linesize);
+		src += src_pitch;
+		dst += dst_pitch;
+	}
+}
+
+void AvgLines8_(BYTE* dst, DWORD h, DWORD pitch)
+{
+	if(h <= 1) return;
+
+	BYTE* s = dst;
+	BYTE* d = dst + (h-2)*pitch;
+
+	for(; s < d; s += pitch*2) {
+		BYTE* tmp = s;
+
+		for(int i = pitch; i--; tmp++) {
+				tmp[pitch] = (tmp[0] + tmp[pitch<<1] + 1) >> 1;
+		}
+	}
+
+	if(!(h&1) && h >= 2) {
+		dst += (h-2)*pitch;
+		memcpy(dst + pitch, dst, pitch);
+	}
+}
+
+void BobPlane(BYTE* dst, BYTE* src, UINT w, UINT h, UINT dstpitch, UINT srcpitch, bool topfield)
+{
+	if(topfield) {
+		CopyOddLines(h, dst, dstpitch, src, srcpitch);
+		AvgLines8_(dst, h, dstpitch);
+	}
+	else {
+		CopyOddLines(h, dst + dstpitch, dstpitch, src + srcpitch, srcpitch);
+		AvgLines8_(dst + dstpitch, h-1, dstpitch);
+	}
+}

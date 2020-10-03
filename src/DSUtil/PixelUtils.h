@@ -28,3 +28,4 @@ extern void CopyI420toYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const 
 extern void ConvertI420toYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced);
 
 extern void BlendPlane(BYTE* dst, BYTE* src, UINT w, UINT h, UINT dstpitch, UINT srcpitch);
+extern void BobPlane(BYTE* dst, BYTE* src, UINT w, UINT h, UINT dstpitch, UINT srcpitch, bool topfield);

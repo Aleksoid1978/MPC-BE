@@ -33,7 +33,6 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/PixelUtils.h"
-#include "../../../DSUtil/vd.h"
 #include <clsids.h>
 #include <moreuuids.h>
 #include <mvrInterfaces.h>
@@ -373,8 +372,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	CalcHueSat(m_UTbl, m_VTbl, m_hue, m_sat);
 	m_rate.Rate = 10000;
 	m_rate.StartTime = 0;
-
-	VDCPUTest();
 }
 
 CMpeg2DecFilter::~CMpeg2DecFilter()
@@ -761,9 +758,9 @@ HRESULT CMpeg2DecFilter::Deliver()
 		BlendPlane(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2);
 	}
 	else if (m_fb.di == DIBob) {
-		DeinterlaceBob(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, tff);
-		DeinterlaceBob(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, tff);
-		DeinterlaceBob(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, tff);
+		BobPlane(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, tff);
+		BobPlane(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, tff);
+		BobPlane(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, tff);
 
 		m_fb.rtStart = rtStart;
 		m_fb.rtStop = (rtStart + rtStop) / 2;
@@ -778,9 +775,9 @@ HRESULT CMpeg2DecFilter::Deliver()
 	}
 
 	if (m_fb.di == DIBob) {
-		DeinterlaceBob(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, !tff);
-		DeinterlaceBob(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, !tff);
-		DeinterlaceBob(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, !tff);
+		BobPlane(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, !tff);
+		BobPlane(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, !tff);
+		BobPlane(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, !tff);
 
 		m_fb.rtStart = (rtStart + rtStop) / 2;
 		m_fb.rtStop = rtStop;

@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="deinterlace.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DSMPropertyBag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
