@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,8 +70,6 @@ CRoQVideoDecoder : public CTransformFilter
 	BYTE* m_u[2] = { 0 };
 	BYTE* m_v[2] = { 0 };
 	int m_pitch = 0;
-
-	void CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h);
 
 	#pragma pack(push, 1)
 	struct roq_cell {BYTE y0, y1, y2, y3, u, v;} m_cells[256];

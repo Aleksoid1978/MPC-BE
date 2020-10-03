@@ -27,7 +27,7 @@
 #include <ksmedia.h>
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/vd.h"
+#include "../../../DSUtil/PixelUtils.h"
 #include "../../../Subtitles/SubtitleInputPin.h"
 #include "RealMediaSplitter.h"
 
@@ -1802,12 +1802,12 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 	}
 
 	BYTE* pI420[3] = {m_pI420, m_pI420Tmp, nullptr};
+	size = m_wout * m_hout;
 
 	if (interlaced) {
-		int size = m_wout * m_hout;
-		DeinterlaceBlend(pI420[1],                pI420[0],                m_wout,     m_hout,     m_wout,     m_wout);
-		DeinterlaceBlend(pI420[1] + size,         pI420[0] + size,         m_wout / 2, m_hout / 2, m_wout / 2, m_wout / 2);
-		DeinterlaceBlend(pI420[1] + size * 5 / 4, pI420[0] + size * 5 / 4, m_wout / 2, m_hout / 2, m_wout / 2, m_wout / 2);
+		BlendPlane(pI420[1],                pI420[0],                m_wout,     m_hout,     m_wout,     m_wout);
+		BlendPlane(pI420[1] + size,         pI420[0] + size,         m_wout / 2, m_hout / 2, m_wout / 2, m_wout / 2);
+		BlendPlane(pI420[1] + size * 5 / 4, pI420[0] + size * 5 / 4, m_wout / 2, m_hout / 2, m_wout / 2, m_wout / 2);
 		pI420[2] = pI420[1], pI420[1] = pI420[0], pI420[0] = pI420[2];
 	}
 
@@ -1819,7 +1819,20 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 		}
 	}
 
-	CopyBuffer(pDataOut, pI420[0], m_wout, m_hout);
+	const BYTE* const src[3] = { pI420[0], pI420[0] + size, pI420[1] + size*5/4 };
+
+	BITMAPINFOHEADER bihOut;
+	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+
+	if (bihOut.biCompression == FCC('NV12')) {
+		CopyI420toNV12(m_hout, pDataOut, bihOut.biWidth, src, m_wout);
+	}
+	else if (bihOut.biCompression == FCC('YV12')) {
+		CopyI420toYV12(m_hout, pDataOut, bihOut.biWidth, src, m_wout);
+	}
+	else if (bihOut.biCompression == FCC('YUY2')) {
+		ConvertI420toYUY2(m_hout, pDataOut, bihOut.biWidth, src, m_wout, false);
+	}
 
 	rtStart = 10000i64 * transform_out.timestamp - m_tStart;
 	rtStop = rtStart + 1;
@@ -1935,46 +1948,10 @@ void CRealVideoDecoder::ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DW
 	}
 }
 
-void CRealVideoDecoder::CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h)
-{
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
-
-	int pitchIn = w;
-	int pitchInUV = pitchIn/2;
-	BYTE* pInU = pIn + pitchIn*h;
-	BYTE* pInV = pInU + pitchInUV*h/2;
-
-	if (bihOut.biCompression == FCC('NV12')) {
-		BitBltFromI420ToNV12(w, h, pOut, pOut + bihOut.biWidth*h, pOut + bihOut.biWidth*h*5/4, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == FCC('YV12')) {
-		BitBltFromI420ToI420(w, h, pOut, pOut + bihOut.biWidth*h*5/4, pOut + bihOut.biWidth*h, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == FCC('YUY2')) {
-		BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == BI_RGB) {
-		int pitchOut = bihOut.biWidth*bihOut.biBitCount / 8;
-
-		if(bihOut.biHeight > 0) {
-			pOut += pitchOut*(h-1);
-			pitchOut = -pitchOut;
-		}
-
-		if(!BitBltFromI420ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pIn, pInU, pInV, pitchIn)) {
-			for (int y = 0; y < h; y++, pIn += pitchIn, pOut += pitchOut) {
-				memset(pOut, 0, pitchOut);
-			}
-		}
-	}
-}
-
 static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_NV12, 3, 12, FCC('NV12')},
 	{&MEDIASUBTYPE_YV12, 3, 12, FCC('YV12')},
 	{&MEDIASUBTYPE_YUY2, 1, 16, FCC('YUY2')},
-	//{&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB},
 };
 
 void CRealVideoDecoder::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
