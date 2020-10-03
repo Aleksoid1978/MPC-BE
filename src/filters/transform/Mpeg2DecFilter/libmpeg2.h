@@ -42,7 +42,7 @@
 #define SEQ_VIDEO_FORMAT_MAC 0x80
 #define SEQ_VIDEO_FORMAT_UNSPECIFIED 0xa0
 
-typedef struct {
+struct mpeg2_sequence_t {
     unsigned int width, height;
     unsigned int chroma_width, chroma_height;
     unsigned int byte_rate;
@@ -60,7 +60,7 @@ typedef struct {
     uint8_t matrix_coefficients;
 
 	void finalize();
-} mpeg2_sequence_t;
+};
 
 #define GOP_FLAG_DROP_FRAME 1
 #define GOP_FLAG_BROKEN_LINK 2
