@@ -21,50 +21,7 @@
 #pragma once
 
 #include <libpng/png.h>
-#include "../../../DSUtil/vd.h"
 #include "WicUtils.h"
-
-static bool BMPDIB(LPCWSTR filename, BYTE* pData)
-{
-	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
-
-	int width = bih->biWidth;
-	int height = abs(bih->biHeight);
-	int bpp = bih->biBitCount / 8;
-	int sih = sizeof(BITMAPINFOHEADER);
-	BYTE *src = pData + sih;
-
-	int bit = 24;
-	int stride = (width * bit + 31) / 32 * bpp;
-	DWORD len = stride * height;
-
-	std::unique_ptr<BYTE[]> rgb(new(std::nothrow) BYTE[len]);
-	if (!rgb) {
-		return false;
-	}
-
-	BitBltFromRGBToRGB(width, height, rgb.get(), stride, bit, src, width * bpp, bih->biBitCount);
-
-	BITMAPFILEHEADER bfh;
-	bfh.bfType = 0x4d42;
-	bfh.bfOffBits = sizeof(bfh) + sih;
-	bfh.bfSize = bfh.bfOffBits + len;
-	bfh.bfReserved1 = bfh.bfReserved2 = 0;
-
-	BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
-
-	FILE* fp;
-	if (_wfopen_s(&fp, filename, L"wb") == 0) {
-		fwrite(&bfh, sizeof(bfh), 1, fp);
-		fwrite(&bi.bmiHeader, sih, 1, fp);
-		fwrite(rgb.get(), len, 1, fp);
-		fclose(fp);
-
-		return true;
-	}
-
-	return false;
-}
 
 static bool PNGDIB(LPCWSTR filename, BYTE* pData, int level)
 {
