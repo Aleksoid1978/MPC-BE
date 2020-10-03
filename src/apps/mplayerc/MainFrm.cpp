@@ -6128,9 +6128,8 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 	const CAppSettings& s = AfxGetAppSettings();
 
 	const CString ext = GetFileExt(fn).MakeLower();
-	if (ext == L".bmp") {
-		BMPDIB(fn, pData);
-	} else if (ext == L".png") {
+
+	if (ext == L".png") {
 		PNGDIB(fn, pData, std::clamp(s.iThumbLevelPNG, 1, 9));
 	} else {
 		size_t dstLen = 0;
