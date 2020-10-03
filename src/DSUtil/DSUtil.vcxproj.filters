@@ -41,12 +41,6 @@
     <ClCompile Include="text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vd_asm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -164,12 +158,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vd_asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AudioParser.h">
