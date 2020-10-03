@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include <moreuuids.h>
-#include "../../../DSUtil/vd.h"
+#include "../../../DSUtil/PixelUtils.h"
 #include "DeinterlacerFilter.h"
 
 CDeinterlacerFilter::CDeinterlacerFilter(LPUNKNOWN punk, HRESULT* phr)
@@ -104,9 +104,9 @@ HRESULT CDeinterlacerFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	if (mtIn.subtype == MEDIASUBTYPE_YUY2 || mtIn.subtype == MEDIASUBTYPE_UYVY) {
-		DeinterlaceBlend(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
+		BlendPlane(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
 	} else if (mtIn.subtype == MEDIASUBTYPE_I420 || mtIn.subtype == MEDIASUBTYPE_YV12 || mtIn.subtype == MEDIASUBTYPE_IYUV || mtIn.subtype == MEDIASUBTYPE_NV12) {
-		DeinterlaceBlend(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
+		BlendPlane(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
 
 		int sizeIn = bihIn.biHeight*pitchIn, sizeOut = abs(bihOut.biHeight)*pitchOut;
 		pitchIn /= 2;
@@ -114,11 +114,11 @@ HRESULT CDeinterlacerFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		bihIn.biHeight /= 2;
 		pDataIn += sizeIn;
 		pDataOut += sizeOut;
-		DeinterlaceBlend(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
+		BlendPlane(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
 
 		pDataIn += sizeIn/4;
 		pDataOut += sizeOut/4;
-		DeinterlaceBlend(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
+		BlendPlane(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
 	}
 
 	return S_OK;

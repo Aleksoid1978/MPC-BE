@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include <moreuuids.h>
-#include "../../../DSUtil/vd.h"
+#include "../../../DSUtil/PixelUtils.h"
 #include "RoQSplitter.h"
 
 #define RoQ_INFO           0x1001
@@ -710,46 +710,24 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if(rtStart < 0)
 		return S_FALSE;
 
-	CopyBuffer(pDataOut, m_y[1], w, h);
+	const BYTE* const src[3] = { m_y[1], m_u[1], m_v[1] };
+
+	BITMAPINFOHEADER bihOut;
+	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+
+	if (bihOut.biCompression == FCC('NV12')) {
+		CopyI420toNV12(h, pDataOut, bihOut.biWidth, src, w);
+	}
+	else if (bihOut.biCompression == FCC('YV12')) {
+		CopyI420toYV12(h, pDataOut, bihOut.biWidth, src, w);
+	}
+	else if (bihOut.biCompression == FCC('YUY2')) {
+		ConvertI420toYUY2(h, pDataOut, bihOut.biWidth * 2, src, w, false);
+	}
 
 	pOut->SetTime(&rtStart, &rtStop);
 
 	return S_OK;
-}
-
-void CRoQVideoDecoder::CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h)
-{
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
-
-	int pitchIn = w;
-	int pitchInUV = pitchIn/2;
-	BYTE* pInU = pIn + pitchIn*h;
-	BYTE* pInV = pInU + pitchInUV*h/2;
-
-	if (bihOut.biCompression == FCC('NV12')) {
-		BitBltFromI420ToNV12(w, h, pOut, pOut + bihOut.biWidth*h, pOut + bihOut.biWidth*h*5/4, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == FCC('YV12')) {
-		BitBltFromI420ToI420(w, h, pOut, pOut + bihOut.biWidth*h*5/4, pOut + bihOut.biWidth*h, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == FCC('YUY2')) {
-		BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == BI_RGB) {
-		int pitchOut = bihOut.biWidth*bihOut.biBitCount / 8;
-	
-		if(bihOut.biHeight > 0) {
-			pOut += pitchOut*(h-1);
-			pitchOut = -pitchOut;
-		}
-	
-		if(!BitBltFromI420ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pIn, pInU, pInV, pitchIn)) {
-			for (int y = 0; y < h; y++, pIn += pitchIn, pOut += pitchOut) {
-				memset(pOut, 0, pitchOut);
-			}
-		}
-	}
 }
 
 HRESULT CRoQVideoDecoder::CheckInputType(const CMediaType* mtIn)
@@ -770,10 +748,10 @@ HRESULT CRoQVideoDecoder::CheckTransform(const CMediaType* mtIn, const CMediaTyp
 	}
 
 	return SUCCEEDED(CheckInputType(mtIn))
-		&& mtOut->majortype == MEDIATYPE_Video && (mtOut->subtype == MEDIASUBTYPE_NV12
-												|| mtOut->subtype == MEDIASUBTYPE_YV12
-												|| mtOut->subtype == MEDIASUBTYPE_YUY2
-												|| mtOut->subtype == MEDIASUBTYPE_RGB32)
+		&& mtOut->majortype == MEDIATYPE_Video
+		&& (mtOut->subtype == MEDIASUBTYPE_NV12
+		|| mtOut->subtype == MEDIASUBTYPE_YV12
+		|| mtOut->subtype == MEDIASUBTYPE_YUY2)
 		? S_OK
 		: VFW_E_TYPE_NOT_ACCEPTED;
 }
@@ -811,10 +789,9 @@ HRESULT CRoQVideoDecoder::GetMediaType(int iPosition, CMediaType* pmt)
 		WORD biBitCount;
 		DWORD biCompression;
 	} fmts[] = {
-		{&MEDIASUBTYPE_NV12, 3, 12, FCC('NV12')},
-		{&MEDIASUBTYPE_YV12, 3, 12, FCC('YV12')},
+		//{&MEDIASUBTYPE_NV12, 3, 12, FCC('NV12')},
+		//{&MEDIASUBTYPE_YV12, 3, 12, FCC('YV12')},
 		{&MEDIASUBTYPE_YUY2, 1, 16, FCC('YUY2')},
-		//{&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB},
 	};
 
 	if(iPosition < 0) return E_INVALIDARG;

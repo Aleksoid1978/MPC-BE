@@ -72,6 +72,9 @@
     <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="NullRenderers.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="PixelUtils.cpp" />
+    <ClCompile Include="PixelUtils_AviSynth.cpp" />
+    <ClCompile Include="PixelUtils_VirtualDub.cpp" />
     <ClCompile Include="Profile.cpp" />
     <ClCompile Include="ResampleRGB32.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -118,6 +121,9 @@
     <ClInclude Include="Mpeg2Def.h" />
     <ClInclude Include="NullRenderers.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PixelUtils.h" />
+    <ClInclude Include="PixelUtils_AviSynth.h" />
+    <ClInclude Include="PixelUtils_VirtualDub.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="ResampleRGB32.h" />
     <ClInclude Include="SharedInclude.h" />

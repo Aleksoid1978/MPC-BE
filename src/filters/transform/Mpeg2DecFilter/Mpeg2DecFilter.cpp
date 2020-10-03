@@ -32,6 +32,7 @@
 
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../../DSUtil/PixelUtils.h"
 #include "../../../DSUtil/vd.h"
 #include <clsids.h>
 #include <moreuuids.h>
@@ -420,30 +421,6 @@ void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsf
 	}
 }
 
-void CMpeg2DecFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, const int w, const int h, const int pitchIn, const bool fInterlaced)
-{
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
-
-	BYTE* pIn  = ppIn[0];
-	BYTE* pInU = ppIn[1];
-	BYTE* pInV = ppIn[2];
-
-	if (bihOut.biCompression == FCC('NV12')) {
-		BitBltFromI420ToNV12(w, h, pOut, pOut + bihOut.biWidth*h, pOut + bihOut.biWidth*h*5/4, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-	}
-	else if (bihOut.biCompression == FCC('YV12')) {
-		BitBltFromI420ToI420(w, h, pOut, pOut + bihOut.biWidth*h*5/4, pOut + bihOut.biWidth*h, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-	}
-	else if(bihOut.biCompression == FCC('YUY2')) {
-		if (!fInterlaced) {
-			BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth * 2, pIn, pInU, pInV, pitchIn);
-		} else {
-			BitBltFromI420ToYUY2Interlaced(w, h, pOut, bihOut.biWidth * 2, pIn, pInU, pInV, pitchIn);
-		}
-	}
-}
-
 STDMETHODIMP CMpeg2DecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
@@ -774,12 +751,16 @@ HRESULT CMpeg2DecFilter::Deliver()
 
 	// deinterlace
 	if (m_fb.di == DIWeave) {
-		BitBltFromI420ToI420(w, h, m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], dpitch, fbuf->buf[0], fbuf->buf[1], fbuf->buf[2], spitch);
-	} else if (m_fb.di == DIBlend) {
-		DeinterlaceBlend(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch);
-		DeinterlaceBlend(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2);
-		DeinterlaceBlend(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2);
-	} else if (m_fb.di == DIBob) {
+		CopyPlane(h,   m_fb.buf[0], dpitch,   fbuf->buf[0], spitch);
+		CopyPlane(h/2, m_fb.buf[1], dpitch/2, fbuf->buf[1], spitch/2);
+		CopyPlane(h/2, m_fb.buf[2], dpitch/2, fbuf->buf[2], spitch/2);
+	}
+	else if (m_fb.di == DIBlend) {
+		BlendPlane(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch);
+		BlendPlane(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2);
+		BlendPlane(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2);
+	}
+	else if (m_fb.di == DIBob) {
 		DeinterlaceBob(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, tff);
 		DeinterlaceBob(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, tff);
 		DeinterlaceBob(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, tff);
@@ -846,16 +827,29 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 	BYTE** buf = &m_fb.buf[0];
 
 	if (m_pSubpicInput->HasAnythingToRender(m_fb.rtStart)) {
-		BitBltFromI420ToI420(m_fb.w, m_fb.h,
-							 m_fb.buf[3], m_fb.buf[4], m_fb.buf[5], m_fb.pitch,
-							 m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], m_fb.pitch);
+		CopyPlane(m_fb.h,   m_fb.buf[3], m_fb.pitch,   m_fb.buf[0], m_fb.pitch);
+		CopyPlane(m_fb.h/2, m_fb.buf[4], m_fb.pitch/2, m_fb.buf[1], m_fb.pitch/2);
+		CopyPlane(m_fb.h/2, m_fb.buf[5], m_fb.pitch/2, m_fb.buf[2], m_fb.pitch/2);
 
 		buf = &m_fb.buf[3];
 
 		m_pSubpicInput->RenderSubpics(m_fb.rtStart, buf, m_fb.pitch, m_fb.h);
 	}
 
-	CopyBuffer(pDataOut, buf, (m_fb.w+7)&~7, m_fb.h, m_fb.pitch, !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME));
+	int w = (m_fb.w + 7)&~7;
+	BITMAPINFOHEADER bihOut;
+	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+
+	if (bihOut.biCompression == FCC('NV12')) {
+		CopyI420toNV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
+	}
+	else if (bihOut.biCompression == FCC('YV12')) {
+		CopyI420toYV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
+	}
+	else if(bihOut.biCompression == FCC('YUY2')) {
+		bool interlaced = !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME);
+		ConvertI420toYUY2(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch, interlaced);
+	}
 
 	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {
 		CAutoLock cAutoLock(&pPin->m_csRateLock);
