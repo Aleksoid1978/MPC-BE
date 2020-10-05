@@ -20,6 +20,5 @@
 
 #pragma once
 
-__int64 FractionScale64(__int64 a, UINT32 b, UINT32 c);	// faster that Int64x32Div32 from wxutil.h
-UINT64  UMulDiv64x32(UINT64 a, UINT32 b, UINT32 c);		// speed equal to FractionScale64
-__int64 MulDiv64(__int64 a, __int64 b, __int64 c);		// in x86 mode slower than llMulDiv from wxutil.h. rounding to the nearest integer
+__int64 FractionScale64(__int64 a, UINT32 b, UINT32 c);	// is 2x times faster than Int64x32Div32 from wxutil.h
+UINT64  UMulDiv64x32(UINT64 a, UINT32 b, UINT32 c);		// slightly faster than FractionScale64

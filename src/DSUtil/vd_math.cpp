@@ -32,8 +32,3 @@ UINT64 UMulDiv64x32(UINT64 a, UINT32 b, UINT32 c)
 {
 	return VDUMulDiv64x32(a, b, c);
 }
-
-__int64 MulDiv64(__int64 a, __int64 b, __int64 c)
-{
-	return VDMulDiv64(a, b, c);
-}
