@@ -342,20 +342,30 @@ HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size)
 	return S_OK;
 }
 
-WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen/* = false*/, bool bCheckMouse/* = true*/)
+WORD AssignedKeyToCmd(UINT keyValue)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
 	for (const auto& wc : s.wmcmds) {
-		if (bCheckMouse) {
-			if (bIsFullScreen) {
-				if (wc.mouseFS == keyOrMouseValue) {
-					return wc.cmd;
-				}
-			} else if (wc.mouse == keyOrMouseValue) {
+		if (wc.key == keyValue) {
+			return wc.cmd;
+		}
+	}
+
+	return 0;
+}
+
+WORD AssignedMouseToCmd(UINT mouseValue, bool bIsFullScreen /*= false*/)
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	for (const auto& wc : s.wmcmds) {
+		if (bIsFullScreen) {
+			if (wc.mouseFS == mouseValue) {
 				return wc.cmd;
 			}
-		} else if (wc.key == keyOrMouseValue) {
+		}
+		else if (wc.mouse == mouseValue) {
 			return wc.cmd;
 		}
 	}
