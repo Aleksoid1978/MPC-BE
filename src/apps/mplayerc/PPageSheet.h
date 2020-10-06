@@ -21,8 +21,6 @@
 
 #pragma once
 
-#define ENABLE_MOUSE_PAGE 0
-
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
 #include "PPageAccelTbl.h"

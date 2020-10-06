@@ -602,15 +602,15 @@ public:
 	bool			bGlobalMedia;
 
 	// Mouse
-	UINT			m_MouseLeftClick;
-	UINT			m_MouseLeftDblClick;
-	UINT			m_MouseMiddleClick;
-	UINT			m_MouseX1Click;
-	UINT			m_MouseX2Click;
-	UINT			m_MouseWheelUp;
-	UINT			m_MouseWheelDown;
-	UINT			m_MouseWheelLeft;
-	UINT			m_MouseWheelRight;
+	UINT			nMouseLeftClick;
+	UINT			nMouseLeftDblClick;
+	UINT			nMouseMiddleClick;
+	UINT			nMouseX1Click;
+	UINT			nMouseX2Click;
+	UINT			nMouseWheelUp;
+	UINT			nMouseWheelDown;
+	UINT			nMouseWheelLeft;
+	UINT			nMouseWheelRight;
 
 	// Logo
 	int				nLogoId;

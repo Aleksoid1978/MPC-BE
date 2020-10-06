@@ -58,18 +58,18 @@ BOOL CPPageMouse::OnInitDialog()
 
 	AddStringData(m_cmbLeftBottonClick, L"---", 0);
 	AddStringData(m_cmbLeftBottonClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
-	SelectByItemData(m_cmbLeftBottonClick, s.m_MouseLeftClick);
+	SelectByItemData(m_cmbLeftBottonClick, s.nMouseLeftClick);
 
 	AddStringData(m_cmbLeftBottonDblClick, L"---", 0);
 	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
-	SelectByItemData(m_cmbLeftBottonDblClick, s.m_MouseLeftDblClick);
+	SelectByItemData(m_cmbLeftBottonDblClick, s.nMouseLeftDblClick);
 
 	AddStringData(m_cmbMiddleBotton, L"---", 0);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_TOGGLE_PLAYLIST), ID_VIEW_PLAYLIST);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_BOSS_KEY), ID_BOSS);
-	SelectByItemData(m_cmbMiddleBotton, s.m_MouseMiddleClick);
+	SelectByItemData(m_cmbMiddleBotton, s.nMouseMiddleClick);
 
 	m_cmbRightBotton.AddString(L"Ñontext menu"); // read only
 	m_cmbRightBotton.SetCurSel(0);
@@ -79,28 +79,28 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_PREVIOUS), ID_NAVIGATE_SKIPBACK);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
-	SelectByItemData(m_cmbXButton1, s.m_MouseX1Click);
+	SelectByItemData(m_cmbXButton1, s.nMouseX1Click);
 
 	AddStringData(m_cmbXButton2, L"---", 0);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_NEXT), ID_NAVIGATE_SKIPFORWARD);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS), ID_NAVIGATE_SKIPBACK);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
-	SelectByItemData(m_cmbXButton2, s.m_MouseX2Click);
+	SelectByItemData(m_cmbXButton2, s.nMouseX2Click);
 
 	AddStringData(m_cmbWheelUp, L"---", 0);
 	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_VOLUME_UP), ID_VOLUME_UP);
 	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_VOLUME_DOWN), ID_VOLUME_DOWN);
 	AddStringData(m_cmbWheelUp, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
 	AddStringData(m_cmbWheelUp, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
-	SelectByItemData(m_cmbWheelUp, s.m_MouseWheelUp);
+	SelectByItemData(m_cmbWheelUp, s.nMouseWheelUp);
 
 	OnWheelUpChange();
 
 	AddStringData(m_cmbWheelLeft, L"---", 0);
 	AddStringData(m_cmbWheelLeft, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbWheelLeft, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
-	SelectByItemData(m_cmbWheelLeft, s.m_MouseWheelLeft);
+	SelectByItemData(m_cmbWheelLeft, s.nMouseWheelLeft);
 
 	OnWheelLeftChange();
 
@@ -113,15 +113,15 @@ BOOL CPPageMouse::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_MouseLeftClick    = (UINT)GetCurItemData(m_cmbLeftBottonClick);
-	s.m_MouseLeftDblClick = (UINT)GetCurItemData(m_cmbLeftBottonDblClick);
-	s.m_MouseMiddleClick  = (UINT)GetCurItemData(m_cmbMiddleBotton);
-	s.m_MouseX1Click      = (UINT)GetCurItemData(m_cmbXButton1);
-	s.m_MouseX2Click      = (UINT)GetCurItemData(m_cmbXButton2);
-	s.m_MouseWheelUp      = (UINT)GetCurItemData(m_cmbWheelUp);
-	s.m_MouseWheelDown    = (UINT)GetCurItemData(m_cmbWheelDown);
-	s.m_MouseWheelLeft    = (UINT)GetCurItemData(m_cmbWheelLeft);
-	s.m_MouseWheelRight   = (UINT)GetCurItemData(m_cmbWheelRight);
+	s.nMouseLeftClick    = (UINT)GetCurItemData(m_cmbLeftBottonClick);
+	s.nMouseLeftDblClick = (UINT)GetCurItemData(m_cmbLeftBottonDblClick);
+	s.nMouseMiddleClick  = (UINT)GetCurItemData(m_cmbMiddleBotton);
+	s.nMouseX1Click      = (UINT)GetCurItemData(m_cmbXButton1);
+	s.nMouseX2Click      = (UINT)GetCurItemData(m_cmbXButton2);
+	s.nMouseWheelUp      = (UINT)GetCurItemData(m_cmbWheelUp);
+	s.nMouseWheelDown    = (UINT)GetCurItemData(m_cmbWheelDown);
+	s.nMouseWheelLeft    = (UINT)GetCurItemData(m_cmbWheelLeft);
+	s.nMouseWheelRight   = (UINT)GetCurItemData(m_cmbWheelRight);
 
 	return __super::OnApply();
 }
