@@ -720,22 +720,25 @@ void CAppSettings::ResetSettings()
 
 	m_filters.RemoveAll();
 
+	// Keys
 	strWinLircAddr = L"127.0.0.1:8765";
 	bWinLirc = false;
 	strUIceAddr = L"127.0.0.1:1234";
 	bUIce = false;
 	bGlobalMedia = true;
 
+#if ENABLE_MOUSE_PAGE
 	// Mouse
-	m_MouseLeftClick    = ID_PLAY_PLAYPAUSE;
-	m_MouseLeftDblClick = ID_VIEW_FULLSCREEN;
-	m_MouseMiddleClick  = 0;
-	m_MouseX1Click      = ID_NAVIGATE_SKIPBACK;
-	m_MouseX2Click      = ID_NAVIGATE_SKIPFORWARD;
-	m_MouseWheelUp      = ID_VOLUME_UP;
-	m_MouseWheelDown    = ID_VOLUME_DOWN;
-	m_MouseWheelLeft    = 0;
-	m_MouseWheelRight   = 0;
+	nMouseLeftClick    = ID_PLAY_PLAYPAUSE;
+	nMouseLeftDblClick = ID_VIEW_FULLSCREEN;
+	nMouseMiddleClick  = 0;
+	nMouseX1Click      = ID_NAVIGATE_SKIPBACK;
+	nMouseX2Click      = ID_NAVIGATE_SKIPFORWARD;
+	nMouseWheelUp      = ID_VOLUME_UP;
+	nMouseWheelDown    = ID_VOLUME_DOWN;
+	nMouseWheelLeft    = 0;
+	nMouseWheelRight   = 0;
+#endif
 
 	bUseDarkTheme = true;
 	nThemeBrightness = 15;
@@ -1301,6 +1304,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		m_pnspresets.Add(str);
 	}
 
+	// Keys
 	CreateCommands();
 
 	for (unsigned i = 0; i < wmcmds.size(); i++) {
@@ -1350,6 +1354,19 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
+
+#if ENABLE_MOUSE_PAGE
+	// Mouse
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,          nMouseLeftClick);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, nMouseLeftDblClick);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE,        nMouseMiddleClick);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1,            nMouseX1Click);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2,            nMouseX2Click);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP,          nMouseWheelUp);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,        nMouseWheelDown);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,        nMouseWheelLeft);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,       nMouseWheelRight);
+#endif
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
@@ -1943,6 +1960,8 @@ void CAppSettings::SaveSettings()
 		profile.WriteString(IDS_R_PNSPRESETS, str, m_pnspresets[i]);
 	}
 
+	// Keys
+
 	profile.DeleteSection(IDS_R_COMMANDS);
 	unsigned n = 0;
 	for (const auto& wc : wmcmds) {
@@ -1963,6 +1982,19 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
+
+#if ENABLE_MOUSE_PAGE
+	// Mouse
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,          nMouseLeftClick);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, nMouseLeftDblClick);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE,        nMouseMiddleClick);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1,            nMouseX1Click);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2,            nMouseX2Click);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP,          nMouseWheelUp);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,        nMouseWheelDown);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,        nMouseWheelLeft);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,       nMouseWheelRight);
+#endif
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);

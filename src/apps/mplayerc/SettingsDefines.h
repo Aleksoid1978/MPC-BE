@@ -28,6 +28,7 @@
 #define IDS_R_FAVDVDS						L"Favorites2\\DVDs"
 #define IDS_R_FAVDEVICES					L"Favorites2\\Devices"
 #define IDS_R_COMMANDS						L"Commands2"
+#define IDS_R_MOUSE							L"Settings\\Mouse"
 #define IDS_R_LOGINS						L"Logins"
 #define IDS_R_SHADERS						L"Shaders"
 #define IDS_R_RECENTFILES					L"RecentFiles"
@@ -77,7 +78,18 @@
 #define IDS_RS_AUDIONORMREALEASETIME		L"AudioNormRealeaseTime"
 #define IDS_RS_AUDIOSAMPLEFORMATS			L"AudioSampleFormats"
 
- // Window size
+// Mouse
+#define IDS_RS_MOUSE_BTN_LEFT				L"BottonLeft"
+#define IDS_RS_MOUSE_BTN_LEFT_DBLCLICK		L"BottonLeftDblClick"
+#define IDS_RS_MOUSE_BTN_MIDDLE				L"BottonMiddle"
+#define IDS_RS_MOUSE_BTN_X1					L"BottonX1"
+#define IDS_RS_MOUSE_BTN_X2					L"BottonX2"
+#define IDS_RS_MOUSE_WHEEL_UP				L"WheelUp"
+#define IDS_RS_MOUSE_WHEEL_DOWN				L"WheelDown"
+#define IDS_RS_MOUSE_WHEEL_LEFT				L"WheelLeft"
+#define IDS_RS_MOUSE_WHEEL_RIGHT			L"WheelRight"
+
+// Window size
 #define IDS_RS_WINDOWMODESTARTUP			L"WindowModeStartup"
 #define IDS_RS_SPECIFIEDWINDOWSIZE			L"SpecifiedWindowSize"
 #define IDS_RS_WINDOWMODEPLAYBACK			L"WindowModePlayback"
