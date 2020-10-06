@@ -30,7 +30,9 @@ bool  LoadType(const CString& fn, CString& type);
 bool  LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
 
-WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
+WORD AssignedKeyToCmd(UINT keyValue);
+WORD AssignedMouseToCmd(UINT mouseValue, bool bIsFullScreen = false);
+
 void SetAudioRenderer(int AudioDevNo);
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
 COLORREF ThemeRGB(const int iR, const int iG, const int iB);
