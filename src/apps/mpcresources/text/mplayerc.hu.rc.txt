@@ -8,7 +8,7 @@
 13		"FFmpeg Fordítóprogram :"
 14		"Libavcodec / Libavutil :"
 21		"Ez a program freeware és a GNU General Public License alatt lett kiadva."
-22		"Magyarra fordította Kleiber Tamás, majd folytatta mickey."
+22		"Magyar fordítás Kleiber Tamás, javította és folytatta mickey."
 23		"OK"
 END
 
