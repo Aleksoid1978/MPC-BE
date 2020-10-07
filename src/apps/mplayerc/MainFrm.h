@@ -906,7 +906,7 @@ public:
 
 	afx_msg void SaveAppSettings();
 
-	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
+	BOOL MouseMessage(UINT id, UINT nFlags, CPoint point);
 
 	afx_msg void OnEnterSizeMove();
 	afx_msg void ClipRectToMonitor(LPRECT prc);
