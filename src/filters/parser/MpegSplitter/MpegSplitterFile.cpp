@@ -358,7 +358,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		const CStreamList& streams = m_streams[type];
 		for (const auto& s : streams) {
 			const SyncPoints& sps = m_SyncPoints[s];
-			if (sps.size() > 1) {
+			if (!sps.empty()) {
 				auto& _streamData = m_streamData[s];
 				_streamData.usePTS = TRUE;
 				_streamData.rtStreamStart = sps[0].rt;

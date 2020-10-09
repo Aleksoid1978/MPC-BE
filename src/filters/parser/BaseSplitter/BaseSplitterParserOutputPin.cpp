@@ -364,109 +364,115 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 		return S_OK;
 	}
 
-	if (p) m_p->AppendData(*p);
-
-	HandleInvalidPacket(6);
-
-	BEGINDATA;
-
-	MOVE_TO_H264_START_CODE(start, end);
-
-	while (start <= end - 4) {
-		BYTE* next = start + 4;
-
-		if (m_bEndOfStream) {
-			next = end;
-		} else {
-			MOVE_TO_H264_START_CODE(next, end);
-
-			if (next >= end - 4) {
-				break;
-			}
-		}
-
-		int size = next - start;
-
-		CH264Nalu Nalu;
-		Nalu.SetBuffer(start, size);
-
-		CAutoPtr<CH264Packet> p2;
-
-		while (Nalu.ReadNext()) {
-			CAutoPtr<CH264Packet> p3(DNew CH264Packet());
-
-			if (bConvertToAVCC) {
-				DWORD dwNalLength	= Nalu.GetDataLength();
-				dwNalLength			= _byteswap_ulong(dwNalLength);
-				const UINT dwSize	= sizeof(dwNalLength);
-
-				p3->resize(Nalu.GetDataLength() + dwSize);
-				memcpy(p3->data(), &dwNalLength, dwSize);
-				memcpy(p3->data() + dwSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
-			} else {
-				p3->resize(Nalu.GetLength());
-				memcpy(p3->data(), Nalu.GetNALBuffer(), Nalu.GetLength());
-			}
-
-			if (p2 == nullptr) {
-				p2 = p3;
-			} else {
-				p2->AppendData(*p3);
-			}
-
-			if (!p2->bDataExists
-					&& (Nalu.GetType() == NALU_TYPE_SLICE || Nalu.GetType() == NALU_TYPE_IDR)) {
-				p2->bDataExists = TRUE;
-			}
-		}
-		start = next;
-
-		if (!p2) {
-			continue;
-		}
-
-		p2->TrackNumber		= m_p->TrackNumber;
-		p2->bDiscontinuity	= m_p->bDiscontinuity;
-		m_p->bDiscontinuity	= FALSE;
-
-		p2->bSyncPoint	= m_p->bSyncPoint;
-		m_p->bSyncPoint	= FALSE;
-
-		p2->rtStart		= m_p->rtStart;
-		m_p->rtStart	= INVALID_TIME;
-		p2->rtStop		= m_p->rtStop;
-		m_p->rtStop		= INVALID_TIME;
-
-		p2->pmt		= m_p->pmt;
-		m_p->pmt	= nullptr;
-
-		m_pl.AddTail(p2);
-
-		if (m_p->pmt) {
-			DeleteMediaType(m_p->pmt);
-		}
-
-		if (p) {
-			if (p->rtStart != INVALID_TIME) {
-				m_p->rtStart	= p->rtStart;
-				m_p->rtStop		= p->rtStop;
-				p->rtStart		= INVALID_TIME;
-			}
-			if (p->bDiscontinuity) {
-				m_p->bDiscontinuity	= p->bDiscontinuity;
-				p->bDiscontinuity	= FALSE;
-			}
-			if (p->bSyncPoint) {
-				m_p->bSyncPoint	= p->bSyncPoint;
-				p->bSyncPoint	= FALSE;
-			}
-
-			m_p->pmt = p->pmt;
-			p->pmt = nullptr;
-		}
+	if (p) {
+		m_p->AppendData(*p);
 	}
 
-	ENDDATA;
+	if (!m_bEndOfStream) {
+		HandleInvalidPacket(6);
+	}
+
+	if (m_p->size() >= 6) {
+		BEGINDATA;
+
+		MOVE_TO_H264_START_CODE(start, end);
+
+		while (start <= end - 4) {
+			BYTE* next = start + 4;
+
+			if (m_bEndOfStream) {
+				next = end;
+			} else {
+				MOVE_TO_H264_START_CODE(next, end);
+
+				if (next >= end - 4) {
+					break;
+				}
+			}
+
+			int size = next - start;
+
+			CH264Nalu Nalu;
+			Nalu.SetBuffer(start, size);
+
+			CAutoPtr<CH264Packet> p2;
+
+			while (Nalu.ReadNext()) {
+				CAutoPtr<CH264Packet> p3(DNew CH264Packet());
+
+				if (bConvertToAVCC) {
+					DWORD dwNalLength = Nalu.GetDataLength();
+					dwNalLength = _byteswap_ulong(dwNalLength);
+					const UINT dwSize = sizeof(dwNalLength);
+
+					p3->resize(Nalu.GetDataLength() + dwSize);
+					memcpy(p3->data(), &dwNalLength, dwSize);
+					memcpy(p3->data() + dwSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+				} else {
+					p3->resize(Nalu.GetLength());
+					memcpy(p3->data(), Nalu.GetNALBuffer(), Nalu.GetLength());
+				}
+
+				if (p2 == nullptr) {
+					p2 = p3;
+				} else {
+					p2->AppendData(*p3);
+				}
+
+				if (!p2->bDataExists
+					&& (Nalu.GetType() == NALU_TYPE_SLICE || Nalu.GetType() == NALU_TYPE_IDR)) {
+					p2->bDataExists = TRUE;
+				}
+			}
+			start = next;
+
+			if (!p2) {
+				continue;
+			}
+
+			p2->TrackNumber     = m_p->TrackNumber;
+			p2->bDiscontinuity  = m_p->bDiscontinuity;
+			m_p->bDiscontinuity = FALSE;
+
+			p2->bSyncPoint  = m_p->bSyncPoint;
+			m_p->bSyncPoint = FALSE;
+
+			p2->rtStart  = m_p->rtStart;
+			m_p->rtStart = INVALID_TIME;
+			p2->rtStop   = m_p->rtStop;
+			m_p->rtStop  = INVALID_TIME;
+
+			p2->pmt  = m_p->pmt;
+			m_p->pmt = nullptr;
+
+			m_pl.AddTail(p2);
+
+			if (m_p->pmt) {
+				DeleteMediaType(m_p->pmt);
+			}
+
+			if (p) {
+				if (p->rtStart != INVALID_TIME) {
+					m_p->rtStart = p->rtStart;
+					m_p->rtStop  = p->rtStop;
+					p->rtStart   = INVALID_TIME;
+				}
+				if (p->bDiscontinuity) {
+					m_p->bDiscontinuity = p->bDiscontinuity;
+					p->bDiscontinuity   = FALSE;
+				}
+				if (p->bSyncPoint) {
+					m_p->bSyncPoint = p->bSyncPoint;
+					p->bSyncPoint   = FALSE;
+				}
+
+				m_p->pmt = p->pmt;
+				p->pmt   = nullptr;
+			}
+		}
+
+		ENDDATA;
+	}
 
 	if (m_bEndOfStream) {
 		if (m_pl.GetCount()) {
