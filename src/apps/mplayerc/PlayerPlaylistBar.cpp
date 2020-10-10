@@ -4014,6 +4014,7 @@ void CPlayerPlaylistBar::TDrawBar()
 		mdc.SelectObject(pOldBm);
 		bm.DeleteObject();
 		mdc.DeleteDC();
+		DeleteObject(hRgnExclude);
 	}
 }
 
