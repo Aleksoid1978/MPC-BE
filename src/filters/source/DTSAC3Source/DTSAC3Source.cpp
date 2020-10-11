@@ -359,6 +359,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 					m_channels += aframe.channels - 2;
 					m_bitrate = (int)(fsize * 8i64 * m_samplerate / m_framelength);
 					bAC3 = false;
+				} else if (!ParseAC3Header(buf, &aframe)
+						|| m_samplerate != aframe.samplerate || m_channels != aframe.channels) {
+					break;
 				}
 			}
 
