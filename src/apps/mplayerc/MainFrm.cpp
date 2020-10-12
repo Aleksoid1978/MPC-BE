@@ -11263,10 +11263,14 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 			w *= m_ZoomX;
 			h *= m_ZoomY;
-			const double dLeft  = (rWnd.Width() - w)*0.5 + (m_PosX-0.5)*(rWnd.Width() + w);
-			const double dRight = (rWnd.Height() - h)*0.5 + (m_PosY-0.5)*(rWnd.Height() + h);
 
-			rVid.SetRect(std::round(dLeft), std::round(dRight), std::round(dLeft + w), std::round(dRight + h));
+			const double dLeft = (rWnd.Width() - w) * 0.5 + (m_PosX - 0.5) * (rWnd.Width() + w);
+			const double dTop  = (rWnd.Height() - h) * 0.5 + (m_PosY - 0.5) * (rWnd.Height() + h);
+
+			rVid.left   = std::round(dLeft);
+			rVid.top    = std::round(dTop);
+			rVid.right  = std::round(rVid.left + w);
+			rVid.bottom = std::round(rVid.top + h);
 		}
 
 		if (m_pCAP) {
