@@ -1123,7 +1123,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 				len += size;
 
-				if (obu_type == AV1Parser::AV1_OBU_Type::AV1_OBU_FRAME_HEADER || obu_type == AV1Parser::AV1_OBU_Type::AV1_OBU_FRAME) {
+				if (obu_type == AV1Parser::AV1_OBU_Type::AV1_OBU_FRAME) {
 					break;
 				}
 
