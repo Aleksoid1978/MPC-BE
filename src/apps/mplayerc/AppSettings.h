@@ -625,7 +625,8 @@ public:
 	int				nAutoFitFactor;
 	bool			bResetWindowAfterClosingFile;
 	bool			bRememberWindowPos;
-	CRect			rcLastWindowPos; // and size
+	CPoint			ptLastWindowPos;
+	CSize			szLastWindowSize;
 	UINT			nLastWindowType;
 	bool			bLimitWindowProportions;
 	bool			bSnapToDesktopEdges;

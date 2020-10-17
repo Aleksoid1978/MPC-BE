@@ -1820,14 +1820,15 @@ void CMainFrame::OnMove(int x, int y)
 			&& IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
 
 		CAppSettings& s = AfxGetAppSettings();
+		CRect rect;
+		GetWindowRect(&rect);
+
+		s.ptLastWindowPos = rect.TopLeft();
+
 		if (m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2) {
-			CRect rc;
-			GetWindowRect(&rc);
-			s.rcLastWindowPos.left  = rc.left;
-			s.rcLastWindowPos.top   = rc.top;
-			s.rcLastWindowPos.right = rc.right;
+			s.szLastWindowSize.cx = rect.Width();
 		} else {
-			GetWindowRect(s.rcLastWindowPos);
+			s.szLastWindowSize = rect.Size();
 		}
 	}
 
@@ -1937,15 +1938,15 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	CAppSettings& s = AfxGetAppSettings();
 	if (!m_bFirstFSAfterLaunchOnFullScreen && IsWindowVisible() && !m_bFullScreen) {
 		if (nType != SIZE_MAXIMIZED && nType != SIZE_MINIMIZED) {
+			CRect rect;
+			GetWindowRect(&rect);
+
+			s.ptLastWindowPos = rect.TopLeft();
+
 			if (m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2) {
-				CRect rc;
-				GetWindowRect(&rc);
-				s.rcLastWindowPos.left = rc.left;
-				s.rcLastWindowPos.top = rc.top;
-				s.rcLastWindowPos.right = rc.right;
-			}
-			else {
-				GetWindowRect(s.rcLastWindowPos);
+				s.szLastWindowSize.cx = rect.Width();
+			} else {
+				s.szLastWindowSize = rect.Size();
 			}
 		}
 		s.nLastWindowType = nType;
@@ -10477,8 +10478,9 @@ void CMainFrame::OnSubCopyClipboard()
 void CMainFrame::SetDefaultWindowRect(int iMonitor)
 {
 	const CAppSettings& s = AfxGetAppSettings();
-	const auto nLastWindowType = s.nLastWindowType;
-	const auto rcLastWindowPos = s.rcLastWindowPos;
+	const auto nLastWindowType  = s.nLastWindowType;
+	const auto ptLastWindowPos  = s.ptLastWindowPos;
+	const auto szLastWindowSize = s.szLastWindowSize;
 
 	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
@@ -10495,7 +10497,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		windowSize = s.sizeFixedWindow;
 	}
 	else if (s.nStartupWindowMode == STARTUPWND_REMLAST) {
-		windowSize = rcLastWindowPos.Size();
+		windowSize = szLastWindowSize;
 	}
 	else if (s.nStartupWindowMode == STARTUPWND_SPECIFIED) {
 		windowSize = s.szSpecifiedWndSize;
@@ -10522,7 +10524,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 
 	bool bRestoredWindowPosition = false;
 	if (s.bRememberWindowPos) {
-		CRect windowRect(rcLastWindowPos.TopLeft(), windowSize);
+		CRect windowRect(ptLastWindowPos, windowSize);
 		if (CMonitors::IsOnScreen(windowRect)) {
 			ClampWindowRect(windowRect);
 			MoveWindow(windowRect);
@@ -10591,7 +10593,7 @@ void CMainFrame::RestoreDefaultWindowRect()
 			windowSize = s.sizeFixedWindow;
 		}
 		else if (s.nStartupWindowMode == STARTUPWND_REMLAST) { // hmmm
-			windowSize = s.rcLastWindowPos.Size();
+			windowSize = s.szLastWindowSize;
 		}
 		else if (s.nStartupWindowMode == STARTUPWND_SPECIFIED) {
 			windowSize = s.szSpecifiedWndSize;
@@ -10617,7 +10619,7 @@ void CMainFrame::RestoreDefaultWindowRect()
 		}
 
 		if (s.bRememberWindowPos) {
-			MoveWindow(CRect(s.rcLastWindowPos.TopLeft(), windowSize));
+			MoveWindow(CRect(s.ptLastWindowPos, windowSize));
 		} else {
 			SetWindowPos(nullptr, 0, 0, windowSize.cx, windowSize.cy, SWP_NOMOVE | SWP_NOZORDER);
 			CenterWindow();
@@ -10885,7 +10887,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	if (m_bFirstFSAfterLaunchOnFullScreen) { // Play started in Fullscreen
 		if (s.nStartupWindowMode == STARTUPWND_REMLAST || s.bRememberWindowPos) {
-			r = s.rcLastWindowPos;
+			r.SetRect(s.ptLastWindowPos, s.ptLastWindowPos + s.szLastWindowSize);
 			if (!s.bRememberWindowPos) {
 				hm = MonitorFromPoint( CPoint( 0,0 ), MONITOR_DEFAULTTOPRIMARY );
 				GetMonitorInfoW(hm, &mi);
