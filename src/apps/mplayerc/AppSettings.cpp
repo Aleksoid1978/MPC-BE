@@ -657,7 +657,8 @@ void CAppSettings::ResetSettings()
 	nAutoFitFactor = 50;
 	bResetWindowAfterClosingFile = false;
 	bRememberWindowPos = false;
-	rcLastWindowPos.SetRectEmpty();
+	ptLastWindowPos.SetPoint(0, 0);
+	szLastWindowSize.SetSize(0, 0);
 	nLastWindowType = SIZE_RESTORED;
 	bLimitWindowProportions = false;
 	bSnapToDesktopEdges = false;
@@ -1101,7 +1102,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
 	if (profile.ReadBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, &ptr, len)) {
 		if (len == sizeof(CRect)) {
-			memcpy(&rcLastWindowPos, ptr, sizeof(CRect));
+			CRect rect;
+			memcpy(&rect, ptr, sizeof(rect));
+			ptLastWindowPos  = rect.TopLeft();
+			szLastWindowSize = rect.Size();
 		} else {
 			bRememberWindowPos = false;
 		}
@@ -1734,7 +1738,8 @@ void CAppSettings::SaveSettings()
 	str.Format(L"%d;%d", szSpecifiedWndSize.cx, szSpecifiedWndSize.cy);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
-	profile.WriteBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rcLastWindowPos, sizeof(rcLastWindowPos));
+	CRect rect(ptLastWindowPos, szLastWindowSize);
+	profile.WriteBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rect, sizeof(rect));
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
