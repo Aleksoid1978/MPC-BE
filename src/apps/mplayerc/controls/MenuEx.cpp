@@ -129,12 +129,19 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	}
 
 	if (lpItem->bMainMenu) { // SYSTEMMENU
-		CBrush brush(m_crBkBar);
-		dc.FillRect(&rect, &brush);
+		dc.FillSolidRect(&rect, m_crBkBar);
+
+		if (lpItem->bFirstInMainMenu) {
+			CRect wndSize;
+			m_pMainFrame->GetClientRect(&wndSize);
+
+			const CRect rectBorder(rect.left, rect.bottom, rect.left + wndSize.Width(), rect.bottom + 1);
+			dc.FillSolidRect(&rectBorder, m_crBkBar);
+			::ExcludeClipRect(dc.GetSafeHdc(), rectBorder.left, rectBorder.top, rectBorder.right, rectBorder.bottom);
+		}
 	}
 	else {
-		CBrush brush(m_crBN);
-		dc.FillRect(&rect, &brush);
+		dc.FillSolidRect(&rect, m_crBN);
 	}
 
 	dc.SetBkMode(TRANSPARENT);
@@ -279,6 +286,9 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 
 		lpItem->uID = uID;
 		lpItem->bMainMenu = bMainMenu;
+		if (i == 0) {
+			lpItem->bFirstInMainMenu = true;
+		}
 
 		if (lpItem->uID > 0) {
 			pMenu->GetMenuStringW(i, lpItem->strText, MF_BYPOSITION);

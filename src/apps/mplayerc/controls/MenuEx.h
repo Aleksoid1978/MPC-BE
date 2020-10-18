@@ -25,6 +25,7 @@ struct MENUITEM
 	CString strText;
 	UINT    uID = 0;
 	bool    bMainMenu = false;
+	bool    bFirstInMainMenu = false;
 	bool    bPopupMenu = false;
 };
 using LPMENUITEM = MENUITEM*;

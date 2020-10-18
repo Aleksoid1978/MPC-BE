@@ -172,7 +172,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_DWMCOMPOSITIONCHANGED, OnDwmCompositionChanged)
 
 	ON_WM_SYSCOMMAND()
-	ON_WM_NCACTIVATE()
 	ON_WM_ACTIVATEAPP()
 	ON_MESSAGE(WM_APPCOMMAND, OnAppCommand)
 	ON_WM_INPUT()
@@ -180,7 +179,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_WM_DRAWITEM()
 	ON_WM_MEASUREITEM()
-	ON_WM_ERASEBKGND()
 
 	ON_WM_TIMER()
 
@@ -872,12 +870,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
 
 	return 0;
-}
-
-BOOL CMainFrame::OnEraseBkgnd(CDC* pDC)
-{
-	DrawSmallBorder();
-	return TRUE;
 }
 
 void CMainFrame::OnDestroy()
@@ -2188,14 +2180,6 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 		RepaintVideo();
 		StartAutoHideCursor();
 	}
-}
-
-BOOL CMainFrame::OnNcActivate(BOOL bActive)
-{
-	const auto bRet = __super::OnNcActivate(bActive);
-	DrawSmallBorder();
-
-	return bRet;
 }
 
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
@@ -20121,7 +20105,7 @@ void CMainFrame::SetColorMenu()
 {
 	m_colMenuBk = ThemeRGB(45, 50, 55);
 
-	const COLORREF crBkBar = m_colMenuBk; //60,65,70			// background system menu bar
+	const COLORREF crBkBar = m_colMenuBk;						// background system menu bar
 	const COLORREF crBN    = ColorBrightness(-25, m_colMenuBk);	// backgroung normal
 	const COLORREF crBNL   = ColorBrightness(+30, crBN);		// backgroung normal lighten (for light edge)
 	const COLORREF crBND   = ColorBrightness(-30, crBN);		// backgroung normal darken (for dark edge)
@@ -20183,26 +20167,6 @@ void CMainFrame::SetColorMenu(CMenu& menu)
 		SetMenuInfo(menu.GetSafeHmenu(), &MenuInfo);
 
 		CMenuEx::ChangeStyle(&menu);
-	}
-}
-
-void CMainFrame::DrawSmallBorder()
-{
-	// To eliminate small border between menu and client rect
-	const auto& s = AfxGetAppSettings();
-	if (s.bUseDarkTheme && s.bDarkMenu && !IsMenuHidden()) {
-		CDC* pDC = GetWindowDC();
-		CRect clientRect;
-		GetClientRect(clientRect);
-		ClientToScreen(clientRect);
-		CRect windowRect;
-		GetWindowRect(windowRect);
-		CRect rect(clientRect.left - windowRect.left, clientRect.top - windowRect.top - 1, clientRect.right - windowRect.left, clientRect.top - windowRect.top);
-
-		CBrush* brush = CBrush::FromHandle(m_hPopupMenuBrush);
-		pDC->FillRect(rect, brush);
-
-		ReleaseDC(pDC);
 	}
 }
 

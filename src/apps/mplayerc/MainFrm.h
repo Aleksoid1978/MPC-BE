@@ -454,7 +454,6 @@ public:
 		TIMER_DM_AUTOCHANGING
 	};
 
-	void DrawSmallBorder(); // draw line under mainmenubar
 	void SetColorMenu();
 	void SetColorMenu(CMenu& menu);
 
@@ -867,7 +866,6 @@ protected:  // control bar embedded members
 
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnDestroy();
 
 	afx_msg LRESULT OnTaskBarRestart(WPARAM, LPARAM);
@@ -889,7 +887,6 @@ public:
 	LRESULT OnDwmCompositionChanged(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg BOOL OnNcActivate(BOOL bActive);
 	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 	afx_msg LRESULT OnAppCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnRawInput(UINT nInputcode, HRAWINPUT hRawInput);
