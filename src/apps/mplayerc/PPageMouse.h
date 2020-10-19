@@ -32,13 +32,14 @@ class CPPageMouse : public CPPageBase
 	CComboBox m_cmbLeftBottonClick;
 	CComboBox m_cmbLeftBottonDblClick;
 	CComboBox m_cmbMiddleBotton;
-	CComboBox m_cmbRightBotton;
 	CComboBox m_cmbXButton1;
 	CComboBox m_cmbXButton2;
 	CComboBox m_cmbWheelUp;
 	CComboBox m_cmbWheelDown;
 	CComboBox m_cmbWheelLeft;
 	CComboBox m_cmbWheelRight;
+
+	CButton m_chkMouseLeftClickOpenRecent;
 
 public:
 	CPPageMouse();

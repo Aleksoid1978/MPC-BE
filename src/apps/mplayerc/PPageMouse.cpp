@@ -41,13 +41,13 @@ void CPPageMouse::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_cmbLeftBottonClick);
 	DDX_Control(pDX, IDC_COMBO2, m_cmbLeftBottonDblClick);
 	DDX_Control(pDX, IDC_COMBO3, m_cmbMiddleBotton);
-	DDX_Control(pDX, IDC_COMBO4, m_cmbRightBotton);
 	DDX_Control(pDX, IDC_COMBO5, m_cmbXButton1);
 	DDX_Control(pDX, IDC_COMBO6, m_cmbXButton2);
 	DDX_Control(pDX, IDC_COMBO7, m_cmbWheelUp);
 	DDX_Control(pDX, IDC_COMBO8, m_cmbWheelDown);
 	DDX_Control(pDX, IDC_COMBO9, m_cmbWheelLeft);
 	DDX_Control(pDX, IDC_COMBO10, m_cmbWheelRight);
+	DDX_Control(pDX, IDC_CHECK1, m_chkMouseLeftClickOpenRecent);
 }
 
 BOOL CPPageMouse::OnInitDialog()
@@ -70,9 +70,6 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_TOGGLE_PLAYLIST), ID_VIEW_PLAYLIST);
 	AddStringData(m_cmbMiddleBotton, ResStr(IDS_AG_BOSS_KEY), ID_BOSS);
 	SelectByItemData(m_cmbMiddleBotton, s.nMouseMiddleClick);
-
-	m_cmbRightBotton.AddString(L"Ñontext menu"); // read only
-	m_cmbRightBotton.SetCurSel(0);
 
 	AddStringData(m_cmbXButton1, L"---", 0);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_NEXT), ID_NAVIGATE_SKIPFORWARD);
@@ -104,6 +101,8 @@ BOOL CPPageMouse::OnInitDialog()
 
 	OnWheelLeftChange();
 
+	m_chkMouseLeftClickOpenRecent.SetCheck(s.bMouseLeftClickOpenRecent ? BST_CHECKED : BST_UNCHECKED);
+
 	return TRUE;
 }
 
@@ -122,6 +121,8 @@ BOOL CPPageMouse::OnApply()
 	s.nMouseWheelDown    = (UINT)GetCurItemData(m_cmbWheelDown);
 	s.nMouseWheelLeft    = (UINT)GetCurItemData(m_cmbWheelLeft);
 	s.nMouseWheelRight   = (UINT)GetCurItemData(m_cmbWheelRight);
+
+	s.bMouseLeftClickOpenRecent = !!m_chkMouseLeftClickOpenRecent.GetCheck();
 
 	return __super::OnApply();
 }

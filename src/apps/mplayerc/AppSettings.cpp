@@ -730,15 +730,16 @@ void CAppSettings::ResetSettings()
 
 #if ENABLE_MOUSE_PAGE
 	// Mouse
-	nMouseLeftClick    = ID_PLAY_PLAYPAUSE;
-	nMouseLeftDblClick = ID_VIEW_FULLSCREEN;
-	nMouseMiddleClick  = 0;
-	nMouseX1Click      = ID_NAVIGATE_SKIPBACK;
-	nMouseX2Click      = ID_NAVIGATE_SKIPFORWARD;
-	nMouseWheelUp      = ID_VOLUME_UP;
-	nMouseWheelDown    = ID_VOLUME_DOWN;
-	nMouseWheelLeft    = 0;
-	nMouseWheelRight   = 0;
+	nMouseLeftClick           = ID_PLAY_PLAYPAUSE;
+	bMouseLeftClickOpenRecent = false;
+	nMouseLeftDblClick        = ID_VIEW_FULLSCREEN;
+	nMouseMiddleClick         = 0;
+	nMouseX1Click             = ID_NAVIGATE_SKIPBACK;
+	nMouseX2Click             = ID_NAVIGATE_SKIPFORWARD;
+	nMouseWheelUp             = ID_VOLUME_UP;
+	nMouseWheelDown           = ID_VOLUME_DOWN;
+	nMouseWheelLeft           = 0;
+	nMouseWheelRight          = 0;
 #endif
 
 	bUseDarkTheme = true;
@@ -1361,15 +1362,16 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 #if ENABLE_MOUSE_PAGE
 	// Mouse
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,          nMouseLeftClick);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, nMouseLeftDblClick);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE,        nMouseMiddleClick);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1,            nMouseX1Click);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2,            nMouseX2Click);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP,          nMouseWheelUp);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,        nMouseWheelDown);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,        nMouseWheelLeft);
-	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,       nMouseWheelRight);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,            nMouseLeftClick);
+	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK,   nMouseLeftDblClick);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE,          nMouseMiddleClick);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1,              nMouseX1Click);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2,              nMouseX2Click);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP,            nMouseWheelUp);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,          nMouseWheelDown);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,          nMouseWheelLeft);
+	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,         nMouseWheelRight);
 #endif
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
@@ -1990,15 +1992,16 @@ void CAppSettings::SaveSettings()
 
 #if ENABLE_MOUSE_PAGE
 	// Mouse
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,          nMouseLeftClick);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, nMouseLeftDblClick);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE,        nMouseMiddleClick);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1,            nMouseX1Click);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2,            nMouseX2Click);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP,          nMouseWheelUp);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,        nMouseWheelDown);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,        nMouseWheelLeft);
-	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,       nMouseWheelRight);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,            nMouseLeftClick);
+	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK,   nMouseLeftDblClick);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE,          nMouseMiddleClick);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1,              nMouseX1Click);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2,              nMouseX2Click);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP,            nMouseWheelUp);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,          nMouseWheelDown);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,          nMouseWheelLeft);
+	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,         nMouseWheelRight);
 #endif
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
