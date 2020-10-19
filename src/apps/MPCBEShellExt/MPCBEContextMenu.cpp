@@ -269,7 +269,7 @@ STDMETHODIMP CMPCBEContextMenu::DragEnter(LPDATAOBJECT lpdobj, DWORD grfKeyState
 
 STDMETHODIMP CMPCBEContextMenu::Drop(LPDATAOBJECT lpdobj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
 {
-	SendData(false, true);
+	SendData(false, true, ::MonitorFromWindow(::GetForegroundWindow(), MONITOR_DEFAULTTONEAREST));
 
 	*pdwEffect = DROPEFFECT_COPY;
 	return S_OK;
@@ -316,7 +316,19 @@ static CString GetMPCPath()
 	return mpcPath;
 }
 
-void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMultipleInstances/* = false*/)
+static BOOL Execute(LPCWSTR lpszCommand, LPCWSTR lpszParameters, HMONITOR hMonitor)
+{
+	SHELLEXECUTEINFOW ShExecInfo = { sizeof(SHELLEXECUTEINFOW) };
+	ShExecInfo.fMask = hMonitor ? SEE_MASK_HMONITOR : 0;
+	ShExecInfo.lpFile = lpszCommand;
+	ShExecInfo.lpParameters = lpszParameters;
+	ShExecInfo.hMonitor = hMonitor;
+	ShExecInfo.nShow = SW_SHOWDEFAULT;
+
+	return ShellExecuteExW(&ShExecInfo);
+}
+
+void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMultipleInstances/* = false*/, HMONITOR hMonitor/* = nullptr*/)
 {
 	bool bMultipleInstances = false;
 	if (bCheckMultipleInstances) {
@@ -333,7 +345,7 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 		CString mpcPath = GetMPCPath();
 		for (auto item : m_fileNames) {
 			item = L'\"' + item + L'\"';
-			ShellExecuteW(GetForegroundWindow(), nullptr, mpcPath.GetString(), item.GetString(), 0, SW_SHOWDEFAULT);
+			Execute(mpcPath.GetString(), item.GetString(), hMonitor);
 		}
 
 	} else {
@@ -385,8 +397,8 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 
 			SendData(hWnd);
 		} else {
-			CString mpcPath = GetMPCPath();
-			if (!mpcPath.IsEmpty() && HINSTANCE(HINSTANCE_ERROR) < ShellExecuteW(GetForegroundWindow(), nullptr, mpcPath.GetString(), nullptr, 0, SW_SHOWDEFAULT)) {
+			const CString mpcPath = GetMPCPath();
+			if (!mpcPath.IsEmpty() && Execute(mpcPath.GetString(), nullptr, hMonitor)) {
 				Sleep(100);
 				int wait_count = 0;
 				HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, nullptr);
