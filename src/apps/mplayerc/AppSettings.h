@@ -603,6 +603,7 @@ public:
 
 	// Mouse
 	UINT			nMouseLeftClick;
+	bool			bMouseLeftClickOpenRecent;
 	UINT			nMouseLeftDblClick;
 	UINT			nMouseMiddleClick;
 	UINT			nMouseX1Click;

@@ -80,6 +80,7 @@
 
 // Mouse
 #define IDS_RS_MOUSE_BTN_LEFT				L"BottonLeft"
+#define IDS_RS_MOUSE_BTN_LEFT_OPENRECENT	L"BottonLeftOpenRecent"
 #define IDS_RS_MOUSE_BTN_LEFT_DBLCLICK		L"BottonLeftDblClick"
 #define IDS_RS_MOUSE_BTN_MIDDLE				L"BottonMiddle"
 #define IDS_RS_MOUSE_BTN_X1					L"BottonX1"
