@@ -362,16 +362,16 @@ WORD AssignedMouseToCmd(UINT mouseValue)
 	UINT cmd = 0;
 
 	switch (mouseValue) {
-	case wmcmd::LDOWN:   cmd = s.nMouseLeftClick;    break;
-	case wmcmd::LDBLCLK: cmd = s.nMouseLeftDblClick; break;
-	case wmcmd::MUP:     cmd = s.nMouseMiddleClick;  break;
-	case wmcmd::RUP:     cmd = ID_MENU_PLAYER_SHORT; break;
-	case wmcmd::X1UP:    cmd = s.nMouseX1Click;      break;
-	case wmcmd::X2UP:    cmd = s.nMouseX2Click;      break;
-	case wmcmd::WUP:     cmd = s.nMouseWheelUp;      break;
-	case wmcmd::WDOWN:   cmd = s.nMouseWheelDown;    break;
-	case wmcmd::WLEFT:   cmd = s.nMouseWheelLeft;    break;
-	case wmcmd::WRIGHT:  cmd = s.nMouseWheelRight;   break;
+	case MOUSE_CLICK_LEFT:     cmd = s.nMouseLeftClick;    break;
+	case MOUSE_CLICK_LEFT_DBL: cmd = s.nMouseLeftDblClick; break;
+	case MOUSE_CLICK_MIDLE:    cmd = s.nMouseMiddleClick;  break;
+	case MOUSE_CLICK_RIGHT:    cmd = ID_MENU_PLAYER_SHORT; break;
+	case MOUSE_CLICK_X1:       cmd = s.nMouseX1Click;      break;
+	case MOUSE_CLICK_X2:       cmd = s.nMouseX2Click;      break;
+	case MOUSE_WHEEL_UP:       cmd = s.nMouseWheelUp;      break;
+	case MOUSE_WHEEL_DOWN:     cmd = s.nMouseWheelDown;    break;
+	case MOUSE_WHEEL_LEFT:     cmd = s.nMouseWheelLeft;    break;
+	case MOUSE_WHEEL_RIGHT:    cmd = s.nMouseWheelRight;   break;
 	}
 
 	return (WORD)cmd;

@@ -31,6 +31,20 @@ bool  LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
 
 WORD AssignedKeyToCmd(UINT keyValue);
+
+enum :UINT {
+	MOUSE_CLICK_LEFT = 1,
+	MOUSE_CLICK_LEFT_DBL,
+	MOUSE_CLICK_MIDLE,
+	MOUSE_CLICK_RIGHT,
+	MOUSE_CLICK_X1,
+	MOUSE_CLICK_X2,
+	MOUSE_WHEEL_UP,
+	MOUSE_WHEEL_DOWN,
+	MOUSE_WHEEL_LEFT,
+	MOUSE_WHEEL_RIGHT,
+};
+
 WORD AssignedMouseToCmd(UINT mouseValue);
 
 void SetAudioRenderer(int AudioDevNo);
