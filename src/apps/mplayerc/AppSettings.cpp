@@ -728,7 +728,6 @@ void CAppSettings::ResetSettings()
 	bUIce = false;
 	bGlobalMedia = true;
 
-#if ENABLE_MOUSE_PAGE
 	// Mouse
 	nMouseLeftClick           = ID_PLAY_PLAYPAUSE;
 	bMouseLeftClickOpenRecent = false;
@@ -740,7 +739,6 @@ void CAppSettings::ResetSettings()
 	nMouseWheelDown           = ID_VOLUME_DOWN;
 	nMouseWheelLeft           = 0;
 	nMouseWheelRight          = 0;
-#endif
 
 	bUseDarkTheme = true;
 	nThemeBrightness = 15;
@@ -1360,7 +1358,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
-#if ENABLE_MOUSE_PAGE
 	// Mouse
 	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,            nMouseLeftClick);
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
@@ -1372,7 +1369,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,          nMouseWheelDown);
 	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,          nMouseWheelLeft);
 	profile.ReadUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,         nMouseWheelRight);
-#endif
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
@@ -1990,7 +1986,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
-#if ENABLE_MOUSE_PAGE
 	// Mouse
 	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT,            nMouseLeftClick);
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
@@ -2002,7 +1997,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN,          nMouseWheelDown);
 	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT,          nMouseWheelLeft);
 	profile.WriteUInt(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT,         nMouseWheelRight);
-#endif
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
