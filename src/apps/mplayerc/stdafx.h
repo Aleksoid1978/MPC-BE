@@ -62,5 +62,3 @@ namespace Gdiplus
 
 #define CheckAndLog(x, msg)	hr = ##x; if (FAILED (hr)) { DLog(msg" : 0x%08x", hr); return hr; }
 #define CheckNoLog(x)		hr = ##x; if (FAILED (hr)) { return hr; }
-
-#define ENABLE_MOUSE_PAGE 1

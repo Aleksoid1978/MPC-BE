@@ -47,9 +47,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	AddPage(&m_player);
 	AddPage(&m_formats);
 	AddPage(&m_acceltbl);
-#if ENABLE_MOUSE_PAGE
 	AddPage(&m_mouse);
-#endif
 	AddPage(&m_logo);
 	AddPage(&m_interface);
 	AddPage(&m_windowsize);

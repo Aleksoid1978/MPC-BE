@@ -24,9 +24,7 @@
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
 #include "PPageAccelTbl.h"
-#if ENABLE_MOUSE_PAGE
 #include "PPageMouse.h"
-#endif
 #include "PPageLogo.h"
 #include "PPagePlayback.h"
 #include "PPageDVD.h"
@@ -77,9 +75,7 @@ private:
 	CPPagePlayer          m_player;
 	CPPageFormats         m_formats;
 	CPPageAccelTbl        m_acceltbl;
-#if ENABLE_MOUSE_PAGE
 	CPPageMouse           m_mouse;
-#endif
 	CPPageLogo            m_logo;
 	CPPageInterface       m_interface;
 	CPPageWindowSize      m_windowsize;
