@@ -57,4 +57,5 @@ protected:
 public:
 	afx_msg void OnWheelUpChange();
 	afx_msg void OnWheelLeftChange();
+	afx_msg void OnBnClickedReset();
 };

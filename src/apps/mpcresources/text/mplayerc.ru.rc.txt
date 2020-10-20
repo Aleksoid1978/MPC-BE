@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Экспорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 29
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
 5		"Левая кнопка"
 6		"Щелчок"
 8		"Если ничего не загружено, то открыть последний файл"
@@ -365,6 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 29
 23		"Вниз"
 25		"Налево"
 27		"Направо"
+29		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41

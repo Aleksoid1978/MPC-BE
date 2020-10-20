@@ -132,6 +132,7 @@ BOOL CPPageMouse::OnApply()
 BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_COMBO7, OnWheelUpChange)
 	ON_CBN_SELCHANGE(IDC_COMBO9, OnWheelLeftChange)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedReset)
 END_MESSAGE_MAP()
 
 // CPPageMouse message handlers
@@ -182,6 +183,25 @@ void CPPageMouse::OnWheelLeftChange()
 		AddStringData(m_cmbWheelRight, L"---", 0);
 	}
 	m_cmbWheelRight.SetCurSel(0);
+
+	SetModified();
+}
+
+void CPPageMouse::OnBnClickedReset()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	SelectByItemData(m_cmbLeftBottonClick, ID_PLAY_PLAYPAUSE);
+	SelectByItemData(m_cmbLeftBottonDblClick, ID_VIEW_FULLSCREEN);
+	SelectByItemData(m_cmbMiddleBotton, 0);
+	SelectByItemData(m_cmbXButton1, ID_NAVIGATE_SKIPBACK);
+	SelectByItemData(m_cmbXButton2, ID_NAVIGATE_SKIPFORWARD);
+	SelectByItemData(m_cmbWheelUp, ID_VOLUME_UP);
+	OnWheelUpChange();
+	SelectByItemData(m_cmbWheelLeft, 0);
+	OnWheelLeftChange();
+
+	m_chkMouseLeftClickOpenRecent.SetCheck(BST_UNCHECKED);
 
 	SetModified();
 }
