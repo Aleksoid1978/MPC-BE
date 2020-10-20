@@ -31,7 +31,7 @@ bool  LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
 
 WORD AssignedKeyToCmd(UINT keyValue);
-WORD AssignedMouseToCmd(UINT mouseValue, bool bIsFullScreen = false);
+WORD AssignedMouseToCmd(UINT mouseValue);
 
 void SetAudioRenderer(int AudioDevNo);
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
