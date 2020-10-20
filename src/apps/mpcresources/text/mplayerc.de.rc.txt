@@ -351,20 +351,20 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 29
-5		"Left button"
-6		"Click"
-8		"If nothing is loaded, open recent file"
-10		"Double click"
-12		"Middle button"
-14		"Right button"
-15		"Сontext menu"
-16		"X-button 1"
-18		"X-button 2"
-20		"Wheel"
-21		"Up"
-23		"Down"
-25		"Left"
-27		"Right"
+5		"Linke Taste"
+6		"Klick"
+8		"Wenn nichts geladen ist, die letzte Datei öffnen"
+10		"Doppelklick"
+12		"Mittlere Taste"
+14		"Rechte Taste"
+15		"Kontextmenü"
+16		"X-Taste 1"
+18		"X-Taste 2"
+20		"Mausrad"
+21		"Oben"
+23		"Unten"
+25		"Links"
+27		"Rechts"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41

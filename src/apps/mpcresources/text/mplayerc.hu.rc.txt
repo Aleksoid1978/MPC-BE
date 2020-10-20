@@ -351,20 +351,20 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 29
-5		"Left button"
-6		"Click"
-8		"If nothing is loaded, open recent file"
-10		"Double click"
-12		"Middle button"
-14		"Right button"
-15		"Сontext menu"
-16		"X-button 1"
-18		"X-button 2"
-20		"Wheel"
-21		"Up"
-23		"Down"
-25		"Left"
-27		"Right"
+5		"Bal gomb"
+6		"Kattintás"
+8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
+10		"Dupla kattintás"
+12		"Középső gomb"
+14		"Jobb gomb"
+15		"Helyi menü"
+16		"X-gomb 1"
+18		"X-gomb 2"
+20		"Egérgörgő"
+21		"Fel"
+23		"Le"
+25		"Bal"
+27		"Jobb"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
