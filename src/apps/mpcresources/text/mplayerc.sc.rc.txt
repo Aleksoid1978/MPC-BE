@@ -351,20 +351,20 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 29
-5		"Left button"
-6		"Click"
-8		"If nothing is loaded, open recent file"
-10		"Double click"
-12		"Middle button"
-14		"Right button"
-15		"Сontext menu"
-16		"X-button 1"
-18		"X-button 2"
-20		"Wheel"
-21		"Up"
-23		"Down"
-25		"Left"
-27		"Right"
+5		"左键"
+6		"点击"
+8		"如果未加载任何内容，则打开最近使用的文件"
+10		"双击"
+12		"中键"
+14		"右键"
+15		"文本菜单"
+16		"X-按键 1"
+18		"X-按键 2"
+20		"滚轮"
+21		"向上"
+23		"向下"
+25		"向左"
+27		"向右"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
