@@ -386,9 +386,7 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 
 void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
-	bool fLeftMouseBtnUnassigned = !AssignedMouseToCmd(wmcmd::LDOWN);
-
-	if (!m_pMainFrame->m_bFullScreen && (m_pMainFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
+	if (!m_pMainFrame->m_bFullScreen && (m_pMainFrame->IsCaptionHidden() || !AssignedMouseToCmd(wmcmd::LDOWN))) {
 		BYTE bFlag = 0;
 		switch (nHitTest) {
 			case HTTOP:

@@ -355,7 +355,7 @@ WORD AssignedKeyToCmd(UINT keyValue)
 	return 0;
 }
 
-WORD AssignedMouseToCmd(UINT mouseValue, bool bIsFullScreen /*= false*/)
+WORD AssignedMouseToCmd(UINT mouseValue)
 {
 	CAppSettings& s = AfxGetAppSettings();
 

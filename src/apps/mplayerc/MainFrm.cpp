@@ -3591,7 +3591,7 @@ BOOL CMainFrame::MouseMessage(UINT id, UINT nFlags, CPoint point)
 		return FALSE;
 	}
 
-	WORD cmd = AssignedMouseToCmd(id, m_bFullScreen);
+	WORD cmd = AssignedMouseToCmd(id);
 	if (cmd) {
 		SendMessageW(WM_COMMAND, cmd);
 		return TRUE;
@@ -3622,7 +3622,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 	m_bLeftMouseDown = TRUE;
 
 	if (m_bFullScreen || CursorOnD3DFullScreenWindow()) {
-		if (AssignedMouseToCmd(wmcmd::LDOWN, m_bFullScreen)) {
+		if (AssignedMouseToCmd(wmcmd::LDOWN)) {
 			m_bLeftMouseDownFullScreen = TRUE;
 			MouseMessage(wmcmd::LDOWN, nFlags, point);
 		}
@@ -3660,17 +3660,10 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	bool fLeftDownMouseBtnUnassigned = !AssignedMouseToCmd(wmcmd::LDOWN, m_bFullScreen);
-	if (!fLeftDownMouseBtnUnassigned && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
+	if (AssignedMouseToCmd(wmcmd::LDOWN) && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
 		MouseMessage(wmcmd::LDOWN, nFlags, point);
 		return;
- 	}
-
-	bool fLeftUpMouseBtnUnassigned = !AssignedMouseToCmd(wmcmd::LUP, m_bFullScreen);
-	if (!fLeftUpMouseBtnUnassigned && !m_bFullScreen) {
-		MouseMessage(wmcmd::LUP, nFlags, point);
-		return;
- 	}
+	}
 
 	__super::OnLButtonUp(nFlags, point);
 }
