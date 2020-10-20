@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportovat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 29
 5		"Left button"
 6		"Click"
 8		"If nothing is loaded, open recent file"
@@ -365,7 +365,6 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
 23		"Down"
 25		"Left"
 27		"Right"
-29		"This is a test panel of settings. These settings don't work.\nTranslation into another language does not need to be done now."
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41

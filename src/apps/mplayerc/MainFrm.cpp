@@ -195,13 +195,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_MBUTTONDOWN()
 	ON_WM_MBUTTONUP()
-	ON_WM_MBUTTONDBLCLK()
-	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
-	ON_WM_RBUTTONDBLCLK()
 	ON_MESSAGE(WM_XBUTTONDOWN, OnXButtonDown)
 	ON_MESSAGE(WM_XBUTTONUP, OnXButtonUp)
-	ON_MESSAGE(WM_XBUTTONDBLCLK, OnXButtonDblClk)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MOUSEHWHEEL()
 	ON_WM_MOUSEMOVE()
@@ -3591,15 +3587,17 @@ BOOL CMainFrame::MouseMessage(UINT id, UINT nFlags, CPoint point)
 		return FALSE;
 	}
 
-	BOOL ret = FALSE;
+	if (id == wmcmd::LDOWN && m_eMediaLoadState != MLS_LOADED && !AfxGetAppSettings().bMouseLeftClickOpenRecent) {
+		return FALSE;
+	}
 
 	WORD cmd = AssignedMouseToCmd(id, m_bFullScreen);
 	if (cmd) {
 		SendMessageW(WM_COMMAND, cmd);
-		ret = TRUE;
+		return TRUE;
 	}
 
-	return ret;
+	return FALSE;
 }
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
@@ -3693,30 +3691,13 @@ void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CMainFrame::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	SendMessageW(WM_CANCELMODE);
-	if (!MouseMessage(wmcmd::MDOWN, nFlags, point)) {
-		__super::OnMButtonDown(nFlags, point);
-	}
+	__super::OnMButtonDown(nFlags, point);
 }
 
 void CMainFrame::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	if (!MouseMessage(wmcmd::MUP, nFlags, point)) {
 		__super::OnMButtonUp(nFlags, point);
-	}
-}
-
-void CMainFrame::OnMButtonDblClk(UINT nFlags, CPoint point)
-{
-	SendMessageW(WM_MBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
-	if (!MouseMessage(wmcmd::MDBLCLK, nFlags, point)) {
-		__super::OnMButtonDblClk(nFlags, point);
-	}
-}
-
-void CMainFrame::OnRButtonDown(UINT nFlags, CPoint point)
-{
-	if (!MouseMessage(wmcmd::RDOWN, nFlags, point)) {
-		__super::OnRButtonDown(nFlags, point);
 	}
 }
 
@@ -3730,34 +3711,16 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 	}
 }
 
-void CMainFrame::OnRButtonDblClk(UINT nFlags, CPoint point)
-{
-	SendMessageW(WM_RBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
-	if (!MouseMessage(wmcmd::RDBLCLK, nFlags, point)) {
-		__super::OnRButtonDblClk(nFlags, point);
-	}
-}
-
 LRESULT CMainFrame::OnXButtonDown(WPARAM wParam, LPARAM lParam)
 {
 	SendMessageW(WM_CANCELMODE);
-	UINT fwButton = GET_XBUTTON_WPARAM(wParam);
-	return MouseMessage(fwButton == XBUTTON1 ? wmcmd::X1DOWN : fwButton == XBUTTON2 ? wmcmd::X2DOWN : wmcmd::NONE,
-					GET_KEYSTATE_WPARAM(wParam), CPoint(lParam));
+	return FALSE;
 }
 
 LRESULT CMainFrame::OnXButtonUp(WPARAM wParam, LPARAM lParam)
 {
 	UINT fwButton = GET_XBUTTON_WPARAM(wParam);
 	return MouseMessage(fwButton == XBUTTON1 ? wmcmd::X1UP : fwButton == XBUTTON2 ? wmcmd::X2UP : wmcmd::NONE,
-					GET_KEYSTATE_WPARAM(wParam), CPoint(lParam));
-}
-
-LRESULT CMainFrame::OnXButtonDblClk(WPARAM wParam, LPARAM lParam)
-{
-	SendMessageW(WM_XBUTTONDOWN, wParam, lParam);
-	UINT fwButton = GET_XBUTTON_WPARAM(wParam);
-	return MouseMessage(fwButton == XBUTTON1 ? wmcmd::X1DBLCLK : fwButton == XBUTTON2 ? wmcmd::X2DBLCLK : wmcmd::NONE,
 					GET_KEYSTATE_WPARAM(wParam), CPoint(lParam));
 }
 
