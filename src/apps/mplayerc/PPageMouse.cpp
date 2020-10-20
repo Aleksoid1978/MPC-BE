@@ -54,6 +54,8 @@ BOOL CPPageMouse::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+
 	CAppSettings& s = AfxGetAppSettings();
 
 	AddStringData(m_cmbLeftBottonClick, L"---", 0);
