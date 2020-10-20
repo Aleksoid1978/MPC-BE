@@ -359,18 +359,22 @@ WORD AssignedMouseToCmd(UINT mouseValue, bool bIsFullScreen /*= false*/)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	for (const auto& wc : s.wmcmds) {
-		if (bIsFullScreen) {
-			if (wc.mouseFS == mouseValue) {
-				return wc.cmd;
-			}
-		}
-		else if (wc.mouse == mouseValue) {
-			return wc.cmd;
-		}
+	UINT cmd = 0;
+
+	switch (mouseValue) {
+	case wmcmd::LDOWN:   cmd = s.nMouseLeftClick;    break;
+	case wmcmd::LDBLCLK: cmd = s.nMouseLeftDblClick; break;
+	case wmcmd::MUP:     cmd = s.nMouseMiddleClick;  break;
+	case wmcmd::RUP:     cmd = ID_MENU_PLAYER_SHORT; break;
+	case wmcmd::X1UP:    cmd = s.nMouseX1Click;      break;
+	case wmcmd::X2UP:    cmd = s.nMouseX2Click;      break;
+	case wmcmd::WUP:     cmd = s.nMouseWheelUp;      break;
+	case wmcmd::WDOWN:   cmd = s.nMouseWheelDown;    break;
+	case wmcmd::WLEFT:   cmd = s.nMouseWheelLeft;    break;
+	case wmcmd::WRIGHT:  cmd = s.nMouseWheelRight;   break;
 	}
 
-	return 0;
+	return (WORD)cmd;
 }
 
 void SetAudioRenderer(int AudioDevNo)

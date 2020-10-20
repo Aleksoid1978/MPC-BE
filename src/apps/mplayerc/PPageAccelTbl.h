@@ -34,13 +34,11 @@ class CPPageAccelTbl : public CPPageBase
 	DECLARE_DYNAMIC(CPPageAccelTbl)
 
 private:
-	enum {COL_CMD, COL_KEY, COL_ID, COL_MOUSE, COL_MOUSE_FS, COL_APPCMD, COL_RMCMD, COL_RMREPCNT};
+	enum {COL_CMD, COL_KEY, COL_ID, COL_APPCMD, COL_RMCMD, COL_RMREPCNT};
 
 	std::vector<wmcmd> m_wmcmds;
 
 	void UpdateKeyDupFlags();
-	void UpdateMouseDupFlags();
-	void UpdateMouseFSDupFlags();
 	void UpdateAppcmdDupFlags();
 	void UpdateRmcmdDupFlags();
 	void UpdateAllDupFlags();
@@ -61,7 +59,6 @@ public:
 	static CString MakeAccelModLabel(BYTE fVirt);
 	static CString MakeAccelShortcutLabel(UINT id);
 	static CString MakeAccelShortcutLabel(ACCEL& a);
-	static CString MakeMouseButtonLabel(UINT mouse);
 	static CString MakeAppCommandLabel(UINT id);
 
 	enum {APPCOMMAND_LAST=APPCOMMAND_DWM_FLIP3D};
