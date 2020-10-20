@@ -3583,11 +3583,11 @@ BOOL CMainFrame::MouseMessage(UINT id, UINT nFlags, CPoint point)
 		m_wndView.MapWindowPoints(this, &r);
 	}
 
-	if (id != wmcmd::WDOWN && id != wmcmd::WUP && !r.PtInRect(point)) {
+	if (id != MOUSE_WHEEL_DOWN && id != MOUSE_WHEEL_UP && !r.PtInRect(point)) {
 		return FALSE;
 	}
 
-	if (id == wmcmd::LDOWN && m_eMediaLoadState != MLS_LOADED && !AfxGetAppSettings().bMouseLeftClickOpenRecent) {
+	if (id == MOUSE_CLICK_LEFT && m_eMediaLoadState != MLS_LOADED && !AfxGetAppSettings().bMouseLeftClickOpenRecent) {
 		return FALSE;
 	}
 
@@ -3622,9 +3622,9 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 	m_bLeftMouseDown = TRUE;
 
 	if (m_bFullScreen || CursorOnD3DFullScreenWindow()) {
-		if (AssignedMouseToCmd(wmcmd::LDOWN)) {
+		if (AssignedMouseToCmd(MOUSE_CLICK_LEFT)) {
 			m_bLeftMouseDownFullScreen = TRUE;
-			MouseMessage(wmcmd::LDOWN, nFlags, point);
+			MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		}
 		return;
 	}
@@ -3660,8 +3660,8 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (AssignedMouseToCmd(wmcmd::LDOWN) && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
-		MouseMessage(wmcmd::LDOWN, nFlags, point);
+	if (AssignedMouseToCmd(MOUSE_CLICK_LEFT) && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
+		MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		return;
 	}
 
@@ -3672,11 +3672,11 @@ void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 
 	if (m_bLeftMouseDown) {
-		MouseMessage(wmcmd::LDOWN, nFlags, point);
+		MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		m_bLeftMouseDown = FALSE;
 	}
 
-	if (!MouseMessage(wmcmd::LDBLCLK, nFlags, point)) {
+	if (!MouseMessage(MOUSE_CLICK_LEFT_DBL, nFlags, point)) {
 		__super::OnLButtonDblClk(nFlags, point);
 	}
 }
@@ -3689,7 +3689,7 @@ void CMainFrame::OnMButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnMButtonUp(UINT nFlags, CPoint point)
 {
-	if (!MouseMessage(wmcmd::MUP, nFlags, point)) {
+	if (!MouseMessage(MOUSE_CLICK_MIDLE, nFlags, point)) {
 		__super::OnMButtonUp(nFlags, point);
 	}
 }
@@ -3699,7 +3699,7 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 	CPoint p;
 	GetCursorPos(&p);
 	SetFocus();
-	if (*WindowFromPoint(p) != *m_pFullscreenWnd && !MouseMessage(wmcmd::RUP, nFlags, point)) {
+	if (*WindowFromPoint(p) != *m_pFullscreenWnd && !MouseMessage(MOUSE_CLICK_RIGHT, nFlags, point)) {
 		__super::OnRButtonUp(nFlags, point);
 	}
 }
@@ -3713,7 +3713,7 @@ LRESULT CMainFrame::OnXButtonDown(WPARAM wParam, LPARAM lParam)
 LRESULT CMainFrame::OnXButtonUp(WPARAM wParam, LPARAM lParam)
 {
 	UINT fwButton = GET_XBUTTON_WPARAM(wParam);
-	return MouseMessage(fwButton == XBUTTON1 ? wmcmd::X1UP : fwButton == XBUTTON2 ? wmcmd::X2UP : wmcmd::NONE,
+	return MouseMessage(fwButton == XBUTTON1 ? MOUSE_CLICK_X1 : fwButton == XBUTTON2 ? MOUSE_CLICK_X2 : 0,
 					GET_KEYSTATE_WPARAM(wParam), CPoint(lParam));
 }
 
@@ -3734,8 +3734,8 @@ BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 	ScreenToClient(&point);
 
 	BOOL fRet =
-		zDelta > 0 ? MouseMessage(wmcmd::WUP, nFlags, point) :
-		zDelta < 0 ? MouseMessage(wmcmd::WDOWN, nFlags, point) :
+		zDelta > 0 ? MouseMessage(MOUSE_WHEEL_UP, nFlags, point) :
+		zDelta < 0 ? MouseMessage(MOUSE_WHEEL_DOWN, nFlags, point) :
 		FALSE;
 
 	return fRet;
@@ -3745,7 +3745,7 @@ void CMainFrame::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	if (zDelta) {
 		ScreenToClient(&pt);
-		MouseMessage((zDelta < 0) ? wmcmd::WLEFT : wmcmd::WRIGHT, nFlags, pt);
+		MouseMessage((zDelta < 0) ? MOUSE_WHEEL_LEFT : MOUSE_WHEEL_RIGHT, nFlags, pt);
 	}
 }
 
