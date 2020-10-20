@@ -73,7 +73,7 @@ void CInPlaceWinHotkey::OnKillFocus(CWnd* pNewWnd)
 	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
-	dispinfo.hdr.code = LVN_ENDLABELEDIT;
+	dispinfo.hdr.code = LVN_ENDLABELEDITW;
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
@@ -172,7 +172,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
-	dispinfo.hdr.code = LVN_ENDLABELEDIT;
+	dispinfo.hdr.code = LVN_ENDLABELEDITW;
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
@@ -340,7 +340,7 @@ void CInPlaceComboBox::OnKillFocus(CWnd* pNewWnd)
 	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
-	dispinfo.hdr.code = LVN_ENDLABELEDIT;
+	dispinfo.hdr.code = LVN_ENDLABELEDITW;
 	dispinfo.item.mask = LVIF_TEXT|LVIF_PARAM;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
@@ -447,7 +447,7 @@ void CInPlaceListBox::OnKillFocus(CWnd* pNewWnd)
 	LV_DISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
-	dispinfo.hdr.code = LVN_ENDLABELEDIT;
+	dispinfo.hdr.code = LVN_ENDLABELEDITW;
 	dispinfo.item.mask = LVIF_TEXT|LVIF_PARAM;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
@@ -919,7 +919,7 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		LV_DISPINFOW dispinfo;
 		dispinfo.hdr.hwndFrom = m_hWnd;
 		dispinfo.hdr.idFrom = GetDlgCtrlID();
-		dispinfo.hdr.code = LVN_BEGINLABELEDIT;
+		dispinfo.hdr.code = LVN_BEGINLABELEDITW;
 		dispinfo.item.mask = 0;
 		dispinfo.item.iItem = m_nItemClicked;
 		dispinfo.item.iSubItem = m_nSubItemClicked;

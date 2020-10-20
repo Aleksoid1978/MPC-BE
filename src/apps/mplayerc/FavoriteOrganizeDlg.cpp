@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -117,10 +117,10 @@ BEGIN_MESSAGE_MAP(CFavoriteOrganizeDlg, CResizableDialog)
 	ON_NOTIFY(TCN_SELCHANGING, IDC_TAB1, OnTcnSelChangingTab1)
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 	ON_WM_ACTIVATE()
-	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST2, OnLvnEndLabelEditList2)
+	ON_NOTIFY(LVN_ENDLABELEDITW, IDC_LIST2, OnLvnEndLabelEditList2)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST2, OnPlayFavorite)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_LIST2, OnKeyPressed)
-	ON_NOTIFY(LVN_GETINFOTIP, IDC_LIST2, OnLvnGetInfoTipList)
+	ON_NOTIFY(LVN_GETINFOTIPW, IDC_LIST2, OnLvnGetInfoTipList)
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
