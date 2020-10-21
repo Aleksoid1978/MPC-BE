@@ -48,9 +48,9 @@ CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CStri
 CmadVRAllocatorPresenter::~CmadVRAllocatorPresenter()
 {
 	// the order is important here
-	m_pSubPicQueue = nullptr;
-	m_pAllocator = nullptr;
-	m_pMVR = nullptr;
+	m_pSubPicQueue.Release();
+	m_pAllocator.Release();
+	m_pMVR.Release();
 }
 
 STDMETHODIMP CmadVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -72,8 +72,8 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 {
 	if (!pD3DDev) {
 		// release all resources
-		m_pSubPicQueue = nullptr;
-		m_pAllocator = nullptr;
+		m_pSubPicQueue.Release();
+		m_pAllocator.Release();
 		return S_OK;
 	}
 

@@ -1115,7 +1115,7 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 
 HRESULT CStreamSwitcherOutputPin::BreakConnect()
 {
-	m_pPinConnection = nullptr;
+	m_pPinConnection.Release();
 	return __super::BreakConnect();
 }
 

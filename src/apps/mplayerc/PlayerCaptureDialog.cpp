@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -687,10 +687,10 @@ void CPlayerCaptureDialog::EmptyVideo()
 
 	m_vfa.RemoveAll();
 
-	m_pAMXB = nullptr;
-	m_pAMTuner = nullptr;
-	m_pAMVSC = nullptr;
-	m_pAMVfwCD = nullptr;
+	m_pAMXB.Release();
+	m_pAMTuner.Release();
+	m_pAMVSC.Release();
+	m_pAMVfwCD.Release();
 
 	if (IsWindow(m_hWnd)) {
 		m_vidinput.ResetContent();
@@ -922,8 +922,8 @@ void CPlayerCaptureDialog::UpdateAudioCodec()
 
 void CPlayerCaptureDialog::UpdateMuxer()
 {
-	m_pMux = nullptr;
-	m_pAudMux = nullptr;
+	m_pMux.Release();
+	m_pAudMux.Release();
 
 	UpdateData();
 
@@ -1520,7 +1520,7 @@ void CPlayerCaptureDialog::OnVideoCodecDimension()
 		m_mtcv = ((CVidFormatElem*)m_vidcodecdimension.GetItemData(i))->mt;
 
 		// we have to recreate the encoder, otherwise it will accept the new media type for only the first time
-		m_pVidEnc = nullptr;
+		m_pVidEnc.Release();
 		m_pVidEncMoniker->BindToObject(0, 0, IID_PPV_ARGS(&m_pVidEnc));
 	}
 }
@@ -1550,7 +1550,7 @@ void CPlayerCaptureDialog::OnAudioCodecDimension()
 		m_mtca = ((CAudFormatElem*)m_audcodecdimension.GetItemData(i))->mt;
 
 		// we have to recreate the encoder, otherwise it will accept the new media type for only the first time
-		m_pAudEnc = nullptr;
+		m_pAudEnc.Release();
 		m_pAudEncMoniker->BindToObject(0, 0, IID_PPV_ARGS(&m_pAudEnc));
 		/*
 		SaveMediaType(
@@ -1605,7 +1605,7 @@ void CPlayerCaptureDialog::OnRecord()
 		if (pFSF) {
 			m_pDst = m_pMux;
 		} else {
-			m_pDst = nullptr;
+			m_pDst.Release();
 			m_pDst.CoCreateInstance(CLSID_FileWriter);
 			pFSF = m_pDst;
 		}
@@ -1630,7 +1630,7 @@ void CPlayerCaptureDialog::OnRecord()
 			if (pFSFAudioMux) {
 				m_pAudDst = m_pAudMux;
 			} else {
-				m_pAudDst = nullptr;
+				m_pAudDst.Release();
 				m_pAudDst.CoCreateInstance(CLSID_FileWriter);
 				pFSFAudioMux = m_pAudDst;
 			}
@@ -1667,8 +1667,8 @@ void CPlayerCaptureDialog::OnRecord()
 		m_pMainFrame->StopCapture();
 		EnableControls(this, true);
 
-		m_pVidBuffer = nullptr;
-		m_pAudBuffer = nullptr;
+		m_pVidBuffer.Release();
+		m_pAudBuffer.Release();
 	}
 }
 

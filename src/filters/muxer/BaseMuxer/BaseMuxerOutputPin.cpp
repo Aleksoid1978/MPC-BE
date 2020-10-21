@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,7 +50,7 @@ IBitStream* CBaseMuxerOutputPin::GetBitStream()
 
 HRESULT CBaseMuxerOutputPin::BreakConnect()
 {
-	m_pBitStream = nullptr;
+	m_pBitStream.Release();
 
 	return __super::BreakConnect();
 }
@@ -107,7 +107,7 @@ HRESULT CBaseMuxerOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 
 HRESULT CBaseMuxerOutputPin::DeliverEndOfStream()
 {
-	m_pBitStream = nullptr;
+	m_pBitStream.Release();
 
 	return __super::DeliverEndOfStream();
 }
