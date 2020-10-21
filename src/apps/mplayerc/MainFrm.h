@@ -417,8 +417,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	void CleanGraph();
 
-	CComPtr<IBaseFilter> pAudioDubSrc;
-
 	void ShowOptions(int idPage = 0);
 
 	HRESULT GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg);
@@ -528,8 +526,6 @@ protected:
 	bool			m_bAudioOnly;
 
 	BOOL			m_bNextIsOpened = FALSE;
-
-	dispmode		m_dmBeforeFullscreen;
 
 	CString					m_LastOpenFile;
 	CAutoPtr<OpenMediaData>	m_lastOMD;
@@ -911,7 +907,6 @@ public:
 	BOOL isSnapClose(int a, int b);
 	BOOL m_bWndZoomed;
 	RECT rc_forceNP;
-	RECT rc_NP;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
@@ -1203,7 +1198,6 @@ public:
 	CMPCGradient m_BackGroundGradient; // used in some toolbars
 
 	CPlayerToolBar		m_wndToolBar;
-	CPlayerListCtrl		m_wndListCtrl;
 	CPlayerPlaylistBar	m_wndPlaylistBar;
 	CFlyBar				m_wndFlyBar;
 	CPreView			m_wndPreView; // SmartSeek
