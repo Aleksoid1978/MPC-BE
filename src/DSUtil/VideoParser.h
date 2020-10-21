@@ -21,7 +21,6 @@
 #pragma once
 
 #include <basestruct.h>
-#include <vector>
 
 static const byte pixel_aspect[17][2]= {
 	{  0,   1 },

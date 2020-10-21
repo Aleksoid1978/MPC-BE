@@ -21,7 +21,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <vector>
 #include <numeric>
 
 template <typename T>

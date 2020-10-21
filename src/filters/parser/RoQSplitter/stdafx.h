@@ -26,4 +26,7 @@
 #include <afxwin.h>                         // MFC core and standard components
 #include "../../../../include/stdafx_common_dshow.h"
 
+#include <vector>
+#include <list>
+
 #include "../../../DSUtil/DSUtil.h"

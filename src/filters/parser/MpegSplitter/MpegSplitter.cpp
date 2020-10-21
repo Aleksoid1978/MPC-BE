@@ -24,7 +24,6 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include <dmodshow.h>
-#include <list>
 #include "MpegSplitter.h"
 #include <moreuuids.h>
 #include <basestruct.h>

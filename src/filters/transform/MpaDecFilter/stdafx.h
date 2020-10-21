@@ -29,5 +29,6 @@
 #include "../../../DSUtil/Log.h"
 
 #include <algorithm>
-#include <memory>
 #include <vector>
+#include <list>
+#include <memory>

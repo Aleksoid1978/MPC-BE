@@ -29,7 +29,6 @@
 #include "MemUsage.h"
 #include <deque>
 #include <mutex>
-#include <vector>
 #include <MediaOffset3D.h>
 
 #define NB_JITTER        126

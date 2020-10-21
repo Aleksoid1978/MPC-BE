@@ -20,9 +20,7 @@
 
 #pragma once
 
-#include <list>
 #include <variant>
-#include <vector>
 #include "GolombBuffer.h"
 
 #define APE_TAG_FOOTER_BYTES   32

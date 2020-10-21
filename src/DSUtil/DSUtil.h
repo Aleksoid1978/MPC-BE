@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <vector>
-#include <list>
 #include <BaseClasses/streams.h>
 #include "H264Nalu.h"
 #include "MediaTypeEx.h"

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,6 @@
  */
 
 #pragma once
-
-#include <vector>
 
 static const WCHAR* MPEG2_Profile[] =
 {
