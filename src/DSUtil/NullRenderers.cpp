@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,10 +54,10 @@ public :
 				m_pD3DDeviceManager->CloseDeviceHandle(m_hDevice);
 				m_hDevice = INVALID_HANDLE_VALUE;
 			}
-			m_pD3DDeviceManager = nullptr;
+			m_pD3DDeviceManager.Release();
 		}
 		if (m_pD3DDev) {
-			m_pD3DDev = nullptr;
+			m_pD3DDev.Release();
 		}
 		if (m_hDXVA2Lib) {
 			FreeLibrary(m_hDXVA2Lib);

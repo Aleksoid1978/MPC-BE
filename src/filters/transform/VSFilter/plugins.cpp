@@ -83,7 +83,7 @@ namespace Plugin
 
 				HRESULT hr;
 				if (!(m_pSubPicQueue = DNew CSubPicQueueNoThread(false, pAllocator, &hr)) || FAILED(hr)) {
-					m_pSubPicQueue = nullptr;
+					m_pSubPicQueue.Release();
 					return false;
 				}
 			}
@@ -181,14 +181,14 @@ namespace Plugin
 
 		bool Open(CString fn) {
 			SetFileName(L"");
-			m_pSubPicProvider = nullptr;
+			m_pSubPicProvider.Release();
 
 			if (CVobSubFile* vsf = DNew CVobSubFile(&m_csSubLock)) {
 				m_pSubPicProvider = (ISubPicProvider*)vsf;
 				if (vsf->Open(CString(fn))) {
 					SetFileName(fn);
 				} else {
-					m_pSubPicProvider = nullptr;
+					m_pSubPicProvider.Release();
 				}
 			}
 
@@ -215,7 +215,7 @@ namespace Plugin
 
 		bool Open(CString fn, int CharSet = DEFAULT_CHARSET) {
 			SetFileName(L"");
-			m_pSubPicProvider = nullptr;
+			m_pSubPicProvider.Release();
 
 			if (!m_pSubPicProvider) {
 				if (CRenderedTextSubtitle* rts = DNew CRenderedTextSubtitle(&m_csSubLock)) {
@@ -223,7 +223,7 @@ namespace Plugin
 					if (rts->Open(CString(fn), CharSet)) {
 						SetFileName(fn);
 					} else {
-						m_pSubPicProvider = nullptr;
+						m_pSubPicProvider.Release();
 					}
 				}
 			}

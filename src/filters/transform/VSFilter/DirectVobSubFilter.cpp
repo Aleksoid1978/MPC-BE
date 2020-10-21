@@ -114,7 +114,7 @@ CDirectVobSubFilter::~CDirectVobSubFilter()
 	if (m_pSubPicQueue) {
 		m_pSubPicQueue->Invalidate();
 	}
-	m_pSubPicQueue = nullptr;
+	m_pSubPicQueue.Release();
 
 	if (m_hfont) {
 		DeleteObject(m_hfont);
@@ -750,7 +750,7 @@ HRESULT CDirectVobSubFilter::BreakConnect(PIN_DIRECTION dir)
 	} else if (dir == PINDIR_OUTPUT) {
 		// not really needed, but may free up a little memory
 		CAutoLock cAutoLock(&m_csQueueLock);
-		m_pSubPicQueue = nullptr;
+		m_pSubPicQueue.Release();
 	}
 
 	return __super::BreakConnect(dir);
@@ -896,7 +896,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 
 	CAutoLock cAutoLock(&m_csQueueLock);
 
-	m_pSubPicQueue = nullptr;
+	m_pSubPicQueue.Release();
 
 	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
 
@@ -959,7 +959,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_bAnimWhenBuffering, pSubPicAllocator, &hr);
 
 	if (FAILED(hr)) {
-		m_pSubPicQueue = nullptr;
+		m_pSubPicQueue.Release();
 	}
 
 	UpdateSubtitle(false);
