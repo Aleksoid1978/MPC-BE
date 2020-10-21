@@ -357,7 +357,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
 10		"双击"
 12		"中键"
 14		"右键"
-15		"文本菜单"
+15		"菜单"
 16		"X-按键 1"
 18		"X-按键 2"
 20		"滚轮"
@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
 23		"向下"
 25		"向左"
 27		"向右"
-29		"重置设置"
+29		"重置"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
