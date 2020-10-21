@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlcoll.h>
-#include <list>
 
 template<class T, typename SEP>
 std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>

@@ -23,7 +23,6 @@
 #include <afxsock.h>
 #include "Log.h"
 #include "UrlParser.h"
-#include <list>
 
 class CMPCSocket : public CSocket
 {

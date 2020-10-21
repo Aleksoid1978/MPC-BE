@@ -21,7 +21,6 @@
 #pragma once
 
 #include <MMReg.h>
-#include <vector>
 #include "GolombBuffer.h"
 
 #define AC3_SYNCWORD                 0x770B

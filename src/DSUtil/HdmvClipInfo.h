@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <vector>
 #include "Mpeg2Def.h"
 #include "../../include/basestruct.h"
 

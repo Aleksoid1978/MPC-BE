@@ -20,8 +20,6 @@
 
 #pragma once
 
-//#include <list>
-//#include <guiddef.h>
 #include <regex>
 
 // this operator is needed to use GUID or CLSID as key in std::map

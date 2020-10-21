@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <list>
-
 struct Chapters {
 	CString        name;
 	REFERENCE_TIME rt = 0;

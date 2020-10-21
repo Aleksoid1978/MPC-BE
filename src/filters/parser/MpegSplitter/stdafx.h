@@ -27,5 +27,7 @@
 #include "../../../../include/stdafx_common_dshow.h"
 
 #include <algorithm>
+#include <vector>
+#include <list>
 
 #include "../../../DSUtil/DSUtil.h"

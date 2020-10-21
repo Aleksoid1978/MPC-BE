@@ -31,6 +31,8 @@
 #include <dvdmedia.h>
 
 #include <algorithm>
+#include <vector>
+#include <list>
 #include <memory>
 
 #include "../../../DSUtil/DSUtil.h"

@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include <MMReg.h>
-#include <list>
 #include <moreuuids.h>
 #include "MpegSplitterFile.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
