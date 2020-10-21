@@ -11773,7 +11773,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_pGB_preview = nullptr;
+	m_pGB_preview.Release();
 
 	m_bUseSmartSeek = s.fSmartSeek;
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
@@ -12240,7 +12240,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(fn, nullptr))) {
 				if (m_pGB_preview) {
-					m_pMFVDC_preview = nullptr;
+					m_pMFVDC_preview.Release();
 
 					m_pMC_preview.Release();
 					m_pMS_preview.Release();
@@ -12254,7 +12254,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 					m_pGB_preview->RemoveFromROT();
 					m_pGB_preview.Release();
-					m_pGB_preview = nullptr;
 				}
 				m_bUseSmartSeek = false;
 			}
@@ -12625,9 +12624,9 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		return ResStr(IDS_MAINFRM_98);
 	}
 
-	m_pCGB = nullptr;
-	m_pVidCap = nullptr;
-	m_pAudCap = nullptr;
+	m_pCGB.Release();
+	m_pVidCap.Release();
+	m_pAudCap.Release();
 
 	if (FAILED(m_pCGB.CoCreateInstance(CLSID_CaptureGraphBuilder2))) {
 		return ResStr(IDS_MAINFRM_99);
@@ -12774,8 +12773,8 @@ void CMainFrame::OpenCustomizeGraph()
 		CComPtr<IMediaFilter> mediaFilter;
 		m_pGB->QueryInterface(IID_PPV_ARGS(&mediaFilter));
 		mediaFilter->SetSyncSource(refClock);
-		mediaFilter = nullptr;
-		refClock = nullptr;
+		mediaFilter.Release();
+		refClock.Release();
 
 		m_pRefClock->QueryInterface(IID_PPV_ARGS(&m_pSyncClock));
 
@@ -16817,7 +16816,7 @@ bool CMainFrame::BuildToCapturePreviewPin(
 
 			hr = m_pCGB->RenderStream(nullptr, &MEDIATYPE_Interleaved, pPin, nullptr, pDVSplitter);
 
-			pPin = nullptr;
+			pPin.Release();
 			hr = m_pCGB->FindPin(pDVSplitter, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
 			hr = m_pCGB->FindPin(pDVSplitter, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Audio, TRUE, 0, &pDVAudPin);
 
@@ -16827,7 +16826,7 @@ bool CMainFrame::BuildToCapturePreviewPin(
 
 			hr = m_pGB->ConnectFilter(pPin, pDVDec);
 
-			pPin = nullptr;
+			pPin.Release();
 			hr = m_pCGB->FindPin(pDVDec, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
 		} else if (FAILED(m_pCGB->FindPin(pVidCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, TRUE, 0, &pPin))) {
 			MessageBoxW(ResStr(IDS_CAPTURE_ERROR_VID_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
@@ -16926,7 +16925,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 
 	if (fVPreview == 2 && !fVidCap && pVidCapPin) {
 		pVidPrevPin = pVidCapPin;
-		pVidCapPin = nullptr;
+		pVidCapPin.Release();
 	}
 
 	bool fAudPrev = pAudPrevPin && fAPreview;
@@ -16934,7 +16933,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 
 	if (fAPreview == 2 && !fAudCap && pAudCapPin) {
 		pAudPrevPin = pAudCapPin;
-		pAudCapPin = nullptr;
+		pAudCapPin.Release();
 	}
 
 	// Preview Video
