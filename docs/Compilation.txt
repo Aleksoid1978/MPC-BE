@@ -27,9 +27,6 @@ Part B: Preparing the GCC environment
     @ECHO OFF
     SET "MPCBE_MSYS=C:\MSYS"
     SET "MPCBE_MINGW=C:\MSYS\mingw"
- 3. Optional, if you want to customize the Windows SDK version used, add the following environment variable (in System Properties->Advanced->Environment Variables):
-    Variable          Value
-    MPCBE_WINSDK_VER  8.1
 
 Part C: Downloading and compiling the MPC-BE source
 
