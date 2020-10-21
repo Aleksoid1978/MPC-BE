@@ -299,12 +299,10 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 			BOOL bIcyFound = FALSE;
 
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			Explode(hdr, sl, '\n');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				CString& hdrline = sl.GetNext(pos);
 
+			for (const auto& hdrline : sl) {
 				CString param, value;
 				int k = hdrline.Find(':');
 				if (k > 0 && k + 1 < hdrline.GetLength()) {
