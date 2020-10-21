@@ -11858,13 +11858,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		m_pGB_preview->AddToROT();
 
 		m_pMC_preview = m_pGB_preview;
-		m_pME_preview = m_pGB_preview;
 		m_pMS_preview = m_pGB_preview; // general
 
 		m_pVW_preview = m_pGB_preview;
 		m_pBV_preview = m_pGB_preview;
-
-		m_pFS_preview = m_pGB_preview;
 	}
 
 	if (!(m_pMC && m_pME && m_pMS)
@@ -12243,15 +12240,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(fn, nullptr))) {
 				if (m_pGB_preview) {
-					m_pMFVP_preview  = nullptr;
 					m_pMFVDC_preview = nullptr;
 
 					m_pMC_preview.Release();
-					m_pME_preview.Release();
 					m_pMS_preview.Release();
 					m_pVW_preview.Release();
 					m_pBV_preview.Release();
-					m_pFS_preview.Release();
 
 					if (m_pDVDC_preview) {
 						m_pDVDC_preview.Release();
@@ -14032,7 +14026,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		if (m_bUseSmartSeek) {
 			m_pGB_preview->FindInterface(IID_PPV_ARGS(&m_pMFVDC_preview), TRUE);
-			m_pGB_preview->FindInterface(IID_PPV_ARGS(&m_pMFVP_preview), TRUE);
 
 			if (m_pMFVDC_preview) {
 				RECT Rect;
@@ -14320,14 +14313,11 @@ void CMainFrame::CloseMediaPrivate()
 
 	if (m_pGB_preview) {
 		PreviewWindowHide();
-		m_pMFVP_preview.Release();
 		m_pMFVDC_preview.Release();
 
-		m_pFS_preview.Release();
 		m_pMS_preview.Release();
 		m_pBV_preview.Release();
 		m_pVW_preview.Release();
-		m_pME_preview.Release();
 		m_pMC_preview.Release();
 
 		if (m_pDVDC_preview) {
