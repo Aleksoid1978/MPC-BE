@@ -1,14 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Configuration" Condition="'$(VisualStudioVersion)' == '15.0'">
-    <WindowsTargetPlatformVersion Condition="'$(MPCBE_WINSDK_VER)' == ''">10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(VisualStudioVersion)' == '16.0'">
-    <WindowsTargetPlatformVersion Condition="'$(MPCBE_WINSDK_VER)' == ''">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <PlatformToolset>v142</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup>
-    <WindowsTargetPlatformVersion Condition="'$(MPCBE_WINSDK_VER)' != ''">$(MPCBE_WINSDK_VER)</WindowsTargetPlatformVersion>
   </PropertyGroup>
 </Project>
