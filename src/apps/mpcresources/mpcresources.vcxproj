@@ -363,7 +363,7 @@
       <SetChecksum>true</SetChecksum>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>..\..\..\include;..\mplayerc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;..\mplayerc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
