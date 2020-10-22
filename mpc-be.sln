@@ -164,11 +164,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\IChapterInfo.h = include\IChapterInfo.h
 		include\IFilterVersion.h = include\IFilterVersion.h
 		include\IKeyFrameInfo.h = include\IKeyFrameInfo.h
+		include\IMediaSample3D.h = include\IMediaSample3D.h
 		include\IMediaSideData.h = include\IMediaSideData.h
+		include\inttypes.h = include\inttypes.h
 		include\ITrackInfo.h = include\ITrackInfo.h
+		include\LAVVideoSettings.h = include\LAVVideoSettings.h
+		include\libdivide.h = include\libdivide.h
 		include\MediaOffset3D.h = include\MediaOffset3D.h
 		include\moreuuids.h = include\moreuuids.h
 		include\mpc_defines.h = include\mpc_defines.h
+		include\mvrInterfaces.h = include\mvrInterfaces.h
+		include\stdafx_common.h = include\stdafx_common.h
+		include\stdafx_common_dshow.h = include\stdafx_common_dshow.h
+		include\SubRenderIntf.h = include\SubRenderIntf.h
+		include\Utf8.h = include\Utf8.h
 		include\Version.h = include\Version.h
 	EndProjectSection
 EndProject
