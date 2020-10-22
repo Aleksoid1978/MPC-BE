@@ -63,6 +63,7 @@ BOOL CPPageMouse::OnInitDialog()
 	SelectByItemData(m_cmbLeftBottonClick, s.nMouseLeftClick);
 
 	AddStringData(m_cmbLeftBottonDblClick, L"---", 0);
+	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
 	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
 	SelectByItemData(m_cmbLeftBottonDblClick, s.nMouseLeftDblClick);
 
