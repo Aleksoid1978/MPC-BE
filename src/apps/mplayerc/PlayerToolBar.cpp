@@ -997,11 +997,11 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	case ID_FILE_OPENQUICK:
 		m_strTipText = ResStr(IDS_MPLAYERC_0) + L" | " + ResStr(IDS_RECENT_FILES);
 		break;
-	case ID_NAVIGATE_SKIPFORWARD:
-		m_strTipText = ResStr(IDS_AG_NEXT);
-		break;
 	case ID_NAVIGATE_SKIPBACK:
-		m_strTipText = ResStr(IDS_AG_PREVIOUS);
+		m_strTipText = ResStr(IDS_AG_PREVIOUS) + L" | " + ResStr(IDS_AG_PREVIOUS_FILE);
+		break;
+	case ID_NAVIGATE_SKIPFORWARD:
+		m_strTipText = ResStr(IDS_AG_NEXT) + L" | " + ResStr(IDS_AG_NEXT_FILE);
 		break;
 	case ID_NAVIGATE_SUBTITLES:
 		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + L" | " + ResStr(IDS_AG_OPTIONS);
@@ -1025,6 +1025,10 @@ void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
 
 	if (Idx == 1) {
 		m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
+	} else if (Idx == 3) {
+		m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPBACKFILE);
+	} else if (Idx == 4) {
+		m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPFORWARDFILE);
 	} else if (Idx == 5) {
 		m_pMainFrame->OnMenuNavJumpTo();
 	} else if (Idx == 6) {
