@@ -22,9 +22,9 @@
 #pragma once
 
 #include "SharedInclude.h"
-#include "../../include/stdafx_common.h"
+#include "stdafx_common.h"
 #include <afxwin.h>                         // MFC core and standard components
-#include "../../include/stdafx_common_dshow.h"
+#include "stdafx_common_dshow.h"
 
 #include <algorithm>
 #include <vector>

@@ -32,8 +32,8 @@
 #include <afxcmn.h>
 
 #include "../../../DSUtil/SharedInclude.h"
-#include "../../../../include/stdafx_common.h"
-#include "../../../../include/stdafx_common_dshow.h"
+#include "stdafx_common.h"
+#include "stdafx_common_dshow.h"
 
 #include <algorithm>
 #include <vector>
