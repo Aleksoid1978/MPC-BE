@@ -79,6 +79,8 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_PREVIOUS), ID_NAVIGATE_SKIPBACK);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
+	AddStringData(m_cmbXButton1, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
+	AddStringData(m_cmbXButton1, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
 	SelectByItemData(m_cmbXButton1, s.nMouseX1Click);
 
 	AddStringData(m_cmbXButton2, L"---", 0);
@@ -86,6 +88,8 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS), ID_NAVIGATE_SKIPBACK);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
+	AddStringData(m_cmbXButton2, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
+	AddStringData(m_cmbXButton2, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
 	SelectByItemData(m_cmbXButton2, s.nMouseX2Click);
 
 	AddStringData(m_cmbWheelUp, L"---", 0);
