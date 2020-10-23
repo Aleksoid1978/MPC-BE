@@ -38,7 +38,7 @@
 // disable conflicting defines
 #undef DrawText
 
-#include "../../DSUtil/SharedInclude.h"
+#include "stdafx_common_cfg.h"
 #include "stdafx_common_dshow.h"
 
 #include <algorithm>

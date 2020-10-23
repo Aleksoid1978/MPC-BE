@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,6 @@
 
 #pragma once
 
-#include "../../../../DSUtil/SharedInclude.h"
+#include "stdafx_common_cfg.h"
 #include <stdafx_common.h>
 #include <stdafx_common_dshow.h>
