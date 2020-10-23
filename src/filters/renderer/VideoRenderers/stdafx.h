@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../../../DSUtil/SharedInclude.h"
+#include "stdafx_common_cfg.h"
 
 #define VC_EXTRALEAN	// Exclude rarely-used stuff from Windows headers
 

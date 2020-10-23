@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../../DSUtil/SharedInclude.h"
+#include "stdafx_common_cfg.h"
 #include "stdafx_common.h"
 #include <afxwin.h>                         // MFC core and standard components
 #include "stdafx_common_dshow.h"
