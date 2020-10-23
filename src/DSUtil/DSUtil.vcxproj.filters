@@ -151,9 +151,6 @@
     <ClInclude Include="NullRenderers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SharedInclude.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>

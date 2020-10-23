@@ -121,7 +121,6 @@
     <ClInclude Include="PixelUtils_VirtualDub.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="ResampleRGB32.h" />
-    <ClInclude Include="SharedInclude.h" />
     <ClInclude Include="SimpleBuffer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="std_helper.h" />
