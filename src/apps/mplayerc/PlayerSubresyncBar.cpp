@@ -175,7 +175,7 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 	m_pSubStream->GetClassID(&clsid);
 
 	if (clsid == __uuidof(CVobSubFile)) {
-		CVobSubFile* pVSF = (CVobSubFile*)(ISubStream*)m_pSubStream;
+		CVobSubFile* pVSF = (CVobSubFile*)m_pSubStream.p;
 
 		m_mode = VOBSUB;
 
@@ -203,7 +203,7 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 		m_list.InsertColumn(COL_CELLID, ResStr(IDS_SUBRESYNC_CLN_CELL_ID), LVCFMT_CENTER, 60);
 		m_list.InsertColumn(COL_FORCED, ResStr(IDS_SUBRESYNC_CLN_FORCED), LVCFMT_CENTER, 60);
 	} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
-		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 		m_mode = TEXTSUB;
 
@@ -289,7 +289,7 @@ void CPlayerSubresyncBar::SaveSubtitle()
 	m_pSubStream->GetClassID(&clsid);
 
 	if (clsid == __uuidof(CVobSubFile) && m_mode == VOBSUB) {
-		CVobSubFile* pVSF = (CVobSubFile*)(ISubStream*)m_pSubStream;
+		CVobSubFile* pVSF = (CVobSubFile*)m_pSubStream.p;
 
 		CAutoLock cAutoLock(m_pSubLock);
 
@@ -312,7 +312,7 @@ void CPlayerSubresyncBar::SaveSubtitle()
 			sp[spnum].fValid = true;
 		}
 	} else if (clsid == __uuidof(CRenderedTextSubtitle) && m_mode == TEXTSUB) {
-		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 		CAutoLock cAutoLock(m_pSubLock);
 

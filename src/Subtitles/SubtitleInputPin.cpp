@@ -102,7 +102,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 		if (!(m_pSubStream = DNew CRenderedTextSubtitle(m_pSubLock))) {
 			return E_FAIL;
 		}
-		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 		pRTS->SetName(CString(GetPinName(pReceivePin)) + L" (embeded)");
 		pRTS->m_dstScreenSize = DEFSCREENSIZE;
 		pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
@@ -153,7 +153,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			if (!(m_pSubStream = DNew CRenderedTextSubtitle(m_pSubLock))) {
 				return E_FAIL;
 			}
-			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 			pRTS->SetName(name);
 			pRTS->m_lcid = lcid;
 			pRTS->m_dstScreenSize = DEFSCREENSIZE;
@@ -176,7 +176,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			if (!(m_pSubStream = DNew CVobSubStream(m_pSubLock))) {
 				return E_FAIL;
 			}
-			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
+			CVobSubStream* pVSS = (CVobSubStream*)m_pSubStream.p;
 			pVSS->Open(name, m_mt.pbFormat + dwOffset, m_mt.cbFormat - dwOffset);
 		} else if (IsHdmvSub(&m_mt)) {
 			if (!(m_pSubStream = DNew CRenderedHdmvSubtitle(m_pSubLock, (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) ? ST_DVB : ST_HDMV, name, lcid))) {
@@ -186,7 +186,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			if (!(m_pSubStream = DNew CVobSubStream(m_pSubLock))) {
 				return E_FAIL;
 			}
-			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
+			CVobSubStream* pVSS = (CVobSubStream*)m_pSubStream.p;
 
 			int x, y, arx, ary;
 			ExtractDim(&m_mt, x, y, arx, ary);
@@ -255,21 +255,21 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 				|| m_mt.subtype == MEDIASUBTYPE_ASS
 				|| m_mt.subtype == MEDIASUBTYPE_ASS2))) {
 		CAutoLock cAutoLock(m_pSubLock);
-		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 		pRTS->RemoveAll();
 		pRTS->CreateSegments();
 	} else if ((m_mt.majortype == MEDIATYPE_Subtitle && m_mt.subtype == MEDIASUBTYPE_VOBSUB)
 				|| (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
 		CAutoLock cAutoLock(m_pSubLock);
-		CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
+		CVobSubStream* pVSS = (CVobSubStream*)m_pSubStream.p;
 		pVSS->RemoveAll();
 	} else if (IsHdmvSub(&m_mt)) {
 		CAutoLock cAutoLock(m_pSubLock);
-		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
+		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)m_pSubStream.p;
 		pHdmvSubtitle->NewSegment(tStart, tStop, dRate);
 	} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
 		CAutoLock cAutoLock(m_pSubLock);
-		CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
+		CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)m_pSubStream.p;
 		pXSUBSubtitle->NewSegment(tStart, tStop, dRate);
 	}
 
@@ -376,7 +376,7 @@ void  CSubtitleInputPin::DecodeSamples()
 					}
 				} else { // marker for end of stream
 					if (IsHdmvSub(&m_mt)) {
-						CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
+						CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)m_pSubStream.p;
 						pHdmvSubtitle->EndOfStream();
 					}
 				}
@@ -406,7 +406,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 
 	if (m_mt.majortype == MEDIATYPE_Text) {
 		CAutoLock cAutoLock(m_pSubLock);
-		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 		if (!strncmp((char*)pData, __GAB1__, strlen(__GAB1__))) {
 			char* ptr = (char*)&pData[strlen(__GAB1__)+1];
@@ -469,7 +469,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 		CAutoLock cAutoLock(m_pSubLock);
 
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
-			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen)).Trim();
 			if (!str.IsEmpty()) {
@@ -477,7 +477,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 				bInvalidate = true;
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS || m_mt.subtype == MEDIASUBTYPE_ASS2) {
-			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
+			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen)).Trim();
 			if (!str.IsEmpty()) {
@@ -512,13 +512,13 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_VOBSUB
 				   || (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
-			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
+			CVobSubStream* pVSS = (CVobSubStream*)m_pSubStream.p;
 			pVSS->Add(tStart, tStop, pData, nLen);
 		} else if (IsHdmvSub(&m_mt)) {
-			CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
+			CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)m_pSubStream.p;
 			pHdmvSubtitle->ParseSample(pData, nLen, tStart, tStop);
 		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
-			CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
+			CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)m_pSubStream.p;
 			pXSUBSubtitle->ParseSample(pData, nLen);
 		}
 	}

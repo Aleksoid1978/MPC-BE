@@ -6576,7 +6576,7 @@ void CMainFrame::OnFileSaveSubtitle()
 			}
 		}
 
-		if (auto pVSF = dynamic_cast<CVobSubFile*>((ISubStream*)m_pCurrentSubStream)) {
+		if (auto pVSF = dynamic_cast<CVobSubFile*>(m_pCurrentSubStream.p)) {
 			// remember to set lpszDefExt to the first extension in the filter so that the save dialog autocompletes the extension
 			// and tracks attempts to overwrite in a graceful manner
 			CFileDialog fd(FALSE, L"idx", suggestedFileName,
@@ -6589,7 +6589,7 @@ void CMainFrame::OnFileSaveSubtitle()
 			}
 
 			return;
-		} else if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+		} else if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 			const Subtitle::SubType types[] = {
 				Subtitle::SRT,
 				Subtitle::SSA,
@@ -6629,9 +6629,9 @@ void CMainFrame::OnUpdateFileSaveSubtitle(CCmdUI* pCmdUI)
 {
 	BOOL bEnable = FALSE;
 
-	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 		bEnable = !pRTS->IsEmpty();
-	} else if (dynamic_cast<CVobSubFile*>((ISubStream*)m_pCurrentSubStream)) {
+	} else if (dynamic_cast<CVobSubFile*>(m_pCurrentSubStream.p)) {
 		bEnable = TRUE;
 	}
 
@@ -8662,7 +8662,7 @@ void CMainFrame::OnUpdateSubtitlesEnable(CCmdUI* pCmdUI)
 
 void CMainFrame::OnMenuSubtitlesStyle()
 {
-	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 		CAutoPtrArray<CPPageSubStyle> pages;
 		std::vector<STSStyle*> styles;
 
@@ -8697,7 +8697,7 @@ void CMainFrame::OnMenuSubtitlesStyle()
 
 void CMainFrame::OnUpdateSubtitlesStyle(CCmdUI* pCmdUI)
 {
-	if (dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+	if (dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 		pCmdUI->Enable(TRUE);
 	} else {
 		pCmdUI->Enable(FALSE);
@@ -10384,7 +10384,7 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 void CMainFrame::OnSubCopyClipboard()
 {
 	if (m_pCAP && GetPlaybackMode() == PM_FILE && m_pMS) {
-		if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+		if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 			REFERENCE_TIME rtNow = 0;
 			m_pMS->GetCurrentPosition(&rtNow);
 			rtNow -= 10000i64 * m_pCAP->GetSubtitleDelay();
@@ -16103,11 +16103,11 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 			pSubStream->GetClassID(&clsid);
 
 			if (clsid == __uuidof(CVobSubFile) || clsid == __uuidof(CVobSubStream)) {
-				if (auto pVSS = dynamic_cast<CVobSubSettings*>((ISubStream*)pSubStream)) {
+				if (auto pVSS = dynamic_cast<CVobSubSettings*>(pSubStream)) {
 					pVSS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
 				}
 			} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
-				CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)pSubStream;
+				CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)pSubStream;
 
 				STSStyle style = s.subdefstyle;
 
@@ -16247,7 +16247,7 @@ void CMainFrame::ReplaceSubtitle(ISubStream* pSubStreamOld, ISubStream* pSubStre
 void CMainFrame::InvalidateSubtitle(DWORD_PTR nSubtitleId, REFERENCE_TIME rtInvalidate)
 {
 	if (m_pCAP) {
-		if (nSubtitleId == -1 || nSubtitleId == (DWORD_PTR)(ISubStream*)m_pCurrentSubStream) {
+		if (nSubtitleId == -1 || nSubtitleId == (DWORD_PTR)m_pCurrentSubStream.p) {
 			m_pCAP->Invalidate(rtInvalidate);
 		}
 	}
@@ -16321,7 +16321,7 @@ void CMainFrame::ToggleSubtitleOnOff(bool bDisplayMessage/* = false*/)
 void CMainFrame::UpdateSubDefaultStyle()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 		{
 			CAutoLock cAutoLock(&m_csSubLock);
 
@@ -16332,7 +16332,7 @@ void CMainFrame::UpdateSubDefaultStyle()
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);
 		}
-	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+	} else if (dynamic_cast<CRenderedHdmvSubtitle*>(m_pCurrentSubStream.p)) {
 		s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
