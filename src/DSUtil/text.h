@@ -21,32 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
-
-template<class T, typename SEP>
-std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
-Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
-{
-	static_assert(sizeof(SEP) <= 2); // SEP must be char or wchar_t
-	sl.RemoveAll();
-	if (str.IsEmpty()) {
-		return T();
-	}
-
-	for (int i = 0, j = 0; ; i = j + 1) {
-		j = str.Find(sep, i);
-
-		if (j < 0 || sl.GetCount() == limit - 1) {
-			sl.AddTail(str.Mid(i).Trim());
-			break;
-		} else {
-			sl.AddTail(str.Mid(i, j - i).Trim());
-		}
-	}
-
-	return sl.GetHead();
-}
-
 template<class T, typename SEP>
 std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
