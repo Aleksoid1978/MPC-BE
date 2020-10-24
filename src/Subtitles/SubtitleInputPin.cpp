@@ -485,21 +485,23 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 
 				int fields = m_mt.subtype == MEDIASUBTYPE_ASS2 ? 10 : 9;
 
-				CAtlList<CStringW> sl;
+				std::list<CStringW> sl;
 				Explode(str, sl, L',', fields);
-				if (sl.GetCount() == (size_t)fields) {
-					stse.readorder = wcstol(sl.RemoveHead(), NULL, 10);
-					stse.layer = wcstol(sl.RemoveHead(), NULL, 10);
-					stse.style = sl.RemoveHead();
-					stse.actor = sl.RemoveHead();
-					stse.marginRect.left = wcstol(sl.RemoveHead(), NULL, 10);
-					stse.marginRect.right = wcstol(sl.RemoveHead(), NULL, 10);
-					stse.marginRect.top = stse.marginRect.bottom = wcstol(sl.RemoveHead(), NULL, 10);
+				if (sl.size() == (size_t)fields) {
+					auto it = sl.cbegin();
+
+					stse.readorder = wcstol(*it++, NULL, 10);
+					stse.layer = wcstol(*it++, NULL, 10);
+					stse.style = *it++;
+					stse.actor = *it++;
+					stse.marginRect.left = wcstol(*it++, NULL, 10);
+					stse.marginRect.right = wcstol(*it++, NULL, 10);
+					stse.marginRect.top = stse.marginRect.bottom = wcstol(*it++, NULL, 10);
 					if (fields == 10) {
-						stse.marginRect.bottom = wcstol(sl.RemoveHead(), NULL, 10);
+						stse.marginRect.bottom = wcstol(*it++, NULL, 10);
 					}
-					stse.effect = sl.RemoveHead();
-					stse.str = sl.RemoveHead();
+					stse.effect = *it++;
+					stse.str = *it++;
 				}
 
 				if (!stse.str.IsEmpty()) {

@@ -35,6 +35,7 @@
 #include <list>
 #include <memory>
 
+#include <atlcoll.h>
 #include "../../../DSUtil/DSUtil.h"
 
 #define CHECK_HR(exp) { if (FAILED(hr = exp)) return hr; }
