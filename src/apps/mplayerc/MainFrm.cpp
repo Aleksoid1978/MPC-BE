@@ -15994,25 +15994,25 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 	try {
 		const CString videoName = GetPlaybackMode() == PM_FILE ? GetCurFileName() : L"";
 		if (!pSubStream) {
-			CComPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
+			auto pRHS = std::make_unique<CRenderedHdmvSubtitle>(&m_csSubLock);
 			if (pRHS && GetFileExt(fname).MakeLower() == L".sup") {
 				if (pRHS->Open(fname, subItem.GetTitle(), videoName)) {
-					pSubStream = pRHS.Detach();
+					pSubStream = pRHS.release();
 				}
 			}
 		}
 
 		if (!pSubStream) {
-			CComPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
+			auto pVSF = std::make_unique<CVobSubFile>(&m_csSubLock);
 			if (GetFileExt(fname).MakeLower() == L".idx" && pVSF && pVSF->Open(fname) && pVSF->GetStreamCount() > 0) {
-				pSubStream = pVSF.Detach();
+				pSubStream = pVSF.release();
 			}
 		}
 
 		if (!pSubStream) {
-			CComPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
+			auto pRTS = std::make_unique<CRenderedTextSubtitle>(&m_csSubLock);
 			if (pRTS && pRTS->Open(fname, DEFAULT_CHARSET, subItem.GetTitle(), videoName) && pRTS->GetStreamCount() > 0) {
-				pSubStream = pRTS.Detach();
+				pSubStream = pRTS.release();
 			}
 		}
 	} catch (CException* e) {
