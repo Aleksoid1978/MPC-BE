@@ -15994,7 +15994,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 	try {
 		const CString videoName = GetPlaybackMode() == PM_FILE ? GetCurFileName() : L"";
 		if (!pSubStream) {
-			CAutoPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
+			CComPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
 			if (pRHS && GetFileExt(fname).MakeLower() == L".sup") {
 				if (pRHS->Open(fname, subItem.GetTitle(), videoName)) {
 					pSubStream = pRHS.Detach();
@@ -16003,14 +16003,14 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 		}
 
 		if (!pSubStream) {
-			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
+			CComPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
 			if (GetFileExt(fname).MakeLower() == L".idx" && pVSF && pVSF->Open(fname) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
 			}
 		}
 
 		if (!pSubStream) {
-			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
+			CComPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
 			if (pRTS && pRTS->Open(fname, DEFAULT_CHARSET, subItem.GetTitle(), videoName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
 			}
