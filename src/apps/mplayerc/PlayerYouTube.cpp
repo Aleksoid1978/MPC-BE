@@ -51,6 +51,7 @@
 #define MATCH_STREAM_MAP_START_2    "url_encoded_fmt_stream_map="
 #define MATCH_ADAPTIVE_FMTS_START_2 "adaptive_fmts="
 #define MATCH_JS_START_2            "'PREFETCH_JS_RESOURCES': [\""
+#define MATCH_JS_START_3            "\"PLAYER_JS_URL\":\""
 #define MATCH_END_2                 "&"
 
 #define MATCH_PLAYER_RESPONSE       "\"player_response\":\""
@@ -457,6 +458,9 @@ namespace Youtube
 			CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
 			if (JSUrl.IsEmpty()) {
 				JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
+				if (JSUrl.IsEmpty()) {
+					JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_3, MATCH_END));
+				}
 			}
 
 			rapidjson::Document player_response_jsonDocument;
