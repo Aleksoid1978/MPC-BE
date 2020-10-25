@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -773,7 +773,7 @@ bool CVobSubFileRipper::Create()
 						sb.vobid = (char)vob;
 						sb.cellid = (char)cell;
 						sb.celltimestamp = tTotal;
-						sb.fValid = true;
+						sb.bValid = true;
 						m_langs[iLang].subpos.push_back(sb);
 					}
 
@@ -810,8 +810,8 @@ bool CVobSubFileRipper::Create()
 	Progress(1);
 
 	for (ptrdiff_t i = 0; i < 32; i++) {
-		if (m_iLang == -1 && m_langs[i].subpos.size() > 0) {
-			m_iLang = (int)i;
+		if (m_nLang == -1 && m_langs[i].subpos.size() > 0) {
+			m_nLang = (int)i;
 		}
 		m_langs[i].id = pgc.ids[i];
 		m_langs[i].name = m_langs[i].alt = FindLangFromId(m_langs[i].id);
@@ -826,11 +826,11 @@ bool CVobSubFileRipper::Create()
 			for (ptrdiff_t j = 0, len = sp.size(); j < len; j++) {
 				Progress(1.0 * j / len);
 
-				sp[j].fValid = false;
+				sp[j].bValid = false;
 				int packetsize = 0, datasize = 0;
 				if (BYTE* buff = GetPacket((int)j, packetsize, datasize, (int)i)) {
 					m_img.GetPacketInfo(buff, packetsize, datasize);
-					sp[j].fValid = m_img.fForced;
+					sp[j].bValid = m_img.fForced;
 					delete [] buff;
 				}
 			}
@@ -841,7 +841,7 @@ bool CVobSubFileRipper::Create()
 
 	Log(LOG_INFO, L"Saving files...");
 
-	if (m_iLang != -1) {
+	if (m_nLang != -1) {
 		if (!Save(m_title)) {
 			Log(LOG_ERROR, L"Could not save output files!");
 			return false;
