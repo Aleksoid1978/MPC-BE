@@ -1923,7 +1923,7 @@ bool CDirectVobSubFilter::Open()
 		CComPtr<ISubStream> pSubStream;
 
 		if (!pSubStream) {
-			CAutoPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
+			CComPtr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
 			if (pRHS && GetFileExt(sub_fn).MakeLower() == L".sup") {
 				if (pRHS->Open(sub_fn, L"", m_videoFileName)) {
 					pSubStream = pRHS.Detach();
@@ -1932,7 +1932,7 @@ bool CDirectVobSubFilter::Open()
 		}
 
 		if (!pSubStream) {
-			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
+			CComPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
 			if (pVSF && pVSF->Open(sub_fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
 				m_frd.files.push_back(sub_fn.Left(sub_fn.GetLength() - 4) + L".sub");
@@ -1940,7 +1940,7 @@ bool CDirectVobSubFilter::Open()
 		}
 
 		if (!pSubStream) {
-			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
+			CComPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
 			if (pRTS && pRTS->Open(sub_fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
 				m_frd.files.push_back(sub_fn + L".style");

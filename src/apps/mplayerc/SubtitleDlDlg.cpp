@@ -458,7 +458,7 @@ void CSubtitleDlDlg::OnOK()
 				return;
 			}
 
-			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&pFrame->m_csSubLock));
+			CComPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&pFrame->m_csSubLock));
 			if (pRTS && pRTS->Open((BYTE*)(LPCSTR)str, str.GetLength(), DEFAULT_CHARSET, CString(sub.name)) && pRTS->GetStreamCount() > 0) {
 				CComPtr<ISubStream> pSubStream = pRTS.Detach();
 				pFrame->m_pSubStreams.AddTail(pSubStream);
