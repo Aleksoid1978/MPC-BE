@@ -179,18 +179,18 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 
 		m_mode = VOBSUB;
 
-		ASSERT(pVSF->m_iLang >= 0);
-		std::vector<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
+		ASSERT(pVSF->m_nLang >= 0);
+		std::vector<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_nLang].subpos;
 
 		for (size_t i = 0, j = sp.size(); i < j; i++) {
 			CString str;
-			str.Format(L"%d,%d,%d,%Iu", sp[i].vobid, sp[i].cellid, sp[i].fForced, i);
+			str.Format(L"%d,%d,%d,%Iu", sp[i].vobid, sp[i].cellid, sp[i].bForced, i);
 			m_sts.Add(str, false, (int)sp[i].start, (int)sp[i].stop);
 		}
 
 		m_sts.CreateDefaultStyle(DEFAULT_CHARSET);
 
-		pVSF->m_fOnlyShowForcedSubs = false;
+		pVSF->m_bOnlyShowForcedSubs = false;
 
 		for (int i = 0, j = m_list.GetHeaderCtrl()->GetItemCount(); i < j; i++) {
 			m_list.DeleteColumn(0);
@@ -293,11 +293,11 @@ void CPlayerSubresyncBar::SaveSubtitle()
 
 		CAutoLock cAutoLock(m_pSubLock);
 
-		ASSERT(pVSF->m_iLang >= 0);
-		std::vector<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
+		ASSERT(pVSF->m_nLang >= 0);
+		std::vector<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_nLang].subpos;
 
 		for (size_t i = 0, j = sp.size(); i < j; i++) {
-			sp[i].fValid = false;
+			sp[i].bValid = false;
 		}
 
 		for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
@@ -309,7 +309,7 @@ void CPlayerSubresyncBar::SaveSubtitle()
 			}
 			sp[spnum].start = m_sts[i].start;
 			sp[spnum].stop = m_sts[i].end;
-			sp[spnum].fValid = true;
+			sp[spnum].bValid = true;
 		}
 	} else if (clsid == __uuidof(CRenderedTextSubtitle) && m_mode == TEXTSUB) {
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;

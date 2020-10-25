@@ -2012,7 +2012,7 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
 		if (clsid == __uuidof(CVobSubFile) || clsid == __uuidof(CVobSubStream)) {
 			if (auto pVSS = dynamic_cast<CVobSubSettings*>(pSubStream)) {
 				pVSS->SetAlignment(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc);
-				pVSS->m_fOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
+				pVSS->m_bOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
 			}
 		} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)pSubStream;
