@@ -458,7 +458,7 @@ void CSubtitleDlDlg::OnOK()
 				return;
 			}
 
-			auto pRTS = std::make_unique<CRenderedTextSubtitle>(&pFrame->m_csSubLock);
+			std::unique_ptr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&pFrame->m_csSubLock));
 			if (pRTS && pRTS->Open((BYTE*)(LPCSTR)str, str.GetLength(), DEFAULT_CHARSET, CString(sub.name)) && pRTS->GetStreamCount() > 0) {
 				CComPtr<ISubStream> pSubStream = pRTS.release();
 				pFrame->m_pSubStreams.AddTail(pSubStream);
