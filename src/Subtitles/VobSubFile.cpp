@@ -363,7 +363,7 @@ bool CVobSubFile::Open(CString fn)
 				}
 
 				sp[j].stop = sp[j].start + m_img.delay;
-				sp[j].bForced = m_img.fForced;
+				sp[j].bForced = m_img.bForced;
 				sp[j].bAnimated = m_img.bAnimated;
 
 				if (j > 0 && sp[j-1].stop > sp[j].start) {
@@ -1199,7 +1199,7 @@ bool CVobSubFile::GetFrame(int idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1
 		return false;
 	}
 
-	if (m_img.iLang != iLang || m_img.iIdx != idx
+	if (m_img.nLang != iLang || m_img.nIdx != idx
 			|| (sp[idx].bAnimated && sp[idx].start + m_img.tCurrent <= rt)) {
 		int packetsize = 0, datasize = 0;
 		CAutoVectorPtr<BYTE> buff;
@@ -1219,11 +1219,11 @@ bool CVobSubFile::GetFrame(int idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1
 			return false;
 		}
 
-		m_img.iIdx = idx;
-		m_img.iLang = iLang;
+		m_img.nIdx = idx;
+		m_img.nLang = iLang;
 	}
 
-	return (m_bOnlyShowForcedSubs ? m_img.fForced : true);
+	return (m_bOnlyShowForcedSubs ? m_img.bForced : true);
 }
 
 bool CVobSubFile::GetFrameByTimeStamp(__int64 time)
@@ -2456,7 +2456,7 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 	p->tStart		= tStart;
 	p->tStop		= vsi.delay > 0 ? (tStart + 10000i64 * vsi.delay) : tStop;
 	p->bAnimated	= vsi.bAnimated;
-	p->bForced		= vsi.fForced;
+	p->bForced		= vsi.bForced;
 	if (p->tStop - p->tStart < UNITS/100) {
 		p->tStop	= _I64_MAX;
 	}
@@ -2466,7 +2466,7 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 	CAutoLock cAutoLock(&m_csSubPics);
 	while (m_subpics.GetCount() && m_subpics.GetTail()->tStart >= tStart) {
 		m_subpics.RemoveTailNoReturn();
-		m_img.iIdx = -1;
+		m_img.nIdx = -1;
 	}
 
 	// We can only render one subpicture at a time, thus if there is overlap
@@ -2485,7 +2485,7 @@ void CVobSubStream::RemoveAll()
 {
 	CAutoLock cAutoLock(&m_csSubPics);
 	m_subpics.RemoveAll();
-	m_img.iIdx = -1;
+	m_img.nIdx = -1;
 }
 
 STDMETHODIMP CVobSubStream::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -2556,12 +2556,12 @@ STDMETHODIMP CVobSubStream::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 	for (; pos; m_subpics.GetPrev(pos)) {
 		SubPic* sp = m_subpics.GetAt(pos);
 		if (sp->tStart <= rt && rt < sp->tStop) {
-			if (m_img.iIdx != (int)pos || (sp->bAnimated && sp->tStart + m_img.tCurrent * 10000i64 <= rt)) {
+			if (m_img.nIdx != (int)pos || (sp->bAnimated && sp->tStart + m_img.tCurrent * 10000i64 <= rt)) {
 				BYTE* pData = sp->pData.GetData();
 				m_img.Decode(
 					pData, (pData[0] << 8) | pData[1], (pData[2] << 8) | pData[3], int((rt - sp->tStart) / 10000i64),
 					m_bCustomPal, m_tridx, m_orgpal, m_cuspal, true);
-				m_img.iIdx = (int)pos;
+				m_img.nIdx = (int)pos;
 			}
 
 			return __super::Render(spd, bbox);

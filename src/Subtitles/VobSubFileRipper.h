@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,8 +26,7 @@
 #include "VobSubFile.h"
 
 #pragma pack(push, 1)
-
-typedef struct {
+struct vidinfo {
 	WORD perm_displ       : 2;
 	WORD ratio            : 2;
 	WORD system           : 2;
@@ -38,46 +37,45 @@ typedef struct {
 	WORD cbrvbr           : 2;
 	WORD line21_2         : 1;
 	WORD line21_1         : 1;
-} vidinfo;
+};
 
-typedef struct {
+struct vc_t {
 	BYTE vob, cell;
 	DWORD tTime, tOffset, tTotal;
 	DWORD start, end;
 	int iAngle;
-	bool fDiscontinuity;
-} vc_t;
+	bool bDiscontinuity;
+};
 
-typedef struct {
+struct PGC {
 	int nAngles;
 	CAtlArray<vc_t> angles[10];
 	int iSelAngle;
 	RGBQUAD pal[16];
 	WORD ids[32];
-} PGC;
+};
 
-typedef struct VSFRipperData_t {
+struct VSFRipperData {
 	CSize vidsize;
 	vidinfo vidinfo;
 	CAtlArray<PGC> pgcs;
 	int iSelPGC;
-	bool fResetTime, fClosedCaption, fForcedOnly;
+	bool bResetTime, bClosedCaption, bForcedOnly;
 
-	bool fClose, fBeep, fAuto; // only used by the UI externally, but may be set through the parameter file
-	bool fCloseIgnoreError;
+	bool bClose, bBeep, bAuto; // only used by the UI externally, but may be set through the parameter file
+	bool bCloseIgnoreError;
 
 	CAtlArray<UINT> selvcs;
 	CAtlMap<BYTE, bool> selids;
 
 	void Reset();
-	void Copy(struct VSFRipperData_t& rd);
+	void Copy(struct VSFRipperData& rd);
+};
 
-} VSFRipperData;
-
-typedef struct {
+struct vcchunk {
 	__int64 start, end;
 	DWORD vc;
-} vcchunk;
+};
 
 #pragma pack(pop)
 
@@ -88,11 +86,12 @@ typedef struct {
 //
 
 interface __declspec(uuid("9E2EBB5C-AD7C-452f-A48B-38685716AC46"))
-IVSFRipperCallback :
-public IUnknown {
+	IVSFRipperCallback :
+	public IUnknown
+{
 	STDMETHOD (OnMessage) (LPCWSTR msg) PURE;
-	STDMETHOD (OnProgress) (double progress /*0->1*/) PURE;
-	STDMETHOD (OnFinished) (bool fSucceeded) PURE;
+	STDMETHOD (OnProgress) (double progress /*0.0 -> 1.0*/) PURE;
+	STDMETHOD (OnFinished) (bool bSucceeded) PURE;
 };
 
 // IVSFRipperCallbackImpl
@@ -112,18 +111,12 @@ protected:
 	}
 
 	// IVSFRipperCallback
-	STDMETHODIMP OnMessage(LPCWSTR msg) {
-		return S_FALSE;
-	}
-	STDMETHODIMP OnProgress(double progress /*0->1*/) {
-		return S_FALSE;
-	}
-	STDMETHODIMP OnFinished(bool fSucceeded) {
-		return S_FALSE;
-	}
+	STDMETHODIMP OnMessage(LPCWSTR msg) { return S_FALSE; }
+	STDMETHODIMP OnProgress(double progress /*0.0 -> 1.0*/) { return S_FALSE; }
+	STDMETHODIMP OnFinished(bool bSucceeded) { return S_FALSE; }
 
 public:
-	IVSFRipperCallbackImpl() : CUnknown(L"IVSFRipperCallbackImpl", NULL) {}
+	IVSFRipperCallbackImpl() : CUnknown(L"IVSFRipperCallbackImpl", nullptr) {}
 };
 
 //
@@ -131,8 +124,9 @@ public:
 //
 
 interface __declspec(uuid("69F935BB-B8D0-43f5-AA2E-BBD0851CC9A6"))
-IVSFRipper :
-public IUnknown {
+	IVSFRipper :
+	public IUnknown
+{
 	STDMETHOD (SetCallBack) (IVSFRipperCallback* pCallback) PURE;
 	STDMETHOD (LoadParamFile) (CString fn) PURE;
 	STDMETHOD (SetInput) (CString infn) PURE;
@@ -141,23 +135,27 @@ public IUnknown {
 	STDMETHOD (UpdateRipperData) (VSFRipperData& rd) PURE;
 	STDMETHOD (Index) () PURE;
 	STDMETHOD (IsIndexing) () PURE;
-	STDMETHOD (Abort) (bool fSavePartial) PURE;
+	STDMETHOD (Abort) (bool bSavePartial) PURE;
 };
 
 class CVobSubFileRipper : public CVobSubFile, protected CAMThread, public IVSFRipper
 {
 private:
-	bool m_fThreadActive, m_fBreakThread, m_fIndexing;
+	bool m_bThreadActive, m_bBreakThread, m_bIndexing;
 	enum {CMD_EXIT, CMD_INDEX};
 	DWORD ThreadProc();
 	bool Create();
 
 	//
 
-	typedef enum {LOG_INFO, LOG_WARNING, LOG_ERROR} log_t;
+	enum log_t {
+		LOG_INFO,
+		LOG_WARNING,
+		LOG_ERROR
+	};
 	void Log(log_t type, LPCWSTR lpszFormat, ...);
 	void Progress(double progress);
-	void Finished(bool fSucceeded);
+	void Finished(bool bSucceeded);
 
 	//
 
@@ -192,5 +190,5 @@ public:
 	STDMETHODIMP UpdateRipperData(VSFRipperData& rd);
 	STDMETHODIMP Index();
 	STDMETHODIMP IsIndexing();
-	STDMETHODIMP Abort(bool fSavePartial);
+	STDMETHODIMP Abort(bool bSavePartial);
 };
