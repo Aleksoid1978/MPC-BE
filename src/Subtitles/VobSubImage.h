@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,8 +46,8 @@ private:
 	RGBQUAD* lpTemp2;
 
 	WORD nOffset[2], nPlane;
-	bool fCustomPal;
-	char fAligned; // we are also using this for calculations, that's why it is char instead of bool...
+	bool bCustomPal;
+	char bAligned; // we are also using this for calculations, that's why it is char instead of bool...
 	int tridx;
 	RGBQUAD* orgpal /*[16]*/,* cuspal /*[4]*/;
 
@@ -55,12 +55,12 @@ private:
 	void Free();
 
 	BYTE GetNibble(const BYTE* lpData);
-	void DrawPixels(CPoint p, int length, int colorid);
+	void DrawPixels(CPoint p, int length, int colorId);
 	void TrimSubImage();
 
 public:
-	int iLang, iIdx;
-	bool fForced, bAnimated;
+	int nLang, nIdx;
+	bool bForced, bAnimated;
 	int tCurrent;
 	__int64 start, delay;
 	CRect rect;
@@ -73,16 +73,14 @@ public:
 	CVobSubImage();
 	virtual ~CVobSubImage();
 
-	void Invalidate() { iLang = iIdx = -1; }
+	void Invalidate() { nLang = nIdx = -1; }
 
-	void GetPacketInfo(const BYTE* lpData, int packetsize, int datasize, int t = INT_MAX);
-	bool Decode(BYTE* lpData, int packetsize, int datasize, int t,
-				bool fCustomPal,
+	void GetPacketInfo(const BYTE* lpData, int packetSize, int dataSize, int t = INT_MAX);
+	bool Decode(BYTE* lpData, int packetSize, int dataSize, int t,
+				bool bCustomPal,
 				int tridx,
 				RGBQUAD* orgpal /*[16]*/, RGBQUAD* cuspal /*[4]*/,
-				bool fTrim);
-
-	/////////
+				bool bTrim);
 
 private:
 	CAutoPtrList<COutline>* GetOutlineList(CPoint& topleft);
@@ -91,8 +89,8 @@ private:
 	void AddSegment(COutline& o, CAtlArray<BYTE>& pathTypes, CAtlArray<CPoint>& pathPoints);
 
 public:
-	bool Polygonize(CAtlArray<BYTE>& pathTypes, CAtlArray<CPoint>& pathPoints, bool fSmooth, int scale);
-	bool Polygonize(CStringW& assstr, bool fSmooth = true, int scale = 3);
+	bool Polygonize(CAtlArray<BYTE>& pathTypes, CAtlArray<CPoint>& pathPoints, bool bSmooth, int scale);
+	bool Polygonize(CStringW& assstr, bool bSmooth = true, int scale = 3);
 
 	void Scale2x();
 };
