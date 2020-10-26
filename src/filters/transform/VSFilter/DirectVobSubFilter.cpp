@@ -1920,31 +1920,34 @@ bool CDirectVobSubFilter::Open()
 			continue;
 		}
 
+		const CStringW ext = GetFileExt(sub_fn).MakeLower();
 		CComPtr<ISubStream> pSubStream;
 
-		if (!pSubStream) {
-			std::unique_ptr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
-			if (pRHS && GetFileExt(sub_fn).MakeLower() == L".sup") {
+		try {
+			if (!pSubStream && ext == L".sup") {
+				std::unique_ptr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
 				if (pRHS->Open(sub_fn, L"", m_videoFileName)) {
 					pSubStream = pRHS.release();
 				}
 			}
-		}
 
-		if (!pSubStream) {
-			std::unique_ptr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
-			if (pVSF && pVSF->Open(sub_fn) && pVSF->GetStreamCount() > 0) {
-				pSubStream = pVSF.release();
-				m_frd.files.push_back(sub_fn.Left(sub_fn.GetLength() - 4) + L".sub");
+			if (!pSubStream && ext == L".idx") {
+				std::unique_ptr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
+				if (pVSF->Open(sub_fn) && pVSF->GetStreamCount() > 0) {
+					pSubStream = pVSF.release();
+					m_frd.files.push_back(sub_fn.Left(sub_fn.GetLength() - 4) + L".sub");
+				}
 			}
-		}
 
-		if (!pSubStream) {
-			std::unique_ptr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
-			if (pRTS && pRTS->Open(sub_fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
-				pSubStream = pRTS.release();
-				m_frd.files.push_back(sub_fn + L".style");
+			if (!pSubStream) {
+				std::unique_ptr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
+				if (pRTS->Open(sub_fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
+					pSubStream = pRTS.release();
+					m_frd.files.push_back(sub_fn + L".style");
+				}
 			}
+		} catch (CException* e) {
+			e->Delete();
 		}
 
 		if (pSubStream) {

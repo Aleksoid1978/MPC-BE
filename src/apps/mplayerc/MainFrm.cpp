@@ -15965,9 +15965,10 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 	}
 
 	CComPtr<ISubStream> pSubStream;
-	CString fname = subItem;
+	const CStringW fname = subItem;
+	const CStringW ext = GetFileExt(fname).MakeLower();
 
-	if (GetFileExt(fname).MakeLower() == L".mks" && s.IsISRAutoLoadEnabled()) {
+	if (ext == L".mks" && s.IsISRAutoLoadEnabled()) {
 		if (CComQIPtr<IGraphBuilderSub> pGBS = m_pGB) {
 			HRESULT hr = pGBS->RenderSubFile(fname);
 			if (SUCCEEDED(hr)) {
@@ -15993,25 +15994,24 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 	// TMP: maybe this will catch something for those who get a runtime error dialog when opening subtitles from cds
 	try {
 		const CString videoName = GetPlaybackMode() == PM_FILE ? GetCurFileName() : L"";
-		if (!pSubStream) {
+
+		if (!pSubStream && ext == L".sup") {
 			std::unique_ptr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
-			if (pRHS && GetFileExt(fname).MakeLower() == L".sup") {
-				if (pRHS->Open(fname, subItem.GetTitle(), videoName)) {
-					pSubStream = pRHS.release();
-				}
+			if (pRHS->Open(fname, subItem.GetTitle(), videoName)) {
+				pSubStream = pRHS.release();
 			}
 		}
 
-		if (!pSubStream) {
+		if (!pSubStream && ext == L".idx") {
 			std::unique_ptr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
-			if (GetFileExt(fname).MakeLower() == L".idx" && pVSF && pVSF->Open(fname) && pVSF->GetStreamCount() > 0) {
+			if (pVSF->Open(fname) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.release();
 			}
 		}
 
 		if (!pSubStream) {
 			std::unique_ptr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
-			if (pRTS && pRTS->Open(fname, DEFAULT_CHARSET, subItem.GetTitle(), videoName) && pRTS->GetStreamCount() > 0) {
+			if (pRTS->Open(fname, DEFAULT_CHARSET, subItem.GetTitle(), videoName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.release();
 			}
 		}
