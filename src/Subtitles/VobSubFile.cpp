@@ -342,7 +342,7 @@ bool CVobSubFile::Open(CString fn)
 
 		m_title = fn;
 
-		for (int i = 0; i < std::size(m_langs); i++) {
+		for (int i = 0; i < (int)std::size(m_langs); i++) {
 			std::vector<SubPos>& sp = m_langs[i].subpos;
 
 			for (size_t j = 0; j < sp.size(); j++) {
@@ -1112,7 +1112,7 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int nLang)
 {
 	BYTE* ret = nullptr;
 
-	if (nLang < 0 || nLang >= std::size(m_langs)) {
+	if (nLang < 0 || nLang >= (int)std::size(m_langs)) {
 		nLang = m_nLang;
 	}
 	std::vector<SubPos>& sp = m_langs[nLang].subpos;
@@ -1174,7 +1174,7 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int nLang)
 
 const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(int idx, int iLang /*= -1*/) const
 {
-	if (iLang < 0 || iLang >= std::size(m_langs)) {
+	if (iLang < 0 || iLang >= (int)std::size(m_langs)) {
 		iLang = m_nLang;
 	}
 	const std::vector<SubPos>& sp = m_langs[iLang].subpos;
@@ -1190,7 +1190,7 @@ const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(int idx, int iLang /*= -1*/
 
 bool CVobSubFile::GetFrame(int idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1*/)
 {
-	if (iLang < 0 || iLang >= std::size(m_langs)) {
+	if (iLang < 0 || iLang >= (int)std::size(m_langs)) {
 		iLang = m_nLang;
 	}
 	std::vector<SubPos>& sp = m_langs[iLang].subpos;
@@ -1233,7 +1233,7 @@ bool CVobSubFile::GetFrameByTimeStamp(__int64 time)
 
 int CVobSubFile::GetFrameIdxByTimeStamp(__int64 time)
 {
-	if (m_nLang < 0 || m_nLang >= std::size(m_langs)) {
+	if (m_nLang < 0 || m_nLang >= (int)std::size(m_langs)) {
 		return -1;
 	}
 
@@ -1414,8 +1414,8 @@ STDMETHODIMP_(int) CVobSubFile::GetStream()
 {
 	int iStream = 0;
 
-	if (m_nLang < std::size(m_langs)) {
-		for (size_t i = 0; i < m_nLang; i++) {
+	if (m_nLang < (int)std::size(m_langs)) {
+		for (int i = 0; i < m_nLang; i++) {
 			if (!m_langs[i].subpos.empty()) {
 				iStream++;
 			}
@@ -1427,7 +1427,7 @@ STDMETHODIMP_(int) CVobSubFile::GetStream()
 
 STDMETHODIMP CVobSubFile::SetStream(int iStream)
 {
-	for (int i = 0; i < std::size(m_langs); i++) {
+	for (int i = 0; i < (int)std::size(m_langs); i++) {
 		std::vector<SubPos>& sp = m_langs[i].subpos;
 
 		if (sp.empty() || iStream-- > 0) {
