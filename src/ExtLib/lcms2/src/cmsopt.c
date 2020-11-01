@@ -941,9 +941,9 @@ void PrelinEval8(CMSREGISTER const cmsUInt16Number Input[],
     g = (cmsUInt8Number) (Input[1] >> 8);
     b = (cmsUInt8Number) (Input[2] >> 8);
 
-    X0 = X1 = (cmsS15Fixed16Number) p8->X0[r];
-    Y0 = Y1 = (cmsS15Fixed16Number) p8->Y0[g];
-    Z0 = Z1 = (cmsS15Fixed16Number) p8->Z0[b];
+    X0 = (cmsS15Fixed16Number) p8->X0[r];
+    Y0 = (cmsS15Fixed16Number) p8->Y0[g];
+    Z0 = (cmsS15Fixed16Number) p8->Z0[b];
 
     rx = p8 ->rx[r];
     ry = p8 ->ry[g];
