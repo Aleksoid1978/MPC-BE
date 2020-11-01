@@ -543,7 +543,7 @@ void File_AvsV::user_data_start()
 
     //But don't accept non-alpha caracters at the beginning (except for "3ivx")
     if (Library_End_Offset-Library_Start_Offset!=4 || CC4(Buffer+Buffer_Offset+Library_Start_Offset)!=0x33697678) //3ivx
-        while (Library_Start_Offset<Element_Size && Buffer[Buffer_Offset+Library_Start_Offset]<=0x40)
+        while (Library_Start_Offset<Library_End_Offset && Buffer[Buffer_Offset+Library_Start_Offset]<=0x40)
             Library_Start_Offset++;
 
     //Parsing

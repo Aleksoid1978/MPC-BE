@@ -3432,90 +3432,11 @@ void File_Mpeg_Descriptors::Descriptor_AA()
 }
 
 //---------------------------------------------------------------------------
-extern const size_t DolbyVision_Profiles_Size;
-extern const char* DolbyVision_Profiles[];
 void File_Mpeg_Descriptors::Descriptor_B0()
 {
     //Parsing
-    int8u  dv_version_major, dv_version_minor, dv_profile, dv_level, dv_bl_signal_compatibility_id;
-    bool rpu_present_flag, el_present_flag, bl_present_flag;
-    Get_B1 (dv_version_major,                                   "dv_version_major");
-    if (dv_version_major && dv_version_major<=2) //Spec says nothing, we hope that a minor version change means that the stream is backward compatible
-    {
-        Get_B1 (dv_version_minor,                               "dv_version_minor");
-        BS_Begin();
-        size_t End=Data_BS_Remain();
-        if (End>=176)
-            End-=176;
-        else
-            End=0; // Not enough place for reserved bits, but we currently ignore such case, just considered as unknown
-        Get_S1 (7, dv_profile,                                  "dv_profile");
-        Get_S1 (6, dv_level,                                    "dv_level");
-        Get_SB (   rpu_present_flag,                            "rpu_present_flag");
-        Get_SB (   el_present_flag,                             "el_present_flag");
-        Get_SB (   bl_present_flag,                             "bl_present_flag");
-        if (Data_BS_Remain())
-        {
-            Get_S1 (4, dv_bl_signal_compatibility_id,           "dv_bl_signal_compatibility_id"); // in dv_version_major 2 only if based on specs but it was confirmed to be seen in dv_version_major 1 too and it does not hurt (value 0 means no new display)
-            if (End<Data_BS_Remain())
-                Skip_BS(Data_BS_Remain()-End,                   "reserved");
-        }
-        else
-            dv_bl_signal_compatibility_id=0;
-        BS_End();
-    }
-    Skip_XX(Element_Size-Element_Offset,                        "Unknown");
-
-    FILLING_BEGIN();
-        Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format"].From_UTF8("Dolby Vision");
-        if (dv_version_major && dv_version_major<=2)
-        {
-            Ztring Summary=Ztring::ToZtring(dv_version_major)+__T('.')+Ztring::ToZtring(dv_version_minor);
-            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Version"]=Summary;
-            string Profile, Level;
-            if (dv_profile<DolbyVision_Profiles_Size)
-                Profile+=DolbyVision_Profiles[dv_profile];
-            else
-                Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
-            Profile+=__T('.');
-            Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
-            Level+=Ztring().From_CC1(dv_level).To_UTF8();
-            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Profile"].From_UTF8(Profile);
-            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Level"].From_UTF8(Level);
-            Summary+=__T(',');
-            Summary+=__T(' ');
-            Summary+=Ztring().From_UTF8(Profile);
-            Summary+=__T('.');
-            Summary+=Ztring().From_UTF8(Level);
-
-            string Layers;
-            if (rpu_present_flag|el_present_flag|bl_present_flag)
-            {
-                Summary+=',';
-                Summary+=' ';
-                if (bl_present_flag)
-                    Layers +="BL+";
-                if (el_present_flag)
-                    Layers +="EL+";
-                if (rpu_present_flag)
-                    Layers +="RPU+";
-                Layers.resize(Layers.size()-1);
-                Summary+=Ztring().From_UTF8(Layers);
-            }
-            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Settings"].From_UTF8(Layers);
-            if (dv_bl_signal_compatibility_id)
-            {
-                string Compatibility;
-                if (dv_bl_signal_compatibility_id<DolbyVision_Compatibility_Size && DolbyVision_Compatibility[dv_bl_signal_compatibility_id])
-                    Compatibility=DolbyVision_Compatibility[dv_bl_signal_compatibility_id];
-                else
-                    Compatibility=Ztring().From_Number(dv_bl_signal_compatibility_id).To_UTF8();
-                Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Compatibility"].From_UTF8(Compatibility);
-            }
-        }
-        else
-            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Version"]=Ztring::ToZtring(dv_version_major);
-    FILLING_END();
+    std::map<std::string, Ztring>& Infos=Complete_Stream->Streams[elementary_PID]->Infos;
+    dvcC(true, &Infos);
 }
 
 //---------------------------------------------------------------------------

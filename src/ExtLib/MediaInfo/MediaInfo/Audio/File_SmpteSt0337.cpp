@@ -187,16 +187,13 @@ void File_SmpteSt0337::Streams_Fill()
         Fill(Parser);
         Merge(*Parser);
 
-        int64u OverallBitRate=Parser->Retrieve(Stream_General, 0, General_OverallBitRate).To_int64u();
-        if (OverallBitRate)
-        {
-            OverallBitRate*=Element_Size; OverallBitRate/=Element_Size-Stream_Bits*4/8;
-            OverallBitRate*=Container_Bits;
-            OverallBitRate/=Stream_Bits;
-            Fill(Stream_General, 0, General_OverallBitRate, OverallBitRate);
-        }
         if (Parser->Count_Get(Stream_Audio))
+        {
             FrameRate=Retrieve(Stream_Audio, 0, Audio_FrameRate).To_float64();
+            float64 FrameRate_Int=float64_int64s(FrameRate);
+            if (FrameRate>=FrameRate_Int/1.0015 && FrameRate<=FrameRate_Int/1.0005)
+                FrameRate=FrameRate_Int/1.001;
+        }
     }
     else if (data_type!=(int8u)-1)
     {
@@ -208,17 +205,56 @@ void File_SmpteSt0337::Streams_Fill()
         }
     }
 
-    // Guard band
-    if (GuardBand_Before) // With guard band, there is big chances that AES3 bit rate is respected
+    // Bit rate
+    if (FrameRate)
     {
-        Fill(Stream_General, 0, General_OverallBitRate, Container_Bits*2*48000);
-        if (!IsSub && File_Size!=(int64u)-1)
-            Fill(Stream_General, 0, General_Duration, ((float64)File_Size)*8/(Container_Bits*2*48000)*1000);
-    }
+        size_t StartPosToClear=0;
+        float64 FrameSize=0;
 
-    if (FrameRate && FrameSizes.size()==1)
-    {
-        Fill(Stream_General, 0, General_OverallBitRate, FrameSizes.begin()->first*8*FrameRate, 0, true);
+        if (FrameSizes.size()==1)
+        {
+            FrameSize=FrameSizes.begin()->first;
+        }
+        else if (FrameSizes.size()==2 && ((--FrameSizes.end())->first-FrameSizes.begin()->first)*4==Container_Bits && FrameSizes.begin()->second*3<=(--FrameSizes.end())->second*2 && (FrameSizes.begin()->second+1)*3>=(--FrameSizes.end())->second*2)
+        {
+            // Maybe NTSC frame rate and 48 kHz.
+            FrameSize=FrameSizes.begin()->first+((float64)Container_Bits)/4*3/5; //2x small then 3x big
+        }
+        else
+        {
+            int64u FrameSize_Total=0;
+            int64u FrameSize_Count=0;
+            for (std::map<int64u, int64u>::iterator F=FrameSizes.begin(); F!=FrameSizes.end(); ++F)
+            {
+                FrameSize_Total+=F->first*F->second;
+                FrameSize_Count+=F->second;
+            }
+            if (FrameSize_Count>=10)
+                FrameSize=((float64)FrameSize_Total/FrameSize_Count);
+        }
+
+        if (FrameSize)
+        {
+            float64 BitRate=FrameSize*8*FrameRate;
+            float64 BitRate_Theory=Container_Bits*2*48000;
+            if (BitRate>=BitRate_Theory*0.999 && BitRate<=BitRate_Theory*1.001)
+                BitRate=BitRate_Theory;
+            Fill(Stream_General, 0, General_OverallBitRate, BitRate, 0, true);
+            Fill(Stream_Audio, 0, Audio_BitRate_Encoded, BitRate, 0, true);
+            StartPosToClear=1;
+        }
+
+        //Underlying encoded bit rate has no meaning
+        if (StartPosToClear)
+        {
+            for (size_t i=StartPosToClear; i<Count_Get(Stream_Audio); i++)
+                Fill(Stream_Audio, i, Audio_BitRate_Encoded, 0, 10, true);
+        }
+        else
+        {
+            for (size_t i=0; i<Count_Get(Stream_Audio); i++)
+                Clear(Stream_Audio, i, Audio_BitRate_Encoded);
+        }
     }
 
     for (size_t Pos=0; Pos<Count_Get(StreamKind_Last); Pos++)
@@ -269,6 +305,13 @@ void File_SmpteSt0337::Streams_Finish()
                     Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_Duration), Retrieve(Stream_General, 0, General_Duration));
             }
         }
+    }
+
+    if (!IsSub && File_Size!=(int64u)-1)
+    {
+        Fill(Stream_Audio, 0, Audio_StreamSize_Encoded, File_Size, 10, true);
+        for (size_t Pos=1; Pos<Count_Get(Stream_Audio); Pos++)
+            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, 0, 10, true);
     }
 }
 
@@ -1394,11 +1437,9 @@ void File_SmpteSt0337::Data_Parse()
         Element_Size=Save_Element_Size;
     }
 
-    // Guard band
-    GuardBand_Before=0;
-
     FILLING_BEGIN();
-        FrameSizes[IsSub?Buffer_Size:((GuardBand_Before+Element_Size)*Container_Bits/Stream_Bits)]++;
+        if (Frame_Count) // Ignore first GuardBand_Before
+            FrameSizes[(IsSub && !GuardBand_Before && !GuardBand_After)?Buffer_Size:(GuardBand_Before+Element_Size+GuardBand_After)]++;
 
         Frame_Count++;
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
@@ -1416,6 +1457,9 @@ void File_SmpteSt0337::Data_Parse()
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFinished]))
             Finish("SMPTE ST 337");
     FILLING_END();
+
+    // Guard band
+    GuardBand_Before=0;
 }
 
 //***************************************************************************

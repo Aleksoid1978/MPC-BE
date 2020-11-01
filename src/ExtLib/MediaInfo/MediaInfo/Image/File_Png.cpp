@@ -80,6 +80,9 @@ File_Png::File_Png()
     #endif //MEDIAINFO_TRACE
     StreamSource=IsStream;
 
+    //In
+    StreamKind=Stream_Max;
+
     //Temp
     Signature_Parsed=false;
 }
@@ -102,7 +105,7 @@ void File_Png::Streams_Accept()
             Fill(Stream_Video, StreamPos_Last, Video_FrameCount, Config->File_Names.size());
     }
     else
-        Stream_Prepare(StreamKind_Last);
+        Stream_Prepare(StreamKind==Stream_Max?StreamKind_Last:StreamKind);
 }
 
 //***************************************************************************
@@ -269,22 +272,15 @@ void File_Png::IHDR()
         {
             Fill(StreamKind_Last, 0, "Width", Width);
             Fill(StreamKind_Last, 0, "Height", Height);
-            int8u Resolution;
-            switch (Colour_type)
-            {
-                case 0 : Resolution=Bit_depth; break;
-                case 2 : Resolution=Bit_depth*3; break;
-                case 3 : Resolution=Bit_depth; break;
-                case 4 : Resolution=Bit_depth*2; break;
-                case 6 : Resolution=Bit_depth*4; break;
-                default: Resolution=0;
-            }
-            if (Resolution)
-                Fill(StreamKind_Last, 0, "BitDepth", Resolution);
+            string ColorSpace=(Colour_type&(1<<1))?"RGB":"Y";
+            if (Colour_type&(1<<2))
+                ColorSpace+='A';
+            Fill(StreamKind_Last, 0, "ColorSpace", ColorSpace);
+            Fill(StreamKind_Last, 0, "BitDepth", Bit_depth);
             switch (Compression_method)
             {
                 case 0 :
-                    Fill(StreamKind_Last, 0, "Format_Compression", "LZ77");
+                    Fill(StreamKind_Last, 0, "Format_Compression", "Deflate");
                     break;
                 default: ;
             }

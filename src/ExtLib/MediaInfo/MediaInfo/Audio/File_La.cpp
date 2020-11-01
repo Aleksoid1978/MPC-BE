@@ -111,7 +111,7 @@ void File_La::FileHeader_Parse()
     Get_L4 (CRC32,                                              "crc");
 
     FILLING_BEGIN();
-        if (SampleRate==0)
+        if (SampleRate==0 || Channels==0)
             return;
         Duration=((int64u)Samples/Channels)*1000/SampleRate; // Seems that it's samples per channels otherwise Duration is doubled ??!!
         if (Duration==0)

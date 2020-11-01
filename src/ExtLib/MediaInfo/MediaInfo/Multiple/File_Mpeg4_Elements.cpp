@@ -43,6 +43,9 @@
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
+#if defined(MEDIAINFO_CINEFORM_YES)
+    #include "MediaInfo/Video/File_CineForm.h"
+#endif
 #if defined(MEDIAINFO_FFV1_YES)
     #include "MediaInfo/Video/File_Ffv1.h"
 #endif
@@ -54,6 +57,9 @@
 #endif
 #if defined(MEDIAINFO_MPEGV_YES)
     #include "MediaInfo/Video/File_Mpegv.h"
+#endif
+#if defined(MEDIAINFO_PNG_YES)
+    #include "MediaInfo/Image/File_Png.h"
 #endif
 #if defined(MEDIAINFO_PRORES_YES)
     #include "MediaInfo/Video/File_ProRes.h"
@@ -1842,7 +1848,7 @@ void File_Mpeg4::mdat_xxxx()
                                 break; //TODO: handle more complex Edit Lists
                     }
 
-                    if (FrameInfo.DTS!=(int64u)-1 && -Delay<(int64s)stts_Offset) //TODO: check potential incoherency between movie timescale and track timescale
+                    if (FrameInfo.DTS!=(int64u)-1 && -Delay<(int64s)stts_Offset && moov_mvhd_TimeScale) //TODO: check potential incoherency between movie timescale and track timescale
                         FrameInfo.DTS+=Delay*1000000000/moov_mvhd_TimeScale;
                     else
                         FrameInfo.DTS=TimeCode_DtsOffset;
@@ -2291,17 +2297,20 @@ void File_Mpeg4::meta_iprp_ipco()
 #define FILLING_BEGIN_IPCO() \
     { \
         FILLING_BEGIN(); \
-            std::vector<int32u>& Entry=meta_iprp_ipma_Entries[meta_iprp_ipco_Buffer_Size]; \
-            size_t Entry_Size=Entry.size(); \
-            int64u Element_Offset_Save=Element_Offset; \
-            for (size_t i=0; i<Entry_Size; i++) \
+            if (meta_iprp_ipco_Buffer_Size<meta_iprp_ipma_Entries.size()) \
             { \
-                moov_trak_tkhd_TrackID=Entry[i]; \
-                META_CREATESTREAM(); \
-                Element_Offset=Element_Offset_Save; \
+                std::vector<int32u>& Entry=meta_iprp_ipma_Entries[meta_iprp_ipco_Buffer_Size]; \
+                size_t Entry_Size=Entry.size(); \
+                int64u Element_Offset_Save=Element_Offset; \
+                for (size_t i=0; i<Entry_Size; i++) \
+                { \
+                    moov_trak_tkhd_TrackID=Entry[i]; \
+                    META_CREATESTREAM(); \
+                    Element_Offset=Element_Offset_Save; \
 
 #define FILLING_END_IPCO() \
-            } \
+                } \
+            }\
         FILLING_END(); \
         meta_iprp_ipco_Buffer_Size++; \
     } \
@@ -5375,6 +5384,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
                 Parser->BitDepth=(int8u)SampleSize;
                 Parser->Endianness=(Flags&0x02)?'B':'L';
                 Parser->Channel_Total=(int8u)Channels;
+                Parser->SamplingRate=SampleRate;
                 Parser->ShouldContinueParsing=true;
                 #if MEDIAINFO_DEMUX
                     if (Config->Demux_Unpacketize_Get())
@@ -5887,6 +5897,21 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
                     #if MEDIAINFO_DEMUX
                         Streams[moov_trak_tkhd_TrackID].Demux_Level=4; //Intermediate
                     #endif //MEDIAINFO_DEMUX
+                }
+            #endif
+            #if defined(MEDIAINFO_PNG_YES)
+                if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Mpeg4, Codec, InfoCodecID_Format)==__T("PNG"))
+                {
+                    File_Png* Parser=new File_Png;
+                    Parser->StreamKind=Stream_Video;
+                    Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+                }
+            #endif
+            #if defined(MEDIAINFO_CINEFORM_YES)
+                if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Mpeg4, Codec, InfoCodecID_Format)==__T("CineForm"))
+                {
+                    File_CineForm* Parser=new File_CineForm;
+                    Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
                 }
             #endif
 
@@ -6842,33 +6867,6 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1()
     FILLING_END();
 }
 
-extern const size_t DolbyVision_Profiles_Size = 10;
-extern const char* DolbyVision_Profiles [DolbyVision_Profiles_Size] = // dv[BL_codec_type].[number_of_layers][bit_depth][cross-compatibility]
-{
-    "dvav",
-    "dvav",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvav",
-};
-
-extern const size_t DolbyVision_Compatibility_Size=7;
-extern const char* DolbyVision_Compatibility[DolbyVision_Compatibility_Size]=
-{
-    "",
-    "HDR10",
-    "SDR",
-    NULL,
-    "HLG",
-    NULL,
-    "Blu-ray",
-};
-
 //---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC()
 {
@@ -6876,85 +6874,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC()
     AddCodecConfigurationBoxInfo();
 
     //Parsing
-    int8u  dv_version_major, dv_version_minor, dv_profile, dv_level, dv_bl_signal_compatibility_id;
-    bool rpu_present_flag, el_present_flag, bl_present_flag;
-    Get_B1 (dv_version_major,                                   "dv_version_major");
-    if (dv_version_major && dv_version_major<=2) //Spec says nothing, we hope that a minor version change means that the stream is backward compatible
-    {
-        Get_B1 (dv_version_minor,                               "dv_version_minor");
-        BS_Begin();
-        size_t End=Data_BS_Remain();
-        if (End>=176)
-            End-=176;
-        else
-            End=0; // Not enough place for reserved bits, but we currently ignore such case, just considered as unknown
-        Get_S1 (7, dv_profile,                                  "dv_profile");
-        Get_S1 (6, dv_level,                                    "dv_level");
-        Get_SB (   rpu_present_flag,                            "rpu_present_flag");
-        Get_SB (   el_present_flag,                             "el_present_flag");
-        Get_SB (   bl_present_flag,                             "bl_present_flag");
-        if (Data_BS_Remain())
-        {
-            Get_S1 (4, dv_bl_signal_compatibility_id,           "dv_bl_signal_compatibility_id"); // in dv_version_major 2 only if based on specs but it was confirmed to be seen in dv_version_major 1 too and it does not hurt (value 0 means no new display)
-            if (End<Data_BS_Remain())
-                Skip_BS(Data_BS_Remain()-End,                   "reserved");
-        }
-        else
-            dv_bl_signal_compatibility_id=0;
-        BS_End();
-    }
-    Skip_XX(Element_Size-Element_Offset,                        "Unknown");
-
-    FILLING_BEGIN();
-        Fill(Stream_Video, StreamPos_Last, "HDR_Format", "Dolby Vision");
-        if (dv_version_major && dv_version_major<=2)
-        {
-            Ztring Summary=Ztring::ToZtring(dv_version_major)+__T('.')+Ztring::ToZtring(dv_version_minor);
-            Fill(Stream_Video, StreamPos_Last, "HDR_Format_Version", Summary);
-            string Profile, Level;
-            if (dv_profile<DolbyVision_Profiles_Size)
-                Profile+=DolbyVision_Profiles[dv_profile];
-            else
-                Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
-            Profile+=__T('.');
-            Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
-            Level+=Ztring().From_CC1(dv_level).To_UTF8();
-            Fill(Stream_Video, StreamPos_Last, "HDR_Format_Profile", Profile);
-            Fill(Stream_Video, StreamPos_Last, "HDR_Format_Level", Level);
-            Summary+=__T(',');
-            Summary+=__T(' ');
-            Summary+=Ztring().From_UTF8(Profile);
-            Summary+=__T('.');
-            Summary+=Ztring().From_UTF8(Level);
-
-            string Layers;
-            if (rpu_present_flag|el_present_flag|bl_present_flag)
-            {
-                Summary+=',';
-                Summary+=' ';
-                if (bl_present_flag)
-                    Layers +="BL+";
-                if (el_present_flag)
-                    Layers +="EL+";
-                if (rpu_present_flag)
-                    Layers +="RPU+";
-                Layers.resize(Layers.size()-1);
-                Summary+=Ztring().From_UTF8(Layers);
-            }
-            Fill(Stream_Video, StreamPos_Last, "HDR_Format_Settings", Layers);
-            if (dv_bl_signal_compatibility_id)
-            {
-                string Compatibility;
-                if (dv_bl_signal_compatibility_id<DolbyVision_Compatibility_Size && DolbyVision_Compatibility[dv_bl_signal_compatibility_id])
-                    Compatibility=DolbyVision_Compatibility[dv_bl_signal_compatibility_id];
-                else
-                    Compatibility=Ztring().From_Number(dv_bl_signal_compatibility_id).To_UTF8();
-                Fill(Stream_Video, StreamPos_Last, Video_HDR_Format_Compatibility, Compatibility);
-            }
-        }
-        else
-            Fill(Stream_Video, StreamPos_Last, "HDR_Format_Version", dv_version_major);
-    FILLING_END();
+    dvcC();
 }
 
 //---------------------------------------------------------------------------

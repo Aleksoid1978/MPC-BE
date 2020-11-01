@@ -1542,7 +1542,7 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                             size_t Up_Pos=Name.find(__T(" LinkedTo_"));
                             size_t Up_Pos_End;
                             if (Up_Pos!=string::npos)
-                                Up_Pos_End=Name.find(__T("_Pos"), Up_Pos);
+                                Up_Pos_End=Name.find(__T("_Pos"), Name.size()-4);
                             if (Up_Pos!=string::npos && Up_Pos_End==Name.size()-4)
                             {
                                 Ztring Up=Name.substr(Up_Pos);
@@ -1584,53 +1584,96 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                                         ToSearch2+=__T(" Alt");
                                         ToSearch2+=ID2;
                                     }
+
+                                    // Search the linked element
                                     for (size_t j=Pos+1; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
                                     {
-                                        if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch2)
+                                        if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch)
                                         {
-                                            while (j<(*Stream_More)[StreamKind][StreamPos].size())
+                                            // Append the sub-elements of the linked element
+                                            for (; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
                                             {
-                                                if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch2, ToSearch2.size())==0)
+                                                // Stop if not the linked element
+                                                if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, 0)==string::npos)
+                                                    break;
+
+                                                // Manage Alt parts when it is inside a list
+                                                Ztring ToSearchAlt=ToSearch+__T(" Alt");
+                                                if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearchAlt, 0)!=string::npos)
                                                 {
-                                                    Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
-                                                    Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
-                                                    if (!ID2.empty())
+                                                    size_t NextChar=(*Stream_More)[StreamKind][StreamPos][j][Info_Name].find_first_not_of(__T("0123456789"), ToSearchAlt.size());
+                                                    if (NextChar==string::npos || (*Stream_More)[StreamKind][StreamPos][j][Info_Name][NextChar]==__T(' '))
                                                     {
-                                                        size_t k=Temp.back()[Info_Name].find(__T(" Alt"));
-                                                        if (k!=(size_t)-1)
+                                                        if (ID2.empty())
+                                                            continue;
+
+                                                        // Check if content is not in main and we have the right Alt
+                                                        if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch2, 0)==0 && (*Stream_More)[StreamKind][StreamPos][j][Info_Name].size()>=ToSearch2.size())
                                                         {
-                                                            if (Temp.back()[Info_Name].find(__T(' '), k+1)==(size_t)-1)
+                                                            Ztring Name=ToSearch;
+                                                            if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].size()>ToSearch2.size())
+                                                                Name+=__T(' ')+(*Stream_More)[StreamKind][StreamPos][j][Info_Name].substr(ToSearch2.size()+1);
+                                                            size_t IsFound=(size_t)-1;
+                                                            for (size_t k=Pos+1; k<j; k++)
                                                             {
-                                                                size_t ValueFirstField=(*Stream_More)[StreamKind][StreamPos].Find(Temp.back()[Info_Name].substr(SpacesCount, k-SpacesCount));
-                                                                if (ValueFirstField!=(size_t)-1)
+                                                                if ((*Stream_More)[StreamKind][StreamPos][k][Info_Name]==Name)
                                                                 {
-                                                                    if (Temp.back()[Info_Text]==__T("Yes"))
-                                                                        Temp.back()[Info_Text].clear();
-                                                                    if (!Temp.back()[Info_Text].empty())
-                                                                        Temp.back()[Info_Text].insert(0, 1, __T(' '));
-                                                                    Temp.back()[Info_Text].insert(0, (*Stream_More)[StreamKind][StreamPos][ValueFirstField][Info_Text]);
+                                                                    IsFound=k;
+                                                                    break;
                                                                 }
                                                             }
-                                                            Temp.back()[Info_Name][k]=__T('-');
+                                                            if (IsFound==(size_t)-1)
+                                                            {
+                                                                Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
+                                                                Temp.back()[Info_Name]=Name;
+                                                                Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
+                                                            }
+                                                        }
+
+                                                        continue;
+                                                    }
+                                                }
+
+                                                // If Alt link, find the Alt element and replace the main element with the alt value
+                                                Ztring Found;
+                                                if (!ID2.empty())
+                                                {
+                                                    size_t Space=(*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(__T(' '));
+                                                    if (Space!=string::npos || (*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch)
+                                                    {
+                                                        Ztring ToSearch3=ToSearch2;
+                                                        if (Space!=string::npos)
+                                                            ToSearch3+=(*Stream_More)[StreamKind][StreamPos][j][Info_Name].substr(Space);
+                                                        for (size_t k=Pos+1; k<(*Stream_More)[StreamKind][StreamPos].size(); k++)
+                                                        {
+                                                            if ((*Stream_More)[StreamKind][StreamPos][k][Info_Name]==ToSearch3)
+                                                            {
+                                                                Found=(*Stream_More)[StreamKind][StreamPos][k][Info_Text];
+                                                                if (k && !Temp.empty()
+                                                                 && Temp[Temp.size()-1][Info_Name].rfind(__T(" ChannelLayout" ))+14==Temp[Temp.size()-1][Info_Name].size()
+                                                                 && (*Stream_More)[StreamKind][StreamPos][k  ][Info_Name].rfind(__T(" Position_Polar"))+15==(*Stream_More)[StreamKind][StreamPos][k  ][Info_Name].size()
+                                                                 && (*Stream_More)[StreamKind][StreamPos][k-1][Info_Name].rfind(__T(" ChannelLayout" ))+14!=(*Stream_More)[StreamKind][StreamPos][k-1][Info_Name].size())
+                                                                {
+                                                                    Temp.resize(Temp.size()-1);
+                                                                }
+                                                            }
                                                         }
                                                     }
-                                                    j++;
                                                 }
-                                                else if (j<(*Stream_More)[StreamKind][StreamPos].size() && (*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, ToSearch.size())==0)
-                                                {
-                                                    Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
+                                                
+                                                // Append
+                                                Temp.push_back((*Stream_More)[StreamKind][StreamPos][j]);
+                                                if (!ID2.empty())
                                                     Temp.back()[Info_Name].insert(ToSearch.size(), __T("-Alt")+ID2);
-                                                    Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
-                                                    j++;
-                                                }
-                                                else
-                                                    break;
+                                                Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
+                                                if (!Found.empty())
+                                                    Temp.back()[Info_Text]=Found;;
                                             }
                                         }
                                     }
                                 }
                             }
-                            else
+                            else if (Up_Pos==string::npos || Name.size()<=11 || Name.find(__T("_Pos/String"), Name.size()-11)==Name.size()-11)
                                 Temp.push_back((*Stream_More)[StreamKind][StreamPos][Pos]);
 
                         }
@@ -1671,7 +1714,12 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                             j=2;
                         else
                             j=1;
-                        if (!Nested && Spaces && Pos && i && i-j<=Track[Pos-1][Info_Name].size() && Name.substr(0, i-j)==Track[Pos-1][Info_Name].substr(0, i-j) && Info_Name_Text<Track[Pos-1].size() && Spaces-1<=Track[Pos-1][Info_Name_Text].find_first_not_of(__T(' ')))
+                        size_t PosPrevious=Pos;
+                        if (PosPrevious)
+                            PosPrevious--;
+                        while (PosPrevious && Track[PosPrevious][Info_Name][0]==__T(' ')) // avoid injected lines
+                            PosPrevious--;
+                        if (!Nested && Spaces && Pos && i && i-j<=Track[PosPrevious][Info_Name].size() && Name.substr(0, i-j)==Track[PosPrevious][Info_Name].substr(0, i-j) && Info_Name_Text<Track[PosPrevious].size() && Spaces-1<=Track[PosPrevious][Info_Name_Text].find_first_not_of(__T(' ')))
                             Nested=true;
                         if (Nested)
                             Name.erase(0, i);

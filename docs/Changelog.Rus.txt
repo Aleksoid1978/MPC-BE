@@ -63,8 +63,9 @@ ShellExt
 	dav1d git-0.7.1-72-gf90ada0;
 	ffmpeg git-n4.4-dev-607-g1ead176d87;
 	Little-CMS git-2.11-23-g5f7853e;
-	MediaInfo git-v20.08-23-g702d6b20;
+	MediaInfo git-v20.09-15-g02863500;
 	openjpeg git-v2.3.1-59-g0f169867;
+	ZenLib git-v0.4.38-17-gc33e615;
 
 1.5.5
 =============================

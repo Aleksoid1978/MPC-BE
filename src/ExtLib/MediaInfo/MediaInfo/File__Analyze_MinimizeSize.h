@@ -782,6 +782,9 @@ public :
     };
     void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta);
     #endif
+    #if defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MK_YES)
+    void dvcC(bool has_dependency_pid=false, std::map<std::string, Ztring>* Infos=NULL);
+    #endif
 
     //***************************************************************************
     // Unknown

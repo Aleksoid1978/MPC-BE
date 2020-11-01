@@ -608,6 +608,9 @@
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_CANOPUS_NO) && !defined(MEDIAINFO_CANOPUS_YES)
     #define MEDIAINFO_CANOPUS_YES
 #endif
+#if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_CINEFORM_NO) && !defined(MEDIAINFO_CINEFORM_YES)
+    #define MEDIAINFO_CINEFORM_YES
+#endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_DIRAC_NO) && !defined(MEDIAINFO_DIRAC_YES)
     #define MEDIAINFO_DIRAC_YES
 #endif

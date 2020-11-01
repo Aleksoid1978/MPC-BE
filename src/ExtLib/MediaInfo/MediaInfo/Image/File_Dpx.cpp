@@ -697,7 +697,7 @@ void File_Dpx::GenericSectionHeader_Dpx()
     Element_Begin1("Image information");
     int32u Width, Height, PAR_H, PAR_V;
     int16u ImageElements;
-    Info_X2(ImageOrientation,                                   "Image orientation");Param_Info1(DPX_Orientation[ImageOrientation]);
+    Info_X2(ImageOrientation,                                   "Image orientation");Param_Info1(DPX_Orientation[ImageOrientation>8?8:ImageOrientation]);
     Get_X2 (ImageElements,                                      "Number of image elements");
     if (ImageElements>8)
         ImageElements=8;

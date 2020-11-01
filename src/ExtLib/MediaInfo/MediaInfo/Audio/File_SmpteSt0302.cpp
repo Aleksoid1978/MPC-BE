@@ -143,9 +143,9 @@ void File_SmpteSt0302::Streams_Fill()
         }
     }
 
-    Fill(Stream_Audio, 0, Audio_BitRate_Encoded, (5+bits_per_sample)*(1+number_channels)*8*48000);
+    Fill(Stream_Audio, 0, Audio_BitRate_Encoded, (5+bits_per_sample)*(1+number_channels)*8*48000, 10, true);
     for (size_t Pos=1; Pos<Count_Get(Stream_Audio); Pos++)
-        Fill(Stream_Audio, Pos, Audio_BitRate_Encoded, 0);
+        Fill(Stream_Audio, Pos, Audio_BitRate_Encoded, 0, 10, true);
 }
 
 //---------------------------------------------------------------------------

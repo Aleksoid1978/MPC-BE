@@ -737,6 +737,9 @@
     <ClInclude Include="MediaInfo\Audio\File_ChannelSplitting.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Video\File_CineForm.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1416,6 +1419,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_ChannelSplitting.cpp">
       <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Video\File_CineForm.cpp">
+      <Filter>Source Files\Video</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

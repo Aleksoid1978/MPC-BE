@@ -388,7 +388,7 @@ static const int8u AC3_bed_channel_assignment_mask_ChannelLayout_Mapping[10] =
     2,
     1,
 };
-int32u AC3_bed_channel_assignment_mask_2_nonstd(int16u bed_channel_assignment_mask)
+extern int32u AC3_bed_channel_assignment_mask_2_nonstd(int16u bed_channel_assignment_mask)
 {
     int32u ToReturn=0;
 
@@ -799,7 +799,7 @@ static const int32u AC3_MLP_Resolution[16]=
 };
 
 //---------------------------------------------------------------------------
-const char* Ac3_emdf_payload_id[16]=
+extern const char* Ac3_emdf_payload_id[16]=
 {
     "Container End",
     "Programme loudness data",
@@ -814,7 +814,7 @@ const char* Ac3_emdf_payload_id[16]=
     "",
     "OAMD",
     "",
-    "",
+    "Personalized Audio Mix-Graph",
     "JOC",
     "",
 };

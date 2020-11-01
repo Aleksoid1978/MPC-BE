@@ -248,6 +248,11 @@ private :
     void Segment_Tracks_TrackEntry_TrickTrackFlag(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_TrickMasterTrackUID(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_TrickMasterTrackSegmentUID(){UInteger_Info();};
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping(){};
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDName(){UTF8_Info();};
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDType();
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDExtraData();
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDValue(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_ContentEncodings(){};
     void Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding(){};
     void Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder(){UInteger_Info();};
@@ -452,6 +457,7 @@ private :
     string  AttachedFile_FileName;
     string  AttachedFile_FileMimeType;
     string  AttachedFile_FileDescription;
+    int64u  BlockAddIDType;
     struct crc32
     {
         int64u  Pos;

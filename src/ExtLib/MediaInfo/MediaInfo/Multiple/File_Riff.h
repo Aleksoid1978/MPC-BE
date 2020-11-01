@@ -118,6 +118,7 @@ private :
     std::map<int32u, stream> Stream;
     int32u                   Stream_ID;
     void Open_Buffer_Init_All();
+    void Parser_Pcm(stream& StreamItem, int16u Channels, int16u BitsPerSample, int16u ValidBitsPerSample, int32u SamplesPerSec, char Endianness='\0');
     struct stream_structure
     {
         int64u                  Name;
