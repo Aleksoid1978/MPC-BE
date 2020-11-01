@@ -255,7 +255,7 @@ void File_Dsf::fmt_()
             Fill(Stream_Audio, 0, Audio_Format, DSF_FormatID[FormatID]);
         else
             Fill(Stream_Audio, 0, Audio_Format, FormatID);
-        if (FormatID<DSF_ChannelType_Size)
+        if (ChannelType<DSF_ChannelType_Size)
         {
             Fill(Stream_Audio, 0, Audio_ChannelPositions, DSF_ChannelType[ChannelType]);
             Fill(Stream_Audio, 0, Audio_ChannelLayout, DSF_ChannelType_ChannelLayout[ChannelType]);

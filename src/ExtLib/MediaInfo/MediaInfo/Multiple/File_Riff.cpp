@@ -242,6 +242,16 @@ void File_Riff::Streams_Finish ()
                     Clear(Stream_Audio, 0, Audio_Channel_s_);
 
                 size_t StreamPos_Base=StreamPos_Last;
+                if (StreamKind_Last==Stream_Audio && (Temp->second.Parsers[0]->Count_Get(Stream_Audio)>1 || (!Temp->second.Parsers[0]->Get(Stream_Audio, 0, Audio_MuxingMode).empty() && Temp->second.Parsers[0]->Get(Stream_Audio, 0, Audio_MuxingMode)!=__T("ADTS"))))
+                {
+                    //Content from underlying format is preffered
+                    Clear(Stream_Audio, StreamPos_Last, Audio_Channel_s_);
+                    Fill(Stream_Audio, StreamPos_Last, Audio_BitRate_Encoded, Retrieve(Stream_Audio, StreamPos_Last, Audio_BitRate), true);
+                    Clear(Stream_Audio, StreamPos_Last, Audio_BitRate);
+                    Clear(Stream_Audio, StreamPos_Last, Audio_SamplingRate);
+                    Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize_Encoded, Retrieve(Stream_Audio, StreamPos_Last, Audio_StreamSize), true);
+                    Clear(Stream_Audio, StreamPos_Last, Audio_StreamSize);
+                }
                 for (size_t Pos=0; Pos<Temp->second.Parsers[0]->Count_Get(StreamKind_Last); Pos++)
                 {
                     Ztring Temp_ID=ID;
@@ -285,6 +295,20 @@ void File_Riff::Streams_Finish ()
                         StreamPos_Last=Count_Get(Stream_Video)-1;
                     }
                 }
+
+                //Special case - Multiple Audio
+                if (StreamKind_Last==Stream_Audio)
+                {
+                    for (size_t Pos=0; Pos<Temp->second.Parsers[0]->Count_Get(Stream_Audio); Pos++)
+                    {
+                        if (Retrieve(Stream_Audio, StreamPos_Base+Pos, Audio_CodecID).empty())
+                            Fill(Stream_Audio, StreamPos_Base+Pos, Audio_CodecID, Retrieve(Stream_Audio, StreamPos_Base, Audio_CodecID));
+                        if (Retrieve(Stream_Audio, StreamPos_Base+Pos, Audio_Duration).empty())
+                            Fill(Stream_Audio, StreamPos_Base+Pos, Audio_Duration, Retrieve(Stream_Audio, StreamPos_Base, Audio_Duration));
+                        if (Pos)
+                            Fill(Stream_Audio, StreamPos_Base+Pos, Audio_StreamSize_Encoded, 0, 10, true);
+                    }
+                }
             }
             else
             {
@@ -293,7 +317,8 @@ void File_Riff::Streams_Finish ()
             }
 
             //Hacks - After
-            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), StreamSize, true);
+            if (!Temp->second.Parsers.empty() && Temp->second.Parsers[0]->Count_Get(StreamKind_Last)==1)
+                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize_Encoded)).empty()?Generic_StreamSize:Generic_StreamSize_Encoded), StreamSize, true);
             if (StreamKind_Last==Stream_Video)
             {
                 if (!Codec_Temp.empty())

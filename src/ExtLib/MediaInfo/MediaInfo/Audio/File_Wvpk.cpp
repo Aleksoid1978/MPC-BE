@@ -124,6 +124,10 @@ File_Wvpk::File_Wvpk()
     SamplingRate=(int8u)-1;
     num_channels=0;
     channel_mask=0;
+    mono=false;
+    hybrid=false;
+    resolution0=false;
+    resolution1=false;
 }
 
 //***************************************************************************

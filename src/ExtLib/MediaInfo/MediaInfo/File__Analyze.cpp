@@ -2135,6 +2135,8 @@ bool File__Analyze::FileHeader_Manage()
     else
     {
         Buffer_Offset+=(size_t)Element_Offset;
+        if (Buffer_Offset>Buffer_Size)
+            Buffer_Size=Buffer_Offset;
         Element_Offset=0;
     }
 

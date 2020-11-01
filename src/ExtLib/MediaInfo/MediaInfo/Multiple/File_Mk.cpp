@@ -311,6 +311,11 @@ namespace Elements
     const int64u Segment_Tracks_TrackEntry_TrickTrackFlag=0x46;
     const int64u Segment_Tracks_TrackEntry_TrickMasterTrackUID=0x47;
     const int64u Segment_Tracks_TrackEntry_TrickMasterTrackSegmentUID=0x44;
+    const int64u Segment_Tracks_TrackEntry_BlockAdditionMapping=0x1E4;
+    const int64u Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDName=0x1A4;
+    const int64u Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDType=0x1E7;
+    const int64u Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDExtraData=0x1ED;
+    const int64u Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDValue=0x1F0;
     const int64u Segment_Tracks_TrackEntry_ContentEncodings=0x2D80;
     const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding=0x2240;
     const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder=0x1031;
@@ -716,6 +721,7 @@ File_Mk::File_Mk()
     Segment_Cluster_Count=0;
     CurrentAttachmentIsCover=false;
     CoverIsSetFromAttachment=false;
+    BlockAddIDType=0;
     Laces_Pos=0;
     IsParsingSegmentTrack_SeekBackTo=0;
     SegmentTrack_Offset_End=0;
@@ -1837,6 +1843,13 @@ void File_Mk::Data_Parse()
                 ATO2(Segment_Tracks_TrackEntry_TrickTrackFlag, "TrickTrackFlag")
                 ATO2(Segment_Tracks_TrackEntry_TrickMasterTrackUID, "TrickMasterTrackUID")
                 ATO2(Segment_Tracks_TrackEntry_TrickMasterTrackSegmentUID, "TrickMasterTrackSegmentUID")
+                LIS2(Segment_Tracks_TrackEntry_BlockAdditionMapping, "BlockAdditionMapping")
+                    ATOM_BEGIN
+                    ATO2(Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDName, "BlockAddIDName")
+                    ATO2(Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDType, "BlockAddIDType")
+                    ATO2(Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDExtraData, "BlockAddIDExtraData")
+                    ATO2(Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDValue, "BlockAddIDValue")
+                    ATOM_END_MK
                 LIS2(Segment_Tracks_TrackEntry_ContentEncodings, "ContentEncodings")
                     ATOM_BEGIN
                     LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding, "ContentEncoding")
@@ -3346,6 +3359,69 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecID()
         CodecID_Manage();
         CodecPrivate_Manage();
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDType()
+{
+    //Parsing
+    int32u Value;
+    Get_C4(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        BlockAddIDType=Value;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDExtraData()
+{
+    //Parsing
+    switch (BlockAddIDType)
+    {
+        case 0x64766343: // dvcC
+        case 0x64767643: // dvvC
+                Element_Name("Dolby Vision Configuration");
+                dvcC();
+                break;
+        case 0x68766345:
+                Element_Name("Dolby Vision EL HEVC");
+                #if MEDIAINFO_TRACE
+                    if (Trace_Activated)
+                    {
+                        File_Hevc* Parser=new File_Hevc();
+                        Parser->FrameIsAlwaysComplete=true;
+                        Parser->MustSynchronize=false;
+                        Parser->MustParse_VPS_SPS_PPS=true;
+                        Parser->SizedBlocks=true;
+                        Open_Buffer_Init(Parser);
+                        Open_Buffer_Continue(Parser);
+                        delete Parser;
+                    }
+                #else
+                    Skip_XX(Element_Size,                       "HEVCDecoderConfigurationRecord"); //enhancement-layer configuration information required to initialize the Dolby Vision decoder for the enhancement - layer substream
+                #endif
+                break;
+        case 0x6D766343:
+                Element_Name("MVC configuration");
+                #if MEDIAINFO_TRACE
+                    if (Trace_Activated)
+                    {
+                        File_Avc* Parser=new File_Avc();
+                        Parser->FrameIsAlwaysComplete=true;
+                        Parser->MustSynchronize=false;
+                        Parser->MustParse_SPS_PPS=true;
+                        Parser->SizedBlocks=true;
+                        Open_Buffer_Init(Parser);
+                        Open_Buffer_Continue(Parser);
+                        delete Parser;
+                    }
+                #else
+                    Skip_XX(Element_Size,                       "MVCDecoderConfigurationRecord");
+                #endif
+                break;
+        default:;
+    }
 }
 
 //---------------------------------------------------------------------------

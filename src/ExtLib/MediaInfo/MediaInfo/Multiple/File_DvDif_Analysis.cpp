@@ -88,6 +88,9 @@ void File_DvDif::Read_Buffer_Continue()
                     for (size_t Pos=0; Pos<48; Pos+=8)
                     {
                         int8u PackType=Buffer[Buffer_Offset+3+Pos+3];
+                        if (PackType!=0xFF)
+                            Coherency_Flags.set(Coherency_PackInSub);
+
                         //dv_timecode
                         if (PackType==0x13) //Pack type=0x13 (dv_timecode)
                         {
@@ -221,16 +224,21 @@ void File_DvDif::Read_Buffer_Continue()
                     for (size_t Pos=0; Pos<15*5; Pos+=5)
                     {
                         int8u PackType=Buffer[Buffer_Offset+3+Pos];
+                        if (PackType!=0xFF)
+                            Coherency_Flags.set(Coherency_PackInVid);
+
                         //video_source
                         if (PackType==0x60) //Pack type=0x60 (video_source)
                         {
                             system=(Buffer[Buffer_Offset+3+Pos+3]&0x20)==0x20?true:false;
                             video_source_stype=Buffer[Buffer_Offset+3+Pos+3]&0x1F;
+                            Coherency_Flags.set(Coherency_video_source);
                         }
                         //video_sourcecontrol
                         if (PackType==0x61)
                         {
                             aspect=(Buffer[Buffer_Offset+3+Pos+2]&0x7);
+                            Coherency_Flags.set(Coherency_video_control);
                         }
 
                         //video_recdate
@@ -318,8 +326,12 @@ void File_DvDif::Read_Buffer_Continue()
 
             case 0x60 : //SCT=3 (Audio)
                 {
+                    int8u PackType=Buffer[Buffer_Offset+3+0];
+                    if (PackType!=0xFF)
+                        Coherency_Flags.set(Coherency_PackInAud);
+
                     //audio_source
-                    if (Buffer[Buffer_Offset+3+0]==0x50) //audio_source
+                    if (PackType==0x50) //audio_source
                     {
                               QU_FSC    =(Buffer[Buffer_Offset+1  ]&0x08)?true:false; //FSC
                               QU_System =(Buffer[Buffer_Offset+3+3]&0x20)?true:false; //50/60
@@ -335,18 +347,20 @@ void File_DvDif::Read_Buffer_Continue()
                         if (audio_source_mode[ChannelGroup].empty())
                             audio_source_mode[ChannelGroup].resize(Dseq_Count, (int8u)-1);
                         audio_source_mode[ChannelGroup][Dseq]=AUDIO_MODE;
+                        Coherency_Flags.set(Coherency_audio_source);
                     }
 
                     //audio_source_control
-                    if (Buffer[Buffer_Offset+3+0]==0x51) //audio_source_control
+                    if (PackType==0x51) //audio_source_control
                     {
                         REC_ST =(Buffer[Buffer_Offset+3+2]&0x80)?true:false;
                         REC_END=(Buffer[Buffer_Offset+3+2]&0x40)?true:false;
                         REC_IsValid=true;
+                        Coherency_Flags.set(Coherency_audio_source);
                     }
 
                     //audio_recdate
-                    if (Buffer[Buffer_Offset+3+0]==0x52) //Pack type=0x52 (audio_rectime)
+                    if (PackType==0x52) //Pack type=0x52 (audio_rectime)
                     {
                         int8u Days                      =((Buffer[Buffer_Offset+3+2]&0x30)>>4)*10
                                                        + ((Buffer[Buffer_Offset+3+2]&0x0F)   )   ;
@@ -375,7 +389,7 @@ void File_DvDif::Read_Buffer_Continue()
                     }
 
                     //audio_rectime
-                    if (Buffer[Buffer_Offset+3+0]==0x53) //Pack type=0x53 (audio_rectime)
+                    if (PackType==0x53) //Pack type=0x53 (audio_rectime)
                     {
                         int8u Frames                    =((Buffer[Buffer_Offset+3+1]&0x30)>>4)*10
                                                        + ((Buffer[Buffer_Offset+3+1]&0x0F)   )   ;
@@ -1395,6 +1409,16 @@ void File_DvDif::Errors_Stats_Update()
             Event1.Errors=Event.Errors;
             Event1.Video_STA_Errors_Count=Video_STA_Errors_ByDseq.size();
             Event1.Video_STA_Errors=Video_STA_Errors_ByDseq.empty()?NULL:&Video_STA_Errors_ByDseq[0];
+            size_t Video_Errors_PerSta[16]; //Per STA
+            memset(Video_Errors_PerSta, 0, sizeof(Video_Errors_PerSta));
+            for (size_t i=0; i<Video_STA_Errors_ByDseq.size(); i++)
+                Video_Errors_PerSta[i%16]+=Video_STA_Errors_ByDseq[i];
+            int MaxStaErrors=((DSF?1500:1350)*(FSC_WasSet?2:1));
+            bool Video_StaNonZero=false;
+            for (size_t i=0; i<16; i++)
+                if (Video_Errors_PerSta[i]==MaxStaErrors)
+                    Video_StaNonZero=true; // Only if all from the same STA value
+            size_t Audio_TotalErrors=0;
             size_t Audio_Errors_PerDseq[16]; //Per Dseq
             if (Audio_Errors.empty())
             {
@@ -1407,11 +1431,22 @@ void File_DvDif::Errors_Stats_Update()
                 for (size_t ChannelGroup=0; ChannelGroup<Audio_Errors.size(); ChannelGroup++)
                     for (size_t Dseq=0; Dseq<Dseq_Count; Dseq++)
                         Audio_Errors_PerDseq[Dseq]+=Audio_Errors[ChannelGroup][Dseq];
+                for (size_t Dseq=0; Dseq<Dseq_Count; Dseq++)
+                    Audio_TotalErrors+=Audio_Errors_PerDseq[Dseq];
                 Event1.Audio_Data_Errors_Count=16;
                 Event1.Audio_Data_Errors=Audio_Errors_PerDseq;
             }
             Event1.Captions_Errors=Captions_Flags[1]?1:0;
             Captions_Flags.reset(1);
+            Event1.Coherency_Flags=(Coherency_Flags[Coherency_PackInSub]?0:(1<<0))
+                                 | (Coherency_Flags[Coherency_PackInVid]?0:(1<<1))
+                                 | (Coherency_Flags[Coherency_DataInAud]?0:(1<<2))
+                                 | ((!Video_StaNonZero)?0:(1<<3))
+                                 | ((Audio_TotalErrors<((DSF?100:90)*(FSC_WasSet?2:1)))?0:(1<<4))
+                                 | ((Coherency_Flags[Coherency_video_source] && Coherency_Flags[Coherency_video_control])?0:(1<<5))
+                                 | ((Coherency_Flags[Coherency_audio_source] && Coherency_Flags[Coherency_audio_control])?0:(1<<6))
+                                 ;
+            Coherency_Flags.reset();
             Config->Event_Send(NULL, (const int8u*)&Event1, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1));
             Config->Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0));
         #endif //MEDIAINFO_EVENTS

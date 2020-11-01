@@ -522,6 +522,7 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_1
     size_t                  Audio_Data_Errors_Count;
     size_t*                 Audio_Data_Errors;
     MediaInfo_int32u        Captions_Errors; // bit 0 = parity issue
+    MediaInfo_int32u        Coherency_Flags; // bit 0 = no pack sub, bit 1 = no pack vid, bit 2 = no pack aud, bit 3 = no data vid, bit 4 = no data aud, bit 5 = no vid source/control, bit 6 = no aud source/control
 };
 
 /*-------------------------------------------------------------------------*/

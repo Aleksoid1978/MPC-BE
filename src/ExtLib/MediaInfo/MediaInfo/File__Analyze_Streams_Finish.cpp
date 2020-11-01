@@ -642,7 +642,7 @@ void File__Analyze::Streams_Finish_StreamOnly(stream_t StreamKind, size_t Pos)
         if (Duration==0)
             Duration=Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Duration)).To_float64();
         int64u StreamSize_Encoded=Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_StreamSize_Encoded)).To_int64u();
-        if (Duration>0 && StreamSize_Encoded>0)
+        if (Duration>0)
             Fill(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_BitRate_Encoded), StreamSize_Encoded*8*1000/Duration, 0);
     }
 
@@ -658,10 +658,13 @@ void File__Analyze::Streams_Finish_StreamOnly(stream_t StreamKind, size_t Pos)
     //StreamSize from BitRate and Duration
     if (StreamKind!=Stream_Other && Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_StreamSize)).empty() && !Retrieve(StreamKind, Pos, "BitRate").empty() && !Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Duration)).empty() && Retrieve(StreamKind, Pos, "BitRate").find(__T(" / "))==std::string::npos) //If not done the first time or by other routine
     {
-        int64u BitRate=Retrieve(StreamKind, Pos, "BitRate").To_int64u();
-        int64u Duration=Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Duration)).To_int64u();
+        float64 BitRate=Retrieve(StreamKind, Pos, "BitRate").To_float64();
+        float64 Duration=Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Duration)).To_float64();
         if (BitRate>0 && Duration>0)
-            Fill(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_StreamSize), BitRate*Duration/8/1000);
+        {
+            float64 StreamSize=BitRate*Duration/8/1000;
+            Fill(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_StreamSize), StreamSize, 0);
+        }
     }
 
     //Bit rate and maximum bit rate
@@ -992,6 +995,139 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
 //---------------------------------------------------------------------------
 void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
 {
+    // 
+    if (Retrieve(Stream_Audio, Pos, Audio_StreamSize_Encoded)==Retrieve(Stream_Audio, Pos, Audio_StreamSize))
+        Clear(Stream_Audio, Pos, Audio_StreamSize_Encoded);
+    if (Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded)==Retrieve(Stream_Audio, Pos, Audio_BitRate))
+        Clear(Stream_Audio, Pos, Audio_BitRate_Encoded);
+
+    //Dolby ED2 merge
+    if (Retrieve(Stream_Audio, Pos, Audio_Format)==__T("Dolby ED2"))
+    {
+        int64u BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_int64u();
+        int64u BitRate_Encoded=Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).To_int64u();
+        int64u StreamSize=Retrieve(Stream_Audio, Pos, Audio_StreamSize).To_int64u();
+        int64u StreamSize_Encoded=Retrieve(Stream_Audio, Pos, Audio_StreamSize_Encoded).To_int64u();
+        for (size_t i=Pos+1; i<Count_Get(Stream_Audio);)
+        {
+            size_t OtherID_Count;
+            Ztring OtherID;
+            Ztring OtherID_String;
+            if (Retrieve_Const(Stream_Audio, i, Audio_Format)==__T("Dolby ED2"))
+            {
+                //if (Retrieve_Const(Stream_Audio, i, Audio_Channel_s_).To_int64u())
+                if (!Retrieve_Const(Stream_Audio, i, "Presentation0").empty())
+                    break; // It is the next ED2
+                OtherID_Count=0;
+                OtherID=Retrieve(Stream_Audio, i, Audio_ID);
+                OtherID_String =Retrieve(Stream_Audio, i, Audio_ID_String);
+            }
+            if (i+7<Count_Get(Stream_Audio) // 8 tracks Dolby E
+             && Retrieve_Const(Stream_Audio, i  , Audio_Format)==__T("Dolby E")
+             && Retrieve_Const(Stream_Audio, i+7, Audio_Format)==__T("Dolby E"))
+            {
+                Ztring NextID=Retrieve_Const(Stream_Audio, i, Audio_ID);
+                size_t NextID_DashPos=NextID.rfind(__T('-'));
+                if (NextID_DashPos!=(size_t)-1)
+                    NextID.erase(NextID_DashPos);
+                if (Retrieve_Const(Stream_Audio, i+7, Audio_ID)==NextID+__T("-8"))
+                {
+                    OtherID_Count=7;
+                    OtherID=NextID;
+                }
+                NextID=Retrieve_Const(Stream_Audio, i, Audio_ID_String);
+                NextID_DashPos=NextID.rfind(__T('-'));
+                if (NextID_DashPos!=(size_t)-1)
+                    NextID.erase(NextID_DashPos);
+                if (Retrieve_Const(Stream_Audio, i+7, Audio_ID_String)==NextID+__T("-8"))
+                {
+                    OtherID_String=NextID;
+                }
+            }
+            if (OtherID.empty())
+                break;
+
+            size_t OtherID_DashPos=OtherID.rfind(__T('-'));
+            if (OtherID_DashPos!=(size_t)-1)
+                OtherID.erase(0, OtherID_DashPos+1);
+            if (!OtherID.empty() && OtherID[0]==__T('(') && OtherID[OtherID.size()-1]==__T(')'))
+            {
+                OtherID.resize(OtherID.size()-1);
+                OtherID.erase(0, 1);
+            }
+            Ztring ID=Retrieve(Stream_Audio, Pos, Audio_ID);
+            if (!ID.empty() && ID[ID.size()-1]==__T(')'))
+            {
+                ID.resize(ID.size()-1);
+                ID+=__T(" / ");
+                ID+=OtherID;
+                ID+=__T(')');
+                Fill(Stream_Audio, Pos, Audio_ID, ID, true);
+            }
+            else
+            {
+                Ztring CurrentID_String=Retrieve(Stream_Audio, Pos, Audio_ID_String);
+                Fill(Stream_Audio, Pos, Audio_ID, OtherID);
+                Fill(Stream_Audio, Pos, Audio_ID_String, CurrentID_String+__T(" / ")+OtherID_String, true);
+            }
+            for (size_t j=i+OtherID_Count; j>=i; j--)
+            {
+                BitRate+=Retrieve(Stream_Audio, j, Audio_BitRate).To_int64u();
+                BitRate_Encoded+=Retrieve(Stream_Audio, j, Audio_BitRate_Encoded).To_int64u();
+                StreamSize+=Retrieve(Stream_Audio, j, Audio_StreamSize).To_int64u();
+                StreamSize_Encoded+=Retrieve(Stream_Audio, j, Audio_StreamSize_Encoded).To_int64u();
+                Stream_Erase(Stream_Audio, j);
+            }
+
+            ZtringList List[6];
+            for (size_t j=0; j<6; j++)
+                List[j].Separator_Set(0, __T(" / "));
+            List[0].Write(Get(Stream_Menu, 0, __T("Format")));
+            List[1].Write(Get(Stream_Menu, 0, __T("Format/String")));
+            List[2].Write(Get(Stream_Menu, 0, __T("List_StreamKind")));
+            List[3].Write(Get(Stream_Menu, 0, __T("List_StreamPos")));
+            List[4].Write(Get(Stream_Menu, 0, __T("List")));
+            List[5].Write(Get(Stream_Menu, 0, __T("List/String")));
+            bool IsNok=false;
+            for (size_t j=0; j<6; j++)
+                if (!List[j].empty() && List[j].size()!=List[3].size())
+                    IsNok=true;
+            if (!IsNok && !List[2].empty() && List[2].size()==List[3].size())
+            {
+                size_t Audio_Begin;
+                for (Audio_Begin=0; Audio_Begin <List[2].size(); Audio_Begin++)
+                    if (List[2][Audio_Begin]==__T("2"))
+                        break;
+                if (Audio_Begin!=List[2].size())
+                {
+                    for (size_t j=0; j<6; j++)
+                        if (!List[j].empty())
+                            List[j].erase(List[j].begin()+Audio_Begin+i);
+                    size_t Audio_End;
+                    for (Audio_End=Audio_Begin+1; Audio_End<List[2].size(); Audio_End++)
+                        if (List[2][Audio_End]!=__T("2"))
+                            break;
+                    for (size_t j=Audio_Begin+i; j<Audio_End; j++)
+                        List[3][j].From_Number(List[3][j].To_int32u()-1-OtherID_Count);
+                    Fill(Stream_Menu, 0, "Format", List[0].Read(), true);
+                    Fill(Stream_Menu, 0, "Format/String", List[1].Read(), true);
+                    Fill(Stream_Menu, 0, "List_StreamKind", List[2].Read(), true);
+                    Fill(Stream_Menu, 0, "List_StreamPos", List[3].Read(), true);
+                    Fill(Stream_Menu, 0, "List", List[4].Read(), true);
+                    Fill(Stream_Menu, 0, "List/String", List[5].Read(), true);
+                }
+            }
+        }
+        if (BitRate)
+            Fill(Stream_Audio, Pos, Audio_BitRate, BitRate, 10, true);
+        if (BitRate_Encoded)
+            Fill(Stream_Audio, Pos, Audio_BitRate_Encoded, BitRate_Encoded, 10, true);
+        if (StreamSize)
+            Fill(Stream_Audio, Pos, Audio_StreamSize, StreamSize, 10, true);
+        if (StreamSize_Encoded)
+            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, StreamSize_Encoded, 10, true);
+    }
+
     //Channels
     if (Retrieve(Stream_Audio, Pos, Audio_Channel_s_).empty())
     {
@@ -1099,13 +1235,17 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
     //Stream size
     if (Retrieve(Stream_Audio, Pos, Audio_StreamSize).empty() && Retrieve(Stream_Audio, Pos, Audio_BitRate_Mode)==__T("CBR"))
     {
-        int64u Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_float64();
-        int64u BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_float64();
-        int64u BitRate_Encoded=Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).To_float64();
+        float64 Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_float64();
+        float64 BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_float64();
         if (Duration && BitRate)
-            Fill(Stream_Audio, Pos, Audio_StreamSize, Duration*BitRate/8/1000);
-        if (Duration && BitRate_Encoded)
-            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, Duration*BitRate_Encoded/8/1000, 10, true);
+            Fill(Stream_Audio, Pos, Audio_StreamSize, Duration*BitRate/8/1000, 0, true);
+    }
+    if (Retrieve(Stream_Audio, Pos, Audio_StreamSize_Encoded).empty() && !Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).empty() && Retrieve(Stream_Audio, Pos, Audio_BitRate_Mode)==__T("CBR"))
+    {
+        float64 Duration=Retrieve(Stream_Audio, Pos, Audio_Duration).To_float64();
+        float64 BitRate_Encoded=Retrieve(Stream_Audio, Pos, Audio_BitRate_Encoded).To_float64();
+        if (Duration)
+            Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, Duration*BitRate_Encoded/8/1000, 0, true);
     }
 
     //CBR/VBR
@@ -1370,7 +1510,11 @@ void File__Analyze::Streams_Finish_InterStreams()
         for (size_t StreamKind_Pos=Stream_General+1; StreamKind_Pos<Stream_Menu; StreamKind_Pos++)
             for (size_t Pos=0; Pos<Count_Get((stream_t)StreamKind_Pos); Pos++)
             {
-                int64u StreamXX_StreamSize=Retrieve((stream_t)StreamKind_Pos, Pos, Fill_Parameter((stream_t)StreamKind_Pos, Generic_StreamSize)).To_int64u();
+                int64u StreamXX_StreamSize=0;
+                if (!Retrieve((stream_t)StreamKind_Pos, Pos, Fill_Parameter((stream_t)StreamKind_Pos, Generic_StreamSize_Encoded)).empty())
+                    StreamXX_StreamSize+=Retrieve((stream_t)StreamKind_Pos, Pos, Fill_Parameter((stream_t)StreamKind_Pos, Generic_StreamSize_Encoded)).To_int64u();
+                else if (!Retrieve((stream_t)StreamKind_Pos, Pos, Fill_Parameter((stream_t)StreamKind_Pos, Generic_StreamSize)).empty())
+                    StreamXX_StreamSize+=Retrieve((stream_t)StreamKind_Pos, Pos, Fill_Parameter((stream_t)StreamKind_Pos, Generic_StreamSize)).To_int64u();
                 if (StreamXX_StreamSize>0 || StreamKind_Pos==Stream_Text)
                     StreamSize-=StreamXX_StreamSize;
                 else

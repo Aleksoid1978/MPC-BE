@@ -32,6 +32,9 @@ public :
     //Constructor/Destructor
     File_Png();
 
+    //In
+    stream_t                    StreamKind;
+
 private :
     //Streams management
     void Streams_Accept();

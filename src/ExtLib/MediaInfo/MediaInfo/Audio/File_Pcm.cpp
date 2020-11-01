@@ -322,7 +322,7 @@ void File_Pcm::Header_Parse()
         }
     #endif //MEDIAINFO_DEMUX
 
-    if (BitDepth && Channels)
+    if (BitDepth*Channels/8)
     {
         int64u Size=(Element_Size/(BitDepth*Channels/8))*(BitDepth*Channels/8); //A complete sample
         if (Element_Size && Size==0)

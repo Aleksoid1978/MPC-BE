@@ -414,6 +414,54 @@ Ztring ChannelLayout_2018_Rename(stream_t StreamKind, const Ztring& Parameter, c
     ShouldReturn=true;
     if (StreamKind==Stream_Audio && (Parameter==__T("BedChannelConfiguration") || (Parameter.size()>=14 && Parameter.find(__T(" ChannelLayout"), Parameter.size()-14)!=string::npos)))
         return ChannelLayout_2018_Rename(Value, StreamFormat);
+    if (StreamKind==Stream_Audio)
+    {
+        size_t ObjectPos=Parameter.find(__T("Object"));
+        if (ObjectPos!=string::npos)
+        {
+            bool NoRename=false;
+            if (ObjectPos && !(Parameter[ObjectPos-1]==__T(' ')))
+                NoRename=true;
+            if (ObjectPos+6>=Parameter.size() || !(Parameter[ObjectPos+6]>=__T('0') && Parameter[ObjectPos+6]<=__T('9')))
+                NoRename=true;
+            if (!NoRename)
+            {
+                size_t SpacePos=Parameter.find(__T(' '), ObjectPos);
+                if (SpacePos==string::npos)
+                    return ChannelLayout_2018_Rename(Value, StreamFormat);
+            }
+        }
+        size_t AltPos=Parameter.find(__T("Alt"));
+        if (AltPos!=string::npos)
+        {
+            bool NoRename=false;
+            if (AltPos && !(Parameter[AltPos-1]==__T(' ')))
+                NoRename=true;
+            if (AltPos+3>=Parameter.size() || !(Parameter[AltPos+3]>=__T('0') && Parameter[AltPos+3]<=__T('9')))
+                NoRename=true;
+            if (!NoRename)
+            {
+                size_t SpacePos=Parameter.find(__T(' '), AltPos);
+                if (SpacePos==string::npos)
+                    return ChannelLayout_2018_Rename(Value, StreamFormat);
+            }
+        }
+        size_t BedPos=Parameter.find(__T("Bed"));
+        if (BedPos!=string::npos)
+        {
+            bool NoRename=false;
+            if (BedPos && !(Parameter[BedPos-1]==__T(' ')))
+                NoRename=true;
+            if (BedPos+3>=Parameter.size() || !(Parameter[BedPos+3]>=__T('0') && Parameter[BedPos+3]<=__T('9')))
+                NoRename=true;
+            if (!NoRename)
+            {
+                size_t SpacePos=Parameter.find(__T(' '), BedPos);
+                if (SpacePos==string::npos)
+                    return ChannelLayout_2018_Rename(Value, StreamFormat);
+            }
+        }
+    }
     ShouldReturn=ShouldReturn_Save;
     return Value;
 }

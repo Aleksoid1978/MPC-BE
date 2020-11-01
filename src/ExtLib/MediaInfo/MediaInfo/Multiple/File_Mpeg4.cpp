@@ -932,6 +932,9 @@ void File_Mpeg4::Streams_Finish()
                  ||  Temp->second.Parsers[0]->Retrieve(Stream_General, 0, General_Format)==__T("Final Cut CDP"))
                 {
                     //Before
+                    int64u StreamSize_Encoded=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize_Encoded)).To_int64u();
+                    if (!StreamSize_Encoded)
+                        StreamSize_Encoded=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize)).To_int64u();
                     Clear(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize));
                     if (StreamKind_Last==Stream_Audio)
                     {
@@ -954,6 +957,8 @@ void File_Mpeg4::Streams_Finish()
                         //Channel coupling, removing the 2 corresponding streams
                         NewPos1=StreamPos_Last-1;
                         ID=Retrieve(StreamKind_Last, NewPos1, General_ID)+__T(" / ")+Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
+                        if (StreamSize_Encoded)
+                            StreamSize_Encoded+=Retrieve(StreamKind_Last, NewPos1, Fill_Parameter(StreamKind_Last, Generic_StreamSize)).To_int64u();
 
                         Stream_Erase(NewKind, StreamPos_Last);
                         Stream_Erase(NewKind, NewPos1);
@@ -994,6 +999,16 @@ void File_Mpeg4::Streams_Finish()
                                 Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
                         for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
                             Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, 1));
+                        if (StreamPos)
+                        {
+                            if (StreamSize_Encoded)
+                                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize_Encoded), 0, 10, true);
+                        }
+                        else
+                        {
+                            if (StreamSize_Encoded)
+                                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize_Encoded), StreamSize_Encoded, 10, true);
+                        }
                     }
                     Ztring LawRating=Temp->second.Parsers[0]->Retrieve(Stream_General, 0, General_LawRating);
                     if (!LawRating.empty())
@@ -1012,6 +1027,17 @@ void File_Mpeg4::Streams_Finish()
                     ZtringListList StreamMoreSave;
                     if (New_Count > 1)
                     {
+                        if (StreamKind_Last==Stream_Audio)
+                        {
+                            //Content from underlying format is preferred
+                            Clear(Stream_Audio, StreamPos_Last, Audio_Channel_s_);
+                            Clear(Stream_Audio, StreamPos_Last, Audio_BitRate);
+                            Clear(Stream_Audio, StreamPos_Last, Audio_SamplingRate);
+                        }
+                        Clear(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize));
+                        Clear(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize_Encoded));
+                        Clear(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate));
+                        Clear(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate_Encoded));
                         ID = Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
                         if (StreamKind_Last != Stream_Max)
                         {

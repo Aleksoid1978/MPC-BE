@@ -117,7 +117,11 @@ Ztring HTTP_Client::Read ()
         return Ztring();
     }
 
-    Ztring ToReturn; ToReturn.From_Local(Buffer, Size);
+    Ztring ToReturn;
+    ToReturn.From_UTF8(Buffer, Size);
+    if (ToReturn.empty())
+        ToReturn.From_Local(Buffer, Size);
+
     delete[] Buffer;
     return ToReturn;
 }

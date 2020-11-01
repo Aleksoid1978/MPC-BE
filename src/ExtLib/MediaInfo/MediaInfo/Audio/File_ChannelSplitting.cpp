@@ -208,11 +208,6 @@ void File_ChannelSplitting::Read_Buffer_Continue()
         return;
     }
 
-    //Demux
-    #if MEDIAINFO_DEMUX
-        Demux(Buffer+Buffer_Offset, Buffer_Size-Buffer_Offset, ContentType_MainStream);
-    #endif //MEDIAINFO_EVENTS
-
     //Size of buffer
     for (size_t i=0; i<Common->SplittedChannels.size(); i++)
     {
@@ -288,6 +283,9 @@ void File_ChannelSplitting::Read_Buffer_Continue_Parse()
         for (size_t Pos=0; Pos<SplittedChannel->Parsers.size(); Pos++)
         {
             Element_Code=SplittedChannels_i*2+1;
+            #if MEDIAINFO_DEMUX
+                Demux(Buffer+Buffer_Offset, Buffer_Size-Buffer_Offset, ContentType_MainStream);
+            #endif //MEDIAINFO_EVENTS
             Open_Buffer_Continue(SplittedChannel->Parsers[Pos], SplittedChannel->Buffer, SplittedChannel->Buffer_Size, false);
 
             //Multiple parsers
