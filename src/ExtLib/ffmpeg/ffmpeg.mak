@@ -463,7 +463,6 @@ SRCS_LC_B = \
 	libavcodec/ttadata.c \
 	libavcodec/ttadsp.c \
 	libavcodec/twinvq.c \
-	libavcodec/utvideo.c \
 	libavcodec/utvideodec.c \
 	libavcodec/utvideodsp.c \
 	libavcodec/utils.c \

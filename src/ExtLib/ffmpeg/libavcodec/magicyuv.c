@@ -25,7 +25,6 @@
 #define CACHED_BITSTREAM_READER !ARCH_X86_32
 
 #include "libavutil/pixdesc.h"
-#include "libavutil/qsort.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
@@ -47,9 +46,8 @@ typedef enum Prediction {
 } Prediction;
 
 typedef struct HuffEntry {
-    uint16_t sym;
     uint8_t  len;
-    uint32_t code;
+    uint16_t code;
 } HuffEntry;
 
 typedef struct MagicYUVContext {
@@ -63,7 +61,7 @@ typedef struct MagicYUVContext {
     int               color_matrix;   // video color matrix
     int               flags;
     int               interlaced;     // video is interlaced
-    uint8_t          *buf;            // pointer to AVPacket->data
+    const uint8_t    *buf;            // pointer to AVPacket->data
     int               hshift[4];
     int               vshift[4];
     Slice            *slices[4];      // slice bitstream positions for each plane
@@ -74,30 +72,26 @@ typedef struct MagicYUVContext {
     LLVidDSPContext   llviddsp;
 } MagicYUVContext;
 
-static int huff_cmp_len(const void *a, const void *b)
+static int huff_build(HuffEntry he[], uint16_t codes_count[33],
+                      VLC *vlc, int nb_elems)
 {
-    const HuffEntry *aa = a, *bb = b;
-    return (aa->len - bb->len) * 4096 + bb->sym - aa->sym;
-}
+    unsigned nb_codes = 0, max = 0;
 
-static int huff_build(HuffEntry he[], VLC *vlc, int nb_elems)
-{
-    uint32_t code;
-    int i;
-
-    AV_QSORT(he, nb_elems, HuffEntry, huff_cmp_len);
-
-    code = 1;
-    for (i = nb_elems - 1; i >= 0; i--) {
-        he[i].code = code >> (32 - he[i].len);
-        code += 0x80000000u >> (he[i].len - 1);
+    for (int i = 32; i > 0; i--) {
+        uint16_t curr = codes_count[i];   // # of leafs of length i
+        codes_count[i] = nb_codes / 2;    // # of non-leaf nodes on level i
+        nb_codes = codes_count[i] + curr; // # of nodes on level i
+        if (curr && !max)
+            max = i;
     }
 
-    ff_free_vlc(vlc);
-    return ff_init_vlc_sparse(vlc, FFMIN(he[nb_elems - 1].len, 12), nb_elems,
-                              &he[0].len,  sizeof(he[0]), sizeof(he[0].len),
-                              &he[0].code, sizeof(he[0]), sizeof(he[0].code),
-                              &he[0].sym,  sizeof(he[0]), sizeof(he[0].sym),  0);
+    for (unsigned i = 0; i < nb_elems; i++) {
+        he[i].code = codes_count[he[i].len];
+        codes_count[he[i].len]++;
+    }
+    return init_vlc(vlc, FFMIN(max, 12), nb_elems,
+                    &he[0].len,  sizeof(he[0]), sizeof(he[0].len),
+                    &he[0].code, sizeof(he[0]), sizeof(he[0].code), 0);
 }
 
 static void magicyuv_median_pred16(uint16_t *dst, const uint16_t *src1,
@@ -270,27 +264,26 @@ static int magy_decode_slice(AVCodecContext *avctx, void *tdata,
         int sheight = AV_CEIL_RSHIFT(s->slice_height, s->vshift[i]);
         ptrdiff_t fake_stride = p->linesize[i] * (1 + interlaced);
         ptrdiff_t stride = p->linesize[i];
+        const uint8_t *slice = s->buf + s->slices[i][j].start;
         int flags, pred;
-        int ret = init_get_bits8(&gb, s->buf + s->slices[i][j].start,
-                                 s->slices[i][j].size);
 
-        if (ret < 0)
-            return ret;
-
-        flags = get_bits(&gb, 8);
-        pred  = get_bits(&gb, 8);
+        flags = bytestream_get_byte(&slice);
+        pred  = bytestream_get_byte(&slice);
 
         dst = p->data[i] + j * sheight * stride;
         if (flags & 1) {
-            if (get_bits_left(&gb) < 8* width * height)
+            if (s->slices[i][j].size - 2 < width * height)
                 return AVERROR_INVALIDDATA;
             for (k = 0; k < height; k++) {
-                for (x = 0; x < width; x++)
-                    dst[x] = get_bits(&gb, 8);
-
+                bytestream_get_buffer(&slice, dst, width);
                 dst += stride;
             }
         } else {
+            int ret = init_get_bits8(&gb, slice, s->slices[i][j].size - 2);
+
+            if (ret < 0)
+                return ret;
+
             for (k = 0; k < height; k++) {
                 for (x = 0; x < width; x++) {
                     int pix;
@@ -385,31 +378,40 @@ static int magy_decode_slice(AVCodecContext *avctx, void *tdata,
     return 0;
 }
 
-static int build_huffman(AVCodecContext *avctx, GetBitContext *gbit, int max)
+static int build_huffman(AVCodecContext *avctx, const uint8_t *table,
+                         int table_size, int max)
 {
     MagicYUVContext *s = avctx->priv_data;
+    GetByteContext gb;
     HuffEntry he[4096];
+    uint16_t length_count[33] = { 0 };
     int i = 0, j = 0, k;
 
-    while (get_bits_left(gbit) >= 8) {
-        int b = get_bits(gbit, 1);
-        int x = get_bits(gbit, 7);
-        int l = get_bitsz(gbit, b * 8) + 1;
+    bytestream2_init(&gb, table, table_size);
 
+    while (bytestream2_get_bytes_left(&gb) > 0) {
+        int b = bytestream2_peek_byteu(&gb) &  0x80;
+        int x = bytestream2_get_byteu(&gb)  & ~0x80;
+        int l = 1;
+
+        if (b) {
+            if (bytestream2_get_bytes_left(&gb) <= 0)
+                break;
+            l += bytestream2_get_byteu(&gb);
+        }
         k = j + l;
         if (k > max || x == 0 || x > 32) {
             av_log(avctx, AV_LOG_ERROR, "Invalid Huffman codes\n");
             return AVERROR_INVALIDDATA;
         }
 
-        for (; j < k; j++) {
-            he[j].sym = j;
+        length_count[x] += l;
+        for (; j < k; j++)
             he[j].len = x;
-        }
 
         if (j == max) {
             j = 0;
-            if (huff_build(he, &s->vlc[i], max)) {
+            if (huff_build(he, length_count, &s->vlc[i], max)) {
                 av_log(avctx, AV_LOG_ERROR, "Cannot build Huffman codes\n");
                 return AVERROR_INVALIDDATA;
             }
@@ -417,6 +419,7 @@ static int build_huffman(AVCodecContext *avctx, GetBitContext *gbit, int max)
             if (i == s->planes) {
                 break;
             }
+            memset(length_count, 0, sizeof(length_count));
         }
     }
 
@@ -434,24 +437,26 @@ static int magy_decode_frame(AVCodecContext *avctx, void *data,
     MagicYUVContext *s = avctx->priv_data;
     ThreadFrame frame = { .f = data };
     AVFrame *p = data;
-    GetByteContext gbyte;
-    GetBitContext gbit;
+    GetByteContext gb;
     uint32_t first_offset, offset, next_offset, header_size, slice_width;
     int width, height, format, version, table_size;
     int ret, i, j;
 
-    bytestream2_init(&gbyte, avpkt->data, avpkt->size);
-    if (bytestream2_get_le32(&gbyte) != MKTAG('M', 'A', 'G', 'Y'))
+    if (avpkt->size < 36)
         return AVERROR_INVALIDDATA;
 
-    header_size = bytestream2_get_le32(&gbyte);
+    bytestream2_init(&gb, avpkt->data, avpkt->size);
+    if (bytestream2_get_le32u(&gb) != MKTAG('M', 'A', 'G', 'Y'))
+        return AVERROR_INVALIDDATA;
+
+    header_size = bytestream2_get_le32u(&gb);
     if (header_size < 32 || header_size >= avpkt->size) {
         av_log(avctx, AV_LOG_ERROR,
                "header or packet too small %"PRIu32"\n", header_size);
         return AVERROR_INVALIDDATA;
     }
 
-    version = bytestream2_get_byte(&gbyte);
+    version = bytestream2_get_byteu(&gb);
     if (version != 7) {
         avpriv_request_sample(avctx, "Version %d", version);
         return AVERROR_PATCHWELCOME;
@@ -464,7 +469,7 @@ static int magy_decode_frame(AVCodecContext *avctx, void *data,
     s->decorrelate = 0;
     s->bps = 8;
 
-    format = bytestream2_get_byte(&gbyte);
+    format = bytestream2_get_byteu(&gb);
     switch (format) {
     case 0x65:
         avctx->pix_fmt = AV_PIX_FMT_GBRP;
@@ -529,6 +534,14 @@ static int magy_decode_frame(AVCodecContext *avctx, void *data,
         avctx->pix_fmt = AV_PIX_FMT_GRAY10;
         s->bps = 10;
         break;
+    case 0x7b:
+        avctx->pix_fmt = AV_PIX_FMT_YUV420P10;
+        s->hshift[1] =
+        s->vshift[1] =
+        s->hshift[2] =
+        s->vshift[2] = 1;
+        s->bps = 10;
+        break;
     default:
         avpriv_request_sample(avctx, "Format 0x%X", format);
         return AVERROR_PATCHWELCOME;
@@ -537,34 +550,34 @@ static int magy_decode_frame(AVCodecContext *avctx, void *data,
     s->magy_decode_slice = s->bps == 8 ? magy_decode_slice : magy_decode_slice10;
     s->planes = av_pix_fmt_count_planes(avctx->pix_fmt);
 
-    bytestream2_skip(&gbyte, 1);
-    s->color_matrix = bytestream2_get_byte(&gbyte);
-    s->flags        = bytestream2_get_byte(&gbyte);
+    bytestream2_skipu(&gb, 1);
+    s->color_matrix = bytestream2_get_byteu(&gb);
+    s->flags        = bytestream2_get_byteu(&gb);
     s->interlaced   = !!(s->flags & 2);
-    bytestream2_skip(&gbyte, 3);
+    bytestream2_skipu(&gb, 3);
 
-    width  = bytestream2_get_le32(&gbyte);
-    height = bytestream2_get_le32(&gbyte);
+    width  = bytestream2_get_le32u(&gb);
+    height = bytestream2_get_le32u(&gb);
     ret = ff_set_dimensions(avctx, width, height);
     if (ret < 0)
         return ret;
 
-    slice_width = bytestream2_get_le32(&gbyte);
+    slice_width = bytestream2_get_le32u(&gb);
     if (slice_width != avctx->coded_width) {
         avpriv_request_sample(avctx, "Slice width %"PRIu32, slice_width);
         return AVERROR_PATCHWELCOME;
     }
-    s->slice_height = bytestream2_get_le32(&gbyte);
+    s->slice_height = bytestream2_get_le32u(&gb);
     if (s->slice_height <= 0 || s->slice_height > INT_MAX - avctx->coded_height) {
         av_log(avctx, AV_LOG_ERROR,
                "invalid slice height: %d\n", s->slice_height);
         return AVERROR_INVALIDDATA;
     }
 
-    bytestream2_skip(&gbyte, 4);
+    bytestream2_skipu(&gb, 4);
 
     s->nb_slices = (avctx->coded_height + s->slice_height - 1) / s->slice_height;
-    if (s->nb_slices > INT_MAX / sizeof(Slice)) {
+    if (s->nb_slices > INT_MAX / FFMAX(sizeof(Slice), 4 * 5)) {
         av_log(avctx, AV_LOG_ERROR,
                "invalid number of slices: %d\n", s->nb_slices);
         return AVERROR_INVALIDDATA;
@@ -581,12 +594,14 @@ static int magy_decode_frame(AVCodecContext *avctx, void *data,
         }
     }
 
+    if (bytestream2_get_bytes_left(&gb) <= s->nb_slices * s->planes * 5)
+        return AVERROR_INVALIDDATA;
     for (i = 0; i < s->planes; i++) {
         av_fast_malloc(&s->slices[i], &s->slices_size[i], s->nb_slices * sizeof(Slice));
         if (!s->slices[i])
             return AVERROR(ENOMEM);
 
-        offset = bytestream2_get_le32(&gbyte);
+        offset = bytestream2_get_le32u(&gb);
         if (offset >= avpkt->size - header_size)
             return AVERROR_INVALIDDATA;
 
@@ -596,32 +611,34 @@ static int magy_decode_frame(AVCodecContext *avctx, void *data,
         for (j = 0; j < s->nb_slices - 1; j++) {
             s->slices[i][j].start = offset + header_size;
 
-            next_offset = bytestream2_get_le32(&gbyte);
+            next_offset = bytestream2_get_le32u(&gb);
             if (next_offset <= offset || next_offset >= avpkt->size - header_size)
                 return AVERROR_INVALIDDATA;
 
             s->slices[i][j].size = next_offset - offset;
+            if (s->slices[i][j].size < 2)
+                return AVERROR_INVALIDDATA;
             offset = next_offset;
         }
 
         s->slices[i][j].start = offset + header_size;
         s->slices[i][j].size  = avpkt->size - s->slices[i][j].start;
+
+        if (s->slices[i][j].size < 2)
+            return AVERROR_INVALIDDATA;
     }
 
-    if (bytestream2_get_byte(&gbyte) != s->planes)
+    if (bytestream2_get_byteu(&gb) != s->planes)
         return AVERROR_INVALIDDATA;
 
-    bytestream2_skip(&gbyte, s->nb_slices * s->planes);
+    bytestream2_skipu(&gb, s->nb_slices * s->planes);
 
-    table_size = header_size + first_offset - bytestream2_tell(&gbyte);
+    table_size = header_size + first_offset - bytestream2_tell(&gb);
     if (table_size < 2)
         return AVERROR_INVALIDDATA;
 
-    ret = init_get_bits8(&gbit, avpkt->data + bytestream2_tell(&gbyte), table_size);
-    if (ret < 0)
-        return ret;
-
-    ret = build_huffman(avctx, &gbit, s->max);
+    ret = build_huffman(avctx, avpkt->data + bytestream2_tell(&gb),
+                        table_size, s->max);
     if (ret < 0)
         return ret;
 

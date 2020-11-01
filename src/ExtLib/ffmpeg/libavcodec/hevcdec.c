@@ -369,12 +369,22 @@ static void export_stream_params(HEVCContext *s, const HEVCSPS *sps)
     if (num != 0 && den != 0)
         av_reduce(&avctx->framerate.den, &avctx->framerate.num,
                   num, den, 1 << 30);
+}
+
+static int export_stream_params_from_sei(HEVCContext *s)
+{
+    AVCodecContext *avctx = s->avctx;
+
+    if (s->sei.a53_caption.buf_ref)
+        s->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
 
     if (s->sei.alternative_transfer.present &&
         av_color_transfer_name(s->sei.alternative_transfer.preferred_transfer_characteristics) &&
         s->sei.alternative_transfer.preferred_transfer_characteristics != AVCOL_TRC_UNSPECIFIED) {
         avctx->color_trc = s->sei.alternative_transfer.preferred_transfer_characteristics;
     }
+
+    return 0;
 }
 
 static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
@@ -581,6 +591,10 @@ static int hls_slice_header(HEVCContext *s)
         s->seq_decode = (s->seq_decode + 1) & 0xff;
         s->max_ra     = INT_MAX;
     }
+
+    ret = export_stream_params_from_sei(s);
+    if (ret < 0)
+        return ret;
 
     sh->dependent_slice_segment_flag = 0;
     if (!sh->first_slice_in_pic_flag) {
@@ -801,6 +815,11 @@ static int hls_slice_header(HEVCContext *s)
         if (s->ps.pps->pic_slice_level_chroma_qp_offsets_present_flag) {
             sh->slice_cb_qp_offset = get_se_golomb(gb);
             sh->slice_cr_qp_offset = get_se_golomb(gb);
+            if (sh->slice_cb_qp_offset < -12 || sh->slice_cb_qp_offset > 12 ||
+                sh->slice_cr_qp_offset < -12 || sh->slice_cr_qp_offset > 12) {
+                av_log(s->avctx, AV_LOG_ERROR, "Invalid slice cx qp offset.\n");
+                return AVERROR_INVALIDDATA;
+            }
         } else {
             sh->slice_cb_qp_offset = 0;
             sh->slice_cr_qp_offset = 0;
@@ -2806,8 +2825,6 @@ static int set_side_data(HEVCContext *s)
         if (!sd)
             av_buffer_unref(&a53->buf_ref);
         a53->buf_ref = NULL;
-
-        s->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
     for (int i = 0; i < s->sei.unregistered.nb_buf_ref; i++) {
@@ -3258,6 +3275,11 @@ static int hevc_decode_extradata(HEVCContext *s, uint8_t *buf, int length, int f
         }
     }
 
+    /* export stream parameters from SEI */
+    ret = export_stream_params_from_sei(s);
+    if (ret < 0)
+        return ret;
+
     return 0;
 }
 
@@ -3484,30 +3506,21 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     if (s->ps.sps != s0->ps.sps)
         s->ps.sps = NULL;
     for (i = 0; i < FF_ARRAY_ELEMS(s->ps.vps_list); i++) {
-        av_buffer_unref(&s->ps.vps_list[i]);
-        if (s0->ps.vps_list[i]) {
-            s->ps.vps_list[i] = av_buffer_ref(s0->ps.vps_list[i]);
-            if (!s->ps.vps_list[i])
-                return AVERROR(ENOMEM);
-        }
+        ret = av_buffer_replace(&s->ps.vps_list[i], s0->ps.vps_list[i]);
+        if (ret < 0)
+            return ret;
     }
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->ps.sps_list); i++) {
-        av_buffer_unref(&s->ps.sps_list[i]);
-        if (s0->ps.sps_list[i]) {
-            s->ps.sps_list[i] = av_buffer_ref(s0->ps.sps_list[i]);
-            if (!s->ps.sps_list[i])
-                return AVERROR(ENOMEM);
-        }
+        ret = av_buffer_replace(&s->ps.sps_list[i], s0->ps.sps_list[i]);
+        if (ret < 0)
+            return ret;
     }
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->ps.pps_list); i++) {
-        av_buffer_unref(&s->ps.pps_list[i]);
-        if (s0->ps.pps_list[i]) {
-            s->ps.pps_list[i] = av_buffer_ref(s0->ps.pps_list[i]);
-            if (!s->ps.pps_list[i])
-                return AVERROR(ENOMEM);
-        }
+        ret = av_buffer_replace(&s->ps.pps_list[i], s0->ps.pps_list[i]);
+        if (ret < 0)
+            return ret;
     }
 
     if (s->ps.sps != s0->ps.sps)
@@ -3532,11 +3545,27 @@ static int hevc_update_thread_context(AVCodecContext *dst,
         s->max_ra = INT_MAX;
     }
 
-    av_buffer_unref(&s->sei.a53_caption.buf_ref);
-    if (s0->sei.a53_caption.buf_ref) {
-        s->sei.a53_caption.buf_ref = av_buffer_ref(s0->sei.a53_caption.buf_ref);
-        if (!s->sei.a53_caption.buf_ref)
-            return AVERROR(ENOMEM);
+    ret = av_buffer_replace(&s->sei.a53_caption.buf_ref, s0->sei.a53_caption.buf_ref);
+    if (ret < 0)
+        return ret;
+
+    for (i = 0; i < s->sei.unregistered.nb_buf_ref; i++)
+        av_buffer_unref(&s->sei.unregistered.buf_ref[i]);
+    s->sei.unregistered.nb_buf_ref = 0;
+
+    if (s0->sei.unregistered.nb_buf_ref) {
+        ret = av_reallocp_array(&s->sei.unregistered.buf_ref,
+                                s0->sei.unregistered.nb_buf_ref,
+                                sizeof(*s->sei.unregistered.buf_ref));
+        if (ret < 0)
+            return ret;
+
+        for (i = 0; i < s0->sei.unregistered.nb_buf_ref; i++) {
+            s->sei.unregistered.buf_ref[i] = av_buffer_ref(s0->sei.unregistered.buf_ref[i]);
+            if (!s->sei.unregistered.buf_ref[i])
+                return AVERROR(ENOMEM);
+            s->sei.unregistered.nb_buf_ref++;
+        }
     }
 
     s->sei.frame_packing        = s0->sei.frame_packing;
@@ -3544,6 +3573,10 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     s->sei.mastering_display    = s0->sei.mastering_display;
     s->sei.content_light        = s0->sei.content_light;
     s->sei.alternative_transfer = s0->sei.alternative_transfer;
+
+    ret = export_stream_params_from_sei(s);
+    if (ret < 0)
+        return ret;
 
     return 0;
 }

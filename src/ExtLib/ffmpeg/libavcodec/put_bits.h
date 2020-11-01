@@ -33,6 +33,8 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/avassert.h"
 
+#include "version.h"
+
 #if ARCH_X86_64
 // TODO: Benchmark and optionally enable on other 64-bit architectures.
 typedef uint64_t BitBuf;
@@ -145,22 +147,22 @@ static inline void flush_put_bits_le(PutBitContext *s)
     s->bit_buf  = 0;
 }
 
-#ifdef BITSTREAM_WRITER_LE
-#define avpriv_align_put_bits align_put_bits_unsupported_here
-#define avpriv_put_string ff_put_string_unsupported_here
-#define avpriv_copy_bits avpriv_copy_bits_unsupported_here
-#else
-/**
- * Pad the bitstream with zeros up to the next byte boundary.
- */
+#if FF_API_AVPRIV_PUT_BITS
 void avpriv_align_put_bits(PutBitContext *s);
+void avpriv_copy_bits(PutBitContext *pb, const uint8_t *src, int length);
+#endif
+
+#ifdef BITSTREAM_WRITER_LE
+#define ff_put_string ff_put_string_unsupported_here
+#define ff_copy_bits ff_copy_bits_unsupported_here
+#else
 
 /**
  * Put the string string in the bitstream.
  *
  * @param terminate_string 0-terminates the written string if value is 1
  */
-void avpriv_put_string(PutBitContext *pb, const char *string,
+void ff_put_string(PutBitContext *pb, const char *string,
                        int terminate_string);
 
 /**
@@ -168,7 +170,7 @@ void avpriv_put_string(PutBitContext *pb, const char *string,
  *
  * @param length the number of bits of src to copy
  */
-void avpriv_copy_bits(PutBitContext *pb, const uint8_t *src, int length);
+void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length);
 #endif
 
 static inline void put_bits_no_assert(PutBitContext *s, int n, BitBuf value)
@@ -383,6 +385,14 @@ static inline void set_put_bits_buffer_size(PutBitContext *s, int size)
     av_assert0(size <= INT_MAX/8 - BUF_BITS);
     s->buf_end = s->buf + size;
     s->size_in_bits = 8*size;
+}
+
+/**
+ * Pad the bitstream with zeros up to the next byte boundary.
+ */
+static inline void align_put_bits(PutBitContext *s)
+{
+    put_bits(s, s->bit_left & 7, 0);
 }
 
 #undef AV_WBBUF
