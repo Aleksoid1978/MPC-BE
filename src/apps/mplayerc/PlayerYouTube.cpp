@@ -1202,6 +1202,9 @@ namespace Youtube
 					urlData data;
 					if (URLReadData(url.GetString(), data)) {
 						channelId = UTF8ToWStr(GetEntry(data.data(), R"(content="https://www.youtube.com/channel/)", R"(")"));
+						if (channelId.IsEmpty()) {
+							channelId = RegExpParse<CString>(data.data(), R"(\\?"channelId\\?":\\?"([-a-zA-Z0-9_]+)\\?)");
+						}
 					}
 				}
 
