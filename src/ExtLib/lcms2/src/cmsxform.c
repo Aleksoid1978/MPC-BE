@@ -447,7 +447,7 @@ void TransformOnePixelWithGamutCheck(_cmsTRANSFORM* p,
     p ->GamutCheck ->Eval16Fn(wIn, &wOutOfGamut, p ->GamutCheck ->Data);
     if (wOutOfGamut >= 1) {
 
-        cmsUInt16Number i;
+        cmsUInt32Number i;
         _cmsAlarmCodesChunkType* ContextAlarmCodes = (_cmsAlarmCodesChunkType*) _cmsContextGetClientChunk(p->ContextID, AlarmCodesContext);        
 
         for (i=0; i < p ->Lut->OutputChannels; i++) {
@@ -774,6 +774,12 @@ void CMSEXPORT _cmsGetTransformFormattersFloat(struct _cmstransform_struct *CMMc
      if (ToOutput)  *ToOutput  = CMMcargo ->ToOutputFloat;
 }
 
+// returns original flags
+cmsUInt32Number CMSEXPORT _cmsGetTransformFlags(struct _cmstransform_struct* CMMcargo)
+{
+    _cmsAssert(CMMcargo != NULL);
+    return CMMcargo->dwOriginalFlags;
+}
 
 // Allocate transform struct and set it to defaults. Ask the optimization plug-in about if those formats are proper
 // for separated transforms. If this is the case,
