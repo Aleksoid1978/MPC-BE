@@ -1413,6 +1413,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
     {
+        .id        = AV_CODEC_ID_AVS3,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "avs3",
+        .long_name = NULL_IF_CONFIG_SMALL("AVS3-P2/IEEE1857.10"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
         .id        = AV_CODEC_ID_Y41P,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "y41p",
@@ -1797,6 +1804,27 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "photocd",
         .long_name = NULL_IF_CONFIG_SMALL("Kodak Photo CD"),
         .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_IPU,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "ipu",
+        .long_name = NULL_IF_CONFIG_SMALL("IPU Video"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ARGO,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "argo",
+        .long_name = NULL_IF_CONFIG_SMALL("Argonaut Games Video"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_CRI,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "cri",
+        .long_name = NULL_IF_CONFIG_SMALL("Cintel RAW"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_LOSSLESS,
     },
 
     /* various PCM "codecs" */

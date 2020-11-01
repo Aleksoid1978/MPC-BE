@@ -24,6 +24,7 @@
  * RV30/40 decoder common data
  */
 
+#include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 
@@ -106,37 +107,33 @@ static VLC_TYPE table_data[117592][2];
  * @param insyms symbols for input codes (NULL for default ones)
  * @param num    VLC table number (for static initialization)
  */
-static void rv34_gen_vlc(const uint8_t *bits, int size, VLC *vlc, const uint8_t *insyms,
+static void rv34_gen_vlc(const uint8_t *bits, int size, VLC *vlc, const uint8_t *syms,
                          const int num)
 {
-    int i;
     int counts[17] = {0}, codes[17];
-    uint16_t cw[MAX_VLC_SIZE], syms[MAX_VLC_SIZE];
-    uint8_t bits2[MAX_VLC_SIZE];
-    int maxbits = 0, realsize = 0;
+    uint16_t cw[MAX_VLC_SIZE];
+    int maxbits;
 
-    for(i = 0; i < size; i++){
-        if(bits[i]){
-            bits2[realsize] = bits[i];
-            syms[realsize] = insyms ? insyms[i] : i;
-            realsize++;
-            maxbits = FFMAX(maxbits, bits[i]);
-            counts[bits[i]]++;
-        }
-    }
+    for (int i = 0; i < size; i++)
+        counts[bits[i]]++;
 
-    codes[0] = 0;
-    for(i = 0; i < 16; i++)
+    /* bits[0] is zero for some tables, i.e. syms actually starts at 1.
+     * So we reset it here. The code assigned to this element is 0x00. */
+    codes[0] = counts[0] = 0;
+    for (int i = 0; i < 16; i++) {
         codes[i+1] = (codes[i] + counts[i]) << 1;
-    for(i = 0; i < realsize; i++)
-        cw[i] = codes[bits2[i]]++;
+        if (counts[i])
+            maxbits = i;
+    }
+    for (int i = 0; i < size; i++)
+        cw[i] = codes[bits[i]]++;
 
     vlc->table = &table_data[table_offs[num]];
     vlc->table_allocated = table_offs[num + 1] - table_offs[num];
-    ff_init_vlc_sparse(vlc, FFMIN(maxbits, 9), realsize,
-                       bits2, 1, 1,
+    ff_init_vlc_sparse(vlc, FFMIN(maxbits, 9), size,
+                       bits, 1, 1,
                        cw,    2, 2,
-                       syms,  2, 2, INIT_VLC_USE_NEW_STATIC);
+                       syms, !!syms, !!syms, INIT_VLC_USE_NEW_STATIC);
 }
 
 /**
@@ -343,8 +340,9 @@ static inline RV34VLC* choose_vlc_set(int quant, int mod, int type)
 {
     if(mod == 2 && quant < 19) quant += 10;
     else if(mod && quant < 26) quant += 5;
-    return type ? &inter_vlcs[rv34_quant_to_vlc_set[1][av_clip(quant, 0, 30)]]
-                : &intra_vlcs[rv34_quant_to_vlc_set[0][av_clip(quant, 0, 30)]];
+    av_assert2(quant >= 0 && quant < 32);
+    return type ? &inter_vlcs[rv34_quant_to_vlc_set[1][quant]]
+                : &intra_vlcs[rv34_quant_to_vlc_set[0][quant]];
 }
 
 /**

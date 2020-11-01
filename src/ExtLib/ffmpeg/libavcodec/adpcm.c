@@ -129,12 +129,14 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
         min_channels = 2;
         max_channels = 8;
         if (avctx->channels & 1) {
-            avpriv_request_sample(avctx, "channel count %d\n", avctx->channels);
+            avpriv_request_sample(avctx, "channel count %d", avctx->channels);
             return AVERROR_PATCHWELCOME;
         }
         break;
     case AV_CODEC_ID_ADPCM_PSX:
         max_channels = 8;
+        if (avctx->channels <= 0 || avctx->block_align % (16 * avctx->channels))
+            return AVERROR_INVALIDDATA;
         break;
     case AV_CODEC_ID_ADPCM_IMA_DAT4:
     case AV_CODEC_ID_ADPCM_THP:
@@ -878,7 +880,7 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
     }
     case AV_CODEC_ID_ADPCM_SWF:
     {
-        int buf_bits       = buf_size * 8 - 2;
+        int buf_bits       = (avctx->block_align ? avctx->block_align : buf_size) * 8 - 2;
         int nbits          = (bytestream2_get_byte(gb) >> 6) + 2;
         int block_hdr_size = 22 * ch;
         int block_size     = block_hdr_size + nbits * ch * 4095;
@@ -887,6 +889,9 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
         nb_samples         = nblocks * 4096;
         if (bits_left >= block_hdr_size)
             nb_samples += 1 + (bits_left - block_hdr_size) / (nbits * ch);
+
+        if (avctx->block_align)
+            nb_samples *= buf_size / avctx->block_align;
         break;
     }
     case AV_CODEC_ID_ADPCM_THP:
@@ -1765,9 +1770,17 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
         }
         break;
     case AV_CODEC_ID_ADPCM_SWF:
-        adpcm_swf_decode(avctx, buf, buf_size, samples);
+    {
+        const int nb_blocks  = avctx->block_align ? avpkt->size / avctx->block_align : 1;
+        const int block_size = avctx->block_align ? avctx->block_align : avpkt->size;
+
+        for (int block = 0; block < nb_blocks; block++) {
+            adpcm_swf_decode(avctx, buf + block * block_size, block_size, samples);
+            samples += nb_samples / nb_blocks;
+        }
         bytestream2_seek(&gb, 0, SEEK_END);
         break;
+    }
     case AV_CODEC_ID_ADPCM_YAMAHA:
         for (n = nb_samples >> (1 - st); n > 0; n--) {
             int v = bytestream2_get_byteu(&gb);
@@ -1968,6 +1981,7 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
             int nb_samples_per_block = 28 * FFMAX(avctx->block_align, 16 * avctx->channels) / (16 * avctx->channels);
             for (channel = 0; channel < avctx->channels; channel++) {
                 samples = samples_p[channel] + block * nb_samples_per_block;
+                av_assert0((block + 1) * nb_samples_per_block <= nb_samples);
 
                 /* Read in every sample for this channel.  */
                 for (i = 0; i < nb_samples_per_block / 28; i++) {

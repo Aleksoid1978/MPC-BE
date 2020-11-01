@@ -864,6 +864,11 @@ static void fill_xyztables(struct SwsContext *c)
     }
 }
 
+static int range_override_needed(enum AVPixelFormat format)
+{
+    return !isYUV(format) && !isGray(format);
+}
+
 int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
                              int srcRange, const int table[4], int dstRange,
                              int brightness, int contrast, int saturation)
@@ -876,9 +881,9 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
     desc_dst = av_pix_fmt_desc_get(c->dstFormat);
     desc_src = av_pix_fmt_desc_get(c->srcFormat);
 
-    if(!isYUV(c->dstFormat) && !isGray(c->dstFormat))
+    if(range_override_needed(c->dstFormat))
         dstRange = 0;
-    if(!isYUV(c->srcFormat) && !isGray(c->srcFormat))
+    if(range_override_needed(c->srcFormat))
         srcRange = 0;
 
     if (c->srcRange != srcRange ||
@@ -1008,8 +1013,8 @@ int sws_getColorspaceDetails(struct SwsContext *c, int **inv_table,
 
     *inv_table  = c->srcColorspaceTable;
     *table      = c->dstColorspaceTable;
-    *srcRange   = c->srcRange;
-    *dstRange   = c->dstRange;
+    *srcRange   = range_override_needed(c->srcFormat) ? 1 : c->srcRange;
+    *dstRange   = range_override_needed(c->dstFormat) ? 1 : c->dstRange;
     *brightness = c->brightness;
     *contrast   = c->contrast;
     *saturation = c->saturation;

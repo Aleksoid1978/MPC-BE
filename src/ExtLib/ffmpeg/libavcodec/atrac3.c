@@ -58,6 +58,8 @@
 #define SAMPLES_PER_FRAME 1024
 #define MDCT_SIZE          512
 
+#define ATRAC3_VLC_BITS 8
+
 typedef struct GainBlock {
     AtracGainInfo g_block[4];
 } GainBlock;
@@ -116,7 +118,7 @@ typedef struct ATRAC3Context {
 } ATRAC3Context;
 
 static DECLARE_ALIGNED(32, float, mdct_window)[MDCT_SIZE];
-static VLC_TYPE atrac3_vlc_table[4096][2];
+static VLC_TYPE atrac3_vlc_table[7 * 1 << ATRAC3_VLC_BITS][2];
 static VLC   spectral_coeff_tab[7];
 
 /**
@@ -245,7 +247,7 @@ static void read_quant_spectral_coeffs(GetBitContext *gb, int selector,
         if (selector != 1) {
             for (i = 0; i < num_codes; i++) {
                 huff_symb = get_vlc2(gb, spectral_coeff_tab[selector-1].table,
-                                     spectral_coeff_tab[selector-1].bits, 3);
+                                     ATRAC3_VLC_BITS, 1);
                 huff_symb += 1;
                 code = huff_symb >> 1;
                 if (huff_symb & 1)
@@ -255,7 +257,7 @@ static void read_quant_spectral_coeffs(GetBitContext *gb, int selector,
         } else {
             for (i = 0; i < num_codes; i++) {
                 huff_symb = get_vlc2(gb, spectral_coeff_tab[selector - 1].table,
-                                     spectral_coeff_tab[selector - 1].bits, 3);
+                                     ATRAC3_VLC_BITS, 1);
                 mantissas[i * 2    ] = mantissa_vlc_tab[huff_symb * 2    ];
                 mantissas[i * 2 + 1] = mantissa_vlc_tab[huff_symb * 2 + 1];
             }
@@ -851,6 +853,7 @@ static int atrac3al_decode_frame(AVCodecContext *avctx, void *data,
 
 static av_cold void atrac3_init_static_data(void)
 {
+    VLC_TYPE (*table)[2] = atrac3_vlc_table;
     int i;
 
     init_imdct_window();
@@ -858,12 +861,12 @@ static av_cold void atrac3_init_static_data(void)
 
     /* Initialize the VLC tables. */
     for (i = 0; i < 7; i++) {
-        spectral_coeff_tab[i].table = &atrac3_vlc_table[atrac3_vlc_offs[i]];
-        spectral_coeff_tab[i].table_allocated = atrac3_vlc_offs[i + 1] -
-                                                atrac3_vlc_offs[i    ];
-        init_vlc(&spectral_coeff_tab[i], 9, huff_tab_sizes[i],
+        spectral_coeff_tab[i].table           = table;
+        spectral_coeff_tab[i].table_allocated = 256;
+        init_vlc(&spectral_coeff_tab[i], ATRAC3_VLC_BITS, huff_tab_sizes[i],
                  huff_bits[i],  1, 1,
                  huff_codes[i], 1, 1, INIT_VLC_USE_NEW_STATIC);
+        table += 256;
     }
 }
 
