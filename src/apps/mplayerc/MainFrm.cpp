@@ -4600,6 +4600,9 @@ void CMainFrame::OnFilePostCloseMedia()
 	}
 	m_wndToolBar.SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
+	DXVAState::ClearState();
+	m_wndToolBar.Invalidate(FALSE);
+
 	DLog(L"CMainFrame::OnFilePostCloseMedia() : end");
 }
 
