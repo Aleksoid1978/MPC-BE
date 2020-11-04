@@ -2760,6 +2760,8 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	const int nItem = lpDrawItemStruct->itemID;
 	const CRect& rcItem = lpDrawItemStruct->rcItem;
+	CRect rcText(rcItem);
+
 	POSITION pos = FindPos(nItem);
 	if (!pos) {
 		ASSERT(FALSE);
@@ -2814,16 +2816,19 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		textcolor |= 0xA0A0A0;
 	}
 
+	pDC->SetTextColor(textcolor);
+
 	CString time = !pli.m_bInvalid ? m_list.GetItemText(nItem, COL_TIME) : L"Invalid";
 	CSize timesize(0, 0);
 	CPoint timept(rcItem.right, 0);
 	if (time.GetLength() > 0) {
 		timesize = pDC->GetTextExtent(time);
 		if ((3 + timesize.cx + 3) < rcItem.Width() / 2) {
-			timept = CPoint(rcItem.right - (3 + timesize.cx + 3), (rcItem.top + rcItem.bottom - timesize.cy) / 2);
+			CRect rc(rcItem);
+			rc.left = rc.right - (3 + timesize.cx + 3);
+			pDC->DrawTextW(time, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-			pDC->SetTextColor(textcolor);
-			pDC->TextOut(timept.x, timept.y, time);
+			rcText.right -= (timesize.cx + 6);
 		}
 	}
 
@@ -2873,18 +2878,9 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		offset = rcItem.Height();
 	}
 
-	CSize filesize = pDC->GetTextExtent(file);
-	filesize.cx += offset;
-	while (3 + filesize.cx + 6 > timept.x && file.GetLength() > 3) {
-		file = file.Left(file.GetLength() - 4) + L"...";
-		filesize = pDC->GetTextExtent(file);
-		filesize.cx += offset;
-	}
-
-	if (file.GetLength() > 3 || GetCurTab().type == EXPLORER) { // L"C:".GetLenght() < 3
-		pDC->SetTextColor(textcolor);
-		pDC->TextOutW(rcItem.left + 3 + offset, (rcItem.top + rcItem.bottom - filesize.cy) / 2, file);
-	}
+	rcText.left += (3 + offset);
+	rcText.right -= 6;
+	pDC->DrawTextW(file, &rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 
 	pDC->RestoreDC(oldDC);
 }
