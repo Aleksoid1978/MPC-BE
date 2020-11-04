@@ -712,6 +712,8 @@ protected:
 	CString m_strTitle;
 	CString m_strPlaybackRenderedPath;
 
+	bool m_bOpening = false;
+
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	BOOL OpenFile(const CString fname, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);

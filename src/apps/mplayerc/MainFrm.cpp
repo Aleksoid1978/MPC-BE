@@ -4491,6 +4491,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	m_wndPlaylistBar.SavePlaylist();
 
 	StartAutoHideCursor();
+
+	m_bOpening = false;
 }
 
 void CMainFrame::OnFilePostCloseMedia()
@@ -11231,6 +11233,12 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			}
 		}
 
+		if (m_bOpening) {
+			if (auto hdc = ::GetDC(m_wndView.GetSafeHwnd())) {
+				m_wndView.SendMessageW(WM_ERASEBKGND, (WPARAM)hdc, 0);
+			}
+		}
+
 		m_wndView.SetVideoRect(rWnd);
 
 		if (bShowStats && rVid.Height() > 0) {
@@ -17482,8 +17490,11 @@ void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 	m_eMediaLoadState = iState;
 	SendAPICommand(CMD_STATE, L"%d", m_eMediaLoadState);
 
+	m_bOpening = true;
+
 	switch (m_eMediaLoadState) {
 		case MLS_CLOSED:
+			m_bOpening = false;
 			DLog(L"CMainFrame::SetLoadState() : CLOSED");
 			break;
 		case MLS_LOADING:
@@ -17493,6 +17504,7 @@ void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 			DLog(L"CMainFrame::SetLoadState() : LOADED");
 			break;
 		case MLS_CLOSING:
+			m_bOpening = false;
 			DLog(L"CMainFrame::SetLoadState() : CLOSING");
 			break;
 		default:
