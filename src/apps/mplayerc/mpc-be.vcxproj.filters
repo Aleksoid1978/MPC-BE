@@ -40,14 +40,14 @@
     <Filter Include="WebServer">
       <UniqueIdentifier>{b8be811f-d5ff-47f4-a83d-b2fa5d5eb556}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Player config">
-      <UniqueIdentifier>{c2fa522d-09a4-4187-b8c5-3e1896202b28}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Dialogs">
       <UniqueIdentifier>{608421c6-623f-4b1b-87fc-c3cdd2a34a9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Graph">
       <UniqueIdentifier>{9a37ee8f-75d2-4cd6-a9b6-5e55368f3709}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player Config">
+      <UniqueIdentifier>{c2fa522d-09a4-4187-b8c5-3e1896202b28}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -325,10 +325,10 @@
       <Filter>WebServer</Filter>
     </ClCompile>
     <ClCompile Include="AppSettings.cpp">
-      <Filter>Player config</Filter>
+      <Filter>Player Config</Filter>
     </ClCompile>
     <ClCompile Include="MediaFormats.cpp">
-      <Filter>Player config</Filter>
+      <Filter>Player Config</Filter>
     </ClCompile>
     <ClCompile Include="ColorControl.cpp">
       <Filter>Source Files</Filter>
@@ -771,13 +771,13 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="SettingsDefines.h">
-      <Filter>Player config</Filter>
+      <Filter>Player Config</Filter>
     </ClInclude>
     <ClInclude Include="MediaFormats.h">
-      <Filter>Player config</Filter>
+      <Filter>Player Config</Filter>
     </ClInclude>
     <ClInclude Include="AppSettings.h">
-      <Filter>Player config</Filter>
+      <Filter>Player Config</Filter>
     </ClInclude>
     <ClInclude Include="FilterEnum.h">
       <Filter>Graph</Filter>
