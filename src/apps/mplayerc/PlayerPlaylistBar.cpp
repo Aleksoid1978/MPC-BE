@@ -3890,7 +3890,8 @@ void CPlayerPlaylistBar::TCalcLayout()
 	GetWindowRect(&rcWindow);
 	GetClientRect(&rcClient);
 	const int width = wSysButton * (m_tabs.size() > 1 ? 3 : 1) + m_tabs[0].r.Width() + (rcWindow.Width() - rcClient.Width()) * 2 - 3;
-	const CSize cz(width, rcTabBar.Height() * 3 + (AfxGetAppSettings().bShowPlaylistSearchBar ? m_nSearchBarHeight * 2 : 0));
+	const CSize cz(width + (SysVersion::IsWin8orLater() ? m_pMainFrame->GetSystemMetricsDPI(SM_CXVSCROLL) : SM_CXVSCROLL),
+				   rcTabBar.Height() * 3 + (AfxGetAppSettings().bShowPlaylistSearchBar ? m_nSearchBarHeight * 2 : 0));
 	m_szMinFloat = m_szMinHorz = m_szMinVert = m_szFixedFloat = cz;
 }
 
