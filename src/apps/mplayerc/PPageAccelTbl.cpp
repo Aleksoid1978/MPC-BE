@@ -972,13 +972,13 @@ void CPPageAccelTbl::SetupList()
 	UpdateAllDupFlags();
 
 	if (!AfxGetAppSettings().AccelTblColWidth.bEnable) {
-		int contentSize;
 		for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
 			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-			contentSize = m_list.GetColumnWidth(nCol);
+			const int contentWidth = m_list.GetColumnWidth(nCol);
 			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
-			if (contentSize > m_list.GetColumnWidth(nCol)) {
-				m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+			const int headerWidth = m_list.GetColumnWidth(nCol);
+			if (contentWidth > headerWidth) {
+				m_list.SetColumnWidth(nCol, contentWidth);
 			}
 		}
 	}

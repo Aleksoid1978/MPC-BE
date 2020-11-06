@@ -526,15 +526,19 @@ void CPPageFullscreen::ModesUpdate()
 
 	for (int nCol = 0; nCol <= COL_SRR; nCol++) {
 		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-		int nColumnWidth = m_list.GetColumnWidth(nCol);
+		int columnWidth = m_list.GetColumnWidth(nCol);
 		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
-		int nHeaderWidth = m_list.GetColumnWidth(nCol);
-		int nNewWidth = std::max(nColumnWidth, nHeaderWidth);
-		m_list.SetColumnWidth(nCol, nNewWidth);
+		const int headerWidth = m_list.GetColumnWidth(nCol);
+
+		if (columnWidth > headerWidth) {
+			m_list.SetColumnWidth(nCol, columnWidth);
+		} else {
+			columnWidth = headerWidth;
+		}
 		{
 			LVCOLUMN col;
 			col.mask = LVCF_MINWIDTH;
-			col.cxMin = nNewWidth;
+			col.cxMin = columnWidth;
 			m_list.SetColumn(nCol, &col);
 		}
 	}
