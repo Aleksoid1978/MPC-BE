@@ -92,17 +92,19 @@ HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
 	m_pFile->Seek(0);
+	__int64 start_pos = 0;
 
-	if (!ReadID3Tag(m_pFile->GetRemaining())) {
-		m_pFile->Seek(0);
+	if (ReadID3Tag(m_pFile->GetRemaining())) {
+		start_pos = m_pFile->GetPos();
 	}
+	m_pFile->Seek(start_pos);
 
 	DWORD id = 0;
 	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('fLaC')) {
 		return E_FAIL;
 	}
 
-	m_pFile->Seek(0);
+	m_pFile->Seek(start_pos);
 
 	m_pDecoder = FLAC__stream_decoder_new();
 	CheckPointer(m_pDecoder, E_FAIL);
@@ -135,7 +137,7 @@ HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
 	if (metadataend) {
 		m_extrasize = metadataend;
 		m_extradata = (BYTE*)malloc(m_extrasize);
-		m_pFile->Seek(0);
+		m_pFile->Seek(start_pos);
 		if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
 			return E_FAIL;
 		}
