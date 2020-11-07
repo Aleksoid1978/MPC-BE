@@ -351,21 +351,21 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
-5		"Left button"
-6		"Click"
-8		"If nothing is loaded, open recent file"
-10		"Double click"
-12		"Middle button"
-14		"Right button"
-15		"Сontext menu"
+5		"Ліва кнопка"
+6		"Клацання"
+8		"Якщо нічого не завантажено, то відкрити останній файл"
+10		"Подвійне клацання"
+12		"Середня кнопка"
+14		"Права кнопка"
+15		"Контекстне меню"
 16		"X-button 1"
 18		"X-button 2"
-20		"Wheel"
-21		"Up"
-23		"Down"
-25		"Left"
-27		"Right"
-29		"Default"
+20		"Коліщатко"
+21		"Догори"
+23		"Донизу"
+25		"Ліворуч"
+27		"Праворуч"
+29		"За замовчуванням"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
