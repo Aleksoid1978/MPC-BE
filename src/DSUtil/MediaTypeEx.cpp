@@ -249,6 +249,7 @@ static const std::map<GUID, LPCSTR> dxvaguids = {
 	ADDENTRY(DXVA2_ModeVP9_VLD_Profile0)
 	ADDENTRY(DXVA2_ModeVP9_VLD_10bit_Profile2)
 	ADDENTRY(DXVA2_ModeVP8_VLD)
+	ADDENTRY(DXVA_ModeAV1_VLD_Profile0)
 };
 #undef ADDENTRY
 
