@@ -2463,7 +2463,9 @@ static const struct {
 	// VP9
 	{&DXVA2_ModeVP9_VLD_Profile0,					L"VP9"},
 	{&DXVA2_ModeVP9_VLD_10bit_Profile2,				L"VP9 10-bit"},
-	{&DXVA2_VP9_VLD_Intel,							L"VP9 Intel"}
+	{&DXVA2_VP9_VLD_Intel,							L"VP9 Intel"},
+	// AV1
+	{&DXVA_ModeAV1_VLD_Profile0,					L"AV1 profile 0"},
 };
 
 CString GetDXVAMode(const GUID& guidDecoder)
