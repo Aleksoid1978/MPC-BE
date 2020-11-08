@@ -3332,8 +3332,9 @@ void CMPCVideoDecFilter::SetThreadCount()
 			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
 
 			if (m_nCodecId == AV_CODEC_ID_AV1) {
-				av_opt_set_int(m_pAVCtx->priv_data, "tilethreads", m_pAVCtx->thread_count == 1 ? 1 : (m_pAVCtx->thread_count < 8 ? 2 : 4), 0);
-				av_opt_set_int(m_pAVCtx->priv_data, "framethreads", m_pAVCtx->thread_count, 0);
+				const auto threadCount = m_pAVCtx->thread_count == 1 ? 1 : (m_pAVCtx->thread_count < 8 ? 2 : 4);
+				av_opt_set_int(m_pAVCtx->priv_data, "tilethreads", threadCount, 0);
+				av_opt_set_int(m_pAVCtx->priv_data, "framethreads", threadCount, 0);
 			}
 		}
 	}
