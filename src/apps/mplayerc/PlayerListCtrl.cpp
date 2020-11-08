@@ -772,8 +772,8 @@ CComboBox* CPlayerListCtrl::ShowInPlaceComboBox(int nItem, int nCol, std::list<C
 		return(nullptr);
 	}
 
-	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | WS_VSCROLL/* | WS_HSCROLL*/
-								  |CBS_DROPDOWNLIST|CBS_DISABLENOSCROLL/*|CBS_NOINTEGRALHEIGHT*/;
+	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | WS_VSCROLL /*| WS_HSCROLL*/
+					| CBS_DROPDOWNLIST /*|CBS_NOINTEGRALHEIGHT*/;
 	CComboBox* pComboBox = DNew CInPlaceComboBox(nItem, nCol, lstItems, nSel);
 	pComboBox->Create(dwStyle, rect, this, IDC_COMBO1);
 
