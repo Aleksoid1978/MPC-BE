@@ -79,8 +79,8 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_PREVIOUS), ID_NAVIGATE_SKIPBACK);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbXButton1, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
-	AddStringData(m_cmbXButton1, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
-	AddStringData(m_cmbXButton1, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
+	AddStringData(m_cmbXButton1, ResStr(IDS_AG_JUMP_BACKWARD_2), ID_PLAY_SEEKBACKWARDMED);
+	AddStringData(m_cmbXButton1, ResStr(IDS_AG_JUMP_FORWARD_2), ID_PLAY_SEEKFORWARDMED);
 	SelectByItemData(m_cmbXButton1, s.nMouseX1Click);
 
 	AddStringData(m_cmbXButton2, L"---", 0);
@@ -88,15 +88,15 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS), ID_NAVIGATE_SKIPBACK);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_NEXT_FILE), ID_NAVIGATE_SKIPFORWARDFILE);
 	AddStringData(m_cmbXButton2, ResStr(IDS_AG_PREVIOUS_FILE), ID_NAVIGATE_SKIPBACKFILE);
-	AddStringData(m_cmbXButton2, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
-	AddStringData(m_cmbXButton2, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
+	AddStringData(m_cmbXButton2, ResStr(IDS_AG_JUMP_BACKWARD_2), ID_PLAY_SEEKBACKWARDMED);
+	AddStringData(m_cmbXButton2, ResStr(IDS_AG_JUMP_FORWARD_2), ID_PLAY_SEEKFORWARDMED);
 	SelectByItemData(m_cmbXButton2, s.nMouseX2Click);
 
 	AddStringData(m_cmbWheelUp, L"---", 0);
 	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_VOLUME_UP), ID_VOLUME_UP);
 	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_VOLUME_DOWN), ID_VOLUME_DOWN);
-	AddStringData(m_cmbWheelUp, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
-	AddStringData(m_cmbWheelUp, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
+	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_JUMP_BACKWARD_2), ID_PLAY_SEEKBACKWARDMED);
+	AddStringData(m_cmbWheelUp, ResStr(IDS_AG_JUMP_FORWARD_2), ID_PLAY_SEEKFORWARDMED);
 	SelectByItemData(m_cmbWheelUp, s.nMouseWheelUp);
 
 	OnWheelUpChange();
@@ -157,10 +157,10 @@ void CPPageMouse::OnWheelUpChange()
 		AddStringData(m_cmbWheelDown, ResStr(IDS_AG_VOLUME_UP), ID_VOLUME_UP);
 		break;
 	case ID_PLAY_SEEKBACKWARDMED:
-		AddStringData(m_cmbWheelDown, ResStr(IDS_MPLAYERC_25), ID_PLAY_SEEKFORWARDMED);
+		AddStringData(m_cmbWheelDown, ResStr(IDS_AG_JUMP_FORWARD_2), ID_PLAY_SEEKFORWARDMED);
 		break;
 	case ID_PLAY_SEEKFORWARDMED:
-		AddStringData(m_cmbWheelDown, ResStr(IDS_MPLAYERC_26), ID_PLAY_SEEKBACKWARDMED);
+		AddStringData(m_cmbWheelDown, ResStr(IDS_AG_JUMP_BACKWARD_2), ID_PLAY_SEEKBACKWARDMED);
 		break;
 	default:
 		AddStringData(m_cmbWheelDown, L"---", 0);
