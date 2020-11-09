@@ -339,7 +339,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
-			} else if (contentType == L"video/mp2t") {
+			} else if (contentType == L"video/mp2t" || contentType == L"video/mpeg") {
 				m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
 			} else if (contentType == L"application/x-ogg" || contentType == L"application/ogg" || contentType == L"audio/ogg") {
 				m_subtype = MEDIASUBTYPE_Ogg;
