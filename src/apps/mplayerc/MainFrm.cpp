@@ -2196,7 +2196,9 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 
 	if (m_bFullScreen) {
 		if (bActive) {
-			SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+			if (!m_bInOptions) {
+				SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+			}
 		} else {
 			const CAppSettings& s = AfxGetAppSettings();
 			const int i = s.iOnTop;
@@ -17141,6 +17143,11 @@ bool CMainFrame::StopCapture()
 
 void CMainFrame::ShowOptions(int idPage)
 {
+	const auto bOnTop = (::GetWindowLongPtrW(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST) == WS_EX_TOPMOST;
+	if (bOnTop) {
+		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+
 	CAppSettings& s = AfxGetAppSettings();
 	s.iSelectedVideoRenderer = -1;
 
@@ -17148,6 +17155,11 @@ void CMainFrame::ShowOptions(int idPage)
 
 	m_bInOptions = true;
 	INT_PTR dResult = options.DoModal();
+
+	if (bOnTop) {
+		SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+
 	if (s.bResetSettings) {
 		PostMessageW(WM_CLOSE);
 		return;
