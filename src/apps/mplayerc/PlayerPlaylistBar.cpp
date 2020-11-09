@@ -3051,25 +3051,24 @@ void CPlayerPlaylistBar::OnLButtonDown(UINT nFlags, CPoint point)
 	if (m_tab_buttons[MENU].r.PtInRect(point)) {
 		TOnMenu();
 		return;
-	}
-	else if (m_tab_buttons[RIGHT].bVisible && m_tab_buttons[RIGHT].r.PtInRect(point)) {
-		TSetOffset();
-		TCalcLayout();
-		TDrawBar();
-	}
-	else if (m_tab_buttons[LEFT].bVisible && m_tab_buttons[LEFT].r.PtInRect(point)) {
-		TSetOffset(true);
-		TCalcLayout();
-		TDrawBar();
-	}
-	else {
-		for (size_t i = 0; i < m_tabs.size(); i++) {
-			if (m_tabs[i].r.PtInRect(point)) {
-				SavePlaylist();
-				curPlayList.m_nFocused_idx = TGetFocusedElement();
-				m_nCurPlayListIndex = i;
-				TSelectTab();
-				return;
+	} else if (point.x < m_tab_buttons[MENU].r.left) {
+		if (m_tab_buttons[RIGHT].bVisible && m_tab_buttons[RIGHT].r.PtInRect(point)) {
+			TSetOffset();
+			TCalcLayout();
+			TDrawBar();
+		} else if (m_tab_buttons[LEFT].bVisible && m_tab_buttons[LEFT].r.PtInRect(point)) {
+			TSetOffset(true);
+			TCalcLayout();
+			TDrawBar();
+		} else {
+			for (size_t i = 0; i < m_tabs.size(); i++) {
+				if (m_tabs[i].r.PtInRect(point)) {
+					SavePlaylist();
+					curPlayList.m_nFocused_idx = TGetFocusedElement();
+					m_nCurPlayListIndex = i;
+					TSelectTab();
+					return;
+				}
 			}
 		}
 	}
