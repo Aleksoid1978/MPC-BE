@@ -386,7 +386,7 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 
 void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
-	if (!m_pMainFrame->m_bFullScreen && (m_pMainFrame->IsCaptionHidden() || !AssignedMouseToCmd(MOUSE_CLICK_LEFT))) {
+	if (!m_pMainFrame->m_bFullScreen && (m_pMainFrame->IsCaptionHidden() || !AssignedMouseToCmd(MOUSE_CLICK_LEFT, 0))) {
 		BYTE bFlag = 0;
 		switch (nHitTest) {
 			case HTTOP:

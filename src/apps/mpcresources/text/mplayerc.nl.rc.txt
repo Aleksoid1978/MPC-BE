@@ -350,22 +350,12 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exporteren"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
 5		"Linkermuisknop"
 6		"Klikken"
 8		"Recent bestand openen als er niets wordt geladen"
 10		"Dubbelklikken"
-12		"Middenmuisknop"
-14		"Rechtermuisknop"
-15		"Systeemmenu"
-16		"XButton1"
-18		"XButton2"
-20		"Scrollwieltje"
-21		"Naar boven"
-23		"Naar beneden"
-25		"Naar links"
-27		"Naar rechts"
-29		"Resetten"
+13		"Resetten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1720,6 +1710,13 @@ STRING IDS_MFMT_WMA		"Windows Media Audio"
 STRING IDS_MFMT_WMV		"Windows Media Video"
 STRING IDS_MKVSPLT_CALC_DURATION		"Tijdsduur berekenen gebaseerd op videodata"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"Laad ingesloten lettertypen"
+STRING IDS_MOUSE_CLICK_MIDDLE		"Middle click"
+STRING IDS_MOUSE_CLICK_X1		"X1 click"
+STRING IDS_MOUSE_CLICK_X2		"X2 click"
+STRING IDS_MOUSE_WHEEL_DOWN		"Wheel Down"
+STRING IDS_MOUSE_WHEEL_LEFT		"Wheel Left"
+STRING IDS_MOUSE_WHEEL_RIGHT		"Wheel Right"
+STRING IDS_MOUSE_WHEEL_UP		"Wheel Up"
 STRING IDS_MPADEC_AC3ENCODE		"Naar AC-3 coderen"
 STRING IDS_MPADEC_AV_SYNC		"A/V Sync-correctie"
 STRING IDS_MPADEC_DRC		"DRC voor AC-3/E-AC-3 toepassen"

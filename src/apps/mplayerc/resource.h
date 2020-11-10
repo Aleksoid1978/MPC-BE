@@ -1476,7 +1476,6 @@
 #define IDS_MFMT_DSD                    39527
 #define IDS_MFMT_DTS                    39528
 #define IDS_MFMT_WEBA                   39529
-
 // playlists
 #define IDS_MFMT_PLS                    39901
 #define IDS_MFMT_BDPLS                  39902
@@ -1725,6 +1724,13 @@
 #define IDS_SHADER_NEW                  41601
 #define IDS_SHADER_DELETE               41602
 #define IDS_SHADER_FOLDER               41603
+#define IDS_MOUSE_CLICK_MIDDLE          41702
+#define IDS_MOUSE_CLICK_X1              41703
+#define IDS_MOUSE_CLICK_X2              41704
+#define IDS_MOUSE_WHEEL_UP              41705
+#define IDS_MOUSE_WHEEL_DOWN            41706
+#define IDS_MOUSE_WHEEL_LEFT            41707
+#define IDS_MOUSE_WHEEL_RIGHT           41708
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
 #define IDS_PPAGE_OUTPUT_MPCVR          42005
 #define IDS_PPAGE_OUTPUT_EVR            42007

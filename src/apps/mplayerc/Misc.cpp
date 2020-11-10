@@ -355,26 +355,33 @@ WORD AssignedKeyToCmd(UINT keyValue)
 	return 0;
 }
 
-WORD AssignedMouseToCmd(UINT mouseValue)
+WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	UINT cmd = 0;
+	CAppSettings::MOUSE_ASSIGNMENT mcmds = {};
 
 	switch (mouseValue) {
-	case MOUSE_CLICK_LEFT:     cmd = s.nMouseLeftClick;    break;
-	case MOUSE_CLICK_LEFT_DBL: cmd = s.nMouseLeftDblClick; break;
-	case MOUSE_CLICK_MIDLE:    cmd = s.nMouseMiddleClick;  break;
-	case MOUSE_CLICK_RIGHT:    cmd = ID_MENU_PLAYER_SHORT; break;
-	case MOUSE_CLICK_X1:       cmd = s.nMouseX1Click;      break;
-	case MOUSE_CLICK_X2:       cmd = s.nMouseX2Click;      break;
-	case MOUSE_WHEEL_UP:       cmd = s.nMouseWheelUp;      break;
-	case MOUSE_WHEEL_DOWN:     cmd = s.nMouseWheelDown;    break;
-	case MOUSE_WHEEL_LEFT:     cmd = s.nMouseWheelLeft;    break;
-	case MOUSE_WHEEL_RIGHT:    cmd = s.nMouseWheelRight;   break;
+	case MOUSE_CLICK_MIDLE:    mcmds = s.MouseMiddleClick;  break;
+	case MOUSE_CLICK_X1:       mcmds = s.MouseX1Click;      break;
+	case MOUSE_CLICK_X2:       mcmds = s.MouseX2Click;      break;
+	case MOUSE_WHEEL_UP:       mcmds = s.MouseWheelUp;      break;
+	case MOUSE_WHEEL_DOWN:     mcmds = s.MouseWheelDown;    break;
+	case MOUSE_WHEEL_LEFT:     mcmds = s.MouseWheelLeft;    break;
+	case MOUSE_WHEEL_RIGHT:    mcmds = s.MouseWheelRight;   break;
+	case MOUSE_CLICK_LEFT:     return (WORD)s.nMouseLeftClick;
+	case MOUSE_CLICK_LEFT_DBL: return (WORD)s.nMouseLeftDblClick;
+	case MOUSE_CLICK_RIGHT:    return (WORD)ID_MENU_PLAYER_SHORT;
 	}
 
-	return (WORD)cmd;
+	if (mcmds.ctrl && (nFlags & MK_CONTROL)) {
+		return (WORD)mcmds.ctrl;
+	}
+	if (mcmds.shift && (nFlags & MK_SHIFT)) {
+		return (WORD)mcmds.shift;
+	}
+
+	return (WORD)mcmds.normal;
 }
 
 void SetAudioRenderer(int AudioDevNo)

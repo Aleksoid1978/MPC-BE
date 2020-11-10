@@ -350,22 +350,12 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportieren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
 5		"Linke Taste"
 6		"Klick"
 8		"Wenn nichts geladen ist, die letzte Datei öffnen"
 10		"Doppelklick"
-12		"Mittlere Taste"
-14		"Rechte Taste"
-15		"Player-Kontextmenü"
-16		"X-Taste 1"
-18		"X-Taste 2"
-20		"Mausrad"
-21		"Nach oben"
-23		"Nach unten"
-25		"Nach links"
-27		"Nach rechts"
-29		"Zurücksetzen"
+13		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1720,6 +1710,13 @@ STRING IDS_MFMT_WMA		"Windows Media Audio"
 STRING IDS_MFMT_WMV		"Windows Media Video"
 STRING IDS_MKVSPLT_CALC_DURATION		"Berechnung der Dauer auf Basis der Videodaten"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"Eingebettete Schriften laden"
+STRING IDS_MOUSE_CLICK_MIDDLE		"Middle click"
+STRING IDS_MOUSE_CLICK_X1		"X1 click"
+STRING IDS_MOUSE_CLICK_X2		"X2 click"
+STRING IDS_MOUSE_WHEEL_DOWN		"Wheel Down"
+STRING IDS_MOUSE_WHEEL_LEFT		"Wheel Left"
+STRING IDS_MOUSE_WHEEL_RIGHT		"Wheel Right"
+STRING IDS_MOUSE_WHEEL_UP		"Wheel Up"
 STRING IDS_MPADEC_AC3ENCODE		"Zu AC-3 encodieren"
 STRING IDS_MPADEC_AV_SYNC		"A/V Sync Korrektur"
 STRING IDS_MPADEC_DRC		"DRC für AC-3 und E-AC-3 anwenden"

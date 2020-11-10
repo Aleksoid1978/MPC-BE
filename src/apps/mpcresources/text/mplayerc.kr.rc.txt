@@ -350,22 +350,12 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"내보내기"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 30
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
 5		"Left button"
 6		"Click"
 8		"If nothing is loaded, open recent file"
 10		"Double click"
-12		"Middle button"
-14		"Right button"
-15		"Сontext menu"
-16		"X-button 1"
-18		"X-button 2"
-20		"Wheel"
-21		"Up"
-23		"Down"
-25		"Left"
-27		"Right"
-29		"Default"
+13		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1720,6 +1710,13 @@ STRING IDS_MFMT_WMA		"Windows Media Audio"
 STRING IDS_MFMT_WMV		"Windows Media Video"
 STRING IDS_MKVSPLT_CALC_DURATION		"Calculate the duration based on the video data"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"내장 폰트 불러옴"
+STRING IDS_MOUSE_CLICK_MIDDLE		"Middle click"
+STRING IDS_MOUSE_CLICK_X1		"X1 click"
+STRING IDS_MOUSE_CLICK_X2		"X2 click"
+STRING IDS_MOUSE_WHEEL_DOWN		"Wheel Down"
+STRING IDS_MOUSE_WHEEL_LEFT		"Wheel Left"
+STRING IDS_MOUSE_WHEEL_RIGHT		"Wheel Right"
+STRING IDS_MOUSE_WHEEL_UP		"Wheel Up"
 STRING IDS_MPADEC_AC3ENCODE		"AC-3로 인코딩"
 STRING IDS_MPADEC_AV_SYNC		"A/V Sync correction"
 STRING IDS_MPADEC_DRC		"AC-3와 E-AC-3를 위한 DRC 적용 "

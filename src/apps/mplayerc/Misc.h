@@ -45,7 +45,7 @@ enum :UINT {
 	MOUSE_WHEEL_RIGHT,
 };
 
-WORD AssignedMouseToCmd(UINT mouseValue);
+WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags);
 
 void SetAudioRenderer(int AudioDevNo);
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
