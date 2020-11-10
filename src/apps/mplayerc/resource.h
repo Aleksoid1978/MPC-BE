@@ -414,6 +414,9 @@
 #define ID_SUBTITLES_STEREO_TOPBOTTOM   1179
 //
 #define ID_SHOW_MILLISECONDS            1200
+#define ID_PLAY_REPEAT_AB               1201
+#define ID_PLAY_REPEAT_AB_MARK_A        1202
+#define ID_PLAY_REPEAT_AB_MARK_B        1203
 //
 #define ID_FILTERS_COPY_TO_CLIPBOARD    1999
 // ranges for menus
@@ -1381,12 +1384,9 @@
 #define IDS_RECORD_STOP                 33457
 #define IDS_FILTERS_COPY_TO_CLIPBOARD   33458
 #define IDS_AG_COPY_IMAGE               33459
-#define ID_PLAY_REPEAT_AB               33460
-#define ID_PLAY_REPEAT_AB_MARK_A        33461
-#define ID_PLAY_REPEAT_AB_MARK_B        33462
-#define IDS_PLAYLOOPMODE_AB             33463
-#define IDS_PLAYLOOPMODE_AB_MARK_A      33464
-#define IDS_PLAYLOOPMODE_AB_MARK_B      33465
+#define IDS_PLAYLOOPMODE_AB             33460
+#define IDS_PLAYLOOPMODE_AB_MARK_A      33461
+#define IDS_PLAYLOOPMODE_AB_MARK_B      33462
 //
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501
