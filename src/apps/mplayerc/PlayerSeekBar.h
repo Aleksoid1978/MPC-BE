@@ -81,6 +81,7 @@ private:
 	TRIVERTEX tvBackground[2];
 
 	CPen m_penPlayed1, m_penPlayed2, m_penChapters;
+	CPen m_penRepeatAB;
 
 	TRIVERTEX tvBufferingProgress[2];
 
