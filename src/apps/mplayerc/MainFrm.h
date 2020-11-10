@@ -387,6 +387,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void AddTextPassThruFilter();
 
 	int m_nLoops;
+	REFERENCE_TIME m_abRepeatPositionA, m_abRepeatPositionB, m_fileEndPosition;
+	bool m_abRepeatPositionAEnabled, m_abRepeatPositionBEnabled;
 
 	bool m_fCustomGraph;
 	bool m_fShockwaveGraph;
@@ -811,6 +813,10 @@ public:
 	void DisplayCurrentChannelOSD();
 	void DisplayCurrentChannelInfo();
 
+	bool CheckABRepeat(REFERENCE_TIME& aPos, REFERENCE_TIME& bPos, bool& aEnabled, bool& bEnabled);
+	void PerformABRepeat();
+	void DisableABRepeat();
+
 	// Implementation
 public:
 	virtual ~CMainFrame();
@@ -996,6 +1002,9 @@ public:
 	afx_msg void OnFileCloseMedia(); // no menu item
 	afx_msg void OnUpdateFileClose(CCmdUI* pCmdUI);
 	afx_msg void OnRepeatForever();
+	afx_msg void OnUpdateRepeatForever(CCmdUI* pCmdUI);
+	afx_msg void OnABRepeat(UINT nID);
+	afx_msg void OnUpdateABRepeat(CCmdUI* pCmdUI);
 
 	afx_msg void OnViewCaptionmenu();
 	afx_msg void OnViewNavigation();

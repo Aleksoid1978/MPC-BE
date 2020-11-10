@@ -1381,6 +1381,13 @@
 #define IDS_RECORD_STOP                 33457
 #define IDS_FILTERS_COPY_TO_CLIPBOARD   33458
 #define IDS_AG_COPY_IMAGE               33459
+#define ID_PLAY_REPEAT_AB               33460
+#define ID_PLAY_REPEAT_AB_MARK_A        33461
+#define ID_PLAY_REPEAT_AB_MARK_B        33462
+#define IDS_PLAYLOOPMODE_AB             33463
+#define IDS_PLAY_LOOPMODE_AB            33464
+#define IDS_PLAYLOOPMODE_AB_MARK_A      33465
+#define IDS_PLAYLOOPMODE_AB_MARK_B      33466
 //
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501

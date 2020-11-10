@@ -269,6 +269,39 @@ void CPlayerSeekBar::OnPaint()
 	const CAppSettings& s = AfxGetAppSettings();
 
 	const bool bEnabled = m_bEnabled && m_stop > 0;
+	const COLORREF repeatAB = COLORREF(RGB(242, 13, 13));
+	const CRect channelRect(GetChannelRect());
+
+	auto funcMarkChannel = [&](REFERENCE_TIME pos, long verticalPadding, COLORREF markColor) {
+		long markPos = channelRect.left + (long)((m_stop > 0) ? channelRect.Width() * pos / m_stop : 0);
+		CRect r(markPos, channelRect.top + verticalPadding, markPos + 1, channelRect.bottom - verticalPadding);
+		if (r.right < channelRect.right) {
+			r.right++;
+		}
+		ASSERT(r.right <= channelRect.right);
+		dc.FillSolidRect(&r, markColor);
+		dc.ExcludeClipRect(&r);
+	};
+
+	auto funcMarkChannelTheme = [&](REFERENCE_TIME pos, CDC& memdc, CPen& pen, const CRect& rect) {
+		if (pos <= 0 || pos >= m_stop) {
+			return;
+		}
+
+		const CRect r = GetChannelRect();
+		memdc.SelectObject(&pen);
+		const int x = r.left + (long)(pos * r.Width() / m_stop);
+
+		// instead of drawing hands can be a marker icon
+		// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+		// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, nullptr, DI_NORMAL);
+		// ::DestroyIcon(appIcon);
+
+		memdc.MoveTo(x, rect.top + 14);
+		memdc.LineTo(x, rect.bottom - 2);
+		memdc.MoveTo(x - 1, rect.bottom - 2);
+		memdc.LineTo(x + 2, rect.bottom - 2);
+	};
 
 	if (s.bUseDarkTheme) {
 		CDC memdc;
@@ -353,32 +386,25 @@ void CPlayerSeekBar::OnPaint()
 				const REFERENCE_TIME stop = m_stop;
 
 				if (stop > 0 && m_pChapterBag && m_pChapterBag->ChapGetCount()) {
-					const CRect rc2 = rc;
-					const CRect r = GetChannelRect();
-					memdc.SelectObject(&m_penChapters);
 
 					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
 						REFERENCE_TIME rt;
 						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, nullptr))) {
 							continue;
 						}
-
-						if (rt <= 0 || rt >= stop) {
-							continue;
-						}
-
-						const int x = r.left + (long)(rt * r.Width() / stop);
-
-						// instead of drawing hands can be a marker icon
-						// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, nullptr, DI_NORMAL);
-						// ::DestroyIcon(appIcon);
-
-						memdc.MoveTo(x, rc2.top + 14);
-						memdc.LineTo(x, rc2.bottom - 2);
-						memdc.MoveTo(x - 1, rc2.bottom - 2);
-						memdc.LineTo(x + 2, rc2.bottom - 2);
+						funcMarkChannelTheme(rt, memdc, m_penChapters, rc);
 					}
+				}
+			}
+
+			REFERENCE_TIME aPos, bPos;
+			bool aEnabled, bEnabled;
+			if (m_pMainFrame->CheckABRepeat(aPos, bPos, aEnabled, bEnabled)) {
+				if (aEnabled) {
+					funcMarkChannelTheme(aPos, memdc, m_penRepeatAB, rc);
+				}
+				if (bEnabled) {
+					funcMarkChannelTheme(bPos, memdc, m_penRepeatAB, rc);
 				}
 			}
 		}
@@ -479,8 +505,6 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
-		const CRect channelRect(GetChannelRect());
-
 		// Chapters
 		if (s.fChapterMarker) {
 			CAutoLock lock(&m_CBLock);
@@ -488,18 +512,21 @@ void CPlayerSeekBar::OnPaint()
 				for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); i++) {
 					REFERENCE_TIME rtChap;
 					if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rtChap, nullptr))) {
-						long chanPos = channelRect.left + (long)((m_stop > 0) ? channelRect.Width() * rtChap / m_stop : 0);
-						CRect r(chanPos, channelRect.top, chanPos + 1, channelRect.bottom);
-						if (r.right < channelRect.right) {
-							r.right++;
-						}
-						ASSERT(r.right <= channelRect.right);
-						dc.FillSolidRect(&r, dark);
-						dc.ExcludeClipRect(&r);
+						funcMarkChannel(rtChap, 1, dark);
 					} else {
 						ASSERT(FALSE);
 					}
 				}
+			}
+		}
+		REFERENCE_TIME aPos, bPos;
+		bool aEnabled, bEnabled;
+		if (m_pMainFrame->CheckABRepeat(aPos, bPos, aEnabled, bEnabled)) {
+			if (aEnabled) {
+				funcMarkChannel(aPos, 1, repeatAB);
+			}
+			if (bEnabled) {
+				funcMarkChannel(bPos, 1, repeatAB);
 			}
 		}
 
@@ -741,6 +768,9 @@ void CPlayerSeekBar::SetColor()
 
 		m_penChapters.DeleteObject();
 		m_penChapters.CreatePen(PS_SOLID, 0, ThemeRGB(255, 255, 255));
+
+		m_penRepeatAB.DeleteObject();
+		m_penRepeatAB.CreatePen(PS_SOLID, 0, ThemeRGB(242, 13, 13));
 
 		ThemeRGB(45, 55, 60, R, G, B);
 		tvBufferingProgress[0] = { 0, 0, COLOR16(R * 256), COLOR16(G * 256), COLOR16(B * 256), 255 * 256 };

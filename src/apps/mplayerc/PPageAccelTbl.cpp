@@ -380,9 +380,9 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case VK_OEM_PERIOD: str = L"Period";      break;
 		case VK_OEM_2:      str = L"OEM 2";       break;
 		case VK_OEM_3:      str = L"OEM 3";       break;
-		case VK_OEM_4:      str = L"OEM 4";       break;
+		case VK_OEM_4:      str = L"[";           break;
 		case VK_OEM_5:      str = L"OEM 5";       break;
-		case VK_OEM_6:      str = L"OEM 6";       break;
+		case VK_OEM_6:      str = L"]";           break;
 		case VK_OEM_7:      str = L"OEM 7";       break;
 		case VK_OEM_8:      str = L"OEM 8";       break;
 		case VK_OEM_AX:     str = L"OEM AX";      break;
