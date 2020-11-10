@@ -844,26 +844,35 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight) {
+					CSize displayAR((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
+					ReduceDim(displayAR);
+
+					if (mts.size() == 1 && mts.front().formattype == FORMAT_VideoInfo) {
+						// VIDEOINFOHEADER does not support aspect ratio. Create an additional media type with VIDEOINFOHEADER2.
+						// The original media type with VIDEOINFOHEADER is needed for some VFW codecs.
+						CSize origAR = sourceRect.Size();
+						ReduceDim(origAR);
+
+						if (origAR != displayAR) {
+							CMediaType mt2(mts.front());
+
+							LONG vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
+							LONG vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
+							LONG bmi = mt2.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
+
+							mt2.formattype = FORMAT_VideoInfo2;
+							mt2.ReallocFormatBuffer(vih2 + bmi);
+							memmove(mt2.Format() + vih2, mt2.Format() + vih1, bmi);
+							memset(mt2.Format() + vih1, 0, vih2 - vih1);
+
+							mts.insert(mts.cbegin(), mt2);
+						}
+					}
+
 					for (auto& item : mts) {
-						if (item.formattype == FORMAT_VideoInfo) {
-							DWORD vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
-							DWORD vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
-							DWORD bmi = item.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
-
-							item.formattype = FORMAT_VideoInfo2;
-							item.ReallocFormatBuffer(vih2 + bmi);
-							memmove(item.Format() + vih2, item.Format() + vih1, bmi);
-							memset(item.Format() + vih1, 0, vih2 - vih1);
-
-							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
-							ReduceDim(aspect);
-							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioX = aspect.cx;
-							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioY = aspect.cy;
-						} else if (item.formattype == FORMAT_MPEG2Video) {
-							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
-							ReduceDim(aspect);
-							((MPEG2VIDEOINFO*)item.Format())->hdr.dwPictAspectRatioX = aspect.cx;
-							((MPEG2VIDEOINFO*)item.Format())->hdr.dwPictAspectRatioY = aspect.cy;
+						if (item.formattype == FORMAT_VideoInfo2 || item.formattype == FORMAT_MPEG2Video) {
+							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioX = displayAR.cx;
+							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioY = displayAR.cy;
 						}
 					}
 				}
