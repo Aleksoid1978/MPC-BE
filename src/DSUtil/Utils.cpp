@@ -20,8 +20,9 @@
 
 #include "stdafx.h"
 #include <basestruct.h>
-#include "Utils.h"
 #include <cmath>
+#include <d3d9.h>
+#include "Utils.h"
 
 uint32_t CountBits(uint32_t v)
 {
@@ -234,4 +235,48 @@ bool StrToDouble(const wchar_t* str, double& value)
 		return true;
 	}
 	return false;
+}
+
+CStringW HR2Str(const HRESULT hr)
+{
+	CStringW str;
+#define UNPACK_VALUE(VALUE) case VALUE: str = L#VALUE; break;
+#define UNPACK_HR_WIN32(VALUE) case (((VALUE) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000): str = L#VALUE; break;
+	switch (hr) {
+		// common HRESULT values https://docs.microsoft.com/en-us/windows/desktop/seccrypto/common-hresult-values
+		UNPACK_VALUE(S_OK);
+		UNPACK_VALUE(S_FALSE);
+		UNPACK_VALUE(E_NOTIMPL);
+		UNPACK_VALUE(E_NOINTERFACE);
+		UNPACK_VALUE(E_POINTER);
+		UNPACK_VALUE(E_ABORT);
+		UNPACK_VALUE(E_FAIL);
+		UNPACK_VALUE(E_UNEXPECTED);
+		UNPACK_VALUE(E_ACCESSDENIED);
+		UNPACK_VALUE(E_HANDLE);
+		UNPACK_VALUE(E_OUTOFMEMORY);
+		UNPACK_VALUE(E_INVALIDARG);
+		UNPACK_VALUE(REGDB_E_CLASSNOTREG);
+		// some System Error Codes
+		UNPACK_HR_WIN32(ERROR_INVALID_WINDOW_HANDLE);
+		UNPACK_HR_WIN32(ERROR_CLASS_ALREADY_EXISTS);
+#ifdef _D3D9_H_
+		// some D3DERR values https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3derr
+		UNPACK_VALUE(S_PRESENT_OCCLUDED);
+		UNPACK_VALUE(S_PRESENT_MODE_CHANGED);
+		UNPACK_VALUE(D3DERR_DEVICEHUNG);
+		UNPACK_VALUE(D3DERR_DEVICELOST);
+		UNPACK_VALUE(D3DERR_DEVICENOTRESET);
+		UNPACK_VALUE(D3DERR_DEVICEREMOVED);
+		UNPACK_VALUE(D3DERR_DRIVERINTERNALERROR);
+		UNPACK_VALUE(D3DERR_INVALIDCALL);
+		UNPACK_VALUE(D3DERR_OUTOFVIDEOMEMORY);
+		UNPACK_VALUE(D3DERR_WASSTILLDRAWING);
+#endif
+	default:
+		str.Format(L"0x%08x", hr);
+	};
+#undef UNPACK_VALUE
+#undef UNPACK_HR_WIN32
+	return str;
 }

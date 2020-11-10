@@ -142,7 +142,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	if (!RegisterClassExW(&wc)) {
 		DWORD dwError = GetLastError();
 		hr = HRESULT_FROM_WIN32(dwError);
-		_Error += L"Failed to RegisterClass\n";
+		_Error.AppendFormat(L"Failed to RegisterClass (Error: %s)\n", HR2Str(hr));
 		return;
 	}
 
