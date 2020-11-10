@@ -1385,9 +1385,8 @@
 #define ID_PLAY_REPEAT_AB_MARK_A        33461
 #define ID_PLAY_REPEAT_AB_MARK_B        33462
 #define IDS_PLAYLOOPMODE_AB             33463
-#define IDS_PLAY_LOOPMODE_AB            33464
-#define IDS_PLAYLOOPMODE_AB_MARK_A      33465
-#define IDS_PLAYLOOPMODE_AB_MARK_B      33466
+#define IDS_PLAYLOOPMODE_AB_MARK_A      33464
+#define IDS_PLAYLOOPMODE_AB_MARK_B      33465
 //
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501
