@@ -351,7 +351,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size() - sizeof(BITMAPINFOHEADER));
 					memset(mt.Format(), 0, mt.FormatLength());
 					memcpy(&pvih->bmiHeader, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
-					mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
+
 					switch (pvih->bmiHeader.biCompression) {
 					case BI_RGB:
 					case BI_BITFIELDS:
@@ -363,19 +363,22 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							pvih->bmiHeader.biBitCount == 24 ? MEDIASUBTYPE_RGB24 :
 							pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
 							MEDIASUBTYPE_NULL;
-						mt.bTemporalCompression = FALSE;
 						pvih->bmiHeader.biSize = sizeof(BITMAPINFOHEADER); // fix mkvmerge bug (http://msdn.microsoft.com/en-us/library/windows/desktop/dd318229%28v=vs.85%29.aspx)
+						mt.SetTemporalCompression(FALSE);
 						break;
 					//case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
 					//case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
 					case FCC('v210'):
-						pvih->bmiHeader.biBitCount = 20; // fixed incorrect bitdepth (ffmpeg bug)
-						mt.bTemporalCompression = FALSE;
+						mt.subtype = MEDIASUBTYPE_v210;
+						pvih->bmiHeader.biBitCount = 20; // fix incorrect bitdepth (ffmpeg bug)
+						mt.SetTemporalCompression(FALSE);
 						break;
+					default:
+						mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
 					}
 
 					pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
-					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fixed frame size
+					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fix frame size
 
 					if (!bHasVideo) {
 						mts.push_back(mt);
@@ -822,22 +825,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pTE->DefaultDuration.Set((UINT64)((100.0 * UNITS) / framerate + 0.001));
 				}
 
+				CRect sourceRect = {
+					(LONG)pTE->v.VideoPixelCropLeft,
+					(LONG)pTE->v.VideoPixelCropTop,
+					(LONG)(pTE->v.PixelWidth - pTE->v.VideoPixelCropRight),
+					(LONG)(pTE->v.PixelHeight - pTE->v.VideoPixelCropBottom)
+				};
+
 				for (auto& item : mts) {
 					if (item.formattype == FORMAT_VideoInfo
 							|| item.formattype == FORMAT_VideoInfo2
 							|| item.formattype == FORMAT_MPEG2Video
 							|| item.formattype == FORMAT_MPEGVideo) {
-						if (pTE->v.PixelWidth && pTE->v.PixelHeight) {
-							RECT rect = {(LONG)pTE->v.VideoPixelCropLeft,
-										 (LONG)pTE->v.VideoPixelCropTop,
-										 (LONG)(pTE->v.PixelWidth - pTE->v.VideoPixelCropRight),
-										 (LONG)(pTE->v.PixelHeight - pTE->v.VideoPixelCropBottom)
-										};
-							VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)item.Format();
-							vih->rcSource = vih->rcTarget = rect;
-						}
-
-						((VIDEOINFOHEADER*)item.Format())->AvgTimePerFrame = (UINT64)(UNITS / framerate + 0.001);
+						VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)item.Format();
+						vih->rcSource = vih->rcTarget = sourceRect;
+						vih->AvgTimePerFrame = (UINT64)(UNITS / framerate + 0.001);
 					}
 				}
 
