@@ -605,13 +605,18 @@ public:
 	UINT			nMouseLeftClick;
 	bool			bMouseLeftClickOpenRecent;
 	UINT			nMouseLeftDblClick;
-	UINT			nMouseMiddleClick;
-	UINT			nMouseX1Click;
-	UINT			nMouseX2Click;
-	UINT			nMouseWheelUp;
-	UINT			nMouseWheelDown;
-	UINT			nMouseWheelLeft;
-	UINT			nMouseWheelRight;
+	struct MOUSE_ASSIGNMENT {
+		UINT normal;
+		UINT ctrl;
+		UINT shift;
+	};
+	MOUSE_ASSIGNMENT MouseMiddleClick;
+	MOUSE_ASSIGNMENT MouseX1Click;
+	MOUSE_ASSIGNMENT MouseX2Click;
+	MOUSE_ASSIGNMENT MouseWheelUp;
+	MOUSE_ASSIGNMENT MouseWheelDown;
+	MOUSE_ASSIGNMENT MouseWheelLeft;
+	MOUSE_ASSIGNMENT MouseWheelRight;
 
 	// Logo
 	int				nLogoId;

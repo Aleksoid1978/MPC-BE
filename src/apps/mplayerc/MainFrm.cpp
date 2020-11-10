@@ -3612,7 +3612,7 @@ BOOL CMainFrame::MouseMessage(UINT id, UINT nFlags, CPoint point)
 		return FALSE;
 	}
 
-	WORD cmd = AssignedMouseToCmd(id);
+	WORD cmd = AssignedMouseToCmd(id, nFlags);
 	if (cmd) {
 		SendMessageW(WM_COMMAND, cmd);
 		return TRUE;
@@ -3643,7 +3643,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 	m_bLeftMouseDown = TRUE;
 
 	if (m_bFullScreen || CursorOnD3DFullScreenWindow()) {
-		if (AssignedMouseToCmd(MOUSE_CLICK_LEFT)) {
+		if (AssignedMouseToCmd(MOUSE_CLICK_LEFT, 0)) {
 			m_bLeftMouseDownFullScreen = TRUE;
 			MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		}
@@ -3681,7 +3681,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (AssignedMouseToCmd(MOUSE_CLICK_LEFT) && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
+	if (AssignedMouseToCmd(MOUSE_CLICK_LEFT, 0) && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
 		MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		return;
 	}
