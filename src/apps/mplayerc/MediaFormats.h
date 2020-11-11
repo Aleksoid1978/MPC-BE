@@ -80,10 +80,10 @@ public:
 class CMediaFormats : public std::vector<CMediaFormatCategory>
 {
 public:
-	CMediaFormats();
-	virtual ~CMediaFormats();
+	CMediaFormats() = default;
+	virtual ~CMediaFormats() = default;
 
-	void UpdateData(const bool& bSave);
+	void UpdateData(const bool bSave);
 
 	bool FindExt(const CString& ext);
 	bool FindAudioExt(const CString& ext);
