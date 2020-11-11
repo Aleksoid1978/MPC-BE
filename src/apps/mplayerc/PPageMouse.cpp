@@ -249,9 +249,9 @@ void CPPageMouse::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			const auto& ids = mouse_cmds->ids;
 			int nSel = -1;
 
-			for (int i = 0; i < ids.size(); i++) {
+			for (size_t i = 0; i < ids.size(); i++) {
 				if (id == ids[i]) {
-					nSel = i;
+					nSel = (int)i;
 					break;
 				}
 			}
