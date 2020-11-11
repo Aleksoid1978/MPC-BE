@@ -155,15 +155,7 @@ CString CMediaFormatCategory::GetBackupExts() const
 // CMediaFormats
 //
 
-CMediaFormats::CMediaFormats()
-{
-}
-
-CMediaFormats::~CMediaFormats()
-{
-}
-
-void CMediaFormats::UpdateData(const bool& bSave)
+void CMediaFormats::UpdateData(const bool bSave)
 {
 	if (bSave) {
 		AfxGetProfile().DeleteSection(IDS_R_FILEFORMATS);

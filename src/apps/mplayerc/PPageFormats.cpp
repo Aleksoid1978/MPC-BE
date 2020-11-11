@@ -686,7 +686,7 @@ BOOL CPPageFormats::OnInitDialog()
 	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
-	mf.UpdateData(FALSE);
+	mf.UpdateData(false);
 	int i = 0;
 	for (const auto& mfc : mf) {
 		CString label;
