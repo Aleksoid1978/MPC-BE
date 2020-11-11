@@ -1674,10 +1674,10 @@ void CEVRAllocatorPresenter::GetMixerThread()
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
 		switch (dwObject) {
-			case WAIT_OBJECT_0 :
+			case WAIT_OBJECT_0: // Quit
 				bQuit = true;
 				break;
-			case WAIT_TIMEOUT : {
+			case WAIT_TIMEOUT: {
 				if (m_nRenderState == Stopped) {
 					continue; // nothing sensible to do here
 				}
@@ -1992,10 +1992,10 @@ void CEVRAllocatorPresenter::RenderThread()
 			NextSleepTime = -1;
 		}
 		switch (dwObject) {
-			case WAIT_OBJECT_0 :
+			case WAIT_OBJECT_0: // Quit
 				bQuit = true;
 				break;
-			case WAIT_OBJECT_0 + 1 :
+			case WAIT_OBJECT_0 + 1: // Flush
 				// Flush pending samples!
 				FlushSamples();
 				m_bEvtFlush = false;
@@ -2003,7 +2003,7 @@ void CEVRAllocatorPresenter::RenderThread()
 				bForcePaint = true;
 				TRACE_EVR("EVR: Flush done!\n");
 				break;
-			case WAIT_OBJECT_0 + 2 :
+			case WAIT_OBJECT_0 + 2: // NewSegment
 				{
 					std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
 					m_mediaOffsetQueue.clear();

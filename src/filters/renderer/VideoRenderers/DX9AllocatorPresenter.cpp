@@ -755,11 +755,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		}
 	}
 
-	DLog(L"    => CreateDevice() : 0x%08x", hr);
+	DLog(L"    => CreateDevice() : %s", HR2Str(hr));
 
 	if (FAILED(hr)) {
 		_Error += L"CreateDevice() failed\n";
-		_Error.AppendFormat(L"Error code: 0x%08x\n", hr);
+		_Error.AppendFormat(L"Error code: %s\n", HR2Str(hr));
 
 		return hr;
 	}
