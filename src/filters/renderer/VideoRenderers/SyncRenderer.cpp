@@ -3484,7 +3484,7 @@ void CSyncAP::MixerThread()
 	while (!bQuit) {
 		DWORD dwObject = WaitForMultipleObjects(std::size(hEvts), hEvts, FALSE, 1);
 		switch (dwObject) {
-			case WAIT_OBJECT_0 :
+			case WAIT_OBJECT_0: // Quit
 				bQuit = true;
 				break;
 			case WAIT_TIMEOUT : {
