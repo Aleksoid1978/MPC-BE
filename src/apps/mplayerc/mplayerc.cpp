@@ -204,7 +204,7 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 {
 	CString s;
 
-	if (m_s.nCLSwitches&CLSW_UNRECOGNIZEDSWITCH) {
+	if (m_s.nCLSwitches & CLSW_UNRECOGNIZEDSWITCH) {
 		std::list<CString> sl;
 		for (int i = 0; i < __argc; i++) {
 			sl.emplace_back(__wargv[i]);
@@ -891,7 +891,8 @@ BOOL CMPlayerCApp::InitInstance()
 
 	// Enable to open options with administrator privilege (for Vista UAC)
 	if (m_s.nCLSwitches & CLSW_ADMINOPTION) {
-		m_s.LoadSettings(); // read all settings. long time but not critical at this point
+		m_bRunAdmin = true;
+		m_s.LoadFormats(true);
 
 		switch (m_s.iAdminOption) {
 			case CPPageFormats::IDD : {
@@ -1265,7 +1266,11 @@ int CMPlayerCApp::ExitInstance()
 		ClearSettings();
 		ShellExecuteW(nullptr, L"open", GetProgramPath(), nullptr, nullptr, SW_SHOWNORMAL);
 	} else {
-		m_s.SaveSettings();
+		if (m_bRunAdmin) {
+			m_s.SaveFormats();
+		} else {
+			m_s.SaveSettings();
+		}
 	}
 
 	OleUninitialize();
