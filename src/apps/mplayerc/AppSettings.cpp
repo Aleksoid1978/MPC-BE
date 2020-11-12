@@ -2009,7 +2009,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2, str);
 	str.Format(L"%u;%u;%u;%u", MouseWheelUp.normal, MouseWheelUp.ctrl, MouseWheelUp.shift, MouseWheelUp.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP, str);
-	str.Format(L"%u;%u;%u;%u", MouseWheelDown.normal, MouseWheelDown, MouseWheelDown.shift, MouseWheelDown.rbtn);
+	str.Format(L"%u;%u;%u;%u", MouseWheelDown.normal, MouseWheelDown.ctrl, MouseWheelDown.shift, MouseWheelDown.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN, str);
 	str.Format(L"%u;%u;%u;%u", MouseWheelLeft.normal, MouseWheelLeft.ctrl, MouseWheelLeft.shift, MouseWheelLeft.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT, str);
