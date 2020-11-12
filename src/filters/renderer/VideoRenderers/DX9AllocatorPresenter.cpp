@@ -143,10 +143,10 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		DWORD dwError = GetLastError();
 		hr = HRESULT_FROM_WIN32(dwError);
 		_Error.AppendFormat(L"Failed to RegisterClass (%s)\n", HR2Str(hr));
-		DLog(L"Registering %s window failed (%s)", g_szClassName, HR2Str(hr));
+		DLog(L"Registering '%s' class failed (%s)!", g_szClassName, HR2Str(hr));
 		return;
 	}
-	DLog(L"Registering %s window completed successfully", g_szClassName);
+	DLog(L"Registering '%s' class completed successfully.", g_szClassName);
 
 	hr = CreateDevice(_Error);
 }
@@ -199,7 +199,7 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	}
 
 	BOOL ret = UnregisterClassW(g_szClassName, AfxGetApp()->m_hInstance);
-	DLog(L"Unregistering %s window %s", g_szClassName, ret ? L"completed successfully" : L"failed");
+	DLog(L"Unregistering '%s' class %s.", g_szClassName, ret ? L"completed successfully" : L"failed");
 }
 
 #if 0
