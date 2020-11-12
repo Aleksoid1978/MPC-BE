@@ -164,11 +164,11 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		m_pMainFrm->SeekTo(rt, false);
 
-		m_pMainFrm->m_fFrameSteppingActive = true;
+		m_pMainFrm->m_bFrameSteppingActive = true;
 		// Number of steps you need to do more than one for some decoders.
 		// TODO - maybe need to find another way to get correct frame ???
 		HRESULT hr = m_pMainFrm->m_pFS->Step(2, nullptr);
-		while (m_pMainFrm->m_fFrameSteppingActive) {
+		while (m_pMainFrm->m_bFrameSteppingActive) {
 			if (m_bAbort) {
 				return;
 			}

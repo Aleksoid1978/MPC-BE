@@ -1598,7 +1598,7 @@ void CPlayerCaptureDialog::OnRecord()
 {
 	UpdateData();
 
-	if (!m_pMainFrame->m_fCapturing) {
+	if (!m_pMainFrame->m_bCapturing) {
 		UpdateMuxer();
 
 		CComQIPtr<IFileSinkFilter2> pFSF = m_pMux;
@@ -1687,7 +1687,7 @@ void CPlayerCaptureDialog::OnChangeAudioBuffers()
 void CPlayerCaptureDialog::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == m_nRecordTimerID) {
-		if (m_pMainFrame->m_fCapturing) {
+		if (m_pMainFrame->m_bCapturing) {
 			ULARGE_INTEGER FreeBytesAvailable, TotalNumberOfBytes, TotalNumberOfFreeBytes;
 			if (GetDiskFreeSpaceExW(m_file.Left(m_file.ReverseFind('\\')+1), &FreeBytesAvailable, &TotalNumberOfBytes, &TotalNumberOfFreeBytes)
 					&& FreeBytesAvailable.QuadPart < 1024i64*1024*10) {
