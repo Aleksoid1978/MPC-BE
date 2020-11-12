@@ -124,31 +124,39 @@ BOOL CPPageMouse::OnInitDialog()
 	m_table_values[ROW_BTN_M][COL_CMD]    = s.MouseMiddleClick.normal;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = s.MouseMiddleClick.ctrl;
 	m_table_values[ROW_BTN_M][COL_SHIFT]  = s.MouseMiddleClick.shift;
+	m_table_values[ROW_BTN_M][COL_RBTN]  = s.MouseMiddleClick.rbtn;
 	m_table_values[ROW_BTN_X1][COL_CMD]   = s.MouseX1Click.normal;
 	m_table_values[ROW_BTN_X1][COL_CTRL]  = s.MouseX1Click.ctrl;
 	m_table_values[ROW_BTN_X1][COL_SHIFT] = s.MouseX1Click.shift;
+	m_table_values[ROW_BTN_X1][COL_RBTN] = s.MouseX1Click.rbtn;
 	m_table_values[ROW_BTN_X2][COL_CMD]   = s.MouseX2Click.normal;
 	m_table_values[ROW_BTN_X2][COL_CTRL]  = s.MouseX2Click.ctrl;
 	m_table_values[ROW_BTN_X2][COL_SHIFT] = s.MouseX2Click.shift;
+	m_table_values[ROW_BTN_X2][COL_RBTN] = s.MouseX2Click.rbtn;
 	m_table_values[ROW_WHL_U][COL_CMD]    = s.MouseWheelUp.normal;
 	m_table_values[ROW_WHL_U][COL_CTRL]   = s.MouseWheelUp.ctrl;
 	m_table_values[ROW_WHL_U][COL_SHIFT]  = s.MouseWheelUp.shift;
+	m_table_values[ROW_WHL_U][COL_RBTN]  = s.MouseWheelUp.rbtn;
 	m_table_values[ROW_WHL_D][COL_CMD]    = s.MouseWheelDown.normal;
 	m_table_values[ROW_WHL_D][COL_CTRL]   = s.MouseWheelDown.ctrl;
 	m_table_values[ROW_WHL_D][COL_SHIFT]  = s.MouseWheelDown.shift;
+	m_table_values[ROW_WHL_D][COL_RBTN]  = s.MouseWheelDown.rbtn;
 	m_table_values[ROW_WHL_L][COL_CMD]    = s.MouseWheelLeft.normal;
 	m_table_values[ROW_WHL_L][COL_CTRL]   = s.MouseWheelLeft.ctrl;
 	m_table_values[ROW_WHL_L][COL_SHIFT]  = s.MouseWheelLeft.shift;
+	m_table_values[ROW_WHL_L][COL_RBTN]  = s.MouseWheelLeft.rbtn;
 	m_table_values[ROW_WHL_R][COL_CMD]    = s.MouseWheelRight.normal;
 	m_table_values[ROW_WHL_R][COL_CTRL]   = s.MouseWheelRight.ctrl;
 	m_table_values[ROW_WHL_R][COL_SHIFT]  = s.MouseWheelRight.shift;
+	m_table_values[ROW_WHL_R][COL_RBTN]  = s.MouseWheelRight.rbtn;
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 	m_list.InsertColumn(COL_ACTION, L"Action");
-	m_list.InsertColumn(COL_CMD, L"Command");
-	m_list.InsertColumn(COL_CTRL, L"Ctrl");
-	m_list.InsertColumn(COL_SHIFT, L"Shift");
+	m_list.InsertColumn(COL_CMD,    L"Command");
+	m_list.InsertColumn(COL_CTRL,   L"Ctrl");
+	m_list.InsertColumn(COL_SHIFT,  L"Shift");
+	m_list.InsertColumn(COL_RBTN,   L"Right button");
 
 	m_list.InsertItem(ROW_BTN_M,  ResStr(IDS_MOUSE_CLICK_MIDDLE));
 	m_list.InsertItem(ROW_BTN_X1, ResStr(IDS_MOUSE_CLICK_X1));
@@ -193,24 +201,31 @@ BOOL CPPageMouse::OnApply()
 	s.MouseMiddleClick.normal = m_table_values[ROW_BTN_M][COL_CMD];
 	s.MouseMiddleClick.ctrl   = m_table_values[ROW_BTN_M][COL_CTRL];
 	s.MouseMiddleClick.shift  = m_table_values[ROW_BTN_M][COL_SHIFT];
+	s.MouseMiddleClick.rbtn   = m_table_values[ROW_BTN_M][COL_RBTN];
 	s.MouseX1Click.normal     = m_table_values[ROW_BTN_X1][COL_CMD];
 	s.MouseX1Click.ctrl       = m_table_values[ROW_BTN_X1][COL_CTRL];
 	s.MouseX1Click.shift      = m_table_values[ROW_BTN_X1][COL_SHIFT];
+	s.MouseX1Click.rbtn       = m_table_values[ROW_BTN_X1][COL_RBTN];
 	s.MouseX2Click.normal     = m_table_values[ROW_BTN_X2][COL_CMD];
 	s.MouseX2Click.ctrl       = m_table_values[ROW_BTN_X2][COL_CTRL];
 	s.MouseX2Click.shift      = m_table_values[ROW_BTN_X2][COL_SHIFT];
+	s.MouseX2Click.rbtn       = m_table_values[ROW_BTN_X2][COL_RBTN];
 	s.MouseWheelUp.normal     = m_table_values[ROW_WHL_U][COL_CMD];
 	s.MouseWheelUp.ctrl       = m_table_values[ROW_WHL_U][COL_CTRL];
 	s.MouseWheelUp.shift      = m_table_values[ROW_WHL_U][COL_SHIFT];
+	s.MouseWheelUp.rbtn       = m_table_values[ROW_WHL_U][COL_RBTN];
 	s.MouseWheelDown.normal   = m_table_values[ROW_WHL_D][COL_CMD];
 	s.MouseWheelDown.ctrl     = m_table_values[ROW_WHL_D][COL_CTRL];
 	s.MouseWheelDown.shift    = m_table_values[ROW_WHL_D][COL_SHIFT];
+	s.MouseWheelDown.rbtn     = m_table_values[ROW_WHL_D][COL_RBTN];
 	s.MouseWheelLeft.normal   = m_table_values[ROW_WHL_L][COL_CMD];
 	s.MouseWheelLeft.ctrl     = m_table_values[ROW_WHL_L][COL_CTRL];
 	s.MouseWheelLeft.shift    = m_table_values[ROW_WHL_L][COL_SHIFT];
+	s.MouseWheelLeft.rbtn     = m_table_values[ROW_WHL_L][COL_RBTN];
 	s.MouseWheelRight.normal  = m_table_values[ROW_WHL_R][COL_CMD];
 	s.MouseWheelRight.ctrl    = m_table_values[ROW_WHL_R][COL_CTRL];
 	s.MouseWheelRight.shift   = m_table_values[ROW_WHL_R][COL_SHIFT];
+	s.MouseWheelRight.rbtn    = m_table_values[ROW_WHL_R][COL_RBTN];
 
 	return __super::OnApply();
 }

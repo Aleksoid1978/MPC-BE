@@ -195,6 +195,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_MBUTTONDOWN()
 	ON_WM_MBUTTONUP()
+	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
 	ON_MESSAGE(WM_XBUTTONDOWN, OnXButtonDown)
 	ON_MESSAGE(WM_XBUTTONUP, OnXButtonUp)
@@ -3661,6 +3662,8 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	m_bWaitingRButtonUp = false;
+
 	if (m_bIsMPCVRExclusiveMode && m_OSD.OnLButtonUp(nFlags, point)) {
 		return;
 	}
@@ -3691,7 +3694,6 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-
 	if (m_bLeftMouseDown) {
 		MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		m_bLeftMouseDown = FALSE;
@@ -3710,19 +3712,35 @@ void CMainFrame::OnMButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnMButtonUp(UINT nFlags, CPoint point)
 {
+	m_bWaitingRButtonUp = false;
+
 	if (!MouseMessage(MOUSE_CLICK_MIDLE, nFlags, point)) {
 		__super::OnMButtonUp(nFlags, point);
 	}
 }
 
+void CMainFrame::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	m_bWaitingRButtonUp = true;
+
+	__super::OnRButtonDown(nFlags, point);
+}
+
 void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	CPoint p;
-	GetCursorPos(&p);
-	SetFocus();
-	if (*WindowFromPoint(p) != *m_pFullscreenWnd && !MouseMessage(MOUSE_CLICK_RIGHT, nFlags, point)) {
-		__super::OnRButtonUp(nFlags, point);
+	if (m_bWaitingRButtonUp) {
+		m_bWaitingRButtonUp = false;
+
+		CPoint p;
+		GetCursorPos(&p);
+		SetFocus();
+		if (*WindowFromPoint(p) != *m_pFullscreenWnd) {
+			SendMessageW(WM_COMMAND, ID_MENU_PLAYER_SHORT);
+
+			return;
+		}
 	}
+	__super::OnRButtonUp(nFlags, point);
 }
 
 LRESULT CMainFrame::OnXButtonDown(WPARAM wParam, LPARAM lParam)
@@ -3733,6 +3751,8 @@ LRESULT CMainFrame::OnXButtonDown(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnXButtonUp(WPARAM wParam, LPARAM lParam)
 {
+	m_bWaitingRButtonUp = false;
+
 	UINT fwButton = GET_XBUTTON_WPARAM(wParam);
 	return MouseMessage(fwButton == XBUTTON1 ? MOUSE_CLICK_X1 : fwButton == XBUTTON2 ? MOUSE_CLICK_X2 : 0,
 					GET_KEYSTATE_WPARAM(wParam), CPoint(lParam));
@@ -3740,6 +3760,8 @@ LRESULT CMainFrame::OnXButtonUp(WPARAM wParam, LPARAM lParam)
 
 BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
+	m_bWaitingRButtonUp = false;
+
 	if (m_wndPreView.IsWindowVisible()) {
 
 		int seek =
@@ -3764,6 +3786,8 @@ BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 
 void CMainFrame::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 {
+	m_bWaitingRButtonUp = false;
+
 	if (zDelta) {
 		ScreenToClient(&pt);
 		MouseMessage((zDelta < 0) ? MOUSE_WHEEL_LEFT : MOUSE_WHEEL_RIGHT, nFlags, pt);

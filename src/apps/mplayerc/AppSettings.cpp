@@ -735,13 +735,13 @@ void CAppSettings::ResetSettings()
 	// Mouse
 	nMouseLeftClick     = ID_PLAY_PLAYPAUSE;
 	nMouseLeftDblClick  = ID_VIEW_FULLSCREEN;
-	MouseMiddleClick    = { 0, 0, 0 };
-	MouseX1Click        = { ID_NAVIGATE_SKIPBACK, 0, 0 };
-	MouseX2Click        = { ID_NAVIGATE_SKIPFORWARD, 0, 0 };
-	MouseWheelUp        = { ID_VOLUME_UP, 0, 0 };
-	MouseWheelDown      = { ID_VOLUME_DOWN, 0, 0 };
-	MouseWheelLeft      = { 0, 0, 0 };
-	MouseWheelRight     = { 0, 0, 0 };
+	MouseMiddleClick    = { 0, 0, 0, 0 };
+	MouseX1Click        = { ID_NAVIGATE_SKIPBACK, 0, 0, 0 };
+	MouseX2Click        = { ID_NAVIGATE_SKIPFORWARD, 0, 0, 0 };
+	MouseWheelUp        = { ID_VOLUME_UP, 0, 0, 0 };
+	MouseWheelDown      = { ID_VOLUME_DOWN, 0, 0, 0 };
+	MouseWheelLeft      = { 0, 0, 0, 0 };
+	MouseWheelRight     = { 0, 0, 0, 0 };
 	bMouseLeftClickOpenRecent = false;
 
 	bUseDarkTheme = true;
@@ -1364,25 +1364,25 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		swscanf_s(str, L"%u", &nMouseLeftDblClick);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseMiddleClick.normal, &MouseMiddleClick.ctrl, &MouseMiddleClick.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseMiddleClick.normal, &MouseMiddleClick.ctrl, &MouseMiddleClick.shift, &MouseMiddleClick.rbtn);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseX1Click.normal, &MouseX1Click.ctrl, &MouseX1Click.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseX1Click.normal, &MouseX1Click.ctrl, &MouseX1Click.shift, &MouseX1Click.rbtn);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseX2Click.normal, &MouseX2Click.ctrl, &MouseX2Click.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseX2Click.normal, &MouseX2Click.ctrl, &MouseX2Click.shift, &MouseX2Click.rbtn);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseWheelUp.normal, &MouseWheelUp.ctrl, &MouseWheelUp.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseWheelUp.normal, &MouseWheelUp.ctrl, &MouseWheelUp.shift, &MouseWheelUp.rbtn);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseWheelDown.normal, &MouseWheelDown.ctrl, &MouseWheelDown.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseWheelDown.normal, &MouseWheelDown.ctrl, &MouseWheelDown.shift, &MouseWheelDown.rbtn);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseWheelLeft.normal, &MouseWheelLeft.ctrl, &MouseWheelLeft.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseWheelLeft.normal, &MouseWheelLeft.ctrl, &MouseWheelLeft.shift, &MouseWheelLeft.rbtn);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT, str)) {
-		swscanf_s(str, L"%u;%u;%u", &MouseWheelRight.normal, &MouseWheelRight.ctrl, &MouseWheelRight.shift);
+		swscanf_s(str, L"%u;%u;%u;%u", &MouseWheelRight.normal, &MouseWheelRight.ctrl, &MouseWheelRight.shift, &MouseWheelRight.rbtn);
 	}
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
 
@@ -2001,19 +2001,19 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT, str);
 	str.Format(L"%u", nMouseLeftDblClick);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, str);
-	str.Format(L"%u;%u;%u", MouseMiddleClick.normal, MouseMiddleClick.ctrl, MouseMiddleClick.shift);
+	str.Format(L"%u;%u;%u;%u", MouseMiddleClick.normal, MouseMiddleClick.ctrl, MouseMiddleClick.shift, MouseMiddleClick.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE, str);
-	str.Format(L"%u;%u;%u", MouseX1Click.normal, MouseX1Click.ctrl, MouseX1Click.shift);
+	str.Format(L"%u;%u;%u;%u", MouseX1Click.normal, MouseX1Click.ctrl, MouseX1Click.shift, MouseX1Click.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X1, str);
-	str.Format(L"%u;%u;%u", MouseX2Click.normal, MouseX2Click.ctrl, MouseX2Click.shift);
+	str.Format(L"%u;%u;%u;%u", MouseX2Click.normal, MouseX2Click.ctrl, MouseX2Click.shift, MouseX2Click.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_X2, str);
-	str.Format(L"%u;%u;%u", MouseWheelUp.normal, MouseWheelUp.ctrl, MouseWheelUp.shift);
+	str.Format(L"%u;%u;%u;%u", MouseWheelUp.normal, MouseWheelUp.ctrl, MouseWheelUp.shift, MouseWheelUp.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_UP, str);
-	str.Format(L"%u;%u;%u", MouseWheelDown.normal, MouseWheelDown, MouseWheelDown.shift);
+	str.Format(L"%u;%u;%u;%u", MouseWheelDown.normal, MouseWheelDown, MouseWheelDown.shift, MouseWheelDown.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_DOWN, str);
-	str.Format(L"%u;%u;%u", MouseWheelLeft.normal, MouseWheelLeft.ctrl, MouseWheelLeft.shift);
+	str.Format(L"%u;%u;%u;%u", MouseWheelLeft.normal, MouseWheelLeft.ctrl, MouseWheelLeft.shift, MouseWheelLeft.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_LEFT, str);
-	str.Format(L"%u;%u;%u", MouseWheelRight.normal, MouseWheelRight.ctrl, MouseWheelRight.shift);
+	str.Format(L"%u;%u;%u;%u", MouseWheelRight.normal, MouseWheelRight.ctrl, MouseWheelRight.shift, MouseWheelRight.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT, str);
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
 

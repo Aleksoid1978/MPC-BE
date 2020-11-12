@@ -371,7 +371,6 @@ WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags)
 	case MOUSE_WHEEL_RIGHT:    mcmds = s.MouseWheelRight;   break;
 	case MOUSE_CLICK_LEFT:     return (WORD)s.nMouseLeftClick;
 	case MOUSE_CLICK_LEFT_DBL: return (WORD)s.nMouseLeftDblClick;
-	case MOUSE_CLICK_RIGHT:    return (WORD)ID_MENU_PLAYER_SHORT;
 	}
 
 	if (mcmds.ctrl && (nFlags & MK_CONTROL)) {
@@ -379,6 +378,9 @@ WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags)
 	}
 	if (mcmds.shift && (nFlags & MK_SHIFT)) {
 		return (WORD)mcmds.shift;
+	}
+	if (mcmds.rbtn && (nFlags & MK_RBUTTON)) {
+		return (WORD)mcmds.rbtn;
 	}
 
 	return (WORD)mcmds.normal;
