@@ -609,6 +609,7 @@ public:
 		UINT normal;
 		UINT ctrl;
 		UINT shift;
+		UINT rbtn;
 	};
 	MOUSE_ASSIGNMENT MouseMiddleClick;
 	MOUSE_ASSIGNMENT MouseX1Click;
