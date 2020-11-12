@@ -320,25 +320,31 @@ void CPPageMouse::OnBnClickedReset()
 	m_table_values[ROW_BTN_M][COL_CMD]    = 0;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = 0;
 	m_table_values[ROW_BTN_M][COL_SHIFT]  = 0;
+	m_table_values[ROW_BTN_M][COL_RBTN]   = 0;
 	m_table_values[ROW_BTN_X1][COL_CMD]   = ID_NAVIGATE_SKIPBACK;
 	m_table_values[ROW_BTN_X1][COL_CTRL]  = 0;
 	m_table_values[ROW_BTN_X1][COL_SHIFT] = 0;
+	m_table_values[ROW_BTN_X1][COL_RBTN]  = 0;
 	m_table_values[ROW_BTN_X2][COL_CMD]   = ID_NAVIGATE_SKIPFORWARD;
 	m_table_values[ROW_BTN_X2][COL_CTRL]  = 0;
 	m_table_values[ROW_BTN_X2][COL_SHIFT] = 0;
+	m_table_values[ROW_BTN_X2][COL_RBTN]  = 0;
 	m_table_values[ROW_WHL_U][COL_CMD]    = ID_VOLUME_UP;
 	m_table_values[ROW_WHL_U][COL_CTRL]   = 0;
 	m_table_values[ROW_WHL_U][COL_SHIFT]  = 0;
+	m_table_values[ROW_WHL_U][COL_RBTN]   = 0;
 	m_table_values[ROW_WHL_D][COL_CMD]    = ID_VOLUME_DOWN;
 	m_table_values[ROW_WHL_D][COL_CTRL]   = 0;
 	m_table_values[ROW_WHL_D][COL_SHIFT]  = 0;
+	m_table_values[ROW_WHL_D][COL_RBTN]   = 0;
 	m_table_values[ROW_WHL_L][COL_CMD]    = 0;
 	m_table_values[ROW_WHL_L][COL_CTRL]   = 0;
 	m_table_values[ROW_WHL_L][COL_SHIFT]  = 0;
+	m_table_values[ROW_WHL_L][COL_RBTN]   = 0;
 	m_table_values[ROW_WHL_R][COL_CMD]    = 0;
 	m_table_values[ROW_WHL_R][COL_CTRL]   = 0;
 	m_table_values[ROW_WHL_R][COL_SHIFT]  = 0;
-
+	m_table_values[ROW_WHL_R][COL_RBTN]   = 0;
 	SyncList();
 
 	SetModified();
