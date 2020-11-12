@@ -3913,6 +3913,8 @@ HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISub
 
 CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
 {
+	DLog(L"CSyncRenderer::CSyncRenderer()");
+
 	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
 	CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
 	m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
@@ -3921,6 +3923,7 @@ CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CS
 
 CSyncRenderer::~CSyncRenderer()
 {
+	DLog(L"CSyncRenderer::~CSyncRenderer()");
 }
 
 STDMETHODIMP CSyncRenderer::NonDelegatingQueryInterface(REFIID riid, void** ppv)
