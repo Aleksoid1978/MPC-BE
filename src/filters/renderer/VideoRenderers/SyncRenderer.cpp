@@ -4000,7 +4000,7 @@ STDMETHODIMP CSyncRenderer::Run(REFERENCE_TIME tStart)
 	return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE CSyncRenderer::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State)
+STDMETHODIMP CSyncRenderer::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State)
 {
 	if (m_pEVRBase) {
 		return m_pEVRBase->GetState(dwMilliSecsTimeout, State);

@@ -575,21 +575,21 @@ namespace GothSync
 		~CSyncRenderer();
 
 		DECLARE_IUNKNOWN;
-		virtual HRESULT STDMETHODCALLTYPE NonDelegatingQueryInterface(REFIID riid, void** ppvObject);
+		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppvObject);
 
 		// IBaseFilter
-		virtual HRESULT STDMETHODCALLTYPE EnumPins(__out IEnumPins **ppEnum);
-		virtual HRESULT STDMETHODCALLTYPE FindPin(LPCWSTR Id, __out IPin **ppPin);
-		virtual HRESULT STDMETHODCALLTYPE QueryFilterInfo(__out FILTER_INFO *pInfo);
-		virtual HRESULT STDMETHODCALLTYPE JoinFilterGraph(__in_opt IFilterGraph *pGraph, __in_opt LPCWSTR pName);
-		virtual HRESULT STDMETHODCALLTYPE QueryVendorInfo(__out LPWSTR *pVendorInfo);
-		virtual HRESULT STDMETHODCALLTYPE Stop();
-		virtual HRESULT STDMETHODCALLTYPE Pause();
-		virtual HRESULT STDMETHODCALLTYPE Run(REFERENCE_TIME tStart);
-		virtual HRESULT STDMETHODCALLTYPE GetState(DWORD dwMilliSecsTimeout, __out FILTER_STATE *State);
-		virtual HRESULT STDMETHODCALLTYPE SetSyncSource(__in_opt  IReferenceClock *pClock);
-		virtual HRESULT STDMETHODCALLTYPE GetSyncSource(__deref_out_opt  IReferenceClock **pClock);
-		virtual HRESULT STDMETHODCALLTYPE GetClassID(__RPC__out CLSID *pClassID);
+		STDMETHODIMP EnumPins(__out IEnumPins **ppEnum);
+		STDMETHODIMP FindPin(LPCWSTR Id, __out IPin **ppPin);
+		STDMETHODIMP QueryFilterInfo(__out FILTER_INFO *pInfo);
+		STDMETHODIMP JoinFilterGraph(__in_opt IFilterGraph *pGraph, __in_opt LPCWSTR pName);
+		STDMETHODIMP QueryVendorInfo(__out LPWSTR *pVendorInfo);
+		STDMETHODIMP Stop();
+		STDMETHODIMP Pause();
+		STDMETHODIMP Run(REFERENCE_TIME tStart);
+		STDMETHODIMP GetState(DWORD dwMilliSecsTimeout, __out FILTER_STATE *State);
+		STDMETHODIMP SetSyncSource(__in_opt  IReferenceClock *pClock);
+		STDMETHODIMP GetSyncSource(__deref_out_opt  IReferenceClock **pClock);
+		STDMETHODIMP GetClassID(__RPC__out CLSID *pClassID);
 	};
 
 	// CGenlock
