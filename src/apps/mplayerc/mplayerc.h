@@ -99,6 +99,8 @@ public:
 private:
 	bool ClearSettings();
 
+	bool m_bRunAdmin = false;
+
 public:
 
 	bool			ChangeSettingsLocation(bool useIni);

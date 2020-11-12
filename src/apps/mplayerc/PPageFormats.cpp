@@ -1140,7 +1140,7 @@ void CPPageFormats::OnBnRunAdmin()
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
-	s.LoadSettings(true);
+	s.LoadFormats(false);
 
 	m_chContextFiles.SetCheck(s.bSetContextFiles);
 	m_chContextDir.SetCheck(s.bSetContextDir);

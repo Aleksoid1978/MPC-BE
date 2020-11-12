@@ -957,6 +957,9 @@ public:
 
 	void			SavePlaylistTabSetting();
 
+	void			LoadFormats(const bool bLoadLanguage);
+	void			SaveFormats();
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;

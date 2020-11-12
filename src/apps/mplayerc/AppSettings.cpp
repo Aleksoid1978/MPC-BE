@@ -1024,12 +1024,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize, 8, 26);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
-	// Associated types with icon or not...
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, bAssociatedWithIcons);
-	// file/dir context menu
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
-
 	// Last Open Dir
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
@@ -1414,8 +1408,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
 
-	m_Formats.UpdateData(false);
-
 	// Internal filters
 	for (int f = 0; f < SRC_COUNT; f++) {
 		profile.ReadBool(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
@@ -1662,6 +1654,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		nCLSwitches |= CLSW_FULLSCREEN;
 	}
 
+	LoadFormats(false);
+
 	bInitialized = true;
 }
 
@@ -1863,12 +1857,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
-	// Associated types with icon or not...
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, bAssociatedWithIcons);
-	// file/dir context menu
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
-
 	// Last Open Dir
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
@@ -2053,8 +2041,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
 
-	m_Formats.UpdateData(true);
-
 	// Internal filters
 	for (int f = 0; f < SRC_COUNT; f++) {
 		profile.WriteBool(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
@@ -2132,6 +2118,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FILE_NAME, bOSDFileName);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
+
+	SaveFormats();
 
 	if (pApp->m_pszRegistryKey) {
 		// WINBUG: on win2k this would crash WritePrivateProfileString
@@ -2666,6 +2654,43 @@ bool CAppSettings::IsISRAutoLoadEnabled() const
 void CAppSettings::SavePlaylistTabSetting()
 {
 	AfxGetProfile().WriteString(IDS_R_SETTINGS, IDS_RS_PLAYLISTTABSSETTINGS, strTabs);
+}
+
+void CAppSettings::LoadFormats(const bool bLoadLanguage)
+{
+	auto& profile = AfxGetProfile();
+
+	if (bLoadLanguage) {
+		// Set interface language first!
+		CString str;
+		profile.ReadString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, str);
+		iLanguage = CMPlayerCApp::GetLanguageIndex(str);
+		if (iLanguage < 0) {
+			iLanguage = CMPlayerCApp::GetDefLanguage();
+		}
+		CMPlayerCApp::SetLanguage(iLanguage, false);
+	}
+
+	// Associated types with icon or not...
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, bAssociatedWithIcons);
+	// file/dir context menu
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
+
+	m_Formats.UpdateData(false);
+}
+
+void CAppSettings::SaveFormats()
+{
+	auto& profile = AfxGetProfile();
+
+	// Associated types with icon or not...
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, bAssociatedWithIcons);
+	// file/dir context menu
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
+
+	m_Formats.UpdateData(true);
 }
 
 // Settings::CRecentFileAndURLList
