@@ -90,6 +90,8 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_CurrentAdapter(0),
 	m_FocusThread(nullptr)
 {
+	DLog(L"CBaseAP::CBaseAP()");
+
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
 		return;
@@ -179,6 +181,8 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 
 CBaseAP::~CBaseAP()
 {
+	DLog(L"CBaseAP::~CBaseAP()");
+
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
 		if (m_pDwmEnableComposition) {
@@ -2227,6 +2231,8 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	, pfAvSetMmThreadPriority(nullptr)
 	, pfAvRevertMmThreadCharacteristics(nullptr)
 {
+	DLog(L"CSyncAP::CSyncAP()");
+
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	m_nResetToken   = 0;
@@ -2311,6 +2317,8 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 
 CSyncAP::~CSyncAP(void)
 {
+	DLog(L"CSyncAP::~CSyncAP()");
+
 	StopWorkerThreads();
 	m_pMediaType.Release();
 	m_pClock.Release();
