@@ -241,10 +241,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<ICaptureGraphBuilder2>  m_pCGB;
 	CStringW                        m_VidDispName, m_AudDispName;
 	CComPtr<IBaseFilter>            m_pVidCap, m_pAudCap;
-	CComPtr<IAMVideoCompression>    pAMVCCap, pAMVCPrev;
-	CComPtr<IAMStreamConfig>        pAMVSCCap, pAMVSCPrev, pAMASC;
-	CComPtr<IAMCrossbar>            pAMXBar;
-	CComPtr<IAMTVTuner>             pAMTuner;
+	CComPtr<IAMStreamConfig>        m_pAMVSCCap, m_pAMVSCPrev, m_pAMASC;
+	CComPtr<IAMCrossbar>            m_pAMXBar;
+	CComPtr<IAMTVTuner>             m_pAMTuner;
 	CComPtr<IAMDroppedFrames>       m_pAMDF;
 
 	CComPtr<IVMRMixerControl9>      m_pVMRMC9;
@@ -390,12 +389,12 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	REFERENCE_TIME m_abRepeatPositionA, m_abRepeatPositionB, m_fileEndPosition;
 	bool m_abRepeatPositionAEnabled, m_abRepeatPositionBEnabled;
 
-	bool m_fCustomGraph;
-	bool m_fShockwaveGraph;
+	bool m_bCustomGraph;
+	bool m_bShockwaveGraph;
 
 	CComPtr<ISubClock> m_pSubClock;
 
-	int m_fFrameSteppingActive;
+	int m_bFrameSteppingActive;
 	int m_nStepForwardCount;
 	REFERENCE_TIME m_rtStepForwardStart;
 	int m_nVolumeBeforeFrameStepping;
@@ -403,9 +402,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	bool m_bEndOfStream;
 	bool m_bGraphEventComplete;
 
-	bool m_fBuffering;
+	bool m_bBuffering;
 
-	bool m_fLiveWM;
+	bool m_bLiveWM;
 
 	void SendStatusMessage(CString msg, int nTimeOut);
 	CString m_playingmsg, m_closingmsg;
@@ -503,7 +502,7 @@ public:
 		return(m_wndPlaylistBar.GetCount() == 0);
 	}
 	bool IsInteractiveVideo() const {
-		return(m_fShockwaveGraph);
+		return(m_bShockwaveGraph);
 	}
 
 	bool IsD3DFullScreenMode() const;
@@ -786,7 +785,7 @@ public:
 	void SetShaders();
 
 	// capturing
-	bool m_fCapturing;
+	bool m_bCapturing;
 	HRESULT BuildCapture(IPin* pPin, IBaseFilter* pBF[3], const GUID& majortype, AM_MEDIA_TYPE* pmt); // pBF: 0 buff, 1 enc, 2 mux, pmt is for 1 enc
 	bool BuildToCapturePreviewPin(
 		IBaseFilter* pVidCap, IPin** pVidCapPin, IPin** pVidPrevPin,
@@ -1311,7 +1310,7 @@ protected:
 	void SetStatusMessage(CString m_msg);
 	CString FillMessage();
 
-	bool m_fValidDVDOpen;
+	bool m_bValidDVDOpen;
 
 	CComPtr<IBaseFilter> m_pBFmadVR;
 
