@@ -1025,7 +1025,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		//if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT ) { // <-- old code
 		if (FAILED(hr)) {
 			MoveToFreeList(pSample, false);
-			DLogIf(hr != MF_E_TRANSFORM_NEED_MORE_INPUT, L"EVR: GetImageFromMixer with error %s", HR2Str(hr));
+			DLogIf(hr != MF_E_TRANSFORM_NEED_MORE_INPUT, L"EVR: GetImageFromMixer failed with error %s", HR2Str(hr));
 			break;
 		}
 
@@ -1949,12 +1949,12 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 
 void CEVRAllocatorPresenter::RenderThread()
 {
-	HANDLE   hEvts[]     = { m_hEvtQuit, m_hEvtFlush, g_hNewSegmentEvent };
-	bool     bQuit       = false;
-	bool     bForcePaint = false;
+	HANDLE   hEvts[]      = { m_hEvtQuit, m_hEvtFlush, g_hNewSegmentEvent };
+	bool     bQuit        = false;
+	bool     bForcePaint  = true; // needs to be true in some rare cases
 	TIMECAPS tc;
 	DWORD    dwResolution;
-	MFTIME   nsSampleTime;
+	MFTIME   nsSampleTime = 0;
 	LONGLONG llClockTime;
 	DWORD    dwObject;
 
@@ -2045,8 +2045,9 @@ void CEVRAllocatorPresenter::RenderThread()
 						bool bForcePaint2 = false;
 						HRESULT hrGetSampleTime = pMFSample->GetSampleTime(&nsSampleTime);
 						if (hrGetSampleTime != S_OK || nsSampleTime == 0) {
-							bForcePaint2 = true;
+							bForcePaint2 = true; // The sample does not have a presentation time or first sample
 						}
+
 						// We assume that all samples have the same duration
 						LONGLONG SampleDuration = 0;
 						pMFSample->GetSampleDuration(&SampleDuration);
