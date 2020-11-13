@@ -33,10 +33,6 @@ CPlayerInfoBar::CPlayerInfoBar(CMainFrame* pMainFrame, int nFirstColWidth)
 {
 }
 
-CPlayerInfoBar::~CPlayerInfoBar()
-{
-}
-
 void CPlayerInfoBar::SetLine(CString label, CString info)
 {
 	if (info.IsEmpty()) {
@@ -147,16 +143,22 @@ CSize CPlayerInfoBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 	return r.Size();
 }
 
-void CPlayerInfoBar::Relayout()
+void CPlayerInfoBar::Relayout(const bool bForce/* = true*/)
 {
-	CRect r;
-	GetParent()->GetClientRect(&r);
+	CRect rc;
+	GetParent()->GetClientRect(&rc);
+
+	if (!bForce && rc == m_rc) {
+		return;
+	}
+
+	m_rc = rc;
 
 	int w = m_pMainFrame->ScaleY(m_nFirstColWidth);
 	int h = m_pMainFrame->ScaleY(17);
 	int y = m_pMainFrame->ScaleY(2);
 
-	for (auto& label : m_labels) {
+	for (const auto& label : m_labels) {
 		CDC* pDC =label->GetDC();
 		CString str;
 		label->GetWindowTextW(str);
@@ -167,7 +169,11 @@ void CPlayerInfoBar::Relayout()
 	const int sep = m_pMainFrame->ScaleX(10);
 	for (size_t i = 0; i < m_labels.size(); i++, y += h) {
 		m_labels[i]->MoveWindow(1, y, w - sep, h);
-		m_infos[i]->MoveWindow(w + sep, y, r.Width() - w - sep - 1, h);
+		m_infos[i]->MoveWindow(w + sep, y, rc.Width() - w - sep - 1, h);
+	}
+
+	if (!bForce) {
+		Invalidate();
 	}
 }
 
@@ -175,6 +181,7 @@ BEGIN_MESSAGE_MAP(CPlayerInfoBar, CDialogBar)
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
 
 // CPlayerInfoBar message handlers
@@ -223,7 +230,6 @@ void CPlayerInfoBar::OnSize(UINT nType, int cx, int cy)
 	CDialogBar::OnSize(nType, cx, cy);
 
 	Relayout();
-
 	Invalidate();
 }
 
@@ -232,5 +238,14 @@ void CPlayerInfoBar::OnLButtonDown(UINT nFlags, CPoint point)
 	if (!m_pMainFrame->m_bFullScreen && !m_pMainFrame->IsZoomed()) {
 		MapWindowPoints(m_pMainFrame, &point, 1);
 		m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+	}
+}
+
+void CPlayerInfoBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
+{
+	__super::OnWindowPosChanged(lpwndpos);
+
+	if (lpwndpos->flags & SWP_SHOWWINDOW) {
+		Relayout(false);
 	}
 }
