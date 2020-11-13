@@ -15852,20 +15852,24 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 
 	int i = 1;
 	for (const auto& pBar : m_bars) {
-		ShowControlBar(pBar, !!(nCS&i), TRUE);
-		if (nCS&i) {
+		const BOOL bShow = nCS & i;
+		ShowControlBar(pBar, !!bShow, TRUE);
+		if (bShow) {
 			m_pLastBar = pBar;
 		}
 
 		CSize s = pBar->CalcFixedLayout(FALSE, TRUE);
-		if (nCSprev&i) {
+		if (nCSprev & i) {
 			hbefore += s.cy;
 		}
-		if (nCS&i) {
+		if (bShow) {
 			hafter += s.cy;
 		}
+
 		i <<= 1;
 	}
+
+	OnTimer(TIMER_STATS);
 
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,12 +38,13 @@ private:
 	std::vector<std::unique_ptr<CStatusLabel>> m_infos;
 
 	int m_nFirstColWidth;
+	CRect m_rc;
 
-	void Relayout();
+	void Relayout(const bool bForce = true);
 
 public:
 	CPlayerInfoBar(CMainFrame* pMainFrame, int nFirstColWidth = 100);
-	virtual ~CPlayerInfoBar();
+	virtual ~CPlayerInfoBar() = default;
 
 	BOOL Create(CWnd* pParentWnd);
 
@@ -61,7 +62,8 @@ protected:
 public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
