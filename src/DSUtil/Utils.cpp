@@ -22,6 +22,7 @@
 #include <basestruct.h>
 #include <cmath>
 #include <d3d9.h>
+#include <Mferror.h>
 #include "Utils.h"
 
 uint32_t CountBits(uint32_t v)
@@ -245,6 +246,7 @@ CStringW HR2Str(const HRESULT hr)
 	switch (hr) {
 		// common HRESULT values https://docs.microsoft.com/en-us/windows/desktop/seccrypto/common-hresult-values
 		UNPACK_VALUE(S_OK);
+#ifdef _WINERROR_
 		UNPACK_VALUE(S_FALSE);
 		UNPACK_VALUE(E_NOTIMPL);
 		UNPACK_VALUE(E_NOINTERFACE);
@@ -260,6 +262,7 @@ CStringW HR2Str(const HRESULT hr)
 		// some System Error Codes
 		UNPACK_HR_WIN32(ERROR_INVALID_WINDOW_HANDLE);
 		UNPACK_HR_WIN32(ERROR_CLASS_ALREADY_EXISTS);
+#endif
 #ifdef _D3D9_H_
 		// some D3DERR values https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3derr
 		UNPACK_VALUE(S_PRESENT_OCCLUDED);
@@ -272,6 +275,13 @@ CStringW HR2Str(const HRESULT hr)
 		UNPACK_VALUE(D3DERR_INVALIDCALL);
 		UNPACK_VALUE(D3DERR_OUTOFVIDEOMEMORY);
 		UNPACK_VALUE(D3DERR_WASSTILLDRAWING);
+#endif
+#ifdef _MFERROR_H
+		// some MF_E values
+		UNPACK_VALUE(MF_E_INVALIDSTREAMNUMBER);
+		UNPACK_VALUE(MF_E_TRANSFORM_NEED_MORE_INPUT);
+		UNPACK_VALUE(MF_E_TRANSFORM_STREAM_CHANGE);
+		UNPACK_VALUE(MF_E_TRANSFORM_TYPE_NOT_SET);
 #endif
 	default:
 		str.Format(L"0x%08x", hr);
