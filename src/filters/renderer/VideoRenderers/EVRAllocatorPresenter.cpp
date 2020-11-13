@@ -982,6 +982,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 			} else {
 				m_bStreamChanged = FALSE;
 				m_bChangeMT = true;
+				DLog(L"EVR: Type %s selected for mixer output", GetMediaTypeFormatDesc(pType));
 				break;
 			}
 		}
@@ -1021,8 +1022,10 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 			llClockAfter = GetPerfCounter();
 		}
 
-		if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) {
+		//if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT ) { // <-- old code
+		if (FAILED(hr)) {
 			MoveToFreeList(pSample, false);
+			DLogIf(hr != MF_E_TRANSFORM_NEED_MORE_INPUT, L"EVR: GetImageFromMixer with error %s", HR2Str(hr));
 			break;
 		}
 
