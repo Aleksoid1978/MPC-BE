@@ -2980,10 +2980,13 @@ bool CSyncAP::GetSampleFromMixer()
 			llClockAfter = GetPerfCounter();
 		}
 
-		if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) { // There are no samples left in the mixer
+		//if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) { // There are no samples left in the mixer // <-- old code
+		if (FAILED(hr)) {
 			MoveToFreeList(pSample, false);
+			DLogIf(hr != MF_E_TRANSFORM_NEED_MORE_INPUT, L"EVR Sync: GetImageFromMixer failed with error %s", HR2Str(hr));
 			break;
 		}
+
 		if (m_pSink) {
 			llMixerLatency = llClockAfter - llClockBefore;
 			m_pSink->Notify (EC_PROCESSING_LATENCY, (LONG_PTR)&llMixerLatency, 0);
