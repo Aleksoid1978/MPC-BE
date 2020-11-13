@@ -3501,7 +3501,7 @@ void CSyncAP::MixerThread()
 					CAutoLock AutoLock(&m_ImageProcessingLock);
 					bNewSample = GetSampleFromMixer();
 				}
-				if (m_bUseInternalTimer && m_pSubPicQueue) {
+				if (bNewSample && m_bUseInternalTimer && m_pSubPicQueue) {
 					m_pSubPicQueue->SetFPS(m_fps);
 				}
 			}
