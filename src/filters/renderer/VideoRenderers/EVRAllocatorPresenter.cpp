@@ -1949,13 +1949,14 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 
 void CEVRAllocatorPresenter::RenderThread()
 {
-	HANDLE		hEvts[]		= { m_hEvtQuit, m_hEvtFlush, g_hNewSegmentEvent };
-	bool		bQuit		= false, bForcePaint = false;
-	TIMECAPS	tc;
-	DWORD		dwResolution;
-	MFTIME		nsSampleTime;
-	LONGLONG	llClockTime;
-	DWORD		dwObject;
+	HANDLE   hEvts[]     = { m_hEvtQuit, m_hEvtFlush, g_hNewSegmentEvent };
+	bool     bQuit       = false;
+	bool     bForcePaint = false;
+	TIMECAPS tc;
+	DWORD    dwResolution;
+	MFTIME   nsSampleTime;
+	LONGLONG llClockTime;
+	DWORD    dwObject;
 
 	// Tell Multimedia Class Scheduler we are a playback thread (increase priority)
 	HANDLE hAvrt = 0;
@@ -2041,10 +2042,10 @@ void CEVRAllocatorPresenter::RenderThread()
 						//pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
 						m_pCurrentDisplaydSample = pMFSample;
 
-						bool bValidSampleTime = true;
+						bool bForcePaint2 = false;
 						HRESULT hrGetSampleTime = pMFSample->GetSampleTime(&nsSampleTime);
 						if (hrGetSampleTime != S_OK || nsSampleTime == 0) {
-							bValidSampleTime = false;
+							bForcePaint2 = true;
 						}
 						// We assume that all samples have the same duration
 						LONGLONG SampleDuration = 0;
@@ -2080,7 +2081,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								llClockTime = m_StarvationClock;
 							}
 
-							if (!bValidSampleTime) {
+							if (bForcePaint2) {
 								// Just play as fast as possible
 								bStepForward = true;
 								pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
