@@ -3479,7 +3479,6 @@ DWORD WINAPI CSyncAP::MixerThreadStatic(LPVOID lpParam)
 
 void CSyncAP::MixerThread()
 {
-	HANDLE hEvts[] = {m_hEvtQuit};
 	bool bQuit = false;
 	TIMECAPS tc;
 	DWORD dwResolution;
@@ -3490,7 +3489,7 @@ void CSyncAP::MixerThread()
 	dwUser = timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
-		DWORD dwObject = WaitForMultipleObjects(std::size(hEvts), hEvts, FALSE, 1);
+		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
 		switch (dwObject) {
 			case WAIT_OBJECT_0: // Quit
 				bQuit = true;
