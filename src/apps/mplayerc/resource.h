@@ -1731,6 +1731,9 @@
 #define IDS_MOUSE_WHEEL_DOWN            41706
 #define IDS_MOUSE_WHEEL_LEFT            41707
 #define IDS_MOUSE_WHEEL_RIGHT           41708
+#define IDS_MOUSE_ACTION                41710
+#define IDS_MOUSE_COMMAND               41711
+#define IDS_MOUSE_RIGHT_BUTTON          41712
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
 #define IDS_PPAGE_OUTPUT_MPCVR          42005
 #define IDS_PPAGE_OUTPUT_EVR            42007

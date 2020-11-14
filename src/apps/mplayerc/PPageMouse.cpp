@@ -156,11 +156,11 @@ BOOL CPPageMouse::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
-	m_list.InsertColumn(COL_ACTION, L"Action");
-	m_list.InsertColumn(COL_CMD,    L"Command");
+	m_list.InsertColumn(COL_ACTION, ResStr(IDS_MOUSE_ACTION));
+	m_list.InsertColumn(COL_CMD,    ResStr(IDS_MOUSE_COMMAND));
 	m_list.InsertColumn(COL_CTRL,   L"Ctrl");
 	m_list.InsertColumn(COL_SHIFT,  L"Shift");
-	m_list.InsertColumn(COL_RBTN,   L"Right button");
+	m_list.InsertColumn(COL_RBTN,   ResStr(IDS_MOUSE_RIGHT_BUTTON));
 
 	m_list.InsertItem(ROW_BTN_M,  ResStr(IDS_MOUSE_CLICK_MIDDLE));
 	m_list.InsertItem(ROW_BTN_X1, ResStr(IDS_MOUSE_CLICK_X1));
