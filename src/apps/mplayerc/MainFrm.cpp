@@ -4374,6 +4374,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	OpenSetupStatsBar();
 	OpenSetupStatusBar();
 	OpenSetupCaptureBar();
+	OnTimer(TIMER_STATS);
 
 	if (GetPlaybackMode() == PM_CAPTURE) {
 		ShowControlBarInternal(&m_wndSubresyncBar, FALSE);
@@ -15869,8 +15870,6 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 		i <<= 1;
 	}
 
-	OnTimer(TIMER_STATS);
-
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);
 	GetWindowPlacement(&wp);
@@ -15888,6 +15887,8 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 	RecalcLayout();
 
 	RepaintVideo();
+
+	OnTimer(TIMER_STATS);
 }
 
 void CMainFrame::CalcControlsSize(CSize& cSize)
