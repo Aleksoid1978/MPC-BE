@@ -53,10 +53,14 @@ CPPageMouse::CPPageMouse()
 	m_comands_5.Add(0, 0);
 	m_comands_5.Add(ID_VOLUME_UP,            IDS_AG_VOLUME_UP);
 	m_comands_5.Add(ID_VOLUME_DOWN,          IDS_AG_VOLUME_DOWN);
+	m_comands_5.Add(ID_PLAY_INCRATE,         IDS_AG_INCREASE_RATE);
+	m_comands_5.Add(ID_PLAY_DECRATE,         IDS_AG_DECREASE_RATE);
 	m_comands_5.Add(ID_PLAY_SEEKBACKWARDMED, IDS_AG_JUMP_BACKWARD_2);
 	m_comands_5.Add(ID_PLAY_SEEKFORWARDMED,  IDS_AG_JUMP_FORWARD_2);
 
 	m_comands_6.Add(0, 0);
+	m_comands_6.Add(ID_PLAY_INCRATE,             IDS_AG_INCREASE_RATE);
+	m_comands_6.Add(ID_PLAY_DECRATE,             IDS_AG_DECREASE_RATE);
 	m_comands_6.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
 	m_comands_6.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
 }
