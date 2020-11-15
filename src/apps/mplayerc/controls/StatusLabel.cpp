@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,11 +30,6 @@ IMPLEMENT_DYNAMIC(CStatusLabel, CStatic)
 CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	: m_fRightAlign(fRightAlign)
 	, m_fAddEllipses(fAddEllipses)
-{
-	m_font.m_hObject = nullptr;
-}
-
-CStatusLabel::~CStatusLabel()
 {
 }
 
@@ -85,11 +80,11 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	dc.Attach(lpDrawItemStruct->hDC);
 	CString str;
 	GetWindowTextW(str);
-	CRect r;
-	GetClientRect(&r);
+	CRect rc;
+	GetClientRect(&rc);
 	CFont* old = dc.SelectObject(&m_font);
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	if (s.bUseDarkTheme) {
 		dc.SetTextColor(ThemeRGB(165, 170, 175));
@@ -99,26 +94,19 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		dc.SetBkColor(0);
 	}
 
-	CSize size = dc.GetTextExtent(str);
-	CPoint p = CPoint(m_fRightAlign ? r.Width() - size.cx : 0, (r.Height() - size.cy) / 2);
-
+	UINT format = DT_VCENTER | DT_SINGLELINE;
 	if (m_fAddEllipses) {
-		while (size.cx > r.Width() - 3 && str.GetLength() > 3) {
-			str = str.Left(str.GetLength() - 4) + L"...";
-			size = dc.GetTextExtent(str);
-		}
+		format |= DT_END_ELLIPSIS;
+	}
+	if (m_fRightAlign) {
+		format |= DT_RIGHT;
+	} else {
+		format |= DT_LEFT;
 	}
 
-	if (s.bUseDarkTheme) {
-		dc.SelectObject(&old);
-		dc.FillSolidRect(&r, ThemeRGB(5, 10, 15));
-		dc.TextOut(p.x, p.y, str);
-	} else {
-		dc.TextOut(p.x, p.y, str);
-		dc.ExcludeClipRect(CRect(p, size));
-		dc.SelectObject(&old);
-		dc.FillSolidRect(&r, 0);
-	}
+	dc.SelectObject(&old);
+	dc.FillSolidRect(&rc, s.bUseDarkTheme ? ThemeRGB(5, 10, 15) : 0);
+	dc.DrawTextW(str, &rc, format);
 
 	dc.Detach();
 }
