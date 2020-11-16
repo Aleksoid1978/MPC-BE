@@ -880,14 +880,14 @@ void COSD::DrawWnd()
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty()) {
-		return;
-	}
-
 	if (m_nMessagePos == OSD_NOMESSAGE) {
 		if (IsWindowVisible()) {
 			ShowWindow(SW_HIDE);
 		}
+		return;
+	}
+
+	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty()) {
 		return;
 	}
 
