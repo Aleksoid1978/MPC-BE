@@ -8092,7 +8092,7 @@ void CMainFrame::OnPlayStop()
 		}
 	}
 
-	if (!m_bEndOfStream) {
+	if (!m_bEndOfStream && m_eMediaLoadState != MLS_CLOSING) {
 		CString strOSD = ResStr(ID_PLAY_STOP);
 		int i = strOSD.Find(L"\n");
 		if (i > 0) {
