@@ -14267,8 +14267,8 @@ void CMainFrame::CloseMediaPrivate()
 	}
 	m_bYoutubeOpened = false;
 
-	m_OSD.Stop();
 	OnPlayStop();
+	m_OSD.Stop();
 
 	m_pparray.RemoveAll();
 	m_ssarray.RemoveAll();
