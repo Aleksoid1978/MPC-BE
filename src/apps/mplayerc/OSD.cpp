@@ -734,7 +734,7 @@ void COSD::ClearMessage(bool hide)
 	}
 }
 
-void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
+void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, const int FontSize/* = 0*/, LPCWSTR OSD_Font/* = nullptr*/)
 {
 	if (!m_bShowMessage) {
 		return;
@@ -755,7 +755,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, in
 		}
 
 		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
-		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
+		m_OSD_Font = OSD_Font ? OSD_Font : s.strOSDFont;
 
 		if (m_OSD_FontCashed != m_OSD_Font
 				|| m_FontSizeCashed != m_FontSize
@@ -787,7 +787,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, in
 		}
 
 		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
-		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
+		m_OSD_Font = OSD_Font ? OSD_Font : s.strOSDFont;
 
 		m_pWnd->KillTimer((UINT_PTR)this);
 		if (nDuration != -1) {
