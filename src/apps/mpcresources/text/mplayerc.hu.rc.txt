@@ -463,7 +463,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 45		"Felső"
 48		"Alsó"
 51		"A feliratok relatív pozícionálása a képkockákhoz"
-53		"Színek && Átlátszóság"
+53		"Színek és Átlátszóság"
 56		"Elsődleges"
 57		"PRI"
 59		"Másodlagos"
