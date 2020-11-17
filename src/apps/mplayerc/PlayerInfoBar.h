@@ -48,9 +48,9 @@ public:
 
 	BOOL Create(CWnd* pParentWnd);
 
-	void SetLine(CString label, CString info);
-	void GetLine(CString label, CString& info);
-	void RemoveLine(CString label);
+	void SetLine(const CString& label, const CString& info);
+	void GetLine(const CString& label, CString& info);
+	void RemoveLine(const CString& label);
 	void RemoveAllLines();
 
 	void ScaleFont();
