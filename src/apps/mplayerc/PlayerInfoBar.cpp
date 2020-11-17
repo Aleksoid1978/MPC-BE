@@ -33,7 +33,7 @@ CPlayerInfoBar::CPlayerInfoBar(CMainFrame* pMainFrame, int nFirstColWidth)
 {
 }
 
-void CPlayerInfoBar::SetLine(CString label, CString info)
+void CPlayerInfoBar::SetLine(const CString& label, const CString& info)
 {
 	if (info.IsEmpty()) {
 		RemoveLine(label);
@@ -56,15 +56,15 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 	}
 
 	m_labels.push_back(std::make_unique<CStatusLabel>(true, false));
-	m_labels.back()->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
+	m_labels.back()->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_OWNERDRAW, RECT{ 0, 0, 0, 0 }, this);
 
 	m_infos.push_back(std::make_unique<CStatusLabel>(false, true));
-	m_infos.back()->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
+	m_infos.back()->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_OWNERDRAW, RECT{ 0, 0, 0, 0 }, this);
 
 	Relayout();
 }
 
-void CPlayerInfoBar::GetLine(CString label, CString& info)
+void CPlayerInfoBar::GetLine(const CString& label, CString& info)
 {
 	info.Empty();
 
@@ -81,7 +81,7 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 	}
 }
 
-void CPlayerInfoBar::RemoveLine(CString label)
+void CPlayerInfoBar::RemoveLine(const CString& label)
 {
 	for (size_t i = 0; i < m_labels.size(); i++) {
 		CString tmp;
