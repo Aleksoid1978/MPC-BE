@@ -70,7 +70,7 @@ public:
 	void Start(CWnd* pWnd);
 	void Stop();
 
-	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration = 5000, const int FontSize = 0, LPCWSTR OSD_Font = nullptr);
+	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration = 5000, const bool bPeriodicallyDisplayed = false, const int FontSize = 0, LPCWSTR OSD_Font = nullptr);
 	void DebugMessage(LPCWSTR format, ...);
 	void ClearMessage(bool hide = false);
 
@@ -181,7 +181,6 @@ private:
 	void InvalidateBitmapOSD();
 	void DrawMessage();
 	void DrawDebug();
-	static void CALLBACK TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime);
 
 	void Reset();
 
@@ -197,6 +196,13 @@ private:
 	int SliderChapWidth    = 0;
 
 	void CreateFontInternal();
+
+	bool m_bPeriodicallyDisplayed = false;
+	std::mutex m_mutexTimer;
+	HANDLE m_hTimerHandle = nullptr;
+	BOOL StartTimer(const DWORD dueTime);
+	void EndTimer(const bool bWaitForCallback = true);
+	static void CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);

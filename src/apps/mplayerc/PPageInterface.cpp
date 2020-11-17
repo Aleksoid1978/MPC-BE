@@ -614,7 +614,7 @@ void CPPageInterface::OnChngOSDCombo()
 		m_OSD_Size = GetCurItemData(m_FontSize);
 		m_FontType.GetLBText(m_FontType.GetCurSel(), str);
 
-		pFrame->m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_TEST), 2000, m_OSD_Size, str);
+		pFrame->m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_TEST), 2000, false, m_OSD_Size, str);
 		pFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
 	}
 

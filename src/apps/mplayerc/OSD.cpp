@@ -115,8 +115,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 COSD::~COSD()
 {
-	//Stop();
-	// do not use Stop() here because m_pWnd->KillTimer((UINT_PTR)this) call causes an error
+	EndTimer();
 
 	if (m_MemDC) {
 		m_MemDC.DeleteDC();
@@ -246,6 +245,7 @@ void COSD::UpdateBitmap()
 void COSD::Reset()
 {
 	m_bShowMessage = true;
+	m_bPeriodicallyDisplayed = false;
 
 	m_MainWndRect.SetRectEmpty();
 	m_strMessage.Empty();
@@ -291,9 +291,7 @@ void COSD::Start(CWnd* pWnd)
 
 void COSD::Stop()
 {
-	if (m_pWnd) {
-		m_pWnd->KillTimer((UINT_PTR)this);
-	}
+	EndTimer();
 
 	m_bCursorMoving			= false;
 	m_bSeekBarVisible		= false;
@@ -620,8 +618,7 @@ void COSD::OnMouseLeave()
 	if (bHideBars) {
 		// Add new timer for removing any messages
 		if (m_pWnd) {
-			m_pWnd->KillTimer((UINT_PTR)this);
-			m_pWnd->SetTimer((UINT_PTR)this, 1000, TimerFunc);
+			StartTimer(1000);
 		}
 		InvalidateBitmapOSD();
 	}
@@ -696,16 +693,6 @@ void COSD::GetRange(__int64& start, __int64& stop)
 	stop  = m_llSeekMax;
 }
 
-void COSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
-{
-	COSD* pOSD = (COSD*)nIDEvent;
-	if (pOSD) {
-		pOSD->ClearMessage();
-	}
-
-	::KillTimer(hWnd, nIDEvent);
-}
-
 void COSD::ClearMessage(bool hide)
 {
 	CAutoLock Lock(&m_Lock);
@@ -734,7 +721,7 @@ void COSD::ClearMessage(bool hide)
 	}
 }
 
-void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, const int FontSize/* = 0*/, LPCWSTR OSD_Font/* = nullptr*/)
+void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration/* = 5000*/, const bool bPeriodicallyDisplayed/* = false*/, const int FontSize/* = 0*/, LPCWSTR OSD_Font/* = nullptr*/)
 {
 	if (!m_bShowMessage) {
 		return;
@@ -743,6 +730,14 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, co
 	const CAppSettings& s = AfxGetAppSettings();
 
 	if (m_pMFVMB) {
+		{
+			std::unique_lock<std::mutex> lock(m_mutexTimer);
+
+			if (bPeriodicallyDisplayed && !m_bPeriodicallyDisplayed && m_hTimerHandle) {
+				return;
+			}
+		}
+
 		if (nPos != OSD_DEBUG) {
 			m_nMessagePos = nPos;
 			m_strMessage  = strMsg;
@@ -771,16 +766,26 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, co
 		m_MemDC.SelectObject(m_MainFont);
 
 		if (m_pWnd) {
-			m_pWnd->KillTimer((UINT_PTR)this);
+			EndTimer();
 			if (nDuration != -1) {
-				m_pWnd->SetTimer((UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
+				StartTimer(nDuration);
 			}
 		}
+
+		m_bPeriodicallyDisplayed = bPeriodicallyDisplayed;
 
 		InvalidateBitmapOSD();
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdDisplayMessage(strMsg, nDuration);
 	} else if (m_pWnd) {
+		{
+			std::unique_lock<std::mutex> lock(m_mutexTimer);
+
+			if (bPeriodicallyDisplayed && !m_bPeriodicallyDisplayed && m_hTimerHandle) {
+				return;
+			}
+		}
+
 		if (nPos != OSD_DEBUG) {
 			m_nMessagePos = nPos;
 			m_strMessage  = strMsg;
@@ -789,14 +794,16 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration, co
 		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
 		m_OSD_Font = OSD_Font ? OSD_Font : s.strOSDFont;
 
-		m_pWnd->KillTimer((UINT_PTR)this);
+		EndTimer();
 		if (nDuration != -1) {
-			m_pWnd->SetTimer((UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
+			StartTimer(nDuration);
 		}
 
 		SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 		//PostMessageW(WM_OSD_DRAW);
 		DrawWnd();
+
+		m_bPeriodicallyDisplayed = bPeriodicallyDisplayed;
 	}
 }
 
@@ -1095,4 +1102,43 @@ void COSD::CreateFontInternal()
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
 
 	m_MainFont.CreateFontIndirectW(&lf);
+}
+
+BOOL COSD::StartTimer(const DWORD dueTime)
+{
+	EndTimer();
+
+	std::unique_lock<std::mutex> lock(m_mutexTimer);
+
+	BOOL ret = FALSE;
+	if (!m_hTimerHandle) {
+		ret = CreateTimerQueueTimer(
+			&m_hTimerHandle,
+			nullptr,
+			TimerCallbackFunc,
+			this,
+			dueTime,
+			0,
+			WT_EXECUTEONLYONCE);
+	}
+
+	return ret;
+}
+
+void COSD::EndTimer(const bool bWaitForCallback/* = true*/)
+{
+	std::unique_lock<std::mutex> lock(m_mutexTimer);
+
+	if (m_hTimerHandle) {
+		DeleteTimerQueueTimer(nullptr, m_hTimerHandle, bWaitForCallback ? INVALID_HANDLE_VALUE : nullptr);
+		m_hTimerHandle = nullptr;
+	}
+}
+
+void COSD::TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+{
+	if (auto pOSD = static_cast<COSD*>(lpParameter)) {
+		pOSD->ClearMessage();
+		pOSD->EndTimer(false);
+	}
 }

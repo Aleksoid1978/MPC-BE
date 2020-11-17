@@ -2580,7 +2580,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					if (!strOSD.IsEmpty()) {
-						m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD);
+						m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 1000, true);
 					}
 				}
 			}
@@ -17546,7 +17546,7 @@ void CMainFrame::DisplayCurrentChannelInfo()
 		if (i > 0) {
 			osd.Delete(i, osd.GetLength() - i);
 		}
-		m_OSD.DisplayMessage(OSD_TOPLEFT, osd ,8000, 12);
+		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 8000, false, 12);
 	}
 }
 
