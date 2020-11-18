@@ -65,6 +65,9 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	m_nThemeGreen      = s.nThemeGreen;
 	m_nThemeBlue       = s.nThemeBlue;
 
+	m_clrFaceABGR    = s.clrFaceABGR;
+	m_clrOutlineABGR = s.clrOutlineABGR;
+
 	return TRUE;
 }
 
@@ -125,7 +128,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						|| m_nThemeBrightness != s.nThemeBrightness
 						|| m_nThemeRed != s.nThemeRed
 						|| m_nThemeGreen != s.nThemeGreen
-						|| m_nThemeBlue != s.nThemeBlue)) {
+						|| m_nThemeBlue != s.nThemeBlue
+						|| m_clrFaceABGR != s.clrFaceABGR
+						|| m_clrOutlineABGR != s.clrOutlineABGR)) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 
@@ -196,6 +201,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 							|| m_nThemeRed != s.nThemeRed
 							|| m_nThemeGreen != s.nThemeGreen
 							|| m_nThemeBlue != s.nThemeBlue
+							|| m_clrFaceABGR != s.clrFaceABGR
+							|| m_clrOutlineABGR != s.clrOutlineABGR
 							|| m_bMute != s.fMute) {
 						m_bRedraw = false;
 
@@ -203,6 +210,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						m_nThemeRed = s.nThemeRed;
 						m_nThemeGreen = s.nThemeGreen;
 						m_nThemeBlue = s.nThemeBlue;
+						m_clrFaceABGR = s.clrFaceABGR;
+						m_clrOutlineABGR = s.clrOutlineABGR;
 						m_bMute = s.fMute;
 
 						if (m_cashedBitmap.GetSafeHandle() != nullptr) {

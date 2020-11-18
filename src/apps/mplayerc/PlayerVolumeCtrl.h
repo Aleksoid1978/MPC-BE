@@ -39,6 +39,9 @@ private:
 	int m_nThemeGreen = -1;
 	int m_nThemeBlue = -1;
 
+	COLORREF m_clrFaceABGR = -1;
+	COLORREF m_clrOutlineABGR = -1;
+
 	CBitmap m_bmUnderCtrl;
 	CBitmap m_cashedBitmap;
 
