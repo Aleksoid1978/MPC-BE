@@ -5778,6 +5778,10 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 
 void CMainFrame::OnFileSaveAs()
 {
+	if (!CanShowDialog()) {
+		return;
+	}
+
 	CString ext, ext_list, in = m_strPlaybackRenderedPath, out = in;
 
 	if (!m_youtubeFields.fname.IsEmpty()) {
@@ -6487,6 +6491,9 @@ void CMainFrame::OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI)
 
 void CMainFrame::OnFileLoadSubtitle()
 {
+	if (!CanShowDialog()) {
+		return;
+	}
 	if (!m_pCAP && !m_pDVS) {
 		AfxMessageBox(ResStr(IDS_MAINFRM_60)+
 					  ResStr(IDS_MAINFRM_61)+
@@ -6696,6 +6703,10 @@ void CMainFrame::OnUpdateFileISDBSearch(CCmdUI *pCmdUI)
 
 void CMainFrame::OnFileISDBDownload()
 {
+	if (!CanShowDialog()) {
+		return;
+	}
+
 	CAppSettings& s = AfxGetAppSettings();
 	filehash fh;
 	if (!::mpc_filehash(GetCurFileName(), fh)) {
@@ -6727,6 +6738,10 @@ void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 
 void CMainFrame::OnFileProperties()
 {
+	if (!CanShowDialog()) {
+		return;
+	}
+
 	CPPageFileInfoSheet m_fileinfo(GetPlaybackMode() == PM_FILE ? GetCurFileName() : GetCurDVDPath(TRUE), this, GetModalParent());
 	m_fileinfo.DoModal();
 }
@@ -9944,7 +9959,7 @@ void CMainFrame::OnUpdateNavigateMenuItem(CCmdUI* pCmdUI)
 
 void CMainFrame::OnTunerScan()
 {
-	CTunerScanDlg		Dlg;
+	CTunerScanDlg Dlg;
 	Dlg.DoModal();
 }
 
