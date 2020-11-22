@@ -3736,11 +3736,8 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 		SetFocus();
 		if (*WindowFromPoint(p) != *m_pFullscreenWnd) {
 			SendMessageW(WM_COMMAND, ID_MENU_PLAYER_SHORT);
-
-			return;
 		}
 	}
-	__super::OnRButtonUp(nFlags, point);
 }
 
 LRESULT CMainFrame::OnXButtonDown(WPARAM wParam, LPARAM lParam)
