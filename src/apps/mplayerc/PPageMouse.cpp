@@ -351,5 +351,9 @@ void CPPageMouse::OnBnClickedReset()
 	m_table_values[ROW_WHL_R][COL_RBTN]   = 0;
 	SyncList();
 
+	for (int nCol = COL_ACTION; nCol < COL_COUNT; nCol++) {
+		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+	}
+
 	SetModified();
 }
