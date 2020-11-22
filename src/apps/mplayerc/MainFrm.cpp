@@ -5126,7 +5126,7 @@ void CMainFrame::OnStreamVideo(UINT nID)
 
 void CMainFrame::OnFileOpenQuick()
 {
-	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar)) {
+	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || !CanShowDialog()) {
 		return;
 	}
 
@@ -5182,11 +5182,7 @@ void CMainFrame::OnFileOpenQuick()
 
 void CMainFrame::OnFileOpenMedia()
 {
-	if (m_eMediaLoadState == MLS_LOADING) {
-		return;
-	}
-
-	if (!CanShowDialog()) {
+	if (m_eMediaLoadState == MLS_LOADING || !CanShowDialog()) {
 		return;
 	}
 
@@ -5557,7 +5553,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 
 void CMainFrame::OnFileOpenDVD()
 {
-	if (m_eMediaLoadState == MLS_LOADING) {
+	if (m_eMediaLoadState == MLS_LOADING || !CanShowDialog()) {
 		return;
 	}
 
@@ -5602,7 +5598,7 @@ void CMainFrame::OnFileOpenDVD()
 
 void CMainFrame::OnFileOpenIso()
 {
-	if (m_eMediaLoadState == MLS_LOADING) {
+	if (m_eMediaLoadState == MLS_LOADING || !CanShowDialog()) {
 		return;
 	}
 
@@ -6328,12 +6324,11 @@ CString CMainFrame::CreateSnapShotFileName()
 
 void CMainFrame::OnFileSaveImage()
 {
-	CAppSettings& s = AfxGetAppSettings();
-
-	/* Check if a compatible renderer is being used */
-	if (!IsRendererCompatibleWithSaveImage()) {
+	if (!CanShowDialog() || !IsRendererCompatibleWithSaveImage()) {
 		return;
 	}
+
+	CAppSettings& s = AfxGetAppSettings();
 
 	CSaveImageDialog fd(
 		s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles, m_pCurrentSubStream != nullptr,
@@ -6410,12 +6405,11 @@ void CMainFrame::OnCopyImage()
 
 void CMainFrame::OnFileSaveThumbnails()
 {
-	CAppSettings& s = AfxGetAppSettings();
-
-	/* Check if a compatible renderer is being used */
-	if (!IsRendererCompatibleWithSaveImage()) {
+	if (!CanShowDialog() || !IsRendererCompatibleWithSaveImage()) {
 		return;
 	}
+
+	CAppSettings& s = AfxGetAppSettings();
 
 	CPath psrc(s.strSnapShotPath);
 	CStringW prefix = L"thumbs";
@@ -6611,7 +6605,7 @@ void CMainFrame::OnUpdateFileLoadAudio(CCmdUI* pCmdUI)
 
 void CMainFrame::OnFileSaveSubtitle()
 {
-	if (m_pCurrentSubStream) {
+	if (m_pCurrentSubStream && CanShowDialog()) {
 		OpenMediaData *pOMD = m_wndPlaylistBar.GetCurOMD();
 		CString suggestedFileName("");
 		if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
@@ -6637,7 +6631,9 @@ void CMainFrame::OnFileSaveSubtitle()
 			}
 
 			return;
-		} else if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
+		}
+
+		if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
 			const Subtitle::SubType types[] = {
 				Subtitle::SRT,
 				Subtitle::SSA,
@@ -8348,11 +8344,7 @@ void CMainFrame::OnUpdatePlaySeek(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlayGoto()
 {
-	if (m_eMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	if (!CanShowDialog()) {
+	if (m_eMediaLoadState != MLS_LOADED || !CanShowDialog()) {
 		return;
 	}
 
