@@ -97,12 +97,14 @@ LPCWSTR CPPageMouse::GetCmdString(MOUSE_COMMANDS* mouse_cmds, const WORD id)
 
 void CPPageMouse::SyncList()
 {
-	for (int i = 0; i < ROW_COUNT; i++) {
-		for (int j = COL_CMD; j < COL_COUNT; j++) {
+	for (int j = COL_CMD; j < COL_COUNT; j++) {
+		for (int i = 0; i < ROW_COUNT; i++) {
 			MOUSE_COMMANDS* mouse_cmds = m_table_comands[i][j];
 			WORD id = m_table_values[i][j];
 			m_list.SetItemText(i, j, GetCmdString(mouse_cmds, id));
 		}
+
+		m_list.SetColumnWidth(j, LVSCW_AUTOSIZE);
 	}
 }
 
@@ -170,23 +172,17 @@ BOOL CPPageMouse::OnInitDialog()
 	m_list.InsertItem(ROW_WHL_L,  ResStr(IDS_MOUSE_WHEEL_LEFT));
 	m_list.InsertItem(ROW_WHL_R,  ResStr(IDS_MOUSE_WHEEL_RIGHT));
 
-	SyncList();
-
 	for (int nCol = COL_ACTION; nCol < COL_COUNT; nCol++) {
-		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-		const int contentSize = m_list.GetColumnWidth(nCol);
 		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
 		const int headerSize = m_list.GetColumnWidth(nCol);
-		if (contentSize > headerSize) {
-			m_list.SetColumnWidth(nCol, contentSize);
-		}
-		{
-			LVCOLUMN col;
-			col.mask = LVCF_MINWIDTH;
-			col.cxMin = headerSize;
-			m_list.SetColumn(nCol, &col);
-		}
+
+		LVCOLUMNW col;
+		col.mask = LVCF_MINWIDTH;
+		col.cxMin = headerSize;
+		m_list.SetColumn(nCol, &col);
 	}
+
+	SyncList();
 
 	return TRUE;
 }
@@ -349,11 +345,8 @@ void CPPageMouse::OnBnClickedReset()
 	m_table_values[ROW_WHL_R][COL_CTRL]   = 0;
 	m_table_values[ROW_WHL_R][COL_SHIFT]  = 0;
 	m_table_values[ROW_WHL_R][COL_RBTN]   = 0;
-	SyncList();
 
-	for (int nCol = COL_ACTION; nCol < COL_COUNT; nCol++) {
-		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-	}
+	SyncList();
 
 	SetModified();
 }
