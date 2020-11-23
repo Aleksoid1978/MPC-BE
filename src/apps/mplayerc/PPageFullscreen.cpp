@@ -277,7 +277,7 @@ BOOL CPPageFullscreen::OnApply()
 void CPPageFullscreen::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 	*pResult = FALSE;
 	if (pItem->iItem < 0) {
 		return;
@@ -288,7 +288,7 @@ void CPPageFullscreen::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPPageFullscreen::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 	if (pItem->iItem < 0) {
@@ -314,7 +314,7 @@ void CPPageFullscreen::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPPageFullscreen::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 	if (!m_list.m_fInPlaceDirty) {
@@ -535,12 +535,11 @@ void CPPageFullscreen::ModesUpdate()
 		} else {
 			columnWidth = headerWidth;
 		}
-		{
-			LVCOLUMN col;
-			col.mask = LVCF_MINWIDTH;
-			col.cxMin = columnWidth;
-			m_list.SetColumn(nCol, &col);
-		}
+
+		LVCOLUMNW col;
+		col.mask = LVCF_MINWIDTH;
+		col.cxMin = columnWidth;
+		m_list.SetColumn(nCol, &col);
 	}
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);

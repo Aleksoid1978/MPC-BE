@@ -242,7 +242,7 @@ END_MESSAGE_MAP()
 void CPPageMouse::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	if (pItem->iItem >= 0 && pItem->iSubItem >= COL_CMD) {
 		*pResult = TRUE;
@@ -254,7 +254,7 @@ void CPPageMouse::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPPageMouse::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	if (pItem->iItem >= 0) {
 		MOUSE_COMMANDS* mouse_cmds = m_table_comands[pItem->iItem][pItem->iSubItem];
@@ -285,7 +285,7 @@ void CPPageMouse::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPPageMouse::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 

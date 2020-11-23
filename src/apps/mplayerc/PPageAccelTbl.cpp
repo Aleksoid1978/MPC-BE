@@ -696,7 +696,7 @@ void CPPageAccelTbl::OnBnClickedResetSelected()
 void CPPageAccelTbl::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -715,7 +715,7 @@ static BYTE s_mods[] = {0,FALT,FCONTROL,FSHIFT,FCONTROL|FALT,FCONTROL|FSHIFT,FAL
 void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	if (pItem->iItem < 0 || pItem->iItem >= (int)m_wmcmds.size()) {
 		*pResult = FALSE;
@@ -772,7 +772,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
