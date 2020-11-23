@@ -73,10 +73,10 @@ class CPPageMouse : public CPPageBase
 
 	//MOUSE_COMMANDS m_comands_1;
 	//MOUSE_COMMANDS m_comands_2;
-	MOUSE_COMMANDS m_comands_3;
-	MOUSE_COMMANDS m_comands_4;
-	MOUSE_COMMANDS m_comands_5;
-	MOUSE_COMMANDS m_comands_6;
+	MOUSE_COMMANDS m_comands_3; // Middle
+	MOUSE_COMMANDS m_comands_4; // X1, X2
+	MOUSE_COMMANDS m_comands_5; // Wheel Up/Down
+	MOUSE_COMMANDS m_comands_6; // Wheel Left/Right
 
 	MOUSE_COMMANDS* m_table_comands[ROW_COUNT][COL_COUNT] = {
 		{nullptr, &m_comands_3, &m_comands_3, &m_comands_3, &m_comands_3}, // ROW_BTN_M
