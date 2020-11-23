@@ -1095,9 +1095,9 @@ int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCWSTR lpszColumnHeadin
 {
 	nCol = __super::InsertColumn(nCol, lpszColumnHeading, nFormat, nWidth, nSubItem);
 	if (nCol != -1 && nMinWidth > 0) {
-		LVCOLUMN col;
-		col.mask	= LVCF_MINWIDTH;
-		col.cxMin	= nMinWidth;
+		LVCOLUMNW col;
+		col.mask = LVCF_MINWIDTH;
+		col.cxMin = nMinWidth;
 		SetColumn(nCol, &col);
 		SetExtendedStyle(GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);
 	}

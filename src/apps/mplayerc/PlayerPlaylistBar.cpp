@@ -3116,7 +3116,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 	}
 
 	WCHAR szLabel[MAX_PATH];
-	LV_ITEMW lvi = {};
+	LVITEMW lvi = {};
 	lvi.stateMask = LVIS_DROPHILITED | LVIS_FOCUSED | LVIS_SELECTED;
 	lvi.pszText = szLabel;
 	lvi.cchTextMax = MAX_PATH;

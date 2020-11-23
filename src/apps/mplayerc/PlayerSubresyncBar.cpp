@@ -664,7 +664,7 @@ static bool ParseTime(CString str, int& ret, bool fWarn = true)
 void CPlayerSubresyncBar::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -684,7 +684,7 @@ void CPlayerSubresyncBar::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPlayerSubresyncBar::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
@@ -706,7 +706,7 @@ void CPlayerSubresyncBar::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
-	LV_ITEMW* pItem = &pDispInfo->item;
+	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
 
