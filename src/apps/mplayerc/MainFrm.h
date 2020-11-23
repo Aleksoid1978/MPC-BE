@@ -317,7 +317,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	HBRUSH m_hMainMenuBrush = nullptr;
 	HBRUSH m_hPopupMenuBrush = nullptr;
 
-	CMenu m_popupMainMenu, m_popupMenu;
+	CMenu m_popupMainMenu;
+	CMenu m_popupMenu;
 	CMenu m_openCDsMenu;
 	CMenu m_recentfilesMenu;
 	CMenu m_languageMenu;
