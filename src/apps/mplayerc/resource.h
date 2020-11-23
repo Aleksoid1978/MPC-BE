@@ -332,9 +332,6 @@
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002
-#define IDS_AG_MENU_AUDIOLANG           1003
-#define IDS_AG_MENU_SUBTITLELANG        1004
-#define IDS_AG_MENU_JUMPTO              1005
 #define ID_MENU_RECENT_FILES            1006
 #define ID_START                        1007
 #define ID_SAVE                         1008
@@ -918,6 +915,9 @@
 #define IDS_PLAYLIST_SORTBYSIZE         14214
 #define IDS_PLAYLIST_SORTBYDATECREATED  14215
 
+#define IDS_AG_MENU_AUDIOLANG           20000
+#define IDS_AG_MENU_SUBTITLELANG        20001
+#define IDS_AG_MENU_JUMPTO              20002
 #define IDS_AG_RESET_STATS              20005
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008
@@ -1122,9 +1122,9 @@
 #define IDS_AG_DVD_MENU_BACK            32951
 #define IDS_AG_DVD_MENU_LEAVE           32952
 #define IDS_AG_BOSS_KEY                 32953
-#define IDS_MPLAYERC_77                 32954
-#define IDS_MPLAYERC_78                 32955
-#define IDS_AG_FILTERS_MENU             32956
+#define IDS_AG_MENU_PLAYER_S            32954
+#define IDS_AG_MENU_PLAYER_L            32955
+#define IDS_AG_MENU_FILTERS             32956
 #define IDS_AG_OPTIONS                  32957
 #define IDS_AG_NEXT_AUDIO               32958
 #define IDS_AG_PREV_AUDIO               32959
