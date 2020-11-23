@@ -276,7 +276,7 @@ BOOL CPPageFullscreen::OnApply()
 
 void CPPageFullscreen::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	NMLVDISPINFOW* pDispInfo = (NMLVDISPINFOW*)pNMHDR;
 	LVITEMW* pItem = &pDispInfo->item;
 	*pResult = FALSE;
 	if (pItem->iItem < 0) {
@@ -287,7 +287,7 @@ void CPPageFullscreen::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFullscreen::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	NMLVDISPINFOW* pDispInfo = (NMLVDISPINFOW*)pNMHDR;
 	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
@@ -313,7 +313,7 @@ void CPPageFullscreen::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFullscreen::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	NMLVDISPINFOW* pDispInfo = (NMLVDISPINFOW*)pNMHDR;
 	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;

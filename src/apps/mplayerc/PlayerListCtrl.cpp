@@ -70,7 +70,7 @@ void CInPlaceWinHotkey::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFOW dispinfo;
+	NMLVDISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDITW;
@@ -169,7 +169,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFOW dispinfo;
+	NMLVDISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDITW;
@@ -337,7 +337,7 @@ void CInPlaceComboBox::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFOW dispinfo;
+	NMLVDISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDITW;
@@ -444,7 +444,7 @@ void CInPlaceListBox::OnKillFocus(CWnd* pNewWnd)
 	CString str;
 	GetWindowTextW(str);
 
-	LV_DISPINFOW dispinfo;
+	NMLVDISPINFOW dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
 	dispinfo.hdr.idFrom = GetDlgCtrlID();
 	dispinfo.hdr.code = LVN_ENDLABELEDITW;
@@ -915,7 +915,7 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	} else if (m_nItemClicked == nItemClickedNow /*&& m_nSubItemClicked == m_nSubItemClickedNow*/) {
 		m_nSubItemClicked = nSubItemClickedNow;
 
-		LV_DISPINFOW dispinfo;
+		NMLVDISPINFOW dispinfo;
 		dispinfo.hdr.hwndFrom = m_hWnd;
 		dispinfo.hdr.idFrom = GetDlgCtrlID();
 		dispinfo.hdr.code = LVN_BEGINLABELEDITW;
@@ -946,7 +946,7 @@ void CPlayerListCtrl::OnTimer(UINT_PTR nIDEvent)
 
 		UINT flag = LVIS_FOCUSED;
 		if ((GetItemState(m_nItemClicked, flag) & flag) == flag && m_nSubItemClicked >= 0) {
-			LV_DISPINFOW dispinfo;
+			NMLVDISPINFOW dispinfo;
 			dispinfo.hdr.hwndFrom = m_hWnd;
 			dispinfo.hdr.idFrom = GetDlgCtrlID();
 			dispinfo.hdr.code = LVN_DOLABELEDIT;
@@ -1062,7 +1062,7 @@ INT_PTR CPlayerListCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 
 	pTI->hwnd = m_hWnd;
 	pTI->uId = (UINT)((row<<10)+(col&0x3ff)+1);
-	pTI->lpszText = LPSTR_TEXTCALLBACK;
+	pTI->lpszText = LPSTR_TEXTCALLBACKW;
 	pTI->rect = rect;
 
 	return pTI->uId;
