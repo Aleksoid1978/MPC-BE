@@ -49,6 +49,7 @@ CPPageMouse::CPPageMouse()
 	m_comands_4.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
 	m_comands_4.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
 	m_comands_4.Add(ID_PLAY_SEEKFORWARDMED,      IDS_AG_JUMP_FORWARD_2);
+	m_comands_4.Add(ID_FILE_CLOSEPLAYLIST,       IDS_AG_CLOSE);
 
 	m_comands_5.Add(0, 0);
 	m_comands_5.Add(ID_VOLUME_UP,            IDS_AG_VOLUME_UP);
