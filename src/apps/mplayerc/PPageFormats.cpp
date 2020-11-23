@@ -1050,7 +1050,7 @@ void CPPageFormats::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CPPageFormats::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	NMLVDISPINFOW* pDispInfo = (NMLVDISPINFOW*)pNMHDR;
 	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
@@ -1064,7 +1064,7 @@ void CPPageFormats::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFormats::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	NMLVDISPINFOW* pDispInfo = (NMLVDISPINFOW*)pNMHDR;
 	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
@@ -1078,7 +1078,7 @@ void CPPageFormats::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFormats::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LV_DISPINFOW* pDispInfo = (LV_DISPINFOW*)pNMHDR;
+	NMLVDISPINFOW* pDispInfo = (NMLVDISPINFOW*)pNMHDR;
 	LVITEMW* pItem = &pDispInfo->item;
 
 	*pResult = FALSE;
