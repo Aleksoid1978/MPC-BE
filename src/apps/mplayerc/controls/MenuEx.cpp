@@ -442,7 +442,8 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 				FillRect(hDC, CRect(rc.left, rc.top, rc.right, rc.bottom), MenuInfo.hbrBack);
 
 				std::vector<int> menuBreaks;
-				for (int i = 0; i < ::GetMenuItemCount(m_hMenuLast); i++) {
+				const int num = ::GetMenuItemCount(m_hMenuLast);
+				for (int i = 0; i < num; i++) {
 					MENUITEMINFOW mii = { sizeof(mii), MIIM_TYPE };
 					::GetMenuItemInfoW(m_hMenuLast, i, TRUE, &mii);
 
