@@ -330,6 +330,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CMenu m_chaptersMenu;
 	CMenu m_favoritesMenu;
 	CMenu m_RButtonMenu;
+	CMenu m_VideoFrameMenu;
 	CMenu m_PanScanMenu;
 	CMenu m_AfterPlaybackMenu;
 
