@@ -2610,7 +2610,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		}
 		break;
 		case TIMER_MOUSEHIDER: {
-			if (!m_bInOptions) {
+			if (!m_bInOptions && !m_bInMenu) {
 				CPoint p;
 				GetCursorPos(&p);
 
