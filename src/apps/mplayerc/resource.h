@@ -5,6 +5,7 @@
 #define IDR_MAINFRAME                   128
 #define IDR_POPUP                       130
 #define IDR_POPUPMAIN                   133
+#define IDR_POPUP_AFTERPLAYBACK         140
 #define IDB_PLAYERFLYBAR_PNG            196
 #define IDB_W7_AUDIO                    197
 #define IDB_W7_TOOLBAR                  198
@@ -315,6 +316,7 @@
 #define ID_AUDIOS                       978
 #define ID_SUBTITLES                    979
 #define ID_JUMPTO                       980
+#define ID_AFTERPLAYBACK                981
 #define ID_VIDEOSTREAMS                 983
 #define ID_COLOR_BRIGHTNESS_INC         984
 #define ID_COLOR_BRIGHTNESS_DEC         985
@@ -332,6 +334,7 @@
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002
+#define ID_MENU_AFTERPLAYBACK           1003
 #define ID_MENU_RECENT_FILES            1006
 #define ID_START                        1007
 #define ID_SAVE                         1008
@@ -918,6 +921,7 @@
 #define IDS_AG_MENU_AUDIOLANG           20000
 #define IDS_AG_MENU_SUBTITLELANG        20001
 #define IDS_AG_MENU_JUMPTO              20002
+#define IDS_AG_MENU_AFTERPLAYBACK       20003
 #define IDS_AG_RESET_STATS              20005
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008

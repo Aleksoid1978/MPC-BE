@@ -330,6 +330,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CMenu m_chaptersMenu;
 	CMenu m_favoritesMenu;
 	CMenu m_RButtonMenu;
+	CMenu m_AfterPlaybackMenu;
 
 	// dynamic menus
 	void MakeEmptySubMenu(CMenu& menu);
@@ -946,6 +947,7 @@ public:
 	afx_msg void OnMenuFavorites();
 	afx_msg void OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateMenuNavAudio(CCmdUI* pCmdUI);
+	afx_msg void OnMenuAfterPlayback();
 
 	afx_msg void OnUpdatePlayerStatus(CCmdUI* pCmdUI);
 
