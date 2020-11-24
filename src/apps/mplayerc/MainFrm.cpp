@@ -694,6 +694,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 
+	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	// create a Main View Window
@@ -2112,10 +2113,12 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		m_popupMenu.DestroyMenu();
 		m_popupMainMenu.DestroyMenu();
+		m_PanScanMenu.DestroyMenu();
 		m_AfterPlaybackMenu.DestroyMenu();
 
 		m_popupMenu.LoadMenuW(IDR_POPUP);
 		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+		m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 		m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 		CMenu defaultMenu;
@@ -4036,8 +4039,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->EnableMenuItem(i, MF_BYPOSITION|fState);
 			continue;
 		}
-		if (firstSubItemID == ID_VIEW_INCSIZE           // is "Pan&Scan" submenu
-				|| firstSubItemID == ID_VIEW_ZOOM_50) { // is "Zoom" submenu
+		if (firstSubItemID == ID_VIEW_ZOOM_50) { // is "Zoom" submenu
 			UINT fState = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly)
 						  ? MF_ENABLED
 						  : (MF_DISABLED | MF_GRAYED);
@@ -4052,6 +4054,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			itemID = mii.wID;
 		}
 		CMenu* pSubMenu = nullptr;
+		bool bEnable = true;
 
 		switch (itemID) {
 		case ID_SUBMENU_OPENDISC:
@@ -4065,6 +4068,10 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		case ID_SUBMENU_LANGUAGE:
 			SetupLanguageMenu();
 			pSubMenu = &m_languageMenu;
+			break;
+		case ID_SUBMENU_PANSCAN:
+			pSubMenu = m_PanScanMenu.GetSubMenu(0);
+			bEnable = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 			break;
 		case ID_SUBMENU_FILTERS:
 			SetupFiltersSubMenu();
@@ -4110,7 +4117,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			mii.fType = MF_POPUP;
 			mii.wID = itemID; // save ID after set popup type
 			mii.hSubMenu = pSubMenu->m_hMenu;
-			mii.fState = (pSubMenu->GetMenuItemCount() > 0 ? MF_ENABLED : (MF_DISABLED | MF_GRAYED));
+			mii.fState = (bEnable && pSubMenu->GetMenuItemCount() > 0 ? MF_ENABLED : (MF_DISABLED | MF_GRAYED));
 			pPopupMenu->SetMenuItemInfoW(i, &mii, TRUE);
 			//continue;
 		}
@@ -17887,10 +17894,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	m_popupMenu.DestroyMenu();
 	m_popupMainMenu.DestroyMenu();
+	m_PanScanMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	CMenu defaultMenu;
@@ -20271,10 +20280,12 @@ void CMainFrame::ResetMenu()
 
 	m_popupMenu.DestroyMenu();
 	m_popupMainMenu.DestroyMenu();
+	m_PanScanMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	CMenu defaultMenu;

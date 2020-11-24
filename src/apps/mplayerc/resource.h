@@ -5,7 +5,8 @@
 #define IDR_MAINFRAME                   128
 #define IDR_POPUP                       130
 #define IDR_POPUPMAIN                   133
-#define IDR_POPUP_AFTERPLAYBACK         140
+#define IDR_POPUP_PANSCAN               140
+#define IDR_POPUP_AFTERPLAYBACK         141
 #define IDB_PLAYERFLYBAR_PNG            196
 #define IDB_W7_AUDIO                    197
 #define IDB_W7_TOOLBAR                  198
@@ -411,14 +412,15 @@
 #define ID_SUBMENU_OPENDISC             1900
 #define ID_SUBMENU_RECENTFILES          1901
 #define ID_SUBMENU_LANGUAGE             1902
-#define ID_SUBMENU_FILTERS              1903
-#define ID_SUBMENU_SHADERS              1904
-#define ID_SUBMENU_AUDIOLANG            1905
-#define ID_SUBMENU_SUBTITLELANG         1906
-#define ID_SUBMENU_VIDEOSTREAM          1907
-#define ID_SUBMENU_AFTERPLAYBACK        1908
-#define ID_SUBMENU_JUMPTO               1909
-#define ID_SUBMENU_FAVORITES            1910
+#define ID_SUBMENU_PANSCAN              1903
+#define ID_SUBMENU_FILTERS              1904
+#define ID_SUBMENU_SHADERS              1905
+#define ID_SUBMENU_AUDIOLANG            1906
+#define ID_SUBMENU_SUBTITLELANG         1907
+#define ID_SUBMENU_VIDEOSTREAM          1908
+#define ID_SUBMENU_AFTERPLAYBACK        1909
+#define ID_SUBMENU_JUMPTO               1910
+#define ID_SUBMENU_FAVORITES            1911
 //
 #define ID_FILTERS_COPY_TO_CLIPBOARD    1999
 // ranges for menus
