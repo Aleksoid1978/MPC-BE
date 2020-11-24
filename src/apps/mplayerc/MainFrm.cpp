@@ -215,6 +215,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_PLAYER_LONG, OnMenuPlayerLong)
 	ON_COMMAND(ID_MENU_FILTERS, OnMenuFilters)
 	ON_COMMAND(ID_MENU_AFTERPLAYBACK, OnMenuAfterPlayback)
+	ON_COMMAND(ID_MENU_AUDIOLANG, OnMenuNavAudio)
+	ON_COMMAND(ID_MENU_SUBTITLELANG, OnMenuNavSubtitle)
+	ON_COMMAND(ID_MENU_JUMPTO, OnMenuNavJumpTo)
+	ON_COMMAND(ID_MENU_RECENT_FILES, OnMenuRecentFiles)
+	ON_COMMAND(ID_MENU_FAVORITES, OnMenuFavorites)
 
 	ON_UPDATE_COMMAND_UI(IDC_PLAYERSTATUS, OnUpdatePlayerStatus)
 
@@ -390,11 +395,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnPlayFilters)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
 	ON_COMMAND(ID_SHADERS_SELECT, OnSelectShaders)
-	ON_COMMAND(ID_MENU_AUDIOLANG, OnMenuNavAudio)
-	ON_COMMAND(ID_MENU_SUBTITLELANG, OnMenuNavSubtitle)
-	ON_COMMAND(ID_MENU_JUMPTO, OnMenuNavJumpTo)
-	ON_COMMAND(ID_MENU_RECENT_FILES, OnMenuRecentFiles)
-	ON_COMMAND(ID_MENU_FAVORITES, OnMenuFavorites)
 
 	ON_COMMAND(ID_AUDIO_OPTIONS, OnMenuAudioOption)
 	ON_COMMAND(ID_SUBTITLES_OPTIONS, OnMenuSubtitlesOption)
@@ -2111,11 +2111,11 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	const auto& s = AfxGetAppSettings();
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		m_popupMenu.DestroyMenu();
-		m_popupMenu.LoadMenuW(IDR_POPUP);
 		m_popupMainMenu.DestroyMenu();
-		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
-
 		m_AfterPlaybackMenu.DestroyMenu();
+
+		m_popupMenu.LoadMenuW(IDR_POPUP);
+		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 		m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 		CMenu defaultMenu;
@@ -4058,13 +4058,21 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			SetupOpenCDSubMenu();
 			pSubMenu = &m_openCDsMenu;
 			break;
-		case ID_SUBMENU_FILTERS:
-			SetupFiltersSubMenu();
-			pSubMenu = &m_filtersMenu;
+		case ID_SUBMENU_RECENTFILES:
+			SetupRecentFilesSubMenu();
+			pSubMenu = &m_recentfilesMenu;
 			break;
 		case ID_SUBMENU_LANGUAGE:
 			SetupLanguageMenu();
 			pSubMenu = &m_languageMenu;
+			break;
+		case ID_SUBMENU_FILTERS:
+			SetupFiltersSubMenu();
+			pSubMenu = &m_filtersMenu;
+			break;
+		case ID_SUBMENU_SHADERS:
+			SetupShadersSubMenu();
+			pSubMenu = &m_shadersMenu;
 			break;
 		case ID_SUBMENU_AUDIOLANG:
 			SetupAudioSubMenu();
@@ -4075,11 +4083,17 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pSubMenu = &m_SubtitlesMenu;
 			break;
 		case ID_SUBMENU_VIDEOSTREAM:
+		{
+			const CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
 			mii.fMask = MIIM_STRING;
-			mii.dwTypeData = (LPWSTR)(LPCWSTR)((GetPlaybackMode() == PM_DVD) ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM));
+			mii.dwTypeData = (LPWSTR)menu_str.GetString();
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 			SetupVideoStreamsSubMenu();
 			pSubMenu = &m_VideoStreamsMenu;
+		}
+			break;
+		case ID_SUBMENU_AFTERPLAYBACK:
+			pSubMenu = m_AfterPlaybackMenu.GetSubMenu(0);
 			break;
 		case ID_SUBMENU_JUMPTO:
 			SetupNavChaptersSubMenu();
@@ -4088,17 +4102,6 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		case ID_SUBMENU_FAVORITES:
 			SetupFavoritesSubMenu();
 			pSubMenu = &m_favoritesMenu;
-			break;
-		case ID_SUBMENU_RECENTFILES:
-			SetupRecentFilesSubMenu();
-			pSubMenu = &m_recentfilesMenu;
-			break;
-		case ID_SUBMENU_SHADERS:
-			SetupShadersSubMenu();
-			pSubMenu = &m_shadersMenu;
-			break;
-		case ID_SUBMENU_AFTERPLAYBACK:
-			pSubMenu = m_AfterPlaybackMenu.GetSubMenu(0);
 			break;
 		}
 
@@ -17883,11 +17886,11 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_RButtonMenu.DestroyMenu();
 
 	m_popupMenu.DestroyMenu();
-	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.DestroyMenu();
-	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
-
 	m_AfterPlaybackMenu.DestroyMenu();
+
+	m_popupMenu.LoadMenuW(IDR_POPUP);
+	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	CMenu defaultMenu;
@@ -20267,11 +20270,11 @@ void CMainFrame::ResetMenu()
 	m_RButtonMenu.DestroyMenu();
 
 	m_popupMenu.DestroyMenu();
-	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.DestroyMenu();
-	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
-
 	m_AfterPlaybackMenu.DestroyMenu();
+
+	m_popupMenu.LoadMenuW(IDR_POPUP);
+	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	CMenu defaultMenu;
