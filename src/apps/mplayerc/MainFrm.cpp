@@ -4011,7 +4011,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 	__super::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
 
 	UINT uiMenuCount = pPopupMenu->GetMenuItemCount();
-	if (uiMenuCount == -1) {
+	if (uiMenuCount == UINT(-1)) {
 		return;
 	}
 
@@ -4051,7 +4051,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		}
 
 		UINT itemID = pPopupMenu->GetMenuItemID(i);
-		if (itemID == 0xFFFFFFFF) {
+		if (itemID == UINT(-1)) {
 			mii.fMask = MIIM_ID;
 			pPopupMenu->GetMenuItemInfoW(i, &mii, TRUE);
 			itemID = mii.wID;
@@ -4130,13 +4130,13 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 	}
 
 	uiMenuCount = pPopupMenu->GetMenuItemCount();
-	if (uiMenuCount == -1) {
+	if (uiMenuCount == UINT(-1)) {
 		return;
 	}
 
-	for (__int64 i = 0; i < uiMenuCount; ++i) {  //temp inst UINT -> __int64
-		__int64 nID = pPopupMenu->GetMenuItemID(i); //temp ren UINT -> __int64
-		if (nID == ID_SEPARATOR || nID == -1
+	for (UINT i = 0; i < uiMenuCount; ++i) {
+		UINT nID = pPopupMenu->GetMenuItemID(i);
+		if (nID == ID_SEPARATOR || nID == UINT(-1)
 				|| (nID >= ID_FAVORITES_FILE_START && nID <= ID_FAVORITES_FILE_END)
 				|| (nID >= ID_FAVORITES_DVD_START && nID <= ID_FAVORITES_DVD_END)
 				|| (nID >= ID_RECENT_FILE_START && nID <= ID_RECENT_FILE_END)
@@ -4167,7 +4167,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 	}
 
 	uiMenuCount = pPopupMenu->GetMenuItemCount();
-	if (uiMenuCount == -1) {
+	if (uiMenuCount == UINT(-1)) {
 		return;
 	}
 
