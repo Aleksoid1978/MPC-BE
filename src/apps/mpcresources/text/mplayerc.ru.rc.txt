@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"О программе"
 7		"MPC-BE"
 8		"Copyright © 2002-2020, смотрите файл Authors.txt"
@@ -1215,6 +1215,7 @@ STRING IDS_AG_LOAD_SUBTITLE		"Загрузить внешние субтитры
 STRING IDS_AG_MEDIAFILES		"Медиафайлы (все типы)|"
 STRING IDS_AG_MENU_AFTERPLAYBACK		"Меню По окончании воспроизведения"
 STRING IDS_AG_MENU_AUDIOLANG		"Меню Язык Аудио"
+STRING IDS_AG_MENU_FAVORITES		"Меню закладок"
 STRING IDS_AG_MENU_FILTERS		"Меню фильтров"
 STRING IDS_AG_MENU_JUMPTO		"Меню Перейти..."
 STRING IDS_AG_MENU_PLAYER_L		"Меню проигрывателя (полное)"
@@ -1493,7 +1494,6 @@ STRING IDS_EXTERNAL_FILTERS_ERROR_MT		"Такой тип уже есть в сп
 STRING IDS_FAVDVDS		"DVD"
 STRING IDS_FAVFILES		"Файлы"
 STRING IDS_FAVORITES_ADD		"&Добавить..."
-STRING IDS_FAVORITES_MENU		"Меню закладок"
 STRING IDS_FAVORITES_ORGANIZE		"&Упорядочить..."
 STRING IDS_FAVORITES_QUICKADD		"Быстро добавить в закладки"
 STRING IDS_FILE_FAV_ADDED		"Файл добавлен в закладки"
