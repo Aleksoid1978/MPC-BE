@@ -4053,42 +4053,53 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		}
 		CMenu* pSubMenu = nullptr;
 
-		if (itemID == ID_FILE_OPENDISC) {
+		switch (itemID) {
+		case ID_FILE_OPENDISC:
 			SetupOpenCDSubMenu();
 			pSubMenu = &m_openCDsMenu;
-		} else if (itemID == ID_FILTERS) {
+			break;
+		case ID_FILTERS:
 			SetupFiltersSubMenu();
 			pSubMenu = &m_filtersMenu;
-		} else if (itemID == ID_MENU_LANGUAGE) {
+			break;
+		case ID_MENU_LANGUAGE:
 			SetupLanguageMenu();
 			pSubMenu = &m_languageMenu;
-		} else if (itemID == ID_AUDIOS) {
+			break;
+		case ID_AUDIOS:
 			SetupAudioSubMenu();
 			pSubMenu = &m_AudioMenu;
-		} else if (itemID == ID_SUBTITLES) {
+			break;
+		case ID_SUBTITLES:
 			SetupSubtitlesSubMenu();
 			pSubMenu = &m_SubtitlesMenu;
-		} else if (itemID == ID_VIDEOSTREAMS) {
-			CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
+			break;
+		case ID_VIDEOSTREAMS:
 			mii.fMask = MIIM_STRING;
-			mii.dwTypeData = (LPWSTR)(LPCWSTR)menu_str;
+			mii.dwTypeData = (LPWSTR)(LPCWSTR)((GetPlaybackMode() == PM_DVD) ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM));
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 			SetupVideoStreamsSubMenu();
 			pSubMenu = &m_VideoStreamsMenu;
-		} else if (itemID == ID_JUMPTO) {
+			break;
+		case ID_JUMPTO:
 			SetupNavChaptersSubMenu();
 			pSubMenu = &m_chaptersMenu;
-		} else if (itemID == ID_FAVORITES) {
+			break;
+		case ID_FAVORITES:
 			SetupFavoritesSubMenu();
 			pSubMenu = &m_favoritesMenu;
-		} else if (itemID == ID_RECENT_FILES) {
+			break;
+		case ID_RECENT_FILES:
 			SetupRecentFilesSubMenu();
 			pSubMenu = &m_recentfilesMenu;
-		} else if (itemID == ID_SHADERS) {
+			break;
+		case ID_SHADERS:
 			SetupShadersSubMenu();
 			pSubMenu = &m_shadersMenu;
-		} else if (itemID == ID_AFTERPLAYBACK) {
+			break;
+		case ID_AFTERPLAYBACK:
 			pSubMenu = m_AfterPlaybackMenu.GetSubMenu(0);
+			break;
 		}
 
 		if (pSubMenu) {
