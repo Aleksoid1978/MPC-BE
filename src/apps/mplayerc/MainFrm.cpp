@@ -694,6 +694,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 
+	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
@@ -2113,11 +2114,13 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		m_popupMenu.DestroyMenu();
 		m_popupMainMenu.DestroyMenu();
+		m_VideoFrameMenu.DestroyMenu();
 		m_PanScanMenu.DestroyMenu();
 		m_AfterPlaybackMenu.DestroyMenu();
 
 		m_popupMenu.LoadMenuW(IDR_POPUP);
 		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+		m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 		m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 		m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
@@ -4068,6 +4071,9 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		case ID_SUBMENU_LANGUAGE:
 			SetupLanguageMenu();
 			pSubMenu = &m_languageMenu;
+			break;
+		case ID_SUBMENU_VIDEOFRAME:
+			pSubMenu = m_VideoFrameMenu.GetSubMenu(0);
 			break;
 		case ID_SUBMENU_PANSCAN:
 			pSubMenu = m_PanScanMenu.GetSubMenu(0);
@@ -17894,11 +17900,13 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	m_popupMenu.DestroyMenu();
 	m_popupMainMenu.DestroyMenu();
+	m_VideoFrameMenu.DestroyMenu();
 	m_PanScanMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
@@ -20280,11 +20288,13 @@ void CMainFrame::ResetMenu()
 
 	m_popupMenu.DestroyMenu();
 	m_popupMainMenu.DestroyMenu();
+	m_VideoFrameMenu.DestroyMenu();
 	m_PanScanMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
