@@ -312,13 +312,6 @@
 #define ID_NAVIGATE_TUNERSCAN           974
 #define ID_FAVORITES_QUICKADD           975
 #define ID_FILE_REOPEN                  976
-#define ID_FILTERS                      977
-#define ID_AUDIOS                       978
-#define ID_SUBTITLES                    979
-#define ID_JUMPTO                       980
-#define ID_FAVORITES                    981
-#define ID_AFTERPLAYBACK                982
-#define ID_VIDEOSTREAMS                 983
 #define ID_COLOR_BRIGHTNESS_INC         984
 #define ID_COLOR_BRIGHTNESS_DEC         985
 #define ID_COLOR_CONTRAST_INC           986
@@ -345,16 +338,12 @@
 #define ID_GOTO_PREV_SUB                1014
 #define ID_GOTO_NEXT_SUB                1015
 #define ID_FILE_OPENDIRECTORY           1016
-#define ID_FILE_OPENDISC                1017
-#define ID_RECENT_FILES                 1018
 #define ID_RECENT_FILES_CLEAR           1019
-#define ID_SHADERS                      1020
 #define ID_SHADERS_TOGGLE               1021
 #define ID_SHADERS_TOGGLE_SCREENSPACE   1022
 #define ID_D3DFULLSCREEN_TOGGLE         1023
 #define ID_AFTERPLAYBACK_ONCE           1029
 #define ID_AFTERPLAYBACK_EVERYTIME      1030
-#define ID_MENU_LANGUAGE                1031
 #define ID_HELP_CHECKFORUPDATE          1032
 #define ID_NAVIGATE_SUBTITLES           1033
 #define ID_NAVIGATE_AUDIO               1034
@@ -418,6 +407,18 @@
 #define ID_PLAY_REPEAT_AB               1201
 #define ID_PLAY_REPEAT_AB_MARK_A        1202
 #define ID_PLAY_REPEAT_AB_MARK_B        1203
+//
+#define ID_SUBMENU_OPENDISC             1900
+#define ID_SUBMENU_RECENTFILES          1901
+#define ID_SUBMENU_LANGUAGE             1902
+#define ID_SUBMENU_FILTERS              1903
+#define ID_SUBMENU_SHADERS              1904
+#define ID_SUBMENU_AUDIOLANG            1905
+#define ID_SUBMENU_SUBTITLELANG         1906
+#define ID_SUBMENU_VIDEOSTREAM          1907
+#define ID_SUBMENU_AFTERPLAYBACK        1908
+#define ID_SUBMENU_JUMPTO               1909
+#define ID_SUBMENU_FAVORITES            1910
 //
 #define ID_FILTERS_COPY_TO_CLIPBOARD    1999
 // ranges for menus
