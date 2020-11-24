@@ -278,7 +278,7 @@
 #define ID_NAVIGATE_MENU_ACTIVATE       933
 #define ID_NAVIGATE_MENU_BACK           934
 #define ID_NAVIGATE_MENU_LEAVE          935
-#define ID_FAVORITES                    936
+#define ID_MENU_FAVORITES               936
 #define ID_FAVORITES_ORGANIZE           937
 #define ID_FAVORITES_ADD                938
 #define ID_HELP_HOMEPAGE                939
@@ -316,7 +316,8 @@
 #define ID_AUDIOS                       978
 #define ID_SUBTITLES                    979
 #define ID_JUMPTO                       980
-#define ID_AFTERPLAYBACK                981
+#define ID_FAVORITES                    981
+#define ID_AFTERPLAYBACK                982
 #define ID_VIDEOSTREAMS                 983
 #define ID_COLOR_BRIGHTNESS_INC         984
 #define ID_COLOR_BRIGHTNESS_DEC         985
@@ -331,9 +332,9 @@
 #define ID_PLAY_AUDIODELAY_ONOFF        995
 #define ID_FILE_AUTOSAVE_DISPLAY        996
 #define ID_COPY_IMAGE                   997
-#define ID_MENU_NAVIGATE_AUDIO          1000
-#define ID_MENU_NAVIGATE_SUBTITLES      1001
-#define ID_MENU_NAVIGATE_JUMPTO         1002
+#define ID_MENU_AUDIOLANG               1000
+#define ID_MENU_SUBTITLELANG            1001
+#define ID_MENU_JUMPTO                  1002
 #define ID_MENU_AFTERPLAYBACK           1003
 #define ID_MENU_RECENT_FILES            1006
 #define ID_START                        1007
