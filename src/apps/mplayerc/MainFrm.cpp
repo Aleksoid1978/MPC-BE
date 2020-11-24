@@ -1264,8 +1264,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 	} else if (pMsg->message == WM_SYSKEYDOWN && pMsg->wParam == VK_MENU
-			&& CursorOnD3DFullScreenWindow()) {
-		// disable pressing Alt on D3D FullScreen window.
+			&& (m_bIsMadVRExclusiveMode || m_bIsMPCVRExclusiveMode || CursorOnD3DFullScreenWindow())) {
+		// disable pressing Alt on D3D FullScreen window/madVR Exclusive/MPCVR Exclusive.
 		return TRUE;
 	}
 
