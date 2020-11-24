@@ -214,6 +214,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_PLAYER_SHORT, OnMenuPlayerShort)
 	ON_COMMAND(ID_MENU_PLAYER_LONG, OnMenuPlayerLong)
 	ON_COMMAND(ID_MENU_FILTERS, OnMenuFilters)
+	ON_COMMAND(ID_MENU_AFTERPLAYBACK, OnMenuAfterPlayback)
 
 	ON_UPDATE_COMMAND_UI(IDC_PLAYERSTATUS, OnUpdatePlayerStatus)
 
@@ -692,6 +693,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+
+	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	// create a Main View Window
 	if (!m_wndView.Create(nullptr, nullptr, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
@@ -2111,6 +2114,9 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 		m_popupMenu.LoadMenuW(IDR_POPUP);
 		m_popupMainMenu.DestroyMenu();
 		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+
+		m_AfterPlaybackMenu.DestroyMenu();
+		m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 		CMenu defaultMenu;
 		defaultMenu.LoadMenuW(IDR_MAINFRAME);
@@ -4081,6 +4087,8 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		} else if (itemID == ID_SHADERS) {
 			SetupShadersSubMenu();
 			pSubMenu = &m_shadersMenu;
+		} else if (itemID == ID_AFTERPLAYBACK) {
+			pSubMenu = m_AfterPlaybackMenu.GetSubMenu(0);
 		}
 
 		if (pSubMenu) {
@@ -8990,6 +8998,11 @@ void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
 	}
 
 	pCmdUI->Enable(fEnable);
+}
+
+void CMainFrame::OnMenuAfterPlayback()
+{
+	OnMenu(m_AfterPlaybackMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnPlayVolume(UINT nID)
@@ -17863,6 +17876,9 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_popupMainMenu.DestroyMenu();
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 
+	m_AfterPlaybackMenu.DestroyMenu();
+	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
+
 	CMenu defaultMenu;
 	defaultMenu.LoadMenuW(IDR_MAINFRAME);
 	CMenu* oldMenu = GetMenu();
@@ -20243,6 +20259,9 @@ void CMainFrame::ResetMenu()
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.DestroyMenu();
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+
+	m_AfterPlaybackMenu.DestroyMenu();
+	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 
 	CMenu defaultMenu;
 	defaultMenu.LoadMenuW(IDR_MAINFRAME);
