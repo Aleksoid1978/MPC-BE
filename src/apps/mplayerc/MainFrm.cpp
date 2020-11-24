@@ -2365,33 +2365,35 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	switch (nIDEvent) {
 		case TIMER_FLYBARWINDOWHIDER:
-			if (m_wndView &&
-						(AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY
-						|| AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS
-						|| m_bFullScreen)) {
+			if (!m_bInMenu) {
+				if (m_wndView &&
+							(AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY
+							|| AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS
+							|| m_bFullScreen)) {
 
-				CPoint p;
-				GetCursorPos(&p);
+					CPoint p;
+					GetCursorPos(&p);
 
-				CRect r_wndView, r_wndFlybar, r_ShowFlybar;
-				m_wndView.GetWindowRect(&r_wndView);
-				m_wndFlyBar.GetWindowRect(&r_wndFlybar);
+					CRect r_wndView, r_wndFlybar, r_ShowFlybar;
+					m_wndView.GetWindowRect(&r_wndView);
+					m_wndFlyBar.GetWindowRect(&r_wndFlybar);
 
-				r_ShowFlybar = r_wndView;
-				r_ShowFlybar.bottom = r_wndFlybar.bottom + r_wndFlybar.Height();
+					r_ShowFlybar = r_wndView;
+					r_ShowFlybar.bottom = r_wndFlybar.bottom + r_wndFlybar.Height();
 
-				if (FlyBarSetPos() == 0) break;
+					if (FlyBarSetPos() == 0) break;
 
-				if (r_ShowFlybar.PtInRect(p) && !m_bHideCursor && !m_wndFlyBar.IsWindowVisible()) {
-					m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
-				} else if (!r_ShowFlybar.PtInRect(p) && m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
+					if (r_ShowFlybar.PtInRect(p) && !m_bHideCursor && !m_wndFlyBar.IsWindowVisible()) {
+						m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+					} else if (!r_ShowFlybar.PtInRect(p) && m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
+						m_wndFlyBar.ShowWindow(SW_HIDE);
+					}
+					OSDBarSetPos();
+
+				} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 					m_wndFlyBar.ShowWindow(SW_HIDE);
+					OSDBarSetPos();
 				}
-				OSDBarSetPos();
-
-			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
-				m_wndFlyBar.ShowWindow(SW_HIDE);
-				OSDBarSetPos();
 			}
 			break;
 		case TIMER_STREAMPOSPOLLER:
@@ -20355,8 +20357,10 @@ LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lPara
 		auto pS = (PCWPSTRUCT)lParam;
 		if (pS->message == WM_CONTEXTMENU || pS->message == WM_ENTERMENULOOP) {
 			m_pThis->StopAutoHideCursor();
+			m_pThis->m_bInMenu = true;
 		} else if (pS->message == WM_MENUSELECT && HIWORD(pS->wParam) == 0xFFFF && pS->lParam == NULL) {
 			m_pThis->StartAutoHideCursor();
+			m_pThis->m_bInMenu = false;
 		}
 	}
 

@@ -1420,4 +1420,6 @@ protected:
 	static inline CMainFrame* m_pThis = nullptr;
 	static inline HHOOK m_MenuHook = nullptr;
 	static LRESULT CALLBACK MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam);
+
+	bool m_bInMenu = false;
 };
