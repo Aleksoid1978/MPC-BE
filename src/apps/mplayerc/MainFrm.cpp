@@ -3981,10 +3981,10 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 		CMenu* pSubMenu = nullptr;
 
-		if (itemID == ID_FAVORITES) {
+		if (itemID == ID_SUBMENU_FAVORITES) {
 			SetupFavoritesSubMenu();
 			pSubMenu = &m_favoritesMenu;
-		}/*else if(itemID == ID_RECENT_FILES) {
+		}/*else if(itemID == ID_SUBMENU_RECENTFILES) {
 			SetupRecentFilesSubMenu();
 			pSubMenu = &m_recentfilesMenu;
 		}*/
@@ -4054,50 +4054,50 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		CMenu* pSubMenu = nullptr;
 
 		switch (itemID) {
-		case ID_FILE_OPENDISC:
+		case ID_SUBMENU_OPENDISC:
 			SetupOpenCDSubMenu();
 			pSubMenu = &m_openCDsMenu;
 			break;
-		case ID_FILTERS:
+		case ID_SUBMENU_FILTERS:
 			SetupFiltersSubMenu();
 			pSubMenu = &m_filtersMenu;
 			break;
-		case ID_MENU_LANGUAGE:
+		case ID_SUBMENU_LANGUAGE:
 			SetupLanguageMenu();
 			pSubMenu = &m_languageMenu;
 			break;
-		case ID_AUDIOS:
+		case ID_SUBMENU_AUDIOLANG:
 			SetupAudioSubMenu();
 			pSubMenu = &m_AudioMenu;
 			break;
-		case ID_SUBTITLES:
+		case ID_SUBMENU_SUBTITLELANG:
 			SetupSubtitlesSubMenu();
 			pSubMenu = &m_SubtitlesMenu;
 			break;
-		case ID_VIDEOSTREAMS:
+		case ID_SUBMENU_VIDEOSTREAM:
 			mii.fMask = MIIM_STRING;
 			mii.dwTypeData = (LPWSTR)(LPCWSTR)((GetPlaybackMode() == PM_DVD) ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM));
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 			SetupVideoStreamsSubMenu();
 			pSubMenu = &m_VideoStreamsMenu;
 			break;
-		case ID_JUMPTO:
+		case ID_SUBMENU_JUMPTO:
 			SetupNavChaptersSubMenu();
 			pSubMenu = &m_chaptersMenu;
 			break;
-		case ID_FAVORITES:
+		case ID_SUBMENU_FAVORITES:
 			SetupFavoritesSubMenu();
 			pSubMenu = &m_favoritesMenu;
 			break;
-		case ID_RECENT_FILES:
+		case ID_SUBMENU_RECENTFILES:
 			SetupRecentFilesSubMenu();
 			pSubMenu = &m_recentfilesMenu;
 			break;
-		case ID_SHADERS:
+		case ID_SUBMENU_SHADERS:
 			SetupShadersSubMenu();
 			pSubMenu = &m_shadersMenu;
 			break;
-		case ID_AFTERPLAYBACK:
+		case ID_SUBMENU_AFTERPLAYBACK:
 			pSubMenu = m_AfterPlaybackMenu.GetSubMenu(0);
 			break;
 		}
