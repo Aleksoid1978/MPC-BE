@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -735,9 +735,9 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 				}
 				ReadByte();
 			}
-			for (BYTE i = 1; i < angle_count; i++) {
-				Skip(9);	// M2TS file name
-				ReadByte();	// stc_id
+			for (BYTE j = 1; j < angle_count; j++) {
+				Skip(9);    // M2TS file name
+				ReadByte(); // stc_id
 			}
 
 			// stn
@@ -750,7 +750,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 			Item.m_ig_offset_sequence_id.resize(stn.num_ig, 0xFF);
 
 			if (bFullInfoRead) {
-				LARGE_INTEGER size = {0, 0};
+				size = {};
 				HANDLE hFile = CreateFileW(Item.m_strFileName, GENERIC_READ, dwShareMode, nullptr,
 										   OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 				if (hFile != INVALID_HANDLE_VALUE) {

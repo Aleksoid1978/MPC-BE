@@ -171,7 +171,7 @@ double DecreaseFloatByGrid(double value, const int step)
 	return value;
 }
 
-bool ÀngleStep90(int& angle)
+bool AngleStep90(int& angle)
 {
 	if (angle % 90 == 0) {
 		angle %= 360;

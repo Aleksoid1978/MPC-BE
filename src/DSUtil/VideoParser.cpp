@@ -616,11 +616,11 @@ namespace HEVCParser {
 				int used;
 				k = rps->num_negative_pics - 1;
 				// flip the negative values to largest first
-				for (unsigned int i = 0; i < rps->num_negative_pics >> 1; i++) {
-					delta_poc = rps->delta_poc[i];
-					used = rps->used[i];
-					rps->delta_poc[i] = rps->delta_poc[k];
-					rps->used[i] = rps->used[k];
+				for (unsigned int j = 0; j < rps->num_negative_pics >> 1; j++) {
+					delta_poc = rps->delta_poc[j];
+					used = rps->used[j];
+					rps->delta_poc[j] = rps->delta_poc[k];
+					rps->used[j] = rps->used[k];
 					rps->delta_poc[k] = delta_poc;
 					rps->used[k] = used;
 					k--;
@@ -641,18 +641,18 @@ namespace HEVCParser {
 			rps->num_delta_pocs = rps->num_negative_pics + nb_positive_pics;
 			if (rps->num_delta_pocs) {
 				prev = 0;
-				for (unsigned int i = 0; i < rps->num_negative_pics; i++) {
+				for (unsigned int j = 0; j < rps->num_negative_pics; j++) {
 					delta_poc = gb.UExpGolombRead() + 1;
 					prev -= delta_poc;
-					rps->delta_poc[i] = prev;
-					rps->used[i] = gb.BitRead(1);
+					rps->delta_poc[j] = prev;
+					rps->used[j] = gb.BitRead(1);
 				}
 				prev = 0;
-				for (unsigned int i = 0; i < nb_positive_pics; i++) {
+				for (unsigned int j = 0; j < nb_positive_pics; j++) {
 					delta_poc = gb.UExpGolombRead() + 1;
 					prev += delta_poc;
-					rps->delta_poc[rps->num_negative_pics + i] = prev;
-					rps->used[rps->num_negative_pics + i] = gb.BitRead(1);
+					rps->delta_poc[rps->num_negative_pics + j] = prev;
+					rps->used[rps->num_negative_pics + j] = gb.BitRead(1);
 				}
 			}
 		}

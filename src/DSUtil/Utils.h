@@ -85,7 +85,7 @@ double IncreaseFloatByGrid(double value, const int step);
 double DecreaseFloatByGrid(double value, const int step);
 
 // checks the multiplicity of the angle of 90 degrees and brings it to the values of 0, 90, 270
-bool ÀngleStep90(int& angle);
+bool AngleStep90(int& angle);
 
 // Functions to convert strings to numeric values. On error, the current value does not change and false is returned.
 

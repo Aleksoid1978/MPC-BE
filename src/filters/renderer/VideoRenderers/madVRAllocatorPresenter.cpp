@@ -185,7 +185,7 @@ STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 
 STDMETHODIMP CmadVRAllocatorPresenter::SetRotation(int rotation)
 {
-	if (ÀngleStep90(rotation)) {
+	if (AngleStep90(rotation)) {
 		HRESULT hr = E_NOTIMPL;
 		int curRotation = rotation;
 		if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
