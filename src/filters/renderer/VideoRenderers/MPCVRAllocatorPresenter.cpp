@@ -190,7 +190,7 @@ STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 
 STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
 {
-	if (ÀngleStep90(rotation)) {
+	if (AngleStep90(rotation)) {
 		HRESULT hr = E_NOTIMPL;
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
 			int curRotation = rotation;

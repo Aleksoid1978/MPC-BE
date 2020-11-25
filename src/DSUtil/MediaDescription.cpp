@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -280,8 +280,6 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 
 			if (pInfo->nAvgBitsPerSec) {
 				Infos.emplace_back(FormatString(L"%u bit", pInfo->nAvgBitsPerSec));
-			}
-			if (pInfo->nAvgBitsPerSec) {
 				Infos.emplace_back(FormatBitrate(pInfo->nAvgBitsPerSec * 8));
 			}
 		} else if (pmt->formattype == FORMAT_VorbisFormat2) {

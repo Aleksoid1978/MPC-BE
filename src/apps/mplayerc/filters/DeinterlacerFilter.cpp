@@ -96,10 +96,8 @@ HRESULT CDeinterlacerFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	int bppOut = !(bihOut.biBitCount&7) ? bihOut.biBitCount : 8;
 	int pitchIn = bihIn.biWidth*bppIn>>3;
 	int pitchOut = bihOut.biWidth*bppOut>>3;
-	BYTE* pDataOut2 = pDataOut;
 
 	if (fFlip) {
-		pDataOut2 += pitchOut*(bihIn.biHeight-1);
 		pitchOut = -pitchOut;
 	}
 

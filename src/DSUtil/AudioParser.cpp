@@ -765,11 +765,11 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 		}
 	}
 
-	for (UINT i = 0; i < num_assets; i++) {
+	for (UINT a = 0; a < num_assets; a++) {
 		gb.BitRead(16 + 4 * isBlownUpHeader);
 	}
 
-	for (UINT i = 0; i < num_assets; i++) {
+	for (UINT a = 0; a < num_assets; a++) {
 		gb.BitRead(9);
 		gb.BitRead(3);
 		if (static_fields) {
@@ -802,7 +802,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 					embedded_6ch = gb.BitRead(1);
 				}
 
-				BYTE spkr_mask_enabled = gb.BitRead(1);
+				spkr_mask_enabled = gb.BitRead(1);
 				int spkr_mask_nbits = 0;
 				if (spkr_mask_enabled) {
 					spkr_mask_nbits = (gb.BitRead(2) + 1) << 2;
