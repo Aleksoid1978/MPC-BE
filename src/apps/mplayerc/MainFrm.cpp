@@ -20409,7 +20409,7 @@ LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lPara
 {
 	if (nCode == HC_ACTION) {
 		auto pS = (PCWPSTRUCT)lParam;
-		if (pS->message == WM_CONTEXTMENU || pS->message == WM_ENTERMENULOOP) {
+		if (pS->message == WM_ENTERMENULOOP) {
 			m_pThis->StopAutoHideCursor();
 			m_pThis->m_bInMenu = true;
 		} else if (pS->message == WM_MENUSELECT && HIWORD(pS->wParam) == 0xFFFF && pS->lParam == NULL) {
