@@ -838,7 +838,6 @@
 #define IDS_PLAYLIST_REMOVE             14116
 #define IDS_PLAYLIST_CLEAR              14117
 #define IDS_PLAYLIST_COPYTOCLIPBOARD    14118
-#define IDS_PLAYLIST_PASTEFROMCLIPBOARD 14139
 #define IDS_PLAYLIST_SAVEAS             14119
 #define IDS_PLAYLIST_SORTBYLABEL        14120
 #define IDS_PLAYLIST_SORTBYPATH         14121
@@ -859,6 +858,7 @@
 #define IDS_SHADERS_SELECT              14136
 #define IDS_PLAYLIST_DELETE             14137
 #define IDS_PLAYLIST_DELETE_QUESTION    14138
+#define IDS_PLAYLIST_PASTEFROMCLIPBOARD 14139
 #define IDS_PLAYLIST_SORT               14140
 #define IDS_PLAYLIST_SORTREVERSE        14141
 #define IDS_PLAYLIST_EXPLORER_REFRESH   14142
@@ -1451,7 +1451,6 @@
 #define IDS_MFMT_ROQ                    39017
 #define IDS_MFMT_DSM                    39018
 #define IDS_MFMT_RAW_VIDEO              39019
-
 // other files
 #define IDS_MFMT_OTHER                  39401
 #define IDS_MFMT_OTHER_AUDIO            39402
@@ -1786,7 +1785,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        44105
-#define _APS_NEXT_COMMAND_VALUE         33443
+#define _APS_NEXT_COMMAND_VALUE          1204
 #define _APS_NEXT_CONTROL_VALUE         22054
 #define _APS_NEXT_SYMED_VALUE           24044
 #endif
