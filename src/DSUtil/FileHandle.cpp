@@ -190,8 +190,8 @@ int CopyDir(LPCWSTR source_folder, LPCWSTR target_folder)
 	wcscpy_s(tf, MAX_PATH, target_folder);
 
 	// set double null-terminated string
-	sf[lstrlenW(sf)+1] = 0;
-	tf[lstrlenW(tf)+1] = 0;
+	sf[wcslen(sf)+1] = 0;
+	tf[wcslen(tf)+1] = 0;
 
 	SHFILEOPSTRUCTW s = { 0 };
 	s.wFunc = FO_COPY;
@@ -214,8 +214,8 @@ int MoveDir(LPCWSTR source_folder, LPCWSTR target_folder)
 	wcscpy_s(tf, MAX_PATH, target_folder);
 
 	// set double null-terminated string
-	sf[lstrlenW(sf)+1] = 0;
-	tf[lstrlenW(tf)+1] = 0;
+	sf[wcslen(sf)+1] = 0;
+	tf[wcslen(tf)+1] = 0;
 
 	SHFILEOPSTRUCTW s = { 0 };
 	s.wFunc = FO_MOVE;
