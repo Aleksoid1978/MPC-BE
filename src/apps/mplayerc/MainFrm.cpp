@@ -697,6 +697,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
+	m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
 	// create a Main View Window
 	if (!m_wndView.Create(nullptr, nullptr, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
@@ -2117,12 +2118,14 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 		m_VideoFrameMenu.DestroyMenu();
 		m_PanScanMenu.DestroyMenu();
 		m_AfterPlaybackMenu.DestroyMenu();
+		m_NavigateMenu.DestroyMenu();
 
 		m_popupMenu.LoadMenuW(IDR_POPUP);
 		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 		m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 		m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 		m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
+		m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
 		CMenu defaultMenu;
 		defaultMenu.LoadMenuW(IDR_MAINFRAME);
@@ -3979,7 +3982,7 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 	for (UINT i = 0; i < uiMenuCount; ++i) {
 		UINT itemID = pMenu->GetMenuItemID(i);
-		if (itemID == 0xFFFFFFFF) {
+		if (itemID == UINT(-1)) {
 			mii.fMask = MIIM_ID;
 			pMenu->GetMenuItemInfoW(i, &mii, TRUE);
 			itemID = mii.wID;
@@ -3987,13 +3990,13 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 		CMenu* pSubMenu = nullptr;
 
-		if (itemID == ID_SUBMENU_FAVORITES) {
+		if (itemID == ID_SUBMENU_NAVIGATE) {
+			pSubMenu = m_NavigateMenu.GetSubMenu(0);
+		}
+		else if (itemID == ID_SUBMENU_FAVORITES) {
 			SetupFavoritesSubMenu();
 			pSubMenu = &m_favoritesMenu;
-		}/*else if(itemID == ID_SUBMENU_RECENTFILES) {
-			SetupRecentFilesSubMenu();
-			pSubMenu = &m_recentfilesMenu;
-		}*/
+		}
 
 		if (pSubMenu) {
 			mii.fMask = MIIM_STATE | MIIM_SUBMENU | MIIM_ID;
@@ -4034,14 +4037,6 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			firstSubItemID= sm->GetMenuItemID(0);
 		}
 
-		if (firstSubItemID == ID_NAVIGATE_SKIPBACK) { // is "Navigate" submenu {
-			UINT fState = (m_eMediaLoadState == MLS_LOADED
-						   && (1/*GetPlaybackMode() == PM_DVD *//*|| (GetPlaybackMode() == PM_FILE && m_PlayList.GetCount() > 0)*/))
-						  ? MF_ENABLED
-						  : (MF_DISABLED | MF_GRAYED);
-			pPopupMenu->EnableMenuItem(i, MF_BYPOSITION|fState);
-			continue;
-		}
 		if (firstSubItemID == ID_VIEW_ZOOM_50) { // is "Zoom" submenu
 			UINT fState = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly)
 						  ? MF_ENABLED
@@ -4107,6 +4102,10 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			break;
 		case ID_SUBMENU_AFTERPLAYBACK:
 			pSubMenu = m_AfterPlaybackMenu.GetSubMenu(0);
+			break;
+		case ID_SUBMENU_NAVIGATE:
+			pSubMenu = m_NavigateMenu.GetSubMenu(0);
+			bEnable = (m_eMediaLoadState == MLS_LOADED);
 			break;
 		case ID_SUBMENU_JUMPTO:
 			SetupNavChaptersSubMenu();
@@ -17903,12 +17902,14 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_VideoFrameMenu.DestroyMenu();
 	m_PanScanMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
+	m_NavigateMenu.DestroyMenu();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
+	m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
 	CMenu defaultMenu;
 	defaultMenu.LoadMenuW(IDR_MAINFRAME);
@@ -20291,12 +20292,14 @@ void CMainFrame::ResetMenu()
 	m_VideoFrameMenu.DestroyMenu();
 	m_PanScanMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
+	m_NavigateMenu.DestroyMenu();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
+	m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
 	CMenu defaultMenu;
 	defaultMenu.LoadMenuW(IDR_MAINFRAME);

@@ -8,6 +8,7 @@
 #define IDR_POPUP_VIDEOFRAME            140
 #define IDR_POPUP_PANSCAN               141
 #define IDR_POPUP_AFTERPLAYBACK         142
+#define IDR_POPUP_NAVIGATE              143
 #define IDB_PLAYERFLYBAR_PNG            196
 #define IDB_W7_AUDIO                    197
 #define IDB_W7_TOOLBAR                  198
@@ -421,8 +422,9 @@
 #define ID_SUBMENU_SUBTITLELANG         1908
 #define ID_SUBMENU_VIDEOSTREAM          1909
 #define ID_SUBMENU_AFTERPLAYBACK        1910
-#define ID_SUBMENU_JUMPTO               1911
-#define ID_SUBMENU_FAVORITES            1912
+#define ID_SUBMENU_NAVIGATE             1911
+#define ID_SUBMENU_JUMPTO               1912
+#define ID_SUBMENU_FAVORITES            1913
 //
 #define ID_FILTERS_COPY_TO_CLIPBOARD    1999
 // ranges for menus
