@@ -3747,13 +3747,8 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_bWaitingRButtonUp) {
 		m_bWaitingRButtonUp = false;
-
-		CPoint p;
-		GetCursorPos(&p);
 		SetFocus();
-		if (*WindowFromPoint(p) != *m_pFullscreenWnd) {
-			SendMessageW(WM_COMMAND, ID_MENU_PLAYER_SHORT);
-		}
+		SendMessageW(WM_COMMAND, ID_MENU_PLAYER_SHORT);
 	}
 }
 
