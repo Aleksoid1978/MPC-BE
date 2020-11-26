@@ -373,7 +373,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 19		"Am Ende &zurückspringen"
 20		"Steuerung"
 21		"Lautstärkestufen:"
-23		"Geschwindigkeitstufen:"
+23		"Geschwindigkeitsstufen:"
 25		"Geschwindigkeit in einer Sitzung nicht zurücksetzen"
 27		"Bevorzugte Spuren"
 28		"Untertitel:"
