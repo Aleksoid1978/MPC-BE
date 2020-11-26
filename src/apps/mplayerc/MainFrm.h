@@ -497,8 +497,8 @@ public:
 	bool IsCaptionHidden() const {//If no caption, there is no menu bar. But if is no menu bar, then the caption can be.
 		return(!m_bFullScreen && AfxGetAppSettings().iCaptionMenuMode > MODE_HIDEMENU);//!=MODE_SHOWCAPTIONMENU && !=MODE_HIDEMENU
 	}
-	bool IsMenuHidden() const {
-		return GetMenuBarVisibility() != AFX_MBV_KEEPVISIBLE;
+	bool IsMainMenuVisible() const {
+		return GetMenuBarVisibility() == AFX_MBV_KEEPVISIBLE;
 	}
 	bool IsSomethingLoaded() const {
 		return((m_eMediaLoadState == MLS_LOADING || m_eMediaLoadState == MLS_LOADED) && !IsD3DFullScreenMode());

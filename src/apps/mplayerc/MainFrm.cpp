@@ -1574,7 +1574,7 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 
 void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
-	const BOOL bMenuVisible = !IsMenuHidden();
+	const BOOL bMenuVisible = IsMainMenuVisible();
 
 	CSize cSize;
 	CalcControlsSize(cSize);
@@ -2009,7 +2009,7 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 	CSize decorationsSize;
 	CRect decorationsRect;
 	CalcControlsSize(decorationsSize);
-	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
+	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), IsMainMenuVisible(), GetWindowExStyle(m_hWnd)));
 	decorationsSize += decorationsRect.Size();
 
 	const CSize videoAreaSize(pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
@@ -4236,7 +4236,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 
 void CMainFrame::OnMenuPlayerShort()
 {
-	OnMenu((IsMenuHidden() || IsD3DFullScreenMode()) ? m_popupMainMenu.GetSubMenu(0) : m_popupMenu.GetSubMenu(0));
+	OnMenu((!IsMainMenuVisible() || IsD3DFullScreenMode()) ? m_popupMainMenu.GetSubMenu(0) : m_popupMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuPlayerLong()
@@ -11446,7 +11446,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		CSize videoTargetSize(int(videoSize.cx * scale + 0.5), int(videoSize.cy * scale + 0.5));
 
 		CRect decorationsRect;
-		VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
+		VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), IsMainMenuVisible(), GetWindowExStyle(m_hWnd)));
 
 		/*
 		if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
@@ -18847,7 +18847,7 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 
 	CRect r;
 	m_wndView.GetClientRect(&r);
-	if (!IsMenuHidden()) {
+	if (IsMainMenuVisible()) {
 		r.OffsetRect(0, GetSystemMetrics(SM_CYMENU));
 	}
 
