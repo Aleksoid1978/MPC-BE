@@ -10838,7 +10838,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			r = m_lastWindowRect;
 		}
 
-		if (s.bHidePlaylistFullScreen && m_wndPlaylistBar.IsHiddenDueToFullscreen()) {
+		if (s.bHidePlaylistFullScreen && m_wndPlaylistBar.IsHiddenDueToFullscreen() && !m_bIsMPCVRExclusiveMode) {
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(false);
 			ShowControlBarInternal(&m_wndPlaylistBar, TRUE);
 		}
