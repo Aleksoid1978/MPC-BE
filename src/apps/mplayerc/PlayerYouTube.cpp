@@ -57,6 +57,9 @@
 #define MATCH_PLAYER_RESPONSE       "\"player_response\":\""
 #define MATCH_PLAYER_RESPONSE_END   "}\""
 
+#define MATCH_PLAYER_RESPONSE_2     "ytInitialPlayerResponse = "
+#define MATCH_PLAYER_RESPONSE_END_2 "};"
+
 namespace Youtube
 {
 #define USE_GOOGLE_API 0
@@ -475,6 +478,13 @@ namespace Youtube
 				player_response_jsonData.Replace(R"(\/)", "/");
 				player_response_jsonData.Replace(R"(\")", R"(")");
 				player_response_jsonData.Replace(R"(\\)", R"(\)");
+			} else {
+				player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonData += "}";
+				}
+			}
+			if (!player_response_jsonData.IsEmpty()) {
 				player_response_jsonDocument.Parse(player_response_jsonData);
 			}
 
