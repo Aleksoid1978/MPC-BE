@@ -110,11 +110,9 @@ HRESULT CBaseSplitterFile::Refresh()
 
 void CBaseSplitterFile::ThreadUpdateLength()
 {
-	HANDLE hEvts[] = { m_evStopThreadLength };
-
 	int count = 0;
 	for (;;) {
-		DWORD dwObject = WaitForMultipleObjects(1, hEvts, FALSE, 1000);
+		DWORD dwObject = WaitForSingleObject(m_evStopThreadLength, 1000);
 		if (dwObject == WAIT_OBJECT_0
 				|| (m_fmode == FM_FILE && count >= 10)) {
 			return;
