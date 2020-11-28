@@ -391,11 +391,11 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 	ULONGLONG segpos = GetStreamPosition(pStream);
 
 	// TODO
-	QWORD voidlen = 100;
+	UINT64 voidlen = 100;
 	if (rtDur > 0) {
-		voidlen += QWORD(1.0 * rtDur / MAXCLUSTERTIME / 10000 + 0.5) * 20;
+		voidlen += UINT64(1.0 * rtDur / MAXCLUSTERTIME / 10000 + 0.5) * 20;
 	} else {
-		voidlen += QWORD(1.0 * 1000 * 60 * 60 * 24 / MAXCLUSTERTIME + 0.5) * 20; // when no duration is known, allocate for 24 hours (~340k)
+		voidlen += UINT64(1.0 * 1000 * 60 * 60 * 24 / MAXCLUSTERTIME + 0.5) * 20; // when no duration is known, allocate for 24 hours (~340k)
 	}
 	ULONGLONG voidpos = GetStreamPosition(pStream);
 	{
@@ -673,15 +673,15 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 				}
 
 				SetStreamPosition(pStream, voidpos);
-				QWORD len = voidlen - seek.Size();
+				UINT64 len = voidlen - seek.Size();
 				ASSERT(len >= 0 && len != 1);
 				seek.Write(pStream);
 
 				if (len == 0) {
 					// nothing to do
 				} else if (len >= 2) {
-					for (QWORD i = 0; i < 8; i++) {
-						if (len >= (QWORD(1) << i * 7) - 2 && len <= (QWORD(1) << (i + 1) * 7) - 2) {
+					for (UINT64 i = 0; i < 8; i++) {
+						if (len >= (UINT64(1) << i * 7) - 2 && len <= (UINT64(1) << (i + 1) * 7) - 2) {
 							Void(len - 2 - i).Write(pStream);
 							break;
 						}
