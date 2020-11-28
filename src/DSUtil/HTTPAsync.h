@@ -54,7 +54,7 @@ protected:
 
 	CString m_header;
 	CString m_contentType;
-	QWORD m_lenght = 0;
+	UINT64 m_lenght = 0;
 
 	static void CALLBACK Callback(__in HINTERNET hInternet,
 								  __in_opt DWORD_PTR dwContext,
@@ -77,6 +77,6 @@ public:
 
 	CString GetHeader() const;
 	CString GetContentType() const;
-	QWORD GetLenght() const;
+	UINT64 GetLenght() const;
 };
 

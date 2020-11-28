@@ -281,7 +281,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	const CString queryInfo = QueryInfoStr(HTTP_QUERY_CONTENT_LENGTH);
 	if (!queryInfo.IsEmpty()) {
-		QWORD val = 0;
+		UINT64 val = 0;
 		if (1 == swscanf_s(queryInfo, L"%I64u", &val)) {
 			m_lenght = val;
 		}
@@ -432,7 +432,7 @@ CString CHTTPAsync::GetContentType() const
 	return m_contentType;
 }
 
-QWORD CHTTPAsync::GetLenght() const
+UINT64 CHTTPAsync::GetLenght() const
 {
 	return m_lenght;
 }

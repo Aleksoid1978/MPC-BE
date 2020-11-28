@@ -119,7 +119,7 @@ namespace Content {
 
 				if (content.bHTTPConnected) {
 					size_t nMinSize = KILOBYTE;
-					const QWORD ContentLength = content.HTTPAsync->GetLenght();
+					const UINT64 ContentLength = content.HTTPAsync->GetLenght();
 					if (ContentLength && ContentLength < nMinSize) {
 						nMinSize = ContentLength;
 					}
@@ -165,7 +165,7 @@ namespace Content {
 
 				if (content.bHTTPConnected) {
 					size_t nMaxSize = 16 * KILOBYTE;
-					const QWORD ContentLength = content.HTTPAsync->GetLenght();
+					const UINT64 ContentLength = content.HTTPAsync->GetLenght();
 					if (ContentLength && ContentLength < nMaxSize) {
 						nMaxSize = ContentLength;
 					}

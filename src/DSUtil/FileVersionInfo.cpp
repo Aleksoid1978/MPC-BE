@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -220,13 +220,13 @@ CString CFileVersionInfo::GetFileVersionExShort(LPCWSTR lpszFileName)
 	return strFileVersion;
 }
 
-QWORD CFileVersionInfo::GetFileVersion(LPCWSTR lpszFileName)
+UINT64 CFileVersionInfo::GetFileVersion(LPCWSTR lpszFileName)
 {
-	QWORD            qwFileVersion = 0;
+	UINT64           uFileVersion = 0;
 	VS_FIXEDFILEINFO FileInfo;
 	if (Create(lpszFileName, FileInfo)) {
-		qwFileVersion = ((QWORD)FileInfo.dwFileVersionMS << 32) | FileInfo.dwFileVersionLS;
+		uFileVersion = ((UINT64)FileInfo.dwFileVersionMS << 32) | FileInfo.dwFileVersionLS;
 	}
 
-	return qwFileVersion;
+	return uFileVersion;
 }

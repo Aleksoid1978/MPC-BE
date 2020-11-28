@@ -395,7 +395,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
 	if (m_hFile != INVALID_HANDLE_VALUE) {
-		const QWORD pos = m_pos;                             // bytes
+		const UINT64 pos = m_pos;                            // bytes
 		const clock_t time = (clock() - m_startTime);        // milliseconds
 		const long speed = m_SaveStats.AddValuesGetSpeed(pos, time);
 
