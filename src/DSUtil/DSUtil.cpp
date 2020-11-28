@@ -432,28 +432,24 @@ CString GetPinName(IPin* pPin)
 
 IFilterGraph* GetGraphFromFilter(IBaseFilter* pBF)
 {
-	if (!pBF) {
-		return nullptr;
+	if (pBF) {
+		CFilterInfo fi;
+		if (SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
+			return fi.pGraph;
+		}
 	}
-	IFilterGraph* pGraph = nullptr;
-	CFilterInfo fi;
-	if (pBF && SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
-		pGraph = fi.pGraph;
-	}
-	return pGraph;
+	return nullptr;
 }
 
 IBaseFilter* GetFilterFromPin(IPin* pPin)
 {
-	if (!pPin) {
-		return nullptr;
+	if (pPin) {
+		CPinInfo pi;
+		if (SUCCEEDED(pPin->QueryPinInfo(&pi))) {
+			return pi.pFilter;
+		}
 	}
-	IBaseFilter* pBF = nullptr;
-	CPinInfo pi;
-	if (pPin && SUCCEEDED(pPin->QueryPinInfo(&pi))) {
-		pBF = pi.pFilter;
-	}
-	return pBF;
+	return nullptr;
 }
 
 IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
