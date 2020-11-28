@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -243,7 +243,7 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	}
 
 	// parse SeekHead (MetaSeekInfo) to get the position of the missing elements
-	while (QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
+	while (UINT64 pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
 		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) > pMN->GetLength()) {
 			break; // a broken file
@@ -869,9 +869,9 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 		return S_OK;
 	}
 
-	std::list<QWORD> lens;
-	QWORD tlen = 0;
-	QWORD FrameSize;
+	std::list<UINT64> lens;
+	UINT64 tlen = 0;
+	UINT64 FrameSize;
 	BYTE FramesInLaceLessOne;
 
 	switch ((Lacing & 0x06) >> 1) {
@@ -885,7 +885,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			pMN->Read(n);
 			while (n-- > 0) {
 				BYTE b;
-				QWORD len = 0;
+				UINT64 len = 0;
 				do {
 					pMN->Read(b);
 					len += b;
@@ -919,7 +919,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			while (FramesInLaceLessOne--) {
 				DiffSize.Parse(pMN);
 				FrameSize += DiffSize;
-				if ((FrameSize > (QWORD)INT_MAX) || (pMN->GetPos() + FrameSize > pMN->GetLength())) {
+				if ((FrameSize > (UINT64)INT_MAX) || (pMN->GetPos() + FrameSize > pMN->GetLength())) {
 					DLog(L"SimpleBlock::Parse() : invalid EBML block size %I64u at %I64u for length %I64u", FrameSize, pMN->GetPos(), pMN->GetLength());
 					return E_FAIL;
 				}
@@ -930,7 +930,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			break;
 	}
 
-	for (const QWORD len : lens) {
+	for (const UINT64 len : lens) {
 		if ((__int64)len < 0) {
 			continue;
 		}
@@ -1298,7 +1298,7 @@ HRESULT CANSI::Parse(CMatroskaNode* pMN)
 {
 	Empty();
 
-	QWORD len = pMN->m_len;
+	UINT64 len = pMN->m_len;
 	CHAR c;
 	while (len-- > 0 && SUCCEEDED(pMN->Read(c))) {
 		*this += c;
@@ -1457,7 +1457,7 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 
 	//int nMoreBytesTmp = nMoreBytes;
 
-	const QWORD UnknownSize = (1i64 << (7 * (nMoreBytes + 1))) - 1;
+	const UINT64 UnknownSize = (1i64 << (7 * (nMoreBytes + 1))) - 1;
 
 	while (nMoreBytes-- > 0) {
 		m_val <<= 8;
@@ -1507,7 +1507,7 @@ HRESULT CSignedLength::Parse(CMatroskaNode* pMN)
 
 	//int nMoreBytesTmp = nMoreBytes;
 
-	QWORD UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
+	UINT64 UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
 
 	while (nMoreBytes-- > 0)
 	{
@@ -1598,7 +1598,7 @@ HRESULT CMatroskaNode::Parse()
 		} else {
 			// find next Node with the same id
 			CID id;
-			QWORD byteCount = 0;
+			UINT64 byteCount = 0;
 			while (byteCount < MAXFAILEDCOUNT && GetPos() < (m_pParent->m_start + m_pParent->m_len)) {
 				SeekTo(m_start + byteCount);
 				if (SUCCEEDED(id.Parse(this))
@@ -1671,7 +1671,7 @@ bool CMatroskaNode::Next(bool fSame)
 
 bool CMatroskaNode::Find(DWORD id, bool fSearch)
 {
-	QWORD pos = m_pParent && m_pParent->m_id == MATROSKA_ID_SEGMENT
+	UINT64 pos = m_pParent && m_pParent->m_id == MATROSKA_ID_SEGMENT
 				? FindPos(id)
 				: 0;
 
@@ -1687,17 +1687,17 @@ bool CMatroskaNode::Find(DWORD id, bool fSearch)
 	return (m_id == id);
 }
 
-void CMatroskaNode::SeekTo(QWORD pos)
+void CMatroskaNode::SeekTo(UINT64 pos)
 {
 	m_pMF->Seek(pos);
 }
 
-QWORD CMatroskaNode::GetPos()
+UINT64 CMatroskaNode::GetPos()
 {
 	return m_pMF->GetPos();
 }
 
-QWORD CMatroskaNode::GetLength()
+UINT64 CMatroskaNode::GetLength()
 {
 	return m_pMF->GetLength();
 }
@@ -1708,12 +1708,12 @@ HRESULT CMatroskaNode::Read(T& var)
 	return m_pMF->Read(var);
 }
 
-HRESULT CMatroskaNode::Read(BYTE* pData, QWORD len)
+HRESULT CMatroskaNode::Read(BYTE* pData, UINT64 len)
 {
 	return m_pMF->ByteRead(pData, len);
 }
 
-QWORD CMatroskaNode::FindPos(DWORD id, QWORD start)
+UINT64 CMatroskaNode::FindPos(DWORD id, UINT64 start)
 {
 	Segment& sm = m_pMF->m_segment;
 
