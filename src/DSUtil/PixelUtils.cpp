@@ -118,7 +118,7 @@ void AvgLines8_(BYTE* dst, DWORD h, DWORD pitch)
 		}
 	}
 
-	if(!(h&1) && h >= 2) {
+	if(!(h&1)) {
 		dst += (h-2)*pitch;
 		memcpy(dst + pitch, dst, pitch);
 	}
