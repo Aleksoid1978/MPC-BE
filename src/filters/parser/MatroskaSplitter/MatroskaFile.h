@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -522,7 +522,7 @@ namespace MatroskaReader
 		CUTF8 FileDescription;
 		CUTF8 FileName;
 		CANSI FileMimeType;
-		QWORD FileDataPos, FileDataLen; // BYTE* FileData
+		UINT64 FileDataPos, FileDataLen; // BYTE* FileData
 		CUInt FileUID;
 
 		AttachedFile() {
@@ -635,7 +635,7 @@ namespace MatroskaReader
 	class Segment
 	{
 	public:
-		QWORD pos, len;
+		UINT64 pos, len;
 		Info SegmentInfo;
 		CNode<Seek> MetaSeekInfo;
 		CNode<Cluster> Clusters;
@@ -684,7 +684,7 @@ namespace MatroskaReader
 	public:
 		CID m_id;
 		CLength m_len;
-		QWORD m_filepos, m_start;
+		UINT64 m_filepos, m_start;
 
 		HRESULT Parse();
 
@@ -699,12 +699,12 @@ namespace MatroskaReader
 		bool Next(bool fSame = false);
 		bool Find(DWORD id, bool fSearch = true);
 
-		QWORD FindPos(DWORD id, QWORD start = 0);
+		UINT64 FindPos(DWORD id, UINT64 start = 0);
 
-		void SeekTo(QWORD pos);
-		QWORD GetPos(), GetLength();
+		void SeekTo(UINT64 pos);
+		UINT64 GetPos(), GetLength();
 		template <class T> HRESULT Read(T& var);
-		HRESULT Read(BYTE* pData, QWORD len);
+		HRESULT Read(BYTE* pData, UINT64 len);
 
 		CAutoPtr<CMatroskaNode> Copy();
 

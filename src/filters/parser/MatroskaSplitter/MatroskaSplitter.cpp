@@ -1663,7 +1663,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (!m_pOutputs.IsEmpty() && !m_pFile->m_segment.Cues.empty()) {
 		auto& s = m_pFile->m_segment;
 		const UINT64 TrackNumber = s.GetMasterTrack();
-		QWORD lastCueClusterPosition = ULONGLONG_MAX;
+		UINT64 lastCueClusterPosition = ULONGLONG_MAX;
 
 		for (const auto& pCue : s.Cues) {
 			for (const auto& pCuePoint : pCue->CuePoints) {
@@ -1882,7 +1882,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			m_rtDuration = (REFERENCE_TIME)(s.SegmentInfo.Duration * s.SegmentInfo.TimeCodeScale / 100);
 			m_rtNewStop  = m_rtStop = m_rtDuration;
 
-			QWORD lastCueClusterPosition = ULONGLONG_MAX;
+			UINT64 lastCueClusterPosition = ULONGLONG_MAX;
 
 			for (const auto& pCue : s.Cues) {
 				for (const auto& pCuePoint : pCue->CuePoints) {
@@ -2033,7 +2033,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			const auto masterTrackNumber = s.GetMasterTrack();
 			m_pBlock = m_pCluster->GetFirstBlock();
 			auto bFound = false;
-			QWORD block_pos = 0;
+			UINT64 block_pos = 0;
 
 			do {
 				CBlockGroupNode bgn;
@@ -2112,7 +2112,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 		CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 		if (pCluster) {
 			bool bBreak = false;
-			QWORD lastCueRelativePosition = ULONGLONG_MAX;
+			UINT64 lastCueRelativePosition = ULONGLONG_MAX;
 			for (const auto& pCue : s.Cues) {
 				for (auto it = pCue->CuePoints.crbegin(); it != pCue->CuePoints.crend(); it++) {
 					const auto& pCuePoint = *it;
@@ -2144,7 +2144,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 								continue;
 							}
 
-							const QWORD pos = pCluster->GetPos();
+							const UINT64 pos = pCluster->GetPos();
 							// prevent processing the same position
 							if (lastCueRelativePosition == pos + pCueTrackPositions->CueRelativePosition) {
 								continue;
