@@ -62,7 +62,7 @@ BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 		if (m_bSupportURL
 				&& urlParser.Parse(lpszFileName)
 				&& m_HTTPAsync.Connect(lpszFileName, 10000) == S_OK) {
-			const QWORD ContentLength = m_HTTPAsync.GetLenght();
+			const UINT64 ContentLength = m_HTTPAsync.GetLenght();
 			if (ContentLength == 0) {
 				return FALSE;
 			}

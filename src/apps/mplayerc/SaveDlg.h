@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,17 +48,17 @@ private:
 
 	CHTTPAsync m_HTTPAsync;
 	HANDLE  m_hFile     = INVALID_HANDLE_VALUE;
-	QWORD   m_len       = 0;
+	UINT64  m_len       = 0;
 	clock_t m_startTime = 0;
 
 	struct {
 		struct {
 			long time;
-			QWORD len;
+			UINT64 len;
 		} TimeLens[40] = {}; // about 8 seconds
 		unsigned pos = 0;
 
-		long AddValuesGetSpeed(const QWORD len, const long time) {
+		long AddValuesGetSpeed(const UINT64 len, const long time) {
 			pos++;
 			if (pos >= std::size(TimeLens)) {
 				pos = 0;
