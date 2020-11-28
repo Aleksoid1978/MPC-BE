@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,21 +39,21 @@ CID::CID(DWORD id)
 {
 }
 
-QWORD CID::Size(bool fWithHeader)
+UINT64 CID::Size(bool fWithHeader)
 {
 	return CUInt(0, m_id).Size(false);
 }
 
 HRESULT CID::Write(IStream* pStream)
 {
-	QWORD len = CID::Size();
+	UINT64 len = CID::Size();
 	DWORD id = m_id;
 	bswap((BYTE*)&id, (int)len);
 	*(BYTE*)&id = ((*(BYTE*)&id) & (1 << (8 - len)) - 1) | (1 << (8 - len));
 	return pStream->Write(&id, (ULONG)len, nullptr);
 }
 
-QWORD CID::HeaderSize(QWORD len)
+UINT64 CID::HeaderSize(UINT64 len)
 {
 	return CID::Size() + CLength(len).Size();
 }
@@ -65,13 +65,13 @@ HRESULT CID::HeaderWrite(IStream* pStream)
 	return S_OK;
 }
 
-QWORD CBinary::Size(bool fWithHeader)
+UINT64 CBinary::Size(bool fWithHeader)
 {
 	if (empty()) {
 		return 0;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -89,13 +89,13 @@ HRESULT CBinary::Write(IStream* pStream)
 	return pStream->Write(data(), (ULONG)size(), nullptr);
 }
 
-QWORD CANSI::Size(bool fWithHeader)
+UINT64 CANSI::Size(bool fWithHeader)
 {
 	if (IsEmpty()) {
 		return 0;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += GetLength();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -113,13 +113,13 @@ HRESULT CANSI::Write(IStream* pStream)
 	return pStream->Write((LPCSTR) * this, GetLength(), nullptr);
 }
 
-QWORD CUTF8::Size(bool fWithHeader)
+UINT64 CUTF8::Size(bool fWithHeader)
 {
 	if (IsEmpty()) {
 		return 0;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += WStrToUTF8(*this).GetLength();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -139,13 +139,13 @@ HRESULT CUTF8::Write(IStream* pStream)
 }
 
 template<class T, class BASE>
-QWORD CSimpleVar<T, BASE>::Size(bool fWithHeader)
+UINT64 CSimpleVar<T, BASE>::Size(bool fWithHeader)
 {
 	if (!m_fSet) {
 		return 0;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += sizeof(T);
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -166,13 +166,13 @@ HRESULT CSimpleVar<T, BASE>::Write(IStream* pStream)
 	return pStream->Write(&val, sizeof(T), nullptr);
 }
 
-QWORD CUInt::Size(bool fWithHeader)
+UINT64 CUInt::Size(bool fWithHeader)
 {
 	if (!m_fSet) {
 		return 0;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 
 	if (m_val == 0) {
 		len++;
@@ -204,13 +204,13 @@ HRESULT CUInt::Write(IStream* pStream)
 	return pStream->Write(&val, (ULONG)l, nullptr);
 }
 
-QWORD CInt::Size(bool fWithHeader)
+UINT64 CInt::Size(bool fWithHeader)
 {
 	if (!m_fSet) {
 		return 0;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 
 	if (m_val == 0) {
 		len++;
@@ -246,15 +246,15 @@ HRESULT CInt::Write(IStream* pStream)
 	return pStream->Write(&val, (ULONG)l, nullptr);
 }
 
-QWORD CLength::Size(bool fWithHeader)
+UINT64 CLength::Size(bool fWithHeader)
 {
 	if (m_len == 0x00FFFFFFFFFFFFFFi64) {
 		return 8;
 	}
 
-	QWORD len = 0;
+	UINT64 len = 0;
 	for (int i = 1; i <= 8; i++) {
-		if (!(m_len & (~((QWORD(1) << (7 * i)) - 1))) && (m_len & ((QWORD(1) << (7 * i)) - 1)) != ((QWORD(1) << (7 * i)) - 1)) {
+		if (!(m_len & (~((UINT64(1) << (7 * i)) - 1))) && (m_len & ((UINT64(1) << (7 * i)) - 1)) != ((UINT64(1) << (7 * i)) - 1)) {
 			len += i;
 			break;
 		}
@@ -264,7 +264,7 @@ QWORD CLength::Size(bool fWithHeader)
 
 HRESULT CLength::Write(IStream* pStream)
 {
-	QWORD len = Size(false);
+	UINT64 len = Size(false);
 	UINT64 val = m_len;
 	bswap((BYTE*)&val, (int)len);
 	*(BYTE*)&val = ((*(BYTE*)&val) & (1 << (8 - len)) - 1) | (1 << (8 - len));
@@ -285,9 +285,9 @@ EBML::EBML(DWORD id)
 {
 }
 
-QWORD EBML::Size(bool fWithHeader)
+UINT64 EBML::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += EBMLVersion.Size();
 	len += EBMLReadVersion.Size();
 	len += EBMLMaxIDLength.Size();
@@ -331,9 +331,9 @@ Info::Info(DWORD id)
 {
 }
 
-QWORD Info::Size(bool fWithHeader)
+UINT64 Info::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += SegmentUID.Size();
 	len += PrevUID.Size();
 	len += NextUID.Size();
@@ -375,11 +375,11 @@ Segment::Segment(DWORD id)
 {
 }
 
-QWORD Segment::Size(bool fWithHeader)
+UINT64 Segment::Size(bool fWithHeader)
 {
 	return 0x00FFFFFFFFFFFFFFi64;
 	/*
-		QWORD len = 0;
+		UINT64 len = 0;
 		if (fWithHeader) len += HeaderSize(len);
 		return len;
 	*/
@@ -396,9 +396,9 @@ Track::Track(DWORD id)
 {
 }
 
-QWORD Track::Size(bool fWithHeader)
+UINT64 Track::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += TrackEntries.Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -440,9 +440,9 @@ TrackEntry::TrackEntry(DWORD id)
 	DescType = NoDesc;
 }
 
-QWORD TrackEntry::Size(bool fWithHeader)
+UINT64 TrackEntry::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += TrackNumber.Size();
 	len += TrackUID.Size();
 	len += TrackType.Size();
@@ -521,9 +521,9 @@ Video::Video(DWORD id)
 {
 }
 
-QWORD Video::Size(bool fWithHeader)
+UINT64 Video::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += FlagInterlaced.Size();
 	len += StereoMode.Size();
 	len += PixelWidth.Size();
@@ -568,9 +568,9 @@ Audio::Audio(DWORD id)
 {
 }
 
-QWORD Audio::Size(bool fWithHeader)
+UINT64 Audio::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += SamplingFrequency.Size();
 	len += OutputSamplingFrequency.Size();
 	len += Channels.Size();
@@ -601,9 +601,9 @@ Cluster::Cluster(DWORD id)
 {
 }
 
-QWORD Cluster::Size(bool fWithHeader)
+UINT64 Cluster::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += TimeCode.Size();
 	len += Position.Size();
 	len += PrevSize.Size();
@@ -634,9 +634,9 @@ BlockGroup::BlockGroup(DWORD id)
 {
 }
 
-QWORD BlockGroup::Size(bool fWithHeader)
+UINT64 BlockGroup::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += BlockDuration.Size();
 	len += ReferencePriority.Size();
 	len += ReferenceBlock.Size();
@@ -668,9 +668,9 @@ CBlock::CBlock(DWORD id)
 {
 }
 
-QWORD CBlock::Size(bool fWithHeader)
+UINT64 CBlock::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += TrackNumber.Size() + 2 + 1; // TrackNumber + TimeCode + Lacing
 	if (BlockData.GetCount() > 1) {
 		len += 1; // nBlockData
@@ -734,9 +734,9 @@ Cue::Cue(DWORD id)
 {
 }
 
-QWORD Cue::Size(bool fWithHeader)
+UINT64 Cue::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += CuePoints.Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -757,9 +757,9 @@ CuePoint::CuePoint(DWORD id)
 {
 }
 
-QWORD CuePoint::Size(bool fWithHeader)
+UINT64 CuePoint::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += CueTime.Size();
 	len += CueTrackPositions.Size();
 	if (fWithHeader) {
@@ -785,9 +785,9 @@ CueTrackPosition::CueTrackPosition(DWORD id)
 {
 }
 
-QWORD CueTrackPosition::Size(bool fWithHeader)
+UINT64 CueTrackPosition::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += CueTrack.Size();
 	len += CueClusterPosition.Size();
 	len += CueBlockNumber.Size();
@@ -815,9 +815,9 @@ Seek::Seek(DWORD id)
 {
 }
 
-QWORD Seek::Size(bool fWithHeader)
+UINT64 Seek::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += SeekHeads.Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -838,9 +838,9 @@ SeekID::SeekID(DWORD id)
 {
 }
 
-QWORD SeekID::Size(bool fWithHeader)
+UINT64 SeekID::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += m_cid.Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -861,9 +861,9 @@ SeekHead::SeekHead(DWORD id)
 {
 }
 
-QWORD SeekHead::Size(bool fWithHeader)
+UINT64 SeekHead::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += ID.Size();
 	len += Position.Size();
 	if (fWithHeader) {
@@ -885,9 +885,9 @@ Tags::Tags(DWORD id)
 {
 }
 
-QWORD Tags::Size(bool fWithHeader)
+UINT64 Tags::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	//len += .Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -902,15 +902,15 @@ HRESULT Tags::Write(IStream* pStream)
 	return S_OK;
 }
 
-Void::Void(QWORD len, DWORD id)
+Void::Void(UINT64 len, DWORD id)
 	: CID(id)
 	, m_len(len)
 {
 }
 
-QWORD Void::Size(bool fWithHeader)
+UINT64 Void::Size(bool fWithHeader)
 {
-	QWORD len = 0;
+	UINT64 len = 0;
 	len += m_len;
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -923,7 +923,7 @@ HRESULT Void::Write(IStream* pStream)
 	HeaderWrite(pStream);
 	BYTE buff[64];
 	memset(buff, 0x80, sizeof(buff));
-	QWORD len = m_len;
+	UINT64 len = m_len;
 	for (; len >= sizeof(buff); len -= sizeof(buff)) {
 		pStream->Write(buff, sizeof(buff), nullptr);
 	}
