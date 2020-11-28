@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,8 @@ class CBaseMuxerInputPin;
 
 struct MuxerPacket {
 	CBaseMuxerInputPin* pPin;
-	REFERENCE_TIME rtStart, rtStop;
+	REFERENCE_TIME rtStart = INVALID_TIME;
+	REFERENCE_TIME rtStop = INVALID_TIME;
 	std::vector<NoInitByte> pData;
 	enum flag_t {
 		empty = 0,
@@ -40,13 +41,11 @@ struct MuxerPacket {
 		eos = 8,
 		bogus = 16
 	};
-	DWORD flags;
-	int index;
-	struct MuxerPacket(CBaseMuxerInputPin* pPin) {
+	DWORD flags = empty;
+	int index = -1;
+
+	MuxerPacket(CBaseMuxerInputPin* pPin) {
 		this->pPin = pPin;
-		rtStart = rtStop = INVALID_TIME;
-		flags = empty;
-		index = -1;
 	}
 
 	bool IsTimeValid() const { return !!(flags & timevalid); }
