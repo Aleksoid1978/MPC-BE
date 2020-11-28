@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,7 +82,7 @@ tp_udf_file udf_get_root(const HANDLE hDrive, const WORD partition_number)
 	tp_udf_tag tag = (tp_udf_tag)sector;
 	DWORD sec_size, max_sec, i, j;
 	DWORD MVDS_lba, MVDS_lba_end, MVDS_back_lba, MVDS_back_lba_end;
-	DWORD	FileDescriptorSequence_lba, FileDescriptorSequence_lba_end;
+	DWORD FileDescriptorSequence_lba, FileDescriptorSequence_lba_end;
 	DWORD partition_lba, parent_icb;
 	tp_udf_AnchorVolumeDescriptorPointer avd;
 	bool res, part_valid, vol_valid;
