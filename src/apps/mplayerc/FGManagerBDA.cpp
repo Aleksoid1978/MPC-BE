@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,6 +35,8 @@
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 
+#define CheckAndLogBDA(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg _T(": 0x%08x\n"), hr); return hr; }
+#define CheckAndLogBDANoRet(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg _T(": 0x%08x\n"), hr); }
 
 /// Format, Video MPEG2
 static const MPEG2VIDEOINFO sMpv_fmt = {
@@ -385,8 +387,8 @@ STDMETHODIMP CFGManagerBDA::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayL
 	CComPtr<IBaseFilter>		pReceiver;
 
 	LOG (L"\nCreating BDA filters...");
-	CheckAndLog (CreateKSFilter (&pNetwork,		KSCATEGORY_BDA_NETWORK_PROVIDER,	s.strBDANetworkProvider),	"BDA : Network provider creation");
-	if (FAILED(hr = CreateKSFilter (&pTuner,	KSCATEGORY_BDA_NETWORK_TUNER,		s.strBDATuner))) {
+	CheckAndLogBDA(CreateKSFilter (&pNetwork, KSCATEGORY_BDA_NETWORK_PROVIDER, s.strBDANetworkProvider), "BDA : Network provider creation");
+	if (FAILED(hr = CreateKSFilter (&pTuner, KSCATEGORY_BDA_NETWORK_TUNER, s.strBDATuner))) {
 		MessageBoxW(AfxGetApp()->GetMainWnd()->m_hWnd, ResStr(IDS_BDA_ERROR_CREATE_TUNER), ResStr(IDS_BDA_ERROR), MB_ICONERROR | MB_OK);
 		DLog(L"BDA : Network tuner creation"" :0x%08x",hr);
 		return hr;
@@ -503,11 +505,11 @@ STDMETHODIMP CFGManagerBDA::SetFrequency(ULONG freq)
 	CheckPointer (m_pBDAControl, E_FAIL);
 	CheckPointer (m_pBDAFreq,	 E_FAIL);
 
-	CheckAndLog (m_pBDAControl->StartChanges(),					"BDA : Setfrequency StartChanges");
-	CheckAndLog (m_pBDAFreq->put_Bandwidth(s.iBDABandwidth),		"BDA : Setfrequency put_Bandwidth");
-	CheckAndLog (m_pBDAFreq->put_Frequency(freq),				"BDA : Setfrequency put_Frequency");
-	CheckAndLog (m_pBDAControl->CheckChanges(),					"BDA : Setfrequency CheckChanges");
-	CheckAndLog (m_pBDAControl->CommitChanges(),				"BDA : Setfrequency CommitChanges");
+	CheckAndLogBDA(m_pBDAControl->StartChanges(),				"BDA : Setfrequency StartChanges");
+	CheckAndLogBDA(m_pBDAFreq->put_Bandwidth(s.iBDABandwidth),	"BDA : Setfrequency put_Bandwidth");
+	CheckAndLogBDA(m_pBDAFreq->put_Frequency(freq),				"BDA : Setfrequency put_Frequency");
+	CheckAndLogBDA(m_pBDAControl->CheckChanges(),				"BDA : Setfrequency CheckChanges");
+	CheckAndLogBDA(m_pBDAControl->CommitChanges(),				"BDA : Setfrequency CommitChanges");
 
 	return hr;
 }
