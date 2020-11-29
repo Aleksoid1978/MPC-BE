@@ -225,6 +225,8 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 
 	m_pPSCorrection.Release();
 	m_pConvertToInterlacePixelShader.Release();
+
+	FreeVideoSurfaces();
 }
 
 HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
