@@ -59,6 +59,3 @@ namespace Gdiplus
 #include "resource.h"
 #include "../../DSUtil/DSUtil.h"
 #include "mplayerc.h"
-
-#define CheckAndLog(x, msg)	hr = ##x; if (FAILED (hr)) { DLog(msg" : 0x%08x", hr); return hr; }
-#define CheckNoLog(x)		hr = ##x; if (FAILED (hr)) { return hr; }
