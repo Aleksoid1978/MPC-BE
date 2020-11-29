@@ -194,11 +194,14 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		}
 	}
 
+	BOOL ret;
+
 	if (m_hWndVR) {
-		DestroyWindow(m_hWndVR);
+		ret = DestroyWindow(m_hWndVR);
+		DLogIf(ret == 0, L"DestroyWindow failed (%s)!", HR2Str(HRESULT_FROM_WIN32(GetLastError())));
 	}
 
-	BOOL ret = UnregisterClassW(g_szClassName, AfxGetApp()->m_hInstance);
+	ret = UnregisterClassW(g_szClassName, AfxGetApp()->m_hInstance);
 	DLog(L"Unregistering '%s' class %s.", g_szClassName, ret ? L"completed successfully" : L"failed");
 }
 
