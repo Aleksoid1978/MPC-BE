@@ -168,15 +168,15 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	}
 
 	m_pFont.Release();
+	m_pSprite.Release();
 	m_pLine.Release();
-	m_pD3DDevEx.Release();
-	m_pD3DDevExRefresh.Release();
-
 	m_pAlphaBitmapTexture.Release();
-
 	CleanupRenderingEngine();
 
+	m_pD3DDevEx.Release();
+	m_pD3DDevExRefresh.Release();
 	m_pD3DEx.Release();
+
 	if (m_hDWMAPI) {
 		FreeLibrary(m_hDWMAPI);
 		m_hDWMAPI = nullptr;
