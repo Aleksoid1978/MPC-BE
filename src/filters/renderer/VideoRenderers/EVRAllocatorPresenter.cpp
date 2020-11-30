@@ -1666,9 +1666,9 @@ void CEVRAllocatorPresenter::CheckWaitingSampleFromMixer()
 
 void CEVRAllocatorPresenter::GetMixerThread()
 {
-	bool		bQuit	= false;
-	TIMECAPS	tc;
-	DWORD		dwResolution;
+	bool     bQuit = false;
+	TIMECAPS tc;
+	DWORD    dwResolution;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
 	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
@@ -1961,7 +1961,7 @@ void CEVRAllocatorPresenter::RenderThread()
 	// Tell Multimedia Class Scheduler we are a playback thread (increase priority)
 	HANDLE hAvrt = 0;
 	if (pfAvSetMmThreadCharacteristicsW) {
-		DWORD dwTaskIndex	= 0;
+		DWORD dwTaskIndex = 0;
 		hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
 		if (pfAvSetMmThreadPriority) {
 			pfAvSetMmThreadPriority (hAvrt, AVRT_PRIORITY_HIGH /*AVRT_PRIORITY_CRITICAL*/);

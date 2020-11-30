@@ -146,7 +146,7 @@ namespace GothSync
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
 		D3DTEXTUREFILTERTYPE		m_filter;
-		D3DPRESENT_PARAMETERS		pp;
+		D3DPRESENT_PARAMETERS		m_pp;
 
 		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_PICTURE_SLOTS];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_PICTURE_SLOTS];

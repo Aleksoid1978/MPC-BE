@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2018 see Authors.txt
+ * (C) 2013-2020 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ class CGPUUsage
 	typedef int (*ADL_OVERDRIVE5_CURRENTACTIVITY_GET)(int iAdapterIndex, ADLPMActivity *lpActivity);
 
 	typedef int (*ADL_OVERDRIVE6_CAPABILITIES_GET)(int iAdapterIndex, ADLOD6Capabilities *lpODCapabilities);
-	typedef int	(*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
+	typedef int (*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
 
 	typedef int (*ADL2_OVERDRIVEN_CAPABILITIES_GET)(ADL_CONTEXT_HANDLE, int, ADLODNCapabilities*);
 	typedef int (*ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET)(ADL_CONTEXT_HANDLE, int, ADLODNPerformanceStatus*);
