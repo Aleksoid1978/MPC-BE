@@ -19,7 +19,9 @@
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
 ; IDP: Download plugin for Inno Setup : https://bitbucket.org/mitrich_k/inno-download-plugin/downloads
-#include <idp.iss>
+#if VER < EncodeVer(6,1,0)
+  #include <idp.iss>
+#endif
 
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
 #define localize
@@ -169,17 +171,19 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 ; Include installer's custom messages
 #include "custom_messages.iss"
 
-#ifdef localize
-  #include <idplang\czech.iss>
-  #include <idplang\default.iss>
-  #include <idplang\french.iss>
-  #include <idplang\german.iss>
-  #include <idplang\hungarian.iss>
-  #include <idplang\italian.iss>
-  #include <idplang\polish.iss>
-  #include <idplang\russian.iss>
-  #include <idplang\slovak.iss>
-  #include <idplang\spanish.iss>
+#if VER < EncodeVer(6,1,0)
+  #ifdef localize
+    #include <idplang\czech.iss>
+    #include <idplang\default.iss>
+    #include <idplang\french.iss>
+    #include <idplang\german.iss>
+    #include <idplang\hungarian.iss>
+    #include <idplang\italian.iss>
+    #include <idplang\polish.iss>
+    #include <idplang\russian.iss>
+    #include <idplang\slovak.iss>
+    #include <idplang\spanish.iss>
+  #endif
 #endif
 
 [Messages]
@@ -299,6 +303,11 @@ const
 
 function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THandle; external 'LoadLibraryExW@kernel32.dll stdcall';
 function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
+
+#if VER >= EncodeVer(6,1,0)
+var
+  DownloadPage: TDownloadWizardPage;
+#endif
 
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
@@ -516,12 +525,38 @@ procedure CurPageChanged(CurPageID: Integer);
 begin
   if CurPageID = wpReady then
   begin
+#if VER < EncodeVer(6,1,0)
     idpClearFiles;
-
     if IsComponentSelected('intel_msdk') then
       idpAddFile('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', ExpandConstant('{tmp}\{#msdk_dll_zip}'));
+#endif
   end;
 end;
+
+#if VER >= EncodeVer(6,1,0)
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  if CurPageID = wpReady then
+  begin
+    DownloadPage.Clear;
+    if IsComponentSelected('intel_msdk') then begin
+      DownloadPage.Add('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', '{#msdk_dll_zip}', '');
+      DownloadPage.Show;
+      try
+        try
+          DownloadPage.Download;
+        except
+          SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
+        end;
+      finally
+        DownloadPage.Hide;
+      end;
+    end;
+  end;
+
+  Result := True;
+end;
+#endif
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
@@ -530,7 +565,7 @@ begin
 
   // When uninstalling, ask the user to delete settings
   if ((CurUninstallStep = usUninstall) and SettingsExist()) then
-   begin
+  begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
     begin
       DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders\*.psh'), False, True, False);
@@ -623,5 +658,9 @@ begin
   WizardForm.ComponentsList.Checked[6] := False;
 #endif
 
+#if VER < EncodeVer(6,1,0)
   idpDownloadAfter(wpReady);
+#else
+  DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
+#endif
 end;
