@@ -143,12 +143,20 @@ Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
 Name: cz; MessagesFile: compiler:Languages\Czech.isl
 Name: de; MessagesFile: Languages\German.isl
+#if VER < EncodeVer(6,0,0)
 Name: el; MessagesFile: compiler:Languages\Greek.isl
+#else
+Name: el; MessagesFile: Languages\Greek.isl
+#endif
 Name: es; MessagesFile: compiler:Languages\Spanish.isl
 Name: eu; MessagesFile: Languages\Basque.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
 Name: he; MessagesFile: compiler:Languages\Hebrew.isl
+#if VER < EncodeVer(6,0,0)
 Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
+#else
+Name: hu; MessagesFile: Languages\Hungarian.isl
+#endif
 #if VER < EncodeVer(6,0,0)
 Name: hy; MessagesFile: compiler:Languages\Armenian.islu
 #else
