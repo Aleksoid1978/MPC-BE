@@ -73,7 +73,7 @@ namespace DSObjects
 
 		CComPtr<IUnknown> m_pDXR;
 		CComPtr<ISubRenderCallback> m_pSRCB;
-		CSize	m_ScreenSize;
+		CSize m_ScreenSize;
 
 	public:
 		CDXRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error);
