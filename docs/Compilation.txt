@@ -3,18 +3,18 @@
  Visual Studio 2017
   1. Install Visual Studio 2017 v15.5.7 or later (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
-     * VC++ 2017 v141 toolset
+     * VC++ 2017 v141 tools
+     * Windows SDK 10.0.17763.0
      * Visual C++ ATL support
-     * MFC and ATL support
-     * Windows 8.1 SDK".
+     * Visual C++ MFC support
  
  Visual Studio 2019
   1. Install Visual Studio 2019 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
-     * MSVC v142 - VS2019 C++ Build Tools
-     * Visual C++ ATL support
-     * MFC and ATL support
-     * SDK for Windows 10(latest).
+     * MSVC v142 - Build Tools C++ 
+     * Windows SDK 10.0.17763.0 or newer (latest).
+     * C++ ATL support
+     * C++ MFC support
 
   Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
