@@ -138,30 +138,19 @@ SignTool=OpenSourceSign
 Name: en; MessagesFile: compiler:Default.isl
 
 #ifdef localize
+#if VER < EncodeVer(6,0,0)
 Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
 Name: cz; MessagesFile: compiler:Languages\Czech.isl
-Name: de; MessagesFile: Languages\German.isl
-#if VER < EncodeVer(6,0,0)
+Name: de; MessagesFile: compiler:Languages\German.isl
 Name: el; MessagesFile: compiler:Languages\Greek.isl
-#else
-Name: el; MessagesFile: Languages\Greek.isl
-#endif
 Name: es; MessagesFile: compiler:Languages\Spanish.isl
 Name: eu; MessagesFile: Languages\Basque.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
 Name: he; MessagesFile: compiler:Languages\Hebrew.isl
-#if VER < EncodeVer(6,0,0)
 Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
-#else
-Name: hu; MessagesFile: Languages\Hungarian.isl
-#endif
-#if VER < EncodeVer(6,0,0)
 Name: hy; MessagesFile: compiler:Languages\Armenian.islu
-#else
-Name: hy; MessagesFile: compiler:Languages\Armenian.isl
-#endif
 Name: it; MessagesFile: compiler:Languages\Italian.isl
 Name: ja; MessagesFile: compiler:Languages\Japanese.isl
 Name: kr; MessagesFile: Languages\Korean.isl
@@ -169,12 +158,39 @@ Name: nl; MessagesFile: compiler:Languages\Dutch.isl
 Name: pl; MessagesFile: compiler:Languages\Polish.isl
 Name: ro; MessagesFile: Languages\Romanian.isl
 Name: ru; MessagesFile: compiler:Languages\Russian.isl
-Name: sc; MessagesFile: Languages\ChineseSimplified.isl
+Name: sc; MessagesFile: Languages\ChineseSimplified.islu
 Name: sv; MessagesFile: Languages\Swedish.isl
 Name: sk; MessagesFile: Languages\Slovak.isl
-Name: tc; MessagesFile: Languages\ChineseTraditional.isl
+Name: tc; MessagesFile: Languages\ChineseTraditional.islu
 Name: tr; MessagesFile: compiler:Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
+#else
+Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
+Name: by; MessagesFile: Languages\Belarusian.isl
+Name: ca; MessagesFile: compiler:Languages\Catalan.isl
+Name: cz; MessagesFile: compiler:Languages\Czech.isl
+Name: de; MessagesFile: compiler:Languages\German.isl
+Name: el; MessagesFile: Languages\Greek.isl
+Name: es; MessagesFile: compiler:Languages\Spanish.isl
+Name: eu; MessagesFile: Languages\Basque.isl
+Name: fr; MessagesFile: compiler:Languages\French.isl
+Name: he; MessagesFile: compiler:Languages\Hebrew.isl
+Name: hu; MessagesFile: Languages\Hungarian.isl
+Name: hy; MessagesFile: compiler:Languages\Armenian.isl
+Name: it; MessagesFile: compiler:Languages\Italian.isl
+Name: ja; MessagesFile: compiler:Languages\Japanese.isl
+Name: kr; MessagesFile: Languages\Korean.isl
+Name: nl; MessagesFile: compiler:Languages\Dutch.isl
+Name: pl; MessagesFile: compiler:Languages\Polish.isl
+Name: ro; MessagesFile: Languages\Romanian.isl
+Name: ru; MessagesFile: compiler:Languages\Russian.isl
+Name: sc; MessagesFile: Languages\ChineseSimplified.islu
+Name: sv; MessagesFile: Languages\Swedish.isl
+Name: sk; MessagesFile: compiler:Languages\Slovak.isl
+Name: tc; MessagesFile: Languages\ChineseTraditional.islu
+Name: tr; MessagesFile: compiler:Languages\Turkish.isl
+Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
+#endif
 #endif
 
 ; Include installer's custom messages
