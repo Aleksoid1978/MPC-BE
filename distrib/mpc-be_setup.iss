@@ -16,6 +16,15 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if VER < EncodeVer(5,5,8)
+  #error A more recent version of Inno Setup 5 is required to compile this script (5.5.8 or newer)
+#elif VER >= EncodeVer(6,0,0) && VER < EncodeVer(6,1,0)
+  #error A more recent version of Inno Setup 6 is required to compile this script (6.1.0 or newer)
+#endif
+#ifndef UNICODE
+  #error Use the Unicode Inno Setup
+#endif
+
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
 ; IDP: Download plugin for Inno Setup : https://bitbucket.org/mitrich_k/inno-download-plugin/downloads
@@ -30,14 +39,6 @@
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
 ; From now on you shouldn't need to change anything
-
-#if VER < EncodeVer(5,5,8)
-  #error Update your Inno Setup version (5.5.8 or newer)
-#endif
-
-#ifndef UNICODE
-  #error Use the Unicode Inno Setup
-#endif
 
 #define ISPP_INVOKED
 #include "..\include\Version.h"
