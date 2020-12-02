@@ -1364,12 +1364,12 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, str)) {
 		swscanf_s(str, L"%u", &nMouseLeftDblClick);
-		if (nMouseLeftDblClick != ID_MENU_PLAYER_SHORT || nMouseLeftDblClick != ID_MENU_PLAYER_LONG) {
-			nMouseLeftDblClick = 0;
-		}
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_RIGHT, str)) {
 		swscanf_s(str, L"%u", &nMouseRightClick);
+		if (nMouseRightClick != ID_MENU_PLAYER_SHORT || nMouseRightClick != ID_MENU_PLAYER_LONG) {
+			nMouseRightClick = 0;
+		}
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE, str)) {
 		swscanf_s(str, L"%u;%u;%u;%u", &MouseMiddleClick.normal, &MouseMiddleClick.ctrl, &MouseMiddleClick.shift, &MouseMiddleClick.rbtn);
