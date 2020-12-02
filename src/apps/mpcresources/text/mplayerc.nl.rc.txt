@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exporteren"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Linkermuisknop"
 6		"Klikken"
 8		"Recent bestand openen als er niets wordt geladen"
 10		"Dubbelklikken"
-13		"Resetten"
+12		"Right button click"
+15		"Resetten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1152,6 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Menu Audiotaal"
 STRING IDS_AG_MENU_FAVORITES		"Favorietenmenu"
 STRING IDS_AG_MENU_FILTERS		"Menu Filters"
 STRING IDS_AG_MENU_JUMPTO		"Menu Spring Naar..."
+STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Weergave Menu (lang)"
 STRING IDS_AG_MENU_PLAYER_S		"Weergave Menu (kort)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Menu Ondertitelingstaal"

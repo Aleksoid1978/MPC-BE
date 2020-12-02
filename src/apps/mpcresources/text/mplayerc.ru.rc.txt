@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Экспорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Левая кнопка"
 6		"Щелчок"
 8		"Если ничего не загружено, то открыть последний файл"
 10		"Двойной щелчок"
-13		"По умолчанию"
+12		"Щелчок правой кнопкой"
+15		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1152,6 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Меню Язык Аудио"
 STRING IDS_AG_MENU_FAVORITES		"Меню закладок"
 STRING IDS_AG_MENU_FILTERS		"Меню фильтров"
 STRING IDS_AG_MENU_JUMPTO		"Меню Перейти..."
+STRING IDS_AG_MENU_PLAYER_A		"Меню проигрывателя (авто)"
 STRING IDS_AG_MENU_PLAYER_L		"Меню проигрывателя (полное)"
 STRING IDS_AG_MENU_PLAYER_S		"Меню проигрывателя (сокращенное)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Меню Язык Субтитров"

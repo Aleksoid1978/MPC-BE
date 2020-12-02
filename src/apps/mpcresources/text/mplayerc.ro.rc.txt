@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportă"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Left button"
 6		"Click"
 8		"If nothing is loaded, open recent file"
 10		"Double click"
-13		"Default"
+12		"Right button click"
+15		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1152,6 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Menu Audio Language"
 STRING IDS_AG_MENU_FAVORITES		"Favorites menu"
 STRING IDS_AG_MENU_FILTERS		"Meniu filtre"
 STRING IDS_AG_MENU_JUMPTO		"Menu Jump To..."
+STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Meniu player (lung)"
 STRING IDS_AG_MENU_PLAYER_S		"Meniu player (scurt)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Menu Subtitle Language"

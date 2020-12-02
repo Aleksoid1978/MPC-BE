@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Εξαγωγή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Αριστερό πλήκτρο"
 6		"Κλικ"
 8		"Εάν δεν έχει φορτωθεί τίποτα, ανοίξτε το πρόσφατο αρχείο"
 10		"Διπλό κλικ"
-13		"Προεπιλογή"
+12		"Right button click"
+15		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1152,6 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Μενού Γλώσσας ήχου"
 STRING IDS_AG_MENU_FAVORITES		"Μενού Αγαπημένα"
 STRING IDS_AG_MENU_FILTERS		"Μενού φίλτρων"
 STRING IDS_AG_MENU_JUMPTO		"Μενού Μετάβαση σε..."
+STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Μενού αναπαραγωγού (ευρύ)"
 STRING IDS_AG_MENU_PLAYER_S		"Μενού αναπαραγωγού (σύντομο)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Μενού Γλώσσας υποτίτλων"

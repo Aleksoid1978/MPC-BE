@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportieren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Linke Maustaste"
 6		"Einfacher Klick"
 8		"Wenn nichts geladen ist, die letzte Datei öffnen"
 10		"Doppelklick"
-13		"Zurücksetzen"
+12		"Right button click"
+15		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1152,6 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Menü: Audiospur"
 STRING IDS_AG_MENU_FAVORITES		"Favoriten"
 STRING IDS_AG_MENU_FILTERS		"Menü: Filter"
 STRING IDS_AG_MENU_JUMPTO		"Zu Menü springen..."
+STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Player-Kontextmenü (lang)"
 STRING IDS_AG_MENU_PLAYER_S		"Player-Kontextmenü (kurz)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Menü: Untertitelspur"

@@ -1048,7 +1048,8 @@
 #define IDS_AG_MOUSE                    32836
 #define IDS_AG_MOUSE_FS                 32837
 #define IDS_AG_APP_COMMAND              32838
-#define IDS_AG_AUDIO_FILE               32841
+#define IDS_AG_MENU_PLAYER_A            32840
+#define IDS_AG_AUDIO_FILE               32868
 #define IDS_AG_PLAYLIST_FILE            32869
 #define IDS_AG_OTHER                    32870
 #define IDS_AG_MEDIAFILES               32871

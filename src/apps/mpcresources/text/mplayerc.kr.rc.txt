@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"내보내기"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Left button"
 6		"Click"
 8		"If nothing is loaded, open recent file"
 10		"Double click"
-13		"Default"
+12		"Right button click"
+15		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1161,6 +1162,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"메뉴 오디오 언어"
 STRING IDS_AG_MENU_FAVORITES		"Favorites menu"
 STRING IDS_AG_MENU_FILTERS		"필터 메뉴"
 STRING IDS_AG_MENU_JUMPTO		"메뉴 이동..."
+STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"플레이어 메뉴 (길게)"
 STRING IDS_AG_MENU_PLAYER_S		"플레이어 메뉴 (짧게)"
 STRING IDS_AG_MENU_SUBTITLELANG		"메뉴 자막 언어"

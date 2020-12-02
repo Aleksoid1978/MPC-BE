@@ -350,12 +350,13 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 14
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 5		"Bal gomb"
 6		"Kattintás"
 8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
 10		"Dupla kattintás"
-13		"Alapértelmezett"
+12		"Right button click"
+15		"Alapértelmezett"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1152,6 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Menü hang nyelve"
 STRING IDS_AG_MENU_FAVORITES		"Kedvencek menü"
 STRING IDS_AG_MENU_FILTERS		"Szűrők menü"
 STRING IDS_AG_MENU_JUMPTO		"Menü Ugrás a..."
+STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Lejátszó menü (hosszú)"
 STRING IDS_AG_MENU_PLAYER_S		"Lejátszó menü (rövid)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Menü felirat nyelve"

@@ -736,6 +736,7 @@ void CAppSettings::ResetSettings()
 	// Mouse
 	nMouseLeftClick     = ID_PLAY_PLAYPAUSE;
 	nMouseLeftDblClick  = ID_VIEW_FULLSCREEN;
+	nMouseRightClick    = 0;
 	MouseMiddleClick    = { 0, 0, 0, 0 };
 	MouseX1Click        = { ID_NAVIGATE_SKIPBACK, 0, 0, 0 };
 	MouseX2Click        = { ID_NAVIGATE_SKIPFORWARD, 0, 0, 0 };
@@ -1363,6 +1364,12 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, str)) {
 		swscanf_s(str, L"%u", &nMouseLeftDblClick);
+		if (nMouseLeftDblClick != ID_MENU_PLAYER_SHORT || nMouseLeftDblClick != ID_MENU_PLAYER_LONG) {
+			nMouseLeftDblClick = 0;
+		}
+	}
+	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_RIGHT, str)) {
+		swscanf_s(str, L"%u", &nMouseRightClick);
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE, str)) {
 		swscanf_s(str, L"%u;%u;%u;%u", &MouseMiddleClick.normal, &MouseMiddleClick.ctrl, &MouseMiddleClick.shift, &MouseMiddleClick.rbtn);
@@ -2002,6 +2009,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT, str);
 	str.Format(L"%u", nMouseLeftDblClick);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, str);
+	str.Format(L"%u", nMouseRightClick);
+	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_RIGHT, str);
 	str.Format(L"%u;%u;%u;%u", MouseMiddleClick.normal, MouseMiddleClick.ctrl, MouseMiddleClick.shift, MouseMiddleClick.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_MIDDLE, str);
 	str.Format(L"%u;%u;%u;%u", MouseX1Click.normal, MouseX1Click.ctrl, MouseX1Click.shift, MouseX1Click.rbtn);
