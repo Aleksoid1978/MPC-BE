@@ -242,7 +242,6 @@ BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
 	ON_NOTIFY(LVN_BEGINLABELEDITW, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDITW, IDC_LIST1, OnEndlabeleditList)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedReset)
 END_MESSAGE_MAP()
 
@@ -315,30 +314,6 @@ void CPPageMouse::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	*pResult = FALSE;
-}
-
-void CPPageMouse::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
-{
-	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
-
-	switch (pLVCD->nmcd.dwDrawStage) {
-	case CDDS_PREPAINT:
-		*pResult = CDRF_NOTIFYITEMDRAW;
-		break;
-	case CDDS_ITEMPREPAINT:
-		*pResult = CDRF_NOTIFYSUBITEMDRAW;
-		break;
-	case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
-		if (4 == pLVCD->iSubItem && pLVCD->nmcd.dwItemSpec == 3) {
-			pLVCD->clrText = GetSysColor(COLOR_MENUTEXT);
-			pLVCD->clrTextBk = GetSysColor(COLOR_MENU);
-		} else {
-			pLVCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
-			pLVCD->clrTextBk = GetSysColor(COLOR_WINDOW);
-		}
-		*pResult = CDRF_DODEFAULT;
-		break;
-	}
 }
 
 void CPPageMouse::OnBnClickedReset()

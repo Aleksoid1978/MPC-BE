@@ -109,6 +109,5 @@ public:
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBnClickedReset();
 };
