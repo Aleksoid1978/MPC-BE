@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Κλικ"
 8		"Εάν δεν έχει φορτωθεί τίποτα, ανοίξτε το πρόσφατο αρχείο"
 10		"Διπλό κλικ"
-12		"Right button click"
+12		"Right click"
 15		"Προεπιλογή"
 END
 

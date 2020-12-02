@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Klikken"
 8		"Recent bestand openen als er niets wordt geladen"
 10		"Dubbelklikken"
-12		"Right button click"
+12		"Right click"
 15		"Resetten"
 END
 

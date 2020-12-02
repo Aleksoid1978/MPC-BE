@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"單按"
 8		"如未有載入內容，則開啟最近檔案"
 10		"雙按"
-12		"Right button click"
+12		"Right click"
 15		"重設"
 END
 

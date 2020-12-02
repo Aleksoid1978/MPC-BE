@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Клацання"
 8		"Якщо нічого не завантажено, то відкрити останній файл"
 10		"Подвійне клацання"
-12		"Right button click"
+12		"Right click"
 15		"За замовчуванням"
 END
 

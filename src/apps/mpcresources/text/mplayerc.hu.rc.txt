@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Kattintás"
 8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
 10		"Dupla kattintás"
-12		"Right button click"
+12		"Right click"
 15		"Alapértelmezett"
 END
 
