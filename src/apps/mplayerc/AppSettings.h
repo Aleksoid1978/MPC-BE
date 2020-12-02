@@ -605,6 +605,7 @@ public:
 	UINT			nMouseLeftClick;
 	bool			bMouseLeftClickOpenRecent;
 	UINT			nMouseLeftDblClick;
+	UINT			nMouseRightClick;
 	struct MOUSE_ASSIGNMENT {
 		UINT normal;
 		UINT ctrl;

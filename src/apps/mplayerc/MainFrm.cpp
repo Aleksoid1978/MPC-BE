@@ -3748,7 +3748,12 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 	if (m_bWaitingRButtonUp) {
 		m_bWaitingRButtonUp = false;
 		SetFocus();
-		SendMessageW(WM_COMMAND, ID_MENU_PLAYER_SHORT);
+
+		UINT cmd = AfxGetAppSettings().nMouseRightClick;
+		if (cmd == 0) {
+			cmd = (!IsMainMenuVisible() || IsD3DFullScreenMode()) ? ID_MENU_PLAYER_LONG : ID_MENU_PLAYER_SHORT;
+		}
+		SendMessageW(WM_COMMAND, cmd);
 	}
 }
 
@@ -4241,7 +4246,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 
 void CMainFrame::OnMenuPlayerShort()
 {
-	OnMenu((!IsMainMenuVisible() || IsD3DFullScreenMode()) ? m_popupMainMenu.GetSubMenu(0) : m_popupMenu.GetSubMenu(0));
+	OnMenu(m_popupMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuPlayerLong()

@@ -31,6 +31,7 @@ class CPPageMouse : public CPPageBase
 
 	CComboBox m_cmbLeftBottonClick;
 	CComboBox m_cmbLeftBottonDblClick;
+	CComboBox m_cmbRightBottonClick;
 
 	CButton m_chkMouseLeftClickOpenRecent;
 
@@ -108,5 +109,6 @@ public:
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBnClickedReset();
 };

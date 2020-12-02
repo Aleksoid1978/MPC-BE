@@ -76,6 +76,7 @@ void CPPageMouse::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_COMBO1, m_cmbLeftBottonClick);
 	DDX_Control(pDX, IDC_COMBO2, m_cmbLeftBottonDblClick);
+	DDX_Control(pDX, IDC_COMBO3, m_cmbRightBottonClick);
 	DDX_Control(pDX, IDC_CHECK1, m_chkMouseLeftClickOpenRecent);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
@@ -125,6 +126,11 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
 	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
 	SelectByItemData(m_cmbLeftBottonDblClick, s.nMouseLeftDblClick);
+
+	AddStringData(m_cmbRightBottonClick, ResStr(IDS_AG_MENU_PLAYER_A), 0);
+	AddStringData(m_cmbRightBottonClick, ResStr(IDS_AG_MENU_PLAYER_S), ID_MENU_PLAYER_SHORT);
+	AddStringData(m_cmbRightBottonClick, ResStr(IDS_AG_MENU_PLAYER_L), ID_MENU_PLAYER_LONG);
+	SelectByItemData(m_cmbRightBottonClick, s.nMouseRightClick);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(s.bMouseLeftClickOpenRecent ? BST_CHECKED : BST_UNCHECKED);
 
@@ -196,6 +202,7 @@ BOOL CPPageMouse::OnApply()
 
 	s.nMouseLeftClick    = (UINT)GetCurItemData(m_cmbLeftBottonClick);
 	s.nMouseLeftDblClick = (UINT)GetCurItemData(m_cmbLeftBottonDblClick);
+	s.nMouseRightClick   = (UINT)GetCurItemData(m_cmbRightBottonClick);
 
 	s.bMouseLeftClickOpenRecent = !!m_chkMouseLeftClickOpenRecent.GetCheck();
 
@@ -235,6 +242,7 @@ BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
 	ON_NOTIFY(LVN_BEGINLABELEDITW, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDITW, IDC_LIST1, OnEndlabeleditList)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedReset)
 END_MESSAGE_MAP()
 
@@ -309,12 +317,37 @@ void CPPageMouse::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = FALSE;
 }
 
+void CPPageMouse::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
+
+	switch (pLVCD->nmcd.dwDrawStage) {
+	case CDDS_PREPAINT:
+		*pResult = CDRF_NOTIFYITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT:
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+		break;
+	case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
+		if (4 == pLVCD->iSubItem && pLVCD->nmcd.dwItemSpec == 3) {
+			pLVCD->clrText = GetSysColor(COLOR_MENUTEXT);
+			pLVCD->clrTextBk = GetSysColor(COLOR_MENU);
+		} else {
+			pLVCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
+			pLVCD->clrTextBk = GetSysColor(COLOR_WINDOW);
+		}
+		*pResult = CDRF_DODEFAULT;
+		break;
+	}
+}
+
 void CPPageMouse::OnBnClickedReset()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
 	SelectByItemData(m_cmbLeftBottonClick, ID_PLAY_PLAYPAUSE);
 	SelectByItemData(m_cmbLeftBottonDblClick, ID_VIEW_FULLSCREEN);
+	SelectByItemData(m_cmbRightBottonClick, 0);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(BST_UNCHECKED);
 
