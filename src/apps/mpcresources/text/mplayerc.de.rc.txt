@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Einfacher Klick"
 8		"Wenn nichts geladen ist, die letzte Datei öffnen"
 10		"Doppelklick"
-12		"Right click"
+12		"Rechtsklick"
 15		"Zurücksetzen"
 END
 
@@ -1153,7 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Menü: Audiospur"
 STRING IDS_AG_MENU_FAVORITES		"Favoriten"
 STRING IDS_AG_MENU_FILTERS		"Menü: Filter"
 STRING IDS_AG_MENU_JUMPTO		"Zu Menü springen..."
-STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
+STRING IDS_AG_MENU_PLAYER_A		"Player-Kontextmenü (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Player-Kontextmenü (lang)"
 STRING IDS_AG_MENU_PLAYER_S		"Player-Kontextmenü (kurz)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Menü: Untertitelspur"
