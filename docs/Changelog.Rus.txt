@@ -85,7 +85,7 @@ ShellExt
 Обновлен греческий перевод (автор George).
 
 Обновлены библиотеки:
-	dav1d git-0.7.1-72-gf90ada0;
+	dav1d git-0.8.0-2-gd6beb0a;
 	ffmpeg git-n4.4-dev-1730-g3da35b7cc7;
 	Little-CMS git-2.11-23-g5f7853e;
 	MediaInfo git-v20.09-15-g02863500;
