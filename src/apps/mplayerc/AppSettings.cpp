@@ -1367,7 +1367,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_RIGHT, str)) {
 		swscanf_s(str, L"%u", &nMouseRightClick);
-		if (nMouseRightClick != ID_MENU_PLAYER_SHORT || nMouseRightClick != ID_MENU_PLAYER_LONG) {
+		if (nMouseRightClick != ID_MENU_PLAYER_SHORT && nMouseRightClick != ID_MENU_PLAYER_LONG) {
 			nMouseRightClick = 0;
 		}
 	}
