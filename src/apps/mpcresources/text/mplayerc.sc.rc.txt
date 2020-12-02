@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"点击"
 8		"如果未加载任何内容，则打开最近使用的文件"
 10		"双击"
-12		"Right button click"
+12		"Right click"
 15		"重置"
 END
 

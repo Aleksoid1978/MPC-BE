@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Einfacher Klick"
 8		"Wenn nichts geladen ist, die letzte Datei öffnen"
 10		"Doppelklick"
-12		"Right button click"
+12		"Right click"
 15		"Zurücksetzen"
 END
 
