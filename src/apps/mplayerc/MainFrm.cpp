@@ -4218,6 +4218,11 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 {
 	CheckPointer(pMenu, FALSE);
 
+	// skip empty menu
+	if (!pMenu->GetMenuItemCount()) {
+		return FALSE;
+	}
+
 	// Do not show popup menu in D3D fullscreen it has several adverse effects.
 	if (CursorOnD3DFullScreenWindow()) {
 		return FALSE;
