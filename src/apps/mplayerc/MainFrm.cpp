@@ -2413,7 +2413,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case TIMER_STREAMPOSPOLLER:
 			if (m_eMediaLoadState == MLS_LOADED) {
-
 				if (m_bFullScreen) {
 					// Get the position of the cursor outside the window in fullscreen mode
 					POINT pos;
@@ -8345,6 +8344,8 @@ void CMainFrame::SetTimersPlay()
 
 void CMainFrame::KillTimersStop()
 {
+	OnTimer(TIMER_STREAMPOSPOLLER);
+
 	KillTimer(TIMER_STREAMPOSPOLLER2);
 	KillTimer(TIMER_STREAMPOSPOLLER);
 	KillTimer(TIMER_STATS);
