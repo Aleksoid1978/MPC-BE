@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 6		"Kattintás"
 8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
 10		"Dupla kattintás"
-12		"Right click"
+12		"Jobb kattintás"
 15		"Alapértelmezett"
 END
 
@@ -1153,7 +1153,7 @@ STRING IDS_AG_MENU_AUDIOLANG		"Menü hang nyelve"
 STRING IDS_AG_MENU_FAVORITES		"Kedvencek menü"
 STRING IDS_AG_MENU_FILTERS		"Szűrők menü"
 STRING IDS_AG_MENU_JUMPTO		"Menü Ugrás a..."
-STRING IDS_AG_MENU_PLAYER_A		"Player Menu (auto)"
+STRING IDS_AG_MENU_PLAYER_A		"Lejátszó menü (auto)"
 STRING IDS_AG_MENU_PLAYER_L		"Lejátszó menü (hosszú)"
 STRING IDS_AG_MENU_PLAYER_S		"Lejátszó menü (rövid)"
 STRING IDS_AG_MENU_SUBTITLELANG		"Menü felirat nyelve"
