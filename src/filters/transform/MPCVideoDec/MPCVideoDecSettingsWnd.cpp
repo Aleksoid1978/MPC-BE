@@ -407,6 +407,7 @@ void CMPCVideoDecSettingsWnd::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == m_nTimerID) {
 		KillTimer(m_nTimerID);
 		UpdateStatusInfo();
+		SetDirty(false);
 	}
 	else {
 		__super::OnTimer(nIDEvent);
