@@ -359,17 +359,17 @@ void COSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
 	m_MemDC.Rectangle(rect);
 }
 
-void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
+void COSD::DrawSlider(CRect* rect, __int64 llStop, __int64 llPos)
 {
 	m_rectBar.left		= rect->left  + 10;
 	m_rectBar.right		= rect->right - 10;
 	m_rectBar.top		= rect->top   + (rect->Height() - SliderBarHeight) / 2;
 	m_rectBar.bottom	= m_rectBar.top + SliderBarHeight;
 
-	if (llMax == llMin) {
+	if (llStop == 0) {
 		m_rectCursor.left	= m_rectBar.left;
 	} else {
-		m_rectCursor.left	= m_rectBar.left + (long)((m_rectBar.Width() - SliderCursorWidth) * llPos / (llMax-llMin));
+		m_rectCursor.left	= m_rectBar.left + (long)((m_rectBar.Width() - SliderCursorWidth) * llPos / llStop);
 	}
 
 	m_rectCursor.right		= m_rectCursor.left + SliderCursorWidth;
@@ -382,11 +382,11 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 	if (AfxGetAppSettings().fChapterMarker) {
 		CAutoLock lock(&m_CBLock);
 
-		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && llMax != llMin) {
+		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && llStop != 0) {
 			REFERENCE_TIME rt;
 			for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); ++i) {
 				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, nullptr))) {
-					__int64 pos = m_rectBar.Width() * rt / (llMax - llMin);
+					__int64 pos = m_rectBar.Width() * rt / llStop;
 					if (pos < 0) {
 						continue;
 					}
@@ -523,7 +523,7 @@ void COSD::InvalidateBitmapOSD()
 	memsetd(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3));
 
 	if (m_bSeekBarVisible) {
-		DrawSlider(&m_rectSeekBar, m_llSeekMin, m_llSeekMax, m_llSeekPos);
+		DrawSlider(&m_rectSeekBar, m_llSeekStop, m_llSeekPos);
 	}
 	if (m_bFlyBarVisible) {
 		DrawFlyBar(&m_rectFlyBar);
@@ -539,9 +539,8 @@ void COSD::InvalidateBitmapOSD()
 
 void COSD::UpdateSeekBarPos(CPoint point)
 {
-	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax - m_llSeekMin) / (m_rectBar.Width() - SliderCursorWidth);
-	m_llSeekPos = std::max(m_llSeekPos, m_llSeekMin);
-	m_llSeekPos = std::min(m_llSeekPos, m_llSeekMax);
+	m_llSeekPos = (point.x - m_rectBar.left) * m_llSeekStop / (m_rectBar.Width() - SliderCursorWidth);
+	m_llSeekPos = std::clamp(m_llSeekPos, 0ll, m_llSeekStop);
 
 	if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
 		m_pMainFrame->GetClosestKeyFrame(m_llSeekPos);
@@ -673,24 +672,31 @@ __int64 COSD::GetPos() const
 	return m_llSeekPos;
 }
 
+
+__int64 COSD::GetRange() const
+{
+	return m_llSeekStop;
+}
+
 void COSD::SetPos(__int64 pos)
 {
+	SetPosAndRange(pos, m_llSeekStop);
+}
+
+void COSD::SetRange(__int64 stop)
+{
+	SetPosAndRange(m_llSeekPos, stop);
+}
+
+void COSD::SetPosAndRange(__int64 pos, __int64 stop)
+{
+	bool bUpdateSeekBar = (m_bSeekBarVisible && (m_llSeekPos != pos || m_llSeekStop != stop));
 	m_llSeekPos = pos;
-	if (m_bSeekBarVisible) {
+	m_llSeekStop = stop;
+	if (bUpdateSeekBar) {
 		InvalidateBitmapOSD();
+		DLog(L"COSD::SetPosAndRange");
 	}
-}
-
-void COSD::SetRange(__int64 start,  __int64 stop)
-{
-	m_llSeekMin = start;
-	m_llSeekMax = stop;
-}
-
-void COSD::GetRange(__int64& start, __int64& stop)
-{
-	start = m_llSeekMin;
-	stop  = m_llSeekMax;
 }
 
 void COSD::ClearMessage(bool hide)
@@ -705,19 +711,14 @@ void COSD::ClearMessage(bool hide)
 		m_nMessagePos = OSD_NOMESSAGE;
 	}
 
-	BOOL bRepaint = FALSE;
 	if (m_pMFVMB) {
-		bRepaint = TRUE; //???
 		m_pMFVMB->ClearAlphaBitmap();
 		DLog(L"IMFVideoMixerBitmap::ClearAlphaBitmap");
+		m_pMainFrame->RepaintVideo(); //???
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
 	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
 		PostMessageW(WM_HIDE);
-	}
-
-	if (bRepaint) {
-		m_pMainFrame->RepaintVideo();
 	}
 }
 
