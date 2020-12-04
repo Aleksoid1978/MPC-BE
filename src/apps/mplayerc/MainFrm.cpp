@@ -2507,8 +2507,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				m_wndSeekBar.Enable(!g_bNoDuration);
 				m_wndSeekBar.SetRange(rtDur);
 				m_wndSeekBar.SetPos(rtNow);
-				m_OSD.SetRange(0, rtDur);
-				m_OSD.SetPos(rtNow);
+				m_OSD.SetPosAndRange(rtNow, rtDur);
 				m_Lcd.SetMediaRange(0, rtDur);
 				m_Lcd.SetMediaPos(rtNow);
 

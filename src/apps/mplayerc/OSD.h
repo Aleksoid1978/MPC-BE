@@ -78,9 +78,10 @@ public:
 	void EnableShowMessage(bool bValue = true) { m_bShowMessage = bValue; };
 
 	__int64 GetPos() const;
+	__int64 GetRange() const;
 	void SetPos(__int64 pos);
-	void SetRange(__int64 start,  __int64 stop);
-	void GetRange(__int64& start, __int64& stop);
+	void SetRange(__int64 stop);
+	void SetPosAndRange(__int64 pos, __int64 stop);
 
 	void OnSize(UINT nType, int cx, int cy);
 	bool OnMouseMove(UINT nFlags, CPoint point);
@@ -140,9 +141,8 @@ private:
 	bool	m_bMouseOverCloseButton;
 	bool	m_bMouseOverExitButton;
 
-	__int64	m_llSeekMin;
-	__int64	m_llSeekMax;
-	__int64	m_llSeekPos;
+	__int64	m_llSeekStop = 0;
+	__int64	m_llSeekPos = 0;
 	HICON	icoExit;
 	HICON	icoExit_a;
 	HICON	icoClose;
@@ -175,7 +175,7 @@ private:
 	void UpdateBitmap();
 	void CalcRect();
 	void UpdateSeekBarPos(CPoint point);
-	void DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos);
+	void DrawSlider(CRect* rect, __int64 llStop, __int64 llPos);
 	void DrawFlyBar(CRect* rect);
 	void DrawRect(CRect* rect, CBrush* pBrush = nullptr, CPen* pPen = nullptr);
 	void InvalidateBitmapOSD();
