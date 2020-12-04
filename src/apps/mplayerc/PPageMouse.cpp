@@ -74,9 +74,9 @@ void CPPageMouse::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_COMBO1, m_cmbLeftBottonClick);
-	DDX_Control(pDX, IDC_COMBO2, m_cmbLeftBottonDblClick);
-	DDX_Control(pDX, IDC_COMBO3, m_cmbRightBottonClick);
+	DDX_Control(pDX, IDC_COMBO1, m_cmbLeftButtonClick);
+	DDX_Control(pDX, IDC_COMBO2, m_cmbLeftButtonDblClick);
+	DDX_Control(pDX, IDC_COMBO3, m_cmbRightButtonClick);
 	DDX_Control(pDX, IDC_CHECK1, m_chkMouseLeftClickOpenRecent);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
@@ -118,19 +118,19 @@ BOOL CPPageMouse::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	AddStringData(m_cmbLeftBottonClick, L"---", 0);
-	AddStringData(m_cmbLeftBottonClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
-	SelectByItemData(m_cmbLeftBottonClick, s.nMouseLeftClick);
+	AddStringData(m_cmbLeftButtonClick, L"---", 0);
+	AddStringData(m_cmbLeftButtonClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
+	SelectByItemData(m_cmbLeftButtonClick, s.nMouseLeftClick);
 
-	AddStringData(m_cmbLeftBottonDblClick, L"---", 0);
-	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
-	AddStringData(m_cmbLeftBottonDblClick, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
-	SelectByItemData(m_cmbLeftBottonDblClick, s.nMouseLeftDblClick);
+	AddStringData(m_cmbLeftButtonDblClick, L"---", 0);
+	AddStringData(m_cmbLeftButtonDblClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
+	AddStringData(m_cmbLeftButtonDblClick, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
+	SelectByItemData(m_cmbLeftButtonDblClick, s.nMouseLeftDblClick);
 
-	AddStringData(m_cmbRightBottonClick, ResStr(IDS_AG_MENU_PLAYER_A), 0);
-	AddStringData(m_cmbRightBottonClick, ResStr(IDS_AG_MENU_PLAYER_S), ID_MENU_PLAYER_SHORT);
-	AddStringData(m_cmbRightBottonClick, ResStr(IDS_AG_MENU_PLAYER_L), ID_MENU_PLAYER_LONG);
-	SelectByItemData(m_cmbRightBottonClick, s.nMouseRightClick);
+	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_A), 0);
+	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_S), ID_MENU_PLAYER_SHORT);
+	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_L), ID_MENU_PLAYER_LONG);
+	SelectByItemData(m_cmbRightButtonClick, s.nMouseRightClick);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(s.bMouseLeftClickOpenRecent ? BST_CHECKED : BST_UNCHECKED);
 
@@ -200,9 +200,9 @@ BOOL CPPageMouse::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.nMouseLeftClick    = (UINT)GetCurItemData(m_cmbLeftBottonClick);
-	s.nMouseLeftDblClick = (UINT)GetCurItemData(m_cmbLeftBottonDblClick);
-	s.nMouseRightClick   = (UINT)GetCurItemData(m_cmbRightBottonClick);
+	s.nMouseLeftClick    = (UINT)GetCurItemData(m_cmbLeftButtonClick);
+	s.nMouseLeftDblClick = (UINT)GetCurItemData(m_cmbLeftButtonDblClick);
+	s.nMouseRightClick   = (UINT)GetCurItemData(m_cmbRightButtonClick);
 
 	s.bMouseLeftClickOpenRecent = !!m_chkMouseLeftClickOpenRecent.GetCheck();
 
@@ -320,9 +320,9 @@ void CPPageMouse::OnBnClickedReset()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	SelectByItemData(m_cmbLeftBottonClick, ID_PLAY_PLAYPAUSE);
-	SelectByItemData(m_cmbLeftBottonDblClick, ID_VIEW_FULLSCREEN);
-	SelectByItemData(m_cmbRightBottonClick, 0);
+	SelectByItemData(m_cmbLeftButtonClick, ID_PLAY_PLAYPAUSE);
+	SelectByItemData(m_cmbLeftButtonDblClick, ID_VIEW_FULLSCREEN);
+	SelectByItemData(m_cmbRightButtonClick, 0);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(BST_UNCHECKED);
 

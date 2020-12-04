@@ -29,9 +29,9 @@ class CPPageMouse : public CPPageBase
 {
 	DECLARE_DYNAMIC(CPPageMouse)
 
-	CComboBox m_cmbLeftBottonClick;
-	CComboBox m_cmbLeftBottonDblClick;
-	CComboBox m_cmbRightBottonClick;
+	CComboBox m_cmbLeftButtonClick;
+	CComboBox m_cmbLeftButtonDblClick;
+	CComboBox m_cmbRightButtonClick;
 
 	CButton m_chkMouseLeftClickOpenRecent;
 
