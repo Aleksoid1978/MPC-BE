@@ -175,9 +175,9 @@ private:
 	void UpdateBitmap();
 	void CalcRect();
 	void UpdateSeekBarPos(CPoint point);
-	void DrawSlider(CRect* rect, __int64 llStop, __int64 llPos);
-	void DrawFlyBar(CRect* rect);
-	void DrawRect(CRect* rect, CBrush* pBrush = nullptr, CPen* pPen = nullptr);
+	void DrawSlider();
+	void DrawFlyBar();
+	void DrawRect(CRect& rect, CBrush* pBrush = nullptr, CPen* pPen = nullptr);
 	void InvalidateBitmapOSD();
 	void DrawMessage();
 	void DrawDebug();
