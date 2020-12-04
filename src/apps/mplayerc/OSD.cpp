@@ -342,7 +342,7 @@ void COSD::CalcRect()
 	}
 }
 
-void COSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
+void COSD::DrawRect(CRect& rect, CBrush* pBrush, CPen* pPen)
 {
 	if (pPen) {
 		m_MemDC.SelectObject(pPen);
@@ -359,54 +359,55 @@ void COSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
 	m_MemDC.Rectangle(rect);
 }
 
-void COSD::DrawSlider(CRect* rect, __int64 llStop, __int64 llPos)
+void COSD::DrawSlider()
 {
-	m_rectBar.left		= rect->left  + 10;
-	m_rectBar.right		= rect->right - 10;
-	m_rectBar.top		= rect->top   + (rect->Height() - SliderBarHeight) / 2;
-	m_rectBar.bottom	= m_rectBar.top + SliderBarHeight;
 
-	if (llStop == 0) {
-		m_rectCursor.left	= m_rectBar.left;
+	m_rectBar.left   = m_rectSeekBar.left  + 10;
+	m_rectBar.right  = m_rectSeekBar.right - 10;
+	m_rectBar.top    = m_rectSeekBar.top   + (m_rectSeekBar.Height() - SliderBarHeight) / 2;
+	m_rectBar.bottom = m_rectBar.top + SliderBarHeight;
+
+	if (m_llSeekStop == 0) {
+		m_rectCursor.left = m_rectBar.left;
 	} else {
-		m_rectCursor.left	= m_rectBar.left + (long)((m_rectBar.Width() - SliderCursorWidth) * llPos / llStop);
+		m_rectCursor.left = m_rectBar.left + (long)((m_rectBar.Width() - SliderCursorWidth) * m_llSeekPos / m_llSeekStop);
 	}
 
-	m_rectCursor.right		= m_rectCursor.left + SliderCursorWidth;
-	m_rectCursor.top		= rect->top   + (rect->Height() - SliderCursorHeight) / 2;
-	m_rectCursor.bottom		= m_rectCursor.top + SliderCursorHeight;
+	m_rectCursor.right  = m_rectCursor.left + SliderCursorWidth;
+	m_rectCursor.top    = m_rectSeekBar.top + (m_rectSeekBar.Height() - SliderCursorHeight) / 2;
+	m_rectCursor.bottom = m_rectCursor.top + SliderCursorHeight;
 
-	DrawRect(rect, &m_brushBack, &m_penBorder);
-	DrawRect(&m_rectBar, &m_brushBar);
+	DrawRect(m_rectSeekBar, &m_brushBack, &m_penBorder);
+	DrawRect(m_rectBar, &m_brushBar);
 
 	if (AfxGetAppSettings().fChapterMarker) {
 		CAutoLock lock(&m_CBLock);
 
-		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && llStop != 0) {
+		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && m_llSeekStop != 0) {
 			REFERENCE_TIME rt;
 			for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); ++i) {
 				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, nullptr))) {
-					__int64 pos = m_rectBar.Width() * rt / llStop;
+					__int64 pos = m_rectBar.Width() * rt / m_llSeekStop;
 					if (pos < 0) {
 						continue;
 					}
 
 					CRect r;
-					r.left		= m_rectBar.left + (LONG)pos - SliderChapWidth / 2;
-					r.top		= rect->top + (rect->Height() - SliderChapHeight) / 2;
-					r.right		= r.left + SliderChapWidth;
-					r.bottom	= r.top + SliderChapHeight;
+					r.left   = m_rectBar.left + (LONG)pos - SliderChapWidth / 2;
+					r.top    = m_rectSeekBar.top + (m_rectSeekBar.Height() - SliderChapHeight) / 2;
+					r.right  = r.left + SliderChapWidth;
+					r.bottom = r.top + SliderChapHeight;
 
-					DrawRect(&r, &m_brushChapter);
+					DrawRect(r, &m_brushChapter);
 				}
 			}
 		}
 	}
 
-	DrawRect(&m_rectCursor, nullptr, &m_penCursor);
+	DrawRect(m_rectCursor, nullptr, &m_penCursor);
 }
 
-void COSD::DrawFlyBar(CRect* rect)
+void COSD::DrawFlyBar()
 {
 	icoExit = m_pButtonsImages->ExtractIconW(0);
 	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, nullptr, DI_NORMAL);
@@ -507,7 +508,7 @@ void COSD::DrawDebug()
 		t = (m_rectWnd.Height() >> 1) - (rectText.Height() >> 1) - 10;
 		b = (m_rectWnd.Height() >> 1) + (rectText.Height() >> 1) + 10;
 		rectMessages = CRect(l, t, r, b);
-		DrawRect(&rectMessages, &m_debugBrushBack, &m_debugPenBorder);
+		DrawRect(rectMessages, &m_debugBrushBack, &m_debugPenBorder);
 		m_MemDC.DrawText(msg, &rectMessages, DT_CENTER | DT_VCENTER);
 	}
 }
@@ -523,10 +524,10 @@ void COSD::InvalidateBitmapOSD()
 	memsetd(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3));
 
 	if (m_bSeekBarVisible) {
-		DrawSlider(&m_rectSeekBar, m_llSeekStop, m_llSeekPos);
+		DrawSlider();
 	}
 	if (m_bFlyBarVisible) {
-		DrawFlyBar(&m_rectFlyBar);
+		DrawFlyBar();
 	}
 
 	DrawMessage();
