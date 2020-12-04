@@ -98,7 +98,7 @@ public:
 
 	void Enable(bool bEnable);
 
-	void GetRange(REFERENCE_TIME& stop);
+	REFERENCE_TIME GetRange() const { return m_stop; }
 	void SetRange(const REFERENCE_TIME stop);
 	void SetPos(const REFERENCE_TIME pos);
 

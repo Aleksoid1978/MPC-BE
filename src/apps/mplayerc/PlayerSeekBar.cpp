@@ -90,11 +90,6 @@ void CPlayerSeekBar::Enable(bool bEnable)
 	Invalidate();
 }
 
-void CPlayerSeekBar::GetRange(REFERENCE_TIME& stop)
-{
-	stop = m_stop;
-}
-
 void CPlayerSeekBar::SetRange(const REFERENCE_TIME stop)
 {
 	if (stop > 0) {
