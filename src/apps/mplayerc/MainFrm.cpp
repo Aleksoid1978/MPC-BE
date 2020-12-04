@@ -8120,6 +8120,8 @@ void CMainFrame::OnPlayStop()
 		if (m_pPlaybackNotify) {
 			m_pPlaybackNotify->Stop();
 		}
+
+		m_OSD.SetPos(0);
 	}
 
 	m_nLoops = 0;
@@ -8344,8 +8346,6 @@ void CMainFrame::SetTimersPlay()
 
 void CMainFrame::KillTimersStop()
 {
-	OnTimer(TIMER_STREAMPOSPOLLER);
-
 	KillTimer(TIMER_STREAMPOSPOLLER2);
 	KillTimer(TIMER_STREAMPOSPOLLER);
 	KillTimer(TIMER_STATS);
