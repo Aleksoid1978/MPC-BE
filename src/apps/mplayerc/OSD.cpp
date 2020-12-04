@@ -695,7 +695,6 @@ void COSD::SetPosAndRange(__int64 pos, __int64 stop)
 	m_llSeekStop = stop;
 	if (bUpdateSeekBar) {
 		InvalidateBitmapOSD();
-		DLog(L"COSD::SetPosAndRange");
 	}
 }
 

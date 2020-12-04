@@ -244,7 +244,7 @@ CStringW HR2Str(const HRESULT hr)
 #define UNPACK_VALUE(VALUE) case VALUE: str = L#VALUE; break;
 #define UNPACK_HR_WIN32(VALUE) case (((VALUE) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000): str = L#VALUE; break;
 	switch (hr) {
-		// common HRESULT values https://docs.microsoft.com/en-us/windows/desktop/seccrypto/common-hresult-values
+		// Common HRESULT Values https://docs.microsoft.com/en-us/windows/desktop/seccrypto/common-hresult-values
 		UNPACK_VALUE(S_OK);
 #ifdef _WINERROR_
 		UNPACK_VALUE(S_FALSE);
@@ -258,8 +258,12 @@ CStringW HR2Str(const HRESULT hr)
 		UNPACK_VALUE(E_HANDLE);
 		UNPACK_VALUE(E_OUTOFMEMORY);
 		UNPACK_VALUE(E_INVALIDARG);
+		// some COM Error Codes (Generic) https://docs.microsoft.com/en-us/windows/win32/com/com-error-codes-1
 		UNPACK_VALUE(REGDB_E_CLASSNOTREG);
-		// some System Error Codes
+		// some COM Error Codes (UI, Audio, DirectX, Codec) https://docs.microsoft.com/en-us/windows/win32/com/com-error-codes-10
+		UNPACK_VALUE(WINCODEC_ERR_UNSUPPORTEDPIXELFORMAT);
+		// some System Error Codes https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes
+		UNPACK_HR_WIN32(ERROR_MOD_NOT_FOUND);
 		UNPACK_HR_WIN32(ERROR_INVALID_WINDOW_HANDLE);
 		UNPACK_HR_WIN32(ERROR_CLASS_ALREADY_EXISTS);
 #endif
