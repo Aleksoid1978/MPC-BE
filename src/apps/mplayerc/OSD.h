@@ -149,6 +149,7 @@ private:
 	HICON	icoClose_a;
 
 	bool	m_bShowMessage;
+	bool	m_bForceRepaint = false;
 
 	CRect	m_MainWndRect;
 
