@@ -540,15 +540,22 @@ void COSD::InvalidateBitmapOSD()
 
 void COSD::UpdateSeekBarPos(CPoint point)
 {
-	m_llSeekPos = (point.x - m_rectBar.left) * m_llSeekStop / (m_rectBar.Width() - SliderCursorWidth);
-	m_llSeekPos = std::clamp(m_llSeekPos, 0ll, m_llSeekStop);
+	__int64 llSeekPos = (point.x - m_rectBar.left) * m_llSeekStop / (m_rectBar.Width() - SliderCursorWidth);
+	llSeekPos = std::clamp(llSeekPos, 0ll, m_llSeekStop);
 
-	if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
-		m_pMainFrame->GetClosestKeyFrame(m_llSeekPos);
-	}
+	if (llSeekPos != m_llSeekPos) {
+		m_bForceRepaint = true;
+		m_llSeekPos = llSeekPos;
 
-	if (m_pWnd) {
-		m_pMainFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
+		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
+			m_pMainFrame->GetClosestKeyFrame(m_llSeekPos);
+		}
+
+		if (m_pWnd) {
+			m_pMainFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
+		}
+
+		InvalidateBitmapOSD();
 	}
 }
 
@@ -629,7 +636,7 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 	bool bRet = false;
 
 	if (m_pMFVMB) {
-		if (m_rectCursor.PtInRect (point)) {
+		if (m_rectCursor.PtInRect(point)) {
 			m_bCursorMoving		= true;
 			bRet				= true;
 		} else if (m_rectExitButton.PtInRect(point) || m_rectCloseButton.PtInRect(point)) {
@@ -638,7 +645,6 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 			m_bSeekBarVisible	= true;
 			bRet				= true;
 			UpdateSeekBarPos(point);
-			InvalidateBitmapOSD();
 		}
 	}
 
@@ -673,7 +679,6 @@ __int64 COSD::GetPos() const
 	return m_llSeekPos;
 }
 
-
 __int64 COSD::GetRange() const
 {
 	return m_llSeekStop;
@@ -691,9 +696,10 @@ void COSD::SetRange(__int64 stop)
 
 void COSD::SetPosAndRange(__int64 pos, __int64 stop)
 {
-	bool bUpdateSeekBar = (m_bSeekBarVisible && (m_llSeekPos != pos || m_llSeekStop != stop));
+	const bool bUpdateSeekBar = (m_bSeekBarVisible && (m_bForceRepaint || m_llSeekPos != pos || m_llSeekStop != stop));
 	m_llSeekPos = pos;
 	m_llSeekStop = stop;
+	m_bForceRepaint = false;
 	if (bUpdateSeekBar) {
 		InvalidateBitmapOSD();
 	}
