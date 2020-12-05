@@ -59,6 +59,13 @@ class CMainFrame;
 
 class COSD : public CWnd, public CDPI
 {
+	enum :int {
+		IMG_EXIT    = 0,
+		IMG_EXIT_A  = 1,
+		IMG_CLOSE   = 23,
+		IMG_CLOSE_A = 24,
+	};
+
 public:
 	COSD(CMainFrame* pMainFrame);
 	~COSD();
@@ -143,10 +150,6 @@ private:
 
 	__int64	m_llSeekStop = 0;
 	__int64	m_llSeekPos = 0;
-	HICON	icoExit;
-	HICON	icoExit_a;
-	HICON	icoClose;
-	HICON	icoClose_a;
 
 	bool	m_bShowMessage;
 	bool	m_bForceRepaint = false;

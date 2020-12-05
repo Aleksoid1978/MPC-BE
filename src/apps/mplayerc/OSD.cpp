@@ -409,24 +409,11 @@ void COSD::DrawSlider()
 
 void COSD::DrawFlyBar()
 {
-	icoExit = m_pButtonsImages->ExtractIconW(0);
-	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, nullptr, DI_NORMAL);
-	DestroyIcon(icoExit);
+	const int nImageExit = m_bMouseOverExitButton ? IMG_EXIT_A : IMG_EXIT;
+	const int nImageCose = m_bMouseOverCloseButton ? IMG_CLOSE_A : IMG_CLOSE;
 
-	icoClose = m_pButtonsImages->ExtractIconW(23);
-	DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose, 0, 0, 0, nullptr, DI_NORMAL);
-	DestroyIcon(icoClose);
-
-	if (m_bMouseOverExitButton) {
-		icoExit_a = m_pButtonsImages->ExtractIconW(1);
-		DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit_a, 0, 0, 0, nullptr, DI_NORMAL);
-		DestroyIcon(icoExit_a);
-	}
-	if (m_bMouseOverCloseButton) {
-		icoClose_a = m_pButtonsImages->ExtractIconW(24);
-		DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose_a, 0, 0, 0, nullptr, DI_NORMAL);
-		DestroyIcon(icoClose_a);
-	}
+	m_pButtonsImages->Draw(&m_MemDC, nImageExit, POINT{ m_rectWnd.right - 34, 10 }, ILD_NORMAL);
+	m_pButtonsImages->Draw(&m_MemDC, nImageCose, POINT{ m_rectWnd.right - 62, 10 }, ILD_NORMAL);
 }
 
 void COSD::DrawMessage()
