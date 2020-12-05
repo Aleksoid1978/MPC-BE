@@ -170,9 +170,7 @@ void CFlyBar::CalcButtonsRect()
 
 void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 {
-	HICON hIcon = m_pButtonsImages->ExtractIconW(y);
-	DrawIconEx(pDC->m_hDC, x - 5 - (iw * z), 5, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
-	DestroyIcon(hIcon);
+	m_pButtonsImages->Draw(pDC, y, POINT{ x - 5 - (iw * z), 5 }, ILD_NORMAL);
 }
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
