@@ -70,7 +70,7 @@ private:
 	CToolTipCtrl m_tooltip;
 	CImageList *m_pButtonsImages = nullptr;
 
-	int m_btIdx = -1;
+	int m_btIdx = 0;
 
 	bool m_bTrackingMouseLeave = false;
 
