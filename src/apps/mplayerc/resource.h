@@ -295,8 +295,8 @@
 #define ID_BUTTONSEP                    946
 #define ID_AFTERPLAYBACK_NEXT           947
 #define ID_AFTERPLAYBACK_DONOTHING      948
-#define ID_MENU_PLAYER_SHORT            949
-#define ID_MENU_PLAYER_LONG             950
+#define ID_MENU_PLAYER_LONG             949
+#define ID_MENU_PLAYER_SHORT            950
 #define ID_MENU_FILTERS                 951
 #define ID_STREAM_AUDIO_NEXT            952
 #define ID_STREAM_AUDIO_PREV            953
