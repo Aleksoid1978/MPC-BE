@@ -26,6 +26,34 @@ class CMainFrame;
 
 class CFlyBar : public CWnd
 {
+	enum :int {
+		IMG_EXIT = 0,
+		IMG_EXIT_A,
+		IMG_FULSCR,
+		IMG_FULSCR_A,
+		IMG_FULSCR_D,
+		IMG_INFO,
+		IMG_INFO_A,
+		IMG_INFO_D,
+		IMG_LOCK,
+		IMG_LOCK_A,
+		IMG_MAXWND,
+		IMG_MAXWND_A,
+		IMG_MAXWND_D,
+		IMG_MINWND,
+		IMG_MINWND_A,
+		IMG_STDWND,
+		IMG_STDWND_A,
+		IMG_SETS,
+		IMG_SETS_A,
+		IMG_UNLOCK,
+		IMG_UNLOCK_A,
+		IMG_WINDOW,
+		IMG_WINDOW_A,
+		IMG_CLOSE,
+		IMG_CLOSE_A,
+	};
+
 	DECLARE_DYNAMIC(CFlyBar)
 
 private:
@@ -40,9 +68,9 @@ private:
 	CRect r_LockIcon;
 
 	CToolTipCtrl m_tooltip;
-	CImageList *m_pButtonsImages;
+	CImageList *m_pButtonsImages = nullptr;
 
-	int bt_idx;
+	int m_btIdx = -1;
 
 	bool m_bTrackingMouseLeave = false;
 
