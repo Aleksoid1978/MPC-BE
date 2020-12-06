@@ -152,7 +152,6 @@ private:
 	__int64	m_llSeekPos = 0;
 
 	bool	m_bShowMessage;
-	bool	m_bForceRepaint = false;
 
 	CRect	m_MainWndRect;
 

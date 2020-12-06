@@ -3958,8 +3958,6 @@ void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		OnPlayVolume(0);
 	} else if (pScrollBar->IsKindOf(RUNTIME_CLASS(CPlayerSeekBar)) && m_eMediaLoadState == MLS_LOADED) {
 		SeekTo(m_wndSeekBar.GetPos());
-	} else {
-		SeekTo(m_OSD.GetPos());
 	}
 
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
@@ -11601,9 +11599,9 @@ void CMainFrame::ClampWindowRect(RECT& windowRect)
 	}
 };
 
-void CMainFrame::RepaintVideo()
+void CMainFrame::RepaintVideo(const bool bForceRepaint/* = false*/)
 {
-	if (!m_bDelaySetOutputRect && GetMediaState() != State_Running) {
+	if (bForceRepaint || (!m_bDelaySetOutputRect && GetMediaState() != State_Running)) {
 		if (m_pCAP) {
 			m_pCAP->Paint(false);
 		} else if (m_pMFVDC) {

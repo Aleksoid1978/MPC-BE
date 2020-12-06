@@ -749,7 +749,7 @@ public:
 	void MoveVideoWindow(bool bShowStats = false, bool bForcedSetVideoRect = false);
 	void SetPreviewVideoPosition();
 
-	void RepaintVideo();
+	void RepaintVideo(const bool bForceRepaint = false);
 	void HideVideoWindow(bool fHide);
 
 	OAFilterState GetMediaState();
