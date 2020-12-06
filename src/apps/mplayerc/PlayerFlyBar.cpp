@@ -168,9 +168,9 @@ void CFlyBar::CalcButtonsRect()
 	r_LockIcon		= CRect(rcBar.right - 5 - (iw * 9), rcBar.top + 5, rcBar.right - 5 - (iw * 8), rcBar.bottom - 5);
 }
 
-void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
+void CFlyBar::DrawButton(CDC *pDC, int nImage, int x, int z)
 {
-	m_pButtonsImages->Draw(pDC, y, POINT{ x - 5 - (iw * z), 5 }, ILD_NORMAL);
+	m_pButtonsImages->Draw(pDC, nImage, POINT{ x - 5 - (iw * z), 5 }, ILD_NORMAL);
 }
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
@@ -335,46 +335,46 @@ void CFlyBar::DrawWnd()
 		for (int i = 0; i < 2; i++) {
 
 			if (!i || bt_idx == 0) { // exit
-				DrawButton(&mdc, x, sep[0][i], 1);
+				DrawButton(&mdc, sep[0][i], x, 1);
 			}
 
 			if (!i || bt_idx == 1) { // min
-				DrawButton(&mdc, x, sep[1][i], 3);
+				DrawButton(&mdc, sep[1][i], x, 3);
 			}
 
 			if (!i || bt_idx == 2) { // restore
 				if (wp.showCmd == SW_SHOWMAXIMIZED) {
-					DrawButton(&mdc, x, sep[2][i], 2);
+					DrawButton(&mdc, sep[2][i], x, 2);
 				} else {
-					DrawButton(&mdc, x, sep[4][i], 2);
+					DrawButton(&mdc, sep[4][i], x, 2);
 				}
 			}
 
 			if (!i || bt_idx == 3) { // settings
-				DrawButton(&mdc, x, sep[5][i], 7);
+				DrawButton(&mdc, sep[5][i], x, 7);
 			}
 
 			if (!i || bt_idx == 4) { // info
 				if (fs != -1) {
-					DrawButton(&mdc, x, sep[6][i], 6);
+					DrawButton(&mdc, sep[6][i], x, 6);
 				} else {
-					DrawButton(&mdc, x, sep[7][i], 6);
+					DrawButton(&mdc, sep[7][i], x, 6);
 				}
 			}
 
 			if (!i || bt_idx == 5) { // fs
 				if (m_pMainFrame->m_bFullScreen) {
-					DrawButton(&mdc, x, sep[8][i], 4);
+					DrawButton(&mdc, sep[8][i], x, 4);
 				} else {
-					DrawButton(&mdc, x, sep[10][i], 4);
+					DrawButton(&mdc, sep[10][i], x, 4);
 				}
 			}
 
 			if (!i || bt_idx == 6) { // lock
 				if (s.fFlybarOnTop) {
-					DrawButton(&mdc, x, sep[11][i], 9);
+					DrawButton(&mdc, sep[11][i], x, 9);
 				} else {
-					DrawButton(&mdc, x, sep[12][i], 9);
+					DrawButton(&mdc, sep[12][i], x, 9);
 				}
 			}
 		}

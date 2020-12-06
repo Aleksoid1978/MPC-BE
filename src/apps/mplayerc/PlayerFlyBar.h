@@ -57,7 +57,7 @@ public:
 	void CalcButtonsRect();
 
 private:
-	void DrawButton(CDC *pDC, int x, int y, int z);
+	void DrawButton(CDC *pDC, int nImage, int x, int z);
 	void UpdateWnd(CPoint point);
 	void DrawWnd();
 
