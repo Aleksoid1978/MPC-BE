@@ -158,11 +158,13 @@ void CFlyBar::CalcButtonsRect()
 	GetWindowRect(&rcBar);
 
 	r_ExitIcon		= CRect(rcBar.right - 5 - (iw),     rcBar.top + 5, rcBar.right - 5,            rcBar.bottom - 5);
-	r_MinIcon		= CRect(rcBar.right - 5 - (iw * 3), rcBar.top + 5, rcBar.right - 5 - (iw * 2), rcBar.bottom - 5);
 	r_RestoreIcon	= CRect(rcBar.right - 5 - (iw * 2), rcBar.top + 5, rcBar.right - 5 - (iw),     rcBar.bottom - 5);
-	r_SettingsIcon	= CRect(rcBar.right - 5 - (iw * 7), rcBar.top + 5, rcBar.right - 5 - (iw * 6), rcBar.bottom - 5);
-	r_InfoIcon		= CRect(rcBar.right - 5 - (iw * 6), rcBar.top + 5, rcBar.right - 5 - (iw * 5), rcBar.bottom - 5);
+	r_MinIcon		= CRect(rcBar.right - 5 - (iw * 3), rcBar.top + 5, rcBar.right - 5 - (iw * 2), rcBar.bottom - 5);
 	r_FSIcon		= CRect(rcBar.right - 5 - (iw * 4), rcBar.top + 5, rcBar.right - 5 - (iw * 3), rcBar.bottom - 5);
+	//
+	r_InfoIcon		= CRect(rcBar.right - 5 - (iw * 6), rcBar.top + 5, rcBar.right - 5 - (iw * 5), rcBar.bottom - 5);
+	r_SettingsIcon	= CRect(rcBar.right - 5 - (iw * 7), rcBar.top + 5, rcBar.right - 5 - (iw * 6), rcBar.bottom - 5);
+	//
 	r_LockIcon		= CRect(rcBar.right - 5 - (iw * 9), rcBar.top + 5, rcBar.right - 5 - (iw * 8), rcBar.bottom - 5);
 }
 
@@ -179,7 +181,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	GetCursorPos(&p);
 	CalcButtonsRect();
 
-	m_btIdx = -1;
+	m_btIdx = 0;
 
 	if (r_ExitIcon.PtInRect(p)) {
 		ShowWindow(SW_HIDE);
@@ -243,13 +245,9 @@ void CFlyBar::UpdateWnd(CPoint point)
 		if (str != ResStr(IDS_AG_EXIT)) {
 			m_tooltip.UpdateTipText(ResStr(IDS_AG_EXIT), this);
 		}
-		m_btIdx = 0;
-	} else if (r_MinIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_TOOLTIP_MINIMIZE)) {
-			m_tooltip.UpdateTipText(ResStr(IDS_TOOLTIP_MINIMIZE), this);
-		}
 		m_btIdx = 1;
-	} else if (r_RestoreIcon.PtInRect(point)) {
+	}
+	else if (r_RestoreIcon.PtInRect(point)) {
 		WINDOWPLACEMENT wp;
 		m_pMainFrame->GetWindowPlacement(&wp);
 		str2 = (wp.showCmd == SW_SHOWMAXIMIZED) ? ResStr(IDS_TOOLTIP_RESTORE) : ResStr(IDS_TOOLTIP_MAXIMIZE);
@@ -257,34 +255,45 @@ void CFlyBar::UpdateWnd(CPoint point)
 			m_tooltip.UpdateTipText(str2, this);
 		}
 		m_btIdx = 2;
-	} else if (r_SettingsIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_AG_OPTIONS)) {
-			m_tooltip.UpdateTipText(ResStr(IDS_AG_OPTIONS), this);
+	}
+	else if (r_MinIcon.PtInRect(point)) {
+		if (str != ResStr(IDS_TOOLTIP_MINIMIZE)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_TOOLTIP_MINIMIZE), this);
 		}
 		m_btIdx = 3;
-	} else if (r_InfoIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_AG_PROPERTIES)) {
-			m_tooltip.UpdateTipText(ResStr(IDS_AG_PROPERTIES), this);
-		}
-		m_btIdx = 4;
-	} else if (r_FSIcon.PtInRect(point)) {
+	}
+	else if (r_FSIcon.PtInRect(point)) {
 		str2 = m_pMainFrame->m_bFullScreen ? ResStr(IDS_TOOLTIP_WINDOW) : ResStr(IDS_TOOLTIP_FULLSCREEN);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
-		m_btIdx = 5;
-	} else if (r_LockIcon.PtInRect(point)) {
+		m_btIdx = 4;
+	}
+	else if (r_InfoIcon.PtInRect(point)) {
+		if (str != ResStr(IDS_AG_PROPERTIES)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_AG_PROPERTIES), this);
+		}
+		m_btIdx = 6;
+	}
+	else if (r_SettingsIcon.PtInRect(point)) {
+		if (str != ResStr(IDS_AG_OPTIONS)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_AG_OPTIONS), this);
+		}
+		m_btIdx = 7;
+	}
+	else if (r_LockIcon.PtInRect(point)) {
 		str2 = AfxGetAppSettings().fFlybarOnTop ? ResStr(IDS_TOOLTIP_UNLOCK) : ResStr(IDS_TOOLTIP_LOCK);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
-		m_btIdx = 6;
-	} else {
+		m_btIdx = 9;
+	}
+	else {
 		if (str.GetLength() > 0) {
 			m_tooltip.UpdateTipText(L"", this);
 		}
 		SetCursor(LoadCursorW(nullptr, IDC_ARROW));
-		m_btIdx = -1;
+		m_btIdx = 0;
 	}
 
 	// set tooltip position
@@ -328,11 +337,8 @@ void CFlyBar::DrawWnd()
 		mdc.SetBkMode(TRANSPARENT);
 		mdc.FillSolidRect(rcBar, RGB(0, 0, 0));
 
-		int nImage = (m_btIdx == 0) ? IMG_EXIT_A : IMG_EXIT;
+		int nImage = (m_btIdx == 1) ? IMG_EXIT_A : IMG_EXIT;
 		DrawButton(&mdc, nImage, x, 1);
-
-		nImage = (m_btIdx == 1) ? IMG_MINWND_A : IMG_MINWND;
-		DrawButton(&mdc, nImage, x, 3);
 
 		if (wp.showCmd == SW_SHOWMAXIMIZED) {
 			nImage = (m_btIdx == 2) ? IMG_STDWND_A : IMG_STDWND;
@@ -341,27 +347,30 @@ void CFlyBar::DrawWnd()
 		}
 		DrawButton(&mdc, nImage, x, 2);
 
-		nImage = (m_btIdx == 3) ? IMG_SETS_A : IMG_SETS;
-		DrawButton(&mdc, nImage, x, 7);
+		nImage = (m_btIdx == 3) ? IMG_MINWND_A : IMG_MINWND;
+		DrawButton(&mdc, nImage, x, 3);
+
+		if (m_pMainFrame->m_bFullScreen) {
+			nImage = (m_btIdx == 4) ? IMG_WINDOW_A : IMG_WINDOW;
+		} else {
+			nImage = (m_btIdx == 4) ? IMG_FULSCR_A : IMG_FULSCR;
+		}
+		DrawButton(&mdc, nImage, x, 4);
 
 		if (fs == -1) {
 			nImage = IMG_INFO_D;
 		} else {
-			nImage = (m_btIdx == 4) ? IMG_INFO_A : IMG_INFO;
+			nImage = (m_btIdx == 6) ? IMG_INFO_A : IMG_INFO;
 		}
 		DrawButton(&mdc, nImage, x, 6);
 
-		if (m_pMainFrame->m_bFullScreen) {
-			nImage = (m_btIdx == 5) ? IMG_WINDOW_A : IMG_WINDOW;
-		} else {
-			nImage = (m_btIdx == 5) ? IMG_FULSCR_A : IMG_FULSCR;
-		}
-		DrawButton(&mdc, nImage, x, 4);
+		nImage = (m_btIdx == 7) ? IMG_SETS_A : IMG_SETS;
+		DrawButton(&mdc, nImage, x, 7);
 
 		if (s.fFlybarOnTop) {
-			nImage = (m_btIdx == 6) ? IMG_LOCK_A : IMG_LOCK;
+			nImage = (m_btIdx == 9) ? IMG_LOCK_A : IMG_LOCK;
 		} else {
-			nImage = (m_btIdx == 6) ? IMG_UNLOCK_A : IMG_UNLOCK;
+			nImage = (m_btIdx == 9) ? IMG_UNLOCK_A : IMG_UNLOCK;
 		}
 		DrawButton(&mdc, nImage, x, 9);
 
@@ -372,7 +381,7 @@ void CFlyBar::DrawWnd()
 		mdc.DeleteDC();
 	}
 
-	m_btIdx = -1;
+	m_btIdx = 0;
 }
 
 BOOL CFlyBar::OnEraseBkgnd(CDC* pDC)
