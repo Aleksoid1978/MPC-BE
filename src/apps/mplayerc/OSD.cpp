@@ -361,7 +361,6 @@ void COSD::DrawRect(CRect& rect, CBrush* pBrush, CPen* pPen)
 
 void COSD::DrawSlider()
 {
-
 	m_rectBar.left   = m_rectSeekBar.left  + 10;
 	m_rectBar.right  = m_rectSeekBar.right - 10;
 	m_rectBar.top    = m_rectSeekBar.top   + (m_rectSeekBar.Height() - SliderBarHeight) / 2;
@@ -522,27 +521,22 @@ void COSD::InvalidateBitmapOSD()
 
 	m_pMFVMB->SetAlphaBitmap(&m_MFVAlphaBitmap);
 
-	m_pMainFrame->RepaintVideo();
+	m_pMainFrame->RepaintVideo(m_llSeekPos == m_llSeekStop);
 }
 
 void COSD::UpdateSeekBarPos(CPoint point)
 {
-	__int64 llSeekPos = (point.x - m_rectBar.left) * m_llSeekStop / (m_rectBar.Width() - SliderCursorWidth);
+	auto llSeekPos = m_llSeekStop * ((__int64)point.x - m_rectBar.left) / ((__int64)m_rectBar.Width() - SliderCursorWidth);
 	llSeekPos = std::clamp(llSeekPos, 0ll, m_llSeekStop);
 
 	if (llSeekPos != m_llSeekPos) {
-		m_bForceRepaint = true;
-		m_llSeekPos = llSeekPos;
-
 		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
-			m_pMainFrame->GetClosestKeyFrame(m_llSeekPos);
+			m_pMainFrame->GetClosestKeyFrame(llSeekPos);
 		}
 
 		if (m_pWnd) {
-			m_pMainFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
+			m_pMainFrame->SeekTo(llSeekPos);
 		}
-
-		InvalidateBitmapOSD();
 	}
 }
 
@@ -683,10 +677,9 @@ void COSD::SetRange(__int64 stop)
 
 void COSD::SetPosAndRange(__int64 pos, __int64 stop)
 {
-	const bool bUpdateSeekBar = (m_bSeekBarVisible && (m_bForceRepaint || m_llSeekPos != pos || m_llSeekStop != stop));
+	const auto bUpdateSeekBar = (m_bSeekBarVisible && (m_llSeekPos != pos || m_llSeekStop != stop));
 	m_llSeekPos = pos;
 	m_llSeekStop = stop;
-	m_bForceRepaint = false;
 	if (bUpdateSeekBar) {
 		InvalidateBitmapOSD();
 	}
