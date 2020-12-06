@@ -128,8 +128,8 @@ BOOL CPPageMouse::OnInitDialog()
 	SelectByItemData(m_cmbLeftButtonDblClick, s.nMouseLeftDblClick);
 
 	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_A), 0);
-	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_S), ID_MENU_PLAYER_SHORT);
 	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_L), ID_MENU_PLAYER_LONG);
+	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_S), ID_MENU_PLAYER_SHORT);
 	SelectByItemData(m_cmbRightButtonClick, s.nMouseRightClick);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(s.bMouseLeftClickOpenRecent ? BST_CHECKED : BST_UNCHECKED);
