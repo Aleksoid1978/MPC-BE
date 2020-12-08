@@ -2,6 +2,92 @@
 
 1.5.6 (beta)
 =============================
+Splitters
+Improved work over the HTTP protocol.
+Removed MPC FLAC Source filter.
+Ignore corrupted 'APIC' and '\0PIC' tags in ID3v2.
+
+UDP/HTTP Reader
+Added support for ShoutCast.
+Added support for streams with content-type "video/mpeg".
+
+AudioSplitter
+Added support for chapters for WAV format.
+Added support for FLAC format.
+Added basic support for AIFF format.
+
+AviSplitter
+Added support for AV1 video.
+
+DVRSplitter
+Added support for Chinese KKmoon CCTV camera file format.
+
+RawVideoSplitter
+Added support for AV1 OBU files.
+
+MatroskaSplitter
+Fixed playback of some VFW type videos.
+
+MpaDecFilter
+Fixed encoding in AC-3. Added check for SPDIF output at 44100 Hz.
+
+MPCVideoDec
+Improved AV1 multithreading decoding.
+
+MpcAudioRenderer
+Fixed playback of DVD-Video with no sound in the menu.
+
+Видеорендереры
+Исправлено преобразование HLG в SDR для EVR-CP.
+Исправлен показ первого кадра в некоторых ситуациях для EVR-CP.
+Небольшая оптимизация EVR-CP и Sync.
+
+Video renderers
+Fixed HLG to SDR conversion for EVR-CP.
+Fixed showing the first frame in some situations for EVR-CP.
+Minor optimization of EVR-CP and Sync.
+
+Subtitles
+Fixed flickering of some subtitles.
+
+Youtube
+User pages like https://www.youtube.com/c/ are now parsed as playlists.
+Added check for the availability of the received link.
+Fixed opening of some links.
+
+Player
+WIC is now used for imaging instead of GDI +.
+Fixed saving thumbnails for video files whose video tracks are noticeably shorter than audio tracks.
+External interface change files (toolbar.png, gpu.png, flybar.png) can now only be in PNG format.
+Added the ability to upload logo and covers in HEIF and WebP format.
+Reduce the size of large images when viewed in the "Logo" settings panel.
+The window size limits the size of the desktop when the player is started and at the beginning of playback.
+Fixed leaking GDI objects when using a playlist.
+Reworked mouse settings. Added the "Mouse" settings panel.
+Added the ability to set the Ctrl, Shift and "Right button" modifiers for some mouse actions.
+The "Previous" and "Next" control buttons are supplemented with the "Previous file" and "Next file" actions when the right mouse button is pressed.
+Optimized primary rendering of the main window for Windows 7, 8, 8.1.
+Fixed the state of the "GPU" indicator after closing a file.
+Optimized rendering of playlist items.
+Added "Repeat A-B" functionality.
+Added the ability to assign a hotkey to open a folder.
+Working with settings has been slightly optimized.
+Optimized text output in the "Information", "Statistics" fields and the status line.
+Improved OSD functionality when displaying permanent messages.
+Fixed various issues for exclusive full screen.
+Optimized Seek Bar output for an exclusive full screen.
+Added the ability to assign a hotkey for calling the "After playback" menu.
+
+ShellExt
+Fixed freeze when opening files from qBittorrent.
+
+Updated Ukrainian translation (by arestarh1986).
+Updated German translation (by Klaus1189).
+Updated Hungarian translation (by mickey).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Turkish translation (by cmhrky).
+Updated Chinese (Traditional) and Dutch translation (by beter).
+Updated Greek translation (by George).
 
 Updated libraries:
 	dav1d git-0.8.0-2-gd6beb0a;
