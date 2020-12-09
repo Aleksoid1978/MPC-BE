@@ -261,6 +261,7 @@ void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 	m_OSDType	= OSD_TYPE_BITMAP;
 
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
+	CreateFontInternal();
 
 	Reset();
 
@@ -285,6 +286,7 @@ void COSD::Start(CWnd* pWnd)
 	m_OSDType	= OSD_TYPE_GDI;
 
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
+	CreateFontInternal();
 
 	Reset();
 }
