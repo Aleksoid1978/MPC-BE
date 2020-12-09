@@ -4240,12 +4240,12 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 
 void CMainFrame::OnMenuPlayerShort()
 {
-	OnMenu(m_popupMenu.GetSubMenu(0));
+	OnMenu(m_popupMainMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuPlayerLong()
 {
-	OnMenu(m_popupMainMenu.GetSubMenu(0));
+	OnMenu(m_popupMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuFilters()
