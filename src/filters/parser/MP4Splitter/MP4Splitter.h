@@ -57,6 +57,8 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	MediaSideDataHDR* m_MasterDataHDR = nullptr;
 	MediaSideDataHDRContentLightLevel* m_HDRContentLightLevel = nullptr;
 
+	int m_pix_fmt = -1;
+
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);

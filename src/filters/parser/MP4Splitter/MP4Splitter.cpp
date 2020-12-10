@@ -1427,6 +1427,42 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 								}
 								break;
+							case AP4_ATOM_TYPE_AVdn:
+							case AP4_ATOM_TYPE_AVdh:
+								{
+									AP4_DataBuffer data;
+									if (AP4_SUCCEEDED(sample.ReadData(data))) {
+										const auto size = data.GetDataSize();
+										if (size >= 0x280) {
+											const auto buf = data.GetData();
+											uint8_t bitdepth = 0;
+											switch (buf[0x21] >> 5) {
+												case 1: bitdepth = 8;  break;
+												case 2: bitdepth = 10; break;
+												case 3: bitdepth = 12; break;
+											}
+											if (bitdepth) {
+												const bool b444Format = (buf[0x2C] >> 6) & 1;
+												if (b444Format) {
+													const bool act = buf[0x2C] & 1;
+													if (bitdepth == 10) {
+														m_pix_fmt = act ? AV_PIX_FMT_YUV444P10 : AV_PIX_FMT_GBRP10;
+													} else if (bitdepth == 12) {
+														m_pix_fmt = act ? AV_PIX_FMT_YUV444P12 : AV_PIX_FMT_GBRP12;
+													}
+												} else if (bitdepth == 12) {
+													m_pix_fmt = AV_PIX_FMT_YUV422P12;
+												} else if (bitdepth == 10) {
+													m_pix_fmt = AV_PIX_FMT_YUV422P10;
+												} else {
+													m_pix_fmt = AV_PIX_FMT_YUV422P;
+												}
+											}
+										}
+									}
+								}
+
+								break;
 						}
 
 						if (AP4_DataInfoAtom* clap = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_CLAP))) {
@@ -2409,6 +2445,13 @@ STDMETHODIMP CMP4SplitterFilter::GetPropertyInt(LPCSTR field, int *value)
 	if (!strcmp(field, "VIDEO_INTERLACED")) {
 		if (m_interlaced != -1) {
 			*value = m_interlaced;
+			return S_OK;
+		}
+		return E_ABORT;
+	}
+	else if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
+		if (m_pix_fmt != -1) {
+			*value = m_pix_fmt;
 			return S_OK;
 		}
 		return E_ABORT;
