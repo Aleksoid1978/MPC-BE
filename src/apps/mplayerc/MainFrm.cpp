@@ -3747,7 +3747,7 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 
 		UINT cmd = AfxGetAppSettings().nMouseRightClick;
 		if (cmd == 0) {
-			cmd = (!IsMainMenuVisible() || IsD3DFullScreenMode()) ? ID_MENU_PLAYER_LONG : ID_MENU_PLAYER_SHORT;
+			cmd = (!IsMainMenuVisible() || IsD3DFullScreenMode()) ? ID_MENU_PLAYER_SHORT : ID_MENU_PLAYER_LONG;
 		}
 		SendMessageW(WM_COMMAND, cmd);
 	}
