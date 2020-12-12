@@ -168,6 +168,7 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
         m_SampleTable = new AP4_AtomSampleTable(stbl, sample_stream);
     }
 
+    /* temporary disabled
     AP4_ElstAtom* elst = dynamic_cast<AP4_ElstAtom*>(
         atom.FindChild("edts/elst"));
     if (elst) {
@@ -177,6 +178,7 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
             (dynamic_cast<AP4_AtomSampleTable*>(m_SampleTable))->SetTimeDelay(AP4_ConvertTime(delay, m_MovieTimeScale, m_MediaTimeScale) - start);
         }
     }
+    */
 
     if (m_Type == TYPE_VIDEO && stbl) {
         if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(stbl->FindChild("stss"))) {
