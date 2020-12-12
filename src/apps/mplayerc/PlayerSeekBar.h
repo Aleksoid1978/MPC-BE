@@ -92,6 +92,15 @@ private:
 	COLORREF m_crHighlightedText;
 	COLORREF m_crTimeText;
 
+	int m_scaleX1 = 1;
+	int m_scaleX4 = 4;
+	int m_scaleX8 = 8;
+
+	int m_scaleY2  = 2;
+	int m_scaleY5  = 5;
+	int m_scaleY7  = 7;
+	int m_scaleY14 = 14;
+
 public:
 	CPlayerSeekBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerSeekBar() = default;

@@ -196,9 +196,9 @@ CRect CPlayerSeekBar::GetChannelRect()
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		//r.DeflateRect(1,1,1,1);
 	} else {
-		const int dx  = m_pMainFrame->ScaleFloorX(8);
-		const int dy1 = m_pMainFrame->ScaleFloorY(7) + 2;
-		const int dy2 = m_pMainFrame->ScaleFloorY(5) + 1;
+		const int dx  = m_scaleX8;
+		const int dy1 = m_scaleY7 + 2;
+		const int dy2 = m_scaleY5 + 1;
 
 		r.DeflateRect(dx, dy1, dx, dy2);
 	}
@@ -216,8 +216,8 @@ CRect CPlayerSeekBar::GetThumbRect()
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		r.SetRect(x, y - 2, x + 3, y + 3);
 	} else {
-		const int dx = m_pMainFrame->ScaleFloorY(7);
-		const int dy = m_pMainFrame->ScaleFloorY(5);
+		const int dx = m_scaleY7;
+		const int dy = m_scaleY5;
 
 		r.SetRect(x + 1 - dx, r.top - dy, x + dx, r.bottom + dy);
 	}
@@ -229,8 +229,8 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 {
 	CRect r = GetThumbRect();
 
-	const int dx = m_pMainFrame->ScaleFloorX(4) - 1;
-	int dy = m_pMainFrame->ScaleFloorY(5);
+	const int dx = m_scaleX4 - 1;
+	int dy = m_scaleY5;
 	if (!m_bEnabled || m_stop <= 0) {
 		dy -= 1;
 	}
@@ -289,13 +289,13 @@ void CPlayerSeekBar::OnPaint()
 
 		// instead of drawing hands can be a marker icon
 		// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-		// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, nullptr, DI_NORMAL);
+		// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0, 0, 0, nullptr, DI_NORMAL);
 		// ::DestroyIcon(appIcon);
 
-		memdc.MoveTo(x, rect.top + 14);
-		memdc.LineTo(x, rect.bottom - 2);
-		memdc.MoveTo(x - 1, rect.bottom - 2);
-		memdc.LineTo(x + 2, rect.bottom - 2);
+		memdc.MoveTo(x, rect.top + m_scaleY14);
+		memdc.LineTo(x, rect.bottom - m_scaleY2);
+		memdc.MoveTo(x - m_scaleX1, rect.bottom - m_scaleY2);
+		memdc.LineTo(x + m_scaleX1, rect.bottom - m_scaleY2);
 	};
 
 	if (s.bUseDarkTheme) {
@@ -738,6 +738,15 @@ void CPlayerSeekBar::ScaleFont()
 	m_font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 					   OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 					   L"Tahoma");
+
+	m_scaleX1 = m_pMainFrame->ScaleFloorX(1);
+	m_scaleX4 = m_pMainFrame->ScaleFloorX(4);
+	m_scaleX8 = m_pMainFrame->ScaleFloorX(8);
+
+	m_scaleY2  = m_pMainFrame->ScaleFloorY(2);
+	m_scaleY5  = m_pMainFrame->ScaleFloorY(5);
+	m_scaleY7  = m_pMainFrame->ScaleFloorY(7);
+	m_scaleY14 = m_pMainFrame->ScaleFloorY(14);
 }
 
 void CPlayerSeekBar::SetColor()
