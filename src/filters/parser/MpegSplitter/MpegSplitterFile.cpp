@@ -1185,15 +1185,6 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					}
 				}
 
-				// AES3
-				if (type == stream_type::unknown && stream_type & AES3_AUDIO) {
-					Seek(start);
-					aes3_ts_hdr h;
-					if (Read(h, len, &s.mt)) {
-						type = stream_type::audio;
-					}
-				}
-
 				// VC1
 				if (type == stream_type::unknown && (stream_type & VC1_VIDEO)) {
 					Seek(start);
@@ -1230,6 +1221,15 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					if (Read(h, len, &s.mt, _streamData.pmt.iso_639_codes)) {
 						s.codec = stream_codec::TELETEXT;
 						type = stream_type::subpic;
+					}
+				}
+
+				// AES3
+				if (type == stream_type::unknown && stream_type & AES3_AUDIO) {
+					Seek(start);
+					aes3_ts_hdr h;
+					if (Read(h, len, &s.mt)) {
+						type = stream_type::audio;
 					}
 				}
 
