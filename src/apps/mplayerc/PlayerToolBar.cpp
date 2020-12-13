@@ -256,62 +256,51 @@ void CPlayerToolBar::SwitchTheme()
 		CBitmap bmp;
 		bmp.Attach(hBitmap);
 
-		BITMAP bitmap = {};
-		bmp.GetBitmap(&bitmap);
-
 		SetSizes({ (LONG)height + 7, (LONG)height + 6 }, SIZE{ (LONG)height, (LONG)height });
-
-		if (32 == bitmap.bmBitsPixel) {
-			VERIFY(m_imgListActive.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
-			VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
-		} else {
-			VERIFY(m_imgListActive.Create(height, height, ILC_COLOR24 | ILC_MASK, 1, 0));
-			VERIFY(m_imgListActive.Add(&bmp, RGB(255, 0, 255)) != -1);
-		}
+		VERIFY(m_imgListActive.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
+		VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
 
 		m_nButtonHeight = height;
 
-		if (32 == bitmap.bmBitsPixel) {
-			const UINT bitmapsize = width * height * 4;
+		const UINT bitmapsize = width * height * 4;
 
-			BYTE* bmpBuffer = (BYTE*)GlobalAlloc(GMEM_FIXED, bitmapsize);
-			if (bmpBuffer) {
-				DWORD dwValue = bmp.GetBitmapBits(bitmapsize, bmpBuffer);
-				if (dwValue) {
-					auto adjustBrightness = [](BYTE c, double p) {
-						int cAdjusted;
-						if (c == 0 && p > 1.0) {
-							cAdjusted = std::lround((p - 1.0) * 255);
-						} else {
-							cAdjusted = std::lround(c * p);
-						}
-
-						return BYTE(std::min(cAdjusted, 255));
-					};
-
-					BYTE* bits = bmpBuffer;
-					for (UINT y = 0; y < height; y++, bits += width*4) {
-						RGBQUAD* p = reinterpret_cast<RGBQUAD*>(bits);
-						for (UINT x = 0; x < width; x++) {
-							HLS hls(p[x]);
-							hls.S = 0.0; // Make the color gray
-
-							RGBQUAD rgb = hls.toRGBQUAD();
-							p[x].rgbRed = BYTE(adjustBrightness(rgb.rgbRed, 0.55) * p[x].rgbReserved / 255);
-							p[x].rgbGreen = BYTE(adjustBrightness(rgb.rgbGreen, 0.55) * p[x].rgbReserved / 255);
-							p[x].rgbBlue = BYTE(adjustBrightness(rgb.rgbBlue, 0.55) * p[x].rgbReserved / 255);
-						}
+		BYTE* bmpBuffer = (BYTE*)GlobalAlloc(GMEM_FIXED, bitmapsize);
+		if (bmpBuffer) {
+			DWORD dwValue = bmp.GetBitmapBits(bitmapsize, bmpBuffer);
+			if (dwValue) {
+				auto adjustBrightness = [](BYTE c, double p) {
+					int cAdjusted;
+					if (c == 0 && p > 1.0) {
+						cAdjusted = std::lround((p - 1.0) * 255);
+					} else {
+						cAdjusted = std::lround(c * p);
 					}
 
-					CBitmap bmpDisabled;
-					bmpDisabled.CreateBitmap(width, height, 1, 32, bmpBuffer);
+					return BYTE(std::min(cAdjusted, 255));
+				};
 
-					VERIFY(m_imgListDisabled.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
-					VERIFY(m_imgListDisabled.Add(&bmpDisabled, nullptr) != 1);
+				BYTE* bits = bmpBuffer;
+				for (UINT y = 0; y < height; y++, bits += width*4) {
+					RGBQUAD* p = reinterpret_cast<RGBQUAD*>(bits);
+					for (UINT x = 0; x < width; x++) {
+						HLS hls(p[x]);
+						hls.S = 0.0; // Make the color gray
+
+						RGBQUAD rgb = hls.toRGBQUAD();
+						p[x].rgbRed = BYTE(adjustBrightness(rgb.rgbRed, 0.55) * p[x].rgbReserved / 255);
+						p[x].rgbGreen = BYTE(adjustBrightness(rgb.rgbGreen, 0.55) * p[x].rgbReserved / 255);
+						p[x].rgbBlue = BYTE(adjustBrightness(rgb.rgbBlue, 0.55) * p[x].rgbReserved / 255);
+					}
 				}
 
-				GlobalFree((HGLOBAL)bmpBuffer);
+				CBitmap bmpDisabled;
+				bmpDisabled.CreateBitmap(width, height, 1, 32, bmpBuffer);
+
+				VERIFY(m_imgListDisabled.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
+				VERIFY(m_imgListDisabled.Add(&bmpDisabled, nullptr) != 1);
 			}
+
+			GlobalFree((HGLOBAL)bmpBuffer);
 		}
 
 		DeleteObject(hBitmap);
