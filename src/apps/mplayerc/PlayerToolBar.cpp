@@ -233,9 +233,9 @@ void CPlayerToolBar::SwitchTheme()
 	UINT width, height;
 
 	// don't use premultiplied alpha here
-	HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir()+L"toolbar.png").GetString());
+	HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"toolbar.png").GetString());
 
-	if (FAILED(hr)) {
+	if (FAILED(hr) && s.bUseDarkTheme) {
 		BYTE* data;
 		UINT size;
 		hr = LoadResourceFile(resid, &data, size);
@@ -256,14 +256,22 @@ void CPlayerToolBar::SwitchTheme()
 		CBitmap bmp;
 		bmp.Attach(hBitmap);
 
+		BITMAP bitmap = {};
+		bmp.GetBitmap(&bitmap);
+
 		SetSizes({ (LONG)height + 7, (LONG)height + 6 }, SIZE{ (LONG)height, (LONG)height });
 
-		VERIFY(m_imgListActive.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
-		VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
+		if (32 == bitmap.bmBitsPixel) {
+			VERIFY(m_imgListActive.Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0));
+			VERIFY(m_imgListActive.Add(&bmp, nullptr) != -1);
+		} else {
+			VERIFY(m_imgListActive.Create(height, height, ILC_COLOR24 | ILC_MASK, 1, 0));
+			VERIFY(m_imgListActive.Add(&bmp, RGB(255, 0, 255)) != -1);
+		}
 
 		m_nButtonHeight = height;
 
-		if (32 == 32) {
+		if (32 == bitmap.bmBitsPixel) {
 			const UINT bitmapsize = width * height * 4;
 
 			BYTE* bmpBuffer = (BYTE*)GlobalAlloc(GMEM_FIXED, bitmapsize);
