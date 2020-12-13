@@ -92,12 +92,14 @@ public:
 
     int GetSystemMetricsDPI(int nIndex)
     {
+        /*
         if (SysVersion::IsWin10orLater()) {
             static tpGetSystemMetricsForDpi pGetSystemMetricsForDpi = (tpGetSystemMetricsForDpi)GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetSystemMetricsForDpi");
             if (pGetSystemMetricsForDpi) {
                 return pGetSystemMetricsForDpi(nIndex, GetDPIScalePercent());
             }
         }
+        */
 
         return ScaleSystemToMonitorX(::GetSystemMetrics(nIndex));
     }
