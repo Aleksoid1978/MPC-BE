@@ -14599,6 +14599,7 @@ void CMainFrame::DoTunerScan(TunerScanData* pTSD)
 void CMainFrame::MakeEmptySubMenu(CMenu& menu)
 {
 	if (!IsMenu(menu.m_hMenu)) {
+		menu.m_hMenu = nullptr;
 		menu.CreatePopupMenu();
 	}
 	else while (menu.RemoveMenu(0, MF_BYPOSITION));
