@@ -12118,6 +12118,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		Content::Online::Disconnect(youtubeUrl);
 
 		pOFD->fns.clear();
+		m_youtubeFields.thumbnailUrl.Empty();
 
 		auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&s](const Youtube::YoutubeUrllistItem& item) {
 			return item.profile->iTag == s.iYoutubeTagSelected;
@@ -12134,6 +12135,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
 			FixFilename(m_youtubeFields.fname);
+
+			m_youtubeFields.thumbnailUrl = it->thumbnailUrl;
 		}
 
 		m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
@@ -19407,6 +19410,38 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 					}
 			}
 			EndEnumFilters;
+
+			if (!bLoadRes && !m_youtubeFields.thumbnailUrl.IsEmpty()) {
+				CHTTPAsync HTTPAsync;
+				if (SUCCEEDED(HTTPAsync.Connect(m_youtubeFields.thumbnailUrl.GetString(), 10000))) {
+					std::vector<uint8_t> pData;
+					const auto contentLength = HTTPAsync.GetLenght();
+					if (contentLength) {
+						pData.resize(contentLength);
+						DWORD dwSizeRead = 0;
+						if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, &dwSizeRead) || dwSizeRead != contentLength) {
+							pData.clear();
+						}
+					} else {
+						std::vector<char> tmp(16 * KILOBYTE);
+						for (;;) {
+							DWORD dwSizeRead = 0;
+							if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), &dwSizeRead)) {
+								break;
+							}
+
+							pData.insert(pData.end(), tmp.begin(), tmp.begin() + dwSizeRead);
+						}
+					}
+
+					if (!pData.empty()) {
+						hr = WicLoadImage(&m_pMainBitmap, true, pData.data(), pData.size());
+						if (SUCCEEDED(hr)) {
+							bLoadRes = true;
+						}
+					}
+				}
+			}
 
 			if (!bLoadRes) {
 				// try to load image from file in the same dir that media file to show in preview & logo;

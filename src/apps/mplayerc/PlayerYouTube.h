@@ -127,6 +127,7 @@ namespace Youtube
 		CString        fname;
 		SYSTEMTIME     dtime    = { 0 };
 		REFERENCE_TIME duration = 0;
+		CString        thumbnailUrl;
 		std::vector<Chapters> chaptersList;
 
 		void Empty() {
@@ -136,6 +137,7 @@ namespace Youtube
 			fname.Empty();
 			dtime = { 0 };
 			duration = 0;
+			thumbnailUrl.Empty();
 			chaptersList.clear();
 		}
 	};
@@ -154,6 +156,7 @@ namespace Youtube
 
 	struct YoutubeUrllistItem : YoutubePlaylistItem {
 		const YoutubeProfile* profile;
+		CString thumbnailUrl;
 	};
 	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 
