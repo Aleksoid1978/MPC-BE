@@ -1223,6 +1223,46 @@ namespace Youtube
 					if (!final_audio_url.IsEmpty()) {
 						urls.push_back(final_audio_url);
 					}
+
+					if (!youtubeAudioUrllist.empty()) {
+						CString thumbnailUrl;
+						if (!player_response_jsonDocument.IsNull()) {
+							if (auto thumbnails = GetValueByPointer(player_response_jsonDocument, "/videoDetails/thumbnail/thumbnails"); thumbnails && thumbnails->IsArray()) {
+								int maxHeight = 0;
+								for (const auto& elem : thumbnails->GetArray()) {
+									CString url;
+									if (!getJsonValue(elem, "url", url)) {
+										continue;
+									}
+
+									int height = 0;
+									if (!getJsonValue(elem, "height", height)) {
+										continue;
+									}
+
+									if (height > maxHeight) {
+										maxHeight = height;
+										thumbnailUrl = url;
+									}
+								}
+							}
+						}
+
+						for (auto item : youtubeAudioUrllist) {
+							if (item.profile->format == Youtube::y_mp4) {
+								item.thumbnailUrl = thumbnailUrl;
+								youtubeUrllist.emplace_back(item);
+								break;
+							}
+						}
+						for (auto item : youtubeAudioUrllist) {
+							if (item.profile->format == Youtube::y_webm) {
+								item.thumbnailUrl = thumbnailUrl;
+								youtubeUrllist.emplace_back(item);
+								break;
+							}
+						}
+					}
 				}
 
 				return !urls.empty();
