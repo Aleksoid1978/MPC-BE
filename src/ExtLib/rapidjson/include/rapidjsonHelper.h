@@ -38,6 +38,11 @@ inline bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T&
 				value = it->value.GetFloat();
 				return true;
 			}
+		} else if constexpr (std::is_same_v<T, bool>) {
+			if (it->value.IsBool()) {
+				value = it->value.GetBool();
+				return true;
+			}
 		} else if constexpr (std::is_same_v<T, CStringA>) {
 			if (it->value.IsString()) {
 				value = it->value.GetString();
