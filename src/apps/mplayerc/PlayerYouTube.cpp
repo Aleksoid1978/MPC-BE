@@ -536,7 +536,14 @@ namespace Youtube
 				strUrls.Replace("\\u0026", "&");
 			}
 
-			if (strUrlsLive.empty() && player_response_jsonDocument.IsNull() && strUrls.IsEmpty()) {
+			bool bStreamingDataExist = false;
+			if (!player_response_jsonDocument.IsNull()) {
+				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+					bStreamingDataExist = true;
+				}
+			}
+
+			if (strUrlsLive.empty() && !bStreamingDataExist && strUrls.IsEmpty()) {
 				bReplacePlus = true;
 
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
