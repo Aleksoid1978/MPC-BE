@@ -1250,10 +1250,10 @@ namespace Youtube
 			CStringA dataStr = data.data();
 
 			while (!dataStr.IsEmpty()) {
-				CStringA jsonEntry = GetEntry(dataStr.GetString(), R"({"responseContext":)", "};");
+				CStringA jsonEntry = GetEntry(dataStr.GetString(), "ytInitialData = ", "};");
 				dataStr.Empty();
 				if (!jsonEntry.IsEmpty()) {
-					jsonEntry = R"({"responseContext":)" + jsonEntry + "}";
+					jsonEntry += "}";
 
 					rapidjson::Document json;
 					if (!json.Parse(jsonEntry).HasParseError()) {
