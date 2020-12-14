@@ -15339,7 +15339,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 			}
 		} else if (m_youtubeUrllist.size() > 1) {
 			int mline = 1;
-			for(const auto& item : m_youtubeUrllist) {
+			for (size_t i = 0; i < m_youtubeUrllist.size(); i++) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 				if (mline > MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
@@ -15347,11 +15347,22 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				}
 				mline++;
 
-				if (item.url == m_strPlaybackRenderedPath) {
+				if (m_youtubeUrllist[i].url == m_strPlaybackRenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				submenu.AppendMenu(flags, id++, item.title);
+				if (i > 1) {
+					const auto& prev_profile = m_youtubeUrllist[i-1].profile;
+					const auto& profile = m_youtubeUrllist[i].profile;
+
+					if (prev_profile->type != Youtube::y_audio
+							&& (prev_profile->format != profile->format || profile->type == Youtube::y_audio)) {
+						submenu.AppendMenu(MF_SEPARATOR);
+						mline++;
+					}
+				}
+
+				submenu.AppendMenu(flags, id++, m_youtubeUrllist[i].title);
 			}
 		}
 
