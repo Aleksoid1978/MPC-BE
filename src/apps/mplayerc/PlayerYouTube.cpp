@@ -583,6 +583,35 @@ namespace Youtube
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 			if (!player_response_jsonDocument.IsNull()) {
+				if (auto videoDetails = GetJsonObject(player_response_jsonDocument, "videoDetails")) {
+					bool isLive = false;
+					if (getJsonValue(*videoDetails, "isLive", isLive) && isLive) {
+						if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+							CString hlsManifestUrl;
+							if (getJsonValue(*streamingData, "hlsManifestUrl", hlsManifestUrl)) {
+								DLog(L"Youtube::Parse_URL() : Downloading m3u8 hls manifest \"%s\"", hlsManifestUrl);
+								urlData m3u8Data;
+								if (URLReadData(hlsManifestUrl.GetString(), m3u8Data)) {
+									CStringA m3u8Str(m3u8Data.data());
+
+									m3u8Str.Replace("\r\n", "\n");
+									std::list<CStringA> lines;
+									Explode(m3u8Str, lines, '\n');
+									for (auto& line : lines) {
+										line.Trim();
+										if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+											continue;
+										}
+
+										line.Replace("/keepalive/yes/", "/");
+										strUrlsLive.emplace_back(line);
+									}
+								}
+							}
+						}
+					}
+				}
+
 				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
 					if (auto formats = GetJsonArray(*streamingData, "formats")) {
 						for (const auto& format : formats->GetArray()) {
