@@ -29,13 +29,6 @@ CPPageMouse::CPPageMouse()
 	: CPPageBase(CPPageMouse::IDD, CPPageMouse::IDD)
 	, m_list(0)
 {
-	//m_comands_1.Add(0, 0);
-	//m_comands_1.Add(ID_PLAY_PLAYPAUSE, IDS_AG_PLAYPAUSE);
-
-	//m_comands_2.Add(0, 0);
-	//m_comands_2.Add(ID_PLAY_PLAYPAUSE,  IDS_AG_PLAYPAUSE);
-	//m_comands_2.Add(ID_VIEW_FULLSCREEN, IDS_AG_FULLSCREEN);
-
 	m_comands_3.Add(0, 0);
 	m_comands_3.Add(ID_PLAY_PLAYPAUSE,  IDS_AG_PLAYPAUSE);
 	m_comands_3.Add(ID_VIEW_FULLSCREEN, IDS_AG_FULLSCREEN);
@@ -191,6 +184,8 @@ BOOL CPPageMouse::OnInitDialog()
 
 	SyncList();
 
+	m_chkMouseLeftClickOpenRecent.EnableWindow(m_cmbLeftButtonClick.GetCurSel() == 1 ? TRUE : FALSE);
+
 	return TRUE;
 }
 
@@ -239,6 +234,7 @@ BOOL CPPageMouse::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
+	ON_CBN_SELCHANGE(IDC_COMBO1, OnLeftClickChange)
 	ON_NOTIFY(LVN_BEGINLABELEDITW, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDITW, IDC_LIST1, OnEndlabeleditList)
@@ -246,6 +242,17 @@ BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
 END_MESSAGE_MAP()
 
 // CPPageMouse message handlers
+
+void CPPageMouse::OnLeftClickChange()
+{
+	if (m_cmbLeftButtonClick.GetCurSel() == 1) {
+		m_chkMouseLeftClickOpenRecent.EnableWindow(TRUE);
+	} else {
+		m_chkMouseLeftClickOpenRecent.EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
 
 void CPPageMouse::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {

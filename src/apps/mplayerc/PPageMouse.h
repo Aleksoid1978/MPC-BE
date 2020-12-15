@@ -72,8 +72,6 @@ class CPPageMouse : public CPPageBase
 
 	UINT m_table_values[ROW_COUNT][COL_COUNT] = {};
 
-	//MOUSE_COMMANDS m_comands_1;
-	//MOUSE_COMMANDS m_comands_2;
 	MOUSE_COMMANDS m_comands_3; // Middle
 	MOUSE_COMMANDS m_comands_4; // X1, X2
 	MOUSE_COMMANDS m_comands_5; // Wheel Up/Down
@@ -106,6 +104,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg void OnLeftClickChange();
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
