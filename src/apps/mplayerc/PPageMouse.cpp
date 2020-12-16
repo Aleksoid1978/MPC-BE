@@ -29,34 +29,31 @@ CPPageMouse::CPPageMouse()
 	: CPPageBase(CPPageMouse::IDD, CPPageMouse::IDD)
 	, m_list(0)
 {
-	m_comands_3.Add(0, 0);
-	m_comands_3.Add(ID_PLAY_PLAYPAUSE,  IDS_AG_PLAYPAUSE);
-	m_comands_3.Add(ID_VIEW_FULLSCREEN, IDS_AG_FULLSCREEN);
-	m_comands_3.Add(ID_VIEW_PLAYLIST,   IDS_AG_TOGGLE_PLAYLIST);
-	m_comands_3.Add(ID_BOSS,            IDS_AG_BOSS_KEY);
+	m_comands_M.Add(0, 0);
+	m_comands_M.Add(ID_PLAY_PLAYPAUSE,  IDS_AG_PLAYPAUSE);
+	m_comands_M.Add(ID_VIEW_FULLSCREEN, IDS_AG_FULLSCREEN);
+	m_comands_M.Add(ID_VIEW_PLAYLIST,   IDS_AG_TOGGLE_PLAYLIST);
+	m_comands_M.Add(ID_BOSS,            IDS_AG_BOSS_KEY);
 
-	m_comands_4.Add(0, 0);
-	m_comands_4.Add(ID_NAVIGATE_SKIPFORWARD,     IDS_AG_NEXT);
-	m_comands_4.Add(ID_NAVIGATE_SKIPBACK,        IDS_AG_PREVIOUS);
-	m_comands_4.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
-	m_comands_4.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
-	m_comands_4.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
-	m_comands_4.Add(ID_PLAY_SEEKFORWARDMED,      IDS_AG_JUMP_FORWARD_2);
-	m_comands_4.Add(ID_FILE_CLOSEPLAYLIST,       IDS_AG_CLOSE);
+	m_comands_X.Add(0, 0);
+	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARD,     IDS_AG_NEXT);
+	m_comands_X.Add(ID_NAVIGATE_SKIPBACK,        IDS_AG_PREVIOUS);
+	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
+	m_comands_X.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
+	m_comands_X.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
+	m_comands_X.Add(ID_PLAY_SEEKFORWARDMED,      IDS_AG_JUMP_FORWARD_2);
+	m_comands_X.Add(ID_FILE_CLOSEPLAYLIST,       IDS_AG_CLOSE);
 
-	m_comands_5.Add(0, 0);
-	m_comands_5.Add(ID_VOLUME_UP,            IDS_AG_VOLUME_UP);
-	m_comands_5.Add(ID_VOLUME_DOWN,          IDS_AG_VOLUME_DOWN);
-	m_comands_5.Add(ID_PLAY_INCRATE,         IDS_AG_INCREASE_RATE);
-	m_comands_5.Add(ID_PLAY_DECRATE,         IDS_AG_DECREASE_RATE);
-	m_comands_5.Add(ID_PLAY_SEEKBACKWARDMED, IDS_AG_JUMP_BACKWARD_2);
-	m_comands_5.Add(ID_PLAY_SEEKFORWARDMED,  IDS_AG_JUMP_FORWARD_2);
+	m_comands_W.Add(0, 0);
+	m_comands_W.Add(ID_VOLUME_UP,                IDS_AG_VOLUME_UP);
+	m_comands_W.Add(ID_VOLUME_DOWN,              IDS_AG_VOLUME_DOWN);
+	m_comands_W.Add(ID_PLAY_INCRATE,             IDS_AG_INCREASE_RATE);
+	m_comands_W.Add(ID_PLAY_DECRATE,             IDS_AG_DECREASE_RATE);
+	m_comands_W.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
+	m_comands_W.Add(ID_PLAY_SEEKFORWARDMED,      IDS_AG_JUMP_FORWARD_2);
+	m_comands_W.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
+	m_comands_W.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
 
-	m_comands_6.Add(0, 0);
-	m_comands_6.Add(ID_PLAY_INCRATE,             IDS_AG_INCREASE_RATE);
-	m_comands_6.Add(ID_PLAY_DECRATE,             IDS_AG_DECREASE_RATE);
-	m_comands_6.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
-	m_comands_6.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
 }
 
 CPPageMouse::~CPPageMouse()

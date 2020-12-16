@@ -72,19 +72,18 @@ class CPPageMouse : public CPPageBase
 
 	UINT m_table_values[ROW_COUNT][COL_COUNT] = {};
 
-	MOUSE_COMMANDS m_comands_3; // Middle
-	MOUSE_COMMANDS m_comands_4; // X1, X2
-	MOUSE_COMMANDS m_comands_5; // Wheel Up/Down
-	MOUSE_COMMANDS m_comands_6; // Wheel Left/Right
+	MOUSE_COMMANDS m_comands_M; // Middle
+	MOUSE_COMMANDS m_comands_X; // X1, X2
+	MOUSE_COMMANDS m_comands_W; // Wheel Up/Down/Left/Right
 
 	MOUSE_COMMANDS* m_table_comands[ROW_COUNT][COL_COUNT] = {
-		{nullptr, &m_comands_3, &m_comands_3, &m_comands_3, &m_comands_3}, // ROW_BTN_M
-		{nullptr, &m_comands_4, &m_comands_4, &m_comands_4, &m_comands_4}, // ROW_BTN_X1
-		{nullptr, &m_comands_4, &m_comands_4, &m_comands_4, &m_comands_4}, // ROW_BTN_X2
-		{nullptr, &m_comands_5, &m_comands_5, &m_comands_5, &m_comands_5}, // ROW_WHL_U
-		{nullptr, &m_comands_5, &m_comands_5, &m_comands_5, &m_comands_5}, // ROW_WHL_D
-		{nullptr, &m_comands_6, &m_comands_6, &m_comands_6, &m_comands_6}, // ROW_WHL_L
-		{nullptr, &m_comands_6, &m_comands_6, &m_comands_6, &m_comands_6}, // ROW_WHL_R
+		{nullptr, &m_comands_M, &m_comands_M, &m_comands_M, &m_comands_M}, // ROW_BTN_M
+		{nullptr, &m_comands_X, &m_comands_X, &m_comands_X, &m_comands_X}, // ROW_BTN_X1
+		{nullptr, &m_comands_X, &m_comands_X, &m_comands_X, &m_comands_X}, // ROW_BTN_X2
+		{nullptr, &m_comands_W, &m_comands_W, &m_comands_W, &m_comands_W}, // ROW_WHL_U
+		{nullptr, &m_comands_W, &m_comands_W, &m_comands_W, &m_comands_W}, // ROW_WHL_D
+		{nullptr, &m_comands_W, &m_comands_W, &m_comands_W, &m_comands_W}, // ROW_WHL_L
+		{nullptr, &m_comands_W, &m_comands_W, &m_comands_W, &m_comands_W}, // ROW_WHL_R
 	};
 
 	LPCWSTR GetCmdString(MOUSE_COMMANDS* mouse_cmds, const WORD id);
