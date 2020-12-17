@@ -58,7 +58,7 @@
     <FxCompile Include="Transformation\final_pass.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
-    <FxCompile Include="Transformation\st2084_correction.hlsl">
+    <FxCompile Include="Transformation\convert_pq_to_sdr.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
     <FxCompile Include="Transformation\hlg_correction.hlsl">

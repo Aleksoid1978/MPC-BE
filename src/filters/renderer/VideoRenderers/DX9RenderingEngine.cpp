@@ -2298,12 +2298,12 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 			m_wsCorrection = L"Fix YCgCo";
 		}
 		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_2084) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
-			m_wsCorrection = L"HDR(BT.2020) to SDR";
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CONVERT_PQ_TO_SDR : IDF_SHADER_PS20_CONVERT_PQ_TO_SDR);
+			m_wsCorrection = L"Convert PQ to SDR";
 		}
 		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_HLG) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
-			m_wsCorrection = L" HDR(HLG) to SDR";
+			m_wsCorrection = L" Fix HLG";
 		}
 		else if (m_D3D9VendorId == PCIV_nVidia && (input_mt.subtype == MEDIASUBTYPE_YUY2 || input_mt.subtype == MEDIASUBTYPE_UYVY)) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_422 : IDF_SHADER_PS20_CORRECTION_422);
