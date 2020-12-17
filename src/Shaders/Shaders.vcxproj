@@ -43,7 +43,7 @@
       <FileType>Document</FileType>
     </None>
     <FxCompile Include="Transformation\hlg_correction.hlsl" />
-    <FxCompile Include="Transformation\st2084_correction.hlsl" />
+    <FxCompile Include="Transformation\convert_pq_to_sdr.hlsl" />
     <FxCompile Include="Transformation\ycgco_correction.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic06.hlsl">
       <FileType>Document</FileType>
