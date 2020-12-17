@@ -394,8 +394,24 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt, const bool bForce1
 		if (sampleformat == SAMPLE_FMT_NONE) {
 			return; // skip spdif/bitstream formats
 		}
-		if (m_bMixer || m_bAutoVolumeControl) {
-			sampleformat = SAMPLE_FMT_FLT; // some transformations change the sample format to float
+		if (m_bAutoVolumeControl) {
+			sampleformat = SAMPLE_FMT_FLT; // this transformations change the sample format to float
+		}
+
+		WORD  channels;
+		DWORD layout;
+
+		const auto input_channels = wfe->nChannels;
+		const auto input_layout = (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->nChannels == CountBits(wfex->dwChannelMask)) ? wfex->dwChannelMask : GetDefChannelMask(wfe->nChannels);
+		if (m_bMixer) {
+			channels = channel_mode[m_nMixerLayout].channels;
+			layout = channel_mode[m_nMixerLayout].ch_layout;
+			if (channels != input_channels || layout != input_layout) {
+				sampleformat = SAMPLE_FMT_FLT; // this transformations change the sample format to float
+			}
+		} else {
+			channels = input_channels;
+			layout = input_layout;
 		}
 
 		if (bForce16Bit ) {
@@ -441,20 +457,6 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt, const bool bForce1
 		}
 
 		WORD bitdeph = get_bits_per_sample(sampleformat);
-
-		WORD  channels;
-		DWORD layout;
-		if (m_bMixer) {
-			channels = channel_mode[m_nMixerLayout].channels;
-			layout   = channel_mode[m_nMixerLayout].ch_layout;
-		} else {
-			channels = wfe->nChannels;
-			if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->nChannels == CountBits(wfex->dwChannelMask)) {
-				layout = wfex->dwChannelMask;
-			} else {
-				layout = GetDefChannelMask(wfe->nChannels);
-			}
-		}
 
 		DWORD samplerate = wfe->nSamplesPerSec;
 		if (samplerate > 192000) { // 192 kHz is limit for DirectSound
