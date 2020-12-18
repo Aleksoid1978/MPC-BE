@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 23		"Zeit-Tooltip anzeigen:"
 25		"Vorschau bei der Suche anzeigen"
 26		"Größe bezogen auf Bildschirmbreite:"
-29		"Kapitelmarken in der Suchleiste anzeigen"
+29		"Kapitelmarker in der Suchleiste anzeigen"
 30		"Flybar aktivieren"
 31		"Schriftgröße der Wiedergabeliste:"
 34		"OSD"
