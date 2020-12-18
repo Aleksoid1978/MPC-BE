@@ -42,7 +42,7 @@
     <None Include="Transformation\hdr_tone_mapping.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="Transformation\hlg_correction.hlsl" />
+    <FxCompile Include="Transformation\convert_bt2020_to_bt709.hlsl" />
     <FxCompile Include="Transformation\convert_pq_to_sdr.hlsl" />
     <FxCompile Include="Transformation\ycgco_correction.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic06.hlsl">
