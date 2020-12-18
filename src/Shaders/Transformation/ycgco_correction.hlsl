@@ -4,13 +4,14 @@ sampler s0 : register(s0);
 
 #include "conv_matrix.hlsl"
 
+static const float4x4 rgb_ycbcr709_ycgco_rgb = mul(ycgco_rgb, rgb_ycbcr709);
+
 float4 main(float2 tex : TEXCOORD0) : COLOR
 {
-	// original pixel
-	float4 c0 = tex2D(s0, tex);
+    float4 pixel = tex2D(s0, tex); // original pixel
 
-	c0 = mul(rgb_ycbcr709, c0); // convert RGB to YUV and get original YCgCo
-	c0 = mul(ycgco_rgb, c0); // convert YCgCo to RGB
+    // convert RGB to YUV and get original YCgCo. convert YCgCo to RGB
+    pixel = mul(rgb_ycbcr709_ycgco_rgb, pixel);
 
-	return c0;
+    return pixel;
 }
