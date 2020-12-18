@@ -768,12 +768,16 @@ STDMETHODIMP CMpcAudioRenderer::Stop()
 
 	m_pSyncClock->UnSlave();
 
+	const auto bNeedStartReleaseTimer = m_filterState == State_Running;
+
 	m_filterState = State_Stopped;
 	if (m_hRendererNeedMoreData) {
 		SetEvent(m_hRendererNeedMoreData);
 	}
 
-	StartReleaseTimer();
+	if (bNeedStartReleaseTimer) {
+		StartReleaseTimer();
+	}
 
 	return CBaseRenderer::Stop();
 };
@@ -784,12 +788,16 @@ STDMETHODIMP CMpcAudioRenderer::Pause()
 
 	m_pSyncClock->UnSlave();
 
+	const auto bNeedStartReleaseTimer = m_filterState == State_Running;
+
 	m_filterState = State_Paused;
 	if (m_hRendererNeedMoreData) {
 		SetEvent(m_hRendererNeedMoreData);
 	}
 
-	StartReleaseTimer();
+	if (bNeedStartReleaseTimer) {
+		StartReleaseTimer();
+	}
 
 	return CBaseRenderer::Pause();
 };
