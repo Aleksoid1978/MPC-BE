@@ -109,7 +109,7 @@ IDF_SHADER_DOWNSCALER_LANCZOS_X  FILE                    "..\\..\\..\\bin\\shade
 IDF_SHADER_DOWNSCALER_LANCZOS_Y  FILE                    "..\\..\\..\\bin\\shaders\\downscaler_lanczos_y.cso"
 IDF_SHADER_CORRECTION_YCGCO      FILE                    "..\\..\\..\\bin\\shaders\\ycgco_correction.cso"
 IDF_SHADER_CONVERT_PQ_TO_SDR     FILE                    "..\\..\\..\\bin\\shaders\\convert_pq_to_sdr.cso"
-IDF_SHADER_CORRECTION_HLG        FILE                    "..\\..\\..\\bin\\shaders\\hlg_correction.cso"
+IDF_SHADER_CONVERT_2020_TO_709   FILE                    "..\\..\\..\\bin\\shaders\\convert_bt2020_to_bt709.cso"
 IDF_SHADER_CORRECTION_422        FILE                    "..\\..\\..\\bin\\shaders\\chroma_422_correction.cso"
 IDF_SHADER_CONVERT_TO_INTERLACE  FILE                    "..\\..\\..\\bin\\shaders\\halfoverunder_to_interlace.cso"
 
@@ -133,7 +133,7 @@ IDF_SHADER_PS20_DOWNSCALER_BOX_X     FILE                "..\\..\\..\\bin\\shade
 IDF_SHADER_PS20_DOWNSCALER_BOX_Y     FILE                "..\\..\\..\\bin\\shaders\\ps20_downscaler_box_y.cso"
 IDF_SHADER_PS20_CORRECTION_YCGCO     FILE                "..\\..\\..\\bin\\shaders\\ps20_ycgco_correction.cso"
 IDF_SHADER_PS20_CONVERT_PQ_TO_SDR    FILE                "..\\..\\..\\bin\\shaders\\ps20_convert_pq_to_sdr.cso"
-IDF_SHADER_PS20_CORRECTION_HLG       FILE                "..\\..\\..\\bin\\shaders\\ps20_hlg_correction.cso"
+IDF_SHADER_PS20_CONVERT_2020_TO_709  FILE                "..\\..\\..\\bin\\shaders\\ps20_convert_bt2020_to_bt709.cso"
 IDF_SHADER_PS20_CORRECTION_422       FILE                "..\\..\\..\\bin\\shaders\\ps20_chroma_422_correction.cso"
 IDF_SHADER_PS20_CONVERT_TO_INTERLACE FILE                "..\\..\\..\\bin\\shaders\\ps20_halfoverunder_to_interlace.cso"
 

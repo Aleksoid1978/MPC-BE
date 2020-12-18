@@ -58,10 +58,10 @@
     <FxCompile Include="Transformation\final_pass.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
-    <FxCompile Include="Transformation\convert_pq_to_sdr.hlsl">
+    <FxCompile Include="Transformation\convert_bt2020_to_bt709.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
-    <FxCompile Include="Transformation\hlg_correction.hlsl">
+    <FxCompile Include="Transformation\convert_pq_to_sdr.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
     <FxCompile Include="Resizers\downscaler.hlsl">
