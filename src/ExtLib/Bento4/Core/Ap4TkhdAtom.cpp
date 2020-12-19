@@ -123,25 +123,27 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_Size size, AP4_ByteStream& stream) :
         AP4_UI32 width  = m_Width >> 16;
         AP4_UI32 height = m_Height >> 16;
 
-		auto ReduceDim = [](AP4_UI64& num, AP4_UI64& den) {
-			const auto gcd = std::gcd(num, den);
-			num /= gcd;
-			den /= gcd;
-		};
-		AP4_UI64 num = (AP4_UI64)width * m_Matrix[0] + (AP4_UI64)height * m_Matrix[3] + ((AP4_UI64)m_Matrix[6] << 16);
-		AP4_UI64 den = (AP4_UI64)width * m_Matrix[1] + (AP4_UI64)height * m_Matrix[4] + ((AP4_UI64)m_Matrix[7] << 16);
-		if (num > 0 && den > 0) {
-			ReduceDim(num, den);
-			while (num > INT32_MAX || den > INT32_MAX) {
-				num >>= 1;
-				den >>= 1;
-			}
-			if (num > 0 && den > 0) {
-				ReduceDim(num, den); // need after num >>= 1 and den >>= 1
-				m_PictARNum = num;
-				m_PictARDen = den;
-			}
-		}
+        // MPC-BE custom code start
+        auto ReduceDim = [](AP4_UI64& num, AP4_UI64& den) {
+            const auto gcd = std::gcd(num, den);
+            num /= gcd;
+            den /= gcd;
+        };
+        AP4_UI64 num = (AP4_UI64)width * m_Matrix[0] + (AP4_UI64)height * m_Matrix[3] + ((AP4_UI64)m_Matrix[6] << 16);
+        AP4_UI64 den = (AP4_UI64)width * m_Matrix[1] + (AP4_UI64)height * m_Matrix[4] + ((AP4_UI64)m_Matrix[7] << 16);
+        if (num > 0 && den > 0) {
+            ReduceDim(num, den);
+            while (num > INT32_MAX || den > INT32_MAX) {
+                num >>= 1;
+                den >>= 1;
+            }
+            if (num > 0 && den > 0) {
+                ReduceDim(num, den); // need after num >>= 1 and den >>= 1
+                m_PictARNum = num;
+                m_PictARDen = den;
+            }
+        }
+        // MPC-BE custom code end
     }
 }
 

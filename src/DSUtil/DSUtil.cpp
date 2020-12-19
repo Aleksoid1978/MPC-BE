@@ -2726,7 +2726,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const ULONG format
 		*extralen = extralength;
 }
 
-HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
+HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize pictAR, BYTE* extra, size_t extralen)
 {
 	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
 
@@ -2737,8 +2737,8 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 	memset(pm2vi, 0, mt->FormatLength());
 	memcpy(&pm2vi->hdr.bmiHeader, pbmi, sizeof(BITMAPINFOHEADER));
 
-	pm2vi->hdr.dwPictAspectRatioX	= aspect.cx;
-	pm2vi->hdr.dwPictAspectRatioY	= aspect.cy;
+	pm2vi->hdr.dwPictAspectRatioX	= pictAR.cx;
+	pm2vi->hdr.dwPictAspectRatioY	= pictAR.cy;
 	pm2vi->hdr.AvgTimePerFrame		= AvgTimePerFrame;
 	pm2vi->hdr.rcSource				= pm2vi->hdr.rcTarget = rc;
 	pm2vi->cbSequenceHeader			= 0;
@@ -2786,7 +2786,7 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 	return hr;
 }
 
-HRESULT CreateMPEG2VIfromMVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
+HRESULT CreateMPEG2VIfromMVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize pictAR, BYTE* extra, size_t extralen)
 {
 	// code from LAV Source ... thanks to it's author
 	if (extralen > 8 && extra && extra[0] == 1) {
@@ -2819,13 +2819,13 @@ HRESULT CreateMPEG2VIfromMVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 		extralen -= 8;
 
 		pbmi->biCompression = FCC('MVC1');
-		return CreateMPEG2VIfromAVC(mt, pbmi, AvgTimePerFrame, aspect, extra, extralen);
+		return CreateMPEG2VIfromAVC(mt, pbmi, AvgTimePerFrame, pictAR, extra, extralen);
 	}
 
 	return E_FAIL;
 }
 
-HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen, DWORD dwProfile/* = 0*/, DWORD dwLevel/* = 0*/, DWORD dwFlags/* = 0*/)
+HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize pictAR, BYTE* extra, size_t extralen, DWORD dwProfile/* = 0*/, DWORD dwLevel/* = 0*/, DWORD dwFlags/* = 0*/)
 {
 	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
 
@@ -2836,8 +2836,8 @@ HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TI
 	memset(pm2vi, 0, mt->FormatLength());
 	memcpy(&pm2vi->hdr.bmiHeader, pbmi, sizeof(BITMAPINFOHEADER));
 
-	pm2vi->hdr.dwPictAspectRatioX	= aspect.cx;
-	pm2vi->hdr.dwPictAspectRatioY	= aspect.cy;
+	pm2vi->hdr.dwPictAspectRatioX	= pictAR.cx;
+	pm2vi->hdr.dwPictAspectRatioY	= pictAR.cy;
 	pm2vi->hdr.AvgTimePerFrame		= AvgTimePerFrame;
 	pm2vi->hdr.rcSource				= pm2vi->hdr.rcTarget = rc;
 

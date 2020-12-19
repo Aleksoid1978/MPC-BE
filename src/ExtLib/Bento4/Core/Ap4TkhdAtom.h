@@ -113,8 +113,8 @@ public:
     AP4_UI32 m_Matrix[9];
     AP4_UI32 m_Width;
     AP4_UI32 m_Height;
-	AP4_UI32 m_PictARNum;
-	AP4_UI32 m_PictARDen;
+    AP4_UI32 m_PictARNum;
+    AP4_UI32 m_PictARDen;
 };
 
 #endif // _AP4_TKHD_ATOM_H_
