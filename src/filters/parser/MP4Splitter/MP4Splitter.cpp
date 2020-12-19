@@ -170,29 +170,22 @@ static void SetTrackName(CString *TrackName, CString Suffix)
 	}											\
 	SetTrackName(&TrackName, tname);			\
 
-static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, LONG codec_height, VIDEOINFOHEADER2* vih2)
+static void SetPictAR(CSize& pictAR, LONG width, LONG height, LONG codec_width, LONG codec_height, VIDEOINFOHEADER2* vih2)
 {
-	__int64 cx = Aspect.cx;
-	__int64 cy = Aspect.cy;
-
-	if (!cx || !cy) {
+	if (!pictAR.cx || !pictAR.cy) {
 		if (width && height) {
-			cx = width;
-			cy = height;
+			pictAR.cx = width;
+			pictAR.cy = height;
 		} else {
-			cx = codec_width;
-			cy = codec_height;
+			pictAR.cx = codec_width;
+			pictAR.cy = codec_height;
 		}
-	} else {
-		cx *= codec_width;
-		cy *= codec_height;
+		ReduceDim(pictAR);
 	}
-	ReduceDim(cx, cy);
-	Aspect.SetSize(cx, cy);
 
 	if (vih2) {
-		vih2->dwPictAspectRatioX = Aspect.cx;
-		vih2->dwPictAspectRatioY = Aspect.cy;
+		vih2->dwPictAspectRatioX = pictAR.cx;
+		vih2->dwPictAspectRatioY = pictAR.cy;
 	}
 }
 
@@ -423,20 +416,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
 
-			CSize Aspect;
+			CSize PictAR;
 			AP4_UI32 width = 0;
 			AP4_UI32 height = 0;
 			REFERENCE_TIME AvgTimePerFrame = 0;
+
 			if (track->GetType() == AP4_Track::TYPE_VIDEO) {
 				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
 					width = tkhd->GetWidth() >> 16;
 					height = tkhd->GetHeight() >> 16;
-					double num = 0;
-					double den = 0;
-					tkhd->GetAspect(num, den);
-					if (num > 0 && den > 0) {
-						Aspect = ReduceDim(num / den);
-					}
+
+					tkhd->GetPictAR(PictAR.cx, PictAR.cy);
 
 					if (!nRotation) {
 						nRotation = tkhd->GetRotation();
@@ -448,15 +438,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (AP4_DataInfoAtom* clef = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("tapt/clef"))) {
-					const AP4_DataBuffer* clef_data = clef->GetData();
-					if (clef_data->GetDataSize() == 12) { // 20 bytes(size) - 8 bytes(header)
-						const uint32_t* data = (uint32_t*)clef_data->GetData();
-						if (data[1] && data[2]) {
-							CSize clef_wh(_byteswap_ulong(data[1]) >> 16, (_byteswap_ulong(data[2]) >> 16));
-							if (clef_wh.cx > 0 && clef_wh.cy > 0) {
-								ReduceDim(clef_wh);
-								Aspect = clef_wh;
+				if (!PictAR.cx || !PictAR.cy) {
+					if (AP4_DataInfoAtom* clef = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("tapt/clef"))) {
+						const AP4_DataBuffer* clef_data = clef->GetData();
+						if (clef_data->GetDataSize() == 12) { // 20 bytes(size) - 8 bytes(header)
+							const uint32_t* data = (uint32_t*)clef_data->GetData();
+							if (data[1] && data[2]) {
+								uint32_t clef_x = _byteswap_ulong(data[1]) >> 16;
+								uint32_t clef_y = _byteswap_ulong(data[2]) >> 16;
+								if (clef_x > 0 && clef_y > 0) {
+									ReduceDim(clef_x, clef_y);
+									PictAR = { (long)clef_x, (long)clef_y };
+								}
 							}
 						}
 					}
@@ -526,7 +519,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.majortype	= MEDIATYPE_Video;
 					mt.formattype	= FORMAT_VideoInfo2;
 
-					vih2						= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize());
+					vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize());
 					memset(vih2, 0, mt.FormatLength());
 					vih2->dwBitRate				= video_desc->GetAvgBitrate()/8;
 					vih2->bmiHeader.biSize		= sizeof(vih2->bmiHeader);
@@ -535,7 +528,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					vih2->rcSource				= vih2->rcTarget = CRect(0, 0, biWidth, biHeight);
 					vih2->AvgTimePerFrame		= AvgTimePerFrame;
 
-					SetAspect(Aspect, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
+					SetPictAR(PictAR, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
 
 					memcpy(vih2 + 1, di->GetData(), di->GetDataSize());
 
@@ -555,7 +548,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								pbmi.biBitCount		= 24;
 								pbmi.biSizeImage	= DIBSIZE(pbmi);
 
-								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
 								mt.SetSampleSize(pbmi.biSizeImage);
 								mts.push_back(mt);
 
@@ -579,7 +572,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								pbmi.biBitCount		= 24;
 								pbmi.biSizeImage	= DIBSIZE(pbmi);
 
-								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
 								mt.SetSampleSize(pbmi.biSizeImage);
 								mts.push_back(mt);
 							}
@@ -936,13 +929,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih2->rcSource					= vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
 						vih2->AvgTimePerFrame			= AvgTimePerFrame;
 
-						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
-							if (!Aspect.cx && pasp->GetHSpacing() > 0 && pasp->GetVSpacing() > 0) {
-								Aspect.SetSize(pasp->GetHSpacing(), pasp->GetVSpacing());
+						if (!PictAR.cx || !PictAR.cy) {
+							if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
+								if (pasp->GetHSpacing() > 0 && pasp->GetVSpacing() > 0) {
+									uint32_t pasp_x = vse->GetWidth() * pasp->GetHSpacing();
+									uint32_t pasp_y = vse->GetHeight() * pasp->GetVSpacing();
+									ReduceDim(pasp_x, pasp_y);
+									PictAR = { (long)pasp_x, (long)pasp_y };
+								}
 							}
 						}
 
-						SetAspect(Aspect, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
+						SetPictAR(PictAR, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
 
 						mt.SetSampleSize(vih2->bmiHeader.biSizeImage);
 
@@ -1082,13 +1080,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									pbmi.biBitCount    = 24;
 									pbmi.biSizeImage   = DIBSIZE(pbmi);
 
-									CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+									CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
 									mt.SetSampleSize(pbmi.biSizeImage);
 
 									mts.clear();
 									mts.push_back(mt);
 
-									if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size))) {
+									if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size))) {
 										mts.insert(mts.cbegin(), mt);
 									} else if (!di->GetDataSize()) {
 										switch (type) {
@@ -1267,7 +1265,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													pbmi.biBitCount    = 24;
 													pbmi.biSizeImage   = DIBSIZE(pbmi);
 
-													CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+													CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
 													mt.SetSampleSize(pbmi.biSizeImage);
 
 													mts.clear();
@@ -1357,7 +1355,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									vc_params_t params = { 0 };
 									HEVCParser::ParseHEVCDecoderConfigurationRecord(data, size, params, false);
 
-									CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size, params.profile, params.level, params.nal_length_size);
+									CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size, params.profile, params.level, params.nal_length_size);
 									mt.SetSampleSize(pbmi.biSizeImage);
 
 									mts.clear();

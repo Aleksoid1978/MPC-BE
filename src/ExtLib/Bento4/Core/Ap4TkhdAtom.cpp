@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - tkhd Atoms 
+|    AP4 - tkhd Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -34,6 +34,8 @@
 #include "Ap4AtomFactory.h"
 #include "Ap4Utils.h"
 
+#include <numeric>
+
 /*----------------------------------------------------------------------
 |       AP4_TkhdAtom::AP4_TkhdAtom
 +---------------------------------------------------------------------*/
@@ -56,8 +58,8 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_UI64 creation_time,
     m_Reserved3(0),
     m_Width(width),
     m_Height(height),
-    m_Num(0),
-    m_Den(0)
+    m_PictARNum(0),
+    m_PictARDen(0)
 {
     m_Flags = AP4_TKHD_FLAG_DEFAULTS;
 
@@ -80,8 +82,8 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_UI64 creation_time,
 +---------------------------------------------------------------------*/
 AP4_TkhdAtom::AP4_TkhdAtom(AP4_Size size, AP4_ByteStream& stream) :
     AP4_Atom(AP4_ATOM_TYPE_TKHD, size, true, stream),
-    m_Num(0),
-    m_Den(0)
+    m_PictARNum(0),
+    m_PictARDen(0)
 {
     if (m_Version == 0) {
         AP4_UI32 tmp = 0;
@@ -121,8 +123,25 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_Size size, AP4_ByteStream& stream) :
         AP4_UI32 width  = m_Width >> 16;
         AP4_UI32 height = m_Height >> 16;
 
-        m_Num = ((double)(AP4_UI64)width * m_Matrix[0] + (AP4_UI64)height * m_Matrix[3] + ((AP4_UI64)m_Matrix[6] << 16)) * height;
-        m_Den = ((double)(AP4_UI64)width * m_Matrix[1] + (AP4_UI64)height * m_Matrix[4] + ((AP4_UI64)m_Matrix[7] << 16)) * width;
+		auto ReduceDim = [](AP4_UI64& num, AP4_UI64& den) {
+			const auto gcd = std::gcd(num, den);
+			num /= gcd;
+			den /= gcd;
+		};
+		AP4_UI64 num = (AP4_UI64)width * m_Matrix[0] + (AP4_UI64)height * m_Matrix[3] + ((AP4_UI64)m_Matrix[6] << 16);
+		AP4_UI64 den = (AP4_UI64)width * m_Matrix[1] + (AP4_UI64)height * m_Matrix[4] + ((AP4_UI64)m_Matrix[7] << 16);
+		if (num > 0 && den > 0) {
+			ReduceDim(num, den);
+			while (num > INT32_MAX || den > INT32_MAX) {
+				num >>= 1;
+				den >>= 1;
+			}
+			if (num > 0 && den > 0) {
+				ReduceDim(num, den); // need after num >>= 1 and den >>= 1
+				m_PictARNum = num;
+				m_PictARDen = den;
+			}
+		}
     }
 }
 

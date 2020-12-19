@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - tkhd Atoms 
+|    AP4 - tkhd Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -59,7 +59,7 @@ public:
                  AP4_UI64 duration,
                  AP4_UI16 volume,
                  AP4_UI32 width,
-                 AP4_UI32 height);    
+                 AP4_UI32 height);
     AP4_TkhdAtom(AP4_Size size, AP4_ByteStream& stream);
     virtual AP4_Result InspectFields(AP4_AtomInspector& inspector);
     virtual AP4_Result WriteFields(AP4_ByteStream& stream);
@@ -70,9 +70,9 @@ public:
         return AP4_SUCCESS;
     }
     AP4_UI32   GetTrackId()  { return m_TrackId;  }
-    AP4_Result SetTrackId(AP4_UI32 track_id)  { 
+    AP4_Result SetTrackId(AP4_UI32 track_id)  {
         m_TrackId = track_id;
-        return AP4_SUCCESS;  
+        return AP4_SUCCESS;
     }
 
     void GetTranslation(AP4_Float& x, AP4_Float& y) {
@@ -91,9 +91,9 @@ public:
         }
         return (AP4_Integer)(rotation + 0.5);
     }
-    void GetAspect(double& num, double& den) {
-        num = m_Num;
-        den = m_Den;
+    void GetPictAR(long& num, long& den) {
+        num = m_PictARNum;
+        den = m_PictARDen;
     }
 // MPC-BE custom code end
 
@@ -113,8 +113,8 @@ public:
     AP4_UI32 m_Matrix[9];
     AP4_UI32 m_Width;
     AP4_UI32 m_Height;
-    double m_Num;
-    double m_Den;
+	AP4_UI32 m_PictARNum;
+	AP4_UI32 m_PictARDen;
 };
 
 #endif // _AP4_TKHD_ATOM_H_
