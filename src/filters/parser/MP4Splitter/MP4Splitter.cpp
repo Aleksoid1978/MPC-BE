@@ -453,10 +453,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (clef_data->GetDataSize() == 12) { // 20 bytes(size) - 8 bytes(header)
 						const uint32_t* data = (uint32_t*)clef_data->GetData();
 						if (data[1] && data[2]) {
-							double num = (double)_byteswap_ulong(data[1]) * height;
-							double den = (double)_byteswap_ulong(data[2]) * width;
-							if (num > 0 && den > 0) {
-								Aspect = ReduceDim(num / den);
+							CSize clef_wh(_byteswap_ulong(data[1]) >> 16, (_byteswap_ulong(data[2]) >> 16));
+							if (clef_wh.cx > 0 && clef_wh.cy > 0) {
+								ReduceDim(clef_wh);
+								Aspect = clef_wh;
 							}
 						}
 					}
