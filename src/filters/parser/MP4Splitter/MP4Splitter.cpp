@@ -149,26 +149,27 @@ STDMETHODIMP CMP4SplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-static void SetTrackName(CString *TrackName, CString Suffix)
+static void SetTrackName(CString& TrackName, LPCWSTR Suffix)
 {
-	if (TrackName->IsEmpty()) {
-		*TrackName = Suffix;
+	if (TrackName.IsEmpty()) {
+		TrackName = Suffix;
 	} else {
-		*TrackName += L" - ";
-		*TrackName += Suffix;
+		TrackName.Append(L" - ");
+		TrackName.Append(Suffix);
 	}
 }
 
-#define FormatTrackName(name, append)			\
-	if (!tname.IsEmpty() && tname[0] < 0x20) {	\
-		tname.Delete(0);						\
-	}											\
-	if (tname.IsEmpty()) {						\
-		tname = name;							\
-	} else if (append) {						\
-		tname.AppendFormat(L"(%s)", name);		\
-	}											\
-	SetTrackName(&TrackName, tname);			\
+static void FormatTrackName(CString& TrackName, LPCWSTR name, const bool bAppend)
+{
+	if (!TrackName.IsEmpty() && TrackName[0] < 0x20) {
+		TrackName.Delete(0);
+	}
+	if (TrackName.IsEmpty()) {
+		TrackName = name;
+	} else if (bAppend) {
+		TrackName.AppendFormat(L"(%s)", name);
+	}
+}
 
 static void SetPictAR(CSize& pictAR, LONG width, LONG height, LONG codec_width, LONG codec_height, VIDEOINFOHEADER2* vih2)
 {
@@ -493,7 +494,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (mpeg_desc) {
 					CStringW TypeString = CStringW(mpeg_desc->GetObjectTypeString(mpeg_desc->GetObjectTypeId()));
 					if ((TypeString.Find(L"UNKNOWN") == -1) && (TypeString.Find(L"INVALID") == -1)) {
-						SetTrackName(&TrackName, TypeString);
+						SetTrackName(TrackName, TypeString);
 					}
 				}
 
@@ -853,7 +854,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
 							// Apple HDV/XDCAM
-							FormatTrackName(L"HDV/XDV MPEG2", 0);
+							FormatTrackName(tname, L"HDV/XDV MPEG2", false);
 
 							m_pFile->Seek(sample.GetOffset());
 							CBaseSplitterFileEx::seqhdr h;
@@ -864,43 +865,43 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || fourcc == FCC('MJPG')) {
-							FormatTrackName(L"M-Jpeg", 1);
+							FormatTrackName(tname, L"M-Jpeg", true);
 						} else if (type == AP4_ATOM_TYPE_MJP2) {
-							FormatTrackName(L"M-Jpeg 2000", 1);
+							FormatTrackName(tname, L"M-Jpeg 2000", true);
 						} else if (type == AP4_ATOM_TYPE_APCN ||
 								   type == AP4_ATOM_TYPE_APCH ||
 								   type == AP4_ATOM_TYPE_APCO ||
 								   type == AP4_ATOM_TYPE_APCS ||
 								   type == AP4_ATOM_TYPE_AP4H ||
 								   type == AP4_ATOM_TYPE_AP4X) {
-							FormatTrackName(L"Apple ProRes", 0);
+							FormatTrackName(tname, L"Apple ProRes", false);
 						} else if (type == AP4_ATOM_TYPE_SVQ1 ||
 								   type == AP4_ATOM_TYPE_SVQ2 ||
 								   type == AP4_ATOM_TYPE_SVQ3) {
-							FormatTrackName(L"Sorenson", 0);
+							FormatTrackName(tname, L"Sorenson", false);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
-							FormatTrackName(L"Cinepack", 0);
+							FormatTrackName(tname, L"Cinepack", false);
 						} else if (type == AP4_ATOM_TYPE_vp08) {
-							FormatTrackName(L"VP8", 0);
+							FormatTrackName(tname, L"VP8", false);
 						} else if (type == AP4_ATOM_TYPE_vp09) {
-							FormatTrackName(L"VP9", 0);
+							FormatTrackName(tname, L"VP9", false);
 						} else if (type == AP4_ATOM_TYPE_av01) {
-							FormatTrackName(L"AV1", 0);
+							FormatTrackName(tname, L"AV1", false);
 						} else if (type == AP4_ATOM_TYPE_Hap1 ||
 								type == AP4_ATOM_TYPE_Hap5 ||
 								type == AP4_ATOM_TYPE_HapA ||
 								type == AP4_ATOM_TYPE_HapM ||
 								type == AP4_ATOM_TYPE_HapY) {
-							FormatTrackName(L"Vidvox Hap", 0);
+							FormatTrackName(tname, L"Vidvox Hap", false);
 						} else if (type == AP4_ATOM_TYPE_FMP4) {
-							FormatTrackName(L"MPEG-4", 0);
+							FormatTrackName(tname, L"MPEG-4", false);
 						} else if (fourcc == FCC('WVC1')) {
-							FormatTrackName(L"VC-1", 0);
+							FormatTrackName(tname, L"VC-1", false);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
 								pData = (AP4_DataBuffer*)Dvc1->GetDecoderInfo();
 							}
 						} else if (!tname.IsEmpty()){
-							SetTrackName(&TrackName, tname);
+							SetTrackName(TrackName, tname);
 						}
 
 						AP4_Size ExtraSize = pData->GetDataSize();
@@ -1043,7 +1044,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							case AP4_ATOM_TYPE_AIVX:
 							case AP4_ATOM_TYPE_AVIN:
 								{
-									SetTrackName(&TrackName, L"MPEG4 Video (H264)");
+									SetTrackName(TrackName, L"MPEG4 Video (H264)");
 
 									const AP4_DataBuffer* di = nullptr;
 									if (AP4_DataInfoAtom* avcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_AVCC))) {
@@ -1329,7 +1330,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							case AP4_ATOM_TYPE_DVHE:
 							case AP4_ATOM_TYPE_DVH1:
 								{
-									SetTrackName(&TrackName, L"HEVC Video (H.265)");
+									SetTrackName(TrackName, L"HEVC Video (H.265)");
 
 									const AP4_DataBuffer* di = nullptr;
 									if (AP4_DataInfoAtom* hvcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_HVCC))) {
@@ -1578,33 +1579,33 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = type & 0xffff;
 						} else if (type == AP4_ATOM_TYPE_ALAW) {
 							fourcc = WAVE_FORMAT_ALAW;
-							SetTrackName(&TrackName, L"PCM A-law");
+							SetTrackName(TrackName, L"PCM A-law");
 						} else if (type == AP4_ATOM_TYPE_ULAW) {
 							fourcc = WAVE_FORMAT_MULAW;
-							SetTrackName(&TrackName, L"PCM mu-law");
+							SetTrackName(TrackName, L"PCM mu-law");
 						} else if (type == AP4_ATOM_TYPE__MP3) {
-							SetTrackName(&TrackName, L"MPEG Audio (MP3)");
+							SetTrackName(TrackName, L"MPEG Audio (MP3)");
 							fourcc = WAVE_FORMAT_MPEGLAYER3;
 						} else if (type == AP4_ATOM_TYPE_ac_3 || type == AP4_ATOM_TYPE_AC_3 || type == AP4_ATOM_TYPE_SAC3) {
 							fourcc = WAVE_FORMAT_DOLBY_AC3;
-							SetTrackName(&TrackName, L"AC-3 Audio");
+							SetTrackName(TrackName, L"AC-3 Audio");
 						} else if (type == AP4_ATOM_TYPE_EAC3) {
-							SetTrackName(&TrackName, L"Enhanced AC-3 audio");
+							SetTrackName(TrackName, L"Enhanced AC-3 audio");
 							fourcc = WAVE_FORMAT_UNKNOWN;
 						} else if (type == AP4_ATOM_TYPE_MP4A) {
 							fourcc = WAVE_FORMAT_RAW_AAC1;
-							SetTrackName(&TrackName, L"MPEG-2 Audio AAC");
+							SetTrackName(TrackName, L"MPEG-2 Audio AAC");
 						} else if (type == AP4_ATOM_TYPE_NMOS) {
 							fourcc = MAKEFOURCC('N','E','L','L');
-							SetTrackName(&TrackName, L"NellyMoser Audio");
+							SetTrackName(TrackName, L"NellyMoser Audio");
 						} else if (type == AP4_ATOM_TYPE_ALAC) {
 							fourcc = MAKEFOURCC('a','l','a','c');
-							SetTrackName(&TrackName, L"ALAC Audio");
+							SetTrackName(TrackName, L"ALAC Audio");
 						} else if (type == AP4_ATOM_TYPE_QDM2) {
-							SetTrackName(&TrackName, L"QDesign Music 2");
+							SetTrackName(TrackName, L"QDesign Music 2");
 						} else if (type == AP4_ATOM_TYPE_SPEX) {
 							fourcc = 0xa109;
-							SetTrackName(&TrackName, L"Speex");
+							SetTrackName(TrackName, L"Speex");
 						} else if ((type == AP4_ATOM_TYPE_NONE || type == AP4_ATOM_TYPE_RAW) && bitspersample == 8 ||
 								    type == AP4_ATOM_TYPE_SOWT && bitspersample == 16 ||
 								   (type == AP4_ATOM_TYPE_IN24 || type == AP4_ATOM_TYPE_IN32) && ase->GetEndian()==ENDIAN_LITTLE) {
@@ -1617,7 +1618,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian()==ENDIAN_LITTLE) {
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 						} else if (type == AP4_ATOM_TYPE_LPCM) {
-							SetTrackName(&TrackName, L"LPCM");
+							SetTrackName(TrackName, L"LPCM");
 							DWORD flags = ase->GetFormatSpecificFlags();
 							if (flags & 2) { // big endian
 								if (flags & 1) { // floating point
@@ -1640,19 +1641,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						} else if (type == AP4_ATOM_TYPE_FLAC) {
-							SetTrackName(&TrackName, L"FLAC");
+							SetTrackName(TrackName, L"FLAC");
 							fourcc = WAVE_FORMAT_FLAC;
 						} else if (type == AP4_ATOM_TYPE_Opus) {
-							SetTrackName(&TrackName, L"Opus");
+							SetTrackName(TrackName, L"Opus");
 							fourcc = WAVE_FORMAT_OPUS;
 						} else if (type == AP4_ATOM_TYPE_DTSC || type == AP4_ATOM_TYPE_DTSE
 								|| type == AP4_ATOM_TYPE_DTSH || type == AP4_ATOM_TYPE_DTSL) {
 							fourcc = type = WAVE_FORMAT_DTS2;
 						} else if (type == AP4_ATOM_TYPE_MP2) {
-							SetTrackName(&TrackName, L"MP2");
+							SetTrackName(TrackName, L"MP2");
 							fourcc = WAVE_FORMAT_MPEG;
 						} else if (type == AP4_ATOM_TYPE_mlpa) {
-							SetTrackName(&TrackName, L"TrueHD");
+							SetTrackName(TrackName, L"TrueHD");
 							fourcc = WAVE_FORMAT_UNKNOWN;
 						}
 
@@ -1665,7 +1666,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							type == AP4_ATOM_TYPE_FL64 ||
 							type == WAVE_FORMAT_PCM    ||
 							type == WAVE_FORMAT_IEEE_FLOAT) {
-							SetTrackName(&TrackName, L"PCM");
+							SetTrackName(TrackName, L"PCM");
 						}
 
 						mt.majortype = MEDIATYPE_Audio;
@@ -1835,7 +1836,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								((BYTE *)(wfe + 1))[0] = profile;
 							}
 
-							SetTrackName(&TrackName, Suffix);
+							SetTrackName(TrackName, Suffix);
 						} else if (type == AP4_ATOM_TYPE_Opus) {
 							mt.subtype = MEDIASUBTYPE_OPUS;
 
