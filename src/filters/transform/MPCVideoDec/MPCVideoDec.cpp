@@ -984,8 +984,6 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-#define CleanDXVAVariable() { m_DXVADecoderGUID = GUID_NULL; ZeroMemory(&m_DXVA2Config, sizeof(m_DXVA2Config)); }
-
 // CMPCVideoDecFilter
 
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
@@ -1537,6 +1535,13 @@ void CMPCVideoDecFilter::CleanupD3DResources()
 	m_pDecoderService.Release();
 }
 
+void CMPCVideoDecFilter::CleanupDXVAVariables()
+{
+	m_DXVADecoderGUID = GUID_NULL;
+	m_DXVASurfaceFormat = D3DFMT_UNKNOWN;
+	ZeroMemory(&m_DXVA2Config, sizeof(m_DXVA2Config));
+}
+
 void CMPCVideoDecFilter::CleanupFFmpeg()
 {
 	m_pAVCodec = nullptr;
@@ -1647,7 +1652,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 	HRESULT hr = E_FAIL;
 
-	CleanDXVAVariable();
+	CleanupDXVAVariables();
 
 	if (m_pDecoderService) {
 		UINT cDecoderGuids               = 0;
@@ -1655,6 +1660,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		GUID decoderGuid                 = GUID_NULL;
 		BOOL bFoundDXVA2Configuration    = FALSE;
 		DXVA2_ConfigPictureDecode config = { 0 };
+		D3DFORMAT surfaceFormat          = D3DFMT_UNKNOWN;
 
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
 
@@ -1697,7 +1703,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					}
 
 					// Find a configuration that we support.
-					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, guid, &config, &bFoundDXVA2Configuration))) {
+					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, guid, config, surfaceFormat, bFoundDXVA2Configuration))) {
 						break;
 					}
 
@@ -1719,8 +1725,9 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		}
 
 		if (SUCCEEDED(hr)) {
-			m_DXVA2Config     = config;
-			m_DXVADecoderGUID = decoderGuid;
+			m_DXVA2Config       = config;
+			m_DXVADecoderGUID   = decoderGuid;
+			m_DXVASurfaceFormat = surfaceFormat;
 		}
 	}
 
@@ -2626,7 +2633,11 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 					SAFE_RELEASE(pSurfaces[i]);
 				}
 
-				if (SUCCEEDED(hr) && SUCCEEDED(SetEVRForDXVA2(pReceivePin))) {
+				if (SUCCEEDED(hr)) {
+					hr = SetEVRForDXVA2(pReceivePin);
+				}
+
+				if (SUCCEEDED(hr)) {
 					m_nDecoderMode = MODE_DXVA2;
 				}
 
@@ -2634,7 +2645,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 
 			if (FAILED(hr)) {
-				CleanDXVAVariable();
+				CleanupDXVAVariables();
 				CleanupD3DResources();
 				SAFE_DELETE(m_pDXVADecoder);
 				m_nDecoderMode = MODE_SOFTWARE;
@@ -3445,14 +3456,14 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 BOOL CMPCVideoDecFilter::IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered)
 {
 	bIsPrefered = (config.ConfigBitstreamRaw == (m_nCodecId == AV_CODEC_ID_H264 ? 2 : 1));
-	return (m_bHighBitdepth && nD3DFormat == MAKEFOURCC('P', '0', '1', '0')
-			|| (!m_bHighBitdepth && (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'))));
+	return (m_bHighBitdepth && nD3DFormat == FCC('P010') || (!m_bHighBitdepth && nD3DFormat == FCC('NV12')));
 }
 
 HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
 														  const GUID& guidDecoder,
-														  DXVA2_ConfigPictureDecode *pSelectedConfig,
-														  BOOL *pbFoundDXVA2Configuration)
+														  DXVA2_ConfigPictureDecode& selectedConfig,
+														  D3DFORMAT& surfaceFormat,
+														  BOOL& bFoundDXVA2Configuration)
 {
 	HRESULT hr = S_OK;
 	UINT cFormats = 0;
@@ -3483,9 +3494,10 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 			for (UINT iConfig = 0; iConfig < cConfigurations; iConfig++) {
 				if (IsSupportedDecoderConfig(pFormats[iFormat], pConfig[iConfig], bIsPrefered)) {
 					// This configuration is good.
-					if (bIsPrefered || !*pbFoundDXVA2Configuration) {
-						*pbFoundDXVA2Configuration = TRUE;
-						*pSelectedConfig           = pConfig[iConfig];
+					if (bIsPrefered || !bFoundDXVA2Configuration) {
+						bFoundDXVA2Configuration = TRUE;
+						selectedConfig           = pConfig[iConfig];
+						surfaceFormat            = pFormats[iFormat];
 
 						FillInVideoDescription(m_VideoDesc, pFormats[iFormat]);
 					}
@@ -3534,6 +3546,14 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 
 	if (SUCCEEDED(hr)) {
 		hr = FindDecoderConfiguration();
+	}
+
+	if (SUCCEEDED(hr)) {
+		const auto& mt = m_pOutput->CurrentMediaType();
+		if ((m_DXVASurfaceFormat == FCC('NV12') && mt.subtype != MEDIASUBTYPE_NV12)
+				|| (m_DXVASurfaceFormat == FCC('P010') && mt.subtype != MEDIASUBTYPE_P010)) {
+			hr = E_FAIL;
+		}
 	}
 
 	if (FAILED(hr)) {
@@ -3588,7 +3608,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(LPDIRECT3DSURFACE9* ppDecoderRend
 	}
 
 	if (FAILED(hr)) {
-		CleanDXVAVariable();
+		CleanupDXVAVariables();
 	}
 
 	return hr;
