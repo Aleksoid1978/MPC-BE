@@ -104,6 +104,7 @@ protected:
 	int										m_nVideoOutputCount;
 	CDXVA2Decoder*							m_pDXVADecoder;
 	GUID									m_DXVADecoderGUID;
+	D3DFORMAT								m_DXVASurfaceFormat = D3DFMT_UNKNOWN;
 
 	DWORD									m_nPCIVendor;
 	DWORD									m_nPCIDevice;
@@ -176,6 +177,7 @@ protected:
 	// === Private functions
 	void			Cleanup();
 	void			CleanupD3DResources();
+	void			CleanupDXVAVariables();
 	void			CleanupFFmpeg();
 	int				FindCodec(const CMediaType* mtIn, BOOL bForced = FALSE);
 	void			AllocExtradata(const CMediaType* mt);
@@ -293,8 +295,9 @@ public:
 	HRESULT						SetEVRForDXVA2(IPin *pPin);
 	HRESULT						FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
 															  const GUID& guidDecoder,
-															  DXVA2_ConfigPictureDecode *pSelectedConfig,
-															  BOOL *pbFoundDXVA2Configuration);
+															  DXVA2_ConfigPictureDecode& selectedConfig,
+															  D3DFORMAT& surfaceFormat,
+															  BOOL& bFoundDXVA2Configuration);
 	HRESULT						CreateDXVA2Decoder(LPDIRECT3DSURFACE9* ppDecoderRenderTargets, UINT nNumRenderTargets);
 	HRESULT						ReinitDXVA2Decoder();
 
