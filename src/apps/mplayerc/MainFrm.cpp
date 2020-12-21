@@ -4538,27 +4538,34 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
 		LPCWSTR decoderName = pLAVVideoStatus->GetActiveDecoderName();
 
-		static const struct {
-			const WCHAR* name;
-			const WCHAR* friendlyname;
-		} LAVDecoderNames[] = {
-			{L"dxva2cb",         L"DXVA2 Copy-back"},
-			{L"dxva2cb direct",  L"DXVA2 Copy-back (direct)"},
-			{L"d3d11 cb",        L"D3D11 Copy-back"},
-			{L"d3d11 cb direct", L"D3D11 Copy-back (direct)"},
-			{L"d3d11 native",    L"D3D11 Native"},
-			{L"cuvid",           L"Nvidia CUVID"},
-			{L"quicksync",       L"Intel QuickSync"},
-			{L"msdk mvc hw",     L"Intel H.264(MVC 3D)"},
-		};
+		GUID guidDXVADecoder = DXVAState::GetDecoderGUID();
+		UnHookDirectXVideoDecoderService(); // this hook is no longer needed
 
-		for (const auto &item : LAVDecoderNames) {
-			if (wcscmp(item.name, decoderName) == 0) {
-				UnHookDirectXVideoDecoderService();
-				DXVAState::SetActiveState(GUID_NULL, item.friendlyname);
-				break;
+		if (wcscmp(decoderName, L"dxva2n") == 0) {
+			DXVAState::SetActiveState(guidDXVADecoder);
+		}
+		else {
+			static const struct {
+				const WCHAR* name;
+				const WCHAR* friendlyname;
+			} LAVDecoderNames[] = {
+				{L"dxva2cb direct",  L"DXVA2 Copy-back (direct)"},
+				{L"d3d11 cb",        L"D3D11 Copy-back"},
+				{L"d3d11 cb direct", L"D3D11 Copy-back (direct)"},
+				{L"d3d11 native",    L"D3D11 Native"},
+				{L"cuvid",           L"Nvidia CUVID"},
+				{L"quicksync",       L"Intel QuickSync"},
+				{L"msdk mvc hw",     L"Intel H.264(MVC 3D)"},
+			};
+
+			for (const auto &item : LAVDecoderNames) {
+				if (wcscmp(item.name, decoderName) == 0) {
+					DXVAState::SetActiveState(GUID_NULL, item.friendlyname);
+					break;
+				}
 			}
 		}
+		// for "avcodec" nothing needs to be done
 	}
 
 	if (bMvcActive == 2) {
