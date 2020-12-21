@@ -4538,11 +4538,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
 		LPCWSTR decoderName = pLAVVideoStatus->GetActiveDecoderName();
 
-		GUID guidDXVADecoder = DXVAState::GetDecoderGUID();
-		UnHookDirectXVideoDecoderService(); // this hook is no longer needed
-
-		if (wcscmp(decoderName, L"dxva2n") == 0) {
-			DXVAState::SetActiveState(guidDXVADecoder);
+		if (wcscmp(decoderName, L"avcodec") == 0) {
+			DXVAState::ClearState();
 		}
 		else {
 			static const struct {
@@ -4560,6 +4557,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 			for (const auto &item : LAVDecoderNames) {
 				if (wcscmp(item.name, decoderName) == 0) {
+					UnHookDirectXVideoDecoderService();
 					DXVAState::SetActiveState(GUID_NULL, item.friendlyname);
 					break;
 				}
