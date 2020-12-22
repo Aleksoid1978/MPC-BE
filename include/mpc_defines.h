@@ -39,6 +39,9 @@
 
 #define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c)) // very fast, but it can give a small rounding error
 
+#define ALIGN(x, a)           __ALIGN_MASK(x,(decltype(x))(a)-1)
+#define __ALIGN_MASK(x, mask) (((x)+(mask))&~(mask))
+
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p) = nullptr; } }
 #define SAFE_DELETE_ARRAY(p) { if (p) { delete [] (p);  (p) = nullptr; } }
 
