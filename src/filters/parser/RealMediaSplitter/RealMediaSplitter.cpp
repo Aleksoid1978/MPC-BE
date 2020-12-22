@@ -1956,8 +1956,8 @@ static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 
 void CRealVideoDecoder::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	nNumber		= _countof(DefaultFormats);
-	*ppFormats	= DefaultFormats;
+	nNumber    = std::size(DefaultFormats);
+	*ppFormats = DefaultFormats;
 }
 
 HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
