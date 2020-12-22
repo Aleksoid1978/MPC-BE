@@ -100,8 +100,7 @@ protected:
 	CSize									m_pOutSize;				// Picture size on output pin
 
 	// === common variables
-	VIDEO_OUTPUT_FORMATS*					m_pVideoOutputFormat;
-	int										m_nVideoOutputCount;
+	std::vector<VIDEO_OUTPUT_FORMATS>		m_VideoOutputFormats;
 	CDXVA2Decoder*							m_pDXVADecoder;
 	GUID									m_DXVADecoderGUID;
 	D3DFORMAT								m_DXVASurfaceFormat = D3DFMT_UNKNOWN;

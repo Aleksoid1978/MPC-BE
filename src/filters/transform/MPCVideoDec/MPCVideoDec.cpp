@@ -1016,8 +1016,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bUseDXVA(true)
 	, m_bUseFFmpeg(true)
 	, m_pDXVADecoder(nullptr)
-	, m_pVideoOutputFormat(nullptr)
-	, m_nVideoOutputCount(0)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bRVDropBFrameTimings(FALSE)
@@ -1518,7 +1516,7 @@ void CMPCVideoDecFilter::Cleanup()
 
 	SAFE_DELETE(m_pMSDKDecoder);
 	SAFE_DELETE(m_pDXVADecoder);
-	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
+	m_VideoOutputFormats.clear();
 
 	CleanupD3DResources();
 
@@ -2198,7 +2196,7 @@ static const VIDEO_OUTPUT_FORMATS DXVAFormats10bit[] = { // DXVA2 10bit
 
 void CMPCVideoDecFilter::BuildOutputFormat()
 {
-	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
+	m_VideoOutputFormats.clear();
 
 	// === New swscaler options
 	int nSwIndex[PixFmt_count] = { 0 };
@@ -2286,21 +2284,20 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		nSwIndex[nSwCount++] = PixFmt_YUY2;
 	}
 
-	m_nVideoOutputCount = m_bUseFFmpeg ? nSwCount : 0;
+	int OutputCount = m_bUseFFmpeg ? nSwCount : 0;
 	if (IsDXVASupported()) {
-		m_nVideoOutputCount += m_bHighBitdepth ? _countof(DXVAFormats10bit) : _countof(DXVAFormats);
+		OutputCount += m_bHighBitdepth ? std::size(DXVAFormats10bit) : std::size(DXVAFormats);
 	}
-
-	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
+	m_VideoOutputFormats.resize(OutputCount);
 
 	int nPos = 0;
 	if (IsDXVASupported()) {
 		if (m_bHighBitdepth) {
-			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats10bit, sizeof(DXVAFormats10bit));
-			nPos += _countof(DXVAFormats10bit);
+			memcpy(&m_VideoOutputFormats[nPos], DXVAFormats10bit, sizeof(DXVAFormats10bit));
+			nPos += std::size(DXVAFormats10bit);
 		} else {
-			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
-			nPos += _countof(DXVAFormats);
+			memcpy(&m_VideoOutputFormats[nPos], DXVAFormats, sizeof(DXVAFormats));
+			nPos += std::size(DXVAFormats);
 		}
 	}
 
@@ -2308,18 +2305,19 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
 			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
-			m_pVideoOutputFormat[nPos + i].subtype			= swof->subtype;
-			m_pVideoOutputFormat[nPos + i].biCompression	= swof->biCompression;
-			m_pVideoOutputFormat[nPos + i].biBitCount		= swof->bpp;
-			m_pVideoOutputFormat[nPos + i].biPlanes			= 1; // This value must be set to 1.
+			auto& outputFormat = m_VideoOutputFormats[nPos + i];
+			outputFormat.subtype       = swof->subtype;
+			outputFormat.biCompression = swof->biCompression;
+			outputFormat.biBitCount    = swof->bpp;
+			outputFormat.biPlanes      = 1; // This value must be set to 1.
 		}
 	}
 }
 
 void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	nNumber    = m_nVideoOutputCount;
-	*ppFormats = m_pVideoOutputFormat;
+	nNumber    = m_VideoOutputFormats.size();
+	*ppFormats = m_VideoOutputFormats.size() ? m_VideoOutputFormats.data() : nullptr;
 }
 
 static void ReconstructH264Extra(BYTE *extra, unsigned& extralen, int NALSize)
