@@ -303,7 +303,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void CalcControlsSize(CSize& cSize);
 
 	bool m_bDelaySetOutputRect = false;
-	void SetDefaultWindowRect(int iMonitor = 0);
+	void SetDefaultWindowRect(int iMonitor, const bool bLastCall);
 	void SetDefaultFullscreenState();
 	void RestoreDefaultWindowRect();
 	void ZoomVideoWindow(bool snap = true, double scale = -1);
