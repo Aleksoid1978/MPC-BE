@@ -10514,7 +10514,7 @@ void CMainFrame::OnSubCopyClipboard()
 	}
 }
 
-void CMainFrame::SetDefaultWindowRect(int iMonitor)
+void CMainFrame::SetDefaultWindowRect(int iMonitor, const bool bLastCall)
 {
 	const CAppSettings& s = AfxGetAppSettings();
 	const auto nLastWindowType  = s.nLastWindowType;
@@ -10589,7 +10589,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		SetWindowPos(nullptr, windowRect.left, windowRect.top, windowRect.Width(), windowRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
-	if (s.nStartupWindowMode == STARTUPWND_REMLAST && s.bRememberWindowPos) {
+	if (bLastCall && s.nStartupWindowMode == STARTUPWND_REMLAST && s.bRememberWindowPos && !(s.nCLSwitches & CLSW_MINIMIZED)) {
 		if (nLastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
 		} else if (nLastWindowType == SIZE_MINIMIZED) {

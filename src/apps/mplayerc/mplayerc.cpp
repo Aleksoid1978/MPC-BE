@@ -1016,7 +1016,7 @@ BOOL CMPlayerCApp::InitInstance()
 	const auto szLastWindowSize = m_s.szLastWindowSize;
 	const auto nLastWindowType = m_s.nLastWindowType;
 
-	pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0);
+	pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0, !SysVersion::IsWin10orLater());
 	pFrame->SetDefaultFullscreenState();
 	pFrame->SetIcon(AfxGetApp()->LoadIconW(IDR_MAINFRAME), TRUE);
 	pFrame->DragAcceptFiles();
@@ -1027,7 +1027,7 @@ BOOL CMPlayerCApp::InitInstance()
 		m_s.szLastWindowSize = szLastWindowSize;
 		m_s.nLastWindowType = nLastWindowType;
 
-		pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0);
+		pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0, true);
 	}
 
 	pFrame->UpdateWindow();
