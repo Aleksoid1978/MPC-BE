@@ -25,16 +25,16 @@
 #include <dxva2api.h>
 
 struct VIDEO_OUTPUT_FORMATS {
-	const GUID*		subtype;
-	WORD			biPlanes;
-	WORD			biBitCount;
-	DWORD			biCompression;
+	const GUID* subtype;
+	DWORD       biCompression;
+	UINT        biBitCount;
+	UINT        packsize;
 
 	bool operator == (const struct VIDEO_OUTPUT_FORMATS& fmt) const {
 		return (subtype == fmt.subtype
-				&& biPlanes == fmt.biPlanes
+				&& biCompression == fmt.biCompression
 				&& biBitCount == fmt.biBitCount
-				&& biCompression == fmt.biCompression);
+				&& packsize == fmt.packsize);
 	}
 };
 

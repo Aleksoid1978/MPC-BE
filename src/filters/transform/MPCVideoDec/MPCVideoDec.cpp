@@ -2188,10 +2188,10 @@ redo:
 }
 
 static const VIDEO_OUTPUT_FORMATS DXVAFormats[]      = { // DXVA2 8bit
-	{&MEDIASUBTYPE_NV12, 1, 12, FCC('dxva')},
+	{&MEDIASUBTYPE_NV12, FCC('dxva'), 12, 1},
 };
 static const VIDEO_OUTPUT_FORMATS DXVAFormats10bit[] = { // DXVA2 10bit
-	{&MEDIASUBTYPE_P010, 1, 24, FCC('dxva')},
+	{&MEDIASUBTYPE_P010, FCC('dxva'), 24, 2},
 };
 
 void CMPCVideoDecFilter::BuildOutputFormat()
@@ -2307,7 +2307,9 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
 			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
-			m_VideoOutputFormats.emplace_back(VIDEO_OUTPUT_FORMATS{ swof->subtype, 1, (WORD)swof->bpp, swof->biCompression });
+			m_VideoOutputFormats.emplace_back(
+				VIDEO_OUTPUT_FORMATS{ swof->subtype, swof->biCompression, (UINT)swof->bpp, (UINT)swof->codedbytes }
+			);
 		}
 	}
 	ASSERT(OutputCount == m_VideoOutputFormats.size());
