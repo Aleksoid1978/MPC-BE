@@ -54,8 +54,6 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	, m_nSubtitleId((DWORD_PTR)-1)
 	, m_bMSMpeg4Fix(false)
 	, m_fps(25)
-	, m_pVideoOutputFormat(nullptr)
-	, m_nVideoOutputCount(0)
 	, m_hEvtTransform(nullptr)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -132,8 +130,6 @@ CDirectVobSubFilter::~CDirectVobSubFilter()
 	for (auto& pTextInput : m_pTextInputs) {
 		delete pTextInput;
 	}
-
-	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
 	m_frd.EndThreadEvent.Set();
 	CAMThread::Close();
@@ -617,8 +613,7 @@ HRESULT CDirectVobSubFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* p
 		InitSubPicQueue();
 
 		{
-			SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
-			m_nVideoOutputCount = 0;
+			m_VideoOutputFormats.clear();
 
 			IPin* pPin = m_pInput->GetConnected();
 			std::list<VIDEO_OUTPUT_FORMATS> fmts;
@@ -638,10 +633,10 @@ HRESULT CDirectVobSubFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* p
 				}
 			}
 
-			m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[fmts.size()];
+			m_VideoOutputFormats.reserve(fmts.size());
 
 			for (const auto& fmt : fmts) {
-				m_pVideoOutputFormat[m_nVideoOutputCount++] = fmt;
+				m_VideoOutputFormats.push_back(fmt);
 			}
 		}
 	} else if (dir == PINDIR_OUTPUT) {
