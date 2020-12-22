@@ -373,7 +373,10 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	pmt->majortype = MEDIATYPE_Video;
 	pmt->subtype   = *fmts[iPosition].subtype;
 
-	int w = m_win, h = m_hin, arx = m_arxin, ary = m_aryin;
+	int w = m_win;
+	int h = m_hin;
+	int arx = m_arxin;
+	int ary = m_aryin;
 	int vsfilter = 0;
 	GetOutputSize(w, h, arx, ary, vsfilter);
 
@@ -397,7 +400,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	bihOut.biSize        = sizeof(bihOut);
 	bihOut.biWidth       = w;
 	bihOut.biHeight      = h;
-	bihOut.biPlanes      = fmts[iPosition].biPlanes;
+	bihOut.biPlanes      = 1; // this value must be set to 1
 	bihOut.biBitCount    = fmts[iPosition].biBitCount;
 	bihOut.biCompression = fmts[iPosition].biCompression;
 	bihOut.biSizeImage   = DIBSIZE(bihOut);
