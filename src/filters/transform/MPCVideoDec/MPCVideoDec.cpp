@@ -2288,16 +2288,18 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (IsDXVASupported()) {
 		OutputCount += m_bHighBitdepth ? std::size(DXVAFormats10bit) : std::size(DXVAFormats);
 	}
-	m_VideoOutputFormats.resize(OutputCount);
+	m_VideoOutputFormats.reserve(OutputCount);
 
 	int nPos = 0;
 	if (IsDXVASupported()) {
 		if (m_bHighBitdepth) {
-			memcpy(&m_VideoOutputFormats[nPos], DXVAFormats10bit, sizeof(DXVAFormats10bit));
-			nPos += std::size(DXVAFormats10bit);
+			for (const auto& fmt : DXVAFormats10bit) {
+				m_VideoOutputFormats.push_back(fmt);
+			}
 		} else {
-			memcpy(&m_VideoOutputFormats[nPos], DXVAFormats, sizeof(DXVAFormats));
-			nPos += std::size(DXVAFormats);
+			for (const auto& fmt : DXVAFormats) {
+				m_VideoOutputFormats.push_back(fmt);
+			}
 		}
 	}
 
@@ -2305,13 +2307,10 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
 			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
-			auto& outputFormat = m_VideoOutputFormats[nPos + i];
-			outputFormat.subtype       = swof->subtype;
-			outputFormat.biCompression = swof->biCompression;
-			outputFormat.biBitCount    = swof->bpp;
-			outputFormat.biPlanes      = 1; // This value must be set to 1.
+			m_VideoOutputFormats.emplace_back(VIDEO_OUTPUT_FORMATS{ swof->subtype, 1, (WORD)swof->bpp, swof->biCompression });
 		}
 	}
+	ASSERT(OutputCount == m_VideoOutputFormats.size());
 }
 
 void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)

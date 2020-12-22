@@ -152,8 +152,7 @@ public:
 	STDMETHODIMP GetClassID(CLSID* pClsid);
 
 protected:
-	VIDEO_OUTPUT_FORMATS*	m_pVideoOutputFormat;
-	int						m_nVideoOutputCount;
+	std::vector<VIDEO_OUTPUT_FORMATS> m_VideoOutputFormats;
 
 	HDC m_hdc;
 	HBITMAP m_hbm;
