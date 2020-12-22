@@ -296,8 +296,8 @@ HRESULT CDirectVobSubFilter::CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int
 
 void CDirectVobSubFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	nNumber		= m_nVideoOutputCount;
-	*ppFormats	= m_pVideoOutputFormat;
+	nNumber    = m_VideoOutputFormats.size();
+	*ppFormats = m_VideoOutputFormats.size() ? m_VideoOutputFormats.data() : nullptr;
 }
 
 void CDirectVobSubFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter)

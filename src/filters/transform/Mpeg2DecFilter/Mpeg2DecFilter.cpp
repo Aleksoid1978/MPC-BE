@@ -482,7 +482,7 @@ static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 
 void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	nNumber = _countof(DefaultFormats);
+	nNumber    = std::size(DefaultFormats);
 	*ppFormats = DefaultFormats;
 }
 
