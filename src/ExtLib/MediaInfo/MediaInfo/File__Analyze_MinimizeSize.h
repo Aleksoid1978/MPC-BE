@@ -62,7 +62,7 @@ public :
         int64u  StreamIDs[16];
         int8u   StreamIDs_Width[16];
         int8u   ParserIDs[16];
-        void    Event_Prepare (struct MediaInfo_Event_Generic* Event);
+        void    Event_Prepare (struct MediaInfo_Event_Generic* Event, int32u Event_Code, size_t Event_Size);
     #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_DEMUX
         int8u   Demux_Level; //bit 0=frame, bit 1=container, bit 2=elementary (eg MPEG-TS), bit 3=ancillary (e.g. DTVCC), default with frame set

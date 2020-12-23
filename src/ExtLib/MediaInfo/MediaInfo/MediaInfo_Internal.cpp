@@ -1315,9 +1315,7 @@ size_t MediaInfo_Internal::Open_Buffer_Init (int64u File_Size_, int64u File_Offs
         if (Info && Info->Status[File__Analyze::IsAccepted])
         {
             struct MediaInfo_Event_General_Move_Done_0 Event;
-            memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
-            Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_Move_Done, 0);
-            Event.EventSize=sizeof(struct MediaInfo_Event_General_Move_Done_0);
+            Info->Event_Prepare((struct MediaInfo_Event_Generic*)&Event, MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_Move_Done, 0), sizeof(struct MediaInfo_Event_General_Move_Done_0));
             Event.StreamIDs_Size=0;
             Event.StreamOffset=File_Offset_;
             Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_Move_Done_0));
@@ -1325,9 +1323,7 @@ size_t MediaInfo_Internal::Open_Buffer_Init (int64u File_Size_, int64u File_Offs
         else
         {
             struct MediaInfo_Event_General_Start_0 Event;
-            memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
-            Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_Start, 0);
-            Event.EventSize=sizeof(struct MediaInfo_Event_General_Start_0);
+            Info->Event_Prepare((struct MediaInfo_Event_Generic*)&Event, MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_Start, 0), sizeof(struct MediaInfo_Event_General_Start_0));
             Event.StreamIDs_Size=0;
             Event.Stream_Size=File_Size_;
             Event.FileName=NULL;
@@ -2232,11 +2228,11 @@ void MediaInfo_Internal::TestContinuousFileNames ()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_EVENTS
-void MediaInfo_Internal::Event_Prepare (struct MediaInfo_Event_Generic* Event)
+void MediaInfo_Internal::Event_Prepare (struct MediaInfo_Event_Generic* Event, int32u Event_Code, size_t Event_Size)
 {
     CriticalSectionLocker CSL(CS);
     if (Info)
-        Info->Event_Prepare(Event);
+        Info->Event_Prepare(Event, Event_Code, Event_Size);
 }
 #endif // MEDIAINFO_EVENTS
 

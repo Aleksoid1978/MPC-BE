@@ -101,6 +101,7 @@ private :
     void moof_mfhd();
     void moof_traf();
     void moof_traf_sdtp();
+    void moof_traf_tfdt();
     void moof_traf_tfhd();
     void moof_traf_trun();
     void moov();
@@ -335,6 +336,7 @@ private :
     void REDV();
     void REOB();
     void skip();
+    void sidx();
     void wide();
 
     //Helpers

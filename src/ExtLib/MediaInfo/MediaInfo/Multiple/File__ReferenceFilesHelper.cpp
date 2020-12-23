@@ -846,10 +846,7 @@ void File__ReferenceFilesHelper::ParseReferences()
 
         #if MEDIAINFO_EVENTS
             struct MediaInfo_Event_General_SubFile_End_0 Event;
-            MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
-            Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_End, 0);
-            Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_End_0);
-
+            MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event, MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_End, 0), sizeof(struct MediaInfo_Event_General_SubFile_End_0));
             MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
         #endif //MEDIAINFO_EVENTS
 

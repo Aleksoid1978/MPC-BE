@@ -188,6 +188,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Actor_Character;Character played\n"
     "Added_Date;Added date\n"
     "Address;Address\n"
+    "AdmProfile;ADM profile\n"
     "AdID;Ad-ID identifier\n"
     "Advanced;Advanced\n"
     "Advanced mode;Advanced mode\n"
@@ -6507,7 +6508,7 @@ void MediaInfo_Config_Summary (ZtringListList &Info)
     Info.Write(Ztring().From_UTF8(
     "General;[%Format/String%][ (%Format_Profile%)][ (%Format_Commercial_IfAny%)]$if(%Format/String%,$: $)%FileSize/String%[, %Duration/String%]\n"
     "Video;[%Language/String%, ][%BitRate/String%$if(%BitRate_Nominal/String%, \\(%BitRate_Nominal/String%\\)), ][%Width%*][%Height%][ (%DisplayAspectRatio/String%), ][$at$ %FrameRate/String%, ][%Format/String%][ (%CodecID/Hint%)][ (%Standard%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%Format_Version%, \\(%Format_Version%\\))$if(%Format_Profile%, \\(%Format_Profile%\\))$if(%Format_Settings%, \\(%Format_Settings%\\))[ (%Format_Commercial_IfAny%)][, %HDR_Format_Commercial%]\n"
-    "Audio;[%Language/String%, ][%BitRate/String%$if(%BitRate_Nominal/String%, \\(%BitRate_Nominal/String%\\)), ][%SamplingRate/String%, ][%BitDepth/String%, ][%Channel(s)_Original/String%  / ][%Channel(s)/String%, ][%Format/String%][ (%CodecID/Hint%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%Format_Version%, \\(%Format_Version%\\))$if(%Format_Profile%, \\(%Format_Profile%\\))$if(%Format_Settings%, \\(%Format_Settings%\\))[ (%Format_Commercial_IfAny%)][ (%ConformanceCheck/Short%)][, %NumberOfPresentations% presentations][, %NumberOfSubstreams% substreams]\n"
+    "Audio;[%Language/String%, ][%BitRate/String%$if(%BitRate_Nominal/String%, \\(%BitRate_Nominal/String%\\)), ][%SamplingRate/String%, ][%BitDepth/String%, ][%Channel(s)_Original/String%  / ][%Channel(s)/String%, ][%Format/String%][ (%CodecID/Hint%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%Format_Version%, \\(%Format_Version%\\))$if(%Format_Profile%, \\(%Format_Profile%\\))$if(%Format_Settings%, \\(%Format_Settings%\\))[ (%Format_Commercial_IfAny%)][ (%ConformanceCheck/Short%)][, %NumberOfPresentations% presentations][, %NumberOfSubstreams% substreams][ (%AdmProfile_Format% ADM profile)]\n"
     "Text;[%Language/String%, ][%Format/String%][ (%Format_Commercial_IfAny%)]$if(%MuxingMode%, \\(%MuxingMode%\\))\n"
     "Image;[%Language/String%, ][%Width%*][%Height%][ (%DisplayAspectRatio/String%)][, %Format/String%]\n"
     "Chapters;[%Language/String%, ]%Total% chapters[, %Format/String%][ (%Format_Commercial_IfAny%)]\n"

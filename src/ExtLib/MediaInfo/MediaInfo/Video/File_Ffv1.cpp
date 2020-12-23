@@ -1937,6 +1937,16 @@ void File_Ffv1::copy_plane_states_to_slice(int8u plane_count)
     for (size_t i = 0; i < plane_count; i++)
     {
         int32u idx = quant_table_index[i];
+
+        if (current_slice->plane_states[i] && current_slice->plane_states_maxsizes[i] < context_count[idx] + 1)
+        {
+            for (size_t j = 0; current_slice->plane_states[i][j]; ++j)
+                delete[] current_slice->plane_states[i][j];
+
+            delete[] current_slice->plane_states[i];
+            current_slice->plane_states[i] = NULL;
+        }
+
         if (!current_slice->plane_states[i])
         {
             current_slice->plane_states[i] = new int8u*[context_count[idx] + 1];

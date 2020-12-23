@@ -985,6 +985,8 @@ File_Ac3::File_Ac3()
             chanmap_Max[Pos][Pos2]=0;
         }
     numblkscod=0;
+    dsurexmod=0;
+    dheadphonmod=0;
     substreamid_Independant_Current=0;
     substreams_Count=0;
     joc_complexity_index_Container=(int8u)-1;
@@ -1033,7 +1035,6 @@ void File_Ac3::Streams_Fill()
 
         if (HD_StreamType==0xBA) //TrueHD
         {
-            if (bsid_Max==(int8u)-1)
             {
                 Fill(Stream_Audio, 0, Audio_Format, "MLP FBA");
                 Fill(Stream_Audio, 0, Audio_Codec, "MLP FBA");
@@ -1044,6 +1045,7 @@ void File_Ac3::Streams_Fill()
                 Fill(Stream_Audio, 0, Audio_Codec_Profile, "MLP FBA 16-ch / MLP FBA");
             }
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
+            Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless");
             Ztring Sampling;
             Sampling.From_Number(AC3_HD_SamplingRate(HD_SamplingRate1));
             Fill(Stream_Audio, 0, Audio_SamplingRate, Sampling);
@@ -1055,12 +1057,12 @@ void File_Ac3::Streams_Fill()
 
         if (HD_StreamType==0xBB) //TrueHD
         {
-            if (!Core_IsPresent)
             {
                 Fill(Stream_Audio, 0, Audio_Format, "MLP");
                 Fill(Stream_Audio, 0, Audio_Codec,  "MLP");
             }
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
+            Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless");
             Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_HD_SamplingRate(HD_SamplingRate2));
             if (HD_SamplingRate1!=HD_SamplingRate2)
                 Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_HD_SamplingRate(HD_SamplingRate2));
@@ -1109,6 +1111,28 @@ void File_Ac3::Streams_Fill()
             Fill_SetOptions(Stream_Audio, 0, "BedChannelCount/String", "Y NIN");
             Fill(Stream_Audio, 0, "BedChannelConfiguration", BedChannelConfiguration);
         }
+    }
+
+    //Surround
+    if (dsurmod_Max[0][0]==2)
+    {
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "Dolby Surround");
+        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dolby Surround");
+    }
+    if (dsurexmod==2)
+    {
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "Dolby Surround EX");
+        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dolby Surround EX");
+    }
+    if (dsurexmod==3)
+    {
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "Dolby Pro Logic IIz");
+        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dolby Pro Logic IIz");
+    }
+    if (dheadphonmod==2)
+    {
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "Dolby Headphone");
+        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dolby Headphone");
     }
 
     //AC-3
@@ -1167,8 +1191,6 @@ void File_Ac3::Streams_Fill()
             if (Retrieve(Stream_Audio, 0, Audio_ChannelLayout).empty())
                 Fill(Stream_Audio, 0, Audio_ChannelLayout, ChannelLayout);
         }
-        if (dsurmod_Max[0][0]==2)
-            Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dolby Digital");
         if (!Retrieve(Stream_Audio, 0, Audio_Format_Profile).empty())
             Fill(Stream_Audio, 0, Audio_Format_Profile, "AC-3");
         if (!Retrieve(Stream_Audio, 0, Audio_Codec_Profile).empty())
@@ -2261,12 +2283,32 @@ void File_Ac3::Core_Frame()
             }
             Skip_SB(                                                "copyrightb - Copyright Bit");
             Skip_SB(                                                "origbs - Original Bit Stream");
-            TEST_SB_SKIP(                                           "timecod1e");
-                Skip_S1(14,                                         "timecod1"); //Note: if timecod is used, change the bitstream parsing for bsid==0x06
-            TEST_SB_END();
-            TEST_SB_SKIP(                                           "timecod2e");
-                Skip_S1(14,                                         "timecod2"); //Note: if timecod is used, change the bitstream parsing for bsid==0x06
-            TEST_SB_END();
+            if (bsid==0x06)
+            {
+                TEST_SB_SKIP(                                       "xbsi1e");
+                    Skip_S1(2,                                      "dmixmod");
+                    Skip_S1(3,                                      "ltrtcmixlev");
+                    Skip_S1(3,                                      "ltrtsurmixlev");
+                    Skip_S1(3,                                      "lorocmixlev");
+                    Skip_S1(3,                                      "lorosurmixlev");
+                TEST_SB_END();
+                TEST_SB_SKIP(                                       "xbsi2e");
+                    Get_S1 (2, dsurexmod,                           "dsurexmod");
+                    Get_S1 (2, dheadphonmod,                        "dheadphonmod");
+                    Skip_SB(                                        "adconvtyp");
+                    Skip_S1(8,                                      "xbsi2");
+                    Skip_SB(                                        "encinfo");
+                TEST_SB_END();
+            }
+            else
+            {
+                TEST_SB_SKIP(                                       "timecod1e");
+                    Skip_S2(14,                                     "timecod1");
+                TEST_SB_END();
+                TEST_SB_SKIP(                                       "timecod2e");
+                    Skip_S2(14,                                     "timecod2");
+                TEST_SB_END();
+            }
             TEST_SB_SKIP(                                           "addbsie");
                 int8u addbsil;
                 Get_S1 (6, addbsil,                                 "addbsil");
@@ -2509,11 +2551,11 @@ void File_Ac3::Core_Frame()
                 Skip_SB(                                            "origbs - Original Bit Stream");
                 if (acmod==0x2)
                 {
-                    Skip_S1(2,                                      "dsurmod");
-                    Skip_S1(2,                                      "dheadphonmod");
+                    Get_S1 (2, dsurmod,                             "dsurmod");
+                    Get_S1 (2, dheadphonmod,                        "dheadphonmod");
                 }
                 if (acmod>=0x6)
-                    Skip_S1(2,                                      "dsurexmod");
+                    Get_S1 (2, dsurexmod,                           "dsurexmod");
                 TEST_SB_SKIP(                                       "audprodie");
                     Skip_S1(5,                                      "mixlevel");
                     Skip_S1(2,                                      "roomtyp");

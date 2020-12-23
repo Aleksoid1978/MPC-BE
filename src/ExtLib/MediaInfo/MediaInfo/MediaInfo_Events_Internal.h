@@ -16,9 +16,9 @@ using namespace MediaInfoLib;
 #define EVENT_BEGIN(_EventType, _EventName, _EventVersion) \
 { \
     struct MediaInfo_Event_##_EventType##_##_EventName##_##_EventVersion Event;\
-    Event_Prepare((struct MediaInfo_Event_Generic*)&Event); \
-    Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_##_EventType, MediaInfo_Event_##_EventType##_##_EventName, _EventVersion); \
-    Event.EventSize=sizeof(struct MediaInfo_Event_##_EventType##_##_EventName##_##_EventVersion); \
+    Event_Prepare((struct MediaInfo_Event_Generic*)&Event, \
+        MediaInfo_EventCode_Create(MediaInfo_Parser_##_EventType, MediaInfo_Event_##_EventType##_##_EventName, _EventVersion), \
+        sizeof(struct MediaInfo_Event_##_EventType##_##_EventName##_##_EventVersion)); \
 
 #define EVENT_END() \
     Config->Event_Send(Status[IsAccepted]?NULL:this, (const int8u*)&Event, Event.EventSize, IsSub?File_Name_WithoutDemux:File_Name); \

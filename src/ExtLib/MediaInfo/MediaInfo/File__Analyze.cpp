@@ -1624,9 +1624,13 @@ bool File__Analyze::Synchronize_0x000001()
 //---------------------------------------------------------------------------
 bool File__Analyze::FileHeader_Begin_0x000001()
 {
+    // No need to check if inside a container
+    if (IsSub)
+        return true;
+
     //Element_Size
     if (Buffer_Size<192*4)
-        return true; //Not enough buffer for a test
+        return false; //Not enough buffer for a test
 
     //Detecting OldDirac/WAV/SWF/FLV/ELF/DPG/WM files
     int64u Magic8=CC8(Buffer);
@@ -3658,9 +3662,11 @@ void File__Analyze::Details_Clear()
 #endif //MEDIAINFO_TRACE
 
 #if MEDIAINFO_EVENTS
-void File__Analyze::Event_Prepare(struct MediaInfo_Event_Generic* Event)
+void File__Analyze::Event_Prepare(struct MediaInfo_Event_Generic* Event, int32u Event_Code, size_t Event_Size)
 {
-    memset(Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+    memset(Event, 0x00, Event_Size);
+    Event->EventCode=Event_Code;
+    Event->EventSize=Event_Size;
     Event->StreamIDs_Size=StreamIDs_Size;
     memcpy_Unaligned_Unaligned_Once1024(Event->StreamIDs, StreamIDs, 128);
     memcpy(Event->StreamIDs_Width, StreamIDs_Width, sizeof(StreamIDs_Width));

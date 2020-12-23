@@ -128,6 +128,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cfloat>
+
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -650,6 +651,7 @@ namespace Elements
     const int64u moof_mfhd=0x6D666864;
     const int64u moof_traf=0x74726166;
     const int64u moof_traf_sdtp=0x73647470;
+    const int64u moof_traf_tfdt=0x74666474;
     const int64u moof_traf_tfhd=0x74666864;
     const int64u moof_traf_trun=0x7472756E;
     const int64u moov=0x6D6F6F76;
@@ -924,6 +926,7 @@ namespace Elements
     const int64u REDV=0x52454456;
     const int64u REOB=0x52454F42;
     const int64u skip=0x736B6970;
+    const int64u sidx=0x73696478;
     const int64u wide=0x77696465;
 }
 
@@ -1024,6 +1027,7 @@ void File_Mpeg4::Data_Parse()
         LIST(moof_traf)
             ATOM_BEGIN
             ATOM(moof_traf_sdtp)
+            ATOM(moof_traf_tfdt)
             ATOM(moof_traf_tfhd)
             ATOM(moof_traf_trun)
             ATOM_END
@@ -1132,20 +1136,20 @@ void File_Mpeg4::Data_Parse()
                         ATOM(moov_trak_mdia_minf_stbl_stsc)
                         LIST(moov_trak_mdia_minf_stbl_stsd)
                             ATOM_BEGIN
-                            LIST(moov_trak_mdia_minf_stbl_stsd_stpp)
+                            LIST_COMPLETE(moov_trak_mdia_minf_stbl_stsd_stpp)
                                 ATOM_BEGIN
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_stpp_btrt)
                                 ATOM_END
                             ATOM(moov_trak_mdia_minf_stbl_stsd_text)
-                            LIST(moov_trak_mdia_minf_stbl_stsd_tmcd)
+                            LIST_COMPLETE(moov_trak_mdia_minf_stbl_stsd_tmcd)
                                 ATOM_BEGIN
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_tmcd_name)
                                 ATOM_END
-                            LIST(moov_trak_mdia_minf_stbl_stsd_tx3g)
+                            LIST_COMPLETE(moov_trak_mdia_minf_stbl_stsd_tx3g)
                                 ATOM_BEGIN
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_tx3g_ftab)
                                 ATOM_END
-                            LIST_DEFAULT(moov_trak_mdia_minf_stbl_stsd_xxxx)
+                            LIST_DEFAULT_COMPLETE(moov_trak_mdia_minf_stbl_stsd_xxxx)
                                 ATOM_BEGIN
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_alac)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_AALP)
@@ -1327,7 +1331,7 @@ void File_Mpeg4::Data_Parse()
                     ATOM_END
                 ATOM_END
             ATOM(moov_udta_WLOC)
-            ATOM(moov_udta_XMP_)
+            LIST_SKIP(moov_udta_XMP_)
             ATOM(moov_udta_yrrc)
             ATOM_DEFAULT (moov_udta_xxxx); //User data
             ATOM_END_DEFAULT
@@ -1345,6 +1349,7 @@ void File_Mpeg4::Data_Parse()
     ATOM(pckg)
     ATOM(pnot)
     LIST_SKIP(skip)
+    ATOM(sidx)
     LIST_SKIP(wide)
     DATA_END
 }
@@ -2761,6 +2766,27 @@ void File_Mpeg4::moof_traf_sdtp()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg4::moof_traf_tfdt()
+{
+    NAME_VERSION_FLAG("Track Fragment Base Media Decode Time");
+    if (Version>1)
+    {
+        Skip_XX(Element_Size-Element_Offset,                   "Data");
+        return;
+    }
+
+    //Parsing
+    if (!Version)
+    {
+        Skip_B4(                                                "baseMediaDecodeTime");
+    }
+    else
+    {
+        Skip_B8(                                                "baseMediaDecodeTime");
+    }
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4::moof_traf_tfhd()
 {
     NAME_VERSION_FLAG("Track Fragment Header");
@@ -2864,7 +2890,9 @@ void File_Mpeg4::moof_traf_trun()
         if (sample_flags_present)
             Skip_B4(                                            "sample_flags");
         if (sample_composition_time_offset_present)
-            Skip_B4(                                            "sample_composition_time_offset");
+        {
+            Info_B4(sample_composition_time_offset,             "sample_composition_time_offset"); Param_Info1((int32s)sample_composition_time_offset);
+        }
         Element_End0();
     }
 }
@@ -8040,6 +8068,7 @@ void File_Mpeg4::moov_trak_udta_xxxx()
 void File_Mpeg4::moov_udta()
 {
     Element_Name("User Data");
+    Skip_XX(Element_TotalSize_Get(), "XXX");
 
     moov_trak_tkhd_TrackID=(int32u)-1;
 }
@@ -8511,7 +8540,11 @@ void File_Mpeg4::moov_udta_XMP_()
     Element_Name("eXtensible Metadata Platform");
 
     //Parsing
-    Skip_XX(Element_Size,                                       "Data");
+    Skip_XX(Element_TotalSize_Get(),                            "Data");
+    #if MEDIAINFO_HASH
+        if (Hash && !IsSecondPass)
+            GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Hash will be done during second pass
+    #endif //MEDIAINFO_HASH
 }
 
 //---------------------------------------------------------------------------
@@ -8879,7 +8912,52 @@ void File_Mpeg4::skip()
     Element_Name("Skip");
 
     //Parsing
-    Skip_XX(Element_Size,                                       "Free");
+    Skip_XX(Element_TotalSize_Get(),                            "Data");
+    #if MEDIAINFO_HASH
+        if (Hash && !IsSecondPass)
+            GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Hash will be done during second pass
+    #endif //MEDIAINFO_HASH
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::sidx()
+{
+    NAME_VERSION_FLAG("Segment Index");
+    if (Version>1)
+    {
+        Skip_XX(Element_Size-Element_Offset,                   "Data");
+        return;
+    }
+
+    //Parsing
+    Skip_B4(                                                    "reference_ID");
+    Skip_B4(                                                    "timescale");
+    if (!Version)
+    {
+        Skip_B4(                                                "earliest_presentation_time");
+        Skip_B4(                                                "first_offset");
+    }
+    else
+    {
+        Skip_B8(                                                "earliest_presentation_time");
+        Skip_B8(                                                "first_offset");
+    }
+    Skip_B2(                                                    "reserved");
+    int16u reference_counts;
+    Get_B2 (reference_counts,                                   "reference_counts");
+    BS_Begin();
+    for (int32u Pos=0; Pos<reference_counts; Pos++)
+    {
+        Element_Begin1("reference");
+        Skip_SB(                                                "reference_type");
+        Skip_S4(31,                                             "referenced_size");
+        Skip_S4(32,                                             "subsegment_duration");
+        Skip_SB(                                                "starts_with_SAP");
+        Skip_S4( 3,                                             "SAP_type");
+        Skip_S4(28,                                             "SAP_delta_time");
+        Element_End0();
+    }
+    BS_End();
 }
 
 //---------------------------------------------------------------------------
