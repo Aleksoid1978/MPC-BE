@@ -128,12 +128,11 @@ static av_cold int decode_init(AVCodecContext * avctx) {
     s->scale_bias = 1.0/(32768*8);
     avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
 
-    /* Generate overlap window */
-    if (!ff_sine_128[127])
-        ff_init_ff_sine_windows(7);
-
     avctx->channels       = 1;
     avctx->channel_layout = AV_CH_LAYOUT_MONO;
+
+    /* Generate overlap window */
+    ff_init_ff_sine_windows(7);
 
     return 0;
 }
@@ -195,7 +194,8 @@ AVCodec ff_nellymoser_decoder = {
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_tag,
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_PARAM_CHANGE,
+    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_PARAM_CHANGE | AV_CODEC_CAP_CHANNEL_CONF,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLT,
                                                       AV_SAMPLE_FMT_NONE },
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

@@ -91,7 +91,7 @@ Updated Greek translation (by George).
 
 Updated libraries:
 	dav1d git-0.8.0-2-gd6beb0a;
-	ffmpeg git-n4.4-dev-1730-g3da35b7cc7;
+	ffmpeg git-n4.4-dev-2373-ga7f9b3b954;
 	Little-CMS git-2.11-42-g7dcc91f;
 	MediaInfo git-v20.09-15-g02863500;
 	openjpeg git-v2.3.1-59-g0f169867;

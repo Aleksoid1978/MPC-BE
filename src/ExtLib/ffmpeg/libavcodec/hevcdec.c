@@ -2875,6 +2875,17 @@ static int set_side_data(HEVCContext *s)
     }
     // ==> End patch MPC
 
+    if (s->sei.dynamic_hdr_plus.info) {
+        AVBufferRef *info_ref = av_buffer_ref(s->sei.dynamic_hdr_plus.info);
+        if (!info_ref)
+            return AVERROR(ENOMEM);
+
+        if (!av_frame_new_side_data_from_buf(out, AV_FRAME_DATA_DYNAMIC_HDR_PLUS, info_ref)) {
+            av_buffer_unref(&info_ref);
+            return AVERROR(ENOMEM);
+        }
+    }
+
     return 0;
 }
 
@@ -3424,6 +3435,8 @@ static av_cold int hevc_decode_free(AVCodecContext *avctx)
     if (s->HEVClc == s->HEVClcList[0])
         s->HEVClc = NULL;
     av_freep(&s->HEVClcList[0]);
+    av_freep(&s->HEVClcList);
+    av_freep(&s->sList);
 
     ff_h2645_packet_uninit(&s->pkt);
 
@@ -3440,7 +3453,9 @@ static av_cold int hevc_init_context(AVCodecContext *avctx)
     s->avctx = avctx;
 
     s->HEVClc = av_mallocz(sizeof(HEVCLocalContext));
-    if (!s->HEVClc)
+    s->HEVClcList = av_mallocz(sizeof(HEVCLocalContext*) * s->threads_number);
+    s->sList = av_mallocz(sizeof(HEVCContext*) * s->threads_number);
+    if (!s->HEVClc || !s->HEVClcList || !s->sList)
         goto fail;
     s->HEVClcList[0] = s->HEVClc;
     s->sList[0] = s;
@@ -3568,6 +3583,10 @@ static int hevc_update_thread_context(AVCodecContext *dst,
         }
     }
 
+    ret = av_buffer_replace(&s->sei.dynamic_hdr_plus.info, s0->sei.dynamic_hdr_plus.info);
+    if (ret < 0)
+        return ret;
+
     s->sei.frame_packing        = s0->sei.frame_packing;
     s->sei.display_orientation  = s0->sei.display_orientation;
     s->sei.mastering_display    = s0->sei.mastering_display;
@@ -3587,6 +3606,16 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
     HEVCContext *s = avctx->priv_data;
     int ret;
 
+    if(avctx->active_thread_type & FF_THREAD_SLICE)
+        s->threads_number = avctx->thread_count;
+    else
+        s->threads_number = 1;
+
+    if((avctx->active_thread_type & FF_THREAD_FRAME) && avctx->thread_count > 1)
+        s->threads_type = FF_THREAD_FRAME;
+    else
+        s->threads_type = FF_THREAD_SLICE;
+
     ret = hevc_init_context(avctx);
     if (ret < 0)
         return ret;
@@ -3597,11 +3626,6 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
 
     atomic_init(&s->wpp_err, 0);
 
-    if(avctx->active_thread_type & FF_THREAD_SLICE)
-        s->threads_number = avctx->thread_count;
-    else
-        s->threads_number = 1;
-
     if (!avctx->internal->is_copy) {
         if (avctx->extradata_size > 0 && avctx->extradata) {
             ret = hevc_decode_extradata(s, avctx->extradata, avctx->extradata_size, 1);
@@ -3611,11 +3635,6 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
             }
         }
     }
-
-    if((avctx->active_thread_type & FF_THREAD_FRAME) && avctx->thread_count > 1)
-            s->threads_type = FF_THREAD_FRAME;
-        else
-            s->threads_type = FF_THREAD_SLICE;
 
     return 0;
 }

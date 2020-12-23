@@ -48,6 +48,10 @@
 #include "vp3dsp.h"
 #include "xiph.h"
 
+#define VP3_MV_VLC_BITS     6
+#define VP4_MV_VLC_BITS     6
+#define SUPERBLOCK_VLC_BITS 6
+
 #define FRAGMENT_PIXELS 8
 
 // FIXME split things out into their own arrays
@@ -489,7 +493,7 @@ static int unpack_superblocks(Vp3DecodeContext *s, GetBitContext *gb)
                 bit ^= 1;
 
             current_run = get_vlc2(gb, s->superblock_run_length_vlc.table,
-                                   6, 2) + 1;
+                                   SUPERBLOCK_VLC_BITS, 2);
             if (current_run == 34)
                 current_run += get_bits(gb, 12);
 
@@ -523,7 +527,7 @@ static int unpack_superblocks(Vp3DecodeContext *s, GetBitContext *gb)
                     bit ^= 1;
 
                 current_run = get_vlc2(gb, s->superblock_run_length_vlc.table,
-                                       6, 2) + 1;
+                                       SUPERBLOCK_VLC_BITS, 2);
                 if (current_run == 34)
                     current_run += get_bits(gb, 12);
 
@@ -885,7 +889,8 @@ static int unpack_modes(Vp3DecodeContext *s, GetBitContext *gb)
 
 static int vp4_get_mv(Vp3DecodeContext *s, GetBitContext *gb, int axis, int last_motion)
 {
-    int v = get_vlc2(gb, s->vp4_mv_vlc[axis][vp4_mv_table_selector[FFABS(last_motion)]].table, 6, 2) - 31;
+    int v = get_vlc2(gb, s->vp4_mv_vlc[axis][vp4_mv_table_selector[FFABS(last_motion)]].table,
+                     VP4_MV_VLC_BITS, 2);
     return last_motion < 0 ? -v : v;
 }
 
@@ -942,8 +947,10 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                 case MODE_INTER_PLUS_MV:
                     /* all 6 fragments use the same motion vector */
                     if (coding_mode == 0) {
-                        motion_x[0] = motion_vector_table[get_vlc2(gb, s->motion_vector_vlc.table, 6, 2)];
-                        motion_y[0] = motion_vector_table[get_vlc2(gb, s->motion_vector_vlc.table, 6, 2)];
+                        motion_x[0] = get_vlc2(gb, s->motion_vector_vlc.table,
+                                               VP3_MV_VLC_BITS, 2);
+                        motion_y[0] = get_vlc2(gb, s->motion_vector_vlc.table,
+                                               VP3_MV_VLC_BITS, 2);
                     } else if (coding_mode == 1) {
                         motion_x[0] = fixed_motion_vector_table[get_bits(gb, 6)];
                         motion_y[0] = fixed_motion_vector_table[get_bits(gb, 6)];
@@ -972,8 +979,10 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                         current_fragment = BLOCK_Y * s->fragment_width[0] + BLOCK_X;
                         if (s->all_fragments[current_fragment].coding_method != MODE_COPY) {
                             if (coding_mode == 0) {
-                                motion_x[k] = motion_vector_table[get_vlc2(gb, s->motion_vector_vlc.table, 6, 2)];
-                                motion_y[k] = motion_vector_table[get_vlc2(gb, s->motion_vector_vlc.table, 6, 2)];
+                                motion_x[k] = get_vlc2(gb, s->motion_vector_vlc.table,
+                                                       VP3_MV_VLC_BITS, 2);
+                                motion_y[k] = get_vlc2(gb, s->motion_vector_vlc.table,
+                                                       VP3_MV_VLC_BITS, 2);
                             } else if (coding_mode == 1) {
                                 motion_x[k] = fixed_motion_vector_table[get_bits(gb, 6)];
                                 motion_y[k] = fixed_motion_vector_table[get_bits(gb, 6)];
@@ -1104,7 +1113,8 @@ static int unpack_block_qpis(Vp3DecodeContext *s, GetBitContext *gb)
             else
                 bit ^= 1;
 
-            run_length = get_vlc2(gb, s->superblock_run_length_vlc.table, 6, 2) + 1;
+            run_length = get_vlc2(gb, s->superblock_run_length_vlc.table,
+                                  SUPERBLOCK_VLC_BITS, 2);
             if (run_length == 34)
                 run_length += get_bits(gb, 12);
             blocks_decoded += run_length;
@@ -2309,20 +2319,6 @@ static av_cold int init_frames(Vp3DecodeContext *s)
     return 0;
 }
 
-static av_cold int theora_init_huffman_tables(VLC *vlc, const HuffTable *huff)
-{
-    uint32_t code = 0, codes[32];
-
-    for (unsigned i = 0; i < huff->nb_entries; i++) {
-        codes[i] = code        >> (31 - huff->entries[i].len);
-        code    += 0x80000000U >> huff->entries[i].len;
-    }
-    return ff_init_vlc_sparse(vlc, 11, huff->nb_entries,
-                              &huff->entries[0].len, sizeof(huff->entries[0]), 1,
-                              codes, 4, 4,
-                              &huff->entries[0].sym, sizeof(huff->entries[0]), 1, 0);
-}
-
 static av_cold int vp3_decode_init(AVCodecContext *avctx)
 {
     Vp3DecodeContext *s = avctx->priv_data;
@@ -2429,56 +2425,73 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
         /* init VLC tables */
         if (s->version < 2) {
             for (i = 0; i < FF_ARRAY_ELEMS(s->coeff_vlc); i++) {
-                if ((ret = init_vlc(&s->coeff_vlc[i], 11, 32,
-                                    &vp3_bias[i][0][1], 4, 2,
-                                    &vp3_bias[i][0][0], 4, 2, 0)) < 0)
+                ret = ff_init_vlc_from_lengths(&s->coeff_vlc[i], 11, 32,
+                                               &vp3_bias[i][0][1], 2,
+                                               &vp3_bias[i][0][0], 2, 1,
+                                               0, 0, avctx);
+                if (ret < 0)
                     return ret;
             }
 #if CONFIG_VP4_DECODER
         } else { /* version >= 2 */
             for (i = 0; i < FF_ARRAY_ELEMS(s->coeff_vlc); i++) {
-                if ((ret = init_vlc(&s->coeff_vlc[i], 11, 32,
-                                    &vp4_bias[i][0][1], 4, 2,
-                                    &vp4_bias[i][0][0], 4, 2, 0)) < 0)
+                ret = ff_init_vlc_from_lengths(&s->coeff_vlc[i], 11, 32,
+                                               &vp4_bias[i][0][1], 2,
+                                               &vp4_bias[i][0][0], 2, 1,
+                                               0, 0, avctx);
+                if (ret < 0)
                     return ret;
             }
 #endif
         }
     } else {
         for (i = 0; i < FF_ARRAY_ELEMS(s->coeff_vlc); i++) {
-            ret = theora_init_huffman_tables(&s->coeff_vlc[i], &s->huffman_table[i]);
+            const HuffTable *tab = &s->huffman_table[i];
+
+            ret = ff_init_vlc_from_lengths(&s->coeff_vlc[i], 11, tab->nb_entries,
+                                           &tab->entries[0].len, sizeof(*tab->entries),
+                                           &tab->entries[0].sym, sizeof(*tab->entries), 1,
+                                           0, 0, avctx);
             if (ret < 0)
                 return ret;
         }
     }
 
-    if ((ret = init_vlc(&s->superblock_run_length_vlc, 6, 34,
-                        &superblock_run_length_vlc_table[0][1], 4, 2,
-                        &superblock_run_length_vlc_table[0][0], 4, 2, 0)) < 0)
+    ret = ff_init_vlc_from_lengths(&s->superblock_run_length_vlc, SUPERBLOCK_VLC_BITS, 34,
+                                   superblock_run_length_vlc_lens, 1,
+                                   NULL, 0, 0, 1, 0, avctx);
+    if (ret < 0)
         return ret;
 
-    if ((ret = init_vlc(&s->fragment_run_length_vlc, 5, 30,
-                        &fragment_run_length_vlc_table[0][1], 4, 2,
-                        &fragment_run_length_vlc_table[0][0], 4, 2, 0)) < 0)
+    ret = ff_init_vlc_from_lengths(&s->fragment_run_length_vlc, 5, 30,
+                                   fragment_run_length_vlc_len, 1,
+                                   NULL, 0, 0, 0, 0, avctx);
+    if (ret < 0)
         return ret;
 
-    if ((ret = init_vlc(&s->mode_code_vlc, 3, 8,
-                        &mode_code_vlc_table[0][1], 2, 1,
-                        &mode_code_vlc_table[0][0], 2, 1, 0)) < 0)
+    ret = ff_init_vlc_from_lengths(&s->mode_code_vlc, 3, 8,
+                                   mode_code_vlc_len, 1,
+                                   NULL, 0, 0, 0, 0, avctx);
+    if (ret < 0)
         return ret;
 
-    if ((ret = init_vlc(&s->motion_vector_vlc, 6, 63,
-                        &motion_vector_vlc_table[0][1], 2, 1,
-                        &motion_vector_vlc_table[0][0], 2, 1, 0)) < 0)
+    ret = ff_init_vlc_from_lengths(&s->motion_vector_vlc, VP3_MV_VLC_BITS, 63,
+                                   &motion_vector_vlc_table[0][1], 2,
+                                   &motion_vector_vlc_table[0][0], 2, 1,
+                                   -31, 0, avctx);
+    if (ret < 0)
         return ret;
 
 #if CONFIG_VP4_DECODER
     for (j = 0; j < 2; j++)
-        for (i = 0; i < 7; i++)
-            if ((ret = init_vlc(&s->vp4_mv_vlc[j][i], 6, 63,
-                                &vp4_mv_vlc[j][i][0][1], 4, 2,
-                                &vp4_mv_vlc[j][i][0][0], 4, 2, 0)) < 0)
+        for (i = 0; i < 7; i++) {
+            ret = ff_init_vlc_from_lengths(&s->vp4_mv_vlc[j][i], VP4_MV_VLC_BITS, 63,
+                                           &vp4_mv_vlc[j][i][0][1], 2,
+                                           &vp4_mv_vlc[j][i][0][0], 2, 1, -31,
+                                           0, avctx);
+            if (ret < 0)
                 return ret;
+        }
 
     /* version >= 2 */
     for (i = 0; i < 2; i++)

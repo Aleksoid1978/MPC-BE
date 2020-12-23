@@ -513,7 +513,14 @@ static int64_t get_bit_rate(AVCodecContext *ctx)
         break;
     case AVMEDIA_TYPE_AUDIO:
         bits_per_sample = av_get_bits_per_sample(ctx->codec_id);
-        bit_rate = bits_per_sample ? ctx->sample_rate * (int64_t)ctx->channels * bits_per_sample : ctx->bit_rate;
+        if (bits_per_sample) {
+            bit_rate = ctx->sample_rate * (int64_t)ctx->channels;
+            if (bit_rate > INT64_MAX / bits_per_sample) {
+                bit_rate = 0;
+            } else
+                bit_rate *= bits_per_sample;
+        } else
+            bit_rate = ctx->bit_rate;
         break;
     default:
         bit_rate = 0;
@@ -533,18 +540,6 @@ static void ff_unlock_avcodec(const AVCodec *codec)
 {
     if (!(codec->caps_internal & FF_CODEC_CAP_INIT_THREADSAFE) && codec->init)
         ff_mutex_unlock(&codec_mutex);
-}
-
-int attribute_align_arg ff_codec_open2_recursive(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
-{
-    int ret = 0;
-
-    ff_unlock_avcodec(codec);
-
-    ret = avcodec_open2(avctx, codec, options);
-
-    ff_lock_avcodec(avctx, codec);
-    return ret;
 }
 
 int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
@@ -667,6 +662,15 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         ret = AVERROR(EINVAL);
         goto free_and_end;
     }
+    if (av_codec_is_decoder(codec) &&
+        codec->type == AVMEDIA_TYPE_AUDIO &&
+        !(codec->capabilities & AV_CODEC_CAP_CHANNEL_CONF) &&
+        avctx->channels == 0) {
+        av_log(avctx, AV_LOG_ERROR, "Decoder requires channel count but channels not set\n");
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }
+
     if (avctx->sample_rate < 0) {
         av_log(avctx, AV_LOG_ERROR, "Invalid sample rate: %d\n", avctx->sample_rate);
         ret = AVERROR(EINVAL);
@@ -677,6 +681,19 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         ret = AVERROR(EINVAL);
         goto free_and_end;
     }
+
+#if FF_API_THREAD_SAFE_CALLBACKS
+FF_DISABLE_DEPRECATION_WARNINGS
+    if ((avctx->thread_type & FF_THREAD_FRAME) &&
+        avctx->get_buffer2 != avcodec_default_get_buffer2 &&
+        !avctx->thread_safe_callbacks) {
+        av_log(avctx, AV_LOG_WARNING, "Requested frame threading with a "
+               "custom get_buffer2() implementation which is not marked as "
+               "thread safe. This is not supported anymore, make your "
+               "callback thread-safe.\n");
+    }
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
     avctx->codec = codec;
     if ((avctx->codec_type == AVMEDIA_TYPE_UNKNOWN || avctx->codec_type == codec->type) &&
@@ -1093,6 +1110,10 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     av_packet_unref(avci->compat_encode_packet);
     av_packet_unref(avci->buffer_pkt);
 
+    av_packet_unref(avci->last_pkt_props);
+    avpriv_packet_list_free(&avci->pkt_props,
+                            &avci->pkt_props_tail);
+
     av_frame_unref(avci->es.in_frame);
     av_packet_unref(avci->ds.in_pkt);
 
@@ -1490,6 +1511,8 @@ int av_get_exact_bits_per_sample(enum AVCodecID codec_id)
     case AV_CODEC_ID_8SVX_FIB:
     case AV_CODEC_ID_ADPCM_ARGO:
     case AV_CODEC_ID_ADPCM_CT:
+    case AV_CODEC_ID_ADPCM_IMA_ALP:
+    case AV_CODEC_ID_ADPCM_IMA_AMV:
     case AV_CODEC_ID_ADPCM_IMA_APC:
     case AV_CODEC_ID_ADPCM_IMA_APM:
     case AV_CODEC_ID_ADPCM_IMA_EA_SEAD:
@@ -1695,7 +1718,7 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
             case AV_CODEC_ID_ADPCM_IMA_SMJPEG:
                 return (frame_bytes - 4) * 2 / ch;
             case AV_CODEC_ID_ADPCM_IMA_AMV:
-                return (frame_bytes - 8) * 2 / ch;
+                return (frame_bytes - 8) * 2;
             case AV_CODEC_ID_ADPCM_THP:
             case AV_CODEC_ID_ADPCM_THP_LE:
                 if (extradata)
