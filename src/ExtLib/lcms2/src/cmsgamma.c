@@ -59,11 +59,11 @@ static cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFl
 
 // The built-in list
 static _cmsParametricCurvesCollection DefaultCurves = {
-    9,                                  // # of curve types
-    { 1, 2, 3, 4, 5, 6, 7, 8, 108 },    // Parametric curve ID
-    { 1, 3, 4, 5, 7, 4, 5, 5, 1 },      // Parameters by type
-    DefaultEvalParametricFn,            // Evaluator
-    NULL                                // Next in chain
+    10,                                      // # of curve types
+    { 1, 2, 3, 4, 5, 6, 7, 8, 108, 109 },    // Parametric curve ID
+    { 1, 3, 4, 5, 7, 4, 5, 5,   1,   1 },    // Parameters by type
+    DefaultEvalParametricFn,                 // Evaluator
+    NULL                                     // Next in chain
 };
 
 // Duplicates the zone of memory used by the plug-in in the new context
@@ -306,6 +306,32 @@ Error:
     if (p ->Table16) _cmsFree(ContextID, p ->Table16);
     _cmsFree(ContextID, p);
     return NULL;
+}
+
+
+// Generates a sigmoidal function with desired steepness.
+cmsINLINE double sigmoid_base(double k, double t)
+{
+    return (1.0 / (1.0 + exp(-k * t))) - 0.5;
+}
+
+cmsINLINE double inverted_sigmoid_base(double k, double t)
+{
+    return -log((1.0 / (t + 0.5)) - 1.0) / k;
+}
+
+cmsINLINE double sigmoid_factory(double k, double t)
+{
+    double correction = 0.5 / sigmoid_base(k, 1);
+
+    return correction * sigmoid_base(k, 2.0 * t - 1.0) + 0.5;
+}
+
+cmsINLINE double inverse_sigmoid_factory(double k, double t)
+{
+    double correction = 0.5 / sigmoid_base(k, 1);
+
+    return (inverted_sigmoid_base(k, (t - 0.5) / correction) + 1.0) / 2.0;
 }
 
 
@@ -640,6 +666,7 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
        }
        break;
 
+
    // S-Shaped: (1 - (1-x)^1/g)^1/g
    case 108:
        if (fabs(Params[0]) < MATRIX_DET_TOLERANCE)
@@ -655,6 +682,15 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     // 1 - (1 - y^g)^g
     case -108:
         Val = 1 - pow(1 - pow(R, Params[0]), Params[0]);
+        break;
+
+    // Sigmoidals
+    case 109:
+        Val = sigmoid_factory(Params[0], R);
+        break;
+
+    case -109:
+        Val = inverse_sigmoid_factory(Params[0], R);
         break;
 
     default:
@@ -1156,6 +1192,7 @@ cmsBool  CMSEXPORT cmsSmoothToneCurve(cmsToneCurve* Tab, cmsFloat64Number lambda
     cmsBool SuccessStatus = TRUE;
     cmsFloat32Number *w, *y, *z;
     cmsUInt32Number i, nItems, Zeros, Poles;
+    cmsBool notCheck = FALSE;
 
     if (Tab != NULL && Tab->InterpParams != NULL)
     {
@@ -1183,6 +1220,12 @@ cmsBool  CMSEXPORT cmsSmoothToneCurve(cmsToneCurve* Tab, cmsFloat64Number lambda
                         w[i + 1] = 1.0;
                     }
 
+                    if (lambda < 0)
+                    {
+                        notCheck = TRUE;
+                        lambda = -lambda;
+                    }
+
                     if (smooth2(ContextID, w, y, z, (cmsFloat32Number)lambda, (int)nItems))
                     {
                         // Do some reality - checking...
@@ -1195,7 +1238,7 @@ cmsBool  CMSEXPORT cmsSmoothToneCurve(cmsToneCurve* Tab, cmsFloat64Number lambda
                             if (z[i] < z[i - 1])
                             {
                                 cmsSignalError(ContextID, cmsERROR_RANGE, "cmsSmoothToneCurve: Non-Monotonic.");
-                                SuccessStatus = FALSE;
+                                SuccessStatus = notCheck;
                                 break;
                             }
                         }
@@ -1203,13 +1246,13 @@ cmsBool  CMSEXPORT cmsSmoothToneCurve(cmsToneCurve* Tab, cmsFloat64Number lambda
                         if (SuccessStatus && Zeros > (nItems / 3))
                         {
                             cmsSignalError(ContextID, cmsERROR_RANGE, "cmsSmoothToneCurve: Degenerated, mostly zeros.");
-                            SuccessStatus = FALSE;
+                            SuccessStatus = notCheck;
                         }
 
                         if (SuccessStatus && Poles > (nItems / 3))
                         {
                             cmsSignalError(ContextID, cmsERROR_RANGE, "cmsSmoothToneCurve: Degenerated, mostly poles.");
-                            SuccessStatus = FALSE;
+                            SuccessStatus = notCheck;
                         }
 
                         if (SuccessStatus) // Seems ok

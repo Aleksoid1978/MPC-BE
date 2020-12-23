@@ -1,5 +1,19 @@
 
 -----------------------
+2.12 Maintenance release
+-----------------------
+Added new build-in sigmoidal tone curve
+Added XCode 12 project
+Addes support for multichannel input up to 15 channels
+Fix LUT8 write matrix
+Fix version mess on 10/11
+Fix tools & samples xgetopt
+plugin: cleanup and better SSE detection
+plugin: add lab to any on float
+plugin: it can now be compiled as C++
+recover PDF documentation, but try to keep it under a resonable size.
+
+-----------------------
 2.11 Maintenance release
 -----------------------
 Fixed __cpuid() on fast float plugin to allow gnu gcc
