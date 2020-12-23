@@ -30,10 +30,11 @@ CPPageMouse::CPPageMouse()
 	, m_list(0)
 {
 	m_comands_M.Add(0, 0);
-	m_comands_M.Add(ID_PLAY_PLAYPAUSE,  IDS_AG_PLAYPAUSE);
-	m_comands_M.Add(ID_VIEW_FULLSCREEN, IDS_AG_FULLSCREEN);
-	m_comands_M.Add(ID_VIEW_PLAYLIST,   IDS_AG_TOGGLE_PLAYLIST);
-	m_comands_M.Add(ID_BOSS,            IDS_AG_BOSS_KEY);
+	m_comands_M.Add(ID_PLAY_PLAYPAUSE,    IDS_AG_PLAYPAUSE);
+	m_comands_M.Add(ID_VIEW_FULLSCREEN,   IDS_AG_FULLSCREEN);
+	m_comands_M.Add(ID_VIEW_FULLSCREEN_2, IDS_AG_FULLSCREEN_2);
+	m_comands_M.Add(ID_VIEW_PLAYLIST,     IDS_AG_TOGGLE_PLAYLIST);
+	m_comands_M.Add(ID_BOSS,              IDS_AG_BOSS_KEY);
 
 	m_comands_X.Add(0, 0);
 	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARD,     IDS_AG_NEXT);
@@ -115,6 +116,7 @@ BOOL CPPageMouse::OnInitDialog()
 	AddStringData(m_cmbLeftButtonDblClick, L"", 0);
 	AddStringData(m_cmbLeftButtonDblClick, ResStr(IDS_AG_PLAYPAUSE), ID_PLAY_PLAYPAUSE);
 	AddStringData(m_cmbLeftButtonDblClick, ResStr(IDS_AG_FULLSCREEN), ID_VIEW_FULLSCREEN);
+	AddStringData(m_cmbLeftButtonDblClick, ResStr(IDS_AG_FULLSCREEN_2), ID_VIEW_FULLSCREEN_2);
 	SelectByItemData(m_cmbLeftButtonDblClick, s.nMouseLeftDblClick);
 
 	AddStringData(m_cmbRightButtonClick, ResStr(IDS_AG_MENU_PLAYER_A), 0);
