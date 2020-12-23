@@ -758,6 +758,39 @@ static int cbs_av1_split_fragment(CodedBitstreamContext *ctx,
         goto fail;
     }
 
+    if (header && size && data[0] & 0x80) {
+        // first bit is nonzero, the extradata does not consist purely of
+        // OBUs. Expect MP4/Matroska AV1CodecConfigurationRecord
+        int config_record_version = data[0] & 0x7f;
+
+        if (config_record_version != 1) {
+            av_log(ctx->log_ctx, AV_LOG_ERROR,
+                   "Unknown version %d of AV1CodecConfigurationRecord "
+                   "found!\n",
+                   config_record_version);
+            err = AVERROR_INVALIDDATA;
+            goto fail;
+        }
+
+        if (size <= 4) {
+            if (size < 4) {
+                av_log(ctx->log_ctx, AV_LOG_WARNING,
+                       "Undersized AV1CodecConfigurationRecord v%d found!\n",
+                       config_record_version);
+                err = AVERROR_INVALIDDATA;
+                goto fail;
+            }
+
+            goto success;
+        }
+
+        // In AV1CodecConfigurationRecord v1, actual OBUs start after
+        // four bytes. Thus set the offset as required for properly
+        // parsing them.
+        data += 4;
+        size -= 4;
+    }
+
     while (size > 0) {
         AV1RawOBUHeader header;
         uint64_t obu_size;
@@ -803,6 +836,7 @@ static int cbs_av1_split_fragment(CodedBitstreamContext *ctx,
         size -= obu_length;
     }
 
+success:
     err = 0;
 fail:
     ctx->trace_enable = trace;
@@ -1042,6 +1076,10 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
             av_buffer_unref(&priv->sequence_header_ref);
             priv->sequence_header = NULL;
 
+            err = ff_cbs_make_unit_refcounted(ctx, unit);
+            if (err < 0)
+                return err;
+
             priv->sequence_header_ref = av_buffer_ref(unit->content_ref);
             if (!priv->sequence_header_ref)
                 return AVERROR(ENOMEM);
@@ -1205,6 +1243,7 @@ static void cbs_av1_flush(CodedBitstreamContext *ctx)
     memset(priv->ref, 0, sizeof(priv->ref));
     priv->operating_point_idc = 0;
     priv->seen_frame_header = 0;
+    priv->tile_num = 0;
 }
 
 static void cbs_av1_close(CodedBitstreamContext *ctx)

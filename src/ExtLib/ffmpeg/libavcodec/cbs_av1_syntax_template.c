@@ -1194,7 +1194,8 @@ static int FUNC(global_motion_params)(CodedBitstreamContext *ctx, RWContext *rw,
 }
 
 static int FUNC(film_grain_params)(CodedBitstreamContext *ctx, RWContext *rw,
-                                   AV1RawFrameHeader *current)
+                                   AV1RawFilmGrainParams *current,
+                                   AV1RawFrameHeader *frame_header)
 {
     CodedBitstreamAV1Context  *priv = ctx->priv_data;
     const AV1RawSequenceHeader *seq = priv->sequence_header;
@@ -1202,7 +1203,7 @@ static int FUNC(film_grain_params)(CodedBitstreamContext *ctx, RWContext *rw,
     int i, err;
 
     if (!seq->film_grain_params_present ||
-        (!current->show_frame && !current->showable_frame))
+        (!frame_header->show_frame && !frame_header->showable_frame))
         return 0;
 
     flag(apply_grain);
@@ -1212,7 +1213,7 @@ static int FUNC(film_grain_params)(CodedBitstreamContext *ctx, RWContext *rw,
 
     fb(16, grain_seed);
 
-    if (current->frame_type == AV1_FRAME_INTER)
+    if (frame_header->frame_type == AV1_FRAME_INTER)
         flag(update_grain);
     else
         infer(update_grain, 1);
@@ -1490,9 +1491,12 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
         fb(8, refresh_frame_flags);
 
     if (!frame_is_intra || current->refresh_frame_flags != all_frames) {
-        if (current->error_resilient_mode && seq->enable_order_hint) {
+        if (seq->enable_order_hint) {
             for (i = 0; i < AV1_NUM_REF_FRAMES; i++) {
-                fbs(order_hint_bits, ref_order_hint[i], 1, i);
+                if (current->error_resilient_mode)
+                    fbs(order_hint_bits, ref_order_hint[i], 1, i);
+                else
+                    infer(ref_order_hint[i], priv->ref[i].order_hint);
                 if (current->ref_order_hint[i] != priv->ref[i].order_hint)
                     priv->ref[i].valid = 0;
             }
@@ -1632,7 +1636,7 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
 
     CHECK(FUNC(global_motion_params)(ctx, rw, current));
 
-    CHECK(FUNC(film_grain_params)(ctx, rw, current));
+    CHECK(FUNC(film_grain_params)(ctx, rw, &current->film_grain, current));
 
     av_log(ctx->log_ctx, AV_LOG_DEBUG, "Frame %d:  size %dx%d  "
            "upscaled %d  render %dx%d  subsample %dx%d  "
@@ -1719,6 +1723,8 @@ static int FUNC(frame_header_obu)(CodedBitstreamContext *ctx, RWContext *rw,
 
         CHECK(FUNC(uncompressed_header)(ctx, rw, current));
 
+        priv->tile_num = 0;
+
         if (current->show_existing_frame) {
             priv->seen_frame_header = 0;
         } else {
@@ -1784,9 +1790,11 @@ static int FUNC(tile_group_obu)(CodedBitstreamContext *ctx, RWContext *rw,
     } else {
         tile_bits = cbs_av1_tile_log2(1, priv->tile_cols) +
                     cbs_av1_tile_log2(1, priv->tile_rows);
-        fb(tile_bits, tg_start);
-        fb(tile_bits, tg_end);
+        fc(tile_bits, tg_start, priv->tile_num, num_tiles - 1);
+        fc(tile_bits, tg_end, current->tg_start, num_tiles - 1);
     }
+
+    priv->tile_num = current->tg_end + 1;
 
     CHECK(FUNC(byte_alignment)(ctx, rw));
 

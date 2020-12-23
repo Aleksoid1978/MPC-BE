@@ -27,11 +27,11 @@
  */
 
 #include "libavcodec/internal.h"
-#include "libavcodec/mathops.h"
 #include "avcodec.h"
 #include "dsd.h"
 
 #define DSD_SILENCE 0x69
+#define DSD_SILENCE_REVERSED 0x96
 /* 0x69 = 01101001
  * This pattern "on repeat" makes a low energy 352.8 kHz tone
  * and a high energy 1.0584 MHz tone which should be filtered
@@ -53,7 +53,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     if (!s)
         return AVERROR(ENOMEM);
 
-    silence = avctx->codec_id == AV_CODEC_ID_DSD_LSBF || avctx->codec_id == AV_CODEC_ID_DSD_LSBF_PLANAR ? ff_reverse[DSD_SILENCE] : DSD_SILENCE;
+    silence = avctx->codec_id == AV_CODEC_ID_DSD_LSBF || avctx->codec_id == AV_CODEC_ID_DSD_LSBF_PLANAR ? DSD_SILENCE_REVERSED : DSD_SILENCE;
     for (i = 0; i < avctx->channels; i++) {
         s[i].pos = 0;
         memset(s[i].buf, silence, sizeof(s[i].buf));
@@ -125,6 +125,7 @@ AVCodec ff_##name_##_decoder = { \
     .capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS, \
     .sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP, \
                                                    AV_SAMPLE_FMT_NONE }, \
+    .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE, \
 };
 
 DSD_DECODER(DSD_LSBF, dsd_lsbf, "DSD (Direct Stream Digital), least significant bit first")

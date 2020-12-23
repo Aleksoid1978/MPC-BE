@@ -39,6 +39,8 @@
 #include "libavutil/attributes.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/libm.h"
+#include "libavutil/thread.h"
+
 #include "avcodec.h"
 #include "bytestream.h"
 #include "fft.h"
@@ -246,13 +248,8 @@ static void read_quant_spectral_coeffs(GetBitContext *gb, int selector,
         /* variable length coding (VLC) */
         if (selector != 1) {
             for (i = 0; i < num_codes; i++) {
-                huff_symb = get_vlc2(gb, spectral_coeff_tab[selector-1].table,
-                                     ATRAC3_VLC_BITS, 1);
-                huff_symb += 1;
-                code = huff_symb >> 1;
-                if (huff_symb & 1)
-                    code = -code;
-                mantissas[i] = code;
+                mantissas[i] = get_vlc2(gb, spectral_coeff_tab[selector-1].table,
+                                        ATRAC3_VLC_BITS, 1);
             }
         } else {
             for (i = 0; i < num_codes; i++) {
@@ -854,6 +851,7 @@ static int atrac3al_decode_frame(AVCodecContext *avctx, void *data,
 static av_cold void atrac3_init_static_data(void)
 {
     VLC_TYPE (*table)[2] = atrac3_vlc_table;
+    const uint8_t (*hufftabs)[2] = atrac3_hufftabs;
     int i;
 
     init_imdct_window();
@@ -863,16 +861,18 @@ static av_cold void atrac3_init_static_data(void)
     for (i = 0; i < 7; i++) {
         spectral_coeff_tab[i].table           = table;
         spectral_coeff_tab[i].table_allocated = 256;
-        init_vlc(&spectral_coeff_tab[i], ATRAC3_VLC_BITS, huff_tab_sizes[i],
-                 huff_bits[i],  1, 1,
-                 huff_codes[i], 1, 1, INIT_VLC_USE_NEW_STATIC);
+        ff_init_vlc_from_lengths(&spectral_coeff_tab[i], ATRAC3_VLC_BITS, huff_tab_sizes[i],
+                                 &hufftabs[0][1], 2,
+                                 &hufftabs[0][0], 2, 1,
+                                 -31, INIT_VLC_USE_NEW_STATIC, NULL);
+        hufftabs += huff_tab_sizes[i];
         table += 256;
     }
 }
 
 static av_cold int atrac3_decode_init(AVCodecContext *avctx)
 {
-    static int static_init_done;
+    static AVOnce init_static_once = AV_ONCE_INIT;
     int i, js_pair, ret;
     int version, delay, samples_per_frame, frame_factor;
     const uint8_t *edata_ptr = avctx->extradata;
@@ -883,10 +883,6 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Channel configuration error!\n");
         return AVERROR(EINVAL);
     }
-
-    if (!static_init_done)
-        atrac3_init_static_data();
-    static_init_done = 1;
 
     /* Take care of the codec-specific extradata. */
     if (avctx->codec_id == AV_CODEC_ID_ATRAC3AL) {
@@ -968,7 +964,7 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
-    if (avctx->block_align > 1024 || avctx->block_align <= 0)
+    if (avctx->block_align > 4096 || avctx->block_align <= 0)
         return AVERROR(EINVAL);
 
     q->decoded_bytes_buffer = av_mallocz(FFALIGN(avctx->block_align, 4) +
@@ -1011,6 +1007,8 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
     if (!q->units)
         return AVERROR(ENOMEM);
 
+    ff_thread_once(&init_static_once, atrac3_init_static_data);
+
     return 0;
 }
 
@@ -1026,7 +1024,7 @@ AVCodec ff_atrac3_decoder = {
     .capabilities     = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1,
     .sample_fmts      = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                         AV_SAMPLE_FMT_NONE },
-    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
 
 AVCodec ff_atrac3al_decoder = {
@@ -1041,5 +1039,5 @@ AVCodec ff_atrac3al_decoder = {
     .capabilities     = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1,
     .sample_fmts      = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                         AV_SAMPLE_FMT_NONE },
-    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

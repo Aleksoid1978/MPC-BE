@@ -1024,13 +1024,12 @@ static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
             return ret;
     }
 
-    av_buffer_unref(&fdst->dsd_ref);
     fdst->dsdctx = NULL;
     fdst->dsd_channels = 0;
+    ret = av_buffer_replace(&fdst->dsd_ref, fsrc->dsd_ref);
+    if (ret < 0)
+        return ret;
     if (fsrc->dsd_ref) {
-        fdst->dsd_ref = av_buffer_ref(fsrc->dsd_ref);
-        if (!fdst->dsd_ref)
-            return AVERROR(ENOMEM);
         fdst->dsdctx = (DSDContext*)fdst->dsd_ref->data;
         fdst->dsd_channels = fsrc->dsd_channels;
     }
@@ -1712,6 +1711,7 @@ AVCodec ff_wavpack_decoder = {
     .flush          = wavpack_decode_flush,
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
-                      AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal  = FF_CODEC_CAP_ALLOCATE_PROGRESS,
+                      AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP |
+                      FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };

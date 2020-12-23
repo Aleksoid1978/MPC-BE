@@ -203,6 +203,7 @@ SRCS_LC = \
 	libavcodec/dxva2_mpeg2.c \
 	libavcodec/dxva2_vc1.c \
 	libavcodec/dxva2_vp9.c \
+	libavcodec/dynamic_hdr10_plus.c \
 	libavcodec/eac3_data.c \
 	libavcodec/eac3dec.c \
 	libavcodec/elsdec.c \
@@ -349,6 +350,8 @@ SRCS_LC = \
 	libavcodec/mpegaudio.c \
 	libavcodec/mpegaudio_parser.c \
 	libavcodec/mpegaudiodata.c \
+	libavcodec/mpegaudiodec_common.c \
+	libavcodec/mpegaudiodec_common_tablegen.c \
 	libavcodec/mpegaudiodec_fixed.c \
 	libavcodec/mpegaudiodec_float.c \
 	libavcodec/mpegaudiodecheader.c \
@@ -625,6 +628,7 @@ SRCS_LU = \
 	libavutil/eval.c \
 	libavutil/fifo.c \
 	libavutil/file_open.c \
+	libavutil/film_grain_params.c \
 	libavutil/fixed_dsp.c \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \

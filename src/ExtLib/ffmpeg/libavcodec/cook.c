@@ -65,6 +65,9 @@
 #define SUBBAND_SIZE    20
 #define MAX_SUBPACKETS   5
 
+#define QUANT_VLC_BITS    9
+#define COUPLING_VLC_BITS 6
+
 typedef struct cook_gains {
     int *now;
     int *previous;
@@ -190,6 +193,21 @@ static av_cold void init_gain_table(COOKContext *q)
                                (1.0 / (double) q->gain_size_factor));
 }
 
+static av_cold int build_vlc(VLC *vlc, int nb_bits, const uint8_t counts[16],
+                             const void *syms, int symbol_size, int offset,
+                             void *logctx)
+{
+    uint8_t lens[MAX_COOK_VLC_ENTRIES];
+    unsigned num = 0;
+
+    for (int i = 0; i < 16; i++)
+        for (unsigned count = num + counts[i]; num < count; num++)
+            lens[num] = i + 1;
+
+    return ff_init_vlc_from_lengths(vlc, nb_bits, num, lens, 1,
+                                    syms, symbol_size, symbol_size,
+                                    offset, 0, logctx);
+}
 
 static av_cold int init_cook_vlc_tables(COOKContext *q)
 {
@@ -197,23 +215,24 @@ static av_cold int init_cook_vlc_tables(COOKContext *q)
 
     result = 0;
     for (i = 0; i < 13; i++) {
-        result |= init_vlc(&q->envelope_quant_index[i], 9, 24,
-                           envelope_quant_index_huffbits[i], 1, 1,
-                           envelope_quant_index_huffcodes[i], 2, 2, 0);
+        result |= build_vlc(&q->envelope_quant_index[i], QUANT_VLC_BITS,
+                            envelope_quant_index_huffcounts[i],
+                            envelope_quant_index_huffsyms[i], 1, -12, q->avctx);
     }
     av_log(q->avctx, AV_LOG_DEBUG, "sqvh VLC init\n");
     for (i = 0; i < 7; i++) {
-        result |= init_vlc(&q->sqvh[i], vhvlcsize_tab[i], vhsize_tab[i],
-                           cvh_huffbits[i], 1, 1,
-                           cvh_huffcodes[i], 2, 2, 0);
+        int sym_size = 1 + (i == 3);
+        result |= build_vlc(&q->sqvh[i], vhvlcsize_tab[i],
+                            cvh_huffcounts[i],
+                            cvh_huffsyms[i], sym_size, 0, q->avctx);
     }
 
     for (i = 0; i < q->num_subpackets; i++) {
         if (q->subpacket[i].joint_stereo == 1) {
-            result |= init_vlc(&q->subpacket[i].channel_coupling, 6,
-                               (1 << q->subpacket[i].js_vlc_bits) - 1,
-                               ccpl_huffbits[q->subpacket[i].js_vlc_bits - 2], 1, 1,
-                               ccpl_huffcodes[q->subpacket[i].js_vlc_bits - 2], 2, 2, 0);
+            result |= build_vlc(&q->subpacket[i].channel_coupling, COUPLING_VLC_BITS,
+                                ccpl_huffcounts[q->subpacket[i].js_vlc_bits - 2],
+                                ccpl_huffsyms[q->subpacket[i].js_vlc_bits - 2], 1,
+                                0, q->avctx);
             av_log(q->avctx, AV_LOG_DEBUG, "subpacket %i Joint-stereo VLC used.\n", i);
         }
     }
@@ -380,8 +399,8 @@ static int decode_envelope(COOKContext *q, COOKSubpacket *p,
             vlc_index = 13; // the VLC tables >13 are identical to No. 13
 
         j = get_vlc2(&q->gb, q->envelope_quant_index[vlc_index - 1].table,
-                     q->envelope_quant_index[vlc_index - 1].bits, 2);
-        quant_index_table[i] = quant_index_table[i - 1] + j - 12; // differential encoding
+                     QUANT_VLC_BITS, 2);
+        quant_index_table[i] = quant_index_table[i - 1] + j; // differential encoding
         if (quant_index_table[i] > 63 || quant_index_table[i] < -63) {
             av_log(q->avctx, AV_LOG_ERROR,
                    "Invalid quantizer %d at position %d, outside [-63, 63] range\n",
@@ -759,7 +778,7 @@ static int decouple_info(COOKContext *q, COOKSubpacket *p, int *decouple_tab)
         for (i = 0; i < length; i++)
             decouple_tab[start + i] = get_vlc2(&q->gb,
                                                p->channel_coupling.table,
-                                               p->channel_coupling.bits, 3);
+                                               COUPLING_VLC_BITS, 3);
     else
         for (i = 0; i < length; i++) {
             int v = get_bits(&q->gb, p->js_vlc_bits);

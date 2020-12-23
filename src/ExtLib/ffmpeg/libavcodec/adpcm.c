@@ -110,6 +110,7 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
     unsigned int max_channels = 2;
 
     switch(avctx->codec->id) {
+    case AV_CODEC_ID_ADPCM_IMA_AMV:
     case AV_CODEC_ID_ADPCM_IMA_CUNNING:
         max_channels = 1;
         break;
@@ -774,7 +775,6 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
         case AV_CODEC_ID_ADPCM_IMA_DAT4:
         case AV_CODEC_ID_ADPCM_IMA_MOFLEX:
         case AV_CODEC_ID_ADPCM_IMA_ISS:     header_size = 4 * ch;      break;
-        case AV_CODEC_ID_ADPCM_IMA_AMV:     header_size = 8;           break;
         case AV_CODEC_ID_ADPCM_IMA_SMJPEG:  header_size = 4 * ch;      break;
     }
     if (header_size > 0)
@@ -782,6 +782,13 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
 
     /* more complex formats */
     switch (avctx->codec->id) {
+    case AV_CODEC_ID_ADPCM_IMA_AMV:
+        bytestream2_skip(gb, 4);
+        has_coded_samples  = 1;
+        *coded_samples     = bytestream2_get_le32u(gb);
+        nb_samples         = FFMIN((buf_size - 8) * 2, *coded_samples);
+        bytestream2_seek(gb, -8, SEEK_CUR);
+        break;
     case AV_CODEC_ID_ADPCM_EA:
         has_coded_samples = 1;
         *coded_samples  = bytestream2_get_le32(gb);
@@ -880,7 +887,7 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
     }
     case AV_CODEC_ID_ADPCM_SWF:
     {
-        int buf_bits       = (avctx->block_align ? avctx->block_align : buf_size) * 8 - 2;
+        int buf_bits       = buf_size * 8 - 2;
         int nbits          = (bytestream2_get_byte(gb) >> 6) + 2;
         int block_hdr_size = 22 * ch;
         int block_size     = block_hdr_size + nbits * ch * 4095;
@@ -889,9 +896,6 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
         nb_samples         = nblocks * 4096;
         if (bits_left >= block_hdr_size)
             nb_samples += 1 + (bits_left - block_hdr_size) / (nbits * ch);
-
-        if (avctx->block_align)
-            nb_samples *= buf_size / avctx->block_align;
         break;
     }
     case AV_CODEC_ID_ADPCM_THP:
@@ -1684,6 +1688,18 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
         }
         break;
     case AV_CODEC_ID_ADPCM_IMA_AMV:
+        av_assert0(avctx->channels == 1);
+
+        /*
+         * Header format:
+         *   int16_t  predictor;
+         *   uint8_t  step_index;
+         *   uint8_t  reserved;
+         *   uint32_t frame_size;
+         *
+         * Some implementations have step_index as 16-bits, but others
+         * only use the lower 8 and store garbage in the upper 8.
+         */
         c->status[0].predictor = sign_extend(bytestream2_get_le16u(&gb), 16);
         c->status[0].step_index = bytestream2_get_byteu(&gb);
         bytestream2_skipu(&gb, 5);
@@ -1693,11 +1709,22 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
             return AVERROR_INVALIDDATA;
         }
 
-        for (n = nb_samples >> (1 - st); n > 0; n--) {
+        for (n = nb_samples >> 1; n > 0; n--) {
             int v = bytestream2_get_byteu(&gb);
 
             *samples++ = adpcm_ima_expand_nibble(&c->status[0], v >> 4, 3);
             *samples++ = adpcm_ima_expand_nibble(&c->status[0], v & 0xf, 3);
+        }
+
+        if (nb_samples & 1) {
+            int v = bytestream2_get_byteu(&gb);
+            *samples++ = adpcm_ima_expand_nibble(&c->status[0], v >> 4, 3);
+
+            if (v & 0x0F) {
+                /* Holds true on all the http://samples.mplayerhq.hu/amv samples. */
+                av_log(avctx, AV_LOG_WARNING, "Last nibble set on packet with odd sample count.\n");
+                av_log(avctx, AV_LOG_WARNING, "Sample will be skipped.\n");
+            }
         }
         break;
     case AV_CODEC_ID_ADPCM_IMA_SMJPEG:
@@ -1770,17 +1797,9 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
         }
         break;
     case AV_CODEC_ID_ADPCM_SWF:
-    {
-        const int nb_blocks  = avctx->block_align ? avpkt->size / avctx->block_align : 1;
-        const int block_size = avctx->block_align ? avctx->block_align : avpkt->size;
-
-        for (int block = 0; block < nb_blocks; block++) {
-            adpcm_swf_decode(avctx, buf + block * block_size, block_size, samples);
-            samples += nb_samples / nb_blocks;
-        }
+        adpcm_swf_decode(avctx, buf, buf_size, samples);
         bytestream2_seek(&gb, 0, SEEK_END);
         break;
-    }
     case AV_CODEC_ID_ADPCM_YAMAHA:
         for (n = nb_samples >> (1 - st); n > 0; n--) {
             int v = bytestream2_get_byteu(&gb);
@@ -2123,6 +2142,7 @@ AVCodec ff_ ## name_ ## _decoder = {                        \
     .flush          = adpcm_flush,                          \
     .capabilities   = AV_CODEC_CAP_DR1,                     \
     .sample_fmts    = sample_fmts_,                         \
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,         \
 }
 
 /* Note: Do not forget to add new entries to the Makefile as well. */
