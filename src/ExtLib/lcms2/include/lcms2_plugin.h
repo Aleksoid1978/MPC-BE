@@ -547,11 +547,6 @@ typedef struct {
 // the optimization  search. Or FALSE if it is unable to optimize and want to give a chance
 // to the rest of optimizers.
 
-typedef void     (* _cmsOPTeval16Fn)(CMSREGISTER const cmsUInt16Number In[],
-                                     CMSREGISTER cmsUInt16Number Out[],
-                                     CMSREGISTER const void* Data);
-
-
 typedef cmsBool  (* _cmsOPToptimizeFn)(cmsPipeline** Lut,
                                        cmsUInt32Number  Intent,
                                        cmsUInt32Number* InputFormat,
@@ -562,7 +557,7 @@ typedef cmsBool  (* _cmsOPToptimizeFn)(cmsPipeline** Lut,
 // duplicator and free functions should also be specified in order to duplicate the LUT construct. Use NULL to inhibit such functionality.
 
 CMSAPI void CMSEXPORT _cmsPipelineSetOptimizationParameters(cmsPipeline* Lut,
-                                               _cmsOPTeval16Fn Eval16,
+                                               _cmsInterpFn16 Eval16,
                                                void* PrivateData,
                                                _cmsFreeUserDataFn FreePrivateDataFn,
                                                _cmsDupUserDataFn DupPrivateDataFn);

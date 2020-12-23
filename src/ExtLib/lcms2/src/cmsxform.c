@@ -273,7 +273,7 @@ void FloatXFORM(_cmsTRANSFORM* p,
     strideIn = 0;
     strideOut = 0;
     memset(fIn, 0, sizeof(fIn));
-    memset(fOut, 0, sizeof(fIn));
+    memset(fOut, 0, sizeof(fOut));
 
     for (i = 0; i < LineCount; i++) {
 

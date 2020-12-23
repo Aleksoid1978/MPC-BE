@@ -778,7 +778,7 @@ Error:
 
     if (DataSetIn == NULL && DataSetOut == NULL) {
 
-        _cmsPipelineSetOptimizationParameters(Dest, (_cmsOPTeval16Fn) DataCLUT->Params->Interpolation.Lerp16, DataCLUT->Params, NULL, NULL);
+        _cmsPipelineSetOptimizationParameters(Dest, DataCLUT->Params->Interpolation.Lerp16, DataCLUT->Params, NULL, NULL);
     }
     else {
 
@@ -1906,7 +1906,7 @@ cmsBool  _cmsRegisterOptimizationPlugin(cmsContext ContextID, cmsPluginBase* Dat
 }
 
 // The entry point for LUT optimization
-cmsBool _cmsOptimizePipeline(cmsContext ContextID,
+cmsBool CMSEXPORT _cmsOptimizePipeline(cmsContext ContextID,
                              cmsPipeline**    PtrLut,
                              cmsUInt32Number  Intent,
                              cmsUInt32Number* InputFormat,
