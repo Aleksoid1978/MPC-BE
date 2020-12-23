@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Menu de &capítulos"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Aumentar tamanho"
 6		"Diminuir tamanho"
 7		"Aumentar comprimento"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Mover para cima"
 15		"Mover para baixo"
 16		"Centralizar"
-18		"Reiniciar"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Reiniciar"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"PnS Diminuir tamanho"
 STRING IDS_AG_PNS_DEC_WIDTH		"PnS Diminuir comprimento"
 STRING IDS_AG_PNS_DOWN		"PnS Abaixo"
 STRING IDS_AG_PNS_DOWNLEFT		"PnS Abaixo/Esquerda"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"PnS Aumentar tamanho"
 STRING IDS_AG_PNS_INC_WIDTH		"PnS Aumentar comprimento"
 STRING IDS_AG_PNS_LEFT		"PnS Esquerda"
 STRING IDS_AG_PNS_RESET		"Resetar PnS"
 STRING IDS_AG_PNS_RIGHT		"PnS Direita"
-STRING IDS_AG_PNS_ROTATEZ_M		"Rotacionar PnS Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Rotacionar PnS Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"PnS Acima"
 STRING IDS_AG_PNS_UPLEFT		"PnS Acima/Esquerda"
 STRING IDS_AG_PNS_UPRIGHT		"PnS Acima/Direita"

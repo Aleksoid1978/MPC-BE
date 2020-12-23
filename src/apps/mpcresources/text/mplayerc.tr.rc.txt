@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"&Bölüm Menüsü"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Boyutu Arttır"
 6		"Boyutu Azalt"
 7		"Genişliği Arttır"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Yukarı Taşı"
 15		"Aşağı Taşı"
 16		"Ortala"
-18		"Sıfırla"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Sıfırla"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1197,8 +1200,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"SzT En Arttır"
 STRING IDS_AG_PNS_LEFT		"SzT Sola Taşı"
 STRING IDS_AG_PNS_RESET		"SzT Sıfırla"
 STRING IDS_AG_PNS_RIGHT		"SzT Sağa Taşı"
-STRING IDS_AG_PNS_ROTATEZ_M		"SzT Döndür Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"SzT Döndür Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"SzT Yukarı Taşı"
 STRING IDS_AG_PNS_UPLEFT		"SzT Yukarı/Sola Taşı"
 STRING IDS_AG_PNS_UPRIGHT		"SzT Yukarı/Sağa Taşı"

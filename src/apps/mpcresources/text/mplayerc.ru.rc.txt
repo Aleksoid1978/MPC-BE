@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Меню с&цен"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Увеличить размер"
 6		"Уменьшить размер"
 7		"Увеличить ширину"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Сместить вверх"
 15		"Сместить вниз"
 16		"Центрировать"
-18		"Сбросить"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Сбросить"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1197,8 +1200,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"Увеличить ширину кадра"
 STRING IDS_AG_PNS_LEFT		"Сдвинуть кадр влево"
 STRING IDS_AG_PNS_RESET		"Сбросить настройки положения кадра"
 STRING IDS_AG_PNS_RIGHT		"Сдвинуть кадр вправо"
-STRING IDS_AG_PNS_ROTATEZ_M		"Повернуть кадр по Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Повернуть кадр по Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Сдвинуть кадр вверх"
 STRING IDS_AG_PNS_UPLEFT		"Сдвинуть кадр вверх/влево"
 STRING IDS_AG_PNS_UPRIGHT		"Сдвинуть кадр вверх/вправо"

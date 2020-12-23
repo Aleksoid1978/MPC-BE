@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Μενού κε&φαλαίων"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Αύξηση μεγέθους"
 6		"Μείωση μεγέθους"
 7		"Αύξηση πλάτους"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Μετακίνηση πάνω"
 15		"Μετακίνηση κάτω"
 16		"Κέντρο"
-18		"Επαναφορά"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Επαναφορά"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1197,8 +1200,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"Πανοραμική: Πλάτος +"
 STRING IDS_AG_PNS_LEFT		"Πανοραμική: Αριστερά"
 STRING IDS_AG_PNS_RESET		"Πανοραμική: Επαναφορά"
 STRING IDS_AG_PNS_RIGHT		"Πανοραμική: Δεξιά"
-STRING IDS_AG_PNS_ROTATEZ_M		"Πανοραμική: Περιστροφή Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Πανοραμική: Περιστροφή Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Πανοραμική: Επάνω"
 STRING IDS_AG_PNS_UPLEFT		"Πανοραμική: Επάνω/Αριστερά"
 STRING IDS_AG_PNS_UPRIGHT		"Πανοραμική: Επάνω/Δεξιά"

@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"チャプター メニュー(&C)"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"サイズを拡大"
 6		"サイズを縮小"
 7		"幅を拡大"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"上へ移動"
 15		"下へ移動"
 16		"中央へ戻す"
-18		"リセット"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"リセット"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1197,8 +1200,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"PnS 幅を拡大"
 STRING IDS_AG_PNS_LEFT		"PnS 左へ移動"
 STRING IDS_AG_PNS_RESET		"PnS リセット"
 STRING IDS_AG_PNS_RIGHT		"PnS 右へ移動"
-STRING IDS_AG_PNS_ROTATEZ_M		"PnS 回転 Z- (時計回り)"
-STRING IDS_AG_PNS_ROTATEZ_P		"PnS 回転 Z+ (反時計回り)"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"PnS 上へ移動"
 STRING IDS_AG_PNS_UPLEFT		"PnS 左上へ移動"
 STRING IDS_AG_PNS_UPRIGHT		"PnS 右上へ移動"

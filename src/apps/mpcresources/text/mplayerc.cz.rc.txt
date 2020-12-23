@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Nabídka kapitol"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Zvětšit velikost"
 6		"Zmenšit velikost"
 7		"Zvětšit šířku"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Posunout nahoru"
 15		"Posunout dolů"
 16		"Vycentrovat"
-18		"Výchozí"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Výchozí"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"P&S zmenšit velikost"
 STRING IDS_AG_PNS_DEC_WIDTH		"P&S zmenšit šířku"
 STRING IDS_AG_PNS_DOWN		"P&S dolů"
 STRING IDS_AG_PNS_DOWNLEFT		"P&S dolů/doleva"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"P&S zvětšit velikost"
 STRING IDS_AG_PNS_INC_WIDTH		"P&S zvětšit šířku"
 STRING IDS_AG_PNS_LEFT		"P&S doleva"
 STRING IDS_AG_PNS_RESET		"Výchozí P&S"
 STRING IDS_AG_PNS_RIGHT		"P&S doprava"
-STRING IDS_AG_PNS_ROTATEZ_M		"P&S pootočit Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"P&S pootočit Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"P&S nahoru"
 STRING IDS_AG_PNS_UPLEFT		"P&S nahoru/doleva"
 STRING IDS_AG_PNS_UPRIGHT		"P&S nahoru/doprava"

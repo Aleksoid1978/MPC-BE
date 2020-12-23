@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Meniu &capitole"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Mărește dimensiune"
 6		"Micșorează dimensiune"
 7		"Mărește lățime"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Mută în sus"
 15		"Mută în jos"
 16		"Centrare"
-18		"Resetează"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Resetează"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"PnS scade mărime"
 STRING IDS_AG_PNS_DEC_WIDTH		"PnS scade lățime"
 STRING IDS_AG_PNS_DOWN		"PnS în jos"
 STRING IDS_AG_PNS_DOWNLEFT		"PnS Jos/Stânga"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"PnS crește mărime"
 STRING IDS_AG_PNS_INC_WIDTH		"PnS crește lățime"
 STRING IDS_AG_PNS_LEFT		"PnS stânga"
 STRING IDS_AG_PNS_RESET		"Reseteză PnS"
 STRING IDS_AG_PNS_RIGHT		"PnS dreapta"
-STRING IDS_AG_PNS_ROTATEZ_M		"Rotație PnS Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Rotație PnS Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"PnS în sus"
 STRING IDS_AG_PNS_UPLEFT		"PnS Sus/Stânga"
 STRING IDS_AG_PNS_UPRIGHT		"PnS Sus/Drepta"

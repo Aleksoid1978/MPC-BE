@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Menu &chapitrage"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Agrandir"
 6		"Rétrécir"
 7		"Agrandir en largeur"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Déplacer vers le haut"
 15		"Déplacer vers le bas"
 16		"Centrer"
-18		"Rétablir"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Rétablir"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"Panoramique Taille -"
 STRING IDS_AG_PNS_DEC_WIDTH		"Panoramique largeur -"
 STRING IDS_AG_PNS_DOWN		"Panoramique bas"
 STRING IDS_AG_PNS_DOWNLEFT		"Panoramique bas/gauche"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"Panoramique Taille +"
 STRING IDS_AG_PNS_INC_WIDTH		"Panoramique Largeur +"
 STRING IDS_AG_PNS_LEFT		"Panoramique gauche"
 STRING IDS_AG_PNS_RESET		"Rétablir le panoramique"
 STRING IDS_AG_PNS_RIGHT		"Panoramique droite"
-STRING IDS_AG_PNS_ROTATEZ_M		"Rotation panoramique Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Rotation panoramique Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Panoramique haut"
 STRING IDS_AG_PNS_UPLEFT		"Panoramique haut/gauche"
 STRING IDS_AG_PNS_UPRIGHT		"Panoramique haut/droite"

@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"&Kapitel Meny"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Öka Storlek"
 6		"Minskning Storlek"
 7		"Öka Bredd"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Flytta Upp"
 15		"Flytta Ner"
 16		"Center"
-18		"Återställ"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Återställ"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"PnS Dec Size"
 STRING IDS_AG_PNS_DEC_WIDTH		"PnS Dec Width"
 STRING IDS_AG_PNS_DOWN		"PnS Ner"
 STRING IDS_AG_PNS_DOWNLEFT		"PnS Ner/Vänster"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"PnS Inc Size"
 STRING IDS_AG_PNS_INC_WIDTH		"PnS Inc Width"
 STRING IDS_AG_PNS_LEFT		"PnS Vänster"
 STRING IDS_AG_PNS_RESET		"Återställ panoramisk"
 STRING IDS_AG_PNS_RIGHT		"PnS Höger"
-STRING IDS_AG_PNS_ROTATEZ_M		"PnS Rotera Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"PnS Rotera Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"PnS Upp"
 STRING IDS_AG_PNS_UPLEFT		"PnS Upp/Vänster"
 STRING IDS_AG_PNS_UPRIGHT		"PnS Upp/Höger"
