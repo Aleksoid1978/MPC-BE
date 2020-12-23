@@ -93,9 +93,9 @@ Updated libraries:
 	dav1d git-0.8.0-2-gd6beb0a;
 	ffmpeg git-n4.4-dev-2373-ga7f9b3b954;
 	Little-CMS git-2.11-42-g7dcc91f;
-	MediaInfo git-v20.09-15-g02863500;
+	MediaInfo git-v20.09-66-gacf041ac;
 	openjpeg git-v2.3.1-59-g0f169867;
-	ZenLib git-v0.4.38-17-gc33e615;
+	ZenLib git-v0.4.38-25-g11a96d5;
 
 1.5.5
 =============================

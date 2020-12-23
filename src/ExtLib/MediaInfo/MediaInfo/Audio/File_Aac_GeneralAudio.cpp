@@ -1163,8 +1163,8 @@ int File_Aac::is_intensity(size_t group, size_t sfb)
 {
     switch (sfb_cb[group][sfb])
     {
-        case 14 :   return 1;
-        case 15 :   return -1;
+        case 15 :   return 1;
+        case 14 :   return -1;
         default :   return 0;
     }
 }

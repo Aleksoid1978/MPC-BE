@@ -156,6 +156,8 @@ private :
     int8u  acmod_Max[8][9];
     int8u  dsurmod_Max[8][9];
     int8u  numblkscod;
+    int8u  dsurexmod;
+    int8u  dheadphonmod;
     int8u  HD_StreamType;
     int8u  HD_SubStreams_Count;
     int8u  HD_SamplingRate1;

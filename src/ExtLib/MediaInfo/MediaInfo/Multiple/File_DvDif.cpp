@@ -283,6 +283,7 @@ File_DvDif::File_DvDif()
     Stats_Total=0;
     Stats_Total_WithoutArb=0;
     Stats_Total_AlreadyDetected=false;
+    memset(BlockStatus, 0, BlockStatus_MaxSize);
     #endif //MEDIAINFO_DVDIF_ANALYZE_YES
 }
 

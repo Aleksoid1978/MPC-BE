@@ -243,14 +243,17 @@ protected :
     std::vector<size_t> Video_STA_Errors_Total; //Per STA type
     static const size_t ChannelGroup_Count=2;
     static const size_t Dseq_Count=16;
+    enum caption
+    {
+        Caption_Present,
+        Caption_ParityIssueAny,
+    };
     bitset<32> Captions_Flags;
     enum coherency
     {
         Coherency_PackInSub,
         Coherency_PackInVid,
         Coherency_PackInAud,
-        Coherency_DataInVid,
-        Coherency_DataInAud,
         Coherency_video_source,
         Coherency_video_control,
         Coherency_audio_source,
@@ -313,7 +316,14 @@ protected :
     };
     std::vector<timeStampsZ> Speed_TimeStampsZ;
 
-
+    enum status
+    {
+        BlockStatus_Unk,
+        BlockStatus_OK,
+        BlockStatus_NOK,
+    };
+    static const size_t BlockStatus_MaxSize=1800*4; // Max 1800 if PAL * 4 if DV100
+    MediaInfo_int8u BlockStatus[BlockStatus_MaxSize];
 
     struct arb
     {

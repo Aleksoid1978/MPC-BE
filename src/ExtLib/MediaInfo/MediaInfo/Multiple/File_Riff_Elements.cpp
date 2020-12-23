@@ -22,9 +22,11 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Setup.h"
+#include "tinyxml2.h"
 #include <ZenLib/Ztring.h>
 #include <string>
 #include <algorithm>
+using namespace tinyxml2;
 using namespace std;
 using namespace ZenLib;
 //---------------------------------------------------------------------------
@@ -424,10 +426,11 @@ namespace Elements
     const int32u WAVE_adtl_labl=0x6C61626C;
     const int32u WAVE_adtl_ltxt=0x6C747874;
     const int32u WAVE_adtl_note=0x6E6F7465;
-    const int32u WAVE_aXML=0x61584D4C;
+    const int32u WAVE_axml=0x61786D6C;
     const int32u WAVE_bext=0x62657874;
     const int32u WAVE_cue_=0x63756520;
     const int32u WAVE_data=0x64617461;
+    const int32u WAVE_dbmd=0x64626D64;
     const int32u WAVE_ds64=0x64733634;
     const int32u WAVE_fact=0x66616374;
     const int32u WAVE_fmt_=0x666D7420;
@@ -612,17 +615,19 @@ void File_Riff::Data_Parse()
     LIST(WAVE)
         ATOM_BEGIN
         ATOM(WAVE__pmx)
-        ATOM(WAVE_aXML)
         LIST(WAVE_adtl)
             ATOM_BEGIN
             ATOM(WAVE_adtl_labl)
             ATOM(WAVE_adtl_ltxt)
             ATOM(WAVE_adtl_note)
             ATOM_END
+        LIST(WAVE_axml)
+            break;
         ATOM(WAVE_bext)
         LIST(WAVE_data)
             break;
         ATOM(WAVE_cue_)
+        ATOM(WAVE_dbmd)
         ATOM(WAVE_ds64)
         ATOM(WAVE_fact)
         ATOM(WAVE_fmt_)
@@ -3535,12 +3540,199 @@ void File_Riff::WAVE__pmx()
 }
 
 //---------------------------------------------------------------------------
-void File_Riff::WAVE_aXML()
+static const char* profile_names[]=
 {
-    Element_Name("aXML");
+    "profileName",
+    "profileVersion",
+    "profileID",
+    "levelID",
+};
+static const int profile_names_size=(int)sizeof(profile_names)/sizeof(const char*);
+static const char* profile_names_InternalID[profile_names_size]=
+{
+    "Format",
+    "Version",
+    "Profile",
+    "Level",
+};
+struct profile_info
+{
+    string Strings[4];
+    string profile_info_build(size_t Max=profile_names_size)
+    {
+        bool HasParenthsis=false;
+        string ToReturn;
+        for (size_t i=0; i<Max; i++)
+        {
+            if (!Strings[i].empty())
+            {
+                if (!ToReturn.empty())
+                {
+                    if (i==1)
+                        ToReturn+=", Version";
+                    if (!HasParenthsis)
+                        ToReturn+=' ';
+                }
+                if (i>=2)
+                {
+                    if (!HasParenthsis)
+                    {
+                        ToReturn+='(';
+                        HasParenthsis=true;
+                    }
+                    else
+                    {
+                        ToReturn+=',';
+                        ToReturn+=' ';
+                    }
+                }
+                if (i>=2)
+                {
+                    ToReturn+=profile_names[i];
+                    ToReturn+='=';
+                }
+                ToReturn+=Strings[i];
+            }
+        }
+        if (HasParenthsis)
+            ToReturn+=')';
+        return ToReturn;
+    }
+};
+
+void File_Riff::WAVE_axml()
+{
+    if (Element_Size!=Element_TotalSize_Get()-Alignement_ExtraByte)
+    {
+        Buffer_MaximumSize=64*1024*1024;
+        Element_WaitForMoreData();
+        return; //Must wait for more data
+    }
+
+    Element_Name("AXML");
 
     //Parsing
     Skip_UTF8(Element_Size,                                     "XML data");
+
+    bool IsBS2076_2=false;
+    bool IsEbuCore_not_2014_or_2016 = false;
+
+    XMLDocument Document;
+    if (Document.Parse((const char*)Buffer+Buffer_Offset, (size_t)Element_Size))
+        return;
+
+    XMLElement* format=NULL;
+    XMLElement* ebuCoreMain=Document.FirstChildElement("ebuCoreMain");
+    if (ebuCoreMain)
+    {
+        const char* xmlns=ebuCoreMain->Attribute("xmlns");
+        if (!xmlns)
+            xmlns=ebuCoreMain->Attribute("xsi:schemaLocation");
+        if (xmlns)
+        {
+            if (!strstr(xmlns, "ebuCore_2014") && !strstr(xmlns, "ebuCore_2016"))
+                IsEbuCore_not_2014_or_2016 = true;
+        }
+
+        XMLElement* coreMetadata=ebuCoreMain->FirstChildElement("coreMetadata");
+        if (coreMetadata)
+        {
+            format=coreMetadata->FirstChildElement("format");
+        }
+    }
+    if (!format)
+    {
+        format=Document.FirstChildElement("format");
+    }
+
+    if (format)
+    {
+        XMLElement* audioFormatExtended=format->FirstChildElement("audioFormatExtended");
+        if (audioFormatExtended)
+        {
+            const char* version=audioFormatExtended->Attribute("version");
+            if (version && !strcmp(version, "ITU-R_BS.2076-2"))
+                IsBS2076_2=true;
+
+            XMLElement* audioProgramme=audioFormatExtended->FirstChildElement("audioProgramme");
+            if (audioProgramme)
+            {
+                const char* audioProgrammeName=audioProgramme->Attribute("audioProgrammeName");
+                if (audioProgrammeName)
+                {
+                    if (!strcmp(audioProgrammeName, "Atmos_Master"))
+                    {
+                        AdmProfile_Dolby|=1; // Need dbmd 9 for flagging Dolby Atmos Master ADM profile
+                        if (!IsEbuCore_not_2014_or_2016 && !IsBS2076_2)
+                            AdmProfile_Dolby|=4; // Version 1 flagged if xmlns is not found or is ebuCore 2014/2016, and not BS 2076-2
+                    }
+                }
+            }
+        }
+
+        XMLElement* audioFormatCustom=format->FirstChildElement("audioFormatCustom");
+        if (audioFormatCustom)
+        {
+            XMLElement* audioFormatCustomSet=audioFormatCustom->FirstChildElement("audioFormatCustomSet");
+            if (audioFormatCustomSet)
+            {
+                XMLElement* admInformation=audioFormatCustomSet->FirstChildElement("admInformation");
+                if (admInformation)
+                {
+                    XMLElement* profile=admInformation->FirstChildElement("profile");
+                    vector<profile_info> profileInfos;
+                    while (profile)
+                    {
+                        profileInfos.resize(profileInfos.size()+1);
+                        profile_info& profileInfo=profileInfos[profileInfos.size()-1];
+
+                        for (size_t i=0; i<profile_names_size; i++)
+                        {
+                            const char* attribute=profile->Attribute(profile_names[i]);
+                            if (attribute)
+                            {
+                                profileInfo.Strings[i]=attribute;
+                                if (!i && profileInfo.Strings[0].size()>=12 && !profileInfo.Strings[0].compare(profileInfo.Strings[0].size()-12, 12, " ADM Profile"))
+                                    profileInfo.Strings[0].resize(profileInfo.Strings[0].size()-12);
+                            }
+                        }
+
+                        profile=profile->NextSiblingElement("profile");
+                    }
+
+                    // Fill
+                    if (!profileInfos.empty())
+                    {
+                        // Find what is in common
+                        int PosCommon=profile_names_size;
+                        for (int i=0; i<PosCommon; i++)
+                            for (size_t j=1; j<profileInfos.size(); j++)
+                                if (profileInfos[j].Strings[i]!=profileInfos[0].Strings[i])
+                                    PosCommon=i;
+
+                        Fill(Stream_Audio, 0, "AdmProfile", PosCommon?profileInfos[0].profile_info_build(PosCommon):string("Multiple"));
+                        if (profileInfos.size()>1)
+                        {
+                            for (size_t i=0; i<profileInfos.size(); i++)
+                            {
+                                Fill(Stream_Audio, 0, ("AdmProfile AdmProfile"+Ztring::ToZtring(i).To_UTF8()).c_str(), profileInfos[i].profile_info_build());
+                                for (size_t j=0; j<profile_names_size; j++)
+                                {
+                                    Fill(Stream_Audio, 0, ("AdmProfile AdmProfile"+Ztring::ToZtring(i).To_UTF8()+' '+profile_names_InternalID[j]).c_str(), profileInfos[i].Strings[j]);
+                                    Fill_SetOptions(Stream_Audio, 0, ("AdmProfile AdmProfile"+Ztring::ToZtring(i).To_UTF8()+' '+profile_names_InternalID[j]).c_str(), "N NTY");
+                                }
+                            }
+                        }
+                        for (size_t j=0; j<(PosCommon==0?1:PosCommon); j++)
+                        {
+                            Fill(Stream_Audio, 0, (string("AdmProfile_")+profile_names_InternalID[j]).c_str(), j<PosCommon?profileInfos[0].Strings[j]:"Multiple");
+                            Fill_SetOptions(Stream_Audio, 0, (string("AdmProfile_")+profile_names_InternalID[j]).c_str(), "N NTY");
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -3783,6 +3975,43 @@ void File_Riff::WAVE_data_Continue()
 
     Element_Code=(int64u)-1;
     AVI__movi_xxxx();
+}
+
+//---------------------------------------------------------------------------
+void File_Riff::WAVE_dbmd()
+{
+    Element_Name("Dolby Audio Metadata");
+
+    //Parsing
+    int32u version;
+    Get_L4 (version,                                            "version");
+    if ((version>>24)>1)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "Data");
+        return;
+    }
+    while(Element_Offset<Element_Size)
+    {
+        Element_Begin1("metadata_segment");
+        int8u metadata_segment_id;
+        Get_L1 (metadata_segment_id,                            "metadata_segment_id"); Element_Info1(Ztring::ToZtring(metadata_segment_id));
+        if (!metadata_segment_id)
+        {
+            Element_End0();
+            break;
+        }
+        int16u metadata_segment_size;
+        Get_L2 (metadata_segment_size,                          "metadata_segment_size");
+        switch (metadata_segment_id)
+        {
+            case 9:
+                AdmProfile_Dolby|=2; // Needed for flagging Dolby Atmos Master ADM profile
+                // Fallthrough
+            default: Skip_XX(metadata_segment_size,             "metadata_segment_payload");
+        }
+        Skip_L1(                                                "metadata_segment_checksum");
+        Element_End0();
+    }
 }
 
 //---------------------------------------------------------------------------

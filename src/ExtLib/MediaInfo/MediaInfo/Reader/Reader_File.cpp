@@ -612,7 +612,14 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 else
             #endif //MEDIAINFO_READTHREAD
             {
-                MI->Config.File_Buffer_Size=F.Read(MI->Config.File_Buffer, (F.Position_Get()+MI->Config.File_Buffer_Size_ToRead<(Partial_End<=MI->Config.File_Size?Partial_End:MI->Config.File_Size))?MI->Config.File_Buffer_Size_ToRead:((size_t)((Partial_End<=MI->Config.File_Size?Partial_End:MI->Config.File_Size)-F.Position_Get())));
+                size_t SizeToRead=(F.Position_Get()+MI->Config.File_Buffer_Size_ToRead<(Partial_End<=MI->Config.File_Size?Partial_End:MI->Config.File_Size))?MI->Config.File_Buffer_Size_ToRead:((size_t)((Partial_End<=MI->Config.File_Size?Partial_End:MI->Config.File_Size)-F.Position_Get()));
+                if (MI->Config.File_Buffer_Size_Max>MI->Info->Buffer_Size)
+                {
+                    size_t SizeToRead_Max=MI->Config.File_Buffer_Size_Max-MI->Info->Buffer_Size;
+                    if (SizeToRead>SizeToRead_Max)
+                        SizeToRead=SizeToRead_Max;
+                }
+                MI->Config.File_Buffer_Size=F.Read(MI->Config.File_Buffer, SizeToRead);
                 #if MEDIAINFO_READTHREAD
                     if (ThreadInstance==NULL && Buffer_End2!=(size_t)-1)
                         Buffer_End2+=MI->Config.File_Buffer_Size;

@@ -1364,6 +1364,8 @@ Ztring& Ztring::Date_From_Seconds_1970_Local (const int32u Value)
     #endif
     Ztring DateT;
     Ztring Date;
+    if (Gmt)
+    {
     Date+=Ztring::ToZtring((Gmt->tm_year+1900));
     Date+=__T("-");
     DateT.From_Number(Gmt->tm_mon+1); if (DateT.size()<2){DateT=Ztring(__T("0"))+Ztring::ToZtring(Gmt->tm_mon+1);}
@@ -1381,6 +1383,7 @@ Ztring& Ztring::Date_From_Seconds_1970_Local (const int32u Value)
     DateT.From_Number(Gmt->tm_sec); if (DateT.size()<2){DateT=Ztring(__T("0"))+Ztring::ToZtring(Gmt->tm_sec);}
     Date+=DateT;
     assign (Date.c_str());
+    }
     return *this;
 }
 

@@ -157,6 +157,7 @@ private :
     int32u SamplesPerSec;   //For bext
     int16u BitsPerSample;   //For PCM only
     int8u  stream_Count;    //How many stream we have to parse
+    int8u  AdmProfile_Dolby;
     bool   rec__Present;    //True if synchro element is present
     bool   NeedOldIndex;
     bool   IsBigEndian;
@@ -309,11 +310,12 @@ private :
     void WAVE_adtl_labl();
     void WAVE_adtl_ltxt();
     void WAVE_adtl_note();
-    void WAVE_aXML ();
+    void WAVE_axml ();
     void WAVE_bext ();
     void WAVE_cue_ ();
     void WAVE_data ();
     void WAVE_data_Continue ();
+    void WAVE_dbmd ();
     void WAVE_ds64 ();
     void WAVE_fact ();
     void WAVE_fmt_ ();
