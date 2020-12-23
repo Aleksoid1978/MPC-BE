@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"&Kapitelmenü"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"&Größe erhöhen"
 6		"Gr&öße verringern"
 7		"&Breite erhöhen"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Nach &oben bewegen"
 15		"Nach &unten bewegen"
 16		"Ze&ntrieren"
-18		"&Zurücksetzen"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"&Zurücksetzen"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1197,8 +1200,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"Pan&Scan: Breite erhöhen"
 STRING IDS_AG_PNS_LEFT		"Pan&Scan: Nach links bewegen"
 STRING IDS_AG_PNS_RESET		"Pan&Scan: Zurücksetzen"
 STRING IDS_AG_PNS_RIGHT		"Pan&Scan: Nach rechts bewegen"
-STRING IDS_AG_PNS_ROTATEZ_M		"Pan&Scan: Um Z-Achse spiegeln"
-STRING IDS_AG_PNS_ROTATEZ_P		"Pan&Scan: Um Z-Achse drehen"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Pan&Scan: Nach oben bewegen"
 STRING IDS_AG_PNS_UPLEFT		"Pan&Scan: Nach oben links bewegen"
 STRING IDS_AG_PNS_UPRIGHT		"Pan&Scan: Nach oben rechts bewegen"

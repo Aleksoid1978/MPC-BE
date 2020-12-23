@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Menu &rozdziałów"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Z&większ rozmiar"
 6		"Z&mniejsz rozmiar"
 7		"Zw&iększ szerokość"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Prz&emieść w górę"
 15		"Przem&ieść w dół"
 16		"Wyśrodku&j"
-18		"Przywróć &domyślne"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Przywróć &domyślne"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1188,14 +1191,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"Zmniejsz rozmiar obrazu"
 STRING IDS_AG_PNS_DEC_WIDTH		"Zmniejsz szerokość obrazu"
 STRING IDS_AG_PNS_DOWN		"Przenieś obraz w dół"
 STRING IDS_AG_PNS_DOWNLEFT		"Przenieś obraz w dół i w lewo"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"Zwiększ rozmiar obrazu"
 STRING IDS_AG_PNS_INC_WIDTH		"Zwiększ szerokość obrazu"
 STRING IDS_AG_PNS_LEFT		"Przenieś obraz w lewo"
 STRING IDS_AG_PNS_RESET		"Przywróć domyślne kadrowanie i skalowanie"
 STRING IDS_AG_PNS_RIGHT		"Przenieś obraz w prawo"
-STRING IDS_AG_PNS_ROTATEZ_M		"Zmniejsz kąt obrotu wokół osi Z"
-STRING IDS_AG_PNS_ROTATEZ_P		"Zwiększ kąt obrotu wokół osi Z"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Przenieś obraz w górę"
 STRING IDS_AG_PNS_UPLEFT		"Przenieś obraz w górę i w lewo"
 STRING IDS_AG_PNS_UPRIGHT		"Przenieś obraz w górę i w prawo"

@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Меню с&цэн"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Павялічыць памер"
 6		"Паменшыць памер"
 7		"Павялічыць шырыню"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Зрушыць уверх"
 15		"Зрушыць уніз"
 16		"Цэнтраваць"
-18		"Скінуць"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Скінуць"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"Паменшыць памер кадра"
 STRING IDS_AG_PNS_DEC_WIDTH		"Паменшыць шырыню кадра"
 STRING IDS_AG_PNS_DOWN		"Ссунуць кадр уніз"
 STRING IDS_AG_PNS_DOWNLEFT		"Ссунуць кадр уніз/налева"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"Павялічыць памер кадра"
 STRING IDS_AG_PNS_INC_WIDTH		"Павялічыць шырыню кадра"
 STRING IDS_AG_PNS_LEFT		"Ссунуць кадр налева"
 STRING IDS_AG_PNS_RESET		"Скінуць налады становішча кадра"
 STRING IDS_AG_PNS_RIGHT		"Ссунуць кадр направа"
-STRING IDS_AG_PNS_ROTATEZ_M		"Павярнуць кадр па Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Павярнуць кадр па Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Ссунуць кадр уверх"
 STRING IDS_AG_PNS_UPLEFT		"Ссунуць кадр уверх/налева"
 STRING IDS_AG_PNS_UPRIGHT		"Ссунуць кадр уверх/направа"

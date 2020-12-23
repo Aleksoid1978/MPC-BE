@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"Feje&zet menü"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Méret növelése"
 6		"Méret csökkentése"
 7		"Szélesség növelése"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Mozgatás fel"
 15		"Mozgatás le"
 16		"Középre állítás"
-18		"Visszaállítás"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Visszaállítás"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"PnL Méret csökkentése"
 STRING IDS_AG_PNS_DEC_WIDTH		"PnL Szélesség csökkentése"
 STRING IDS_AG_PNS_DOWN		"PnL Le"
 STRING IDS_AG_PNS_DOWNLEFT		"PnL Le/Balra"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"PnL Méret növelése"
 STRING IDS_AG_PNS_INC_WIDTH		"PnL Szélesség növelése"
 STRING IDS_AG_PNS_LEFT		"PnL Balra"
 STRING IDS_AG_PNS_RESET		"PnL Visszaállítás"
 STRING IDS_AG_PNS_RIGHT		"PnL Jobbra"
-STRING IDS_AG_PNS_ROTATEZ_M		"PnL Elforgatás Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"PnL Elforgatás Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"PnL Fel"
 STRING IDS_AG_PNS_UPLEFT		"PnL Fel/Balra"
 STRING IDS_AG_PNS_UPRIGHT		"PnL Fel/Jobbra"

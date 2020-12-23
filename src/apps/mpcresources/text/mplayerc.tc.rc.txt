@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"章節選單(&C)"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"增加大小"
 6		"降低大小"
 7		"增加寬度"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"上移"
 15		"下移"
 16		"置中"
-18		"重設"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"重設"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1197,8 +1200,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"平移掃描 - 增加寬度"
 STRING IDS_AG_PNS_LEFT		"平移掃描 - 左移"
 STRING IDS_AG_PNS_RESET		"平移掃描 - 重設"
 STRING IDS_AG_PNS_RIGHT		"平移掃描 - 右移"
-STRING IDS_AG_PNS_ROTATEZ_M		"平移掃描 - 旋轉 Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"平移掃描 - 旋轉 Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"平移掃描 - 上移"
 STRING IDS_AG_PNS_UPLEFT		"平移掃描 - 左上"
 STRING IDS_AG_PNS_UPRIGHT		"平移掃描 - 右上"

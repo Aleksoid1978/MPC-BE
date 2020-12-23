@@ -227,8 +227,8 @@
 #define ID_PANSCAN_MOVEDOWNRIGHT        875
 #define ID_PANSCAN_CENTER               876
 #define ID_PANSCAN_FLIP                 880
-#define ID_PANSCAN_ROTATEZP             881
-#define ID_PANSCAN_ROTATEZM             882
+#define ID_PANSCAN_ROTATE_CCW           881
+#define ID_PANSCAN_ROTATE_CW            882
 #define ID_ONTOP_NEVER                  883
 #define ID_ONTOP_ALWAYS                 884
 #define ID_ONTOP_WHILEPLAYING           885
@@ -1334,8 +1334,8 @@
 #define IDS_AG_VIDFRM_OUTSIDE           33229
 #define IDS_AG_PNS_RESET                33230
 #define IDS_AG_PNS_FLIP                 33234
-#define IDS_AG_PNS_ROTATEZ_P            33235
-#define IDS_AG_PNS_ROTATEZ_M            33236
+#define IDS_AG_PNS_ROTATE_CCW           33235
+#define IDS_AG_PNS_ROTATE_CW            33236
 #define IDS_AG_TEARING_TEST             33237
 #define IDS_AT_TOGGLE_SHADER            33238
 #define IDS_SCALE_16_9                  33239

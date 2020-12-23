@@ -985,7 +985,7 @@ BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
 14		"&Գլուխների ընտրացանկ"
 END
 
-BEGIN MENU IDR_POPUP_PANSCAN LINES 20
+BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 5		"Մեծացնել չափը"
 6		"Փոքրացնել չափը"
 7		"Մեծացնել լայնքը"
@@ -997,7 +997,10 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 20
 14		"Տեղափոխել վերև"
 15		"Տեղափոխել ներքև"
 16		"Կենտրոնացնել"
-18		"Ետարկել"
+18		"Rotate Clockwise"
+19		"Rotate Counterclockwise"
+20		"Flip Horizontally"
+22		"Ետարկել"
 END
 
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
@@ -1191,14 +1194,14 @@ STRING IDS_AG_PNS_DEC_SIZE		"Փոքրացնել կադրի չափը"
 STRING IDS_AG_PNS_DEC_WIDTH		"Փոքրացնել կադրի լայնքը"
 STRING IDS_AG_PNS_DOWN		"Շարժել կադրը ներքև"
 STRING IDS_AG_PNS_DOWNLEFT		"Շարժել կադրը ներքև/ձախ"
-STRING IDS_AG_PNS_FLIP		"PnS Horizontal Flip"
+STRING IDS_AG_PNS_FLIP		"PnS Flip Horizontally"
 STRING IDS_AG_PNS_INC_SIZE		"Մեծացնել կադրի չափը"
 STRING IDS_AG_PNS_INC_WIDTH		"Մեծացնել կադրի լայնքը"
 STRING IDS_AG_PNS_LEFT		"Շարժել կադրը ձախ"
 STRING IDS_AG_PNS_RESET		"Ետարկել"
 STRING IDS_AG_PNS_RIGHT		"Շարժել կադրը աջ"
-STRING IDS_AG_PNS_ROTATEZ_M		"Շրջել կադրը Z-"
-STRING IDS_AG_PNS_ROTATEZ_P		"Շրջել կադրը Z+"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
 STRING IDS_AG_PNS_UP		"Շարժել կադրը վերև"
 STRING IDS_AG_PNS_UPLEFT		"Շարժել կադրը վերև/ձախ"
 STRING IDS_AG_PNS_UPRIGHT		"Շարժել կադրը վերև/աջ"
