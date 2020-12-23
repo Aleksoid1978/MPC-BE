@@ -36,9 +36,6 @@
 
 static av_cold int pcm_encode_init(AVCodecContext *avctx)
 {
-
-// ==> Start patch MPC
-/*
     avctx->frame_size = 0;
 #if !CONFIG_HARDCODED_TABLES
     switch (avctx->codec->id) {
@@ -60,8 +57,7 @@ static av_cold int pcm_encode_init(AVCodecContext *avctx)
     avctx->bits_per_coded_sample = av_get_bits_per_sample(avctx->codec->id);
     avctx->block_align           = avctx->channels * avctx->bits_per_coded_sample / 8;
     avctx->bit_rate              = avctx->block_align * 8LL * avctx->sample_rate;
-*/
-// ==> End patch MPC
+
     return 0;
 }
 
