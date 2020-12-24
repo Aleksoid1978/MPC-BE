@@ -997,9 +997,9 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 14		"Mozgatás fel"
 15		"Mozgatás le"
 16		"Középre állítás"
-18		"Rotate Clockwise"
-19		"Rotate Counterclockwise"
-20		"Flip Horizontally"
+18		"Forgatás az óramutató járásával megegyező irányba"
+19		"Forgatás az óramutató járásával ellentétes irányba"
+20		"Fordítsa vízszintesen"
 22		"Visszaállítás"
 END
 
