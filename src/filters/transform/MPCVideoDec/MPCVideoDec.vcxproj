@@ -126,7 +126,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Debug_$(Platform)\ffmpeg.lib;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Debug_$(Platform)\ffmpeg.lib;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -157,7 +157,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Release_$(Platform)\ffmpeg.lib;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -172,7 +172,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Release_$(Platform)\ffmpeg.lib;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -187,28 +187,28 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
@@ -226,7 +226,7 @@
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
     <ClCompile Include="MSDKDecoder\ByteParser.cpp" />
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp" />
-    <ClCompile Include="pixconv_functions.cpp" />
+    <ClCompile Include="pixconv\pixconv_functions.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -235,7 +235,6 @@
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
     <ClInclude Include="DXVADecoder\DXVAAllocator.h" />
     <ClInclude Include="DXVADecoder\MediaSampleSideData.h" />
-    <ClInclude Include="DXVADecoder\stdafx.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="FormatConverter.h" />
     <ClInclude Include="IMPCVideoDec.h" />
@@ -251,8 +250,7 @@
     <ClInclude Include="MSDKDecoder\include\mfxvideo.h" />
     <ClInclude Include="MSDKDecoder\include\mfxvstructures.h" />
     <ClInclude Include="MSDKDecoder\MSDKDecoder.h" />
-    <ClInclude Include="MSDKDecoder\stdafx.h" />
-    <ClInclude Include="pixconv_sse2_templates.h" />
+    <ClInclude Include="pixconv\pixconv_sse2_templates.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

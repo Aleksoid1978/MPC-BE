@@ -39,7 +39,7 @@ extern "C" {
 #include "ByteParser.h"
 
 #include "../MPCVideoDec.h"
-#include "../pixconv_sse2_templates.h"
+#include "../pixconv/pixconv_sse2_templates.h"
 
 inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, ptrdiff_t linesize, unsigned lines)
 {
