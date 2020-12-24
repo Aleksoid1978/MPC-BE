@@ -36,6 +36,25 @@ extern "C" {
 }
 #pragma warning(pop)
 
+// from FFmpeg/libavutil/mem.h
+#define DECLARE_ALIGNED(n,t,v) __declspec(align(n)) t v
+
+// from LAVFilters/decoder/LAVVideo/pixconv/pixconv.cpp
+// 8x8 Bayes ordered dithering table, scaled to the 0-255 range for 16->8 conversion
+// stored as 16-bit unsigned for optimized SIMD access
+// clang-format off
+DECLARE_ALIGNED(16, const uint16_t, dither_8x8_256)[8][8] = {
+  {   0, 192,  48, 240,  12, 204,  60, 252 },
+  { 128,  64, 176, 112, 140,  76, 188, 124 },
+  {  32, 224,  16, 208,  44, 236,  28, 220 },
+  { 160,  96, 144,  80, 172, 108, 156,  92 },
+  {   8, 200,  56, 248,   4, 196,  52, 244 },
+  { 136,  72, 184, 120, 132,  68, 180, 116 },
+  {  40, 232,  24, 216,  36, 228,  20, 212 },
+  { 168, 104, 152,  88, 164, 100, 148,  84 }
+};
+// clang-format on
+
 int sws_scale2(struct SwsContext *c, const uint8_t *const srcSlice[], const ptrdiff_t srcStride[], int srcSliceY, int srcSliceH, uint8_t *const dst[], const ptrdiff_t dstStride[])
 {
   int srcStride2[4];
