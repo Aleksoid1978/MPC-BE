@@ -22,6 +22,9 @@
     <Filter Include="MSDKDecoder\include">
       <UniqueIdentifier>{6dcd5a6f-58d7-47b6-bf30-e20e765f189d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pixconv">
+      <UniqueIdentifier>{f14b2a0f-1719-46f8-ae06-bf1b7228f2b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ffmpegContext.cpp">
@@ -34,9 +37,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pixconv_functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -56,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp">
       <Filter>MSDKDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\pixconv_functions.cpp">
+      <Filter>pixconv</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,9 +83,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pixconv_sse2_templates.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MSDKDecoder\include\mfxcommon.h">
       <Filter>MSDKDecoder\include</Filter>
     </ClInclude>
@@ -104,9 +104,6 @@
     <ClInclude Include="MSDKDecoder\include\mfxvstructures.h">
       <Filter>MSDKDecoder\include</Filter>
     </ClInclude>
-    <ClInclude Include="DXVADecoder\stdafx.h">
-      <Filter>DXVADecoder</Filter>
-    </ClInclude>
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h">
       <Filter>DXVADecoder</Filter>
     </ClInclude>
@@ -125,8 +122,8 @@
     <ClInclude Include="MSDKDecoder\MSDKDecoder.h">
       <Filter>MSDKDecoder</Filter>
     </ClInclude>
-    <ClInclude Include="MSDKDecoder\stdafx.h">
-      <Filter>MSDKDecoder</Filter>
+    <ClInclude Include="pixconv\pixconv_sse2_templates.h">
+      <Filter>pixconv</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
