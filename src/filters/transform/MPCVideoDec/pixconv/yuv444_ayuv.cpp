@@ -152,5 +152,3 @@ HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src
 
     return S_OK;
 }
-
-#undef YUV444_PACK_AYUV

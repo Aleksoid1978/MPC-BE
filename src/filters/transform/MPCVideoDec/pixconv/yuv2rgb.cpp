@@ -740,19 +740,24 @@ const RGBCoeffs* CFormatConverter::getRGBCoeffs(int width, int height)
             Kg = 0.7010;
             Kb = 0.0870;
             break;
-        case AVCOL_SPC_YCGCO:
+        case AVCOL_SPC_FCC:
             Kr = 0.300;
             Kg = 0.590;
             Kb = 0.110;
             break;
+        case AVCOL_SPC_YCGCO:
+            Kr = 0.25;
+            Kg = 0.5;
+            Kb = 0.25;
+            break;
         case AVCOL_SPC_BT2020_CL:
         case AVCOL_SPC_BT2020_NCL:
-          Kr = 0.2627;
-          Kg = 0.6780;
-          Kb = 0.0593;
-          break;
+            Kr = 0.2627;
+            Kg = 0.6780;
+            Kb = 0.0593;
+            break;
         default:
-          DLog(L"CFormatConverter()::getRGBCoeffs(): Unknown color space: %d - defaulting to BT709", colorspace);
+            DLog(L"CFormatConverter()::getRGBCoeffs(): Unknown color space: %d - defaulting to BT709", colorspace);
         case AVCOL_SPC_BT709:
             Kr = 0.2126;
             Kg = 0.7152;
