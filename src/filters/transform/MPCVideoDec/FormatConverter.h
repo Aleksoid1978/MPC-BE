@@ -143,17 +143,17 @@ protected:
 	YUVRGBConversionFunc m_RGBConvFuncs[2][1][2][PixFmt_count][9];
 
 	void SetConvertFunc();
-	// from LAV Filters
-	HRESULT ConvertToAYUV(CONV_FUNC_PARAMS);
-	HRESULT ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical);
-	HRESULT ConvertToY410(CONV_FUNC_PARAMS);
-	HRESULT ConvertToY416(CONV_FUNC_PARAMS);
 
 	// Conversion function pointer
 	typedef HRESULT (CFormatConverter::*ConverterFn)(CONV_FUNC_PARAMS);
 	ConverterFn pConvertFn;
 
+	// from LAV Filters
 	HRESULT ConvertGeneric(CONV_FUNC_PARAMS);
+	HRESULT ConvertToAYUV(CONV_FUNC_PARAMS);
+	HRESULT ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical);
+	HRESULT ConvertToY410(CONV_FUNC_PARAMS);
+	HRESULT ConvertToY416(CONV_FUNC_PARAMS);
 
 	// optimized function
 	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);

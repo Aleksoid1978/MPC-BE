@@ -60,6 +60,9 @@
     <ClCompile Include="pixconv\pixconv_functions.cpp">
       <Filter>pixconv</Filter>
     </ClCompile>
+    <ClCompile Include="pixconv\convert_generic.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ffmpegContext.h">
