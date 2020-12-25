@@ -36,50 +36,54 @@
 
 static HBITMAP TransparentBitmap(HBITMAP hBmp)
 {
-	HBITMAP RetBmp = NULL;
+	HBITMAP RetBmp = nullptr;
 	if (hBmp) {
-		HDC BufferDC = CreateCompatibleDC(NULL);	// DC for Source Bitmap
+		HDC BufferDC = CreateCompatibleDC(nullptr);	// DC for Source Bitmap
 		if (BufferDC) {
 
-			HGDIOBJ PreviousBufferObject = SelectObject(BufferDC,hBmp);
+			HGDIOBJ PreviousBufferObject = SelectObject(BufferDC, hBmp);
 			// here BufferDC contains the bitmap
 
-			HDC DirectDC = CreateCompatibleDC(NULL); // DC for working
+			HDC DirectDC = CreateCompatibleDC(nullptr); // DC for working
 			if (DirectDC) {
 				// Get bitmap size
 
-				BITMAP bm;
-				GetObject(hBmp, sizeof(bm), &bm);
+				BITMAP bm = {};
+				GetObjectW(hBmp, sizeof(bm), &bm);
+
+				const auto width  = std::max<int>(::GetSystemMetrics(SM_CXMENUCHECK), bm.bmWidth);
+				const auto height = std::max<int>(::GetSystemMetrics(SM_CYMENUCHECK), bm.bmHeight);
 
 				// create a BITMAPINFO for the CreateDIBSection
-				BITMAPINFO RGB32BitsBITMAPINFO = { 0 };
+				BITMAPINFO RGB32BitsBITMAPINFO = {};
 				RGB32BitsBITMAPINFO.bmiHeader.biSize      = sizeof(BITMAPINFOHEADER);
-				RGB32BitsBITMAPINFO.bmiHeader.biWidth     = bm.bmWidth;
-				RGB32BitsBITMAPINFO.bmiHeader.biHeight    = bm.bmHeight;
+				RGB32BitsBITMAPINFO.bmiHeader.biWidth     = width;
+				RGB32BitsBITMAPINFO.bmiHeader.biHeight    = height;
 				RGB32BitsBITMAPINFO.bmiHeader.biPlanes    = 1;
 				RGB32BitsBITMAPINFO.bmiHeader.biBitCount  = 32;
-				RGB32BitsBITMAPINFO.bmiHeader.biSizeImage = bm.bmWidth * bm.bmHeight * 4;
+				RGB32BitsBITMAPINFO.bmiHeader.biSizeImage = width * height * 4;
 
 				// pointer used for direct Bitmap pixels access
 				UINT* ptPixels;
-
 				HBITMAP DirectBitmap = CreateDIBSection(DirectDC,
 														&RGB32BitsBITMAPINFO,
 														DIB_RGB_COLORS,
-														(void **)&ptPixels,
-														NULL, 0);
+														(void**)&ptPixels,
+														nullptr, 0);
 				if (DirectBitmap) {
 					// here DirectBitmap!=NULL so ptPixels!=NULL no need to test
 					HGDIOBJ PreviousObject = SelectObject(DirectDC, DirectBitmap);
-					BitBlt(DirectDC, 0, 0,
-						   bm.bmWidth, bm.bmHeight,
-						   BufferDC, 0, 0,
-						   SRCCOPY);
+					if (width > bm.bmWidth && height > bm.bmHeight) {
+						SetStretchBltMode(DirectDC, STRETCH_HALFTONE);
+						StretchBlt(DirectDC, 0, 0, width, height, BufferDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCPAINT);
+					} else {
+						BitBlt(DirectDC, 0, 0, bm.bmWidth, bm.bmHeight, BufferDC, 0, 0, SRCCOPY);
+					}
 
 					// Don't delete the result of SelectObject because it's
 					// our modified bitmap (DirectBitmap)
 
-					SelectObject(DirectDC,PreviousObject);
+					SelectObject(DirectDC, PreviousObject);
 
 					// finish
 					RetBmp = DirectBitmap;
@@ -87,7 +91,7 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 				// clean up
 				DeleteDC(DirectDC);
 			}
-			SelectObject(BufferDC,PreviousBufferObject);
+			SelectObject(BufferDC, PreviousBufferObject);
 
 			// BufferDC is now useless
 			DeleteDC(BufferDC);
@@ -98,8 +102,8 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 }
 
 CMPCBEContextMenu::CMPCBEContextMenu()
-	: m_hPlayBmp(TransparentBitmap(LoadBitmap(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY))))
-	, m_hAddBmp(TransparentBitmap(LoadBitmap(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD))))
+	: m_hPlayBmp(TransparentBitmap(LoadBitmapW(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCEW(IDB_MPCBEBMP_PLAY))))
+	, m_hAddBmp(TransparentBitmap(LoadBitmapW(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCEW(IDB_MPCBEBMP_ADD))))
 {
 }
 
@@ -225,8 +229,8 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 			PLAY_MPC = path_buff;
 		}
 
-		memset(path_buff, 0, sizeof(path_buff));
 		len = sizeof(path_buff);
+		ZeroMemory(path_buff, len);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"Add", path_buff, &len)) {
 			ADDTO_MPC = path_buff;
 		}
