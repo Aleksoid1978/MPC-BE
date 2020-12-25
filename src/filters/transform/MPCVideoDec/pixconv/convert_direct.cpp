@@ -114,7 +114,7 @@ HRESULT CFormatConverter::convert_nv12_yv12_direct_sse4(const uint8_t* const src
     const ptrdiff_t outChromaStride = dstStride[1];
     const ptrdiff_t chromaHeight = (height >> 1);
 
-    const ptrdiff_t stride = std::min((ptrdiff_t)FFALIGN(width, 64), std::min(inStride, outStride));
+    const ptrdiff_t stride = std::min<ptrdiff_t>(FFALIGN(width, 64), std::min(inStride, outStride));
 
     __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm7;
     xmm7 = _mm_set1_epi16(0x00FF);
