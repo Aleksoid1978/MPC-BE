@@ -57,10 +57,28 @@
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp">
       <Filter>MSDKDecoder</Filter>
     </ClCompile>
-    <ClCompile Include="pixconv\pixconv_functions.cpp">
+    <ClCompile Include="pixconv\convert_generic.cpp">
       <Filter>pixconv</Filter>
     </ClCompile>
-    <ClCompile Include="pixconv\convert_generic.cpp">
+    <ClCompile Include="pixconv\convert_direct.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\pixconv.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\yuv2yuv_unscaled.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\interleave.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\yuv444_ayuv.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\yuv2rgb.cpp">
+      <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv\yuv420_yuy2.cpp">
       <Filter>pixconv</Filter>
     </ClCompile>
   </ItemGroup>
@@ -126,6 +144,9 @@
       <Filter>MSDKDecoder</Filter>
     </ClInclude>
     <ClInclude Include="pixconv\pixconv_sse2_templates.h">
+      <Filter>pixconv</Filter>
+    </ClInclude>
+    <ClInclude Include="pixconv\pixconv_internal.h">
       <Filter>pixconv</Filter>
     </ClInclude>
   </ItemGroup>

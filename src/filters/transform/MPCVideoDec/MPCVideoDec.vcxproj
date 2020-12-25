@@ -226,8 +226,14 @@
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
     <ClCompile Include="MSDKDecoder\ByteParser.cpp" />
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp" />
+    <ClCompile Include="pixconv\convert_direct.cpp" />
     <ClCompile Include="pixconv\convert_generic.cpp" />
-    <ClCompile Include="pixconv\pixconv_functions.cpp" />
+    <ClCompile Include="pixconv\interleave.cpp" />
+    <ClCompile Include="pixconv\pixconv.cpp" />
+    <ClCompile Include="pixconv\yuv2rgb.cpp" />
+    <ClCompile Include="pixconv\yuv2yuv_unscaled.cpp" />
+    <ClCompile Include="pixconv\yuv420_yuy2.cpp" />
+    <ClCompile Include="pixconv\yuv444_ayuv.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -251,6 +257,7 @@
     <ClInclude Include="MSDKDecoder\include\mfxvideo.h" />
     <ClInclude Include="MSDKDecoder\include\mfxvstructures.h" />
     <ClInclude Include="MSDKDecoder\MSDKDecoder.h" />
+    <ClInclude Include="pixconv\pixconv_internal.h" />
     <ClInclude Include="pixconv\pixconv_sse2_templates.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
