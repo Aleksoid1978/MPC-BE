@@ -157,19 +157,21 @@ protected:
 
 	// optimized function
 	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
+
 	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
 	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);
+
+	HRESULT convert_yuv_yv_nv12_dither_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv420_px1x_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv_yv(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv420_nv12(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv422_yuy2_uyvy_dither_le(CONV_FUNC_PARAMS);
+	HRESULT convert_nv12_yv12(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv444_y410(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv444_ayuv(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv444_ayuv_dither_le(CONV_FUNC_PARAMS);
-	HRESULT convert_yuv420_px1x_le(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv420_yuy2(CONV_FUNC_PARAMS);
-	HRESULT convert_yuv422_yuy2_uyvy_dither_le(CONV_FUNC_PARAMS);
-	HRESULT convert_yuv_yv_nv12_dither_le(CONV_FUNC_PARAMS);
-	HRESULT convert_yuv_yv(CONV_FUNC_PARAMS);
-	HRESULT convert_yuv420_nv12(CONV_FUNC_PARAMS);
-	HRESULT convert_nv12_yv12(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv_rgb(CONV_FUNC_PARAMS);
 	void InitRGBConvDispatcher();
