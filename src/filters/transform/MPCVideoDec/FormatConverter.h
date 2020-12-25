@@ -169,8 +169,10 @@ protected:
 	HRESULT convert_nv12_yv12(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv444_y410(CONV_FUNC_PARAMS);
+
 	HRESULT convert_yuv444_ayuv(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv444_ayuv_dither_le(CONV_FUNC_PARAMS);
+
 	HRESULT convert_yuv420_yuy2(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv_rgb(CONV_FUNC_PARAMS);
