@@ -226,6 +226,7 @@
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
     <ClCompile Include="MSDKDecoder\ByteParser.cpp" />
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp" />
+    <ClCompile Include="pixconv\convert_generic.cpp" />
     <ClCompile Include="pixconv\pixconv_functions.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
