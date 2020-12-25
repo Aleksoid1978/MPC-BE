@@ -154,7 +154,12 @@ protected:
 	ConverterFn pConvertFn;
 
 	HRESULT ConvertGeneric(CONV_FUNC_PARAMS);
+
 	// optimized function
+	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
+	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
+	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);
+
 	HRESULT convert_yuv444_y410(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv444_ayuv(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv444_ayuv_dither_le(CONV_FUNC_PARAMS);
@@ -165,14 +170,10 @@ protected:
 	HRESULT convert_yuv_yv(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv420_nv12(CONV_FUNC_PARAMS);
 	HRESULT convert_nv12_yv12(CONV_FUNC_PARAMS);
-	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);
-
-	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
-	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv_rgb(CONV_FUNC_PARAMS);
-	const RGBCoeffs* getRGBCoeffs(int width, int height);
 	void InitRGBConvDispatcher();
+	const RGBCoeffs* getRGBCoeffs(int width, int height);
 
 public:
 	CFormatConverter();
