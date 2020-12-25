@@ -370,10 +370,16 @@ void CFormatConverter::SetConvertFunc()
 	}
 
 	if (CPUInfo::HaveSSE4()) {
-		if (m_out_pixfmt == PixFmt_NV12 && m_FProps.pftype == PFType_NV12) {
+		if (m_FProps.pftype == PFType_NV12) {
+			if (m_out_pixfmt == PixFmt_NV12) {
+				pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+			}
+			else if (m_out_pixfmt == PixFmt_YV12) {
+				pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
+			}
+		}
+		else if (m_FProps.pftype == PFType_P010 && m_out_pixfmt == PixFmt_P010) {
 			pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
-		} else if (m_out_pixfmt == PixFmt_YV12 && m_FProps.pftype == PFType_NV12) {
-			pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
 		}
 	}
 }
