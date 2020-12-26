@@ -973,17 +973,25 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (mt.subtype == MEDIASUBTYPE_VP90 && m_profile != -1 && m_pix_fmt != -1) {
 					for (const auto& item : mts) {
+						BYTE* extra = nullptr;
 						if (item.formattype == FORMAT_VideoInfo2) {
 							mt = item;
-							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
-							BYTE *extra = (BYTE*)(vih2 + 1);
+							auto vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
+							extra = (BYTE*)(vih2 + 1);
+						} else if (item.formattype == FORMAT_VideoInfo) {
+							mt = item;
+							auto vih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 16);
+							extra = (BYTE*)(vih + 1);
+						}
+
+						if (extra) {
 							memcpy(extra, "vpcC", 4);
 							// use code from LAV
 							AV_WB8 (extra +  4, 1); // version
 							AV_WB24(extra +  5, 0); // flags
 							AV_WB8 (extra +  8, m_profile);
 							AV_WB8 (extra +  9, 0);
-							AV_WB8 (extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0 ) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
+							AV_WB8 (extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
 							AV_WB8 (extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
 							AV_WB8 (extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
 							AV_WB8 (extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
