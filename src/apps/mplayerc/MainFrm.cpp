@@ -20465,114 +20465,6 @@ LRESULT CALLBACK CMainFrame::MenuHookProc(int nCode, WPARAM wParam, LPARAM lPara
 	return ::CallNextHookEx(m_MenuHook, nCode, wParam, lParam);
 }
 
-#pragma region GraphThread
-
-//
-// CGraphThread
-//
-
-IMPLEMENT_DYNCREATE(CGraphThread, CWinThread)
-
-BOOL CGraphThread::InitInstance()
-{
-	SetThreadName((DWORD)-1, "GraphThread");
-	AfxSocketInit();
-	return SUCCEEDED(CoInitialize(0)) ? TRUE : FALSE;
-}
-
-int CGraphThread::ExitInstance()
-{
-	CoUninitialize();
-	return __super::ExitInstance();
-}
-
-BEGIN_MESSAGE_MAP(CGraphThread, CWinThread)
-	ON_THREAD_MESSAGE(TM_EXIT, OnExit)
-	ON_THREAD_MESSAGE(TM_OPEN, OnOpen)
-	ON_THREAD_MESSAGE(TM_CLOSE, OnClose)
-	ON_THREAD_MESSAGE(TM_RESIZE, OnResize)
-	ON_THREAD_MESSAGE(TM_RESET, OnReset)
-	ON_THREAD_MESSAGE(TM_TUNER_SCAN, OnTunerScan)
-	ON_THREAD_MESSAGE(TM_DISPLAY_CHANGE, OnDisplayChange)
-END_MESSAGE_MAP()
-
-void CGraphThread::OnExit(WPARAM wParam, LPARAM lParam)
-{
-	PostQuitMessage(0);
-	if (CAMEvent* e = (CAMEvent*)lParam) {
-		e->Set();
-	}
-}
-
-void CGraphThread::OnOpen(WPARAM wParam, LPARAM lParam)
-{
-	if (m_pMainFrame) {
-		ASSERT(WaitForSingleObject(m_pMainFrame->m_hGraphThreadEventOpen, 0) == WAIT_TIMEOUT);
-		if (m_pMainFrame->m_eMediaLoadState == MLS_LOADING) {
-			CAutoPtr<OpenMediaData> pOMD((OpenMediaData*)lParam);
-			m_pMainFrame->OpenMediaPrivate(pOMD);
-		}
-		m_pMainFrame->m_hGraphThreadEventOpen.SetEvent();
-	}
-}
-
-void CGraphThread::OnClose(WPARAM wParam, LPARAM lParam)
-{
-	if (m_pMainFrame) {
-		ASSERT(WaitForSingleObject(m_pMainFrame->m_hGraphThreadEventClose, 0) == WAIT_TIMEOUT);
-		if (m_pMainFrame->m_eMediaLoadState == MLS_CLOSING) {
-			m_pMainFrame->CloseMediaPrivate();
-		}
-		m_pMainFrame->m_hGraphThreadEventClose.SetEvent();
-	}
-}
-
-void CGraphThread::OnResize(WPARAM wParam, LPARAM lParam)
-{
-	if (m_pMainFrame) {
-		BOOL* b = (BOOL*)wParam;
-		BOOL bResult = m_pMainFrame->ResizeDevice();
-		if (b) {
-			*b = bResult;
-		}
-	}
-	if (CAMEvent* e = (CAMEvent*)lParam) {
-		e->Set();
-	}
-}
-
-void CGraphThread::OnReset(WPARAM wParam, LPARAM lParam)
-{
-	if (m_pMainFrame) {
-		BOOL* b = (BOOL*)wParam;
-		BOOL bResult = m_pMainFrame->ResetDevice();
-		if (b) {
-			*b = bResult;
-		}
-	}
-	if (CAMEvent* e = (CAMEvent*)lParam) {
-		e->Set();
-	}
-}
-
-void CGraphThread::OnTunerScan(WPARAM wParam, LPARAM lParam)
-{
-	if (m_pMainFrame) {
-		CAutoPtr<TunerScanData> pTSD((TunerScanData*)lParam);
-		m_pMainFrame->DoTunerScan(pTSD);
-	}
-}
-
-void CGraphThread::OnDisplayChange(WPARAM wParam, LPARAM lParam)
-{
-	if (m_pMainFrame) {
-		m_pMainFrame->DisplayChange();
-	}
-	if (CAMEvent* e = (CAMEvent*)lParam) {
-		e->Set();
-	}
-}
-
 void CMainFrame::OnUpdateABRepeat(CCmdUI* pCmdUI)
 {
 	bool canABRepeat = GetPlaybackMode() == PM_FILE || GetPlaybackMode() == PM_DVD;
@@ -20718,6 +20610,114 @@ void CMainFrame::OnUpdateRepeatForever(CCmdUI* pCmdUI)
 
 	if (pCmdUI->m_pMenu) {
 		pCmdUI->m_pMenu->CheckMenuItem(ID_REPEAT_FOREVER, MF_BYCOMMAND | (s.fLoopForever ? MF_CHECKED : MF_UNCHECKED));
+	}
+}
+
+#pragma region GraphThread
+
+//
+// CGraphThread
+//
+
+IMPLEMENT_DYNCREATE(CGraphThread, CWinThread)
+
+BOOL CGraphThread::InitInstance()
+{
+	SetThreadName((DWORD)-1, "GraphThread");
+	AfxSocketInit();
+	return SUCCEEDED(CoInitialize(0)) ? TRUE : FALSE;
+}
+
+int CGraphThread::ExitInstance()
+{
+	CoUninitialize();
+	return __super::ExitInstance();
+}
+
+BEGIN_MESSAGE_MAP(CGraphThread, CWinThread)
+	ON_THREAD_MESSAGE(TM_EXIT, OnExit)
+	ON_THREAD_MESSAGE(TM_OPEN, OnOpen)
+	ON_THREAD_MESSAGE(TM_CLOSE, OnClose)
+	ON_THREAD_MESSAGE(TM_RESIZE, OnResize)
+	ON_THREAD_MESSAGE(TM_RESET, OnReset)
+	ON_THREAD_MESSAGE(TM_TUNER_SCAN, OnTunerScan)
+	ON_THREAD_MESSAGE(TM_DISPLAY_CHANGE, OnDisplayChange)
+END_MESSAGE_MAP()
+
+void CGraphThread::OnExit(WPARAM wParam, LPARAM lParam)
+{
+	PostQuitMessage(0);
+	if (CAMEvent* e = (CAMEvent*)lParam) {
+		e->Set();
+	}
+}
+
+void CGraphThread::OnOpen(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		ASSERT(WaitForSingleObject(m_pMainFrame->m_hGraphThreadEventOpen, 0) == WAIT_TIMEOUT);
+		if (m_pMainFrame->m_eMediaLoadState == MLS_LOADING) {
+			CAutoPtr<OpenMediaData> pOMD((OpenMediaData*)lParam);
+			m_pMainFrame->OpenMediaPrivate(pOMD);
+		}
+		m_pMainFrame->m_hGraphThreadEventOpen.SetEvent();
+	}
+}
+
+void CGraphThread::OnClose(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		ASSERT(WaitForSingleObject(m_pMainFrame->m_hGraphThreadEventClose, 0) == WAIT_TIMEOUT);
+		if (m_pMainFrame->m_eMediaLoadState == MLS_CLOSING) {
+			m_pMainFrame->CloseMediaPrivate();
+		}
+		m_pMainFrame->m_hGraphThreadEventClose.SetEvent();
+	}
+}
+
+void CGraphThread::OnResize(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		BOOL* b = (BOOL*)wParam;
+		BOOL bResult = m_pMainFrame->ResizeDevice();
+		if (b) {
+			*b = bResult;
+		}
+	}
+	if (CAMEvent* e = (CAMEvent*)lParam) {
+		e->Set();
+	}
+}
+
+void CGraphThread::OnReset(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		BOOL* b = (BOOL*)wParam;
+		BOOL bResult = m_pMainFrame->ResetDevice();
+		if (b) {
+			*b = bResult;
+		}
+	}
+	if (CAMEvent* e = (CAMEvent*)lParam) {
+		e->Set();
+	}
+}
+
+void CGraphThread::OnTunerScan(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		CAutoPtr<TunerScanData> pTSD((TunerScanData*)lParam);
+		m_pMainFrame->DoTunerScan(pTSD);
+	}
+}
+
+void CGraphThread::OnDisplayChange(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		m_pMainFrame->DisplayChange();
+	}
+	if (CAMEvent* e = (CAMEvent*)lParam) {
+		e->Set();
 	}
 }
 
