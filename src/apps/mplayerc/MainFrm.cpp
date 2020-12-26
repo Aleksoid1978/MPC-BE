@@ -827,14 +827,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShader = s.bToggleShader;
 	m_bToggleShaderScreenSpace = s.bToggleShaderScreenSpace;
 
-#if (MPC_VERSION_STATUS == 1)
-	m_strTitle.Format(L"%s %s", ResStr(IDR_MAINFRAME), MPC_VERSION_WSTR);
-#else
-	m_strTitle.Format(L"%s %s beta", ResStr(IDR_MAINFRAME), MPC_VERSION_SVN_WSTR);
-#endif
 #ifdef _WIN64
-	m_strTitle.Append(L" x64");
+	m_strTitle.SetString(L"MPC-BE x64");
+#else
+	m_strTitle.SetString(L"MPC-BE");
 #endif
+#if (MPC_VERSION_STATUS == 1)
+	m_strTitle.AppendFormat(L" %s", MPC_VERSION_WSTR);
+#else
+	m_strTitle.AppendFormat(L" %s beta", MPC_VERSION_SVN_WSTR);
+#endif
+
 
 	SetWindowTextW(m_strTitle);
 	m_Lcd.SetMediaTitle(m_strTitle);
