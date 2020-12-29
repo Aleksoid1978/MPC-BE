@@ -107,7 +107,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	CComPtr<IWICBitmap> pBitmap;
 	UINT width, height;
 
-	HRESULT hr = WicLoadImage(&pBitmap, true, (::GetProgramDir()+L"flybar.png").GetString());
+	HRESULT hr = WicLoadImage(&pBitmap, true, (::GetProgramDir() + L"flybar.png").GetString());
 
 	if (FAILED(hr)) {
 		BYTE* data;

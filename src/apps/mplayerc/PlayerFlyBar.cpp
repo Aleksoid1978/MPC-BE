@@ -22,7 +22,6 @@
 #include "MainFrm.h"
 #include "../../DSUtil/FileHandle.h"
 #include "WicUtils.h"
-#include "SvgHelper.h"
 #include "PlayerFlyBar.h"
 
 // CPrevView
@@ -30,33 +29,12 @@
 CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 {
-	HBITMAP hBitmap = nullptr;
-
-	CSvgImage svgFlybar;
-	bool ok = svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
-	if (ok) {
-		int w = 0;
-		int h = pMainFrame->ScaleY(24);
-		hBitmap = svgFlybar.Rasterize(w, h);
-		if (hBitmap) {
-			if (w == h * 25) {
-				CBitmap *bitmap = DNew CBitmap();
-				bitmap->Attach(hBitmap);
-
-				m_pButtonsImages = DNew CImageList();
-				m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
-				m_pButtonsImages->Add(bitmap, nullptr);
-
-				iw = h;
-				delete bitmap;
-			}
-			DeleteObject(hBitmap);
-		}
-
-		if (m_pButtonsImages) {
-			return;
-		}
+	m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
+	if (CreateFromExternal()) {
+		return;
 	}
+
+	HBITMAP hBitmap = nullptr;
 
 	CComPtr<IWICBitmap> pBitmap;
 	UINT width, height;
@@ -194,6 +172,40 @@ void CFlyBar::CalcButtonsRect()
 	r_SettingsIcon	= CRect(rcBar.right - 5 - (iw * 7), rcBar.top + 5, rcBar.right - 5 - (iw * 6), rcBar.bottom - 5);
 	//
 	r_LockIcon		= CRect(rcBar.right - 5 - (iw * 9), rcBar.top + 5, rcBar.right - 5 - (iw * 8), rcBar.bottom - 5);
+}
+
+void CFlyBar::Scale()
+{
+	CreateFromExternal();
+}
+
+bool CFlyBar::CreateFromExternal()
+{
+	if (m_svgFlybar.IsLoad()) {
+		int w = 0;
+		int h = m_pMainFrame->ScaleY(24);
+		if (HBITMAP hBitmap = m_svgFlybar.Rasterize(w, h)) {
+			if (w == h * 25) {
+				CBitmap* bitmap = DNew CBitmap();
+				bitmap->Attach(hBitmap);
+
+				SAFE_DELETE(m_pButtonsImages);
+				m_pButtonsImages = DNew CImageList();
+				m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+				m_pButtonsImages->Add(bitmap, nullptr);
+
+				iw = h;
+				delete bitmap;
+			}
+			DeleteObject(hBitmap);
+		}
+
+		if (m_pButtonsImages) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void CFlyBar::DrawButton(CDC *pDC, int nImage, int x, int z)

@@ -2111,6 +2111,7 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	m_wndPlaylistBar.ScaleFont();
 	m_wndStatusBar.ScaleFont();
 	m_wndPreView.ScaleFont();
+	m_wndFlyBar.Scale();
 
 	CMenuEx::ScaleFont();
 	const auto& s = AfxGetAppSettings();

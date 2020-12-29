@@ -22,8 +22,8 @@
 
 class CSvgImage
 {
-	void* pSvgImage = nullptr;
-	void* pRasterizer = nullptr;
+	void* m_pSvgImage = nullptr;
+	void* m_pRasterizer = nullptr;
 
 public:
 	~CSvgImage();
@@ -37,4 +37,6 @@ public:
 	bool Load(const wchar_t* filename);
 	HBITMAP Rasterize(int& w, int& h); // if the dimension is zero, then it will be set automatically
 	bool Rasterize(CBitmap& bitmap, int& w, int& h); // if the dimension is zero, then it will be set automatically
+
+	bool IsLoad() { return m_pSvgImage && m_pRasterizer; }
 };

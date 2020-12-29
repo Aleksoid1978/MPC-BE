@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "SvgHelper.h"
+
 class CMainFrame;
 
 // CFlyBar
@@ -70,6 +72,8 @@ private:
 	CToolTipCtrl m_tooltip;
 	CImageList *m_pButtonsImages = nullptr;
 
+	CSvgImage m_svgFlybar;
+
 	int m_btIdx = 0;
 
 	bool m_bTrackingMouseLeave = false;
@@ -83,8 +87,11 @@ public:
 	int iw;
 
 	void CalcButtonsRect();
+	void Scale();
 
 private:
+	bool CreateFromExternal();
+
 	void DrawButton(CDC *pDC, int nImage, int x, int z);
 	void UpdateWnd(CPoint point);
 	void DrawWnd();
