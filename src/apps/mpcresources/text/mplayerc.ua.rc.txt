@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"За замовчуванням"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Аудіо"
 6		"Гучність"
 7		"Мін."
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Наприклад: eng jap swe)"
 33		"Налаштування відкриття файлів"
 34		"При відкритті аудіофайла,"
-36		"Додати схожі файли до списку відтворення"
-37		"Окремий потік для ланцюжка фільтрів"
-39		"Звіт про помилки рендерингу потоків"
-40		"Запам'ятовувати обрані доріжки у списку відтворення"
+36		"Окремий потік для ланцюжка фільтрів"
+38		"Звіт про помилки рендерингу потоків"
+39		"Запам'ятовувати обрані доріжки у списку відтворення"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Програвач::Розмір вікна"
 STRING IDD_PPAGEYOUTUBE		"Відтворення::Онлайн сервіси"
 STRING IDF_LOGO1		"Типовий"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Додати до списка відтворення MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Наприкінці відтворення: Закрити програму"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Наприкінці відтворення: Завжди закривати файл"

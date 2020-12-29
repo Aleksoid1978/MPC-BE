@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"音声"
 6		"音量"
 7		"最小"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(例: eng jap swe)"
 33		"開く設定"
 34		"音声ファイルを開く時に、"
-36		"類似ファイルをプレイリストに追加する"
-37		"ワーカー スレッドを使用してフィルター グラフを作成する"
-39		"レンダリングに失敗したピンを報告する"
-40		"プレイリストで選択されたトラックを記憶する"
+36		"ワーカー スレッドを使用してフィルター グラフを作成する"
+38		"レンダリングに失敗したピンを報告する"
+39		"プレイリストで選択されたトラックを記憶する"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"プレーヤー::ウィンドウ サイズ"
 STRING IDD_PPAGEYOUTUBE		"再生::動画共有サービス"
 STRING IDF_LOGO1		"既定"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"MPC-BE プレイリストに追加"
 STRING IDS_AFTERPLAYBACK_CLOSE		"再生終了後: 終了"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"再生終了後: 常にファイルを閉じる"

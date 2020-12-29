@@ -590,7 +590,7 @@ void CAppSettings::ResetSettings()
 	bRememberSelectedTracks = false;
 
 	nAudioWindowMode = 1;
-	bAddSimilarFiles = false;
+	nAddSimilarFiles = 0;
 	fEnableWorkerThreadForOpening = true;
 	fReportFailedPins = true;
 
@@ -988,7 +988,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERSELECTEDTRACKS, bRememberSelectedTracks);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode, 0, 2);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, bAddSimilarFiles);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, nAddSimilarFiles, 0, 2);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 
@@ -1800,7 +1800,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERSELECTEDTRACKS, bRememberSelectedTracks);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, bAddSimilarFiles);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, nAddSimilarFiles);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 

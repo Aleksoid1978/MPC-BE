@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"По умолчанию"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Аудио"
 6		"Громкость"
 7		"Тише"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Например: eng rus jap)"
 33		"Настройки открытия файлов"
 34		"При открытии аудиофайла,"
-36		"Добавить в плейлист похожие файлы"
-37		"Рабочий поток для построения цепи фильтров"
-39		"Отчет об ошибках рендеринга потоков"
-40		"Запоминать выбранные дорожки в плейлисте"
+36		"Рабочий поток для построения цепи фильтров"
+38		"Отчет об ошибках рендеринга потоков"
+39		"Запоминать выбранные дорожки в плейлисте"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Проигрыватель::Размер окна"
 STRING IDD_PPAGEYOUTUBE		"Воспроизведение::Онлайн сервисы"
 STRING IDF_LOGO1		"Стандартный"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"Все файлы"
+STRING IDS_ADDPLAYLIST_NONE		"Ничего"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Похожие файлы"
 STRING IDS_ADD_TO_PLAYLIST		"Добавить в плейлист MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"По окончании воспроизведения: закрыть плеер"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"По окончании воспроизведения: всегда закрыть файл"

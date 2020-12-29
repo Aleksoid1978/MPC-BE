@@ -33,7 +33,6 @@ CPPagePlayback::CPPagePlayback()
 	, m_fRewind(FALSE)
 	, m_nVolume(0)
 	, m_nBalance(0)
-	, m_bAddSimilarFiles(FALSE)
 	, m_fEnableWorkerThreadForOpening(FALSE)
 	, m_fReportFailedPins(FALSE)
 	, m_nVolumeStep(1)
@@ -71,7 +70,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
 
 	DDX_Control(pDX, IDC_COMBO4, m_cbAudioWindowMode);
-	DDX_Check(pDX, IDC_CHECK3, m_bAddSimilarFiles);
+	DDX_Control(pDX, IDC_COMBO5, m_cbAddSimilarFiles);
 	DDX_Check(pDX, IDC_CHECK7, m_fEnableWorkerThreadForOpening);
 	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
 
@@ -95,7 +94,7 @@ BOOL CPPagePlayback::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO4, IDC_HAND);
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -136,7 +135,11 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_cbAudioWindowMode.AddString(ResStr(IDS_AUDIOWINDOW_HIDE));
 	m_cbAudioWindowMode.SetCurSel(s.nAudioWindowMode);
 
-	m_bAddSimilarFiles = s.bAddSimilarFiles;
+	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDPLAYLIST_NONE));
+	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDPLAYLIST_SIMILAR));
+	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDPLAYLIST_ALL));
+	m_cbAddSimilarFiles.SetCurSel(s.nAddSimilarFiles);
+
 	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
 	m_fReportFailedPins = s.fReportFailedPins;
 
@@ -161,7 +164,7 @@ BOOL CPPagePlayback::OnApply()
 	s.nLoops = m_nLoops;
 	s.fRewind = !!m_fRewind;
 	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
-	s.bAddSimilarFiles = !!m_bAddSimilarFiles;
+	s.nAddSimilarFiles = m_cbAddSimilarFiles.GetCurSel();
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
 	s.fReportFailedPins = !!m_fReportFailedPins;
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;

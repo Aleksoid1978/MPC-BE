@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"오디오"
 6		"볼륨"
 7		"최소"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(예: eng kor jap)"
 33		"열기 설정"
 34		"When opening an audio file,"
-36		"Add similar files to playlist"
-37		"필터그래프를 생성하는 작업자 쓰레드 사용"
-39		"렌더링에 실패하면 핀 보고"
-40		"Remember selected tracks in playlist"
+36		"필터그래프를 생성하는 작업자 쓰레드 사용"
+38		"렌더링에 실패하면 핀 보고"
+39		"Remember selected tracks in playlist"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1081,6 +1081,9 @@ STRING IDD_PPAGEWINDOWSIZE		"플레이어::Window size"
 STRING IDD_PPAGEYOUTUBE		"재생::Online media services"
 STRING IDF_LOGO1		"Default"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"MPC-BE 재생목록에 추가"
 STRING IDS_AFTERPLAYBACK_CLOSE		"재생이 끝나면: 종료"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"

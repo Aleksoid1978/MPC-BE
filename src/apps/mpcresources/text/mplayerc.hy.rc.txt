@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Ձայնը"
 6		"Բարձրությունը"
 7		"Min"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Օրինակ՝ eng jap swe)"
 33		"Ֆայլերի բացման կարգավորում"
 34		"When opening an audio file,"
-36		"Add similar files to playlist"
-37		"Ֆիլտրերի շարքի կառուցման հոսք"
-39		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
-40		"Remember selected tracks in playlist"
+36		"Ֆիլտրերի շարքի կառուցման հոսք"
+38		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
+39		"Remember selected tracks in playlist"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Վերարտադրիչը::Window size"
 STRING IDD_PPAGEYOUTUBE		"Վերարտադրում::Online media services"
 STRING IDF_LOGO1		"Default"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Ավելացնել MPC-BE-ի խաղացանկին"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Վերարտադրելուց հետո. Փակել"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"

@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Προεπιλογή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Ήχος"
 6		"Ένταση"
 7		"Ελάχ."
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Παράδειγμα: ell eng fre)"
 33		"Ρυθμίσεις ανοίγματος"
 34		"Όταν ανοίγει ένα αρχείο ήχου,"
-36		"Προσθήκη παρόμοιων αρχείων στη λίστα"
-37		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
-39		"Αναφορά pin που απέτυχαν να αποδοθούν"
-40		"Απομνημόνευση επιλεγμένων κομματιών στη λίστα αναπαραγωγής"
+36		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
+38		"Αναφορά pin που απέτυχαν να αποδοθούν"
+39		"Απομνημόνευση επιλεγμένων κομματιών στη λίστα αναπαραγωγής"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Αναπαραγωγός::Μέγεθος παραθ
 STRING IDD_PPAGEYOUTUBE		"Αναπαραγωγή::Online υπηρεσίες"
 STRING IDF_LOGO1		"Προεπιλογή"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Προσθήκη στη λίστα αναπαραγωγής του MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Μετά την αναπαραγωγή: Έξοδος"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Μετά την αναπαραγωγή: Πάντα κλείσιμο αρχείου"

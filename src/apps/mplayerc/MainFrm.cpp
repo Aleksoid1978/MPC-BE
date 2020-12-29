@@ -18725,7 +18725,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 			buttons[4].iBitmap = 5;
 			StringCchCopyW(buttons[4].szTip, _countof(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN));
 
-			hr = m_pTaskbarList->ThumbBarAddButtons(m_hWnd, ARRAYSIZE(buttons), buttons);
+			hr = m_pTaskbarList->ThumbBarAddButtons(m_hWnd, std::size(buttons), buttons);
 		}
 		ImageList_Destroy(himl);
 	}
@@ -20086,7 +20086,8 @@ BOOL CMainFrame::OpenYoutubePlaylist(const CString& url, BOOL bOnlyParse/* = FAL
 
 BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 {
-	if (!AfxGetAppSettings().bAddSimilarFiles
+	auto& s = AfxGetAppSettings();
+	if (!s.nAddSimilarFiles
 			|| fns.size() != 1
 			|| !::PathFileExistsW(fns.front())
 			|| ::PathIsDirectoryW(fns.front())) {
@@ -20096,80 +20097,106 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 	CString fname = fns.front();
 	const CString path = AddSlash(GetFolderOnly(fname));
 	fname = GetFileOnly(fname);
-	CString name(fname);
-	CString ext;
-	const int n = name.ReverseFind('.');
-	if (n > 0) {
-		ext = name.Mid(n).MakeLower();
-		name.Truncate(n);
-	}
-
-	const LPCWSTR excludeMask =
-		L"ATS_\\d{2}_\\d{1}.*|" // DVD Audio
-		L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
-		L"\\d{5}\\.clpi|"       // Blu-ray clip info
-		L"\\d{5}\\.m2ts|"       // Blu-ray streams
-		L"\\d{5}\\.mpls|"       // Blu-ray playlist
-		L".+\\.evo";            // HD-DVD streams
-	const std::wregex excludeMaskRe(excludeMask, std::wregex::icase);
-	if (std::regex_match(fname.GetString(), excludeMaskRe)) {
-		return FALSE;
-	};
-
-	std::wstring regExp = std::regex_replace(name.GetString(), std::wregex(LR"([\.\(\)\[\]\{\}\+])"), L"\\$&");
-
-	std::wcmatch match;
-	if (std::regex_search(regExp.c_str(), match, std::wregex(LR"(\b(?:S\d+E\d+)(\S+)(?:\b576|720|1080|1440|2160)[ip]\b)"))
-			&& match.size() == 2
-			&& match[1].length() > 1) {
-		regExp.replace(match.position(1), match[1].length(), LR"((\S+))");
-	}
-
-	regExp = std::regex_replace(regExp, std::wregex(LR"((a|p)\\.m\\.)"), LR"(((a|p)\.m\.))");
-
-	auto replaceDigital = [](const std::wstring& input) {
-		std::wregex re(LR"((?:\b576|720|1080|1440|2160)[ip]\b|\d+ *- *\d+|\d+)");
-		std::wsregex_token_iterator
-			begin(input.cbegin(), input.end(), re, { -1, 0 }),
-			end;
-
-		std::wstring output;
-		std::for_each(begin, end, [&](const std::wstring& m) {
-			if (std::regex_match(m, std::wregex(L"(576|720|1080|1440|2160)[ip]"))) {
-				output += m;
-			} else if (std::regex_match(m, std::wregex(LR"(\d+ *- *\d+|\d+)"))) {
-				output += LR"((\d+ *- *\d+|\d+))";
-			} else {
-				output += m;
-			}
-		});
-		return output;
-	};
-
-	regExp = replaceDigital(regExp);
-
-	regExp += L".*";
-	if (!ext.IsEmpty()) {
-		regExp += L"\\" + ext;
-	}
-
-	const std::wregex mask(regExp, std::wregex::icase);
 
 	std::vector<CString> files;
-	WIN32_FIND_DATAW wfd = { 0 };
-	HANDLE hFile = FindFirstFileW(path + '*' + ext, &wfd);
-	if (hFile != INVALID_HANDLE_VALUE) {
-		do {
-			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				continue;
-			}
+	if (s.nAddSimilarFiles == 1) {
+		CString name(fname);
+		CString ext;
+		const int n = name.ReverseFind('.');
+		if (n > 0) {
+			ext = name.Mid(n).MakeLower();
+			name.Truncate(n);
+		}
 
-			if (std::regex_match(wfd.cFileName, mask)) {
-				files.emplace_back(wfd.cFileName);
-			}
-		} while (FindNextFileW(hFile, &wfd));
+		const LPCWSTR excludeMask =
+			L"ATS_\\d{2}_\\d{1}.*|" // DVD Audio
+			L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
+			L"\\d{5}\\.clpi|"       // Blu-ray clip info
+			L"\\d{5}\\.m2ts|"       // Blu-ray streams
+			L"\\d{5}\\.mpls|"       // Blu-ray playlist
+			L".+\\.evo";            // HD-DVD streams
+		const std::wregex excludeMaskRe(excludeMask, std::wregex::icase);
+		if (std::regex_match(fname.GetString(), excludeMaskRe)) {
+			return FALSE;
+		};
 
-		FindClose(hFile);
+		std::wstring regExp = std::regex_replace(name.GetString(), std::wregex(LR"([\.\(\)\[\]\{\}\+])"), L"\\$&");
+
+		const LPCWSTR replaceText[] = {
+			LR"(\b(?:s\d+\\?.?e\d+\\?.?)(.+)(?:\b576|720|1080|1440|2160)[ip]\b)",
+			LR"((?:\b576|720|1080|1440|2160)[ip]\b(\D+))"
+		};
+		for (const auto text : replaceText) {
+			std::wcmatch match;
+			if (std::regex_search(regExp.c_str(), match, std::wregex(text, std::regex_constants::icase))
+					&& match.size() == 2
+					&& match[1].length() > 1) {
+				regExp.replace(match.position(1), match[1].length(), LR"((.+))");
+			}
+		}
+
+		regExp = std::regex_replace(regExp, std::wregex(LR"((a|p)\\.m\\.)"), LR"(((a|p)\.m\.))");
+
+		auto replaceDigital = [](const std::wstring& input) {
+			std::wregex re(LR"((?:\b576|720|1080|1440|2160)[ip]\b|\d+ *- *\d+|\d+)");
+			std::wsregex_token_iterator
+				begin(input.cbegin(), input.end(), re, { -1, 0 }),
+				end;
+
+			std::wstring output;
+			std::for_each(begin, end, [&](const std::wstring& m) {
+				if (std::regex_match(m, std::wregex(L"(576|720|1080|1440|2160)[ip]"))) {
+					output += m;
+				} else if (std::regex_match(m, std::wregex(LR"(\d+ *- *\d+|\d+)"))) {
+					output += LR"((\d+ *- *\d+|\d+))";
+				} else {
+					output += m;
+				}
+			});
+			return output;
+		};
+
+		regExp = replaceDigital(regExp);
+
+		regExp += L".*";
+		if (!ext.IsEmpty()) {
+			regExp += L"\\" + ext;
+		}
+
+		const std::wregex mask(regExp, std::wregex::icase);
+
+		WIN32_FIND_DATAW wfd = {};
+		HANDLE hFile = FindFirstFileW(path + '*' + ext, &wfd);
+		if (hFile != INVALID_HANDLE_VALUE) {
+			do {
+				if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					continue;
+				}
+
+				if (std::regex_match(wfd.cFileName, mask)) {
+					files.emplace_back(wfd.cFileName);
+				}
+			} while (FindNextFileW(hFile, &wfd));
+
+			FindClose(hFile);
+		}
+	} else {
+		auto& mf = s.m_Formats;
+		WIN32_FIND_DATAW wfd = {};
+		HANDLE hFile = FindFirstFileW(path + L"*.*", &wfd);
+		if (hFile != INVALID_HANDLE_VALUE) {
+			do {
+				if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					continue;
+				}
+				const CString ext = GetFileExt(wfd.cFileName).MakeLower();
+				if (mf.FindExt(ext)) {
+					files.emplace_back(wfd.cFileName);
+				}
+			} while (FindNextFileW(hFile, &wfd));
+
+			FindClose(hFile);
+		}
 	}
 
 	if (!files.empty()) {
