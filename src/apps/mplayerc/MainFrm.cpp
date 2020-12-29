@@ -359,7 +359,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_D3DFULLSCREEN_TOGGLE, OnD3DFullscreenToggle)
 	ON_COMMAND_RANGE(ID_GOTO_PREV_SUB, ID_GOTO_NEXT_SUB, OnGotoSubtitle)
 	ON_COMMAND_RANGE(ID_SHIFT_SUB_DOWN, ID_SHIFT_SUB_UP, OnShiftSubtitle)
-	ON_COMMAND_RANGE(ID_SUB_DELAY_DOWN, ID_SUB_DELAY_UP, OnSubtitleDelay)
+	ON_COMMAND_RANGE(ID_SUB_DELAY_DEC, ID_SUB_DELAY_INC, OnSubtitleDelay)
 	ON_COMMAND_RANGE(ID_LANGUAGE_ENGLISH, ID_LANGUAGE_LAST, OnLanguage)
 
 	ON_COMMAND(ID_PLAY_PLAY, OnPlayPlay)
@@ -17856,7 +17856,7 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 	if (m_pDVS) {
 		int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
 		if (SUCCEEDED(m_pDVS->get_SubtitleTiming(&SubtitleDelay, &SubtitleSpeedMul, &SubtitleSpeedDiv))) {
-			if (nID == ID_SUB_DELAY_DOWN) {
+			if (nID == ID_SUB_DELAY_DEC) {
 				SubtitleDelay -= AfxGetAppSettings().nSubDelayInterval;
 			} else {
 				SubtitleDelay += AfxGetAppSettings().nSubDelayInterval;
@@ -17874,16 +17874,15 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 			return;
 		}
 
-		int newDelay;
-		int oldDelay = m_pCAP->GetSubtitleDelay();
+		int delay = m_pCAP->GetSubtitleDelay();
 
-		if (nID == ID_SUB_DELAY_DOWN) {
-			newDelay = oldDelay - AfxGetAppSettings().nSubDelayInterval;
+		if (nID == ID_SUB_DELAY_DEC) {
+			delay -= AfxGetAppSettings().nSubDelayInterval;
 		} else {
-			newDelay = oldDelay + AfxGetAppSettings().nSubDelayInterval;
+			delay += AfxGetAppSettings().nSubDelayInterval;
 		}
 
-		SetSubtitleDelay(newDelay);
+		SetSubtitleDelay(delay);
 	}
 }
 
