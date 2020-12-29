@@ -39,7 +39,7 @@ float CSvgImage::CalcScale(int& w, int& h)
 {
 	float scale = 1.0f;
 
-	auto svgimage = ((NSVGimage*)pSvgImage);
+	auto svgimage = ((NSVGimage*)m_pSvgImage);
 
 	if (!w && !h) {
 		w = (uint32_t)std::round(svgimage->width);
@@ -62,14 +62,14 @@ float CSvgImage::CalcScale(int& w, int& h)
 
 void CSvgImage::Clear()
 {
-	if (pRasterizer) {
-		nsvgDeleteRasterizer((NSVGrasterizer*)pRasterizer);
-		pRasterizer = nullptr;
+	if (m_pRasterizer) {
+		nsvgDeleteRasterizer((NSVGrasterizer*)m_pRasterizer);
+		m_pRasterizer = nullptr;
 	}
 
-	if (pSvgImage) {
-		nsvgDelete((NSVGimage*)pSvgImage);
-		pSvgImage = nullptr;
+	if (m_pSvgImage) {
+		nsvgDelete((NSVGimage*)m_pSvgImage);
+		m_pSvgImage = nullptr;
 	}
 }
 
@@ -77,12 +77,12 @@ bool CSvgImage::Load(char* svgData)
 {
 	Clear();
 
-	pSvgImage = nsvgParse(svgData, "px", 96.0f);
-	if (pSvgImage) {
-		pRasterizer = nsvgCreateRasterizer();
+	m_pSvgImage = nsvgParse(svgData, "px", 96.0f);
+	if (m_pSvgImage) {
+		m_pRasterizer = nsvgCreateRasterizer();
 	}
 
-	if (!pSvgImage || !pRasterizer) {
+	if (!m_pSvgImage || !m_pRasterizer) {
 		Clear();
 		return false;
 	}
@@ -99,7 +99,7 @@ bool CSvgImage::Load(const wchar_t* filename)
 		const size_t len = ftell(file);
 		fseek(file, 0, SEEK_SET);
 
-		std::unique_ptr<char[]> svgData(new(std::nothrow) char[len+1]);
+		std::unique_ptr<char[]> svgData(new(std::nothrow) char[len + 1]);
 		if (svgData) {
 			const size_t ret = fread(svgData.get(), 1, len, file);
 
@@ -120,12 +120,12 @@ HBITMAP CSvgImage::Rasterize(int& w, int& h)
 {
 	HBITMAP hBitmap = nullptr;
 
-	if (pSvgImage && pRasterizer) {
+	if (m_pSvgImage && m_pRasterizer) {
 		float scale = CalcScale(w, h);
 
 		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[w * h * 4]);
 		if (buffer) {
-			nsvgRasterize((NSVGrasterizer*)pRasterizer, (NSVGimage*)pSvgImage, 0.0f, 0.0f, scale, buffer.get(), w, h, w * 4);
+			nsvgRasterize((NSVGrasterizer*)m_pRasterizer, (NSVGimage*)m_pSvgImage, 0.0f, 0.0f, scale, buffer.get(), w, h, w * 4);
 
 			hBitmap = CreateBitmap(w, h, 1, 32, buffer.get());
 		}
@@ -136,12 +136,12 @@ HBITMAP CSvgImage::Rasterize(int& w, int& h)
 
 bool CSvgImage::Rasterize(CBitmap& bitmap, int& w, int& h) // not tested
 {
-	if (pSvgImage && pRasterizer) {
+	if (m_pSvgImage && m_pRasterizer) {
 		float scale = CalcScale(w, h);
 
 		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[w * h * 4]);
 		if (buffer) {
-			nsvgRasterize((NSVGrasterizer*)pRasterizer, (NSVGimage*)pSvgImage, 0.0f, 0.0f, scale, buffer.get(), w, h, w * 4);
+			nsvgRasterize((NSVGrasterizer*)m_pRasterizer, (NSVGimage*)m_pSvgImage, 0.0f, 0.0f, scale, buffer.get(), w, h, w * 4);
 			bitmap.CreateBitmap(w, h, 1, 32, buffer.get());
 
 			return true;
