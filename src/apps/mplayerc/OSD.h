@@ -137,8 +137,8 @@ private:
 	CRect	m_rectCloseButton;
 	CRect	m_rectExitButton;
 
-	int			m_nButtonHeight;
-	CImageList	*m_pButtonsImages;
+	CImageList *m_pButtonsImages;
+	int		m_nButtonHeight;
 
 	CRect	m_rectCursor;
 	CRect	m_rectBar;

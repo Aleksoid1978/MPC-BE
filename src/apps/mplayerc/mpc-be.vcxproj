@@ -55,7 +55,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 /FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;ffmpeg.lib;comsuppw.lib;Delayimp.lib;detours.lib;lgLcd.lib;Psapi.lib;SetupAPI.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
@@ -198,6 +198,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SubtitleDlDlg.cpp" />
+    <ClCompile Include="SvgHelper.cpp" />
     <ClCompile Include="ThumbsTaskDlg.cpp" />
     <ClCompile Include="TorrentInfo.cpp" />
     <ClCompile Include="TunerScanDlg.cpp" />
@@ -233,6 +234,8 @@
     <ClInclude Include="filters\TextPassThruFilter.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="nanosvg\nanosvg.h" />
+    <ClInclude Include="nanosvg\nanosvgrast.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerFlyBar.h" />
@@ -324,6 +327,7 @@
     <ClInclude Include="ShockwaveGraph.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SubtitleDlDlg.h" />
+    <ClInclude Include="SvgHelper.h" />
     <ClInclude Include="ThumbsTaskDlg.h" />
     <ClInclude Include="TorrentInfo.h" />
     <ClInclude Include="TunerScanDlg.h" />

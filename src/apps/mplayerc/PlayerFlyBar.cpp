@@ -22,6 +22,7 @@
 #include "MainFrm.h"
 #include "../../DSUtil/FileHandle.h"
 #include "WicUtils.h"
+#include "SvgHelper.h"
 #include "PlayerFlyBar.h"
 
 // CPrevView
@@ -29,8 +30,35 @@
 CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 {
-	CComPtr<IWICBitmap> pBitmap;
 	HBITMAP hBitmap = nullptr;
+
+	CSvgImage svgFlybar;
+	bool ok = svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
+	if (ok) {
+		int w = 0;
+		int h = pMainFrame->ScaleY(24);
+		hBitmap = svgFlybar.Rasterize(w, h);
+		if (hBitmap) {
+			if (w == h * 25) {
+				CBitmap *bitmap = DNew CBitmap();
+				bitmap->Attach(hBitmap);
+
+				m_pButtonsImages = DNew CImageList();
+				m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+				m_pButtonsImages->Add(bitmap, nullptr);
+
+				iw = h;
+				delete bitmap;
+			}
+			DeleteObject(hBitmap);
+		}
+
+		if (m_pButtonsImages) {
+			return;
+		}
+	}
+
+	CComPtr<IWICBitmap> pBitmap;
 	UINT width, height;
 
 	HRESULT hr = WicLoadImage(&pBitmap, true, (::GetProgramDir()+L"flybar.png").GetString());

@@ -24,6 +24,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileHandle.h"
 #include "WicUtils.h"
+#include "SvgHelper.h"
 #include "OSD.h"
 
 #define SEEKBAR_HEIGHT       60
@@ -75,9 +76,35 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
 
+	HBITMAP hBitmap = nullptr;
+
+	CSvgImage svgFlybar;
+	bool ok = svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
+	if (ok) {
+		int w = 0;
+		int h = ScaleY(24);
+		hBitmap = svgFlybar.Rasterize(w, h);
+		if (hBitmap) {
+			if (w == h * 25) {
+				CBitmap *bitmap = DNew CBitmap();
+				bitmap->Attach(hBitmap);
+
+				m_pButtonsImages = DNew CImageList();
+				m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+				m_pButtonsImages->Add(bitmap, nullptr);
+
+				m_nButtonHeight = h;
+				delete bitmap;
+			}
+			DeleteObject(hBitmap);
+		}
+
+		if (m_pButtonsImages) {
+			return;
+		}
+	}
 
 	CComPtr<IWICBitmap> pBitmap;
-	HBITMAP hBitmap = nullptr;
 	UINT width, height;
 
 	HRESULT hr = WicLoadImage(&pBitmap, true, (::GetProgramDir()+L"flybar.png").GetString());
@@ -322,25 +349,25 @@ void COSD::CalcRect()
 
 		m_pWnd->GetClientRect(&m_rectWnd);
 
-		m_rectSeekBar.left			= m_rectWnd.left		+ 10;
-		m_rectSeekBar.right			= m_rectWnd.right		- 10;
-		m_rectSeekBar.top			= m_rectWnd.bottom		- SeekBarHeight;
-		m_rectSeekBar.bottom		= m_rectSeekBar.top		+ SeekBarHeight;
+		m_rectSeekBar.left       = m_rectWnd.left        + 10;
+		m_rectSeekBar.right      = m_rectWnd.right       - 10;
+		m_rectSeekBar.top        = m_rectWnd.bottom      - SeekBarHeight;
+		m_rectSeekBar.bottom     = m_rectSeekBar.top     + SeekBarHeight;
 
-		m_rectFlyBar.left			= m_rectWnd.left;
-		m_rectFlyBar.right			= m_rectWnd.right;
-		m_rectFlyBar.top			= m_rectWnd.top;
-		m_rectFlyBar.bottom			= m_rectWnd.top			+ 100;
+		m_rectFlyBar.left        = m_rectWnd.left;
+		m_rectFlyBar.right       = m_rectWnd.right;
+		m_rectFlyBar.top         = m_rectWnd.top;
+		m_rectFlyBar.bottom      = m_rectWnd.top           + ScaleY(100);
 
-		m_rectExitButton.left		= m_rectWnd.right		- 34;
-		m_rectExitButton.right		= m_rectWnd.right		- 10;
-		m_rectExitButton.top		= m_rectWnd.top			- 10;
-		m_rectExitButton.bottom		= m_rectWnd.top			+ 34;
+		m_rectExitButton.right   = m_rectWnd.right         - ScaleX(10);
+		m_rectExitButton.top     = m_rectWnd.top           + ScaleY(10);
+		m_rectExitButton.left    = m_rectExitButton.right  - m_nButtonHeight;
+		m_rectExitButton.bottom  = m_rectExitButton.top    + m_nButtonHeight;
 
-		m_rectCloseButton.left		= m_rectExitButton.left	- 28;
-		m_rectCloseButton.right		= m_rectExitButton.left	- 4;
-		m_rectCloseButton.top		= m_rectWnd.top			- 10;
-		m_rectCloseButton.bottom	= m_rectWnd.top			+ 34;
+		m_rectCloseButton.right  = m_rectExitButton.left   - ScaleX(4);
+		m_rectCloseButton.top    = m_rectExitButton.top;
+		m_rectCloseButton.left   = m_rectCloseButton.right - m_nButtonHeight;
+		m_rectCloseButton.bottom = m_rectCloseButton.top   + m_nButtonHeight;
 	}
 }
 
@@ -411,10 +438,10 @@ void COSD::DrawSlider()
 void COSD::DrawFlyBar()
 {
 	const int nImageExit = m_bMouseOverExitButton ? IMG_EXIT_A : IMG_EXIT;
-	const int nImageCose = m_bMouseOverCloseButton ? IMG_CLOSE_A : IMG_CLOSE;
+	const int nImageClose = m_bMouseOverCloseButton ? IMG_CLOSE_A : IMG_CLOSE;
 
-	m_pButtonsImages->Draw(&m_MemDC, nImageExit, POINT{ m_rectWnd.right - 34, 10 }, ILD_NORMAL);
-	m_pButtonsImages->Draw(&m_MemDC, nImageCose, POINT{ m_rectWnd.right - 62, 10 }, ILD_NORMAL);
+	m_pButtonsImages->Draw(&m_MemDC, nImageExit, m_rectExitButton.TopLeft(), ILD_NORMAL);
+	m_pButtonsImages->Draw(&m_MemDC, nImageClose, m_rectCloseButton.TopLeft(), ILD_NORMAL);
 }
 
 void COSD::DrawMessage()
