@@ -23,10 +23,10 @@
 #define NANOSVG_IMPLEMENTATION
 #pragma warning(push)
 #pragma warning(disable:4244)
-#include "nanosvg/nanosvg.h"
+#include "../../ExtLib/nanosvg/src/nanosvg.h"
 #pragma warning(pop)
 #define NANOSVGRAST_IMPLEMENTATION
-#include "nanosvg/nanosvgrast.h"
+#include "../../ExtLib/nanosvg/src/nanosvgrast.h"
 
 #include "SvgHelper.h"
 

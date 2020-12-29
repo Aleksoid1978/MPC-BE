@@ -49,9 +49,6 @@
     <Filter Include="Player Config">
       <UniqueIdentifier>{c2fa522d-09a4-4187-b8c5-3e1896202b28}</UniqueIdentifier>
     </Filter>
-    <Filter Include="nanosvg">
-      <UniqueIdentifier>{0718b315-6082-439c-91d5-8a8b2b7e1a73}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filters\ChaptersSouce.cpp">
@@ -793,15 +790,6 @@
     </ClInclude>
     <ClInclude Include="PPageMouse.h">
       <Filter>Player Options</Filter>
-    </ClInclude>
-    <ClInclude Include="nanosvg\nanosvg.h">
-      <Filter>nanosvg</Filter>
-    </ClInclude>
-    <ClInclude Include="nanosvg\nanosvgrast.h">
-      <Filter>nanosvg</Filter>
-    </ClInclude>
-    <ClInclude Include="Direct2DUtils.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SvgHelper.h">
       <Filter>Header Files</Filter>

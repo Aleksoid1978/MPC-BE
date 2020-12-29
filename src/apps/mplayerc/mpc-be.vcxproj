@@ -234,8 +234,6 @@
     <ClInclude Include="filters\TextPassThruFilter.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="nanosvg\nanosvg.h" />
-    <ClInclude Include="nanosvg\nanosvgrast.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerFlyBar.h" />
