@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Zvuk"
 6		"Hlasitosť"
 7		"Min"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(príklad: eng jap swe)"
 33		"Nastavenia otvárania súborov"
 34		"When opening an audio file,"
-36		"Add similar files to playlist"
-37		"Pri vytváraní grafu filtra otvoriť iné vlákno"
-39		"Zaznamenať piny, ktoré sa nevykreslia"
-40		"Remember selected tracks in playlist"
+36		"Pri vytváraní grafu filtra otvoriť iné vlákno"
+38		"Zaznamenať piny, ktoré sa nevykreslia"
+39		"Remember selected tracks in playlist"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Prehrávač::Window size"
 STRING IDD_PPAGEYOUTUBE		"Prehrávanie::Online media services"
 STRING IDF_LOGO1		"Default"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Pridať do playlistu programu MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Po prehratí: Ukončiť"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"

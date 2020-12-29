@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Alapértelmezett"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Audió"
 6		"Hangerő"
 7		"Min"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Példa: eng jap swe)"
 33		"Megnyitási beállítások"
 34		"Amikor megnyit egy hangfájlt,"
-36		"Hasonló fájlok hozzáadása a lejátszási listához"
-37		"Használjon szálat a szűrő gráf felépítéséhez"
-39		"Hibás, nem átalakítható csatlakozók jelentése"
-40		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
+36		"Használjon szálat a szűrő gráf felépítéséhez"
+38		"Hibás, nem átalakítható csatlakozók jelentése"
+39		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Lejátszó::Ablak mérete"
 STRING IDD_PPAGEYOUTUBE		"Lejátszás::Online médiaszolgáltatások"
 STRING IDF_LOGO1		"Alapértelmezett"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Hozzáadás az MPC-BE Lejátszási listához"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Lejátszás után: Kilépés"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Lejátszás után: Mindig zárja be a fájlt"

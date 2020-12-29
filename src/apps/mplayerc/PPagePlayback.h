@@ -59,7 +59,7 @@ public:
 	BOOL		m_bRememberSelectedTracks;
 
 	CComboBox	m_cbAudioWindowMode;
-	BOOL		m_bAddSimilarFiles;
+	CComboBox	m_cbAddSimilarFiles;
 	BOOL		m_fEnableWorkerThreadForOpening;
 	BOOL		m_fReportFailedPins;
 

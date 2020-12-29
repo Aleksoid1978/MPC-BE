@@ -669,7 +669,7 @@ public:
 	CStringW		strAudiosLanguageOrder;
 	bool			bRememberSelectedTracks;
 	int				nAudioWindowMode;
-	bool			bAddSimilarFiles;
+	int				nAddSimilarFiles;
 	bool			fEnableWorkerThreadForOpening;
 	bool			fReportFailedPins;
 

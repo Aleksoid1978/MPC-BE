@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Audio"
 6		"Vol."
 7		"Mín"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Ejemplo: eng jap swe)"
 33		"Opciones de apertura"
 34		"When opening an audio file,"
-36		"Add similar files to playlist"
-37		"Usar proceso funcional para construir extr. de filtros"
-39		"Reportar conectores que no quieran funcionar"
-40		"Remember selected tracks in playlist"
+36		"Usar proceso funcional para construir extr. de filtros"
+38		"Reportar conectores que no quieran funcionar"
+39		"Remember selected tracks in playlist"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Reproductor::Window size"
 STRING IDD_PPAGEYOUTUBE		"Reproducción::Online media services"
 STRING IDF_LOGO1		"Default"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Agregar a la lista de reproducción de MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"After Playback: Exit"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"

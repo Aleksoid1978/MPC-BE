@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(Bijv.: nl eng jap )"
 33		"Opties voor openen"
 34		"Wanneer een audio-bestand is geopend,"
-36		"Dergelijke bestanden aan afspeellijst toevoegen"
-37		"Filtergraph in aparte CPU-thread samenstellen"
-39		"Rapporteer pins die niet renderen"
-40		"Onthoud geselecteerde items in de afspeellijst"
+36		"Filtergraph in aparte CPU-thread samenstellen"
+38		"Rapporteer pins die niet renderen"
+39		"Onthoud geselecteerde items in de afspeellijst"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Speler::Venstergrootte"
 STRING IDD_PPAGEYOUTUBE		"Weergave::Online-videodienst"
 STRING IDF_LOGO1		"Standaard"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"Aan afspeellijst van MPC-BE toevoegen"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Na weergave: Venster afsluiten"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Na weergave: Altijd bestand sluiten"

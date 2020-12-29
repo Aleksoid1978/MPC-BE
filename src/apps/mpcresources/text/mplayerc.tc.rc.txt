@@ -359,7 +359,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
 15		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"音訊"
 6		"音量"
 7		"小"
@@ -382,10 +382,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"（範例：eng jap swe）"
 33		"開啟設定"
 34		"開啟音訊檔案時，"
-36		"於播放清單加入相似檔案"
-37		"使用工作執行緒建立篩選器圖 (Filter Graph)"
-39		"回報繪製失敗的 Pin"
-40		"記住播放清單中選定的項目"
+36		"使用工作執行緒建立篩選器圖 (Filter Graph)"
+38		"回報繪製失敗的 Pin"
+39		"記住播放清單中選定的項目"
+40		"Add to playlist:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
@@ -1072,6 +1072,9 @@ STRING IDD_PPAGEWINDOWSIZE		"播放程式::視窗大小"
 STRING IDD_PPAGEYOUTUBE		"播放::線上影音服務"
 STRING IDF_LOGO1		"預設"
 STRING IDR_MAINFRAME		"MPC-BE"
+STRING IDS_ADDPLAYLIST_ALL		"All files"
+STRING IDS_ADDPLAYLIST_NONE		"Nothing"
+STRING IDS_ADDPLAYLIST_SIMILAR		"Similar files"
 STRING IDS_ADD_TO_PLAYLIST		"加到 MPC-BE 的播放清單"
 STRING IDS_AFTERPLAYBACK_CLOSE		"播放完後：離開"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"播放完後：總是關閉檔案"
