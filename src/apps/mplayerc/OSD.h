@@ -26,6 +26,7 @@
 #include <mvrInterfaces.h>
 #include <HighDPI.h>
 #include "../../DSUtil/DSMPropertyBag.h"
+#include "SvgHelper.h"
 
 #define WM_HIDE			(WM_USER + 1001)
 #define WM_OSD_DRAW		(WM_USER + 1002)
@@ -137,8 +138,9 @@ private:
 	CRect	m_rectCloseButton;
 	CRect	m_rectExitButton;
 
-	CImageList *m_pButtonsImages;
+	CImageList *m_pButtonsImages = nullptr;
 	int		m_nButtonHeight;
+	int		m_externalFlyBarHeight = 0;
 
 	CRect	m_rectCursor;
 	CRect	m_rectBar;
@@ -206,6 +208,9 @@ private:
 	BOOL StartTimer(const DWORD dueTime);
 	void EndTimer(const bool bWaitForCallback = true);
 	static void CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
+
+	CSvgImage m_svgFlybar;
+	bool CreateFromExternal();
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);

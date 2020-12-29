@@ -24,7 +24,6 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileHandle.h"
 #include "WicUtils.h"
-#include "SvgHelper.h"
 #include "OSD.h"
 
 #define SEEKBAR_HEIGHT       60
@@ -76,33 +75,12 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
 
-	HBITMAP hBitmap = nullptr;
-
-	CSvgImage svgFlybar;
-	bool ok = svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
-	if (ok) {
-		int w = 0;
-		int h = ScaleY(24);
-		hBitmap = svgFlybar.Rasterize(w, h);
-		if (hBitmap) {
-			if (w == h * 25) {
-				CBitmap *bitmap = DNew CBitmap();
-				bitmap->Attach(hBitmap);
-
-				m_pButtonsImages = DNew CImageList();
-				m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
-				m_pButtonsImages->Add(bitmap, nullptr);
-
-				m_nButtonHeight = h;
-				delete bitmap;
-			}
-			DeleteObject(hBitmap);
-		}
-
-		if (m_pButtonsImages) {
-			return;
-		}
+	m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
+	if (CreateFromExternal()) {
+		return;
 	}
+
+	HBITMAP hBitmap = nullptr;
 
 	CComPtr<IWICBitmap> pBitmap;
 	UINT width, height;
@@ -288,6 +266,7 @@ void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 	m_OSDType	= OSD_TYPE_BITMAP;
 
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
+	CreateFromExternal();
 	CreateFontInternal();
 
 	Reset();
@@ -313,6 +292,7 @@ void COSD::Start(CWnd* pWnd)
 	m_OSDType	= OSD_TYPE_GDI;
 
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
+	CreateFromExternal();
 	CreateFontInternal();
 
 	Reset();
@@ -1046,8 +1026,42 @@ void COSD::OverrideDPI(int dpix, int dpiy)
 {
 	CDPI::OverrideDPI(dpix, dpiy);
 
+	CreateFromExternal();
+
 	m_FontSizeCashed = 0;
 	DrawWnd();
+}
+
+bool COSD::CreateFromExternal()
+{
+	if (m_svgFlybar.IsLoad()) {
+		int w = 0;
+		int h = ScaleY(24);
+		if (h != m_externalFlyBarHeight) {
+			m_externalFlyBarHeight = h;
+			if (HBITMAP hBitmap = m_svgFlybar.Rasterize(w, h)) {
+				if (w == h * 25) {
+					CBitmap* bitmap = DNew CBitmap();
+					bitmap->Attach(hBitmap);
+
+					SAFE_DELETE(m_pButtonsImages);
+					m_pButtonsImages = DNew CImageList();
+					m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+					m_pButtonsImages->Add(bitmap, nullptr);
+
+					m_nButtonHeight = h;
+					delete bitmap;
+				}
+				DeleteObject(hBitmap);
+			}
+
+			if (m_pButtonsImages) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void COSD::GradientFill(CDC* pDc, CRect* rc)
