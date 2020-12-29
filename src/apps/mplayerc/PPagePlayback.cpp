@@ -135,9 +135,9 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_cbAudioWindowMode.AddString(ResStr(IDS_AUDIOWINDOW_HIDE));
 	m_cbAudioWindowMode.SetCurSel(s.nAudioWindowMode);
 
-	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDPLAYLIST_NONE));
-	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDPLAYLIST_SIMILAR));
-	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDPLAYLIST_ALL));
+	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDTOPLS_FROMDIR_NONE));
+	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDTOPLS_FROMDIR_SIMILAR));
+	m_cbAddSimilarFiles.AddString(ResStr(IDS_ADDTOPLS_FROMDIR_ALL));
 	m_cbAddSimilarFiles.SetCurSel(s.nAddSimilarFiles);
 
 	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;

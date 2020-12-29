@@ -54,8 +54,8 @@ CPPageMouse::CPPageMouse()
 	m_comands_W.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
 	m_comands_W.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
 	m_comands_W.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
-	m_comands_W.Add(ID_SUB_DELAY_UP,             IDS_MPLAYERC_105);
-	m_comands_W.Add(ID_SUB_DELAY_DOWN,           IDS_MPLAYERC_104);
+	m_comands_W.Add(ID_SUB_DELAY_INC,            IDS_AG_SUBDELAY_INC);
+	m_comands_W.Add(ID_SUB_DELAY_DEC,            IDS_AG_SUBDELAY_DEC);
 }
 
 CPPageMouse::~CPPageMouse()

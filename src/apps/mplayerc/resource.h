@@ -998,11 +998,11 @@
 #define IDC_VSYNC                       22069
 #define IDC_VSYNC_INTERNAL              22070
 //
-#define ID_SUB_DELAY_DOWN               24000
-#define ID_SUB_DELAY_UP                 24001
+#define ID_SUB_DELAY_DEC                24000
+#define ID_SUB_DELAY_INC                24001
 //
-#define IDS_MPLAYERC_104                24002
-#define IDS_MPLAYERC_105                24003
+#define IDS_AG_SUBDELAY_DEC             24002
+#define IDS_AG_SUBDELAY_INC             24003
 #define IDS_FILE_SAVE_THUMBNAILS        24005
 #define IDC_MAINFRAME_ICON              24006
 #define IDS_OSD_TEST                    24007
@@ -1296,9 +1296,9 @@
 #define IDS_AUDIOWINDOW_NONE            33180
 #define IDS_AUDIOWINDOW_COVER           33181
 #define IDS_AUDIOWINDOW_HIDE            33182
-#define IDS_ADDPLAYLIST_NONE            33183
-#define IDS_ADDPLAYLIST_SIMILAR         33184
-#define IDS_ADDPLAYLIST_ALL             33185
+#define IDS_ADDTOPLS_FROMDIR_NONE       33183
+#define IDS_ADDTOPLS_FROMDIR_SIMILAR    33184
+#define IDS_ADDTOPLS_FROMDIR_ALL        33185
 #define IDS_EXCLUSIVE_FS_WARNING        33190
 #define IDS_MAINFRM_139                 33191
 #define IDS_AG_TITLE2                   33192
