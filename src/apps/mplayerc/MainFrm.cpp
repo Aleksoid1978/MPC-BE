@@ -18670,10 +18670,11 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 			hr = svgFlybar.Load(tmp.GetBuffer()) ? S_OK : E_FAIL;
 			if (svgFlybar.IsLoad()) {
 				width = 0;
-				if (SysVersion::IsWin8orLater()) {
+				if (SysVersion::IsWin10orLater()) {
 					height = GetSystemMetrics(SM_CYICON);
 				} else {
-					height = ScaleY(18); // for Windows 7
+					// for Windows 7, 8.1
+					height = ScaleY(8); // Don't use GetSystemMetrics(SM_CYICON) here!
 				}
 				hBitmap = svgFlybar.Rasterize(width, height);
 			}
