@@ -11,7 +11,7 @@
 #define IDR_POPUP_NAVIGATE              143
 #define IDB_PLAYERFLYBAR_PNG            196
 #define IDB_W7_AUDIO                    197
-#define IDB_W7_TOOLBAR                  198
+#define IDB_WIN_TASKBAR_TOOLBAR         198
 #define IDB_MEDIAINFO_LANGUAGE          199
 #define IDB_PLAYERTOOLBAR               201
 #define IDB_NOAUDIO                     202
