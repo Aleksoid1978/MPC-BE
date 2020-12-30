@@ -18658,28 +18658,29 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
 	if (SUCCEEDED(hr)) {
-		CComPtr<IWICBitmap> pBitmap;
 		HBITMAP hBitmap = nullptr;
-		UINT width, height;
+		int width, height;
 		BYTE* data;
 		UINT size;
-		HRESULT hr = LoadResourceFile(IDB_W7_TOOLBAR, &data, size);
+
+		HRESULT hr = LoadResourceFile(IDB_WIN_TASKBAR_TOOLBAR, &data, size);
 		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmap, true, data, size);
-		}
-		if (SUCCEEDED(hr)) {
-			hr = pBitmap->GetSize(&width, &height);
-		}
-		if (SUCCEEDED(hr)) {
-			hr = WicCreateHBitmap(hBitmap, pBitmap);
+			CStringA tmp((char*)data, size);
+			CSvgImage svgFlybar;
+			hr = svgFlybar.Load(tmp.GetBuffer()) ? S_OK : E_FAIL;
+			if (svgFlybar.IsLoad()) {
+				width = 0;
+				height = GetSystemMetrics(SM_CYICON);
+				hBitmap = svgFlybar.Rasterize(width, height);
+			}
 		}
 
-		if (FAILED(hr)) {
+		if (FAILED(hr) || !hBitmap) {
 			m_pTaskbarList->Release();
-			return hr;
+			return E_FAIL;
 		}
 
-		UINT nI = width / height;
+		const auto nI = width / height;
 		HIMAGELIST himl = ImageList_Create(height, height, ILC_COLOR32, nI, 0);
 
 		// Add the bitmap
@@ -18695,35 +18696,35 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 			buttons[0].dwFlags = THBF_DISABLED;
 			buttons[0].iId = IDTB_BUTTON3;
 			buttons[0].iBitmap = 0;
-			StringCchCopyW(buttons[0].szTip, _countof(buttons[0].szTip), ResStr(IDS_AG_PREVIOUS));
+			StringCchCopyW(buttons[0].szTip, std::size(buttons[0].szTip), ResStr(IDS_AG_PREVIOUS));
 
 			// STOP
 			buttons[1].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 			buttons[1].dwFlags = THBF_DISABLED;
 			buttons[1].iId = IDTB_BUTTON1;
 			buttons[1].iBitmap = 1;
-			StringCchCopyW(buttons[1].szTip, _countof(buttons[1].szTip), ResStr(IDS_AG_STOP));
+			StringCchCopyW(buttons[1].szTip, std::size(buttons[1].szTip), ResStr(IDS_AG_STOP));
 
 			// PLAY/PAUSE
 			buttons[2].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 			buttons[2].dwFlags = THBF_DISABLED;
 			buttons[2].iId = IDTB_BUTTON2;
 			buttons[2].iBitmap = 3;
-			StringCchCopyW(buttons[2].szTip, _countof(buttons[2].szTip), ResStr(IDS_AG_PLAYPAUSE));
+			StringCchCopyW(buttons[2].szTip, std::size(buttons[2].szTip), ResStr(IDS_AG_PLAYPAUSE));
 
 			// NEXT
 			buttons[3].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 			buttons[3].dwFlags = THBF_DISABLED;
 			buttons[3].iId = IDTB_BUTTON4;
 			buttons[3].iBitmap = 4;
-			StringCchCopyW(buttons[3].szTip, _countof(buttons[3].szTip), ResStr(IDS_AG_NEXT));
+			StringCchCopyW(buttons[3].szTip, std::size(buttons[3].szTip), ResStr(IDS_AG_NEXT));
 
 			// FULLSCREEN
 			buttons[4].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 			buttons[4].dwFlags = THBF_DISABLED;
 			buttons[4].iId = IDTB_BUTTON5;
 			buttons[4].iBitmap = 5;
-			StringCchCopyW(buttons[4].szTip, _countof(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN));
+			StringCchCopyW(buttons[4].szTip, std::size(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN));
 
 			hr = m_pTaskbarList->ThumbBarAddButtons(m_hWnd, std::size(buttons), buttons);
 		}
@@ -18779,29 +18780,29 @@ HRESULT CMainFrame::UpdateThumbarButton()
 	buttons[0].dwFlags = (s.fDontUseSearchInFolder && m_wndPlaylistBar.GetCount() <= 1 && (m_pCB && m_pCB->ChapGetCount() <= 1)) ? THBF_DISABLED : THBF_ENABLED;
 	buttons[0].iId = IDTB_BUTTON3;
 	buttons[0].iBitmap = 0;
-	StringCchCopyW(buttons[0].szTip, _countof(buttons[0].szTip), ResStr(IDS_AG_PREVIOUS));
+	StringCchCopyW(buttons[0].szTip, std::size(buttons[0].szTip), ResStr(IDS_AG_PREVIOUS));
 
 	buttons[1].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[1].iId = IDTB_BUTTON1;
 	buttons[1].iBitmap = 1;
-	StringCchCopyW(buttons[1].szTip, _countof(buttons[1].szTip), ResStr(IDS_AG_STOP));
+	StringCchCopyW(buttons[1].szTip, std::size(buttons[1].szTip), ResStr(IDS_AG_STOP));
 
 	buttons[2].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[2].iId = IDTB_BUTTON2;
 	buttons[2].iBitmap = 3;
-	StringCchCopyW(buttons[2].szTip, _countof(buttons[2].szTip), ResStr(IDS_AG_PLAYPAUSE));
+	StringCchCopyW(buttons[2].szTip, std::size(buttons[2].szTip), ResStr(IDS_AG_PLAYPAUSE));
 
 	buttons[3].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[3].dwFlags = (s.fDontUseSearchInFolder && m_wndPlaylistBar.GetCount() <= 1 && (m_pCB && m_pCB->ChapGetCount() <= 1)) ? THBF_DISABLED : THBF_ENABLED;
 	buttons[3].iId = IDTB_BUTTON4;
 	buttons[3].iBitmap = 4;
-	StringCchCopyW(buttons[3].szTip, _countof(buttons[3].szTip), ResStr(IDS_AG_NEXT));
+	StringCchCopyW(buttons[3].szTip, std::size(buttons[3].szTip), ResStr(IDS_AG_NEXT));
 
 	buttons[4].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[4].dwFlags = THBF_ENABLED;
 	buttons[4].iId = IDTB_BUTTON5;
 	buttons[4].iBitmap = 5;
-	StringCchCopyW(buttons[4].szTip, _countof(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN));
+	StringCchCopyW(buttons[4].szTip, std::size(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN));
 
 	HICON hIcon = nullptr;
 

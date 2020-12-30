@@ -1,0 +1,17 @@
+<svg width="540" height="90" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<defs>
+  <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1"/>
+    <stop offset="100%" style="stop-color:#808080;stop-opacity:1"/>
+  </linearGradient>
+</defs>
+
+<path fill="url(#icon-gradient)" stroke="black" d="M18,17 h10 v56 h-10 z m54,0 v56 h-8 l-28,-28 l28,-28 z"/>
+<path fill="url(#icon-gradient)" stroke="black" d="M107,23 a6,6 0 0,1 6,-6 h44 a6,6 0 0,1 6,6 v44 a6,6 0 0,1 -6,6 h-44 a6,6 0 0,1 -6,-6 z"/>
+<path fill="url(#icon-gradient)" stroke="black" d="M200,12 h15 v66 h-15 z m35,0 h15 v66 h-15 z"/>
+<path fill="url(#icon-gradient)" stroke="black" d="M285,12 h10 l50,33 l-50,33 h-10 z"/>
+<path fill="url(#icon-gradient)" stroke="black" d="M378,17 h8 l28,28 l-28,28 h-8 z m54,0 v56 h-10 v-56 z"/>
+<path fill="url(#icon-gradient)" stroke="black" d="M465,40 h7.5 v27.5 h27.5 v7.5 h-35 z m22.5,-2.5 h15 v15 h-15 z m2.5,-22.5 h35 v35 h-7.5 v-27.5 h-27.5 z"/>
+
+</svg>
