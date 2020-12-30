@@ -18674,7 +18674,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 					height = GetSystemMetrics(SM_CYICON);
 				} else {
 					// for Windows 7, 8.1
-					height = ScaleY(8); // Don't use GetSystemMetrics(SM_CYICON) here!
+					height = ScaleY(18); // Don't use GetSystemMetrics(SM_CYICON) here!
 				}
 				hBitmap = svgFlybar.Rasterize(width, height);
 			}
