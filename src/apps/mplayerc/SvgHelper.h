@@ -35,6 +35,7 @@ public:
 	void Clear();
 	bool Load(char* svgData);
 	bool Load(const wchar_t* filename);
+	bool Load(UINT resid);
 	HBITMAP Rasterize(int& w, int& h); // if the dimension is zero, then it will be set automatically
 	bool Rasterize(CBitmap& bitmap, int& w, int& h); // if the dimension is zero, then it will be set automatically
 

@@ -21,14 +21,12 @@
 #include "stdafx.h"
 
 #define NANOSVG_IMPLEMENTATION
-#pragma warning(push)
-#pragma warning(disable:4244)
 #include "../../ExtLib/nanosvg/src/nanosvg.h"
-#pragma warning(pop)
 #define NANOSVGRAST_IMPLEMENTATION
 #include "../../ExtLib/nanosvg/src/nanosvgrast.h"
 
 #include "SvgHelper.h"
+#include "Misc.h"
 
 CSvgImage::~CSvgImage()
 {
@@ -111,6 +109,16 @@ bool CSvgImage::Load(const wchar_t* filename)
 			}
 		}
 		fclose(file);
+	}
+
+	return false;
+}
+
+bool CSvgImage::Load(UINT resid)
+{
+	CStringA svgData;
+	if (LoadResource(resid, svgData, L"FILE")) {
+		return Load(svgData.GetBuffer());
 	}
 
 	return false;
