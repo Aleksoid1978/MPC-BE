@@ -18659,28 +18659,20 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
 	if (SUCCEEDED(hr)) {
 		HBITMAP hBitmap = nullptr;
-		int width, height;
-		BYTE* data;
-		UINT size;
+		int width = 0, height;
 
-		HRESULT hr = LoadResourceFile(IDB_WIN_TASKBAR_TOOLBAR, &data, size);
-		if (SUCCEEDED(hr)) {
-			CStringA tmp((char*)data, size);
-			CSvgImage svgFlybar;
-			hr = svgFlybar.Load(tmp.GetBuffer()) ? S_OK : E_FAIL;
-			if (svgFlybar.IsLoad()) {
-				width = 0;
-				if (SysVersion::IsWin10orLater()) {
-					height = GetSystemMetrics(SM_CYICON);
-				} else {
-					// for Windows 7, 8.1
-					height = ScaleY(18); // Don't use GetSystemMetrics(SM_CYICON) here!
-				}
-				hBitmap = svgFlybar.Rasterize(width, height);
+		CSvgImage svgFlybar;
+		if (svgFlybar.Load(IDB_WIN_TASKBAR_TOOLBAR)) {
+			if (SysVersion::IsWin10orLater()) {
+				height = GetSystemMetrics(SM_CYICON);
+			} else {
+				// for Windows 7, 8.1
+				height = ScaleY(18); // Don't use GetSystemMetrics(SM_CYICON) here!
 			}
+			hBitmap = svgFlybar.Rasterize(width, height);
 		}
 
-		if (FAILED(hr) || !hBitmap) {
+		if (!hBitmap) {
 			m_pTaskbarList->Release();
 			return E_FAIL;
 		}
@@ -18691,7 +18683,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		// Add the bitmap
 		ImageList_Add(himl, hBitmap, 0);
 		DeleteObject(hBitmap);
-		hr = m_pTaskbarList->ThumbBarSetImageList(m_hWnd, himl);
+		HRESULT hr = m_pTaskbarList->ThumbBarSetImageList(m_hWnd, himl);
 
 		if (SUCCEEDED(hr)) {
 			THUMBBUTTON buttons[5] = {};
