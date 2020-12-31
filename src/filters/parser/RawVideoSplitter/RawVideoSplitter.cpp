@@ -917,52 +917,84 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_RAWType == RAW_NONE) {
 		m_pFile->Seek(0);
 
-		auto size = std::min((__int64)64 * KILOBYTE, m_pFile->GetLength());
+		auto size = std::min<__int64>(64 * KILOBYTE, m_pFile->GetLength());
 		std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[size]);
 		if (ptr && m_pFile->ByteRead(ptr.get(), size) == S_OK) {
 			AV1Parser::AV1SequenceParameters seq_params;
 			std::vector<uint8_t> obu_sequence_header;
 			if (AV1Parser::ParseOBU(ptr.get(), size, seq_params, obu_sequence_header)) {
-				mt.SetTemporalCompression(TRUE);
-				mt.SetVariableSize();
-				mt.majortype = MEDIATYPE_Video;
-				mt.subtype = MEDIASUBTYPE_AV01;
-				mt.formattype = FORMAT_VIDEOINFO2;
+				auto ParseObuHeader = [](CBaseSplitterFileEx* pFile, uint8_t& obu_type) -> int64_t {
+					const auto pos = pFile->GetPos();
 
-				VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 8 + obu_sequence_header.size());
-				memset(vih2, 0, mt.FormatLength());
-				vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-				vih2->bmiHeader.biWidth = seq_params.width;
-				vih2->bmiHeader.biHeight = seq_params.height;
-				vih2->bmiHeader.biPlanes = 1;
-				vih2->bmiHeader.biBitCount = 24;
-				vih2->bmiHeader.biCompression = FCC('AV01');
-				vih2->bmiHeader.biSizeImage = DIBSIZE(vih2->bmiHeader);
-				vih2->dwInterlaceFlags = 0;
-				vih2->rcSource = vih2->rcTarget = { 0, 0, (LONG)seq_params.width, (LONG)seq_params.height };
+					static BYTE buf[AV1Parser::MAX_OBU_HEADER_SIZE] = {};
+					if (pFile->ByteRead(buf, AV1Parser::MAX_OBU_HEADER_SIZE) != S_OK) {
+						return -1;
+					}
+					pFile->Seek(pos);
 
-				BYTE* extra = (BYTE*)(vih2 + 1);
-				memcpy(extra, "av1C", 4);
+					return AV1Parser::ParseOBUHeaderSize(buf, AV1Parser::MAX_OBU_HEADER_SIZE, obu_type);
+				};
 
-				CBitsWriter bw(extra + 4, 4);
-				bw.writeBits(1, 1); // marker
-				bw.writeBits(7, 1); // version
-				bw.writeBits(3, seq_params.profile);
-				bw.writeBits(5, seq_params.level);
-				bw.writeBits(1, seq_params.tier);
-				bw.writeBits(1, seq_params.bitdepth > 8);
-				bw.writeBits(1, seq_params.bitdepth == 12);
-				bw.writeBits(1, seq_params.monochrome);
-				bw.writeBits(1, seq_params.chroma_subsampling_x);
-				bw.writeBits(1, seq_params.chroma_subsampling_y);
-				bw.writeBits(2, seq_params.chroma_sample_position);
-				bw.writeBits(8, 0); // padding
+				m_pFile->Seek(0);
+				size = std::min<__int64>(MEGABYTE, m_pFile->GetLength());
+				auto bFrameFound = false;
+				while (m_pFile->GetPos() <= size) {
+					uint8_t obu_type = 0;
+					const auto obuSize = ParseObuHeader(m_pFile, obu_type);
+					if (obuSize == -1) {
+						break;
+					}
 
-				memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+					if (obu_type == AV1Parser::AV1_OBU_Type::AV1_OBU_FRAME) {
+						bFrameFound = true;
+						break;
+					}
 
-				mts.push_back(mt);
-				m_RAWType = RAW_AV1_OBU;
-				pName = L"AV1 Video Output";
+					m_pFile->Skip(obuSize);
+				}
+
+				if (bFrameFound) {
+					mt.SetTemporalCompression(TRUE);
+					mt.SetVariableSize();
+					mt.majortype = MEDIATYPE_Video;
+					mt.subtype = MEDIASUBTYPE_AV01;
+					mt.formattype = FORMAT_VIDEOINFO2;
+
+					VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 8 + obu_sequence_header.size());
+					memset(vih2, 0, mt.FormatLength());
+					vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+					vih2->bmiHeader.biWidth = seq_params.width;
+					vih2->bmiHeader.biHeight = seq_params.height;
+					vih2->bmiHeader.biPlanes = 1;
+					vih2->bmiHeader.biBitCount = 24;
+					vih2->bmiHeader.biCompression = FCC('AV01');
+					vih2->bmiHeader.biSizeImage = DIBSIZE(vih2->bmiHeader);
+					vih2->dwInterlaceFlags = 0;
+					vih2->rcSource = vih2->rcTarget = { 0, 0, (LONG)seq_params.width, (LONG)seq_params.height };
+
+					BYTE* extra = (BYTE*)(vih2 + 1);
+					memcpy(extra, "av1C", 4);
+
+					CBitsWriter bw(extra + 4, 4);
+					bw.writeBits(1, 1); // marker
+					bw.writeBits(7, 1); // version
+					bw.writeBits(3, seq_params.profile);
+					bw.writeBits(5, seq_params.level);
+					bw.writeBits(1, seq_params.tier);
+					bw.writeBits(1, seq_params.bitdepth > 8);
+					bw.writeBits(1, seq_params.bitdepth == 12);
+					bw.writeBits(1, seq_params.monochrome);
+					bw.writeBits(1, seq_params.chroma_subsampling_x);
+					bw.writeBits(1, seq_params.chroma_subsampling_y);
+					bw.writeBits(2, seq_params.chroma_sample_position);
+					bw.writeBits(8, 0); // padding
+
+					memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+
+					mts.push_back(mt);
+					m_RAWType = RAW_AV1_OBU;
+					pName = L"AV1 Video Output";
+				}
 			}
 		}
 	}
