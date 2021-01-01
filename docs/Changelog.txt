@@ -27,23 +27,28 @@ Added support for AV1 OBU files.
 
 MatroskaSplitter
 Fixed playback of some VFW type videos.
+Fixed reading HDR data for VP9.
+
+MP4Splitter
+Added pixel format detection for DNxHD.
+Fixed playing files from "edit list".
+Fixed getting frame sizes and aspect ratios for some MOV files.
 
 MpaDecFilter
 Fixed encoding in AC-3. Added check for SPDIF output at 44100 Hz.
 
 MPCVideoDec
 Improved AV1 multithreading decoding.
+The DXVA2 decoder will only connect for compatible media types.
+
+AudioSwitcher
+Fixed turning off the mixer when not required.
 
 MpcAudioRenderer
 Fixed playback of DVD-Video with no sound in the menu.
 
-Видеорендереры
-Исправлено преобразование HLG в SDR для EVR-CP.
-Исправлен показ первого кадра в некоторых ситуациях для EVR-CP.
-Небольшая оптимизация EVR-CP и Sync.
-
 Video renderers
-Fixed HLG to SDR conversion for EVR-CP.
+Fixed display of HLG for EVR-CP.
 Fixed showing the first frame in some situations for EVR-CP.
 Minor optimization of EVR-CP and Sync.
 
@@ -53,7 +58,9 @@ Fixed flickering of some subtitles.
 Youtube
 User pages like https://www.youtube.com/c/ are now parsed as playlists.
 Added check for the availability of the received link.
-Fixed opening of some links.
+Fixed opening of various links.
+Improved YouTube format selection menu.
+Added the ability to open only the audio track for a YouTube video.
 
 Player
 WIC is now used for imaging instead of GDI +.
@@ -77,6 +84,10 @@ Improved OSD functionality when displaying permanent messages.
 Fixed various issues for exclusive full screen.
 Optimized Seek Bar output for an exclusive full screen.
 Added the ability to assign a hotkey for calling the "After playback" menu.
+Improved work on multiple displays and different DPI systems.
+Rotation and Flip commands have been added to the "Pan & Scan" submenu.
+Added the ability to add all media files in a folder when adding one file.
+Added support for loading external flybar.svg.
 
 ShellExt
 Fixed freeze when opening files from qBittorrent.
