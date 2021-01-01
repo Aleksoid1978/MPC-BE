@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,13 +59,20 @@ class CPPageMouse : public CPPageBase
 		std::vector<WORD> ids;
 		std::list<CString> str_list;
 
-		void Add(WORD id, UINT str_id) {
-			ASSERT(ids.size() == str_list.size());
+		void Add(const WORD id)
+		{
 			ids.emplace_back(id);
-			if (str_id) {
-				str_list.emplace_back(ResStr(str_id));
-			} else {
+			if (id == 0) {
 				str_list.emplace_back(L"");
+			} else {
+				auto& wmcmds = AfxGetAppSettings().wmcmds;
+				for (const auto& wc : wmcmds) {
+					if (id == wc.cmd) {
+						str_list.emplace_back(ResStr(wc.dwname));
+						break;
+					}
+				}
+				ASSERT(ids.size() == str_list.size());
 			}
 		}
 	};

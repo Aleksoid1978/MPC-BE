@@ -1361,6 +1361,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	// Mouse
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT, str)) {
 		swscanf_s(str, L"%u", &nMouseLeftClick);
+		if (nMouseLeftClick != 0 && nMouseLeftClick != ID_PLAY_PLAYPAUSE) {
+			nMouseLeftClick = ID_PLAY_PLAYPAUSE;
+		}
 	}
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_DBLCLICK, str)) {
 		swscanf_s(str, L"%u", &nMouseLeftDblClick);

@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,33 +29,33 @@ CPPageMouse::CPPageMouse()
 	: CPPageBase(CPPageMouse::IDD, CPPageMouse::IDD)
 	, m_list(0)
 {
-	m_comands_M.Add(0, 0);
-	m_comands_M.Add(ID_PLAY_PLAYPAUSE,    IDS_AG_PLAYPAUSE);
-	m_comands_M.Add(ID_VIEW_FULLSCREEN,   IDS_AG_FULLSCREEN);
-	m_comands_M.Add(ID_VIEW_FULLSCREEN_2, IDS_AG_FULLSCREEN_2);
-	m_comands_M.Add(ID_VIEW_PLAYLIST,     IDS_AG_TOGGLE_PLAYLIST);
-	m_comands_M.Add(ID_BOSS,              IDS_AG_BOSS_KEY);
+	m_comands_M.Add(0);
+	m_comands_M.Add(ID_PLAY_PLAYPAUSE);
+	m_comands_M.Add(ID_VIEW_FULLSCREEN);
+	m_comands_M.Add(ID_VIEW_FULLSCREEN_2);
+	m_comands_M.Add(ID_VIEW_PLAYLIST);
+	m_comands_M.Add(ID_BOSS);
 
-	m_comands_X.Add(0, 0);
-	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARD,     IDS_AG_NEXT);
-	m_comands_X.Add(ID_NAVIGATE_SKIPBACK,        IDS_AG_PREVIOUS);
-	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
-	m_comands_X.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
-	m_comands_X.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
-	m_comands_X.Add(ID_PLAY_SEEKFORWARDMED,      IDS_AG_JUMP_FORWARD_2);
-	m_comands_X.Add(ID_FILE_CLOSEPLAYLIST,       IDS_AG_CLOSE);
+	m_comands_X.Add(0);
+	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARD);
+	m_comands_X.Add(ID_NAVIGATE_SKIPBACK);
+	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARDFILE);
+	m_comands_X.Add(ID_NAVIGATE_SKIPBACKFILE);
+	m_comands_X.Add(ID_PLAY_SEEKBACKWARDMED);
+	m_comands_X.Add(ID_PLAY_SEEKFORWARDMED);
+	m_comands_X.Add(ID_FILE_CLOSEPLAYLIST);
 
-	m_comands_W.Add(0, 0);
-	m_comands_W.Add(ID_VOLUME_UP,                IDS_AG_VOLUME_UP);
-	m_comands_W.Add(ID_VOLUME_DOWN,              IDS_AG_VOLUME_DOWN);
-	m_comands_W.Add(ID_PLAY_INCRATE,             IDS_AG_INCREASE_RATE);
-	m_comands_W.Add(ID_PLAY_DECRATE,             IDS_AG_DECREASE_RATE);
-	m_comands_W.Add(ID_PLAY_SEEKFORWARDMED,      IDS_AG_JUMP_FORWARD_2);
-	m_comands_W.Add(ID_PLAY_SEEKBACKWARDMED,     IDS_AG_JUMP_BACKWARD_2);
-	m_comands_W.Add(ID_NAVIGATE_SKIPFORWARDFILE, IDS_AG_NEXT_FILE);
-	m_comands_W.Add(ID_NAVIGATE_SKIPBACKFILE,    IDS_AG_PREVIOUS_FILE);
-	m_comands_W.Add(ID_SUB_DELAY_INC,            IDS_AG_SUBDELAY_INC);
-	m_comands_W.Add(ID_SUB_DELAY_DEC,            IDS_AG_SUBDELAY_DEC);
+	m_comands_W.Add(0);
+	m_comands_W.Add(ID_VOLUME_UP);
+	m_comands_W.Add(ID_VOLUME_DOWN);
+	m_comands_W.Add(ID_PLAY_INCRATE);
+	m_comands_W.Add(ID_PLAY_DECRATE);
+	m_comands_W.Add(ID_PLAY_SEEKFORWARDMED);
+	m_comands_W.Add(ID_PLAY_SEEKBACKWARDMED);
+	m_comands_W.Add(ID_NAVIGATE_SKIPFORWARDFILE);
+	m_comands_W.Add(ID_NAVIGATE_SKIPBACKFILE);
+	m_comands_W.Add(ID_SUB_DELAY_INC);
+	m_comands_W.Add(ID_SUB_DELAY_DEC);
 }
 
 CPPageMouse::~CPPageMouse()
@@ -130,31 +130,31 @@ BOOL CPPageMouse::OnInitDialog()
 	m_table_values[ROW_BTN_M][COL_CMD]    = s.MouseMiddleClick.normal;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = s.MouseMiddleClick.ctrl;
 	m_table_values[ROW_BTN_M][COL_SHIFT]  = s.MouseMiddleClick.shift;
-	m_table_values[ROW_BTN_M][COL_RBTN]  = s.MouseMiddleClick.rbtn;
+	m_table_values[ROW_BTN_M][COL_RBTN]   = s.MouseMiddleClick.rbtn;
 	m_table_values[ROW_BTN_X1][COL_CMD]   = s.MouseX1Click.normal;
 	m_table_values[ROW_BTN_X1][COL_CTRL]  = s.MouseX1Click.ctrl;
 	m_table_values[ROW_BTN_X1][COL_SHIFT] = s.MouseX1Click.shift;
-	m_table_values[ROW_BTN_X1][COL_RBTN] = s.MouseX1Click.rbtn;
+	m_table_values[ROW_BTN_X1][COL_RBTN]  = s.MouseX1Click.rbtn;
 	m_table_values[ROW_BTN_X2][COL_CMD]   = s.MouseX2Click.normal;
 	m_table_values[ROW_BTN_X2][COL_CTRL]  = s.MouseX2Click.ctrl;
 	m_table_values[ROW_BTN_X2][COL_SHIFT] = s.MouseX2Click.shift;
-	m_table_values[ROW_BTN_X2][COL_RBTN] = s.MouseX2Click.rbtn;
+	m_table_values[ROW_BTN_X2][COL_RBTN]  = s.MouseX2Click.rbtn;
 	m_table_values[ROW_WHL_U][COL_CMD]    = s.MouseWheelUp.normal;
 	m_table_values[ROW_WHL_U][COL_CTRL]   = s.MouseWheelUp.ctrl;
 	m_table_values[ROW_WHL_U][COL_SHIFT]  = s.MouseWheelUp.shift;
-	m_table_values[ROW_WHL_U][COL_RBTN]  = s.MouseWheelUp.rbtn;
+	m_table_values[ROW_WHL_U][COL_RBTN]   = s.MouseWheelUp.rbtn;
 	m_table_values[ROW_WHL_D][COL_CMD]    = s.MouseWheelDown.normal;
 	m_table_values[ROW_WHL_D][COL_CTRL]   = s.MouseWheelDown.ctrl;
 	m_table_values[ROW_WHL_D][COL_SHIFT]  = s.MouseWheelDown.shift;
-	m_table_values[ROW_WHL_D][COL_RBTN]  = s.MouseWheelDown.rbtn;
+	m_table_values[ROW_WHL_D][COL_RBTN]   = s.MouseWheelDown.rbtn;
 	m_table_values[ROW_WHL_L][COL_CMD]    = s.MouseWheelLeft.normal;
 	m_table_values[ROW_WHL_L][COL_CTRL]   = s.MouseWheelLeft.ctrl;
 	m_table_values[ROW_WHL_L][COL_SHIFT]  = s.MouseWheelLeft.shift;
-	m_table_values[ROW_WHL_L][COL_RBTN]  = s.MouseWheelLeft.rbtn;
+	m_table_values[ROW_WHL_L][COL_RBTN]   = s.MouseWheelLeft.rbtn;
 	m_table_values[ROW_WHL_R][COL_CMD]    = s.MouseWheelRight.normal;
 	m_table_values[ROW_WHL_R][COL_CTRL]   = s.MouseWheelRight.ctrl;
 	m_table_values[ROW_WHL_R][COL_SHIFT]  = s.MouseWheelRight.shift;
-	m_table_values[ROW_WHL_R][COL_RBTN]  = s.MouseWheelRight.rbtn;
+	m_table_values[ROW_WHL_R][COL_RBTN]   = s.MouseWheelRight.rbtn;
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
