@@ -126,6 +126,7 @@ protected:
 	REFERENCE_TIME							m_rtStartCache;
 
 	DWORD									m_dwSYNC;
+	DWORD									m_dwSYNC2;
 
 	CMediaType								m_pCurrentMediaType;
 
