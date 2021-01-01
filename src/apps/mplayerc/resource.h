@@ -641,6 +641,7 @@
 #define IDD_SHADERNEW_DLG               10067
 #define IDD_CMD_LINE_HELP               10068
 #define IDD_PLAYLISTNAME                10069
+#define IDD_ADDCOMMAND_DLG              10070
 // nameless controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
