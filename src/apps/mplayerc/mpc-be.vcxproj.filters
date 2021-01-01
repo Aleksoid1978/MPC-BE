@@ -414,6 +414,9 @@
     <ClCompile Include="SvgHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AddCommandDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -793,6 +796,9 @@
     </ClInclude>
     <ClInclude Include="SvgHelper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddCommandDlg.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
