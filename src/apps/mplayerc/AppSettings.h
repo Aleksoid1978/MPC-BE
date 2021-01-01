@@ -350,10 +350,15 @@ public:
 		this->cmd = cmd;
 	}
 
-	wmcmd(WORD cmd, WORD key, BYTE fVirt, DWORD dwname, UINT appcmd = 0, UINT mouse = NONE, UINT mouseFS = NONE, LPCSTR rmcmd = "", int rmrepcnt = 5) {
+	wmcmd(WORD cmd,  DWORD dwname,
+		WORD key = 0, BYTE fVirt = 0,
+		UINT appcmd = 0,
+		UINT mouse = NONE, UINT mouseFS = NONE,
+		LPCSTR rmcmd = "", int rmrepcnt = 5)
+	{
 		this->cmd      = cmd;
 		this->key      = key;
-		this->fVirt    = fVirt;
+		this->fVirt    = fVirt|FVIRTKEY|FNOINVERT;
 		this->dwname   = dwname;
 		this->appcmd   = backup_appcmd  = appcmd;
 		this->mouse    = backup_mouse   = mouse;
