@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -991,8 +991,8 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 			}
 		}
 		break;
-	case ID_FILE_OPENQUICK:
-		m_strTipText = ResStr(IDS_MPLAYERC_0) + L" | " + ResStr(IDS_RECENT_FILES);
+	case ID_FILE_OPENFILE:
+		m_strTipText = ResStr(IDS_AG_OPEN_FILE) + L" | " + ResStr(IDS_RECENT_FILES);
 		break;
 	case ID_NAVIGATE_SKIPBACK:
 		m_strTipText = ResStr(IDS_AG_PREVIOUS) + L" | " + ResStr(IDS_AG_PREVIOUS_FILE);
