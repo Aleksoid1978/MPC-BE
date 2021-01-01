@@ -49,7 +49,7 @@
 #define MPC_WND_CLASS_NAMEW     _CRT_WIDE(MPC_WND_CLASS_NAME)
 
 #define MPC_COMP_NAME_STR       L"MPC-BE Team"
-#define MPC_COPYRIGHT_STR       L"Copyright © 2002-2020 all contributors, see Authors.txt"
+#define MPC_COPYRIGHT_STR       L"Copyright © 2002-2021 all contributors, see Authors.txt"
 
 #define MPC_VERSION_NUM         MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH
 #define MPC_VERSION_STR         MAKE_STR(MPC_VERSION_MAJOR) "." MAKE_STR(MPC_VERSION_MINOR) "." MAKE_STR(MPC_VERSION_PATCH)
