@@ -156,7 +156,7 @@
 #define IDF_SHADER_PS20_CONVERT_TO_INTERLACE 785
 
 // commands
-#define ID_FILE_OPENMEDIA               800
+#define ID_FILE_OPENFILEURL             800
 #define ID_FILE_OPENDVD                 801
 #define ID_FILE_OPENDEVICE              802
 #define ID_FILE_CLOSEMEDIA              803
@@ -307,7 +307,7 @@
 #define ID_STREAM_VIDEO_PREV            962
 #define ID_REPEAT_FOREVER               967
 #define ID_VIEW_ZOOM_AUTOFIT            968
-#define ID_FILE_OPENQUICK               969
+#define ID_FILE_OPENFILE                969
 #define ID_VOLUME_GAIN_INC              970
 #define ID_VOLUME_GAIN_DEC              971
 #define ID_VOLUME_GAIN_OFF              972
@@ -1059,8 +1059,8 @@
 #define IDS_PIXELSHADERCOMPILER_0       32874
 #define IDS_PIXELSHADERCOMPILER_1       32875
 #define IDS_AG_NOT_KNOWN                32876
-#define IDS_MPLAYERC_0                  32877
-#define IDS_AG_OPEN_FILE                32878
+#define IDS_AG_OPEN_FILE                32877
+#define IDS_AG_OPEN_FILEURL             32878
 #define IDS_AG_OPEN_DVD                 32879
 #define IDS_AG_OPEN_DEVICE              32880
 #define IDS_AG_SAVE_AS                  32881
@@ -1106,10 +1106,10 @@
 #define IDS_AG_ALWAYS_ON_TOP            32921
 #define IDS_AG_PNS_INC_SIZE             32922
 #define IDS_AG_PNS_INC_WIDTH            32923
-#define IDS_MPLAYERC_47                 32924
+#define IDS_AG_PNS_INC_HEIGHT           32924
 #define IDS_AG_PNS_DEC_SIZE             32925
 #define IDS_AG_PNS_DEC_WIDTH            32926
-#define IDS_MPLAYERC_50                 32927
+#define IDS_AG_PNS_DEC_HEIGHT           32927
 #define IDS_AG_PNS_CENTER               32928
 #define IDS_AG_PNS_LEFT                 32929
 #define IDS_AG_PNS_RIGHT                32930
@@ -1118,7 +1118,7 @@
 #define IDS_AG_PNS_UPLEFT               32933
 #define IDS_AG_PNS_UPRIGHT              32934
 #define IDS_AG_PNS_DOWNLEFT             32935
-#define IDS_MPLAYERC_59                 32936
+#define IDS_AG_PNS_DOWNRIGHT            32936
 #define IDS_AG_VOLUME_UP                32937
 #define IDS_AG_VOLUME_DOWN              32938
 #define IDS_AG_VOLUME_MUTE              32939
@@ -1144,8 +1144,8 @@
 #define IDS_AG_PREV_AUDIO               32959
 #define IDS_AG_NEXT_SUBTITLE            32960
 #define IDS_AG_PREV_SUBTITLE            32961
-#define IDS_MPLAYERC_85                 32962
-#define IDS_MPLAYERC_86                 32963
+#define IDS_AG_SUBTITLE_ONOFF           32962
+#define IDS_AG_SUBTITLE_RELOAD          32963
 #define IDS_AG_NEXT_VIDEO               32968
 #define IDS_AG_PREV_VIDEO               32969
 #define IDS_REPEAT_FOREVER              32970
