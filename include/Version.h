@@ -1,7 +1,7 @@
 #ifndef ISPP_INVOKED
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@
 // MPC_VERSION_STATUS: 0 - beta; 1 - stable
 
 #define MPC_WND_CLASS_NAME      "MPC-BE"
-#define MPC_YEAR_COMMENTS       "2002-2020"
+#define MPC_YEAR_COMMENTS       "2002-2021"
 #define MPC_VERSION_COMMENTS    "http://sourceforge.net/projects/mpcbe/"
 
 #ifndef ISPP_INVOKED
