@@ -1021,6 +1021,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bRVDropBFrameTimings(FALSE)
 	, m_bInterlaced(FALSE)
 	, m_dwSYNC(0)
+	, m_dwSYNC2(0)
 	, m_bDecodingStart(FALSE)
 	, m_bHighBitdepth(FALSE)
 	, m_dRate(1.0)
@@ -1886,17 +1887,19 @@ redo:
 				}
 
 				f.Read(&m_dwSYNC, sizeof(m_dwSYNC));
+				f.Seek(4, CFile::current);
+				f.Read(&m_dwSYNC2, sizeof(m_dwSYNC2));
 				f.Close();
 			}
 		};
 
 		auto IsAVI = [&]() {
 			ReadSourceHeader();
-			return (m_dwSYNC == MAKEFOURCC('R','I','F','F'));
+			return (m_dwSYNC == FCC('RIFF') && (m_dwSYNC2 == FCC('AVI ') || m_dwSYNC == FCC('AVIX') || m_dwSYNC == FCC('AMV ')));
 		};
 		auto IsOGG = [&]() {
 			ReadSourceHeader();
-			return (m_dwSYNC == MAKEFOURCC('O','g','g','S'));
+			return (m_dwSYNC == FCC('OggS'));
 		};
 
 		// Enable B-Frame reorder
