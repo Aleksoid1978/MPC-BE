@@ -57,7 +57,7 @@ BOOL CAddCommandDlg::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	for (int i = 0; i < s.wmcmds.size(); i++) {
+	for (int i = 0; i < (int)s.wmcmds.size(); i++) {
 		const wmcmd& wc = s.wmcmds[i];
 
 		m_list.InsertItem(i, wc.GetName());
