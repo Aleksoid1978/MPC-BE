@@ -61,19 +61,20 @@ class CPPageMouse : public CPPageBase
 
 		void Add(const WORD id)
 		{
-			ids.emplace_back(id);
 			if (id == 0) {
+				ids.emplace_back(id);
 				str_list.emplace_back(L"");
 			} else {
 				auto& wmcmds = AfxGetAppSettings().wmcmds;
 				for (const auto& wc : wmcmds) {
 					if (id == wc.cmd) {
+						ids.emplace_back(id);
 						str_list.emplace_back(ResStr(wc.dwname));
 						break;
 					}
 				}
-				ASSERT(ids.size() == str_list.size());
 			}
+			ASSERT(ids.size() == str_list.size());
 		}
 	};
 

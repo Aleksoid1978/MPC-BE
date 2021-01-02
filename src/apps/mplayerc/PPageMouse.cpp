@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
+#include "../../DSUtil/std_helper.h"
 #include "PPageMouse.h"
 
 // CPPageMouse dialog
@@ -155,6 +156,17 @@ BOOL CPPageMouse::OnInitDialog()
 	m_table_values[ROW_WHL_R][COL_CTRL]   = s.MouseWheelRight.ctrl;
 	m_table_values[ROW_WHL_R][COL_SHIFT]  = s.MouseWheelRight.shift;
 	m_table_values[ROW_WHL_R][COL_RBTN]   = s.MouseWheelRight.rbtn;
+
+	for (int i = ROW_BTN_M; i < ROW_COUNT; i++) {
+		for (int j = COL_CMD; j < COL_COUNT; j++) {
+			WORD id = (WORD)m_table_values[i][j];
+			MOUSE_COMMANDS* mc = m_table_comands[i][j];
+
+			if (mc && !Contains(mc->ids, id)) {
+				mc->Add(id);
+			}
+		}
+	}
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
