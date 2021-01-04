@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,7 +70,7 @@ private:
 	CRect r_LockIcon;
 
 	CToolTipCtrl m_tooltip;
-	CImageList *m_pButtonsImages = nullptr;
+	CImageList *m_pButtonImages = nullptr;
 
 	CSvgImage m_svgFlybar;
 
@@ -90,7 +90,7 @@ public:
 	void Scale();
 
 private:
-	bool CreateFromExternal();
+	bool UpdateButtonImages();
 
 	void DrawButton(CDC *pDC, int nImage, int x, int z);
 	void UpdateWnd(CPoint point);

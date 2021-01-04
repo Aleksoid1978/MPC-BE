@@ -18662,7 +18662,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		int width = 0, height;
 
 		CSvgImage svgFlybar;
-		if (svgFlybar.Load(IDB_WIN_TASKBAR_TOOLBAR)) {
+		if (svgFlybar.Load(IDF_SVG_TASKBAR_BUTTONS)) {
 			if (SysVersion::IsWin10orLater()) {
 				height = GetSystemMetrics(SM_CYICON);
 			} else {

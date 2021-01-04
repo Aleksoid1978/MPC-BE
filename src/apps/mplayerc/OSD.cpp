@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -75,47 +75,11 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
 
-	m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
-	if (CreateFromExternal()) {
-		return;
+	bool ok = m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
+	if (!ok) {
+		ok = m_svgFlybar.Load(IDF_SVG_FLYBAR);
 	}
-
-	HBITMAP hBitmap = nullptr;
-
-	CComPtr<IWICBitmap> pBitmap;
-	UINT width, height;
-
-	HRESULT hr = WicLoadImage(&pBitmap, true, (::GetProgramDir() + L"flybar.png").GetString());
-
-	if (FAILED(hr)) {
-		BYTE* data;
-		UINT size;
-		hr = LoadResourceFile(IDB_PLAYERFLYBAR_PNG, &data, size);
-		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmap, true, data, size);
-		}
-	}
-
-	if (SUCCEEDED(hr)) {
-		hr = pBitmap->GetSize(&width, &height);
-	}
-	if (SUCCEEDED(hr) && width == height * 25) {
-		hr = WicCreateHBitmap(hBitmap, pBitmap);
-	}
-
-	if (SUCCEEDED(hr)) {
-		CBitmap *bitmap = DNew CBitmap();
-		bitmap->Attach(hBitmap);
-
-		m_pButtonsImages = DNew CImageList();
-		m_pButtonsImages->Create(height, height, ILC_COLOR32 | ILC_MASK, 1, 0);
-		m_pButtonsImages->Add(bitmap, nullptr);
-
-		m_nButtonHeight = height;
-
-		delete bitmap;
-		DeleteObject(hBitmap);
-	}
+	UpdateButtonImages();
 }
 
 COSD::~COSD()
@@ -126,8 +90,8 @@ COSD::~COSD()
 		m_MemDC.DeleteDC();
 	}
 
-	if (m_pButtonsImages) {
-		delete m_pButtonsImages;
+	if (m_pButtonImages) {
+		delete m_pButtonImages;
 	}
 }
 
@@ -266,7 +230,7 @@ void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 	m_OSDType	= OSD_TYPE_BITMAP;
 
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
-	CreateFromExternal();
+	UpdateButtonImages();
 	CreateFontInternal();
 
 	Reset();
@@ -292,7 +256,7 @@ void COSD::Start(CWnd* pWnd)
 	m_OSDType	= OSD_TYPE_GDI;
 
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
-	CreateFromExternal();
+	UpdateButtonImages();
 	CreateFontInternal();
 
 	Reset();
@@ -420,8 +384,8 @@ void COSD::DrawFlyBar()
 	const int nImageExit = m_bMouseOverExitButton ? IMG_EXIT_A : IMG_EXIT;
 	const int nImageClose = m_bMouseOverCloseButton ? IMG_CLOSE_A : IMG_CLOSE;
 
-	m_pButtonsImages->Draw(&m_MemDC, nImageExit, m_rectExitButton.TopLeft(), ILD_NORMAL);
-	m_pButtonsImages->Draw(&m_MemDC, nImageClose, m_rectCloseButton.TopLeft(), ILD_NORMAL);
+	m_pButtonImages->Draw(&m_MemDC, nImageExit, m_rectExitButton.TopLeft(), ILD_NORMAL);
+	m_pButtonImages->Draw(&m_MemDC, nImageClose, m_rectCloseButton.TopLeft(), ILD_NORMAL);
 }
 
 void COSD::DrawMessage()
@@ -1026,13 +990,13 @@ void COSD::OverrideDPI(int dpix, int dpiy)
 {
 	CDPI::OverrideDPI(dpix, dpiy);
 
-	CreateFromExternal();
+	UpdateButtonImages();
 
 	m_FontSizeCashed = 0;
 	DrawWnd();
 }
 
-bool COSD::CreateFromExternal()
+bool COSD::UpdateButtonImages()
 {
 	if (m_svgFlybar.IsLoad()) {
 		int w = 0;
@@ -1044,10 +1008,10 @@ bool COSD::CreateFromExternal()
 					CBitmap* bitmap = DNew CBitmap();
 					bitmap->Attach(hBitmap);
 
-					SAFE_DELETE(m_pButtonsImages);
-					m_pButtonsImages = DNew CImageList();
-					m_pButtonsImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
-					m_pButtonsImages->Add(bitmap, nullptr);
+					SAFE_DELETE(m_pButtonImages);
+					m_pButtonImages = DNew CImageList();
+					m_pButtonImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+					m_pButtonImages->Add(bitmap, nullptr);
 
 					m_nButtonHeight = h;
 					delete bitmap;
@@ -1055,7 +1019,7 @@ bool COSD::CreateFromExternal()
 				DeleteObject(hBitmap);
 			}
 
-			if (m_pButtonsImages) {
+			if (m_pButtonImages) {
 				return true;
 			}
 		}
