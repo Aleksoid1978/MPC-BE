@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "../../DSUtil/std_helper.h"
+#include "AddCommandDlg.h"
 #include "PPageMouse.h"
 
 // CPPageMouse dialog
@@ -36,6 +37,7 @@ CPPageMouse::CPPageMouse()
 	m_comands_M.Add(ID_VIEW_FULLSCREEN_2);
 	m_comands_M.Add(ID_VIEW_PLAYLIST);
 	m_comands_M.Add(ID_BOSS);
+	m_comands_M.AddEllipsisEnd();
 
 	m_comands_X.Add(0);
 	m_comands_X.Add(ID_NAVIGATE_SKIPFORWARD);
@@ -45,6 +47,7 @@ CPPageMouse::CPPageMouse()
 	m_comands_X.Add(ID_PLAY_SEEKBACKWARDMED);
 	m_comands_X.Add(ID_PLAY_SEEKFORWARDMED);
 	m_comands_X.Add(ID_FILE_CLOSEPLAYLIST);
+	m_comands_X.AddEllipsisEnd();
 
 	m_comands_W.Add(0);
 	m_comands_W.Add(ID_VOLUME_UP);
@@ -57,6 +60,7 @@ CPPageMouse::CPPageMouse()
 	m_comands_W.Add(ID_NAVIGATE_SKIPBACKFILE);
 	m_comands_W.Add(ID_SUB_DELAY_INC);
 	m_comands_W.Add(ID_SUB_DELAY_DEC);
+	m_comands_W.AddEllipsisEnd();
 }
 
 CPPageMouse::~CPPageMouse()
@@ -317,17 +321,39 @@ void CPPageMouse::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = FALSE;
 
 	if (m_list.m_fInPlaceDirty && pItem->iItem >= 0 && pItem->iSubItem >= COL_CMD && pItem->pszText) {
-		MOUSE_COMMANDS* mouse_cmds = m_table_comands[pItem->iItem][pItem->iSubItem];
+		MOUSE_COMMANDS* mc = m_table_comands[pItem->iItem][pItem->iSubItem];
 
-		if (mouse_cmds) {
-			m_table_values[pItem->iItem][pItem->iSubItem] = mouse_cmds->ids[pItem->lParam];
+		if (mc) {
+			size_t idx = pItem->lParam;
+			LPCWSTR str = pItem->pszText;
 
-			m_list.SetItemText(pItem->iItem, pItem->iSubItem, pItem->pszText);
-			m_list.SetColumnWidth(pItem->iSubItem, LVSCW_AUTOSIZE);
+			if (idx >= mc->ids.size()) {
+				CAddCommandDlg dlg(this);
+				if (dlg.DoModal() == IDOK) {
+					const WORD id = dlg.GetSelectedCommandID();
+
+					for (idx = 0; idx < mc->ids.size(); idx++) {
+						if (id == mc->ids[idx]) {
+							break;
+						}
+					}
+					if (idx == mc->ids.size()) {
+						mc->Add(id);
+					}
+					auto it = mc->str_list.cbegin();
+					std::advance(it, idx);
+					str = *it;
+				}
+			}
+
+			if (idx < mc->ids.size()) {
+				m_table_values[pItem->iItem][pItem->iSubItem] = mc->ids[idx];
+				m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);
+				m_list.SetColumnWidth(pItem->iSubItem, LVSCW_AUTOSIZE);
+				SetModified();
+			}
 
 			*pResult = TRUE;
-			SetModified();
-
 			return;
 		}
 	}
