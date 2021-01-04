@@ -454,6 +454,7 @@ HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 			m_rtLastQueuedSampleTimeEnd = m_rtNextRenderedSampleTime = m_rtCurrentRenderedTime = m_rtLastReceivedSampleTimeEnd = rtTime;
 		}
 
+		CAutoLock cCheckLock(&m_csCheck);
 		CAutoLock cAutoLock(&m_csAudioClock);
 		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtCurrentRenderedTime);
 	}
@@ -754,9 +755,12 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 		NewSegment();
 	}
 
-	if (m_pAudioClock && !m_pSyncClock->IsSlave()) {
-		CAutoLock cAutoLock(&m_csAudioClock);
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtCurrentRenderedTime);
+	{
+		CAutoLock cCheckLock(&m_csCheck);
+		if (m_pAudioClock && !m_pSyncClock->IsSlave()) {
+			CAutoLock cAutoLock(&m_csAudioClock);
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtCurrentRenderedTime);
+		}
 	}
 
 	return CBaseRenderer::Run(rtStart);
