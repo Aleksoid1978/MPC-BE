@@ -58,6 +58,7 @@ class CPPageMouse : public CPPageBase
 	struct MOUSE_COMMANDS {
 		std::vector<WORD> ids;
 		std::list<CString> str_list;
+		bool bEllipsisEnd = false;
 
 		void Add(const WORD id)
 		{
@@ -69,12 +70,23 @@ class CPPageMouse : public CPPageBase
 				for (const auto& wc : wmcmds) {
 					if (id == wc.cmd) {
 						ids.emplace_back(id);
-						str_list.emplace_back(ResStr(wc.dwname));
+						if (bEllipsisEnd) {
+							str_list.emplace(--str_list.end(), ResStr(wc.dwname));
+						} else {
+							str_list.emplace_back(ResStr(wc.dwname));
+						}
 						break;
 					}
 				}
 			}
-			ASSERT(ids.size() == str_list.size());
+		}
+
+		void AddEllipsisEnd()
+		{
+			if (!bEllipsisEnd) {
+				str_list.emplace_back(L"...");
+				bEllipsisEnd = true;
+			}
 		}
 	};
 
