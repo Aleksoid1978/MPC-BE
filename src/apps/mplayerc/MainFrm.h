@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1231,8 +1231,11 @@ public:
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 	bool CanPreviewUse();
 
-	CFullscreenWnd*	m_pFullscreenWnd;
-	COSD		m_OSD;
+	CFullscreenWnd* m_pFullscreenWnd;
+
+	CSvgImage m_svgFlybar;
+	CSvgImage m_svgTaskbarButtons;
+	COSD      m_OSD;
 
 	CString		GetSystemLocalTime();
 	int			m_nCurSubtitle;

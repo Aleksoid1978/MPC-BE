@@ -29,11 +29,6 @@
 CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 {
-	bool ok = m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
-	if (!ok) {
-		ok = m_svgFlybar.Load(IDF_SVG_FLYBAR);
-	}
-	UpdateButtonImages();
 }
 
 CFlyBar::~CFlyBar()
@@ -145,10 +140,10 @@ void CFlyBar::Scale()
 
 bool CFlyBar::UpdateButtonImages()
 {
-	if (m_svgFlybar.IsLoad()) {
+	if (m_pMainFrame->m_svgFlybar.IsLoad()) {
 		int w = 0;
 		int h = m_pMainFrame->ScaleY(24);
-		if (HBITMAP hBitmap = m_svgFlybar.Rasterize(w, h)) {
+		if (HBITMAP hBitmap = m_pMainFrame->m_svgFlybar.Rasterize(w, h)) {
 			if (w == h * 25) {
 				CBitmap* bitmap = DNew CBitmap();
 				bitmap->Attach(hBitmap);

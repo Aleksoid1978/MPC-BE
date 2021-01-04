@@ -74,12 +74,6 @@ COSD::COSD(CMainFrame* pMainFrame)
 	m_debugPenBorder.CreatePen(PS_SOLID, 1, m_Color[OSD_BORDER]);
 
 	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
-
-	bool ok = m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
-	if (!ok) {
-		ok = m_svgFlybar.Load(IDF_SVG_FLYBAR);
-	}
-	UpdateButtonImages();
 }
 
 COSD::~COSD()
@@ -998,12 +992,12 @@ void COSD::OverrideDPI(int dpix, int dpiy)
 
 bool COSD::UpdateButtonImages()
 {
-	if (m_svgFlybar.IsLoad()) {
+	if (m_pMainFrame->m_svgFlybar.IsLoad()) {
 		int w = 0;
 		int h = ScaleY(24);
 		if (h != m_externalFlyBarHeight) {
 			m_externalFlyBarHeight = h;
-			if (HBITMAP hBitmap = m_svgFlybar.Rasterize(w, h)) {
+			if (HBITMAP hBitmap = m_pMainFrame->m_svgFlybar.Rasterize(w, h)) {
 				if (w == h * 25) {
 					CBitmap* bitmap = DNew CBitmap();
 					bitmap->Attach(hBitmap);

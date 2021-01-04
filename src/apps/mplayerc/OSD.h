@@ -104,6 +104,7 @@ public:
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
 
 	void OverrideDPI(int dpix, int dpiy);
+	bool UpdateButtonImages();
 
 	DECLARE_DYNAMIC(COSD)
 
@@ -208,9 +209,6 @@ private:
 	BOOL StartTimer(const DWORD dueTime);
 	void EndTimer(const bool bWaitForCallback = true);
 	static void CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
-
-	CSvgImage m_svgFlybar;
-	bool UpdateButtonImages();
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);
