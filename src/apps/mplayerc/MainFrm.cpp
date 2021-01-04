@@ -868,6 +868,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
+	bool ok = m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
+	if (!ok) {
+		ok = m_svgFlybar.Load(IDF_SVG_FLYBAR);
+	}
+	m_wndFlyBar.UpdateButtonImages();
+	m_OSD.UpdateButtonImages();
+
+	ok = m_svgTaskbarButtons.Load(IDF_SVG_TASKBAR_BUTTONS);
+
 	// Windows 8 - if app is not pinned on the taskbar, it's not receive "TaskbarButtonCreated" message. Bug ???
 	if (SysVersion::IsWin8orLater()) {
 		CreateThumbnailToolbar();
@@ -18648,7 +18657,7 @@ void CMainFrame::OnFileOpenDirectory()
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
 {
-	if (!SysVersion::IsWin7orLater() || !AfxGetAppSettings().fUseWin7TaskBar) {
+	if (!SysVersion::IsWin7orLater() || !AfxGetAppSettings().fUseWin7TaskBar || !m_svgTaskbarButtons.IsLoad()) {
 		return E_FAIL;
 	}
 
@@ -18661,16 +18670,13 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		HBITMAP hBitmap = nullptr;
 		int width = 0, height;
 
-		CSvgImage svgFlybar;
-		if (svgFlybar.Load(IDF_SVG_TASKBAR_BUTTONS)) {
-			if (SysVersion::IsWin10orLater()) {
-				height = GetSystemMetrics(SM_CYICON);
-			} else {
-				// for Windows 7, 8.1
-				height = ScaleY(18); // Don't use GetSystemMetrics(SM_CYICON) here!
-			}
-			hBitmap = svgFlybar.Rasterize(width, height);
+		if (SysVersion::IsWin10orLater()) {
+			height = GetSystemMetrics(SM_CYICON);
+		} else {
+			// for Windows 7, 8.1
+			height = ScaleY(18); // Don't use GetSystemMetrics(SM_CYICON) here!
 		}
+		hBitmap = m_svgTaskbarButtons.Rasterize(width, height);
 
 		if (!hBitmap) {
 			m_pTaskbarList->Release();

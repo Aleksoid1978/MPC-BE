@@ -72,8 +72,6 @@ private:
 	CToolTipCtrl m_tooltip;
 	CImageList *m_pButtonImages = nullptr;
 
-	CSvgImage m_svgFlybar;
-
 	int m_btIdx = 0;
 
 	bool m_bTrackingMouseLeave = false;
@@ -88,10 +86,9 @@ public:
 
 	void CalcButtonsRect();
 	void Scale();
-
-private:
 	bool UpdateButtonImages();
 
+private:
 	void DrawButton(CDC *pDC, int nImage, int x, int z);
 	void UpdateWnd(CPoint point);
 	void DrawWnd();
