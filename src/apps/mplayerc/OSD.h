@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -138,7 +138,7 @@ private:
 	CRect	m_rectCloseButton;
 	CRect	m_rectExitButton;
 
-	CImageList *m_pButtonsImages = nullptr;
+	CImageList *m_pButtonImages = nullptr;
 	int		m_nButtonHeight;
 	int		m_externalFlyBarHeight = 0;
 
@@ -210,7 +210,7 @@ private:
 	static void CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
 
 	CSvgImage m_svgFlybar;
-	bool CreateFromExternal();
+	bool UpdateButtonImages();
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);
