@@ -28,6 +28,15 @@
 #include "SvgHelper.h"
 #include "Misc.h"
 
+
+void SwapRB(uint32_t* data, const size_t pixcount)
+{
+	for (size_t i = 0; i < pixcount; i++) {
+		uint32_t color = data[i];
+		data[i] = ((color & 0xff) << 16) | ((color & 0xff0000) >> 16) | (color & 0xff00ff00);
+	}
+}
+
 CSvgImage::~CSvgImage()
 {
 	Clear();
@@ -140,12 +149,13 @@ HBITMAP CSvgImage::Rasterize(int& w, int& h)
 	HBITMAP hBitmap = nullptr;
 
 	if (m_pSvgImage && m_pRasterizer) {
-		float scale = CalcScale(w, h);
+		const float scale = CalcScale(w, h);
+		const size_t pixcount = w * h;
+		std::unique_ptr<uint32_t[]> buffer(new(std::nothrow) uint32_t[pixcount]);
 
-		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[w * h * 4]);
 		if (buffer) {
-			nsvgRasterize((NSVGrasterizer*)m_pRasterizer, (NSVGimage*)m_pSvgImage, 0.0f, 0.0f, scale, buffer.get(), w, h, w * 4);
-
+			nsvgRasterize((NSVGrasterizer*)m_pRasterizer, (NSVGimage*)m_pSvgImage, 0.0f, 0.0f, scale, (BYTE*)buffer.get(), w, h, w * 4);
+			SwapRB(buffer.get(), pixcount);
 			hBitmap = CreateBitmap(w, h, 1, 32, buffer.get());
 		}
 	}
@@ -156,11 +166,13 @@ HBITMAP CSvgImage::Rasterize(int& w, int& h)
 bool CSvgImage::Rasterize(CBitmap& bitmap, int& w, int& h) // not tested
 {
 	if (m_pSvgImage && m_pRasterizer) {
-		float scale = CalcScale(w, h);
+		const float scale = CalcScale(w, h);
+		const size_t pixcount = w * h;
+		std::unique_ptr<uint32_t[]> buffer(new(std::nothrow) uint32_t[pixcount]);
 
-		std::unique_ptr<BYTE[]> buffer(new(std::nothrow) BYTE[w * h * 4]);
 		if (buffer) {
-			nsvgRasterize((NSVGrasterizer*)m_pRasterizer, (NSVGimage*)m_pSvgImage, 0.0f, 0.0f, scale, buffer.get(), w, h, w * 4);
+			nsvgRasterize((NSVGrasterizer*)m_pRasterizer, (NSVGimage*)m_pSvgImage, 0.0f, 0.0f, scale, (BYTE*)buffer.get(), w, h, w * 4);
+			SwapRB(buffer.get(), pixcount);
 			bitmap.CreateBitmap(w, h, 1, 32, buffer.get());
 
 			return true;
