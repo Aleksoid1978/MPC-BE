@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 #pragma once
 
 #include "PlayerVolumeCtrl.h"
+#include "SvgHelper.h"
 
 // CPlayerToolBar
 
@@ -37,6 +38,7 @@ private:
 	int			m_nUseDarkTheme;
 	bool		m_bMute;
 
+	CSvgImage	m_svgToolbar;
 	HICON		m_hDXVAIcon;
 	LONG		m_nDXVAIconWidth;
 	LONG		m_nDXVAIconHeight;

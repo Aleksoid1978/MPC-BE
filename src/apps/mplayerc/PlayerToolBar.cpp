@@ -40,6 +40,15 @@ CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	, m_nDXVAIconWidth(0)
 	, m_nDXVAIconHeight(0)
 {
+	bool ok = m_svgToolbar.Load(::GetProgramDir() + L"toolbar.svg");
+	if (ok) {
+		int w, h;
+		ok = m_svgToolbar.GetOriginalSize(w, h);
+		if (!ok || w != h * 15) {
+			DLog(L"CPlayerToolBar::CPlayerToolBar() Incorrect toolbar.svg");
+			m_svgToolbar.Clear();
+		}
+	}
 }
 
 CPlayerToolBar::~CPlayerToolBar()
@@ -227,30 +236,44 @@ void CPlayerToolBar::SwitchTheme()
 		resid = toolbarImageResId[imageDpiScalePercentIndex];
 	}
 
-	// load toolbar image
-	CComPtr<IWICBitmap> pBitmap;
+	HRESULT hr = E_FAIL;
 	HBITMAP hBitmap = nullptr;
 	UINT width, height;
 
-	// don't use premultiplied alpha here
-	HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"toolbar.png").GetString());
-
-	if (FAILED(hr) && s.bUseDarkTheme) {
-		BYTE* data;
-		UINT size;
-		hr = LoadResourceFile(resid, &data, size);
-		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmap, false, data, size);
+	// load toolbar image
+	if (m_svgToolbar.IsLoad()) {
+		int w = 0;
+		int h = m_pMainFrame->ScaleY(24);
+		hBitmap = m_svgToolbar.Rasterize(w, h);
+		if (hBitmap) {
+			hr = S_OK;
+			width = w;
+			height = h;
 		}
 	}
 
-	if (SUCCEEDED(hr)) {
-		hr = pBitmap->GetSize(&width, &height);
+	if (!hBitmap) {
+		CComPtr<IWICBitmap> pBitmap;
+		// don't use premultiplied alpha here
+		hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"toolbar.png").GetString());
+
+		if (FAILED(hr) && s.bUseDarkTheme) {
+			BYTE* data;
+			UINT size;
+			hr = LoadResourceFile(resid, &data, size);
+			if (SUCCEEDED(hr)) {
+				hr = WicLoadImage(&pBitmap, false, data, size);
+			}
+		}
+
+		if (SUCCEEDED(hr)) {
+			hr = pBitmap->GetSize(&width, &height);
+		}
+		if (SUCCEEDED(hr) && width == height * 15) {
+			hr = WicCreateHBitmap(hBitmap, pBitmap);
+		}
+		pBitmap.Release();
 	}
-	if (SUCCEEDED(hr) && width == height * 15) {
-		hr = WicCreateHBitmap(hBitmap, pBitmap);
-	}
-	pBitmap.Release();
 
 	if (SUCCEEDED(hr)) {
 		CBitmap bmp;
@@ -334,8 +357,9 @@ void CPlayerToolBar::SwitchTheme()
 			resid = gpuImageResId[imageDpiScalePercentIndex].resid;
 		}
 
+		CComPtr<IWICBitmap> pBitmap;
 		// don't use premultiplied alpha here
-		HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"gpu.png").GetString());
+		hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"gpu.png").GetString());
 
 		if (SUCCEEDED(hr)) {
 			hr = pBitmap->GetSize(&width, &height);
