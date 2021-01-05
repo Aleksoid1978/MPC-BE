@@ -342,7 +342,7 @@ void CPlayerToolBar::SwitchTheme()
 		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
 
 		CSvgImage svgImage;
-		if (svgImage.Load(IDB_DXVA_INDICATOR)) {
+		if (svgImage.Load(IDF_SVG_GPU_INDICATOR)) {
 			int w = 0;
 			int h = m_pMainFrame->ScaleY(16);
 			hBitmap = svgImage.Rasterize(w, h);
