@@ -44,7 +44,7 @@ CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	if (ok) {
 		int w, h;
 		ok = m_svgToolbar.GetOriginalSize(w, h);
-		if (!ok || w != h * 15) {
+		if (!ok || (w != h * 15 && w != h * 16)) {
 			DLog(L"CPlayerToolBar::CPlayerToolBar() Incorrect toolbar.svg");
 			m_svgToolbar.Clear();
 		}
@@ -268,8 +268,11 @@ void CPlayerToolBar::SwitchTheme()
 
 		if (SUCCEEDED(hr)) {
 			hr = pBitmap->GetSize(&width, &height);
+			if (width != height * 15 && width != height * 16) {
+				hr = E_INVALIDARG;
+			}
 		}
-		if (SUCCEEDED(hr) && width == height * 15) {
+		if (SUCCEEDED(hr)) {
 			hr = WicCreateHBitmap(hBitmap, pBitmap);
 		}
 		pBitmap.Release();
