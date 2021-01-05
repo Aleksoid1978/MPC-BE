@@ -41,6 +41,7 @@
 #include "FileDropTarget.h"
 #include "KeyProvider.h"
 #include "PlayerYouTube.h"
+#include "SvgHelper.h"
 
 #include "../../DSUtil/DSMPropertyBag.h"
 #include "../../DSUtil/FontInstaller.h"

@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "SvgHelper.h"
-
 class CMainFrame;
 
 // CFlyBar
