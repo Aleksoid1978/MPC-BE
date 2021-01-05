@@ -1234,9 +1234,10 @@ public:
 
 	CFullscreenWnd* m_pFullscreenWnd;
 
-	CSvgImage m_svgFlybar;
-	CSvgImage m_svgTaskbarButtons;
-	COSD      m_OSD;
+	CSvgImage  m_svgFlybar;
+	CSvgImage  m_svgTaskbarButtons;
+	CImageList m_pTaskbarStateIconsImages;
+	COSD       m_OSD;
 
 	CString		GetSystemLocalTime();
 	int			m_nCurSubtitle;

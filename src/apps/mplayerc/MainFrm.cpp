@@ -18732,6 +18732,32 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 			hr = m_pTaskbarList->ThumbBarAddButtons(m_hWnd, std::size(buttons), buttons);
 		}
 		ImageList_Destroy(himl);
+
+		if (!m_pTaskbarStateIconsImages.GetSafeHandle()) {
+			CComPtr<IWICBitmap> pBitmap;
+			hBitmap = nullptr;
+			UINT width, height;
+			BYTE* data;
+			UINT size;
+			hr = LoadResourceFile(IDB_TASKBAR_STATE_ICONS, &data, size);
+			if (SUCCEEDED(hr)) {
+				hr = WicLoadImage(&pBitmap, false, data, size);
+			}
+			if (SUCCEEDED(hr)) {
+				hr = pBitmap->GetSize(&width, &height);
+			}
+			if (SUCCEEDED(hr) && height == 16 && width == height * 3) {
+				hr = WicCreateHBitmap(hBitmap, pBitmap);
+			}
+			pBitmap.Release();
+
+			if (hBitmap) {
+				m_pTaskbarStateIconsImages.Create(height, height, ILC_COLOR32, 3, 0);
+				ImageList_Add(m_pTaskbarStateIconsImages.GetSafeHandle(), hBitmap, 0);
+
+				DeleteObject(hBitmap);
+			}
+		}
 	}
 
 	UpdateThumbarButton();
@@ -18773,7 +18799,7 @@ HRESULT CMainFrame::UpdateThumbarButton()
 		buttons[4].dwFlags = THBF_HIDDEN;
 		buttons[4].iId = IDTB_BUTTON5;
 
-		HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, ARRAYSIZE(buttons), buttons);
+		HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, std::size(buttons), buttons);
 		return hr;
 	}
 
@@ -18816,21 +18842,21 @@ HRESULT CMainFrame::UpdateThumbarButton()
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 2;
 
-			hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_TB_PLAY), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+			hIcon = m_pTaskbarStateIconsImages.ExtractIconW(0);
 			m_pTaskbarList->SetProgressState(m_hWnd, m_wndSeekBar.HasDuration() ? TBPF_NORMAL : TBPF_NOPROGRESS);
 		} else if (fs == State_Stopped) {
 			buttons[1].dwFlags = THBF_DISABLED;
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 3;
 
-			hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_TB_STOP), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+			hIcon = m_pTaskbarStateIconsImages.ExtractIconW(2);
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NOPROGRESS);
 		} else if (fs == State_Paused) {
 			buttons[1].dwFlags = THBF_ENABLED;
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 3;
 
-			hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_TB_PAUSE), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+			hIcon = m_pTaskbarStateIconsImages.ExtractIconW(1);
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_PAUSED);
 		}
 
@@ -18843,8 +18869,8 @@ HRESULT CMainFrame::UpdateThumbarButton()
 
 		m_pTaskbarList->SetOverlayIcon(m_hWnd, hIcon, L"");
 
-		if (hIcon != nullptr) {
-			DestroyIcon( hIcon );
+		if (hIcon) {
+			DestroyIcon(hIcon);
 		}
 	} else {
 		buttons[0].dwFlags = THBF_DISABLED;
@@ -18857,7 +18883,7 @@ HRESULT CMainFrame::UpdateThumbarButton()
 		m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NOPROGRESS);
 	}
 
-	HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, ARRAYSIZE(buttons), buttons);
+	HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, std::size(buttons), buttons);
 
 	UpdateThumbnailClip();
 
