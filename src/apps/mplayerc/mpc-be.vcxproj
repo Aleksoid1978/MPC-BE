@@ -367,9 +367,6 @@
     <None Include="res\tb_play_16.ico" />
     <None Include="res\tb_stop_16.ico" />
     <None Include="res\toolbar.bmp" />
-    <None Include="res\toolbar.png" />
-    <None Include="res\flybar.png" />
-    <None Include="res\Toolbarw7.png" />
     <None Include="res\web\1pix.gif" />
     <None Include="res\web\404.html">
       <FileType>HTML</FileType>
@@ -634,9 +631,6 @@
     <ProjectReference Include="..\..\ExtLib\ui\TreePropSheet\TreePropSheet.vcxproj">
       <Project>{ab494732-ef6d-44d0-bcf8-80ff04858d10}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\gpu.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

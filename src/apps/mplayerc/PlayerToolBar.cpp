@@ -208,34 +208,6 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetIndent(0);
 	}
 
-	const int dpiScalePercent = m_pMainFrame->GetDPIScalePercent();
-	static const int imageDpiScalePercent[] = {
-		350, 300, 250, 225, 200, 175, 150, 125
-	};
-	static const int toolbarImageResId[] = {
-		IDB_PLAYERTOOLBAR_PNG_350,
-		IDB_PLAYERTOOLBAR_PNG_300,
-		IDB_PLAYERTOOLBAR_PNG_250,
-		IDB_PLAYERTOOLBAR_PNG_225,
-		IDB_PLAYERTOOLBAR_PNG_200,
-		IDB_PLAYERTOOLBAR_PNG_175,
-		IDB_PLAYERTOOLBAR_PNG_150,
-		IDB_PLAYERTOOLBAR_PNG_125
-	};
-
-	int imageDpiScalePercentIndex = -1;
-	for (size_t i = 0; i < std::size(imageDpiScalePercent); i++) {
-		if (dpiScalePercent >= imageDpiScalePercent[i]) {
-			imageDpiScalePercentIndex = i;
-			break;
-		}
-	}
-
-	int resid = IDB_PLAYERTOOLBAR_PNG;
-	if (imageDpiScalePercentIndex != -1) {
-		resid = toolbarImageResId[imageDpiScalePercentIndex];
-	}
-
 	HRESULT hr = E_FAIL;
 	HBITMAP hBitmap = nullptr;
 	UINT width, height;
@@ -256,16 +228,6 @@ void CPlayerToolBar::SwitchTheme()
 		CComPtr<IWICBitmap> pBitmap;
 		// don't use premultiplied alpha here
 		hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"toolbar.png").GetString());
-
-		if (FAILED(hr) && s.bUseDarkTheme) {
-			BYTE* data;
-			UINT size;
-			hr = LoadResourceFile(resid, &data, size);
-			if (SUCCEEDED(hr)) {
-				hr = WicLoadImage(&pBitmap, false, data, size);
-			}
-		}
-
 		if (SUCCEEDED(hr)) {
 			hr = pBitmap->GetSize(&width, &height);
 			if (width != height * 15 && width != height * 16) {
@@ -276,6 +238,20 @@ void CPlayerToolBar::SwitchTheme()
 			hr = WicCreateHBitmap(hBitmap, pBitmap);
 		}
 		pBitmap.Release();
+
+		if (FAILED(hr) && s.bUseDarkTheme) {
+			bool ok = m_svgToolbar.Load(IDF_SVG_TOOLBAR);
+			if (ok) {
+				int w = 0;
+				int h = m_pMainFrame->ScaleY(24);
+				hBitmap = m_svgToolbar.Rasterize(w, h);
+				if (hBitmap) {
+					hr = S_OK;
+					width = w;
+					height = h;
+				}
+			}
+		}
 	}
 
 	if (SUCCEEDED(hr)) {
