@@ -999,16 +999,12 @@ bool COSD::UpdateButtonImages()
 			m_externalFlyBarHeight = h;
 			if (HBITMAP hBitmap = m_pMainFrame->m_svgFlybar.Rasterize(w, h)) {
 				if (w == h * 25) {
-					CBitmap* bitmap = DNew CBitmap();
-					bitmap->Attach(hBitmap);
-
 					SAFE_DELETE(m_pButtonImages);
 					m_pButtonImages = DNew CImageList();
 					m_pButtonImages->Create(h, h, ILC_COLOR32 | ILC_MASK, 1, 0);
-					m_pButtonImages->Add(bitmap, nullptr);
+					ImageList_Add(m_pButtonImages->GetSafeHandle(), hBitmap, nullptr);
 
 					m_nButtonHeight = h;
-					delete bitmap;
 				}
 				DeleteObject(hBitmap);
 			}
