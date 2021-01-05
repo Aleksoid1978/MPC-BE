@@ -24,6 +24,7 @@
 
 #define IDF_SVG_FLYBAR                  223
 #define IDF_SVG_TASKBAR_BUTTONS         224
+#define IDB_TASKBAR_STATE_ICONS         225
 
 #define IDB_PLAYERTOOLBAR_PNG           250
 #define IDB_PLAYERTOOLBAR_PNG_125       251
@@ -79,9 +80,6 @@
 #define IDF_CONTROLVOLUMEGRIP_PNG       537
 #define IDR_HTML_VARIABLES              538
 #define IDF_FAVICON                     539
-#define IDR_TB_PLAY                     540
-#define IDR_TB_PAUSE                    541
-#define IDR_TB_STOP                     542
 
 #define IDB_DXVA_INDICATOR              550
 #define IDB_DXVA_INDICATOR_125          551
