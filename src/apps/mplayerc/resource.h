@@ -82,14 +82,6 @@
 #define IDF_FAVICON                     539
 
 #define IDB_DXVA_INDICATOR              550
-#define IDB_DXVA_INDICATOR_125          551
-#define IDB_DXVA_INDICATOR_150          552
-#define IDB_DXVA_INDICATOR_175          553
-#define IDB_DXVA_INDICATOR_200          554
-#define IDB_DXVA_INDICATOR_225          555
-#define IDB_DXVA_INDICATOR_250          556
-#define IDB_DXVA_INDICATOR_300          557
-#define IDB_DXVA_INDICATOR_350          558
 
 #define IDF_SHADER_EMPTY                700
 #define IDF_SHADER_FINAL                701

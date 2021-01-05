@@ -341,58 +341,22 @@ void CPlayerToolBar::SwitchTheme()
 		}
 		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
 
-		const struct {
-			int resid;
-			int height;
-		} gpuImageResId[] = {
-			{IDB_DXVA_INDICATOR_350, 56 },
-			{IDB_DXVA_INDICATOR_300, 48 },
-			{IDB_DXVA_INDICATOR_250, 40 },
-			{IDB_DXVA_INDICATOR_225, 36 },
-			{IDB_DXVA_INDICATOR_200, 32 },
-			{IDB_DXVA_INDICATOR_175, 28 },
-			{IDB_DXVA_INDICATOR_150, 24 },
-			{IDB_DXVA_INDICATOR_125, 20 }
-		};
+		CSvgImage svgImage;
+		if (svgImage.Load(IDB_DXVA_INDICATOR)) {
+			int w = 0;
+			int h = m_pMainFrame->ScaleY(16);
+			hBitmap = svgImage.Rasterize(w, h);
+			if (hBitmap) {
+				CImageList imgListDXVAIcon;
+				imgListDXVAIcon.Create(w, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+				ImageList_Add(imgListDXVAIcon.GetSafeHandle(), hBitmap, nullptr);
 
-		resid = IDB_DXVA_INDICATOR;
-		if (imageDpiScalePercentIndex != -1) {
-			resid = gpuImageResId[imageDpiScalePercentIndex].resid;
-		}
+				m_hDXVAIcon = imgListDXVAIcon.ExtractIconW(0);
+				m_nDXVAIconWidth = w;
+				m_nDXVAIconHeight = h;
 
-		CComPtr<IWICBitmap> pBitmap;
-		for (int i = 0; i < _countof(gpuImageResId); i++) {
-			const int gpuresid = gpuImageResId[i].resid;
-			if (gpuresid < resid && (LONG)height < m_nButtonHeight) {
-				resid = gpuresid;
-				break;
+				DeleteObject(hBitmap);
 			}
-		}
-
-		BYTE* data;
-		UINT size;
-		hr = LoadResourceFile(resid, &data, size);
-		if (SUCCEEDED(hr)) {
-			hr = WicLoadImage(&pBitmap, false, data, size);
-		}
-		if (SUCCEEDED(hr)) {
-			hr = pBitmap->GetSize(&width, &height);
-		}
-		if (SUCCEEDED(hr)) {
-			hr = WicCreateHBitmap(hBitmap, pBitmap);
-		}
-
-		if (SUCCEEDED(hr)) {
-			CImageList imgListDXVAIcon;
-			imgListDXVAIcon.Create(width, height, ILC_COLOR32 | ILC_MASK, 1, 0);
-			ImageList_Add(imgListDXVAIcon.GetSafeHandle(), hBitmap, nullptr);
-
-			m_hDXVAIcon = imgListDXVAIcon.ExtractIconW(0);
-
-			m_nDXVAIconWidth  = width;
-			m_nDXVAIconHeight = height;
-
-			DeleteObject(hBitmap);
 		}
 	}
 

@@ -185,15 +185,7 @@ IDF_SVG_FLYBAR                   FILE                    "res\\flybar.svg"
 IDF_SVG_TASKBAR_BUTTONS          FILE                    "res\\taskbar_buttons.svg"
 IDB_TASKBAR_STATE_ICONS          FILE                    "res\\taskbar_state_icons.png"
 IDB_W7_AUDIO                     FILE                    "res\\audio.png"
-IDB_DXVA_INDICATOR               FILE                    "res\\gpu.png"
-IDB_DXVA_INDICATOR_125           FILE                    "res\\gpu_125.png"
-IDB_DXVA_INDICATOR_150           FILE                    "res\\gpu_150.png"
-IDB_DXVA_INDICATOR_175           FILE                    "res\\gpu_175.png"
-IDB_DXVA_INDICATOR_200           FILE                    "res\\gpu_200.png"
-IDB_DXVA_INDICATOR_225           FILE                    "res\\gpu_225.png"
-IDB_DXVA_INDICATOR_250           FILE                    "res\\gpu_250.png"
-IDB_DXVA_INDICATOR_300           FILE                    "res\\gpu_300.png"
-IDB_DXVA_INDICATOR_350           FILE                    "res\\gpu_350.png"
+IDB_DXVA_INDICATOR               FILE                    "res\\gpu.svg"
 
 /////////////////////////////////////////////////////////////////////////////
 //

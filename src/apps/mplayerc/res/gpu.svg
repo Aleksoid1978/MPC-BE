@@ -1,0 +1,8 @@
+<svg width="120" height="80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M2.5,17.5 a10,10 0 0,1 10,-10 h95 a10,10 0 0,1 10,10 v50 a10,10 0 0,1 -10,10 h-95 a10,10 0 0,1 -10,-10 z"/>
+<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M42.5,35 v-2.5 a5,5 0 0,0 -5,-5 h-5 a5,5 0 0,0 -5,5 v20 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-10 h-7.5
+ m17.5,17.5 v-32.5 h10 a5,5 0 0,1 5,5 v5 a5,5 0 0,1 -5,5 h-10
+ m25,-17.5 v27.5 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-27.5"/>
+
+</svg>
