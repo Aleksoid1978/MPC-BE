@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,16 +40,16 @@ float CSvgImage::CalcScale(int& w, int& h)
 	auto svgimage = ((NSVGimage*)m_pSvgImage);
 
 	if (!w && !h) {
-		w = (uint32_t)std::round(svgimage->width);
-		h = (uint32_t)std::round(svgimage->height);
+		w = (int)std::round(svgimage->width);
+		h = (int)std::round(svgimage->height);
 	}
 	else if (!w) {
 		scale = h / svgimage->height;
-		w = (uint32_t)std::round(svgimage->width * scale);
+		w = (int)std::round(svgimage->width * scale);
 	}
 	else if (!h) {
 		scale = w / svgimage->width;
-		h = (uint32_t)std::round(svgimage->height * scale);
+		h = (int)std::round(svgimage->height * scale);
 	}
 	else {
 		scale = std::min(w / svgimage->width, h / svgimage->height);
@@ -121,6 +121,17 @@ bool CSvgImage::Load(UINT resid)
 		return Load(svgData.GetBuffer());
 	}
 
+	return false;
+}
+
+bool CSvgImage::GetOriginalSize(int& w, int& h)
+{
+	if (m_pSvgImage) {
+		auto svgimage = ((NSVGimage*)m_pSvgImage);
+		w = (int)std::round(svgimage->width);
+		h = (int)std::round(svgimage->height);
+		return true;
+	}
 	return false;
 }
 

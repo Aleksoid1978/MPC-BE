@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,13 +29,14 @@ public:
 	~CSvgImage();
 
 private:
-	float CSvgImage::CalcScale(int& w, int& h);
+	float CalcScale(int& w, int& h);
 
 public:
 	void Clear();
 	bool Load(char* svgData);
 	bool Load(const wchar_t* filename);
 	bool Load(UINT resid);
+	bool GetOriginalSize(int& w, int& h);
 	HBITMAP Rasterize(int& w, int& h); // if the dimension is zero, then it will be set automatically
 	bool Rasterize(CBitmap& bitmap, int& w, int& h); // if the dimension is zero, then it will be set automatically
 

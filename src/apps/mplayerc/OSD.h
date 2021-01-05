@@ -26,7 +26,6 @@
 #include <mvrInterfaces.h>
 #include <HighDPI.h>
 #include "../../DSUtil/DSMPropertyBag.h"
-#include "SvgHelper.h"
 
 #define WM_HIDE			(WM_USER + 1001)
 #define WM_OSD_DRAW		(WM_USER + 1002)
