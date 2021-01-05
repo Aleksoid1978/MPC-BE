@@ -13,9 +13,9 @@
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 9
-3		"Select command"
-7		"OK"
-8		"Cancel"
+3		"选择命令"
+7		"确定"
+8		"取消"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -640,7 +640,7 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"可用的在线字幕"
-7		"替换当前已装载的字幕"
+7		"替换当前已加载的字幕"
 8		"下载并打开"
 END
 
@@ -1038,7 +1038,7 @@ STRING IDC_DSMADVR		"高品渲染器，需要支持 Direct3D 9 或更新版本�
 STRING IDC_DSNULL_ANY		"连接到任意视频文件类型并且会将进入的采样信息传送到任意地方。当您不需要显示视频并希望节省不必要的 cpu 工作时请使用它。"
 STRING IDC_DSNULL_UNCOMP		"和普通的空渲染器相同, 但仅会被连接到未压缩的类型上。"
 STRING IDC_DSSYNC		"与 EVR (自定义) 相同, 但提供了几个选项来同步显示刷新率，用以减少视频中被丢弃与重复的帧。"
-STRING IDC_DSSYSDEF		"DirectShow 的默认渲染滤镜（VMR-7）。 如果其它渲染器因为某些原因无法被装载那么将会返回到此。"
+STRING IDC_DSSYSDEF		"DirectShow 的默认渲染滤镜（VMR-7）。 如果其它渲染器因为某些原因无法被加载那么将会返回到此。"
 STRING IDC_DSVMR9WIN		"与 VMR-7 有相同的功能，但画面升频效果较佳。"
 STRING IDC_DSVMRLOADMIXER		"将 VMR 放置到混合器模式中，这将会使许多在属性页由它所控制功能生效并且它将使用独立的工作线程来渲染画面。"
 STRING IDC_DSVMRYUVMIXER		"降低渲染器的兼容性，提高性能。"
@@ -1244,7 +1244,7 @@ STRING IDS_AG_SUBTITLELANG		"字幕语言(&B)"
 STRING IDS_AG_SUBTITLES		"字幕"
 STRING IDS_AG_SUBTITLES_SAVED		"已保存字幕"
 STRING IDS_AG_SUBTITLE_ONOFF		"开/关字幕"
-STRING IDS_AG_SUBTITLE_RELOAD		"重新装载字幕"
+STRING IDS_AG_SUBTITLE_RELOAD		"重新加载字幕"
 STRING IDS_AG_TEARING_TEST		"撕裂测试"
 STRING IDS_AG_TITLE		"标题 %d"
 STRING IDS_AG_TITLE2		"标题: %02d/%02d"
@@ -1541,7 +1541,7 @@ STRING IDS_MAINFRM_40		", 空闲: %I64dKB"
 STRING IDS_MAINFRM_41		", 空闲: %I64dMB"
 STRING IDS_MAINFRM_42		", 空闲 V/A 缓存: %03d/%03d"
 STRING IDS_MAINFRM_46		"选择 DVD/BD 的路径:"
-STRING IDS_MAINFRM_47		" 已成功装载"
+STRING IDS_MAINFRM_47		" 已成功加载"
 STRING IDS_MAINFRM_48		"所有文件(*.*)|*.*||"
 STRING IDS_MAINFRM_49		"GetDIB 失败, hr = %08x"
 STRING IDS_MAINFRM_51		"GetCurrentImage 失败, hr = %08x"
@@ -1927,7 +1927,7 @@ STRING IDS_SUBTITLES_ENABLE		"开启(&E)"
 STRING IDS_SUBTITLES_ERROR		"字幕未加载或渲染模式不支持。"
 STRING IDS_SUBTITLES_FORCED		"&只显示强制字幕"
 STRING IDS_SUBTITLES_OPTIONS		"选项(&O)..."
-STRING IDS_SUBTITLES_RELOAD		"重装载(&R)"
+STRING IDS_SUBTITLES_RELOAD		"重加载(&R)"
 STRING IDS_SUBTITLES_STEREO		"立体字幕"
 STRING IDS_SUBTITLES_STEREO_DONTUSE		"不使用"
 STRING IDS_SUBTITLES_STEREO_SIDEBYSIDE		"左/右 (Side-by-side)"
