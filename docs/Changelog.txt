@@ -87,7 +87,7 @@ Added the ability to assign a hotkey for calling the "After playback" menu.
 Improved work on multiple displays and different DPI systems.
 Rotation and Flip commands have been added to the "Pan & Scan" submenu.
 Added the ability to add all media files in a folder when adding one file.
-Added support for loading external flybar.svg.
+Toolbar, flybar, taskbar buttons are now in SVG format (thanks to Ivan Shatsky). Improved display of interface elements on large Windows scales. Added the ability to load external toolbar.svg and flybar.svg.
 
 ShellExt
 Fixed freeze when opening files from qBittorrent.
