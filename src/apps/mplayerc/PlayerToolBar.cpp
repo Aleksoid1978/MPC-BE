@@ -358,37 +358,23 @@ void CPlayerToolBar::SwitchTheme()
 		}
 
 		CComPtr<IWICBitmap> pBitmap;
-		// don't use premultiplied alpha here
-		hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"gpu.png").GetString());
+		for (int i = 0; i < _countof(gpuImageResId); i++) {
+			const int gpuresid = gpuImageResId[i].resid;
+			if (gpuresid < resid && (LONG)height < m_nButtonHeight) {
+				resid = gpuresid;
+				break;
+			}
+		}
 
+		BYTE* data;
+		UINT size;
+		hr = LoadResourceFile(resid, &data, size);
+		if (SUCCEEDED(hr)) {
+			hr = WicLoadImage(&pBitmap, false, data, size);
+		}
 		if (SUCCEEDED(hr)) {
 			hr = pBitmap->GetSize(&width, &height);
-			if (SUCCEEDED(hr) && (LONG)height >= m_nButtonHeight) {
-				hr = E_ABORT;
-				pBitmap.Release();
-			}
 		}
-
-		if (FAILED(hr)) {
-			for (int i = 0; i < _countof(gpuImageResId); i++) {
-				const int gpuresid = gpuImageResId[i].resid;
-				if (gpuresid < resid && (LONG)height < m_nButtonHeight) {
-					resid = gpuresid;
-					break;
-				}
-			}
-
-			BYTE* data;
-			UINT size;
-			hr = LoadResourceFile(resid, &data, size);
-			if (SUCCEEDED(hr)) {
-				hr = WicLoadImage(&pBitmap, false, data, size);
-			}
-			if (SUCCEEDED(hr)) {
-				hr = pBitmap->GetSize(&width, &height);
-			}
-		}
-
 		if (SUCCEEDED(hr)) {
 			hr = WicCreateHBitmap(hBitmap, pBitmap);
 		}
