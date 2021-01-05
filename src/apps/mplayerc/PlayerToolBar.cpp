@@ -335,7 +335,7 @@ void CPlayerToolBar::SwitchTheme()
 		}
 
 		// don't use premultiplied alpha here
-		HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir()+L"gpu.png").GetString());
+		HRESULT hr = WicLoadImage(&pBitmap, false, (::GetProgramDir() + L"gpu.png").GetString());
 
 		if (SUCCEEDED(hr)) {
 			hr = pBitmap->GetSize(&width, &height);
@@ -370,19 +370,11 @@ void CPlayerToolBar::SwitchTheme()
 		}
 
 		if (SUCCEEDED(hr)) {
-			BOOL ret = TRUE;
+			CImageList imgListDXVAIcon;
+			imgListDXVAIcon.Create(width, height, ILC_COLOR32 | ILC_MASK, 1, 0);
+			ImageList_Add(imgListDXVAIcon.GetSafeHandle(), hBitmap, nullptr);
 
-			CBitmap *bitmap = DNew CBitmap();
-			ret = bitmap->Attach(hBitmap);
-
-			CImageList *pButtonDXVA = DNew CImageList();
-			ret = pButtonDXVA->Create(width, height, ILC_COLOR32 | ILC_MASK, 1, 0);
-			ret = pButtonDXVA->Add(bitmap, nullptr);
-
-			m_hDXVAIcon = pButtonDXVA->ExtractIconW(0);
-
-			delete pButtonDXVA;
-			delete bitmap;
+			m_hDXVAIcon = imgListDXVAIcon.ExtractIconW(0);
 
 			m_nDXVAIconWidth  = width;
 			m_nDXVAIconHeight = height;
