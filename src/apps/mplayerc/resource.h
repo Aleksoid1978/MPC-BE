@@ -22,20 +22,11 @@
 #define IDF_LOGO1                       210
 #define IDB_STREAMTYPES                 215
 
-#define IDF_SVG_GPU_INDICATOR           222
+#define IDF_SVG_TOOLBAR                 220
+#define IDF_SVG_GPU_INDICATOR           221
 #define IDF_SVG_FLYBAR                  223
 #define IDF_SVG_TASKBAR_BUTTONS         224
 #define IDB_TASKBAR_STATE_ICONS         225
-
-#define IDB_PLAYERTOOLBAR_PNG           250
-#define IDB_PLAYERTOOLBAR_PNG_125       251
-#define IDB_PLAYERTOOLBAR_PNG_150       252
-#define IDB_PLAYERTOOLBAR_PNG_175       253
-#define IDB_PLAYERTOOLBAR_PNG_200       254
-#define IDB_PLAYERTOOLBAR_PNG_225       255
-#define IDB_PLAYERTOOLBAR_PNG_250       256
-#define IDB_PLAYERTOOLBAR_PNG_300       257
-#define IDB_PLAYERTOOLBAR_PNG_350       258
 
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303
