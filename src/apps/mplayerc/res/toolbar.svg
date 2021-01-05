@@ -19,8 +19,8 @@
   </linearGradient>
 </defs>
 
-<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M7.5,17.5 a10,10 0 0,1 10,-10 h85 a10,10 0 0,1 10,10 v85 a10,10 0 0,1 -10,10 h-85 a10,10 0 0,1 -10,-10 z"/>
-<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M127.5,17.5 a10,10 0 0,1 10,-10 h85 a10,10 0 0,1 10,10 v85 a10,10 0 0,1 -10,10 h-85 a10,10 0 0,1 -10,-10 z"/>
+<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M7.5,22.5 a15,15 0 0,1 15,-15 h75 a15,15 0 0,1 15,15 v75 a15,15 0 0,1 -15,15 h-75 a15,15 0 0,1 -15,-15 z"/>
+<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M127.5,22.5 a15,15 0 0,1 15,-15 h75 a15,15 0 0,1 15,15 v75 a15,15 0 0,1 -15,15 h-75 a15,15 0 0,1 -15,-15 z"/>
 
 <path fill="url(#button)" stroke="black" d="M42,32 l48,28 l-48,28 z"/>
 
@@ -53,7 +53,7 @@
 
 <path fill="url(#button)" stroke="black" d="M1755,30 v60 l-17.5,-17.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
 
-<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M1802.5,32.5 a10,10 0 0,1 10,-10 h95 a10,10 0 0,1 10,10 v50 a10,10 0 0,1 -10,10 h-95 a10,10 0 0,1 -10,-10 z"/>
+<path fill="none" stroke="#C0C0C0" stroke-width="5" d="M1807.5,37.5 a15,15 0 0,1 15,-15 h75 a15,15 0 0,1 15,15 v40 a15,15 0 0,1 -15,15 h-75 a15,15 0 0,1 -15,-15 z"/>
 <path fill="none" stroke="#C0C0C0" stroke-width="5" d="M1842.5,50 v-2.5 a5,5 0 0,0 -5,-5 h-5 a5,5 0 0,0 -5,5 v20 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-10 h-7.5
  m17.5,17.5 v-32.5 h10 a5,5 0 0,1 5,5 v5 a5,5 0 0,1 -5,5 h-10
  m25,-17.5 v27.5 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-27.5"/>
