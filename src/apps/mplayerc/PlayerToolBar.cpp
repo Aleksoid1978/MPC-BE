@@ -341,21 +341,28 @@ void CPlayerToolBar::SwitchTheme()
 		}
 		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
 
-		CSvgImage svgImage;
-		if (svgImage.Load(IDF_SVG_GPU_INDICATOR)) {
-			int w = 0;
-			int h = m_pMainFrame->ScaleY(16);
-			hBitmap = svgImage.Rasterize(w, h);
-			if (hBitmap) {
-				CImageList imgListDXVAIcon;
-				imgListDXVAIcon.Create(w, h, ILC_COLOR32 | ILC_MASK, 1, 0);
-				ImageList_Add(imgListDXVAIcon.GetSafeHandle(), hBitmap, nullptr);
+		if (m_imgListActive.GetImageCount() == 16) {
+			m_hDXVAIcon = m_imgListActive.ExtractIconW(15);
+			m_nDXVAIconWidth = height;
+			m_nDXVAIconHeight = height;
+		}
+		else {
+			CSvgImage svgImage;
+			if (svgImage.Load(IDF_SVG_GPU_INDICATOR)) {
+				int w = 0;
+				int h = m_pMainFrame->ScaleY(16);
+				hBitmap = svgImage.Rasterize(w, h);
+				if (hBitmap) {
+					CImageList imgListDXVAIcon;
+					imgListDXVAIcon.Create(w, h, ILC_COLOR32 | ILC_MASK, 1, 0);
+					ImageList_Add(imgListDXVAIcon.GetSafeHandle(), hBitmap, nullptr);
 
-				m_hDXVAIcon = imgListDXVAIcon.ExtractIconW(0);
-				m_nDXVAIconWidth = w;
-				m_nDXVAIconHeight = h;
+					m_hDXVAIcon = imgListDXVAIcon.ExtractIconW(0);
+					m_nDXVAIconWidth = w;
+					m_nDXVAIconHeight = h;
 
-				DeleteObject(hBitmap);
+					DeleteObject(hBitmap);
+				}
 			}
 		}
 	}
