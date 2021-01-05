@@ -22,6 +22,7 @@
 #define IDF_LOGO1                       210
 #define IDB_STREAMTYPES                 215
 
+#define IDF_SVG_GPU_INDICATOR           222
 #define IDF_SVG_FLYBAR                  223
 #define IDF_SVG_TASKBAR_BUTTONS         224
 #define IDB_TASKBAR_STATE_ICONS         225
@@ -80,8 +81,6 @@
 #define IDF_CONTROLVOLUMEGRIP_PNG       537
 #define IDR_HTML_VARIABLES              538
 #define IDF_FAVICON                     539
-
-#define IDB_DXVA_INDICATOR              550
 
 #define IDF_SHADER_EMPTY                700
 #define IDF_SHADER_FINAL                701
