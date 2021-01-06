@@ -26,7 +26,7 @@
 #define IDF_SVG_GPU_INDICATOR           221
 #define IDF_SVG_FLYBAR                  223
 #define IDF_SVG_TASKBAR_BUTTONS         224
-#define IDB_TASKBAR_STATE_ICONS         225
+#define IDF_SVG_TASKBAR_STATE_ICONS     225
 
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303
