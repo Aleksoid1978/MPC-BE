@@ -18734,28 +18734,18 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		ImageList_Destroy(himl);
 
 		if (!m_pTaskbarStateIconsImages.GetSafeHandle()) {
-			CComPtr<IWICBitmap> pBitmap;
-			hBitmap = nullptr;
-			UINT width, height;
-			BYTE* data;
-			UINT size;
-			hr = LoadResourceFile(IDB_TASKBAR_STATE_ICONS, &data, size);
-			if (SUCCEEDED(hr)) {
-				hr = WicLoadImage(&pBitmap, false, data, size);
-			}
-			if (SUCCEEDED(hr)) {
-				hr = pBitmap->GetSize(&width, &height);
-			}
-			if (SUCCEEDED(hr) && height == 16 && width == height * 3) {
-				hr = WicCreateHBitmap(hBitmap, pBitmap);
-			}
-			pBitmap.Release();
+			CSvgImage svgTaskbarStateIcons;
+			if (svgTaskbarStateIcons.Load(IDF_SVG_TASKBAR_STATE_ICONS)) {
+				int width = 0;
+				int height = ScaleY(16);
+				if (HBITMAP hBitmap = svgTaskbarStateIcons.Rasterize(width, height)) {
+					if (width == height * 3) {
+						m_pTaskbarStateIconsImages.Create(height, height, ILC_COLOR32, 3, 0);
+						ImageList_Add(m_pTaskbarStateIconsImages.GetSafeHandle(), hBitmap, 0);
+					}
 
-			if (hBitmap) {
-				m_pTaskbarStateIconsImages.Create(height, height, ILC_COLOR32, 3, 0);
-				ImageList_Add(m_pTaskbarStateIconsImages.GetSafeHandle(), hBitmap, 0);
-
-				DeleteObject(hBitmap);
+					DeleteObject(hBitmap);
+				}
 			}
 		}
 	}

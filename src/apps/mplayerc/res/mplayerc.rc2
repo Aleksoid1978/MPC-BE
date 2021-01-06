@@ -176,7 +176,7 @@ IDF_SVG_TOOLBAR                  FILE                    "res\\toolbar.svg"
 IDF_SVG_GPU_INDICATOR            FILE                    "res\\gpu.svg"
 IDF_SVG_FLYBAR                   FILE                    "res\\flybar.svg"
 IDF_SVG_TASKBAR_BUTTONS          FILE                    "res\\taskbar_buttons.svg"
-IDB_TASKBAR_STATE_ICONS          FILE                    "res\\taskbar_state_icons.png"
+IDF_SVG_TASKBAR_STATE_ICONS      FILE                    "res\\taskbar_state_icons.svg"
 IDB_W7_AUDIO                     FILE                    "res\\audio.png"
 
 /////////////////////////////////////////////////////////////////////////////
