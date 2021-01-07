@@ -326,7 +326,7 @@ void CPlayerToolBar::SwitchTheme()
 			CSvgImage svgImage;
 			if (svgImage.Load(IDF_SVG_GPU_INDICATOR)) {
 				int w = 0;
-				int h = m_pMainFrame->ScaleY(24);
+				int h = height;
 				hBitmap = svgImage.Rasterize(w, h);
 				if (hBitmap) {
 					CImageList imgListDXVAIcon;
