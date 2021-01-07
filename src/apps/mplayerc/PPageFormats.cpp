@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 #include <psapi.h>
 #include <HighDPI.h>
 #include "PPageFormats.h"
+#include "SvgHelper.h"
 
 static constexpr auto previousRegistration = L"PreviousRegistration";
 static constexpr auto registeredAppName    = L"MPC-BE";
@@ -654,34 +655,25 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.InsertColumn(COL_CATEGORY, L"Category", LVCFMT_LEFT);
 
-	int dpiY = 96;
-
-	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
-		dpiY = pDpi->GetDPIY();
-	} else {
-		// this panel can be created without the main window.
-		pDpi = DNew CDPI();
-		dpiY = pDpi->GetDPIY();
-		delete pDpi;
+	CSvgImage svgImage;
+	if (svgImage.Load(IDF_SVG_ONOFF)) {
+		int w = 0;
+		int h = 0;
+		if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
+			h = pDpi->ScaleY(12);
+		} else {
+			// this panel can be created without the main window.
+			CDPI dpi;
+			h = dpi.ScaleY(12);
+		}
+		if (HBITMAP hBitmap = svgImage.Rasterize(w, h)) {
+			if (w == h * 3) {
+				m_onoff.Create(h, h, ILC_COLOR32 | ILC_MASK, 3, 0);
+				ImageList_Add(m_onoff.GetSafeHandle(), hBitmap, nullptr);
+			}
+			DeleteObject(hBitmap);
+		}
 	}
-
-	int bm_id, bm_size;
-	if (dpiY >= 192) {
-		bm_id = IDB_ONOFF_192;
-		bm_size = 24;
-	} else if (dpiY >= 144) {
-		bm_id = IDB_ONOFF_144;
-		bm_size = 18;
-	} else {
-		bm_id = IDB_ONOFF_96;
-		bm_size = 12;
-	}
-
-	CBitmap onoff;
-	onoff.Attach(::LoadBitmapW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(bm_id)));
-
-	m_onoff.Create(bm_size, bm_size, ILC_COLOR4 | ILC_MASK, 0, 3);
-	m_onoff.Add(&onoff, 0xffffff);
 
 	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
 
