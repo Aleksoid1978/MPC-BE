@@ -31,6 +31,7 @@ class CAddCommandDlg : public CDialog
 private:
 	CEdit m_FilterEdit;
 	CListCtrl m_list;
+	CButton m_okButton;
 
 	enum {
 		COL_CMD,
@@ -38,7 +39,7 @@ private:
 		COL_COUNT
 	};
 
-	WORD selectedID = 0;
+	WORD m_selectedID = 0;
 	UINT_PTR m_nFilterTimerID;
 
 	void FillList();
@@ -50,7 +51,7 @@ public:
 
 	enum { IDD = IDD_ADDCOMMAND_DLG };
 
-	WORD GetSelectedCommandID() { return selectedID; }
+	WORD GetSelectedCommandID() { return m_selectedID; }
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -61,5 +62,6 @@ protected:
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnChangeFilterEdit();
+	afx_msg void OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBnClickedOk();
 };

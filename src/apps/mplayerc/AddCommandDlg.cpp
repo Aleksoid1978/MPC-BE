@@ -50,6 +50,8 @@ void CAddCommandDlg::FillList()
 
 void CAddCommandDlg::FilterList()
 {
+	m_okButton.EnableWindow(FALSE);
+
 	CString filter;
 	m_FilterEdit.GetWindowText(filter);
 
@@ -96,11 +98,13 @@ void CAddCommandDlg::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_EDIT1, m_FilterEdit);
 	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Control(pDX, IDOK, m_okButton);
 }
 
 BEGIN_MESSAGE_MAP(CAddCommandDlg, CDialog)
 	ON_WM_TIMER()
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST1, OnItemchangedList)
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -129,6 +133,8 @@ BOOL CAddCommandDlg::OnInitDialog()
 		m_list.SetColumn(nCol, &col);
 	}
 
+	m_okButton.EnableWindow(FALSE);
+
 	return TRUE;
 }
 
@@ -148,13 +154,30 @@ void CAddCommandDlg::OnChangeFilterEdit()
 	m_nFilterTimerID = SetTimer(2, 100, NULL);
 }
 
+void CAddCommandDlg::OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+
+	if(pNMLV->uChanged & LVIF_STATE) {
+		if (pNMLV->uNewState & (LVIS_SELECTED | LVNI_FOCUSED)) {
+			m_okButton.EnableWindow(TRUE);
+		}
+		else {
+			m_okButton.EnableWindow(FALSE);
+		}
+	}
+
+	*pResult = 0;
+}
+
+
 void CAddCommandDlg::OnBnClickedOk()
 {
 	UpdateData();
 
 	int selected = m_list.GetSelectionMark();
 	if (selected != -1) {
-		selectedID = m_list.GetItemData(selected);
+		m_selectedID = m_list.GetItemData(selected);
 	}
 
 	OnOK();
