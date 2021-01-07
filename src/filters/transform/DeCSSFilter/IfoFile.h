@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,6 +28,9 @@
 
 class CIfoFile
 {
+	CStringW m_ifoFilename;
+	bool m_bAOB = false;
+
 	struct chapter_t {
 		REFERENCE_TIME rtime;
 		UINT32 first_sector;
@@ -44,7 +47,8 @@ class CIfoFile
 public:
 	CIfoFile();
 
-	bool OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum = 0); // vts ifo
+	bool OpenIFO(LPCWSTR fn, ULONG nProgNum = 0); // vts ifo
+	bool OpenVOB(CVobFile* vobfile); // vts ifo
 
 	BSTR			GetTrackName(UINT aTrackIdx) const;
 	UINT			GetChaptersCount() const { return (UINT)m_pChapters.size(); }
