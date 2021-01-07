@@ -12607,8 +12607,7 @@ void CMainFrame::SetupChapters()
 				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
 
 				CIfoFile ifo;
-				CVobFile vob;
-				if (::PathFileExistsW(path) && ifo.OpenIFO(path, &vob, TTN) && ulNumOfChapters >= ifo.GetChaptersCount()) {
+				if (::PathFileExistsW(path) && ifo.OpenIFO(path, TTN) && ulNumOfChapters >= ifo.GetChaptersCount()) {
 					for (UINT i = 0; i < ifo.GetChaptersCount(); i++) {
 						REFERENCE_TIME rt = ifo.GetChapterTime(i);
 						CString str;

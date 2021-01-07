@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -306,7 +306,7 @@ CVTSStream::~CVTSStream()
 bool CVTSStream::Load(const WCHAR* fnw, bool bEnableTitleSelection)
 {
 	// TODO bEnableTitleSelection
-	return (m_ifo && m_vob && m_ifo->OpenIFO(fnw, m_vob, 0));
+	return (m_ifo && m_vob && m_ifo->OpenIFO(fnw, 0) && m_ifo->OpenVOB(m_vob));
 }
 
 HRESULT CVTSStream::SetPointer(LONGLONG llPos)

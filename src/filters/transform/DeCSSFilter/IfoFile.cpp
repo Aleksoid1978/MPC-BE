@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -113,14 +113,16 @@ CIfoFile::CIfoFile()
 {
 }
 
-bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
+bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 {
+	m_ifoFilename.SetString(fn);
+	m_bAOB = false;
 	m_pStream_Lang.clear();
 	m_pChapters.clear();
 	m_rtDuration = 0;
 	m_Aspect = { 0, 0 };
 
-	if (fn.Right(6).MakeUpper() != L"_0.IFO") {
+	if (m_ifoFilename.Right(6).MakeUpper() != L"_0.IFO") {
 		return false;
 	}
 
@@ -130,8 +132,6 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 
 	char hdr[IFO_HEADER_SIZE + 1] = { 0 };
 	m_ifoFile.Read(hdr, IFO_HEADER_SIZE);
-
-	bool isAob = false;
 
 	if (strcmp(hdr, VTS_HEADER) == 0) {
 		// http://dvdnav.mplayerhq.hu/dvdinfo/index.html
@@ -465,20 +465,25 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 
 		m_rtDuration = (__int64)pts * 1000 / 9;
 		m_pStream_Lang[0] = L"undefined";
-		isAob = true;
+		m_bAOB = true;
 	}
 
 	m_ifoFile.Close();
 
-	if (m_pChapters.empty()) {
+	return !m_pChapters.empty();
+}
+
+bool CIfoFile::OpenVOB(CVobFile* vobfile)
+{
+	if (!vobfile) {
 		return false;
 	}
 
-	fn.Truncate(fn.GetLength() - 5);
+	CStringW fn = m_ifoFilename.Left(m_ifoFilename.GetLength() - 5);
 	std::list<CString> vobs;
 	for(int i = 1; i < 9; i++) { // skip VTS_xx_0.VOB
-		CString vob;
-		if (isAob) {
+		CStringW vob;
+		if (m_bAOB) {
 			vob.Format(L"%s%d.aob", fn, i);
 		} else {
 			vob.Format(L"%s%d.vob", fn, i);
@@ -503,7 +508,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		return false;
 	}
 
-	if (isAob) {
+	if (m_bAOB) {
 		size_t i = 0;
 		BYTE data[2048];
 		int first_substreamID = 0;
