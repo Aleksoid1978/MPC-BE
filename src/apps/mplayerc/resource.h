@@ -15,9 +15,7 @@
 #define IDB_NOAUDIO                     202
 #define IDB_MONO                        203
 #define IDB_STEREO                      204
-#define IDB_ONOFF_96                    205
-#define IDB_ONOFF_144                   207
-#define IDB_ONOFF_192                   208
+#define IDF_SVG_ONOFF                   205
 #define IDF_LOGO0                       209
 #define IDF_LOGO1                       210
 #define IDB_STREAMTYPES                 215
