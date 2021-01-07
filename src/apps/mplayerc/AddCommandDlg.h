@@ -29,6 +29,7 @@ class CAddCommandDlg : public CDialog
 	DECLARE_DYNAMIC(CAddCommandDlg)
 
 private:
+	CEdit m_FilterEdit;
 	CListCtrl m_list;
 
 	enum {
@@ -38,6 +39,10 @@ private:
 	};
 
 	WORD selectedID = 0;
+	UINT_PTR m_nFilterTimerID;
+
+	void FillList();
+	void FilterList();
 
 public:
 	CAddCommandDlg(CWnd* pParent = nullptr);
@@ -54,5 +59,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnChangeFilterEdit();
 	afx_msg void OnBnClickedOk();
 };

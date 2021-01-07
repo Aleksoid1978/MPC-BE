@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1014,13 +1014,13 @@ void CPPageAccelTbl::FilterList()
 		for (size_t i = 0; i < m_wmcmds.size(); i++) {
 			const wmcmd& wc = m_wmcmds[i];
 
-			CString hotkey, id, name, sname;
+			CString hotkey, id, name;
 
 			HotkeyModToString(wc.key, wc.fVirt, hotkey); hotkey.MakeLower();
-			id.Format(L"%d", wc.cmd); id.MakeLower();
-			sname = wc.GetName(); LowerCase(sname);
+			id.Format(L"%d", wc.cmd);
+			name = wc.GetName(); LowerCase(name);
 
-			if (sname.Find(filter) != -1 || hotkey.Find(filter) != -1 || id.Find(filter) != -1) {
+			if (name.Find(filter) != -1 || hotkey.Find(filter) != -1 || id.Find(filter) != -1) {
 				int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
 				auto itemData = std::make_unique<ITEMDATA>();
 				itemData->index = i;
