@@ -33,14 +33,74 @@ CAddCommandDlg::~CAddCommandDlg()
 {
 }
 
+void CAddCommandDlg::FillList()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	for (int i = 0; i < (int)s.wmcmds.size(); i++) {
+		const wmcmd& wc = s.wmcmds[i];
+
+		m_list.InsertItem(i, wc.GetName());
+		CString str_id;
+		str_id.Format(L"%d", wc.cmd);
+		m_list.SetItemText(i, COL_ID, str_id);
+		m_list.SetItemData(i, wc.cmd);
+	}
+}
+
+void CAddCommandDlg::FilterList()
+{
+	CString filter;
+	m_FilterEdit.GetWindowText(filter);
+
+	m_list.SetRedraw(false);
+	m_list.DeleteAllItems();
+
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (filter.IsEmpty()) {
+		FillList();
+	}
+	else {
+		auto LowerCase = [](CString& str) {
+			if (!str.IsEmpty()) {
+				::CharLowerBuffW(str.GetBuffer(), str.GetLength());
+			}
+		};
+		LowerCase(filter);
+		int n = 0;
+
+		for (int i = 0; i < (int)s.wmcmds.size(); i++) {
+			const wmcmd& wc = s.wmcmds[i];
+
+			CString name = wc.GetName();
+			LowerCase(name);
+			CString str_id;
+			str_id.Format(L"%d", wc.cmd);
+
+			if (name.Find(filter) >= 0 || str_id.Find(filter) >= 0) {
+				m_list.InsertItem(n, wc.GetName());
+				m_list.SetItemText(n, COL_ID, str_id);
+				m_list.SetItemData(n, wc.cmd);
+			}
+		}
+	}
+
+	m_list.SetRedraw(true);
+	m_list.RedrawWindow();
+}
+
 void CAddCommandDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 
+	DDX_Control(pDX, IDC_EDIT1, m_FilterEdit);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
 BEGIN_MESSAGE_MAP(CAddCommandDlg, CDialog)
+	ON_WM_TIMER()
+	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -57,15 +117,7 @@ BOOL CAddCommandDlg::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	for (int i = 0; i < (int)s.wmcmds.size(); i++) {
-		const wmcmd& wc = s.wmcmds[i];
-
-		m_list.InsertItem(i, wc.GetName());
-		CString str_id;
-		str_id.Format(L"%d", wc.cmd);
-		m_list.SetItemText(i, COL_ID, str_id);
-		m_list.SetItemData(i, wc.cmd);
-	}
+	FillList();
 
 	for (int nCol = 0; nCol < COL_COUNT; nCol++) {
 		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
@@ -78,6 +130,22 @@ BOOL CAddCommandDlg::OnInitDialog()
 	}
 
 	return TRUE;
+}
+
+void CAddCommandDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == m_nFilterTimerID) {
+		KillTimer(m_nFilterTimerID);
+		FilterList();
+	} else {
+		__super::OnTimer(nIDEvent);
+	}
+}
+
+void CAddCommandDlg::OnChangeFilterEdit()
+{
+	KillTimer(m_nFilterTimerID);
+	m_nFilterTimerID = SetTimer(2, 100, NULL);
 }
 
 void CAddCommandDlg::OnBnClickedOk()
