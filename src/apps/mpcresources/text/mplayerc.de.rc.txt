@@ -13,10 +13,10 @@
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
-3		"Select command"
+3		"Befehl auswählen"
 6		"Filter:"
-9		"OK"
-10		"Cancel"
+9		"&OK"
+10		"&Abbrechen"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -106,8 +106,8 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
-5		"Speichern"
-6		"Abbrechen"
+5		"&Speichern"
+6		"&Abbrechen"
 7		"Titel:"
 9		"Pfad:"
 END
