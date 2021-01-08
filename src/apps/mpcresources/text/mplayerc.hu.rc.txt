@@ -13,10 +13,10 @@
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
-3		"Select command"
-6		"Filter:"
+3		"Válassza ki a parancsot"
+6		"Szűrő:"
 9		"OK"
-10		"Cancel"
+10		"Mégse"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
