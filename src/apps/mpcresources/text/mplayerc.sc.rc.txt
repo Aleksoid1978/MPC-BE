@@ -14,7 +14,7 @@ END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
 3		"选择命令"
-6		"Filter:"
+6		"过滤:"
 9		"确定"
 10		"取消"
 END
