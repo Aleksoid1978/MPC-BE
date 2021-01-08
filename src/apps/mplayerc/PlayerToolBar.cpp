@@ -213,7 +213,7 @@ void CPlayerToolBar::SwitchTheme()
 	UINT width, height;
 
 	// load toolbar image
-	if (m_svgToolbar.IsLoad()) {
+	if (s.bUseDarkTheme && m_svgToolbar.IsLoad()) {
 		int w = 0;
 		int h = m_pMainFrame->ScaleY(24);
 		hBitmap = m_svgToolbar.Rasterize(w, h);
