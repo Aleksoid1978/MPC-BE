@@ -1,4 +1,4 @@
-<svg width="1920" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="1920" height="120" xmlns="http://www.w3.org/2000/svg">
 
 <defs>
   <linearGradient id="button" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -14,7 +14,7 @@
     <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:1"/>
   </linearGradient>
   <linearGradient id="silence" x1="0%" y1="20%" x2="0%" y2="80%">
-    <stop offset="0%" style="stop-color:#E89682;stop-opacity:1"/>
+    <stop offset="0%" style="stop-color:#E88282;stop-opacity:1"/>
     <stop offset="100%" style="stop-color:#C85A5A;stop-opacity:1"/>
   </linearGradient>
 </defs>
@@ -22,19 +22,19 @@
 <path fill="none" stroke="#C0C0C0" stroke-width="5" d="M7.5,22.5 a15,15 0 0,1 15,-15 h75 a15,15 0 0,1 15,15 v75 a15,15 0 0,1 -15,15 h-75 a15,15 0 0,1 -15,-15 z"/>
 <path fill="none" stroke="#C0C0C0" stroke-width="5" d="M127.5,22.5 a15,15 0 0,1 15,-15 h75 a15,15 0 0,1 15,15 v75 a15,15 0 0,1 -15,15 h-75 a15,15 0 0,1 -15,-15 z"/>
 
-<path fill="url(#button)" stroke="black" d="M42,32 l48,28 l-48,28 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M42.5,32.5 l47.5,27.5 l-47.5,27.5 z"/>
 
-<path fill="url(#button)" stroke="black" d="M160,35 h10 v50 h-10 z m30,0 h10 v50 h-10 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M157.5,35 h15 v50 h-15 z m30,0 h15 v50 h-15 z"/>
 
-<path fill="url(#button)" stroke="black" d="M276,40 a4,4 0 0,1 4,-4 h40 a4,4 0 0,1 4,4 v40 a4,4 0 0,1 -4,4 h-40 a4,4 0 0,1 -4,-4 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M277.5,42.5 a5,5 0 0,1 5,-5 h35 a5,5 0 0,1 5,5 v35 a5,5 0 0,1 -5,5 h-35 a5,5 0 0,1 -5,-5 z"/>
 
-<path fill="url(#button)" stroke="black" d="M526,85 h-10 v-50 h10 v20 l38,-20 v50 l-38,-20 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M530,85 h-12.5 v-50 h12.5 v20 l30,-20 h5 v50 h-5 l-30,-20 z"/>
 
-<path fill="url(#button)" stroke="black" d="M671,85 h10 v-50 h-10 v20 l-38,-20 v50 l38,-20 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M670,85 h12.5,0 v-50 h-12.5 v20 l-30,-20 h-5 v50 h5 l30,-20 z"/>
 
-<path fill="url(#button)" stroke="black" d="M755,35 h15 v50 h-15 z m55,25 l-30,-25 v50 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M755,35 h15 v50 h-15 z m60,25 l-30,-25 h-5 v50 h5 z"/>
 
-<path fill="url(#button)" stroke="black" d="M875,60 h50 l-25,-30 z m0,7.5 h50 v15 h-50 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M875,65 h50 v-5 l-25,-25 l-25,25 z m0,5 h50 v15 h-50 z"/>
 
 <path fill="none" stroke="#C0C0C0" stroke-width="5" d="M1107.5,75 v-27.5 a5,5 0 0,1 5,-5 h10 v32.5 m-15,-17.5 h15
  m10,-17.5 v27.5 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-27.5
@@ -44,14 +44,14 @@
  m10,-10 v27.5 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-27.5
  m10,17.5 h10 a5,5 0 0,0 5,-5 v-5 a5,5 0 0,0 -5,-5 h-10 v30 h10 a5,5 0 0,0 5,-5 v-5 a5,5 0 0,0 -5,-5"/>
 
-<path fill="url(#button)" stroke="black" d="M1505,30 v60 l-17.5,-17.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M1505,25 v70 l-22.5,-22.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
 <path fill="white" d="M1510.029,44.23 a27.5,27.5 0 0,1 0,31.54 a2.5,2.5 0 0,0 4.096,2.868 a32.5,32.5 0 0,0 0,-37.276 a2.5,2.5 0 0,0 -4.096,2.868
  m12.288,-8.602 a42.5,42.5 0 0,1 0,48.744 a2.5,2.5 0 0,0 4.097,2.867 a47.5,47.5 0 0,0 0,-54.478 a2.5,2.5 0 0,0 -4.097,2.867"/>
 
-<path fill="url(#button)" stroke="black" d="M1625,30 v60 l-17.5,-17.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
+<path fill="url(#button)" stroke="black" stroke-width="1.25" d="M1625,25 v70 l-22.5,-22.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
 <path fill="url(#silence)" d="M1642.5,60 l-7.5,-7.5 a5.3033,5.3033 0 0,1 7.5,-7.5 l7.5,7.5 l7.5,-7.5 a5.3033,5.3033 0 0,1 7.5,7.5 l-7.5,7.5 l7.5,7.5 a5.3033,5.3033 0 0,1 -7.5,7.5 l-7.5,-7.5 l-7.5,7.5 a5.3033,5.3033 0 0,1 -7.5,-7.5 z"/>
 
-<path fill="url(#button)" stroke="black" d="M1755,30 v60 l-17.5,-17.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
+<path fill="url(#button)" stroke="black" d="M1760,25 v70 l-22.5,-22.5 h-12.5 a5,5 0 0,1 -5,-5 v-15 a5,5 0 0,1 5,-5 h12.5 z"/>
 
 <path fill="none" stroke="#C0C0C0" stroke-width="5" d="M1807.5,37.5 a15,15 0 0,1 15,-15 h75 a15,15 0 0,1 15,15 v40 a15,15 0 0,1 -15,15 h-75 a15,15 0 0,1 -15,-15 z"/>
 <path fill="none" stroke="#C0C0C0" stroke-width="5" d="M1842.5,50 v-2.5 a5,5 0 0,0 -5,-5 h-5 a5,5 0 0,0 -5,5 v20 a5,5 0 0,0 5,5 h5 a5,5 0 0,0 5,-5 v-10 h-7.5
