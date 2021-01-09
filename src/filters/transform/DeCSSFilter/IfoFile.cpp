@@ -133,6 +133,7 @@ bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 	char hdr[IFO_HEADER_SIZE + 1] = { 0 };
 	m_ifoFile.Read(hdr, IFO_HEADER_SIZE);
 
+	// DVD-Video
 	if (strcmp(hdr, VTS_HEADER) == 0) {
 		// http://dvdnav.mplayerhq.hu/dvdinfo/index.html
 		// http://dvd.sourceforge.net/dvdinfo/index.html
@@ -291,8 +292,10 @@ bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 							if (programs[0].chapters[i].duration == 0) {
 								programs[0].chapters[i].duration = duration;
 							}
+#if 0
 							ASSERT(programs[0].chapters[i].first_sector == firstVOBUStartSector);
 							ASSERT(programs[0].chapters[i].last_sector == lastVOBUEndSector);
+#endif
 							break;
 						}
 					}
@@ -304,11 +307,6 @@ bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 					if (chapter.last_sector < lastVOBUEndSector) {
 						chapter.last_sector = lastVOBUEndSector;
 					}
-				}
-
-				auto& chapters = programs[prog].chapters;
-				if (chapters.size() && chapters[chapters.size() - 1].last_sector + 1 != chapter.first_sector) {
-					continue; // ignore jumps for program
 				}
 
 				programs[prog].chapters.push_back(chapter);
@@ -345,6 +343,7 @@ bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 
 		auto& chapters = programs[selected_prog].chapters;
 		REFERENCE_TIME time = 0;
+
 		for (size_t i = 0; i < chapters.size(); i++) {
 			chapter_t chapter;
 			chapter.first_sector = chapters[i].first_sector;
@@ -352,11 +351,15 @@ bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 			chapter.title = chapter.track = 0;
 			chapter.rtime = time;
 
-			m_pChapters.push_back(chapter);
+			if (chapters[i].duration > 10000000) {
+				// only full-length chapters, ignoring program jumps
+				m_pChapters.push_back(chapter);
+			}
 			time += chapters[i].duration;
 		}
 		ASSERT(time == m_rtDuration);
 	}
+	// DVD-Audio
 	else if (m_ifoFile.GetLength() >= 4096 && strcmp(hdr, ATS_HEADER) == 0) {
 
 		m_ifoFile.Seek(256, CFile::begin);
