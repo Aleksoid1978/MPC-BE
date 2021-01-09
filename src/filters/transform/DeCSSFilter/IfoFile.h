@@ -41,8 +41,8 @@ class CIfoFile
 	std::map<DWORD, CString> m_pStream_Lang;
 	std::vector<chapter_t> m_pChapters;
 
-	REFERENCE_TIME	m_rtDuration;
-	fraction_t		m_Aspect;
+	REFERENCE_TIME	m_rtDuration = 0;
+	fraction_t		m_Aspect = {};
 
 public:
 	CIfoFile();
