@@ -108,27 +108,25 @@ struct pgc_t {
 //
 
 CIfoFile::CIfoFile()
-	: m_Aspect({0,0})
-	, m_rtDuration(0)
 {
 }
 
 bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 {
 	m_ifoFilename.SetString(fn);
-	m_bAOB = false;
-	m_pStream_Lang.clear();
-	m_pChapters.clear();
-	m_rtDuration = 0;
-	m_Aspect = { 0, 0 };
 
 	if (m_ifoFilename.Right(6).MakeUpper() != L"_0.IFO") {
 		return false;
 	}
-
-	if (!m_ifoFile.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
+	if (!m_ifoFile.Open(m_ifoFilename, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
 		return false;
 	}
+
+	m_bAOB = false;
+	m_pStream_Lang.clear();
+	m_pChapters.clear();
+	m_rtDuration = 0;
+	m_Aspect = {};
 
 	char hdr[IFO_HEADER_SIZE + 1] = { 0 };
 	m_ifoFile.Read(hdr, IFO_HEADER_SIZE);

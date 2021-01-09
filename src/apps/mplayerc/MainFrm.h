@@ -385,6 +385,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	// chapters (file mode)
 	CComPtr<IDSMChapterBag> m_pCB;
+	ULONG m_chapterTitleNum = 0;
 	void SetupChapters();
 
 	//

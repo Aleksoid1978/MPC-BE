@@ -12588,31 +12588,39 @@ void CMainFrame::SetupChapters()
 				}
 			}
 		}
-	} else if (GetPlaybackMode() == PM_DVD) {
-		m_pCB->ChapRemoveAll();
-
-		WCHAR buff[MAX_PATH] = { 0 };
- 		ULONG len = 0;
- 		DVD_PLAYBACK_LOCATION2 loc;
+	}
+	else if (GetPlaybackMode() == PM_DVD) {
+		WCHAR buff[MAX_PATH] = {};
+		ULONG len = 0;
+		DVD_PLAYBACK_LOCATION2 loc = {};
 		ULONG ulNumOfChapters = 0;
- 		if (SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))
-				&& SUCCEEDED(m_pDVDI->GetCurrentLocation(&loc))
-				&& SUCCEEDED(m_pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters))
-				&& ulNumOfChapters > 1) {
- 			CStringW path;
-			path.Format(L"%s\\VIDEO_TS.IFO", buff);
 
-			ULONG VTSN, TTN;
-			if (::PathFileExistsW(path) && CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
-				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
+		HRESULT hr = m_pDVDI->GetDVDDirectory(buff, std::size(buff), &len);
+		if (SUCCEEDED(hr)) {
+			hr = m_pDVDI->GetCurrentLocation(&loc);
+		}
+		if (loc.TitleNum != m_chapterTitleNum) {
+			m_pCB->ChapRemoveAll(); // remove chapters even if GetDVDDirectory and GetCurrentLocation fails
 
-				CIfoFile ifo;
-				if (::PathFileExistsW(path) && ifo.OpenIFO(path, TTN) && ulNumOfChapters >= ifo.GetChaptersCount()) {
-					for (UINT i = 0; i < ifo.GetChaptersCount(); i++) {
-						REFERENCE_TIME rt = ifo.GetChapterTime(i);
-						CString str;
-						str.Format(IDS_AG_CHAPTER, i + 1);
-						m_pCB->ChapAppend(rt, str);
+			if (SUCCEEDED(hr)) {
+				hr = m_pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters);
+			}
+			if (SUCCEEDED(hr) && ulNumOfChapters > 1) {
+				CStringW path;
+				path.Format(L"%s\\VIDEO_TS.IFO", buff);
+
+				ULONG VTSN, TTN;
+				if (CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
+					path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
+
+					CIfoFile ifo;
+					if (ifo.OpenIFO(path, TTN) && ulNumOfChapters >= ifo.GetChaptersCount()) {
+						for (UINT i = 0; i < ifo.GetChaptersCount(); i++) {
+							REFERENCE_TIME rt = ifo.GetChapterTime(i);
+							CString str;
+							str.Format(IDS_AG_CHAPTER, i + 1);
+							m_pCB->ChapAppend(rt, str);
+						}
 					}
 				}
 			}
@@ -14366,6 +14374,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_rtDurationOverride = -1;
 	m_kfs.clear();
 	m_pCB.Release();
+	m_chapterTitleNum = 0;
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
