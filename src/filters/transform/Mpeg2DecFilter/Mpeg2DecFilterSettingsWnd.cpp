@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -105,9 +105,9 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 	{
 		int h = std::max(21, m_fontheight); // special size for sliders
 		static const WCHAR* labels[] = {m_strBrightness, m_strContrast, m_strHue, m_strSaturation};
-		for (int i = 0; i < _countof(m_procamp_slider); i++) {
+		for (unsigned i = 0; i < std::size(m_procamp_slider); i++) {
 			m_procamp_static[i].Create(labels[i], WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(80), m_fontheight)), this);
-			m_procamp_slider[i].Create(dwStyle, CRect(p + CPoint(ScaleX(85), 0), CSize(ScaleX(201), h)), this, IDC_PP_SLIDER1 + i);
+			m_procamp_slider[i].Create(dwStyle|TBS_DOWNISLEFT, CRect(p + CPoint(ScaleX(85), 0), CSize(ScaleX(201), h)), this, IDC_PP_SLIDER1 + i);
 			m_procamp_value[i].Create(L"", WS_VISIBLE | WS_CHILD, CRect(p + CPoint(ScaleX(85 + 201), 0), CSize(ScaleX(30), m_fontheight)), this);
 			p.y += h;
 		}
