@@ -5,7 +5,7 @@ The GUI on the basis of the original patch Bobdynlan (bobdynlan@users.sourceforg
 Active:
 --------
 aleksoid (Admin, Senior Software Engineer, Forum moderator, Code) - Aleksoid1978@mail.ru, Russia
-Angel (Forum administrator) - angel.belnet@gmail.com, Russia
+Angel (Forum administrator) - Russia
 arestarh1986 (Documentation) - Ukraine
 szl/alexins (Software Engineer Technologist) - mpcbe@outlook.com, icq:6531931, Republic of Slovenia
 v0lt (Admin, Forum moderator, Code) - Russia
