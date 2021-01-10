@@ -803,7 +803,7 @@ public:
 
 	bool DoAfterPlaybackEvent();
 	void ParseDirs(std::list<CString>& sl);
-	int SearchInDir(const bool& bForward);
+	int SearchInDir(const bool bForward);
 
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

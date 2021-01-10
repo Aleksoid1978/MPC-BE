@@ -14517,7 +14517,7 @@ void CMainFrame::ParseDirs(std::list<CString>& sl)
 	}
 }
 
-int CMainFrame::SearchInDir(const bool& bForward)
+int CMainFrame::SearchInDir(const bool bForward)
 {
 	std::list<CString> sl;
 
