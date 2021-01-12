@@ -144,7 +144,7 @@ BOOL CPPageColor::OnSetActive()
 {
 	CRenderersSettings& rs = AfxGetAppSettings().m_VRSettings;
 
-	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM && rs.iSurfaceFormat == D3DFMT_A16B16G16R16F) {
+	if (rs.iVideoRenderer == VIDRNDT_EVR_CP && rs.iSurfaceFormat == D3DFMT_A16B16G16R16F) {
 		m_chkColorManagment.EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
 		UpdateColorManagment();

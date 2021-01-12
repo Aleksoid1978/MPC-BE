@@ -772,7 +772,7 @@
 #define IDC_FINDINPLAYLIST              10628
 #define IDC_CHECK_SUBRESYNC             10629
 #define IDC_BASSREDIRECT_CHECK          10630
-#define IDC_DSSYSDEF                    10700
+#define IDC_DSVMR7                      10703
 #define IDC_DSVMR9WIN                   10704
 #define IDC_DSDXR                       10707
 #define IDC_DSNULL_ANY                  10708
@@ -1729,6 +1729,7 @@
 #define IDS_MOUSE_ACTION                41710
 #define IDS_MOUSE_COMMAND               41711
 #define IDS_MOUSE_RIGHT_BUTTON          41712
+#define IDS_PPAGE_OUTPUT_VMR7           42003
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
 #define IDS_PPAGE_OUTPUT_MPCVR          42005
 #define IDS_PPAGE_OUTPUT_EVR            42007

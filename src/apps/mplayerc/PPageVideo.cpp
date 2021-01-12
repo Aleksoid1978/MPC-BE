@@ -34,7 +34,7 @@ static HRESULT IsRendererAvailable(int VideoRendererType)
 {
 	switch (VideoRendererType) {
 		case VIDRNDT_EVR:
-		case VIDRNDT_EVR_CUSTOM:
+		case VIDRNDT_EVR_CP:
 		case VIDRNDT_SYNC:
 			return CheckFilterCLSID(CLSID_EnhancedVideoRenderer);
 		case VIDRNDT_MPCVR:
@@ -51,8 +51,8 @@ static HRESULT IsRendererAvailable(int VideoRendererType)
 IMPLEMENT_DYNAMIC(CPPageVideo, CPPageBase)
 CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
-	, m_iVideoRendererType(VIDRNDT_SYSDEFAULT)
-	, m_iVideoRendererType_store(VIDRNDT_SYSDEFAULT)
+	, m_iVideoRendererType(VIDRNDT_VMR7)
+	, m_iVideoRendererType_store(VIDRNDT_VMR7)
 	, m_bResetDevice(FALSE)
 	, m_iEvrBuffers(RS_EVRBUFFERS_DEF)
 	, m_bD3D9RenderDevice(FALSE)
@@ -173,10 +173,10 @@ BOOL CPPageVideo::OnInitDialog()
 
 	auto addRenderer = [&](int iVR, UINT nID) {
 		switch (iVR) {
-		case VIDRNDT_SYSDEFAULT:
-		case VIDRNDT_VMR9WINDOWED:
+		case VIDRNDT_VMR7:
+		case VIDRNDT_VMR9_W:
 		case VIDRNDT_EVR:
-		case VIDRNDT_EVR_CUSTOM:
+		case VIDRNDT_EVR_CP:
 		case VIDRNDT_SYNC:
 		case VIDRNDT_MPCVR:
 		case VIDRNDT_DXR:
@@ -203,16 +203,16 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
-	addRenderer(VIDRNDT_SYSDEFAULT,   IDS_PPAGE_OUTPUT_SYS_DEF);
-	addRenderer(VIDRNDT_VMR9WINDOWED, IDS_PPAGE_OUTPUT_VMR9WINDOWED);
-	addRenderer(VIDRNDT_EVR,          IDS_PPAGE_OUTPUT_EVR);
-	addRenderer(VIDRNDT_EVR_CUSTOM,   IDS_PPAGE_OUTPUT_EVR_CUSTOM);
-	addRenderer(VIDRNDT_SYNC,         IDS_PPAGE_OUTPUT_SYNC);
-	addRenderer(VIDRNDT_MPCVR,        IDS_PPAGE_OUTPUT_MPCVR);
-	addRenderer(VIDRNDT_DXR,          IDS_PPAGE_OUTPUT_DXR);
-	addRenderer(VIDRNDT_MADVR,        IDS_PPAGE_OUTPUT_MADVR);
-	addRenderer(VIDRNDT_NULL_ANY,     IDS_PPAGE_OUTPUT_NULL_ANY);
-	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
+	addRenderer(VIDRNDT_VMR7,        IDS_PPAGE_OUTPUT_VMR7);
+	addRenderer(VIDRNDT_VMR9_W,      IDS_PPAGE_OUTPUT_VMR9WINDOWED);
+	addRenderer(VIDRNDT_EVR,         IDS_PPAGE_OUTPUT_EVR);
+	addRenderer(VIDRNDT_EVR_CP,      IDS_PPAGE_OUTPUT_EVR_CUSTOM);
+	addRenderer(VIDRNDT_SYNC,        IDS_PPAGE_OUTPUT_SYNC);
+	addRenderer(VIDRNDT_MPCVR,       IDS_PPAGE_OUTPUT_MPCVR);
+	addRenderer(VIDRNDT_DXR,         IDS_PPAGE_OUTPUT_DXR);
+	addRenderer(VIDRNDT_MADVR,       IDS_PPAGE_OUTPUT_MADVR);
+	addRenderer(VIDRNDT_NULL_ANY,    IDS_PPAGE_OUTPUT_NULL_ANY);
+	addRenderer(VIDRNDT_NULL_UNCOMP, IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
 	SelectByItemData(m_cbVideoRenderer, m_iVideoRendererType);
 
@@ -248,7 +248,7 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 
 	switch (m_iVideoRendererType) {
-		case VIDRNDT_EVR_CUSTOM:
+		case VIDRNDT_EVR_CP:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 					GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(TRUE);
 					m_cbD3D9RenderDevice.EnableWindow(FALSE);
@@ -381,7 +381,7 @@ void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 {
 	int vrenderer = GetCurItemData(m_cbVideoRenderer);
 
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER) && vrenderer == VIDRNDT_VMR9WINDOWED);
+	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER) && vrenderer == VIDRNDT_VMR9_W);
 }
 
 void CPPageVideo::OnDSRendererChange()
@@ -413,10 +413,10 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 
 	switch (CurrentVR) {
-		case VIDRNDT_SYSDEFAULT:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), &m_cbVideoRenderer);
+		case VIDRNDT_VMR7:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_VMR9WINDOWED:
+		case VIDRNDT_VMR9_W:
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
@@ -425,7 +425,7 @@ void CPPageVideo::OnDSRendererChange()
 		case VIDRNDT_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_EVR_CUSTOM:
+		case VIDRNDT_EVR_CP:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(TRUE);
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE_CHECK));
