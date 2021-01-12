@@ -75,7 +75,7 @@ CRenderersSettings::CRenderersSettings()
 
 void CRenderersSettings::SetDefault()
 {
-	iVideoRenderer					= VIDRNDT_EVR_CUSTOM;
+	iVideoRenderer					= VIDRNDT_EVR_CP;
 
 	sD3DRenderDevice.Empty();
 	bResetDevice					= false;
@@ -132,11 +132,11 @@ void CRenderersSettings::Load()
 	CProfile& profile = AfxGetProfile();
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
-	iVideoRenderer = discard(iVideoRenderer, (int)VIDRNDT_EVR_CUSTOM,
-		{VIDRNDT_SYSDEFAULT,
-		VIDRNDT_VMR9WINDOWED,
+	iVideoRenderer = discard(iVideoRenderer, (int)VIDRNDT_EVR_CP,
+		{VIDRNDT_VMR7,
+		VIDRNDT_VMR9_W,
 		VIDRNDT_EVR,
-		VIDRNDT_EVR_CUSTOM,
+		VIDRNDT_EVR_CP,
 		VIDRNDT_SYNC,
 		VIDRNDT_MPCVR,
 		VIDRNDT_DXR,

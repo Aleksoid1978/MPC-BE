@@ -412,7 +412,7 @@ CAppSettings::~CAppSettings()
 
 bool CAppSettings::IsD3DFullscreen() const
 {
-	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
+	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP) {
 		return fD3DFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
 	}
 
@@ -2648,10 +2648,10 @@ CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 
 bool CAppSettings::IsISRSelect() const
 {
-	return (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_DXR ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_SYNC ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_MADVR ||
+	return (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP ||
+			m_VRSettings.iVideoRenderer == VIDRNDT_DXR    ||
+			m_VRSettings.iVideoRenderer == VIDRNDT_SYNC   ||
+			m_VRSettings.iVideoRenderer == VIDRNDT_MADVR  ||
 			m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR);
 }
 

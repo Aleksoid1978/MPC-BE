@@ -142,9 +142,9 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
 
 	bool VRwithSR =
-		rs.iVideoRenderer == VIDRNDT_MADVR ||
-		rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		rs.iVideoRenderer == VIDRNDT_SYNC ||
+		rs.iVideoRenderer == VIDRNDT_MADVR  ||
+		rs.iVideoRenderer == VIDRNDT_EVR_CP ||
+		rs.iVideoRenderer == VIDRNDT_SYNC   ||
 		rs.iVideoRenderer == VIDRNDT_MPCVR;
 
 	str = L"VSFilter/xy-VSFilter";

@@ -92,7 +92,7 @@ void CPPageSync::InitDialogPrivate()
 	m_chkVMRFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
 	m_chkVMRFlushGPUWait.SetCheck(rs.bFlushGPUWait);
 
-	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
+	if (rs.iVideoRenderer == VIDRNDT_EVR_CP) {
 		m_chkVSync.EnableWindow(TRUE);
 		m_chkVSyncInternal.EnableWindow(TRUE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(TRUE);
@@ -107,7 +107,7 @@ void CPPageSync::InitDialogPrivate()
 	}
 
 	if ((!SysVersion::IsWin8orLater()) &&
-			(rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+			(rs.iVideoRenderer == VIDRNDT_EVR_CP ||
 			rs.iVideoRenderer == VIDRNDT_MADVR ||
 			rs.iVideoRenderer == VIDRNDT_SYNC)) {
 		m_chkDisableAero.EnableWindow(TRUE);
@@ -115,7 +115,7 @@ void CPPageSync::InitDialogPrivate()
 		m_chkDisableAero.EnableWindow(FALSE);
 	}
 
-	m_chkEnableFrameTimeCorrection.EnableWindow(rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
+	m_chkEnableFrameTimeCorrection.EnableWindow(rs.iVideoRenderer == VIDRNDT_EVR_CP ? TRUE : FALSE);
 
 	m_iSyncMode = rs.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
 				: rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1

@@ -1435,10 +1435,10 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT) && S_OK != IsPinConnected(pPin)) {
 			if (GetPinName(pPin)[0] == '~'
-					&& rs.iVideoRenderer != VIDRNDT_EVR_CUSTOM
+					&& rs.iVideoRenderer != VIDRNDT_EVR_CP
 					&& rs.iVideoRenderer != VIDRNDT_EVR
 					&& rs.iVideoRenderer != VIDRNDT_SYNC
-					&& rs.iVideoRenderer != VIDRNDT_VMR9WINDOWED) {
+					&& rs.iVideoRenderer != VIDRNDT_VMR9_W) {
 
 				// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 				if (FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
@@ -2650,7 +2650,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}"), MERIT64_DO_NOT_USE));
 
 	//block default video renderer renderer if it was not selected
-	if (rs.iVideoRenderer != VIDRNDT_SYSDEFAULT) {
+	if (rs.iVideoRenderer != VIDRNDT_VMR7) {
 		m_transform.push_back(DNew CFGFilterRegistry(CLSID_VideoRendererDefault, MERIT64_DO_NOT_USE));
 		m_transform.push_back(DNew CFGFilterRegistry(CLSID_VideoRenderer, MERIT64_DO_NOT_USE));
 	}
@@ -2658,9 +2658,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Subtitle renderers
 
 	bool VRwithSR =
-		rs.iVideoRenderer == VIDRNDT_MADVR ||
-		rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		rs.iVideoRenderer == VIDRNDT_SYNC ||
+		rs.iVideoRenderer == VIDRNDT_MADVR  ||
+		rs.iVideoRenderer == VIDRNDT_EVR_CP ||
+		rs.iVideoRenderer == VIDRNDT_SYNC   ||
 		rs.iVideoRenderer == VIDRNDT_MPCVR;
 
 	switch (s.iSubtitleRenderer) {
@@ -2832,13 +2832,13 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		};
 
 		switch (rs.iVideoRenderer) {
-			case VIDRNDT_VMR9WINDOWED:
+			case VIDRNDT_VMR9_W:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", vrmerit));
 				break;
 			case VIDRNDT_EVR:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", vrmerit));
 				break;
-			case VIDRNDT_EVR_CUSTOM:
+			case VIDRNDT_EVR_CP:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"Enhanced Video Renderer (custom presenter)", vrmerit));
 				break;
 			case VIDRNDT_SYNC:
