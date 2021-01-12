@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -414,16 +414,16 @@ void CPPageVideo::OnDSRendererChange()
 
 	switch (CurrentVR) {
 		case VIDRNDT_VMR7:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_VMR7), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_VMR9_W:
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_VMR9W), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_EVR:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_EVR_CP:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
@@ -452,7 +452,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR_CP), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_SYNC:
 			UpdateResizerList(GetCurItemData(m_cbDX9Resizer));
@@ -467,19 +467,19 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR_SYNC), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DXR:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_HAALI_VR), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_NULL_ANY:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_ANY), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_NULLVR_ANY), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_NULL_UNCOMP:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_NULLVR_UNCOMP), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_MADVR:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), &m_cbVideoRenderer);
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
