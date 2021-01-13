@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,8 +45,6 @@ private:
 	CComboBox m_cbFrameMode;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
-	CButton   m_chkVMRMixerMode;
-	CButton   m_chkVMRMixerYUV;
 	CButton   m_chkNoSmallUpscale;
 	CButton   m_chkNoSmallDownscale;
 
@@ -75,7 +73,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnUpdateMixerYUV(CCmdUI* pCmdUI);
 	afx_msg void OnDSRendererChange();
 	afx_msg void OnResetDevice();
 	afx_msg void OnFullscreenCheck();

@@ -44,9 +44,6 @@
 #define IDS_RS_FLUSHGPUAFTERPRESENT	L"FlushGPUAfterPresent"
 #define IDS_RS_FLUSHGPUWAIT			L"FlushGPUWait"
 
-#define IDS_RS_VMR_MIXERMODE		L"VMRMixerMode"
-#define IDS_RS_VMR_MIXERYUV			L"VMRMixerYUV"
-
 #define IDS_RS_EVR_OUTPUTRANGE		L"EVROutputRange"
 #define IDS_RS_EVR_BUFFERS			L"EVRBuffers"
 
@@ -94,9 +91,6 @@ void CRenderersSettings::SetDefault()
 	bFlushGPUAfterPresent			= false;
 	bFlushGPUWait					= false;
 
-	bVMRMixerMode					= true;
-	bVMRMixerYUV					= true;
-
 	iEVROutputRange					= 0;
 	nEVRBuffers						= 5;
 
@@ -133,8 +127,7 @@ void CRenderersSettings::Load()
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
 	iVideoRenderer = discard(iVideoRenderer, (int)VIDRNDT_EVR_CP,
-		{VIDRNDT_VMR9_W,
-		VIDRNDT_EVR,
+		{VIDRNDT_EVR,
 		VIDRNDT_EVR_CP,
 		VIDRNDT_SYNC,
 		VIDRNDT_MPCVR,
@@ -168,9 +161,6 @@ void CRenderersSettings::Load()
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, bFlushGPUWait);
-
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERMODE, bVMRMixerMode);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERYUV, bVMRMixerYUV);
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
@@ -218,9 +208,6 @@ void CRenderersSettings::Save()
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, bFlushGPUWait);
-
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERMODE, bVMRMixerMode);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERYUV, bVMRMixerYUV);
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);

@@ -78,8 +78,6 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_RESETDEVICE, m_bResetDevice);
 	DDX_Control(pDX, IDC_EXCLUSIVE_FULLSCREEN_CHECK, m_chkD3DFullscreen);
 	DDX_Control(pDX, IDC_CHECK1, m_chk10bitOutput);
-	DDX_Control(pDX, IDC_DSVMRLOADMIXER, m_chkVMRMixerMode);
-	DDX_Control(pDX, IDC_DSVMRYUVMIXER, m_chkVMRMixerYUV);
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
 	DDX_Text(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_SPIN1, m_spnEvrBuffers);
@@ -95,7 +93,6 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_BN_CLICKED(IDC_D3D9DEVICE_CHECK, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_RESETDEVICE, OnResetDevice)
 	ON_BN_CLICKED(IDC_EXCLUSIVE_FULLSCREEN_CHECK, OnFullscreenCheck)
-	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
 	ON_CBN_SELCHANGE(IDC_COMBO8, OnFrameModeChange)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
@@ -122,8 +119,6 @@ BOOL CPPageVideo::OnInitDialog()
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
 	m_chk10bitOutput.SetCheck(rs.b10BitOutput);
-	m_chkVMRMixerMode.SetCheck(rs.bVMRMixerMode);
-	m_chkVMRMixerYUV.SetCheck(rs.bVMRMixerYUV);
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
@@ -173,7 +168,6 @@ BOOL CPPageVideo::OnInitDialog()
 
 	auto addRenderer = [&](int iVR, UINT nID) {
 		switch (iVR) {
-		case VIDRNDT_VMR9_W:
 		case VIDRNDT_EVR:
 		case VIDRNDT_EVR_CP:
 		case VIDRNDT_SYNC:
@@ -202,7 +196,6 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
-	addRenderer(VIDRNDT_VMR9_W,      IDS_PPAGE_OUTPUT_VMR9WINDOWED);
 	addRenderer(VIDRNDT_EVR,         IDS_PPAGE_OUTPUT_EVR);
 	addRenderer(VIDRNDT_EVR_CP,      IDS_PPAGE_OUTPUT_EVR_CUSTOM);
 	addRenderer(VIDRNDT_SYNC,        IDS_PPAGE_OUTPUT_SYNC);
@@ -294,8 +287,6 @@ BOOL CPPageVideo::OnApply()
 	rs.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
 	rs.iResizer			= GetCurItemData(m_cbDX9Resizer);
 	rs.iDownscaler		= GetCurItemData(m_cbDownscaler);
-	rs.bVMRMixerMode	= !!m_chkVMRMixerMode.GetCheck();
-	rs.bVMRMixerYUV		= !!m_chkVMRMixerYUV.GetCheck();
 	s.fD3DFullscreen	= !!m_chkD3DFullscreen.GetCheck();
 	rs.bResetDevice		= !!m_bResetDevice;
 
@@ -375,13 +366,6 @@ void CPPageVideo::UpdateDownscalerList(int select)
 	m_cbDownscaler.SetRedraw(TRUE);
 }
 
-void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
-{
-	int vrenderer = GetCurItemData(m_cbVideoRenderer);
-
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER) && vrenderer == VIDRNDT_VMR9_W);
-}
-
 void CPPageVideo::OnDSRendererChange()
 {
 	int CurrentVR = (int)GetCurItemData(m_cbVideoRenderer);
@@ -395,8 +379,6 @@ void CPPageVideo::OnDSRendererChange()
 	m_cbDownscaler.EnableWindow(FALSE);
 	m_chkD3DFullscreen.EnableWindow(FALSE);
 	m_chk10bitOutput.EnableWindow(FALSE);
-	m_chkVMRMixerMode.EnableWindow(FALSE);
-	m_chkVMRMixerYUV.EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
 	m_spnEvrBuffers.EnableWindow(FALSE);
@@ -411,12 +393,6 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 
 	switch (CurrentVR) {
-		case VIDRNDT_VMR9_W:
-			m_chkVMRMixerMode.EnableWindow(TRUE);
-			m_chkVMRMixerYUV.EnableWindow(TRUE);
-
-			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_VMR9W), &m_cbVideoRenderer);
-			break;
 		case VIDRNDT_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR), &m_cbVideoRenderer);
 			break;
@@ -541,8 +517,6 @@ void CPPageVideo::OnBnClickedDefault()
 	UpdateData(FALSE);
 
 	m_cbEVROutputRange.SetCurSel(0);
-	m_chkVMRMixerMode.SetCheck(BST_CHECKED);
-	m_chkVMRMixerYUV.SetCheck(BST_CHECKED);
 
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);

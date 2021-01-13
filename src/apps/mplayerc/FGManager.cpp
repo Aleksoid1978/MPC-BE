@@ -1437,8 +1437,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			if (GetPinName(pPin)[0] == '~'
 					&& rs.iVideoRenderer != VIDRNDT_EVR_CP
 					&& rs.iVideoRenderer != VIDRNDT_EVR
-					&& rs.iVideoRenderer != VIDRNDT_SYNC
-					&& rs.iVideoRenderer != VIDRNDT_VMR9_W) {
+					&& rs.iVideoRenderer != VIDRNDT_SYNC) {
 
 				// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 				if (FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
@@ -2830,9 +2829,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		};
 
 		switch (rs.iVideoRenderer) {
-			case VIDRNDT_VMR9_W:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", vrmerit));
-				break;
 			case VIDRNDT_EVR:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", vrmerit));
 				break;
