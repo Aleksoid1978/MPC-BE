@@ -977,7 +977,6 @@
 #define IDS_FILE_SAVE_THUMBNAILS        24005
 #define IDC_MAINFRAME_ICON              24006
 #define IDS_OSD_TEST                    24007
-#define IDS_DESC_VMR7                   31003
 #define IDS_DESC_VMR9W                  31004
 #define IDS_DESC_HAALI_VR               31007
 #define IDS_DESC_NULLVR_ANY             31008
@@ -1729,7 +1728,6 @@
 #define IDS_MOUSE_ACTION                41710
 #define IDS_MOUSE_COMMAND               41711
 #define IDS_MOUSE_RIGHT_BUTTON          41712
-#define IDS_PPAGE_OUTPUT_VMR7           42003
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
 #define IDS_PPAGE_OUTPUT_MPCVR          42005
 #define IDS_PPAGE_OUTPUT_EVR            42007

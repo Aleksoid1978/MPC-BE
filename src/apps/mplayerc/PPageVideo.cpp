@@ -173,7 +173,6 @@ BOOL CPPageVideo::OnInitDialog()
 
 	auto addRenderer = [&](int iVR, UINT nID) {
 		switch (iVR) {
-		case VIDRNDT_VMR7:
 		case VIDRNDT_VMR9_W:
 		case VIDRNDT_EVR:
 		case VIDRNDT_EVR_CP:
@@ -203,7 +202,6 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
-	addRenderer(VIDRNDT_VMR7,        IDS_PPAGE_OUTPUT_VMR7);
 	addRenderer(VIDRNDT_VMR9_W,      IDS_PPAGE_OUTPUT_VMR9WINDOWED);
 	addRenderer(VIDRNDT_EVR,         IDS_PPAGE_OUTPUT_EVR);
 	addRenderer(VIDRNDT_EVR_CP,      IDS_PPAGE_OUTPUT_EVR_CUSTOM);
@@ -413,9 +411,6 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 
 	switch (CurrentVR) {
-		case VIDRNDT_VMR7:
-			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_VMR7), &m_cbVideoRenderer);
-			break;
 		case VIDRNDT_VMR9_W:
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
