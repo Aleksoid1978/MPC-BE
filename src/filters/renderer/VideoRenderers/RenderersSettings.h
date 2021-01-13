@@ -35,8 +35,8 @@
 #define RS_SPCSIZE_MAX		60
 
 enum : int {
-	VIDRNDT_VMR7 = 0,
-	VIDRNDT_VMR9_W,
+	//VIDRNDT_VMR7 = 0, // obsolete
+	VIDRNDT_VMR9_W = 1,
 	VIDRNDT_EVR,
 	VIDRNDT_EVR_CP,
 	VIDRNDT_SYNC,

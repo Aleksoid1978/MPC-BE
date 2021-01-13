@@ -2649,11 +2649,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Morgan Stream Switcher (mmswitch.ax)
 	m_transform.push_back(DNew CFGFilterRegistry(GUIDFromCString(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}"), MERIT64_DO_NOT_USE));
 
-	//block default video renderer renderer if it was not selected
-	if (rs.iVideoRenderer != VIDRNDT_VMR7) {
-		m_transform.push_back(DNew CFGFilterRegistry(CLSID_VideoRendererDefault, MERIT64_DO_NOT_USE));
-		m_transform.push_back(DNew CFGFilterRegistry(CLSID_VideoRenderer, MERIT64_DO_NOT_USE));
-	}
+	// block default video renderer renderer
+	m_transform.push_back(DNew CFGFilterRegistry(CLSID_VideoRendererDefault, MERIT64_DO_NOT_USE));
+	m_transform.push_back(DNew CFGFilterRegistry(CLSID_VideoRenderer, MERIT64_DO_NOT_USE));
 
 	// Subtitle renderers
 

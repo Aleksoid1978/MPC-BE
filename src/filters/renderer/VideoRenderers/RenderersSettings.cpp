@@ -133,8 +133,7 @@ void CRenderersSettings::Load()
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
 	iVideoRenderer = discard(iVideoRenderer, (int)VIDRNDT_EVR_CP,
-		{VIDRNDT_VMR7,
-		VIDRNDT_VMR9_W,
+		{VIDRNDT_VMR9_W,
 		VIDRNDT_EVR,
 		VIDRNDT_EVR_CP,
 		VIDRNDT_SYNC,
