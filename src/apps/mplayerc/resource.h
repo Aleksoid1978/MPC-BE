@@ -774,8 +774,6 @@
 #define IDC_BASSREDIRECT_CHECK          10630
 #define IDC_REGULARSURF                 10727
 #define IDC_DX9RESIZER_COMBO            10730
-#define IDC_DSVMRLOADMIXER              10731
-#define IDC_DSVMRYUVMIXER               10734
 #define IDC_BUTTON_MI_SAVEAS            10736
 #define IDC_MIEDIT                      10737
 #define IDC_LISTCHANNELS                10738
@@ -977,7 +975,6 @@
 #define IDS_FILE_SAVE_THUMBNAILS        24005
 #define IDC_MAINFRAME_ICON              24006
 #define IDS_OSD_TEST                    24007
-#define IDS_DESC_VMR9W                  31004
 #define IDS_DESC_HAALI_VR               31007
 #define IDS_DESC_NULLVR_ANY             31008
 #define IDS_DESC_NULLVR_UNCOMP          31009
@@ -1728,7 +1725,6 @@
 #define IDS_MOUSE_ACTION                41710
 #define IDS_MOUSE_COMMAND               41711
 #define IDS_MOUSE_RIGHT_BUTTON          41712
-#define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
 #define IDS_PPAGE_OUTPUT_MPCVR          42005
 #define IDS_PPAGE_OUTPUT_EVR            42007
 #define IDS_PPAGE_OUTPUT_EVR_CUSTOM     42008

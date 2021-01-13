@@ -36,8 +36,8 @@
 
 enum : int {
 	//VIDRNDT_VMR7 = 0, // obsolete
-	VIDRNDT_VMR9_W = 1,
-	VIDRNDT_EVR,
+	//VIDRNDT_VMR9_W = 1, // obsolete
+	VIDRNDT_EVR = 2,
 	VIDRNDT_EVR_CP,
 	VIDRNDT_SYNC,
 	VIDRNDT_MPCVR,
@@ -136,10 +136,6 @@ public:
 	bool	bFlushGPUBeforeVSync;
 	bool	bFlushGPUAfterPresent;
 	bool	bFlushGPUWait;
-
-	// VMR
-	bool	bVMRMixerMode;
-	bool	bVMRMixerYUV;
 
 	// EVR
 	int		iEVROutputRange;

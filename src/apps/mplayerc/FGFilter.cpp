@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -472,28 +472,6 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 			}
 		}
 		EndEnumPins;
-
-		const CRenderersSettings& rs = GetRenderersSettings();
-		if (GetRenderersSettings().bVMRMixerMode) {
-			// VMR9
-			if (CComQIPtr<IVMRFilterConfig9> pConfig = pBF) {
-				VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(4)));
-
-				if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
-					DWORD dwPrefs;
-					VERIFY(SUCCEEDED(pVMRMC9->GetMixingPrefs(&dwPrefs)));
-
-					// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
-					dwPrefs |= MixerPref9_NonSquareMixing;
-					dwPrefs |= MixerPref9_NoDecimation;
-					if (rs.bVMRMixerYUV) {
-						dwPrefs &= ~MixerPref9_RenderTargetMask;
-						dwPrefs |= MixerPref9_RenderTargetYUV;
-					}
-					VERIFY(SUCCEEDED(pVMRMC9->SetMixingPrefs(dwPrefs)));
-				}
-			}
-		}
 
 		*ppBF = pBF.Detach();
 	}
