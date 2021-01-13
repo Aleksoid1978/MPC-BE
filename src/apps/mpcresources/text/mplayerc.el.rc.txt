@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Έλεγχος χρωμάτων (για VMR-9, EVR και madVR)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Φωτεινότητα"
 7		"Αντίθεση"
 8		"Απόχρωση"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Απόδοση βίντεο"
-7		"VMR-9 και ρυθμίσεις EVR (CP)"
+7		"EVR-CP and EVR Sync settings"
 8		"Επιλογή συσκευής απόδοσης D3D9"
 10		"Αποκλειστική πλήρης οθόνη"
 12		"10-bit RGB έξοδος"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Μέγεθος αρχείου: %s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Όνομα αρχείου: %s\\N%sΑνάλυση: %dx%d %s\\NΔιάρκεια: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"συντάχθηκαν: %d, απορρίφθηκαν: %d"
 STRING IDS_MAINFRM_60		"Για φόρτωση υποτίτλων πρέπει να αλλάξετε τον τύπο απόδοσης βίντεο και να ανοίξετε ξανά το αρχείο.\n- DirectShow: VMR-7/VMR-9 (χωρίς απόδοση), EVR (CP), Sync, madVR ή Haali\n- RealMedia: Ειδική απόδοση για RealMedia ή άνοιγμά του με το DirectShow\n- QuickTime : απόδοση DX7 ή DX9 για QuickTime\n- ShockWave : Μη διαθέσιμο"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 (renderless), EVR Custom, EVR Sync, or Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Προμεγεθυμένοι Pixel Shaders: on"
 STRING IDS_MAINFRM_66		"Προμεγεθυμένοι Pixel Shaders: off"

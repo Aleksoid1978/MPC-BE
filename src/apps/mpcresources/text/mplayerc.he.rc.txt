@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"כלי שליטה בצבע (עבור VMR-9 ו-EVR)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"בהירות"
 7		"ניגודיות"
 8		"גוון"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
-7		"VMR-9 and EVR-CP settings"
+7		"EVR-CP and EVR Sync settings"
 8		"Select D3D9 Render Device"
 10		"Exclusive fullscreen"
 12		"10-bit RGB output"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"גודל קובץ: %s (%s בתים)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}שם קובץ: %s\\N%sרזולוצייה: %dx%d %s\\Nאורך: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"צויירו: %d, הושמטו: %d"
 STRING IDS_MAINFRM_60		"בכדי לטעון כתוביות, עליך לשנות את סוג מציג הוידאו ולפתוח את הקובץ מחדש.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 (renderless), EVR מותאם אישית, EVR מסונכרן או Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: לא זמין\n"
 STRING IDS_MAINFRM_65		"מצלילי פיקסלים שלפני שינוי גודל: מופעלים"
 STRING IDS_MAINFRM_66		"מצלילי פיקסלים שלפני שינוי גודל: כבויים"

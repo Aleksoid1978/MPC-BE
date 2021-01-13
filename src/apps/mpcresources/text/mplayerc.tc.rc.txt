@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"色彩控制項（VMR-9 、 EVR 及 madVR）"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"亮度"
 7		"對比"
 8		"色調"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"視訊繪製器"
-7		"VMR-9 及 EVR 自訂呈現設定"
+7		"EVR-CP and EVR Sync settings"
 8		"選擇 D3D9 繪製裝置"
 10		"全螢幕獨佔模式"
 12		"10-bit RGB 輸出"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"檔案大小：%s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}檔案名稱：%s\\N%s解析度：%dx%d %s\\N時間長度：%02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"已繪製：%d，已略過：%d"
 STRING IDS_MAINFRM_60		"要載入字幕您必須變更視訊繪製器類型並重新開啟檔案。\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 （無轉換）、 EVR 自訂呈現 、 EVR 同步繪製 、 madVR 或是 Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"縮放前像素着色器：開啟"
 STRING IDS_MAINFRM_66		"縮放前像素着色器：關閉"

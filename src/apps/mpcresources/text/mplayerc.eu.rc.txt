@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Margo aginteak (VMR-9 eta EVR)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Dizdira"
 7		"Zuribeltztasuna"
 8		"Nabardura"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Bideo aurkezlea"
-7		"VMR-9 eta EVR-CP ezarpenak"
+7		"EVR-CP and EVR Sync settings"
 8		"Hautatu D3D9 Aurkezpen Gailua"
 10		"Exclusive fullscreen"
 12		"10-bit RGB irteera"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Agiri Neurria: %s (%s byte)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Agiri Izena: %s\\N%sBereizmena: %dx%d %s\\NIraupena: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"marraztuta: %d, erorita: %d"
 STRING IDS_MAINFRM_60		"Azpidatziak gertatzeko bideo aurkezlea aldatu eta agiria berrireki behar duzu.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 (aurkezgabe), EVR Egile, EVR Aldib, edo Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Aurre-Birneurriratu Pixel Itzalak: eraginda"
 STRING IDS_MAINFRM_66		"Aurre-Birneurriratu Pixel Itzalak: etenda"
