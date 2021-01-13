@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Színvezérlők (VMR-9 és EVR számára)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Világosság"
 7		"Élesség"
 8		"Színárnyalat"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Videó megjelenítő"
-7		"VMR-9 és EVR-CP beállítások"
+7		"EVR-CP and EVR Sync settings"
 8		"Válassza a D3D9 megjelenítő eszközt"
 10		"Exkluzív teljesképernyő"
 12		"10-bit RGB kimenet"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Fájlméret: %s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Fájlnév: %s\\N%sFelbontás: %dx%d %s\\NIdőtartam: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"rajzolt: %d, elejtett: %d"
 STRING IDS_MAINFRM_60		"Ahhoz, hogy feliratokat nyithasson meg, át kell állítani a videó átalakítót és újra meg kell nyitni a fájlt.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 renderless vagy Haali's\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Előméretezés Pixel Árnyékolók: be"
 STRING IDS_MAINFRM_66		"Előméretezés Pixel Árnyékolók: ki"

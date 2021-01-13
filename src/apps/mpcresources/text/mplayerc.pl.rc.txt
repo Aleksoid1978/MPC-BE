@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Zarządzanie kolorami trybów VMR-9 i EVR"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Jasność:"
 7		"Kontrast:"
 8		"Odcień:"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Renderer wideo"
-7		"Ustawienia VMR-9 i EVR-CP"
+7		"EVR-CP and EVR Sync settings"
 8		"Wybór urzadzenia renderującego D3D9"
 10		"Exclusive fullscreen"
 12		"Wyjście RGB 10-bitowe"
@@ -1543,7 +1543,7 @@ STRING IDS_MAINFRM_58		"Rozmiar pliku:: %s (%s bajtów)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Nazwa pliku: %s\\N%sRozmiar obrazu: %dx%d %s\\NCzas odtwarzania: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"wyświetlone – %d, porzucone – %d"
 STRING IDS_MAINFRM_60		"Aby wczytać napisy, należy ponownie otworzyć plik, zmieniając wcześniej filtr renderujący na jeden z poniższych:\n"
-STRING IDS_MAINFRM_61		"- DirectShow: „VMR-7/VMR-9 (renderless)”, „EVR - profil własny” lub „Haali”,\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: brak.\n"
 STRING IDS_MAINFRM_65		"Cieniowanie pikseli przed skalowaniem: włączone"
 STRING IDS_MAINFRM_66		"Cieniowanie pikseli przed skalowaniem: wyłączone"

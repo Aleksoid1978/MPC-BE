@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Color controls (for VMR-9 and EVR)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Brillo"
 7		"Contraste"
 8		"Tinta"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
-7		"VMR-9 and EVR-CP settings"
+7		"EVR-CP and EVR Sync settings"
 8		"Select D3D9 Render Device"
 10		"Exclusive fullscreen"
 12		"10-bit RGB output"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Tamaño del Archivo: %s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Nombre del Archivo: %s\\N%sResolución: %dx%d %s\\NDuración: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"dibujados: %d, perdidos: %d"
 STRING IDS_MAINFRM_60		"Para cargar los subtítulos tiene que cambiar el render de video y re-abrir el archivo.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 sin render o Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Pre-Resize Pixel Shaders: on"
 STRING IDS_MAINFRM_66		"Pre-Resize Pixel Shaders: off"

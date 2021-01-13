@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"컬러 컨트롤 (VMR-9 / EVR 전용)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"밝기"
 7		"대조"
 8		"색조"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
-7		"VMR-9 와 EVR-CP 설정"
+7		"EVR-CP and EVR Sync settings"
 8		"D3D9 렌더 장치를 선택"
 10		"Exclusive fullscreen"
 12		"10-bit RGB output"
@@ -1558,7 +1558,7 @@ STRING IDS_MAINFRM_58		"파일 크기: %s (%s 바이트)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}파일 이름: %s\\N%s해상도: %dx%d %s\\N기간: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"떨어짐: %d, 떨어짐: %d"
 STRING IDS_MAINFRM_60		"자막을 보기위해서는 다음 비디오 렌더러로 변경한 후 파일을 다시 열어야 합니다.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 렌더리스 또는 Haali's\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"선처리 리사이즈 픽셀 셰이더: 켜짐"
 STRING IDS_MAINFRM_66		"선처리 리사이즈 픽셀 셰이더: 꺼짐"

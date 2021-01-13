@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"カラー コントロール (VMR-9, EVR および madVR 用)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"明るさ"
 7		"コントラスト"
 8		"色相"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"ビデオ レンダラー"
-7		"VMR-9 および EVR-CP 設定"
+7		"EVR-CP and EVR Sync settings"
 8		"D3D9 レンダー デバイスを選択する"
 10		"排他フルスクリーン"
 12		"10-bit RGB 出力"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"ファイル サイズ: %s (%s バイト)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}ファイル名: %s\\N%s解像度: %dx%d %s\\N長さ: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"再生: %d, 欠落: %d"
 STRING IDS_MAINFRM_60		"字幕を読み込むにはビデオ レンダラーを変更し、ファイルを開き直す必要があります。\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 (レンダレス)、EVR カスタム、EVR 同期、Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"リサイズ前のピクセル シェーダー: オン"
 STRING IDS_MAINFRM_66		"リサイズ前のピクセル シェーダー: オフ"

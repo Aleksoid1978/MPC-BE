@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Kleurregeling (voor VMR-9, EVR en madVR)"
+5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Helderheid"
 7		"Contrast"
 8		"Tint"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Videorenderer"
-7		"Instellingen van VMR-9 en EVR-CP"
+7		"EVR-CP and EVR Sync settings"
 8		"Kies D3D9-renderapparaat"
 10		"Exclusieve volledigschermmodus"
 12		"10-bits RGB-uitvoer"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Bestandsgrootte: %s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Bestandsnaam: %s\\N%sResolutie: %dx%d %s\\NTijdsduur: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"gemaakt: %d, verworpen: %d"
 STRING IDS_MAINFRM_60		"Om ondertiteling te kunnen laden moet u de videorenderer veranderen en het bestand opnieuw openen.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 (renderless), EVR Custom, EVR Sync, madVR, of Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Pre-Resize Pixel Shaders: Aan"
 STRING IDS_MAINFRM_66		"Pre-Resize Pixel Shaders: Uit"

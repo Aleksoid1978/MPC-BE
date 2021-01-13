@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Управление цветом (для VMR-9, EVR и madVR)"
+5		"Управление цветом (для EVR, madVR и MPC VR)"
 6		"Яркость"
 7		"Контрастность"
 8		"Оттенок"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Видео-рендерер"
-7		"Параметры VMR-9 и EVR-CP"
+7		"Параметры EVR-CP и EVR Sync"
 8		"Устройство D3D9-рендеринга"
 10		"Эксклюзивный полный экран"
 12		"10-bit RGB вывод"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Размер файла: %s (%s байт)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Имя файла: %s\\N%sРазрешение: %dx%d %s\\NДлительность: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"записано: %d, потеряно: %d"
 STRING IDS_MAINFRM_60		"Для загрузки субтитров вам нужно изменить тип рендера и открыть файл заново.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: VMR-7/VMR-9 renderless, EVR Custom, EVR Sync или Haali\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR или MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: недоступен\n"
 STRING IDS_MAINFRM_65		"Пиксельные шейдеры кадра: включены"
 STRING IDS_MAINFRM_66		"Пиксельные шейдеры кадра: отключены"
