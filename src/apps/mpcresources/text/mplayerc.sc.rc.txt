@@ -170,7 +170,7 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
 5		"音频渲染器"
 7		"属性"
 9		"多重输出"
-10		"音频打开设定"
+10		"音频打开设置"
 11		"自动加载外部音轨"
 13		"重置"
 14		"选择外部音频文件替代内嵌音轨。"
@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Color controls (for EVR, madVR and MPC VR)"
+5		"色彩控制（用于EVR、madVR和MPC VR）"
 6		"亮度"
 7		"对比度"
 8		"色调"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"视频渲染器"
-7		"EVR-CP and EVR Sync settings"
+7		"EVR（自定义）及 EVR同步设置"
 8		"选择 D3D9 渲染设备"
 10		"全屏幕独占模式"
 12		"10-bit RGB 输出"
@@ -1081,7 +1081,7 @@ STRING IDS_AFTERPLAYBACK_NEXT		"回放结束后: 播放文件夹中的下一个�
 STRING IDS_AFTERPLAYBACK_SHUTDOWN		"回放结束后: 关机"
 STRING IDS_AFTERPLAYBACK_STANDBY		"回放结束后: 待机"
 STRING IDS_AG_ABORTED		"已放弃"
-STRING IDS_AG_ADVANCED		"高级设定"
+STRING IDS_AG_ADVANCED		"高级设置"
 STRING IDS_AG_ALLFILES		"所有文件(*.*)|*.*|"
 STRING IDS_AG_ALWAYS_ON_TOP		"总是前端显示"
 STRING IDS_AG_ANGLE		"视角 %d"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"文件大小: %s(%s 字节)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}文件名: %s\\N%s分辨率: %dx%d %s\\N持续时间: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"描绘: %d; 丢弃: %d"
 STRING IDS_MAINFRM_60		"要载入字幕,您需要更改视频渲染器类型然后重新打开文件。\n"
-STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP、EVR Sync、Haali、madVR 或 MPC VR。\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"预调整大小像素着色器: 开启"
 STRING IDS_MAINFRM_66		"预调整大小像素着色器: 关闭"
