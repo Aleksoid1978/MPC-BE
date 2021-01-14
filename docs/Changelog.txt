@@ -54,6 +54,7 @@ Video renderers
 Fixed display of HLG for EVR-CP.
 Fixed showing the first frame in some situations for EVR-CP.
 Minor optimization of EVR-CP and Sync.
+Removed support for VMR-7 ("System default") and VMR-9.
 
 Subtitles
 Fixed flickering of some subtitles.
