@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Color controls (for EVR, madVR and MPC VR)"
+5		"Színvezérlők (EVR, madVR és MPC VR esetén)"
 6		"Világosság"
 7		"Élesség"
 8		"Színárnyalat"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Videó megjelenítő"
-7		"EVR-CP and EVR Sync settings"
+7		"EVR-CP és EVR Sync beállítások"
 8		"Válassza a D3D9 megjelenítő eszközt"
 10		"Exkluzív teljesképernyő"
 12		"10-bit RGB kimenet"
@@ -1412,7 +1412,7 @@ STRING IDS_DESC_EVR		"Video megjelenítő hardveres dekódolási támogatással.
 STRING IDS_DESC_EVR_CP		"Ugyanaz, mint az EVR, de az Allocator-Presenterrel a feliratozáshoz és az utófeldolgozáshoz."
 STRING IDS_DESC_EVR_SYNC		"Ugyanaz, mint az EVR (CP), de számos lehetőséget kínál a képkocka sebességének szinkronizálására a képernyő frissítési gyakoriságával, hogy kiküszöbölje a kihagyott vagy duplikált képkockákat."
 STRING IDS_DESC_HAALI_VR		"Úgy néz ki, mint a VMR-9, de valódi bicubic átméretezőt használ."
-STRING IDS_DESC_MADVR		"Kiváló minőségű megjelenítőnek szüksége van egy GPU-ra, amely támogatja a D3D9 vagy újabb verziót."
+STRING IDS_DESC_MADVR		"Kiváló minőségű megjelenítőhöz olyan GPU szükséges, amely támogatja a D3D9 vagy újabb verziókat."
 STRING IDS_DESC_NULLVR_ANY		"Minden videószerű médiatípushoz csatlakozni fog és a bejövő mintákat nem küldi ki sehová. Ezt akkor válassza, ha a videómegjelenítésre nincs szüksége és meg szeretné kímélni a processzorát a felesleges munkától."
 STRING IDS_DESC_NULLVR_UNCOMP		"Ugyan az, mint a sima Null átalakító, de ez csak tömörítetlen típusokhoz fog csatlakozni."
 STRING IDS_DISABLE_ALL_FILTERS		"&Összes szűrő tiltása"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Fájlméret: %s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Fájlnév: %s\\N%sFelbontás: %dx%d %s\\NIdőtartam: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"rajzolt: %d, elejtett: %d"
 STRING IDS_MAINFRM_60		"Ahhoz, hogy feliratokat nyithasson meg, át kell állítani a videó átalakítót és újra meg kell nyitni a fájlt.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR vagy MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Előméretezés Pixel Árnyékolók: be"
 STRING IDS_MAINFRM_66		"Előméretezés Pixel Árnyékolók: ki"
