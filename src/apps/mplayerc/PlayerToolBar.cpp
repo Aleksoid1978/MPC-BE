@@ -149,7 +149,8 @@ void CPlayerToolBar::SwitchTheme()
 
 		tb.SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 		tb.DeleteButton(1);
-		tb.DeleteButton(tb.GetButtonCount()-2);
+		tb.DeleteButton(tb.GetButtonCount() - 1);
+		tb.DeleteButton(tb.GetButtonCount() - 1);
 
 		SetMute(s.fMute);
 
