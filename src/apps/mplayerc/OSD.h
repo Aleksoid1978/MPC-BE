@@ -101,6 +101,7 @@ public:
 	OSD_TYPE GetOSDType() { return m_OSDType; };
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
+	void RemoveChapters();
 
 	void OverrideDPI(int dpix, int dpiy);
 	bool UpdateButtonImages();

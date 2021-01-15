@@ -4617,6 +4617,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	s.nCLSwitches &= CLSW_OPEN | CLSW_PLAY | CLSW_AFTERPLAYBACK_MASK | CLSW_NOFOCUS;
 	s.ResetPositions();
 
+	m_OSD.RemoveChapters();
 	if (s.ShowOSD.Enable) {
 		m_OSD.Start(m_pOSDWnd);
 	}
@@ -4629,6 +4630,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_wndSeekBar.Enable(false);
 	m_wndSeekBar.SetRange(0);
 	m_wndSeekBar.SetPos(0);
+	m_wndSeekBar.RemoveChapters();
 	m_wndInfoBar.RemoveAllLines();
 	m_wndStatsBar.RemoveAllLines();
 	m_wndStatusBar.Clear();

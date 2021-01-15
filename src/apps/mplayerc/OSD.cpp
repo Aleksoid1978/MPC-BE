@@ -975,9 +975,14 @@ void COSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 	CAutoLock lock(&m_CBLock);
 
 	if (pCB) {
-		m_pChapterBag.Release();
-		pCB.CopyTo(&m_pChapterBag);
+		m_pChapterBag = pCB;
 	}
+}
+
+void COSD::RemoveChapters()
+{
+	CAutoLock lock(&m_CBLock);
+	m_pChapterBag.Release();
 }
 
 void COSD::OverrideDPI(int dpix, int dpiy)

@@ -101,6 +101,9 @@ private:
 	int m_scaleY7  = 7;
 	int m_scaleY14 = 14;
 
+	std::unique_ptr<CDC> m_pEnabledThumb;
+	std::unique_ptr<CDC> m_pDisabledThumb;
+
 public:
 	CPlayerSeekBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerSeekBar() = default;
@@ -120,6 +123,7 @@ public:
 	void UpdateToolTipText();
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
+	void RemoveChapters();
 
 	virtual BOOL Create(CWnd* pParentWnd);
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
