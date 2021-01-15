@@ -267,38 +267,27 @@ void CPlayerSeekBar::OnPaint()
 	const COLORREF repeatAB = COLORREF(RGB(242, 13, 13));
 	const CRect channelRect(GetChannelRect());
 
-	auto funcMarkChannel = [&](REFERENCE_TIME pos, long verticalPadding, COLORREF markColor) {
-		long markPos = channelRect.left + (long)((m_stop > 0) ? channelRect.Width() * pos / m_stop : 0);
-		CRect r(markPos, channelRect.top + verticalPadding, markPos + 1, channelRect.bottom - verticalPadding);
-		if (r.right < channelRect.right) {
-			r.right++;
-		}
-		ASSERT(r.right <= channelRect.right);
-		dc.FillSolidRect(&r, markColor);
-		dc.ExcludeClipRect(&r);
-	};
-
-	auto funcMarkChannelTheme = [&](REFERENCE_TIME pos, CDC& memdc, CPen& pen, const CRect& rect) {
-		if (pos <= 0 || pos >= m_stop) {
-			return;
-		}
-
-		const CRect r = GetChannelRect();
-		memdc.SelectObject(&pen);
-		const int x = r.left + (long)(pos * r.Width() / m_stop);
-
-		// instead of drawing hands can be a marker icon
-		// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-		// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0, 0, 0, nullptr, DI_NORMAL);
-		// ::DestroyIcon(appIcon);
-
-		memdc.MoveTo(x, rect.top + m_scaleY14);
-		memdc.LineTo(x, rect.bottom - m_scaleY2);
-		memdc.MoveTo(x - m_scaleX1, rect.bottom - m_scaleY2);
-		memdc.LineTo(x + m_scaleX1, rect.bottom - m_scaleY2);
-	};
-
 	if (s.bUseDarkTheme) {
+		auto funcMarkChannelTheme = [&](REFERENCE_TIME pos, CDC& memdc, CPen& pen, const CRect& rect) {
+			if (pos <= 0 || pos >= m_stop) {
+				return;
+			}
+
+			const CRect r(channelRect);
+			memdc.SelectObject(&pen);
+			const int x = r.left + (long)(pos * r.Width() / m_stop);
+
+			// instead of drawing hands can be a marker icon
+			// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+			// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0, 0, 0, nullptr, DI_NORMAL);
+			// ::DestroyIcon(appIcon);
+
+			memdc.MoveTo(x, rect.top + m_scaleY14);
+			memdc.LineTo(x, rect.bottom - m_scaleY2);
+			memdc.MoveTo(x - m_scaleX1, rect.bottom - m_scaleY2);
+			memdc.LineTo(x + m_scaleX1, rect.bottom - m_scaleY2);
+		};
+
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r;
@@ -319,7 +308,7 @@ void CPlayerSeekBar::OnPaint()
 
 		memdc.SetBkMode(TRANSPARENT);
 
-		CRect rc = GetChannelRect();
+		CRect rc(channelRect);
 		const int nposx = GetThumbRect().right - 2;
 		const int nposy = r.top;
 
@@ -354,7 +343,7 @@ void CPlayerSeekBar::OnPaint()
 
 				m_pMainFrame->m_BackGroundGradient.Paint(&memdc, r, 0, s.nThemeBrightness, m_crBackground.R, m_crBackground.G, m_crBackground.B);
 
-				rc = GetChannelRect();
+				rc = channelRect;
 			} else {
 				tvBackgroundEnabledLeft[0].x = rc.left; tvBackgroundEnabledLeft[0].y = rc.top;
 				tvBackgroundEnabledLeft[1].x = nposx; tvBackgroundEnabledLeft[1].y = rc.bottom - 3;
@@ -450,6 +439,17 @@ void CPlayerSeekBar::OnPaint()
 		memdc.DeleteDC();
 		m_bmPaint.DeleteObject();
 	} else {
+		auto funcMarkChannel = [&](REFERENCE_TIME pos, long verticalPadding, COLORREF markColor) {
+			long markPos = channelRect.left + (long)((m_stop > 0) ? channelRect.Width() * pos / m_stop : 0);
+			CRect r(markPos, channelRect.top + verticalPadding, markPos + 1, channelRect.bottom - verticalPadding);
+			if (r.right < channelRect.right) {
+				r.right++;
+			}
+			ASSERT(r.right <= channelRect.right);
+			dc.FillSolidRect(&r, markColor);
+			dc.ExcludeClipRect(&r);
+		};
+
 		const COLORREF dark   = GetSysColor(COLOR_GRAYTEXT);
 		const COLORREF white  = GetSysColor(COLOR_WINDOW);
 		const COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
@@ -458,7 +458,11 @@ void CPlayerSeekBar::OnPaint()
 
 		// thumb
 		{
+			CBrush b(bkg);
+
 			CRect r(GetThumbRect());
+			dc.FillRect(&r, &b);
+
 			CRect ri(GetInnerThumbRect());
 			CRect rt = r, rit = ri;
 
@@ -466,8 +470,6 @@ void CPlayerSeekBar::OnPaint()
 			r.DeflateRect(0, 0, 1, 1);
 			dc.Draw3dRect(&r, light, shadow);
 			r.DeflateRect(1, 1, 1, 1);
-
-			CBrush b(bkg);
 
 			dc.FrameRect(&r, &b);
 			r.DeflateRect(0, 1, 0, 1);
@@ -857,8 +859,9 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
+		const auto channelRect_y = GetChannelRect().TopLeft().y;
 		point.x -= r_width / 2 - 2;
-		point.y = GetChannelRect().TopLeft().y - (r_height + 13);
+		point.y = channelRect_y - (r_height + 13);
 		ClientToScreen(&point);
 		point.x = std::max(mi.rcWork.left + 5, std::min(point.x, mi.rcWork.right - r_width - 5));
 
@@ -866,7 +869,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 			const CRect r = mi.rcWork;
 			if (!r.PtInRect(point)) {
 				CPoint p(point);
-				p.y = GetChannelRect().TopLeft().y + 30;
+				p.y = channelRect_y + 30;
 				ClientToScreen(&p);
 
 				point.y = p.y;
