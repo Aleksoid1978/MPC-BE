@@ -85,9 +85,10 @@ CSize CPlayerSeekBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 
 void CPlayerSeekBar::Enable(bool bEnable)
 {
-	m_bEnabled = bEnable;
-
-	Invalidate();
+	if (m_bEnabled != bEnable) {
+		m_bEnabled = bEnable;
+		Invalidate();
+	}
 }
 
 void CPlayerSeekBar::SetRange(const REFERENCE_TIME stop)
