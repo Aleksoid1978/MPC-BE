@@ -450,62 +450,92 @@ void CPlayerSeekBar::OnPaint()
 			dc.ExcludeClipRect(&r);
 		};
 
+		auto CreateThumb = [this](const bool bEnabled, CDC& parentDC) {
+			auto& pThumb = bEnabled ? m_pEnabledThumb : m_pDisabledThumb;
+			pThumb = std::make_unique<CDC>();
+			if (pThumb->CreateCompatibleDC(&parentDC)) {
+				const COLORREF white = GetSysColor(COLOR_WINDOW);
+				const COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
+				const COLORREF light = GetSysColor(COLOR_3DHILIGHT);
+				const COLORREF bkg = GetSysColor(COLOR_BTNFACE);
+
+				CBrush b(bkg);
+
+				CRect r(GetThumbRect());
+				r.MoveToXY(0, 0);
+
+				CBitmap bmp;
+				VERIFY(bmp.CreateCompatibleBitmap(&parentDC, r.Width(), r.Height()));
+				VERIFY(pThumb->SelectObject(bmp));
+
+				pThumb->FillRect(&r, &b);
+
+				pThumb->Draw3dRect(&r, light, 0);
+				r.DeflateRect(0, 0, 1, 1);
+				pThumb->Draw3dRect(&r, light, shadow);
+				r.DeflateRect(1, 1, 1, 1);
+
+				pThumb->FrameRect(&r, &b);
+				r.DeflateRect(0, 1, 0, 1);
+				pThumb->FrameRect(&r, &b);
+
+				r.DeflateRect(1, 1, 0, 0);
+				pThumb->Draw3dRect(&r, shadow, bkg);
+
+				if (bEnabled) {
+					r.DeflateRect(1, 1, 1, 2);
+					CPen white(PS_INSIDEFRAME, 1, white);
+					CPen* old = pThumb->SelectObject(&white);
+					pThumb->MoveTo(r.left, r.top);
+					pThumb->LineTo(r.right, r.top);
+					pThumb->MoveTo(r.left, r.bottom);
+					pThumb->LineTo(r.right, r.bottom);
+					pThumb->SelectObject(old);
+					pThumb->SetPixel(r.CenterPoint().x, r.top, 0);
+					pThumb->SetPixel(r.CenterPoint().x, r.bottom, 0);
+				}
+			} else {
+				ASSERT(FALSE);
+			}
+		};
+
 		const COLORREF dark   = GetSysColor(COLOR_GRAYTEXT);
 		const COLORREF white  = GetSysColor(COLOR_WINDOW);
 		const COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
 		const COLORREF light  = GetSysColor(COLOR_3DHILIGHT);
 		const COLORREF bkg    = GetSysColor(COLOR_BTNFACE);
 
-		// thumb
-		{
+		if (!bEnabled) {
+			CRect r;
+			GetClientRect(&r);
 			CBrush b(bkg);
-
-			CRect r(GetThumbRect());
 			dc.FillRect(&r, &b);
-
-			CRect ri(GetInnerThumbRect());
-			CRect rt = r, rit = ri;
-
-			dc.Draw3dRect(&r, light, 0);
-			r.DeflateRect(0, 0, 1, 1);
-			dc.Draw3dRect(&r, light, shadow);
-			r.DeflateRect(1, 1, 1, 1);
-
-			dc.FrameRect(&r, &b);
-			r.DeflateRect(0, 1, 0, 1);
-			dc.FrameRect(&r, &b);
-
-			r.DeflateRect(1, 1, 0, 0);
-			dc.Draw3dRect(&r, shadow, bkg);
-
-			if (bEnabled) {
-				r.DeflateRect(1, 1, 1, 2);
-				CPen white(PS_INSIDEFRAME, 1, white);
-				CPen* old = dc.SelectObject(&white);
-				dc.MoveTo(r.left, r.top);
-				dc.LineTo(r.right, r.top);
-				dc.MoveTo(r.left, r.bottom);
-				dc.LineTo(r.right, r.bottom);
-				dc.SelectObject(old);
-				dc.SetPixel(r.CenterPoint().x, r.top, 0);
-				dc.SetPixel(r.CenterPoint().x, r.bottom, 0);
-			}
-
-			//dc.SetPixel(r.CenterPoint().x + 5, r.top - 4, bkg); //?
-
-			{
-				CRgn rgn1, rgn2;
-				rgn1.CreateRectRgnIndirect(&rt);
-				rgn2.CreateRectRgnIndirect(&rit);
-				ExtSelectClipRgn(dc, rgn1, RGN_DIFF);
-				ExtSelectClipRgn(dc, rgn2, RGN_OR);
-			}
 		}
+
+		// thumb
+		auto& pThumb = bEnabled ? m_pEnabledThumb : m_pDisabledThumb;
+		if (!pThumb) {
+			CreateThumb(bEnabled, dc);
+			ASSERT(pThumb);
+		}
+
+		CRect r(GetThumbRect());
+		CRect ri(GetInnerThumbRect());
+
+		CRgn rgn1, rgn2;
+		rgn1.CreateRectRgnIndirect(&r);
+		rgn2.CreateRectRgnIndirect(&ri);
+
+		ExtSelectClipRgn(dc, rgn2, RGN_DIFF);
+		VERIFY(dc.BitBlt(r.TopLeft().x, r.TopLeft().y, r.Width(), r.Height(), pThumb.get(), 0, 0, SRCCOPY));
+		ExtSelectClipRgn(dc, rgn1, RGN_XOR);
 
 		// Chapters
 		if (s.fChapterMarker) {
 			CAutoLock lock(&m_CBLock);
-			if (m_pChapterBag) {
+
+			const REFERENCE_TIME stop = m_stop;
+			if (stop > 0 && m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 				for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); i++) {
 					REFERENCE_TIME rtChap;
 					if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rtChap, nullptr))) {
@@ -516,6 +546,7 @@ void CPlayerSeekBar::OnPaint()
 				}
 			}
 		}
+
 		REFERENCE_TIME aPos, bPos;
 		bool aEnabled, bEnabled;
 		if (m_pMainFrame->CheckABRepeat(aPos, bPos, aEnabled, bEnabled)) {
@@ -749,6 +780,9 @@ void CPlayerSeekBar::ScaleFont()
 	m_scaleY5  = m_pMainFrame->ScaleFloorY(5);
 	m_scaleY7  = m_pMainFrame->ScaleFloorY(7);
 	m_scaleY14 = m_pMainFrame->ScaleFloorY(14);
+
+	m_pEnabledThumb.release();
+	m_pDisabledThumb.release();
 }
 
 void CPlayerSeekBar::SetColor()
@@ -952,7 +986,12 @@ void CPlayerSeekBar::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 	CAutoLock lock(&m_CBLock);
 
 	if (pCB) {
-		m_pChapterBag.Release();
-		pCB.CopyTo(&m_pChapterBag);
+		m_pChapterBag = pCB;
 	}
+}
+
+void CPlayerSeekBar::RemoveChapters()
+{
+	CAutoLock lock(&m_CBLock);
+	m_pChapterBag.Release();
 }
