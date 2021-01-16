@@ -5755,7 +5755,7 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 		return;
 	}
 
-	BOOL bIsValidSubExtAll = TRUE;
+	bool bIsValidSubExtAll = true;
 
 	for (const auto& fname : slFiles) {
 		const CString ext = GetFileExt(fname).Mid(1).MakeLower(); // extension without a dot
@@ -5764,44 +5764,47 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 			return ext == subExt;
 		});
 
-		if (!validate_ext
-				|| (m_pDVS && ext == "mks")) {
-			bIsValidSubExtAll = FALSE;
+		if (!validate_ext || (m_pDVS && ext == "mks")) {
+			bIsValidSubExtAll = false;
 			break;
 		}
 	}
 
-	if (bIsValidSubExtAll && m_eMediaLoadState == MLS_LOADED && (m_pCAP || m_pDVS)) {
+	if (bIsValidSubExtAll && m_eMediaLoadState == MLS_LOADED) {
+		if (m_pCAP || m_pDVS) {
 
-		for (const auto& fname : slFiles) {
-			BOOL b_SubLoaded = FALSE;
+			for (const auto& fname : slFiles) {
+				bool b_SubLoaded = false;
 
-			if (m_pDVS) {
-				if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)fname))) {
-					m_pDVS->put_SelectedLanguage(0);
-					m_pDVS->put_HideSubtitles(true);
-					m_pDVS->put_HideSubtitles(false);
-
-					b_SubLoaded = TRUE;
-				}
-			} else {
-				ISubStream *pSubStream = nullptr;
-				if (LoadSubtitle(fname, &pSubStream)) {
-					SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
-					b_SubLoaded = TRUE;
-
-					AddSubtitlePathsAddons(fname.GetString());
-				}
-			}
-
-			if (b_SubLoaded) {
-				SetToolBarSubtitleButton();
-
-				SendStatusMessage(GetFileOnly(fname) + ResStr(IDS_MAINFRM_47), 3000);
 				if (m_pDVS) {
-					return;
+					if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)fname))) {
+						m_pDVS->put_SelectedLanguage(0);
+						m_pDVS->put_HideSubtitles(true);
+						m_pDVS->put_HideSubtitles(false);
+
+						b_SubLoaded = true;
+					}
+				} else {
+					ISubStream *pSubStream = nullptr;
+					if (LoadSubtitle(fname, &pSubStream)) {
+						SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
+						b_SubLoaded = true;
+
+						AddSubtitlePathsAddons(fname.GetString());
+					}
+				}
+
+				if (b_SubLoaded) {
+					SetToolBarSubtitleButton();
+
+					SendStatusMessage(GetFileOnly(fname) + ResStr(IDS_MAINFRM_47), 3000);
+					if (m_pDVS) {
+						return;
+					}
 				}
 			}
+		} else {
+			AfxMessageBox(ResStr(IDS_MAINFRM_60) + ResStr(IDS_MAINFRM_61) + ResStr(IDS_MAINFRM_64), MB_OK);
 		}
 
 		return;
