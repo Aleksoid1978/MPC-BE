@@ -204,7 +204,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
-5		"Localização da unidade de DVD ou da pasta "VIDEO_TS""
+5		"Localização da unidade de DVD ou da pasta ""VIDEO_TS"""
 6		"Padrão"
 7		"Caminho definido pelo usuário:"
 10		"Idioma preferido para navegador de DVD"
@@ -285,7 +285,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
-6		"Usar tema "escuro" (padrão)"
+6		"Usar tema ""escuro"" (padrão)"
 7		"Brilho :"
 9		"Configurar cor do indicador de som:"
 10		"Preencher:"
