@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2020 see Authors.txt
+ * (C) 2013-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -181,8 +181,8 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 									iOverdriveVersions[2] = 0;
 								}
 
-								for (unsigned i = 0; i < std::size(iOverdriveVersions) && iOverdriveVersions[i] != 0; i++) {
-									switch (iOverdriveVersions[i]) {
+								for (unsigned j = 0; j < std::size(iOverdriveVersions) && iOverdriveVersions[j] != 0; j++) {
+									switch (iOverdriveVersions[j]) {
 										case 5:
 											{
 												ADL_OVERDRIVE5_ODPARAMETERS_GET ADL_Overdrive5_ODParameters_Get;
@@ -199,7 +199,7 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 												}
 
 												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
-												ATIData.iOverdriveVersion = iOverdriveVersions[i];
+												ATIData.iOverdriveVersion = iOverdriveVersions[j];
 											}
 											break;
 										case 6:
@@ -218,7 +218,7 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 												}
 
 												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
-												ATIData.iOverdriveVersion = iOverdriveVersions[i];
+												ATIData.iOverdriveVersion = iOverdriveVersions[j];
 											}
 											break;
 										case 7:
@@ -238,7 +238,7 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 												}
 
 												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
-												ATIData.iOverdriveVersion = iOverdriveVersions[i];
+												ATIData.iOverdriveVersion = iOverdriveVersions[j];
 											}
 											break;
 									}

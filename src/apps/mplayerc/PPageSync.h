@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,9 +39,9 @@ public:
 	CButton m_chkVSyncInternal;
 	CButton m_chkDisableAero;
 	CButton m_chkEnableFrameTimeCorrection;
-	CButton m_chkVMRFlushGPUBeforeVSync;
-	CButton m_chkVMRFlushGPUAfterPresent;
-	CButton m_chkVMRFlushGPUWait;
+	CButton m_chkFlushGPUBeforeVSync;
+	CButton m_chkFlushGPUAfterPresent;
+	CButton m_chkFlushGPUWait;
 
 	int m_iSyncMode;
 	int m_iLineDelta;

@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -118,7 +118,7 @@ CString GetLastErrorMsg(LPWSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 	// Format the error message
 
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-		(lstrlenW((LPCWSTR)lpMsgBuf) + lstrlenW((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
+		(wcslen((LPCWSTR)lpMsgBuf) + wcslen((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
 	StringCchPrintfW((LPWSTR)lpDisplayBuf,
 		LocalSize(lpDisplayBuf) / sizeof(WCHAR),
 		L"Function '%s' failed with error %d: %s",
@@ -164,17 +164,15 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 		}
 	}
 
-	ULONG len;
-	HICON hIcon = nullptr;
-
 	do {
 		CRegKey key;
+		ULONG len;
 
 		CString RegPathAssociated;
 		RegPathAssociated.Format(L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%ws\\UserChoice", ext);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, RegPathAssociated, KEY_READ)) {
-			len = _countof(buff);
+			len = std::size(buff);
 			memset(buff, 0, sizeof(buff));
 
 			CString ext_Associated = ext;
@@ -188,7 +186,7 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 				break;
 			}
 
-			len = _countof(buff);
+			len = std::size(buff);
 			memset(buff, 0, sizeof(buff));
 			if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len) || (ext = buff).Trim().IsEmpty()) {
 				break;
@@ -201,7 +199,7 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 
 		CString icon;
 
-		len = _countof(buff);
+		len = std::size(buff);
 		memset(buff, 0, sizeof(buff));
 		if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len) || (icon = buff).Trim().IsEmpty()) {
 			break;
@@ -220,7 +218,7 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 		icon = icon.Left(i);
 		icon.Replace(L"\"", L"");
 
-		hIcon = nullptr;
+		HICON hIcon = nullptr;
 		UINT cnt = fSmall
 				   ? ExtractIconExW(icon, id, nullptr, &hIcon, 1)
 				   : ExtractIconExW(icon, id, &hIcon, nullptr, 1);
@@ -276,7 +274,7 @@ bool LoadType(const CString& fn, CString& type)
 				ULONG len;
 
 				while (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, tmp)) {
-					len = _countof(buff);
+					len = std::size(buff);
 					memset(buff, 0, sizeof(buff));
 
 					if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len)) {
