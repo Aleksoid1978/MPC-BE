@@ -186,7 +186,7 @@ public:
 	bool bVSync                     = false;
 	bool bDisableDesktopComposition = false;
 
-	void Fill(CRenderersSettings& rs)
+	void Fill(const CRenderersSettings& rs)
 	{
 		iPresentMode               = rs.iPresentMode;
 		iSurfaceFormat             = rs.iSurfaceFormat;

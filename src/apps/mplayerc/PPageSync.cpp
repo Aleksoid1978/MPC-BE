@@ -46,9 +46,9 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_VSYNC_INTERNAL, m_chkVSyncInternal);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
-	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);
-	DDX_Control(pDX, IDC_CHECK6, m_chkVMRFlushGPUAfterPresent);
-	DDX_Control(pDX, IDC_CHECK7, m_chkVMRFlushGPUWait);
+	DDX_Control(pDX, IDC_CHECK5, m_chkFlushGPUBeforeVSync);
+	DDX_Control(pDX, IDC_CHECK6, m_chkFlushGPUAfterPresent);
+	DDX_Control(pDX, IDC_CHECK7, m_chkFlushGPUWait);
 
 	DDX_Radio(pDX, IDC_RADIO1, m_iSyncMode);
 	DDX_Control(pDX, IDC_CYCLEDELTA, m_edtCycleDelta);
@@ -88,22 +88,22 @@ void CPPageSync::InitDialogPrivate()
 	m_chkVSyncInternal.SetCheck(rs.bVSyncInternal);
 	m_chkDisableAero.SetCheck(rs.bDisableDesktopComposition);
 	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
-	m_chkVMRFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
-	m_chkVMRFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
-	m_chkVMRFlushGPUWait.SetCheck(rs.bFlushGPUWait);
+	m_chkFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
+	m_chkFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
+	m_chkFlushGPUWait.SetCheck(rs.bFlushGPUWait);
 
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CP) {
 		m_chkVSync.EnableWindow(TRUE);
 		m_chkVSyncInternal.EnableWindow(TRUE);
-		m_chkVMRFlushGPUBeforeVSync.EnableWindow(TRUE);
-		m_chkVMRFlushGPUAfterPresent.EnableWindow(TRUE);
-		m_chkVMRFlushGPUWait.EnableWindow(TRUE);
+		m_chkFlushGPUBeforeVSync.EnableWindow(TRUE);
+		m_chkFlushGPUAfterPresent.EnableWindow(TRUE);
+		m_chkFlushGPUWait.EnableWindow(TRUE);
 	} else {
 		m_chkVSync.EnableWindow(FALSE);
 		m_chkVSyncInternal.EnableWindow(FALSE);
-		m_chkVMRFlushGPUBeforeVSync.EnableWindow(FALSE);
-		m_chkVMRFlushGPUAfterPresent.EnableWindow(FALSE);
-		m_chkVMRFlushGPUWait.EnableWindow(FALSE);
+		m_chkFlushGPUBeforeVSync.EnableWindow(FALSE);
+		m_chkFlushGPUAfterPresent.EnableWindow(FALSE);
+		m_chkFlushGPUWait.EnableWindow(FALSE);
 	}
 
 	if ((!SysVersion::IsWin8orLater()) &&
@@ -176,9 +176,9 @@ BOOL CPPageSync::OnApply()
 	rs.bVSyncInternal				= !!m_chkVSyncInternal.GetCheck();
 	rs.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
 	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
-	rs.bFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
-	rs.bFlushGPUAfterPresent		= !!m_chkVMRFlushGPUAfterPresent.GetCheck();
-	rs.bFlushGPUWait				= !!m_chkVMRFlushGPUWait.GetCheck();
+	rs.bFlushGPUBeforeVSync			= !!m_chkFlushGPUBeforeVSync.GetCheck();
+	rs.bFlushGPUAfterPresent		= !!m_chkFlushGPUAfterPresent.GetCheck();
+	rs.bFlushGPUWait				= !!m_chkFlushGPUWait.GetCheck();
 
 	rs.iSynchronizeMode	= m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
 							: m_iSyncMode == 1 ? SYNCHRONIZE_DISPLAY
