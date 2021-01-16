@@ -162,12 +162,12 @@ void CPlayerSeekBar::SetPosInternal(const REFERENCE_TIME pos)
 	m_posreal = pos;
 	const CRect after = GetThumbRect();
 
-	if (!AfxGetAppSettings().bUseDarkTheme) {
-		if (before != after) {
+	if (before != after) {
+		if (AfxGetAppSettings().bUseDarkTheme) {
+			Invalidate();
+		} else {
 			InvalidateRect(before | after);
 		}
-	} else {
-		Invalidate();
 	}
 }
 
