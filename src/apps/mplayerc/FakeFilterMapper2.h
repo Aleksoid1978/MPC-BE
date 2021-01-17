@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,39 +26,34 @@
 class FilterOverride
 {
 public:
-	bool fDisabled, fTemporary;
-	enum { REGISTERED, EXTERNAL } type;
+	bool fDisabled  = false;
+	bool fTemporary = false;
+	enum { REGISTERED, EXTERNAL } type = EXTERNAL;
 	// REGISTERED
 	CStringW dispname;
 	// EXTERNAL
 	CString path, name;
-	CLSID clsid;
+	CLSID clsid = GUID_NULL;
 	// props
 	std::list<GUID> guids, backup;
 	enum { PREFERRED, BLOCK, MERIT };
-	int iLoadType;
-	DWORD dwMerit;
+	int iLoadType = 0;
+	DWORD dwMerit = 0;
 
-	FilterOverride()
-		: fDisabled(false)
-		, fTemporary(false)
-		, type(EXTERNAL)
-		, clsid(GUID_NULL)
-		, iLoadType(0)
-		, dwMerit(0) {
-	}
-	FilterOverride(FilterOverride* f) {
-		fDisabled	= f->fDisabled;
-		fTemporary	= f->fTemporary;
-		type		= f->type;
-		dispname	= f->dispname;
-		path		= f->path;
-		name		= f->name;
-		clsid		= f->clsid;
-		guids		= f->guids;
-		backup		= f->backup;
-		iLoadType	= f->iLoadType;
-		dwMerit		= f->dwMerit;
+	FilterOverride() {}
+	FilterOverride(FilterOverride* f)
+        : fDisabled (f->fDisabled)
+        , fTemporary(f->fTemporary)
+        , type      (f->type)
+        , dispname  (f->dispname)
+        , path      (f->path)
+        , name      (f->name)
+        , clsid     (f->clsid)
+        , guids     (f->guids)
+        , backup    (f->backup)
+        , iLoadType (f->iLoadType)
+        , dwMerit   (f->dwMerit)
+	{
 	}
 };
 
