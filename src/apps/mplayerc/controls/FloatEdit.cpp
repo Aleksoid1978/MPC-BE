@@ -40,7 +40,7 @@ double CFloatEdit::operator = (double d)
 	CString s;
 	s.Format(L"%.4f", d);
 	s.TrimRight('0');
-	if (s[s.GetLength() - 1] == '.') s.Truncate(s.GetLength() - 1);
+	if (s[s.GetLength() - 1] == '.') s.AppendChar('0');
 	SetWindowTextW(s);
 
 	return d;
