@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,9 +50,20 @@ CFloatEdit::operator double()
 {
 	CString s;
 	GetWindowTextW(s);
-	float f = 0;
+	float flt;
+	if (swscanf_s(s, L"%f", &flt) != 1) {
+		flt = 0.0f;
+	}
+	flt = std::clamp(flt, m_lower, m_upper);
 
-	return (swscanf_s(s, L"%f", &f) == 1 ? f : 0);
+	return flt;
+}
+
+void CFloatEdit::SetRange(float fLower, float fUpper)
+{
+	ASSERT(fLower < fUpper);
+	m_lower = fLower;
+	m_upper = fUpper;
 }
 
 BEGIN_MESSAGE_MAP(CFloatEdit, CEdit)
@@ -72,9 +83,9 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 		CString s;
 		GetWindowTextW(s);
-		float f = 0;
+		float flt = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%f%c", &f, &ch, 1) != 1 && s != "-") {
+		if (swscanf_s(s, L"%f%c", &flt, &ch, 1) != 1 && s != "-") {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -100,9 +111,9 @@ LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 	if (lr == 1) {
 		CString s;
 		GetWindowTextW(s);
-		float f = 0;
+		float flt = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%f%c", &f, &ch, 1) != 1) {
+		if (swscanf_s(s, L"%f%c", &flt, &ch, 1) != 1) {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
