@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,9 +60,9 @@ public:
 	CIntEdit m_scaley;
 	CSpinButtonCtrl m_scaleyspin;
 	int m_borderstyle;
-	CIntEdit m_borderwidth;
+	CFloatEdit m_borderwidth;
 	CSpinButtonCtrl m_borderwidthspin;
-	CIntEdit m_shadowdepth;
+	CFloatEdit m_shadowdepth;
 	CSpinButtonCtrl m_shadowdepthspin;
 	int m_screenalignment;
 	CIntEdit m_marginleft;
