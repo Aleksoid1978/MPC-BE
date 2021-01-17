@@ -210,7 +210,7 @@ void CPPageSubStyle::Init()
 
 	m_relativeTo = m_stss->relativeTo;
 
-	for (int i = 0; i < std::size(m_alpha); i++) {
+	for (unsigned i = 0; i < std::size(m_alpha); i++) {
 		m_alpha[i] = 255-m_stss->alpha[i];
 	}
 
@@ -224,24 +224,24 @@ BOOL CPPageSubStyle::OnApply()
 	UpdateData();
 
 	if (m_iCharset >= 0) {
-		m_stss->charSet		= m_charset.GetItemData(m_iCharset);
+		m_stss->charSet = m_charset.GetItemData(m_iCharset);
 	}
 
-	m_stss->fontSpacing		= m_spacing;
-	m_stss->fontAngleZ		= m_angle;
-	m_stss->fontScaleX		= m_scalex;
-	m_stss->fontScaleY		= m_scaley;
+	m_stss->fontSpacing   = m_spacing;
+	m_stss->fontAngleZ    = m_angle;
+	m_stss->fontScaleX    = m_scalex;
+	m_stss->fontScaleY    = m_scaley;
 
-	m_stss->borderStyle		= m_borderstyle;
-	m_stss->outlineWidthX	= m_stss->outlineWidthY	= m_borderwidth;
-	m_stss->shadowDepthX	= m_stss->shadowDepthY	= m_shadowdepth;
+	m_stss->borderStyle   = m_borderstyle;
+	m_stss->outlineWidthX = m_stss->outlineWidthY = m_borderwidth;
+	m_stss->shadowDepthX  = m_stss->shadowDepthY  = m_shadowdepth;
 
-	m_stss->scrAlignment	= m_screenalignment + 1;
-	m_stss->marginRect		= CRect(m_marginleft, m_margintop, m_marginright, m_marginbottom);
-	m_stss->relativeTo		= m_relativeTo;
+	m_stss->scrAlignment  = m_screenalignment + 1;
+	m_stss->marginRect    = CRect(m_marginleft, m_margintop, m_marginright, m_marginbottom);
+	m_stss->relativeTo    = m_relativeTo;
 
-	for (int i = 0; i < std::size(m_alpha); i++) {
-		m_stss->alpha[i]	= 255 - m_alpha[i];
+	for (unsigned i = 0; i < std::size(m_alpha); i++) {
+		m_stss->alpha[i] = 255 - m_alpha[i];
 	}
 
 	BOOL bStyleChanged = (m_stss_init != *m_stss);
