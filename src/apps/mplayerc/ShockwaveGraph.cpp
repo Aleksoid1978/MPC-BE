@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,12 +100,12 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 
 		if (m_hFile != INVALID_HANDLE_VALUE) {
 			BYTE Buff[128] = {0};
-			ReadBuffer(m_hFile, Buff, 3);	// Signature
+			ReadBuffer(m_hFile, Buff, 3); // Signature
 			if (memcmp(Buff, "CWS", 3) == 0 || memcmp(Buff, "FWS", 3) == 0) {
 				CGolombBuffer gb(nullptr, 0);
 
-				LARGE_INTEGER size = {0};
-				GetFileSizeEx(m_hFile, &size);
+				LARGE_INTEGER fileSize = {0};
+				GetFileSizeEx(m_hFile, &fileSize);
 
 				BYTE ver = 0;
 				ReadBuffer(m_hFile, &ver, 1);
@@ -116,35 +116,35 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 				std::vector<BYTE> DecompData;
 
 				if (memcmp(Buff, "CWS", 3) == 0) {
-					if (size.QuadPart < 5 * MEGABYTE) {
+					if (fileSize.QuadPart < 5 * MEGABYTE) {
 
-						DecompData.resize(size.QuadPart - 8);
-						DWORD size = ReadBuffer(m_hFile, DecompData.data(), DecompData.size());
+						DecompData.resize(fileSize.QuadPart - 8);
+						DWORD dwRead = ReadBuffer(m_hFile, DecompData.data(), DecompData.size());
 
-						if (size == DecompData.size()) {
+						if (dwRead == DecompData.size()) {
 							// decompress
 							for (;;) {
 								int res;
 								z_stream d_stream;
 
-								d_stream.zalloc	= (alloc_func)nullptr;
-								d_stream.zfree	= (free_func)nullptr;
-								d_stream.opaque	= (voidpf)nullptr;
+								d_stream.zalloc = (alloc_func)nullptr;
+								d_stream.zfree  = (free_func)nullptr;
+								d_stream.opaque = (voidpf)nullptr;
 
 								if (Z_OK != (res = inflateInit(&d_stream))) {
 									DecompData.clear();
 									break;
 								}
 
-								d_stream.next_in	= DecompData.data();
-								d_stream.avail_in	= (uInt)DecompData.size();
+								d_stream.next_in  = DecompData.data();
+								d_stream.avail_in = (uInt)DecompData.size();
 
 								BYTE* dst = nullptr;
 								int n = 0;
 								do {
 									dst = (BYTE*)realloc(dst, ++n * 1000);
-									d_stream.next_out	= &dst[(n - 1) * 1000];
-									d_stream.avail_out	= 1000;
+									d_stream.next_out  = &dst[(n - 1) * 1000];
+									d_stream.avail_out = 1000;
 									if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
 										DecompData.clear();
 										free(dst);
@@ -167,19 +167,19 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 						}
 
 						if (flen == DecompData.size()) {
-							gb.Reset(DecompData.data(), std::min(_countof(Buff), DecompData.size()));
+							gb.Reset(DecompData.data(), std::min(std::size(Buff), DecompData.size()));
 						}
 					}
 
 				} else if (memcmp(Buff, "FWS", 3) == 0) {
-					DWORD dwRead = ReadBuffer(m_hFile, Buff, std::min((LONGLONG)_countof(Buff), size.QuadPart));
+					DWORD dwRead = ReadBuffer(m_hFile, Buff, std::min((LONGLONG)std::size(Buff), fileSize.QuadPart));
 					if (dwRead) {
 						gb.Reset(Buff, dwRead);
 					}
 				}
 
 				if (gb.GetSize() > 1) {
-					int Nbits	= (int)gb.BitRead(5);
+					int Nbits   = (int)gb.BitRead(5);
 					UINT64 Xmin = gb.BitRead(Nbits);
 					UINT64 Xmax = gb.BitRead(Nbits);
 					UINT64 Ymin = gb.BitRead(Nbits);

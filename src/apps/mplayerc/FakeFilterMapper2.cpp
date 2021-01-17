@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -652,12 +652,12 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 						continue;
 					}
 
-					for (UINT i = 0; i < rgPin.nMediaTypes; i++) {
-						if (!rgPin.lpMediaType[i].clsMajorType || !rgPin.lpMediaType[i].clsMinorType) {
+					for (UINT j = 0; j < rgPin.nMediaTypes; j++) {
+						if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
 							break;
 						}
-						f->guids.push_back(*rgPin.lpMediaType[i].clsMajorType);
-						f->guids.push_back(*rgPin.lpMediaType[i].clsMinorType);
+						f->guids.push_back(*rgPin.lpMediaType[j].clsMajorType);
+						f->guids.push_back(*rgPin.lpMediaType[j].clsMinorType);
 					}
 				}
 			} else if (prf2->dwVersion == 2) {
@@ -667,12 +667,12 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 						continue;
 					}
 
-					for (UINT i = 0; i < rgPin.nMediaTypes; i++) {
-						if (!rgPin.lpMediaType[i].clsMajorType || !rgPin.lpMediaType[i].clsMinorType) {
+					for (UINT j = 0; j < rgPin.nMediaTypes; j++) {
+						if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
 							break;
 						}
-						f->guids.push_back(*rgPin.lpMediaType[i].clsMajorType);
-						f->guids.push_back(*rgPin.lpMediaType[i].clsMinorType);
+						f->guids.push_back(*rgPin.lpMediaType[j].clsMajorType);
+						f->guids.push_back(*rgPin.lpMediaType[j].clsMinorType);
 					}
 				}
 			}
