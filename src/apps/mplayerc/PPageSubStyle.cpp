@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -141,8 +141,8 @@ BOOL CPPageSubStyle::OnInitDialog()
 	m_angle.SetRange(0, 359);
 	m_scalex.SetRange(-10000, 10000);
 	m_scaley.SetRange(-10000, 10000);
-	m_borderwidth.SetRange(0, 10000);
-	m_shadowdepth.SetRange(0, 10000);
+	m_borderwidth.SetRange(0.0f, 100.0f);
+	m_shadowdepth.SetRange(0.0f, 100.0f);
 	m_marginleft.SetRange(-10000, 10000);
 	m_marginright.SetRange(-10000, 10000);
 	m_margintop.SetRange(-10000, 10000);
@@ -152,14 +152,14 @@ BOOL CPPageSubStyle::OnInitDialog()
 	m_anglespin.SetRange(0, 359);
 	m_scalexspin.SetRange(-10000, 10000);
 	m_scaleyspin.SetRange(-10000, 10000);
-	m_borderwidthspin.SetRange(0, 10000);
-	m_shadowdepthspin.SetRange(0, 10000);
+	m_borderwidthspin.SetRange(0, 100);
+	m_shadowdepthspin.SetRange(0, 100);
 	m_marginleftspin.SetRange(-10000, 10000);
 	m_marginrightspin.SetRange(-10000, 10000);
 	m_margintopspin.SetRange(-10000, 10000);
 	m_marginbottomspin.SetRange(-10000, 10000);
-	for (int i = 0; i < _countof(m_alphasliders); i++) {
-		m_alphasliders[i].SetRange(0, 255);
+	for (auto& slider : m_alphasliders) {
+		slider.SetRange(0, 255);
 	}
 
 	Init();
@@ -199,18 +199,18 @@ void CPPageSubStyle::Init()
 
 
 	m_borderstyle = m_stss->borderStyle;
-	m_borderwidth = (int)std::min(m_stss->outlineWidthX, m_stss->outlineWidthY);
-	m_shadowdepth = (int)std::min(m_stss->shadowDepthX, m_stss->shadowDepthY);
+	m_borderwidth = std::min(m_stss->outlineWidthX, m_stss->outlineWidthY);
+	m_shadowdepth = std::min(m_stss->shadowDepthX, m_stss->shadowDepthY);
 
 	m_screenalignment = m_stss->scrAlignment-1;
-	m_marginleft = m_stss->marginRect.left;
-	m_marginright = m_stss->marginRect.right;
-	m_margintop = m_stss->marginRect.top;
+	m_marginleft   = m_stss->marginRect.left;
+	m_marginright  = m_stss->marginRect.right;
+	m_margintop    = m_stss->marginRect.top;
 	m_marginbottom = m_stss->marginRect.bottom;
 
 	m_relativeTo = m_stss->relativeTo;
 
-	for (int i = 0; i < _countof(m_alpha); i++) {
+	for (int i = 0; i < std::size(m_alpha); i++) {
 		m_alpha[i] = 255-m_stss->alpha[i];
 	}
 
@@ -240,7 +240,7 @@ BOOL CPPageSubStyle::OnApply()
 	m_stss->marginRect		= CRect(m_marginleft, m_margintop, m_marginright, m_marginbottom);
 	m_stss->relativeTo		= m_relativeTo;
 
-	for (int i = 0; i < _countof(m_alpha); i++) {
+	for (int i = 0; i < std::size(m_alpha); i++) {
 		m_stss->alpha[i]	= 255 - m_alpha[i];
 	}
 
@@ -313,14 +313,14 @@ void CPPageSubStyle::OnBnClickedCheck1()
 
 	int avg = 0;
 
-	for (int i = 0; i < _countof(m_alphasliders); i++) {
-		avg += m_alphasliders[i].GetPos();
+	for (auto& slider : m_alphasliders) {
+		avg += slider.GetPos();
 	}
 
-	avg /= 4;
+	avg /= std::size(m_alphasliders);
 
-	for (int i = 0; i < _countof(m_alphasliders); i++) {
-		m_alphasliders[i].SetPos(avg);
+	for (auto& slider : m_alphasliders) {
+		slider.SetPos(avg);
 	}
 
 	SetModified();
@@ -376,8 +376,8 @@ void CPPageSubStyle::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	if (m_linkalphasliders && pScrollBar) {
 		int pos = ((CSliderCtrl*)pScrollBar)->GetPos();
 
-		for (int i = 0; i < _countof(m_alphasliders); i++) {
-			m_alphasliders[i].SetPos(pos);
+		for (auto& slider : m_alphasliders) {
+			slider.SetPos(pos);
 		}
 	}
 
