@@ -84,9 +84,7 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN5, m_scaleyspin);
 	DDX_Radio(pDX, IDC_RADIO1, m_borderstyle);
 	DDX_Control(pDX, IDC_EDIT1, m_borderwidth);
-	DDX_Control(pDX, IDC_SPIN1, m_borderwidthspin);
 	DDX_Control(pDX, IDC_EDIT2, m_shadowdepth);
-	DDX_Control(pDX, IDC_SPIN2, m_shadowdepthspin);
 	DDX_Radio(pDX, IDC_RADIO3, m_screenalignment);
 	DDX_Control(pDX, IDC_EDIT7, m_marginleft);
 	DDX_Control(pDX, IDC_SPIN6, m_marginleftspin);
@@ -152,8 +150,6 @@ BOOL CPPageSubStyle::OnInitDialog()
 	m_anglespin.SetRange(0, 359);
 	m_scalexspin.SetRange(-10000, 10000);
 	m_scaleyspin.SetRange(-10000, 10000);
-	m_borderwidthspin.SetRange(0, 100);
-	m_shadowdepthspin.SetRange(0, 100);
 	m_marginleftspin.SetRange(-10000, 10000);
 	m_marginrightspin.SetRange(-10000, 10000);
 	m_margintopspin.SetRange(-10000, 10000);

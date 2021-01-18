@@ -61,9 +61,7 @@ public:
 	CSpinButtonCtrl m_scaleyspin;
 	int m_borderstyle;
 	CFloatEdit m_borderwidth;
-	CSpinButtonCtrl m_borderwidthspin;
 	CFloatEdit m_shadowdepth;
-	CSpinButtonCtrl m_shadowdepthspin;
 	int m_screenalignment;
 	CIntEdit m_marginleft;
 	CIntEdit m_marginright;
