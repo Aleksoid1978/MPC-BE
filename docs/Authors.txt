@@ -31,7 +31,8 @@ Greek                 : Lampros Zouloumis, George
 Hungarian             : Kleiber Tamás, mickey
 Italian               : Lord Maius
 Korean                : kuh3h3
-Polish                : Volfield
+Polish                : Volfield, maxoku
+Portuguese (Brazil)   : SIEGFRIED JANKE
 Turkish               : Thingol, cmhrky
 Ukrainian             : arestarh1986
 Japanese              : Gyeong, Socket774

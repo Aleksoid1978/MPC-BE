@@ -105,6 +105,8 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Turkish translation (by cmhrky).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 Updated Greek translation (by George).
+Updated Portuguese (Brazil) translation (by SIEGFRIED JANKE).
+Updated Polish translation (by maxoku).
 
 Updated libraries:
 	dav1d git-0.8.1-17-gb12229c;
