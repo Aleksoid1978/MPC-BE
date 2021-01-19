@@ -13,10 +13,10 @@
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
-3		"Select command"
-6		"Filter:"
-9		"OK"
-10		"Cancel"
+3		"選取指令"
+6		"過濾︰"
+9		"確定"
+10		"取消"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Color controls (for EVR, madVR and MPC VR)"
+5		"色彩控制項（EVR 、 madVR 及 MPC VR）"
 6		"亮度"
 7		"對比"
 8		"色調"
@@ -389,7 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 32		"（範例：eng jap swe）"
 33		"開啟設定"
 34		"開啟音訊檔案時，"
-36		"Additionally add to playlist:"
+36		"附加到播放清單︰"
 38		"使用工作執行緒建立篩選器圖 (Filter Graph)"
 40		"回報繪製失敗的 Pin"
 41		"記住播放清單中選定的項目"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"視訊繪製器"
-7		"EVR-CP and EVR Sync settings"
+7		"EVR 自訂呈現及 EVR 同步繪製設定"
 8		"選擇 D3D9 繪製裝置"
 10		"全螢幕獨佔模式"
 12		"10-bit RGB 輸出"
@@ -1002,9 +1002,9 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 14		"上移"
 15		"下移"
 16		"置中"
-18		"Rotate Clockwise"
-19		"Rotate Counterclockwise"
-20		"Flip Horizontally"
+18		"順時針旋轉"
+19		"逆時針旋轉"
+20		"水平鏡像"
 22		"重設"
 END
 
@@ -1066,9 +1066,9 @@ STRING IDD_PPAGEWINDOWSIZE		"播放程式::視窗大小"
 STRING IDD_PPAGEYOUTUBE		"播放::線上影音服務"
 STRING IDF_LOGO1		"預設"
 STRING IDR_MAINFRAME		"MPC-BE"
-STRING IDS_ADDTOPLS_FROMDIR_ALL		"all files from folder"
-STRING IDS_ADDTOPLS_FROMDIR_NONE		"nothing"
-STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
+STRING IDS_ADDTOPLS_FROMDIR_ALL		"同一資料夾的所有檔案"
+STRING IDS_ADDTOPLS_FROMDIR_NONE		"無"
+STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"同一資料夾的相似檔案"
 STRING IDS_ADD_TO_PLAYLIST		"加到 MPC-BE 的播放清單"
 STRING IDS_AFTERPLAYBACK_CLOSE		"播放完後：離開"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"播放完後：總是關閉檔案"
@@ -1201,8 +1201,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"平移掃描 - 增加寬度"
 STRING IDS_AG_PNS_LEFT		"平移掃描 - 左移"
 STRING IDS_AG_PNS_RESET		"平移掃描 - 重設"
 STRING IDS_AG_PNS_RIGHT		"平移掃描 - 右移"
-STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
-STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
+STRING IDS_AG_PNS_ROTATE_CCW		"平移掃描 - 逆時針旋轉"
+STRING IDS_AG_PNS_ROTATE_CW		"平移掃描 - 順時針旋轉"
 STRING IDS_AG_PNS_UP		"平移掃描 - 上移"
 STRING IDS_AG_PNS_UPLEFT		"平移掃描 - 左上"
 STRING IDS_AG_PNS_UPRIGHT		"平移掃描 - 右上"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"檔案大小：%s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}檔案名稱：%s\\N%s解析度：%dx%d %s\\N時間長度：%02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"已繪製：%d，已略過：%d"
 STRING IDS_MAINFRM_60		"要載入字幕您必須變更視訊繪製器類型並重新開啟檔案。\n"
-STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR 自訂呈現 、 EVR 同步繪製 、 madVR 、 Haali 或是 MPC VR。\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"縮放前像素着色器：開啟"
 STRING IDS_MAINFRM_66		"縮放前像素着色器：關閉"

@@ -13,10 +13,10 @@
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
-3		"Select command"
+3		"Opdracht selecteren"
 6		"Filter:"
 9		"OK"
-10		"Cancel"
+10		"Annuleren"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -191,7 +191,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
-5		"Color controls (for EVR, madVR and MPC VR)"
+5		"Kleurregeling (voor EVR, madVR en MPC VR)"
 6		"Helderheid"
 7		"Contrast"
 8		"Tint"
@@ -389,7 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 32		"(Bijv.: nl eng jap )"
 33		"Opties voor openen"
 34		"Wanneer een audio-bestand is geopend,"
-36		"Additionally add to playlist:"
+36		"Voeg daarnaast toe aan de afspeellijst:"
 38		"Filtergraph in aparte CPU-thread samenstellen"
 40		"Rapporteer pins die niet renderen"
 41		"Onthoud geselecteerde items in de afspeellijst"
@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Videorenderer"
-7		"EVR-CP and EVR Sync settings"
+7		"Instellingen van EVR-CP en EVR Sync"
 8		"Kies D3D9-renderapparaat"
 10		"Exclusieve volledigschermmodus"
 12		"10-bits RGB-uitvoer"
@@ -1002,9 +1002,9 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 14		"Omhoog verplaatsen"
 15		"Omlaag verplaatsen"
 16		"&Centreren"
-18		"Rotate Clockwise"
-19		"Rotate Counterclockwise"
-20		"Flip Horizontally"
+18		"Met de klok mee draaien"
+19		"Tegen de klok in draaien"
+20		"Horizontaal omkeren"
 22		"Resetten"
 END
 
@@ -1066,9 +1066,9 @@ STRING IDD_PPAGEWINDOWSIZE		"Speler::Venstergrootte"
 STRING IDD_PPAGEYOUTUBE		"Weergave::Online-videodienst"
 STRING IDF_LOGO1		"Standaard"
 STRING IDR_MAINFRAME		"MPC-BE"
-STRING IDS_ADDTOPLS_FROMDIR_ALL		"all files from folder"
-STRING IDS_ADDTOPLS_FROMDIR_NONE		"nothing"
-STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
+STRING IDS_ADDTOPLS_FROMDIR_ALL		"Alle bestanden in de map"
+STRING IDS_ADDTOPLS_FROMDIR_NONE		"Niets"
+STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"Dergelijke bestanden in de map"
 STRING IDS_ADD_TO_PLAYLIST		"Aan afspeellijst van MPC-BE toevoegen"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Na weergave: Venster afsluiten"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Na weergave: Altijd bestand sluiten"
@@ -1201,8 +1201,8 @@ STRING IDS_AG_PNS_INC_WIDTH		"PnS Inc Breedte"
 STRING IDS_AG_PNS_LEFT		"PnS links"
 STRING IDS_AG_PNS_RESET		"PnS Reset"
 STRING IDS_AG_PNS_RIGHT		"PnS rechts"
-STRING IDS_AG_PNS_ROTATE_CCW		"PnS Rotate Counterclockwise"
-STRING IDS_AG_PNS_ROTATE_CW		"PnS Rotate Clockwise"
+STRING IDS_AG_PNS_ROTATE_CCW		"PnS tegen de klok in draaien"
+STRING IDS_AG_PNS_ROTATE_CW		"PnS met de klok mee draaien"
 STRING IDS_AG_PNS_UP		"PnS hoog"
 STRING IDS_AG_PNS_UPLEFT		"PnS hoog/links"
 STRING IDS_AG_PNS_UPRIGHT		"PnS hoog/rechts"
@@ -1549,7 +1549,7 @@ STRING IDS_MAINFRM_58		"Bestandsgrootte: %s (%s bytes)\\N"
 STRING IDS_MAINFRM_59		"{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Bestandsnaam: %s\\N%sResolutie: %dx%d %s\\NTijdsduur: %02d:%02d:%02d"
 STRING IDS_MAINFRM_6		"gemaakt: %d, verworpen: %d"
 STRING IDS_MAINFRM_60		"Om ondertiteling te kunnen laden moet u de videorenderer veranderen en het bestand opnieuw openen.\n"
-STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
+STRING IDS_MAINFRM_61		"- DirectShow: EVR-CP, EVR Sync, Haali, madVR of MPC VR.\n"
 STRING IDS_MAINFRM_64		"- ShockWave: n/a\n"
 STRING IDS_MAINFRM_65		"Pre-Resize Pixel Shaders: Aan"
 STRING IDS_MAINFRM_66		"Pre-Resize Pixel Shaders: Uit"
