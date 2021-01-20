@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -329,7 +329,8 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		CComQIPtr<IMFGetService>	pMFGS	= pBF;
 		CComQIPtr<IEVRFilterConfig>	pConfig	= pBF;
 
-		if (FAILED(pConfig->SetNumberOfStreams(3))) { // TODO - maybe need other number of input stream ...
+		// 3 video streams are required to play DVD-Video with some decoders
+		if (FAILED(pConfig->SetNumberOfStreams(3))) {
 			DLog(L"IEVRFilterConfig->SetNumberOfStreams(3) fail");
 			break;
 		}

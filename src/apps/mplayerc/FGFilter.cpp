@@ -453,8 +453,11 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		EXIT_ON_ERROR(hr);
 
 		if (m_clsid == CLSID_EnhancedVideoRenderer) {
-			if (CComQIPtr<IEVRFilterConfig> pConfig = pBF) {
-				VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
+			if (m_name != "EVR - Preview Window") {
+				if (CComQIPtr<IEVRFilterConfig> pConfig = pBF) {
+					// 3 video streams are required to play DVD-Video with some decoders
+					VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
+				}
 			}
 
 			if (CComQIPtr<IMFGetService> pMFGS = pBF) {
