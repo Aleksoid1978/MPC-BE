@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - ctts Atoms 
+|    AP4 - ctts Atoms
 |
 |    Copyright 2003 Gilles Boccon-Gibod & Julien Boeuf
 |
@@ -41,8 +41,8 @@
 +---------------------------------------------------------------------*/
 class AP4_CttsTableEntry {
  public:
-    AP4_CttsTableEntry() : 
-        m_SampleCount(0), 
+    AP4_CttsTableEntry() :
+        m_SampleCount(0),
         m_SampleOffset(0) {}
     AP4_CttsTableEntry(AP4_Cardinal sample_count,
                        AP4_SI32 sample_offset) :
@@ -63,7 +63,7 @@ class AP4_CttsAtom : public AP4_Atom
     AP4_CttsAtom(AP4_Size size, AP4_ByteStream& stream);
     virtual AP4_Result InspectFields(AP4_AtomInspector& inspector);
     virtual AP4_Result WriteFields(AP4_ByteStream& stream);
-    virtual AP4_Result GetCtsOffset(AP4_Ordinal sample, 
+    virtual AP4_Result GetCtsOffset(AP4_Ordinal sample,
                                     AP4_SI32& cts_offset);
 
  private:

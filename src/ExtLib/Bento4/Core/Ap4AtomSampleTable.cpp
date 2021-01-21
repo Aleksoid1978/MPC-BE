@@ -48,7 +48,7 @@
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::AP4_AtomSampleTable
 +---------------------------------------------------------------------*/
-AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl, 
+AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl,
                                          AP4_ByteStream&    sample_stream) :
     m_SampleStream(sample_stream)
     , m_tsDelay(0)
@@ -65,13 +65,13 @@ AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl,
     // keep a reference to the sample stream
     m_SampleStream.AddReference();
 
-    if (m_StsdAtom && m_StszAtom && m_StscAtom && m_SttsAtom 
+    if (m_StsdAtom && m_StszAtom && m_StscAtom && m_SttsAtom
         && (m_StszAtom->m_SampleSize == 1
             || (m_SttsAtom->m_Entries.ItemCount() == 1 && m_SttsAtom->m_Entries[0].m_SampleDuration == 1)))
     {
         // fix mov files
-        for (AP4_List<AP4_Atom>::Item* item = m_StsdAtom->GetChildren().FirstItem(); 
-            item; 
+        for (AP4_List<AP4_Atom>::Item* item = m_StsdAtom->GetChildren().FirstItem();
+            item;
             item = item->GetNext()) {
             AP4_Atom* atom = item->GetData();
 
@@ -112,7 +112,7 @@ AP4_AtomSampleTable::~AP4_AtomSampleTable()
 |       AP4_AtomSampleTable::GetSample
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_AtomSampleTable::GetSample(AP4_Ordinal index, 
+AP4_AtomSampleTable::GetSample(AP4_Ordinal index,
                                AP4_Sample& sample)
 {
     AP4_Result result;
@@ -129,21 +129,21 @@ AP4_AtomSampleTable::GetSample(AP4_Ordinal index,
     AP4_Ordinal chunk, skip, desc;
     result = m_StscAtom->GetChunkForSample(index, chunk, skip, desc);
     if (AP4_FAILED(result)) return result;
-    
+
     // check that the result is within bounds
     if (skip > index) return AP4_ERROR_INTERNAL;
 
     // get the atom offset for this chunk
     AP4_Offset offset;
-    if (m_StcoAtom) result = m_StcoAtom->GetChunkOffset(chunk, offset); 
-    else if (m_Co64Atom) result = m_Co64Atom->GetChunkOffset(chunk, offset); 
-    else result = AP4_ERROR_INTERNAL;    
+    if (m_StcoAtom) result = m_StcoAtom->GetChunkOffset(chunk, offset);
+    else if (m_Co64Atom) result = m_Co64Atom->GetChunkOffset(chunk, offset);
+    else result = AP4_ERROR_INTERNAL;
     if (AP4_FAILED(result)) return result;
 /*
     // compute the additional offset inside the chunk
     for (unsigned int i = index-skip; i < index; i++) {
         AP4_Size size;
-        result = m_StszAtom->GetSampleSize(i, size); 
+        result = m_StszAtom->GetSampleSize(i, size);
         if (AP4_FAILED(result)) return result;
         offset += size;
     }
@@ -163,14 +163,12 @@ AP4_AtomSampleTable::GetSample(AP4_Ordinal index,
     if (AP4_FAILED(result)) return result;
     sample.SetDts(dts);
     sample.SetDuration(duration);
-    if (m_CttsAtom == NULL) {
-        sample.SetCts(dts + m_tsDelay);
-    } else {
-        AP4_SI32 cts_offset;
-        result = m_CttsAtom->GetCtsOffset(index, cts_offset);
-        if (AP4_FAILED(result)) return result;
-        sample.SetCts(dts + cts_offset + m_tsDelay);
-    }     
+
+    AP4_SI32 cts_offset = 0;
+    if (m_CttsAtom) {
+        m_CttsAtom->GetCtsOffset(index, cts_offset);
+    }
+    sample.SetCts(dts + cts_offset + m_tsDelay);
 
     // set the size
     AP4_Size sample_size;
@@ -224,7 +222,7 @@ AP4_AtomSampleTable::GetSampleDescriptionCount()
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::GetChunkForSample
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_AtomSampleTable::GetChunkForSample(AP4_Ordinal  sample,
                                        AP4_Ordinal& chunk,
                                        AP4_Ordinal& skip,
@@ -236,7 +234,7 @@ AP4_AtomSampleTable::GetChunkForSample(AP4_Ordinal  sample,
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::GetChunkOffset
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_AtomSampleTable::GetChunkOffset(AP4_Ordinal chunk, AP4_Offset& offset)
 {
     return
@@ -248,19 +246,19 @@ AP4_AtomSampleTable::GetChunkOffset(AP4_Ordinal chunk, AP4_Offset& offset)
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::SetChunkOffset
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_AtomSampleTable::SetChunkOffset(AP4_Ordinal chunk, AP4_Offset offset)
 {
-    return 
-        m_StcoAtom ? m_StcoAtom->SetChunkOffset(chunk, offset) : 
-        m_Co64Atom ? m_Co64Atom->SetChunkOffset(chunk, offset) : 
+    return
+        m_StcoAtom ? m_StcoAtom->SetChunkOffset(chunk, offset) :
+        m_Co64Atom ? m_Co64Atom->SetChunkOffset(chunk, offset) :
         AP4_FAILURE;
 }
 
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::SetSampleSize
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_AtomSampleTable::SetSampleSize(AP4_Ordinal sample, AP4_Size size)
 {
     return m_StszAtom ? m_StszAtom->SetSampleSize(sample, size) : AP4_FAILURE;
@@ -269,7 +267,7 @@ AP4_AtomSampleTable::SetSampleSize(AP4_Ordinal sample, AP4_Size size)
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::GetSampleIndexForTimeStamp
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
                                                 AP4_Ordinal& index)
 {

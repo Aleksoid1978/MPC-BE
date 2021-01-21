@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - ctts Atoms 
+|    AP4 - ctts Atoms
 |
 |    Copyright 2003 Gilles Boccon-Gibod & Julien Boeuf
 |
@@ -64,10 +64,10 @@ AP4_CttsAtom::GetCtsOffset(AP4_Ordinal sample, AP4_SI32& cts_offset)
 {
     // default value
     cts_offset = 0;
-    
+
     // sample indexes start at 1
     if (sample == 0) return AP4_ERROR_OUT_OF_RANGE;
-    
+
     // check the lookup cache
     AP4_Ordinal lookup_start = 0;
     AP4_Ordinal sample_start = 0;
@@ -93,7 +93,7 @@ AP4_CttsAtom::GetCtsOffset(AP4_Ordinal sample, AP4_SI32& cts_offset)
         }
 
         // update the upper bound
-        sample_start += entry.m_SampleCount;        
+        sample_start += entry.m_SampleCount;
     }
 
     // sample is greater than the number of samples
