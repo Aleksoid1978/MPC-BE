@@ -15970,6 +15970,11 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 		s.nCS = nCS;
 	}
 
+	if (s.bUseDarkTheme && (nCS & CS_STATUSBAR)) {
+		OnTimer(TIMER_STREAMPOSPOLLER2);
+		m_wndSeekBar.Invalidate();
+	}
+
 	RecalcLayout();
 
 	RepaintVideo();
