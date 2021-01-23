@@ -160,6 +160,9 @@ void CPlayerSeekBar::SetPosInternal(const REFERENCE_TIME pos)
 	const auto& s = AfxGetAppSettings();
 
 	if (s.bUseDarkTheme && !s.bStatusBarIsVisible && !s.strTimeOnSeekBar.IsEmpty()) {
+		m_pos = std::clamp(pos, 0LL, m_stop);
+		m_posreal = pos;
+
 		Invalidate();
 		return;
 	}
