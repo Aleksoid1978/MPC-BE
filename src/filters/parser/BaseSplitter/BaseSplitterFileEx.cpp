@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1337,7 +1337,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 			return false;
 		}
 
-		h.bMixedMVC = sps & subset_sps;
+		h.bMixedMVC = sps && subset_sps;
 	}
 
 	Nalu.SetBuffer(pData.data(), pData.size());
@@ -1432,7 +1432,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 				extradata.insert(extradata.end(), data.begin(), data.end());
 			}
 
-			CreateMPEG2VISimple(pmt, &bmi, params.AvgTimePerFrame, aspect, extradata.data(), extradata.size(), params.profile, params.level, 4);
+			CreateMPEG2VISimple(pmt, &bmi, params.AvgTimePerFrame, aspect, extradata.data(), extradata.size(), params.profile, params.level);
 			pmt->SetTemporalCompression(TRUE);
 			pmt->SetVariableSize();
 		}
