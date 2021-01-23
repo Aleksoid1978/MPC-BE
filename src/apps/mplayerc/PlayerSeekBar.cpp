@@ -157,13 +157,20 @@ void CPlayerSeekBar::SetPosInternal(const REFERENCE_TIME pos)
 		return;
 	}
 
+	const auto& s = AfxGetAppSettings();
+
+	if (s.bUseDarkTheme && !s.bStatusBarIsVisible && !s.strTimeOnSeekBar.IsEmpty()) {
+		Invalidate();
+		return;
+	}
+
 	const CRect before = GetThumbRect();
 	m_pos = std::clamp(pos, 0LL, m_stop);
 	m_posreal = pos;
 	const CRect after = GetThumbRect();
 
 	if (before != after) {
-		if (AfxGetAppSettings().bUseDarkTheme) {
+		if (s.bUseDarkTheme) {
 			Invalidate();
 		} else {
 			InvalidateRect(before | after);
