@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2827,6 +2827,8 @@ HRESULT CreateMPEG2VIfromMVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 
 HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize pictAR, BYTE* extra, size_t extralen, DWORD dwProfile/* = 0*/, DWORD dwLevel/* = 0*/, DWORD dwFlags/* = 0*/)
 {
+	CheckPointer(mt, E_FAIL);
+
 	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
 
 	mt->majortype					= MEDIATYPE_Video;
@@ -2854,6 +2856,8 @@ HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TI
 
 HRESULT CreateAVCfromH264(CMediaType* mt)
 {
+	CheckPointer(mt, E_FAIL);
+
 	if (mt->formattype != FORMAT_MPEG2_VIDEO) {
 		return E_FAIL;
 	}
@@ -2863,22 +2867,27 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 		return E_FAIL;
 	}
 
-	BYTE* extra		= (BYTE*)&pm2vi->dwSequenceHeader[0];
-	DWORD extrasize	= pm2vi->cbSequenceHeader;
+	const BYTE* extra     = (BYTE*)&pm2vi->dwSequenceHeader[0];
+	const DWORD extrasize = pm2vi->cbSequenceHeader;
 
-	BYTE* dst		= DNew BYTE[extrasize];
-	DWORD dstSize	= 0;
+	std::unique_ptr<BYTE[]> dst_ptr(new(std::nothrow) BYTE[extrasize]);
+	if (!dst_ptr) {
+		return E_FAIL;
+	}
+
+	auto dst = dst_ptr.get();
+	DWORD dstSize = 0;
 
 	CH264Nalu Nalu;
 	Nalu.SetBuffer(extra, extrasize);
 	while (Nalu.ReadNext()) {
 		if (Nalu.GetType() == NALU_TYPE_SPS || Nalu.GetType() == NALU_TYPE_PPS) {
-			size_t nalLength = Nalu.GetDataLength();
+			const size_t nalLength = Nalu.GetDataLength();
 			*(dst + dstSize++) = (BYTE)(nalLength >> 8);
 			*(dst + dstSize++) = nalLength & 0xff;
 
-			memcpy(dst + dstSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
-			dstSize += Nalu.GetDataLength();
+			memcpy(dst + dstSize, Nalu.GetDataBuffer(), nalLength);
+			dstSize += nalLength;
 		}
 	}
 
@@ -2888,13 +2897,17 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 		mt->subtype = MEDIASUBTYPE_AVC1;
 		pm2vi->hdr.bmiHeader.biCompression = mt->subtype.Data1;
 
+		if (!pm2vi->dwFlags) {
+			pm2vi->dwFlags = 4;
+		}
+
 		pm2vi->cbSequenceHeader = dstSize;
 		memcpy(&pm2vi->dwSequenceHeader[0], dst, dstSize);
+
+		return S_OK;
 	}
 
-	delete [] dst;
-
-	return dstSize ? S_OK : E_FAIL;
+	return E_FAIL;
 }
 
 void CreateVorbisMediaType(CMediaType& mt, std::vector<CMediaType>& mts, DWORD Channels, DWORD SamplesPerSec, DWORD BitsPerSample, const BYTE* pData, size_t Count)
