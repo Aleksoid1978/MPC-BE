@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -230,14 +230,13 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 	class spu : public std::vector<BYTE>
 	{
 	public:
-		bool m_fForced;
-		REFERENCE_TIME m_rtStart, m_rtStop;
+		bool m_fForced = false;
+		REFERENCE_TIME m_rtStart = 0;
+		REFERENCE_TIME m_rtStop = 0;
 		DWORD m_offset[2];
 		AM_PROPERTY_SPHLI m_sphli; // parsed
 		CAutoPtr<AM_PROPERTY_SPHLI> m_psphli; // for the menu (optional)
 		spu() {
-			m_fForced = false;
-			m_rtStart = m_rtStop = 0;
 			memset(&m_offset, 0, sizeof(m_offset));
 			memset(&m_sphli, 0, sizeof(m_sphli));
 		}
