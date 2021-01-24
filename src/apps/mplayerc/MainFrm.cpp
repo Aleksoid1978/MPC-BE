@@ -15968,11 +15968,11 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 
 	if (fSave) {
 		s.nCS = nCS;
-	}
 
-	if (s.bUseDarkTheme && (nCS & CS_STATUSBAR)) {
-		OnTimer(TIMER_STREAMPOSPOLLER2);
-		m_wndSeekBar.Invalidate();
+		if (s.bUseDarkTheme) {
+			OnTimer(TIMER_STREAMPOSPOLLER2);
+			m_wndSeekBar.Invalidate();
+		}
 	}
 
 	RecalcLayout();
