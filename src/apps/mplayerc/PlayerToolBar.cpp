@@ -658,7 +658,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				GetItemRect(12, &rVolume);
 
 				if (rSub.right < rVolume.left - m_nDXVAIconWidth) {
-					DrawIconEx(dc.m_hDC, rVolume.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2 + 1), m_hDXVAIcon, 0, 0, 0, nullptr, DI_NORMAL);
+					DrawIconEx(dc.m_hDC, rVolume.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2), m_hDXVAIcon, 0, 0, 0, nullptr, DI_NORMAL);
 				}
 			}
 
