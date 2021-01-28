@@ -4502,7 +4502,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_bFirstFSAfterLaunchOnFullScreen = true;
 	}
 
-	if (m_bFullScreen && !m_bAudioOnly && !s.fLaunchfullscreen && !s.IsD3DFullscreen() && s.fullScreenModes.bEnabled == 1) {
+	if (!m_bAudioOnly &&
+			((m_bFullScreen && !m_bAudioOnly && !s.fLaunchfullscreen && !s.IsD3DFullscreen() && s.fullScreenModes.bEnabled == 1) || m_bNeedAutoChangeMonitorMode)) {
 		AutoChangeMonitorMode();
 	}
 
@@ -13959,6 +13960,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		m_dMediaInfoFPS	= 0.0;
+		m_bNeedAutoChangeMonitorMode = false;
 
 		if ((s.fullScreenModes.bEnabled == 1 && (IsD3DFullScreenMode() || s.fLaunchfullscreen))
 				|| s.fullScreenModes.bEnabled == 2) {
@@ -14045,6 +14047,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				if (s.fLaunchfullscreen && !IsD3DFullScreenMode() && !m_bFullScreen && !m_bAudioOnly ) {
 					ToggleFullscreen(true, true);
 				}
+			} else {
+				m_bNeedAutoChangeMonitorMode = true;
 			}
 		}
 
