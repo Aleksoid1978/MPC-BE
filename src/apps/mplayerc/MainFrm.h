@@ -574,6 +574,7 @@ protected:
 
 	void AutoChangeMonitorMode();
 	double m_dMediaInfoFPS;
+	bool m_bNeedAutoChangeMonitorMode = false;
 
 	bool GraphEventComplete();
 
