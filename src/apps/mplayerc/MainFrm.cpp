@@ -19222,12 +19222,12 @@ BOOL CMainFrame::CheckDVD(CString& path)
 	return FALSE;
 }
 
-void CMainFrame::SetStatusMessage(CString m_msg)
+void CMainFrame::SetStatusMessage(const CString& msg)
 {
-	if (m_OldMessage != m_msg) {
-		m_wndStatusBar.SetStatusMessage(m_msg);
+	if (m_OldMessage != msg) {
+		m_wndStatusBar.SetStatusMessage(msg);
+		m_OldMessage = msg;
 	}
-	m_OldMessage = m_msg;
 }
 
 CString CMainFrame::FillMessage()

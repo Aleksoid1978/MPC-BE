@@ -1320,7 +1320,7 @@ protected:
 	void WTSUnRegisterSessionNotification();
 
 	CString m_OldMessage;
-	void SetStatusMessage(CString m_msg);
+	void SetStatusMessage(const CString& msg);
 	CString FillMessage();
 
 	bool m_bValidDVDOpen;
