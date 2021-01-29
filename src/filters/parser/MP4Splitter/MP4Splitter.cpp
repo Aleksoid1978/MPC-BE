@@ -1682,6 +1682,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfe->nBlockAlign     = ase->GetBytesPerFrame();
 						wfe->nAvgBytesPerSec = ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0;
 
+						if (!movie->HasFragmentsIndex()) {
+							// calculate bitrate
+							AP4_UI64 total_size = 0;
+							for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
+								if (AP4_SUCCEEDED(track->GetSample(i, sample))) {
+									total_size += sample.GetSize();
+								}
+							}
+
+							wfe->nAvgBytesPerSec = llMulDiv(1000, total_size, track->GetDurationHighPrecision(), 0);
+						}
+
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
