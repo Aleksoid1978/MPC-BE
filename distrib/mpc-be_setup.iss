@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2020 see Authors.txt
+; (C) 2009-2021 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -314,6 +314,7 @@ Type: files; Name: {app}\{#msdk_dll}
 
 [Registry]
 Root: HKLM; Subkey: "SOFTWARE\Clients\Media\MPC-BE"; Flags: dontcreatekey uninsdeletekey
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{#mpcbe_exe}"; ValueType: string; ValueName: ""; ValueData: "{app}\{#mpcbe_exe}"; Flags: deletekey uninsdeletekey
 
 [Code]
 function IsProcessorFeaturePresent(Feature: Integer): Boolean;
