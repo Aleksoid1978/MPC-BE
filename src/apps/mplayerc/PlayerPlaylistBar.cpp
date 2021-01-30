@@ -1015,9 +1015,6 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				auto& curTab = GetCurTab();
 
 				switch (pMsg->wParam) {
-				case VK_ESCAPE:
-					m_pMainFrame->ShowControlBarInternal(this, FALSE);
-					return TRUE;
 				case VK_RETURN:
 					if (GetKeyState(VK_CONTROL) < 0) {
 						m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
