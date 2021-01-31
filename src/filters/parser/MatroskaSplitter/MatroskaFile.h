@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -325,6 +325,18 @@ namespace MatroskaReader
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
+	class CProjection
+	{
+	public:
+		CUInt   ProjectionType;
+		CBinary ProjectionPrivate;
+		CFloat  ProjectionPoseYaw;
+		CFloat  ProjectionPosePitch;
+		CFloat  ProjectionPoseRoll;
+
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
 	class Video
 	{
 	public:
@@ -337,6 +349,7 @@ namespace MatroskaReader
 		CFloat FrameRate; // Number of frames per second. Informational only.
 
 		Colour VideoColorInformation;
+		CProjection Projection;
 
 		Video() {
 			FlagInterlaced.Set(0);
