@@ -274,7 +274,7 @@ namespace MatroskaReader
 		HRESULT ParseTimeCode(CMatroskaNode* pMN);
 	};
 
-	class MasteringMetadata
+	class CMasteringMetadata
 	{
 	public:
 		CFloat PrimaryRChromaticityX, PrimaryRChromaticityY;
@@ -285,7 +285,7 @@ namespace MatroskaReader
 
 		bool bValid;
 
-		MasteringMetadata() {
+		CMasteringMetadata() {
 			PrimaryRChromaticityX.Set(0.0); PrimaryRChromaticityY.Set(0.0);
 			PrimaryGChromaticityX.Set(0.0); PrimaryGChromaticityY.Set(0.0);
 			PrimaryBChromaticityX.Set(0.0); PrimaryBChromaticityX.Set(0.0);
@@ -297,7 +297,7 @@ namespace MatroskaReader
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
-	class Colour
+	class CColour
 	{
 	public:
 		CUInt MatrixCoefficients;
@@ -309,11 +309,11 @@ namespace MatroskaReader
 		CUInt MaxCLL;
 		CUInt MaxFALL;
 
-		MasteringMetadata SMPTE2086MasteringMetadata;
+		CMasteringMetadata MasteringMetadata;
 
 		bool bValid;
 
-		Colour() {
+		CColour() {
 			MatrixCoefficients.Set(0);
 			ChromaSitingHorz.Set(0); ChromaSitingHorz.Set(0);
 			Range.Set(0);
@@ -348,7 +348,7 @@ namespace MatroskaReader
 		CFloat GammaValue;
 		CFloat FrameRate; // Number of frames per second. Informational only.
 
-		Colour VideoColorInformation;
+		CColour Colour;
 		CProjection Projection;
 
 		Video() {

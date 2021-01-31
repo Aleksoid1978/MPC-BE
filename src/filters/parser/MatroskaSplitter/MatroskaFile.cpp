@@ -525,7 +525,7 @@ bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
 	return true;
 }
 
-HRESULT MasteringMetadata::Parse(CMatroskaNode* pMN0)
+HRESULT CMasteringMetadata::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
 	case 0x55D1:
@@ -571,7 +571,7 @@ HRESULT MasteringMetadata::Parse(CMatroskaNode* pMN0)
 	EndChunk
 }
 
-HRESULT Colour::Parse(CMatroskaNode* pMN0)
+HRESULT CColour::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
 	case 0x55B1:
@@ -607,7 +607,7 @@ HRESULT Colour::Parse(CMatroskaNode* pMN0)
 		bValid = true;
 		break;
 	case 0x55D0:
-		SMPTE2086MasteringMetadata.Parse(pMN);
+		MasteringMetadata.Parse(pMN);
 		break;
 	EndChunk
 }
@@ -700,7 +700,7 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 		FrameRate.Parse(pMN);
 		break;
 	case 0x55B0:
-		VideoColorInformation.Parse(pMN);
+		Colour.Parse(pMN);
 		break;
 	case 0x7670:
 		Projection.Parse(pMN);
