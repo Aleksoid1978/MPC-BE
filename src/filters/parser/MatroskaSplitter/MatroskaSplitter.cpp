@@ -1636,7 +1636,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					} else if (SimpleTag->TagName == L"3d-plane") {
 						pg_offsets.push_back(_wtoi(SimpleTag->TagString));
 					} else if (SimpleTag->TagName == L"ROTATE" || SimpleTag->TagName == L"ROTATION") {
-						SetProperty(L"ROTATION", SimpleTag->TagString);
+						CComBSTR prop;
+						if (FAILED(GetProperty(L"ROTATION", &prop))) {
+							SetProperty(L"ROTATION", SimpleTag->TagString);
+						}
 					}
 				}
 			}
