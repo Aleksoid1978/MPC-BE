@@ -276,6 +276,7 @@ namespace MatroskaReader
 
 	class CMasteringMetadata
 	{
+		bool m_bValid = false;
 	public:
 		CFloat PrimaryRChromaticityX, PrimaryRChromaticityY;
 		CFloat PrimaryGChromaticityX, PrimaryGChromaticityY;
@@ -283,22 +284,22 @@ namespace MatroskaReader
 		CFloat WhitePointChromaticityX, WhitePointChromaticityY;
 		CFloat LuminanceMax, LuminanceMin;
 
-		bool bValid;
-
 		CMasteringMetadata() {
 			PrimaryRChromaticityX.Set(0.0); PrimaryRChromaticityY.Set(0.0);
 			PrimaryGChromaticityX.Set(0.0); PrimaryGChromaticityY.Set(0.0);
 			PrimaryBChromaticityX.Set(0.0); PrimaryBChromaticityX.Set(0.0);
 			WhitePointChromaticityX.Set(0.0); WhitePointChromaticityY.Set(0.0);
 			LuminanceMax.Set(0.0); LuminanceMin.Set(0.0);
-
-			bValid = false;
+		}
+		bool IsValid() const {
+			return m_bValid;
 		}
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
 	class CColour
 	{
+		bool m_bValid = false;
 	public:
 		CUInt MatrixCoefficients;
 		CUInt ChromaSitingHorz;
@@ -308,10 +309,7 @@ namespace MatroskaReader
 		CUInt Primaries;
 		CUInt MaxCLL;
 		CUInt MaxFALL;
-
 		CMasteringMetadata MasteringMetadata;
-
-		bool bValid;
 
 		CColour() {
 			MatrixCoefficients.Set(0);
@@ -319,8 +317,9 @@ namespace MatroskaReader
 			Range.Set(0);
 			TransferCharacteristics.Set(0);
 			Primaries.Set(0);
-
-			bValid = false;
+		}
+		bool IsValid() const {
+			return m_bValid;
 		}
 		HRESULT Parse(CMatroskaNode* pMN);
 	};

@@ -530,43 +530,43 @@ HRESULT CMasteringMetadata::Parse(CMatroskaNode* pMN0)
 	BeginChunk
 	case 0x55D1:
 		PrimaryRChromaticityX.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D2:
 		PrimaryRChromaticityY.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D3:
 		PrimaryGChromaticityX.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D4:
 		PrimaryGChromaticityY.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D5:
 		PrimaryBChromaticityX.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D6:
 		PrimaryBChromaticityY.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D7:
 		WhitePointChromaticityX.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D8:
 		WhitePointChromaticityY.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D9:
 		LuminanceMax.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55DA:
 		LuminanceMin.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	EndChunk
 }
@@ -576,35 +576,35 @@ HRESULT CColour::Parse(CMatroskaNode* pMN0)
 	BeginChunk
 	case 0x55B1:
 		MatrixCoefficients.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55B7:
 		ChromaSitingHorz.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55B8:
 		ChromaSitingVert.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55B9:
 		Range.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55BA:
 		TransferCharacteristics.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55BB:
 		Primaries.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55BC:
 		MaxCLL.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55BD:
 		MaxFALL.Parse(pMN);
-		bValid = true;
+		m_bValid = true;
 		break;
 	case 0x55D0:
 		MasteringMetadata.Parse(pMN);

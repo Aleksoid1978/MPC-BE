@@ -905,7 +905,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					SetProperty(L"STEREOSCOPIC3DMODE", matroska_stereo_mode[pTE->v.StereoMode]);
 				}
 
-				if (pTE->v.Colour.bValid) {
+				if (pTE->v.Colour.IsValid()) {
 					m_ColorSpace = DNew(ColorSpace);
 					ZeroMemory(m_ColorSpace, sizeof(ColorSpace));
 
@@ -958,7 +958,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_HDRContentLightLevel->MaxFALL = pTE->v.Colour.MaxFALL;
 				}
 
-				if (pTE->v.Colour.MasteringMetadata.bValid) {
+				if (pTE->v.Colour.MasteringMetadata.IsValid()) {
 					CMasteringMetadata& metadata = pTE->v.Colour.MasteringMetadata;
 
 					m_MasterDataHDR = DNew(MediaSideDataHDR);
