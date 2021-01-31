@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -874,6 +874,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioX = displayAR.cx;
 							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioY = displayAR.cy;
 						}
+					}
+
+					if (pTE->v.Projection.ProjectionPoseRoll.IsValid()) {
+						CStringW strRotation;
+						strRotation.Format(L"%.0f", (double)pTE->v.Projection.ProjectionPoseRoll);
+						SetProperty(L"ROTATION", strRotation);
 					}
 				}
 
