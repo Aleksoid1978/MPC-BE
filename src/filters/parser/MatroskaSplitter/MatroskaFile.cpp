@@ -612,6 +612,38 @@ HRESULT Colour::Parse(CMatroskaNode* pMN0)
 	EndChunk
 }
 
+HRESULT CProjection::Parse(CMatroskaNode* pMN0)
+{
+	CUInt  uValue;
+	CFloat fValue;
+
+	BeginChunk
+	case 0x7671:
+		if (SUCCEEDED(uValue.Parse(pMN)) && uValue >= 0 && uValue <= 3) {
+			ProjectionType = uValue;
+		}
+		break;
+	case 0x7672:
+		ProjectionPrivate.Parse(pMN);
+		break;
+	case 0x7673:
+		if (SUCCEEDED(fValue.Parse(pMN)) && fValue >= -180.0 && fValue <= 180.0) {
+			ProjectionPoseYaw = fValue;
+		}
+		break;
+	case 0x7674:
+		if (SUCCEEDED(fValue.Parse(pMN)) && fValue >= -90.0 && fValue <= 90.0) {
+			ProjectionPosePitch = fValue;
+		}
+		break;
+	case 0x7675:
+		if (SUCCEEDED(fValue.Parse(pMN)) && fValue >= -180.0 && fValue <= 180.0) {
+			ProjectionPoseRoll = fValue;
+		}
+		break;
+	EndChunk
+}
+
 HRESULT Video::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
@@ -669,6 +701,9 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 		break;
 	case 0x55B0:
 		VideoColorInformation.Parse(pMN);
+		break;
+	case 0x7670:
+		Projection.Parse(pMN);
 		break;
 	}
 	} while (pMN->Next());
