@@ -905,24 +905,24 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					SetProperty(L"STEREOSCOPIC3DMODE", matroska_stereo_mode[pTE->v.StereoMode]);
 				}
 
-				if (pTE->v.VideoColorInformation.bValid) {
+				if (pTE->v.Colour.bValid) {
 					m_ColorSpace = DNew(ColorSpace);
 					ZeroMemory(m_ColorSpace, sizeof(ColorSpace));
 
-					if (pTE->v.VideoColorInformation.MatrixCoefficients != AVCOL_SPC_RESERVED) {
-						m_ColorSpace->MatrixCoefficients = pTE->v.VideoColorInformation.MatrixCoefficients;
+					if (pTE->v.Colour.MatrixCoefficients != AVCOL_SPC_RESERVED) {
+						m_ColorSpace->MatrixCoefficients = pTE->v.Colour.MatrixCoefficients;
 					}
-					if (pTE->v.VideoColorInformation.Primaries != AVCOL_PRI_RESERVED
-							&& pTE->v.VideoColorInformation.Primaries != AVCOL_PRI_RESERVED0) {
-						m_ColorSpace->Primaries = pTE->v.VideoColorInformation.Primaries;
+					if (pTE->v.Colour.Primaries != AVCOL_PRI_RESERVED
+							&& pTE->v.Colour.Primaries != AVCOL_PRI_RESERVED0) {
+						m_ColorSpace->Primaries = pTE->v.Colour.Primaries;
 					}
-					if (pTE->v.VideoColorInformation.Range != AVCOL_RANGE_UNSPECIFIED
-							&& pTE->v.VideoColorInformation.Range <= AVCOL_RANGE_JPEG) {
-						m_ColorSpace->Range = pTE->v.VideoColorInformation.Range;
+					if (pTE->v.Colour.Range != AVCOL_RANGE_UNSPECIFIED
+							&& pTE->v.Colour.Range <= AVCOL_RANGE_JPEG) {
+						m_ColorSpace->Range = pTE->v.Colour.Range;
 					}
-					if (pTE->v.VideoColorInformation.TransferCharacteristics != AVCOL_TRC_RESERVED
-							&& pTE->v.VideoColorInformation.TransferCharacteristics != AVCOL_TRC_RESERVED0) {
-						m_ColorSpace->TransferCharacteristics = pTE->v.VideoColorInformation.TransferCharacteristics;
+					if (pTE->v.Colour.TransferCharacteristics != AVCOL_TRC_RESERVED
+							&& pTE->v.Colour.TransferCharacteristics != AVCOL_TRC_RESERVED0) {
+						m_ColorSpace->TransferCharacteristics = pTE->v.Colour.TransferCharacteristics;
 					}
 
 					enum MatroskaColourChromaSitingHorz {
@@ -939,27 +939,27 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						MATROSKA_COLOUR_CHROMASITINGVERT_NB
 					};
 
-					if (pTE->v.VideoColorInformation.ChromaSitingHorz != MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED
-							&& pTE->v.VideoColorInformation.ChromaSitingVert != MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED
-							&& pTE->v.VideoColorInformation.ChromaSitingHorz < MATROSKA_COLOUR_CHROMASITINGHORZ_NB
-							&& pTE->v.VideoColorInformation.ChromaSitingVert < MATROSKA_COLOUR_CHROMASITINGVERT_NB) {
+					if (pTE->v.Colour.ChromaSitingHorz != MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED
+							&& pTE->v.Colour.ChromaSitingVert != MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED
+							&& pTE->v.Colour.ChromaSitingHorz < MATROSKA_COLOUR_CHROMASITINGHORZ_NB
+							&& pTE->v.Colour.ChromaSitingVert < MATROSKA_COLOUR_CHROMASITINGVERT_NB) {
 						m_ColorSpace->ChromaLocation =
-							chroma_pos_to_enum((pTE->v.VideoColorInformation.ChromaSitingHorz - 1) << 7,
-											   (pTE->v.VideoColorInformation.ChromaSitingVert - 1) << 7);
+							chroma_pos_to_enum((pTE->v.Colour.ChromaSitingHorz - 1) << 7,
+											   (pTE->v.Colour.ChromaSitingVert - 1) << 7);
 					}
 
 				}
 
-				if (pTE->v.VideoColorInformation.MaxCLL.IsValid() && pTE->v.VideoColorInformation.MaxFALL.IsValid()) {
+				if (pTE->v.Colour.MaxCLL.IsValid() && pTE->v.Colour.MaxFALL.IsValid()) {
 					m_HDRContentLightLevel = DNew(MediaSideDataHDRContentLightLevel);
 					ZeroMemory(m_HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
 
-					m_HDRContentLightLevel->MaxCLL  = pTE->v.VideoColorInformation.MaxCLL;
-					m_HDRContentLightLevel->MaxFALL = pTE->v.VideoColorInformation.MaxFALL;
+					m_HDRContentLightLevel->MaxCLL  = pTE->v.Colour.MaxCLL;
+					m_HDRContentLightLevel->MaxFALL = pTE->v.Colour.MaxFALL;
 				}
 
-				if (pTE->v.VideoColorInformation.SMPTE2086MasteringMetadata.bValid) {
-					MasteringMetadata& metadata = pTE->v.VideoColorInformation.SMPTE2086MasteringMetadata;
+				if (pTE->v.Colour.MasteringMetadata.bValid) {
+					CMasteringMetadata& metadata = pTE->v.Colour.MasteringMetadata;
 
 					m_MasterDataHDR = DNew(MediaSideDataHDR);
 					ZeroMemory(m_MasterDataHDR, sizeof(MediaSideDataHDR));
