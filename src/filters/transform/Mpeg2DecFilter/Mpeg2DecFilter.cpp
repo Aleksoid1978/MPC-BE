@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -410,7 +410,7 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	return S_OK;
 }
 
-void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter)
+void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary)
 {
 	if (m_dec && m_dec->m_info.m_sequence) {
 		w = m_dec->m_info.m_sequence->picture_width;
