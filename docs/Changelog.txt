@@ -1,5 +1,9 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
+1.5.5 (beta)
+=============================
+VSFilter is excluded from the project. 
+
 1.5.6
 =============================
 Splitters
