@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -377,8 +377,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	int h = m_hin;
 	int arx = m_arxin;
 	int ary = m_aryin;
-	int vsfilter = 0;
-	GetOutputSize(w, h, arx, ary, vsfilter);
+	GetOutputSize(w, h, arx, ary);
 
 	m_wout = m_win;
 	m_hout = m_hin;
@@ -428,7 +427,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 
 	pmt->SetSampleSize(bihOut.biSizeImage);
 
-	if (!vsfilter) {
+	{
 		// copy source and target rectangles from input pin
 		VIDEOINFOHEADER* vih      = (VIDEOINFOHEADER*)pmt->Format();
 		VIDEOINFOHEADER* vihInput = (VIDEOINFOHEADER*)mtInput.Format();
@@ -464,8 +463,7 @@ HRESULT CBaseVideoFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt)
 		ExtractDim(pmt, m_win, m_hin, m_arx, m_ary);
 		m_arxin = m_arx;
 		m_aryin = m_ary;
-		int vsfilter = 0;
-		GetOutputSize(m_wout, m_hout, m_arx, m_ary, vsfilter);
+		GetOutputSize(m_wout, m_hout, m_arx, m_ary);
 
 		ReduceDim(m_arx, m_ary);
 	}
