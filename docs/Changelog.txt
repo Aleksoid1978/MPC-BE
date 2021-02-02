@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.5.6 (beta)
+1.5.6
 =============================
 Splitters
 Improved work over the HTTP protocol.
@@ -21,6 +21,7 @@ Added basic support for AIFF format.
 
 AviSplitter
 Added support for AV1 video.
+Improved compatibility with some external H.264 video decoders. 
 
 DVRSplitter
 Added support for Chinese KKmoon CCTV camera file format.
@@ -31,11 +32,14 @@ Added support for AV1 OBU files.
 MatroskaSplitter
 Fixed playback of some VFW type videos.
 Fixed reading HDR data for VP9.
+Added support for the "ProjectionPoseRoll" element, in which the frame rotation angle is recorded. 
 
 MP4Splitter
 Added pixel format detection for DNxHD.
 Fixed playing files from "edit list".
 Fixed getting frame sizes and aspect ratios for some MOV files.
+Fixed opening files with empty 'ctts' atom.
+Fixed bitrate detection for some audio tracks.
 
 MpaDecFilter
 Fixed encoding in AC-3. Added check for SPDIF output at 44100 Hz.
@@ -95,7 +99,10 @@ Toolbar, flybar, taskbar buttons and other graphics are now in SVG format (thank
 Fixed display of chapters in the search bar for some DVD-Videos.
 Various fixes in the player interface.
 
-ShellExt
+Installer
+Added path to the player to the "App Paths" registry key. 
+
+Shell Extension
 Fixed freeze when opening files from qBittorrent.
 
 Updated Ukrainian translation (by arestarh1986).
