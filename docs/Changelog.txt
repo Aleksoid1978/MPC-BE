@@ -4,6 +4,9 @@
 =============================
 VSFilter is excluded from the project. 
 
+Updated libraries:
+	dav1d git-0.8.1-39-g7c316a7;
+
 1.5.6
 =============================
 Splitters
