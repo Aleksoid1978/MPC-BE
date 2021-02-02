@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@
 #include "../DSUtil/SysVersion.h"
 #include "../DSUtil/WinAPIUtils.h"
 #include "../DSUtil/DXVAState.h"
-#include "../../transform/VSFilter/IDirectVobSub.h"
+#include "IDirectVobSub.h"
 #include "FocusThread.h"
 #include "D3DHook.h"
 #include "Variables.h"

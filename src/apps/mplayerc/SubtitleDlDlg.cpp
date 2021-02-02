@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,6 @@
 #include <afxwin.h>
 #include "SubtitleDlDlg.h"
 #include "MainFrm.h"
-#include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include "../../DSUtil/DSUtil.h"
 
 #define UWM_PARSE	(WM_USER + 100)

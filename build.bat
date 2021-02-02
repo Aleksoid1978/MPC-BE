@@ -219,7 +219,6 @@ IF /I "%1" == "Win32" (
 
 IF /I "%SIGN%" == "True" (
   CALL :SubSign %DIR% *.ax
-  CALL :SubSign %DIR% VSFilter.dll
 )
 
 EXIT /B
@@ -417,7 +416,6 @@ IF /I "%NAME%" == "MPC-BE" (
   COPY /Y /V "..\distrib\Shaders11\*.hlsl"         "%PCKG_NAME%\Shaders11\*.hlsl" >NUL
 ) ELSE (
   COPY /Y /V "%~1_%ARCH%\*.ax"           "%PCKG_NAME%\*.ax" >NUL
-  COPY /Y /V "%~1_%ARCH%\VSFilter.dll"   "%PCKG_NAME%\VSFilter.dll" >NUL
 )
 
 COPY /Y /V "..\docs\COPYING.txt"             "%PCKG_NAME%" >NUL
