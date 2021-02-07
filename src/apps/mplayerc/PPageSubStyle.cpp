@@ -75,7 +75,6 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBO1, m_iCharset);
 	DDX_Control(pDX, IDC_COMBO1, m_charset);
 	DDX_Control(pDX, IDC_EDIT3, m_spacing);
-	DDX_Control(pDX, IDC_SPIN3, m_spacingspin);
 	DDX_Control(pDX, IDC_EDIT4, m_angle);
 	DDX_Control(pDX, IDC_SPIN10, m_anglespin);
 	DDX_Control(pDX, IDC_EDIT5, m_scalex);
@@ -135,7 +134,7 @@ BOOL CPPageSubStyle::OnInitDialog()
 	SetCursor(m_hWnd, IDC_RESET, IDC_HAND);
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	m_spacing.SetRange(-10000, 10000);
+	m_spacing.SetRange(-100.0f, 100.0f);
 	m_angle.SetRange(0, 359);
 	m_scalex.SetRange(-10000, 10000);
 	m_scaley.SetRange(-10000, 10000);
@@ -146,7 +145,6 @@ BOOL CPPageSubStyle::OnInitDialog()
 	m_margintop.SetRange(-10000, 10000);
 	m_marginbottom.SetRange(-10000, 10000);
 
-	m_spacingspin.SetRange(-10000, 10000);
 	m_anglespin.SetRange(0, 359);
 	m_scalexspin.SetRange(-10000, 10000);
 	m_scaleyspin.SetRange(-10000, 10000);
@@ -181,7 +179,7 @@ void CPPageSubStyle::Init()
 	}
 
 	// TODO: allow floats in these edit boxes
-	m_spacing = (int)m_stss->fontSpacing;
+	m_spacing = m_stss->fontSpacing;
 
 	while (m_stss->fontAngleZ < 0) {
 		m_stss->fontAngleZ += 360;
