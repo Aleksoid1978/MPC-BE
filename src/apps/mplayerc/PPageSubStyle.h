@@ -51,8 +51,7 @@ public:
 	CButton m_font;
 	int m_iCharset;
 	CComboBox m_charset;
-	CIntEdit m_spacing;
-	CSpinButtonCtrl m_spacingspin;
+	CFloatEdit m_spacing;
 	CIntEdit m_angle;
 	CSpinButtonCtrl m_anglespin;
 	CIntEdit m_scalex;
