@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 //
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -1023,15 +1023,23 @@ private:
                     is.Take();
                     unsigned codepoint = ParseHex4(is, escapeOffset);
                     RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-                    if (RAPIDJSON_UNLIKELY(codepoint >= 0xD800 && codepoint <= 0xDBFF)) {
-                        // Handle UTF-16 surrogate pair
-                        if (RAPIDJSON_UNLIKELY(!Consume(is, '\\') || !Consume(is, 'u')))
+                    if (RAPIDJSON_UNLIKELY(codepoint >= 0xD800 && codepoint <= 0xDFFF)) {
+                        // high surrogate, check if followed by valid low surrogate
+                        if (RAPIDJSON_LIKELY(codepoint <= 0xDBFF)) {
+                            // Handle UTF-16 surrogate pair
+                            if (RAPIDJSON_UNLIKELY(!Consume(is, '\\') || !Consume(is, 'u')))
+                                RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, escapeOffset);
+                            unsigned codepoint2 = ParseHex4(is, escapeOffset);
+                            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
+                            if (RAPIDJSON_UNLIKELY(codepoint2 < 0xDC00 || codepoint2 > 0xDFFF))
+                                RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, escapeOffset);
+                            codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
+                        }
+                        // single low surrogate
+                        else
+                        {
                             RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, escapeOffset);
-                        unsigned codepoint2 = ParseHex4(is, escapeOffset);
-                        RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-                        if (RAPIDJSON_UNLIKELY(codepoint2 < 0xDC00 || codepoint2 > 0xDFFF))
-                            RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, escapeOffset);
-                        codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
+                        }
                     }
                     TEncoding::Encode(os, codepoint);
                 }
