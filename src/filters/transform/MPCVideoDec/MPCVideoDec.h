@@ -120,6 +120,8 @@ protected:
 	HANDLE									m_hDevice;
 	DXVA2_VideoDesc							m_VideoDesc;
 
+	BOOL									m_bFailDXVA2Decode = FALSE;
+
 	BOOL									m_bWaitingForKeyFrame;
 	BOOL									m_bRVDropBFrameTimings;
 

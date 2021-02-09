@@ -2187,6 +2187,8 @@ redo:
 		m_pDXVADecoder->FillHWContext();
 	}
 
+	m_bFailDXVA2Decode = FALSE;
+
 	return S_OK;
 }
 
@@ -3074,7 +3076,9 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 	int ret = avcodec_send_packet(m_pAVCtx, avpkt);
 	if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-		if (UseDXVA2() && !m_bDXVACompatible) {
+		if (UseDXVA2() && (!m_bDXVACompatible || m_bFailDXVA2Decode)) {
+			CleanupDXVAVariables();
+			CleanupD3DResources();
 			SAFE_DELETE(m_pDXVADecoder);
 			m_nDecoderMode = MODE_SOFTWARE;
 			DXVAState::ClearState();
@@ -4142,15 +4146,10 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 			}
 
 			if (FAILED(hr)) {
-				SAFE_DELETE(m_pDXVADecoder);
-				m_nDecoderMode = MODE_SOFTWARE;
-				DXVAState::ClearState();
-
-				InitDecoder(&m_pCurrentMediaType);
-				ChangeOutputMediaFormat(2);
+				m_bFailDXVA2Decode = TRUE;
+			} else {
+				m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
 			}
-
-			m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
 		}
 	}
 
