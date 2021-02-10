@@ -59,7 +59,7 @@ class AP4_SampleDescription
     // constructors & destructor
     AP4_SampleDescription(Type type) : m_Type(type) {}
     virtual ~AP4_SampleDescription() {}
-                 
+
     // accessors
     Type GetType() const { return m_Type; }
 
@@ -85,7 +85,7 @@ class AP4_UnknownSampleDescription : public AP4_SampleDescription
  protected:
     AP4_SampleEntry* m_SampleEntry;
 };
-    
+
 /*----------------------------------------------------------------------
 |       AP4_MpegSampleDescription
 +---------------------------------------------------------------------*/
@@ -95,7 +95,7 @@ class AP4_MpegSampleDescription : public AP4_SampleDescription
     // types
     typedef AP4_UI08 StreamType;
     typedef AP4_UI08 OTI;
-    
+
     // class methods
     const char* GetStreamTypeString(StreamType type);
     const char* GetObjectTypeString(OTI oti);
@@ -108,7 +108,7 @@ class AP4_MpegSampleDescription : public AP4_SampleDescription
                               AP4_UI32              max_bitrate,
                               AP4_UI32              avg_bitrate);
     virtual ~AP4_MpegSampleDescription();
-    
+
     // accessors
     AP4_Byte GetStreamType() const { return m_StreamType; }
     AP4_Byte GetObjectTypeId() const { return m_ObjectTypeId; }
@@ -128,7 +128,7 @@ class AP4_MpegSampleDescription : public AP4_SampleDescription
     AP4_UI32        m_BufferSize;
     AP4_UI32        m_MaxBitrate;
     AP4_UI32        m_AvgBitrate;
-    
+
 };
 
 /*----------------------------------------------------------------------
@@ -178,8 +178,8 @@ public:
     AP4_Atom* ToAtom() const;
 
     /**
-     * For sample descriptions of MPEG-4 audio tracks (i.e GetObjectTypeId() 
-     * returns AP4_OTI_MPEG4_AUDIO), this method returns the MPEG4 Audio Object 
+     * For sample descriptions of MPEG-4 audio tracks (i.e GetObjectTypeId()
+     * returns AP4_OTI_MPEG4_AUDIO), this method returns the MPEG4 Audio Object
      * Type. For other sample descriptions, this method returns 0.
      */
     Mpeg4AudioObjectType GetMpeg4AudioObjectType() const;
@@ -230,7 +230,7 @@ protected:
 +---------------------------------------------------------------------*/
 const AP4_MpegSampleDescription::StreamType AP4_FORBIDDEN_STREAM_TYPE = 0x00;
 const AP4_MpegSampleDescription::StreamType AP4_OD_STREAM_TYPE        = 0x01;
-const AP4_MpegSampleDescription::StreamType AP4_CR_STREAM_TYPE        = 0x02;    
+const AP4_MpegSampleDescription::StreamType AP4_CR_STREAM_TYPE        = 0x02;
 const AP4_MpegSampleDescription::StreamType AP4_BIFS_STREAM_TYPE      = 0x03;
 const AP4_MpegSampleDescription::StreamType AP4_VISUAL_STREAM_TYPE    = 0x04;
 const AP4_MpegSampleDescription::StreamType AP4_AUDIO_STREAM_TYPE     = 0x05;
@@ -256,6 +256,7 @@ const AP4_MpegSampleDescription::OTI AP4_MPEG2_PART3_AUDIO_OTI    = 0x69;
 const AP4_MpegSampleDescription::OTI AP4_MPEG1_VISUAL_OTI         = 0x6A;
 const AP4_MpegSampleDescription::OTI AP4_MPEG1_AUDIO_OTI          = 0x6B;
 const AP4_MpegSampleDescription::OTI AP4_JPEG_OTI                 = 0x6C;
+const AP4_MpegSampleDescription::OTI AP4_PNG_OTI                  = 0x6D;
 const AP4_MpegSampleDescription::OTI AP4_TSC2_OTI                 = 0xD0;
 
 const AP4_MpegSampleDescription::OTI AP4_DTSC_AUDIO_OTI           = 0xA9;

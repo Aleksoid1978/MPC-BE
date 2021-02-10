@@ -94,7 +94,7 @@ AP4_MpegSampleDescription::~AP4_MpegSampleDescription()
 /*----------------------------------------------------------------------
 |       AP4_MpegSampleDescription::CreateEsDescriptor
 +---------------------------------------------------------------------*/
-AP4_EsDescriptor* 
+AP4_EsDescriptor*
 AP4_MpegSampleDescription::CreateEsDescriptor() const
 {
     AP4_EsDescriptor* desc = new AP4_EsDescriptor(0);
@@ -104,7 +104,7 @@ AP4_MpegSampleDescription::CreateEsDescriptor() const
     } else {
         dsi_desc = NULL;
     }
-    AP4_DecoderConfigDescriptor* decoder_config = 
+    AP4_DecoderConfigDescriptor* decoder_config =
         new AP4_DecoderConfigDescriptor(m_StreamType,
         m_ObjectTypeId,
         m_BufferSize,
@@ -156,8 +156,8 @@ AP4_MpegAudioSampleDescription::AP4_MpegAudioSampleDescription(
     AP4_UI32              max_bitrate,
     AP4_UI32              avg_bitrate) :
     AP4_MpegSampleDescription(AP4_AUDIO_STREAM_TYPE,
-                              oti, 
-                              decoder_info, buffer_size, 
+                              oti,
+                              decoder_info, buffer_size,
                               max_bitrate, avg_bitrate),
     m_SampleRate(sample_rate),
     m_SampleSize(sample_size),
@@ -240,13 +240,13 @@ AP4_MpegVideoSampleDescription::ToAtom() const
 /*----------------------------------------------------------------------
 |       AP4_MpegSampleDescription::GetStreamTypeString
 +---------------------------------------------------------------------*/
-const char* 
+const char*
 AP4_MpegSampleDescription::GetStreamTypeString(StreamType type)
 {
     switch (type) {
-        case AP4_FORBIDDEN_STREAM_TYPE: return "INVALID"; 
+        case AP4_FORBIDDEN_STREAM_TYPE: return "INVALID";
         case AP4_OD_STREAM_TYPE:        return "Object Descriptor";
-        case AP4_CR_STREAM_TYPE:        return "CR";    
+        case AP4_CR_STREAM_TYPE:        return "CR";
         case AP4_BIFS_STREAM_TYPE:      return "BIFS";
         case AP4_VISUAL_STREAM_TYPE:    return "Visual";
         case AP4_AUDIO_STREAM_TYPE:     return "Audio";
@@ -261,7 +261,7 @@ AP4_MpegSampleDescription::GetStreamTypeString(StreamType type)
 /*----------------------------------------------------------------------
 |       AP4_MpegSampleDescription::GetObjectTypeString
 +---------------------------------------------------------------------*/
-const char* 
+const char*
 AP4_MpegSampleDescription::GetObjectTypeString(OTI oti)
 {
     switch (oti) {
@@ -283,6 +283,7 @@ AP4_MpegSampleDescription::GetObjectTypeString(OTI oti)
         case AP4_MPEG1_AUDIO_OTI:          return "MPEG-1 Audio";
         case AP4_JPEG_OTI:                 return "JPEG";
         case AP4_TSC2_OTI:                 return "TSC2";
+        case AP4_PNG_OTI:                  return "PNG";
         case AP4_DTSC_AUDIO_OTI:           return "DTS audio";
         case AP4_DTSH_AUDIO_OTI:           return "DTS-HD High Resolution Audio";
         case AP4_DTSL_AUDIO_OTI:           return "DTS-HD Master Audio";
