@@ -373,6 +373,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biBitCount = 20; // fix incorrect bitdepth (ffmpeg bug)
 						mt.SetTemporalCompression(FALSE);
 						break;
+					case FCC('MPNG'):
+						mt.subtype = MEDIASUBTYPE_PNG;
+						mt.SetTemporalCompression(FALSE);
+						break;
 					default:
 						mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
 					}
