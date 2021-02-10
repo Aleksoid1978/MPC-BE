@@ -383,6 +383,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('av01'):
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('AV01'));
 					break;
+				case FCC('MPNG'):
+					mt.subtype = MEDIASUBTYPE_PNG;
+					break;
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";

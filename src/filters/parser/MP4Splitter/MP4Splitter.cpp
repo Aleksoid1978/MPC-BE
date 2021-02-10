@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -522,12 +522,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize());
 					memset(vih2, 0, mt.FormatLength());
-					vih2->dwBitRate				= video_desc->GetAvgBitrate()/8;
-					vih2->bmiHeader.biSize		= sizeof(vih2->bmiHeader);
-					vih2->bmiHeader.biWidth		= biWidth;
-					vih2->bmiHeader.biHeight	= biHeight;
-					vih2->rcSource				= vih2->rcTarget = CRect(0, 0, biWidth, biHeight);
-					vih2->AvgTimePerFrame		= AvgTimePerFrame;
+					vih2->dwBitRate            = video_desc->GetAvgBitrate()/8;
+					vih2->bmiHeader.biSize     = sizeof(vih2->bmiHeader);
+					vih2->bmiHeader.biWidth    = biWidth;
+					vih2->bmiHeader.biHeight   = biHeight;
+					vih2->bmiHeader.biBitCount = video_desc->GetDepth();
+					vih2->rcSource             = vih2->rcTarget = CRect(0, 0, biWidth, biHeight);
+					vih2->AvgTimePerFrame      = AvgTimePerFrame;
 
 					SetPictAR(PictAR, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
 
@@ -610,6 +611,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case AP4_TSC2_OTI:
 							vih2->bmiHeader.biCompression = FCC('TSC2');
 							mt.subtype = MEDIASUBTYPE_TSCC2;
+							mts.push_back(mt);
+							break;
+						case AP4_PNG_OTI:
+							vih2->bmiHeader.biCompression = FCC('PNG ');
+							mt.subtype = MEDIASUBTYPE_PNG;
 							mts.push_back(mt);
 							break;
 					}
