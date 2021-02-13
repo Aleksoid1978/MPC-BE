@@ -97,22 +97,10 @@
     <ClInclude Include="h\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="source\a_memory.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
-    </YASM>
-    <YASM Include="source\a_thunk.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
-    </YASM>
-    <YASM Include="source\a64_cpuaccel.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
-    </YASM>
     <YASM Include="source\a64_fraction.asm">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
     </YASM>
     <YASM Include="source\a64_int128.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
-    </YASM>
-    <YASM Include="source\a64_thunk.asm">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
     </YASM>
   </ItemGroup>
