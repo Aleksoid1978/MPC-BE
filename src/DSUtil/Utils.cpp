@@ -77,7 +77,7 @@ uint64_t RescaleU64x32(uint64_t a, uint32_t b, uint32_t c)
 
 int64_t RescaleI64x32(int64_t a, uint32_t b, uint32_t c)
 {
-	return a < 0 ? -RescaleU64x32(-a, b, c) : RescaleU64x32(a, b, c);
+	return a < 0 ? -(int64_t)RescaleU64x32(-a, b, c) : RescaleU64x32(a, b, c);
 }
 
 // code from ffmpeg
