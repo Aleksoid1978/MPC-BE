@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,6 +58,11 @@ inline void expand_range(T const& val, T& lo, T& hi)
 
 uint32_t CountBits(uint32_t v);
 uint32_t BitNum(uint32_t v, uint32_t b);
+
+// a * b / c
+uint64_t RescaleU64x32(uint64_t a, uint32_t b, uint32_t c);
+// a * b / c
+int64_t RescaleI64x32(int64_t a, uint32_t b, uint32_t c);
 
 template <typename T>
 inline void ReduceDim(T &num, T &den)
