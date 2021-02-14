@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include <moreuuids.h>
-#include "../../../DSUtil/vd_math.h"
 #include "RawVideoSplitter.h"
 
 #ifdef REGISTER_FILTER
@@ -401,7 +400,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		if (!m_pFile->IsStreaming()) {
 			__int64 num_frames = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize);
-			m_rtDuration = FractionScale64(UNITS * num_frames, fpsden, fpsnum);
+			m_rtDuration = RescaleI64x32(UNITS * num_frames, fpsden, fpsnum);
 			m_rtNewStop = m_rtStop = m_rtDuration;
 		}
 		mt.SetSampleSize(m_framesize);
@@ -443,7 +442,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			DLogIf(!num_frames, L"IVF: unknown number of frames");
 
 			m_AvgTimePerFrame = UNITS * fpsden / fpsnum;
-			m_rtDuration = FractionScale64(UNITS * num_frames, fpsden, fpsnum);
+			m_rtDuration = RescaleI64x32(UNITS * num_frames, fpsden, fpsnum);
 
 			mt.majortype = MEDIATYPE_Video;
 			mt.formattype = FORMAT_VIDEOINFO2;

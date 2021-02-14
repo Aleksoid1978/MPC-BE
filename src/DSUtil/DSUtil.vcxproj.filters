@@ -110,9 +110,6 @@
     <ClCompile Include="UrlParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vd_math.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PixelUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -245,9 +242,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UrlParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vd_math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PixelUtils.h">

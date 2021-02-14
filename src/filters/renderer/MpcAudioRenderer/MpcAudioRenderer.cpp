@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2020 see Authors.txt
+ * (C) 2009-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,6 @@
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/std_helper.h"
-#include "../../../DSUtil/vd_math.h"
 #include "AudioHelper.h"
 #include "AudioDevice.h"
 #include "MpcAudioRenderer.h"
@@ -147,8 +146,8 @@ static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 	}
 }
 
-#define SamplesToTime(samples, wfex)    (FractionScale64(samples, UNITS, wfex->nSamplesPerSec))
-#define TimeToSamples(time, wfex)       (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
+#define SamplesToTime(samples, wfex)    (RescaleI64x32(samples, UNITS, wfex->nSamplesPerSec))
+#define TimeToSamples(time, wfex)       (RescaleI64x32(time, wfex->nSamplesPerSec, UNITS))
 
 #define IsExclusive(wfex)               (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
 #define IsExclusiveMode()               (m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)

@@ -27,7 +27,6 @@
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MP4AudioDecoderConfig.h"
-#include "../../../DSUtil/vd_math.h"
 #include "MP4Splitter.h"
 
 #include <Bento4/Core/Ap4.h>
@@ -2052,7 +2051,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								SAFE_DELETE_ARRAY(buff);
 							}
 
-							const REFERENCE_TIME rtStart = FractionScale64(sample.GetCts(), UNITS, track->GetMediaTimeScale());
+							const REFERENCE_TIME rtStart = RescaleI64x32(sample.GetCts(), UNITS, track->GetMediaTimeScale());
 							ChapAppend(rtStart, ChapterName);
 						}
 					}
@@ -2311,7 +2310,7 @@ start:
 				continue;
 			}
 
-			const REFERENCE_TIME rt = FractionScale64(tp.second.ts, UNITS, track->GetMediaTimeScale());
+			const REFERENCE_TIME rt = RescaleI64x32(tp.second.ts, UNITS, track->GetMediaTimeScale());
 
 			if (tp.second.index < track->GetSampleCount()) {
 				if (!pNext
@@ -2346,8 +2345,8 @@ start:
 
 			CAutoPtr<CPacket> p(DNew CPacket());
 			p->TrackNumber = (DWORD)track->GetId();
-			p->rtStart = FractionScale64(sample.GetCts(), UNITS, track->GetMediaTimeScale());
-			p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
+			p->rtStart = RescaleI64x32(sample.GetCts(), UNITS, track->GetMediaTimeScale());
+			p->rtStop = RescaleI64x32(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
 			if (p->rtStop == p->rtStart && p->rtStart != INVALID_TIME) {
 				p->rtStop++;
 			}
@@ -2368,7 +2367,7 @@ start:
 					p->resize(size + data.GetDataSize());
 					memcpy(p->data() + size, data.GetData(), data.GetDataSize());
 
-					p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
+					p->rtStop = RescaleI64x32(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
 
 					duration = p->rtStop - p->rtStart;
 
