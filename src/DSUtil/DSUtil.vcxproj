@@ -82,7 +82,6 @@
     <ClCompile Include="text.cpp" />
     <ClCompile Include="UrlParser.cpp" />
     <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="vd_math.cpp" />
     <ClCompile Include="VideoParser.cpp" />
     <ClCompile Include="WinAPIUtils.cpp" />
   </ItemGroup>
@@ -129,7 +128,6 @@
     <ClInclude Include="CUrl.h" />
     <ClInclude Include="UrlParser.h" />
     <ClInclude Include="Utils.h" />
-    <ClInclude Include="vd_math.h" />
     <ClInclude Include="VideoParser.h" />
     <ClInclude Include="WinAPIUtils.h" />
   </ItemGroup>

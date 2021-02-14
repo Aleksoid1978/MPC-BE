@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/vd_math.h"
 #include "DTSHDFile.h"
 
 // ATSC A/103:2014 Non-Real-Time Content Delivery, Annex E: DTS-HD File Structure
@@ -101,7 +100,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 				m_bitdepth = 16;
 				m_channels = CountBits((ChannelMask & 0xffff) | ((ChannelMask & 0xae66) << 16));
 				m_layout = 0; // not used for MEDIASUBTYPE_DTS/MEDIASUBTYPE_DTS2
-				m_rtduration = FractionScale64(UNITS * NumFramesTotal, SamplesPerFrameAtMaxFs, MaxSampleRateHz);
+				m_rtduration = RescaleI64x32(UNITS * NumFramesTotal, SamplesPerFrameAtMaxFs, MaxSampleRateHz);
 			}
 			else {
 				return E_FAIL;
