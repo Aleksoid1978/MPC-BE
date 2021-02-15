@@ -68,6 +68,8 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	m_clrFaceABGR    = s.clrFaceABGR;
 	m_clrOutlineABGR = s.clrOutlineABGR;
 
+	m_toolTipHandle = (HWND)SendMessageW(TBM_GETTOOLTIPS);
+
 	return TRUE;
 }
 
@@ -403,20 +405,18 @@ void CVolumeCtrl::SetPosInternal(const CPoint& point, const bool bUpdateToolTip/
 	int w = r.right - r.left - 4;
 	SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w / 2)) / w);
 
-	if (bUpdateToolTip) {
-		if (auto pToolTipCtrl = GetToolTips()) {
-			GetChannelRect(&r);
-			ClientToScreen(r);
+	if (bUpdateToolTip && m_toolTipHandle) {
+		GetChannelRect(&r);
+		ClientToScreen(r);
 
-			CRect tooltipRect;
-			pToolTipCtrl->GetWindowRect(tooltipRect);
+		CRect tooltipRect;
+		::GetWindowRect(m_toolTipHandle, &tooltipRect);
 
-			POINT p = { posX, point.y };
-			ClientToScreen(&p);
-			p.y = r.top - tooltipRect.Height();
+		POINT p = { posX, point.y };
+		ClientToScreen(&p);
+		p.y = r.top - tooltipRect.Height();
 
-			pToolTipCtrl->SendMessageW(TTM_TRACKPOSITION, 0, MAKELPARAM(p.x, p.y));
-		}
+		::SendMessageW(m_toolTipHandle, TTM_TRACKPOSITION, 0, MAKELPARAM(p.x, p.y));
 	}
 }
 
@@ -428,7 +428,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		m_bDrag = true;
 		SetCapture();
 
-		if (auto pToolTipCtrl = GetToolTips()) {
+		if (m_toolTipHandle) {
 			TOOLINFO ti = { sizeof(TOOLINFO) };
 			ti.uFlags = TTF_TRACK | TTF_IDISHWND | TTF_ABSOLUTE;
 			ti.hwnd = m_hWnd;
@@ -436,7 +436,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 			ti.hinst = AfxGetInstanceHandle();
 			ti.lpszText = LPSTR_TEXTCALLBACK;
 
-			pToolTipCtrl->SendMessageW(TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
+			::SendMessageW(m_toolTipHandle, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
 		}
 	} else {
 		CSliderCtrl::OnLButtonDown(nFlags, point);
@@ -459,8 +459,8 @@ void CVolumeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			ReleaseCapture();
 			m_bDrag = false;
 		}
-		if (auto pToolTipCtrl = GetToolTips()) {
-			pToolTipCtrl->SendMessageW(TTM_TRACKACTIVATE, FALSE, 0);
+		if (m_toolTipHandle) {
+			::SendMessageW(m_toolTipHandle, TTM_TRACKACTIVATE, FALSE, 0);
 		}
 	} else {
 		CSliderCtrl::OnLButtonUp(nFlags, point);

@@ -51,6 +51,8 @@ private:
 
 	void SetPosInternal(const CPoint& point, const bool bUpdateToolTip = false);
 
+	HWND m_toolTipHandle = nullptr;
+
 public:
 	CVolumeCtrl(bool bSelfDrawn = true);
 	virtual ~CVolumeCtrl() = default;
