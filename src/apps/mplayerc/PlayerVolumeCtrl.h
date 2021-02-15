@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,6 +47,9 @@ private:
 
 	bool m_bRedraw = true;
 	bool m_bMute = false;
+	bool m_bDrag = false;
+
+	void SetPosInternal(const CPoint& point, const bool bUpdateToolTip = false);
 
 public:
 	CVolumeCtrl(bool bSelfDrawn = true);
@@ -69,10 +72,13 @@ protected:
 public:
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void HScroll(UINT nSBCode, UINT nPos);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint point);
+
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 
 	virtual void Invalidate(BOOL bErase = TRUE) { m_bItemRedraw = true; CSliderCtrl::Invalidate(bErase); }
 };
