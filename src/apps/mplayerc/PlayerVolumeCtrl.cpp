@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,12 +95,14 @@ void CVolumeCtrl::DecreaseVolume()
 BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)
 	ON_WM_ERASEBKGND()
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNMCustomdraw)
-	ON_WM_LBUTTONDOWN()
 	ON_WM_SETFOCUS()
 	ON_WM_HSCROLL_REFLECT()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_SETCURSOR()
 	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 // CVolumeCtrl message handlers
@@ -376,7 +378,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = lr;
 }
 
-void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+void CVolumeCtrl::SetPosInternal(const CPoint& point, const bool bUpdateToolTip/* = false*/)
 {
 	CRect r;
 	GetChannelRect(&r);
@@ -389,16 +391,80 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	r.left += 3;
 	r.right -= 4;
 
+	int posX = point.x;
 	if (point.x < r.left) {
 		SetPos(start);
+		posX = r.left;
 	} else if (point.x >= r.right) {
 		SetPos(stop);
+		posX = r.right;
 	}
 
 	int w = r.right - r.left - 4;
 	SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w / 2)) / w);
 
-	CSliderCtrl::OnLButtonDown(nFlags, point);
+	if (bUpdateToolTip) {
+		if (auto pToolTipCtrl = GetToolTips()) {
+			GetChannelRect(&r);
+			ClientToScreen(r);
+
+			CRect tooltipRect;
+			pToolTipCtrl->GetWindowRect(tooltipRect);
+
+			POINT p = { posX, point.y };
+			ClientToScreen(&p);
+			p.y = r.top - tooltipRect.Height();
+
+			pToolTipCtrl->SendMessageW(TTM_TRACKPOSITION, 0, MAKELPARAM(p.x, p.y));
+		}
+	}
+}
+
+void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	SetPosInternal(point);
+
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		m_bDrag = true;
+		SetCapture();
+
+		if (auto pToolTipCtrl = GetToolTips()) {
+			TOOLINFO ti = { sizeof(TOOLINFO) };
+			ti.uFlags = TTF_TRACK | TTF_IDISHWND | TTF_ABSOLUTE;
+			ti.hwnd = m_hWnd;
+			ti.uId = (UINT_PTR)m_hWnd;
+			ti.hinst = AfxGetInstanceHandle();
+			ti.lpszText = LPSTR_TEXTCALLBACK;
+
+			pToolTipCtrl->SendMessageW(TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
+		}
+	} else {
+		CSliderCtrl::OnLButtonDown(nFlags, point);
+	}
+}
+
+void CVolumeCtrl::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (AfxGetAppSettings().bUseDarkTheme && m_bDrag) {
+		SetPosInternal(point, true);
+	} else {
+		CSliderCtrl::OnMouseMove(nFlags, point);
+	}
+}
+
+void CVolumeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		if (m_bDrag) {
+			ReleaseCapture();
+			m_bDrag = false;
+		}
+		if (auto pToolTipCtrl = GetToolTips()) {
+			pToolTipCtrl->SendMessageW(TTM_TRACKACTIVATE, FALSE, 0);
+		}
+	} else {
+		CSliderCtrl::OnLButtonUp(nFlags, point);
+	}
 }
 
 void CVolumeCtrl::OnSetFocus(CWnd* pOldWnd)
