@@ -6,6 +6,7 @@ VSFilter is excluded from the project.
 
 Updated libraries:
 	dav1d git-0.8.1-39-g7c316a7;
+	Detours git-v4.0.1-77-g9116a26;
 	rapidjson git-v1.1.0-588-g13dfc96c;
 
 1.5.6
