@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2020 see Authors.txt
+ * (C) 2017-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -149,9 +149,9 @@ namespace D3DHook {
 		DLog(L"D3DHook::Hook() : try to install hook for the device '%s'", device.GetString());
 
 		CString driverDll;
-		DISPLAY_DEVICE dd = { sizeof(DISPLAY_DEVICE) };
+		DISPLAY_DEVICEW dd = { sizeof(DISPLAY_DEVICEW) };
 		DWORD iDevNum = 0;
-		while (EnumDisplayDevices(0, iDevNum, &dd, 0)) {
+		while (EnumDisplayDevicesW(0, iDevNum, &dd, 0)) {
 			DLog(L"D3DHook::Hook() : EnumDisplayDevices() : DeviceName - '%s', DeviceString - '%s', DeviceKey - '%s'", dd.DeviceName, dd.DeviceString, dd.DeviceKey);
 			if (device == dd.DeviceString) {
 				CString lpszKeyName = dd.DeviceKey; lpszKeyName.Replace(L"\\Registry\\Machine\\", L""); lpszKeyName.Trim();
@@ -166,13 +166,12 @@ namespace D3DHook {
 #endif
 						ULONG nChars = 0;
 						if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, nullptr, &nChars) && nChars > 0) {
-							LPWSTR pszValue = DNew WCHAR[nChars];
-							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue, &nChars)) {
+							CString pszValue;
+							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue.GetBuffer(nChars), &nChars)) {
 								// we need only the first value
+								pszValue.ReleaseBuffer(nChars);
 								driverDll = pszValue; driverDll.Trim();
 							}
-
-							delete [] pszValue;
 						}
 
 						regkey.Close();
