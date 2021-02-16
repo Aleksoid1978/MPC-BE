@@ -40,7 +40,7 @@ CFileVersionInfo    -                          -
 CLineNumberEdit     -                          -
 coolsb              -                          http://www.codeproject.com/KB/dialog/coolscroll.aspx
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
-Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
+Detours             MIT License                https://github.com/microsoft/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
 dav1d               BSD License                https://code.videolan.org/videolan/dav1d/
 libflac             GPLv2 / BSD License        https://github.com/xiph/flac/
