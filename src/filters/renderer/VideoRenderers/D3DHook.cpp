@@ -22,7 +22,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include <detours/detours.h>
+#include <Detours/src/detours.h>
 #include "D3DHook.h"
 #include "include/d3dumddi.h"
 #include "../../../DSUtil/Log.h"

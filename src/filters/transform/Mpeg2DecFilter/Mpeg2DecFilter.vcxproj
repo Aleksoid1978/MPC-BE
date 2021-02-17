@@ -129,7 +129,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>detours.lib;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>Mpeg2DecFilter.def</ModuleDefinitionFile>
@@ -158,7 +158,7 @@
       <PreprocessorDefinitions>MPEG2ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>detours.lib;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>Mpeg2DecFilter.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -239,6 +239,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\Detours\Detours.vcxproj">
+      <Project>{2dd13fcc-cb32-4610-b691-6cfc6a022483}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\filters\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
