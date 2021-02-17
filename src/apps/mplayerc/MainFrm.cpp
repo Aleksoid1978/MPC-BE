@@ -5648,7 +5648,11 @@ void CMainFrame::OnFileOpenDVD()
 			m_wndPlaylistBar.Open(path);
 			OpenCurPlaylistItem();
 		} else {
-			m_closingmsg = ResStr(IDS_MAINFRM_93);
+			if (m_eMediaLoadState == MLS_LOADED) {
+				SendStatusMessage(ResStr(IDS_MAINFRM_93), 3000);
+			} else {
+				m_closingmsg = ResStr(IDS_MAINFRM_93);
+			}
 		}
 	}
 }
@@ -17359,7 +17363,7 @@ CString CMainFrame::GetStatusMessage()
 	return str;
 }
 
-void CMainFrame::SendStatusMessage(CString msg, int nTimeOut)
+void CMainFrame::SendStatusMessage(const CString& msg, const int nTimeOut)
 {
 	KillTimer(TIMER_STATUSERASER);
 

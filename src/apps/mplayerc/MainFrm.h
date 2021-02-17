@@ -413,7 +413,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	bool m_bLiveWM;
 
-	void SendStatusMessage(CString msg, int nTimeOut);
+	void SendStatusMessage(const CString& msg, const int nTimeOut);
 	CString m_playingmsg, m_closingmsg;
 
 	REFERENCE_TIME m_rtDurationOverride;
