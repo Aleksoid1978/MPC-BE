@@ -14,9 +14,6 @@
     <ClInclude Include="src\detours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\detver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\creatwth.cpp">
@@ -26,21 +23,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\disasm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\disolarm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\disolarm64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\disolia64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\disolx64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\disolx86.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\image.cpp">

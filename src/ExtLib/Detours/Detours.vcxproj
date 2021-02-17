@@ -28,7 +28,6 @@
   <Import Project="..\..\platform.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -74,17 +73,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\detours.h" />
-    <ClInclude Include="src\detver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\creatwth.cpp" />
     <ClCompile Include="src\detours.cpp" />
     <ClCompile Include="src\disasm.cpp" />
-    <ClCompile Include="src\disolarm.cpp" />
-    <ClCompile Include="src\disolarm64.cpp" />
-    <ClCompile Include="src\disolia64.cpp" />
-    <ClCompile Include="src\disolx64.cpp" />
-    <ClCompile Include="src\disolx86.cpp" />
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\modules.cpp" />
   </ItemGroup>
