@@ -35,7 +35,7 @@
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/FileVersion.h"
 #include <winddk/ntddcdvd.h>
-#include <detours/detours.h>
+#include <Detours/src/detours.h>
 #include <afxsock.h>
 #include <atlsync.h>
 #include "UpdateChecker.h"
