@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -181,6 +181,8 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 		case WM_RBUTTONUP :
 		case WM_RBUTTONDBLCLK :
 		case WM_XBUTTONDOWN :
+		case WM_XBUTTONUP :
+		case WM_XBUTTONDBLCLK :
 
 		case WM_MOUSEWHEEL :
 		case WM_MOUSEHWHEEL :
