@@ -450,7 +450,7 @@ private :
     void nal_unit_header_svc_extension();
     void nal_unit_header_mvc_extension();
     void ref_pic_list_modification(int32u slice_type, bool mvc);
-    void pred_weight_table(int32u num_ref_idx_l0_active_minus1, int32u num_ref_idx_l1_active_minus1, int8u ChromaArrayType);
+    void pred_weight_table(int32u  slice_type, int32u num_ref_idx_l0_active_minus1, int32u num_ref_idx_l1_active_minus1, int8u ChromaArrayType);
     void dec_ref_pic_marking(vector<int8u> &memory_management_control_operations);
 
     //Packets - Specific

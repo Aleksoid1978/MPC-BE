@@ -606,63 +606,63 @@ void File_Teletext::Data_Parse()
             Param_Info1(Ztring().From_UTF8((const char*)&byte, 1));
             if (byte!=Stream.CC_Displayed_Values[Y][PosX] && (!C[7] || Y)) // C[7] is "Suppress Header", to be tested when Y==0
             {
-                Char Uni;
+                wchar_t Uni;
                 switch (CharacterSubset)
                 {
                     case 0x00:  //English
                                 switch(byte)
                                 {
-                                    case 0x23: Uni = __T('\xA3'); break;
-                                    case 0x24: Uni = __T('$'); break;
-                                    case 0x40: Uni = __T('@'); break;
-                                    case 0x5B: Uni = __T('\x2190'); break;
-                                    case 0x5C: Uni = __T('\xBD'); break;
-                                    case 0x5D: Uni = __T('\x2192'); break;
-                                    case 0x5E: Uni = __T('\x2191'); break;
-                                    case 0x5F: Uni = __T('#'); break;
-                                    case 0x60: Uni = __T('-'); break;
-                                    case 0x7B: Uni = __T('\xBC'); break;
-                                    case 0x7C: Uni = __T('|'); break;
-                                    case 0x7D: Uni = __T('\xBE'); break;
-                                    case 0x7E: Uni = __T('\xF7'); break;
+                                    case 0x23: Uni = L'\xA3'; break;
+                                    case 0x24: Uni = L'$'; break;
+                                    case 0x40: Uni = L'@'; break;
+                                    case 0x5B: Uni = L'\x2190'; break;
+                                    case 0x5C: Uni = L'\xBD'; break;
+                                    case 0x5D: Uni = L'\x2192'; break;
+                                    case 0x5E: Uni = L'\x2191'; break;
+                                    case 0x5F: Uni = L'#'; break;
+                                    case 0x60: Uni = L'-'; break;
+                                    case 0x7B: Uni = L'\xBC'; break;
+                                    case 0x7C: Uni = L'|'; break;
+                                    case 0x7D: Uni = L'\xBE'; break;
+                                    case 0x7E: Uni = L'\xF7'; break;
                                     default: Uni=byte;
                                 }
                                 break;
                     case 0x04:  //French
                                 switch(byte)
                                 {
-                                    case 0x23: Uni = __T('\xE9'); break;
-                                    case 0x24: Uni = __T('\xEF'); break;
-                                    case 0x40: Uni = __T('\xE0'); break;
-                                    case 0x5B: Uni = __T('\xEB'); break;
-                                    case 0x5C: Uni = __T('\xEA'); break;
-                                    case 0x5D: Uni = __T('\xF9'); break;
-                                    case 0x5E: Uni = __T('\xEE'); break;
-                                    case 0x5F: Uni = __T('#'); break;
-                                    case 0x60: Uni = __T('\xE8'); break;
-                                    case 0x7B: Uni = __T('\xE2'); break;
-                                    case 0x7C: Uni = __T('\xF4'); break;
-                                    case 0x7D: Uni = __T('\xFB'); break;
-                                    case 0x7E: Uni = __T('\xE7'); break;
+                                    case 0x23: Uni = L'\xE9'; break;
+                                    case 0x24: Uni = L'\xEF'; break;
+                                    case 0x40: Uni = L'\xE0'; break;
+                                    case 0x5B: Uni = L'\xEB'; break;
+                                    case 0x5C: Uni = L'\xEA'; break;
+                                    case 0x5D: Uni = L'\xF9'; break;
+                                    case 0x5E: Uni = L'\xEE'; break;
+                                    case 0x5F: Uni = L'#'; break;
+                                    case 0x60: Uni = L'\xE8'; break;
+                                    case 0x7B: Uni = L'\xE2'; break;
+                                    case 0x7C: Uni = L'\xF4'; break;
+                                    case 0x7D: Uni = L'\xFB'; break;
+                                    case 0x7E: Uni = L'\xE7'; break;
                                     default: Uni=byte;
                                 }
                                 break;
                     case 0x05:  //Portuguese/Spanish
                                 switch(byte)
                                 {
-                                    case 0x23: Uni = __T('\xE7'); break;
-                                    case 0x24: Uni = __T('$'); break;
-                                    case 0x40: Uni = __T('\xA1'); break;
-                                    case 0x5B: Uni = __T('\xE1'); break;
-                                    case 0x5C: Uni = __T('\xE9'); break;
-                                    case 0x5D: Uni = __T('\xED'); break;
-                                    case 0x5E: Uni = __T('\xF3'); break;
-                                    case 0x5F: Uni = __T('\xFA'); break;
-                                    case 0x60: Uni = __T('\xBF'); break;
-                                    case 0x7B: Uni = __T('\xFC'); break;
-                                    case 0x7C: Uni = __T('\xF1'); break;
-                                    case 0x7D: Uni = __T('\xE8'); break;
-                                    case 0x7E: Uni = __T('\xE0'); break;
+                                    case 0x23: Uni = L'\xE7'; break;
+                                    case 0x24: Uni = L'$'; break;
+                                    case 0x40: Uni = L'\xA1'; break;
+                                    case 0x5B: Uni = L'\xE1'; break;
+                                    case 0x5C: Uni = L'\xE9'; break;
+                                    case 0x5D: Uni = L'\xED'; break;
+                                    case 0x5E: Uni = L'\xF3'; break;
+                                    case 0x5F: Uni = L'\xFA'; break;
+                                    case 0x60: Uni = L'\xBF'; break;
+                                    case 0x7B: Uni = L'\xFC'; break;
+                                    case 0x7C: Uni = L'\xF1'; break;
+                                    case 0x7D: Uni = L'\xE8'; break;
+                                    case 0x7E: Uni = L'\xE0'; break;
                                     default: Uni=byte;
                                 }
                                 break;
@@ -723,7 +723,7 @@ void File_Teletext::HasChanged()
             for (size_t PosY=0; PosY<26; ++PosY)
             {
                 if (PosY)
-                    Content+=EOL;
+                    Content+=Ztring(EOL).To_Unicode().c_str();
                 Content+=Stream.CC_Displayed_Values[PosY];
                 Row_Values[PosY]=Stream.CC_Displayed_Values[PosY].c_str();
             }

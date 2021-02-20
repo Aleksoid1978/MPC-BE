@@ -1101,7 +1101,6 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         String NewValue_Lower(Value);
         transform(NewValue_Lower.begin(), NewValue_Lower.end(), NewValue_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
 
-        CriticalSectionLocker CSL(CS);
         if (NewValue_Lower==__T("csv"))
             Trace_Format_Set(Trace_Format_CSV);
         else if (NewValue_Lower==__T("xml") || NewValue_Lower==__T("MAXML"))

@@ -86,15 +86,8 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
 
     //Get all filenames
     ZtringList List;
-    size_t Pos=File_Name.find(__T(':'));
-    if (Pos!=string::npos && Pos!=1)
-        List.push_back(File_Name);
-    #if defined(MEDIAINFO_FILE_YES)
-    else if (File::Exists(File_Name))
-        List.push_back(File_Name);
-    #endif //defined(MEDIAINFO_FILE_YES)
     #if defined(MEDIAINFO_DIRECTORY_YES)
-    else
+    if (Dir::Exists(File_Name))
     {
         List=Dir::GetAllFileNames(File_Name, (Options&FileOption_NoRecursive)?Dir::Include_Files:((Dir::dirlist_t)(Dir::Include_Files|Dir::Parse_SubDirs)));
         sort(List.begin(), List.end());
@@ -115,7 +108,11 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
             }
         #endif //MEDIAINFO_ADVANCED
     }
+    else
     #endif //defined(MEDIAINFO_DIRECTORY_YES)
+    {
+        List.push_back(File_Name);
+    }
 
     #if defined(MEDIAINFO_DIRECTORY_YES)
         Reader_Directory().Directory_Cleanup(List);

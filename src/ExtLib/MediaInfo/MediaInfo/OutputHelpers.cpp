@@ -29,7 +29,7 @@ namespace MediaInfoLib
 Ztring XML_Encode (const Ztring& Data)
 {
     Ztring Result;
-    wstring::size_type Pos;
+    tstring::size_type Pos;
     for (Pos=0; Pos<Data.size(); Pos++)
     {
         switch (Data[Pos])
@@ -45,7 +45,7 @@ Ztring XML_Encode (const Ztring& Data)
                 if (Pos+1<Data.size() && Data[Pos+1]==__T('\n')) // translate the #xD #xA sequence to a single #xA character
                     Pos++;
             break;
-            default: if (Data[Pos]>=0x20) Result+=Data[Pos]; // Ignore others control characters
+            default: if (Data[Pos]<0x0 || Data[Pos]>=0x20) Result+=Data[Pos]; // Ignore others control characters
         }
     }
     return Result;

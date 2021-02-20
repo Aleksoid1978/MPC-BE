@@ -2486,7 +2486,7 @@ void File_DolbyE::object_info_block(int8u obj_idx, int8u blk)
     {
         dyn_object& D=ObjectElements[ObjectElements.size()-1];
         dyn_object::dyn_object_alt& A=D.Alts[blk];
-        A.obj_gain_db=INT_MAX;
+        A.obj_gain_db=INT8_MAX;
     }
     if (b_object_not_active || (obj_idx<b_object_in_bed_or_isf.size() && b_object_in_bed_or_isf[obj_idx]))
         object_render_info_status_idx=0;
@@ -2728,12 +2728,12 @@ void File_DolbyE::mgi_payload()
                     int8u dyn_obj_gain_db_bits;
                     Get_S1(6, dyn_obj_gain_db_bits,             "dyn_obj_gain_db_bits");
                     if (dyn_obj_gain_db_bits==63)
-                        A.obj_gain_db=INT_MIN;
+                        A.obj_gain_db=INT8_MIN;
                     else
                         A.obj_gain_db=15-dyn_obj_gain_db_bits;
                 }
                 else
-                    A.obj_gain_db=INT_MAX;
+                    A.obj_gain_db=INT8_MAX;
                 if (object_info_mask & 0x2)
                 {
                     Get_S1 (6, A.pos3d_x_bits,                  "pos3d_x_bits"); Param_Info3(mgi_bitstream_val_to_Q15(A.pos3d_x_bits, 6)/32768.0*100, "%", 0);

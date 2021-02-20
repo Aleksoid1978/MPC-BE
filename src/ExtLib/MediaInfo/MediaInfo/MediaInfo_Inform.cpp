@@ -1032,7 +1032,7 @@ size_t Xml_Content_Escape_MustEscape(const Ztring &Content)
             case __T('>') :
                             return Pos;
             default      :
-                            if (Content[Pos]<0x20)
+                            if (Content[Pos]>=0x0 && Content[Pos]<0x20)
                                 return Pos;
         }
     }
@@ -1082,7 +1082,7 @@ Ztring &MediaInfo_Internal::Xml_Content_Escape_Modifying (Ztring &Content, size_
             case __T('\n'):
                             break;
             default:
-                        if (Content[Pos]<0x20)
+                        if (Content[Pos]>=0x0 && Content[Pos]<0x20)
                         {
                             /* Is still invalid XML
                             Ztring Character=__T("#x")+Ztring::ToZtring(Content[Pos]/16, 16)+Ztring::ToZtring(Content[Pos]%16, 16)+__T(";");
@@ -1110,7 +1110,7 @@ size_t Content_MustEncode (const Ztring &Content)
     size_t Pos=0;
     size_t Size=Content.size();
     for (; Pos<Size; Pos++)
-        if (Content[Pos]<0x20)
+        if (Content[Pos]>=0x0 && Content[Pos]<0x20)
             return Pos;
 
     return Pos;
@@ -1127,7 +1127,7 @@ Ztring &MediaInfo_Internal::Content_Encode_Modifying (Ztring &Content, size_t &M
 
     for (; Pos<Content.size(); Pos++)
     {
-        if (Content[Pos]<0x20)
+        if (Content[Pos]>=0x0 && Content[Pos]<0x20)
         {
             string Content_Utf8=Content_Save.To_UTF8(); //TODO: shouldn't we never convert to Unicode?
             string Content_Base64=Base64::encode(Content_Utf8);

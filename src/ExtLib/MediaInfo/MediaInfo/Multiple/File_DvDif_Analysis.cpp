@@ -44,9 +44,25 @@ void File_DvDif::Read_Buffer_Continue()
             return;
     }
 
+    #if MEDIAINFO_DEMUX
+        if (Demux_UnpacketizeContainer && !Synchro_Manage()) // We need to manage manually synchronization in case of demux
+        {
+            Element_WaitForMoreData();
+            return; //Wait for more data
+        }
+    #endif // MEDIAINFO_DEMUX
+
     //Errors stats
     while (Buffer_Offset+80<=Buffer_Size)
     {
+        #if MEDIAINFO_DEMUX
+            if (Demux_TotalBytes && Buffer_TotalBytes+Buffer_Offset>=Demux_TotalBytes)
+            {
+                Element_WaitForMoreData();
+                return; //Wait for more data
+            }
+        #endif // MEDIAINFO_DEMUX
+
         //Quick search depends of SCT
         switch(Buffer[Buffer_Offset]&0xE0)
         {

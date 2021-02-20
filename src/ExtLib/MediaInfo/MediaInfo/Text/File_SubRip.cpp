@@ -277,7 +277,7 @@ void File_SubRip::Read_Buffer_Continue()
                 Event.DTS=Items[Items_Pos].PTS_Begin;
                 Event.PTS=Event.DTS;
                 Event.DUR=Items[Items_Pos].PTS_End-Items[Items_Pos].PTS_Begin;
-                Event.Content=Items[Items_Pos].Content.c_str();
+                Event.Content=Items[Items_Pos].Content.To_Unicode().c_str();
                 Event.Flags=IsVTT?1:0;
                 Event.MuxingMode=(int8u)-1;
                 Event.Service=(int8u)-1;
@@ -293,7 +293,7 @@ void File_SubRip::Read_Buffer_Continue()
                     Event.DTS=Items[Items_Pos].PTS_End;
                     Event.PTS=Event.DTS;
                     Event.DUR=0;
-                    Event.Content=__T("");
+                    Event.Content=L"";
                     Event.Flags=IsVTT?1:0;
                     Event.MuxingMode=(int8u)-1;
                     Event.Service=(int8u)-1;

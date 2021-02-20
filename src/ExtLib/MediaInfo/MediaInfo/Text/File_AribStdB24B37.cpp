@@ -749,7 +749,7 @@ void File_AribStdB24B37::caption_statement() //caption_data()
             }
         Frame_Count_NotParsedIncluded=Frame_Count;
         EVENT_BEGIN (Global, SimpleText, 0)
-            Event.Content=Streams[(size_t)(Element_Code-1)].Line.c_str();
+            Event.Content=Streams[(size_t)(Element_Code-1)].Line.To_Unicode().c_str();
             Event.Flags=0;
             Event.MuxingMode=MuxingMode;
             Event.Service=(int8u)Element_Code;

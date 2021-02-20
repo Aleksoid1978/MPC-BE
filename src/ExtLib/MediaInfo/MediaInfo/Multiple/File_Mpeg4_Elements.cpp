@@ -870,6 +870,7 @@ namespace Elements
     const int64u moov_trak_tref_tmcd=0x746D6364;
     const int64u moov_trak_tref_vdep=0x76646570;
     const int64u moov_trak_udta=0x75647461;
+    const int64u moov_trak_udta_free=0x66726565;
     const int64u moov_udta=0x75647461;
     const int64u moov_udta_AllF=0x416C6C46;
     const int64u moov_udta_chpl=0x6368706C;
@@ -882,6 +883,7 @@ namespace Elements
     const int64u moov_udta_DcMD_DcME_Mtmd=0x4D746D64;
     const int64u moov_udta_DcMD_DcME_Rate=0x52617465;
     const int64u moov_udta_FIEL=0x4649454C;
+    const int64u moov_udta_free=0x66726565;
     const int64u moov_udta_FXTC=0x46585443;
     const int64u moov_udta_hinf=0x68696E66;
     const int64u moov_udta_hinv=0x68696E76;
@@ -912,6 +914,7 @@ namespace Elements
     const int64u moov_udta_tags_tseg_tshd=0x74736864;
     const int64u moov_udta_WLOC=0x574C4F43;
     const int64u moov_udta_XMP_=0x584D505F;
+    const int64u moov_udta_Xtra=0x58747261;
     const int64u moov_udta_yrrc=0x79727263;
     const int64u pdin=0x7064696E;
     const int64u PICT=0x50494354;
@@ -1269,7 +1272,10 @@ void File_Mpeg4::Data_Parse()
                 ATOM(moov_trak_tref_vdep)
                 ATOM_END
             LIST(moov_trak_udta)
-                ATOM_DEFAULT_ALONE (moov_trak_udta_xxxx);
+                ATOM_BEGIN
+                ATOM (moov_trak_udta_free);
+                ATOM_DEFAULT (moov_trak_udta_xxxx);
+                ATOM_END_DEFAULT
             ATOM_END
         LIST(moov_udta)
             ATOM_BEGIN
@@ -1288,6 +1294,7 @@ void File_Mpeg4::Data_Parse()
                     ATOM_END
                 ATOM_END
             ATOM(moov_udta_FIEL)
+            ATOM(moov_udta_free)
             ATOM(moov_udta_FXTC)
             ATOM(moov_udta_hinf)
             ATOM(moov_udta_hinv)
@@ -1332,6 +1339,7 @@ void File_Mpeg4::Data_Parse()
                 ATOM_END
             ATOM(moov_udta_WLOC)
             LIST_SKIP(moov_udta_XMP_)
+            ATOM(moov_udta_Xtra)
             ATOM(moov_udta_yrrc)
             ATOM_DEFAULT (moov_udta_xxxx); //User data
             ATOM_END_DEFAULT
@@ -8545,6 +8553,16 @@ void File_Mpeg4::moov_udta_XMP_()
         if (Hash && !IsSecondPass)
             GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Hash will be done during second pass
     #endif //MEDIAINFO_HASH
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_udta_Xtra()
+{
+    Element_Name("Microsoft Xtra");
+    // Hints: https://leo-van-stee.github.io/
+
+    //Parsing
+    Skip_XX(Element_Size,                                       "Data"); //TODO
 }
 
 //---------------------------------------------------------------------------
