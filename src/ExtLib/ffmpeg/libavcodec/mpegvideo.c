@@ -32,6 +32,8 @@
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/motion_vector.h"
+#include "libavutil/video_enc_params.h"
+
 #include "avcodec.h"
 #include "blockdsp.h"
 #include "h264chroma.h"
@@ -660,17 +662,14 @@ void ff_mpv_common_defaults(MpegEncContext *s)
 }
 
 /**
- * Set the given MpegEncContext to defaults for decoding.
+ * Initialize the given MpegEncContext for decoding.
  * the changed fields will not depend upon
  * the prior state of the MpegEncContext.
  */
-void ff_mpv_decode_defaults(MpegEncContext *s)
-{
-    ff_mpv_common_defaults(s);
-}
-
 void ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx)
 {
+    ff_mpv_common_defaults(s);
+
     s->avctx           = avctx;
     s->width           = avctx->coded_width;
     s->height          = avctx->coded_height;
@@ -790,7 +789,7 @@ static int init_context_frame(MpegEncContext *s)
     }
 
     /* which mb is an intra block,  init macroblock skip table */
-    if (!FF_ALLOCZ_TYPED_ARRAY(s->mbintra_table, mb_array_size) ||
+    if (!FF_ALLOC_TYPED_ARRAY(s->mbintra_table, mb_array_size) ||
         // Note the + 1 is for a quicker MPEG-4 slice_end detection
         !FF_ALLOCZ_TYPED_ARRAY(s->mbskip_table,  mb_array_size + 2))
         return AVERROR(ENOMEM);
@@ -1425,14 +1424,33 @@ void ff_print_debug_info(MpegEncContext *s, Picture *p, AVFrame *pict)
 
 int ff_mpv_export_qp_table(MpegEncContext *s, AVFrame *f, Picture *p, int qp_type)
 {
-    AVBufferRef *ref = av_buffer_ref(p->qscale_table_buf);
-    int offset = 2*s->mb_stride + 1;
-    if(!ref)
+    AVVideoEncParams *par;
+    int mult = (qp_type == FF_QSCALE_TYPE_MPEG1) ? 2 : 1;
+    unsigned int nb_mb = p->alloc_mb_height * p->alloc_mb_width;
+    unsigned int x, y;
+
+    if (!(s->avctx->export_side_data & AV_CODEC_EXPORT_DATA_VIDEO_ENC_PARAMS))
+        return 0;
+
+    par = av_video_enc_params_create_side_data(f, AV_VIDEO_ENC_PARAMS_MPEG2, nb_mb);
+    if (!par)
         return AVERROR(ENOMEM);
-    av_assert0(ref->size >= offset + s->mb_stride * ((f->height+15)/16));
-    ref->size -= offset;
-    ref->data += offset;
-    return av_frame_set_qp_table(f, ref, s->mb_stride, qp_type);
+
+    for (y = 0; y < p->alloc_mb_height; y++)
+        for (x = 0; x < p->alloc_mb_width; x++) {
+            const unsigned int block_idx = y * p->alloc_mb_width + x;
+            const unsigned int     mb_xy = y * p->alloc_mb_stride + x;
+            AVVideoBlockParams *b = av_video_enc_params_block(par, block_idx);
+
+            b->src_x = x * 16;
+            b->src_y = y * 16;
+            b->w     = 16;
+            b->h     = 16;
+
+            b->delta_qp = p->qscale_table[mb_xy] * mult;
+        }
+
+    return 0;
 }
 
 static inline int hpel_motion_lowres(MpegEncContext *s,

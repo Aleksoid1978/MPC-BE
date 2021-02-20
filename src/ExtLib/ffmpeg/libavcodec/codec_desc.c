@@ -1427,6 +1427,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
     {
+        .id        = AV_CODEC_ID_VVC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "vvc",
+        .long_name = NULL_IF_CONFIG_SMALL("H.266 / VVC (Versatile Video Coding)"),
+        .props     = AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_REORDER,
+        .profiles  = NULL_IF_CONFIG_SMALL(ff_vvc_profiles),
+    },
+    {
         .id        = AV_CODEC_ID_Y41P,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "y41p",
@@ -3444,6 +3452,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "bin_data",
         .long_name = NULL_IF_CONFIG_SMALL("binary data"),
         .mime_types= MT("application/octet-stream"),
+    },
+    {
+        .id        = AV_CODEC_ID_MPEG2TS,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "mpegts",
+        .long_name = NULL_IF_CONFIG_SMALL("raw MPEG-TS stream"),
+        .mime_types= MT("application/MP2T"),
     },
     {
         .id        = AV_CODEC_ID_WRAPPED_AVFRAME,

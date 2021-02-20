@@ -92,6 +92,8 @@ SRCS_LC = \
 	libavcodec/aac_parser.c \
 	libavcodec/aacadtsdec.c \
 	libavcodec/aacdec.c \
+	libavcodec/aacps.c \
+	libavcodec/aacps_common.c \
 	libavcodec/aacps_float.c \
 	libavcodec/aacpsdsp_float.c \
 	libavcodec/aacsbr.c \
@@ -214,7 +216,6 @@ SRCS_LC = \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fdctdsp.c \
-	libavcodec/fft_fixed.c \
 	libavcodec/fft_fixed_32.c \
 	libavcodec/fft_float.c \
 	libavcodec/fft_init_table.c \
@@ -314,7 +315,6 @@ SRCS_LC = \
 	libavcodec/magicyuv.c \
 	libavcodec/mathtables.c \
 	libavcodec/me_cmp.c \
-	libavcodec/mdct_fixed.c \
 	libavcodec/mdct_fixed_32.c \
 	libavcodec/mdct_float.c \
 	libavcodec/mdct15.c \
@@ -516,6 +516,7 @@ SRCS_LC_B = \
 	libavcodec/vp9prob.c \
 	libavcodec/vp9recon.c \
 	libavcodec/wavpack.c \
+	libavcodec/wavpackdata.c \
 	libavcodec/wma.c \
 	libavcodec/wma_common.c \
 	libavcodec/wma_freqs.c \
@@ -807,7 +808,8 @@ SRCS_YASM_LS = \
 	libswscale/x86/output.asm \
 	libswscale/x86/rgb_2_rgb.asm \
 	libswscale/x86/scale.asm \
-	libswscale/x86/yuv_2_rgb.asm
+	libswscale/x86/yuv_2_rgb.asm \
+	libswscale/x86/yuv2yuvX.asm
 
 OBJS_LC = \
 	$(SRCS_LC:%.c=$(OBJ_DIR)%.o) \

@@ -33,9 +33,11 @@ extern AVCodecParser ff_avs3_parser;
 extern AVCodecParser ff_bmp_parser;
 extern AVCodecParser ff_cavsvideo_parser;
 extern AVCodecParser ff_cook_parser;
+extern AVCodecParser ff_cri_parser;
 extern AVCodecParser ff_dca_parser;
 extern AVCodecParser ff_dirac_parser;
 extern AVCodecParser ff_dnxhd_parser;
+extern AVCodecParser ff_dolby_e_parser;
 extern AVCodecParser ff_dpx_parser;
 extern AVCodecParser ff_dvaudio_parser;
 extern AVCodecParser ff_dvbsub_parser;
@@ -71,6 +73,7 @@ extern AVCodecParser ff_vp3_parser;
 extern AVCodecParser ff_vp8_parser;
 extern AVCodecParser ff_vp9_parser;
 extern AVCodecParser ff_webp_parser;
+extern AVCodecParser ff_xbm_parser;
 extern AVCodecParser ff_xma_parser;
 
 #include "libavcodec/parser_list.c"

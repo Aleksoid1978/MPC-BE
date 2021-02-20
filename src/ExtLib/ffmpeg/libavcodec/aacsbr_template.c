@@ -37,10 +37,6 @@
 static av_cold void aacsbr_tableinit(void)
 {
     int n;
-    for (n = 1; n < 320; n++)
-        sbr_qmf_window_us[320 + n] = sbr_qmf_window_us[320 - n];
-    sbr_qmf_window_us[384] = -sbr_qmf_window_us[384];
-    sbr_qmf_window_us[512] = -sbr_qmf_window_us[512];
 
     for (n = 0; n < 320; n++)
         sbr_qmf_window_ds[n] = sbr_qmf_window_us[2*n];
@@ -955,14 +951,14 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
         if (!ac->oc[1].m4ac.ps) {
             // ==> Start patch MPC
             av_log(ac->avctx, AV_LOG_ERROR, "Parametric Stereo signaled to be not-present but was found in the bitstream, force stereo output.\n");
-            *num_bits_left -= AAC_RENAME(ff_ps_read_data)(ac->avctx, gb, &sbr->ps, *num_bits_left);
+            *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps.common, *num_bits_left);
             ac->avctx->profile = FF_PROFILE_AAC_HE_V2;
             ac->oc[1].m4ac.ps = 1;
             //skip_bits_long(gb, *num_bits_left); // bs_fill_bits
             //*num_bits_left = 0;
             // ==> End patch MPC
         } else {
-            *num_bits_left -= AAC_RENAME(ff_ps_read_data)(ac->avctx, gb, &sbr->ps, *num_bits_left);
+            *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps.common, *num_bits_left);
             ac->avctx->profile = FF_PROFILE_AAC_HE_V2;
         }
         break;
@@ -1553,7 +1549,7 @@ void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int 
     }
 
     if (ac->oc[1].m4ac.ps == 1) {
-        if (sbr->ps.start) {
+        if (sbr->ps.common.start) {
             AAC_RENAME(ff_ps_apply)(ac->avctx, &sbr->ps, sbr->X[0], sbr->X[1], sbr->kx[1] + sbr->m[1]);
         } else {
             memcpy(sbr->X[1], sbr->X[0], sizeof(sbr->X[0]));

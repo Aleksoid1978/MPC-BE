@@ -33,6 +33,7 @@
 #include "libavutil/crc.h"
 #include "libavutil/downmix_info.h"
 #include "libavutil/opt.h"
+#include "libavutil/thread.h"
 #include "bswapdsp.h"
 #include "internal.h"
 #include "aac_ac3_parser.h"
@@ -183,23 +184,26 @@ static av_cold void ac3_tables_init(void)
  */
 static av_cold int ac3_decode_init(AVCodecContext *avctx)
 {
+    static AVOnce init_static_once = AV_ONCE_INIT;
     AC3DecodeContext *s = avctx->priv_data;
-    int i;
+    int i, ret;
 
     s->avctx = avctx;
 
-    ac3_tables_init();
-    ff_mdct_init(&s->imdct_256, 8, 1, 1.0);
-    ff_mdct_init(&s->imdct_512, 9, 1, 1.0);
+    if ((ret = ff_mdct_init(&s->imdct_256, 8, 1, 1.0)) < 0 ||
+        (ret = ff_mdct_init(&s->imdct_512, 9, 1, 1.0)) < 0)
+        return ret;
     AC3_RENAME(ff_kbd_window_init)(s->window, 5.0, 256);
     ff_bswapdsp_init(&s->bdsp);
 
 #if (USE_FIXED)
     s->fdsp = avpriv_alloc_fixed_dsp(avctx->flags & AV_CODEC_FLAG_BITEXACT);
 #else
-    s->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
     ff_fmt_convert_init(&s->fmt_conv, avctx);
+    s->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
 #endif
+    if (!s->fdsp)
+        return AVERROR(ENOMEM);
 
     ff_ac3dsp_init(&s->ac3dsp, avctx->flags & AV_CODEC_FLAG_BITEXACT);
     av_lfg_init(&s->dith_state, 0);
@@ -222,6 +226,8 @@ static av_cold int ac3_decode_init(AVCodecContext *avctx)
         s->xcfptr[i] = s->transform_coeffs[i];
         s->dlyptr[i] = s->delay[i];
     }
+
+    ff_thread_once(&init_static_once, ac3_tables_init);
 
     return 0;
 }

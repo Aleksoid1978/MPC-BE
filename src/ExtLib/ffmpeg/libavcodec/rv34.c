@@ -27,7 +27,9 @@
 #include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem_internal.h"
 #include "libavutil/thread.h"
+#include "libavutil/video_enc_params.h"
 
 #include "avcodec.h"
 #include "error_resilience.h"
@@ -1487,7 +1489,6 @@ av_cold int ff_rv34_decode_init(AVCodecContext *avctx)
     MpegEncContext *s = &r->s;
     int ret;
 
-    ff_mpv_decode_defaults(s);
     ff_mpv_decode_init(s, avctx);
     s->out_format = FMT_H263;
 

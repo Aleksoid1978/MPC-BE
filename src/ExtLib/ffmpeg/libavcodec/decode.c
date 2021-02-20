@@ -165,52 +165,6 @@ static int extract_packet_props(AVCodecInternal *avci, AVPacket *pkt)
     return ret;
 }
 
-static int unrefcount_frame(AVCodecInternal *avci, AVFrame *frame)
-{
-    int ret;
-
-    /* move the original frame to our backup */
-    av_frame_unref(avci->to_free);
-    av_frame_move_ref(avci->to_free, frame);
-
-    /* now copy everything except the AVBufferRefs back
-     * note that we make a COPY of the side data, so calling av_frame_free() on
-     * the caller's frame will work properly */
-    ret = av_frame_copy_props(frame, avci->to_free);
-    if (ret < 0)
-        return ret;
-
-    memcpy(frame->data,     avci->to_free->data,     sizeof(frame->data));
-    memcpy(frame->linesize, avci->to_free->linesize, sizeof(frame->linesize));
-    if (avci->to_free->extended_data != avci->to_free->data) {
-        int planes = avci->to_free->channels;
-        int size   = planes * sizeof(*frame->extended_data);
-
-        if (!size) {
-            av_frame_unref(frame);
-            return AVERROR_BUG;
-        }
-
-        frame->extended_data = av_malloc(size);
-        if (!frame->extended_data) {
-            av_frame_unref(frame);
-            return AVERROR(ENOMEM);
-        }
-        memcpy(frame->extended_data, avci->to_free->extended_data,
-               size);
-    } else
-        frame->extended_data = frame->data;
-
-    frame->format         = avci->to_free->format;
-    frame->width          = avci->to_free->width;
-    frame->height         = avci->to_free->height;
-    frame->channel_layout = avci->to_free->channel_layout;
-    frame->nb_samples     = avci->to_free->nb_samples;
-    frame->channels       = avci->to_free->channels;
-
-    return 0;
-}
-
 int ff_decode_bsfs_init(AVCodecContext *avctx)
 {
     AVCodecInternal *avci = avctx->internal;
@@ -267,8 +221,10 @@ int ff_decode_get_packet(AVCodecContext *avctx, AVPacket *pkt)
     if (ret < 0)
         goto finish;
 
+#if FF_API_OLD_ENCDEC
     if (avctx->codec->receive_frame)
         avci->compat_decode_consumed += pkt->size;
+#endif
 
     return 0;
 finish:
@@ -521,7 +477,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
     }
 
+#if FF_API_OLD_ENCDEC
     avci->compat_decode_consumed += ret;
+#endif
 
     if (ret >= pkt->size || ret < 0) {
         av_packet_unref(pkt);
@@ -745,6 +703,54 @@ int attribute_align_arg avcodec_receive_frame(AVCodecContext *avctx, AVFrame *fr
     return 0;
 }
 
+#if FF_API_OLD_ENCDEC
+FF_DISABLE_DEPRECATION_WARNINGS
+static int unrefcount_frame(AVCodecInternal *avci, AVFrame *frame)
+{
+    int ret;
+
+    /* move the original frame to our backup */
+    av_frame_unref(avci->to_free);
+    av_frame_move_ref(avci->to_free, frame);
+
+    /* now copy everything except the AVBufferRefs back
+     * note that we make a COPY of the side data, so calling av_frame_free() on
+     * the caller's frame will work properly */
+    ret = av_frame_copy_props(frame, avci->to_free);
+    if (ret < 0)
+        return ret;
+
+    memcpy(frame->data,     avci->to_free->data,     sizeof(frame->data));
+    memcpy(frame->linesize, avci->to_free->linesize, sizeof(frame->linesize));
+    if (avci->to_free->extended_data != avci->to_free->data) {
+        int planes = avci->to_free->channels;
+        int size   = planes * sizeof(*frame->extended_data);
+
+        if (!size) {
+            av_frame_unref(frame);
+            return AVERROR_BUG;
+        }
+
+        frame->extended_data = av_malloc(size);
+        if (!frame->extended_data) {
+            av_frame_unref(frame);
+            return AVERROR(ENOMEM);
+        }
+        memcpy(frame->extended_data, avci->to_free->extended_data,
+               size);
+    } else
+        frame->extended_data = frame->data;
+
+    frame->format         = avci->to_free->format;
+    frame->width          = avci->to_free->width;
+    frame->height         = avci->to_free->height;
+    frame->channel_layout = avci->to_free->channel_layout;
+    frame->nb_samples     = avci->to_free->nb_samples;
+    frame->channels       = avci->to_free->channels;
+
+    return 0;
+}
+
 static int compat_decode(AVCodecContext *avctx, AVFrame *frame,
                          int *got_frame, const AVPacket *pkt)
 {
@@ -840,6 +846,8 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
 {
     return compat_decode(avctx, frame, got_frame_ptr, avpkt);
 }
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
 static void get_subtitle_defaults(AVSubtitle *sub)
 {

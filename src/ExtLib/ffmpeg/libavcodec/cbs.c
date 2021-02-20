@@ -23,12 +23,13 @@
 #include "libavutil/avassert.h"
 #include "libavutil/buffer.h"
 #include "libavutil/common.h"
+#include "libavutil/opt.h"
 
 #include "cbs.h"
 #include "cbs_internal.h"
 
 
-static const CodedBitstreamType *cbs_type_table[] = {
+static const CodedBitstreamType *const cbs_type_table[] = {
 #if CONFIG_CBS_AV1
     &ff_cbs_type_av1,
 #endif
@@ -101,6 +102,10 @@ int ff_cbs_init(CodedBitstreamContext **ctx_ptr,
             av_freep(&ctx);
             return AVERROR(ENOMEM);
         }
+        if (type->priv_class) {
+            *(const AVClass **)ctx->priv_data = type->priv_class;
+            av_opt_set_defaults(ctx->priv_data);
+        }
     }
 
     ctx->decompose_unit_types = NULL;
@@ -129,6 +134,10 @@ void ff_cbs_close(CodedBitstreamContext **ctx_ptr)
         ctx->codec->close(ctx);
 
     av_freep(&ctx->write_buffer);
+
+    if (ctx->codec->priv_class && ctx->priv_data)
+        av_opt_free(ctx->priv_data);
+
     av_freep(&ctx->priv_data);
     av_freep(ctx_ptr);
 }
@@ -193,6 +202,12 @@ static int cbs_read_fragment_content(CodedBitstreamContext *ctx,
             av_log(ctx->log_ctx, AV_LOG_VERBOSE,
                    "Decomposition unimplemented for unit %d "
                    "(type %"PRIu32").\n", i, unit->type);
+        } else if (err == AVERROR(EAGAIN)) {
+            av_log(ctx->log_ctx, AV_LOG_VERBOSE,
+                   "Skipping decomposition of unit %d "
+                   "(type %"PRIu32").\n", i, unit->type);
+            av_buffer_unref(&unit->content_ref);
+            unit->content = NULL;
         } else if (err < 0) {
             av_log(ctx->log_ctx, AV_LOG_ERROR, "Failed to read unit %d "
                    "(type %"PRIu32").\n", i, unit->type);

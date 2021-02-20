@@ -346,7 +346,6 @@ static int update_context_from_user(AVCodecContext *dst, AVCodecContext *src)
 
     dst->opaque   = src->opaque;
     dst->debug    = src->debug;
-    dst->debug_mv = src->debug_mv;
 
     dst->slice_flags = src->slice_flags;
     dst->flags2      = src->flags2;
@@ -778,10 +777,6 @@ int ff_frame_thread_init(AVCodecContext *avctx)
 
     if (!thread_count) {
         int nb_cpus = av_cpu_count();
-#if FF_API_DEBUG_MV
-        if ((avctx->debug & (FF_DEBUG_VIS_QP | FF_DEBUG_VIS_MB_TYPE)) || avctx->debug_mv)
-            nb_cpus = 1;
-#endif
         // use number of cores + 1 as thread count if there is more than one
         if (nb_cpus > 1)
             thread_count = avctx->thread_count = FFMIN(nb_cpus + 1, MAX_AUTO_THREADS);
