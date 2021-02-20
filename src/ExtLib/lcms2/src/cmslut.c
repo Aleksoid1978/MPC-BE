@@ -1337,7 +1337,7 @@ void _LUTeval16(CMSREGISTER const cmsUInt16Number In[], CMSREGISTER cmsUInt16Num
 
 // Does evaluate the LUT on cmsFloat32Number-basis.
 static
-void _LUTevalFloat(CMSREGISTER const cmsFloat32Number In[], CMSREGISTER cmsFloat32Number Out[], const void* D)
+void _LUTevalFloat(const cmsFloat32Number In[], cmsFloat32Number Out[], const void* D)
 {
     cmsPipeline* lut = (cmsPipeline*) D;
     cmsStage *mpe;
@@ -1658,7 +1658,7 @@ cmsUInt32Number CMSEXPORT cmsPipelineStageCount(const cmsPipeline* lut)
 // This function may be used to set the optional evaluator and a block of private data. If private data is being used, an optional
 // duplicator and free functions should also be specified in order to duplicate the LUT construct. Use NULL to inhibit such functionality.
 void CMSEXPORT _cmsPipelineSetOptimizationParameters(cmsPipeline* Lut,
-                                        _cmsInterpFn16 Eval16,
+                                        _cmsPipelineEval16Fn Eval16,
                                         void* PrivateData,
                                         _cmsFreeUserDataFn FreePrivateDataFn,
                                         _cmsDupUserDataFn  DupPrivateDataFn)
