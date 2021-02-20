@@ -264,7 +264,7 @@ bool ZtringListListF::CSV_Sauvegarder ()
     //Sauvegarde
     File F;
     if (!F.Create(Name, true))
-        return Error;
+        return false;
 
     if (Separator[0]==__T("(Default)"))
         Separator[0]=EOL;
@@ -280,7 +280,7 @@ bool ZtringListListF::CFG_Sauvegarder ()
 {
     File F;
     if (!F.Create(Name, true))
-        return Error;
+        return false;
 
     Ztring ToWrite;
     Ztring Propriete, Valeur, Commentaire;

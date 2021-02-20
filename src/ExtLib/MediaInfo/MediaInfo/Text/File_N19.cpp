@@ -524,7 +524,7 @@ void File_N19::Data_Parse()
                     Event.DTS=((int64u)(TCO_Latest))*1000000; // "-TCP_Offset" removed for the moment. TODO: find a way for when TCP_Offset should be removed and when it should not
                     Event.PTS=Event.DTS;
                     Event.DUR=((int64u)(TCI-TCO_Latest))*1000000;
-                    Event.Content=__T("");
+                    Event.Content=L"";
                     Event.Flags=0;
                     Event.MuxingMode=(int8u)-1;
                     Event.Service=(int8u)-1;
@@ -599,7 +599,7 @@ void File_N19::Data_Parse()
                 Event.DTS=((int64u)(TCI))*1000000; // "-TCP_Offset" removed for the moment. TODO: find a way for when TCP_Offset should be removed and when it should not
                 Event.PTS=Event.DTS;
                 Event.DUR=((int64u)(TCO-TCI))*1000000;
-                Event.Content=TF.c_str();
+                Event.Content=TF.To_Unicode().c_str();
                 Event.Flags=0;
                 Event.MuxingMode=(int8u)-1;
                 Event.Service=(int8u)-1;

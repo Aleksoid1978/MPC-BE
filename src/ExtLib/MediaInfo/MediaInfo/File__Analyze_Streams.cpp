@@ -148,7 +148,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 
     if (Meta.Luminance[0]!=(int32u)-1 && Meta.Luminance[1]!=(int32u)-1)
         MasteringDisplay_Luminance=        __T("min: ")+Ztring::ToZtring(((float64)Meta.Luminance[0])/10000, 4)
-                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/10000, (Meta.Luminance[1]-((int)Meta.Luminance[1])==0)?0:4)
+                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/10000, ((float64)Meta.Luminance[1]/10000-Meta.Luminance[1]/10000==0)?0:4)
                                   +__T(" cd/m2");
 }
 #endif
@@ -511,18 +511,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     if (!Value.empty())
     {
         size_t Value_NotBOM_Pos;
-        if (sizeof(Char)==1)
-        {
-            Value_NotBOM_Pos=0;
-            while (Value.size()-Value_NotBOM_Pos>=3 // Avoid deep recursivity
-             && Value[Value_NotBOM_Pos  ]==0xEF 
-             && Value[Value_NotBOM_Pos+1]==0xBB
-             && Value[Value_NotBOM_Pos+2]==0xBF
-                )
-                Value_NotBOM_Pos+=3;
-        }
-        else
-        {
+        #if defined(UNICODE) || defined (_UNICODE)
             //Check inverted bytes from UTF BOM
             Value_NotBOM_Pos=Value.find_first_not_of(__T('\xFFFE')); // Avoid deep recursivity
             if (Value_NotBOM_Pos)
@@ -543,7 +532,16 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
             }
 
             Value_NotBOM_Pos=Value.find_first_not_of(__T('\xFEFF')); // Avoid deep recursivity
-        }
+        #else
+            Value_NotBOM_Pos=0;
+            while (Value.size()-Value_NotBOM_Pos>=3 // Avoid deep recursivity
+             && Value[Value_NotBOM_Pos  ]==0xEF
+             && Value[Value_NotBOM_Pos+1]==0xBB
+             && Value[Value_NotBOM_Pos+2]==0xBF
+                )
+                Value_NotBOM_Pos+=3;
+        #endif //defined(UNICODE) || defined (_UNICODE)
+
         if (Value_NotBOM_Pos)
             return Fill(StreamKind, StreamPos, Parameter, Value.substr(Value_NotBOM_Pos), Replace);
     }

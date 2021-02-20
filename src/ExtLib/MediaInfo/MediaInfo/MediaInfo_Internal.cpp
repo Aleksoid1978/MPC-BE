@@ -56,6 +56,13 @@
     #include "ZenLib/FileName.h"
     #include <cstring>
 #endif //MEDIAINFO_DEBUG_BUFFER
+#if MEDIAINFO_ADVANCED
+    #include <iostream>
+    #ifdef WINDOWS
+        #include <fcntl.h>
+        #include <io.h>
+    #endif
+#endif //MEDIAINFO_ADVANCED
 using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -1196,6 +1203,29 @@ void MediaInfo_Internal::Entry()
             #endif //MEDIAINFO_NEXTPACKET
         }
     #endif //MEDIAINFO_FILE_YES
+    #if MEDIAINFO_ADVANCED
+        else if (Config.File_Names[0]==__T("-")
+            #ifdef WINDOWS
+                //&& WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 0) == WAIT_OBJECT_0 //Check if there is something is stdin
+                && _setmode(_fileno(stdin), _O_BINARY) != -1 //Force binary mode
+            #endif
+            )
+        {
+            static const size_t Read_Size=24000; //TODO: tweak this value
+            unsigned char Buffer[Read_Size];
+            Open_Buffer_Init();
+            for (;;)
+            {
+                size_t Buffer_Size = fread(Buffer, 1, Read_Size, stdin);
+                if (!Buffer_Size)
+                    break;
+                Open_Buffer_Continue((int8u*)Buffer, Buffer_Size);
+                if (feof(stdin))
+                    break;
+            }
+            Open_Buffer_Finalize();
+        }
+    #endif //MEDIAINFO_ADVANCED
 
     Config.State_Set(1);
 }

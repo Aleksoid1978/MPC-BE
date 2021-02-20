@@ -291,7 +291,7 @@ void File_Ttml::Read_Buffer_Continue()
                     Event.DTS=DTS_Begin;
                     Event.PTS=Event.DTS;
                     Event.DUR=DTS_End-DTS_Begin;
-                    Event.Content=Content.c_str();
+                    Event.Content=Content.To_Unicode().c_str();
                     Event.Flags=0;
                     Event.MuxingMode=MuxingMode;
                     Event.Service=(int8u)Element_Code;
@@ -304,7 +304,7 @@ void File_Ttml::Read_Buffer_Continue()
                     Event.DTS=DTS_End;
                     Event.PTS=Event.DTS;
                     Event.DUR=0;
-                    Event.Content=__T("");
+                    Event.Content=L"";
                     Event.Flags=0;
                     Event.MuxingMode=MuxingMode;
                     Event.Service=(int8u)Element_Code;

@@ -83,10 +83,12 @@ struct Node
         Childs.push_back(new Node(Name, Value, Multiple));
         return Childs.back();
     }
+    #if defined(UNICODE) || defined (_UNICODE)
     Node* Add_Child(const std::string& Name, const ZenLib::Ztring& Value, bool Multiple=false)
     {
         return Add_Child(Name, Value.To_UTF8(), Multiple);
     }
+    #endif //defined(UNICODE) || defined (_UNICODE)
     Node* Add_Child(const std::string& Name, const std::string& Value, const std::string& _Atribute_Name, const char* _Atribute_Value, bool Multiple=false)
     {
         Childs.push_back(new Node(Name, Value, _Atribute_Name, _Atribute_Value, Multiple));
@@ -97,6 +99,7 @@ struct Node
         Childs.push_back(new Node(Name, Value, _Atribute_Name, _Atribute_Value, Multiple));
         return Childs.back();
     }
+    #if defined(UNICODE) || defined (_UNICODE)
     Node* Add_Child(const std::string& Name, const std::string& Value, const std::string& _Atribute_Name, const ZenLib::Ztring& _Atribute_Value, bool Multiple=false)
     {
         return Add_Child(Name, Value, _Atribute_Name, _Atribute_Value.To_UTF8(), Multiple);
@@ -105,6 +108,7 @@ struct Node
     {
         return Add_Child(Name, Value.To_UTF8(), _Atribute_Name, _Atribute_Value, Multiple);
     }
+    #endif //defined(UNICODE) || defined (_UNICODE)
     //Add_Child_IfNotEmpty functions
     Node* Add_Child_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, const std::string& Name, bool Multiple=false)
     {

@@ -265,7 +265,10 @@ void File_Wm::Header_FileProperties()
     //Filling
     if (MaximumBitRate)
         Fill(Stream_General, 0, General_OverallBitRate_Maximum, MaximumBitRate);
-    Fill(Stream_General, 0, General_Encoded_Date, Ztring().Date_From_Milliseconds_1601(CreationDate/10000));
+    Ztring Encoded_Date_New=Ztring().Date_From_Seconds_1601(CreationDate/10000000);
+    const Ztring& Encoded_Date_Old=Retrieve_Const(Stream_General, 0, General_Encoded_Date);
+    if (Encoded_Date_Old.empty() || Encoded_Date_New!=Encoded_Date_Old)
+        Fill(Stream_General, 0, General_Encoded_Date, Encoded_Date_New);
     if (PlayDuration/1000>Preroll)
         Fill(Stream_General, 0, General_Duration, PlayDuration/10000-Preroll);
     FileProperties_Preroll=(int32u)(Preroll);
@@ -1162,7 +1165,12 @@ void File_Wm::Header_ExtendedContentDescription()
             else if (Name==__T("WM/EncoderSettings"))
                 Fill(Stream_General, 0, General_Encoded_Library_Settings, Value);
             else if (Name==__T("WM/EncodingTime"))
-                Fill(Stream_General, 0, General_Encoded_Date, Ztring().Date_From_Seconds_1601(Value_Int64));
+            {
+                 Ztring Encoded_Date_New=Ztring().Date_From_Seconds_1601(Value_Int64/10000000);
+                 const Ztring& Encoded_Date_Old=Retrieve_Const(Stream_General, 0, General_Encoded_Date);
+                 if (Encoded_Date_Old.empty() || Encoded_Date_New!=Encoded_Date_Old)
+                    Fill(Stream_General, 0, General_Encoded_Date, Encoded_Date_New);
+            }
             else if (Name==__T("WM/Genre"))
                 Fill(Stream_General, 0, General_Genre, Value, true); //Clear last value
             else if (Name==__T("WM/GenreID"))

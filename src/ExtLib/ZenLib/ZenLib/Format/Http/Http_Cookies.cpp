@@ -86,7 +86,21 @@ void Cookies::Create_Lines(std::ostream& Out)
         if (Cookie->second.Expires!=(time_t)-1)
         {
             char Temp[200];
-            if (strftime(Temp, 200, "%a, %d-%b-%Y %H:%M:%S GMT", gmtime(&Cookie->second.Expires)))
+            #if defined(HAVE_GMTIME_R)
+            struct tm Gmt_Temp;
+            struct tm *Gmt=gmtime_r(&Cookie->second.Expires, &Gmt_Temp);
+            #elif defined(_MSC_VER)
+            struct tm Gmt_Temp;
+            errno_t gmtime_s_Result=gmtime_s(&Gmt_Temp , &Cookie->second.Expires);
+            struct tm* Gmt=gmtime_s_Result?NULL:&Gmt_Temp;
+            #else
+            #ifdef __GNUC__
+            #warning "This version of ZenLib is not thread safe"
+            #endif
+            struct tm *Gmt=gmtime(&Cookie->second.Expires);
+            #endif
+
+            if (strftime(Temp, 200, "%a, %d-%b-%Y %H:%M:%S GMT", Gmt))
                 Out << "; expires=" << Temp;
         }
         if (!Cookie->second.Path.empty())
