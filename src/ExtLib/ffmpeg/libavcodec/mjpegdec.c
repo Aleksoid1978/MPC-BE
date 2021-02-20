@@ -172,7 +172,7 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
     s->start_code    = -1;
     s->first_picture = 1;
     s->got_picture   = 0;
-    s->org_height    = avctx->coded_height;
+    s->orig_height    = avctx->coded_height;
     avctx->chroma_sample_location = AVCHROMA_LOC_CENTER;
     avctx->colorspace = AVCOL_SPC_BT470BG;
     s->hwaccel_pix_fmt = s->hwaccel_sw_pix_fmt = AV_PIX_FMT_NONE;
@@ -466,8 +466,8 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         /* test interlaced mode */
         if (s->first_picture   &&
             (s->multiscope != 2 || s->avctx->time_base.den >= 25 * s->avctx->time_base.num) &&
-            s->org_height != 0 &&
-            s->height < ((s->org_height * 3) / 4)) {
+            s->orig_height != 0 &&
+            s->height < ((s->orig_height * 3) / 4)) {
             s->interlaced                    = 1;
             s->bottom_field                  = s->interlace_polarity;
             s->picture_ptr->interlaced_frame = 1;
@@ -2606,19 +2606,12 @@ eoi_parser:
 
             frame->pkt_dts = s->pkt->dts;
 
-            if (!s->lossless) {
+            if (!s->lossless && avctx->debug & FF_DEBUG_QP) {
                 int qp = FFMAX3(s->qscale[0],
                                 s->qscale[1],
                                 s->qscale[2]);
-                int qpw = (s->width + 15) / 16;
-                AVBufferRef *qp_table_buf = av_buffer_alloc(qpw);
-                if (qp_table_buf) {
-                    memset(qp_table_buf->data, qp, qpw);
-                    av_frame_set_qp_table(frame, qp_table_buf, 0, FF_QSCALE_TYPE_MPEG1);
-                }
 
-                if(avctx->debug & FF_DEBUG_QP)
-                    av_log(avctx, AV_LOG_DEBUG, "QP: %d\n", qp);
+                av_log(avctx, AV_LOG_DEBUG, "QP: %d\n", qp);
             }
 
             goto the_end;
@@ -2990,7 +2983,7 @@ AVCodec ff_mjpeg_decoder = {
     .profiles       = NULL_IF_CONFIG_SMALL(ff_mjpeg_profiles),
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP |
                       FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM | FF_CODEC_CAP_SETS_PKT_DTS,
-    .hw_configs     = (const AVCodecHWConfigInternal*[]) {
+    .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_MJPEG_NVDEC_HWACCEL
                         HWACCEL_NVDEC(mjpeg),
 #endif

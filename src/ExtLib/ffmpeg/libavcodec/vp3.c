@@ -35,6 +35,7 @@
 #include <string.h>
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
 #include "get_bits.h"
@@ -2873,6 +2874,9 @@ static int theora_decode_header(AVCodecContext *avctx, GetBitContext *gb)
     uint8_t offset_x = 0, offset_y = 0;
     int ret;
     AVRational fps, aspect;
+
+    if (get_bits_left(gb) < 206)
+        return AVERROR_INVALIDDATA;
 
     s->theora_header = 0;
     s->theora = get_bits(gb, 24);

@@ -30,6 +30,7 @@
 #define AVCODEC_MJPEGDEC_H
 
 #include "libavutil/log.h"
+#include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/stereo3d.h"
 
@@ -59,7 +60,7 @@ typedef struct MJpegDecodeContext {
     VLC vlcs[3][4];
     int qscale[4];      ///< quantizer scale calculated from quant_matrixes
 
-    int org_height;  /* size given at codec init */
+    int orig_height;  /* size given at codec init */
     int first_picture;    /* true if decoding first picture */
     int interlaced;     /* true if interlaced */
     int bottom_field;   /* true if bottom field */

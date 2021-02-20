@@ -276,7 +276,7 @@ typedef struct MpegEncContext {
     int mv[2][4][2];
     int field_select[2][2];
     int last_mv[2][2][2];             ///< last MV, used for MV prediction in MPEG-1 & B-frame MPEG-4
-    uint8_t *fcode_tab;               ///< smallest fcode needed for each MV
+    const uint8_t *fcode_tab;         ///< smallest fcode needed for each MV
     int16_t direct_scale_mv[2][64];   ///< precomputed to avoid divisions in ff_mpeg4_set_direct_mv
 
     MotionEstContext me;
@@ -694,7 +694,6 @@ void ff_mpv_common_init_mips(MpegEncContext *s);
 int ff_mpv_common_frame_size_change(MpegEncContext *s);
 void ff_mpv_common_end(MpegEncContext *s);
 
-void ff_mpv_decode_defaults(MpegEncContext *s);
 void ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx);
 void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64]);
 void ff_mpv_report_decode_progress(MpegEncContext *s);

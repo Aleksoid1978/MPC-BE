@@ -580,18 +580,23 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     }
     avctx->internal = avci;
 
+#if FF_API_OLD_ENCDEC
     avci->to_free = av_frame_alloc();
     avci->compat_decode_frame = av_frame_alloc();
     avci->compat_encode_packet = av_packet_alloc();
+    if (!avci->to_free || !avci->compat_decode_frame || !avci->compat_encode_packet) {
+        ret = AVERROR(ENOMEM);
+        goto free_and_end;
+    }
+#endif
     avci->buffer_frame = av_frame_alloc();
     avci->buffer_pkt = av_packet_alloc();
     avci->es.in_frame = av_frame_alloc();
     avci->ds.in_pkt = av_packet_alloc();
     avci->last_pkt_props = av_packet_alloc();
-    if (!avci->compat_decode_frame || !avci->compat_encode_packet ||
-        !avci->buffer_frame || !avci->buffer_pkt          ||
+    if (!avci->buffer_frame || !avci->buffer_pkt          ||
         !avci->es.in_frame  || !avci->ds.in_pkt           ||
-        !avci->to_free      || !avci->last_pkt_props) {
+        !avci->last_pkt_props) {
         ret = AVERROR(ENOMEM);
         goto free_and_end;
     }
@@ -1065,10 +1070,12 @@ FF_ENABLE_DEPRECATION_WARNINGS
     av_freep(&avctx->priv_data);
     av_freep(&avctx->subtitle_header);
 
+#if FF_API_OLD_ENCDEC
     av_frame_free(&avci->to_free);
     av_frame_free(&avci->compat_decode_frame);
-    av_frame_free(&avci->buffer_frame);
     av_packet_free(&avci->compat_encode_packet);
+#endif
+    av_frame_free(&avci->buffer_frame);
     av_packet_free(&avci->buffer_pkt);
     av_packet_free(&avci->last_pkt_props);
 
@@ -1106,8 +1113,10 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     avci->draining_done = 0;
     avci->nb_draining_errors = 0;
     av_frame_unref(avci->buffer_frame);
+#if FF_API_OLD_ENCDEC
     av_frame_unref(avci->compat_decode_frame);
     av_packet_unref(avci->compat_encode_packet);
+#endif
     av_packet_unref(avci->buffer_pkt);
 
     av_packet_unref(avci->last_pkt_props);
@@ -1128,8 +1137,12 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     if (av_codec_is_decoder(avctx->codec))
         av_bsf_flush(avci->bsf);
 
+#if FF_API_OLD_ENCDEC
+FF_DISABLE_DEPRECATION_WARNINGS
     if (!avctx->refcounted_frames)
         av_frame_unref(avci->to_free);
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 }
 
 void avsubtitle_free(AVSubtitle *sub)
@@ -1169,10 +1182,12 @@ av_cold int avcodec_close(AVCodecContext *avctx)
             avctx->codec->close(avctx);
         avctx->internal->byte_buffer_size = 0;
         av_freep(&avctx->internal->byte_buffer);
+#if FF_API_OLD_ENCDEC
         av_frame_free(&avctx->internal->to_free);
         av_frame_free(&avctx->internal->compat_decode_frame);
-        av_frame_free(&avctx->internal->buffer_frame);
         av_packet_free(&avctx->internal->compat_encode_packet);
+#endif
+        av_frame_free(&avctx->internal->buffer_frame);
         av_packet_free(&avctx->internal->buffer_pkt);
         av_packet_free(&avctx->internal->last_pkt_props);
         avpriv_packet_list_free(&avctx->internal->pkt_props,
@@ -1653,14 +1668,10 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
             return 256 * sr / 245;
         else if (id == AV_CODEC_ID_DST)
             return 588 * sr / 44100;
-
-        if (ch > 0) {
-            /* calc from sample rate and channels */
-            if (id == AV_CODEC_ID_BINKAUDIO_DCT) {
-                if (sr / 22050 > 22)
-                    return 0;
-                return (480 << (sr / 22050)) / ch;
-            }
+        else if (id == AV_CODEC_ID_BINKAUDIO_DCT) {
+            if (sr / 22050 > 22)
+                return 0;
+            return (480 << (sr / 22050));
         }
 
         if (id == AV_CODEC_ID_MP3)
@@ -1710,7 +1721,10 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
                 return frame_bytes / (9 * ch) * 16;
             case AV_CODEC_ID_ADPCM_PSX:
             case AV_CODEC_ID_ADPCM_DTK:
-                return frame_bytes / (16 * ch) * 28;
+                frame_bytes /= 16 * ch;
+                if (frame_bytes > INT_MAX / 28)
+                    return 0;
+                return frame_bytes * 28;
             case AV_CODEC_ID_ADPCM_4XM:
             case AV_CODEC_ID_ADPCM_IMA_DAT4:
             case AV_CODEC_ID_ADPCM_IMA_ISS:

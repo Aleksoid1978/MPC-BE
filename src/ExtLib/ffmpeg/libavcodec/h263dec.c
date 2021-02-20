@@ -28,6 +28,8 @@
 #define UNCHECKED_BITSTREAM_READER 1
 
 #include "libavutil/cpu.h"
+#include "libavutil/video_enc_params.h"
+
 #include "avcodec.h"
 #include "error_resilience.h"
 #include "flv.h"
@@ -73,7 +75,6 @@ av_cold int ff_h263_decode_init(AVCodecContext *avctx)
     s->out_format      = FMT_H263;
 
     // set defaults
-    ff_mpv_decode_defaults(s);
     ff_mpv_decode_init(s, avctx);
 
     s->quant_precision = 5;

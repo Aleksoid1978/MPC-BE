@@ -243,6 +243,7 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Only mono and stereo is supported\n");
         return AVERROR(EINVAL);
     }
+    avctx->bits_per_raw_sample =
     s->bps = avctx->bits_per_coded_sample;
     switch (s->bps) {
     case 8:
@@ -1333,7 +1334,7 @@ static void do_apply_filter(APEContext *ctx, int version, APEFilter *f,
             /* Version 3.98 and later files */
 
             /* Update the adaption coefficients */
-            absres = FFABS(res);
+            absres = FFABSU(res);
             if (absres)
                 *f->adaptcoeffs = APESIGN(res) *
                                   (8 << ((absres > f->avg * 3) + (absres > f->avg * 4 / 3)));

@@ -203,9 +203,6 @@ static int alloc_picture_tables(AVCodecContext *avctx, Picture *pic, int encodin
     }
 
     if (out_format == FMT_H263 || encoding ||
-#if FF_API_DEBUG_MV
-        avctx->debug_mv ||
-#endif
         (avctx->export_side_data & AV_CODEC_EXPORT_DATA_MVS)) {
         int mv_size        = 2 * (b8_array_size + 4) * sizeof(int16_t);
         int ref_index_size = 4 * mb_array_size;
@@ -220,6 +217,7 @@ static int alloc_picture_tables(AVCodecContext *avctx, Picture *pic, int encodin
 
     pic->alloc_mb_width  = mb_width;
     pic->alloc_mb_height = mb_height;
+    pic->alloc_mb_stride = mb_stride;
 
     return 0;
 }
@@ -346,6 +344,7 @@ int ff_update_picture_tables(Picture *dst, Picture *src)
 
     dst->alloc_mb_width  = src->alloc_mb_width;
     dst->alloc_mb_height = src->alloc_mb_height;
+    dst->alloc_mb_stride = src->alloc_mb_stride;
 
     return 0;
 }
