@@ -553,11 +553,22 @@ typedef cmsBool  (* _cmsOPToptimizeFn)(cmsPipeline** Lut,
                                        cmsUInt32Number* OutputFormat,
                                        cmsUInt32Number* dwFlags);
 
+// Pipeline Evaluator (in 16 bits)
+typedef void (* _cmsPipelineEval16Fn)(CMSREGISTER const cmsUInt16Number In[],
+                                     CMSREGISTER cmsUInt16Number Out[],
+                                     const void* Data);
+
+// Pipeline Evaluator (in floating point)
+typedef void (* _cmsPipelineEvalFloatFn)(const cmsFloat32Number In[],
+                                         cmsFloat32Number Out[],
+                                         const void* Data);
+
+
 // This function may be used to set the optional evaluator and a block of private data. If private data is being used, an optional
 // duplicator and free functions should also be specified in order to duplicate the LUT construct. Use NULL to inhibit such functionality.
 
 CMSAPI void CMSEXPORT _cmsPipelineSetOptimizationParameters(cmsPipeline* Lut,
-                                               _cmsInterpFn16 Eval16,
+                                               _cmsPipelineEval16Fn Eval16,
                                                void* PrivateData,
                                                _cmsFreeUserDataFn FreePrivateDataFn,
                                                _cmsDupUserDataFn DupPrivateDataFn);

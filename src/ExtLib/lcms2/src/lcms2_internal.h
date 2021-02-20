@@ -908,13 +908,7 @@ cmsStage*                          _cmsStageClipNegatives(cmsContext ContextID, 
 
 
 // For curve set only
-cmsToneCurve**     _cmsStageGetPtrToCurveSet(const cmsStage* mpe);
-
-
-// Pipeline Evaluator (in floating point)
-typedef void (* _cmsPipelineEvalFloatFn)(const cmsFloat32Number In[],
-                                         cmsFloat32Number Out[],
-                                         const void* Data);
+cmsToneCurve**  _cmsStageGetPtrToCurveSet(const cmsStage* mpe);
 
 struct _cmsPipeline_struct {
 
@@ -924,7 +918,7 @@ struct _cmsPipeline_struct {
     // Data & evaluators
     void *Data;
 
-    _cmsInterpFn16         Eval16Fn;
+   _cmsPipelineEval16Fn    Eval16Fn;
    _cmsPipelineEvalFloatFn EvalFloatFn;
    _cmsFreeUserDataFn      FreeDataFn;
    _cmsDupUserDataFn       DupDataFn;

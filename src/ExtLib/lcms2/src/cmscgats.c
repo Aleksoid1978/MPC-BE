@@ -1496,6 +1496,14 @@ cmsBool CMSEXPORT cmsIT8SetDataFormat(cmsHANDLE  h, int n, const char *Sample)
     return SetDataFormat(it8, n, Sample);
 }
 
+// A safe atoi that returns 0 when NULL input is given
+static
+cmsInt32Number satoi(const char* b)
+{
+    if (b == NULL) return 0;
+    return atoi(b);
+}
+
 static
 void AllocateDataSet(cmsIT8* it8)
 {
@@ -1503,8 +1511,8 @@ void AllocateDataSet(cmsIT8* it8)
 
     if (t -> Data) return;    // Already allocated
 
-    t-> nSamples   = atoi(cmsIT8GetProperty(it8, "NUMBER_OF_FIELDS"));
-    t-> nPatches   = atoi(cmsIT8GetProperty(it8, "NUMBER_OF_SETS"));
+    t-> nSamples   = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_FIELDS"));
+    t-> nPatches   = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_SETS"));
 
     if (t -> nSamples < 0 || t->nSamples > 0x7ffe || t->nPatches < 0 || t->nPatches > 0x7ffe)
     {
@@ -1677,11 +1685,11 @@ void WriteHeader(cmsIT8* it8, SAVESTREAM* fp)
                     break;
 
             case WRITE_HEXADECIMAL:
-                    Writef(fp, "\t0x%X", atoi(p ->Value));
+                    Writef(fp, "\t0x%X", satoi(p ->Value));
                     break;
 
             case WRITE_BINARY:
-                    Writef(fp, "\t0x%B", atoi(p ->Value));
+                    Writef(fp, "\t0x%B", satoi(p ->Value));
                     break;
 
             case WRITE_PAIR:
@@ -1710,7 +1718,7 @@ void WriteDataFormat(SAVESTREAM* fp, cmsIT8* it8)
 
        WriteStr(fp, "BEGIN_DATA_FORMAT\n");
        WriteStr(fp, " ");
-       nSamples = atoi(cmsIT8GetProperty(it8, "NUMBER_OF_FIELDS"));
+       nSamples = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_FIELDS"));
 
        for (i = 0; i < nSamples; i++) {
 
@@ -1733,7 +1741,7 @@ void WriteData(SAVESTREAM* fp, cmsIT8* it8)
 
        WriteStr (fp, "BEGIN_DATA\n");
 
-       t->nPatches = atoi(cmsIT8GetProperty(it8, "NUMBER_OF_SETS"));
+       t->nPatches = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_SETS"));
 
        for (i = 0; i < t-> nPatches; i++) {
 

@@ -978,7 +978,7 @@ cmsToneCurve* CMSEXPORT cmsJoinToneCurve(cmsContext ContextID,
     //Iterate
     for (i=0; i <  nResultingPoints; i++) {
 
-        t = (cmsFloat32Number) i / (nResultingPoints-1);
+        t = (cmsFloat32Number) i / (cmsFloat32Number)(nResultingPoints-1);
         x = cmsEvalToneCurveFloat(X,  t);
         Res[i] = cmsEvalToneCurveFloat(Yreversed, x);
     }
