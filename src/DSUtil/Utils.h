@@ -98,6 +98,7 @@ bool StrToInt32(const wchar_t* str, int32_t& value);
 bool StrToUInt32(const wchar_t* str, uint32_t& value);
 bool StrToInt64(const wchar_t* str, int64_t& value);
 bool StrToUInt64(const wchar_t* str, uint64_t& value);
+bool StrHexToUInt64(const wchar_t* str, uint64_t& value);
 bool StrToDouble(const wchar_t* str, double& value);
 
 CStringW HR2Str(const HRESULT hr);

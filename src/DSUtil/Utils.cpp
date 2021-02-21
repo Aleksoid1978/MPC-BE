@@ -265,6 +265,17 @@ bool StrToUInt64(const wchar_t* str, uint64_t& value)
 	return false;
 }
 
+bool StrHexToUInt64(const wchar_t* str, uint64_t& value)
+{
+	wchar_t* end;
+	uint64_t v = wcstoull(str, &end, 16);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
 bool StrToDouble(const wchar_t* str, double& value)
 {
 	wchar_t* end;
