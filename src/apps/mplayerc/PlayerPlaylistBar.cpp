@@ -2877,7 +2877,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	rcText.left += (3 + offset);
 	rcText.right -= 6;
-	pDC->DrawTextW(file, &rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+	pDC->DrawTextW(file, &rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
 
 	pDC->RestoreDC(oldDC);
 }
