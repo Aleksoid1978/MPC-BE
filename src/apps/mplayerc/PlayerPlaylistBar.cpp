@@ -804,7 +804,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	}
 
 	m_list.CreateEx(
-		0,//less margins//WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE,
+		0, //less margins//WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE,
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP
 		| LVS_OWNERDRAWFIXED
 		| LVS_NOCOLUMNHEADER
@@ -3225,6 +3225,12 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 	}
 
 	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)800);
+
+	static auto wndStyle = ::GetWindowLongPtrW(pNMHDR->hwndFrom, GWL_STYLE);
+	if ((wndStyle & TTS_NOPREFIX) == 0) {
+		wndStyle |= TTS_NOPREFIX;
+		::SetWindowLongPtrW(pNMHDR->hwndFrom, GWL_STYLE, wndStyle);
+	}
 
 	pTTT->lpszText = (LPWSTR)strTipText.GetString();
 
