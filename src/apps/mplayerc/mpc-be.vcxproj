@@ -107,6 +107,7 @@
     <ClCompile Include="filters\ChaptersSouce.cpp" />
     <ClCompile Include="filters\DeinterlacerFilter.cpp" />
     <ClCompile Include="filters\TextPassThruFilter.cpp" />
+    <ClCompile Include="HistoryFile.cpp" />
     <ClCompile Include="ItemPropertiesDlg.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="OSD.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="filters\ChaptersSouce.h" />
     <ClInclude Include="filters\DeinterlacerFilter.h" />
     <ClInclude Include="filters\TextPassThruFilter.h" />
+    <ClInclude Include="HistoryFile.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="OSD.h" />

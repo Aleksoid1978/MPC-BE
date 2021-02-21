@@ -417,6 +417,9 @@
     <ClCompile Include="AddCommandDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -799,6 +802,9 @@
     </ClInclude>
     <ClInclude Include="AddCommandDlg.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryFile.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
