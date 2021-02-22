@@ -46,7 +46,7 @@ struct SessionInfo_t {
 class CHistoryFile
 {
 private:
-	std::recursive_mutex m_Mutex;
+	std::mutex m_Mutex;
 
 	CStringW m_filename;
 	std::list<SessionInfo_t> m_SessionInfos;

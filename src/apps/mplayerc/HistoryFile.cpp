@@ -174,14 +174,13 @@ bool CHistoryFile::WriteFile()
 		for (const auto& sesInfo : m_SessionInfos) {
 			str.Format(L"[%03d]\n", i++);
 
-			if (sesInfo.Path.GetLength()) {
-				str.AppendFormat(L"Path=%s\n", sesInfo.Path);
-			}
 			if (sesInfo.Title.GetLength()) {
 				str.AppendFormat(L"Title=%s\n", sesInfo.Title);
 			}
 
 			if (sesInfo.DVDId) {
+				// We do not write the path here, because it may be the same for different DVDs.
+				// The path must be recorded in a separate section to be displayed in the recent files menu.
 				str.AppendFormat(L"DVDId=%016x\n", sesInfo.DVDId);
 
 				if (sesInfo.DVDTitle) {
@@ -193,6 +192,8 @@ bool CHistoryFile::WriteFile()
 				}
 			}
 			else if (sesInfo.Path.GetLength()) {
+				str.AppendFormat(L"Path=%s\n", sesInfo.Path);
+
 				if (sesInfo.Position > UNITS) {
 					LONGLONG seconds = sesInfo.Position / UNITS;
 					int h = (int)(seconds / 3600);
@@ -231,14 +232,14 @@ bool CHistoryFile::WriteFile()
 
 void CHistoryFile::SetFilename(CStringW& filename)
 {
-	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	m_filename = filename;
 }
 
 bool CHistoryFile::Clear()
 {
-	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	if (_wremove(m_filename) == 0) {
 		m_SessionInfos.clear();
@@ -249,7 +250,7 @@ bool CHistoryFile::Clear()
 
 bool CHistoryFile::GetSessionInfo(SessionInfo_t& sesInfo)
 {
-	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	ReadFile();
 
@@ -287,7 +288,7 @@ bool CHistoryFile::GetSessionInfo(SessionInfo_t& sesInfo)
 
 void CHistoryFile::GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count)
 {
-	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	recentSessions.clear();
 	ReadFile();
@@ -306,7 +307,7 @@ void CHistoryFile::GetRecentSessions(std::vector<SessionInfo_t>& recentSessions,
 
 void CHistoryFile::SetSessionInfo(SessionInfo_t& sesInfo)
 {
-	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	ReadFile();
 
