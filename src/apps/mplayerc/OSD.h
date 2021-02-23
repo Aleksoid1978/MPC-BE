@@ -113,7 +113,7 @@ private:
 	CComPtr<IMadVRTextOsd>       m_pMVTO;
 
 	CMainFrame*			m_pMainFrame;
-	CWnd*				m_pWnd;
+	CWnd*				m_pWnd = nullptr;
 
 	CCritSec			m_Lock;
 	CDC					m_MemDC;
@@ -128,11 +128,10 @@ private:
 	CBrush	m_brushChapter;
 	CPen	m_debugPenBorder;
 	CBrush	m_debugBrushBack;
-	int		m_FontSize;
+	int		m_FontSize = 0;
 	CString	m_OSD_Font;
 
-	CRect		m_rectWnd;
-	COLORREF	m_Color[OSD_LAST];
+	CRect	m_rectWnd;
 
 	CRect	m_rectSeekBar;
 	CRect	m_rectFlyBar;
@@ -145,25 +144,25 @@ private:
 
 	CRect	m_rectCursor;
 	CRect	m_rectBar;
-	bool	m_bCursorMoving;
-	bool	m_bSeekBarVisible;
-	bool	m_bFlyBarVisible;
-	bool	m_bMouseOverCloseButton;
-	bool	m_bMouseOverExitButton;
+	bool	m_bCursorMoving   = false;
+	bool	m_bSeekBarVisible = false;
+	bool	m_bFlyBarVisible  = false;
+	bool	m_bMouseOverCloseButton = false;
+	bool	m_bMouseOverExitButton  = false;
 
 	__int64	m_llSeekStop = 0;
-	__int64	m_llSeekPos = 0;
+	__int64	m_llSeekPos  = 0;
 
-	bool	m_bShowMessage;
+	bool	m_bShowMessage = true;
 
 	CRect	m_MainWndRect;
 
 	const CWnd*		m_pWndInsertAfter;
 
-	OSD_TYPE		m_OSDType;
+	OSD_TYPE		m_OSDType = OSD_TYPE_NONE;
 
 	CString			m_strMessage;
-	OSD_MESSAGEPOS	m_nMessagePos;
+	OSD_MESSAGEPOS	m_nMessagePos = OSD_NOMESSAGE;
 	std::list<CString> m_debugMessages;
 
 	CCritSec				m_CBLock;

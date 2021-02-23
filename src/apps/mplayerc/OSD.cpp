@@ -33,21 +33,16 @@
 #define SLIDER_CHAP_HEIGHT   10
 #define SLIDER_CHAP_WIDTH    4
 
+#define OSD_COLOR_TRANSPARENT RGB(  0,   0,   0)
+#define OSD_COLOR_BACKGROUND  RGB( 32,  40,  48)
+#define OSD_COLOR_BORDER      RGB( 48,  56,  62)
+#define OSD_COLOR_TEXT        RGB(224, 224, 224)
+#define OSD_COLOR_BAR         RGB( 64,  72,  80)
+#define OSD_COLOR_CURSOR      RGB(192, 200, 208)
+#define OSD_COLOR_DEBUGCLR    RGB(128, 136, 144)
+
 COSD::COSD(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_nMessagePos(OSD_NOMESSAGE)
-	, m_bSeekBarVisible(false)
-	, m_bFlyBarVisible(false)
-	, m_bCursorMoving(false)
-	, m_pMFVMB(nullptr)
-	, m_pMVTO(nullptr)
-	, m_pWnd(nullptr)
-	, m_FontSize(0)
-	, m_bMouseOverExitButton(false)
-	, m_bMouseOverCloseButton(false)
-	, m_bShowMessage(true)
-	, m_OSDType(OSD_TYPE_NONE)
-	, m_pChapterBag(nullptr)
 	, m_pWndInsertAfter(&wndNoTopMost)
 	, m_nDEFFLAGS(SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS | SWP_NOZORDER)
 {
@@ -57,21 +52,13 @@ COSD::COSD(CMainFrame* pMainFrame)
 		m_pWndInsertAfter = &wndTop;
 	}
 
-	m_Color[OSD_TRANSPARENT]	= RGB(  0,   0,   0);
-	m_Color[OSD_BACKGROUND]		= RGB( 32,  40,  48);
-	m_Color[OSD_BORDER]			= RGB( 48,  56,  62);
-	m_Color[OSD_TEXT]			= RGB(224, 224, 224);
-	m_Color[OSD_BAR]			= RGB( 64,  72,  80);
-	m_Color[OSD_CURSOR]			= RGB(192, 200, 208);
-	m_Color[OSD_DEBUGCLR]		= RGB(128, 136, 144);
-
-	m_penBorder.CreatePen(PS_SOLID, 1, m_Color[OSD_BORDER]);
-	m_penCursor.CreatePen(PS_SOLID, 4, m_Color[OSD_CURSOR]);
-	m_brushBack.CreateSolidBrush(m_Color[OSD_BACKGROUND]);
-	m_brushBar.CreateSolidBrush (m_Color[OSD_BAR]);
-	m_brushChapter.CreateSolidBrush(m_Color[OSD_CURSOR]);
-	m_debugBrushBack.CreateSolidBrush(m_Color[OSD_DEBUGCLR]);
-	m_debugPenBorder.CreatePen(PS_SOLID, 1, m_Color[OSD_BORDER]);
+	m_penBorder.CreatePen(PS_SOLID, 1, OSD_COLOR_BORDER);
+	m_penCursor.CreatePen(PS_SOLID, 4, OSD_COLOR_CURSOR);
+	m_brushBack.CreateSolidBrush(OSD_COLOR_BACKGROUND);
+	m_brushBar.CreateSolidBrush (OSD_COLOR_BAR);
+	m_brushChapter.CreateSolidBrush(OSD_COLOR_CURSOR);
+	m_debugBrushBack.CreateSolidBrush(OSD_COLOR_DEBUGCLR);
+	m_debugPenBorder.CreatePen(PS_SOLID, 1, OSD_COLOR_BORDER);
 
 	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
 }
@@ -187,13 +174,13 @@ void COSD::UpdateBitmap()
 				m_MFVAlphaBitmap.GetBitmapFromDC  = TRUE;
 				m_MFVAlphaBitmap.bitmap.hdc       = m_MemDC;
 				m_MFVAlphaBitmap.params.dwFlags   = MFVideoAlphaBitmap_SrcColorKey;
-				m_MFVAlphaBitmap.params.clrSrcKey = m_Color[OSD_TRANSPARENT];
+				m_MFVAlphaBitmap.params.clrSrcKey = OSD_COLOR_TRANSPARENT;
 				m_MFVAlphaBitmap.params.rcSrc     = m_rectWnd;
 				m_MFVAlphaBitmap.params.nrcDest   = { 0, 0, 1, 1 };
 				m_MFVAlphaBitmap.params.fAlpha    = 1.0;
 			}
 
-			m_MemDC.SetTextColor(m_Color[OSD_TEXT]);
+			m_MemDC.SetTextColor(OSD_COLOR_TEXT);
 			m_MemDC.SetBkMode(TRANSPARENT);
 		}
 
