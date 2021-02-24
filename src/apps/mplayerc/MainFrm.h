@@ -463,7 +463,6 @@ public:
 	void StartWebServer(int nPort);
 	void StopWebServer();
 
-	CString GetStatusMessage();
 	PMODE GetPlaybackMode() const {
 		return m_ePlaybackMode;
 	}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -793,7 +793,7 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 
 	CPath file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
 
-	CString status;// = m_pMainFrame->GetStatusMessage();
+	CString status;
 	OAFilterState fs = m_pMainFrame->GetMediaState();
 	switch (fs) {
 		case State_Stopped:

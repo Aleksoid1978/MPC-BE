@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,6 +45,7 @@ private:
 	CFont m_font;
 
 	CMenu m_TimeMenu;
+	CStatusLabel m_status;
 
 public:
 	CPlayerStatusBar(CMainFrame* pMainFrame);
@@ -58,7 +59,6 @@ public:
 	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool bShowMilliSecs, const GUID& timeFormat);
 
 	CString GetStatusTimer();
-	CString GetStatusMessage();
 
 	void ShowTimer(bool fShow);
 
@@ -69,7 +69,6 @@ public:
 	void ScaleFont();
 	void SetMenu();
 
-	CStatusLabel m_status;
 	void Relayout();
 
 	DECLARE_MESSAGE_MAP()

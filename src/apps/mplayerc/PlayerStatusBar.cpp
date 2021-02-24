@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -219,14 +219,6 @@ CString CPlayerStatusBar::GetStatusTimer()
 	return strResult;
 }
 
-CString CPlayerStatusBar::GetStatusMessage()
-{
-	CString strResult;
-	m_status.GetWindowTextW(strResult);
-
-	return strResult;
-}
-
 void CPlayerStatusBar::SetStatusTimer(CString str)
 {
 	if (GetStatusTimer() != str) {
@@ -426,7 +418,7 @@ void CPlayerStatusBar::OnPaint()
 			memdc.DrawText(str, strlen, &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 		}
 
-		str = GetStatusMessage();
+		m_status.GetWindowTextW(str);
 		strlen = str.GetLength();
 
 		if (strlen > 0) {

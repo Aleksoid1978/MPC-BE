@@ -17356,13 +17356,6 @@ void CMainFrame::StopWebServer()
 	}
 }
 
-CString CMainFrame::GetStatusMessage()
-{
-	CString str;
-	m_wndStatusBar.m_status.GetWindowTextW(str);
-	return str;
-}
-
 void CMainFrame::SendStatusMessage(const CString& msg, const int nTimeOut)
 {
 	KillTimer(TIMER_STATUSERASER);
