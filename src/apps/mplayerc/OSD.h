@@ -133,7 +133,10 @@ class COSD : public CWnd, public CDPI
 	__int64 m_llSeekPos  = 0;
 	CRect   m_rectSeekBar;
 	CRect   m_rectSlider;
+	CRect   m_rectPosText;
 	CRect   m_rectCursor;
+	int     m_SeekbarTextHeight = 0;
+	CFont   m_SeekbarFont;
 	CComPtr<IDSMChapterBag> m_pChapterBag;
 
 	int SliderCursorHeight = 0;
