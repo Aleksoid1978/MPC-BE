@@ -66,6 +66,83 @@ class COSD : public CWnd, public CDPI
 		IMG_CLOSE_A = 24,
 	};
 
+	CComPtr<IMFVideoMixerBitmap> m_pMFVMB;
+	CComPtr<IMadVRTextOsd>       m_pMVTO;
+
+	CMainFrame*			m_pMainFrame;
+	CWnd*				m_pWnd = nullptr;
+
+	CCritSec			m_Lock;
+	CDC					m_MemDC;
+	MFVideoAlphaBitmap	m_MFVAlphaBitmap;
+	BITMAP				m_BitmapInfo;
+
+	CString	m_OSD_Font;
+	int		m_FontSize = 0;
+
+	CFont	m_MainFont;
+	CPen	m_penBorder;
+	CPen	m_penCursor;
+	CBrush	m_brushBack;
+	CBrush	m_brushBar;
+	CBrush	m_brushChapter;
+	CPen	m_debugPenBorder;
+	CBrush	m_debugBrushBack;
+
+	CRect	m_rectWnd;
+
+	CRect	m_rectFlyBar;
+	CRect	m_rectCloseButton;
+	CRect	m_rectExitButton;
+
+	CImageList *m_pButtonImages = nullptr;
+	int		m_nButtonHeight;
+	int		m_externalFlyBarHeight = 0;
+
+	bool	m_bCursorMoving   = false;
+	bool	m_bSeekBarVisible = false;
+	bool	m_bFlyBarVisible  = false;
+	bool	m_bMouseOverCloseButton = false;
+	bool	m_bMouseOverExitButton  = false;
+
+	bool	m_bShowMessage = true;
+
+	CRect	m_MainWndRect;
+
+	const CWnd*		m_pWndInsertAfter;
+
+	OSD_TYPE		m_OSDType = OSD_TYPE_NONE;
+
+	CString			m_strMessage;
+	OSD_MESSAGEPOS	m_nMessagePos = OSD_NOMESSAGE;
+	std::list<CString> m_debugMessages;
+
+	CCritSec		m_CBLock;
+
+	UINT m_nDEFFLAGS;
+
+	CRect          m_MainWndRectCashed;
+	CString        m_strMessageCashed;
+	OSD_MESSAGEPOS m_nMessagePosCashed = OSD_NOMESSAGE;
+	CString        m_OSD_FontCashed;
+	int            m_FontSizeCashed = 0;
+	bool           m_bFontAACashed = false;
+
+	// Seekbar
+	__int64 m_llSeekStop = 0;
+	__int64 m_llSeekPos  = 0;
+	CRect   m_rectSeekBar;
+	CRect   m_rectBar;
+	CRect   m_rectCursor;
+	CComPtr<IDSMChapterBag> m_pChapterBag;
+
+	int SeekBarHeight      = 0;
+	int SliderBarHeight    = 0;
+	int SliderCursorHeight = 0;
+	int SliderCursorWidth  = 0;
+	int SliderChapHeight   = 0;
+	int SliderChapWidth    = 0;
+
 public:
 	COSD(CMainFrame* pMainFrame);
 	~COSD();
@@ -109,79 +186,12 @@ public:
 	DECLARE_DYNAMIC(COSD)
 
 private:
-	CComPtr<IMFVideoMixerBitmap> m_pMFVMB;
-	CComPtr<IMadVRTextOsd>       m_pMVTO;
-
-	CMainFrame*			m_pMainFrame;
-	CWnd*				m_pWnd = nullptr;
-
-	CCritSec			m_Lock;
-	CDC					m_MemDC;
-	MFVideoAlphaBitmap	m_MFVAlphaBitmap;
-	BITMAP				m_BitmapInfo;
-
-	CFont	m_MainFont;
-	CPen	m_penBorder;
-	CPen	m_penCursor;
-	CBrush	m_brushBack;
-	CBrush	m_brushBar;
-	CBrush	m_brushChapter;
-	CPen	m_debugPenBorder;
-	CBrush	m_debugBrushBack;
-	int		m_FontSize = 0;
-	CString	m_OSD_Font;
-
-	CRect	m_rectWnd;
-
-	CRect	m_rectSeekBar;
-	CRect	m_rectFlyBar;
-	CRect	m_rectCloseButton;
-	CRect	m_rectExitButton;
-
-	CImageList *m_pButtonImages = nullptr;
-	int		m_nButtonHeight;
-	int		m_externalFlyBarHeight = 0;
-
-	CRect	m_rectCursor;
-	CRect	m_rectBar;
-	bool	m_bCursorMoving   = false;
-	bool	m_bSeekBarVisible = false;
-	bool	m_bFlyBarVisible  = false;
-	bool	m_bMouseOverCloseButton = false;
-	bool	m_bMouseOverExitButton  = false;
-
-	__int64	m_llSeekStop = 0;
-	__int64	m_llSeekPos  = 0;
-
-	bool	m_bShowMessage = true;
-
-	CRect	m_MainWndRect;
-
-	const CWnd*		m_pWndInsertAfter;
-
-	OSD_TYPE		m_OSDType = OSD_TYPE_NONE;
-
-	CString			m_strMessage;
-	OSD_MESSAGEPOS	m_nMessagePos = OSD_NOMESSAGE;
-	std::list<CString> m_debugMessages;
-
-	CCritSec				m_CBLock;
-	CComPtr<IDSMChapterBag> m_pChapterBag;
-
-	UINT m_nDEFFLAGS;
-
-	CRect          m_MainWndRectCashed;
-	CString        m_strMessageCashed;
-	OSD_MESSAGEPOS m_nMessagePosCashed = OSD_NOMESSAGE;
-	CString        m_OSD_FontCashed;
-	int            m_FontSizeCashed = 0;
-	bool           m_bFontAACashed = false;
-
 	void UpdateBitmap();
-	void CalcRect();
+	void CalcSeekbar();
+	void CalcFlybar();
 	void UpdateSeekBarPos(CPoint point);
-	void DrawSlider();
-	void DrawFlyBar();
+	void DrawSeekbar();
+	void DrawFlybar();
 	void DrawRect(CRect& rect, CBrush* pBrush = nullptr, CPen* pPen = nullptr);
 	void InvalidateBitmapOSD();
 	void DrawMessage();
@@ -192,13 +202,6 @@ private:
 	void DrawWnd();
 
 	void GradientFill(CDC* pDc, CRect* rc);
-
-	int SeekBarHeight      = 0;
-	int SliderBarHeight    = 0;
-	int SliderCursorHeight = 0;
-	int SliderCursorWidth  = 0;
-	int SliderChapHeight   = 0;
-	int SliderChapWidth    = 0;
 
 	void CreateFontInternal();
 

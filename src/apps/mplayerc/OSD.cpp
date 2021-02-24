@@ -131,7 +131,9 @@ void COSD::OnSize(UINT nType, int cx, int cy)
 			m_bFlyBarVisible	= false;
 		}
 
-		CalcRect();
+		CalcSeekbar();
+		CalcFlybar();
+
 		InvalidateBitmapOSD();
 		UpdateBitmap();
 	}
@@ -200,7 +202,8 @@ void COSD::Reset()
 	m_MainWndRect.SetRectEmpty();
 	m_strMessage.Empty();
 
-	CalcRect();
+	CalcSeekbar();
+	CalcFlybar();
 }
 
 void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
@@ -262,7 +265,7 @@ void COSD::Stop()
 	Reset();
 }
 
-void COSD::CalcRect()
+void COSD::CalcSeekbar()
 {
 	if (m_pWnd) {
 		SeekBarHeight      = ScaleY(SEEKBAR_HEIGHT);
@@ -274,10 +277,17 @@ void COSD::CalcRect()
 
 		m_pWnd->GetClientRect(&m_rectWnd);
 
-		m_rectSeekBar.left       = m_rectWnd.left        + 10;
-		m_rectSeekBar.right      = m_rectWnd.right       - 10;
-		m_rectSeekBar.top        = m_rectWnd.bottom      - SeekBarHeight;
-		m_rectSeekBar.bottom     = m_rectSeekBar.top     + SeekBarHeight;
+		m_rectSeekBar.left   = m_rectWnd.left    + 10;
+		m_rectSeekBar.right  = m_rectWnd.right   - 10;
+		m_rectSeekBar.top    = m_rectWnd.bottom  - SeekBarHeight;
+		m_rectSeekBar.bottom = m_rectSeekBar.top + SeekBarHeight;
+	}
+}
+
+void COSD::CalcFlybar()
+{
+	if (m_pWnd) {
+		m_pWnd->GetClientRect(&m_rectWnd);
 
 		m_rectFlyBar.left        = m_rectWnd.left;
 		m_rectFlyBar.right       = m_rectWnd.right;
@@ -313,7 +323,7 @@ void COSD::DrawRect(CRect& rect, CBrush* pBrush, CPen* pPen)
 	m_MemDC.Rectangle(rect);
 }
 
-void COSD::DrawSlider()
+void COSD::DrawSeekbar()
 {
 	m_rectBar.left   = m_rectSeekBar.left  + 10;
 	m_rectBar.right  = m_rectSeekBar.right - 10;
@@ -332,6 +342,15 @@ void COSD::DrawSlider()
 
 	DrawRect(m_rectSeekBar, &m_brushBack, &m_penBorder);
 	DrawRect(m_rectBar, &m_brushBar);
+
+#if 0
+	CRect textrect(m_rectBar.left + m_rectBar.Width() / 2, m_rectSeekBar.top, m_rectBar.right, m_rectBar.top);
+	CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);
+
+	//m_MemDC.SelectObject(m_SeekbarFont); // TODO
+	m_MemDC.SetTextColor(OSD_COLOR_CURSOR);
+	m_MemDC.DrawText(text, &textrect, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+#endif
 
 	if (AfxGetAppSettings().fChapterMarker) {
 		CAutoLock lock(&m_CBLock);
@@ -360,7 +379,7 @@ void COSD::DrawSlider()
 	DrawRect(m_rectCursor, nullptr, &m_penCursor);
 }
 
-void COSD::DrawFlyBar()
+void COSD::DrawFlybar()
 {
 	const int nImageExit = m_bMouseOverExitButton ? IMG_EXIT_A : IMG_EXIT;
 	const int nImageClose = m_bMouseOverCloseButton ? IMG_CLOSE_A : IMG_CLOSE;
@@ -379,7 +398,7 @@ void COSD::DrawMessage()
 		CRect rectText(0, 0, 0, 0);
 		CRect rectMessages;
 
-		m_MemDC.DrawText(m_strMessage, &rectText, DT_CALCRECT);
+		m_MemDC.DrawText(m_strMessage, &rectText, DT_CALCRECT | DT_NOPREFIX);
 		rectText.InflateRect(20, 10);
 		switch (m_nMessagePos) {
 			case OSD_TOPLEFT :
@@ -439,7 +458,7 @@ void COSD::DrawDebug()
 
 		CRect rectText(0, 0, 0, 0);
 		CRect rectMessages;
-		m_MemDC.DrawText(msg, &rectText, DT_CALCRECT);
+		m_MemDC.DrawText(msg, &rectText, DT_CALCRECT | DT_NOPREFIX);
 		rectText.InflateRect(20, 10);
 
 		int l, r, t, b;
@@ -449,7 +468,7 @@ void COSD::DrawDebug()
 		b = (m_rectWnd.Height() >> 1) + (rectText.Height() >> 1) + 10;
 		rectMessages = CRect(l, t, r, b);
 		DrawRect(rectMessages, &m_debugBrushBack, &m_debugPenBorder);
-		m_MemDC.DrawText(msg, &rectMessages, DT_CENTER | DT_VCENTER);
+		m_MemDC.DrawText(msg, &rectMessages, DT_CENTER | DT_VCENTER | DT_NOPREFIX);
 	}
 }
 
@@ -464,10 +483,10 @@ void COSD::InvalidateBitmapOSD()
 	memsetd(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3));
 
 	if (m_bSeekBarVisible) {
-		DrawSlider();
+		DrawSeekbar();
 	}
 	if (m_bFlyBarVisible) {
-		DrawFlyBar();
+		DrawFlybar();
 	}
 
 	DrawMessage();
@@ -887,7 +906,7 @@ void COSD::DrawWnd()
 	}
 
 	CRect rectText;
-	temp_DC.DrawText(m_strMessage, &rectText, DT_CALCRECT);
+	temp_DC.DrawText(m_strMessage, &rectText, DT_CALCRECT | DT_NOPREFIX);
 	rectText.right = messageWidth;
 	rectText.InflateRect(0, 0, 10, 10);
 
