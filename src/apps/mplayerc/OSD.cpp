@@ -287,6 +287,25 @@ void COSD::CalcSeekbar()
 		m_rectSlider.right  = m_rectSeekBar.right - 8;
 		m_rectSlider.top    = m_rectSeekBar.top   + (m_rectSeekBar.Height() - SliderBarHeight) / 2;
 		m_rectSlider.bottom = m_rectSlider.top + SliderBarHeight;
+
+		m_rectPosText.SetRect(m_rectSlider.left + m_rectSlider.Width() / 2, m_rectSeekBar.top, m_rectSlider.right, m_rectSlider.top);
+
+
+		if (m_SeekbarTextHeight != m_rectPosText.Height() || !m_SeekbarFont.GetSafeHandle()) {
+			if (m_SeekbarFont.GetSafeHandle()) {
+				m_SeekbarFont.DeleteObject();
+			}
+
+			m_SeekbarTextHeight = m_rectPosText.Height();
+
+			LOGFONT lf = {};
+			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+			lf.lfHeight = -MulDiv(m_SeekbarTextHeight, 72, 96);
+			lf.lfQuality = DEFAULT_QUALITY;
+			wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
+
+			m_SeekbarFont.CreateFontIndirectW(&lf);
+		}
 	}
 }
 
@@ -344,14 +363,13 @@ void COSD::DrawSeekbar()
 	DrawRect(m_rectSeekBar, &m_brushBack, &m_penBorder);
 	DrawRect(m_rectSlider, &m_brushBar);
 
-#if 0
-	CRect textrect(m_rectBar.left + m_rectBar.Width() / 2, m_rectSeekBar.top, m_rectBar.right, m_rectBar.top);
-	CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);
+	if (m_SeekbarFont.GetSafeHandle()) {
+		CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);
 
-	//m_MemDC.SelectObject(m_SeekbarFont); // TODO
-	m_MemDC.SetTextColor(OSD_COLOR_CURSOR);
-	m_MemDC.DrawText(text, &textrect, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-#endif
+		m_MemDC.SelectObject(m_SeekbarFont);
+		m_MemDC.SetTextColor(OSD_COLOR_CURSOR);
+		m_MemDC.DrawText(text, &m_rectPosText, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+	}
 
 	if (AfxGetAppSettings().fChapterMarker) {
 		CAutoLock lock(&m_CBLock);
