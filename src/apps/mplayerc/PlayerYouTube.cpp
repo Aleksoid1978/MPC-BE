@@ -781,8 +781,6 @@ namespace Youtube
 									}
 
 									if (!funcList.empty() && !funcCodeList.empty()) {
-										funcGroup += '.';
-
 										for (const auto& func : funcList) {
 											int funcArg = 0;
 											const CStringA funcArgs = GetEntry(func, "(", ")");
@@ -797,7 +795,16 @@ namespace Youtube
 												}
 											}
 
-											CStringA funcName = GetEntry(func, funcGroup, "(");
+											CStringA funcName = GetEntry(func, funcGroup + '.', "(");
+											if (funcName.IsEmpty()) {
+												funcName = GetEntry(func, funcGroup, "(");
+												if (funcName.IsEmpty()) {
+													continue;
+												}
+											}
+											if (funcName.Find("[") != -1) {
+												funcName.Replace("[", ""); funcName.Replace("]", "");
+											}
 											funcName += ":function";
 
 											auto funcType = youtubeFuncType::funcNONE;
