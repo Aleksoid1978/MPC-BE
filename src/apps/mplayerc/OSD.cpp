@@ -124,7 +124,7 @@ void COSD::OnDrawWnd()
 
 void COSD::OnSize(UINT nType, int cx, int cy)
 {
-	if (m_pWnd && (m_pMFVMB)) {
+	if (m_pWnd && m_pMFVMB) {
 		if (m_bSeekBarVisible || m_bFlyBarVisible) {
 			m_bCursorMoving		= false;
 			m_bSeekBarVisible	= false;
@@ -267,20 +267,26 @@ void COSD::Stop()
 
 void COSD::CalcSeekbar()
 {
-	if (m_pWnd) {
-		SeekBarHeight      = ScaleY(SEEKBAR_HEIGHT);
-		SliderBarHeight    = ScaleY(SLIDER_BAR_HEIGHT);
+	if (m_pWnd && m_pMFVMB) {
 		SliderCursorHeight = ScaleY(SLIDER_CURSOR_HEIGHT);
 		SliderCursorWidth  = ScaleX(SLIDER_CURSOR_WIDTH);
 		SliderChapHeight   = ScaleY(SLIDER_CHAP_HEIGHT);
 		SliderChapWidth    = ScaleY(SLIDER_CHAP_WIDTH);
 
+		int SeekBarHeight      = ScaleY(SEEKBAR_HEIGHT);
+		int SliderBarHeight    = ScaleY(SLIDER_BAR_HEIGHT);
+
 		m_pWnd->GetClientRect(&m_rectWnd);
 
-		m_rectSeekBar.left   = m_rectWnd.left    + 10;
-		m_rectSeekBar.right  = m_rectWnd.right   - 10;
+		m_rectSeekBar.left   = m_rectWnd.left    + 8;
+		m_rectSeekBar.right  = m_rectWnd.right   - 8;
 		m_rectSeekBar.top    = m_rectWnd.bottom  - SeekBarHeight;
 		m_rectSeekBar.bottom = m_rectSeekBar.top + SeekBarHeight;
+
+		m_rectSlider.left   = m_rectSeekBar.left  + 8;
+		m_rectSlider.right  = m_rectSeekBar.right - 8;
+		m_rectSlider.top    = m_rectSeekBar.top   + (m_rectSeekBar.Height() - SliderBarHeight) / 2;
+		m_rectSlider.bottom = m_rectSlider.top + SliderBarHeight;
 	}
 }
 
@@ -325,15 +331,10 @@ void COSD::DrawRect(CRect& rect, CBrush* pBrush, CPen* pPen)
 
 void COSD::DrawSeekbar()
 {
-	m_rectBar.left   = m_rectSeekBar.left  + 10;
-	m_rectBar.right  = m_rectSeekBar.right - 10;
-	m_rectBar.top    = m_rectSeekBar.top   + (m_rectSeekBar.Height() - SliderBarHeight) / 2;
-	m_rectBar.bottom = m_rectBar.top + SliderBarHeight;
-
 	if (m_llSeekStop == 0) {
-		m_rectCursor.left = m_rectBar.left;
+		m_rectCursor.left = m_rectSlider.left;
 	} else {
-		m_rectCursor.left = m_rectBar.left + (long)((m_rectBar.Width() - SliderCursorWidth) * m_llSeekPos / m_llSeekStop);
+		m_rectCursor.left = m_rectSlider.left + (long)((m_rectSlider.Width() - SliderCursorWidth) * m_llSeekPos / m_llSeekStop);
 	}
 
 	m_rectCursor.right  = m_rectCursor.left + SliderCursorWidth;
@@ -341,7 +342,7 @@ void COSD::DrawSeekbar()
 	m_rectCursor.bottom = m_rectCursor.top + SliderCursorHeight;
 
 	DrawRect(m_rectSeekBar, &m_brushBack, &m_penBorder);
-	DrawRect(m_rectBar, &m_brushBar);
+	DrawRect(m_rectSlider, &m_brushBar);
 
 #if 0
 	CRect textrect(m_rectBar.left + m_rectBar.Width() / 2, m_rectSeekBar.top, m_rectBar.right, m_rectBar.top);
@@ -359,13 +360,13 @@ void COSD::DrawSeekbar()
 			REFERENCE_TIME rt;
 			for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); ++i) {
 				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, nullptr))) {
-					__int64 pos = m_rectBar.Width() * rt / m_llSeekStop;
+					__int64 pos = m_rectSlider.Width() * rt / m_llSeekStop;
 					if (pos < 0) {
 						continue;
 					}
 
 					CRect r;
-					r.left   = m_rectBar.left + (LONG)pos - SliderChapWidth / 2;
+					r.left   = m_rectSlider.left + (LONG)pos - SliderChapWidth / 2;
 					r.top    = m_rectSeekBar.top + (m_rectSeekBar.Height() - SliderChapHeight) / 2;
 					r.right  = r.left + SliderChapWidth;
 					r.bottom = r.top + SliderChapHeight;
@@ -499,7 +500,7 @@ void COSD::InvalidateBitmapOSD()
 
 void COSD::UpdateSeekBarPos(CPoint point)
 {
-	auto llSeekPos = m_llSeekStop * ((__int64)point.x - m_rectBar.left) / ((__int64)m_rectBar.Width() - SliderCursorWidth);
+	auto llSeekPos = m_llSeekStop * ((__int64)point.x - m_rectSlider.left) / ((__int64)m_rectSlider.Width() - SliderCursorWidth);
 	llSeekPos = std::clamp(llSeekPos, 0ll, m_llSeekStop);
 
 	if (llSeekPos != m_llSeekPos) {
