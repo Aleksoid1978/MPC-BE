@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,8 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 		return false;
 	}
 
-	DWORD tag_size = gb.ReadDwordLE(); // field size
-	const DWORD flags = gb.ReadDwordLE(); // field flags
+	DWORD tag_size = gb.ReadDwordLE();
+	const DWORD flags = gb.ReadDwordLE();
 
 	CStringA key;
 	BYTE b = gb.ReadByte();
@@ -53,7 +53,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 		if (tag_size) {
 			binary data(tag_size);
 			gb.ReadBuffer(data.data(), tag_size);
-			TagItems.push_back(std::make_tuple(APE_TYPE_BINARY, CString(key), std::move(data)));
+			TagItems.emplace_back(APE_TYPE_BINARY, CString(key), std::move(data));
 		}
 	} else {
 		auto data = std::make_unique<BYTE[]>(tag_size + 1);
@@ -61,7 +61,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 			return false;
 		}
 		gb.ReadBuffer(data.get(), tag_size);
-		TagItems.push_back(std::make_tuple(APE_TYPE_STRING, CString(key), UTF8ToWStr((LPCSTR)data.get())));
+		TagItems.emplace_back(APE_TYPE_STRING, CString(key), UTF8ToWStr((LPCSTR)data.get()));
 	}
 
 	return true;
