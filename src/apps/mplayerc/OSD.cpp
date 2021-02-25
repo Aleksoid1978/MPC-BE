@@ -300,7 +300,7 @@ void COSD::CalcSeekbar()
 
 			LOGFONT lf = {};
 			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-			lf.lfHeight = -MulDiv(m_SeekbarTextHeight, 72, 96);
+			lf.lfHeight = -(m_SeekbarTextHeight * 72 / 96);
 			lf.lfQuality = DEFAULT_QUALITY;
 			wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
 
