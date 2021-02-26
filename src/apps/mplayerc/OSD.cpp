@@ -28,8 +28,8 @@
 
 #define SEEKBAR_HEIGHT       60
 #define SLIDER_BAR_HEIGHT    10
-#define SLIDER_CURSOR_HEIGHT 30
-#define SLIDER_CURSOR_WIDTH  15
+#define SLIDER_CURSOR_HEIGHT 20
+#define SLIDER_CURSOR_WIDTH  8
 #define SLIDER_CHAP_HEIGHT   10
 #define SLIDER_CHAP_WIDTH    4
 
@@ -53,7 +53,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	}
 
 	m_penBorder.CreatePen(PS_SOLID, 1, OSD_COLOR_BORDER);
-	m_penCursor.CreatePen(PS_SOLID, 4, OSD_COLOR_CURSOR);
+	m_brushCursor.CreateSolidBrush(OSD_COLOR_CURSOR);
 	m_brushBack.CreateSolidBrush(OSD_COLOR_BACKGROUND);
 	m_brushBar.CreateSolidBrush (OSD_COLOR_BAR);
 	m_brushChapter.CreateSolidBrush(OSD_COLOR_CURSOR);
@@ -271,18 +271,19 @@ void COSD::CalcSeekbar()
 		SliderChapHeight   = ScaleY(SLIDER_CHAP_HEIGHT);
 		SliderChapWidth    = ScaleY(SLIDER_CHAP_WIDTH);
 
-		int SeekBarHeight      = ScaleY(SEEKBAR_HEIGHT);
-		int SliderBarHeight    = ScaleY(SLIDER_BAR_HEIGHT);
+		int SeekBarHeight   = ScaleY(SEEKBAR_HEIGHT);
+		int SliderBarHeight = ScaleY(SLIDER_BAR_HEIGHT);
+		int hor8 = ScaleX(8);
 
 		m_pWnd->GetClientRect(&m_rectWnd);
 
-		m_rectSeekBar.left   = m_rectWnd.left    + 8;
-		m_rectSeekBar.right  = m_rectWnd.right   - 8;
+		m_rectSeekBar.left   = m_rectWnd.left    + hor8;
+		m_rectSeekBar.right  = m_rectWnd.right   - hor8;
 		m_rectSeekBar.top    = m_rectWnd.bottom  - SeekBarHeight;
 		m_rectSeekBar.bottom = m_rectSeekBar.top + SeekBarHeight;
 
-		m_rectSlider.left   = m_rectSeekBar.left  + 8;
-		m_rectSlider.right  = m_rectSeekBar.right - 8;
+		m_rectSlider.left   = m_rectSeekBar.left  + hor8;
+		m_rectSlider.right  = m_rectSeekBar.right - hor8;
 		m_rectSlider.top    = m_rectSeekBar.top   + (m_rectSeekBar.Height() - SliderBarHeight) / 2;
 		m_rectSlider.bottom = m_rectSlider.top + SliderBarHeight;
 
@@ -297,7 +298,6 @@ void COSD::CalcSeekbar()
 			LOGFONT lf = {};
 			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 			lf.lfHeight = -(m_SeekbarTextHeight * 72 / 96);
-			lf.lfQuality = DEFAULT_QUALITY;
 			wcscpy_s(lf.lfFaceName, LF_FACESIZE, AfxGetAppSettings().strOSDFont);
 
 			m_SeekbarFont.CreateFontIndirectW(&lf);
@@ -346,12 +346,10 @@ void COSD::DrawRect(CRect& rect, CBrush* pBrush, CPen* pPen)
 
 void COSD::DrawSeekbar()
 {
-	if (m_llSeekStop == 0) {
-		m_rectCursor.left = m_rectSlider.left;
-	} else {
-		m_rectCursor.left = m_rectSlider.left + (long)((m_rectSlider.Width() - SliderCursorWidth) * m_llSeekPos / m_llSeekStop);
+	m_rectCursor.left = m_rectSlider.left;
+	if (m_llSeekStop >= 0) {
+		m_rectCursor.left += (long)((m_rectSlider.Width() - SliderCursorWidth) * m_llSeekPos / m_llSeekStop);
 	}
-
 	m_rectCursor.right  = m_rectCursor.left + SliderCursorWidth;
 	m_rectCursor.top    = m_rectSeekBar.top + (m_rectSeekBar.Height() - SliderCursorHeight) / 2;
 	m_rectCursor.bottom = m_rectCursor.top + SliderCursorHeight;
@@ -391,7 +389,7 @@ void COSD::DrawSeekbar()
 		}
 	}
 
-	DrawRect(m_rectCursor, nullptr, &m_penCursor);
+	DrawRect(m_rectCursor, &m_brushCursor);
 }
 
 void COSD::DrawFlybar()
