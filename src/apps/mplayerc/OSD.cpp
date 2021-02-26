@@ -202,6 +202,8 @@ void COSD::Reset()
 	m_MainWndRect.SetRectEmpty();
 	m_strMessage.Empty();
 
+	m_SeekbarFont.DeleteObject();
+
 	CalcSeekbar();
 	CalcFlybar();
 }
@@ -292,9 +294,7 @@ void COSD::CalcSeekbar()
 
 
 		if (m_SeekbarTextHeight != m_rectPosText.Height() || !m_SeekbarFont.GetSafeHandle()) {
-			if (m_SeekbarFont.GetSafeHandle()) {
-				m_SeekbarFont.DeleteObject();
-			}
+			m_SeekbarFont.DeleteObject();
 
 			m_SeekbarTextHeight = m_rectPosText.Height();
 
@@ -302,7 +302,7 @@ void COSD::CalcSeekbar()
 			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 			lf.lfHeight = -(m_SeekbarTextHeight * 72 / 96);
 			lf.lfQuality = DEFAULT_QUALITY;
-			wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
+			wcscpy_s(lf.lfFaceName, LF_FACESIZE, AfxGetAppSettings().strOSDFont);
 
 			m_SeekbarFont.CreateFontIndirectW(&lf);
 		}
