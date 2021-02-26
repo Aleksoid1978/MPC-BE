@@ -186,10 +186,6 @@ void COSD::UpdateBitmap()
 			m_MemDC.SetBkMode(TRANSPARENT);
 		}
 
-		if (m_MainFont.GetSafeHandle()) {
-			m_MemDC.SelectObject(m_MainFont);
-		}
-
 		DeleteObject(hbmpRender);
 	}
 }
@@ -366,11 +362,9 @@ void COSD::DrawSeekbar()
 	if (m_SeekbarFont.GetSafeHandle()) {
 		CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);
 
-		auto oldObj = m_MemDC.SelectObject(m_SeekbarFont);
+		m_MemDC.SelectObject(m_SeekbarFont);
 		m_MemDC.SetTextColor(OSD_COLOR_CURSOR);
 		m_MemDC.DrawText(text, &m_rectPosText, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-
-		m_MemDC.SelectObject(oldObj);
 	}
 
 	if (AfxGetAppSettings().fChapterMarker) {
@@ -418,6 +412,8 @@ void COSD::DrawMessage()
 	if (m_nMessagePos != OSD_NOMESSAGE) {
 		CRect rectText(0, 0, 0, 0);
 		CRect rectMessages;
+
+		m_MemDC.SelectObject(m_MainFont);
 
 		m_MemDC.DrawText(m_strMessage, &rectText, DT_CALCRECT | DT_NOPREFIX);
 		rectText.InflateRect(20, 10);
@@ -476,6 +472,8 @@ void COSD::DrawDebug()
 				msg.AppendFormat(L"\r\n%s", tmp);
 			}
 		}
+
+		m_MemDC.SelectObject(m_MainFont);
 
 		CRect rectText(0, 0, 0, 0);
 		CRect rectMessages;
@@ -743,8 +741,6 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration/* =
 		m_OSD_FontCashed = m_OSD_Font;
 		m_FontSizeCashed = m_FontSize;
 		m_bFontAACashed = s.fFontAA;
-
-		m_MemDC.SelectObject(m_MainFont);
 
 		if (m_pWnd) {
 			EndTimer();
