@@ -82,7 +82,7 @@ class COSD : public CWnd, public CDPI
 
 	CFont	m_MainFont;
 	CPen	m_penBorder;
-	CPen	m_penCursor;
+	CBrush	m_brushCursor;
 	CBrush	m_brushBack;
 	CBrush	m_brushBar;
 	CBrush	m_brushChapter;
