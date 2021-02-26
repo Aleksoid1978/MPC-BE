@@ -366,9 +366,11 @@ void COSD::DrawSeekbar()
 	if (m_SeekbarFont.GetSafeHandle()) {
 		CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);
 
-		m_MemDC.SelectObject(m_SeekbarFont);
+		auto oldObj = m_MemDC.SelectObject(m_SeekbarFont);
 		m_MemDC.SetTextColor(OSD_COLOR_CURSOR);
 		m_MemDC.DrawText(text, &m_rectPosText, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+
+		m_MemDC.SelectObject(oldObj);
 	}
 
 	if (AfxGetAppSettings().fChapterMarker) {
