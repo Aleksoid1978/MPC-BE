@@ -38,6 +38,7 @@
 #define OSD_COLOR_BORDER      RGB( 48,  56,  62)
 #define OSD_COLOR_TEXT        RGB(224, 224, 224)
 #define OSD_COLOR_BAR         RGB( 64,  72,  80)
+#define OSD_COLOR_BAR2        RGB(  0, 123, 167)
 #define OSD_COLOR_CURSOR      RGB(192, 200, 208)
 #define OSD_COLOR_DEBUGCLR    RGB(128, 136, 144)
 
@@ -56,6 +57,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	m_brushCursor.CreateSolidBrush(OSD_COLOR_CURSOR);
 	m_brushBack.CreateSolidBrush(OSD_COLOR_BACKGROUND);
 	m_brushBar.CreateSolidBrush (OSD_COLOR_BAR);
+	m_brushBar2.CreateSolidBrush (OSD_COLOR_BAR2);
 	m_brushChapter.CreateSolidBrush(OSD_COLOR_CURSOR);
 	m_debugBrushBack.CreateSolidBrush(OSD_COLOR_DEBUGCLR);
 	m_debugPenBorder.CreatePen(PS_SOLID, 1, OSD_COLOR_BORDER);
@@ -355,7 +357,12 @@ void COSD::DrawSeekbar()
 	m_rectCursor.bottom = m_rectCursor.top + SliderCursorHeight;
 
 	DrawRect(m_rectSeekBar, &m_brushBack, &m_penBorder);
-	DrawRect(m_rectSlider, &m_brushBar);
+	CRect rect(m_rectSlider);
+	rect.right = m_rectCursor.left+1;
+	DrawRect(rect, &m_brushBar2);
+	rect.left = m_rectCursor.right-1;
+	rect.right = m_rectSlider.right;
+	DrawRect(rect, &m_brushBar);
 
 	if (m_SeekbarFont.GetSafeHandle()) {
 		CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);

@@ -85,6 +85,7 @@ class COSD : public CWnd, public CDPI
 	CBrush	m_brushCursor;
 	CBrush	m_brushBack;
 	CBrush	m_brushBar;
+	CBrush	m_brushBar2;
 	CBrush	m_brushChapter;
 	CPen	m_debugPenBorder;
 	CBrush	m_debugBrushBack;
