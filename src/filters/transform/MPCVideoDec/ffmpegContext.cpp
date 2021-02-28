@@ -200,7 +200,8 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
 				break;
 			case FCC('ap4h'): // Apple ProRes 4444
-				pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
+			case FCC('ap4x'): // Apple ProRes 4444 XQ
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P12LE;
 				break;
 			}
 			break;
