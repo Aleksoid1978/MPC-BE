@@ -997,6 +997,11 @@ void CMainFrame::OnClose()
 	}
 	s.slTMPFilesList.clear();
 
+	if (m_CaptureWndBitmap) {
+		DeleteObject(m_CaptureWndBitmap);
+		m_CaptureWndBitmap = nullptr;
+	}
+
 	DLog(L"CMainFrame::OnClose() : end");
 	__super::OnClose();
 }
@@ -19709,6 +19714,10 @@ void CMainFrame::CreateCaptureWindow()
 		GetClientRect(&rectClient);
 	}
 
+	if (m_CaptureWndBitmap) {
+		DeleteObject(m_CaptureWndBitmap);
+		m_CaptureWndBitmap = nullptr;
+	}
 	m_CaptureWndBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
 }
 
