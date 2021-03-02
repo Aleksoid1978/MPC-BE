@@ -900,12 +900,23 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(tname, L"Vidvox Hap", false);
 						} else if (type == AP4_ATOM_TYPE_FMP4) {
 							FormatTrackName(tname, L"MPEG-4", false);
+						} else if (type == AP4_ATOM_TYPE_SHQ0 ||
+								   type == AP4_ATOM_TYPE_SHQ1 ||
+								   type == AP4_ATOM_TYPE_SHQ2 ||
+								   type == AP4_ATOM_TYPE_SHQ3 ||
+								   type == AP4_ATOM_TYPE_SHQ4 ||
+								   type == AP4_ATOM_TYPE_SHQ5 ||
+								   type == AP4_ATOM_TYPE_SHQ7 ||
+								   type == AP4_ATOM_TYPE_SHQ9) {
+							FormatTrackName(tname, L"SpeedHQ", false);
 						} else if (fourcc == FCC('WVC1')) {
 							FormatTrackName(tname, L"VC-1", false);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
 								pData = (AP4_DataBuffer*)Dvc1->GetDecoderInfo();
 							}
-						} else if (!tname.IsEmpty()){
+						}
+
+						if (!tname.IsEmpty()) {
 							SetTrackName(TrackName, tname);
 						}
 

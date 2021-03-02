@@ -766,6 +766,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_V410_DECODER 1
 #define CONFIG_RAWVIDEO_DECODER 1
 #define CONFIG_HAP_DECODER 1
+#define CONFIG_SPEEDHQ_DECODER 1
 
 #define CONFIG_AAC_DECODER 1
 #define CONFIG_AAC_LATM_DECODER 1

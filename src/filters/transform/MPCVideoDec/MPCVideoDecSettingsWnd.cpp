@@ -478,6 +478,7 @@ static const struct {
 	{CODEC_PNG,			L"PNG"},
 	{CODEC_QT,			L"QuickTime video (8BPS, QTRle, rpza)"},
 	{CODEC_SCREC,		L"Screen Recorder (CSCD, MS, TSCC, VMnc)"},
+	{CODEC_SHQ,			L"SpeedHQ"},
 	{CODEC_SVQ3,		L"SVQ1/3"},
 	{CODEC_THEORA,		L"Theora"},
 	{CODEC_UTVD,		L"Ut video"},

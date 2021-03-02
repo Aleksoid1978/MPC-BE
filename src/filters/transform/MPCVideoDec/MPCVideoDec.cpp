@@ -106,6 +106,7 @@ vcodecs[] = {
 	{L"screc",			CODEC_SCREC		},
 	{L"indeo",			CODEC_INDEO		},
 	{L"h263",			CODEC_H263		},
+	{L"shq",			CODEC_SHQ		},
 	{L"svq3",			CODEC_SVQ3		},
 	{L"realv",			CODEC_REALV		},
 	{L"dirac",			CODEC_DIRAC		},
@@ -498,6 +499,16 @@ FFMPEG_CODECS ffCodecs[] = {
 	// AV1
 	{ &MEDIASUBTYPE_AV01, AV_CODEC_ID_AV1, VDEC_AV1, -1 },
 
+	// SpeedHQ
+	{ &MEDIASUBTYPE_SHQ0, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ1, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ2, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ3, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ4, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ5, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ7, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+	{ &MEDIASUBTYPE_SHQ9, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
+
 	// uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, VDEC_UNCOMPRESSED, -1 },
@@ -864,6 +875,16 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 
 	// AV1
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AV01 },
+
+	// SpeedHQ
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ0 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ1 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ2 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ3 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ4 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ5 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ7 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ9 },
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
@@ -1378,6 +1399,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					m_bUseDXVA		= (m_nActiveCodecs & CODEC_HEVC_DXVA) != 0;
 					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_HEVC) != 0;
 					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
+					break;
+				case AV_CODEC_ID_SPEEDHQ :
+					bCodecActivated = (m_nActiveCodecs & CODEC_SHQ) != 0;
 					break;
 				case AV_CODEC_ID_SVQ3 :
 				case AV_CODEC_ID_SVQ1 :

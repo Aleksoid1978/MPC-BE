@@ -158,6 +158,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_REAL]				= L"vdec_real";
 	VideoFiltersKeys[VDEC_HAP]				= L"vdec_hap";
 	VideoFiltersKeys[VDEC_AV1]				= L"vdec_av1";
+	VideoFiltersKeys[VDEC_SHQ]				= L"vdec_shq";
 	VideoFiltersKeys[VDEC_UNCOMPRESSED]		= L"vdec_uncompressed";
 
 	// Internal audio decoders
