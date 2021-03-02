@@ -444,6 +444,7 @@ SRCS_LC_B = \
 	libavcodec/snow_dwt.c \
 	libavcodec/snow.c \
 	libavcodec/sp5xdec.c \
+	libavcodec/speedhq.c \
 	libavcodec/startcode.c \
 	libavcodec/svq1.c \
 	libavcodec/svq13.c \

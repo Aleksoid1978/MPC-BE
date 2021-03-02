@@ -629,6 +629,15 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_FMP4:
         // TSC2(TechSmith Camtasia)
         case AP4_ATOM_TYPE_tsc2:
+        // SpeedHQ
+        case AP4_ATOM_TYPE_SHQ0:
+        case AP4_ATOM_TYPE_SHQ1:
+        case AP4_ATOM_TYPE_SHQ2:
+        case AP4_ATOM_TYPE_SHQ3:
+        case AP4_ATOM_TYPE_SHQ4:
+        case AP4_ATOM_TYPE_SHQ5:
+        case AP4_ATOM_TYPE_SHQ7:
+        case AP4_ATOM_TYPE_SHQ9:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 

@@ -57,6 +57,7 @@ static const AVCodec * const codec_list[] = {
     &ff_rv20_decoder,
     &ff_rv30_decoder,
     &ff_rv40_decoder,
+    &ff_speedhq_decoder,
     &ff_svq1_decoder,
     &ff_svq3_decoder,
     &ff_theora_decoder,

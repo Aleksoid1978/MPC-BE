@@ -536,6 +536,15 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DOPS = AP4_ATOM_TYPE('d','O','p','s');
 const AP4_Atom::Type AP4_ATOM_TYPE_mlpa = AP4_ATOM_TYPE('m','l','p','a');
 // TSC2(TechSmith Camtasia)
 const AP4_Atom::Type AP4_ATOM_TYPE_tsc2 = AP4_ATOM_TYPE('t','s','c','2');
+// SpeedHQ
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ0 = AP4_ATOM_TYPE('S','H','Q','0');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ1 = AP4_ATOM_TYPE('S','H','Q','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ2 = AP4_ATOM_TYPE('S','H','Q','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ3 = AP4_ATOM_TYPE('S','H','Q','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ4 = AP4_ATOM_TYPE('S','H','Q','4');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ5 = AP4_ATOM_TYPE('S','H','Q','5');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ7 = AP4_ATOM_TYPE('S','H','Q','7');
+const AP4_Atom::Type AP4_ATOM_TYPE_SHQ9 = AP4_ATOM_TYPE('S','H','Q','9');
 
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
