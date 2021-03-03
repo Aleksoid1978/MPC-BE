@@ -470,33 +470,22 @@
 #define CONFIG_JNI 0
 #define HAVE_X86ASM 1
 
+#define HAVE_EXP2 1
+#define HAVE_EXP2F 1
+#define HAVE_EXPF 1
+#define HAVE_HYPOT 1
+#define HAVE_LLRINT 1
+#define HAVE_LRINT 1
+#define HAVE_LRINTF 1
+#define HAVE_RDTSC 1
+#define HAVE_ROUND 1
+
 #ifdef __GNUC__
 	#define HAVE_ATTRIBUTE_MAY_ALIAS 1
 	#define HAVE_ATTRIBUTE_PACKED 1
-	#define HAVE_EXP2 1
-	#define HAVE_EXP2F 1
-	#define HAVE_EXPF 1
-	#define HAVE_HYPOT 1
-	#define HAVE_LLRINT 1
-	#define HAVE_LRINT 1
-	#define HAVE_LRINTF 1
-	#define HAVE_RDTSC 1
-	#define HAVE_ROUND 1
-
 #else
 	#define HAVE_ATTRIBUTE_MAY_ALIAS 0
 	#define HAVE_ATTRIBUTE_PACKED 0
-	#define HAVE_EXP2 0
-	#define HAVE_EXP2F 0
-	#define HAVE_EXPF 0
-	#define HAVE_HYPOT 1
-	#define HAVE_LLRINT 0
-	#define HAVE_LRINT 0
-	#define HAVE_LRINTF 0
-	#define HAVE_RDTSC 0
-	#define HAVE_ROUND 0
-	#define rint(x) (int)(x+0.5)
-	#define cbrtf(x) pow((float)x, (float)1.0/3)
 #endif
 
 #define CONFIG_DCT 1
