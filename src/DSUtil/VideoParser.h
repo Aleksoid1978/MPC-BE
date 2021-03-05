@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,7 +62,7 @@ struct vc_params_t {
 	fraction_t sar;
 
 	void clear() {
-		memset(this, 0, sizeof(*this));
+		ZeroMemory(this, sizeof(*this));
 	}
 };
 

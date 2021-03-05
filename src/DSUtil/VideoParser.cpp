@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -196,7 +196,7 @@ namespace AVCParser {
 
 		CGolombBuffer gb(data, size, true);
 
-		memset(&params, 0, sizeof(params));
+		params.clear();
 
 		params.profile = gb.BitRead(8);
 		if (std::find(std::cbegin(profiles), std::cend(profiles), params.profile) == std::cend(profiles)) {
@@ -268,7 +268,7 @@ namespace AVCParser {
 		UINT64 pic_height_in_map_units_minus1 = gb.UExpGolombRead();
 		params.interlaced = !gb.BitRead(1);
 
-		if (params.interlaced) {
+		if (params.interlaced) {						// !frame_mbs_only_flag
 			gb.BitRead(1);								// mb_adaptive_frame_field_flag
 		}
 
@@ -279,7 +279,8 @@ namespace AVCParser {
 
 		UINT crop_left, crop_right, crop_top, crop_bottom;
 		crop_left = crop_right = crop_top = crop_bottom = 0;
-		if (gb.BitRead(1)) {					// frame_cropping_flag
+		const bool frame_cropping_flag = gb.BitRead(1);
+		if (frame_cropping_flag) {				// frame_cropping_flag
 			crop_left	= gb.UExpGolombRead();	// frame_cropping_rect_left_offset
 			crop_right	= gb.UExpGolombRead();	// frame_cropping_rect_right_offset
 			crop_top	= gb.UExpGolombRead();	// frame_cropping_rect_top_offset
@@ -377,15 +378,17 @@ namespace AVCParser {
 			params.sar.num = params.sar.den = 1;
 		}
 
-		unsigned int mb_Width = (unsigned int)pic_width_in_mbs_minus1 + 1;
-		unsigned int mb_Height = ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - !params.interlaced);
-		BYTE CHROMA444 = (chroma_format_idc == 3);
+		params.width  = (pic_width_in_mbs_minus1 + 1) * 16;
+		params.height = ((pic_height_in_map_units_minus1 + 1) * (2 - !params.interlaced)) * 16;
 
-		params.width = 16 * mb_Width - (2u >> CHROMA444) * std::min(crop_right, (8u << CHROMA444) - 1);
-		if (!params.interlaced) {
-			params.height = 16 * mb_Height - (2u >> CHROMA444) * std::min(crop_bottom, (8u << CHROMA444) - 1);
-		} else {
-			params.height = 16 * mb_Height - (4u >> CHROMA444) * std::min(crop_bottom, (8u << CHROMA444) - 1);
+		if (frame_cropping_flag) {
+			const auto vsub = (chroma_format_idc == 1) ? 1 : 0;
+			const auto hsub = (chroma_format_idc == 1 || chroma_format_idc == 2) ? 1 : 0;
+			const auto step_x = 1 << hsub;
+			const auto step_y = (2 - !params.interlaced) << vsub;
+
+			params.width  -= (crop_left + crop_right)  * step_x;
+			params.height -= (crop_top  + crop_bottom) * step_y;
 		}
 
 		if (params.height < 100 || params.width < 100) {
@@ -399,7 +402,7 @@ namespace AVCParser {
 		return true;
 
 	error:
-		memset(&params, 0, sizeof(params));
+		params.clear();
 		return false;
 	}
 } // namespace AVCParser
