@@ -191,7 +191,7 @@ class CPlayerPlaylistBar : public CPlayerBar
 private:
 	enum {COL_NAME, COL_TIME};
 
-	CMainFrame* m_pMainFrame;
+	CMainFrame* m_pMainFrame = nullptr;
 
 	CImageList m_fakeImageList;
 	CPlayerListCtrl m_list;
