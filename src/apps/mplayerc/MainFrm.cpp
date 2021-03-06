@@ -7304,7 +7304,9 @@ void CMainFrame::OnUpdateViewSubresync(CCmdUI* pCmdUI)
 void CMainFrame::OnViewPlaylist()
 {
 	ShowControlBarInternal(&m_wndPlaylistBar, !m_wndPlaylistBar.IsWindowVisible());
-	m_wndPlaylistBar.SetFocus();
+	if (m_wndPlaylistBar.IsWindowVisible()) {
+		m_wndPlaylistBar.SetFocus();
+	}
 }
 
 void CMainFrame::OnUpdateViewPlaylist(CCmdUI* pCmdUI)

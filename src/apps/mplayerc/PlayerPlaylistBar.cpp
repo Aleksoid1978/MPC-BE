@@ -2629,7 +2629,7 @@ void CPlayerPlaylistBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 
 	if (lpwndpos->flags & SWP_HIDEWINDOW) {
 		m_bVisible = false;
-		GetParentFrame()->SetFocus();
+		m_pMainFrame->SetFocus();
 	} else if (lpwndpos->flags & SWP_SHOWWINDOW) {
 		m_bVisible = true;
 	}
