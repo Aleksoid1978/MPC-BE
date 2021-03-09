@@ -730,9 +730,15 @@ namespace Youtube
 						if (it != youtubeSignatureCache.cend() && !it->second.IsEmpty()) {
 							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
 							if (!d.Parse(it->second.GetString()).HasParseError()) {
+								const auto maxNum = signature.GetLength() - 1;
 								for (auto& it = d.MemberBegin(); it != d.MemberEnd(); ++it) {
 									int funcType;
-									if (StrToInt32(it->name.GetString(), funcType) && funcType > youtubeFuncType::funcNONE && funcType < youtubeFuncType::funcLAST) {
+									if (StrToInt32(it->name.GetString(), funcType) && (funcType > youtubeFuncType::funcNONE && funcType < youtubeFuncType::funcLAST)) {
+										const auto value = it->value.GetInt();
+										if (value < 0 || value > maxNum) {
+											JSFuncs.clear();
+											break;
+										}
 										JSFuncs.emplace_back(static_cast<youtubeFuncType>(funcType), it->value.GetInt());
 									}
 								}
