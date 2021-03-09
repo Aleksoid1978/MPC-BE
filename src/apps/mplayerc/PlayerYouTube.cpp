@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -403,7 +403,8 @@ namespace Youtube
 		funcNONE = -1,
 		funcDELETE,
 		funcREVERSE,
-		funcSWAP
+		funcSWAP,
+		funcLAST
 	};
 
 	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, YoutubeUrllist& youtubeAudioUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
@@ -456,7 +457,7 @@ namespace Youtube
 			const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
-			std::vector<std::tuple<youtubeFuncType, int>> JSFuncs;
+			std::vector<std::pair<youtubeFuncType, int>> JSFuncs;
 			BOOL bJSParsed = FALSE;
 			CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
 			if (JSUrl.IsEmpty()) {
@@ -721,112 +722,145 @@ namespace Youtube
 				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 					if (!bJSParsed) {
 						bJSParsed = TRUE;
-						urlData jsData;
-						if (URLReadData(JSUrl.GetString(), jsData)) {
-							static LPCSTR signatureRegExps[] = {
-								R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
-								R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
-								R"((?:\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
-								R"(([a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
-								R"((["\'])signature\1\s*,\s*([a-zA-Z0-9$]+)\()",
-								R"(\.sig\|\|([a-zA-Z0-9$]+)\()",
-								R"(yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*([a-zA-Z0-9$]+)\()",
-								R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
-								R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
-								R"(\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
-								R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
-								R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()"
-							};
-							CStringA funcName;
-							for (const auto& sigRegExp : signatureRegExps) {
-								funcName = RegExpParse<CStringA>(jsData.data(), sigRegExp);
-								if (!funcName.IsEmpty()) {
-									break;
+
+						const auto JSPlayerId = RegExpParse<CString>(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
+
+						auto& youtubeSignatureCache = AfxGetAppSettings().youtubeSignatureCache;
+						const auto& it = youtubeSignatureCache.find(JSPlayerId);
+						if (it != youtubeSignatureCache.cend() && !it->second.IsEmpty()) {
+							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
+							if (!d.Parse(it->second.GetString()).HasParseError()) {
+								for (auto& it = d.MemberBegin(); it != d.MemberEnd(); ++it) {
+									int funcType;
+									if (StrToInt32(it->name.GetString(), funcType) && funcType > youtubeFuncType::funcNONE && funcType < youtubeFuncType::funcLAST) {
+										JSFuncs.emplace_back(static_cast<youtubeFuncType>(funcType), it->value.GetInt());
+									}
 								}
 							}
-							if (!funcName.IsEmpty()) {
-								CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
-								const CStringA funcBody = RegExpParse<CStringA>(jsData.data(), funcRegExp.GetString());
-								if (!funcBody.IsEmpty()) {
-									CStringA funcGroup;
-									std::list<CStringA> funcList;
-									std::list<CStringA> funcCodeList;
+						}
 
-									std::list<CStringA> code;
-									Explode(funcBody, code, ';');
+						if (JSFuncs.empty()) {
+							urlData jsData;
+							if (URLReadData(JSUrl.GetString(), jsData)) {
+								static LPCSTR signatureRegExps[] = {
+									R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
+									R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
+									R"((?:\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
+									R"(([a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
+									R"((["\'])signature\1\s*,\s*([a-zA-Z0-9$]+)\()",
+									R"(\.sig\|\|([a-zA-Z0-9$]+)\()",
+									R"(yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*([a-zA-Z0-9$]+)\()",
+									R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
+									R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
+									R"(\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
+									R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
+									R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()"
+								};
+								CStringA funcName;
+								for (const auto& sigRegExp : signatureRegExps) {
+									funcName = RegExpParse<CStringA>(jsData.data(), sigRegExp);
+									if (!funcName.IsEmpty()) {
+										break;
+									}
+								}
+								if (!funcName.IsEmpty()) {
+									CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
+									const CStringA funcBody = RegExpParse<CStringA>(jsData.data(), funcRegExp.GetString());
+									if (!funcBody.IsEmpty()) {
+										CStringA funcGroup;
+										std::list<CStringA> funcList;
+										std::list<CStringA> funcCodeList;
 
-									for (const auto& line : code) {
+										std::list<CStringA> code;
+										Explode(funcBody, code, ';');
 
-										if (line.Find("split") >= 0 || line.Find("return") >= 0) {
-											continue;
-										}
+										for (const auto& line : code) {
 
-										funcList.push_back(line);
-
-										if (funcGroup.IsEmpty()) {
-											const int k = line.Find('.');
-											if (k > 0) {
-												funcGroup = line.Left(k);
+											if (line.Find("split") >= 0 || line.Find("return") >= 0) {
+												continue;
 											}
-										}
-									}
 
-									if (!funcGroup.IsEmpty()) {
-										CStringA tmp; tmp.Format("var %s={", funcGroup);
-										tmp = GetEntry(jsData.data(), tmp, "};");
-										if (!tmp.IsEmpty()) {
-											tmp.Remove('\n');
-											Explode(tmp, funcCodeList, "},");
-										}
-									}
+											funcList.push_back(line);
 
-									if (!funcList.empty() && !funcCodeList.empty()) {
-										for (const auto& func : funcList) {
-											int funcArg = 0;
-											const CStringA funcArgs = GetEntry(func, "(", ")");
-
-											std::list<CStringA> args;
-											Explode(funcArgs, args, ',');
-											if (args.size() >= 1) {
-												CStringA& arg = args.back();
-												int value = 0;
-												if (sscanf_s(arg, "%d", &value) == 1) {
-													funcArg = value;
+											if (funcGroup.IsEmpty()) {
+												const int k = line.Find('.');
+												if (k > 0) {
+													funcGroup = line.Left(k);
 												}
 											}
+										}
 
-											CStringA funcName = GetEntry(func, funcGroup + '.', "(");
-											if (funcName.IsEmpty()) {
-												funcName = GetEntry(func, funcGroup, "(");
-												if (funcName.IsEmpty()) {
-													continue;
-												}
+										if (!funcGroup.IsEmpty()) {
+											CStringA tmp; tmp.Format("var %s={", funcGroup);
+											tmp = GetEntry(jsData.data(), tmp, "};");
+											if (!tmp.IsEmpty()) {
+												tmp.Remove('\n');
+												Explode(tmp, funcCodeList, "},");
 											}
-											if (funcName.Find("[") != -1) {
-												funcName.Replace("[", ""); funcName.Replace("]", "");
-											}
-											funcName += ":function";
+										}
 
-											auto funcType = youtubeFuncType::funcNONE;
+										if (!funcList.empty() && !funcCodeList.empty()) {
+											for (const auto& func : funcList) {
+												int funcArg = 0;
+												const CStringA funcArgs = GetEntry(func, "(", ")");
 
-											for (const auto& funcCode : funcCodeList) {
-												if (funcCode.Find(funcName) >= 0) {
-													if (funcCode.Find("splice") > 0) {
-														funcType = youtubeFuncType::funcDELETE;
-													} else if (funcCode.Find("reverse") > 0) {
-														funcType = youtubeFuncType::funcREVERSE;
-													} else if (funcCode.Find(".length]") > 0) {
-														funcType = youtubeFuncType::funcSWAP;
+												std::list<CStringA> args;
+												Explode(funcArgs, args, ',');
+												if (args.size() >= 1) {
+													CStringA& arg = args.back();
+													int value = 0;
+													if (sscanf_s(arg, "%d", &value) == 1) {
+														funcArg = value;
 													}
-													break;
 												}
-											}
 
-											if (funcType != youtubeFuncType::funcNONE) {
-												JSFuncs.emplace_back(funcType, funcArg);
+												CStringA funcName = GetEntry(func, funcGroup + '.', "(");
+												if (funcName.IsEmpty()) {
+													funcName = GetEntry(func, funcGroup, "(");
+													if (funcName.IsEmpty()) {
+														continue;
+													}
+												}
+												if (funcName.Find("[") != -1) {
+													funcName.Replace("[", ""); funcName.Replace("]", "");
+												}
+												funcName += ":function";
+
+												auto funcType = youtubeFuncType::funcNONE;
+
+												for (const auto& funcCode : funcCodeList) {
+													if (funcCode.Find(funcName) >= 0) {
+														if (funcCode.Find("splice") > 0) {
+															funcType = youtubeFuncType::funcDELETE;
+														} else if (funcCode.Find("reverse") > 0) {
+															funcType = youtubeFuncType::funcREVERSE;
+														} else if (funcCode.Find(".length]") > 0) {
+															funcType = youtubeFuncType::funcSWAP;
+														}
+														break;
+													}
+												}
+
+												if (funcType != youtubeFuncType::funcNONE) {
+													JSFuncs.emplace_back(funcType, funcArg);
+												}
 											}
 										}
 									}
+								}
+
+								if (!JSFuncs.empty()) {
+									CString buffer = L"{ ";
+									for (auto& it = JSFuncs.cbegin(); it < JSFuncs.cend(); ++it) {
+										buffer.AppendFormat(L"\"%d\" : %d", it->first, it->second);
+
+										if (it != std::prev(JSFuncs.cend())) {
+											buffer += L", ";
+										}
+									}
+									buffer += L" }";
+
+									youtubeSignatureCache[JSPlayerId] = buffer;
 								}
 							}
 						}
