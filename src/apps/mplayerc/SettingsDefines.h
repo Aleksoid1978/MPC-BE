@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,7 @@
 #define IDS_R_RECENTFILES					L"RecentFiles"
 #define IDS_R_FILEFORMATS					L"FileFormats"
 #define IDS_R_PNSPRESETS					L"Settings\\PnSPresets"
+#define IDS_R_YOUTUBECACHE					L"Settings\\YoutubeCache"
 
 #define IDS_RS_FAV_REMEMBERPOS				L"RememberPosition"
 #define IDS_RS_FAV_RELATIVEDRIVE			L"RelativeDrive"

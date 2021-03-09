@@ -945,6 +945,7 @@ public:
 	} YoutubeFormat;
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeTagSelected = 0; // not saved
+	std::map<CString, CString> youtubeSignatureCache;
 
 	bool			bYDLEnable;
 	int				iYDLMaxHeight;

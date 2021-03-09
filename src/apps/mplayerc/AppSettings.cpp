@@ -921,6 +921,8 @@ void CAppSettings::ResetSettings()
 
 	bPasteClipboardURL = false;
 
+	youtubeSignatureCache.clear();
+
 	strTabs.Empty();
 }
 
@@ -1662,6 +1664,14 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
+	std::vector<CStringW> valuenames;
+	profile.EnumValueNames(IDS_R_YOUTUBECACHE, valuenames);
+	for (const auto& name : valuenames) {
+		CString value;
+		profile.ReadString(IDS_R_YOUTUBECACHE, name, value);
+		youtubeSignatureCache[name] = value;
+	}
+
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {
 		nCLSwitches |= CLSW_FULLSCREEN;
 	}
@@ -2132,6 +2142,10 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FILE_NAME, bOSDFileName);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
+
+	for (const auto& [name, value] : youtubeSignatureCache) {
+		profile.WriteString(IDS_R_YOUTUBECACHE, name, value);
+	}
 
 	SaveFormats();
 
