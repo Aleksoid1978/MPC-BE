@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -67,12 +67,12 @@ public:
 	bool ReadString(const wchar_t* section, const wchar_t* entry, CStringW& value);
 	bool ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes);
 
-	bool WriteBool  (const wchar_t* section, const wchar_t* entry, const bool     value);
-	bool WriteInt   (const wchar_t* section, const wchar_t* entry, const int      value);
-	bool WriteUInt  (const wchar_t* section, const wchar_t* entry, const unsigned value);
-	bool WriteInt64 (const wchar_t* section, const wchar_t* entry, const __int64  value);
-	bool WriteDouble(const wchar_t* section, const wchar_t* entry, const double   value);
-	bool WriteString(const wchar_t* section, const wchar_t* entry, const CStringW value);
+	bool WriteBool  (const wchar_t* section, const wchar_t* entry, const bool      value);
+	bool WriteInt   (const wchar_t* section, const wchar_t* entry, const int       value);
+	bool WriteUInt  (const wchar_t* section, const wchar_t* entry, const unsigned  value);
+	bool WriteInt64 (const wchar_t* section, const wchar_t* entry, const __int64   value);
+	bool WriteDouble(const wchar_t* section, const wchar_t* entry, const double    value);
+	bool WriteString(const wchar_t* section, const wchar_t* entry, const CStringW& value);
 	bool WriteBinary(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes);
 
 	void EnumValueNames(const wchar_t* section, std::vector<CStringW>& valuenames);

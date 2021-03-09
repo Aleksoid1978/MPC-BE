@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -592,7 +592,7 @@ bool CProfile::WriteDouble(const wchar_t* section, const wchar_t* entry, const d
 	return ret;
 }
 
-bool CProfile::WriteString(const wchar_t* section, const wchar_t* entry, const CStringW value)
+bool CProfile::WriteString(const wchar_t* section, const wchar_t* entry, const CStringW& value)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
 
@@ -677,7 +677,7 @@ void CProfile::EnumValueNames(const wchar_t* section, std::vector<CStringW>& val
 			DWORD    cbSecurityDescriptor;
 			FILETIME ftLastWriteTime;
 
-			// Get the class name and the value count. 
+			// Get the class name and the value count.
 			DWORD retCode = RegQueryInfoKeyW(
 				regkey.m_hKey,
 				achClass,
@@ -818,7 +818,7 @@ void CProfile::Flush(bool bForce)
 		UNREFERENCED_PARAMETER(e);
 		ASSERT(FALSE);
 	}
-	
+
 	fpStatus = fclose(fp);
 	ASSERT(fpStatus == 0);
 }
