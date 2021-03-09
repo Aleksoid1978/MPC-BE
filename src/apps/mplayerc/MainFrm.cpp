@@ -15399,8 +15399,8 @@ void CMainFrame::SetupNavChaptersSubMenu()
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				if (i > 1) {
-					const auto& prev_profile = m_youtubeUrllist[i-1].profile;
+				if (i > 0) {
+					const auto& prev_profile = m_youtubeUrllist[i - 1].profile;
 					const auto& profile = m_youtubeUrllist[i].profile;
 
 					if (prev_profile->type != Youtube::y_audio
@@ -17761,7 +17761,7 @@ bool CMainFrame::CanShowDialog() const
 		return monitorD3D != monitorMain;
 	}
 
-	return true;
+	return !m_bIsMadVRExclusiveMode && !m_bIsMPCVRExclusiveMode;
 }
 
 void CMainFrame::DestroyD3DWindow()
