@@ -164,6 +164,7 @@ SRCS_LC = \
 	libavcodec/codec_desc.c \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
+	libavcodec/d3d11va.c \
 	libavcodec/dca.c \
 	libavcodec/dca_core.c \
 	libavcodec/dca_core_bsf.c \
@@ -636,6 +637,7 @@ SRCS_LU = \
 	libavutil/frame.c \
 	libavutil/hdr_dynamic_metadata.c \
 	libavutil/hwcontext.c \
+	libavutil/hwcontext_d3d11va.c \
 	libavutil/hwcontext_dxva2.c \
 	libavutil/imgutils.c \
 	libavutil/integer.c \

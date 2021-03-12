@@ -23,6 +23,7 @@
 * libavcodec/hevcdec.c
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
+* libavcodec/hwconfig.h
 * libavcodec/internal.h
 * libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
@@ -36,6 +37,7 @@
 
 * libavfilter/allfilters.c 
 
+* libavutil/hwcontext_d3d11va.c
 * libavutil/hwcontext_dxva2.c
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
