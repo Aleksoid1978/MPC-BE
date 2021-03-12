@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2427,7 +2427,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 
 	CString fn = pli->m_fns.front().GetName().MakeLower();
 
-	if (TGetPathType(fn) != FILE) {
+	if (TGetPathType(fn) != IT_FILE) {
 		return nullptr;
 	}
 
@@ -3281,16 +3281,23 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m_list.SubItemHitTest(&lvhti);
 
 	POSITION pos = FindPos(lvhti.iItem);
-	bool bMIEnable = false;
+
+	ItemType item_type = IT_NONE;
 	CString sCurrentPath;
+
 	if (pos) {
 		CPlaylistItem& pli = curPlayList.GetAt(pos);
 		if (!pli.m_fns.empty()) {
 			sCurrentPath = pli.m_fns.front().GetName();
-			bMIEnable = !::PathIsURLW(sCurrentPath) && sCurrentPath != L"pipe://stdin";
 
-			if (bMIEnable && curTab.type == EXPLORER) {
-				bMIEnable = TGetPathType(sCurrentPath) == FILE;
+			if (curTab.type == EXPLORER) {
+				item_type = (ItemType)TGetPathType(sCurrentPath);
+			}
+			else if (::PathIsURLW(sCurrentPath)) {
+				item_type = IT_URL;
+			}
+			else if (sCurrentPath == L"pipe://stdin") {
+				item_type = IT_PIPE;
 			}
 		}
 	}
@@ -3318,6 +3325,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SORTBYID, // restore
 		M_SHUFFLE,
 		M_REFRESH,
+		M_OPENFOLDER,
 		M_MEDIAINFO,
 		M_SHOWTOOLTIP,
 		M_SHOWSEARCHBAR,
@@ -3377,7 +3385,10 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShufflePlaylistItems ? MF_CHECKED : MF_UNCHECKED), M_SHUFFLE, ResStr(IDS_PLAYLIST_SHUFFLE));
 		m.AppendMenu(MF_SEPARATOR);
 	}
-	m.AppendMenu(MF_STRING | (bOnItem && bMIEnable ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_MEDIAINFO, L"MediaInfo");
+	m.AppendMenu(MF_STRING | (bOnItem && item_type == IT_FILE ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_MEDIAINFO, L"MediaInfo");
+	if (item_type == IT_FILE) {
+		m.AppendMenu(MF_STRING | MF_ENABLED, M_OPENFOLDER, L"Open containing folder");
+	}
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistTooltip ? MF_CHECKED : MF_UNCHECKED), M_SHOWTOOLTIP, ResStr(IDS_PLAYLIST_SHOWTOOLTIP));
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistSearchBar ? MF_CHECKED : MF_UNCHECKED), M_SHOWSEARCHBAR, ResStr(IDS_PLAYLIST_SHOWSEARCHBAR));
@@ -3758,6 +3769,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				s.nLastFileInfoPage = nID;
 			}
 			break;
+		case M_OPENFOLDER:
+			ShellExecuteW(nullptr, nullptr, L"explorer.exe", L"/select,\"" + sCurrentPath + L"\"", nullptr, SW_SHOWNORMAL);
+			break;
 		case M_SHOWTOOLTIP:
 			s.bShowPlaylistTooltip = !s.bShowPlaylistTooltip;
 			break;
@@ -3777,8 +3791,6 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_DURATION:
 			s.bPlaylistDetermineDuration = !s.bPlaylistDetermineDuration;
-			break;
-		default:
 			break;
 	}
 }
@@ -4500,16 +4512,16 @@ int CPlayerPlaylistBar::TGetPathType(const CString& path) const
 
 	const auto suffix = path.Right(1);
 	if (suffix == L":") {
-		return DRIVE;
+		return IT_DRIVE;
 	}
 	else if (suffix == L"<") {
-		return PARENT;
+		return IT_PARENT;
 	}
 	else if (suffix == L">") {
-		return FOLDER;
+		return IT_FOLDER;
 	}
 
-	return FILE;
+	return IT_FILE;
 }
 
 void CPlayerPlaylistBar::TTokenizer(const CString& strFields, LPCWSTR strDelimiters, std::vector<CString>& arFields)
@@ -4792,9 +4804,9 @@ bool CPlayerPlaylistBar::TNavigate()
 
 					const auto type = TGetPathType(path);
 					switch (type) {
-						case DRIVE:
+						case IT_DRIVE:
 							break;
-						case PARENT:
+						case IT_PARENT:
 							path.TrimRight(L"\\<");
 							path = GetFolderOnly(path);
 							if (path.Right(1) == L":") {
@@ -4802,7 +4814,7 @@ bool CPlayerPlaylistBar::TNavigate()
 							}
 							oldPath.TrimRight(L"\\<");
 							break;
-						case FOLDER:
+						case IT_FOLDER:
 							path.TrimRight(L">");
 							break;
 						default:
@@ -4816,7 +4828,7 @@ bool CPlayerPlaylistBar::TNavigate()
 					TParseFolder(path);
 					Refresh();
 
-					type == PARENT ? TSelectFolder(oldPath) : EnsureVisible(curPlayList.GetHeadPosition());
+					type == IT_PARENT ? TSelectFolder(oldPath) : EnsureVisible(curPlayList.GetHeadPosition());
 
 					return true;
 				}

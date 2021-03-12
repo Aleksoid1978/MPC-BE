@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -245,12 +245,14 @@ private:
 		EXPLORER
 	};
 
-	enum {
-		ROOT,
-		DRIVE,
-		FOLDER,
-		PARENT,
-		FILE
+	enum ItemType : int {
+		IT_NONE = -1,
+		IT_PARENT = 0,
+		IT_DRIVE,
+		IT_FOLDER,
+		IT_FILE,
+		IT_URL,
+		IT_PIPE,
 	};
 
 	enum SORT : BYTE {
