@@ -623,7 +623,7 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	hr = pD3D11DecoderConfiguration->ActivateD3D11Decoding(pDeviceContext->device, pDeviceContext->device_context, pDeviceContext->lock_ctx, 0);
 	SAFE_RELEASE(pD3D11DecoderConfiguration);
 
-	return S_OK;
+	return hr;
 }
 
 void CD3D11Decoder::FillHWContext(AVD3D11VAContext* ctx)
