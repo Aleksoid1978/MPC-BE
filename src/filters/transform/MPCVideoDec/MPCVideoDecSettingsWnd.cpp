@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,28 +27,6 @@
 // CMPCVideoDecSettingsWnd
 //
 
-int g_AVDiscard[] = {
-	AVDISCARD_NONE,
-	AVDISCARD_DEFAULT,
-	AVDISCARD_NONREF,
-	AVDISCARD_BIDIR,
-	AVDISCARD_NONKEY,
-	AVDISCARD_ALL,
-};
-
-int FindDiscardIndex(int nValue)
-{
-	for (int i=0; i<_countof (g_AVDiscard); i++)
-		if (g_AVDiscard[i] == nValue) {
-			return i;
-		}
-	return 1;
-}
-
-CMPCVideoDecSettingsWnd::CMPCVideoDecSettingsWnd()
-{
-}
-
 bool CMPCVideoDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
 {
 	ASSERT(!m_pMDF);
@@ -75,7 +53,6 @@ void CMPCVideoDecSettingsWnd::OnDisconnect()
 
 void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 {
-	CString str;
 	m_edtInputFormat.SetWindowTextW(m_pMDF->GetInformation(INFO_InputFormat));
 	m_edtFrameSize.SetWindowTextW(m_pMDF->GetInformation(INFO_FrameSize));
 	m_edtOutputFormat.SetWindowTextW(m_pMDF->GetInformation(INFO_OutputFormat));
@@ -416,10 +393,6 @@ void CMPCVideoDecSettingsWnd::OnTimer(UINT_PTR nIDEvent)
 
 // ====== Codec filter property page (for standalone filter only)
 #ifdef REGISTER_FILTER
-CMPCVideoDecCodecWnd::CMPCVideoDecCodecWnd()
-{
-}
-
 bool CMPCVideoDecCodecWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
 {
 	ASSERT(!m_pMDF);

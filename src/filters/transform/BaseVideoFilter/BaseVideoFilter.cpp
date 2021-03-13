@@ -253,7 +253,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		ASSERT(SUCCEEDED(hrQA)); // should better not fail, after all "mt" is the current media type, just with a different resolution
 		HRESULT hr = S_OK;
 
-		if (m_nDecoderMode == MODE_DXVA2) {
+		if (m_nDecoderMode != MODE_SOFTWARE ) {
 			m_pOutput->SetMediaType(&mt);
 			m_bSendMediaType = true;
 		} else {

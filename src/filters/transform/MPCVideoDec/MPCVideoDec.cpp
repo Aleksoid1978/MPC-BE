@@ -24,6 +24,7 @@
 #include "MPCVideoDec.h"
 #include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"
+#include "./D3D11Decoder/D3D11Decoder.h"
 
 #include "../../../DSUtil/CPUInfo.h"
 #include "../../../DSUtil/D3D9Helper.h"
@@ -1035,6 +1036,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nARX(0)
 	, m_nARY(0)
 	, m_bUseDXVA(true)
+	, m_bUseD3D11(true)
 	, m_bUseFFmpeg(true)
 	, m_pDXVADecoder(nullptr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
@@ -1165,12 +1167,17 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
+	m_pD3D11Decoder = DNew CD3D11Decoder(this);
+	if (FAILED(m_pD3D11Decoder->Init())) {
+		SAFE_DELETE(m_pD3D11Decoder);
+	}
+
 #ifdef _DEBUG
 	// Check codec definition table
-	size_t nCodecs		= _countof(ffCodecs);
-	size_t nPinTypes	= _countof(sudPinTypesIn);
-	size_t nPinTypesUncompressed = _countof(sudPinTypesInUncompressed);
-	ASSERT(nCodecs == nPinTypes + nPinTypesUncompressed );
+	constexpr auto nCodecs               = std::size(ffCodecs);
+	constexpr auto nPinTypes             = std::size(sudPinTypesIn);
+	constexpr auto nPinTypesUncompressed = std::size(sudPinTypesInUncompressed);
+	ASSERT(nCodecs == nPinTypes + nPinTypesUncompressed);
 	for (size_t i = 0; i < nPinTypes; i++) {
 		ASSERT(ffCodecs[i].clsMinorType == sudPinTypesIn[i].clsMinorType);
 	}
@@ -1343,13 +1350,12 @@ static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[VDEC_DXV
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE*/)
 {
-	m_bUseFFmpeg	= false;
-	m_bUseDXVA		= false;
+	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = false;
 	for (size_t i = 0; i < _countof(ffCodecs); i++)
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 #ifndef REGISTER_FILTER
-			m_bUseFFmpeg	= bForced || IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
-			m_bUseDXVA		= bForced || IsDXVAEnabled(ffCodecs[i], m_DXVAFilters);
+			m_bUseFFmpeg = bForced || IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
+			m_bUseDXVA   = bForced || IsDXVAEnabled(ffCodecs[i], m_DXVAFilters);
 			return ((m_bUseDXVA || m_bUseFFmpeg) ? i : -1);
 #else
 			bool bCodecActivated = false;
@@ -1541,6 +1547,7 @@ void CMPCVideoDecFilter::Cleanup()
 
 	SAFE_DELETE(m_pMSDKDecoder);
 	SAFE_DELETE(m_pDXVADecoder);
+	SAFE_DELETE(m_pD3D11Decoder);
 	m_VideoOutputFormats.clear();
 
 	CleanupD3DResources();
@@ -1649,16 +1656,16 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 	return __super::SetMediaType(direction, pmt);
 }
 
-bool CMPCVideoDecFilter::IsDXVASupported()
+bool CMPCVideoDecFilter::IsDXVASupported(const bool bMode)
 {
 	if (m_nCodecId != AV_CODEC_ID_NONE) {
 		// Enabled by user ?
-		if (m_bUseDXVA) {
+		if (bMode) {
 			// is the file compatible ?
 			if (m_bDXVACompatible) {
 				// Does the codec suppport DXVA ?
-				for (int i = 0; i < _countof(DXVAModes); i++) {
-					if (m_nCodecId == DXVAModes[i].nCodecId) {
+				for (const auto& mode : DXVAModes) {
+					if (m_nCodecId == mode.nCodecId) {
 						return true;
 					}
 				}
@@ -1764,7 +1771,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 #define VP9_CHECK_PROFILE(profile) \
 	((profile) == FF_PROFILE_VP9_0 || (profile) == FF_PROFILE_VP9_2)
 
-static bool check_dxva_compatible(const AVCodecID& codec, const AVPixelFormat& pix_fmt, const int& profile)
+bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const enum AVPixelFormat pix_fmt, const int profile)
 {
 	switch (codec) {
 		case AV_CODEC_ID_MPEG2VIDEO:
@@ -1806,7 +1813,7 @@ static bool check_dxva_compatible(const AVCodecID& codec, const AVPixelFormat& p
 	return true;
 }
 
-HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
+HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 {
 	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
@@ -1828,6 +1835,8 @@ redo:
 	if (nNewCodec == -1) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
+
+	m_bUseD3D11 = m_bUseDXVA && m_bD3D11DecodeCompatible && m_pD3D11Decoder;
 
 	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y8, I420)
 	CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected());
@@ -1950,9 +1959,15 @@ redo:
 		m_pParser = av_parser_init(m_nCodecId);
 	}
 
-	if (bReinit && m_nDecoderMode == MODE_SOFTWARE) {
-		m_bUseDXVA = false;
+	if (m_bFallBackFromD3D11) {
+		m_bUseD3D11 = false;
+	} else if (m_bFallBackFromDXVA2) {
+		m_bUseDXVA = m_bUseD3D11 = false;
+	} else if (bReinit && m_nDecoderMode == MODE_SOFTWARE) {
+		m_bUseDXVA = m_bUseD3D11 = false;
 	}
+
+	m_bFallBackFromDXVA2 = m_bFallBackFromD3D11 = false;
 
 	SetThreadCount();
 
@@ -1980,7 +1995,7 @@ redo:
 	}
 
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO && bInterlacedFieldPerSample && m_nPCIVendor == PCIV_ATI) {
-		m_bUseDXVA = false;
+		m_bUseDXVA = m_bUseD3D11 = false;
 	}
 
 	if (bChangeType) {
@@ -2008,7 +2023,9 @@ redo:
 	m_pAVCtx->skip_frame            = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->opaque                = this;
 
-	if (IsDXVASupported()) {
+	if (IsDXVASupported(m_bUseD3D11)) {
+		m_pD3D11Decoder->AdditionaDecoderInit(m_pAVCtx);
+	} else if (IsDXVASupported(m_bUseDXVA)) {
 		m_pAVCtx->hwaccel_context   = (dxva_context *)av_mallocz(sizeof(dxva_context));
 		m_pAVCtx->get_format        = av_get_format;
 		m_pAVCtx->get_buffer2       = av_get_buffer;
@@ -2157,7 +2174,7 @@ redo:
 	m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 	m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
 
-	if (bChangeType && IsDXVASupported()) {
+	if (bChangeType && IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 		do {
 			m_bDXVACompatible = false;
 
@@ -2193,7 +2210,7 @@ redo:
 						break;
 					}
 				}
-			} else if (!check_dxva_compatible(m_nCodecId, m_pAVCtx->pix_fmt, m_pAVCtx->profile)) {
+			} else if (!CheckDXVACompatible(m_nCodecId, m_pAVCtx->pix_fmt, m_pAVCtx->profile)) {
 				break;
 			}
 
@@ -2211,7 +2228,11 @@ redo:
 		m_pDXVADecoder->FillHWContext();
 	}
 
-	m_bFailDXVA2Decode = FALSE;
+	if (IsDXVASupported(m_bUseD3D11)) {
+		m_pD3D11Decoder->PostInitDecoder(m_pAVCtx);
+	}
+
+	m_bFailDXVA2Decode = m_bFailD3D11Decode = FALSE;
 
 	return S_OK;
 }
@@ -2314,13 +2335,13 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	}
 
 	int OutputCount = m_bUseFFmpeg ? nSwCount : 0;
-	if (IsDXVASupported()) {
+	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 		OutputCount += m_bHighBitdepth ? std::size(DXVAFormats10bit) : std::size(DXVAFormats);
 	}
 	m_VideoOutputFormats.reserve(OutputCount);
 
 	int nPos = 0;
-	if (IsDXVASupported()) {
+	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 		if (m_bHighBitdepth) {
 			for (const auto& fmt : DXVAFormats10bit) {
 				m_VideoOutputFormats.push_back(fmt);
@@ -2620,8 +2641,22 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
-	if (direction == PINDIR_OUTPUT) {
-		if (IsDXVASupported() && SUCCEEDED(ConfigureDXVA2(pReceivePin))) {
+ 	if (direction == PINDIR_OUTPUT) {
+		if (IsDXVASupported(m_bUseD3D11)) {
+			HRESULT hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
+			if (SUCCEEDED(hr)) {
+				m_bD3D11DecodeCompatible = TRUE;
+				m_nDecoderMode = MODE_D3D11;
+				if (auto guid = m_pD3D11Decoder->GetDecoderGuid()) {
+					DXVAState::SetActiveState(*guid, L"D3D11 Native");
+				}
+			} else {
+				m_bD3D11DecodeCompatible = FALSE;
+				m_nDecoderMode = MODE_SOFTWARE;
+				DXVAState::ClearState();
+				m_bFallBackFromD3D11 = true;
+			}
+		} else if (IsDXVASupported(m_bUseDXVA) && SUCCEEDED(ConfigureDXVA2(pReceivePin))) {
 			HRESULT hr = E_FAIL;
 			for (;;) {
 				CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
@@ -2678,6 +2713,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				SAFE_DELETE(m_pDXVADecoder);
 				m_nDecoderMode = MODE_SOFTWARE;
 				DXVAState::ClearState();
+				m_bFallBackFromDXVA2 = true;
 			}
 		}
 
@@ -2686,7 +2722,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				return VFW_E_INVALIDMEDIATYPE;
 			}
 
-			if (IsDXVASupported()) {
+			if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 				HRESULT hr;
 				if (FAILED(hr = InitDecoder(&m_pCurrentMediaType))) {
 					return hr;
@@ -2719,7 +2755,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties)
 {
-	if (UseDXVA2()) {
+	if (UseDXVA2() || UseD3D11()) {
 		if (m_pInput->IsConnected() == FALSE) {
 			return E_UNEXPECTED;
 		}
@@ -3106,6 +3142,16 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			SAFE_DELETE(m_pDXVADecoder);
 			m_nDecoderMode = MODE_SOFTWARE;
 			DXVAState::ClearState();
+			m_bFallBackFromDXVA2 = !m_bDXVACompatible;
+
+			InitDecoder(&m_pCurrentMediaType);
+			ChangeOutputMediaFormat(2);
+		} else if (UseD3D11() && (!m_bDXVACompatible || m_bFailD3D11Decode)) {
+			DXVAState::ClearState();
+			m_bFallBackFromD3D11 = !m_bDXVACompatible;
+			if (!m_bDXVACompatible) {
+				m_nDecoderMode = MODE_SOFTWARE;
+			}
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
@@ -3143,6 +3189,9 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		if (UseDXVA2()) {
 			hr = m_pDXVADecoder->DeliverFrame();
+			Continue;
+		} else if (UseD3D11()) {
+			hr = m_pD3D11Decoder->DeliverFrame();
 			Continue;
 		}
 
@@ -3366,7 +3415,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
-		if (IsDXVASupported() || m_nCodecId == AV_CODEC_ID_MPEG4) {
+		if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11) || m_nCodecId == AV_CODEC_ID_MPEG4) {
 			m_pAVCtx->thread_count = 1;
 		} else {
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber();
@@ -3470,12 +3519,12 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc& videoDesc, D3DF
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 {
-	if (IsDXVASupported()) {
-		for (int i = 0; i < _countof(DXVAModes); i++) {
-			if (DXVAModes[i].nCodecId == m_nCodecId
-					&& DXVAModes[i].decoderGUID == decoderGUID
-					&& DXVAModes[i].bHighBitdepth == !!m_bHighBitdepth) {
-				return true;
+	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+		for (const auto& mode : DXVAModes) {
+			if (mode.nCodecId == m_nCodecId
+					&& mode.decoderGUID == decoderGUID
+					&& mode.bHighBitdepth == !!m_bHighBitdepth) {
+				return TRUE;
 			}
 		}
 	}
@@ -3649,7 +3698,7 @@ HRESULT CMPCVideoDecFilter::ReinitDXVA2Decoder()
 	HRESULT hr = E_FAIL;
 
 	SAFE_DELETE(m_pDXVADecoder);
-	if (m_pDXVA2Allocator && IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
+	if (m_pDXVA2Allocator && IsDXVASupported(m_bUseDXVA) && SUCCEEDED(FindDecoderConfiguration())) {
 		hr = RecommitAllocator();
 	}
 
@@ -3658,18 +3707,22 @@ HRESULT CMPCVideoDecFilter::ReinitDXVA2Decoder()
 
 HRESULT CMPCVideoDecFilter::InitAllocator(IMemAllocator **ppAlloc)
 {
-	HRESULT hr = S_FALSE;
-	m_pDXVA2Allocator = DNew CVideoDecDXVAAllocator(this, &hr);
-	if (!m_pDXVA2Allocator) {
-		return E_OUTOFMEMORY;
-	}
-	if (FAILED(hr)) {
-		SAFE_DELETE(m_pDXVA2Allocator);
-		return hr;
-	}
+	if (UseDXVA2()) {
+		HRESULT hr = S_FALSE;
+		m_pDXVA2Allocator = new(std::nothrow) CVideoDecDXVAAllocator(this, &hr);
+		if (!m_pDXVA2Allocator) {
+			return E_OUTOFMEMORY;
+		}
+		if (FAILED(hr)) {
+			SAFE_DELETE(m_pDXVA2Allocator);
+			return hr;
+		}
 
-	// Return the IMemAllocator interface.
-	return m_pDXVA2Allocator->QueryInterface(IID_PPV_ARGS(ppAlloc));
+		// Return the IMemAllocator interface.
+		return m_pDXVA2Allocator->QueryInterface(IID_PPV_ARGS(ppAlloc));
+	} else {
+		return m_pD3D11Decoder->InitAllocator(ppAlloc);
+	}
 }
 
 HRESULT CMPCVideoDecFilter::RecommitAllocator()
@@ -3921,7 +3974,7 @@ STDMETHODIMP_(MPC_SCAN_TYPE) CMPCVideoDecFilter::GetScanType()
 
 STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
 {
-	return m_pGraph && m_pDXVADecoder ? &m_DXVADecoderGUID : nullptr;
+	return m_pGraph && m_pDXVADecoder ? &m_DXVADecoderGUID : (m_bUseD3D11 && m_pD3D11Decoder ? m_pD3D11Decoder->GetDecoderGuid() : nullptr);
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(ULONGLONG nValue)
@@ -4082,7 +4135,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
-				const auto& pix_fmt = m_pDXVADecoder ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
+				const auto& pix_fmt = m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
 
 				infostr = m_pAVCtx->codec_descriptor->name;
 				if (m_pAVCtx->codec_id == AV_CODEC_ID_RAWVIDEO) {
@@ -4127,7 +4180,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_OutputFormat:
 			if (GUID* DxvaGuid = GetDXVADecoderGuid()) {
-				infostr.Format(L"DXVA2 (%s)", GetDXVAMode(*DxvaGuid));
+				infostr.Format(L"%s (%s)", UseDXVA2() ? L"DXVA2" : L"D3D11", GetDXVAMode(*DxvaGuid));
 				break;
 			}
 			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
@@ -4150,7 +4203,7 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 
 	if (m_pDXVADecoder) {
 		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
-			|| ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
+				|| ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
 			const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
 			const BOOL bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
 														  || (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
@@ -4184,7 +4237,7 @@ int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, in
 {
 	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
 	CheckPointer(pFilter->m_pDXVADecoder, -1);
-	if (!check_dxva_compatible(c->codec_id, c->sw_pix_fmt, c->profile)) {
+	if (!pFilter->CheckDXVACompatible(c->codec_id, c->sw_pix_fmt, c->profile)) {
 		pFilter->m_bDXVACompatible = false;
 		return -1;
 	}
@@ -4231,7 +4284,7 @@ CVideoDecOutputPin::~CVideoDecOutputPin()
 
 HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 {
-	if (m_pVideoDecFilter && m_pVideoDecFilter->UseDXVA2()) {
+	if (m_pVideoDecFilter && (m_pVideoDecFilter->UseDXVA2() || m_pVideoDecFilter->UseD3D11())) {
 		return m_pVideoDecFilter->InitAllocator(ppAlloc);
 	}
 

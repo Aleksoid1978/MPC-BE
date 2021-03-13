@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,7 +98,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	void		UpdateStatusInfo();
 
 public:
-	CMPCVideoDecSettingsWnd();
+	CMPCVideoDecSettingsWnd() = default;
+	~CMPCVideoDecSettingsWnd() = default;
 
 	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 	void OnDisconnect();
@@ -129,7 +130,8 @@ class __declspec(uuid("3C395D46-8B0F-440d-B962-2F4A97355453"))
 	CImageList		m_onoff;
 
 public:
-	CMPCVideoDecCodecWnd();
+	CMPCVideoDecCodecWnd() = default;
+	~CMPCVideoDecCodecWnd() = default;
 
 	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 	void OnDisconnect();

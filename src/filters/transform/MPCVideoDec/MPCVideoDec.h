@@ -41,6 +41,7 @@ struct AVCodecContext;
 struct AVCodecParserContext;
 struct AVFrame;
 struct AVPacket;
+class CD3D11Decoder;
 
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
@@ -95,6 +96,7 @@ protected:
 	double									m_dRate;
 
 	bool									m_bUseDXVA;
+	bool									m_bUseD3D11;
 	bool									m_bUseFFmpeg;
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
@@ -121,6 +123,11 @@ protected:
 	DXVA2_VideoDesc							m_VideoDesc;
 
 	BOOL									m_bFailDXVA2Decode = FALSE;
+	BOOL									m_bFailD3D11Decode = FALSE;
+	BOOL									m_bD3D11DecodeCompatible = TRUE;
+
+	bool									m_bFallBackFromDXVA2 = FALSE;
+	bool									m_bFallBackFromD3D11 = FALSE;
 
 	BOOL									m_bWaitingForKeyFrame;
 	BOOL									m_bRVDropBFrameTimings;
@@ -176,6 +183,8 @@ protected:
 	bool m_bHasPalette = false;
 	unsigned int m_Palette[256] = {};
 
+	CD3D11Decoder* m_pD3D11Decoder = nullptr;
+
 	// === Private functions
 	void			Cleanup();
 	void			CleanupD3DResources();
@@ -207,7 +216,9 @@ protected:
 	HRESULT						CheckDXVA2Decoder(AVCodecContext *c);
 
 	static int					av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
-	static enum AVPixelFormat	av_get_format(struct AVCodecContext *c, const enum AVPixelFormat * pix_fmts);
+	static enum AVPixelFormat	av_get_format(struct AVCodecContext *c, const enum AVPixelFormat* pix_fmts);
+
+	bool						CheckDXVACompatible(const enum AVCodecID codec, const enum AVPixelFormat pix_fmt, const int profile);
 
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
@@ -285,8 +296,9 @@ public:
 	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 
 	inline bool					UseDXVA2() const { return m_nDecoderMode == MODE_DXVA2; }
+	inline bool					UseD3D11() const { return m_nDecoderMode == MODE_D3D11; }
 
-	bool						IsDXVASupported();
+	bool						IsDXVASupported(const bool bMode);
 	void						UpdateAspectRatio();
 	void						FlushDXVADecoder();
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
@@ -316,6 +328,9 @@ private:
 	friend class CVideoDecDXVAAllocator;
 	friend class CDXVA2Decoder;
 	friend class CMSDKDecoder;
+	friend class CD3D11Decoder;
+
+	BOOL m_bInInit = FALSE;
 
 	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 

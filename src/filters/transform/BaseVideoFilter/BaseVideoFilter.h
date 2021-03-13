@@ -40,7 +40,8 @@ struct VIDEO_OUTPUT_FORMATS {
 
 enum DECODER_MODE {
 	MODE_SOFTWARE,
-	MODE_DXVA2
+	MODE_DXVA2,
+	MODE_D3D11
 };
 
 class CBaseVideoFilter : public CTransformFilter

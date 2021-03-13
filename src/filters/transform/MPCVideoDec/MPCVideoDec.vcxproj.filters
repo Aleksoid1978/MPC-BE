@@ -25,6 +25,9 @@
     <Filter Include="pixconv">
       <UniqueIdentifier>{f14b2a0f-1719-46f8-ae06-bf1b7228f2b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3D11Decoder">
+      <UniqueIdentifier>{4685cb13-4cc9-4ce8-895a-42a6b2c1fdb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ffmpegContext.cpp">
@@ -80,6 +83,12 @@
     </ClCompile>
     <ClCompile Include="pixconv\yuv420_yuy2.cpp">
       <Filter>pixconv</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Decoder\D3D11SurfaceAllocator.cpp">
+      <Filter>D3D11Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Decoder\D3D11Decoder.cpp">
+      <Filter>D3D11Decoder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +157,15 @@
     </ClInclude>
     <ClInclude Include="pixconv\pixconv_internal.h">
       <Filter>pixconv</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Decoder\D3D11SurfaceAllocator.h">
+      <Filter>D3D11Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Decoder\ID3DVideoMemoryConfiguration.h">
+      <Filter>D3D11Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Decoder\D3D11Decoder.h">
+      <Filter>D3D11Decoder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

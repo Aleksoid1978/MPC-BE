@@ -214,6 +214,8 @@
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3D11Decoder\D3D11Decoder.cpp" />
+    <ClCompile Include="D3D11Decoder\D3D11SurfaceAllocator.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp" />
     <ClCompile Include="DXVADecoder\DXVAAllocator.cpp" />
     <ClCompile Include="DXVADecoder\MediaSampleSideData.cpp" />
@@ -239,6 +241,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="D3D11Decoder\D3D11Decoder.h" />
+    <ClInclude Include="D3D11Decoder\D3D11SurfaceAllocator.h" />
+    <ClInclude Include="D3D11Decoder\ID3DVideoMemoryConfiguration.h" />
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
     <ClInclude Include="DXVADecoder\DXVAAllocator.h" />
     <ClInclude Include="DXVADecoder\MediaSampleSideData.h" />
