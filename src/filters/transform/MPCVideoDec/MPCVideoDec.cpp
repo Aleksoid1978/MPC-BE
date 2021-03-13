@@ -1173,9 +1173,11 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
-	m_pD3D11Decoder = DNew CD3D11Decoder(this);
-	if (FAILED(m_pD3D11Decoder->Init())) {
-		SAFE_DELETE(m_pD3D11Decoder);
+	if (m_bEnableD3D11Decoder) {
+		m_pD3D11Decoder = DNew CD3D11Decoder(this);
+		if (FAILED(m_pD3D11Decoder->Init())) {
+			SAFE_DELETE(m_pD3D11Decoder);
+		}
 	}
 
 #ifdef _DEBUG
