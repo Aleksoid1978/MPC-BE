@@ -15756,7 +15756,8 @@ void CMainFrame::SetupRecentFilesSubMenu()
 	}
 
 	UINT id = ID_RECENT_FILE_START;
-	CRecentFileList& MRU = AfxGetAppSettings().MRU;
+	CAppSettings& s = AfxGetAppSettings();
+	CRecentFileList& MRU = s.MRU;
 	MRU.ReadList();
 
 	int mru_count = 0;
@@ -15777,25 +15778,32 @@ void CMainFrame::SetupRecentFilesSubMenu()
 			CString path(MRU[i]);
 
 			if (PathIsURLW(path)) {
-				EllipsisURL(path, 100);
-			}
-			else if (IsDVDStartFile(path)) {
-				path.Truncate(path.ReverseFind('\\'));
-				EllipsisPath(path, 100);
-				path.Insert(0, L"DVD - ");
-			}
-			else if (IsBDStartFile(path)) {
-				path.Truncate(path.ReverseFind('\\'));
-				if (path.Right(5).MakeUpper() == L"\\BDMV") {
-					path.Truncate(path.GetLength() - 5);
+				if (s.bRecentFilesMenuEllipsis) {
+					EllipsisURL(path, 100);
 				}
-				EllipsisPath(path, 100);
-				path.Insert(0, L"Blu-ray - ");
-			} else if (IsBDPlsFile(path)) {
-				EllipsisPath(path, 100);
-				path.Insert(0, L"Blu-ray - ");
-			} else {
-				EllipsisPath(path, 100);
+			}
+			else {
+				CStringW prefix;
+
+				if (IsDVDStartFile(path)) {
+					path.Truncate(path.ReverseFind('\\'));
+					prefix = L"DVD - ";
+				}
+				else if (IsBDStartFile(path)) {
+					path.Truncate(path.ReverseFind('\\'));
+					if (path.Right(5).MakeUpper() == L"\\BDMV") {
+						path.Truncate(path.GetLength() - 5);
+					}
+					prefix = L"Blu-ray - ";
+				}
+				else if (IsBDPlsFile(path)) {
+					prefix = L"Blu-ray - ";
+				}
+
+				if (s.bRecentFilesMenuEllipsis) {
+					EllipsisPath(path, 100);
+				}
+				path.Insert(0, prefix);
 			}
 
 			path.Replace(L"&", L"&&");

@@ -579,6 +579,7 @@ public:
 	int				iSeekBarTextStyle;
 	bool			bKeepHistory;
 	int				iRecentFilesNumber;
+	bool			bRecentFilesMenuEllipsis;
 	CRecentFileAndURLList MRU;
 	CRecentFileAndURLList MRUDub;
 	bool			bRememberDVDPos;
