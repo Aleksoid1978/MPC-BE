@@ -55,6 +55,7 @@ protected:
 	MPC_SCAN_TYPE							m_nScanType;
 	int										m_nARMode;
 	int										m_nDiscardMode;
+	bool									m_bEnableD3D11Decoder;
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
 	bool									m_fPixFmts[PixFmt_count];
@@ -263,6 +264,8 @@ public:
 	STDMETHODIMP SetARMode(int nValue);
 	STDMETHODIMP_(int) GetARMode();
 
+	STDMETHODIMP SetD3D11Decoder(bool enable);
+	STDMETHODIMP_(bool) GetD3D11Decoder();
 	STDMETHODIMP SetDXVACheckCompatibility(int nValue);
 	STDMETHODIMP_(int) GetDXVACheckCompatibility();
 	STDMETHODIMP SetDXVA_SD(int nValue);

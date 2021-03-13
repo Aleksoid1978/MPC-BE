@@ -122,6 +122,8 @@ public IUnknown {
 	STDMETHOD(SetARMode(int nValue)) PURE;
 	STDMETHOD_(int, GetARMode()) PURE;
 
+	STDMETHOD(SetD3D11Decoder(bool enable)) PURE;
+	STDMETHOD_(bool, GetD3D11Decoder()) PURE;
 	STDMETHOD(SetDXVACheckCompatibility(int nValue)) PURE;
 	STDMETHOD_(int, GetDXVACheckCompatibility()) PURE;
 	STDMETHOD(SetDXVA_SD(int nValue)) PURE;

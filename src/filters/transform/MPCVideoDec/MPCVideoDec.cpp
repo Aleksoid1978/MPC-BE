@@ -69,6 +69,7 @@ extern "C" {
 #define OPT_DiscardMode      L"DiscardMode"
 #define OPT_ScanType         L"ScanType"
 #define OPT_ARMode           L"ARMode"
+#define OPT_EnableD3D11Dec   L"EnableD3D11Decoder"
 #define OPT_DXVACheck        L"DXVACheckCompatibility"
 #define OPT_DisableDXVA_SD   L"DisableDXVA_SD"
 #define OPT_SW_prefix        L"Sw_"
@@ -1014,6 +1015,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
 	, m_nScanType(SCAN_AUTO)
 	, m_nARMode(2)
+	, m_bEnableD3D11Decoder(true)
 	, m_nDXVACheckCompatibility(1)
 	, m_nDXVA_SD(0)
 	, m_nSwRGBLevels(0)
@@ -1098,6 +1100,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ARMode, dw)) {
 			m_nARMode = dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_EnableD3D11Dec, dw)) {
+			m_bEnableD3D11Decoder = !!dw;
+		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DXVACheck, dw)) {
 			m_nDXVACheckCompatibility = dw;
 		}
@@ -1132,6 +1137,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ScanType, *(int*)&m_nScanType);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
+	profile.ReadBool(OPT_SECTION_VideoDec, OPT_EnableD3D11Dec, m_bEnableD3D11Decoder);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -3885,6 +3891,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 		key.SetDWORDValue(OPT_DiscardMode, m_nDiscardMode);
 		key.SetDWORDValue(OPT_ScanType, (int)m_nScanType);
 		key.SetDWORDValue(OPT_ARMode, m_nARMode);
+		key.SetDWORDValue(OPT_EnableD3D11Dec, m_bEnableD3D11Decoder);
 		key.SetDWORDValue(OPT_DXVACheck, m_nDXVACheckCompatibility);
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
@@ -3909,6 +3916,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ScanType, (int)m_nScanType);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+	profile.WriteBool(OPT_SECTION_VideoDec, OPT_EnableD3D11Dec, m_bEnableD3D11Decoder);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -4001,6 +4009,19 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetARMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nARMode;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetD3D11Decoder(bool enable)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bEnableD3D11Decoder = enable;
+	return S_OK;
+}
+
+STDMETHODIMP_(bool) CMPCVideoDecFilter::GetD3D11Decoder()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bEnableD3D11Decoder;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetDXVACheckCompatibility(int nValue)

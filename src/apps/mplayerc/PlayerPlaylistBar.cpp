@@ -3387,7 +3387,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	}
 	m.AppendMenu(MF_STRING | (bOnItem && item_type == IT_FILE ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_MEDIAINFO, L"MediaInfo");
 	if (item_type == IT_FILE) {
-		m.AppendMenu(MF_STRING | MF_ENABLED, M_OPENFOLDER, L"Open containing folder");
+		m.AppendMenu(MF_STRING | MF_ENABLED, M_OPENFOLDER, ResStr(IDS_PLAYLIST_OPENFOLDER));
 	}
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistTooltip ? MF_CHECKED : MF_UNCHECKED), M_SHOWTOOLTIP, ResStr(IDS_PLAYLIST_SHOWTOOLTIP));

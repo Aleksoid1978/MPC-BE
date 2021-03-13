@@ -104,10 +104,15 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_chSkipBFrames.Create(ResStr(IDS_VDF_SKIPBFRAMES)+L"*", dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_SKIPBFRAMES);
 	m_chSkipBFrames.SetCheck(FALSE);
 
-	////////// DXVA settings //////////
+	////////// Hardware acceleration //////////
 	p.y = 10 + ScaleY(115) + 5;
-	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(65))), this, (UINT)IDC_STATIC);
+	m_grpHwAcceleration.Create(ResStr(IDS_VDF_HW_ACCELERATION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(90))), this, (UINT)IDC_STATIC);
 	p.y += h20;
+
+	// Use D3D11 decoder
+	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_USE_D3D_DEC);
+	m_chUseD3D11Decoder.SetCheck(TRUE);
+	p.y += h25;
 
 	// DXVA Compatibility check
 	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
@@ -119,12 +124,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Set DXVA for SD (H.264)
-	m_cbDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_DXVA_SD);
-	m_cbDXVA_SD.SetCheck (FALSE);
+	m_chDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_DXVA_SD);
+	m_chDXVA_SD.SetCheck (FALSE);
 	p.y += h25;
 
 	////////// Status //////////
-	p.y = 10 + ScaleY(115) + 5 + ScaleY(65) + 5;
+	p.y = 10 + ScaleY(115) + 5 + ScaleY(90) + 5;
 	int w1 = ScaleX(122);
 	int w2 = width_s - w1;
 	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(85))), this, (UINT)IDC_STATIC);
@@ -204,8 +209,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_chARMode.SetCheck(m_pMDF->GetARMode());
 		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
 
+		m_chUseD3D11Decoder.SetCheck(!!m_pMDF->GetD3D11Decoder());
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
-		m_cbDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
+		m_chDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
 		// === New swscaler options
 		for (int i = 0; i < PixFmt_count; i++) {
@@ -257,9 +263,9 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetARMode(m_chARMode.GetCheck());
 		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
 
+		m_pMDF->SetD3D11Decoder(m_chUseD3D11Decoder.GetCheck());
 		m_pMDF->SetDXVACheckCompatibility(m_cbDXVACompatibilityCheck.GetCurSel());
-
-		m_pMDF->SetDXVA_SD(m_cbDXVA_SD.GetCheck());
+		m_pMDF->SetDXVA_SD(m_chDXVA_SD.GetCheck());
 
 		// === New swscaler options
 		int refresh = 0; // no refresh
@@ -331,8 +337,9 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_chARMode.SetCheck(BST_INDETERMINATE);
 	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 
+	m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
 	m_cbDXVACompatibilityCheck.SetCurSel(1);
-	m_cbDXVA_SD.SetCheck(BST_UNCHECKED);
+	m_chDXVA_SD.SetCheck(BST_UNCHECKED);
 
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (i == PixFmt_AYUV || i == PixFmt_RGB48) {
