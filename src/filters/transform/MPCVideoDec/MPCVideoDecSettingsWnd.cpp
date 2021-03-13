@@ -111,7 +111,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// Use D3D11 decoder
 	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_USE_D3D_DEC);
-	m_chUseD3D11Decoder.SetCheck(TRUE);
+	if (SysVersion::IsWin8orLater()) {
+		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
+	} else {
+		m_chUseD3D11Decoder.EnableWindow(FALSE);
+		m_chUseD3D11Decoder.SetCheck(BST_UNCHECKED);
+	}
 	p.y += h25;
 
 	// DXVA Compatibility check
@@ -209,7 +214,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_chARMode.SetCheck(m_pMDF->GetARMode());
 		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
 
-		m_chUseD3D11Decoder.SetCheck(!!m_pMDF->GetD3D11Decoder());
+		if (SysVersion::IsWin8orLater()) {
+			m_chUseD3D11Decoder.SetCheck(!!m_pMDF->GetD3D11Decoder());
+		}
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
 		m_chDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
@@ -263,7 +270,9 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetARMode(m_chARMode.GetCheck());
 		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
 
-		m_pMDF->SetD3D11Decoder(m_chUseD3D11Decoder.GetCheck());
+		if (SysVersion::IsWin8orLater()) {
+			m_pMDF->SetD3D11Decoder(m_chUseD3D11Decoder.GetCheck());
+		}
 		m_pMDF->SetDXVACheckCompatibility(m_cbDXVACompatibilityCheck.GetCurSel());
 		m_pMDF->SetDXVA_SD(m_chDXVA_SD.GetCheck());
 
@@ -337,7 +346,9 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_chARMode.SetCheck(BST_INDETERMINATE);
 	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 
-	m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
+	if (SysVersion::IsWin8orLater()) {
+		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
+	}
 	m_cbDXVACompatibilityCheck.SetCurSel(1);
 	m_chDXVA_SD.SetCheck(BST_UNCHECKED);
 
