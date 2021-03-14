@@ -7,7 +7,7 @@ VSFilter is excluded from the project.
 Updated libraries:
 	dav1d git-0.8.2-0-gf06148e;
 	Detours git-v4.0.1-77-g9116a26;
-	ffmpeg git-n4.4-dev-3099-g029e3c1c70;
+	ffmpeg git-n4.4-dev-3435-gbd525e2876;
 	Little-CMS git-2.12-g924a020;
 	MediaInfo git-v20.09-101-g5d833dd1;
 	rapidjson git-v1.1.0-588-g13dfc96c;

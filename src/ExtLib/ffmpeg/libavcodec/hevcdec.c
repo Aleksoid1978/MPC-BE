@@ -3311,7 +3311,7 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
                              AVPacket *avpkt)
 {
     int ret;
-    int new_extradata_size;
+    buffer_size_t new_extradata_size;
     uint8_t *new_extradata;
     HEVCContext *s = avctx->priv_data;
 

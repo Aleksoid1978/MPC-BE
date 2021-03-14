@@ -419,6 +419,14 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
         for (; n > 0; n--)
             *samples++ = *src++ + 128;
         break;
+    case AV_CODEC_ID_PCM_SGA:
+        for (; n > 0; n--) {
+            int sign = *src >> 7;
+            int magn = *src & 0x7f;
+            *samples++ = sign ? 128 - magn : 128 + magn;
+            src++;
+        }
+        break;
     case AV_CODEC_ID_PCM_S8_PLANAR:
         n /= avctx->channels;
         for (c = 0; c < avctx->channels; c++) {

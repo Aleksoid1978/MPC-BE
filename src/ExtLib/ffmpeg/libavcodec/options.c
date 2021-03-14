@@ -130,6 +130,7 @@ static int init_context_defaults(AVCodecContext *s, const AVCodec *codec)
     s->pkt_timebase        = (AVRational){ 0, 1 };
     s->get_buffer2         = avcodec_default_get_buffer2;
     s->get_format          = avcodec_default_get_format;
+    s->get_encode_buffer   = avcodec_default_get_encode_buffer;
     s->execute             = avcodec_default_execute;
     s->execute2            = avcodec_default_execute2;
     s->sample_aspect_ratio = (AVRational){0,1};
@@ -312,6 +313,7 @@ const AVClass *avcodec_get_class(void)
     return &av_codec_context_class;
 }
 
+#if FF_API_GET_FRAME_CLASS
 #define FOFFSET(x) offsetof(AVFrame,x)
 
 static const AVOption frame_options[]={
@@ -327,7 +329,6 @@ static const AVOption frame_options[]={
 {NULL},
 };
 
-#if FF_API_COPY_CONTEXT
 static const AVClass av_frame_class = {
     .class_name              = "AVFrame",
     .item_name               = NULL,
@@ -354,7 +355,6 @@ static const AVOption subtitle_rect_options[]={
 {NULL},
 };
 
-#if FF_API_COPY_CONTEXT
 static const AVClass av_subtitle_rect_class = {
     .class_name             = "AVSubtitleRect",
     .item_name              = NULL,
@@ -366,4 +366,3 @@ const AVClass *avcodec_get_subtitle_rect_class(void)
 {
     return &av_subtitle_rect_class;
 }
-#endif

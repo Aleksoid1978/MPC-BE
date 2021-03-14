@@ -326,6 +326,7 @@ SRCS_LC = \
 	libavcodec/mjpega_dump_header_bsf.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
+	libavcodec/mjpegdec_common.c \
 	libavcodec/mlp.c \
 	libavcodec/mlp_parse.c \
 	libavcodec/mlp_parser.c \
@@ -459,7 +460,6 @@ SRCS_LC_B = \
 	libavcodec/texturedsp.c \
 	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
-	libavcodec/tiff_data.c \
 	libavcodec/tpeldsp.c \
 	libavcodec/truespeech.c \
 	libavcodec/tscc.c \
