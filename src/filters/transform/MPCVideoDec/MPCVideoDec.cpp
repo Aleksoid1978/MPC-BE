@@ -2670,8 +2670,9 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			if (SUCCEEDED(hr)) {
 				m_bD3D11DecodeCompatible = TRUE;
 				m_nDecoderMode = MODE_D3D11;
-				auto guid = m_pD3D11Decoder->GetDecoderGuid();
-				DXVAState::SetActiveState(*guid, L"D3D11 Native");
+				if (auto guid = m_pD3D11Decoder->GetDecoderGuid()) {
+					DXVAState::SetActiveState(*guid, L"D3D11 Native");
+				}
 
 				auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
 				m_nPCIVendor = adapterDesc->VendorId;

@@ -48,7 +48,7 @@ public:
 
 	HRESULT InitAllocator(IMemAllocator** ppAlloc);
 
-	GUID* GetDecoderGuid() { return &m_DecoderGUID; }
+	GUID* GetDecoderGuid() { return m_DecoderGUID != GUID_NULL ? &m_DecoderGUID : nullptr; }
 	DXGI_ADAPTER_DESC* GetAdapterDesc() { return &m_AdapterDesc; }
 
 private:
