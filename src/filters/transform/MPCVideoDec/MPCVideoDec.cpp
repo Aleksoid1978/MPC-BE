@@ -1969,9 +1969,7 @@ redo:
 
 	if (m_bFallBackFromD3D11) {
 		m_bUseD3D11 = false;
-	} else if (m_bFallBackFromDXVA2) {
-		m_bUseDXVA = m_bUseD3D11 = false;
-	} else if (bReinit && m_nDecoderMode == MODE_SOFTWARE) {
+	} else if (m_bFallBackFromDXVA2 || (bReinit && m_nDecoderMode == MODE_SOFTWARE)) {
 		m_bUseDXVA = m_bUseD3D11 = false;
 	}
 
@@ -3155,13 +3153,13 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			SAFE_DELETE(m_pDXVADecoder);
 			m_nDecoderMode = MODE_SOFTWARE;
 			DXVAState::ClearState();
-			m_bFallBackFromDXVA2 = !m_bDXVACompatible;
+			m_bFallBackFromDXVA2 = m_bDXVACompatible;
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
 		} else if (UseD3D11() && (!m_bDXVACompatible || m_bFailD3D11Decode)) {
 			DXVAState::ClearState();
-			m_bFallBackFromD3D11 = !m_bDXVACompatible;
+			m_bFallBackFromD3D11 = m_bDXVACompatible;
 			if (!m_bDXVACompatible) {
 				m_nDecoderMode = MODE_SOFTWARE;
 			}

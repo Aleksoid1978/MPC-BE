@@ -313,7 +313,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
 	HRESULT hr = S_OK;
 
-	const int depth = GetLumaBits(c->pix_fmt);
+	const int depth = GetLumaBits(c->sw_pix_fmt);
 	m_pFilter->m_bHighBitdepth = (depth == 10) && ((codec == AV_CODEC_ID_HEVC && c->profile == FF_PROFILE_HEVC_MAIN_10)
 												|| (codec == AV_CODEC_ID_VP9 && c->profile == FF_PROFILE_VP9_2));
 
