@@ -167,6 +167,51 @@ protected :
     int64u Speed_Contains_NULL;                         //Per Frame - Error 4
     int64u Speed_FrameCount_Arb_Incoherency;            //Global    - Error 5
     int64u Speed_FrameCount_Stts_Fluctuation;           //Global    - Error 6
+    struct abst_bf
+    {
+        struct value_trust
+        {
+            int32s Value;
+            int32s Trust;
+
+            value_trust()
+            {
+                Value=0;
+                Trust=0;
+            }
+
+            bool operator < (const value_trust& b) const
+            {
+                if (Trust==b.Trust)
+                    return Value<b.Value;
+                return Trust>b.Trust;
+            }
+        };
+        vector<value_trust> abst[2]; //0=standard, 1=non-standard x1.5
+        set<int32s> StoredValues;
+        size_t bf[2];
+        size_t Frames_NonStandard[2]; //0=x0.5, 1=x1.5
+
+        abst_bf()
+        {
+            Frames_NonStandard[0]=0;
+            Frames_NonStandard[1]=0;
+            reset();
+        }
+
+        void reset()
+        {
+            abst[0].clear();
+            abst[1].clear();
+            bf[0]=0;
+            bf[1]=0;
+            StoredValues.clear();
+        }
+    };
+    abst_bf AbstBf_Current_Weighted;
+    int32u AbstBf_Current;
+    int32u AbstBf_Previous;
+    int32s AbstBf_Previous_MaxAbst;
     int8u  SMP;
     int8u  QU;
     bool   QU_FSC; //Validity is with QU

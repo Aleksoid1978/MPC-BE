@@ -9,7 +9,7 @@ VSFilter исключен из проекта.
 	Detours git-v4.0.1-77-g9116a26;
 	ffmpeg git-n4.4-dev-3435-gbd525e2876;
 	Little-CMS git-2.12-1-gab54114;
-	MediaInfo git-v20.09-101-g5d833dd1;
+	MediaInfo git-v20.09-113-g68676c89;
 	rapidjson git-v1.1.0-588-g13dfc96c;
 	ZenLib git-v0.4.38-33-g71c33ea;
 

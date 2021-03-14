@@ -8076,7 +8076,6 @@ void File_Mpeg4::moov_trak_udta_xxxx()
 void File_Mpeg4::moov_udta()
 {
     Element_Name("User Data");
-    Skip_XX(Element_TotalSize_Get(), "XXX");
 
     moov_trak_tkhd_TrackID=(int32u)-1;
 }

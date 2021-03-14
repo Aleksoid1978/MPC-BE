@@ -58,10 +58,10 @@
 #endif //MEDIAINFO_DEBUG_BUFFER
 #if MEDIAINFO_ADVANCED
     #include <iostream>
-    #ifdef WINDOWS
+    #if defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
         #include <fcntl.h>
         #include <io.h>
-    #endif
+    #endif //defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
 #endif //MEDIAINFO_ADVANCED
 using namespace ZenLib;
 using namespace std;
@@ -1205,10 +1205,10 @@ void MediaInfo_Internal::Entry()
     #endif //MEDIAINFO_FILE_YES
     #if MEDIAINFO_ADVANCED
         else if (Config.File_Names[0]==__T("-")
-            #ifdef WINDOWS
+            #if defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
                 //&& WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 0) == WAIT_OBJECT_0 //Check if there is something is stdin
                 && _setmode(_fileno(stdin), _O_BINARY) != -1 //Force binary mode
-            #endif
+            #endif //defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
             )
         {
             static const size_t Read_Size=24000; //TODO: tweak this value
