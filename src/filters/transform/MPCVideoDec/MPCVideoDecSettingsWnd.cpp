@@ -61,144 +61,213 @@ void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 
 bool CMPCVideoDecSettingsWnd::OnActivate()
 {
-	const int h16 = ScaleY(16);
-	const int h20 = ScaleY(20);
-	const int h25 = ScaleY(25);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CString str;
 
-	int label_w = ScaleX(225);
-	int combo_w = ScaleX(110);
-	int width_s = label_w + combo_w;
+	CRect rect;
+	long label_w = 224;
+	long control_w = 108;
+	long row_w = label_w + control_w;
+	long group_w = row_w + 8;
+
+	long x0 = 4;
+	long x1 = 8;
+	long x2 = x1 + label_w;
+	long y = 8;
+
 
 	////////// Video settings //////////
-	CPoint p(10, 10);
-	m_grpDecoder.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(115))), this, (UINT)IDC_STATIC);
-	p.y += h20;
+	CalcRect(rect, x0, y, group_w, 108);
+	m_grpDecoder.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
+	y += 20;
 
 	// Decoding threads
-	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_THREAD_NUMBER);
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
+	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_THREAD_NUMBER);
 	m_cbThreadNumber.AddString (ResStr (IDS_VDF_AUTO));
 	for (int i = 1; i <= 16; i++) {
 		str.Format(L"%d", i);
 		m_cbThreadNumber.AddString(str);
 	}
-	p.y += h25;
+	y += 24;
 
 	// Deinterlacing
-	m_txtScanType.Create(ResStr(IDS_VDF_SCANTYPE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbScanType.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DEINTERLACING);
-	m_cbScanType.AddString (ResStr(IDS_VDF_AUTO));
-	m_cbScanType.AddString (ResStr(IDS_VDF_SCANTYPE_TOP));
-	m_cbScanType.AddString (ResStr(IDS_VDF_SCANTYPE_BOTTOM));
-	m_cbScanType.AddString (ResStr(IDS_VDF_SCANTYPE_PROGRESSIVE));
-	p.y += h25;
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtScanType.Create(ResStr(IDS_VDF_SCANTYPE), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
+	m_cbScanType.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_DEINTERLACING);
+	m_cbScanType.AddString(ResStr(IDS_VDF_AUTO));
+	m_cbScanType.AddString(ResStr(IDS_VDF_SCANTYPE_TOP));
+	m_cbScanType.AddString(ResStr(IDS_VDF_SCANTYPE_BOTTOM));
+	m_cbScanType.AddString(ResStr(IDS_VDF_SCANTYPE_PROGRESSIVE));
+	y += 24;
 
 	// Read AR from stream
-	m_chARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_AR);
+	CalcTextRect(rect, x1, y, row_w);
+	m_chARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, rect, this, IDC_PP_AR);
 	m_chARMode.SetCheck(FALSE);
-	p.y += ScaleY(22);
+	y += 20;
 
 	// Skip B-frames
-	m_chSkipBFrames.Create(ResStr(IDS_VDF_SKIPBFRAMES)+L"*", dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_SKIPBFRAMES);
+	CalcTextRect(rect, x1, y, row_w);
+	m_chSkipBFrames.Create(ResStr(IDS_VDF_SKIPBFRAMES) + L"*", dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_SKIPBFRAMES);
 	m_chSkipBFrames.SetCheck(FALSE);
 
 	////////// Hardware acceleration //////////
-	p.y = 10 + ScaleY(115) + 5;
-	m_grpHwAcceleration.Create(ResStr(IDS_VDF_HW_ACCELERATION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(90))), this, (UINT)IDC_STATIC);
-	p.y += h20;
+	y = 120;
+	CalcRect(rect, x0, y, group_w, 88);
+	m_grpHwAcceleration.Create(ResStr(IDS_VDF_HW_ACCELERATION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
+	y += 20;
 
 	// Use D3D11 decoder
-	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_USE_D3D_DEC);
+	CalcTextRect(rect, x1, y, row_w);
+	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_USE_D3D_DEC);
 	if (SysVersion::IsWin8orLater()) {
 		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
 	} else {
 		m_chUseD3D11Decoder.EnableWindow(FALSE);
 		m_chUseD3D11Decoder.SetCheck(BST_UNCHECKED);
 	}
-	p.y += h25;
+	y += 24;
 
 	// DXVA Compatibility check
-	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbDXVACompatibilityCheck.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DXVA_CHECK);
-	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_FULLCHECK));
-	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
-	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_REFCHECK));
-	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_ALLCHECK));
-	p.y += h25;
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
+	m_cbDXVACompatibilityCheck.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_DXVA_CHECK);
+	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_FULLCHECK));
+	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
+	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_REFCHECK));
+	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_ALLCHECK));
+	y += 24;
 
 	// Set DXVA for SD (H.264)
-	m_chDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_DXVA_SD);
-	m_chDXVA_SD.SetCheck (FALSE);
-	p.y += h25;
+	CalcTextRect(rect, x1, y, row_w);
+	m_chDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_DXVA_SD);
+	m_chDXVA_SD.SetCheck(FALSE);
 
 	////////// Status //////////
-	p.y = 10 + ScaleY(115) + 5 + ScaleY(90) + 5;
-	int w1 = ScaleX(122);
-	int w2 = width_s - w1;
-	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(85))), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_txtInputFormat.Create(ResStr(IDS_VDF_STATUS_INPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtInputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
-	p.y += h16;
-	m_txtFrameSize.Create(ResStr(IDS_VDF_STATUS_FRAMESIZE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtFrameSize.Create(WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL|ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
-	p.y += h16;
-	m_txtOutputFormat.Create(ResStr(IDS_VDF_STATUS_OUTPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtOutputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
-	p.y += h16;
-	m_txtGraphicsAdapter.Create(ResStr(IDS_VDF_STATUS_ADAPTER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtGraphicsAdapter.Create(WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL|ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
+	label_w = 124;
+	control_w = row_w - label_w;
+	x2 = x1 + label_w;
+	y = 212;
+	CalcRect(rect, x0, y, group_w, 88);
+	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtInputFormat.Create(ResStr(IDS_VDF_STATUS_INPUT), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_edtInputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, rect, this, 0);
+	y += 16;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtFrameSize.Create(ResStr(IDS_VDF_STATUS_FRAMESIZE), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_edtFrameSize.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_READONLY, rect, this, 0);
+	y += 16;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtOutputFormat.Create(ResStr(IDS_VDF_STATUS_OUTPUT), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_edtOutputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, rect, this, 0);
+	y += 16;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtGraphicsAdapter.Create(ResStr(IDS_VDF_STATUS_ADAPTER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_edtGraphicsAdapter.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_READONLY, rect, this, 0);
 
 	////////// Format conversion //////////
-	p = CPoint(10 + width_s + 15, 10);
-	combo_w = ScaleX(85);
-	label_w = ScaleX(196);
-	width_s = label_w + combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(170))), this, (UINT)IDC_STATIC);
-	p.y += h20;
+	x0 = x0 + group_w + 8;
+	label_w = 60;
+	control_w = 52;
+	row_w = label_w + control_w * 4 + 4;
+	group_w = row_w + 8;
+	x1 = x0 + 4;
+	x2 = x1 + label_w;
+	y = 8;
+	CalcRect(rect, x0, y, group_w, 172);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
+	y += 20;
 
 	// Software output formats
-	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_txt8bit.Create(L"8-bit", WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_txt10bit.Create(L"10-bit", WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_txt16bit.Create(L"16-bit", WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_txt420.Create(L"4:2:0 YUV:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_NV12].Create(L"NV12", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_NV12);
-	m_cbFormat[PixFmt_YV12].Create(L"YV12", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV12);
-	m_cbFormat[PixFmt_P010].Create(L"P010", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P010);
-	m_cbFormat[PixFmt_P016].Create(L"P016", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P016);
-	p.y += h20;
-	m_txt422.Create(L"4:2:2 YUV:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_YUY2].Create(L"YUY2", dwStyle | BS_3STATE, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_SW_YUY2);
-	m_cbFormat[PixFmt_YV16].Create(L"YV16", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV16);
-	m_cbFormat[PixFmt_P210].Create(L"P210", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P210);
-	m_cbFormat[PixFmt_P216].Create(L"P216", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P216);
-	p.y += h20;
-	m_txt444.Create(L"4:4:4 YUV:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_AYUV].Create(L"AYUV", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(51), m_fontheight)), this, IDC_PP_SW_AYUV);
-	m_cbFormat[PixFmt_YV24].Create(L"YV24", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV24);
-	m_cbFormat[PixFmt_Y410].Create(L"Y410", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y410);
-	m_cbFormat[PixFmt_Y416].Create(L"Y416", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y416);
-	p.y += h20;
-	m_txtRGB.Create(L"RGB:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_RGB32].Create(L"RGB32", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB32);
-	m_cbFormat[PixFmt_RGB48].Create(L"RGB48", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB48);
-	p.y += h25;
+	CalcTextRect(rect, x1, y, row_w);
+	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+
+	CalcTextRect(rect, x2, y, control_w);
+	m_txt8bit.Create(L"8-bit", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2 + control_w * 2, y, control_w);
+	m_txt10bit.Create(L"10-bit", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2 + control_w * 3, y, control_w);
+	m_txt16bit.Create(L"16-bit", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txt420.Create(L"4:2:0 YUV:", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_cbFormat[PixFmt_NV12].Create(L"NV12", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_NV12);
+	CalcTextRect(rect, x2 + control_w, y, control_w);
+	m_cbFormat[PixFmt_YV12].Create(L"YV12", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_YV12);
+	CalcTextRect(rect, x2 + control_w * 2, y, control_w);
+	m_cbFormat[PixFmt_P010].Create(L"P010", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_P010);
+	CalcTextRect(rect, x2 + control_w * 3, y, control_w);
+	m_cbFormat[PixFmt_P016].Create(L"P016", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_P016);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txt422.Create(L"4:2:2 YUV:", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_cbFormat[PixFmt_YUY2].Create(L"YUY2", dwStyle | BS_3STATE, rect, this, IDC_PP_SW_YUY2);
+	CalcTextRect(rect, x2 + control_w, y, control_w);
+	m_cbFormat[PixFmt_YV16].Create(L"YV16", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_YV16);
+	CalcTextRect(rect, x2 + control_w * 2, y, control_w);
+	m_cbFormat[PixFmt_P210].Create(L"P210", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_P210);
+	CalcTextRect(rect, x2 + control_w * 3, y, control_w);
+	m_cbFormat[PixFmt_P216].Create(L"P216", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_P216);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txt444.Create(L"4:4:4 YUV:", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_cbFormat[PixFmt_AYUV].Create(L"AYUV", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_AYUV);
+	CalcTextRect(rect, x2 + control_w, y, control_w);
+	m_cbFormat[PixFmt_YV24].Create(L"YV24", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_YV24);
+	CalcTextRect(rect, x2 + control_w * 2, y, control_w);
+	m_cbFormat[PixFmt_Y410].Create(L"Y410", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_Y410);
+	CalcTextRect(rect, x2 + control_w * 3, y, control_w);
+	m_cbFormat[PixFmt_Y416].Create(L"Y416", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_Y416);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtRGB.Create(L"RGB:", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, 56);
+	m_cbFormat[PixFmt_RGB32].Create(L"RGB32", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_RGB32);
+	CalcTextRect(rect, x2 + control_w * 3, y, 56);
+	m_cbFormat[PixFmt_RGB48].Create(L"RGB48", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_RGB48);
+	y += 24;
 
 	// Output levels
-	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWRGBLEVELS);
+	control_w = 88;
+	label_w = row_w - control_w;
+	x2 = x1 + label_w;
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcTextRect(rect, x2, y, control_w);
+	m_cbSwRGBLevels.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_SWRGBLEVELS);
 	m_cbSwRGBLevels.AddString(L"PC (0-255)");
 	m_cbSwRGBLevels.AddString(L"TV (16-235)");
+	y += 24;
 
-	p.y = 10 + ScaleY(115) + 5 + ScaleY(90) + 5 + ScaleY(85) - m_fontheight;
-	int btn_w = ScaleX(75);
-	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
-	m_txtVersion.Create(WS_CHILD|WS_VISIBLE|ES_READONLY|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	CalcRect(rect, x0, 212 + 88 - 32, 76, 32);
+	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle | BS_MULTILINE, rect, this, IDC_PP_RESET);
+	CalcTextRect(rect, x0 + 76, 212 + 88 - 16, group_w - 76);
+	m_txtVersion.Create(WS_CHILD | WS_VISIBLE | ES_READONLY | ES_RIGHT, rect, this, (UINT)IDC_STATIC);
+
+	///////////////////////////////////////
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
