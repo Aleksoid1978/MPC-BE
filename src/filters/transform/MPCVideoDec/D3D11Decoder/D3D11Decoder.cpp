@@ -313,6 +313,10 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
 	HRESULT hr = S_OK;
 
+	const int depth = GetLumaBits(c->pix_fmt);
+	m_pFilter->m_bHighBitdepth = (depth == 10) && ((codec == AV_CODEC_ID_HEVC && c->profile == FF_PROFILE_HEVC_MAIN_10)
+												|| (codec == AV_CODEC_ID_VP9 && c->profile == FF_PROFILE_VP9_2));
+
 	UINT nProfiles = pDeviceContext->video_device->GetVideoDecoderProfileCount();
 	std::vector<GUID> supportedDecoderGuids;
 
@@ -439,7 +443,9 @@ HRESULT CD3D11Decoder::ReInitD3D11Decoder(AVCodecContext* c)
 			m_dwSurfaceHeight != dxva_align_dimensions(c->codec_id, c->coded_height) ||
 			m_SurfaceFormat != d3d11va_map_sw_to_hw_format(c->sw_pix_fmt)) {
 		AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
-		DLog(L"CD3D11Decoder::ReInitD3D11Decoder() : No D3D11 Decoder or image dimensions changed -> Re-Allocating resources");
+		DLog(L"CD3D11Decoder::ReInitD3D11Decoder() : No D3D11 Decoder or video dimensions/format changed -> Re-Allocating resources");
+
+		const auto bChangeFormat = m_SurfaceFormat != DXGI_FORMAT_UNKNOWN && m_SurfaceFormat != d3d11va_map_sw_to_hw_format(c->sw_pix_fmt);
 
 		if (m_pDecoder)
 			avcodec_flush_buffers(c);
@@ -449,6 +455,10 @@ HRESULT CD3D11Decoder::ReInitD3D11Decoder(AVCodecContext* c)
 		pDeviceContext->unlock(pDeviceContext->lock_ctx);
 		if (FAILED(hr))
 			return hr;
+
+		if (bChangeFormat) {
+			m_pFilter->ChangeOutputMediaFormat(2);
+		}
 
 		// decommit the allocator
 		m_pAllocator->Decommit();
