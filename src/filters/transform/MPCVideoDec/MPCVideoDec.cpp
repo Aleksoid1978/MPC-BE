@@ -1780,6 +1780,8 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 	((profile) <= FF_PROFILE_HEVC_MAIN_10)
 #define VP9_CHECK_PROFILE(profile) \
 	((profile) == FF_PROFILE_VP9_0 || (profile) == FF_PROFILE_VP9_2)
+#define AV1_CHECK_PROFILE(profile) \
+	((profile) == FF_PROFILE_AV1_MAIN)
 
 bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const enum AVPixelFormat pix_fmt, const int profile)
 {
@@ -1810,6 +1812,14 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 				return false;
 			}
 			if (profile != FF_PROFILE_UNKNOWN && !VP9_CHECK_PROFILE(profile)) {
+				return false;
+			}
+			break;
+		case AV_CODEC_ID_AV1:
+			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
+				return false;
+			}
+			if (profile != FF_PROFILE_UNKNOWN && !AV1_CHECK_PROFILE(profile)) {
 				return false;
 			}
 			break;
@@ -2178,7 +2188,8 @@ redo:
 
 	const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
 	m_bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
-										|| (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
+										|| (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2)
+										|| (m_nCodecId == AV_CODEC_ID_AV1 && m_pAVCtx->profile == FF_PROFILE_AV1_MAIN));
 
 	m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 	m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
