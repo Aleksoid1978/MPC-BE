@@ -1853,7 +1853,7 @@ Error:
 static
 cmsBool  Type_LUT8_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
 {
-    cmsUInt32Number j, nTabSize, i, n;
+    cmsUInt32Number j, nTabSize, i;
     cmsUInt8Number  val;
     cmsPipeline* NewLUT = (cmsPipeline*) Ptr;
     cmsStage* mpe;
@@ -1901,8 +1901,6 @@ cmsBool  Type_LUT8_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) NewLUT ->OutputChannels)) return FALSE;
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) clutPoints)) return FALSE;
     if (!_cmsWriteUInt8Number(io, 0)) return FALSE; // Padding
-
-	n = NewLUT->InputChannels * NewLUT->OutputChannels;
 
     if (MatMPE != NULL) {
         
