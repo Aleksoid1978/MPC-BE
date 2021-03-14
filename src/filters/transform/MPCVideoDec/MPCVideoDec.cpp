@@ -3984,7 +3984,7 @@ STDMETHODIMP_(MPC_SCAN_TYPE) CMPCVideoDecFilter::GetScanType()
 
 STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
 {
-	return m_pGraph && m_pDXVADecoder ? &m_DXVADecoderGUID : (m_bUseD3D11 && m_pD3D11Decoder ? m_pD3D11Decoder->GetDecoderGuid() : nullptr);
+	return m_pGraph ? (m_pDXVADecoder ? &m_DXVADecoderGUID : (m_bUseD3D11 && m_pD3D11Decoder ? m_pD3D11Decoder->GetDecoderGuid() : nullptr)) : nullptr;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(ULONGLONG nValue)
