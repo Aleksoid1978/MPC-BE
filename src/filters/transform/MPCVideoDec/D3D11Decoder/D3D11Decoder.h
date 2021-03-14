@@ -49,6 +49,7 @@ public:
 	HRESULT InitAllocator(IMemAllocator** ppAlloc);
 
 	GUID* GetDecoderGuid() { return &m_DecoderGUID; }
+	DXGI_ADAPTER_DESC* GetAdapterDesc() { return &m_AdapterDesc; }
 
 private:
 	friend class CD3D11SurfaceAllocator;
