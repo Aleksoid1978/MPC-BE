@@ -438,6 +438,7 @@ static const struct {
 	ULONGLONG	CodecId;
 	LPCWSTR		CodeName;
 } mpc_codecs[] = {
+	{CODEC_AV1_DXVA,	L"DXVA2: AV1"},
 	{CODEC_H264_DXVA,	L"DXVA2: H.264/AVC"},
 	{CODEC_HEVC_DXVA,	L"DXVA2: HEVC"},
 	{CODEC_MPEG2_DXVA,	L"DXVA2: MPEG-2"},

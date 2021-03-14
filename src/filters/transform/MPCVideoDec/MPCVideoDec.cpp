@@ -130,7 +130,8 @@ vcodecs[] = {
 	{L"mpeg2_dxva",		CODEC_MPEG2_DXVA},
 	{L"vc1_dxva",		CODEC_VC1_DXVA	},
 	{L"wmv3_dxva",		CODEC_WMV3_DXVA	},
-	{L"vp9_dxva",		CODEC_VP9_DXVA	}
+	{L"vp9_dxva",		CODEC_VP9_DXVA	},
+	{L"av1_dxva",		CODEC_AV1_DXVA	}
 };
 #endif
 
@@ -1535,7 +1536,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					bCodecActivated = (m_nActiveCodecs & CODEC_HAP) != 0;
 					break;
 				case AV_CODEC_ID_AV1 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_AV1) != 0;
+					m_bUseDXVA = (m_nActiveCodecs & CODEC_AV1_DXVA) != 0;
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_AV1) != 0;
+					bCodecActivated = m_bUseDXVA || m_bUseFFmpeg;
 					break;
 			}
 
