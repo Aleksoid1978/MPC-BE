@@ -372,6 +372,8 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 		}
 	}
 
+	DLog(L"CMPCVideoDecFilter::FindVideoServiceConversion() : no supported format found");
+
 	return E_FAIL;
 }
 

@@ -164,7 +164,10 @@ struct {
 	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D, false },
 	// VP9
 	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_10bit_Profile2, true },
-	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_Profile0, false }
+	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_Profile0, false },
+	// AV1
+	{ AV_CODEC_ID_AV1, DXVA2_ModeAV1_VLD_Profile0, true },
+	{ AV_CODEC_ID_AV1, DXVA2_ModeAV1_VLD_Profile0, false }
 };
 
 FFMPEG_CODECS ffCodecs[] = {
@@ -499,7 +502,7 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_HapY, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
 
 	// AV1
-	{ &MEDIASUBTYPE_AV01, AV_CODEC_ID_AV1, VDEC_AV1, -1 },
+	{ &MEDIASUBTYPE_AV01, AV_CODEC_ID_AV1, VDEC_AV1, VDEC_DXVA_AV1 },
 
 	// SpeedHQ
 	{ &MEDIASUBTYPE_SHQ0, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, -1 },
@@ -1023,7 +1026,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_pAVCtx(nullptr)
 	, m_pFrame(nullptr)
 	, m_pParser(nullptr)
-	, m_nCodecNb(-1)
 	, m_nCodecId(AV_CODEC_ID_NONE)
 	, m_bCalculateStopTime(false)
 	, m_bReorderBFrame(false)
@@ -1596,8 +1598,7 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 
 	m_FormatConverter.Cleanup();
 
-	m_nCodecNb	= -1;
-	m_nCodecId	= AV_CODEC_ID_NONE;
+	m_nCodecId = AV_CODEC_ID_NONE;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1686,7 +1687,7 @@ bool CMPCVideoDecFilter::IsDXVASupported(const bool bMode)
 
 HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 {
-	DLog(L"CMPCVideoDecFilter::FindDecoderConfiguration(DXVA2)");
+	DLog(L"CMPCVideoDecFilter::FindDecoderConfiguration()");
 
 	HRESULT hr = E_FAIL;
 
@@ -1759,6 +1760,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 			CoTaskMemFree(pDecoderGuids);
 		}
 		if (!bFoundDXVA2Configuration) {
+			DLog(L"CMPCVideoDecFilter::FindDecoderConfiguration() : no supported format found");
 			hr = E_FAIL; // Unable to find a configuration.
 		}
 
@@ -1852,8 +1854,6 @@ redo:
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	m_nCodecNb = nNewCodec;
-
 	if (bChangeType) {
 		ExtractAvgTimePerFrame(pmt, m_rtAvrTimePerFrame);
 		int wout, hout;
@@ -1881,8 +1881,19 @@ redo:
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
+	if (m_bFallBackFromD3D11) {
+		m_bUseD3D11 = false;
+	} else if (m_bFallBackFromDXVA2 || (bReinit && m_nDecoderMode == MODE_SOFTWARE)) {
+		m_bUseDXVA = m_bUseD3D11 = false;
+	}
+	m_bFallBackFromDXVA2 = m_bFallBackFromD3D11 = false;
+
 	m_nCodecId = ffCodecs[nNewCodec].nFFCodec;
-	m_pAVCodec = avcodec_find_decoder(m_nCodecId);
+	if (m_nCodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11)) {
+		m_pAVCodec = avcodec_find_decoder_by_name("av1");
+	} else {
+		m_pAVCodec = avcodec_find_decoder(m_nCodecId);
+	}
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
 	if (bChangeType) {
@@ -1966,14 +1977,6 @@ redo:
 			|| pmt->subtype == MEDIASUBTYPE_HEVC) {
 		m_pParser = av_parser_init(m_nCodecId);
 	}
-
-	if (m_bFallBackFromD3D11) {
-		m_bUseD3D11 = false;
-	} else if (m_bFallBackFromDXVA2 || (bReinit && m_nDecoderMode == MODE_SOFTWARE)) {
-		m_bUseDXVA = m_bUseD3D11 = false;
-	}
-
-	m_bFallBackFromDXVA2 = m_bFallBackFromD3D11 = false;
 
 	SetThreadCount();
 
@@ -2166,7 +2169,7 @@ redo:
 	m_nAlign = 16;
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
 		m_nAlign <<= 1;
-	} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
+	} else if (m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_AV1) {
 		m_nAlign = 128;
 	}
 

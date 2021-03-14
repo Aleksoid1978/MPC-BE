@@ -77,7 +77,6 @@ protected:
 	AVCodecContext*							m_pAVCtx;
 	AVCodecParserContext*					m_pParser;
 	AVFrame*								m_pFrame;
-	int										m_nCodecNb;
 	enum AVCodecID							m_nCodecId;
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
 	bool									m_bCalculateStopTime;

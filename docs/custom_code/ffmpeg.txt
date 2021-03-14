@@ -14,6 +14,7 @@
 * libavcodec/codec_list.c
 * libavcodec/decode.c
 * libavcodec/dxva2.c
+* libavcodec/dxva2_av1.c
 * libavcodec/error_resilience.h
 * libavcodec/h264_refs.c
 * libavcodec/h264_slice.c

@@ -135,6 +135,7 @@ SRCS_LC = \
 	libavcodec/audiodsp.c \
 	libavcodec/av1_parse.c \
 	libavcodec/av1_parser.c \
+	libavcodec/av1dec.c \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
@@ -201,6 +202,7 @@ SRCS_LC = \
 	libavcodec/dvdata.c \
 	libavcodec/dvdec.c \
 	libavcodec/dxva2.c \
+	libavcodec/dxva2_av1.c \
 	libavcodec/dxva2_h264.c \
 	libavcodec/dxva2_hevc.c \
 	libavcodec/dxva2_mpeg2.c \

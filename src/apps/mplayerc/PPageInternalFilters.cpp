@@ -62,6 +62,7 @@ static filter_t s_source_filters[] = {
 
 static filter_t s_video_decoders[] = {
 	// DXVA2 decoders
+	{L"DXVA2: AV1",					DXVA_DECODER,  VDEC_DXVA_AV1,		0},
 	{L"DXVA2: H.264/AVC",			DXVA_DECODER,  VDEC_DXVA_H264,		0},
 	{L"DXVA2: HEVC",				DXVA_DECODER,  VDEC_DXVA_HEVC,		0},
 	{L"DXVA2: MPEG-2 Video",		DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
