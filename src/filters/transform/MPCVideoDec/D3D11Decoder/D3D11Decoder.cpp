@@ -322,12 +322,12 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	UINT nProfiles = pDeviceContext->video_device->GetVideoDecoderProfileCount();
 	std::vector<GUID> supportedDecoderGuids;
 
-	DLog(L"CMPCVideoDecFilter::FindVideoServiceConversion() : Enumerating supported D3D11 modes (count: %d)", nProfiles);
+	DLog(L"CD3D11Decoder::FindVideoServiceConversion() : Enumerating supported D3D11 modes (count: %d)", nProfiles);
 	for (UINT i = 0; i < nProfiles; i++) {
 		GUID guidProfile;
 		hr = pDeviceContext->video_device->GetVideoDecoderProfile(i, &guidProfile);
 		if (FAILED(hr)) {
-			DLog(L"CMPCVideoDecFilter::FindVideoServiceConversion() : Error retrieving decoder profile");
+			DLog(L"CD3D11Decoder::FindVideoServiceConversion() : Error retrieving decoder profile");
 			return hr;
 		}
 
@@ -374,7 +374,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 		}
 	}
 
-	DLog(L"CMPCVideoDecFilter::FindVideoServiceConversion() : no supported format found");
+	DLog(L"CD3D11Decoder::FindVideoServiceConversion() : no supported format found");
 
 	return E_FAIL;
 }
@@ -387,7 +387,7 @@ HRESULT CD3D11Decoder::FindDecoderConfiguration(AVCodecContext* c, const D3D11_V
 	UINT nConfig = 0;
 	hr = pDeviceContext->video_device->GetVideoDecoderConfigCount(desc, &nConfig);
 	if (FAILED(hr)) {
-		DLog(L"MPCVideoDecFilter::FindDecoderConfiguration() : Unable to retreive decoder configuration count");
+		DLog(L"CD3D11Decoder::FindDecoderConfiguration() : Unable to retreive decoder configuration count");
 		return E_FAIL;
 	}
 
@@ -399,7 +399,7 @@ HRESULT CD3D11Decoder::FindDecoderConfiguration(AVCodecContext* c, const D3D11_V
 		if (FAILED(hr))
 			continue;
 
-		DLog(L"MPCVideoDecFilter::FindDecoderConfiguration() : Configuration Record %d: ConfigBitstreamRaw = %d", i, config.ConfigBitstreamRaw);
+		DLog(L"CD3D11Decoder::FindDecoderConfiguration() : Configuration Record %d: ConfigBitstreamRaw = %d", i, config.ConfigBitstreamRaw);
 
 		int score;
 		if (config.ConfigBitstreamRaw == 1)
@@ -419,7 +419,7 @@ HRESULT CD3D11Decoder::FindDecoderConfiguration(AVCodecContext* c, const D3D11_V
 	}
 
 	if (best_score < 0) {
-		DLog(L"MPCVideoDecFilter::FindDecoderConfiguration() : No matching configuration available");
+		DLog(L"CD3D11Decoder::FindDecoderConfiguration() : No matching configuration available");
 		return E_FAIL;
 	}
 
