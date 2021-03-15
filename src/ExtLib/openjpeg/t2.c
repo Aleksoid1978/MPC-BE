@@ -245,7 +245,7 @@ OPJ_BOOL opj_t2_encode_packets(opj_t2_t* p_t2,
                             l_image->numcomps : 1;
     OPJ_UINT32 l_nb_pocs = l_tcp->numpocs + 1;
 
-    l_pi = opj_pi_initialise_encode(l_image, l_cp, p_tile_no, p_t2_mode);
+    l_pi = opj_pi_initialise_encode(l_image, l_cp, p_tile_no, p_t2_mode, p_manager);
     if (!l_pi) {
         return OPJ_FALSE;
     }
@@ -425,7 +425,7 @@ OPJ_BOOL opj_t2_decode_packets(opj_tcd_t* tcd,
 #endif
 
     /* create a packet iterator */
-    l_pi = opj_pi_create_decode(l_image, l_cp, p_tile_no);
+    l_pi = opj_pi_create_decode(l_image, l_cp, p_tile_no, p_manager);
     if (!l_pi) {
         return OPJ_FALSE;
     }
@@ -739,6 +739,15 @@ static OPJ_BOOL opj_t2_encode_packet(OPJ_UINT32 tileno,
                 continue;
             }
 
+            /* Avoid out of bounds access of https://github.com/uclouvain/openjpeg/issues/1294 */
+            /* but likely not a proper fix. */
+            if (precno >= res->pw * res->ph) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "opj_t2_encode_packet(): accessing precno=%u >= %u\n",
+                              precno, res->pw * res->ph);
+                return OPJ_FALSE;
+            }
+
             prc = &band->precincts[precno];
             opj_tgt_reset(prc->incltree);
             opj_tgt_reset(prc->imsbtree);
@@ -804,6 +813,15 @@ static OPJ_BOOL opj_t2_encode_packet(OPJ_UINT32 tileno,
         /* Skip empty bands */
         if (opj_tcd_is_band_empty(band)) {
             continue;
+        }
+
+        /* Avoid out of bounds access of https://github.com/uclouvain/openjpeg/issues/1297 */
+        /* but likely not a proper fix. */
+        if (precno >= res->pw * res->ph) {
+            opj_event_msg(p_manager, EVT_ERROR,
+                          "opj_t2_encode_packet(): accessing precno=%u >= %u\n",
+                          precno, res->pw * res->ph);
+            return OPJ_FALSE;
         }
 
         prc = &band->precincts[precno];

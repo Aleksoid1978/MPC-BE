@@ -112,7 +112,7 @@ void tcd_dump(FILE *fd, opj_tcd_t *tcd, opj_tcd_image_t * img)
  * Initializes tile coding/decoding
  */
 static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
-        OPJ_BOOL isEncoder, OPJ_FLOAT32 fraction, OPJ_SIZE_T sizeof_block,
+        OPJ_BOOL isEncoder, OPJ_SIZE_T sizeof_block,
         opj_event_mgr_t* manager);
 
 /**
@@ -721,10 +721,9 @@ OPJ_BOOL opj_alloc_tile_component_data(opj_tcd_tilecomp_t *l_tilec)
 /* ----------------------------------------------------------------------- */
 
 static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
-        OPJ_BOOL isEncoder, OPJ_FLOAT32 fraction, OPJ_SIZE_T sizeof_block,
+        OPJ_BOOL isEncoder, OPJ_SIZE_T sizeof_block,
         opj_event_mgr_t* manager)
 {
-    OPJ_UINT32(*l_gain_ptr)(OPJ_UINT32) = 00;
     OPJ_UINT32 compno, resno, bandno, precno, cblkno;
     opj_tcp_t * l_tcp = 00;
     opj_cp_t * l_cp = 00;
@@ -740,7 +739,6 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
     OPJ_UINT32 p, q;
     OPJ_UINT32 l_level_no;
     OPJ_UINT32 l_pdx, l_pdy;
-    OPJ_UINT32 l_gain;
     OPJ_INT32 l_x0b, l_y0b;
     OPJ_UINT32 l_tx0, l_ty0;
     /* extent of precincts , top left, bottom right**/
@@ -879,11 +877,6 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
         l_level_no = l_tilec->numresolutions;
         l_res = l_tilec->resolutions;
         l_step_size = l_tccp->stepsizes;
-        if (l_tccp->qmfbid == 0) {
-            l_gain_ptr = &opj_dwt_getgain_real;
-        } else {
-            l_gain_ptr  = &opj_dwt_getgain;
-        }
         /*fprintf(stderr, "\tlevel_no=%d\n",l_level_no);*/
 
         for (resno = 0; resno < l_tilec->numresolutions; ++resno) {
@@ -970,7 +963,6 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
             l_band = l_res->bands;
 
             for (bandno = 0; bandno < l_res->numbands; ++bandno, ++l_band, ++l_step_size) {
-                OPJ_INT32 numbps;
                 /*fprintf(stderr, "\t\t\tband_no=%d/%d\n", bandno, l_res->numbands );*/
 
                 if (resno == 0) {
@@ -1006,11 +998,24 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
                     }
                 }
 
-                /** avoid an if with storing function pointer */
-                l_gain = (*l_gain_ptr)(l_band->bandno);
-                numbps = (OPJ_INT32)(l_image_comp->prec + l_gain);
-                l_band->stepsize = (OPJ_FLOAT32)(((1.0 + l_step_size->mant / 2048.0) * pow(2.0,
-                                                  (OPJ_INT32)(numbps - l_step_size->expn)))) * fraction;
+                {
+                    /* Table E-1 - Sub-band gains */
+                    /* BUG_WEIRD_TWO_INVK (look for this identifier in dwt.c): */
+                    /* the test (!isEncoder && l_tccp->qmfbid == 0) is strongly */
+                    /* linked to the use of two_invK instead of invK */
+                    const OPJ_INT32 log2_gain = (!isEncoder &&
+                                                 l_tccp->qmfbid == 0) ? 0 : (l_band->bandno == 0) ? 0 :
+                                                (l_band->bandno == 3) ? 2 : 1;
+
+                    /* Nominal dynamic range. Equation E-4 */
+                    const OPJ_INT32 Rb = (OPJ_INT32)l_image_comp->prec + log2_gain;
+
+                    /* Delta_b value of Equation E-3 in "E.1 Inverse quantization
+                    * procedure" of the standard */
+                    l_band->stepsize = (OPJ_FLOAT32)(((1.0 + l_step_size->mant / 2048.0) * pow(2.0,
+                                                      (OPJ_INT32)(Rb - l_step_size->expn))));
+                }
+
                 /* Mb value of Equation E-2 in "E.1 Inverse quantization
                  * procedure" of the standard */
                 l_band->numbps = l_step_size->expn + (OPJ_INT32)l_tccp->numgbits -
@@ -1193,14 +1198,14 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
 OPJ_BOOL opj_tcd_init_encode_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
                                   opj_event_mgr_t* p_manager)
 {
-    return opj_tcd_init_tile(p_tcd, p_tile_no, OPJ_TRUE, 1.0F,
+    return opj_tcd_init_tile(p_tcd, p_tile_no, OPJ_TRUE,
                              sizeof(opj_tcd_cblk_enc_t), p_manager);
 }
 
 OPJ_BOOL opj_tcd_init_decode_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
                                   opj_event_mgr_t* p_manager)
 {
-    return opj_tcd_init_tile(p_tcd, p_tile_no, OPJ_FALSE, 0.5F,
+    return opj_tcd_init_tile(p_tcd, p_tile_no, OPJ_FALSE,
                              sizeof(opj_tcd_cblk_dec_t), p_manager);
 }
 
@@ -1238,10 +1243,16 @@ static OPJ_BOOL opj_tcd_code_block_enc_allocate_data(opj_tcd_cblk_enc_t *
 
     /* +1 is needed for https://github.com/uclouvain/openjpeg/issues/835 */
     /* and actually +2 required for https://github.com/uclouvain/openjpeg/issues/982 */
+    /* and +7 for https://github.com/uclouvain/openjpeg/issues/1283 (-M 3) */
+    /* and +26 for https://github.com/uclouvain/openjpeg/issues/1283 (-M 7) */
+    /* and +28 for https://github.com/uclouvain/openjpeg/issues/1283 (-M 44) */
+    /* and +33 for https://github.com/uclouvain/openjpeg/issues/1283 (-M 4) */
+    /* and +63 for https://github.com/uclouvain/openjpeg/issues/1283 (-M 4 -IMF 2K) */
+    /* and +74 for https://github.com/uclouvain/openjpeg/issues/1283 (-M 4 -n 8 -s 7,7 -I) */
     /* TODO: is there a theoretical upper-bound for the compressed code */
     /* block size ? */
-    l_data_size = 2 + (OPJ_UINT32)((p_code_block->x1 - p_code_block->x0) *
-                                   (p_code_block->y1 - p_code_block->y0) * (OPJ_INT32)sizeof(OPJ_UINT32));
+    l_data_size = 74 + (OPJ_UINT32)((p_code_block->x1 - p_code_block->x0) *
+                                    (p_code_block->y1 - p_code_block->y0) * (OPJ_INT32)sizeof(OPJ_UINT32));
 
     if (l_data_size > p_code_block->data_size) {
         if (p_code_block->data) {
@@ -2411,7 +2422,8 @@ static OPJ_BOOL opj_tcd_dc_level_shift_encode(opj_tcd_t *p_tcd)
             }
         } else {
             for (i = 0; i < l_nb_elem; ++i) {
-                *l_current_ptr = (*l_current_ptr - l_tccp->m_dc_level_shift) * (1 << 11);
+                *((OPJ_FLOAT32 *) l_current_ptr) = (OPJ_FLOAT32)(*l_current_ptr -
+                                                   l_tccp->m_dc_level_shift);
                 ++l_current_ptr;
             }
         }
@@ -2469,8 +2481,11 @@ static OPJ_BOOL opj_tcd_mct_encode(opj_tcd_t *p_tcd)
 
         opj_free(l_data);
     } else if (l_tcp->tccps->qmfbid == 0) {
-        opj_mct_encode_real(l_tile->comps[0].data, l_tile->comps[1].data,
-                            l_tile->comps[2].data, samples);
+        opj_mct_encode_real(
+            (OPJ_FLOAT32*)l_tile->comps[0].data,
+            (OPJ_FLOAT32*)l_tile->comps[1].data,
+            (OPJ_FLOAT32*)l_tile->comps[2].data,
+            samples);
     } else {
         opj_mct_encode(l_tile->comps[0].data, l_tile->comps[1].data,
                        l_tile->comps[2].data, samples);
@@ -2488,11 +2503,11 @@ static OPJ_BOOL opj_tcd_dwt_encode(opj_tcd_t *p_tcd)
 
     for (compno = 0; compno < l_tile->numcomps; ++compno) {
         if (l_tccp->qmfbid == 1) {
-            if (! opj_dwt_encode(l_tile_comp)) {
+            if (! opj_dwt_encode(p_tcd, l_tile_comp)) {
                 return OPJ_FALSE;
             }
         } else if (l_tccp->qmfbid == 0) {
-            if (! opj_dwt_encode_real(l_tile_comp)) {
+            if (! opj_dwt_encode_real(p_tcd, l_tile_comp)) {
                 return OPJ_FALSE;
             }
         }
@@ -2506,15 +2521,9 @@ static OPJ_BOOL opj_tcd_dwt_encode(opj_tcd_t *p_tcd)
 
 static OPJ_BOOL opj_tcd_t1_encode(opj_tcd_t *p_tcd)
 {
-    opj_t1_t * l_t1;
     const OPJ_FLOAT64 * l_mct_norms;
     OPJ_UINT32 l_mct_numcomps = 0U;
     opj_tcp_t * l_tcp = p_tcd->tcp;
-
-    l_t1 = opj_t1_create(OPJ_TRUE);
-    if (l_t1 == 00) {
-        return OPJ_FALSE;
-    }
 
     if (l_tcp->mct == 1) {
         l_mct_numcomps = 3U;
@@ -2529,13 +2538,9 @@ static OPJ_BOOL opj_tcd_t1_encode(opj_tcd_t *p_tcd)
         l_mct_norms = (const OPJ_FLOAT64 *)(l_tcp->mct_norms);
     }
 
-    if (! opj_t1_encode_cblks(l_t1, p_tcd->tcd_image->tiles, l_tcp, l_mct_norms,
-                              l_mct_numcomps)) {
-        opj_t1_destroy(l_t1);
-        return OPJ_FALSE;
-    }
-
-    opj_t1_destroy(l_t1);
+    return opj_t1_encode_cblks(p_tcd,
+                               p_tcd->tcd_image->tiles, l_tcp, l_mct_norms,
+                               l_mct_numcomps);
 
     return OPJ_TRUE;
 }
@@ -2847,6 +2852,7 @@ void opj_tcd_marker_info_destroy(opj_tcd_marker_info_t *p_tcd_marker_info)
 {
     if (p_tcd_marker_info) {
         opj_free(p_tcd_marker_info->p_packet_size);
+        opj_free(p_tcd_marker_info);
     }
 }
 

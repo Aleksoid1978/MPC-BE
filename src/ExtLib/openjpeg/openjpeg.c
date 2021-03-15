@@ -657,6 +657,9 @@ opj_codec_t* OPJ_CALLCONV opj_create_compress(OPJ_CODEC_FORMAT p_format)
                        const char* const*,
                        struct opj_event_mgr *)) opj_j2k_encoder_set_extra_options;
 
+        l_codec->opj_set_threads =
+            (OPJ_BOOL(*)(void * p_codec, OPJ_UINT32 num_threads)) opj_j2k_set_threads;
+
         l_codec->m_codec = opj_j2k_create_compress();
         if (! l_codec->m_codec) {
             opj_free(l_codec);
@@ -699,6 +702,9 @@ opj_codec_t* OPJ_CALLCONV opj_create_compress(OPJ_CODEC_FORMAT p_format)
                     *)(void *,
                        const char* const*,
                        struct opj_event_mgr *)) opj_jp2_encoder_set_extra_options;
+
+        l_codec->opj_set_threads =
+            (OPJ_BOOL(*)(void * p_codec, OPJ_UINT32 num_threads)) opj_jp2_set_threads;
 
         l_codec->m_codec = opj_jp2_create(OPJ_FALSE);
         if (! l_codec->m_codec) {

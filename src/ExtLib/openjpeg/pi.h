@@ -107,6 +107,8 @@ typedef struct opj_pi_iterator {
     OPJ_UINT32 x, y;
     /** FIXME DOC*/
     OPJ_UINT32 dx, dy;
+    /** event manager */
+    opj_event_mgr_t* manager;
 } opj_pi_iterator_t;
 
 /** @name Exported functions */
@@ -119,13 +121,15 @@ typedef struct opj_pi_iterator {
  * @param   cp      the coding parameters.
  * @param   tileno  index of the tile being encoded.
  * @param   t2_mode the type of pass for generating the packet iterator
+ * @param   manager Event manager
  *
  * @return  a list of packet iterator that points to the first packet of the tile (not true).
 */
 opj_pi_iterator_t *opj_pi_initialise_encode(const opj_image_t *image,
         opj_cp_t *cp,
         OPJ_UINT32 tileno,
-        J2K_T2_MODE t2_mode);
+        J2K_T2_MODE t2_mode,
+        opj_event_mgr_t* manager);
 
 /**
  * Updates the encoding parameters of the codec.
@@ -161,12 +165,14 @@ Create a packet iterator for Decoder
 @param image Raw image for which the packets will be listed
 @param cp Coding parameters
 @param tileno Number that identifies the tile for which to list the packets
+@param manager Event manager
 @return Returns a packet iterator that points to the first packet of the tile
 @see opj_pi_destroy
 */
 opj_pi_iterator_t *opj_pi_create_decode(opj_image_t * image,
                                         opj_cp_t * cp,
-                                        OPJ_UINT32 tileno);
+                                        OPJ_UINT32 tileno,
+                                        opj_event_mgr_t* manager);
 /**
  * Destroys a packet iterator array.
  *

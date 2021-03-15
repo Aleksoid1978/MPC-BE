@@ -78,7 +78,7 @@ Most compilers implement their own version of this keyword ...
 
 #if defined(OPJ_STATIC) || !defined(_WIN32)
 /* http://gcc.gnu.org/wiki/Visibility */
-#   if __GNUC__ >= 4
+#   if !defined(_WIN32) && __GNUC__ >= 4
 #       if defined(OPJ_STATIC) /* static library uses "hidden" */
 #           define OPJ_API    __attribute__ ((visibility ("hidden")))
 #       else
@@ -1348,15 +1348,14 @@ OPJ_API OPJ_BOOL OPJ_CALLCONV opj_setup_decoder(opj_codec_t *p_codec,
  * number, or "ALL_CPUS". If OPJ_NUM_THREADS is set and this function is called,
  * this function will override the behaviour of the environment variable.
  *
- * Currently this function must be called after opj_setup_decoder() and
- * before opj_read_header().
+ * This function must be called after opj_setup_decoder() and
+ * before opj_read_header() for the decoding side, or after opj_setup_encoder()
+ * and before opj_start_compress() for the encoding side.
  *
- * Note: currently only has effect on the decompressor.
- *
- * @param p_codec       decompressor handler
+ * @param p_codec       decompressor or compressor handler
  * @param num_threads   number of threads.
  *
- * @return OPJ_TRUE     if the decoder is correctly set
+ * @return OPJ_TRUE     if the function is successful.
  */
 OPJ_API OPJ_BOOL OPJ_CALLCONV opj_codec_set_threads(opj_codec_t *p_codec,
         int num_threads);
