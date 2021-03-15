@@ -23,6 +23,7 @@
 
 #include <moreuuids.h>
 #include "../../../../DSUtil/DSUtil.h"
+#include "../../../../DSUtil/DXVAState.h"
 #include "D3D11Decoder.h"
 #include "../MPCVideoDec.h"
 
@@ -270,6 +271,7 @@ HRESULT CD3D11Decoder::CreateD3D11Decoder(AVCodecContext* c)
 	FillHWContext((AVD3D11VAContext*)c->hwaccel_context);
 
 	m_DecoderGUID = profileGUID;
+	DXVAState::SetActiveState(m_DecoderGUID, L"D3D11 Native");
 
 	return S_OK;
 }
