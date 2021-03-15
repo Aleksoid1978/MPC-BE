@@ -217,6 +217,11 @@ LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_COMMAND :
 			m_pMainFrame->PostMessageW(message, wParam, lParam);
 			break;
+		case WM_NCACTIVATE :
+			if (!wParam && !m_pMainFrame->CanShowDialog()) {
+				return 0;
+			}
+			break;
 	}
 
 	return CWnd::WindowProc(message, wParam, lParam);
