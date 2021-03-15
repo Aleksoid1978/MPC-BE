@@ -156,6 +156,7 @@ HRESULT CD3D11Decoder::CreateD3D11Device(UINT nDeviceIndex, ID3D11Device** ppDev
 		std::size(s_D3D11Levels), D3D11_SDK_VERSION, &pD3D11Device, &d3dFeatureLevel, nullptr);
 	if (FAILED(hr)) {
 		DLog(L"CD3D11Decoder::CreateD3D11Device() : Failed to create a D3D11 device with video support");
+		return hr;
 	}
 
 	DLog(L"CD3D11Decoder::CreateD3D11Device() : Created D3D11 device with feature level %d.%d", d3dFeatureLevel >> 12, (d3dFeatureLevel >> 8) & 0xF);
@@ -253,11 +254,10 @@ HRESULT CD3D11Decoder::CreateD3D11Decoder(AVCodecContext* c)
 		viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.ArraySlice = i;
 
-		hr = pDeviceContext->video_device->CreateVideoDecoderOutputView(pFramesContext->texture, &viewDesc,
-			&m_pOutputViews[i]);
+		hr = pDeviceContext->video_device->CreateVideoDecoderOutputView(pFramesContext->texture, &viewDesc, &m_pOutputViews[i]);
 		if (FAILED(hr)) {
 			DLog(L"CD3D11Decoder::CreateD3D11Decoder() : Failed to create video decoder output views");
-			return E_FAIL;
+			return hr;
 		}
 	}
 
@@ -265,7 +265,7 @@ HRESULT CD3D11Decoder::CreateD3D11Decoder(AVCodecContext* c)
 	hr = pDeviceContext->video_device->CreateVideoDecoder(&desc, &decoder_config, &m_pDecoder);
 	if (FAILED(hr)) {
 		DLog(L"CD3D11Decoder::CreateD3D11Decoder() : Failed to create video decoder object");
-		return E_FAIL;
+		return hr;
 	}
 
 	FillHWContext((AVD3D11VAContext*)c->hwaccel_context);
@@ -578,13 +578,11 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	}
 
 	// check if the connection supports native mode
-	if (pD3D11DecoderConfiguration)
-	{
+	if (pD3D11DecoderConfiguration) {
 		CMediaType mt = m_pFilter->m_pOutput->CurrentMediaType();
 		if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
 			(m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
-			(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016))
-		{
+			(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016)) {
 			DbgLog((LOG_ERROR, 10, L"-> Connection is not the appropriate pixel format for D3D11 Native"));
 			SAFE_RELEASE(pD3D11DecoderConfiguration);
 			return E_FAIL;
@@ -675,7 +673,6 @@ void CD3D11Decoder::AdditionaDecoderInit(AVCodecContext* c)
 	c->error_concealment = 0;
 	av_opt_set_int(c, "enable_er", 0, AV_OPT_SEARCH_CHILDREN);
 }
-
 
 HRESULT CD3D11Decoder::DeliverFrame()
 {
