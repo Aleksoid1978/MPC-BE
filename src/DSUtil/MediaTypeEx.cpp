@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -549,12 +549,11 @@ CString GetGUIDString(const GUID& guid)
 	}
 
 	if (strcmp(guidStr, "Unknown GUID Name") == 0) {
-
 		auto it = dxvaguids.find(guid);
 		if (it != dxvaguids.cend()) {
 			guidStr = (*it).second;
 		}
-		else if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID)- sizeof(GUID::Data1)) == 0) {
+		else if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID) - sizeof(GUID::Data1)) == 0) {
 			// GUID like {xxxxxxxx-0000-0010-8000-00AA00389B71}
 
 			switch (guid.Data1) {
@@ -570,7 +569,12 @@ CString GetGUIDString(const GUID& guid)
 		}
 	}
 
-	return CString(guidStr);;
+	CString res(guidStr);
+	if (res == L"Unknown GUID Name") {
+		res.AppendFormat(L" - %s", CStringFromGUID(guid).GetString());
+	}
+
+	return res;
 }
 
 CString GetGUIDString2(const GUID& guid)
