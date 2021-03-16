@@ -540,10 +540,10 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 {
 	DLog(L"CD3D11Decoder::PostConnect()");
 
-	ID3D11DecoderConfiguration* pD3D11DecoderConfiguration = nullptr;
+	CComPtr<ID3D11DecoderConfiguration> pD3D11DecoderConfiguration;
 	HRESULT hr = pPin->QueryInterface(&pD3D11DecoderConfiguration);
 	if (FAILED(hr))	{
-		DLog(L"CD3D11Decoder::PostConnect() : ID3D11DecoderConfiguration not available, exit");
+		DLog(L"CD3D11Decoder::PostConnect() : ID3D11DecoderConfiguration not available");
 		return hr;
 	}
 
@@ -560,7 +560,6 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	ID3D11Device* pD3D11Device = nullptr;
 	hr = CreateD3D11Device(nDevice, &pD3D11Device, &m_AdapterDesc);
 	if (FAILED(hr)) {
-		SAFE_RELEASE(pD3D11DecoderConfiguration);
 		return E_FAIL;
 	}
 
@@ -573,7 +572,6 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	int ret = av_hwdevice_ctx_init(m_pDevCtx);
 	if (ret < 0) {
 		av_buffer_unref(&m_pDevCtx);
-		SAFE_RELEASE(pD3D11DecoderConfiguration);
 		return E_FAIL;
 	}
 
@@ -584,7 +582,6 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 			(m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
 			(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016)) {
 			DbgLog((LOG_ERROR, 10, L"-> Connection is not the appropriate pixel format for D3D11 Native"));
-			SAFE_RELEASE(pD3D11DecoderConfiguration);
 			return E_FAIL;
 		}
 	}
@@ -593,7 +590,6 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	GUID guidConversion = GUID_NULL;
 	hr = FindVideoServiceConversion(c, c->codec_id, c->profile, m_SurfaceFormat, &guidConversion);
 	if (FAILED(hr)) {
-		SAFE_RELEASE(pD3D11DecoderConfiguration);
 		return hr;
 	}
 
@@ -607,7 +603,6 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	D3D11_VIDEO_DECODER_CONFIG decoder_config = {};
 	hr = FindDecoderConfiguration(c, &desc, &decoder_config);
 	if (FAILED(hr)) {
-		SAFE_RELEASE(pD3D11DecoderConfiguration);
 		return hr;
 	}
 
@@ -626,14 +621,13 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	ID3D11Texture2D* pTexture2D = nullptr;
 	hr = pD3D11Device->CreateTexture2D(&texDesc, nullptr, &pTexture2D);
 	if (FAILED(hr)) {
-		SAFE_RELEASE(pD3D11DecoderConfiguration);
 		return hr;
 	}
 	SAFE_RELEASE(pTexture2D);
 
 	// Notice the connected pin that we're sending D3D11 textures
 	hr = pD3D11DecoderConfiguration->ActivateD3D11Decoding(pDeviceContext->device, pDeviceContext->device_context, pDeviceContext->lock_ctx, 0);
-	SAFE_RELEASE(pD3D11DecoderConfiguration);
+	DLogIf(FAILED(hr), L"CD3D11Decoder::PostConnect() : ID3D11DecoderConfiguration::ActivateD3D11Decoding() failed");
 
 	return hr;
 }
