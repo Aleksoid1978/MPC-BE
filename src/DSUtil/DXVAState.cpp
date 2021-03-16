@@ -46,6 +46,9 @@ namespace DXVAState {
 
 		if (customDescription) {
 			m_sDXVADecoderDescription = customDescription;
+			if (guidDXVADecoder != GUID_NULL) {
+				m_guidDXVADecoder = guidDXVADecoder;
+			}
 			if (m_guidDXVADecoder != GUID_NULL) {
 				m_sDXVADecoderDescription.AppendFormat(L", %s", GetDXVAMode(m_guidDXVADecoder));
 			}
