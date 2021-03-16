@@ -496,6 +496,10 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 			}
 
 			if (m_clsid == CLSID_MPCVRAllocatorPresenter) {
+				if (CComQIPtr<ID3DFullscreenControl> pD3DFS = *ppBF) {
+					pD3DFS->SetD3DFullscreen(bFullscreen);
+				}
+
 				// MPC VR supports calling IVideoWindow::put_Owner before the pins are connected
 				if (CComQIPtr<IVideoWindow> pVW = *ppBF) {
 					VERIFY(SUCCEEDED(pVW->put_Owner((OAHWND)m_hWnd)));
