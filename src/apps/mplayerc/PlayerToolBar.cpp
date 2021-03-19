@@ -28,6 +28,8 @@
 
 #include <cmath>
 
+constexpr auto ID_GPU = 99999999;
+
 // CPlayerToolBar
 
 typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList);
@@ -36,9 +38,6 @@ IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
 
 CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_hDXVAIcon(nullptr)
-	, m_nDXVAIconWidth(0)
-	, m_nDXVAIconHeight(0)
 {
 	bool ok = m_svgToolbar.Load(::GetProgramDir() + L"toolbar.svg");
 	if (ok) {
@@ -53,8 +52,8 @@ CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 
 CPlayerToolBar::~CPlayerToolBar()
 {
-	if (m_hDXVAIcon) {
-		DestroyIcon(m_hDXVAIcon);
+	if (m_hGPUIcon) {
+		DestroyIcon(m_hGPUIcon);
 	}
 }
 
@@ -312,16 +311,16 @@ void CPlayerToolBar::SwitchTheme()
 
 	// load GPU/DXVA indicator
 	if (s.bUseDarkTheme) {
-		if (m_hDXVAIcon) {
-			DestroyIcon(m_hDXVAIcon);
-			m_hDXVAIcon = nullptr;
+		if (m_hGPUIcon) {
+			DestroyIcon(m_hGPUIcon);
+			m_hGPUIcon = nullptr;
 		}
-		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
+		m_nGPUIconWidth = m_nGPUIconHeight = 0;
 
 		if (m_imgListActive.GetImageCount() == 16) {
-			m_hDXVAIcon = m_imgListActive.ExtractIconW(15);
-			m_nDXVAIconWidth = height;
-			m_nDXVAIconHeight = height;
+			m_hGPUIcon = m_imgListActive.ExtractIconW(15);
+			m_nGPUIconWidth = height;
+			m_nGPUIconHeight = height;
 		}
 		else {
 			CSvgImage svgImage;
@@ -334,9 +333,9 @@ void CPlayerToolBar::SwitchTheme()
 					imgListDXVAIcon.Create(w, h, ILC_COLOR32 | ILC_MASK, 1, 0);
 					ImageList_Add(imgListDXVAIcon.GetSafeHandle(), hBitmap, nullptr);
 
-					m_hDXVAIcon = imgListDXVAIcon.ExtractIconW(0);
-					m_nDXVAIconWidth = w;
-					m_nDXVAIconHeight = h;
+					m_hGPUIcon = imgListDXVAIcon.ExtractIconW(0);
+					m_nGPUIconWidth = w;
+					m_nGPUIconHeight = h;
 
 					DeleteObject(hBitmap);
 				}
@@ -555,7 +554,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	LRESULT lr = CDRF_DODEFAULT;
 
 	const auto& s = AfxGetAppSettings();
-	const auto bGPU = (m_pMainFrame->GetMediaState() != -1) && DXVAState::GetState() && m_hDXVAIcon;
+	const auto bGPUIconShow = (m_pMainFrame->GetMediaState() != -1) && DXVAState::GetState() && m_hGPUIcon;
+	if (!bGPUIconShow) {
+		m_bGPUIconShow = false;
+	}
 
 	static const int sep[] = {2, 7, 10, 11};
 
@@ -650,15 +652,24 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				}
 			}
 
-			if (bGPU) {
+			if (bGPUIconShow) {
 				CRect rSub;
 				GetItemRect(10, &rSub);
 
 				CRect rVolume;
 				GetItemRect(12, &rVolume);
 
-				if (rSub.right < rVolume.left - m_nDXVAIconWidth) {
-					DrawIconEx(dc.m_hDC, rVolume.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2), m_hDXVAIcon, 0, 0, 0, nullptr, DI_NORMAL);
+				m_bGPUIconShow = false;
+				m_GPUIconRect.SetRectEmpty();
+
+				if (rSub.right < rVolume.left - m_nGPUIconWidth) {
+					m_bGPUIconShow = true;
+
+					const int xLeft = rVolume.left - 8 - m_nGPUIconWidth;
+					const int yTop  = r.CenterPoint().y - (m_nGPUIconHeight / 2);
+					m_GPUIconRect.SetRect(xLeft, yTop, xLeft + m_nGPUIconWidth, yTop + m_nGPUIconHeight);
+
+					DrawIconEx(dc.m_hDC, xLeft, yTop, m_hGPUIcon, 0, 0, 0, nullptr, DI_NORMAL);
 				}
 			}
 
@@ -959,6 +970,9 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	case ID_NAVIGATE_AUDIO:
 		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + L" | " + ResStr(IDS_AG_OPTIONS);
 		break;
+	case ID_GPU:
+		m_strTipText = DXVAState::GetDescription();
+		break;
 	default:
 		return FALSE;
 	}
@@ -990,4 +1004,21 @@ void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
 	}
 
 	__super::OnRButtonDown(nFlags, point);
+}
+
+INT_PTR CPlayerToolBar::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
+{
+	auto id = __super::OnToolHitTest(point, pTI);
+	if (id == -1 && pTI) {
+		if (m_bGPUIconShow && m_GPUIconRect.PtInRect(point)) {
+			id = ID_GPU;
+
+			pTI->hwnd     = m_hWnd;
+			pTI->uId      = id;
+			pTI->rect     = m_GPUIconRect;
+			pTI->lpszText = LPSTR_TEXTCALLBACKW;
+		}
+	}
+
+	return id;
 }

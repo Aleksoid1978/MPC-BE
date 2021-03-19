@@ -39,9 +39,12 @@ private:
 	bool		m_bMute;
 
 	CSvgImage	m_svgToolbar;
-	HICON		m_hDXVAIcon;
-	LONG		m_nDXVAIconWidth;
-	LONG		m_nDXVAIconHeight;
+
+	HICON		m_hGPUIcon = nullptr;
+	LONG		m_nGPUIconWidth = 0;
+	LONG		m_nGPUIconHeight = 0;
+	bool		m_bGPUIconShow = false;
+	CRect		m_GPUIconRect;
 
 	CImageList	m_imgListActive;
 	CImageList	m_imgListDisabled;
@@ -109,6 +112,8 @@ protected:
 
 	afx_msg void OnUpdateAudio(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateSubtitle(CCmdUI* pCmdUI);
+
+	virtual INT_PTR OnToolHitTest(CPoint point, TOOLINFO* pTI) const override;
 
 	DECLARE_MESSAGE_MAP()
 };
