@@ -27,6 +27,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
 #include "PPageVideo.h"
+#include "ComPropertySheet.h"
 
 // CPPageVideo dialog
 
@@ -96,6 +97,7 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
 	ON_CBN_SELCHANGE(IDC_COMBO8, OnFrameModeChange)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
+	ON_BN_CLICKED(IDC_BUTTON1, OnVideoRenderPropClick)
 END_MESSAGE_MAP()
 
 // CPPageVideo message handlers
@@ -391,6 +393,7 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC10)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 
 	switch (CurrentVR) {
 		case VIDRNDT_EVR:
@@ -451,6 +454,10 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_MADVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
+			break;
+		case VIDRNDT_MPCVR:
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
@@ -537,4 +544,18 @@ void CPPageVideo::OnBnClickedDefault()
 
 	Invalidate();
 	SetModified();
+}
+
+void CPPageVideo::OnVideoRenderPropClick()
+{
+	const auto& s = AfxGetAppSettings();
+	if (s.iSelectedVideoRenderer == VIDRNDT_MPCVR || s.iSelectedVideoRenderer == VIDRNDT_MADVR) {
+		CComPtr<IBaseFilter> pBF;
+		HRESULT hr = pBF.CoCreateInstance(s.iSelectedVideoRenderer == VIDRNDT_MPCVR ? CLSID_MPCVR : CLSID_madVR);
+		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
+			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
+			ps.AddPages(pSPP);
+			ps.DoModal();
+		}
+	}
 }

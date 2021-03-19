@@ -80,4 +80,6 @@ public:
 	afx_msg void OnSurfaceFormatChange();
 	afx_msg void OnFrameModeChange();
 	afx_msg void OnBnClickedDefault();
+
+	afx_msg void OnVideoRenderPropClick();
 };

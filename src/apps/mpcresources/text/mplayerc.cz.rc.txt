@@ -520,7 +520,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"Video renderer"
 7		"EVR-CP and EVR Sync settings"
 8		"Select D3D9 Render Device"
@@ -538,6 +538,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 30		"Do not scale at small frame size decreases"
 32		"Default"
 33		"Presentation mode:"
+35		"Properties"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

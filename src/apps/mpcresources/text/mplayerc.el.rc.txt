@@ -520,7 +520,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Οι αλλαγές θα ενεργοποιηθούν μετά το κλείσιμο κι επανεκκίνηση της αναπαραγωγής."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"Απόδοση βίντεο"
 7		"EVR-CP and EVR Sync settings"
 8		"Επιλογή συσκευής απόδοσης D3D9"
@@ -538,6 +538,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 30		"Μη γίνεται κλιμάκωση σε μικρή μείωσηη μεγέθους πλαισίου"
 32		"Προεπιλογή"
 33		"Λειτουργία παρουσίασης:"
+35		"Properties"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
