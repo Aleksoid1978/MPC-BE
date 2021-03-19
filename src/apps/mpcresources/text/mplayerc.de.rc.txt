@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"Videorenderer"
-7		"Properties"
+7		"Eigenschaften"
 8		"Einstellungen für EVR (custom presenter) und EVR Sync"
 9		"Rendergerät verwenden:"
 11		"Vollbild (Exclusive Mode)"

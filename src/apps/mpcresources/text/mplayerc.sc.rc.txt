@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"视频渲染器"
-7		"Properties"
+7		"属性"
 8		"EVR（自定义）及 EVR同步设置"
 9		"选择 D3D9 渲染设备"
 11		"全屏幕独占模式"
