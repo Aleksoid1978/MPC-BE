@@ -11098,6 +11098,8 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 
 			MoveVideoWindow();
 		}
+
+		SetFocus();
 	}
 }
 
