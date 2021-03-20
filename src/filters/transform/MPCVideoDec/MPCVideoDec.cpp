@@ -1367,19 +1367,14 @@ static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE*/)
 {
 	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = false;
-	for (size_t i = 0; i < _countof(ffCodecs); i++)
+	for (size_t i = 0; i < _countof(ffCodecs); i++) {
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 			if (bForced) { // hack
 				m_bUseFFmpeg = true;
 				m_bUseDXVA = true;
 			}
 			else {
-#ifndef REGISTER_FILTER
-				m_bUseFFmpeg = IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
-				if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
-					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
-				}
-#else
+#ifdef REGISTER_FILTER
 				switch (ffCodecs[i].nFFCodec) {
 				case AV_CODEC_ID_FLV1:
 				case AV_CODEC_ID_VP6F:
@@ -1392,7 +1387,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_divx) ||
 						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_Divx)) {
 						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_DIVX) != 0;
-					} else {
+					}
+					else {
 						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_XVID) != 0;	// Xvid/MPEG-4
 					}
 					break;
@@ -1413,7 +1409,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					if ((*ffCodecs[i].clsMinorType == MEDIASUBTYPE_MVC1) ||
 						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_AMVC)) {
 						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_H264_MVC) != 0;
-					} else {
+					}
+					else {
 						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_H264) != 0;
 					}
 					break;
@@ -1539,15 +1536,17 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					m_bUseFFmpeg = true;
 					break;
 				}
-
+#else
+				m_bUseFFmpeg = IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
+#endif
 				if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
 					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
 				}
-#endif
 			}
 
 			return m_bUseFFmpeg ? i : -1;
 		}
+	}
 
 	return -1;
 }
