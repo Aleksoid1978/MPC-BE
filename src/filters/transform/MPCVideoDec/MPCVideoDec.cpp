@@ -1369,194 +1369,184 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = false;
 	for (size_t i = 0; i < _countof(ffCodecs); i++)
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
-#ifndef REGISTER_FILTER
 			if (bForced) { // hack
 				m_bUseFFmpeg = true;
 				m_bUseDXVA = true;
 			}
 			else {
+#ifndef REGISTER_FILTER
 				m_bUseFFmpeg = IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
 				if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
 					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
 				}
-			}
-			return m_bUseFFmpeg ? i : -1;
 #else
-			bool bCodecActivated = false;
-			m_bUseFFmpeg         = true;
-			switch (ffCodecs[i].nFFCodec) {
-				case AV_CODEC_ID_FLV1 :
-				case AV_CODEC_ID_VP6F :
-					bCodecActivated = (m_nActiveCodecs & CODEC_FLASH) != 0;
+				switch (ffCodecs[i].nFFCodec) {
+				case AV_CODEC_ID_FLV1:
+				case AV_CODEC_ID_VP6F:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_FLASH) != 0;
 					break;
-				case AV_CODEC_ID_MPEG4 :
-					if ((*ffCodecs[i].clsMinorType == MEDIASUBTYPE_DX50) ||		// DivX
-							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_dx50) ||
-							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_DIVX) ||
-							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_divx) ||
-							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_Divx) ) {
-						bCodecActivated = (m_nActiveCodecs & CODEC_DIVX) != 0;
+				case AV_CODEC_ID_MPEG4:
+					if ((*ffCodecs[i].clsMinorType == MEDIASUBTYPE_DX50) ||	// DivX
+						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_dx50) ||
+						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_DIVX) ||
+						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_divx) ||
+						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_Divx)) {
+						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_DIVX) != 0;
 					} else {
-						bCodecActivated = (m_nActiveCodecs & CODEC_XVID) != 0;	// Xvid/MPEG-4
+						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_XVID) != 0;	// Xvid/MPEG-4
 					}
 					break;
-				case AV_CODEC_ID_WMV1 :
-				case AV_CODEC_ID_WMV2 :
-				case AV_CODEC_ID_WMV3IMAGE :
-					bCodecActivated = (m_nActiveCodecs & CODEC_WMV) != 0;
+				case AV_CODEC_ID_WMV1:
+				case AV_CODEC_ID_WMV2:
+				case AV_CODEC_ID_WMV3IMAGE:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_WMV) != 0;
 					break;
-				case AV_CODEC_ID_WMV3 :
-					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_WMV) != 0;
-					bCodecActivated = m_bUseFFmpeg;
+				case AV_CODEC_ID_WMV3:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_WMV) != 0;
 					break;
-				case AV_CODEC_ID_MSMPEG4V3 :
-				case AV_CODEC_ID_MSMPEG4V2 :
-				case AV_CODEC_ID_MSMPEG4V1 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_MSMPEG4) != 0;
+				case AV_CODEC_ID_MSMPEG4V3:
+				case AV_CODEC_ID_MSMPEG4V2:
+				case AV_CODEC_ID_MSMPEG4V1:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_MSMPEG4) != 0;
 					break;
-				case AV_CODEC_ID_H264 :
+				case AV_CODEC_ID_H264:
 					if ((*ffCodecs[i].clsMinorType == MEDIASUBTYPE_MVC1) ||
-							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_AMVC)) {
-						bCodecActivated = (m_nActiveCodecs & CODEC_H264_MVC) != 0;
+						(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_AMVC)) {
+						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_H264_MVC) != 0;
 					} else {
-						m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_H264) != 0;
-						bCodecActivated = m_bUseFFmpeg;
+						m_bUseFFmpeg = (m_nActiveCodecs & CODEC_H264) != 0;
 					}
 					break;
-				case AV_CODEC_ID_HEVC :
-					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_HEVC) != 0;
-					bCodecActivated = m_bUseFFmpeg;
+				case AV_CODEC_ID_HEVC:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_HEVC) != 0;
 					break;
-				case AV_CODEC_ID_SPEEDHQ :
-					bCodecActivated = (m_nActiveCodecs & CODEC_SHQ) != 0;
+				case AV_CODEC_ID_SPEEDHQ:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_SHQ) != 0;
 					break;
-				case AV_CODEC_ID_SVQ3 :
-				case AV_CODEC_ID_SVQ1 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_SVQ3) != 0;
+				case AV_CODEC_ID_SVQ3:
+				case AV_CODEC_ID_SVQ1:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_SVQ3) != 0;
 					break;
-				case AV_CODEC_ID_H263 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_H263) != 0;
+				case AV_CODEC_ID_H263:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_H263) != 0;
 					break;
-				case AV_CODEC_ID_DIRAC  :
-					bCodecActivated = (m_nActiveCodecs & CODEC_DIRAC) != 0;
+				case AV_CODEC_ID_DIRAC:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_DIRAC) != 0;
 					break;
-				case AV_CODEC_ID_DVVIDEO  :
-					bCodecActivated = (m_nActiveCodecs & CODEC_DV) != 0;
+				case AV_CODEC_ID_DVVIDEO:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_DV) != 0;
 					break;
-				case AV_CODEC_ID_THEORA :
-					bCodecActivated = (m_nActiveCodecs & CODEC_THEORA) != 0;
+				case AV_CODEC_ID_THEORA:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_THEORA) != 0;
 					break;
-				case AV_CODEC_ID_VC1 :
-					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_VC1) != 0;
-					bCodecActivated = m_bUseFFmpeg;
+				case AV_CODEC_ID_VC1:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VC1) != 0;
 					break;
-				case AV_CODEC_ID_VC1IMAGE :
-					bCodecActivated = (m_nActiveCodecs & CODEC_VC1) != 0;
+				case AV_CODEC_ID_VC1IMAGE:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VC1) != 0;
 					break;
-				case AV_CODEC_ID_AMV :
-					bCodecActivated = (m_nActiveCodecs & CODEC_AMVV) != 0;
+				case AV_CODEC_ID_AMV:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_AMVV) != 0;
 					break;
-				case AV_CODEC_ID_LAGARITH :
-					bCodecActivated = (m_nActiveCodecs & CODEC_LOSSLESS) != 0;
+				case AV_CODEC_ID_LAGARITH:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_LOSSLESS) != 0;
 					break;
-				case AV_CODEC_ID_VP3  :
-				case AV_CODEC_ID_VP5  :
-				case AV_CODEC_ID_VP6  :
-				case AV_CODEC_ID_VP6A :
-					bCodecActivated = (m_nActiveCodecs & CODEC_VP356) != 0;
+				case AV_CODEC_ID_VP3:
+				case AV_CODEC_ID_VP5:
+				case AV_CODEC_ID_VP6:
+				case AV_CODEC_ID_VP6A:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VP356) != 0;
 					break;
-				case AV_CODEC_ID_VP7  :
-				case AV_CODEC_ID_VP8  :
-					bCodecActivated = (m_nActiveCodecs & CODEC_VP89) != 0;
+				case AV_CODEC_ID_VP7:
+				case AV_CODEC_ID_VP8:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VP89) != 0;
 					break;
-				case AV_CODEC_ID_VP9  :
-					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_VP89) != 0;
-					bCodecActivated = m_bUseFFmpeg;
+				case AV_CODEC_ID_VP9:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VP89) != 0;
 					break;
-				case AV_CODEC_ID_MJPEG  :
-				case AV_CODEC_ID_MJPEGB :
-					bCodecActivated = (m_nActiveCodecs & CODEC_MJPEG) != 0;
+				case AV_CODEC_ID_MJPEG:
+				case AV_CODEC_ID_MJPEGB:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_MJPEG) != 0;
 					break;
-				case AV_CODEC_ID_INDEO3 :
-				case AV_CODEC_ID_INDEO4 :
-				case AV_CODEC_ID_INDEO5 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_INDEO) != 0;
+				case AV_CODEC_ID_INDEO3:
+				case AV_CODEC_ID_INDEO4:
+				case AV_CODEC_ID_INDEO5:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_INDEO) != 0;
 					break;
-				case AV_CODEC_ID_UTVIDEO :
-					bCodecActivated = (m_nActiveCodecs & CODEC_UTVD) != 0;
+				case AV_CODEC_ID_UTVIDEO:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_UTVD) != 0;
 					break;
-				case AV_CODEC_ID_CSCD    :
-				case AV_CODEC_ID_TSCC    :
-				case AV_CODEC_ID_TSCC2   :
-				case AV_CODEC_ID_VMNC    :
-					bCodecActivated = (m_nActiveCodecs & CODEC_SCREC) != 0;
+				case AV_CODEC_ID_CSCD:
+				case AV_CODEC_ID_TSCC:
+				case AV_CODEC_ID_TSCC2:
+				case AV_CODEC_ID_VMNC:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_SCREC) != 0;
 					break;
-				case AV_CODEC_ID_RV10 :
-				case AV_CODEC_ID_RV20 :
-				case AV_CODEC_ID_RV30 :
-				case AV_CODEC_ID_RV40 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_REALV) != 0;
+				case AV_CODEC_ID_RV10:
+				case AV_CODEC_ID_RV20:
+				case AV_CODEC_ID_RV30:
+				case AV_CODEC_ID_RV40:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_REALV) != 0;
 					break;
-				case AV_CODEC_ID_MPEG2VIDEO :
-					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_MPEG2) != 0;
-					bCodecActivated	= m_bUseFFmpeg;
+				case AV_CODEC_ID_MPEG2VIDEO:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_MPEG2) != 0;
 					break;
-				case AV_CODEC_ID_MPEG1VIDEO :
-					bCodecActivated = (m_nActiveCodecs & CODEC_MPEG1) != 0;
+				case AV_CODEC_ID_MPEG1VIDEO:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_MPEG1) != 0;
 					break;
-				case AV_CODEC_ID_PRORES :
-					bCodecActivated = (m_nActiveCodecs & CODEC_PRORES) != 0;
+				case AV_CODEC_ID_PRORES:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_PRORES) != 0;
 					break;
-				case AV_CODEC_ID_BINKVIDEO :
-					bCodecActivated = (m_nActiveCodecs & CODEC_BINKV) != 0;
+				case AV_CODEC_ID_BINKVIDEO:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_BINKV) != 0;
 					break;
-				case AV_CODEC_ID_PNG :
-					bCodecActivated = (m_nActiveCodecs & CODEC_PNG) != 0;
+				case AV_CODEC_ID_PNG:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_PNG) != 0;
 					break;
-				case AV_CODEC_ID_CLLC :
-				case AV_CODEC_ID_HQ_HQA :
-				case AV_CODEC_ID_HQX :
-					bCodecActivated = (m_nActiveCodecs & CODEC_CANOPUS) != 0;
+				case AV_CODEC_ID_CLLC:
+				case AV_CODEC_ID_HQ_HQA:
+				case AV_CODEC_ID_HQX:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_CANOPUS) != 0;
 					break;
-				case AV_CODEC_ID_CFHD :
-					bCodecActivated = (m_nActiveCodecs & VDEC_CINEFORM) != 0;
+				case AV_CODEC_ID_CFHD:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_CINEFORM) != 0;
 					break;
-				case AV_CODEC_ID_V210 :
-				case AV_CODEC_ID_V410 :
-				case AV_CODEC_ID_R210 :
-				case AV_CODEC_ID_R10K :
-				case AV_CODEC_ID_RAWVIDEO :
-					bCodecActivated = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
+				case AV_CODEC_ID_V210:
+				case AV_CODEC_ID_V410:
+				case AV_CODEC_ID_R210:
+				case AV_CODEC_ID_R10K:
+				case AV_CODEC_ID_RAWVIDEO:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
 					break;
-				case AV_CODEC_ID_DNXHD :
-					bCodecActivated = (m_nActiveCodecs & CODEC_DNXHD) != 0;
+				case AV_CODEC_ID_DNXHD:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_DNXHD) != 0;
 					break;
-				case AV_CODEC_ID_CINEPAK :
-					bCodecActivated = (m_nActiveCodecs & CODEC_CINEPAK) != 0;
+				case AV_CODEC_ID_CINEPAK:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_CINEPAK) != 0;
 					break;
-				case AV_CODEC_ID_8BPS  :
-				case AV_CODEC_ID_QTRLE :
-				case AV_CODEC_ID_RPZA  :
-					bCodecActivated = (m_nActiveCodecs & CODEC_QT) != 0;
+				case AV_CODEC_ID_8BPS:
+				case AV_CODEC_ID_QTRLE:
+				case AV_CODEC_ID_RPZA:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_QT) != 0;
 					break;
-				case AV_CODEC_ID_HAP :
-					bCodecActivated = (m_nActiveCodecs & CODEC_HAP) != 0;
+				case AV_CODEC_ID_HAP:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_HAP) != 0;
 					break;
-				case AV_CODEC_ID_AV1 :
+				case AV_CODEC_ID_AV1:
 					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_AV1) != 0;
-					bCodecActivated = m_bUseFFmpeg;
 					break;
-			}
+				default:
+					m_bUseFFmpeg = true;
+					break;
+				}
 
-			if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
-				m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
-			}
-
-			if (!bCodecActivated && !bForced) {
-				m_bUseFFmpeg = false;
-			}
-			return ((bForced || bCodecActivated) ? i : -1);
+				if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
+					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
+				}
 #endif
+			}
+
+			return m_bUseFFmpeg ? i : -1;
 		}
 
 	return -1;
