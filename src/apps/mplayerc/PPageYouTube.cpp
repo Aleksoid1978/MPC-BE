@@ -72,6 +72,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_cbFormat.AddString(L"MP4");
 	m_cbFormat.AddString(L"WebM");
+	m_cbFormat.AddString(L"MP4 AV1");
 	m_cbFormat.SetCurSel(s.YoutubeFormat.fmt);
 
 	static std::vector<int> resolutions;
