@@ -1370,11 +1370,17 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 	for (size_t i = 0; i < _countof(ffCodecs); i++)
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 #ifndef REGISTER_FILTER
-			m_bUseFFmpeg = bForced || IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
-			if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
-				m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
+			if (bForced) { // hack
+				m_bUseFFmpeg = true;
+				m_bUseDXVA = true;
 			}
-			return ((m_bUseDXVA || m_bUseFFmpeg) ? i : -1);
+			else {
+				m_bUseFFmpeg = IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
+				if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
+					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
+				}
+			}
+			return m_bUseFFmpeg ? i : -1;
 #else
 			bool bCodecActivated = false;
 			m_bUseFFmpeg         = true;
