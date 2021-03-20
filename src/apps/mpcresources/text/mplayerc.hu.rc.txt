@@ -522,7 +522,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"Videó megjelenítő"
-7		"Properties"
+7		"Tulajdonságok"
 8		"EVR-CP és EVR Sync beállítások"
 9		"Válassza a D3D9 megjelenítő eszközt"
 11		"Exkluzív teljesképernyő"
