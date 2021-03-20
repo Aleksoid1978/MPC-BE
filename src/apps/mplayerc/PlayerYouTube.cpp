@@ -1159,18 +1159,34 @@ namespace Youtube
 				}
 
 				final_item = nullptr;
-				size_t k;
-				for (k = 0; k < youtubeUrllist.size(); k++) {
-					if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
-						final_item = &youtubeUrllist[k];
-						break;
+				
+				int k_mp4 = -1;
+				int k_webm = -1;
+				int k_av1 = -1;
+				for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
+					const auto& format = youtubeUrllist[i].profile->format;
+					if (k_mp4 < 0 && format == y_mp4) {
+						k_mp4 = i;
+					}
+					else if (k_webm < 0 && format == y_webm) {
+						k_webm = i;
+					}
+					else if (k_av1 < 0 && format == y_mp4_av1) {
+						k_av1 = i;
 					}
 				}
-				if (!final_item) {
-					final_item = &youtubeUrllist[0];
-					k = 0;
-					DLog(L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == y_webm ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4");
+
+				size_t k = 0;
+				if (s.YoutubeFormat.fmt == y_mp4) {
+					k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
 				}
+				else if (s.YoutubeFormat.fmt == y_webm) {
+					k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
+				}
+				else if (s.YoutubeFormat.fmt == y_mp4_av1) {
+					k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
+				}
+				final_item = &youtubeUrllist[k];
 
 				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
 					const auto profile = youtubeUrllist[i].profile;
