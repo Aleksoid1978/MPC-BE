@@ -62,7 +62,7 @@ public:
 		if (m_merit >= MERIT64_ABOVE_DSHOW) {
 			// High merit MPC Video Decoder
 			for (const auto& fmt : fmts) {
-				if (m_bIsPreview || s.VideoFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
+				if (m_bIsPreview || s.VideoFilters[fmt.FFMPEGCode]) {
 					AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 				}
 			}
@@ -83,20 +83,15 @@ public:
 			return hr;
 		}
 
-		bool dxva_filters[VDEC_DXVA_COUNT];
-		bool video_filters[VDEC_COUNT];
-
 		CAppSettings& s = AfxGetAppSettings();
 
-		memcpy(&dxva_filters, &s.DXVAFilters, sizeof(s.DXVAFilters));
+		bool video_filters[VDEC_COUNT];
 		memcpy(&video_filters, &s.VideoFilters, sizeof(s.VideoFilters));
 
 		if (m_merit == MERIT64_DO_USE) {
-			memset(&dxva_filters, true, sizeof(dxva_filters));
 			memset(&video_filters, true, sizeof(video_filters));
 		}
 		if (m_bIsPreview) {
-			memset(&dxva_filters, false, sizeof(dxva_filters));
 			memset(&video_filters, true, sizeof(video_filters));
 			for (int i = 0; i < PixFmt_count; i++) {
 				pBF->SetSwPixelFormat((MPCPixelFormat)i, false);
@@ -108,9 +103,6 @@ public:
 		}
 		video_filters[VDEC_UNCOMPRESSED] = false;
 
-		for (size_t i = 0; i < VDEC_DXVA_COUNT; i++) {
-			pBF->SetDXVACodec(i, dxva_filters[i]);
-		}
 		for (size_t i = 0; i < VDEC_COUNT; i++) {
 			pBF->SetFFMpegCodec(i, video_filters[i]);
 		}
@@ -1828,12 +1820,11 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	CAppSettings& s = AfxGetAppSettings();
 	const CRenderersSettings& rs = s.m_VRSettings;
 
-	CFGFilter*	pFGF;
+	CFGFilter* pFGF;
 
-	bool *src	= s.SrcFilters;
-	bool *dxva	= s.DXVAFilters;
-	bool *video	= s.VideoFilters;
-	bool *audio	= s.AudioFilters;
+	bool *src   = s.SrcFilters;
+	bool *video = s.VideoFilters;
+	bool *audio = s.AudioFilters;
 
 	// Source filters
 

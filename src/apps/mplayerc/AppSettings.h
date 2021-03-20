@@ -755,7 +755,6 @@ public:
 
 	// Internal Filters
 	bool			SrcFilters[SRC_COUNT];
-	bool			DXVAFilters[VDEC_DXVA_COUNT];
 	bool			VideoFilters[VDEC_COUNT];
 	bool			AudioFilters[ADEC_COUNT];
 	int				iBufferDuration;
@@ -977,7 +976,6 @@ private :
 	int				nCurrentFilePosition;
 
 	LPCWSTR			SrcFiltersKeys[SRC_COUNT];
-	LPCWSTR			DXVAFiltersKeys[VDEC_DXVA_COUNT];
 	LPCWSTR			VideoFiltersKeys[VDEC_COUNT];
 	LPCWSTR			AudioFiltersKeys[ADEC_COUNT];
 

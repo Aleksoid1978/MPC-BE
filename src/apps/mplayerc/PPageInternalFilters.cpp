@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,15 +61,6 @@ static filter_t s_source_filters[] = {
 };
 
 static filter_t s_video_decoders[] = {
-	// DXVA2 decoders
-	{L"DXVA2: AV1",					DXVA_DECODER,  VDEC_DXVA_AV1,		0},
-	{L"DXVA2: H.264/AVC",			DXVA_DECODER,  VDEC_DXVA_H264,		0},
-	{L"DXVA2: HEVC",				DXVA_DECODER,  VDEC_DXVA_HEVC,		0},
-	{L"DXVA2: MPEG-2 Video",		DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
-	{L"DXVA2: VC-1",				DXVA_DECODER,  VDEC_DXVA_VC1,		0},
-	{L"DXVA2: WMV3",				DXVA_DECODER,  VDEC_DXVA_WMV3,		0},
-	{L"DXVA2: VP9",					DXVA_DECODER,  VDEC_DXVA_VP9,		0},
-	// Software decoders
 	{L"AMV Video",					VIDEO_DECODER, VDEC_AMV,			0},
 	{L"Apple ProRes",				VIDEO_DECODER, VDEC_PRORES,			0},
 	{L"AOMedia Video 1 (AV1)",		VIDEO_DECODER, VDEC_AV1,			0},
@@ -246,10 +237,6 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 	enum {
 		ENABLE_ALL = 1,
 		DISABLE_ALL,
-		ENABLE_FFMPEG,
-		DISABLE_FFMPEG,
-		ENABLE_DXVA,
-		DISABLE_DXVA,
 	};
 
 	int totalFilters = 0, totalChecked = 0;
@@ -263,20 +250,6 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 	m.AppendMenu(MF_STRING | state, ENABLE_ALL, ResStr(IDS_ENABLE_ALL_FILTERS));
 	state = (totalChecked != 0) ? MF_ENABLED : MF_GRAYED;
 	m.AppendMenu(MF_STRING | state, DISABLE_ALL, ResStr(IDS_DISABLE_ALL_FILTERS));
-
-	if (m_n == VIDEO) {
-		m.AppendMenu(MF_SEPARATOR);
-		state = (m_nbChecked[VIDEO_DECODER] != m_nbFiltersPerType[VIDEO_DECODER]) ? MF_ENABLED : MF_GRAYED;
-		m.AppendMenu(MF_STRING | state, ENABLE_FFMPEG, ResStr(IDS_ENABLE_FFMPEG_FILTERS));
-		state = (m_nbChecked[VIDEO_DECODER] != 0) ? MF_ENABLED : MF_GRAYED;
-		m.AppendMenu(MF_STRING | state, DISABLE_FFMPEG, ResStr(IDS_DISABLE_FFMPEG_FILTERS));
-
-		m.AppendMenu(MF_SEPARATOR);
-		state = (m_nbChecked[DXVA_DECODER] != m_nbFiltersPerType[DXVA_DECODER]) ? MF_ENABLED : MF_GRAYED;
-		m.AppendMenu(MF_STRING | state, ENABLE_DXVA, ResStr(IDS_ENABLE_DXVA_FILTERS));
-		state = (m_nbChecked[DXVA_DECODER] != 0) ? MF_ENABLED : MF_GRAYED;
-		m.AppendMenu(MF_STRING | state, DISABLE_DXVA, ResStr(IDS_DISABLE_DXVA_FILTERS));
-	}
 
 	CPoint p = point;
 	::MapWindowPoints(m_hWnd, HWND_DESKTOP, &p, 1);
@@ -306,26 +279,6 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 				break;
 			case DISABLE_ALL:
 				SetCheck(i, FALSE);
-				break;
-			case ENABLE_FFMPEG:
-				if (s_video_decoders[i].type == VIDEO_DECODER) {
-					SetCheck(i, TRUE);
-				}
-				break;
-			case DISABLE_FFMPEG:
-				if (s_video_decoders[i].type == VIDEO_DECODER) {
-					SetCheck(i, FALSE);
-				}
-				break;
-			case ENABLE_DXVA:
-				if (s_video_decoders[i].type == DXVA_DECODER) {
-					SetCheck(i, TRUE);
-				}
-				break;
-			case DISABLE_DXVA:
-				if (s_video_decoders[i].type == DXVA_DECODER) {
-					SetCheck(i, FALSE);
-				}
 				break;
 			}
 		}
@@ -416,17 +369,7 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	}
 
 	for (auto& item : s_video_decoders) {
-		bool checked = false;
-		if (item.type == DXVA_DECODER) {
-			checked = s.DXVAFilters[item.flag];
-		}
-		else if (item.type == VIDEO_DECODER) {
-			checked = s.VideoFilters[item.flag];
-		}
-		else {
-			ASSERT(0);
-			continue;
-		}
+		bool checked = s.VideoFilters[item.flag];
 		m_listVideo.AddFilter(&item, checked);
 	}
 
@@ -497,9 +440,6 @@ BOOL CPPageInternalFilters::OnApply()
 			switch (f->type) {
 				case SOURCE_FILTER:
 					s.SrcFilters[f->flag] = !!list->GetCheck(i);
-					break;
-				case DXVA_DECODER:
-					s.DXVAFilters[f->flag] = !!list->GetCheck(i);
 					break;
 				case VIDEO_DECODER:
 					s.VideoFilters[f->flag] = !!list->GetCheck(i);

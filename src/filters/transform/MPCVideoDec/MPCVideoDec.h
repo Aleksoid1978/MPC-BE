@@ -56,6 +56,7 @@ protected:
 	int										m_nARMode;
 	int										m_nDiscardMode;
 	bool									m_bEnableD3D11Decoder;
+	bool									m_bHwDecs[HWDec_count];
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
 	bool									m_fPixFmts[PixFmt_count];
@@ -64,7 +65,6 @@ protected:
 
 	CCritSec								m_csProps;
 
-	bool									m_DXVAFilters[VDEC_DXVA_COUNT];
 	bool									m_VideoFilters[VDEC_COUNT];
 
 	bool									m_bDXVACompatible;
@@ -263,6 +263,8 @@ public:
 	STDMETHODIMP SetARMode(int nValue);
 	STDMETHODIMP_(int) GetARMode();
 
+	STDMETHODIMP SetHwDecoder(MPCHwDecoder hwdec, bool enable);
+	STDMETHODIMP_(bool) GetHwDecoder(MPCHwDecoder hwdec);
 	STDMETHODIMP SetD3D11Decoder(bool enable);
 	STDMETHODIMP_(bool) GetD3D11Decoder();
 	STDMETHODIMP SetDXVACheckCompatibility(int nValue);
@@ -324,7 +326,6 @@ public:
 
 	// === Codec functions
 	HRESULT						SetFFMpegCodec(int nCodec, bool bEnabled);
-	HRESULT						SetDXVACodec(int nCodec, bool bEnabled);
 
 private:
 	friend class CVideoDecDXVAAllocator;
@@ -359,7 +360,6 @@ namespace MPCVideoDec {
 		const CLSID* clsMinorType;
 
 		const int    FFMPEGCode;
-		const int    DXVACode;
 	};
 	typedef std::list<FORMAT> FORMATS;
 

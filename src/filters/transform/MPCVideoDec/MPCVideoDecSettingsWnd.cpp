@@ -117,13 +117,39 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Hardware acceleration //////////
 	y = 120;
-	CalcRect(rect, x0, y, group_w, 88);
+	CalcRect(rect, x0, y, group_w, 128);
 	m_grpHwAcceleration.Create(ResStr(IDS_VDF_HW_ACCELERATION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, 64);
+	m_txtHWCodec.Create(L"Codecs:", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+
+	int codec_w = 60;
+	int codec_x1 = x1 + 64;
+	int codec_x2 = codec_x1 + codec_w + 8;
+	int codec_x3 = codec_x2 + codec_w + 8;
+	int codec_x4 = codec_x3 + codec_w + 8;
+
+	CalcTextRect(rect, codec_x1, y, codec_w);
+	m_cbHWCodec[HWDec_H264].Create(L"H.264", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_H264);
+	CalcTextRect(rect, codec_x2, y, codec_w);
+	m_cbHWCodec[HWDec_HEVC].Create(L"HEVC", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_HEVC);
+	CalcTextRect(rect, codec_x3, y, codec_w);
+	m_cbHWCodec[HWDec_VP9].Create(L"VP9", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VP9);
+	CalcTextRect(rect, codec_x4, y, codec_w);
+	m_cbHWCodec[HWDec_AV1].Create(L"AV1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_AV1);
+	y += 20;
+	CalcTextRect(rect, codec_x1, y, codec_w);
+	m_cbHWCodec[HWDec_MPEG2].Create(L"MPEG-2", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_MPEG2);
+	CalcTextRect(rect, codec_x2, y, codec_w);
+	m_cbHWCodec[HWDec_VC1].Create(L"VC-1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VC1);
+	CalcTextRect(rect, codec_x3, y, codec_w);
+	m_cbHWCodec[HWDec_WMV3].Create(L"WMV3", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_WMV3);
 	y += 20;
 
 	// Use D3D11 decoder
 	CalcTextRect(rect, x1, y, row_w);
-	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_USE_D3D_DEC);
+	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_D3D11_DEC);
 	if (SysVersion::IsWin8orLater()) {
 		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
 	} else {
@@ -152,7 +178,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	label_w = 124;
 	control_w = row_w - label_w;
 	x2 = x1 + label_w;
-	y = 212;
+	y = 252;
 	CalcRect(rect, x0, y, group_w, 88);
 	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
 	y += 20;
@@ -262,9 +288,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(L"TV (16-235)");
 	y += 24;
 
-	CalcRect(rect, x0, 212 + 88 - 32, 76, 32);
+	CalcRect(rect, x0, 340 - 32, 76, 32);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle | BS_MULTILINE, rect, this, IDC_PP_RESET);
-	CalcTextRect(rect, x0 + 76, 212 + 88 - 16, group_w - 76);
+	CalcTextRect(rect, x0 + 76, 340 - 16, group_w - 76);
 	m_txtVersion.Create(WS_CHILD | WS_VISIBLE | ES_READONLY | ES_RIGHT, rect, this, (UINT)IDC_STATIC);
 
 	///////////////////////////////////////
@@ -283,13 +309,15 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_chARMode.SetCheck(m_pMDF->GetARMode());
 		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
 
+		for (int i = 0; i < HWDec_count; i++) {
+			m_cbHWCodec[i].SetCheck(!!m_pMDF->GetHwDecoder((MPCHwDecoder)i));
+		}
 		if (SysVersion::IsWin8orLater()) {
 			m_chUseD3D11Decoder.SetCheck(!!m_pMDF->GetD3D11Decoder());
 		}
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
 		m_chDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
-		// === New swscaler options
 		for (int i = 0; i < PixFmt_count; i++) {
 			if (i == PixFmt_YUY2) {
 				m_cbFormat[PixFmt_YUY2].SetCheck(m_pMDF->GetSwPixelFormat(PixFmt_YUY2) ? BST_CHECKED : BST_INDETERMINATE);
@@ -339,6 +367,9 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetARMode(m_chARMode.GetCheck());
 		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
 
+		for (int i = 0; i < HWDec_count; i++) {
+			m_pMDF->SetHwDecoder((MPCHwDecoder)i, m_cbHWCodec[i].GetCheck() == BST_CHECKED);
+		}
 		if (SysVersion::IsWin8orLater()) {
 			m_pMDF->SetD3D11Decoder(m_chUseD3D11Decoder.GetCheck());
 		}
@@ -507,13 +538,6 @@ static const struct {
 	ULONGLONG	CodecId;
 	LPCWSTR		CodeName;
 } mpc_codecs[] = {
-	{CODEC_AV1_DXVA,	L"DXVA2: AV1"},
-	{CODEC_H264_DXVA,	L"DXVA2: H.264/AVC"},
-	{CODEC_HEVC_DXVA,	L"DXVA2: HEVC"},
-	{CODEC_MPEG2_DXVA,	L"DXVA2: MPEG-2"},
-	{CODEC_VC1_DXVA,	L"DXVA2: VC-1"},
-	{CODEC_WMV3_DXVA,	L"DXVA2: WMV3"},
-	{CODEC_VP9_DXVA,	L"DXVA2: VP9"},
 	{CODEC_AMVV,		L"AMV video"},
 	{CODEC_AV1,			L"AOMedia Video 1 (AV1)"},
 	{CODEC_PRORES,		L"Apple ProRes"},

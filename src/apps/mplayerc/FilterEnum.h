@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2019 see Authors.txt
+ * (C) 2010-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 
 enum {
 	SOURCE_FILTER,
-	DXVA_DECODER,
 	VIDEO_DECODER,
 	AUDIO_DECODER,
 	FILTER_TYPE_NB
@@ -63,18 +62,6 @@ enum SOURCE_FILTER {
 	SRC_AIFF,
 
 	SRC_COUNT
-};
-
-enum DXVA_FILTER {
-	VDEC_DXVA_H264,
-	VDEC_DXVA_HEVC,
-	VDEC_DXVA_MPEG2,
-	VDEC_DXVA_VC1,
-	VDEC_DXVA_WMV3,
-	VDEC_DXVA_VP9,
-	VDEC_DXVA_AV1,
-
-	VDEC_DXVA_COUNT
 };
 
 enum VIDEO_FILTER {

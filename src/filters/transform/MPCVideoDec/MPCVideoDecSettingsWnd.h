@@ -29,7 +29,14 @@ enum {
 	IDC_PP_DEINTERLACING,
 	IDC_PP_AR,
 	IDC_PP_SKIPBFRAMES,
-	IDC_PP_USE_D3D_DEC,
+	IDC_PP_HW_MPEG2,
+	IDC_PP_HW_WMV3,
+	IDC_PP_HW_VC1,
+	IDC_PP_HW_H264,
+	IDC_PP_HW_HEVC,
+	IDC_PP_HW_VP9,
+	IDC_PP_HW_AV1,
+	IDC_PP_D3D11_DEC,
 	IDC_PP_DXVA_CHECK,
 	IDC_PP_DXVA_SD,
 	IDC_PP_SW_NV12,
@@ -64,6 +71,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_chSkipBFrames;
 
 	CButton		m_grpHwAcceleration;
+	CStatic		m_txtHWCodec;
+	CButton		m_cbHWCodec[HWDec_count];
 	CButton		m_chUseD3D11Decoder;
 	CStatic		m_txtDXVACompatibilityCheck;
 	CComboBox	m_cbDXVACompatibilityCheck;
