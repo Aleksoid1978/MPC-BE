@@ -97,7 +97,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txt422;
 	CStatic     m_txt444;
 	CStatic     m_txtRGB;
-	CButton		m_cbFormat[PixFmt_count];
+	CButton     m_cbFormat[PixFmt_count];
 	CStatic     m_txtSwRGBLevels;
 	CComboBox   m_cbSwRGBLevels;
 
@@ -119,7 +119,7 @@ public:
 	bool OnApply();
 
 	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCEW(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(647, 295); }
+	static CSize GetWindowSize() { return CSize(636, 348); }
 
 	DECLARE_MESSAGE_MAP()
 

@@ -1400,8 +1400,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					bCodecActivated = (m_nActiveCodecs & CODEC_WMV) != 0;
 					break;
 				case AV_CODEC_ID_WMV3 :
-					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_WMV) != 0;
-					bCodecActivated	= m_bUseFFmpeg;
+					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_WMV) != 0;
+					bCodecActivated = m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_MSMPEG4V3 :
 				case AV_CODEC_ID_MSMPEG4V2 :
@@ -1413,13 +1413,13 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_AMVC)) {
 						bCodecActivated = (m_nActiveCodecs & CODEC_H264_MVC) != 0;
 					} else {
-						m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_H264) != 0;
-						bCodecActivated	= m_bUseFFmpeg;
+						m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_H264) != 0;
+						bCodecActivated = m_bUseFFmpeg;
 					}
 					break;
 				case AV_CODEC_ID_HEVC :
-					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_HEVC) != 0;
-					bCodecActivated	= m_bUseFFmpeg;
+					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_HEVC) != 0;
+					bCodecActivated = m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_SPEEDHQ :
 					bCodecActivated = (m_nActiveCodecs & CODEC_SHQ) != 0;
@@ -1441,8 +1441,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					bCodecActivated = (m_nActiveCodecs & CODEC_THEORA) != 0;
 					break;
 				case AV_CODEC_ID_VC1 :
-					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_VC1) != 0;
-					bCodecActivated	= m_bUseFFmpeg;
+					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_VC1) != 0;
+					bCodecActivated = m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_VC1IMAGE :
 					bCodecActivated = (m_nActiveCodecs & CODEC_VC1) != 0;
@@ -1464,8 +1464,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					bCodecActivated = (m_nActiveCodecs & CODEC_VP89) != 0;
 					break;
 				case AV_CODEC_ID_VP9  :
-					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_VP89) != 0;
-					bCodecActivated	= m_bUseFFmpeg;
+					m_bUseFFmpeg    = (m_nActiveCodecs & CODEC_VP89) != 0;
+					bCodecActivated = m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_MJPEG  :
 				case AV_CODEC_ID_MJPEGB :

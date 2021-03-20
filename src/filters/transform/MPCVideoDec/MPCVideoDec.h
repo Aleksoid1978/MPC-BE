@@ -95,9 +95,9 @@ protected:
 	REFERENCE_TIME							m_rtLastStop;			// rtStop  for last delivered frame
 	double									m_dRate;
 
+	bool									m_bUseFFmpeg;
 	bool									m_bUseDXVA;
 	bool									m_bUseD3D11;
-	bool									m_bUseFFmpeg;
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
 
