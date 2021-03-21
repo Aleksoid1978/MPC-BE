@@ -122,7 +122,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	y += 20;
 
 	CalcTextRect(rect, x1, y, 64);
-	m_txtHWCodec.Create(L"Codecs:", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	m_txtHWCodec.Create(ResStr(IDS_VDF_HW_CODECS), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
 
 	int codec_w = 60;
 	int codec_x1 = x1 + 64;

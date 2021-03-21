@@ -9,7 +9,8 @@
 #define IDS_VDF_THREADNUMBER            7402
 #define IDS_VDF_SKIPBFRAMES             7403
 #define IDS_VDF_AR_MODE                 7410
-#define IDS_VDF_HW_ACCELERATION         7413
+#define IDS_VDF_HW_ACCELERATION         7412
+#define IDS_VDF_HW_CODECS               7413
 #define IDS_VDF_USE_D3D11_DECODER       7414
 #define IDS_VDF_DXVACOMPATIBILITY       7416
 #define IDS_VDF_DXVA_FULLCHECK          7417
