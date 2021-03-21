@@ -445,6 +445,7 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_HAALI_VR), &m_cbVideoRenderer);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_NULL_ANY:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_NULLVR_ANY), &m_cbVideoRenderer);
@@ -454,10 +455,10 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_MADVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_MPCVR:
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
@@ -549,13 +550,21 @@ void CPPageVideo::OnBnClickedDefault()
 void CPPageVideo::OnVideoRenderPropClick()
 {
 	const auto& s = AfxGetAppSettings();
-	if (s.iSelectedVideoRenderer == VIDRNDT_MPCVR || s.iSelectedVideoRenderer == VIDRNDT_MADVR) {
-		CComPtr<IBaseFilter> pBF;
-		HRESULT hr = pBF.CoCreateInstance(s.iSelectedVideoRenderer == VIDRNDT_MPCVR ? CLSID_MPCVR : CLSID_madVR);
-		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
-			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
-			ps.AddPages(pSPP);
-			ps.DoModal();
-		}
+
+	CLSID clsid;
+	switch (s.iSelectedVideoRenderer) {
+	case VIDRNDT_MPCVR: clsid = CLSID_MPCVR; break;
+	case VIDRNDT_DXR:   clsid = CLSID_DXR;   break;
+	case VIDRNDT_MADVR: clsid = CLSID_madVR; break;
+	default:
+		return;
+	}
+
+	CComPtr<IBaseFilter> pBF;
+	HRESULT hr = pBF.CoCreateInstance(clsid);
+	if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
+		CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
+		ps.AddPages(pSPP);
+		ps.DoModal();
 	}
 }
