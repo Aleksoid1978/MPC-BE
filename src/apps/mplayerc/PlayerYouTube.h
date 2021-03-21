@@ -85,6 +85,15 @@ namespace Youtube
 		{243, y_webm,    y_video,  360, L"webm", false, false},
 		{242, y_webm,    y_video,  240, L"webm", false, false},
 		// MP4 (AV1)
+		{702, y_mp4_av1, y_video, 4320, L"mp4",  false, true},
+		{701, y_mp4_av1, y_video, 2160, L"mp4",  false, true},
+		{700, y_mp4_av1, y_video, 1440, L"mp4",  false, true},
+		{699, y_mp4_av1, y_video, 1080, L"mp4",  false, true},
+		{698, y_mp4_av1, y_video,  720, L"mp4",  false, true},
+		{697, y_mp4_av1, y_video,  480, L"mp4",  false, true},
+		{696, y_mp4_av1, y_video,  360, L"mp4",  false, true},
+		{695, y_mp4_av1, y_video,  240, L"mp4",  false, true},
+
 		{571, y_mp4_av1, y_video, 4320, L"mp4",  false, false},
 		{402, y_mp4_av1, y_video, 4320, L"mp4",  false, false},
 		{401, y_mp4_av1, y_video, 2160, L"mp4",  false, false},
