@@ -446,6 +446,9 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_chARMode.SetCheck(BST_INDETERMINATE);
 	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 
+	for (int i = 0; i < HWDec_count; i++) {
+		m_cbHWCodec[i].SetCheck(BST_CHECKED);
+	}
 	if (SysVersion::IsWin8orLater()) {
 		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
 	}
