@@ -177,6 +177,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 				case 0:
 					switch (pAVCtx->bits_per_coded_sample) {
 					case 32: pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; break;
+					default:
 					case 24: pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; break;
 					case 16: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
 					case 12: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
