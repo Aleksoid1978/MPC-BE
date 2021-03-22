@@ -4110,13 +4110,14 @@ static inline uint32_t count_rice_bits_in_partition_(
 	const FLAC__int32 *residual
 )
 {
-	uint32_t i, partition_bits =
+	uint32_t i;
+	uint64_t partition_bits =
 		FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN + /* actually could end up being FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN but err on side of 16bps */
 		(1+rice_parameter) * partition_samples /* 1 for unary stop bit + rice_parameter for the binary portion */
 	;
 	for(i = 0; i < partition_samples; i++)
 		partition_bits += ( (FLAC__uint32)((residual[i]<<1)^(residual[i]>>31)) >> rice_parameter );
-	return partition_bits;
+	return (uint32_t)(flac_min(partition_bits,(uint32_t)(-1))); // To make sure the return value doesn't overflow
 }
 #else
 static inline uint32_t count_rice_bits_in_partition_(
@@ -4125,15 +4126,15 @@ static inline uint32_t count_rice_bits_in_partition_(
 	const FLAC__uint64 abs_residual_partition_sum
 )
 {
-	return
+	return (uint32_t)(flac_min( // To make sure the return value doesn't overflow
 		FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN + /* actually could end up being FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN but err on side of 16bps */
 		(1+rice_parameter) * partition_samples + /* 1 for unary stop bit + rice_parameter for the binary portion */
 		(
 			rice_parameter?
-				(uint32_t)(abs_residual_partition_sum >> (rice_parameter-1)) /* rice_parameter-1 because the real coder sign-folds instead of using a sign bit */
-				: (uint32_t)(abs_residual_partition_sum << 1) /* can't shift by negative number, so reverse */
+				(abs_residual_partition_sum >> (rice_parameter-1)) /* rice_parameter-1 because the real coder sign-folds instead of using a sign bit */
+				: (abs_residual_partition_sum << 1) /* can't shift by negative number, so reverse */
 		)
-		- (partition_samples >> 1)
+		- (partition_samples >> 1),(uint32_t)(-1)));
 		/* -(partition_samples>>1) to subtract out extra contributions to the abs_residual_partition_sum.
 		 * The actual number of bits used is closer to the sum(for all i in the partition) of  abs(residual[i])>>(rice_parameter-1)
 		 * By using the abs_residual_partition sum, we also add in bits in the LSBs that would normally be shifted out.
@@ -4224,7 +4225,10 @@ FLAC__bool set_partitioned_rice_(
 				raw_bits[0] = 0;
 		}
 		parameters[0] = best_rice_parameter;
-		bits_ += best_partition_bits;
+		if(best_partition_bits < UINT_MAX - bits_) // To make sure _bits doesn't overflow
+			bits_ += best_partition_bits;
+		else
+			bits_ = UINT_MAX;
 	}
 	else {
 		uint32_t partition, residual_sample;
@@ -4327,7 +4331,10 @@ FLAC__bool set_partitioned_rice_(
 					raw_bits[partition] = 0;
 			}
 			parameters[partition] = best_rice_parameter;
-			bits_ += best_partition_bits;
+			if(best_partition_bits < UINT_MAX - bits_) // To make sure _bits doesn't overflow
+				bits_ += best_partition_bits;
+			else
+				bits_ = UINT_MAX;
 			residual_sample += partition_samples;
 		}
 	}
