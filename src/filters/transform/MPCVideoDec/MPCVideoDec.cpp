@@ -1371,7 +1371,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 			if (bForced) { // hack
 				m_bUseFFmpeg = true;
-				m_bUseDXVA = true;
+				if (ffCodecs[i].HwDec != HWDec_None) {
+					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
+				}
 			}
 			else {
 #ifdef REGISTER_FILTER
@@ -1639,19 +1641,28 @@ HRESULT CMPCVideoDecFilter::CheckTransform(const CMediaType* mtIn, const CMediaT
 HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt)
 {
 	if (direction == PINDIR_INPUT) {
+		if (m_pDXVADecoder) {
+			CleanupDXVAVariables();
+			CleanupD3DResources();
+			SAFE_DELETE(m_pDXVADecoder);
+		}
+		DXVAState::ClearState();
+		m_nDecoderMode = MODE_SOFTWARE;
+		m_bDXVACompatible = true;
+		m_bD3D11DecodeCompatible = TRUE;
+
+		m_bReinit = true;
 		HRESULT hr = InitDecoder(pmt);
 		if (FAILED(hr)) {
 			return hr;
 		}
 
-		BuildOutputFormat();
+		DLog(L"CMPCVideoDecFilter::SetMediaType() - PINDIR_INPUT");
 
-		if (UseDXVA2()
-				&& (m_pCurrentMediaType != *pmt)) {
-			hr = ReinitDXVA2Decoder();
-			if (FAILED(hr)) {
-				return hr;
-			}
+		if (m_pOutput->IsConnected() && m_pCurrentMediaType != *pmt) {
+			ChangeOutputMediaFormat(2);
+		} else {
+			BuildOutputFormat();
 		}
 
 		m_bDecodingStart    = FALSE;
@@ -1895,7 +1906,7 @@ redo:
 
 	if (m_bFallBackFromD3D11) {
 		m_bUseD3D11 = false;
-	} else if (m_bFallBackFromDXVA2 || (bReinit && m_nDecoderMode == MODE_SOFTWARE)) {
+	} else if (m_bFallBackFromDXVA2) {
 		m_bUseDXVA = m_bUseD3D11 = false;
 	}
 	m_bFallBackFromDXVA2 = m_bFallBackFromD3D11 = false;
@@ -2061,7 +2072,9 @@ redo:
 	}
 
 	avcodec_lock;
+	m_bInInit = TRUE;
 	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, &options);
+	m_bInInit = FALSE;
 	avcodec_unlock;
 
 	if (options) {
@@ -2664,6 +2677,8 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
  	if (direction == PINDIR_OUTPUT) {
+		DLog(L"CMPCVideoDecFilter::CompleteConnect() - PINDIR_OUTPUT");
+
 		if (IsDXVASupported(m_bUseD3D11)) {
 			HRESULT hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
 			if (SUCCEEDED(hr)) {
@@ -2681,9 +2696,15 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				DXVAState::ClearState();
 				m_bFallBackFromD3D11 = true;
 			}
-		} else if (IsDXVASupported(m_bUseDXVA) && SUCCEEDED(ConfigureDXVA2(pReceivePin))) {
+		} else if (IsDXVASupported(m_bUseDXVA)) {
 			HRESULT hr = E_FAIL;
 			for (;;) {
+				hr = ConfigureDXVA2(pReceivePin);
+				if (FAILED(hr)) {
+					DLog(L"CMPCVideoDecFilter::CompleteConnect() : ConfigureDXVA2() - FAILED (0x%08x)", hr);
+					break;
+				}
+
 				CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
 				hr = m_pDeviceManager->GetVideoService(m_hDevice, IID_PPV_ARGS(&pDXVA2Service));
 				if (FAILED(hr)) {
@@ -2773,6 +2794,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 			EndEnumFilters;
 		}
+
+		m_bReinit = false;
 	}
 
 	return __super::CompleteConnect (direction, pReceivePin);
@@ -3457,6 +3480,11 @@ void CMPCVideoDecFilter::SetThreadCount()
 
 HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 {
+	if (m_bReinit) {
+		DLog(L"CMPCVideoDecFilter::Transform() - skip sample during initialization");
+		return S_OK;
+	}
+
 	HRESULT			hr;
 	BYTE*			buffer;
 	int				buflen;

@@ -129,6 +129,8 @@ protected:
 	bool									m_bFallBackFromDXVA2 = FALSE;
 	bool									m_bFallBackFromD3D11 = FALSE;
 
+	bool									m_bReinit = false;
+
 	BOOL									m_bWaitingForKeyFrame;
 	BOOL									m_bRVDropBFrameTimings;
 

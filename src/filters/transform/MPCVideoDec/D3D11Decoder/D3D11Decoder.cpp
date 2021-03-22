@@ -540,6 +540,11 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 {
 	DLog(L"CD3D11Decoder::PostConnect()");
 
+	if (m_pAllocator) {
+		m_pAllocator->DecoderDestruct();
+		SAFE_RELEASE(m_pAllocator);
+	}
+
 	CComPtr<ID3D11DecoderConfiguration> pD3D11DecoderConfiguration;
 	HRESULT hr = pPin->QueryInterface(&pD3D11DecoderConfiguration);
 	if (FAILED(hr))	{
@@ -576,14 +581,12 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	}
 
 	// check if the connection supports native mode
-	if (pD3D11DecoderConfiguration) {
-		CMediaType mt = m_pFilter->m_pOutput->CurrentMediaType();
-		if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
-			(m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
-			(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016)) {
-			DbgLog((LOG_ERROR, 10, L"-> Connection is not the appropriate pixel format for D3D11 Native"));
-			return E_FAIL;
-		}
+	CMediaType& mt = m_pFilter->m_pOutput->CurrentMediaType();
+	if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
+		(m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
+		(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016)) {
+		DLog(L"-> Connection is not the appropriate pixel format '%s' for D3D11 Native", GetGUIDString(mt.subtype));
+		return E_FAIL;
 	}
 
 	// verify hardware support
