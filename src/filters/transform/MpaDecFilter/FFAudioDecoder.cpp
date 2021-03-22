@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -470,61 +470,60 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		return hr;
 	}
 
-	int ret = 0;
-	AVPacket avpkt;
-	av_init_packet(&avpkt);
+	if (AVPacket* avpkt = av_packet_alloc()) {
+		int ret = 0;
+		if (m_pParser) {
+			BYTE* pOut = nullptr;
+			int pOut_size = 0;
 
-	if (m_pParser) {
-		BYTE* pOut = nullptr;
-		int pOut_size = 0;
+			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+			if (used_bytes < 0) {
+				DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
+				av_packet_free(&avpkt);
+				return E_FAIL;
+			} else if (used_bytes == 0 && pOut_size == 0) {
+				DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
+			}
 
-		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-		if (used_bytes < 0) {
-			DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
-			av_packet_unref(&avpkt);
-			return E_FAIL;
-		} else if (used_bytes == 0 && pOut_size == 0) {
-			DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
+			if (used_bytes >= pOut_size && m_pFilter->m_bUpdateTimeCache) {
+				m_pFilter->UpdateCacheTimeStamp();
+			}
+
+			if (out_size) {
+				*out_size = used_bytes;
+			}
+
+			hr = S_FALSE;
+
+			if (pOut_size > 0) {
+				avpkt->data = pOut;
+				avpkt->size = pOut_size;
+				avpkt->dts  = m_pFilter->m_rtStartInputCache;
+
+				ret = avcodec_send_packet(m_pAVCtx, avpkt);
+			}
+		} else {
+			avpkt->data = p;
+			avpkt->size = size;
+			avpkt->dts  = m_pFilter->m_rtStartInput;
+
+			ret = avcodec_send_packet(m_pAVCtx, avpkt);
 		}
 
-		if (used_bytes >= pOut_size && m_pFilter->m_bUpdateTimeCache) {
-			m_pFilter->UpdateCacheTimeStamp();
+		if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+			if (!m_pParser && out_size) {
+				*out_size = size;
+			}
+
+			hr = S_OK;
 		}
 
-		if (out_size) {
-			*out_size = used_bytes;
-		}
-
-		hr = S_FALSE;
-
-		if (pOut_size > 0) {
-			avpkt.data = pOut;
-			avpkt.size = pOut_size;
-			avpkt.dts  = m_pFilter->m_rtStartInputCache;
-
-			ret = avcodec_send_packet(m_pAVCtx, &avpkt);
-		}
-	} else {
-		avpkt.data = p;
-		avpkt.size = size;
-		avpkt.dts  = m_pFilter->m_rtStartInput;
-
-		ret = avcodec_send_packet(m_pAVCtx, &avpkt);
-	}
-
-	if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-		if (!m_pParser && out_size) {
-			*out_size = size;
-		}
-
-		hr = S_OK;
+		av_packet_free(&avpkt);
 	}
 
 	if (hr == E_FAIL) {
 		Init(GetCodecId(), nullptr);
 	}
-
-	av_packet_unref(&avpkt);
 
 	return hr;
 }

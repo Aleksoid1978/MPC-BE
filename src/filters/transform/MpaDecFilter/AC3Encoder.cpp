@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -150,33 +150,30 @@ HRESULT CAC3Encoder::Encode(std::vector<float>& BuffIn, std::vector<BYTE>& BuffO
 		}
 	}
 
-	int ret;
-	AVPacket avpkt;
-	int got_packet;
+	if (AVPacket* avpkt = av_packet_alloc()) {
+		int got_packet = 0;
+		int ret = encode(m_pAVCtx, m_pFrame, &got_packet, avpkt);
+		if (ret < 0) {
+			av_packet_free(&avpkt);
+			return E_FAIL;
+		}
+		if (got_packet) {
+			BuffOut.resize(avpkt->size);
+			memcpy(BuffOut.data(), avpkt->data, avpkt->size);
+		}
+		av_packet_free(&avpkt);
 
-	av_init_packet(&avpkt);
-	avpkt.data = nullptr; // packet data will be allocated by the encoder
-	avpkt.size = 0;
+		size_t old_size = BuffIn.size() * sizeof(float);
+		size_t new_size = old_size - m_framesize;
+		size_t new_count = new_size / sizeof(float);
 
-	ret = encode(m_pAVCtx, m_pFrame, &got_packet, &avpkt);
-	if (ret < 0) {
-		av_packet_unref(&avpkt);
+		memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
+		BuffIn.resize(new_count);
+
+		return S_OK;
+	} else {
 		return E_FAIL;
 	}
-	if (got_packet) {
-		BuffOut.resize(avpkt.size);
-		memcpy(BuffOut.data(), avpkt.data, avpkt.size);
-	}
-	av_packet_unref(&avpkt);
-
-	size_t old_size  = BuffIn.size() * sizeof(float);
-	size_t new_size  = old_size - m_framesize;
-	size_t new_count = new_size / sizeof(float);
-
-	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
-	BuffIn.resize(new_count);
-
-	return S_OK;
 }
 
 void CAC3Encoder::FlushBuffers()
