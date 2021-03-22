@@ -4859,7 +4859,7 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(i
         if (Segment_Info_Count>1)
             return; //First element has the priority
         mastering_metadata_2086& MasteringMetadata=Stream[TrackNumber].MasteringMetadata;
-        int16u& Value=Stream[TrackNumber].MasteringMetadata.Primaries[i];
+        int16u& Value= MasteringMetadata.Primaries[i];
         if (Value==(int16u)-1 && Float>=0 && Float<=1)
             Value=((int16u)float32_int32s(Float*50000));
     FILLING_END();
@@ -4876,7 +4876,7 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Luminance
         if (Segment_Info_Count>1)
             return; //First element has the priority
         mastering_metadata_2086& MasteringMetadata=Stream[TrackNumber].MasteringMetadata;
-        int32u& Value=Stream[TrackNumber].MasteringMetadata.Luminance[i];
+        int32u& Value= MasteringMetadata.Luminance[i];
         if (Value==(int32u)-1 && Float<0x8FFFFFFF/10000)
             Value=float32_int32s(Float*10000);
     FILLING_END();

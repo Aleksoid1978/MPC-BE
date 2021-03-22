@@ -614,6 +614,37 @@ static const char* AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_List[17+
     "Tfc",
     "Tbc",
 };
+static int8s AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_Reordering[17+11] =
+{
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    6, // Wide channels before top layer
+    6, // Wide channels before top layer
+    -2,
+    -2,
+    -2,
+    -2,
+    -2,
+    -2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
 static Ztring AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(int32u nonstd_bed_channel_assignment_mask)
 {
     if (!nonstd_bed_channel_assignment_mask)
@@ -623,9 +654,10 @@ static Ztring AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(int32u nonstd
 
     for (int8u i=0; i<17+11; i++)
     {
-        if (nonstd_bed_channel_assignment_mask&(1<<i))
+        int8u i2=i+AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_Reordering[i];
+        if (nonstd_bed_channel_assignment_mask&(1<<i2))
         {
-            ToReturn+=Ztring().From_UTF8(AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_List[i]);
+            ToReturn+=Ztring().From_UTF8(AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_List[i2]);
             ToReturn+=__T(' ');
         }
     }
@@ -1730,7 +1762,7 @@ bool File_Ac4::Synchronize()
         Buffer_Offset_Current=Buffer_Offset;
         Synched=true; //For using Synched_Test()
         int8s i=0;
-        const int8s count=4;
+        const int8s count=(Frame_Count_Valid && Frame_Count_Valid<4)?Frame_Count_Valid:4;
         for (; i<count; i++) //4 frames in a row tested
         {
             if (!Synched_Test())

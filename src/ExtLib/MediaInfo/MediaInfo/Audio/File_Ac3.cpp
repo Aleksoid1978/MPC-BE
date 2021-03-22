@@ -356,15 +356,36 @@ static const char* AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_List[17]
     "Rw",
     "LFE2",
 };
+static int8s AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_Reordering[17] =
+{
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    6, // Wide channels before top layer
+    6, // Wide channels before top layer
+    -2,
+    -2,
+    -2,
+    -2,
+    -2,
+    -2,
+    0,
+};
 Ztring AC3_nonstd_bed_channel_assignment_mask_ChannelLayout(int32u nonstd_bed_channel_assignment_mask)
 {
     Ztring ToReturn;
 
     for (int8u i=0; i<17; i++)
     {
-        if (nonstd_bed_channel_assignment_mask&(1<<i))
+        int8u i2=i+AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_Reordering[i];
+        if (nonstd_bed_channel_assignment_mask&(1<<i2))
         {
-            ToReturn+=Ztring().From_UTF8(AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_List[i]);
+            ToReturn+=Ztring().From_UTF8(AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_List[i2]);
             ToReturn+=__T(' ');
         }
     }

@@ -137,6 +137,7 @@ private :
     MediaInfo_Internal &operator =(const MediaInfo_Internal &);
 
     static void ConvertRetour(Ztring& Retour);
+    static void ConvertRetourSCX(Ztring& Retour);
 
     //Open Buffer
     bool Info_IsMultipleParsing;

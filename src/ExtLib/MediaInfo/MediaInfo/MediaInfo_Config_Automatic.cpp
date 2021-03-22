@@ -1108,6 +1108,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "RenderMode;Render mode\n"
     "ReplayGain_Gain;Replay gain\n"
     "ReplayGain_Peak;Replay gain peak\n"
+    "ReportBy;Report created by\n"
     "Resolution;Resolution\n"
     "s; s\n"
     "SamplePeakLevel;Sample peak level\n"

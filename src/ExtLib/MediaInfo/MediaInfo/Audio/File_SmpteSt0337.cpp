@@ -28,6 +28,9 @@
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
 #endif
+#if defined(MEDIAINFO_AC4_YES)
+    #include "MediaInfo/Audio/File_Ac4.h"
+#endif
 #if defined(MEDIAINFO_DOLBYE_YES)
     #include "MediaInfo/Audio/File_DolbyE.h"
 #endif
@@ -994,6 +997,9 @@ void File_SmpteSt0337::Header_Parse()
     }
 
     // Filling
+    Padding=(int8u)(Size%Container_Bits);
+    if (Padding)
+        Size+=Container_Bits-Padding;
     Header_Fill_Size(Container_Bits*4/8+Size/8);
     Header_Fill_Code(0, "SMPTE ST 337");
 }
@@ -1291,6 +1297,10 @@ void File_SmpteSt0337::Data_Parse()
                         }
                         #endif //defined(MEDIAINFO_AAC_YES)
                         break;
+            case 24 :   // AC-4
+                        Parser=new File_Ac4();
+                        ((File_Ac4*)Parser)->Frame_Count_Valid=1;
+                        break;
             case 28 :   // Dolby E
                         #if defined(MEDIAINFO_DOLBYE_YES)
                         Parser=new File_DolbyE();
@@ -1392,7 +1402,7 @@ void File_SmpteSt0337::Data_Parse()
         #endif
 
         Parser->FrameInfo=FrameInfo;
-        Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+        Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset-Padding/8));
         Element_Offset=Element_Size;
         #if MEDIAINFO_DEMUX
             FrameInfo.DUR=Parser->FrameInfo.DUR;

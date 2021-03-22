@@ -69,22 +69,22 @@ namespace Elements
     const int16u SOP =0xFF91; //JPEG 2000
     const int16u EPH =0xFF92; //JPEG 2000
     const int16u SOD =0xFF93; //JPEG 2000
-    const int16u S0F0=0xFFC0;
-    const int16u S0F1=0xFFC1;
-    const int16u S0F2=0xFFC2;
-    const int16u S0F3=0xFFC3;
+    const int16u SOF0=0xFFC0;
+    const int16u SOF1=0xFFC1;
+    const int16u SOF2=0xFFC2;
+    const int16u SOF3=0xFFC3;
     const int16u DHT =0xFFC4;
-    const int16u S0F5=0xFFC5;
-    const int16u S0F6=0xFFC6;
-    const int16u S0F7=0xFFC7;
+    const int16u SOF5=0xFFC5;
+    const int16u SOF6=0xFFC6;
+    const int16u SOF7=0xFFC7;
     const int16u JPG =0xFFC8;
-    const int16u S0F9=0xFFC9;
-    const int16u S0FA=0xFFCA;
-    const int16u S0FB=0xFFCB;
+    const int16u SOF9=0xFFC9;
+    const int16u SOFA=0xFFCA;
+    const int16u SOFB=0xFFCB;
     const int16u DAC =0xFFCC;
-    const int16u S0FD=0xFFCD;
-    const int16u S0FE=0xFFCE;
-    const int16u S0FF=0xFFCF;
+    const int16u SOFD=0xFFCD;
+    const int16u SOFE=0xFFCE;
+    const int16u SOFF=0xFFCF;
     const int16u RST0=0xFFD0;
     const int16u RST1=0xFFD1;
     const int16u RST2=0xFFD2;
@@ -637,22 +637,22 @@ void File_Jpeg::Data_Parse()
         CASE_INFO(SOP ,                                         "Start of packet"); //JPEG 2000
         CASE_INFO(EPH ,                                         "End of packet header"); //JPEG 2000
         CASE_INFO(SOD ,                                         "Start of data"); //JPEG 2000
-        CASE_INFO(S0F0,                                         "Baseline DCT (Huffman)");
-        CASE_INFO(S0F1,                                         "Extended sequential DCT (Huffman)");
-        CASE_INFO(S0F2,                                         "Progressive DCT (Huffman)");
-        CASE_INFO(S0F3,                                         "Lossless (sequential) (Huffman)");
+        CASE_INFO(SOF0,                                         "Baseline DCT (Huffman)");
+        CASE_INFO(SOF1,                                         "Extended sequential DCT (Huffman)");
+        CASE_INFO(SOF2,                                         "Progressive DCT (Huffman)");
+        CASE_INFO(SOF3,                                         "Lossless (sequential) (Huffman)");
         CASE_INFO(DHT ,                                         "Define Huffman Tables");
-        CASE_INFO(S0F5,                                         "Differential sequential DCT (Huffman)");
-        CASE_INFO(S0F6,                                         "Differential progressive DCT (Huffman)");
-        CASE_INFO(S0F7,                                         "Differential lossless (sequential) (Huffman)");
+        CASE_INFO(SOF5,                                         "Differential sequential DCT (Huffman)");
+        CASE_INFO(SOF6,                                         "Differential progressive DCT (Huffman)");
+        CASE_INFO(SOF7,                                         "Differential lossless (sequential) (Huffman)");
         CASE_INFO(JPG ,                                         "Reserved for JPEG extensions");
-        CASE_INFO(S0F9,                                         "Extended sequential DCT (Arithmetic)");
-        CASE_INFO(S0FA,                                         "Progressive DCT (Arithmetic)");
-        CASE_INFO(S0FB,                                         "Lossless (sequential) (Arithmetic)");
+        CASE_INFO(SOF9,                                         "Extended sequential DCT (Arithmetic)");
+        CASE_INFO(SOFA,                                         "Progressive DCT (Arithmetic)");
+        CASE_INFO(SOFB,                                         "Lossless (sequential) (Arithmetic)");
         CASE_INFO(DAC ,                                         "Define Arithmetic Coding");
-        CASE_INFO(S0FD,                                         "Differential sequential DCT (Arithmetic)");
-        CASE_INFO(S0FE,                                         "Differential progressive DCT (Arithmetic)");
-        CASE_INFO(S0FF,                                         "Differential lossless (sequential) (Arithmetic)");
+        CASE_INFO(SOFD,                                         "Differential sequential DCT (Arithmetic)");
+        CASE_INFO(SOFE,                                         "Differential progressive DCT (Arithmetic)");
+        CASE_INFO(SOFF,                                         "Differential lossless (sequential) (Arithmetic)");
         CASE_INFO(RST0,                                         "Restart Interval Termination 0");
         CASE_INFO(RST1,                                         "Restart Interval Termination 1");
         CASE_INFO(RST2,                                         "Restart Interval Termination 2");

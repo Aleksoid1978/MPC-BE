@@ -90,22 +90,22 @@ private :
     void EPH () {Skip_XX(Element_Size, "Data");}
     void SOD ();
     void SOF_();
-    void S0F0() {SOF_();};
-    void S0F1() {SOF_();};
-    void S0F2() {SOF_();};
-    void S0F3() {SOF_();}
+    void SOF0() {SOF_();};
+    void SOF1() {SOF_();};
+    void SOF2() {SOF_();};
+    void SOF3() {SOF_();}
     void DHT () {Skip_XX(Element_Size, "Data");}
-    void S0F5() {SOF_();}
-    void S0F6() {SOF_();}
-    void S0F7() {SOF_();}
+    void SOF5() {SOF_();}
+    void SOF6() {SOF_();}
+    void SOF7() {SOF_();}
     void JPG () {Skip_XX(Element_Size, "Data");}
-    void S0F9() {SOF_();}
-    void S0FA() {SOF_();}
-    void S0FB() {SOF_();}
+    void SOF9() {SOF_();}
+    void SOFA() {SOF_();}
+    void SOFB() {SOF_();}
     void DAC () {Skip_XX(Element_Size, "Data");}
-    void S0FD() {SOF_();}
-    void S0FE() {SOF_();}
-    void S0FF() {SOF_();}
+    void SOFD() {SOF_();}
+    void SOFE() {SOF_();}
+    void SOFF() {SOF_();}
     void RST0() {};
     void RST1() {};
     void RST2() {};

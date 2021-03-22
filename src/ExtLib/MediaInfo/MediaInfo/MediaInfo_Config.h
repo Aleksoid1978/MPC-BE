@@ -200,6 +200,9 @@ public :
           void      Inform_Replace_Set (const ZtringListList &NewInform_Replace);
           ZtringListList Inform_Replace_Get_All ();
 
+          void      Inform_Version_Set (bool NewValue);
+          bool      Inform_Version_Get ();
+
           #if MEDIAINFO_ADVANCED
           Ztring    Cover_Data_Set (const Ztring &NewValue);
           Ztring    Cover_Data_Get ();
@@ -409,6 +412,7 @@ private :
     std::map<Ztring, bool> Trace_Modificators; //If we want to add/remove some details
     bool            Language_Raw;
     bool            ReadByHuman;
+    bool            Inform_Version;
     bool            Legacy;
     bool            LegacyStreamDisplay;
     bool            SkipBinaryData;
