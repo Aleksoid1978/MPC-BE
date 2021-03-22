@@ -70,12 +70,6 @@ int ff_decode_get_packet(AVCodecContext *avctx, AVPacket *pkt);
 int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
 
 /**
- * Called during avcodec_open2() to initialize avctx->internal->bsf.
- * The bsf should be freed with av_bsf_free().
- */
-int ff_decode_bsfs_init(AVCodecContext *avctx);
-
-/**
  * Make sure avctx.hw_frames_ctx is set. If it's not set, the function will
  * try to allocate it from hw_device_ctx. If that is not possible, an error
  * message is printed, and an error code is returned.
@@ -84,5 +78,11 @@ int ff_decode_get_hw_frames_ctx(AVCodecContext *avctx,
                                 enum AVHWDeviceType dev_type);
 
 int ff_attach_decode_data(AVFrame *frame);
+
+/**
+ * Perform decoder initialization and validation.
+ * Called when opening the decoder, before the AVCodec.init() call.
+ */
+int ff_decode_preinit(AVCodecContext *avctx);
 
 #endif /* AVCODEC_DECODE_H */

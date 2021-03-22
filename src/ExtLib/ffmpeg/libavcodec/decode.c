@@ -185,7 +185,7 @@ static int extract_packet_props(AVCodecInternal *avci, const AVPacket *pkt)
     return 0;
 }
 
-int ff_decode_bsfs_init(AVCodecContext *avctx)
+static int decode_bsfs_init(AVCodecContext *avctx)
 {
     AVCodecInternal *avci = avctx->internal;
     int ret;
@@ -305,7 +305,6 @@ static inline int decode_simple_internal(AVCodecContext *avctx, AVFrame *frame, 
     AVCodecInternal   *avci = avctx->internal;
     DecodeSimpleContext *ds = &avci->ds;
     AVPacket           *pkt = ds->in_pkt;
-    // copy to ensure we do not change pkt
     int got_frame, actual_got_frame;
     int ret;
 
@@ -2010,4 +2009,91 @@ int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
     if (ret < 0)
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
     return ret;
+}
+
+int ff_decode_preinit(AVCodecContext *avctx)
+{
+    int ret = 0;
+
+    /* if the decoder init function was already called previously,
+     * free the already allocated subtitle_header before overwriting it */
+    av_freep(&avctx->subtitle_header);
+
+#if FF_API_THREAD_SAFE_CALLBACKS
+FF_DISABLE_DEPRECATION_WARNINGS
+    if ((avctx->thread_type & FF_THREAD_FRAME) &&
+        avctx->get_buffer2 != avcodec_default_get_buffer2 &&
+        !avctx->thread_safe_callbacks) {
+        av_log(avctx, AV_LOG_WARNING, "Requested frame threading with a "
+               "custom get_buffer2() implementation which is not marked as "
+               "thread safe. This is not supported anymore, make your "
+               "callback thread-safe.\n");
+    }
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
+    if (avctx->codec_type == AVMEDIA_TYPE_AUDIO && avctx->channels == 0 &&
+        !(avctx->codec->capabilities & AV_CODEC_CAP_CHANNEL_CONF)) {
+        av_log(avctx, AV_LOG_ERROR, "Decoder requires channel count but channels not set\n");
+        return AVERROR(EINVAL);
+    }
+    if (avctx->codec->max_lowres < avctx->lowres || avctx->lowres < 0) {
+        av_log(avctx, AV_LOG_WARNING, "The maximum value for lowres supported by the decoder is %d\n",
+               avctx->codec->max_lowres);
+        avctx->lowres = avctx->codec->max_lowres;
+    }
+    if (avctx->sub_charenc) {
+        if (avctx->codec_type != AVMEDIA_TYPE_SUBTITLE) {
+            av_log(avctx, AV_LOG_ERROR, "Character encoding is only "
+                   "supported with subtitles codecs\n");
+            return AVERROR(EINVAL);
+        } else if (avctx->codec_descriptor->props & AV_CODEC_PROP_BITMAP_SUB) {
+            av_log(avctx, AV_LOG_WARNING, "Codec '%s' is bitmap-based, "
+                   "subtitles character encoding will be ignored\n",
+                   avctx->codec_descriptor->name);
+            avctx->sub_charenc_mode = FF_SUB_CHARENC_MODE_DO_NOTHING;
+        } else {
+            /* input character encoding is set for a text based subtitle
+             * codec at this point */
+            if (avctx->sub_charenc_mode == FF_SUB_CHARENC_MODE_AUTOMATIC)
+                avctx->sub_charenc_mode = FF_SUB_CHARENC_MODE_PRE_DECODER;
+
+            if (avctx->sub_charenc_mode == FF_SUB_CHARENC_MODE_PRE_DECODER) {
+#if CONFIG_ICONV
+                iconv_t cd = iconv_open("UTF-8", avctx->sub_charenc);
+                if (cd == (iconv_t)-1) {
+                    ret = AVERROR(errno);
+                    av_log(avctx, AV_LOG_ERROR, "Unable to open iconv context "
+                           "with input character encoding \"%s\"\n", avctx->sub_charenc);
+                    return ret;
+                }
+                iconv_close(cd);
+#else
+                av_log(avctx, AV_LOG_ERROR, "Character encoding subtitles "
+                       "conversion needs a libavcodec built with iconv support "
+                       "for this codec\n");
+                return AVERROR(ENOSYS);
+#endif
+            }
+        }
+    }
+
+    avctx->pts_correction_num_faulty_pts =
+    avctx->pts_correction_num_faulty_dts = 0;
+    avctx->pts_correction_last_pts =
+    avctx->pts_correction_last_dts = INT64_MIN;
+
+    if (   !CONFIG_GRAY && avctx->flags & AV_CODEC_FLAG_GRAY
+        && avctx->codec_descriptor->type == AVMEDIA_TYPE_VIDEO)
+        av_log(avctx, AV_LOG_WARNING,
+               "gray decoding requested but not enabled at configuration time\n");
+    if (avctx->flags2 & AV_CODEC_FLAG2_EXPORT_MVS) {
+        avctx->export_side_data |= AV_CODEC_EXPORT_DATA_MVS;
+    }
+
+    ret = decode_bsfs_init(avctx);
+    if (ret < 0)
+        return ret;
+
+    return 0;
 }

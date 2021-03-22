@@ -32,6 +32,7 @@
 #include "packet.h"
 #include "packet_internal.h"
 
+#if FF_API_INIT_PACKET
 void av_init_packet(AVPacket *pkt)
 {
     pkt->pts                  = AV_NOPTS_VALUE;
@@ -49,6 +50,16 @@ FF_ENABLE_DEPRECATION_WARNINGS
     pkt->side_data            = NULL;
     pkt->side_data_elems      = 0;
 }
+#endif
+
+static void get_packet_defaults(AVPacket *pkt)
+{
+    memset(pkt, 0, sizeof(*pkt));
+
+    pkt->pts             = AV_NOPTS_VALUE;
+    pkt->dts             = AV_NOPTS_VALUE;
+    pkt->pos             = -1;
+}
 
 AVPacket *av_packet_alloc(void)
 {
@@ -56,7 +67,7 @@ AVPacket *av_packet_alloc(void)
     if (!pkt)
         return pkt;
 
-    av_init_packet(pkt);
+    get_packet_defaults(pkt);
 
     return pkt;
 }
@@ -92,7 +103,7 @@ int av_new_packet(AVPacket *pkt, int size)
     if (ret < 0)
         return ret;
 
-    av_init_packet(pkt);
+    get_packet_defaults(pkt);
     pkt->buf      = buf;
     pkt->data     = buf->data;
     pkt->size     = size;
@@ -496,42 +507,55 @@ int av_packet_split_side_data(AVPacket *pkt){
 }
 #endif
 
+#if FF_API_BUFFER_SIZE_T
 uint8_t *av_packet_pack_dictionary(AVDictionary *dict, int *size)
+#else
+uint8_t *av_packet_pack_dictionary(AVDictionary *dict, size_t *size)
+#endif
 {
-    AVDictionaryEntry *t = NULL;
     uint8_t *data = NULL;
     *size = 0;
 
     if (!dict)
         return NULL;
 
-    while ((t = av_dict_get(dict, "", t, AV_DICT_IGNORE_SUFFIX))) {
-        const size_t keylen   = strlen(t->key);
-        const size_t valuelen = strlen(t->value);
-        const size_t new_size = *size + keylen + 1 + valuelen + 1;
-        uint8_t *const new_data = av_realloc(data, new_size);
+    for (int pass = 0; pass < 2; pass++) {
+        const AVDictionaryEntry *t = NULL;
+        size_t total_length = 0;
 
-        if (!new_data)
-            goto fail;
-        data = new_data;
-        if (new_size > INT_MAX)
-            goto fail;
+        while ((t = av_dict_get(dict, "", t, AV_DICT_IGNORE_SUFFIX))) {
+            for (int i = 0; i < 2; i++) {
+                const char  *str = i ? t->value : t->key;
+                const size_t len = strlen(str) + 1;
 
-        memcpy(data + *size, t->key, keylen + 1);
-        memcpy(data + *size + keylen + 1, t->value, valuelen + 1);
-
-        *size = new_size;
+                if (pass)
+                    memcpy(data + total_length, str, len);
+#if FF_API_BUFFER_SIZE_T
+                else if (len > INT_MAX - total_length)
+#else
+                else if (len > SIZE_MAX - total_length)
+#endif
+                    return NULL;
+                total_length += len;
+            }
+        }
+        if (pass)
+            break;
+        data = av_malloc(total_length);
+        if (!data)
+            return NULL;
+        *size = total_length;
     }
 
     return data;
-
-fail:
-    av_freep(&data);
-    *size = 0;
-    return NULL;
 }
 
+#if FF_API_BUFFER_SIZE_T
 int av_packet_unpack_dictionary(const uint8_t *data, int size, AVDictionary **dict)
+#else
+int av_packet_unpack_dictionary(const uint8_t *data, size_t size,
+                                AVDictionary **dict)
+#endif
 {
     const uint8_t *end;
     int ret;
@@ -611,9 +635,7 @@ void av_packet_unref(AVPacket *pkt)
 {
     av_packet_free_side_data(pkt);
     av_buffer_unref(&pkt->buf);
-    av_init_packet(pkt);
-    pkt->data = NULL;
-    pkt->size = 0;
+    get_packet_defaults(pkt);
 }
 
 int av_packet_ref(AVPacket *dst, const AVPacket *src)
@@ -668,9 +690,7 @@ AVPacket *av_packet_clone(const AVPacket *src)
 void av_packet_move_ref(AVPacket *dst, AVPacket *src)
 {
     *dst = *src;
-    av_init_packet(src);
-    src->data = NULL;
-    src->size = 0;
+    get_packet_defaults(src);
 }
 
 int av_packet_make_refcounted(AVPacket *pkt)
@@ -730,13 +750,13 @@ FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 }
 
-int avpriv_packet_list_put(AVPacketList **packet_buffer,
-                           AVPacketList **plast_pktl,
+int avpriv_packet_list_put(PacketList **packet_buffer,
+                           PacketList **plast_pktl,
                            AVPacket      *pkt,
                            int (*copy)(AVPacket *dst, const AVPacket *src),
                            int flags)
 {
-    AVPacketList *pktl = av_mallocz(sizeof(AVPacketList));
+    PacketList *pktl = av_mallocz(sizeof(PacketList));
     int ret;
 
     if (!pktl)
@@ -767,11 +787,11 @@ int avpriv_packet_list_put(AVPacketList **packet_buffer,
     return 0;
 }
 
-int avpriv_packet_list_get(AVPacketList **pkt_buffer,
-                           AVPacketList **pkt_buffer_end,
+int avpriv_packet_list_get(PacketList **pkt_buffer,
+                           PacketList **pkt_buffer_end,
                            AVPacket      *pkt)
 {
-    AVPacketList *pktl;
+    PacketList *pktl;
     if (!*pkt_buffer)
         return AVERROR(EAGAIN);
     pktl        = *pkt_buffer;
@@ -783,12 +803,12 @@ int avpriv_packet_list_get(AVPacketList **pkt_buffer,
     return 0;
 }
 
-void avpriv_packet_list_free(AVPacketList **pkt_buf, AVPacketList **pkt_buf_end)
+void avpriv_packet_list_free(PacketList **pkt_buf, PacketList **pkt_buf_end)
 {
-    AVPacketList *tmp = *pkt_buf;
+    PacketList *tmp = *pkt_buf;
 
     while (tmp) {
-        AVPacketList *pktl = tmp;
+        PacketList *pktl = tmp;
         tmp = pktl->next;
         av_packet_unref(&pktl->pkt);
         av_freep(&pktl);

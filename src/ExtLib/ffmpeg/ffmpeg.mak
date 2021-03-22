@@ -136,6 +136,7 @@ SRCS_LC = \
 	libavcodec/av1_parse.c \
 	libavcodec/av1_parser.c \
 	libavcodec/av1dec.c \
+	libavcodec/avcodec.c \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
@@ -163,6 +164,7 @@ SRCS_LC = \
 	libavcodec/cinepak.c \
 	libavcodec/cllc.c \
 	libavcodec/codec_desc.c \
+	libavcodec/codec_par.c \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/d3d11va.c \
