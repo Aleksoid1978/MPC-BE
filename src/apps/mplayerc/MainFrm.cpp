@@ -11894,18 +11894,6 @@ void CMainFrame::SetBalance(int balance)
 // Open/Close
 //
 
-bool CMainFrame::IsRealEngineCompatible(CString strFilename) const
-{
-	// Real Media engine didn't support Unicode filename (nor filenames with # characters)
-	for (int i=0; i<strFilename.GetLength(); i++) {
-		WCHAR	Char = strFilename[i];
-		if (Char<32 || Char>126 || Char==35) {
-			return false;
-		}
-	}
-	return true;
-}
-
 CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 {
 	ASSERT(m_pGB == nullptr);

@@ -204,9 +204,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CWebClientSocket;
 	friend class CGraphThread;
 	friend class CPPageSubtitles;
-	friend class CPPagePlayback;
 	friend class CPPageSoundProcessing;
-	friend class CPPagePlayer;
 	friend class CPPageInterface;
 	friend class CMPlayerCApp;
 	friend class CPlayerPlaylistBar;
@@ -278,8 +276,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComQIPtr<IDirectVobSub>		m_pDVS;
 
 	bool							m_bMainIsMPEGSplitter;
-
-	void SetBalance(int balance);
 
 	// external fonts
 
@@ -473,6 +469,7 @@ public:
 	int GetVolume() {
 		return m_wndToolBar.m_volctrl.GetPos();
 	}
+	void SetBalance(int balance);
 
 	HWND m_hWnd_toolbar;
 
@@ -521,6 +518,8 @@ public:
 	static bool GetCurDispMode(dispmode& dm, const CString& DisplayName);
 	static bool GetDispMode(const DWORD iModeNum, dispmode& dm, const CString& DisplayName);
 
+	void UpdateWindowTitle();
+
 protected:
 	void SetDispMode(const dispmode& dm, const CString& DisplayName, const BOOL bForceRegistryMode = FALSE);
 
@@ -568,8 +567,6 @@ protected:
 	// void OpenSetupToolBar();
 	void OpenSetupCaptureBar();
 	void OpenUpdatePlaybackInfo(const CString path);
-
-	void UpdateWindowTitle();
 
 	void AutoChangeMonitorMode();
 	double m_dMediaInfoFPS;
@@ -1255,6 +1252,7 @@ public:
 	bool		m_bInOptions;
 	bool		m_bStopTunerScan;
 
+	MPC_LOADSTATE GetLoadState() { return m_eMediaLoadState; }
 	void		SetLoadState(MPC_LOADSTATE iState);
 	void		SetPlayState(MPC_PLAYSTATE iState);
 	bool		CreateFullScreenWindow();
@@ -1265,8 +1263,7 @@ public:
 	LPCWSTR		GetDVDAudioFormatName(DVD_AudioAttributes& ATR) const;
 	void		SetAudioDelay(REFERENCE_TIME rtShift);
 	void		SetSubtitleDelay(int delay_ms);
-	//void		AutoSelectTracks();
-	bool		IsRealEngineCompatible(CString strFilename) const;
+
 	void		SetTimersPlay();
 	void		KillTimersStop();
 

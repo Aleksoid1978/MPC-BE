@@ -81,8 +81,7 @@ void CPPageSync::InitDialogPrivate()
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_VRSettings;
 
-	CMainFrame * pFrame;
-	pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
+	CMainFrame* pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 
 	m_chkVSync.SetCheck(rs.bVSync);
 	m_chkVSyncInternal.SetCheck(rs.bVSyncInternal);
