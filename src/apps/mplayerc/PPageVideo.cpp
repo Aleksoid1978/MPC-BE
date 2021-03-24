@@ -26,6 +26,7 @@
 #include "../../DSUtil/D3D9Helper.h"
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
+#include "MainFrm.h"
 #include "PPageVideo.h"
 #include "ComPropertySheet.h"
 
@@ -395,6 +396,8 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 
+	bool bNothingOpened = ((CMainFrame *)AfxGetApp()->m_pMainWnd)->GetLoadState() == MLS_CLOSED;
+
 	switch (CurrentVR) {
 		case VIDRNDT_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR), &m_cbVideoRenderer);
@@ -445,7 +448,7 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_HAALI_VR), &m_cbVideoRenderer);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(bNothingOpened && IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_NULL_ANY:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_NULLVR_ANY), &m_cbVideoRenderer);
@@ -455,10 +458,10 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_MADVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(bNothingOpened && IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_MPCVR:
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(bNothingOpened && IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
