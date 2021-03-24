@@ -124,10 +124,6 @@ protected:
 
 	BOOL									m_bFailDXVA2Decode = FALSE;
 	BOOL									m_bFailD3D11Decode = FALSE;
-	BOOL									m_bD3D11DecodeCompatible = TRUE;
-
-	bool									m_bFallBackFromDXVA2 = FALSE;
-	bool									m_bFallBackFromD3D11 = FALSE;
 
 	bool									m_bReinit = false;
 

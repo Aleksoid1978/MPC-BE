@@ -1601,8 +1601,6 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 	av_frame_free(&m_pFrame);
 
 	m_FormatConverter.Cleanup();
-
-	m_nCodecId = AV_CODEC_ID_NONE;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1649,7 +1647,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 		DXVAState::ClearState();
 		m_nDecoderMode = MODE_SOFTWARE;
 		m_bDXVACompatible = true;
-		m_bD3D11DecodeCompatible = TRUE;
 
 		m_bReinit = true;
 		HRESULT hr = InitDecoder(pmt);
@@ -1850,6 +1847,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 {
 	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
+	CheckPointer(pmt, VFW_E_TYPE_NOT_ACCEPTED);
+
 	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
 	const BOOL bReinit = (m_pAVCtx != nullptr);
 
@@ -1863,13 +1862,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 
 redo:
 	CleanupFFmpeg();
-
-	const int nNewCodec = FindCodec(pmt, bReinit);
-	if (nNewCodec == -1) {
-		return VFW_E_TYPE_NOT_ACCEPTED;
-	}
-
-	m_bUseD3D11 = m_bUseDXVA && m_bD3D11DecodeCompatible && m_pD3D11Decoder;
 
 	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y8, I420)
 	CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected());
@@ -1904,14 +1896,15 @@ redo:
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	if (m_bFallBackFromD3D11) {
-		m_bUseD3D11 = false;
-	} else if (m_bFallBackFromDXVA2) {
-		m_bUseDXVA = m_bUseD3D11 = false;
+	if (bChangeType) {
+		const int nNewCodec = FindCodec(pmt, bReinit);
+		if (nNewCodec == -1) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+		m_nCodecId = ffCodecs[nNewCodec].nFFCodec;
+		m_bUseD3D11 = m_bUseDXVA && m_pD3D11Decoder;
 	}
-	m_bFallBackFromDXVA2 = m_bFallBackFromD3D11 = false;
 
-	m_nCodecId = ffCodecs[nNewCodec].nFFCodec;
 	if (m_nCodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11)) {
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
 	} else {
@@ -2679,10 +2672,10 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
  	if (direction == PINDIR_OUTPUT) {
 		DLog(L"CMPCVideoDecFilter::CompleteConnect() - PINDIR_OUTPUT");
 
+		HRESULT hr = S_OK;
 		if (IsDXVASupported(m_bUseD3D11)) {
-			HRESULT hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
+			hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
 			if (SUCCEEDED(hr)) {
-				m_bD3D11DecodeCompatible = TRUE;
 				m_nDecoderMode = MODE_D3D11;
 				DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
 
@@ -2691,13 +2684,11 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				m_nPCIDevice = adapterDesc->DeviceId;
 				m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
 			} else {
-				m_bD3D11DecodeCompatible = FALSE;
 				m_nDecoderMode = MODE_SOFTWARE;
 				DXVAState::ClearState();
-				m_bFallBackFromD3D11 = true;
+				m_bUseD3D11 = false;
 			}
 		} else if (IsDXVASupported(m_bUseDXVA)) {
-			HRESULT hr = E_FAIL;
 			for (;;) {
 				hr = ConfigureDXVA2(pReceivePin);
 				if (FAILED(hr)) {
@@ -2759,7 +2750,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				SAFE_DELETE(m_pDXVADecoder);
 				m_nDecoderMode = MODE_SOFTWARE;
 				DXVAState::ClearState();
-				m_bFallBackFromDXVA2 = true;
+				m_bUseDXVA = false;
 			}
 		}
 
@@ -2768,7 +2759,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				return VFW_E_INVALIDMEDIATYPE;
 			}
 
-			if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+			if (FAILED(hr)) {
 				HRESULT hr;
 				if (FAILED(hr = InitDecoder(&m_pCurrentMediaType))) {
 					return hr;
@@ -3190,16 +3181,14 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			SAFE_DELETE(m_pDXVADecoder);
 			m_nDecoderMode = MODE_SOFTWARE;
 			DXVAState::ClearState();
-			m_bFallBackFromDXVA2 = m_bDXVACompatible;
+			m_bUseDXVA = false;
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
 		} else if (UseD3D11() && (!m_bDXVACompatible || m_bFailD3D11Decode)) {
 			DXVAState::ClearState();
-			m_bFallBackFromD3D11 = m_bDXVACompatible;
-			if (!m_bDXVACompatible) {
-				m_nDecoderMode = MODE_SOFTWARE;
-			}
+			m_bUseD3D11 = false;
+			m_nDecoderMode = MODE_SOFTWARE;
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
