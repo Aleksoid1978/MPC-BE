@@ -474,7 +474,18 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8 || m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
-			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen)).Trim();
+			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen));
+			if (m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
+				auto pos = str.Find(L"\r\n");
+				if (pos != -1) {
+					str.Delete(0, pos + 2);
+					pos = str.Find(L"\r\n");
+					if (pos != -1) {
+						str.Delete(0, pos + 2);
+					}
+				}
+			}
+			FastTrim(str);
 			if (!str.IsEmpty()) {
 				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
 				bInvalidate = true;
