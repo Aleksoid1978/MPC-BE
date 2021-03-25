@@ -208,6 +208,7 @@ static const std::map<GUID, LPCSTR> subtitleguids = {
 	{MEDIASUBTYPE_DVB_SUBTITLES,  "DVB"},
 	{MEDIASUBTYPE_DVD_SUBPICTURE, "DVD Subtitles"},
 	{MEDIASUBTYPE_HDMVSUB,        "PGS"},
+	{MEDIASUBTYPE_WEBVTT,         "WebVTT"},
 };
 
 #define ADDENTRY(mode) { mode, #mode },

@@ -87,6 +87,7 @@ HRESULT CSubtitleInputPin::CheckMediaType(const CMediaType* pmt)
 				|| pmt->subtype == MEDIASUBTYPE_SSA
 				|| pmt->subtype == MEDIASUBTYPE_ASS
 				|| pmt->subtype == MEDIASUBTYPE_ASS2
+				|| pmt->subtype == MEDIASUBTYPE_WEBVTT
 				|| pmt->subtype == MEDIASUBTYPE_VOBSUB)
 			|| pmt->majortype == MEDIATYPE_Video && (pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE || pmt->subtype == MEDIASUBTYPE_XSUB)
 			|| IsHdmvSub(pmt)
@@ -149,7 +150,8 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 				/*|| m_mt.subtype == MEDIASUBTYPE_USF*/
 				|| m_mt.subtype == MEDIASUBTYPE_SSA
 				|| m_mt.subtype == MEDIASUBTYPE_ASS
-				|| m_mt.subtype == MEDIASUBTYPE_ASS2) {
+				|| m_mt.subtype == MEDIASUBTYPE_ASS2
+				|| m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
 			if (!(m_pSubStream = DNew CRenderedTextSubtitle(m_pSubLock))) {
 				return E_FAIL;
 			}
@@ -159,7 +161,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			pRTS->m_dstScreenSize = DEFSCREENSIZE;
 			pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 
-			if (dwOffset > 0 && m_mt.cbFormat != dwOffset) {
+			if (m_mt.subtype != MEDIASUBTYPE_WEBVTT && dwOffset > 0 && m_mt.cbFormat != dwOffset) {
 				CMediaType mt = m_mt;
 				if (mt.pbFormat[dwOffset+0] != 0xef
 						&& mt.pbFormat[dwOffset+1] != 0xbb
@@ -253,7 +255,8 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 				/*|| m_mt.subtype == MEDIASUBTYPE_USF*/
 				|| m_mt.subtype == MEDIASUBTYPE_SSA
 				|| m_mt.subtype == MEDIASUBTYPE_ASS
-				|| m_mt.subtype == MEDIASUBTYPE_ASS2))) {
+				|| m_mt.subtype == MEDIASUBTYPE_ASS2
+				|| m_mt.subtype == MEDIASUBTYPE_WEBVTT))) {
 		CAutoLock cAutoLock(m_pSubLock);
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 		pRTS->RemoveAll();
@@ -468,7 +471,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 
 		CAutoLock cAutoLock(m_pSubLock);
 
-		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
+		if (m_mt.subtype == MEDIASUBTYPE_UTF8 || m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen)).Trim();
