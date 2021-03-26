@@ -3299,6 +3299,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			else if (sCurrentPath == L"pipe://stdin") {
 				item_type = IT_PIPE;
 			}
+			else if (::PathFileExistsW(sCurrentPath)) {
+				item_type = IT_FILE;
+			}
 		}
 	}
 	const bool bOnItem = !!(lvhti.flags & LVHT_ONITEM);
