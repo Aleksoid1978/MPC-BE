@@ -2685,7 +2685,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				DXVAState::ClearState();
 				m_bUseDXVA = m_bUseD3D11 = false;
 
-				hr = E_FAIL;
+				hr = VFW_E_TYPE_NOT_ACCEPTED;
 			} else if (IsDXVASupported(m_bUseD3D11)) {
 				hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
 				if (SUCCEEDED(hr)) {
@@ -2774,12 +2774,14 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 
 			if (FAILED(hr)) {
-				HRESULT hr;
-				if (FAILED(hr = InitDecoder(&m_pCurrentMediaType))) {
-					return hr;
+				HRESULT hr2 = InitDecoder(&m_pCurrentMediaType);
+				if (FAILED(hr2)) {
+					return hr2;
 				}
 
-				ChangeOutputMediaFormat(2);
+				if (hr != VFW_E_TYPE_NOT_ACCEPTED) {
+					ChangeOutputMediaFormat(2);
+				}
 			}
 		}
 
@@ -2803,7 +2805,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		m_bReinit = false;
 	}
 
-	return __super::CompleteConnect (direction, pReceivePin);
+	return __super::CompleteConnect(direction, pReceivePin);
 }
 
 HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties)
