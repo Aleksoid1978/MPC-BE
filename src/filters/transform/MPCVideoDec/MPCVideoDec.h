@@ -290,6 +290,7 @@ public:
 	STDMETHODIMP_(int) GetMvcActive();
 
 	// IExFilterConfig
+	STDMETHODIMP GetInt(LPCSTR field, int* value) override;
 	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
 	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
 

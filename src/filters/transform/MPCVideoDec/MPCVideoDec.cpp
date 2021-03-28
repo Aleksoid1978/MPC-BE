@@ -4283,6 +4283,30 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 // IExFilterConfig
 
+STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
+{
+	CheckPointer(value, E_POINTER);
+
+	if (!strcmp(field, "decode_mode")) {
+		CAutoLock cAutoLock(&m_csProps); // hmm
+		if (m_bUseD3D11) {
+			*value = 3;
+		}
+		else if (m_bUseDXVA) {
+			*value = 2;
+		}
+		else if (m_bUseFFmpeg) {
+			*value = 1;
+		}
+		else {
+			*value = 0;
+		}
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
 STDMETHODIMP CMPCVideoDecFilter::GetInt64(LPCSTR field, __int64 *value)
 {
 	CheckPointer(value, E_POINTER);
