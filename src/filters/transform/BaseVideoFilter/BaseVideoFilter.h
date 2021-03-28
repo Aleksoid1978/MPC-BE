@@ -39,6 +39,7 @@ struct VIDEO_OUTPUT_FORMATS {
 };
 
 enum DECODER_MODE {
+	MODE_NONE = 0, // not used yet 
 	MODE_SOFTWARE,
 	MODE_DXVA2,
 	MODE_D3D11

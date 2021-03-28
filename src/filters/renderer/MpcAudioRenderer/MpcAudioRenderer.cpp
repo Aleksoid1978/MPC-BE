@@ -1232,7 +1232,7 @@ STDMETHODIMP_(UINT) CMpcAudioRenderer::GetMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	CheckPointer(m_pGraph, MODE_NONE)
+	CheckPointer(m_pGraph, MODE_WASAPI_NONE)
 
 	if (m_bIsBitstream) {
 		return MODE_WASAPI_EXCLUSIVE_BITSTREAM;

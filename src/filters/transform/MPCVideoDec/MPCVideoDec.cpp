@@ -4290,19 +4290,11 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 
 	if (!strcmp(field, "decode_mode")) {
 		CAutoLock cAutoLock(&m_csProps); // hmm
-		switch (m_nDecoderMode) {
-		case MODE_SOFTWARE:
-			*value = m_bUseFFmpeg ? 1 : 0;
-			break;
-		case MODE_DXVA2:
-			*value = 2;
-			break;
-		case MODE_D3D11:
-			*value = 3;
-			break;
-		default:
-			*value = 0;
-			break;
+
+		if (m_nDecoderMode == MODE_SOFTWARE && !m_bUseFFmpeg) {
+			*value = MODE_NONE;
+		} else {
+			*value = m_nDecoderMode;
 		}
 		return S_OK;
 	}

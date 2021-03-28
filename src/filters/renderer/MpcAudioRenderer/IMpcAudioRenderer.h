@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2020 see Authors.txt
+ * (C) 2010-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@ enum DEVICE_MODE : int {
 	MODE_WASAPI_EXCLUSIVE,
 	// internal
 	MODE_WASAPI_EXCLUSIVE_BITSTREAM,
-	MODE_NONE
+	MODE_WASAPI_NONE
 };
 
 enum BITSTREAM_MODE {
