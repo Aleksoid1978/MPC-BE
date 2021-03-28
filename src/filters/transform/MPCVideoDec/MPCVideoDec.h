@@ -21,6 +21,7 @@
 #pragma once
 
 #include "../BaseVideoFilter/BaseVideoFilter.h"
+#include "../../filters/FilterInterfacesImpl.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "./DXVADecoder/DXVA2Decoder.h"
@@ -47,9 +48,11 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
 	, public IMPCVideoDecFilter
+	, public CExFilterConfigImpl
 	, public ISpecifyPropertyPages2
 {
-protected:
+private:
+	CCritSec								m_csProps;
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;
 	MPC_SCAN_TYPE							m_nScanType;
@@ -62,14 +65,11 @@ protected:
 	bool									m_fPixFmts[PixFmt_count];
 	int										m_nSwRGBLevels;
 	//
-
-	CCritSec								m_csProps;
-
 	bool									m_VideoFilters[VDEC_COUNT];
 
+	bool									m_bEnableHwDecoding  = true; // internal (not saved)
 	bool									m_bDXVACompatible;
 	unsigned __int64						m_nActiveCodecs;
-
 	BOOL									m_bInterlaced;
 
 	// === FFMpeg variables
@@ -289,6 +289,10 @@ public:
 	STDMETHODIMP SetMvcOutputMode(int nMode, bool bSwapLR);
 	STDMETHODIMP_(int) GetMvcActive();
 
+	// IExFilterConfig
+	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
+	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
+
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
 	BOOL						IsSupportedDecoderMode(const GUID& decoderGUID);
@@ -339,6 +343,10 @@ private:
 	// *** Re-Commit the allocator (creates surfaces and new decoder)
 	HRESULT						RecommitAllocator();
 };
+
+//
+// CVideoDecOutputPin
+//
 
 class CVideoDecOutputPin : public CBaseVideoOutputPin
 {

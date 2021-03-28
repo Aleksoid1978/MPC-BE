@@ -1367,13 +1367,11 @@ static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE*/)
 {
 	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = false;
+
 	for (size_t i = 0; i < _countof(ffCodecs); i++) {
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 			if (bForced) { // hack
 				m_bUseFFmpeg = true;
-				if (ffCodecs[i].HwDec != HWDec_None) {
-					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
-				}
 			}
 			else {
 #ifdef REGISTER_FILTER
@@ -1541,9 +1539,10 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 #else
 				m_bUseFFmpeg = IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
 #endif
-				if (m_bUseFFmpeg && ffCodecs[i].HwDec != HWDec_None) {
-					m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
-				}
+			}
+
+			if (m_bUseFFmpeg && m_bEnableHwDecoding && ffCodecs[i].HwDec != HWDec_None) {
+				m_bUseDXVA = m_bHwDecs[ffCodecs[i].HwDec];
 			}
 
 			return m_bUseFFmpeg ? i : -1;
@@ -4281,6 +4280,36 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 	return infostr;
 }
+
+// IExFilterConfig
+
+STDMETHODIMP CMPCVideoDecFilter::GetInt64(LPCSTR field, __int64 *value)
+{
+	CheckPointer(value, E_POINTER);
+
+	if (!strcmp(field, "version")) {
+		*value  = ((uint64_t)MPC_VERSION_MAJOR << 48)
+			| ((uint64_t)MPC_VERSION_MINOR << 32)
+			| ((uint64_t)MPC_VERSION_PATCH << 16)
+			| ((uint64_t)MPC_VERSION_REV);
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
+{
+	if (strcmp(field, "hw_decoding") == 0) {
+		CAutoLock cAutoLock(&m_csProps); // hmm
+		m_bEnableHwDecoding  = value;
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+//
 
 HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 {
