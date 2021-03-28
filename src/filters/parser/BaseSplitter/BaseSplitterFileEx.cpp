@@ -186,6 +186,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 						gb.BitRead(16);
 						gb.BitRead(2);
 						h.hdr.picture_structure = gb.BitRead(2);
+						h.hdr.top_field_first = gb.BitRead(1);
 
 						found++;
 					}

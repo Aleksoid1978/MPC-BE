@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,6 +74,7 @@ public:
 			// misc
 			LONG arx, ary;
 			BYTE picture_structure:2;
+			BYTE top_field_first:1;
 		} hdr;
 		//
 		std::vector<BYTE> data;
