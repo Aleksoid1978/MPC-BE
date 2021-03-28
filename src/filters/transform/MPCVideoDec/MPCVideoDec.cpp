@@ -1606,6 +1606,7 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 {
 	return
 		QI(IMPCVideoDecFilter)
+		QI(IExFilterConfig)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -4289,17 +4290,19 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 
 	if (!strcmp(field, "decode_mode")) {
 		CAutoLock cAutoLock(&m_csProps); // hmm
-		if (m_bUseD3D11) {
-			*value = 3;
-		}
-		else if (m_bUseDXVA) {
+		switch (m_nDecoderMode) {
+		case MODE_SOFTWARE:
+			*value = m_bUseFFmpeg ? 1 : 0;
+			break;
+		case MODE_DXVA2:
 			*value = 2;
-		}
-		else if (m_bUseFFmpeg) {
-			*value = 1;
-		}
-		else {
+			break;
+		case MODE_D3D11:
+			*value = 3;
+			break;
+		default:
 			*value = 0;
+			break;
 		}
 		return S_OK;
 	}
