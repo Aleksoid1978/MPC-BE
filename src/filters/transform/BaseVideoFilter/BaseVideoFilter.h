@@ -78,12 +78,12 @@ public:
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 
-	HRESULT CheckInputType(const CMediaType* mtIn);
+	HRESULT CheckInputType(const CMediaType* mtIn) override;
 	HRESULT CheckOutputType(const CMediaType& mtOut);
-	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
-	HRESULT DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);
-	HRESULT GetMediaType(int iPosition, CMediaType* pMediaType);
-	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt);
+	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut) override;
+	HRESULT DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties) override;
+	virtual HRESULT GetMediaType(int iPosition, CMediaType* pmt) override;
+	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt) override;
 
 	void SetAspect(CSize aspect);
 };
