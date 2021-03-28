@@ -2673,42 +2673,55 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		DLog(L"CMPCVideoDecFilter::CompleteConnect() - PINDIR_OUTPUT");
 
 		HRESULT hr = S_OK;
-		if (IsDXVASupported(m_bUseD3D11)) {
-			hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
-			if (SUCCEEDED(hr)) {
-				m_nDecoderMode = MODE_D3D11;
-				DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
+		if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+			const auto& mt = m_pOutput->CurrentMediaType();
+			if (mt.subtype != MEDIASUBTYPE_NV12 && mt.subtype != MEDIASUBTYPE_P010) {
+				DLog(L"CMPCVideoDecFilter::CompleteConnect() - wrong output media type '%s' for H/W decoding, fallback to software decoding", GetGUIDString(mt.subtype));
 
-				auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
-				m_nPCIVendor = adapterDesc->VendorId;
-				m_nPCIDevice = adapterDesc->DeviceId;
-				m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
-			} else {
+				CleanupDXVAVariables();
+				CleanupD3DResources();
+				SAFE_DELETE(m_pDXVADecoder);
 				m_nDecoderMode = MODE_SOFTWARE;
 				DXVAState::ClearState();
-				m_bUseD3D11 = false;
-			}
-		} else if (IsDXVASupported(m_bUseDXVA)) {
-			for (;;) {
-				hr = ConfigureDXVA2(pReceivePin);
-				if (FAILED(hr)) {
-					DLog(L"CMPCVideoDecFilter::CompleteConnect() : ConfigureDXVA2() - FAILED (0x%08x)", hr);
-					break;
-				}
+				m_bUseDXVA = m_bUseD3D11 = false;
 
-				CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
-				hr = m_pDeviceManager->GetVideoService(m_hDevice, IID_PPV_ARGS(&pDXVA2Service));
-				if (FAILED(hr)) {
-					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirect3DDeviceManager9::GetVideoService() - FAILED (0x%08x)", hr);
-					break;
-				}
-				if (!pDXVA2Service) {
-					break;
-				}
+				hr = E_FAIL;
+			} else if (IsDXVASupported(m_bUseD3D11)) {
+				hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
+				if (SUCCEEDED(hr)) {
+					m_nDecoderMode = MODE_D3D11;
+					DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
 
-				const UINT numSurfaces = std::max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1ui16);
-				LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = {};
-				hr = pDXVA2Service->CreateSurface(
+					auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
+					m_nPCIVendor = adapterDesc->VendorId;
+					m_nPCIDevice = adapterDesc->DeviceId;
+					m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
+				} else {
+					m_nDecoderMode = MODE_SOFTWARE;
+					DXVAState::ClearState();
+					m_bUseD3D11 = false;
+				}
+			} else if (IsDXVASupported(m_bUseDXVA)) {
+				for (;;) {
+					hr = ConfigureDXVA2(pReceivePin);
+					if (FAILED(hr)) {
+						DLog(L"CMPCVideoDecFilter::CompleteConnect() : ConfigureDXVA2() - FAILED (0x%08x)", hr);
+						break;
+					}
+
+					CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
+					hr = m_pDeviceManager->GetVideoService(m_hDevice, IID_PPV_ARGS(&pDXVA2Service));
+					if (FAILED(hr)) {
+						DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirect3DDeviceManager9::GetVideoService() - FAILED (0x%08x)", hr);
+						break;
+					}
+					if (!pDXVA2Service) {
+						break;
+					}
+
+					const UINT numSurfaces = std::max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1ui16);
+					LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = {};
+					hr = pDXVA2Service->CreateSurface(
 						m_nSurfaceWidth,
 						m_nSurfaceHeight,
 						numSurfaces - 1,
@@ -2718,39 +2731,40 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 						DXVA2_VideoDecoderRenderTarget,
 						pSurfaces,
 						nullptr);
-				if (FAILED(hr)) {
-					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr);
+					if (FAILED(hr)) {
+						DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr);
+						break;
+					}
+
+					CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
+					hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config, pSurfaces, numSurfaces, &pDirectXVideoDec);
+					if (FAILED(hr)) {
+						DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr);
+					}
+
+					for (UINT i = 0; i < numSurfaces; i++) {
+						SAFE_RELEASE(pSurfaces[i]);
+					}
+
+					if (SUCCEEDED(hr)) {
+						hr = SetEVRForDXVA2(pReceivePin);
+					}
+
+					if (SUCCEEDED(hr)) {
+						m_nDecoderMode = MODE_DXVA2;
+					}
+
 					break;
 				}
 
-				CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
-				hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config, pSurfaces, numSurfaces, &pDirectXVideoDec);
 				if (FAILED(hr)) {
-					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr);
+					CleanupDXVAVariables();
+					CleanupD3DResources();
+					SAFE_DELETE(m_pDXVADecoder);
+					m_nDecoderMode = MODE_SOFTWARE;
+					DXVAState::ClearState();
+					m_bUseDXVA = false;
 				}
-
-				for (UINT i = 0; i < numSurfaces; i++) {
-					SAFE_RELEASE(pSurfaces[i]);
-				}
-
-				if (SUCCEEDED(hr)) {
-					hr = SetEVRForDXVA2(pReceivePin);
-				}
-
-				if (SUCCEEDED(hr)) {
-					m_nDecoderMode = MODE_DXVA2;
-				}
-
-				break;
-			}
-
-			if (FAILED(hr)) {
-				CleanupDXVAVariables();
-				CleanupD3DResources();
-				SAFE_DELETE(m_pDXVADecoder);
-				m_nDecoderMode = MODE_SOFTWARE;
-				DXVAState::ClearState();
-				m_bUseDXVA = false;
 			}
 		}
 
