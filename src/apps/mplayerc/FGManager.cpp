@@ -91,6 +91,7 @@ public:
 		if (m_merit == MERIT64_DO_USE) {
 			memset(&video_filters, true, sizeof(video_filters));
 		}
+
 		if (m_bIsPreview) {
 			memset(&video_filters, true, sizeof(video_filters));
 			for (int i = 0; i < PixFmt_count; i++) {
@@ -100,6 +101,10 @@ public:
 			pBF->SetSwPixelFormat(PixFmt_YV12, true);
 			pBF->SetSwPixelFormat(PixFmt_YUY2, true);
 			pBF->SetSwPixelFormat(PixFmt_RGB32, true);
+
+			if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+				pEFC->SetBool("hw_decoding", false);
+			}
 		}
 		video_filters[VDEC_UNCOMPRESSED] = false;
 
