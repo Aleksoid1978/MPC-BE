@@ -39,7 +39,7 @@ struct VIDEO_OUTPUT_FORMATS {
 };
 
 enum DECODER_MODE {
-	MODE_NONE = 0, // not used yet 
+	MODE_NONE = 0,
 	MODE_SOFTWARE,
 	MODE_DXVA2,
 	MODE_D3D11
@@ -48,20 +48,28 @@ enum DECODER_MODE {
 class CBaseVideoFilter : public CTransformFilter
 {
 protected:
-	int m_win, m_hin, m_arxin, m_aryin;
-	int m_wout, m_hout, m_arxout, m_aryout;
-	int m_arx, m_ary;
+	int m_win = 0;
+	int m_hin = 0;
+	int m_arxin = 0;
+	int m_aryin = 0;
 
-	bool m_bSendMediaType;
+	int m_wout = 0;
+	int m_hout = 0;
+	int m_arxout = 0;
+	int m_aryout = 0;
+
+	int m_arx = 0;
+	int m_ary = 0;
+
+	DECODER_MODE m_nDecoderMode = MODE_NONE;
+	DXVA2_ExtendedFormat m_dxvaExtFormat = {};
+
+	BOOL m_bMVC_Output_TopBottom = FALSE;
+	bool m_bSendMediaType = false;
 
 	long m_cBuffers;
 
 	CCritSec m_csReceive;
-
-	DECODER_MODE m_nDecoderMode;
-	DXVA2_ExtendedFormat m_dxvaExtFormat;
-
-	BOOL m_bMVC_Output_TopBottom = FALSE;
 
 	HRESULT Receive(IMediaSample* pIn);
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
