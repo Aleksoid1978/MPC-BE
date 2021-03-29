@@ -1845,6 +1845,8 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 {
+	CAutoLock cObjectLock(m_pLock);
+
 	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
 	CheckPointer(pmt, VFW_E_TYPE_NOT_ACCEPTED);
@@ -4213,7 +4215,8 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetMvcActive()
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 {
-	CAutoLock cAutoLock(&m_csProps);
+	CAutoLock cObjectLock(m_pLock);
+
 	CString infostr;
 
 	switch (index) {
@@ -4289,7 +4292,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 	CheckPointer(value, E_POINTER);
 
 	if (!strcmp(field, "decode_mode")) {
-		CAutoLock cAutoLock(&m_csProps); // hmm
+		CAutoLock cObjectLock(m_pLock);
 
 		if (m_nDecoderMode == MODE_SOFTWARE && !m_bUseFFmpeg) {
 			*value = MODE_NONE;
@@ -4322,8 +4325,6 @@ STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned
 	// experimental !
 
 	if (!strcmp(field, "input_format")) {
-		CAutoLock cAutoLock(&m_csProps); // need a better way!
-
 		CStringW ret = GetInformation(INFO_InputFormat);
 
 		int len = ret.GetLength();
@@ -4342,8 +4343,6 @@ STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned
 	}
 
 	if (!strcmp(field, "output_format")) {
-		CAutoLock cAutoLock(&m_csProps); // need a better way!
-
 		CStringW ret = GetInformation(INFO_OutputFormat);
 
 		int len = ret.GetLength();
@@ -4367,8 +4366,9 @@ STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned
 STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
 {
 	if (strcmp(field, "hw_decoding") == 0) {
-		CAutoLock cAutoLock(&m_csProps); // hmm
-		m_bEnableHwDecoding  = value;
+		CAutoLock cObjectLock(m_pLock);
+
+		m_bEnableHwDecoding = value;
 		return S_OK;
 	}
 
