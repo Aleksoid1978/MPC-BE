@@ -292,6 +292,7 @@ public:
 	// IExFilterConfig
 	STDMETHODIMP GetInt(LPCSTR field, int* value) override;
 	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
+	STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, unsigned* chars);
 	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
 
 	// === common functions

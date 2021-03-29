@@ -4317,6 +4317,53 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt64(LPCSTR field, __int64 *value)
 	return E_INVALIDARG;
 }
 
+STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned* chars)
+{
+	// experimental !
+
+	if (!strcmp(field, "input_format")) {
+		CAutoLock cAutoLock(&m_csProps); // need a better way!
+
+		CStringW ret = GetInformation(INFO_InputFormat);
+
+		int len = ret.GetLength();
+		size_t sz = (len + 1) * sizeof(WCHAR);
+		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
+
+		if (!buf) {
+			return E_OUTOFMEMORY;
+		}
+
+		wcscpy_s(buf, len + 1, ret);
+		*chars = len;
+		*value = buf;
+
+		return S_OK;
+	}
+
+	if (!strcmp(field, "output_format")) {
+		CAutoLock cAutoLock(&m_csProps); // need a better way!
+
+		CStringW ret = GetInformation(INFO_OutputFormat);
+
+		int len = ret.GetLength();
+		size_t sz = (len + 1) * sizeof(WCHAR);
+		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
+
+		if (!buf) {
+			return E_OUTOFMEMORY;
+		}
+
+		wcscpy_s(buf, len + 1, ret);
+		*chars = len;
+		*value = buf;
+
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
 STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
 {
 	if (strcmp(field, "hw_decoding") == 0) {
