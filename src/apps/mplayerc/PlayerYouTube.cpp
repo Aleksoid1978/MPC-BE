@@ -950,6 +950,9 @@ namespace Youtube
 			}
 
 			CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "]");
+			if (chaptersStr.IsEmpty()) {
+				chaptersStr = GetEntry(data.data(), R"("markersMap":[{"key":"DESCRIPTION_CHAPTERS","value":)", "]");
+			}
 			if (!chaptersStr.IsEmpty()) {
 				chaptersStr.Replace(R"(\/)", "/");
 				chaptersStr.Replace(R"(\")", R"(")");
