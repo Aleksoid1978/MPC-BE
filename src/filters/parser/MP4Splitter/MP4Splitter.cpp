@@ -2203,10 +2203,23 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_pOutputs.GetCount()) {
 		AP4_Movie* movie = m_pFile->GetMovie();
 
+		for (auto& [id, tp] : m_trackpos) {
+			AP4_Track* track = movie->GetTrack(id);
+
+			AP4_Sample sample;
+			if (AP4_SUCCEEDED(track->GetSample(0, sample))) {
+				const auto rt = RescaleI64x32(sample.GetCts(), UNITS, track->GetMediaTimeScale());
+				m_rtOffset = std::min(m_rtOffset, rt);
+			}
+		}
+		if (m_rtOffset == MAXLONGLONG) {
+			m_rtOffset = 0;
+		}
+
 		if (movie->HasFragmentsIndex()) {
 			const AP4_Array<AP4_IndexTableEntry>& entries = movie->GetFragmentsIndexEntries();
 			for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-				const SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
+				const SyncPoint sp = { entries[i].m_rt - m_rtOffset, __int64(entries[i].m_offset) };
 				m_sps.push_back(sp);
 			}
 		} else {
@@ -2219,7 +2232,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
 				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-					const SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
+					const SyncPoint sp = { entries[i].m_rt - m_rtOffset, __int64(entries[i].m_offset) };
 					m_sps.push_back(sp);
 				}
 
@@ -2278,7 +2291,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		AP4_Track* track = movie->GetTrack(id);
 
 		if (track->HasIndex() && track->GetIndexEntries().ItemCount()) {
-			if (AP4_FAILED(track->GetIndexForRefTime(rt, tp.index, tp.ts, tp.offset))) {
+			if (AP4_FAILED(track->GetIndexForRefTime(rt + m_rtOffset, tp.index, tp.ts, tp.offset))) {
 				continue;
 			}
 		} else {
@@ -2417,6 +2430,8 @@ start:
 				p->SetData(data.GetData(), data.GetDataSize());
 			}
 
+			p->rtStart -= m_rtOffset;
+			p->rtStop -= m_rtOffset;
 			hr = DeliverPacket(p);
 		}
 

@@ -279,14 +279,11 @@ AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
             const AP4_Ordinal index = i + 1;
             result = m_SttsAtom->GetDts(index, dts, duration);
             if (AP4_FAILED(result)) return result;
-            if (m_CttsAtom == NULL) {
-                cts = dts + m_tsDelay;
-            } else {
-                AP4_SI32 cts_offset;
-                result = m_CttsAtom->GetCtsOffset(index, cts_offset);
-                if (AP4_FAILED(result)) return result;
-                cts = dts + cts_offset + m_tsDelay;
+            AP4_SI32 cts_offset = 0;
+            if (m_CttsAtom) {
+                m_CttsAtom->GetCtsOffset(index, cts_offset);
             }
+            cts = dts + cts_offset;
 
             return AP4_SUCCESS;
         };
