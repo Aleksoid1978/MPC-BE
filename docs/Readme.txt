@@ -50,7 +50,6 @@ libspeex            BSD License                http://speex.org/
 Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
 MediaInfo           BSD License                https://mediaarea.net/MediaInfo
-MusePack            GPL                        http://musepack.net/
 RapidJSON           MIT License                https://github.com/Tencent/rapidjson
 ResizableLib        Artistic License           https://github.com/ppescher/resizablelib
 soxr                LGPL                       https://sourceforge.net/projects/soxr/
