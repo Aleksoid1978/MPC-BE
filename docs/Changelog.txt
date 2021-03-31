@@ -2,7 +2,55 @@
 
 1.5.5 (beta)
 =============================
-VSFilter is excluded from the project. 
+VSFilter is excluded from the project.
+
+AviSplitter
+Added support for 'MPNG' (PNG) codec.
+
+MP4Splitter
+Added support for 'MPNG' (PNG) codec.
+Added support for SpeedHQ codec.
+
+MatroskaSplitter
+Added support for 'MPNG' (PNG) codec.
+
+Improved AV1 multi-threaded decoding with dav1d library.
+Improved Apple ProRes support ('ap4h', 'ap4x').
+Added support for SpeedHQ codec.
+Added support for hardware decoding using Direct3D 11.
+Added support for AV1 hardware decoding.
+Added support for switching video streams of different formats, taking into account the presence or absence of hardware decoding.
+
+Subtitles
+Added support for MEDIASUBTYPE_WEBVTT.
+
+Youtube
+Added caching of signature decoding functions.
+Added ability to select "MP4-AV1" format as preferred format.
+Added support for AV1 10-bit HDR.
+Improved support for getting a list of chapters.
+
+Player
+Some parameters of the standard subtitle style can now be set to non-integer values.
+Fixed display of volume control in dark theme when using mouse.
+Added error message when opening DVD / Blu-ray folder in the status bar.
+Fixed X-mouse buttons working in full screen mode.
+Fixed display of the '&' symbol in the playlist.
+Added time display on scroll bar in exclusive full screen.
+Fixed display of the '&' symbol in the playlist.
+Added time display on seek bar in exclusive full screen.
+Improved player in an exclusive full screen MPC VR and madVR.
+Added the ability to open a file from the playlist in the explorer.
+Added display of tooltip for GPU icon.
+Added a button to call the properties window of some video renderers.
+Various improvements in the player interface.
+
+Updated Japanese translation.
+Updated Portuguese (Brazil) translation (by Siegfried Janke).
+Updated German translation (by Klaus1189).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Hungarian translation (by mickey).
+Updated Turkish translation (by cmhrky).
 
 Updated libraries:
 	dav1d git-0.8.2-0-gf06148e;
