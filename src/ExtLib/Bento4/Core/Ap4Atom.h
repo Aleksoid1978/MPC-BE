@@ -283,6 +283,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_CLLI = AP4_ATOM_TYPE('c','l','l','i');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_NAME = AP4_ATOM_TYPE('n','a','m','e');
 
+const AP4_Atom::Type AP4_ATOM_TYPE_SBGP = AP4_ATOM_TYPE('s','b','g','p');
+
 // 'raw ' (audio or video)
 const AP4_Atom::Type AP4_ATOM_TYPE_RAW  = AP4_ATOM_TYPE('r','a','w',' ');
 

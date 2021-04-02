@@ -44,6 +44,7 @@
 #include "Ap4StssAtom.h"
 #include "Ap4MdhdAtom.h"
 #include "Ap4ElstAtom.h"
+#include "Ap4SbgpAtom.h"
 
 /*----------------------------------------------------------------------
 |       AP4_Track::AP4_Track
@@ -190,6 +191,33 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
                         REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / GetMediaTimeScale() * sample.GetCts());
                         if (AP4_FAILED(m_IndexEntries.Append(AP4_IndexTableEntry(index, sample.GetCts(), rt, sample.GetOffset())))) {
                             break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (m_IndexEntries.ItemCount() <= 1) {
+            if (auto sbgp = dynamic_cast<AP4_SbgpAtom*>(stbl->FindChild("sbgp"))) {
+                const auto groupingType = sbgp->GetGroupingType();
+                if (groupingType == AP4_ATOM_TYPE('r', 'a', 'p', ' ')) {
+                    auto& entries = sbgp->GetEntries();
+                    AP4_Cardinal index = 0;
+                    for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
+                        if (entries[i].group_description_index > 0) {
+                            for (AP4_UI32 k = 0; k < entries[i].sample_count; ++k) {
+                                AP4_Sample sample;
+                                if (AP4_SUCCEEDED(GetSample(index, sample))) {
+                                    REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / GetMediaTimeScale() * sample.GetCts());
+                                    if (AP4_FAILED(m_IndexEntries.Append(AP4_IndexTableEntry(index, sample.GetCts(), rt, sample.GetOffset())))) {
+                                        break;
+                                    }
+                                }
+
+                                index++;
+                            }
+                        } else {
+                            index += entries[i].sample_count;
                         }
                     }
                 }

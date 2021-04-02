@@ -81,6 +81,7 @@
 #include "Ap4DataInfoAtom.h"
 #include "Ap4Dvc1Atom.h"
 #include "Ap4Utils.h"
+#include "Ap4SbgpAtom.h"
 /*----------------------------------------------------------------------
 |       class variables
 +---------------------------------------------------------------------*/
@@ -396,6 +397,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         case AP4_ATOM_TYPE_SIDX:
             atom = new AP4_SidxAtom(size, stream);
+            break;
+
+        case AP4_ATOM_TYPE_SBGP:
+            atom = new AP4_SbgpAtom(size, stream);
             break;
 
         // full container atoms
