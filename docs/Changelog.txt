@@ -10,10 +10,13 @@ Added support for 'MPNG' (PNG) codec.
 MP4Splitter
 Added support for 'MPNG' (PNG) codec.
 Added support for SpeedHQ codec.
+Added support for shifting tracks in time using the 'elst' atom.
+Added the ability to get a list of keyframes from the 'sbgp' atom.
 
 MatroskaSplitter
 Added support for 'MPNG' (PNG) codec.
 
+MPCVideoDec
 Improved AV1 multi-threaded decoding with dav1d library.
 Improved Apple ProRes support ('ap4h', 'ap4x').
 Added support for SpeedHQ codec.
@@ -51,6 +54,7 @@ Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 Updated Turkish translation (by cmhrky).
+Updated Chinese (Traditional) and Dutch translation (by beter).
 
 Updated libraries:
 	dav1d git-0.8.2-0-gf06148e;
