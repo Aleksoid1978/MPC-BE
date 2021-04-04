@@ -2801,7 +2801,15 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
             return ret;
         }
 
-        avctx->pix_fmt = mpeg_get_pixelformat(avctx);
+        Mpeg1Context* s1 = avctx->priv_data;
+        MpegEncContext* s = &s1->mpeg_enc_ctx;
+
+        if (s->chroma_format < 2)
+            avctx->pix_fmt = AV_PIX_FMT_YUV420P;
+        else if (s->chroma_format == 2)
+            avctx->pix_fmt = AV_PIX_FMT_YUV422P;
+        else
+            avctx->pix_fmt = AV_PIX_FMT_YUV444P;
     }
     // ==> End patch MPC
     return 0;
