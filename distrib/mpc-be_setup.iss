@@ -503,7 +503,6 @@ begin
   DeleteFile(ExpandConstant('{app}\default.mpcpl'));
   DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
   RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
   RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
   Log('CleanUpSettingsAndFiles done.');
