@@ -917,7 +917,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = MEDIASUBTYPE_AV01;
 					mt.formattype = FORMAT_VIDEOINFO2;
 
-					VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 8 + obu_sequence_header.size());
+					VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 4 + obu_sequence_header.size());
 					memset(vih2, 0, mt.FormatLength());
 					vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 					vih2->bmiHeader.biWidth = seq_params.width;
@@ -930,9 +930,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					vih2->rcSource = vih2->rcTarget = { 0, 0, (LONG)seq_params.width, (LONG)seq_params.height };
 
 					BYTE* extra = (BYTE*)(vih2 + 1);
-					memcpy(extra, "av1C", 4);
 
-					CBitsWriter bw(extra + 4, 4);
+					CBitsWriter bw(extra, 4);
 					bw.writeBits(1, 1); // marker
 					bw.writeBits(7, 1); // version
 					bw.writeBits(3, seq_params.profile);
@@ -946,7 +945,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					bw.writeBits(2, seq_params.chroma_sample_position);
 					bw.writeBits(8, 0); // padding
 
-					memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+					memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
 
 					mts.push_back(mt);
 					m_RAWType = RAW_AV1_OBU;

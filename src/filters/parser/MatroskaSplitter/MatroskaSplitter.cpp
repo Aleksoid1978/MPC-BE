@@ -665,10 +665,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							if (mt.subtype == MEDIASUBTYPE_AV01) {
 								if (pTE->CodecPrivate.size() >= 4 && pTE->CodecPrivate.front() == 0x81) { // marker = 1(1), version = 1(7)
-									pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size() + 4);
+									pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size());
 									BYTE* extra = (BYTE*)(pvih + 1);
-									memcpy(extra, "av1C", 4);
-									memcpy(extra + 4, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
+									memcpy(extra, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 									mts.insert(mts.cbegin(), mt);
 								} else {
@@ -677,11 +676,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										AV1Parser::AV1SequenceParameters seq_params;
 										std::vector<uint8_t> obu_sequence_header;
 										if (AV1Parser::ParseOBU(pData.data(), pData.size(), seq_params, obu_sequence_header)) {
-											pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 8 + obu_sequence_header.size());
+											pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 4 + obu_sequence_header.size());
 											BYTE* extra = (BYTE*)(pvih + 1);
-											memcpy(extra, "av1C", 4);
 
-											CBitsWriter bw(extra + 4, 4);
+											CBitsWriter bw(extra, 4);
 											bw.writeBits(1, 1); // marker
 											bw.writeBits(7, 1); // version
 											bw.writeBits(3, seq_params.profile);
@@ -695,7 +693,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											bw.writeBits(2, seq_params.chroma_sample_position);
 											bw.writeBits(8, 0); // padding
 
-											memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+											memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
 
 											mts.insert(mts.cbegin(), mt);
 										}

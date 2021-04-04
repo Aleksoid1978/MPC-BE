@@ -1416,10 +1416,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											if (version != 0x81) { // marker = 1(1), version = 1(7)
 												DLog(L"CMP4SplitterFilter::CreateOutputs() : Unknown AV1 Codec Configuration Box version - 0x%02x", version);
 											} else {
-												vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize() + 4);
+												vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize());
 												BYTE* extra = (BYTE*)(vih2 + 1);
-												memcpy(extra, "av1C", 4);
-												memcpy(extra + 4, di->GetData(), di->GetDataSize());
+												memcpy(extra, di->GetData(), di->GetDataSize());
 
 												mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
 												mts.insert(mts.cbegin(), mt);
@@ -1435,11 +1434,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											AV1Parser::AV1SequenceParameters seq_params;
 											std::vector<uint8_t> obu_sequence_header;
 											if (AV1Parser::ParseOBU(data.GetData(), data.GetDataSize(), seq_params, obu_sequence_header)) {
-												vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 8 + obu_sequence_header.size());
+												vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 4 + obu_sequence_header.size());
 												BYTE* extra = (BYTE*)(vih2 + 1);
-												memcpy(extra, "av1C", 4);
 
-												CBitsWriter bw(extra + 4, 4);
+												CBitsWriter bw(extra, 4);
 												bw.writeBits(1, 1); // marker
 												bw.writeBits(7, 1); // version
 												bw.writeBits(3, seq_params.profile);
@@ -1453,7 +1451,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												bw.writeBits(2, seq_params.chroma_sample_position);
 												bw.writeBits(8, 0); // padding
 
-												memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+												memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
 
 												mts.insert(mts.cbegin(), mt);
 											}

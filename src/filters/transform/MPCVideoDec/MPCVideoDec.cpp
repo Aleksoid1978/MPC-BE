@@ -2573,9 +2573,8 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 				extralen = 0;
 			}
 		} else if (m_nCodecId == AV_CODEC_ID_AV1) {
-			if (extralen >= 8
-					&& AV_RB32(extra) == 'av1C' && AV_RB8(extra + 4) == 0x81) {
-				CGolombBuffer gb(extra + 5, extralen - 5);
+			if (extralen >= 4 && AV_RB8(extra) == 0x81) {
+				CGolombBuffer gb(extra + 1, extralen - 1);
 				const unsigned seq_profile = gb.BitRead(3);
 				gb.BitRead(5); // seq_level_idx
 				gb.BitRead(1); // seq_tier
