@@ -2800,6 +2800,8 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
         if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE)) {
             return ret;
         }
+
+        avctx->pix_fmt = mpeg_get_pixelformat(avctx);
     }
     // ==> End patch MPC
     return 0;
