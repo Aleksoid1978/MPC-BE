@@ -22,6 +22,7 @@
 #include <MMReg.h>
 #include <moreuuids.h>
 #include "RawVideoSplitter.h"
+#include "../../../DSUtil/BitsWriter.h"
 
 #ifdef REGISTER_FILTER
 
@@ -83,49 +84,6 @@ static const BYTE FRAME_[6]			= {'F', 'R', 'A', 'M', 'E', 0x0A};
 
 static const BYTE SHORT_START_CODE[3] = {0x00, 0x00, 0x01};
 static const BYTE LONG_START_CODE[4]  = {0x00, 0x00, 0x00, 0x01};
-
-class CBitsWriter
-{
-	uint8_t* m_buffer = nullptr;
-	size_t m_bufferSize = 0;
-
-	size_t m_bitPosition = 0;
-public:
-	CBitsWriter(uint8_t* buf, const size_t size)
-		: m_buffer(buf)
-		, m_bufferSize(size)
-	{}
-
-	bool writeBits(size_t numBits, uint64_t value) {
-		if (numBits > 64 || (m_bitPosition + numBits) > m_bufferSize * 8) {
-			return false;
-		}
-
-		auto bytePos = m_bitPosition >> 3;
-		auto bitOffset = 8 - (m_bitPosition & 7);
-
-		m_bitPosition += numBits;
-
-		for (; numBits > bitOffset; bitOffset = 8) {
-			auto bitMask = (1ull << bitOffset) - 1;
-			m_buffer[bytePos] &= ~bitMask;
-			m_buffer[bytePos++] |= (value >> (numBits - bitOffset)) & bitMask;
-
-			numBits -= bitOffset;
-		}
-		if (numBits == bitOffset) {
-			auto bitMask = (1ull << bitOffset) - 1;
-			m_buffer[bytePos] &= ~bitMask;
-			m_buffer[bytePos] |= value & bitMask;
-		} else {
-			auto bitMask = (1ull << numBits) - 1;
-			m_buffer[bytePos] &= ~(bitMask << (bitOffset - numBits));
-			m_buffer[bytePos] |= (value & bitMask) << (bitOffset - numBits);
-		}
-
-		return true;
-	}
-};
 
 //
 // CRawVideoSplitterFilter

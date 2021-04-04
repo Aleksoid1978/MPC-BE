@@ -2080,19 +2080,6 @@ redo:
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	if (m_nCodecId == AV_CODEC_ID_AV1 && m_pAVCtx->extradata) {
-		if (AVCodecParserContext* pParser = av_parser_init(m_nCodecId)) {
-			BYTE* pOutBuffer = nullptr;
-			int pOutLen = 0;
-			int used_bytes = av_parser_parse2(pParser, m_pAVCtx, &pOutBuffer, &pOutLen, m_pAVCtx->extradata, m_pAVCtx->extradata_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-			if (pOutLen > 0) {
-				m_pAVCtx->pix_fmt = (enum AVPixelFormat)pParser->format;
-			}
-
-			av_parser_close(pParser);
-		}
-	}
-
 	FillAVCodecProps(m_pAVCtx, pBMI);
 
 	if (pFilter) {

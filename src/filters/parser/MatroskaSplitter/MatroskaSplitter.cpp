@@ -28,6 +28,7 @@
 #include "../../../DSUtil/VideoParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/std_helper.h"
+#include "../../../DSUtil/BitsWriter.h"
 #include <IMediaSideData.h>
 
 #include <moreuuids.h>
@@ -673,10 +674,31 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								} else {
 									std::vector<BYTE> pData;
 									if (ReadFirtsBlock(pData, pTE)) {
-										const auto size = pData.size();
-										pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + size);
-										memcpy(pvih + 1, pData.data(), size);
-										mts.insert(mts.cbegin(), mt);
+										AV1Parser::AV1SequenceParameters seq_params;
+										std::vector<uint8_t> obu_sequence_header;
+										if (AV1Parser::ParseOBU(pData.data(), pData.size(), seq_params, obu_sequence_header)) {
+											pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 8 + obu_sequence_header.size());
+											BYTE* extra = (BYTE*)(pvih + 1);
+											memcpy(extra, "av1C", 4);
+
+											CBitsWriter bw(extra + 4, 4);
+											bw.writeBits(1, 1); // marker
+											bw.writeBits(7, 1); // version
+											bw.writeBits(3, seq_params.profile);
+											bw.writeBits(5, seq_params.level);
+											bw.writeBits(1, seq_params.tier);
+											bw.writeBits(1, seq_params.bitdepth > 8);
+											bw.writeBits(1, seq_params.bitdepth == 12);
+											bw.writeBits(1, seq_params.monochrome);
+											bw.writeBits(1, seq_params.chroma_subsampling_x);
+											bw.writeBits(1, seq_params.chroma_subsampling_y);
+											bw.writeBits(2, seq_params.chroma_sample_position);
+											bw.writeBits(8, 0); // padding
+
+											memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+
+											mts.insert(mts.cbegin(), mt);
+										}
 									}
 								}
 							} else if (mt.subtype == MEDIASUBTYPE_VP90) {

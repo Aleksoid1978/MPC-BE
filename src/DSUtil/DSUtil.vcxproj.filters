@@ -253,5 +253,8 @@
     <ClInclude Include="PixelUtils_VirtualDub.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BitsWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

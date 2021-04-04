@@ -27,6 +27,7 @@
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MP4AudioDecoderConfig.h"
+#include "../../../DSUtil/BitsWriter.h"
 #include "MP4Splitter.h"
 
 #include <Bento4/Core/Ap4.h>
@@ -1431,13 +1432,31 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									if (!bReadAV1C) {
 										AP4_DataBuffer data;
 										if (AP4_SUCCEEDED(sample.ReadData(data))) {
-											const auto size = data.GetDataSize();
-											vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + size);
-											memcpy(vih2 + 1, data.GetData(), size);
+											AV1Parser::AV1SequenceParameters seq_params;
+											std::vector<uint8_t> obu_sequence_header;
+											if (AV1Parser::ParseOBU(data.GetData(), data.GetDataSize(), seq_params, obu_sequence_header)) {
+												vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 8 + obu_sequence_header.size());
+												BYTE* extra = (BYTE*)(vih2 + 1);
+												memcpy(extra, "av1C", 4);
 
-											mts.clear();
-											mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
-											mts.push_back(mt);
+												CBitsWriter bw(extra + 4, 4);
+												bw.writeBits(1, 1); // marker
+												bw.writeBits(7, 1); // version
+												bw.writeBits(3, seq_params.profile);
+												bw.writeBits(5, seq_params.level);
+												bw.writeBits(1, seq_params.tier);
+												bw.writeBits(1, seq_params.bitdepth > 8);
+												bw.writeBits(1, seq_params.bitdepth == 12);
+												bw.writeBits(1, seq_params.monochrome);
+												bw.writeBits(1, seq_params.chroma_subsampling_x);
+												bw.writeBits(1, seq_params.chroma_subsampling_y);
+												bw.writeBits(2, seq_params.chroma_sample_position);
+												bw.writeBits(8, 0); // padding
+
+												memcpy(extra + 8, obu_sequence_header.data(), obu_sequence_header.size());
+
+												mts.insert(mts.cbegin(), mt);
+											}
 										}
 									}
 								}
