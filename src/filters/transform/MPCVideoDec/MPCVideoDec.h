@@ -52,6 +52,7 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public ISpecifyPropertyPages2
 {
 private:
+	CCritSec								m_csInitDec;
 	CCritSec								m_csProps;
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;

@@ -1845,7 +1845,7 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 {
-	CAutoLock cObjectLock(m_pLock);
+	CAutoLock cLock(&m_csInitDec);
 
 	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
@@ -4201,7 +4201,7 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetMvcActive()
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 {
-	CAutoLock cObjectLock(m_pLock);
+	CAutoLock cLock(&m_csInitDec);
 
 	CString infostr;
 
@@ -4278,7 +4278,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 	CheckPointer(value, E_POINTER);
 
 	if (!strcmp(field, "decode_mode")) {
-		CAutoLock cObjectLock(m_pLock);
+		CAutoLock cLock(&m_csInitDec);
 
 		if (m_nDecoderMode == MODE_SOFTWARE && !m_bUseFFmpeg) {
 			*value = MODE_NONE;
@@ -4352,7 +4352,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned
 STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
 {
 	if (strcmp(field, "hw_decoding") == 0) {
-		CAutoLock cObjectLock(m_pLock);
+		CAutoLock cLock(&m_csInitDec);
 
 		m_bEnableHwDecoding = value;
 		return S_OK;
