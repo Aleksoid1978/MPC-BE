@@ -11147,8 +11147,8 @@ void CMainFrame::AutoChangeMonitorMode()
 
 				if (m_clsidCAP == CLSID_MPCVRAllocatorPresenter) {
 					if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP) {
-						bool bDeinterlace = false;
-						if (S_OK == pIExFilterConfig->GetBool("deinterlace", &bDeinterlace) && bDeinterlace) {
+						bool bDoubleRate = false;
+						if (S_OK == pIExFilterConfig->GetBool("doubleRate", &bDoubleRate) && bDoubleRate) {
 							dFPS *= 2.0;
 						}
 					}
