@@ -11144,7 +11144,15 @@ void CMainFrame::AutoChangeMonitorMode()
 			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame(FALSE) * 10000000i64);
 			if (rtAvgTimePerFrame > 0) {
 				dFPS = 10000000.0 / rtAvgTimePerFrame;
-				if (g_nFrameType == PICT_BOTTOM_FIELD || g_nFrameType == PICT_TOP_FIELD) {
+
+				if (m_clsidCAP == CLSID_MPCVRAllocatorPresenter) {
+					if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP) {
+						bool bDeinterlace = false;
+						if (S_OK == pIExFilterConfig->GetBool("deinterlace", &bDeinterlace) && bDeinterlace) {
+							dFPS *= 2.0;
+						}
+					}
+				} else if (g_nFrameType == PICT_BOTTOM_FIELD || g_nFrameType == PICT_TOP_FIELD) {
 					dFPS *= 2.0;
 				}
 			}
