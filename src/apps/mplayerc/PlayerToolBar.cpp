@@ -933,10 +933,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case ID_VOLUME_MUTE:
 		{
-			TBBUTTONINFO bi;
-			bi.cbSize = sizeof(bi);
-			bi.dwMask = TBIF_IMAGE;
-
+			TBBUTTONINFOW bi = { sizeof(bi), TBIF_IMAGE };
 			GetToolBarCtrl().GetButtonInfo(ID_VOLUME_MUTE, &bi);
 
 			if (bi.iImage == 12) {
@@ -977,6 +974,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		return FALSE;
 	}
 
+	m_strTipText.Replace(L"&", L"");
 	pTTT->lpszText = m_strTipText.GetBuffer();
 	*pResult = 0;
 
