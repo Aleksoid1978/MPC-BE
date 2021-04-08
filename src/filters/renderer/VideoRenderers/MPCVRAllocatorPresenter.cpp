@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2020 see Authors.txt
+ * (C) 2019-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -160,7 +160,10 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
 
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
-		pIExFilterConfig->SetBool("lessRedraws", true);
+		CRenderersSettings& rs = GetRenderersSettings();
+
+		hr = pIExFilterConfig->SetBool("lessRedraws", true);
+		hr = pIExFilterConfig->SetBool("d3dFullscreenControl", rs.bMPCVRFullscreenControl);
 	}
 
 	CComQIPtr<IBaseFilter> pBF = m_pMPCVR;

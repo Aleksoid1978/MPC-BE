@@ -406,7 +406,7 @@ CAppSettings::~CAppSettings()
 bool CAppSettings::IsD3DFullscreen() const
 {
 	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP
-			|| (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && fD3DFullscreenMPCVR)) {
+			|| (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && m_VRSettings.bMPCVRFullscreenControl)) {
 		return fD3DFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
 	}
 
@@ -816,7 +816,6 @@ void CAppSettings::ResetSettings()
 	nLastUsedPage = 0;
 
 	fD3DFullscreen = false;
-	fD3DFullscreenMPCVR = false;
 	//fMonitorAutoRefreshRate = false;
 	iStereo3DMode = STEREO3D_AUTO;
 	bStereo3DSwapLR = false;
@@ -1472,7 +1471,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREENMPCVR, fD3DFullscreenMPCVR);
 	//profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {

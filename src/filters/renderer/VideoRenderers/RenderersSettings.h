@@ -141,6 +141,8 @@ public:
 	int		iEVROutputRange;
 	int		nEVRBuffers;
 
+	bool	bMPCVRFullscreenControl = false; // experimental, changes only in the registry 
+
 	// SyncRenderer settings
 	int		iSynchronizeMode;
 	int		iLineDelta;

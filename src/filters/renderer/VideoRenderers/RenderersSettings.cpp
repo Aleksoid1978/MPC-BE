@@ -47,6 +47,8 @@
 #define IDS_RS_EVR_OUTPUTRANGE		L"EVROutputRange"
 #define IDS_RS_EVR_BUFFERS			L"EVRBuffers"
 
+#define IDS_RS_MPCVR_FSCONTROL		L"MPCVRFullscreenControl"
+
 #define IDS_RS_SYNC_MODE			L"SyncMode"
 #define IDS_RS_SYNC_LINEDELTA		L"SyncLineDelta"
 #define IDS_RS_SYNC_COLUMNDELTA		L"SyncColumnDelta"
@@ -93,6 +95,8 @@ void CRenderersSettings::SetDefault()
 
 	iEVROutputRange					= 0;
 	nEVRBuffers						= 5;
+
+	//bMPCVRFullscreenControl			= false;
 
 	iSynchronizeMode				= SYNCHRONIZE_NEAREST;
 	iLineDelta						= 0;
@@ -165,6 +169,8 @@ void CRenderersSettings::Load()
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
 
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, bMPCVRFullscreenControl);
+
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
@@ -211,6 +217,8 @@ void CRenderersSettings::Save()
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
+
+	//profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, bMPCVRFullscreenControl);
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
