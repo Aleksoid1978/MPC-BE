@@ -105,7 +105,6 @@
 #define IDS_RS_LIMITWINDOWPROPORTIONS		L"LimitWindowProportions"
 #define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 
-#define IDS_RS_D3DFULLSCREEN				L"D3DFullScreen"
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"
 #define IDS_RS_STEREO3D_SWAPLEFTRIGHT		L"Stereo3DSwapLeftRight"

@@ -6919,7 +6919,7 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter) {
 		pCmdUI->Enable(TRUE);
-		pCmdUI->SetCheck(AfxGetAppSettings().fD3DFullscreen);
+		pCmdUI->SetCheck(GetRenderersSettings().bExclusiveFullscreen);
 
 		return;
 	}
@@ -6975,10 +6975,12 @@ void CMainFrame::OnViewVSyncInternal()
 void CMainFrame::OnViewD3DFullScreen()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	s.fD3DFullscreen = !s.fD3DFullscreen;
+	CRenderersSettings& rs = s.m_VRSettings;
+
+	rs.bExclusiveFullscreen = !rs.bExclusiveFullscreen;
 	s.SaveSettings();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.fD3DFullscreen ? ResStr(IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON) : ResStr(IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF));
+						 rs.bExclusiveFullscreen ? ResStr(IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON) : ResStr(IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF));
 }
 
 void CMainFrame::OnViewDisableDesktopComposition()
@@ -7398,7 +7400,7 @@ bool CMainFrame::CanSwitchD3DFS()
 	}
 
 	const CAppSettings& s = AfxGetAppSettings();
-	if ((s.fD3DFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN))) {
+	if ((s.m_VRSettings.bExclusiveFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN))) {
 		if (m_eMediaLoadState == MLS_LOADED) {
 			return m_pD3DFS && !m_bFullScreen;
 		}

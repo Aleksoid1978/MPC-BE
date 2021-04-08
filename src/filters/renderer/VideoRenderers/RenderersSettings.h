@@ -121,10 +121,12 @@ public:
 	CString	sD3DRenderDevice;
 	bool	bResetDevice;
 
+	bool	bExclusiveFullscreen;
+	bool	b10BitOutput;
+
 	// surfaces and resizer
 	int		iPresentMode;
 	D3DFORMAT iSurfaceFormat;
-	bool	b10BitOutput;
 	int		iResizer;
 	int		iDownscaler;
 

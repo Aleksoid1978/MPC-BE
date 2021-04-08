@@ -698,7 +698,6 @@ public:
 	CString			strAudioRendererDisplayName;
 	CString			strSecondAudioRendererDisplayName;
 
-	bool			fD3DFullscreen;
 	int				iStereo3DMode;
 	bool			bStereo3DSwapLR;
 

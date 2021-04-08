@@ -115,12 +115,12 @@ BOOL CPPageVideo::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO2, IDC_HAND);
 
 	CAppSettings& s = AfxGetAppSettings();
-
 	CRenderersSettings& rs = s.m_VRSettings;
+
 	m_iVideoRendererType   = rs.iVideoRenderer;
 
-	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
-	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
+	m_chkD3DFullscreen.SetCheck(rs.bExclusiveFullscreen);
+	m_chk10bitOutput.EnableWindow(rs.bExclusiveFullscreen);
 	m_chk10bitOutput.SetCheck(rs.b10BitOutput);
 
 	m_cbEVROutputRange.AddString(L"0-255");
@@ -287,11 +287,11 @@ BOOL CPPageVideo::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_VRSettings;
 
-	rs.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
-	rs.iResizer			= GetCurItemData(m_cbDX9Resizer);
-	rs.iDownscaler		= GetCurItemData(m_cbDownscaler);
-	s.fD3DFullscreen	= !!m_chkD3DFullscreen.GetCheck();
-	rs.bResetDevice		= !!m_bResetDevice;
+	rs.iVideoRenderer		= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
+	rs.iResizer				= GetCurItemData(m_cbDX9Resizer);
+	rs.iDownscaler			= GetCurItemData(m_cbDownscaler);
+	rs.bExclusiveFullscreen = !!m_chkD3DFullscreen.GetCheck();
+	rs.bResetDevice			= !!m_bResetDevice;
 
 	rs.iPresentMode		= (int)GetCurItemData(m_cbDX9PresentMode);
 	rs.iSurfaceFormat	= (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);

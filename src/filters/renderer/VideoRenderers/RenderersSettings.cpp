@@ -30,9 +30,11 @@
 #define IDS_RS_RENDERDEVICE			L"RenderDevice"
 #define IDS_RS_RESETDEVICE			L"ResetDevice"
 
+#define IDS_RS_EXCLUSIVEFULLSCREEN	L"ExclusiveFullscreen"
+#define IDS_RS_OUTPUT10BIT			L"Output10Bit"
+
 #define IDS_RS_PRESENTMODE			L"PresentMode"
 #define IDS_RS_SURFACEFORMAT		L"SurfaceFormat"
-#define IDS_RS_OUTPUT10BIT			L"Output10Bit"
 #define IDS_RS_RESIZER				L"Resizer"
 #define IDS_RS_DOWNSCALER			L"Downscaler"
 
@@ -79,9 +81,11 @@ void CRenderersSettings::SetDefault()
 	sD3DRenderDevice.Empty();
 	bResetDevice					= false;
 
+	bExclusiveFullscreen			= false;
+	b10BitOutput					= false;
+
 	iPresentMode					= 0;
 	iSurfaceFormat					= D3DFMT_X8R8G8B8;
-	b10BitOutput					= false;
 	iResizer						= RESIZER_SHADER_CATMULL;
 	iDownscaler						= DOWNSCALER_SIMPLE;
 
@@ -144,8 +148,10 @@ void CRenderersSettings::Load()
 	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
 
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
 
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
 	int val;
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, val);
 	if (val == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
@@ -153,8 +159,6 @@ void CRenderersSettings::Load()
 	} else {
 		iSurfaceFormat = discard((D3DFORMAT)val, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
 	}
-
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_RESIZER, iResizer);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
 
@@ -201,9 +205,11 @@ void CRenderersSettings::Save()
 	profile.WriteString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
 
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
+
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, iSurfaceFormat);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_RESIZER, iResizer);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
 

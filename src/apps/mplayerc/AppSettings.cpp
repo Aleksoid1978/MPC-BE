@@ -407,7 +407,7 @@ bool CAppSettings::IsD3DFullscreen() const
 {
 	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP
 			|| (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && m_VRSettings.bMPCVRFullscreenControl)) {
-		return fD3DFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
+		return m_VRSettings.bExclusiveFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
 	}
 
 	return false;
@@ -815,7 +815,6 @@ void CAppSettings::ResetSettings()
 
 	nLastUsedPage = 0;
 
-	fD3DFullscreen = false;
 	//fMonitorAutoRefreshRate = false;
 	iStereo3DMode = STEREO3D_AUTO;
 	bStereo3DSwapLR = false;
@@ -1470,7 +1469,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
 	//profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
@@ -1877,7 +1875,6 @@ void CAppSettings::SaveSettings()
 	// Last Saved Playlist Dir
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
 	//profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
