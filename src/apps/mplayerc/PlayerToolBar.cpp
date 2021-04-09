@@ -974,7 +974,6 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		return FALSE;
 	}
 
-	m_strTipText.Replace(L"&", L"");
 	pTTT->lpszText = m_strTipText.GetBuffer();
 	*pResult = 0;
 
