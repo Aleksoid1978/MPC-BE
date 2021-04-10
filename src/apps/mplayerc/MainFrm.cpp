@@ -14158,7 +14158,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pMVRFG = m_pCAP;
 		m_pMVTO  = m_pCAP;
 
-		if (!(m_clsidCAP == CLSID_MPCVRAllocatorPresenter && !s.m_VRSettings.bMPCVRFullscreenControl)) {
+		if (m_clsidCAP != CLSID_MPCVRAllocatorPresenter) {
 			m_pD3DFS = m_pCAP;
 		}
 
