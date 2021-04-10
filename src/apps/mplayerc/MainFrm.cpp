@@ -14157,10 +14157,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pMVRI  = m_pCAP;
 		m_pMVRFG = m_pCAP;
 		m_pMVTO  = m_pCAP;
-
-		if (m_clsidCAP != CLSID_MPCVRAllocatorPresenter) {
-			m_pD3DFS = m_pCAP;
-		}
+		m_pD3DFS = m_pCAP;
 
 		SetupVMR9ColorControl();
 
