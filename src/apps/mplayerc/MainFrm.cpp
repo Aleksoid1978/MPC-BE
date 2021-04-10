@@ -4453,7 +4453,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	m_bDelaySetOutputRect = false;
 
-	if (s.fLaunchfullscreen && !s.IsD3DFullscreen() && !m_bFullScreen && !m_bAudioOnly) {
+	if (s.fLaunchfullscreen && !s.ExclusiveFSAllowed() && !m_bFullScreen && !m_bAudioOnly) {
 		ToggleFullscreen(true, true);
 	}
 
@@ -4512,7 +4512,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	if (!m_bAudioOnly &&
-			((m_bFullScreen && !m_bAudioOnly && !s.fLaunchfullscreen && !s.IsD3DFullscreen() && s.fullScreenModes.bEnabled == 1) || m_bNeedAutoChangeMonitorMode)) {
+			((m_bFullScreen && !m_bAudioOnly && !s.fLaunchfullscreen && !s.ExclusiveFSAllowed() && s.fullScreenModes.bEnabled == 1) || m_bNeedAutoChangeMonitorMode)) {
 		AutoChangeMonitorMode();
 	}
 
@@ -7405,7 +7405,7 @@ bool CMainFrame::CanSwitchD3DFS()
 			return m_pD3DFS && !m_bFullScreen;
 		}
 
-		return s.IsD3DFullscreen();
+		return s.ExclusiveFSAllowed();
 	}
 
 	return false;
@@ -10646,7 +10646,7 @@ void CMainFrame::SetDefaultFullscreenState()
 
 	// Waffs : fullscreen command line
 	if (!(s.nCLSwitches & CLSW_ADD) && (s.nCLSwitches & CLSW_FULLSCREEN) && !s.slFiles.empty()) {
-		if (s.IsD3DFullscreen()) {
+		if (s.ExclusiveFSAllowed()) {
 			m_bStartInD3DFullscreen = true;
 		} else {
 			ToggleFullscreen(true, true);
@@ -17476,7 +17476,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	bool bUseThread  = m_pGraphThread && s.fEnableWorkerThreadForOpening && (bDirectShow || !pFileData) && !pDeviceData;
 
 	// create d3dfs window if launching in fullscreen and d3dfs is enabled
-	if (s.IsD3DFullscreen() && (m_bStartInD3DFullscreen || s.fLaunchfullscreen)) {
+	if (s.ExclusiveFSAllowed() && (m_bStartInD3DFullscreen || s.fLaunchfullscreen)) {
 		CreateFullScreenWindow();
 		m_pVideoWnd = m_pFullscreenWnd;
 		m_bStartInD3DFullscreen = false;

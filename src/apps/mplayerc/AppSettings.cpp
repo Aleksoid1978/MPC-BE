@@ -403,11 +403,13 @@ CAppSettings::~CAppSettings()
 	}
 }
 
-bool CAppSettings::IsD3DFullscreen() const
+bool CAppSettings::ExclusiveFSAllowed() const
 {
-	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP
-			|| (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && m_VRSettings.bMPCVRFullscreenControl)) {
-		return m_VRSettings.bExclusiveFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
+	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP && (m_VRSettings.bExclusiveFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN))) {
+		return  true;
+	}
+	if (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && m_VRSettings.bExclusiveFullscreen && m_VRSettings.bMPCVRFullscreenControl) {
+		return true;
 	}
 
 	return false;
@@ -1661,7 +1663,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		youtubeSignatureCache[name] = value;
 	}
 
-	if (fLaunchfullscreen && !IsD3DFullscreen()) {
+	if (fLaunchfullscreen && !ExclusiveFSAllowed()) {
 		nCLSwitches |= CLSW_FULLSCREEN;
 	}
 

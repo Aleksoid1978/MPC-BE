@@ -912,7 +912,7 @@ public:
 
 	HWND			hMasterWnd;
 
-	bool			IsD3DFullscreen() const;
+	bool			ExclusiveFSAllowed() const;
 	CString			SelectedAudioRenderer() const;
 	void			ResetPositions();
 	DVD_POSITION*	CurrentDVDPosition();

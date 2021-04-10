@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -360,22 +360,22 @@ void CPPageFullscreen::OnUpdateFullscreenRes(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
+	pCmdUI->Enable(!AfxGetAppSettings().ExclusiveFSAllowed());
 }
 
 void CPPageFullscreen::OnUpdateShowBarsWhenFullScreenTimeOut(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
+	pCmdUI->Enable(!AfxGetAppSettings().ExclusiveFSAllowed());
 }
 
 void CPPageFullscreen::OnUpdateStatic1(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
+	pCmdUI->Enable(!AfxGetAppSettings().ExclusiveFSAllowed());
 }
 
 void CPPageFullscreen::OnUpdateStatic2(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
+	pCmdUI->Enable(!AfxGetAppSettings().ExclusiveFSAllowed());
 }
 
 void CPPageFullscreen::OnUpdateFullScrCombo()
