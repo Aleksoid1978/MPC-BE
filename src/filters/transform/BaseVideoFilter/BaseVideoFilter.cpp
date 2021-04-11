@@ -169,16 +169,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
-	auto GetRenderCLSID = [&]() {
-		CLSID renderClsid = CLSID_NULL;
-		CComPtr<IPin> pPin = m_pOutput;
-		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
-			renderClsid = GetCLSID(pBF);
-		}
-		return renderClsid;
-	};
-	static CLSID renderClsid = GetRenderCLSID();
-
 	bool bNeedReconnect = bForce;
 	{
 		int wout = 0, hout = 0, arxout = 0, aryout = 0;
