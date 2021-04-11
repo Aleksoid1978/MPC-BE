@@ -2790,6 +2790,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			EndEnumFilters;
 		}
 
+		m_OutputFilterClsid = GetCLSID(pReceivePin);
 		m_bReinit = false;
 	}
 
@@ -3027,7 +3028,12 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_SPC_BT2020_CL:
 		case AVCOL_SPC_BT2020_NCL:
-			fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_BT2020_10;
+			if (m_OutputFilterClsid == CLSID_EnhancedVideoRenderer) {
+				// Hack to get the same result on different video adapters after EVR mixer.
+				fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT709;
+			} else {
+				fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_BT2020_10;
+			}
 			break;
 		// Custom values, not official standard, but understood by madVR, YCGCO understood by EVR-CP
 		case AVCOL_SPC_FCC:

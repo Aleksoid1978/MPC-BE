@@ -148,6 +148,8 @@ private:
 
 	BOOL									m_MVC_Base_View_R_flag;
 
+	CLSID									m_OutputFilterClsid = GUID_NULL;
+
 	struct {
 		MediaSideDataHDR*                  masterDataHDR        = nullptr;
 		MediaSideDataHDRContentLightLevel* HDRContentLightLevel = nullptr;
