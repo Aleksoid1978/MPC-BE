@@ -20174,7 +20174,8 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 
 		std::wstring regExp = std::regex_replace(name.GetString(), std::wregex(LR"([\.\(\)\[\]\{\}\+])"), L"\\$&");
 
-		const LPCWSTR replaceText[] = {
+		static const LPCWSTR replaceText[] = {
+			LR"(\b(?:s\d+\\?.?e\d+\\?.?)(.+)(?:\bDVD))",
 			LR"(\b(?:s\d+\\?.?e\d+\\?.?)(.+)(?:\b576|720|1080|1440|2160)[ip]\b)",
 			LR"((?:\b576|720|1080|1440|2160)[ip]\b(\D+))"
 		};
