@@ -7400,15 +7400,12 @@ bool CMainFrame::CanSwitchD3DFS()
 	}
 
 	const CAppSettings& s = AfxGetAppSettings();
-	if ((s.m_VRSettings.bExclusiveFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN))) {
-		if (m_eMediaLoadState == MLS_LOADED) {
-			return m_pD3DFS && !m_bFullScreen;
-		}
-
+	if (m_eMediaLoadState == MLS_LOADED) {
+		bool optOn = s.m_VRSettings.bExclusiveFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN);
+		return optOn && m_pD3DFS && !m_bFullScreen;
+	} else {
 		return s.ExclusiveFSAllowed();
 	}
-
-	return false;
 }
 
 void CMainFrame::OnViewFullscreen()
