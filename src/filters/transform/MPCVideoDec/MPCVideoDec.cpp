@@ -2657,7 +2657,7 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
- 	if (direction == PINDIR_OUTPUT) {
+	if (direction == PINDIR_OUTPUT) {
 		DLog(L"CMPCVideoDecFilter::CompleteConnect() - PINDIR_OUTPUT");
 
 		HRESULT hr = S_OK;

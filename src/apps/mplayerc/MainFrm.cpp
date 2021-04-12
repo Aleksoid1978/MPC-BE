@@ -11132,9 +11132,9 @@ void CMainFrame::AutoChangeMonitorMode()
 					}
 				}
 				devMon++;
- 			}
+			}
 			dev++;
- 		}
+		}
 	}
 
 	// Set Display Mode
@@ -13565,7 +13565,7 @@ size_t CMainFrame::GetSubSelIdx()
 
 			if (bMatch) {
 				return nIdx;
- 			} else {
+			} else {
 				for (size_t iIndex = 0; iIndex < subarray.size(); iIndex++) {
 					if (subarray[iIndex].Ext) {
 						return iIndex;

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,8 @@
 		int		nLimit = ((int)gb.BitRead(12)) + gb.GetPos();					\
 		while (gb.GetPos() < nLimit)											\
 		{																		\
-			MPEG2_DESCRIPTOR 	nType	= (MPEG2_DESCRIPTOR)gb.BitRead(8);		\
-			WORD			 	nLength	= (WORD)gb.BitRead(8);
+			MPEG2_DESCRIPTOR	nType	= (MPEG2_DESCRIPTOR)gb.BitRead(8);		\
+			WORD				nLength	= (WORD)gb.BitRead(8);
 
 #define SkipDescriptor(gb, nType, nLength)										\
 			gb.ReadBuffer(DescBuffer, nLength);									\

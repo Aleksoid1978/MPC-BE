@@ -1816,7 +1816,7 @@ STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
 }
 
 //
-// 	CFGManagerCustom
+// CFGManagerCustom
 //
 
 CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
