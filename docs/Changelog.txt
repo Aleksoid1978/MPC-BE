@@ -51,7 +51,7 @@ Improved player in an exclusive full screen MPC VR and madVR.
 Added the ability to open a file from the playlist in the explorer.
 Added display of tooltip for GPU icon.
 Added a button to call the properties window of some video renderers.
-Added functionality for adding similar files.
+Expanded functionality to add similar files.
 Various improvements in the player interface.
 
 Installer
