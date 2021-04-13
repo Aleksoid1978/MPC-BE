@@ -23,6 +23,11 @@ Added support for SpeedHQ codec.
 Added support for hardware decoding using Direct3D 11.
 Added support for AV1 hardware decoding.
 Added support for switching video streams of different formats, taking into account the presence or absence of hardware decoding.
+Improved support for MPEG-2 4:2:0.
+Fixed color distortion of VideoTransferMatrix BT2020 for EVR on Intel Iris Xe.
+
+Video renderers
+Improved display mode switching for interlaced files when using MPC Video Renderer.
 
 Subtitles
 Added support for MEDIASUBTYPE_WEBVTT.
@@ -46,7 +51,11 @@ Improved player in an exclusive full screen MPC VR and madVR.
 Added the ability to open a file from the playlist in the explorer.
 Added display of tooltip for GPU icon.
 Added a button to call the properties window of some video renderers.
+Added functionality for adding similar files.
 Various improvements in the player interface.
+
+Installer
+Removing the player no longer removes the external filter settings.
 
 Updated Japanese translation.
 Updated Portuguese (Brazil) translation (by Siegfried Janke).
