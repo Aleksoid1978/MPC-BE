@@ -20173,7 +20173,8 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 
 		static const LPCWSTR replaceText[] = {
 			LR"(\b(?:s\d+\\?.?e\d+\\?.?)(.+)(?:(?:\b576|720|1080|1440|2160)[ip]\b|DVD))",
-			LR"((?:(?:\b576|720|1080|1440|2160)[ip]\b|DVD)(\D+))"
+			LR"((?:(?:\b576|720|1080|1440|2160)[ip]\b|DVD)([^0-9]+))",
+			LR"(\b(?:s\d+\\?.?e\d+\\?.?)([^0-9]+)$)"
 		};
 		for (const auto text : replaceText) {
 			std::wcmatch match;
