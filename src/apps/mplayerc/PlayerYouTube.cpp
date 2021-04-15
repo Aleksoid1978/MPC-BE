@@ -1162,7 +1162,7 @@ namespace Youtube
 				}
 
 				final_item = nullptr;
-				
+
 				int k_mp4 = -1;
 				int k_webm = -1;
 				int k_av1 = -1;
