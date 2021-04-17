@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,6 +103,11 @@ typedef struct tagDOLBYAC3WAVEFORMAT {
 struct fraction_t {
 	int num;
 	int den;
+};
+
+struct fraction64_t {
+	int64_t num;
+	int64_t den;
 };
 
 struct SyncPoint {
