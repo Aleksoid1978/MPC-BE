@@ -888,6 +888,58 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		subChangeNotifyThreadStart();
 	}
 
+	// Setup 'CONSENT' cookie for internal Youtube parser
+	constexpr auto lpszUrl = L"https://www.youtube.com";
+
+	CString lpszCookieData;
+	DWORD dwSize = 2048;
+
+	InternetGetCookieExW(lpszUrl, nullptr, lpszCookieData.GetBuffer(dwSize), &dwSize, INTERNET_COOKIE_HTTPONLY, nullptr);
+	lpszCookieData.ReleaseBuffer(dwSize);
+
+	int consentId = 0;
+	bool bSetCookies = true;
+
+	if (!lpszCookieData.IsEmpty()) {
+		std::list<CString> cookies;
+		Explode(lpszCookieData, cookies, L';');
+		for (auto& cookie : cookies) {
+			cookie.Trim();
+			const auto pos = cookie.Find(L'=');
+			if (pos > 0) {
+				const auto param = cookie.Left(pos);
+				const auto value = cookie.Mid(pos + 1);
+
+				if (param == L"__Secure-3PSID") {
+					bSetCookies = false;
+					break;
+				} else if (param == L"CONSENT") {
+					if (value.Find(L"YES") != -1) {
+						bSetCookies = false;
+						break;
+					}
+					consentId = _wtoi(RegExpParse<CString>(value.GetString(), LR"(PENDING\+(\d+))"));
+				}
+			}
+		}
+	}
+
+	if (bSetCookies) {
+		if (!consentId) {
+			std::random_device random_device;
+			std::mt19937 generator(random_device());
+			std::uniform_int_distribution<> distribution(100, 999);
+
+			consentId = distribution(generator);
+		}
+
+		SYSTEMTIME st;
+		::GetLocalTime(&st);
+
+		lpszCookieData.Format(L"YES+cb.%04u%02u%02u-17-p0.en+FX+%d", st.wYear, st.wMonth, st.wDay, consentId);
+		InternetSetCookieExW(lpszUrl, L"CONSENT", lpszCookieData.GetString(), INTERNET_COOKIE_HTTPONLY, NULL);
+	}
+
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
 
 	return 0;
