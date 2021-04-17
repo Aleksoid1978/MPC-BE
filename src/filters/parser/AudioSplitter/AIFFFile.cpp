@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -150,17 +150,19 @@ REFERENCE_TIME CAIFFFile::Seek(REFERENCE_TIME rt)
 
 int CAIFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
-	if (m_pFile->GetPos() + m_block_align > m_endpos) {
+	const __int64 start = m_pFile->GetPos();
+
+	if (start + m_block_align > m_endpos) {
 		return 0;
 	}
 
-	const auto size = std::min((__int64)m_block_size, m_endpos - m_pFile->GetPos());
+	const auto size = std::min((__int64)m_block_size, m_endpos - start);
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
 
-	packet->rtStart	= rtStart;
-	packet->rtStop	= rtStart + SCALE64(m_rtduration, size, m_length);
+	packet->rtStart = rtStart;
+	packet->rtStop  = rtStart + SCALE64(m_rtduration, size, m_length);
 
 	return size;
 }

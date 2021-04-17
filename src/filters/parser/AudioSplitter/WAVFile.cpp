@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -338,18 +338,20 @@ REFERENCE_TIME CWAVFile::Seek(REFERENCE_TIME rt)
 
 int CWAVFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
-	if (m_pFile->GetPos() + m_nBlockAlign > m_endpos) {
+	const __int64 start = m_pFile->GetPos();
+
+	if (start + m_nBlockAlign > m_endpos) {
 		return 0;
 	}
 
-	int size = (int)std::min((__int64)m_blocksize, m_endpos - m_pFile->GetPos());
+	int size = (int)std::min((__int64)m_blocksize, m_endpos - start);
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
 
-	__int64 len = m_pFile->GetPos() - m_startpos;
-	packet->rtStart	= SCALE64(m_rtduration, len, m_length);
-	packet->rtStop	= SCALE64(m_rtduration, (len + size), m_length);
+	__int64 len = start - m_startpos;
+	packet->rtStart = SCALE64(m_rtduration, len, m_length);
+	packet->rtStop  = SCALE64(m_rtduration, (len + size), m_length);
 
 	return size;
 }

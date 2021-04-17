@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -444,8 +444,9 @@ REFERENCE_TIME CDFFFile::Seek(REFERENCE_TIME rt)
 
 int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
+	const __int64 start = m_pFile->GetPos();
+
 	if (m_subtype == MEDIASUBTYPE_DST) {
-		const __int64 start = m_pFile->GetPos();
 		DWORD dw;
 		for (__int64 i = 0, j = m_endpos - start - sizeof(dffchunk_t);
 				i <= 10 * MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&dw, sizeof(dw));
@@ -473,18 +474,18 @@ int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	if (m_pFile->GetPos() + m_block_size > m_endpos) {
+	if (start + m_block_size > m_endpos) {
 		return 0;
 	}
 
-	int size = (int)std::min((__int64)m_max_blocksize, m_endpos - m_pFile->GetPos());
+	int size = (int)std::min((__int64)m_max_blocksize, m_endpos - start);
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
 
-	__int64 len = m_pFile->GetPos() - m_startpos;
-	packet->rtStart	= SCALE64(m_rtduration, len, m_length);
-	packet->rtStop	= SCALE64(m_rtduration, (len + size), m_length);
+	__int64 len = start - m_startpos;
+	packet->rtStart = SCALE64(m_rtduration, len, m_length);
+	packet->rtStop  = SCALE64(m_rtduration, (len + size), m_length);
 
 	return size;
 }
