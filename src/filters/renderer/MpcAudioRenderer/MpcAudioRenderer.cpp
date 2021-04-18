@@ -2948,8 +2948,7 @@ void CMpcAudioRenderer::WaitFinish()
 	}
 
 	for (;;) {
-		if (m_filterState != State_Running
-				|| m_bNeedReinitialize || m_bNeedReinitializeFull
+		if (m_bNeedReinitialize || m_bNeedReinitializeFull
 				|| !WasapiQueueSize()) {
 			break;
 		}
