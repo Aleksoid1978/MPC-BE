@@ -38,28 +38,28 @@ struct WAVEFORMATEXPS2 : public WAVEFORMATEX {
 	}
 };
 
-typedef struct tagVORBISFORMAT {
-	WORD nChannels;
+struct VORBISFORMAT {
+	WORD  nChannels;
 	DWORD nSamplesPerSec;
 	DWORD nMinBitsPerSec;
 	DWORD nAvgBitsPerSec;
 	DWORD nMaxBitsPerSec;
 	float fQuality;
-} VORBISFORMAT, *PVORBISFORMAT, FAR *LPVORBISFORMAT;
+};
 
-typedef struct tagVORBISFORMAT2 {
+struct VORBISFORMAT2 {
 	DWORD Channels;
 	DWORD SamplesPerSec;
 	DWORD BitsPerSample;
 	DWORD HeaderSize[3]; // 0: Identification, 1: Comment, 2: Setup
-} VORBISFORMAT2, *PVORBISFORMAT2, FAR *LPVORBISFORMAT2;
+};
 
 #pragma pack(push, 1)
-typedef struct {
+struct SUBTITLEINFO {
 	DWORD dwOffset;
-	CHAR IsoLang[4]; // three letter lang code + terminating zero
+	CHAR  IsoLang[4];     // three letter lang code + terminating zero
 	WCHAR TrackName[256]; // 256 chars ought to be enough for everyone :)
-} SUBTITLEINFO;
+};
 #pragma pack(pop)
 
 struct WAVEFORMATEX_HDMV_LPCM : public WAVEFORMATEX {
@@ -91,14 +91,14 @@ struct WAVEFORMATEXFFMPEG
 	}
 };
 
-typedef struct tagDOLBYAC3WAVEFORMAT {
-	WAVEFORMATEX	wfx;
-	BYTE			bBigEndian;		// TRUE = Big Endian, FALSE little endian
-	BYTE			bsid;
-	BYTE			lfeon;
-	BYTE			copyrightb;
-	BYTE			nAuxBitsCode;	//  Aux bits per frame
-} DOLBYAC3WAVEFORMAT;
+struct DOLBYAC3WAVEFORMAT {
+	WAVEFORMATEX wfx;
+	BYTE bBigEndian;   // 1 - Big-endian, 0 - Little-endian
+	BYTE bsid;
+	BYTE lfeon;
+	BYTE copyrightb;
+	BYTE nAuxBitsCode; // Aux bits per frame
+};
 
 struct fraction_t {
 	int num;
