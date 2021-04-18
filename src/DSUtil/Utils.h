@@ -63,6 +63,8 @@ uint32_t BitNum(uint32_t v, uint32_t b);
 uint64_t RescaleU64x32(uint64_t a, uint32_t b, uint32_t c);
 // a * b / c
 int64_t RescaleI64x32(int64_t a, uint32_t b, uint32_t c);
+// a * b / c
+int64_t RescaleI64(int64_t a, int64_t b, int64_t c);
 
 template <typename T>
 inline void ReduceDim(T &num, T &den)

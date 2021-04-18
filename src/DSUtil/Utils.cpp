@@ -80,6 +80,11 @@ int64_t RescaleI64x32(int64_t a, uint32_t b, uint32_t c)
 	return a < 0 ? -(int64_t)RescaleU64x32(-a, b, c) : RescaleU64x32(a, b, c);
 }
 
+int64_t RescaleI64(int64_t a, int64_t b, int64_t c)
+{
+	return llMulDiv(a, b, c, 0);
+}
+
 // code from ffmpeg
 int64_t av_gcd(int64_t a, int64_t b) {
 	if (b) return av_gcd(b, a%b);
