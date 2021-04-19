@@ -8207,6 +8207,10 @@ void CMainFrame::OnPlayStop()
 		}
 
 		m_OSD.SetPos(0);
+
+		if (m_pCAP) {
+			m_pCAP->SetTime(0);
+		}
 	}
 
 	m_nLoops = 0;
