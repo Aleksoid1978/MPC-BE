@@ -42,7 +42,6 @@ CPPagePlayer::CPPagePlayer()
 	, m_bUseIni(FALSE)
 	, m_bHideCDROMsSubMenu(FALSE)
 	, m_bPriority(FALSE)
-	, m_bAllowDrag(FALSE)
 {
 }
 
@@ -59,7 +58,6 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK1,   m_bKeepHistory);
 	DDX_Check(pDX, IDC_CHECK10,  m_bHideCDROMsSubMenu);
 	DDX_Check(pDX, IDC_CHECK9,   m_bPriority);
-	DDX_Check(pDX, IDC_CHECK12,  m_bAllowDrag);
 	DDX_Check(pDX, IDC_SHOW_OSD, m_bShowOSD);
 	DDX_Check(pDX, IDC_CHECK14,  m_bOSDFileName);
 	DDX_Check(pDX, IDC_CHECK15,  m_bOSDSeekTime);
@@ -116,7 +114,6 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bKeepHistory				= s.bKeepHistory;
 	m_bHideCDROMsSubMenu		= s.bHideCDROMsSubMenu;
 	m_bPriority					= s.dwPriority != NORMAL_PRIORITY_CLASS;
-	m_bAllowDrag				= s.bAllowDrag;
 	m_bShowOSD					= s.ShowOSD.Enable;
 	m_bOSDFileName				= s.ShowOSD.FileName;
 	m_bOSDSeekTime				= s.ShowOSD.SeekTime;
@@ -175,7 +172,6 @@ BOOL CPPagePlayer::OnApply()
 	s.bKeepHistory = !!m_bKeepHistory;
 	s.bHideCDROMsSubMenu = !!m_bHideCDROMsSubMenu;
 	s.dwPriority = !m_bPriority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
-	s.bAllowDrag = !!m_bAllowDrag;
 	BOOL bShowOSDChanged = s.ShowOSD.Enable != m_bShowOSD;
 
 	s.ShowOSD.Enable   = m_bShowOSD ? 1 : 0;

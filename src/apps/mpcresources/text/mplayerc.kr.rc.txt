@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 7		"파일을 열때마다 같은 플레이어창 사용"
@@ -417,9 +417,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 28		"실행파일 폴더에 설정 저장"
 29		"'디스크 열기' 메뉴 사용안함"
 30		"프로세스 우선순위 높이기"
-31		"Allow drag via video area"
-32		"Network timeout:"
-35		"sec."
+31		"Network timeout:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

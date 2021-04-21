@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Možnosti otevírání"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -417,9 +417,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 28		"Store settings in the player folder"
 29		"Zakázat nabídku Otevřít disk"
 30		"Spouštět se zvýšenou prioritou"
-31		"Allow drag via video area"
-32		"Network timeout:"
-35		"sec."
+31		"Network timeout:"
+34		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

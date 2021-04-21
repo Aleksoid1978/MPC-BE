@@ -741,6 +741,7 @@ void CAppSettings::ResetSettings()
 	MouseWheelLeft      = { 0, 0, 0, 0 };
 	MouseWheelRight     = { 0, 0, 0, 0 };
 	bMouseLeftClickOpenRecent = false;
+	bMouseEasyMove      = true;
 
 	bUseDarkTheme = true;
 	nThemeBrightness = 15;
@@ -782,8 +783,6 @@ void CAppSettings::ResetSettings()
 	bHideCDROMsSubMenu = false;
 
 	dwPriority = NORMAL_PRIORITY_CLASS;
-	bAllowDrag = true;
-
 	fLaunchfullscreen = false;
 
 	fEnableWebServer = false;
@@ -1396,6 +1395,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		swscanf_s(str, L"%u;%u;%u;%u", &MouseWheelRight.normal, &MouseWheelRight.ctrl, &MouseWheelRight.shift, &MouseWheelRight.rbtn);
 	}
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
+	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_EASYMOVE, bMouseEasyMove);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
@@ -1438,9 +1438,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(unsigned*)&dwPriority);
 	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
-
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ALLOWDRAG, bAllowDrag);
-
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
@@ -2037,6 +2034,7 @@ void CAppSettings::SaveSettings()
 	str.Format(L"%u;%u;%u;%u", MouseWheelRight.normal, MouseWheelRight.ctrl, MouseWheelRight.shift, MouseWheelRight.rbtn);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT, str);
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
+	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_EASYMOVE, bMouseEasyMove);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
@@ -2080,10 +2078,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
 
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ALLOWDRAG, bAllowDrag);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);

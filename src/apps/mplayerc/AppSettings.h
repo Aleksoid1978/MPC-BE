@@ -575,7 +575,6 @@ public:
 
 	bool			bHideCDROMsSubMenu;
 	DWORD			dwPriority;
-	bool			bAllowDrag;
 	int				iTitleBarTextStyle;
 	int				iSeekBarTextStyle;
 	bool			bKeepHistory;
@@ -612,6 +611,7 @@ public:
 	UINT			nMouseLeftClick;
 	bool			bMouseLeftClickOpenRecent;
 	UINT			nMouseLeftDblClick;
+	bool			bMouseEasyMove;
 	UINT			nMouseRightClick;
 	struct MOUSE_ASSIGNMENT {
 		UINT normal;

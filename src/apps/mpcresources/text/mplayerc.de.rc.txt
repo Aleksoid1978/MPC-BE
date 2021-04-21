@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Ausgewählte Titel in der Wiedergabeliste merken"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Dateiaufruf"
 6		"Einzelnen Prozess des Players erzwingen"
 7		"Mediendateien mit dem aktuellen Player öffnen"
@@ -417,9 +417,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 28		"Einstellungen als Datei (.ini) speichern"
 29		"Disc-Wiedergabe deaktivieren"
 30		"&Prozesspriorität höher als normal"
-31		"Allow drag via video area"
-32		"Netzwerk-Zeitüberschreitung:"
-35		"Sek."
+31		"Netzwerk-Zeitüberschreitung:"
+34		"Sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

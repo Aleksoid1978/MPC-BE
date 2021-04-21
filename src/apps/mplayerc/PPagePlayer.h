@@ -47,7 +47,6 @@ public:
 	BOOL m_bUseIni;
 	BOOL m_bHideCDROMsSubMenu;
 	BOOL m_bPriority;
-	BOOL m_bAllowDrag;
 
 	CComboBox m_cbTitleBarPrefix;
 	CComboBox m_cbSeekBarText;

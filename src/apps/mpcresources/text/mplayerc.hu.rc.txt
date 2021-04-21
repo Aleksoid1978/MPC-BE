@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Megnyitási lehetőségek"
 6		"Kényszerítsen egyetlen folyamatot"
 7		"Használja ugyanazt a folyamatot minden fájlhoz"
@@ -417,9 +417,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 28		"Tárolja a beállításokat a lejátszó mappájában"
 29		"Kikapcsolja az 'Open Disc' menüt"
 30		"A lejátszó prioritása normál érték felett"
-31		"Allow drag via video area"
-32		"Hálózat időtúllépése:"
-35		"mp."
+31		"Hálózat időtúllépése:"
+34		"mp."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
