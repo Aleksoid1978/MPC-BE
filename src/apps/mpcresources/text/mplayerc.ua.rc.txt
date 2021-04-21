@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Експорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Ліва кнопка"
 6		"Клацання"
 8		"Якщо нічого не завантажено, то відкрити останній файл"
 10		"Подвійне клацання"
-12		"Right click"
-15		"За замовчуванням"
+12		"Move window by the video area"
+13		"Right click"
+16		"За замовчуванням"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

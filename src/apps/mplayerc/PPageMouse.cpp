@@ -75,6 +75,7 @@ void CPPageMouse::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_cmbLeftButtonDblClick);
 	DDX_Control(pDX, IDC_COMBO3, m_cmbRightButtonClick);
 	DDX_Control(pDX, IDC_CHECK1, m_chkMouseLeftClickOpenRecent);
+	DDX_Control(pDX, IDC_CHECK2, m_chkMouseEasyMove);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
@@ -131,6 +132,7 @@ BOOL CPPageMouse::OnInitDialog()
 	SelectByItemData(m_cmbRightButtonClick, s.nMouseRightClick);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(s.bMouseLeftClickOpenRecent ? BST_CHECKED : BST_UNCHECKED);
+	m_chkMouseEasyMove.SetCheck(s.bMouseEasyMove ? BST_CHECKED : BST_UNCHECKED);
 
 	m_table_values[ROW_BTN_M][COL_CMD]    = s.MouseMiddleClick.normal;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = s.MouseMiddleClick.ctrl;
@@ -216,6 +218,7 @@ BOOL CPPageMouse::OnApply()
 	s.nMouseRightClick   = (UINT)GetCurItemData(m_cmbRightButtonClick);
 
 	s.bMouseLeftClickOpenRecent = !!m_chkMouseLeftClickOpenRecent.GetCheck();
+	s.bMouseEasyMove            = !!m_chkMouseEasyMove.GetCheck();
 
 	s.MouseMiddleClick.normal = m_table_values[ROW_BTN_M][COL_CMD];
 	s.MouseMiddleClick.ctrl   = m_table_values[ROW_BTN_M][COL_CTRL];
@@ -370,6 +373,7 @@ void CPPageMouse::OnBnClickedReset()
 	SelectByItemData(m_cmbRightButtonClick, 0);
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(BST_UNCHECKED);
+	m_chkMouseEasyMove.SetCheck(BST_CHECKED);
 
 	m_table_values[ROW_BTN_M][COL_CMD]    = 0;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = 0;

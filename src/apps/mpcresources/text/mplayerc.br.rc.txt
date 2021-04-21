@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exportar"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Botão esquerdo"
 6		"Clique"
 8		"Se nada for carregado, abrir arquivo recente"
 10		"Duplo clique"
-12		"Clique no direito"
-15		"Padrão"
+12		"Move window by the video area"
+13		"Clique no direito"
+16		"Padrão"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"エクスポート"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"左ボタン"
 6		"クリック"
 8		"何も読み込まれていない場合は、最近使ったファイルを開く"
 10		"ダブル クリック"
-12		"右クリック"
-15		"既定"
+12		"Move window by the video area"
+13		"右クリック"
+16		"既定"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

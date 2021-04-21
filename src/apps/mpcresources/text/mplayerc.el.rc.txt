@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Εξαγωγή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Αριστερό πλήκτρο"
 6		"Κλικ"
 8		"Εάν δεν έχει φορτωθεί τίποτα, ανοίξτε το πρόσφατο αρχείο"
 10		"Διπλό κλικ"
-12		"Right click"
-15		"Προεπιλογή"
+12		"Move window by the video area"
+13		"Right click"
+16		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

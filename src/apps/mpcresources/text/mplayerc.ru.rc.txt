@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Экспорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Левая кнопка"
 6		"Щелчок"
 8		"Если ничего не загружено, то открыть последний файл"
 10		"Двойной щелчок"
-12		"Щелчок правый"
-15		"По умолчанию"
+12		"Переносить окно за видеобласть"
+13		"Щелчок правый"
+16		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Esporta"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Left button"
 6		"Click"
 8		"If nothing is loaded, open recent file"
 10		"Double click"
-12		"Right click"
-15		"Default"
+12		"Move window by the video area"
+13		"Right click"
+16		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

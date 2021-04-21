@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Bal gomb"
 6		"Kattintás"
 8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
 10		"Dupla kattintás"
-12		"Jobb kattintás"
-15		"Alapértelmezett"
+12		"Move window by the video area"
+13		"Jobb kattintás"
+16		"Alapértelmezett"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

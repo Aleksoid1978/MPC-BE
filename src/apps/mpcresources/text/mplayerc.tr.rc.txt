@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Ver"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Sol tuş"
 6		"Tıklama"
 8		"Hiçbir şey yüklenmemişse son dosyayı aç"
 10		"Çift Tıklama"
-12		"Sağ Tıklama"
-15		"Varsayılan"
+12		"Move window by the video area"
+13		"Sağ Tıklama"
+16		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

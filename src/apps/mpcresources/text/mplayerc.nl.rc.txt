@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Exporteren"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Linkermuisknop"
 6		"Klikken"
 8		"Recent bestand openen als er niets wordt geladen"
 10		"Dubbelklikken"
-12		"Rechts klikken"
-15		"Resetten"
+12		"Move window by the video area"
+13		"Rechts klikken"
+16		"Resetten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42

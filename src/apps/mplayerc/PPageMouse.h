@@ -34,6 +34,7 @@ class CPPageMouse : public CPPageBase
 	CComboBox m_cmbRightButtonClick;
 
 	CButton m_chkMouseLeftClickOpenRecent;
+	CButton m_chkMouseEasyMove;
 
 	CPlayerListCtrl m_list;
 	enum {

@@ -357,13 +357,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 33		"Eksportuj"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 16
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 5		"Lewy przycisk"
 6		"Klik"
 8		"Jeśli nic nie jest wczytane, otwórz ostatni plik"
 10		"Podwójny klik"
-12		"Prawy klik"
-15		"Domyślne"
+12		"Move window by the video area"
+13		"Prawy klik"
+16		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
