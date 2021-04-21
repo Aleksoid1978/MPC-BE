@@ -782,6 +782,8 @@ void CAppSettings::ResetSettings()
 	bHideCDROMsSubMenu = false;
 
 	dwPriority = NORMAL_PRIORITY_CLASS;
+	bAllowDrag = true;
+
 	fLaunchfullscreen = false;
 
 	fEnableWebServer = false;
@@ -1436,6 +1438,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(unsigned*)&dwPriority);
 	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
+
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ALLOWDRAG, bAllowDrag);
+
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
@@ -2075,7 +2080,10 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
 
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
+
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ALLOWDRAG, bAllowDrag);
+
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);

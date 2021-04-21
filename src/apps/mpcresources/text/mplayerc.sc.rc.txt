@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"记住播放列表中的选定曲目"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"打开选项"
 6		"只播放一个文件"
 7		"为每个媒体文件使用相同的播放器"
@@ -417,8 +417,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"保存设置到播放器所在文件夹"
 29		"隐藏打开光盘菜单"
 30		"高于普通进程优先级"
-31		"网络超时:"
-34		"秒"
+31		"Allow drag via video area"
+32		"网络超时:"
+35		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

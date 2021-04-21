@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Запоминать выбранные дорожки в плейлисте"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Открывать файлы, используя"
 6		"всегда один процесс"
 7		"один и тот же процесс для каждого файла"
@@ -417,8 +417,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Хранить настройки в папке плеера"
 29		"Отключить меню 'Открыть диск'"
 30		"Повышенный приоритет процесса"
-31		"Тайм-аут соединения:"
-34		"сек."
+31		"Разрешить двигать за видео область"
+32		"Тайм-аут соединения:"
+35		"сек."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Запам'ятовувати обрані доріжки у списку відтворення"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"При відкритті файлів"
 6		"Примусовий одновіконний режим"
 7		"Використовувати один процес для усіх файлів"
@@ -417,8 +417,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Зберігати налаштування в теці плеєра"
 29		"Заборонити меню 'Відкрити диск'"
 30		"Підвищений пріоритет процесу"
-31		"Мережевий тайм-аут:"
-34		"сек."
+31		"Allow drag via video area"
+32		"Мережевий тайм-аут:"
+35		"сек."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

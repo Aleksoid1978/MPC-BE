@@ -575,6 +575,7 @@ public:
 
 	bool			bHideCDROMsSubMenu;
 	DWORD			dwPriority;
+	bool			bAllowDrag;
 	int				iTitleBarTextStyle;
 	int				iSeekBarTextStyle;
 	bool			bKeepHistory;

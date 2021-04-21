@@ -217,6 +217,7 @@
 #define IDS_RS_WEBSERVERUSECOMPRESSION		L"WebServerUseCompression"
 #define IDS_RS_SNAPSHOTPATH					L"SnapShotPath"
 #define IDS_RS_PRIORITY						L"Priority"
+#define IDS_RS_ALLOWDRAG					L"AllowDrag"
 #define IDS_RS_SNAPSHOTEXT					L"SnapShotExt"
 #define IDS_RS_SNAPSHOT_SUBTITLES			L"SnapShotSubtitles"
 #define IDS_RS_ISDB							L"ISDb"

@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"記住播放清單中選定的項目"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"開啟選項"
 6		"強制單一程式"
 7		"所有檔案使用同一處理程序"
@@ -417,8 +417,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"儲存設定到播放程式資料夾"
 29		"停用「開啟光碟」選單"
 30		"程式優先順序調成標準以上"
-31		"連線逾時："
-34		"秒"
+31		"Allow drag via video area"
+32		"連線逾時："
+35		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

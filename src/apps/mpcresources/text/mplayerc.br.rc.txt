@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Lembrar faixas selecionadas na lista de reprodução"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Opções abrir"
 6		"Forçar único processo"
 7		"Usar mesmo processo para todos os arquivos"
@@ -417,8 +417,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Armazenar configurações na pasta do player"
 29		"Desativar menu 'Abrir disco'"
 30		"Prioridade do processo acima do normal"
-31		"Tempo limite da rede:"
-34		"seg"
+31		"Allow drag via video area"
+32		"Tempo limite da rede:"
+35		"seg"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32

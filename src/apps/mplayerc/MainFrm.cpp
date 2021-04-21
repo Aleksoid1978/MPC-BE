@@ -3739,7 +3739,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (!IsZoomed()) {
+	if (!IsZoomed() && AfxGetAppSettings().bAllowDrag) {
 		SetCapture();
 		m_bBeginCapture = true;
 		m_beginCapturePoint = point;
@@ -3760,8 +3760,10 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		StartAutoHideCursor();
 	}
 
-	m_bBeginCapture = false;
-	ReleaseCapture();
+	if (AfxGetAppSettings().bAllowDrag) {
+		m_bBeginCapture = false;
+		ReleaseCapture();
+	}
 
 	if (m_bLeftMouseDownFullScreen) {
 		m_bLeftMouseDownFullScreen = FALSE;

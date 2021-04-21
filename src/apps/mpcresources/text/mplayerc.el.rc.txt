@@ -395,7 +395,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Απομνημόνευση επιλεγμένων κομματιών στη λίστα αναπαραγωγής"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Επιλογές ανοίγματος"
 6		"Εξαναγκασμός μίας διεργασίας"
 7		"Χρήση του ίδιου αναπαραγωγού για κάθε αρχείο πολυμέσων"
@@ -417,8 +417,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 28		"Τοποθέτηση ρυθμίσεων στο φάκελο του αναπ/γού"
 29		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
 30		"Προτεραιότητα διεργασίας πάνω από κανονική"
-31		"Χρονικό διάστημα δικτύου:"
-34		"δευτ."
+31		"Allow drag via video area"
+32		"Χρονικό διάστημα δικτύου:"
+35		"δευτ."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
