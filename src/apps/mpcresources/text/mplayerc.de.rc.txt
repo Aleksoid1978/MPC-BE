@@ -362,7 +362,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 6		"Einfacher Klick"
 8		"Wenn nichts geladen ist, die letzte Datei öffnen"
 10		"Doppelklick"
-12		"Move window by the video area"
+12		"Fenster im Videobereich verschieben"
 13		"Rechtsklick"
 16		"Zurücksetzen"
 END
