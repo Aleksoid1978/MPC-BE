@@ -362,7 +362,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 6		"Kattintás"
 8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
 10		"Dupla kattintás"
-12		"Move window by the video area"
+12		"Ablak áthelyezése a videó területre"
 13		"Jobb kattintás"
 16		"Alapértelmezett"
 END
