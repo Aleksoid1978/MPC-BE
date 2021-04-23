@@ -362,7 +362,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 6		"Tıklama"
 8		"Hiçbir şey yüklenmemişse son dosyayı aç"
 10		"Çift Tıklama"
-12		"Move window by the video area"
+12		"Pencereyi video alanı vasıtasıyla taşı"
 13		"Sağ Tıklama"
 16		"Varsayılan"
 END
