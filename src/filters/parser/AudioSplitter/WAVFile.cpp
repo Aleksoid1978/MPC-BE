@@ -275,7 +275,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		default:
 			for (int i = 0; i < sizeof(Chunk.id); i++) {
 				BYTE ch = Chunk.data[i];
-				if (ch != 0x20 && (ch < '0' || ch > '9') && (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z')) {
+				if (ch != 0x20 && (ch < '0' || ch > '9') && (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z') && ch != '_') {
 					DLog(L"CWAVFile::Open() : broken file!");
 					return E_FAIL;
 				}
