@@ -1394,9 +1394,8 @@ namespace AV1Parser {
 
 		obu_size = leb128(gb);
 		start_pos = gb.GetPos();
-		const auto ret = obu_size + start_pos;
 
-		return ret <= buf_size ? ret : -1;
+		return obu_size + start_pos;
 	};
 
 	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size, uint8_t& obu_type)
@@ -1421,7 +1420,7 @@ namespace AV1Parser {
 			int start_pos = 0;
 			uint8_t type = 0;
 			auto len = ParseOBUHeader(buf, size, obu_size, start_pos, type);
-			if (len < 0) {
+			if (len < 0 || len > size) {
 				break;
 			}
 
