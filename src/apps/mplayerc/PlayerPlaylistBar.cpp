@@ -3292,7 +3292,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		}
 	}
 
-	auto curTab = GetCurTab();
+	auto& curTab = GetCurTab();
 
 	LVHITTESTINFO lvhti;
 	lvhti.pt = p;
