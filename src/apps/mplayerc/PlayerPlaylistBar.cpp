@@ -3498,6 +3498,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_REMOVEMISSINGFILES:
 			RemoveMissingFiles();
+			break;
 		case M_SORTBYID:
 			if (bExplorer) {
 				return;
