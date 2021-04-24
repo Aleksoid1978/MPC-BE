@@ -417,6 +417,7 @@ public:
 
 	void Refresh();
 	bool Empty();
+	void RemoveMissingFiles();
 	void Remove(const std::vector<int>& items, const bool bDelete);
 
 	void Open(const CString& fn);

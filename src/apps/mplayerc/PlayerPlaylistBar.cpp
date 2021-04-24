@@ -1914,6 +1914,25 @@ bool CPlayerPlaylistBar::Empty()
 	return bWasPlaying;
 }
 
+void CPlayerPlaylistBar::RemoveMissingFiles()
+{
+	if (GetCurTab().type == PLAYLIST) {
+		auto& PlayList = GetCurPlayList();
+
+		POSITION pos = PlayList.GetHeadPosition();
+		while (pos) {
+			POSITION cur = pos;
+			CPlaylistItem& pli = PlayList.GetNext(pos);
+			if (pli.m_type == CPlaylistItem::file) {
+				LPCWSTR path = pli.m_fns.front();
+				if (!::PathIsURLW(path) && !::PathFileExistsW(path)) {
+					PlayList.RemoveAt(cur);
+				}
+			}
+		}
+	}
+}
+
 void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelete)
 {
 	if (!items.empty()) {
@@ -3315,6 +3334,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_REMOVE,
 		M_DELETE,
 		M_CLEAR,
+		M_REMOVEMISSINGFILES,
 		M_TOCLIPBOARD,
 		M_FROMCLIPBOARD,
 		M_SAVEAS,
@@ -3348,6 +3368,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_DELETE, ResStr(IDS_PLAYLIST_DELETE) + L"\tShift+Delete");
 		m.AppendMenu(MF_SEPARATOR);
 		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
+		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_REMOVEMISSINGFILES, ResStr(IDS_PLAYLIST_REMOVEMISSINGFILES));
 		m.AppendMenu(MF_SEPARATOR);
 	}
 	m.AppendMenu(MF_STRING | (m_list.GetSelectedCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_TOCLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD) + L"\tCltr+C");
@@ -3475,6 +3496,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				CloseMedia();
 			}
 			break;
+		case M_REMOVEMISSINGFILES:
+			RemoveMissingFiles();
 		case M_SORTBYID:
 			if (bExplorer) {
 				return;
