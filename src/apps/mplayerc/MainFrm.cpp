@@ -143,6 +143,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_MPCVR_SWITCH_FULLSCREEN, OnMPCVRSwitchFullscreen)
+	ON_MESSAGE(WM_DXVASTATE_CHANGE, OnDXVAStateChange)
 
 	ON_MESSAGE(WM_HANDLE_CMDLINE, HandleCmdLine)
 
@@ -5378,6 +5379,15 @@ LRESULT CMainFrame::OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam)
 
 	FlyBarSetPos();
 	OSDBarSetPos();
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnDXVAStateChange(WPARAM wParam, LPARAM lParam)
+{
+	if (m_wndToolBar && ::IsWindow(m_wndToolBar.GetSafeHwnd())) {
+		m_wndToolBar.Invalidate();
+	}
 
 	return 0;
 }

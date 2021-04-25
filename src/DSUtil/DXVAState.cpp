@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,13 +31,26 @@ namespace DXVAState {
 	CString m_sDXVADecoderDescription = L"Software";
 	CString m_sDXVADecoderShortDescription;
 
+	static void OnChangeState()
+	{
+		if (const auto app = AfxGetApp()) {
+			if (const auto wnd = app->GetMainWnd()) {
+				::PostMessageW(wnd->GetSafeHwnd(), WM_DXVASTATE_CHANGE, 0, 0);
+			}
+		}
+	}
+
 	void ClearState()
 	{
-		m_bDXVActive      = FALSE;
-		m_guidDXVADecoder = GUID_NULL;
+		if (m_bDXVActive) {
+			m_bDXVActive      = FALSE;
+			m_guidDXVADecoder = GUID_NULL;
 
-		m_sDXVADecoderDescription = L"Software";
-		m_sDXVADecoderShortDescription.Empty();
+			m_sDXVADecoderDescription = L"Software";
+			m_sDXVADecoderShortDescription.Empty();
+
+			OnChangeState();
+		}
 	}
 
 	void SetActiveState(const GUID& guidDXVADecoder, LPCWSTR customDescription/* = nullptr*/)
@@ -58,6 +71,8 @@ namespace DXVAState {
 			m_sDXVADecoderShortDescription = L"DXVA2";
 			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVAMode(m_guidDXVADecoder));
 		}
+
+		OnChangeState();
 	}
 
 	const BOOL GetState()

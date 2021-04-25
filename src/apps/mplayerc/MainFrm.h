@@ -967,6 +967,7 @@ public:
 	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
 
 	LRESULT OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam);
+	LRESULT OnDXVAStateChange(WPARAM wParam, LPARAM lParam);
 
 	std::mutex m_mutex_cmdLineQueue;
 	std::deque<std::vector<BYTE>> m_cmdLineQueue;
