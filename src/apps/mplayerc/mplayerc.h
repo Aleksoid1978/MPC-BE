@@ -69,14 +69,13 @@ private:
 
 	virtual BOOL OnIdle(LONG lCount) override;
 public:
+	CAppSettings m_s;
+	CString m_AudioRendererDisplayName_CL;
+
 	CMPlayerCApp();
 	~CMPlayerCApp();
 
 	void ShowCmdlnSwitches() const;
-
-	CString			m_AudioRendererDisplayName_CL;
-
-	CAppSettings m_s;
 
 	typedef UINT (*PTR_GetRemoteControlCode)(UINT nInputcode, HRAWINPUT hRawInput);
 

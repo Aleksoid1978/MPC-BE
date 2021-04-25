@@ -60,6 +60,6 @@ public:
 
 	bool Clear();
 	bool GetSessionInfo(SessionInfo_t& sesInfo);
-	void GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count);
+	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void SetSessionInfo(SessionInfo_t& sesInfo);
 };

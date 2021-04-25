@@ -648,7 +648,16 @@ void CAppSettings::ResetSettings()
 	dZoomY = 1.0;
 	sizeAspectRatio.cx = 0;
 	sizeAspectRatio.cy = 0;
+
 	bKeepHistory = true;
+	bRecentFilesMenuEllipsis = true;
+	bRememberDVDPos = false;
+	bRememberFilePos = false;
+	// playback positions for last played DVDs
+	nCurrentDvdPosition = -1;
+	memset(DvdPosition, 0, sizeof(DvdPosition));
+	// playback positions for last played files
+	nCurrentFilePosition = -1;
 
 	// Window size
 	nStartupWindowMode = STARTUPWND_DEFAULT;
@@ -869,17 +878,6 @@ void CAppSettings::ResetSettings()
 	fBDAIgnoreEncryptedChannels = false;
 
 	m_DVBChannels.clear();
-
-	bRecentFilesMenuEllipsis = true;
-
-	// playback positions for last played DVDs
-	bRememberDVDPos = false;
-	nCurrentDvdPosition = -1;
-	memset(DvdPosition, 0, sizeof(DvdPosition));
-
-	// playback positions for last played files
-	bRememberFilePos = false;
-	nCurrentFilePosition = -1;
 
 	bStartMainTitle = false;
 	bNormalStartDVD = true;
