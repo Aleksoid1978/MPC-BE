@@ -28,8 +28,8 @@
 #include "libavutil/version.h"
 
 #define LIBAVCODEC_VERSION_MAJOR  58
-#define LIBAVCODEC_VERSION_MINOR 135
-#define LIBAVCODEC_VERSION_MICRO 100
+#define LIBAVCODEC_VERSION_MINOR 136
+#define LIBAVCODEC_VERSION_MICRO 101
 
 #define LIBAVCODEC_VERSION_INT  AV_VERSION_INT(LIBAVCODEC_VERSION_MAJOR, \
                                                LIBAVCODEC_VERSION_MINOR, \
@@ -51,9 +51,6 @@
  * at once through the bump. This improves the git bisect-ability of the change.
  */
 
-#ifndef FF_API_AVCTX_TIMEBASE
-#define FF_API_AVCTX_TIMEBASE    (LIBAVCODEC_VERSION_MAJOR < 59)
-#endif
 #ifndef FF_API_CODED_FRAME
 #define FF_API_CODED_FRAME       (LIBAVCODEC_VERSION_MAJOR < 59)
 #endif
@@ -167,6 +164,12 @@
 #endif
 #ifndef FF_API_INIT_PACKET
 #define FF_API_INIT_PACKET         (LIBAVCODEC_VERSION_MAJOR < 60)
+#endif
+#ifndef FF_API_AVCTX_TIMEBASE
+#define FF_API_AVCTX_TIMEBASE    (LIBAVCODEC_VERSION_MAJOR < 60)
+#endif
+#ifndef FF_API_MPEGVIDEO_OPTS
+#define FF_API_MPEGVIDEO_OPTS      (LIBAVCODEC_VERSION_MAJOR < 60)
 #endif
 
 #endif /* AVCODEC_VERSION_H */

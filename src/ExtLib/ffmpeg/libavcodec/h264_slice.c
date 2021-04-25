@@ -304,9 +304,8 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
     if (dst == src)
         return 0;
 
-    // We can't fail if SPS isn't set at it breaks current skip_frame code
-    //if (!h1->ps.sps)
-    //    return AVERROR_INVALIDDATA;
+    if (inited && !h1->ps.sps)
+        return AVERROR_INVALIDDATA;
 
     if (inited &&
         (h->width                 != h1->width                 ||
@@ -465,21 +464,17 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
     return err;
 }
 
-// ==> Start patch MPC
 int ff_h264_update_thread_context_for_user(AVCodecContext *dst,
                                            const AVCodecContext *src)
 {
-    H264Context *h = dst->priv_data, *h1 = src->priv_data;
-    int err = 0;
+    H264Context *h = dst->priv_data;
+    const H264Context *h1 = src->priv_data;
 
-    if (dst == src)
-        return 0;
+    h->is_avc = h1->is_avc;
+    h->nal_length_size = h1->nal_length_size;
 
-    h->x264_build = h1->x264_build;
-
-    return err;
+    return 0;
 }
-// ==> End patch MPC
 
 static int h264_frame_start(H264Context *h)
 {
@@ -958,6 +953,11 @@ static int h264_slice_header_init(H264Context *h)
 {
     const SPS *sps = h->ps.sps;
     int i, ret;
+
+    if (!sps) {
+        ret = AVERROR_INVALIDDATA;
+        goto fail;
+    }
 
     ff_set_sar(h->avctx, sps->sar);
     av_pix_fmt_get_chroma_sub_sample(h->avctx->pix_fmt,

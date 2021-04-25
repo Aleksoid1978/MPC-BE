@@ -120,6 +120,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 }
 #endif
 
+#if FF_API_COLORSPACE_NAME
 const char *av_get_colorspace_name(enum AVColorSpace val)
 {
     static const char * const name[] = {
@@ -135,7 +136,7 @@ const char *av_get_colorspace_name(enum AVColorSpace val)
         return NULL;
     return name[val];
 }
-
+#endif
 static void get_frame_defaults(AVFrame *frame)
 {
     if (frame->extended_data != frame->data)
@@ -468,7 +469,7 @@ int av_frame_ref(AVFrame *dst, const AVFrame *src)
         if (ret < 0)
             goto fail;
 
-        return ret;
+        return 0;
     }
 
     /* ref the buffers */
@@ -852,6 +853,7 @@ const char *av_frame_side_data_name(enum AVFrameSideDataType type)
     case AV_FRAME_DATA_VIDEO_ENC_PARAMS:            return "Video encoding parameters";
     case AV_FRAME_DATA_SEI_UNREGISTERED:            return "H.26[45] User Data Unregistered SEI message";
     case AV_FRAME_DATA_FILM_GRAIN_PARAMS:           return "Film grain parameters";
+    case AV_FRAME_DATA_DETECTION_BBOXES:            return "Bounding boxes for object detection and classification";
     }
     return NULL;
 }

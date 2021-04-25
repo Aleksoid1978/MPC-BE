@@ -3495,6 +3495,18 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
 
     return 0;
 }
+
+static int mpeg4_update_thread_context_for_user(AVCodecContext *dst,
+                                                const AVCodecContext *src)
+{
+    MpegEncContext *m = dst->priv_data;
+    const MpegEncContext *m1 = src->priv_data;
+
+    m->quarter_sample = m1->quarter_sample;
+    m->divx_packed    = m1->divx_packed;
+
+    return 0;
+}
 #endif
 
 static av_cold void mpeg4_init_static(void)
@@ -3579,13 +3591,13 @@ AVCodec ff_mpeg4_decoder = {
                              AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal         = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM |
-                             FF_CODEC_CAP_ALLOCATE_PROGRESS |
-                             FF_CODEC_CAP_INIT_CLEANUP,
+                             FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = ff_mpeg_flush,
     .max_lowres            = 3,
     .pix_fmts              = ff_h263_hwaccel_pixfmt_list_420,
     .profiles              = NULL_IF_CONFIG_SMALL(ff_mpeg4_video_profiles),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(mpeg4_update_thread_context),
+    .update_thread_context_for_user = ONLY_IF_THREADS_ENABLED(mpeg4_update_thread_context_for_user),
     .priv_class = &mpeg4_class,
     .hw_configs            = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_MPEG4_NVDEC_HWACCEL

@@ -221,6 +221,7 @@ static void free_buffers(CFHDContext *s)
     int i, j;
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->plane); i++) {
+        Plane *p = &s->plane[i];
         av_freep(&s->plane[i].idwt_buf);
         av_freep(&s->plane[i].idwt_tmp);
         s->plane[i].idwt_size = 0;
@@ -230,9 +231,16 @@ static void free_buffers(CFHDContext *s)
 
         for (j = 0; j < 10; j++)
             s->plane[i].l_h[j] = NULL;
+
+        for (j = 0; j < DWT_LEVELS_3D; j++)
+            p->band[j][0].read_ok =
+            p->band[j][1].read_ok =
+            p->band[j][2].read_ok =
+            p->band[j][3].read_ok = 0;
     }
     s->a_height = 0;
     s->a_width  = 0;
+    s->a_transform_type = INT_MIN;
 }
 
 static int alloc_buffers(AVCodecContext *avctx)
@@ -356,6 +364,7 @@ static int alloc_buffers(AVCodecContext *avctx)
         }
     }
 
+    s->a_transform_type = s->transform_type;
     s->a_height = s->coded_height;
     s->a_width  = s->coded_width;
     s->a_format = s->coded_format;
@@ -655,7 +664,8 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
                 s->coded_height = s->a_height;
 
             if (s->a_width != s->coded_width || s->a_height != s->coded_height ||
-                s->a_format != s->coded_format) {
+                s->a_format != s->coded_format ||
+                s->transform_type != s->a_transform_type) {
                 free_buffers(s);
                 if ((ret = alloc_buffers(avctx)) < 0) {
                     free_buffers(s);
@@ -698,11 +708,18 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
         coeff_data = s->plane[s->channel_num].subband[s->subband_num_actual];
 
         /* Lowpass coefficients */
-        if (tag == BitstreamMarker && data == 0xf0f && s->a_width && s->a_height) {
-            int lowpass_height = s->plane[s->channel_num].band[0][0].height;
-            int lowpass_width  = s->plane[s->channel_num].band[0][0].width;
-            int lowpass_a_height = s->plane[s->channel_num].band[0][0].a_height;
-            int lowpass_a_width  = s->plane[s->channel_num].band[0][0].a_width;
+        if (tag == BitstreamMarker && data == 0xf0f) {
+            int lowpass_height, lowpass_width, lowpass_a_height, lowpass_a_width;
+
+            if (!s->a_width || !s->a_height) {
+                ret = AVERROR_INVALIDDATA;
+                goto end;
+            }
+
+            lowpass_height = s->plane[s->channel_num].band[0][0].height;
+            lowpass_width  = s->plane[s->channel_num].band[0][0].width;
+            lowpass_a_height = s->plane[s->channel_num].band[0][0].a_height;
+            lowpass_a_width  = s->plane[s->channel_num].band[0][0].a_width;
 
             if (lowpass_width < 3 ||
                 lowpass_width > lowpass_a_width) {
@@ -749,19 +766,29 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
                        lowpass_width * sizeof(*coeff_data));
             }
 
+            s->plane[s->channel_num].band[0][0].read_ok = 1;
+
             av_log(avctx, AV_LOG_DEBUG, "Lowpass coefficients %d\n", lowpass_width * lowpass_height);
         }
 
-        if ((tag == BandHeader || tag == BandSecondPass) && s->subband_num_actual != 255 && s->a_width && s->a_height) {
-            int highpass_height = s->plane[s->channel_num].band[s->level][s->subband_num].height;
-            int highpass_width  = s->plane[s->channel_num].band[s->level][s->subband_num].width;
-            int highpass_a_width = s->plane[s->channel_num].band[s->level][s->subband_num].a_width;
-            int highpass_a_height = s->plane[s->channel_num].band[s->level][s->subband_num].a_height;
-            int highpass_stride = s->plane[s->channel_num].band[s->level][s->subband_num].stride;
+        av_assert0(s->subband_num_actual != 255);
+        if (tag == BandHeader || tag == BandSecondPass) {
+            int highpass_height, highpass_width, highpass_a_width, highpass_a_height, highpass_stride, a_expected;
             int expected;
-            int a_expected = highpass_a_height * highpass_a_width;
             int level, run, coeff;
             int count = 0, bytes;
+
+            if (!s->a_width || !s->a_height) {
+                ret = AVERROR_INVALIDDATA;
+                goto end;
+            }
+
+            highpass_height = s->plane[s->channel_num].band[s->level][s->subband_num].height;
+            highpass_width  = s->plane[s->channel_num].band[s->level][s->subband_num].width;
+            highpass_a_width = s->plane[s->channel_num].band[s->level][s->subband_num].a_width;
+            highpass_a_height = s->plane[s->channel_num].band[s->level][s->subband_num].a_height;
+            highpass_stride = s->plane[s->channel_num].band[s->level][s->subband_num].stride;
+            a_expected = highpass_a_height * highpass_a_width;
 
             if (!got_buffer) {
                 av_log(avctx, AV_LOG_ERROR, "No end of header tag found\n");
@@ -873,6 +900,7 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
                 bytestream2_seek(&gb, bytes, SEEK_CUR);
 
             av_log(avctx, AV_LOG_DEBUG, "End subband coeffs %i extra %i\n", count, count - expected);
+            s->plane[s->channel_num].band[s->level][s->subband_num].read_ok = 1;
 finish:
             if (s->subband_num_actual != 255)
                 s->codebook = 0;
@@ -888,6 +916,7 @@ finish:
     ff_thread_finish_setup(avctx);
 
     if (!s->a_width || !s->a_height || s->a_format == AV_PIX_FMT_NONE ||
+        s->a_transform_type == INT_MIN ||
         s->coded_width || s->coded_height || s->coded_format != AV_PIX_FMT_NONE) {
         av_log(avctx, AV_LOG_ERROR, "Invalid dimensions\n");
         ret = AVERROR(EINVAL);
@@ -898,6 +927,22 @@ finish:
         av_log(avctx, AV_LOG_ERROR, "No end of header tag found\n");
         ret = AVERROR(EINVAL);
         goto end;
+    }
+
+    for (plane = 0; plane < s->planes; plane++) {
+        int o, level;
+
+        for (level = 0; level < (s->transform_type == 0 ? DWT_LEVELS : DWT_LEVELS_3D) ; level++) {
+            if (s->transform_type == 2)
+                if (level == 2 || level == 5)
+                    continue;
+            for (o = !!level; o < 4 ; o++) {
+                if (!s->plane[plane].band[level][o].read_ok) {
+                    ret = AVERROR_INVALIDDATA;
+                    goto end;
+                }
+            }
+        }
     }
 
     if (s->transform_type == 0 && s->sample_type != 1) {
@@ -1381,12 +1426,14 @@ static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
     if (pdst->plane[0].idwt_size != psrc->plane[0].idwt_size ||
         pdst->a_format != psrc->a_format ||
         pdst->a_width != psrc->a_width ||
-        pdst->a_height != psrc->a_height)
+        pdst->a_height != psrc->a_height ||
+        pdst->a_transform_type != psrc->a_transform_type)
         free_buffers(pdst);
 
     pdst->a_format = psrc->a_format;
     pdst->a_width  = psrc->a_width;
     pdst->a_height = psrc->a_height;
+    pdst->a_transform_type = psrc->a_transform_type;
     pdst->transform_type = psrc->transform_type;
     pdst->progressive = psrc->progressive;
     pdst->planes = psrc->planes;
@@ -1395,6 +1442,7 @@ static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
         pdst->coded_width  = pdst->a_width;
         pdst->coded_height = pdst->a_height;
         pdst->coded_format = pdst->a_format;
+        pdst->transform_type = pdst->a_transform_type;
         ret = alloc_buffers(dst);
         if (ret < 0)
             return ret;

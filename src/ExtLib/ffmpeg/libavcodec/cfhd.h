@@ -114,6 +114,7 @@ typedef struct SubBand {
     int width;
     int a_height;
     int height;
+    int8_t read_ok;
 } SubBand;
 
 typedef struct Plane {
@@ -165,6 +166,7 @@ typedef struct CFHDContext {
     int a_width;
     int a_height;
     int a_format;
+    int a_transform_type;
 
     int bpc; // bits per channel/component
     int channel_cnt;

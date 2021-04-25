@@ -10,7 +10,6 @@
 * libavcodec/aacdec_template.c
 * libavcodec/aacsbr_template.c
 * libavcodec/bsf_list.c
-* libavcodec/codec.h
 * libavcodec/codec_list.c
 * libavcodec/decode.c
 * libavcodec/dxva2.c
@@ -31,7 +30,6 @@
 * libavcodec/mpegaudio_parser.c
 * libavcodec/parser_list.c
 * libavcodec/pcm.c
-* libavcodec/pthread_frame.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
 * libavcodec/vp9.c

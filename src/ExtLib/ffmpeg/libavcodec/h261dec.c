@@ -79,6 +79,7 @@ static av_cold int h261_decode_init(AVCodecContext *avctx)
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 
     h->gob_start_code_skipped = 0;
+    ff_mpv_idct_init(s);
 
     ff_thread_once(&init_static_once, h261_decode_init_static);
 
@@ -595,10 +596,6 @@ static int h261_decode_frame(AVCodecContext *avctx, void *data,
 retry:
     init_get_bits(&s->gb, buf, buf_size * 8);
 
-    if (!s->context_initialized)
-        // we need the IDCT permutation for reading a custom matrix
-        ff_mpv_idct_init(s);
-
     ret = h261_decode_picture_header(h);
 
     /* skip if the header was thrashed */
@@ -678,6 +675,6 @@ AVCodec ff_h261_decoder = {
     .close          = h261_decode_end,
     .decode         = h261_decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .max_lowres     = 3,
 };
