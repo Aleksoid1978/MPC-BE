@@ -1226,6 +1226,11 @@ void* CMSEXPORT cmsStageData(const cmsStage* mpe)
     return mpe -> Data;
 }
 
+cmsContext CMSEXPORT cmsGetStageContextID(const cmsStage* mpe)
+{
+    return mpe -> ContextID;
+}
+
 cmsStage*  CMSEXPORT cmsStageNext(const cmsStage* mpe)
 {
     return mpe -> Next;
