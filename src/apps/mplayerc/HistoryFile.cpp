@@ -306,6 +306,26 @@ void CHistoryFile::GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned c
 	}
 }
 
+void CHistoryFile::GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	recentSessions.clear();
+	ReadFile();
+
+	if (count > m_SessionInfos.size()) {
+		count = m_SessionInfos.size();
+	}
+
+	if (count) {
+		recentSessions.reserve(count);
+		auto it = m_SessionInfos.cbegin();
+		for (unsigned i = 0; i < count; i++) {
+			recentSessions.emplace_back(*it++);
+		}
+	}
+}
+
 void CHistoryFile::SetSessionInfo(SessionInfo_t& sesInfo)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
