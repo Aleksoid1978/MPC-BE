@@ -7252,7 +7252,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_frma()
     Get_C4 (Codec,                                              "data_format");
 
     FILLING_BEGIN();
-        CodecID_Fill(Ztring().From_CC4(Codec), Stream_Video, StreamPos_Last, InfoCodecID_Format_Mpeg4);
+        CodecID_Fill(Ztring().From_CC4(Codec), StreamKind_Last, StreamPos_Last, InfoCodecID_Format_Mpeg4);
     FILLING_END();
 }
 

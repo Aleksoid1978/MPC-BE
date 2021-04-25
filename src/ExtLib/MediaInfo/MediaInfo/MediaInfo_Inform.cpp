@@ -50,6 +50,9 @@
 # if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
 #include "MediaInfo/OutputHelpers.h"
 #endif //MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
+
+//---------------------------------------------------------------------------
+#include <ctime>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -419,18 +422,38 @@ Ztring MediaInfo_Internal::Inform()
 
     if (HTML) Retour+=__T("\n</body>\n</html>\n");
 
-    if (MediaInfoLib::Config.Inform_Version_Get() && !CSV && !HTML && !XML && !XML_0_7_78_MA && !XML_0_7_78_MI && !JSON)
+    if (!CSV && !HTML && !XML && !XML_0_7_78_MA && !XML_0_7_78_MI && !JSON)
     {
-        Ztring Name=MediaInfoLib::Config.Language_Get(__T("ReportBy"));
-        int8u Name_Size=MediaInfoLib::Config.Language_Get(__T("  Config_Text_ColumnSize")).To_int8u();
-        if (Name_Size==0)
-            Name_Size=32; //Default
-        Name.resize(Name_Size, ' ');
+        if (MediaInfoLib::Config.Inform_Version_Get())
+        {
+            Ztring Name=MediaInfoLib::Config.Language_Get(__T("ReportBy"));
+            int8u Name_Size=MediaInfoLib::Config.Language_Get(__T("  Config_Text_ColumnSize")).To_int8u();
+            if (Name_Size==0)
+                Name_Size=32; //Default
+            Name.resize(Name_Size, ' ');
 
-        Retour+=Name;
-        Retour+=MediaInfoLib::Config.Language_Get(__T("  Config_Text_Separator"));
-        Retour+=MediaInfo_Version;
-        Retour+=MediaInfoLib::Config.LineSeparator_Get();
+            Retour+=Name;
+            Retour+=MediaInfoLib::Config.Language_Get(__T("  Config_Text_Separator"));
+            Retour+=MediaInfo_Version;
+            Retour+=MediaInfoLib::Config.LineSeparator_Get();
+        }
+
+        if (MediaInfoLib::Config.Inform_Timestamp_Get())
+        {
+            Ztring Name=MediaInfoLib::Config.Language_Get(__T("CreatedOn"));
+
+            int8u Name_Size=MediaInfoLib::Config.Language_Get(__T("  Config_Text_ColumnSize")).To_int8u();
+            if (Name_Size==0)
+                Name_Size=32; //Default
+            Name.resize(Name_Size, ' ');
+
+            Ztring Date=Ztring().Date_From_Seconds_1970((int64s)time(NULL));
+
+            Retour+=Name;
+            Retour+=MediaInfoLib::Config.Language_Get(__T("  Config_Text_Separator"));
+            Retour+=Date;
+            Retour+=MediaInfoLib::Config.LineSeparator_Get();
+        }
     }
 
     #if defined(MEDIAINFO_XML_YES)

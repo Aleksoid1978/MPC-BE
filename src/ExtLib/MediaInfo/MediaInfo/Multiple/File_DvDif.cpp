@@ -273,6 +273,8 @@ File_DvDif::File_DvDif()
     Speed_Contains_NULL=0;
     Speed_FrameCount_Arb_Incoherency=0;
     Speed_FrameCount_Stts_Fluctuation=0;
+    Speed_FrameCount_system[0]=0;
+    Speed_FrameCount_system[1]=0;
     AbstBf_Current=(0x7FFFFF)<<1;
     AbstBf_Previous=(0x7FFFFF)<<1;
     AbstBf_Previous_MaxAbst=0xFFFFFF;
@@ -833,6 +835,11 @@ bool File_DvDif::Demux_UnpacketizeContainer_Test()
             Demux_Offset=(size_t)(File_Size-File_Offset); //Using the complete buffer (no next sync)
 
         Element_Code=-1;
+        FrameInfo.DTS=FrameInfo.PTS=Speed_FrameCount_system[0]*100100000/3+Speed_FrameCount_system[1]*40000000;
+        Speed_FrameCount_system[system]++;
+        int64u NextPTS=Speed_FrameCount_system[0]*100100000/3+Speed_FrameCount_system[1]*40000000;
+        Speed_FrameCount_system[system]--;
+        FrameInfo.DUR=(int64u)-1; // Unknown, system flag is not yet checked
         Demux_UnpacketizeContainer_Demux();
     }
 

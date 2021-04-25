@@ -345,10 +345,10 @@ size_t MediaInfoList_Internal::Save(size_t)
 //---------------------------------------------------------------------------
 void MediaInfoList_Internal::Close(size_t FilePos)
 {
-    if (IsRunning())
+    if (IsRunning() || IsTerminating())
     {
         RequestTerminate();
-        while(IsExited())
+        while(!IsExited())
             Yield();
     }
 

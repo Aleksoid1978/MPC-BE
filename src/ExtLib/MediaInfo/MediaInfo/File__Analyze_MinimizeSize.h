@@ -774,7 +774,7 @@ public :
     #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
     void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance);
     #endif
-    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES)
+    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES) || defined(MEDIAINFO_MXF_YES)
     struct mastering_metadata_2086
     {
         int16u Primaries[8];

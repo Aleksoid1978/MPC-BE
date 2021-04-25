@@ -518,7 +518,9 @@ Thread::returnvalue Thread::RequestTerminate()
 Thread::returnvalue Thread::ForceTerminate()
 {
     //Terminating (not clean)
+    #if !defined(__ANDROID_API__)
     pthread_cancel((pthread_t)ThreadPointer);
+    #endif
 
     //Configuring
     State=State_Terminated;

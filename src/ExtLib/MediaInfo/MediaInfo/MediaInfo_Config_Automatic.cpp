@@ -326,6 +326,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Cover_Description;Cover description\n"
     "Cover_Mime;Cover MIME\n"
     "Cover_Type;Cover type\n"
+    "CreatedOn;Report created on\n"
     "Cropped;Crop dimensions\n"
     "Custom;Custom\n"
     "Customize;Customize\n"

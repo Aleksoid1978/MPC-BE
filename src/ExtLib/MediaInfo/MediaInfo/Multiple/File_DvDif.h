@@ -167,6 +167,7 @@ protected :
     int64u Speed_Contains_NULL;                         //Per Frame - Error 4
     int64u Speed_FrameCount_Arb_Incoherency;            //Global    - Error 5
     int64u Speed_FrameCount_Stts_Fluctuation;           //Global    - Error 6
+    int64u Speed_FrameCount_system[2];                  //Global    - Total per system (NTSC or PAL)
     struct abst_bf
     {
         struct value_trust

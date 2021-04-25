@@ -155,6 +155,8 @@ Actor;Acteur
 Actor_Character;Personnage joué
 Added_Date;Date d'ajout
 Address;Adresse
+Add creation date to text output;Ajouter la date de creation à la sortie texte
+Add version to text output;Ajouter la version à la sortie texte
 AdID;
 Advanced;Avancée
 Advanced mode;Mode Avancé

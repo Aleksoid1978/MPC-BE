@@ -445,7 +445,14 @@ void File_DvDif::Read_Buffer_Continue()
                             bool FSC=(Buffer[Buffer_Offset+1  ]&0x08)?true:false;
                             bool FSP=(Buffer[Buffer_Offset+1  ]&0x04)?true:false;
                             if (!FSC && FSP) // Only first part of DV50/DV100
+                            {
+                                FrameInfo.DTS=FrameInfo.PTS=Speed_FrameCount_system[0]*100100000/3+Speed_FrameCount_system[1]*40000000;
+                                Speed_FrameCount_system[system]++;
+                                int64u NextPTS=Speed_FrameCount_system[0]*100100000/3+Speed_FrameCount_system[1]*40000000;
+                                Speed_FrameCount_system[system]--;
+                                FrameInfo.DUR=NextPTS-FrameInfo.PTS; // PTS + DUR = PTS of next frame, DUR rounding is adapted in order to have the exact PTS of next frame
                                 Demux(Buffer+Buffer_Offset+3+Pos+1, 4, ContentType_MainStream);
+                            }
                             Captions_Flags.set(Caption_Present);
 
                             // Quick parity check
@@ -678,6 +685,12 @@ void File_DvDif::Errors_Stats_Update()
             return;
     }
 
+    FrameInfo.DTS=FrameInfo.PTS=Speed_FrameCount_system[0]*100100000/3+Speed_FrameCount_system[1]*40000000;
+    Speed_FrameCount_system[system]++;
+    int64u NextPTS=Speed_FrameCount_system[0]*100100000/3+Speed_FrameCount_system[1]*40000000;
+    Speed_FrameCount_system[system]--;
+    FrameInfo.DUR=NextPTS-FrameInfo.PTS; // PTS + DUR = PTS of next frame, DUR rounding is adapted in order to have the exact PTS of next frame
+
     Ztring Errors_Stats_Line;
     {
         bool Errors_AreDetected=false;
@@ -725,6 +738,7 @@ void File_DvDif::Errors_Stats_Update()
 
         EVENT_BEGIN(DvDif, Change, 0)
             Event.StreamOffset=Speed_FrameCount_StartOffset;
+            Event.FrameNumber=Speed_FrameCount;
             switch (video_source_stype)
             {
                 case 0x00 :
@@ -1652,6 +1666,7 @@ void File_DvDif::Errors_Stats_Update()
             struct MediaInfo_Event_DvDif_Analysis_Frame_1 Event1;
             Event_Prepare((struct MediaInfo_Event_Generic*)&Event1, MediaInfo_EventCode_Create(MediaInfo_Parser_DvDif, MediaInfo_Event_DvDif_Analysis_Frame, 1), sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1));
             Event1.StreamOffset=Speed_FrameCount_StartOffset;
+            Event1.FrameNumber=Speed_FrameCount;
             Event1.TimeCode=Event.TimeCode;
             Event1.RecordedDateTime1=Event.RecordedDateTime1;
             Event1.RecordedDateTime2Buggy=Event.RecordedDateTime2;
@@ -1792,6 +1807,7 @@ void File_DvDif::Errors_Stats_Update()
     Speed_Arb_Last=Speed_Arb_Current;
     Speed_Arb_Current.Clear();
     Speed_FrameCount++;
+    Speed_FrameCount_system[system]++;
     REC_IsValid=false;
     audio_source_mode.clear();
     Speed_Contains_NULL=0;

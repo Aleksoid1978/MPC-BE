@@ -3577,38 +3577,43 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
         std::map<std::string, Ztring>::iterator Info_MasteringDisplay_WhitePointChromaticity = Descriptor->second.Infos.find("MasteringDisplay_WhitePointChromaticity");
         std::map<std::string, Ztring>::iterator MasteringDisplay_Luminance_Max = Descriptor->second.Infos.find("MasteringDisplay_Luminance_Max");
         std::map<std::string, Ztring>::iterator MasteringDisplay_Luminance_Min = Descriptor->second.Infos.find("MasteringDisplay_Luminance_Min");
-        if (Info_MasteringDisplay_Primaries!= Descriptor->second.Infos.end() || Info_MasteringDisplay_WhitePointChromaticity!= Descriptor->second.Infos.end())
+        mastering_metadata_2086 MasteringMeta;
+        memset(&MasteringMeta, 0xFF, sizeof(MasteringMeta));
+        if (Info_MasteringDisplay_Primaries!= Descriptor->second.Infos.end())
         {
-            Ztring MasteringDisplay_ColorPrimaries;
-            if (Info_MasteringDisplay_Primaries!= Descriptor->second.Infos.end())
+            ZtringList Primaries (Info_MasteringDisplay_Primaries->second);
+            if (Primaries.size() == 6)
             {
-                MasteringDisplay_ColorPrimaries=Info_MasteringDisplay_Primaries->second;
-                if (Info_MasteringDisplay_WhitePointChromaticity!= Descriptor->second.Infos.end())
-                    MasteringDisplay_ColorPrimaries+=__T(", White point: ")+Info_MasteringDisplay_WhitePointChromaticity->second;
+                MasteringMeta.Primaries[0] = Primaries[0].To_int16u();
+                MasteringMeta.Primaries[1] = Primaries[1].To_int16u();
+                MasteringMeta.Primaries[2] = Primaries[2].To_int16u();
+                MasteringMeta.Primaries[3] = Primaries[3].To_int16u();
+                MasteringMeta.Primaries[4] = Primaries[4].To_int16u();
+                MasteringMeta.Primaries[5] = Primaries[5].To_int16u();
             }
-            else
-                    MasteringDisplay_ColorPrimaries=__T("White point: ")+Info_MasteringDisplay_WhitePointChromaticity->second;
-
-            if (MasteringDisplay_ColorPrimaries==__T("R: x=0.640000 y=0.330000, G: x=0.300000 y=0.600000, B: x=0.150000 y=0.060000, White point: x=0.312700 y=0.329000")) MasteringDisplay_ColorPrimaries=__T("BT.709");
-            if (MasteringDisplay_ColorPrimaries==__T("R: x=0.708000 y=0.292000, G: x=0.170000 y=0.797000, B: x=0.131000 y=0.046000, White point: x=0.312700 y=0.329000")) MasteringDisplay_ColorPrimaries=__T("BT.2020");
-            if (MasteringDisplay_ColorPrimaries==__T("R: x=0.680000 y=0.320000, G: x=0.265000 y=0.690000, B: x=0.150000 y=0.060000, White point: x=0.312700 y=0.329000")) MasteringDisplay_ColorPrimaries=__T("Display P3");
-
-            Descriptor->second.Infos["MasteringDisplay_ColorPrimaries"]=MasteringDisplay_ColorPrimaries;
         }
-        if (MasteringDisplay_Luminance_Max!=Descriptor->second.Infos.end() || MasteringDisplay_Luminance_Min!=Descriptor->second.Infos.end())
+        if (Info_MasteringDisplay_WhitePointChromaticity!= Descriptor->second.Infos.end())
         {
-            Ztring MasteringDisplay_Luminance;
-            if (MasteringDisplay_Luminance_Min!=Descriptor->second.Infos.end())
+            ZtringList WhitePoint (Info_MasteringDisplay_WhitePointChromaticity->second);
+            if (WhitePoint.size() == 2)
             {
-                MasteringDisplay_Luminance=__T("min: ")+MasteringDisplay_Luminance_Min->second+__T(" cd/m2");
-                if (MasteringDisplay_Luminance_Max!=Descriptor->second.Infos.end())
-                    MasteringDisplay_Luminance+=__T(", max: ")+ MasteringDisplay_Luminance_Max->second+__T(" cd/m2");;
+                MasteringMeta.Primaries[6] = WhitePoint[0].To_int16u();
+                MasteringMeta.Primaries[7] = WhitePoint[1].To_int16u();
             }
-            else
-                    MasteringDisplay_Luminance=__T("max: ")+MasteringDisplay_Luminance_Max->second;
-
-            Descriptor->second.Infos["MasteringDisplay_Luminance"]=MasteringDisplay_Luminance;
         }
+        if (MasteringDisplay_Luminance_Min!=Descriptor->second.Infos.end())
+        {
+            MasteringMeta.Luminance[0] = MasteringDisplay_Luminance_Min->second.To_int32u();
+        }
+        if (MasteringDisplay_Luminance_Max!=Descriptor->second.Infos.end())
+        {
+            MasteringMeta.Luminance[1] = MasteringDisplay_Luminance_Max->second.To_int32u();
+        }
+        Ztring MasteringDisplay_ColorPrimaries;
+        Ztring MasteringDisplay_Luminance;
+        Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, MasteringMeta);
+        Descriptor->second.Infos["MasteringDisplay_ColorPrimaries"]=MasteringDisplay_ColorPrimaries;
+        Descriptor->second.Infos["MasteringDisplay_Luminance"]=MasteringDisplay_Luminance;
 
         for (std::map<std::string, Ztring>::iterator Info=Descriptor->second.Infos.begin(); Info!=Descriptor->second.Infos.end(); ++Info)
             if (Info!=Info_MasteringDisplay_Primaries
@@ -9789,34 +9794,13 @@ void File_Mxf::MasteringDisplayPrimaries()
     }
 
     FILLING_BEGIN();
-        //Reordering to RGB
-        size_t G=4, B=4, R=4;
-        for (size_t c=0; c<3; c++)
+        ZtringList MasteringDisplay_ColorPrimaries;
+        for (size_t c = 0; c < 3; c++)
         {
-            if (x[c]<17500 && y[c]<17500)
-                B=c;
-            else if (y[c]-x[c]>=0)
-                G=c;
-            else
-                R=c;
+            MasteringDisplay_ColorPrimaries.push_back(Ztring::ToZtring(x[c]));
+            MasteringDisplay_ColorPrimaries.push_back(Ztring::ToZtring(y[c]));
         }
-        if ((R|B|G)>=4)
-        {
-            //Order not automatically detected, betting on GBR order
-            G=0;
-            B=1;
-            R=2;
-        }
-
-        Ztring
-        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[R])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[R])/50000, 6)
-                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[G])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[G])/50000, 6)
-                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[B])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[B])/50000, 6)
-            ;
-        Descriptor_Fill("MasteringDisplay_Primaries", MasteringDisplay_ColorPrimaries);
+        Descriptor_Fill("MasteringDisplay_Primaries", MasteringDisplay_ColorPrimaries.Read());
     FILLING_END();
 }
 
@@ -9830,12 +9814,10 @@ void File_Mxf::MasteringDisplayWhitePointChromaticity()
     Get_B2(y,                                                   "white_point_y");
 
     FILLING_BEGIN();
-        Ztring
-        MasteringDisplay_ColorPrimaries=
-                                           __T("x=")+Ztring::ToZtring(((float64)x)/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y)/50000, 6);
-            ;
-        Descriptor_Fill("MasteringDisplay_WhitePointChromaticity", MasteringDisplay_ColorPrimaries);
+        ZtringList MasteringDisplay_WhitePointChromaticity;
+        MasteringDisplay_WhitePointChromaticity.push_back(Ztring::ToZtring(x));
+        MasteringDisplay_WhitePointChromaticity.push_back(Ztring::ToZtring(y));
+        Descriptor_Fill("MasteringDisplay_WhitePointChromaticity", MasteringDisplay_WhitePointChromaticity.Read());
     FILLING_END();
 }
 
@@ -9848,7 +9830,7 @@ void File_Mxf::MasteringDisplayMaximumLuminance()
     Get_B4 (max,                                                "Data");
 
     FILLING_BEGIN();
-        Descriptor_Fill("MasteringDisplay_Luminance_Max", Ztring::ToZtring(((float64)max)/10000, (max-((int)max)==0)?0:4));
+        Descriptor_Fill("MasteringDisplay_Luminance_Max", Ztring::ToZtring(max));
     FILLING_END();
 }
 
@@ -9861,7 +9843,7 @@ void File_Mxf::MasteringDisplayMinimumLuminance()
     Get_B4 (min,                                               "Data");
 
     FILLING_BEGIN();
-        Descriptor_Fill("MasteringDisplay_Luminance_Min", Ztring::ToZtring(((float64)min)/10000, 4));
+        Descriptor_Fill("MasteringDisplay_Luminance_Min", Ztring::ToZtring(min));
     FILLING_END();
 }
 

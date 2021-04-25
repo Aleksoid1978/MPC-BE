@@ -2938,8 +2938,7 @@ void File_Mpeg_Descriptors::Descriptor_7F_06()
     FILLING_BEGIN();
         if (elementary_PID_IsValid)
         {
-            mix_type;
-            Complete_Stream->Streams[elementary_PID]->Infos["MixType"]=Ztring().From_UTF8(mix_type?"Dependent":"Independent");;
+            Complete_Stream->Streams[elementary_PID]->Infos["MixType"]=Ztring().From_UTF8(mix_type?"Independent":"Dependent");;
             Complete_Stream->Streams[elementary_PID]->Infos["EditorialClassification"]=Mpeg_Descriptors_editorial_classification(editorial_classification);
             if (!Language.empty())
             {
