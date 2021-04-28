@@ -955,7 +955,6 @@ namespace Youtube
 			}
 			if (!chaptersStr.IsEmpty()) {
 				chaptersStr.Replace(R"(\/)", "/");
-				chaptersStr.Replace(R"(\")", R"(")");
 				chaptersStr.Replace(R"(\\)", R"(\)");
 				chaptersStr += "]}";
 
