@@ -8,6 +8,7 @@ Updated libraries:
 	ffmpeg git-n4.5-dev-385-gbb40f800bd;
 	Little-CMS git-2.12-12-gb423949;
 	MediaInfo git-v21.03-8-ge6a48693;
+	Speex-1.2.0-25-g870ff84;
 	ZenLib git-v0.4.39-g13b9d3db;
 
 1.5.7
