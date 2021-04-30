@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,13 +33,13 @@ int Rasterizer::getOverlayWidth() const
 
 Rasterizer::Rasterizer()
 	: fFirstSet(false)
-	, mpPathTypes(NULL)
-	, mpPathPoints(NULL)
+	, mpPathTypes(nullptr)
+	, mpPathPoints(nullptr)
 	, mPathPoints(0)
-	, mpEdgeBuffer(NULL)
+	, mpEdgeBuffer(nullptr)
 	, mEdgeHeapSize(0)
 	, mEdgeNext(0)
-	, mpScanBuffer(NULL)
+	, mpScanBuffer(nullptr)
 {
 	m_bUseAVX2 = CPUInfo::HaveAVX2();
 }
@@ -244,7 +244,7 @@ bool Rasterizer::EndPath(HDC hdc)
 	::CloseFigure(hdc);
 
 	if (::EndPath(hdc)) {
-		mPathPoints = GetPath(hdc, NULL, NULL, 0);
+		mPathPoints = GetPath(hdc, nullptr, nullptr, 0);
 
 		if (!mPathPoints) {
 			return true;
@@ -281,9 +281,9 @@ bool Rasterizer::PartialEndPath(HDC hdc, long dx, long dy)
 		BYTE* pNewTypes;
 		POINT* pNewPoints;
 
-		nPoints = GetPath(hdc, NULL, NULL, 0);
+		nPoints = GetPath(hdc, nullptr, nullptr, 0);
 
-		if (!nPoints) {
+		if (nPoints < 1) {
 			return true;
 		}
 
@@ -396,7 +396,6 @@ bool Rasterizer::ScanConvert()
 		}
 
 		// Initialize scanline list.
-
 		mpScanBuffer = DEBUG_NEW unsigned int[m_pOutlineData->mHeight];
 		ZeroMemory(mpScanBuffer, m_pOutlineData->mHeight * sizeof(unsigned int));
 

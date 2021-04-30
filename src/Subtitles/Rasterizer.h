@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,8 +60,8 @@ struct COverlayData {
 		, mOverlayWidth(0)
 		, mOverlayHeight(0)
 		, mOverlayPitch(0)
-		, mpOverlayBufferBody(NULL)
-		, mpOverlayBufferBorder(NULL) {}
+		, mpOverlayBufferBody(nullptr)
+		, mpOverlayBufferBorder(nullptr) {}
 
 	COverlayData(const COverlayData& overlayData)
 		: mOffsetX(overlayData.mOffsetX)
@@ -80,7 +80,7 @@ struct COverlayData {
 			memcpy(mpOverlayBufferBody, overlayData.mpOverlayBufferBody, mOverlayPitch * mOverlayHeight);
 			memcpy(mpOverlayBufferBorder, overlayData.mpOverlayBufferBorder, mOverlayPitch * mOverlayHeight);
 		} else {
-			mpOverlayBufferBody = mpOverlayBufferBorder = NULL;
+			mpOverlayBufferBody = mpOverlayBufferBorder = nullptr;
 		}
 	}
 
@@ -107,7 +107,7 @@ struct COverlayData {
 			memcpy(mpOverlayBufferBody, overlayData.mpOverlayBufferBody, mOverlayPitch * mOverlayHeight);
 			memcpy(mpOverlayBufferBorder, overlayData.mpOverlayBufferBorder, mOverlayPitch * mOverlayHeight);
 		} else {
-			mpOverlayBufferBody = mpOverlayBufferBorder = NULL;
+			mpOverlayBufferBody = mpOverlayBufferBorder = nullptr;
 		}
 
 		return *this;
@@ -116,11 +116,11 @@ struct COverlayData {
 	void DeleteOverlay() {
 		if (mpOverlayBufferBody) {
 			_aligned_free(mpOverlayBufferBody);
-			mpOverlayBufferBody = NULL;
+			mpOverlayBufferBody = nullptr;
 		}
 		if (mpOverlayBufferBorder) {
 			_aligned_free(mpOverlayBufferBorder);
-			mpOverlayBufferBorder = NULL;
+			mpOverlayBufferBorder = nullptr;
 		}
 	}
 };
