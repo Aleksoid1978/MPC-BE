@@ -65,6 +65,7 @@
   #define Description  = app_name + " x64 " + app_version
   #define msdk_dll     = "libmfxsw64.dll"
   #define msdk_dll_zip = "libmfxsw64.dll.zip"
+  #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #else
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
@@ -75,6 +76,7 @@
   #define Description  = app_name + " " + app_version
   #define msdk_dll     = "libmfxsw32.dll"
   #define msdk_dll_zip = "libmfxsw32.dll.zip"
+  #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
 #endif
 
 [Setup]
@@ -264,6 +266,9 @@ Source: "Shaders\*.hlsl";                  DestDir: "{commonappdata}\{#app_name}
 Source: "Shaders\*.hlsl";                  DestDir: "{app}\Shaders";                     Flags: ignoreversion; Components: main; Check: IniUsed()
 Source: "Shaders11\*.hlsl";                DestDir: "{commonappdata}\{#app_name}\Shaders11"; Flags: ignoreversion; Components: main;
 Source: "Shaders11\*.hlsl";                DestDir: "{app}\Shaders11";                   Flags: ignoreversion; Components: main; Check: IniUsed()
+
+Source: "VisualElements\*.png";            DestDir: "{app}";                             Flags: ignoreversion; Components: main
+Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 
 [Icons]
 #ifdef x64Build
