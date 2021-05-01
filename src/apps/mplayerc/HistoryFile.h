@@ -47,6 +47,7 @@ class CHistoryFile
 {
 private:
 	std::mutex m_Mutex;
+	DWORD m_LastAccessTick = 0;
 
 	CStringW m_filename;
 	std::list<SessionInfo_t> m_SessionInfos;
@@ -58,9 +59,9 @@ private:
 public:
 	void SetFilename(CStringW& filename);
 
-	bool Clear();
+	bool Clear(); // Clears the list and deletes the history file
 	bool GetSessionInfo(SessionInfo_t& sesInfo);
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count);
-	void SetSessionInfo(SessionInfo_t& sesInfo);
+	void SaveSessionInfo(SessionInfo_t& sesInfo);
 };

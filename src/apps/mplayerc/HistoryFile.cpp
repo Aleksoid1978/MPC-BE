@@ -50,6 +50,11 @@ bool CHistoryFile::ReadFile()
 		return false;
 	}
 
+	const DWORD tick = GetTickCount();
+	if (m_LastAccessTick && std::labs(tick - m_LastAccessTick) < 100) {
+		return true;
+	}
+
 	FILE* fp;
 	int fpStatus;
 	do { // Open mpc-be.ini in UNICODE mode, retry if it is already being used by another process
@@ -140,6 +145,7 @@ bool CHistoryFile::ReadFile()
 
 	fpStatus = fclose(fp);
 	ASSERT(fpStatus == 0);
+	m_LastAccessTick = GetTickCount();
 
 	if (sesInfo.Path.GetLength() || sesInfo.DVDId) {
 		m_SessionInfos.push_back(sesInfo);
@@ -226,6 +232,7 @@ bool CHistoryFile::WriteFile()
 
 	fpStatus = fclose(fp);
 	ASSERT(fpStatus == 0);
+	m_LastAccessTick = GetTickCount();
 
 	return ret;
 }
@@ -326,7 +333,7 @@ void CHistoryFile::GetRecentSessions(std::vector<SessionInfo_t>& recentSessions,
 	}
 }
 
-void CHistoryFile::SetSessionInfo(SessionInfo_t& sesInfo)
+void CHistoryFile::SaveSessionInfo(SessionInfo_t& sesInfo)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
