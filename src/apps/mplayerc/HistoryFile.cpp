@@ -23,7 +23,7 @@
 
 #define HISTORY_ENTRY_LIMIT 100
 
-std::list<SessionInfo_t>::iterator CHistoryFile::FindSessionInfo(SessionInfo_t& sesInfo)
+std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(SessionInfo& sesInfo)
 {
 	if (sesInfo.DVDId) {
 		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
@@ -75,7 +75,7 @@ bool CHistoryFile::ReadFile()
 
 	m_SessionInfos.clear();
 
-	SessionInfo_t sesInfo;
+	SessionInfo sesInfo;
 	CStringW section;
 	CStringW line;
 
@@ -85,14 +85,16 @@ bool CHistoryFile::ReadFile()
 		if (line[0] == '[') { // new section
 			if (section.GetLength()) {
 				section.Empty();
-				if (sesInfo.Path.GetLength() || sesInfo.DVDId) {
+
+				if (sesInfo.Path.GetLength()) {
 					m_SessionInfos.push_back(sesInfo);
 				}
+				sesInfo = {};
 			}
+
 			pos = line.Find(']');
 			if (pos > 0) {
 				section = line.Mid(1, pos - 1);
-				sesInfo = {};
 			}
 			continue;
 		}
@@ -119,9 +121,8 @@ bool CHistoryFile::ReadFile()
 					StrHexToUInt64(value, sesInfo.DVDId);
 				}
 				else if (param == L"DVDPosition") {
-					ULONG dvdTitle;
-					int h, m, s;
-					if (swscanf_s(value, L"%ul,%02d:%02d:%02d", &dvdTitle, &h, &m, &s) == 4) {
+					unsigned dvdTitle, h, m, s;
+					if (swscanf_s(value, L"%02u,%02u:%02u:%02u", &dvdTitle, &h, &m, &s) == 4) {
 						sesInfo.DVDTitle = dvdTitle;
 						sesInfo.DVDTimecode = { (BYTE)h, (BYTE)m, (BYTE)s, 0 };
 					}
@@ -149,7 +150,7 @@ bool CHistoryFile::ReadFile()
 	ASSERT(fpStatus == 0);
 	m_LastAccessTick = GetTickCount();
 
-	if (sesInfo.Path.GetLength() || sesInfo.DVDId) {
+	if (section.GetLength() && sesInfo.Path.GetLength()) {
 		m_SessionInfos.push_back(sesInfo);
 	}
 
@@ -160,7 +161,7 @@ bool CHistoryFile::WriteFile()
 {
 	FILE* fp;
 	int fpStatus;
-	do { // Open mpc-be.ini, retry if it is already being used by another process
+	do { // Open history file, retry if it is already being used by another process
 		fp = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
 		if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 			break;
@@ -180,49 +181,48 @@ bool CHistoryFile::WriteFile()
 		file.WriteString(L"; MPC-BE history file\n");
 		int i = 1;
 		for (const auto& sesInfo : m_SessionInfos) {
-			str.Format(L"[%03d]\n", i++);
-
-			if (sesInfo.Title.GetLength()) {
-				str.AppendFormat(L"Title=%s\n", sesInfo.Title);
-			}
-
-			if (sesInfo.DVDId) {
-				// We do not write the path here, because it may be the same for different DVDs.
-				// The path must be recorded in a separate section to be displayed in the recent files menu.
-				str.AppendFormat(L"DVDId=%016x\n", sesInfo.DVDId);
-
-				if (sesInfo.DVDTitle) {
-					str.AppendFormat(L"DVDPosition=%ul,%02d:%02d:%02d\n",
-						sesInfo.DVDTitle,
-						sesInfo.DVDTimecode.bHours,
-						sesInfo.DVDTimecode.bMinutes,
-						sesInfo.DVDTimecode.bSeconds);
-				}
-			}
-			else if (sesInfo.Path.GetLength()) {
+			if (sesInfo.Path.GetLength()) {
+				str.Format(L"[%03d]\n", i++);
 				str.AppendFormat(L"Path=%s\n", sesInfo.Path);
 
-				if (sesInfo.Position > UNITS) {
-					LONGLONG seconds = sesInfo.Position / UNITS;
-					int h = (int)(seconds / 3600);
-					int m = (int)(seconds / 60 % 60);
-					int s = (int)(seconds % 60);
-					str.AppendFormat(L"Position=%02d:%02d:%02d\n", h, m, s);
+				if (sesInfo.Title.GetLength()) {
+					str.AppendFormat(L"Title=%s\n", sesInfo.Title);
 				}
-				if (sesInfo.AudioNum >= 0) {
-					str.AppendFormat(L"AudioNum=%d\n", sesInfo.AudioNum);
+
+				if (sesInfo.DVDId) {
+					str.AppendFormat(L"DVDId=%016I64x\n", sesInfo.DVDId);
+					if (sesInfo.DVDTitle) {
+						str.AppendFormat(L"DVDPosition=%02u,%02u:%02u:%02u\n",
+							(unsigned)sesInfo.DVDTitle,
+							(unsigned)sesInfo.DVDTimecode.bHours,
+							(unsigned)sesInfo.DVDTimecode.bMinutes,
+							(unsigned)sesInfo.DVDTimecode.bSeconds);
+					}
 				}
-				if (sesInfo.SubtitleNum >= 0) {
-					str.AppendFormat(L"SubtitleNum=%d\n", sesInfo.SubtitleNum);
+				else {
+					if (sesInfo.Position > UNITS) {
+						LONGLONG seconds = sesInfo.Position / UNITS;
+						int h = (int)(seconds / 3600);
+						int m = (int)(seconds / 60 % 60);
+						int s = (int)(seconds % 60);
+						str.AppendFormat(L"Position=%02d:%02d:%02d\n", h, m, s);
+					}
+					if (sesInfo.AudioNum >= 0) {
+						str.AppendFormat(L"AudioNum=%d\n", sesInfo.AudioNum);
+					}
+					if (sesInfo.SubtitleNum >= 0) {
+						str.AppendFormat(L"SubtitleNum=%d\n", sesInfo.SubtitleNum);
+					}
+					if (sesInfo.AudioPath.GetLength()) {
+						str.AppendFormat(L"AudioPath=%s\n", sesInfo.AudioPath);
+					}
+					if (sesInfo.SubtitlePath.GetLength()) {
+						str.AppendFormat(L"SubtitlePath=%d\n", sesInfo.SubtitlePath);
+					}
 				}
-				if (sesInfo.AudioPath.GetLength()) {
-					str.AppendFormat(L"AudioPath=%s\n", sesInfo.AudioPath);
-				}
-				if (sesInfo.SubtitlePath.GetLength()) {
-					str.AppendFormat(L"SubtitlePath=%d\n", sesInfo.SubtitlePath);
-				}
+				str.AppendChar(L'\n');
+				file.WriteString(str);
 			}
-			file.WriteString(str);
 		}
 	}
 	catch (CFileException& e) {
@@ -257,7 +257,7 @@ bool CHistoryFile::Clear()
 	return false;
 }
 
-bool CHistoryFile::OpenSessionInfo(SessionInfo_t& sesInfo)
+bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -297,7 +297,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo_t& sesInfo)
 	return found;
 }
 
-void CHistoryFile::SaveSessionInfo(SessionInfo_t& sesInfo)
+void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -338,7 +338,7 @@ void CHistoryFile::GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned c
 	}
 }
 
-void CHistoryFile::GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count)
+void CHistoryFile::GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 

@@ -20,7 +20,7 @@
 
 #pragma once
 
-struct SessionInfo_t {
+struct SessionInfo {
 	CStringW Path;
 	CStringW Title;
 	REFERENCE_TIME Position = 0;
@@ -31,11 +31,6 @@ struct SessionInfo_t {
 	int SubtitleNum = -1;
 	CStringW AudioPath;
 	CStringW SubtitlePath;
-
-	void NewDVD(ULONGLONG dvdId) {
-		*this = {};
-		DVDId = dvdId;
-	}
 
 	void NewPath(CStringW path) {
 		*this = {};
@@ -50,9 +45,9 @@ private:
 	DWORD m_LastAccessTick = 0;
 
 	CStringW m_filename;
-	std::list<SessionInfo_t> m_SessionInfos;
+	std::list<SessionInfo> m_SessionInfos;
 
-	std::list<SessionInfo_t>::iterator FindSessionInfo(SessionInfo_t& sesInfo);
+	std::list<SessionInfo>::iterator FindSessionInfo(SessionInfo& sesInfo);
 	bool ReadFile();
 	bool WriteFile();
 
@@ -60,9 +55,9 @@ public:
 	void SetFilename(CStringW& filename);
 
 	bool Clear(); // Clear list and delete history file
-	bool OpenSessionInfo(SessionInfo_t& sesInfo); // Read or create an entry in the history file
-	void SaveSessionInfo(SessionInfo_t& sesInfo);
+	bool OpenSessionInfo(SessionInfo& sesInfo); // Read or create an entry in the history file
+	void SaveSessionInfo(SessionInfo& sesInfo);
 
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
-	void GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count);
+	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
 };
