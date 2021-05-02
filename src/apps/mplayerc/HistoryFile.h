@@ -59,9 +59,10 @@ private:
 public:
 	void SetFilename(CStringW& filename);
 
-	bool Clear(); // Clears the list and deletes the history file
-	bool GetSessionInfo(SessionInfo_t& sesInfo);
+	bool Clear(); // Clear list and delete history file
+	bool OpenSessionInfo(SessionInfo_t& sesInfo); // Read or create an entry in the history file
+	void SaveSessionInfo(SessionInfo_t& sesInfo);
+
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo_t>& recentSessions, unsigned count);
-	void SaveSessionInfo(SessionInfo_t& sesInfo);
 };

@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include "HistoryFile.h"
 
+#define HISTORY_ENTRY_LIMIT 100
+
 std::list<SessionInfo_t>::iterator CHistoryFile::FindSessionInfo(SessionInfo_t& sesInfo)
 {
 	if (sesInfo.DVDId) {
@@ -255,7 +257,7 @@ bool CHistoryFile::Clear()
 	return false;
 }
 
-bool CHistoryFile::GetSessionInfo(SessionInfo_t& sesInfo)
+bool CHistoryFile::OpenSessionInfo(SessionInfo_t& sesInfo)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -276,21 +278,44 @@ bool CHistoryFile::GetSessionInfo(SessionInfo_t& sesInfo)
 			sesInfo.AudioNum    = si.AudioNum;
 			sesInfo.SubtitleNum = si.SubtitleNum;
 		}
-
-		m_SessionInfos.erase(it);
-
 		found = true;
 	}
 
-	m_SessionInfos.emplace_front(sesInfo);
+	if (it != m_SessionInfos.begin()) {
+		if (found) {
+			m_SessionInfos.erase(it);
+		}
 
-	while (m_SessionInfos.size() > 100) {
+		m_SessionInfos.emplace_front(sesInfo);
+
+		while (m_SessionInfos.size() > HISTORY_ENTRY_LIMIT) {
+			m_SessionInfos.pop_back();
+		}
+		WriteFile();
+	}
+
+	return found;
+}
+
+void CHistoryFile::SaveSessionInfo(SessionInfo_t& sesInfo)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	ReadFile();
+
+	auto it = FindSessionInfo(sesInfo);
+
+	if (it != m_SessionInfos.end()) {
+		m_SessionInfos.erase(it);
+	}
+
+	m_SessionInfos.emplace_front(sesInfo); // Writing new data
+
+	while (m_SessionInfos.size() > HISTORY_ENTRY_LIMIT) {
 		m_SessionInfos.pop_back();
 	}
 
 	WriteFile();
-
-	return found;
 }
 
 void CHistoryFile::GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count)
@@ -331,25 +356,4 @@ void CHistoryFile::GetRecentSessions(std::vector<SessionInfo_t>& recentSessions,
 			recentSessions.emplace_back(*it++);
 		}
 	}
-}
-
-void CHistoryFile::SaveSessionInfo(SessionInfo_t& sesInfo)
-{
-	std::lock_guard<std::mutex> lock(m_Mutex);
-
-	ReadFile();
-
-	auto it = FindSessionInfo(sesInfo);
-
-	if (it != m_SessionInfos.end()) {
-		m_SessionInfos.erase(it);
-	}
-
-	m_SessionInfos.emplace_front(sesInfo);
-
-	while (m_SessionInfos.size() > 100) {
-		m_SessionInfos.pop_back();
-	}
-
-	WriteFile();
 }
