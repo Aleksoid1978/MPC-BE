@@ -182,7 +182,8 @@ bool CHistoryFile::WriteFile()
 		int i = 1;
 		for (const auto& sesInfo : m_SessionInfos) {
 			if (sesInfo.Path.GetLength()) {
-				str.Format(L"[%03d]\n", i++);
+				str.Format(L"\n[%03d]\n", i++);
+
 				str.AppendFormat(L"Path=%s\n", sesInfo.Path);
 
 				if (sesInfo.Title.GetLength()) {
@@ -220,7 +221,6 @@ bool CHistoryFile::WriteFile()
 						str.AppendFormat(L"SubtitlePath=%d\n", sesInfo.SubtitlePath);
 					}
 				}
-				str.AppendChar(L'\n');
 				file.WriteString(str);
 			}
 		}
@@ -281,7 +281,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo)
 		found = true;
 	}
 
-	if (it != m_SessionInfos.begin()) {
+	if (it != m_SessionInfos.begin() || !found) { // not first entry or empty list
 		if (found) {
 			m_SessionInfos.erase(it);
 		}
