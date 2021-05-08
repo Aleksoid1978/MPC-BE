@@ -11255,8 +11255,8 @@ bool CMainFrame::GetCurDispMode(dispmode& dm, const CString& DisplayName)
 
 bool CMainFrame::GetDispMode(const DWORD iModeNum, dispmode& dm, const CString& DisplayName)
 {
-	DEVMODE devmode;
-	devmode.dmSize = sizeof(DEVMODE);
+	DEVMODEW devmode;
+	devmode.dmSize = sizeof(DEVMODEW);
 	CString GetDisplayName = DisplayName;
 	if (GetDisplayName == L"Current" || GetDisplayName.IsEmpty()) {
 		CMonitor monitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
@@ -11299,7 +11299,7 @@ void CMainFrame::SetDispMode(const dispmode& dm, const CString& DisplayName, con
 		bPausedForAutochangeMonitorMode = TRUE;
 	}
 
-	DEVMODE dmScreenSettings = { 0 };
+	DEVMODEW dmScreenSettings = { 0 };
 	dmScreenSettings.dmSize             = sizeof(dmScreenSettings);
 	dmScreenSettings.dmPelsWidth        = dm.size.cx;
 	dmScreenSettings.dmPelsHeight       = dm.size.cy;
