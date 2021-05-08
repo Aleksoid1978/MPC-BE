@@ -14042,7 +14042,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_dMediaInfoFPS	= 0.0;
 		m_bNeedAutoChangeMonitorMode = false;
 
-		if ((s.fullScreenModes.bEnabled == 1 && (IsD3DFullScreenMode() || s.fLaunchfullscreen))
+		if ((s.fullScreenModes.bEnabled == 1 && (IsD3DFullScreenMode() || m_bFullScreen || s.fLaunchfullscreen))
 				|| s.fullScreenModes.bEnabled == 2) {
 			// DVD
 			if (pDVDData) {
