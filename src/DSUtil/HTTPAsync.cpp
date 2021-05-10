@@ -48,28 +48,10 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 							SetEvent(pContext->m_hRequestOpenedEvent);
 						}
 						break;
-					case INTERNET_STATUS_REQUEST_SENT:
-						{
-							DWORD* lpBytesSent = (DWORD*)lpvStatusInformation;
-							UNREFERENCED_PARAMETER(lpBytesSent);
-						}
-						break;
 					case INTERNET_STATUS_REQUEST_COMPLETE:
 						{
 							pContext->m_bRequestComplete = TRUE;
 							SetEvent(pContext->m_hRequestCompleteEvent);
-						}
-						break;
-					case INTERNET_STATUS_REDIRECT:
-						{
-							CString strNewAddr = (LPCWSTR)lpvStatusInformation;
-							UNREFERENCED_PARAMETER(strNewAddr);
-						}
-						break;
-					case INTERNET_STATUS_RESPONSE_RECEIVED:
-						{
-							DWORD* dwBytesReceived = (DWORD*)lpvStatusInformation;
-							UNREFERENCED_PARAMETER(dwBytesReceived);
 						}
 						break;
 					}
