@@ -141,19 +141,39 @@ HRESULT CD3D11Decoder::CreateD3D11Device(UINT nDeviceIndex, ID3D11Device** ppDev
 
 	// Create a device with video support, and BGRA support for Direct2D interoperability (drawing UI, etc)
 	UINT nCreationFlags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#ifdef _DEBUG
-	HMODULE hD3D11SDKLayers = LoadLibraryW(L"D3D11_1SDKLayers.dll");
-	if (hD3D11SDKLayers) {
-		nCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-		FreeLibrary(hD3D11SDKLayers);
-	} else {
-		DLog(L"CD3D11Decoder::CreateD3D11Device() : D3D11_1SDKLayers.dll could not be loaded. D3D11 debugging messages will not be displayed");
-	}
-#endif
 
 	D3D_FEATURE_LEVEL d3dFeatureLevel;
-	hr = m_dxLib.mD3D11CreateDevice(pDXGIAdapter, D3D_DRIVER_TYPE_UNKNOWN, nullptr, nCreationFlags, s_D3D11Levels,
-		std::size(s_D3D11Levels), D3D11_SDK_VERSION, &pD3D11Device, &d3dFeatureLevel, nullptr);
+	hr = m_dxLib.mD3D11CreateDevice(
+		pDXGIAdapter,
+		D3D_DRIVER_TYPE_UNKNOWN,
+		nullptr,
+#ifdef _DEBUG
+		nCreationFlags | D3D11_CREATE_DEVICE_DEBUG,
+#else
+		nCreationFlags,
+#endif
+		s_D3D11Levels,
+		std::size(s_D3D11Levels),
+		D3D11_SDK_VERSION,
+		&pD3D11Device,
+		&d3dFeatureLevel,
+		nullptr);
+#ifdef _DEBUG
+	if (hr == DXGI_ERROR_SDK_COMPONENT_MISSING) {
+		DLog(L"WARNING: D3D11 debugging messages will not be displayed");
+		hr = m_dxLib.mD3D11CreateDevice(
+			pDXGIAdapter,
+			D3D_DRIVER_TYPE_UNKNOWN,
+			nullptr,
+			nCreationFlags,
+			s_D3D11Levels,
+			std::size(s_D3D11Levels),
+			D3D11_SDK_VERSION,
+			&pD3D11Device,
+			&d3dFeatureLevel,
+			nullptr);
+	}
+#endif
 	if (FAILED(hr)) {
 		DLog(L"CD3D11Decoder::CreateD3D11Device() : Failed to create a D3D11 device with video support");
 		return hr;
