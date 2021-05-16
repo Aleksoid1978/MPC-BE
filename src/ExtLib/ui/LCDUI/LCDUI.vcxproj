@@ -72,7 +72,6 @@
       <PrecompiledHeaderFile>LCDUI.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>lgLcd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -83,7 +82,6 @@
       <PrecompiledHeaderFile>LCDUI.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>lgLcd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -95,7 +93,6 @@
       <PrecompiledHeaderFile>LCDUI.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>lgLcd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -106,7 +103,6 @@
       <PrecompiledHeaderFile>LCDUI.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>lgLcd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

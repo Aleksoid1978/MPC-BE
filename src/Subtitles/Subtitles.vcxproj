@@ -44,9 +44,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>Wininet.lib</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseSub.cpp" />

@@ -153,7 +153,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>BinkSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -165,7 +164,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>BinkSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -177,7 +175,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>BinkSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -189,7 +186,6 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>BinkSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>

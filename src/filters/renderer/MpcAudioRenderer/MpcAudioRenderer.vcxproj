@@ -130,7 +130,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Debug_$(Platform)\ffmpeg.lib;Winmm.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Debug_$(Platform)\ffmpeg.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -145,7 +145,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Debug_$(Platform)\ffmpeg.lib;Winmm.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Debug_$(Platform)\ffmpeg.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -160,7 +160,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Release_$(Platform)\ffmpeg.lib;Winmm.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Release_$(Platform)\ffmpeg.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -175,7 +175,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Release_$(Platform)\ffmpeg.lib;Winmm.lib;Version.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;$(SolutionDir)bin\lib\Release_$(Platform)\ffmpeg.lib;libspeex.a;libdav1d.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -189,36 +189,24 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AudioDevice.cpp" />

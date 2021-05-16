@@ -154,7 +154,6 @@
       <PreprocessorDefinitions>FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -167,7 +166,6 @@
       <PreprocessorDefinitions>FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -180,7 +178,6 @@
       <PreprocessorDefinitions>FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -193,7 +190,6 @@
       <PreprocessorDefinitions>FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
