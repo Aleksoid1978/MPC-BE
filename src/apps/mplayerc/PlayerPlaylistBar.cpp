@@ -1354,6 +1354,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		std::list<CString> redir;
 		const CString ct = Content::GetType(fn, &redir);
 		if (!redir.empty()) {
+			Content::Online::Disconnect(fn);
 			for (const auto& r : redir) {
 				ParsePlayList(r, subs, !::PathIsURLW(r));
 			}
@@ -1411,6 +1412,8 @@ static CString CombinePath(CPath p, const CString& fn)
 
 bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 {
+	Content::Online::Disconnect(fn);
+
 	CString str;
 	std::map<int, CPlaylistItem> pli;
 	std::vector<int> idx;
@@ -1639,6 +1642,8 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 
 bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 {
+	Content::Online::Disconnect(fn);
+
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
 	if (!f.Open(fn)) {
 		return false;
