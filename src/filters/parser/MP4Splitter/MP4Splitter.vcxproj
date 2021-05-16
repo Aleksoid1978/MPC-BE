@@ -153,7 +153,7 @@
       <AdditionalIncludeDirectories>..\..\..\ExtLib\Bento4\Core;..\..\..\ExtLib\Bento4\Crypto;$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MP4Splitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -165,7 +165,7 @@
       <AdditionalIncludeDirectories>..\..\..\ExtLib\Bento4\Core;..\..\..\ExtLib\Bento4\Crypto;$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MP4Splitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -177,7 +177,7 @@
       <AdditionalIncludeDirectories>..\..\..\ExtLib\Bento4\Core;..\..\..\ExtLib\Bento4\Crypto;$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MP4Splitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -189,7 +189,7 @@
       <AdditionalIncludeDirectories>..\..\..\ExtLib\Bento4\Core;..\..\..\ExtLib\Bento4\Crypto;$(SolutionDir)include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MP4Splitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
