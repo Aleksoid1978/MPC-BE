@@ -22,3 +22,6 @@
 
 #pragma comment(lib, "strmiids.lib")
 #pragma comment(lib, "winmm.lib")
+
+#pragma comment(lib, "libspeex.a")
+#pragma comment(lib, "libdav1d.a")
