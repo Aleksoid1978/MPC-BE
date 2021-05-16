@@ -16796,6 +16796,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 
 	m_bEndOfStream = false;
 	m_bGraphEventComplete = false;
+	m_nStepForwardCount = 0;
 
 	if (m_abRepeatPositionAEnabled && rtPos < m_abRepeatPositionA ||
 		m_abRepeatPositionBEnabled && rtPos > m_abRepeatPositionB)
