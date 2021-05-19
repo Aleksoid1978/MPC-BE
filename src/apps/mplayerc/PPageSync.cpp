@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <clsids.h>
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 #include "PPageSync.h"
@@ -109,7 +110,7 @@ void CPPageSync::InitDialogPrivate()
 	m_edtTargetSyncOffset = rs.dTargetSyncOffset;
 	m_edtControlLimit = rs.dControlLimit;
 
-	if ((rs.iVideoRenderer == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
+	if (pFrame->m_clsidCAP != CLSID_SyncAllocatorPresenter) {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
