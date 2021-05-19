@@ -257,7 +257,7 @@ bool CHistoryFile::Clear()
 	return false;
 }
 
-bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo)
+bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -267,18 +267,23 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo)
 	auto it = FindSessionInfo(sesInfo);
 
 	if (it != m_SessionInfos.end()) {
-		auto& si = (*it);
-
-		if (sesInfo.DVDId) {
-			sesInfo.DVDTitle    = si.DVDTitle;
-			sesInfo.DVDTimecode = si.DVDTimecode;
-		}
-		else if (sesInfo.Path.GetLength()) {
-			sesInfo.Position    = si.Position;
-			sesInfo.AudioNum    = si.AudioNum;
-			sesInfo.SubtitleNum = si.SubtitleNum;
-		}
 		found = true;
+
+		if (bReadPos) {
+			auto& si = (*it);
+
+			if (sesInfo.DVDId) {
+				sesInfo.DVDTitle = si.DVDTitle;
+				sesInfo.DVDTimecode = si.DVDTimecode;
+			}
+			else if (sesInfo.Path.GetLength()) {
+				sesInfo.Position     = si.Position;
+				sesInfo.AudioNum     = si.AudioNum;
+				sesInfo.SubtitleNum  = si.SubtitleNum;
+				//sesInfo.AudioPath    = si.AudioPath;
+				//sesInfo.SubtitlePath = si.SubtitlePath;
+			}
+		}
 	}
 
 	if (it != m_SessionInfos.begin() || !found) { // not first entry or empty list
@@ -316,6 +321,21 @@ void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
 	}
 
 	WriteFile();
+}
+
+void CHistoryFile::DeleteSessionInfo(SessionInfo& sesInfo)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	ReadFile();
+
+	auto it = FindSessionInfo(sesInfo);
+
+	if (it != m_SessionInfos.end()) {
+		m_SessionInfos.erase(it);
+
+		WriteFile();
+	}
 }
 
 void CHistoryFile::GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count)

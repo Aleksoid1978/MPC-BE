@@ -36,6 +36,16 @@ struct SessionInfo {
 		*this = {};
 		Path = path;
 	}
+
+	void CleanPosition() {
+		Position = 0;
+		DVDTitle = 0;
+		DVDTimecode = {};
+		AudioNum = -1;
+		SubtitleNum = -1;
+		AudioPath.Empty();
+		SubtitlePath.Empty();
+	}
 };
 
 class CHistoryFile
@@ -55,8 +65,9 @@ public:
 	void SetFilename(CStringW& filename);
 
 	bool Clear(); // Clear list and delete history file
-	bool OpenSessionInfo(SessionInfo& sesInfo); // Read or create an entry in the history file
+	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos); // Read or create an entry in the history file
 	void SaveSessionInfo(SessionInfo& sesInfo);
+	void DeleteSessionInfo(SessionInfo& sesInfo);
 
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
