@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
-5		"EVR (custom presenter) settings"
+5		"Einstellungen von EVR (custom presenter)"
 6		"VSync"
 7		"Interne VSync"
 8		"Windows-Desktopgestaltung (Aero) deaktivieren"
@@ -507,7 +507,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
 10		"GPU vor VSync leeren"
 11		"GPU nach Ausgabe leeren"
 12		"Auf geleerte GPU warten"
-13		"EVR-Sync-Einstellungen"
+13		"Einstellungen von EVR Sync"
 14		"Videowiedergabe an Anzeige anpassen"
 15		"Anzeige an Videowiedergabe anpassen"
 16		"Videobilder mit nächstgelegener VSync darstellen"
