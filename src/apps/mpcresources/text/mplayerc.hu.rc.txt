@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
-5		"EVR (custom presenter) settings"
+5		"EVR (custom presenter) beállítások"
 6		"VSync"
 7		"Belső VSync"
 8		"Asztali kompozíció letiltása (Aero)"
@@ -510,7 +510,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
 13		"EVR Szinkronizálási beállítások"
 14		"Videó képernyőhöz illesztése"
 15		"Képernyő videóhoz illesztése"
-16		"Megjelenítés a legközelebbi vsync-nél"
+16		"Megjelenítés a legközelebbi VSync-nél"
 17		"Frekvencia hangolás:"
 19		"Frekvencia hangolás:"
 21		"sor"
