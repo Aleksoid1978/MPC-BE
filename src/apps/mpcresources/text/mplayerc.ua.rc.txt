@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
-5		"EVR (custom presenter) settings"
+5		"Налаштування EVR (custom presenter)"
 6		"Вертикальна синхронізація (VSync)"
 7		"Вбудована синхронізація (VSync)"
 8		"Вимкнути ефекти робочого столу (Aero)"
