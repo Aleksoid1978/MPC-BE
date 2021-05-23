@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -96,7 +96,7 @@ namespace Content {
 		bool bGOTCt         = false;
 		bool bGOTRedir      = false;
 		std::vector<BYTE> raw;
-		std::shared_ptr<CHTTPAsync> HTTPAsync = nullptr;
+		std::unique_ptr<CHTTPAsync> HTTPAsync;
 		CString ct;
 		CString body;
 		CString hdr;
@@ -137,13 +137,13 @@ namespace Content {
 		}
 	}
 
-	static const bool Connect(const CString fn)
+	static const bool Connect(const CString& fn)
 	{
 		auto& content = Contents[fn];
 
 		if (!content.bInitialized) {
 			content.bInitialized = true;
-			content.HTTPAsync = std::make_shared<CHTTPAsync>();
+			content.HTTPAsync = std::make_unique<CHTTPAsync>();
 
 			CString realPath(fn);
 			CorrectAceStream(realPath);
@@ -367,7 +367,7 @@ namespace Content {
 
 	const std::wregex html_mime_regex(L"text/html(?:;\\s*charset=([\"']?)[\\w-]+\\1)?", std::regex_constants::icase);
 
-	const CString GetType(CString fn, std::list<CString>* redir)
+	const CString GetType(const CString& fn, std::list<CString>* redir)
 	{
 		CUrlParser urlParser;
 		CString ct, body;

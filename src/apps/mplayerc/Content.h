@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include <atlstr.h>
 
 // TODO: make function
-#define CorrectAceStream(path) if (path.Left(12) == L"acestream://") {path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12));}
+#define CorrectAceStream(path) if (path.Left(12) == L"acestream://") { path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12)); }
 
 namespace Content {
 	namespace Online {
@@ -35,5 +35,5 @@ namespace Content {
 		void GetRaw(const CString& fn, std::vector<BYTE>& raw);
 		void GetHeader(const CString& fn, CString& hdr);
 	}
-	const CString GetType(CString fn, std::list<CString>* redir = nullptr);
+	const CString GetType(const CString& fn, std::list<CString>* redir = nullptr);
 }
