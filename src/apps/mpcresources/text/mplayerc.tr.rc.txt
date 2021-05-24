@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
-5		"EVR (custom presenter) settings"
+5		"GVİ (özel sunucu) ayarları"
 6		"Dikey Eşzamanlama"
 7		"Dahili Dikey Eşzamanlama"
 8		"Masaüstü bileşimini devre dışı bırak (Aero)"
