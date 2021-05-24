@@ -564,7 +564,7 @@ namespace Youtube
 
 				const CStringA sts = RegExpParse<CStringA>(data.data(), "\"sts\"\\s*:\\s*(\\d+)");
 
-				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
+				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S&html5=1", videoId, videoId, sts);
 				if (!URLReadData(link.GetString(), data)) {
 					return false;
 				}
