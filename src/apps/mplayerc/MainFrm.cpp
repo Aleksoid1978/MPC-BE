@@ -16610,13 +16610,13 @@ int CMainFrame::GetAudioTrackIdx()
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 		DWORD cStreams = 0;
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
-			for (int i = 0; i < (int)cStreams; i++) {
+			for (DWORD i = 0; i < cStreams; i++) {
 				DWORD dwFlags = 0;
 				if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, nullptr, nullptr, nullptr))) {
 					return -1;
 				}
 				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-					return i;
+					return (int)i;
 				}
 			}
 		}
@@ -16630,12 +16630,13 @@ int CMainFrame::GetSubtitleTrackIdx()
 	if (/*m_eMediaLoadState == MLS_LOADED && */GetPlaybackMode() == PM_FILE
 			&& !(m_iSubtitleSel & 0x80000000)) {
 		int subStreams = 0;
-		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-		if (pSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
+
+		if (!AfxGetAppSettings().fDisableInternalSubtitles) {
+			CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 			DWORD cStreams = 0;
-			if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
-				CComQIPtr<IBaseFilter> pBF = pSS;
-				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+			if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
+				CLSID clsid = GetCLSID(m_pMainSourceFilter);
+				if (clsid == CLSID_HaaliSplitterAR || clsid == CLSID_HaaliSplitter) {
 					cStreams--;
 				}
 
