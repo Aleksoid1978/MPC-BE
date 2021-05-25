@@ -362,7 +362,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 6		"Klikken"
 8		"Recent bestand openen als er niets wordt geladen"
 10		"Dubbelklikken"
-12		"Move window by the video area"
+12		"Venster verplaatsen door het videobeeld te verslepen"
 13		"Rechts klikken"
 16		"Resetten"
 END
@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
-5		"EVR (custom presenter) settings"
+5		"Instellingen voor EVR-CP"
 6		"VSync"
 7		"Interne VSync"
 8		"Deactiveer Bureaubladsamenstelling (Aero)"
@@ -507,7 +507,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 33
 10		"GPU legen voor VSync"
 11		"GPU legen na afspelen"
 12		"Wacht tot GPU leeg"
-13		"EVR Sync-instellingen"
+13		"Instellingen voor EVR Sync"
 14		"Synchroniseer video aan monitor"
 15		"Synchroniseer monitor aan video"
 16		"Toon bij de dichtstbijzijnde VSync"
@@ -1784,7 +1784,7 @@ STRING IDS_PLAYLIST_OPENFOLDER		"Bestandslocatie openen"
 STRING IDS_PLAYLIST_PASTEFROMCLIPBOARD		"Plakken vanuit het klembord"
 STRING IDS_PLAYLIST_RANDOMIZE		"&Willekeurig"
 STRING IDS_PLAYLIST_REMOVE		"&Verwijderen"
-STRING IDS_PLAYLIST_REMOVEMISSINGFILES		"Remove missing files"
+STRING IDS_PLAYLIST_REMOVEMISSINGFILES		"Ontbrekende bestanden verwijderen"
 STRING IDS_PLAYLIST_RENAME_CURRENT		"Afspeellijst hernoemen"
 STRING IDS_PLAYLIST_RESTORE		"&Herstel"
 STRING IDS_PLAYLIST_SAVEAS		"Opslaan &als..."
