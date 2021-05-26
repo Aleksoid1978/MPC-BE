@@ -374,7 +374,7 @@ void EllipsisText(CStringW& text, const int maxlen)
 			text.Truncate(maxlen);
 		}
 		text.TrimRight();
-		text.AppendChar(L'\u2026');
+		text.AppendChar(L'\x2026');
 	}
 }
 
@@ -394,7 +394,7 @@ void EllipsisURL(CStringW& url, const int maxlen)
 					}
 				}
 				url.Truncate(std::max(maxlen, k));
-				url.AppendChar(L'\u2026');
+				url.AppendChar(L'\x2026');
 			}
 		}
 	}
@@ -419,7 +419,7 @@ void EllipsisPath(CStringW& path, const int maxlen)
 				while ((q = path.Find('\\', k+1)) > 0 && q < midlen) {
 					k = q;
 				}
-				path = path.Left(k + 1) + L'\u2026' + path.Mid(n);
+				path = path.Left(k + 1) + L'\x2026' + path.Mid(n);
 			}
 		}
 	}
