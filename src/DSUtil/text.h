@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -148,6 +148,7 @@ extern CStringW AltUTF8ToWStr(LPCSTR lpUTF8Str);
 extern CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr);
 
 void FixFilename(CStringW& str);
+void EllipsisText(CStringW& text, const int maxlen);
 void EllipsisURL(CStringW& url, const int maxlen);
 void EllipsisPath(CStringW& path, const int maxlen);
 
