@@ -21,8 +21,6 @@
 #include "stdafx.h"
 #include "HistoryFile.h"
 
-#define HISTORY_ENTRY_LIMIT 100
-
 std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(SessionInfo& sesInfo)
 {
 	if (sesInfo.DVDId) {
@@ -128,10 +126,16 @@ bool CHistoryFile::ReadFile()
 					}
 				}
 				else if (param == L"AudioNum") {
-					StrToInt32(value, sesInfo.AudioNum);
+					int32_t i32val;
+					if (StrToInt32(value, i32val) && i32val >= 1) {
+						sesInfo.AudioNum = i32val - 1;
+					}
 				}
 				else if (param == L"SubtitleNum") {
-					StrToInt32(value, sesInfo.SubtitleNum);
+					int32_t i32val;
+					if (StrToInt32(value, i32val) && i32val >= 1) {
+						sesInfo.SubtitleNum = i32val - 1;
+					}
 				}
 				else if (param == L"AudioPath") {
 					sesInfo.AudioPath = value;
@@ -178,7 +182,7 @@ bool CHistoryFile::WriteFile()
 	CStdioFile file(fp);
 	CStringW str;
 	try {
-		file.WriteString(L"; MPC-BE history file\n");
+		file.WriteString(L"; MPC-BE History File 0.1\n");
 		int i = 1;
 		for (const auto& sesInfo : m_SessionInfos) {
 			if (sesInfo.Path.GetLength()) {
@@ -209,10 +213,10 @@ bool CHistoryFile::WriteFile()
 						str.AppendFormat(L"Position=%02d:%02d:%02d\n", h, m, s);
 					}
 					if (sesInfo.AudioNum >= 0) {
-						str.AppendFormat(L"AudioNum=%d\n", sesInfo.AudioNum);
+						str.AppendFormat(L"AudioNum=%d\n", sesInfo.AudioNum + 1);
 					}
 					if (sesInfo.SubtitleNum >= 0) {
-						str.AppendFormat(L"SubtitleNum=%d\n", sesInfo.SubtitleNum);
+						str.AppendFormat(L"SubtitleNum=%d\n", sesInfo.SubtitleNum + 1);
 					}
 					if (sesInfo.AudioPath.GetLength()) {
 						str.AppendFormat(L"AudioPath=%s\n", sesInfo.AudioPath);
@@ -244,6 +248,11 @@ void CHistoryFile::SetFilename(CStringW& filename)
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	m_filename = filename;
+}
+
+void CHistoryFile::SetMaxCount(unsigned maxcount)
+{
+	m_maxCount = std::clamp(maxcount, 10u, 999u);
 }
 
 bool CHistoryFile::Clear()
@@ -293,7 +302,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 
 		m_SessionInfos.emplace_front(sesInfo);
 
-		while (m_SessionInfos.size() > HISTORY_ENTRY_LIMIT) {
+		while (m_SessionInfos.size() > m_maxCount) {
 			m_SessionInfos.pop_back();
 		}
 		WriteFile();
@@ -316,7 +325,7 @@ void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
 
 	m_SessionInfos.emplace_front(sesInfo); // Writing new data
 
-	while (m_SessionInfos.size() > HISTORY_ENTRY_LIMIT) {
+	while (m_SessionInfos.size() > m_maxCount) {
 		m_SessionInfos.pop_back();
 	}
 

@@ -56,6 +56,7 @@ private:
 
 	CStringW m_filename;
 	std::list<SessionInfo> m_SessionInfos;
+	unsigned m_maxCount = 100;
 
 	std::list<SessionInfo>::iterator FindSessionInfo(SessionInfo& sesInfo);
 	bool ReadFile();
@@ -63,6 +64,7 @@ private:
 
 public:
 	void SetFilename(CStringW& filename);
+	void SetMaxCount(unsigned maxcount);
 
 	bool Clear(); // Clear list and delete history file
 	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos); // Read or create an entry in the history file
