@@ -106,7 +106,7 @@ bool CHistoryFile::ReadFile()
 			CStringW param = line.Mid(0, pos).Trim();
 			CStringW value = line.Mid(pos + 1).Trim();
 			if (value.GetLength()) {
-				if (param == "Path") {
+				if (param == L"Path") {
 					sesInfo.Path = value;
 				}
 				else if (param == L"Position") {
