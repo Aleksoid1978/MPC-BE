@@ -182,3 +182,13 @@ T& FastTrim(T& str)
 {
 	return FastTrimRight(str).TrimLeft();
 }
+
+inline bool MatchSubstr(CStringW& str, int iFirst, const WCHAR* sub)
+{
+	return str.Mid(iFirst, wcslen(sub)).Compare(sub) == 0;
+}
+
+inline bool MatchSubstrNoCase(CStringW& str, int iFirst, const WCHAR* sub)
+{
+	return str.Mid(iFirst, wcslen(sub)).CompareNoCase(sub) == 0;
+}
