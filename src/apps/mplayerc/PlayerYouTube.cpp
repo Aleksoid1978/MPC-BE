@@ -571,7 +571,10 @@ namespace Youtube
 
 				const CStringA strData = UrlDecode(data.data());
 
-				const auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
+				auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+?\})&)");
+				if (player_response_jsonData.IsEmpty()) {
+					player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
+				}
 				if (!player_response_jsonData.IsEmpty()) {
 					player_response_jsonDocument.Parse(player_response_jsonData);
 				}
