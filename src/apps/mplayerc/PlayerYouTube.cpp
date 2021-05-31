@@ -301,6 +301,16 @@ namespace Youtube
 		return bParse;
 	}
 
+	static auto ParseVideoInfoResponse(LPCSTR szIn)
+	{
+		auto player_response_jsonData = RegExpParse<CStringA>(szIn, R"(player_response=(\{\S+?\})&)");
+		if (player_response_jsonData.IsEmpty()) {
+			player_response_jsonData = RegExpParse<CStringA>(szIn, R"(player_response=(\{\S+\}))");
+		}
+
+		return player_response_jsonData;
+	}
+
 	static bool ParseMetadata(const CString& videoId, YoutubeFields& y_fields)
 	{
 		if (!videoId.IsEmpty()) {
@@ -313,10 +323,7 @@ namespace Youtube
 			if (URLReadData(url.GetString(), data)) {
 				const CStringA strData = UrlDecode(data.data());
 
-				auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+?\})&)");
-				if (player_response_jsonData.IsEmpty()) {
-					player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
-				}
+				auto player_response_jsonData = ParseVideoInfoResponse(strData.GetString());
 				if (!player_response_jsonData.IsEmpty()) {
 					rapidjson::Document player_response_jsonDocument;
 					player_response_jsonDocument.Parse(player_response_jsonData);
@@ -571,10 +578,7 @@ namespace Youtube
 
 				const CStringA strData = UrlDecode(data.data());
 
-				auto player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+?\})&)");
-				if (player_response_jsonData.IsEmpty()) {
-					player_response_jsonData = RegExpParse<CStringA>(strData.GetString(), R"(player_response=(\{\S+\}))");
-				}
+				auto player_response_jsonData = ParseVideoInfoResponse(strData.GetString());
 				if (!player_response_jsonData.IsEmpty()) {
 					player_response_jsonDocument.Parse(player_response_jsonData);
 				}
