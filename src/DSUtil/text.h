@@ -183,12 +183,12 @@ T& FastTrim(T& str)
 	return FastTrimRight(str).TrimLeft();
 }
 
-inline bool MatchSubstr(CStringW& str, int iFirst, const WCHAR* sub)
+inline bool MatchSubstr(const CStringW& str, int iFirst, const WCHAR* sub)
 {
 	return wcsncmp(str.GetString() + iFirst, sub, wcslen(sub)) == 0;;
 }
 
-inline bool MatchSubstrNoCase(CStringW& str, int iFirst, const WCHAR* sub)
+inline bool MatchSubstrNoCase(const CStringW& str, int iFirst, const WCHAR* sub)
 {
 	return _wcsnicmp(str.GetString() + iFirst, sub, wcslen(sub)) == 0;
 }

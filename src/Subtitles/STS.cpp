@@ -1272,11 +1272,8 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 			if (buff.Find(L'{') == 0 && (i = buff.Find(L'}')) > 1 && i < buff.GetLength()) {
 				if (STSStyle* s = GetMicroDVDStyle(buff.Mid(i+1), CharSet)) {
 					style = buff.Mid(1, i-1);
-					style.MakeUpper();
 					if (style.GetLength()) {
-						CString str = style.Mid(1);
-						str.MakeLower();
-						style = style.Left(1) + str;
+						style = style.Left(1).MakeUpper() + style.Mid(1).MakeLower();
 					}
 					ret.AddStyle(style, s);
 					CharSet = s->charSet;

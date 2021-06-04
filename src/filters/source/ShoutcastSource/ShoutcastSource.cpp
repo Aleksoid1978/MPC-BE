@@ -733,7 +733,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 					m_title = str.Mid(i, j - i);
 
 					// special code for 101.ru - it's use json format in MetaInfo
-					if (!m_title.IsEmpty() && m_title.Left(1) == L"{") {
+					if (!m_title.IsEmpty() && m_title.GetAt(0) == L'{') {
 						CString tmp(m_title);
 						const auto pos = tmp.ReverseFind(L'}');
 						if (pos > 0) {

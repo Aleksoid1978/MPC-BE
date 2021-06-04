@@ -1677,7 +1677,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			pli = DNew CPlaylistItem;
 		}
 
-		if (str.Left(1) == L"#") {
+		if (str.GetAt(0) == L'#') {
 			auto DeleteLeft = [](const auto pos, auto& str) {
 				str = str.Mid(pos, str.GetLength() - pos);
 				str.TrimLeft();

@@ -119,7 +119,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 							m_icydata.name = str.Mid(i, j - i);
 
 							// special code for 101.ru - it's use json format in MetaInfo
-							if (!m_icydata.name.IsEmpty() && m_icydata.name.Left(1) == L"{") {
+							if (!m_icydata.name.IsEmpty() && m_icydata.name.GetAt(0) == L'{') {
 								CString tmp(m_icydata.name);
 								const auto pos = tmp.ReverseFind(L'}');
 								if (pos > 0) {
