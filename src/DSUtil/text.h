@@ -185,10 +185,10 @@ T& FastTrim(T& str)
 
 inline bool MatchSubstr(CStringW& str, int iFirst, const WCHAR* sub)
 {
-	return str.Mid(iFirst, wcslen(sub)).Compare(sub) == 0;
+	return wcsncmp(str.GetString() + iFirst, sub, wcslen(sub)) == 0;;
 }
 
 inline bool MatchSubstrNoCase(CStringW& str, int iFirst, const WCHAR* sub)
 {
-	return str.Mid(iFirst, wcslen(sub)).CompareNoCase(sub) == 0;
+	return _wcsnicmp(str.GetString() + iFirst, sub, wcslen(sub)) == 0;
 }
