@@ -24,7 +24,7 @@
 #include <atlstr.h>
 
 // TODO: make function
-#define CorrectAceStream(path) if (path.Left(12) == L"acestream://") { path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12)); }
+#define CorrectAceStream(path) if (MatchSubstr(path, 0, L"acestream://")) { path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12)); }
 
 namespace Content {
 	namespace Online {

@@ -5086,7 +5086,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 				if (SUCCEEDED(pSS->Info(nNewStream, nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr)) && pszName) {
 					CString stream_name = pszName;
 					CoTaskMemFree(pszName);
-					if (stream_name.Left(11) == L"Subtitle - ") {
+					if (MatchSubstr(stream_name, 0, L"Subtitle - ")) {
 						stream_name = stream_name.Mid(10);
 					}
 					CString strMessage;
@@ -5207,7 +5207,7 @@ void CMainFrame::OnStreamVideo(UINT nID)
 						if (SUCCEEDED(pSS->Info(stms[current], nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr)) && pszName) {
 							CString stream_name = pszName;
 							CoTaskMemFree(pszName);
-							if (stream_name.Left(8) == L"Video - ") {
+							if (MatchSubstr(stream_name, 0, L"Video - ")) {
 								stream_name = stream_name.Mid(7);
 							}
 							CString strMessage;
@@ -10247,7 +10247,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 	favname.Remove('|');
 
 	// RelativeDrive
-	if (s.bFavRelativeDrive && path.GetLength() >= 3 && path.Mid(1, 2) == L":\\") {
+	if (s.bFavRelativeDrive && path.GetLength() >= 3 && MatchSubstr(path, 1, L":\\")) {
 		path.SetAt(0, '?');
 	}
 
@@ -10366,10 +10366,10 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on.
 	//       Could be useful when using removable devices. All you have to do then is plug in your 500 gb drive,
 	//       full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
-	if (path.Left(3) == L"?:\\") {
+	if (MatchSubstr(path, 0, L"?:\\")) {
 		CString exepath(GetProgramPath());
 
-		if (exepath.Mid(1, 2) == L":\\") {
+		if (MatchSubstr(exepath, 1, L":\\")) {
 			path.SetAt(0, exepath[0]);
 		}
 	}
@@ -10479,9 +10479,9 @@ void CMainFrame::PlayFavoriteDVD(CString fav)
 
 	CString path = *it++;
 
-	if (path.Left(3) == L"?:\\") {
+	if (MatchSubstr(path, 0, L"?:\\")) {
 		CString exepath(GetProgramPath());
-		if (exepath.Mid(1, 2) == L":\\") {
+		if (MatchSubstr(exepath, 1, L":\\")) {
 			path.SetAt(0, exepath[0]);
 		}
 	}
@@ -11755,7 +11755,7 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label, bool bD3D11)
 
 					CString str;
 					file.ReadString(str); // read first string
-					if (str.Left(25) == L"// $MinimumShaderProfile:") {
+					if (MatchSubstr(str, 0, L"// $MinimumShaderProfile:")) {
 						shader.profile = str.Mid(25).Trim(); // shader version property
 					}
 					else {

@@ -671,7 +671,7 @@ namespace Youtube
 				JSUrl.Replace(L"\\/", L"/");
 				JSUrl.Trim();
 
-				if (JSUrl.Left(2) == L"//") {
+				if (MatchSubstr(JSUrl, 0, L"//")) {
 					JSUrl = L"https:" + JSUrl;
 				} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
 					JSUrl = L"https://www.youtube.com" + JSUrl;
@@ -1369,7 +1369,7 @@ namespace Youtube
 					}
 				}
 
-				if (channelId.Left(2) == L"UC") {
+				if (MatchSubstr(channelId, 0, L"UC")) {
 					const CString playlistId = L"UU" + channelId.Right(channelId.GetLength() - 2);
 					url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
 				} else {
@@ -1383,7 +1383,8 @@ namespace Youtube
 				return false;
 			}
 
-			const auto extract_mix = playlistId.Left(2) == L"RD" || playlistId.Left(2) == L"UL" || playlistId.Left(2) == L"PU";
+			const auto plId_type = playlistId.Left(2);
+			const auto extract_mix = plId_type == L"RD" || plId_type == L"UL" || plId_type == L"PU";
 			if (extract_mix) {
 				DLog(L"Youtube::Parse_Playlist() : mixed playlist");
 				url.Format(L"https://www.youtube.com/watch?v=%s&list=%s", videoIdCurrent, playlistId);

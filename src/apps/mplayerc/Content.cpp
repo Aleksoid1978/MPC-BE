@@ -210,7 +210,7 @@ namespace Content {
 					if (content.body.GetLength() >= 8 && wcsncmp((LPCTSTR)content.body + 4, L"moov", 4) == 0) {
 						content.ct = L"video/quicktime";
 					}
-					if (content.body.Left(7) == L"#EXTM3U" && content.body.Find(L"#EXT-X-MEDIA-SEQUENCE") > 7) {
+					if (MatchSubstr(content.body, 0, L"#EXTM3U") && content.body.Find(L"#EXT-X-MEDIA-SEQUENCE") > 7) {
 						content.ct = L"application/http-live-streaming";
 					}
 					if (content.body.Find(L"#EXT-X-STREAM-INF:") >= 0) {
@@ -218,7 +218,7 @@ namespace Content {
 					}
 					if ((content.ct.Find(L"text/plain") == 0
 							|| content.ct.Find(L"application/vnd.apple.mpegurl") == 0
-							|| content.ct.Find(L"audio/mpegurl") == 0) && content.body.Left(7) == L"#EXTM3U") {
+							|| content.ct.Find(L"audio/mpegurl") == 0) && MatchSubstr(content.body, 0, L"#EXTM3U")) {
 						content.ct = L"audio/x-mpegurl";
 					}
 				}
@@ -272,7 +272,7 @@ namespace Content {
 			CString url = CString(match[k].first, match[k].length());
 			url.Trim();
 
-			if (playlist_type == PLAYLIST_RAM && url.Left(7) == L"file://") {
+			if (playlist_type == PLAYLIST_RAM && MatchSubstr(url, 0, L"file://")) {
 				url.Delete(0, 7);
 				url.Replace('/', '\\');
 			}
@@ -344,7 +344,7 @@ namespace Content {
 			CString fn2 = CString(match[k].first, match[k].length());
 			fn2.Trim();
 
-			if (playlist_type == PLAYLIST_RAM && fn2.Left(7) == L"file://") {
+			if (playlist_type == PLAYLIST_RAM && MatchSubstr(fn2, 0, L"file://")) {
 				fn2.Delete(0, 7);
 				fn2.Replace('/', '\\');
 			}

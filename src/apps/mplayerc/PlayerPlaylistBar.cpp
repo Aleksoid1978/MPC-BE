@@ -1669,7 +1669,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	while (f.ReadString(str)) {
 		FastTrim(str);
 
-		if (str.IsEmpty() || (str.Left(7) == L"#EXTM3U")) {
+		if (str.IsEmpty() || (MatchSubstr(str, 0, L"#EXTM3U"))) {
 			continue;
 		}
 
@@ -1683,7 +1683,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				str.TrimLeft();
 			};
 
-			if (str.Left(8) == L"#EXTINF:") {
+			if (MatchSubstr(str, 0, L"#EXTINF:")) {
 				DeleteLeft(8, str);
 
 				int pos = str.Find(L",");
@@ -1700,15 +1700,15 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					}
 				}
 				title = str.TrimLeft();
-			} else if (str.Left(8) == L"#EXTALB:") {
+			} else if (MatchSubstr(str, 0, L"#EXTALB:")) {
 				DeleteLeft(8, str);
 				album = str;
-			} else if (str.Left(18) == L"#EXT-X-STREAM-INF:") {
+			} else if (MatchSubstr(str, 0, L"#EXT-X-STREAM-INF:")) {
 				DeleteLeft(18, str);
 				title = str;
 
 				audioId = RegExpParse<CString>(str.GetString(), LR"(AUDIO=\"(\S*?)\")");
-			} else if (str.Left(13) == L"#EXT-X-MEDIA:" && str.Find(L"TYPE=AUDIO") >= 13) {
+			} else if (MatchSubstr(str, 0, L"#EXT-X-MEDIA:") && str.Find(L"TYPE=AUDIO") >= 13) {
 				const auto id = RegExpParse<CString>(str.GetString(), LR"(GROUP-ID=\"(\S*?)\")");
 				if (!id.IsEmpty()) {
 					const auto url = RegExpParse<CString>(str.GetString(), LR"(URI=\"(.*?)\")");

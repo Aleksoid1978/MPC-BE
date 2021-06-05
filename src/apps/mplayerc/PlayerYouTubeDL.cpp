@@ -158,7 +158,7 @@ namespace YoutubeDL
 								float tbr = .0f;
 								if (getJsonValue(format, "tbr", tbr)) {
 									if ((tbr > maxtbr)
-											|| (tbr == maxtbr && protocol.Left(4) == "http")) {
+											|| (tbr == maxtbr && MatchSubstr(protocol, 0, "http"))) {
 										maxtbr = tbr;
 										bestAudioUrl = url;
 									}
@@ -218,7 +218,7 @@ namespace YoutubeDL
 								continue;
 							}
 							if ((height > maxHeight)
-									|| (height == maxHeight && protocol.Left(4) == "http")) {
+									|| (height == maxHeight && MatchSubstr(protocol, 0, "http"))) {
 								maxHeight = height;
 								bestUrl = url;
 								bVideoOnly = false;
