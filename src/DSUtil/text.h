@@ -183,12 +183,22 @@ T& FastTrim(T& str)
 	return FastTrimRight(str).TrimLeft();
 }
 
-inline bool MatchSubstr(const CStringW& str, int iFirst, const WCHAR* sub)
+inline bool MatchSubstr(const CStringA& str, int iFirst, const char* sub)
 {
-	return wcsncmp(str.GetString() + iFirst, sub, wcslen(sub)) == 0;;
+	return strncmp(str.GetString() + iFirst, sub, std::char_traits<char>::length(sub)) == 0;
 }
 
-inline bool MatchSubstrNoCase(const CStringW& str, int iFirst, const WCHAR* sub)
+inline bool MatchSubstr(const CStringW& str, int iFirst, const wchar_t* sub)
 {
-	return _wcsnicmp(str.GetString() + iFirst, sub, wcslen(sub)) == 0;
+	return wcsncmp(str.GetString() + iFirst, sub, std::char_traits<wchar_t>::length(sub)) == 0;
+}
+
+inline bool MatchSubstrNoCase(const CStringA& str, int iFirst, const char* sub)
+{
+	return _strnicmp(str.GetString() + iFirst, sub, std::char_traits<char>::length(sub)) == 0;
+}
+
+inline bool MatchSubstrNoCase(const CStringW& str, int iFirst, const wchar_t* sub)
+{
+	return _wcsnicmp(str.GetString() + iFirst, sub, std::char_traits<wchar_t>::length(sub)) == 0;
 }
