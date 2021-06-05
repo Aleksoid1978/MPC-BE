@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <string>
+
 template<class T, typename SEP>
 std::enable_if_t<(std::is_same_v<T, CStringW> || std::is_same_v<T, CStringA>), T>
 Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
