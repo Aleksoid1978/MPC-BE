@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileInfoClip.h"
-#include <qnetwork.h>
 #include "../../DSUtil/WinAPIUtils.h"
 
 

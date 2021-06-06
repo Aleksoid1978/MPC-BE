@@ -58,7 +58,6 @@
 #include <dsound.h>
 #include <uuids.h>
 #include <clsids.h>
-#include <qnetwork.h>
 #include <psapi.h>
 
 #include "FGManager.h"
@@ -1569,22 +1568,14 @@ LPCWSTR CMainFrame::GetTextForBar(int style)
 
 void CMainFrame::UpdateTitle()
 {
-	if (m_eMediaLoadState == MLS_LOADED && m_PlaybackInfo.bUpdateTitle) {
-		BeginEnumFilters(m_pGB, pEF, pBF) {
-			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-				if (CheckMainFilter(pBF)) {
-					CComBSTR bstr;
-					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-						if (m_PlaybackInfo.Title != bstr.m_str) {
-							m_PlaybackInfo.Title = bstr.m_str;
-							UpdateWindowTitle();
-						}
-						break;
-					}
-				}
+	if (m_eMediaLoadState == MLS_LOADED && m_PlaybackInfo.bUpdateTitle && m_pAMMC) {
+		CComBSTR bstr;
+		if (SUCCEEDED(m_pAMMC->get_Title(&bstr)) && bstr.Length()) {
+			if (m_PlaybackInfo.Title != bstr.m_str) {
+				m_PlaybackInfo.Title = bstr.m_str;
+				UpdateWindowTitle();
 			}
 		}
-		EndEnumFilters;
 
 		if (m_wndInfoBar.IsWindowVisible()) {
 			OpenSetupInfoBar();
@@ -8057,21 +8048,11 @@ void CMainFrame::OnPlayPlay()
 				strOSD = pli.m_label;
 			}
 
-			if (strOSD.IsEmpty()) {
-				BeginEnumFilters(m_pGB, pEF, pBF) {
-					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-						if (!CheckMainFilter(pBF)) {
-							continue;
-						}
-
-						CComBSTR bstr;
-						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-							strOSD = bstr.m_str;
-							break;
-						}
-					}
+			if (strOSD.IsEmpty() && m_pAMMC) {
+				CComBSTR bstr;
+				if (SUCCEEDED(m_pAMMC->get_Title(&bstr)) && bstr.Length()) {
+					strOSD = bstr.m_str;
 				}
-				EndEnumFilters;
 			}
 		}
 
@@ -12488,6 +12469,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (!m_pKFI) {
 					m_pKFI = pBF;
 				}
+				if (!m_pAMMC) {
+					m_pAMMC = pBF;
+				}
 				EndEnumFilters;
 
 				m_pMainSourceFilter = FindFilter(__uuidof(CMpegSplitterFilter), m_pGB);
@@ -13158,63 +13142,54 @@ void CMainFrame::OpenSetupInfoBar()
 {
 	if (GetPlaybackMode() == PM_FILE) {
 		bool fEmpty = true;
-		BeginEnumFilters(m_pGB, pEF, pBF) {
-
-			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-				if (!CheckMainFilter(pBF)) {
-					continue;
+		if (m_pAMMC) {
+			CComBSTR bstr;
+			if (SUCCEEDED(m_pAMMC->get_Title(&bstr))) {
+				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), bstr.m_str);
+				if (bstr.Length()) {
+					fEmpty = false;
 				}
-
-				CComBSTR bstr;
-				if (SUCCEEDED(pAMMC->get_Title(&bstr))) {
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), bstr.m_str);
-					if (bstr.Length()) {
-						fEmpty = false;
-					}
-					bstr.Empty();
+				bstr.Empty();
+			}
+			if (SUCCEEDED(m_pAMMC->get_AuthorName(&bstr))) {
+				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), bstr.m_str);
+				if (bstr.Length()) {
+					fEmpty = false;
 				}
-				if (SUCCEEDED(pAMMC->get_AuthorName(&bstr))) {
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), bstr.m_str);
-					if (bstr.Length()) {
-						fEmpty = false;
-					}
-					bstr.Empty();
+				bstr.Empty();
+			}
+			if (SUCCEEDED(m_pAMMC->get_Copyright(&bstr))) {
+				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_COPYRIGHT), bstr.m_str);
+				if (bstr.Length()) {
+					fEmpty = false;
 				}
-				if (SUCCEEDED(pAMMC->get_Copyright(&bstr))) {
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_COPYRIGHT), bstr.m_str);
-					if (bstr.Length()) {
-						fEmpty = false;
-					}
-					bstr.Empty();
+				bstr.Empty();
+			}
+			if (SUCCEEDED(m_pAMMC->get_Rating(&bstr))) {
+				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_RATING), bstr.m_str);
+				if (bstr.Length()) {
+					fEmpty = false;
 				}
-				if (SUCCEEDED(pAMMC->get_Rating(&bstr))) {
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_RATING), bstr.m_str);
-					if (bstr.Length()) {
-						fEmpty = false;
-					}
-					bstr.Empty();
+				bstr.Empty();
+			}
+			if (SUCCEEDED(m_pAMMC->get_Description(&bstr))) {
+				// show only the first description line
+				CString str(bstr.m_str);
+				int k = str.Find(L"\r\n");
+				if (k > 0) {
+					str.Truncate(k);
+					str.Append(L" \x2026");
 				}
-				if (SUCCEEDED(pAMMC->get_Description(&bstr))) {
-					// show only the first description line
-					CString str(bstr.m_str);
-					int k = str.Find(L"\r\n");
-					if (k > 0) {
-						str.Truncate(k);
-						str.Append(L" \x2026");
-					}
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), str);
-					if (bstr.Length()) {
-						fEmpty = false;
-					}
-					bstr.Empty();
+				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), str);
+				if (bstr.Length()) {
+					fEmpty = false;
 				}
-				if (!fEmpty) {
-					RecalcLayout();
-					break;
-				}
+				bstr.Empty();
+			}
+			if (!fEmpty) {
+				RecalcLayout();
 			}
 		}
-		EndEnumFilters;
 
 		if (!m_youtubeFields.title.IsEmpty()) {
 			m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_youtubeFields.title);
@@ -14519,6 +14494,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMainSourceFilter.Release();
 	m_pSwitcherFilter.Release();
 	m_pDVS.Release();
+	m_pAMMC.Release();
 	m_pKFI.Release();
 
 	if (m_pGB) {
