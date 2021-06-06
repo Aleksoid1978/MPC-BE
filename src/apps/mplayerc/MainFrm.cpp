@@ -13311,19 +13311,13 @@ void CMainFrame::OpenUpdatePlaybackInfo(const CString path)
 		else {
 			bool bGetTitle = false;
 
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-					if (CheckMainFilter(pBF)) {
-						CComBSTR bstr;
-						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-							m_PlaybackInfo.Title = bstr.m_str;
-							bGetTitle = true;
-							break;
-						}
-					}
+			if (m_pAMMC) {
+				CComBSTR bstr;
+				if (SUCCEEDED(m_pAMMC->get_Title(&bstr)) && bstr.Length()) {
+					m_PlaybackInfo.Title = bstr.m_str;
+					bGetTitle = true;
 				}
 			}
-			EndEnumFilters;
 
 			if (!bGetTitle) {
 				CPlaylistItem pli;
