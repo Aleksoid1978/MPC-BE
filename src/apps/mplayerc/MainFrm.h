@@ -273,7 +273,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
 	CComQIPtr<IFileSourceFilter>	m_pMainFSF;
 	CComQIPtr<IKeyFrameInfo>		m_pKFI;
-	CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> m_pAMMC;
+	CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> m_pAMMC[2];
 
 	CComQIPtr<IDirectVobSub>		m_pDVS;
 
