@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,7 @@
 #include "ShoutcastSource.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/entities.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 
@@ -718,6 +719,8 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		static BYTE buff[255*16], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
+			int len = decode_html_entities_utf8((char*)buff, nullptr);
+
 			CString str = UTF8orLocalToWStr((LPCSTR)buff);
 
 			DLog(L"CShoutcastStream(): Metainfo: %s", str);

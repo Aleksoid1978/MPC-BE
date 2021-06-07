@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2020 see Authors.txt
+ * (C) 2017-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/UrlParser.h"
+#include "../../../DSUtil/entities.h"
 
 #define RAPIDJSON_SSE2
 #include <rapidjson/include/rapidjson/document.h>
@@ -104,6 +105,8 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 			DWORD _dwSizeRead = 0;
 			if (S_OK == m_HTTPAsync.Read(&b, 1, &_dwSizeRead) && _dwSizeRead == 1 && b) {
 				if (S_OK == m_HTTPAsync.Read(buff, b * 16, &_dwSizeRead) && _dwSizeRead == b * 16) {
+					int len = decode_html_entities_utf8((char*)buff, nullptr);
+
 					CString str = UTF8orLocalToWStr((LPCSTR)buff);
 
 					DbgLog((LOG_TRACE, 3, L"CUDPStream::HTTPRead(): Metainfo: %s", str));
