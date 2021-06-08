@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -672,10 +672,25 @@ BOOL (__stdcall * Real_DeviceIoControl)(HANDLE, DWORD, LPVOID, DWORD, LPVOID, DW
 BOOL WINAPI Mine_DeviceIoControl(HANDLE hDevice, DWORD dwIoControlCode, LPVOID lpInBuffer, DWORD nInBufferSize, LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped)
 {
 	BOOL ret = Real_DeviceIoControl(hDevice, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, lpOverlapped);
-
-	if (IOCTL_DVD_GET_REGION == dwIoControlCode && lpOutBuffer && lpBytesReturned && *lpBytesReturned == sizeof(DVD_REGION)) {
+	if (IOCTL_DVD_GET_REGION == dwIoControlCode && lpOutBuffer && nOutBufferSize == sizeof(DVD_REGION)) {
 		DVD_REGION* pDVDRegion = (DVD_REGION*)lpOutBuffer;
-		pDVDRegion->SystemRegion = ~pDVDRegion->RegionData;
+
+		if (pDVDRegion->RegionData > 0) {
+			UCHAR disc_regions = ~pDVDRegion->RegionData;
+			if ((disc_regions & pDVDRegion->SystemRegion) == 0) {
+				if      (disc_regions & 1)   pDVDRegion->SystemRegion = 1;
+				else if (disc_regions & 2)   pDVDRegion->SystemRegion = 2;
+				else if (disc_regions & 4)   pDVDRegion->SystemRegion = 4;
+				else if (disc_regions & 8)   pDVDRegion->SystemRegion = 8;
+				else if (disc_regions & 16)  pDVDRegion->SystemRegion = 16;
+				else if (disc_regions & 32)  pDVDRegion->SystemRegion = 32;
+				else if (disc_regions & 128) pDVDRegion->SystemRegion = 128;
+				ret = true;
+			}
+		} else if (pDVDRegion->SystemRegion == 0) {
+			pDVDRegion->SystemRegion = 1;
+			ret = true;
+		}
 	}
 
 	return ret;
