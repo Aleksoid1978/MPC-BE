@@ -217,7 +217,7 @@
 #define ID_PLAY_PLAYPAUSE               889
 #define ID_PLAY_STOP                    890
 #define ID_PLAY_FRAMESTEP               891
-#define ID_PLAY_FRAMESTEPCANCEL         892
+#define ID_PLAY_FRAMESTEP_BACK          892
 #define ID_PLAY_GOTO                    893
 #define ID_PLAY_DECRATE                 894
 #define ID_PLAY_INCRATE                 895
@@ -1066,7 +1066,7 @@
 #define IDS_AG_PLAY                     32890
 #define IDS_AG_STOP                     32891
 #define IDS_AG_FRAMESTEP                32892
-#define IDS_MPLAYERC_16                 32893
+#define IDS_AG_FRAMESTEP_BACK           32893
 #define IDS_AG_GO_TO                    32894
 #define IDS_AG_INCREASE_RATE            32895
 #define IDS_AG_DECREASE_RATE            32896
