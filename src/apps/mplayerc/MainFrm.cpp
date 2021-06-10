@@ -978,7 +978,6 @@ void CMainFrame::OnDestroy()
 	}
 
 	m_ExtSubFiles.clear();
-	m_ExtSubFilesTime.clear();
 	m_ExtSubPaths.clear();
 
 	__super::OnDestroy();
@@ -4684,7 +4683,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	}
 
 	m_ExtSubFiles.clear();
-	m_ExtSubFilesTime.clear();
 	m_ExtSubPaths.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
@@ -13964,7 +13962,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	ASSERT(pFileData || pDVDData || pDeviceData);
 
 	m_ExtSubFiles.clear();
-	m_ExtSubFilesTime.clear();
 	m_ExtSubPaths.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
@@ -16263,16 +16260,10 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 		}
 
 		if (subChangeNotifyThread.joinable() && !::PathIsURLW(fname)) {
-
-			if (!Contains(m_ExtSubFiles, fname)) {
-				m_ExtSubFiles.emplace_back(fname);
-
+			auto it = std::find_if(m_ExtSubFiles.cbegin(), m_ExtSubFiles.cend(), [&fname](filepathtime_t fpt) { return fpt.path == fname; });
+			if (it == m_ExtSubFiles.cend()) {
 				CFileStatus status;
-				if (CFileGetStatus(fname, status)) {
-					m_ExtSubFilesTime.push_back(status.m_mtime);
-				} else {
-					m_ExtSubFilesTime.push_back(0);
-				}
+				m_ExtSubFiles.emplace_back(filepathtime_t{ fname, CFileGetStatus(fname, status) ? status.m_mtime : 0 });
 			}
 
 			const CString path = GetFolderOnly(fname);
@@ -19834,13 +19825,12 @@ void CMainFrame::subChangeNotifyThreadFunction()
 				break;
 			}
 
-			BOOL bChanged = FALSE;
-			for (size_t idx = 0; idx < m_ExtSubFiles.size(); idx++) {
+			bool bChanged = false;
+			for (auto& extSubFile : m_ExtSubFiles) {
 				CFileStatus status;
-				CString fn = m_ExtSubFiles[idx];
-				if (CFileGetStatus(fn, status) && m_ExtSubFilesTime[idx] != status.m_mtime) {
-					m_ExtSubFilesTime[idx] = status.m_mtime;
-					bChanged = TRUE;
+				if (CFileGetStatus(extSubFile.path, status) && extSubFile.time != status.m_mtime) {
+					extSubFile.time = status.m_mtime;
+					bChanged = true;
 				}
 			}
 

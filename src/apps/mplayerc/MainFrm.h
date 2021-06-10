@@ -1328,8 +1328,8 @@ protected:
 
 	HMODULE m_hWtsLib;
 
-	std::vector<CStringW> m_ExtSubFiles;
-	std::vector<CTime>    m_ExtSubFilesTime;
+	struct filepathtime_t { CStringW path; CTime time; };
+	std::vector<filepathtime_t> m_ExtSubFiles;
 	std::vector<CStringW> m_ExtSubPaths;
 
 	void subChangeNotifyThreadStart();
