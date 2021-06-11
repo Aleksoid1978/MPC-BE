@@ -342,15 +342,10 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	fl.RemoveAll();
 
 	CString fn = CString(lpcwstrFileName).TrimLeft();
-	CString protocol = fn.Left(fn.Find(':')+1).TrimRight(':').MakeLower();
+	CString protocol = fn.Left(fn.Find(':')).MakeLower();
 	CString ext = CPath(fn).GetExtension().MakeLower();
 
-	if (fn.Find(L"pipe:") == 0) {
-		protocol = L"pipe";
-	}
-
 	HANDLE hFile = INVALID_HANDLE_VALUE;
-
 	std::vector<BYTE> httpbuf;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(L".cda") != 0)) {

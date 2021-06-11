@@ -12456,7 +12456,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (s.bKeepHistory && pOFD->bAddRecent && fn.Find(L"pipe:") == -1) {
+		if (s.bKeepHistory && pOFD->bAddRecent && !MatchSubstr(fn, 0, L"pipe:")) {
 			CRecentFileList* pMRU = bFirst ? &s.MRU : &s.MRUDub;
 			pMRU->ReadList();
 			pMRU->Add(fn);
@@ -12533,7 +12533,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	if (!pOFD->fns.empty()) {
 		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.front();
-		if (fn.Find(L"pipe:") == -1
+		if (!MatchSubstr(fn, 0, L"pipe:")
 				&& s.bKeepHistory && s.bRememberFilePos && !s.NewFile(fn)) {
 			const FILE_POSITION* FilePosition = s.CurrentFilePosition();
 			if (m_pMS && FilePosition->llPosition > 0) {
