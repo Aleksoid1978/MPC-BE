@@ -2579,10 +2579,6 @@ void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
 		root = IDS_R_FAVDVDS;
 		maxcount = ID_FAVORITES_DVD_END - ID_FAVORITES_DVD_START + 1;
 		break;
-	case FAV_DEVICE:
-		root = IDS_R_FAVDEVICES;
-		maxcount = ID_FAVORITES_DEVICE_END - ID_FAVORITES_DEVICE_START + 1;
-		break;
 	default:
 		return;
 	}
@@ -2614,7 +2610,6 @@ void CAppSettings::SetFav(favtype ft, std::list<CString>& sl)
 	switch (ft) {
 	case FAV_FILE:   root = IDS_R_FAVFILES;   break;
 	case FAV_DVD:    root = IDS_R_FAVDVDS;    break;
-	case FAV_DEVICE: root = IDS_R_FAVDEVICES; break;
 	default:
 		return;
 	}

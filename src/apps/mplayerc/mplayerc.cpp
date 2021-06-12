@@ -254,10 +254,9 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	AfxGetMyApp()->GetAppSavePath(oldpath);
 
 	// Load favorites so that they can be correctly saved to the new location
-	std::list<CString> filesFav, DVDsFav, devicesFav;
+	std::list<CString> filesFav, DVDsFav;
 	AfxGetAppSettings().GetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().GetFav(FAV_DVD, DVDsFav);
-	AfxGetAppSettings().GetFav(FAV_DEVICE, devicesFav);
 
 	if (useIni) {
 		bool success = m_Profile.StoreSettingsToIni();
@@ -272,7 +271,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
-	AfxGetAppSettings().SetFav(FAV_DEVICE, devicesFav);
 
 	// Save external filters to the new location
 	m_s.SaveExternalFilters();

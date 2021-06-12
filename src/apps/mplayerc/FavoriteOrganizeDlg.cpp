@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -143,7 +143,6 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 
 	s.GetFav(FAV_FILE, m_FavLists[0]);
 	s.GetFav(FAV_DVD, m_FavLists[1]);
-	s.GetFav(FAV_DEVICE, m_FavLists[2]);
 
 	SetupList();
 
@@ -438,7 +437,6 @@ void CFavoriteOrganizeDlg::OnBnClickedOk()
 
 	s.SetFav(FAV_FILE, m_FavLists[0]);
 	s.SetFav(FAV_DVD, m_FavLists[1]);
-	s.SetFav(FAV_DEVICE, m_FavLists[2]);
 
 	OnOK();
 }

@@ -452,8 +452,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_FILE_START, ID_FAVORITES_FILE_END, OnUpdateFavoritesFile)
 	ON_COMMAND_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnFavoritesDVD)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnUpdateFavoritesDVD)
-	ON_COMMAND_RANGE(ID_FAVORITES_DEVICE_START, ID_FAVORITES_DEVICE_END, OnFavoritesDevice)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_DEVICE_START, ID_FAVORITES_DEVICE_END, OnUpdateFavoritesDevice)
 
 	ON_COMMAND(ID_RECENT_FILES_CLEAR, OnRecentFileClear)
 	ON_UPDATE_COMMAND_UI(ID_RECENT_FILES_CLEAR, OnUpdateRecentFileClear)
@@ -10499,17 +10497,6 @@ void CMainFrame::OnUpdateFavoritesDVD(CCmdUI* pCmdUI)
 	UNREFERENCED_PARAMETER(nID);
 }
 
-void CMainFrame::OnFavoritesDevice(UINT nID)
-{
-	nID -= ID_FAVORITES_DEVICE_START;
-}
-
-void CMainFrame::OnUpdateFavoritesDevice(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID - ID_FAVORITES_DEVICE_START;
-	UNREFERENCED_PARAMETER(nID);
-}
-
 // help
 
 void CMainFrame::OnHelpHomepage()
@@ -15967,24 +15954,6 @@ void CMainFrame::SetupFavoritesSubMenu()
 	}
 
 	nLastGroupStart = submenu.GetMenuItemCount();
-
-	id = ID_FAVORITES_DEVICE_START;
-	s.GetFav(FAV_DEVICE, favlist);
-
-	for (const auto& fav : favlist) {
-		std::list<CString> sl;
-		ExplodeEsc(fav, sl, L'|', 2);
-
-		if (sl.size() == 2 && sl.front().GetLength()) {
-			CString favname = sl.front();
-			favname.Replace(L"&", L"&&");
-			favname.Replace(L"\t", L" ");
-
-			submenu.AppendMenu(flags, id, favname);
-		}
-
-		id++;
-	}
 }
 
 void CMainFrame::SetupShadersSubMenu()

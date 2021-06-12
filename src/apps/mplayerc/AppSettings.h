@@ -181,7 +181,6 @@ enum dvstype {
 enum favtype {
 	FAV_FILE,
 	FAV_DVD,
-	FAV_DEVICE
 };
 
 #define MAX_DVD_POSITION 50

@@ -1178,8 +1178,6 @@ public:
 	afx_msg void OnUpdateFavoritesFile(CCmdUI* pCmdUI);
 	afx_msg void OnFavoritesDVD(UINT nID);
 	afx_msg void OnUpdateFavoritesDVD(CCmdUI* pCmdUI);
-	afx_msg void OnFavoritesDevice(UINT nID);
-	afx_msg void OnUpdateFavoritesDevice(CCmdUI* pCmdUI);
 	afx_msg void OnRecentFileClear();
 	afx_msg void OnUpdateRecentFileClear(CCmdUI* pCmdUI);
 	afx_msg void OnRecentFile(UINT nID);

@@ -421,8 +421,6 @@
 #define ID_FAVORITES_FILE_END           3799
 #define ID_FAVORITES_DVD_START          3800
 #define ID_FAVORITES_DVD_END            3899
-#define ID_FAVORITES_DEVICE_START       3900
-#define ID_FAVORITES_DEVICE_END         3999
 #define ID_FILE_OPEN_CD_START           4000
 #define ID_FILE_OPEN_CD_END             4099
 #define ID_PANNSCAN_PRESETS_START       4100

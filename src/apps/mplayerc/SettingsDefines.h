@@ -26,7 +26,6 @@
 #define IDS_R_FAVORITES						L"Favorites2"
 #define IDS_R_FAVFILES						L"Favorites2\\Files"
 #define IDS_R_FAVDVDS						L"Favorites2\\DVDs"
-#define IDS_R_FAVDEVICES					L"Favorites2\\Devices"
 #define IDS_R_COMMANDS						L"Commands2"
 #define IDS_R_MOUSE							L"Settings\\Mouse"
 #define IDS_R_LOGINS						L"Logins"
