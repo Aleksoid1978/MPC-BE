@@ -2434,7 +2434,7 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 
 		// set mixer format string
 		CString subtypestr = GetGUIDString(input_mt.subtype);
-		if (MatchSubstr(subtypestr, 0, L"MEDIASUBTYPE_")) {
+		if (StartsWith(subtypestr, L"MEDIASUBTYPE_")) {
 			m_strInputFmt = subtypestr.Mid(13);
 		} else {
 			BITMAPINFOHEADER bih;

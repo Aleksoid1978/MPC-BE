@@ -404,10 +404,10 @@ void EllipsisPath(CStringW& path, const int maxlen)
 {
 	if (path.GetLength() > maxlen) {
 		int k = -1;
-		if (MatchSubstr(path, 0, L"\\\\")) {
+		if (StartsWith(path, L"\\\\")) {
 			k = path.Find('\\', k+1);
 		}
-		else if (MatchSubstr(path, 1, L":\\")) {
+		else if (StartsWith(path, L":\\", 1)) {
 			k = 2;
 		}
 

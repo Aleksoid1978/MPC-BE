@@ -671,7 +671,7 @@ namespace Youtube
 				JSUrl.Replace(L"\\/", L"/");
 				JSUrl.Trim();
 
-				if (MatchSubstr(JSUrl, 0, L"//")) {
+				if (StartsWith(JSUrl, L"//")) {
 					JSUrl = L"https:" + JSUrl;
 				} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
 					JSUrl = L"https://www.youtube.com" + JSUrl;
@@ -1369,7 +1369,7 @@ namespace Youtube
 					}
 				}
 
-				if (MatchSubstr(channelId, 0, L"UC")) {
+				if (StartsWith(channelId, L"UC")) {
 					const CString playlistId = L"UU" + channelId.Right(channelId.GetLength() - 2);
 					url.Format(L"https://www.youtube.com/playlist?list=%s", playlistId);
 				} else {

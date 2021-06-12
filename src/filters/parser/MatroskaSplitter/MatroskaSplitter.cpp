@@ -447,7 +447,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 					bHasVideo = true;
-				} else if (MatchSubstr(CodecID, 0, "V_MPEG4/ISO/")) {
+				} else if (StartsWith(CodecID, "V_MPEG4/ISO/")) {
 					BITMAPINFOHEADER pbmi;
 					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
 					pbmi.biSize			= sizeof(pbmi);
@@ -596,7 +596,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else {
 							fourcc = GETU32(pTE->CodecPrivate.data() + 4);
 						}
-					} else if (MatchSubstr(CodecID, 0, "V_REAL/RV") && CodecID.GetLength() >= 11) {
+					} else if (StartsWith(CodecID, "V_REAL/RV") && CodecID.GetLength() >= 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
 					} else if (CodecID == "V_FFV1") {
 						fourcc = FCC('FFV1');
@@ -654,7 +654,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (!bHasVideo) {
 							mts.push_back(mt);
 
-							if (MatchSubstr(CodecID, 0, "V_REAL/RV") && pTE->CodecPrivate.size() > 26) {
+							if (StartsWith(CodecID, "V_REAL/RV") && pTE->CodecPrivate.size() > 26) {
 								const BYTE* extra = pTE->CodecPrivate.data() + 26;
 								const size_t extralen = pTE->CodecPrivate.size() - 26;
 
@@ -1068,7 +1068,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					f->wHeadEmphasis	= 0;
 
 					mts.push_back(mt);
-				} else if (MatchSubstr(CodecID, 0, "A_AC3")) {
+				} else if (StartsWith(CodecID, "A_AC3")) {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
 
 					std::vector<BYTE> pData;
@@ -1235,7 +1235,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					wfe->nAvgBytesPerSec = 0;
 					mts.push_back(mt);
-				} else if (MatchSubstr(CodecID, 0, "A_AAC/")) {
+				} else if (StartsWith(CodecID, "A_AAC/")) {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
 					wfe->cbSize = 2;
@@ -1340,7 +1340,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										  (DWORD)pTE->a.SamplingFrequency,
 										  DWORD(pTE->a.BitDepth),
 										  pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
-				} else if (MatchSubstr(CodecID, 0, "A_REAL/") && CodecID.GetLength() >= 11) {
+				} else if (StartsWith(CodecID, "A_REAL/") && CodecID.GetLength() >= 11) {
 					mt.subtype = FOURCCMap((DWORD)CodecID[7]|((DWORD)CodecID[8]<<8)|((DWORD)CodecID[9]<<16)|((DWORD)CodecID[10]<<24));
 					mt.bTemporalCompression = TRUE;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
@@ -1362,7 +1362,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
 					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
-				} else if (MatchSubstr(CodecID, 0, "A_OPUS")) {
+				} else if (StartsWith(CodecID, "A_OPUS")) {
 					wfe->wFormatTag = WAVE_FORMAT_OPUS;
 					mt.subtype = MEDIASUBTYPE_OPUS;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.size();

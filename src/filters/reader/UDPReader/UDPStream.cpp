@@ -203,7 +203,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	CUrlParser urlParser;
 	CString str_protocol;
 
-	if (MatchSubstr(m_url_str, 0, L"pipe:")) {
+	if (StartsWith(m_url_str, L"pipe:")) {
 		str_protocol = L"pipe";
 	} else {
 		if (!urlParser.Parse(fnw)) {
