@@ -593,7 +593,7 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		  pFGF->GetType());
 
 	CString name = pFGF->GetName();
-	if (name.Find(L"MPC ") == 0 && pFGF->GetType() != L"CFGFilterInternal") {
+	if (StartsWith(name, L"MPC ") && pFGF->GetType() != L"CFGFilterInternal") {
 		CString external;
 		external.Format(L" (%s)", ResStr(IDS_EXTERNAL));
 

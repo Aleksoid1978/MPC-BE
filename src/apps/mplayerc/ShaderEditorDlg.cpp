@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -118,7 +118,7 @@ void CShaderEdit::OnUpdate()
 		m_acdlg.m_list.ResetContent();
 
 		for (auto& hlslfunc : m_acdlg.m_HLSLFuncs) {
-			if (CString(hlslfunc.str).Find(text) == 0) {
+			if (wcsncmp(hlslfunc.str, text, text.GetLength()) == 0) {
 				int i = m_acdlg.m_list.AddString(hlslfunc.name);
 				m_acdlg.m_list.SetItemDataPtr(i, (void*)&hlslfunc);
 			}

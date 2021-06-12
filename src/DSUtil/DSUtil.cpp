@@ -110,7 +110,7 @@ bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 
 	const CString filterName = GetFilterName(pBF).MakeLower();
 
-	if (filterName.Find(L"directvobsub") == 0) {
+	if (StartsWith(filterName, L"directvobsub")) {
 		return true;
 	}
 	if (filterName.Find(L"video") < 0) {

@@ -214,7 +214,7 @@ void CPPageSubtitles::OnBnClickedButton2()
 	if (wtf.Open(L"http://" + ISDb + L"/test.php") && wtf.ReadString(str) && str == ver) {
 		msg = ResStr(IDS_PPSDB_URLCORRECT);
 		nIconType = MB_ICONINFORMATION;
-	} else if (str.Find(L"ISDb v") == 0) {
+	} else if (StartsWith(str, L"ISDb v")) {
 		msg = ResStr(IDS_PPSDB_PROTOCOLERR);
 	} else {
 		msg = ResStr(IDS_PPSDB_BADURL);

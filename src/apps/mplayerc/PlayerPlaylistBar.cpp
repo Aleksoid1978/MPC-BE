@@ -1240,7 +1240,7 @@ static bool SearchFiles(CString path, std::list<CString>& sl, bool bSingleElemen
 
 			FindClose(h);
 
-			if (sl.size() == 0 && mask.Find(L":\\") == 1) {
+			if (sl.size() == 0 && StartsWith(mask, L":\\", 1)) {
 				if (CDROM_VideoCD == GetCDROMType(mask[0], sl)) {
 					sl.clear();
 				}
@@ -1393,7 +1393,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 
 static CString CombinePath(CPath p, const CString& fn)
 {
-	if (fn.Find(L":\\") == 1 || fn.Find(L"\\") == 0) {
+	if (StartsWith(fn, L":\\", 1) || StartsWith(fn, L"\\")) {
 		return fn;
 	}
 

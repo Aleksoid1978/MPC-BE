@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -442,10 +442,10 @@ static void InitCodecList(std::vector<Codec>& codecs, CComboBox& box, const GUID
 		}
 
 		CStringW str = CStringW(c.displayName).MakeLower();
-		if (str.Find(L"@device:sw:") == 0) {
+		if (StartsWith(str, L"@device:sw:")) {
 			c.friendlyName = L"(DS)";
 		}
-		else if (str.Find(L"@device:cm:") == 0) {
+		else if (StartsWith(str, L"@device:cm:")) {
 			if (cat == CLSID_VideoCompressorCategory) {
 				// for some unknown reason, the VfW codecs never added in x64 mode
 				c.friendlyName = L"(VfW)";
@@ -455,8 +455,8 @@ static void InitCodecList(std::vector<Codec>& codecs, CComboBox& box, const GUID
 			}
 		}
 #if 0 // TODO?
-		else if (str.Find(L"@device:dmo:") == 0) {
-			c.FriendlyName = L"(DMO)";
+		else if (StartsWith(str, L"@device:dmo:")) {
+			c.friendlyName = L"(DMO)";
 		}
 #endif
 		else {
