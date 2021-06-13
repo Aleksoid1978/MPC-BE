@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "HistoryFile.h"
+#include <atlenc.h>
 
 std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(SessionInfo& sesInfo)
 {
@@ -125,6 +126,17 @@ bool CHistoryFile::ReadFile()
 						sesInfo.DVDTimecode = { (BYTE)h, (BYTE)m, (BYTE)s, 0 };
 					}
 				}
+				else if (param == L"DVDState") {
+					CStringA base64(value);
+					int nDestLen = Base64DecodeGetRequiredLength(base64.GetLength());
+					sesInfo.DVDState.resize(nDestLen);
+					BOOL ret = Base64Decode(base64, base64.GetLength(), sesInfo.DVDState.data(), &nDestLen);
+					if (ret) {
+						sesInfo.DVDState.resize(nDestLen);
+					} else {
+						sesInfo.DVDState.clear();
+					}
+				}
 				else if (param == L"AudioNum") {
 					int32_t i32val;
 					if (StrToInt32(value, i32val) && i32val >= 1) {
@@ -202,6 +214,15 @@ bool CHistoryFile::WriteFile()
 							(unsigned)sesInfo.DVDTimecode.bHours,
 							(unsigned)sesInfo.DVDTimecode.bMinutes,
 							(unsigned)sesInfo.DVDTimecode.bSeconds);
+					}
+				}
+				if (sesInfo.DVDState.size()) {
+					int nDestLen = Base64EncodeGetRequiredLength(sesInfo.DVDState.size());
+					CStringA base64;
+					BOOL ret = Base64Encode(sesInfo.DVDState.data(), sesInfo.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+					if (ret) {
+						base64.ReleaseBufferSetLength(nDestLen);
+						str.AppendFormat(L"DVDState=%hs\n", base64);
 					}
 				}
 				else {

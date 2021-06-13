@@ -23,10 +23,13 @@
 struct SessionInfo {
 	CStringW Path;
 	CStringW Title;
-	REFERENCE_TIME Position = 0;
+
 	ULONGLONG DVDId = 0;
 	ULONG DVDTitle = 0;
 	DVD_HMSF_TIMECODE DVDTimecode = {};
+	std::vector<uint8_t> DVDState;
+
+	REFERENCE_TIME Position = 0;
 	int AudioNum = -1;
 	int SubtitleNum = -1;
 	CStringW AudioPath;
@@ -38,9 +41,11 @@ struct SessionInfo {
 	}
 
 	void CleanPosition() {
-		Position = 0;
 		DVDTitle = 0;
 		DVDTimecode = {};
+		DVDState.clear();
+
+		Position = 0;
 		AudioNum = -1;
 		SubtitleNum = -1;
 		AudioPath.Empty();
