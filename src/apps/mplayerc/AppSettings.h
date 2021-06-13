@@ -162,7 +162,7 @@ enum MCE_RAW_INPUT {
 #define AUDRNDT_MPC         L"MPC Audio Renderer"
 
 #define DEFAULT_AUDIO_PATHS    L".;.\\audio;.\\fandub"
-#define DEFAULT_SUBTITLE_PATHS L".;.\\subtitles;.\\subs;.\\sub"
+#define DEFAULT_SUBTITLE_PATHS L".;.\\subtitles;.\\subs;.\\*sub"
 #define DEFAULT_JUMPDISTANCE_1  1000
 #define DEFAULT_JUMPDISTANCE_2  5000
 #define DEFAULT_JUMPDISTANCE_3 20000
