@@ -53,29 +53,72 @@ struct SessionInfo {
 	}
 };
 
-class CHistoryFile
+//
+// CMpcLstFile
+//
+
+class CMpcLstFile
 {
-private:
+protected:
 	std::mutex m_Mutex;
 	DWORD m_LastAccessTick = 0;
 
 	CStringW m_filename;
-	std::list<SessionInfo> m_SessionInfos;
 	unsigned m_maxCount = 100;
+	LPCWSTR m_Header = L"";
+
+	virtual void IntAddEntry(SessionInfo& sesInfo) = 0;
+	virtual void IntClearEntries() = 0;
+
+	bool ReadFile();
+
+public:
+	bool Clear(); // Clear list and delete file
+
+	void SetFilename(CStringW& filename);
+	void SetMaxCount(unsigned maxcount);
+};
+
+//
+// CHistoryFile
+//
+
+class CHistoryFile : public CMpcLstFile
+{
+private:
+	std::list<SessionInfo> m_SessionInfos;
+
+	void IntAddEntry(SessionInfo& sesInfo) override;
+	void IntClearEntries() override;
 
 	std::list<SessionInfo>::iterator FindSessionInfo(SessionInfo& sesInfo);
-	bool ReadFile();
 	bool WriteFile();
 
 public:
-	void SetFilename(CStringW& filename);
-	void SetMaxCount(unsigned maxcount);
-
-	bool Clear(); // Clear list and delete history file
 	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos); // Read or create an entry in the history file
 	void SaveSessionInfo(SessionInfo& sesInfo);
 	void DeleteSessionInfo(SessionInfo& sesInfo);
 
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
+};
+
+//
+// CFavoritesFile
+//
+
+class CFavoritesFile : public CMpcLstFile
+{
+private:
+	void IntAddEntry(SessionInfo& sesInfo) override;
+	void IntClearEntries() override;
+
+	bool WriteFile();
+
+public:
+	std::list<SessionInfo> m_FavFiles;
+	std::list<SessionInfo> m_FavDVDs;
+
+	void OpenFavorites();
+	void SaveFavorites();
 };

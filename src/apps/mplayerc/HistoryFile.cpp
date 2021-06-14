@@ -22,30 +22,11 @@
 #include "HistoryFile.h"
 #include <atlenc.h>
 
-std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(SessionInfo& sesInfo)
-{
-	if (sesInfo.DVDId) {
-		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
-			if (sesInfo.DVDId == (*it).DVDId) {
-				return it;
-			}
-		}
-	}
-	else if (sesInfo.Path.GetLength()) {
-		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
-			if (sesInfo.Path.CompareNoCase((*it).Path) == 0) {
-				return it;
-			}
-		}
-	}
-	else {
-		ASSERT(0);
-	}
+//
+// CMpcLstFile
+//
 
-	return m_SessionInfos.end();
-}
-
-bool CHistoryFile::ReadFile()
+bool CMpcLstFile::ReadFile()
 {
 	if (!::PathFileExistsW(m_filename)) {
 		return false;
@@ -72,7 +53,7 @@ bool CHistoryFile::ReadFile()
 
 	CStdioFile file(fp);
 
-	m_SessionInfos.clear();
+	IntClearEntries();
 
 	SessionInfo sesInfo;
 	CStringW section;
@@ -84,10 +65,7 @@ bool CHistoryFile::ReadFile()
 		if (line[0] == '[') { // new section
 			if (section.GetLength()) {
 				section.Empty();
-
-				if (sesInfo.Path.GetLength()) {
-					m_SessionInfos.push_back(sesInfo);
-				}
+				IntAddEntry(sesInfo);
 				sesInfo = {};
 			}
 
@@ -166,18 +144,80 @@ bool CHistoryFile::ReadFile()
 	ASSERT(fpStatus == 0);
 	m_LastAccessTick = GetTickCount();
 
-	if (section.GetLength() && sesInfo.Path.GetLength()) {
-		m_SessionInfos.push_back(sesInfo);
+	if (section.GetLength()) {
+		IntAddEntry(sesInfo);
 	}
 
 	return true;
+}
+
+bool CMpcLstFile::Clear()
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	if (_wremove(m_filename) == 0 || errno == ENOENT) {
+		IntClearEntries();
+		return true;
+	}
+	return false;
+}
+
+void CMpcLstFile::SetFilename(CStringW& filename)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	m_filename = filename;
+}
+
+void CMpcLstFile::SetMaxCount(unsigned maxcount)
+{
+	m_maxCount = std::clamp(maxcount, 10u, 999u);
+}
+
+//
+// CHistoryFile
+//
+
+void CHistoryFile::IntAddEntry(SessionInfo& sesInfo)
+{
+	if (sesInfo.Path.GetLength()) {
+		m_SessionInfos.emplace_back(sesInfo);
+	}
+}
+
+void CHistoryFile::IntClearEntries()
+{
+	m_SessionInfos.clear();
+}
+
+std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(SessionInfo& sesInfo)
+{
+	if (sesInfo.DVDId) {
+		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
+			if (sesInfo.DVDId == (*it).DVDId) {
+				return it;
+			}
+		}
+	}
+	else if (sesInfo.Path.GetLength()) {
+		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
+			if (sesInfo.Path.CompareNoCase((*it).Path) == 0) {
+				return it;
+			}
+		}
+	}
+	else {
+		ASSERT(0);
+	}
+
+	return m_SessionInfos.end();
 }
 
 bool CHistoryFile::WriteFile()
 {
 	FILE* fp;
 	int fpStatus;
-	do { // Open history file, retry if it is already being used by another process
+	do { // Open file, retry if it is already being used by another process
 		fp = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
 		if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 			break;
@@ -215,14 +255,14 @@ bool CHistoryFile::WriteFile()
 							(unsigned)sesInfo.DVDTimecode.bMinutes,
 							(unsigned)sesInfo.DVDTimecode.bSeconds);
 					}
-				}
-				if (sesInfo.DVDState.size()) {
-					int nDestLen = Base64EncodeGetRequiredLength(sesInfo.DVDState.size());
-					CStringA base64;
-					BOOL ret = Base64Encode(sesInfo.DVDState.data(), sesInfo.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-					if (ret) {
-						base64.ReleaseBufferSetLength(nDestLen);
-						str.AppendFormat(L"DVDState=%hs\n", base64);
+					if (sesInfo.DVDState.size()) {
+						int nDestLen = Base64EncodeGetRequiredLength(sesInfo.DVDState.size());
+						CStringA base64;
+						BOOL ret = Base64Encode(sesInfo.DVDState.data(), sesInfo.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+						if (ret) {
+							base64.ReleaseBufferSetLength(nDestLen);
+							str.AppendFormat(L"DVDState=%hs\n", base64);
+						}
 					}
 				}
 				else {
@@ -262,29 +302,6 @@ bool CHistoryFile::WriteFile()
 	m_LastAccessTick = GetTickCount();
 
 	return ret;
-}
-
-void CHistoryFile::SetFilename(CStringW& filename)
-{
-	std::lock_guard<std::mutex> lock(m_Mutex);
-
-	m_filename = filename;
-}
-
-void CHistoryFile::SetMaxCount(unsigned maxcount)
-{
-	m_maxCount = std::clamp(maxcount, 10u, 999u);
-}
-
-bool CHistoryFile::Clear()
-{
-	std::lock_guard<std::mutex> lock(m_Mutex);
-
-	if (_wremove(m_filename) == 0 || errno == ENOENT) {
-		m_SessionInfos.clear();
-		return true;
-	}
-	return false;
 }
 
 bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
@@ -410,4 +427,139 @@ void CHistoryFile::GetRecentSessions(std::vector<SessionInfo>& recentSessions, u
 			recentSessions.emplace_back(*it++);
 		}
 	}
+}
+
+//
+// CFavoritesFile
+//
+
+void CFavoritesFile::IntAddEntry(SessionInfo& sesInfo)
+{
+	if (sesInfo.Path.GetLength()) {
+		if (sesInfo.DVDId) {
+			m_FavDVDs.emplace_back(sesInfo);
+		} else {
+			m_FavFiles.emplace_back(sesInfo);
+		}
+	}
+}
+
+void CFavoritesFile::IntClearEntries()
+{
+	m_FavFiles.clear();
+	m_FavDVDs.clear();
+}
+
+bool CFavoritesFile::WriteFile()
+{
+	FILE* fp;
+	int fpStatus;
+	do { // Open file, retry if it is already being used by another process
+		fp = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
+		if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+			break;
+		}
+		Sleep(100);
+	} while (true);
+	if (!fp) {
+		ASSERT(FALSE);
+		return false;
+	}
+
+	bool ret = true;
+
+	CStdioFile file(fp);
+	CStringW str;
+	try {
+		file.WriteString(L"; MPC-BE Favorites File 0.1\n");
+		int i = 1;
+		for (const auto& sesInfo : m_FavFiles) {
+			if (sesInfo.Path.GetLength()) {
+				str.Format(L"\n[%03d]\n", i++);
+
+				str.AppendFormat(L"Path=%s\n", sesInfo.Path);
+
+				if (sesInfo.Title.GetLength()) {
+					str.AppendFormat(L"Title=%s\n", sesInfo.Title);
+				}
+				if (sesInfo.Position > UNITS) {
+					LONGLONG seconds = sesInfo.Position / UNITS;
+					int h = (int)(seconds / 3600);
+					int m = (int)(seconds / 60 % 60);
+					int s = (int)(seconds % 60);
+					str.AppendFormat(L"Position=%02d:%02d:%02d\n", h, m, s);
+				}
+				if (sesInfo.AudioNum >= 0) {
+					str.AppendFormat(L"AudioNum=%d\n", sesInfo.AudioNum + 1);
+				}
+				if (sesInfo.SubtitleNum >= 0) {
+					str.AppendFormat(L"SubtitleNum=%d\n", sesInfo.SubtitleNum + 1);
+				}
+				if (sesInfo.AudioPath.GetLength()) {
+					str.AppendFormat(L"AudioPath=%s\n", sesInfo.AudioPath);
+				}
+				if (sesInfo.SubtitlePath.GetLength()) {
+					str.AppendFormat(L"SubtitlePath=%d\n", sesInfo.SubtitlePath);
+				}
+
+				file.WriteString(str);
+			}
+		}
+
+		for (const auto& sesDvd : m_FavDVDs) {
+			if (sesDvd.Path.GetLength() && sesDvd.DVDId) {
+				str.Format(L"\n[%03d]\n", i++);
+
+				str.AppendFormat(L"Path=%s\n", sesDvd.Path);
+
+				if (sesDvd.Title.GetLength()) {
+					str.AppendFormat(L"Title=%s\n", sesDvd.Title);
+				}
+
+				str.AppendFormat(L"DVDId=%016I64x\n", sesDvd.DVDId);
+
+				if (sesDvd.DVDTitle) {
+					str.AppendFormat(L"DVDPosition=%02u,%02u:%02u:%02u\n",
+						(unsigned)sesDvd.DVDTitle,
+						(unsigned)sesDvd.DVDTimecode.bHours,
+						(unsigned)sesDvd.DVDTimecode.bMinutes,
+						(unsigned)sesDvd.DVDTimecode.bSeconds);
+				}
+				if (sesDvd.DVDState.size()) {
+					int nDestLen = Base64EncodeGetRequiredLength(sesDvd.DVDState.size());
+					CStringA base64;
+					BOOL ret = Base64Encode(sesDvd.DVDState.data(), sesDvd.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+					if (ret) {
+						base64.ReleaseBufferSetLength(nDestLen);
+						str.AppendFormat(L"DVDState=%hs\n", base64);
+					}
+				}
+
+				file.WriteString(str);
+			}
+		}
+	}
+	catch (CFileException& e) {
+		// Fail silently if disk is full
+		UNREFERENCED_PARAMETER(e);
+		ASSERT(FALSE);
+		ret = false;
+	}
+
+	fpStatus = fclose(fp);
+	ASSERT(fpStatus == 0);
+	m_LastAccessTick = GetTickCount();
+
+	return ret;
+}
+
+void CFavoritesFile::OpenFavorites()
+{
+	IntClearEntries();
+	ReadFile();
+}
+
+void CFavoritesFile::SaveFavorites()
+{
+	WriteFile();
 }
