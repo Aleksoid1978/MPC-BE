@@ -280,7 +280,7 @@ bool CHistoryFile::Clear()
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
-	if (_wremove(m_filename) == 0) {
+	if (_wremove(m_filename) == 0 || errno == ENOENT) {
 		m_SessionInfos.clear();
 		return true;
 	}
@@ -298,21 +298,25 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 
 	if (it != m_SessionInfos.end()) {
 		found = true;
+		auto& si = (*it);
 
 		if (bReadPos) {
-			auto& si = (*it);
-
 			if (sesInfo.DVDId) {
-				sesInfo.DVDTitle = si.DVDTitle;
+				sesInfo.DVDTitle    = si.DVDTitle;
 				sesInfo.DVDTimecode = si.DVDTimecode;
+				sesInfo.DVDState    = si.DVDState;
 			}
 			else if (sesInfo.Path.GetLength()) {
 				sesInfo.Position     = si.Position;
 				sesInfo.AudioNum     = si.AudioNum;
 				sesInfo.SubtitleNum  = si.SubtitleNum;
-				//sesInfo.AudioPath    = si.AudioPath;
-				//sesInfo.SubtitlePath = si.SubtitlePath;
+				sesInfo.AudioPath    = si.AudioPath;
+				sesInfo.SubtitlePath = si.SubtitlePath;
 			}
+		}
+
+		if (sesInfo.Title.IsEmpty()) {
+			sesInfo.Title = si.Title;
 		}
 	}
 
