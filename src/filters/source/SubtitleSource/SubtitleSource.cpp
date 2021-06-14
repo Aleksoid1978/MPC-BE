@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -636,7 +636,7 @@ HRESULT CSubtitleSourceSSA::GetMediaType(CMediaType* pmt)
 
 	CFile f;
 	WCHAR path[MAX_PATH], fn[MAX_PATH];
-	if (!GetTempPath(MAX_PATH, path) || !GetTempFileName(path, L"mpc_sts", 0, fn)) {
+	if (!GetTempPathW(MAX_PATH, path) || !GetTempFileNameW(path, L"mpc_sts", 0, fn)) {
 		return E_FAIL;
 	}
 
@@ -686,7 +686,7 @@ HRESULT CSubtitleSourceASS::GetMediaType(CMediaType* pmt)
 
 	CFile f;
 	WCHAR path[MAX_PATH], fn[MAX_PATH];
-	if (!GetTempPath(MAX_PATH, path) || !GetTempFileName(path, L"mpc_sts", 0, fn)) {
+	if (!GetTempPathW(MAX_PATH, path) || !GetTempFileNameW(path, L"mpc_sts", 0, fn)) {
 		return E_FAIL;
 	}
 
