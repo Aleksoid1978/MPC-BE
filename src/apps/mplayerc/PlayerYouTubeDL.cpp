@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2020 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -342,7 +342,7 @@ namespace YoutubeDL
 
 						// subtitles
 						if (auto requested_subtitles = GetJsonObject(d, "requested_subtitles")) {
-							for (const auto& subtitle : requested_subtitles->GetObject()) {
+							for (const auto& subtitle : requested_subtitles->GetObj()) {
 								CString sub_url;
 								getJsonValue(subtitle.value, "url", sub_url);
 								CString sub_lang = UTF8ToWStr(subtitle.name.GetString());
