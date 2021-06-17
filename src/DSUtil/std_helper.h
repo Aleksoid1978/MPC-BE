@@ -54,9 +54,10 @@ bool Contains(const std::vector<T>& vector, const T& item)
 	return std::find(vector.cbegin(), vector.cend(), item) != vector.cend();
 }
 
-template <class StringT, class T>
-StringT RegExpParse(const T* szIn, const T* szRE)
+template <class T>
+CStringT<T, StrTraitMFC<T>> RegExpParse(const T* szIn, const T* szRE)
 {
+	using StringT = CStringT<T, StrTraitMFC<T>>;
 	try {
 		const std::basic_regex<T> regex(szRE);
 		std::match_results<const T*> match;

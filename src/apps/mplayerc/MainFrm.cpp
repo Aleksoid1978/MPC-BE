@@ -916,7 +916,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 						bSetCookies = false;
 						break;
 					}
-					consentId = _wtoi(RegExpParse<CString>(value.GetString(), LR"(PENDING\+(\d+))"));
+					consentId = _wtoi(RegExpParse(value.GetString(), LR"(PENDING\+(\d+))"));
 				}
 			}
 		}
@@ -11165,9 +11165,9 @@ void CMainFrame::AutoChangeMonitorMode()
 			DWORD devMon = 0;
 			while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
 				if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-					const CString DeviceID = RegExpParse<CString>(ddMon.DeviceID, LR"(MONITOR\\(\S*?)\\)");
+					const CString DeviceID = RegExpParse(ddMon.DeviceID, LR"(MONITOR\\(\S*?)\\)");
 					if (strFullScreenMonitorID == DeviceID) {
-						strFullScreenMonitor = RegExpParse<CString>(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
+						strFullScreenMonitor = RegExpParse(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
 						bMonValid = TRUE;
 						break;
 					}
@@ -19174,7 +19174,7 @@ BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRe
 						if (cf.Open(bdmt_xml_file)) {
 							CString line;
 							while (cf.ReadString(line)) {
-								const auto title = RegExpParse<CString>(line.GetString(), L"<di:name>([^<>\\n]+)</di:name>");
+								const auto title = RegExpParse(line.GetString(), L"<di:name>([^<>\\n]+)</di:name>");
 								if (!title.IsEmpty()) {
 									m_BDLabel = title;
 									break;

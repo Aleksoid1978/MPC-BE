@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -823,7 +823,7 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		}
 
 		if (tmp.Find(L"</tt>") != -1) {
-			const auto body = RegExpParse<CString>(tmp.GetString(), LR"(<body[^>]*?>(.*)</body>)");
+			const auto body = RegExpParse(tmp.GetString(), LR"(<body[^>]*?>(.*)</body>)");
 			if (!body.IsEmpty()) {
 				const std::wregex regex(LR"(<p(.*?)</p>)");
 
@@ -895,7 +895,7 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 							}
 						}
 						if (time_begin != -1 && time_end > time_begin) {
-							auto text = RegExpParse<CString>(line.GetString(), LR"(>(.+))");
+							auto text = RegExpParse(line.GetString(), LR"(>(.+))");
 							if (!text.IsEmpty()) {
 								ret.Add(TTML2SSA(text), file->IsUnicode(), time_begin, time_end);
 							}

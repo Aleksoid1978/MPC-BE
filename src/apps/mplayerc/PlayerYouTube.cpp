@@ -303,9 +303,9 @@ namespace Youtube
 
 	static auto ParseVideoInfoResponse(LPCSTR szIn)
 	{
-		auto player_response_jsonData = RegExpParse<CStringA>(szIn, R"(player_response=(\{\S+?\})&)");
+		auto player_response_jsonData = RegExpParse(szIn, R"(player_response=(\{\S+?\})&)");
 		if (player_response_jsonData.IsEmpty()) {
-			player_response_jsonData = RegExpParse<CStringA>(szIn, R"(player_response=(\{\S+\}))");
+			player_response_jsonData = RegExpParse(szIn, R"(player_response=(\{\S+\}))");
 		}
 
 		return player_response_jsonData;
@@ -424,7 +424,7 @@ namespace Youtube
 
 			HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
 
-			CString videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
+			CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
 			if (rtStart <= 0) {
 				BOOL bMatch = FALSE;
@@ -452,7 +452,7 @@ namespace Youtube
 				}
 
 				if (!bMatch) {
-					const CString timeStart = RegExpParse<CString>(url.GetString(), L"(?:t|time_continue)=([0-9]+)");
+					const CString timeStart = RegExpParse(url.GetString(), L"(?:t|time_continue)=([0-9]+)");
 					if (!timeStart.IsEmpty()) {
 						rtStart = _wtol(timeStart) * UNITS;
 					}
@@ -569,7 +569,7 @@ namespace Youtube
 					JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
 				}
 
-				const CStringA sts = RegExpParse<CStringA>(data.data(), "\"sts\"\\s*:\\s*(\\d+)");
+				const CStringA sts = RegExpParse(data.data(), "\"sts\"\\s*:\\s*(\\d+)");
 
 				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S&html5=1", videoId, videoId, sts);
 				if (!URLReadData(link.GetString(), data)) {
@@ -733,7 +733,7 @@ namespace Youtube
 					if (!bJSParsed) {
 						bJSParsed = TRUE;
 
-						const auto JSPlayerId = RegExpParse<CString>(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
+						const auto JSPlayerId = RegExpParse(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
 
 						auto& youtubeSignatureCache = AfxGetAppSettings().youtubeSignatureCache;
 						const auto& it = youtubeSignatureCache.find(JSPlayerId);
@@ -774,14 +774,14 @@ namespace Youtube
 								};
 								CStringA funcName;
 								for (const auto& sigRegExp : signatureRegExps) {
-									funcName = RegExpParse<CStringA>(jsData.data(), sigRegExp);
+									funcName = RegExpParse(jsData.data(), sigRegExp);
 									if (!funcName.IsEmpty()) {
 										break;
 									}
 								}
 								if (!funcName.IsEmpty()) {
 									CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
-									const CStringA funcBody = RegExpParse<CStringA>(jsData.data(), funcRegExp.GetString());
+									const CStringA funcBody = RegExpParse(jsData.data(), funcRegExp.GetString());
 									if (!funcBody.IsEmpty()) {
 										CStringA funcGroup;
 										std::list<CStringA> funcList;
@@ -928,7 +928,7 @@ namespace Youtube
 					dashmpdUrl.Replace(L"\\/", L"/");
 					if (dashmpdUrl.Find(L"/s/") > 0) {
 						CStringA url(dashmpdUrl);
-						CStringA signature = RegExpParse<CStringA>(url.GetString(), "/s/([0-9A-Z]+.[0-9A-Z]+)");
+						CStringA signature = RegExpParse(url.GetString(), "/s/([0-9A-Z]+.[0-9A-Z]+)");
 						if (!signature.IsEmpty()) {
 							SignatureDecode(url, signature, "/signature/%s");
 							dashmpdUrl = url;
@@ -945,9 +945,9 @@ namespace Youtube
 						while (std::regex_search(text, match, regex)) {
 							if (match.size() == 2) {
 								const CString xmlElement(match[1].first, match[1].length());
-								const CString url = RegExpParse<CString>(xmlElement.GetString(), L"<BaseURL>(.*?)</BaseURL>");
-								const int itag    = _wtoi(RegExpParse<CString>(xmlElement.GetString(), L"id=\"([0-9]+)\""));
-								const int fps     = _wtoi(RegExpParse<CString>(xmlElement.GetString(), L"frameRate=\"([0-9]+)\""));
+								const CString url = RegExpParse(xmlElement.GetString(), L"<BaseURL>(.*?)</BaseURL>");
+								const int itag    = _wtoi(RegExpParse(xmlElement.GetString(), L"id=\"([0-9]+)\""));
+								const int fps     = _wtoi(RegExpParse(xmlElement.GetString(), L"frameRate=\"([0-9]+)\""));
 								if (url.Find(L"dur/") > 0) {
 									AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
 								}
@@ -1108,7 +1108,7 @@ namespace Youtube
 				}
 			} else {
 				for (const auto& urlLive : strUrlsLive) {
-					CStringA itag = RegExpParse<CStringA>(urlLive.GetString(), "/itag/(\\d+)");
+					CStringA itag = RegExpParse(urlLive.GetString(), "/itag/(\\d+)");
 					if (!itag.IsEmpty()) {
 						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(urlLive), atoi(itag));
 					}
@@ -1355,7 +1355,7 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			HandleURL(url);
 
-			auto channelId = RegExpParse<CString>(url.GetString(), L"www.youtube.com(?:/channel|/c|/user)/([^/]+)");
+			auto channelId = RegExpParse(url.GetString(), L"www.youtube.com(?:/channel|/c|/user)/([^/]+)");
 			if (!channelId.IsEmpty()) {
 				if (url.Find(YOUTUBE_CHANNEL_URL) == -1) {
 					DLog(L"Youtube::Parse_Playlist() : downloading user page '%s'", url);
@@ -1364,7 +1364,7 @@ namespace Youtube
 					if (URLReadData(url.GetString(), data)) {
 						channelId = UTF8ToWStr(GetEntry(data.data(), R"(content="https://www.youtube.com/channel/)", R"(")"));
 						if (channelId.IsEmpty()) {
-							channelId = RegExpParse<CString>(data.data(), R"(\\?"channelId\\?":\\?"([-a-zA-Z0-9_]+)\\?)");
+							channelId = RegExpParse(data.data(), R"(\\?"channelId\\?":\\?"([-a-zA-Z0-9_]+)\\?)");
 						}
 					}
 				}
@@ -1377,8 +1377,8 @@ namespace Youtube
 				}
 			}
 
-			const auto videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
-			const auto playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
+			const auto videoIdCurrent = RegExpParse(url.GetString(), videoIdRegExp);
+			const auto playlistId = RegExpParse(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
 			if (playlistId.IsEmpty()) {
 				return false;
 			}
@@ -1578,7 +1578,7 @@ namespace Youtube
 
 					continue;
 				} else {
-					auto moreUrl = UrlDecode(RegExpParse<CStringA>(moreStr.GetString(), R"(data-uix-load-more-href="/?([^"]+)\")"));
+					auto moreUrl = UrlDecode(RegExpParse(moreStr.GetString(), R"(data-uix-load-more-href="/?([^"]+)\")"));
 					moreStr.Empty();
 					if (!moreUrl.IsEmpty()) {
 						moreUrl.Replace("&amp;", "&"); moreUrl += "&disable_polymer=true";
@@ -1599,8 +1599,8 @@ namespace Youtube
 			return !youtubePlaylist.empty();
 
 #else
-			const CString videoIdCurrent = RegExpParse<CString>(url.GetString(), videoIdRegExp);
-			const CString playlistId = RegExpParse<CString>(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
+			const CString videoIdCurrent = RegExpParse(url.GetString(), videoIdRegExp);
+			const CString playlistId = RegExpParse(url.GetString(), L"list=([-a-zA-Z0-9_]+)");
 			if (playlistId.IsEmpty()) {
 				return false;
 			}
@@ -1674,7 +1674,7 @@ namespace Youtube
 		bool bRet = false;
 		if (CheckURL(url)) {
 			HandleURL(url);
-			const CString videoId = RegExpParse<CString>(url.GetString(), videoIdRegExp);
+			const CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
 			bRet = ParseMetadata(videoId, y_fields);
 		}

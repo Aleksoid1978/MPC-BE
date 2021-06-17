@@ -154,11 +154,11 @@ BOOL CPPageFullscreen::OnInitDialog()
 		DWORD devMon = 0;
 		while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-				const CString DeviceID = RegExpParse<CString>(ddMon.DeviceID, LR"(MONITOR\\(\S*?)\\)");
-				const CString DeviceName = RegExpParse<CString>(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
+				const CString DeviceID = RegExpParse(ddMon.DeviceID, LR"(MONITOR\\(\S*?)\\)");
+				const CString DeviceName = RegExpParse(ddMon.DeviceName, LR"((\\\\.\\DISPLAY\d+)\\)");
 
 				if (!DeviceID.IsEmpty() && !DeviceName.IsEmpty()) {
-					const CString DeviceNumber = RegExpParse<CString>(DeviceName.GetString(), LR"(DISPLAY(\d+))");
+					const CString DeviceNumber = RegExpParse(DeviceName.GetString(), LR"(DISPLAY(\d+))");
 					if (DeviceName == strCurMon) {
 						m_iMonitorTypeCtrl.AddString(L"DISPLAY ( " + DeviceNumber + L" ) - [id: " + DeviceID + L" *" + ResStr(IDS_FULLSCREENMONITOR_CURRENT) + L"] - " + ddMon.DeviceString);
 						m_monitors[0].id = DeviceID;

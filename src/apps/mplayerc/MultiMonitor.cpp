@@ -103,7 +103,7 @@ void CMonitor::GetDeviceId( CString& string ) const
 	DWORD iDevNum = 0;
 	while (EnumDisplayDevicesW(mi.szDevice, iDevNum, &dd, 0)) {
 		if (dd.StateFlags & DISPLAY_DEVICE_ACTIVE && !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-			string = RegExpParse<CString>(dd.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
+			string = RegExpParse(dd.DeviceID, LR"(MONITOR\\(\S+\b)\\)");
 			return;
 		}
 		iDevNum++;

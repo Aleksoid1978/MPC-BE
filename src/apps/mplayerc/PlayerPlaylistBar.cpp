@@ -1707,11 +1707,11 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				DeleteLeft(18, str);
 				title = str;
 
-				audioId = RegExpParse<CString>(str.GetString(), LR"(AUDIO=\"(\S*?)\")");
+				audioId = RegExpParse(str.GetString(), LR"(AUDIO=\"(\S*?)\")");
 			} else if (StartsWith(str, L"#EXT-X-MEDIA:") && str.Find(L"TYPE=AUDIO") >= 13) {
-				const auto id = RegExpParse<CString>(str.GetString(), LR"(GROUP-ID=\"(\S*?)\")");
+				const auto id = RegExpParse(str.GetString(), LR"(GROUP-ID=\"(\S*?)\")");
 				if (!id.IsEmpty()) {
-					const auto url = RegExpParse<CString>(str.GetString(), LR"(URI=\"(.*?)\")");
+					const auto url = RegExpParse(str.GetString(), LR"(URI=\"(.*?)\")");
 					if (!url.IsEmpty()) {
 						auto& audio_items = audio_fns[id];
 						audio_items.emplace_back(MakePath(CombinePath(base, url)));
