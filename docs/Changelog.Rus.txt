@@ -45,7 +45,7 @@ Youtube
 	Detours git-v4.0.1-92-gfe7216c;
 	ffmpeg git-n4.5-dev-1109-g604924a069;
 	Little-CMS git-2.12-17-g79e8395;
-	MediaInfo git-v21.03-8-ge6a48693;
+	MediaInfo git-v21.03-14-gee8c3c17;
 	Speex-1.2.0-25-g870ff84;
 	rapidjson git-v1.1.0-630-gb557259f;
 	ZenLib git-v0.4.39-g13b9d3db;

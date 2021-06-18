@@ -467,7 +467,15 @@ Ztring MediaInfo_Internal::Inform()
     #if defined(MEDIAINFO_JSON_YES)
         if (JSON)
         {
-            Retour=__T("{\n")+Ztring().From_UTF8(To_JSON(*Node_Main, 0, false, false))+__T("\n}");
+            Retour=__T("{\n");
+            Node Node_Version("creatingLibrary");
+            Node_Version.Add_Child("name", Ztring("MediaInfoLib"));
+            Node_Version.Add_Child("version", Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring()));
+            Node_Version.Add_Child("url", Ztring(__T("http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo")));
+            Retour+=Ztring().From_UTF8(To_JSON(Node_Version, 0, false, false))+__T(",\n");
+
+            Retour+=Ztring().From_UTF8(To_JSON(*Node_Main, 0, false, false));
+            Retour+=__T("\n}");
             delete Node_Main;
             delete Node_MI;
         }

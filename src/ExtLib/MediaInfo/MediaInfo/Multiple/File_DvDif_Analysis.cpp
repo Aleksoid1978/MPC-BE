@@ -756,8 +756,17 @@ void File_DvDif::Errors_Stats_Update()
                             Event.Height=720;
                             break;
                 default   : 
-                            Event.Width=0;
-                            Event.Height=0;
+                            //Relying on other sources for the window size
+                            if (!FSC_WasSet) //Original DV 25 Mbps
+                            {
+                                Event.Width=720;
+                                Event.Height=system?576:480; //Considering DV 25 Mbps as SD for sure, so similar to stype of 0
+                            }
+                            else
+                            {
+                                Event.Width=0;
+                                Event.Height=0;
+                            }
             }
             if (video_source_stype!=(int8u)-1)
             {
@@ -775,6 +784,7 @@ void File_DvDif::Errors_Stats_Update()
                     {
                         switch (video_source_stype)
                         {
+                            case  1 : //stype of 1 is not in spec, but considering it as same as stype of 0
                             case  0 : if (APT==0)
                                         Event.VideoChromaSubsampling=1;      //PAL 25 Mbps (IEC 61834)
                                       else
