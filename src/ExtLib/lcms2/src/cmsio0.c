@@ -488,7 +488,6 @@ cmsIOHANDLER* CMSEXPORT cmsGetProfileIOhandler(cmsHPROFILE hProfile)
 // Creates an empty structure holding all required parameters
 cmsHPROFILE CMSEXPORT cmsCreateProfilePlaceholder(cmsContext ContextID)
 {
-    time_t now = time(NULL);
     _cmsICCPROFILE* Icc = (_cmsICCPROFILE*) _cmsMallocZero(ContextID, sizeof(_cmsICCPROFILE));
     if (Icc == NULL) return NULL;
 
@@ -499,15 +498,20 @@ cmsHPROFILE CMSEXPORT cmsCreateProfilePlaceholder(cmsContext ContextID)
 
     // Set default version
     Icc ->Version =  0x02100000;
-
+    
     // Set creation date/time
-    memmove(&Icc ->Created, gmtime(&now), sizeof(Icc ->Created));
+    if (!_cmsGetTime(&Icc->Created))
+        goto Error;
 
     // Create a mutex if the user provided proper plugin. NULL otherwise
     Icc ->UsrMutex = _cmsCreateMutex(ContextID);
 
     // Return the handle
     return (cmsHPROFILE) Icc;
+
+Error:
+    _cmsFree(ContextID, Icc);
+    return NULL;
 }
 
 cmsContext CMSEXPORT cmsGetProfileContextID(cmsHPROFILE hProfile)
