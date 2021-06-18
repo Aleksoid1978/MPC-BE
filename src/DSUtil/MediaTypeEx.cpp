@@ -570,12 +570,7 @@ CString GetGUIDString(const GUID& guid)
 		}
 	}
 
-	CString res(guidStr);
-	if (res == L"Unknown GUID Name") {
-		res.AppendFormat(L" - %s", CStringFromGUID(guid).GetString());
-	}
-
-	return res;
+	return CString(guidStr);
 }
 
 CString GetGUIDString2(const GUID& guid)
