@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ class CMpaDecFilter;
 class CFFAudioDecoder
 {
 protected:
-	AVCodec*              m_pAVCodec;
+	const AVCodec*        m_pAVCodec;
 	AVCodecContext*       m_pAVCtx;
 	AVCodecParserContext* m_pParser;
 	AVFrame*              m_pFrame;

@@ -167,9 +167,6 @@ void av_write_image_line(const uint16_t *src,
     av_write_image_line2(src, data, linesize, desc, x, y, c, w, 2);
 }
 
-#if FF_API_PLUS1_MINUS1
-FF_DISABLE_DEPRECATION_WARNINGS
-#endif
 static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_YUV420P] = {
         .name = "yuv420p",
@@ -177,9 +174,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -189,9 +186,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 8, 1, 7, 1 },        /* Y */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* U */
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* V */
+            { 0, 2, 0, 0, 8 },        /* Y */
+            { 0, 4, 1, 0, 8 },        /* U */
+            { 0, 4, 3, 0, 8 },        /* V */
         },
     },
     [AV_PIX_FMT_YVYU422] = {
@@ -200,9 +197,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 8, 1, 7, 1 },        /* Y */
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* U */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* V */
+            { 0, 2, 0, 0, 8 },        /* Y */
+            { 0, 4, 3, 0, 8 },        /* U */
+            { 0, 4, 1, 0, 8 },        /* V */
         },
     },
     [AV_PIX_FMT_Y210LE] = {
@@ -211,9 +208,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 0, 6, 10, 3, 9, 1 },        /* Y */
-            { 0, 8, 2, 6, 10, 7, 9, 3 },        /* U */
-            { 0, 8, 6, 6, 10, 7, 9, 7 },        /* V */
+            { 0, 4, 0, 6, 10 },        /* Y */
+            { 0, 8, 2, 6, 10 },        /* U */
+            { 0, 8, 6, 6, 10 },        /* V */
         },
     },
     [AV_PIX_FMT_Y210BE] = {
@@ -222,9 +219,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 0, 6, 10, 3, 9, 1 },        /* Y */
-            { 0, 8, 2, 6, 10, 7, 9, 3 },        /* U */
-            { 0, 8, 6, 6, 10, 7, 9, 7 },        /* V */
+            { 0, 4, 0, 6, 10 },        /* Y */
+            { 0, 8, 2, 6, 10 },        /* U */
+            { 0, 8, 6, 6, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE,
     },
@@ -234,9 +231,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 3, 0, 0, 8, 2, 7, 1 },        /* R */
-            { 0, 3, 1, 0, 8, 2, 7, 2 },        /* G */
-            { 0, 3, 2, 0, 8, 2, 7, 3 },        /* B */
+            { 0, 3, 0, 0, 8 },        /* R */
+            { 0, 3, 1, 0, 8 },        /* G */
+            { 0, 3, 2, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -246,9 +243,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 3, 2, 0, 8, 2, 7, 3 },        /* R */
-            { 0, 3, 1, 0, 8, 2, 7, 2 },        /* G */
-            { 0, 3, 0, 0, 8, 2, 7, 1 },        /* B */
+            { 0, 3, 2, 0, 8 },        /* R */
+            { 0, 3, 1, 0, 8 },        /* G */
+            { 0, 3, 0, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -258,9 +255,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0,
         .log2_chroma_h= 0,
         .comp = {
-            { 0, 4, 2, 4, 10, 3, 9, 2 },       /* R */
-            { 0, 4, 1, 2, 10, 3, 9, 3 },       /* G */
-            { 0, 4, 0, 0, 10, 3, 9, 4 },       /* B */
+            { 0, 4, 2, 4, 10 },       /* R */
+            { 0, 4, 1, 2, 10 },       /* G */
+            { 0, 4, 0, 0, 10 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -270,9 +267,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0,
         .log2_chroma_h= 0,
         .comp = {
-            { 0, 4, 0, 4, 10, 3, 9, 2 },       /* R */
-            { 0, 4, 1, 2, 10, 3, 9, 3 },       /* G */
-            { 0, 4, 2, 0, 10, 3, 9, 4 },       /* B */
+            { 0, 4, 0, 4, 10 },       /* R */
+            { 0, 4, 1, 2, 10 },       /* G */
+            { 0, 4, 2, 0, 10 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_BE,
     },
@@ -282,9 +279,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -294,9 +291,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -306,9 +303,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 2,
         .log2_chroma_h = 2,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -318,9 +315,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 2,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -330,9 +327,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 2,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -342,9 +339,8 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
+            { 0, 1, 0, 0, 8 },        /* Y */
         },
-        .flags = FF_PSEUDOPAL,
         .alias = "gray8,y8",
     },
     [AV_PIX_FMT_MONOWHITE] = {
@@ -353,7 +349,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 1, 0, 0, 1 },        /* Y */
+            { 0, 1, 0, 0, 1 },        /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BITSTREAM,
     },
@@ -363,7 +359,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 7, 1, 0, 0, 1 },        /* Y */
+            { 0, 1, 0, 7, 1 },        /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BITSTREAM,
     },
@@ -373,7 +369,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },
+            { 0, 1, 0, 0, 8 },
         },
         .flags = AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -383,9 +379,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -395,9 +391,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -407,9 +403,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -423,9 +419,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 1, 0, 8, 1, 7, 2 },        /* Y */
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* U */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* V */
+            { 0, 2, 1, 0, 8 },        /* Y */
+            { 0, 4, 0, 0, 8 },        /* U */
+            { 0, 4, 2, 0, 8 },        /* V */
         },
     },
     [AV_PIX_FMT_UYYVYY411] = {
@@ -434,9 +430,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 2,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* Y */
-            { 0, 6, 0, 0, 8, 5, 7, 1 },        /* U */
-            { 0, 6, 3, 0, 8, 5, 7, 4 },        /* V */
+            { 0, 4, 1, 0, 8 },        /* Y */
+            { 0, 6, 0, 0, 8 },        /* U */
+            { 0, 6, 3, 0, 8 },        /* V */
         },
     },
     [AV_PIX_FMT_BGR8] = {
@@ -445,11 +441,11 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 3, 0, 2, 1 },        /* R */
-            { 0, 1, 0, 3, 3, 0, 2, 1 },        /* G */
-            { 0, 1, 0, 6, 2, 0, 1, 1 },        /* B */
+            { 0, 1, 0, 0, 3 },        /* R */
+            { 0, 1, 0, 3, 3 },        /* G */
+            { 0, 1, 0, 6, 2 },        /* B */
         },
-        .flags = AV_PIX_FMT_FLAG_RGB | FF_PSEUDOPAL,
+        .flags = AV_PIX_FMT_FLAG_RGB,
     },
     [AV_PIX_FMT_BGR4] = {
         .name = "bgr4",
@@ -457,9 +453,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 3, 0, 1, 3, 0, 4 },        /* R */
-            { 0, 4, 1, 0, 2, 3, 1, 2 },        /* G */
-            { 0, 4, 0, 0, 1, 3, 0, 1 },        /* B */
+            { 0, 4, 3, 0, 1 },        /* R */
+            { 0, 4, 1, 0, 2 },        /* G */
+            { 0, 4, 0, 0, 1 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_RGB,
     },
@@ -469,11 +465,11 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 1, 0, 0, 1 },        /* R */
-            { 0, 1, 0, 1, 2, 0, 1, 1 },        /* G */
-            { 0, 1, 0, 3, 1, 0, 0, 1 },        /* B */
+            { 0, 1, 0, 0, 1 },        /* R */
+            { 0, 1, 0, 1, 2 },        /* G */
+            { 0, 1, 0, 3, 1 },        /* B */
         },
-        .flags = AV_PIX_FMT_FLAG_RGB | FF_PSEUDOPAL,
+        .flags = AV_PIX_FMT_FLAG_RGB,
     },
     [AV_PIX_FMT_RGB8] = {
         .name = "rgb8",
@@ -481,11 +477,11 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 6, 2, 0, 1, 1 },        /* R */
-            { 0, 1, 0, 3, 3, 0, 2, 1 },        /* G */
-            { 0, 1, 0, 0, 3, 0, 2, 1 },        /* B */
+            { 0, 1, 0, 6, 2 },        /* R */
+            { 0, 1, 0, 3, 3 },        /* G */
+            { 0, 1, 0, 0, 3 },        /* B */
         },
-        .flags = AV_PIX_FMT_FLAG_RGB | FF_PSEUDOPAL,
+        .flags = AV_PIX_FMT_FLAG_RGB,
     },
     [AV_PIX_FMT_RGB4] = {
         .name = "rgb4",
@@ -493,9 +489,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 0, 0, 1, 3, 0, 1 },        /* R */
-            { 0, 4, 1, 0, 2, 3, 1, 2 },        /* G */
-            { 0, 4, 3, 0, 1, 3, 0, 4 },        /* B */
+            { 0, 4, 0, 0, 1 },        /* R */
+            { 0, 4, 1, 0, 2 },        /* G */
+            { 0, 4, 3, 0, 1 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BITSTREAM | AV_PIX_FMT_FLAG_RGB,
     },
@@ -505,11 +501,11 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 3, 1, 0, 0, 1 },        /* R */
-            { 0, 1, 0, 1, 2, 0, 1, 1 },        /* G */
-            { 0, 1, 0, 0, 1, 0, 0, 1 },        /* B */
+            { 0, 1, 0, 3, 1 },        /* R */
+            { 0, 1, 0, 1, 2 },        /* G */
+            { 0, 1, 0, 0, 1 },        /* B */
         },
-        .flags = AV_PIX_FMT_FLAG_RGB | FF_PSEUDOPAL,
+        .flags = AV_PIX_FMT_FLAG_RGB,
     },
     [AV_PIX_FMT_NV12] = {
         .name = "nv12",
@@ -517,9 +513,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 2, 0, 0, 8, 1, 7, 1 },        /* U */
-            { 1, 2, 1, 0, 8, 1, 7, 2 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 2, 0, 0, 8 },        /* U */
+            { 1, 2, 1, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -529,9 +525,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 2, 1, 0, 8, 1, 7, 2 },        /* U */
-            { 1, 2, 0, 0, 8, 1, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 2, 1, 0, 8 },        /* U */
+            { 1, 2, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -541,10 +537,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* R */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* G */
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* B */
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* A */
+            { 0, 4, 1, 0, 8 },        /* R */
+            { 0, 4, 2, 0, 8 },        /* G */
+            { 0, 4, 3, 0, 8 },        /* B */
+            { 0, 4, 0, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -554,10 +550,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* R */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* G */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* B */
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* A */
+            { 0, 4, 0, 0, 8 },        /* R */
+            { 0, 4, 1, 0, 8 },        /* G */
+            { 0, 4, 2, 0, 8 },        /* B */
+            { 0, 4, 3, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -567,10 +563,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* R */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* G */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* B */
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* A */
+            { 0, 4, 3, 0, 8 },        /* R */
+            { 0, 4, 2, 0, 8 },        /* G */
+            { 0, 4, 1, 0, 8 },        /* B */
+            { 0, 4, 0, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -580,10 +576,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* R */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* G */
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* B */
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* A */
+            { 0, 4, 2, 0, 8 },        /* R */
+            { 0, 4, 1, 0, 8 },        /* G */
+            { 0, 4, 0, 0, 8 },        /* B */
+            { 0, 4, 3, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -593,9 +589,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0,
         .log2_chroma_h= 0,
         .comp = {
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* R */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* G */
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* B */
+            { 0, 4, 1, 0, 8 },        /* R */
+            { 0, 4, 2, 0, 8 },        /* G */
+            { 0, 4, 3, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -605,9 +601,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0,
         .log2_chroma_h= 0,
         .comp = {
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* R */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* G */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* B */
+            { 0, 4, 0, 0, 8 },        /* R */
+            { 0, 4, 1, 0, 8 },        /* G */
+            { 0, 4, 2, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -617,9 +613,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0,
         .log2_chroma_h= 0,
         .comp = {
-            { 0, 4, 3, 0, 8, 3, 7, 4 },        /* R */
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* G */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* B */
+            { 0, 4, 3, 0, 8 },        /* R */
+            { 0, 4, 2, 0, 8 },        /* G */
+            { 0, 4, 1, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -629,9 +625,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0,
         .log2_chroma_h= 0,
         .comp = {
-            { 0, 4, 2, 0, 8, 3, 7, 3 },        /* R */
-            { 0, 4, 1, 0, 8, 3, 7, 2 },        /* G */
-            { 0, 4, 0, 0, 8, 3, 7, 1 },        /* B */
+            { 0, 4, 2, 0, 8 },        /* R */
+            { 0, 4, 1, 0, 8 },        /* G */
+            { 0, 4, 0, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -641,7 +637,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },       /* Y */
+            { 0, 2, 0, 0, 9 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BE,
         .alias = "y9be",
@@ -652,7 +648,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },       /* Y */
+            { 0, 2, 0, 0, 9 },       /* Y */
         },
         .alias = "y9le",
     },
@@ -662,7 +658,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },       /* Y */
+            { 0, 2, 0, 0, 10 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BE,
         .alias = "y10be",
@@ -673,7 +669,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },       /* Y */
+            { 0, 2, 0, 0, 10 },       /* Y */
         },
         .alias = "y10le",
     },
@@ -683,7 +679,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },       /* Y */
+            { 0, 2, 0, 0, 12 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BE,
         .alias = "y12be",
@@ -694,7 +690,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },       /* Y */
+            { 0, 2, 0, 0, 12 },       /* Y */
         },
         .alias = "y12le",
     },
@@ -704,7 +700,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },       /* Y */
+            { 0, 2, 0, 0, 14 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BE,
         .alias = "y14be",
@@ -715,7 +711,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },       /* Y */
+            { 0, 2, 0, 0, 14 },       /* Y */
         },
         .alias = "y14le",
     },
@@ -725,7 +721,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* Y */
+            { 0, 2, 0, 0, 16 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BE,
         .alias = "y16be",
@@ -736,7 +732,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* Y */
+            { 0, 2, 0, 0, 16 },       /* Y */
         },
         .alias = "y16le",
     },
@@ -746,9 +742,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -758,9 +754,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -770,9 +766,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -782,9 +778,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -794,9 +790,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -806,9 +802,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -818,10 +814,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
-            { 3, 1, 0, 0, 8, 0, 7, 1 },        /* A */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
+            { 3, 1, 0, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -831,10 +827,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
-            { 3, 1, 0, 0, 8, 0, 7, 1 },        /* A */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
+            { 3, 1, 0, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -844,10 +840,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* U */
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* V */
-            { 3, 1, 0, 0, 8, 0, 7, 1 },        /* A */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 1, 0, 0, 8 },        /* U */
+            { 2, 1, 0, 0, 8 },        /* V */
+            { 3, 1, 0, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -857,10 +853,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
-            { 3, 2, 0, 0, 9, 1, 8, 1 },        /* A */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
+            { 3, 2, 0, 0, 9 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -870,10 +866,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
-            { 3, 2, 0, 0, 9, 1, 8, 1 },        /* A */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
+            { 3, 2, 0, 0, 9 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -883,10 +879,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
-            { 3, 2, 0, 0, 9, 1, 8, 1 },        /* A */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
+            { 3, 2, 0, 0, 9 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -896,10 +892,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
-            { 3, 2, 0, 0, 9, 1, 8, 1 },        /* A */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
+            { 3, 2, 0, 0, 9 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -909,10 +905,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
-            { 3, 2, 0, 0, 9, 1, 8, 1 },        /* A */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
+            { 3, 2, 0, 0, 9 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -922,10 +918,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
-            { 3, 2, 0, 0, 9, 1, 8, 1 },        /* A */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
+            { 3, 2, 0, 0, 9 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -935,10 +931,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },        /* A */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
+            { 3, 2, 0, 0, 10 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -948,10 +944,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },        /* A */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
+            { 3, 2, 0, 0, 10 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -961,10 +957,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },        /* A */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
+            { 3, 2, 0, 0, 10 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -974,10 +970,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },        /* A */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
+            { 3, 2, 0, 0, 10 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -987,10 +983,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },        /* A */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
+            { 3, 2, 0, 0, 10 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1000,10 +996,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },        /* A */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
+            { 3, 2, 0, 0, 10 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1013,10 +1009,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },        /* A */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
+            { 3, 2, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1026,10 +1022,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },        /* A */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
+            { 3, 2, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1039,10 +1035,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },        /* A */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
+            { 3, 2, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1052,10 +1048,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },        /* A */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
+            { 3, 2, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1065,10 +1061,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },        /* A */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
+            { 3, 2, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1078,10 +1074,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },        /* A */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
+            { 3, 2, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1091,9 +1087,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 6, 0, 0, 16, 5, 15, 1 },       /* R */
-            { 0, 6, 2, 0, 16, 5, 15, 3 },       /* G */
-            { 0, 6, 4, 0, 16, 5, 15, 5 },       /* B */
+            { 0, 6, 0, 0, 16 },       /* R */
+            { 0, 6, 2, 0, 16 },       /* G */
+            { 0, 6, 4, 0, 16 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_BE,
     },
@@ -1103,9 +1099,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 6, 0, 0, 16, 5, 15, 1 },       /* R */
-            { 0, 6, 2, 0, 16, 5, 15, 3 },       /* G */
-            { 0, 6, 4, 0, 16, 5, 15, 5 },       /* B */
+            { 0, 6, 0, 0, 16 },       /* R */
+            { 0, 6, 2, 0, 16 },       /* G */
+            { 0, 6, 4, 0, 16 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1115,10 +1111,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 8, 0, 0, 16, 7, 15, 1 },       /* R */
-            { 0, 8, 2, 0, 16, 7, 15, 3 },       /* G */
-            { 0, 8, 4, 0, 16, 7, 15, 5 },       /* B */
-            { 0, 8, 6, 0, 16, 7, 15, 7 },       /* A */
+            { 0, 8, 0, 0, 16 },       /* R */
+            { 0, 8, 2, 0, 16 },       /* G */
+            { 0, 8, 4, 0, 16 },       /* B */
+            { 0, 8, 6, 0, 16 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1128,10 +1124,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 8, 0, 0, 16, 7, 15, 1 },       /* R */
-            { 0, 8, 2, 0, 16, 7, 15, 3 },       /* G */
-            { 0, 8, 4, 0, 16, 7, 15, 5 },       /* B */
-            { 0, 8, 6, 0, 16, 7, 15, 7 },       /* A */
+            { 0, 8, 0, 0, 16 },       /* R */
+            { 0, 8, 2, 0, 16 },       /* G */
+            { 0, 8, 4, 0, 16 },       /* B */
+            { 0, 8, 6, 0, 16 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1141,9 +1137,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, -1, 3, 5, 1, 4, 0 },        /* R */
-            { 0, 2,  0, 5, 6, 1, 5, 1 },        /* G */
-            { 0, 2,  0, 0, 5, 1, 4, 1 },        /* B */
+            { 0, 2, -1, 3, 5 },        /* R */
+            { 0, 2,  0, 5, 6 },        /* G */
+            { 0, 2,  0, 0, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1153,9 +1149,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 1, 3, 5, 1, 4, 2 },        /* R */
-            { 0, 2, 0, 5, 6, 1, 5, 1 },        /* G */
-            { 0, 2, 0, 0, 5, 1, 4, 1 },        /* B */
+            { 0, 2, 1, 3, 5 },        /* R */
+            { 0, 2, 0, 5, 6 },        /* G */
+            { 0, 2, 0, 0, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1165,9 +1161,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, -1, 2, 5, 1, 4, 0 },        /* R */
-            { 0, 2,  0, 5, 5, 1, 4, 1 },        /* G */
-            { 0, 2,  0, 0, 5, 1, 4, 1 },        /* B */
+            { 0, 2, -1, 2, 5 },        /* R */
+            { 0, 2,  0, 5, 5 },        /* G */
+            { 0, 2,  0, 0, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1177,9 +1173,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 1, 2, 5, 1, 4, 2 },        /* R */
-            { 0, 2, 0, 5, 5, 1, 4, 1 },        /* G */
-            { 0, 2, 0, 0, 5, 1, 4, 1 },        /* B */
+            { 0, 2, 1, 2, 5 },        /* R */
+            { 0, 2, 0, 5, 5 },        /* G */
+            { 0, 2, 0, 0, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1189,9 +1185,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, -1, 0, 4, 1, 3, 0 },        /* R */
-            { 0, 2,  0, 4, 4, 1, 3, 1 },        /* G */
-            { 0, 2,  0, 0, 4, 1, 3, 1 },        /* B */
+            { 0, 2, -1, 0, 4 },        /* R */
+            { 0, 2,  0, 4, 4 },        /* G */
+            { 0, 2,  0, 0, 4 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1201,9 +1197,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 1, 0, 4, 1, 3, 2 },        /* R */
-            { 0, 2, 0, 4, 4, 1, 3, 1 },        /* G */
-            { 0, 2, 0, 0, 4, 1, 3, 1 },        /* B */
+            { 0, 2, 1, 0, 4 },        /* R */
+            { 0, 2, 0, 4, 4 },        /* G */
+            { 0, 2, 0, 0, 4 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1213,9 +1209,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 6, 4, 0, 16, 5, 15, 5 },       /* R */
-            { 0, 6, 2, 0, 16, 5, 15, 3 },       /* G */
-            { 0, 6, 0, 0, 16, 5, 15, 1 },       /* B */
+            { 0, 6, 4, 0, 16 },       /* R */
+            { 0, 6, 2, 0, 16 },       /* G */
+            { 0, 6, 0, 0, 16 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1225,9 +1221,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 6, 4, 0, 16, 5, 15, 5 },       /* R */
-            { 0, 6, 2, 0, 16, 5, 15, 3 },       /* G */
-            { 0, 6, 0, 0, 16, 5, 15, 1 },       /* B */
+            { 0, 6, 4, 0, 16 },       /* R */
+            { 0, 6, 2, 0, 16 },       /* G */
+            { 0, 6, 0, 0, 16 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1237,10 +1233,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 8, 4, 0, 16, 7, 15, 5 },       /* R */
-            { 0, 8, 2, 0, 16, 7, 15, 3 },       /* G */
-            { 0, 8, 0, 0, 16, 7, 15, 1 },       /* B */
-            { 0, 8, 6, 0, 16, 7, 15, 7 },       /* A */
+            { 0, 8, 4, 0, 16 },       /* R */
+            { 0, 8, 2, 0, 16 },       /* G */
+            { 0, 8, 0, 0, 16 },       /* B */
+            { 0, 8, 6, 0, 16 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1250,10 +1246,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 8, 4, 0, 16, 7, 15, 5 },       /* R */
-            { 0, 8, 2, 0, 16, 7, 15, 3 },       /* G */
-            { 0, 8, 0, 0, 16, 7, 15, 1 },       /* B */
-            { 0, 8, 6, 0, 16, 7, 15, 7 },       /* A */
+            { 0, 8, 4, 0, 16 },       /* R */
+            { 0, 8, 2, 0, 16 },       /* G */
+            { 0, 8, 0, 0, 16 },       /* B */
+            { 0, 8, 6, 0, 16 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1263,9 +1259,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2,  0, 0, 5, 1, 4, 1 },        /* R */
-            { 0, 2,  0, 5, 6, 1, 5, 1 },        /* G */
-            { 0, 2, -1, 3, 5, 1, 4, 0 },        /* B */
+            { 0, 2,  0, 0, 5 },        /* R */
+            { 0, 2,  0, 5, 6 },        /* G */
+            { 0, 2, -1, 3, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1275,9 +1271,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 5, 1, 4, 1 },        /* R */
-            { 0, 2, 0, 5, 6, 1, 5, 1 },        /* G */
-            { 0, 2, 1, 3, 5, 1, 4, 2 },        /* B */
+            { 0, 2, 0, 0, 5 },        /* R */
+            { 0, 2, 0, 5, 6 },        /* G */
+            { 0, 2, 1, 3, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1287,9 +1283,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2,  0, 0, 5, 1, 4, 1 },       /* R */
-            { 0, 2,  0, 5, 5, 1, 4, 1 },       /* G */
-            { 0, 2, -1, 2, 5, 1, 4, 0 },       /* B */
+            { 0, 2,  0, 0, 5 },       /* R */
+            { 0, 2,  0, 5, 5 },       /* G */
+            { 0, 2, -1, 2, 5 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
      },
@@ -1299,9 +1295,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 5, 1, 4, 1 },        /* R */
-            { 0, 2, 0, 5, 5, 1, 4, 1 },        /* G */
-            { 0, 2, 1, 2, 5, 1, 4, 2 },        /* B */
+            { 0, 2, 0, 0, 5 },        /* R */
+            { 0, 2, 0, 5, 5 },        /* G */
+            { 0, 2, 1, 2, 5 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
@@ -1311,9 +1307,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2,  0, 0, 4, 1, 3, 1 },       /* R */
-            { 0, 2,  0, 4, 4, 1, 3, 1 },       /* G */
-            { 0, 2, -1, 0, 4, 1, 3, 0 },       /* B */
+            { 0, 2,  0, 0, 4 },       /* R */
+            { 0, 2,  0, 4, 4 },       /* G */
+            { 0, 2, -1, 0, 4 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
      },
@@ -1323,48 +1319,27 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 4, 1, 3, 1 },        /* R */
-            { 0, 2, 0, 4, 4, 1, 3, 1 },        /* G */
-            { 0, 2, 1, 0, 4, 1, 3, 2 },        /* B */
+            { 0, 2, 0, 0, 4 },        /* R */
+            { 0, 2, 0, 4, 4 },        /* G */
+            { 0, 2, 1, 0, 4 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_RGB,
     },
-#if FF_API_VAAPI
-    [AV_PIX_FMT_VAAPI_MOCO] = {
-        .name = "vaapi_moco",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VAAPI_IDCT] = {
-        .name = "vaapi_idct",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VAAPI_VLD] = {
-        .name = "vaapi_vld",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-#else
     [AV_PIX_FMT_VAAPI] = {
         .name = "vaapi",
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .flags = AV_PIX_FMT_FLAG_HWACCEL,
     },
-#endif
     [AV_PIX_FMT_YUV420P9LE] = {
         .name = "yuv420p9le",
         .nb_components = 3,
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1374,9 +1349,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1386,9 +1361,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1398,9 +1373,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1410,9 +1385,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1422,9 +1397,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1434,9 +1409,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* Y */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* U */
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* V */
+            { 0, 2, 0, 0, 14 },        /* Y */
+            { 1, 2, 0, 0, 14 },        /* U */
+            { 2, 2, 0, 0, 14 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1446,9 +1421,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* Y */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* U */
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* V */
+            { 0, 2, 0, 0, 14 },        /* Y */
+            { 1, 2, 0, 0, 14 },        /* U */
+            { 2, 2, 0, 0, 14 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1458,9 +1433,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1470,9 +1445,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1482,9 +1457,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1494,9 +1469,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1506,9 +1481,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1518,9 +1493,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1530,9 +1505,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1542,9 +1517,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1554,9 +1529,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* Y */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* U */
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* V */
+            { 0, 2, 0, 0, 14 },        /* Y */
+            { 1, 2, 0, 0, 14 },        /* U */
+            { 2, 2, 0, 0, 14 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1566,9 +1541,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* Y */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* U */
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* V */
+            { 0, 2, 0, 0, 14 },        /* Y */
+            { 1, 2, 0, 0, 14 },        /* U */
+            { 2, 2, 0, 0, 14 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1578,9 +1553,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1590,9 +1565,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1602,9 +1577,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1614,9 +1589,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },        /* Y */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },        /* U */
-            { 2, 2, 0, 0, 16, 1, 15, 1 },        /* V */
+            { 0, 2, 0, 0, 16 },        /* Y */
+            { 1, 2, 0, 0, 16 },        /* U */
+            { 2, 2, 0, 0, 16 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1626,9 +1601,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1638,9 +1613,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* U */
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 2, 0, 0, 10 },        /* U */
+            { 2, 2, 0, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1650,9 +1625,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1662,9 +1637,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* Y */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* U */
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* V */
+            { 0, 2, 0, 0, 9 },        /* Y */
+            { 1, 2, 0, 0, 9 },        /* U */
+            { 2, 2, 0, 0, 9 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1674,9 +1649,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1686,9 +1661,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1698,9 +1673,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* Y */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* U */
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* V */
+            { 0, 2, 0, 0, 14 },        /* Y */
+            { 1, 2, 0, 0, 14 },        /* U */
+            { 2, 2, 0, 0, 14 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1710,9 +1685,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* Y */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* U */
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* V */
+            { 0, 2, 0, 0, 14 },        /* Y */
+            { 1, 2, 0, 0, 14 },        /* U */
+            { 2, 2, 0, 0, 14 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -1732,8 +1707,8 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .name = "ya8",
         .nb_components = 2,
         .comp = {
-            { 0, 2, 0, 0, 8, 1, 7, 1 },        /* Y */
-            { 0, 2, 1, 0, 8, 1, 7, 2 },        /* A */
+            { 0, 2, 0, 0, 8 },        /* Y */
+            { 0, 2, 1, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_ALPHA,
         .alias = "gray8a",
@@ -1742,8 +1717,8 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .name = "ya16le",
         .nb_components = 2,
         .comp = {
-            { 0, 4, 0, 0, 16, 3, 15, 1 },        /* Y */
-            { 0, 4, 2, 0, 16, 3, 15, 3 },        /* A */
+            { 0, 4, 0, 0, 16 },        /* Y */
+            { 0, 4, 2, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1751,8 +1726,8 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .name = "ya16be",
         .nb_components = 2,
         .comp = {
-            { 0, 4, 0, 0, 16, 3, 15, 1 },        /* Y */
-            { 0, 4, 2, 0, 16, 3, 15, 3 },        /* A */
+            { 0, 4, 0, 0, 16 },        /* Y */
+            { 0, 4, 2, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -1766,9 +1741,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* R */
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* G */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* B */
+            { 2, 1, 0, 0, 8 },        /* R */
+            { 0, 1, 0, 0, 8 },        /* G */
+            { 1, 1, 0, 0, 8 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1778,9 +1753,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* R */
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* G */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* B */
+            { 2, 2, 0, 0, 9 },        /* R */
+            { 0, 2, 0, 0, 9 },        /* G */
+            { 1, 2, 0, 0, 9 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1790,9 +1765,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 9, 1, 8, 1 },        /* R */
-            { 0, 2, 0, 0, 9, 1, 8, 1 },        /* G */
-            { 1, 2, 0, 0, 9, 1, 8, 1 },        /* B */
+            { 2, 2, 0, 0, 9 },        /* R */
+            { 0, 2, 0, 0, 9 },        /* G */
+            { 1, 2, 0, 0, 9 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1802,9 +1777,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* R */
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* G */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* B */
+            { 2, 2, 0, 0, 10 },        /* R */
+            { 0, 2, 0, 0, 10 },        /* G */
+            { 1, 2, 0, 0, 10 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1814,9 +1789,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 10, 1, 9, 1 },        /* R */
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* G */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },        /* B */
+            { 2, 2, 0, 0, 10 },        /* R */
+            { 0, 2, 0, 0, 10 },        /* G */
+            { 1, 2, 0, 0, 10 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1826,9 +1801,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* R */
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* G */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* B */
+            { 2, 2, 0, 0, 12 },        /* R */
+            { 0, 2, 0, 0, 12 },        /* G */
+            { 1, 2, 0, 0, 12 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1838,9 +1813,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* R */
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* G */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* B */
+            { 2, 2, 0, 0, 12 },        /* R */
+            { 0, 2, 0, 0, 12 },        /* G */
+            { 1, 2, 0, 0, 12 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1850,9 +1825,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* R */
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* G */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* B */
+            { 2, 2, 0, 0, 14 },        /* R */
+            { 0, 2, 0, 0, 14 },        /* G */
+            { 1, 2, 0, 0, 14 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1862,9 +1837,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 14, 1, 13, 1 },        /* R */
-            { 0, 2, 0, 0, 14, 1, 13, 1 },        /* G */
-            { 1, 2, 0, 0, 14, 1, 13, 1 },        /* B */
+            { 2, 2, 0, 0, 14 },        /* R */
+            { 0, 2, 0, 0, 14 },        /* G */
+            { 1, 2, 0, 0, 14 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1874,9 +1849,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 16, 1, 15, 1 },       /* R */
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* G */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },       /* B */
+            { 2, 2, 0, 0, 16 },       /* R */
+            { 0, 2, 0, 0, 16 },       /* G */
+            { 1, 2, 0, 0, 16 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1886,9 +1861,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 16, 1, 15, 1 },       /* R */
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* G */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },       /* B */
+            { 2, 2, 0, 0, 16 },       /* R */
+            { 0, 2, 0, 0, 16 },       /* G */
+            { 1, 2, 0, 0, 16 },       /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB,
     },
@@ -1898,10 +1873,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 1, 0, 0, 8, 0, 7, 1 },        /* R */
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* G */
-            { 1, 1, 0, 0, 8, 0, 7, 1 },        /* B */
-            { 3, 1, 0, 0, 8, 0, 7, 1 },        /* A */
+            { 2, 1, 0, 0, 8 },        /* R */
+            { 0, 1, 0, 0, 8 },        /* G */
+            { 1, 1, 0, 0, 8 },        /* B */
+            { 3, 1, 0, 0, 8 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB |
                  AV_PIX_FMT_FLAG_ALPHA,
@@ -1912,10 +1887,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 16, 1, 15, 1 },       /* R */
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* G */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },       /* B */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },       /* A */
+            { 2, 2, 0, 0, 16 },       /* R */
+            { 0, 2, 0, 0, 16 },       /* G */
+            { 1, 2, 0, 0, 16 },       /* B */
+            { 3, 2, 0, 0, 16 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB |
                  AV_PIX_FMT_FLAG_ALPHA,
@@ -1926,10 +1901,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 16, 1, 15, 1 },       /* R */
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* G */
-            { 1, 2, 0, 0, 16, 1, 15, 1 },       /* B */
-            { 3, 2, 0, 0, 16, 1, 15, 1 },       /* A */
+            { 2, 2, 0, 0, 16 },       /* R */
+            { 0, 2, 0, 0, 16 },       /* G */
+            { 1, 2, 0, 0, 16 },       /* B */
+            { 3, 2, 0, 0, 16 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR |
                  AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
@@ -1946,9 +1921,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 6, 0, 4, 12, 5, 11, 1 },       /* X */
-            { 0, 6, 2, 4, 12, 5, 11, 3 },       /* Y */
-            { 0, 6, 4, 4, 12, 5, 11, 5 },       /* Z */
+            { 0, 6, 0, 4, 12 },       /* X */
+            { 0, 6, 2, 4, 12 },       /* Y */
+            { 0, 6, 4, 4, 12 },       /* Z */
       },
       /*.flags = -- not used*/
     },
@@ -1958,9 +1933,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 6, 0, 4, 12, 5, 11, 1 },       /* X */
-            { 0, 6, 2, 4, 12, 5, 11, 3 },       /* Y */
-            { 0, 6, 4, 4, 12, 5, 11, 5 },       /* Z */
+            { 0, 6, 0, 4, 12 },       /* X */
+            { 0, 6, 2, 4, 12 },       /* Y */
+            { 0, 6, 4, 4, 12 },       /* Z */
        },
         .flags = AV_PIX_FMT_FLAG_BE,
     },
@@ -1970,9 +1945,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0, \
         .log2_chroma_h= 0, \
         .comp = {          \
-            {0,1,0,0,2,0,1,1},\
-            {0,1,0,0,4,0,3,1},\
-            {0,1,0,0,2,0,1,1},\
+            { 0, 1, 0, 0, 2 }, \
+            { 0, 1, 0, 0, 4 }, \
+            { 0, 1, 0, 0, 2 }, \
         },                 \
 
 #define BAYER16_DESC_COMMON \
@@ -1980,9 +1955,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w= 0, \
         .log2_chroma_h= 0, \
         .comp = {          \
-            {0,2,0,0,4,1,3,1},\
-            {0,2,0,0,8,1,7,1},\
-            {0,2,0,0,4,1,3,1},\
+            { 0, 2, 0, 0, 4 }, \
+            { 0, 2, 0, 0, 8 }, \
+            { 0, 2, 0, 0, 4 }, \
         },                 \
 
     [AV_PIX_FMT_BAYER_BGGR8] = {
@@ -2051,9 +2026,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 2, 0, 0, 8, 1, 7, 1 },        /* U */
-            { 1, 2, 1, 0, 8, 1, 7, 2 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 2, 0, 0, 8 },        /* U */
+            { 1, 2, 1, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -2063,9 +2038,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 4, 0, 0, 10, 3, 9, 1 },        /* U */
-            { 1, 4, 2, 0, 10, 3, 9, 3 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 4, 0, 0, 10 },        /* U */
+            { 1, 4, 2, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -2075,9 +2050,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 10, 1, 9, 1 },        /* Y */
-            { 1, 4, 0, 0, 10, 3, 9, 1 },        /* U */
-            { 1, 4, 2, 0, 10, 3, 9, 3 },        /* V */
+            { 0, 2, 0, 0, 10 },        /* Y */
+            { 1, 4, 0, 0, 10 },        /* U */
+            { 1, 4, 2, 0, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_BE,
     },
@@ -2103,10 +2078,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 8, 2, 0, 16, 7, 15, 3 },        /* Y */
-            { 0, 8, 4, 0, 16, 7, 15, 5 },        /* U */
-            { 0, 8, 6, 0, 16, 7, 15, 7 },        /* V */
-            { 0, 8, 0, 0, 16, 7, 15, 1 },        /* A */
+            { 0, 8, 2, 0, 16 },        /* Y */
+            { 0, 8, 4, 0, 16 },        /* U */
+            { 0, 8, 6, 0, 16 },        /* V */
+            { 0, 8, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -2116,10 +2091,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 8, 2, 0, 16, 7, 15, 3 },        /* Y */
-            { 0, 8, 4, 0, 16, 7, 15, 5 },        /* U */
-            { 0, 8, 6, 0, 16, 7, 15, 7 },        /* V */
-            { 0, 8, 0, 0, 16, 7, 15, 1 },        /* A */
+            { 0, 8, 2, 0, 16 },        /* Y */
+            { 0, 8, 4, 0, 16 },        /* U */
+            { 0, 8, 6, 0, 16 },        /* V */
+            { 0, 8, 0, 0, 16 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -2129,9 +2104,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 6, 10, 1, 9, 1 },        /* Y */
-            { 1, 4, 0, 6, 10, 3, 9, 1 },        /* U */
-            { 1, 4, 2, 6, 10, 3, 9, 3 },        /* V */
+            { 0, 2, 0, 6, 10 },        /* Y */
+            { 1, 4, 0, 6, 10 },        /* U */
+            { 1, 4, 2, 6, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -2141,9 +2116,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 6, 10, 1, 9, 1 },        /* Y */
-            { 1, 4, 0, 6, 10, 3, 9, 1 },        /* U */
-            { 1, 4, 2, 6, 10, 3, 9, 3 },        /* V */
+            { 0, 2, 0, 6, 10 },        /* Y */
+            { 1, 4, 0, 6, 10 },        /* U */
+            { 1, 4, 2, 6, 10 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_BE,
     },
@@ -2153,9 +2128,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* Y */
-            { 1, 4, 0, 0, 16, 3, 15, 1 },       /* U */
-            { 1, 4, 2, 0, 16, 3, 15, 3 },       /* V */
+            { 0, 2, 0, 0, 16 },       /* Y */
+            { 1, 4, 0, 0, 16 },       /* U */
+            { 1, 4, 2, 0, 16 },       /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -2165,9 +2140,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 1,
         .comp = {
-            { 0, 2, 0, 0, 16, 1, 15, 1 },       /* Y */
-            { 1, 4, 0, 0, 16, 3, 15, 1 },       /* U */
-            { 1, 4, 2, 0, 16, 3, 15, 3 },       /* V */
+            { 0, 2, 0, 0, 16 },       /* Y */
+            { 1, 4, 0, 0, 16 },       /* U */
+            { 1, 4, 2, 0, 16 },       /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_BE,
     },
@@ -2177,10 +2152,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 12, 1, 11, 1 },       /* R */
-            { 0, 2, 0, 0, 12, 1, 11, 1 },       /* G */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },       /* B */
-            { 3, 2, 0, 0, 12, 1, 11, 1 },       /* A */
+            { 2, 2, 0, 0, 12 },       /* R */
+            { 0, 2, 0, 0, 12 },       /* G */
+            { 1, 2, 0, 0, 12 },       /* B */
+            { 3, 2, 0, 0, 12 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB |
                  AV_PIX_FMT_FLAG_ALPHA,
@@ -2191,10 +2166,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 12, 1, 11, 1 },       /* R */
-            { 0, 2, 0, 0, 12, 1, 11, 1 },       /* G */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },       /* B */
-            { 3, 2, 0, 0, 12, 1, 11, 1 },       /* A */
+            { 2, 2, 0, 0, 12 },       /* R */
+            { 0, 2, 0, 0, 12 },       /* G */
+            { 1, 2, 0, 0, 12 },       /* B */
+            { 3, 2, 0, 0, 12 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR |
                  AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
@@ -2205,10 +2180,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 10, 1, 9, 1 },       /* R */
-            { 0, 2, 0, 0, 10, 1, 9, 1 },       /* G */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },       /* B */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },       /* A */
+            { 2, 2, 0, 0, 10 },       /* R */
+            { 0, 2, 0, 0, 10 },       /* G */
+            { 1, 2, 0, 0, 10 },       /* B */
+            { 3, 2, 0, 0, 10 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB |
                  AV_PIX_FMT_FLAG_ALPHA,
@@ -2219,10 +2194,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 2, 0, 0, 10, 1, 9, 1 },       /* R */
-            { 0, 2, 0, 0, 10, 1, 9, 1 },       /* G */
-            { 1, 2, 0, 0, 10, 1, 9, 1 },       /* B */
-            { 3, 2, 0, 0, 10, 1, 9, 1 },       /* A */
+            { 2, 2, 0, 0, 10 },       /* R */
+            { 0, 2, 0, 0, 10 },       /* G */
+            { 1, 2, 0, 0, 10 },       /* B */
+            { 3, 2, 0, 0, 10 },       /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR |
                  AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
@@ -2237,9 +2212,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 4, 0, 0, 32, 3, 31, 1 },        /* R */
-            { 0, 4, 0, 0, 32, 3, 31, 1 },        /* G */
-            { 1, 4, 0, 0, 32, 3, 31, 1 },        /* B */
+            { 2, 4, 0, 0, 32 },        /* R */
+            { 0, 4, 0, 0, 32 },        /* G */
+            { 1, 4, 0, 0, 32 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR |
                  AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_FLOAT,
@@ -2250,9 +2225,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 4, 0, 0, 32, 3, 31, 1 },        /* R */
-            { 0, 4, 0, 0, 32, 3, 31, 1 },        /* G */
-            { 1, 4, 0, 0, 32, 3, 31, 1 },        /* B */
+            { 2, 4, 0, 0, 32 },        /* R */
+            { 0, 4, 0, 0, 32 },        /* G */
+            { 1, 4, 0, 0, 32 },        /* B */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_FLOAT | AV_PIX_FMT_FLAG_RGB,
     },
@@ -2262,10 +2237,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 4, 0, 0, 32, 3, 31, 1 },        /* R */
-            { 0, 4, 0, 0, 32, 3, 31, 1 },        /* G */
-            { 1, 4, 0, 0, 32, 3, 31, 1 },        /* B */
-            { 3, 4, 0, 0, 32, 3, 31, 1 },        /* A */
+            { 2, 4, 0, 0, 32 },        /* R */
+            { 0, 4, 0, 0, 32 },        /* G */
+            { 1, 4, 0, 0, 32 },        /* B */
+            { 3, 4, 0, 0, 32 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR |
                  AV_PIX_FMT_FLAG_ALPHA | AV_PIX_FMT_FLAG_RGB |
@@ -2277,10 +2252,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 2, 4, 0, 0, 32, 3, 31, 1 },        /* R */
-            { 0, 4, 0, 0, 32, 3, 31, 1 },        /* G */
-            { 1, 4, 0, 0, 32, 3, 31, 1 },        /* B */
-            { 3, 4, 0, 0, 32, 3, 31, 1 },        /* A */
+            { 2, 4, 0, 0, 32 },        /* R */
+            { 0, 4, 0, 0, 32 },        /* G */
+            { 1, 4, 0, 0, 32 },        /* B */
+            { 3, 4, 0, 0, 32 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA |
                  AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_FLOAT,
@@ -2299,7 +2274,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 0, 0, 32, 3, 31, 1 },       /* Y */
+            { 0, 4, 0, 0, 32 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_FLOAT,
         .alias = "yf32be",
@@ -2310,7 +2285,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 4, 0, 0, 32, 3, 31, 1 },       /* Y */
+            { 0, 4, 0, 0, 32 },       /* Y */
         },
         .flags = AV_PIX_FMT_FLAG_FLOAT,
         .alias = "yf32le",
@@ -2321,10 +2296,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
-            { 3, 2, 0, 0, 12, 1, 11, 1 },        /* A */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
+            { 3, 2, 0, 0, 12 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -2334,10 +2309,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 1,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
-            { 3, 2, 0, 0, 12, 1, 11, 1 },        /* A */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
+            { 3, 2, 0, 0, 12 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -2347,10 +2322,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
-            { 3, 2, 0, 0, 12, 1, 11, 1 },        /* A */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
+            { 3, 2, 0, 0, 12 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -2360,10 +2335,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 2, 0, 0, 12, 1, 11, 1 },        /* Y */
-            { 1, 2, 0, 0, 12, 1, 11, 1 },        /* U */
-            { 2, 2, 0, 0, 12, 1, 11, 1 },        /* V */
-            { 3, 2, 0, 0, 12, 1, 11, 1 },        /* A */
+            { 0, 2, 0, 0, 12 },        /* Y */
+            { 1, 2, 0, 0, 12 },        /* U */
+            { 2, 2, 0, 0, 12 },        /* V */
+            { 3, 2, 0, 0, 12 },        /* A */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
@@ -2373,9 +2348,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 2, 0, 0, 8, 1, 7, 1 },        /* U */
-            { 1, 2, 1, 0, 8, 1, 7, 2 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 2, 0, 0, 8 },        /* U */
+            { 1, 2, 1, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -2385,9 +2360,9 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_w = 0,
         .log2_chroma_h = 0,
         .comp = {
-            { 0, 1, 0, 0, 8, 0, 7, 1 },        /* Y */
-            { 1, 2, 1, 0, 8, 1, 7, 2 },        /* U */
-            { 1, 2, 0, 0, 8, 1, 7, 1 },        /* V */
+            { 0, 1, 0, 0, 8 },        /* Y */
+            { 1, 2, 1, 0, 8 },        /* U */
+            { 1, 2, 0, 0, 8 },        /* V */
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
@@ -2396,9 +2371,6 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .flags = AV_PIX_FMT_FLAG_HWACCEL,
     },
 };
-#if FF_API_PLUS1_MINUS1
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
 static const char * const color_range_names[] = {
     [AVCOL_RANGE_UNSPECIFIED] = "unknown",
@@ -2515,10 +2487,6 @@ enum AVPixelFormat av_get_pix_fmt(const char *name)
         pix_fmt = get_pix_fmt_internal(name2);
     }
 
-#if FF_API_VAAPI
-    if (pix_fmt == AV_PIX_FMT_NONE && !strcmp(name, "vaapi"))
-        pix_fmt = AV_PIX_FMT_VAAPI;
-#endif
     return pix_fmt;
 }
 

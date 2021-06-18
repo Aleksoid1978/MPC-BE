@@ -314,11 +314,6 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
 
     // match timestamps and packet size
     frame->pts = p->m.timestamp;
-#if FF_API_PKT_PTS
-FF_DISABLE_DEPRECATION_WARNINGS
-    frame->pkt_pts = p->m.timestamp;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     frame->pkt_dts = p->m.timestamp;
     frame->pkt_pos = p->m.offset;
     frame->pkt_size = p->m.size;
@@ -474,7 +469,7 @@ static const AVClass libdav1d_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_libdav1d_decoder = {
+const AVCodec ff_libdav1d_decoder = {
     .name           = "libdav1d",
     .long_name      = NULL_IF_CONFIG_SMALL("dav1d AV1 decoder by VideoLAN"),
     .type           = AVMEDIA_TYPE_VIDEO,

@@ -118,11 +118,16 @@ int ff_jpegls_decode_lse(MJpegDecodeContext *s)
                 shift = 8 - s->avctx->bits_per_raw_sample;
             }
 
-            s->picture_ptr->format =
-            s->avctx->pix_fmt = AV_PIX_FMT_PAL8;
+            s->force_pal8++;
+            if (!pal) {
+                if (s->force_pal8 > 1)
+                    return AVERROR_INVALIDDATA;
+                return 1;
+            }
+
             for (i=s->palette_index; i<=maxtab; i++) {
                 uint8_t k = i << shift;
-                pal[k] = 0;
+                pal[k] = wt < 4 ? 0xFF000000 : 0;
                 for (j=0; j<wt; j++) {
                     pal[k] |= get_bits(&s->gb, 8) << (8*(wt-j-1));
                 }
@@ -544,7 +549,7 @@ end:
     return ret;
 }
 
-AVCodec ff_jpegls_decoder = {
+const AVCodec ff_jpegls_decoder = {
     .name           = "jpegls",
     .long_name      = NULL_IF_CONFIG_SMALL("JPEG-LS"),
     .type           = AVMEDIA_TYPE_VIDEO,

@@ -153,11 +153,10 @@ static int mpeg4video_parse(AVCodecParserContext *s,
     return next;
 }
 
-AVCodecParser ff_mpeg4video_parser = {
+const AVCodecParser ff_mpeg4video_parser = {
     .codec_ids      = { AV_CODEC_ID_MPEG4 },
     .priv_data_size = sizeof(struct Mp4vParseContext),
     .parser_init    = mpeg4video_parse_init,
     .parser_parse   = mpeg4video_parse,
     .parser_close   = ff_parse_close,
-    .split          = ff_mpeg4video_split,
 };

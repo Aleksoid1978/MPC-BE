@@ -1004,7 +1004,7 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
         return send_next_delayed_frame(h, pict, got_frame, 0);
 
     if (av_packet_get_side_data(avpkt, AV_PKT_DATA_NEW_EXTRADATA, NULL)) {
-        buffer_size_t side_size;
+        size_t side_size;
         uint8_t *side = av_packet_get_side_data(avpkt, AV_PKT_DATA_NEW_EXTRADATA, &side_size);
         ff_h264_decode_extradata(side, side_size,
                                  &h->ps, &h->is_avc, &h->nal_length_size,
@@ -1072,7 +1072,7 @@ static const AVClass h264_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_h264_decoder = {
+const AVCodec ff_h264_decoder = {
     .name                  = "h264",
     .long_name             = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
     .type                  = AVMEDIA_TYPE_VIDEO,

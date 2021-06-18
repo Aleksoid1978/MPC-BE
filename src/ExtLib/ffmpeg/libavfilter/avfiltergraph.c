@@ -131,9 +131,6 @@ void avfilter_graph_free(AVFilterGraph **graph)
 
     av_freep(&(*graph)->scale_sws_opts);
     av_freep(&(*graph)->aresample_swr_opts);
-#if FF_API_LAVR_OPTS
-    av_freep(&(*graph)->resample_lavr_opts);
-#endif
     av_freep(&(*graph)->filters);
     av_freep(&(*graph)->internal);
     av_freep(graph);
@@ -1363,8 +1360,8 @@ int avfilter_graph_request_oldest(AVFilterGraph *graph)
         if (r != AVERROR_EOF)
             break;
         av_log(oldest->dst, AV_LOG_DEBUG, "EOF on sink link %s:%s.\n",
-               oldest->dst ? oldest->dst->name : "unknown",
-               oldest->dstpad ? oldest->dstpad->name : "unknown");
+               oldest->dst->name,
+               oldest->dstpad->name);
         /* EOF: remove the link from the heap */
         if (oldest->age_index < --graph->sink_links_count)
             heap_bubble_down(graph, graph->sink_links[graph->sink_links_count],

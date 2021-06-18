@@ -5,7 +5,7 @@
 
 Updated libraries:
 	dav1d git-0.9.0-24-gddbbfde;
-	ffmpeg git-n4.5-dev-385-gbb40f800bd;
+	ffmpeg git-n4.5-dev-1109-g604924a069;
 	Little-CMS git-2.12-12-gb423949;
 	MediaInfo git-v21.03-8-ge6a48693;
 	Speex-1.2.0-25-g870ff84;

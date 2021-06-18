@@ -70,7 +70,7 @@ static void dump_floats(WMACodecContext *s, const char *name,
 static av_cold int wma_decode_init(AVCodecContext *avctx)
 {
     WMACodecContext *s = avctx->priv_data;
-    int i, flags2;
+    int i, flags2, ret;
     uint8_t *extradata;
 
     if (!avctx->block_align) {
@@ -102,24 +102,35 @@ static av_cold int wma_decode_init(AVCodecContext *avctx)
     for (i=0; i<MAX_CHANNELS; i++)
         s->max_exponent[i] = 1.0;
 
-    if (ff_wma_init(avctx, flags2) < 0)
-        return -1;
+    if ((ret = ff_wma_init(avctx, flags2)) < 0)
+        return ret;
 
     /* init MDCT */
-    for (i = 0; i < s->nb_block_sizes; i++)
-        ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1, 1.0 / 32768.0);
-
-    if (s->use_noise_coding) {
-        ff_init_vlc_from_lengths(&s->hgain_vlc, HGAINVLCBITS, FF_ARRAY_ELEMS(ff_wma_hgain_hufftab),
-                                 &ff_wma_hgain_hufftab[0][1], 2,
-                                 &ff_wma_hgain_hufftab[0][0], 2, 1, -18, 0, avctx);
+    for (i = 0; i < s->nb_block_sizes; i++) {
+        ret = ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1,
+                           1, 1.0 / 32768.0);
+        if (ret < 0)
+            return ret;
     }
 
-    if (s->use_exp_vlc)
-        init_vlc(&s->exp_vlc, EXPVLCBITS, sizeof(ff_aac_scalefactor_bits), // FIXME move out of context
-                 ff_aac_scalefactor_bits, 1, 1,
-                 ff_aac_scalefactor_code, 4, 4, 0);
-    else
+    if (s->use_noise_coding) {
+        ret = ff_init_vlc_from_lengths(&s->hgain_vlc, HGAINVLCBITS,
+                                       FF_ARRAY_ELEMS(ff_wma_hgain_hufftab),
+                                       &ff_wma_hgain_hufftab[0][1], 2,
+                                       &ff_wma_hgain_hufftab[0][0], 2, 1,
+                                       -18, 0, avctx);
+        if (ret < 0)
+            return ret;
+    }
+
+    if (s->use_exp_vlc) {
+        // FIXME move out of context
+        ret = init_vlc(&s->exp_vlc, EXPVLCBITS, sizeof(ff_aac_scalefactor_bits),
+                       ff_aac_scalefactor_bits, 1, 1,
+                       ff_aac_scalefactor_code, 4, 4, 0);
+        if (ret < 0)
+            return ret;
+    } else
         wma_lsp_to_curve_init(s, s->frame_len);
 
     avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
@@ -964,7 +975,7 @@ static av_cold void flush(AVCodecContext *avctx)
 }
 
 #if CONFIG_WMAV1_DECODER
-AVCodec ff_wmav1_decoder = {
+const AVCodec ff_wmav1_decoder = {
     .name           = "wmav1",
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Audio 1"),
     .type           = AVMEDIA_TYPE_AUDIO,
@@ -977,10 +988,11 @@ AVCodec ff_wmav1_decoder = {
     .capabilities   = AV_CODEC_CAP_DR1,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
 #endif
 #if CONFIG_WMAV2_DECODER
-AVCodec ff_wmav2_decoder = {
+const AVCodec ff_wmav2_decoder = {
     .name           = "wmav2",
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Audio 2"),
     .type           = AVMEDIA_TYPE_AUDIO,
@@ -993,5 +1005,6 @@ AVCodec ff_wmav2_decoder = {
     .capabilities   = AV_CODEC_CAP_DR1,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
 #endif

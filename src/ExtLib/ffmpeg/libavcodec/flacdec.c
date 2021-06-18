@@ -660,7 +660,7 @@ static const AVClass flac_decoder_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_flac_decoder = {
+const AVCodec ff_flac_decoder = {
     .name           = "flac",
     .long_name      = NULL_IF_CONFIG_SMALL("FLAC (Free Lossless Audio Codec)"),
     .type           = AVMEDIA_TYPE_AUDIO,
@@ -678,4 +678,5 @@ AVCodec ff_flac_decoder = {
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },
     .priv_class     = &flac_decoder_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

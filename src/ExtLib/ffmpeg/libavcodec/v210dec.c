@@ -214,7 +214,7 @@ static const AVClass v210dec_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_v210_decoder = {
+const AVCodec ff_v210_decoder = {
     .name           = "v210",
     .long_name      = NULL_IF_CONFIG_SMALL("Uncompressed 4:2:2 10-bit"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -226,4 +226,5 @@ AVCodec ff_v210_decoder = {
                       AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_FRAME_THREADS,
     .priv_class     = &v210dec_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

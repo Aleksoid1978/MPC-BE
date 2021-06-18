@@ -29,7 +29,7 @@
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
-#include "libavutil/mem_internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/pixfmt.h"
@@ -55,7 +55,8 @@ void av_fast_padded_malloc(void *ptr, unsigned int *size, size_t min_size)
         *size = 0;
         return;
     }
-    if (!ff_fast_malloc(p, size, min_size + AV_INPUT_BUFFER_PADDING_SIZE, 1))
+    av_fast_mallocz(p, size, min_size + AV_INPUT_BUFFER_PADDING_SIZE);
+    if (*p)
         memset(*p + min_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 }
 
@@ -67,7 +68,8 @@ void av_fast_padded_mallocz(void *ptr, unsigned int *size, size_t min_size)
         *size = 0;
         return;
     }
-    if (!ff_fast_malloc(p, size, min_size + AV_INPUT_BUFFER_PADDING_SIZE, 1))
+    av_fast_malloc(p, size, min_size + AV_INPUT_BUFFER_PADDING_SIZE);
+    if (*p)
         memset(*p, 0, min_size + AV_INPUT_BUFFER_PADDING_SIZE);
 }
 
@@ -272,6 +274,16 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
             w_align = 8;
             h_align = 8;
         }
+        if (s->codec_id == AV_CODEC_ID_MJPEG   ||
+            s->codec_id == AV_CODEC_ID_MJPEGB  ||
+            s->codec_id == AV_CODEC_ID_LJPEG   ||
+            s->codec_id == AV_CODEC_ID_SMVJPEG ||
+            s->codec_id == AV_CODEC_ID_AMV     ||
+            s->codec_id == AV_CODEC_ID_SP5X    ||
+            s->codec_id == AV_CODEC_ID_JPEGLS) {
+            w_align =   8;
+            h_align = 2*8;
+        }
         break;
     case AV_PIX_FMT_BGR24:
         if ((s->codec_id == AV_CODEC_ID_MSZH) ||
@@ -429,24 +441,6 @@ enum AVPixelFormat avpriv_find_pix_fmt(const PixelFormatTag *tags,
     return AV_PIX_FMT_NONE;
 }
 
-#if FF_API_CODEC_GET_SET
-MAKE_ACCESSORS(AVCodecContext, codec, AVRational, pkt_timebase)
-MAKE_ACCESSORS(AVCodecContext, codec, const AVCodecDescriptor *, codec_descriptor)
-MAKE_ACCESSORS(AVCodecContext, codec, int, lowres)
-MAKE_ACCESSORS(AVCodecContext, codec, int, seek_preroll)
-MAKE_ACCESSORS(AVCodecContext, codec, uint16_t*, chroma_intra_matrix)
-
-unsigned av_codec_get_codec_properties(const AVCodecContext *codec)
-{
-    return codec->properties;
-}
-
-int av_codec_get_max_lowres(const AVCodec *codec)
-{
-    return codec->max_lowres;
-}
-#endif
-
 int avpriv_codec_get_cap_skip_frame_fill_param(const AVCodec *codec){
     return !!(codec->caps_internal & FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM);
 }
@@ -470,28 +464,6 @@ const char *avcodec_get_name(enum AVCodecID id)
         return codec->name;
     return "unknown_codec";
 }
-
-#if FF_API_TAG_STRING
-size_t av_get_codec_tag_string(char *buf, size_t buf_size, unsigned int codec_tag)
-{
-    int i, len, ret = 0;
-
-#define TAG_PRINT(x)                                              \
-    (((x) >= '0' && (x) <= '9') ||                                \
-     ((x) >= 'a' && (x) <= 'z') || ((x) >= 'A' && (x) <= 'Z') ||  \
-     ((x) == '.' || (x) == ' ' || (x) == '-' || (x) == '_'))
-
-    for (i = 0; i < 4; i++) {
-        len = snprintf(buf, buf_size,
-                       TAG_PRINT(codec_tag & 0xFF) ? "%c" : "[%d]", codec_tag & 0xFF);
-        buf        += len;
-        buf_size    = buf_size > len ? buf_size - len : 0;
-        ret        += len;
-        codec_tag >>= 8;
-    }
-    return ret;
-}
-#endif
 
 const char *av_get_profile_name(const AVCodec *codec, int profile)
 {
@@ -729,6 +701,7 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
                     return 0;
                 return frame_bytes * 28;
             case AV_CODEC_ID_ADPCM_4XM:
+            case AV_CODEC_ID_ADPCM_IMA_ACORN:
             case AV_CODEC_ID_ADPCM_IMA_DAT4:
             case AV_CODEC_ID_ADPCM_IMA_ISS:
                 return (frame_bytes - 4 * ch) * 2 / ch;
@@ -773,25 +746,33 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
             if (ba > 0) {
                 /* calc from frame_bytes, channels, and block_align */
                 int blocks = frame_bytes / ba;
-                int64_t tmp;
+                int64_t tmp = 0;
                 switch (id) {
                 case AV_CODEC_ID_ADPCM_IMA_WAV:
                     if (bps < 2 || bps > 5)
                         return 0;
                     tmp = blocks * (1LL + (ba - 4 * ch) / (bps * ch) * 8);
+                    break;
+                case AV_CODEC_ID_ADPCM_IMA_DK3:
+                    tmp = blocks * (((ba - 16LL) * 2 / 3 * 4) / ch);
+                    break;
+                case AV_CODEC_ID_ADPCM_IMA_DK4:
+                    tmp = blocks * (1 + (ba - 4LL * ch) * 2 / ch);
+                    break;
+                case AV_CODEC_ID_ADPCM_IMA_RAD:
+                    tmp = blocks * ((ba - 4LL * ch) * 2 / ch);
+                    break;
+                case AV_CODEC_ID_ADPCM_MS:
+                    tmp = blocks * (2 + (ba - 7LL * ch) * 2LL / ch);
+                    break;
+                case AV_CODEC_ID_ADPCM_MTAF:
+                    tmp = blocks * (ba - 16LL) * 2 / ch;
+                    break;
+                }
+                if (tmp) {
                     if (tmp != (int)tmp)
                         return 0;
                     return tmp;
-                case AV_CODEC_ID_ADPCM_IMA_DK3:
-                    return blocks * (((ba - 16) * 2 / 3 * 4) / ch);
-                case AV_CODEC_ID_ADPCM_IMA_DK4:
-                    return blocks * (1 + (ba - 4 * ch) * 2 / ch);
-                case AV_CODEC_ID_ADPCM_IMA_RAD:
-                    return blocks * ((ba - 4 * ch) * 2 / ch);
-                case AV_CODEC_ID_ADPCM_MS:
-                    return blocks * (2 + (ba - 7 * ch) * 2LL / ch);
-                case AV_CODEC_ID_ADPCM_MTAF:
-                    return blocks * (ba - 16) * 2 / ch;
                 }
             }
 
@@ -884,17 +865,6 @@ const AVCodecHWConfig *avcodec_get_hw_config(const AVCodec *codec, int index)
             return NULL;
     return &codec->hw_configs[index]->public;
 }
-
-#if FF_API_USER_VISIBLE_AVHWACCEL
-AVHWAccel *av_hwaccel_next(const AVHWAccel *hwaccel)
-{
-    return NULL;
-}
-
-void av_register_hwaccel(AVHWAccel *hwaccel)
-{
-}
-#endif
 
 unsigned int avpriv_toupper4(unsigned int x)
 {

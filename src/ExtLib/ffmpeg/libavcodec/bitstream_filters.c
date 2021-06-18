@@ -75,12 +75,6 @@ const AVBitStreamFilter *av_bsf_iterate(void **opaque)
     return f;
 }
 
-#if FF_API_NEXT
-const AVBitStreamFilter *av_bsf_next(void **opaque) {
-    return av_bsf_iterate(opaque);
-}
-#endif
-
 const AVBitStreamFilter *av_bsf_get_by_name(const char *name)
 {
     const AVBitStreamFilter *f = NULL;
@@ -96,28 +90,6 @@ const AVBitStreamFilter *av_bsf_get_by_name(const char *name)
 
     return NULL;
 }
-
-#if FF_API_CHILD_CLASS_NEXT
-const AVClass *ff_bsf_child_class_next(const AVClass *prev)
-{
-    const AVBitStreamFilter *f = NULL;
-    void *i = 0;
-
-    /* find the filter that corresponds to prev */
-    while (prev && (f = av_bsf_iterate(&i))) {
-        if (f->priv_class == prev) {
-            break;
-        }
-    }
-
-    /* find next filter with priv options */
-    while ((f = av_bsf_iterate(&i))) {
-        if (f->priv_class)
-            return f->priv_class;
-    }
-    return NULL;
-}
-#endif
 
 const AVClass *ff_bsf_child_class_iterate(void **opaque)
 {

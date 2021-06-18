@@ -74,7 +74,7 @@ private:
 	BOOL									m_bInterlaced;
 
 	// === FFMpeg variables
-	AVCodec*								m_pAVCodec;
+	const AVCodec*							m_pAVCodec;
 	AVCodecContext*							m_pAVCtx;
 	AVCodecParserContext*					m_pParser;
 	AVFrame*								m_pFrame;

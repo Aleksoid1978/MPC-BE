@@ -483,7 +483,7 @@ static const AVClass fic_decoder_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-AVCodec ff_fic_decoder = {
+const AVCodec ff_fic_decoder = {
     .name           = "fic",
     .long_name      = NULL_IF_CONFIG_SMALL("Mirillis FIC"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -494,4 +494,5 @@ AVCodec ff_fic_decoder = {
     .close          = fic_decode_close,
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS,
     .priv_class     = &fic_decoder_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

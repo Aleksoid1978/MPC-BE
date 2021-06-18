@@ -938,7 +938,7 @@ static av_cold int tak_decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_tak_decoder = {
+const AVCodec ff_tak_decoder = {
     .name             = "tak",
     .long_name        = NULL_IF_CONFIG_SMALL("TAK (Tom's lossless Audio Kompressor)"),
     .type             = AVMEDIA_TYPE_AUDIO,
@@ -953,4 +953,5 @@ AVCodec ff_tak_decoder = {
                                                         AV_SAMPLE_FMT_S16P,
                                                         AV_SAMPLE_FMT_S32P,
                                                         AV_SAMPLE_FMT_NONE },
+    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE,
 };

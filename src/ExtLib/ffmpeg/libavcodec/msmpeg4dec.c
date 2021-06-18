@@ -295,7 +295,7 @@ av_cold int ff_msmpeg4_decode_init(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
     static volatile int done = 0;
-    int i, ret;
+    int ret;
     MVTable *mv;
 
     if ((ret = av_image_check_size(avctx->width, avctx->height, 0, avctx)) < 0)
@@ -307,9 +307,6 @@ av_cold int ff_msmpeg4_decode_init(AVCodecContext *avctx)
     ff_msmpeg4_common_init(s);
 
     if (!done) {
-        for(i=0;i<NB_RL_TABLES;i++) {
-            ff_rl_init(&ff_rl_table[i], ff_static_rl_table_store[i]);
-        }
         INIT_FIRST_VLC_RL(ff_rl_table[0], 642);
         INIT_FIRST_VLC_RL(ff_rl_table[1], 1104);
         INIT_FIRST_VLC_RL(ff_rl_table[2], 554);
@@ -858,7 +855,7 @@ void ff_msmpeg4_decode_motion(MpegEncContext *s, int *mx_ptr, int *my_ptr)
     *my_ptr = my;
 }
 
-AVCodec ff_msmpeg4v1_decoder = {
+const AVCodec ff_msmpeg4v1_decoder = {
     .name           = "msmpeg4v1",
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 1"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -876,7 +873,7 @@ AVCodec ff_msmpeg4v1_decoder = {
     },
 };
 
-AVCodec ff_msmpeg4v2_decoder = {
+const AVCodec ff_msmpeg4v2_decoder = {
     .name           = "msmpeg4v2",
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 2"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -894,7 +891,7 @@ AVCodec ff_msmpeg4v2_decoder = {
     },
 };
 
-AVCodec ff_msmpeg4v3_decoder = {
+const AVCodec ff_msmpeg4v3_decoder = {
     .name           = "msmpeg4",
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 Microsoft variant version 3"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -912,7 +909,7 @@ AVCodec ff_msmpeg4v3_decoder = {
     },
 };
 
-AVCodec ff_wmv1_decoder = {
+const AVCodec ff_wmv1_decoder = {
     .name           = "wmv1",
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 7"),
     .type           = AVMEDIA_TYPE_VIDEO,

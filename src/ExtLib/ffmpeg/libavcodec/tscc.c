@@ -57,6 +57,7 @@ typedef struct TsccContext {
     unsigned char* decomp_buf;
     GetByteContext gb;
     int height;
+    int zlib_init_ok;
     z_stream zstream;
 
     uint32_t pal[256];
@@ -128,8 +129,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     c->height = avctx->height;
 
-    // Needed if zlib unused or init aborted before inflateInit
-    memset(&c->zstream, 0, sizeof(z_stream));
     switch(avctx->bits_per_coded_sample){
     case  8: avctx->pix_fmt = AV_PIX_FMT_PAL8; break;
     case 16: avctx->pix_fmt = AV_PIX_FMT_RGB555; break;
@@ -160,6 +159,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Inflate init error: %d\n", zret);
         return AVERROR_UNKNOWN;
     }
+    c->zlib_init_ok = 1;
 
     c->frame = av_frame_alloc();
     if (!c->frame)
@@ -175,12 +175,13 @@ static av_cold int decode_end(AVCodecContext *avctx)
     av_freep(&c->decomp_buf);
     av_frame_free(&c->frame);
 
-    inflateEnd(&c->zstream);
+    if (c->zlib_init_ok)
+        inflateEnd(&c->zstream);
 
     return 0;
 }
 
-AVCodec ff_tscc_decoder = {
+const AVCodec ff_tscc_decoder = {
     .name           = "camtasia",
     .long_name      = NULL_IF_CONFIG_SMALL("TechSmith Screen Capture Codec"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -190,5 +191,5 @@ AVCodec ff_tscc_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

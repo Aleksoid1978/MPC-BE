@@ -243,9 +243,6 @@ typedef struct AVCodec {
      *****************************************************************
      */
     int priv_data_size;
-#if FF_API_NEXT
-    struct AVCodec *next;
-#endif
     /**
      * @name Frame-level threading support functions
      * @{
@@ -370,7 +367,7 @@ const AVCodec *av_codec_iterate(void **opaque);
  * @param id AVCodecID of the requested decoder
  * @return A decoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_decoder(enum AVCodecID id);
+const AVCodec *avcodec_find_decoder(enum AVCodecID id);
 
 /**
  * Find a registered decoder with the specified name.
@@ -378,7 +375,7 @@ AVCodec *avcodec_find_decoder(enum AVCodecID id);
  * @param name name of the requested decoder
  * @return A decoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_decoder_by_name(const char *name);
+const AVCodec *avcodec_find_decoder_by_name(const char *name);
 
 /**
  * Find a registered encoder with a matching codec ID.
@@ -386,7 +383,7 @@ AVCodec *avcodec_find_decoder_by_name(const char *name);
  * @param id AVCodecID of the requested encoder
  * @return An encoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_encoder(enum AVCodecID id);
+const AVCodec *avcodec_find_encoder(enum AVCodecID id);
 
 /**
  * Find a registered encoder with the specified name.
@@ -394,7 +391,7 @@ AVCodec *avcodec_find_encoder(enum AVCodecID id);
  * @param name name of the requested encoder
  * @return An encoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_encoder_by_name(const char *name);
+const AVCodec *avcodec_find_encoder_by_name(const char *name);
 /**
  * @return a non-zero number if codec is an encoder, zero otherwise
  */
@@ -404,6 +401,15 @@ int av_codec_is_encoder(const AVCodec *codec);
  * @return a non-zero number if codec is a decoder, zero otherwise
  */
 int av_codec_is_decoder(const AVCodec *codec);
+
+/**
+ * Return a name for the specified profile, if available.
+ *
+ * @param codec the codec that is searched for the given profile
+ * @param profile the profile value for which a name is requested
+ * @return A name for the profile if found, NULL otherwise.
+ */
+const char *av_get_profile_name(const AVCodec *codec, int profile);
 
 enum {
     /**

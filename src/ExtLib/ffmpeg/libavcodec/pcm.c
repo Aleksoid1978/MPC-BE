@@ -30,6 +30,7 @@
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "encode.h"
 #include "internal.h"
 #include "mathops.h"
 #include "pcm_tablegen.h"
@@ -106,7 +107,7 @@ static int pcm_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     n           = frame->nb_samples * avctx->channels;
     samples     = (const short *)frame->data[0];
 
-    if ((ret = ff_alloc_packet2(avctx, avpkt, n * sample_size, n * sample_size)) < 0)
+    if ((ret = ff_get_encode_buffer(avctx, avpkt, n * sample_size, 0)) < 0)
         return ret;
     dst = avpkt->data;
 
@@ -550,14 +551,14 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
 
 #define PCM_ENCODER_0(id_, sample_fmt_, name_, long_name_)
 #define PCM_ENCODER_1(id_, sample_fmt_, name_, long_name_)                  \
-AVCodec ff_ ## name_ ## _encoder = {                                        \
+const AVCodec ff_ ## name_ ## _encoder = {                                  \
     .name         = #name_,                                                 \
     .long_name    = NULL_IF_CONFIG_SMALL(long_name_),                       \
     .type         = AVMEDIA_TYPE_AUDIO,                                     \
     .id           = AV_CODEC_ID_ ## id_,                                    \
+    .capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE,    \
     .init         = pcm_encode_init,                                        \
     .encode2      = pcm_encode_frame,                                       \
-    .capabilities = AV_CODEC_CAP_VARIABLE_FRAME_SIZE,                       \
     .sample_fmts  = (const enum AVSampleFormat[]){ sample_fmt_,             \
                                                    AV_SAMPLE_FMT_NONE },    \
     .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,                          \
@@ -572,7 +573,7 @@ AVCodec ff_ ## name_ ## _encoder = {                                        \
 
 #define PCM_DECODER_0(id, sample_fmt, name, long_name)
 #define PCM_DECODER_1(id_, sample_fmt_, name_, long_name_)                  \
-AVCodec ff_ ## name_ ## _decoder = {                                        \
+const AVCodec ff_ ## name_ ## _decoder = {                                  \
     .name           = #name_,                                               \
     .long_name      = NULL_IF_CONFIG_SMALL(long_name_),                     \
     .type           = AVMEDIA_TYPE_AUDIO,                                   \

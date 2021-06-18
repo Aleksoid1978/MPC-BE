@@ -31,6 +31,7 @@
 
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/thread.h"
 #include "avcodec.h"
 #include "copy_block.h"
 #include "bytestream.h"
@@ -1049,12 +1050,13 @@ static void output_plane(const Plane *plane, int buf_sel, uint8_t *dst,
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
+    static AVOnce init_static_once = AV_ONCE_INIT;
     Indeo3DecodeContext *ctx = avctx->priv_data;
 
     ctx->avctx     = avctx;
     avctx->pix_fmt = AV_PIX_FMT_YUV410P;
 
-    build_requant_tab();
+    ff_thread_once(&init_static_once, build_requant_tab);
 
     ff_hpeldsp_init(&ctx->hdsp, avctx->flags);
 
@@ -1131,7 +1133,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_indeo3_decoder = {
+const AVCodec ff_indeo3_decoder = {
     .name           = "indeo3",
     .long_name      = NULL_IF_CONFIG_SMALL("Intel Indeo 3"),
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -1141,5 +1143,5 @@ AVCodec ff_indeo3_decoder = {
     .close          = decode_close,
     .decode         = decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

@@ -48,9 +48,6 @@
 #include "put_bits.h"
 #include "simple_idct.h"
 
-/* XXX: also include quantization */
-RL_VLC_ELEM ff_dv_rl_vlc[1664];
-
 static inline void dv_calc_mb_coordinates(const AVDVProfile *d, int chan,
                                           int seq, int slot, uint16_t *tbl)
 {
@@ -198,65 +195,9 @@ int ff_dv_init_dynamic_tables(DVVideoContext *ctx, const AVDVProfile *d)
 av_cold int ff_dvvideo_init(AVCodecContext *avctx)
 {
     DVVideoContext *s = avctx->priv_data;
-    static int done = 0;
-    int i, j;
-
-    if (!done) {
-        VLC dv_vlc;
-        uint16_t  new_dv_vlc_bits[NB_DV_VLC * 2];
-        uint8_t    new_dv_vlc_len[NB_DV_VLC * 2];
-        uint8_t    new_dv_vlc_run[NB_DV_VLC * 2];
-        int16_t  new_dv_vlc_level[NB_DV_VLC * 2];
-
-        done = 1;
-
-        /* it's faster to include sign bit in a generic VLC parsing scheme */
-        for (i = 0, j = 0; i < NB_DV_VLC; i++, j++) {
-            new_dv_vlc_bits[j]  = ff_dv_vlc_bits[i];
-            new_dv_vlc_len[j]   = ff_dv_vlc_len[i];
-            new_dv_vlc_run[j]   = ff_dv_vlc_run[i];
-            new_dv_vlc_level[j] = ff_dv_vlc_level[i];
-
-            if (ff_dv_vlc_level[i]) {
-                new_dv_vlc_bits[j] <<= 1;
-                new_dv_vlc_len[j]++;
-
-                j++;
-                new_dv_vlc_bits[j]  = (ff_dv_vlc_bits[i] << 1) | 1;
-                new_dv_vlc_len[j]   =  ff_dv_vlc_len[i] + 1;
-                new_dv_vlc_run[j]   =  ff_dv_vlc_run[i];
-                new_dv_vlc_level[j] = -ff_dv_vlc_level[i];
-            }
-        }
-
-        /* NOTE: as a trick, we use the fact the no codes are unused
-         * to accelerate the parsing of partial codes */
-        init_vlc(&dv_vlc, TEX_VLC_BITS, j, new_dv_vlc_len,
-                 1, 1, new_dv_vlc_bits, 2, 2, 0);
-        av_assert1(dv_vlc.table_size == 1664);
-
-        for (i = 0; i < dv_vlc.table_size; i++) {
-            int code = dv_vlc.table[i][0];
-            int len  = dv_vlc.table[i][1];
-            int level, run;
-
-            if (len < 0) { // more bits needed
-                run   = 0;
-                level = code;
-            } else {
-                run   = new_dv_vlc_run[code] + 1;
-                level = new_dv_vlc_level[code];
-            }
-            ff_dv_rl_vlc[i].len   = len;
-            ff_dv_rl_vlc[i].level = level;
-            ff_dv_rl_vlc[i].run   = run;
-        }
-        ff_free_vlc(&dv_vlc);
-    }
 
     s->avctx = avctx;
     avctx->chroma_sample_location = AVCHROMA_LOC_TOPLEFT;
 
     return 0;
 }
-

@@ -1319,7 +1319,7 @@ static av_cold int svq3_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static void free_picture(AVCodecContext *avctx, SVQ3Frame *pic)
+static void free_picture(SVQ3Frame *pic)
 {
     int i;
     for (i = 0; i < 2; i++) {
@@ -1371,7 +1371,7 @@ static int get_buffer(AVCodecContext *avctx, SVQ3Frame *pic)
 
     return 0;
 fail:
-    free_picture(avctx, pic);
+    free_picture(pic);
     return ret;
 }
 
@@ -1587,12 +1587,10 @@ static av_cold int svq3_decode_end(AVCodecContext *avctx)
 {
     SVQ3Context *s = avctx->priv_data;
 
-    free_picture(avctx, s->cur_pic);
-    free_picture(avctx, s->next_pic);
-    free_picture(avctx, s->last_pic);
-    av_frame_free(&s->cur_pic->f);
-    av_frame_free(&s->next_pic->f);
-    av_frame_free(&s->last_pic->f);
+    for (int i = 0; i < FF_ARRAY_ELEMS(s->frames); i++) {
+        free_picture(&s->frames[i]);
+        av_frame_free(&s->frames[i].f);
+    }
     av_freep(&s->slice_buf);
     av_freep(&s->intra4x4_pred_mode);
     av_freep(&s->edge_emu_buffer);
@@ -1601,7 +1599,7 @@ static av_cold int svq3_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec ff_svq3_decoder = {
+const AVCodec ff_svq3_decoder = {
     .name           = "svq3",
     .long_name      = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3 / Sorenson Video 3 / SVQ3"),
     .type           = AVMEDIA_TYPE_VIDEO,
