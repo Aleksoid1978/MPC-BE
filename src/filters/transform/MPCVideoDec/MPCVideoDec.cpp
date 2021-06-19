@@ -1720,7 +1720,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 #ifdef DEBUG_OR_LOG
 				CString msg;
-				msg.Format(L"        %s", GetGUIDString(guid));
+				msg.Format(L"        %s", GetGUIDString2(guid));
 #endif
 				if (IsSupportedDecoderMode(guid)) {
 #ifdef DEBUG_OR_LOG
@@ -1739,7 +1739,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 			if (!supportedDecoderGuids.empty()) {
 				for (const auto& guid : supportedDecoderGuids) {
-					DLog(L"    => Attempt : %s", GetGUIDString(guid));
+					DLog(L"    => Attempt : %s", GetGUIDString2(guid));
 
 					if (DXVA2_Intel_H264_ClearVideo == guid) {
 						const int width_mbs  = m_nSurfaceWidth / 16;
@@ -1759,7 +1759,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					if (bFoundDXVA2Configuration) {
 						// Found a good configuration. Save the GUID.
 						decoderGuid = guid;
-						DLog(L"    => Use : %s", GetGUIDString(decoderGuid));
+						DLog(L"    => Use : %s", GetGUIDString2(decoderGuid));
 						break;
 					}
 				}
