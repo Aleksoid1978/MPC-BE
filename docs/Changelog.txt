@@ -3,6 +3,36 @@
 1.5.8 (beta)
 =============================
 
+ShoutcastSource
+Added decoding of HTML codes like "& # NNNN;" in the title of the track.
+
+UDPReader
+Added decoding of HTML codes like "& # NNNN;" in the title of the track for Shoutcast and Icecast radio.
+
+AudioSplitter
+Improved work with DFF, DSF, DTD-HD and WAV.
+Fixed opening of some WAV files.
+
+MpcAudioRenderer
+Fixed playing of very short files.
+
+Subtitles
+Fixed display of external subtitles during playback after pressing "Stop".
+
+Youtube
+Updated support for opening videos and playlists.
+Fixed getting metadata.
+
+Player
+Added option "Move window by the video area".
+Added the "Remove missing files" command to the playlist menu.
+Fixed sorting in the "Explorer" playlist.
+Added and icons for display in the "tiles" of the Start menu.
+Fixed switching display mode in some cases.
+Fixed navigation when alternating step-by-step movement and movement for a specific time.
+Redesigned the "Frame synchronization" settings panel.
+Expanded the ability to play DVD-Video with region restrictions on drives with the same restriction.
+
 Updated libraries:
 	dav1d git-0.9.0-24-gddbbfde;
 	Detours git-v4.0.1-92-gfe7216c;
