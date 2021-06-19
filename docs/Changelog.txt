@@ -4,10 +4,10 @@
 =============================
 
 ShoutcastSource
-Added decoding of HTML codes like "& # NNNN;" in the title of the track.
+Added decoding of HTML codes like "&#NNNN;" in the title of the track.
 
 UDPReader
-Added decoding of HTML codes like "& # NNNN;" in the title of the track for Shoutcast and Icecast radio.
+Added decoding of HTML codes like "&#NNNN;" in the title of the track for Shoutcast and Icecast radio.
 
 AudioSplitter
 Improved work with DFF, DSF, DTD-HD and WAV.
@@ -32,6 +32,13 @@ Fixed switching display mode in some cases.
 Fixed navigation when alternating step-by-step movement and movement for a specific time.
 Redesigned the "Frame synchronization" settings panel.
 Expanded the ability to play DVD-Video with region restrictions on drives with the same restriction.
+
+Updated German translation (by Klaus1189).
+Updated Hungarian translation (by mickey).
+Updated Turkish translation (by cmhrky).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Ukrainian translation (by arestarh1986).
+Updated Chinese (Traditional) and Dutch translation (by beter).
 
 Updated libraries:
 	dav1d git-0.9.0-24-gddbbfde;
