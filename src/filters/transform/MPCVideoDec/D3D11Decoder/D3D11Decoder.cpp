@@ -353,7 +353,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 
 #ifdef DEBUG_OR_LOG
 		CString msg;
-		msg.Format(L"        %s", GetGUIDString(guidProfile));
+		msg.Format(L"        %s", GetGUIDString2(guidProfile));
 #endif
 		if (m_pFilter->IsSupportedDecoderMode(guidProfile)) {
 #ifdef DEBUG_OR_LOG
@@ -372,7 +372,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 
 	if (!supportedDecoderGuids.empty()) {
 		for (const auto& guid : supportedDecoderGuids) {
-			DLog(L"    => Attempt : %s", GetGUIDString(guid));
+			DLog(L"    => Attempt : %s", GetGUIDString2(guid));
 
 			if (DXVA2_Intel_H264_ClearVideo == guid) {
 				const int width_mbs = m_dwSurfaceWidth / 16;
@@ -387,7 +387,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 			BOOL bSupported = FALSE;
 			hr = pDeviceContext->video_device->CheckVideoDecoderFormat(&guid, surface_format, &bSupported);
 			if (SUCCEEDED(hr) && bSupported) {
-				DLog(L"    => Use : %s", GetGUIDString(guid));
+				DLog(L"    => Use : %s", GetGUIDString2(guid));
 				*input = guid;
 				return S_OK;
 			}
