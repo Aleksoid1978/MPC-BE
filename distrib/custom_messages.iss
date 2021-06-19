@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2019 see Authors.txt
+; (C) 2009-2021 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -803,7 +803,7 @@ ru.langcode=ru
 ru.comp_mpciconlib=Библиотека значков
 ru.comp_mpcresources=Локализации
 ru.comp_mpcbeshellext=Установить расширение оболочки
-ru.comp_intel_msdk=H.264 MVC 3D Декодер (будет скачан)
+ru.comp_intel_msdk=Декодер H.264 MVC 3D (будет скачан)
 ru.msg_DeleteSettings=Удалить также настроенные параметры MPC-BE?%n%nЕсли запланирована переустановка MPC-BE, эти параметры не нужно удалять.
 ru.msg_NoD3DX9DLL_found=Не установлена последняя версия системы DirectX!%n%nЗагрузите и установите последнюю версию DirectX June 2010 независимо от версии установленной операционной системы.
 ru.msg_SetupIsRunningWarning=Программа установки MPC-BE уже запущена!
