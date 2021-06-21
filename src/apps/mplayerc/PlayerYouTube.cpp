@@ -318,7 +318,7 @@ namespace Youtube
 			bool bParse = false;
 
 			CString url;
-			url.Format(L"https://www.youtube.com/get_video_info?video_id=%s&html5=1", videoId);
+			url.Format(L"https://www.youtube.com/get_video_info?video_id=%s&html5=1&c=TVHTML5&cver=6.20180913", videoId);
 			urlData data;
 			if (URLReadData(url.GetString(), data)) {
 				const CStringA strData = UrlDecode(data.data());
@@ -571,7 +571,7 @@ namespace Youtube
 
 				const CStringA sts = RegExpParse(data.data(), "\"sts\"\\s*:\\s*(\\d+)");
 
-				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S&html5=1", videoId, videoId, sts);
+				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S&html5=1&c=TVHTML5&cver=6.20180913", videoId, videoId, sts);
 				if (!URLReadData(link.GetString(), data)) {
 					return false;
 				}
