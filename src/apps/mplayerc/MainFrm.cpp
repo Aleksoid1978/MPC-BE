@@ -833,7 +833,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #if (MPC_VERSION_STATUS == 1)
 	m_strTitle.AppendFormat(L" %s", MPC_VERSION_WSTR);
 #else
-	m_strTitle.AppendFormat(L" %s beta", MPC_VERSION_SVN_WSTR);
+	m_strTitle.AppendFormat(L" %s alpha", MPC_VERSION_SVN_WSTR);
 #endif
 
 
@@ -7814,7 +7814,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 			}
 
 			CString info;
-			info.Format(L"Rotation: %d°", rotation);
+			info.Format(L"Rotation: %d", rotation);
 			SendStatusMessage(info, 3000);
 		}
 	}
