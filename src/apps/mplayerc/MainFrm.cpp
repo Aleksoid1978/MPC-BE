@@ -7763,7 +7763,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 			}
 
 			CString info;
-			info.Format(L"Rotation: %d", rotation);
+			info.Format(L"Rotation: %d°", rotation);
 			SendStatusMessage(info, 3000);
 		}
 	}
