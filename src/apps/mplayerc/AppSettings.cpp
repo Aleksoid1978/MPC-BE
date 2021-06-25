@@ -67,10 +67,7 @@ void CFiltersPrioritySettings::LoadSettings()
 
 CAppSettings::CAppSettings()
 	: bInitialized(false)
-	, bKeepHistory(true)
 	, iRecentFilesNumber(20)
-	, MRU(0, L"Recent File List", L"File%d", iRecentFilesNumber)
-	, MRUDub(0, L"Recent Dub List", L"Dub%d", iRecentFilesNumber)
 	, hAccel(nullptr)
 	, nCmdlnWebServerPort(-1)
 	, bShowDebugInfo(false)
@@ -392,8 +389,6 @@ void CAppSettings::CreateCommands()
 
 	ADDCMD((ID_WINDOW_TO_PRIMARYSCREEN,	IDS_AG_WINDOW_TO_PRIMARYSCREEN, '1', FCONTROL|FALT));
 #undef ADDCMD
-
-	ResetPositions();
 }
 
 CAppSettings::~CAppSettings()
@@ -425,101 +420,6 @@ CString CAppSettings::SelectedAudioRenderer() const
 	}
 
 	return strResult;
-}
-
-void CAppSettings::ResetPositions()
-{
-	nCurrentDvdPosition  = -1;
-	nCurrentFilePosition = -1;
-}
-
-DVD_POSITION* CAppSettings::CurrentDVDPosition()
-{
-	if (nCurrentDvdPosition != -1) {
-		return &DvdPosition[nCurrentDvdPosition];
-	} else {
-		return nullptr;
-	}
-}
-
-bool CAppSettings::NewDvd(ULONGLONG llDVDGuid)
-{
-	// Look for the DVD position
-	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
-		if (DvdPosition[i].llDVDGuid == llDVDGuid) {
-			nCurrentDvdPosition = i;
-			return false;
-		}
-	}
-
-	// If DVD is unknown, we put it first
-	for (int i = std::min(iRecentFilesNumber, MAX_DVD_POSITION) - 1; i > 0; i--) {
-		memcpy(&DvdPosition[i], &DvdPosition[i - 1], sizeof(DVD_POSITION));
-	}
-	DvdPosition[0].llDVDGuid = llDVDGuid;
-	nCurrentDvdPosition      = 0;
-	return true;
-}
-
-FILE_POSITION* CAppSettings::CurrentFilePosition()
-{
-	if (nCurrentFilePosition != -1) {
-		return &FilePosition[nCurrentFilePosition];
-	} else {
-		return nullptr;
-	}
-}
-
-bool CAppSettings::NewFile(LPCTSTR strFileName)
-{
-	// Look for the file position
-	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-		if (FilePosition[i].strFile == strFileName) {
-			nCurrentFilePosition = i;
-			return false;
-		}
-	}
-
-	// If it is unknown, we put it first
-	for (int i = std::min(iRecentFilesNumber, MAX_FILE_POSITION) - 1; i > 0; i--) {
-		FilePosition[i].strFile        = FilePosition[i - 1].strFile;
-		FilePosition[i].llPosition     = FilePosition[i - 1].llPosition;
-		FilePosition[i].nAudioTrack    = FilePosition[i - 1].nAudioTrack;
-		FilePosition[i].nSubtitleTrack = FilePosition[i - 1].nSubtitleTrack;
-	}
-	FilePosition[0].strFile        = strFileName;
-	FilePosition[0].llPosition     = 0;
-	FilePosition[0].nAudioTrack    = -1;
-	FilePosition[0].nSubtitleTrack = -1;
-
-	nCurrentFilePosition = 0;
-	return true;
-}
-
-bool CAppSettings::RemoveFile(LPCTSTR strFileName)
-{
-	// Look for the file position
-	int idx = -1;
-
-	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-		if (FilePosition[i].strFile == strFileName) {
-			idx = i;
-			break;
-		}
-	}
-
-	if (idx != -1) {
-		for (int i = idx; i < MAX_FILE_POSITION - 1; i++) {
-			FilePosition[i].strFile        = FilePosition[i + 1].strFile;
-			FilePosition[i].llPosition     = FilePosition[i + 1].llPosition;
-			FilePosition[i].nAudioTrack    = FilePosition[i + 1].nAudioTrack;
-			FilePosition[i].nSubtitleTrack = FilePosition[i + 1].nSubtitleTrack;
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 void CAppSettings::DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize)
@@ -653,11 +553,6 @@ void CAppSettings::ResetSettings()
 	bRecentFilesMenuEllipsis = true;
 	bRememberDVDPos = false;
 	bRememberFilePos = false;
-	// playback positions for last played DVDs
-	nCurrentDvdPosition = -1;
-	memset(DvdPosition, 0, sizeof(DvdPosition));
-	// playback positions for last played files
-	nCurrentFilePosition = -1;
 
 	// Window size
 	nStartupWindowMode = STARTUPWND_DEFAULT;
@@ -1021,6 +916,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize, 8, 26);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE, strLastOpenFile);
 	// Last Open Dir
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
@@ -1121,8 +1017,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
-	MRU.SetSize(iRecentFilesNumber);
-	MRUDub.SetSize(iRecentFilesNumber);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
@@ -1133,8 +1027,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTNEXTONERROR, bPlaylistNextOnError);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTDETERMINEDURATION, bPlaylistDetermineDuration);
 
-	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
-	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, bUseDVDPath);
@@ -1568,51 +1462,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		m_DVBChannels.push_back(Channel);
 	}
 
-	// playback positions for last played DVDs
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
-	nCurrentDvdPosition = -1;
-	memset(DvdPosition, 0, sizeof(DvdPosition));
-	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
-		CString lpKeyName;
-		CString lpString;
-
-		lpKeyName.Format(L"DVD%d", i + 1);
-		profile.ReadString(IDS_R_RECENTFILES, lpKeyName, lpString);
-		if (lpString.GetLength() / 2 == sizeof(DVD_POSITION)) {
-			DeserializeHex(lpString, (BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
-		}
-	}
-
-	// playback positions for last played files
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
-	nCurrentFilePosition = -1;
-	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-		CString lpKeyName;
-		CString lpString;
-
-		lpKeyName.Format(L"File%d", i + 1);
-		profile.ReadString(IDS_R_RECENTFILES, lpKeyName, lpString);
-
-		std::list<CString> args;
-		ExplodeEsc(lpString, args, L'|');
-		auto it = args.begin();
-
-		if (it != args.end()) {
-			FilePosition[i].strFile = *it++;
-
-			if (it != args.end()) {
-				FilePosition[i].llPosition = _wtoi64(*it++);
-
-				if (it != args.end()) {
-					swscanf_s(*it++, L"%d", &FilePosition[i].nAudioTrack);
-
-					if (it != args.end()) {
-						swscanf_s(*it++, L"%d", &FilePosition[i].nSubtitleTrack);
-					}
-				}
-			}
-		}
-	}
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, bStartMainTitle);
 	bNormalStartDVD			= true;
@@ -1785,8 +1636,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTNEXTONERROR, bPlaylistNextOnError);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTDETERMINEDURATION, bPlaylistDetermineDuration);
 
-	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
-	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
 	m_VRSettings.Save();
 
@@ -1872,6 +1723,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE, strLastOpenFile);
 	// Last Open Dir
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
@@ -1955,29 +1807,6 @@ void CAppSettings::SaveSettings()
 	// playback positions for last played DVDs
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
-	if (bKeepHistory) {
-		if (bRememberDVDPos) {
-			for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
-				CString strDVDPos;
-				CString strValue;
-
-				strDVDPos.Format(L"DVD%d", i + 1);
-				strValue = SerializeHex((BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
-				profile.WriteString(IDS_R_RECENTFILES, strDVDPos, strValue);
-			}
-		}
-
-		if (bRememberFilePos) {
-			for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-				CString lpKeyName;
-				CString lpString;
-
-				lpKeyName.Format(L"File%d", i + 1);
-				lpString.Format(L"%s|%I64d|%d|%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-				profile.WriteString(IDS_R_RECENTFILES, lpKeyName, lpString);
-			}
-		}
-	}
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, bStartMainTitle);
 
@@ -2244,63 +2073,6 @@ engine_t CAppSettings::GetFileEngine(CString path)
 	return DirectShow;
 }
 
-void CAppSettings::SaveCurrentFilePosition()
-{
-	CProfile& profile = AfxGetProfile();
-	int i = nCurrentFilePosition;
-
-	CString lpKeyName;
-	CString lpString;
-
-	lpKeyName.Format(L"File%d", i + 1);
-	lpString.Format(L"%s|%I64d|%d|%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-	profile.WriteString(IDS_R_RECENTFILES, lpKeyName, lpString);
-}
-
-void CAppSettings::ClearFilePositions()
-{
-	CProfile& profile = AfxGetProfile();
-	CString lpKeyName;
-
-	for (int i = 0; i < MAX_FILE_POSITION; i++) {
-		FilePosition[i].strFile.Empty();
-		FilePosition[i].llPosition     = 0;
-		FilePosition[i].nAudioTrack    = -1;
-		FilePosition[i].nSubtitleTrack = -1;
-
-		lpKeyName.Format(L"File%d", i + 1);
-		profile.WriteString(IDS_R_RECENTFILES, lpKeyName, L"");
-	}
-}
-
-void CAppSettings::SaveCurrentDVDPosition()
-{
-	CProfile& profile = AfxGetProfile();
-	int i = nCurrentDvdPosition;
-
-	CString lpKeyName;
-	CString lpString;
-
-	lpKeyName.Format(L"DVD%d", i + 1);
-	lpString = SerializeHex((BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
-	profile.WriteString(IDS_R_RECENTFILES, lpKeyName, lpString);
-}
-
-void CAppSettings::ClearDVDPositions()
-{
-	CProfile& profile = AfxGetProfile();
-	CString lpKeyName;
-
-	for (int i = 0; i < MAX_DVD_POSITION; i++) {
-		DvdPosition[i].llDVDGuid = 0;
-		DvdPosition[i].lTitle    = 0;
-		memset(&DvdPosition[i].Timecode, 0, sizeof(DVD_HMSF_TIMECODE));
-
-		lpKeyName.Format(L"DVD%d", i + 1);
-		profile.WriteString(IDS_R_RECENTFILES, lpKeyName, L"");
-	}
-}
-
 __int64 CAppSettings::ConvertTimeToMSec(CString& time) const
 {
 	__int64 Sec = 0;
@@ -2383,7 +2155,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 	rtShift = 0;
 	lDVDTitle = 0;
 	lDVDChapter = 0;
-	memset(&DVDPosition, 0, sizeof(DVDPosition));
+	DVDPosition = {};
 	iAdminOption = 0;
 	sizeFixedWindow.SetSize(0, 0);
 	iMonitor = 0;
@@ -2563,78 +2335,6 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 	}
 }
 
-void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
-{
-	sl.clear();
-
-	CString root;
-	int maxcount;
-
-	switch (ft) {
-	case FAV_FILE:
-		root = IDS_R_FAVFILES;
-		maxcount = ID_FAVORITES_FILE_END - ID_FAVORITES_FILE_START + 1;
-		break;
-	case FAV_DVD:
-		root = IDS_R_FAVDVDS;
-		maxcount = ID_FAVORITES_DVD_END - ID_FAVORITES_DVD_START + 1;
-		break;
-	default:
-		return;
-	}
-
-	CProfile& profile = AfxGetProfile();
-	for (int i = 0; i < maxcount; i++) {
-		CString fav;
-		fav.Format(L"Fav%02d", i);
-		CString s;
-		profile.ReadString(root, fav, s);
-		if (s.IsEmpty()) {
-			break;
-		}
-
-		std::list<CString> args;
-		ExplodeEsc(s, args, L'|');
-		if (args.size() < 4) {
-			ASSERT(FALSE);
-			continue;
-		}
-		sl.push_back(s);
-	}
-}
-
-void CAppSettings::SetFav(favtype ft, std::list<CString>& sl)
-{
-	CString root;
-
-	switch (ft) {
-	case FAV_FILE:   root = IDS_R_FAVFILES;   break;
-	case FAV_DVD:    root = IDS_R_FAVDVDS;    break;
-	default:
-		return;
-	}
-
-	CProfile& profile = AfxGetProfile();
-	profile.DeleteSection(root);
-
-	int i = 0;
-	for (const auto& item : sl) {
-		CString s;
-		s.Format(L"Fav%02d", i++);
-		profile.WriteString(root, s, item);
-	}
-}
-
-void CAppSettings::AddFav(favtype ft, CString s)
-{
-	std::list<CString> sl;
-	GetFav(ft, sl);
-	if (sl.size() < 100 && !Contains(sl, s)) {
-		sl.push_back(s);
-		SetFav(ft, sl);
-	}
-}
-
 CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 {
 	for (auto& Channel : m_DVBChannels) {
@@ -2706,66 +2406,5 @@ void CAppSettings::SaveFormats()
 	m_Formats.UpdateData(true);
 }
 
-// Settings::CRecentFileAndURLList
-CAppSettings::CRecentFileAndURLList::CRecentFileAndURLList(UINT nStart, LPCTSTR lpszSection,
-		LPCTSTR lpszEntryFormat, int nSize,
-		int nMaxDispLen)
-	: CRecentFileList(nStart, lpszSection, lpszEntryFormat, nSize, nMaxDispLen)
-{
-}
-
 extern BOOL AFXAPI AfxFullPath(LPTSTR lpszPathOut, LPCTSTR lpszFileIn);
 extern BOOL AFXAPI AfxComparePath(LPCTSTR lpszPath1, LPCTSTR lpszPath2);
-
-void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
-{
-	ASSERT(m_arrNames != nullptr);
-	ASSERT(lpszPathName != nullptr);
-	ASSERT(AfxIsValidString(lpszPathName));
-
-	CString pathName = lpszPathName;
-	if (CString(pathName).MakeLower().Find(L"@device:") >= 0) {
-		return;
-	}
-
-	bool isURL = (pathName.Find(L"://") >= 0 || Youtube::CheckURL(lpszPathName));
-
-	// fully qualify the path name
-	if (!isURL) {
-		AfxFullPath(pathName.GetBuffer(pathName.GetLength() + 1024), lpszPathName);
-		pathName.ReleaseBuffer();
-	}
-
-	// update the MRU list, if an existing MRU string matches file name
-	int iMRU;
-	for (iMRU = 0; iMRU < m_nSize-1; iMRU++) {
-		if ((isURL && !wcscmp(m_arrNames[iMRU], pathName))
-				|| AfxComparePath(m_arrNames[iMRU], pathName)) {
-			break;    // iMRU will point to matching entry
-		}
-	}
-	// move MRU strings before this one down
-	for (; iMRU > 0; iMRU--) {
-		ASSERT(iMRU > 0);
-		ASSERT(iMRU < m_nSize);
-		m_arrNames[iMRU] = m_arrNames[iMRU-1];
-	}
-	// place this one at the beginning
-	m_arrNames[0] = pathName;
-}
-
-void CAppSettings::CRecentFileAndURLList::SetSize(int nSize)
-{
-	ENSURE_ARG(nSize >= 0);
-
-	if (m_nSize != nSize) {
-		CString* arrNames = DNew CString[nSize];
-		int nSizeToCopy = std::min(m_nSize, nSize);
-		for (int i = 0; i < nSizeToCopy; i++) {
-			arrNames[i] = m_arrNames[i];
-		}
-		delete [] m_arrNames;
-		m_arrNames = arrNames;
-		m_nSize = nSize;
-	}
-}

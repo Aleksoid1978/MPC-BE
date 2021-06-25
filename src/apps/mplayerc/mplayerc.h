@@ -28,6 +28,7 @@
 #include <afxadv.h>
 #include <atlsync.h>
 #include "../../DSUtil/Profile.h"
+#include "HistoryFile.h"
 #include "AppSettings.h"
 
 #include <mutex>
@@ -70,6 +71,9 @@ private:
 	virtual BOOL OnIdle(LONG lCount) override;
 public:
 	CAppSettings m_s;
+	CHistoryFile m_HistoryFile;
+	CFavoritesFile m_FavoritesFile;
+
 	CString m_AudioRendererDisplayName_CL;
 
 	CMPlayerCApp();

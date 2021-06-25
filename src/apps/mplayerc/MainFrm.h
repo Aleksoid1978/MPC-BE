@@ -43,6 +43,9 @@
 #include "PlayerYouTube.h"
 #include "SvgHelper.h"
 
+#include "mplayerc.h"
+#include "HistoryFile.h"
+
 #include "../../DSUtil/DSMPropertyBag.h"
 #include "../../DSUtil/FontInstaller.h"
 #include "../../SubPic/ISubPic.h"
@@ -538,8 +541,11 @@ protected:
 	CString m_LastOpenBDPath, m_BDLabel;
 	HMONITOR m_LastWindow_HM;
 
+	SessionInfo m_SessionInfo;
 	DVD_DOMAIN m_iDVDDomain;
 	DWORD m_iDVDTitle;
+	bool m_bDVDRestorePos = false;
+	std::vector<CStringW> m_RecentPaths; // used in SetupRecentFilesSubMenu and OnRecentFile
 
 	double m_PlaybackRate;
 
@@ -725,8 +731,8 @@ public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	BOOL OpenFile(const CString fname, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
-	void PlayFavoriteFile(CString fav);
-	void PlayFavoriteDVD(CString fav);
+	void PlayFavoriteFile(SessionInfo fav);
+	void PlayFavoriteDVD(SessionInfo fav);
 	bool ResizeDevice();
 	bool ResetDevice();
 	bool DisplayChange();
@@ -860,8 +866,6 @@ protected:  // control bar embedded members
 	const UINT CF_URLA = RegisterClipboardFormatW(CFSTR_INETURLA);
 	const UINT CF_URLW = RegisterClipboardFormatW(CFSTR_INETURLW);
 	void DropFiles(std::list<CString>& slFiles);
-
-	LPCWSTR GetRecentFile();
 
 	void RestoreControlBars();
 	void SaveControlBars();

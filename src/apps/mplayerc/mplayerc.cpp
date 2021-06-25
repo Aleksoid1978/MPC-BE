@@ -45,6 +45,9 @@ extern "C" {
 	int mingw_app_type = 1;
 }
 
+#define MPC_HISTORY_FILENAME "history.mpc_lst"
+#define MPC_FAVORITES_FILENAME "favorites.mpc_lst"
+
 const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_ARMENIAN,				1067,	L"Armenian",				L"hy",	L"arm"},
 	{ID_LANGUAGE_BASQUE,				1069,	L"Basque",					L"eu",	L"baq"},
@@ -253,10 +256,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	CString oldpath;
 	AfxGetMyApp()->GetAppSavePath(oldpath);
 
-	// Load favorites so that they can be correctly saved to the new location
-	std::list<CString> filesFav, DVDsFav;
-	AfxGetAppSettings().GetFav(FAV_FILE, filesFav);
-	AfxGetAppSettings().GetFav(FAV_DVD, DVDsFav);
+	// TODO copy History and Favorites files
 
 	if (useIni) {
 		bool success = m_Profile.StoreSettingsToIni();
@@ -267,10 +267,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		m_Profile.StoreSettingsToRegistry();
 		_wremove(m_Profile.GetIniPath());
 	}
-
-	// Save favorites to the new location
-	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
-	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
 
 	// Save external filters to the new location
 	m_s.SaveExternalFilters();
@@ -284,6 +280,9 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	if (!useIni && !::PathFileExistsW(newpath)) {
 		EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
 	}
+
+	m_HistoryFile.SetFilename(newpath + MPC_HISTORY_FILENAME);
+	m_FavoritesFile.SetFilename(newpath + MPC_FAVORITES_FILENAME);
 
 	if (oldpath.GetLength() > 0) {
 		// moving shader files
@@ -972,6 +971,9 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
+	CString appSavePath;
+	GetAppSavePath(appSavePath);
+
 	if (!m_Profile.IsIniValid()) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
@@ -980,9 +982,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 
 		// checking for the existence of the Shader and Shaders11 folders
-		CString shaderpath;
-		GetAppSavePath(shaderpath);
-		shaderpath.Append(L"Shaders");
+		CString shaderpath(appSavePath + L"Shaders");
 		CString shaderpath11(shaderpath + L"11");
 
 		BOOL bShaderDirExists = ::PathFileExistsW(shaderpath);
@@ -1014,6 +1014,9 @@ BOOL CMPlayerCApp::InitInstance()
 			}
 		}
 	}
+
+	m_HistoryFile.SetFilename(appSavePath + MPC_HISTORY_FILENAME);
+	m_FavoritesFile.SetFilename(appSavePath + MPC_FAVORITES_FILENAME);
 
 	AfxEnableControlContainer();
 

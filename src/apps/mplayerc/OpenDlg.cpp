@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -80,26 +80,21 @@ BOOL COpenDlg::OnInitDialog()
 	UpdateData(FALSE);
 
 	if (s.bKeepHistory) {
-		CRecentFileList& MRU = s.MRU;
-		MRU.ReadList();
 		m_mrucombo.ResetContent();
-
-		for (int i = 0; i < MRU.GetSize(); i++)
-			if (!MRU[i].IsEmpty()) {
-				m_mrucombo.AddString(MRU[i]);
-			}
-
-		CorrectComboListWidth(m_mrucombo);
-
-		CRecentFileList& MRUDub = s.MRUDub;
-		MRUDub.ReadList();
 		m_mrucombo2.ResetContent();
 
-		for (int i = 0; i < MRUDub.GetSize(); i++)
-			if (!MRUDub[i].IsEmpty()) {
-				m_mrucombo2.AddString(MRUDub[i]);
-			}
+		std::vector<SessionInfo> recentSessions;
+		AfxGetMyApp()->m_HistoryFile.GetRecentSessions(recentSessions, AfxGetAppSettings().iRecentFilesNumber);
 
+		for (const auto& rs : recentSessions) {
+			if (!rs.Path.IsEmpty()) {
+				m_mrucombo.AddString(rs.Path);
+			}
+			if (!rs.AudioPath.IsEmpty()) {
+				m_mrucombo2.AddString(rs.Path);
+			}
+		}
+		CorrectComboListWidth(m_mrucombo);
 		CorrectComboListWidth(m_mrucombo2);
 
 		if (m_mrucombo.GetCount() > 0) {
@@ -293,24 +288,13 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
 	, m_mask(mask)
 {
+	CAppSettings& s = AfxGetAppSettings();
 	m_fAllowDirSelection = fAllowDirSelection;
 
 	CString str(lpszFileName);
 
-	if (str.IsEmpty()) {
-		CRecentFileList& MRU = AfxGetAppSettings().MRU;
-		MRU.ReadList();
-
-		for (int i = 0; i < MRU.GetSize(); i++) {
-			if (!MRU[i].IsEmpty()) {
-				str = MRU[i];
-				break;
-			}
-		}
-	}
-
-	if (str.Find(L"://") > 0) {
-		str.Empty();
+	if (s.bKeepHistory && (str.IsEmpty() || ::PathIsURLW(str))) {
+		str = s.strLastOpenFile;
 	}
 
 	str = GetFolderOnly(str);

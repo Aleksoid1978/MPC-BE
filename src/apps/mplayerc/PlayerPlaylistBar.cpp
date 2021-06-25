@@ -2702,7 +2702,7 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 			// If the file is already playing, don't try to restore a previously saved position
 			if (m_pMainFrame->GetPlaybackMode() == PM_FILE && pos == curPlayList.GetPos()) {
 				const CPlaylistItem& pli = curPlayList.GetAt(pos);
-				AfxGetAppSettings().RemoveFile(pli.m_fns.front());
+				//AfxGetAppSettings().RemoveFile(pli.m_fns.front());
 			}
 			else {
 				curPlayList.SetPos(pos);
@@ -2720,7 +2720,7 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 			// If the file is already playing, don't try to restore a previously saved position
 			if (m_pMainFrame->GetPlaybackMode() == PM_FILE && pos == curPlayList.GetPos()) {
 				const CPlaylistItem& pli = curPlayList.GetAt(pos);
-				AfxGetAppSettings().RemoveFile(pli.m_fns.front());
+				//AfxGetAppSettings().RemoveFile(pli.m_fns.front());
 			}
 			else {
 				curPlayList.SetPos(pos);

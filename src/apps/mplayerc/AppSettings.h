@@ -183,21 +183,6 @@ enum favtype {
 	FAV_DVD,
 };
 
-#define MAX_DVD_POSITION 50
-struct DVD_POSITION {
-	ULONGLONG         llDVDGuid = 0;
-	ULONG             lTitle    = 0;
-	DVD_HMSF_TIMECODE Timecode  = { 0 };
-};
-
-#define MAX_FILE_POSITION APP_RECENTFILES_MAX
-struct FILE_POSITION {
-	CString  strFile;
-	LONGLONG llPosition     = 0;
-	int      nAudioTrack    = -1;
-	int      nSubtitleTrack = -1;
-};
-
 enum {
 	TIME_TOOLTIP_ABOVE_SEEKBAR,
 	TIME_TOOLTIP_BELOW_SEEKBAR
@@ -519,18 +504,6 @@ class CAppSettings
 {
 	bool bInitialized;
 
-	class CRecentFileAndURLList : public CRecentFileList
-	{
-	public:
-		CRecentFileAndURLList(UINT nStart, LPCTSTR lpszSection,
-							  LPCTSTR lpszEntryFormat, int nSize,
-							  int nMaxDispLen = AFX_ABBREV_FILENAME_LEN);
-
-		virtual void Add(LPCTSTR lpszPathName); // we have to override CRecentFileList::Add because the original version can't handle URLs
-
-		void SetSize(int nSize);
-	};
-
 public:
 	bool bResetSettings;
 
@@ -579,8 +552,6 @@ public:
 	bool			bKeepHistory;
 	int				iRecentFilesNumber;
 	bool			bRecentFilesMenuEllipsis;
-	CRecentFileAndURLList MRU;
-	CRecentFileAndURLList MRUDub;
 	bool			bRememberDVDPos;
 	bool			bRememberFilePos;
 	bool			bRememberPlaylistItems;
@@ -899,6 +870,7 @@ public:
 	bool			bPlaylistDetermineDuration;
 
 	// OTHER STATES
+	CString			strLastOpenFile;
 	CString			strLastOpenDir;
 	CString			strLastSavedPlaylistDir;
 
@@ -914,17 +886,6 @@ public:
 
 	bool			ExclusiveFSAllowed() const;
 	CString			SelectedAudioRenderer() const;
-	void			ResetPositions();
-	DVD_POSITION*	CurrentDVDPosition();
-	bool			NewDvd(ULONGLONG llDVDGuid);
-	FILE_POSITION*	CurrentFilePosition();
-	bool			NewFile(LPCTSTR strFileName);
-	bool			RemoveFile(LPCTSTR strFileName);
-
-	void			SaveCurrentDVDPosition();
-	void			ClearDVDPositions();
-	void			SaveCurrentFilePosition();
-	void			ClearFilePositions();
 
 	void			DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize);
 	CString			SerializeHex(BYTE* pBuffer, int nBufSize) const;
@@ -968,11 +929,6 @@ public:
 	void			SaveFormats();
 
 private :
-	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
-	int				nCurrentDvdPosition;
-	FILE_POSITION	FilePosition[MAX_FILE_POSITION];
-	int				nCurrentFilePosition;
-
 	LPCWSTR			SrcFiltersKeys[SRC_COUNT];
 	LPCWSTR			VideoFiltersKeys[VDEC_COUNT];
 	LPCWSTR			AudioFiltersKeys[ADEC_COUNT];
@@ -990,9 +946,6 @@ public:
 	void			SaveSettings();
 	void			SaveExternalFilters();
 
-	void			GetFav(favtype ft, std::list<CString>& sl);
-	void			SetFav(favtype ft, std::list<CString>& sl);
-	void			AddFav(favtype ft, CString s);
 	CDVBChannel*	FindChannelByPref(int nPrefNumber);
 
 	int				GetMultiInst();

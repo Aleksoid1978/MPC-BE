@@ -40,23 +40,47 @@ CFavoriteOrganizeDlg::~CFavoriteOrganizeDlg()
 
 void CFavoriteOrganizeDlg::SetupList()
 {
-	auto& favlist = m_FavLists[m_tab.GetCurSel()];
-
 	m_list.DeleteAllItems();
 
-	for (const auto& fav : favlist) {
-		std::list<CString> sl;
-		ExplodeEsc(fav, sl, L'|', 2);
+	auto& favoritesFile = AfxGetMyApp()->m_FavoritesFile;
+	const int curTab = m_tab.GetCurSel();
 
-		if (sl.size() == 2) {
-			int n = m_list.InsertItem(m_list.GetItemCount(), sl.front());
-			m_list.SetItemData(n, (DWORD_PTR)&(fav));
+	if (curTab == 0) {
+		auto& favFiles = AfxGetMyApp()->m_FavoritesFile.m_FavFiles;
 
-			REFERENCE_TIME rt = 0;
-			if (StrToInt64(sl.back(), rt) && rt > 0) {
-				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
-				CString str;
-				str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+		for (const auto& favFile : favFiles) {
+			auto& favname = favFile.Title.GetLength() ? favFile.Title : favFile.Path;
+			int n = m_list.InsertItem(m_list.GetItemCount(), favname);
+
+			m_list.SetItemData(n, (DWORD_PTR)&(favFile));
+
+			if (favFile.Position > UNITS) {
+				CStringW str;
+				LONGLONG seconds = favFile.Position / UNITS;
+				int h = (int)(seconds / 3600);
+				int m = (int)(seconds / 60 % 60);
+				int s = (int)(seconds % 60);
+				str.Format(L"[%02d:%02d:%02d]", h, m, s);
+				m_list.SetItemText(n, 1, str);
+			}
+		}
+	}
+	else if (curTab == 1) {
+		auto& favDvds = AfxGetMyApp()->m_FavoritesFile.m_FavDVDs;
+
+		for (const auto& favDvd : favDvds) {
+			auto& favname = favDvd.Title.GetLength() ? favDvd.Title : favDvd.Path;
+			int n = m_list.InsertItem(m_list.GetItemCount(), favDvd.Title);
+
+			m_list.SetItemData(n, (DWORD_PTR)&(favDvd));
+
+			if (favDvd.DVDTitle) {
+				CStringW str;
+				str.Format(L"[%02u,%02u:%02u:%02u]",
+					(unsigned)favDvd.DVDTitle,
+					(unsigned)favDvd.DVDTimecode.bHours,
+					(unsigned)favDvd.DVDTimecode.bMinutes,
+					(unsigned)favDvd.DVDTimecode.bSeconds);
 				m_list.SetItemText(n, 1, str);
 			}
 		}
@@ -67,23 +91,27 @@ void CFavoriteOrganizeDlg::SetupList()
 
 void CFavoriteOrganizeDlg::SaveList()
 {
-	auto& favlist = m_FavLists[m_tab.GetCurSel()];
-
-	std::list<CString> sl;
-	for (int i = 0; i < m_list.GetItemCount(); i++) {
-		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(i));
-		if (it == favlist.end()) {
-			ASSERT(0);
-			break;
+	auto sync_favlist = [&](std::list<SessionInfo>& favlist) {
+		std::list<SessionInfo> newfavlist;
+		for (int i = 0; i < m_list.GetItemCount(); i++) {
+			auto it = FindInListByPointer(favlist, (SessionInfo*)m_list.GetItemData(i));
+			if (it == favlist.end()) {
+				ASSERT(0);
+				break;
+			}
+			newfavlist.push_back(*it);
 		}
+		favlist = newfavlist;
+	};
 
-		std::list<CString> args;
-		ExplodeEsc(*it, args, L'|', 4);
-		args.front() = m_list.GetItemText(i, 0);
+	const int curTab = m_tab.GetCurSel();
 
-		sl.push_back(ImplodeEsc(args, L'|'));
+	if (curTab == 0) {
+		sync_favlist(AfxGetMyApp()->m_FavoritesFile.m_FavFiles);
 	}
-	favlist = sl;
+	else if (curTab == 1) {
+		sync_favlist(AfxGetMyApp()->m_FavoritesFile.m_FavDVDs);
+	}
 }
 
 void CFavoriteOrganizeDlg::UpdateColumnsSizes()
@@ -141,8 +169,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 	m_list.InsertColumn(1, L"");
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
-	s.GetFav(FAV_FILE, m_FavLists[0]);
-	s.GetFav(FAV_DVD, m_FavLists[1]);
+	AfxGetMyApp()->m_FavoritesFile.OpenFavorites();
 
 	SetupList();
 
@@ -216,32 +243,30 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 void CFavoriteOrganizeDlg::OnEditBnClicked()
 {
 	if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
-		auto& favlist = m_FavLists[m_tab.GetCurSel()];
 		int nItem = m_list.GetNextSelectedItem(pos);
 
-		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(nItem));
-		if (it == favlist.end()) {
-			ASSERT(0);
-			return;
+		auto edit_favitem = [&](std::list<SessionInfo>& favlist) {
+			auto it = FindInListByPointer(favlist, (SessionInfo*)m_list.GetItemData(nItem));
+			if (it == favlist.end()) {
+				ASSERT(0);
+				return;
+			}
+
+			CItemPropertiesDlg ipd((*it).Title, (*it).Path);
+			if (ipd.DoModal() == IDOK) {
+				m_list.SetItemText(nItem, 0, ipd.GetPropertyName());
+				(*it).Title = ipd.GetPropertyName();
+				(*it).Path = ipd.GetPropertyPath();
+			}
+		};
+
+		const int curTab = m_tab.GetCurSel();
+
+		if (curTab == 0) {
+			edit_favitem(AfxGetMyApp()->m_FavoritesFile.m_FavFiles);
 		}
-
-		std::list<CString> args;
-		ExplodeEsc(*it, args, L'|', 4);
-		if (args.size() < 4) {
-			ASSERT(0);
-			return;
-		}
-
-		CString& name = args.front();
-		CString& path = *(std::next(args.begin(), 3));
-
-		CItemPropertiesDlg ipd(name, path);
-		if (ipd.DoModal() == IDOK) {
-			m_list.SetItemText(nItem, 0, ipd.GetPropertyName());
-			name = ipd.GetPropertyName();
-			path = ipd.GetPropertyPath();
-			const CString str = ImplodeEsc(args, L'|');
-			*it = str;
+		else if (curTab == 1) {
+			edit_favitem(AfxGetMyApp()->m_FavoritesFile.m_FavDVDs);
 		}
 	}
 }
@@ -266,22 +291,25 @@ void CFavoriteOrganizeDlg::OnLvnEndLabelEditList2(NMHDR* pNMHDR, LRESULT* pResul
 
 void CFavoriteOrganizeDlg::PlayFavorite(int nItem)
 {
-	auto pFrame = AfxGetMainFrame();
-	switch (m_tab.GetCurSel()) {
-		case 0: // Files
-		{
-			auto it = FindInListByPointer(m_FavLists[0], (CString*)m_list.GetItemData(nItem));
-			pFrame->PlayFavoriteFile(*it);
+	if (nItem >= 0 && nItem < m_list.GetItemCount()) {
+		return;
+	}
+
+	const int curTab = m_tab.GetCurSel();
+
+	if (curTab == 0) {
+		auto& favlist = AfxGetMyApp()->m_FavoritesFile.m_FavFiles;
+		auto it = FindInListByPointer(favlist, (SessionInfo*)m_list.GetItemData(nItem));
+		if (it != favlist.end()) {
+			AfxGetMainFrame()->PlayFavoriteFile(*it);
 		}
-			break;
-		case 1: // DVDs
-		{
-			auto it = FindInListByPointer(m_FavLists[1], (CString*)m_list.GetItemData(nItem));
-			pFrame->PlayFavoriteDVD(*it);
+	}
+	else if (curTab == 1) {
+		auto& favlist = AfxGetMyApp()->m_FavoritesFile.m_FavDVDs;
+		auto it = FindInListByPointer(favlist, (SessionInfo*)m_list.GetItemData(nItem));
+		if (it != favlist.end()) {
+			AfxGetMainFrame()->PlayFavoriteDVD(*it);
 		}
-			break;
-		case 2: // Devices
-			break;
 	}
 }
 
@@ -289,9 +317,7 @@ void CFavoriteOrganizeDlg::OnPlayFavorite(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
-	if (pItemActivate->iItem >= 0) {
-		PlayFavorite(pItemActivate->iItem);
-	}
+	PlayFavorite(pItemActivate->iItem);
 }
 
 void CFavoriteOrganizeDlg::OnKeyPressed(NMHDR* pNMHDR, LRESULT* pResult)
@@ -306,9 +332,7 @@ void CFavoriteOrganizeDlg::OnKeyPressed(NMHDR* pNMHDR, LRESULT* pResult)
 		case VK_RETURN:
 			if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
 				int nItem = m_list.GetNextSelectedItem(pos);
-				if (nItem >= 0 && nItem < m_list.GetItemCount()) {
-					PlayFavorite(nItem);
-				}
+				PlayFavorite(nItem);
 			}
 			*pResult = 1;
 			break;
@@ -333,25 +357,33 @@ void CFavoriteOrganizeDlg::OnKeyPressed(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 {
-	POSITION pos;
-	int nItem = -1;
-	auto& favlist = m_FavLists[m_tab.GetCurSel()];
+	auto erase_favitem = [&](std::list<SessionInfo>& favlist) {
+		POSITION pos;
+		while (pos = m_list.GetFirstSelectedItemPosition()) {
+			int nItem = m_list.GetNextSelectedItem(pos);
+			if (nItem < 0 || nItem >= m_list.GetItemCount()) {
+				return;
+			}
 
-	while (pos = m_list.GetFirstSelectedItemPosition()) {
-		nItem = m_list.GetNextSelectedItem(pos);
-		if (nItem < 0 || nItem >= m_list.GetItemCount()) {
-			return;
+			auto it = FindInListByPointer(favlist, (SessionInfo*)m_list.GetItemData(nItem));
+			if (it != favlist.end()) {
+				favlist.erase(it);
+			}
+
+			m_list.DeleteItem(nItem);
 		}
+	};
 
-		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(nItem));
-		if (it != favlist.end()) {
-			favlist.erase(it);
-		}
+	const int curTab = m_tab.GetCurSel();
 
-		m_list.DeleteItem(nItem);
+	if (curTab == 0) {
+		erase_favitem(AfxGetMyApp()->m_FavoritesFile.m_FavFiles);
+	}
+	else if (curTab == 1) {
+		erase_favitem(AfxGetMyApp()->m_FavoritesFile.m_FavDVDs);
 	}
 
-	nItem = std::min(nItem, m_list.GetItemCount() - 1);
+	int nItem = std::min(nItem, m_list.GetItemCount() - 1);
 	m_list.SetItemState(nItem, LVIS_SELECTED, LVIS_SELECTED);
 }
 
@@ -435,8 +467,7 @@ void CFavoriteOrganizeDlg::OnBnClickedOk()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.SetFav(FAV_FILE, m_FavLists[0]);
-	s.SetFav(FAV_DVD, m_FavLists[1]);
+	AfxGetMyApp()->m_FavoritesFile.SaveFavorites();
 
 	OnOK();
 }
@@ -456,23 +487,23 @@ void CFavoriteOrganizeDlg::OnSize(UINT nType, int cx, int cy)
 void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLVGETINFOTIPW pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIPW>(pNMHDR);
-	auto& favlist = m_FavLists[m_tab.GetCurSel()];
 
-	auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(pGetInfoTip->iItem));
-	if (it == favlist.end()) {
-		ASSERT(0);
-		return;
+	auto setTipText = [&](std::list<SessionInfo>& favlist) {
+		auto it = FindInListByPointer(favlist, (SessionInfo*)m_list.GetItemData(pGetInfoTip->iItem));
+		if (it != favlist.end()) {
+			StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, (*it).Path);
+			*pResult = 0;
+		}
+	};
+
+	const int curTab = m_tab.GetCurSel();
+
+	if (curTab == 0) {
+		auto& favlist = AfxGetMyApp()->m_FavoritesFile.m_FavFiles;
+		setTipText(AfxGetMyApp()->m_FavoritesFile.m_FavFiles);
 	}
-
-	std::list<CString> args;
-	ExplodeEsc(*it, args, L'|', 4);
-	if (args.size() < 4) {
-		ASSERT(0);
-		return;
+	else if (curTab == 1) {
+		auto& favlist = AfxGetMyApp()->m_FavoritesFile.m_FavDVDs;
+		setTipText(AfxGetMyApp()->m_FavoritesFile.m_FavFiles);
 	}
-
-	const CString& path = *(std::next(args.begin(), 3));
-
-	StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path);
-	*pResult = 0;
 }
