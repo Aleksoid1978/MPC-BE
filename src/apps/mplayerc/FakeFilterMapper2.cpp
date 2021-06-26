@@ -677,8 +677,6 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 				}
 			}
 
-			f->backup = f->guids;
-
 			m_filters.push_back(f);
 		}
 

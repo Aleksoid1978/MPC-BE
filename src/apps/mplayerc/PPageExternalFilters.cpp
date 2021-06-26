@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 #include "RegFilterChooserDlg.h"
 #include "SelectMediaType.h"
 #include "FGFilter.h"
+#include "FakeFilterMapper2.h"
 #include <moreuuids.h>
 #include "../../DSUtil/std_helper.h"
 
@@ -592,20 +593,16 @@ void CPPageExternalFilters::OnResetTypes()
 			CFGFilterRegistry fgf(f->dispname);
 			if (!fgf.GetName().IsEmpty()) {
 				f->guids = fgf.GetTypes();
-				f->backup = fgf.GetTypes();
-			} else {
-				f->guids = f->backup;
 			}
 		} else {
 			CFilterMapper2 fm2(false);
 			fm2.Register(f->path);
 			for (const auto& filter : fm2.m_filters) {
 				if (filter->clsid == f->clsid) {
-					f->backup = filter->backup;
+					f->guids = filter->guids;
 					break;
 				}
 			}
-			f->guids = f->backup;
 		}
 
 		m_pLastSelFilter = nullptr;

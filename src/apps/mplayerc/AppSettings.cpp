@@ -1129,21 +1129,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				break;
 			}
 
-			f->backup.clear();
-			for (unsigned int i = 0; ; i++) {
-				CString val;
-				val.Format(L"org%04u", i);
-				CString guid;
-				profile.ReadString(key, val, guid);
-				if (guid.IsEmpty()) {
-					break;
-				}
-				f->backup.push_back(GUIDFromCString(guid));
-			}
-			if (f->backup.size() & 1) {
-				f->backup.pop_back();
-			}
-
 			f->guids.clear();
 			for (unsigned int i = 0; ; i++) {
 				CString val;
@@ -2029,12 +2014,6 @@ void CAppSettings::SaveExternalFilters()
 			profile.WriteString(key, L"CLSID", CStringFromGUID(f->clsid));
 		}
 		unsigned i = 0;
-		for (const auto& item : f->backup) {
-			CString val;
-			val.Format(L"org%04u", i++);
-			profile.WriteString(key, val, CStringFromGUID(item));
-		}
-		i = 0;
 		for (const auto& item : f->guids) {
 			CString val;
 			val.Format(L"mod%04u", i++);

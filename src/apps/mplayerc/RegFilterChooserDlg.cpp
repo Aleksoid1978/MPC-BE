@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -129,7 +129,6 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 		f->dispname  = fgf.GetDisplayName();
 		f->clsid     = fgf.GetCLSID();
 		f->guids     = fgf.GetTypes();
-		f->backup    = fgf.GetTypes();
 		f->dwMerit   = fgf.GetMeritForDirectShow();
 		f->iLoadType = FilterOverride::MERIT;
 		m_filters.push_back(f);

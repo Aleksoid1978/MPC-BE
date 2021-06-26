@@ -35,7 +35,7 @@ public:
 	CString path, name;
 	CLSID clsid = GUID_NULL;
 	// props
-	std::list<GUID> guids, backup;
+	std::list<GUID> guids;
 	enum { PREFERRED, BLOCK, MERIT };
 	int iLoadType = 0;
 	DWORD dwMerit = 0;
@@ -50,7 +50,6 @@ public:
         , name      (f->name)
         , clsid     (f->clsid)
         , guids     (f->guids)
-        , backup    (f->backup)
         , iLoadType (f->iLoadType)
         , dwMerit   (f->dwMerit)
 	{
