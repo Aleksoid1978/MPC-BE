@@ -80,6 +80,7 @@ extern bool				CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& Fr
 extern bool				HasMediaType(IFilterGraph *pFilterGraph, const GUID &mediaType);
 
 extern void				ExtractMediaTypes(IPin* pPin, std::vector<GUID>& types);
+extern void				ExtractMediaTypes(IPin* pPin, std::list<PinType>& types);
 extern void				ExtractMediaTypes(IPin* pPin, std::list<CMediaType>& mts);
 extern bool				ExtractBIH(const AM_MEDIA_TYPE* pmt, BITMAPINFOHEADER* bih);
 extern bool				ExtractBIH(IMediaSample* pMS, BITMAPINFOHEADER* bih);

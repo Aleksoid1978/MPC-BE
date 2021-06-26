@@ -133,3 +133,8 @@ struct NoInitByte
 		//static_assert(__alignof(*this) == __alignof(value), "invalid alignment");
 	}
 };
+
+struct PinType {
+	GUID major;
+	GUID sub;
+};

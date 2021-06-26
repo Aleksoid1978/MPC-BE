@@ -637,15 +637,37 @@ void ExtractMediaTypes(IPin* pPin, std::vector<GUID>& types)
 	BeginEnumMediaTypes(pPin, pEM, pmt) {
 		bool fFound = false;
 
-		for (size_t i = 0; !fFound && i < types.size(); i += 2) {
+		for (size_t i = 0; i < types.size(); i += 2) {
 			if (types[i] == pmt->majortype && types[i+1] == pmt->subtype) {
 				fFound = true;
+				break;
 			}
 		}
 
 		if (!fFound) {
 			types.push_back(pmt->majortype);
 			types.push_back(pmt->subtype);
+		}
+	}
+	EndEnumMediaTypes(pmt)
+}
+
+void ExtractMediaTypes(IPin* pPin, std::list<PinType>& types)
+{
+	types.clear();
+
+	BeginEnumMediaTypes(pPin, pEM, pmt) {
+		bool fFound = false;
+
+		for (const auto& type : types) {
+			if (type.major == pmt->majortype && type.sub == pmt->subtype) {
+				fFound = true;
+				break;
+			}
+		}
+
+		if (!fFound) {
+			types.push_back({ pmt->majortype, pmt->subtype });
 		}
 	}
 	EndEnumMediaTypes(pmt)
