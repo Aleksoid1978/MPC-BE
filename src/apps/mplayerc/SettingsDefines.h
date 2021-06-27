@@ -31,8 +31,8 @@
 #define IDS_R_PNSPRESETS					L"Settings\\PnSPresets"
 #define IDS_R_YOUTUBECACHE					L"Settings\\YoutubeCache"
 
-#define IDS_RS_FAV_REMEMBERPOS				L"RememberPosition"
-#define IDS_RS_FAV_RELATIVEDRIVE			L"RelativeDrive"
+#define IDS_RS_FAV_REMEMBERPOS				L"FavRememberPos"
+#define IDS_RS_FAV_RELATIVEDRIVE			L"FavRelativeDrive"
 #define IDS_RS_DVDPOS						L"RememberDVDPos"
 #define IDS_RS_DVD_START_MAIN_TITLE			L"StartMainTitleDVD"
 #define IDS_RS_FILEPOS						L"RememberFilePos"
