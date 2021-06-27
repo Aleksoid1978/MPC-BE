@@ -208,11 +208,9 @@ private:
 	void CreateFontInternal();
 
 	bool m_bPeriodicallyDisplayed = false;
-	std::mutex m_mutexTimer;
-	HANDLE m_hTimerHandle = nullptr;
-	BOOL StartTimer(const DWORD dueTime);
-	void EndTimer(const bool bWaitForCallback = true);
-	static void CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
+	std::atomic<bool> m_bTimerStarted = false;
+	void StartTimer(const UINT nTimerDurarion);
+	void EndTimer();
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);

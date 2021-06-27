@@ -714,12 +714,8 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration/* =
 	const CAppSettings& s = AfxGetAppSettings();
 
 	if (m_pMFVMB) {
-		{
-			std::unique_lock<std::mutex> lock(m_mutexTimer);
-
-			if (bPeriodicallyDisplayed && !m_bPeriodicallyDisplayed && m_hTimerHandle) {
-				return;
-			}
+		if (bPeriodicallyDisplayed && !m_bPeriodicallyDisplayed && m_bTimerStarted) {
+			return;
 		}
 
 		if (nPos != OSD_DEBUG) {
@@ -760,12 +756,8 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration/* =
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdDisplayMessage(strMsg, nDuration);
 	} else if (m_pWnd) {
-		{
-			std::unique_lock<std::mutex> lock(m_mutexTimer);
-
-			if (bPeriodicallyDisplayed && !m_bPeriodicallyDisplayed && m_hTimerHandle) {
-				return;
-			}
+		if (bPeriodicallyDisplayed && !m_bPeriodicallyDisplayed && m_bTimerStarted) {
+			return;
 		}
 
 		if (nPos != OSD_DEBUG) {
@@ -1121,41 +1113,28 @@ void COSD::CreateFontInternal()
 	m_MainFont.CreateFontIndirectW(&lf);
 }
 
-BOOL COSD::StartTimer(const DWORD dueTime)
+void COSD::StartTimer(const UINT nTimerDurarion)
 {
 	EndTimer();
 
-	std::unique_lock<std::mutex> lock(m_mutexTimer);
-
-	BOOL ret = FALSE;
-	if (!m_hTimerHandle) {
-		ret = CreateTimerQueueTimer(
-			&m_hTimerHandle,
-			nullptr,
-			TimerCallbackFunc,
-			this,
-			dueTime,
-			0,
-			WT_EXECUTEONLYONCE);
-	}
-
-	return ret;
-}
-
-void COSD::EndTimer(const bool bWaitForCallback/* = true*/)
-{
-	std::unique_lock<std::mutex> lock(m_mutexTimer);
-
-	if (m_hTimerHandle) {
-		DeleteTimerQueueTimer(nullptr, m_hTimerHandle, bWaitForCallback ? INVALID_HANDLE_VALUE : nullptr);
-		m_hTimerHandle = nullptr;
+	if (m_pWnd) {
+		m_pWnd->SetTimer((UINT_PTR)this, nTimerDurarion,
+			[](HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime) {
+				if (auto pOSD = reinterpret_cast<COSD*>(nIDEvent)) {
+					pOSD->ClearMessage();
+					pOSD->EndTimer();
+				}
+			});
+		m_bTimerStarted = true;
 	}
 }
 
-void COSD::TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+void COSD::EndTimer()
 {
-	if (auto pOSD = static_cast<COSD*>(lpParameter)) {
-		pOSD->ClearMessage();
-		pOSD->EndTimer(false);
+	if (m_bTimerStarted) {
+		if (m_pWnd) {
+			m_pWnd->KillTimer(reinterpret_cast<UINT_PTR>(this));
+		}
+		m_bTimerStarted = false;
 	}
 }
