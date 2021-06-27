@@ -33,9 +33,9 @@
 
 #define IDS_RS_FAV_REMEMBERPOS				L"RememberPosition"
 #define IDS_RS_FAV_RELATIVEDRIVE			L"RelativeDrive"
-#define IDS_RS_DVDPOS						L"Remember DVD Pos"
-#define IDS_RS_DVD_START_MAIN_TITLE			L"Start Main Title DVD"
-#define IDS_RS_FILEPOS						L"Remember File Pos"
+#define IDS_RS_DVDPOS						L"RememberDVDPos"
+#define IDS_RS_DVD_START_MAIN_TITLE			L"StartMainTitleDVD"
+#define IDS_RS_FILEPOS						L"RememberFilePos"
 #define IDS_RS_SHOWOSD						L"ShowOSD"
 #define IDS_RS_LANGUAGE						L"Language"
 #define IDS_RS_GLOBALMEDIA					L"UseGlobalMedia"
@@ -148,8 +148,8 @@
 #define IDS_RS_THEMEBLUE					L"ThemeBlue"
 #define IDS_RS_DARKMENU						L"DarkMenu"
 
-#define IDS_RS_CLRFACEABGR					L"Toolbar clrFace(ABGR)"
-#define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)"
+#define IDS_RS_CLRFACEABGR					L"Toolbar clrFace(ABGR)" // TODO: remake it
+#define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)" // TODO: remake it
 
 #define IDS_RS_CLOSEDCAPTIONS				L"ClosedCaptions"
 #define IDS_RS_AUDIORENDERERTYPE			L"AudioRendererType"
@@ -190,7 +190,6 @@
 #define IDS_RS_JUMPDISTM					L"JumpDistM"
 #define IDS_RS_JUMPDISTL					L"JumpDistL"
 #define IDS_RS_REPORTFAILEDPINS				L"ReportFailedPins"
-#define IDS_RS_SRCFILTERS					L"SrcFilters"
 #define IDS_RS_KEEPHISTORY					L"KeepHistory"
 #define IDS_RS_RECENT_FILES_NUMBER			L"RecentFilesNumber"
 #define IDS_RS_RECENT_FILES_MENU_ELLIPSIS	L"RecentFilesMenuEllipsis"
@@ -264,7 +263,7 @@
 #define IDS_RS_AUDIO_DISP_NAME				L"AudDispName"
 #define IDS_RS_COUNTRY						L"Country"
 
-#define IDS_R_DVB							L"DVB configuration"
+#define IDS_R_DVB							L"DVBConfiguration"
 #define IDS_RS_BDA_NETWORKPROVIDER			L"BDANetworkProvider"
 #define IDS_RS_BDA_TUNER					L"BDATuner"
 #define IDS_RS_BDA_RECEIVER					L"BDAReceiver"
@@ -323,7 +322,7 @@
 #define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
 #define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
 
-#define IDS_R_FILTERS_PRIORITY				L"Settings\\Filters Priority"
+#define IDS_R_FILTERS_PRIORITY				L"Settings\\FiltersPriority"
 
 #define IDS_RS_LASTFILEINFOPAGE				L"LastFileInfoPage"
 
