@@ -270,6 +270,17 @@ bool StrToUInt64(const wchar_t* str, uint64_t& value)
 	return false;
 }
 
+bool StrHexToUInt32(const wchar_t* str, uint32_t& value)
+{
+	wchar_t* end;
+	uint32_t v = wcstoul(str, &end, 16);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
 bool StrHexToUInt64(const wchar_t* str, uint64_t& value)
 {
 	wchar_t* end;
