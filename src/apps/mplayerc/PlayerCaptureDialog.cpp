@@ -28,29 +28,31 @@
 #include "../../filters/muxer/DSMMuxer/DSMMuxer.h"
 
 
-static bool LoadMediaType(CStringW displayName, AM_MEDIA_TYPE** ppmt)
+static bool LoadMediaType(const CStringW prefix, CStringW name, AM_MEDIA_TYPE** ppmt)
 {
-	bool fRet = false;
+	if (prefix.IsEmpty() || !ppmt) {
+		return false;
+	}
 
-	if (!ppmt) {
-		return fRet;
+	CProfile& profile = AfxGetProfile();
+	CStringW str;
+	if (!profile.ReadString(IDS_R_CAPTURE, prefix + L"DeviceName", str) || str != name) {
+		return false;
 	}
 
 	*ppmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
 	if (!*ppmt) {
-		return fRet;
+		return false;
 	}
 
 	ZeroMemory(*ppmt, sizeof(AM_MEDIA_TYPE));
-
-	CProfile& profile = AfxGetProfile();
 	BYTE* pData;
 	UINT len;
-	if (profile.ReadBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"MediaType", &pData, len)) {
+	if (profile.ReadBinary2(IDS_R_CAPTURE, prefix + L"MediaType", &pData, len)) {
 		if ( len != sizeof(AM_MEDIA_TYPE) ) {
 			CoTaskMemFree(*ppmt);
 			delete [] pData;
-			return fRet;
+			return false;
 		}
 		memcpy(*ppmt, pData, len);
 		delete [] pData;
@@ -58,12 +60,10 @@ static bool LoadMediaType(CStringW displayName, AM_MEDIA_TYPE** ppmt)
 		(*ppmt)->cbFormat = 0;
 		(*ppmt)->pbFormat = nullptr;
 
-		fRet = true;
-
-		if (profile.ReadBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"Format", &pData, len)) {
+		if (profile.ReadBinary2(IDS_R_CAPTURE, prefix + L"Format", &pData, len)) {
 			if ( !len ) {
 				delete [] pData;
-				return fRet;
+				return false;
 			}
 			(*ppmt)->cbFormat = len;
 			(*ppmt)->pbFormat = (BYTE*)CoTaskMemAlloc(len);
@@ -72,17 +72,20 @@ static bool LoadMediaType(CStringW displayName, AM_MEDIA_TYPE** ppmt)
 		}
 	}
 
-	return fRet;
+	return true;
 }
 
-static void SaveMediaType(CStringW displayName, AM_MEDIA_TYPE* pmt)
+static void SaveMediaType(const CStringW prefix, const CStringW name, AM_MEDIA_TYPE* pmt)
 {
-	if (displayName.IsEmpty() || !pmt) {
+	if (prefix.IsEmpty() || !pmt) {
 		return;
 	}
 
-	AfxGetProfile().WriteBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
-	AfxGetProfile().WriteBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"Format", pmt->pbFormat, pmt->cbFormat);
+	CProfile& profile = AfxGetProfile();
+
+	profile.WriteString(IDS_R_CAPTURE, prefix + L"DeviceName", name);
+	profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
+	profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"Format", pmt->pbFormat, pmt->cbFormat);
 }
 
 static void LoadDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const GUID& cat)
@@ -785,7 +788,7 @@ void CPlayerCaptureDialog::UpdateMediaTypes()
 				bih->biHeight = m_vidver.GetPos32();
 				bih->biSizeImage = bih->biWidth*bih->biHeight*bih->biBitCount>>3;
 			}
-			SaveMediaType(m_vidDisplayName, pmt);
+			SaveMediaType(L"Vid", m_vidDisplayName, pmt);
 
 			m_mtv = *pmt;
 			DeleteMediaType(pmt);
@@ -806,7 +809,7 @@ void CPlayerCaptureDialog::UpdateMediaTypes()
 		}
 
 		if (pmt) {
-			SaveMediaType(m_audDisplayName, pmt);
+			SaveMediaType(L"Aud", m_audDisplayName, pmt);
 
 			m_mta = *pmt;
 			DeleteMediaType(pmt);
@@ -897,7 +900,7 @@ void CPlayerCaptureDialog::UpdateVideoCodec()
 
 	SaveDefaultCodec(m_pVidEncArray, m_vidcodec, CLSID_VideoCompressorCategory);
 
-	//SaveMediaType(displayName, &m_mtcv);
+	//SaveMediaType(L"Vid", &m_mtcv);
 }
 
 void CPlayerCaptureDialog::UpdateAudioCodec()
@@ -917,7 +920,7 @@ void CPlayerCaptureDialog::UpdateAudioCodec()
 
 	SaveDefaultCodec(m_pAudEncArray, m_audcodec, CLSID_AudioCompressorCategory);
 
-	//SaveMediaType(displayName, &m_mtca);
+	//SaveMediaType(L"Aud", &m_mtca);
 }
 
 void CPlayerCaptureDialog::UpdateMuxer()
@@ -1142,7 +1145,7 @@ void CPlayerCaptureDialog::UpdateVideoControls()
 
 	if (m_pAMVSC) {
 		AM_MEDIA_TYPE* pmt;
-		if (LoadMediaType(m_vidDisplayName, &pmt)) {
+		if (LoadMediaType(L"Vid", m_vidDisplayName, &pmt)) {
 			m_pAMVSC->SetFormat(pmt);
 			DeleteMediaType(pmt);
 		}
@@ -1213,7 +1216,7 @@ void CPlayerCaptureDialog::UpdateAudioControls()
 
 	if (m_pAMASC) {
 		AM_MEDIA_TYPE* pmt;
-		if (LoadMediaType(m_audDisplayName, &pmt)) {
+		if (LoadMediaType(L"Aud", m_audDisplayName, &pmt)) {
 			m_pAMASC->SetFormat(pmt);
 			DeleteMediaType(pmt);
 		}
