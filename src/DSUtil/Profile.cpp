@@ -749,20 +749,22 @@ bool CProfile::WriteBinary(const wchar_t* section, const wchar_t* entry, const B
 		}
 		return ret;
 	} else {
-		int nDestLen = Base64EncodeGetRequiredLength(nbytes);
-		CStringA base64;
-		BOOL ret = Base64Encode(pdata, nbytes, base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-		if (ret) {
-			base64.ReleaseBufferSetLength(nDestLen);
-			CStringW valueStr(base64);
-			InitIni();
-			CStringW& old = m_ProfileMap[section][entry];
-			if (old != valueStr) {
-				old = valueStr;
-				m_bIniNeedFlush = true;
-			}
-			ret = true;
+		CStringW valueStr;
+		WCHAR* buffer = valueStr.GetBuffer(nbytes * 2);
+		// Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
+		for (ULONG i = 0; i < nbytes; i++) {
+			buffer[i * 2] = 'A' + (pdata[i] & 0xf);
+			buffer[i * 2 + 1] = 'A' + (pdata[i] >> 4 & 0xf);
 		}
+		valueStr.ReleaseBufferSetLength(nbytes * 2);
+
+		InitIni();
+		CStringW& old = m_ProfileMap[section][entry];
+		if (old != valueStr) {
+			old = valueStr;
+			m_bIniNeedFlush = true;
+		}
+		ret = true;
 	}
 
 	return ret;
