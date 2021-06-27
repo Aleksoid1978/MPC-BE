@@ -377,6 +377,35 @@ bool CProfile::ReadDouble(const wchar_t* section, const wchar_t* entry, double& 
 	return ret;
 }
 
+bool CProfile::ReadHex32(const wchar_t* section, const wchar_t* entry, unsigned& value)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	bool ret = false;
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, section, KEY_READ)) {
+			if (ERROR_SUCCESS == regkey.QueryDWORDValue(entry, *(DWORD*)&value)) {
+				ret = true;
+			}
+			regkey.Close();
+		}
+	}
+	else {
+		InitIni();
+		auto it1 = m_ProfileMap.find(section);
+		if (it1 != m_ProfileMap.end()) {
+			auto it2 = it1->second.find(entry);
+			if (it2 != it1->second.end()) {
+				ret = StrHexToUInt32(it2->second, value);
+			}
+		}
+	}
+
+	return ret;
+}
+
 bool CProfile::ReadString(const wchar_t* section, const wchar_t* entry, CStringW& value)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
@@ -581,6 +610,36 @@ bool CProfile::WriteDouble(const wchar_t* section, const wchar_t* entry, const d
 		}
 	} else {
 		InitIni();
+		CStringW& old = m_ProfileMap[section][entry];
+		if (old != valueStr) {
+			old = valueStr;
+			m_bIniNeedFlush = true;
+		}
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool CProfile::WriteHex32(const wchar_t* section, const wchar_t* entry, const unsigned value)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	bool ret = false;
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, section)) {
+			if (ERROR_SUCCESS == regkey.SetDWORDValue(entry, (DWORD)value)) {
+				ret = true;
+			}
+			regkey.Close();
+		}
+	}
+	else {
+		InitIni();
+		CStringW valueStr;
+		valueStr.Format(L"0x%04x", value);
 		CStringW& old = m_ProfileMap[section][entry];
 		if (old != valueStr) {
 			old = valueStr;

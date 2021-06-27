@@ -64,6 +64,7 @@ public:
 	bool ReadInt64 (const wchar_t* section, const wchar_t* entry, __int64&  value, const __int64 lo, const __int64 hi);
 	bool ReadDouble(const wchar_t* section, const wchar_t* entry, double&   value);
 	bool ReadDouble(const wchar_t* section, const wchar_t* entry, double&   value, const double lo, const double hi);
+	bool ReadHex32 (const wchar_t* section, const wchar_t* entry, unsigned& value);
 	bool ReadString(const wchar_t* section, const wchar_t* entry, CStringW& value);
 	bool ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes);
 
@@ -72,6 +73,7 @@ public:
 	bool WriteUInt  (const wchar_t* section, const wchar_t* entry, const unsigned  value);
 	bool WriteInt64 (const wchar_t* section, const wchar_t* entry, const __int64   value);
 	bool WriteDouble(const wchar_t* section, const wchar_t* entry, const double    value);
+	bool WriteHex32 (const wchar_t* section, const wchar_t* entry, const unsigned  value);
 	bool WriteString(const wchar_t* section, const wchar_t* entry, const CStringW& value);
 	bool WriteBinary(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes);
 
