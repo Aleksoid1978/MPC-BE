@@ -1093,7 +1093,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		m_filters.RemoveAll();
 		for (unsigned int i = 0; ; i++) {
 			CString key;
-			key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
+			key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
 			CAutoPtr<FilterOverride> f(DNew FilterOverride);
 
 			bool enabled = false;
@@ -1131,14 +1131,21 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 			f->guids.clear();
 			for (unsigned int i = 0; ; i++) {
-				CString val;
-				val.Format(L"mod%04u", i);
-				CString guid;
-				profile.ReadString(key, val, guid);
-				if (guid.IsEmpty()) {
+				CString entry;
+				entry.Format(L"MT_%03u", i);
+				CString value;
+				if (!profile.ReadString(key, entry, value)) {
 					break;
 				}
-				f->guids.push_back(GUIDFromCString(guid));
+				GUID major, sub;
+				HRESULT hr = GUIDFromCString(value.Left(38), major);
+				if (SUCCEEDED(hr)) {
+					hr = GUIDFromCString(value.Mid(38), sub);
+					if (SUCCEEDED(hr)) {
+						f->guids.emplace_back(major);
+						f->guids.emplace_back(sub);
+					}
+				}
 			}
 			if (f->guids.size() & 1) {
 				f->guids.pop_back();
@@ -1974,7 +1981,7 @@ void CAppSettings::SaveExternalFilters()
 
 	for (unsigned int i = 0; ; i++) {
 		CString key;
-		key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
+		key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
 		int j = -1;
 		profile.ReadInt(key, L"Enabled", j);
 		profile.DeleteSection(key);
@@ -1993,7 +2000,7 @@ void CAppSettings::SaveExternalFilters()
 		}
 
 		CString key;
-		key.Format(L"%s\\%04u", IDS_R_FILTERS, k);
+		key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, k);
 
 		profile.WriteInt(key, L"SourceType", (int)f->type);
 		profile.WriteInt(key, L"Enabled", (int)!f->fDisabled);
@@ -2014,10 +2021,15 @@ void CAppSettings::SaveExternalFilters()
 			profile.WriteString(key, L"CLSID", CStringFromGUID(f->clsid));
 		}
 		unsigned i = 0;
-		for (const auto& item : f->guids) {
-			CString val;
-			val.Format(L"mod%04u", i++);
-			profile.WriteString(key, val, CStringFromGUID(item));
+		for (auto it = f->guids.cbegin(); it != f->guids.cend(); it++) {
+			CString value(CStringFromGUID(*it)); // majortype
+			it++;
+			if (it != f->guids.cend()) {
+				value.Append(CStringFromGUID(*it)); // subtype
+				CString entry;
+				entry.Format(L"MT_%03u", i++);
+				profile.WriteString(key, entry, value);
+			}
 		}
 		profile.WriteInt(key, L"LoadType", f->iLoadType);
 		profile.WriteUInt(key, L"Merit", f->dwMerit);

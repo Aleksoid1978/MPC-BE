@@ -21,7 +21,7 @@
 #pragma once
 
 #define IDS_R_SETTINGS						L"Settings"
-#define IDS_R_FILTERS						L"Filters"
+#define IDS_R_EXTERNAL_FILTERS				L"ExternalFilters"
 #define IDS_R_INTERNAL_FILTERS				L"InternalFilters"
 #define IDS_R_COMMANDS						L"Commands2"
 #define IDS_R_MOUSE							L"Settings\\Mouse"
