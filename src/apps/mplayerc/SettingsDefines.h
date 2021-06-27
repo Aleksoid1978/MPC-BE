@@ -33,9 +33,9 @@
 
 #define IDS_RS_FAV_REMEMBERPOS				L"FavRememberPos"
 #define IDS_RS_FAV_RELATIVEDRIVE			L"FavRelativeDrive"
-#define IDS_RS_DVDPOS						L"RememberDVDPos"
-#define IDS_RS_DVD_START_MAIN_TITLE			L"StartMainTitleDVD"
 #define IDS_RS_FILEPOS						L"RememberFilePos"
+#define IDS_RS_DVDPOS						L"RememberDVDPos"
+#define IDS_RS_DVD_START_MAIN_TITLE			L"DVDStartMainTitle"
 #define IDS_RS_SHOWOSD						L"ShowOSD"
 #define IDS_RS_LANGUAGE						L"Language"
 #define IDS_RS_GLOBALMEDIA					L"UseGlobalMedia"
