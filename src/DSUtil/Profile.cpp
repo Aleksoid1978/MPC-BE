@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include <atlpath.h>
+#include <atlenc.h>
 #include "FileHandle.h"
 #include "Utils.h"
 #include "Log.h"
@@ -497,6 +498,60 @@ bool CProfile::ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** p
 	return ret;
 }
 
+bool CProfile::ReadBinary2(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	bool ret = false;
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, section, KEY_READ)) {
+			if (ERROR_SUCCESS == regkey.QueryBinaryValue(entry, NULL, (ULONG*)&nbytes)) {
+				*ppdata = new(std::nothrow) BYTE[nbytes];
+				if (*ppdata && ERROR_SUCCESS == regkey.QueryBinaryValue(entry, *ppdata, (ULONG*)&nbytes)) {
+					ret = true;
+				}
+			}
+			regkey.Close();
+		}
+	} else {
+		CStringW valueStr;
+
+		InitIni();
+		auto it1 = m_ProfileMap.find(section);
+		if (it1 != m_ProfileMap.end()) {
+			auto it2 = it1->second.find(entry);
+			if (it2 != it1->second.end()) {
+				valueStr = it2->second;
+			}
+		}
+
+		CStringA base64(valueStr);
+		if (base64.IsEmpty()) {
+			return false;
+		}
+
+		int nDestLen = Base64DecodeGetRequiredLength(base64.GetLength());
+		BYTE* pBinary = new(std::nothrow) BYTE[nDestLen];
+		if (!pBinary) {
+			ASSERT(0);
+			return false;
+		}
+		BOOL decOk = Base64Decode(base64, base64.GetLength(), *ppdata, &nDestLen);
+		if (!decOk) {
+			delete[] pBinary;
+			return false;
+		}
+
+		*ppdata = pBinary;
+
+		ret = true;
+	}
+
+	return ret;
+}
+
 bool CProfile::WriteBool(const wchar_t* section, const wchar_t* entry, const bool value)
 {
 	return WriteInt(section, entry, value ? 1 : 0); // strictly write "true" as 1
@@ -694,22 +749,55 @@ bool CProfile::WriteBinary(const wchar_t* section, const wchar_t* entry, const B
 		}
 		return ret;
 	} else {
-		CStringW valueStr;
-		WCHAR* buffer = valueStr.GetBuffer(nbytes * 2);
-		// Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
-		for (ULONG i = 0; i < nbytes; i++) {
-			buffer[i * 2] = 'A' + (pdata[i] & 0xf);
-			buffer[i * 2 + 1] = 'A' + (pdata[i] >> 4 & 0xf);
+		int nDestLen = Base64EncodeGetRequiredLength(nbytes);
+		CStringA base64;
+		BOOL ret = Base64Encode(pdata, nbytes, base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+		if (ret) {
+			base64.ReleaseBufferSetLength(nDestLen);
+			CStringW valueStr(base64);
+			InitIni();
+			CStringW& old = m_ProfileMap[section][entry];
+			if (old != valueStr) {
+				old = valueStr;
+				m_bIniNeedFlush = true;
+			}
+			ret = true;
 		}
-		valueStr.ReleaseBufferSetLength(nbytes * 2);
+	}
 
-		InitIni();
-		CStringW& old = m_ProfileMap[section][entry];
-		if (old != valueStr) {
-			old = valueStr;
-			m_bIniNeedFlush = true;
+	return ret;
+}
+
+bool CProfile::WriteBinary2(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	bool ret = false;
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, section)) {
+			if (ERROR_SUCCESS == regkey.SetBinaryValue(entry, pdata, nbytes)) {
+				ret = true;
+			}
+			regkey.Close();
 		}
-		ret = true;
+		return ret;
+	} else {
+		int nDestLen = Base64EncodeGetRequiredLength(nbytes);
+		CStringA base64;
+		BOOL encOk = Base64Encode(pdata, nbytes, base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+		if (encOk) {
+			base64.ReleaseBufferSetLength(nDestLen);
+			CStringW valueStr(base64);
+			InitIni();
+			CStringW& old = m_ProfileMap[section][entry];
+			if (old != valueStr) {
+				old = valueStr;
+				m_bIniNeedFlush = true;
+			}
+			ret = true;
+		}
 	}
 
 	return ret;
