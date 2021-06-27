@@ -36,7 +36,7 @@ static bool LoadMediaType(const CStringW prefix, CStringW name, AM_MEDIA_TYPE** 
 
 	CProfile& profile = AfxGetProfile();
 	CStringW str;
-	if (!profile.ReadString(IDS_R_CAPTURE, prefix + L"DeviceName", str) || str != name) {
+	if (!profile.ReadString(IDS_R_CAPTURE, prefix + L"DispName", str) || str != name) {
 		return false;
 	}
 
@@ -83,9 +83,10 @@ static void SaveMediaType(const CStringW prefix, const CStringW name, AM_MEDIA_T
 
 	CProfile& profile = AfxGetProfile();
 
-	profile.WriteString(IDS_R_CAPTURE, prefix + L"DeviceName", name);
-	profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
-	profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"Format", pmt->pbFormat, pmt->cbFormat);
+	if (profile.WriteString(IDS_R_CAPTURE, prefix + L"DispName", name)) {
+		profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
+		profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"Format", pmt->pbFormat, pmt->cbFormat);
+	}
 }
 
 static void LoadDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const GUID& cat)
@@ -685,7 +686,7 @@ void CPlayerCaptureDialog::EmptyVideo()
 	if (m_pAMTuner && !m_vidDisplayName.IsEmpty()) {
 		long lChannel = 0, lVivSub = 0, lAudSub = 0;
 		m_pAMTuner->get_Channel(&lChannel, &lVivSub, &lAudSub);
-		AfxGetProfile().WriteInt(IDS_R_CAPTURE L"\\" + CString(m_vidDisplayName), L"Channel", lChannel);
+		AfxGetProfile().WriteInt(IDS_R_CAPTURE, L"Channel", lChannel);
 	}
 
 	m_vfa.RemoveAll();

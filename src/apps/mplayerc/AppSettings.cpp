@@ -756,8 +756,8 @@ void CAppSettings::ResetSettings()
 
 	// Save analog capture settings
 	iDefaultCaptureDevice = 0;
-	strAnalogVideo = L"dummy";
-	strAnalogAudio = L"dummy";
+	strAnalogVideo.Empty();
+	strAnalogAudio.Empty();
 	iAnalogCountry = 1;
 
 	strBDANetworkProvider.Empty();
