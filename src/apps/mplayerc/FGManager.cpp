@@ -1426,40 +1426,36 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT) && S_OK != IsPinConnected(pPin)) {
-			if (GetPinName(pPin)[0] == '~'
-					&& rs.iVideoRenderer != VIDRNDT_EVR_CP
+
+			if (GetPinName(pPin)[0] == '~') {
+				if (rs.iVideoRenderer != VIDRNDT_EVR_CP
 					&& rs.iVideoRenderer != VIDRNDT_EVR
 					&& rs.iVideoRenderer != VIDRNDT_SYNC) {
-
-				// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
+					continue;
+				}
 				if (FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
-					continue;
-				}
-			}
+					CLSID clsid;
+					pBF->GetClassID(&clsid);
 
-			CLSID clsid;
-			pBF->GetClassID(&clsid);
-
-			// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
-			if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
-				if (clsid == CLSID_NvidiaVideoDecoder || clsid == CLSID_SonicCinemasterVideoDecoder) {
-					continue;
-				}
-
-				// HACK: block any Line21 connections, if Line 21 Decoder is blocked
-				// TODO: understand why lock in the filter does not work
-				bool bBlockLine21Decoder2 = false;
-
-				for (const auto& pFGF : m_override) {
-					if (pFGF->GetCLSID() == CLSID_Line21Decoder2) {
-						if (pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
-							bBlockLine21Decoder2 = true;
-						}
-						break;
+					// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
+					if (clsid == CLSID_NvidiaVideoDecoder || clsid == CLSID_SonicCinemasterVideoDecoder) {
+						continue;
 					}
-				}
-				if (bBlockLine21Decoder2) {
-					continue;
+
+					// HACK: block any Line21 connections, if Line 21 Decoder is blocked
+					// TODO: understand why lock in the filter does not work
+					bool bBlockLine21Decoder2 = false;
+					for (const auto& pFGF : m_override) {
+						if (pFGF->GetCLSID() == CLSID_Line21Decoder2) {
+							if (pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+								bBlockLine21Decoder2 = true;
+							}
+							break;
+						}
+					}
+					if (bBlockLine21Decoder2) {
+						continue;
+					}
 				}
 			}
 
