@@ -468,6 +468,7 @@ static CStringW SubRipper2SSA(CStringW str)
 	str.Replace(L"</b>", L"{\\b}");
 	str.Replace(L"<u>", L"{\\u1}");
 	str.Replace(L"</u>", L"{\\u}");
+	str.Replace(L"<br>", L"\n");
 
 	return str;
 }
