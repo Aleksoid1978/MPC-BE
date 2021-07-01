@@ -44,9 +44,6 @@
 #define IDS_RS_TITLEBARTEXT					L"TitleBarText"
 #define IDS_RS_SEEKBARTEXT					L"SeekBarText"
 #define IDS_RS_CONTROLSTATE					L"ControlState"
-#define IDS_RS_VOLUME						L"Volume"
-#define IDS_RS_MUTE							L"Mute"
-#define IDS_RS_BALANCE						L"Balance"
 #define IDS_RS_LOOP							L"Loop"
 #define IDS_RS_LOOPNUM						L"LoopNum"
 #define IDS_RS_ENABLESUBTITLES				L"EnableSubtitles"
@@ -61,8 +58,19 @@
 
 #define IDS_RS_SUBSAVEEXTERNALSTYLEFILE		L"SubSaveExternalStyleFile"
 
+// Video
+#define IDS_R_VIDEO							L"Settings\\Video"
+#define IDS_RS_COLOR_BRIGHTNESS				L"ColorBrightness"
+#define IDS_RS_COLOR_CONTRAST				L"ColorContrast"
+#define IDS_RS_COLOR_HUE					L"ColorHue"
+#define IDS_RS_COLOR_SATURATION				L"ColorSaturation"
+// the rest of the Video settings are in RenderersSettings.cpp
+
 // Audio
 #define IDS_R_AUDIO							L"Settings\\Audio"
+#define IDS_RS_VOLUME						L"Volume"
+#define IDS_RS_MUTE							L"Mute"
+#define IDS_RS_BALANCE						L"Balance"
 #define IDS_RS_AUDIORENDERER				L"AudioRenderer"
 #define IDS_RS_AUDIORENDERER2				L"AudioRenderer2"
 #define IDS_RS_DUALAUDIOOUTPUT				L"DualAudioOtput"
@@ -112,10 +120,6 @@
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"
 #define IDS_RS_STEREO3D_SWAPLEFTRIGHT		L"Stereo3DSwapLeftRight"
-#define IDS_RS_COLOR_BRIGHTNESS				L"VideoBrightness"
-#define IDS_RS_COLOR_CONTRAST				L"VideoContrast"
-#define IDS_RS_COLOR_HUE					L"VideoHue"
-#define IDS_RS_COLOR_SATURATION				L"VideoSaturation"
 #define IDS_RS_SHADERLIST					L"ShaderList"
 #define IDS_RS_SHADERLISTSCREENSPACE		L"ShaderListScreenSpace"
 #define IDS_RS_SHADERS11POSTSCALE			L"Shaders11PostScale"

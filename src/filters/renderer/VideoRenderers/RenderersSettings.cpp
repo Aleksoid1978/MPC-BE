@@ -23,8 +23,6 @@
 #include "RenderersSettings.h"
 #include "../../../apps/mplayerc/mplayerc.h"
 
-#define IDS_R_VIDEO					L"Settings\\Video"
-
 #define IDS_RS_VIDEORENDERER		L"VideoRenderer"
 
 #define IDS_RS_RENDERDEVICE			L"RenderDevice"

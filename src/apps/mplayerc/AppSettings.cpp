@@ -847,9 +847,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume, 0, 100);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance, -100, 100);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MUTE, fMute);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
@@ -1060,7 +1057,16 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
 
+	// Video
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness, -100, 100);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_CONTRAST, iContrast, -100, 100);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_HUE, iHue, -180, 180);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_SATURATION, iSaturation, -100, 100);
+
 	// Audio
+	profile.ReadInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume, 0, 100);
+	profile.ReadInt(IDS_R_AUDIO, IDS_RS_BALANCE, nBalance, -100, 100);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_MUTE, fMute);
 	profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER, strAudioRendererDisplayName);
 	profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER2, strAudioRendererDisplayName2);
 	profile.ReadBool(IDS_R_AUDIO, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
@@ -1365,11 +1371,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness, -100, 100);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast, -100, 100);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue, -180, 180);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation, -100, 100);
-
 	{ // load shader list
 		int curPos;
 		CString token;
@@ -1538,9 +1539,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MUTE, fMute);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
@@ -1674,7 +1672,16 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
+	// Video
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_CONTRAST, iContrast);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_HUE, iHue);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_SATURATION, iSaturation);
+
 	// Audio
+	profile.WriteInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume);
+	profile.WriteInt(IDS_R_AUDIO, IDS_RS_BALANCE, nBalance);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_MUTE, fMute);
 	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER, strAudioRendererDisplayName);
 	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER2, strAudioRendererDisplayName2);
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
@@ -1726,11 +1733,6 @@ void CAppSettings::SaveSettings()
 	//profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
-
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
 
 	{ // save shader list
 		str.Empty();
