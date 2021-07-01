@@ -983,25 +983,24 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	// Window size
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode, STARTUPWND_DEFAULT, STARTUPWND_SPECIFIED);
-	CSize wndSize;
-	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str) && swscanf_s(str, L"%d;%d", &wndSize.cx, &wndSize.cy) == 2) {
+	SIZE wndSize;
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str)
+			&& swscanf_s(str, L"%d;%d", &wndSize.cx, &wndSize.cy) == 2) {
 		if (wndSize.cx >= 480 && wndSize.cx <= 3840 && wndSize.cy >= 240 && wndSize.cy <= 2160) {
 			szSpecifiedWndSize = wndSize;
 		}
 	}
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_LASTWINDOWSIZE, str)
+			&& swscanf_s(str, L"%d;%d", &wndSize.cx, &wndSize.cy) == 2) {
+		szLastWindowSize = wndSize;
+	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
-	if (profile.ReadBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, &ptr, len)) {
-		if (len == sizeof(CRect)) {
-			CRect rect;
-			memcpy(&rect, ptr, sizeof(rect));
-			ptLastWindowPos  = rect.TopLeft();
-			szLastWindowSize = rect.Size();
-		} else {
-			bRememberWindowPos = false;
-		}
-		delete[] ptr;
+	POINT point;
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_LASTWINDOWPOS, str)
+			&& swscanf_s(str, L"%d;%d", &point.x, &point.y) == 2) {
+		ptLastWindowPos  = point;
 	} else {
-		bRememberWindowPos = false;
+		bRememberWindowPos = false; // Hmm
 	}
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, nLastWindowType);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
@@ -1609,9 +1608,11 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode);
 	str.Format(L"%d;%d", szSpecifiedWndSize.cx, szSpecifiedWndSize.cy);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str);
+	str.Format(L"%d;%d", szLastWindowSize.cx, szLastWindowSize.cy);
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LASTWINDOWSIZE, str);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
-	CRect rect(ptLastWindowPos, szLastWindowSize);
-	profile.WriteBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rect, sizeof(rect));
+	str.Format(L"%d;%d", ptLastWindowPos.x, ptLastWindowPos.y);
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LASTWINDOWPOS, str);
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
