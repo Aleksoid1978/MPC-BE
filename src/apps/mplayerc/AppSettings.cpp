@@ -1060,14 +1060,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift, -600000, 600000);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
-	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, str)) {
+	// Audio
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOMIXER, bAudioMixer);
+	if (profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIOMIXERLAYOUT, str)) {
 		str.Trim();
 		for (int i = SPK_MONO; i <= SPK_7_1; i++) {
 			if (str == channel_mode_sets[i]) {
@@ -1076,17 +1075,19 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			}
 		}
 	}
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
-	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, dAudioCenter_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
-	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, dAudioSurround_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
-	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, dAudioGain_dB, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel, 0, 100);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime, 5, 10);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
+	profile.ReadDouble(IDS_R_AUDIO, IDS_RS_AUDIOLEVELCENTER, dAudioCenter_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
+	profile.ReadDouble(IDS_R_AUDIO, IDS_RS_AUDIOLEVELSURROUND, dAudioSurround_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
+	profile.ReadDouble(IDS_R_AUDIO, IDS_RS_AUDIOGAIN, dAudioGain_dB, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
+	profile.ReadInt(IDS_R_AUDIO, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel, 0, 100);
+	profile.ReadInt(IDS_R_AUDIO, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime, 5, 10);
+	profile.ReadInt(IDS_R_AUDIO, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
 	iAudioSampleFormats &= SFMT_MASK;
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
+	profile.ReadInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift, -600000, 600000);
 
 	{
 		m_filters.RemoveAll();
@@ -1677,20 +1678,21 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
-	profile.WriteDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, dAudioCenter_dB);
-	profile.WriteDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, dAudioSurround_dB);
-	profile.WriteDouble(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, dAudioGain_dB);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
+	// Audio
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOMIXER, bAudioMixer);
+	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
+	profile.WriteDouble(IDS_R_AUDIO, IDS_RS_AUDIOLEVELCENTER, dAudioCenter_dB);
+	profile.WriteDouble(IDS_R_AUDIO, IDS_RS_AUDIOLEVELSURROUND, dAudioSurround_dB);
+	profile.WriteDouble(IDS_R_AUDIO, IDS_RS_AUDIOGAIN, dAudioGain_dB);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
+	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
+	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
+	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
+	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
