@@ -49,6 +49,7 @@
 #include <map>
 #include <string>
 #include <regex>
+#include <atomic>
 
  // Workaround compilation errors when including GDI+ with NOMINMAX defined
 namespace Gdiplus

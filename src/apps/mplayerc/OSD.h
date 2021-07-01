@@ -208,7 +208,7 @@ private:
 	void CreateFontInternal();
 
 	bool m_bPeriodicallyDisplayed = false;
-	std::atomic<bool> m_bTimerStarted = false;
+	std::atomic_bool m_bTimerStarted = false;
 	void StartTimer(const UINT nTimerDurarion);
 	void EndTimer();
 
