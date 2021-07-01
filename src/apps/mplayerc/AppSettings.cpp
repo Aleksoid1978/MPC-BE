@@ -471,7 +471,7 @@ void CAppSettings::ResetSettings()
 	bSpeedNotReset = false;
 
 	strAudioRendererDisplayName.Empty();
-	strSecondAudioRendererDisplayName.Empty();
+	strAudioRendererDisplayName2.Empty();
 	fDualAudioOutput = false;
 
 	fAutoloadAudio = true;
@@ -862,10 +862,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_PLAYLISTTABSSETTINGS, strTabs);
 
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
-
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, fAutoloadAudio);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, fPrioritizeExternalAudio);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, strAudioPaths);
@@ -1065,6 +1061,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
 
 	// Audio
+	profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER, strAudioRendererDisplayName);
+	profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER2, strAudioRendererDisplayName2);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
 	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOMIXER, bAudioMixer);
 	if (profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIOMIXERLAYOUT, str)) {
 		str.Trim();
@@ -1637,9 +1636,6 @@ void CAppSettings::SaveSettings()
 
 	SavePlaylistTabSetting();
 
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, fAutoloadAudio);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, fPrioritizeExternalAudio);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, strAudioPaths);
@@ -1679,6 +1675,9 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
 	// Audio
+	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER, strAudioRendererDisplayName);
+	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIORENDERER2, strAudioRendererDisplayName2);
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOMIXER, bAudioMixer);
 	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);

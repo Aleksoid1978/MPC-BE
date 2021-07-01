@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -148,7 +148,7 @@ BOOL CPPageAudio::OnInitDialog()
 		if (s.strAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
 			m_iAudioRendererType = idx;
 		}
-		if (s.strSecondAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
+		if (s.strAudioRendererDisplayName2 == m_AudioRendererDisplayNames[idx]) {
 			m_iSecAudioRendererType = idx;
 		}
 	}
@@ -185,9 +185,9 @@ BOOL CPPageAudio::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.strAudioRendererDisplayName       = m_AudioRendererDisplayNames[m_iAudioRendererType];
-	s.strSecondAudioRendererDisplayName = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
-	s.fDualAudioOutput                  = !!m_DualAudioOutput.GetCheck();
+	s.strAudioRendererDisplayName  = m_AudioRendererDisplayNames[m_iAudioRendererType];
+	s.strAudioRendererDisplayName2 = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
+	s.fDualAudioOutput             = !!m_DualAudioOutput.GetCheck();
 
 	s.fAutoloadAudio = !!m_fAutoloadAudio;
 	s.fPrioritizeExternalAudio = !!m_fPrioritizeExternalAudio;

@@ -1542,7 +1542,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 										hr = Connect(infTeeFilterOutPin, pPinIn);
 									}
 
-									SelAudioRenderer = s.strSecondAudioRendererDisplayName;
+									SelAudioRenderer = s.strAudioRendererDisplayName2;
 								}
 							}
 							break;
@@ -2884,7 +2884,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			}
 
 			// second audio output
-			SelAudioRenderer = s.strSecondAudioRendererDisplayName;
+			SelAudioRenderer = s.strAudioRendererDisplayName2;
 			armerit -= 0x100;
 		}
 	}

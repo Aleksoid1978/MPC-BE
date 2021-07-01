@@ -61,7 +61,11 @@
 
 #define IDS_RS_SUBSAVEEXTERNALSTYLEFILE		L"SubSaveExternalStyleFile"
 
+// Audio
 #define IDS_R_AUDIO							L"Settings\\Audio"
+#define IDS_RS_AUDIORENDERER				L"AudioRenderer"
+#define IDS_RS_AUDIORENDERER2				L"AudioRenderer2"
+#define IDS_RS_DUALAUDIOOUTPUT				L"DualAudioOtput"
 #define IDS_RS_AUDIOMIXER					L"Mixer"
 #define IDS_RS_AUDIOMIXERLAYOUT				L"MixerLayout"
 #define IDS_RS_AUDIOSTEREOFROMDECODER		L"StereoFromDecoder"
@@ -156,9 +160,6 @@
 #define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)" // TODO: remake it
 
 #define IDS_RS_CLOSEDCAPTIONS				L"ClosedCaptions"
-#define IDS_RS_AUDIORENDERERTYPE			L"AudioRendererType"
-#define IDS_RS_SECONDAUDIORENDERER			L"SecondAudioRenderer"
-#define IDS_RS_DUALAUDIOOUTPUT				L"DualAudioOtput"
 #define IDS_RS_HIDECAPTIONMENU				L"HideCaptionMenu"
 #define IDS_RS_HIDENAVIGATION				L"HideNavigation"
 #define IDS_RS_DEFAULTVIDEOFRAME			L"DefaultVideoFrame"

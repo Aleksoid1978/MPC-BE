@@ -667,7 +667,7 @@ public:
 
 	bool			fDualAudioOutput;
 	CString			strAudioRendererDisplayName;
-	CString			strSecondAudioRendererDisplayName;
+	CString			strAudioRendererDisplayName2;
 
 	int				iStereo3DMode;
 	bool			bStereo3DSwapLR;
