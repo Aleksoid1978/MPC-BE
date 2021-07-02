@@ -1329,16 +1329,16 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort, 1, 65535);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBUI_ENABLE_PREVIEW, bWebUIEnablePreview);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);
+	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
+	profile.ReadInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPORT, nWebServerPort, 1, 65535);
+	profile.ReadInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERQUALITY, nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
+	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
+	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
+	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
+	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_WEBUI_ENABLE_PREVIEW, bWebUIEnablePreview);
+	profile.ReadString(IDS_R_WEBSERVER, IDS_RS_WEBROOT, strWebRoot);
+	profile.ReadString(IDS_R_WEBSERVER, IDS_RS_WEBDEFINDEX, strWebDefIndex);
+	profile.ReadString(IDS_R_WEBSERVER, IDS_RS_WEBSERVERCGI, strWebServerCGI);
 
 	CString MyPictures;
 	WCHAR szPath[MAX_PATH] = { 0 };
@@ -1903,16 +1903,16 @@ void CAppSettings::SaveSettings()
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WEBUI_ENABLE_PREVIEW, bWebUIEnablePreview);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);
+	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
+	profile.WriteInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPORT, nWebServerPort);
+	profile.WriteInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERQUALITY, nWebServerQuality);
+	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
+	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
+	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
+	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_WEBUI_ENABLE_PREVIEW, bWebUIEnablePreview);
+	profile.WriteString(IDS_R_WEBSERVER, IDS_RS_WEBROOT, strWebRoot);
+	profile.WriteString(IDS_R_WEBSERVER, IDS_RS_WEBDEFINDEX, strWebDefIndex);
+	profile.WriteString(IDS_R_WEBSERVER, IDS_RS_WEBSERVERCGI, strWebServerCGI);
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, strSnapShotPath);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
