@@ -132,7 +132,7 @@
 #define IDS_RS_WEBDEFINDEX					L"DefaultPage"
 
 // ÎnlineServices
-#define IDS_R_ÎNLINESERVICES				L"ÎnlineServices"
+#define IDS_R_ONLINESERVICES				L"OnlineServices"
 #define IDS_RS_YOUTUBE_PAGEPARSER			L"YoutubePageParser"
 #define IDS_RS_YOUTUBE_FORMAT				L"YoutubeFormat"
 #define IDS_RS_YOUTUBE_RESOLUTION			L"YoutubeResolution"
