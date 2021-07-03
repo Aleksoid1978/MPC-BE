@@ -1464,27 +1464,29 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
+	// ÎnlineServices
+	profile.ReadBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	str.Empty();
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, str);
-	YoutubeFormat.fmt =  (str == L"WEBM") ? 1 : (str == L"AV1") ? 2 : 0;
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
+	profile.ReadString(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_FORMAT, str);
+	YoutubeFormat.fmt =
+		(str == L"WEBM") ? Youtube::y_webm
+		: (str == L"AV1") ? Youtube::y_mp4_av1
+		: Youtube::y_mp4;
+	profile.ReadInt(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	YoutubeFormat.res = discard(YoutubeFormat.res, 720, s_CommonVideoHeights);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
+	profile.ReadBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	if (YoutubeFormat.fps60) {
-		profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
+		profile.ReadBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
 	} else {
 		YoutubeFormat.hdr = false;
 	}
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
-
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YDL_ENABLE, bYDLEnable);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
+	profile.ReadBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
+	profile.ReadBool(IDS_R_ÎNLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
+	profile.ReadInt(IDS_R_ÎNLINESERVICES, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
-
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
+	profile.ReadBool(IDS_R_ÎNLINESERVICES, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
+	profile.ReadString(IDS_R_ÎNLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
+	profile.ReadString(IDS_R_ÎNLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(unsigned*)&nLastFileInfoPage);
 
@@ -1930,19 +1932,21 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, (YoutubeFormat.fmt == 1) ? L"WEBM" : (YoutubeFormat.fmt == 2) ? L"AV1" : L"MP4");
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YDL_ENABLE, bYDLEnable);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
-
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
+	// ÎnlineServices
+	profile.WriteBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
+	profile.WriteString(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_FORMAT,
+		(YoutubeFormat.fmt == Youtube::y_webm) ? L"WEBM"
+		: (YoutubeFormat.fmt == Youtube::y_mp4_av1) ? L"AV1"
+		: L"MP4");
+	profile.WriteInt(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
+	profile.WriteBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
+	profile.WriteBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
+	profile.WriteBool(IDS_R_ÎNLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
+	profile.WriteBool(IDS_R_ÎNLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
+	profile.WriteInt(IDS_R_ÎNLINESERVICES, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
+	profile.WriteBool(IDS_R_ÎNLINESERVICES, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
+	profile.WriteString(IDS_R_ÎNLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
+	profile.WriteString(IDS_R_ÎNLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 

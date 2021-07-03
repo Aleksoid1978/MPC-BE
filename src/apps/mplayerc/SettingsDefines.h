@@ -131,6 +131,20 @@
 #define IDS_RS_WEBSERVERCGI					L"CGIHandlers"
 #define IDS_RS_WEBDEFINDEX					L"DefaultPage"
 
+// ÎnlineServices
+#define IDS_R_ÎNLINESERVICES				L"ÎnlineServices"
+#define IDS_RS_YOUTUBE_PAGEPARSER			L"YoutubePageParser"
+#define IDS_RS_YOUTUBE_FORMAT				L"YoutubeFormat"
+#define IDS_RS_YOUTUBE_RESOLUTION			L"YoutubeResolution"
+#define IDS_RS_YOUTUBE_60FPS				L"Youtube60fps"
+#define IDS_RS_YOUTUBE_HDR					L"YoutubeHDR"
+#define IDS_RS_YOUTUBE_LOAD_PLAYLIST		L"YoutubeLoadPlaylist"
+#define IDS_RS_YDL_ENABLE					L"YDLEnable"
+#define IDS_RS_YDL_MAXHEIGHT				L"YDLMaxHeight"
+#define IDS_RS_YDL_MAXIMUM_QUALITY			L"YDLMaximumQuality"
+#define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
+#define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
+
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"
 #define IDS_RS_STEREO3D_SWAPLEFTRIGHT		L"Stereo3DSwapLeftRight"
@@ -318,21 +332,6 @@
 #define IDS_RS_LAST_OPEN_FILTER_DIR			L"LastOpenFilterDir"
 #define IDS_RS_DLGPROPX						L"DlgPropX"
 #define IDS_RS_DLGPROPY						L"DlgPropY"
-
-#define IDS_RS_YOUTUBE_PAGEPARSER			L"YoutubePageParser"
-#define IDS_RS_YOUTUBE_FORMAT				L"YoutubeFormat"
-#define IDS_RS_YOUTUBE_RESOLUTION			L"YoutubeResolution"
-#define IDS_RS_YOUTUBE_60FPS				L"Youtube60fps"
-#define IDS_RS_YOUTUBE_HDR					L"YoutubeHDR"
-#define IDS_RS_YOUTUBE_LOAD_PLAYLIST		L"YoutubeLoadPlaylist"
-
-#define IDS_RS_YDL_ENABLE					L"YDLEnable"
-#define IDS_RS_YDL_MAXHEIGHT				L"YDLMaxHeight"
-#define IDS_RS_YDL_MAXIMUM_QUALITY			L"YDLMaximumQuality"
-
-#define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
-#define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
-
 
 #define IDS_RS_LASTFILEINFOPAGE				L"LastFileInfoPage"
 
