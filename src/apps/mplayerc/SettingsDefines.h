@@ -28,6 +28,7 @@
 #define IDS_R_LOGINS						L"Logins"
 #define IDS_R_SHADERS						L"Shaders"
 #define IDS_R_FILEFORMATS					L"FileFormats"
+#define IDS_R_FILTERS_PRIORITY				L"FiltersPriority"
 #define IDS_R_PNSPRESETS					L"Settings\\PnSPresets"
 #define IDS_R_YOUTUBECACHE					L"Settings\\YoutubeCache"
 
@@ -118,7 +119,7 @@
 #define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 
 // WebServer
-#define IDS_R_WEBSERVER						L"Settings\\WebServer"
+#define IDS_R_WEBSERVER						L"WebServer"
 #define IDS_RS_ENABLEWEBSERVER				L"EnableWebServer"
 #define IDS_RS_WEBSERVERPORT				L"Port"
 #define IDS_RS_WEBSERVERQUALITY				L"ImageQuality"
@@ -332,7 +333,6 @@
 #define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
 #define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
 
-#define IDS_R_FILTERS_PRIORITY				L"Settings\\FiltersPriority"
 
 #define IDS_RS_LASTFILEINFOPAGE				L"LastFileInfoPage"
 
