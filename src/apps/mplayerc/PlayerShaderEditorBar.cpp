@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ CPlayerShaderEditorBar::~CPlayerShaderEditorBar()
 
 BOOL CPlayerShaderEditorBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 {
-	if (!__super::Create(ResStr(IDS_SHADER_EDITOR), pParentWnd, ID_VIEW_SHADEREDITOR, defDockBarID, L"Shader Editor")) {
+	if (!__super::Create(ResStr(IDS_SHADER_EDITOR), pParentWnd, ID_VIEW_SHADEREDITOR, defDockBarID, L"ShaderEditor")) {
 		return FALSE;
 	}
 
