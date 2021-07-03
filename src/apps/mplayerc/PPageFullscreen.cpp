@@ -26,6 +26,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/std_helper.h"
 #include "MultiMonitor.h"
+#include <map>
 
 static CString FormatModeString(const dispmode& dmod)
 {
@@ -147,6 +148,42 @@ BOOL CPPageFullscreen::OnInitDialog()
 		m_strFullScreenMonitor = L"Current";
 	}
 
+	std::map<CString, CString> monitors;
+	UINT32 num_paths;
+	UINT32 num_modes;
+	std::vector<DISPLAYCONFIG_PATH_INFO> paths;
+	std::vector<DISPLAYCONFIG_MODE_INFO> modes;
+	LONG res;
+
+	do {
+		res = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
+		if (ERROR_SUCCESS == res) {
+			paths.resize(num_paths);
+			modes.resize(num_modes);
+			res = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &num_paths, paths.data(), &num_modes, modes.data(), nullptr);
+		}
+	} while (ERROR_INSUFFICIENT_BUFFER == res);
+
+	if (res == ERROR_SUCCESS) {
+		paths.resize(num_paths);
+
+		for (const auto& path : paths) {
+			DISPLAYCONFIG_SOURCE_DEVICE_NAME source = {
+				{DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME, sizeof(source), path.sourceInfo.adapterId, path.sourceInfo.id}, {},
+			};
+			res = DisplayConfigGetDeviceInfo(&source.header);
+			if (ERROR_SUCCESS == res) {
+				DISPLAYCONFIG_TARGET_DEVICE_NAME name = {
+					{DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, sizeof(name), path.sourceInfo.adapterId, path.targetInfo.id}, {},
+				};
+				res = DisplayConfigGetDeviceInfo(&name.header);
+				if (ERROR_SUCCESS == res) {
+					monitors[source.viewGdiDeviceName] = name.monitorFriendlyDeviceName;
+				}
+			}
+		}
+	}
+
 	DISPLAY_DEVICEW dd = { sizeof(dd) };
 	DWORD dev = 0; // device index
 	while (EnumDisplayDevicesW(0, dev, &dd, 0)) {
@@ -159,12 +196,15 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 				if (!DeviceID.IsEmpty() && !DeviceName.IsEmpty()) {
 					const CString DeviceNumber = RegExpParse(DeviceName.GetString(), LR"(DISPLAY(\d+))");
+					const auto it = monitors.find(DeviceName);
+					CString MonitorFullName;
+					MonitorFullName.Format(L"DISPLAY (%s) - %s", DeviceNumber.GetString(), it != monitors.cend() ? it->second.GetString() : DeviceID.GetString());
 					if (DeviceName == strCurMon) {
-						m_iMonitorTypeCtrl.AddString(L"DISPLAY ( " + DeviceNumber + L" ) - [id: " + DeviceID + L" *" + ResStr(IDS_FULLSCREENMONITOR_CURRENT) + L"] - " + ddMon.DeviceString);
 						m_monitors[0].id = DeviceID;
-					} else {
-						m_iMonitorTypeCtrl.AddString(L"DISPLAY ( " + DeviceNumber + L" ) - [id: " + DeviceID + L"] - " + ddMon.DeviceString);
+						MonitorFullName.AppendFormat(L" *%s", ResStr(IDS_FULLSCREENMONITOR_CURRENT).GetString());
 					}
+					m_iMonitorTypeCtrl.AddString(MonitorFullName);
+
 					m_monitors.push_back({ DeviceName, DeviceID });
 					if (m_iMonitorType == 0 && m_strFullScreenMonitor == DeviceName) {
 						m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
