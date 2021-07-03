@@ -1668,12 +1668,11 @@ void CEVRAllocatorPresenter::CheckWaitingSampleFromMixer()
 void CEVRAllocatorPresenter::GetMixerThread()
 {
 	bool     bQuit = false;
-	TIMECAPS tc;
-	DWORD    dwResolution;
 
+	TIMECAPS tc = {};
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
-	timeBeginPeriod(dwResolution);
+	const UINT wTimerRes = std::max(tc.wPeriodMin, 1u);
+	timeBeginPeriod(wTimerRes);
 
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
@@ -1714,7 +1713,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 		}
 	}
 
-	timeEndPeriod(dwResolution);
+	timeEndPeriod(wTimerRes);
 }
 
 void ModerateFloat(double& Value, double Target, double& ValuePrim, double ChangeSpeed)
@@ -1953,8 +1952,6 @@ void CEVRAllocatorPresenter::RenderThread()
 	HANDLE   hEvts[]      = { m_hEvtQuit, m_hEvtFlush, g_hNewSegmentEvent };
 	bool     bQuit        = false;
 	bool     bForcePaint  = true; // needs to be true in some rare cases
-	TIMECAPS tc;
-	DWORD    dwResolution;
 	MFTIME   nsSampleTime = 0;
 	LONGLONG llClockTime;
 	DWORD    dwObject;
@@ -1969,9 +1966,11 @@ void CEVRAllocatorPresenter::RenderThread()
 		}
 	}
 
+	TIMECAPS tc = {};
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
-	timeBeginPeriod(dwResolution);
+	const UINT wTimerRes = std::max(tc.wPeriodMin, 1u);
+	timeBeginPeriod(wTimerRes);
+
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	auto SubPicSetTime = [&] {
@@ -2307,7 +2306,7 @@ void CEVRAllocatorPresenter::RenderThread()
 		}
 	}
 
-	timeEndPeriod(dwResolution);
+	timeEndPeriod(wTimerRes);
 	if (pfAvRevertMmThreadCharacteristics) {
 		pfAvRevertMmThreadCharacteristics(hAvrt);
 	}
@@ -2325,10 +2324,10 @@ void CEVRAllocatorPresenter::VSyncThread()
 	bool filled = false;
 	UINT prevSL = UINT_MAX;
 
-	TIMECAPS tc;
+	TIMECAPS tc = {};
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	const UINT dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
-	timeBeginPeriod(dwResolution);
+	const UINT wTimerRes = std::max(tc.wPeriodMin, 1u);
+	timeBeginPeriod(wTimerRes);
 
 	bool bQuit = false;
 	LONGLONG start = 0;
@@ -2529,7 +2528,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 		}
 	}
 
-	timeEndPeriod(dwResolution);
+	timeEndPeriod(wTimerRes);
 }
 
 DWORD WINAPI CEVRAllocatorPresenter::VSyncThreadStatic(LPVOID lpParam)

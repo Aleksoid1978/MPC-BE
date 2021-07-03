@@ -3485,13 +3485,12 @@ DWORD WINAPI CSyncAP::MixerThreadStatic(LPVOID lpParam)
 void CSyncAP::MixerThread()
 {
 	bool bQuit = false;
-	TIMECAPS tc;
-	DWORD dwResolution;
 	DWORD dwUser = 0;
 
+	TIMECAPS tc = {};
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
-	dwUser = timeBeginPeriod(dwResolution);
+	const UINT wTimerRes = std::max(tc.wPeriodMin, 1u);
+	timeBeginPeriod(wTimerRes);
 
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
@@ -3512,7 +3511,8 @@ void CSyncAP::MixerThread()
 			break;
 		}
 	}
-	timeEndPeriod (dwResolution);
+
+	timeEndPeriod(wTimerRes);
 }
 
 DWORD WINAPI CSyncAP::RenderThreadStatic(LPVOID lpParam)
@@ -3527,8 +3527,6 @@ void CSyncAP::RenderThread()
 {
 	HANDLE hEvts[] = {m_hEvtQuit, m_hEvtFlush, m_hEvtSkip};
 	bool bQuit = false;
-	TIMECAPS tc;
-	DWORD dwResolution;
 	LONGLONG llRefClockTime;
 	double dTargetSyncOffset;
 	MFTIME llSystemTime;
@@ -3548,10 +3546,10 @@ void CSyncAP::RenderThread()
 	}
 
 	// Set timer resolution
+	TIMECAPS tc = {};
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
-	dwUser = timeBeginPeriod(dwResolution);
-	pNewSample.Release();
+	const UINT wTimerRes = std::max(tc.wPeriodMin, 1u);
+	timeBeginPeriod(wTimerRes);
 
 	auto SubPicSetTime = [&] {
 		if (!g_bExternalSubtitleTime) {
@@ -3725,11 +3723,13 @@ void CSyncAP::RenderThread()
 			pNewSample.Release();
 		}
 	} // while
+
 	if (pNewSample) {
 		MoveToFreeList(pNewSample, true);
 		pNewSample.Release();
 	}
-	timeEndPeriod (dwResolution);
+
+	timeEndPeriod(wTimerRes);
 	if (pfAvRevertMmThreadCharacteristics) {
 		pfAvRevertMmThreadCharacteristics(hAvrt);
 	}
