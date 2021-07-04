@@ -1879,7 +1879,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_THEME, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.WriteInt(IDS_R_THEME, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
 	COLORREF themeColor = RGB(nThemeRed, nThemeGreen, nThemeBlue);
-	profile.WriteHex32(IDS_R_THEME, IDS_RS_THEMECOLOR, clrFaceABGR);
+	profile.WriteHex32(IDS_R_THEME, IDS_RS_THEMECOLOR, themeColor);
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, clrFaceABGR);
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, clrOutlineABGR);
 	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
