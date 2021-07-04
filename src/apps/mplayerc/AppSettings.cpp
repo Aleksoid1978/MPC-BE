@@ -906,8 +906,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition, TIME_TOOLTIP_ABOVE_SEEKBAR, TIME_TOOLTIP_BELOW_SEEKBAR);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize, 8, 26);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE, strLastOpenFile);
 	// Last Open Dir
@@ -1286,20 +1284,30 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_EASYMOVE, bMouseEasyMove);
 
+	// OSD
+	profile.ReadUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
+	profile.ReadInt(IDS_R_OSD, IDS_RS_OSD_SIZE, nOSDSize, 8, 26);
+	profile.ReadString(IDS_R_OSD, IDS_RS_OSD_FONT, strOSDFont);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, fFontShadow);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, fFontAA);
+	profile.ReadHex32(IDS_R_OSD, IDS_RS_OSD_FONTCOLOR, *(unsigned*)&clrFontABGR);
+	profile.ReadHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR1, *(unsigned*)&clrGrad1ABGR);
+	profile.ReadHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR2, *(unsigned*)&clrGrad2ABGR);
+	profile.ReadInt(IDS_R_OSD, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
+	profile.ReadInt(IDS_R_OSD, IDS_RS_OSD_BORDER, nOSDBorder);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FILE_NAME, bOSDFileName);
+
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DARKMENU, bDarkMenu);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, *(unsigned*)&clrFaceABGR);
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, *(unsigned*)&clrOutlineABGR);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, *(unsigned*)&clrFontABGR);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, *(unsigned*)&clrGrad1ABGR);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, *(unsigned*)&clrGrad2ABGR);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
@@ -1405,7 +1413,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);
 
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, ShowOSD.value);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MIN_MPLS_DURATION, nMinMPlsDuration, 0, 20);
@@ -1419,8 +1426,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent, 100, 200);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, fFontShadow);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, fFontAA);
 
 	// Save analog capture settings
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -1493,10 +1498,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
 	profile.ReadInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay, 1, 365);
 	profile.ReadInt64(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, tUpdaterLastCheck);
-
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FILE_NAME, bOSDFileName);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
@@ -1723,8 +1724,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE, strLastOpenFile);
 	// Last Open Dir
@@ -1758,7 +1757,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);
 
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, ShowOSD.value);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
@@ -1772,8 +1770,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, fFontShadow);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, fFontAA);
 
 	// Save analog capture settings
 	profile.WriteInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -1861,20 +1857,30 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_EASYMOVE, bMouseEasyMove);
 
+	// OSD
+	profile.WriteUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
+	profile.WriteInt(IDS_R_OSD, IDS_RS_OSD_SIZE, nOSDSize);
+	profile.WriteString(IDS_R_OSD, IDS_RS_OSD_FONT, strOSDFont);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, fFontShadow);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, fFontAA);
+	profile.WriteHex32(IDS_R_OSD, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
+	profile.WriteHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR1, clrGrad1ABGR);
+	profile.WriteHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR2, clrGrad2ABGR);
+	profile.WriteInt(IDS_R_OSD, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
+	profile.WriteInt(IDS_R_OSD, IDS_RS_OSD_BORDER, nOSDBorder);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FILE_NAME, bOSDFileName);
+
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DARKMENU, bDarkMenu);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, clrGrad1ABGR);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, clrGrad2ABGR);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
@@ -1955,10 +1961,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
 	profile.WriteInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay);
 	profile.WriteInt64(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, tUpdaterLastCheck);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FILE_NAME, bOSDFileName);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 

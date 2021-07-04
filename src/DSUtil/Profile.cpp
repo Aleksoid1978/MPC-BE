@@ -694,7 +694,7 @@ bool CProfile::WriteHex32(const wchar_t* section, const wchar_t* entry, const un
 	else {
 		InitIni();
 		CStringW valueStr;
-		valueStr.Format(L"0x%04x", value);
+		valueStr.Format(L"0x%06X", value);
 		CStringW& old = m_ProfileMap[section][entry];
 		if (old != valueStr) {
 			old = valueStr;
