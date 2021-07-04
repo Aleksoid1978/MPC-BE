@@ -893,16 +893,16 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay, 0, 9);
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PAUSEMINIMIZEDVIDEO, bPauseMinimizedVideo);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WIN7TASKBAR, fUseWin7TaskBar);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, fExitAfterPlayback);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, fNextInDirAfterPlayback);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXIT_AFTER_PB, fExitAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB, fNextInDirAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition, TIME_TOOLTIP_ABOVE_SEEKBAR, TIME_TOOLTIP_BELOW_SEEKBAR);
@@ -1715,16 +1715,16 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, CString(strFullScreenMonitorID));
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PAUSEMINIMIZEDVIDEO, bPauseMinimizedVideo);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, fExitAfterPlayback);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, fNextInDirAfterPlayback);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WIN7TASKBAR, fUseWin7TaskBar);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXIT_AFTER_PB, fExitAfterPlayback);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB, fNextInDirAfterPlayback);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
 
