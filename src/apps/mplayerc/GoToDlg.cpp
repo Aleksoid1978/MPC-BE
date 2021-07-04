@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 {
 	if (m_fps == 0) {
 		CString str = L"0";
-		AfxGetProfile().ReadString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, str);
+		AfxGetProfile().ReadString(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_FPS, str);
 
 		if (float fps; swscanf_s(str, L"%f", &fps) == 1) {
 			m_fps = fps;
@@ -89,9 +89,9 @@ BOOL CGoToDlg::OnInitDialog()
 
 		UpdateData(FALSE);
 
-		int gtlu = TYPE_TIME;
-		AfxGetProfile().ReadInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, gtlu);
-		switch (gtlu) {
+		int lastTimeFmt = TYPE_TIME;
+		AfxGetProfile().ReadInt(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_LASTTIMEFMT, lastTimeFmt);
+		switch (lastTimeFmt) {
 			default:
 			case TYPE_TIME:
 				m_timeedit.SetFocus();
@@ -118,7 +118,7 @@ void CGoToDlg::OnBnClickedOk1()
 {
 	UpdateData();
 
-	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, TYPE_TIME);
+	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_TIME);
 
 	unsigned int hh = 0;
 	unsigned int mm = 0;
@@ -145,7 +145,7 @@ void CGoToDlg::OnBnClickedOk2()
 {
 	UpdateData();
 
-	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, TYPE_FRAME);
+	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_FRAME);
 
 	unsigned int frame;
 	float fps;

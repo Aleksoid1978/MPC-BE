@@ -24,13 +24,11 @@
 #define IDS_R_EXTERNAL_FILTERS				L"ExternalFilters"
 #define IDS_R_INTERNAL_FILTERS				L"InternalFilters"
 #define IDS_R_COMMANDS						L"Commands2"
-#define IDS_R_MOUSE							L"Settings\\Mouse"
 #define IDS_R_LOGINS						L"Logins"
 #define IDS_R_SHADERS						L"Shaders"
 #define IDS_R_FILEFORMATS					L"FileFormats"
 #define IDS_R_FILTERS_PRIORITY				L"FiltersPriority"
 #define IDS_R_PNSPRESETS					L"Settings\\PnSPresets"
-#define IDS_R_YOUTUBECACHE					L"Settings\\YoutubeCache"
 
 #define IDS_RS_FAV_REMEMBERPOS				L"FavRememberPos"
 #define IDS_RS_FAV_RELATIVEDRIVE			L"FavRelativeDrive"
@@ -58,6 +56,20 @@
 #define IDS_RS_THUMBWIDTH					L"ThumbWidth"
 
 #define IDS_RS_SUBSAVEEXTERNALSTYLEFILE		L"SubSaveExternalStyleFile"
+
+// Window size
+#define IDS_RS_WINDOWMODESTARTUP			L"WindowModeStartup"
+#define IDS_RS_SPECIFIEDWINDOWSIZE			L"SpecifiedWindowSize"
+#define IDS_RS_LASTWINDOWSIZE				L"LastWindowSize"
+#define IDS_RS_LASTWINDOWPOS				L"LastWindowPos"
+#define IDS_RS_WINDOWMODEPLAYBACK			L"WindowModePlayback"
+#define IDS_RS_AUTOSCALEFACTOR				L"AutoScaleFactor"
+#define IDS_RS_AUTOFITFACTOR				L"AutoFitFactor"
+#define IDS_RS_RESETWINDOWAFTERCLOSINGFILE	L"ResetWindowAfterClosingFile"
+#define IDS_RS_REMEMBERWINDOWPOS			L"RememberWindowPos"
+#define IDS_RS_LASTWINDOWTYPE				L"LastWindowType"
+#define IDS_RS_LIMITWINDOWPROPORTIONS		L"LimitWindowProportions"
+#define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 
 // Video
 #define IDS_R_VIDEO							L"Settings\\Video"
@@ -91,6 +103,7 @@
 #define IDS_RS_AUDIOTIMESHIFT				L"TimeShift"
 
 // Mouse
+#define IDS_R_MOUSE							L"Settings\\Mouse"
 #define IDS_RS_MOUSE_BTN_LEFT				L"ButtonLeft"
 #define IDS_RS_MOUSE_BTN_LEFT_OPENRECENT	L"ButtonLeftOpenRecent"
 #define IDS_RS_MOUSE_BTN_LEFT_DBLCLICK		L"ButtonLeftDblClick"
@@ -103,20 +116,6 @@
 #define IDS_RS_MOUSE_WHEEL_DOWN				L"WheelDown"
 #define IDS_RS_MOUSE_WHEEL_LEFT				L"WheelLeft"
 #define IDS_RS_MOUSE_WHEEL_RIGHT			L"WheelRight"
-
-// Window size
-#define IDS_RS_WINDOWMODESTARTUP			L"WindowModeStartup"
-#define IDS_RS_SPECIFIEDWINDOWSIZE			L"SpecifiedWindowSize"
-#define IDS_RS_LASTWINDOWSIZE				L"LastWindowSize"
-#define IDS_RS_LASTWINDOWPOS				L"LastWindowPos"
-#define IDS_RS_WINDOWMODEPLAYBACK			L"WindowModePlayback"
-#define IDS_RS_AUTOSCALEFACTOR				L"AutoScaleFactor"
-#define IDS_RS_AUTOFITFACTOR				L"AutoFitFactor"
-#define IDS_RS_RESETWINDOWAFTERCLOSINGFILE	L"ResetWindowAfterClosingFile"
-#define IDS_RS_REMEMBERWINDOWPOS			L"RememberWindowPos"
-#define IDS_RS_LASTWINDOWTYPE				L"LastWindowType"
-#define IDS_RS_LIMITWINDOWPROPORTIONS		L"LimitWindowProportions"
-#define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 
 // WebServer
 #define IDS_R_WEBSERVER						L"WebServer"
@@ -133,6 +132,7 @@
 
 // ÎnlineServices
 #define IDS_R_ONLINESERVICES				L"OnlineServices"
+#define IDS_R_YOUTUBECACHE					L"OnlineServices\\YoutubeCache"
 #define IDS_RS_YOUTUBE_PAGEPARSER			L"YoutubePageParser"
 #define IDS_RS_YOUTUBE_FORMAT				L"YoutubeFormat"
 #define IDS_RS_YOUTUBE_RESOLUTION			L"YoutubeResolution"
@@ -144,6 +144,55 @@
 #define IDS_RS_YDL_MAXIMUM_QUALITY			L"YDLMaximumQuality"
 #define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
 #define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
+
+// Capture
+#define IDS_R_CAPTURE						L"Capture"
+#define IDS_RS_DEFAULT_CAPTURE				L"DefaultCapture"
+#define IDS_RS_VIDEO_DISP_NAME				L"VidDispName"
+#define IDS_RS_AUDIO_DISP_NAME				L"AudDispName"
+#define IDS_RS_COUNTRY						L"Country"
+
+// DVBConfiguration
+#define IDS_R_DVB							L"DVBConfiguration"
+#define IDS_RS_BDA_NETWORKPROVIDER			L"BDANetworkProvider"
+#define IDS_RS_BDA_TUNER					L"BDATuner"
+#define IDS_RS_BDA_RECEIVER					L"BDAReceiver"
+#define IDS_RS_BDA_STANDARD					L"BDAStandard"
+#define IDS_RS_BDA_SCAN_FREQ_START			L"BDAScanFreqStart"
+#define IDS_RS_BDA_SCAN_FREQ_END			L"BDAScanFreqEnd"
+#define IDS_RS_BDA_BANDWIDTH				L"BDABandWidth"
+#define IDS_RS_BDA_USE_OFFSET				L"BDAUseOffset"
+#define IDS_RS_BDA_OFFSET					L"BDAOffset"
+#define IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS	L"BDAIgnoreEncryptedChannels"
+#define IDS_RS_DVB_LAST_CHANNEL				L"LastChannel"
+
+// Updater
+#define IDS_R_UPDATER						L"Settings\\Updater"
+#define IDS_RS_UPDATER_AUTO_CHECK			L"UpdaterAutoCheck"
+#define IDS_RS_UPDATER_DELAY				L"UpdaterDelay"
+#define IDS_RS_UPDATER_LAST_CHECK			L"UpdaterLastCheck"
+
+#define IDS_RS_OSD_SIZE						L"OSD_Size"
+#define IDS_RS_OSD_FONT						L"OSD_Font"
+#define IDS_RS_OSD_FONTSHADOW				L"OSDFontShadow"
+#define IDS_RS_OSD_FONTAA					L"OSDFontAA"
+#define IDS_RS_OSD_FONTCOLOR				L"OSDFontColor"
+#define IDS_RS_OSD_GRAD1COLOR				L"OSDGrad1Color"
+#define IDS_RS_OSD_GRAD2COLOR				L"OSDGrad2Color"
+#define IDS_RS_OSD_TRANSPARENT				L"OSDTransparent"
+#define IDS_RS_OSD_BORDER					L"OSDBorder"
+#define IDS_RS_OSD_REMAINING_TIME			L"OSD_RemainingTime"
+#define IDS_RS_OSD_LOCAL_TIME				L"OSD_LocalTime"
+#define IDS_RS_OSD_FILE_NAME				L"OSD_FileName"
+
+#define IDS_RS_USEDARKTHEME					L"UseDarkTheme"
+#define IDS_RS_THEMEBRIGHTNESS				L"ThemeBrightness"
+#define IDS_RS_THEMERED						L"ThemeRed"
+#define IDS_RS_THEMEGREEN					L"ThemeGreen"
+#define IDS_RS_THEMEBLUE					L"ThemeBlue"
+#define IDS_RS_DARKMENU						L"DarkMenu"
+#define IDS_RS_CLRFACEABGR					L"Toolbar clrFace(ABGR)" // TODO: remake it
+#define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)" // TODO: remake it
 
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"
@@ -180,16 +229,6 @@
 #define IDS_RS_FULLSCREENRES_APPLY_DEF		L"ApplyDefault"
 #define IDS_RS_RESTORERESAFTEREXIT			L"RestoreResAfterExit"
 #define IDS_RS_DISPLAYMODECHANGEDELAY		L"DisplayModeChangeDelay"
-
-#define IDS_RS_USEDARKTHEME					L"UseDarkTheme"
-#define IDS_RS_THEMEBRIGHTNESS				L"ThemeBrightness"
-#define IDS_RS_THEMERED						L"ThemeRed"
-#define IDS_RS_THEMEGREEN					L"ThemeGreen"
-#define IDS_RS_THEMEBLUE					L"ThemeBlue"
-#define IDS_RS_DARKMENU						L"DarkMenu"
-
-#define IDS_RS_CLRFACEABGR					L"Toolbar clrFace(ABGR)" // TODO: remake it
-#define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)" // TODO: remake it
 
 #define IDS_RS_CLOSEDCAPTIONS				L"ClosedCaptions"
 #define IDS_RS_HIDECAPTIONMENU				L"HideCaptionMenu"
@@ -262,18 +301,6 @@
 #define IDS_RS_MPC_NO_SEARCH_IN_FOLDER		L"DontUseSearchInFolder"
 #define IDS_RS_USE_TIME_TOOLTIP				L"UseTimeTooltip"
 #define IDS_RS_TIME_TOOLTIP_POSITION		L"TimeTooltipPosition"
-#define IDS_RS_OSD_SIZE						L"OSD_Size"
-#define IDS_RS_OSD_FONT						L"OSD_Font"
-#define IDS_RS_OSD_FONTSHADOW				L"OSDFontShadow"
-#define IDS_RS_OSD_FONTAA					L"OSDFontAA"
-#define IDS_RS_OSD_FONTCOLOR				L"OSDFontColor"
-#define IDS_RS_OSD_GRAD1COLOR				L"OSDGrad1Color"
-#define IDS_RS_OSD_GRAD2COLOR				L"OSDGrad2Color"
-#define IDS_RS_OSD_TRANSPARENT				L"OSDTransparent"
-#define IDS_RS_OSD_BORDER					L"OSDBorder"
-#define IDS_RS_OSD_REMAINING_TIME			L"OSD_RemainingTime"
-#define IDS_RS_OSD_LOCAL_TIME				L"OSD_LocalTime"
-#define IDS_RS_OSD_FILE_NAME				L"OSD_FileName"
 #define IDS_RS_LAST_OPEN_FILE				L"LastOpenFile"
 #define IDS_RS_LAST_OPEN_DIR				L"LastOpenDir"
 #define IDS_RS_LAST_SAVED_PLAYLIST_DIR		L"LastSavedPlaylistDir"
@@ -281,25 +308,6 @@
 
 #define IDS_RS_TOGGLESHADER					L"ToggleShader"
 #define IDS_RS_TOGGLESHADERSSCREENSPACE		L"ToggleShaderScreenSpace"
-
-#define IDS_RS_DEFAULT_CAPTURE				L"DefaultCapture"
-#define IDS_R_CAPTURE						L"Capture"
-#define IDS_RS_VIDEO_DISP_NAME				L"VidDispName"
-#define IDS_RS_AUDIO_DISP_NAME				L"AudDispName"
-#define IDS_RS_COUNTRY						L"Country"
-
-#define IDS_R_DVB							L"DVBConfiguration"
-#define IDS_RS_BDA_NETWORKPROVIDER			L"BDANetworkProvider"
-#define IDS_RS_BDA_TUNER					L"BDATuner"
-#define IDS_RS_BDA_RECEIVER					L"BDAReceiver"
-#define IDS_RS_BDA_STANDARD					L"BDAStandard"
-#define IDS_RS_BDA_SCAN_FREQ_START			L"BDAScanFreqStart"
-#define IDS_RS_BDA_SCAN_FREQ_END			L"BDAScanFreqEnd"
-#define IDS_RS_BDA_BANDWIDTH				L"BDABandWidth"
-#define IDS_RS_BDA_USE_OFFSET				L"BDAUseOffset"
-#define IDS_RS_BDA_OFFSET					L"BDAOffset"
-#define IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS	L"BDAIgnoreEncryptedChannels"
-#define IDS_RS_DVB_LAST_CHANNEL				L"LastChannel"
 
 #define IDS_RS_FASTSEEK_KEYFRAME			L"FastSeek"
 #define IDS_RS_HIDE_WINDOWED_MOUSE_POINTER	L"HideWindowedMousePointer"
@@ -315,16 +323,7 @@
 
 #define IDS_RS_REMAINING_TIME				L"RemainingTime"
 
-#define IDS_RS_GOTO_LAST_USED				L"gotoluf"
-#define IDS_RS_GOTO_FPS						L"fps"
-
 #define IDS_RS_SHADERS_INITIALIZED			L"Initialized"
-
-#define IDS_R_DLG_SUBTITLEDL				L"Dialogs\\SubtitleDl"
-#define IDS_RS_DLG_SUBTITLEDL_COLWIDTH		L"ColWidth"
-
-#define IDS_R_DLG_ORGANIZE_FAV				L"Dialogs\\OrganizeFavorites"
-#define IDS_R_DLG_CMD_LINE_HELP				L"Dialogs\\CmdLineHelp"
 
 #define IDS_RS_USE_FLYBAR					L"UseFlybar"
 #define IDS_RS_USE_FLYBAR_ONTOP				L"UseFlybarOnTop"
@@ -335,14 +334,23 @@
 
 #define IDS_RS_LASTFILEINFOPAGE				L"LastFileInfoPage"
 
-#define IDS_R_UPDATER						L"Settings\\Updater"
-#define IDS_RS_UPDATER_AUTO_CHECK			L"UpdaterAutoCheck"
-#define IDS_RS_UPDATER_DELAY				L"UpdaterDelay"
-#define IDS_RS_UPDATER_LAST_CHECK			L"UpdaterLastCheck"
-
 #define IDS_RS_CONTEXTFILES					L"ShowContextFiles"
 #define IDS_RS_CONTEXTDIR					L"ShowContextDir"
 
 #define IDS_RS_PASTECLIPBOARDURL			L"PasteClipboardURL"
 
 #define IDS_RS_PLAYLISTTABSSETTINGS			L"TabsSettings"
+
+
+// Dialogs
+
+#define IDS_R_DLG_SUBTITLEDL				L"Dialogs\\SubtitleDl"
+#define IDS_RS_DLG_SUBTITLEDL_COLWIDTH		L"ColWidth"
+
+#define IDS_R_DLG_ORGANIZE_FAV				L"Dialogs\\OrganizeFavorites"
+
+#define IDS_R_DLG_CMD_LINE_HELP				L"Dialogs\\CmdLineHelp"
+
+#define IDS_R_DLG_GOTO						L"Dialogs\\GoTo"
+#define IDS_RS_DLG_GOTO_LASTTIMEFMT			L"LastTimeFmt"
+#define IDS_RS_DLG_GOTO_FPS					L"fps"
