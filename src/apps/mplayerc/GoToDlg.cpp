@@ -35,7 +35,7 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 {
 	if (m_fps == 0) {
 		CString str = L"0";
-		AfxGetProfile().ReadString(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_FPS, str);
+		AfxGetProfile().ReadString(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_FPS, str);
 
 		if (float fps; swscanf_s(str, L"%f", &fps) == 1) {
 			m_fps = fps;
@@ -90,7 +90,7 @@ BOOL CGoToDlg::OnInitDialog()
 		UpdateData(FALSE);
 
 		int lastTimeFmt = TYPE_TIME;
-		AfxGetProfile().ReadInt(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_LASTTIMEFMT, lastTimeFmt);
+		AfxGetProfile().ReadInt(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_LASTTIMEFMT, lastTimeFmt);
 		switch (lastTimeFmt) {
 			default:
 			case TYPE_TIME:
@@ -118,7 +118,7 @@ void CGoToDlg::OnBnClickedOk1()
 {
 	UpdateData();
 
-	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_TIME);
+	AfxGetProfile().WriteInt(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_TIME);
 
 	unsigned int hh = 0;
 	unsigned int mm = 0;
@@ -145,7 +145,7 @@ void CGoToDlg::OnBnClickedOk2()
 {
 	UpdateData();
 
-	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_FRAME);
+	AfxGetProfile().WriteInt(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_FRAME);
 
 	unsigned int frame;
 	float fps;
