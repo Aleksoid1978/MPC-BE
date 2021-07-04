@@ -187,14 +187,14 @@
 #define IDS_RS_OSD_LOCAL_TIME				L"LocalTime"
 #define IDS_RS_OSD_FILE_NAME				L"FileName"
 
+// Theme
+#define IDS_R_THEME							L"Theme"
 #define IDS_RS_USEDARKTHEME					L"UseDarkTheme"
 #define IDS_RS_THEMEBRIGHTNESS				L"ThemeBrightness"
-#define IDS_RS_THEMERED						L"ThemeRed"
-#define IDS_RS_THEMEGREEN					L"ThemeGreen"
-#define IDS_RS_THEMEBLUE					L"ThemeBlue"
+#define IDS_RS_THEMECOLOR					L"ThemeColor"
+#define IDS_RS_TOOLBARCOLORFACE				L"ToolbarColorFace"
+#define IDS_RS_TOOLBARCOLOROUTLINE			L"ToolbarColorOutline"
 #define IDS_RS_DARKMENU						L"DarkMenu"
-#define IDS_RS_CLRFACEABGR					L"Toolbar clrFace(ABGR)" // TODO: remake it
-#define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)" // TODO: remake it
 
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"

@@ -1299,15 +1299,18 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
 	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FILE_NAME, bOSDFileName);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DARKMENU, bDarkMenu);
-
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, *(unsigned*)&clrFaceABGR);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, *(unsigned*)&clrOutlineABGR);
+	// Theme
+	profile.ReadBool(IDS_R_THEME, IDS_RS_USEDARKTHEME, bUseDarkTheme);
+	profile.ReadInt(IDS_R_THEME, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
+	COLORREF themeColor;
+	if (profile.ReadHex32(IDS_R_THEME, IDS_RS_THEMECOLOR, *(unsigned*)&themeColor)) {
+		nThemeRed   = GetRValue(themeColor);
+		nThemeGreen = GetGValue(themeColor);
+		nThemeBlue  = GetBValue(themeColor);
+	}
+	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, *(unsigned*)&clrFaceABGR);
+	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, *(unsigned*)&clrOutlineABGR);
+	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
@@ -1872,15 +1875,14 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_LOCAL_TIME, bOSDLocalTime);
 	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FILE_NAME, bOSDFileName);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DARKMENU, bDarkMenu);
-
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
+	// Theme
+	profile.WriteBool(IDS_R_THEME, IDS_RS_USEDARKTHEME, bUseDarkTheme);
+	profile.WriteInt(IDS_R_THEME, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
+	COLORREF themeColor = RGB(nThemeRed, nThemeGreen, nThemeBlue);
+	profile.WriteHex32(IDS_R_THEME, IDS_RS_THEMECOLOR, clrFaceABGR);
+	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, clrFaceABGR);
+	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, clrOutlineABGR);
+	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
