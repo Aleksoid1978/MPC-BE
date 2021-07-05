@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2020 see Authors.txt
+ * (C) 2011-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -178,51 +178,26 @@ CStringW GetProgramDir()
 	return path;
 }
 
-int CopyDir(LPCWSTR source_folder, LPCWSTR target_folder)
+// wFunc can be FO_MOVE or FO_COPY.
+// To move a folder, add "\" to the end of the source path.
+// To copy a folder, add "\*" to the end of the source path.
+int FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc)
 {
-	CStringW new_sf(source_folder);
-	new_sf.Append(L"\\*");
+	auto from_str = std::make_unique<WCHAR[]>(source.GetLength() + 2);
+	wcscpy_s(from_str.get(), source.GetLength()+1, source);
 
-	WCHAR sf[MAX_PATH+1];
-	WCHAR tf[MAX_PATH+1];
-
-	wcscpy_s(sf, MAX_PATH, new_sf);
-	wcscpy_s(tf, MAX_PATH, target_folder);
+	auto to_str = std::make_unique<WCHAR[]>(target.GetLength() + 2);
+	wcscpy_s(to_str.get(), target.GetLength()+1, target);
 
 	// set double null-terminated string
-	sf[wcslen(sf)+1] = 0;
-	tf[wcslen(tf)+1] = 0;
+	from_str[wcslen(from_str.get())+1] = 0;
+	to_str[wcslen(to_str.get())+1] = 0;
 
-	SHFILEOPSTRUCTW s = { 0 };
-	s.wFunc = FO_COPY;
-	s.pTo = tf;
-	s.pFrom = sf;
-	s.fFlags = FOF_NO_UI;
+	SHFILEOPSTRUCTW FileOp = { 0 };
+	FileOp.wFunc  = wFunc;
+	FileOp.pFrom  = from_str.get();
+	FileOp.pTo    = to_str.get();
+	FileOp.fFlags = FOF_NO_UI;
 
-	return SHFileOperationW(&s);
+	return SHFileOperationW(&FileOp);
 }
-
-int MoveDir(LPCWSTR source_folder, LPCWSTR target_folder)
-{
-	CStringW new_sf(source_folder);
-	new_sf.Append(L"\\");
-
-	WCHAR sf[MAX_PATH+1];
-	WCHAR tf[MAX_PATH+1];
-
-	wcscpy_s(sf, MAX_PATH, new_sf);
-	wcscpy_s(tf, MAX_PATH, target_folder);
-
-	// set double null-terminated string
-	sf[wcslen(sf)+1] = 0;
-	tf[wcslen(tf)+1] = 0;
-
-	SHFILEOPSTRUCTW s = { 0 };
-	s.wFunc = FO_MOVE;
-	s.pTo = tf;
-	s.pFrom = sf;
-	s.fFlags = FOF_NO_UI;
-
-	return SHFileOperationW(&s);
-}
-
