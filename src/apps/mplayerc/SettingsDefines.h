@@ -208,7 +208,6 @@
 #define IDS_RS_RESTORERESAFTEREXIT			L"RestoreResAfterExit"
 #define IDS_RS_DISPLAYMODECHANGEDELAY		L"DisplayModeChangeDelay"
 
-#define IDS_RS_MONITOR_AUTOREFRESHRATE		L"MonitorAutoRefreshRate"
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"
 #define IDS_RS_STEREO3D_SWAPLEFTRIGHT		L"Stereo3DSwapLeftRight"
 #define IDS_RS_SHADERLIST					L"ShaderList"

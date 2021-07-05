@@ -649,9 +649,9 @@ void CAppSettings::ResetSettings()
 
 	bUseDarkTheme = true;
 	nThemeBrightness = 15;
-	nThemeRed = 256;
-	nThemeGreen = 256;
-	nThemeBlue = 256;
+	nThemeRed   = 255;
+	nThemeGreen = 255;
+	nThemeBlue  = 255;
 	bDarkMenu = true;
 	nOSDTransparent = 100;
 	nOSDBorder = 1;
@@ -722,7 +722,6 @@ void CAppSettings::ResetSettings()
 
 	nLastUsedPage = 0;
 
-	//fMonitorAutoRefreshRate = false;
 	iStereo3DMode = STEREO3D_AUTO;
 	bStereo3DSwapLR = false;
 
@@ -1373,7 +1372,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
-	//profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
@@ -1734,7 +1732,6 @@ void CAppSettings::SaveSettings()
 	// Last Saved Playlist Dir
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
 
-	//profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
 

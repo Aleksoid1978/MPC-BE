@@ -880,8 +880,6 @@ public:
 	CString			strTimeOnSeekBar;
 	bool			bStatusBarIsVisible;
 
-	//bool			fMonitorAutoRefreshRate;
-
 	HWND			hMasterWnd;
 
 	bool			ExclusiveFSAllowed() const;
