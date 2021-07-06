@@ -1019,14 +1019,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, bUseDVDPath);
-
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_MENULANG, *(unsigned*)&idMenuLang);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, *(unsigned*)&idAudioLang);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, *(unsigned*)&idSubtitlesLang);
-
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, bClosedCaptions);
 	// TODO: rename subdefstyle -> defStyle
 	{
 		str.Empty();
@@ -1350,6 +1342,16 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_WEBSERVER, IDS_RS_WEBDEFINDEX, strWebDefIndex);
 	profile.ReadString(IDS_R_WEBSERVER, IDS_RS_WEBSERVERCGI, strWebServerCGI);
 
+	// DVD
+	profile.ReadBool(IDS_R_DVD, IDS_RS_DVD_USEPATH, bUseDVDPath);
+	profile.ReadString(IDS_R_DVD, IDS_RS_DVD_PATH, strDVDPath);
+	profile.ReadUInt(IDS_R_DVD, IDS_RS_DVD_MENULANG, *(unsigned*)&idMenuLang);
+	profile.ReadUInt(IDS_R_DVD, IDS_RS_DVD_AUDIOLANG, *(unsigned*)&idAudioLang);
+	profile.ReadUInt(IDS_R_DVD, IDS_RS_DVD_SUBTITLESLANG, *(unsigned*)&idSubtitlesLang);
+	profile.ReadBool(IDS_R_DVD, IDS_RS_DVD_CLOSEDCAPTIONS, bClosedCaptions);
+	profile.ReadBool(IDS_R_DVD, IDS_RS_DVD_STARTMAINTITLE, bStartMainTitle);
+	bNormalStartDVD = true;
+
 	CString MyPictures;
 	WCHAR szPath[MAX_PATH] = { 0 };
 	if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
@@ -1462,9 +1464,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
-
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, bStartMainTitle);
-	bNormalStartDVD			= true;
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
@@ -1654,12 +1653,14 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, bUseDVDPath);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_MENULANG, idMenuLang);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, idAudioLang);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, idSubtitlesLang);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, bClosedCaptions);
+	// DVD
+	profile.WriteBool(IDS_R_DVD, IDS_RS_DVD_USEPATH, bUseDVDPath);
+	profile.WriteString(IDS_R_DVD, IDS_RS_DVD_PATH, strDVDPath);
+	profile.WriteUInt(IDS_R_DVD, IDS_RS_DVD_MENULANG, idMenuLang);
+	profile.WriteUInt(IDS_R_DVD, IDS_RS_DVD_AUDIOLANG, idAudioLang);
+	profile.WriteUInt(IDS_R_DVD, IDS_RS_DVD_SUBTITLESLANG, idSubtitlesLang);
+	profile.WriteBool(IDS_R_DVD, IDS_RS_DVD_CLOSEDCAPTIONS, bClosedCaptions);
+	profile.WriteBool(IDS_R_DVD, IDS_RS_DVD_STARTMAINTITLE, bStartMainTitle);
 
 	CString style;
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SPSTYLE, style <<= subdefstyle);
@@ -1801,8 +1802,6 @@ void CAppSettings::SaveSettings()
 	// playback positions for last played DVDs
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, bStartMainTitle);
 
 	profile.DeleteSection(IDS_R_PNSPRESETS);
 	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {

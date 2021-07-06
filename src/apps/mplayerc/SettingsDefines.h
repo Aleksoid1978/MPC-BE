@@ -34,7 +34,6 @@
 #define IDS_RS_FAV_RELATIVEDRIVE			L"FavRelativeDrive"
 #define IDS_RS_FILEPOS						L"RememberFilePos"
 #define IDS_RS_DVDPOS						L"RememberDVDPos"
-#define IDS_RS_DVD_START_MAIN_TITLE			L"DVDStartMainTitle"
 #define IDS_RS_LANGUAGE						L"Language"
 #define IDS_RS_GLOBALMEDIA					L"UseGlobalMedia"
 #define IDS_RS_TITLEBARTEXT					L"TitleBarText"
@@ -163,6 +162,16 @@
 #define IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS	L"BDAIgnoreEncryptedChannels"
 #define IDS_RS_DVB_LAST_CHANNEL				L"LastChannel"
 
+// DVD
+#define IDS_R_DVD							L"DVD"
+#define IDS_RS_DVD_USEPATH					L"UseDVDPath"
+#define IDS_RS_DVD_PATH						L"DVDPath"
+#define IDS_RS_DVD_MENULANG					L"MenuLang"
+#define IDS_RS_DVD_AUDIOLANG				L"AudioLang"
+#define IDS_RS_DVD_SUBTITLESLANG			L"SubtitlesLang"
+#define IDS_RS_DVD_CLOSEDCAPTIONS			L"ClosedCaptions"
+#define IDS_RS_DVD_STARTMAINTITLE			L"StartMainTitle"
+
 // Updater
 #define IDS_R_UPDATER						L"Settings\\Updater"
 #define IDS_RS_UPDATER_AUTO_CHECK			L"UpdaterAutoCheck"
@@ -220,17 +229,11 @@
 #define IDS_RS_SPEED_NOTRESET				L"SpeedNotReset"
 #define IDS_RS_MULTIINST					L"MultipleInstances"
 #define IDS_RS_ALWAYSONTOP					L"AlwaysOnTop"
-#define IDS_RS_DVDPATH						L"DVDPath"
-#define IDS_RS_USEDVDPATH					L"UseDVDPath"
-#define IDS_RS_MENULANG						L"MenuLang"
-#define IDS_RS_AUDIOLANG					L"AudioLang"
-#define IDS_RS_SUBTITLESLANG				L"SubtitlesLang"
 #define IDS_RS_SPSTYLE						L"SPDefaultStyle"
 #define IDS_RS_SPOVERRIDEPLACEMENT			L"SPOverridePlacement"
 #define IDS_RS_SPHORPOS						L"SPHorPos"
 #define IDS_RS_SPVERPOS						L"SPVerPos"
 
-#define IDS_RS_CLOSEDCAPTIONS				L"ClosedCaptions"
 #define IDS_RS_HIDECAPTIONMENU				L"HideCaptionMenu"
 #define IDS_RS_HIDENAVIGATION				L"HideNavigation"
 #define IDS_RS_DEFAULTVIDEOFRAME			L"DefaultVideoFrame"
