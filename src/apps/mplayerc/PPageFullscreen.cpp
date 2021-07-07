@@ -151,9 +151,15 @@ BOOL CPPageFullscreen::OnInitDialog()
 	std::map<CString, CString> monitors;
 
 	if (SysVersion::IsWin7orLater()) {
-		typedef LONG(WINAPI *PFN_QueryDisplayConfig)(UINT32, UINT32*, DISPLAYCONFIG_PATH_INFO*, UINT32*, DISPLAYCONFIG_MODE_INFO*, DISPLAYCONFIG_TOPOLOGY_ID*);
+		typedef LONG(WINAPI* PFN_GetDisplayConfigBufferSizes)(UINT32, UINT32*, UINT32*);
+		static auto pGetDisplayConfigBufferSizes = reinterpret_cast<PFN_GetDisplayConfigBufferSizes>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "GetDisplayConfigBufferSizes"));
+
+		typedef LONG(WINAPI* PFN_QueryDisplayConfig)(UINT32, UINT32*, DISPLAYCONFIG_PATH_INFO*, UINT32*, DISPLAYCONFIG_MODE_INFO*, DISPLAYCONFIG_TOPOLOGY_ID*);
 		static auto pQueryDisplayConfig = reinterpret_cast<PFN_QueryDisplayConfig>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "QueryDisplayConfig"));
-		if (pQueryDisplayConfig) {
+
+		typedef LONG(WINAPI* PFN_DisplayConfigGetDeviceInfo)(DISPLAYCONFIG_DEVICE_INFO_HEADER*);
+		static auto pDisplayConfigGetDeviceInfo = reinterpret_cast<PFN_DisplayConfigGetDeviceInfo>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "DisplayConfigGetDeviceInfo"));
+		if (pGetDisplayConfigBufferSizes && pQueryDisplayConfig && pDisplayConfigGetDeviceInfo) {
 			UINT32 num_paths;
 			UINT32 num_modes;
 			std::vector<DISPLAYCONFIG_PATH_INFO> paths;
@@ -161,7 +167,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 			LONG res;
 
 			do {
-				res = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
+				res = pGetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
 				if (ERROR_SUCCESS == res) {
 					paths.resize(num_paths);
 					modes.resize(num_modes);
@@ -176,12 +182,12 @@ BOOL CPPageFullscreen::OnInitDialog()
 					DISPLAYCONFIG_SOURCE_DEVICE_NAME source = {
 						{DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME, sizeof(source), path.sourceInfo.adapterId, path.sourceInfo.id}, {},
 					};
-					res = DisplayConfigGetDeviceInfo(&source.header);
+					res = pDisplayConfigGetDeviceInfo(&source.header);
 					if (ERROR_SUCCESS == res) {
 						DISPLAYCONFIG_TARGET_DEVICE_NAME name = {
 							{DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, sizeof(name), path.sourceInfo.adapterId, path.targetInfo.id}, {},
 						};
-						res = DisplayConfigGetDeviceInfo(&name.header);
+						res = pDisplayConfigGetDeviceInfo(&name.header);
 						if (ERROR_SUCCESS == res) {
 							monitors[source.viewGdiDeviceName] = name.monitorFriendlyDeviceName;
 						}
