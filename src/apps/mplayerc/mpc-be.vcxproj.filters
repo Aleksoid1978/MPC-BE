@@ -420,6 +420,9 @@
     <ClCompile Include="HistoryFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HistoryDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -805,6 +808,9 @@
     </ClInclude>
     <ClInclude Include="HistoryFile.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryDlg.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

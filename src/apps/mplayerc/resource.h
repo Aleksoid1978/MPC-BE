@@ -320,6 +320,7 @@
 #define ID_GOTO_PREV_SUB                1014
 #define ID_GOTO_NEXT_SUB                1015
 #define ID_FILE_OPENDIRECTORY           1016
+#define ID_SHOW_HISTORY                 1018
 #define ID_RECENT_FILES_CLEAR           1019
 #define ID_SHADERS_TOGGLE               1021
 #define ID_SHADERS_TOGGLE_SCREENSPACE   1022
@@ -621,6 +622,7 @@
 #define IDD_CMD_LINE_HELP               10068
 #define IDD_PLAYLISTNAME                10069
 #define IDD_ADDCOMMAND_DLG              10070
+#define IDD_HISTORY                     10071
 // nameless controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
@@ -1341,6 +1343,7 @@
 #define IDS_AG_VSYNCINTERNAL            33261
 #define IDS_AG_FULLSCREENGUISUPPORT     33266
 #define IDS_AG_ENABLEFRAMETIMECORRECTION 33275
+#define IDS_SHOW_HISTORY                33282
 #define IDS_RECENT_FILES_CLEAR          33283
 #define IDS_RECENT_FILES                33284
 #define IDS_RECENT_FILES_QUESTION       33285

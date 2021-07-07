@@ -351,6 +351,8 @@
 
 #define IDS_R_DLG_ORGANIZE_FAV				L"Dialogs\\OrganizeFavorites"
 
+#define IDS_R_DLG_HISTORY					L"Dialogs\\History"
+
 #define IDS_R_DLG_CMD_LINE_HELP				L"Dialogs\\CmdLineHelp"
 
 #define IDS_R_DLG_GOTO						L"Dialogs\\GoTo"

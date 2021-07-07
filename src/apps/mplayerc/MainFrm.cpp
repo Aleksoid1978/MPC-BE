@@ -43,6 +43,7 @@
 #include "SaveImageDialog.h"
 #include "FavoriteAddDlg.h"
 #include "FavoriteOrganizeDlg.h"
+#include "HistoryDlg.h"
 #include "ShaderCombineDlg.h"
 #include "FullscreenWnd.h"
 #include "TunerScanDlg.h"
@@ -453,6 +454,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnFavoritesDVD)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnUpdateFavoritesDVD)
 
+	ON_COMMAND(ID_SHOW_HISTORY, OnShowHistory)
 	ON_COMMAND(ID_RECENT_FILES_CLEAR, OnRecentFileClear)
 	ON_UPDATE_COMMAND_UI(ID_RECENT_FILES_CLEAR, OnUpdateRecentFileClear)
 	ON_COMMAND_RANGE(ID_RECENT_FILE_START, ID_RECENT_FILE_END, OnRecentFile)
@@ -10218,6 +10220,12 @@ void CMainFrame::OnFavoritesOrganize()
 	dlg.DoModal();
 }
 
+void CMainFrame::OnShowHistory()
+{
+	CHistoryDlg dlg;
+	dlg.DoModal();
+}
+
 void CMainFrame::OnRecentFileClear()
 {
 	if (IDYES != AfxMessageBox(ResStr(IDS_RECENT_FILES_QUESTION), MB_YESNO)) {
@@ -15738,6 +15746,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(recentSessions, s.iRecentFilesNumber);
 
 	if (recentSessions.size()) {
+		submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SHOW_HISTORY, ResStr(IDS_SHOW_HISTORY));
 		submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_RECENT_FILES_CLEAR, ResStr(IDS_RECENT_FILES_CLEAR));
 		submenu.AppendMenu(MF_SEPARATOR | MF_ENABLED);
 

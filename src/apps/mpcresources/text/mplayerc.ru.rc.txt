@@ -105,6 +105,10 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 13		"Вперед!"
 END
 
+BEGIN DIALOGEX IDD_HISTORY LINES 7
+3		"История"
+END
+
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
 5		"&Сохранить"
 6		"&Отмена"
@@ -1865,6 +1869,7 @@ STRING IDS_SHADER_EDITOR		"Редактор шейдеров"
 STRING IDS_SHADER_FOLDER		"Открыть папку с шейдерами"
 STRING IDS_SHADER_NEW		"Создать новый..."
 STRING IDS_SHADER_SAVE		"Сохранить"
+STRING IDS_SHOW_HISTORY		"Показать историю (experimental)"
 STRING IDS_SIDE_LEFT		"Боковой левый"
 STRING IDS_SIDE_RIGHT		"Боковой правый"
 STRING IDS_SIZE_UNIT_G		"ГБ"
