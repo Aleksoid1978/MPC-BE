@@ -44,21 +44,33 @@ void CHistoryDlg::SetupList()
 	std::vector<SessionInfo> recentSessions;
 	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(recentSessions, INT_MAX);
 
-	for (const auto& session : recentSessions) {
-		int n = m_list.InsertItem(m_list.GetItemCount(), session.Path);
-		m_list.SetItemText(n, 1, session.Title);
+	for (const auto& sesInfo : recentSessions) {
+		CStringW str;
+		int n = m_list.InsertItem(m_list.GetItemCount(), sesInfo.Path);
+
+		m_list.SetItemText(n, COL_TITLE, sesInfo.Title);
+
+		if (sesInfo.DVDId) {
+			if (sesInfo.DVDTitle) {
+				str.Format(L"%02u,%02u:%02u:%02u\n",
+					(unsigned)sesInfo.DVDTitle,
+					(unsigned)sesInfo.DVDTimecode.bHours,
+					(unsigned)sesInfo.DVDTimecode.bMinutes,
+					(unsigned)sesInfo.DVDTimecode.bSeconds);
+				m_list.SetItemText(n, COL_POS, str);
+			}
+		}
+		else {
+			if (sesInfo.Position > UNITS) {
+				LONGLONG seconds = sesInfo.Position / UNITS;
+				int h = (int)(seconds / 3600);
+				int m = (int)(seconds / 60 % 60);
+				int s = (int)(seconds % 60);
+				str.Format(L"%02d:%02d:%02d\n", h, m, s);
+				m_list.SetItemText(n, COL_POS, str);
+			}
+		}
 	}
-
-	UpdateColumnsSizes();
-}
-
-void CHistoryDlg::UpdateColumnsSizes()
-{
-	CRect r;
-	m_list.GetClientRect(r);
-	m_list.SetColumnWidth(0, LVSCW_AUTOSIZE);
-	m_list.SetColumnWidth(1, LVSCW_AUTOSIZE);
-	m_list.SetColumnWidth(1, std::max(m_list.GetColumnWidth(1), r.Width() - m_list.GetColumnWidth(0)));
 }
 
 void CHistoryDlg::DoDataExchange(CDataExchange* pDX)
@@ -70,7 +82,6 @@ void CHistoryDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_WM_ACTIVATE()
-	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // CHistoryDlg message handlers
@@ -81,27 +92,27 @@ BOOL CHistoryDlg::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_list.InsertColumn(0, L"Path");
-	m_list.InsertColumn(1, L"Title");
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	m_list.InsertColumn(COL_PATH, L"Path");
+	m_list.InsertColumn(COL_TITLE, L"Title");
+	m_list.InsertColumn(COL_POS, L"Position");
 
 	SetupList();
+
+	for (int nCol = COL_PATH; nCol < COL_COUNT; nCol++) {
+		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
+		const int headerWidth = m_list.GetColumnWidth(nCol);
+		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+		const int contentWidth = m_list.GetColumnWidth(nCol);
+
+		if (headerWidth > contentWidth) {
+			m_list.SetColumnWidth(nCol, headerWidth);
+		}
+	}
 
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
 
 	return TRUE;
-}
-
-void CHistoryDlg::OnSize(UINT nType, int cx, int cy)
-{
-	__super::OnSize(nType, cx, cy);
-
-	if (IsWindow(m_list)) {
-		m_list.SetRedraw(FALSE);
-		m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		UpdateColumnsSizes();
-		m_list.SetRedraw();
-	}
 }

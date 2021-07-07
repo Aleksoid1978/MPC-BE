@@ -31,6 +31,13 @@ class CHistoryDlg : public CResizableDialog
 	//DECLARE_DYNAMIC(CHistoryDlg)
 
 public:
+	enum {
+		COL_PATH = 0,
+		COL_TITLE,
+		COL_POS,
+		COL_COUNT
+	};
+
 	CHistoryDlg(CWnd* pParent = nullptr);
 	virtual ~CHistoryDlg();
 
@@ -42,9 +49,7 @@ protected:
 	virtual BOOL OnInitDialog();
 
 	void SetupList();
-	void UpdateColumnsSizes();
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
