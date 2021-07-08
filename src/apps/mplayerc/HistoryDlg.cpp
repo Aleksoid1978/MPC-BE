@@ -120,6 +120,9 @@ BOOL CHistoryDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	AddAnchor(IDC_EDIT1, TOP_LEFT);
+	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
+
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
@@ -141,8 +144,6 @@ BOOL CHistoryDlg::OnInitDialog()
 			m_list.SetColumnWidth(nCol, headerWidth);
 		}
 	}
-
-	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
 
