@@ -30,19 +30,20 @@ class CHistoryDlg : public CResizableDialog
 {
 	//DECLARE_DYNAMIC(CHistoryDlg)
 
-public:
+private:
 	enum {
 		COL_PATH = 0,
 		COL_TITLE,
 		COL_POS,
 		COL_COUNT
 	};
-
-	CHistoryDlg(CWnd* pParent = nullptr);
-	virtual ~CHistoryDlg();
-
 	enum { IDD = IDD_HISTORY };
 	CListCtrl m_list;
+	std::vector<SessionInfo> m_recentSessions;
+
+public:
+	CHistoryDlg(CWnd* pParent = nullptr);
+	virtual ~CHistoryDlg();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

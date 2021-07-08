@@ -41,10 +41,9 @@ void CHistoryDlg::SetupList()
 {
 	m_list.DeleteAllItems();
 
-	std::vector<SessionInfo> recentSessions;
-	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(recentSessions, INT_MAX);
+	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
 
-	for (const auto& sesInfo : recentSessions) {
+	for (const auto& sesInfo : m_recentSessions) {
 		CStringW str;
 		int n = m_list.InsertItem(m_list.GetItemCount(), sesInfo.Path);
 
@@ -70,6 +69,8 @@ void CHistoryDlg::SetupList()
 				m_list.SetItemText(n, COL_POS, str);
 			}
 		}
+
+		m_list.SetItemData(n, n);
 	}
 }
 
