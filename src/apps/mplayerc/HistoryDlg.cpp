@@ -39,11 +39,34 @@ CHistoryDlg::~CHistoryDlg()
 
 void CHistoryDlg::SetupList()
 {
+	m_list.SetRedraw(false);
 	m_list.DeleteAllItems();
 
-	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
+	CStringW filter;
+	m_FilterEdit.GetWindowText(filter);
 
-	for (const auto& sesInfo : m_recentSessions) {
+	for (size_t i = 0; i < m_recentSessions.size(); i++) {
+		const auto& sesInfo = m_recentSessions[i];
+
+		if (filter.GetLength()) {
+			auto LowerCase = [](CStringW& str) {
+				if (!str.IsEmpty()) {
+					::CharLowerBuffW(str.GetBuffer(), str.GetLength());
+				}
+			};
+
+			CStringW path(sesInfo.Path);
+			CStringW title(sesInfo.Title);
+
+			LowerCase(filter);
+			LowerCase(path);
+			LowerCase(title);
+
+			if (path.Find(filter) < 0 && (title.IsEmpty() || title.Find(filter) < 0)) {
+				continue;
+			}
+		}
+
 		CStringW str;
 		int n = m_list.InsertItem(m_list.GetItemCount(), sesInfo.Path);
 
@@ -70,19 +93,25 @@ void CHistoryDlg::SetupList()
 			}
 		}
 
-		m_list.SetItemData(n, n);
+		m_list.SetItemData(n, i);
 	}
+
+	m_list.SetRedraw(true);
+	m_list.RedrawWindow();
 }
 
 void CHistoryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
+	DDX_Control(pDX, IDC_EDIT1, m_FilterEdit);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
 BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_WM_ACTIVATE()
+	ON_WM_TIMER()
+	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
 END_MESSAGE_MAP()
 
 // CHistoryDlg message handlers
@@ -97,6 +126,8 @@ BOOL CHistoryDlg::OnInitDialog()
 	m_list.InsertColumn(COL_PATH, L"Path");
 	m_list.InsertColumn(COL_TITLE, L"Title");
 	m_list.InsertColumn(COL_POS, L"Position");
+
+	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
 
 	SetupList();
 
@@ -116,4 +147,20 @@ BOOL CHistoryDlg::OnInitDialog()
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
 
 	return TRUE;
+}
+
+void CHistoryDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == m_nFilterTimerID) {
+		KillTimer(m_nFilterTimerID);
+		SetupList();
+	} else {
+		__super::OnTimer(nIDEvent);
+	}
+}
+
+void CHistoryDlg::OnChangeFilterEdit()
+{
+	KillTimer(m_nFilterTimerID);
+	m_nFilterTimerID = SetTimer(2, 100, NULL);
 }

@@ -41,6 +41,9 @@ private:
 	CListCtrl m_list;
 	std::vector<SessionInfo> m_recentSessions;
 
+	UINT_PTR m_nFilterTimerID;
+	CEdit m_FilterEdit;
+
 public:
 	CHistoryDlg(CWnd* pParent = nullptr);
 	virtual ~CHistoryDlg();
@@ -53,4 +56,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnChangeFilterEdit();
 };
