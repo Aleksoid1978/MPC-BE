@@ -105,6 +105,8 @@ void CHistoryDlg::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_EDIT1, m_FilterEdit);
+	DDX_Control(pDX, IDC_BUTTON1, m_DelSelButton);
+	DDX_Control(pDX, IDC_BUTTON2, m_ClearButton);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
@@ -112,6 +114,8 @@ BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_WM_ACTIVATE()
 	ON_WM_TIMER()
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
+	ON_BN_CLICKED(IDC_BUTTON1, OnDelSelBnClicked)
+	ON_BN_CLICKED(IDC_BUTTON2, OnClearBnClicked)
 END_MESSAGE_MAP()
 
 // CHistoryDlg message handlers
@@ -121,9 +125,9 @@ BOOL CHistoryDlg::OnInitDialog()
 	__super::OnInitDialog();
 
 	AddAnchor(IDC_EDIT1, TOP_LEFT);
+	AddAnchor(IDC_BUTTON1, TOP_LEFT);
+	AddAnchor(IDC_BUTTON2, TOP_LEFT);
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
-
-	CAppSettings& s = AfxGetAppSettings();
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	m_list.InsertColumn(COL_PATH, L"Path");
@@ -164,4 +168,37 @@ void CHistoryDlg::OnChangeFilterEdit()
 {
 	KillTimer(m_nFilterTimerID);
 	m_nFilterTimerID = SetTimer(2, 100, NULL);
+}
+
+void CHistoryDlg::OnDelSelBnClicked()
+{
+	std::list<SessionInfo> selSessions;
+
+	POSITION pos = m_list.GetFirstSelectedItemPosition();
+
+	while (pos) {
+		int nItem = m_list.GetNextSelectedItem(pos);
+
+		size_t index = m_list.GetItemData(nItem);
+		if (index < m_recentSessions.size()) {
+			CStringW dd = m_list.GetItemText(nItem, 0);
+			selSessions.emplace_back(m_recentSessions[index]);
+		}
+	}
+
+	if (selSessions.size()) {
+		if (AfxGetMyApp()->m_HistoryFile.DeleteSessions(selSessions)) {
+			AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
+			SetupList();
+		}
+	}
+}
+
+void CHistoryDlg::OnClearBnClicked()
+{
+	if (IDYES == AfxMessageBox(ResStr(IDS_RECENT_FILES_QUESTION), MB_ICONQUESTION | MB_YESNO)) {
+		if (AfxGetMyApp()->m_HistoryFile.Clear()) {
+			SetupList();
+		}
+	}
 }

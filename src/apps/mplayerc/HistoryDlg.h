@@ -43,6 +43,8 @@ private:
 
 	UINT_PTR m_nFilterTimerID;
 	CEdit m_FilterEdit;
+	CButton m_DelSelButton;
+	CButton m_ClearButton;
 
 public:
 	CHistoryDlg(CWnd* pParent = nullptr);
@@ -58,4 +60,6 @@ protected:
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnChangeFilterEdit();
+	afx_msg void OnDelSelBnClicked();
+	afx_msg void OnClearBnClicked();
 };

@@ -190,17 +190,17 @@ void CHistoryFile::IntClearEntries()
 	m_SessionInfos.clear();
 }
 
-std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(SessionInfo& sesInfo)
+std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(const SessionInfo& sesInfo, std::list<SessionInfo>::iterator begin)
 {
 	if (sesInfo.DVDId) {
-		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
+		for (auto it = begin; it != m_SessionInfos.end(); ++it) {
 			if (sesInfo.DVDId == (*it).DVDId) {
 				return it;
 			}
 		}
 	}
 	else if (sesInfo.Path.GetLength()) {
-		for (auto it = m_SessionInfos.begin(); it != m_SessionInfos.end(); ++it) {
+		for (auto it = begin; it != m_SessionInfos.end(); ++it) {
 			if (sesInfo.Path.CompareNoCase((*it).Path) == 0) {
 				return it;
 			}
@@ -311,7 +311,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 	ReadFile();
 
 	bool found = false;
-	auto it = FindSessionInfo(sesInfo);
+	auto it = FindSessionInfo(sesInfo, m_SessionInfos.begin());
 
 	if (it != m_SessionInfos.end()) {
 		found = true;
@@ -359,7 +359,7 @@ void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
 
 	ReadFile();
 
-	auto it = FindSessionInfo(sesInfo);
+	auto it = FindSessionInfo(sesInfo, m_SessionInfos.begin());
 
 	if (it != m_SessionInfos.end()) {
 		m_SessionInfos.erase(it);
@@ -374,19 +374,32 @@ void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
 	WriteFile();
 }
 
-void CHistoryFile::DeleteSessionInfo(SessionInfo& sesInfo)
+bool CHistoryFile::DeleteSessions(std::list<SessionInfo>& sessions)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
-	ReadFile();
-
-	auto it = FindSessionInfo(sesInfo);
-
-	if (it != m_SessionInfos.end()) {
-		m_SessionInfos.erase(it);
-
-		WriteFile();
+	if (!ReadFile()) {
+		return false;
 	}
+
+	bool changed = false;
+
+	for (const auto& sesInfo : sessions) {
+		auto it = FindSessionInfo(sesInfo, m_SessionInfos.begin());
+
+		// delete what was found and all unexpected duplicates (for example, after manual editing)
+		while (it != m_SessionInfos.end()) {
+			m_SessionInfos.erase(it++);
+			changed = true;
+			it = FindSessionInfo(sesInfo, it);
+		}
+	}
+
+	if (changed) {
+		return WriteFile();
+	}
+
+	return true; // already deleted 
 }
 
 void CHistoryFile::GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count)

@@ -91,13 +91,13 @@ private:
 	void IntAddEntry(SessionInfo& sesInfo) override;
 	void IntClearEntries() override;
 
-	std::list<SessionInfo>::iterator FindSessionInfo(SessionInfo& sesInfo);
+	std::list<SessionInfo>::iterator FindSessionInfo(const SessionInfo& sesInfo, std::list<SessionInfo>::iterator begin);
 	bool WriteFile();
 
 public:
 	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos); // Read or create an entry in the history file
 	void SaveSessionInfo(SessionInfo& sesInfo);
-	void DeleteSessionInfo(SessionInfo& sesInfo);
+	bool DeleteSessions(std::list<SessionInfo>& sessions);
 
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
