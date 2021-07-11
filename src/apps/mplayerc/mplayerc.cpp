@@ -272,6 +272,9 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	// Write settings immediately
 	m_s.SaveSettings();
 
+	CStringW oldHistoryPath(oldpath + MPC_HISTORY_FILENAME);
+	CStringW oldFavoritesPath(oldpath + MPC_FAVORITES_FILENAME);
+
 	CString newpath;
 	AfxGetMyApp()->GetAppSavePath(newpath); // call it after saving the settings
 
@@ -285,30 +288,35 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	m_HistoryFile.SetFilename(newHistoryPath);
 	m_FavoritesFile.SetFilename(newFavoritesPath);
 
-	// moving history and favorites files
-	int ret = FileOperation(oldpath + MPC_HISTORY_FILENAME, newHistoryPath, FO_MOVE);
-	if (ret != 0) {
-		MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
+	if (::PathFileExistsW(oldHistoryPath)) {
+		// moving history and favorites files
+		int ret = FileOperation(oldHistoryPath, newHistoryPath, FO_MOVE);
+		if (ret != 0) {
+			MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
+		}
 	}
-	ret = FileOperation(oldpath + MPC_FAVORITES_FILENAME, newFavoritesPath, FO_MOVE);
-	if (ret != 0) {
-		MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
+	if (::PathFileExistsW(oldFavoritesPath)) {
+		// moving favorites files
+		int ret = FileOperation(oldpath + MPC_FAVORITES_FILENAME, newFavoritesPath, FO_MOVE);
+		if (ret != 0) {
+			MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
+		}
 	}
 
 	// moving shader files
-	CStringW shaderpath = oldpath + L"Shaders\\";
-	if (::PathFileExistsW(shaderpath)) {
+	CStringW oldShaderPath = oldpath + L"Shaders\\";
+	if (::PathFileExistsW(oldShaderPath)) {
 		// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-		int ret = FileOperation(shaderpath, newpath, FO_MOVE);
+		int ret = FileOperation(oldShaderPath, newpath, FO_MOVE);
 		if (ret != 0) {
 			MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 		}
 	}
 
-	shaderpath = oldpath + L"Shaders11\\";
-	if (::PathFileExistsW(shaderpath)) {
+	oldShaderPath = oldpath + L"Shaders11\\";
+	if (::PathFileExistsW(oldShaderPath)) {
 		// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-		int ret = FileOperation(shaderpath, newpath, FO_MOVE);
+		int ret = FileOperation(oldShaderPath, newpath, FO_MOVE);
 		if (ret != 0) {
 			MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
 		}
