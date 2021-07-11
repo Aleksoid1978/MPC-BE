@@ -106,7 +106,7 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
-3		"Gesamte Chronik (experimentell)
+3		"Gesamte Chronik (experimentell)"
 7		"Ausgewählte löschen"
 8		"Alle löschen"
 END
@@ -411,7 +411,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 11		"Suchleiste"
 13		"Verlauf und Privatsphäre"
 14		"&Chronik anlegen"
-16		"Einträge in 'Neueste Chronik':"
+16		"Einträge in ""Neueste Chronik"":"
 19		"DVD/BD-Wiedergabeposition merken"
 20		"Datei-Wiedergabeposition merken"
 21		"Letzten Pan&&Scan-Zoom merken"
