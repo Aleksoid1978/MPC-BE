@@ -198,6 +198,7 @@ void CHistoryDlg::OnClearBnClicked()
 {
 	if (IDYES == AfxMessageBox(ResStr(IDS_RECENT_FILES_QUESTION), MB_ICONQUESTION | MB_YESNO)) {
 		if (AfxGetMyApp()->m_HistoryFile.Clear()) {
+			m_recentSessions.clear();
 			SetupList();
 		}
 	}
