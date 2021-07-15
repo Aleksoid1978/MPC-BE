@@ -2,11 +2,14 @@
 
 1.6.0 (alpha)
 =============================
+Player
+The history of open files and URLs is now saved in the history.mpc_lst file. Added a window for viewing history.
+Bookmarks are now saved in the favorites.mpc_lst file.
+Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player. 
 
 
 1.5.8
 =============================
-
 ShoutcastSource
 Added decoding of HTML codes like "&#NNNN;" in the title of the track.
 
