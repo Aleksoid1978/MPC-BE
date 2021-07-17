@@ -105,7 +105,12 @@ DAV1D_API int dav1d_open(Dav1dContext **c_out, const Dav1dSettings *s);
  * @param buf The data to be parser.
  * @param sz  Size of the data.
  *
- * @return 0 on success, or < 0 (a negative DAV1D_ERR code) on error.
+ * @return
+ *                  0: Success, and out is filled with the parsed Sequence Header
+ *                     OBU parameters.
+ *  DAV1D_ERR(ENOENT): No Sequence Header OBUs were found in the buffer.
+ *  other negative DAV1D_ERR codes: Invalid data in the buffer, invalid passed-in
+ *                                  arguments, and other errors during parsing.
  *
  * @note It is safe to feed this function data containing other OBUs than a
  *       Sequence Header, as they will simply be ignored. If there is more than

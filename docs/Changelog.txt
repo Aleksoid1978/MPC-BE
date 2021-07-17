@@ -7,6 +7,9 @@ The history of open files and URLs is now saved in the history.mpc_lst file. Add
 Bookmarks are now saved in the favorites.mpc_lst file.
 Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player. 
 
+Updated libraries:
+	dav1d git-0.9.0-57-g73db537;
+
 
 1.5.8
 =============================
