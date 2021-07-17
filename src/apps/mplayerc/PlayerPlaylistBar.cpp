@@ -37,6 +37,11 @@
 #include "./Controls/MenuEx.h"
 #include "TorrentInfo.h"
 
+#define ID_PLSMENU_ADD_PLAYLIST    2001
+#define ID_PLSMENU_ADD_EXPLORER    2002
+#define ID_PLSMENU_RENAME_PLAYLIST 2003
+#define ID_PLSMENU_DELETE_PLAYLIST 2004
+
 static CString MakePath(CString path)
 {
 	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
@@ -63,11 +68,11 @@ struct CUETrack {
 	CString m_Performer;
 
 	CUETrack(const CString& fn, const REFERENCE_TIME rt, const UINT trackNum, const CString& Title, const CString& Performer) {
-		m_rt		= rt;
-		m_trackNum = trackNum;
-		m_fn		= fn;
-		m_Title		= Title;
-		m_Performer	= Performer;
+		m_rt        = rt;
+		m_trackNum  = trackNum;
+		m_fn        = fn;
+		m_Title     = Title;
+		m_Performer = Performer;
 	}
 };
 
@@ -168,6 +173,10 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 	return CUETrackList.size() > 0;
 }
 
+//
+// CPlaylistItem
+//
+
 CPlaylistItem::CPlaylistItem()
 	: m_type(file)
 	, m_bInvalid(false)
@@ -184,18 +193,18 @@ CPlaylistItem::CPlaylistItem()
 CPlaylistItem& CPlaylistItem::operator = (const CPlaylistItem& pli)
 {
 	if (this != &pli) {
-		m_id = pli.m_id;
-		m_label = pli.m_label;
-		m_fns = pli.m_fns;
-		m_subs = pli.m_subs;
-		m_type = pli.m_type;
-		m_bInvalid = pli.m_bInvalid;
+		m_id         = pli.m_id;
+		m_label      = pli.m_label;
+		m_fns        = pli.m_fns;
+		m_subs       = pli.m_subs;
+		m_type       = pli.m_type;
+		m_bInvalid   = pli.m_bInvalid;
 		m_bDirectory = pli.m_bDirectory;
-		m_duration = pli.m_duration;
-		m_vinput = pli.m_vinput;
-		m_vchannel = pli.m_vchannel;
-		m_ainput = pli.m_ainput;
-		m_country = pli.m_country;
+		m_duration   = pli.m_duration;
+		m_vinput     = pli.m_vinput;
+		m_vchannel   = pli.m_vchannel;
+		m_ainput     = pli.m_ainput;
+		m_country    = pli.m_country;
 	}
 	return(*this);
 }
@@ -501,6 +510,10 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 }
 
+//
+// CPlaylist
+//
+
 POSITION CPlaylist::Append(CPlaylistItem& item, const bool bParseDuration)
 {
 	if (bParseDuration && !item.m_duration && !item.m_fns.empty()) {
@@ -757,6 +770,10 @@ static unsigned GetNextId()
 	static unsigned id = 1;
 	return id++;
 }
+
+//
+// CPlayerPlaylistBar
+//
 
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
 
@@ -4089,25 +4106,24 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	UINT id = 1;
 	CMenu submenu;
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		UINT flags = MF_BYPOSITION | MF_STRING | MF_ENABLED;
 		if (i == m_nCurPlayListIndex) {
 			flags |= MF_CHECKED | MFT_RADIOCHECK;
 		}
-		menu.AppendMenuW(flags, id++, m_tabs[i].name);
+		menu.AppendMenuW(flags, 1 + i, m_tabs[i].name);
 	}
 	menu.AppendMenuW(MF_SEPARATOR);
 
 	submenu.CreatePopupMenu();
-	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, id++, ResStr(IDS_PLAYLIST_ADD_PLAYLIST));
-	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, id++, ResStr(IDS_PLAYLIST_ADD_EXPLORER));
+	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, ID_PLSMENU_ADD_PLAYLIST, ResStr(IDS_PLAYLIST_ADD_PLAYLIST));
+	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, ID_PLSMENU_ADD_EXPLORER, ResStr(IDS_PLAYLIST_ADD_EXPLORER));
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu.Detach(), ResStr(IDS_PLAYLIST_ADD_NEW));
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
-		, id++, ResStr(IDS_PLAYLIST_RENAME_CURRENT));
+		, ID_PLSMENU_RENAME_PLAYLIST, ResStr(IDS_PLAYLIST_RENAME_CURRENT));
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
-		, id++, ResStr(IDS_PLAYLIST_DELETE_CURRENT));
+		, ID_PLSMENU_DELETE_PLAYLIST, ResStr(IDS_PLAYLIST_DELETE_CURRENT));
 
 	m_pMainFrame->SetColorMenu(menu);
 
@@ -4128,10 +4144,8 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 		TEnsureVisible(m_nCurPlayListIndex);
 		TSelectTab();
 	} else {
-		int element = (nID - size);
-
-		switch (element) {
-			case 1: // ADD PLAYLIST TAB
+		switch (nID) {
+			case ID_PLSMENU_ADD_PLAYLIST:
 				{
 					size_t cnt = 1;
 					for (size_t i = 0; i < m_tabs.size(); i++) {
@@ -4169,7 +4183,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					TCalcLayout();
 				}
 				break;
-			case 2: // ADD EXPLORER TAB
+			case ID_PLSMENU_ADD_EXPLORER:
 				{
 					size_t cnt = 1;
 					for (size_t i = 0; i < m_tabs.size(); i++) {
@@ -4209,7 +4223,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					bNewExplorer = true;
 				}
 				break;
-			case 3: // RENAME TAB
+			case ID_PLSMENU_RENAME_PLAYLIST:
 				{
 					strDefName = GetCurTab().name;
 					CPlaylistNameDlg dlg(strDefName);
@@ -4224,7 +4238,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					SavePlaylist();
 				}
 				break;
-			case 4: // DELETE TAB
+			case ID_PLSMENU_DELETE_PLAYLIST:
 				{
 					if (Empty()) {
 						CloseMedia();
