@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2723,8 +2723,8 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	sub->m_wrapStyle = m_defaultWrapStyle;
 	sub->m_fAnimated = false;
 	sub->m_relativeTo = stss.relativeTo;
-	sub->m_scalex = dstScreenSize.cx > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx * 8) : 1.0;
-	sub->m_scaley = dstScreenSize.cy > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Height() : m_size.cy) / (dstScreenSize.cy * 8) : 1.0;
+	sub->m_scalex = dstScreenSize.cx > 0 ? double(stss.relativeTo == STSStyle::VIDEO ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx * 8) : 1.0;
+	sub->m_scaley = dstScreenSize.cy > 0 ? double(stss.relativeTo == STSStyle::VIDEO ? m_vidrect.Height() : m_size.cy) / (dstScreenSize.cy * 8) : 1.0;
 
 	STSEntry stse = GetAt(entry);
 	CRect marginRect = stse.marginRect;
@@ -2767,7 +2767,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		sub->m_clip.SetRect(0, 0, m_size.cx >> 3, m_size.cy >> 3);
 	}
 
-	if (stss.relativeTo == 1) {
+	if (stss.relativeTo == STSStyle::VIDEO) {
 		marginRect.left   += m_vidrect.left;
 		marginRect.top    += m_vidrect.top;
 		marginRect.right  += m_size.cx - m_vidrect.right;

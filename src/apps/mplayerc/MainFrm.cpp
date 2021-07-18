@@ -16240,7 +16240,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 					pRTS->SetDefaultStyle(style);
 				}
 
-				if (pRTS->GetDefaultStyle(style) && style.relativeTo == 2) {
+				if (pRTS->GetDefaultStyle(style) && style.relativeTo == STSStyle::AUTO) {
 					style.relativeTo = s.subdefstyle.relativeTo;
 					pRTS->SetDefaultStyle(style);
 				}

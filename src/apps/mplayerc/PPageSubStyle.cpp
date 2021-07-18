@@ -232,7 +232,7 @@ BOOL CPPageSubStyle::OnApply()
 
 	m_stss->scrAlignment  = m_screenalignment + 1;
 	m_stss->marginRect    = CRect(m_marginleft, m_margintop, m_marginright, m_marginbottom);
-	m_stss->relativeTo    = m_relativeTo;
+	m_stss->relativeTo    = (STSStyle::RelativeTo)m_relativeTo;
 
 	for (unsigned i = 0; i < std::size(m_alpha); i++) {
 		m_stss->alpha[i] = 255 - m_alpha[i];

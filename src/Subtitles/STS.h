@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,6 +33,12 @@ enum tmode {TIME, FRAME}; // the meaning of STSEntry::start/end
 class STSStyle
 {
 public:
+	enum RelativeTo {
+		WINDOW = 0,
+		VIDEO = 1,
+		AUTO // ~video for SSA/ASS, ~window for the rest
+	};
+
 	CRect		marginRect;		// measured from the sides
 	int			scrAlignment;	// 1 - 9: as on the numpad, 0: default
 	int			borderStyle;	// 0: outline, 1: opaque box
@@ -53,7 +59,7 @@ public:
 	double		fGaussianBlur;
 	double		fontAngleZ, fontAngleX, fontAngleY;
 	double		fontShiftX, fontShiftY;
-	int			relativeTo;		// 0: window, 1: video, 2: undefined (~window)
+	RelativeTo	relativeTo;
 
 	STSStyle();
 

@@ -590,7 +590,7 @@ void CAppSettings::ResetSettings()
 	bClosedCaptions = false;
 
 	subdefstyle.SetDefault();
-	subdefstyle.relativeTo = 1;
+	subdefstyle.relativeTo = STSStyle::VIDEO;
 	fOverridePlacement = false;
 	nHorPos = 50;
 	nVerPos = 90;
@@ -1025,7 +1025,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPSTYLE, str);
 		subdefstyle <<= str;
 		if (str.IsEmpty()) {
-			subdefstyle.relativeTo = 1;    //default "Position subtitles relative to the video frame" option is checked
+			subdefstyle.relativeTo = STSStyle::VIDEO; //default "Position subtitles relative to the video frame" option is checked
 		}
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SPOVERRIDEPLACEMENT, fOverridePlacement);
