@@ -55,6 +55,7 @@ namespace DXVAState {
 
 	void SetActiveState(const GUID& guidDXVADecoder, LPCWSTR customDescription/* = nullptr*/)
 	{
+		const bool bChangeState = !!m_bDXVActive;
 		m_bDXVActive = TRUE;
 
 		if (customDescription) {
@@ -72,7 +73,9 @@ namespace DXVAState {
 			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVAMode(m_guidDXVADecoder));
 		}
 
-		OnChangeState();
+		if (bChangeState) {
+			OnChangeState();
+		}
 	}
 
 	const BOOL GetState()
