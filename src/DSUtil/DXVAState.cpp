@@ -55,7 +55,7 @@ namespace DXVAState {
 
 	void SetActiveState(const GUID& guidDXVADecoder, LPCWSTR customDescription/* = nullptr*/)
 	{
-		const bool bChangeState = !!m_bDXVActive;
+		const bool bChangeState = (m_bDXVActive == FALSE);
 		m_bDXVActive = TRUE;
 
 		if (customDescription) {
