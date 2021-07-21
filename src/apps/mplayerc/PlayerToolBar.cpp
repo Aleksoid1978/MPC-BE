@@ -172,17 +172,21 @@ void CPlayerToolBar::SwitchTheme()
 		m_nUseDarkTheme = (int)s.bUseDarkTheme;
 	}
 
-	if (s.bUseDarkTheme) {
-		if (HMODULE h = LoadLibraryW(L"uxtheme.dll")) {
-			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
+	if (HMODULE h = LoadLibraryW(L"uxtheme.dll")) {
+		SetWindowThemeFunct pfSetWindowTheme = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
-			if (f) {
-				f(m_hWnd, L" ", L" ");
+		if (pfSetWindowTheme) {
+			if (s.bUseDarkTheme) {
+				pfSetWindowTheme(m_hWnd, L" ", L" ");
+			} else {
+				pfSetWindowTheme(m_hWnd, L"Explorer", nullptr);
 			}
-
-			FreeLibrary(h);
 		}
 
+		FreeLibrary(h);
+	}
+
+	if (s.bUseDarkTheme) {
 		COLORSCHEME cs = { sizeof(COLORSCHEME) };
 		cs.clrBtnHighlight = 0x0046413c;
 		cs.clrBtnShadow    = 0x0037322d;
@@ -190,16 +194,6 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetColorScheme(&cs);
 		tb.SetIndent(5);
 	} else {
-		if (HMODULE h = LoadLibraryW(L"uxtheme.dll")) {
-			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
-
-			if (f) {
-				f(m_hWnd, L"Explorer", nullptr);
-			}
-
-			FreeLibrary(h);
-		}
-
 		COLORSCHEME cs = { sizeof(COLORSCHEME) };
 		cs.clrBtnHighlight = GetSysColor(COLOR_BTNFACE);
 		cs.clrBtnShadow    = GetSysColor(COLOR_BTNSHADOW);
