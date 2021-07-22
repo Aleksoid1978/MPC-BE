@@ -117,60 +117,61 @@ void CPreView::OnPaint()
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
+	const int w = rcBar.Width();
+	const int h = rcBar.Height();
 
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
 
 	CBitmap bm;
-	bm.CreateCompatibleBitmap(&dc, rcBar.Width(), rcBar.Height());
+	bm.CreateCompatibleBitmap(&dc, w, h);
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
-	mdc.SetBkMode(TRANSPARENT);
 
 	int i, k;
 
-	k = rcBar.Height();
+	k = h;
 	for(i = 0; i < k; i++) {
-		mdc.FillSolidRect(0, i, rcBar.Width(), 1, RGBFill(m_cr1.R1, m_cr1.G1, m_cr1.B1, m_cr1.R2, m_cr1.G2, m_cr1.B2, i, k));
+		mdc.FillSolidRect(0, i, w, 1, RGBFill(m_cr1.R1, m_cr1.G1, m_cr1.B1, m_cr1.R2, m_cr1.G2, m_cr1.B2, i, k));
 	}
 
-	k = rcBar.Width();
+	k = w;
 	for(i = 0; i < k; i++) {
-		mdc.FillSolidRect(i, 0, 1, 1, RGBFill(m_cr2.R1, m_cr2.G1, m_cr2.B1, m_cr2.R2, m_cr2.G2, m_cr2.B2, i, k));
+		mdc.SetPixelV(i, 0, RGBFill(m_cr2.R1, m_cr2.G1, m_cr2.B1, m_cr2.R2, m_cr2.G2, m_cr2.B2, i, k));
 	}
 
-	k = rcBar.Width();
+	k = w;
 	for(i = rcBar.left + m_border; i < k - m_border; i++) {
-		mdc.FillSolidRect(i, m_caption, 1, 1, RGBFill(m_cr3.R1, m_cr3.G1, m_cr3.B1, m_cr3.R2, m_cr3.G2, m_cr3.B2, i, k));
+		mdc.SetPixelV(i, m_caption, RGBFill(m_cr3.R1, m_cr3.G1, m_cr3.B1, m_cr3.R2, m_cr3.G2, m_cr3.B2, i, k));
 	}
 
-	k = rcBar.Width();
+	k = w;
 	for(i = rcBar.left + m_border; i < k - m_border; i++) {
-		mdc.FillSolidRect(i, rcBar.bottom - m_border - 1, 1, 1, RGBFill(m_cr4.R1, m_cr4.G1, m_cr4.B1, m_cr4.R2, m_cr4.G2, m_cr4.B2, i, k));
+		mdc.SetPixelV(i, rcBar.bottom - m_border - 1, RGBFill(m_cr4.R1, m_cr4.G1, m_cr4.B1, m_cr4.R2, m_cr4.G2, m_cr4.B2, i, k));
 	}
 
-	k = rcBar.Width();
+	k = w;
 	for(i = 0; i < k; i++) {
-		mdc.FillSolidRect(i, rcBar.bottom - 1, 1, 1, RGBFill(m_cr5.R1, m_cr5.G1, m_cr5.B1, m_cr5.R2, m_cr5.G2, m_cr5.B2, i, k));
+		mdc.SetPixelV(i, rcBar.bottom - 1, RGBFill(m_cr5.R1, m_cr5.G1, m_cr5.B1, m_cr5.R2, m_cr5.G2, m_cr5.B2, i, k));
 	}
 
-	k = rcBar.Height();
+	k = h;
 	for(i = 0; i < k - 1; i++) {
-		mdc.FillSolidRect(0, i, 1, 1, RGBFill(m_cr6.R1, m_cr6.G1, m_cr6.B1, m_cr6.R2, m_cr6.G2, m_cr6.B2, i, k));
+		mdc.SetPixelV(0, i, RGBFill(m_cr6.R1, m_cr6.G1, m_cr6.B1, m_cr6.R2, m_cr6.G2, m_cr6.B2, i, k));
 	}
 
-	k = rcBar.Height();
+	k = h;
 	for(i = m_caption; i < k - m_border; i++) {
-		mdc.FillSolidRect(m_border, i, 1, 1, RGBFill(m_cr7.R1, m_cr7.G1, m_cr7.B1, m_cr7.R2, m_cr7.G2, m_cr7.B2, i, k));
+		mdc.SetPixelV(m_border, i, RGBFill(m_cr7.R1, m_cr7.G1, m_cr7.B1, m_cr7.R2, m_cr7.G2, m_cr7.B2, i, k));
 	}
 
-	k = rcBar.Height();
+	k = h;
 	for(i = m_caption; i < k - m_border; i++) {
-		mdc.FillSolidRect(rcBar.right - m_border - 1, i, 1, 1, RGBFill(m_cr8.R1, m_cr8.G1, m_cr8.B1, m_cr8.R2, m_cr8.G2, m_cr8.B2, i, k));
+		mdc.SetPixelV(rcBar.right - m_border - 1, i, RGBFill(m_cr8.R1, m_cr8.G1, m_cr8.B1, m_cr8.R2, m_cr8.G2, m_cr8.B2, i, k));
 	}
 
-	k = rcBar.Height();
+	k = h;
 	for(i = 0 ; i < k; i++) {
-		mdc.FillSolidRect(rcBar.right - 1, i, 1, 1, RGBFill(m_cr9.R1, m_cr9.G1, m_cr9.B1, m_cr9.R2, m_cr9.G2, m_cr9.B2, i, k));
+		mdc.SetPixelV(rcBar.right - 1, i, RGBFill(m_cr9.R1, m_cr9.G1, m_cr9.B1, m_cr9.R2, m_cr9.G2, m_cr9.B2, i, k));
 	}
 
 	// text
@@ -178,11 +179,12 @@ void CPreView::OnPaint()
 	CRect rtime(rcBar);
 	rtime.top = 0;
 	rtime.bottom = m_caption;
+	mdc.SetBkMode(TRANSPARENT);
 	mdc.SetTextColor(m_crText);
 	mdc.DrawTextW(m_tooltipstr, m_tooltipstr.GetLength(), &rtime, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	dc.ExcludeClipRect(m_videorect);
-	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
+	dc.BitBlt(0, 0, w, h, &mdc, 0, 0, SRCCOPY);
 
 	mdc.SelectObject(pOldBm);
 	bm.DeleteObject();
