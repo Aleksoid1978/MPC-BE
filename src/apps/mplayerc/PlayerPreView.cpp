@@ -127,12 +127,14 @@ void CPreView::OnPaint()
 	bm.CreateCompatibleBitmap(&dc, w, h);
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
 
-	int i, k;
+	TRIVERTEX vert[2] = {
+		{ 0, 0, COLOR16(m_cr1.R1 * 256), COLOR16(m_cr1.G1 * 256), COLOR16(m_cr1.B1 * 256), 0 },
+		{ w, h, COLOR16(m_cr1.R2 * 256), COLOR16(m_cr1.G2 * 256), COLOR16(m_cr1.B2 * 256), 0 }
+	};
+	GRADIENT_RECT GradientRect = { 0 , 1 };
+	mdc.GradientFill(vert, 2, &GradientRect, 1, GRADIENT_FILL_RECT_V);
 
-	k = h;
-	for(i = 0; i < k; i++) {
-		mdc.FillSolidRect(0, i, w, 1, RGBFill(m_cr1.R1, m_cr1.G1, m_cr1.B1, m_cr1.R2, m_cr1.G2, m_cr1.B2, i, k));
-	}
+	int i, k;
 
 	k = w;
 	for(i = 0; i < k; i++) {
