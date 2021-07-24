@@ -70,17 +70,17 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bIsFullscreen(bFullscreen)
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 	, m_rcMonitor(0, 0, 0, 0)
-	, m_pD3DXCreateLine(nullptr)
-	, m_pD3DXCreateFontW(nullptr)
-	, m_pD3DXCreateSprite(nullptr)
 	, m_FocusThread(nullptr)
 	, m_bMVC_Base_View_R_flag(false)
 	, m_nStereoOffsetInPixels(4)
 	, m_nCurrentSubtitlesStream(0)
 	, m_bDisplayChanged(false)
 	, m_bResizingDevice(false)
-	, m_pfnDwmEnableComposition(nullptr)
-	, m_pDirect3DCreate9Ex(nullptr)
+	, m_pfDirect3DCreate9Ex(nullptr)
+	, m_pfDwmEnableComposition(nullptr)
+	, m_pfD3DXCreateLine(nullptr)
+	, m_pfD3DXCreateFontW(nullptr)
+	, m_pfD3DXCreateSprite(nullptr)
 {
 	DLog(L"CDX9AllocatorPresenter::CDX9AllocatorPresenter()");
 
@@ -91,24 +91,24 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
-		(FARPROC&)m_pD3DXCreateLine            = GetProcAddress(hDll, "D3DXCreateLine");
-		(FARPROC&)m_pD3DXCreateFontW           = GetProcAddress(hDll, "D3DXCreateFontW");
-		(FARPROC&)m_pD3DXCreateSprite          = GetProcAddress(hDll, "D3DXCreateSprite");
+		(FARPROC&)m_pfD3DXCreateLine   = GetProcAddress(hDll, "D3DXCreateLine");
+		(FARPROC&)m_pfD3DXCreateFontW  = GetProcAddress(hDll, "D3DXCreateFontW");
+		(FARPROC&)m_pfD3DXCreateSprite = GetProcAddress(hDll, "D3DXCreateSprite");
 	} else {
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
 	}
 
-	(FARPROC &)m_pfnDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
+	(FARPROC &)m_pfDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
 
 	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
-		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
+		(FARPROC&)m_pfDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
 	}
 
-	if (m_pDirect3DCreate9Ex) {
-		m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
+	if (m_pfDirect3DCreate9Ex) {
+		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
 		if (!m_pD3DEx) {
-			m_pDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
+			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
 		}
 	}
 	if (!m_pD3DEx) {
@@ -117,8 +117,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	if (GetRenderersSettings().bDisableDesktopComposition && m_pfnDwmEnableComposition) {
-		m_pfnDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+	if (GetRenderersSettings().bDisableDesktopComposition && m_pfDwmEnableComposition) {
+		m_pfDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 	}
 
 	DwmEnableMMCSS(TRUE);
@@ -148,8 +148,8 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		D3DHook::UnHook();
 	}
 
-	if (GetRenderersSettings().bDisableDesktopComposition && m_pfnDwmEnableComposition) {
-		m_pfnDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+	if (GetRenderersSettings().bDisableDesktopComposition && m_pfDwmEnableComposition) {
+		m_pfDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 	}
 
 	DwmEnableMMCSS(FALSE);
@@ -401,9 +401,9 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 	bool bRet = false;
 
-	if (!m_bIsFullscreen && m_pfnDwmEnableComposition) {
+	if (!m_bIsFullscreen && m_pfDwmEnableComposition) {
 		if (New.bDisableDesktopComposition != Current.bDisableDesktopComposition) {
-			m_pfnDwmEnableComposition(New.bDisableDesktopComposition ? DWM_EC_DISABLECOMPOSITION : DWM_EC_ENABLECOMPOSITION);
+			m_pfDwmEnableComposition(New.bDisableDesktopComposition ? DWM_EC_DISABLECOMPOSITION : DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
@@ -1719,10 +1719,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 
 	CComPtr<IDirect3D9Ex> pD3DEx;
 
-	if (m_pDirect3DCreate9Ex) {
-		m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &pD3DEx);
+	if (m_pfDirect3DCreate9Ex) {
+		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &pD3DEx);
 		if (!pD3DEx) {
-			m_pDirect3DCreate9Ex(D3D9b_SDK_VERSION, &pD3DEx);
+			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &pD3DEx);
 		}
 	}
 
@@ -1813,7 +1813,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	}
 	WindowRect = m_windowRect;
 
-	if (!m_pFont && m_pD3DXCreateFontW) {
+	if (!m_pFont && m_pfD3DXCreateFontW) {
 		int  FontHeight = std::max(m_windowRect.Height() / 35, 6); // must be equal to 5 or more
 		UINT FontWidth  = std::max(m_windowRect.Width() / 130, 4); // 0 = auto
 		UINT FontWeight = FW_BOLD;
@@ -1823,7 +1823,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		TextHeight = FontHeight;
 
-		m_pD3DXCreateFontW(m_pD3DDevEx,					// D3D device
+		m_pfD3DXCreateFontW(m_pD3DDevEx,					// D3D device
 						   FontHeight,					// Height
 						   FontWidth,					// Width
 						   FontWeight,					// Weight
@@ -1837,12 +1837,12 @@ void CDX9AllocatorPresenter::DrawStats()
 						   &m_pFont);					// ppFont
 	}
 
-	if (!m_pSprite && m_pD3DXCreateSprite) {
-		m_pD3DXCreateSprite(m_pD3DDevEx, &m_pSprite);
+	if (!m_pSprite && m_pfD3DXCreateSprite) {
+		m_pfD3DXCreateSprite(m_pD3DDevEx, &m_pSprite);
 	}
 
-	if (!m_pLine && m_pD3DXCreateLine) {
-		m_pD3DXCreateLine(m_pD3DDevEx, &m_pLine);
+	if (!m_pLine && m_pfD3DXCreateLine) {
+		m_pfD3DXCreateLine(m_pD3DDevEx, &m_pLine);
 	}
 
 	if (m_pFont && m_pSprite) {

@@ -89,11 +89,11 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_llEstVBlankTime(0),
 	m_CurrentAdapter(0),
 	m_FocusThread(nullptr),
-	m_pfnDwmEnableComposition(nullptr),
-	m_pDirect3DCreate9Ex(nullptr),
-	m_pD3DXCreateLine(nullptr),
-	m_pD3DXCreateFontW(nullptr),
-	m_pD3DXCreateSprite(nullptr)
+	m_pfDirect3DCreate9Ex(nullptr),
+	m_pfDwmEnableComposition(nullptr),
+	m_pfD3DXCreateLine(nullptr),
+	m_pfD3DXCreateFontW(nullptr),
+	m_pfD3DXCreateSprite(nullptr)
 {
 	DLog(L"CBaseAP::CBaseAP()");
 
@@ -104,24 +104,24 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 
 	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
-		(FARPROC &)m_pD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
-		(FARPROC &)m_pD3DXCreateFontW = GetProcAddress(hDll, "D3DXCreateFontW");
-		(FARPROC &)m_pD3DXCreateSprite = GetProcAddress(hDll, "D3DXCreateSprite");
+		(FARPROC&)m_pfD3DXCreateLine   = GetProcAddress(hDll, "D3DXCreateLine");
+		(FARPROC&)m_pfD3DXCreateFontW  = GetProcAddress(hDll, "D3DXCreateFontW");
+		(FARPROC&)m_pfD3DXCreateSprite = GetProcAddress(hDll, "D3DXCreateSprite");
 	} else {
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
 	}
 
-	(FARPROC &)m_pfnDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
+	(FARPROC&)m_pfDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
 
 	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
-		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
+		(FARPROC&)m_pfDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
 	}
 
-	if (m_pDirect3DCreate9Ex) {
-		m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
+	if (m_pfDirect3DCreate9Ex) {
+		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
 		if (!m_pD3DEx) {
-			m_pDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
+			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
 		}
 	}
 
@@ -138,8 +138,8 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CRenderersSettings& rs = GetRenderersSettings();
 	if (rs.bDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
-		if (m_pfnDwmEnableComposition) {
-			m_pfnDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+		if (m_pfDwmEnableComposition) {
+			m_pfDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
 	} else {
 		m_bDesktopCompositionDisabled = false;
@@ -179,8 +179,8 @@ CBaseAP::~CBaseAP()
 
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
-		if (m_pfnDwmEnableComposition) {
-			m_pfnDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+		if (m_pfDwmEnableComposition) {
+			m_pfDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
@@ -327,15 +327,15 @@ bool CBaseAP::SettingsNeedResetDevice()
 		if (Current.bDisableDesktopComposition) {
 			if (!m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = true;
-				if (m_pfnDwmEnableComposition) {
-					m_pfnDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+				if (m_pfDwmEnableComposition) {
+					m_pfDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 				}
 			}
 		} else {
 			if (m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = false;
-				if (m_pfnDwmEnableComposition) {
-					m_pfnDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+				if (m_pfDwmEnableComposition) {
+					m_pfDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 				}
 			}
 		}
@@ -588,19 +588,19 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pSubPicQueue->SetSubPicProvider(pSubPicProvider);
 	}
 
-	if (m_pD3DXCreateFontW) {
+	if (m_pfD3DXCreateFontW) {
 		const long MinSize = 1600;
 		int CurrentSize = std::min(m_ScreenSize.cx, MinSize);
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
-		m_pD3DXCreateFontW(m_pD3DDevEx, 24.0 * Scale, 11.0 * Scale, CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
+		m_pfD3DXCreateFontW(m_pD3DDevEx, 24.0 * Scale, 11.0 * Scale, CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
 						   DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
 	}
-	if (m_pD3DXCreateSprite) {
-		m_pD3DXCreateSprite(m_pD3DDevEx, &m_pSprite);
+	if (m_pfD3DXCreateSprite) {
+		m_pfD3DXCreateSprite(m_pD3DDevEx, &m_pSprite);
 	}
-	if (m_pD3DXCreateLine) {
-		m_pD3DXCreateLine (m_pD3DDevEx, &m_pLine);
+	if (m_pfD3DXCreateLine) {
+		m_pfD3DXCreateLine (m_pD3DDevEx, &m_pLine);
 	}
 	m_LastAdapterCheck = GetPerfCounter();
 	return S_OK;

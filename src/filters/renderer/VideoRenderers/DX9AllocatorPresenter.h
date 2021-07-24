@@ -60,10 +60,10 @@ namespace DSObjects
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
 		// This function is deprecated as of Windows 8
-		HRESULT (__stdcall * m_pfnDwmEnableComposition)(UINT uCompositionAction);
+		HRESULT (__stdcall * m_pfDwmEnableComposition)(UINT uCompositionAction);
 
 		HMODULE m_hD3D9;
-		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
+		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 
 		CCritSec m_RenderLock;
 
@@ -109,11 +109,11 @@ namespace DSObjects
 
 		long					m_nTearingPos;
 
-		HRESULT (__stdcall *m_pD3DXCreateLine)(
+		HRESULT (__stdcall *m_pfD3DXCreateLine)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXLINE        *ppLine
 		);
-		HRESULT (__stdcall *m_pD3DXCreateFontW)(
+		HRESULT (__stdcall *m_pfD3DXCreateFontW)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_In_  INT               Height,
 			_In_  UINT              Width,
@@ -127,7 +127,7 @@ namespace DSObjects
 			_In_  LPCWSTR           pFacename,
 			_Out_ LPD3DXFONT        *ppFont
 		);
-		HRESULT (__stdcall *m_pD3DXCreateSprite)(
+		HRESULT (__stdcall *m_pfD3DXCreateSprite)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXSPRITE      *ppSprite
 		);
