@@ -3726,20 +3726,25 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(LPDIRECT3DSURFACE9* ppDecoderRend
 {
 	DLog(L"CMPCVideoDecFilter::CreateDXVA2Decoder()");
 
-	HRESULT                       hr;
+	SAFE_DELETE(m_pDXVADecoder);
 	CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
 
-	SAFE_DELETE(m_pDXVADecoder);
-
-	hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config,
-											   ppDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
+	HRESULT hr = m_pDecoderService->CreateVideoDecoder(
+		m_DXVADecoderGUID,
+		&m_VideoDesc,
+		&m_DXVA2Config,
+		ppDecoderRenderTargets,
+		nNumRenderTargets,
+		&pDirectXVideoDec
+	);
 
 	if (SUCCEEDED(hr)) {
 		m_pDXVADecoder = DNew CDXVA2Decoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, &m_DXVA2Config, ppDecoderRenderTargets, nNumRenderTargets);
+		DLog(L"DXVA2 decoder successfully created %s", HR2Str(hr));
 	}
-
-	if (FAILED(hr)) {
+	else {
 		CleanupDXVAVariables();
+		DLog(L"DXVA2 decoder creation failed with error %s", HR2Str(hr));
 	}
 
 	return hr;

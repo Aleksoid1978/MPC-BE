@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -186,7 +186,6 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_ppRTSurfaceArray, m_lCount);
 		if (FAILED(hr)) {
-			DLog(L"CVideoDecDXVAAllocator::Alloc() : CMPCVideoDecFilter::CreateDXVA2Decoder() - FAILED (0x%08x)", hr);
 			Free();
 		}
 	}
