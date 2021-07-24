@@ -42,7 +42,9 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 
 	mpahdr m_mpahdr;
 	aachdr m_aachdr;
-	__int64 m_startpos;
+
+	__int64 m_startpos = 0;
+	__int64 m_endpos   = 0;
 
 	__int64 m_procsize;
 	CRBMap<__int64, int> m_pos2fsize;
@@ -69,6 +71,12 @@ public:
 
 	__int64 GetStartPos() {
 		return m_startpos;
+	}
+	__int64 GetEndPos() {
+		return m_endpos;
+	}
+	__int64 GetRemaining() override {
+		return (m_endpos ? m_endpos : GetLength()) - GetPos();
 	}
 
 	bool Sync(int limit = DEF_SYNC_SIZE);

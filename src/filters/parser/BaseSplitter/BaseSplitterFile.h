@@ -72,7 +72,7 @@ public:
 	__int64 GetPos();
 	__int64 GetAvailable();
 	__int64 GetLength();
-	__int64 GetRemaining();
+	virtual __int64 GetRemaining();
 
 	virtual void Seek(__int64 pos);
 	void Skip(__int64 offset);

@@ -114,12 +114,10 @@ HRESULT CMpaSplitterFile::Init()
 
 	endpos = GetLength();
 	if (IsRandomAccess()) {
-		bool bID3TagPresent = false;
 		if (endpos > ID3v1_TAG_SIZE) {
 			Seek(endpos - ID3v1_TAG_SIZE);
 
 			if (BitRead(24) == 'TAG') {
-				bID3TagPresent = true;
 				endpos -= ID3v1_TAG_SIZE;
 
 				if (!m_pID3Tag) {
@@ -135,7 +133,7 @@ HRESULT CMpaSplitterFile::Init()
 			}
 		}
 
-		if (!bID3TagPresent && endpos > APE_TAG_FOOTER_BYTES) {
+		if (endpos > APE_TAG_FOOTER_BYTES) {
 			BYTE buf[APE_TAG_FOOTER_BYTES] = {};
 
 			Seek(endpos - APE_TAG_FOOTER_BYTES);
@@ -259,6 +257,7 @@ HRESULT CMpaSplitterFile::Init()
 	}
 
 	m_startpos = startpos;
+	m_endpos = endpos;
 	Seek(m_startpos);
 
 	if (m_mode == mode::mpa) {
@@ -329,7 +328,7 @@ bool CMpaSplitterFile::Sync(int limit/* = DEF_SYNC_SIZE*/)
 
 bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit/* = DEF_SYNC_SIZE*/, BOOL bExtraCheck/* = FALSE*/)
 {
-	__int64 endpos = std::min(GetLength(), GetPos() + limit);
+	__int64 endpos = std::min(m_endpos, GetPos() + limit);
 
 	if (m_mode == mode::mpa) {
 		while (GetPos() <= endpos - MPA_HEADER_SIZE) {
