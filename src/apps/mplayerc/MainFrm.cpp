@@ -18881,7 +18881,12 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 		r.OffsetRect(0, GetSystemMetrics(SM_CYMENU));
 	}
 
-	if (!AfxGetAppSettings().fUseWin7TaskBar || m_eMediaLoadState != MLS_LOADED || (m_bAudioOnly && !SysVersion::IsWin10orLater()) || m_bFullScreen || IsD3DFullScreenMode() || r.IsRectEmpty()) {
+	if (!AfxGetAppSettings().fUseWin7TaskBar
+			|| m_eMediaLoadState != MLS_LOADED
+			|| (m_bAudioOnly && !SysVersion::IsWin10orLater())
+			|| m_bFullScreen
+			|| IsD3DFullScreenMode()
+			|| r.IsRectEmpty()) {
 		return m_pTaskbarList->SetThumbnailClip(m_hWnd, nullptr);
 	}
 

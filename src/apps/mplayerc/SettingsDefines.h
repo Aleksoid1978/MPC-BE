@@ -217,6 +217,17 @@
 #define IDS_RS_RESTORERESAFTEREXIT			L"RestoreResAfterExit"
 #define IDS_RS_DISPLAYMODECHANGEDELAY		L"DisplayModeChangeDelay"
 
+// Playlist
+#define IDS_RS_SHUFFLEPLAYLISTITEMS			L"ShufflePlaylistItems"
+#define IDS_RS_REMEMBERPLAYLISTITEMS		L"RememberPlaylistItems"
+#define IDS_RS_HIDEPLAYLISTFULLSCREEN		L"HidePlaylistFullScreen"
+#define IDS_RS_SHOWPLAYLISTTOOLTIP			L"ShowPlaylistTooltip"
+#define IDS_RS_SHOWPLAYLISTSEARCHBAR		L"ShowPlaylistSearchBar"
+#define IDS_RS_PLAYLISTNEXTONERROR			L"PlaylistNextOnError"
+#define IDS_RS_PLAYLISTDETERMINEDURATION	L"PlaylistDetermineDuration"
+#define IDS_RS_PLAYLISTFONTPERCENT			L"PlaylistFontPercent"
+#define IDS_RS_PLAYLISTTABSSETTINGS			L"TabsSettings"
+
 #define IDS_RS_STEREO3D_MODE				L"Stereo3DMode"
 #define IDS_RS_STEREO3D_SWAPLEFTRIGHT		L"Stereo3DSwapLeftRight"
 #define IDS_RS_SHADERLIST					L"ShaderList"
@@ -273,13 +284,6 @@
 #define IDS_RS_LOGOEXT						L"LogoExt"
 #define IDS_RS_COMPMONDESKARDIFF			L"CompMonDeskARDiff"
 #define IDS_RS_HIDECDROMSSUBMENU			L"HideCDROMsSubMenu"
-#define IDS_RS_SHUFFLEPLAYLISTITEMS			L"ShufflePlaylistItems"
-#define IDS_RS_REMEMBERPLAYLISTITEMS		L"RememberPlaylistItems"
-#define IDS_RS_HIDEPLAYLISTFULLSCREEN		L"HidePlaylistFullScreen"
-#define IDS_RS_SHOWPLAYLISTTOOLTIP			L"ShowPlaylistTooltip"
-#define IDS_RS_SHOWPLAYLISTSEARCHBAR		L"ShowPlaylistSearchBar"
-#define IDS_RS_PLAYLISTNEXTONERROR			L"PlaylistNextOnError"
-#define IDS_RS_PLAYLISTDETERMINEDURATION	L"PlaylistDetermineDuration"
 #define IDS_RS_ONTOP						L"OnTop"
 #define IDS_RS_SNAPSHOTPATH					L"SnapShotPath"
 #define IDS_RS_PRIORITY						L"Priority"
@@ -321,7 +325,6 @@
 #define IDS_RS_SMARTSEEK_SIZE				L"SmartSeekSize"
 #define IDS_RS_CHAPTER_MARKER				L"ChapterMarker"
 #define IDS_RS_FILENAMEONSEEKBAR			L"FileNameOnSeekBar"
-#define IDS_RS_PLAYLISTFONTPERCENT			L"PlaylistFontPercent"
 
 #define IDS_RS_REMAINING_TIME				L"RemainingTime"
 
@@ -340,9 +343,6 @@
 #define IDS_RS_CONTEXTDIR					L"ShowContextDir"
 
 #define IDS_RS_PASTECLIPBOARDURL			L"PasteClipboardURL"
-
-#define IDS_RS_PLAYLISTTABSSETTINGS			L"TabsSettings"
-
 
 // Dialogs
 
