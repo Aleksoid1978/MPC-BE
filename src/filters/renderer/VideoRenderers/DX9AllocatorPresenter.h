@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,10 +59,9 @@ namespace DSObjects
 
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
-		HMODULE m_hDWMAPI;
-		HRESULT (__stdcall * m_pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
-		HRESULT (__stdcall * m_pDwmEnableComposition)(UINT uCompositionAction);
-		HRESULT (__stdcall * m_pDwmEnableMMCSS)(BOOL fEnableMMCSS);
+		// This function is deprecated as of Windows 8
+		HRESULT (__stdcall * m_pfnDwmEnableComposition)(UINT uCompositionAction);
+
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 

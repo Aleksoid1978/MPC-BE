@@ -1292,13 +1292,9 @@ public:
 	HRESULT		UpdateThumbarButton();
 	HRESULT		UpdateThumbnailClip();
 
-	HMODULE		m_hDWMAPI;
-	HRESULT		(__stdcall * m_DwmGetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __out_bcount(cbAttribute) PVOID pvAttribute, DWORD cbAttribute);
-	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in_bcount(cbAttribute) LPCVOID pvAttribute, DWORD cbAttribute);
-	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)(HWND hwnd, HBITMAP hbmp, DWORD dwSITFlags);
-	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt POINT *pptClient, DWORD dwSITFlags);
-	HRESULT		(__stdcall * m_DwmInvalidateIconicBitmapsFnc)(HWND hwnd);
-	HRESULT		(__stdcall * m_DwmIsCompositionEnabled)(__out BOOL* pfEnabled);
+	HRESULT		(__stdcall * m_pfnDwmSetIconicThumbnail)(HWND hwnd, HBITMAP hbmp, DWORD dwSITFlags);
+	HRESULT		(__stdcall * m_pfnDwmSetIconicLivePreviewBitmap)(HWND hwnd, HBITMAP hbmp, __in_opt POINT *pptClient, DWORD dwSITFlags);
+	HRESULT		(__stdcall * m_pfnDwmInvalidateIconicBitmaps)(HWND hwnd);
 	BOOL		m_bDesktopCompositionEnabled = TRUE;
 
 	HBITMAP		m_CaptureWndBitmap;
@@ -1307,12 +1303,12 @@ public:
 	void		CreateCaptureWindow();
 
 
-	HRESULT			SetAudioPicture(BOOL show = TRUE);
+	HRESULT		SetAudioPicture(BOOL show = TRUE);
 	CComPtr<IWICBitmap> m_pMainBitmap;
 	CComPtr<IWICBitmap> m_pMainBitmapSmall;
 
-	HBITMAP			m_ThumbCashedBitmap;
-	CSize			m_ThumbCashedSize;
+	HBITMAP		m_ThumbCashedBitmap;
+	CSize		m_ThumbCashedSize;
 
 	void		AddFavorite(bool bDisplayMessage = false, bool bShowDialog = true);
 

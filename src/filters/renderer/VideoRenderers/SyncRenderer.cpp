@@ -88,7 +88,12 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_dCycleDifference(1.0),
 	m_llEstVBlankTime(0),
 	m_CurrentAdapter(0),
-	m_FocusThread(nullptr)
+	m_FocusThread(nullptr),
+	m_pfnDwmEnableComposition(nullptr),
+	m_pDirect3DCreate9Ex(nullptr),
+	m_pD3DXCreateLine(nullptr),
+	m_pD3DXCreateFontW(nullptr),
+	m_pD3DXCreateSprite(nullptr)
 {
 	DLog(L"CBaseAP::CBaseAP()");
 
@@ -97,11 +102,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		return;
 	}
 
-	HINSTANCE hDll;
-	m_pD3DXCreateLine = nullptr;
-	m_pD3DXCreateFontW = nullptr;
-	m_pD3DXCreateSprite = nullptr;
-	hDll = GetD3X9Dll();
+	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
 		(FARPROC &)m_pD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 		(FARPROC &)m_pD3DXCreateFontW = GetProcAddress(hDll, "D3DXCreateFontW");
@@ -110,15 +111,8 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
 	}
 
-	m_pDwmIsCompositionEnabled = nullptr;
-	m_pDwmEnableComposition = nullptr;
-	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
-	if (m_hDWMAPI) {
-		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
-		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
-	}
+	(FARPROC &)m_pfnDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
 
-	m_pDirect3DCreate9Ex = nullptr;
 	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
 		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
@@ -144,8 +138,8 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CRenderersSettings& rs = GetRenderersSettings();
 	if (rs.bDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
-		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+		if (m_pfnDwmEnableComposition) {
+			m_pfnDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
 	} else {
 		m_bDesktopCompositionDisabled = false;
@@ -185,8 +179,8 @@ CBaseAP::~CBaseAP()
 
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
-		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+		if (m_pfnDwmEnableComposition) {
+			m_pfnDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
@@ -197,10 +191,6 @@ CBaseAP::~CBaseAP()
 	m_pD3DDevEx.Release();
 	m_pPSC.Free();
 	m_pD3DEx.Release();
-	if (m_hDWMAPI) {
-		FreeLibrary(m_hDWMAPI);
-		m_hDWMAPI = nullptr;
-	}
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
 		m_hD3D9 = nullptr;
@@ -337,15 +327,15 @@ bool CBaseAP::SettingsNeedResetDevice()
 		if (Current.bDisableDesktopComposition) {
 			if (!m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = true;
-				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+				if (m_pfnDwmEnableComposition) {
+					m_pfnDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 				}
 			}
 		} else {
 			if (m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = false;
-				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+				if (m_pfnDwmEnableComposition) {
+					m_pfnDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 				}
 			}
 		}
@@ -435,9 +425,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_pGenlock->SetDisplayResolution(d3ddm.Width, d3ddm.Height);
 
 	BOOL bCompositionEnabled = false;
-	if (m_pDwmIsCompositionEnabled) {
-		m_pDwmIsCompositionEnabled(&bCompositionEnabled);
-	}
+	DwmIsCompositionEnabled(&bCompositionEnabled);
+
 	m_bCompositionEnabled = bCompositionEnabled != 0;
 
 	CSize backBufferSize;
@@ -1569,9 +1558,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	}
 
 	BOOL bCompositionEnabled = false;
-	if (m_pDwmIsCompositionEnabled) {
-		m_pDwmIsCompositionEnabled(&bCompositionEnabled);
-	}
+	DwmIsCompositionEnabled(&bCompositionEnabled);
+
 	if ((bCompositionEnabled != 0) != m_bCompositionEnabled) {
 		if (m_bIsFullscreen) {
 			m_bCompositionEnabled = (bCompositionEnabled != 0);

@@ -613,19 +613,15 @@ CMainFrame::CMainFrame() :
 	m_flastnID(0),
 	m_bfirstPlay(false),
 	m_pBFmadVR(nullptr),
-	m_hDWMAPI(0),
 	m_hWtsLib(0),
 	m_CaptureWndBitmap(nullptr),
 	m_ThumbCashedBitmap(nullptr),
 	m_nSelSub2(-1),
 	m_hGraphThreadEventOpen(FALSE, TRUE),
 	m_hGraphThreadEventClose(FALSE, TRUE),
-	m_DwmGetWindowAttributeFnc(nullptr),
-	m_DwmSetWindowAttributeFnc(nullptr),
-	m_DwmSetIconicThumbnailFnc(nullptr),
-	m_DwmSetIconicLivePreviewBitmapFnc(nullptr),
-	m_DwmInvalidateIconicBitmapsFnc(nullptr),
-	m_DwmIsCompositionEnabled(nullptr),
+	m_pfnDwmSetIconicThumbnail(nullptr),
+	m_pfnDwmSetIconicLivePreviewBitmap(nullptr),
+	m_pfnDwmInvalidateIconicBitmaps(nullptr),
 	m_OSD(this),
 	m_wndView(this),
 	m_wndToolBar(this),
@@ -852,23 +848,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	s.strFSMonOnLaunch = s.strFullScreenMonitor;
 	GetCurDispMode(s.dmFSMonOnLaunch, s.strFSMonOnLaunch);
 
-	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
-	if (m_hDWMAPI) {
-		if (SysVersion::IsWin10orLater()) {
-			(FARPROC &)m_DwmGetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
-		} else {
-			(FARPROC &)m_DwmSetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
-			(FARPROC &)m_DwmSetIconicThumbnailFnc         = GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
-			(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc = GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
-			(FARPROC &)m_DwmInvalidateIconicBitmapsFnc    = GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
-		}
+	(FARPROC &)m_pfnDwmSetIconicThumbnail         = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmSetIconicThumbnail");
+	(FARPROC &)m_pfnDwmSetIconicLivePreviewBitmap = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmSetIconicLivePreviewBitmap");
+	(FARPROC &)m_pfnDwmInvalidateIconicBitmaps    = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmInvalidateIconicBitmaps");
 
-		if (!SysVersion::IsWin8orLater()) {
-			(FARPROC&)m_DwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
-			if (m_DwmIsCompositionEnabled) {
-				m_DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
-			}
-		}
+	if (!SysVersion::IsWin8orLater()) {
+		DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
 	}
 
 	bool ok = m_svgFlybar.Load(::GetProgramDir() + L"flybar.svg");
@@ -1031,10 +1016,6 @@ void CMainFrame::OnClose()
 
 	if (s.fullScreenModes.bEnabled && s.fRestoreResAfterExit) {
 		SetDispMode(s.dmFSMonOnLaunch, s.strFSMonOnLaunch, TRUE);
-	}
-
-	if (m_hDWMAPI) {
-		FreeLibrary(m_hDWMAPI);
 	}
 
 	m_pMainBitmap.Release();
@@ -2207,8 +2188,8 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnDwmCompositionChanged(WPARAM wParam, LPARAM lParam)
 {
-	if (m_DwmIsCompositionEnabled) {
-		m_DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
+	if (!SysVersion::IsWin8orLater()) {
+		DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
 	}
 
 	return 0;
@@ -2235,12 +2216,12 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 		ShowWindow(SW_HIDE);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE) {
-		if (IsSomethingLoaded() && m_bAudioOnly && m_DwmSetIconicLivePreviewBitmapFnc) {
+		if (IsSomethingLoaded() && m_bAudioOnly && m_pfnDwmSetIconicLivePreviewBitmap) {
 			isWindowMinimized = true;
 			CreateCaptureWindow();
 		}
 	} else if ((nID & 0xFFF0) == SC_RESTORE) {
-		if (m_bAudioOnly && m_DwmSetIconicLivePreviewBitmapFnc) {
+		if (m_bAudioOnly && m_pfnDwmSetIconicLivePreviewBitmap) {
 			isWindowMinimized = false;
 			if (m_CaptureWndBitmap) {
 				DeleteObject(m_CaptureWndBitmap);
@@ -2579,8 +2560,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					m_wndSubresyncBar.SetFPS(m_pCAP->GetFPS());
 				}
 
-				if (m_DwmInvalidateIconicBitmapsFnc) {
-					m_DwmInvalidateIconicBitmapsFnc(m_hWnd);
+				if (m_pfnDwmInvalidateIconicBitmaps) {
+					m_pfnDwmInvalidateIconicBitmaps(m_hWnd);
 				}
 			}
 			break;
@@ -11540,7 +11521,7 @@ CRect CMainFrame::GetInvisibleBorderSize() const
 {
 	CRect invisibleBorders;
 	if (SysVersion::IsWin10orLater()
-			&& m_DwmGetWindowAttributeFnc && SUCCEEDED(m_DwmGetWindowAttributeFnc(GetSafeHwnd(), DWMWA_EXTENDED_FRAME_BOUNDS, &invisibleBorders, sizeof(RECT)))) {
+			&& SUCCEEDED(DwmGetWindowAttribute(GetSafeHwnd(), DWMWA_EXTENDED_FRAME_BOUNDS, &invisibleBorders, sizeof(RECT)))) {
 		CRect windowRect;
 		GetWindowRect(&windowRect);
 
@@ -19381,11 +19362,11 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 	}
 	m_ThumbCashedSize.SetSize(0, 0);
 
-	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+	if (m_pfnDwmSetIconicThumbnail) {
 		// for customize an iconic thumbnail and a live preview in Windows 7/8
 		const BOOL set = s.fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded() && show;
-		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
-		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
+		DwmSetWindowAttribute(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
+		DwmSetWindowAttribute(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
 
 	m_pMainBitmap.Release();
@@ -19521,7 +19502,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 {
-	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_DwmSetIconicThumbnailFnc || !m_pMainBitmapSmall) {
+	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_pfnDwmSetIconicThumbnail || !m_pMainBitmapSmall) {
 		return 0;
 	}
 
@@ -19552,7 +19533,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 	}
 
 	if (m_ThumbCashedBitmap) {
-		hr = m_DwmSetIconicThumbnailFnc(m_hWnd, m_ThumbCashedBitmap, 0);
+		hr = m_pfnDwmSetIconicThumbnail(m_hWnd, m_ThumbCashedBitmap, 0);
 		if (SUCCEEDED(hr)) {
 			m_ThumbCashedSize.SetSize(nWidth, nHeight);
 		}
@@ -19567,7 +19548,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 {
-	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_DwmSetIconicLivePreviewBitmapFnc) {
+	if (!IsSomethingLoaded() || !m_bAudioOnly || !m_pfnDwmSetIconicLivePreviewBitmap) {
 		return 0;
 	}
 
@@ -19575,7 +19556,7 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 	HRESULT hr = E_FAIL;
 
 	if (isWindowMinimized && m_CaptureWndBitmap) {
-		hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, m_CaptureWndBitmap, nullptr, (style & WS_CAPTION || style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
+		hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, m_CaptureWndBitmap, nullptr, (style & WS_CAPTION || style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
 	} else {
 		CRect rectClient;
 		if (AfxGetAppSettings().iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
@@ -19586,7 +19567,7 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 
 		if (HBITMAP hBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height())) {
 			if (style & WS_CAPTION || style & WS_THICKFRAME) {
-				hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, nullptr, DWM_SIT_DISPLAYFRAME);
+				hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, hBitmap, nullptr, DWM_SIT_DISPLAYFRAME);
 			} else {
 				POINT offset = {};
 				if (style & WS_CAPTION) {
@@ -19597,7 +19578,7 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 					offset.y = (rectClient.top) - GetSystemMetrics(SM_CYSIZEFRAME);
 				}
 
-				hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, &offset, 0);
+				hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, hBitmap, &offset, 0);
 			}
 			::DeleteObject(hBitmap);
 		}

@@ -79,6 +79,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_nCurrentSubtitlesStream(0)
 	, m_bDisplayChanged(false)
 	, m_bResizingDevice(false)
+	, m_pfnDwmEnableComposition(nullptr)
+	, m_pDirect3DCreate9Ex(nullptr)
 {
 	DLog(L"CDX9AllocatorPresenter::CDX9AllocatorPresenter()");
 
@@ -96,17 +98,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
 	}
 
-	m_pDwmIsCompositionEnabled = nullptr;
-	m_pDwmEnableComposition = nullptr;
-	m_pDwmEnableMMCSS = nullptr;
-	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
-	if (m_hDWMAPI) {
-		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
-		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
-		(FARPROC &)m_pDwmEnableMMCSS = GetProcAddress(m_hDWMAPI, "DwmEnableMMCSS");
-	}
+	(FARPROC &)m_pfnDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
 
-	m_pDirect3DCreate9Ex = nullptr;
 	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
 		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
@@ -124,15 +117,11 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	if (m_pDwmEnableComposition) {
-		if (GetRenderersSettings().bDisableDesktopComposition) {
-			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-		}
+	if (GetRenderersSettings().bDisableDesktopComposition && m_pfnDwmEnableComposition) {
+		m_pfnDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 	}
 
-	if (m_pDwmEnableMMCSS) {
-		m_pDwmEnableMMCSS(TRUE);
-	}
+	DwmEnableMMCSS(TRUE);
 
 	WNDCLASSEXW wc = {};
 	wc.cbSize = sizeof(wc);
@@ -159,13 +148,11 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		D3DHook::UnHook();
 	}
 
-	if (m_pDwmEnableComposition && GetRenderersSettings().bDisableDesktopComposition) {
-		m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+	if (GetRenderersSettings().bDisableDesktopComposition && m_pfnDwmEnableComposition) {
+		m_pfnDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 	}
 
-	if (m_pDwmEnableMMCSS) {
-		m_pDwmEnableMMCSS(FALSE);
-	}
+	DwmEnableMMCSS(FALSE);
 
 	m_pFont.Release();
 	m_pSprite.Release();
@@ -177,10 +164,6 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	m_pD3DDevExRefresh.Release();
 	m_pD3DEx.Release();
 
-	if (m_hDWMAPI) {
-		FreeLibrary(m_hDWMAPI);
-		m_hDWMAPI = nullptr;
-	}
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
 		m_hD3D9 = nullptr;
@@ -418,9 +401,9 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 	bool bRet = false;
 
-	if (!m_bIsFullscreen && m_pDwmEnableComposition) {
+	if (!m_bIsFullscreen && m_pfnDwmEnableComposition) {
 		if (New.bDisableDesktopComposition != Current.bDisableDesktopComposition) {
-			m_pDwmEnableComposition(New.bDisableDesktopComposition ? DWM_EC_DISABLECOMPOSITION : DWM_EC_ENABLECOMPOSITION);
+			m_pfnDwmEnableComposition(New.bDisableDesktopComposition ? DWM_EC_DISABLECOMPOSITION : DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
@@ -623,9 +606,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	HRESULT hr = S_OK;
 
 	m_bCompositionEnabled = FALSE;
-	if (m_pDwmIsCompositionEnabled) {
-		m_pDwmIsCompositionEnabled(&m_bCompositionEnabled);
-	}
+	DwmIsCompositionEnabled(&m_bCompositionEnabled);
 
 	// detect FP 16-bit textures support
 	m_bFP16Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
@@ -1611,9 +1592,9 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			bResetDevice = true;
 		}
 
-		if (!bResetDevice && m_pDwmIsCompositionEnabled) {
+		if (!bResetDevice) {
 			BOOL bCompositionEnabled = FALSE;
-			m_pDwmIsCompositionEnabled(&bCompositionEnabled);
+			DwmIsCompositionEnabled(&bCompositionEnabled);
 
 			if (bCompositionEnabled != m_bCompositionEnabled) {
 				if (m_bIsFullscreen) {

@@ -22,3 +22,4 @@
 #include "stdafx.h"
 
 #pragma comment(lib, "psapi.lib")
+#pragma comment(lib, "dwmapi.lib")
