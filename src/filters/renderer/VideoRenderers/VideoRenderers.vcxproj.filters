@@ -12,12 +12,12 @@
     <Filter Include="Header Files\Include">
       <UniqueIdentifier>{1a873151-c074-4ff8-a37e-9b1e957193a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3DUtil">
+      <UniqueIdentifier>{d9e03646-85a6-4ad1-be52-b5d889578688}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AllocatorCommon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX9AllocatorPresenter.cpp">
@@ -80,12 +80,12 @@
     <ClCompile Include="MPCVRAllocatorPresenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D3DUtil\D3D9Font.cpp">
+      <Filter>D3DUtil</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3DFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DX9AllocatorPresenter.h">
@@ -162,6 +162,15 @@
     </ClInclude>
     <ClInclude Include="MPCVRAllocatorPresenter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DUtil\D3D9Font.h">
+      <Filter>D3DUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DUtil\D3DCommon.h">
+      <Filter>D3DUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DUtil\FontBitmap.h">
+      <Filter>D3DUtil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
