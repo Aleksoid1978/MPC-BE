@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -330,7 +330,8 @@ HRESULT WicCreateDibSecton(HBITMAP& hBitmap, BYTE** ppData, BITMAPINFO& bminfo, 
 		const UINT bitmapsize = width * height * 4;
 
 		bminfo = { sizeof(BITMAPINFOHEADER), (LONG)width, -(LONG)height, 1, 32, BI_RGB };
-		hBitmap = CreateDIBSection(nullptr, &bminfo, DIB_RGB_COLORS, (void**)ppData, 0, 0);
+		// the "hdc" parameter is not needed for DIB_RGB_COLORS
+		hBitmap = CreateDIBSection(nullptr, &bminfo, DIB_RGB_COLORS, (void**)ppData, nullptr, 0);
 		if (!hBitmap) {
 			return E_FAIL;
 		}
