@@ -106,9 +106,9 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
-3		"History (experimental)"
-7		"Delete selected"
-8		"Clear"
+3		"Geschiedenis (experimenteel)"
+7		"Verwijder aangevinkt"
+8		"Leegmaken"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1871,7 +1871,7 @@ STRING IDS_SHADER_EDITOR		"Shader Editor"
 STRING IDS_SHADER_FOLDER		"Map van shader(s) openen"
 STRING IDS_SHADER_NEW		"Nieuw..."
 STRING IDS_SHADER_SAVE		"Opslaan"
-STRING IDS_SHOW_HISTORY		"Show history"
+STRING IDS_SHOW_HISTORY		"Geschiedenis weergeven"
 STRING IDS_SIDE_LEFT		"Zijkant Links"
 STRING IDS_SIDE_RIGHT		"Zijkant Rechts"
 STRING IDS_SIZE_UNIT_G		"GB"
