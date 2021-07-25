@@ -848,9 +848,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	s.strFSMonOnLaunch = s.strFullScreenMonitor;
 	GetCurDispMode(s.dmFSMonOnLaunch, s.strFSMonOnLaunch);
 
-	(FARPROC &)m_pfnDwmSetIconicThumbnail         = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmSetIconicThumbnail");
-	(FARPROC &)m_pfnDwmSetIconicLivePreviewBitmap = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmSetIconicLivePreviewBitmap");
-	(FARPROC &)m_pfnDwmInvalidateIconicBitmaps    = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmInvalidateIconicBitmaps");
+	if (!SysVersion::IsWin10orLater()) {
+		// do not use these functions for Windows 10 due to some problems
+		(FARPROC &)m_pfnDwmSetIconicThumbnail         = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmSetIconicThumbnail");
+		(FARPROC &)m_pfnDwmSetIconicLivePreviewBitmap = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmSetIconicLivePreviewBitmap");
+		(FARPROC &)m_pfnDwmInvalidateIconicBitmaps    = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmInvalidateIconicBitmaps");
+	}
 
 	if (!SysVersion::IsWin8orLater()) {
 		DwmIsCompositionEnabled(&m_bDesktopCompositionEnabled);
@@ -19363,7 +19366,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 	m_ThumbCashedSize.SetSize(0, 0);
 
 	if (m_pfnDwmSetIconicThumbnail) {
-		// for customize an iconic thumbnail and a live preview in Windows 7/8
+		// for customize an iconic thumbnail and a live preview in Windows 7/8/8.1
 		const BOOL set = s.fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded() && show;
 		DwmSetWindowAttribute(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		DwmSetWindowAttribute(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
