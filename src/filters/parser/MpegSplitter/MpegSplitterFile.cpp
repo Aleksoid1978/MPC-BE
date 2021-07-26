@@ -1134,6 +1134,18 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					}
 				}
 
+				// AAC
+				if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
+					Seek(start);
+					aachdr h;
+					if (Read(h, len, &s.mt)) {
+						m_aacValid[s].Handle(h);
+						if (m_aacValid[s].IsValid()) {
+							type = stream_type::audio;
+						}
+					}
+				}
+
 				// AC3, E-AC3, TrueHD
 				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 					Seek(start);
