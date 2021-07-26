@@ -214,16 +214,16 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DSUtil\DSUtil.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\Filters.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\filters\filters\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\AsyncReader\AsyncReader.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\AsyncReader\AsyncReader.vcxproj">
       <Project>{9f31d122-e84d-485a-a58d-09dad01a56ce}</Project>
     </ProjectReference>
   </ItemGroup>

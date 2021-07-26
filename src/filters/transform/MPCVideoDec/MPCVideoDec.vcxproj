@@ -275,28 +275,28 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DSUtil\DSUtil.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\openjpeg\openjpeg.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\soxr\soxr.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\soxr\soxr.vcxproj">
       <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\zlib\zlib.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\zlib\zlib.vcxproj">
       <Project>{2fcd4b66-9cf9-4c8f-bc70-37cd20002d49}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\Filters.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\filters\filters\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\BaseVideoFilter\BaseVideoFilter.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\filters\transform\BaseVideoFilter\BaseVideoFilter.vcxproj">
       <Project>{54dda60f-e528-4d07-a152-960a1e818680}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\ffmpeg\ffmpeg.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
   </ItemGroup>

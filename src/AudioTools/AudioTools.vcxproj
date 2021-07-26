@@ -62,7 +62,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExtLib\soxr\soxr.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\soxr\soxr.vcxproj">
       <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
     </ProjectReference>
   </ItemGroup>
