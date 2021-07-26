@@ -26,6 +26,7 @@
 #include "SyncAllocatorPresenter.h"
 #include "AllocatorCommon.h"
 #include <dxva2api.h>
+#include "D3DUtil/D3D9Font.h"
 
 #define MFVBITMAP_DISABLE 0x40000000 // TODO remake without it
 #define MFVBITMAP_UPDATE  0x80000000
@@ -156,8 +157,8 @@ namespace GothSync
 		CComPtr<IDirect3DTexture9>	m_pScreenSizeTextures[2];
 		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
 		CComPtr<ID3DXLine>			m_pLine;
-		CComPtr<ID3DXFont>			m_pFont;
-		CComPtr<ID3DXSprite>		m_pSprite;
+
+		CD3D9Font m_Font3D;
 
 		// Shaders
 		LPCSTR m_ShaderProfile;
@@ -180,7 +181,6 @@ namespace GothSync
 		// Functions to trace timing performance
 		void SyncStats(LONGLONG syncTime);
 		void SyncOffsetStats(LONGLONG syncOffset);
-		void DrawText(const RECT &rc, const CString &strText, int _Priority);
 		void DrawStats();
 
 		template<unsigned texcoords>
@@ -203,24 +203,6 @@ namespace GothSync
 		HRESULT (__stdcall *m_pfD3DXCreateLine)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXLINE        *ppLine
-		);
-		HRESULT (__stdcall *m_pfD3DXCreateFontW)(
-			_In_  LPDIRECT3DDEVICE9 pDevice,
-			_In_  INT               Height,
-			_In_  UINT              Width,
-			_In_  UINT              Weight,
-			_In_  UINT              MipLevels,
-			_In_  BOOL              Italic,
-			_In_  DWORD             CharSet,
-			_In_  DWORD             OutputPrecision,
-			_In_  DWORD             Quality,
-			_In_  DWORD             PitchAndFamily,
-			_In_  LPCWSTR           pFacename,
-			_Out_ LPD3DXFONT        *ppFont
-		);
-		HRESULT (__stdcall *m_pfD3DXCreateSprite)(
-			_In_  LPDIRECT3DDEVICE9 pDevice,
-			_Out_ LPD3DXSPRITE      *ppSprite
 		);
 
 		long m_nTearingPos;
