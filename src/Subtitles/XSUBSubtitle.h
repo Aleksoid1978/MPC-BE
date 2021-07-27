@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "../SubPic/SubPicProviderImpl.h"
+#include "SubPic/SubPicProviderImpl.h"
 #include "CompositionObject.h"
 
 class __declspec(uuid("86551353-62BE-4513-B14D-B5882A73823E"))

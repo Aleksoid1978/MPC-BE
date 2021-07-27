@@ -29,8 +29,8 @@
 #include <mfapi.h>
 #include <Mferror.h>
 #include <cmath>
-#include "../../../SubPic/DX9SubPic.h"
-#include "../../../SubPic/SubPicQueueImpl.h"
+#include "SubPic/DX9SubPic.h"
+#include "SubPic/SubPicQueueImpl.h"
 #include <clsids.h>
 #include "MacrovisionKicker.h"
 #include "IPinHook.h"
@@ -39,9 +39,9 @@
 #include "FocusThread.h"
 #include "Variables.h"
 #include "Utils.h"
-#include "../DSUtil/D3D9Helper.h"
-#include "../DSUtil/DXVAState.h"
-#include "../../../apps/mplayerc/resource.h"
+#include "DSUtil/D3D9Helper.h"
+#include "DSUtil/DXVAState.h"
+#include "apps/mplayerc/resource.h"
 
 using namespace GothSync;
 using namespace D3D9Helper;

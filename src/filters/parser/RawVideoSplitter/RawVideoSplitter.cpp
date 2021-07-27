@@ -22,7 +22,7 @@
 #include <MMReg.h>
 #include <moreuuids.h>
 #include "RawVideoSplitter.h"
-#include "../../../DSUtil/BitsWriter.h"
+#include "DSUtil/BitsWriter.h"
 
 #ifdef REGISTER_FILTER
 
@@ -73,7 +73,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

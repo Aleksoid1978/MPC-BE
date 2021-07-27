@@ -24,13 +24,13 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-#include "ffmpeg/libavcodec/avcodec.h"
+#include "ExtLib/ffmpeg/libavcodec/avcodec.h"
 }
 #pragma warning(pop)
 
-#include "../../../DSUtil/ffmpeg_log.h"
+#include "DSUtil/ffmpeg_log.h"
 
-#include "../../Lock.h"
+#include "filters/Lock.h"
 
 // CFFAudioEncoder
 

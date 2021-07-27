@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,9 @@
 #include <clsids.h>
 #include "MainFrm.h"
 #include "SaveDlg.h"
-#include "../../DSUtil/FileHandle.h"
-#include "../../DSUtil/UrlParser.h"
-#include "../../filters/filters.h"
+#include "DSUtil/FileHandle.h"
+#include "DSUtil/UrlParser.h"
+#include "filters/filters.h"
 
 static unsigned int AdaptUnit(double& val, size_t unitsNb)
 {

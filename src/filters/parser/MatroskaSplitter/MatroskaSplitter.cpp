@@ -23,12 +23,12 @@
 #include <MMReg.h>
 #include "MatroskaSplitter.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/MP4AudioDecoderConfig.h"
-#include "../../../DSUtil/VideoParser.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/std_helper.h"
-#include "../../../DSUtil/BitsWriter.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/MP4AudioDecoderConfig.h"
+#include "DSUtil/VideoParser.h"
+#include "DSUtil/GolombBuffer.h"
+#include "DSUtil/std_helper.h"
+#include "DSUtil/BitsWriter.h"
 #include <IMediaSideData.h>
 
 #include <moreuuids.h>
@@ -85,13 +85,13 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

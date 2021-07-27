@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2020 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,4 +29,4 @@
 #include <vector>
 #include <list>
 
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"

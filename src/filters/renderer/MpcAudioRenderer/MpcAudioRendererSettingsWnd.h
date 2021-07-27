@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2020 see Authors.txt
+ * (C) 2010-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "../../filters/InternalPropertyPage.h"
+#include "filters/filters/InternalPropertyPage.h"
 #include "AudioDevice.h"
 #include "IMpcAudioRenderer.h"
 #include "resource.h"

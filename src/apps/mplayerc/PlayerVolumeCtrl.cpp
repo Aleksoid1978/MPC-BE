@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "../../DSUtil/FileHandle.h"
+#include "DSUtil/FileHandle.h"
 #include "WicUtils.h"
 #include "PlayerVolumeCtrl.h"
 

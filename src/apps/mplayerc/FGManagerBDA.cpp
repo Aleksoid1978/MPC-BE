@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,19 +21,19 @@
 #include "stdafx.h"
 #include <ks.h>
 #include <ksmedia.h>
-#include <BaseClasses/streams.h>
+#include <ExtLib/BaseClasses/streams.h>
 #include <mpeg2data.h>
 #include <tuner.h>
 #include <dvbsiparser.h>
-#include "../../DSUtil/GolombBuffer.h"
-#include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
+#include "DSUtil/GolombBuffer.h"
+#include "filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include <moreuuids.h>
 #include <basestruct.h>
 #include "FGManagerBDA.h"
 #include "DVBChannel.h"
 #include "Mpeg2SectionData.h"
 #include "MainFrm.h"
-#include "../../DSUtil/SysVersion.h"
+#include "DSUtil/SysVersion.h"
 
 #define CheckAndLogBDA(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg _T(": 0x%08x\n"), hr); return hr; }
 #define CheckAndLogBDANoRet(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg _T(": 0x%08x\n"), hr); }

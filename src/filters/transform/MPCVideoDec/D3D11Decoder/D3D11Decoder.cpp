@@ -22,8 +22,8 @@
 #include "stdafx.h"
 
 #include <moreuuids.h>
-#include "../../../../DSUtil/DSUtil.h"
-#include "../../../../DSUtil/DXVAState.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/DXVAState.h"
 #include "D3D11Decoder.h"
 #include "../MPCVideoDec.h"
 
@@ -31,11 +31,11 @@
 #pragma warning(disable: 4005)
 extern "C"
 {
-	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libavutil/opt.h>
-	#include <ffmpeg/libavutil/pixdesc.h>
-	#include <ffmpeg/libavutil/hwcontext_d3d11va.h>
-	#include <ffmpeg/libavcodec/d3d11va.h>
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libavutil/opt.h>
+	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
+	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d11va.h>
+	#include <ExtLib/ffmpeg/libavcodec/d3d11va.h>
 }
 #pragma warning(pop)
 

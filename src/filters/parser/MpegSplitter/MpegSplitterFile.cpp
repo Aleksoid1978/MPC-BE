@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,8 +24,8 @@
 #include <moreuuids.h>
 #include "MpegSplitterFile.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/MP4AudioDecoderConfig.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/MP4AudioDecoderConfig.h"
 
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)

@@ -26,17 +26,17 @@
 #include "FfmpegContext.h"
 #include "./D3D11Decoder/D3D11Decoder.h"
 
-#include "../../../DSUtil/CPUInfo.h"
-#include "../../../DSUtil/D3D9Helper.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/ffmpeg_log.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/SysVersion.h"
-#include "../../../DSUtil/DXVAState.h"
-#include "../../parser/AviSplitter/AviSplitter.h"
-#include "../../parser/OggSplitter/OggSplitter.h"
-#include "../../parser/MpegSplitter/MpegSplitter.h"
-#include "../../Lock.h"
+#include "DSUtil/CPUInfo.h"
+#include "DSUtil/D3D9Helper.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/ffmpeg_log.h"
+#include "DSUtil/GolombBuffer.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/DXVAState.h"
+#include "filters/parser/AviSplitter/AviSplitter.h"
+#include "filters/parser/OggSplitter/OggSplitter.h"
+#include "filters/parser/MpegSplitter/MpegSplitter.h"
+#include "filters/Lock.h"
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
 
@@ -46,13 +46,13 @@
 #pragma warning(disable: 4005)
 #pragma warning(disable: 5033)
 extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libavcodec/dxva2.h>
-	#include <ffmpeg/libavutil/intreadwrite.h>
-	#include <ffmpeg/libavutil/imgutils.h>
-	#include <ffmpeg/libavutil/mastering_display_metadata.h>
-	#include <ffmpeg/libavutil/opt.h>
-	#include <ffmpeg/libavutil/pixdesc.h>
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libavcodec/dxva2.h>
+	#include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
+	#include <ExtLib/ffmpeg/libavutil/imgutils.h>
+	#include <ExtLib/ffmpeg/libavutil/mastering_display_metadata.h>
+	#include <ExtLib/ffmpeg/libavutil/opt.h>
+	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 
@@ -990,13 +990,13 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

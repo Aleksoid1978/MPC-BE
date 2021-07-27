@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 #pragma once
 
 #include "AllocatorCommon.h"
-#include "../SubPic/SubPicAllocatorPresenterImpl.h"
-#include "../SubPic/ISubRender.h"
+#include "SubPic/SubPicAllocatorPresenterImpl.h"
+#include "SubPic/ISubRender.h"
 
 namespace DSObjects
 {

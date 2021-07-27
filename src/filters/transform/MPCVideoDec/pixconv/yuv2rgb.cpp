@@ -30,7 +30,7 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-    #include <ffmpeg/libavutil/pixfmt.h>
+    #include <ExtLib/ffmpeg/libavutil/pixfmt.h>
 }
 #pragma warning(pop)
 

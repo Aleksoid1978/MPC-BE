@@ -27,7 +27,7 @@
 #pragma warning(disable: 5033) // warning C5033: 'register' is no longer a supported storage class
 extern "C" {
 	#define AVCODEC_X86_MATHOPS_H
-	#include <ffmpeg/libavcodec/get_bits.h>
+	#include <ExtLib/ffmpeg/libavcodec/get_bits.h>
 };
 #pragma warning(pop)
 

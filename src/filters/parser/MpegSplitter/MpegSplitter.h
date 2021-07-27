@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "MpegSplitterFile.h"
 #include "MpegSplitterSettingsWnd.h"
-#include "../../../DSUtil/AudioParser.h"
+#include "DSUtil/AudioParser.h"
 #include <ITrackInfo.h>
 #include <deque>
 

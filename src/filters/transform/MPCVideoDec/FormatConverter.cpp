@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,17 +21,17 @@
 #include "stdafx.h"
 #include <moreuuids.h>
 #include "FormatConverter.h"
-#include "../../../DSUtil/CPUInfo.h"
-#include "../../../DSUtil/Utils.h"
+#include "DSUtil/CPUInfo.h"
+#include "DSUtil/Utils.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
 #pragma warning(disable: 5033)
 extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libswscale/swscale.h>
-	#include <ffmpeg/libswscale/swscale_internal.h>
-	#include <ffmpeg/libavutil/pixdesc.h>
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libswscale/swscale.h>
+	#include <ExtLib/ffmpeg/libswscale/swscale_internal.h>
+	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 

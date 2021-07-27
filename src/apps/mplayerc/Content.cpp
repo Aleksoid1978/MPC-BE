@@ -21,9 +21,9 @@
 #include "stdafx.h"
 #include <atlutil.h>
 #include "Content.h"
-#include "../../DSUtil/FileHandle.h"
-#include "../../DSUtil/HTTPAsync.h"
-#include "../../DSUtil/UrlParser.h"
+#include "DSUtil/FileHandle.h"
+#include "DSUtil/HTTPAsync.h"
+#include "DSUtil/UrlParser.h"
 
 static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 {

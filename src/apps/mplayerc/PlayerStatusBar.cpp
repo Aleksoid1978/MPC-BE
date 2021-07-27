@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "./Controls/MenuEx.h"
-#include "../../DSUtil/SysVersion.h"
+#include "DSUtil/SysVersion.h"
 #include "PlayerStatusBar.h"
 
 // CPlayerStatusBar

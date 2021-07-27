@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "PPageInternalFilters.h"
 #include "ComPropertySheet.h"
-#include "../../filters/filters.h"
+#include "filters/filters.h"
 
 
 static filter_t s_source_filters[] = {

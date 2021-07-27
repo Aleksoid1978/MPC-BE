@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "SubtitleSource.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 #include <moreuuids.h>
 #include <basestruct.h>
 
@@ -110,7 +110,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 class CSubtitleSourceApp : public CFilterApp
 {

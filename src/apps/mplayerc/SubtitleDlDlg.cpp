@@ -23,7 +23,7 @@
 #include <afxwin.h>
 #include "SubtitleDlDlg.h"
 #include "MainFrm.h"
-#include "../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 #define UWM_PARSE	(WM_USER + 100)
 #define UWM_FAILED	(WM_USER + 101)

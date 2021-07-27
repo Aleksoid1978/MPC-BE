@@ -25,18 +25,18 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libavutil/intreadwrite.h>
-	#include <ffmpeg/libavutil/opt.h>
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
+	#include <ExtLib/ffmpeg/libavutil/opt.h>
 }
 #pragma warning(pop)
 
 #include <moreuuids.h>
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/ffmpeg_log.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../Lock.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/ffmpeg_log.h"
+#include "DSUtil/GolombBuffer.h"
+#include "filters/Lock.h"
 
 static const struct {
 	const CLSID* clsMinorType;

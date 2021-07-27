@@ -25,12 +25,12 @@
 #include <utility>
 #include <clsids.h>
 #include <LAVVideoSettings.h>
-#include "../../../SubPic/DX9SubPic.h"
-#include "../../../SubPic/SubPicQueueImpl.h"
+#include "SubPic/DX9SubPic.h"
+#include "SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
-#include "../DSUtil/SysVersion.h"
-#include "../DSUtil/WinAPIUtils.h"
-#include "../DSUtil/DXVAState.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/DXVAState.h"
 #include "IDirectVobSub.h"
 #include "FocusThread.h"
 #include "D3DHook.h"

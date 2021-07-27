@@ -23,10 +23,10 @@
 #include <atlutil.h>
 #include "MainFrm.h"
 #include "Misc.h"
-#include "../../Subtitles/TextFile.h"
+#include "Subtitles/TextFile.h"
 #include "WebClient.h"
 #include "DIB.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "DSUtil/WinAPIUtils.h"
 
 CWebClientSocket::CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame)
 	: m_pWebServer(pWebServer)

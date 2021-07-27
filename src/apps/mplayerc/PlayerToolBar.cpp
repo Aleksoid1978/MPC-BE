@@ -21,8 +21,8 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "../../DSUtil/DXVAState.h"
-#include "../../DSUtil/FileHandle.h"
+#include "DSUtil/DXVAState.h"
+#include "DSUtil/FileHandle.h"
 #include "WicUtils.h"
 #include "PlayerToolBar.h"
 

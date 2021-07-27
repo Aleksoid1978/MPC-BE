@@ -20,8 +20,8 @@
  */
 
 #pragma once
-#include "../../../SubPic/ISubPic.h"
-#include "../../../SubPic/SubPicAllocatorPresenterImpl.h"
+#include "SubPic/ISubPic.h"
+#include "SubPic/SubPicAllocatorPresenterImpl.h"
 #include "RenderersSettings.h"
 #include "SyncAllocatorPresenter.h"
 #include "AllocatorCommon.h"

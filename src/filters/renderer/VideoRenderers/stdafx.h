@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 
 #include <afxdisp.h>
 #include <afxole.h>
-#include <BaseClasses/streams.h>
+#include <ExtLib/BaseClasses/streams.h>
 #include <dvdmedia.h>
 
 #include <algorithm>
@@ -36,6 +36,6 @@
 #include <memory>
 
 #include <atlcoll.h>
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 #define CHECK_HR(exp) { if (FAILED(hr = exp)) return hr; }

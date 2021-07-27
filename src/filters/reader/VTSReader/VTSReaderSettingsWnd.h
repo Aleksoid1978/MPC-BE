@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "../../filters/InternalPropertyPage.h"
+#include "filters/filters/InternalPropertyPage.h"
 #include "IVTSReader.h"
 #include "resource.h"
 

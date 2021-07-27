@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,9 +23,9 @@
 #include <moreuuids.h>
 #include "BaseSplitterParserOutputPin.h"
 
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/H264Nalu.h"
-#include "../../../DSUtil/MediaDescription.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/H264Nalu.h"
+#include "DSUtil/MediaDescription.h"
 
 #define SEQ_START_CODE     0xB3010000
 #define PICTURE_START_CODE 0x00010000

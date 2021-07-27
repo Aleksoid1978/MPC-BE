@@ -21,9 +21,9 @@
 #include "stdafx.h"
 
 #define NANOSVG_IMPLEMENTATION
-#include "../../ExtLib/nanosvg/src/nanosvg.h"
+#include "ExtLib/nanosvg/src/nanosvg.h"
 #define NANOSVGRAST_IMPLEMENTATION
-#include "../../ExtLib/nanosvg/src/nanosvgrast.h"
+#include "ExtLib/nanosvg/src/nanosvgrast.h"
 
 #include "SvgHelper.h"
 #include "Misc.h"

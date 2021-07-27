@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2019 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "AudioSyncClock.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 CAudioSyncClock::CAudioSyncClock(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseReferenceClock(L"MPC Audio Sync Clock", pUnk, phr)

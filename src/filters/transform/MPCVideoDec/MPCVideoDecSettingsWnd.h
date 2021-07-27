@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "../../filters/InternalPropertyPage.h"
+#include "filters/filters/InternalPropertyPage.h"
 #include "IMPCVideoDec.h"
 #include "resource.h"
 

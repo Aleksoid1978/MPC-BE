@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,12 +21,12 @@
 
 #include "stdafx.h"
 #include <atlbase.h>
-#include <BaseClasses/streams.h>
+#include <ExtLib/BaseClasses/streams.h>
 #include <dvdmedia.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include "DeCSSFilter.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 #include "CSSauth.h"
 #include "CSSscramble.h"
 #include <moreuuids.h>
@@ -67,7 +67,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

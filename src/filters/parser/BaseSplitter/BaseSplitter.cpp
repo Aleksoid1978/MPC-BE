@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include <moreuuids.h>
-#include "../../../DSUtil/std_helper.h"
+#include "DSUtil/std_helper.h"
 #include "Version.h"
 #include "BaseSplitter.h"
 

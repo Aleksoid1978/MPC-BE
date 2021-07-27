@@ -21,8 +21,8 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "FullscreenWnd.h"
-#include "../../DSUtil/SysVersion.h"
-#include "../../DSUtil/FileHandle.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/FileHandle.h"
 #include "WicUtils.h"
 #include "OSD.h"
 

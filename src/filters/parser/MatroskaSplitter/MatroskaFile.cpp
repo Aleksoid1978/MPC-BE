@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "MatroskaFile.h"
-#include <zlib/zlib.h>
+#include <ExtLib/zlib/zlib.h>
 
 #define DOCTYPE        "matroska"
 #define DOCTYPE_WEBM   "webm"

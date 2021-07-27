@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../../filters/FilterInterfacesImpl.h"
+#include "filters/filters/FilterInterfacesImpl.h"
 
 #define RawVideoSplitterName	L"MPC RAW Video Splitter"
 #define RawVideoSourceName		L"MPC RAW Video Source"

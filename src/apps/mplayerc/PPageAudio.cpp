@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include "../../filters/renderer/MpcAudioRenderer/MpcAudioRenderer.h"
+#include "filters/renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "ComPropertySheet.h"
 #include "PPageAudio.h"
 

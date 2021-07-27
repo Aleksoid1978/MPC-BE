@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "DSMSplitterFile.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 #include <moreuuids.h>
 
 CDSMSplitterFile::CDSMSplitterFile(IAsyncReader* pReader, HRESULT& hr, IDSMResourceBagImpl& res, IDSMChapterBagImpl& chap)

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileMediaInfo.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "DSUtil/WinAPIUtils.h"
 
 static String mi_get_lang_file()
 {

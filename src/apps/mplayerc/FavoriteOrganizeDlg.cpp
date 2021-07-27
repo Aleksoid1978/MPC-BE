@@ -23,7 +23,7 @@
 #include "MainFrm.h"
 #include "ItemPropertiesDlg.h"
 #include "FavoriteOrganizeDlg.h"
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/std_helper.h"
 
 // CFavoriteOrganizeDlg dialog
 

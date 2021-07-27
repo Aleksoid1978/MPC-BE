@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "../SubPic/SubPicProviderImpl.h"
+#include "SubPic/SubPicProviderImpl.h"
 #include "HdmvSub.h"
 #include "BaseSub.h"
 

@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include <clsids.h>
 #include "MainFrm.h"
-#include "../../DSUtil/SysVersion.h"
+#include "DSUtil/SysVersion.h"
 #include "PPageSync.h"
 
 

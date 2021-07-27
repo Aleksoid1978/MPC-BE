@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 
 #include <map>
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../../../DSUtil/GolombBuffer.h"
+#include "DSUtil/GolombBuffer.h"
 
 #define NO_SUBTITLE_PID  WORD_MAX // Fake PID use for the "No subtitle" entry
 #define NO_SUBTITLE_NAME L"No subtitle"

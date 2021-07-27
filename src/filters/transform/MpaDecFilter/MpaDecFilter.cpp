@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,14 +28,14 @@
 
 #include "MpaDecFilter.h"
 #include "AudioHelper.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/SysVersion.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/SysVersion.h"
 #include "Version.h"
 #include <moreuuids.h>
 #include <basestruct.h>
 
-#include <ffmpeg/libavcodec/avcodec.h>
+#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
 #include "AudioDecoders.h"
 
 // option names
@@ -248,13 +248,13 @@ STDAPI DllUnregisterServer()
 
 //
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

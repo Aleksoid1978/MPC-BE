@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileInfoClip.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "DSUtil/WinAPIUtils.h"
 
 
 // CPPageFileInfoClip dialog

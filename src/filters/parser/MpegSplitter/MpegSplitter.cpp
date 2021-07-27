@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,8 +28,8 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 
-#include "../../reader/VTSReader/VTSReader.h"
-#include "../apps/mplayerc/SettingsDefines.h"
+#include "filters/reader/VTSReader/VTSReader.h"
+#include "apps/mplayerc/SettingsDefines.h"
 
 // option names
 #define OPT_REGKEY_MPEGSplit  L"Software\\MPC-BE Filters\\MPEG Splitter"
@@ -95,13 +95,13 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

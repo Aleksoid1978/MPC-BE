@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,8 +23,8 @@
 
 #include <atlcoll.h>
 #include "../BaseSplitter/BaseSplitterFileEx.h"
-#include "../../../DSUtil/ID3Tag.h"
-#include "../../../DSUtil/ApeTag.h"
+#include "DSUtil/ID3Tag.h"
+#include "DSUtil/ApeTag.h"
 
 #define DEF_SYNC_SIZE 8096
 

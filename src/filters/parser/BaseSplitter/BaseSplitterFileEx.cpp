@@ -22,9 +22,9 @@
 #include "stdafx.h"
 #include "BaseSplitterFileEx.h"
 #include <MMReg.h>
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/MP4AudioDecoderConfig.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/GolombBuffer.h"
+#include "DSUtil/MP4AudioDecoderConfig.h"
 #include <moreuuids.h>
 #include <basestruct.h>
 

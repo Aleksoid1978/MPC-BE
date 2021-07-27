@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2020 see Authors.txt
+ * (C) 2015-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "AudioDevice.h"
 #include <FunctionDiscoveryKeys_devpkey.h>
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 static BOOL CALLBACK DSEnumCallback(LPGUID lpGUID,
 	LPCTSTR lpszDesc,

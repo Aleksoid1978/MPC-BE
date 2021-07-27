@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,11 +24,11 @@
 #include "../MPCVideoDec.h"
 #include "DXVAAllocator.h"
 #include "../FfmpegContext.h"
-#include "../../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libavcodec/dxva2.h>
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libavcodec/dxva2.h>
 }
 
 CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config, LPDIRECT3DSURFACE9* ppD3DSurface, UINT numSurfaces)

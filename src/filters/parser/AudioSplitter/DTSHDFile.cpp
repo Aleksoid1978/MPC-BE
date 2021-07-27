@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include "../../../DSUtil/AudioParser.h"
+#include "DSUtil/AudioParser.h"
 #include "DTSHDFile.h"
 
 // ATSC A/103:2014 Non-Real-Time Content Delivery, Annex E: DTS-HD File Structure

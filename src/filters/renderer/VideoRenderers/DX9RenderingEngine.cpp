@@ -21,12 +21,12 @@
 #include "stdafx.h"
 #pragma warning(push)
 #pragma warning(disable: 5033) // warning C5033: 'register' is no longer a supported storage class
-#include <lcms2/include/lcms2.h>
+#include <ExtLib/lcms2/include/lcms2.h>
 #pragma warning(pop)
 #include <DirectXPackedVector.h>
 #include "Dither.h"
 #include "DX9RenderingEngine.h"
-#include "../../../apps/mplayerc/resource.h"
+#include "apps/mplayerc/resource.h"
 
 #define RELEASE_PTR_ARRAY(a) for (auto& item : a) { item.Release(); }
 

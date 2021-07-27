@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <libpng/png.h>
+#include <ExtLib/libpng/png.h>
 #include "WicUtils.h"
 
 static bool PNGDIB(LPCWSTR filename, BYTE* pData, int level)

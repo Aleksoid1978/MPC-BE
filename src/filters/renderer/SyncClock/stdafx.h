@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2020 see Authors.txt
+ * (C) 2009-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,5 +25,5 @@
 
 #include <afx.h>
 #include <afxwin.h>                         // MFC core and standard components
-#include <BaseClasses/streams.h>
+#include <ExtLib/BaseClasses/streams.h>
 #include <dvdmedia.h>

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,9 +23,9 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 
-#include <Bento4/Core/Ap4.h>
-#include <Bento4/Core/Ap4File.h>
-#include <Bento4/Core/Ap4ByteStream.h>
+#include <ExtLib/Bento4/Core/Ap4.h>
+#include <ExtLib/Bento4/Core/Ap4File.h>
+#include <ExtLib/Bento4/Core/Ap4ByteStream.h>
 
 class AP4_AsyncReaderStream : public AP4_ByteStream
 {

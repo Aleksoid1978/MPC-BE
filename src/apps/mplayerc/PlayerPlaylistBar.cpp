@@ -24,10 +24,10 @@
 #include <IntShCut.h>
 #include <random>
 #include "MainFrm.h"
-#include "../../DSUtil/SysVersion.h"
-#include "../../DSUtil/Filehandle.h"
-#include "../../DSUtil/std_helper.h"
-#include "../../DSUtil/UrlParser.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/Filehandle.h"
+#include "DSUtil/std_helper.h"
+#include "DSUtil/UrlParser.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "OpenDlg.h"

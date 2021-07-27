@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,19 +24,19 @@
 #include <time.h> // for the _time64 workaround
 #include <algorithm>
 #include <mpc_defines.h>
-#include "../../../DSUtil/FileVersion.h"
+#include "DSUtil/FileVersion.h"
 #include "ffmpegContext.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
 #pragma warning(disable: 5033)
 extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
 #define class classFFMPEG
-	#include <ffmpeg/libavcodec/mpegvideo.h>
-	#include <ffmpeg/libavcodec/h264dec.h>
-	#include <ffmpeg/libavcodec/ffv1.h>
+	#include <ExtLib/ffmpeg/libavcodec/mpegvideo.h>
+	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>
+	#include <ExtLib/ffmpeg/libavcodec/ffv1.h>
 #undef class
 }
 #pragma warning(pop)

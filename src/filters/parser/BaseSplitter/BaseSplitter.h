@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,15 +26,15 @@
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
 #include <IBitRateInfo.h>
-#include "../../filters/FilterInterfacesImpl.h"
+#include "filters/filters/FilterInterfacesImpl.h"
 #include "BaseSplitterFileEx.h"
 #include "BaseSplitterInputPin.h"
 #include "BaseSplitterOutputPin.h"
 #include "BaseSplitterParserOutputPin.h"
 #include "AsyncReader.h"
-#include "../../../DSUtil/DSMPropertyBag.h"
-#include "../../../DSUtil/FontInstaller.h"
-#include "../../../DSUtil/MediaDescription.h"
+#include "DSUtil/DSMPropertyBag.h"
+#include "DSUtil/FontInstaller.h"
+#include "DSUtil/MediaDescription.h"
 
 #define PACKET_PTS_DISCONTINUITY 0x0001
 

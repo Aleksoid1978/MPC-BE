@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,12 +26,12 @@
 #include <KsMedia.h>
 #include <clsids.h>
 //#include <moreuuids.h>
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/AudioTools.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/SysVersion.h"
-#include "../../../AudioTools/AudioHelper.h"
-#include "../../../ExtLib/ffmpeg/libavutil/channel_layout.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/AudioTools.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/SysVersion.h"
+#include "AudioTools/AudioHelper.h"
+#include "ExtLib/ffmpeg/libavutil/channel_layout.h"
 #include "AudioSwitcher.h"
 
 #ifdef REGISTER_FILTER
@@ -73,7 +73,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

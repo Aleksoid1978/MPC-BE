@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "../../filters/FilterInterfacesImpl.h"
+#include "filters/filters/FilterInterfacesImpl.h"
 #include "SampleFormat.h"
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "IMpaDecFilter.h"

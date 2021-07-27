@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "AudioHelper.h"
 #include <MMReg.h>
-#include "../DSUtil/Utils.h"
+#include "DSUtil/Utils.h"
 #include "BassRedirect.h"
 
 // CBassRedirect

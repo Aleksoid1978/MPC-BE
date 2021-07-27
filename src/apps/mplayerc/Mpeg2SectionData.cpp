@@ -19,9 +19,9 @@
  */
 
 #include "stdafx.h"
-#include <BaseClasses/streams.h>
+#include <ExtLib/BaseClasses/streams.h>
 #include <mpeg2data.h>
-#include "../../DSUtil/GolombBuffer.h"
+#include "DSUtil/GolombBuffer.h"
 #include "Mpeg2SectionData.h"
 
 #define BeginEnumDescriptors(gb, nType, nLength)								\

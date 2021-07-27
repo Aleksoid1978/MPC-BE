@@ -29,7 +29,7 @@
 #include "FGFilter.h"
 #include "FakeFilterMapper2.h"
 #include <moreuuids.h>
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/std_helper.h"
 
 static const std::vector<GUID> s_MajorTypes = {
 	MEDIATYPE_NULL,

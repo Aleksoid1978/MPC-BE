@@ -20,9 +20,9 @@
  */
 
 #include "stdafx.h"
-#include "../../transform/DeCSSFilter/IfoFile.h"
+#include "filters/transform/DeCSSFilter/IfoFile.h"
 #include "VTSReader.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 // option names
 #define OPT_REGKEY_VTSReader		L"Software\\MPC-BE Filters\\VTS Reader"
@@ -73,13 +73,13 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

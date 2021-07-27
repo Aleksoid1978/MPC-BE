@@ -46,9 +46,9 @@
 #include "mplayerc.h"
 #include "HistoryFile.h"
 
-#include "../../DSUtil/DSMPropertyBag.h"
-#include "../../DSUtil/FontInstaller.h"
-#include "../../SubPic/ISubPic.h"
+#include "DSUtil/DSMPropertyBag.h"
+#include "DSUtil/FontInstaller.h"
+#include "SubPic/ISubPic.h"
 
 #include "BaseGraph.h"
 #include "ShockwaveGraph.h"
@@ -67,8 +67,8 @@
 #include "OSD.h"
 #include "LcdSupport.h"
 #include "MpcApi.h"
-#include "../../filters/renderer/SyncClock/SyncClock.h"
-#include "../../filters/transform/DecSSFilter/IfoFile.h"
+#include "filters/renderer/SyncClock/SyncClock.h"
+#include "filters/transform/DecSSFilter/IfoFile.h"
 #include "IDirectVobSub.h"
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>

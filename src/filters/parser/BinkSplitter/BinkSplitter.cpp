@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

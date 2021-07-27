@@ -20,8 +20,8 @@
 
 #include "stdafx.h"
 #include "MPCVRAllocatorPresenter.h"
-#include "../../../SubPic/DX9SubPic.h"
-#include "../../../SubPic/SubPicQueueImpl.h"
+#include "SubPic/DX9SubPic.h"
+#include "SubPic/SubPicQueueImpl.h"
 #include "RenderersSettings.h"
 #include "Variables.h"
 #include <clsids.h>

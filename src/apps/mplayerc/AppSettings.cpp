@@ -26,11 +26,11 @@
 #include "Misc.h"
 #include "PlayerYouTube.h"
 #include "PPageFormats.h"
-#include "../../DSUtil/FileHandle.h"
-#include "../../DSUtil/SysVersion.h"
-#include "../../DSUtil/WinAPIUtils.h"
-#include "../../DSUtil/std_helper.h"
-#include "../../filters/switcher/AudioSwitcher/IAudioSwitcherFilter.h"
+#include "DSUtil/FileHandle.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/std_helper.h"
+#include "filters/switcher/AudioSwitcher/IAudioSwitcherFilter.h"
 #include "AppSettings.h"
 
 const LPCWSTR channel_mode_sets[] = {

@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2019 see Authors.txt
+ * (C) 2017-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,8 @@
  */
 
 #include "stdafx.h"
-#include "../../filters/transform/MpaDecFilter/MpaDecFilter.h"
-#include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
+#include "filters/transform/MpaDecFilter/MpaDecFilter.h"
+#include "filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include "MainFrm.h"
 #include "PPageSoundProcessing.h"
 #include <cmath>

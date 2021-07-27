@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,9 +20,9 @@
  */
 
 #include "stdafx.h"
-#include "../../DSUtil/DSUtil.h"
-#include "../../apps/mplayerc/mplayerc.h"
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/DSUtil.h"
+#include "apps/mplayerc/mplayerc.h"
+#include "DSUtil/std_helper.h"
 
 #include "InternalPropertyPage.h"
 

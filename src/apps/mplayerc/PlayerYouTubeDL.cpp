@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "PlayerYouTubeDL.h"
 
-#include <rapidjson/include/rapidjsonHelper.h>
+#include <ExtLib/rapidjson/include/rapidjsonHelper.h>
 
 #define bufsize (2ul * KILOBYTE)
 

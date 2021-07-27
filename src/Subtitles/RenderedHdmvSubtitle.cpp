@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include <array>
-#include "../DSUtil/GolombBuffer.h"
+#include "DSUtil/GolombBuffer.h"
 #include "HdmvSub.h"
 #include "DVBSub.h"
 #include "SubtitleHelpers.h"

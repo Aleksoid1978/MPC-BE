@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #pragma once
 
 #include "MultiFiles.h"
-#include "../../../DSUtil/HTTPAsync.h"
+#include "DSUtil/HTTPAsync.h"
 
 interface __declspec(uuid("6DDB4EE7-45A0-4459-A508-BD77B32C91B2"))
 ISyncReader :

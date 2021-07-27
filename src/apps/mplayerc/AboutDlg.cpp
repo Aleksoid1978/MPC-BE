@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "AboutDlg.h"
-#include "../../DSUtil/FileHandle.h"
+#include "DSUtil/FileHandle.h"
 
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();

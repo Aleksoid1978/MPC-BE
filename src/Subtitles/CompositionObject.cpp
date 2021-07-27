@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "CompositionObject.h"
 #include "ColorConvert.h"
-#include "../DSUtil/GolombBuffer.h"
+#include "DSUtil/GolombBuffer.h"
 #include <d3d9types.h>
 
 CompositionObject::CompositionObject()

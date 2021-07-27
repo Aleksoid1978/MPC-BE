@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 #include "stdafx.h"
 #include "RenderersSettings.h"
 #include "DXRAllocatorPresenter.h"
-#include "../../../SubPic/DX9SubPic.h"
-#include "../../../SubPic/SubPicQueueImpl.h"
+#include "SubPic/DX9SubPic.h"
+#include "SubPic/SubPicQueueImpl.h"
 #include <clsids.h>
 
 using namespace DSObjects;

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #ifdef DEBUG_OR_LOG
 
 extern "C" {
-	#include <ffmpeg/libavutil/log.h>
+	#include <ExtLib/ffmpeg/libavutil/log.h>
 }
 
 #define LOG_BUF_LEN 2048

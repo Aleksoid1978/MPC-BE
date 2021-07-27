@@ -22,7 +22,7 @@
 #pragma once
 
 #include "PPageBase.h"
-#include "../../Subtitles/STS.h"
+#include "Subtitles/STS.h"
 
 // CPPageSubStyle dialog
 

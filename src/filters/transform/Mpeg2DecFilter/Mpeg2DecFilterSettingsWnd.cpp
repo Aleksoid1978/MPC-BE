@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "Mpeg2DecFilterSettingsWnd.h"
-#include "../../../DSUtil/MFCHelper.h"
+#include "DSUtil/MFCHelper.h"
 
 //
 // CMpeg2DecSettingsWnd

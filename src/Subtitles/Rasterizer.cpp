@@ -23,8 +23,8 @@
 #include <intrin.h>
 #include "Rasterizer.h"
 #include "SeparableFilter.h"
-#include "../SubPic/ISubPic.h"
-#include "../DSUtil/CPUInfo.h"
+#include "SubPic/ISubPic.h"
+#include "DSUtil/CPUInfo.h"
 
 int Rasterizer::getOverlayWidth() const
 {

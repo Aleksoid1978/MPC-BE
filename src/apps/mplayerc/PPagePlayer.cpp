@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPagePlayer.h"
-#include "../../DSUtil/Filehandle.h"
+#include "DSUtil/Filehandle.h"
 
 // CPPagePlayer dialog
 

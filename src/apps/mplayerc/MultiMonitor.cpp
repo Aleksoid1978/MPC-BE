@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "MultiMonitor.h"
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/std_helper.h"
 
 CMonitor::CMonitor() : m_hMonitor( nullptr )
 {

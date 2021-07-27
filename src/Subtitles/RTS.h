@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include <mutex>
 #include "STS.h"
 #include "Rasterizer.h"
-#include "../SubPic/SubPicProviderImpl.h"
+#include "SubPic/SubPicProviderImpl.h"
 #include "RenderingCache.h"
 
 class Effect;

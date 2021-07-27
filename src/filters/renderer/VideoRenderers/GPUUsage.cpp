@@ -21,7 +21,7 @@
 
 #include "StdAfx.h"
 #include "GPUUsage.h"
-#include "../../../DSUtil/SysVersion.h"
+#include "DSUtil/SysVersion.h"
 
 // Memory allocation function
 static void* __stdcall ADL_Main_Memory_Alloc(int iSize)

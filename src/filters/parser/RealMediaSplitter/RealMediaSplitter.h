@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 
 #include <atlbase.h>
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../../transform/BaseVideoFilter/BaseVideoFilter.h"
+#include "filters/transform/BaseVideoFilter/BaseVideoFilter.h"
 
 #define RMSplitterName     L"MPC RealMedia Splitter"
 #define RMSourceName       L"MPC RealMedia Source"

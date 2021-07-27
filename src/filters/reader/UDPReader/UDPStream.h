@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 #pragma once
 
 #include <deque>
-#include <AsyncReader/asyncio.h>
-#include "../../../DSUtil/HTTPAsync.h"
+#include <ExtLib/AsyncReader/asyncio.h>
+#include "DSUtil/HTTPAsync.h"
 
 #define UDPReaderName   L"MPC UDP/HTTP Reader"
 #define STDInReaderName L"MPC Std input Reader"

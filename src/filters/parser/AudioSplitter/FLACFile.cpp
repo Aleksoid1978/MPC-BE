@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "FLACFile.h"
-#include <libflac/src/libflac/include/protected/stream_decoder.h>
+#include <ExtLib/libflac/src/libflac/include/protected/stream_decoder.h>
 
 #define FLAC_DECODER (FLAC__StreamDecoder*)m_pDecoder
 

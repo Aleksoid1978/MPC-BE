@@ -30,9 +30,9 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/PixelUtils.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/GolombBuffer.h"
+#include "DSUtil/PixelUtils.h"
 #include <clsids.h>
 #include <moreuuids.h>
 #include <mvrInterfaces.h>
@@ -158,7 +158,7 @@ LONG WINAPI Mine_ChangeDisplaySettingsExW(LPCWSTR lpszDeviceName, LPDEVMODEW lpD
 
 //
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 class CMpeg2DecFilterApp : public CFilterApp
 {
@@ -189,7 +189,7 @@ CMpeg2DecFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

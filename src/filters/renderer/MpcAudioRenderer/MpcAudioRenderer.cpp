@@ -22,11 +22,11 @@
 #include <map>
 #include <moreuuids.h>
 #include <math.h>
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/AudioTools.h"
-#include "../../../DSUtil/SysVersion.h"
-#include "../../../DSUtil/std_helper.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/AudioTools.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/std_helper.h"
 #include "AudioHelper.h"
 #include "AudioDevice.h"
 #include "MpcAudioRenderer.h"
@@ -83,13 +83,13 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 
 #else
 
-#include "../../../DSUtil/Profile.h"
+#include "DSUtil/Profile.h"
 
 #endif
 

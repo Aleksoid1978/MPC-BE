@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,9 +26,9 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include <moreuuids.h>
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/PixelUtils.h"
-#include "../../../Subtitles/SubtitleInputPin.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/PixelUtils.h"
+#include "Subtitles/SubtitleInputPin.h"
 #include "RealMediaSplitter.h"
 
 template<typename T>
@@ -169,7 +169,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

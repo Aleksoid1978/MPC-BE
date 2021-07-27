@@ -22,7 +22,7 @@
 #pragma once
 
 #include <afxtaskdialog.h>
-#include "../../DSUtil/HTTPAsync.h"
+#include "DSUtil/HTTPAsync.h"
 
 // CSaveDlg dialog
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -388,7 +388,7 @@ HRESULT CNullUVideoRenderer::CheckMediaType(const CMediaType* pmt)
 		   : E_FAIL;
 }
 
-#include "../filters/renderer/VideoRenderers/Utils.h"
+#include "filters/renderer/VideoRenderers/Utils.h"
 HRESULT CNullUVideoRenderer::DoRenderSample(IMediaSample* pSample)
 {
 #if _DEBUG && 0

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,16 +20,16 @@
 
 #include "stdafx.h"
 #include "AudioHelper.h"
-#include "../DSUtil/Utils.h"
+#include "DSUtil/Utils.h"
 #include "Mixer.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-	#include "ffmpeg/libswresample/swresample.h"
-	#include "ffmpeg/libswresample/swresample_internal.h"
-	#include "ffmpeg/libavutil/samplefmt.h"
-	#include "ffmpeg/libavutil/opt.h"
+	#include "ExtLib/ffmpeg/libswresample/swresample.h"
+	#include "ExtLib/ffmpeg/libswresample/swresample_internal.h"
+	#include "ExtLib/ffmpeg/libavutil/samplefmt.h"
+	#include "ExtLib/ffmpeg/libavutil/opt.h"
 }
 #pragma warning(pop)
 

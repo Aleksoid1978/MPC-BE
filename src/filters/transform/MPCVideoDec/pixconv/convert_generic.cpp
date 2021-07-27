@@ -26,8 +26,8 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-    #include <ffmpeg/libavutil/intreadwrite.h>
-    #include <ffmpeg/libswscale/swscale.h>
+    #include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
+    #include <ExtLib/ffmpeg/libswscale/swscale.h>
 }
 #pragma warning(pop)
 

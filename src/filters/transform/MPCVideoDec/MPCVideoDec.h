@@ -21,12 +21,12 @@
 #pragma once
 
 #include "../BaseVideoFilter/BaseVideoFilter.h"
-#include "../../filters/FilterInterfacesImpl.h"
+#include "filters/filters/FilterInterfacesImpl.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "./DXVADecoder/DXVA2Decoder.h"
 #include "FormatConverter.h"
-#include "../../../apps/mplayerc/FilterEnum.h"
+#include "apps/mplayerc/FilterEnum.h"
 
 #include <IMediaSideData.h>
 #include <basestruct.h>

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../../../DSUtil/ApeTag.h"
-#include "../../../DSUtil/ID3Tag.h"
+#include "DSUtil/ApeTag.h"
+#include "DSUtil/ID3Tag.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 #include <stdint.h>

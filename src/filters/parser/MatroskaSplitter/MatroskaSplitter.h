@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@
 #include <basestruct.h>
 #include <IMediaSideData.h>
 #include <ITrackInfo.h>
-#include "../../filters/FilterInterfacesImpl.h"
+#include "filters/filters/FilterInterfacesImpl.h"
 
 #define MatroskaSplitterName L"MPC Matroska Splitter"
 #define MatroskaSourceName   L"MPC Matroska Source"

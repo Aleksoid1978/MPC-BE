@@ -18,7 +18,7 @@
  */
 
 #include "stdafx.h"
-#include "../../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 #include "D3D11SurfaceAllocator.h"
 #include "D3D11Decoder.h"
 

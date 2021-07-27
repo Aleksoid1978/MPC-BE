@@ -20,8 +20,8 @@
  */
 
 #include "stdafx.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/GolombBuffer.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/GolombBuffer.h"
 
 #include "IfoFile.h"
 

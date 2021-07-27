@@ -59,5 +59,5 @@ namespace Gdiplus
 };
 
 #include "resource.h"
-#include "../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 #include "mplayerc.h"

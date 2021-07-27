@@ -22,11 +22,11 @@
 #pragma once
 
 #include "stdafx.h"
-#include <Detours/src/detours.h>
+#include <ExtLib/Detours/src/detours.h>
 #include "D3DHook.h"
 #include "include/d3dumddi.h"
-#include "../../../DSUtil/Log.h"
-#include "../../../DSUtil/SysVersion.h"
+#include "DSUtil/Log.h"
+#include "DSUtil/SysVersion.h"
 
 namespace D3DHook {
 	UINT m_refreshRate = 0;

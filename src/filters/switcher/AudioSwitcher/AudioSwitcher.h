@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "../../../AudioTools/Mixer.h"
-#include "../../../AudioTools/BassRedirect.h"
-#include "../../../DSUtil/SimpleBuffer.h"
+#include "AudioTools/Mixer.h"
+#include "AudioTools/BassRedirect.h"
+#include "DSUtil/SimpleBuffer.h"
 #include "StreamSwitcher.h"
 #include "IAudioSwitcherFilter.h"
 #include "AudioNormalizer.h"

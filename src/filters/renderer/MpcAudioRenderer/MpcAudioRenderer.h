@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2020 see Authors.txt
+ * (C) 2009-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,16 +20,16 @@
 
 #pragma once
 
-#include <BaseClasses/streams.h>
+#include <ExtLib/BaseClasses/streams.h>
 #include <mmdeviceapi.h>
 #include <audioclient.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
 #include "MpcAudioRendererSettingsWnd.h"
-#include "Mixer.h"
+#include "AudioTools/Mixer.h"
 #include "Filter.h"
 #include "AudioSyncClock.h"
-#include "../../../DSUtil/Packet.h"
-#include <libbs2b/bs2bclass.h>
+#include "DSUtil/Packet.h"
+#include <ExtLib/libbs2b/bs2bclass.h>
 
 #define MpcAudioRendererName L"MPC Audio Renderer"
 

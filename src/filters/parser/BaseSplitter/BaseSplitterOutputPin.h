@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,8 +25,8 @@
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
 #include <IBitRateInfo.h>
-#include "../../../DSUtil/Packet.h"
-#include "../../../DSUtil/DSMPropertyBag.h"
+#include "DSUtil/Packet.h"
+#include "DSUtil/DSMPropertyBag.h"
 
 #define QUEUE_DURATION_MIN    100
 #define QUEUE_DURATION_DEF   3000

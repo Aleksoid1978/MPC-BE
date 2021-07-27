@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,12 +22,12 @@
 #pragma once
 
 #include <atlbase.h>
-#include <AsyncReader/asyncio.h>
-#include <AsyncReader/asyncrdr.h>
+#include <ExtLib/AsyncReader/asyncio.h>
+#include <ExtLib/AsyncReader/asyncrdr.h>
 
 #include <ITrackInfo.h>
 #include "VTSReaderSettingsWnd.h"
-#include "../../../DSUtil/DSMPropertyBag.h"
+#include "DSUtil/DSMPropertyBag.h"
 
 #include "IVTSReader.h"
 

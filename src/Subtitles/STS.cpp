@@ -26,8 +26,8 @@
 #include <regex>
 #include "RealTextParser.h"
 #include "USFSubtitles.h"
-#include "../DSUtil/WinAPIUtils.h"
-#include "../DSUtil/std_helper.h"
+#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/std_helper.h"
 
 using std::wstring;
 

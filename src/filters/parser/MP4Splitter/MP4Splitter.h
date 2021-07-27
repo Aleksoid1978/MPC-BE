@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include <atlbase.h>
 #include "MP4SplitterFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../../filters/FilterInterfacesImpl.h"
+#include "filters/filters/FilterInterfacesImpl.h"
 #include <IMediaSideData.h>
 
 #define MP4SplitterName L"MPC MP4/MOV Splitter"

@@ -24,7 +24,7 @@
 #include <memory.h>
 #include <mfapi.h>
 #include "BaseVideoFilter.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 #include <moreuuids.h>
 
 //

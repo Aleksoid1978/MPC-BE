@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "HdmvSub.h"
-#include "../DSUtil/GolombBuffer.h"
+#include "DSUtil/GolombBuffer.h"
 
 #if (0) // Set to 1 to activate HDMV subtitles debug log
 	#define TRACE_HDMVSUB DLog

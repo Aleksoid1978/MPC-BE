@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,9 +25,9 @@
 #include <afxinet.h>
 #include <afxsock.h>
 #include <qnetwork.h>
-#include "../../../DSUtil/MPCSocket.h"
-#include "../../../DSUtil/UrlParser.h"
-#include "../../parser/BaseSplitter/BaseSplitter.h"
+#include "DSUtil/MPCSocket.h"
+#include "DSUtil/UrlParser.h"
+#include "filters/parser/BaseSplitter/BaseSplitter.h"
 
 #define ShoutcastSourceName   L"MPC ShoutCast Source"
 

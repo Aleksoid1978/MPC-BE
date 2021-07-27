@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/std_helper.h"
 #include "AddCommandDlg.h"
 #include "PPageMouse.h"
 

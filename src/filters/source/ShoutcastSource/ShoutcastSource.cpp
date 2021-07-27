@@ -22,14 +22,14 @@
 #include "stdafx.h"
 #include <regex>
 #include "ShoutcastSource.h"
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/entities.h"
+#include "DSUtil/GolombBuffer.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/entities.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 
 #define RAPIDJSON_SSE2
-#include <rapidjson/include/rapidjson/document.h>
+#include <ExtLib/rapidjson/include/rapidjson/document.h>
 
 #define MAXFRAMESIZE	((144 * 320000 / 8000) + 1)
 #define BUFFERS			2
@@ -71,7 +71,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 class CShoutcastSourceApp : public CFilterApp
 {

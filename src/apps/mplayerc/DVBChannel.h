@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "../../DSUtil/HdmvClipInfo.h"
+#include "DSUtil/HdmvClipInfo.h"
 
 #define FORMAT_VERSION_0			0
 #define FORMAT_VERSION_1			1

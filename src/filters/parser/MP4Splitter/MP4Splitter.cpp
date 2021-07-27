@@ -24,26 +24,26 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <cmath>
-#include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/MP4AudioDecoderConfig.h"
-#include "../../../DSUtil/BitsWriter.h"
+#include "DSUtil/GolombBuffer.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/MP4AudioDecoderConfig.h"
+#include "DSUtil/BitsWriter.h"
 #include "MP4Splitter.h"
 
-#include <Bento4/Core/Ap4.h>
-#include <Bento4/Core/Ap4File.h>
-#include <Bento4/Core/Ap4CttsAtom.h>
-#include <Bento4/Core/Ap4SttsAtom.h>
-#include <Bento4/Core/Ap4StssAtom.h>
-#include <Bento4/Core/Ap4StsdAtom.h>
-#include <Bento4/Core/Ap4IsmaCryp.h>
-#include <Bento4/Core/Ap4ChplAtom.h>
-#include <Bento4/Core/Ap4FtabAtom.h>
-#include <Bento4/Core/Ap4DataAtom.h>
-#include <Bento4/Core/Ap4PaspAtom.h>
-#include <Bento4/Core/Ap4ChapAtom.h>
-#include <Bento4/Core/Ap4Dvc1Atom.h>
-#include <Bento4/Core/Ap4DataInfoAtom.h>
+#include <ExtLib/Bento4/Core/Ap4.h>
+#include <ExtLib/Bento4/Core/Ap4File.h>
+#include <ExtLib/Bento4/Core/Ap4CttsAtom.h>
+#include <ExtLib/Bento4/Core/Ap4SttsAtom.h>
+#include <ExtLib/Bento4/Core/Ap4StssAtom.h>
+#include <ExtLib/Bento4/Core/Ap4StsdAtom.h>
+#include <ExtLib/Bento4/Core/Ap4IsmaCryp.h>
+#include <ExtLib/Bento4/Core/Ap4ChplAtom.h>
+#include <ExtLib/Bento4/Core/Ap4FtabAtom.h>
+#include <ExtLib/Bento4/Core/Ap4DataAtom.h>
+#include <ExtLib/Bento4/Core/Ap4PaspAtom.h>
+#include <ExtLib/Bento4/Core/Ap4ChapAtom.h>
+#include <ExtLib/Bento4/Core/Ap4Dvc1Atom.h>
+#include <ExtLib/Bento4/Core/Ap4DataInfoAtom.h>
 
 #include <libavutil/intreadwrite.h>
 #include <libavutil/pixfmt.h>
@@ -99,7 +99,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

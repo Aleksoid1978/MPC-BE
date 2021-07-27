@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 
 #include <qnetwork.h>
 #include "UDPStream.h"
-#include <AsyncReader/asyncrdr.h>
+#include <ExtLib/AsyncReader/asyncrdr.h>
 
 #define UDPReaderName   L"MPC UDP/HTTP Reader"
 #define STDInReaderName L"MPC Std input Reader"

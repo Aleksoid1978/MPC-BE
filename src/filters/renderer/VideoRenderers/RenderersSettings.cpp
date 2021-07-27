@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "RenderersSettings.h"
-#include "../../../apps/mplayerc/mplayerc.h"
+#include "apps/mplayerc/mplayerc.h"
 
 #define IDS_RS_VIDEORENDERER		L"VideoRenderer"
 

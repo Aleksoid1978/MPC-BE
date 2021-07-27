@@ -24,18 +24,18 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-  #include <ffmpeg/libavcodec/avcodec.h>
-  #include <ffmpeg/libavutil/imgutils.h>
-  #include <ffmpeg/libavutil/intreadwrite.h>
+  #include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+  #include <ExtLib/ffmpeg/libavutil/imgutils.h>
+  #include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
 }
 #pragma warning(pop)
 
 #include "MSDKDecoder.h"
 #include <moreuuids.h>
 #include <IMediaSample3D.h>
-#include "../../../../DSUtil/D3D9Helper.h"
-#include "../../../../DSUtil/DSUtil.h"
-#include "../../../../DSUtil/SysVersion.h"
+#include "DSUtil/D3D9Helper.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/SysVersion.h"
 #include "ByteParser.h"
 
 #include "../MPCVideoDec.h"

@@ -22,7 +22,7 @@
 #include "MainFrm.h"
 #include "ItemPropertiesDlg.h"
 #include "HistoryDlg.h"
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/std_helper.h"
 
 // CHistoryDlg dialog
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2020 see Authors.txt
+ * (C) 2010-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,8 +24,8 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include "MpcAudioRendererSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/AudioParser.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/AudioParser.h"
 
 //
 // CMpcAudioRendererSettingsWnd

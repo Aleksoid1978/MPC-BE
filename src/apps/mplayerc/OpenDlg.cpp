@@ -25,7 +25,7 @@
 #include <dlgs.h>
 #include "OpenDlg.h"
 #include "MainFrm.h"
-#include "../../DSUtil/Filehandle.h"
+#include "DSUtil/Filehandle.h"
 
 // COpenDlg dialog
 

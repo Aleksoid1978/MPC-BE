@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,8 @@
 #include "IPinHook.h"
 #include "AllocatorCommon.h"
 #include "Variables.h"
-#include "../../../DSUtil/SysVersion.h"
-#include "../../../DSUtil/DXVAState.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/DXVAState.h"
 
 #define DXVA_LOGFILE_A 0 // set to 1 for logging DXVA data to a file
 #define LOG_BITSTREAM  0 // set to 1 for logging DXVA bistream data to a file

@@ -19,12 +19,12 @@
  */
 
 #include "stdafx.h"
-#include "../../DSUtil/HTTPAsync.h"
-#include "../../DSUtil/text.h"
-#include "../../DSUtil/std_helper.h"
+#include "DSUtil/HTTPAsync.h"
+#include "DSUtil/text.h"
+#include "DSUtil/std_helper.h"
 #include "PlayerYouTube.h"
 
-#include <rapidjson/include/rapidjsonHelper.h>
+#include <ExtLib/rapidjson/include/rapidjsonHelper.h>
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_USER_URL            L"youtube.com/user/"

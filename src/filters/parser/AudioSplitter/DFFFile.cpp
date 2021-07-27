@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include "../../../DSUtil/AudioParser.h"
+#include "DSUtil/AudioParser.h"
 #include "DFFFile.h"
 
 //

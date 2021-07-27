@@ -30,12 +30,12 @@
 #include <psapi.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
-#include "../../DSUtil/WinAPIUtils.h"
-#include "../../DSUtil/SysVersion.h"
-#include "../../DSUtil/FileHandle.h"
-#include "../../DSUtil/FileVersion.h"
+#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/FileHandle.h"
+#include "DSUtil/FileVersion.h"
 #include <winddk/ntddcdvd.h>
-#include <Detours/src/detours.h>
+#include <ExtLib/Detours/src/detours.h>
 #include <afxsock.h>
 #include <atlsync.h>
 #include "UpdateChecker.h"

@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2020 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "MenuEx.h"
 #include "../MainFrm.h"
-#include "../../../DSUtil/SysVersion.h"
+#include "DSUtil/SysVersion.h"
 
 std::vector<std::unique_ptr<MENUITEM>> m_pMenuItems;
 

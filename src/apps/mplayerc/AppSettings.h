@@ -24,8 +24,8 @@
 #include "SettingsDefines.h"
 #include "FakeFilterMapper2.h"
 #include "FilterEnum.h"
-#include "../../filters/renderer/VideoRenderers/RenderersSettings.h"
-#include "../../Subtitles/STS.h"
+#include "filters/renderer/VideoRenderers/RenderersSettings.h"
+#include "Subtitles/STS.h"
 #include "MediaFormats.h"
 #include "DVBChannel.h"
 #include <afxsock.h>

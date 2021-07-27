@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2019 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "SampleFormat.h"
-#include "../../../DSUtil/Packet.h"
+#include "DSUtil/Packet.h"
 
 struct AVFilterGraph;
 struct AVFilterContext;

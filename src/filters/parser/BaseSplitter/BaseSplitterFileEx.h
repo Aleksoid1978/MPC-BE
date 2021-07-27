@@ -22,9 +22,9 @@
 #pragma once
 
 #include "BaseSplitterFile.h"
-#include "../../../DSUtil/Mpeg2Def.h"
-#include "../../../DSUtil/SimpleBuffer.h"
-#include "../../../DSUtil/VideoParser.h"
+#include "DSUtil/Mpeg2Def.h"
+#include "DSUtil/SimpleBuffer.h"
+#include "DSUtil/VideoParser.h"
 
 #if (0)
 	#define DEBUG_ASSERT ASSERT

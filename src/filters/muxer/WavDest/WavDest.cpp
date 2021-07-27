@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,10 +20,10 @@
  */
 
 #include "stdafx.h"
-#include "BaseClasses/streams.h"
+#include "ExtLib/BaseClasses/streams.h"
 #include <aviriff.h>
 #include "WavDest.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER
 
@@ -60,7 +60,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../filters/Filters.h"
+#include "filters/filters/Filters.h"
 
 CFilterApp theApp;
 

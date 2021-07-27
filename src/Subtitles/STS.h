@@ -22,7 +22,7 @@
 #pragma once
 
 #include <atlcoll.h>
-#include <BaseClasses/wxutil.h>
+#include <ExtLib/BaseClasses/wxutil.h>
 #include "TextFile.h"
 #include "SubtitleHelpers.h"
 

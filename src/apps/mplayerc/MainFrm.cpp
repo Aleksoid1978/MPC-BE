@@ -26,14 +26,14 @@
 #include <afxglobals.h>
 #include <..\src\mfc\afximpl.h>
 
-#include "../../DSUtil/WinAPIUtils.h"
-#include "../../DSUtil/SysVersion.h"
-#include "../../DSUtil/Filehandle.h"
-#include "../../DSUtil/FileVersion.h"
-#include "../../DSUtil/DXVAState.h"
-#include "../../DSUtil/std_helper.h"
-#include "../../DSUtil/UrlParser.h"
-#include "../../DSUtil/NullRenderers.h"
+#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/SysVersion.h"
+#include "DSUtil/Filehandle.h"
+#include "DSUtil/FileVersion.h"
+#include "DSUtil/DXVAState.h"
+#include "DSUtil/std_helper.h"
+#include "DSUtil/UrlParser.h"
+#include "DSUtil/NullRenderers.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"
@@ -51,7 +51,7 @@
 #include "ISDb.h"
 #include "UpdateChecker.h"
 
-#include <BaseClasses/mtype.h>
+#include <ExtLib/BaseClasses/mtype.h>
 #include <Mpconfig.h>
 #include <ks.h>
 #include <ksmedia.h>
@@ -65,8 +65,8 @@
 #include "FGManagerBDA.h"
 #include "filters/TextPassThruFilter.h"
 #include "filters/ChaptersSouce.h"
-#include "../../filters/filters.h"
-#include "../../filters/filters/InternalPropertyPage.h"
+#include "filters/filters.h"
+#include "filters/filters/InternalPropertyPage.h"
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
 #include "ComPropertySheet.h"
@@ -77,9 +77,9 @@
 
 #include "DIB.h"
 
-#include "../../Subtitles/RenderedHdmvSubtitle.h"
-#include "../../Subtitles/XSUBSubtitle.h"
-#include "../../SubPic/MemSubPic.h"
+#include "Subtitles/RenderedHdmvSubtitle.h"
+#include "Subtitles/XSUBSubtitle.h"
+#include "SubPic/MemSubPic.h"
 
 #include "MultiMonitor.h"
 

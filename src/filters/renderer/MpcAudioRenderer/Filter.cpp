@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2019 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,9 +21,9 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "Filter.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/ffmpeg_log.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/AudioParser.h"
+#include "DSUtil/ffmpeg_log.h"
 #include "AudioHelper.h"
 
 extern "C"

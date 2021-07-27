@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,8 +22,8 @@
 
 #include <afxwin.h>
 #include "MainFrm.h"
-#include "../../DSUtil/Filehandle.h"
-#include "../../DSUtil/ResampleRGB32.h"
+#include "DSUtil/Filehandle.h"
+#include "DSUtil/ResampleRGB32.h"
 
 #include "ThumbsTaskDlg.h"
 

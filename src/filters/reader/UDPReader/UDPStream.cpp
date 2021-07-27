@@ -25,12 +25,12 @@
 #include <Ws2tcpip.h>
 #include "UDPStream.h"
 #include <moreuuids.h>
-#include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/UrlParser.h"
-#include "../../../DSUtil/entities.h"
+#include "DSUtil/DSUtil.h"
+#include "DSUtil/UrlParser.h"
+#include "DSUtil/entities.h"
 
 #define RAPIDJSON_SSE2
-#include <rapidjson/include/rapidjson/document.h>
+#include <ExtLib/rapidjson/include/rapidjson/document.h>
 
 #define MAXSTORESIZE  2 * MEGABYTE // The maximum size of a buffer for storing the received information is 2 Mb
 #define MAXBUFSIZE   16 * KILOBYTE // The maximum packet size is 16 Kb

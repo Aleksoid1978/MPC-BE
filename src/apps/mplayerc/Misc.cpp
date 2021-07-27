@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "Misc.h"
-#include "../../DSUtil/FileHandle.h"
+#include "DSUtil/FileHandle.h"
 
 bool SetPrivilege(LPCWSTR privilege, bool bEnable/* = true*/)
 {

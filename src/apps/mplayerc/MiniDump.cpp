@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,8 +22,8 @@
 #include "MiniDump.h"
 #include "Misc.h"
 #include <DbgHelp.h>
-#include "../../DSUtil/FileHandle.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "DSUtil/FileHandle.h"
+#include "DSUtil/WinAPIUtils.h"
 
 typedef BOOL(WINAPI* tpSymInitialize)(
 	_In_ HANDLE hProcess,

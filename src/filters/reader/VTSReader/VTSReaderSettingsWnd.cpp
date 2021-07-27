@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "VTSReaderSettingsWnd.h"
-#include "../../../DSUtil/MFCHelper.h"
+#include "DSUtil/MFCHelper.h"
 
 CVTSReaderSettingsWnd::CVTSReaderSettingsWnd(void)
 {
