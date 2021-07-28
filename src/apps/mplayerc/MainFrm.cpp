@@ -16610,7 +16610,7 @@ REFERENCE_TIME const CMainFrame::GetClosestKeyFrame(REFERENCE_TIME rtTarget)
 
 void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 {
-	OAFilterState fs = GetMediaState();
+	const OAFilterState fs = GetMediaState();
 
 	if (rtPos < 0) {
 		rtPos = 0;
@@ -16677,6 +16677,9 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 
 	OnTimer(TIMER_STREAMPOSPOLLER);
 	OnTimer(TIMER_STREAMPOSPOLLER2);
+	if (fs == State_Paused) {
+		OnTimer(TIMER_STATS);
+	}
 
 	SendCurrentPositionToApi(true);
 }
