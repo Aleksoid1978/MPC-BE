@@ -33,7 +33,7 @@
 #include "OpenDlg.h"
 #include "Content.h"
 #include "PlaylistNameDlg.h"
-#include <coolsb/coolscroll.h>
+#include <ExtLib/ui/coolsb/coolscroll.h>
 #include "./Controls/MenuEx.h"
 #include "TorrentInfo.h"
 

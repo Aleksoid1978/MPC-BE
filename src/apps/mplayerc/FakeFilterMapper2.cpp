@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "FakeFilterMapper2.h"
-#include <MacrovisionKicker.h>
+#include <filters/renderer/VideoRenderers/MacrovisionKicker.h>
 #include <ExtLib/Detours/src/detours.h>
 
 HRESULT (__stdcall * Real_CoCreateInstance)(CONST IID& a0,

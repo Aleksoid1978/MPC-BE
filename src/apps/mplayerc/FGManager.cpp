@@ -23,7 +23,6 @@
 #include <mpconfig.h>
 #include "FGManager.h"
 #include "filters/AllFilters.h"
-#include <madVRAllocatorPresenter.h>
 #include "filters/DeinterlacerFilter.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/FileVersion.h"
@@ -40,7 +39,7 @@
 #include <mvrInterfaces.h>
 #include "MediaFormats.h"
 #include "Content.h"
-#include <IPinHook.h>
+#include <filters/renderer/VideoRenderers/IPinHook.h>
 
 class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
 {

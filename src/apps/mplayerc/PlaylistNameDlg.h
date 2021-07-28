@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <ResizableLib/ResizableDialog.h>
+#include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 
 class CPlaylistNameDlg : public CCmdUIDialog
 {

@@ -22,7 +22,7 @@
 
 #include <afxcmn.h>
 #include <afxwin.h>
-#include <ResizableLib/ResizableDialog.h>
+#include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 
 // CHistoryDlg dialog
 

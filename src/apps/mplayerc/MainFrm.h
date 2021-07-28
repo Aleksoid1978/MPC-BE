@@ -70,13 +70,13 @@
 #include "filters/renderer/SyncClock/SyncClock.h"
 #include "filters/transform/DecSSFilter/IfoFile.h"
 #include "IDirectVobSub.h"
-#include <sizecbar/scbarg.h>
+#include <ExtLib/ui/sizecbar/scbarg.h>
 #include <afxinet.h>
 #include <afxmt.h>
 #include "ColorControl.h"
 #include "RateControl.h"
 #include "DiskImage.h"
-#include <AllocatorCommon.h>
+#include <filters/renderer/VideoRenderers/AllocatorCommon.h>
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>

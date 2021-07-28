@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #pragma once
 
 #include <lglcd/lglcd.h>
-#include <LCDUI/LCDUI.h>
+#include <ExtLib/ui/LCDUI/LCDUI.h>
 
 class CLCDMyProgressBar : public CLCDProgressBar
 {

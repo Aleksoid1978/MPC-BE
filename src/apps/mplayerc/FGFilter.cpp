@@ -23,8 +23,7 @@
 #include <mpconfig.h>
 #include "FGFilter.h"
 #include "MainFrm.h"
-#include <AllocatorCommon.h>
-#include <SyncAllocatorPresenter.h>
+#include <filters/renderer/VideoRenderers/SyncAllocatorPresenter.h>
 #include <clsids.h>
 #include <moreuuids.h>
 

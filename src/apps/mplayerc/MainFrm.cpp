@@ -71,11 +71,10 @@
 #include "filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include "filters/transform/MPCVideoDec/MPCVideoDec.h"
 #include "filters/filters/InternalPropertyPage.h"
-#include <AllocatorCommon.h>
-#include <SyncAllocatorPresenter.h>
+#include <filters/renderer/VideoRenderers/SyncAllocatorPresenter.h>
+#include <filters/renderer/VideoRenderers/IPinHook.h>
 #include "ComPropertySheet.h"
 #include "LcdSupport.h"
-#include <IPinHook.h>
 #include <comdef.h>
 #include <dwmapi.h>
 
@@ -95,7 +94,7 @@
 #include <SubRenderIntf.h>
 #include <LAVVideoSettings.h>
 
-#include "Variables.h"
+#include "filters/renderer/VideoRenderers/Variables.h"
 
 #include "PlayerYouTubeDL.h"
 #include "./Controls/MenuEx.h"

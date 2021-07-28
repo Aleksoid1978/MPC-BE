@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <PixelShaderCompiler.h>
+#include <filters/renderer/VideoRenderers/PixelShaderCompiler.h>
 #include "controls/LineNumberEdit.h"
 #include "ShaderAutoCompleteDlg.h"
-#include <ResizableLib/ResizableDialog.h>
+#include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 
 // CShaderEdit
 

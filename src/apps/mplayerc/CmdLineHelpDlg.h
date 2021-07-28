@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include <afxwin.h>
-#include "ResizableLib/ResizableDialog.h"
+#include "ExtLib/ui/ResizableLib/ResizableDialog.h"
 
 class CmdLineHelpDlg : public CResizableDialog
 {

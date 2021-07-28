@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2017 see Authors.txt
+ * (C) 2015-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 
 #include <afxwin.h>
 //#include "afxdialogex.h"
-#include <ResizableLib/ResizableDialog.h>
+#include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 
 class CItemPropertiesDlg : public CResizableDialog
 {

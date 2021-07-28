@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,7 +46,7 @@
 #include "PPageWindowSize.h"
 #include "PPageMisc.h"
 #include "PPageCapture.h"
-#include <TreePropSheet/TreePropSheet.h>
+#include <ExtLib/ui/TreePropSheet/TreePropSheet.h>
 
 // CTreePropSheetTreeCtrl
 

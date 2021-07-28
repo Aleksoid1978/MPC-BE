@@ -23,7 +23,7 @@
 
 #include "filters/transform/BufferFilter/BufferFilter.h"
 #include "controls/FloatEdit.h"
-#include <ResizableLib/ResizableDialog.h>
+#include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 #include "PlayerBar.h"
 
 
