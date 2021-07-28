@@ -22,8 +22,14 @@
 #include "stdafx.h"
 #include "PPageInternalFilters.h"
 #include "ComPropertySheet.h"
-#include "filters/filters.h"
-
+#include "filters/parser/AviSplitter/AviSplitter.h"
+#include "filters/parser/MpegSplitter/MpegSplitter.h"
+#include "filters/parser/MatroskaSplitter/MatroskaSplitter.h"
+#include "filters/reader/CDDAReader/CDDAReader.h"
+#include "filters/reader/VTSReader/VTSReader.h"
+#include "filters/transform/MPCVideoDec/MPCVideoDec.h"
+#include "filters/transform/Mpeg2DecFilter/Mpeg2DecFilter.h"
+#include "filters/transform/MpaDecFilter/MpaDecFilter.h"
 
 static filter_t s_source_filters[] = {
 	{L"AC3",						SOURCE_FILTER, SRC_AC3,				0},

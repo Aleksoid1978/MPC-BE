@@ -26,7 +26,10 @@
 #include "SaveDlg.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/UrlParser.h"
-#include "filters/filters.h"
+#include "filters/reader/CDDAReader/CDDAReader.h"
+#include "filters/reader/CDXAReader/CDXAReader.h"
+#include "filters/reader/VTSReader/VTSReader.h"
+#include "filters/parser/StreamDriveThru/StreamDriveThru.h"
 
 static unsigned int AdaptUnit(double& val, size_t unitsNb)
 {

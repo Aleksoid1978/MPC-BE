@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,15 +36,15 @@
 #include "parser/RawVideoSplitter/RawVideoSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
-#include "parser/StreamDriveThru/StreamDriveThru.h"
 #include "parser/AudioSplitter/AudioSplitter.h"
 #include "parser/BinkSplitter/BinkSplitter.h"
 #include "parser/DVRSplitter/DVRSplitter.h"
+#include "parser/StreamDriveThru/StreamDriveThru.h"
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
-#include "reader/UDPReader/UDPReader.h"
 #include "reader/VTSReader/VTSReader.h"
+#include "reader/UDPReader/UDPReader.h"
 
 #include "renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "renderer/SyncClock/SyncClock.h"

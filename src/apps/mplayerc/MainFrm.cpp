@@ -58,6 +58,7 @@
 #include <dvdevcod.h>
 #include <dsound.h>
 #include <uuids.h>
+#include <moreuuids.h>
 #include <clsids.h>
 #include <psapi.h>
 
@@ -65,7 +66,10 @@
 #include "FGManagerBDA.h"
 #include "filters/TextPassThruFilter.h"
 #include "filters/ChaptersSouce.h"
-#include "filters/filters.h"
+#include "filters/parser/MpegSplitter/MpegSplitter.h"
+#include "filters/parser/MatroskaSplitter/IMatroskaSplitter.h"
+#include "filters/switcher/AudioSwitcher/AudioSwitcher.h"
+#include "filters/transform/MPCVideoDec/MPCVideoDec.h"
 #include "filters/filters/InternalPropertyPage.h"
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>

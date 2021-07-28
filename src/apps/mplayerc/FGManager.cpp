@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include <mpconfig.h>
 #include "FGManager.h"
-#include "filters/Filters.h"
+#include "filters/AllFilters.h"
 #include <madVRAllocatorPresenter.h>
 #include "filters/DeinterlacerFilter.h"
 #include "DSUtil/SysVersion.h"
