@@ -97,7 +97,7 @@ STDAPI DllUnregisterServer()
 
 //
 
-#include <Detours/src/detours.h>
+#include <ExtLib/Detours/src/detours.h>
 
 BOOL (__stdcall * Real_IsDebuggerPresent)(void)
 	= IsDebuggerPresent;
