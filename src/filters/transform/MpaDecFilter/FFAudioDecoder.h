@@ -21,7 +21,7 @@
 #pragma once
 
 #include "PaddedBuffer.h"
-#include "SampleFormat.h"
+#include "AudioTools/SampleFormat.h"
 
 struct AVCodec;
 struct AVCodecContext;

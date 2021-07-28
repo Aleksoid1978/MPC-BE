@@ -27,7 +27,7 @@
 #include <sys/timeb.h>
 
 #include "MpaDecFilter.h"
-#include "AudioHelper.h"
+#include "AudioTools/AudioHelper.h"
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/SysVersion.h"

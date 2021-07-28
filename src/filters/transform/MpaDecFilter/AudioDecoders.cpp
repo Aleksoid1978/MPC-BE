@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include <MMReg.h>
-#include "SampleFormat.h"
+#include "AudioTools/SampleFormat.h"
 #include "AudioDecoders.h"
 
 void bswap16_buf(uint16_t* dst16, const uint16_t* src16, unsigned len)

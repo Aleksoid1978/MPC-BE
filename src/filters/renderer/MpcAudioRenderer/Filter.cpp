@@ -24,7 +24,7 @@
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/ffmpeg_log.h"
-#include "AudioHelper.h"
+#include "AudioTools/AudioHelper.h"
 
 extern "C"
 {

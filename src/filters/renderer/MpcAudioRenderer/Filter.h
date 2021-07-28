@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "SampleFormat.h"
+#include "AudioTools/SampleFormat.h"
 #include "DSUtil/Packet.h"
 
 struct AVFilterGraph;

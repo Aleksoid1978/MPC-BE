@@ -23,11 +23,11 @@
 
 #include <stdint.h>
 #include "filters/filters/FilterInterfacesImpl.h"
-#include "SampleFormat.h"
+#include "AudioTools/SampleFormat.h"
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "IMpaDecFilter.h"
 #include "MpaDecFilterSettingsWnd.h"
-#include "Mixer.h"
+#include "AudioTools/Mixer.h"
 #include "PaddedBuffer.h"
 #include "FFAudioDecoder.h"
 #include "AC3Encoder.h"

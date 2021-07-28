@@ -62,7 +62,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\filters\renderer\VideoRenderers;$(SolutionDir)src;$(SolutionDir)src\ExtLib\MediaInfo;$(SolutionDir)src\ExtLib\ui;$(SolutionDir)src\ExtLib\ZenLib;$(SolutionDir)src\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\filters\renderer\VideoRenderers;$(SolutionDir)src;$(SolutionDir)src\ExtLib\MediaInfo;$(SolutionDir)src\ExtLib\ui;$(SolutionDir)src\ExtLib\ZenLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Manifest>
       <EnableDpiAwareness>false</EnableDpiAwareness>
