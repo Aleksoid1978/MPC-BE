@@ -1851,11 +1851,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 
 	CheckPointer(pmt, VFW_E_TYPE_NOT_ACCEPTED);
 
-	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
+	const BOOL bMediaTypeChanged = (m_pCurrentMediaType != *pmt);
 	const BOOL bReinit = (m_pAVCtx != nullptr);
 
 	int64_t x264_build = -1;
-	if (m_nCodecId == AV_CODEC_ID_H264 && bReinit && !bChangeType) {
+	if (m_nCodecId == AV_CODEC_ID_H264 && bReinit && !bMediaTypeChanged) {
 		int64_t val = -1;
 		if (av_opt_get_int(m_pAVCtx->priv_data, "x264_build", 0, &val) >= 0) {
 			x264_build = val;
@@ -1871,7 +1871,7 @@ redo:
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	if (bChangeType) {
+	if (bMediaTypeChanged) {
 		ExtractAvgTimePerFrame(pmt, m_rtAvrTimePerFrame);
 		int wout, hout;
 		ExtractDim(pmt, wout, hout, m_nARX, m_nARY);
@@ -1898,7 +1898,7 @@ redo:
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	if (bChangeType) {
+	if (bMediaTypeChanged) {
 		const int nNewCodec = FindCodec(pmt, bReinit);
 		if (nNewCodec == -1) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
@@ -1914,7 +1914,7 @@ redo:
 	}
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
-	if (bChangeType) {
+	if (bMediaTypeChanged) {
 		const CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
 		const BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
 											   || clsidInput == CLSID_WMAsfReader); // WM ASF Reader
@@ -2025,7 +2025,7 @@ redo:
 		m_bUseDXVA = m_bUseD3D11 = false;
 	}
 
-	if (bChangeType) {
+	if (bMediaTypeChanged) {
 		m_bWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
 						 || m_nCodecId == AV_CODEC_ID_VC1IMAGE
 						 || m_nCodecId == AV_CODEC_ID_WMV3
@@ -2092,7 +2092,7 @@ redo:
 				}
 			}
 
-			if (bChangeType) {
+			if (bMediaTypeChanged) {
 				m_FilterInfo.Clear();
 				int value = 0;
 				if (SUCCEEDED(pIExFilterInfo->GetPropertyInt("VIDEO_PROFILE", &value))) {
@@ -2191,7 +2191,7 @@ redo:
 	m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 	m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
 
-	if (bChangeType && IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+	if (bMediaTypeChanged && IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 		do {
 			m_bDXVACompatible = false;
 
@@ -2245,7 +2245,7 @@ redo:
 		m_pDXVADecoder->FillHWContext();
 	}
 
-	if (IsDXVASupported(m_bUseD3D11)) {
+	if (bMediaTypeChanged && IsDXVASupported(m_bUseD3D11)) {
 		m_pD3D11Decoder->PostInitDecoder(m_pAVCtx);
 	}
 
