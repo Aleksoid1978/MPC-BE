@@ -29,6 +29,7 @@
 #include "MemUsage.h"
 #include <deque>
 #include <mutex>
+#include <ID3DFullscreenControl.h>
 #include <MediaOffset3D.h>
 
 #define NB_JITTER        126

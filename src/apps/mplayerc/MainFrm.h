@@ -56,6 +56,7 @@
 #include <IChapterInfo.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
+#include <ID3DFullscreenControl.h>
 #include <HighDPI.h>
 
 #include "WebServer.h"

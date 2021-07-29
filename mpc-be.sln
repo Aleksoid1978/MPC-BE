@@ -156,6 +156,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\IBitRateInfo.h = include\IBitRateInfo.h
 		include\IBufferInfo.h = include\IBufferInfo.h
 		include\IChapterInfo.h = include\IChapterInfo.h
+		include\ID3DFullscreenControl.h = include\ID3DFullscreenControl.h
 		include\IFilterVersion.h = include\IFilterVersion.h
 		include\IKeyFrameInfo.h = include\IKeyFrameInfo.h
 		include\IMediaSample3D.h = include\IMediaSample3D.h

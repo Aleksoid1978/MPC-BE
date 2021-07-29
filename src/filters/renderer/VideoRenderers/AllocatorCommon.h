@@ -33,18 +33,9 @@ const wchar_t* GetD3DFormatStr(D3DFORMAT Format);
 
 HRESULT LoadSurfaceFromMemory(IDirect3DSurface9* pDestSurface, LPCVOID pSrcMemory, UINT SrcPitch, UINT SrcHeight);
 
-// Set and query D3DFullscreen mode.
-interface __declspec(uuid("8EA1E899-B77D-4777-9F0E-66421BEA50F8"))
-ID3DFullscreenControl :
-public IUnknown {
-	STDMETHOD(SetD3DFullscreen)(bool fEnabled) PURE;
-	STDMETHOD(GetD3DFullscreen)(bool * pfEnabled) PURE;
-};
-
 // Notify playback events
 interface __declspec(uuid("7DB66F45-A3CB-4B06-8219-916C33E53E2D"))
 IPlaybackNotify :
 public IUnknown {
 	STDMETHOD(Stop)() PURE;
 };
-
