@@ -2,10 +2,23 @@
 
 1.6.0 (alpha)
 =============================
+MPCVideoDec
+Eliminated high load on the system with frequent navigation on H.264 and MPEG-2 videos when using the D3D11 decoder. 
+
+Subtitles
+Texture size 2560x1600 changed to 2560x1440. 
+
 Player
 The history of open files and URLs is now saved in the history.mpc_lst file. Added a window for viewing history.
 Bookmarks are now saved in the favorites.mpc_lst file.
-Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player. 
+Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player.
+Statistics information is now updated after navigation when playback is paused.
+Fixed DVD-Video playback with built-in filters. 
+
+Updated Chinese (Simplified) translation (by wushantao).
+Updated German translation (by Klaus1189).
+Updated Hungarian translation (by mickey).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	dav1d git-0.9.0-57-g73db537;
