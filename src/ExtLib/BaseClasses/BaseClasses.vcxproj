@@ -48,6 +48,9 @@
       <EnablePREfast>false</EnablePREfast>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
+    <Lib>
+      <AdditionalDependencies>strmiids.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -55,6 +58,9 @@
       <PrecompiledHeaderFile>streams.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
+    <Lib>
+      <AdditionalDependencies>strmiids.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -63,6 +69,9 @@
       <EnablePREfast>false</EnablePREfast>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
+    <Lib>
+      <AdditionalDependencies>strmiids.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -70,6 +79,9 @@
       <PrecompiledHeaderFile>streams.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
+    <Lib>
+      <AdditionalDependencies>strmiids.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="amextra.h" />
