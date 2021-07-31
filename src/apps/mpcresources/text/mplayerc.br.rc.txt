@@ -106,9 +106,9 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
-3		"History (experimental)"
-7		"Delete selected"
-8		"Clear"
+3		"Histórico (experimental)"
+7		"Deletar selecionado"
+8		"Limpar"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1871,7 +1871,7 @@ STRING IDS_SHADER_EDITOR		"Editor de shader"
 STRING IDS_SHADER_FOLDER		"Abrir pasta de shader"
 STRING IDS_SHADER_NEW		"Novo..."
 STRING IDS_SHADER_SAVE		"Salvar"
-STRING IDS_SHOW_HISTORY		"Show history"
+STRING IDS_SHOW_HISTORY		"Mostrar histórico"
 STRING IDS_SIDE_LEFT		"Lado esquerdo"
 STRING IDS_SIDE_RIGHT		"Lado direito"
 STRING IDS_SIZE_UNIT_G		"GB"
