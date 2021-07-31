@@ -557,6 +557,7 @@ Note: when adding a new codec, you have to:
 	REGISTER_<ENCODER|DECODER|PARSER> (<codec suffix>, <codec suffix lowercase>);
 	line to libavcodec/allcodecs.c
 */
+#define CONFIG_MACOS_KPERF 0
 #define CONFIG_BSFS 1
 #define CONFIG_AAC_ADTSTOASC_BSF 0
 #define CONFIG_CHOMP_BSF 0

@@ -290,7 +290,7 @@ typedef struct SwsContext {
      * Note that src, dst, srcStride, dstStride will be copied in the
      * sws_scale() wrapper so they can be freely modified here.
      */
-    SwsFunc swscale;
+    SwsFunc convert_unscaled;
     int srcW;                     ///< Width  of source      luma/alpha planes.
     int srcH;                     ///< Height of source      luma/alpha planes.
     int dstH;                     ///< Height of destination luma/alpha planes.
@@ -626,6 +626,18 @@ typedef struct SwsContext {
     SwsDither dither;
 
     SwsAlphaBlend alphablend;
+
+    // scratch buffer for converting packed rgb0 sources
+    // filled with a copy of the input frame + fully opaque alpha,
+    // then passed as input to further conversion
+    uint8_t     *rgb0_scratch;
+    unsigned int rgb0_scratch_allocated;
+
+    // scratch buffer for converting XYZ sources
+    // filled with the input converted to rgb48
+    // then passed as input to further conversion
+    uint8_t     *xyz_scratch;
+    unsigned int xyz_scratch_allocated;
 } SwsContext;
 //FIXME check init (where 0)
 
@@ -858,19 +870,15 @@ extern const int32_t ff_yuv2rgb_coeffs[11][4];
 extern const AVClass ff_sws_context_class;
 
 /**
- * Set c->swscale to an unscaled converter if one exists for the specific
- * source and destination formats, bit depths, flags, etc.
+ * Set c->convert_unscaled to an unscaled converter if one exists for the
+ * specific source and destination formats, bit depths, flags, etc.
  */
 void ff_get_unscaled_swscale(SwsContext *c);
 void ff_get_unscaled_swscale_ppc(SwsContext *c);
 void ff_get_unscaled_swscale_arm(SwsContext *c);
 void ff_get_unscaled_swscale_aarch64(SwsContext *c);
 
-/**
- * Return function pointer to fastest main scaler path function depending
- * on architecture and available optimizations.
- */
-SwsFunc ff_getSwsFunc(SwsContext *c);
+void ff_sws_init_scale(SwsContext *c);
 
 void ff_sws_init_input_funcs(SwsContext *c);
 void ff_sws_init_output_funcs(SwsContext *c,

@@ -28,6 +28,7 @@
 #include "config.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
@@ -40,7 +41,6 @@
 #include "internal.h"
 #include "put_bits.h"
 #include "raw.h"
-#include "version.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdatomic.h>
@@ -712,7 +712,7 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
             case AV_CODEC_ID_ADPCM_THP:
             case AV_CODEC_ID_ADPCM_THP_LE:
                 if (extradata)
-                    return frame_bytes * 14 / (8 * ch);
+                    return frame_bytes * 14LL / (8 * ch);
                 break;
             case AV_CODEC_ID_ADPCM_XA:
                 return (frame_bytes / 128) * 224 / ch;

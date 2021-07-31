@@ -25,6 +25,7 @@
 #pragma warning(disable: 4005)
 extern "C" {
 #include "ExtLib/ffmpeg/libavcodec/avcodec.h"
+#include "ExtLib/ffmpeg/libavutil/channel_layout.h"
 }
 #pragma warning(pop)
 

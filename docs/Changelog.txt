@@ -22,6 +22,7 @@ Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	dav1d git-0.9.0-57-g73db537;
+	ffmpeg git-n4.5-dev-1460-gb9176dbfb7;
 
 
 1.5.8

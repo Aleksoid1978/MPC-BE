@@ -32,6 +32,7 @@
 #include "libavutil/mathematics.h"
 #include "libavutil/pixfmt.h"
 #include "avcodec.h"
+#include "bsf.h"
 #include "config.h"
 
 /**
@@ -78,6 +79,11 @@
  * Codec handles avctx->thread_count == 0 (auto) internally.
  */
 #define FF_CODEC_CAP_AUTO_THREADS           (1 << 7)
+/**
+ * Codec handles output frame properties internally instead of letting the
+ * internal logic derive them from AVCodecInternal.last_pkt_props.
+ */
+#define FF_CODEC_CAP_SETS_FRAME_PROPS       (1 << 8)
 
 /**
  * AVCodec.codec_tags termination value
