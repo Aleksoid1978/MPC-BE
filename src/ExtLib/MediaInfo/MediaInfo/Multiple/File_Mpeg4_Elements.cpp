@@ -1967,9 +1967,9 @@ void File_Mpeg4::mdat_xxxx()
         #endif //MEDIAINFO_DEMUX
         Element_Show();
 
-        #if MEDIAINFO_DEMUX
-            if (!Stream_Temp.IsFilled && Stream_Temp.Parsers[Pos]->Status[IsFilled])
-            {
+        if (!Stream_Temp.IsFilled && Stream_Temp.Parsers[Pos]->Status[IsFilled])
+        {
+            #if MEDIAINFO_DEMUX
                 if (Stream_Temp.StreamKind==Stream_Other) //If this is a TimeCode track
                 {
                     if (((File_Mpeg4_TimeCode*)Stream_Temp.Parsers[Pos])->Pos!=(int32u)-1)
@@ -1982,46 +1982,46 @@ void File_Mpeg4::mdat_xxxx()
                             }
                     }
                 }
+            #endif //MEDIAINFO_DEMUX
 
-                Stream_Temp.IsFilled=true;
+            Stream_Temp.IsFilled=true;
 
-                if (Config->ParseSpeed<1 && !mdat_Pos.empty())
+            if (Config->ParseSpeed<1 && !mdat_Pos.empty())
+            {
+                bool File_Offset_Next_IsValid;
+                int64u File_Offset_Next;
+                if (mdat_Pos_Temp!=mdat_Pos_Max)
                 {
-                    bool File_Offset_Next_IsValid;
-                    int64u File_Offset_Next;
-                    if (mdat_Pos_Temp!=mdat_Pos_Max)
-                    {
-                        File_Offset_Next=mdat_Pos_Temp->Offset;
-                        File_Offset_Next_IsValid=true;
-                    }
-                    else
-                    {
-                        File_Offset_Next=(int64u)-1;
-                        File_Offset_Next_IsValid=false;
-                    }
-                    mdat_pos mdat_Pos_New;
-                    mdat_Pos_Max=mdat_Pos.empty()?NULL:(&mdat_Pos[0]+mdat_Pos.size());
-                    if (!mdat_Pos.empty())
-                    {
-                        for (mdat_Pos_Type* mdat_Pos_Item=&mdat_Pos[0]; mdat_Pos_Item<mdat_Pos_Max; ++mdat_Pos_Item)
-                            if (mdat_Pos_Item->StreamID!=(int32u)Element_Code)
-                                mdat_Pos_New.push_back(*mdat_Pos_Item);
-                    }
-                    mdat_Pos=mdat_Pos_New;
-                    std::sort(mdat_Pos.begin(), mdat_Pos.end(), &mdat_pos_sort);
-                    mdat_Pos_Temp=mdat_Pos.empty()?NULL:&mdat_Pos[0];
-                    mdat_Pos_Max=mdat_Pos_Temp+mdat_Pos.size();
-                    if (File_Offset_Next_IsValid)
-                        for (; mdat_Pos_Temp<mdat_Pos_Max; ++mdat_Pos_Temp)
-                        {
-                            if (mdat_Pos_Temp->Offset>=File_Offset_Next)
-                                break;
-                        }
-                    else
-                        mdat_Pos_Temp=mdat_Pos_Max;
+                    File_Offset_Next=mdat_Pos_Temp->Offset;
+                    File_Offset_Next_IsValid=true;
                 }
+                else
+                {
+                    File_Offset_Next=(int64u)-1;
+                    File_Offset_Next_IsValid=false;
+                }
+                mdat_pos mdat_Pos_New;
+                mdat_Pos_Max=mdat_Pos.empty()?NULL:(&mdat_Pos[0]+mdat_Pos.size());
+                if (!mdat_Pos.empty())
+                {
+                    for (mdat_Pos_Type* mdat_Pos_Item=&mdat_Pos[0]; mdat_Pos_Item<mdat_Pos_Max; ++mdat_Pos_Item)
+                        if (mdat_Pos_Item->StreamID!=(int32u)Element_Code)
+                            mdat_Pos_New.push_back(*mdat_Pos_Item);
+                }
+                mdat_Pos=mdat_Pos_New;
+                std::sort(mdat_Pos.begin(), mdat_Pos.end(), &mdat_pos_sort);
+                mdat_Pos_Temp=mdat_Pos.empty()?NULL:&mdat_Pos[0];
+                mdat_Pos_Max=mdat_Pos_Temp+mdat_Pos.size();
+                if (File_Offset_Next_IsValid)
+                    for (; mdat_Pos_Temp<mdat_Pos_Max; ++mdat_Pos_Temp)
+                    {
+                        if (mdat_Pos_Temp->Offset>=File_Offset_Next)
+                            break;
+                    }
+                else
+                    mdat_Pos_Temp=mdat_Pos_Max;
             }
-        #endif //MEDIAINFO_DEMUX
+        }
 
         //Multiple parsers
         if (Stream_Temp.Parsers.size()>1)
