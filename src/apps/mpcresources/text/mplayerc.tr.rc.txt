@@ -106,9 +106,9 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
-3		"History (experimental)"
-7		"Delete selected"
-8		"Clear"
+3		"Geçmiş (deneysel)"
+7		"Seçilenleri sil"
+8		"Temizle"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -410,8 +410,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 9		"Başlık çubuğu metini"
 11		"Arama çubuğu metini"
 13		"Geçmiş"
-14		"Dosya geçmişini hatırla"
-16		"Son dosya sayısı:"
+14		"Son açılan dosyaları geçmişte sakla"
+16		"Son dosyalar sayısı:"
 19		"DVD yerleşimini hatırla"
 20		"Dosya yerleşimini hatırla"
 21		"Son büyütme ayarlarını hatırla"
@@ -1835,7 +1835,7 @@ STRING IDS_PROPERTIESFOR		"'%s' için özellikler"
 STRING IDS_PROPSHEET_PROPERTIES		"Özellikler"
 STRING IDS_PUBLISHED		"Yayımlandı : "
 STRING IDS_RECENT_FILES		"Son Dosyalar"
-STRING IDS_RECENT_FILES_CLEAR		"Listeyi temizle"
+STRING IDS_RECENT_FILES_CLEAR		"Listeyi Temizle"
 STRING IDS_RECENT_FILES_QUESTION		"Son dosyalar listesini temizlemek istediğinizden emin misiniz?"
 STRING IDS_RECORD_START		"Kaydet"
 STRING IDS_RECORD_STOP		"Dur"
@@ -1871,7 +1871,7 @@ STRING IDS_SHADER_EDITOR		"Tonlama Düzenleyicisi"
 STRING IDS_SHADER_FOLDER		"Tonlamalar klasörünü aç"
 STRING IDS_SHADER_NEW		"Yeni..."
 STRING IDS_SHADER_SAVE		"Kaydet"
-STRING IDS_SHOW_HISTORY		"Show history"
+STRING IDS_SHOW_HISTORY		"Geçmişi Göster"
 STRING IDS_SIDE_LEFT		"Yan Sol"
 STRING IDS_SIDE_RIGHT		"Yan Sağ"
 STRING IDS_SIZE_UNIT_G		"GB"
