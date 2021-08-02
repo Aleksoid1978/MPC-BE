@@ -31,6 +31,7 @@
 #include <mutex>
 #include <ID3DFullscreenControl.h>
 #include <MediaOffset3D.h>
+#include "D3DUtil/D3D9Font.h"
 
 #define NB_JITTER        126
 
@@ -68,9 +69,8 @@ namespace DSObjects
 
 		CCritSec m_RenderLock;
 
-		CComPtr<ID3DXLine>   m_pLine;
-		CComPtr<ID3DXFont>   m_pFont;
-		CComPtr<ID3DXSprite> m_pSprite;
+		CComPtr<ID3DXLine> m_pLine;
+		CD3D9Font m_Font3D;
 
 		bool                       m_bAlphaBitmapEnable = false;
 		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;
@@ -113,24 +113,6 @@ namespace DSObjects
 		HRESULT (__stdcall *m_pfD3DXCreateLine)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXLINE        *ppLine
-		);
-		HRESULT (__stdcall *m_pfD3DXCreateFontW)(
-			_In_  LPDIRECT3DDEVICE9 pDevice,
-			_In_  INT               Height,
-			_In_  UINT              Width,
-			_In_  UINT              Weight,
-			_In_  UINT              MipLevels,
-			_In_  BOOL              Italic,
-			_In_  DWORD             CharSet,
-			_In_  DWORD             OutputPrecision,
-			_In_  DWORD             Quality,
-			_In_  DWORD             PitchAndFamily,
-			_In_  LPCWSTR           pFacename,
-			_Out_ LPD3DXFONT        *ppFont
-		);
-		HRESULT (__stdcall *m_pfD3DXCreateSprite)(
-			_In_  LPDIRECT3DDEVICE9 pDevice,
-			_Out_ LPD3DXSPRITE      *ppSprite
 		);
 
 		long					m_nUsedBuffer;
