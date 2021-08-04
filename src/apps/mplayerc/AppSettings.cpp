@@ -792,7 +792,7 @@ void CAppSettings::ResetSettings()
 	bYDLMaximumQuality = false;
 
 	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
-	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%25s&index=1&m3u";
+	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u";
 
 	nLastFileInfoPage = 0;
 
