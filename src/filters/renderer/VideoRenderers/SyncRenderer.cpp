@@ -1684,6 +1684,7 @@ void CBaseAP::DrawStats()
 	// pApp->m_iDisplayStats = 1 for full stats, 2 for little less, 3 for basic, 0 for no stats
 	{
 		CString strText;
+		strText.Preallocate(1000);
 
 		strText.Format(L"Frames drawn from stream start: %u | Sample time stamp: %d ms", m_pcFramesDrawn, (int)(m_llSampleTime / 10000));
 
