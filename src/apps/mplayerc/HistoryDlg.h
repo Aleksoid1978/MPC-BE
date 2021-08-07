@@ -31,13 +31,15 @@ class CHistoryDlg : public CResizableDialog
 	//DECLARE_DYNAMIC(CHistoryDlg)
 
 private:
+	enum { IDD = IDD_HISTORY };
+
 	enum {
 		COL_PATH = 0,
 		COL_TITLE,
 		COL_POS,
 		COL_COUNT
 	};
-	enum { IDD = IDD_HISTORY };
+
 	CListCtrl m_list;
 	std::vector<SessionInfo> m_recentSessions;
 
@@ -62,4 +64,5 @@ public:
 	afx_msg void OnChangeFilterEdit();
 	afx_msg void OnDelSelBnClicked();
 	afx_msg void OnClearBnClicked();
+	afx_msg void OnClose();
 };

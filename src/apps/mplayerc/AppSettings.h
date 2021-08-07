@@ -909,6 +909,8 @@ public:
 	bool			bOSDLocalTime;
 	bool			bOSDFileName;
 
+	int				HistoryColWidths[3];
+
 	void			SavePlaylistTabSetting();
 
 	void			LoadFormats(const bool bLoadLanguage);

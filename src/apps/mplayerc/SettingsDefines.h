@@ -346,6 +346,7 @@
 
 //
 #define IDS_R_ACCELTBLCOLWIDTHS				L"AccelTblColWidths"
+#define IDS_R_HISTORYCOLWIDTHS				L"HistoryColWidths"
 
 // Dialogs
 

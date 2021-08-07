@@ -116,6 +116,7 @@ BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
 	ON_BN_CLICKED(IDC_BUTTON1, OnDelSelBnClicked)
 	ON_BN_CLICKED(IDC_BUTTON2, OnClearBnClicked)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 // CHistoryDlg message handlers
@@ -138,15 +139,28 @@ BOOL CHistoryDlg::OnInitDialog()
 
 	SetupList();
 
-	for (int nCol = COL_PATH; nCol < COL_COUNT; nCol++) {
-		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
-		const int headerWidth = m_list.GetColumnWidth(nCol);
-		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-		const int contentWidth = m_list.GetColumnWidth(nCol);
+	CAppSettings& s = AfxGetAppSettings();
 
-		if (headerWidth > contentWidth) {
-			m_list.SetColumnWidth(nCol, headerWidth);
+	for (int i = 0; i < COL_COUNT; i++) {
+		int width = s.HistoryColWidths[i];
+
+		if (width <= 0 || width > 2000) {
+			m_list.SetColumnWidth(i, LVSCW_AUTOSIZE_USEHEADER);
+			const int headerW = m_list.GetColumnWidth(i);
+
+			m_list.SetColumnWidth(i, LVSCW_AUTOSIZE);
+			width = m_list.GetColumnWidth(i);
+
+			if (headerW > width) {
+				width = headerW;
+			}
 		}
+		else {
+			if (width < 25) {
+				width = 25;
+			}
+		}
+		m_list.SetColumnWidth(i, width);
 	}
 
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
@@ -202,4 +216,15 @@ void CHistoryDlg::OnClearBnClicked()
 			SetupList();
 		}
 	}
+}
+
+void CHistoryDlg::OnClose()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	for (int i = 0; i < COL_COUNT; i++) {
+		s.HistoryColWidths[i] = m_list.GetColumnWidth(i);
+	}
+
+	__super::OnClose();
 }

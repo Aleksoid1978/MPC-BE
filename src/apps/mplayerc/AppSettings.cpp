@@ -808,6 +808,8 @@ void CAppSettings::ResetSettings()
 
 	youtubeSignatureCache.clear();
 
+	ZeroMemory(HistoryColWidths, sizeof(HistoryColWidths));
+
 	strTabs.Empty();
 }
 
@@ -1511,6 +1513,17 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		youtubeSignatureCache[name] = value;
 	}
 
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_R_HISTORYCOLWIDTHS, str)) {
+		int ret = swscanf_s(str, L"%d;%d;%d",
+			&HistoryColWidths[0],
+			&HistoryColWidths[1],
+			&HistoryColWidths[2]
+		);
+		if (ret != std::size(HistoryColWidths)) {
+			ZeroMemory(HistoryColWidths, sizeof(HistoryColWidths));
+		}
+	}
+
 	if (fLaunchfullscreen && !ExclusiveFSAllowed()) {
 		nCLSwitches |= CLSW_FULLSCREEN;
 	}
@@ -1975,6 +1988,16 @@ void CAppSettings::SaveSettings()
 
 	for (const auto& [name, value] : youtubeSignatureCache) {
 		profile.WriteString(IDS_R_YOUTUBECACHE, name, value);
+	}
+
+	if (HistoryColWidths[0]) {
+		str.Empty();
+		for (int i = 0; i < std::size(HistoryColWidths); i++) {
+			str.AppendFormat(L"%d;", HistoryColWidths[i]);
+		}
+		profile.WriteString(IDS_R_SETTINGS, IDS_R_HISTORYCOLWIDTHS, str);
+	} else {
+		profile.DeleteValue(IDS_R_SETTINGS, IDS_R_HISTORYCOLWIDTHS);
 	}
 
 	SaveFormats();
