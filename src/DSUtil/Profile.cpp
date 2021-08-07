@@ -439,7 +439,7 @@ bool CProfile::ReadString(const wchar_t* section, const wchar_t* entry, CStringW
 	return ret;
 }
 
-bool CProfile::ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes)
+bool CProfile::ReadBinaryOld(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
 
@@ -498,7 +498,7 @@ bool CProfile::ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** p
 	return ret;
 }
 
-bool CProfile::ReadBinary2(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes)
+bool CProfile::ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
 
@@ -733,7 +733,7 @@ bool CProfile::WriteString(const wchar_t* section, const wchar_t* entry, const C
 	return ret;
 }
 
-bool CProfile::WriteBinary(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes)
+bool CProfile::WriteBinaryOld(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
 
@@ -770,7 +770,7 @@ bool CProfile::WriteBinary(const wchar_t* section, const wchar_t* entry, const B
 	return ret;
 }
 
-bool CProfile::WriteBinary2(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes)
+bool CProfile::WriteBinary(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
 

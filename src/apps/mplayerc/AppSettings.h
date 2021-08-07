@@ -278,18 +278,6 @@ struct fpsmode {
 	}
 };
 
-struct AccelTbl {
-	bool bEnable;
-	int cmd;
-	int key;
-	int id;
-	int mwnd;
-	int mfs;
-	int appcmd;
-	int remcmd;
-	int repcnt;
-};
-
 #pragma pack(pop)
 
 class wmcmd : public ACCEL
@@ -576,6 +564,7 @@ public:
 	CString			strUIceAddr;
 	CUIceClient		UIceClient;
 	bool			bGlobalMedia;
+	int				AccelTblColWidths[6];
 
 	// Mouse
 	UINT			nMouseLeftClick;
@@ -693,7 +682,6 @@ public:
 		bool bApplyDefault;
 	} fullScreenModes;
 
-	AccelTbl		AccelTblColWidth;
 	bool			fRestoreResAfterExit;
 	dispmode		dmFSMonOnLaunch;
 	CString			strFSMonOnLaunch;

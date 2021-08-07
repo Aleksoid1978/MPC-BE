@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,17 @@ class CPPageAccelTbl : public CPPageBase
 	DECLARE_DYNAMIC(CPPageAccelTbl)
 
 private:
-	enum {COL_CMD, COL_KEY, COL_ID, COL_APPCMD, COL_RMCMD, COL_RMREPCNT};
+	enum {
+		COL_CMD,
+		COL_KEY,
+		COL_ID,
+		COL_APPCMD,
+		COL_RMCMD,
+		COL_RMREPCNT,
+		COL_COUNT
+	};
+
+	int m_headerColWidths[COL_COUNT];
 
 	std::vector<wmcmd> m_wmcmds;
 
@@ -88,6 +98,7 @@ protected:
 	virtual BOOL OnKillActive();
 
 	void SetupList();
+	void SetupColWidths(bool bUserValue);
 	void FilterList();
 
 	DECLARE_MESSAGE_MAP()

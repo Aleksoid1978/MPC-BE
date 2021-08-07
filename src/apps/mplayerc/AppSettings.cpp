@@ -538,8 +538,6 @@ void CAppSettings::ResetSettings()
 	fullScreenModes.bEnabled = FALSE;
 	fullScreenModes.bApplyDefault = false;
 
-	ZeroMemory(&AccelTblColWidth, sizeof(AccelTbl));
-
 	fExitFullScreenAtTheEnd = true;
 	fExitFullScreenAtFocusLost = false;
 	fRestoreResAfterExit = true;
@@ -632,6 +630,7 @@ void CAppSettings::ResetSettings()
 	strUIceAddr = L"127.0.0.1:1234";
 	bUIce = false;
 	bGlobalMedia = true;
+	ZeroMemory(AccelTblColWidths, sizeof(AccelTblColWidths));
 
 	// Mouse
 	nMouseLeftClick     = ID_PLAY_PLAYPAUSE;
@@ -925,7 +924,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 
 		entry.Format(L"Res%u", cnt);
-		if (profile.ReadBinary(IDS_RS_FULLSCREENRES, entry, &ptr, len)) {
+		if (profile.ReadBinaryOld(IDS_RS_FULLSCREENRES, entry, &ptr, len)) {
 			if (len >= (sizeof(fpsmode) + 1)) {
 				BYTE size = ptr[0];
 				if (size && size <= MaxFullScreenModes && size * sizeof(fpsmode) == len - 1) {
@@ -943,17 +942,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	if (fullScreenModes.res.empty()) {
 		fullScreenModes.bEnabled = FALSE;
 		fullScreenModes.bApplyDefault = false;
-	}
-
-	if (profile.ReadBinary(IDS_R_SETTINGS, L"AccelTblColWidth", &ptr, len)) {
-		if (len == sizeof(AccelTbl)) {
-			memcpy(&AccelTblColWidth, ptr, sizeof(AccelTbl));
-		} else {
-			AccelTblColWidth.bEnable = false;
-		}
-		delete [] ptr;
-	} else {
-		AccelTblColWidth.bEnable = false;
 	}
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
@@ -1234,6 +1222,20 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
+
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_R_ACCELTBLCOLWIDTHS, str)) {
+		int ret = swscanf_s(str, L"%d;%d;%d;%d;%d;%d",
+			&AccelTblColWidths[0],
+			&AccelTblColWidths[1],
+			&AccelTblColWidths[2],
+			&AccelTblColWidths[3],
+			&AccelTblColWidths[4],
+			&AccelTblColWidths[5]
+		);
+		if (ret != std::size(AccelTblColWidths)) {
+			ZeroMemory(AccelTblColWidths, sizeof(AccelTblColWidths));
+		}
+	}
 
 	// Mouse
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT, str)) {
@@ -1582,12 +1584,11 @@ void CAppSettings::SaveSettings()
 				value.resize(1 + item.dmFullscreenRes.size() * sizeof(fpsmode));
 				value[0] = (BYTE)item.dmFullscreenRes.size();
 				memcpy(&value[1], item.dmFullscreenRes.data(), item.dmFullscreenRes.size() * sizeof(fpsmode));
-				profile.WriteBinary(IDS_RS_FULLSCREENRES, entry, value.data(), value.size());
+				profile.WriteBinaryOld(IDS_RS_FULLSCREENRES, entry, value.data(), value.size());
 			}
 		}
 	}
 
-	profile.WriteBinary(IDS_R_SETTINGS, L"AccelTblColWidth", (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
 
@@ -1831,6 +1832,16 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
+
+	if (AccelTblColWidths[0]) {
+		str.Empty();
+		for (int i = 0; i < std::size(AccelTblColWidths); i++) {
+			str.AppendFormat(L"%d;", AccelTblColWidths[i]);
+		}
+		profile.WriteString(IDS_R_SETTINGS, IDS_R_ACCELTBLCOLWIDTHS, str);
+	} else {
+		profile.DeleteValue(IDS_R_SETTINGS, IDS_R_ACCELTBLCOLWIDTHS);
+	}
 
 	// Mouse
 	str.Format(L"%u", nMouseLeftClick);

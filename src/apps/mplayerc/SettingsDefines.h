@@ -344,6 +344,9 @@
 
 #define IDS_RS_PASTECLIPBOARDURL			L"PasteClipboardURL"
 
+//
+#define IDS_R_ACCELTBLCOLWIDTHS				L"AccelTblColWidths"
+
 // Dialogs
 
 #define IDS_R_DLG_SUBTITLEDL				L"Dialogs\\SubtitleDl"

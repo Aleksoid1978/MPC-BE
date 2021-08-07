@@ -48,7 +48,7 @@ static bool LoadMediaType(const CStringW prefix, CStringW name, AM_MEDIA_TYPE** 
 	ZeroMemory(*ppmt, sizeof(AM_MEDIA_TYPE));
 	BYTE* pData;
 	UINT len;
-	if (profile.ReadBinary2(IDS_R_CAPTURE, prefix + L"MediaType", &pData, len)) {
+	if (profile.ReadBinary(IDS_R_CAPTURE, prefix + L"MediaType", &pData, len)) {
 		if ( len != sizeof(AM_MEDIA_TYPE) ) {
 			CoTaskMemFree(*ppmt);
 			delete [] pData;
@@ -60,7 +60,7 @@ static bool LoadMediaType(const CStringW prefix, CStringW name, AM_MEDIA_TYPE** 
 		(*ppmt)->cbFormat = 0;
 		(*ppmt)->pbFormat = nullptr;
 
-		if (profile.ReadBinary2(IDS_R_CAPTURE, prefix + L"Format", &pData, len)) {
+		if (profile.ReadBinary(IDS_R_CAPTURE, prefix + L"Format", &pData, len)) {
 			if ( !len ) {
 				delete [] pData;
 				return false;
@@ -84,8 +84,8 @@ static void SaveMediaType(const CStringW prefix, const CStringW name, AM_MEDIA_T
 	CProfile& profile = AfxGetProfile();
 
 	if (profile.WriteString(IDS_R_CAPTURE, prefix + L"DispName", name)) {
-		profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
-		profile.WriteBinary2(IDS_R_CAPTURE, prefix + L"Format", pmt->pbFormat, pmt->cbFormat);
+		profile.WriteBinary(IDS_R_CAPTURE, prefix + L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
+		profile.WriteBinary(IDS_R_CAPTURE, prefix + L"Format", pmt->pbFormat, pmt->cbFormat);
 	}
 }
 

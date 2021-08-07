@@ -571,6 +571,8 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	m_UIceAddr = s.strUIceAddr;
 	m_bGlobalMedia = s.bGlobalMedia;
 
+	ASSERT(std::size(s.AccelTblColWidths) == COL_COUNT);
+
 	UpdateData(FALSE);
 
 	{
@@ -590,12 +592,17 @@ BOOL CPPageAccelTbl::OnInitDialog()
 			m_list.DeleteColumn(0);
 		}
 
-		m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.cmd);
-		m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT, s.AccelTblColWidth.key);
-		m_list.InsertColumn(COL_ID, L"ID", LVCFMT_LEFT, s.AccelTblColWidth.id);
-		m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.appcmd);
-		m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
-		m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
+		m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT);
+		m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT);
+		m_list.InsertColumn(COL_ID, L"ID", LVCFMT_LEFT);
+		m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT);
+		m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT);
+		m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_LEFT);
+
+		for (int i = 0; i < COL_COUNT; i++) {
+			m_list.SetColumnWidth(i, LVSCW_AUTOSIZE_USEHEADER);
+			m_headerColWidths[i] = m_list.GetColumnWidth(i);
+		}
 
 		for (size_t i = 0; i < m_wmcmds.size(); i++) {
 			const wmcmd& wc = m_wmcmds[i];
@@ -607,6 +614,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 		}
 
 		SetupList();
+		SetupColWidths(true);
 	}
 
 	// subclass the keylist control
@@ -650,13 +658,9 @@ BOOL CPPageAccelTbl::OnApply()
 
 	AfxGetMyApp()->RegisterHotkeys();
 
-	s.AccelTblColWidth.bEnable = true;
-	s.AccelTblColWidth.cmd		= m_list.GetColumnWidth(COL_CMD);
-	s.AccelTblColWidth.key		= m_list.GetColumnWidth(COL_KEY);
-	s.AccelTblColWidth.id		= m_list.GetColumnWidth(COL_ID);
-	s.AccelTblColWidth.appcmd	= m_list.GetColumnWidth(COL_APPCMD);
-	s.AccelTblColWidth.remcmd	= m_list.GetColumnWidth(COL_RMCMD);
-	s.AccelTblColWidth.repcnt	= m_list.GetColumnWidth(COL_RMREPCNT);
+	for (int i = 0; i < COL_COUNT; i++) {
+		s.AccelTblColWidths[i] = m_list.GetColumnWidth(i);
+	}
 
 	return __super::OnApply();
 }
@@ -687,8 +691,8 @@ void CPPageAccelTbl::OnBnClickedResetSelected()
 		wc.Restore();
 	}
 
-	AfxGetAppSettings().AccelTblColWidth.bEnable = false;
 	SetupList();
+	SetupColWidths(false);
 
 	SetModified();
 }
@@ -970,17 +974,31 @@ void CPPageAccelTbl::SetupList()
 	}
 
 	UpdateAllDupFlags();
+}
 
-	if (!AfxGetAppSettings().AccelTblColWidth.bEnable) {
-		for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
-			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-			const int contentWidth = m_list.GetColumnWidth(nCol);
-			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
-			const int headerWidth = m_list.GetColumnWidth(nCol);
-			if (contentWidth > headerWidth) {
-				m_list.SetColumnWidth(nCol, contentWidth);
+void CPPageAccelTbl::SetupColWidths(bool bUserValue)
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	for (int i = COL_CMD; i < COL_COUNT; i++) {
+		int width = bUserValue ? s.AccelTblColWidths[i] : 0;
+		auto& headerW = m_headerColWidths[i];
+
+		if (width <= 0 || width > 2000) {
+			m_list.SetColumnWidth(i, LVSCW_AUTOSIZE);
+			width = m_list.GetColumnWidth(i);
+			if (headerW > width) {
+				width = headerW;
 			}
 		}
+		else {
+			if (width < 25) {
+				width = 25;
+			}
+		}
+		m_list.SetColumnWidth(i, width);
+
+		s.AccelTblColWidths[i] = width;
 	}
 }
 

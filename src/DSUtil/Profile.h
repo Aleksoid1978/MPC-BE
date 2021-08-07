@@ -66,8 +66,8 @@ public:
 	bool ReadDouble(const wchar_t* section, const wchar_t* entry, double&   value, const double lo, const double hi);
 	bool ReadHex32 (const wchar_t* section, const wchar_t* entry, unsigned& value);
 	bool ReadString(const wchar_t* section, const wchar_t* entry, CStringW& value);
+	bool ReadBinaryOld(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes);
 	bool ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes);
-	bool ReadBinary2(const wchar_t* section, const wchar_t* entry, BYTE** ppdata, unsigned& nbytes);
 
 	bool WriteBool  (const wchar_t* section, const wchar_t* entry, const bool      value);
 	bool WriteInt   (const wchar_t* section, const wchar_t* entry, const int       value);
@@ -76,8 +76,8 @@ public:
 	bool WriteDouble(const wchar_t* section, const wchar_t* entry, const double    value);
 	bool WriteHex32 (const wchar_t* section, const wchar_t* entry, const unsigned  value);
 	bool WriteString(const wchar_t* section, const wchar_t* entry, const CStringW& value);
+	bool WriteBinaryOld(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes);
 	bool WriteBinary(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes);
-	bool WriteBinary2(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes);
 
 	void EnumValueNames(const wchar_t* section, std::vector<CStringW>& valuenames);
 
