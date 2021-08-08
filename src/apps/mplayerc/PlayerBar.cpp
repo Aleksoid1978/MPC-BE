@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2019 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,7 +55,7 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 
 	CString section = L"ToolBars\\" + m_strSettingName;
 
-	__super::LoadState(section + L"\\State");
+	__super::LoadState(section);
 
 	UINT dockBarID = m_defDockBarID;
 	profile.ReadInt(section, L"DockState", *(int*)&dockBarID);
@@ -93,7 +93,7 @@ void CPlayerBar::SaveState()
 
 	CString section = L"ToolBars\\" + m_strSettingName;
 
-	__super::SaveState(section + L"\\State");
+	__super::SaveState(section);
 
 	UINT dockBarID = GetParent()->GetDlgCtrlID();
 
