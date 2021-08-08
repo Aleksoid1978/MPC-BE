@@ -1300,7 +1300,8 @@ public:
 
 	HBITMAP		m_CaptureWndBitmap;
 	bool		isWindowMinimized;
-	HBITMAP		CreateCaptureDIB(int nWidth, int nHeight);
+
+	HBITMAP		CreateCaptureDIB(const int x, const int y, const int w, const int h);
 	void		CreateCaptureWindow();
 
 

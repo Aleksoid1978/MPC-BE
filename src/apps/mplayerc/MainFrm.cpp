@@ -19562,92 +19562,60 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 	}
 
 	const DWORD style = GetStyle();
-	HRESULT hr = E_FAIL;
+	HRESULT hr = S_FALSE;
 
 	if (isWindowMinimized && m_CaptureWndBitmap) {
-		hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, m_CaptureWndBitmap, nullptr, (style & WS_CAPTION || style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
-	} else {
-		CRect rectClient;
-		if (AfxGetAppSettings().iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-			GetWindowRect(&rectClient);
-		} else {
-			GetClientRect(&rectClient);
+		hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, m_CaptureWndBitmap, nullptr, (style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
+	}
+	else {
+		const int borderX = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CXSIZEFRAME) : 0;
+		const int borderY = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CYSIZEFRAME) : 0;
+		const int captionY = (style & WS_CAPTION) ? GetSystemMetrics(SM_CYCAPTION) : 0;
+		int x, y, w, h;
+
+		CRect rect;
+		GetWindowRect(&rect);
+		x = borderX;
+		y = borderY + captionY;
+		w = rect.Width() - borderX * 2;
+		h = rect.Height() - (borderY * 2 + captionY);
+		{
+			// HACK
+			x += borderX;
+			y += borderY;
+			w -= borderX*2;
+			h -= borderY*2;
 		}
 
-		if (HBITMAP hBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height())) {
-			if (style & WS_CAPTION || style & WS_THICKFRAME) {
-				hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, hBitmap, nullptr, DWM_SIT_DISPLAYFRAME);
-			} else {
-				POINT offset = {};
-				if (style & WS_CAPTION) {
-					offset.x = (rectClient.left) - GetSystemMetrics(SM_CXSIZEFRAME);
-					offset.y = (rectClient.top) - (GetSystemMetrics(SM_CYCAPTION) + SM_CYSIZEFRAME);
-				} else if (style & WS_THICKFRAME) {
-					offset.x = (rectClient.left) - GetSystemMetrics(SM_CXSIZEFRAME);
-					offset.y = (rectClient.top) - GetSystemMetrics(SM_CYSIZEFRAME);
-				}
-
-				hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, hBitmap, &offset, 0);
-			}
+		if (HBITMAP hBitmap = CreateCaptureDIB(x, y, w, h)) {
+			hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, hBitmap, nullptr, (style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
 			::DeleteObject(hBitmap);
 		}
 	}
 
-	if (FAILED(hr)) {
-		// TODO ...
-	}
+	DLogIf(FAILED(hr), L"DwmSetIconicLivePreviewBitmap() failed with error %s", HR2Str(hr));
 
 	return 0;
 }
 
-HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
+HBITMAP CMainFrame::CreateCaptureDIB(const int x, const int y, const int w, const int h)
 {
 	HBITMAP hbm = nullptr;
 	CWindowDC wDC(this);
-	if (HDC hdcMem = CreateCompatibleDC(wDC)) {
-		const bool bCaptionWithMenu = (AfxGetAppSettings().iCaptionMenuMode == MODE_SHOWCAPTIONMENU) ? true : false;
 
+	if (HDC hdcMem = CreateCompatibleDC(wDC)) {
 		BITMAPINFO bmi = {};
-		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		if (bCaptionWithMenu) {
-			bmi.bmiHeader.biWidth  = nWidth - (GetSystemMetrics(SM_CXSIZEFRAME) * 2);
-			bmi.bmiHeader.biHeight = -(nHeight - GetSystemMetrics(SM_CYCAPTION) - (GetSystemMetrics(SM_CYSIZEFRAME) * 2));
-		} else {
-			bmi.bmiHeader.biWidth  = nWidth;
-			bmi.bmiHeader.biHeight = -nHeight;
-		}
-		bmi.bmiHeader.biPlanes     = 1;
-		bmi.bmiHeader.biBitCount   = 32;
+		bmi.bmiHeader.biSize     = sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth    = w;
+		bmi.bmiHeader.biHeight   = -h;
+		bmi.bmiHeader.biPlanes   = 1;
+		bmi.bmiHeader.biBitCount = 32;
 
 		PBYTE pbDS = nullptr;
 		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, nullptr, 0);
 		if (hbm) {
 			SelectObject(hdcMem, hbm);
-			if (bCaptionWithMenu) {
-				BitBlt(
-					hdcMem,
-					0,
-					0,
-					nWidth + (GetSystemMetrics(SM_CXSIZEFRAME) * 2),
-					nHeight + (GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYSIZEFRAME)),
-					wDC,
-					GetSystemMetrics(SM_CXSIZEFRAME),
-					GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYSIZEFRAME),
-					MERGECOPY
-				);
-			} else {
-				BitBlt(
-					hdcMem,
-					0,
-					0,
-					nWidth,
-					nHeight,
-					wDC,
-					0,
-					0,
-					MERGECOPY
-				);
-			}
+			BitBlt(hdcMem, 0, 0, w, h, wDC, x, y, MERGECOPY);
 		}
 
 		DeleteDC(hdcMem);
@@ -19658,20 +19626,34 @@ HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
 
 void CMainFrame::CreateCaptureWindow()
 {
-	CAppSettings& s = AfxGetAppSettings();
-	CRect rectClient(0, 0, 0, 0);
-
-	if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-		GetWindowRect(&rectClient);
-	} else {
-		GetClientRect(&rectClient);
-	}
-
 	if (m_CaptureWndBitmap) {
 		DeleteObject(m_CaptureWndBitmap);
 		m_CaptureWndBitmap = nullptr;
 	}
-	m_CaptureWndBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
+
+	const DWORD style = GetStyle();
+
+	const int borderX = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CXSIZEFRAME) : 0;
+	const int borderY = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CYSIZEFRAME) : 0;
+	const int captionY = (style & WS_CAPTION) ? GetSystemMetrics(SM_CYCAPTION) : 0;
+	int x, y, w, h;
+
+	CRect rect;
+	GetWindowRect(&rect);
+	x = borderX;
+	y = borderY + captionY;
+	w = rect.Width() - borderX * 2;
+	h = rect.Height() - (borderY * 2 + captionY);
+	{
+		// HACK
+		x += borderX;
+		y += borderY;
+		w -= borderX * 2;
+		h -= borderY * 2;
+	}
+	GetClientRect(&rect);
+
+	m_CaptureWndBitmap = CreateCaptureDIB(x, y, w, h);
 }
 
 const CString CMainFrame::GetAltFileName()
