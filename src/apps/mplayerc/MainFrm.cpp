@@ -19571,14 +19571,13 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 		const int borderX = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CXSIZEFRAME) : 0;
 		const int borderY = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CYSIZEFRAME) : 0;
 		const int captionY = (style & WS_CAPTION) ? GetSystemMetrics(SM_CYCAPTION) : 0;
-		int x, y, w, h;
 
 		CRect rect;
 		GetWindowRect(&rect);
-		x = borderX;
-		y = borderY + captionY;
-		w = rect.Width() - borderX * 2;
-		h = rect.Height() - (borderY * 2 + captionY);
+		int x = borderX;
+		int y = borderY + captionY;
+		int w = rect.Width() - borderX * 2;
+		int h = rect.Height() - (borderY * 2 + captionY);
 		{
 			// HACK
 			x += borderX;
@@ -19636,14 +19635,13 @@ void CMainFrame::CreateCaptureWindow()
 	const int borderX = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CXSIZEFRAME) : 0;
 	const int borderY = (style & WS_THICKFRAME) ? GetSystemMetrics(SM_CYSIZEFRAME) : 0;
 	const int captionY = (style & WS_CAPTION) ? GetSystemMetrics(SM_CYCAPTION) : 0;
-	int x, y, w, h;
 
 	CRect rect;
 	GetWindowRect(&rect);
-	x = borderX;
-	y = borderY + captionY;
-	w = rect.Width() - borderX * 2;
-	h = rect.Height() - (borderY * 2 + captionY);
+	int x = borderX;
+	int y = borderY + captionY;
+	int w = rect.Width() - borderX * 2;
+	int h = rect.Height() - (borderY * 2 + captionY);
 	{
 		// HACK
 		x += borderX;
@@ -19651,7 +19649,6 @@ void CMainFrame::CreateCaptureWindow()
 		w -= borderX * 2;
 		h -= borderY * 2;
 	}
-	GetClientRect(&rect);
 
 	m_CaptureWndBitmap = CreateCaptureDIB(x, y, w, h);
 }
