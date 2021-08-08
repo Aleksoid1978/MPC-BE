@@ -89,9 +89,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
-		(FARPROC&)m_pfD3DXCreateLine   = GetProcAddress(hDll, "D3DXCreateLine");
-	} else {
-		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
+		(FARPROC&)m_pfD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 	}
 
 	(FARPROC &)m_pfDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
@@ -2095,11 +2093,15 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 		}
 
+		if (iDetailedStats && !m_pfD3DXCreateLine) {
+			strText.Append(L"\nERROR: The file d3dx9_43.dll is not loaded, so the graph will not be drawn.");
+		}
+
 		m_Font3D.Draw2DText(42, 42, D3DCOLOR_XRGB(0, 0, 0), strText);
 		m_Font3D.Draw2DText(40, 40, D3DCOLOR_XRGB(255, 204, 0), strText);
 	}
 
-	if (m_pLine && iDetailedStats) {
+	if (iDetailedStats && m_pLine) {
 		D3DXVECTOR2 Points[NB_JITTER];
 
 		const int defwidth  = 810;
