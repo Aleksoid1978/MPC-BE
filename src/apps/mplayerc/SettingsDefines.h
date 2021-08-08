@@ -292,7 +292,6 @@
 #define IDS_RS_ISDB							L"ISDb"
 #define IDS_RS_ASPECTRATIO_X				L"AspectRatioX"
 #define IDS_RS_ASPECTRATIO_Y				L"AspectRatioY"
-#define IDS_RS_LASTUSEDPAGE					L"LastUsedPage"
 #define IDS_RS_THUMBROWS					L"ThumbRows"
 #define IDS_RS_THUMBCOLS					L"ThumbCols"
 #define IDS_RS_THUMBQUALITY					L"ThumbQuality"
@@ -344,10 +343,11 @@
 
 #define IDS_RS_PASTECLIPBOARDURL			L"PasteClipboardURL"
 
-//
-#define IDS_R_ACCELTBLCOLWIDTHS				L"AccelTblColWidths"
-
 // Dialogs
+
+#define IDS_R_DLG_OPTIONS					L"Dialogs\\Options"
+#define IDS_RS_LASTUSEDPAGE					L"LastUsedPage"
+#define IDS_R_ACCELCOLWIDTHS				L"AccelColWidths"
 
 #define IDS_R_DLG_SUBTITLEDL				L"Dialogs\\SubtitleDl"
 #define IDS_RS_DLG_SUBTITLEDL_COLWIDTH		L"ColWidth"

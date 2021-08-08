@@ -1225,20 +1225,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
-	if (profile.ReadString(IDS_R_SETTINGS, IDS_R_ACCELTBLCOLWIDTHS, str)) {
-		int ret = swscanf_s(str, L"%d;%d;%d;%d;%d;%d",
-			&AccelTblColWidths[0],
-			&AccelTblColWidths[1],
-			&AccelTblColWidths[2],
-			&AccelTblColWidths[3],
-			&AccelTblColWidths[4],
-			&AccelTblColWidths[5]
-		);
-		if (ret != std::size(AccelTblColWidths)) {
-			ZeroMemory(AccelTblColWidths, sizeof(AccelTblColWidths));
-		}
-	}
-
 	// Mouse
 	if (profile.ReadString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT, str)) {
 		swscanf_s(str, L"%u", &nMouseLeftClick);
@@ -1376,8 +1362,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
-
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
@@ -1513,6 +1497,25 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		youtubeSignatureCache[name] = value;
 	}
 
+	// Dialogs
+
+	// Option window
+	profile.ReadUInt(IDS_R_DLG_OPTIONS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
+	if (profile.ReadString(IDS_R_DLG_OPTIONS, IDS_R_ACCELCOLWIDTHS, str)) {
+		int ret = swscanf_s(str, L"%d;%d;%d;%d;%d;%d",
+			&AccelTblColWidths[0],
+			&AccelTblColWidths[1],
+			&AccelTblColWidths[2],
+			&AccelTblColWidths[3],
+			&AccelTblColWidths[4],
+			&AccelTblColWidths[5]
+		);
+		if (ret != std::size(AccelTblColWidths)) {
+			ZeroMemory(AccelTblColWidths, sizeof(AccelTblColWidths));
+		}
+	}
+
+	// History window
 	if (profile.ReadString(IDS_R_DLG_HISTORY, IDS_R_HISTORYCOLWIDTHS, str)) {
 		int ret = swscanf_s(str, L"%d;%d;%d",
 			&HistoryColWidths[0],
@@ -1846,16 +1849,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
-	if (AccelTblColWidths[0]) {
-		str.Empty();
-		for (int i = 0; i < std::size(AccelTblColWidths); i++) {
-			str.AppendFormat(L"%d;", AccelTblColWidths[i]);
-		}
-		profile.WriteString(IDS_R_SETTINGS, IDS_R_ACCELTBLCOLWIDTHS, str);
-	} else {
-		profile.DeleteValue(IDS_R_SETTINGS, IDS_R_ACCELTBLCOLWIDTHS);
-	}
-
 	// Mouse
 	str.Format(L"%u", nMouseLeftClick);
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT, str);
@@ -1907,8 +1900,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
-
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
@@ -1990,6 +1981,22 @@ void CAppSettings::SaveSettings()
 		profile.WriteString(IDS_R_YOUTUBECACHE, name, value);
 	}
 
+	// Dialogs
+
+	// Option window
+	profile.WriteUInt(IDS_R_DLG_OPTIONS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
+	if (AccelTblColWidths[0]) {
+		str.Empty();
+		for (int i = 0; i < std::size(AccelTblColWidths); i++) {
+			str.AppendFormat(L"%d;", AccelTblColWidths[i]);
+		}
+		profile.WriteString(IDS_R_DLG_OPTIONS, IDS_R_ACCELCOLWIDTHS, str);
+	}
+	else {
+		profile.DeleteValue(IDS_R_DLG_OPTIONS, IDS_R_ACCELCOLWIDTHS);
+	}
+
+	// History window
 	if (HistoryColWidths[0]) {
 		str.Empty();
 		for (int i = 0; i < std::size(HistoryColWidths); i++) {
