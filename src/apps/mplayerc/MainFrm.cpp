@@ -2223,12 +2223,12 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE) {
 		if (IsSomethingLoaded() && m_bAudioOnly && m_pfnDwmSetIconicLivePreviewBitmap) {
-			isWindowMinimized = true;
+			m_isWindowMinimized = true;
 			CreateCaptureWindow();
 		}
 	} else if ((nID & 0xFFF0) == SC_RESTORE) {
 		if (m_bAudioOnly && m_pfnDwmSetIconicLivePreviewBitmap) {
-			isWindowMinimized = false;
+			m_isWindowMinimized = false;
 			if (m_CaptureWndBitmap) {
 				DeleteObject(m_CaptureWndBitmap);
 				m_CaptureWndBitmap = nullptr;
@@ -19564,7 +19564,7 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 	const DWORD style = GetStyle();
 	HRESULT hr = S_FALSE;
 
-	if (isWindowMinimized && m_CaptureWndBitmap) {
+	if (m_isWindowMinimized && m_CaptureWndBitmap) {
 		hr = m_pfnDwmSetIconicLivePreviewBitmap(m_hWnd, m_CaptureWndBitmap, nullptr, (style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
 	}
 	else {

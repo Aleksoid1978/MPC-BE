@@ -1299,11 +1299,10 @@ public:
 	BOOL		m_bDesktopCompositionEnabled = TRUE;
 
 	HBITMAP		m_CaptureWndBitmap;
-	bool		isWindowMinimized;
+	bool		m_isWindowMinimized = false;
 
 	HBITMAP		CreateCaptureDIB(const int x, const int y, const int w, const int h);
 	void		CreateCaptureWindow();
-
 
 	HRESULT		SetAudioPicture(BOOL show = TRUE);
 	CComPtr<IWICBitmap> m_pMainBitmap;
