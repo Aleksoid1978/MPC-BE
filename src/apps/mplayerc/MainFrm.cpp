@@ -6808,8 +6808,8 @@ void CMainFrame::OnFileProperties()
 		return;
 	}
 
-	CPPageFileInfoSheet m_fileinfo(GetPlaybackMode() == PM_FILE ? GetCurFileName() : GetCurDVDPath(TRUE), this, GetModalParent());
-	m_fileinfo.DoModal();
+	CPPageFileInfoSheet fileInfo(GetPlaybackMode() == PM_FILE ? GetCurFileName() : GetCurDVDPath(TRUE), this, GetModalParent());
+	fileInfo.DoModal();
 }
 
 void CMainFrame::OnUpdateFileProperties(CCmdUI* pCmdUI)
@@ -10871,9 +10871,9 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			if (!s.bRememberWindowPos) {
 				hm = MonitorFromPoint( CPoint( 0,0 ), MONITOR_DEFAULTTOPRIMARY );
 				GetMonitorInfoW(hm, &mi);
-				CRect m_r = mi.rcMonitor;
-				int left = m_r.left + (m_r.Width() - r.Width())/2;
-				int top = m_r.top + (m_r.Height() - r.Height())/2;
+				CRect rMI = mi.rcMonitor;
+				int left = rMI.left + (rMI.Width() - r.Width())/2;
+				int top = rMI.top + (rMI.Height() - r.Height())/2;
 				r = CRect(left, top, left + r.Width(), top + r.Height());
 			}
 			if (s.nStartupWindowMode != STARTUPWND_REMLAST) {
@@ -17649,7 +17649,7 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 	UpdateThumbarButton();
 }
 
-bool CMainFrame::CreateFullScreenWindow()
+BOOL CMainFrame::CreateFullScreenWindow()
 {
 	const CAppSettings& s = AfxGetAppSettings();
 	CMonitor monitor;
@@ -17680,7 +17680,7 @@ bool CMainFrame::CreateFullScreenWindow()
 	CRect monitorRect;
 	monitor.GetMonitorRect(monitorRect);
 
-	return !!m_pFullscreenWnd->CreateEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, L"", ResStr(IDS_MAINFRM_136),
+	return m_pFullscreenWnd->CreateEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, L"", ResStr(IDS_MAINFRM_136),
 										WS_POPUP | WS_VISIBLE, monitorRect, nullptr, 0);
 }
 

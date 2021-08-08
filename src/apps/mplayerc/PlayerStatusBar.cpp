@@ -352,9 +352,9 @@ void CPlayerStatusBar::OnPaint()
 		CDC memdc;
 		memdc.CreateCompatibleDC(&dc);
 
-		CBitmap m_bmPaint;
-		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
-		memdc.SelectObject(&m_bmPaint);
+		CBitmap bmPaint;
+		bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
+		memdc.SelectObject(&bmPaint);
 
 		// background
 		int R, G, B;

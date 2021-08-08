@@ -95,22 +95,22 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 
 	if (!::PathIsURLW(lpcwstrFile)) {
 		// handle only local files
-		HANDLE m_hFile = CreateFileW(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+		HANDLE hFile = CreateFileW(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
 												 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 
-		if (m_hFile != INVALID_HANDLE_VALUE) {
+		if (hFile != INVALID_HANDLE_VALUE) {
 			BYTE Buff[128] = {0};
-			ReadBuffer(m_hFile, Buff, 3); // Signature
+			ReadBuffer(hFile, Buff, 3); // Signature
 			if (memcmp(Buff, "CWS", 3) == 0 || memcmp(Buff, "FWS", 3) == 0) {
 				CGolombBuffer gb(nullptr, 0);
 
 				LARGE_INTEGER fileSize = {0};
-				GetFileSizeEx(m_hFile, &fileSize);
+				GetFileSizeEx(hFile, &fileSize);
 
 				BYTE ver = 0;
-				ReadBuffer(m_hFile, &ver, 1);
+				ReadBuffer(hFile, &ver, 1);
 				DWORD flen = 0;
-				ReadBuffer(m_hFile, (BYTE*)(&flen), sizeof(flen));
+				ReadBuffer(hFile, (BYTE*)(&flen), sizeof(flen));
 				flen -= 8;
 
 				std::vector<BYTE> DecompData;
@@ -119,7 +119,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 					if (fileSize.QuadPart < 5 * MEGABYTE) {
 
 						DecompData.resize(fileSize.QuadPart - 8);
-						DWORD dwRead = ReadBuffer(m_hFile, DecompData.data(), DecompData.size());
+						DWORD dwRead = ReadBuffer(hFile, DecompData.data(), DecompData.size());
 
 						if (dwRead == DecompData.size()) {
 							// decompress
@@ -172,7 +172,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 					}
 
 				} else if (memcmp(Buff, "FWS", 3) == 0) {
-					DWORD dwRead = ReadBuffer(m_hFile, Buff, std::min((LONGLONG)std::size(Buff), fileSize.QuadPart));
+					DWORD dwRead = ReadBuffer(hFile, Buff, std::min((LONGLONG)std::size(Buff), fileSize.QuadPart));
 					if (dwRead) {
 						gb.Reset(Buff, dwRead);
 					}
@@ -189,7 +189,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 				}
 			}
 
-			CloseHandle(m_hFile);
+			CloseHandle(hFile);
 		}
 	}
 

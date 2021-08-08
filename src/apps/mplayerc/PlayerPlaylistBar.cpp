@@ -3794,8 +3794,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			{
 				const auto nID = s.nLastFileInfoPage;
 				s.nLastFileInfoPage = IDD_FILEMEDIAINFO;
-				CPPageFileInfoSheet m_fileinfo(sCurrentPath, m_pMainFrame, m_pMainFrame, true);
-				m_fileinfo.DoModal();
+				CPPageFileInfoSheet fileInfo(sCurrentPath, m_pMainFrame, m_pMainFrame, true);
+				fileInfo.DoModal();
 				s.nLastFileInfoPage = nID;
 			}
 			break;

@@ -1262,7 +1262,7 @@ public:
 	MPC_LOADSTATE GetLoadState() { return m_eMediaLoadState; }
 	void		SetLoadState(MPC_LOADSTATE iState);
 	void		SetPlayState(MPC_PLAYSTATE iState);
-	bool		CreateFullScreenWindow();
+	BOOL		CreateFullScreenWindow();
 	void		SetupEVRColorControl();
 	void		SetupVMR9ColorControl();
 	void		SetColorControl(DWORD flags, int& brightness, int& contrast, int& hue, int& saturation);

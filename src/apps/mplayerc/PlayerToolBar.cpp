@@ -913,17 +913,17 @@ int CPlayerToolBar::getHitButtonIdx(CPoint point)
 BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
-	static CString m_strTipText;
+	static CString s_strTipText;
 
 	switch (pNMHDR->idFrom) {
 	case ID_PLAY_PLAY:
-		m_strTipText = (m_pMainFrame->GetMediaState() == State_Running) ? ResStr(IDS_AG_PAUSE) : ResStr(IDS_AG_PLAY);
+		s_strTipText = (m_pMainFrame->GetMediaState() == State_Running) ? ResStr(IDS_AG_PAUSE) : ResStr(IDS_AG_PLAY);
 		break;
 	case ID_PLAY_STOP:
-		m_strTipText = ResStr(IDS_AG_STOP) + L" | " + ResStr(IDS_AG_CLOSE);
+		s_strTipText = ResStr(IDS_AG_STOP) + L" | " + ResStr(IDS_AG_CLOSE);
 		break;
 	case ID_PLAY_FRAMESTEP:
-		m_strTipText = ResStr(IDS_AG_STEP) + L" | " + ResStr(IDS_AG_JUMP_TO);
+		s_strTipText = ResStr(IDS_AG_STEP) + L" | " + ResStr(IDS_AG_JUMP_TO);
 		break;
 	case ID_VOLUME_MUTE:
 		{
@@ -931,44 +931,44 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 			GetToolBarCtrl().GetButtonInfo(ID_VOLUME_MUTE, &bi);
 
 			if (bi.iImage == 12) {
-				m_strTipText = ResStr(ID_VOLUME_MUTE);
+				s_strTipText = ResStr(ID_VOLUME_MUTE);
 			}
 			else if (bi.iImage == 13) {
-				m_strTipText = ResStr(ID_VOLUME_MUTE_OFF);
+				s_strTipText = ResStr(ID_VOLUME_MUTE_OFF);
 			}
 			else if (bi.iImage == 14) {
-				m_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
+				s_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
 			}
 
-			int i = m_strTipText.Find('\n'); // TODO: remove it
+			int i = s_strTipText.Find('\n'); // TODO: remove it
 			if (i > 0) {
-				m_strTipText = m_strTipText.Left(i);
+				s_strTipText = s_strTipText.Left(i);
 			}
 		}
 		break;
 	case ID_FILE_OPENFILE:
-		m_strTipText = ResStr(IDS_AG_OPEN_FILE) + L" | " + ResStr(IDS_RECENT_FILES);
+		s_strTipText = ResStr(IDS_AG_OPEN_FILE) + L" | " + ResStr(IDS_RECENT_FILES);
 		break;
 	case ID_NAVIGATE_SKIPBACK:
-		m_strTipText = ResStr(IDS_AG_PREVIOUS) + L" | " + ResStr(IDS_AG_PREVIOUS_FILE);
+		s_strTipText = ResStr(IDS_AG_PREVIOUS) + L" | " + ResStr(IDS_AG_PREVIOUS_FILE);
 		break;
 	case ID_NAVIGATE_SKIPFORWARD:
-		m_strTipText = ResStr(IDS_AG_NEXT) + L" | " + ResStr(IDS_AG_NEXT_FILE);
+		s_strTipText = ResStr(IDS_AG_NEXT) + L" | " + ResStr(IDS_AG_NEXT_FILE);
 		break;
 	case ID_NAVIGATE_SUBTITLES:
-		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + L" | " + ResStr(IDS_AG_OPTIONS);
+		s_strTipText = ResStr(IDS_AG_SUBTITLELANG) + L" | " + ResStr(IDS_AG_OPTIONS);
 		break;
 	case ID_NAVIGATE_AUDIO:
-		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + L" | " + ResStr(IDS_AG_OPTIONS);
+		s_strTipText = ResStr(IDS_AG_AUDIOLANG) + L" | " + ResStr(IDS_AG_OPTIONS);
 		break;
 	case ID_GPU:
-		m_strTipText = DXVAState::GetDescription();
+		s_strTipText = DXVAState::GetDescription();
 		break;
 	default:
 		return FALSE;
 	}
 
-	pTTT->lpszText = m_strTipText.GetBuffer();
+	pTTT->lpszText = s_strTipText.GetBuffer();
 	*pResult = 0;
 
 	return TRUE;

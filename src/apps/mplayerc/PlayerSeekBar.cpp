@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -304,12 +304,12 @@ void CPlayerSeekBar::OnPaint()
 		};
 
 		CDC memdc;
-		CBitmap m_bmPaint;
+		CBitmap bmPaint;
 		CRect r;
 		GetClientRect(&r);
 		memdc.CreateCompatibleDC(&dc);
-		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
-		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
+		bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
+		CBitmap *bmOld = memdc.SelectObject(&bmPaint);
 
 		GRADIENT_RECT gr = {0, 1};
 
@@ -452,7 +452,7 @@ void CPlayerSeekBar::OnPaint()
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 		DeleteObject(memdc.SelectObject(bmOld));
 		memdc.DeleteDC();
-		m_bmPaint.DeleteObject();
+		bmPaint.DeleteObject();
 	} else {
 		auto funcMarkChannel = [&](REFERENCE_TIME pos, long verticalPadding, COLORREF markColor) {
 			long markPos = channelRect.left + (long)((m_stop > 0) ? channelRect.Width() * pos / m_stop : 0);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1175,8 +1175,8 @@ void CPlayerSubresyncBar::OnLvnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-static CUIntArray m_itemGroups;
-static int m_totalGroups;
+static CUIntArray s_itemGroups;
+static int s_totalGroups;
 
 void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -1185,13 +1185,13 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = CDRF_DODEFAULT;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
-		m_itemGroups.SetSize(m_list.GetItemCount());
-		m_totalGroups = 0;
+		s_itemGroups.SetSize(m_list.GetItemCount());
+		s_totalGroups = 0;
 		for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
 			if (m_list.GetItemData(i)&TSEP) {
-				m_totalGroups++;
+				s_totalGroups++;
 			}
-			m_itemGroups[i] = m_totalGroups;
+			s_itemGroups[i] = s_totalGroups;
 		}
 
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
@@ -1215,8 +1215,8 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 		clrTextBk = 0xffffff;
-		//	  if (m_totalGroups > 0)
-		clrTextBk -= ((m_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
+		//if (s_totalGroups > 0)
+		clrTextBk -= ((s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
 
 		if (m_sts[pLVCD->nmcd.dwItemSpec].start <= m_rt / 10000 && m_rt / 10000 < m_sts[pLVCD->nmcd.dwItemSpec].end) {
 			clrText |= 0xFF;

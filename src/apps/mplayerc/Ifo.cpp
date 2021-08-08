@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -218,17 +218,17 @@ bool CIfo::RemoveUOPs()
 bool CIfo::SaveFile (LPCWSTR strFile)
 {
 	bool bRet = false;
-	HANDLE m_hFile;
+	HANDLE hFile;
 
 	if (m_pBuffer) {
-		m_hFile = Real_CreateFileW(strFile, GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+		hFile = Real_CreateFileW(strFile, GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 									nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-		ASSERT(m_hFile != INVALID_HANDLE_VALUE);
+		ASSERT(hFile != INVALID_HANDLE_VALUE);
 
-		if (m_hFile != INVALID_HANDLE_VALUE) {
+		if (hFile != INVALID_HANDLE_VALUE) {
 			DWORD dwSize;
-			WriteFile(m_hFile, m_pBuffer, m_dwSize, &dwSize, nullptr);
-			CloseHandle(m_hFile);
+			WriteFile(hFile, m_pBuffer, m_dwSize, &dwSize, nullptr);
+			CloseHandle(hFile);
 			bRet = true;
 		}
 	}
