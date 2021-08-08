@@ -71,6 +71,7 @@ namespace DSObjects
 
 		CComPtr<ID3DXLine> m_pLine;
 		CD3D9Font m_Font3D;
+		bool m_bFont3DUpdate = true;
 
 		bool                       m_bAlphaBitmapEnable = false;
 		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;

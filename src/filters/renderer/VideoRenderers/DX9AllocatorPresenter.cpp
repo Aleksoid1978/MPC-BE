@@ -1746,6 +1746,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
 {
 	const auto bWindowSizeChanged = m_windowRect.Size() != CRect(w).Size();
+
 	__super::SetPosition(w, v);
 
 	if (m_hWndVR) {
@@ -1755,6 +1756,10 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
 	if (bWindowSizeChanged && !m_bIsFullscreen && m_d3dpp.SwapEffect != D3DSWAPEFFECT_COPY) {
 		m_bResizingDevice = true;
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_RESIZE_DEVICE);
+	}
+
+	if (bWindowSizeChanged) {
+		m_bFont3DUpdate = true; // do not set "false" here
 	}
 }
 
@@ -1800,23 +1805,15 @@ void CDX9AllocatorPresenter::DrawStats()
 	const LONGLONG llMaxSyncOffset = m_MaxSyncOffset;
 	const LONGLONG llMinSyncOffset = m_MinSyncOffset;
 
-
-	static CRect s_windowRect;
-	static UINT s_fontFlags = 0;
-
-	if (s_windowRect != m_windowRect) {
+	if (m_bFont3DUpdate) {
 		const UINT fontH = std::max(m_windowRect.Height() / 35, 6); // must be equal to 5 or more
-		const UINT fontW  = std::max(m_windowRect.Width() / 130, 4); // 0 = auto
+		const UINT fontW = std::max(m_windowRect.Width() / 130, 4); // 0 = auto
 		const UINT fontFlags = (m_rcMonitor.Width() - m_windowRect.Width() > 100) ? 0 : D3DFONT_BOLD;
 
-		const SIZE charSize = m_Font3D.GetMaxCharMetric();
-		if (charSize.cx != fontW || charSize.cy != fontH || s_fontFlags != fontFlags) {
-			s_fontFlags = fontFlags;
-			HRESULT hr2 = m_Font3D.CreateFontBitmap(L"Lucida Console", fontH, fontW, fontFlags);
-			DLogIf(FAILED(hr2), L"m_Font3D font creation failed with error {}", HR2Str(hr2));
-		}
+		HRESULT hr2 = m_Font3D.CreateFontBitmap(L"Lucida Console", fontH, fontW, fontFlags);
+		DLogIf(FAILED(hr2), L"m_Font3D font creation failed with error {}", HR2Str(hr2));
 
-		s_windowRect = m_windowRect;
+		m_bFont3DUpdate = false;
 	}
 
 	if (!m_pLine && m_pfD3DXCreateLine) {
