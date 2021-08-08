@@ -346,7 +346,6 @@
 
 //
 #define IDS_R_ACCELTBLCOLWIDTHS				L"AccelTblColWidths"
-#define IDS_R_HISTORYCOLWIDTHS				L"HistoryColWidths"
 
 // Dialogs
 
@@ -356,6 +355,7 @@
 #define IDS_R_DLG_ORGANIZE_FAV				L"Dialogs\\OrganizeFavorites"
 
 #define IDS_R_DLG_HISTORY					L"Dialogs\\History"
+#define IDS_R_HISTORYCOLWIDTHS				L"HistoryColWidths"
 
 #define IDS_R_DLG_CMD_LINE_HELP				L"Dialogs\\CmdLineHelp"
 

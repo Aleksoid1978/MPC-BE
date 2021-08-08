@@ -1513,7 +1513,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		youtubeSignatureCache[name] = value;
 	}
 
-	if (profile.ReadString(IDS_R_SETTINGS, IDS_R_HISTORYCOLWIDTHS, str)) {
+	if (profile.ReadString(IDS_R_DLG_HISTORY, IDS_R_HISTORYCOLWIDTHS, str)) {
 		int ret = swscanf_s(str, L"%d;%d;%d",
 			&HistoryColWidths[0],
 			&HistoryColWidths[1],
@@ -1995,9 +1995,9 @@ void CAppSettings::SaveSettings()
 		for (int i = 0; i < std::size(HistoryColWidths); i++) {
 			str.AppendFormat(L"%d;", HistoryColWidths[i]);
 		}
-		profile.WriteString(IDS_R_SETTINGS, IDS_R_HISTORYCOLWIDTHS, str);
+		profile.WriteString(IDS_R_DLG_HISTORY, IDS_R_HISTORYCOLWIDTHS, str);
 	} else {
-		profile.DeleteValue(IDS_R_SETTINGS, IDS_R_HISTORYCOLWIDTHS);
+		profile.DeleteValue(IDS_R_DLG_HISTORY, IDS_R_HISTORYCOLWIDTHS);
 	}
 
 	SaveFormats();
