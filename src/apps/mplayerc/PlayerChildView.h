@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,9 +25,10 @@ class CMainFrame;
 
 class CChildView : public CWnd
 {
-	CRect m_vrect;
+	CRect m_videoRect;
+	CRect m_logoRect;
 
-	CCritSec     m_csLogo;
+	CCritSec m_csLogo;
 	CComPtr<IWICBitmap> m_pBitmap;
 	CComPtr<IWICBitmap> m_pBitmapResized;
 
@@ -48,7 +49,10 @@ public:
 	void SetVideoRect(CRect r = CRect(0,0,0,0));
 
 	CRect GetVideoRect() const {
-		return(m_vrect);
+		return(m_videoRect);
+	}
+	CRect GetLogoRect() const {
+		return(m_logoRect);
 	}
 
 	void LoadLogo();

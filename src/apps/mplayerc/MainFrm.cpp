@@ -18865,10 +18865,10 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 {
 	CheckPointer(m_pTaskbarList, E_FAIL);
 
-	CRect r;
-	m_wndView.GetClientRect(&r);
+	CRect clientRect;
+	m_wndView.GetClientRect(&clientRect);
 	if (IsMainMenuVisible()) {
-		r.OffsetRect(0, GetSystemMetrics(SM_CYMENU));
+		clientRect.OffsetRect(0, GetSystemMetrics(SM_CYMENU));
 	}
 
 	if (!AfxGetAppSettings().fUseWin7TaskBar
@@ -18876,11 +18876,11 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 			|| (m_bAudioOnly && !SysVersion::IsWin10orLater())
 			|| m_bFullScreen
 			|| IsD3DFullScreenMode()
-			|| r.IsRectEmpty()) {
+			|| clientRect.IsRectEmpty()) {
 		return m_pTaskbarList->SetThumbnailClip(m_hWnd, nullptr);
 	}
 
-	return m_pTaskbarList->SetThumbnailClip(m_hWnd, &r);
+	return m_pTaskbarList->SetThumbnailClip(m_hWnd, &clientRect);
 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)

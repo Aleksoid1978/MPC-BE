@@ -124,7 +124,7 @@ BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 
 void CChildView::SetVideoRect(CRect r)
 {
-	m_vrect = r;
+	m_videoRect = r;
 	Invalidate();
 }
 
@@ -135,6 +135,7 @@ void CChildView::LoadLogo()
 	CAutoLock cAutoLock(&m_csLogo);
 
 	m_pBitmapResized.Release();
+	m_logoRect.SetRectEmpty();
 
 	HRESULT hr = E_FAIL;
 
@@ -197,17 +198,15 @@ void CChildView::LoadLogo()
 
 CSize CChildView::GetLogoSize() const
 {
-	SIZE size = { 0, 0 };
-
 	if (m_pBitmap) {
 		UINT w, h;
 		HRESULT hr = m_pBitmap->GetSize(&w, &h);
 		if (SUCCEEDED(hr)) {
-			size = { (LONG)w, (LONG)h };
+			return { (LONG)w, (LONG)h };
 		}
 	}
 
-	return size;
+	return { 0, 0 };
 }
 
 void CChildView::ClearResizedImage()
@@ -265,7 +264,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			pBitmapSource = m_pBitmap;
 		}
 	} else {
-		pDC->ExcludeClipRect(m_vrect);
+		pDC->ExcludeClipRect(m_videoRect);
 	}
 
 	if (pBitmapSource) {
@@ -278,17 +277,18 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			h = MulDiv(w, height, width);
 			int x = std::lround(((double)r.Width() - w) / 2.0);
 			int y = std::lround(((double)r.Height() - h) / 2.0);
-			r = CRect(CPoint(x, y), CSize(w, h));
+			m_logoRect = CRect(CPoint(x, y), CSize(w, h));
 
-			if (!r.IsRectEmpty()) {
-				UINT rwidth, rheight;
+			if (!m_logoRect.IsRectEmpty()) {
 				if (m_pBitmapResized) {
+					UINT rwidth, rheight;
 					hr = m_pBitmapResized->GetSize(&rwidth, &rheight);
+					if (FAILED(hr) || w != (int)rwidth || h != (int)rheight) {
+						m_pBitmapResized.Release();
+					}
 				}
 
-				if (!m_pBitmapResized || w != (int)rwidth || h != (int)rheight) {
-					m_pBitmapResized.Release();
-
+				if (!m_pBitmapResized) {
 					hr = WicCreateBitmapScaled(&m_pBitmapResized, w, h, pBitmapSource);
 				}
 
@@ -298,14 +298,15 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 					BITMAPINFO bminfo;
 					hr = WicCreateDibSecton(hBitmap, &data, bminfo, m_pBitmapResized);
 					::SetDIBitsToDevice(*pDC, x, y, w, h, 0, 0, 0, h, data, &bminfo, DIB_RGB_COLORS);
-					pDC->ExcludeClipRect(r);
+					pDC->ExcludeClipRect(m_logoRect);
 					DeleteObject(hBitmap);
+				} else {
+					m_logoRect.SetRectEmpty();
 				}
 			}
 		}
 	}
 
-	GetClientRect(r);
 	pDC->FillSolidRect(r, bkcolor);
 
 	return TRUE;
