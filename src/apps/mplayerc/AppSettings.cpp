@@ -1987,8 +1987,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteUInt(IDS_R_DLG_OPTIONS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 	if (AccelTblColWidths[0]) {
 		str.Empty();
-		for (int i = 0; i < std::size(AccelTblColWidths); i++) {
-			str.AppendFormat(L"%d;", AccelTblColWidths[i]);
+		for (const auto value : AccelTblColWidths) {
+			str.AppendFormat(L"%d;", value);
 		}
 		profile.WriteString(IDS_R_DLG_OPTIONS, IDS_R_ACCELCOLWIDTHS, str);
 	}
@@ -1999,8 +1999,8 @@ void CAppSettings::SaveSettings()
 	// History window
 	if (HistoryColWidths[0]) {
 		str.Empty();
-		for (int i = 0; i < std::size(HistoryColWidths); i++) {
-			str.AppendFormat(L"%d;", HistoryColWidths[i]);
+		for (const auto value : HistoryColWidths) {
+			str.AppendFormat(L"%d;", value);
 		}
 		profile.WriteString(IDS_R_DLG_HISTORY, IDS_R_HISTORYCOLWIDTHS, str);
 	} else {
