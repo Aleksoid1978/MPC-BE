@@ -5523,6 +5523,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 	s.nCLSwitches &= ~CLSW_NOFOCUS;
 
 	UpdateThumbarButton();
+	UpdateThumbnailClip();
 
 	return 0;
 }
@@ -10919,6 +10920,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	}
 
 	UpdateThumbarButton();
+	UpdateThumbnailClip();
 }
 
 void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
@@ -17647,6 +17649,7 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 	}
 
 	UpdateThumbarButton();
+	UpdateThumbnailClip();
 }
 
 BOOL CMainFrame::CreateFullScreenWindow()
@@ -18732,6 +18735,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 	}
 
 	UpdateThumbarButton();
+	UpdateThumbnailClip();
 
 	return hr;
 }
@@ -18855,8 +18859,6 @@ HRESULT CMainFrame::UpdateThumbarButton()
 	}
 
 	HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, std::size(buttons), buttons);
-
-	UpdateThumbnailClip();
 
 	return hr;
 }

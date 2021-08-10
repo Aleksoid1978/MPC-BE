@@ -254,6 +254,7 @@ BOOL CPPageInterface::OnApply()
 
 	pFrame->CreateThumbnailToolbar();
 	pFrame->UpdateThumbarButton();
+	pFrame->UpdateThumbnailClip();
 	pFrame->SetAudioPicture();
 
 	pFrame->m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
