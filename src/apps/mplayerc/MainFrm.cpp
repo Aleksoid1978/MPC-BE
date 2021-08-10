@@ -15755,29 +15755,35 @@ void CMainFrame::SetupRecentFilesSubMenu()
 					EllipsisURL(str, 100);
 				}
 			}
-			else if (IsDVDStartFile(str)) {
-				if (str.GetLength() == 24 && session.Title.GetLength() && str.Mid(1).CompareNoCase(L":\\VIDEO_TS\\VIDEO_TS.IFO") == 0) {
-					WCHAR drive = str[0];
-					str.Format(L"DVD - %c:\"%s\"", drive, session.Title);
+			else {
+				bool bPath = true;
+				CStringW prefix;
+
+				if (IsDVDStartFile(str)) {
+					if (str.GetLength() == 24 && session.Title.GetLength() && str.Mid(1).CompareNoCase(L":\\VIDEO_TS\\VIDEO_TS.IFO") == 0) {
+						WCHAR drive = str[0];
+						str.Format(L"DVD - %c:\"%s\"", drive, session.Title);
+						bPath = false;
+					} else {
+						str.Truncate(str.ReverseFind('\\'));
+						prefix = L"DVD - ";
+					}
 				}
-				else {
+				else if (IsBDStartFile(str)) {
 					str.Truncate(str.ReverseFind('\\'));
+					if (str.Right(5).MakeUpper() == L"\\BDMV") {
+						str.Truncate(str.GetLength() - 5);
+					}
+					prefix = L"Blu-ray - ";
+				}
+				else if (IsBDPlsFile(str)) {
+					prefix = L"Blu-ray - ";
+				}
+
+				if (bPath && s.bRecentFilesMenuEllipsis) {
 					EllipsisPath(str, 100);
-					str.Insert(0, L"DVD - ");
 				}
-			}
-			else if (IsBDStartFile(str)) {
-				str.Truncate(str.ReverseFind('\\'));
-				if (str.Right(5).MakeUpper() == L"\\BDMV") {
-					str.Truncate(str.GetLength() - 5);
-				}
-				EllipsisPath(str, 100);
-				str.Insert(0, L"Blu-ray - ");
-			} else if (IsBDPlsFile(str)) {
-				EllipsisPath(str, 100);
-				str.Insert(0, L"Blu-ray - ");
-			} else {
-				EllipsisPath(str, 100);
+				str.Insert(0, prefix);
 			}
 
 			str.Replace(L"&", L"&&");
