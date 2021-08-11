@@ -660,6 +660,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_FL32:
         case AP4_ATOM_TYPE_FL64:
         case AP4_ATOM_TYPE_LPCM:
+        case AP4_ATOM_TYPE_IPCM:
         case AP4_ATOM_TYPE_ALAW:
         case AP4_ATOM_TYPE_ULAW:
         case AP4_ATOM_TYPE_NMOS:

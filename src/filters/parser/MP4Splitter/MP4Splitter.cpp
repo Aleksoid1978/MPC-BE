@@ -1650,10 +1650,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = type = WAVE_FORMAT_PCM;
 						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian()==ENDIAN_LITTLE) {
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
-						} else if (type == AP4_ATOM_TYPE_LPCM) {
+						} else if (type == AP4_ATOM_TYPE_LPCM || type == AP4_ATOM_TYPE_IPCM) {
 							SetTrackName(TrackName, L"LPCM");
 							DWORD flags = ase->GetFormatSpecificFlags();
-							if (flags & 2) { // big endian
+							if ((flags & 2) || (type == AP4_ATOM_TYPE_IPCM)) { // big endian
 								if (flags & 1) { // floating point
 									if      (bitspersample == 32) type = AP4_ATOM_TYPE_FL32;
 									else if (bitspersample == 64) type = AP4_ATOM_TYPE_FL64;
