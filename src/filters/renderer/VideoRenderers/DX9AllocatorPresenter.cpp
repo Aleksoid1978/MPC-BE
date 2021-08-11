@@ -537,7 +537,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	m_bDisplayChanged				= false;
 
-	m_Font3D.InvalidateDeviceObjects();
 	m_pLine.Release();
 
 	m_bAlphaBitmapEnable = false;
@@ -761,9 +760,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		return hr;
 	}
 
-	HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pD3DDevEx);
-	DLogIf(FAILED(hr2), L"m_Font3D initialization failed with error {}", HR2Str(hr2));
-
 	m_LastAdapterCheck = GetPerfCounter();
 
 	m_MonitorName.Empty();
@@ -799,6 +795,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	if (!bTryToReset) {
+		m_Font3D.InvalidateDeviceObjects();
+		HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pD3DDevEx);
+		DLogIf(FAILED(hr2), L"m_Font3D initialization failed with error {}", HR2Str(hr2));
+		m_bFont3DUpdate = true;
+
 		OnResetDevice();
 	}
 
