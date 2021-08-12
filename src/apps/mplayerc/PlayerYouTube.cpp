@@ -316,22 +316,44 @@ namespace Youtube
 		if (!videoId.IsEmpty()) {
 #if !USE_GOOGLE_API
 			bool bParse = false;
+			if (auto hInet = InternetOpenW(L"Mozilla/5.0 (Windows NT 6.1))", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
+				if (auto hSession = InternetConnectW(hInet, L"www.youtube.com", 443, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 1)) {
+					if (auto hRequest = HttpOpenRequestW(hSession,
+														 L"POST",
+														 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
+														 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
+						CStringA requestData;
+						requestData.Format(R"({"context":{"client":{"clientName":"ANDROID_EMBEDDED_PLAYER","clientVersion":"16.05"}},"videoId":"%S"})", videoId.GetString());
 
-			CString url;
-			url.Format(L"https://www.youtube.com/get_video_info?video_id=%s&html5=1&c=TVHTML5&cver=6.20180913", videoId);
-			urlData data;
-			if (URLReadData(url.GetString(), data)) {
-				const CStringA strData = UrlDecode(data.data());
+						if (HttpSendRequestW(hRequest, nullptr, 0, reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
+							urlData data;
+							static std::vector<char> tmp(16 * 1024);
+							for (;;) {
+								DWORD dwSizeRead = 0;
+								if (!InternetReadFile(hRequest, reinterpret_cast<LPVOID>(tmp.data()), tmp.size(), &dwSizeRead) || !dwSizeRead) {
+									break;
+								}
 
-				auto player_response_jsonData = ParseVideoInfoResponse(strData.GetString());
-				if (!player_response_jsonData.IsEmpty()) {
-					rapidjson::Document player_response_jsonDocument;
-					player_response_jsonDocument.Parse(player_response_jsonData);
+								data.insert(data.end(), tmp.begin(), tmp.begin() + dwSizeRead);
+							}
 
-					bParse = ParseResponseJson(player_response_jsonDocument, y_fields, true);
+							if (!data.empty()) {
+								data.push_back('\0');
+
+								const CStringA response_jsonData = UrlDecode(data.data());
+								rapidjson::Document player_response_jsonDocument;
+								player_response_jsonDocument.Parse(response_jsonData);
+
+								bParse = ParseResponseJson(player_response_jsonDocument, y_fields, true);
+							}
+						}
+
+						InternetCloseHandle(hRequest);
+					}
+					InternetCloseHandle(hSession);
 				}
+				InternetCloseHandle(hInet);
 			}
-
 			return bParse;
 #else
 			CString url;
