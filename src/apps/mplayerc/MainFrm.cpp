@@ -12091,7 +12091,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
 			std::list<CString> urls;
-			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart)) {
+			CString errorMessage;
+			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart, errorMessage)) {
 				youtubeUrl = fn;
 				Content::Online::Disconnect(fn);
 
@@ -12102,6 +12103,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+			} else if (!errorMessage.IsEmpty()) {
+				return errorMessage;
 			}
 		}
 	}
