@@ -59,6 +59,7 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Debug"      SET "BUILDCFG=Debug"      & SET /A ARGBC+=1 & SET /A ARGD+=1
   IF /I "%%A" == "Release"    SET "BUILDCFG=Release"    & SET /A ARGBC+=1
   IF /I "%%A" == "VS2017"     SET "COMPILER=VS2017"     & SET /A ARGCOMP+=1
+  IF /I "%%A" == "VS2022"     SET "COMPILER=VS2022"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"            & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
@@ -100,6 +101,8 @@ SET "PARAMS=-property installationPath -requires Microsoft.Component.MSBuild Mic
 
 IF /I "%COMPILER%" == "VS2017" (
   SET "PARAMS=%PARAMS% -version [15.0,16.0^)"
+) ELSE IF /I "%COMPILER%" == "VS2022" (
+  SET "PARAMS=%PARAMS% -latest -prerelease -version [,17.0)"
 ) ELSE (
   SET "PARAMS=%PARAMS% -latest"
 )
