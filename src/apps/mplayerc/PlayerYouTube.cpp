@@ -257,7 +257,9 @@ namespace Youtube
 													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
-					requestData.Format(R"({"context":{"client":{"clientName":"ANDROID_EMBEDDED_PLAYER","clientVersion":"16.05"}},"videoId":"%S"})", videoId);
+					constexpr auto str = R"({"context": {"client": {"clientName": "WEB", "clientVersion": "2.20210622.10.00", "clientScreen": "EMBED"}, )"
+										 R"("thirdParty": {"embedUrl": "https://google.com"} }, "videoId": "%S", "contentCheckOk": true, "racyCheckOk": true})";
+					requestData.Format(str, videoId);
 
 					if (HttpSendRequestW(hRequest, nullptr, 0, reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
 						static std::vector<char> tmp(16 * 1024);
@@ -286,7 +288,7 @@ namespace Youtube
 		return false;
 	}
 
-	static bool ParseResponseJson(rapidjson::Document& json, YoutubeFields& y_fields, const bool bReplacePlus)
+	static bool ParseResponseJson(rapidjson::Document& json, YoutubeFields& y_fields)
 	{
 		bool bParse = false;
 		if (!json.IsNull()) {
@@ -295,15 +297,9 @@ namespace Youtube
 
 				if (getJsonValue(*videoDetails, "title", y_fields.title)) {
 					y_fields.title = FixHtmlSymbols(y_fields.title);
-					if (bReplacePlus) {
-						y_fields.title.Replace('+', ' ');
-					}
 				}
 
 				getJsonValue(*videoDetails, "author", y_fields.author);
-				if (bReplacePlus) {
-					y_fields.author.Replace('+', ' ');
-				}
 
 				if (getJsonValue(*videoDetails, "shortDescription", y_fields.content)) {
 					y_fields.content.Replace(L"\\r\\n", L"\r\n");
@@ -311,10 +307,6 @@ namespace Youtube
 
 					std::wstring wstr = std::regex_replace(y_fields.content.GetString(), std::wregex(LR"(\r\n|\r|\n)"), L"\r\n");
 					y_fields.content = wstr.c_str();
-
-					if (bReplacePlus) {
-						y_fields.content.Replace('+', ' ');
-					}
 				}
 
 				CStringA lengthSeconds;
@@ -346,11 +338,10 @@ namespace Youtube
 			bool bParse = false;
 			urlData data;
 			if (URLPostData(videoId.GetString(), data)) {
-				const CStringA response_jsonData = UrlDecode(data.data());
 				rapidjson::Document player_response_jsonDocument;
-				player_response_jsonDocument.Parse(response_jsonData);
+				player_response_jsonDocument.Parse(data.data());
 
-				bParse = ParseResponseJson(player_response_jsonDocument, y_fields, true);
+				bParse = ParseResponseJson(player_response_jsonDocument, y_fields);
 			}
 			return bParse;
 #else
@@ -499,7 +490,6 @@ namespace Youtube
 			}
 
 			rapidjson::Document player_response_jsonDocument;
-			bool bReplacePlus = false;
 
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
@@ -576,15 +566,12 @@ namespace Youtube
 			}
 
 			if (strUrlsLive.empty() && !bStreamingDataExist && strUrls.IsEmpty()) {
-				bReplacePlus = true;
-
 				urlData data;
 				if (!URLPostData(videoId.GetString(), data)) {
 					return false;
 				}
 
-				const CStringA response_jsonData = UrlDecode(data.data());
-				player_response_jsonDocument.Parse(response_jsonData);
+				player_response_jsonDocument.Parse(data.data());
 			}
 
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
@@ -1255,7 +1242,7 @@ namespace Youtube
 			if (!final_video_url.IsEmpty()) {
 				final_video_url.Replace(L"http://", L"https://");
 
-				const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields, bReplacePlus);
+				const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
 				if (!bParseMetadata) {
 					ParseMetadata(videoId, y_fields);
 				}
