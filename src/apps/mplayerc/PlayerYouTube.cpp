@@ -257,7 +257,7 @@ namespace Youtube
 													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
-					constexpr auto str = R"({"context": {"client": {"clientName": "WEB", "clientVersion": "2.20210622.10.00", "clientScreen": "EMBED"}, )"
+					constexpr auto str = R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "clientScreen": "EMBED"}, )"
 										 R"("thirdParty": {"embedUrl": "https://google.com"} }, "videoId": "%S", "contentCheckOk": true, "racyCheckOk": true})";
 					requestData.Format(str, videoId);
 
