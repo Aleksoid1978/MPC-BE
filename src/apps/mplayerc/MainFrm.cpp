@@ -483,6 +483,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_SUB_COPYTOCLIPBOARD, OnSubCopyClipboard)
 
+	ON_COMMAND(ID_PASTEFROMCLIPBOARD, OnPasteFromClipboard)
+
 	ON_WM_WTSSESSION_CHANGE()
 END_MESSAGE_MAP()
 
@@ -10454,6 +10456,11 @@ void CMainFrame::OnSubCopyClipboard()
 			}
 		}
 	}
+}
+
+void CMainFrame::OnPasteFromClipboard()
+{
+	m_wndPlaylistBar.PasteFromClipboard();
 }
 
 void CMainFrame::SetDefaultWindowRect(int iMonitor, const bool bLastCall)

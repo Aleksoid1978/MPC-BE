@@ -461,6 +461,7 @@
 #define ID_LANGUAGE_GREEK               5025
 #define ID_LANGUAGE_ROMANIAN            5026
 #define ID_LANGUAGE_LAST                5050
+#define ID_PASTEFROMCLIPBOARD           5051
 ////////////////////////////////////////////
 // strings for built-in filters
 #define IDS_FILTER_SETTINGS_CAPTION     7000

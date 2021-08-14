@@ -483,8 +483,8 @@ public:
 
 	virtual void Invalidate() { m_list.Invalidate(); }
 
-protected:
 	void PasteFromClipboard();
+protected:
 	void CopyToClipboard();
 
 	bool m_bDrawDragImage = false;
