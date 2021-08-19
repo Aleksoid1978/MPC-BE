@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - stts Atoms 
+|    AP4 - stts Atoms
 |
 |    Copyright 2003 Gilles Boccon-Gibod & Julien Boeuf
 |
@@ -94,7 +94,7 @@ AP4_SttsAtom::GetDts(AP4_Ordinal sample, AP4_TimeStamp& dts, AP4_Duration& durat
     // default value
     dts = 0;
     duration = 0;
-    
+
     // sample indexes start at 1
     if (sample == 0) return AP4_ERROR_OUT_OF_RANGE;
 
@@ -134,7 +134,7 @@ AP4_SttsAtom::GetDts(AP4_Ordinal sample, AP4_TimeStamp& dts, AP4_Duration& durat
 
             return AP4_SUCCESS;
         }
- 
+
         // update the sample and dts bases
         sample_start += entry.m_SampleCount;
         dts_start    += entry.m_SampleCount * entry.m_SampleDuration;
@@ -187,26 +187,29 @@ AP4_SttsAtom::WriteFields(AP4_ByteStream& stream)
 |       AP4_SttsAtom::GetSampleIndexForTimeStamp
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_SttsAtom::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& sample)
+AP4_SttsAtom::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_SI64 offset, AP4_Ordinal& sample)
 {
     // init
     AP4_Cardinal entry_count = m_Entries.ItemCount();
-    AP4_Duration accumulated = 0;
+    AP4_SI64 accumulated = offset;
     sample = 0;
-    
-    for (AP4_Ordinal i=0; i<entry_count; i++) {
-        AP4_Duration next_accumulated = accumulated 
-            + m_Entries[i].m_SampleCount * m_Entries[i].m_SampleDuration;
-        
+
+    for (AP4_Ordinal i = 0; i < entry_count; i++) {
+        const auto& entry = m_Entries[i];
+        AP4_Duration next_accumulated = accumulated
+            + entry.m_SampleCount * entry.m_SampleDuration;
+
         // check if the ts is in the range of this entry
-        if (ts < next_accumulated && m_Entries[i].m_SampleDuration) {
-            sample += (AP4_Ordinal) ((ts - accumulated) / m_Entries[i].m_SampleDuration);
+        if (ts < next_accumulated && entry.m_SampleDuration) {
+            if (static_cast<AP4_SI64>(ts) > accumulated) {
+                sample += (AP4_Ordinal)((ts - accumulated) / entry.m_SampleDuration);
+            }
             return AP4_SUCCESS;
         }
 
         // update accumulated and sample
         accumulated = next_accumulated;
-        sample += m_Entries[i].m_SampleCount;
+        sample += entry.m_SampleCount;
     }
 
     // ts not in range of the table

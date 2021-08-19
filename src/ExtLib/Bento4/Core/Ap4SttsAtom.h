@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - stts Atoms 
+|    AP4 - stts Atoms
 |
 |    Copyright 2003 Gilles Boccon-Gibod & Julien Boeuf
 |
@@ -42,8 +42,8 @@
 +---------------------------------------------------------------------*/
 class AP4_SttsTableEntry {
  public:
-    AP4_SttsTableEntry() : 
-        m_SampleCount(0), 
+    AP4_SttsTableEntry() :
+        m_SampleCount(0),
         m_SampleDuration(0) {}
     AP4_SttsTableEntry(AP4_Cardinal sample_count,
                        AP4_Duration sample_duration) :
@@ -66,7 +66,7 @@ class AP4_SttsAtom : public AP4_Atom
     virtual AP4_Result InspectFields(AP4_AtomInspector& inspector);
     virtual AP4_Result GetDts(AP4_Ordinal sample, AP4_TimeStamp& dts, AP4_Duration& duration);
     virtual AP4_Result AddEntry(AP4_UI32 sample_count, AP4_UI32 sample_duration);
-    virtual AP4_Result GetSampleIndexForTimeStamp(AP4_TimeStamp ts, 
+    virtual AP4_Result GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_SI64 offset,
                                                   AP4_Ordinal& sample);
     virtual AP4_Result WriteFields(AP4_ByteStream& stream);
 

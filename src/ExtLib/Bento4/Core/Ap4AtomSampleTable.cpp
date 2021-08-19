@@ -271,7 +271,7 @@ AP4_Result
 AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
                                                 AP4_Ordinal& index)
 {
-    AP4_Result result = m_SttsAtom ? m_SttsAtom->GetSampleIndexForTimeStamp(ts, index) : AP4_FAILURE;
+    AP4_Result result = m_SttsAtom ? m_SttsAtom->GetSampleIndexForTimeStamp(ts, m_tsDelay, index) : AP4_FAILURE;
     if AP4_SUCCEEDED(result) {
         auto GetCts = [&](AP4_Ordinal i, AP4_SI64& cts) {
             AP4_TimeStamp dts;
@@ -283,7 +283,7 @@ AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
             if (m_CttsAtom) {
                 m_CttsAtom->GetCtsOffset(index, cts_offset);
             }
-            cts = dts + cts_offset;
+            cts = dts + cts_offset + m_tsDelay;
 
             return AP4_SUCCESS;
         };
