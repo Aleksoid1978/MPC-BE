@@ -106,9 +106,9 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
-3		"History (experimental)"
-7		"Delete selected"
-8		"Clear"
+3		"Історія (експериментально)"
+7		"Видалити обране"
+8		"Очистити"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1075,7 +1075,7 @@ STRING IDD_PPAGEWINDOWSIZE		"Програвач::Розмір вікна"
 STRING IDD_PPAGEYOUTUBE		"Відтворення::Онлайн сервіси"
 STRING IDF_LOGO1		"Типовий"
 STRING IDR_MAINFRAME		"MPC-BE"
-STRING IDS_ADDTOPLAYLISTROMCLIPBOARD		"Add to playlist from clipboard"
+STRING IDS_ADDTOPLAYLISTROMCLIPBOARD		"Додати в список відтворення з буферу обміну"
 STRING IDS_ADDTOPLS_FROMDIR_ALL		"всі файли з теки"
 STRING IDS_ADDTOPLS_FROMDIR_NONE		"нічого"
 STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"подібні файли з теки"
@@ -1872,7 +1872,7 @@ STRING IDS_SHADER_EDITOR		"Редактор шейдерів"
 STRING IDS_SHADER_FOLDER		"Відкрити теку з шейдерами"
 STRING IDS_SHADER_NEW		"Новий..."
 STRING IDS_SHADER_SAVE		"Зберегти"
-STRING IDS_SHOW_HISTORY		"Show history"
+STRING IDS_SHOW_HISTORY		"Показати історію"
 STRING IDS_SIDE_LEFT		"Бічний лівий"
 STRING IDS_SIDE_RIGHT		"Бічний правий"
 STRING IDS_SIZE_UNIT_G		"ГБ"
