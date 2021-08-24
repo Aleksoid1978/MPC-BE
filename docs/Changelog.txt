@@ -2,6 +2,11 @@
 
 1.6.0 (alpha)
 =============================
+MP4Splitter
+Extended support for PCM audio ('ipcm').
+The analysis of the average bitrate of audio tracks has been removed. This will speed up the opening of some files.
+Improved support for files with tracks with offset timestamps.
+
 MPCVideoDec
 Eliminated high load on the system with frequent navigation on H.264 and MPEG-2 videos when using the D3D11 decoder.
 
@@ -11,6 +16,10 @@ EVR-CP and Sync Renderer no longer require d3dx9_43.dll to render statistics tex
 Subtitles
 Texture size 2560x1600 changed to 2560x1440.
 
+Youtube
+Improved retrieval of video metadata.
+Added error output for videos with restrictions.
+
 Player
 The history of open files and URLs is now saved in the history.mpc_lst file. Added a window for viewing history.
 Bookmarks are now saved in the favorites.mpc_lst file.
@@ -19,6 +28,7 @@ Statistics information is now updated after navigation when playback is paused.
 Fixed DVD-Video playback with built-in filters.
 Open file/URL dialog now automatically removes enclosing quotes from given paths.
 Fixed shift and enlargement of the main window when hovering over the cover of the audio file displayed above the taskbar.
+Added the command "Add to playlist from clipboard" (Ctrl+V).
 
 Updated Chinese (Simplified) translation (by wushantao).
 Updated German translation (by Klaus1189).
@@ -26,6 +36,7 @@ Updated Hungarian translation (by mickey).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Turkish translation (by cmhrky).
 Updated Portuguese (Brazil) translation (by Siegfried Janke).
+Updated Japanese translation.
 
 Updated libraries:
 	dav1d git-0.9.1-6-gb342445;
