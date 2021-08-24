@@ -390,6 +390,7 @@
 #define ID_PLAY_REPEAT_AB               1201
 #define ID_PLAY_REPEAT_AB_MARK_A        1202
 #define ID_PLAY_REPEAT_AB_MARK_B        1203
+#define ID_ADDTOPLAYLISTROMCLIPBOARD    1210
 //
 #define ID_SUBMENU_OPENDISC             1900
 #define ID_SUBMENU_RECENTFILES          1901
@@ -461,7 +462,6 @@
 #define ID_LANGUAGE_GREEK               5025
 #define ID_LANGUAGE_ROMANIAN            5026
 #define ID_LANGUAGE_LAST                5050
-#define ID_PASTEFROMCLIPBOARD           5051
 ////////////////////////////////////////////
 // strings for built-in filters
 #define IDS_FILTER_SETTINGS_CAPTION     7000
@@ -1392,6 +1392,7 @@
 #define IDS_PLAYLOOPMODE_AB             33460
 #define IDS_PLAYLOOPMODE_AB_MARK_A      33461
 #define IDS_PLAYLOOPMODE_AB_MARK_B      33462
+#define IDS_ADDTOPLAYLISTROMCLIPBOARD   33463
 //
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501

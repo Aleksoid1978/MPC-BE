@@ -1200,7 +1200,7 @@ public:
 
 	afx_msg void OnSubCopyClipboard();
 
-	afx_msg void OnPasteFromClipboard();
+	afx_msg void OnAddToPlaylistFromClipboard();
 
 	afx_msg void OnClose();
 

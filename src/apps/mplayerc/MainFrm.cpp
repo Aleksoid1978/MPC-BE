@@ -483,7 +483,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_SUB_COPYTOCLIPBOARD, OnSubCopyClipboard)
 
-	ON_COMMAND(ID_PASTEFROMCLIPBOARD, OnPasteFromClipboard)
+	ON_COMMAND(ID_ADDTOPLAYLISTROMCLIPBOARD, OnAddToPlaylistFromClipboard)
 
 	ON_WM_WTSSESSION_CHANGE()
 END_MESSAGE_MAP()
@@ -10458,7 +10458,7 @@ void CMainFrame::OnSubCopyClipboard()
 	}
 }
 
-void CMainFrame::OnPasteFromClipboard()
+void CMainFrame::OnAddToPlaylistFromClipboard()
 {
 	m_wndPlaylistBar.PasteFromClipboard();
 }
