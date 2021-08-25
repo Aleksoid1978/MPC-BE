@@ -162,7 +162,7 @@ bool CMpcLstFile::Clear()
 	return false;
 }
 
-void CMpcLstFile::SetFilename(CStringW& filename)
+void CMpcLstFile::SetFilename(const CStringW& filename)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -178,7 +178,7 @@ void CMpcLstFile::SetMaxCount(unsigned maxcount)
 // CHistoryFile
 //
 
-void CHistoryFile::IntAddEntry(SessionInfo& sesInfo)
+void CHistoryFile::IntAddEntry(const SessionInfo& sesInfo)
 {
 	if (sesInfo.Path.GetLength()) {
 		m_SessionInfos.emplace_back(sesInfo);
@@ -353,7 +353,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 	return found;
 }
 
-void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
+void CHistoryFile::SaveSessionInfo(const SessionInfo& sesInfo)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -374,7 +374,7 @@ void CHistoryFile::SaveSessionInfo(SessionInfo& sesInfo)
 	WriteFile();
 }
 
-bool CHistoryFile::DeleteSessions(std::list<SessionInfo>& sessions)
+bool CHistoryFile::DeleteSessions(const std::list<SessionInfo>& sessions)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -399,7 +399,7 @@ bool CHistoryFile::DeleteSessions(std::list<SessionInfo>& sessions)
 		return WriteFile();
 	}
 
-	return true; // already deleted 
+	return true; // already deleted
 }
 
 void CHistoryFile::GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count)
@@ -446,7 +446,7 @@ void CHistoryFile::GetRecentSessions(std::vector<SessionInfo>& recentSessions, u
 // CFavoritesFile
 //
 
-void CFavoritesFile::IntAddEntry(SessionInfo& sesInfo)
+void CFavoritesFile::IntAddEntry(const SessionInfo& sesInfo)
 {
 	if (sesInfo.Path.GetLength()) {
 		if (sesInfo.DVDId) {

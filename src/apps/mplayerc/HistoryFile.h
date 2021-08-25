@@ -67,7 +67,7 @@ protected:
 	unsigned m_maxCount = 100;
 	LPCWSTR m_Header = L"";
 
-	virtual void IntAddEntry(SessionInfo& sesInfo) = 0;
+	virtual void IntAddEntry(const SessionInfo& sesInfo) = 0;
 	virtual void IntClearEntries() = 0;
 
 	bool ReadFile();
@@ -75,7 +75,7 @@ protected:
 public:
 	bool Clear(); // Clear list and delete file
 
-	void SetFilename(CStringW& filename);
+	void SetFilename(const CStringW& filename);
 	void SetMaxCount(unsigned maxcount);
 };
 
@@ -88,7 +88,7 @@ class CHistoryFile : public CMpcLstFile
 private:
 	std::list<SessionInfo> m_SessionInfos;
 
-	void IntAddEntry(SessionInfo& sesInfo) override;
+	void IntAddEntry(const SessionInfo& sesInfo) override;
 	void IntClearEntries() override;
 
 	std::list<SessionInfo>::iterator FindSessionInfo(const SessionInfo& sesInfo, std::list<SessionInfo>::iterator begin);
@@ -96,8 +96,8 @@ private:
 
 public:
 	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos); // Read or create an entry in the history file
-	void SaveSessionInfo(SessionInfo& sesInfo);
-	bool DeleteSessions(std::list<SessionInfo>& sessions);
+	void SaveSessionInfo(const SessionInfo& sesInfo);
+	bool DeleteSessions(const std::list<SessionInfo>& sessions);
 
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
@@ -110,7 +110,7 @@ public:
 class CFavoritesFile : public CMpcLstFile
 {
 private:
-	void IntAddEntry(SessionInfo& sesInfo) override;
+	void IntAddEntry(const SessionInfo& sesInfo) override;
 	void IntClearEntries() override;
 
 	bool WriteFile();
