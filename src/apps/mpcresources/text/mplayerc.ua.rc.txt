@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"Історія (експериментально)"
-7		"Видалити обране"
-8		"Очистити"
+6		"MENU"
+8		"Видалити обране"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1491,6 +1491,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"Помилка обробки введен�
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Аудіо Перемикач"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Не вдалося опитати необхідні інтерфейси для відтворення"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Не вдалося встановити цільове вікно для сповіщення графу"
+STRING IDS_HISTORY_CLEAR		"Clear"
+STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
+STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HUE_DEC		"Відтінок -"
 STRING IDS_HUE_INC		"Відтінок +"
 STRING IDS_HZ		"Гц"

@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"Gesamte Chronik (experimentell)"
-7		"Ausgewählte löschen"
-8		"Alle löschen"
+6		"MENU"
+8		"Ausgewählte löschen"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1491,6 +1491,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"Fehler beim Parsen der eingegebenen Zeit!"
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Audio Umschalter"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Problem bei der Abfrage der für die Wiedergabe benötigten Schnittstelle."
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Das Zielfenster für die Graph Benachrichtigung konnte nicht gesetzt werden."
+STRING IDS_HISTORY_CLEAR		"Clear"
+STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
+STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HUE_DEC		"Farbton -"
 STRING IDS_HUE_INC		"Farbton +"
 STRING IDS_HZ		"Hz"

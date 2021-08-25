@@ -100,13 +100,46 @@ void CHistoryDlg::SetupList()
 	m_list.RedrawWindow();
 }
 
+int CHistoryDlg::DeleteMissingFiles()
+{
+	int count = 0;
+	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
+
+	std::list<SessionInfo> missingFiles;
+
+	for (auto& sesInfo : m_recentSessions) {
+		if (!sesInfo.DVDId && !::PathIsURLW(sesInfo.Path) && !::PathFileExistsW(sesInfo.Path)) {
+			missingFiles.emplace_back(sesInfo);
+		}
+	}
+
+	if (missingFiles.size()) {
+		if (historyFile.DeleteSessions(missingFiles)) {
+			count = missingFiles.size();
+			historyFile.GetRecentSessions(m_recentSessions, INT_MAX);
+			SetupList();
+		}
+	}
+
+	return count;
+}
+
+void CHistoryDlg::ClearHistory()
+{
+	if (IDYES == AfxMessageBox(ResStr(IDS_RECENT_FILES_QUESTION), MB_ICONQUESTION | MB_YESNO)) {
+		if (AfxGetMyApp()->m_HistoryFile.Clear()) {
+			m_recentSessions.clear();
+			SetupList();
+		}
+	}
+}
+
 void CHistoryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_EDIT1, m_FilterEdit);
-	DDX_Control(pDX, IDC_BUTTON1, m_DelSelButton);
-	DDX_Control(pDX, IDC_BUTTON2, m_ClearButton);
+	DDX_Control(pDX, IDC_BUTTON2, m_DelSelButton);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
@@ -114,8 +147,8 @@ BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_WM_ACTIVATE()
 	ON_WM_TIMER()
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
-	ON_BN_CLICKED(IDC_BUTTON1, OnDelSelBnClicked)
-	ON_BN_CLICKED(IDC_BUTTON2, OnClearBnClicked)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedDelSel)
 	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
@@ -125,8 +158,8 @@ BOOL CHistoryDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	AddAnchor(IDC_EDIT1, TOP_LEFT);
 	AddAnchor(IDC_BUTTON1, TOP_LEFT);
+	AddAnchor(IDC_EDIT1, TOP_LEFT);
 	AddAnchor(IDC_BUTTON2, TOP_LEFT);
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 
@@ -184,7 +217,39 @@ void CHistoryDlg::OnChangeFilterEdit()
 	m_nFilterTimerID = SetTimer(2, 100, NULL);
 }
 
-void CHistoryDlg::OnDelSelBnClicked()
+void CHistoryDlg::OnBnClickedMenu()
+{
+	enum {
+		M_DEL_SELECTED = 1,
+		M_REMOVE_MISSING,
+		M_CLEAR,
+	};
+
+	CMenu menu;
+	menu.CreatePopupMenu();
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_DEL_SELECTED, ResStr(IDS_HISTORY_DEL_SELECTED));
+	menu.AppendMenuW(MF_SEPARATOR);
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_REMOVE_MISSING, ResStr(IDS_HISTORY_REMOVE_MISSING));
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_CLEAR, ResStr(IDS_HISTORY_CLEAR));
+
+	CRect wrect;
+	GetDlgItem(IDC_BUTTON1)->GetWindowRect(&wrect);
+
+	int id = menu.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, wrect.left, wrect.bottom, this);
+	switch (id) {
+	case M_DEL_SELECTED:
+		OnBnClickedDelSel();
+		break;
+	case M_REMOVE_MISSING:
+		DeleteMissingFiles();
+		break;
+	case M_CLEAR:
+		ClearHistory();
+		break;
+	}
+}
+
+void CHistoryDlg::OnBnClickedDelSel()
 {
 	std::list<SessionInfo> selSessions;
 
@@ -203,16 +268,6 @@ void CHistoryDlg::OnDelSelBnClicked()
 	if (selSessions.size()) {
 		if (AfxGetMyApp()->m_HistoryFile.DeleteSessions(selSessions)) {
 			AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
-			SetupList();
-		}
-	}
-}
-
-void CHistoryDlg::OnClearBnClicked()
-{
-	if (IDYES == AfxMessageBox(ResStr(IDS_RECENT_FILES_QUESTION), MB_ICONQUESTION | MB_YESNO)) {
-		if (AfxGetMyApp()->m_HistoryFile.Clear()) {
-			m_recentSessions.clear();
 			SetupList();
 		}
 	}

@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"История (experimental)"
-7		"Удалить выбранное"
-8		"Очистить"
+6		"МЕНЮ"
+8		"Удалить выбранное"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1491,6 +1491,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"Время написано некорре�
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Аудиопереключатель"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Не удалось запросить необходимые интерфейсы для воспроизведения"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Не удалось создать окно для вывода графа"
+STRING IDS_HISTORY_CLEAR		"Очистить"
+STRING IDS_HISTORY_DEL_SELECTED		"Удалить выбранное"
+STRING IDS_HISTORY_REMOVE_MISSING		"Убрать несуществующие файлы"
 STRING IDS_HUE_DEC		"Оттенок -"
 STRING IDS_HUE_INC		"Оттенок +"
 STRING IDS_HZ		"Гц"

@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"History (experimental)"
-7		"Delete selected"
-8		"Clear"
+6		"MENU"
+8		"Delete selected"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1491,6 +1491,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"שגיאה בפענוח הזמן שהוזן
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"מחליף זרמי שמע"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Failed to query the needed interfaces for playback"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Could not set target window for graph notification"
+STRING IDS_HISTORY_CLEAR		"Clear"
+STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
+STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HUE_DEC		"גוון -"
 STRING IDS_HUE_INC		"גוון +"
 STRING IDS_HZ		"הרץ"

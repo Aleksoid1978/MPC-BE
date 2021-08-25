@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"History (experimental)"
-7		"Delete selected"
-8		"Clear"
+6		"MENU"
+8		"Delete selected"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1500,6 +1500,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"시간을 파싱하는데 오류가 발생�
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"오디오 스위처"
 STRING IDS_GRAPH_INTERFACES_ERROR		"재생 인터페이스 문의 실패"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"그래프통지 대상 윈도우 설정 실패"
+STRING IDS_HISTORY_CLEAR		"Clear"
+STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
+STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HUE_DEC		"색조 -"
 STRING IDS_HUE_INC		"색조 +"
 STRING IDS_HZ		"Hz"

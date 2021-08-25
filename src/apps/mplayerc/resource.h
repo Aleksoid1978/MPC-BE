@@ -1728,6 +1728,9 @@
 #define IDS_SHADER_NEW                  41601
 #define IDS_SHADER_DELETE               41602
 #define IDS_SHADER_FOLDER               41603
+#define IDS_HISTORY_DEL_SELECTED        41610
+#define IDS_HISTORY_REMOVE_MISSING      41611
+#define IDS_HISTORY_CLEAR               41612
 #define IDS_MOUSE_CLICK_MIDDLE          41702
 #define IDS_MOUSE_CLICK_X1              41703
 #define IDS_MOUSE_CLICK_X2              41704

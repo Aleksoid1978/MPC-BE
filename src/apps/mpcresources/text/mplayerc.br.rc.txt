@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"Histórico (experimental)"
-7		"Deletar selecionado"
-8		"Limpar"
+6		"MENU"
+8		"Deletar selecionado"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1491,6 +1491,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"Erro ao analisar a hora inserida!"
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Opção de áudio"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Falhou ao consultar interfaces necessárias para reprodução"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Não pode definir a janela destino para notificação do gráfico"
+STRING IDS_HISTORY_CLEAR		"Clear"
+STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
+STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HUE_DEC		"Matiz -"
 STRING IDS_HUE_INC		"Matiz +"
 STRING IDS_HZ		"Hz"

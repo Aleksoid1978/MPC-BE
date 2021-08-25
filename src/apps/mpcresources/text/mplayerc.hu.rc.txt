@@ -107,8 +107,8 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"Előzmények (kísérleti)"
-7		"Kiválasztottak törlése"
-8		"Tiszta"
+6		"MENU"
+8		"Kiválasztottak törlése"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1491,6 +1491,9 @@ STRING IDS_GOTO_ERROR_PARSING_TIME		"Hiba a beírt idő elemzésekor!"
 STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Audió-váltó"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Nem sikerült lekérdezni a lejátszáshoz szükséges felületeket"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Nem sikerült beállítani a célablakot a grafikon értesítéséhez"
+STRING IDS_HISTORY_CLEAR		"Clear"
+STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
+STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HUE_DEC		"Hue -"
 STRING IDS_HUE_INC		"Hue +"
 STRING IDS_HZ		"Hz"

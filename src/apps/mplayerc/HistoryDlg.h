@@ -46,7 +46,6 @@ private:
 	UINT_PTR m_nFilterTimerID;
 	CEdit m_FilterEdit;
 	CButton m_DelSelButton;
-	CButton m_ClearButton;
 
 public:
 	CHistoryDlg(CWnd* pParent = nullptr);
@@ -57,12 +56,14 @@ protected:
 	virtual BOOL OnInitDialog();
 
 	void SetupList();
+	int DeleteMissingFiles();
+	void ClearHistory();
 
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnChangeFilterEdit();
-	afx_msg void OnDelSelBnClicked();
-	afx_msg void OnClearBnClicked();
+	afx_msg void OnBnClickedMenu();
+	afx_msg void OnBnClickedDelSel();
 	afx_msg void OnClose();
 };
