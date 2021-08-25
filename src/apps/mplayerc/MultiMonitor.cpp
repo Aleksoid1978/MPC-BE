@@ -1,8 +1,6 @@
 /*
- *
- * Author: Donald Kackman
- * Email: don@itsEngineering.com
- * Copyright 2002, Donald Kackman
+* (C) 2002 Donald Kackman (don@itsEngineering.com)
+* (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,14 +50,14 @@ HMONITOR CMonitor::Detach()
 	return hMonitor;
 }
 
-HDC CMonitor::CreateDC() const
+HDC CMonitor::CreateMonDC() const
 {
 	ASSERT( IsMonitor() );
 
 	CString name;
 	GetName( name );
 
-	HDC hdc = ::CreateDC( name, name, nullptr, nullptr );
+	HDC hdc = ::CreateDCW( name, name, nullptr, nullptr );
 	ASSERT( hdc != nullptr );
 
 	CRect rect;
@@ -73,7 +71,7 @@ HDC CMonitor::CreateDC() const
 
 int CMonitor::GetBitsPerPixel() const
 {
-	HDC hdc = CreateDC();
+	HDC hdc = CreateMonDC();
 	int ret = ::GetDeviceCaps( hdc, BITSPIXEL ) * ::GetDeviceCaps( hdc, PLANES );
 	VERIFY( ::DeleteDC( hdc ) );
 
@@ -84,9 +82,9 @@ void CMonitor::GetName( CString& string ) const
 {
 	ASSERT( IsMonitor() );
 
-	MONITORINFOEX mi;
+	MONITORINFOEXW mi;
 	mi.cbSize = sizeof( mi );
-	::GetMonitorInfo( m_hMonitor, &mi );
+	::GetMonitorInfoW( m_hMonitor, &mi );
 
 	string = mi.szDevice;
 }
@@ -95,9 +93,9 @@ void CMonitor::GetDeviceId( CString& string ) const
 {
 	ASSERT( IsMonitor() );
 
-	MONITORINFOEX mi;
+	MONITORINFOEXW mi;
 	mi.cbSize = sizeof( mi );
-	::GetMonitorInfo( m_hMonitor, &mi );
+	::GetMonitorInfoW( m_hMonitor, &mi );
 
 	DISPLAY_DEVICEW dd = { sizeof(dd) };
 	DWORD iDevNum = 0;
@@ -146,7 +144,7 @@ void CMonitor::GetMonitorRect( LPRECT lprc ) const
 	RECT        rc;
 
 	mi.cbSize = sizeof( mi );
-	::GetMonitorInfo( m_hMonitor, &mi );
+	::GetMonitorInfoW( m_hMonitor, &mi );
 	rc = mi.rcMonitor;
 
 	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
@@ -160,7 +158,7 @@ void CMonitor::GetWorkAreaRect( LPRECT lprc ) const
 	RECT        rc;
 
 	mi.cbSize = sizeof( mi );
-	::GetMonitorInfo( m_hMonitor, &mi );
+	::GetMonitorInfoW( m_hMonitor, &mi );
 	rc = mi.rcWork;
 
 	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
@@ -181,9 +179,9 @@ void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect, con
 	rect.InflateRect(inflateRect);
 
 	// Added rounding to get exactly the same rect as the CWnd::CenterWindow method returns.
-	lprc->left = lround(rect.left + ( rect.Width() - w ) / 2.0);
-	lprc->top = lround(rect.top + ( rect.Height() - h ) / 2.0);
-	lprc->right	= lprc->left + w;
+	lprc->left   = lround(rect.left + ( rect.Width() - w ) / 2.0);
+	lprc->top    = lround(rect.top + ( rect.Height() - h ) / 2.0);
+	lprc->right  = lprc->left + w;
 	lprc->bottom = lprc->top + h;
 }
 
@@ -228,7 +226,7 @@ BOOL CMonitor::IsPrimaryMonitor() const
 	MONITORINFO mi;
 
 	mi.cbSize = sizeof( mi );
-	::GetMonitorInfo( m_hMonitor, &mi );
+	::GetMonitorInfoW( m_hMonitor, &mi );
 
 	return mi.dwFlags == MONITORINFOF_PRIMARY;
 }

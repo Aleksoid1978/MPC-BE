@@ -1,8 +1,6 @@
 /*
- *
- * Author: Donald Kackman
- * Email: don@itsEngineering.com
- * Copyright 2002, Donald Kackman
+ * (C) 2002 Donald Kackman (don@itsEngineering.com)
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +35,7 @@ public:
 	void CenterRectToMonitor(LPRECT lprc, const BOOL UseWorkAreaRect = FALSE, const CRect& inflateRect = {}) const;
 	void CenterWindowToMonitor( CWnd* const pWnd, const BOOL UseWorkAreaRect = FALSE ) const;
 
-	HDC CreateDC() const;
+	HDC CreateMonDC() const;
 
 	void GetMonitorRect( LPRECT lprc ) const;
 	void GetWorkAreaRect( LPRECT lprc ) const;

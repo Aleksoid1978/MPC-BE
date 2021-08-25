@@ -766,9 +766,9 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_nMonitorHorRes = m_nMonitorVerRes = 0;
 
 	HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-	MONITORINFOEX mi;
+	MONITORINFOEXW mi;
 	ZeroMemory(&mi, sizeof(mi));
-	mi.cbSize = sizeof(MONITORINFOEX);
+	mi.cbSize = sizeof(mi);
 	if (GetMonitorInfoW(hMonitor, &mi)) {
 		ReadDisplay(mi.szDevice, &m_MonitorName, &m_nMonitorHorRes, &m_nMonitorVerRes);
 		m_rcMonitor = mi.rcMonitor;
