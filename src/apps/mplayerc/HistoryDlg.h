@@ -56,7 +56,8 @@ protected:
 	virtual BOOL OnInitDialog();
 
 	void SetupList();
-	int DeleteMissingFiles();
+	void RemoveSelected();
+	int  RemoveMissingFiles();
 	void ClearHistory();
 
 	DECLARE_MESSAGE_MAP()
@@ -64,6 +65,6 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnChangeFilterEdit();
 	afx_msg void OnBnClickedMenu();
-	afx_msg void OnBnClickedDelSel();
+	afx_msg void OnBnClickedRemoveSel();
 	afx_msg void OnClose();
 };

@@ -100,7 +100,31 @@ void CHistoryDlg::SetupList()
 	m_list.RedrawWindow();
 }
 
-int CHistoryDlg::DeleteMissingFiles()
+void CHistoryDlg::RemoveSelected()
+{
+	std::list<SessionInfo> selSessions;
+
+	POSITION pos = m_list.GetFirstSelectedItemPosition();
+
+	while (pos) {
+		int nItem = m_list.GetNextSelectedItem(pos);
+
+		size_t index = m_list.GetItemData(nItem);
+		if (index < m_recentSessions.size()) {
+			CStringW dd = m_list.GetItemText(nItem, 0);
+			selSessions.emplace_back(m_recentSessions[index]);
+		}
+	}
+
+	if (selSessions.size()) {
+		if (AfxGetMyApp()->m_HistoryFile.DeleteSessions(selSessions)) {
+			AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
+			SetupList();
+		}
+	}
+}
+
+int CHistoryDlg::RemoveMissingFiles()
 {
 	int count = 0;
 	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
@@ -148,7 +172,7 @@ BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_WM_TIMER()
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
-	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedDelSel)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedRemoveSel)
 	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
@@ -220,14 +244,14 @@ void CHistoryDlg::OnChangeFilterEdit()
 void CHistoryDlg::OnBnClickedMenu()
 {
 	enum {
-		M_DEL_SELECTED = 1,
+		M_REMOVE_SELECTED = 1,
 		M_REMOVE_MISSING,
 		M_CLEAR,
 	};
 
 	CMenu menu;
 	menu.CreatePopupMenu();
-	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_DEL_SELECTED, ResStr(IDS_HISTORY_DEL_SELECTED));
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_REMOVE_SELECTED, ResStr(IDS_HISTORY_REMOVE_SELECTED));
 	menu.AppendMenuW(MF_SEPARATOR);
 	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_REMOVE_MISSING, ResStr(IDS_HISTORY_REMOVE_MISSING));
 	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_CLEAR, ResStr(IDS_HISTORY_CLEAR));
@@ -237,11 +261,11 @@ void CHistoryDlg::OnBnClickedMenu()
 
 	int id = menu.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, wrect.left, wrect.bottom, this);
 	switch (id) {
-	case M_DEL_SELECTED:
-		OnBnClickedDelSel();
+	case M_REMOVE_SELECTED:
+		RemoveSelected();
 		break;
 	case M_REMOVE_MISSING:
-		DeleteMissingFiles();
+		RemoveMissingFiles();
 		break;
 	case M_CLEAR:
 		ClearHistory();
@@ -249,28 +273,9 @@ void CHistoryDlg::OnBnClickedMenu()
 	}
 }
 
-void CHistoryDlg::OnBnClickedDelSel()
+void CHistoryDlg::OnBnClickedRemoveSel()
 {
-	std::list<SessionInfo> selSessions;
-
-	POSITION pos = m_list.GetFirstSelectedItemPosition();
-
-	while (pos) {
-		int nItem = m_list.GetNextSelectedItem(pos);
-
-		size_t index = m_list.GetItemData(nItem);
-		if (index < m_recentSessions.size()) {
-			CStringW dd = m_list.GetItemText(nItem, 0);
-			selSessions.emplace_back(m_recentSessions[index]);
-		}
-	}
-
-	if (selSessions.size()) {
-		if (AfxGetMyApp()->m_HistoryFile.DeleteSessions(selSessions)) {
-			AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
-			SetupList();
-		}
-	}
+	RemoveSelected();
 }
 
 void CHistoryDlg::OnClose()

@@ -108,7 +108,7 @@ END
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"History (experimental)"
 6		"MENU"
-8		"Delete selected"
+8		"Remove selected"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -1486,8 +1486,8 @@ STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Przełącznik audio"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Błąd podczas zapytania interfejsów potrzebnych do odtwarzania"
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Nie można ustawić docelowego okna do powiadomienia grafu."
 STRING IDS_HISTORY_CLEAR		"Clear"
-STRING IDS_HISTORY_DEL_SELECTED		"Delete selected"
 STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
+STRING IDS_HISTORY_REMOVE_SELECTED		"Remove selected"
 STRING IDS_HUE_DEC		"Odcień -"
 STRING IDS_HUE_INC		"Odcień +"
 STRING IDS_HZ		"Hz"
