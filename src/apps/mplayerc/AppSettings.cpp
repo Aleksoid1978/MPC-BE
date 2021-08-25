@@ -884,15 +884,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop, 0, 3);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut, -1, 10);
-
-	//Multi-monitor code
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, strFullScreenMonitor);
-	// DeviceID
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, strFullScreenMonitorID);
-
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay, 0, 9);
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);
@@ -914,43 +905,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
-
-	profile.ReadInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
-	profile.ReadBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
-	fullScreenModes.res.clear();
-	for (size_t cnt = 0; cnt < MaxMonitorId; cnt++) {
-		fullScreenRes item;
-
-		CString entry;
-		entry.Format(L"MonitorId%u", cnt);
-		if (!profile.ReadString(IDS_RS_FULLSCREENRES, entry, str) || str.IsEmpty()) {
-			break;
-		}
-
-		entry.Format(L"Res%u", cnt);
-		if (profile.ReadBinaryOld(IDS_RS_FULLSCREENRES, entry, &ptr, len)) {
-			if (len >= (sizeof(fpsmode) + 1)) {
-				BYTE size = ptr[0];
-				if (size && size <= MaxFullScreenModes && size * sizeof(fpsmode) == len - 1) {
-					item.dmFullscreenRes.resize(size);
-					memcpy(item.dmFullscreenRes.data(), ptr + 1, len - 1);
-
-					item.monitorId = str;
-					fullScreenModes.res.emplace_back(item);
-				}
-			}
-			delete [] ptr;
-		}
-	}
-
-	if (fullScreenModes.res.empty()) {
-		fullScreenModes.bEnabled = FALSE;
-		fullScreenModes.bApplyDefault = false;
-	}
-
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
 
 	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str)
 			&& swscanf_s(str, L"%f,%f", &dZoomX, &dZoomY) == 2
@@ -1295,6 +1249,51 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, *(unsigned*)&clrOutlineABGR);
 	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
 
+	// FullScreen
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut, -1, 10);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
+	//Multi-monitor code
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, strFullScreenMonitor);
+	// DeviceID
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, strFullScreenMonitorID);
+	// display modes
+	profile.ReadInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
+	profile.ReadBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
+	fullScreenModes.res.clear();
+	for (size_t cnt = 0; cnt < MaxMonitorId; cnt++) {
+		fullScreenRes item;
+
+		CString entry;
+		entry.Format(L"MonitorId%u", cnt);
+		if (!profile.ReadString(IDS_RS_FULLSCREENRES, entry, str) || str.IsEmpty()) {
+			break;
+		}
+
+		entry.Format(L"Res%u", cnt);
+		if (profile.ReadBinaryOld(IDS_RS_FULLSCREENRES, entry, &ptr, len)) {
+			if (len >= (sizeof(fpsmode) + 1)) {
+				BYTE size = ptr[0];
+				if (size && size <= MaxFullScreenModes && size * sizeof(fpsmode) == len - 1) {
+					item.dmFullscreenRes.resize(size);
+					memcpy(item.dmFullscreenRes.data(), ptr + 1, len - 1);
+
+					item.monitorId = str;
+					fullScreenModes.res.emplace_back(item);
+				}
+			}
+			delete [] ptr;
+		}
+	}
+	if (fullScreenModes.res.empty()) {
+		fullScreenModes.bEnabled = FALSE;
+		fullScreenModes.bApplyDefault = false;
+	}
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay, 0, 9);
+
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
@@ -1321,7 +1320,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(unsigned*)&dwPriority);
 	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
 	profile.ReadInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPORT, nWebServerPort, 1, 65535);
@@ -1581,34 +1579,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
-
-	if (!fullScreenModes.res.empty()) {
-		profile.DeleteSection(IDS_RS_FULLSCREENRES);
-		profile.WriteInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
-		profile.WriteBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
-		size_t cnt = 0;
-		std::vector<BYTE> value;
-		for (const auto& item : fullScreenModes.res) {
-			if (!item.monitorId.IsEmpty()) {
-				CString entry;
-				entry.Format(L"MonitorId%u", cnt);
-				profile.WriteString(IDS_RS_FULLSCREENRES, entry, item.monitorId);
-
-				entry.Format(L"Res%u", cnt++);
-				value.resize(1 + item.dmFullscreenRes.size() * sizeof(fpsmode));
-				value[0] = (BYTE)item.dmFullscreenRes.size();
-				memcpy(&value[1], item.dmFullscreenRes.data(), item.dmFullscreenRes.size() * sizeof(fpsmode));
-				profile.WriteBinaryOld(IDS_RS_FULLSCREENRES, entry, value.data(), value.size());
-			}
-		}
-	}
-
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
 
 	if (bSavePnSZoom) {
 		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
@@ -1726,11 +1696,6 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
-
-	// Multi-monitor code
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
-	// DeviceID
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, CString(strFullScreenMonitorID));
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);
@@ -1899,6 +1864,40 @@ void CAppSettings::SaveSettings()
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, clrOutlineABGR);
 	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
 
+	// FullScreen
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
+	// Multi-monitor code
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
+	// DeviceID
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, CString(strFullScreenMonitorID));
+	// display modes
+	if (!fullScreenModes.res.empty()) {
+		profile.DeleteSection(IDS_RS_FULLSCREENRES);
+		profile.WriteInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
+		profile.WriteBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
+		size_t cnt = 0;
+		std::vector<BYTE> value;
+		for (const auto& item : fullScreenModes.res) {
+			if (!item.monitorId.IsEmpty()) {
+				CString entry;
+				entry.Format(L"MonitorId%u", cnt);
+				profile.WriteString(IDS_RS_FULLSCREENRES, entry, item.monitorId);
+
+				entry.Format(L"Res%u", cnt++);
+				value.resize(1 + item.dmFullscreenRes.size() * sizeof(fpsmode));
+				value[0] = (BYTE)item.dmFullscreenRes.size();
+				memcpy(&value[1], item.dmFullscreenRes.data(), item.dmFullscreenRes.size() * sizeof(fpsmode));
+				profile.WriteBinaryOld(IDS_RS_FULLSCREENRES, entry, value.data(), value.size());
+			}
+		}
+	}
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
+
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
@@ -1924,7 +1923,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
 
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
 	profile.WriteInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPORT, nWebServerPort);
