@@ -132,7 +132,15 @@ int CHistoryDlg::RemoveMissingFiles()
 	std::list<SessionInfo> missingFiles;
 
 	for (auto& sesInfo : m_recentSessions) {
-		if (!sesInfo.DVDId && !::PathIsURLW(sesInfo.Path) && !::PathFileExistsW(sesInfo.Path)) {
+		if (sesInfo.DVDId && sesInfo.Path.GetLength() == 24 && StartsWithNoCase(sesInfo.Path, L":\\VIDEO_TS\\VIDEO_TS.IFO", 1)) {
+			// skip DVD-Video at the root of the disc
+			continue;
+		}
+		if (::PathIsURLW(sesInfo.Path)) {
+			// skip URL
+			continue;
+		}
+		if (!::PathFileExistsW(sesInfo.Path)) {
 			missingFiles.emplace_back(sesInfo);
 		}
 	}
