@@ -130,7 +130,7 @@ static bool WICDIB(LPCWSTR filename, BYTE* pData, int quality, BYTE* output, siz
 	}
 
 	HRESULT hr = WicSaveImage(
-		src, pitch, 
+		src, pitch,
 		bih->biWidth, abs(bih->biHeight),
 		format, quality,
 		filename,

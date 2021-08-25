@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ BOOL CPlaylistNameDlg::OnInitDialog()
 	__super::OnInitDialog();
 
 	UpdateData(FALSE);
-	
+
 	m_namectrl.SetFocus();
 	m_namectrl.SetWindowText(m_name);
 	m_namectrl.SetSel(0, -1);

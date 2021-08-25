@@ -25,7 +25,7 @@
 class CPlaylistNameDlg : public CCmdUIDialog
 {
 	DECLARE_DYNAMIC(CPlaylistNameDlg)
-	
+
 public:
 	CPlaylistNameDlg(const CString& str, CWnd* pParent = nullptr);
 	virtual ~CPlaylistNameDlg() = default;
