@@ -68,7 +68,7 @@
 #define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 
 // Video
-#define IDS_R_VIDEO							L"Settings\\Video"
+#define IDS_R_VIDEO							L"Video"
 #define IDS_RS_COLOR_BRIGHTNESS				L"ColorBrightness"
 #define IDS_RS_COLOR_CONTRAST				L"ColorContrast"
 #define IDS_RS_COLOR_HUE					L"ColorHue"
@@ -76,7 +76,7 @@
 // the rest of the Video settings are in RenderersSettings.cpp
 
 // Audio
-#define IDS_R_AUDIO							L"Settings\\Audio"
+#define IDS_R_AUDIO							L"Audio"
 #define IDS_RS_VOLUME						L"Volume"
 #define IDS_RS_MUTE							L"Mute"
 #define IDS_RS_BALANCE						L"Balance"
@@ -99,7 +99,7 @@
 #define IDS_RS_AUDIOTIMESHIFT				L"TimeShift"
 
 // Mouse
-#define IDS_R_MOUSE							L"Settings\\Mouse"
+#define IDS_R_MOUSE							L"Mouse"
 #define IDS_RS_MOUSE_BTN_LEFT				L"ButtonLeft"
 #define IDS_RS_MOUSE_BTN_LEFT_OPENRECENT	L"ButtonLeftOpenRecent"
 #define IDS_RS_MOUSE_BTN_LEFT_DBLCLICK		L"ButtonLeftDblClick"
