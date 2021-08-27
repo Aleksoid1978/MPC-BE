@@ -149,7 +149,7 @@
 #define IDS_RS_COUNTRY						L"Country"
 
 // DVBConfiguration
-#define IDS_R_DVB							L"DVBConfiguration"
+#define IDS_R_DVB							L"DVB"
 #define IDS_RS_BDA_NETWORKPROVIDER			L"BDANetworkProvider"
 #define IDS_RS_BDA_TUNER					L"BDATuner"
 #define IDS_RS_BDA_RECEIVER					L"BDAReceiver"
