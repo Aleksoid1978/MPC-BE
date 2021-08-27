@@ -111,7 +111,6 @@ void CHistoryDlg::RemoveSelected()
 
 		size_t index = m_list.GetItemData(nItem);
 		if (index < m_recentSessions.size()) {
-			CStringW dd = m_list.GetItemText(nItem, 0);
 			selSessions.emplace_back(m_recentSessions[index]);
 		}
 	}
@@ -181,6 +180,7 @@ BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedRemoveSel)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, OnDblclkList)
 	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
@@ -284,6 +284,22 @@ void CHistoryDlg::OnBnClickedMenu()
 void CHistoryDlg::OnBnClickedRemoveSel()
 {
 	RemoveSelected();
+}
+
+void CHistoryDlg::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	int index = ((NM_LISTVIEW *)pNMHDR)->iItem;
+	if (index >= 0 && index < m_recentSessions.size()) {
+		const auto& sesInfo = m_recentSessions[index];
+
+		auto pFrame = AfxGetMainFrame();
+		if (!pFrame->m_wndPlaylistBar.SelectFileInPlaylist(sesInfo.Path)) {
+			pFrame->m_wndPlaylistBar.Open(sesInfo.Path);
+		}
+		pFrame->OpenCurPlaylistItem();
+	}
+
+	*pResult = 0;
 }
 
 void CHistoryDlg::OnClose()

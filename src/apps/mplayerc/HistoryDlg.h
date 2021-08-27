@@ -66,5 +66,6 @@ public:
 	afx_msg void OnChangeFilterEdit();
 	afx_msg void OnBnClickedMenu();
 	afx_msg void OnBnClickedRemoveSel();
+	afx_msg void OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnClose();
 };
