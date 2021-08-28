@@ -289,7 +289,7 @@ void CHistoryDlg::OnBnClickedRemoveSel()
 void CHistoryDlg::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	int index = ((NM_LISTVIEW *)pNMHDR)->iItem;
-	if (index >= 0 && index < m_recentSessions.size()) {
+	if (index >= 0 && index < (int)m_recentSessions.size()) {
 		const auto& sesInfo = m_recentSessions[index];
 
 		auto pFrame = AfxGetMainFrame();

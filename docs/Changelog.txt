@@ -37,6 +37,7 @@ Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Turkish translation (by cmhrky).
 Updated Portuguese (Brazil) translation (by Siegfried Janke).
 Updated Japanese translation.
+Updated Ukrainian translation (by arestarh1986).
 
 Updated libraries:
 	dav1d git-0.9.1-6-gb342445;
