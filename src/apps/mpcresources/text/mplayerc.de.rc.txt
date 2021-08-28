@@ -247,7 +247,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 13		"MP4:"
 14		"FLV:"
 15		"WMV:"
-25		"To use this functionality, add the desired source filters to 'External Filters' and click 'Apply'. After that, you can specify the desired source filter for a specific file format."
+25		"Um diese Funktion zu verwenden, fügen Sie die gewünschten Quellfilter zu 'Externe Filter' hinzu und klicken Sie dann auf 'Übernehmen'. Danach können Sie den gewünschten Quellfilter für ein bestimmtes Dateiformat angeben."
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
@@ -1493,11 +1493,11 @@ STRING IDS_GRAPHBUILDER_AUDIOSWITCHER		"Audio Umschalter"
 STRING IDS_GRAPH_INTERFACES_ERROR		"Problem bei der Abfrage der für die Wiedergabe benötigten Schnittstelle."
 STRING IDS_GRAPH_TARGET_WND_ERROR		"Das Zielfenster für die Graph Benachrichtigung konnte nicht gesetzt werden."
 STRING IDS_HISTORY_CLEAR		"Gesamte Chronik löschen"
-STRING IDS_HISTORY_PATH		"Path"
+STRING IDS_HISTORY_PATH		"Pfad"
 STRING IDS_HISTORY_POSITION		"Position"
 STRING IDS_HISTORY_REMOVE_MISSING		"Nicht vorhandene Medien entfernen"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Ausgewählte löschen"
-STRING IDS_HISTORY_TITLE		"Title"
+STRING IDS_HISTORY_TITLE		"Titel"
 STRING IDS_HUE_DEC		"Farbton -"
 STRING IDS_HUE_INC		"Farbton +"
 STRING IDS_HZ		"Hz"
