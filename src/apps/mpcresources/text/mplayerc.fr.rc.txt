@@ -236,7 +236,7 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Rétablir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 25
+BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 5		"Source Filters"
 6		"HTTP:"
 7		"UDP:"
@@ -247,6 +247,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 25
 13		"MP4:"
 14		"FLV:"
 15		"WMV:"
+25		"To use this functionality, add the desired source filters to 'External Filters' and click 'Apply'. After that, you can specify the desired source filter for a specific file format."
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25

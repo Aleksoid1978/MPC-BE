@@ -236,7 +236,7 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Сбросить список"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 25
+BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 5		"Фильтры источников"
 6		"HTTP:"
 7		"UDP:"
@@ -247,6 +247,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 25
 13		"MP4:"
 14		"FLV:"
 15		"WMV:"
+25		"Чтобы пользоваться этим функционалом, добавьте нужные фильтры источников во 'Внешние фильтры' и нажмите 'Применить'. После этого можете указать необходимый фильтр источников для конкретного формата файла."
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
