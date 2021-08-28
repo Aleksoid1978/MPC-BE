@@ -196,9 +196,9 @@ BOOL CHistoryDlg::OnInitDialog()
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	m_list.InsertColumn(COL_PATH, L"Path");
-	m_list.InsertColumn(COL_TITLE, L"Title");
-	m_list.InsertColumn(COL_POS, L"Position");
+	m_list.InsertColumn(COL_PATH, ResStr(IDS_HISTORY_PATH));
+	m_list.InsertColumn(COL_TITLE, ResStr(IDS_HISTORY_TITLE));
+	m_list.InsertColumn(COL_POS, ResStr(IDS_HISTORY_POSITION));
 
 	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
 
