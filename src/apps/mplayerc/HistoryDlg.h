@@ -24,6 +24,25 @@
 #include <afxwin.h>
 #include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 
+class CExListCtrl : public CListCtrl
+{
+	BOOL CExListCtrl::PreTranslateMessage(MSG* pMsg) override
+	{
+		if (pMsg->message == WM_CHAR) {
+			WCHAR chr = static_cast<WCHAR>(pMsg->wParam);
+			switch (chr) {
+			case 0x01: // Ctrl-A
+				for (int i = 0, count = GetItemCount(); i < count; i++) {
+					SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+				}
+				break;
+			}
+		}
+
+		return CListCtrl::PreTranslateMessage(pMsg);
+	}
+};
+
 // CHistoryDlg dialog
 
 class CHistoryDlg : public CResizableDialog
@@ -40,7 +59,7 @@ private:
 		COL_COUNT
 	};
 
-	CListCtrl m_list;
+	CExListCtrl m_list;
 	std::vector<SessionInfo> m_recentSessions;
 
 	UINT_PTR m_nFilterTimerID;
