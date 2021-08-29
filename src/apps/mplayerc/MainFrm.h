@@ -526,7 +526,7 @@ public:
 
 	void UpdateWindowTitle();
 
-protected:
+private:
 	void SetDispMode(const dispmode& dm, const CString& DisplayName, const BOOL bForceRegistryMode = FALSE);
 
 	bool			m_bUseSmartSeek;
@@ -837,7 +837,7 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
+private: // control bar embedded members
 
 	CChildView m_wndView;
 
@@ -976,6 +976,7 @@ public:
 	LRESULT OnMPCVRSwitchFullscreen(WPARAM wParam, LPARAM lParam);
 	LRESULT OnDXVAStateChange(WPARAM wParam, LPARAM lParam);
 
+private:
 	std::mutex m_mutex_cmdLineQueue;
 	std::deque<std::vector<BYTE>> m_cmdLineQueue;
 	LRESULT HandleCmdLine(WPARAM wParam, LPARAM lParam);
@@ -985,6 +986,9 @@ public:
 	void cmdLineThreadFunction();
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 
+	CMPC_Lcd m_Lcd;
+
+public:
 	afx_msg void OnFileOpenDVD();
 	afx_msg void OnFileOpenIso();
 	afx_msg void OnFileOpenDevice();
@@ -1211,8 +1215,6 @@ public:
 	void OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void OnFilePostCloseMedia();
 
-	CMPC_Lcd m_Lcd;
-
 	// Main Window
 	CWnd*			m_pVideoWnd;
 	CWnd*			m_pOSDWnd;
@@ -1315,7 +1317,7 @@ public:
 
 	void		AddFavorite(bool bDisplayMessage = false, bool bShowDialog = true);
 
-protected:
+private:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void WTSRegisterSessionNotification();
 	void WTSUnRegisterSessionNotification();
@@ -1405,7 +1407,7 @@ public:
 
 	void		SetColor();
 
-protected:
+private:
 	CDiskImage	m_DiskImage;
 	BOOL		m_bNeedUnmountImage = TRUE;
 	BOOL		OpenIso(const CString& pathName, REFERENCE_TIME rtStart = INVALID_TIME);

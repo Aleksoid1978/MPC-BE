@@ -74,7 +74,6 @@
 #include <filters/renderer/VideoRenderers/SyncAllocatorPresenter.h>
 #include <filters/renderer/VideoRenderers/IPinHook.h>
 #include "ComPropertySheet.h"
-#include "LcdSupport.h"
 #include <comdef.h>
 #include <dwmapi.h>
 
