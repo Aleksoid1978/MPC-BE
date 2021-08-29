@@ -92,9 +92,7 @@ void CPPageSync::InitDialogPrivate()
 	m_chkFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
 	m_chkFlushGPUWait.SetCheck(rs.bFlushGPUWait);
 
-	if ((!SysVersion::IsWin8orLater()) &&
-			(rs.iVideoRenderer == VIDRNDT_EVR_CP ||
-			rs.iVideoRenderer == VIDRNDT_MADVR)) {
+	if (!SysVersion::IsWin8orLater() && rs.iVideoRenderer == VIDRNDT_EVR_CP) {
 		m_chkDisableAero.EnableWindow(TRUE);
 	} else {
 		m_chkDisableAero.EnableWindow(FALSE);
