@@ -21,9 +21,9 @@ Improved retrieval of video metadata.
 Added error output for videos with restrictions.
 
 Player
+Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player.
 The history of open files and URLs is now saved in the history.mpc_lst file. Added a window for viewing history.
 Bookmarks are now saved in the favorites.mpc_lst file.
-Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player.
 Statistics information is now updated after navigation when playback is paused.
 Fixed DVD-Video playback with built-in filters.
 Open file/URL dialog now automatically removes enclosing quotes from given paths.
@@ -44,6 +44,7 @@ Updated libraries:
 	ffmpeg git-n4.5-dev-1460-gb9176dbfb7;
 	Little-CMS git-2.12-30-g076cf32;
 	MediaInfo git-v21.03-16-gcc597bf7;
+	nanosvg git-3cdd4a9;
 
 
 1.5.8
