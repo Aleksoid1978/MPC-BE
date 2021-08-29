@@ -383,10 +383,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
 	m_pGenlock->SetDisplayResolution(d3ddm.Width, d3ddm.Height);
 
-	BOOL bCompositionEnabled = false;
-	DwmIsCompositionEnabled(&bCompositionEnabled);
-
-	m_bCompositionEnabled = bCompositionEnabled != 0;
+	DwmIsCompositionEnabled(&m_bCompositionEnabled);
 
 	CSize backBufferSize;
 	GetMaxResolution(m_pD3DEx, backBufferSize);
@@ -465,7 +462,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			m_BackbufferFmt = D3DFMT_A2R10G10B10;
 			m_pp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		}
-		if (bCompositionEnabled) {
+		if (m_bCompositionEnabled) {
 			// Desktop composition presents the whole desktop
 			m_pp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 		} else {
@@ -1523,9 +1520,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	BOOL bCompositionEnabled = false;
 	DwmIsCompositionEnabled(&bCompositionEnabled);
 
-	if ((bCompositionEnabled != 0) != m_bCompositionEnabled) {
+	if (bCompositionEnabled != m_bCompositionEnabled) {
 		if (m_bIsFullscreen) {
-			m_bCompositionEnabled = (bCompositionEnabled != 0);
+			m_bCompositionEnabled = bCompositionEnabled;
 		} else {
 			bResetDevice = true;
 		}

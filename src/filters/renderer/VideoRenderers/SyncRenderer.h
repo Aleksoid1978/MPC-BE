@@ -234,8 +234,8 @@ namespace GothSync
 		double m_fSyncOffsetStdDev; // The std dev of the above
 
 		bool m_b10BitOutput;
-		bool m_bCompositionEnabled;
 		bool m_bIsFullscreen;
+		BOOL m_bCompositionEnabled; // DWM composition before creating a D3D9 device
 
 		// Display and frame rates and cycles
 		double m_dDetectedScanlineTime; // Time for one (horizontal) scan line. Extracted at stream start and used to calculate vsync time
