@@ -111,6 +111,21 @@ public:
 			pBF->SetFFMpegCodec(i, video_filters[i]);
 		}
 
+		if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+			int iMvcOutputMode = MVC_OUTPUT_Auto;
+			switch (s.iStereo3DMode) {
+				case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+				case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+				case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+				case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+				case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+				default:
+					ASSERT(FALSE);
+			}
+
+			pEFC->SetInt("mvc_mode", iMvcOutputMode << 16 | (int)s.bStereo3DSwapLR);
+		}
+
 		*ppBF = pBF.Detach();
 
 		return hr;
@@ -2758,23 +2773,6 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 		pASF->SetOutputFormats(s.iAudioSampleFormats);
 		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64 * s.iAudioTimeShift : 0);
-	}
-
-	if (CComQIPtr<IMPCVideoDecFilter> pVDF = pBF) {
-		int iMvcOutputMode;
-		switch (s.iStereo3DMode) {
-		case STEREO3D_AUTO:              iMvcOutputMode = MVC_OUTPUT_Auto;          break;
-		case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
-		case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-		case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
-		case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-		case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
-		default:
-			ASSERT(FALSE);
-			return hr;
-		}
-
-		pVDF->SetMvcOutputMode(iMvcOutputMode, s.bStereo3DSwapLR);
 	}
 
 	return hr;

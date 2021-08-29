@@ -1892,6 +1892,7 @@ redo:
 
 		if (m_pMSDKDecoder) {
 			m_bMVC_Output_TopBottom = m_iMvcOutputMode == MVC_OUTPUT_TopBottom;
+			m_pMSDKDecoder->SetOutputMode(m_iMvcOutputMode, m_bMvcSwapLR);
 			return S_OK;
 		}
 
@@ -4189,27 +4190,6 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 	return 0; // YUV->YUV or RGB->RGB conversion
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	if (nMode < 0 || nMode > MVC_OUTPUT_TopBottom) {
-		return E_INVALIDARG;
-	}
-	m_iMvcOutputMode = nMode;
-	m_bMvcSwapLR = bSwapLR;
-
-	if (m_pMSDKDecoder) {
-		m_pMSDKDecoder->SetOutputMode(nMode, bSwapLR);
-	}
-
-	return S_OK;
-}
-
-STDMETHODIMP_(int) CMPCVideoDecFilter::GetMvcActive()
-{
-	return (m_pMSDKDecoder != nullptr) ? 1 + m_pMSDKDecoder->GetHwAcceleration() : 0;
-}
-
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 {
 	CAutoLock cLock(&m_csInitDec);
@@ -4297,6 +4277,10 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 			*value = m_nDecoderMode;
 		}
 		return S_OK;
+	} else if (!strcmp(field, "mvc_mode")) {
+		// 0 - no, 1 - software decode, 2 - h/w decode
+		*value = (m_pMSDKDecoder ? 1 + m_pMSDKDecoder->GetHwAcceleration() : 0);
+		return S_OK;
 	}
 
 	return E_INVALIDARG;
@@ -4366,6 +4350,30 @@ STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
 		CAutoLock cLock(&m_csInitDec);
 
 		m_bEnableHwDecoding = value;
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetInt(LPCSTR field, int value)
+{
+	if (strcmp(field, "mvc_mode") == 0) {
+		CAutoLock cLock(&m_csInitDec);
+
+		int nMode = value >> 16;
+		bool bSwapLR = !!(value && 0xFFFF);
+
+		if (nMode < 0 || nMode > MVC_OUTPUT_TopBottom) {
+			return E_INVALIDARG;
+		}
+		m_iMvcOutputMode = nMode;
+		m_bMvcSwapLR = bSwapLR;
+
+		if (m_pMSDKDecoder) {
+			m_pMSDKDecoder->SetOutputMode(nMode, bSwapLR);
+		}
+
 		return S_OK;
 	}
 

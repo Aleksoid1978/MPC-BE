@@ -289,14 +289,12 @@ public:
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP_(int) GetColorSpaceConversion();
 
-	STDMETHODIMP SetMvcOutputMode(int nMode, bool bSwapLR);
-	STDMETHODIMP_(int) GetMvcActive();
-
 	// IExFilterConfig
 	STDMETHODIMP GetInt(LPCSTR field, int* value) override;
 	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
 	STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, unsigned* chars);
 	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
+	STDMETHODIMP SetInt(LPCSTR field, int value) override;
 
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);

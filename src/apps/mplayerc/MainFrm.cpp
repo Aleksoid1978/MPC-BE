@@ -4343,8 +4343,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	CRenderersSettings& rs = s.m_VRSettings;
 
 	BOOL bMvcActive = FALSE;
-	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
-		bMvcActive = pVDF->GetMvcActive();
+	if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
+		pEFC->GetInt("mvc_mode", &bMvcActive);
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
@@ -7845,9 +7845,9 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 	}
 
 	BOOL bMvcActive = FALSE;
-	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
-		pVDF->SetMvcOutputMode(iMvcOutputMode, s.bStereo3DSwapLR);
-		bMvcActive = pVDF->GetMvcActive();
+	if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
+		pEFC->SetInt("mvc_mode", iMvcOutputMode << 16 | (int)s.bStereo3DSwapLR);
+		pEFC->GetInt("mvc_mode", &bMvcActive);
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
@@ -7876,9 +7876,8 @@ void CMainFrame::OnViewSwapLeftRight()
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
-		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
-		if (pVDF) {
-			pVDF->SetMvcOutputMode(s.iStereo3DMode == STEREO3D_HALFOVERUNDER ? MVC_OUTPUT_HalfTopBottom : s.iStereo3DMode, s.bStereo3DSwapLR);
+		if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), pFG)) {
+			pEFC->SetInt("mvc_mode", (s.iStereo3DMode == STEREO3D_HALFOVERUNDER ? MVC_OUTPUT_HalfTopBottom : s.iStereo3DMode) << 16 | (int)s.bStereo3DSwapLR);
 		}
 	}
 }
