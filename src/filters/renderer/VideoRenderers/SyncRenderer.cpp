@@ -90,7 +90,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	, m_CurrentAdapter(0)
 	, m_FocusThread(nullptr)
 	, m_pfDirect3DCreate9Ex(nullptr)
-	, m_pfDwmEnableComposition(nullptr)
 	, m_pfD3DXCreateLine(nullptr)
 {
 	DLog(L"CBaseAP::CBaseAP()");
@@ -104,8 +103,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	if (hDll) {
 		(FARPROC&)m_pfD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 	}
-
-	(FARPROC&)m_pfDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
 
 	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
@@ -130,14 +127,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	m_AlphaBitmapParams = {};
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.bDisableDesktopComposition) {
-		m_bDesktopCompositionDisabled = true;
-		if (m_pfDwmEnableComposition) {
-			m_pfDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-		}
-	} else {
-		m_bDesktopCompositionDisabled = false;
-	}
 
 	m_pGenlock = DNew CGenlock(rs.dTargetSyncOffset, rs.dControlLimit, rs.iLineDelta, rs.iColumnDelta, rs.dCycleDelta, 0); // Must be done before CreateDXDevice
 	hr = CreateDXDevice(_Error);
@@ -170,13 +159,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 CBaseAP::~CBaseAP()
 {
 	DLog(L"CBaseAP::~CBaseAP()");
-
-	if (m_bDesktopCompositionDisabled) {
-		m_bDesktopCompositionDisabled = false;
-		if (m_pfDwmEnableComposition) {
-			m_pfDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-		}
-	}
 
 	m_pLine.Release();
 	m_Font3D.InvalidateDeviceObjects();
@@ -317,23 +299,7 @@ bool CBaseAP::SettingsNeedResetDevice()
 	CAffectingRenderersSettings& Current = m_LastAffectingSettings;
 
 	bool bRet = false;
-	if (!m_bIsFullscreen) {
-		if (Current.bDisableDesktopComposition) {
-			if (!m_bDesktopCompositionDisabled) {
-				m_bDesktopCompositionDisabled = true;
-				if (m_pfDwmEnableComposition) {
-					m_pfDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-				}
-			}
-		} else {
-			if (m_bDesktopCompositionDisabled) {
-				m_bDesktopCompositionDisabled = false;
-				if (m_pfDwmEnableComposition) {
-					m_pfDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-				}
-			}
-		}
-	}
+
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 

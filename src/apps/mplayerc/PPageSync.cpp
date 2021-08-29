@@ -94,8 +94,7 @@ void CPPageSync::InitDialogPrivate()
 
 	if ((!SysVersion::IsWin8orLater()) &&
 			(rs.iVideoRenderer == VIDRNDT_EVR_CP ||
-			rs.iVideoRenderer == VIDRNDT_MADVR ||
-			rs.iVideoRenderer == VIDRNDT_SYNC)) {
+			rs.iVideoRenderer == VIDRNDT_MADVR)) {
 		m_chkDisableAero.EnableWindow(TRUE);
 	} else {
 		m_chkDisableAero.EnableWindow(FALSE);
