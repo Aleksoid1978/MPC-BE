@@ -133,7 +133,6 @@ public:
 	// frame synchronization
 	bool	bVSync;
 	bool	bVSyncInternal;
-	bool	bDisableDesktopComposition;
 	bool	bEVRFrameTimeCorrection;
 	bool	bFlushGPUBeforeVSync;
 	bool	bFlushGPUAfterPresent;
@@ -188,7 +187,6 @@ public:
 	D3DFORMAT iSurfaceFormat        = D3DFMT_X8R8G8B8;
 	bool b10BitOutput               = false;
 	bool bVSync                     = false;
-	bool bDisableDesktopComposition = false;
 
 	void Fill(const CRenderersSettings& rs)
 	{
@@ -196,7 +194,6 @@ public:
 		iSurfaceFormat             = rs.iSurfaceFormat;
 		b10BitOutput               = rs.b10BitOutput;
 		bVSync                     = rs.bVSync;
-		bDisableDesktopComposition = rs.bDisableDesktopComposition;
 	}
 };
 

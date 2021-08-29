@@ -77,7 +77,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bDisplayChanged(false)
 	, m_bResizingDevice(false)
 	, m_pfDirect3DCreate9Ex(nullptr)
-	, m_pfDwmEnableComposition(nullptr)
 	, m_pfD3DXCreateLine(nullptr)
 {
 	DLog(L"CDX9AllocatorPresenter::CDX9AllocatorPresenter()");
@@ -91,8 +90,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	if (hDll) {
 		(FARPROC&)m_pfD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 	}
-
-	(FARPROC &)m_pfDwmEnableComposition = GetProcAddress(GetModuleHandleW(L"dwmapi.dll"), "DwmEnableComposition");
 
 	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
@@ -109,10 +106,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		hr = E_FAIL;
 		_Error += L"Failed to create Direct3D 9Ex\n";
 		return;
-	}
-
-	if (GetRenderersSettings().bDisableDesktopComposition && m_pfDwmEnableComposition) {
-		m_pfDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 	}
 
 	DwmEnableMMCSS(TRUE);
@@ -140,10 +133,6 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 
 	if (SysVersion::IsWin8orLater()) {
 		D3DHook::UnHook();
-	}
-
-	if (GetRenderersSettings().bDisableDesktopComposition && m_pfDwmEnableComposition) {
-		m_pfDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 	}
 
 	DwmEnableMMCSS(FALSE);
@@ -393,12 +382,6 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	CAffectingRenderersSettings& Current = m_LastAffectingSettings;
 
 	bool bRet = false;
-
-	if (!m_bIsFullscreen && m_pfDwmEnableComposition) {
-		if (New.bDisableDesktopComposition != Current.bDisableDesktopComposition) {
-			m_pfDwmEnableComposition(New.bDisableDesktopComposition ? DWM_EC_DISABLECOMPOSITION : DWM_EC_ENABLECOMPOSITION);
-		}
-	}
 
 	bRet = bRet || (!m_bIsFullscreen && New.bVSync != Current.bVSync);
 	bRet = bRet || (!m_bIsFullscreen && New.iPresentMode != Current.iPresentMode);
@@ -1880,7 +1863,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				case D3DSWAPEFFECT_FLIPEX : strText += L" FlipEx"; break;
 			}
 
-			if (rs.bDisableDesktopComposition) {
+			if (!m_bCompositionEnabled) {
 				strText += L" DisDC";
 			}
 

@@ -339,9 +339,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_VSYNCINTERNAL, OnViewVSyncInternal)
 
 	ON_COMMAND(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnViewD3DFullScreen)
-	ON_COMMAND(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnViewDisableDesktopComposition)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnUpdateViewD3DFullscreen)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
 
 	ON_COMMAND(ID_VIEW_RESET_DEFAULT, OnViewResetDefault)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_RESET_DEFAULT, OnUpdateViewResetDefault)
@@ -6924,19 +6922,6 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(0);
 }
 
-void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
-{
-	if (!SysVersion::IsWin8orLater() && (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter)) {
-		pCmdUI->Enable(TRUE);
-		pCmdUI->SetCheck(GetRenderersSettings().bDisableDesktopComposition);
-
-		return;
-	}
-
-	pCmdUI->Enable(FALSE);
-	pCmdUI->SetCheck(0);
-}
-
 void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter) {
@@ -6977,15 +6962,6 @@ void CMainFrame::OnViewD3DFullScreen()
 	s.SaveSettings();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bExclusiveFullscreen ? ResStr(IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON) : ResStr(IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF));
-}
-
-void CMainFrame::OnViewDisableDesktopComposition()
-{
-	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bDisableDesktopComposition = !rs.bDisableDesktopComposition;
-	rs.Save();
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
 }
 
 void CMainFrame::OnViewResetDefault()

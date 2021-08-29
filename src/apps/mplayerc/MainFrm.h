@@ -1083,14 +1083,12 @@ public:
 	afx_msg void OnViewDisplayStatsSC();
 
 	afx_msg void OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI);
 
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
 	afx_msg void OnViewVSync();
 	afx_msg void OnViewVSyncInternal();
 
 	afx_msg void OnViewD3DFullScreen();
-	afx_msg void OnViewDisableDesktopComposition();
 	afx_msg void OnViewResetDefault();
 	afx_msg void OnUpdateViewResetDefault(CCmdUI* pCmdUI);
 

@@ -37,7 +37,6 @@ public:
 
 	CButton m_chkVSync;
 	CButton m_chkVSyncInternal;
-	CButton m_chkDisableAero;
 	CButton m_chkEnableFrameTimeCorrection;
 	CButton m_chkFlushGPUBeforeVSync;
 	CButton m_chkFlushGPUAfterPresent;

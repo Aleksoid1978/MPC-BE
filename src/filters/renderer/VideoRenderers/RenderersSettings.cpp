@@ -38,7 +38,6 @@
 
 #define IDS_RS_VSYNC				L"VSync"
 #define IDS_RS_VSYNC_INTERNAL		L"VSyncInternal"
-#define IDS_RS_DISABLEDESKCOMP		L"DisableDesktopComposition"
 #define IDS_RS_FRAMETIMECORRECTION	L"FrameTimeCorrection"
 #define IDS_RS_FLUSHGPUBEFOREVSYNC	L"FlushGPUBeforeVSync"
 #define IDS_RS_FLUSHGPUAFTERPRESENT	L"FlushGPUAfterPresent"
@@ -89,7 +88,6 @@ void CRenderersSettings::SetDefault()
 
 	bVSync							= false;
 	bVSyncInternal					= false;
-	bDisableDesktopComposition		= false;
 	bEVRFrameTimeCorrection			= false;
 	bFlushGPUBeforeVSync			= false;
 	bFlushGPUAfterPresent			= false;
@@ -162,7 +160,6 @@ void CRenderersSettings::Load()
 
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, bVSyncInternal);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
@@ -213,7 +210,6 @@ void CRenderersSettings::Save()
 
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, bVSyncInternal);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);

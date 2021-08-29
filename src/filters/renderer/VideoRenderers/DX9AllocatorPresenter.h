@@ -61,9 +61,6 @@ namespace DSObjects
 
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
-		// This function is deprecated as of Windows 8
-		HRESULT (__stdcall * m_pfDwmEnableComposition)(UINT uCompositionAction);
-
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 

@@ -45,7 +45,6 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_VSYNC, m_chkVSync);
 	DDX_Control(pDX, IDC_VSYNC_INTERNAL, m_chkVSyncInternal);
-	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
 	DDX_Control(pDX, IDC_CHECK5, m_chkFlushGPUBeforeVSync);
 	DDX_Control(pDX, IDC_CHECK6, m_chkFlushGPUAfterPresent);
@@ -86,17 +85,10 @@ void CPPageSync::InitDialogPrivate()
 
 	m_chkVSync.SetCheck(rs.bVSync);
 	m_chkVSyncInternal.SetCheck(rs.bVSyncInternal);
-	m_chkDisableAero.SetCheck(rs.bDisableDesktopComposition);
 	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
 	m_chkFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
 	m_chkFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
 	m_chkFlushGPUWait.SetCheck(rs.bFlushGPUWait);
-
-	if (!SysVersion::IsWin8orLater() && rs.iVideoRenderer == VIDRNDT_EVR_CP) {
-		m_chkDisableAero.EnableWindow(TRUE);
-	} else {
-		m_chkDisableAero.EnableWindow(FALSE);
-	}
 
 	m_iSyncMode = rs.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
 				: rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
@@ -155,7 +147,6 @@ BOOL CPPageSync::OnApply()
 
 	rs.bVSync						= !!m_chkVSync.GetCheck();
 	rs.bVSyncInternal				= !!m_chkVSyncInternal.GetCheck();
-	rs.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
 	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
 	rs.bFlushGPUBeforeVSync			= !!m_chkFlushGPUBeforeVSync.GetCheck();
 	rs.bFlushGPUAfterPresent		= !!m_chkFlushGPUAfterPresent.GetCheck();
