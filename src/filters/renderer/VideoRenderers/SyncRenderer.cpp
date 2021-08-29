@@ -1727,7 +1727,7 @@ void CBaseAP::DrawStats()
 			if (m_bIsFullscreen) {
 				strText += L"D3DFS ";
 			}
-			if (rs.bDisableDesktopComposition) {
+			if (!m_bCompositionEnabled) {
 				strText += L"DisDC ";
 			}
 			if (rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
