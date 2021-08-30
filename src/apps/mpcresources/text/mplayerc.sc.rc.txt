@@ -247,7 +247,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 13		"MP4文件:"
 14		"FLV文件:"
 15		"WMV文件:"
-25		"若使用此功能，请将所需的源滤镜添加到"
+25		"若使用此功能，请将所需的源滤镜添加到“外部滤镜”并单击“应用”。之后，您可以为特定文件格式指定所需的源滤镜。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
