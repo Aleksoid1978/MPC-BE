@@ -45,6 +45,7 @@ Youtube
 	Little-CMS git-2.12-30-g076cf32;
 	MediaInfo git-v21.03-16-gcc597bf7;
 	nanosvg git-3cdd4a9;
+	rapidjson git-v1.1.0-665-g00dbcf2c;
 
 1.5.8
 =============================
