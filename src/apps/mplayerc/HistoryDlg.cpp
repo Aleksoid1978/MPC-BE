@@ -181,6 +181,7 @@ BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedRemoveSel)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, OnDblclkList)
+	ON_NOTIFY(LVN_KEYDOWN, IDC_LIST1, OnKeydownList)
 	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
@@ -297,6 +298,21 @@ void CHistoryDlg::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 			pFrame->m_wndPlaylistBar.Open(sesInfo.Path);
 		}
 		pFrame->OpenCurPlaylistItem();
+	}
+
+	*pResult = 0;
+}
+
+void CHistoryDlg::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	NMLVKEYDOWN* pLVKeyDow = (NMLVKEYDOWN*)pNMHDR;
+
+	if ((pLVKeyDow->flags && KF_EXTENDED) && pLVKeyDow->wVKey == VK_DELETE) {
+		CString str;
+		str.Format(L"Are you sure you want to delete %u entries from the list of recent files?", m_list.GetSelectedCount());
+		if (IDYES == AfxMessageBox(str, MB_ICONQUESTION | MB_YESNO)) {
+			RemoveSelected();
+		}
 	}
 
 	*pResult = 0;

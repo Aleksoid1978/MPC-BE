@@ -86,5 +86,6 @@ public:
 	afx_msg void OnBnClickedMenu();
 	afx_msg void OnBnClickedRemoveSel();
 	afx_msg void OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnClose();
 };
