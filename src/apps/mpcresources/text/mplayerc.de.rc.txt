@@ -133,7 +133,7 @@ END
 BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Medien öffnen"
 7		"Neben lokalen Mediendateien können auch Inhalte aus dem Internet wiedergegeben werden. Dafür bitte den Pfadnamen bzw. die Internetadresse angeben."
-8		"Medien:"
+8		"Öffne:"
 10		"Öffnen..."
 11		"Audiospur:"
 13		"Öffnen..."
@@ -247,7 +247,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 13		"MP4:"
 14		"FLV:"
 15		"WMV:"
-25		"Um diese Funktion zu verwenden, fügen Sie die gewünschten Quellfilter zu 'Externe Filter' hinzu und klicken Sie dann auf 'Übernehmen'. Danach können Sie den gewünschten Quellfilter für ein bestimmtes Dateiformat angeben."
+25		"Um diese Funktion zu verwenden, fügen Sie die gewünschten Quell-Filter zu 'Externe Filter' hinzu und klicken Sie dann auf 'Übernehmen'. Danach können Sie den gewünschten Quell-Filter für ein bestimmtes Format angeben."
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
@@ -347,7 +347,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Sprungintervalle (klein, mittel, groß in ms)"
 9		"Zurücksetzen"
 10		"Schnellen Suchlauf verwenden (Keyframes)"
-11		"Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Mediendateien im Ordner durch 'Vorwärts/Rückwärts springen' öffnen"
+11		"Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Medien im Ordner durch 'Rückwärts springen | Vorherige Datei' / 'Vorwärts springen | Nächste Datei' öffnen"
 13		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
 15		"Videowiedergabe pausieren, wenn minimiert"
 17		"Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken"
@@ -404,13 +404,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
-5		"Dateiaufruf"
+5		"Öffnen von Medien"
 6		"Einzelnen Prozess des Players erzwingen"
 7		"Mediendateien mit dem aktuellen Player öffnen"
 8		"Mediendateien mit jeweils neuem Player öffnen"
 9		"Titelleiste"
 11		"Suchleiste"
-13		"Verlauf und Privatsphäre"
+13		"Chronik und Position"
 14		"&Chronik anlegen"
 16		"Einträge in 'Neueste Chronik':"
 19		"DVD/BD-Wiedergabeposition merken"
@@ -420,8 +420,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 23		"Weitere Einstellungen"
 24		"&Taskleistensymbol anzeigen"
 25		"OSD anzeigen (Neustart notwendig)"
-26		"Name von Mediendatei anzeigen"
-27		"Suchzeit anzeigen"
+26		"Dateiname (bzw. Titel)"
+27		"Verstrichene/Verbleibende Zeit / Gesamtzeit"
 28		"Einstellungen als Datei (.ini) speichern"
 29		"Disc-Wiedergabe deaktivieren"
 30		"&Prozesspriorität höher als normal"
@@ -1843,7 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Gesamte Chronik wirklich löschen?"
 STRING IDS_RECORD_START		"Aufnahme"
 STRING IDS_RECORD_STOP		"Stopp"
 STRING IDS_REGAIN_VOLUME		"Lautstärke zurücksetzen"
-STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d Einträge werden aus der Liste gelöscht. Sind Sie sicher?"
 STRING IDS_REND_NOT_AVAILABLE		"**nicht verfügbar**"
 STRING IDS_REND_NOT_INSTALLED		"**nicht installiert**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s ist nicht verfügbar. %s wird verwendet."
