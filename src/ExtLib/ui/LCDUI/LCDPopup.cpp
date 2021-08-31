@@ -18,11 +18,13 @@
 //************************************************************************
 
 #include "LCDUI.h"
-#include <gdiplus.h>
 #include "LCDPopup.h"
 
+#if LCDIU_GDIPLUS_ENABLE
+#include <gdiplus.h>
 // This uses GDI+
 using namespace Gdiplus;
+#endif
 
 
 //************************************************************************
@@ -38,7 +40,9 @@ CLCDPopupBackground::CLCDPopupBackground(void)
     m_cAlphaEnd = m_cAlphaStart/2;
     m_cfColor = 0;
     m_nRectRadius = 15;
+#if LCDIU_GDIPLUS_ENABLE
     m_pGraphicsPath = NULL;
+#endif
 }
 
 
@@ -50,11 +54,13 @@ CLCDPopupBackground::CLCDPopupBackground(void)
 
 CLCDPopupBackground::~CLCDPopupBackground(void)
 {
+#if LCDIU_GDIPLUS_ENABLE
     if (m_pGraphicsPath)
     {
         delete m_pGraphicsPath;
         m_pGraphicsPath = NULL;
     }
+#endif
 }
 
 
@@ -79,6 +85,7 @@ void CLCDPopupBackground::SetSize(int nCX, int nCY)
 
 void CLCDPopupBackground::OnDraw(CLCDGfxBase &rGfx)
 {
+#if LCDIU_GDIPLUS_ENABLE
     if (NULL == m_pGraphicsPath)
     {
         // Size has not been set
@@ -105,6 +112,7 @@ void CLCDPopupBackground::OnDraw(CLCDGfxBase &rGfx)
         SolidBrush brush(Color::MakeARGB(m_cAlphaStart, GetRValue(m_cfColor), GetGValue(m_cfColor), GetBValue(m_cfColor)));
         gfx.FillPath(&brush, m_pGraphicsPath);
     }
+#endif
 }
 
 
@@ -166,6 +174,7 @@ void CLCDPopupBackground::SetRoundedRecteRadius(int nRadius)
 
 void CLCDPopupBackground::RecalcRoundedRectangle(void)
 {
+#if LCDIU_GDIPLUS_ENABLE
     if (m_pGraphicsPath)
     {
         delete m_pGraphicsPath;
@@ -187,6 +196,7 @@ void CLCDPopupBackground::RecalcRoundedRectangle(void)
     m_pGraphicsPath->AddArc(l, t + h - d, d, d, 90, 90);
     m_pGraphicsPath->AddLine(l, t + h - m_nRectRadius, l, t + m_nRectRadius);
     m_pGraphicsPath->CloseFigure();
+#endif
 }
 
 

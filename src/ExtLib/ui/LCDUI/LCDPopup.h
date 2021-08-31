@@ -24,6 +24,8 @@
 #include "LCDText.h"
 #include "LCDBitmap.h"
 
+#define LCDIU_GDIPLUS_ENABLE 0 // MPC-BE no longer uses GDI+
+
 
 //************************************************************************
 //
@@ -52,7 +54,9 @@ private:
     COLORREF m_cfColor;
     BOOL m_bUseGradient;
     int m_nRectRadius;
+#if LCDIU_GDIPLUS_ENABLE
     Gdiplus::GraphicsPath* m_pGraphicsPath;
+#endif
 };
 
 

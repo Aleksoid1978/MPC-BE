@@ -51,13 +51,6 @@
 #include <regex>
 #include <atomic>
 
- // Workaround compilation errors when including GDI+ with NOMINMAX defined
-namespace Gdiplus
-{
-	using std::min;
-	using std::max;
-};
-
 #include "resource.h"
 #include "DSUtil/DSUtil.h"
 #include "mplayerc.h"
