@@ -1843,6 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Вы уверены, что хотите оч
 STRING IDS_RECORD_START		"Запись"
 STRING IDS_RECORD_STOP		"Стоп"
 STRING IDS_REGAIN_VOLUME		"Восстанавливать громкость Вкл/Откл"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d записей из списка будут удалены. Вы уверены?"
 STRING IDS_REND_NOT_AVAILABLE		"**недоступен**"
 STRING IDS_REND_NOT_INSTALLED		"**не установлен**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s недоступен. Будет использован %s."

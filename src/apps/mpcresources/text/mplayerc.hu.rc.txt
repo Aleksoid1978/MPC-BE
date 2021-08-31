@@ -1843,6 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Biztosan törölni szeretnéd a legutóbb meg
 STRING IDS_RECORD_START		"Felvétel"
 STRING IDS_RECORD_STOP		"Stop"
 STRING IDS_REGAIN_VOLUME		"Váltás regain hangerőre"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**nem érhető el**"
 STRING IDS_REND_NOT_INSTALLED		"**nincs telepítve**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s nem érhető el. %s felhasználható."

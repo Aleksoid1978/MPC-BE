@@ -1843,6 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Zihur zaude azken agirien zerrenda ezabatzea 
 STRING IDS_RECORD_START		"Record"
 STRING IDS_RECORD_STOP		"Stop"
 STRING IDS_REGAIN_VOLUME		"Aldatu berrirabazi bolumena"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**eskuraezina**"
 STRING IDS_REND_NOT_INSTALLED		"**ezarri gabe**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s is not available. %s will be used."

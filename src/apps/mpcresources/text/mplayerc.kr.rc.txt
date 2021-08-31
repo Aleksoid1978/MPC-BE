@@ -1852,6 +1852,7 @@ STRING IDS_RECENT_FILES_QUESTION		"최근 파일 목록을 지우시겠습니까
 STRING IDS_RECORD_START		"Record"
 STRING IDS_RECORD_STOP		"Stop"
 STRING IDS_REGAIN_VOLUME		"볼륨복원 토글"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**사용불가능**"
 STRING IDS_REND_NOT_INSTALLED		"**not installed**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s is not available. %s will be used."

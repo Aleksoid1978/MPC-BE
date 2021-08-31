@@ -1837,6 +1837,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Wyczyścić listę ostatnio otwartych plików
 STRING IDS_RECORD_START		"Rejestruj"
 STRING IDS_RECORD_STOP		"Zatrzymaj"
 STRING IDS_REGAIN_VOLUME		"Przełącz utrzymywanie głośności (regain)"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**niedostępny**"
 STRING IDS_REND_NOT_INSTALLED		"**nie zainstalowany**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s is not available. %s will be used."

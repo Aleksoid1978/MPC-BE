@@ -1843,6 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Մաքրե՞լ վերջին բացված ֆա
 STRING IDS_RECORD_START		"Record"
 STRING IDS_RECORD_STOP		"Stop"
 STRING IDS_REGAIN_VOLUME		"Toggle regain volume"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**unavailable**"
 STRING IDS_REND_NOT_INSTALLED		"**not installed**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s is not available. %s will be used."

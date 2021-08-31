@@ -1843,6 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Tem certeza e quer apagar a lista de arquivos
 STRING IDS_RECORD_START		"Gravar"
 STRING IDS_RECORD_STOP		"Parar"
 STRING IDS_REGAIN_VOLUME		"Alternar recuperar o volume"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**não disponível**"
 STRING IDS_REND_NOT_INSTALLED		"**não disponível**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s não está disponível. %s será usado."

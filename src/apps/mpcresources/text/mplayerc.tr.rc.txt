@@ -1843,6 +1843,7 @@ STRING IDS_RECENT_FILES_QUESTION		"Son dosyalar listesini temizlemek istediğini
 STRING IDS_RECORD_START		"Kaydet"
 STRING IDS_RECORD_STOP		"Dur"
 STRING IDS_REGAIN_VOLUME		"Ses yükseltmesine geç"
+STRING IDS_REMOVEFROMLISTQUESTION		"%d entries from the list will be deleted. Are you sure?"
 STRING IDS_REND_NOT_AVAILABLE		"**kullanılamıyor**"
 STRING IDS_REND_NOT_INSTALLED		"**yüklü değil**"
 STRING IDS_REND_UNAVAILABLEMSG		"%s kullanılamıyor. %s kullanılacak."
