@@ -680,10 +680,16 @@ namespace Youtube
 					item.profile = profile;
 					item.url = url;
 
+					switch (profile->format) {
+					case y_mp4_avc:  item.title = L"MP4"; break;
+					case y_webm_vid: item.title = L"WebM";     break;
+					case y_mp4_av1:  item.title = L"MP4(AV1)"; break;
+					case y_stream:   item.title = L"HLS Live"; break;
+					default:         item.title = L"unknown";  break;
+					}
+
 					if (quality_label) {
-						item.title.Format(L"%s %S",
-							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : (profile->format == y_mp4_av1 ? L"MP4(AV1)" : L"MP4")),
-							quality_label);
+						item.title.AppendFormat(L" %S", quality_label);
 						if (profile->type == y_video) {
 							item.title.Append(L" dash");
 						}
@@ -691,9 +697,7 @@ namespace Youtube
 							item.title.Append(L" (10 bit)");
 						}
 					} else {
-						item.title.Format(L"%s %dp",
-							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : (profile->format == y_mp4_av1 ? L"MP4(AV1)" : L"MP4")),
-							profile->quality);
+						item.title.AppendFormat(L"%dp",profile->quality);
 						if (profile->type == y_video) {
 							item.title.Append(L" dash");
 						}
@@ -712,9 +716,13 @@ namespace Youtube
 					YoutubeUrllistItem item;
 					item.profile = audioprofile;
 					item.url = url;
-					item.title.Format(L"%s %dkbit/s",
-						audioprofile->format == y_webm ? L"WebM/Opus" : L"MP4/AAC",
-						audioprofile->quality);
+
+					switch (audioprofile->format) {
+					case y_mp4_aac:  item.title = L"MP4/AAC";   break;
+					case y_webm_aud: item.title = L"WebM/Opus"; break;
+					default:         item.title = L"unknown";  break;
+					}
+					item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
 
 					audioUrls.emplace_back(item);
 				}
@@ -1169,10 +1177,10 @@ namespace Youtube
 				int k_av1 = -1;
 				for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
 					const auto& format = youtubeUrllist[i].profile->format;
-					if (k_mp4 < 0 && format == y_mp4) {
+					if (k_mp4 < 0 && format == y_mp4_avc) {
 						k_mp4 = i;
 					}
-					else if (k_webm < 0 && format == y_webm) {
+					else if (k_webm < 0 && format == y_webm_vid) {
 						k_webm = i;
 					}
 					else if (k_av1 < 0 && format == y_mp4_av1) {
@@ -1181,10 +1189,10 @@ namespace Youtube
 				}
 
 				size_t k = 0;
-				if (s.YoutubeFormat.fmt == y_mp4) {
+				if (s.YoutubeFormat.fmt == y_mp4_avc) {
 					k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
 				}
-				else if (s.YoutubeFormat.fmt == y_webm) {
+				else if (s.YoutubeFormat.fmt == y_webm_vid) {
 					k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
 				}
 				else if (s.YoutubeFormat.fmt == y_mp4_av1) {
@@ -1316,14 +1324,14 @@ namespace Youtube
 						}
 
 						for (auto item : youtubeAudioUrllist) {
-							if (item.profile->format == Youtube::y_mp4) {
+							if (item.profile->format == Youtube::y_mp4_aac) {
 								item.thumbnailUrl = thumbnailUrl;
 								youtubeUrllist.emplace_back(item);
 								break;
 							}
 						}
 						for (auto item : youtubeAudioUrllist) {
-							if (item.profile->format == Youtube::y_webm) {
+							if (item.profile->format == Youtube::y_webm_aud) {
 								item.thumbnailUrl = thumbnailUrl;
 								youtubeUrllist.emplace_back(item);
 								break;
@@ -1674,15 +1682,16 @@ namespace Youtube
 		return bRet;
 	}
 
-	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* profile, const YoutubeUrllist& youtubeAudioUrllist)
+	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* vprofile, const YoutubeUrllist& youtubeAudioUrllist)
 	{
 		const YoutubeUrllistItem* audio_item = nullptr;
 
 		if (youtubeAudioUrllist.size()) {
 			for (const auto& item : youtubeAudioUrllist) {
-				if (profile->format == item.profile->format) {
+				if (vprofile->format == y_mp4_avc && item.profile->format == y_mp4_aac
+						|| vprofile->format != y_mp4_avc && item.profile->format != y_mp4_aac) {
 					audio_item = &item;
-					if (profile->type != y_video || profile->quality > 360) {
+					if (vprofile->type != y_video || vprofile->quality > 360) {
 						break;
 					}
 				}
