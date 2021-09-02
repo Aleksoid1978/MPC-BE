@@ -178,5 +178,5 @@ namespace Youtube
 
 	bool Parse_URL(CString url, YoutubeFields& y_fields);
 
-	const YoutubeUrllistItem* GetAudioUrl(const yformat format, const YoutubeUrllist& youtubeAudioUrllist);
+	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* profile, const YoutubeUrllist& youtubeAudioUrllist);
 }

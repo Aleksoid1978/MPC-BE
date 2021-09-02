@@ -12054,7 +12054,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pOFD->fns.push_back(it->url);
 
 			if (it->profile->type == Youtube::y_video && !m_youtubeAudioUrllist.empty()) {
-				const auto audio_item = Youtube::GetAudioUrl(it->profile->format, m_youtubeAudioUrllist);
+				const auto audio_item = Youtube::GetAudioUrl(it->profile, m_youtubeAudioUrllist);
 				pOFD->fns.push_back(audio_item->url);
 			}
 

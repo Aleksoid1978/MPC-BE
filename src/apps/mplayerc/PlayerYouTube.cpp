@@ -1236,7 +1236,7 @@ namespace Youtube
 
 			CString final_audio_url;
 			if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
-				const auto audio_item = GetAudioUrl(final_item->profile->format, youtubeAudioUrllist);
+				const auto audio_item = GetAudioUrl(final_item->profile, youtubeAudioUrllist);
 				final_audio_url = audio_item->url;
 				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", audio_item->title, audio_item->url);
 			}
@@ -1674,14 +1674,15 @@ namespace Youtube
 		return bRet;
 	}
 
-	const YoutubeUrllistItem* GetAudioUrl(const yformat format, const YoutubeUrllist& youtubeAudioUrllist)
+	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* profile, const YoutubeUrllist& youtubeAudioUrllist)
 	{
 		const YoutubeUrllistItem* audio_item = nullptr;
-		if (!youtubeAudioUrllist.empty()) {
-			if (youtubeAudioUrllist.size() > 1) {
-				for (const auto& item : youtubeAudioUrllist) {
-					if (format == item.profile->format) {
-						audio_item = &item;
+
+		if (youtubeAudioUrllist.size()) {
+			for (const auto& item : youtubeAudioUrllist) {
+				if (profile->format == item.profile->format) {
+					audio_item = &item;
+					if (profile->type != y_video || profile->quality > 360) {
 						break;
 					}
 				}
