@@ -260,7 +260,7 @@ void CHistoryDlg::OnBnClickedMenu()
 
 	CMenu menu;
 	menu.CreatePopupMenu();
-	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_REMOVE_SELECTED, ResStr(IDS_HISTORY_REMOVE_SELECTED));
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_REMOVE_SELECTED, ResStr(IDS_HISTORY_REMOVE_SELECTED)+L"\tDelete");
 	menu.AppendMenuW(MF_SEPARATOR);
 	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_REMOVE_MISSING, ResStr(IDS_HISTORY_REMOVE_MISSING));
 	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_CLEAR, ResStr(IDS_HISTORY_CLEAR));
