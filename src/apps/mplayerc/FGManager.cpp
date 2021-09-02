@@ -119,8 +119,6 @@ public:
 				case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
 				case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
 				case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
-				default:
-					ASSERT(FALSE);
 			}
 
 			pEFC->SetInt("mvc_mode", iMvcOutputMode << 16 | (int)s.bStereo3DSwapLR);
