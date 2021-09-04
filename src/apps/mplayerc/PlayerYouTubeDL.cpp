@@ -168,6 +168,20 @@ namespace YoutubeDL
 							CString fmt;
 							getJsonValue(format, "format", fmt);
 
+							if (ext == L"mp4") {
+								if (StartsWith(vcodec, "avc1")) {
+									profile->format = Youtube::yformat::y_mp4_avc;
+								}
+								else if (StartsWith(vcodec, "av01")) {
+									profile->format = Youtube::yformat::y_mp4_av1;
+								}
+								else {
+									profile->format = Youtube::yformat::y_mp4_other;
+								}
+							}
+							else if (ext == L"webm") {
+								profile->format = Youtube::yformat::y_webm_vid;
+							}
 							profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
 							profile->ext = ext;
 							profile->quality = height;
@@ -344,6 +358,9 @@ namespace YoutubeDL
 
 						if (!youtubeUrllist.empty()) {
 							std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& a, const Youtube::YoutubeUrllistItem& b) {
+								if (a.profile->format != b.profile->format) {
+									return (a.profile->format < b.profile->format);
+								}
 								if (a.profile->ext != b.profile->ext) {
 									return (a.profile->ext < b.profile->ext);
 								}

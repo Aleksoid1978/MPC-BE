@@ -25,10 +25,11 @@
 namespace Youtube
 {
 	enum yformat {
-		// videofile (used in settings)
-		y_mp4_avc = 0,
-		y_webm_vid,
-		y_mp4_av1,
+		// videofile
+		y_mp4_avc = 0, // used in settings
+		y_webm_vid,    // used in settings
+		y_mp4_av1,     // used in settings
+		y_mp4_other,
 
 		// videostream
 		y_stream,
