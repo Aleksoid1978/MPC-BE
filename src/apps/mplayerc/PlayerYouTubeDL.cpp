@@ -225,7 +225,6 @@ namespace YoutubeDL
 						}
 
 						float tbr = 0.0f;
-						// TODO: set low quality audio for low quality video
 						if (getJsonValue(format, "tbr", tbr)) {
 							if (aud_bitrate == 0.0f
 								||(vid_height > 360 && tbr > aud_bitrate)
