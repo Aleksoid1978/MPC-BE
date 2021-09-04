@@ -48,6 +48,7 @@
   <ItemGroup>
     <ClCompile Include="AudioHelper.cpp" />
     <ClCompile Include="BassRedirect.cpp" />
+    <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Mixer.cpp" />
     <ClCompile Include="SampleFormat.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -57,6 +58,7 @@
   <ItemGroup>
     <ClInclude Include="AudioHelper.h" />
     <ClInclude Include="BassRedirect.h" />
+    <ClInclude Include="Filter.h" />
     <ClInclude Include="Mixer.h" />
     <ClInclude Include="SampleFormat.h" />
     <ClInclude Include="stdafx.h" />
