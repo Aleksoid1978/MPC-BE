@@ -2172,7 +2172,7 @@ CString CAppSettings::ParseFileName(const CString& param)
 	CString fullPathName;
 
 	// Try to transform relative pathname into full pathname
-	if (param.Find(L":") < 0) {
+	if (param.Find(L':') < 0) {
 		fullPathName.ReleaseBuffer(GetFullPathNameW(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), nullptr));
 
 		CFileStatus fs;

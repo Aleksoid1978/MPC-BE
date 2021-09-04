@@ -411,7 +411,7 @@ HRESULT WicSaveImage(
 	auto pixFmtDesc = GetPixelFormatDesc(pixelFormat);
 
 	std::wstring ext;
-	ext.assign(filename, filename.find_last_of(L"."));
+	ext.assign(filename, filename.find_last_of(L'.'));
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
 	if (ext == L".bmp") {

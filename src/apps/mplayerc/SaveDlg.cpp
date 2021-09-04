@@ -427,7 +427,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 						0
 					};
 
-					str.Append(L",");
+					str.AppendChar(L',');
 
 					if (tcDur.bHours > 0) {
 						str.AppendFormat(L" %0.2dh", tcDur.bHours);
@@ -487,7 +487,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 					0
 				};
 
-				str.Append(L",");
+				str.AppendChar(L',');
 
 				if (tcDur.bHours > 0) {
 					str.AppendFormat(L" %0.2dh", tcDur.bHours);

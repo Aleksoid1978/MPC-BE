@@ -42,6 +42,12 @@
 #define ID_PLSMENU_RENAME_PLAYLIST 2003
 #define ID_PLSMENU_DELETE_PLAYLIST 2004
 
+WCHAR LastChar(const CStringW& str)
+{
+	int len = str.GetLength();
+	return len > 0 ? str.GetAt(len - 1) : 0;
+}
+
 static CString MakePath(CString path)
 {
 	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
@@ -224,8 +230,8 @@ bool CPlaylistItem::FindFolder(LPCWSTR path) const
 {
 	for (const auto& fi : m_fns) {
 		CString str = fi.GetName();
-		str.TrimRight(L">");
-		str.TrimRight(L"<");
+		str.TrimRight(L'>');
+		str.TrimRight(L'<');
 		if (str.CompareNoCase(path) == 0) {
 			return true;
 		}
@@ -1082,14 +1088,14 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				case VK_BACK:
 					if (curTab.type == EXPLORER) {
 						auto path = curPlayList.GetHead().m_fns.front().GetName();
-						if (path.Right(1) == L"<") {
+						if (LastChar(path) == L'<') {
 							auto oldPath = path;
 							oldPath.TrimRight(L"\\<");
 
 							path.TrimRight(L"\\<");
 							path = GetFolderOnly(path);
-							if (path.Right(1) == L":") {
-								path = (L".");
+							if (LastChar(path) == L':') {
+								path = L".";
 							}
 							path = AddSlash(path);
 
@@ -1540,8 +1546,8 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 		}
 		else {
 			auto path = PlayList.GetHead().m_fns.front().GetName();
-			if (path.Right(1) == L"<") {
-				path.TrimRight(L"<");
+			if (LastChar(path) == L'<') {
+				path.TrimRight(L'<');
 				PlayList.RemoveAll();
 				if (::PathFileExistsW(path)) {
 					TParseFolder(path);
@@ -1703,7 +1709,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			if (StartsWith(str, L"#EXTINF:")) {
 				DeleteLeft(8, str);
 
-				int pos = str.Find(L",");
+				int pos = str.Find(L',');
 				if (pos > 0) {
 					const auto tmp = str.Left(pos);
 					int dur = 0;
@@ -2880,12 +2886,12 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		const int w = rcItem.Height() - 4;
 
 		bool bfsFolder = false;
-		if (file.Right(1) == L"<") {
+		if (LastChar(file) == L'<') {
 			file = L"[..]";
 			bfsFolder = true;
 		}
-		else if (file.Right(1) == L">"){
-			file.TrimRight(L">");
+		else if (LastChar(file) == L'>'){
+			file.TrimRight(L'>');
 			file = L"[" + file + L"]";
 			bfsFolder = true;
 		}
@@ -2904,7 +2910,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 			}
 
 			auto ext = GetFileExt(path).MakeLower();
-			if (ext.IsEmpty() && path.Right(1) == L":") {
+			if (ext.IsEmpty() && LastChar(path) == L':') {
 				ext = path;
 			}
 
@@ -3770,8 +3776,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				}
 
 				auto path = curPlayList.GetHead().m_fns.front().GetName();
-				if (path.Right(1) == L"<") {
-					path.TrimRight(L"<");
+				if (LastChar(path) == L'<') {
+					path.TrimRight(L'<');
 					curPlayList.RemoveAll();
 					if (::PathFileExistsW(path)) {
 						TParseFolder(path);
@@ -4537,14 +4543,14 @@ int CPlayerPlaylistBar::TGetPathType(const CString& path) const
 		return -1;
 	}
 
-	const auto suffix = path.Right(1);
-	if (suffix == L":") {
+	const auto suffix = LastChar(path);
+	if (suffix == L':') {
 		return IT_DRIVE;
 	}
-	else if (suffix == L"<") {
+	else if (suffix == L'<') {
 		return IT_PARENT;
 	}
-	else if (suffix == L">") {
+	else if (suffix == L'>') {
 		return IT_FOLDER;
 	}
 
@@ -4836,13 +4842,13 @@ bool CPlayerPlaylistBar::TNavigate()
 						case IT_PARENT:
 							path.TrimRight(L"\\<");
 							path = GetFolderOnly(path);
-							if (path.Right(1) == L":") {
-								path = (L".");
+							if (LastChar(path) == L':') {
+								path = L".";
 							}
 							oldPath.TrimRight(L"\\<");
 							break;
 						case IT_FOLDER:
-							path.TrimRight(L">");
+							path.TrimRight(L'>');
 							break;
 						default:
 							return false;
