@@ -396,8 +396,6 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 
-	bool bNothingOpened = ((CMainFrame *)AfxGetApp()->m_pMainWnd)->GetLoadState() == MLS_CLOSED;
-
 	switch (CurrentVR) {
 		case VIDRNDT_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR), &m_cbVideoRenderer);
@@ -448,7 +446,7 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_HAALI_VR), &m_cbVideoRenderer);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(bNothingOpened && IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_NULL_ANY:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_NULLVR_ANY), &m_cbVideoRenderer);
@@ -458,10 +456,10 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_MADVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(bNothingOpened && IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_MPCVR:
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(bNothingOpened && IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
@@ -564,8 +562,11 @@ void CPPageVideo::OnVideoRenderPropClick()
 	}
 
 	CComPtr<IBaseFilter> pBF;
-	HRESULT hr = pBF.CoCreateInstance(clsid);
-	if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
+	CComQIPtr<ISpecifyPropertyPages> pSPP = FindFilter(clsid, AfxGetMainFrame()->m_pGB);
+	if (!pSPP) {
+		pBF.CoCreateInstance(clsid); pSPP = pBF;
+	}
+	if (pSPP) {
 		CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
 		ps.AddPages(pSPP);
 		ps.DoModal();

@@ -213,6 +213,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CMPlayerCApp;
 	friend class CPlayerPlaylistBar;
 	friend class CPPageSync;
+	friend class CPPageVideo;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
