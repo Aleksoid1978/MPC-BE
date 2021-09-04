@@ -129,12 +129,11 @@ namespace YoutubeDL
 			if (!d.Parse(buf_out.GetString()).HasParseError()) {
 				int iTag = 1;
 				if (auto formats = GetJsonArray(d, "formats")) {
-					int maxHeight = 0;
+					int vid_height = 0;
 					bool bVideoOnly = false;
 
-					float maxtbr = 0.0f;
+					float aud_bitrate = 0.0f;
 					CStringA bestAudioUrl;
-
 					std::map<CStringA, CStringA> audioUrls;
 
 					CStringA bestUrl;
@@ -146,33 +145,13 @@ namespace YoutubeDL
 								|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
 							continue;
 						}
-
 						CStringA url;
 						if (!getJsonValue(format, "url", url)) {
 							continue;
 						}
-
 						CStringA vcodec;
-						if (getJsonValue(format, "vcodec", vcodec)) {
-							if (vcodec == "none") {
-								float tbr = .0f;
-								if (getJsonValue(format, "tbr", tbr)) {
-									if ((tbr > maxtbr)
-											|| (tbr == maxtbr && StartsWith(protocol, "http"))) {
-										maxtbr = tbr;
-										bestAudioUrl = url;
-									}
-								} else if (bestAudioUrl.IsEmpty()) {
-									bestAudioUrl = url;
-								}
-
-								CStringA language;
-								if (getJsonValue(format, "language", language)) {
-									if (const auto it = audioUrls.find(language); it == audioUrls.cend()) {
-										audioUrls[language] = url;
-									}
-								}
-							}
+						if (!getJsonValue(format, "vcodec", vcodec) || vcodec == "none") {
+							continue;
 						}
 
 						int height = 0;
@@ -217,15 +196,52 @@ namespace YoutubeDL
 							if (height > maxHeightOptions) {
 								continue;
 							}
-							if ((height > maxHeight)
-									|| (height == maxHeight && StartsWith(protocol, "http"))) {
-								maxHeight = height;
+							if ((height > vid_height)
+									|| (height == vid_height && StartsWith(protocol, "http"))) {
+								vid_height = height;
 								bestUrl = url;
 								bVideoOnly = false;
 
 								if (acodec == "none") {
 									bVideoOnly = true;
 								}
+							}
+						}
+					}
+
+					for (const auto& format : formats->GetArray()) {
+						CStringA protocol;
+						if (!getJsonValue(format, "protocol", protocol)
+							|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
+							continue;
+						}
+						CStringA url;
+						if (!getJsonValue(format, "url", url)) {
+							continue;
+						}
+						CStringA vcodec;
+						if (!getJsonValue(format, "vcodec", vcodec) || vcodec != "none") {
+							continue;
+						}
+
+						float tbr = 0.0f;
+						// TODO: set low quality audio for low quality video
+						if (getJsonValue(format, "tbr", tbr)) {
+							if (aud_bitrate == 0.0f
+								||(vid_height > 360 && tbr > aud_bitrate)
+								|| (vid_height <= 360 && tbr < aud_bitrate)
+								|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
+								aud_bitrate = tbr;
+								bestAudioUrl = url;
+							}
+						} else if (bestAudioUrl.IsEmpty()) {
+							bestAudioUrl = url;
+						}
+
+						CStringA language;
+						if (getJsonValue(format, "language", language)) {
+							if (const auto it = audioUrls.find(language); it == audioUrls.cend()) {
+								audioUrls[language] = url;
 							}
 						}
 					}
@@ -248,7 +264,7 @@ namespace YoutubeDL
 								}
 
 								int height = 0;
-								if (getJsonValue(format, "height", height) && height == maxHeight) {
+								if (getJsonValue(format, "height", height) && height == vid_height) {
 									float tbr = .0f;
 									getJsonValue(format, "tbr", tbr);
 
