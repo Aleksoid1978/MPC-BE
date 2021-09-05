@@ -53,7 +53,7 @@ public:
 	CAudioFilter();
 	~CAudioFilter();
 
-	HRESULT Init(const WAVEFORMATEX* wfe, const char* flt_name, const char* flt_args);
+	HRESULT Init(const WAVEFORMATEX* wfe, const char* flt_name, const char* flt_args, const bool autoconvert);
 
 	HRESULT Push(const CAutoPtr<CPacket>& p);
 	HRESULT Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size);

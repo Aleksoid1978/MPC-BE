@@ -49,7 +49,7 @@ CAudioFilter::~CAudioFilter()
 	avfilter_graph_free(&m_pFilterGraph);
 }
 
-HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const char* flt_args)
+HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const char* flt_args, const bool autoconvert)
 {
 	CAutoLock cAutoLock(&m_csFilter);
 
@@ -70,7 +70,7 @@ HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const 
 
 	m_pFilterGraph = avfilter_graph_alloc();
 	CheckPointer(m_pFilterGraph, E_FAIL);
-	avfilter_graph_set_auto_convert(m_pFilterGraph, AVFILTER_AUTO_CONVERT_NONE);
+	avfilter_graph_set_auto_convert(m_pFilterGraph, autoconvert ? AVFILTER_AUTO_CONVERT_ALL : AVFILTER_AUTO_CONVERT_NONE);
 
 	SampleFormat sample_fmt = GetSampleFormat(wfe);
 	AVSampleFormat av_sample_fmt = AV_SAMPLE_FMT_NONE;
@@ -228,7 +228,10 @@ HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 	}
 	av_frame_unref(m_pFrame);
 
-	return ret < 0 ? E_FAIL : S_OK;
+	return
+		ret >= 0 ? S_OK :
+		ret == AVERROR(EAGAIN) ? E_PENDING :
+		E_FAIL;
 }
 
 HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples)
@@ -245,7 +248,10 @@ HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& sim
 	}
 	av_frame_unref(m_pFrame);
 
-	return ret < 0 ? E_FAIL : S_OK;
+	return
+		ret >= 0 ? S_OK :
+		ret == AVERROR(EAGAIN) ? E_PENDING :
+		E_FAIL;
 }
 
 void CAudioFilter::Flush()
