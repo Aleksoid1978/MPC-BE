@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <basestruct.h>
 #include "Filter.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/ffmpeg_log.h"
@@ -30,8 +31,6 @@ extern "C"
 	#include <libavfilter/buffersink.h>
 	#include <libavfilter/buffersrc.h>
 }
-
-AVRational m_time_base = { 0, 0 };
 
 CAudioFilter::CAudioFilter()
 {
@@ -75,26 +74,27 @@ HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const 
 
 	SampleFormat sample_fmt = GetSampleFormat(wfe);
 	AVSampleFormat av_sample_fmt = AV_SAMPLE_FMT_NONE;
+
 	switch (sample_fmt) {
-		case SAMPLE_FMT_U8:
-			av_sample_fmt = AV_SAMPLE_FMT_U8;
-			break;
-		case SAMPLE_FMT_S16:
-			av_sample_fmt = AV_SAMPLE_FMT_S16;
-			break;
-		case SAMPLE_FMT_S24:
-		case SAMPLE_FMT_S32:
-			av_sample_fmt = AV_SAMPLE_FMT_S32;
-			break;
-		case SAMPLE_FMT_FLT:
-			av_sample_fmt = AV_SAMPLE_FMT_FLT;
-			break;
-		case SAMPLE_FMT_DBL:
-			av_sample_fmt = AV_SAMPLE_FMT_DBL;
-			break;
-		default:
-			ASSERT(FALSE);
-			return E_FAIL;
+	case SAMPLE_FMT_U8:
+		av_sample_fmt = AV_SAMPLE_FMT_U8;
+		break;
+	case SAMPLE_FMT_S16:
+		av_sample_fmt = AV_SAMPLE_FMT_S16;
+		break;
+	case SAMPLE_FMT_S24:
+	case SAMPLE_FMT_S32:
+		av_sample_fmt = AV_SAMPLE_FMT_S32;
+		break;
+	case SAMPLE_FMT_FLT:
+		av_sample_fmt = AV_SAMPLE_FMT_FLT;
+		break;
+	case SAMPLE_FMT_DBL:
+		av_sample_fmt = AV_SAMPLE_FMT_DBL;
+		break;
+	default:
+		ASSERT(FALSE);
+		return E_FAIL;
 	}
 
 	DWORD layout = 0;
@@ -108,24 +108,24 @@ HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const 
 	do {
 		char args[256] = { 0 };
 		_snprintf_s(args, sizeof(args), "time_base=1/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%x",
-					wfe->nSamplesPerSec,
-					wfe->nSamplesPerSec,
-					av_get_sample_fmt_name(av_sample_fmt),
-					layout);
+			wfe->nSamplesPerSec,
+			wfe->nSamplesPerSec,
+			av_get_sample_fmt_name(av_sample_fmt),
+			layout);
 		ret = avfilter_graph_create_filter(&m_pFilterBufferSrc,
-												buffersrc,
-												"in",
-												args,
-												nullptr,
-												m_pFilterGraph);
+			buffersrc,
+			"in",
+			args,
+			nullptr,
+			m_pFilterGraph);
 		if (ret < 0) { break; }
 
 		ret = avfilter_graph_create_filter(&m_pFilterBufferSink,
-											buffersink,
-											"out",
-											nullptr,
-											nullptr,
-											m_pFilterGraph);
+			buffersink,
+			"out",
+			nullptr,
+			nullptr,
+			m_pFilterGraph);
 		if (ret < 0) { break; }
 
 		const AVFilter* filter = avfilter_get_by_name(flt_name);
@@ -153,20 +153,25 @@ HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const 
 	m_Channels = wfe->nChannels;
 	m_layout = layout;
 
-	m_time_base = av_buffersink_get_time_base(m_pFilterBufferSink);
+	AVRational time_base = av_buffersink_get_time_base(m_pFilterBufferSink);
+	m_time_base = { time_base.num, time_base.den };
 
 	return S_OK;
 }
 
 HRESULT CAudioFilter::Push(const CAutoPtr<CPacket>& p)
 {
+	return Push(p->rtStart, p->data(), p->size());
+}
+
+HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size)
+{
 	CheckPointer(m_pFilterGraph, E_FAIL);
 	CheckPointer(m_pFrame, E_FAIL);
 
-	BYTE *pData   = p->data();
 	BYTE* pTmpBuf = nullptr;
 
-	const int nSamples = p->size() / (m_Channels * get_bytes_per_sample(m_sample_fmt));
+	const int nSamples = size / (m_Channels * get_bytes_per_sample(m_sample_fmt));
 
 	if (m_av_sample_fmt == AV_SAMPLE_FMT_S32 && m_sample_fmt == SAMPLE_FMT_S24) {
 		DWORD pSize = nSamples * m_Channels * sizeof(int32_t);
@@ -180,7 +185,7 @@ HRESULT CAudioFilter::Push(const CAutoPtr<CPacket>& p)
 	m_pFrame->channels       = m_Channels;
 	m_pFrame->channel_layout = m_layout;
 	m_pFrame->sample_rate    = m_SamplesPerSec;
-	m_pFrame->pts            = av_rescale(p->rtStart, m_time_base.den, m_time_base.num * UNITS);
+	m_pFrame->pts            = av_rescale(time_start, m_time_base.den, m_time_base.num * UNITS);
 
 	const int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
 	int ret = avcodec_fill_audio_frame(m_pFrame, m_pFrame->channels, m_av_sample_fmt, pData, buffersize, 1);
@@ -226,6 +231,22 @@ HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 	return ret < 0 ? E_FAIL : S_OK;
 }
 
+HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples)
+{
+	if (m_av_sample_fmt != AV_SAMPLE_FMT_FLT || !m_pFilterGraph || !m_pFrame) {
+		return E_ABORT;
+	}
+
+	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
+	if (ret >= 0) {
+		time_start = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
+		allsamples = m_pFrame->nb_samples * m_pFrame->channels;
+		simpleBuffer.WriteData(0, (float*)m_pFrame->data[0], allsamples);
+	}
+	av_frame_unref(m_pFrame);
+
+	return ret < 0 ? E_FAIL : S_OK;
+}
 
 void CAudioFilter::Flush()
 {

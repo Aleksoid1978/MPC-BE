@@ -22,6 +22,7 @@
 
 #include "AudioTools/SampleFormat.h"
 #include "DSUtil/Packet.h"
+#include "DSUtil/SimpleBuffer.h"
 
 struct AVFilterGraph;
 struct AVFilterContext;
@@ -46,13 +47,19 @@ private:
 	DWORD           m_SamplesPerSec      = 0;
 	WORD            m_Channels           = 0;
 
+	fraction_t      m_time_base          = { 0, 0 };
+
 public:
 	CAudioFilter();
 	~CAudioFilter();
 
 	HRESULT Init(const WAVEFORMATEX* wfe, const char* flt_name, const char* flt_args);
+
 	HRESULT Push(const CAutoPtr<CPacket>& p);
+	HRESULT Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size);
+
 	HRESULT Pull(CAutoPtr<CPacket>& p);
+	HRESULT Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples);
 
 	BOOL IsInitialized() const { return m_pFilterGraph != nullptr; }
 
