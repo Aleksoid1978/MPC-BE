@@ -509,6 +509,49 @@ HRESULT CNullUAudioRenderer::DoRenderSample(IMediaSample* pSample)
 	}
 #endif
 
+#if _DEBUG && 0
+	static CStringW fname;
+	if (fname.IsEmpty()) {
+		AM_MEDIA_TYPE* pmt = nullptr;
+		if (S_OK == pSample->GetMediaType(&pmt) && pmt && pmt->formattype == FORMAT_WaveFormatEx) {
+			WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->pbFormat;
+			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+
+			fname = L"C:\\TEMP\\AudioData";
+			fname.AppendFormat(L".%uHz", wfe->nSamplesPerSec);
+			fname.AppendFormat(L".%uch", wfe->nChannels);
+
+			WORD tag = wfe->wFormatTag;
+			if (tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_PCM)) {
+				if (wfe->wBitsPerSample == 8) {
+					fname.AppendFormat(L".u%u", wfe->wBitsPerSample);
+				} else {
+					fname.AppendFormat(L".i%u", wfe->wBitsPerSample);
+				}
+			} else if (tag == WAVE_FORMAT_IEEE_FLOAT || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)) {
+				fname.AppendFormat(L".f%u", wfe->wBitsPerSample);
+			}
+
+			fname.Append(L".bin");
+		}
+		DeleteMediaType(pmt);
+	}
+	else {
+		const long lSize = pSample->GetActualDataLength();
+		BYTE* pMediaBuffer = nullptr;
+		HRESULT hr = pSample->GetPointer(&pMediaBuffer);
+
+		FILE* hFile;
+		if (_wfopen_s(&hFile, fname, L"ab") == 0) {
+			fwrite(pMediaBuffer,
+				1,
+				lSize,
+				hFile);
+			fclose(hFile);
+		}
+	}
+#endif
+
 	return S_OK;
 }
 
