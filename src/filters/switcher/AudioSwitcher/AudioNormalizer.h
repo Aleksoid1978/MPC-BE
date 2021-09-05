@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,24 +23,25 @@
 class CAudioNormalizer
 {
 protected:
-	int m_level;
-	bool m_boost;
-	int m_stepping, m_stepping_vol;
-	int m_rising;
+	int  m_level = 75;
+	bool m_boost =true;
+	int  m_stepping = 8;
+	int  m_stepping_vol = 1 << m_stepping;
+	int  m_rising = 0;
+
+	int m_vol = m_stepping_vol;
+
+	unsigned m_predictor = 0;
+	BYTE m_prediction[4096];
 
 	std::vector<double> m_bufHQ;
 	std::vector<double> m_smpHQ;
 
-	DWORD m_predictor;
-	BYTE m_prediction[4096];
-
-	int m_vol;
-
 	int ProcessInternal(float *samples, unsigned numsamples, unsigned nch);
 
 public:
-	CAudioNormalizer(void);
-	virtual ~CAudioNormalizer(void);
+	CAudioNormalizer();
+	virtual ~CAudioNormalizer();
 
 	void SetParam(int Level, bool Boost, int Steping);
 	int Process(float *samples, unsigned numsamples, unsigned nch);

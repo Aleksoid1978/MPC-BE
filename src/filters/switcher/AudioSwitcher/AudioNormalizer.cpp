@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,20 +26,12 @@
 // CAudioNormalizer
 //
 
-CAudioNormalizer::CAudioNormalizer(void)
+CAudioNormalizer::CAudioNormalizer()
 {
-	m_predictor = 0;
 	memset(m_prediction, 7, sizeof(m_prediction));
-
-	m_level = 75;
-	m_stepping = 8;
-	m_boost = true;
-	m_vol = m_stepping_vol = 1 << m_stepping;
-
-	m_rising = 0;
 }
 
-CAudioNormalizer::~CAudioNormalizer(void)
+CAudioNormalizer::~CAudioNormalizer()
 {
 }
 
@@ -121,8 +113,7 @@ redo:
 		samples[k] = (float)((bufHQ[k] + 0.5) / 32768);
 	}
 
-	if (m_boost == false
-			&& m_vol > m_stepping_vol) {
+	if (m_boost == false && m_vol > m_stepping_vol) {
 		m_vol = m_stepping_vol;
 	}
 
@@ -149,10 +140,9 @@ void CAudioNormalizer::SetParam(int Level, bool Boost, int Steping)
 	m_level = Level;
 	m_boost = Boost;
 	if (m_stepping != Steping) {
-		const int tmp = m_stepping;
+		m_vol = (m_vol << Steping) / (1 << m_stepping);
 
 		m_stepping = Steping;
 		m_stepping_vol = 1 << m_stepping;
-		m_vol = (m_vol << m_stepping) / (1 << tmp);
 	}
 }
