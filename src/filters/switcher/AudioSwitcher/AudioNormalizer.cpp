@@ -42,30 +42,18 @@ int CAudioNormalizer::ProcessInternal(float *samples, unsigned numsamples, unsig
 	}
 
 	const size_t allsamples = numsamples * nch;
-	if (allsamples > m_bufHQ.size()) {
-		m_bufHQ.resize(allsamples);
-		m_smpHQ.resize(allsamples);
-	}
-	double *bufHQ = m_bufHQ.data();
-	double *smpHQ = m_smpHQ.data();
-
-	size_t k;
-	for (k = 0; k < allsamples; k++) {
-		smpHQ[k] = (double)samples[k] * 32768;
-	}
 
 	int tries = 0;
 
 redo:
 	const double factor = m_vol != m_stepping_vol ? (double)m_vol / (double)(m_stepping_vol) : 1.0;
-	for (k = 0; k < allsamples; k++) {
-		bufHQ[k] = smpHQ[k] * factor;
+
+	float peak = 0.0f;
+	for (size_t k = 0; k < allsamples; k++) {
+		peak = std::max(peak , fabs(samples[k]));
 	}
 
-	double highest = 0.0;
-	for (k = 0; k < allsamples; k++) {
-		highest = std::max(highest, fabs(bufHQ[k]));
-	}
+	const double highest = (double)peak * factor * 32768;
 
 	if (highest > 30000.0) {
 		if (m_vol > m_stepping) {
@@ -109,8 +97,8 @@ redo:
 		}
 	}
 
-	for (k = 0; k < allsamples; k++) {
-		samples[k] = (float)((bufHQ[k] + 0.5) / 32768);
+	for (size_t k = 0; k < allsamples; k++) {
+		samples[k] *= factor;
 	}
 
 	if (m_boost == false && m_vol > m_stepping_vol) {

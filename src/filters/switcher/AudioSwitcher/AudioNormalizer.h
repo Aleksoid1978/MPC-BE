@@ -34,9 +34,6 @@ protected:
 	unsigned m_predictor = 0;
 	BYTE m_prediction[4096];
 
-	std::vector<double> m_bufHQ;
-	std::vector<double> m_smpHQ;
-
 	int ProcessInternal(float *samples, unsigned numsamples, unsigned nch);
 
 public:
