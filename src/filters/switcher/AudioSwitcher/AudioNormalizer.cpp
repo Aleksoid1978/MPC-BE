@@ -50,7 +50,7 @@ redo:
 
 	float peak = 0.0f;
 	for (size_t k = 0; k < allsamples; k++) {
-		peak = std::max(peak , fabs(samples[k]));
+		peak = std::max(peak , std::abs(samples[k]));
 	}
 
 	const double highest = (double)peak * factor * 32768;
