@@ -115,7 +115,7 @@ bool COggFile::ReadPages(OggPage& page)
 			const auto pos = GetPos();
 			OggPage page_next;
 			bRet = Read(page_next);
-			if (!bRet || page_next.m_hdr.number_page_segments != page.m_hdr.number_page_segments) {
+			if (!bRet || page_next.m_hdr.bitstream_serial_number != page.m_hdr.bitstream_serial_number) {
 				Seek(pos);
 				break;
 			}
