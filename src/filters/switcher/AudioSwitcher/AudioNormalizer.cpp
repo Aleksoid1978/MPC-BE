@@ -43,17 +43,16 @@ int CAudioNormalizer::ProcessInternal(float *samples, unsigned numsamples, unsig
 
 	const size_t allsamples = numsamples * nch;
 
+	float max_peak = 0.0f;
+	for (size_t k = 0; k < allsamples; k++) {
+		max_peak = std::max(max_peak , std::abs(samples[k]));
+	}
+
 	int tries = 0;
 
 redo:
 	const double factor = m_vol != m_stepping_vol ? (double)m_vol / (double)(m_stepping_vol) : 1.0;
-
-	float peak = 0.0f;
-	for (size_t k = 0; k < allsamples; k++) {
-		peak = std::max(peak , std::abs(samples[k]));
-	}
-
-	const double highest = (double)peak * factor * 32768;
+	const double highest = (double)max_peak * factor * 32768;
 
 	if (highest > 30000.0) {
 		if (m_vol > m_stepping) {
