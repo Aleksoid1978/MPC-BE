@@ -746,6 +746,9 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 	const DWORD cnt = gb.ReadDwordLE();
 	for (DWORD n = cnt; gb.RemainingSize() >= 4 && n-- > 0; ) {
 		const DWORD size = gb.ReadDwordLE();
+		if (size > static_cast<DWORD>(gb.RemainingSize())) {
+			return;
+		}
 		CStringA str;
 		gb.ReadBuffer((BYTE*)str.GetBufferSetLength(size), size);
 
