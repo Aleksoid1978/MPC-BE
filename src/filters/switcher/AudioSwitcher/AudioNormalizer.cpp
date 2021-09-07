@@ -133,3 +133,179 @@ void CAudioNormalizer::SetParam(int Level, bool Boost, int Steping)
 		m_stepping_vol = 1 << m_stepping;
 	}
 }
+
+//
+// CAudioAutoVolume
+//
+
+CAudioAutoVolume::CAudioAutoVolume()
+{
+	for (size_t i = 0; i < std::size(m_smooth); i++)
+	{
+		m_smooth[i] = SmoothNew(100);
+	}
+}
+
+CAudioAutoVolume::~CAudioAutoVolume()
+{
+	for (size_t i = 0; i < std::size(m_smooth); i++)
+	{
+		if (m_smooth[i]) SmoothDelete(m_smooth[i]);
+	}
+}
+
+int CAudioAutoVolume::Process(short *samples, int numsamples, int nch)
+{
+	double level = -1.0;
+
+	calc_power_level(samples, numsamples, nch);
+	{
+		int channel = 0;
+
+		level = -1.0;
+		for (channel = 0; channel < nch; ++channel)
+		{
+			double channel_level = SmoothGetMax(m_smooth[channel]);
+
+			if (channel_level > level) level = channel_level;
+		}
+	}
+
+	if (level > m_silence_level)
+	{
+		double gain = m_normalize_level / level;
+
+		if (gain > m_max_mult) gain = m_max_mult;
+
+		adjust_gain(samples, numsamples, nch, gain);
+	}
+
+	return numsamples;
+}
+
+void CAudioAutoVolume::calc_power_level(short *samples, int numsamples, int nch)
+{
+	int channel = 0;
+	int i = 0;
+	double sum[8];
+	short *data = samples;
+
+	for (channel = 0; channel < nch; ++channel)
+	{
+		sum[channel] = 0.0;
+	}
+
+	for (i = 0, channel = 0; i < numsamples * nch; ++i, ++data)
+	{
+		double sample = *data;
+		double temp = 0.0;
+
+		if (m_do_compress)
+		{
+			if (sample > m_cutoff) sample = m_cutoff + (sample - m_cutoff) / m_degree;
+		}
+
+		temp = sample*sample;
+
+		sum[channel] += temp;
+
+		++channel;
+		channel = channel % nch;
+	}
+
+	{
+		static const double NORMAL = 1.0 / ((double)MAXSHORT);
+		static const double NORMAL_SQUARED = NORMAL * NORMAL;
+		double channel_length = 2.0 / (numsamples * nch);
+
+		for (channel = 0; channel < nch; ++channel)
+		{
+			double level = sum[channel] * channel_length * NORMAL_SQUARED;
+
+			SmoothAddSample(m_smooth[channel], sqrt(level));
+		}
+	}
+}
+
+void CAudioAutoVolume::adjust_gain(short *samples, int numsamples, int nch, double gain)
+{
+	short *data = samples;
+	int i = 0;
+#define NO_GAIN 0.01
+
+	if (gain >= 1.0 - NO_GAIN && gain <= 1.0 + NO_GAIN) return;
+
+	for (i = 0; i < numsamples * nch; ++i, ++data)
+	{
+		double samp = (double)*data;
+
+		if (m_do_compress)
+		{
+			if (samp > m_cutoff) samp = m_cutoff + (samp - m_cutoff) / m_degree;
+		}
+		samp *= gain;
+		*data = (short)std::clamp(samp, (double)(short)MINSHORT, (double)(short)MAXSHORT);
+	}
+}
+
+CAudioAutoVolume::smooth_t *CAudioAutoVolume::SmoothNew(int size)
+{
+	smooth_t * sm = (smooth_t *)malloc(sizeof(smooth_t));
+	if (sm == nullptr) return nullptr;
+
+	ZeroMemory(sm, sizeof(smooth_t));
+
+	sm->data = (double *)malloc(size * sizeof(double));
+	if (sm->data == nullptr)
+	{
+		free(sm);
+		return nullptr;
+	}
+	ZeroMemory(sm->data, size * sizeof(double));
+
+	sm->size = size;
+	sm->current = sm->used = 0;
+	sm->max = 0.0;
+	return sm;
+}
+
+void CAudioAutoVolume::SmoothDelete(smooth_t *del)
+{
+	if (del == nullptr)
+		return;
+
+	if (del->data != nullptr) free(del->data);
+
+	free(del);
+}
+
+void CAudioAutoVolume::SmoothAddSample(smooth_t *sm, double sample)
+{
+	if (sm == nullptr)	return;
+
+	sm->data[sm->current] = sample;
+
+	++sm->current;
+
+	if (sm->current > sm->used) ++sm->used;
+	if (sm->current >= sm->size) sm->current %= sm->size;
+}
+
+double CAudioAutoVolume::SmoothGetMax(smooth_t *sm)
+{
+	if (sm == nullptr) return -1.0;
+
+	{
+		int i = 0;
+		double smoothed = 0.0;
+
+		for (i = 0; i < sm->used; ++i) smoothed += sm->data[i];
+		smoothed = smoothed / sm->used;
+
+		if (sm->used < sm->size) return (smoothed * sm->used + m_normalize_level * (sm->size - sm->used)) / sm->size;
+
+		if (sm->max < smoothed) sm->max = smoothed;
+	}
+
+	return sm->max;
+}

@@ -20,6 +20,10 @@
 
 #pragma once
 
+//
+// CAudioNormalizer
+//
+
 class CAudioNormalizer
 {
 protected:
@@ -42,4 +46,42 @@ public:
 
 	void SetParam(int Level, bool Boost, int Steping);
 	int Process(float *samples, unsigned numsamples, unsigned nch);
+};
+
+//
+// CAudioAutoVolume
+//
+
+class CAudioAutoVolume
+{
+protected:
+	struct smooth_t {
+		double * data;
+		double max;
+		int size;
+		int used;
+		int current;
+	};
+
+	smooth_t *m_smooth[10] = {};
+	const double m_normalize_level = 0.25;
+	const double m_silence_level = 0.01;
+	const double m_max_mult = 5.0;
+
+	const bool   m_do_compress = false;
+	const double m_cutoff = 13000.0;
+	const double m_degree = 2.0;
+
+	void calc_power_level(short *samples, int numsamples, int nch);
+	void adjust_gain(short *samples, int numsamples, int nch, double gain);
+	smooth_t *SmoothNew(int size);
+	void SmoothDelete(smooth_t *del);
+	void SmoothAddSample(smooth_t *sm, double sample);
+	double SmoothGetMax(smooth_t *sm);
+
+public:
+	CAudioAutoVolume();
+	virtual ~CAudioAutoVolume();
+
+	int Process(short *samples, int numsamples, int nch);
 };
