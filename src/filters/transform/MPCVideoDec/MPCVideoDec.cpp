@@ -3790,16 +3790,12 @@ HRESULT CMPCVideoDecFilter::RecommitAllocator()
 	if (m_pDXVA2Allocator) {
 		// Re-Commit the allocator (creates surfaces and new decoder)
 		hr = m_pDXVA2Allocator->Decommit();
+		GetOutputPin()->GetConnected()->BeginFlush();
+		GetOutputPin()->GetConnected()->EndFlush();
 		if (m_pDXVA2Allocator->DecommitInProgress()) {
-			DLog(L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream");
-			GetOutputPin()->GetConnected()->BeginFlush();
-			GetOutputPin()->GetConnected()->EndFlush();
-			if (m_pDXVA2Allocator->DecommitInProgress()) {
-				DLog(L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! Flush had no effect, decommit of the allocator still not complete");
-			} else {
-				DLog(L"CMPCVideoDecFilter::RecommitAllocator() : Flush was successfull, decommit completed!");
-			}
+			DLog(L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! Flush had no effect, decommit of the allocator still not complete");
 		}
+
 		hr = m_pDXVA2Allocator->Commit();
 	}
 
