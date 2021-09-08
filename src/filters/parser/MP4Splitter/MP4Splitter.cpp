@@ -1957,17 +1957,23 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			DWORD id = track->GetId();
 
-			CStringW name, lang;
-			name.Format(L"Output %d", id);
+			CStringW pinName;
 
-			if (!TrackName.IsEmpty()) {
-				name = TrackName;
+			if (TrackLanguage.GetLength()) {
+				if (TrackLanguage != "und") {
+					pinName = ISO6392ToLanguage(TrackLanguage).Trim();
+					CStringW lng(TrackLanguage);
+					if (!StartsWithNoCase(pinName, lng)) {
+						pinName.AppendFormat(L" (%s)", lng);
+					}
+					pinName.Append(L", ");
+				}
 			}
 
-			if (!TrackLanguage.IsEmpty()) {
-				if (TrackLanguage != "und") {
-					name.AppendFormat(L" (%S)", TrackLanguage);
-				}
+			if (TrackName.GetLength()) {
+				pinName.Append(TrackName);
+			} else {
+				pinName.AppendFormat(L"Output %d", id);
 			}
 
 			if (AP4_Track::TYPE_VIDEO == track->GetType() && videoSize == CSize(0, 0)) {
@@ -1981,7 +1987,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMP4SplitterOutputPin(mts, name, this, this, &hr));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMP4SplitterOutputPin(mts, pinName, this, this, &hr));
 
 			if (!TrackName.IsEmpty()) {
 				pPinOut->SetProperty(L"NAME", TrackName);
