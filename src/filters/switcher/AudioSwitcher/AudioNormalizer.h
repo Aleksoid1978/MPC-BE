@@ -72,8 +72,8 @@ protected:
 	const double m_cutoff = 13000.0;
 	const double m_degree = 2.0;
 
-	void calc_power_level(int16_t *samples, int numsamples, int nch);
-	void adjust_gain(int16_t *samples, int numsamples, int nch, double gain);
+	void calc_power_level(float *samples, int numsamples, int nch);
+	void adjust_gain(float *samples, int numsamples, int nch, double gain);
 	smooth_t *SmoothNew(int size);
 	void SmoothDelete(smooth_t *del);
 	void SmoothAddSample(smooth_t *sm, double sample);
@@ -83,5 +83,5 @@ public:
 	CAudioAutoVolume();
 	virtual ~CAudioAutoVolume();
 
-	int Process(int16_t *samples, int numsamples, int nch);
+	int Process(float *samples, int numsamples, int nch);
 };

@@ -154,8 +154,13 @@ CAudioAutoVolume::~CAudioAutoVolume()
 	}
 }
 
-int CAudioAutoVolume::Process(int16_t *samples, int numsamples, int nch)
+int CAudioAutoVolume::Process(float *samples, int numsamples, int nch)
 {
+	const size_t allsamples = numsamples * nch;
+	for (size_t k = 0; k < allsamples; k++) {
+		samples[k] *= INT16_MAX;
+	}
+
 	double level = -1.0;
 
 	calc_power_level(samples, numsamples, nch);
@@ -180,15 +185,19 @@ int CAudioAutoVolume::Process(int16_t *samples, int numsamples, int nch)
 		adjust_gain(samples, numsamples, nch, gain);
 	}
 
+	for (size_t k = 0; k < allsamples; k++) {
+		samples[k] /= INT16_MAX;
+	}
+
 	return numsamples;
 }
 
-void CAudioAutoVolume::calc_power_level(int16_t *samples, int numsamples, int nch)
+void CAudioAutoVolume::calc_power_level(float *samples, int numsamples, int nch)
 {
 	int channel = 0;
 	int i = 0;
 	double sum[8];
-	int16_t *data = samples;
+	float *data = samples;
 
 	for (channel = 0; channel < nch; ++channel)
 	{
@@ -227,9 +236,9 @@ void CAudioAutoVolume::calc_power_level(int16_t *samples, int numsamples, int nc
 	}
 }
 
-void CAudioAutoVolume::adjust_gain(int16_t *samples, int numsamples, int nch, double gain)
+void CAudioAutoVolume::adjust_gain(float *samples, int numsamples, int nch, double gain)
 {
-	int16_t *data = samples;
+	float *data = samples;
 	int i = 0;
 #define NO_GAIN 0.01
 
@@ -244,7 +253,7 @@ void CAudioAutoVolume::adjust_gain(int16_t *samples, int numsamples, int nch, do
 			if (samp > m_cutoff) samp = m_cutoff + (samp - m_cutoff) / m_degree;
 		}
 		samp *= gain;
-		*data = (int16_t)std::clamp(samp, (double)INT16_MIN, (double)INT16_MAX);
+		*data = (float)std::clamp(samp, (double)INT16_MIN, (double)INT16_MAX);
 	}
 }
 
