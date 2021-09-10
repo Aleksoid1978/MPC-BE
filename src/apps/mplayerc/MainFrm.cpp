@@ -9543,37 +9543,17 @@ void CMainFrame::OnNavigateSkipFile(UINT nID)
 				return item.m_strFileName == m_strPlaybackRenderedPath;
 			});
 
-			const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
 			if (nID == ID_NAVIGATE_SKIPBACKFILE) {
 				if (it == m_BDPlaylists.cbegin()) {
 					return;
 				}
-				for (;;) {
-					it--;
-					if (it->Duration() < rtMinMPlsDuration) {
-						if (it == m_BDPlaylists.cbegin()) {
-							return;
-						}
-						continue;
-					}
 
-					break;
-				}
+				it--;
 			} else if (nID == ID_NAVIGATE_SKIPFORWARDFILE) {
 				if (it == std::prev(m_BDPlaylists.cend())) {
 					return;
 				}
-				for (;;) {
-					it++;
-					if (it->Duration() < rtMinMPlsDuration) {
-						if (it == std::prev(m_BDPlaylists.cend())) {
-							return;
-						}
-						continue;
-					}
-
-					break;
-				}
+				it++;
 			}
 
 			const CString fileName(it->m_strFileName);
@@ -9824,12 +9804,8 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
 		if (id < m_BDPlaylists.size()) {
-			const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
 			UINT idx = 0;
 			for (const auto& item : m_BDPlaylists) {
-				if (item.Duration() < rtMinMPlsDuration) {
-					continue;
-				}
 				if (idx == id && item.m_strFileName != m_strPlaybackRenderedPath) {
 					m_bNeedUnmountImage = FALSE;
 					SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
@@ -15325,13 +15301,8 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 	if (GetPlaybackMode() == PM_FILE) {
 		if (!m_BDPlaylists.empty()) {
-			const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
 			int mline = 1;
 			for (const auto& Item : m_BDPlaylists) {
-				if (Item.m_strFileName != m_strPlaybackRenderedPath && Item.Duration() < rtMinMPlsDuration) {
-					continue;
-				}
-
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 				if (mline > MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
@@ -19064,8 +19035,9 @@ BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRe
 	if (::PathIsDirectoryW(bdmv_folder + L"\\PLAYLIST") && ::PathIsDirectoryW(bdmv_folder + L"\\STREAM")) {
 		CHdmvClipInfo ClipInfo;
 		CString main_mpls_file;
+		CHdmvClipInfo::CPlaylist Playlist;
 
-		if (SUCCEEDED(ClipInfo.FindMainMovie(bdmv_folder, main_mpls_file, m_BDPlaylists))) {
+		if (SUCCEEDED(ClipInfo.FindMainMovie(bdmv_folder, main_mpls_file, Playlist))) {
 			if (bdmv_folder.Right(5).MakeUpper() == L"\\BDMV") { // real BDMV folder
 				CString infFile = bdmv_folder.Left(bdmv_folder.GetLength() - 5) + L"\\disc.inf";
 
@@ -19116,6 +19088,14 @@ BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRe
 			m_LastOpenBDPath = bdmv_folder;
 
 			if (OpenFile(mpls_file.GetLength() ? mpls_file : main_mpls_file, rtStart, FALSE) == TRUE) {
+				const auto rtMinMPlsDuration = (REFERENCE_TIME)AfxGetAppSettings().nMinMPlsDuration * 60 * UNITS;
+				m_BDPlaylists.clear();
+				for (const auto& item : Playlist) {
+					if (item.Duration() >= rtMinMPlsDuration) {
+						m_BDPlaylists.push_back(item);
+					}
+				}
+
 				return TRUE;
 			}
 		}
