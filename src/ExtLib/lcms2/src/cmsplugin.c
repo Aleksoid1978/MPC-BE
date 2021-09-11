@@ -993,7 +993,7 @@ void* CMSEXPORT cmsGetContextUserData(cmsContext ContextID)
 cmsBool _cmsGetTime(struct tm* ptr_time)
 {
     struct tm* t;
-#if defined(HAVE_GMTIME_R) || defined(HAVE__GMTIME64_S)
+#if defined(HAVE_GMTIME_R) || defined(HAVE_GMTIME_S)
     struct tm tm;
 #endif
 
@@ -1001,8 +1001,8 @@ cmsBool _cmsGetTime(struct tm* ptr_time)
 
 #ifdef HAVE_GMTIME_R
     t = gmtime_r(&now, &tm);
-#elif defined(HAVE__GMTIME64_S)
-    t = _gmtime64_s(&tm, &now) == 0 ? &tm : NULL;
+#elif defined(HAVE_GMTIME_S)
+    t = gmtime_s(&tm, &now) == 0 ? &tm : NULL;
 #else
     _cmsEnterCriticalSectionPrimitive(&_cmsContextPoolHeadMutex);
     t = gmtime(&now);
