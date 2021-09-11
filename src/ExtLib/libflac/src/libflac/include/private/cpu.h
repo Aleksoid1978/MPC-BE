@@ -90,8 +90,14 @@
   #if __has_builtin(__builtin_ia32_pmuldq128)
     #define FLAC__SSE4_1_SUPPORTED 1
   #endif
+  #if __has_builtin(__builtin_ia32_maxps256)
+    #define FLAC__AVX_SUPPORTED 1
+  #endif
   #if __has_builtin(__builtin_ia32_pabsd256)
     #define FLAC__AVX2_SUPPORTED 1
+  #endif
+  #if __has_builtin(__builtin_ia32_vfmaddps)
+    #define FLAC__FMA_SUPPORTED 1
   #endif
 #elif defined __GNUC__ && !defined __clang__ && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 9)) /* GCC 4.9+ */
   #define FLAC__SSE_TARGET(x) __attribute__ ((__target__ (x)))
