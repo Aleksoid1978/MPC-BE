@@ -1456,7 +1456,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 			}
-			else if (pTE->TrackType != TrackEntry::TypeVideo) {
+			else if (pTE->TrackType == TrackEntry::TypeAudio || pTE->TrackType == TrackEntry::TypeSubtitle) {
 				pinName = L"Unknown";
 			}
 
@@ -1471,7 +1471,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (pinName.IsEmpty()) {
 				pinName = outputDesc;
 			}
-			else if (pTE->TrackType != TrackEntry::TypeVideo /*&& pTE->TrackType != TrackEntry::TypeAudio*/) {
+			else if (pTE->TrackType != TrackEntry::TypeVideo) {
 				pinName.AppendFormat(L" (%s)", outputDesc);
 			}
 
