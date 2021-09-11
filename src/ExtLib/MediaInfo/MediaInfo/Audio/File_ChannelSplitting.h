@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/Audio/File_Pcm.h"
 #include <cstring>
 //---------------------------------------------------------------------------
 
@@ -29,13 +29,12 @@ namespace MediaInfoLib
 // Class File_ChannelSplitting
 //***************************************************************************
 #ifdef MEDIAINFO_SMPTEST0337_YES
-class File_ChannelSplitting : public File__Analyze
+class File_ChannelSplitting : public File_Pcm_Base
 {
 public :
     //In
     int8u   BitDepth;
     int16u  SamplingRate;
-    int8u   Endianness;
     bool    Aligned;
 
     struct common
@@ -70,7 +69,7 @@ public :
                 Buffer=new int8u[Buffer_Size_Max];
             }
         };
-        vector<channel*>    SplittedChannels;
+        vector<channel*>    SplittedChannels[2]; //0 = Subframe, 1=Frame
 
         common()
         {
@@ -78,8 +77,9 @@ public :
 
         ~common()
         {
-            for (size_t Pos=0; Pos<SplittedChannels.size(); Pos++)
-                delete SplittedChannels[Pos]; //Channels[Pos]=NULL;
+            for (int c=0; c<2; c++)
+                for (size_t Pos=0; Pos<SplittedChannels[c].size(); Pos++)
+                    delete SplittedChannels[c][Pos]; //Channels[c][Pos]=NULL;
         }
     };
     int64u  StreamID;
@@ -104,6 +104,7 @@ private :
     //Temp
     bool AllFilled;
     bool AllFinished;
+    size_t SplittedChannels_c;
     size_t SplittedChannels_i;
 };
 

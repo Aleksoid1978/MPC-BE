@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/Audio/File_Pcm.h"
 #include <cstring>
 //---------------------------------------------------------------------------
 
@@ -29,13 +29,12 @@ namespace MediaInfoLib
 // Class File_ChannelGrouping
 //***************************************************************************
 #ifdef MEDIAINFO_SMPTEST0337_YES
-class File_ChannelGrouping : public File__Analyze
+class File_ChannelGrouping : public File_Pcm_Base
 {
 public :
     //In
     int8u   BitDepth;
     int16u  SamplingRate;
-    int8u   Endianness;
     bool    Aligned;
     bool    CanBePcm;
 

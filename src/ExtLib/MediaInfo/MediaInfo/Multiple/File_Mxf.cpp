@@ -16400,7 +16400,7 @@ void File_Mxf::ChooseParser(const essences::iterator &Essence, const descriptors
                                                                         ChooseParser_ChannelGrouping(Essence, Descriptor);
                                                                     if (Descriptor->second.ChannelCount==2) //PCM, but one file is found with Dolby E in it
                                                                         ChooseParser_SmpteSt0337(Essence, Descriptor);
-                                                                    if (Descriptor->second.ChannelCount>2 && Descriptor->second.ChannelCount!=(int32u)-1) //PCM, but one file is found with Dolby E in it
+                                                                    if (Descriptor->second.ChannelCount>=2 && Descriptor->second.ChannelCount!=(int32u)-1) //PCM, but one file is found with Dolby E in it
                                                                         ChooseParser_ChannelSplitting(Essence, Descriptor);
                                                         default   : return ChooseParser_Pcm(Essence, Descriptor);
                                                     }

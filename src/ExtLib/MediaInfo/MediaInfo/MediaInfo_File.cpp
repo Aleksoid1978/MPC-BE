@@ -201,6 +201,9 @@
 #if defined(MEDIAINFO_AC4_YES)
     #include "MediaInfo/Audio/File_Ac4.h"
 #endif
+#if defined(MEDIAINFO_ADM_YES)
+    #include "MediaInfo/Audio/File_Adm.h"
+#endif
 #if defined(MEDIAINFO_ALS_YES)
     #include "MediaInfo/Audio/File_Als.h"
 #endif
@@ -425,6 +428,9 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
     // Multiple
     #if defined(MEDIAINFO_AAF_YES)
         else if (Parser==__T("Aaf"))        Info=new File_Aaf();
+    #endif
+    #if defined(MEDIAINFO_ADM_YES)
+        else if (Parser==__T("Adm"))        Info=new File_Adm();
     #endif
     #if defined(MEDIAINFO_BDAV_YES)
         else if (Parser==__T("Bdav"))       {Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4;}
@@ -1163,6 +1169,11 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_H263_YES)
         delete Info; Info=new File_H263();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+
+    //At the end, could load too much data for nothing
+    #if defined(MEDIAINFO_ADM_YES)
+        delete Info; Info=new File_Adm();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Default (empty)

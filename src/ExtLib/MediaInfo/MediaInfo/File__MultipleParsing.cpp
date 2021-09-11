@@ -185,6 +185,9 @@
 #if defined(MEDIAINFO_AC4_YES)
     #include "MediaInfo/Audio/File_Ac4.h"
 #endif
+#if defined(MEDIAINFO_ADM_YES)
+    #include "MediaInfo/Audio/File_Adm.h"
+#endif
 #if defined(MEDIAINFO_ALS_YES)
     #include "MediaInfo/Audio/File_Als.h"
 #endif
@@ -412,6 +415,9 @@ File__MultipleParsing::File__MultipleParsing()
     // Multiple
     #if defined(MEDIAINFO_AAF_YES)
         Parser.push_back(new File_Aaf());
+    #endif
+    #if defined(MEDIAINFO_ADM_YES)
+        Parser.push_back(new File_Adm());
     #endif
     #if defined(MEDIAINFO_BDAV_YES)
         {File_MpegTs* Temp=new File_MpegTs(); Temp->BDAV_Size=4; Parser.push_back(Temp);}

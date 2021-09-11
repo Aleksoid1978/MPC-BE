@@ -312,6 +312,7 @@ private :
     void WAVE_adtl_note();
     void WAVE_axml ();
     void WAVE_bext ();
+    void WAVE_bxml () {WAVE_axml();}
     void WAVE_cue_ ();
     void WAVE_data ();
     void WAVE_data_Continue ();

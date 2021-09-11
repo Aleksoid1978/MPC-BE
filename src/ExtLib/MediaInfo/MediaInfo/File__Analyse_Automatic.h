@@ -688,6 +688,8 @@ enum video
     Video_FrameRate_Original_String,
     Video_FrameRate_Original_Num,
     Video_FrameRate_Original_Den,
+    Video_FrameRate_Real,
+    Video_FrameRate_Real_String,
     Video_FrameCount,
     Video_Source_FrameCount,
     Video_Standard,

@@ -474,6 +474,10 @@ void File_Mpeg4::Streams_Finish()
         {
             Fill(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio, DisplayAspectRatio);
         }
+        if (StreamKind_Last==Stream_Video && !FrameRate_Real.empty() && Retrieve_Const(Stream_Video, StreamPos_Last, Video_FrameRate_Real).empty())
+        {
+            Fill(Stream_Video, StreamPos_Last, Video_FrameRate_Real, FrameRate_Real);
+        }
 
         //if (Temp->second.stsz_StreamSize)
         //    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.stsz_StreamSize);

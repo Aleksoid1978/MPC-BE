@@ -2993,7 +2993,10 @@ void File_Avc::sei_message_user_data_registered_itu_t_t35_GA94_03_Delayed(int32u
     // Skipping missing frames
     if (TemporalReferences_Max-TemporalReferences_Min>(size_t)(4*(seq_parameter_sets[seq_parameter_set_id]->max_num_ref_frames+3))) // max_num_ref_frames ref frame maximum
     {
-        TemporalReferences_Min=TemporalReferences_Max-4*(seq_parameter_sets[seq_parameter_set_id]->max_num_ref_frames+3);
+        size_t TemporalReferences_Min_New=TemporalReferences_Max-4*(seq_parameter_sets[seq_parameter_set_id]->max_num_ref_frames+3);
+        while (TemporalReferences_Min_New>TemporalReferences_Min && TemporalReferences[TemporalReferences_Min_New-1])
+            TemporalReferences_Min_New--;
+        TemporalReferences_Min=TemporalReferences_Min_New;
         while (TemporalReferences[TemporalReferences_Min]==NULL)
             TemporalReferences_Min++;
     }

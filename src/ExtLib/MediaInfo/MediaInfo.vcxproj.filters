@@ -740,6 +740,12 @@
     <ClInclude Include="MediaInfo\Video\File_CineForm.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Adm.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\tfsxml\tfsxml.h">
+      <Filter>extra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1422,6 +1428,12 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Video\File_CineForm.cpp">
       <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Adm.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\tfsxml\tfsxml.c">
+      <Filter>extra</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

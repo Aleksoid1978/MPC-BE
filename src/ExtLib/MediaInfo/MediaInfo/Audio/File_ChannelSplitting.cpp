@@ -42,6 +42,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 File_ChannelSplitting::File_ChannelSplitting()
+:File_Pcm_Base()
 {
     //Configuration
     #if MEDIAINFO_EVENTS
@@ -59,7 +60,6 @@ File_ChannelSplitting::File_ChannelSplitting()
     //In
     BitDepth=0;
     SamplingRate=0;
-    Endianness=0;
     Aligned=false;
     Common=NULL;
     Channel_Total=1;
@@ -77,11 +77,44 @@ File_ChannelSplitting::~File_ChannelSplitting()
 //---------------------------------------------------------------------------
 void File_ChannelSplitting::Streams_Fill()
 {
+    bool HasSadm=false;
+    for (size_t i=0; i<Common->SplittedChannels[0].size(); i++)
+    {
+        std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[0][i]->Parsers;
+
+        if (Parsers.size()!=1)
+            continue;
+        Fill(Parsers[0]);
+        if (Parsers[0]->Get(Stream_Audio, 0, "Metadata_Format").find(__T("ADM"))==0)
+            HasSadm=true;
+    }
+    if (HasSadm)
+    {
+        File_Pcm Parser;
+        Parser.BitDepth=BitDepth;
+        Parser.Channels=Channel_Total;
+        Parser.SamplingRate=SamplingRate;
+        Parser.Endianness=Endianness;
+        Open_Buffer_Init(&Parser);
+        Parser.Accept();
+        Fill(&Parser);
+        size_t Pos=Count_Get(Stream_Audio);
+        Merge(Parser);
+
+        for (size_t i=0; i<Common->SplittedChannels[0].size(); i++)
+        {
+            std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[0][i]->Parsers;
+
+            Merge(*Parsers[0], Stream_Audio, 0, 0);
+        }
+        return;
+    }
+
     Fill(Stream_General, 0, General_Format, "ChannelSplitting");
 
-    for (size_t i=0; i<Common->SplittedChannels.size(); i++)
+    for (size_t i=0; i<Common->SplittedChannels[1].size(); i++)
     {
-        std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[i]->Parsers;
+        std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[1][i]->Parsers;
 
         if (Parsers.size()!=1)
             continue;
@@ -106,7 +139,6 @@ void File_ChannelSplitting::Streams_Fill()
             continue;
         }
 
-        Fill(Parsers[0]);
         size_t Pos=Count_Get(Stream_Audio);
         Merge(*Parsers[0]);
         for (size_t j=0; j<Parsers[0]->Count_Get(Stream_Audio); j++)
@@ -134,15 +166,16 @@ void File_ChannelSplitting::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_ChannelSplitting::Streams_Finish()
 {
-    for (size_t i = 0; i<Common->SplittedChannels.size(); i++)
-    {
-        std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[i]->Parsers;
+    for (int c=0; c<2; c++)
+        for (size_t i = 0; i<Common->SplittedChannels[c].size(); i++)
+        {
+            std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[c][i]->Parsers;
         
-        if (Parsers.size()!=1)
-            continue;
+            if (Parsers.size()!=1)
+                continue;
 
-        Finish(Parsers[0]);
-    }
+            Finish(Parsers[0]);
+        }
 }
 
 //***************************************************************************
@@ -162,37 +195,40 @@ void File_ChannelSplitting::Read_Buffer_Init()
             
         //Common
         Common=new common;
-        Common->SplittedChannels.resize(Channel_Total/2);
-
-        for (size_t i=0; i<Common->SplittedChannels.size(); i++)
+        for (int c=0; c<2; c++)
         {
-            Common->SplittedChannels[i]=new common::channel;
-            std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[i]->Parsers;
+            Common->SplittedChannels[c].resize(Channel_Total/(1+c));
 
-            //SMPTE ST 337
+            for (size_t i=0; i<Common->SplittedChannels[c].size(); i++)
             {
-                File_SmpteSt0337* Parser=new File_SmpteSt0337;
-                Parser->Container_Bits=BitDepth;
-                Parser->Endianness=Endianness;
-                Parser->Aligned=Aligned;
-                Parsers.push_back(Parser);
-            }
+                Common->SplittedChannels[c][i]=new common::channel;
+                std::vector<File__Analyze*>& Parsers=Common->SplittedChannels[c][i]->Parsers;
 
-            // PCM // TODO (currently no demux)
+                //SMPTE ST 337
+                {
+                    File_SmpteSt0337* Parser=new File_SmpteSt0337;
+                    Parser->Container_Bits=BitDepth;
+                    Parser->Endianness=Endianness;
+                    Parser->Aligned=Aligned;
+                    Parsers.push_back(Parser);
+                }
 
-            //for all parsers
-            for (size_t Pos=0; Pos<Parsers.size(); Pos++)
-            {
-                #if MEDIAINFO_DEMUX
-                    if (Config->Demux_Unpacketize_Get())
-                    {
-                        Parsers[Pos]->Demux_UnpacketizeContainer=true;
-                        Parsers[Pos]->Demux_Level=2; //Container
-                        Demux_Level=4; //Intermediate
-                    }
-                #endif //MEDIAINFO_DEMUX
-                Element_Code=i+1;
-                Open_Buffer_Init(Parsers[Pos]);
+                // PCM // TODO (currently no demux)
+
+                //for all parsers
+                for (size_t Pos=0; Pos<Parsers.size(); Pos++)
+                {
+                    #if MEDIAINFO_DEMUX
+                        if (Config->Demux_Unpacketize_Get())
+                        {
+                            Parsers[Pos]->Demux_UnpacketizeContainer=true;
+                            Parsers[Pos]->Demux_Level=2; //Container
+                            Demux_Level=4; //Intermediate
+                        }
+                    #endif //MEDIAINFO_DEMUX
+                    Element_Code=i+1;
+                    Open_Buffer_Init(Parsers[Pos]);
+                }
             }
         }
     }
@@ -209,37 +245,46 @@ void File_ChannelSplitting::Read_Buffer_Continue()
     }
 
     //Size of buffer
-    for (size_t i=0; i<Common->SplittedChannels.size(); i++)
-    {
-        common::channel* SplittedChannel=Common->SplittedChannels[i];
+    for (int c=0; c<2; c++)
+        for (size_t i=0; i<Common->SplittedChannels[c].size(); i++)
+        {
+            common::channel* SplittedChannel=Common->SplittedChannels[c][i];
 
-        if (Buffer_Size/Common->SplittedChannels.size()>SplittedChannel->Buffer_Size_Max)
-            SplittedChannel->resize(Buffer_Size/Common->SplittedChannels.size());
-        SplittedChannel->Buffer_Size=0;
-    }
+            if (Buffer_Size/Common->SplittedChannels[c].size()>SplittedChannel->Buffer_Size_Max)
+                SplittedChannel->resize(Buffer_Size/Common->SplittedChannels[c].size());
+            SplittedChannel->Buffer_Size=0;
+        }
 
     //Copying to splitted channels
     Buffer_Offset=0;
     while (Channel_Total*BitDepth<=(Buffer_Size-Buffer_Offset)*8)
     {
-        for (size_t i=0; i<Common->SplittedChannels.size(); i++)
+        for (size_t i=0; i<Common->SplittedChannels[1].size(); i++)
         {
-            common::channel* SplittedChannel=Common->SplittedChannels[i];
+            common::channel* SplittedChannel00=Common->SplittedChannels[0][i*2];
+            common::channel* SplittedChannel01=Common->SplittedChannels[0][i*2+1];
+            common::channel* SplittedChannel1=Common->SplittedChannels[1][i];
 
             switch (BitDepth)
             {
                 case 24:
                     // Copy 6 bytes
-                    SplittedChannel->Buffer[SplittedChannel->Buffer_Size++]=Buffer[Buffer_Offset++];
+                    SplittedChannel00->Buffer[SplittedChannel00->Buffer_Size++]=Buffer[Buffer_Offset];
+                    SplittedChannel01->Buffer[SplittedChannel01->Buffer_Size++]=Buffer[Buffer_Offset+BitDepth/8];
+                    SplittedChannel1->Buffer[SplittedChannel1->Buffer_Size++]=Buffer[Buffer_Offset++];
                 case 20:
                     // Copy 5 bytes
-                    SplittedChannel->Buffer[SplittedChannel->Buffer_Size++]=Buffer[Buffer_Offset++];
+                    SplittedChannel00->Buffer[SplittedChannel00->Buffer_Size++]=Buffer[Buffer_Offset];
+                    SplittedChannel01->Buffer[SplittedChannel01->Buffer_Size++]=Buffer[Buffer_Offset+BitDepth/8];
+                    SplittedChannel1->Buffer[SplittedChannel1->Buffer_Size++]=Buffer[Buffer_Offset++];
                 case 16:
                     // Copy 4 bytes
-                    SplittedChannel->Buffer[SplittedChannel->Buffer_Size++]=Buffer[Buffer_Offset++];
-                    SplittedChannel->Buffer[SplittedChannel->Buffer_Size++]=Buffer[Buffer_Offset++];
-                    SplittedChannel->Buffer[SplittedChannel->Buffer_Size++]=Buffer[Buffer_Offset++];
-                    SplittedChannel->Buffer[SplittedChannel->Buffer_Size++]=Buffer[Buffer_Offset++];
+                    SplittedChannel00->Buffer[SplittedChannel00->Buffer_Size++]=Buffer[Buffer_Offset];
+                    SplittedChannel01->Buffer[SplittedChannel01->Buffer_Size++]=Buffer[Buffer_Offset+BitDepth/8];
+                    SplittedChannel1->Buffer[SplittedChannel1->Buffer_Size++]=Buffer[Buffer_Offset++];
+                    SplittedChannel1->Buffer[SplittedChannel1->Buffer_Size++]=Buffer[Buffer_Offset++];
+                    SplittedChannel1->Buffer[SplittedChannel1->Buffer_Size++]=Buffer[Buffer_Offset++];
+                    SplittedChannel1->Buffer[SplittedChannel1->Buffer_Size++]=Buffer[Buffer_Offset++];
                     break;
                 default: ;
                     // Not supported
@@ -249,21 +294,23 @@ void File_ChannelSplitting::Read_Buffer_Continue()
         }
     }
 
-    for (size_t i=0; i<Common->SplittedChannels.size(); i++)
-    {
-        common::channel* SplittedChannel=Common->SplittedChannels[i];
-
-        for (size_t Pos=0; Pos<SplittedChannel->Parsers.size(); Pos++)
+    for (int c=0; c<2; c++)
+        for (size_t i=0; i<Common->SplittedChannels[c].size(); i++)
         {
-            if (FrameInfo_Next.DTS!=(int64u)-1)
-                SplittedChannel->Parsers[Pos]->FrameInfo = FrameInfo_Next; //AES3 parse has its own buffer management
-            else if (FrameInfo.DTS!=(int64u)-1)
-                SplittedChannel->Parsers[Pos]->FrameInfo = FrameInfo;
+            common::channel* SplittedChannel=Common->SplittedChannels[c][i];
+
+            for (size_t Pos=0; Pos<SplittedChannel->Parsers.size(); Pos++)
+            {
+                if (FrameInfo_Next.DTS!=(int64u)-1)
+                    SplittedChannel->Parsers[Pos]->FrameInfo = FrameInfo_Next; //AES3 parse has its own buffer management
+                else if (FrameInfo.DTS!=(int64u)-1)
+                    SplittedChannel->Parsers[Pos]->FrameInfo = FrameInfo;
+            }
         }
-    }
     FrameInfo=frame_info();
     AllFilled=true;
     AllFinished=true;
+    SplittedChannels_c=0;
     SplittedChannels_i=0;
     size_t ContentSize=Buffer_Offset;
     Buffer_Offset=0;
@@ -276,64 +323,68 @@ void File_ChannelSplitting::Read_Buffer_Continue()
 
 void File_ChannelSplitting::Read_Buffer_Continue_Parse()
 {
-    for (; SplittedChannels_i<Common->SplittedChannels.size(); SplittedChannels_i++)
+    for (; SplittedChannels_c<2; SplittedChannels_c++)
     {
-        common::channel* SplittedChannel=Common->SplittedChannels[SplittedChannels_i];
-
-        for (size_t Pos=0; Pos<SplittedChannel->Parsers.size(); Pos++)
+        for (; SplittedChannels_i<Common->SplittedChannels[SplittedChannels_c].size(); SplittedChannels_i++)
         {
-            Element_Code=SplittedChannels_i*2+1;
-            #if MEDIAINFO_DEMUX
-                Demux(Buffer+Buffer_Offset, Buffer_Size-Buffer_Offset, ContentType_MainStream);
-            #endif //MEDIAINFO_EVENTS
-            Open_Buffer_Continue(SplittedChannel->Parsers[Pos], SplittedChannel->Buffer, SplittedChannel->Buffer_Size, false);
+            common::channel* SplittedChannel=Common->SplittedChannels[SplittedChannels_c][SplittedChannels_i];
 
-            //Multiple parsers
-            if (SplittedChannel->Parsers.size()>1)
+            for (size_t Pos=0; Pos<SplittedChannel->Parsers.size(); Pos++)
             {
-                //Test if valid
-                if (!Status[IsAccepted] && SplittedChannel->Parsers[SplittedChannel->Parsers.size()-1]->Frame_Count+1 >= ((File_Pcm*)SplittedChannel->Parsers[SplittedChannel->Parsers.size()-1])->Frame_Count_Valid)
+                Element_Code=SplittedChannels_i*2+1;
+                #if MEDIAINFO_DEMUX
+                    Demux(Buffer+Buffer_Offset, Buffer_Size-Buffer_Offset, ContentType_MainStream);
+                #endif //MEDIAINFO_EVENTS
+                Open_Buffer_Continue(SplittedChannel->Parsers[Pos], SplittedChannel->Buffer, SplittedChannel->Buffer_Size, false);
+
+                //Multiple parsers
+                if (SplittedChannel->Parsers.size()>1)
                 {
-                    //Rejecting here, else the parser may emit a frame before we detect that we want to reject the stream because there are no PCM stream (not handled here)
-                    Reject();
+                    //Test if valid
+                    if (!Status[IsAccepted] && SplittedChannel->Parsers[SplittedChannel->Parsers.size()-1]->Frame_Count+1 >= ((File_Pcm*)SplittedChannel->Parsers[SplittedChannel->Parsers.size()-1])->Frame_Count_Valid)
+                    {
+                        //Rejecting here, else the parser may emit a frame before we detect that we want to reject the stream because there are no PCM stream (not handled here)
+                        Reject();
+                        return;
+                    }
+                    if (!SplittedChannel->Parsers[Pos]->Status[IsAccepted] && SplittedChannel->Parsers[Pos]->Status[IsFinished])
+                    {
+                        delete *(SplittedChannel->Parsers.begin()+Pos);
+                        SplittedChannel->Parsers.erase(SplittedChannel->Parsers.begin()+Pos);
+                        Pos--;
+                    }
+                    else if (SplittedChannel->Parsers.size()>1 && SplittedChannel->Parsers[Pos]->Status[IsAccepted])
+                    {
+                        if (Pos==SplittedChannel->Parsers.size()-1)
+                            SplittedChannel->IsPcm=true; //Last parser is PCM
+                        
+                        File__Analyze* Parser=SplittedChannel->Parsers[Pos];
+                        for (size_t Pos2=0; Pos2<SplittedChannel->Parsers.size(); Pos2++)
+                        {
+                            if (Pos2!=Pos)
+                                delete *(SplittedChannel->Parsers.begin()+Pos2);
+                        }
+                        SplittedChannel->Parsers.clear();
+                        SplittedChannel->Parsers.push_back(Parser);
+                    }
+                }
+            }
+            if (!Status[IsAccepted] && !SplittedChannel->IsPcm && SplittedChannel->Parsers.size()==1 && SplittedChannel->Parsers[0]->Status[IsAccepted])
+                Accept();
+            if (SplittedChannel->IsPcm || SplittedChannel->Parsers.size()!=1 || (!SplittedChannel->Parsers[0]->Status[IsFinished] && !SplittedChannel->Parsers[0]->Status[IsFilled]))
+                AllFilled=false;
+            if (SplittedChannel->IsPcm || SplittedChannel->Parsers.size()!=1 || !SplittedChannel->Parsers[0]->Status[IsFinished])
+                AllFinished=false;
+
+            #if MEDIAINFO_DEMUX
+                if (Config->Demux_EventWasSent)
+                {
+                    SplittedChannels_i++;
                     return;
                 }
-                if (!SplittedChannel->Parsers[Pos]->Status[IsAccepted] && SplittedChannel->Parsers[Pos]->Status[IsFinished])
-                {
-                    delete *(SplittedChannel->Parsers.begin()+Pos);
-                    SplittedChannel->Parsers.erase(SplittedChannel->Parsers.begin()+Pos);
-                    Pos--;
-                }
-                else if (SplittedChannel->Parsers.size()>1 && SplittedChannel->Parsers[Pos]->Status[IsAccepted])
-                {
-                    if (Pos==SplittedChannel->Parsers.size()-1)
-                        SplittedChannel->IsPcm=true; //Last parser is PCM
-                        
-                    File__Analyze* Parser=SplittedChannel->Parsers[Pos];
-                    for (size_t Pos2=0; Pos2<SplittedChannel->Parsers.size(); Pos2++)
-                    {
-                        if (Pos2!=Pos)
-                            delete *(SplittedChannel->Parsers.begin()+Pos2);
-                    }
-                    SplittedChannel->Parsers.clear();
-                    SplittedChannel->Parsers.push_back(Parser);
-                }
-            }
+            #endif //MEDIAINFO_DEMUX
         }
-        if (!Status[IsAccepted] && !SplittedChannel->IsPcm && SplittedChannel->Parsers.size()==1 && SplittedChannel->Parsers[0]->Status[IsAccepted])
-            Accept();
-        if (SplittedChannel->IsPcm || SplittedChannel->Parsers.size()!=1 || (!SplittedChannel->Parsers[0]->Status[IsFinished] && !SplittedChannel->Parsers[0]->Status[IsFilled]))
-            AllFilled=false;
-        if (SplittedChannel->IsPcm || SplittedChannel->Parsers.size()!=1 || !SplittedChannel->Parsers[0]->Status[IsFinished])
-            AllFinished=false;
-
-        #if MEDIAINFO_DEMUX
-            if (Config->Demux_EventWasSent)
-            {
-                SplittedChannels_i++;
-                return;
-            }
-        #endif //MEDIAINFO_DEMUX
+        SplittedChannels_i=0;
     }
     Frame_Count++;
     if (!Status[IsFilled] && AllFilled)
@@ -348,14 +399,15 @@ void File_ChannelSplitting::Read_Buffer_Unsynched()
     if (!Common)
         return;
 
-    for (size_t i=0; i<Common->SplittedChannels.size(); i++)
-    {
-        common::channel* SplittedChannel=Common->SplittedChannels[i];
+    for (int c=0; c<2; c++)
+        for (size_t i=0; i<Common->SplittedChannels[c].size(); i++)
+        {
+            common::channel* SplittedChannel=Common->SplittedChannels[c][i];
 
-        for (size_t Pos=0; Pos<Common->SplittedChannels[i]->Parsers.size(); Pos++)
-            if (SplittedChannel->Parsers[Pos])
-                SplittedChannel->Parsers[Pos]->Open_Buffer_Unsynch();
-    }
+            for (size_t Pos=0; Pos<SplittedChannel->Parsers.size(); Pos++)
+                if (SplittedChannel->Parsers[Pos])
+                    SplittedChannel->Parsers[Pos]->Open_Buffer_Unsynch();
+        }
 }
 
 //***************************************************************************

@@ -66,6 +66,7 @@ static const char* Smpte_St0302_ChannelsPositions2(int8u Channels)
 
 //---------------------------------------------------------------------------
 File_Pcm::File_Pcm()
+:File_Pcm_Base()
 {
     //Configuration
     ParserName="PCM";
@@ -85,7 +86,6 @@ File_Pcm::File_Pcm()
     BitDepth_Significant=0;
     Channels=0;
     SamplingRate=0;
-    Endianness='\0';
     Sign='\0';
 }
 

@@ -16,7 +16,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/Audio/File_Pcm.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -26,7 +26,7 @@ namespace MediaInfoLib
 // Class File_SmpteSt0337
 //***************************************************************************
 
-class File_SmpteSt0337 : public File__Analyze
+class File_SmpteSt0337 : public File_Pcm_Base
 {
 public :
     // In
@@ -69,7 +69,7 @@ private :
     float64 FrameRate;
     int8u   Stream_Bits;
     int8u   Padding;
-    int8u   data_type;
+    int32u  data_type;
     std::map<int64u, int64u> FrameSizes;
     int64s  GuardBand_Before;
     int64s  GuardBand_After;

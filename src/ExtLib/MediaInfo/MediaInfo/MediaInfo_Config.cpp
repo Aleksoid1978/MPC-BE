@@ -122,6 +122,9 @@
 #if defined(MEDIAINFO_LIBCURL_YES)
     #include "MediaInfo/Reader/Reader_libcurl.h"
 #endif //defined(MEDIAINFO_LIBCURL_YES)
+#if defined(MEDIAINFO_GRAPHVIZ_YES)
+    #include "MediaInfo/Export/Export_Graph.h"
+#endif //defined(MEDIAINFO_GRAPHVIZ_YES)
 #if defined(MEDIAINFO_EBUCORE_YES)
     #include "MediaInfo/Export/Export_EbuCore.h"
 #endif //defined(MEDIAINFO_EBUCORE_YES)
@@ -432,6 +435,10 @@ void MediaInfo_Config::Init(bool Force)
     #if MEDIAINFO_ADVANCED
         Format_Profile_Split=false;
     #endif //MEDIAINFO_ADVANCED
+    #if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+        Graph_Adm_ShowTrackUIDs=false;
+        Graph_Adm_ShowChannelFormats=false;
+    #endif //defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
     #if defined(MEDIAINFO_EBUCORE_YES)
         AcquisitionDataOutputMode=Export_EbuCore::AcquisitionDataOutputMode_Default;
     #endif //defined(MEDIAINFO_EBUCORE_YES)
@@ -1426,6 +1433,40 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
             return __T("advanced features are disabled due to compilation options");
         #endif // MEDIAINFO_ADVANCED
     }
+    if (Option_Lower==__T("graph_adm_showtrackuids"))
+    {
+        #if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            Graph_Adm_ShowTrackUIDs_Set(Value.To_int8u()?true:false);
+            return Ztring();
+        #else //defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            return __T("Feature disabled due to compilation options");
+        #endif // defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+    }
+    if (Option_Lower == __T("graph_adm_showtrackuids_get"))
+    {
+        #if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            return Graph_Adm_ShowTrackUIDs_Get()?__T("1"):__T("0");
+        #else //defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            return __T("Feature disabled due to compilation options");
+        #endif // defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+    }
+    if (Option_Lower==__T("graph_adm_showchannelformats"))
+    {
+        #if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            Graph_Adm_ShowChannelFormats_Set(Value.To_int8u()?true:false);
+            return Ztring();
+        #else //defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            return __T("Feature disabled due to compilation options");
+        #endif // defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+    }
+    if (Option_Lower == __T("graph_adm_showchannelformats_get"))
+    {
+        #if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            return Graph_Adm_ShowChannelFormats_Get()?__T("1"):__T("0");
+        #else //defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+            return __T("Feature disabled due to compilation options");
+        #endif // defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+    }
     if (Option_Lower==__T("acquisitiondataoutputmode"))
     {
         #if defined(MEDIAINFO_EBUCORE_YES)
@@ -1494,10 +1535,20 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
             return __T("Libcurl support is disabled due to compilation options");
         #endif // defined(MEDIAINFO_LIBCURL_YES)
     }
+
+    if (Option_Lower==__T("info_graph_svg_plugin_state"))
+    {
+        #if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_GRAPHVIZ_YES)
+            return GraphSvgPluginState()?__T("1"):__T("0");
+        #else // defined(MEDIAINFO_GRAPHVIZ_YES)
+            return __T("Graphviz support is disabled due to compilation options");
+        #endif // defined(MEDIAINFO_GRAPHVIZ_YES)
+    }
+
     if (Option_Lower==__T("info_canhandleurls"))
     {
         #if defined(MEDIAINFO_LIBCURL_YES)
-            return CanHandleUrls()?__T("1"):__T("0");;
+            return CanHandleUrls()?__T("1"):__T("0");
         #else // defined(MEDIAINFO_LIBCURL_YES)
             return __T("Libcurl support is disabled due to compilation options");
         #endif // defined(MEDIAINFO_LIBCURL_YES)
@@ -3367,6 +3418,32 @@ bool MediaInfo_Config::Format_Profile_Split_Get ()
 }
 #endif // MEDIAINFO_ADVANCED
 
+#if defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+void MediaInfo_Config::Graph_Adm_ShowTrackUIDs_Set(bool Value)
+{
+    CriticalSectionLocker CSL(CS);
+    Graph_Adm_ShowTrackUIDs=Value;
+}
+
+bool MediaInfo_Config::Graph_Adm_ShowTrackUIDs_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return Graph_Adm_ShowTrackUIDs;
+}
+
+void MediaInfo_Config::Graph_Adm_ShowChannelFormats_Set(bool Value)
+{
+    CriticalSectionLocker CSL(CS);
+    Graph_Adm_ShowChannelFormats=Value;
+}
+
+bool MediaInfo_Config::Graph_Adm_ShowChannelFormats_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return Graph_Adm_ShowChannelFormats;
+}
+#endif //defined(MEDIAINFO_GRAPH_YES) && defined(MEDIAINFO_ADM_YES)
+
 #if defined(MEDIAINFO_EBUCORE_YES)
 void MediaInfo_Config::AcquisitionDataOutputMode_Set(size_t Value)
 {
@@ -3523,6 +3600,18 @@ void MediaInfo_Config::Log_Send (int8u Type, int8u Severity, int32u MessageCode,
     Event_Send((const int8u*)&Event, sizeof(MediaInfo_Event_Log_0));
 }
 #endif //MEDIAINFO_EVENTS
+
+//***************************************************************************
+// Graphviz
+//***************************************************************************
+
+#if defined(MEDIAINFO_GRAPHVIZ_YES)
+bool MediaInfo_Config::GraphSvgPluginState()
+{
+    CriticalSectionLocker CSL(CS);
+    return Export_Graph::Load();
+}
+#endif //defined(MEDIAINFO_GRAPHVIZ_YES)
 
 //***************************************************************************
 // Curl

@@ -779,15 +779,6 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
     //technicalAttributeString - colour_range
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "colour_range", Child, "colour_range");
 
-    //technicalAttributeString - StreamSize
-    Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_StreamSize, Child, "StreamSize", Export_EbuCore::Version_Max, Version>=Export_EbuCore::Version_1_6?"byte":NULL);
-
-    //technicalAttributeString - Compression_Mode
-    Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Compression_Mode, Child, "Compression_Mode");
-
-    //technicalAttributeString - BitDepth
-    Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_BitDepth, Child, "BitDepth", Export_EbuCore::Version_Max, Version>=Export_EbuCore::Version_1_6?"bit":NULL);
-
     //technicalAttributeString
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "FpaManufacturer", Child, "FPAManufacturer");
 
@@ -796,20 +787,6 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
 
     //technicalAttributeString - Format_Settings_GOP
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Format_Settings_GOP, Child, "GOP");
-
-    //technicalAttributeBoolean - Format_Settings_CABAC
-    if (MI.Get(Stream_Video, StreamPos, Video_Format)==__T("AVC"))
-        Add_TechnicalAttributeBoolean_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Format_Settings_CABAC, Child, "CABAC");
-
-    //technicalAttributeBoolean - Format_Settings_MBAFF
-    if (MI.Get(Stream_Video, StreamPos, Video_Format)==__T("AVC") && !MI.Get(Stream_Video, StreamPos, Video_ScanType).empty())
-        Child->Add_Child("ebucore:technicalAttributeBoolean", MI.Get(Stream_Video, StreamPos, Video_ScanType)==__T("MBAFF")?"true":"false", "typeLabel", "MBAFF", true);
-
-    //technicalAttributeBoolean - FpaPass
-    Add_TechnicalAttributeBoolean_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "FpaPass", Child, "MBAFF");
-
-    //technicalAttributeString
-    Child->Add_Child_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "VideoComments", "ebucore:comment", "typeLabel", std::string("VideoComments"), true);
 
     //technicalAttributeString - Encoded_Library
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "Encoded_Library/String", Child, "WritingLibrary");
@@ -828,6 +805,29 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
 
     //technicalAttributeString - MaxSlicesCount
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "MaxSlicesCount", Child, "MaxSlicesCount");
+
+    //technicalAttributeString - Compression_Mode
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Compression_Mode, Child, "Compression_Mode");
+
+    //technicalAttributeInteger - BitDepth
+    Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_BitDepth, Child, "BitDepth", Export_EbuCore::Version_Max, Version>=Export_EbuCore::Version_1_6?"bit":NULL);
+
+    //technicalAttributeInteger - StreamSize
+    Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_StreamSize, Child, "StreamSize", Export_EbuCore::Version_Max, Version>=Export_EbuCore::Version_1_6?"byte":NULL);
+
+    //technicalAttributeBoolean - Format_Settings_CABAC
+    if (MI.Get(Stream_Video, StreamPos, Video_Format)==__T("AVC"))
+        Add_TechnicalAttributeBoolean_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Format_Settings_CABAC, Child, "CABAC");
+
+    //technicalAttributeBoolean - Format_Settings_MBAFF
+    if (MI.Get(Stream_Video, StreamPos, Video_Format)==__T("AVC") && !MI.Get(Stream_Video, StreamPos, Video_ScanType).empty())
+        Child->Add_Child("ebucore:technicalAttributeBoolean", MI.Get(Stream_Video, StreamPos, Video_ScanType)==__T("MBAFF")?"true":"false", "typeLabel", "MBAFF", true);
+
+    //technicalAttributeBoolean - FpaPass
+    Add_TechnicalAttributeBoolean_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "FpaPass", Child, "MBAFF");
+
+    //comment - VideoComments
+    Child->Add_Child_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "VideoComments", "ebucore:comment", "typeLabel", std::string("VideoComments"), true);
 }
 
 //---------------------------------------------------------------------------

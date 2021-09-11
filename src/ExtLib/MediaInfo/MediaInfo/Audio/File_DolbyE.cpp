@@ -1073,6 +1073,22 @@ void File_DolbyE::Streams_Fill_ED2()
         Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, ChannelCount);
     Streams_Fill_PerProgram();
 
+    if (!Presets.empty())
+    {
+        Fill(Stream_Audio, 0, "NumberOfPresentations", Presets.size());
+        Fill_SetOptions(Stream_Audio, 0, "NumberOfPresentations", "N NIY");
+    }
+    if (!BedInstances.empty())
+    {
+        Fill(Stream_Audio, 0, "NumberOfBeds", BedInstances.size());
+        Fill_SetOptions(Stream_Audio, 0, "NumberOfBeds", "N NIY");
+    }
+    if (!DynObjects.empty())
+    {
+        Fill(Stream_Audio, 0, "NumberOfObjects", DynObjects.size());
+        Fill_SetOptions(Stream_Audio, 0, "NumberOfObjects", "N NIY");
+    }
+
     for (size_t p=0; p<Presets.size(); p++)
     {
         const preset& Presentation_Current=Presets[p];
@@ -1094,6 +1110,12 @@ void File_DolbyE::Streams_Fill_ED2()
         }
         Fill(Stream_Audio, 0, (P+" DefaultTargetDeviceConfig").c_str(), default_target_device_config_Value(Presentation_Current.default_target_device_config));
         Fill_SetOptions(Stream_Audio, 0, (P+" DefaultTargetDeviceConfig").c_str(), "Y NTY");
+
+        if (!Presentation_Current.target_device_configs.empty())
+        {
+            Fill(Stream_Audio, 0, (P+" NumberOfTargets").c_str(), Presentation_Current.target_device_configs.size());
+            Fill_SetOptions(Stream_Audio, 0, (P+" NumberOfTargets").c_str(), "N NIY");
+        }
         for (size_t t=0; t<Presentation_Current.target_device_configs.size(); t++)
         {
             const preset::target_device_config& Target_Current=Presentation_Current.target_device_configs[t];
@@ -1228,6 +1250,11 @@ void File_DolbyE::Streams_Fill_ED2()
             }
         }
 
+        if (!BedInstance.Alts.empty())
+        {
+            Fill(Stream_Audio, 0, (P+" NumberOfAlts").c_str(), BedInstance.Alts.size());
+            Fill_SetOptions(Stream_Audio, 0, (P+" NumberOfAlts").c_str(), "N NIY");
+        }
         for (size_t a=0; a<BedInstance.Alts.size(); a++)
         {
             const bed_instance::bed_alt& BedInstance_Current=BedInstance.Alts[a];
@@ -1330,6 +1357,11 @@ void File_DolbyE::Streams_Fill_ED2()
             }
         }
 
+        if (!DynObject.Alts.empty())
+        {
+            Fill(Stream_Audio, 0, (P+" NumberOfAlts").c_str(), DynObject.Alts.size());
+            Fill_SetOptions(Stream_Audio, 0, (P+" NumberOfAlts").c_str(), "N NIY");
+        }
         for (size_t a=0; a<DynObject.Alts.size(); a++)
         {
             const dyn_object::dyn_object_alt& DynObject_Current=DynObject.Alts[a];

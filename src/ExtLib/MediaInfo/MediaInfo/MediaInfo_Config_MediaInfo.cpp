@@ -1525,12 +1525,15 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
         const Char* UpSuffix=__T("_Pos");
         const Char* HideSuffix=__T("_Pos/String");
         //for (set<string>::iterator File_ExpandSubs_Item=File_ExpandSubs_Items.begin(); File_ExpandSubs_Item!=File_ExpandSubs_Items.end(); ++File_ExpandSubs_Item)
-        for (size_t i=0; i<3; i++)
+        for (size_t i=0; i<6; i++)
         {
             //const Ztring Sub=Ztring().From_UTF8(*File_ExpandSubs_Item);
             for (size_t StreamKind=Stream_General; StreamKind<Stream_Max; StreamKind++)
                 for (size_t StreamPos=0; StreamPos<(*Stream_More)[StreamKind].size(); StreamPos++)
                 {
+                    if (i && (*Stream_More)[StreamKind][StreamPos].size()>4*1024)
+                        break; // Too big, arbitrary stop
+
                     ZtringListList Temp;
                     size_t Pos_Max=(*Stream_More)[StreamKind][StreamPos].size();
                     for (size_t Pos=0; Pos<Pos_Max; Pos++)
@@ -1586,7 +1589,7 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                                     }
 
                                     // Search the linked element
-                                    for (size_t j=Pos+1; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
+                                    for (size_t j=0; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
                                     {
                                         if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name]==ToSearch)
                                         {
@@ -1594,7 +1597,8 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                                             for (; j<(*Stream_More)[StreamKind][StreamPos].size(); j++)
                                             {
                                                 // Stop if not the linked element
-                                                if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, 0)==string::npos)
+                                                if ((*Stream_More)[StreamKind][StreamPos][j][Info_Name].rfind(ToSearch, 0)==string::npos
+                                                 && (*Stream_More)[StreamKind][StreamPos][j][Info_Name][0]!=__T(' '))
                                                     break;
 
                                                 // Manage Alt parts when it is inside a list

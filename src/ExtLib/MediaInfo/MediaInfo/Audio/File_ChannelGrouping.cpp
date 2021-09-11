@@ -42,6 +42,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 File_ChannelGrouping::File_ChannelGrouping()
+:File_Pcm_Base()
 {
     //Configuration
     #if MEDIAINFO_EVENTS
@@ -59,7 +60,6 @@ File_ChannelGrouping::File_ChannelGrouping()
     //In
     BitDepth=0;
     SamplingRate=0;
-    Endianness=0;
     Aligned=false;
     CanBePcm=false;
     Common=NULL;

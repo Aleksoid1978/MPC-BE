@@ -6,79 +6,47 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about PCM files
+// Information about ADM files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_PcmH
-#define MediaInfo_File_PcmH
+#ifndef MediaInfo_File_AdmH
+#define MediaInfo_File_AdmH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include <deque>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
+class file_adm_private;
+
 //***************************************************************************
-// Class File_Pcm
+// Class File_Adm
 //***************************************************************************
 
-class File_Pcm_Base : public File__Analyze
-{
-public:
-    int8u   Endianness;
-
-    //Constructor/destructor
-    File_Pcm_Base() : File__Analyze()
-    {
-        Endianness='\0';
-    }
-};
-
-class File_Pcm : public File_Pcm_Base
+class File_Adm : public File__Analyze
 {
 public :
     //In
-    int64u          Frame_Count_Valid;
-    ZenLib::Ztring  Codec;
-    int32u          SamplingRate;
-    int8u           BitDepth;
-    int8u           BitDepth_Significant;
-    int8u           Channels;
-    int8u           Sign;
-
-    //Buffer - Global
-    void Read_Buffer_Continue ();
-    #if MEDIAINFO_DEMUX
-    struct demux_item
-    {
-        int64u Size;
-        int64u DTS;
-        int64u DUR;
-    };
-    std::deque<demux_item> Demux_Items;
-    #endif //MEDIAINFO_DEMUX
+    const char* MuxingMode;
 
     //Constructor/Destructor
-    File_Pcm();
+    File_Adm();
+    ~File_Adm();
 
 private :
-    //Streams management
-    void Streams_Fill();
-    void Streams_Finish();
-
     //Buffer - File header
     bool FileHeader_Begin();
 
-    //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
+    //Temp
+    file_adm_private* File_Adm_Private;
 };
 
 } //NameSpace
 
 #endif
+

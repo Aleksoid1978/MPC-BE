@@ -67,6 +67,9 @@ extern const char* Hevc_profile_idc(int32u profile_idc)
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Hevc.h"
+#if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+    #include "MediaInfo/Text/File_DtvccTransport.h"
+#endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 #include <cmath>
 #include <algorithm>
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
@@ -202,12 +205,32 @@ File_Hevc::File_Hevc()
     //Specific
     RiskCalculationN=0;
     RiskCalculationD=0;
+
+    //Temporal references
+    TemporalReferences_DelayedElement=NULL;
+    TemporalReferences_Min=0;
+    TemporalReferences_Max=0;
+    TemporalReferences_Reserved=0;
+    TemporalReferences_Offset=0;
+    TemporalReferences_Offset_pic_order_cnt_lsb_Last=0;
+    TemporalReferences_pic_order_cnt_Min=0;
+    pic_order_cnt_DTS_Ref=(int64u)-1;
+
+    //Text
+    #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        GA94_03_IsPresent=false;
+        GA94_03_Parser=NULL;
+    #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 }
 
 //---------------------------------------------------------------------------
 File_Hevc::~File_Hevc()
 {
     Clean_Seq_Parameter();
+    Clean_Temp_References();
+    #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        delete GA94_03_Parser; //GA94_03_Parser=NULL;
+    #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 }
 //---------------------------------------------------------------------------
 void File_Hevc::Clean_Seq_Parameter()
@@ -222,6 +245,15 @@ void File_Hevc::Clean_Seq_Parameter()
         delete video_parameter_sets[Pos]; //video_parameter_sets[Pos]=NULL;
     video_parameter_sets.clear();
     
+}
+
+//---------------------------------------------------------------------------
+void File_Hevc::Clean_Temp_References()
+{
+    for (size_t Pos = 0; Pos<TemporalReferences.size(); Pos++)
+        delete TemporalReferences[Pos]; //TemporalReferences[Pos]=NULL;
+    TemporalReferences.clear();
+    pic_order_cnt_DTS_Ref=(int64u)-1;
 }
 
 //***************************************************************************
@@ -405,6 +437,29 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
 //---------------------------------------------------------------------------
 void File_Hevc::Streams_Finish()
 {
+    //GA94 captions
+    #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        if (GA94_03_Parser && GA94_03_Parser->Status[IsAccepted])
+        {
+            Clear(Stream_Text);
+
+            Finish(GA94_03_Parser);
+            Merge(*GA94_03_Parser);
+
+            Ztring LawRating=GA94_03_Parser->Retrieve(Stream_General, 0, General_LawRating);
+            if (!LawRating.empty())
+                Fill(Stream_General, 0, General_LawRating, LawRating, true);
+            Ztring Title=GA94_03_Parser->Retrieve(Stream_General, 0, General_Title);
+            if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+                Fill(Stream_General, 0, General_Title, Title);
+
+            for (size_t Pos=0; Pos<Count_Get(Stream_Text); Pos++)
+            {
+                Ztring MuxingMode=Retrieve(Stream_Text, Pos, "MuxingMode");
+                Fill(Stream_Text, Pos, "MuxingMode", __T("SCTE 128 / ")+MuxingMode, true);
+            }
+        }
+    #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 }
 
 //***************************************************************************
@@ -908,6 +963,22 @@ void File_Hevc::Read_Buffer_Unsynched()
     //Impossible to know TimeStamps now
     PTS_End=0;
     DTS_End=0;
+
+    //Temporal references
+    Clean_Temp_References();
+    delete TemporalReferences_DelayedElement; TemporalReferences_DelayedElement=NULL;
+    TemporalReferences_Min=0;
+    TemporalReferences_Max=0;
+    TemporalReferences_Reserved=0;
+    TemporalReferences_Offset=0;
+    TemporalReferences_Offset_pic_order_cnt_lsb_Last=0;
+    TemporalReferences_pic_order_cnt_Min=0;
+
+    //Text
+    #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        if (GA94_03_Parser)
+            GA94_03_Parser->Open_Buffer_Unsynch();
+    #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 }
 
 //***************************************************************************
@@ -1511,7 +1582,7 @@ void File_Hevc::seq_parameter_set()
     //Parsing
     seq_parameter_set_struct::vui_parameters_struct* vui_parameters_Item=NULL;
     int32u  sps_seq_parameter_set_id, chroma_format_idc, pic_width_in_luma_samples, pic_height_in_luma_samples, bit_depth_luma_minus8, bit_depth_chroma_minus8, log2_max_pic_order_cnt_lsb_minus4, num_short_term_ref_pic_sets;
-    int32u  conf_win_left_offset=0, conf_win_right_offset=0, conf_win_top_offset=0, conf_win_bottom_offset=0;
+    int32u  conf_win_left_offset=0, conf_win_right_offset=0, conf_win_top_offset=0, conf_win_bottom_offset=0, sps_max_num_reorder_pics=0;
     int8u   video_parameter_set_id, max_sub_layers_minus1;
     bool    separate_colour_plane_flag=false, sps_sub_layer_ordering_info_present_flag;
     BS_Begin();
@@ -1541,6 +1612,7 @@ void File_Hevc::seq_parameter_set()
         std::vector<seq_parameter_set_struct*>::iterator Data_Item=seq_parameter_sets.begin()+sps_seq_parameter_set_id;
         delete *Data_Item; *Data_Item=new seq_parameter_set_struct(
                                                                     NULL, //TODO: check which code is intended here
+                                                                    0,
                                                                     0,
                                                                     0,
                                                                     0,
@@ -1620,7 +1692,7 @@ void File_Hevc::seq_parameter_set()
     {
         Element_Begin1("SubLayer");
         Skip_UE(                                                "sps_max_dec_pic_buffering_minus1");
-        Skip_UE(                                                "sps_max_num_reorder_pics");
+        Get_UE (sps_max_num_reorder_pics,                       "sps_max_num_reorder_pics");
         Skip_UE(                                                "sps_max_latency_increase_plus1");
         Element_End0();
     }
@@ -1698,6 +1770,7 @@ void File_Hevc::seq_parameter_set()
                                                                     (int8u)log2_max_pic_order_cnt_lsb_minus4,
                                                                     (int8u)bit_depth_luma_minus8,
                                                                     (int8u)bit_depth_chroma_minus8,
+                                                                    (int8u)sps_max_num_reorder_pics,
                                                                     general_progressive_source_flag,
                                                                     general_interlaced_source_flag,
                                                                     general_frame_only_constraint_flag,
@@ -1710,6 +1783,29 @@ void File_Hevc::seq_parameter_set()
 
         //Autorisation of other streams
         Streams[34].Searching_Payload=true; //pic_parameter_set
+
+        //Computing values (for speed)
+        size_t MaxNumber=(int32u)std::pow(2.0, (int)((*Data_Item)->log2_max_pic_order_cnt_lsb_minus4 + 4)); // TODO
+        /*
+        switch (Data_Item_New->pic_order_cnt_type)
+        {
+            case 0 :
+                        MaxNumber=Data_Item_New->MaxPicOrderCntLsb;
+                        break;
+            case 1 :
+            case 2 :
+                        MaxNumber=Data_Item_New->MaxFrameNum*2;
+                        break;
+            default:
+                        MaxNumber = 0;
+        }
+        */
+
+        if (MaxNumber>TemporalReferences_Reserved)
+        {
+            TemporalReferences.resize(4*MaxNumber);
+            TemporalReferences_Reserved=MaxNumber;
+        }
     FILLING_ELSE();
         delete vui_parameters_Item; //vui_parameters_Item=NULL;
     FILLING_END();
@@ -2184,8 +2280,145 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5()
 
     switch (itu_t_t35_terminal_provider_code)
     {
+        case 0x0031: sei_message_user_data_registered_itu_t_t35_B5_0031(); break;
         case 0x003A: sei_message_user_data_registered_itu_t_t35_B5_003A(); break;
         case 0x003C: sei_message_user_data_registered_itu_t_t35_B5_003C(); break;
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 0031
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_0031()
+{
+    int32u Identifier;
+    Peek_B4(Identifier);
+    switch (Identifier)
+    {
+        case 0x47413934 :   sei_message_user_data_registered_itu_t_t35_B5_0031_GA94(); return;
+        default         :   if (Element_Size-Element_Offset)
+                                Skip_XX(Element_Size-Element_Offset, "Unknown");
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 0031 - GA94
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_0031_GA94()
+{
+    //Parsing
+    int8u user_data_type_code;
+    Skip_B4("GA94_identifier");
+    Get_B1(user_data_type_code, "user_data_type_code");
+    switch (user_data_type_code)
+    {
+        case 0x03: sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03(); break;
+        default: Skip_XX(Element_Size - Element_Offset, "GA94_reserved_user_data");
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 0031 - GA94 - 03
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03()
+{
+    #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        GA94_03_IsPresent=true;
+        MustExtendParsingDuration=true;
+        Buffer_TotalBytes_Fill_Max=(int64u)-1; //Disabling this feature for this format, this is done in the parser
+
+        Element_Info1("DTVCC Transport");
+
+        //Coherency
+        delete TemporalReferences_DelayedElement; TemporalReferences_DelayedElement=new temporal_reference();
+
+        TemporalReferences_DelayedElement->GA94_03=new buffer_data(Buffer+Buffer_Offset+(size_t)Element_Offset,(size_t)(Element_Size-Element_Offset));
+
+        //Parsing
+        Skip_XX(Element_Size-Element_Offset,                    "CC data");
+    #else //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        Skip_XX(Element_Size-Element_Offset,                    "DTVCC Transport data");
+    #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+}
+
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03_Delayed(int32u seq_parameter_set_id)
+{
+    // Skipping missing frames
+    if (TemporalReferences_Max-TemporalReferences_Min>(size_t)(4*(seq_parameter_sets[seq_parameter_set_id]->sps_max_num_reorder_pics+3))) // max_num_ref_frames ref frame maximum
+    {
+        size_t TemporalReferences_Min_New=TemporalReferences_Max-4*(seq_parameter_sets[seq_parameter_set_id]->sps_max_num_reorder_pics+3);
+        while (TemporalReferences_Min_New>TemporalReferences_Min && TemporalReferences[TemporalReferences_Min_New-1])
+            TemporalReferences_Min_New--;
+        TemporalReferences_Min=TemporalReferences_Min_New;
+        while (TemporalReferences[TemporalReferences_Min]==NULL)
+            TemporalReferences_Min++;
+    }
+
+    // Parsing captions
+    while (TemporalReferences[TemporalReferences_Min] && TemporalReferences_Min+2*seq_parameter_sets[seq_parameter_set_id]->sps_max_num_reorder_pics<TemporalReferences_Max)
+    {
+        #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+            Element_Begin1("Reordered DTVCC Transport");
+
+            //Parsing
+            #if MEDIAINFO_DEMUX
+                int64u Element_Code_Old=Element_Code;
+                Element_Code=0x4741393400000003LL;
+            #endif //MEDIAINFO_DEMUX
+            if (GA94_03_Parser==NULL)
+            {
+                GA94_03_Parser=new File_DtvccTransport;
+                Open_Buffer_Init(GA94_03_Parser);
+                ((File_DtvccTransport*)GA94_03_Parser)->Format=File_DtvccTransport::Format_A53_4_GA94_03;
+            }
+            if (((File_DtvccTransport*)GA94_03_Parser)->AspectRatio==0)
+            {
+                float64 PixelAspectRatio=1;
+                std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=seq_parameter_sets.begin();
+                for (; seq_parameter_set_Item!=seq_parameter_sets.end(); ++seq_parameter_set_Item)
+                    if ((*seq_parameter_set_Item))
+                        break;
+                if (seq_parameter_set_Item!=seq_parameter_sets.end())
+                {
+                    if (((*seq_parameter_set_Item)->vui_parameters) && ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_info_present_flag))
+                    {
+                        if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc<Avc_PixelAspectRatio_Size)
+                            PixelAspectRatio=Avc_PixelAspectRatio[(*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc];
+                        else if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc==0xFF && (*seq_parameter_set_Item)->vui_parameters->sar_height)
+                            PixelAspectRatio=((float64)(*seq_parameter_set_Item)->vui_parameters->sar_width)/(*seq_parameter_set_Item)->vui_parameters->sar_height;
+                    }
+                    const int32u Width =(*seq_parameter_set_Item)->pic_width_in_luma_samples;
+                    const int32u Height=(*seq_parameter_set_Item)->pic_height_in_luma_samples;
+                    if(Height)
+                        ((File_DtvccTransport*)GA94_03_Parser)->AspectRatio=Width*PixelAspectRatio/Height;
+                }
+            }
+            if (GA94_03_Parser->PTS_DTS_Needed)
+            {
+                GA94_03_Parser->FrameInfo.PCR=FrameInfo.PCR;
+                GA94_03_Parser->FrameInfo.PTS=FrameInfo.PTS;
+                GA94_03_Parser->FrameInfo.DTS=FrameInfo.DTS;
+            }
+            #if MEDIAINFO_DEMUX
+                if (TemporalReferences[TemporalReferences_Min]->GA94_03)
+                {
+                    int8u Demux_Level_Save=Demux_Level;
+                    Demux_Level=8; //Ancillary
+                    Demux(TemporalReferences[TemporalReferences_Min]->GA94_03->Data, TemporalReferences[TemporalReferences_Min]->GA94_03->Size, ContentType_MainStream);
+                    Demux_Level=Demux_Level_Save;
+                }
+                Element_Code=Element_Code_Old;
+            #endif //MEDIAINFO_DEMUX
+            if (TemporalReferences[TemporalReferences_Min]->GA94_03)
+            {
+                #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+                    GA94_03_Parser->ServiceDescriptors=ServiceDescriptors;
+                #endif
+                Open_Buffer_Continue(GA94_03_Parser, TemporalReferences[TemporalReferences_Min]->GA94_03->Data, TemporalReferences[TemporalReferences_Min]->GA94_03->Size);
+            }
+
+            Element_End0();
+        #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+
+        //TemporalReferences_Min+=((seq_parameter_sets[seq_parameter_set_id]->frame_mbs_only_flag | !TemporalReferences[TemporalReferences_Min]->IsField)?2:1);
+        TemporalReferences_Min++;
     }
 }
 
@@ -2742,6 +2975,7 @@ void File_Hevc::slice_segment_header()
             Skip_S1((*pic_parameter_set_Item)->num_extra_slice_header_bits, "slice_reserved_flags");
         Get_UE (slice_type,                                     "slice_type"); Param_Info1(Hevc_slice_type(slice_type));
     }
+
     //TODO...
     Skip_BS(Data_BS_Remain(),                                   "(ToDo)");
 
@@ -2754,17 +2988,147 @@ void File_Hevc::slice_segment_header()
             {
                 case 19 :
                 case 20 :   // This is an IDR frame
+                case 21 :
+                case 22 :
+                case 23 :
+                            TemporalReferences_Offset=TemporalReferences_Max+1;
+                            pic_order_cnt_DTS_Ref=FrameInfo.DTS;
                             if (Config->Config_PerPackage && Element_Code==0x05) // First slice of an IDR frame
                             {
                                 // IDR
                                 Config->Config_PerPackage->FrameForAlignment(this, true);
                                 Config->Config_PerPackage->IsClosedGOP(this);
                             }
-                            break;
-                default:    ; // This is not an IDR frame
             }
         }
     #endif //MEDIAINFO_EVENTS
+
+    //Saving some info
+    std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item;
+    if ((*pic_parameter_set_Item)->seq_parameter_set_id>=seq_parameter_sets.size() || (*(seq_parameter_set_Item=seq_parameter_sets.begin()+(*pic_parameter_set_Item)->seq_parameter_set_id))==NULL || (*seq_parameter_set_Item)->vui_parameters==NULL)
+        return;
+    float FrameRate=0;
+    if ((*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
+        FrameRate=(float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick;
+    else
+        FrameRate=0;
+    if (first_slice_segment_in_pic_flag && pic_order_cnt_DTS_Ref!=(int64u)-1 && FrameInfo.PTS!=(int64u)-1 && FrameRate)
+    {
+        //Frame order detection
+        int64s pic_order_cnt=float64_int64s((FrameInfo.PTS-pic_order_cnt_DTS_Ref)*FrameRate/1000000000);
+        if (pic_order_cnt<TemporalReferences_pic_order_cnt_Min)
+        {
+            if (pic_order_cnt<0)
+            {
+                size_t Base=(size_t)(TemporalReferences_Offset+TemporalReferences_pic_order_cnt_Min);
+                size_t ToInsert=(size_t)(TemporalReferences_pic_order_cnt_Min-pic_order_cnt);
+                if (Base+ToInsert>=4*TemporalReferences_Reserved || Base>=4*TemporalReferences_Reserved || ToInsert+TemporalReferences_Max>=4*TemporalReferences_Reserved || TemporalReferences_Max>=4*TemporalReferences_Reserved || TemporalReferences_Max-Base>=4*TemporalReferences_Reserved)
+                {
+                    Trusted_IsNot("Problem in temporal references");
+                    return;
+                }
+                Element_Info1(__T("Offset of ")+Ztring::ToZtring(ToInsert));
+                TemporalReferences.insert(TemporalReferences.begin()+Base, ToInsert, NULL);
+                TemporalReferences_Offset+=ToInsert;
+                TemporalReferences_Offset_pic_order_cnt_lsb_Last += ToInsert;
+                TemporalReferences_Max+=ToInsert;
+                TemporalReferences_pic_order_cnt_Min=pic_order_cnt;
+            }
+            else if (TemporalReferences_Min>(size_t)(TemporalReferences_Offset+pic_order_cnt))
+                TemporalReferences_Min=(size_t)(TemporalReferences_Offset+pic_order_cnt);
+        }
+
+        if (pic_order_cnt<0 && TemporalReferences_Offset<(size_t)(-pic_order_cnt)) //Found in playreadyEncryptedBlowUp.ts without encryption test
+        {
+            Trusted_IsNot("Problem in temporal references");
+            return;
+        }
+
+        if ((size_t)(TemporalReferences_Offset+pic_order_cnt)>=3*TemporalReferences_Reserved)
+        {
+            size_t Offset=TemporalReferences_Max-TemporalReferences_Offset;
+            if (Offset%2)
+                Offset++;
+            if (Offset>=TemporalReferences_Reserved && pic_order_cnt>=(int64s)TemporalReferences_Reserved)
+            {
+                TemporalReferences_Offset+=TemporalReferences_Reserved;
+                pic_order_cnt-=TemporalReferences_Reserved;
+                TemporalReferences_pic_order_cnt_Min-=TemporalReferences_Reserved/2;
+            }
+            while (TemporalReferences_Offset+pic_order_cnt>=3*TemporalReferences_Reserved)
+            {
+                for (size_t Pos=0; Pos<TemporalReferences_Reserved; Pos++)
+                {
+                    if (TemporalReferences[Pos])
+                    {
+                        /*
+                        if ((Pos % 2) == 0)
+                            PictureTypes_PreviousFrames+=Avc_slice_type[TemporalReferences[Pos]->slice_type];
+                        */
+                        delete TemporalReferences[Pos];
+                        TemporalReferences[Pos]=NULL;
+                    }
+                    /*
+                    else if (!PictureTypes_PreviousFrames.empty()) //Only if stream already started
+                    {
+                        if ((Pos%2)==0)
+                            PictureTypes_PreviousFrames+=' ';
+                    }
+                    */
+                }
+                /*
+                if (PictureTypes_PreviousFrames.size()>=8*TemporalReferences.size())
+                    PictureTypes_PreviousFrames.erase(PictureTypes_PreviousFrames.begin(), PictureTypes_PreviousFrames.begin()+PictureTypes_PreviousFrames.size()-TemporalReferences.size());
+                */
+                TemporalReferences.erase(TemporalReferences.begin(), TemporalReferences.begin()+TemporalReferences_Reserved);
+                TemporalReferences.resize(4*TemporalReferences_Reserved);
+                if (TemporalReferences_Reserved<TemporalReferences_Offset)
+                    TemporalReferences_Offset-=TemporalReferences_Reserved;
+                else
+                    TemporalReferences_Offset=0;
+                if (TemporalReferences_Reserved<TemporalReferences_Min)
+                    TemporalReferences_Min-=TemporalReferences_Reserved;
+                else
+                    TemporalReferences_Min=0;
+                if (TemporalReferences_Reserved<TemporalReferences_Max)
+                    TemporalReferences_Max-=TemporalReferences_Reserved;
+                else
+                    TemporalReferences_Max=0;
+                if (TemporalReferences_Reserved<TemporalReferences_Offset_pic_order_cnt_lsb_Last)
+                    TemporalReferences_Offset_pic_order_cnt_lsb_Last-=TemporalReferences_Reserved;
+                else
+                    TemporalReferences_Offset_pic_order_cnt_lsb_Last=0;
+            }
+        }
+
+        //TemporalReferences_Offset_pic_order_cnt_lsb_Diff=(int32s)((int32s)(TemporalReferences_Offset+pic_order_cnt)-TemporalReferences_Offset_pic_order_cnt_lsb_Last);
+        TemporalReferences_Offset_pic_order_cnt_lsb_Last=(size_t)(TemporalReferences_Offset+pic_order_cnt);
+        /*
+        if (field_pic_flag && (*seq_parameter_set_Item)->pic_order_cnt_type == 2 && TemporalReferences_Offset_pic_order_cnt_lsb_Last<TemporalReferences.size() && TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last])
+            TemporalReferences_Offset_pic_order_cnt_lsb_Last++;
+        */
+        if (TemporalReferences_Max<=TemporalReferences_Offset_pic_order_cnt_lsb_Last)
+            TemporalReferences_Max=TemporalReferences_Offset_pic_order_cnt_lsb_Last;//+((*seq_parameter_set_Item)->frame_mbs_only_flag?2:1);
+        if (TemporalReferences_Min>TemporalReferences_Offset_pic_order_cnt_lsb_Last)
+            TemporalReferences_Min=TemporalReferences_Offset_pic_order_cnt_lsb_Last;
+        if (TemporalReferences_DelayedElement)
+        {
+            delete TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]; TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]=TemporalReferences_DelayedElement;
+        }
+        if (TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]==NULL)
+            TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]=new temporal_reference();
+        /*
+        TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]->frame_num=frame_num;
+        TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]->slice_type=(int8u)slice_type;
+        TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]->IsTop=!bottom_field_flag;
+        TemporalReferences[TemporalReferences_Offset_pic_order_cnt_lsb_Last]->IsField=field_pic_flag;
+        */
+        if (TemporalReferences_DelayedElement)
+        {
+            TemporalReferences_DelayedElement=NULL;
+            sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03_Delayed((*pic_parameter_set_Item)->seq_parameter_set_id);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------

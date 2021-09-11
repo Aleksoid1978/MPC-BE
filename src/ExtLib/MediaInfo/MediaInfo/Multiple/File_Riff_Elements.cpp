@@ -209,6 +209,9 @@ std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask)
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
 #endif
+#if defined(MEDIAINFO_ADM_YES)
+    #include "MediaInfo/Audio/File_Adm.h"
+#endif
 #if defined(MEDIAINFO_DTS_YES)
     #include "MediaInfo/Audio/File_Dts.h"
 #endif
@@ -245,6 +248,9 @@ std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask)
 #endif //MEDIAINFO_GXF_YES
 #include <vector>
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#if defined(MEDIAINFO_ADM_YES)
+    #include <zlib.h>
+#endif
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -428,6 +434,7 @@ namespace Elements
     const int32u WAVE_adtl_note=0x6E6F7465;
     const int32u WAVE_axml=0x61786D6C;
     const int32u WAVE_bext=0x62657874;
+    const int32u WAVE_bxml=0x62786D6C;
     const int32u WAVE_cue_=0x63756520;
     const int32u WAVE_data=0x64617461;
     const int32u WAVE_dbmd=0x64626D64;
@@ -624,6 +631,8 @@ void File_Riff::Data_Parse()
         LIST(WAVE_axml)
             break;
         ATOM(WAVE_bext)
+        LIST(WAVE_bxml)
+            break;
         LIST(WAVE_data)
             break;
         ATOM(WAVE_cue_)
@@ -3609,7 +3618,80 @@ void File_Riff::WAVE_axml()
         return; //Must wait for more data
     }
 
-    Element_Name("AXML");
+    int8u* UncompressedData;
+    size_t UncompressedData_Size;
+    if (Element_Code==Elements::WAVE_bxml)
+    {
+        Element_Name("Compressed AXML");
+
+        //Header
+        int16u Version; // Maybe...
+        Get_L2 (Version,                                        "Version");
+        if (Version!=1)
+        {
+            Skip_XX(Element_Size-Element_Offset,                "Data (Unsuported)");
+            return;
+        }
+
+        //Uncompress init
+        z_stream strm;
+        strm.next_in=(Bytef*)Buffer+Buffer_Offset+2;
+        strm.avail_in=(uInt)Element_Size-2;
+        strm.next_out=NULL;
+        strm.avail_out=0;
+        strm.total_out=0;
+        strm.zalloc=Z_NULL;
+        strm.zfree=Z_NULL;
+        inflateInit2(&strm, 15+16); // 15 + 16 are magic values for gzip
+
+        //Prepare out
+        strm.avail_out=0x10000; //Blocks of 64 KiB, arbitrary chosen, as a begin
+        strm.next_out=(Bytef*)new Bytef[strm.avail_out];
+
+        //Parse compressed data, with handling of the case the output buffer is not big enough
+        for (;;)
+        {
+            //inflate
+            int inflate_Result=inflate(&strm, Z_NO_FLUSH);
+            if (inflate_Result<0)
+                break;
+
+            //Check if we need to stop
+            if (strm.avail_out || inflate_Result)
+                break;
+
+            //Need to increase buffer
+            size_t UncompressedData_NewMaxSize=strm.total_out*4;
+            int8u* UncompressedData_New=new int8u[UncompressedData_NewMaxSize];
+            memcpy(UncompressedData_New, strm.next_out-strm.total_out, strm.total_out);
+            delete[] (strm.next_out-strm.total_out); strm.next_out=UncompressedData_New;
+            strm.next_out=strm.next_out+strm.total_out;
+            strm.avail_out=UncompressedData_NewMaxSize-strm.total_out;
+        }
+        UncompressedData=strm.next_out-strm.total_out;
+        UncompressedData_Size=strm.total_out;
+    }
+    else
+    {
+        Element_Name("AXML");
+
+        UncompressedData=(int8u*)Buffer+Buffer_Offset;
+        UncompressedData_Size=(size_t)Element_Size;
+    }
+
+    //Creating the parser
+    File_Adm MI;
+
+    //Parsing
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI, UncompressedData, UncompressedData_Size);
+
+    //Filling
+    Finish(&MI);
+    if (!Count_Get(Stream_Audio))
+        Stream_Prepare(Stream_Audio);
+    Merge(MI, Stream_Audio, 0, 0);
+    return;
 
     //Parsing
     Skip_UTF8(Element_Size,                                     "XML data");
@@ -3618,7 +3700,7 @@ void File_Riff::WAVE_axml()
     bool IsEbuCore_not_2014_or_2016 = false;
 
     XMLDocument Document;
-    if (Document.Parse((const char*)Buffer+Buffer_Offset, (size_t)Element_Size))
+    if (Document.Parse((const char*)UncompressedData, UncompressedData_Size))
         return;
 
     XMLElement* format=NULL;
@@ -4257,11 +4339,11 @@ void File_Riff::Parser_Pcm(stream& StreamItem, int16u Channels, int16u BitsPerSa
         #endif //MEDIAINFO_DEMUX
         StreamItem.Parsers.push_back(Parser);
     }
-    if (Channels>2 && BitsPerSample<=32 && SamplesPerSec==48000) //Some SMPTE ST 337 streams are hidden in PCM stream
+    if (Channels>=2 && BitsPerSample<=32 && SamplesPerSec==48000) //Some SMPTE ST 337 streams are hidden in PCM stream
     {
         File_ChannelSplitting* Parser=new File_ChannelSplitting;
         Parser->BitDepth=(int8u)BitsPerSample;
-        Parser->Endianness='B';
+        Parser->Endianness=Endianness;
         Parser->Channel_Total=(int8u)Channels;
         Parser->ShouldContinueParsing=true;
         Parser->SamplingRate=48000;

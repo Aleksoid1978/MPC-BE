@@ -1144,6 +1144,8 @@ void File_Ac4::Streams_Fill()
     //Filling
     if (!Presentations.empty())
         Fill(Stream_Audio, 0, "NumberOfPresentations", Presentations.size());
+    if (!Groups.empty() && bitstream_version>=2)
+        Fill(Stream_Audio, 0, "NumberOfGroups", Groups.size());
     if (!AudioSubstreams.empty())
         Fill(Stream_Audio, 0, "NumberOfSubstreams", AudioSubstreams.size());
 

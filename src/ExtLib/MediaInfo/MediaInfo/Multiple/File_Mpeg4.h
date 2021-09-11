@@ -382,6 +382,7 @@ private :
     int32u                                  Vendor;
     Ztring                                  Vendor_Version;
     Ztring                                  DisplayAspectRatio;
+    Ztring                                  FrameRate_Real;
     int64u                                  FirstMdatPos;
     int64u                                  LastMdatPos; //This is the position of the byte after the last byte of mdat
     int64u                                  FirstMoovPos;

@@ -217,6 +217,7 @@ private :
         int8u   log2_max_pic_order_cnt_lsb_minus4;
         int8u   bit_depth_luma_minus8;
         int8u   bit_depth_chroma_minus8;
+        int8u   sps_max_num_reorder_pics;
         bool    general_progressive_source_flag;
         bool    general_interlaced_source_flag;
         bool    general_frame_only_constraint_flag;
@@ -229,7 +230,7 @@ private :
         int8u   ChromaArrayType() {return separate_colour_plane_flag?0:chroma_format_idc;}
 
         //Constructor/Destructor
-        seq_parameter_set_struct(vui_parameters_struct* vui_parameters_, int32u profile_space_, bool tier_flag_, int32u profile_idc_, int32u level_idc_, int32u pic_width_in_luma_samples_, int32u pic_height_in_luma_samples_, int32u conf_win_left_offset_, int32u conf_win_right_offset_, int32u conf_win_top_offset_, int32u conf_win_bottom_offset_, int8u video_parameter_set_id_, int8u chroma_format_idc_, bool separate_colour_plane_flag_, int8u log2_max_pic_order_cnt_lsb_minus4_, int8u bit_depth_luma_minus8_, int8u bit_depth_chroma_minus8_, bool general_progressive_source_flag_, bool general_interlaced_source_flag_, bool general_frame_only_constraint_flag_, bool general_max_8bit_constraint_flag_)
+        seq_parameter_set_struct(vui_parameters_struct* vui_parameters_, int32u profile_space_, bool tier_flag_, int32u profile_idc_, int32u level_idc_, int32u pic_width_in_luma_samples_, int32u pic_height_in_luma_samples_, int32u conf_win_left_offset_, int32u conf_win_right_offset_, int32u conf_win_top_offset_, int32u conf_win_bottom_offset_, int8u video_parameter_set_id_, int8u chroma_format_idc_, bool separate_colour_plane_flag_, int8u log2_max_pic_order_cnt_lsb_minus4_, int8u bit_depth_luma_minus8_, int8u bit_depth_chroma_minus8_, int8u sps_max_num_reorder_pics_, bool general_progressive_source_flag_, bool general_interlaced_source_flag_, bool general_frame_only_constraint_flag_, bool general_max_8bit_constraint_flag_)
             :
             vui_parameters(vui_parameters_),
             #if MEDIAINFO_DEMUX
@@ -252,6 +253,7 @@ private :
             log2_max_pic_order_cnt_lsb_minus4(log2_max_pic_order_cnt_lsb_minus4_),
             bit_depth_luma_minus8(bit_depth_luma_minus8_),
             bit_depth_chroma_minus8(bit_depth_chroma_minus8_),
+            sps_max_num_reorder_pics(sps_max_num_reorder_pics_),
             general_progressive_source_flag(general_progressive_source_flag_),
             general_interlaced_source_flag(general_interlaced_source_flag_),
             general_frame_only_constraint_flag(general_frame_only_constraint_flag_),
@@ -360,6 +362,10 @@ private :
     void sei_message_pic_timing(int32u &seq_parameter_set_id, int32u payloadSize);
     void sei_message_user_data_registered_itu_t_t35();
     void sei_message_user_data_registered_itu_t_t35_B5();
+    void sei_message_user_data_registered_itu_t_t35_B5_0031();
+    void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94();
+    void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03();
+    void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03_Delayed(int32u seq_parameter_set_id);
     void sei_message_user_data_registered_itu_t_t35_B5_003A();
     void sei_message_user_data_registered_itu_t_t35_B5_003A_00();
     void sei_message_user_data_registered_itu_t_t35_B5_003A_02();
@@ -394,6 +400,51 @@ private :
     size_t RiskCalculationD;
 
     vector<stream_payload> Streams;
+
+    //Temporal references
+    struct temporal_reference
+    {
+        #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+            buffer_data* GA94_03;
+        #endif //MEDIAINFO_DTVCCTRANSPORT_YES
+
+        int32u frame_num;
+        int8u  slice_type;
+        bool   IsTop;
+        bool   IsField;
+
+        temporal_reference()
+        {
+            #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+                GA94_03=NULL;
+            #endif //MEDIAINFO_DTVCCTRANSPORT_YES
+            slice_type=(int8u)-1;
+        }
+
+        ~temporal_reference()
+        {
+            #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+                delete GA94_03; //GA94_03=NULL;
+            #endif //MEDIAINFO_DTVCCTRANSPORT_YES
+        }
+    };
+    typedef vector<temporal_reference*> temporal_references;
+    temporal_references                 TemporalReferences; //per pic_order_cnt_lsb
+    void Clean_Temp_References();
+    temporal_reference*                 TemporalReferences_DelayedElement;
+    size_t                              TemporalReferences_Min;
+    size_t                              TemporalReferences_Max;
+    size_t                              TemporalReferences_Reserved;
+    size_t                              TemporalReferences_Offset;
+    size_t                              TemporalReferences_Offset_pic_order_cnt_lsb_Last;
+    int64s                              TemporalReferences_pic_order_cnt_Min;
+    int64u                              pic_order_cnt_DTS_Ref;
+
+    //Text
+    #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+        File__Analyze*                  GA94_03_Parser;
+        bool                            GA94_03_IsPresent;
+    #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 
     //Replacement of File__Analyze buffer
     const int8u*                        Buffer_ToSave;
