@@ -302,7 +302,6 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
    if (buffer != NULL && new_size > png_ptr->read_buffer_size)
    {
       png_ptr->read_buffer = NULL;
-      png_ptr->read_buffer = NULL;
       png_ptr->read_buffer_size = 0;
       png_free(png_ptr, buffer);
       buffer = NULL;
@@ -2079,7 +2078,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (i == 1 && buf[0] != 'M' && buf[0] != 'I'
                  && info_ptr->eXIf_buf[0] != buf[0])
       {
-         png_crc_finish(png_ptr, length);
+         png_crc_finish(png_ptr, length-i-1);
          png_chunk_benign_error(png_ptr, "incorrect byte-order specifier");
          png_free(png_ptr, info_ptr->eXIf_buf);
          info_ptr->eXIf_buf = NULL;
