@@ -29,6 +29,7 @@
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "internal.h"
+#include "pthread_internal.h"
 #include "thread.h"
 
 #define MAX_THREADS 64
@@ -52,6 +53,7 @@ typedef struct{
     pthread_mutex_t task_fifo_mutex; /* Used to guard (next_)task_index */
     pthread_cond_t task_fifo_cond;
 
+    unsigned pthread_init_cnt;
     unsigned max_tasks;
     Task tasks[BUFFER_SIZE];
     pthread_mutex_t finished_task_mutex; /* Guards tasks[i].finished */
@@ -64,6 +66,12 @@ typedef struct{
     pthread_t worker[MAX_THREADS];
     atomic_int exit;
 } ThreadContext;
+
+#define OFF(member) offsetof(ThreadContext, member)
+DEFINE_OFFSET_ARRAY(ThreadContext, thread_ctx, pthread_init_cnt,
+                    (OFF(buffer_mutex), OFF(task_fifo_mutex), OFF(finished_task_mutex)),
+                    (OFF(task_fifo_cond), OFF(finished_task_cond)));
+#undef OFF
 
 static void * attribute_align_arg worker(void *v){
     AVCodecContext *avctx = v;
@@ -122,11 +130,12 @@ end:
     return NULL;
 }
 
-int ff_frame_thread_encoder_init(AVCodecContext *avctx)
+av_cold int ff_frame_thread_encoder_init(AVCodecContext *avctx)
 {
     int i=0;
     ThreadContext *c;
-
+    AVCodecContext *thread_avctx = NULL;
+    int ret;
 
     if(   !(avctx->thread_type & FF_THREAD_FRAME)
        || !(avctx->codec->capabilities & AV_CODEC_CAP_FRAME_THREADS))
@@ -185,46 +194,49 @@ int ff_frame_thread_encoder_init(AVCodecContext *avctx)
 
     c->parent_avctx = avctx;
 
-    pthread_mutex_init(&c->task_fifo_mutex, NULL);
-    pthread_mutex_init(&c->finished_task_mutex, NULL);
-    pthread_mutex_init(&c->buffer_mutex, NULL);
-    pthread_cond_init(&c->task_fifo_cond, NULL);
-    pthread_cond_init(&c->finished_task_cond, NULL);
+    ret = ff_pthread_init(c, thread_ctx_offsets);
+    if (ret < 0)
+        goto fail;
     atomic_init(&c->exit, 0);
 
     c->max_tasks = avctx->thread_count + 2;
-    for (unsigned i = 0; i < c->max_tasks; i++) {
-        if (!(c->tasks[i].indata  = av_frame_alloc()) ||
-            !(c->tasks[i].outdata = av_packet_alloc()))
+    for (unsigned j = 0; j < c->max_tasks; j++) {
+        if (!(c->tasks[j].indata  = av_frame_alloc()) ||
+            !(c->tasks[j].outdata = av_packet_alloc())) {
+            ret = AVERROR(ENOMEM);
             goto fail;
+        }
     }
 
     for(i=0; i<avctx->thread_count ; i++){
-        int ret;
         void *tmpv;
-        AVCodecContext *thread_avctx = avcodec_alloc_context3(avctx->codec);
-        if(!thread_avctx)
+        thread_avctx = avcodec_alloc_context3(avctx->codec);
+        if (!thread_avctx) {
+            ret = AVERROR(ENOMEM);
             goto fail;
+        }
         tmpv = thread_avctx->priv_data;
         *thread_avctx = *avctx;
+        thread_avctx->priv_data = tmpv;
+        thread_avctx->internal = NULL;
+        thread_avctx->hw_frames_ctx = NULL;
         ret = av_opt_copy(thread_avctx, avctx);
         if (ret < 0)
             goto fail;
-        thread_avctx->priv_data = tmpv;
-        thread_avctx->internal = NULL;
         if (avctx->codec->priv_class) {
-            int ret = av_opt_copy(thread_avctx->priv_data, avctx->priv_data);
+            ret = av_opt_copy(thread_avctx->priv_data, avctx->priv_data);
             if (ret < 0)
                 goto fail;
         }
         thread_avctx->thread_count = 1;
         thread_avctx->active_thread_type &= ~FF_THREAD_FRAME;
 
-        if (avcodec_open2(thread_avctx, avctx->codec, NULL) < 0)
+        if ((ret = avcodec_open2(thread_avctx, avctx->codec, NULL)) < 0)
             goto fail;
         av_assert0(!thread_avctx->internal->frame_thread_encoder);
         thread_avctx->internal->frame_thread_encoder = c;
-        if(pthread_create(&c->worker[i], NULL, worker, thread_avctx)) {
+        if ((ret = pthread_create(&c->worker[i], NULL, worker, thread_avctx))) {
+            ret = AVERROR(ret);
             goto fail;
         }
     }
@@ -233,23 +245,29 @@ int ff_frame_thread_encoder_init(AVCodecContext *avctx)
 
     return 0;
 fail:
+    avcodec_close(thread_avctx);
+    av_freep(&thread_avctx);
     avctx->thread_count = i;
     av_log(avctx, AV_LOG_ERROR, "ff_frame_thread_encoder_init failed\n");
     ff_frame_thread_encoder_free(avctx);
-    return -1;
+    return ret;
 }
 
-void ff_frame_thread_encoder_free(AVCodecContext *avctx){
-    int i;
+av_cold void ff_frame_thread_encoder_free(AVCodecContext *avctx)
+{
     ThreadContext *c= avctx->internal->frame_thread_encoder;
 
-    pthread_mutex_lock(&c->task_fifo_mutex);
-    atomic_store(&c->exit, 1);
-    pthread_cond_broadcast(&c->task_fifo_cond);
-    pthread_mutex_unlock(&c->task_fifo_mutex);
+    /* In case initializing the mutexes/condition variables failed,
+     * they must not be used. In this case the thread_count is zero
+     * as no thread has been initialized yet. */
+    if (avctx->thread_count > 0) {
+        pthread_mutex_lock(&c->task_fifo_mutex);
+        atomic_store(&c->exit, 1);
+        pthread_cond_broadcast(&c->task_fifo_cond);
+        pthread_mutex_unlock(&c->task_fifo_mutex);
 
-    for (i=0; i<avctx->thread_count; i++) {
-         pthread_join(c->worker[i], NULL);
+        for (int i = 0; i < avctx->thread_count; i++)
+            pthread_join(c->worker[i], NULL);
     }
 
     for (unsigned i = 0; i < c->max_tasks; i++) {
@@ -257,11 +275,7 @@ void ff_frame_thread_encoder_free(AVCodecContext *avctx){
         av_packet_free(&c->tasks[i].outdata);
     }
 
-    pthread_mutex_destroy(&c->task_fifo_mutex);
-    pthread_mutex_destroy(&c->finished_task_mutex);
-    pthread_mutex_destroy(&c->buffer_mutex);
-    pthread_cond_destroy(&c->task_fifo_cond);
-    pthread_cond_destroy(&c->finished_task_cond);
+    ff_pthread_free(c, thread_ctx_offsets);
     av_freep(&avctx->internal->frame_thread_encoder);
 }
 

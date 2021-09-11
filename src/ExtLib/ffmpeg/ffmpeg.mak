@@ -264,6 +264,7 @@ SRCS_LC = \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
 	libavcodec/h2645_parse.c \
+	libavcodec/h274.c \
 	libavcodec/hap.c \
 	libavcodec/hapdec.c \
 	libavcodec/hevc_cabac.c \

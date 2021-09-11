@@ -42,7 +42,7 @@ Updated Ukrainian translation (by arestarh1986).
 Updated libraries:
 	dav1d git-0.9.1-6-gb342445;
 	Detours git-v4.0.1-96-g45a76a3;
-	ffmpeg git-n4.5-dev-1460-gb9176dbfb7;
+	ffmpeg git-n4.5-dev-1945-g966fc3c070;
 	libflac git-1.3.3-85-gb358381a;
 	libpng git-v1.6.37-36-ga37d48365;
 	Little-CMS git-2.12-39-gc07b7e3;

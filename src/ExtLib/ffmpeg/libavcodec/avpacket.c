@@ -26,6 +26,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
+#include "libavutil/rational.h"
 
 #include "bytestream.h"
 #include "internal.h"
@@ -44,6 +45,9 @@ void av_init_packet(AVPacket *pkt)
     pkt->buf                  = NULL;
     pkt->side_data            = NULL;
     pkt->side_data_elems      = 0;
+    pkt->opaque               = NULL;
+    pkt->opaque_ref           = NULL;
+    pkt->time_base            = av_make_q(0, 1);
 }
 #endif
 
@@ -54,6 +58,7 @@ static void get_packet_defaults(AVPacket *pkt)
     pkt->pts             = AV_NOPTS_VALUE;
     pkt->dts             = AV_NOPTS_VALUE;
     pkt->pos             = -1;
+    pkt->time_base       = av_make_q(0, 1);
 }
 
 AVPacket *av_packet_alloc(void)
@@ -374,7 +379,7 @@ int av_packet_shrink_side_data(AVPacket *pkt, enum AVPacketSideDataType type,
 
 int av_packet_copy_props(AVPacket *dst, const AVPacket *src)
 {
-    int i;
+    int i, ret;
 
     dst->pts                  = src->pts;
     dst->dts                  = src->dts;
@@ -382,9 +387,16 @@ int av_packet_copy_props(AVPacket *dst, const AVPacket *src)
     dst->duration             = src->duration;
     dst->flags                = src->flags;
     dst->stream_index         = src->stream_index;
-
+    dst->opaque               = src->opaque;
+    dst->time_base            = src->time_base;
+    dst->opaque_ref           = NULL;
     dst->side_data            = NULL;
     dst->side_data_elems      = 0;
+
+    ret = av_buffer_replace(&dst->opaque_ref, src->opaque_ref);
+    if (ret < 0)
+        return ret;
+
     for (i = 0; i < src->side_data_elems; i++) {
         enum AVPacketSideDataType type = src->side_data[i].type;
         size_t size = src->side_data[i].size;
@@ -392,6 +404,7 @@ int av_packet_copy_props(AVPacket *dst, const AVPacket *src)
         uint8_t *dst_data = av_packet_new_side_data(dst, type, size);
 
         if (!dst_data) {
+            av_buffer_unref(&dst->opaque_ref);
             av_packet_free_side_data(dst);
             return AVERROR(ENOMEM);
         }
@@ -404,6 +417,7 @@ int av_packet_copy_props(AVPacket *dst, const AVPacket *src)
 void av_packet_unref(AVPacket *pkt)
 {
     av_packet_free_side_data(pkt);
+    av_buffer_unref(&pkt->opaque_ref);
     av_buffer_unref(&pkt->buf);
     get_packet_defaults(pkt);
 }

@@ -146,8 +146,6 @@ typedef struct BiquadsContext {
 static int query_formats(AVFilterContext *ctx)
 {
     BiquadsContext *s = ctx->priv;
-    AVFilterFormats *formats;
-    AVFilterChannelLayouts *layouts;
     static const enum AVSampleFormat auto_sample_fmts[] = {
         AV_SAMPLE_FMT_S16P,
         AV_SAMPLE_FMT_S32P,
@@ -159,46 +157,33 @@ static int query_formats(AVFilterContext *ctx)
         AV_SAMPLE_FMT_S16P,
         AV_SAMPLE_FMT_NONE
     };
-    int ret;
-
-    layouts = ff_all_channel_counts();
-    if (!layouts)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_channel_layouts(ctx, layouts);
+    const enum AVSampleFormat *sample_fmts_list = sample_fmts;
+    int ret = ff_set_common_all_channel_counts(ctx);
     if (ret < 0)
         return ret;
 
     switch (s->precision) {
     case 0:
         sample_fmts[0] = AV_SAMPLE_FMT_S16P;
-        formats = ff_make_format_list(sample_fmts);
         break;
     case 1:
         sample_fmts[0] = AV_SAMPLE_FMT_S32P;
-        formats = ff_make_format_list(sample_fmts);
         break;
     case 2:
         sample_fmts[0] = AV_SAMPLE_FMT_FLTP;
-        formats = ff_make_format_list(sample_fmts);
         break;
     case 3:
         sample_fmts[0] = AV_SAMPLE_FMT_DBLP;
-        formats = ff_make_format_list(sample_fmts);
         break;
     default:
-        formats = ff_make_format_list(auto_sample_fmts);
+        sample_fmts_list = auto_sample_fmts;
         break;
     }
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ret = ff_set_common_formats(ctx, formats);
+    ret = ff_set_common_formats_from_list(ctx, sample_fmts_list);
     if (ret < 0)
         return ret;
 
-    formats = ff_all_samplerates();
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
+    return ff_set_common_all_samplerates(ctx);
 }
 
 #define BIQUAD_FILTER(name, type, min, max, need_clipping)                    \
@@ -812,7 +797,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *buf)
 
     td.in = buf;
     td.out = out_buf;
-    ctx->internal->execute(ctx, filter_channel, &td, NULL, FFMIN(outlink->channels, ff_filter_get_nb_threads(ctx)));
+    ff_filter_execute(ctx, filter_channel, &td, NULL,
+                      FFMIN(outlink->channels, ff_filter_get_nb_threads(ctx)));
 
     for (ch = 0; ch < outlink->channels; ch++) {
         if (s->cache[ch].clippings > 0)
@@ -853,7 +839,6 @@ static const AVFilterPad inputs[] = {
         .type         = AVMEDIA_TYPE_AUDIO,
         .filter_frame = filter_frame,
     },
-    { NULL }
 };
 
 static const AVFilterPad outputs[] = {
@@ -862,7 +847,6 @@ static const AVFilterPad outputs[] = {
         .type         = AVMEDIA_TYPE_AUDIO,
         .config_props = config_output,
     },
-    { NULL }
 };
 
 #define OFFSET(x) offsetof(BiquadsContext, x)
@@ -885,8 +869,8 @@ const AVFilter ff_af_##name_ = {                               \
     .init          = name_##_init,                       \
     .uninit        = uninit,                             \
     .query_formats = query_formats,                      \
-    .inputs        = inputs,                             \
-    .outputs       = outputs,                            \
+    FILTER_INPUTS(inputs),                               \
+    FILTER_OUTPUTS(outputs),                             \
     .priv_class    = &name_##_class,                     \
     .process_command = process_command,                  \
     .flags         = AVFILTER_FLAG_SLICE_THREADS | AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL, \

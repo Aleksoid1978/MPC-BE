@@ -444,7 +444,9 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
         // the last byte of the extradata is a version number, 1 for the
         // samples we can decode
 
-        init_get_bits(&gb, avctx->extradata, avctx->extradata_size*8);
+        ret = init_get_bits8(&gb, avctx->extradata, avctx->extradata_size);
+        if (ret < 0)
+            return ret;
 
         if ((ret = ff_vc1_decode_sequence_header(avctx, v, &gb)) < 0)
           return ret;
@@ -770,8 +772,11 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             buf_size2 = vc1_unescape_buffer(buf, buf_size, buf2);
         }
         init_get_bits(&s->gb, buf2, buf_size2*8);
-    } else
-        init_get_bits(&s->gb, buf, buf_size*8);
+    } else{
+        ret = init_get_bits8(&s->gb, buf, buf_size);
+        if (ret < 0)
+            return ret;
+    }
 
     if (v->res_sprite) {
         v->new_sprite  = !get_bits1(&s->gb);
@@ -1132,7 +1137,9 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             ret = AVERROR_INVALIDDATA;
             goto err;
         }
-        if (!v->field_mode)
+        if (   !v->field_mode
+            && avctx->codec_id != AV_CODEC_ID_WMV3IMAGE
+            && avctx->codec_id != AV_CODEC_ID_VC1IMAGE)
             ff_er_frame_end(&s->er);
     }
 
@@ -1160,12 +1167,14 @@ image:
         if (s->pict_type == AV_PICTURE_TYPE_B || s->low_delay) {
             if ((ret = av_frame_ref(pict, s->current_picture_ptr->f)) < 0)
                 goto err;
-            ff_print_debug_info(s, s->current_picture_ptr, pict);
+            if (!v->field_mode)
+                ff_print_debug_info(s, s->current_picture_ptr, pict);
             *got_frame = 1;
         } else if (s->last_picture_ptr) {
             if ((ret = av_frame_ref(pict, s->last_picture_ptr->f)) < 0)
                 goto err;
-            ff_print_debug_info(s, s->last_picture_ptr, pict);
+            if (!v->field_mode)
+                ff_print_debug_info(s, s->last_picture_ptr, pict);
             *got_frame = 1;
         }
     }

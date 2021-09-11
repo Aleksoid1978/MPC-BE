@@ -70,11 +70,15 @@ typedef struct AVFilterPad     AVFilterPad;
 typedef struct AVFilterFormats AVFilterFormats;
 typedef struct AVFilterChannelLayouts AVFilterChannelLayouts;
 
+#if FF_API_PAD_COUNT
 /**
- * Get the number of elements in a NULL-terminated array of AVFilterPads (e.g.
- * AVFilter.inputs/outputs).
+ * Get the number of elements in an AVFilter's inputs or outputs array.
+ *
+ * @deprecated Use avfilter_filter_pad_count() instead.
  */
+attribute_deprecated
 int avfilter_pad_count(const AVFilterPad *pads);
+#endif
 
 /**
  * Get the name of an AVFilterPad.
@@ -156,15 +160,16 @@ typedef struct AVFilter {
     const char *description;
 
     /**
-     * List of inputs, terminated by a zeroed element.
+     * List of static inputs.
      *
      * NULL if there are no (static) inputs. Instances of filters with
      * AVFILTER_FLAG_DYNAMIC_INPUTS set may have more inputs than present in
      * this list.
      */
     const AVFilterPad *inputs;
+
     /**
-     * List of outputs, terminated by a zeroed element.
+     * List of static outputs.
      *
      * NULL if there are no (static) outputs. Instances of filters with
      * AVFILTER_FLAG_DYNAMIC_OUTPUTS set may have more outputs than present in
@@ -194,6 +199,16 @@ typedef struct AVFilter {
      * New public fields should be added right above.
      *****************************************************************
      */
+
+    /**
+     * The number of entries in the list of inputs.
+     */
+    uint16_t nb_inputs;
+
+    /**
+     * The number of entries in the list of outputs.
+     */
+    uint16_t nb_outputs;
 
     /**
      * Filter pre-initialization function
@@ -301,13 +316,6 @@ typedef struct AVFilter {
     int (*process_command)(AVFilterContext *, const char *cmd, const char *arg, char *res, int res_len, int flags);
 
     /**
-     * Filter initialization function, alternative to the init()
-     * callback. Args contains the user-supplied parameters, opaque is
-     * used for providing binary data.
-     */
-    int (*init_opaque)(AVFilterContext *ctx, void *opaque);
-
-    /**
      * Filter activation function.
      *
      * Called when any processing is needed from the filter, instead of any
@@ -321,6 +329,11 @@ typedef struct AVFilter {
      */
     int (*activate)(AVFilterContext *ctx);
 } AVFilter;
+
+/**
+ * Get the number of elements in an AVFilter's inputs or outputs array.
+ */
+unsigned avfilter_filter_pad_count(const AVFilter *filter, int is_output);
 
 /**
  * Process multiple parts of the frame concurrently.
@@ -549,19 +562,8 @@ struct AVFilterLink {
     AVRational frame_rate;
 
     /**
-     * Buffer partially filled with samples to achieve a fixed/minimum size.
-     */
-    AVFrame *partial_buf;
-
-    /**
-     * Size of the partial buffer to allocate.
-     * Must be between min_samples and max_samples.
-     */
-    int partial_buf_size;
-
-    /**
      * Minimum number of samples to filter at once. If filter_frame() is
-     * called with fewer samples, it will accumulate them in partial_buf.
+     * called with fewer samples, it will accumulate them in fifo.
      * This field and the related ones must not be changed after filtering
      * has started.
      * If 0, all related fields are ignored.
@@ -583,6 +585,11 @@ struct AVFilterLink {
      * Number of past frames sent through the link.
      */
     int64_t frame_count_in, frame_count_out;
+
+    /**
+     * Number of past samples sent through the link.
+     */
+    int64_t sample_count_in, sample_count_out;
 
     /**
      * A pointer to a FFFramePool struct.

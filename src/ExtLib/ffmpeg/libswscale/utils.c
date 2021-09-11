@@ -49,6 +49,7 @@
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
+#include "libavutil/slicethread.h"
 #include "libavutil/thread.h"
 #include "libavutil/aarch64/cpu.h"
 #include "libavutil/ppc/cpu.h"
@@ -871,6 +872,18 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
     const AVPixFmtDescriptor *desc_src;
     int need_reinit = 0;
 
+    if (c->nb_slice_ctx) {
+        for (int i = 0; i < c->nb_slice_ctx; i++) {
+            int ret = sws_setColorspaceDetails(c->slice_ctx[i], inv_table,
+                                               srcRange, table, dstRange,
+                                               brightness, contrast, saturation);
+            if (ret < 0)
+                return ret;
+        }
+
+        return 0;
+    }
+
     handle_formats(c);
     desc_dst = av_pix_fmt_desc_get(c->dstFormat);
     desc_src = av_pix_fmt_desc_get(c->srcFormat);
@@ -1004,6 +1017,12 @@ int sws_getColorspaceDetails(struct SwsContext *c, int **inv_table,
 {
     if (!c )
         return -1;
+
+    if (c->nb_slice_ctx) {
+        return sws_getColorspaceDetails(c->slice_ctx[0], inv_table, srcRange,
+                                        table, dstRange, brightness, contrast,
+                                        saturation);
+    }
 
     *inv_table  = c->srcColorspaceTable;
     *table      = c->dstColorspaceTable;
@@ -1170,6 +1189,58 @@ static enum AVPixelFormat alphaless_fmt(enum AVPixelFormat fmt)
     }
 }
 
+static int context_init_threaded(SwsContext *c,
+                                 SwsFilter *src_filter, SwsFilter *dst_filter)
+{
+    int ret;
+
+    ret = avpriv_slicethread_create(&c->slicethread, (void*)c,
+                                    ff_sws_slice_worker, NULL, c->nb_threads);
+    if (ret == AVERROR(ENOSYS)) {
+        c->nb_threads = 1;
+        return 0;
+    } else if (ret < 0)
+        return ret;
+
+    c->nb_threads = ret;
+
+    c->slice_ctx = av_mallocz_array(c->nb_threads, sizeof(*c->slice_ctx));
+    c->slice_err = av_mallocz_array(c->nb_threads, sizeof(*c->slice_err));
+    if (!c->slice_ctx || !c->slice_err)
+        return AVERROR(ENOMEM);
+
+    for (int i = 0; i < c->nb_threads; i++) {
+        c->slice_ctx[i] = sws_alloc_context();
+        if (!c->slice_ctx[i])
+            return AVERROR(ENOMEM);
+
+        ret = av_opt_copy((void*)c->slice_ctx[i], (void*)c);
+        if (ret < 0)
+            return ret;
+
+        c->slice_ctx[i]->nb_threads = 1;
+
+        ret = sws_init_context(c->slice_ctx[i], src_filter, dst_filter);
+        if (ret < 0)
+            return ret;
+
+        c->nb_slice_ctx++;
+
+        if (c->slice_ctx[i]->dither == SWS_DITHER_ED) {
+            av_log(c, AV_LOG_VERBOSE,
+                   "Error-diffusion dither is in use, scaling will be single-threaded.");
+            break;
+        }
+    }
+
+    c->frame_src = av_frame_alloc();
+    c->frame_dst = av_frame_alloc();
+    if (!c->frame_src || !c->frame_dst)
+        return AVERROR(ENOMEM);
+
+    return 0;
+}
+
 av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
                              SwsFilter *dstFilter)
 {
@@ -1191,6 +1262,13 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
     enum AVPixelFormat tmpFmt;
     static const float float_mult = 1.0f / 255.0f;
     static AVOnce rgb2rgb_once = AV_ONCE_INIT;
+
+    if (c->nb_threads != 1) {
+        ret = context_init_threaded(c, srcFilter, dstFilter);
+        if (ret < 0 || c->nb_threads > 1)
+            return ret;
+        // threading disabled in this build, init as single-threaded
+    }
 
     cpu_flags = av_get_cpu_flags();
     flags     = c->flags;
@@ -1299,6 +1377,8 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
 
     av_pix_fmt_get_chroma_sub_sample(srcFormat, &c->chrSrcHSubSample, &c->chrSrcVSubSample);
     av_pix_fmt_get_chroma_sub_sample(dstFormat, &c->chrDstHSubSample, &c->chrDstVSubSample);
+
+    c->dst_slice_align = 1 << c->chrDstVSubSample;
 
     if (isAnyRGB(dstFormat) && !(flags&SWS_FULL_CHR_H_INT)) {
         if (dstW&1) {
@@ -1422,6 +1502,11 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
     c->chrDstH = AV_CEIL_RSHIFT(dstH, c->chrDstVSubSample);
 
     if (!FF_ALLOCZ_TYPED_ARRAY(c->formatConvBuffer, FFALIGN(srcW * 2 + 78, 16) * 2))
+        goto nomem;
+
+    c->frame_src = av_frame_alloc();
+    c->frame_dst = av_frame_alloc();
+    if (!c->frame_src || !c->frame_dst)
         goto nomem;
 
     c->srcBpc = desc_src->comp[0].depth;
@@ -2247,8 +2332,20 @@ void sws_freeContext(SwsContext *c)
     if (!c)
         return;
 
+    for (i = 0; i < c->nb_slice_ctx; i++)
+        sws_freeContext(c->slice_ctx[i]);
+    av_freep(&c->slice_ctx);
+    av_freep(&c->slice_err);
+
+    avpriv_slicethread_free(&c->slicethread);
+
     for (i = 0; i < 4; i++)
         av_freep(&c->dither_error[i]);
+
+    av_frame_free(&c->frame_src);
+    av_frame_free(&c->frame_dst);
+
+    av_freep(&c->src_ranges.ranges);
 
     av_freep(&c->vLumFilter);
     av_freep(&c->vChrFilter);
@@ -2363,4 +2460,64 @@ struct SwsContext *sws_getCachedContext(struct SwsContext *context, int srcW,
         }
     }
     return context;
+}
+
+int ff_range_add(RangeList *rl, unsigned int start, unsigned int len)
+{
+    Range *tmp;
+    unsigned int idx;
+
+    /* find the first existing range after the new one */
+    for (idx = 0; idx < rl->nb_ranges; idx++)
+        if (rl->ranges[idx].start > start)
+            break;
+
+    /* check for overlap */
+    if (idx > 0) {
+        Range *prev = &rl->ranges[idx - 1];
+        if (prev->start + prev->len > start)
+            return AVERROR(EINVAL);
+    }
+    if (idx < rl->nb_ranges) {
+        Range *next = &rl->ranges[idx];
+        if (start + len > next->start)
+            return AVERROR(EINVAL);
+    }
+
+    tmp = av_fast_realloc(rl->ranges, &rl->ranges_allocated,
+                          (rl->nb_ranges + 1) * sizeof(*rl->ranges));
+    if (!tmp)
+        return AVERROR(ENOMEM);
+    rl->ranges = tmp;
+
+    memmove(rl->ranges + idx + 1, rl->ranges + idx,
+            sizeof(*rl->ranges) * (rl->nb_ranges - idx));
+    rl->ranges[idx].start = start;
+    rl->ranges[idx].len   = len;
+    rl->nb_ranges++;
+
+    /* merge ranges */
+    if (idx > 0) {
+        Range *prev = &rl->ranges[idx - 1];
+        Range *cur  = &rl->ranges[idx];
+        if (prev->start + prev->len == cur->start) {
+            prev->len += cur->len;
+            memmove(rl->ranges + idx - 1, rl->ranges + idx,
+                    sizeof(*rl->ranges) * (rl->nb_ranges - idx));
+            rl->nb_ranges--;
+            idx--;
+        }
+    }
+    if (idx < rl->nb_ranges - 1) {
+        Range *cur  = &rl->ranges[idx];
+        Range *next = &rl->ranges[idx + 1];
+        if (cur->start + cur->len == next->start) {
+            cur->len += next->len;
+            memmove(rl->ranges + idx, rl->ranges + idx + 1,
+                    sizeof(*rl->ranges) * (rl->nb_ranges - idx - 1));
+            rl->nb_ranges--;
+        }
+    }
+
+    return 0;
 }

@@ -86,10 +86,6 @@
 
 #define FF_MEMORY_POISON 0x2a
 
-#define MAKE_ACCESSORS(str, name, type, field) \
-    type av_##name##_get_##field(const str *s) { return s->field; } \
-    void av_##name##_set_##field(str *s, type v) { s->field = v; }
-
 /* Check if the hard coded offset of a struct member still matches reality.
  * Induce a compilation failure if not.
  */
@@ -102,6 +98,11 @@
 #define FF_ALLOCZ_TYPED_ARRAY(p, nelem) (p = av_mallocz_array(nelem, sizeof(*p)))
 
 #define FF_PTR_ADD(ptr, off) ((off) ? (ptr) + (off) : (ptr))
+
+/**
+ * Access a field in a structure by its offset.
+ */
+#define FF_FIELD_AT(type, off, obj) (*(type *)((char *)&(obj) + (off)))
 
 #include "libm.h"
 
@@ -196,6 +197,12 @@ void avpriv_request_sample(void *avc,
 #   define ff_dlog(ctx, ...) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__)
 #else
 #   define ff_dlog(ctx, ...) do { if (0) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
+#endif
+
+#ifdef TRACE
+#   define ff_tlog(ctx, ...) av_log(ctx, AV_LOG_TRACE, __VA_ARGS__)
+#else
+#   define ff_tlog(ctx, ...) do { } while(0)
 #endif
 
 // For debuging we use signed operations so overflows can be detected (by ubsan)
