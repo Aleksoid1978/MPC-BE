@@ -933,6 +933,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		InternetSetCookieExW(lpszUrl, L"CONSENT", lpszCookieData.GetString(), INTERNET_COOKIE_HTTPONLY, NULL);
 	}
 
+	m_CMediaControls.Init(this);
+
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
 
 	return 0;

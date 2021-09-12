@@ -57,7 +57,7 @@
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>psapi.dll;api-ms-win-core-winrt-l1-1-0.dll;api-ms-win-core-winrt-string-l1-1-0.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
@@ -110,6 +110,7 @@
     <ClCompile Include="HistoryDlg.cpp" />
     <ClCompile Include="HistoryFile.cpp" />
     <ClCompile Include="ItemPropertiesDlg.cpp" />
+    <ClCompile Include="MediaControls.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="OSD.cpp" />
     <ClCompile Include="PlayerCaptureDialog.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="HistoryDlg.h" />
     <ClInclude Include="HistoryFile.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
+    <ClInclude Include="MediaControls.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerCaptureDialog.h" />

@@ -78,6 +78,7 @@
 #include "RateControl.h"
 #include "DiskImage.h"
 #include <filters/renderer/VideoRenderers/AllocatorCommon.h>
+#include "MediaControls.h"
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -214,6 +215,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CPlayerPlaylistBar;
 	friend class CPPageSync;
 	friend class CPPageVideo;
+	friend class CMediaControls;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
@@ -1436,4 +1438,6 @@ private:
 	static LRESULT CALLBACK MenuHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 	bool m_bInMenu = false;
+
+	CMediaControls m_CMediaControls;
 };
