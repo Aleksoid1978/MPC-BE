@@ -126,7 +126,7 @@ static const std::map<WORD, LPCSTR> aformattags = {
 	{WAVE_FORMAT_DTS2,                  "DTS"},
 	{WAVE_FORMAT_DOLBY_AC3_SPDIF,       "S/PDIF"},
 	// other
-	{WAVE_FORMAT_DOLBY_AC3,             "Dolby AC3"},
+	{WAVE_FORMAT_DOLBY_AC3,             "AC-3"},
 	{WAVE_FORMAT_LATM_AAC,              "AAC(LATM)"},
 	{WAVE_FORMAT_FLAC,                  "FLAC"},
 	{WAVE_FORMAT_TTA1,                  "TTA"},
@@ -154,7 +154,8 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_Vorbis2,         "Vorbis"},
 	{MEDIASUBTYPE_MP4A,            "MPEG4 Audio"},
 	{MEDIASUBTYPE_FLAC_FRAMED,     "FLAC (framed)"},
-	{MEDIASUBTYPE_DOLBY_AC3,       "Dolby AC3"},
+	{MEDIASUBTYPE_DOLBY_AC3,       "AC-3"},
+	{MEDIASUBTYPE_WAVE_DOLBY_AC3,  "AC-3"},
 	{MEDIASUBTYPE_DOLBY_DDPLUS,    "DD+"},
 	{MEDIASUBTYPE_DOLBY_TRUEHD,    "TrueHD"},
 	{MEDIASUBTYPE_DTS,             "DTS"},
