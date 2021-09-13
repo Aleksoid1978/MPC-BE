@@ -388,23 +388,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			auto GetTrackName = [&track]() {
-				// We do not use the "mdia/hdlr" atom, because it is useless information ("SoundHandler" and so on).
-				CStringW track_name;
-				const auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"));
-				if (nameAtom) {
-					auto name_data = nameAtom->GetData();
-					if (name_data->GetDataSize() > 0) {
-						CStringA tmp((char*)name_data->GetData(), name_data->GetDataSize());
-						track_name = AltUTF8ToWStr(tmp);
-					}
+			CString TrackName;
+			// We do not use the "mdia/hdlr" atom, because it is useless information ("SoundHandler" and so on).
+			const auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"));
+			if (nameAtom) {
+				auto name_data = nameAtom->GetData();
+				if (name_data->GetDataSize() > 0) {
+					CStringA tmp((char*)name_data->GetData(), name_data->GetDataSize());
+					TrackName = AltUTF8ToWStr(tmp);
 				}
-				return track_name;
-			};
-
-			CString TrackName = GetTrackName();
-			if (TrackName.GetLength() && TrackName[0] < 0x20) {
-				TrackName.Delete(0);
 			}
 			TrackName.Trim();
 
