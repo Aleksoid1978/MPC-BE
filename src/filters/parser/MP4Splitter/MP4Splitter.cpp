@@ -388,25 +388,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			auto GetTrackName = [&]() {
-				const auto name = track->GetTrackName();
-				auto TrackNameUTF8 = AltUTF8ToWStr(name.c_str());
-				if (auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"))) {
+			auto GetTrackName = [&track]() {
+				// We do not use the "mdia/hdlr" atom, because it is useless information ("SoundHandler" and so on).
+				CStringW track_name;
+				const auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"));
+				if (nameAtom) {
 					auto name_data = nameAtom->GetData();
 					if (name_data->GetDataSize() > 0) {
 						CStringA tmp((char*)name_data->GetData(), name_data->GetDataSize());
-						auto TrackNameUTF8_UDTA = AltUTF8ToWStr(tmp);
-						if (!TrackNameUTF8_UDTA.IsEmpty()) {
-							if (TrackNameUTF8.IsEmpty()) {
-								TrackNameUTF8 = TrackNameUTF8_UDTA;
-							} else {
-								TrackNameUTF8.Append(L" / " + TrackNameUTF8_UDTA);
-							}
-						}
+						track_name = AltUTF8ToWStr(tmp);
 					}
 				}
-
-				return TrackNameUTF8.IsEmpty() ? ConvertToWStr(name.c_str(), CP_ACP) : TrackNameUTF8;
+				return track_name;
 			};
 
 			CString TrackName = GetTrackName();
