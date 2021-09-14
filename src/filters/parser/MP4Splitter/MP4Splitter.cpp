@@ -302,8 +302,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	//bool b_HasVideo = false;
-
 	m_trackpos.clear();
 
 	m_pFile.Free();
@@ -327,6 +325,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	AP4_Array<AP4_UI32> ChapterTrackEntries;
 
 	if (AP4_Movie* movie = m_pFile->GetMovie()) {
+		int iAudio = 0;
+		CStringW outputDesc;
+
 		// looking for main video track (skip tracks with motionless frames)
 		AP4_UI32 mainvideoID = 0;
 		for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
@@ -348,6 +349,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		}
+
 		// process the tracks
 		for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
 				item;
@@ -361,7 +363,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
-			//if (b_HasVideo && track->GetType() == AP4_Track::TYPE_VIDEO) {
 			if (track->GetType() == AP4_Track::TYPE_VIDEO && track->GetId() != mainvideoID) {
 				continue;
 			}
@@ -483,8 +484,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (AP4_MpegVideoSampleDescription* video_desc =
-							dynamic_cast<AP4_MpegVideoSampleDescription*>(mpeg_desc)) {
+				// AP4_MpegVideoSampleDescription
+				if (auto* video_desc = dynamic_cast<AP4_MpegVideoSampleDescription*>(mpeg_desc)) {
 					const AP4_DataBuffer* di = video_desc->GetDecoderInfo();
 					if (!di) {
 						di = &empty;
@@ -605,11 +606,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 					}
 
-					if (mt.subtype == GUID_NULL) {
-						DLog(L"Unknown video OBI: %02x", video_desc->GetObjectTypeId());
+					if (mt.subtype != GUID_NULL) {
+						outputDesc.SetString(L"Video 1");
 					}
-				} else if (AP4_MpegAudioSampleDescription* audio_desc =
-							   dynamic_cast<AP4_MpegAudioSampleDescription*>(mpeg_desc)) {
+					DLogIf(mt.subtype == GUID_NULL, L"Unknown video OBI: %02x", video_desc->GetObjectTypeId());
+				}
+				// AP4_MpegAudioSampleDescription
+				else if (auto audio_desc = dynamic_cast<AP4_MpegAudioSampleDescription*>(mpeg_desc)) {
 					const AP4_DataBuffer* di = audio_desc->GetDecoderInfo();
 					if (!di) {
 						di = &empty;
@@ -732,11 +735,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 					}
 
-					if (mt.subtype == GUID_NULL) {
-						DLog(L"Unknown audio OBI: %02x", audio_desc->GetObjectTypeId());
+					if (mt.subtype != GUID_NULL) {
+						iAudio++;
+						outputDesc.Format(L"Audio %d", iAudio);
 					}
-				} else if (AP4_MpegSystemSampleDescription* system_desc =
-							   dynamic_cast<AP4_MpegSystemSampleDescription*>(desc)) {
+					DLogIf(mt.subtype == GUID_NULL, L"Unknown audio OBI: %02x", audio_desc->GetObjectTypeId());
+				}
+				// AP4_MpegSystemSampleDescription
+				else if (auto system_desc = dynamic_cast<AP4_MpegSystemSampleDescription*>(desc)) {
 					const AP4_DataBuffer* di = system_desc->GetDecoderInfo();
 					if (!di) {
 						di = &empty;
@@ -794,11 +800,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 					}
 
-					if (mt.subtype == GUID_NULL) {
-						DLog(L"Unknown audio OBI: %02x", system_desc->GetObjectTypeId());
-					}
-				} else if (AP4_UnknownSampleDescription* unknown_desc =
-							   dynamic_cast<AP4_UnknownSampleDescription*>(desc)) { // TEMP
+					DLogIf(mt.subtype == GUID_NULL, L"Unknown system OBI: %02x", system_desc->GetObjectTypeId());
+				}
+				// AP4_UnknownSampleDescription
+				else if (auto unknown_desc = dynamic_cast<AP4_UnknownSampleDescription*>(desc)) { // TEMP
 					AP4_SampleEntry* sample_entry = unknown_desc->GetSampleEntry();
 
 					if (dynamic_cast<AP4_TextSampleEntry*>(sample_entry)
@@ -835,7 +840,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						continue; // Multiple fourcc, we skip first JPEG.
 					}
 
-					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
+					// AP4_VisualSampleEntry
+					if (auto vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
 						const DWORD fourcc = GetFourcc(vse);
 						AP4_DataBuffer* pData = (AP4_DataBuffer*)&db;
 
@@ -967,11 +973,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								break; // incorrect or unsupported
 							}
 							mts.push_back(mt);
+							outputDesc.SetString(L"Video 1");
 							break;
 						}
 
 						mt.subtype = FOURCCMap(fourcc);
 						mts.push_back(mt);
+						outputDesc.SetString(L"Video 1");
 
 						if (fourcc == FCC('yuv2')
 								|| fourcc == FCC('b16g')
@@ -993,7 +1001,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (typelwr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typelwr);
 							mts.push_back(mt);
-							//b_HasVideo = true;
 						}
 
 						_strupr_s(buff);
@@ -1001,7 +1008,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (typeupr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typeupr);
 							mts.push_back(mt);
-							//b_HasVideo = true;
 						}
 
 						if (vse->m_hasPalette) {
@@ -1586,7 +1592,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						break;
-					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
+					}
+					// AP4_AudioSampleEntry
+					else if (auto ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
 						WORD  channels      = ase->GetChannelCount();
@@ -1898,6 +1906,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							memcpy(wfe + 1, db.GetData(), db.GetDataSize());
 						}
 
+						iAudio++;
+						outputDesc.Format(L"Audio %d", iAudio);
 						mts.push_back(mt);
 
 						if (AP4_DataInfoAtom* WfexAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_WFEX))) {
@@ -1923,7 +1933,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						break;
-					} else {
+					}
+					else {
 						DLog(L"Unknow MP4 Stream %x" , type);
 					}
 				}
@@ -1957,8 +1968,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			if (TrackName.GetLength()) {
 				pinName.Append(TrackName);
+				if (outputDesc.GetLength()) {
+					pinName.AppendFormat(L" (%s)", outputDesc);
+				}
 			} else {
-				pinName.AppendFormat(L"Output %d", id);
+				if (outputDesc.GetLength()) {
+					pinName.Append(outputDesc);
+				} else {
+					pinName.AppendFormat(L"Output %d", id);
+				}
 			}
 
 			if (AP4_Track::TYPE_VIDEO == track->GetType() && videoSize == CSize(0, 0)) {
