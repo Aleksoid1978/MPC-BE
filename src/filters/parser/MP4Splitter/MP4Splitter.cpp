@@ -326,7 +326,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	if (AP4_Movie* movie = m_pFile->GetMovie()) {
 		int iAudio = 0;
-		CStringW outputDesc;
+		int iSubtitle = 0;
 
 		// looking for main video track (skip tracks with motionless frames)
 		AP4_UI32 mainvideoID = 0;
@@ -402,6 +402,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			TrackName.Trim();
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
+			CStringW outputDesc;
 
 			CSize PictAR;
 			AP4_UI32 width = 0;
@@ -800,6 +801,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 					}
 
+					if (mt.subtype != GUID_NULL) {
+						iSubtitle++;
+						outputDesc.Format(L"Subtitle %d", iSubtitle);
+					}
 					DLogIf(mt.subtype == GUID_NULL, L"Unknown system OBI: %02x", system_desc->GetObjectTypeId());
 				}
 				// AP4_UnknownSampleDescription
@@ -823,6 +828,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 						wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
 						mts.push_back(mt);
+
+						iSubtitle++;
+						outputDesc.Format(L"Subtitle %d", iSubtitle);
 					}
 				}
 			} else if (AP4_StsdAtom* stsd = dynamic_cast<AP4_StsdAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd"))) {
