@@ -872,10 +872,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (!PictAR.cx || !PictAR.cy) {
 							if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
 								if (pasp->GetHSpacing() > 0 && pasp->GetVSpacing() > 0) {
-									uint32_t pasp_x = vse->GetWidth() * pasp->GetHSpacing();
-									uint32_t pasp_y = vse->GetHeight() * pasp->GetVSpacing();
-									ReduceDim(pasp_x, pasp_y);
-									PictAR = { (long)pasp_x, (long)pasp_y };
+									auto pictAR_x = (uint64_t)vse->GetWidth() * pasp->GetHSpacing();
+									auto pictAR_y = (uint64_t)vse->GetHeight() * pasp->GetVSpacing();
+									ReduceDim(pictAR_x, pictAR_y);
+									PictAR = { (long)pictAR_x, (long)pictAR_y };
 								}
 							}
 						}
