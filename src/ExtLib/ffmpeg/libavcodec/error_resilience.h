@@ -20,13 +20,7 @@
 #define AVCODEC_ERROR_RESILIENCE_H
 
 #include <stdint.h>
-// ==> Start patch MPC
-#ifdef __cplusplus
-typedef int atomic_int;
-#else
 #include <stdatomic.h>
-#endif
-// ==> End patch MPC
 
 #include "avcodec.h"
 #include "me_cmp.h"
