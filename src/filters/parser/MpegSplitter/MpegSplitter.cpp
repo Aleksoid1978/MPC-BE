@@ -188,7 +188,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 
 			if (pInfo->hdr.bmiHeader.biCompression == FCC('AVC1') || pInfo->hdr.bmiHeader.biCompression == FCC('H264')) {
 				bIsAVC = true;
-				Infos.emplace_back(L"AVC (H.264)");
+				Infos.emplace_back(L"H.264/AVC");
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('AMVC')) {
 				bIsAVC = true;
 				Infos.emplace_back(L"MVC (Full)");
@@ -199,7 +199,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				Infos.emplace_back(L"MPEG2");
 				bIsMPEG2 = true;
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('HEVC') || pInfo->hdr.bmiHeader.biCompression == FCC('HVC1')) {
-				Infos.emplace_back(L"HEVC (H.265)");
+				Infos.emplace_back(L"HEVC");
 				bIsHEVC = true;
 			} else {
 				WCHAR Temp[5];

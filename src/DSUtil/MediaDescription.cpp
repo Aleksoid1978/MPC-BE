@@ -76,7 +76,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 
 			if (pInfo->hdr.bmiHeader.biCompression == FCC('AVC1') || pInfo->hdr.bmiHeader.biCompression == FCC('H264')) {
 				bIsAVC = true;
-				Infos.emplace_back(L"AVC (H.264)");
+				Infos.emplace_back(L"H.264/AVC");
 				bAdd = TRUE;
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('AMVC') || pInfo->hdr.bmiHeader.biCompression == FCC('MVC1')) {
 				bIsAVC = true;
@@ -91,7 +91,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				bIsMPEG2 = true;
 				bAdd = TRUE;
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('HEVC') || pInfo->hdr.bmiHeader.biCompression == FCC('HVC1')) {
-				Infos.emplace_back(L"HEVC (H.265)");
+				Infos.emplace_back(L"HEVC");
 				bIsHEVC = true;
 				bAdd = TRUE;
 			}
@@ -200,7 +200,8 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(FormatBitrate(pVideoInfo->dwBitRate));
 			}
 		}
-	} else if (pmt->majortype == MEDIATYPE_Audio) {
+	}
+	else if (pmt->majortype == MEDIATYPE_Audio) {
 		if (pmt->formattype == FORMAT_WaveFormatEx) {
 			const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, pmt);
 

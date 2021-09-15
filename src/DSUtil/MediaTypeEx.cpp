@@ -48,7 +48,7 @@ static const std::map<DWORD, LPCSTR> vfourcs = {
 	{FCC('DX50'), "DivX 5"},
 	{FCC('DIVX'), "DivX 6"},
 	{FCC('XVID'), "Xvid"},
-	{FCC('MP4V'), "MPEG4 Video"},
+	{FCC('MP4V'), "MPEG-4"},
 	{FCC('AVC1'), "H.264/AVC"},
 	{FCC('H264'), "H.264/AVC"},
 	{FCC('RV10'), "RealVideo 1"},
@@ -273,9 +273,9 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 
 		if (codec.IsEmpty()) {
 			if (formattype == FORMAT_MPEGVideo) {
-				codec = L"MPEG1 Video";
+				codec = L"MPEG-1 Video";
 			} else if (formattype == FORMAT_MPEG2_VIDEO) {
-				codec = L"MPEG2 Video";
+				codec = L"MPEG-2 Video";
 			} else if (formattype == FORMAT_DiracVideoInfo) {
 				codec = L"Dirac Video";
 			}
@@ -469,17 +469,17 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 			str = (*it).second;
 		} else {
 			if (subtype == MEDIASUBTYPE_DiracVideo) {
-				str = L"Dirac Video";
+				str = L"Dirac";
 			} else if (subtype == MEDIASUBTYPE_MP4V ||
 					   subtype == MEDIASUBTYPE_mp4v) {
-				str = L"MPEG4 Video";
+				str = L"MPEG-4";
 			} else if (subtype == MEDIASUBTYPE_apch ||
 					   subtype == MEDIASUBTYPE_apcn ||
 					   subtype == MEDIASUBTYPE_apcs ||
 					   subtype == MEDIASUBTYPE_apco ||
 					   subtype == MEDIASUBTYPE_ap4h ||
 					   subtype == MEDIASUBTYPE_ap4x) {
-				str.Format(L"ProRes Video (%4.4hs)", &biCompression);
+				str.Format(L"ProRes (%4.4hs)", &biCompression);
 			} else if (subtype == MEDIASUBTYPE_RGB48) {
 				str = L"RGB48";
 			} else if (biCompression < 256) {
