@@ -2062,6 +2062,9 @@ again:
 		} else if (m_DeviceModeCurrent == MODE_WASAPI_SHARED) { // SHARED
 			WAVEFORMATEX* pDeviceFormat = nullptr;
 			if (SUCCEEDED(m_pAudioClient->GetMixFormat(&pDeviceFormat)) && pDeviceFormat) {
+				m_pWaveFormatExOutput->wBitsPerSample = pDeviceFormat->wBitsPerSample;
+				m_pWaveFormatExOutput->nBlockAlign = m_pWaveFormatExOutput->nChannels * m_pWaveFormatExOutput->wBitsPerSample / 8;
+
 				if (m_pWaveFormatExOutput->nSamplesPerSec != pDeviceFormat->nSamplesPerSec) {
 					m_pWaveFormatExOutput->nSamplesPerSec = pDeviceFormat->nSamplesPerSec;
 					m_pWaveFormatExOutput->nAvgBytesPerSec = m_pWaveFormatExOutput->nSamplesPerSec * m_pWaveFormatExOutput->nBlockAlign;
