@@ -37,21 +37,20 @@ bool CMpcLstFile::ReadFile()
 		return true;
 	}
 
-	FILE* fp;
-	int fpStatus;
+	FILE* pFile;
 	do { // Open mpc-be.ini in UNICODE mode, retry if it is already being used by another process
-		fp = _wfsopen(m_filename, L"r, ccs=UNICODE", _SH_SECURE);
-		if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+		pFile = _wfsopen(m_filename, L"r, ccs=UNICODE", _SH_SECURE);
+		if (pFile || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 			break;
 		}
 		Sleep(100);
 	} while (true);
-	if (!fp) {
+	if (!pFile) {
 		ASSERT(0);
 		return false;;
 	}
 
-	CStdioFile file(fp);
+	CStdioFile file(pFile);
 
 	IntClearEntries();
 
@@ -140,7 +139,7 @@ bool CMpcLstFile::ReadFile()
 		}
 	}
 
-	fpStatus = fclose(fp);
+	int fpStatus = fclose(pFile);
 	ASSERT(fpStatus == 0);
 	m_LastAccessTick = GetTickCount();
 
@@ -215,23 +214,22 @@ std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(const SessionInfo
 
 bool CHistoryFile::WriteFile()
 {
-	FILE* fp;
-	int fpStatus;
+	FILE* pFile;
 	do { // Open file, retry if it is already being used by another process
-		fp = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
-		if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+		pFile = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
+		if (pFile || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 			break;
 		}
 		Sleep(100);
 	} while (true);
-	if (!fp) {
+	if (!pFile) {
 		ASSERT(FALSE);
 		return false;
 	}
 
 	bool ret = true;
 
-	CStdioFile file(fp);
+	CStdioFile file(pFile);
 	CStringW str;
 	try {
 		file.WriteString(L"; MPC-BE History File 0.1\n");
@@ -297,7 +295,7 @@ bool CHistoryFile::WriteFile()
 		ret = false;
 	}
 
-	fpStatus = fclose(fp);
+	int fpStatus = fclose(pFile);
 	ASSERT(fpStatus == 0);
 	m_LastAccessTick = GetTickCount();
 
@@ -469,23 +467,22 @@ void CFavoritesFile::IntClearEntries()
 
 bool CFavoritesFile::WriteFile()
 {
-	FILE* fp;
-	int fpStatus;
+	FILE* pFile;
 	do { // Open file, retry if it is already being used by another process
-		fp = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
-		if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+		pFile = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
+		if (pFile || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 			break;
 		}
 		Sleep(100);
 	} while (true);
-	if (!fp) {
+	if (!pFile) {
 		ASSERT(FALSE);
 		return false;
 	}
 
 	bool ret = true;
 
-	CStdioFile file(fp);
+	CStdioFile file(pFile);
 	CStringW str;
 	try {
 		file.WriteString(L"; MPC-BE Favorites File 0.1\n");
@@ -563,7 +560,7 @@ bool CFavoritesFile::WriteFile()
 		ret = false;
 	}
 
-	fpStatus = fclose(fp);
+	int fpStatus = fclose(pFile);
 	ASSERT(fpStatus == 0);
 	m_LastAccessTick = GetTickCount();
 
