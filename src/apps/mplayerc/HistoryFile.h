@@ -51,6 +51,20 @@ struct SessionInfo {
 		AudioPath.Empty();
 		SubtitlePath.Empty();
 	}
+
+	bool Equals(const SessionInfo& b) const {
+		bool ret = Path.CompareNoCase(b.Path) == 0
+			&& Title.Compare(b.Title) == 0
+			&& DVDId == b.DVDId
+			&& DVDTitle == b.DVDTitle
+			&& memcmp(&DVDTimecode, &b.DVDTimecode, sizeof(DVD_HMSF_TIMECODE)) == 0
+			&& DVDState == b.DVDState
+			&& Position == b.Position
+			&& AudioNum == b.SubtitleNum
+			&& AudioPath.CompareNoCase(b.AudioPath) == 0
+			&& SubtitlePath.CompareNoCase(b.SubtitlePath) == 0;
+		return ret;
+	}
 };
 
 //

@@ -361,6 +361,10 @@ void CHistoryFile::SaveSessionInfo(const SessionInfo& sesInfo)
 
 	auto it = FindSessionInfo(sesInfo, m_SessionInfos.begin());
 
+	if (it == m_SessionInfos.begin() && sesInfo.Equals(*it)) {
+		return;
+	}
+
 	if (it != m_SessionInfos.end()) {
 		m_SessionInfos.erase(it);
 	}
