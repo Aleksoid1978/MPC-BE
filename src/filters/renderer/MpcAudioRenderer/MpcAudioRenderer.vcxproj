@@ -266,6 +266,9 @@
     <ProjectReference Include="$(SolutionDir)src\filters\filters\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
+      <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

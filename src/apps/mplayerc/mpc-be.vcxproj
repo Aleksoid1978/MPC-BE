@@ -637,6 +637,9 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\ui\TreePropSheet\TreePropSheet.vcxproj">
       <Project>{ab494732-ef6d-44d0-bcf8-80ff04858d10}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
+      <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

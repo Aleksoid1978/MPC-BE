@@ -299,6 +299,9 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
+      <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

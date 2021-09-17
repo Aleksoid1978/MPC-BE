@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bits.c" />
+    <ClCompile Include="cb_search.c" />
+    <ClCompile Include="exc_10_16_table.c" />
+    <ClCompile Include="exc_10_32_table.c" />
+    <ClCompile Include="exc_20_32_table.c" />
+    <ClCompile Include="exc_5_256_table.c" />
+    <ClCompile Include="exc_5_64_table.c" />
+    <ClCompile Include="exc_8_128_table.c" />
+    <ClCompile Include="fftwrap.c" />
+    <ClCompile Include="filters.c" />
+    <ClCompile Include="gain_table.c" />
+    <ClCompile Include="gain_table_lbr.c" />
+    <ClCompile Include="hexc_10_32_table.c" />
+    <ClCompile Include="hexc_table.c" />
+    <ClCompile Include="high_lsp_tables.c" />
+    <ClCompile Include="kiss_fft.c" />
+    <ClCompile Include="kiss_fftr.c" />
+    <ClCompile Include="lpc.c" />
+    <ClCompile Include="lsp.c" />
+    <ClCompile Include="lsp_tables_nb.c" />
+    <ClCompile Include="ltp.c" />
+    <ClCompile Include="modes.c" />
+    <ClCompile Include="modes_wb.c" />
+    <ClCompile Include="nb_celp.c" />
+    <ClCompile Include="quant_lsp.c" />
+    <ClCompile Include="sb_celp.c" />
+    <ClCompile Include="smallft.c" />
+    <ClCompile Include="speex.c" />
+    <ClCompile Include="speex_callbacks.c" />
+    <ClCompile Include="speex_header.c" />
+    <ClCompile Include="stereo.c" />
+    <ClCompile Include="vbr.c" />
+    <ClCompile Include="vq.c" />
+    <ClCompile Include="window.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="speex\speex.h" />
+    <ClInclude Include="speex\speex_bits.h" />
+    <ClInclude Include="speex\speex_callbacks.h" />
+    <ClInclude Include="speex\speex_config_types.h" />
+    <ClInclude Include="speex\speex_header.h" />
+    <ClInclude Include="speex\speex_stereo.h" />
+    <ClInclude Include="speex\speex_types.h" />
+    <ClInclude Include="speex_noglobals.h" />
+    <ClInclude Include="cb_search.h" />
+    <ClInclude Include="fftwrap.h" />
+    <ClInclude Include="filters.h" />
+    <ClInclude Include="filters_sse.h" />
+    <ClInclude Include="kiss_fft.h" />
+    <ClInclude Include="kiss_fftr.h" />
+    <ClInclude Include="lpc.h" />
+    <ClInclude Include="lsp.h" />
+    <ClInclude Include="ltp.h" />
+    <ClInclude Include="ltp_sse.h" />
+    <ClInclude Include="math_approx.h" />
+    <ClInclude Include="misc.h" />
+    <ClInclude Include="modes.h" />
+    <ClInclude Include="nb_celp.h" />
+    <ClInclude Include="pseudofloat.h" />
+    <ClInclude Include="quant_lsp.h" />
+    <ClInclude Include="sb_celp.h" />
+    <ClInclude Include="stack_alloc.h" />
+    <ClInclude Include="vbr.h" />
+    <ClInclude Include="vq.h" />
+    <ClInclude Include="config.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}</ProjectGuid>
+    <RootNamespace>speex</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>speex</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)src\platform.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)src\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

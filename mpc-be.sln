@@ -191,6 +191,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "coolsb", "src\ExtLib\ui\coo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detours", "src\ExtLib\Detours\Detours.vcxproj", "{2DD13FCC-CB32-4610-B691-6CFC6A022483}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "speex", "src\ExtLib\speex\speex.vcxproj", "{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Filter|Win32 = Debug Filter|Win32
@@ -1229,6 +1231,22 @@ Global
 		{2DD13FCC-CB32-4610-B691-6CFC6A022483}.Release|Win32.Build.0 = Release|Win32
 		{2DD13FCC-CB32-4610-B691-6CFC6A022483}.Release|x64.ActiveCfg = Release|x64
 		{2DD13FCC-CB32-4610-B691-6CFC6A022483}.Release|x64.Build.0 = Release|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug Filter|Win32.ActiveCfg = Debug|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug Filter|Win32.Build.0 = Debug|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug Filter|x64.ActiveCfg = Debug|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug Filter|x64.Build.0 = Debug|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug|Win32.Build.0 = Debug|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug|x64.ActiveCfg = Debug|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Debug|x64.Build.0 = Debug|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release Filter|Win32.ActiveCfg = Release|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release Filter|Win32.Build.0 = Release|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release Filter|x64.ActiveCfg = Release|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release Filter|x64.Build.0 = Release|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release|Win32.ActiveCfg = Release|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release|Win32.Build.0 = Release|Win32
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release|x64.ActiveCfg = Release|x64
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1310,6 +1328,7 @@ Global
 		{C868FDA0-2A56-4274-8C34-AC4751DA7BED} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
 		{441EC5B6-6450-4A08-A345-3ECD7DBDC6ED} = {2913B7E4-7A8B-43D5-A60B-345A0782816A}
 		{2DD13FCC-CB32-4610-B691-6CFC6A022483} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
+		{F4C233D1-297B-4B6B-BD63-A7D38F88AA83} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {078D97C7-7181-4DB4-90A5-9EC3801FD925}

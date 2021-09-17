@@ -265,6 +265,9 @@
     <ProjectReference Include="$(SolutionDir)src\filters\transform\DeCSSFilter\DeCSSFilterStatic.vcxproj">
       <Project>{4b065c3d-054e-4f95-9a74-4e53e9df7144}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
+      <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
