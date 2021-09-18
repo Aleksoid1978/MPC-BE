@@ -100,7 +100,6 @@ SRCS_LC = \
 	libavcodec/aactab.c \
 	libavcodec/ac3.c \
 	libavcodec/ac3_parser.c \
-	libavcodec/ac3dec.c \
 	libavcodec/ac3dec_data.c \
 	libavcodec/ac3dec_float.c \
 	libavcodec/ac3dsp.c \
