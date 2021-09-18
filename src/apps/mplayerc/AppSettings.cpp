@@ -954,13 +954,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTTOOLTIP, bShowPlaylistTooltip);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTSEARCHBAR, bShowPlaylistSearchBar);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTNEXTONERROR, bPlaylistNextOnError);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTDETERMINEDURATION, bPlaylistDetermineDuration);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHUFFLE, bShufflePlaylistItems);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_HIDEINFULLSCREEN, bHidePlaylistFullScreen);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_NEXTONERROR, bPlaylistNextOnError);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_DETERMINEDURATION, bPlaylistDetermineDuration);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
@@ -1611,13 +1611,13 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESETWINDOWAFTERCLOSINGFILE, bResetWindowAfterClosingFile);
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTTOOLTIP, bShowPlaylistTooltip);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTSEARCHBAR, bShowPlaylistSearchBar);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTNEXTONERROR, bPlaylistNextOnError);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PLAYLISTDETERMINEDURATION, bPlaylistDetermineDuration);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHUFFLE, bShufflePlaylistItems);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_HIDEINFULLSCREEN, bHidePlaylistFullScreen);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_NEXTONERROR, bPlaylistNextOnError);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_DETERMINEDURATION, bPlaylistDetermineDuration);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
