@@ -86,9 +86,10 @@ STDAPI DllRegisterServer(void)
 	if (SUCCEEDED(hr)) {
 		CString KeyName = GetKeyName();
 		if (KeyName.IsEmpty()) {
-			return hr;
+			return E_FAIL;
 		}
 
+		hr = E_FAIL;
 		if (::StringFromGUID2(CLSID_MPCBEContextMenu, strWideCLSID, 50) > 0) {
 			CRegKey key;
 			if (GetKeyValue(L"ShowDir")) {
