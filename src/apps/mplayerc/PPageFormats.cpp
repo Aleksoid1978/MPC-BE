@@ -426,6 +426,11 @@ bool CPPageFormats::RegisterShellExt(LPCWSTR lpszLibrary)
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 		key.SetStringValue(L"MpcPath", GetProgramPath());
+		key.Close();
+	}
+	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, shellExtKeyName)) {
+		key.SetStringValue(L"MpcPath", GetProgramPath());
+		key.Close();
 	}
 
 	HINSTANCE hDLL = LoadLibraryW(lpszLibrary);
@@ -940,6 +945,22 @@ BOOL CPPageFormats::OnApply()
 
 			key.SetDWORDValue(L"ShowFiles", !!m_chContextFiles.GetCheck());
 			key.SetDWORDValue(L"ShowDir", !!m_chContextDir.GetCheck());
+
+			key.SetDWORDValue(IDS_RS_MULTIINST, s.iMultipleInst);
+
+			key.Close();
+		}
+
+		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, shellExtKeyName)) {
+			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));
+			key.SetStringValue(L"Add", ResStr(IDS_ADD_TO_PLAYLIST));
+
+			key.SetDWORDValue(L"ShowFiles", !!m_chContextFiles.GetCheck());
+			key.SetDWORDValue(L"ShowDir", !!m_chContextDir.GetCheck());
+
+			key.SetDWORDValue(IDS_RS_MULTIINST, s.iMultipleInst);
+
+			key.Close();
 		}
 
 		const bool bIs64 = SysVersion::IsW64();

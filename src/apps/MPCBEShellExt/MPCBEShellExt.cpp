@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,7 +48,11 @@ static CString GetKeyName()
 	CString KeyName;
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
+	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
+	if (ERROR_SUCCESS != ret) {
+		ret = key.Open(HKEY_LOCAL_MACHINE, shellExtKeyName, KEY_READ);
+	}
+	if (ERROR_SUCCESS == ret) {
 		WCHAR path_buff[MAX_PATH] = {};
 		ULONG len = std::size(path_buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
@@ -66,7 +70,11 @@ static BOOL GetKeyValue(LPCTSTR value)
 	BOOL bValue = FALSE;
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
+	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
+	if (ERROR_SUCCESS != ret) {
+		ret = key.Open(HKEY_LOCAL_MACHINE, shellExtKeyName, KEY_READ);
+	}
+	if (ERROR_SUCCESS == ret) {
 		DWORD dwValue = 0;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(value, dwValue)) {
 			bValue = !!dwValue;

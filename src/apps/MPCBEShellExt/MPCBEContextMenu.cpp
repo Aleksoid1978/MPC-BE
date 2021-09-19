@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -221,7 +221,11 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 	CString ADDTO_MPC = (GetUserDefaultUILanguage() == 1049) ? ADDTO_MPC_RU	: ADDTO_MPC_EN;
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
+	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
+	if (ERROR_SUCCESS != ret) {
+		ret = key.Open(HKEY_LOCAL_MACHINE, shellExtKeyName, KEY_READ);
+	}
+	if (ERROR_SUCCESS == ret) {
 		WCHAR path_buff[MAX_PATH] = { 0 };
 		ULONG len = std::size(path_buff);
 
@@ -286,7 +290,11 @@ static CString GetMPCPath()
 	ULONG len = std::size(buff);
 	CString mpcPath;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
+	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
+	if (ERROR_SUCCESS != ret) {
+		ret = key.Open(HKEY_LOCAL_MACHINE, shellExtKeyName, KEY_READ);
+	}
+	if (ERROR_SUCCESS == ret) {
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", buff, &len) && ::PathFileExistsW(buff)) {
 			mpcPath = buff; mpcPath.Trim();
 		}
@@ -294,7 +302,7 @@ static CString GetMPCPath()
 	}
 
 	if (mpcPath.IsEmpty()) {
-		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE", KEY_READ)) {
 			len = std::size(buff);
 			ZeroMemory(buff, len);
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", buff, &len) && ::PathFileExistsW(buff)) {
@@ -306,7 +314,7 @@ static CString GetMPCPath()
 
 #ifdef _WIN64
 	if (mpcPath.IsEmpty()) {
-		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
+		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE", KEY_READ)) {
 			len = std::size(buff);
 			ZeroMemory(buff, len);
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", buff, &len) && ::PathFileExistsW(buff)) {
@@ -337,7 +345,11 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 	bool bMultipleInstances = false;
 	if (bCheckMultipleInstances) {
 		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
+		auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
+		if (ERROR_SUCCESS != ret) {
+			ret = key.Open(HKEY_LOCAL_MACHINE, shellExtKeyName, KEY_READ);
+		}
+		if (ERROR_SUCCESS == ret) {
 			DWORD dwValue = 0;
 			if (ERROR_SUCCESS == key.QueryDWORDValue(L"MultipleInstances", dwValue)) {
 				bMultipleInstances = (dwValue == 2);
