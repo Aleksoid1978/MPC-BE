@@ -40,12 +40,17 @@ private:
 
 	AVFrame         *m_pFrame            = nullptr;
 
-	AVSampleFormat  m_av_sample_fmt      = (AVSampleFormat)-1;
-	SampleFormat    m_sample_fmt         = SAMPLE_FMT_NONE;
+	SampleFormat    m_inSampleFmt        = SAMPLE_FMT_NONE;
+	AVSampleFormat  m_inAvSampleFmt      = (AVSampleFormat)-1;
+	uint64_t        m_inLayout           = 0;
+	int             m_inChannels         = 0;
+	int             m_inSamplerate       = 0;
 
-	DWORD           m_layout             = 0;
-	DWORD           m_SamplesPerSec      = 0;
-	WORD            m_Channels           = 0;
+	SampleFormat    m_outSampleFmt       = SAMPLE_FMT_NONE;
+	AVSampleFormat  m_outAvSampleFmt     = (AVSampleFormat)-1;
+	uint64_t        m_outLayout          = 0;
+	int             m_outChannels        = 0;
+	int             m_outSamplerate      = 0;
 
 	fraction_t      m_time_base          = { 0, 0 };
 
@@ -53,7 +58,11 @@ public:
 	CAudioFilter();
 	~CAudioFilter();
 
-	HRESULT Init(const WAVEFORMATEX* wfe, const char* flt_name, const char* flt_args, const bool autoconvert);
+	HRESULT Initialize(
+		const SampleFormat in_format, const uint32_t in_layout, const int in_samplerate,
+		const SampleFormat out_format, const uint32_t out_layout, const int out_samplerate,
+		const bool autoconvert,
+		const std::list<std::pair<CStringA, CStringA>>& filters);
 
 	HRESULT Push(const CAutoPtr<CPacket>& p);
 	HRESULT Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size);
