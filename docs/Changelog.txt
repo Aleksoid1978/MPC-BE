@@ -6,12 +6,26 @@ MP4Splitter
 Extended support for PCM audio ('ipcm').
 The analysis of the average bitrate of audio tracks has been removed. This will speed up the opening of some files.
 Improved support for files with tracks with offset timestamps.
+Changed the format of the output pins and the list of audio tracks in the player.
+Fixed distortion of frame proportions when using the 'pasp' atom in some cases.
+
+OggSplitter
+Fixed reading of metadata in some files.
 
 MPCVideoDec
 Eliminated high load on the system with frequent navigation on H.264 and MPEG-2 videos when using the D3D11 decoder.
+The MVC decoder information is now available through the IExFilterConfig interface.
+
+AudioSwitcher
+Optimized auto volume control code.
+
+MpcAudioRenderer
+Fixed freezing at the end of playback in some cases.
+Corrected the selection of the sample format for the WASAPI Shared mode.
 
 VideoRenderers
 EVR-CP and Sync Renderer no longer require d3dx9_43.dll to render statistics text.
+Removed the ability to disable desktop composition (Aero) on Windows 7.
 
 Subtitles
 Texture size 2560x1600 changed to 2560x1440.
@@ -19,6 +33,9 @@ Texture size 2560x1600 changed to 2560x1440.
 Youtube
 Improved retrieval of video metadata.
 Added error output for videos with restrictions.
+Added recognition of links like "youtube.com/shorts/".
+For YouTube videos VP9 and AV1 with a frame size of 360p or less, select the lowest audio quality so that the audio bitrate is no more than the video bitrate.
+Added sorting of formats when opening via youtube_dl.
 
 Player
 Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player.
@@ -29,6 +46,9 @@ Fixed DVD-Video playback with built-in filters.
 Open file/URL dialog now automatically removes enclosing quotes from given paths.
 Fixed shift and enlargement of the main window when hovering over the cover of the audio file displayed above the taskbar.
 Added the command "Add to playlist from clipboard" (Ctrl+V).
+Removed "Disable desktop effects (Aero)" option.
+The ability to call the properties of the active video renderer in the "Video" settings panel during playback has been implemented.
+Fixed working with Blu-ray playlists and chapters. 
 
 Updated Chinese (Simplified) translation (by wushantao).
 Updated German translation (by Klaus1189).
