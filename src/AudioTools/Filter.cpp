@@ -30,6 +30,7 @@ extern "C"
 	#include <libavcodec/avcodec.h>
 	#include <libavfilter/buffersink.h>
 	#include <libavfilter/buffersrc.h>
+	#include <libavutil/opt.h>
 }
 
 CAudioFilter::CAudioFilter()
@@ -128,6 +129,11 @@ HRESULT CAudioFilter::Init(const WAVEFORMATEX* wfe, const char* flt_name, const 
 			m_pFilterGraph);
 		if (ret < 0) { break; }
 
+		ret = av_opt_set_bin(m_pFilterBufferSink, "sample_fmts",
+			(uint8_t*)&av_sample_fmt, sizeof(av_sample_fmt),
+			AV_OPT_SEARCH_CHILDREN);
+		if (ret < 0) { break; }
+
 		const AVFilter* filter = avfilter_get_by_name(flt_name);
 		AVFilterContext* filter_ctx = avfilter_graph_alloc_filter(m_pFilterGraph, filter, flt_name);
 		ret = avfilter_init_str(filter_ctx, flt_args);
@@ -201,8 +207,9 @@ HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const s
 
 HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 {
-	CheckPointer(m_pFilterGraph, E_FAIL);
-	CheckPointer(m_pFrame, E_FAIL);
+	if (!m_pFilterGraph || !m_pFrame) {
+		return E_ABORT;
+	}
 
 	if (!p) {
 		p.Attach(DNew CPacket());
@@ -236,12 +243,14 @@ HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 
 HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples)
 {
-	if (m_av_sample_fmt != AV_SAMPLE_FMT_FLT || !m_pFilterGraph || !m_pFrame) {
+	if (!m_pFilterGraph || !m_pFrame) {
 		return E_ABORT;
 	}
 
 	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
 	if (ret >= 0) {
+		ASSERT(m_pFrame->format == m_av_sample_fmt && m_pFrame->channels == m_Channels);
+
 		time_start = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
 		allsamples = m_pFrame->nb_samples * m_pFrame->channels;
 		simpleBuffer.WriteData(0, (float*)m_pFrame->data[0], allsamples);
