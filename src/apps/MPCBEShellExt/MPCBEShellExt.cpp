@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MPCBEShellExt_i.h"
 #include "dllmain.h"
+#include <xutility>
 
 // Used to determine whether the DLL can be unloaded by OLE
 STDAPI DllCanUnloadNow(void)
@@ -49,7 +50,7 @@ static CString GetKeyName()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, shellExtKeyName)) {
 		WCHAR path_buff[MAX_PATH] = {};
-		ULONG len = sizeof(path_buff);
+		ULONG len = std::size(path_buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			KeyName = GetFileOnly(path_buff);
 			KeyName.Truncate(KeyName.GetLength() - 4);
