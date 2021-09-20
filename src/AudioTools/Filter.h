@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <list>
 #include "AudioTools/SampleFormat.h"
 #include "DSUtil/Packet.h"
 #include "DSUtil/SimpleBuffer.h"
