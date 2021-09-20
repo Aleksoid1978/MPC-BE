@@ -127,11 +127,11 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 		return false;
 	}
 
-	BYTE* data;
+	BYTE* pData = nullptr;
 	UINT size;
-	hr = LoadResourceFile(IDF_MAIN_ICON, &data, size);
+	hr = LoadResourceFile(IDF_MAIN_ICON, &pData, size);
 	if (SUCCEEDED(hr)) {
-		m_defaultImageData.insert(m_defaultImageData.end(), data, data + size);
+		m_defaultImageData.insert(m_defaultImageData.end(), pData, pData + size);
 	}
 
 	m_pMainFrame = pMainFrame;
@@ -172,7 +172,49 @@ bool CMediaControls::Update()
 			pVideoDisplayProperties->put_Title(HStringReference(title).Get());
 		}
 
-		if (!m_defaultImageData.empty()) {
+		static std::list<LPCWSTR> mimeStrings = {
+			L"image/jpeg",
+			L"image/jpg",
+			L"image/png",
+			L"image/bmp"
+		};
+		bool bFoundResource = false;
+		std::vector<uint8_t> m_imageData;
+		BeginEnumFilters(m_pMainFrame->m_pGB, pEF, pBF) {
+			if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+				if (pRB && m_pMainFrame->CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
+					for (DWORD i = 0; i < pRB->ResGetCount() && !bFoundResource; i++) {
+						CComBSTR mime;
+						BYTE* pData = nullptr;
+						DWORD len = 0;
+						if (SUCCEEDED(pRB->ResGet(i, nullptr, nullptr, &mime, &pData, &len, nullptr))) {
+							CString mimeStr(mime);
+							mimeStr.Trim();
+
+							if (std::find(mimeStrings.cbegin(), mimeStrings.cend(), mimeStr) != mimeStrings.cend()) {
+								m_imageData.insert(m_imageData.end(), pData, pData + len);
+								bFoundResource = true;
+							}
+
+							CoTaskMemFree(pData);
+						}
+					}
+				}
+			}
+
+			if (bFoundResource) {
+				break;
+			}
+		}
+		EndEnumFilters;
+
+		if (bFoundResource) {
+			ComPtr<IStream> stream;
+			CreateStreamOverRandomAccessStream(m_pImageStream.Get(), IID_PPV_ARGS(stream.GetAddressOf()));
+			stream->Write(m_imageData.data(), m_imageData.size(), nullptr);
+
+			m_pDisplay->put_Thumbnail(m_pImageStreamReference.Get());
+		} else if (!m_defaultImageData.empty()) {
 			ComPtr<IStream> stream;
 			CreateStreamOverRandomAccessStream(m_pImageStream.Get(), IID_PPV_ARGS(stream.GetAddressOf()));
 			stream->Write(m_defaultImageData.data(), m_defaultImageData.size(), nullptr);
