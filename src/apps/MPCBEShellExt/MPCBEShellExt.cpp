@@ -54,7 +54,7 @@ static CString GetKeyName()
 	}
 	if (ERROR_SUCCESS == ret) {
 		WCHAR path_buff[MAX_PATH] = {};
-		ULONG len = std::size(path_buff);
+		ULONG len = (ULONG)std::size(path_buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			KeyName = GetFileOnly(path_buff);
 			KeyName.Truncate(KeyName.GetLength() - 4);

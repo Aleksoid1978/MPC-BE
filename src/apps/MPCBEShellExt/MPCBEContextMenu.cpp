@@ -227,13 +227,13 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 	}
 	if (ERROR_SUCCESS == ret) {
 		WCHAR path_buff[MAX_PATH] = { 0 };
-		ULONG len = std::size(path_buff);
+		ULONG len = (ULONG)std::size(path_buff);
 
 		if (ERROR_SUCCESS == key.QueryStringValue(L"Play", path_buff, &len)) {
 			PLAY_MPC = path_buff;
 		}
 
-		len = std::size(path_buff);
+		len = (ULONG)std::size(path_buff);
 		ZeroMemory(path_buff, len);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"Add", path_buff, &len)) {
 			ADDTO_MPC = path_buff;
@@ -287,7 +287,7 @@ static CString GetMPCPath()
 {
 	CRegKey key;
 	WCHAR buff[MAX_PATH] = {};
-	ULONG len = std::size(buff);
+	ULONG len = (ULONG)std::size(buff);
 	CString mpcPath;
 
 	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
@@ -303,7 +303,7 @@ static CString GetMPCPath()
 
 	if (mpcPath.IsEmpty()) {
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE", KEY_READ)) {
-			len = std::size(buff);
+			len = (ULONG)std::size(buff);
 			ZeroMemory(buff, len);
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", buff, &len) && ::PathFileExistsW(buff)) {
 				mpcPath = buff; mpcPath.Trim();
@@ -315,7 +315,7 @@ static CString GetMPCPath()
 #ifdef _WIN64
 	if (mpcPath.IsEmpty()) {
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE", KEY_READ)) {
-			len = std::size(buff);
+			len = (ULONG)std::size(buff);
 			ZeroMemory(buff, len);
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", buff, &len) && ::PathFileExistsW(buff)) {
 				mpcPath = buff; mpcPath.Trim();
