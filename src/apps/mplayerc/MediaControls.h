@@ -33,13 +33,17 @@ class CMediaControls final
 	Microsoft::WRL::ComPtr<ABI::Windows::Media::ISystemMediaTransportControls> m_pControls;
 	Microsoft::WRL::ComPtr<ABI::Windows::Media::ISystemMediaTransportControlsDisplayUpdater> m_pDisplay;
 
+	EventRegistrationToken m_EventRegistrationToken = {};
+
+	void OnButtonPressed(ABI::Windows::Media::SystemMediaTransportControlsButton mediaButton);
+
 public:
 	CMediaControls() = default;
 	CMediaControls(CMediaControls&&) = delete;
 	CMediaControls(const CMediaControls&) = delete;
 	CMediaControls& operator=(CMediaControls&&) = delete;
 	CMediaControls& operator=(const CMediaControls&) = delete;
-	virtual ~CMediaControls() = default;
+	virtual ~CMediaControls();
 
 	bool Init(CMainFrame* pMainFrame);
 	bool Update();

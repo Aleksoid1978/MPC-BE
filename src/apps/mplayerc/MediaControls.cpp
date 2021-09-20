@@ -33,6 +33,13 @@ using namespace Microsoft::WRL::Wrappers;
 
 #pragma comment(lib, "runtimeobject.lib")
 
+CMediaControls::~CMediaControls()
+{
+	if (m_pControls && m_EventRegistrationToken.value) {
+		m_pControls->remove_ButtonPressed(m_EventRegistrationToken);
+	}
+}
+
 bool CMediaControls::Init(CMainFrame* pMainFrame)
 {
 	if (!SysVersion::IsWin81orLater()) {
@@ -70,6 +77,24 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 	hr = m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Closed);
 	if (FAILED(hr)) {
 		DLog(L"CMediaControls::Init() : ISystemMediaTransportControls::put_PlaybackStatus() failed");
+		return false;
+	}
+
+	auto callbackButtonPressed = Callback<ABI::Windows::Foundation::ITypedEventHandler<SystemMediaTransportControls*, SystemMediaTransportControlsButtonPressedEventArgs*>>(
+										  [this](ISystemMediaTransportControls*, ISystemMediaTransportControlsButtonPressedEventArgs* pArgs) {
+		HRESULT hr = S_OK;
+		SystemMediaTransportControlsButton mediaButton;
+		if (FAILED(hr = pArgs->get_Button(&mediaButton))) {
+			DLog(L"CMediaControls::Init() : ISystemMediaTransportControls::callback::get_Button() failed");
+			return hr;
+		}
+
+		OnButtonPressed(mediaButton);
+		return S_OK;
+	});
+	hr = m_pControls->add_ButtonPressed(callbackButtonPressed.Get(), &m_EventRegistrationToken);
+	if (FAILED(hr)) {
+		DLog(L"CMediaControls::Init() : ISystemMediaTransportControls::add_ButtonPressed() failed");
 		return false;
 	}
 
@@ -146,4 +171,25 @@ bool CMediaControls::UpdateButtons()
 	}
 
 	return true;
+}
+
+void CMediaControls::OnButtonPressed(SystemMediaTransportControlsButton mediaButton)
+{
+	switch (mediaButton) {
+		case SystemMediaTransportControlsButton_Play:
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_PLAY_PLAY);
+			break;
+		case SystemMediaTransportControlsButton_Pause:
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_PLAY_PAUSE);
+			break;
+		case SystemMediaTransportControlsButton_Stop:
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_PLAY_STOP);
+			break;
+		case SystemMediaTransportControlsButton_Previous:
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPBACKFILE);
+			break;
+		case SystemMediaTransportControlsButton_Next:
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPFORWARDFILE);
+			break;
+	}
 }
