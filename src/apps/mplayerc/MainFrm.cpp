@@ -4586,6 +4586,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	StartAutoHideCursor();
 
+	m_CMediaControls.Update();
+
 	m_bOpening = false;
 }
 
@@ -8195,6 +8197,8 @@ void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 	}
 
 	pCmdUI->Enable(fEnable);
+
+	m_CMediaControls.UpdateButtons();
 }
 
 void CMainFrame::OnPlayFrameStep(UINT nID)
@@ -9513,28 +9517,33 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 
 void CMainFrame::OnUpdateNavigateSkip(CCmdUI* pCmdUI)
 {
-	BOOL bOn = FALSE;
+	pCmdUI->Enable(IsNavigateSkipEnabled());
+}
+
+bool CMainFrame::IsNavigateSkipEnabled()
+{
+	bool bEnabled = false;
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_DVD && m_iDVDDomain != DVD_DOMAIN_VideoManagerMenu && m_iDVDDomain != DVD_DOMAIN_VideoTitleSetMenu) {
-			bOn = TRUE;
+			bEnabled = true;
 		} else if (GetPlaybackMode() == PM_CAPTURE && !m_bCapturing) {
-			bOn = TRUE;
+			bEnabled = true;
 		} else if (GetPlaybackMode() == PM_FILE) {
 			if (m_pCB->ChapGetCount() > 1) {
-				bOn = TRUE;
+				bEnabled = true;
 			} else if (m_wndPlaylistBar.GetCount() == 1) {
 				if (m_bIsBDPlay) {
-					bOn = !m_BDPlaylists.empty();
+					bEnabled = !m_BDPlaylists.empty();
 				} else if (!AfxGetAppSettings().fDontUseSearchInFolder) {
-					bOn = TRUE;
+					bEnabled = true;
 				}
 			} else {
-				bOn = TRUE;
+				bEnabled = true;
 			}
 		}
 	}
 
-	pCmdUI->Enable(bOn);
+	return bEnabled;
 }
 
 void CMainFrame::OnNavigateSkipFile(UINT nID)
@@ -14423,6 +14432,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_bMainIsMPEGSplitter = false;
 
 	m_FontInstaller.UninstallFonts();
+
+	m_CMediaControls.Update();
 
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }

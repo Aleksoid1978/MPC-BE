@@ -1439,5 +1439,7 @@ private:
 
 	bool m_bInMenu = false;
 
+	bool IsNavigateSkipEnabled();
+
 	CMediaControls m_CMediaControls;
 };

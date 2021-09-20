@@ -42,5 +42,7 @@ public:
 	virtual ~CMediaControls() = default;
 
 	bool Init(CMainFrame* pMainFrame);
+	bool Update();
+	bool UpdateButtons();
 };
 

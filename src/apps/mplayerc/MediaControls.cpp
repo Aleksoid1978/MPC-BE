@@ -67,7 +67,7 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 		return false;
 	}
 
-	hr = m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Stopped);
+	hr = m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Closed);
 	if (FAILED(hr)) {
 		DLog(L"CMediaControls::Init() : ISystemMediaTransportControls::put_PlaybackStatus() failed");
 		return false;
@@ -75,5 +75,75 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 
 	m_pMainFrame = pMainFrame;
 	m_bInitialized = true;
+
+	return true;
+}
+
+bool CMediaControls::Update()
+{
+	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
+		auto title = m_pMainFrame->GetTextForBar(AfxGetAppSettings().iTitleBarTextStyle);
+		if (m_pMainFrame->m_bAudioOnly) {
+			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Music);
+
+			ComPtr<IMusicDisplayProperties> pMusicDisplayProperties;
+			m_pDisplay->get_MusicProperties(pMusicDisplayProperties.GetAddressOf());
+			pMusicDisplayProperties->put_Title(HStringReference(title).Get());
+		} else {
+			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Video);
+
+			ComPtr<IVideoDisplayProperties> pVideoDisplayProperties;
+			m_pDisplay->get_VideoProperties(pVideoDisplayProperties.GetAddressOf());
+			pVideoDisplayProperties->put_Title(HStringReference(title).Get());
+		}
+		m_pDisplay->Update();
+	} else {
+		m_pDisplay->ClearAll();
+	}
+
+	return UpdateButtons();
+}
+
+bool CMediaControls::UpdateButtons()
+{
+	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
+		m_pControls->put_IsEnabled(true);
+
+		auto fs = m_pMainFrame->GetMediaState();
+		switch (fs) {
+			case State_Running:
+				m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Playing);
+
+				m_pControls->put_IsPlayEnabled(false);
+				m_pControls->put_IsPauseEnabled(true);
+				m_pControls->put_IsStopEnabled(true);
+
+				break;
+			case State_Paused:
+				m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Paused);
+
+				m_pControls->put_IsPlayEnabled(true);
+				m_pControls->put_IsPauseEnabled(false);
+				m_pControls->put_IsStopEnabled(true);
+
+				break;
+			case State_Stopped:
+				m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Stopped);
+
+				m_pControls->put_IsPlayEnabled(true);
+				m_pControls->put_IsPauseEnabled(false);
+				m_pControls->put_IsStopEnabled(false);
+
+				break;
+		}
+
+		const bool bEnabled = m_pMainFrame->IsNavigateSkipEnabled();
+		m_pControls->put_IsPreviousEnabled(bEnabled);
+		m_pControls->put_IsNextEnabled(bEnabled);
+	} else {
+		m_pControls->put_PlaybackStatus(ABI::Windows::Media::MediaPlaybackStatus_Closed);
+		m_pControls->put_IsEnabled(false);
+	}
+
 	return true;
 }
