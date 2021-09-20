@@ -10,6 +10,7 @@
 #define IDR_POPUP_AFTERPLAYBACK         142
 #define IDR_POPUP_NAVIGATE              143
 #define IDB_W7_AUDIO                    197
+#define IDF_MAIN_ICON                   198
 #define IDB_MEDIAINFO_LANGUAGE          199
 #define IDB_PLAYERTOOLBAR               201
 #define IDB_NOAUDIO                     202

@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "MediaControls.h"
+#include "Misc.h"
 #include "DSUtil/SysVersion.h"
 
 #include <shcore.h>
@@ -126,6 +127,13 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 		return false;
 	}
 
+	BYTE* data;
+	UINT size;
+	hr = LoadResourceFile(IDF_MAIN_ICON, &data, size);
+	if (SUCCEEDED(hr)) {
+		m_defaultImageData.insert(m_defaultImageData.end(), data, data + size);
+	}
+
 	m_pMainFrame = pMainFrame;
 	m_bInitialized = true;
 
@@ -139,19 +147,37 @@ bool CMediaControls::Update()
 	}
 
 	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
-		auto title = m_pMainFrame->GetTextForBar(AfxGetAppSettings().iTitleBarTextStyle);
+		auto title = m_pMainFrame->m_PlaybackInfo.GetTitleOrFileNameOrPath();
 		if (m_pMainFrame->m_bAudioOnly) {
 			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Music);
 
 			ComPtr<IMusicDisplayProperties> pMusicDisplayProperties;
 			m_pDisplay->get_MusicProperties(pMusicDisplayProperties.GetAddressOf());
 			pMusicDisplayProperties->put_Title(HStringReference(title).Get());
+
+			for (const auto& pAMMC : m_pMainFrame->m_pAMMC) {
+				if (pAMMC) {
+					CComBSTR bstr;
+					if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
+						pMusicDisplayProperties->put_Artist(HStringReference(bstr).Get());
+						break;
+					}
+				}
+			}
 		} else {
 			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Video);
 
 			ComPtr<IVideoDisplayProperties> pVideoDisplayProperties;
 			m_pDisplay->get_VideoProperties(pVideoDisplayProperties.GetAddressOf());
 			pVideoDisplayProperties->put_Title(HStringReference(title).Get());
+		}
+
+		if (!m_defaultImageData.empty()) {
+			ComPtr<IStream> stream;
+			CreateStreamOverRandomAccessStream(m_pImageStream.Get(), IID_PPV_ARGS(stream.GetAddressOf()));
+			stream->Write(m_defaultImageData.data(), m_defaultImageData.size(), nullptr);
+
+			m_pDisplay->put_Thumbnail(m_pImageStreamReference.Get());
 		}
 
 		m_pDisplay->Update();
@@ -223,10 +249,10 @@ void CMediaControls::OnButtonPressed(SystemMediaTransportControlsButton mediaBut
 			m_pMainFrame->PostMessageW(WM_COMMAND, ID_PLAY_STOP);
 			break;
 		case SystemMediaTransportControlsButton_Previous:
-			m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPBACKFILE);
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPBACK);
 			break;
 		case SystemMediaTransportControlsButton_Next:
-			m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPFORWARDFILE);
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
 			break;
 	}
 }
