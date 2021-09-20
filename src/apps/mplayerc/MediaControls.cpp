@@ -22,15 +22,14 @@
 #include "MainFrm.h"
 #include "MediaControls.h"
 #include "DSUtil/SysVersion.h"
-#include <shcore.h>
 
+#include <shcore.h>
 #include <systemmediatransportcontrolsinterop.h>
 
 using namespace Windows::Foundation;
-using namespace ABI::Windows::Media;
-using namespace ABI::Windows::Storage::Streams;
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
+using namespace ABI::Windows::Media;
 using namespace ABI::Windows::Storage::Streams;
 
 #pragma comment(lib, "runtimeobject.lib")
@@ -48,6 +47,10 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 	if (!SysVersion::IsWin81orLater()) {
 		DLog(L"CMediaControls::Init() : Windows 8.1 or later is required for Media Key Support");
 		return false;
+	}
+
+	if (m_bInitialized) {
+		return true;
 	}
 
 	ComPtr<ISystemMediaTransportControlsInterop> pInterop;
@@ -131,6 +134,10 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 
 bool CMediaControls::Update()
 {
+	if (!m_bInitialized) {
+		return false;
+	}
+
 	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
 		auto title = m_pMainFrame->GetTextForBar(AfxGetAppSettings().iTitleBarTextStyle);
 		if (m_pMainFrame->m_bAudioOnly) {
@@ -157,6 +164,10 @@ bool CMediaControls::Update()
 
 bool CMediaControls::UpdateButtons()
 {
+	if (!m_bInitialized) {
+		return false;
+	}
+
 	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
 		m_pControls->put_IsEnabled(true);
 
