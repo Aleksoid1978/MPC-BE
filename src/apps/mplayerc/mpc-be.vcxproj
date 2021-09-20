@@ -57,7 +57,7 @@
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>psapi.dll;api-ms-win-core-winrt-l1-1-0.dll;api-ms-win-core-winrt-string-l1-1-0.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>psapi.dll;api-ms-win-core-winrt-l1-1-0.dll;api-ms-win-core-winrt-string-l1-1-0.dll;api-ms-win-shcore-stream-winrt-l1-1-0.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>

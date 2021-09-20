@@ -33,6 +33,11 @@ class CMediaControls final
 	Microsoft::WRL::ComPtr<ABI::Windows::Media::ISystemMediaTransportControls> m_pControls;
 	Microsoft::WRL::ComPtr<ABI::Windows::Media::ISystemMediaTransportControlsDisplayUpdater> m_pDisplay;
 
+	Microsoft::WRL::ComPtr<ABI::Windows::Storage::Streams::IRandomAccessStream> m_pImageStream;
+	Microsoft::WRL::ComPtr<ABI::Windows::Storage::Streams::IRandomAccessStreamReference> m_pImageStreamReference;
+
+	std::vector<uint8_t> m_defaultImageData;
+
 	EventRegistrationToken m_EventRegistrationToken = {};
 
 	void OnButtonPressed(ABI::Windows::Media::SystemMediaTransportControlsButton mediaButton);

@@ -22,6 +22,7 @@
 #include "MainFrm.h"
 #include "MediaControls.h"
 #include "DSUtil/SysVersion.h"
+#include <shcore.h>
 
 #include <systemmediatransportcontrolsinterop.h>
 
@@ -30,8 +31,10 @@ using namespace ABI::Windows::Media;
 using namespace ABI::Windows::Storage::Streams;
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
+using namespace ABI::Windows::Storage::Streams;
 
 #pragma comment(lib, "runtimeobject.lib")
+#pragma comment(lib, "ShCore.lib")
 
 CMediaControls::~CMediaControls()
 {
@@ -51,7 +54,7 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 	HRESULT hr = GetActivationFactory(HStringReference(RuntimeClass_Windows_Media_SystemMediaTransportControls).Get(),
 									  pInterop.GetAddressOf());
 	if (FAILED(hr)) {
-		DLog(L"CMediaControls::Init() : GetActivationFactory() failed");
+		DLog(L"CMediaControls::Init() : GetActivationFactory(ISystemMediaTransportControlsInterop) failed");
 		return false;
 	}
 
@@ -65,6 +68,28 @@ bool CMediaControls::Init(CMainFrame* pMainFrame)
 	hr = m_pControls->get_DisplayUpdater(m_pDisplay.GetAddressOf());
 	if (FAILED(hr)) {
 		DLog(L"CMediaControls::Init() : ISystemMediaTransportControls::get_DisplayUpdater() failed");
+		return false;
+	}
+
+	hr = ActivateInstance(HStringReference(RuntimeClass_Windows_Storage_Streams_InMemoryRandomAccessStream).Get(),
+						  m_pImageStream.GetAddressOf());
+	if (FAILED(hr)) {
+		DLog(L"CMediaControls::Init() : ActivateInstance(IRandomAccessStream) failed");
+		return false;
+	}
+
+	ComPtr<IRandomAccessStreamReferenceStatics> pStreamRefFactory;
+	hr = GetActivationFactory(HStringReference(RuntimeClass_Windows_Storage_Streams_RandomAccessStreamReference).Get(),
+							  pStreamRefFactory.GetAddressOf());
+	if (FAILED(hr)) {
+		DLog(L"CMediaControls::Init() : GetActivationFactory(IRandomAccessStreamReferenceStatics) failed");
+		return false;
+	}
+
+	hr = pStreamRefFactory->CreateFromStream(m_pImageStream.Get(),
+											 m_pImageStreamReference.GetAddressOf());
+	if (FAILED(hr)) {
+		DLog(L"CMediaControls::Init() : CreateFromStream() failed");
 		return false;
 	}
 
@@ -121,6 +146,7 @@ bool CMediaControls::Update()
 			m_pDisplay->get_VideoProperties(pVideoDisplayProperties.GetAddressOf());
 			pVideoDisplayProperties->put_Title(HStringReference(title).Get());
 		}
+
 		m_pDisplay->Update();
 	} else {
 		m_pDisplay->ClearAll();
