@@ -11484,7 +11484,12 @@ double CMainFrame::GetZoomAutoFitScale()
 	const CAppSettings& s = AfxGetAppSettings();
 	CSize arxy = GetVideoSize();
 
-	double fitscale = s.nAutoFitFactor / 100.0 * std::min((double)m_rcDesktop.Width() / arxy.cx, (double)m_rcDesktop.Height() / arxy.cy);
+	double fitscale =
+		s.nAutoFitFactor == 33 ? 1.0 / 3 :
+		s.nAutoFitFactor == 67 ? 2.0 / 3 :
+		(double)s.nAutoFitFactor / 100;
+
+	fitscale *= std::min((double)m_rcDesktop.Width() / arxy.cx, (double)m_rcDesktop.Height() / arxy.cy);
 
 	if (s.nPlaybackWindowMode == PLAYBACKWND_FITSCREENLARGER && fitscale > 1.0) {
 		fitscale = 1.0;
