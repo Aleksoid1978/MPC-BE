@@ -87,6 +87,11 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+// stupid hack for ffmpeg linking
+void *__imp__aligned_malloc  = _aligned_malloc;
+void *__imp__aligned_realloc = _aligned_realloc;
+void *__imp__aligned_free    = _aligned_free;
+
 #else
 
 #include "DSUtil/Profile.h"
@@ -1653,12 +1658,15 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		}
 	}
 
-	if (m_dRate != 1.0
-			&& !m_bIsBitstream
-			&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput)) )) {
-		if (SUCCEEDED(m_Filter.Push(p))) {
-			while (SUCCEEDED(m_Filter.Pull(p))) {
-				PushToQueue(p);
+	if (m_dRate != 1.0 && !m_bIsBitstream) {
+		hr = SetupAudioFilter();
+
+		if (SUCCEEDED(hr)) {
+			hr = m_Filter.Push(p);
+			if (SUCCEEDED(hr)) {
+				while (SUCCEEDED(m_Filter.Pull(p))) {
+					PushToQueue(p);
+				}
 			}
 		}
 	} else {
@@ -1708,6 +1716,40 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 	return S_OK;
 }
 #pragma endregion
+
+HRESULT CMpcAudioRenderer::SetupAudioFilter()
+{
+	if (m_Filter.IsInitialized()) {
+		return S_FALSE;
+	}
+
+	if (m_dRate == 1.0 || m_dRate < 0.25 || m_dRate > 10.0) {
+		m_Filter.Flush();
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr;
+	CStringA flt_args;
+	if (m_dRate < 0.5) {
+		flt_args.Format("tempo=%f", sqrt(m_dRate));
+		hr = m_Filter.Initialize(
+			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
+			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
+			false,
+			{ {"atempo", flt_args}, {"atempo", flt_args} }
+		);
+	}
+	else {
+		flt_args.Format("tempo=%f", m_dRate);
+		hr = m_Filter.Initialize(
+			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
+			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
+			false, { {"atempo", flt_args} }
+		);
+	}
+
+	return hr;
+}
 
 HRESULT CMpcAudioRenderer::GetAudioDevice(const BOOL bForceUseDefaultDevice)
 {
@@ -2927,11 +2969,15 @@ void CMpcAudioRenderer::WaitFinish()
 
 					rtStart = p->rtStop;
 
-					if (m_dRate != 1.0
-							&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput)) )) {
-						if (SUCCEEDED(m_Filter.Push(p))) {
-							while (SUCCEEDED(m_Filter.Pull(p))) {
-								PushToQueue(p);
+					if (m_dRate != 1.0) {
+						HRESULT hr = SetupAudioFilter();
+
+						if (SUCCEEDED(hr)) {
+							hr = m_Filter.Push(p);
+							if (SUCCEEDED(hr)) {
+								while (SUCCEEDED(m_Filter.Pull(p))) {
+									PushToQueue(p);
+								}
 							}
 						}
 					} else {

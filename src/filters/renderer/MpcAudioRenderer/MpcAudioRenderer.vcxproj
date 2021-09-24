@@ -211,7 +211,6 @@
   <ItemGroup>
     <ClCompile Include="AudioDevice.cpp" />
     <ClCompile Include="AudioSyncClock.cpp" />
-    <ClCompile Include="Filter.cpp" />
     <ClCompile Include="MpcAudioRenderer.cpp" />
     <ClCompile Include="MpcAudioRendererSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -224,7 +223,6 @@
   <ItemGroup>
     <ClInclude Include="AudioDevice.h" />
     <ClInclude Include="AudioSyncClock.h" />
-    <ClInclude Include="Filter.h" />
     <ClInclude Include="IMpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRendererSettingsWnd.h" />
@@ -248,14 +246,8 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\libbs2b\libbs2b.vcxproj">
       <Project>{c868fda0-2a56-4274-8c34-ac4751da7bed}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\openjpeg\openjpeg.vcxproj">
-      <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\soxr\soxr.vcxproj">
       <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\zlib\zlib.vcxproj">
-      <Project>{2fcd4b66-9cf9-4c8f-bc70-37cd20002d49}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
@@ -265,9 +257,6 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\filters\filters\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
-      <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

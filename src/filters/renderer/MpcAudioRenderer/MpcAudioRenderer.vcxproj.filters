@@ -24,9 +24,6 @@
     <ClCompile Include="MpcAudioRendererSettingsWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Filter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,9 +50,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MpcAudioRendererSettingsWnd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Filter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AudioDevice.h">

@@ -26,7 +26,7 @@
 #include <FunctionDiscoveryKeys_devpkey.h>
 #include "MpcAudioRendererSettingsWnd.h"
 #include "AudioTools/Mixer.h"
-#include "Filter.h"
+#include "AudioTools/Filter.h"
 #include "AudioSyncClock.h"
 #include "DSUtil/Packet.h"
 #include <ExtLib/libbs2b/bs2bclass.h>
@@ -204,7 +204,8 @@ private:
 	void SetBalanceMask(const DWORD output_layout);
 	void ApplyVolumeBalance(BYTE* pData, UINT32 size);
 
-	CFilter m_Filter;
+	CAudioFilter m_Filter;
+	HRESULT SetupAudioFilter();
 
 	// CMpcAudioRenderer WASAPI methods
 	HRESULT GetAudioDevice(const BOOL bForceUseDefaultDevice);

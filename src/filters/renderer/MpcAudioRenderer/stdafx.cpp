@@ -21,5 +21,3 @@
 #include "stdafx.h"
 
 #pragma comment(lib, "winmm.lib")
-
-#pragma comment(lib, "libdav1d.a")
