@@ -54,11 +54,17 @@ namespace YoutubeDL
 		startup_info.hStdError = hStderr_w;
 		startup_info.wShowWindow = SW_HIDE;
 		startup_info.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+		CStringW ydlpath;
+		if (::PathFileExistsW(L"yt-dlp.exe")) {
+			ydlpath = L"yt-dlp.exe";
+		} else {
+			ydlpath = L"youtube-dl.exe";
+		}
 
-		CStringW args(L"youtube-dl.exe -j --all-subs --sub-format vtt \"" + url + "\"");
+		CStringW args; args.Format(LR"(%s -j --all-subs --sub-format vtt "%s")", ydlpath.GetString(), url.GetString());
 		PROCESS_INFORMATION proc_info = {};
 		const bool bSuccess = CreateProcessW(nullptr, args.GetBuffer(), nullptr, nullptr, true, 0,
-			nullptr, nullptr, &startup_info, &proc_info);
+											 nullptr, nullptr, &startup_info, &proc_info);
 		CloseHandle(hStdout_w);
 		CloseHandle(hStderr_w);
 
