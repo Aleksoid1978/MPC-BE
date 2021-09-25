@@ -1723,7 +1723,7 @@ HRESULT CMpcAudioRenderer::SetupAudioFilter()
 		return S_FALSE;
 	}
 
-	if (m_dRate == 1.0 || m_dRate < 0.25 || m_dRate > 10.0) {
+	if (m_dRate == 1.0 || m_dRate < 0.25 || m_dRate > 8.0) {
 		m_Filter.Flush();
 		return E_INVALIDARG;
 	}
