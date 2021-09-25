@@ -605,8 +605,6 @@ void CAppSettings::ResetSettings()
 	strSubtitlePaths = DEFAULT_SUBTITLE_PATHS;
 
 	fUseDefaultSubtitlesStyle = false;
-	bAudioTimeShift = false;
-	iAudioTimeShift = 0;
 
 	iBufferDuration = APP_BUFDURATION_DEF;
 	iNetworkTimeout = APP_NETTIMEOUT_DEF;
@@ -623,6 +621,9 @@ void CAppSettings::ResetSettings()
 	iAudioNormLevel = 75;
 	iAudioNormRealeaseTime = 8;
 	iAudioSampleFormats = SFMT_MASK;
+	bAudioTimeShift = false;
+	iAudioTimeShift = 0;
+	sAudioFilter1.Empty();
 
 	m_filters.RemoveAll();
 
@@ -1028,6 +1029,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioSampleFormats &= SFMT_MASK;
 	profile.ReadBool(IDS_R_AUDIO, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
 	profile.ReadInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift, -600000, 600000);
+	if (profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1, str)) {
+		sAudioFilter1 = str;
+	} else {
+		sAudioFilter1.Empty();
+	}
 
 	{
 		m_filters.RemoveAll();
@@ -1687,6 +1693,11 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
+	if (sAudioFilter1.GetLength()) {
+		profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1, CStringW(sAudioFilter1));
+	} else {
+		profile.DeleteValue(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1);
+	}
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);

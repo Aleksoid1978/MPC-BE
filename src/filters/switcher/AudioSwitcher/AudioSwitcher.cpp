@@ -36,10 +36,6 @@
 
 #ifdef REGISTER_FILTER
 
-void* __imp__aligned_malloc  = _aligned_malloc;
-void* __imp__aligned_realloc = _aligned_realloc;
-void* __imp__aligned_free    = _aligned_free;
-
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_NULL}
 };
@@ -76,6 +72,11 @@ STDAPI DllUnregisterServer()
 #include "filters/filters/Filters.h"
 
 CFilterApp theApp;
+
+// stupid hack for ffmpeg linking
+void* __imp__aligned_malloc  = _aligned_malloc;
+void* __imp__aligned_realloc = _aligned_realloc;
+void* __imp__aligned_free    = _aligned_free;
 
 #endif
 
@@ -225,14 +226,21 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	const WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
 	SampleFormat audio_sampleformat = GetSampleFormat(in_wfe);
 
+	REFERENCE_TIME rtStart, rtStop ;
+	const bool inputTimeValid = SUCCEEDED(pIn->GetTime(&rtStart, &rtStop));
+
+	if (!inputTimeValid) {
+		rtStart = m_rtNextStart;
+		rtStop  = m_rtNextStart + 1;
+	}
+
 	// bitsreaming
 	if (audio_sampleformat == SAMPLE_FMT_NONE) {
-		REFERENCE_TIME start, stop;
-		if (SUCCEEDED(pIn->GetTime(&start, &stop))) {
-			start += m_rtAudioTimeShift / m_dRate;
-			stop  += m_rtAudioTimeShift / m_dRate;
-			pOut->SetTime(&start, &stop);
-		}
+		if (inputTimeValid) {
+			rtStart += m_rtAudioTimeShift / m_dRate;
+			rtStop  += m_rtAudioTimeShift / m_dRate;
+			pOut->SetTime(&rtStart, &rtStop);
+ 		}
 		return __super::Transform(pIn, pOut);
 	}
 
@@ -261,8 +269,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	SampleFormat output_sampleformat  = GetSampleFormat(output_wfe);
 	const int    output_samplesize    = pOut->GetSize() / (output_channels * get_bytes_per_sample(output_sampleformat));
 
-	REFERENCE_TIME delay = 0;
-
 	bool levels = (audio_layout&SPEAKER_FRONT_CENTER) && m_dCenterLevel != 1.0
 				|| (audio_layout&(SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_BACK_CENTER|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT)) && m_dSurroundLevel != 1.0;
 
@@ -284,7 +290,9 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			mix_data = (BYTE*)m_buffer.Data();
 		}
 
-		delay = m_Mixer.GetDelay();
+		REFERENCE_TIME delay = m_Mixer.GetDelay();
+		rtStart -= delay;
+
 		mix_samples = m_Mixer.Mixing(mix_data, mix_samples, audio_data, audio_samples);
 
 		if (!mix_samples) {
@@ -339,6 +347,37 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 	}
 
+	if (m_afilters.size()) {
+		hr = S_FALSE;
+		if (!m_AudioFilter.IsInitialized()) {
+			hr = m_AudioFilter.Initialize(
+				SAMPLE_FMT_FLT, audio_layout, audio_samplerate,
+				SAMPLE_FMT_FLT, audio_layout, audio_samplerate,
+				true, m_afilters
+			);
+		}
+		if (SUCCEEDED(hr)) {
+			if (audio_sampleformat != SAMPLE_FMT_FLT) {
+				m_buffer.ExpandSize(audio_allsamples);
+				convert_to_float(audio_sampleformat, audio_channels, audio_samples, audio_data, m_buffer.Data());
+
+				audio_data = (BYTE*)m_buffer.Data();
+				audio_sampleformat = SAMPLE_FMT_FLT;
+			}
+
+			hr = m_AudioFilter.Push(rtStart, audio_data, audio_allsamples * 4);
+			if (SUCCEEDED(hr)) {
+				hr = m_AudioFilter.Pull(rtStart, m_buffer, audio_allsamples);
+				if (hr == E_PENDING) {
+					pOut->SetActualDataLength(0);
+					return S_OK;
+				}
+				audio_data = (BYTE*)m_buffer.Data();
+				audio_samples = audio_allsamples / audio_channels;
+			}
+		}
+	}
+
 	// Copy or convert to output
 	if (audio_data != pDataOut && audio_samples > output_samplesize) {
 		return E_FAIL;
@@ -364,14 +403,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	pOut->SetActualDataLength(audio_allsamples * get_bytes_per_sample(audio_sampleformat));
 
 	REFERENCE_TIME rtDur = 10000000i64 * audio_samples / audio_samplerate;
-	REFERENCE_TIME rtStart, rtStop;
-	if (FAILED(pIn->GetTime(&rtStart, &rtStop))) {
-		rtStart = m_rtNextStart;
-		rtStop  = m_rtNextStart + rtDur;
-	} else if (delay) {
-		rtStart -= delay;
-		rtStop   = rtStart + rtDur;
-	}
+	rtStop = rtStart + rtDur;
 	m_rtNextStart = rtStop;
 
 	rtStart += m_rtAudioTimeShift / m_dRate;
@@ -394,7 +426,7 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt, const bool bForce1
 		if (sampleformat == SAMPLE_FMT_NONE) {
 			return; // skip spdif/bitstream formats
 		}
-		if (m_bAutoVolumeControl) {
+		if (m_bAutoVolumeControl || m_afilters.size()) {
 			sampleformat = SAMPLE_FMT_FLT; // this transformations change the sample format to float
 		}
 
@@ -507,6 +539,15 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt, const bool bForce1
 		// write new mt.subtype
 		mt.subtype = (sampleformat == SAMPLE_FMT_FLT) ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT : KSDATAFORMAT_SUBTYPE_PCM;
 	}
+}
+
+HRESULT CAudioSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
+{
+	CAutoLock cAutoLock(&m_csTransform);
+
+	m_AudioFilter.Flush();
+
+	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
 void CAudioSwitcherFilter::CheckSupportedOutputMediaType()
@@ -688,6 +729,37 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioTimeShift(REFERENCE_TIME rtAudioTimeS
 {
 	m_rtAudioTimeShift = rtAudioTimeShift;
 	return S_OK;
+}
+
+STDMETHODIMP CAudioSwitcherFilter::SetAudioFilter1(const char* str_filter)
+{
+	CAutoLock cAutoLock(&m_csTransform);
+
+	m_AudioFilter.Flush();
+	m_afilters.clear();
+
+	if (str_filter) {
+		std::pair<CStringA, CStringA> filter;
+
+		CStringA str(str_filter);
+		str.Trim();
+
+		int k = str.Find("=");
+		if (k < 0) {
+			filter.first = str;
+		}
+		else {
+			filter.first = str.Left(k);
+			filter.second = str.Mid(k + 1);
+		}
+
+		if (filter.first == "compand") {
+			m_afilters.emplace_back(filter);
+			return S_OK;
+		}
+	}
+
+	return E_INVALIDARG;
 }
 
 // IAMStreamSelect

@@ -97,6 +97,7 @@
 #define IDS_RS_AUDIOSAMPLEFORMATS			L"SampleFormats"
 #define IDS_RS_ENABLEAUDIOTIMESHIFT			L"EnableTimeShift"
 #define IDS_RS_AUDIOTIMESHIFT				L"TimeShift"
+#define IDS_RS_AUDIOFILTER1					L"AudioFilter1"
 
 // Mouse
 #define IDS_R_MOUSE							L"Mouse"

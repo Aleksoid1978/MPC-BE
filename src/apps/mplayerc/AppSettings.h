@@ -732,6 +732,7 @@ public:
 	int				iAudioSampleFormats;
 	bool			bAudioTimeShift;
 	int				iAudioTimeShift;
+	CStringA		sAudioFilter1;
 
 	// External Filters
 	CAutoPtrList<FilterOverride> m_filters;

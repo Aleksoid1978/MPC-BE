@@ -23,6 +23,7 @@
 
 #include "AudioTools/Mixer.h"
 #include "AudioTools/BassRedirect.h"
+#include "AudioTools/Filter.h"
 #include "DSUtil/SimpleBuffer.h"
 #include "StreamSwitcher.h"
 #include "IAudioSwitcherFilter.h"
@@ -54,6 +55,9 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	int		m_iNormLevel;
 	int		m_iNormRealeaseTime;
 
+	CAudioFilter m_AudioFilter;
+	std::list<std::pair<CStringA, CStringA>> m_afilters;
+
 	bool	m_bInt16;
 	bool	m_bInt24;
 	bool	m_bInt32;
@@ -76,6 +80,7 @@ public:
 	HRESULT CheckMediaType(const CMediaType* pmt) override;
 	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut) override;
 	void TransformMediaType(CMediaType& mt, const bool bForce16Bit = false) override;
+	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate) override;
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
@@ -89,6 +94,7 @@ public:
 	STDMETHODIMP SetOutputFormats(int iSampleFormats);
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
+	STDMETHODIMP SetAudioFilter1(const char* str_filter);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);

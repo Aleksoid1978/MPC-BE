@@ -49,4 +49,5 @@ public IUnknown {
 	STDMETHOD(SetOutputFormats) (int iSampleFormat) PURE;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
+	STDMETHOD(SetAudioFilter1)(const char* str_filter) PURE;
 };
