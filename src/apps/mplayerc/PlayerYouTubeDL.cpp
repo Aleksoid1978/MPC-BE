@@ -57,6 +57,8 @@ namespace YoutubeDL
 		CStringW ydlpath;
 		if (::PathFileExistsW(L"yt-dlp.exe")) {
 			ydlpath = L"yt-dlp.exe";
+		} else if (::PathFileExistsW(L"yt-dlp_x86.exe")) {
+			ydlpath = L"yt-dlp_x86.exe";
 		} else {
 			ydlpath = L"youtube-dl.exe";
 		}
@@ -174,6 +176,7 @@ namespace YoutubeDL
 							CString fmt;
 							getJsonValue(format, "format", fmt);
 
+							profile->format = Youtube::yformat::y_mp4_other;
 							if (ext == L"mp4") {
 								if (StartsWith(vcodec, "avc1")) {
 									profile->format = Youtube::yformat::y_mp4_avc;
