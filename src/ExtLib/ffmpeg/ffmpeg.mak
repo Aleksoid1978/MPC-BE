@@ -607,6 +607,7 @@ SRCS_LF = \
 	libavfilter/af_aresample.c \
 	libavfilter/af_atempo.c \
 	libavfilter/af_biquads.c \
+	libavfilter/af_compand.c \
 	libavfilter/allfilters.c \
 	libavfilter/audio.c \
 	libavfilter/avfilter.c \

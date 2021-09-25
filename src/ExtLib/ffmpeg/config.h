@@ -933,6 +933,7 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_ARESAMPLE_FILTER 1
 #define CONFIG_ATEMPO_FILTER 1
+#define CONFIG_COMPAND_FILTER 1
 #define CONFIG_HWUPLOAD_CUDA_FILTER 0
 #define CONFIG_LOWPASS_FILTER 0
 
