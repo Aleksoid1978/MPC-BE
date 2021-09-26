@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 5		"Channel Mixer"
 6		"Mix channels to:"
 8		"Request stereo from the decoder"
@@ -437,13 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Formato de Muestrs de Salida:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
-28		"Desplazamiento del audio (ms):"
-31		"Default"
+23		"FFmpeg filters"
+26		"Formato de Muestrs de Salida:"
+27		"Int16"
+28		"Int24"
+29		"Int32"
+30		"Float"
+31		"Desplazamiento del audio (ms):"
+34		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

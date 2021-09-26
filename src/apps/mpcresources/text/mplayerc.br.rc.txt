@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"seg"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 5		"Mixagem de canais"
 6		"Misturar canais para:"
 8		"Solicitar estéreo do decodificador"
@@ -437,13 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Controle de volume"
 17		"Autocontrole de volume"
 18		"Aumentar áudio"
-23		"Formato de amostra de saída:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
-28		"Deslocar tempo de áudio (ms):"
-31		"Padrão"
+23		"FFmpeg filters"
+26		"Formato de amostra de saída:"
+27		"Int16"
+28		"Int24"
+29		"Int32"
+30		"Float"
+31		"Deslocar tempo de áudio (ms):"
+34		"Padrão"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

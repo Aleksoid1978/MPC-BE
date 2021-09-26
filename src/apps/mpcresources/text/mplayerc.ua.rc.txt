@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"сек."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 5		"Мікшер каналів"
 6		"Мікшування каналів:"
 8		"Запит стерео у декодера"
@@ -437,13 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Керування гучністю"
 17		"Автоматичне регулювання гучності"
 18		"Підсилення аудіо"
-23		"Формат виводу:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
-28		"Затримка звуку (мс):"
-31		"Типово"
+23		"FFmpeg filters"
+26		"Формат виводу:"
+27		"Int16"
+28		"Int24"
+29		"Int32"
+30		"Float"
+31		"Затримка звуку (мс):"
+34		"Типово"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

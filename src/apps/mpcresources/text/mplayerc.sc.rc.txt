@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"秒"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 5		"声道合成"
 6		"混合声道至:"
 8		"要求解码器输出 2.0 立体声"
@@ -437,13 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"音量控制"
 17		"自动音量控制"
 18		"音频增强"
-23		"输出采样格式:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"浮点"
-28		"音频延迟时间(毫秒): "
-31		"默认值"
+23		"FFmpeg filters"
+26		"输出采样格式:"
+27		"Int16"
+28		"Int24"
+29		"Int32"
+30		"浮点"
+31		"音频延迟时间(毫秒): "
+34		"默认值"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

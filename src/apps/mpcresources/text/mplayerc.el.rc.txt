@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"δευτ."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 5		"Μείκτης καναλιών"
 6		"Μίξη καναλιών σε:"
 8		"Αίτηση στερεοφωνικού από τον αποκωδικοποιητή"
@@ -437,13 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Έλεγχος έντασης"
 17		"Αυτόματος έλεγχος έντασης"
 18		"Ώθηση ήχου"
-23		"Μορφή δείγμ. εξόδου:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
-28		"Χρονική μετατόπιση ήχου (ms):"
-31		"Προεπιλογή"
+23		"FFmpeg filters"
+26		"Μορφή δείγμ. εξόδου:"
+27		"Int16"
+28		"Int24"
+29		"Int32"
+30		"Float"
+31		"Χρονική μετατόπιση ήχου (ms):"
+34		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
