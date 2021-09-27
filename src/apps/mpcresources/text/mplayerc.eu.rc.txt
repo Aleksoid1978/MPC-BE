@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 5		"Bide Nahastzailea"
 6		"Nahastu bideak:"
 8		"Eskatu estereoa dekodeatzailetik"
@@ -437,14 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 14		"Bolumen agintea"
 17		"Berez irabazi agintea"
 18		"Audioa bultzada"
-23		"FFmpeg filters"
-26		"Irteera lagin heuskarria:"
-27		"Int16"
-28		"Int24"
-29		"Int32"
-30		"Gain"
-31		"Audio denbora aldaketa (sm):"
-34		"Berezkoa"
+24		"FFmpeg filters"
+27		"Irteera lagin heuskarria:"
+28		"Int16"
+29		"Int24"
+30		"Int32"
+31		"Gain"
+32		"Audio denbora aldaketa (sm):"
+35		"Berezkoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

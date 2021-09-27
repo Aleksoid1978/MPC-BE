@@ -429,7 +429,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 34		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 5		"Kanaalmixer"
 6		"Mix kanalen in:"
 8		"Stereo-audio uit decoder proberen te verkrijgen"
@@ -437,14 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 35
 14		"Volumecontrole"
 17		"Automatische volumeregeling"
 18		"Audio boosten"
-23		"FFmpeg filters"
-26		"Audio-uitvoerformaat:"
-27		"Int16"
-28		"Int24"
-29		"Int32"
-30		"Float"
-31		"Audio-tijdsverschuiving (ms):"
-34		"Standaard"
+24		"FFmpeg filters"
+27		"Audio-uitvoerformaat:"
+28		"Int16"
+29		"Int24"
+30		"Int32"
+31		"Float"
+32		"Audio-tijdsverschuiving (ms):"
+35		"Standaard"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
