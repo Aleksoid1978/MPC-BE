@@ -50,6 +50,7 @@ class CPPageSoundProcessing : public CPPageBase
 	CSliderCtrl	m_sldNormLevel;
 	CSliderCtrl	m_sldNormRealeaseTime;
 
+	CButton		m_chkAudioFilters;
 	CComboBox	m_cmbFilter1Name;
 	CEdit		m_edtFilter1Args;
 
@@ -92,7 +93,7 @@ public:
 	afx_msg void OnInt32Check();
 	afx_msg void OnFloatCheck();
 	afx_msg void OnTimeShiftCheck();
-	afx_msg void OnBnClickedSoundProcessingDefault();
+	afx_msg void OnBnClickedDefault();
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnCancel();

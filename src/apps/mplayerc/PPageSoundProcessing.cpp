@@ -122,6 +122,7 @@ void CPPageSoundProcessing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER3, m_sldNormLevel);
 	DDX_Control(pDX, IDC_SLIDER4, m_sldNormRealeaseTime);
 
+	DDX_Control(pDX, IDC_CHECK1, m_chkAudioFilters);
 	DDX_Control(pDX, IDC_COMBO1, m_cmbFilter1Name);
 	DDX_Control(pDX, IDC_EDIT1, m_edtFilter1Args);
 
@@ -145,7 +146,7 @@ BEGIN_MESSAGE_MAP(CPPageSoundProcessing, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK11, OnInt32Check)
 	ON_BN_CLICKED(IDC_CHECK12, OnFloatCheck)
 	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
-	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedSoundProcessingDefault)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
@@ -182,18 +183,19 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_sldNormRealeaseTime.SetRange(5, 10, TRUE);
 	m_sldNormRealeaseTime.SetPos(s.iAudioNormRealeaseTime);
 
+	m_chkAudioFilters.SetCheck(s.bAudioFilters);
 	m_cmbFilter1Name.AddString(L"");
 	m_cmbFilter1Name.AddString(L"compand");
-	if (s.sAudioFilter1.GetLength()) {
+	if (s.strAudioFilter1.GetLength()) {
 		CStringW flt_name;
 		CStringW flt_args;
-		int k = s.sAudioFilter1.Find("=");
+		int k = s.strAudioFilter1.Find("=");
 		if (k < 0) {
-			flt_name = s.sAudioFilter1;
+			flt_name = s.strAudioFilter1;
 		}
 		else {
-			flt_name = s.sAudioFilter1.Left(k);
-			flt_args = s.sAudioFilter1.Mid(k + 1);
+			flt_name = s.strAudioFilter1.Left(k);
+			flt_args = s.strAudioFilter1.Mid(k + 1);
 		}
 
 		if (flt_name == "compand") {
@@ -249,15 +251,16 @@ BOOL CPPageSoundProcessing::OnApply()
 	s.iAudioNormLevel			= m_sldNormLevel.GetPos();
 	s.iAudioNormRealeaseTime	= m_sldNormRealeaseTime.GetPos();
 
+	s.bAudioFilters				= !!m_chkAudioFilters.GetCheck();
 	const int k = m_cmbFilter1Name.GetCurSel();
 	if (k== 0) {
-		s.sAudioFilter1.Empty();
+		s.strAudioFilter1.Empty();
 	} else {
 		CStringW flt_name;
 		CStringW flt_args;
 		m_cmbFilter1Name.GetWindowText(flt_name);
 		m_edtFilter1Args.GetWindowText(flt_args);
-		s.sAudioFilter1.Format("%S=%S", flt_name, flt_args);
+		s.strAudioFilter1.Format("%S=%S", flt_name, flt_args);
 	}
 
 	s.iAudioSampleFormats		= GetSampleFormats();
@@ -285,7 +288,11 @@ BOOL CPPageSoundProcessing::OnApply()
 		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 		pASF->SetOutputFormats(s.iAudioSampleFormats);
 		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
-		pASF->SetAudioFilter1(s.sAudioFilter1);
+		if (s.bAudioFilters) {
+			pASF->SetAudioFilter1(s.strAudioFilter1);
+		} else {
+			pASF->SetAudioFilter1(nullptr);
+		}
 	}
 
 	return __super::OnApply();
@@ -398,7 +405,7 @@ void CPPageSoundProcessing::OnTimeShiftCheck()
 	SetModified();
 }
 
-void CPPageSoundProcessing::OnBnClickedSoundProcessingDefault()
+void CPPageSoundProcessing::OnBnClickedDefault()
 {
 	m_chkMixer.SetCheck(BST_UNCHECKED);
 	SelectByItemData(m_cmbMixerLayout, SPK_STEREO);
@@ -412,6 +419,7 @@ void CPPageSoundProcessing::OnBnClickedSoundProcessingDefault()
 	m_sldNormLevel.SetPos(75);
 	m_sldNormRealeaseTime.SetPos(8);
 
+	m_chkAudioFilters.SetCheck(BST_UNCHECKED);
 	m_cmbFilter1Name.SetCurSel(0);
 
 	m_chkInt16.SetCheck(BST_CHECKED);

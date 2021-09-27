@@ -623,7 +623,8 @@ void CAppSettings::ResetSettings()
 	iAudioSampleFormats = SFMT_MASK;
 	bAudioTimeShift = false;
 	iAudioTimeShift = 0;
-	sAudioFilter1.Empty();
+	bAudioFilters = false;
+	strAudioFilter1.Empty();
 
 	m_filters.RemoveAll();
 
@@ -1029,10 +1030,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioSampleFormats &= SFMT_MASK;
 	profile.ReadBool(IDS_R_AUDIO, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
 	profile.ReadInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift, -600000, 600000);
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOFILTERS, bAudioFilters);
 	if (profile.ReadString(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1, str)) {
-		sAudioFilter1 = str;
+		strAudioFilter1 = str;
 	} else {
-		sAudioFilter1.Empty();
+		strAudioFilter1.Empty();
 	}
 
 	{
@@ -1693,11 +1695,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
-	if (sAudioFilter1.GetLength()) {
-		profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1, CStringW(sAudioFilter1));
-	} else {
-		profile.DeleteValue(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1);
-	}
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOFILTERS, bAudioFilters);
+	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1, CStringW(strAudioFilter1));
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);

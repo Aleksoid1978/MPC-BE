@@ -738,25 +738,27 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioFilter1(const char* str_filter)
 	m_AudioFilter.Flush();
 	m_afilters.clear();
 
-	if (str_filter) {
-		std::pair<CStringA, CStringA> filter;
+	if (!str_filter || str_filter[0] == 0) {
+		return S_FALSE;
+	}
 
-		CStringA str(str_filter);
-		str.Trim();
+	std::pair<CStringA, CStringA> filter;
 
-		int k = str.Find("=");
-		if (k < 0) {
-			filter.first = str;
-		}
-		else {
-			filter.first = str.Left(k);
-			filter.second = str.Mid(k + 1);
-		}
+	CStringA str(str_filter);
+	str.Trim();
 
-		if (filter.first == "compand") {
-			m_afilters.emplace_back(filter);
-			return S_OK;
-		}
+	int k = str.Find("=");
+	if (k < 0) {
+		filter.first = str;
+	}
+	else {
+		filter.first = str.Left(k);
+		filter.second = str.Mid(k + 1);
+	}
+
+	if (filter.first == "compand") {
+		m_afilters.emplace_back(filter);
+		return S_OK;
 	}
 
 	return E_INVALIDARG;
