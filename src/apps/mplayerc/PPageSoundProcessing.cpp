@@ -156,6 +156,8 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	CorrectCWndWidth(&m_chkAudioFilters);
+
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_chkMixer.SetCheck(s.bAudioMixer);
