@@ -200,8 +200,9 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 			flt_args = s.strAudioFilter1.Mid(k + 1);
 		}
 
-		if (flt_name == "compand") {
-			m_cmbFilter1Name.SetCurSel(1);
+		const int idx = m_cmbFilter1Name.FindStringExact(1, flt_name);
+		if (idx != CB_ERR ) {
+			m_cmbFilter1Name.SetCurSel(idx);
 			m_edtFilter1Args.SetWindowText(flt_args);
 		}
 	}
