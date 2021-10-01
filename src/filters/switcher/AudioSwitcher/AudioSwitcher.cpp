@@ -764,6 +764,15 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioFilter1(const char* str_filter)
 	return E_INVALIDARG;
 }
 
+STDMETHODIMP_(int) CAudioSwitcherFilter::GetAudioFilterState()
+{
+	if (m_AudioFilter.IsInitialized()) {
+		return m_afilters.size();
+	} else {
+		return m_afilters.size() ? -2 : -1;
+	}
+}
+
 // IAMStreamSelect
 
 STDMETHODIMP CAudioSwitcherFilter::Enable(long lIndex, DWORD dwFlags)

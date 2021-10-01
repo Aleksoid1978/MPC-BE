@@ -95,6 +95,7 @@ public:
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
 	STDMETHODIMP SetAudioFilter1(const char* str_filter);
+	STDMETHODIMP_(int) GetAudioFilterState();
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
