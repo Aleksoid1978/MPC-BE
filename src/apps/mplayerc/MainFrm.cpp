@@ -14249,6 +14249,10 @@ void CMainFrame::CloseMediaPrivate()
 		auto& historyFile = AfxGetMyApp()->m_HistoryFile;
 
 		if (GetPlaybackMode() == PM_FILE) {
+			if (m_SessionInfo.Title.IsEmpty()) {
+				m_SessionInfo.Title = m_PlaybackInfo.Title;
+			}
+
 			if (s.bRememberFilePos && !m_bGraphEventComplete) {
 				REFERENCE_TIME rtDur;
 				m_pMS->GetDuration(&rtDur);
