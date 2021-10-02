@@ -12632,10 +12632,21 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	if (SUCCEEDED(hr)) {
 		m_SessionInfo.DVDId = ullDiscID;
 
-		if (pODD->title.GetLength() == 24 && pODD->title.Mid(1).CompareNoCase(L":\\VIDEO_TS\\VIDEO_TS.IFO") == 0) {
-			const CString DVDLabel = GetDriveLabel(pODD->title[0]);
-			if (DVDLabel.GetLength() > 0) {
-				m_SessionInfo.Title = DVDLabel;
+		const CStringW& path = pODD->title;
+
+		if (EndsWithNoCase(path, L"\\VIDEO_TS\\VIDEO_TS.IFO")) {
+			if (path.GetLength() == 24 && path[1] == L':') {
+				const CString DVDLabel = GetDriveLabel(path[0]);
+				if (DVDLabel.GetLength() > 0) {
+					m_SessionInfo.Title = DVDLabel;
+				}
+			}
+			else if (path.GetLength() > 24) {
+				CStringW str = path.Left(path.GetLength() - 22);
+				int k= str.ReverseFind(L'\\');
+				if (k > 1) {
+					m_SessionInfo.Title = str.Mid(k + 1);
+				}
 			}
 		}
 

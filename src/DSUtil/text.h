@@ -204,3 +204,43 @@ inline bool StartsWithNoCase(const CStringW& str, const wchar_t* prefix, int pos
 {
 	return _wcsnicmp(str.GetString() + pos, prefix, std::char_traits<wchar_t>::length(prefix)) == 0;
 }
+
+inline bool EndsWith(const CStringA& str, const char* suffix)
+{
+	const size_t len = std::char_traits<char>::length(suffix);
+	const int pos = str.GetLength() - (int)len;
+	if (pos >= 0) {
+		return strncmp(str.GetString() + pos, suffix, len) == 0;
+	}
+	return false;
+}
+
+inline bool EndsWith(const CStringW& str, const wchar_t* suffix)
+{
+	const size_t len = std::char_traits<wchar_t>::length(suffix);
+	const int pos = str.GetLength() - (int)len;
+	if (pos >= 0) {
+		return wcsncmp(str.GetString() + pos, suffix, len) == 0;
+	}
+	return false;
+}
+
+inline bool EndsWithNoCase(const CStringA& str, const char* suffix)
+{
+	const size_t len = std::char_traits<char>::length(suffix);
+	const int pos = str.GetLength() - (int)len;
+	if (pos >= 0) {
+		return _strnicmp(str.GetString() + pos, suffix, len) == 0;
+	}
+	return false;
+}
+
+inline bool EndsWithNoCase(const CStringW& str, const wchar_t* suffix)
+{
+	const size_t len = std::char_traits<wchar_t>::length(suffix);
+	const int pos = str.GetLength() - (int)len;
+	if (pos >= 0) {
+		return _wcsnicmp(str.GetString() + pos, suffix, len) == 0;
+	}
+	return false;
+}
