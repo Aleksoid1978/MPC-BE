@@ -134,6 +134,17 @@ public:
 	}
 };
 
+
+static LPCWSTR s_strPlayerTitle = "MPC-BE "
+#ifdef _WIN64
+	L"x64 "
+#endif
+#if (MPC_VERSION_STATUS == 1)
+	MPC_VERSION_WSTR;
+#else
+	MPC_VERSION_SVN_WSTR " alpha";
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
@@ -828,20 +839,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShader = s.bToggleShader;
 	m_bToggleShaderScreenSpace = s.bToggleShaderScreenSpace;
 
-#ifdef _WIN64
-	m_strTitle.SetString(L"MPC-BE x64");
-#else
-	m_strTitle.SetString(L"MPC-BE");
-#endif
-#if (MPC_VERSION_STATUS == 1)
-	m_strTitle.AppendFormat(L" %s", MPC_VERSION_WSTR);
-#else
-	m_strTitle.AppendFormat(L" %s alpha", MPC_VERSION_SVN_WSTR);
-#endif
-
-
-	SetWindowTextW(m_strTitle);
-	m_Lcd.SetMediaTitle(m_strTitle);
+	SetWindowTextW(s_strPlayerTitle);
+	m_Lcd.SetMediaTitle(s_strPlayerTitle);
 
 	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();
 
@@ -4649,8 +4648,8 @@ void CMainFrame::OnFilePostCloseMedia()
 	RecalcLayout();
 	UpdateWindow();
 
-	SetWindowTextW(m_strTitle);
-	m_Lcd.SetMediaTitle(m_strTitle);
+	SetWindowTextW(s_strPlayerTitle);
+	m_Lcd.SetMediaTitle(s_strPlayerTitle);
 
 	SetAlwaysOnTop(s.iOnTop);
 
@@ -13239,9 +13238,10 @@ void CMainFrame::UpdateWindowTitle()
 	m_Lcd.SetMediaTitle(title);
 
 	if (style == TEXTBAR_EMPTY) {
-		title = m_strTitle;
+		title = s_strPlayerTitle;
 	} else {
-		title += L" - " + m_strTitle;
+		title.Append(L" - ");
+		title.Append(s_strPlayerTitle);
 	}
 
 	CString curTitle;

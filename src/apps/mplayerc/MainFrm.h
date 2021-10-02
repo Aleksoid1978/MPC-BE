@@ -716,17 +716,19 @@ private:
 			bUpdateTitle = false;
 		}
 		LPCWSTR GetFileNameOrTitleOrPath() {
-			return FileName.GetLength() ? FileName.GetString() : Title.GetLength() ? Title.GetString() : Path.GetString();
+			return
+				FileName.GetLength() ? FileName.GetString() :
+				Title.GetLength() ? Title.GetString() :
+				Path.GetString();
 		}
 		LPCWSTR GetTitleOrFileNameOrPath() {
-			return Title.GetLength() ? Title.GetString() : FileName.GetLength() ? FileName.GetString() : Path.GetString();
-		}
-		LPCWSTR GetFileNameOrOrPath() {
-			return FileName.GetLength() ? FileName.GetString() : Path.GetString();
+			return
+				Title.GetLength() ? Title.GetString() :
+				FileName.GetLength() ? FileName.GetString() :
+				Path.GetString();
 		}
 	} m_PlaybackInfo;
 
-	CString m_strTitle;
 	CString m_strPlaybackRenderedPath;
 
 	bool m_bOpening = false;
