@@ -234,6 +234,13 @@ HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const s
 	return ret < 0 ? E_FAIL : S_OK;
 }
 
+void CAudioFilter::PushEnd()
+{
+	if (m_pFilterBufferSink) {
+		int ret = av_buffersrc_add_frame(m_pFilterBufferSrc, nullptr);
+	}
+}
+
 HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 {
 	if (!m_pFilterGraph || !m_pFrame) {

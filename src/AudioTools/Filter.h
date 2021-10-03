@@ -67,6 +67,7 @@ public:
 
 	HRESULT Push(const CAutoPtr<CPacket>& p);
 	HRESULT Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size);
+	void PushEnd();
 
 	HRESULT Pull(CAutoPtr<CPacket>& p);
 	HRESULT Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples);
