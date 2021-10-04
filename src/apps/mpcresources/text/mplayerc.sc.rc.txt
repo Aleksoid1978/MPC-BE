@@ -437,7 +437,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 14		"音量控制"
 17		"自动音量控制"
 18		"音频增强"
-24		"FFmpeg filters"
+24		"FFmpeg过滤器"
 27		"输出采样格式:"
 28		"Int16"
 29		"Int24"
