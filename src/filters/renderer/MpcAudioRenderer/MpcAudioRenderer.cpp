@@ -1590,7 +1590,8 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			HRESULT hr = E_INVALIDARG;
 			switch (m_output_params.sf) {
 				case SAMPLE_FMT_S16:
-					hr = convert_to_int16(m_input_params.sf, m_output_params.channels, out_samples, in_buff, (int16_t*)out_buf);
+					m_DitherInt16.UpdateInput(m_input_params.sf, m_output_params.channels);
+					m_DitherInt16.Process((int16_t*)out_buf, in_buff, out_samples);
 					break;
 				case SAMPLE_FMT_S24:
 					hr = convert_to_int24(m_input_params.sf, m_output_params.channels, out_samples, in_buff, out_buf);

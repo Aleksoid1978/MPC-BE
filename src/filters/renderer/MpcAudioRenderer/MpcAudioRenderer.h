@@ -27,6 +27,7 @@
 #include "MpcAudioRendererSettingsWnd.h"
 #include "AudioTools/Mixer.h"
 #include "AudioTools/Filter.h"
+#include "AudioTools/DitherInt16.h"
 #include "AudioSyncClock.h"
 #include "DSUtil/Packet.h"
 #include <ExtLib/libbs2b/bs2bclass.h>
@@ -206,6 +207,8 @@ private:
 
 	CAudioFilter m_Filter;
 	HRESULT SetupAudioFilter();
+
+	CDitherInt16 m_DitherInt16;
 
 	// CMpcAudioRenderer WASAPI methods
 	HRESULT GetAudioDevice(const BOOL bForceUseDefaultDevice);
