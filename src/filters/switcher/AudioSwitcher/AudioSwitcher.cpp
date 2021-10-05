@@ -385,7 +385,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if (audio_data != pDataOut) {
 		switch (output_sampleformat) {
 		case SAMPLE_FMT_S16:
-			hr = convert_to_int16(audio_sampleformat, audio_channels, audio_samples, audio_data, (int16_t*)pDataOut);
+			m_DitherInt16.UpdateInput(audio_sampleformat, audio_channels);
+			m_DitherInt16.Process((int16_t*)pDataOut, audio_data, audio_samples);
 			break;
 		case SAMPLE_FMT_S24:
 			hr = convert_to_int24(audio_sampleformat, audio_channels, audio_samples, audio_data, pDataOut);

@@ -24,6 +24,7 @@
 #include "AudioTools/Mixer.h"
 #include "AudioTools/BassRedirect.h"
 #include "AudioTools/Filter.h"
+#include "AudioTools/DitherInt16.h"
 #include "DSUtil/SimpleBuffer.h"
 #include "StreamSwitcher.h"
 #include "IAudioSwitcherFilter.h"
@@ -57,6 +58,8 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 
 	CAudioFilter m_AudioFilter;
 	std::list<std::pair<CStringA, CStringA>> m_afilters;
+
+	CDitherInt16 m_DitherInt16;
 
 	bool	m_bInt16;
 	bool	m_bInt24;
