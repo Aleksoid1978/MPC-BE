@@ -1138,7 +1138,7 @@ STDMETHODIMP CMpcAudioRenderer::SetWasapiMode(INT nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_DeviceMode != nValue) {
+	if (m_DeviceMode != nValue) {
 		SetReinitializeAudioDevice();
 	}
 
@@ -1156,7 +1156,7 @@ STDMETHODIMP CMpcAudioRenderer::SetWasapiMethod(INT nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_WasapiMethod != nValue) {
+	if (m_WasapiMethod != nValue) {
 		SetReinitializeAudioDevice();
 	}
 
@@ -1260,7 +1260,7 @@ STDMETHODIMP CMpcAudioRenderer::SetBitExactOutput(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_bUseBitExactOutput != bValue && IsExclusiveMode()) {
+	if (m_bUseBitExactOutput != bValue && IsExclusiveMode()) {
 		SetReinitializeAudioDevice();
 	}
 
@@ -1278,7 +1278,7 @@ STDMETHODIMP CMpcAudioRenderer::SetSystemLayoutChannels(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_bUseSystemLayoutChannels != bValue && IsExclusiveMode()) {
+	if (m_bUseSystemLayoutChannels != bValue && IsExclusiveMode()) {
 		SetReinitializeAudioDevice();
 	}
 
