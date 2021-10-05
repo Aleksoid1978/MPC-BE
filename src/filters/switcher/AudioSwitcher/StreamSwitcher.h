@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -230,16 +230,17 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 
 	CCritSec m_csState, m_csPins;
 
+	bool m_bInputPinChanged = false;
+
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin, IPin* pReceivePin);
-	bool m_bInputPinChanged;
 
 	virtual void CheckSupportedOutputMediaType() PURE;
 
 protected:
 	double m_dRate = 1.0;
+	bool m_bOutputFormatChanged = false;
 
 	void SelectInput(CStreamSwitcherInputPin* pInput);
-	bool m_bOutputFormatChanged;
 
 public:
 	CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid);
