@@ -29,6 +29,9 @@
     <ClCompile Include="Filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DitherInt16.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioHelper.h">
@@ -47,6 +50,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DitherInt16.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

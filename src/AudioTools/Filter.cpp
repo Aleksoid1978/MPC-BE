@@ -202,7 +202,7 @@ HRESULT CAudioFilter::Push(const CAutoPtr<CPacket>& p)
 
 HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size)
 {
-	if (!m_pFilterGraph || !m_pFrame) {
+	if (!m_pFilterBufferSrc || !m_pFrame) {
 		return E_ABORT;
 	}
 	ASSERT(av_sample_fmt_is_planar(m_inAvSampleFmt) == 0);
@@ -243,7 +243,7 @@ void CAudioFilter::PushEnd()
 
 HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 {
-	if (!m_pFilterGraph || !m_pFrame) {
+	if (!m_pFilterBufferSink || !m_pFrame) {
 		return E_ABORT;
 	}
 	ASSERT(av_sample_fmt_is_planar(m_outAvSampleFmt) == 0);
@@ -279,7 +279,7 @@ HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 
 HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples)
 {
-	if (m_outAvSampleFmt != AV_SAMPLE_FMT_FLT || !m_pFilterGraph || !m_pFrame) {
+	if (m_outAvSampleFmt != AV_SAMPLE_FMT_FLT || !m_pFilterBufferSink || !m_pFrame) {
 		return E_ABORT;
 	}
 
