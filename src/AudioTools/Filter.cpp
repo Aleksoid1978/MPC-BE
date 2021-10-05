@@ -33,6 +33,34 @@ extern "C"
 	#include <libavutil/opt.h>
 }
 
+CStringW AvError2Str(const int averror)
+{
+	CStringW str;
+
+	if (averror >= 0) {
+		str = L"OK";
+	} else {
+#define UNPACK_VALUE(VALUE) case VALUE: str = L#VALUE; break;
+		switch (averror) {
+			UNPACK_VALUE(AVERROR(EIO))
+			UNPACK_VALUE(AVERROR(EAGAIN))
+			UNPACK_VALUE(AVERROR(ENOMEM))
+			UNPACK_VALUE(AVERROR(EINVAL))
+			UNPACK_VALUE(AVERROR(ERANGE))
+			UNPACK_VALUE(AVERROR(ENOSYS))
+			UNPACK_VALUE(AVERROR_BUG)
+			UNPACK_VALUE(AVERROR_EOF)
+			UNPACK_VALUE(AVERROR_OPTION_NOT_FOUND)
+			UNPACK_VALUE(AVERROR_PATCHWELCOME)
+		default:
+			str.Format(L"AVERROR(%d)", averror);
+		};
+#undef UNPACK_VALUE
+	}
+
+	return str;
+}
+
 AVSampleFormat MpcToAvSampleFormat(const SampleFormat sample_fmt)
 {
 	switch (sample_fmt) {
@@ -185,6 +213,7 @@ HRESULT CAudioFilter::Initialize(
 	} while (0);
 
 	if (ret < 0) {
+		DLog(L"CAudioFilter::Initialize failed with %s", AvError2Str(ret));
 		Flush();
 		return E_FAIL;
 	}
@@ -230,6 +259,7 @@ HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const s
 	ret = av_buffersrc_write_frame(m_pFilterBufferSrc, m_pFrame);
 
 	av_frame_unref(m_pFrame);
+	DLogIf(ret < 0, L"CAudioFilter::Push failed with %s", AvError2Str(ret));
 
 	return ret < 0 ? E_FAIL : S_OK;
 }

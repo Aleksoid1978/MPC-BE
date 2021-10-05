@@ -557,7 +557,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			charSize = m_Font3D.GetMaxCharMetric();
 		}
 	}
-	DLogIf(FAILED(hr2), L"m_Font3D failed with error {}", HR2Str(hr2));
+	DLogIf(FAILED(hr2), L"m_Font3D failed with error %s", HR2Str(hr2));
 
 	if (m_pfD3DXCreateLine) {
 		m_pfD3DXCreateLine (m_pD3DDevEx, &m_pLine);

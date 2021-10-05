@@ -780,7 +780,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	if (!bTryToReset) {
 		m_Font3D.InvalidateDeviceObjects();
 		HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pD3DDevEx);
-		DLogIf(FAILED(hr2), L"m_Font3D initialization failed with error {}", HR2Str(hr2));
+		DLogIf(FAILED(hr2), L"m_Font3D initialization failed with error %s", HR2Str(hr2));
 		m_bFont3DUpdate = true;
 
 		OnResetDevice();
@@ -1793,7 +1793,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		const UINT fontFlags = (m_rcMonitor.Width() - m_windowRect.Width() > 100) ? 0 : D3DFONT_BOLD;
 
 		HRESULT hr2 = m_Font3D.CreateFontBitmap(L"Lucida Console", fontH, fontW, fontFlags);
-		DLogIf(FAILED(hr2), L"m_Font3D font creation failed with error {}", HR2Str(hr2));
+		DLogIf(FAILED(hr2), L"m_Font3D font creation failed with error %s", HR2Str(hr2));
 
 		m_bFont3DUpdate = false;
 	}
