@@ -23,6 +23,7 @@
 #pragma warning(disable: 5033) // warning C5033: 'register' is no longer a supported storage class
 #include <ExtLib/lcms2/include/lcms2.h>
 #pragma warning(pop)
+#include <mfobjects.h>
 #include <DirectXPackedVector.h>
 #include "Dither.h"
 #include "DX9RenderingEngine.h"
@@ -2297,11 +2298,11 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
 			m_wsCorrection = L"Fix YCgCo";
 		}
-		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_2084) {
+		else if (extformat.VideoTransferFunction == MFVideoTransFunc_2084) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CONVERT_PQ_TO_SDR : IDF_SHADER_PS20_CONVERT_PQ_TO_SDR);
 			m_wsCorrection = L"Convert PQ to SDR";
 		}
-		else if (extformat.VideoPrimaries == VIDEOPRIMARIES_BT2020) {
+		else if (extformat.VideoPrimaries == MFVideoPrimaries_BT2020) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CONVERT_2020_TO_709 : IDF_SHADER_PS20_CONVERT_2020_TO_709);
 			m_wsCorrection = L"Convert BT.2020 to BT.709";
 		}

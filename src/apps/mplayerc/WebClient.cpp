@@ -728,9 +728,9 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 								DXVA2_ExtendedFormat exfmt;
 								exfmt.value = vih2->dwControlFlags;
 								switch (exfmt.VideoTransferFunction) {
-									case VIDEOTRANSFUNC_2084: HDR = L"HDR";      break;
-									case VIDEOTRANSFUNC_HLG:  HDR = L"HDR(HLG)"; break;
-									default:                  HDR = L"SDR";      break;
+									case MFVideoTransFunc_2084: HDR = L"HDR";      break;
+									case MFVideoTransFunc_HLG:  HDR = L"HDR(HLG)"; break;
+									default:                    HDR = L"SDR";      break;
 								}
 							}
 

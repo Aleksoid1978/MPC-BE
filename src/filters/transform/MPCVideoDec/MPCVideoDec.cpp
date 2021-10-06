@@ -3002,15 +3002,15 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			break;
 		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_PRI_BT2020:
-			fmt.VideoPrimaries = VIDEOPRIMARIES_BT2020;
+			fmt.VideoPrimaries = MFVideoPrimaries_BT2020;
 			break;
 		case AVCOL_PRI_SMPTE428:
 			// XYZ
-			fmt.VideoPrimaries = VIDEOPRIMARIES_XYZ;
+			fmt.VideoPrimaries = MFVideoPrimaries_XYZ;
 			break;
 		case AVCOL_PRI_SMPTE431:
 			// DCI-P3
-			fmt.VideoPrimaries = VIDEOPRIMARIES_DCI_P3;
+			fmt.VideoPrimaries = MFVideoPrimaries_DCI_P3;
 			break;
 	}
 
@@ -3033,7 +3033,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 				// Hack to get the same result on different video adapters after EVR mixer.
 				fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT709;
 			} else {
-				fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_BT2020_10;
+				fmt.VideoTransferMatrix = MFVideoTransferMatrix_BT2020_10;
 			}
 			break;
 		// Custom values, not official standard, but understood by madVR, YCGCO understood by EVR-CP
@@ -3068,18 +3068,21 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		case AVCOL_TRC_SMPTE240M:
 			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_240M;
 			break;
+		case AVCOL_TRC_LINEAR:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_10;
+			break;
+		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_TRC_LOG:
 			fmt.VideoTransferFunction = MFVideoTransFunc_Log_100;
 			break;
 		case AVCOL_TRC_LOG_SQRT:
 			fmt.VideoTransferFunction = MFVideoTransFunc_Log_316;
 			break;
-		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_TRC_SMPTEST2084:
-			fmt.VideoTransferFunction = VIDEOTRANSFUNC_2084;
+			fmt.VideoTransferFunction = MFVideoTransFunc_2084;
 			break;
 		case AVCOL_TRC_ARIB_STD_B67:
-			fmt.VideoTransferFunction = VIDEOTRANSFUNC_HLG;
+			fmt.VideoTransferFunction = MFVideoTransFunc_HLG;
 			break;
 	}
 
