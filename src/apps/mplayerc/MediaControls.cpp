@@ -147,7 +147,7 @@ bool CMediaControls::Update()
 	}
 
 	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
-		auto title = m_pMainFrame->m_PlaybackInfo.GetTitleOrFileNameOrPath();
+		auto title = m_pMainFrame->GetTitleOrFileNameOrPath();
 		if (m_pMainFrame->m_bAudioOnly) {
 			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Music);
 

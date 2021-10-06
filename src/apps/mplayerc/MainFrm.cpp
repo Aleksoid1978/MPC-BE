@@ -1531,13 +1531,13 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 LPCWSTR CMainFrame::GetTextForBar(int style)
 {
 	if (style == TEXTBAR_FILENAME) {
-		return m_PlaybackInfo.GetFileNameOrTitleOrPath();
+		return GetFileNameOrTitleOrPath();
 	}
 	if (style == TEXTBAR_TITLE) {
-		return m_PlaybackInfo.GetTitleOrFileNameOrPath();
+		return GetTitleOrFileNameOrPath();
 	}
 	if (style == TEXTBAR_FULLPATH) {
-		return m_PlaybackInfo.Path.GetString();
+		return m_SessionInfo.Path.GetString();
 	}
 
 	return L"";
@@ -1545,13 +1545,13 @@ LPCWSTR CMainFrame::GetTextForBar(int style)
 
 void CMainFrame::UpdateTitle()
 {
-	if (m_eMediaLoadState == MLS_LOADED && m_PlaybackInfo.bUpdateTitle && m_pAMMC[0]) {
+	if (m_eMediaLoadState == MLS_LOADED && m_bUpdateTitle && m_pAMMC[0]) {
 		for (const auto& pAMMC : m_pAMMC) {
 			if (pAMMC) {
 				CComBSTR bstr;
 				if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-					if (m_PlaybackInfo.Title != bstr.m_str) {
-						m_PlaybackInfo.Title = bstr.m_str;
+					if (m_SessionInfo.Title != bstr.m_str) {
+						m_SessionInfo.Title = bstr.m_str;
 						UpdateWindowTitle();
 						break;
 					}
@@ -2612,7 +2612,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					if (s.bOSDFileName) {
-						FormatString(strOSD, m_PlaybackInfo.GetFileNameOrTitleOrPath());
+						FormatString(strOSD, GetFileNameOrTitleOrPath());
 					}
 
 					if (m_pBFmadVR) {
@@ -10105,11 +10105,11 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 	sesInfo.CleanPosition();
 
 	std::list<CString> descList;
-	if (m_PlaybackInfo.FileName.GetLength()) {
-		descList.push_back(m_PlaybackInfo.FileName);
+	if (m_FileName.GetLength()) {
+		descList.push_back(m_FileName);
 	}
-	if (m_PlaybackInfo.Title.GetLength()) {
-		descList.push_back(m_PlaybackInfo.Title);
+	if (m_SessionInfo.Title.GetLength()) {
+		descList.push_back(m_SessionInfo.Title);
 	}
 
 	if (bShowDialog) {
@@ -12059,7 +12059,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
-	} else if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
+	}
+	else if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
 		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
 			std::list<CString> urls;
@@ -12082,8 +12083,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	if (s.bYDLEnable
-			&& pOFD->fns.size() == 1 && ::PathIsURLW(pOFD->fns.front())
 			&& youtubeUrl.IsEmpty()
+			&& pOFD->fns.size() == 1
+			&& ::PathIsURLW(pOFD->fns.front())
 			&& Content::Online::CheckConnect(pOFD->fns.front())) {
 		const CString fn = pOFD->fns.front().GetName();
 		CString online_hdr;
@@ -12122,6 +12124,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 			}
 		}
+	}
+
+	if (!::PathIsURLW(pOFD->fns.front())) {
+		m_FileName = GetFileOnly(pOFD->fns.front());
+	}
+	else if (youtubeUrl.IsEmpty()) {
+		m_bUpdateTitle = true;
 	}
 
 	auto AddCustomChapters = [&](const auto& chaplist) {
@@ -12361,6 +12370,15 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			if (m_youtubeFields.title.GetLength()) {
 				m_SessionInfo.Title = m_youtubeFields.title;
 			}
+			else if (m_LastOpenBDPath.GetLength()) {
+				CString fn2 = L"Blu-ray";
+				if (m_BDLabel.GetLength()) {
+					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
+				} else {
+					MakeBDLabel(pOFD->fns.front(), fn2);
+				}
+				m_SessionInfo.Title = fn2;
+			}
 			else if (m_pAMMC[0]) {
 				for (const auto& pAMMC : m_pAMMC) {
 					if (pAMMC) {
@@ -12369,6 +12387,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 							m_SessionInfo.Title = bstr.m_str;
 							break;
 						}
+					}
+				}
+
+				if (m_SessionInfo.Title.IsEmpty()) {
+					CPlaylistItem pli;
+					if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.empty() && !pli.m_label.IsEmpty()) {
+						m_SessionInfo.Title = pli.m_label;
 					}
 				}
 			}
@@ -12831,6 +12856,9 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 
 	pODD->title = ResStr(IDS_CAPTURE_LIVE);
 
+	ClearPlaybackInfo();
+	m_SessionInfo.Title = ResStr(IDS_CAPTURE_LIVE);
+
 	SetPlaybackMode(PM_CAPTURE);
 
 	return L"";
@@ -13173,71 +13201,6 @@ void CMainFrame::OpenSetupStatusBar()
 		EndEnumFilters;
 
 		m_wndStatusBar.SetStatusBitmap(id);
-	}
-}
-
-void CMainFrame::OpenUpdatePlaybackInfo(const CString path)
-{
-	m_PlaybackInfo.Clear();
-
-	if (path.IsEmpty()) {
-		return;
-	}
-
-	m_PlaybackInfo.Path = path;
-
-	if (GetPlaybackMode() == PM_FILE) {
-		// BD title
-		if (m_LastOpenBDPath.GetLength() > 0) {
-			CString fn2 = L"Blu-ray";
-			if (m_BDLabel.GetLength() > 0) {
-				fn2.AppendFormat(L" \"%s\"", m_BDLabel);
-			} else {
-				MakeBDLabel(path, fn2);
-			}
-			m_PlaybackInfo.Title = fn2;
-		}
-		// YouTube title and path
-		else if (m_youtubeFields.title.GetLength()) {
-			m_PlaybackInfo.Title = m_youtubeFields.title;
-			m_PlaybackInfo.Path = m_wndPlaylistBar.GetCurFileName();
-		}
-		// file and URL title
-		else {
-			bool bGetTitle = false;
-
-			for (const auto& pAMMC : m_pAMMC) {
-				if (pAMMC) {
-					CComBSTR bstr;
-					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-						m_PlaybackInfo.Title = bstr.m_str;
-						bGetTitle = true;
-						break;
-					}
-				}
-			}
-
-			if (!bGetTitle) {
-				CPlaylistItem pli;
-				if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.empty() && !pli.m_label.IsEmpty()) {
-					m_PlaybackInfo.Title = pli.m_label;
-				}
-			}
-
-			if (::PathIsURLW(path)) {
-				// use update for title for URLs
-				m_PlaybackInfo.bUpdateTitle = true;
-			} else {
-				// file name
-				m_PlaybackInfo.FileName = path.Mid(std::max(path.ReverseFind('\\'), path.ReverseFind('/')) + 1);
-			}
-		}
-	}
-	else if (GetPlaybackMode() == PM_DVD) {
-		MakeDVDLabel(L"", m_PlaybackInfo.Title);
-	}
-	else if (GetPlaybackMode() == PM_CAPTURE) {
-		m_PlaybackInfo.Title = ResStr(IDS_CAPTURE_LIVE);
 	}
 }
 
@@ -14193,7 +14156,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			s.rtShift = 0;
 		}
 
-		OpenUpdatePlaybackInfo(pOMD->title);
 		UpdateWindowTitle();
 
 		OpenSetupSubStream(pOMD);
@@ -14260,10 +14222,6 @@ void CMainFrame::CloseMediaPrivate()
 		auto& historyFile = AfxGetMyApp()->m_HistoryFile;
 
 		if (GetPlaybackMode() == PM_FILE) {
-			if (m_SessionInfo.Title.IsEmpty()) {
-				m_SessionInfo.Title = m_PlaybackInfo.Title;
-			}
-
 			if (s.bRememberFilePos && !m_bGraphEventComplete) {
 				REFERENCE_TIME rtDur;
 				m_pMS->GetDuration(&rtDur);
@@ -14307,7 +14265,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_ExternalSubstreams.clear();
 
-	m_PlaybackInfo.Clear();
+	ClearPlaybackInfo();
 
 	m_strPlaybackRenderedPath.Empty();
 

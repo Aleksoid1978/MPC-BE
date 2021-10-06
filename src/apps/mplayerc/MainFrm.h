@@ -545,16 +545,41 @@ private:
 	CString m_LastOpenBDPath, m_BDLabel;
 	HMONITOR m_LastWindow_HM;
 
+	double m_PlaybackRate;
+
+	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
+	int m_iDefRotation;
+
 	SessionInfo m_SessionInfo;
 	DVD_DOMAIN m_iDVDDomain;
 	DWORD m_iDVDTitle;
 	bool m_bDVDRestorePos = false;
 	std::vector<CStringW> m_RecentPaths; // used in SetupRecentFilesSubMenu and OnRecentFile
 
-	double m_PlaybackRate;
+	CStringW m_FileName;
+	bool m_bUpdateTitle = false;
+	void ClearPlaybackInfo()
+	{
+		m_SessionInfo.NewPath("");
+		m_FileName.Empty();
+		m_bUpdateTitle = false;
+	}
+	LPCWSTR GetFileNameOrTitleOrPath() {
+		return
+			m_FileName.GetLength() ? m_FileName.GetString() :
+			m_SessionInfo.Title.GetLength() ? m_SessionInfo.Title.GetString() :
+			m_SessionInfo.Path.GetString();
+	}
+	LPCWSTR GetTitleOrFileNameOrPath() {
+		return
+			m_SessionInfo.Title.GetLength() ? m_SessionInfo.Title.GetString() :
+			m_FileName.GetLength() ? m_FileName.GetString() :
+			m_SessionInfo.Path.GetString();
+	}
 
-	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
-	int m_iDefRotation;
+	CString m_strPlaybackRenderedPath;
+
+	bool m_bOpening = false;
 
 	// Operations
 	bool OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD);
@@ -578,7 +603,6 @@ private:
 	void OpenSetupStatusBar();
 	// void OpenSetupToolBar();
 	void OpenSetupCaptureBar();
-	void OpenUpdatePlaybackInfo(const CString path);
 
 	void AutoChangeMonitorMode();
 	double m_dMediaInfoFPS;
@@ -702,36 +726,6 @@ private:
 		}
 	};
 	touchScreen m_touchScreen;
-
-	struct {
-		CString FileName;
-		CString Title;
-		CString Path;
-		bool bUpdateTitle = false;
-
-		void Clear() {
-			FileName.Empty();
-			Title.Empty();
-			Path.Empty();
-			bUpdateTitle = false;
-		}
-		LPCWSTR GetFileNameOrTitleOrPath() {
-			return
-				FileName.GetLength() ? FileName.GetString() :
-				Title.GetLength() ? Title.GetString() :
-				Path.GetString();
-		}
-		LPCWSTR GetTitleOrFileNameOrPath() {
-			return
-				Title.GetLength() ? Title.GetString() :
-				FileName.GetLength() ? FileName.GetString() :
-				Path.GetString();
-		}
-	} m_PlaybackInfo;
-
-	CString m_strPlaybackRenderedPath;
-
-	bool m_bOpening = false;
 
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
