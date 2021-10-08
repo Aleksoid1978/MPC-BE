@@ -39,6 +39,7 @@ class CDitherInt16
 	void Initialize();
 
 public:
+	CDitherInt16();
 	void UpdateInput(const SampleFormat sf, const int chanels);
 
 	void ProcessFloat(int16_t* pDst, float* pSrc, const int samples);

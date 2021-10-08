@@ -26,23 +26,24 @@
 // used code from Sanear
 // https://github.com/alexmarsev/sanear/blob/master/src/DspDither.cpp
 
-inline int64_t GetPerformanceCounter()
-{
-	LARGE_INTEGER counter;
-	QueryPerformanceCounter(&counter);
-	return counter.QuadPart;
-}
-
 // DitherInt16
+
+CDitherInt16::CDitherInt16()
+{
+	for (auto& distributor : m_distributor) {
+		// unnecessary initialization with the range (0; 1). it's here to just show the range explicitly.
+		distributor = std::uniform_real_distribution<float>(0.0f, 1.0f);
+	}
+}
 
 void CDitherInt16::Initialize()
 {
 	m_simpleBuffer.SetSize(0);
 
-	for (size_t i = 0; i < 18; i++) {
-		m_previous[i] = 0.0f;
-		m_generator[i].seed((uint32_t)(GetPerformanceCounter() + i));
-		m_distributor[i] = std::uniform_real_distribution<float>(0, 1.0f);
+	m_previous.fill(0.0f);
+	unsigned seed = 12345;
+	for (auto& generator : m_generator) {
+		generator.seed(seed++);
 	}
 }
 
