@@ -1253,6 +1253,7 @@ public:
 	Youtube::YoutubeFields m_youtubeFields;
 	Youtube::YoutubeUrllist m_youtubeUrllist;
 	Youtube::YoutubeUrllist m_youtubeAudioUrllist;
+	std::vector<uint8_t> m_youtubeThumbnailData;
 	bool m_bYoutubeOpened = false;
 
 	const CString GetAltFileName();

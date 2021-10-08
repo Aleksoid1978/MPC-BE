@@ -14277,6 +14277,7 @@ void CMainFrame::CloseMediaPrivate()
 
 		YoutubeDL::Clear();
 	}
+	m_youtubeThumbnailData.clear();
 	m_bYoutubeOpened = false;
 
 	OnPlayStop();
@@ -19392,13 +19393,12 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 			if (!bLoadRes && !m_youtubeFields.thumbnailUrl.IsEmpty()) {
 				CHTTPAsync HTTPAsync;
 				if (SUCCEEDED(HTTPAsync.Connect(m_youtubeFields.thumbnailUrl.GetString(), 10000))) {
-					std::vector<uint8_t> pData;
 					const auto contentLength = HTTPAsync.GetLenght();
 					if (contentLength) {
-						pData.resize(contentLength);
+						m_youtubeThumbnailData.resize(contentLength);
 						DWORD dwSizeRead = 0;
-						if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, &dwSizeRead) || dwSizeRead != contentLength) {
-							pData.clear();
+						if (S_OK != HTTPAsync.Read((PBYTE)m_youtubeThumbnailData.data(), contentLength, &dwSizeRead) || dwSizeRead != contentLength) {
+							m_youtubeThumbnailData.clear();
 						}
 					} else {
 						std::vector<char> tmp(16 * KILOBYTE);
@@ -19408,12 +19408,12 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 								break;
 							}
 
-							pData.insert(pData.end(), tmp.begin(), tmp.begin() + dwSizeRead);
+							m_youtubeThumbnailData.insert(m_youtubeThumbnailData.end(), tmp.begin(), tmp.begin() + dwSizeRead);
 						}
 					}
 
-					if (!pData.empty()) {
-						hr = WicLoadImage(&m_pMainBitmap, true, pData.data(), pData.size());
+					if (!m_youtubeThumbnailData.empty()) {
+						hr = WicLoadImage(&m_pMainBitmap, true, m_youtubeThumbnailData.data(), m_youtubeThumbnailData.size());
 						if (SUCCEEDED(hr)) {
 							bLoadRes = true;
 						}

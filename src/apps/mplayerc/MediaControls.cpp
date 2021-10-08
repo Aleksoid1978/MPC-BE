@@ -178,12 +178,11 @@ bool CMediaControls::Update()
 			L"image/png",
 			L"image/bmp"
 		};
-		bool bFoundResource = false;
 		std::vector<uint8_t> m_imageData;
 		BeginEnumFilters(m_pMainFrame->m_pGB, pEF, pBF) {
 			if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
 				if (pRB && m_pMainFrame->CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
-					for (DWORD i = 0; i < pRB->ResGetCount() && !bFoundResource; i++) {
+					for (DWORD i = 0; i < pRB->ResGetCount() && m_imageData.empty(); i++) {
 						CComBSTR mime;
 						BYTE* pData = nullptr;
 						DWORD len = 0;
@@ -193,7 +192,6 @@ bool CMediaControls::Update()
 
 							if (std::find(mimeStrings.cbegin(), mimeStrings.cend(), mimeStr) != mimeStrings.cend()) {
 								m_imageData.insert(m_imageData.end(), pData, pData + len);
-								bFoundResource = true;
 							}
 
 							CoTaskMemFree(pData);
@@ -202,13 +200,17 @@ bool CMediaControls::Update()
 				}
 			}
 
-			if (bFoundResource) {
+			if (!m_imageData.empty()) {
 				break;
 			}
 		}
 		EndEnumFilters;
 
-		if (bFoundResource) {
+		if (m_imageData.empty() && !m_pMainFrame->m_youtubeThumbnailData.empty()) {
+			m_imageData = m_pMainFrame->m_youtubeThumbnailData;
+		}
+
+		if (!m_imageData.empty()) {
 			ComPtr<IStream> stream;
 			CreateStreamOverRandomAccessStream(m_pImageStream.Get(), IID_PPV_ARGS(stream.GetAddressOf()));
 			stream->Write(m_imageData.data(), m_imageData.size(), nullptr);
