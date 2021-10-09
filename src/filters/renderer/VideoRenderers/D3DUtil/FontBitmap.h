@@ -24,6 +24,10 @@
 
 #define DUMP_BITMAP 0
 
+#if _DEBUG && DUMP_BITMAP
+#include "apps/mplayerc/WicUtils.h"
+#endif
+
 struct Grid_t {
 	UINT stepX = 0;
 	UINT stepY = 0;
@@ -189,7 +193,11 @@ public:
 
 #if _DEBUG && DUMP_BITMAP
 		if (S_OK == hr) {
-			SaveToBMP((BYTE*)m_pBitmapBits, m_bmWidth * 4, m_bmWidth, m_bmHeight, 32, L"c:\\temp\\font_gdi_bitmap.bmp");
+			size_t outlen = 0;
+			WicSaveImage((BYTE*)m_pBitmapBits, m_bmWidth * 4,
+				m_bmWidth, m_bmHeight, GUID_WICPixelFormat32bppPBGRA,
+				0, L"c:\\temp\\font_gdi_bitmap.png",
+				nullptr, outlen);
 		}
 #endif
 
