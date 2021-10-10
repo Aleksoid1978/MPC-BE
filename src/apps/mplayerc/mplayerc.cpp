@@ -1032,6 +1032,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
+	m_HistoryFile.SetMaxCount(200);
 	m_HistoryFile.SetFilename(appSavePath + MPC_HISTORY_FILENAME);
 	m_FavoritesFile.SetFilename(appSavePath + MPC_FAVORITES_FILENAME);
 
