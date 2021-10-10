@@ -47,6 +47,7 @@ private :
 	CButton		m_cbReleaseDeviceIdle;
 	CButton		m_cbUseCrossFeed;
 	CButton		m_cbDummyChannels;
+	CButton		m_btnReset;
 
 	CStatic		m_txtSoundDevice;
 	CComboBox	m_cbSoundDevice;
@@ -61,7 +62,8 @@ private :
 		IDC_PP_CHECK_FORMAT,
 		IDC_PP_FREE_DEVICE_INACTIVE,
 		IDC_PP_USE_CROSSFEED,
-		IDC_PP_DUMMY_CHANNELS
+		IDC_PP_DUMMY_CHANNELS,
+		IDC_PP_RESET,
 	};
 
 public:
@@ -80,6 +82,7 @@ public:
 
 	afx_msg void OnClickedWasapiMode();
 	afx_msg void OnClickedBitExact();
+	afx_msg void OnBnClickedReset();
 };
 
 

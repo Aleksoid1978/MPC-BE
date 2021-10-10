@@ -3,6 +3,7 @@
 // Used by MpcAudioRenderer.rc
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
+#define IDS_FILTER_RESET_SETTINGS       7010
 #define IDS_ARS_WASAPI_MODE             7600
 #define IDS_ARS_EXCLUSIVE               7601
 #define IDS_ARS_SHARED                  7602
