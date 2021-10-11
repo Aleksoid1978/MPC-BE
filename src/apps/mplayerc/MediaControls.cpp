@@ -148,6 +148,7 @@ bool CMediaControls::Update()
 
 	if (m_pMainFrame->m_eMediaLoadState == MLS_LOADED) {
 		auto title = m_pMainFrame->GetTitleOrFileNameOrPath();
+		auto author = m_pMainFrame->m_youtubeFields.author;
 		if (m_pMainFrame->m_bAudioOnly) {
 			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Music);
 
@@ -155,14 +156,20 @@ bool CMediaControls::Update()
 			m_pDisplay->get_MusicProperties(pMusicDisplayProperties.GetAddressOf());
 			pMusicDisplayProperties->put_Title(HStringReference(title).Get());
 
-			for (const auto& pAMMC : m_pMainFrame->m_pAMMC) {
-				if (pAMMC) {
-					CComBSTR bstr;
-					if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
-						pMusicDisplayProperties->put_Artist(HStringReference(bstr).Get());
-						break;
+			if (author.IsEmpty()) {
+				for (const auto& pAMMC : m_pMainFrame->m_pAMMC) {
+					if (pAMMC) {
+						CComBSTR bstr;
+						if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
+							author = bstr;
+							break;
+						}
 					}
 				}
+			}
+
+			if (!author.IsEmpty()) {
+				pMusicDisplayProperties->put_Artist(HStringReference(author).Get());
 			}
 		} else {
 			m_pDisplay->put_Type(MediaPlaybackType::MediaPlaybackType_Video);
@@ -170,6 +177,10 @@ bool CMediaControls::Update()
 			ComPtr<IVideoDisplayProperties> pVideoDisplayProperties;
 			m_pDisplay->get_VideoProperties(pVideoDisplayProperties.GetAddressOf());
 			pVideoDisplayProperties->put_Title(HStringReference(title).Get());
+
+			if (!author.IsEmpty()) {
+				pVideoDisplayProperties->put_Subtitle(HStringReference(author).Get());
+			}
 		}
 
 		static std::list<LPCWSTR> mimeStrings = {
