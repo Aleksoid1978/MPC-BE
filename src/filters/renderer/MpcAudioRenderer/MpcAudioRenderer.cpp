@@ -1592,6 +1592,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 				case SAMPLE_FMT_S16:
 					m_DitherInt16.UpdateInput(m_input_params.sf, m_output_params.channels);
 					m_DitherInt16.Process((int16_t*)out_buf, in_buff, out_samples);
+					hr = S_OK;
 					break;
 				case SAMPLE_FMT_S24:
 					hr = convert_to_int24(m_input_params.sf, m_output_params.channels, out_samples, in_buff, out_buf);
@@ -1605,7 +1606,8 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			}
 
 			if (FAILED(hr)) {
-				return E_INVALIDARG;
+				SAFE_DELETE_ARRAY(out_buf);
+				return hr;
 			}
 		}
 
