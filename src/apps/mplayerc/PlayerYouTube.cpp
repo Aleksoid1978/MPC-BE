@@ -500,20 +500,34 @@ namespace Youtube
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
 
-			auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
-			if (!player_response_jsonData.IsEmpty()) {
-				player_response_jsonData += "}";
-				player_response_jsonData.Replace(R"(\/)", "/");
-				player_response_jsonData.Replace(R"(\")", R"(")");
-				player_response_jsonData.Replace(R"(\\)", R"(\)");
-			} else {
-				player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonData += "}";
+			urlData postData;
+			if (URLPostData(videoId.GetString(), postData)) {
+				player_response_jsonDocument.Parse(postData.data());
+			}
+
+			bool bStreamingDataExist = false;
+			if (!player_response_jsonDocument.IsNull()) {
+				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+					bStreamingDataExist = true;
 				}
 			}
-			if (!player_response_jsonData.IsEmpty()) {
-				player_response_jsonDocument.Parse(player_response_jsonData);
+
+			if (!bStreamingDataExist) {
+				auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonData += "}";
+					player_response_jsonData.Replace(R"(\/)", "/");
+					player_response_jsonData.Replace(R"(\")", R"(")");
+					player_response_jsonData.Replace(R"(\\)", R"(\)");
+				} else {
+					player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+					if (!player_response_jsonData.IsEmpty()) {
+						player_response_jsonData += "}";
+					}
+				}
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonDocument.Parse(player_response_jsonData);
+				}
 			}
 
 			// live streaming
@@ -562,22 +576,6 @@ namespace Youtube
 					strUrls += adaptive_fmts;
 				}
 				strUrls.Replace("\\u0026", "&");
-			}
-
-			bool bStreamingDataExist = false;
-			if (!player_response_jsonDocument.IsNull()) {
-				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
-					bStreamingDataExist = true;
-				}
-			}
-
-			if (strUrlsLive.empty() && !bStreamingDataExist && strUrls.IsEmpty()) {
-				urlData data;
-				if (!URLPostData(videoId.GetString(), data)) {
-					return false;
-				}
-
-				player_response_jsonDocument.Parse(data.data());
 			}
 
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
