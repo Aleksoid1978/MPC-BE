@@ -13,7 +13,7 @@
 #define IDS_ARS_RELEASE_DEVICE_IDLE     7606
 #define IDS_ARS_CROSSFEED               7607
 #define IDS_ARS_DEVICE_PERIOD           7608
-#define IDS_ARS_CHECK_FORMAT            7609
+#define IDS_ARS_ALT_CHECK_FORMAT        7609
 #define IDS_ARS_STATUS                  7610
 #define IDS_ARS_DEVICE                  7611
 #define IDS_ARS_MODE                    7612
@@ -24,6 +24,8 @@
 #define IDS_ARS_CHANNELS                7617
 #define IDS_ARS_WASAPI_METHOD           7618
 #define IDS_ARS_DUMMY_CHANNELS          7619
+#define IDS_ARS_TIP_BITEXACT_OUTPUT     7620
+#define IDS_ARS_TIP_ALT_CHECK_FORMAT    7621
 #define IDS_AG_DEFAULT                  33000
 
 // Next default values for new objects

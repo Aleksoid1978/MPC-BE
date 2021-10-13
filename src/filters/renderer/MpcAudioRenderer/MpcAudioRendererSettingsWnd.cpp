@@ -91,7 +91,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	p.y += h20;
 	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
 	p.y += h20;
-	m_cbCheckFormat.Create(ResStr(IDS_ARS_CHECK_FORMAT), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_CHECK_FORMAT);
+	m_cbAltCheckFormat.Create(ResStr(IDS_ARS_ALT_CHECK_FORMAT), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_ALT_FORMAT_CHECK);
 	p.y += h20;
 	m_cbReleaseDeviceIdle.Create(ResStr(IDS_ARS_RELEASE_DEVICE_IDLE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_FREE_DEVICE_INACTIVE);
 	p.y += h20;
@@ -137,7 +137,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		SelectByItemData(m_cbDevicePeriod, m_pMAR->GetDevicePeriod());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
-		m_cbCheckFormat.SetCheck(!m_pMAR->GetCheckFormat());
+		m_cbAltCheckFormat.SetCheck(m_pMAR->GetAltCheckFormat());
 		m_cbReleaseDeviceIdle.SetCheck(m_pMAR->GetReleaseDeviceIdle());
 		m_cbUseCrossFeed.SetCheck(m_pMAR->GetCrossFeed());
 		m_cbDummyChannels.SetCheck(m_pMAR->GetDummyChannels());
@@ -153,6 +153,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	SetCursor(m_hWnd, IDC_PP_SOUND_DEVICE, IDC_HAND);
 
 	OnClickedWasapiMode();
+
+	EnableToolTips(TRUE);
 
 	return true;
 }
@@ -171,7 +173,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetDevicePeriod(GetCurItemData(m_cbDevicePeriod));
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
-		m_pMAR->SetCheckFormat(!m_cbCheckFormat.GetCheck());
+		m_pMAR->SetAltCheckFormat(m_cbAltCheckFormat.GetCheck());
 		m_pMAR->SetReleaseDeviceIdle(m_cbReleaseDeviceIdle.GetCheck());
 		m_pMAR->SetCrossFeed(m_cbUseCrossFeed.GetCheck());
 		m_pMAR->SetDummyChannels(m_cbDummyChannels.GetCheck());
@@ -189,6 +191,7 @@ BEGIN_MESSAGE_MAP(CMpcAudioRendererSettingsWnd, CInternalPropertyPageWnd)
 	ON_CBN_SELCHANGE(IDC_PP_WASAPI_MODE, OnClickedWasapiMode)
 	ON_BN_CLICKED(IDC_PP_USE_BITEXACT_OUTPUT, OnClickedBitExact)
 	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
+	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 
@@ -204,7 +207,7 @@ void CMpcAudioRendererSettingsWnd::OnClickedWasapiMode()
 void CMpcAudioRendererSettingsWnd::OnClickedBitExact()
 {
 	m_cbUseSystemLayoutChannels.EnableWindow(m_cbUseBitExactOutput.GetCheck() && m_cbUseBitExactOutput.IsWindowEnabled());
-	m_cbCheckFormat.EnableWindow(m_cbUseBitExactOutput.GetCheck() && m_cbUseBitExactOutput.IsWindowEnabled());
+	m_cbAltCheckFormat.EnableWindow(m_cbUseBitExactOutput.GetCheck() && m_cbUseBitExactOutput.IsWindowEnabled());
 }
 
 void CMpcAudioRendererSettingsWnd::OnBnClickedReset()
@@ -215,12 +218,46 @@ void CMpcAudioRendererSettingsWnd::OnBnClickedReset()
 
 	m_cbUseBitExactOutput.SetCheck(BST_CHECKED);
 	m_cbUseSystemLayoutChannels.SetCheck(BST_CHECKED);
-	m_cbCheckFormat.SetCheck(BST_UNCHECKED);
+	m_cbAltCheckFormat.SetCheck(BST_UNCHECKED);
 	m_cbReleaseDeviceIdle.SetCheck(BST_UNCHECKED);
 	m_cbUseCrossFeed.SetCheck(BST_UNCHECKED);
 	m_cbDummyChannels.SetCheck(BST_UNCHECKED);
 
 	OnClickedWasapiMode();
+}
+
+BOOL CMpcAudioRendererSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
+{
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
+
+	if (pNMHDR->code == TTN_NEEDTEXTW && (pTTT->uFlags & TTF_IDISHWND)) {
+		static CString strTipText;
+		UINT_PTR nID = pNMHDR->idFrom;
+
+		CToolTipCtrl* pToolTip = AfxGetModuleThreadState()->m_pToolTip;
+		if (pToolTip) {
+			pToolTip->SetMaxTipWidth(SHRT_MAX);
+		}
+
+		nID = ::GetDlgCtrlID((HWND)nID);
+		switch (nID) {
+		case IDC_PP_USE_BITEXACT_OUTPUT:
+			strTipText = ResStr(IDS_ARS_TIP_BITEXACT_OUTPUT);
+			break;
+		case IDC_PP_ALT_FORMAT_CHECK:
+			strTipText = ResStr(IDS_ARS_TIP_ALT_CHECK_FORMAT);
+			break;
+		default:
+			return FALSE;
+		}
+
+		pTTT->lpszText = strTipText.GetBuffer();
+
+		*pResult = 0;
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 //

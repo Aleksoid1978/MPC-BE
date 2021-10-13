@@ -41,7 +41,7 @@
 #define OPT_AudioDeviceName         L"SoundDeviceName"
 #define OPT_UseBitExactOutput       L"UseBitExactOutput"
 #define OPT_UseSystemLayoutChannels L"UseSystemLayoutChannels"
-#define OPT_CheckFormat             L"CheckFormat"
+#define OPT_AltCheckFormat          L"AltCheckFormat"
 #define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
 #define OPT_UseCrossFeed            L"CrossFeed"
 #define OPT_DummyChannels           L"DummyChannels"
@@ -199,7 +199,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, pfAvRevertMmThreadCharacteristics(nullptr)
 	, m_bUseBitExactOutput(TRUE)
 	, m_bUseSystemLayoutChannels(TRUE)
-	, m_bCheckFormat(TRUE)
+	, m_bAltCheckFormat(FALSE)
 	, m_bReleaseDeviceIdle(FALSE)
 	, m_filterState(State_Stopped)
 	, m_hRendererNeedMoreData(nullptr)
@@ -256,8 +256,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseSystemLayoutChannels, dw)) {
 			m_bUseSystemLayoutChannels = !!dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_CheckFormat, dw)) {
-			m_bCheckFormat = !!dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_AltCheckFormat, dw)) {
+			m_bAltCheckFormat = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReleaseDeviceIdle, dw)) {
 			m_bReleaseDeviceIdle = !!dw;
@@ -278,7 +278,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	profile.ReadString(OPT_SECTION_AudRend, OPT_AudioDeviceName, m_DeviceName);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
-	profile.ReadInt(OPT_SECTION_AudRend, OPT_CheckFormat, m_bCheckFormat);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_AltCheckFormat, m_bAltCheckFormat);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
@@ -1111,7 +1111,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetStringValue(OPT_AudioDeviceName, m_DeviceName);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
-		key.SetDWORDValue(OPT_CheckFormat, m_bCheckFormat);
+		key.SetDWORDValue(OPT_AltCheckFormat, m_bAltCheckFormat);
 		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 		key.SetDWORDValue(OPT_DummyChannels, m_bDummyChannels);
@@ -1125,7 +1125,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	profile.WriteString(OPT_SECTION_AudRend, OPT_AudioDeviceName, m_DeviceName);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
-	profile.WriteInt(OPT_SECTION_AudRend, OPT_CheckFormat, m_bCheckFormat);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_AltCheckFormat, m_bAltCheckFormat);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
@@ -1292,18 +1292,18 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetSystemLayoutChannels()
 	return m_bUseSystemLayoutChannels;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetCheckFormat(BOOL bValue)
+STDMETHODIMP CMpcAudioRenderer::SetAltCheckFormat(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	m_bCheckFormat = bValue;
+	m_bAltCheckFormat = bValue;
 	return S_OK;
 }
 
-STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetCheckFormat()
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetAltCheckFormat()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_bCheckFormat;
+	return m_bAltCheckFormat;
 }
 
 STDMETHODIMP CMpcAudioRenderer::SetReleaseDeviceIdle(BOOL bValue)
@@ -2016,7 +2016,7 @@ again:
 				if (m_bUseBitExactOutput) {
 					WAVEFORMATEXTENSIBLE wfexAsIs = { 0 };
 
-					if (!m_bCheckFormat) {
+					if (m_bAltCheckFormat) {
 						WORD nChannels = pWaveFormatEx->nChannels;
 						DWORD dwChannelMask = GetChannelMask(pWaveFormatEx, nChannels);
 
@@ -2179,7 +2179,7 @@ again:
 
 		hr = InitAudioClient();
 		if (SUCCEEDED(hr)) {
-			hr = CreateRenderClient(m_pWaveFormatExOutput, m_bCheckFormat);
+			hr = CreateRenderClient(m_pWaveFormatExOutput, m_bAltCheckFormat);
 		}
 
 		if (AUDCLNT_E_DEVICE_IN_USE == hr && !m_bUseDefaultDevice) {

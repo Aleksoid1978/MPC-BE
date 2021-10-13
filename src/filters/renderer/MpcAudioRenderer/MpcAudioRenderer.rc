@@ -94,7 +94,7 @@ BEGIN
     IDS_ARS_WASAPI_METHOD          "WASAPI method:"
     IDS_ARS_BITEXACT_OUTPUT        "Allow bit-exact output"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Use system layout channels"
-    IDS_ARS_CHECK_FORMAT           "Do not check format support"
+    IDS_ARS_ALT_CHECK_FORMAT       "Alternative check of supported format"
     IDS_ARS_SOUND_DEVICE           "Sound Device:"
     IDS_ARS_RELEASE_DEVICE_IDLE    "Release device when idle"
     IDS_ARS_CROSSFEED              "Enable stereo crossfeed (for headphones)"
@@ -109,6 +109,8 @@ BEGIN
     IDS_ARS_SAMPLERATE             "Sample rate:"
     IDS_ARS_CHANNELS               "Channels"
     IDS_AG_DEFAULT                 "Default"
+    IDS_ARS_TIP_BITEXACT_OUTPUT    "If possible, the audio will be sent out in its original format.\nOtherwise, the format specified in the system settings will be used."
+    IDS_ARS_TIP_ALT_CHECK_FORMAT   "The renderer will try to initialize the device skipping some checks."
 END
 
 #endif    // English (United States) resources
