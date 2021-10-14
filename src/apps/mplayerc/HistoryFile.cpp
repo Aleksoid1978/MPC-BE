@@ -569,8 +569,10 @@ bool CFavoritesFile::WriteFile()
 
 void CFavoritesFile::OpenFavorites()
 {
-	IntClearEntries();
-	ReadFile();
+	bool ok = ReadFile();
+	if (!ok) {
+		IntClearEntries();
+	}
 }
 
 void CFavoritesFile::SaveFavorites()
