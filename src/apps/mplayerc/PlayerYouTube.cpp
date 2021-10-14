@@ -957,14 +957,14 @@ namespace Youtube
 				}
 			}
 
-			CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "]");
+			CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "}}}]");
 			if (chaptersStr.IsEmpty()) {
-				chaptersStr = GetEntry(data.data(), R"("markersMap":[{"key":"DESCRIPTION_CHAPTERS","value":)", "]");
+				chaptersStr = GetEntry(data.data(), R"("markersMap":[{"key":"DESCRIPTION_CHAPTERS","value":)", "}}}]");
 			}
 			if (!chaptersStr.IsEmpty()) {
 				chaptersStr.Replace(R"(\/)", "/");
 				chaptersStr.Replace(R"(\\)", R"(\)");
-				chaptersStr += "]}";
+				chaptersStr += "}}}]}";
 
 				rapidjson::Document d;
 				if (!d.Parse(chaptersStr).HasParseError()) {
@@ -982,7 +982,9 @@ namespace Youtube
 						}
 					}
 				}
-			} else {
+			}
+
+			if (y_fields.chaptersList.empty()) {
 				const std::regex regex(R"((?:^|<br\s*\/>)([^<]*<a[^>]+onclick=["\']yt\.www\.watch\.player\.seekTo[^>]+>(\d{1,2}:\d{1,2}(?::\d{1,2})?)<\/a>[^>]*)(?=$|<br\s*\/>))");
 				std::cmatch match;
 				LPCSTR text = data.data();
