@@ -3996,7 +3996,7 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 		if (itemID == ID_SUBMENU_NAVIGATE) {
 			pSubMenu = m_NavigateMenu.GetSubMenu(0);
 		}
-		else if (itemID == ID_SUBMENU_FAVORITES) {
+		else if (itemID == ID_SUBMENU_FAVORITES_MAIN) {
 			SetupFavoritesSubMenu();
 			pSubMenu = &m_favoritesMenu;
 		}

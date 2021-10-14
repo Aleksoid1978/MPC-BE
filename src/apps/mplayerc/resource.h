@@ -406,6 +406,7 @@
 #define ID_SUBMENU_NAVIGATE             1911
 #define ID_SUBMENU_JUMPTO               1912
 #define ID_SUBMENU_FAVORITES            1913
+#define ID_SUBMENU_FAVORITES_MAIN       1914
 //
 #define ID_FILTERS_COPY_TO_CLIPBOARD    1999
 // ranges for menus
