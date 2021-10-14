@@ -3993,7 +3993,7 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 		CMenu* pSubMenu = nullptr;
 
-		if (itemID == ID_SUBMENU_NAVIGATE) {
+		if (itemID == ID_SUBMENU_NAVIGATE_MAIN) {
 			pSubMenu = m_NavigateMenu.GetSubMenu(0);
 		}
 		else if (itemID == ID_SUBMENU_FAVORITES_MAIN) {
