@@ -73,18 +73,19 @@ struct SessionInfo {
 
 class CMpcLstFile
 {
-protected:
-	std::mutex m_Mutex;
+private:
 	DWORD m_LastAccessTick = 0;
 
+protected:
+	std::mutex m_Mutex;
 	CStringW m_filename;
 	unsigned m_maxCount = 100;
-	LPCWSTR m_Header = L"";
 
-	virtual void IntAddEntry(const SessionInfo& sesInfo) = 0;
+	FILE* CheckOpenFileForRead(bool& valid);
+	FILE* OpenFileForWrite();
+	void CloseFile(FILE*& pFile);
+
 	virtual void IntClearEntries() = 0;
-
-	bool ReadFile();
 
 public:
 	bool Clear(); // Clear list and delete file
@@ -94,10 +95,21 @@ public:
 };
 
 //
+// CSessionFile
+//
+
+class CSessionFile : public CMpcLstFile
+{
+protected:
+	virtual void IntAddEntry(const SessionInfo& sesInfo) = 0;
+	bool ReadFile();
+};
+
+//
 // CHistoryFile
 //
 
-class CHistoryFile : public CMpcLstFile
+class CHistoryFile : public CSessionFile
 {
 private:
 	std::list<SessionInfo> m_SessionInfos;
@@ -121,7 +133,7 @@ public:
 // CFavoritesFile
 //
 
-class CFavoritesFile : public CMpcLstFile
+class CFavoritesFile : public CSessionFile
 {
 private:
 	void IntAddEntry(const SessionInfo& sesInfo) override;

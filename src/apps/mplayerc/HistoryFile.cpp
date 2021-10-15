@@ -26,28 +26,93 @@
 // CMpcLstFile
 //
 
-bool CMpcLstFile::ReadFile()
+FILE* CMpcLstFile::CheckOpenFileForRead(bool& valid)
 {
 	if (!::PathFileExistsW(m_filename)) {
-		return false;
+		valid = false;
+		return nullptr;
 	}
 
 	const DWORD tick = GetTickCount();
 	if (m_LastAccessTick && std::labs(tick - m_LastAccessTick) < 100) {
-		return true;
+		valid = true;
+		return nullptr;
 	}
 
 	FILE* pFile;
+
 	do { // Open mpc-be.ini in UNICODE mode, retry if it is already being used by another process
 		pFile = _wfsopen(m_filename, L"r, ccs=UNICODE", _SH_SECURE);
+		if (pFile || GetLastError() != ERROR_SHARING_VIOLATION) {
+			break;
+		}
+		Sleep(100);
+	} while (true);
+
+	ASSERT(pFile);
+	valid = pFile != nullptr;
+
+	return pFile;
+}
+
+FILE* CMpcLstFile::OpenFileForWrite()
+{
+	FILE* pFile;
+
+	do { // Open file, retry if it is already being used by another process
+		pFile = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
 		if (pFile || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 			break;
 		}
 		Sleep(100);
 	} while (true);
+
+	ASSERT(pFile);
+
+	return pFile;
+}
+
+void CMpcLstFile::CloseFile(FILE*& pFile)
+{
+	int fpStatus = fclose(pFile);
+	ASSERT(fpStatus == 0);
+	m_LastAccessTick = GetTickCount();
+	pFile = nullptr;
+}
+
+bool CMpcLstFile::Clear()
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	if (_wremove(m_filename) == 0 || errno == ENOENT) {
+		IntClearEntries();
+		return true;
+	}
+	return false;
+}
+
+void CMpcLstFile::SetFilename(const CStringW& filename)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	m_filename = filename;
+}
+
+void CMpcLstFile::SetMaxCount(unsigned maxcount)
+{
+	m_maxCount = std::clamp(maxcount, 10u, 999u);
+}
+
+//
+// CSessionFile
+//
+
+bool CSessionFile::ReadFile()
+{
+	bool valid = false;
+	FILE* pFile = CheckOpenFileForRead(valid);
 	if (!pFile) {
-		ASSERT(0);
-		return false;;
+		return valid;
 	}
 
 	CStdioFile file(pFile);
@@ -139,38 +204,13 @@ bool CMpcLstFile::ReadFile()
 		}
 	}
 
-	int fpStatus = fclose(pFile);
-	ASSERT(fpStatus == 0);
-	m_LastAccessTick = GetTickCount();
+	CloseFile(pFile);
 
 	if (section.GetLength()) {
 		IntAddEntry(sesInfo);
 	}
 
 	return true;
-}
-
-bool CMpcLstFile::Clear()
-{
-	std::lock_guard<std::mutex> lock(m_Mutex);
-
-	if (_wremove(m_filename) == 0 || errno == ENOENT) {
-		IntClearEntries();
-		return true;
-	}
-	return false;
-}
-
-void CMpcLstFile::SetFilename(const CStringW& filename)
-{
-	std::lock_guard<std::mutex> lock(m_Mutex);
-
-	m_filename = filename;
-}
-
-void CMpcLstFile::SetMaxCount(unsigned maxcount)
-{
-	m_maxCount = std::clamp(maxcount, 10u, 999u);
 }
 
 //
@@ -214,16 +254,8 @@ std::list<SessionInfo>::iterator CHistoryFile::FindSessionInfo(const SessionInfo
 
 bool CHistoryFile::WriteFile()
 {
-	FILE* pFile;
-	do { // Open file, retry if it is already being used by another process
-		pFile = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
-		if (pFile || (GetLastError() != ERROR_SHARING_VIOLATION)) {
-			break;
-		}
-		Sleep(100);
-	} while (true);
+	FILE* pFile = OpenFileForWrite();
 	if (!pFile) {
-		ASSERT(FALSE);
 		return false;
 	}
 
@@ -295,9 +327,7 @@ bool CHistoryFile::WriteFile()
 		ret = false;
 	}
 
-	int fpStatus = fclose(pFile);
-	ASSERT(fpStatus == 0);
-	m_LastAccessTick = GetTickCount();
+	CloseFile(pFile);
 
 	return ret;
 }
@@ -467,16 +497,8 @@ void CFavoritesFile::IntClearEntries()
 
 bool CFavoritesFile::WriteFile()
 {
-	FILE* pFile;
-	do { // Open file, retry if it is already being used by another process
-		pFile = _wfsopen(m_filename, L"w, ccs=UTF-8", _SH_SECURE);
-		if (pFile || (GetLastError() != ERROR_SHARING_VIOLATION)) {
-			break;
-		}
-		Sleep(100);
-	} while (true);
+	FILE* pFile = OpenFileForWrite();
 	if (!pFile) {
-		ASSERT(FALSE);
 		return false;
 	}
 
@@ -560,9 +582,7 @@ bool CFavoritesFile::WriteFile()
 		ret = false;
 	}
 
-	int fpStatus = fclose(pFile);
-	ASSERT(fpStatus == 0);
-	m_LastAccessTick = GetTickCount();
+	CloseFile(pFile);
 
 	return ret;
 }
