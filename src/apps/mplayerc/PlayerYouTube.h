@@ -27,7 +27,7 @@ namespace Youtube
 	enum yformat {
 		// videofile
 		y_mp4_avc = 0, // used in settings
-		y_webm_vid,    // used in settings
+		y_webm_vp9,    // used in settings
 		y_mp4_av1,     // used in settings
 		y_mp4_other,
 
@@ -74,25 +74,24 @@ namespace Youtube
 		{134, y_mp4_avc,  y_video,  360, L"mp4",  false, false},
 		{133, y_mp4_avc,  y_video,  240, L"mp4",  false, false},
 		// WebM (VP9)
-		{272, y_webm_vid, y_video, 4320, L"webm", true,  false},
-		{272, y_webm_vid, y_video, 4320, L"webm", false, false},
-		{272, y_webm_vid, y_video, 2880, L"webm", false, false},
-		{337, y_webm_vid, y_video, 2160, L"webm", true , true },
-		{315, y_webm_vid, y_video, 2160, L"webm", true , false},
-		{313, y_webm_vid, y_video, 2160, L"webm", false, false},
-		{336, y_webm_vid, y_video, 1440, L"webm", true , true },
-		{308, y_webm_vid, y_video, 1440, L"webm", true , false},
-		{271, y_webm_vid, y_video, 1440, L"webm", false, false},
-		{335, y_webm_vid, y_video, 1080, L"webm", true , true },
-		{303, y_webm_vid, y_video, 1080, L"webm", true , false},
-		{248, y_webm_vid, y_video, 1080, L"webm", false, false},
-		{334, y_webm_vid, y_video,  720, L"webm", true , true },
-		{302, y_webm_vid, y_video,  720, L"webm", true , false},
-		{247, y_webm_vid, y_video,  720, L"webm", false, false},
-		{244, y_webm_vid, y_video,  480, L"webm", false, false},
-		{ 43, y_webm_vid, y_media,  360, L"webm", false, false}, // VP8 + Vorbis
-		{243, y_webm_vid, y_video,  360, L"webm", false, false},
-		{242, y_webm_vid, y_video,  240, L"webm", false, false},
+		{272, y_webm_vp9, y_video, 4320, L"webm", true,  false},
+		{272, y_webm_vp9, y_video, 4320, L"webm", false, false},
+		{272, y_webm_vp9, y_video, 2880, L"webm", false, false},
+		{337, y_webm_vp9, y_video, 2160, L"webm", true , true },
+		{315, y_webm_vp9, y_video, 2160, L"webm", true , false},
+		{313, y_webm_vp9, y_video, 2160, L"webm", false, false},
+		{336, y_webm_vp9, y_video, 1440, L"webm", true , true },
+		{308, y_webm_vp9, y_video, 1440, L"webm", true , false},
+		{271, y_webm_vp9, y_video, 1440, L"webm", false, false},
+		{335, y_webm_vp9, y_video, 1080, L"webm", true , true },
+		{303, y_webm_vp9, y_video, 1080, L"webm", true , false},
+		{248, y_webm_vp9, y_video, 1080, L"webm", false, false},
+		{334, y_webm_vp9, y_video,  720, L"webm", true , true },
+		{302, y_webm_vp9, y_video,  720, L"webm", true , false},
+		{247, y_webm_vp9, y_video,  720, L"webm", false, false},
+		{244, y_webm_vp9, y_video,  480, L"webm", false, false},
+		{243, y_webm_vp9, y_video,  360, L"webm", false, false},
+		{242, y_webm_vp9, y_video,  240, L"webm", false, false},
 		// MP4 (AV1)
 		{702, y_mp4_av1,  y_video, 4320, L"mp4",  false, true},
 		{701, y_mp4_av1,  y_video, 2160, L"mp4",  false, true},

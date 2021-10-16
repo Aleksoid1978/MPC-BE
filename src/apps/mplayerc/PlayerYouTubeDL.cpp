@@ -217,7 +217,7 @@ namespace YoutubeDL
 								}
 							}
 							else if (ext == L"webm") {
-								profile->format = Youtube::yformat::y_webm_vid;
+								profile->format = Youtube::yformat::y_webm_vp9;
 							}
 							profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
 							profile->ext = ext;

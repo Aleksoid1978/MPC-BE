@@ -680,7 +680,7 @@ namespace Youtube
 
 					switch (profile->format) {
 					case y_mp4_avc:  item.title = L"MP4(H.264)"; break;
-					case y_webm_vid: item.title = L"WebM(VP9)";  break;
+					case y_webm_vp9: item.title = L"WebM(VP9)";  break;
 					case y_mp4_av1:  item.title = L"MP4(AV1)";   break;
 					case y_stream:   item.title = L"HLS Live";  break;
 					default:         item.title = L"unknown";   break;
@@ -1180,7 +1180,7 @@ namespace Youtube
 					if (k_mp4 < 0 && format == y_mp4_avc) {
 						k_mp4 = i;
 					}
-					else if (k_webm < 0 && format == y_webm_vid) {
+					else if (k_webm < 0 && format == y_webm_vp9) {
 						k_webm = i;
 					}
 					else if (k_av1 < 0 && format == y_mp4_av1) {
@@ -1192,7 +1192,7 @@ namespace Youtube
 				if (s.YoutubeFormat.fmt == y_mp4_avc) {
 					k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
 				}
-				else if (s.YoutubeFormat.fmt == y_webm_vid) {
+				else if (s.YoutubeFormat.fmt == y_webm_vp9) {
 					k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
 				}
 				else if (s.YoutubeFormat.fmt == y_mp4_av1) {
