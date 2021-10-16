@@ -59,17 +59,7 @@ void CDiskImage::Init()
 
 #if ENABLE_DTLITE
 	// DAEMON Tools Lite
-	m_dtlite_path.Empty();
-
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe", KEY_READ)) {
-		ULONG nChars = 0;
-		if (ERROR_SUCCESS == key.QueryStringValue(nullptr, nullptr, &nChars)) {
-			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, m_dtlite_path.GetBuffer(nChars), &nChars)) {
-				m_dtlite_path.ReleaseBuffer(nChars);
-			}
-		}
-		key.Close();
-	}
+	m_dtlite_path = GetRegAppPath(L"DTLite.exe", false);
 
 	if (::PathFileExistsW(m_dtlite_path)) {
 		// simple check
@@ -97,17 +87,7 @@ void CDiskImage::Init()
 
 #if ENABLE_VIRTUALCLONEDRIVE
 	// Virtual CloneDrive
-	m_vcd_path.Empty();
-
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe", KEY_READ)) {
-		ULONG nChars = 0;
-		if (ERROR_SUCCESS == key.QueryStringValue(nullptr, nullptr, &nChars)) {
-			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, m_vcd_path.GetBuffer(nChars), &nChars)) {
-				m_vcd_path.ReleaseBuffer(nChars);
-			}
-		}
-		key.Close();
-	}
+	m_vcd_path = GetRegAppPath(L"VCDMount.exe", false);
 
 	if (::PathFileExistsW(m_vcd_path)) {
 		// simple check

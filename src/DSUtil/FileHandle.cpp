@@ -178,6 +178,31 @@ CStringW GetProgramDir()
 	return path;
 }
 
+//
+// Get application path from "App Paths" subkey
+//
+CStringW GetRegAppPath(LPCWSTR appFileName, const bool bCurrentUser)
+{
+	CStringW keyName(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\");
+	keyName.Append(appFileName);
+
+	const HKEY hKeyParent = bCurrentUser ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
+	CStringW appPath;
+	CRegKey key;
+
+	if (ERROR_SUCCESS == key.Open(hKeyParent, keyName, KEY_READ)) {
+		ULONG nChars = 0;
+		if (ERROR_SUCCESS == key.QueryStringValue(nullptr, nullptr, &nChars)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, appPath.GetBuffer(nChars), &nChars)) {
+				appPath.ReleaseBuffer(nChars);
+			}
+		}
+		key.Close();
+	}
+
+	return appPath;
+}
+
 // wFunc can be FO_MOVE or FO_COPY.
 // To move a folder, add "\" to the end of the source path.
 // To copy a folder, add "\*" to the end of the source path.
