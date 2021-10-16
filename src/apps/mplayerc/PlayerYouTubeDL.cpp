@@ -38,7 +38,7 @@ namespace YoutubeDL
 
 		LPCWSTR ydl_filenames[] = {
 			L"yt-dlp.exe",
-			L"yt-dlp.exe",
+			L"yt-dlp_x86.exe",
 			L"youtube-dl.exe"
 		};
 		CStringW ydl_path;
