@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include "DSUtil/Filehandle.h"
 #include "PlayerYouTubeDL.h"
 
 #include <ExtLib/rapidjson/include/rapidjsonHelper.h>
@@ -34,6 +35,40 @@ namespace YoutubeDL
 		y_fields.Empty();
 		YoutubeProfiles.clear();
 		urls.clear();
+
+		LPCWSTR ydl_filenames[] = {
+			L"yt-dlp.exe",
+			L"yt-dlp.exe",
+			L"youtube-dl.exe"
+		};
+		CStringW ydl_path;
+
+		for (auto& ydl_filename : ydl_filenames) {
+			if (::PathFileExistsW(ydl_filename)) {
+				ydl_path = ydl_filename;
+				break;
+			}
+			// CreateProcessW and other functions (unlike ShellExecuteExW) does not look for
+			// an executable file in the "App Paths", so we will do it manually.
+
+			// see "App Paths" in HKEY_CURRENT_USER
+			CStringW apppath = GetRegAppPath(ydl_filename, true);
+			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
+				ydl_path = apppath;
+				break;
+			}
+
+			// see "App Paths" in HKEY_LOCAL_MACHINE
+			apppath = GetRegAppPath(ydl_filename, false);
+			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
+				ydl_path = apppath;
+				break;
+			}
+		}
+
+		if (ydl_path.IsEmpty()) {
+			return false;
+		}
 
 		HANDLE hStdout_r, hStdout_w;
 		HANDLE hStderr_r, hStderr_w;
@@ -54,16 +89,9 @@ namespace YoutubeDL
 		startup_info.hStdError = hStderr_w;
 		startup_info.wShowWindow = SW_HIDE;
 		startup_info.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-		CStringW ydlpath;
-		if (::PathFileExistsW(L"yt-dlp.exe")) {
-			ydlpath = L"yt-dlp.exe";
-		} else if (::PathFileExistsW(L"yt-dlp_x86.exe")) {
-			ydlpath = L"yt-dlp_x86.exe";
-		} else {
-			ydlpath = L"youtube-dl.exe";
-		}
 
-		CStringW args; args.Format(LR"(%s -j --all-subs --sub-format vtt "%s")", ydlpath.GetString(), url.GetString());
+		CStringW args;
+		args.Format(LR"(%s -j --all-subs --sub-format vtt "%s")", ydl_path.GetString(), url.GetString());
 		PROCESS_INFORMATION proc_info = {};
 		const bool bSuccess = CreateProcessW(nullptr, args.GetBuffer(), nullptr, nullptr, true, 0,
 											 nullptr, nullptr, &startup_info, &proc_info);
