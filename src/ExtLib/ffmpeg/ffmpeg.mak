@@ -1,9 +1,10 @@
-BIN_DIR      = ../../../bin
-ZLIB_DIR     = ../zlib
-OPENJPEG_DIR = ../openjpeg
-SPEEX_DIR    = ../speex
-SOXR_DIR     = ../soxr
-DAV1_DIR     = ../dav1d
+BIN_DIR       = ../../../bin
+ZLIB_DIR      = ../zlib
+OPENJPEG_DIR  = ../openjpeg
+SPEEX_DIR     = ../speex
+SOXR_DIR      = ../soxr
+DAV1_DIR      = ../dav1d
+FFNVCODEC_DIR = ../nv-codec-headers/include
 
 ifeq ($(64BIT),yes)
 	PLATFORM = x64
@@ -29,7 +30,7 @@ TARGET_LIB        = $(TARGET_LIB_DIR)/ffmpeg.lib
 ARSCRIPT          = $(OBJ_DIR)script.ar
 
 # Compiler and yasm flags
-CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) \
+CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
@@ -392,6 +393,13 @@ SRCS_LC = \
 SRCS_LC_B = \
 	libavcodec/noise_bsf.c \
 	libavcodec/null_bsf.c \
+	libavcodec/nvdec.c \
+	libavcodec/nvdec_av1.c \
+	libavcodec/nvdec_h264.c \
+	libavcodec/nvdec_hevc.c \
+	libavcodec/nvdec_mpeg12.c \
+	libavcodec/nvdec_vc1.c \
+	libavcodec/nvdec_vp9.c \
 	libavcodec/options.c \
 	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
@@ -642,6 +650,7 @@ SRCS_LU = \
 	libavutil/frame.c \
 	libavutil/hdr_dynamic_metadata.c \
 	libavutil/hwcontext.c \
+	libavutil/hwcontext_cuda.c \
 	libavutil/hwcontext_d3d11va.c \
 	libavutil/hwcontext_dxva2.c \
 	libavutil/imgutils.c \
