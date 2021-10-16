@@ -11531,7 +11531,7 @@ void CMainFrame::ClampWindowRect(RECT& windowRect)
 
 void CMainFrame::RepaintVideo(const bool bForceRepaint/* = false*/)
 {
-	if (bForceRepaint || (!m_bDelaySetOutputRect && GetMediaState() != State_Running)) {
+	if (!m_bDelaySetOutputRect && (bForceRepaint || GetMediaState() != State_Running)) {
 		if (m_pCAP) {
 			m_pCAP->Paint(false);
 		} else if (m_pMFVDC) {
