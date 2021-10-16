@@ -679,11 +679,11 @@ namespace Youtube
 					item.url = url;
 
 					switch (profile->format) {
-					case y_mp4_avc:  item.title = L"MP4"; break;
-					case y_webm_vid: item.title = L"WebM";     break;
-					case y_mp4_av1:  item.title = L"MP4(AV1)"; break;
-					case y_stream:   item.title = L"HLS Live"; break;
-					default:         item.title = L"unknown";  break;
+					case y_mp4_avc:  item.title = L"MP4(H.264)"; break;
+					case y_webm_vid: item.title = L"WebM(VP9)";  break;
+					case y_mp4_av1:  item.title = L"MP4(AV1)";   break;
+					case y_stream:   item.title = L"HLS Live";  break;
+					default:         item.title = L"unknown";   break;
 					}
 
 					if (quality_label) {
