@@ -28,12 +28,13 @@
 #include "ThumbsTaskDlg.h"
 
 enum {
-	PROGRESS_E_VIDFMT	= -5,
-	PROGRESS_E_VIDSIZE	= -4,
-	PROGRESS_E_MEMORY	= -3,
-	PROGRESS_E_FAIL		= -2,
-	PROGRESS_E_WAIT		= -1,
-	PROGRESS_COMPLETED	= INT16_MAX,
+	PROGRESS_E_SAVE     = -6,
+	PROGRESS_E_VIDFMT   = -5,
+	PROGRESS_E_VIDSIZE  = -4,
+	PROGRESS_E_MEMORY   = -3,
+	PROGRESS_E_FAIL     = -2,
+	PROGRESS_E_WAIT     = -1,
+	PROGRESS_COMPLETED  = INT16_MAX,
 };
 
 // CThumbsTaskDlg dialog
@@ -297,6 +298,8 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	bool ok = m_pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
 	if (ok) {
 		m_iProgress = PROGRESS_COMPLETED;
+	} else {
+		m_iProgress = PROGRESS_E_SAVE;
 	}
 }
 
@@ -373,6 +376,9 @@ HRESULT CThumbsTaskDlg::OnTimer(_In_ long lTime)
 		break;
 	case PROGRESS_E_VIDFMT:
 		SetContent(m_ErrorMsg);
+		break;
+	case PROGRESS_E_SAVE:
+		SetContent(ResStr(IDS_MAINFRM_53));
 		break;
 	// operation is completed, close the dialog
 	case PROGRESS_COMPLETED:
