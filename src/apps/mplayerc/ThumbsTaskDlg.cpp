@@ -294,10 +294,10 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		rts.Render(spd, 0, 25, bbox);
 	}
 
-	m_pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
-
-	m_bSuccessfully = true;
-	m_iProgress = PROGRESS_COMPLETED; // the end
+	bool ok = m_pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
+	if (ok) {
+		m_iProgress = PROGRESS_COMPLETED;
+	}
 }
 
 IMPLEMENT_DYNAMIC(CThumbsTaskDlg, CTaskDialog)
@@ -310,13 +310,17 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCWSTR filename)
 	, m_pMainFrm(nullptr)
 	, m_iProgress(0)
 	, m_bAbort(false)
-	, m_bSuccessfully(false)
 {
 
 	SetDialogWidth(150);
 }
 
-CThumbsTaskDlg::~CThumbsTaskDlg()
+bool CThumbsTaskDlg::IsCompleteOk()
+{
+	return m_iProgress == PROGRESS_COMPLETED;
+}
+
+void CThumbsTaskDlg::StopThread()
 {
 	if (m_Thread.joinable()) {
 		m_bAbort = true;
@@ -339,6 +343,13 @@ HRESULT CThumbsTaskDlg::OnInit()
 	SetProgressBarPosition(0);
 
 	m_Thread = std::thread([this] { SaveThumbnails(m_filename); });
+
+	return S_OK;
+}
+
+HRESULT CThumbsTaskDlg::OnDestroy()
+{
+	StopThread();
 
 	return S_OK;
 }

@@ -44,11 +44,13 @@ private:
 
 public:
 	CThumbsTaskDlg(LPCWSTR filename);
-	virtual ~CThumbsTaskDlg();
 
-	bool m_bSuccessfully;
+	bool IsCompleteOk();
 
-protected:
-	virtual HRESULT OnInit();
-	virtual HRESULT OnTimer(_In_ long lTime);
+private:
+	void StopThread();
+
+	HRESULT OnInit() override;
+	HRESULT OnDestroy() override;
+	HRESULT OnTimer(_In_ long lTime) override;
 };

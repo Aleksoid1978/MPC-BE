@@ -419,6 +419,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	bool m_bLiveWM;
 
 	void SendStatusMessage(const CString& msg, const int nTimeOut);
+	void SendStatusCompactPath(const CString& path);
+
 	CString m_playingmsg, m_closingmsg;
 
 	REFERENCE_TIME m_rtDurationOverride;
@@ -433,7 +435,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	HRESULT GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT GetOriginalFrame(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT RenderCurrentSubtitles(BYTE* pData);
-	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
+	bool SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	bool IsRendererCompatibleWithSaveImage();
 	void SaveImage(LPCWSTR fn, bool displayed);
 	void SaveThumbnails(LPCWSTR fn);

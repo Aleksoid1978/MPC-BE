@@ -6182,31 +6182,21 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 	return hr;
 }
 
-void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
+bool CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 {
 	const CAppSettings& s = AfxGetAppSettings();
 
 	const CString ext = GetFileExt(fn).MakeLower();
+	bool ok;
 
 	if (ext == L".png") {
-		PNGDIB(fn, pData, std::clamp(s.iThumbLevelPNG, 1, 9));
+		ok = PNGDIB(fn, pData, std::clamp(s.iThumbLevelPNG, 1, 9));
 	} else {
 		size_t dstLen = 0;
-		WICDIB(fn, pData, s.iThumbQuality, nullptr, dstLen);
+		ok = WICDIB(fn, pData, s.iThumbQuality, nullptr, dstLen);
 	}
 
-	CString fName(fn);
-	fName.Replace(L"\\\\", L"\\");
-
-	CPath p(fName);
-	if (CDC* pDC = m_wndStatusBar.GetDC()) {
-		CRect r;
-		m_wndStatusBar.GetClientRect(&r);
-		p.CompactPath(pDC->m_hDC, r.Width());
-		m_wndStatusBar.ReleaseDC(pDC);
-	}
-
-	SendStatusMessage(p, 3000);
+	return ok;
 }
 
 void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
@@ -6225,8 +6215,11 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 
 	if (hr == S_OK && dib.size()) {
 		if (fn) {
-			SaveDIB(fn, dib.data(), dib.size());
-			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
+			bool ok = SaveDIB(fn, dib.data(), dib.size());
+			if (ok) {
+				SendStatusCompactPath(fn);
+				m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
+			}
 		} else {
 			// Allocate a global memory object for the DIB
 			HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, dib.size());
@@ -6297,7 +6290,8 @@ void CMainFrame::SaveThumbnails(LPCWSTR fn)
 		SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
 	}
 
-	if (dlg.m_bSuccessfully) {
+	if (dlg.IsCompleteOk()) {
+		SendStatusCompactPath(fn);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_THUMBS_SAVED), 3000);
 	}
 }
@@ -17281,6 +17275,21 @@ void CMainFrame::SendStatusMessage(const CString& msg, const int nTimeOut)
 	m_playingmsg = msg;
 	SetTimer(TIMER_STATUSERASER, nTimeOut, nullptr);
 	m_Lcd.SetStatusMessage(msg, nTimeOut);
+}
+
+void CMainFrame::SendStatusCompactPath(const CString& path)
+{
+	CString msg(path);
+	if (CDC* pDC = m_wndStatusBar.GetDC()) {
+		CRect r;
+		m_wndStatusBar.GetClientRect(&r);
+		if (::PathCompactPathW(pDC->m_hDC, msg.GetBuffer(), r.Width())) {
+			msg.ReleaseBuffer();
+		}
+		m_wndStatusBar.ReleaseDC(pDC);
+	}
+
+	SendStatusMessage(msg, 3000);
 }
 
 BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, BOOL bAddRecent/* = TRUE*/)
