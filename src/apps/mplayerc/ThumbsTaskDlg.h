@@ -31,14 +31,14 @@ class CThumbsTaskDlg : public CTaskDialog
 	DECLARE_DYNAMIC(CThumbsTaskDlg)
 
 private:
-	CMainFrame*      m_pMainFrm;
+	CMainFrame*      m_pMainFrm = nullptr;
 
-	CString          m_filename;
+	CStringW         m_filename;
 
 	std::thread      m_Thread;
-	std::atomic_int  m_iProgress;
-	std::atomic_bool m_bAbort;
-	CString          m_ErrorMsg;
+	std::atomic_int  m_iProgress = 0;
+	std::atomic_bool m_bAbort = false;
+	CStringW         m_ErrorMsg;
 
 	void SaveThumbnails(LPCWSTR filepath);
 

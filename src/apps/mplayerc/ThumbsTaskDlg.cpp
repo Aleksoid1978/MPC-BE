@@ -161,7 +161,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 	for (int i = 1, pics = cols * rows; i <= pics; i++) {
 		const REFERENCE_TIME rt = duration * i / (pics + 1);
-		const CString strTime = ReftimeToString2(rt);
+		const CStringW strTime = ReftimeToString2(rt);
 
 		m_pMainFrm->SeekTo(rt, false);
 
@@ -189,7 +189,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		style->marginRect.SetRectEmpty();
 		rts.AddStyle(L"thumbs", style);
 
-		CString str;
+		CStringW str;
 		str.Format(L"{\\an7\\1c&Hffffff&\\4a&Hb0&\\bord1\\shad4\\be1}{\\p1}m %d %d l %d %d %d %d %d %d{\\p}",
 				   r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
 		rts.Add(str, true, 0, 1, L"thumbs");
@@ -200,7 +200,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		rts.Render(spd, 0, 25, bbox);
 
 		std::vector<BYTE> dib;
-		CString errmsg;
+		CStringW errmsg;
 		if (S_OK != m_pMainFrm->GetOriginalFrame(dib, errmsg)) {
 			m_iProgress = PROGRESS_E_FAIL;
 			return;
@@ -264,11 +264,11 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
 		}
 
-		CString filename = m_pMainFrm->GetAltFileName(); // YouTube
-		CString filesize;
+		CStringW filename = m_pMainFrm->GetAltFileName(); // YouTube
+		CStringW filesize;
 
 		if (filename.IsEmpty()) {
-			const CString filepath = m_pMainFrm->GetCurFileName();
+			const CStringW filepath = m_pMainFrm->GetCurFileName();
 			filename = GetFileOnly(filepath);
 
 			WIN32_FIND_DATAW wfd;
@@ -278,8 +278,8 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 				const __int64 size = (__int64(wfd.nFileSizeHigh) << 32) | wfd.nFileSizeLow;
 				WCHAR szFileSize[65] = { 0 };
-				StrFormatByteSize(size, szFileSize, _countof(szFileSize));
-				CString szByteSize;
+				StrFormatByteSize(size, szFileSize, std::size(szFileSize));
+				CStringW szByteSize;
 				szByteSize.Format(L"%I64d", size);
 				filesize.Format(ResStr(IDS_MAINFRM_58), szFileSize, FormatNumber(szByteSize));
 			}
@@ -310,9 +310,6 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCWSTR filename)
 		TDCBF_CANCEL_BUTTON,
 		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_filename(filename)
-	, m_pMainFrm(nullptr)
-	, m_iProgress(0)
-	, m_bAbort(false)
 {
 
 	SetDialogWidth(150);
@@ -340,7 +337,7 @@ HRESULT CThumbsTaskDlg::OnInit()
 	m_pMainFrm = AfxGetMainFrame();
 
 	const CAppSettings& s = AfxGetAppSettings();
-	int n = 1 + s.iThumbCols * s.iThumbRows + 1;
+	const int n = 1 + s.iThumbCols * s.iThumbRows + 1;
 
 	SetProgressBarRange(0, n);
 	SetProgressBarPosition(0);
