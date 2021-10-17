@@ -311,7 +311,6 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCWSTR filename)
 		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_filename(filename)
 {
-
 	SetDialogWidth(150);
 }
 
@@ -357,10 +356,11 @@ HRESULT CThumbsTaskDlg::OnDestroy()
 HRESULT CThumbsTaskDlg::OnTimer(_In_ long lTime)
 {
 	switch (m_iProgress) {
-	// waiting after error
-	case PROGRESS_E_WAIT:
-
+	case PROGRESS_E_WAIT: // waiting after error
 		return S_FALSE;
+	case PROGRESS_COMPLETED: // operation is completed, close the dialog
+		ClickCommandControl(IDCANCEL);
+		return S_OK;
 	// errors
 	case PROGRESS_E_FAIL:
 		SetContent(ResStr(IDS_AG_ERROR));
@@ -377,11 +377,8 @@ HRESULT CThumbsTaskDlg::OnTimer(_In_ long lTime)
 	case PROGRESS_E_SAVE:
 		SetContent(ResStr(IDS_MAINFRM_53));
 		break;
-	// operation is completed, close the dialog
-	case PROGRESS_COMPLETED:
-		ClickCommandControl(IDCANCEL);
 
-		return S_OK;
+
 	}
 
 	if (m_iProgress < PROGRESS_E_WAIT) {

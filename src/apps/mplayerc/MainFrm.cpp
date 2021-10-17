@@ -5923,8 +5923,8 @@ void CMainFrame::OnFileSaveAs()
 	HRESULT hr;
 	CSaveDlg dlg(in, name, p, hr);
 	if (SUCCEEDED(hr)) {
-		const auto ret = dlg.DoModal();
-		if (ret == IDOK && !m_youtubeFields.fname.IsEmpty()) {
+		dlg.DoModal();
+		if (dlg.IsCompleteOk() && !m_youtubeFields.fname.IsEmpty()) {
 			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
 			if (pFileData && pFileData->fns.size() == 2) {
 				ext = p.GetExtension().MakeLower();

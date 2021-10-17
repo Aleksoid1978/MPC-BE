@@ -74,8 +74,9 @@ private:
 	} m_SaveStats;
 
 	std::thread        m_SaveThread;
-	std::atomic_ullong m_pos    = 0;
-	std::atomic_bool   m_bAbort = false;
+	std::atomic_ullong m_pos       = 0;
+	std::atomic_int    m_iProgress = 0;
+	std::atomic_bool   m_bAbort    = false;
 
 	void Save();
 
@@ -83,16 +84,15 @@ private:
 	WSAEVENT m_WSAEvent = nullptr;
 	sockaddr_in m_addr = {};
 
-	HWND m_TaskDlgHwnd = nullptr;
-
 public:
 	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr);
-	virtual ~CSaveDlg();
 
-protected:
-	virtual HRESULT OnInit();
-	virtual HRESULT OnTimer(_In_ long lTime);
-	virtual HRESULT OnCommandControlClick(_In_ int nCommandControlID);
+	bool IsCompleteOk();
+
+private:
+	HRESULT OnDestroy() override;
+	HRESULT OnTimer(_In_ long lTime) override;
+	HRESULT OnCommandControlClick(_In_ int nCommandControlID) override;
 
 	HRESULT InitFileCopy();
 };

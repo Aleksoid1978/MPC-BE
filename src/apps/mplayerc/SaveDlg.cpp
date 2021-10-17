@@ -43,6 +43,52 @@ static unsigned int AdaptUnit(double& val, size_t unitsNb)
 	return unit;
 }
 
+static HRESULT CopyFiles(CString sourceFile, CString destFile)
+{
+	HRESULT hr = S_OK;
+
+	CComPtr<IShellItem> psiItem;
+	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, nullptr, IID_PPV_ARGS(&psiItem));
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	CComPtr<IShellItem> psiDestinationFolder;
+	CString pszPath = AddSlash(GetFolderOnly(destFile));
+	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	CComPtr<IFileOperation> pFileOperation;
+	hr = CoCreateInstance(CLSID_FileOperation,
+						  nullptr,
+						  CLSCTX_INPROC_SERVER,
+						  IID_PPV_ARGS(&pFileOperation));
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	CString pszCopyName = GetFileOnly(destFile);
+	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, nullptr);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	hr = pFileOperation->PerformOperations();
+
+	return hr;
+}
+
+enum {
+	PROGRESS_COMPLETED = INT16_MAX,
+};
+
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
@@ -65,71 +111,10 @@ CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
 	hr = InitFileCopy();
 }
 
-CSaveDlg::~CSaveDlg()
+
+bool CSaveDlg::IsCompleteOk()
 {
-	if (pMC) {
-		pMC->Stop();
-	}
-
-	if (m_SaveThread.joinable()) {
-		m_bAbort = true;
-		m_SaveThread.join();
-	}
-
-	if (m_protocol == protocol::PROTOCOL_UDP) {
-		if (m_WSAEvent != nullptr) {
-			WSACloseEvent(m_WSAEvent);
-		}
-
-		if (m_UdpSocket != INVALID_SOCKET) {
-			closesocket(m_UdpSocket);
-			m_UdpSocket = INVALID_SOCKET;
-		}
-
-		WSACleanup();
-	}
-
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_hFile);
-	}
-
-	if (m_hIcon) {
-		DestroyIcon(m_hIcon);
-	}
-}
-
-static HRESULT CopyFiles(CString sourceFile, CString destFile)
-{
-	#define FOF_UI_FLAGS FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR
-
-	HRESULT hr = S_OK;
-
-	CComPtr<IShellItem> psiItem;
-	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, nullptr, IID_PPV_ARGS(&psiItem));
-	EXIT_ON_ERROR(hr);
-
-	CComPtr<IShellItem> psiDestinationFolder;
-	CString pszPath = AddSlash(GetFolderOnly(destFile));
-	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
-	EXIT_ON_ERROR(hr);
-
-	CComPtr<IFileOperation> pFileOperation;
-	hr = CoCreateInstance(CLSID_FileOperation,
-						  nullptr,
-						  CLSCTX_INPROC_SERVER,
-						  IID_PPV_ARGS(&pFileOperation));
-	EXIT_ON_ERROR(hr);
-
-	hr = pFileOperation->SetOperationFlags(FOF_UI_FLAGS | FOFX_NOMINIMIZEBOX);
-	EXIT_ON_ERROR(hr);
-
-	CString pszCopyName = GetFileOnly(destFile);
-	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, nullptr);
-	EXIT_ON_ERROR(hr);
-
-	hr = pFileOperation->PerformOperations();
-
-	return hr;
+	return m_iProgress == PROGRESS_COMPLETED;
 }
 
 HRESULT CSaveDlg::InitFileCopy()
@@ -374,7 +359,7 @@ void CSaveDlg::Save()
 
 			m_pos += dwSizeRead;
 			if (m_len && m_len == m_pos) {
-				::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_OK_BUTTON), 0);
+				m_iProgress = PROGRESS_COMPLETED;
 				break;
 			}
 
@@ -386,14 +371,48 @@ void CSaveDlg::Save()
 	}
 }
 
-HRESULT CSaveDlg::OnInit()
+HRESULT CSaveDlg::OnDestroy()
 {
-	m_TaskDlgHwnd = ::GetActiveWindow();
-	return __super::OnInit();
+	if (pMC) {
+		pMC->Stop();
+	}
+
+	if (m_SaveThread.joinable()) {
+		m_bAbort = true;
+		m_SaveThread.join();
+	}
+
+	if (m_protocol == protocol::PROTOCOL_UDP) {
+		if (m_WSAEvent != nullptr) {
+			WSACloseEvent(m_WSAEvent);
+		}
+
+		if (m_UdpSocket != INVALID_SOCKET) {
+			closesocket(m_UdpSocket);
+			m_UdpSocket = INVALID_SOCKET;
+		}
+
+		WSACleanup();
+	}
+
+	if (m_hFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_hFile);
+	}
+
+	if (m_hIcon) {
+		DestroyIcon(m_hIcon);
+	}
+
+	return S_OK;
 }
 
 HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 {
+	if (m_iProgress == PROGRESS_COMPLETED) {
+		ClickCommandControl(IDCANCEL);
+		return S_OK;
+	}
+
 	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
@@ -506,7 +525,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		SetProgressBarPosition(dur > 0 ? (int)(1000 * pos / dur) : 0);
 
 		if (dur && pos >= dur) {
-			::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_OK_BUTTON), 0);
+			m_iProgress = PROGRESS_COMPLETED;
 			return S_FALSE;
 		}
 	}
