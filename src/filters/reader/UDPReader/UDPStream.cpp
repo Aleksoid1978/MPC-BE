@@ -94,7 +94,9 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 		}
 
 		HRESULT hr = m_HTTPAsync.Read(pBuffer, dwSizeToRead, dwSizeRead, dwTimeOut);
-		EXIT_ON_ERROR(hr);
+		if (FAILED(hr)) {
+			return hr;
+		}
 
 		if ((m_nBytesRead += *dwSizeRead) == m_icydata.metaint) {
 			m_nBytesRead = 0;

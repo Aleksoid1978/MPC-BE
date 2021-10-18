@@ -449,7 +449,9 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 	} else {
 		CComPtr<IBaseFilter> pBF;
 		hr = pBF.CoCreateInstance(m_clsid);
-		EXIT_ON_ERROR(hr);
+		if (FAILED(hr)) {
+			return hr;
+		}
 
 		if (m_clsid == CLSID_EnhancedVideoRenderer) {
 			if (m_name != "EVR - Preview Window") {
