@@ -91,8 +91,10 @@
 #include "Content.h"
 
 #include <SubRenderIntf.h>
+namespace LAVVideo
+{
 #include <LAVVideoSettings.h>
-
+}
 #include "filters/renderer/VideoRenderers/Variables.h"
 
 #include "PlayerYouTubeDL.h"
@@ -4545,7 +4547,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	// Trying to find LAV Video is in the graph
-	if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
+	if (CComQIPtr<LAVVideo::ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
 		LPCWSTR decoderName = pLAVVideoStatus->GetActiveDecoderName();
 
 		if (wcscmp(decoderName, L"avcodec") == 0) {
