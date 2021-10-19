@@ -69,7 +69,7 @@ extern "C" {
 #define OPT_DiscardMode      L"DiscardMode"
 #define OPT_ScanType         L"ScanType"
 #define OPT_ARMode           L"ARMode"
-#define OPT_EnableD3D11Dec   L"EnableD3D11Decoder"
+#define OPT_HwDecoder        L"HwDecoder"
 #define OPT_DXVACheck        L"DXVACheckCompatibility"
 #define OPT_DisableDXVA_SD   L"DisableDXVA_SD"
 #define OPT_SW_prefix        L"Sw_"
@@ -1023,7 +1023,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
 	, m_nScanType(SCAN_AUTO)
 	, m_nARMode(2)
-	, m_bEnableD3D11Decoder(true)
+	, m_nHwDecoder(HWDec_D3D11)
 	, m_nDXVACheckCompatibility(1)
 	, m_nDXVA_SD(0)
 	, m_nSwRGBLevels(0)
@@ -1114,8 +1114,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 				m_bHwCodecs[i] = !!dw;
 			}
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_EnableD3D11Dec, dw)) {
-			m_bEnableD3D11Decoder = !!dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_HwDecoder, dw)) {
+			m_nHwDecoder = (MPCHwDecoder)discard<int>(dw, HWDec_D3D11, 0, HWDec_count-1);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DXVACheck, dw)) {
 			m_nDXVACheckCompatibility = dw;
@@ -1146,15 +1146,20 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 	}
 #else
+	int value;
 	CProfile& profile = AfxGetProfile();
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber, 0, 16);
-	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ScanType, *(int*)&m_nScanType);
+	if (profile.ReadInt(OPT_SECTION_VideoDec, OPT_ScanType, value)) {
+		m_nScanType = (MPC_SCAN_TYPE)value;
+	}
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
 	for (int i = 0; i < HWCodec_count; i++) {
 		profile.ReadBool(OPT_SECTION_VideoDec, hwdec_opt_names[i], m_bHwCodecs[i]);
 	}
-	profile.ReadBool(OPT_SECTION_VideoDec, OPT_EnableD3D11Dec, m_bEnableD3D11Decoder);
+	if (profile.ReadInt(OPT_SECTION_VideoDec, OPT_HwDecoder, value, 0, HWDec_count - 1)) {
+		m_nHwDecoder = (MPCHwDecoder)value;
+	}
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -1190,7 +1195,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
-	if (m_bEnableD3D11Decoder) {
+	if (m_nHwDecoder == HWDec_D3D11) {
 		m_pD3D11Decoder = DNew CD3D11Decoder(this);
 		if (FAILED(m_pD3D11Decoder->Init())) {
 			SAFE_DELETE(m_pD3D11Decoder);
@@ -3933,7 +3938,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 		for (int i = 0; i < HWCodec_count; i++) {
 			key.SetDWORDValue(hwdec_opt_names[i], m_bHwCodecs[i]);
 		}
-		key.SetDWORDValue(OPT_EnableD3D11Dec, m_bEnableD3D11Decoder);
+		key.SetDWORDValue(OPT_HwDecoder, m_nHwDecoder);
 		key.SetDWORDValue(OPT_DXVACheck, m_nDXVACheckCompatibility);
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
@@ -3959,7 +3964,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 	for (int i = 0; i < HWCodec_count; i++) {
 		profile.WriteInt(OPT_SECTION_VideoDec, hwdec_opt_names[i], m_bHwCodecs[i]);
 	}
-	profile.WriteBool(OPT_SECTION_VideoDec, OPT_EnableD3D11Dec, m_bEnableD3D11Decoder);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_HwDecoder, m_nHwDecoder);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -4076,17 +4081,21 @@ STDMETHODIMP_(bool) CMPCVideoDecFilter::GetHwCodec(MPCHwCodec hwcodec)
 	return m_bHwCodecs[hwcodec];
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetD3D11Decoder(bool enable)
+STDMETHODIMP CMPCVideoDecFilter::SetHwDecoder(int value)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_bEnableD3D11Decoder = enable;
+
+	if (value < 0 || value >= HWDec_count) {
+		return E_INVALIDARG;
+	}
+	m_nHwDecoder = (MPCHwDecoder)value;
 	return S_OK;
 }
 
-STDMETHODIMP_(bool) CMPCVideoDecFilter::GetD3D11Decoder()
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetHwDecoder()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_bEnableD3D11Decoder;
+	return m_nHwDecoder;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetDXVACheckCompatibility(int nValue)

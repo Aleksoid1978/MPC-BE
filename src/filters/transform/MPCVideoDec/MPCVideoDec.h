@@ -59,7 +59,7 @@ private:
 	MPC_SCAN_TYPE							m_nScanType;
 	int										m_nARMode;
 	int										m_nDiscardMode;
-	bool									m_bEnableD3D11Decoder;
+	MPCHwDecoder							m_nHwDecoder;
 	bool									m_bHwCodecs[HWCodec_count];
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
@@ -266,8 +266,8 @@ public:
 
 	STDMETHODIMP SetHwCodec(MPCHwCodec hwcodec, bool enable);
 	STDMETHODIMP_(bool) GetHwCodec(MPCHwCodec hwcodec);
-	STDMETHODIMP SetD3D11Decoder(bool enable);
-	STDMETHODIMP_(bool) GetD3D11Decoder();
+	STDMETHODIMP SetHwDecoder(int value);
+	STDMETHODIMP_(int) GetHwDecoder();
 	STDMETHODIMP SetDXVACheckCompatibility(int nValue);
 	STDMETHODIMP_(int) GetDXVACheckCompatibility();
 	STDMETHODIMP SetDXVA_SD(int nValue);

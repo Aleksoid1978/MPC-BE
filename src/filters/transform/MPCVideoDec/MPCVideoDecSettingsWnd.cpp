@@ -313,7 +313,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 			m_cbHWCodec[i].SetCheck(!!m_pMDF->GetHwCodec((MPCHwCodec)i));
 		}
 		if (SysVersion::IsWin8orLater()) {
-			m_chUseD3D11Decoder.SetCheck(!!m_pMDF->GetD3D11Decoder());
+			m_chUseD3D11Decoder.SetCheck(m_pMDF->GetHwDecoder() == HWDec_D3D11 ? BST_CHECKED : BST_UNCHECKED);
 		}
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
 		m_chDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
@@ -371,7 +371,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 			m_pMDF->SetHwCodec((MPCHwCodec)i, m_cbHWCodec[i].GetCheck() == BST_CHECKED);
 		}
 		if (SysVersion::IsWin8orLater()) {
-			m_pMDF->SetD3D11Decoder(m_chUseD3D11Decoder.GetCheck());
+			m_pMDF->SetHwDecoder(m_chUseD3D11Decoder.GetCheck() == BST_CHECKED ? HWDec_D3D11 : HWDec_DXVA2);
 		}
 		m_pMDF->SetDXVACheckCompatibility(m_cbDXVACompatibilityCheck.GetCurSel());
 		m_pMDF->SetDXVA_SD(m_chDXVA_SD.GetCheck());

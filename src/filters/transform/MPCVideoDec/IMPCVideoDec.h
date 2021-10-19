@@ -81,6 +81,12 @@ enum MPCHwCodec {
 	HWCodec_count
 };
 
+enum MPCHwDecoder {
+	HWDec_DXVA2 = 0,
+	HWDec_D3D11,
+	HWDec_count
+};
+
 enum MPCPixelFormat {
 	PixFmt_None = -1,
 	// YUV 8 bit
@@ -127,8 +133,8 @@ public IUnknown {
 
 	STDMETHOD(SetHwCodec(MPCHwCodec hwcodec, bool enable)) PURE;
 	STDMETHOD_(bool, GetHwCodec(MPCHwCodec hwcodec)) PURE;
-	STDMETHOD(SetD3D11Decoder(bool enable)) PURE;
-	STDMETHOD_(bool, GetD3D11Decoder()) PURE;
+	STDMETHOD(SetHwDecoder(int value)) PURE;
+	STDMETHOD_(int, GetHwDecoder()) PURE;
 	STDMETHOD(SetDXVACheckCompatibility(int nValue)) PURE;
 	STDMETHOD_(int, GetDXVACheckCompatibility()) PURE;
 	STDMETHOD(SetDXVA_SD(int nValue)) PURE;
