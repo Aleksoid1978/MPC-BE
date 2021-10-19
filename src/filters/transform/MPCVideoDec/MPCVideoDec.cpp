@@ -1023,7 +1023,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
 	, m_nScanType(SCAN_AUTO)
 	, m_nARMode(2)
-	, m_nHwDecoder(HWDec_D3D11)
+	, m_nHwDecoder(SysVersion::IsWin8orLater() ? HWDec_D3D11 : HWDec_DXVA2)
 	, m_nDXVACheckCompatibility(1)
 	, m_nDXVA_SD(0)
 	, m_nSwRGBLevels(0)
@@ -1195,7 +1195,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
-	if (m_nHwDecoder == HWDec_D3D11) {
+	if (SysVersion::IsWin8orLater() && m_nHwDecoder == HWDec_D3D11) {
 		m_pD3D11Decoder = DNew CD3D11Decoder(this);
 		if (FAILED(m_pD3D11Decoder->Init())) {
 			SAFE_DELETE(m_pD3D11Decoder);
