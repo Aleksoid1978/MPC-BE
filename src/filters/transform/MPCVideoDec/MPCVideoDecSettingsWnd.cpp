@@ -147,14 +147,14 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbHWCodec[HWCodec_WMV3].Create(L"WMV3", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_WMV3);
 	y += 20;
 
-	// Use D3D11 decoder
-	CalcTextRect(rect, x1, y, row_w);
-	m_chUseD3D11Decoder.Create(ResStr(IDS_VDF_USE_D3D11_DECODER), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_D3D11_DEC);
+	// HW Decoder
+	CalcTextRect(rect, x1, y, label_w);
+	m_txtHWDecoder.Create(L"Preferred hardware decoder", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
+	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DEC);
+	AddStringData(m_cbHWDecoder, L"DXVA2", HWDec_DXVA2);
 	if (SysVersion::IsWin8orLater()) {
-		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
-	} else {
-		m_chUseD3D11Decoder.EnableWindow(FALSE);
-		m_chUseD3D11Decoder.SetCheck(BST_UNCHECKED);
+		AddStringData(m_cbHWDecoder, L"D3D11", HWDec_D3D11);
 	}
 	y += 24;
 
@@ -312,9 +312,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		for (int i = 0; i < HWCodec_count; i++) {
 			m_cbHWCodec[i].SetCheck(!!m_pMDF->GetHwCodec((MPCHwCodec)i));
 		}
-		if (SysVersion::IsWin8orLater()) {
-			m_chUseD3D11Decoder.SetCheck(m_pMDF->GetHwDecoder() == HWDec_D3D11 ? BST_CHECKED : BST_UNCHECKED);
+
+		int hwdec = m_pMDF->GetHwDecoder();
+		if (!SysVersion::IsWin8orLater() && hwdec == HWDec_D3D11) {
+			hwdec = HWDec_DXVA2; // Windows 7 does not support D3D11 decoder
 		}
+		SelectByItemData(m_cbHWDecoder, hwdec);
+
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
 		m_chDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
@@ -370,9 +374,10 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		for (int i = 0; i < HWCodec_count; i++) {
 			m_pMDF->SetHwCodec((MPCHwCodec)i, m_cbHWCodec[i].GetCheck() == BST_CHECKED);
 		}
-		if (SysVersion::IsWin8orLater()) {
-			m_pMDF->SetHwDecoder(m_chUseD3D11Decoder.GetCheck() == BST_CHECKED ? HWDec_D3D11 : HWDec_DXVA2);
-		}
+
+		int hwdec = (int)GetCurItemData(m_cbHWDecoder);
+		m_pMDF->SetHwDecoder(hwdec);
+
 		m_pMDF->SetDXVACheckCompatibility(m_cbDXVACompatibilityCheck.GetCurSel());
 		m_pMDF->SetDXVA_SD(m_chDXVA_SD.GetCheck());
 
@@ -449,9 +454,10 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	for (int i = 0; i < HWCodec_count; i++) {
 		m_cbHWCodec[i].SetCheck(BST_CHECKED);
 	}
-	if (SysVersion::IsWin8orLater()) {
-		m_chUseD3D11Decoder.SetCheck(BST_CHECKED);
-	}
+
+	int hwdec = SysVersion::IsWin8orLater() ? HWDec_D3D11 : HWDec_DXVA2;
+	SelectByItemData(m_cbHWDecoder, hwdec);
+
 	m_cbDXVACompatibilityCheck.SetCurSel(1);
 	m_chDXVA_SD.SetCheck(BST_UNCHECKED);
 
