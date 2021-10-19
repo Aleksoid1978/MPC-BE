@@ -145,12 +145,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbHWCodec[HWCodec_VC1].Create(L"VC-1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VC1);
 	CalcTextRect(rect, codec_x3, y, codec_w);
 	m_cbHWCodec[HWCodec_WMV3].Create(L"WMV3", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_WMV3);
-	y += 20;
+	y += 24;
 
 	// HW Decoder
-	CalcTextRect(rect, x1, y, label_w);
+	CalcTextRect(rect, x1, y, label_w-20);
 	m_txtHWDecoder.Create(L"Preferred hardware decoder", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
+	CalcRect(rect, x2-20, y, control_w+20, 200); rect.top -= 4;
 	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DEC);
 	m_cbHWDecoder.AddString(L"DXVA2");
 	str = L"D3D11";
@@ -158,7 +158,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		str.Append(L" (not available)");
 	}
 	m_cbHWDecoder.AddString(str);
-	y += 24;
+	y += 28;
 
 	// DXVA Compatibility check
 	CalcTextRect(rect, x1, y, label_w);
