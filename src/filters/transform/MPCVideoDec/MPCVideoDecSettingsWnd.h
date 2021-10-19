@@ -72,7 +72,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 
 	CButton		m_grpHwAcceleration;
 	CStatic		m_txtHWCodec;
-	CButton		m_cbHWCodec[HWDec_count];
+	CButton		m_cbHWCodec[HWCodec_count];
 	CButton		m_chUseD3D11Decoder;
 	CStatic		m_txtDXVACompatibilityCheck;
 	CComboBox	m_cbDXVACompatibilityCheck;

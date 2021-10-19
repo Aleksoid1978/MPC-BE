@@ -69,16 +69,16 @@ enum MPC_SCAN_TYPE : int {
 	SCAN_PROGRESSIVE
 };
 
-enum MPCHwDecoder {
-	HWDec_None = -1,
-	HWDec_MPEG2,
-	HWDec_WMV3,
-	HWDec_VC1,
-	HWDec_H264,
-	HWDec_HEVC,
-	HWDec_VP9,
-	HWDec_AV1,
-	HWDec_count
+enum MPCHwCodec {
+	HWCodec_None = -1,
+	HWCodec_MPEG2,
+	HWCodec_WMV3,
+	HWCodec_VC1,
+	HWCodec_H264,
+	HWCodec_HEVC,
+	HWCodec_VP9,
+	HWCodec_AV1,
+	HWCodec_count
 };
 
 enum MPCPixelFormat {
@@ -125,8 +125,8 @@ public IUnknown {
 	STDMETHOD(SetARMode(int nValue)) PURE;
 	STDMETHOD_(int, GetARMode()) PURE;
 
-	STDMETHOD(SetHwDecoder(MPCHwDecoder hwdec, bool enable)) PURE;
-	STDMETHOD_(bool, GetHwDecoder(MPCHwDecoder hwdec)) PURE;
+	STDMETHOD(SetHwCodec(MPCHwCodec hwcodec, bool enable)) PURE;
+	STDMETHOD_(bool, GetHwCodec(MPCHwCodec hwcodec)) PURE;
 	STDMETHOD(SetD3D11Decoder(bool enable)) PURE;
 	STDMETHOD_(bool, GetD3D11Decoder()) PURE;
 	STDMETHOD(SetDXVACheckCompatibility(int nValue)) PURE;

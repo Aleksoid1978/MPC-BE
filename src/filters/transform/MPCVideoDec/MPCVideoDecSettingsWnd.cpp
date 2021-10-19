@@ -131,20 +131,20 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	int codec_x4 = codec_x3 + codec_w + 8;
 
 	CalcTextRect(rect, codec_x1, y, codec_w);
-	m_cbHWCodec[HWDec_H264].Create(L"H.264", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_H264);
+	m_cbHWCodec[HWCodec_H264].Create(L"H.264", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_H264);
 	CalcTextRect(rect, codec_x2, y, codec_w);
-	m_cbHWCodec[HWDec_HEVC].Create(L"HEVC", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_HEVC);
+	m_cbHWCodec[HWCodec_HEVC].Create(L"HEVC", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_HEVC);
 	CalcTextRect(rect, codec_x3, y, codec_w);
-	m_cbHWCodec[HWDec_VP9].Create(L"VP9", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VP9);
+	m_cbHWCodec[HWCodec_VP9].Create(L"VP9", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VP9);
 	CalcTextRect(rect, codec_x4, y, codec_w);
-	m_cbHWCodec[HWDec_AV1].Create(L"AV1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_AV1);
+	m_cbHWCodec[HWCodec_AV1].Create(L"AV1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_AV1);
 	y += 20;
 	CalcTextRect(rect, codec_x1, y, codec_w);
-	m_cbHWCodec[HWDec_MPEG2].Create(L"MPEG-2", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_MPEG2);
+	m_cbHWCodec[HWCodec_MPEG2].Create(L"MPEG-2", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_MPEG2);
 	CalcTextRect(rect, codec_x2, y, codec_w);
-	m_cbHWCodec[HWDec_VC1].Create(L"VC-1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VC1);
+	m_cbHWCodec[HWCodec_VC1].Create(L"VC-1", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_VC1);
 	CalcTextRect(rect, codec_x3, y, codec_w);
-	m_cbHWCodec[HWDec_WMV3].Create(L"WMV3", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_WMV3);
+	m_cbHWCodec[HWCodec_WMV3].Create(L"WMV3", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_HW_WMV3);
 	y += 20;
 
 	// Use D3D11 decoder
@@ -309,8 +309,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_chARMode.SetCheck(m_pMDF->GetARMode());
 		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
 
-		for (int i = 0; i < HWDec_count; i++) {
-			m_cbHWCodec[i].SetCheck(!!m_pMDF->GetHwDecoder((MPCHwDecoder)i));
+		for (int i = 0; i < HWCodec_count; i++) {
+			m_cbHWCodec[i].SetCheck(!!m_pMDF->GetHwCodec((MPCHwCodec)i));
 		}
 		if (SysVersion::IsWin8orLater()) {
 			m_chUseD3D11Decoder.SetCheck(!!m_pMDF->GetD3D11Decoder());
@@ -367,8 +367,8 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetARMode(m_chARMode.GetCheck());
 		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
 
-		for (int i = 0; i < HWDec_count; i++) {
-			m_pMDF->SetHwDecoder((MPCHwDecoder)i, m_cbHWCodec[i].GetCheck() == BST_CHECKED);
+		for (int i = 0; i < HWCodec_count; i++) {
+			m_pMDF->SetHwCodec((MPCHwCodec)i, m_cbHWCodec[i].GetCheck() == BST_CHECKED);
 		}
 		if (SysVersion::IsWin8orLater()) {
 			m_pMDF->SetD3D11Decoder(m_chUseD3D11Decoder.GetCheck());
@@ -446,7 +446,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_chARMode.SetCheck(BST_INDETERMINATE);
 	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 
-	for (int i = 0; i < HWDec_count; i++) {
+	for (int i = 0; i < HWCodec_count; i++) {
 		m_cbHWCodec[i].SetCheck(BST_CHECKED);
 	}
 	if (SysVersion::IsWin8orLater()) {

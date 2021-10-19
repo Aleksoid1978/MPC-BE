@@ -60,7 +60,7 @@ private:
 	int										m_nARMode;
 	int										m_nDiscardMode;
 	bool									m_bEnableD3D11Decoder;
-	bool									m_bHwDecs[HWDec_count];
+	bool									m_bHwCodecs[HWCodec_count];
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
 	bool									m_fPixFmts[PixFmt_count];
@@ -264,8 +264,8 @@ public:
 	STDMETHODIMP SetARMode(int nValue);
 	STDMETHODIMP_(int) GetARMode();
 
-	STDMETHODIMP SetHwDecoder(MPCHwDecoder hwdec, bool enable);
-	STDMETHODIMP_(bool) GetHwDecoder(MPCHwDecoder hwdec);
+	STDMETHODIMP SetHwCodec(MPCHwCodec hwcodec, bool enable);
+	STDMETHODIMP_(bool) GetHwCodec(MPCHwCodec hwcodec);
 	STDMETHODIMP SetD3D11Decoder(bool enable);
 	STDMETHODIMP_(bool) GetD3D11Decoder();
 	STDMETHODIMP SetDXVACheckCompatibility(int nValue);
