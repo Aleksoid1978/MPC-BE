@@ -3305,7 +3305,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			av_frame_copy_props(m_pFrame, hw_frame);
 
 			if (hw_frame->format == m_HWPixFmt && !DXVAState::GetState()) {
-				DXVAState::SetActiveState(GUID_NULL, m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC");break;
+				DXVAState::SetActiveState(GUID_NULL, m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC");
 			}
 		}
 
