@@ -3305,7 +3305,28 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			av_frame_copy_props(m_pFrame, hw_frame);
 
 			if (hw_frame->format == m_HWPixFmt && !DXVAState::GetState()) {
-				DXVAState::SetActiveState(GUID_NULL, m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC");
+				CString codec;
+				switch (m_nCodecId) {
+					case AV_CODEC_ID_AV1: codec = L"AV1"; break;
+					case AV_CODEC_ID_H264: codec = L"H264"; break;
+					case AV_CODEC_ID_HEVC: codec = L"HEVC"; break;
+					case AV_CODEC_ID_MPEG2VIDEO: codec = L"MPEG2"; break;
+					case AV_CODEC_ID_VC1:
+					case AV_CODEC_ID_WMV3: codec = L"VC1"; break;
+					case AV_CODEC_ID_VP9: codec = L"VP9"; break;
+				}
+
+				CString description = m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC";
+				if (!codec.IsEmpty()) {
+					const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
+					if (depth > 8) {
+						codec.AppendFormat(L" %d-bit", depth);
+					}
+
+					description += L", " + codec;
+				}
+
+				DXVAState::SetActiveState(GUID_NULL, description);
 			}
 		}
 
