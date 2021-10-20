@@ -158,6 +158,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		str.Append(L" (not available)");
 	}
 	m_cbHWDecoder.AddString(str);
+	str = L"D3D11cb";
+	if (!SysVersion::IsWin8orLater()) {
+		str.Append(L" (not available)");
+	}
+	m_cbHWDecoder.AddString(str);
+	m_cbHWDecoder.AddString(L"NVDEC (Nvidia only)");
 	y += 28;
 
 	// DXVA Compatibility check

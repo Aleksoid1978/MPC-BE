@@ -1062,6 +1062,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bMvcSwapLR(false)
 	, m_MVC_Base_View_R_flag(FALSE)
 	, m_dxva_pix_fmt(AV_PIX_FMT_NONE)
+	, m_HWPixFmt(AV_PIX_FMT_NONE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1371,7 +1372,7 @@ static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE*/)
 {
-	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = false;
+	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = m_bUseD3D11cb = m_bUseNVDEC = false;
 
 	for (size_t i = 0; i < _countof(ffCodecs); i++) {
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
@@ -1601,6 +1602,8 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 		av_freep(&m_pAVCtx->hwaccel_context);
 		avcodec_free_context(&m_pAVCtx);
 	}
+
+	av_buffer_unref(&m_HWDeviceCtx);
 
 	av_frame_free(&m_pFrame);
 
@@ -1911,6 +1914,12 @@ redo:
 		}
 		m_nCodecId = ffCodecs[nNewCodec].nFFCodec;
 		m_bUseD3D11 = m_bUseDXVA && m_pD3D11Decoder;
+
+		if (m_bUseDXVA && (m_nHwDecoder == HWDec_D3D11cb || m_nHwDecoder == HWDec_NVDEC)) {
+			m_bUseDXVA = m_bUseD3D11 = false;
+			m_bUseD3D11cb = (m_nHwDecoder == HWDec_D3D11cb);
+			m_bUseNVDEC = (m_nHwDecoder == HWDec_NVDEC);
+		}
 	}
 
 	if (m_nCodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11)) {
@@ -1919,6 +1928,22 @@ redo:
 		m_pAVCodec = avcodec_find_decoder(m_nCodecId);
 	}
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
+
+	if (bMediaTypeChanged && (m_bUseD3D11cb || m_bUseNVDEC)) {
+		auto hwDeviceType = m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA;
+		m_HWPixFmt = AV_PIX_FMT_NONE;
+		for (int i = 0;; i++) {
+			auto config = avcodec_get_hw_config(m_pAVCodec, i);
+			if (!config) {
+				break;
+			}
+			if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
+					config->device_type == hwDeviceType) {
+				m_HWPixFmt = config->pix_fmt;
+				break;
+			}
+		}
+	}
 
 	if (bMediaTypeChanged) {
 		const CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
@@ -2063,6 +2088,14 @@ redo:
 		m_pAVCtx->get_format        = av_get_format;
 		m_pAVCtx->get_buffer2       = av_get_buffer;
 		m_pAVCtx->slice_flags      |= SLICE_FLAG_ALLOW_FIELD;
+	} else if ((m_bUseD3D11cb || m_bUseNVDEC) && m_HWPixFmt != AV_PIX_FMT_NONE) {
+		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0) < 0) {
+			m_HWPixFmt = AV_PIX_FMT_NONE;
+			m_bUseD3D11cb = m_bUseNVDEC = false;
+		} else {
+			m_pAVCtx->get_format = av_get_format;
+			m_pAVCtx->hw_device_ctx = av_buffer_ref(m_HWDeviceCtx);
+		}
 	}
 
 	AllocExtradata(pmt);
@@ -3164,7 +3197,7 @@ HRESULT CMPCVideoDecFilter::FillAVPacket(AVPacket *avpkt, const BYTE *buffer, in
 	return S_OK;
 }
 
-#define Continue { av_frame_unref(m_pFrame); continue; }
+#define Continue { av_frame_unref(m_pFrame); av_frame_free(&hw_frame); continue; }
 HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll/* = FALSE*/)
 {
 	if (avpkt) {
@@ -3211,15 +3244,24 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
+		} else if (m_bUseD3D11cb || m_bUseNVDEC) {
+			DXVAState::ClearState();
+			m_HWPixFmt = AV_PIX_FMT_NONE;
+			m_bUseD3D11cb = m_bUseNVDEC = false;
+			InitDecoder(&m_pCurrentMediaType);
+			ChangeOutputMediaFormat(2);
 		}
 
 		return S_FALSE;
 	}
 
 	for (;;) {
-		ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
+		AVFrame* hw_frame = m_HWPixFmt != AV_PIX_FMT_NONE ? av_frame_alloc() : nullptr;
+
+		ret = m_HWPixFmt == AV_PIX_FMT_NONE ? avcodec_receive_frame(m_pAVCtx, m_pFrame) : avcodec_receive_frame(m_pAVCtx, hw_frame);
 		if (ret < 0 && ret != AVERROR(EAGAIN)) {
 			av_frame_unref(m_pFrame);
+			av_frame_free(&hw_frame);
 			return S_FALSE;
 		}
 
@@ -3234,8 +3276,42 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			}
 		}
 
+		if (m_HWPixFmt != AV_PIX_FMT_NONE) {
+			if (ret < 0) {
+				av_frame_unref(m_pFrame);
+				av_frame_free(&hw_frame);
+				break;
+			}
+
+			if (hw_frame->format != m_HWPixFmt) {
+				DXVAState::ClearState();
+				m_HWPixFmt = AV_PIX_FMT_NONE;
+				m_bUseD3D11cb = m_bUseNVDEC = false;
+
+				m_pFrame->format = hw_frame->format;
+				m_pFrame->width = hw_frame->width;
+				m_pFrame->height = hw_frame->height;
+				m_pFrame->channels = hw_frame->channels;
+				m_pFrame->channel_layout = hw_frame->channel_layout;
+				m_pFrame->nb_samples = hw_frame->nb_samples;
+				av_frame_get_buffer(m_pFrame, 32);
+				ret = av_frame_copy(m_pFrame, hw_frame);
+			} else {
+				ret = av_hwframe_transfer_data(m_pFrame, hw_frame, 0);
+			}
+			if (ret < 0) {
+				Continue;
+			}
+			av_frame_copy_props(m_pFrame, hw_frame);
+
+			if (hw_frame->format == m_HWPixFmt && !DXVAState::GetState()) {
+				DXVAState::SetActiveState(GUID_NULL, m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC");break;
+			}
+		}
+
 		if (ret < 0 || !m_pFrame->data[0]) {
 			av_frame_unref(m_pFrame);
+			av_frame_free(&hw_frame);
 			break;
 		}
 
@@ -3308,6 +3384,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		hr = m_pOutput->Deliver(pOut);
 
 		av_frame_unref(m_pFrame);
+		av_frame_free(&hw_frame);
 	}
 
 	return S_OK;
@@ -4258,8 +4335,13 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 				infostr.Format(L"%s (%s)", UseDXVA2() ? L"DXVA2" : L"D3D11", GetDXVAMode(*DxvaGuid));
 				break;
 			}
+			if (m_bUseD3D11cb) {
+				infostr = L"D3D11 Copy-back: ";
+			} else if (m_bUseNVDEC) {
+				infostr = L"NVDEC: ";
+			}
 			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
-				infostr.Format(L"%s (%d-bit %s)", swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));
+				infostr.AppendFormat(L"%s (%d-bit %s)", swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));
 			}
 			break;
 		case INFO_GraphicsAdapter:
@@ -4459,6 +4541,8 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 				continue;
 			}
 			break;
+		} else if (*p == pFilter->m_HWPixFmt) {
+			return *p;
 		}
 	}
 

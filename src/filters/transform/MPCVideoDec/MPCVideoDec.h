@@ -42,6 +42,7 @@ struct AVCodecContext;
 struct AVCodecParserContext;
 struct AVFrame;
 struct AVPacket;
+struct AVBufferRef;
 class CD3D11Decoder;
 
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
@@ -101,6 +102,11 @@ private:
 	bool									m_bUseD3D11;
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
+
+	bool									m_bUseD3D11cb = false;
+	bool									m_bUseNVDEC = false;
+	AVPixelFormat							m_HWPixFmt;
+	AVBufferRef*							m_HWDeviceCtx = nullptr;
 
 	// === common variables
 	std::vector<VIDEO_OUTPUT_FORMATS>		m_VideoOutputFormats;

@@ -84,6 +84,8 @@ enum MPCHwCodec {
 enum MPCHwDecoder {
 	HWDec_DXVA2 = 0,
 	HWDec_D3D11,
+	HWDec_D3D11cb,
+	HWDec_NVDEC,
 	HWDec_count
 };
 
