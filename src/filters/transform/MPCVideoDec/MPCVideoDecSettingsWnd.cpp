@@ -117,7 +117,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Hardware acceleration //////////
 	y = 120;
-	CalcRect(rect, x0, y, group_w, 128);
+	CalcRect(rect, x0, y, group_w, 136);
 	m_grpHwAcceleration.Create(ResStr(IDS_VDF_HW_ACCELERATION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
 	y += 20;
 
@@ -186,7 +186,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	label_w = 124;
 	control_w = row_w - label_w;
 	x2 = x1 + label_w;
-	y = 252;
+	y = 260;
 	CalcRect(rect, x0, y, group_w, 88);
 	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
 	y += 20;

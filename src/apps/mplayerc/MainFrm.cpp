@@ -5923,10 +5923,10 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	HRESULT hr;
-	CSaveDlg dlg(in, name, p, hr);
+	CSaveDlg save_dlg(in, name, p, hr);
 	if (SUCCEEDED(hr)) {
-		dlg.DoModal();
-		if (dlg.IsCompleteOk() && !m_youtubeFields.fname.IsEmpty()) {
+		save_dlg.DoModal();
+		if (save_dlg.IsCompleteOk() && !m_youtubeFields.fname.IsEmpty()) {
 			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
 			if (pFileData && pFileData->fns.size() == 2) {
 				ext = p.GetExtension().MakeLower();
@@ -5940,9 +5940,9 @@ void CMainFrame::OnFileSaveAs()
 				++it;
 				in = (*it).GetName();
 
-				CSaveDlg dlg_second(in, name, p, hr);
+				CSaveDlg save_dlg2(in, name, p, hr);
 				if (SUCCEEDED(hr)) {
-					dlg_second.DoModal();
+					save_dlg2.DoModal();
 				}
 			}
 		}
