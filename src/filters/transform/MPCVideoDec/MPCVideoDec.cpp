@@ -3307,13 +3307,13 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			if (hw_frame->format == m_HWPixFmt && !DXVAState::GetState()) {
 				CString codec;
 				switch (m_nCodecId) {
-					case AV_CODEC_ID_AV1: codec = L"AV1"; break;
-					case AV_CODEC_ID_H264: codec = L"H264"; break;
-					case AV_CODEC_ID_HEVC: codec = L"HEVC"; break;
-					case AV_CODEC_ID_MPEG2VIDEO: codec = L"MPEG2"; break;
+					case AV_CODEC_ID_AV1:        codec = L"AV1";    break;
+					case AV_CODEC_ID_H264:       codec = L"H.264";  break;
+					case AV_CODEC_ID_HEVC:       codec = L"HEVC";   break;
+					case AV_CODEC_ID_MPEG2VIDEO: codec = L"MPEG-2"; break;
 					case AV_CODEC_ID_VC1:
-					case AV_CODEC_ID_WMV3: codec = L"VC1"; break;
-					case AV_CODEC_ID_VP9: codec = L"VP9"; break;
+					case AV_CODEC_ID_WMV3:       codec = L"VC-1";   break;
+					case AV_CODEC_ID_VP9:        codec = L"VP9";    break;
 				}
 
 				CString description = m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC";
