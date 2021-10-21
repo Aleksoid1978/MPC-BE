@@ -15,13 +15,20 @@ Fixed reading of metadata in some files.
 MPCVideoDec
 Eliminated high load on the system with frequent navigation on H.264 and MPEG-2 videos when using the D3D11 decoder.
 The MVC decoder information is now available through the IExFilterConfig interface.
+Added support for "copy-back" mode for D3D11 decoder.
+Added support for NVDEC decoder for NVIDIA video cards.
 
 AudioSwitcher
 Optimized auto volume control code.
+Added audio processing with "compand" audio filter (included in FFmpeg).
+Added dithering when outputting to Int16, if the sound was of higher bit depth before.
 
 MpcAudioRenderer
 Fixed freezing at the end of playback in some cases.
 Corrected the selection of the sample format for the WASAPI Shared mode.
+Reduced size of MpcAudioRenderer.ax.
+Added dithering when outputting to Int16, if the sound was of higher bit depth before.
+Added reset button.
 
 VideoRenderers
 EVR-CP and Sync Renderer no longer require d3dx9_43.dll to render statistics text.
@@ -36,6 +43,9 @@ Added error output for videos with restrictions.
 Added recognition of links like "youtube.com/shorts/".
 For YouTube videos VP9 and AV1 with a frame size of 360p or less, select the lowest audio quality so that the audio bitrate is no more than the video bitrate.
 Added sorting of formats when opening via youtube_dl.
+Added support for yt-dlp (a fork of youtube-dl).
+Fixed slow playback of some links.
+Paths to youtube_dl and yt-dlp can now be written in the system registry in the "App Paths" keys.
 
 Player
 Reworked saving of many settings. The values of these settings will not be inherited when upgrading from older versions of the player.
@@ -48,7 +58,12 @@ Fixed shift and enlargement of the main window when hovering over the cover of t
 Added the command "Add to playlist from clipboard" (Ctrl+V).
 Removed "Disable desktop effects (Aero)" option.
 The ability to call the properties of the active video renderer in the "Video" settings panel during playback has been implemented.
-Fixed working with Blu-ray playlists and chapters. 
+Fixed working with Blu-ray playlists and chapters.
+Added support for System Media Transport Controls.
+The values of 33% and 67% for the option "After starting playback, fit window to screen" are now interpreted as 1/3 and 2/3.
+
+MPCBEShellExt (explorer extension)
+Improved operation for users with limited rights.
 
 Updated Chinese (Simplified) translation (by wushantao).
 Updated German translation (by Klaus1189).
