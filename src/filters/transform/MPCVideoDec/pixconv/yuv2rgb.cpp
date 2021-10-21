@@ -53,7 +53,7 @@ __forceinline static int yuv2rgb_convert_pixels(const uint8_t* &srcY, const uint
     xmm7 = _mm_setzero_si128();
 
     // Shift > 0 is for 9/10 bit formats
-    if (inputFormat == PFType_P010)
+    if (inputFormat == PFType_P01x)
     {
         // Load 2 32-bit macro pixels from each line, which contain 4 UV at 16-bit each samples
         PIXCONV_LOAD_PIXEL8(xmm0, srcU);
@@ -102,9 +102,9 @@ __forceinline static int yuv2rgb_convert_pixels(const uint8_t* &srcY, const uint
 
     // Chroma upsampling required
     if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_YUV422 ||
-        inputFormat == PFType_P010)
+        inputFormat == PFType_P01x)
     {
-        if (inputFormat == PFType_P010)
+        if (inputFormat == PFType_P01x)
         {
             srcU += 8;
             srcV += 8;
@@ -141,7 +141,7 @@ __forceinline static int yuv2rgb_convert_pixels(const uint8_t* &srcY, const uint
         }
 
         // 4:2:0 - upsample to 4:2:2 using 75:25
-        if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010)
+        if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P01x)
         {
             // Too high bitdepth, shift down to 14-bit
             if (shift >= 7)
@@ -211,7 +211,7 @@ __forceinline static int yuv2rgb_convert_pixels(const uint8_t* &srcY, const uint
         // Shift the result to 12 bit
         // For 10-bit input, we need to shift one bit off, or we exceed the allowed processing depth
         // For 8-bit, we need to add one bit
-        if ((inputFormat == PFType_YUV420 && shift > 1) || inputFormat == PFType_P010)
+        if ((inputFormat == PFType_YUV420 && shift > 1) || inputFormat == PFType_P01x)
         {
             if (shift >= 5)
             {
@@ -495,7 +495,7 @@ static int __stdcall yuv2rgb_convert(const uint8_t *srcY, const uint8_t *srcU, c
     _mm_sfence();
 
     // 4:2:0 needs special handling for the first and the last line
-    if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010)
+    if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P01x)
     {
         if (line == 0)
         {
@@ -522,7 +522,7 @@ static int __stdcall yuv2rgb_convert(const uint8_t *srcY, const uint8_t *srcU, c
     {
         y = srcY + line * srcStrideY;
 
-        if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010)
+        if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P01x)
         {
             u = srcU + (line >> 1) * srcStrideUV;
             v = srcV + (line >> 1) * srcStrideUV;
@@ -544,13 +544,13 @@ static int __stdcall yuv2rgb_convert(const uint8_t *srcY, const uint8_t *srcU, c
             y, u, v, rgb, srcStrideY, srcStrideUV, dstStride, line, coeffs, lineDither, 0);
     }
 
-    if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010  ||
+    if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P01x  ||
         lastLineInOddHeight)
     {
         if (sliceYEnd == height)
         {
             y = srcY + (height - 1) * srcStrideY;
-            if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010)
+            if (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P01x)
             {
                 u = srcU + ((height >> 1) - 1) * srcStrideUV;
                 v = srcV + ((height >> 1) - 1) * srcStrideUV;
@@ -602,7 +602,7 @@ HRESULT CFormatConverter::convert_yuv_rgb(const uint8_t* const src[4], const ptr
     }
 
     // P010 has the data in the high bits, so set shift appropriately
-    if (inputFormat == PFType_P010)
+    if (inputFormat == PFType_P01x)
         shift = 8;
 
     YUVRGBConversionFunc convFn = m_RGBConvFuncs[outFmt][0][bYCgCo][inputFormat][shift];
@@ -628,7 +628,7 @@ HRESULT CFormatConverter::convert_yuv_rgb(const uint8_t* const src[4], const ptr
     else
     {
         const int is_odd =
-            (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010);
+            (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P01x);
         const ptrdiff_t lines_per_thread = (height / m_NumThreads) & ~1;
 
         Concurrency::parallel_for(0, m_NumThreads, [&](int i) {
@@ -669,7 +669,7 @@ void CFormatConverter::InitRGBConvDispatcher()
     ZeroMemory(&m_RGBConvFuncs, sizeof(m_RGBConvFuncs));
 
     CONV_FUNC(PFType_NV12, 0);
-    CONV_FUNC(PFType_P010, 8);
+    CONV_FUNC(PFType_P01x, 8);
 
     CONV_FUNCX(PFType_YUV420);
     CONV_FUNCX(PFType_YUV422);

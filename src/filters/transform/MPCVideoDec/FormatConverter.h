@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -68,14 +68,14 @@ struct SwsContext;
 enum MPCPixFmtType {
 	PFType_unspecified,
 	PFType_RGB,
-	PFType_YUV420,
-	PFType_YUV422,
-	PFType_YUV444,
-	PFType_YUV420Px,
-	PFType_YUV422Px,
-	PFType_YUV444Px,
-	PFType_NV12,
-	PFType_P010,
+	PFType_YUV420,   // YUV 4:2:0, 8 bit
+	PFType_YUV422,   // YUV 4:2:2, 8 bit
+	PFType_YUV444,   // YUV 4:2:2, 8 bit
+	PFType_YUV420Px, // YUV 4:2:0, 9-16 bit
+	PFType_YUV422Px, // YUV 4:2:2, 9-16 bit
+	PFType_YUV444Px, // YUV 4:4:4, 9-16 bit
+	PFType_NV12,     // YUV 4:2:0, U/V interleaved
+	PFType_P01x,     // YUV 4:2:0, 10 to 16-bit, U/V interleaved, MSB aligned
 };
 
 struct FrameProps {

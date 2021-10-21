@@ -141,8 +141,8 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 
 	if (av_pix_fmt == AV_PIX_FMT_NV12) {
 		return PFType_NV12;
-	} else if (av_pix_fmt == AV_PIX_FMT_P010) {
-		return PFType_P010;
+	} else if (av_pix_fmt == AV_PIX_FMT_P010 || av_pix_fmt == AV_PIX_FMT_P016) {
+		return PFType_P01x;
 	}
 
 	int lumabits = pfdesc->comp[0].depth;
@@ -362,7 +362,7 @@ void CFormatConverter::SetConvertFunc()
 				case PFType_YUV444:
 				case PFType_YUV444Px:
 				case PFType_NV12:
-				case PFType_P010:
+				case PFType_P01x:
 					pConvertFn = &CFormatConverter::convert_yuv_rgb;
 					m_RequiredAlignment = 4;
 			}
@@ -378,7 +378,7 @@ void CFormatConverter::SetConvertFunc()
 				pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
 			}
 		}
-		else if (m_FProps.pftype == PFType_P010 && m_out_pixfmt == PixFmt_P010) {
+		else if (m_FProps.pftype == PFType_P01x && m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016) {
 			pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 		}
 	}
