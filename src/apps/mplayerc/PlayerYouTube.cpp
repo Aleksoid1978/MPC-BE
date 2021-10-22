@@ -1276,12 +1276,31 @@ namespace Youtube
 
 								CString sub_url;
 								if (getJsonValue(elem, "baseUrl", sub_url)) {
-									sub_url += L"&fmt=vtt";
+									if (sub_url.Find(L"&fmt=")) {
+										std::list<CString> params;
+										Explode(sub_url, params, L'&');
+										for (const auto& param : params) {
+											if (param.Left(4) == L"fmt=") {
+												sub_url.Replace(param, L"fmt=vtt");
+												break;
+											}
+										}
+									} else {
+										sub_url += L"&fmt=vtt";
+									}
 								}
 
 								CString sub_name;
 								if (auto name = GetJsonObject(elem, "name")) {
 									getJsonValue(*name, "simpleText", sub_name);
+								}
+								if (sub_name.IsEmpty()) {
+									if (auto name = GetValueByPointer(elem, "/name/runs"); name && name->IsArray()) {
+										auto array = name->GetArray();
+										if (!array.Empty()) {
+											getJsonValue(array[0], "text", sub_name);
+										}
+									}
 								}
 
 								if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
