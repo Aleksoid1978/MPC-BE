@@ -1277,14 +1277,8 @@ namespace Youtube
 								CString sub_url;
 								if (getJsonValue(elem, "baseUrl", sub_url)) {
 									if (sub_url.Find(L"&fmt=")) {
-										std::list<CString> params;
-										Explode(sub_url, params, L'&');
-										for (const auto& param : params) {
-											if (param.Left(4) == L"fmt=") {
-												sub_url.Replace(param, L"fmt=vtt");
-												break;
-											}
-										}
+										auto result = std::regex_replace(sub_url.GetString(), std::wregex(LR"((&fmt=.[^&]+))"), L"&fmt=vtt");
+										sub_url = result.c_str();
 									} else {
 										sub_url += L"&fmt=vtt";
 									}
