@@ -394,7 +394,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	return bRet;
 }
 
-void CDX9AllocatorPresenter::LockD3DDevice()
+HANDLE CDX9AllocatorPresenter::LockD3DDevice()
 {
 	if (m_pD3DDevEx) {
 		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
@@ -403,19 +403,21 @@ void CDX9AllocatorPresenter::LockD3DDevice()
 			&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
 			if (pCritSec->DebugInfo->CriticalSection == pCritSec) {
 				EnterCriticalSection(pCritSec);
+				return pCritSec->OwningThread;
 			}
 		}
 	}
+	return nullptr;
 }
 
-void CDX9AllocatorPresenter::UnlockD3DDevice()
+void CDX9AllocatorPresenter::UnlockD3DDevice(HANDLE& lockOwner)
 {
 	if (m_pD3DDevEx) {
 		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
 
 		if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
 			&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
-			if (pCritSec->DebugInfo->CriticalSection == pCritSec) {
+			if (pCritSec->DebugInfo->CriticalSection == pCritSec && pCritSec->OwningThread == lockOwner) {
 				LeaveCriticalSection(pCritSec);
 			}
 		}
@@ -1055,7 +1057,7 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 	return true;
 }
 
-bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSize, bool _bWaitIfInside, bool _bNeedAccurate, bool _bMeasure, bool &_bTakenLock)
+bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSize, bool _bWaitIfInside, bool _bNeedAccurate, bool _bMeasure, HANDLE& lockOwner)
 {
 	if (_bMeasure) {
 		m_RasterStatusWaitTimeMaxCalc = 0;
@@ -1193,10 +1195,9 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 		}
 
 		if ((ScanLineDiffLock >= 0 && ScanLineDiffLock <= D3DDevLockRange) || (LastLineDiffLock < 0 && ScanLineDiffLock > 0)) {
-			if (!_bTakenLock && _bMeasure) {
-				_bTakenLock = true;
+			if (!lockOwner && _bMeasure) {
 				llPerfLock = GetPerfCounter();
-				LockD3DDevice();
+				lockOwner = LockD3DDevice();
 			}
 		}
 		LastLineDiffLock = ScanLineDiffLock;
@@ -1220,7 +1221,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 		m_VBlankEndWait = ScanLine;
 		m_VBlankWaitTime = GetPerfCounter() - llPerf;
 
-		if (_bTakenLock) {
+		if (lockOwner) {
 			m_VBlankLockTime = GetPerfCounter() - llPerfLock;
 		} else {
 			m_VBlankLockTime = 0;
@@ -1246,7 +1247,7 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 	}
 }
 
-bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
+bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, HANDLE& lockOwner)
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	if (!rs.bVSyncInternal) {
@@ -1262,11 +1263,11 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
 	int WaitFor = GetVBlackPos();
 
 	if (!bCompositionEnabled) {
-		_Waited = WaitForVBlankRange(WaitFor, 0, false, true, true, _bTakenLock);
+		_Waited = WaitForVBlankRange(WaitFor, 0, false, true, true, lockOwner);
 		return true;
 	} else {
 		// Instead we wait for VBlack after the present, this seems to fix the stuttering problem. It's also possible to fix by removing the Sleep above, but that isn't an option.
-		WaitForVBlankRange(WaitFor, 0, false, true, true, _bTakenLock);
+		WaitForVBlankRange(WaitFor, 0, false, true, true, lockOwner);
 		return false;
 	}
 }
@@ -1448,10 +1449,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	bool bWaited = false;
-	bool bTakenLock = false;
+	HANDLE lockOwner = nullptr;
 	if (fAll) {
 		// Only sync to refresh when redrawing all
-		bool bTest = WaitForVBlank(bWaited, bTakenLock);
+		bool bTest = WaitForVBlank(bWaited, lockOwner);
 		ASSERT(bTest == bDoVSyncInPresent);
 		if (!bDoVSyncInPresent) {
 			LONGLONG Time = GetPerfCounter();
@@ -1528,8 +1529,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		OnVBlankFinished(fAll, Time);
 	}
 
-	if (bTakenLock) {
-		UnlockD3DDevice();
+	if (lockOwner) {
+		UnlockD3DDevice(lockOwner);
 	}
 
 	/*if (!bWaited)

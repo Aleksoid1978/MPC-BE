@@ -2372,15 +2372,15 @@ void CEVRAllocatorPresenter::VSyncThread()
 						}
 
 						int ScanlineStart = ScanLine;
-						bool bTakenLock;
-						WaitForVBlankRange(ScanlineStart, 5, true, true, false, bTakenLock);
+						HANDLE lockOwner = nullptr;
+						WaitForVBlankRange(ScanlineStart, 5, true, true, false, lockOwner);
 						LONGLONG TimeStart = GetPerfCounter();
 
-						WaitForVBlankRange(ScanLineMiddle, 5, true, true, false, bTakenLock);
+						WaitForVBlankRange(ScanLineMiddle, 5, true, true, false, lockOwner);
 						LONGLONG TimeMiddle = GetPerfCounter();
 
 						int ScanlineEnd = ScanLine;
-						WaitForVBlankRange(ScanlineEnd, 5, true, true, false, bTakenLock);
+						WaitForVBlankRange(ScanlineEnd, 5, true, true, false, lockOwner);
 						LONGLONG TimeEnd = GetPerfCounter();
 
 						double nSeconds = double(TimeEnd - TimeStart) / 10000000.0;

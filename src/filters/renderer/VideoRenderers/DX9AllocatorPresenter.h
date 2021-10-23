@@ -76,8 +76,8 @@ namespace DSObjects
 
 		bool SettingsNeedResetDevice();
 
-		void LockD3DDevice();
-		void UnlockD3DDevice();
+		HANDLE LockD3DDevice();
+		void UnlockD3DDevice(HANDLE& lockOwner);
 
 		HRESULT CreateDevice(CString &_Error);
 		HRESULT AllocSurfaces();
@@ -91,8 +91,8 @@ namespace DSObjects
 		DWORD GetVertexProcessing();
 
 		bool GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bMeasureTime);
-		bool WaitForVBlankRange(int &_RasterStart, int _RasterEnd, bool _bWaitIfInside, bool _bNeedAccurate, bool _bMeasure, bool &_bTakenLock);
-		bool WaitForVBlank(bool &_Waited, bool &_bTakenLock);
+		bool WaitForVBlankRange(int &_RasterStart, int _RasterEnd, bool _bWaitIfInside, bool _bNeedAccurate, bool _bMeasure, HANDLE& lockOwner);
+		bool WaitForVBlank(bool &_Waited, HANDLE& lockOwner);
 		int GetVBlackPos();
 		void CalculateJitter(LONGLONG PerformanceCounter);
 		virtual void OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter) {}
