@@ -3276,13 +3276,15 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			}
 		}
 
-		if (m_HWPixFmt != AV_PIX_FMT_NONE) {
-			if (ret < 0) {
-				av_frame_unref(m_pFrame);
-				av_frame_free(&hw_frame);
-				break;
-			}
+		auto frame = m_HWPixFmt == AV_PIX_FMT_NONE ? m_pFrame : hw_frame;
 
+		if (ret < 0 || !frame->data[0]) {
+			av_frame_unref(m_pFrame);
+			av_frame_free(&hw_frame);
+			break;
+		}
+
+		if (m_HWPixFmt != AV_PIX_FMT_NONE) {
 			if (hw_frame->format != m_HWPixFmt) {
 				DXVAState::ClearState();
 				m_HWPixFmt = AV_PIX_FMT_NONE;
@@ -3328,12 +3330,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				DXVAState::SetActiveState(GUID_NULL, description);
 			}
-		}
-
-		if (ret < 0 || !m_pFrame->data[0]) {
-			av_frame_unref(m_pFrame);
-			av_frame_free(&hw_frame);
-			break;
 		}
 
 		UpdateAspectRatio();
