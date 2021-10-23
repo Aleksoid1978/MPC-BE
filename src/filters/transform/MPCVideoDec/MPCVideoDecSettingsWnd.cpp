@@ -148,9 +148,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	y += 24;
 
 	// HW Decoder
-	CalcTextRect(rect, x1, y, label_w-20);
+	CalcTextRect(rect, x1, y, label_w-24);
 	m_txtHWDecoder.Create(L"Preferred hardware decoder", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2-20, y, control_w+20, 200); rect.top -= 4;
+	CalcRect(rect, x2-24, y, control_w+24, 200); rect.top -= 4;
 	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DEC);
 	m_cbHWDecoder.AddString(L"DXVA2");
 	str = L"D3D11";
@@ -282,7 +282,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbFormat[PixFmt_RGB32].Create(L"RGB32", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_RGB32);
 	CalcTextRect(rect, x2 + control_w * 3, y, 56);
 	m_cbFormat[PixFmt_RGB48].Create(L"RGB48", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_RGB48);
-	y += 24;
+	y += 28;
 
 	// Output levels
 	control_w = 88;
@@ -290,15 +290,15 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	x2 = x1 + label_w;
 	CalcTextRect(rect, x1, y, label_w);
 	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcTextRect(rect, x2, y, control_w);
+	CalcTextRect(rect, x2, y, control_w); rect.top -= 4;
 	m_cbSwRGBLevels.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_SWRGBLEVELS);
 	m_cbSwRGBLevels.AddString(L"PC (0-255)");
 	m_cbSwRGBLevels.AddString(L"TV (16-235)");
 	y += 24;
 
-	CalcRect(rect, x0, 340 - 32, 76, 32);
+	CalcRect(rect, x0, 348 - 32, 76, 32);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle | BS_MULTILINE, rect, this, IDC_PP_RESET);
-	CalcTextRect(rect, x0 + 76, 340 - 16, group_w - 76);
+	CalcTextRect(rect, x0 + 76, 348 - 16, group_w - 76);
 	m_txtVersion.Create(WS_CHILD | WS_VISIBLE | ES_READONLY | ES_RIGHT, rect, this, (UINT)IDC_STATIC);
 
 	///////////////////////////////////////
