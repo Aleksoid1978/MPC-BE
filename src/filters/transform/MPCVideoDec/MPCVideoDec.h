@@ -31,6 +31,7 @@
 #include <IMediaSideData.h>
 #include <basestruct.h>
 #include <mpc_defines.h>
+#include <d3d11.h>
 
 #include "./MSDKDecoder/MSDKDecoder.h"
 
@@ -107,6 +108,7 @@ private:
 	bool									m_bUseNVDEC = false;
 	AVPixelFormat							m_HWPixFmt;
 	AVBufferRef*							m_HWDeviceCtx = nullptr;
+	CComPtr<ID3D11Texture2D>				m_pStagingD3D11Texture2D;
 
 	// === common variables
 	std::vector<VIDEO_OUTPUT_FORMATS>		m_VideoOutputFormats;
