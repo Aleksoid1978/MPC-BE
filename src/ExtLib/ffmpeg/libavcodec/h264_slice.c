@@ -480,7 +480,6 @@ int ff_h264_update_thread_context_for_user(AVCodecContext *dst,
 
     h->is_avc = h1->is_avc;
     h->nal_length_size = h1->nal_length_size;
-    h->x264_build = h1->x264_build;
 
     return 0;
 }
@@ -1933,8 +1932,13 @@ static int h264_slice_header_parse(const H264Context *h, H264SliceContext *sl,
         sl->max_pic_num  = 1 << (sps->log2_max_frame_num + 1);
     }
 
-    if (nal->type == H264_NAL_IDR_SLICE)
-        sl->idr_pic_id = get_ue_golomb_long(&sl->gb);
+    if (nal->type == H264_NAL_IDR_SLICE) {
+        unsigned idr_pic_id = get_ue_golomb_long(&sl->gb);
+        if (idr_pic_id < 65536) {
+            sl->idr_pic_id = idr_pic_id;
+        } else
+            av_log(h->avctx, AV_LOG_WARNING, "idr_pic_id is invalid\n");
+    }
 
     sl->poc_lsb = 0;
     sl->delta_poc_bottom = 0;

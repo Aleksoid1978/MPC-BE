@@ -25,6 +25,16 @@
 #include "mpeg12vlc.h"
 #include "mpegvideo.h"
 
+/* Start codes. */
+#define SEQ_END_CODE            0x000001b7
+#define SEQ_START_CODE          0x000001b3
+#define GOP_START_CODE          0x000001b8
+#define PICTURE_START_CODE      0x00000100
+#define SLICE_MIN_START_CODE    0x00000101
+#define SLICE_MAX_START_CODE    0x000001af
+#define EXT_START_CODE          0x000001b5
+#define USER_START_CODE         0x000001b2
+
 void ff_mpeg12_common_init(MpegEncContext *s);
 
 #define INIT_2D_VLC_RL(rl, static_size, flags)\
@@ -60,7 +70,9 @@ int ff_mpeg1_decode_block_intra(GetBitContext *gb,
                                 int16_t *block, int index, int qscale);
 
 void ff_mpeg1_clean_buffers(MpegEncContext *s);
+#if FF_API_FLAG_TRUNCATED
 int ff_mpeg1_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size, AVCodecParserContext *s);
+#endif
 
 void ff_mpeg1_encode_picture_header(MpegEncContext *s, int picture_number);
 void ff_mpeg1_encode_mb(MpegEncContext *s, int16_t block[8][64],

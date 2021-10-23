@@ -1855,7 +1855,7 @@ static int xma_decode_packet(AVCodecContext *avctx, void *data,
         eof = 1;
 
         for (i = 0; i < s->num_streams; i++) {
-            if (!s->xma[i].eof_done) {
+            if (!s->xma[i].eof_done && s->frames[i]->data[0]) {
                 ret = decode_packet(avctx, &s->xma[i], s->frames[i],
                                     &got_stream_frame_ptr, avpkt);
             }
@@ -1932,11 +1932,12 @@ static int xma_decode_packet(AVCodecContext *avctx, void *data,
             for (i = 0; i < s->num_streams; i++) {
                 const int start_ch = s->start_channel[i];
                 void *left[1] = { frame->extended_data[start_ch + 0] };
-                void *right[1] = { frame->extended_data[start_ch + 1] };
 
                 av_audio_fifo_read(s->samples[0][i], left, nb_samples);
-                if (s->xma[i].nb_channels > 1)
+                if (s->xma[i].nb_channels > 1) {
+                    void *right[1] = { frame->extended_data[start_ch + 1] };
                     av_audio_fifo_read(s->samples[1][i], right, nb_samples);
+                }
             }
 
             *got_frame_ptr = nb_samples > 0;

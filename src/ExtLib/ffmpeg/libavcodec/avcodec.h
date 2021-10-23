@@ -245,11 +245,15 @@ typedef struct RcOverride{
  * error[?] variables will be set during encoding.
  */
 #define AV_CODEC_FLAG_PSNR            (1 << 15)
+#if FF_API_FLAG_TRUNCATED
 /**
  * Input bitstream might be truncated at a random location
  * instead of only at frame boundaries.
+ *
+ * @deprecated use codec parsers for packetizing input
  */
 #define AV_CODEC_FLAG_TRUNCATED       (1 << 16)
+#endif
 /**
  * Use interlaced DCT.
  */
@@ -1853,13 +1857,14 @@ typedef struct AVCodecContext {
      */
     AVBufferRef *hw_frames_ctx;
 
+#if FF_API_SUB_TEXT_FORMAT
     /**
-     * Control the form of AVSubtitle.rects[N]->ass
-     * - decoding: set by user
-     * - encoding: unused
+     * @deprecated unused
      */
+    attribute_deprecated
     int sub_text_format;
 #define FF_SUB_TEXT_FMT_ASS              0
+#endif
 
     /**
      * Audio only. The amount of padding (in samples) appended by the encoder to

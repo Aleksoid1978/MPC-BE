@@ -30,7 +30,7 @@
 
 #include "h274.h"
 
-static const int8_t Gaussian_LUT[2048+256];
+static const int8_t Gaussian_LUT[2048+4];
 static const uint32_t Seed_LUT[256];
 static const int8_t R64T[64][64];
 
@@ -74,9 +74,9 @@ static void init_slice_c(int8_t out[64][64], uint8_t h, uint8_t v,
 
     // 64x64 inverse integer transform
     for (int y = 0; y < 64; y++) {
-        for (int x = 0; x < 64; x++) {
+        for (int x = 0; x <= freq_h; x++) {
             int32_t sum = 0;
-            for (int p = 0; p < 64; p++)
+            for (int p = 0; p <= freq_v; p++)
                 sum += R64T[y][p] * out[x][p];
             tmp[y][x] = (sum + 128) >> 8;
         }
@@ -85,7 +85,7 @@ static void init_slice_c(int8_t out[64][64], uint8_t h, uint8_t v,
     for (int y = 0; y < 64; y++) {
         for (int x = 0; x < 64; x++) {
             int32_t sum = 0;
-            for (int p = 0; p < 64; p++)
+            for (int p = 0; p <= freq_h; p++)
                 sum += tmp[y][p] * R64T[x][p]; // R64T^T = R64
             // Renormalize and clip to [-127, 127]
             out[y][x] = av_clip((sum + 128) >> 8, -127, 127);
@@ -145,8 +145,8 @@ static void deblock_8x8_c(int8_t *out, const int out_stride)
     for (int y = 0; y < 8; y++) {
         const int8_t l1 = out[-2], l0 = out[-1];
         const int8_t r0 = out[0], r1 = out[1];
-        out[0]  = (l0 + (r0 << 1) + r1) >> 2;
-        out[-1] = (r0 + (l0 << 1) + l1) >> 2;
+        out[0]  = (l0 + r0 * 2 + r1) >> 2;
+        out[-1] = (r0 + l0 * 2 + l1) >> 2;
         out += out_stride;
     }
 }
@@ -250,8 +250,8 @@ int ff_h274_apply_film_grain(AVFrame *out_frame, const AVFrame *in_frame,
             // Adaptation for 4:2:0 chroma subsampling
             for (int i = 0; i < h274.num_intensity_intervals[c]; i++) {
                 h274.comp_model_value[c][i][0] >>= 1;
-                h274.comp_model_value[c][i][1] <<= 1;
-                h274.comp_model_value[c][i][2] <<= 1;
+                h274.comp_model_value[c][i][1] *= 2;
+                h274.comp_model_value[c][i][2] *= 2;
             }
         }
 
@@ -289,7 +289,7 @@ int ff_h274_apply_film_grain(AVFrame *out_frame, const AVFrame *in_frame,
 }
 
 // These tables are all taken from the SMPTE RDD 5-2006 specification
-static const int8_t Gaussian_LUT[2048+256] = {
+static const int8_t Gaussian_LUT[2048+4] = {
     -11, 12, 103, -11, 42, -35, 12, 59, 77, 98, -87, 3, 65, -78, 45, 56, -51, 21,
     13, -11, -20, -19, 33, -127, 17, -6, -105, 18, 19, 71, 48, -10, -38, 42,
     -2, 75, -67, 52, -90, 33, -47, 21, -3, -56, 49, 1, -57, -42, -1, 120, -127,
@@ -417,22 +417,7 @@ static const int8_t Gaussian_LUT[2048+256] = {
     4, -66, -81, 122, -20, -34, -37, -84, 127, 68, 46, 17, 47,
 
     // Repeat the beginning of the array to allow wrapping reads
-    -11, 12, 103, -11, 42, -35, 12, 59, 77, 98, -87, 3, 65, -78, 45, 56, -51, 21,
-    13, -11, -20, -19, 33, -127, 17, -6, -105, 18, 19, 71, 48, -10, -38, 42,
-    -2, 75, -67, 52, -90, 33, -47, 21, -3, -56, 49, 1, -57, -42, -1, 120, -127,
-    -108, -49, 9, 14, 127, 122, 109, 52, 127, 2, 7, 114, 19, 30, 12, 77, 112,
-    82, -61, -127, 111, -52, -29, 2, -49, -24, 58, -29, -73, 12, 112, 67, 79,
-    -3, -114, -87, -6, -5, 40, 58, -81, 49, -27, -31, -34, -105, 50, 16, -24,
-    -35, -14, -15, -127, -55, -22, -55, -127, -112, 5, -26, -72, 127, 127, -2,
-    41, 87, -65, -16, 55, 19, 91, -81, -65, -64, 35, -7, -54, 99, -7, 88, 125,
-    -26, 91, 0, 63, 60, -14, -23, 113, -33, 116, 14, 26, 51, -16, 107, -8, 53,
-    38, -34, 17, -7, 4, -91, 6, 63, 63, -15, 39, -36, 19, 55, 17, -51, 40, 33,
-    -37, 126, -39, -118, 17, -30, 0, 19, 98, 60, 101, -12, -73, -17, -52, 98,
-    3, 3, 60, 33, -3, -2, 10, -42, -106, -38, 14, 127, 16, -127, -31, -86, -39,
-    -56, 46, -41, 75, 23, -19, -22, -70, 74, -54, -2, 32, -45, 17, -92, 59,
-    -64, -67, 56, -102, -29, -87, -34, -92, 68, 5, -74, -61, 93, -43, 14, -26,
-    -38, -126, -17, 16, -127, 64, 34, 31, 93, 17, -51, -59, 71, 77, 81, 127,
-    127, 61, 33, -106, -93, 0, 0, 75,
+    -11, 12, 103, -11,
 };
 
 static const uint32_t Seed_LUT[256] = {

@@ -49,7 +49,9 @@
 #include "pixblockdsp.h"
 #include "put_bits.h"
 #include "ratecontrol.h"
+#if FF_API_FLAG_TRUNCATED
 #include "parser.h"
+#endif
 #include "mpegutils.h"
 #include "mpeg12data.h"
 #include "qpeldsp.h"
@@ -62,18 +64,6 @@
 #define MAX_THREADS 32
 
 #define MAX_B_FRAMES 16
-
-/* Start codes. */
-#define SEQ_END_CODE            0x000001b7
-#define SEQ_START_CODE          0x000001b3
-#define GOP_START_CODE          0x000001b8
-#define PICTURE_START_CODE      0x00000100
-#define SLICE_MIN_START_CODE    0x00000101
-#define SLICE_MAX_START_CODE    0x000001af
-#define EXT_START_CODE          0x000001b5
-#define USER_START_CODE         0x000001b2
-#define SLICE_START_CODE        0x000001b7
-
 
 /**
  * MpegEncContext.
@@ -359,7 +349,9 @@ typedef struct MpegEncContext {
     int mb_num_left;                 ///< number of MBs left in this video packet (for partitioned Slices only)
     int next_p_frame_damaged;        ///< set if the next p frame is damaged, to avoid showing trashed B-frames
 
+#if FF_API_FLAG_TRUNCATED
     ParseContext parse_context;
+#endif
 
     /* H.263 specific */
     int gob_index;

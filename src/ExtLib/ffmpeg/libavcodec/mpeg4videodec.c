@@ -550,7 +550,7 @@ int ff_mpeg4_decode_studio_slice_header(Mpeg4DecContext *ctx)
     unsigned vlc_len;
     uint16_t mb_num;
 
-    if (get_bits_left(gb) >= 32 && get_bits_long(gb, 32) == SLICE_START_CODE) {
+    if (get_bits_left(gb) >= 32 && get_bits_long(gb, 32) == SLICE_STARTCODE) {
         vlc_len = av_log2(s->mb_width * s->mb_height) + 1;
         mb_num = get_bits(gb, vlc_len);
 
@@ -3590,8 +3590,10 @@ const AVCodec ff_mpeg4_decoder = {
     .close                 = ff_h263_decode_end,
     .decode                = ff_h263_decode_frame,
     .capabilities          = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
-                             AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
-                             AV_CODEC_CAP_FRAME_THREADS,
+#if FF_API_FLAG_TRUNCATED
+                             AV_CODEC_CAP_TRUNCATED |
+#endif
+                             AV_CODEC_CAP_DELAY | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal         = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM |
                              FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = ff_mpeg_flush,

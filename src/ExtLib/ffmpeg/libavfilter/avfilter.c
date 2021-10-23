@@ -47,9 +47,8 @@
 #include "libavutil/ffversion.h"
 const char av_filter_ffversion[] = "FFmpeg version " FFMPEG_VERSION;
 
-void ff_tlog_ref(void *ctx, AVFrame *ref, int end)
+static void tlog_ref(void *ctx, AVFrame *ref, int end)
 {
-    av_unused char buf[16];
     ff_tlog(ctx,
             "ref[%p buf:%p data:%p linesize[%d, %d, %d, %d] pts:%"PRId64" pos:%"PRId64,
             ref, ref->buf, ref->data[0],
@@ -702,7 +701,7 @@ AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name)
         ret->input_pads   = av_memdup(filter->inputs,  ret->nb_inputs  * sizeof(*filter->inputs));
         if (!ret->input_pads)
             goto err;
-        ret->inputs       = av_mallocz_array(ret->nb_inputs, sizeof(AVFilterLink*));
+        ret->inputs      = av_calloc(ret->nb_inputs, sizeof(*ret->inputs));
         if (!ret->inputs)
             goto err;
     }
@@ -712,7 +711,7 @@ AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name)
         ret->output_pads  = av_memdup(filter->outputs, ret->nb_outputs * sizeof(*filter->outputs));
         if (!ret->output_pads)
             goto err;
-        ret->outputs      = av_mallocz_array(ret->nb_outputs, sizeof(AVFilterLink*));
+        ret->outputs     = av_calloc(ret->nb_outputs, sizeof(*ret->outputs));
         if (!ret->outputs)
             goto err;
     }
@@ -812,7 +811,7 @@ static int process_options(AVFilterContext *ctx, AVDictionary **options,
                            const char *args)
 {
     const AVOption *o = NULL;
-    int ret, count = 0;
+    int ret;
     char *av_uninit(parsed_key), *av_uninit(value);
     const char *key;
     int offset= -1;
@@ -875,10 +874,9 @@ static int process_options(AVFilterContext *ctx, AVDictionary **options,
 
         av_free(value);
         av_free(parsed_key);
-        count++;
     }
 
-    return count;
+    return 0;
 }
 
 int ff_filter_process_command(AVFilterContext *ctx, const char *cmd,
@@ -925,6 +923,8 @@ int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
         ret = ctx->filter->init(ctx);
     else if (ctx->filter->init_dict)
         ret = ctx->filter->init_dict(ctx, options);
+    if (ret < 0)
+        return ret;
 
     if (ctx->enable_str) {
         ret = set_enable_expr(ctx, ctx->enable_str);
@@ -932,7 +932,7 @@ int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
             return ret;
     }
 
-    return ret;
+    return 0;
 }
 
 int avfilter_init_str(AVFilterContext *filter, const char *args)
@@ -1018,7 +1018,7 @@ fail:
 int ff_filter_frame(AVFilterLink *link, AVFrame *frame)
 {
     int ret;
-    FF_TPRINTF_START(NULL, filter_frame); ff_tlog_link(NULL, link, 1); ff_tlog(NULL, " "); ff_tlog_ref(NULL, frame, 1);
+    FF_TPRINTF_START(NULL, filter_frame); ff_tlog_link(NULL, link, 1); ff_tlog(NULL, " "); tlog_ref(NULL, frame, 1);
 
     /* Consistency checks */
     if (link->type == AVMEDIA_TYPE_VIDEO) {

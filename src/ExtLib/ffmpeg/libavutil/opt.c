@@ -262,9 +262,12 @@ static int set_string_number(void *obj, void *target_obj, const AVOption *o, con
             const char * const_names[64];
             int search_flags = (o->flags & AV_OPT_FLAG_CHILD_CONSTS) ? AV_OPT_SEARCH_CHILDREN : 0;
             const AVOption *o_named = av_opt_find(target_obj, i ? buf : val, o->unit, 0, search_flags);
-            if (o_named && o_named->type == AV_OPT_TYPE_CONST)
+            if (o_named && o_named->type == AV_OPT_TYPE_CONST) {
                 d = DEFAULT_NUMVAL(o_named);
-            else {
+                if (o_named->flags & AV_OPT_FLAG_DEPRECATED)
+                    av_log(obj, AV_LOG_WARNING, "The \"%s\" option is deprecated: %s\n",
+                           o_named->name, o_named->help);
+            } else {
                 if (o->unit) {
                     for (o_named = NULL; o_named = av_opt_next(target_obj, o_named); ) {
                         if (o_named->type == AV_OPT_TYPE_CONST &&
@@ -1632,7 +1635,7 @@ int av_opt_set_dict2(void *obj, AVDictionary **options, int search_flags)
 {
     AVDictionaryEntry *t = NULL;
     AVDictionary    *tmp = NULL;
-    int ret = 0;
+    int ret;
 
     if (!options)
         return 0;
@@ -1646,11 +1649,10 @@ int av_opt_set_dict2(void *obj, AVDictionary **options, int search_flags)
             av_dict_free(&tmp);
             return ret;
         }
-        ret = 0;
     }
     av_dict_free(options);
     *options = tmp;
-    return ret;
+    return 0;
 }
 
 int av_opt_set_dict(void *obj, AVDictionary **options)
@@ -1829,10 +1831,7 @@ int av_opt_query_ranges(AVOptionRanges **ranges_arg, void *obj, const char *key,
 {
     int ret;
     const AVClass *c = *(AVClass**)obj;
-    int (*callback)(AVOptionRanges **, void *obj, const char *key, int flags) = NULL;
-
-    if (c->version > (52 << 16 | 11 << 8))
-        callback = c->query_ranges;
+    int (*callback)(AVOptionRanges **, void *obj, const char *key, int flags) = c->query_ranges;
 
     if (!callback)
         callback = av_opt_query_ranges_default;

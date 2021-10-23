@@ -58,7 +58,7 @@ do {                                                                       \
  * If check is set, nothing is modified and it is only checked whether
  * the formats are compatible.
  * If empty_allowed is set and one of a,b->nb is zero, the lists are
- * merged; otherwise, it is treated as error.
+ * merged; otherwise, 0 (for nonmergeability) is returned.
  */
 #define MERGE_FORMATS(a, b, fmts, nb, type, check, empty_allowed)          \
 do {                                                                       \
@@ -113,9 +113,9 @@ static int merge_formats_internal(AVFilterFormats *a, AVFilterFormats *b,
        To avoid that, pretend that there are no common formats to force the
        insertion of a conversion filter. */
     if (type == AVMEDIA_TYPE_VIDEO)
-        for (i = 0; i < a->nb_formats; i++)
+        for (i = 0; i < a->nb_formats; i++) {
+            const AVPixFmtDescriptor *const adesc = av_pix_fmt_desc_get(a->formats[i]);
             for (j = 0; j < b->nb_formats; j++) {
-                const AVPixFmtDescriptor *adesc = av_pix_fmt_desc_get(a->formats[i]);
                 const AVPixFmtDescriptor *bdesc = av_pix_fmt_desc_get(b->formats[j]);
                 alpha2 |= adesc->flags & bdesc->flags & AV_PIX_FMT_FLAG_ALPHA;
                 chroma2|= adesc->nb_components > 1 && bdesc->nb_components > 1;
@@ -124,6 +124,7 @@ static int merge_formats_internal(AVFilterFormats *a, AVFilterFormats *b,
                     chroma1|= adesc->nb_components > 1;
                 }
             }
+        }
 
     // If chroma or alpha can be lost through merging then do not merge
     if (alpha2 > alpha1 || chroma2 > chroma1)
@@ -430,16 +431,18 @@ int ff_add_channel_layout(AVFilterChannelLayouts **l, uint64_t channel_layout)
     return 0;
 }
 
+AVFilterFormats *ff_make_formats_list_singleton(int fmt)
+{
+    int fmts[2] = { fmt, -1 };
+    return ff_make_format_list(fmts);
+}
+
 AVFilterFormats *ff_all_formats(enum AVMediaType type)
 {
     AVFilterFormats *ret = NULL;
 
     if (type == AVMEDIA_TYPE_VIDEO) {
-        const AVPixFmtDescriptor *desc = NULL;
-        while ((desc = av_pix_fmt_desc_next(desc))) {
-            if (ff_add_format(&ret, av_pix_fmt_desc_get_id(desc)) < 0)
-                return NULL;
-        }
+        return ff_formats_pixdesc_filter(0, 0);
     } else if (type == AVMEDIA_TYPE_AUDIO) {
         enum AVSampleFormat fmt = 0;
         while (av_get_sample_fmt_name(fmt)) {
@@ -452,7 +455,7 @@ AVFilterFormats *ff_all_formats(enum AVMediaType type)
     return ret;
 }
 
-int ff_formats_pixdesc_filter(AVFilterFormats **rfmts, unsigned want, unsigned rej)
+AVFilterFormats *ff_formats_pixdesc_filter(unsigned want, unsigned rej)
 {
     unsigned nb_formats, fmt, flags;
     AVFilterFormats *formats = NULL;
@@ -476,18 +479,17 @@ int ff_formats_pixdesc_filter(AVFilterFormats **rfmts, unsigned want, unsigned r
         }
         if (formats) {
             av_assert0(formats->nb_formats == nb_formats);
-            *rfmts = formats;
-            return 0;
+            return formats;
         }
         formats = av_mallocz(sizeof(*formats));
         if (!formats)
-            return AVERROR(ENOMEM);
+            return NULL;
         formats->nb_formats = nb_formats;
         if (nb_formats) {
             formats->formats = av_malloc_array(nb_formats, sizeof(*formats->formats));
             if (!formats->formats) {
                 av_freep(&formats);
-                return AVERROR(ENOMEM);
+                return NULL;
             }
         }
     }
@@ -708,12 +710,40 @@ int ff_set_common_formats_from_list(AVFilterContext *ctx, const int *fmts)
 
 int ff_default_query_formats(AVFilterContext *ctx)
 {
+    const AVFilter *const f = ctx->filter;
+    AVFilterFormats *formats;
+    enum AVMediaType type;
     int ret;
-    enum AVMediaType type = ctx->nb_inputs  ? ctx->inputs [0]->type :
-                            ctx->nb_outputs ? ctx->outputs[0]->type :
-                            AVMEDIA_TYPE_VIDEO;
 
-    ret = ff_set_common_formats(ctx, ff_all_formats(type));
+    switch (f->formats_state) {
+    case FF_FILTER_FORMATS_PIXFMT_LIST:
+        type    = AVMEDIA_TYPE_VIDEO;
+        formats = ff_make_format_list(f->formats.pixels_list);
+        break;
+    case FF_FILTER_FORMATS_SAMPLEFMTS_LIST:
+        type    = AVMEDIA_TYPE_AUDIO;
+        formats = ff_make_format_list(f->formats.samples_list);
+        break;
+    case FF_FILTER_FORMATS_SINGLE_PIXFMT:
+        type    = AVMEDIA_TYPE_VIDEO;
+        formats = ff_make_formats_list_singleton(f->formats.pix_fmt);
+        break;
+    case FF_FILTER_FORMATS_SINGLE_SAMPLEFMT:
+        type    = AVMEDIA_TYPE_AUDIO;
+        formats = ff_make_formats_list_singleton(f->formats.sample_fmt);
+        break;
+    default:
+        av_assert2(!"Unreachable");
+    /* Intended fallthrough */
+    case FF_FILTER_FORMATS_PASSTHROUGH:
+    case FF_FILTER_FORMATS_QUERY_FUNC:
+        type    = ctx->nb_inputs  ? ctx->inputs [0]->type :
+                  ctx->nb_outputs ? ctx->outputs[0]->type : AVMEDIA_TYPE_VIDEO;
+        formats = ff_all_formats(type);
+        break;
+    }
+
+    ret = ff_set_common_formats(ctx, formats);
     if (ret < 0)
         return ret;
     if (type == AVMEDIA_TYPE_AUDIO) {

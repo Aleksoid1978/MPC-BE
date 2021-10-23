@@ -122,10 +122,8 @@ typedef struct EncodeSimpleContext {
 
 typedef struct AVCodecInternal {
     /**
-     * Whether the parent AVCodecContext is a copy of the context which had
-     * init() called on it.
-     * This is used by multithreading - shared tables and picture pointers
-     * should be freed from the original context only.
+     * When using frame-threaded decoding, this field is set for the first
+     * worker thread (e.g. to decode extradata just once).
      */
     int is_copy;
 
@@ -154,6 +152,13 @@ typedef struct AVCodecInternal {
      */
     uint8_t *byte_buffer;
     unsigned int byte_buffer_size;
+
+    /**
+     * This is set to AV_PKT_FLAG_KEY for encoders that encode intra-only
+     * formats (i.e. whose codec descriptor has AV_CODEC_PROP_INTRA_ONLY set).
+     * This is used to set said flag generically for said encoders.
+     */
+    int intra_only_flag;
 
     void *frame_thread_encoder;
 

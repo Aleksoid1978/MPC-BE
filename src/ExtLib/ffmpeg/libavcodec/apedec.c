@@ -879,7 +879,7 @@ static av_always_inline int filter_fast_3320(APEPredictor *p,
     }
 
     predictionA = p->buf[delayA] * 2U - p->buf[delayA - 1];
-    p->lastA[filter] = decoded + ((int32_t)(predictionA  * p->coeffsA[filter][0]) >> 9);
+    p->lastA[filter] = decoded + (unsigned)((int32_t)(predictionA  * p->coeffsA[filter][0]) >> 9);
 
     if ((decoded ^ predictionA) > 0)
         p->coeffsA[filter][0]++;
@@ -979,7 +979,7 @@ static void long_filter_ehigh_3830(int32_t *buffer, int length)
         for (j = 7; j > 0; j--)
             delay[j] = delay[j - 1];
         delay[0] = buffer[i];
-        buffer[i] -= dotprod >> 9;
+        buffer[i] -= (unsigned)(dotprod >> 9);
     }
 }
 
@@ -1337,7 +1337,7 @@ static void do_apply_filter(APEContext *ctx, int version, APEFilter *f,
             absres = FFABSU(res);
             if (absres)
                 *f->adaptcoeffs = APESIGN(res) *
-                                  (8 << ((absres > f->avg * 3) + (absres > f->avg * 4 / 3)));
+                                  (8 << ((absres > f->avg * 3LL) + (absres > (f->avg + f->avg / 3))));
                 /* equivalent to the following code
                     if (absres <= f->avg * 4 / 3)
                         *f->adaptcoeffs = APESIGN(res) * 8;

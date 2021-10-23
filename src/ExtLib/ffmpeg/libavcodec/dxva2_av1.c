@@ -79,7 +79,7 @@ static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *c
     pp->max_height = seq->max_frame_height_minus_1 + 1;
 
     pp->CurrPicTextureIndex = ff_dxva2_get_surface_index(avctx, ctx, h->cur_frame.tf.f);
-    pp->superres_denom      = frame_header->use_superres ? frame_header->coded_denom : AV1_SUPERRES_NUM;
+    pp->superres_denom      = frame_header->use_superres ? frame_header->coded_denom + AV1_SUPERRES_DENOM_MIN : AV1_SUPERRES_NUM;
     pp->bitdepth            = get_bit_depth_from_seq(seq);
     pp->seq_profile         = seq->seq_profile;
 
@@ -145,7 +145,7 @@ static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *c
         pp->frame_refs[i].Index  = ref_frame->buf[0] ? ref_idx : 0xFF;
 
         /* Global Motion */
-        pp->frame_refs[i].wminvalid = (h->cur_frame.gm_type[AV1_REF_FRAME_LAST + i] == AV1_WARP_MODEL_IDENTITY);
+        pp->frame_refs[i].wminvalid = h->cur_frame.gm_invalid[AV1_REF_FRAME_LAST + i];
         pp->frame_refs[i].wmtype    = h->cur_frame.gm_type[AV1_REF_FRAME_LAST + i];
         for (j = 0; j < 6; ++j) {
              pp->frame_refs[i].wmmat[j] = h->cur_frame.gm_params[AV1_REF_FRAME_LAST + i][j];

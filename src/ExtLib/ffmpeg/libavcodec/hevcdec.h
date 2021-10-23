@@ -39,14 +39,12 @@
 #include "hevc_ps.h"
 #include "hevc_sei.h"
 #include "hevcdsp.h"
+#include "h274.h"
 #include "internal.h"
 #include "thread.h"
 #include "videodsp.h"
 
 #define SHIFT_CTB_WPP 2
-
-//TODO: check if this is really the maximum
-#define MAX_TRANSFORM_DEPTH 5
 
 #define MAX_TB_SIZE 32
 #define MAX_QP 51
@@ -395,7 +393,10 @@ typedef struct DBParams {
 
 typedef struct HEVCFrame {
     AVFrame *frame;
+    AVFrame *frame_grain;
     ThreadFrame tf;
+    ThreadFrame tf_grain;
+    int needs_fg; /* 1 if grain needs to be applied by the decoder */
     MvField *tab_mvf;
     RefPicList *refPicList;
     RefPicListTab **rpl_tab;
@@ -525,6 +526,7 @@ typedef struct HEVCContext {
     HEVCDSPContext hevcdsp;
     VideoDSPContext vdsp;
     BswapDSPContext bdsp;
+    H274FilmGrainDatabase h274db;
     int8_t *qp_y_tab;
     uint8_t *horizontal_bs;
     uint8_t *vertical_bs;
