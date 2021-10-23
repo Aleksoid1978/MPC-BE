@@ -382,13 +382,19 @@ class file_adm_private
 public:
     tfsxml_string p;
     Items_Struct Items[item_Max];
-    int Version = 0;
+    int Version;
+    bool DolbyProfileCanNotBeVersion1;
     vector<profile_info> profileInfos;
 
     void parse();
     void coreMetadata();
     void format();
     void audioFormatExtended();
+
+    file_adm_private() {
+        Version = 0;
+        DolbyProfileCanNotBeVersion1 = false;
+    };
 };
 
 void file_adm_private::parse()
@@ -459,8 +465,22 @@ void file_adm_private::parse()
     for (;;) {
         if (tfsxml_next(&p, &b))
             break;
+        if (!tfsxml_cmp_charp(b, "audioFormatExtended"))
+        {
+            audioFormatExtended();
+        }
         if (!tfsxml_cmp_charp(b, "ebuCoreMain"))
         {
+            while (!tfsxml_attr(&p, &b, &v)) {
+                if (!tfsxml_cmp_charp(b, "xmlns") || !tfsxml_cmp_charp(b, "xsi:schemaLocation")) {
+                    DolbyProfileCanNotBeVersion1 = false;
+                    if (!tfsxml_str_charp(v, "ebuCore_2014").len && !tfsxml_str_charp(v, "ebuCore_2016").len) {
+                        DolbyProfileCanNotBeVersion1 = true;
+                    }
+                    if (!DolbyProfileCanNotBeVersion1)
+                        break;
+                }
+            }
             tfsxml_enter(&p, &b);
             for (;;) {
                 if (tfsxml_next(&p, &b))
@@ -505,9 +525,6 @@ void file_adm_private::format()
     for (;;) {
         if (tfsxml_next(&p, &b))
             break;
-        if (!tfsxml_cmp_charp(b, "audioFormatExtended")) {
-            audioFormatExtended();
-        }
         if (!tfsxml_cmp_charp(b, "audioFormatCustom")) {
             tfsxml_enter(&p, &b);
             while (!tfsxml_next(&p, &b)) {
@@ -538,6 +555,9 @@ void file_adm_private::format()
                     }
                 }
             }
+        }
+        if (!tfsxml_cmp_charp(b, "audioFormatExtended")) {
+            audioFormatExtended();
         }
     }
 }
@@ -798,8 +818,6 @@ File_Adm::File_Adm()
     Buffer_MaximumSize = 256 * 1024 * 1024;
 
     File_Adm_Private = new file_adm_private();
-
-    MuxingMode=NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -865,10 +883,19 @@ bool File_Adm::FileHeader_Begin()
         Fill(Stream_Audio, StreamPos_Last, Audio_Format, "ADM");
 
     Fill(Stream_Audio, StreamPos_Last, "Metadata_Format", "ADM, Version " + Ztring::ToZtring(File_Adm_Private->Version).To_UTF8());
-    if (MuxingMode)
+    if (!MuxingMode.empty())
         Fill(Stream_Audio, StreamPos_Last, "Metadata_MuxingMode", MuxingMode);
     if (File_Adm_Private->Items[item_audioProgramme].Items.size() == 1 && File_Adm_Private->Items[item_audioProgramme].Items[0].Strings[audioProgramme_audioProgrammeName] == "Atmos_Master") {
-        Fill(Stream_Audio, 0, "AdmProfile", "Dolby Atmos Master");
+        if (!File_Adm_Private->DolbyProfileCanNotBeVersion1 && File_Adm_Private->Version>1)
+            File_Adm_Private->DolbyProfileCanNotBeVersion1=true;
+        Fill(Stream_Audio, 0, "AdmProfile", (!File_Adm_Private->DolbyProfileCanNotBeVersion1)?"Dolby Atmos Master, Version 1":"Dolby Atmos Master");
+        Fill(Stream_Audio, 0, "AdmProfile_Format", "Dolby Atmos Master");
+        Fill_SetOptions(Stream_Audio, 0, "AdmProfile_Format", "N NTY");
+        if (!File_Adm_Private->DolbyProfileCanNotBeVersion1)
+        {
+            Fill(Stream_Audio, 0, "AdmProfile_Version", "1");
+            Fill_SetOptions(Stream_Audio, 0, "AdmProfile_Version", "N NTY");
+        }
     }
     vector<profile_info>& profileInfos = File_Adm_Private->profileInfos;
     if (!profileInfos.empty())

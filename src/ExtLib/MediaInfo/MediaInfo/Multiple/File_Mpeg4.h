@@ -172,6 +172,10 @@ private :
     void moov_trak_mdia_minf_stbl_stps();
     void moov_trak_mdia_minf_stbl_stsc();
     void moov_trak_mdia_minf_stbl_stsd();
+    void moov_trak_mdia_minf_stbl_stsd_mebx();
+    void moov_trak_mdia_minf_stbl_stsd_mebx_keys();
+    void moov_trak_mdia_minf_stbl_stsd_mebx_keys_PHDR();
+    void moov_trak_mdia_minf_stbl_stsd_mebx_keys_PHDR_keyd();
     void moov_trak_mdia_minf_stbl_stsd_stpp();
     void moov_trak_mdia_minf_stbl_stsd_stpp_btrt() {moov_trak_mdia_minf_stbl_stsd_xxxx_btrt();}
     void moov_trak_mdia_minf_stbl_stsd_text();
@@ -261,6 +265,7 @@ private :
     void moov_trak_txas();
     void moov_trak_tref();
     void moov_trak_tref_chap();
+    void moov_trak_tref_cdsc();
     void moov_trak_tref_clcp();
     void moov_trak_tref_dpnd();
     void moov_trak_tref_fall();
@@ -466,6 +471,7 @@ private :
         int32u                  mvex_trex_default_sample_duration;
         int32u                  mvex_trex_default_sample_size;
         int32u                  TimeCode_TrackID;
+        int32u                  HasAtomStyle;
         bool                    TimeCode_IsVisual;
         bool                    IsPcm;
         bool                    IsPcmMono;
@@ -491,6 +497,8 @@ private :
         std::vector<int32u>     ForcedFor;
         std::vector<int32u>     Chapters;
         std::vector<int32u>     ChaptersFor;
+        std::vector<int32u>     Meta;
+        std::vector<int32u>     MetaFor;
         float32                 CleanAperture_Width;
         float32                 CleanAperture_Height;
         float32                 CleanAperture_PixelAspectRatio;
@@ -545,6 +553,7 @@ private :
             mvex_trex_default_sample_duration=0;
             mvex_trex_default_sample_size=0;
             TimeCode_TrackID=(int32u)-1;
+            HasAtomStyle=0;
             TimeCode_IsVisual=false;
             IsPcm=false;
             IsPcmMono=false;

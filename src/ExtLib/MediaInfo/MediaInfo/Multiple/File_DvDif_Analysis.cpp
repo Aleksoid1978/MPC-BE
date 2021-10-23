@@ -890,6 +890,7 @@ void File_DvDif::Errors_Stats_Update()
             Event.RecordedDateTime1=0;
             Event.RecordedDateTime2=0;
             int16u RecordedDateTime2Fixed=0;
+            int16u MoreFlags=0;
             Event.Arb=0;
             Event.Verbosity=0;
             Event.Errors=NULL;
@@ -1255,6 +1256,13 @@ void File_DvDif::Errors_Stats_Update()
             Errors_Stats_Line+=__T('N');
             #if MEDIAINFO_EVENTS
                 Event.RecordedDateTime1|=1<<30;
+                bool IsLess = Speed_RecTime_Current.Time.Hours < Speed_RecTime_Current_Theory2.Time.Hours
+                           || Speed_RecTime_Current.Time.Minutes < Speed_RecTime_Current_Theory2.Time.Minutes
+                           || Speed_RecTime_Current.Time.Seconds < Speed_RecTime_Current_Theory2.Time.Seconds;
+                if (IsLess)
+                {
+                    MoreFlags |= 1 << 0;
+                }
             #endif //MEDIAINFO_EVENTS
             if (!REC_IsValid || REC_ST)
             {
@@ -1727,6 +1735,7 @@ void File_DvDif::Errors_Stats_Update()
             Event1.BlockStatus_Count=((DSF?1800:1500)*(FSC_WasSet?2:1));
             Event1.BlockStatus=BlockStatus;
             Event1.AbstBf=AbstBf_Current;
+            Event1.MoreFlags=MoreFlags;
             Config->Event_Send(NULL, (const int8u*)&Event1, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1));
             Config->Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0));
             memset(BlockStatus, 0, Event1.BlockStatus_Count);

@@ -465,6 +465,11 @@ void File_Mpeg4::Streams_Finish()
         StreamKind_Last=Temp->second.StreamKind;
         StreamPos_Last=Temp->second.StreamPos;
 
+        if (StreamKind_Last==Stream_Max && !Temp->second.MetaFor.empty())
+        {
+            ++Temp;
+            continue;
+        }
         if (StreamKind_Last==Stream_Max && Temp->second.hdlr_SubType)
         {
             Stream_Prepare(Stream_Other);
@@ -675,6 +680,21 @@ void File_Mpeg4::Streams_Finish()
                 if (TempString.size())
                 {
                     Fill(StreamKind_Last, StreamPos_Last, "Menus", TempString.To_UTF8().c_str());
+                    TempString.clear();
+                }
+            }
+            if (!Temp->second.Meta.empty())
+            {
+                for (TrackID = Temp->second.Meta.begin(); TrackID != Temp->second.Meta.end(); ++TrackID)
+                {
+                    if (Streams[*TrackID].Parsers.size()==1)
+                        Merge(*Streams[*TrackID].Parsers[0], Stream_Video, 0, StreamPos_Last);
+                    if (TempString.size()) TempString.append(__T(","));
+                    TempString.append(Ztring().From_Number(*TrackID));
+                }
+                if (TempString.size())
+                {
+                    Fill(StreamKind_Last, StreamPos_Last, "Metas", TempString.To_UTF8().c_str());
                     TempString.clear();
                 }
             }

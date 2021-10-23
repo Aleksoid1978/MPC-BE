@@ -34,6 +34,7 @@
  day1; օր.
  day2; օր.
  day3; օր.
+ dB0;
  dB1; դԲ
  dB2; դԲ
  dB3; դԲ
@@ -117,6 +118,9 @@
  month1; ամիս.
  month2; ամիս.
  month3; ամիս.
+ object1;
+ object2;
+ object3;
  pixel1; փիքս.
  pixel2; փիքս.
  pixel3; փիքս.
@@ -153,9 +157,14 @@ ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Կատարողը
 Actor_Character;Դերը
+Add creation date to text output;
+Add version to text output;
 Added_Date;Ավելացման ամսաթիվը
 Address;Հասցեն
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Լրացուցիչ
 Advanced mode;Ընդլայնված եղանակ
 Album;Ալբոմը
@@ -181,9 +190,12 @@ Audio1;Առաջին ձայնը
 Audio2;Երկրորդ ձայնը
 AudioComments;
 AudioCount;Ձայների քանակը
+AudioDescription;
 AudioDescriptionPresent;
 AudioDescriptionType;
 AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;
 Author;Հեղինակը
 BarCode;Կոդը
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
 Channel(s);Ալիք(ներ)
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Դիրքը
 Chapter(s);Հոսքերը
 Chapters;Հոսքերը
@@ -225,6 +240,7 @@ Choose language;Ընտրեք լեզուն
 Choreographer;Պարարվեստը
 Chroma;Գույնայնությունը
 ChromaSubsampling;Գույների ընտրություն
+Classifier;
 ClearList;
 Close;Փակել
 Close all before open;Բացելուց առաջ փակել բոլորը
@@ -294,12 +310,17 @@ Date;Ամսաթիվը
 Debug;Փոխադրիչ
 Decimal point;Տասնորդական կետ
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Հապաղում
 Delay_Source;Հապաղում օրիգինալում
 Delay_Source_Container;Փաթեթը
 Delay_Source_Stream;'Աղբյուր' հոսքը
 Delete;Ջնջել
 Description;Նկարագրությունը
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Թվայնացման ամսաթիվը
 Dimensions;Չափերը
 Director;Ռեժիսորը
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Կողմերի հարաբեր-ը օրիգինալում
 DistributedBy;Տարածողը
 Distributor;
+DolbyAtmos;
 Donate;Օժանդակություն
 DotsPerInch;Կետեր դյույմի վրա
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Տևողությունը
 Duration_End;Ավարտվելու ժ-ը
 Duration_Start;Սկսվելու ժ-ը
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Փոփոխել
 EditedBy;Փոփոխվել է
+EditorialClassification;
 ElementCount;
 EMail;Փոստը
 Encoded_Application;Կոդավորող ծրագիրը
@@ -352,6 +378,7 @@ FileExtension;Տեսակը
 FileName;Ֆայլի անունը
 FileNameExtension;
 FileSize;Ֆայլի չափը
+FlatPanelTv;
 Folder;Թղթապանակը
 Folder (R);Թղթապանակը (R)
 Folder (R)_Hint;Ընտրեք թղթապանակը (բոլոր ենթաթղթապանակներով)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Մշտական
 FrameRate_Mode_VFR;Փոփոխական
 FrameRate_Nominal;Կադրերի պայմանական հաճախ-ը
 FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
+FrameRate_Real;
 General;Ընդհանուր
 Genre;Ժանրը
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
 Gop_OpenClosed_Open;
+Graph;
+Group;
 Grouping;
+GroupPreset;
 h; ժ.
 HDR_Format;
 Header file;Ստեղծել գլխագիրը
@@ -615,6 +646,7 @@ Height_CleanAperture;
 Height_Original;Օրիգինալի բարձր-ը
 Help;Օգնություն
 Hint;Հուշում
+HomeTheaterAvr;
 How many audio streams?;Ձայնի հոսքերը.
 How many chapters streams?;Մասերի հոսքերի քանակը.
 How many text streams?;Տեքստային հոսքերի քանակը.
@@ -622,12 +654,17 @@ How many video streams?;Տեսանյութերի հոսքերի քանակը.
 HTML;HTML
 ID;ID-ին
 IdentClockStart;
+IFrameInterval;
 Image;Պատկերը
 Image stream(s);Պատկերների հոսքերը
 Image_Codec_List;Պատկերների կոդավորիչները
 ImageCount;Պատկերների հոսքերի քանակը
+ImmersiveStereo;
 Info;Տեղեկություն
 Instruments;Գործիքներ
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Առաջինը ներքին դաշտը
 Interlaced_Interlaced;Միահյուսված
 Interlaced_PPF;Առաջադեմ
@@ -849,10 +886,24 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zu;Zulu
 LawRating;Իրավունքների սահ-ում
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Շտեմարանը
+Lifetime_Subscribe_Button;
 Lightness;Պայծառությունը
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Ցանկը
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Երգի տեքստը
 Lyrics;Երգերի տեքստը
 Mastered_Date;Օրիգինալի ամսաթիվը
@@ -883,6 +936,9 @@ matrix_coefficients;Կետացանցի գործակիցը
 Matrix_Format;
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
 MediaInfo_About_About;
 Menu;Ընտրացանկը
@@ -892,12 +948,14 @@ Menu_Hint;Լրացուցիչ հնարավորություններ
 Menu_No;Չկա Ընտրացանկ
 MenuCount;Ընտրացանկի հոսքերի ք-ը
 MenuID;Ընտրացանկի ID-ին
+MixType;
 mn; ր.
 Mood;Կարգավորված
 More;Ավելին
 Movie;Ֆիլմի անունը
 ms; մվ.
 MSDI;MSDI
+MultipleStream;
 MusicBy;Երգահանը
 MuxingMode;Խառման եղանակը
 MuxingMode_MoreInfo;Խառման եղանակը, լր. տեղեկություն
@@ -912,8 +970,18 @@ NewVersion_Question_Content;Հասանելի է նոր %Version% տարբերա�
 NewVersion_Question_Title;Հասանելի է նոր տարբերակ!
 No;Ոչ
 Not yet;Դեռ չկա
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Գույների քանակը
+ObjectCount;
 OK;ԼԱՎ
 One output file per input file;Նոր ֆայլ յուրաքանչյուրի համար
 Open;Բացել
@@ -981,6 +1049,8 @@ PartNumber;
 PartTotal;
 Performer;Կատարողը
 Period;Շրջանը
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Հեռախոս
 PictureRatio;
 PixelAspectRatio;Փիքսելների համամասնությունը
@@ -992,11 +1062,23 @@ Played_First_Date;Առաջին վերարտադրումը
 Played_Last_Date;Վերջին վերարտադրումը
 PlayTime;Տևողությունը
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Դիրքը
+Position_Cartesian;
+Position_Polar;
 Position_Total;Ընդամենը
 Preferences;Կարգավորումներ
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;
 Producer;Պրոդյուսերը
 ProductionDesigner;Դիզայնի մշակողը
@@ -1011,15 +1093,18 @@ Purchased_Date;Գնման ամսաթիվը
 Quote character;Չակերտների նշանը
 RadioStation;Ռադիոկայանը
 Rating;Վարկանիշը
+RealtimeLoudnessCorrected;
 Recorded_Date;Գրելու ամսաթիվը
 Recorded_Location;Գրելու տեղը
 Released_Date;Թողարկման ամսաթիվը
 RemixedBy;Ռեմիքսը՝
+RenderMode;
 Renew;
 ReplayGain_Gain;Ձայնի կարգավորիչ
 ReplayGain_Peak;Ձայնի կարգավորման գագաթը
 Report;
 Resolution;Լուծաչափը
+RestoreLifetimeSubscription;
 s; վայր.
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;
 ShimVersion;
 Show menu;Ցուցադրել ընտրացանկը
 Show toolbar;Ցուցադրել վահանակը
+SignalGroup;
 SigningPresent;
 SignLanguage;
 Sort;Դասավորել ըստ
+SoundCategory;
 SoundEngineer;Ձայն. ռեժիսորը
 Source;
 Source_Duration;
@@ -1071,6 +1158,7 @@ Source_FrameCount;
 Source_SamplingCount;
 Source_StreamSize;
 Source_StreamSize_Encoded;
+SpokenSubtitles;
 Standard;Ստանդարտ
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Ենթահոսքը
+SubtstreamIdChannel;
 Summary;Համառոտ
 Supported formats;Աջակցվող տեսակները
 Supported?;Աջակցվու՞մ է
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Համառոտ
 SystemId;ID-ին
 Tagged_Application;Նշված ծրագիրը
 Tagged_Date;Նշման ամսաթիվը
+TargetDeviceConfig;
 Technician;Տեխնիկը
 TermsOfUse;Օգտագ. կանոնները
 TertiaryAudioLanguage;
@@ -1150,6 +1244,7 @@ Tree & Text;Ծառի տեսքով և տեքստ
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+TypeDefinition;
 UniqueID;Բացառիկ ID-ին
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;80
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;74
+ZZ_AutomaticLanguage_Percent;78

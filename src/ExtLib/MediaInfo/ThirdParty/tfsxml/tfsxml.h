@@ -16,6 +16,7 @@ typedef struct tfsxml_string
 } tfsxml_string;
 
 int tfsxml_cmp_charp(tfsxml_string a, const char* b);
+tfsxml_string tfsxml_str_charp(tfsxml_string a, const char* b);
 
 /** Initialize the parser
  *

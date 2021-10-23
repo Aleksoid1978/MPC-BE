@@ -843,15 +843,18 @@ extern const char* Ac3_emdf_payload_id[16]=
 //---------------------------------------------------------------------------
 int32u Ac3_variable_bits(BitStream_Fast &Search2, int8u Bits)
 {
-    int32u ToReturn = 0;
+    int32u Info = 0;
 
-    do
+    for (;;)
     {
-        ToReturn += Search2.Get4(Bits);
+        Info += Search2.Get4(Bits);
+        if (!Search2.GetB())
+            break;
+        Info <<= Bits;
+        Info += (1 << Bits);
     }
-    while (Search2.GetB());
 
-    return ToReturn;
+    return Info;
 }
 
 //---------------------------------------------------------------------------
@@ -3867,7 +3870,7 @@ void File_Ac3::emdf_container()
     if (key_id == 7)
     {
         int32u add;
-        Get_V4 (2, add,                                         "key_id addition");
+        Get_V4 (3, add,                                         "key_id addition");
         key_id += add;
     }
 
@@ -3905,18 +3908,13 @@ void File_Ac3::emdf_container()
                 case 14: joc(); break;
                 default: Skip_BS(emdf_payload_size*8,           "(Unknown)");
             }
-            if (Data_BS_Remain() - emdf_payload_End < 8)
+            size_t RemainginBits=Data_BS_Remain();
+            if (RemainginBits>=emdf_payload_End)
             {
-                int8u padding;
-                Peek_S1(Data_BS_Remain() - emdf_payload_End, padding);
-                if (!padding)
-                    Skip_S1(Data_BS_Remain() - emdf_payload_End, "padding");
+                if (RemainginBits>emdf_payload_End)
+                    Skip_BS(RemainginBits-emdf_payload_End,     "(Unparsed bits)");
             }
-            if (Data_BS_Remain() > emdf_payload_End)
-            {
-                Skip_BS(Data_BS_Remain() - emdf_payload_End,    "(Unparsed emdf_payload bytes)");
-            }
-            else if (Data_BS_Remain() < emdf_payload_End)
+            else
             {
                 //There is a problem, too many bits were consumed by the parser. //TODO: prevent the parser to consume more bits than count of bits in this element
                 if (Data_BS_Remain() >= RemainAfterEMDF)
@@ -4124,7 +4122,8 @@ void File_Ac3::program_assignment()
             Get_S1 (4, reserved_data_size_bits,                 "reserved_data_size_bits");
             int8u padding = 8 - (reserved_data_size_bits % 8);
             Skip_S1(reserved_data_size_bits,                    "reserved_data()");
-            Skip_S1(padding,                                    "padding");
+            if (padding)
+                Skip_S1(padding,                                "padding");
         }
     }
 
@@ -4297,12 +4296,9 @@ void File_Ac3::HD()
                         program_assignment();
                         Element_End0();
                     }
-                    int16u padding;
-                    Peek_S2(Data_BS_Remain()%16, padding);
-                    if (Data_BS_Remain()-Data_BS_Remain()%16==After && !padding)
-                        Skip_BS(Data_BS_Remain()%16,            "padding");
-                    if (Data_BS_Remain()>After)
-                        Skip_BS(Data_BS_Remain()-After,         "reserved");
+                    size_t RemainginBits=Data_BS_Remain();
+                    if (RemainginBits>After)
+                        Skip_BS(RemainginBits-After,            "(Unparsed bits)");
                     BS_End();
                 }
             }
@@ -4899,52 +4895,45 @@ void File_Ac3::Get_V4(int8u  Bits, int32u  &Info, const char* Name)
 {
     Info = 0;
 
-    #if MEDIAINFO_TRACE
-        if (Trace_Activated)
-        {
-            int8u Count = 0;
-            do
-            {
-                Info += BS->Get4(Bits);
-                Count += Bits;
-            }
-            while (BS->GetB());
-            Param(Name, Info, Count);
-            Param_Info(__T("(")+Ztring::ToZtring(Count)+__T(" bits)"));
-        }
-        else
-    #endif //MEDIAINFO_TRACE
-        {
-            do
-                Info += BS->Get4(Bits);
-            while (BS->GetB());
-        }
+#if MEDIAINFO_TRACE
+    int8u Count = 0;
+#endif //MEDIAINFO_TRACE
+    for (;;)
+    {
+        Info += BS->Get4(Bits);
+#if MEDIAINFO_TRACE
+        Count += Bits;
+#endif //MEDIAINFO_TRACE
+        if (!BS->GetB())
+            break;
+        Info <<= Bits;
+        Info += (1 << Bits);
+    }
+#if MEDIAINFO_TRACE
+    if (Trace_Activated)
+    {
+        Param(Name, Info, Count);
+        Param_Info(__T("(") + Ztring::ToZtring(Count) + __T(" bits)"));
+    }
+#endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
 void File_Ac3::Skip_V4(int8u  Bits, const char* Name)
 {
-    #if MEDIAINFO_TRACE
-        if (Trace_Activated)
-        {
-            int8u Info = 0;
-            int8u Count = 0;
-            do
-            {
-                Info += BS->Get4(Bits);
-                Count += Bits;
-            }
-            while (BS->GetB());
-            Param(Name, Info, Count);
-            Param_Info(__T("(")+Ztring::ToZtring(Count)+__T(" bits)"));
-        }
-        else
-    #endif //MEDIAINFO_TRACE
-        {
-            do
-                BS->Skip(Bits);
-            while (BS->GetB());
-        }
+#if MEDIAINFO_TRACE
+    if (Trace_Activated)
+    {
+        int32u Info = 0;
+        Get_V4(Bits, Info, Name);
+    }
+    else
+#endif //MEDIAINFO_TRACE
+    {
+        do
+            BS->Skip(Bits);
+        while (BS->GetB());
+    }
 }
 
 } //NameSpace

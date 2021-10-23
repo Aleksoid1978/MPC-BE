@@ -34,6 +34,7 @@
  day1; dia
  day2; dies
  day3; dies
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; mes
  month2; mesos
  month3; mesos
+ object1;
+ object2;
+ object3;
  pixel1; píxel
  pixel2; píxels
  pixel3; píxels
@@ -153,9 +157,14 @@ ActiveFormatDescription;Descripció format actiu
 ActiveFormatDescription_MuxingMode;Descripció format actiu, mode multiplexor
 Actor;Actor
 Actor_Character;Personatge interpretat
+Add creation date to text output;
+Add version to text output;
 Added_Date;Data d'addició
 Address;Adreça
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Avançat
 Advanced mode;Mode avançat
 Album;Àlbum
@@ -181,9 +190,12 @@ Audio1;Primera pista d'àudio
 Audio2;Segona pista d'àudio
 AudioComments;Audiocomentaris
 AudioCount;Total de pistes d'àudio
+AudioDescription;
 AudioDescriptionPresent;Descripció àudio present
 AudioDescriptionType;Tipus descripció àudio
 AudioLoudnessStandard;Estàndard del volum d'àudio
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;Disposició pista àudio
 Author;Autor
 BarCode;Codi de barres
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Bits/(píxel*fotograma)
 BufferSize;Mida búfer
 Cancel;Cancel·la
 Channel(s);Canal(s)
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Posicions dels canals
 Chapter(s);Capítol(s)
 Chapters;Capítols
@@ -225,6 +240,7 @@ Choose language;Tria el teu idioma
 Choreographer;Coreografia
 Chroma;Croma
 ChromaSubsampling;Submostreig croma
+Classifier;
 ClearList;
 Close;Tanca
 Close all before open;Tanca tot abans d'obrir
@@ -294,12 +310,17 @@ Date;Data
 Debug;Depuració
 Decimal point;Punt decimal
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Retard
 Delay_Source;Retard, origen
 Delay_Source_Container;Contenidor
 Delay_Source_Stream;Pista en brut
 Delete;Esborra
 Description;Descripció
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Data de la digitalització
 Dimensions;Mides
 Director;Director
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;Relació d'aspecte d'obertura neta
 DisplayAspectRatio_Original;Relació d'aspecte original
 DistributedBy;Distribuït per
 Distributor;Distribuïdor
+DolbyAtmos;
 Donate;Donació
 DotsPerInch;Punts per polçada
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Durada
 Duration_End;Temps final
 Duration_Start;Temps inicial
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Edita
 EditedBy;Editat per
+EditorialClassification;
 ElementCount;
 EMail;Correu
 Encoded_Application;Aplicació
@@ -352,6 +378,7 @@ FileExtension;Extensió d'arxiu
 FileName;Nom de l'arxiu
 FileNameExtension;
 FileSize;Mida de l'arxiu
+FlatPanelTv;
 Folder;Carpeta
 Folder (R);Carpeta (R)
 Folder (R)_Hint;Tria una carpeta (i les seves subcarpetes)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Constant
 FrameRate_Mode_VFR;Variable
 FrameRate_Nominal;Fotogrames per segon nominals
 FrameRate_Original;Fotogrames per segon originals
+FrameRate_Real;
 General;General
 Genre;Gènere
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;GOP, obert/tancat
 Gop_OpenClosed_Closed;Tancat
 Gop_OpenClosed_FirstFrame;GOP, obert/tancat primer fotograma
 Gop_OpenClosed_Open;Obert
+Graph;
+Group;
 Grouping;Agrupament
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Capçalera de l'arxiu
@@ -615,6 +646,7 @@ Height_CleanAperture;Alçada obertura neta
 Height_Original;Alçada original
 Help;Ajuda
 Hint;Consell
+HomeTheaterAvr;
 How many audio streams?;Quantes pistes d'àudio?
 How many chapters streams?;Quantes pistes de capítols?
 How many text streams?;Quantes pistes de text?
@@ -622,12 +654,17 @@ How many video streams?;Quantes pistes de vídeo?
 HTML;HTML
 ID;ID
 IdentClockStart;Inici rellotge ident
+IFrameInterval;
 Image;Imatge
 Image stream(s);Pistes d'imatge
 Image_Codec_List;Llista de còdecs
 ImageCount;Comptador de pistes d'imatge
+ImmersiveStereo;
 Info;Info
 Instruments;Instruments
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Camp inferior primer
 Interlaced_Interlaced;Entrellaçat
 Interlaced_PPF;Progressiu
@@ -849,10 +886,24 @@ Language_zh-tw;Xinès (Taiwan)
 Language_zu;Zulú
 LawRating;Classificació llei
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Llibreria multiplexat
+Lifetime_Subscribe_Button;
 Lightness;Lleugeresa
 LineUpStart;Alineació inicial
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Llista
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Lletrista
 Lyrics;Lletra
 Mastered_Date;Data de masterització
@@ -883,6 +936,9 @@ matrix_coefficients;Coeficients matriu
 Matrix_Format;Codificació matriu, format
 MaxCLL;Nivell leuger contingut màxim
 MaxFALL;Nivell leuger mitjana fotogrames màxim
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;MediaInfo proporciona informació tècnica d'arxius de vídeo i àudio.\r\nExcepte la interfaç gràfica a la Mac App Store, és de codi obert, el que significa que és gratuït per als usuaris i els desenvolupadors tenen accés lliure per a estudiar-lo, millorar-lo i redistribuir-lo (llicència BSD)
 MediaInfo_About_About;
 Menu;Menú
@@ -892,12 +948,14 @@ Menu_Hint;Més possibilitats
 Menu_No;Sense menú
 MenuCount;Nombre de pistes al menú
 MenuID;ID menú
+MixType;
 mn; min
 Mood;Humor
 More;Més
 Movie;Nom de la pel·lícula
 ms; ms
 MSDI;MSDI
+MultipleStream;
 MusicBy;Música per
 MuxingMode;Mode multiplexat
 MuxingMode_MoreInfo;Mode multiplexat, més info
@@ -912,8 +970,18 @@ NewVersion_Question_Content;Està disponible una nova versió (v%Version%), vols
 NewVersion_Question_Title;S'ha publicat una nova versió!
 No;No
 Not yet;Encara no
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Nombre de colors
+ObjectCount;
 OK;D'acord
 One output file per input file;Un arxiu de sortida per arxiu d'entrada
 Open;Obre
@@ -981,6 +1049,8 @@ PartNumber;Codi sèrie
 PartTotal;Codi publicació
 Performer;Intèrpret
 Period;Període
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Telèfon
 PictureRatio;Relació imatge
 PixelAspectRatio;Relació d'aspecte
@@ -992,11 +1062,23 @@ Played_First_Date;Data de la primera reproducció
 Played_Last_Date;Darrera data de reproducció
 PlayTime;Duració
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Posició
+Position_Cartesian;
+Position_Polar;
 Position_Total;Total
 Preferences;Preferències
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;Idioma àudio primari
 Producer;Productor
 ProductionDesigner;Disseny de producció
@@ -1011,15 +1093,18 @@ Purchased_Date;Data de compra
 Quote character;Caràcter cita
 RadioStation;Emissora de ràdio
 Rating;Valoració
+RealtimeLoudnessCorrected;
 Recorded_Date;Data d'enregistrament
 Recorded_Location;Lloc de gravació
 Released_Date;Data de publicació
 RemixedBy;Remesclat per
+RenderMode;
 Renew;
 ReplayGain_Gain;Ganància reproducció
 ReplayGain_Peak;Límit ganància reproducció
 Report;
 Resolution;Resolució
+RestoreLifetimeSubscription;
 s; s
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;Nom de falca
 ShimVersion;Versió de falca
 Show menu;Mostra el menú
 Show toolbar;Mostra la barra d'eines
+SignalGroup;
 SigningPresent;Signatura present
 SignLanguage;Idioma signatura
 Sort;Ordenats per
+SoundCategory;
 SoundEngineer;Sonidista
 Source;Origen
 Source_Duration;Duració original
@@ -1071,6 +1158,7 @@ Source_FrameCount;Quantitat fotogrames original
 Source_SamplingCount;Quantitat mostres original
 Source_StreamSize;Mida pista original
 Source_StreamSize_Encoded;Mida pista codificada original
+SpokenSubtitles;
 Standard;Estàndard
 StoreMethod_InterleavedFields;Camps intercalats
 StoreMethod_SeparatedFields;Camps separats
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Subpista
+SubtstreamIdChannel;
 Summary;Resum
 Supported formats;Formats compatibles
 Supported?;Compatible?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Sinopsi
 SystemId;Id
 Tagged_Application;Aplicació d'etiquetatge
 Tagged_Date;Data d'etiquetatge
+TargetDeviceConfig;
 Technician;Tècnic
 TermsOfUse;Condicions d'ús
 TertiaryAudioLanguage;Idoma àudio terciari
@@ -1150,6 +1244,7 @@ Tree & Text;Arbre i text
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Tipus
+TypeDefinition;
 UniqueID;ID únic
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;93
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;86

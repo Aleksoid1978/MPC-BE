@@ -72,11 +72,13 @@
         #undef Yield
         #undef max
     }
-    #elif defined(_POSIX_PRIORITY_SCHEDULING)
-        #include <sched.h>
+    #else
         #include <unistd.h>
         #include <signal.h>
-    #endif //_POSIX_PRIORITY_SCHEDULING
+        #if defined(_POSIX_PRIORITY_SCHEDULING) // Note: unistd.h must be included first
+            #include <sched.h>
+        #endif //_POSIX_PRIORITY_SCHEDULING
+    #endif
     #include <ctime>
 #endif
 using namespace ZenLib;
@@ -837,7 +839,7 @@ static stream_t Text2StreamT(const Ztring& ParameterName, size_t ToRemove)
 // std::cin threaded interface
 //***************************************************************************
 
-#if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+#if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
 class Reader_Cin_Thread;
 set<Reader_Cin_Thread*> ToTerminate;
 CriticalSection ToTerminate_CS;
@@ -1379,7 +1381,7 @@ void MediaInfo_Internal::Entry()
             #endif //MEDIAINFO_NEXTPACKET
         }
     #endif //MEDIAINFO_FILE_YES
-    #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+    #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
         else if (Config.File_Names[0]==__T("-")
             #if defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
                 //&& WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 0) == WAIT_OBJECT_0 //Check if there is something is stdin
@@ -1431,7 +1433,7 @@ void MediaInfo_Internal::Entry()
             }
             Open_Buffer_Finalize();
         }
-    #endif //MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+    #endif //MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES) && !defined(WINDOWS_UWP) && !defined(__BORLANDC__)
 
     Config.State_Set(1);
 }
@@ -2019,16 +2021,19 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, size_t Par
                         EXECUTE_STRING(ToReturn, Debug+=__T("Get, will return "); Debug+=ToReturn;)
                 }
             }
+            size_t Format_Pos=File__Analyze::Fill_Parameter(StreamKind, Generic_Format);
             #if MEDIAINFO_ADVANCED
             if (Config.File_ChannelLayout_Get())
             #endif //MEDIAINFO_ADVANCED
             {
-                Ztring ToReturn=ChannelLayout_2018_Rename(StreamKind, Parameter, Stream[StreamKind][StreamPos], Stream[StreamKind][StreamPos][File__Analyze::Fill_Parameter(StreamKind, Generic_Format)], ShouldReturn);
+                Ztring ToReturn;
+                if (Format_Pos<Stream[StreamKind][StreamPos].size())
+                    ToReturn=ChannelLayout_2018_Rename(StreamKind, Parameter, Stream[StreamKind][StreamPos], Stream[StreamKind][StreamPos][Format_Pos], ShouldReturn);
                 if (ShouldReturn)
                     EXECUTE_STRING(ToReturn, Debug+=__T("Get, will return "); Debug += ToReturn;)
             }
-            if (Stream[StreamKind][StreamPos][Parameter].empty() && Parameter==File__Analyze::Fill_Parameter(StreamKind, Generic_Format_String))
-                EXECUTE_STRING(Stream[StreamKind][StreamPos][File__Analyze::Fill_Parameter(StreamKind, Generic_Format)], Debug += __T("Get, will return "); Debug+=ToReturn;)
+            if (Format_Pos<Stream[StreamKind][StreamPos].size() && Stream[StreamKind][StreamPos][Parameter].empty() && Parameter==File__Analyze::Fill_Parameter(StreamKind, Generic_Format_String))
+                EXECUTE_STRING(Stream[StreamKind][StreamPos][Format_Pos], Debug += __T("Get, will return "); Debug+=ToReturn;)
             EXECUTE_STRING(Stream[StreamKind][StreamPos][Parameter], Debug += __T("Get, will return "); Debug+=ToReturn;)
         }
         else
@@ -2040,8 +2045,11 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, size_t Par
         if (KindOfInfo==Info_Text && Config.File_ChannelLayout_Get())
         #endif //MEDIAINFO_ADVANCED
         {
+            size_t Format_Pos=File__Analyze::Fill_Parameter(StreamKind, Generic_Format);
+            Ztring ToReturn;
             bool ShouldReturn=false;
-            Ztring ToReturn=ChannelLayout_2018_Rename(StreamKind, Stream_More[StreamKind][StreamPos][Parameter-MediaInfoLib::Config.Info_Get(StreamKind).size()][Info_Name], Stream_More[StreamKind][StreamPos][Parameter-MediaInfoLib::Config.Info_Get(StreamKind).size()](KindOfInfo), Stream[StreamKind][StreamPos][File__Analyze::Fill_Parameter(StreamKind, Generic_Format)], ShouldReturn);
+            if (Format_Pos<Stream[StreamKind][StreamPos].size())
+                ToReturn=ChannelLayout_2018_Rename(StreamKind, Stream_More[StreamKind][StreamPos][Parameter-MediaInfoLib::Config.Info_Get(StreamKind).size()][Info_Name], Stream_More[StreamKind][StreamPos][Parameter-MediaInfoLib::Config.Info_Get(StreamKind).size()](KindOfInfo), Stream[StreamKind][StreamPos][Format_Pos], ShouldReturn);
             if (ShouldReturn)
                 EXECUTE_STRING(ToReturn, Debug+=__T("Get, will return ");Debug+=ToReturn;)
         }
@@ -2172,8 +2180,11 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, const Stri
         if (KindOfInfo==Info_Text && Config.File_ChannelLayout_Get())
         #endif //MEDIAINFO_ADVANCED
         {
+            size_t Format_Pos=File__Analyze::Fill_Parameter(StreamKind, Generic_Format);
+            Ztring ToReturn;
             bool ShouldReturn=false;
-            Ztring ToReturn=ChannelLayout_2018_Rename(StreamKind, Stream_More[StreamKind][StreamPos][ParameterI][Info_Name], Stream_More[StreamKind][StreamPos][ParameterI](KindOfInfo), Stream[StreamKind][StreamPos][File__Analyze::Fill_Parameter(StreamKind, Generic_Format)], ShouldReturn);
+            if (Format_Pos<Stream[StreamKind][StreamPos].size())
+                ToReturn=ChannelLayout_2018_Rename(StreamKind, Stream_More[StreamKind][StreamPos][ParameterI][Info_Name], Stream_More[StreamKind][StreamPos][ParameterI](KindOfInfo), Stream[StreamKind][StreamPos][Format_Pos], ShouldReturn);
             if (ShouldReturn)
                 EXECUTE_STRING(ToReturn, Debug+=__T("Get, will return ");Debug+=ToReturn;)
         }

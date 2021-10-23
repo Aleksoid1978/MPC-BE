@@ -2465,7 +2465,7 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
     bool Attachments_Demux=true;
 
     //Parsing
-    if ((Attachments_Demux || !CoverIsSetFromAttachment && CurrentAttachmentIsCover) && Element_Size<=16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
+    if ((Attachments_Demux || !CoverIsSetFromAttachment && CurrentAttachmentIsCover) && Element_TotalSize_Get()<=16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
     {
         if (!Element_IsComplete_Get())
         {
@@ -2519,9 +2519,7 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
         #endif //MEDIAINFO_EVENTS
     }
     
-    Element_Offset=Element_Size;
-
-    Element_ThisIsAList();
+    Element_Offset=Element_TotalSize_Get();
 }
 
 //---------------------------------------------------------------------------
@@ -4983,8 +4981,14 @@ void File_Mk::CRC32_Check ()
             const size_t Offset = Buffer_Offset + (size_t)((Element_WantNextLevel && Element_Offset <= Element_Size) ? Element_Offset : Element_Size);
             if (Element_Offset > Element_Size)
             {
-                CRC32Compute_SkipUpTo = File_Offset + Element_Offset;
+                if (Config->ParseSpeed<1)
+                {
+                    CRC32Compute.clear();
+                    break;
+                }
+                CRC32Compute_SkipUpTo = File_Offset + Buffer_Offset + Element_Offset;
                 Element_Offset = Element_Size;
+                Element_ThisIsAList(); // Fake for forcing the parser to be called for the whole stream
             }
             
             Matroska_CRC32_Compute(CRC32Compute[i].Computed, Buffer + Buffer_Offset - (size_t)Header_Size, Buffer + Offset);

@@ -34,6 +34,7 @@
  day1; день
  day2; дня
  day3; дней
+ dB0;
  dB1; дБ
  dB2; дБ
  dB3; дБ
@@ -117,6 +118,9 @@
  month1; месяц
  month2; месяца
  month3; месяцов
+ object1;
+ object2;
+ object3;
  pixel1; пиксель
  pixel2; пикселя
  pixel3; пикселей
@@ -153,9 +157,14 @@ ActiveFormatDescription;Описание активного формата
 ActiveFormatDescription_MuxingMode;Описание активного формата, режим смешивания
 Actor;Исполнитель
 Actor_Character;Роль
+Add creation date to text output;
+Add version to text output;
 Added_Date;Дата добавлениия
 Address;Адрес
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Дополнительно
 Advanced mode;Расширенный режим
 Album;Альбом
@@ -181,9 +190,12 @@ Audio1;Первый аудиопоток
 Audio2;Второй аудиопоток
 AudioComments;Голосовой комментарий
 AudioCount;Количество аудиопотоков
+AudioDescription;
 AudioDescriptionPresent;Наличие голосового описания
 AudioDescriptionType;Тип голосового описания
 AudioLoudnessStandard;Стандарт громкости аудио
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;Макет аудиодорожки
 Author;Автор
 BarCode;Штрих-код
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
 BufferSize;Размер буфера
 Cancel;Отмена
 Channel(s);Каналы
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Расположение каналов
 Chapter(s);Разделы
 Chapters;Разделы
@@ -225,6 +240,7 @@ Choose language;Выберите язык
 Choreographer;Хореограф
 Chroma;Цветность
 ChromaSubsampling;Субдискретизация насыщенности
+Classifier;
 ClearList;
 Close;Закрыть
 Close all before open;Закрывать всё перед открытием новых файлов
@@ -294,12 +310,17 @@ Date;Дата
 Debug;Отладка
 Decimal point;Десятичная точка
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Задержка
 Delay_Source;Задержка в оригинале
 Delay_Source_Container;Контейнер
 Delay_Source_Stream;'Сырой' поток
 Delete;Удалить
 Description;Описание
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Дата оцифровки
 Dimensions;Размеры
 Director;Режиссёр
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;Соотношение сторон диспл�
 DisplayAspectRatio_Original;Соотношение сторон в оригинале
 DistributedBy;Распространитель
 Distributor;Распространитель
+DolbyAtmos;
 Donate;Сделать пожертвование
 DotsPerInch;Точек на дюйм
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Продолжительность
 Duration_End;Время окончания
 Duration_Start;Время начала
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Править
 EditedBy;Изменено
+EditorialClassification;
 ElementCount;
 EMail;Почта
 Encoded_Application;Программа кодирования
@@ -352,6 +378,7 @@ FileExtension;Расширение
 FileName;Имя файла
 FileNameExtension;
 FileSize;Размер файла
+FlatPanelTv;
 Folder;Папка
 Folder (R);Папка (R)
 Folder (R)_Hint;Выберите папку для обработки (со всеми вложенными папками)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Постоянный
 FrameRate_Mode_VFR;Переменный
 FrameRate_Nominal;Номинальная частота кадров
 FrameRate_Original;Частота кадров в оригинале
+FrameRate_Real;
 General;Общее
 Genre;Жанр
 Genre_000;
@@ -606,7 +634,10 @@ Gop_OpenClosed;GOP, открыто/закрыто
 Gop_OpenClosed_Closed;Закрыто
 Gop_OpenClosed_FirstFrame;GOP, открыто/закрыто на первом кадре
 Gop_OpenClosed_Open;Открыто
+Graph;
+Group;
 Grouping;Группирование
+GroupPreset;
 h; ч.
 HDR_Format;
 Header file;Создать заголовок
@@ -615,6 +646,7 @@ Height_CleanAperture;Высота апертуры
 Height_Original;Высота оригинала
 Help;Помощь
 Hint;Подсказка
+HomeTheaterAvr;
 How many audio streams?;Сколько аудиопотоков?
 How many chapters streams?;Сколько потоков разделов?
 How many text streams?;Сколько текстовых потоков?
@@ -622,12 +654,17 @@ How many video streams?;Сколько видеопотоков?
 HTML;HTML
 ID;Идентификатор
 IdentClockStart;Начало идентификации
+IFrameInterval;
 Image;Изображения
 Image stream(s);Потоки изображений
 Image_Codec_List;Кодеки изображений
 ImageCount;Количество потоков изображений
+ImmersiveStereo;
 Info;Информация
 Instruments;Инструменты
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Нижнее поле первое
 Interlaced_Interlaced;Чересстрочная
 Interlaced_PPF;Прогрессивная
@@ -849,10 +886,24 @@ Language_zh-tw;
 Language_zu;
 LawRating;Ограничение по возрасту
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Библиотека смешивания
+Lifetime_Subscribe_Button;
 Lightness;Якрость
 LineUpStart;Начало построения
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Список
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Поэт-песенник
 Lyrics;Текст песен
 Mastered_Date;Дата мастеринга
@@ -883,6 +936,9 @@ matrix_coefficients;Коэффициенты матрицы
 Matrix_Format;Формат кодирования матрицы
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;Отображает детальную информацию\r\nо мультимедиа-файлах Matroska, OGG (включая OGM)\r\nMPEG1 (включая VCD), MPEG2 (включая DVD и SVCD), MPEG4 (включая iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включая WMV, WMA)\r\nMicrosoft RIFF (включая AVI, WAV, DivX)\r\nзвуковых форматах (AC3, DTS, SSC, AU, AIFF)
 MediaInfo_About_About;
 Menu;Меню
@@ -892,12 +948,14 @@ Menu_Hint;Дополнительные возможности
 Menu_No;Нет меню
 MenuCount;Количество потоков меню
 MenuID;Идентификатор меню
+MixType;
 mn; м.
 Mood;Настроение
 More;Ещё
 Movie;Название фильма
 ms; мс.
 MSDI;MSDI
+MultipleStream;
 MusicBy;Композитор
 MuxingMode;Режим смешивания
 MuxingMode_MoreInfo;Режим смешивания, доп. информация
@@ -912,8 +970,18 @@ NewVersion_Question_Content;Доступна новая версия %Version%, 
 NewVersion_Question_Title;Выпущена новая версия!
 No;Нет
 Not yet;Ещё нет
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Количество цветов
+ObjectCount;
 OK;OK
 One output file per input file;Новый файл для каждого исходного
 Open;Открыть
@@ -981,6 +1049,8 @@ PartNumber;Номер части
 PartTotal;Всего частей
 Performer;Исполнитель
 Period;Период
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Телефон
 PictureRatio;Изображение радио
 PixelAspectRatio;Пропорции пикселя
@@ -992,11 +1062,23 @@ Played_First_Date;Первое воспроизведение
 Played_Last_Date;Последнее воспроизведение
 PlayTime;Длительность
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Положение
+Position_Cartesian;
+Position_Polar;
 Position_Total;Всего
 Preferences;Настройки
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;Основной язык аудио
 Producer;Продюсер
 ProductionDesigner;Художник-постановщик
@@ -1011,15 +1093,18 @@ Purchased_Date;Дата покупки
 Quote character;Символ кавычек
 RadioStation;Радиостанция
 Rating;Оценка
+RealtimeLoudnessCorrected;
 Recorded_Date;Дата записи
 Recorded_Location;Место записи
 Released_Date;Дата выпуска
 RemixedBy;Ремикс выполнил
+RenderMode;
 Renew;
 ReplayGain_Gain;Нормализатор звука
 ReplayGain_Peak;Пик нормализатор звука
 Report;
 Resolution;Разрешение
+RestoreLifetimeSubscription;
 s; с.
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;Название прокладки
 ShimVersion;Версия прокладки
 Show menu;Показывать меню
 Show toolbar;Показывать панель
+SignalGroup;
 SigningPresent;Наличие подписи
 SignLanguage;Язык подписи
 Sort;Сортировать по
+SoundCategory;
 SoundEngineer;Звукорежиссёр
 Source;Оригинал
 Source_Duration;Продолжительность оригинала
@@ -1071,6 +1158,7 @@ Source_FrameCount;Количество кадров оригинала
 Source_SamplingCount;Количество примеров оригинала
 Source_StreamSize;Размер потока оригинала
 Source_StreamSize_Encoded;Закодированный размер потока оригинала
+SpokenSubtitles;
 Standard;Стандарт вещания
 StoreMethod_InterleavedFields;Чередующиеся поля
 StoreMethod_SeparatedFields;Раздельные поля
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Подпоток
+SubtstreamIdChannel;
 Summary;Сводка
 Supported formats;Поддерживаемые форматы
 Supported?;Поддерживается?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Сводка
 SystemId;Идентификатор
 Tagged_Application;Пометившая программа
 Tagged_Date;Дата пометки
+TargetDeviceConfig;
 Technician;Техник
 TermsOfUse;Условия использования
 TertiaryAudioLanguage;Третий язык аудио
@@ -1150,6 +1244,7 @@ Tree & Text;Дерево и текст
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Тип
+TypeDefinition;
 UniqueID;Уникальный идентификатор
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;55
+ZZ_AutomaticLanguage_Percent;86

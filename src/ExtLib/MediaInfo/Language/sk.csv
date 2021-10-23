@@ -34,6 +34,7 @@
  day1; deň
  day2; dni
  day3; dní
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; mesiac
  month2; mesiace
  month3; mesiacov
+ object1;
+ object2;
+ object3;
  pixel1; pixel
  pixel2; pixelov
  pixel3; pixelov
@@ -153,9 +157,14 @@ ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Herec
 Actor_Character;Character played
+Add creation date to text output;
+Add version to text output;
 Added_Date;Dátum pridania
 Address;Adresa
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Pokročilé
 Advanced mode;Viac detailov
 Album;Album
@@ -181,9 +190,12 @@ Audio1;Prvý audio stream
 Audio2;Druhý audio stream
 AudioComments;
 AudioCount;Počet audio streamov
+AudioDescription;
 AudioDescriptionPresent;
 AudioDescriptionType;
 AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;
 Author;Autor
 BarCode;BarCode
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
 BufferSize;
 Cancel;Zrušiť
 Channel(s);Kanál(y)
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Channel positions
 Chapter(s);Kapitola(y)
 Chapters;Kapitoly
@@ -225,6 +240,7 @@ Choose language;Vybrať jazyk
 Choreographer;Choreograf
 Chroma;Chroma
 ChromaSubsampling;
+Classifier;
 ClearList;
 Close;Zatvoriť
 Close all before open;Zatvoriť všetko pred otvorením nového
@@ -294,12 +310,17 @@ Date;Dátum
 Debug;Pokročilé
 Decimal point;Decimal point
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Delay
 Delay_Source;
 Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Odstrániť
 Description;Popis
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Digitized date
 Dimensions;
 Director;Director
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Pôvodný pomer strán pre zobrazenie
 DistributedBy;Distribútor
 Distributor;
+DolbyAtmos;
 Donate;Zaslat finančný dar
 DotsPerInch;Bodov na palec
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Trvanie
 Duration_End;
 Duration_Start;
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Upraviť
 EditedBy;Upravil
+EditorialClassification;
 ElementCount;
 EMail;E-Mail
 Encoded_Application;Použitý software
@@ -352,6 +378,7 @@ FileExtension;Prípona súboru
 FileName;Názov súboru
 FileNameExtension;
 FileSize;Veľkosť súboru
+FlatPanelTv;
 Folder;Adresár
 Folder (R);Adresár (R)
 Folder (R)_Hint;Select a folder to study (with all folders recursively)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Konštantný
 FrameRate_Mode_VFR;Variabilný
 FrameRate_Nominal;Nominálna frekvencia snímok
 FrameRate_Original;Pôvodná frekvencia snímok
+FrameRate_Real;
 General;Hlavné parametre
 Genre;žáner
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
 Gop_OpenClosed_Open;
+Graph;
+Group;
 Grouping;
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Create a header file
@@ -615,6 +646,7 @@ Height_CleanAperture;
 Height_Original;Pôvodná výška
 Help;Pomocník
 Hint;
+HomeTheaterAvr;
 How many audio streams?;How many audio streams?
 How many chapters streams?;How many chapters streams?
 How many text streams?;How many text streams?
@@ -622,12 +654,17 @@ How many video streams?;How many video streams?
 HTML;HTML
 ID;ID
 IdentClockStart;
+IFrameInterval;
 Image;Obrázok
 Image stream(s);Image streams
 Image_Codec_List;Codecs Image
 ImageCount;Count of image streams
+ImmersiveStereo;
 Info;Info
 Instruments;Instruments
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Dolný riadok ako prvý
 Interlaced_Interlaced;Prekladané
 Interlaced_PPF;Progresívne
@@ -849,10 +886,24 @@ Language_zh-tw;Čínsky (Taiwan)
 Language_zu;Zulu
 LawRating;Law rating
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Muxing library
+Lifetime_Subscribe_Button;
 Lightness;
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Zoznam
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Textár
 Lyrics;Text
 Mastered_Date;Mastered date
@@ -883,6 +936,9 @@ matrix_coefficients;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;Menu
@@ -892,12 +948,14 @@ Menu_Hint;More possibilities
 Menu_No;Žiadne menu
 MenuCount;Count of menu streams
 MenuID;Označenie menu
+MixType;
 mn; min
 Mood;Mood
 More;Viac
 Movie;Názov filmu
 ms; ms
 MSDI;MSDI
+MultipleStream;
 MusicBy;Hudbu zložil
 MuxingMode;
 MuxingMode_MoreInfo;
@@ -912,8 +970,18 @@ NewVersion_Question_Content;K dispozícii je nová verzia (v%Version%), chcete s
 NewVersion_Question_Title;Bola vydaná nová verzia!
 No;Nie
 Not yet;Ešte nie
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;
+ObjectCount;
 OK;OK
 One output file per input file;One output file per input file
 Open;Otvoriť
@@ -981,6 +1049,8 @@ PartNumber;
 PartTotal;
 Performer;Umelec
 Period;Period
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Telefón
 PictureRatio;
 PixelAspectRatio;Pomer bodov
@@ -992,11 +1062,23 @@ Played_First_Date;Dátum prvého prehratia
 Played_Last_Date;Dátum posledného prehratia
 PlayTime;Hrací čas
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Pozícia
+Position_Cartesian;
+Position_Polar;
 Position_Total;Celkom
 Preferences;Predvoľby
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;
 Producer;Producent
 ProductionDesigner;ProductionDesigner
@@ -1011,15 +1093,18 @@ Purchased_Date;Dátum zakúpenia
 Quote character;Quote character
 RadioStation;Rozhlasová stanica
 Rating;Hodnotenie
+RealtimeLoudnessCorrected;
 Recorded_Date;Dátum nahrávania
 Recorded_Location;Lokalita nahrávania
 Released_Date;Dátum vydania
 RemixedBy;Remixoval/-a
+RenderMode;
 Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
 Report;
 Resolution;Rozlíšenie
+RestoreLifetimeSubscription;
 s; sek.
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;
 ShimVersion;
 Show menu;Zobraziť menu
 Show toolbar;Zobraziť nástrojovú lištu
+SignalGroup;
 SigningPresent;
 SignLanguage;
 Sort;Zoradiť podľa
+SoundCategory;
 SoundEngineer;Sound engineer
 Source;
 Source_Duration;
@@ -1071,6 +1158,7 @@ Source_FrameCount;
 Source_SamplingCount;
 Source_StreamSize;
 Source_StreamSize_Encoded;
+SpokenSubtitles;
 Standard;Štandard
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;SubTrack
+SubtstreamIdChannel;
 Summary;Summary
 Supported formats;Podporované formáty
 Supported?;Podporovaný?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;
 Tagged_Date;Tagged date
+TargetDeviceConfig;
 Technician;Technician
 TermsOfUse;Terms of use
 TertiaryAudioLanguage;
@@ -1150,6 +1244,7 @@ Tree & Text;Strom a text
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+TypeDefinition;
 UniqueID;
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;69
-ZZ_AutomaticLanguage_Percent;75
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;70

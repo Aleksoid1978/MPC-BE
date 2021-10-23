@@ -746,6 +746,12 @@
     <ClInclude Include="ThirdParty\tfsxml\tfsxml.h">
       <Filter>extra</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_DolbyAudioMetadata.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Iab.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1434,6 +1440,12 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\tfsxml\tfsxml.c">
       <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_DolbyAudioMetadata.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Iab.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -293,6 +293,7 @@ protected :
     {
         Caption_Present,
         Caption_ParityIssueAny,
+        PreviousFrameHasNoAudioSourceControl,
     };
     bitset<32> Captions_Flags;
     enum coherency

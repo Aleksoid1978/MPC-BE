@@ -2163,7 +2163,7 @@ bool File__Analyze::FileHeader_Manage()
     Element_Size=Buffer_Size-Buffer_Offset;
     Element_Begin1("File Header");
     FileHeader_Parse();
-    if (Element_Offset==0)
+    if (Element_Offset==0 && !Status[IsFinished])
         Element_DoNotShow();
     Element_End0();
     if (Status[IsFinished]) //Newest parsers set this bool if there is an error

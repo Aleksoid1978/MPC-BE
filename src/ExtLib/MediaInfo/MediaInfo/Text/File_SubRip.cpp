@@ -146,7 +146,8 @@ bool File_SubRip::FileHeader_Begin()
     List.Write(Temp);
     Temp = List.Read();
 
-    if (List(0, 0)==__T("WEBVTT FILE") || List(0, 0)==__T("WEBVTT"))
+    Ztring const& First=List(0, 0);
+    if (First.rfind(__T("WEBVTT"))==0 && (First.size()==6 || First[6]==' ' || First[6]=='\t'))
         IsVTT=true;
 
     if (!IsVTT)

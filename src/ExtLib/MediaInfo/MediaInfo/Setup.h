@@ -728,6 +728,9 @@
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_FLAC_NO) && !defined(MEDIAINFO_FLAC_YES)
     #define MEDIAINFO_FLAC_YES
 #endif
+#if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_IAB_NO) && !defined(MEDIAINFO_IAB_YES)
+    #define MEDIAINFO_IAB_YES
+#endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_IT_NO) && !defined(MEDIAINFO_IT_YES)
     #define MEDIAINFO_IT_YES
 #endif

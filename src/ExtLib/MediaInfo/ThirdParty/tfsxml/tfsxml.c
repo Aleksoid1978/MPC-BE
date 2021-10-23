@@ -31,6 +31,30 @@ int tfsxml_cmp_charp(tfsxml_string a, const char* b)
         return *a.buf; // a is longer than b
 }
 
+tfsxml_string tfsxml_str_charp(tfsxml_string a, const char* b)
+{
+    // iterate string to be scanned
+    for (; a.len; a.buf++, a.len--)
+    {
+        const char* buf = a.buf;
+        int len = a.len;
+        const char* bb = b;
+        // Compare char per char
+        for (; len && *bb; buf++, len--, bb++)
+        {
+            char c = *buf - *bb;
+            if (c)
+                break;
+        }
+        if (!len)
+        {
+            return a;
+        }
+    }
+    a.buf = NULL;
+    a.len = 0;
+    return a;
+}
 
 int tfsxml_init(tfsxml_string* priv, void *buf, int len)
 {

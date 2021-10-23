@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Mxf.h"
 #include "MediaInfo/Video/File_DolbyVisionMetadata.h"
+#include "MediaInfo/Audio/File_DolbyAudioMetadata.h"
 #if defined(MEDIAINFO_DVDIF_YES)
     #include "MediaInfo/Multiple/File_DvDif.h"
 #endif
@@ -52,6 +53,12 @@
 #endif
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
+#endif
+#if defined(MEDIAINFO_ADM_YES)
+    #include "MediaInfo/Audio/File_Adm.h"
+#endif
+#if defined(MEDIAINFO_IAB_YES)
+    #include "MediaInfo/Audio/File_Iab.h"
 #endif
 #if defined(MEDIAINFO_SMPTEST0337_YES)
     #include "MediaInfo/Audio/File_ChannelGrouping.h"
@@ -146,6 +153,7 @@ namespace Elements
 
     //                         03 - Locally Unique Identifiers
     //                           04 - ?
+    UUID(060E2B34, 0101010D, 01030408, 00000000, 0000, "", Application_08_BodySID, "")
     UUID(060E2B34, 0101010E, 0103040A, 00000000, 0000, "SMPTE ST 377-4", MCAChannelID, "MCA Channel ID")
 
     //                           07 - ?
@@ -365,6 +373,8 @@ namespace Elements
     UUID(060E2B34, 02530101, 0D010101, 01016C00, 0000, "SMPTE ST 377-4", SoundfieldGroupLabelSubDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016D00, 0000, "SMPTE ST 377-4", GroupOfSoundfieldGroupsLabelSubDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016E00, 0000, "SMPTE ST 381-3", AVCSubDescriptor, "AVC Sub-Descriptor")
+    UUID(060E2B34, 02530101, 0D010101, 01017B00, 0000, "SMPTE ST 207-201", IABEssenceDescriptor, "IAB Essence Descriptor")
+    UUID(060E2B34, 02530101, 0D010101, 01017C00, 0000, "SMPTE ST 207-201", IABSoundfieldLabelSubDescriptor, "IAB Soundfield Label SubDescriptor")
 
     //                           02 - MXF File Structure
     //                             01 - Version 1
@@ -405,6 +415,8 @@ namespace Elements
     //                           04 - ?
     //                             01 - ?
     UUID(060E2B34, 02530101, 0D010401, 01010100, 0000, "", DMScheme1, "")
+    UUID(060E2B34, 02530101, 0D010401, 04010100, 0000, "", Application04_01_04_01_01, "")
+    UUID(060E2B34, 02530101, 0D010401, 04020100, 0000, "", Application04_01_04_02_01, "")
 
     //                           05 - ?
     //                             09 - ?
@@ -707,6 +719,7 @@ static const char* Mxf_EssenceElement(const int128u EssenceElement)
                         case 0x04 : return "PCM"; //BWF
                         case 0x05 : return "MPEG Audio / AC-3";
                         case 0x0A : return "A-law";
+                        case 0x0D : return "IAB";
                         default   : return "Unknown stream";
                     }
         case 0x17 : //GC Data
@@ -770,6 +783,7 @@ static const char* Mxf_EssenceContainer(const int128u EssenceContainer)
                                                                                         case 0x11 : return "VC-3";
                                                                                         case 0x13 : return "Timed Text";
                                                                                         case 0x1C : return "ProRes";
+                                                                                        case 0x1D : return "IAB";
                                                                                         default   : return "";
                                                                                     }
                                                                         default   : return "";
@@ -917,6 +931,12 @@ static const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u 
                     switch (Code7)
                     {
                         case 0x01 : return "Frame";
+                        default   : return "";
+                    }
+        case 0x1D : //IAB
+                    switch (Code7)
+                    {
+                        case 0x01 : return "Clip";
                         default   : return "";
                     }
         default   : return "";
@@ -1115,6 +1135,17 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
                                                                         default   : return "";
                                                                     }
                                                          default   : return "";
+                                                    }
+                                         default   : return "";
+                                    }
+                        case 0x09 : //Dolby
+                                    switch (Code3)
+                                    {
+                                        case 0x06 :
+                                                    switch (Code4)
+                                                    {
+                                                        case 0x04 : return "IAB";
+                                                        default   : return "";
                                                     }
                                          default   : return "";
                                     }
@@ -2300,8 +2331,11 @@ File_Mxf::File_Mxf()
     #endif //defined(MEDIAINFO_ANCILLARY_YES)
 
     ExtraMetadata_Offset=(int64u)-1;
-    ExtraMetadata_SID=(int32u)-1;
     DolbyVisionMetadata=NULL;
+    DolbyAudioMetadata=NULL;
+    #if defined(MEDIAINFO_ADM_YES)
+        Adm=NULL;
+    #endif
 
     #if MEDIAINFO_DEMUX
         Demux_HeaderParsed=false;
@@ -2345,6 +2379,11 @@ File_Mxf::~File_Mxf()
         delete AcquisitionMetadata_Sony_E201_Lists[ i ];
 	
     AcquisitionMetadata_Sony_E201_Lists.clear();
+    delete DolbyVisionMetadata;
+    delete DolbyAudioMetadata;
+    #if defined(MEDIAINFO_ADM_YES)
+        delete Adm;
+    #endif
 }
 
 //***************************************************************************
@@ -2731,10 +2770,18 @@ void File_Mxf::Streams_Finish()
         }
     }
 
-    //Dolby Vision
+    //Metadata
     if (DolbyVisionMetadata)
-    {
         Merge(*DolbyVisionMetadata, Stream_Video, 0, 0);
+    if (DolbyAudioMetadata) //Before ADM for having content before all ADM stuff
+        Merge(*DolbyAudioMetadata, Stream_Audio, 0, 0);
+    if (Adm)
+        Merge(*Adm, Stream_Audio, 0, 0);
+    if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
+    {
+        Clear(Stream_Audio, 0, "AdmProfile");
+        Clear(Stream_Audio, 0, "AdmProfile_Format");
+        Clear(Stream_Audio, 0, "AdmProfile_Version");
     }
 }
 
@@ -6002,6 +6049,8 @@ void File_Mxf::Data_Parse()
     ELEMENT(SoundfieldGroupLabelSubDescriptor,                  "Soundfield Group Label Sub-Descriptor")
     ELEMENT(GroupOfSoundfieldGroupsLabelSubDescriptor,          "Group Of Soundfield Groups Label Sub-Descriptor")
     ELEMENT(AVCSubDescriptor,                                   "AVC Sub-Descriptor")
+    ELEMENT(IABEssenceDescriptor,                               "IAB Essence Descriptor")
+    ELEMENT(IABSoundfieldLabelSubDescriptor,                    "IAB Soundfield Label SubDescriptor")
     ELEMENT(OpenIncompleteHeaderPartition,                      "Open and Incomplete Header Partition Pack")
     ELEMENT(ClosedIncompleteHeaderPartition,                    "Closed and Incomplete Header Partition Pack")
     ELEMENT(OpenCompleteHeaderPartition,                        "Open and Complete Header Partition Pack")
@@ -6046,6 +6095,8 @@ void File_Mxf::Data_Parse()
     ELEMENT(AS11_AAF_Segmentation,                              "AS-11 segmentation metadata framework")
     ELEMENT(AS11_AAF_UKDPP,                                     "AS-11 UK DPP metadata framework")
     ELEMENT(DMScheme1,                                          "Descriptive Metadata Scheme 1") //SMPTE 380M
+    ELEMENT(Application04_01_04_01_01,                          "Application04_01_04_01_01")
+    ELEMENT(Application04_01_04_02_01,                          "Application04_01_04_02_01")
     ELEMENT(Application05_09_01,                                "Application05_09_01")
     ELEMENT(Dolby_PHDRMetadataTrackSubDescriptor,               "Dolby PHDRMetadataTrackSubDescriptor")
     ELEMENT(Omneon_010201010100,                                "Omneon .01.02.01.01.01.00")
@@ -6084,7 +6135,7 @@ void File_Mxf::Data_Parse()
                 if (SingleDescriptor->second.ByteRate==(int32u)-1)
                 {
                     std::map<std::string, Ztring>::const_iterator i=Descriptors.begin()->second.Infos.find("SamplingRate");
-                    if (i != SingleDescriptor->second.Infos.end())
+                    if (i != Descriptors.begin()->second.Infos.end())
                     {
                         int32u SamplingRate=i->second.To_int32u();
 
@@ -7453,7 +7504,7 @@ void File_Mxf::RandomIndexPack()
         FILLING_BEGIN();
             if (!RandomIndexPacks_AlreadyParsed && PartitionPack_AlreadyParsed.find(RandomIndexPack.ByteOffset)==PartitionPack_AlreadyParsed.end())
                 RandomIndexPacks.push_back(RandomIndexPack);
-            if (!RandomIndexPacks_AlreadyParsed && RandomIndexPack.BodySID==ExtraMetadata_SID)
+            if (!RandomIndexPacks_AlreadyParsed && ExtraMetadata_SID.find(RandomIndexPack.BodySID)!=ExtraMetadata_SID.end() && RandomIndexPack.ByteOffset<ExtraMetadata_Offset)
                 ExtraMetadata_Offset=RandomIndexPack.ByteOffset;
         FILLING_END();
     }
@@ -7716,15 +7767,107 @@ void File_Mxf::DMScheme1()
 
 //---------------------------------------------------------------------------
 //
-void File_Mxf::Application05_09_01()
+void File_Mxf::Application04_01_04_01_01()
+{
+    {
+        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
+        if (Primer_Value!=Primer_Values.end())
+        {
+            int32u Code_Compare1=Primer_Value->second.hi>>32;
+            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
+            int32u Code_Compare3=Primer_Value->second.lo>>32;
+            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
+            if(0);
+            ELEMENT_UUID(PrimaryExtendedSpokenLanguage,                 "Primary Extended Spoken Language")
+            ELEMENT_UUID(SecondaryExtendedSpokenLanguage,               "Secondary Extended Spoken Language")
+            ELEMENT_UUID(OriginalExtendedSpokenLanguage,                "Original Extended Spoken Language")
+            ELEMENT_UUID(SecondaryOriginalExtendedSpokenLanguage,       "Secondary Original Extended Spoken Language")
+        }
+    }
+
+    InterchangeObject();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::Application04_01_04_02_01()
+{
+    {
+        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
+        if (Primer_Value!=Primer_Values.end())
+        {
+            int32u Code_Compare1=Primer_Value->second.hi>>32;
+            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
+            int32u Code_Compare3=Primer_Value->second.lo>>32;
+            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
+            if(0);
+            ELEMENT_UUID(PrimaryExtendedSpokenLanguage,                 "Primary Extended Spoken Language")
+            ELEMENT_UUID(SecondaryExtendedSpokenLanguage,               "Secondary Extended Spoken Language")
+            ELEMENT_UUID(OriginalExtendedSpokenLanguage,                "Original Extended Spoken Language")
+            ELEMENT_UUID(SecondaryOriginalExtendedSpokenLanguage,       "Secondary Original Extended Spoken Language")
+            ELEMENT_UUID(Application_08_BodySID,                        "BodySID?")
+        }
+    }
+
+    InterchangeObject();
+}
+
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::Application_08_BodySID()
 {
     //Parsing
-    delete DolbyVisionMetadata;
-    DolbyVisionMetadata=new File_DolbyVisionMetadata;
-    Open_Buffer_Init(DolbyVisionMetadata);
-    Open_Buffer_Continue(DolbyVisionMetadata);
+    int32u Data;
+    Get_B4 (Data,                                               "Data"); Element_Info1(Data);
+
+    FILLING_BEGIN();
+         ExtraMetadata_SID.insert(Data);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::Application05_09_01()
+{
+    //Parsing - Dolby Vision Metadata
+    File_DolbyVisionMetadata* DolbyVisionMetadata_New=new File_DolbyVisionMetadata;
+    Open_Buffer_Init(DolbyVisionMetadata_New);
+    Open_Buffer_Continue(DolbyVisionMetadata_New);
+    if (DolbyVisionMetadata_New->Status[IsAccepted])
+    {
+        delete DolbyVisionMetadata;
+        DolbyVisionMetadata=DolbyVisionMetadata_New;
+    }
     Element_Offset=0;
+
+    //Parsing - ADM
+    #if defined(MEDIAINFO_ADM_YES)
+        File_Adm* Adm_New=new File_Adm;
+        Open_Buffer_Init(Adm_New);
+        Open_Buffer_Continue(Adm_New);
+        if (Adm_New->Status[IsAccepted])
+        {
+            delete Adm;
+            Adm=Adm_New;
+        }
+        Element_Offset=0;
+    #endif
+
+    //Parsing - Dolby Audio Metadata
+    File_DolbyAudioMetadata* DolbyAudioMetadata_New=new File_DolbyAudioMetadata;
+    DolbyAudioMetadata_New->IsXML=true;
+    Open_Buffer_Init(DolbyAudioMetadata_New);
+    Open_Buffer_Continue(DolbyAudioMetadata_New);
+    if (DolbyAudioMetadata_New->Status[IsAccepted])
+    {
+        delete DolbyAudioMetadata;
+        DolbyAudioMetadata=DolbyAudioMetadata_New;
+    }
+    Element_Offset=0;
+
     Skip_String(Element_Size,                                   "Data");
+    Element_Show();
 }
 
 //---------------------------------------------------------------------------
@@ -8138,6 +8281,26 @@ void File_Mxf::AVCSubDescriptor()
     //{
     //    default:
                 GenerationInterchangeObject();
+    //}
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::IABEssenceDescriptor()
+{
+    //switch(Code2)
+    //{
+    //    default:
+                GenericSoundEssenceDescriptor();
+    //}
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::IABSoundfieldLabelSubDescriptor()
+{
+    //switch(Code2)
+    //{
+    //    default:
+    MCALabelSubDescriptor();
     //}
 }
 
@@ -9933,8 +10096,11 @@ void File_Mxf::GenericSoundEssenceDescriptor_ChannelCount()
     Get_B4 (Value,                                              "Value"); Element_Info1(Value);
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].ChannelCount=Value;
-        Descriptor_Fill("Channel(s)", Ztring().From_Number(Value));
+        if (Value)
+        {
+            Descriptors[InstanceUID].ChannelCount=Value;
+            Descriptor_Fill("Channel(s)", Ztring().From_Number(Value));
+        }
     FILLING_END();
 }
 
@@ -13423,8 +13589,7 @@ void File_Mxf::Dolby_SimplePayloadSID()
     Get_B4 (Data,                                               "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (ExtraMetadata_SID==(int32u)-1)
-            ExtraMetadata_SID=Data;
+         ExtraMetadata_SID.insert(Data);
     FILLING_END();
 }
 
@@ -16433,6 +16598,7 @@ void File_Mxf::ChooseParser(const essences::iterator &Essence, const descriptors
                                                                                                         return ChooseParser_SmpteSt0337(Essence, Descriptor);
                                                                                                     else
                                                                                                         return ChooseParser_Mpega(Essence, Descriptor);
+                                                                                        case 0x0A : return ChooseParser_Iab(Essence, Descriptor);
                                                                                         case 0x1C : if (Descriptor->second.ChannelCount==1)
                                                                                                         return ChooseParser_ChannelGrouping(Essence, Descriptor); //Dolby E (in 2 mono streams)
                                                                                                     else
@@ -16803,6 +16969,10 @@ void File_Mxf::ChooseParser__Aaf_GC_Sound(const essences::iterator &Essence, con
         case 0x0A : //A-law, Custom wrapped
                     ChooseParser_Alaw(Essence, Descriptor);
                     Essences[Code_Compare4].Infos["Format_Settings_Wrapping"]=__T("Custom");
+                    break;
+        case 0x0D : //IAB
+                    ChooseParser_Iab(Essence, Descriptor);
+                    Essences[Code_Compare4].Infos["Format_Settings_Wrapping"]=__T("Clip");
                     break;
         default   : //Unknown
                     ;
@@ -17449,6 +17619,24 @@ void File_Mxf::ChooseParser_DolbyVisionFrameData(const essences::iterator &Essen
     Open_Buffer_Init(Parser);
     Parser->Stream_Prepare(Stream_Other);
     Parser->Fill(Stream_Other, 0, Other_Format, "Dolby Vision Metadata");
+    Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_Iab(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
+{
+    Essence->second.StreamKind=Stream_Audio;
+
+    //Filling
+    #if defined(MEDIAINFO_IAB_YES)
+        File_Iab* Parser=new File_Iab;
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Audio);
+        Parser->Fill(Stream_Audio, 0, Audio_Format, "IAB");
+    #endif
     Essence->second.Parsers.push_back(Parser);
 }
 

@@ -527,6 +527,7 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_1
     size_t                  BlockStatus_Count;
     const MediaInfo_int8u*  BlockStatus;
     MediaInfo_int32u        AbstBf;
+    MediaInfo_int32u        MoreFlags;
 };
 
 /*-------------------------------------------------------------------------*/

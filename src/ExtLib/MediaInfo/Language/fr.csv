@@ -34,6 +34,7 @@
  day1; jour
  day2; jours
  day3; jours
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; mois
  month2; mois
  month3; mois
+ object1;
+ object2;
+ object3;
  pixel1; pixel
  pixel2; pixels
  pixel3; pixels
@@ -153,11 +157,14 @@ ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Acteur
 Actor_Character;Personnage joué
+Add creation date to text output;
+Add version to text output;
 Added_Date;Date d'ajout
 Address;Adresse
-Add creation date to text output;Ajouter la date de creation à la sortie texte
-Add version to text output;Ajouter la version à la sortie texte
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Avancée
 Advanced mode;Mode Avancé
 Album;Album
@@ -183,9 +190,12 @@ Audio1;Première piste Audio
 Audio2;Deuxième piste Audio
 AudioComments;
 AudioCount;Nombre de pistes audio
+AudioDescription;
 AudioDescriptionPresent;
 AudioDescriptionType;
 AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;
 Author;Auteur / Réalisateur
 BarCode;Code-barre
@@ -208,7 +218,10 @@ Bits-(Pixel*Frame);Bits/(Pixel*Image)
 BufferSize;Taille du buffer
 Cancel;Annuler
 Channel(s);Canaux
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Position des cannaux
 Chapter(s);Chapitre(s)
 Chapters;Chapitres
@@ -227,6 +240,7 @@ Choose language;Choisissez la langue personnalisée
 Choreographer;Responsable de la chorégraphie
 Chroma;Chrominance
 ChromaSubsampling;Sous-échantillonnage de la chrominance
+Classifier;
 ClearList;Vider la liste
 Close;Fermer
 Close all before open;Tout fermer avant d'ouvrir
@@ -296,12 +310,17 @@ Date;Date
 Debug;Debug
 Decimal point;Point décimal
 Default_Setting;Par défaut
+DefaultTargetDeviceConfig;
 Delay;Délai
 Delay_Source;Délai, origine
 Delay_Source_Container;Conteneur
 Delay_Source_Stream;Flux brut
 Delete;Supprimer
 Description;Description
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Date de numérisation
 Dimensions;Dimensions
 Director;Réalisateur
@@ -312,15 +331,20 @@ DisplayAspectRatio_CleanAperture;Format à l'écran, Clean Aperture
 DisplayAspectRatio_Original;Format à l'écran d'origine
 DistributedBy;Distribué par
 Distributor;
+DolbyAtmos;
 Donate;Faire un don
 DotsPerInch;Point par pouce
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Durée
 Duration_End;Heure de fin
 Duration_Start;Heure de début
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Modifier
 EditedBy;Monté par
+EditorialClassification;
 ElementCount;
 EMail;E-mail
 Encoded_Application;Application utilisée
@@ -354,6 +378,7 @@ FileExtension;Extension du fichier
 FileName;Nom du fichier
 FileNameExtension;
 FileSize;Taille du fichier
+FlatPanelTv;
 Folder;Dossier
 Folder (R);Dossier (R)
 Folder (R)_Hint;Sélectionne un dossier à étudier (avec tous ses sous-dossiers)
@@ -409,6 +434,7 @@ FrameRate_Mode_CFR;Constant
 FrameRate_Mode_VFR;Variable
 FrameRate_Nominal;Images/s nominal
 FrameRate_Original;Images/s d'origine
+FrameRate_Real;
 General;Général
 Genre;Genre
 Genre_000;Blues
@@ -608,7 +634,10 @@ Gop_OpenClosed;GOP, ouvert/fermé
 Gop_OpenClosed_Closed;Fermé
 Gop_OpenClosed_FirstFrame;GOP, ouvert/fermé de la première imageGrouping
 Gop_OpenClosed_Open;Ouvert
+Graph;
+Group;
 Grouping;Groupement
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Créer un fichier Header
@@ -617,6 +646,7 @@ Height_CleanAperture;Hauteur, Clean Aperture
 Height_Original;Largeur originale
 Help;Aide
 Hint;Suggestion
+HomeTheaterAvr;
 How many audio streams?;Combien de flux audio?
 How many chapters streams?;Combien de flux chapitres?
 How many text streams?;Combien de flux texte?
@@ -624,12 +654,17 @@ How many video streams?;Combien de flux vidéo?
 HTML;HTML
 ID;ID
 IdentClockStart;
+IFrameInterval;
 Image;Image
 Image stream(s);Piste(s) image
 Image_Codec_List;Codecs Image
 ImageCount;Nombre de pistes image
+ImmersiveStereo;
 Info;Info
 Instruments;Instruments
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Ligne du bas d'abord
 Interlaced_Interlaced;Entrelacé
 Interlaced_PPF;Progressif
@@ -851,11 +886,24 @@ Language_zh-tw;Chinois (Taiwan)
 Language_zu;Zoulou
 LawRating;Classé
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Bibliotheque utilisée
 Lifetime_Subscribe_Button;S'abonner à vie pour %PRICE%
 Lightness;Luminosité
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Liste
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -874,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Parolier
 Lyrics;Paroles
 Mastered_Date;Date de création
@@ -886,6 +936,9 @@ matrix_coefficients;Coefficients de la matrice
 Matrix_Format;Encodage matriciel, format
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;MediaInfo fournit des informations techniques et les tags à propos de vos fichiers video et audio.\r\nExcepté l'interface graphique du Mac App Store, c'est un logiciel libre, ce qui signifie qu'il est gratuit pour l'utilisateur final et que les développeurs on la liberté de l'étudier, l'améliorer et le redistribuer (licence BSD)
 MediaInfo_About_About;MediaInfo v%MI_VERSION% basé sur MediaInfoLib v%MIL_VERSION%
 Menu;Menu
@@ -895,12 +948,14 @@ Menu_Hint;Plus de possibilités
 Menu_No;Pas de menu
 MenuCount;Nombre de pistes menu
 MenuID;ID de menu
+MixType;
 mn; min
 Mood;Humeur
 More;Plus
 Movie;Nom du film
 ms; ms
 MSDI;MSDI
+MultipleStream;
 MusicBy;Musique par
 MuxingMode;Type de muxing
 MuxingMode_MoreInfo;Type de muxing, plus d'info
@@ -915,8 +970,18 @@ NewVersion_Question_Content;Une nouvelle version (v%Version%) est disponible, so
 NewVersion_Question_Title;Une nouvelle version est sortie!
 No;Non
 Not yet;Pas encore
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Nombre de couleurs
+ObjectCount;
 OK;OK
 One output file per input file;Erreur de lecture du fichier
 Open;Ouvrir
@@ -984,6 +1049,8 @@ PartNumber;
 PartTotal;
 Performer;Interprète
 Period;Période
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Téléphone
 PictureRatio;
 PixelAspectRatio;Taille du pixel
@@ -995,11 +1062,23 @@ Played_First_Date;Première lecture
 Played_Last_Date;Dernière lecture
 PlayTime;Durée
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Position
+Position_Cartesian;
+Position_Polar;
 Position_Total;Total
 Preferences;Préférences
+PreferredDownmix;
 Premium;Premium
 Premium_Summary;Fonctionnalités pour les abonnés premium
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;
 Producer;Producteur
 ProductionDesigner;Directeur artistique
@@ -1014,10 +1093,12 @@ Purchased_Date;Date d'achat
 Quote character;Caractère de citation
 RadioStation;Station de radio
 Rating;Note
+RealtimeLoudnessCorrected;
 Recorded_Date;Date d'enregistrement
 Recorded_Location;Lieu d'enregistrement
 Released_Date;Date de première diffusion
 RemixedBy;Remixé par
+RenderMode;
 Renew;Renouveler
 ReplayGain_Gain;Gain en lecture
 ReplayGain_Peak;Crête de gain en lecture
@@ -1065,9 +1146,11 @@ ShimName;
 ShimVersion;
 Show menu;Montrer le menu
 Show toolbar;Montrer la barre d'outils
+SignalGroup;
 SigningPresent;
 SignLanguage;
 Sort;Trié par
+SoundCategory;
 SoundEngineer;Ingénieur du son
 Source;Source
 Source_Duration;Durée de la source duration
@@ -1075,6 +1158,7 @@ Source_FrameCount;Nombre d'images de la source
 Source_SamplingCount;Nombre d'échantillons de la source
 Source_StreamSize;Taille du flux source
 Source_StreamSize_Encoded;Taille du flux encodé source
+SpokenSubtitles;
 Standard;Norme
 StoreMethod_InterleavedFields;Trames entrelacées
 StoreMethod_SeparatedFields;Trames séparées
@@ -1107,15 +1191,20 @@ Subscription_Ended;Votre abonnement vient de se terminer.
 Subscription_Expired;Abonnement expiré depuis le %DATE%
 Subscription_Lifetime;Abonnement à vie detecté
 Subscription_Thanks;Abonnement détecté. Merci pour votre soutien !
+Substream;
 SubTrack;Sous-piste
+SubtstreamIdChannel;
 Summary;Résumé
 Supported formats;Formats supportés
 Supported?;Supporté?
 SupportUs;Soutenez-nous. Obtenez le thème sombre et d'autres fonctionnalités à venir.
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Synopsis
 SystemId;Id
 Tagged_Application;Application de marquage
 Tagged_Date;Date de marquage
+TargetDeviceConfig;
 Technician;Technicien
 TermsOfUse;Conditions d'utilisation
 TertiaryAudioLanguage;
@@ -1155,6 +1244,7 @@ Tree & Text;Arbre & Texte
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Type
+TypeDefinition;
 UniqueID;Identifiant unique
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1195,5 +1285,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;86
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;84

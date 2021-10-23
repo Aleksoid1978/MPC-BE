@@ -34,6 +34,7 @@
  day1; dia
  day2; dias
  day3; dias
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; mês
  month2; meses
  month3; meses
+ object1;
+ object2;
+ object3;
  pixel1; pixel
  pixel2; pixels
  pixel3; pixels
@@ -153,9 +157,14 @@ ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Ator
 Actor_Character;Personagem representado
+Add creation date to text output;
+Add version to text output;
 Added_Date;Data de adição
 Address;Endereço
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Avançado
 Advanced mode;Modo avançado
 Album;Álbum
@@ -181,9 +190,12 @@ Audio1;Primeira faixa de áudio
 Audio2;Segunda faixa de áudio
 AudioComments;
 AudioCount;Contagem das faixas de áudio
+AudioDescription;
 AudioDescriptionPresent;
 AudioDescriptionType;
 AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;
 Author;Autor
 BarCode;Código de barras
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Bits/(Pixels*Quadros)
 BufferSize;
 Cancel;Cancelar
 Channel(s);Nº de canais
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Posições dos canais
 Chapter(s);Capítulo(s)
 Chapters;Capítulos
@@ -225,6 +240,7 @@ Choose language;Escolha o idioma
 Choreographer;Coreógrafo
 Chroma;Saturação
 ChromaSubsampling;
+Classifier;
 ClearList;
 Close;Close
 Close all before open;Fechar tudo antes de abrir
@@ -294,12 +310,17 @@ Date;Data
 Debug;Depurar
 Decimal point;Ponto decimal
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Atraso
 Delay_Source;
 Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Excluir
 Description;Descrição
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Data de digitalização
 Dimensions;Dimensões
 Director;Diretor
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Proporção original da imagem
 DistributedBy;Distribuído por
 Distributor;
+DolbyAtmos;
 Donate;Doar
 DotsPerInch;Pontos por polegada
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Duração
 Duration_End;Tempo de finalização
 Duration_Start;Tempo de ínicio
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Editar
 EditedBy;Editado por
+EditorialClassification;
 ElementCount;
 EMail;E-Mail
 Encoded_Application;Programa usado
@@ -352,6 +378,7 @@ FileExtension;Extensão do arquivo
 FileName;Nome do arquivo
 FileNameExtension;
 FileSize;Tamanho do arquivo
+FlatPanelTv;
 Folder;Pasta
 Folder (R);Sub-pasta
 Folder (R)_Hint;Selecione uma pasta para examinar (incluíndo sub-pastas)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;TConstante
 FrameRate_Mode_VFR;Variável
 FrameRate_Nominal;Taxa de quadros nominal
 FrameRate_Original;Taxa de quadros original
+FrameRate_Real;
 General;Geral
 Genre;Gênero
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
 Gop_OpenClosed_Open;
+Graph;
+Group;
 Grouping;
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Criar um arquivo de cabeçalho
@@ -615,6 +646,7 @@ Height_CleanAperture;
 Height_Original;
 Help;Ajuda
 Hint;Dica
+HomeTheaterAvr;
 How many audio streams?;Quantas faixas de áudio?
 How many chapters streams?;Quantas faixas de capítulos?
 How many text streams?;Quantas faixas de texto?
@@ -622,12 +654,17 @@ How many video streams?;Quantas faixas de vídeo?
 HTML;HTML
 ID;ID
 IdentClockStart;
+IFrameInterval;
 Image;Imagem
 Image stream(s);Faixas de imagem
 Image_Codec_List;Codecs de Imagem
 ImageCount;Número de faixas de imagem
+ImmersiveStereo;
 Info;Informações
 Instruments;Instrumentos
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Primeiro a área inferior
 Interlaced_Interlaced;Entrelaçado
 Interlaced_PPF;Progressivo
@@ -849,10 +886,24 @@ Language_zh-tw;Chinês (Taiwan)
 Language_zu;Zulu
 LawRating;Classificação
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Biblioteca de multiplexão
+Lifetime_Subscribe_Button;
 Lightness;Iluminação
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Lista
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Compositor
 Lyrics;Letra
 Mastered_Date;Data de criação
@@ -883,6 +936,9 @@ matrix_coefficients;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;Proporciona informações detalhadas\r\nsobre um arquivo multimídia:\r\nMatroska, OGG (incluíndo OGM)\r\nMPEG1 (incluíndo VCD)\r\nMPEG2 (incluíndo DVD e SVCD)\r\nMPEG4 (incluíndo iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindows Media (incluíndo WMV, WMA)\r\nMicrosoft RIFF (incluíndo AVI, WAV)\r\nArquivos de som (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;Menu
@@ -892,12 +948,14 @@ Menu_Hint;Mais possibilidades
 Menu_No;Sem menu
 MenuCount;Número de faixas de menu
 MenuID;ID no Menu
+MixType;
 mn; min
 Mood;Descrição
 More;Mais
 Movie;Nome do Vídeo
 ms; ms
 MSDI;MSDI
+MultipleStream;
 MusicBy;Música de
 MuxingMode;Modo de Multiplexação
 MuxingMode_MoreInfo;Modo de multiplexação, mais informações
@@ -912,8 +970,18 @@ NewVersion_Question_Content;Uma nova verão (v%Version%) está disponível, gost
 NewVersion_Question_Title;Uma nova versão foi lançada!
 No;Não
 Not yet;Ainda não
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Número de cores
+ObjectCount;
 OK;OK
 One output file per input file;Um arquivo de saída por um de entrada
 Open;Abrir
@@ -981,6 +1049,8 @@ PartNumber;
 PartTotal;
 Performer;Intérprete
 Period;Período
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Telefone
 PictureRatio;
 PixelAspectRatio;Proporção de pixels
@@ -992,11 +1062,23 @@ Played_First_Date;Reproduzido pela primeira vez
 Played_Last_Date;Reproduzido pela última vez
 PlayTime;Duração
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Posição
+Position_Cartesian;
+Position_Polar;
 Position_Total;Total
 Preferences;Preferências
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;
 Producer;Produtor
 ProductionDesigner;Designer de Produção
@@ -1011,15 +1093,18 @@ Purchased_Date;Data de aquisição
 Quote character;Caracter Aspas
 RadioStation;Estação de Rádio
 Rating;Classificação
+RealtimeLoudnessCorrected;
 Recorded_Date;Data de gravação
 Recorded_Location;Local de gravação
 Released_Date;Data de lançamento
 RemixedBy;Remixado por
+RenderMode;
 Renew;
 ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Pico do replay gain
 Report;
 Resolution;Resolução
+RestoreLifetimeSubscription;
 s;s
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;
 ShimVersion;
 Show menu;Exibir menu
 Show toolbar;Exibir barra de ferramentas
+SignalGroup;
 SigningPresent;
 SignLanguage;
 Sort;Ordenado por
+SoundCategory;
 SoundEngineer;Engenheiro de som
 Source;
 Source_Duration;
@@ -1071,6 +1158,7 @@ Source_FrameCount;
 Source_SamplingCount;
 Source_StreamSize;
 Source_StreamSize_Encoded;
+SpokenSubtitles;
 Standard;Padrão
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Sub-Faixa
+SubtstreamIdChannel;
 Summary;Sumário
 Supported formats;Formatos suportados
 Supported?;Suportado?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Sinopse
 SystemId;Id
 Tagged_Application;Programa Alvo
 Tagged_Date;Data rotulada
+TargetDeviceConfig;
 Technician;Technician
 TermsOfUse;Termos de uso
 TertiaryAudioLanguage;
@@ -1150,6 +1244,7 @@ Tree & Text;Raiz & Texto
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+TypeDefinition;
 UniqueID;
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Local da escrita
 WrittenBy;Escrito por
 Yes;Sim
 Your system;Seu sistema
-ZZ_Automatic_Percent;78
-ZZ_AutomaticLanguage_Percent;82
+ZZ_Automatic_Percent;73
+ZZ_AutomaticLanguage_Percent;76

@@ -34,6 +34,7 @@
  day1; 天
  day2; 天
  day3; 天
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; 月
  month2; 月
  month3; 月
+ object1;
+ object2;
+ object3;
  pixel1; 像素
  pixel2; 像素
  pixel3; 像素
@@ -153,9 +157,14 @@ ActiveFormatDescription;活动图像标识符 (AFD)
 ActiveFormatDescription_MuxingMode;活动图像标识符 (AFD), 混流模式
 Actor;演员
 Actor_Character;饰演角色
+Add creation date to text output;
+Add version to text output;
 Added_Date;添加日期
 Address;地址
 AdID;广告 ID 标识符
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;高级
 Advanced mode;高级模式
 Album;专辑
@@ -181,9 +190,12 @@ Audio1;音频 1
 Audio2;音频 2
 AudioComments;音频注释
 AudioCount;音频流总数
+AudioDescription;
 AudioDescriptionPresent;含有音频说明
 AudioDescriptionType;音频说明类型
 AudioLoudnessStandard;音频响度标准
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;音轨格式
 Author;作者
 BarCode;条形码
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);数据密度 [码率/(像素*帧率)]
 BufferSize;缓冲大小
 Cancel;取消
 Channel(s);声道数
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;声道格式
+ChannelMode;
 ChannelPositions;声道位置
 Chapter(s);章节数
 Chapters;章节
@@ -225,6 +240,7 @@ Choose language;选择语言
 Choreographer;动作指导
 Chroma;色度
 ChromaSubsampling;色度抽样
+Classifier;
 ClearList;清除列表
 Close;关闭
 Close all before open;打开新文件前关闭其他文件
@@ -294,12 +310,17 @@ Date;日期
 Debug;调试
 Decimal point;小数点
 Default_Setting;系统默认
+DefaultTargetDeviceConfig;
 Delay;延迟
 Delay_Source;延迟来源
 Delay_Source_Container;容器
 Delay_Source_Stream;媒体流
 Delete;删除
 Description;说明
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;数字化日期
 Dimensions;尺寸
 Director;导演
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;干净光圈画面比例
 DisplayAspectRatio_Original;原始画面比例
 DistributedBy;发行商
 Distributor;发行商
+DolbyAtmos;
 Donate;赞助
 DotsPerInch;DPI
+Downmix;
 DrcSets_Count;DRC 组数
 DrcSets_Effects;DRC 效果类型
 Duration;时长
 Duration_End;结束时间
 Duration_Start;开始时间
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;编辑
 EditedBy;编辑者
+EditorialClassification;
 ElementCount;元素总数
 EMail;电子邮件
 Encoded_Application;编码程序
@@ -352,6 +378,7 @@ FileExtension;扩展名
 FileName;文件名
 FileNameExtension;文件名和扩展名
 FileSize;文件大小
+FlatPanelTv;
 Folder;文件夹
 Folder (R);文件夹 (R)
 Folder (R)_Hint;选择一个文件夹 (包含所有子文件夹)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;恒定帧率 (CFR)
 FrameRate_Mode_VFR;动态帧率 (VFR)
 FrameRate_Nominal;额定帧率
 FrameRate_Original;原始帧率
+FrameRate_Real;
 General;概览
 Genre;流派
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;GOP 开闭
 Gop_OpenClosed_Closed;封闭 (Closed)
 Gop_OpenClosed_FirstFrame;第一帧 GOP 开闭
 Gop_OpenClosed_Open;开放 (Open)
+Graph;
+Group;
 Grouping;分组
+GroupPreset;
 h; 时
 HDR_Format;HDR 格式
 Header file;创建头文件
@@ -615,6 +646,7 @@ Height_CleanAperture;干净光圈高度
 Height_Original;原始高度
 Help;帮助
 Hint;提示
+HomeTheaterAvr;
 How many audio streams?;有多少个音频流？
 How many chapters streams?;有多少个章节流？
 How many text streams?;有多少个字幕流？
@@ -622,12 +654,17 @@ How many video streams?;有多少个视频流？
 HTML;网页
 ID;ID
 IdentClockStart;报时画面起始点
+IFrameInterval;
 Image;图像
 Image stream(s);图像流
 Image_Codec_List;图像解码器
 ImageCount;图像流总数
+ImmersiveStereo;
 Info;信息
 Instruments;乐器
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;底场优先 (BFF)
 Interlaced_Interlaced;隔行扫描 (交错)
 Interlaced_PPF;逐行扫描 (连续)
@@ -849,10 +886,24 @@ Language_zh-tw;繁体中文 (Chinese, Taiwan)
 Language_zu;祖鲁语 (Zulu)
 LawRating;分级
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;混流函数库
+Lifetime_Subscribe_Button;
 Lightness;亮度
 LineUpStart;Line Up 起始点
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;列表
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;锚点响度
 Loudness_Anchor_Album;锚点响度 (专辑)
 Loudness_Count;响度信息数
@@ -871,6 +922,8 @@ Loudness_Range;响度范围
 Loudness_Range_Album;响度范围 (专辑)
 Loudness_RoomType;制作录音室类型
 Loudness_RoomType_Album;制作录音室类型 (专辑)
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;作词
 Lyrics;歌词
 Mastered_Date;母带制作日期
@@ -883,6 +936,9 @@ matrix_coefficients;矩阵系数
 Matrix_Format;矩阵编码, 格式
 MaxCLL;最大内容亮度 (CLL)
 MaxFALL;最大帧平均亮度 (FALL)
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;使用 MediaInfo 可以轻松读取音视频文件的编码和标签信息。\r\n本软件按 BSD 授权协议开源，用户可以免费使用，开发者也可以自由地学习、修改、重新发布本软件。（Mac App Store 图形界面除外）
 MediaInfo_About_About;MediaInfo v%MI_VERSION%，内置 MediaInfoLib v%MIL_VERSION%
 Menu;菜单
@@ -892,12 +948,14 @@ Menu_Hint;更多选择
 Menu_No;无菜单
 MenuCount;菜单流总数
 MenuID;菜单 ID
+MixType;
 mn; 分
 Mood;情绪
 More;更多
 Movie;电影名称
 ms; 毫秒
 MSDI;MSDI
+MultipleStream;
 MusicBy;音乐制作
 MuxingMode;混流模式
 MuxingMode_MoreInfo;混流模式详细信息
@@ -912,8 +970,18 @@ NewVersion_Question_Content;有新版本 (v%Version%)，要下载吗？
 NewVersion_Question_Title;新版本已发布！
 No;否
 Not yet;尚无
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;动态对象总数
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;色彩数量
+ObjectCount;
 OK;确定
 One output file per input file;一个输入文件对应一个输出文件
 Open;打开
@@ -981,6 +1049,8 @@ PartNumber;分段编号
 PartTotal;分段总数
 Performer;演员
 Period;时期
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;电话
 PictureRatio;画面比例
 PixelAspectRatio;像素宽高比
@@ -992,11 +1062,23 @@ Played_First_Date;首次播放时间
 Played_Last_Date;上次播放时间
 PlayTime;播放时长
 PodcastCategory;播客类别
+PortableHeadphones;
+PortableSpeakers;
 Position;位置
+Position_Cartesian;
+Position_Polar;
 Position_Total;总数
 Preferences;设置
+PreferredDownmix;
 Premium;高级版
 Premium_Summary;高级版订阅功能
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;主音频语言
 Producer;制片人
 ProductionDesigner;制作设计师
@@ -1011,15 +1093,18 @@ Purchased_Date;购买日期
 Quote character;引号
 RadioStation;广播电台
 Rating;分级
+RealtimeLoudnessCorrected;
 Recorded_Date;录制日期
 Recorded_Location;录制地点
 Released_Date;发行日期
 RemixedBy;混音者
+RenderMode;
 Renew;续订
 ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益峰值
 Report;报告
 Resolution;分辨率
+RestoreLifetimeSubscription;
 s; 秒
 SamplePeakLevel;采样峰值等级
 SamplePeakLevel_Album;采样峰值等级 (专辑)
@@ -1061,9 +1146,11 @@ ShimName;Shim 名称
 ShimVersion;Shim 版本
 Show menu;显示菜单
 Show toolbar;显示工具栏
+SignalGroup;
 SigningPresent;含有签名
 SignLanguage;签名语言
 Sort;排序
+SoundCategory;
 SoundEngineer;录音师
 Source;源
 Source_Duration;源, 时长
@@ -1071,6 +1158,7 @@ Source_FrameCount;源, 帧数
 Source_SamplingCount;源, 采样数
 Source_StreamSize;源, 流大小
 Source_StreamSize_Encoded;源, 编码后流大小
+SpokenSubtitles;
 Standard;标准
 StoreMethod_InterleavedFields;交错场
 StoreMethod_SeparatedFields;单独场
@@ -1101,16 +1189,22 @@ Subscription_Active;订阅有效期至 %DATE%
 Subscription_Android;%PRICE%/年（免费试用 3 天）
 Subscription_Ended;你的订购刚刚到期。
 Subscription_Expired;订购过期时间 %DATE%
+Subscription_Lifetime;
 Subscription_Thanks;已检测到订阅。感谢您的支持！
+Substream;
 SubTrack;副轨道
+SubtstreamIdChannel;
 Summary;摘要
 Supported formats;支持格式
 Supported?;是否支持
 SupportUs;请支持我们。不仅可以解锁深色主题，未来还有更多功能。
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;系统摘要
 SystemId;ID
 Tagged_Application;标记软件
 Tagged_Date;标记日期
+TargetDeviceConfig;
 Technician;技术员
 TermsOfUse;使用条款
 TertiaryAudioLanguage;第三音频语言
@@ -1150,6 +1244,7 @@ Tree & Text;树状图和文本
 TruePeakLevel;真实峰值等级
 TruePeakLevel_Album;真实峰值等级 (专辑)
 Type;类型
+TypeDefinition;
 UniqueID;特征 ID
 UniversalAdID;通用广告 ID
 UniversalAdID_Registry;通用广告 ID 登记处
@@ -1190,5 +1285,5 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;100
-ZZ_AutomaticLanguage_Percent;100
+ZZ_Automatic_Percent;92
+ZZ_AutomaticLanguage_Percent;92

@@ -285,33 +285,36 @@ void File_SmpteSt0337::Streams_Fill()
 
     for (size_t Pos=0; Pos<Count_Get(StreamKind_Last); Pos++)
     {
-        if (!IsSub && StreamKind_Last==Stream_Audio && Retrieve_Const(StreamKind_Last, Pos, "Format").empty())
+        if (!IsSub || Retrieve_Const(StreamKind_Last, Pos, "Metadata_MuxingMode").empty())
         {
-            Fill(Stream_Audio, Pos, Audio_Format, "PCM");
-            Fill(Stream_Audio, Pos, Audio_Channel_s_, 2);
+            if (!IsSub && StreamKind_Last==Stream_Audio && Retrieve_Const(StreamKind_Last, Pos, "Format").empty())
+            {
+                Fill(Stream_Audio, Pos, Audio_Format, "PCM");
+                Fill(Stream_Audio, Pos, Audio_Channel_s_, 2);
+            }
+            if (Endianness=='L' && Retrieve(StreamKind_Last, Pos, "Format_Settings_Endianness")==__T("Little"))
+                Endianness='B';
+            switch (Endianness)
+            {
+                case 'B' :
+                            Fill(StreamKind_Last, Pos, "Format_Settings", "Big");
+                            Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Big", Unlimited, true, true);
+                            break;
+                case 'L' :
+                            Fill(StreamKind_Last, Pos, "Format_Settings", "Little");
+                            Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Little", Unlimited, true, true);
+                            break;
+                default  : ;
+            }
+            Fill(StreamKind_Last, Pos, "Format_Settings_Mode", Container_Bits);
+            if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth)).empty())
+                Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Stream_Bits);
+            if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode))!=__T("CBR"))
+                Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
         }
-        if (Endianness=='L' && Retrieve(StreamKind_Last, Pos, "Format_Settings_Endianness")==__T("Little"))
-            Endianness='B';
-        switch (Endianness)
-        {
-            case 'B' :
-                        Fill(StreamKind_Last, Pos, "Format_Settings", "Big");
-                        Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Big", Unlimited, true, true);
-                        break;
-            case 'L' :
-                        Fill(StreamKind_Last, Pos, "Format_Settings", "Little");
-                        Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Little", Unlimited, true, true);
-                        break;
-            default  : ;
-        }
-        Fill(StreamKind_Last, Pos, "Format_Settings_Mode", Container_Bits);
-        if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth)).empty())
-            Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Stream_Bits);
 
         if (IsSub && Retrieve_Const(StreamKind_Last, Pos, "Metadata_MuxingMode").empty())
             Fill(StreamKind_Last, Pos, "MuxingMode", "SMPTE ST 337");
-        if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode))!=__T("CBR"))
-            Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
     }
 }
 
@@ -1248,6 +1251,7 @@ void File_SmpteSt0337::Data_Parse()
     int8u data_type_dependent;
     int8u* UncompressedData=NULL;
     size_t UncompressedData_Size=0;
+    string MuxingMode;
     Element_Begin1("Header");
         BS_Begin();
         Skip_S3(Stream_Bits,                                    "Pa");
@@ -1296,7 +1300,22 @@ void File_SmpteSt0337::Data_Parse()
                         Skip_S1(Stream_Bits-16,                 "reserved");
                     Element_End0();
                 }
-                if (Parser || data_stream_number || multiple_chunk_flag || format_type>1 || Track_ID || track_numbers)
+                MuxingMode=string("SMPTE ST 337 / SMPTE ST 2116");
+                if (!data_stream_number && !multiple_chunk_flag && !in_timeline_flag && format_type<=1)
+                {
+                    MuxingMode+=" Level ";
+                    MuxingMode+='A';
+                    if (format_type==1)
+                        MuxingMode+='X';
+                    if (track_numbers<10)
+                        MuxingMode+='1'+track_numbers;
+                    else
+                    {
+                        MuxingMode+='1';
+                        MuxingMode+='0'-10+track_numbers;
+                    }
+                }
+                if (Parser || data_stream_number || multiple_chunk_flag || in_timeline_flag || format_type>1 || Track_ID || track_numbers)
                 {
                     Skip_BS(Data_BS_Remain(),                   "Data (Unsupported)");
                 }
@@ -1459,7 +1478,6 @@ void File_SmpteSt0337::Data_Parse()
             case 32+1 : // ADM
                         #if defined(MEDIAINFO_ADM_YES)
                         {
-                        const char* const MuxingMode="SMPTE ST 337 / SMPTE ST 2116";
                         if (UncompressedData || Element_Offset<Element_Size)
                         {
                             Parser=new File_Adm();

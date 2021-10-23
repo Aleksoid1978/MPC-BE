@@ -34,6 +34,7 @@
  day1; dag
  day2; dagar
  day3; dagar
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; månad
  month2; månader
  month3; månader
+ object1;
+ object2;
+ object3;
  pixel1; pixel
  pixel2; pixlar
  pixel3; pixlar
@@ -153,9 +157,14 @@ ActiveFormatDescription;Aktiv formatbeskrivning
 ActiveFormatDescription_MuxingMode;Aktiv formatbeskrivning, mux-läge
 Actor;Skådespelare
 Actor_Character;Roll
+Add creation date to text output;
+Add version to text output;
 Added_Date;Tillagd
 Address;Adress
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Avancerat
 Advanced mode;Avancerat läge
 Album;Album
@@ -181,9 +190,12 @@ Audio1;Första ljudströmmen
 Audio2;Andra ljudströmmen
 AudioComments;Ljudkommentarer
 AudioCount;Antal ljudströmmar
+AudioDescription;
 AudioDescriptionPresent;Aktuell ljudbeskrivning
 AudioDescriptionType;Ljudbeskrivningstyp
 AudioLoudnessStandard;Ljudstyrkestandard
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;Ljudspårslayout
 Author;Författare
 BarCode;Streckkod
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
 BufferSize;Buffertstorlek
 Cancel;Avbryt
 Channel(s);Kanal(er)
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Kanalpositioner
 Chapter(s);Kapitel
 Chapters;Kapitel
@@ -225,6 +240,7 @@ Choose language;Välj önskat språk
 Choreographer;Koreograf
 Chroma;Kroma
 ChromaSubsampling;Kroma-delsampling
+Classifier;
 ClearList;
 Close;Stäng
 Close all before open;Stäng alla före öppna
@@ -294,12 +310,17 @@ Date;Datum
 Debug;Felsök
 Decimal point;Decimalpunkt
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Fördröjning
 Delay_Source;Fördröjning, orig.
 Delay_Source_Container;Behållare
 Delay_Source_Stream;Raw ström
 Delete;Tabort
 Description;Beskrivning
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Digitaliseringsdatum
 Dimensions;Dimensioner
 Director;Regissör
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Ursprungligt skärmbildförhållande
 DistributedBy;Distribuerad av
 Distributor;Distributör
+DolbyAtmos;
 Donate;Donera
 DotsPerInch;Punkter per inch
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Varaktighet
 Duration_End;Sluttid
 Duration_Start;Starttid
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Redigera
 EditedBy;Redigerad av
+EditorialClassification;
 ElementCount;
 EMail;E-post
 Encoded_Application;Skrivande program
@@ -352,6 +378,7 @@ FileExtension;Filändelse
 FileName;Filnamn
 FileNameExtension;
 FileSize;Filstorlek
+FlatPanelTv;
 Folder;Mapp
 Folder (R);Mapp (R)
 Folder (R)_Hint;Välj en mapp (med alla undermappar rekursivt)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Konstant
 FrameRate_Mode_VFR;Variabelt
 FrameRate_Nominal;Nominell bildfrekvens
 FrameRate_Original;Ursprunglig bildfrekvens
+FrameRate_Real;
 General;Allmänt
 Genre;Genre
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;GOP, Öppen/Stängd
 Gop_OpenClosed_Closed;Stängd
 Gop_OpenClosed_FirstFrame;GOP, Öppen/Stängd av första bildrutan
 Gop_OpenClosed_Open;Öppen
+Graph;
+Group;
 Grouping;Gruppering
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Skapa en header-fil
@@ -615,6 +646,7 @@ Height_CleanAperture;
 Height_Original;Ursprunglig höjd
 Help;Hjälp
 Hint;Tips
+HomeTheaterAvr;
 How many audio streams?;Hur många ljudströmmar?
 How many chapters streams?;Hur många kapitelströmmar
 How many text streams?;Hur många textströmmar
@@ -622,12 +654,17 @@ How many video streams?;Hur många videoströmmar
 HTML;HTML
 ID;ID
 IdentClockStart;
+IFrameInterval;
 Image;Bild
 Image stream(s);Bildströmmar
 Image_Codec_List;Bildcodecs
 ImageCount;Antal bildströmmar
+ImmersiveStereo;
 Info;Info
 Instruments;Instrument
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Bottenfält först
 Interlaced_Interlaced;Sammanflätning
 Interlaced_PPF;Progressiv
@@ -849,10 +886,24 @@ Language_zh-tw;Kinesiska (Taiwan)
 Language_zu;Zulu
 LawRating;Åldersgräns
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Muxningsbibliotek
+Lifetime_Subscribe_Button;
 Lightness;Ljus
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Lista
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Texter från
 Lyrics;Texter
 Mastered_Date;Master-datum
@@ -883,6 +936,9 @@ matrix_coefficients;Matriskoefficienter
 Matrix_Format;Matriskodning, format
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;MediaInfo tillhandahåller enkel tillgång till teknisk information, och tagginformation, om video- och ljudfiler.\r\nFörutom Mac App Stores grafiska användargränsnitt, är mjukvaran öppen källkod. Det innebär att den är kostnadsfri för slutanvändaren och att andra utvecklare tillåts studera, förbättra och återdistribuera programmet (BSD-licens).
 MediaInfo_About_About;
 Menu;Meny
@@ -892,12 +948,14 @@ Menu_Hint;Fler möjligheter
 Menu_No;Ingen meny
 MenuCount;Antal menyströmmar
 MenuID;Meny-ID
+MixType;
 mn; min
 Mood;Läge
 More;Mer
 Movie;Filmnamn
 ms; ms
 MSDI;MSDI
+MultipleStream;
 MusicBy;Musik av
 MuxingMode;Muxningsläge
 MuxingMode_MoreInfo;Muxningsläge, mer info
@@ -912,8 +970,18 @@ NewVersion_Question_Content;En ny version (v%Version%) finns tillgänglig. Vill 
 NewVersion_Question_Title;En ny version har släppts!
 No;Nej
 Not yet;Inte än
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Antal färger
+ObjectCount;
 OK;OK
 One output file per input file;En utdatafil per indatafil
 Open;Öppna
@@ -981,6 +1049,8 @@ PartNumber;Delnummer
 PartTotal;Antal delar
 Performer;Artist
 Period;Period
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Telefon
 PictureRatio;Bildförhållande
 PixelAspectRatio;Pixelförhållande
@@ -992,11 +1062,23 @@ Played_First_Date;Spelades först
 Played_Last_Date;Spelades senast
 PlayTime;Speltid
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Position
+Position_Cartesian;
+Position_Polar;
 Position_Total;Totalt
 Preferences;Inställningar
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;Primärt ljudspråk
 Producer;Producent
 ProductionDesigner;Produktionsdesigner
@@ -1011,15 +1093,18 @@ Purchased_Date;Inköpsdatum
 Quote character;Citationstecken
 RadioStation;Radiokanal
 Rating;Betyg
+RealtimeLoudnessCorrected;
 Recorded_Date;Inspelningsdatum
 Recorded_Location;Inspelningsort
 Released_Date;Publiceringsdatum
 RemixedBy;Remix av
+RenderMode;
 Renew;
 ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain peak
 Report;
 Resolution;Upplösning
+RestoreLifetimeSubscription;
 s; sek
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;Shim-namn
 ShimVersion;Shim-version
 Show menu;Visa meny
 Show toolbar;Visa verktygsfält
+SignalGroup;
 SigningPresent;Signaturer
 SignLanguage;Signaturspråk
 Sort;Sorterad av
+SoundCategory;
 SoundEngineer;Ljudingenjör
 Source;Källa
 Source_Duration;Källans varaktighet
@@ -1071,6 +1158,7 @@ Source_FrameCount;Källans bildfrekvens
 Source_SamplingCount;Källans samplingsfrekvens
 Source_StreamSize;Källans strömstorlek
 Source_StreamSize_Encoded;Källans kodade strömstorlek
+SpokenSubtitles;
 Standard;Standard
 StoreMethod_InterleavedFields;Interfolierade fält
 StoreMethod_SeparatedFields;Separerade fält
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Underspår
+SubtstreamIdChannel;
 Summary;Sammanfattning
 Supported formats;Format som stöds
 Supported?;Stöd?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Sammandrag
 SystemId;Id
 Tagged_Application;Taggningsprogram
 Tagged_Date;Taggingsdatum
+TargetDeviceConfig;
 Technician;Tekniker
 TermsOfUse;Användarvillkor
 TertiaryAudioLanguage;Tertiärt ljudspråk
@@ -1150,6 +1244,7 @@ Tree & Text;Träd & Text
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Typ
+TypeDefinition;
 UniqueID;Unikt ID
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;85
+ZZ_AutomaticLanguage_Percent;85

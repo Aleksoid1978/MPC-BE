@@ -33,6 +33,8 @@ class File_ChannelSplitting : public File_Pcm_Base
 {
 public :
     //In
+    Ztring  Codec;
+    int8u   Sign;
     int8u   BitDepth;
     int16u  SamplingRate;
     bool    Aligned;

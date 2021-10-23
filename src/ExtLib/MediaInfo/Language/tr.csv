@@ -34,6 +34,7 @@
  day1; gün
  day2; gün
  day3; gün
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; ay
  month2; ay
  month3; ay
+ object1;
+ object2;
+ object3;
  pixel1; piksel
  pixel2; piksel
  pixel3; piksel
@@ -153,9 +157,14 @@ ActiveFormatDescription;Etkin Biçim Açıklaması
 ActiveFormatDescription_MuxingMode;Etkin Biçim Açıklaması, Çoklama kipi
 Actor;Oyuncu
 Actor_Character;Oynayan karakter
+Add creation date to text output;
+Add version to text output;
 Added_Date;Eklenme tarihi
 Address;Adres
 AdID;Ad-ID tanımlayıcı
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Gelişmiş
 Advanced mode;Gelişmiş kip
 Album;Albüm
@@ -181,9 +190,12 @@ Audio1;Birinci seslendirme
 Audio2;İkinci seslendirme
 AudioComments;Ses Açıklamaları
 AudioCount;Ses sayısı
+AudioDescription;
 AudioDescriptionPresent;Ses Açıklaması Sunumu
 AudioDescriptionType;Ses Açıklaması Türü
 AudioLoudnessStandard;Ses Yüksekliği Standartı
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;Ses İzi Düzeni
 Author;Hazırlayan
 BarCode;BarKod
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Bit/(Piksel*Kare)
 BufferSize;Arabellek boyutu
 Cancel;İptal
 Channel(s);Kanal
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;Kanal düzeni
+ChannelMode;
 ChannelPositions;Kanal konumları
 Chapter(s);Bölüm
 Chapters;Bölüm
@@ -225,6 +240,7 @@ Choose language;İstediğiniz dili seçin
 Choreographer;Koreograf
 Chroma;Krom
 ChromaSubsampling;Krom altörnekleme
+Classifier;
 ClearList;
 Close;Kapat
 Close all before open;Açmadan önce tümünü kapat
@@ -294,12 +310,17 @@ Date;Tarih
 Debug;Hata Ayıklama
 Decimal point;Ondalık ayırıcı
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Gecikme
 Delay_Source;Gecikme, kaynağı
 Delay_Source_Container;Kapsayıcı
 Delay_Source_Stream;Ham akış
 Delete;Sil
 Description;Açıklama
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Sayısallaştırılmış tarih
 Dimensions;Boyutlar
 Director;Yönetmen
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;Temiz diyafram görüntüsü en-boy oranı
 DisplayAspectRatio_Original;Orijinal görüntü en-boy oranı
 DistributedBy;Dağıtan
 Distributor;Dağıtıcı
+DolbyAtmos;
 Donate;Bağış
 DotsPerInch;İnç başına nokta
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Süre
 Duration_End;Bitiş zamanı
 Duration_Start;Başlangıç zamanı
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Düzenle
 EditedBy;Düzenleyen
+EditorialClassification;
 ElementCount;Öğe sayısı
 EMail;E-Posta
 Encoded_Application;Yazma uygulaması
@@ -352,6 +378,7 @@ FileExtension;Dosya uzantısı
 FileName;Dosya adı
 FileNameExtension;Dosya adı uzantısı
 FileSize;Dosya boyutu
+FlatPanelTv;
 Folder;Klasör
 Folder (R);Klasör (R)
 Folder (R)_Hint;Çalışmak için klasör seç (yinelemeli tüm klasörler ile)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Sabit
 FrameRate_Mode_VFR;Değişken
 FrameRate_Nominal;Düşük kare hızı
 FrameRate_Original;Orijinal kare hızı
+FrameRate_Real;
 General;Genel
 Genre;Tarz
 Genre_000;Blues
@@ -606,7 +634,10 @@ Gop_OpenClosed;GOP, Açık/Kapalı
 Gop_OpenClosed_Closed;Kapalı
 Gop_OpenClosed_FirstFrame;GOP, Açık/İlk karede kapalı
 Gop_OpenClosed_Open;Açık
+Graph;
+Group;
 Grouping;Gruplama
+GroupPreset;
 h; s
 HDR_Format;HDR biçimi
 Header file;Üst bilgi dosyası oluştur
@@ -615,6 +646,7 @@ Height_CleanAperture;Temiz diyafram yüksekliği
 Height_Original;Orijinal yükseklik
 Help;Yardım
 Hint;İpucu
+HomeTheaterAvr;
 How many audio streams?;Kaç tane seslendirme akışı?
 How many chapters streams?;Kaç tane bölüm akışı?
 How many text streams?;Kaç tane yazı akışı?
@@ -622,12 +654,17 @@ How many video streams?;Kaç tane görüntü akışı?
 HTML;HTML
 ID;ID
 IdentClockStart;Tanım Saat Başlangıcı
+IFrameInterval;
 Image;Resim
 Image stream(s);Resim akışı
 Image_Codec_List;Kodek İmajı
 ImageCount;Resim akışları sayısı
+ImmersiveStereo;
 Info;Bilgi
 Instruments;Enstrüman
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;En Alt Alanın İlki
 Interlaced_Interlaced;Karışık
 Interlaced_PPF;Aşamalı
@@ -849,10 +886,24 @@ Language_zh-tw;Çince (Tayvan)
 Language_zu;Zulu
 LawRating;Kanun oranı
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Çoklama kütüphanesi
+Lifetime_Subscribe_Button;
 Lightness;Canlılık
 LineUpStart;Sıra Başlangıcı
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Liste
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Söz yazarı
 Lyrics;Şarkı Sözleri
 Mastered_Date;Elden geçirildiği tarihi
@@ -883,6 +936,9 @@ matrix_coefficients;Matriks katsayısı
 Matrix_Format;Martiks kodlama, biçim
 MaxCLL;En Fazla İçerik Işık Seviyesi
 MaxFALL;En Fazla Kare-Ortalama Işık Seviyesi
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;MediaInfo, görüntü ve ses dosyaları hakkında teknik ve etiket bilgilerine kolay erişim sağlar.\r\nMac App Store grafik kullanıcı arayüzü dışında, açık kaynak kodlu yazılımdır, bu da çalışma özgürlüğüne sahip, geliştirmek ve programı yeniden dağıtmak için (BSD lisansı) son kullanıcıya ve geliştiricilere ücretsiz olduğu anlamına gelir.
 MediaInfo_About_About;
 Menu;Menü
@@ -892,12 +948,14 @@ Menu_Hint;Daha fazla olasılık
 Menu_No;Menü yok
 MenuCount;Meni sayısı
 MenuID;Menü ID
+MixType;
 mn; dk
 Mood;Mizaç
 More;Daha
 Movie;Film adı
 ms; ms
 MSDI;MSDI
+MultipleStream;
 MusicBy;Müziği yapan
 MuxingMode;Çoklama kipi
 MuxingMode_MoreInfo;Çoklama kipi, daha fazla bilgi
@@ -912,8 +970,18 @@ NewVersion_Question_Content;Yeni sürüm (s%Version%) mevcut, indirmek ister mis
 NewVersion_Question_Title;Yeni bir sürüm yayımlandı!
 No;Hayır
 Not yet;Henüz yok
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;Değişken nesneler sayısı
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Renk sayısı
+ObjectCount;
 OK;TAMAM
 One output file per input file;Girdi dosyası başına bir çıktı dosyası
 Open;Aç
@@ -981,6 +1049,8 @@ PartNumber;Parça Numarası
 PartTotal;Parça Toplamı
 Performer;Sanatçı
 Period;Dönem
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Telefon
 PictureRatio;Resim Oranı
 PixelAspectRatio;Piksel en-boy oranı
@@ -992,11 +1062,23 @@ Played_First_Date;İlk oynatma
 Played_Last_Date;Son oynatma
 PlayTime;Oynatma Süresi
 PodcastCategory;Podcast kategorisi
+PortableHeadphones;
+PortableSpeakers;
 Position;Konum
+Position_Cartesian;
+Position_Polar;
 Position_Total;Toplam
 Preferences;Tercihler
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;Birincil Ses Dili
 Producer;Yapımcı
 ProductionDesigner;Üretim tasarımcısı
@@ -1011,15 +1093,18 @@ Purchased_Date;satın alma tarihi
 Quote character;Alıntı bölümü
 RadioStation;Radyo istasyonu
 Rating;İzlenme oranı
+RealtimeLoudnessCorrected;
 Recorded_Date;Kaydedildiği tarih
 Recorded_Location;Kaydedildiği yer
 Released_Date;Yayım tarihi
 RemixedBy;Remiksleyen
+RenderMode;
 Renew;
 ReplayGain_Gain;Tekrar oynatma kazancı
 ReplayGain_Peak;Tekrar oynatma kazancı ucu
 Report;
 Resolution;Çözünürlük
+RestoreLifetimeSubscription;
 s; s
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;Dolgu Adı
 ShimVersion;Dolgu Sürümü
 Show menu;Menüyü göster
 Show toolbar;Araç çubuğunu göster
+SignalGroup;
 SigningPresent;İşaretle Sunum
 SignLanguage;İşaret Dili
 Sort;Sıralayan
+SoundCategory;
 SoundEngineer;Ses teknisyeni
 Source;Kaynak
 Source_Duration;Kaynak süresi
@@ -1071,6 +1158,7 @@ Source_FrameCount;Kaynak kare sayısı
 Source_SamplingCount;Kaynak örnek sayısı
 Source_StreamSize;Kaynak akış boyutu
 Source_StreamSize_Encoded;Kaynak kodlanmış akış boyutu
+SpokenSubtitles;
 Standard;Standart
 StoreMethod_InterleavedFields;Boşluklu alanlar
 StoreMethod_SeparatedFields;Ayrılmış alanlar
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Altİz
+SubtstreamIdChannel;
 Summary;Özet
 Supported formats;Desteklenen biçimler
 Supported?;Desteklenen mi?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Özet
 SystemId;Id
 Tagged_Application;Etiketleme uygulaması
 Tagged_Date;Etiketleme tarihi
+TargetDeviceConfig;
 Technician;Teknisyen
 TermsOfUse;Kullanım şarları
 TertiaryAudioLanguage;Üçüncül Ses Dili
@@ -1150,6 +1244,7 @@ Tree & Text;Ağaç ve Metin
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Tür
+TypeDefinition;
 UniqueID;Benzersiz ID
 UniversalAdID;Evrensel Ad ID
 UniversalAdID_Registry;Evrensel Ad ID kayıt defteri
@@ -1190,5 +1285,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;95
-ZZ_AutomaticLanguage_Percent;95
+ZZ_Automatic_Percent;88
+ZZ_AutomaticLanguage_Percent;88

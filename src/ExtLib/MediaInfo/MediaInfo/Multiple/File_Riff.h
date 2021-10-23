@@ -26,6 +26,9 @@
 namespace MediaInfoLib
 {
 
+class File_Adm;
+class File_DolbyAudioMetadata;
+
 //***************************************************************************
 // Class File_Riff
 //***************************************************************************
@@ -137,6 +140,10 @@ private :
     Ztring Tdat_tc_A;
     Ztring Tdat_tc_O;
     ZtringList MD5s;
+    File_DolbyAudioMetadata* DolbyAudioMetadata;
+    #if defined(MEDIAINFO_ADM_YES)
+    File_Adm* Adm;
+    #endif
     int64u WAVE_data_Size;  //RF64 WAVE_data real chunk size
     int64u WAVE_fact_samplesCount;  //RF64 WAVE_fact real samplesCount
     int64u Alignement_ExtraByte; //Padding from the container
@@ -157,7 +164,6 @@ private :
     int32u SamplesPerSec;   //For bext
     int16u BitsPerSample;   //For PCM only
     int8u  stream_Count;    //How many stream we have to parse
-    int8u  AdmProfile_Dolby;
     bool   rec__Present;    //True if synchro element is present
     bool   NeedOldIndex;
     bool   IsBigEndian;

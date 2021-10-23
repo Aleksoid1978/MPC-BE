@@ -4,15 +4,9 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// Information about ADM files
-//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_AdmH
-#define MediaInfo_File_AdmH
+#ifndef MediaInfo_IabH
+#define MediaInfo_IabH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -22,31 +16,42 @@
 namespace MediaInfoLib
 {
 
-class file_adm_private;
-
 //***************************************************************************
-// Class File_Adm
+// Class File_Iab
 //***************************************************************************
 
-class File_Adm : public File__Analyze
+class File_Iab : public File__Analyze
 {
 public :
     //In
-    string MuxingMode;
-
+    int64u Frame_Count_Valid;
     //Constructor/Destructor
-    File_Adm();
-    ~File_Adm();
+    File_Iab();
+    ~File_Iab();
 
 private :
-    //Buffer - File header
-    bool FileHeader_Begin();
+    //Streams management
+    void Streams_Fill();
+
+    //Buffer - Per element
+    void Header_Parse();
+    void Data_Parse();
+
+    //Elements
+    void FrameHeader();
+    void BedDefinition();
+    void BedRemap();
 
     //Temp
-    file_adm_private* File_Adm_Private;
+    int8u Version;
+    int8u SampleRate;
+    int8u BitDepth;
+    int8u FrameRate;
+
+    //Helpers
+    void Get_Flex8(int32u& Info, const char* Name);
 };
 
 } //NameSpace
 
 #endif
-

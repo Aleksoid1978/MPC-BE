@@ -22,6 +22,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Riff.h"
+#include "MediaInfo/Audio/File_DolbyAudioMetadata.h"
 #if defined(MEDIAINFO_MPEG4V_YES)
     #include "MediaInfo/Video/File_Mpeg4v.h"
 #endif
@@ -30,6 +31,9 @@
 #endif
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
+#endif
+#if defined(MEDIAINFO_ADM_YES)
+    #include "MediaInfo/Audio/File_Adm.h"
 #endif
 #if defined(MEDIAINFO_DTS_YES)
     #include "MediaInfo/Audio/File_Dts.h"
@@ -40,6 +44,7 @@
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
 #endif //MEDIAINFO_EVENTS
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if defined(MEDIAINFO_FILE_YES)
 #include <ZenLib/File.h>
 #endif //defined(MEDIAINFO_FILE_YES)
@@ -105,6 +110,10 @@ File_Riff::File_Riff()
     Interleaved1_10=0;
 
     //Temp
+    DolbyAudioMetadata=NULL;
+    #if defined(MEDIAINFO_ADM_YES)
+        Adm=NULL;
+    #endif
     WAVE_data_Size=(int64u)-1;
     WAVE_fact_samplesCount=(int64u)-1;
     Buffer_DataToParse_Begin=(int64u)-1;
@@ -121,7 +130,6 @@ File_Riff::File_Riff()
     SMV_BlockSize=0;
     SamplesPerSec=0;
     stream_Count=0;
-    AdmProfile_Dolby=0;
     BlockAlign=0;
     rec__Present=false;
     NeedOldIndex=true;
@@ -148,6 +156,10 @@ File_Riff::~File_Riff()
     #ifdef MEDIAINFO_DVDIF_YES
         delete (File_DvDif*)DV_FromHeader; //DV_FromHeader=NULL
     #endif //MEDIAINFO_DVDIF_YES
+    delete DolbyAudioMetadata;
+    #if defined(MEDIAINFO_ADM_YES)
+        delete Adm;
+    #endif
 }
 
 //***************************************************************************
@@ -178,16 +190,15 @@ void File_Riff::Streams_Finish ()
     //Global
     if (IsRIFF64)
         Fill(Stream_General, 0, General_Format_Profile, "RF64");
-    if ((AdmProfile_Dolby&3)==3)
+    if (DolbyAudioMetadata) //Before ADM for having content before all ADM stuff
+        Merge(*DolbyAudioMetadata, Stream_Audio, 0, 0);
+    if (Adm)
+        Merge(*Adm, Stream_Audio, 0, 0);
+    if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
     {
-        Fill(Stream_Audio, 0, "AdmProfile", (AdmProfile_Dolby&4)?"Dolby Atmos Master, Version 1":"Dolby Atmos Master");
-        Fill(Stream_Audio, 0, "AdmProfile_Format", "Dolby Atmos Master");
-        Fill_SetOptions(Stream_Audio, 0, "AdmProfile_Format", "N NTY");
-        if (AdmProfile_Dolby&4)
-        {
-            Fill(Stream_Audio, 0, "AdmProfile_Version", "1");
-            Fill_SetOptions(Stream_Audio, 0, "AdmProfile_Version", "N NTY");
-        }
+        Clear(Stream_Audio, 0, "AdmProfile");
+        Clear(Stream_Audio, 0, "AdmProfile_Format");
+        Clear(Stream_Audio, 0, "AdmProfile_Version");
     }
 
     //Time codes

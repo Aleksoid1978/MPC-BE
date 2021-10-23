@@ -6,44 +6,46 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about ADM files
+// Information about Dolby Audio Metadata files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_AdmH
-#define MediaInfo_File_AdmH
+#ifndef MediaInfo_File_DolbyAudioMetadataH
+#define MediaInfo_File_DolbyAudioMetadataH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/File__HasReferences.h"
+#include "MediaInfo/Multiple/File_DcpPkl.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class file_adm_private;
-
 //***************************************************************************
-// Class File_Adm
+// Class File_DolbyAudioMetadata
 //***************************************************************************
 
-class File_Adm : public File__Analyze
+class File_DolbyAudioMetadata : public File__Analyze, File__HasReferences
 {
-public :
+public:
     //In
-    string MuxingMode;
+    bool IsXML;
+    
+    //Out
+    bool HasSegment9;
 
     //Constructor/Destructor
-    File_Adm();
-    ~File_Adm();
+    File_DolbyAudioMetadata();
 
 private :
     //Buffer - File header
     bool FileHeader_Begin();
 
-    //Temp
-    file_adm_private* File_Adm_Private;
+    //Buffer - Global
+    void Read_Buffer_Continue();
 };
 
 } //NameSpace

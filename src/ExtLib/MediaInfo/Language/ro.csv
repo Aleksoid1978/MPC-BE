@@ -34,6 +34,7 @@
  day1;zi
  day2;zile
  day3;zile
+ dB0;
  dB1;
  dB2;
  dB3;
@@ -117,6 +118,9 @@
  month1;luna
  month2;luni
  month3;luni
+ object1;
+ object2;
+ object3;
  pixel1;pixel
  pixel2;pixeli
  pixel3;pixeli
@@ -153,9 +157,14 @@ ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Actor
 Actor_Character;Personaj
+Add creation date to text output;
+Add version to text output;
 Added_Date;
 Address;Adresa
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Avansat
 Advanced mode;Mod avansat
 Album;Album
@@ -181,9 +190,12 @@ Audio1;Primul flux audio
 Audio2;Al doilea flux audia
 AudioComments;
 AudioCount;Numarul de fluxuri audio
+AudioDescription;
 AudioDescriptionPresent;
 AudioDescriptionType;
 AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;
 Author;Autor
 BarCode;Cod de bare
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);
 BufferSize;
 Cancel;Anulare
 Channel(s);Canal(e)
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Pozitia canalelor
 Chapter(s);Capitol(e)
 Chapters;Capitole
@@ -225,6 +240,7 @@ Choose language;Selectati limba dorita
 Choreographer;Coregraf
 Chroma;
 ChromaSubsampling;
+Classifier;
 ClearList;
 Close;Inchideti
 Close all before open;Inchideti tot inainte de a deschide
@@ -294,12 +310,17 @@ Date;Data
 Debug;Depanare
 Decimal point;Punct zecimal
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Intarziere
 Delay_Source;
 Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Sterge
 Description;Descriere
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Data digitizarii
 Dimensions;
 Director;Director
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
 DistributedBy;Distribuit de
 Distributor;
+DolbyAtmos;
 Donate;Donatii
 DotsPerInch;
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;
 Duration_End;
 Duration_Start;
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Editare
 EditedBy;Editat de
+EditorialClassification;
 ElementCount;
 EMail;E-mail
 Encoded_Application;Dezvoltator aplicatie
@@ -352,6 +378,7 @@ FileExtension;Extensia fisierului
 FileName;Numele fisierului
 FileNameExtension;
 FileSize;Dimensiunea fisierului
+FlatPanelTv;
 Folder;Director
 Folder (R);Director (R)
 Folder (R)_Hint;Selectati un director pentru analiza (cu toate subdirecoarele incluse)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;
 FrameRate_Mode_VFR;
 FrameRate_Nominal;
 FrameRate_Original;
+FrameRate_Real;
 General;Generale
 Genre;Gen
 Genre_000;
@@ -606,7 +634,10 @@ Gop_OpenClosed;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Grouping
 Gop_OpenClosed_Open;
+Graph;
+Group;
 Grouping;
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Generare header fisier
@@ -615,6 +646,7 @@ Height_CleanAperture;
 Height_Original;
 Help;Ajutor
 Hint;
+HomeTheaterAvr;
 How many audio streams?;Cate fluxuri audio?
 How many chapters streams?;Cate capitole?
 How many text streams?;Cate fluxuri text?
@@ -622,12 +654,17 @@ How many video streams?;Cate fluxuri video?
 HTML;HTML
 ID;ID
 IdentClockStart;
+IFrameInterval;
 Image;Imagine
 Image stream(s);Fluxuri imagine
 Image_Codec_List;Codecuri imagine
 ImageCount;Numarul de fluxuri imagine
+ImmersiveStereo;
 Info;
 Instruments;Instrumente
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;
 Interlaced_Interlaced;
 Interlaced_PPF;
@@ -849,10 +886,24 @@ Language_zh-tw;
 Language_zu;
 LawRating;
 LCCN;
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Biblioteca muxing
+Lifetime_Subscribe_Button;
 Lightness;
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Textier
 Lyrics;
 Mastered_Date;Data realizarii
@@ -883,6 +936,9 @@ matrix_coefficients;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;Furnizeaza informatii foarte detaliate\r\n despre un fisier multimedia
 MediaInfo_About_About;
 Menu;Meniu
@@ -892,12 +948,14 @@ Menu_Hint;Mai multe posibilitati
 Menu_No;
 MenuCount;
 MenuID;
+MixType;
 mn; min
 Mood;Mod
 More;Mai mult(e)
 Movie;Numele filmului
 ms; ms
 MSDI;
+MultipleStream;
 MusicBy;
 MuxingMode;
 MuxingMode_MoreInfo;
@@ -912,8 +970,18 @@ NewVersion_Question_Content;
 NewVersion_Question_Title;
 No;Nu
 Not yet;
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;
+ObjectCount;
 OK;OK
 One output file per input file;Un fisier destinatie pentru fiecare fisier sursa
 Open;Deschide
@@ -981,6 +1049,8 @@ PartNumber;
 PartTotal;
 Performer;Cantaret
 Period;Perioada
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Telefon
 PictureRatio;
 PixelAspectRatio;Dimensiune pixel
@@ -992,11 +1062,23 @@ Played_First_Date;
 Played_Last_Date;
 PlayTime;Durata redare
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Pozitie
+Position_Cartesian;
+Position_Polar;
 Position_Total;
 Preferences;Preferinte
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;
 Producer;Producator
 ProductionDesigner;Director productie
@@ -1011,15 +1093,18 @@ Purchased_Date;Data achizitionarii
 Quote character;Citate
 RadioStation;Statia radio
 Rating;Rating
+RealtimeLoudnessCorrected;
 Recorded_Date;Data inregistrarii
 Recorded_Location;Locul inregistrarii
 Released_Date;Data lansarii
 RemixedBy;Rearanjat de
+RenderMode;
 Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
 Report;
 Resolution;Rezolutie
+RestoreLifetimeSubscription;
 s;s
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;
 ShimVersion;
 Show menu;Afisare meniu
 Show toolbar;Afisare toolbar
+SignalGroup;
 SigningPresent;
 SignLanguage;
 Sort;Sortat de
+SoundCategory;
 SoundEngineer;Inginer de sunet
 Source;
 Source_Duration;
@@ -1071,6 +1158,7 @@ Source_FrameCount;
 Source_SamplingCount;
 Source_StreamSize;
 Source_StreamSize_Encoded;
+SpokenSubtitles;
 Standard;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Sub-pista
+SubtstreamIdChannel;
 Summary;Sumar
 Supported formats;Formate acceptate
 Supported?;Acceptat?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;
 SystemId;
 Tagged_Application;
 Tagged_Date;Data marcarii
+TargetDeviceConfig;
 Technician;Tehnician
 TermsOfUse;Condifiile de utilizare
 TertiaryAudioLanguage;
@@ -1150,6 +1244,7 @@ Tree & Text;Arbore si text
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+TypeDefinition;
 UniqueID;
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
-ZZ_Automatic_Percent;28
-ZZ_AutomaticLanguage_Percent;64
+ZZ_Automatic_Percent;26
+ZZ_AutomaticLanguage_Percent;59

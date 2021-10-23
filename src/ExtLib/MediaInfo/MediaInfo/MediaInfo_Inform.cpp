@@ -505,7 +505,6 @@ Ztring MediaInfo_Internal::Inform()
         {
             Retour=Ztring().From_UTF8(To_XML(*Node_Main, 0, false, false));
             delete Node_Main;
-            delete Node_MI;
         }
     #endif //MEDIAINFO_XML_YES
     #if defined(MEDIAINFO_JSON_YES)
@@ -521,7 +520,6 @@ Ztring MediaInfo_Internal::Inform()
             Retour+=Ztring().From_UTF8(To_JSON(*Node_Main, 0, false, false));
             Retour+=__T("\n}");
             delete Node_Main;
-            delete Node_MI;
         }
     #endif //MEDIAINFO_JSON_YES
 

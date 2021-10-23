@@ -1,16 +1,16 @@
   Language_ISO639;ja
-  Author_Email;nihongoka@gmail.com
-  Author_Name;だい( http://barca.daa.jp )
-  Author_OldNames;barlog
+  Author_Email;
+  Author_Name;だい(barlog), maboroshin(pc.genkaku.in)
+  Author_OldNames;だい(barlog http://barca.daa.jp nihongoka@gmail.com), maboroshin(genkaku.in)
   Language_Name;日本語
   Config_Text_ColumnSize;40
   Config_Text_Separator; : 
   Config_Text_NumberTag; #
   Config_Text_FloatSeparator;.
-  Config_Text_ThousandsSeparator; 
- audio stream1; オーディオストリーム
- audio stream2; オーディオストリーム
- audio stream3; オーディオストリーム
+  Config_Text_ThousandsSeparator;,
+ audio stream1; 個の音声ストリーム
+ audio stream2; 個の音声ストリーム
+ audio stream3; 個の音声ストリーム
  bit1; ビット
  bit2; ビット
  bit3; ビット
@@ -25,18 +25,19 @@
  chapter1; チャプター
  chapter2; チャプター
  chapter3; チャプター
- chapters stream1; チャプターストリーム
- chapters stream2; チャプターストリーム
- chapters stream3; チャプターストリーム
- character1;
- character2;
- character3;
+ chapters stream1; 個のチャプターストリーム
+ chapters stream2; 個のチャプターストリーム
+ chapters stream3; 個のチャプターストリーム
+ character1;文字
+ character2;文字
+ character3;文字
  day1; 日
  day2; 日
  day3; 日
- dB1; dB1
- dB2; dB2
- dB3; dB3
+ dB0;
+ dB1; dB
+ dB2; dB
+ dB3; dB
  file1; ファイル
  file2; ファイル
  file3; ファイル
@@ -48,8 +49,8 @@
  frame3; フレーム
  GB; GB
  Gb; Gb
- Gbps; Gbps
- GBps; GBps
+ Gbps; Gb/秒
+ GBps; GB/秒
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -66,9 +67,9 @@
  hour2; 時間
  hour3; 時間
  Hz; Hz
- image stream1; イメージストリーム
- image stream2; イメージストリーム
- image stream3; イメージストリーム
+ image stream1; 個の画像ストリーム
+ image stream2; 個の画像ストリーム
+ image stream3; 個の画像ストリーム
  KB; KB
  Kb; Kb
  KBps; KBps
@@ -117,21 +118,24 @@
  month1; 月
  month2; 月
  month3; 月
+ object1;
+ object2;
+ object3;
  pixel1; ピクセル
  pixel2; ピクセル
  pixel3; ピクセル
  second1; 秒
  second2; 秒
  second3; 秒
- text stream1; テキストストリーム
- text stream2; テキストストリーム
- text stream3; テキストストリーム
- video frames1; ビデオフレーム
- video frames2; ビデオフレーム
- video frames3; ビデオフレーム
- video stream1; ビデオストリーム
- video stream2; ビデオストリーム
- video stream3; ビデオストリーム
+ text stream1; 個の字幕ストリーム
+ text stream2; 個の字幕ストリーム
+ text stream3; 個の字幕ストリーム
+ video frames1; 個の映像フレーム
+ video frames2; 個の映像フレーム
+ video frames3; 個の映像フレーム
+ video stream1; 個の映像ストリーム
+ video stream2; 個の映像ストリーム
+ video stream3; 個の映像ストリーム
  warppoint0; ワープポイント
  warppoint1; ワープポイント
  warppoint2; ワープポイント
@@ -144,273 +148,297 @@
  year3; 年
 , ;, 
 : ;: 
-3D;
-3DType;
-About;バージョン情報
+3D;3D
+3DType;3D種別
+About;このソフトの情報
 About_Hint;連絡方法と最新版チェック
-Accompaniment;演奏者
-ActiveFormatDescription;
-ActiveFormatDescription_MuxingMode;
+Accompaniment;伴奏
+ActiveFormatDescription;アクティブフォーマットデスクリプション
+ActiveFormatDescription_MuxingMode;アクティブフォーマットデスクリプション Mux 種別
 Actor;主演
 Actor_Character;出演名
+Add creation date to text output;出力テキストに作成日を追加
+Add version to text output;出力テキストにバージョン情報を追加
 Added_Date;追加日
-Address;アドレス
-AdID;
+Address;住所
+AdID;広告ID識別子
+ADM: Show ChannelFormats;ADM: ChannelFormat を表示
+ADM: Show TrackUIDs;ADM: TrackUID を表示
+AdmProfile;
 Advanced;詳細
 Advanced mode;詳細モード
-Album;アルバム
-Album_ReplayGain_Gain;リプレイゲイン ゲイン
-Album_ReplayGain_Peak;リプレイゲイン ピーク
+Album;アルバム名
+Album_ReplayGain_Gain;アルバム リプレイゲイン
+Album_ReplayGain_Peak;アルバム リプレイゲイン ピーク
 Alignment;アラインメント
-Alignment_Aligned;アライン
-Alignment_Split;分割
+Alignment_Aligned;インターリーブで整列
+Alignment_Split;インターリーブで分割
 All;すべて
-AlternateGroup;
+AlternateGroup;代替グループ
 Archival_Location;作成された場所
-Arranger;アレンジ者
-ArtDirector;アートディレクター
-AspectRatio;解像度
-AssistantDirector;AD
+Arranger;編曲者
+ArtDirector;美術監督
+AspectRatio;アスペクト比
+AssistantDirector;助監督
 at;at
-At least one file;（少なくとも一つ以上のファイルを開いてください）
-Audio;オーディオ
+At least one file;( 1つ以上のファイルを開いてください )
+Audio;音声
 Audio stream(s);音声ストリーム
-Audio_Codec_List;音声コーデックリスト
+Audio_Codec_List;音声コーデック
 Audio_No;音声なし
-Audio1;プライマリ音声
-Audio2;セカンダリ音声
-AudioComments;
-AudioCount;音声数
-AudioDescriptionPresent;
-AudioDescriptionType;
-AudioLoudnessStandard;
-AudioTrackLayout;
+Audio1;音声ストリーム 1
+Audio2;音声ストリーム 2
+AudioComments;音声コメント
+AudioCount;音声ストリーム数
+AudioDescription;
+AudioDescriptionPresent;音声解説の有無
+AudioDescriptionType;音声解説の種類
+AudioLoudnessStandard;ラウンドネス基準
+AudioRenderingIndication;
+AudioSceneInfoID;
+AudioTrackLayout;音声トラックの配置
 Author;製作者
 BarCode;バーコード
 Basic;基本
-Basic_Note;メモ : ファイルについてのさらなる情報は別のビューで開かねばなりません(シート、ツリー...)
-BedChannelConfiguration;
-BedChannelCount;
-BitDepth;
-BitDepth_Detected;
-BitDepth_Stored;
+Basic_Note;注 : このファイルの詳細情報は、別の表示方法で開いて確認してください (シート、ツリーなど)
+BedChannelConfiguration;ベッドチャンネルの構成
+BedChannelCount;ベッドチャンネルの数
+BitDepth;ビット深度
+BitDepth_Detected;検出したビット深度
+BitDepth_Stored;保存されたビット深度
 BitRate;ビットレート
-BitRate_Encoded;
-BitRate_Maximum;最大
-BitRate_Minimum;最小
-BitRate_Mode;ビットレートモード
-BitRate_Mode_CBR;CBR モード
-BitRate_Mode_VBR;VBR モード
-BitRate_Nominal;ノミナル
+BitRate_Encoded;エンコードされたビットレート
+BitRate_Maximum;最大ビットレート
+BitRate_Minimum;最小ビットレート
+BitRate_Mode;ビットレート種別
+BitRate_Mode_CBR;固定 (CBR)
+BitRate_Mode_VBR;可変 (VBR)
+BitRate_Nominal;ビットレート名
 Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
-BufferSize;
+BufferSize;バッファサイズ
 Cancel;キャンセル
 Channel(s);チャンネル
-ChannelLayout;
+ChannelCoded;
+ChannelConfiguration;
+ChannelLayout;チャンネルの配置
+ChannelMode;
 ChannelPositions;チャンネルの位置
 Chapter(s);チャプター
 Chapters;チャプター
 Chapters stream(s);チャプターストリーム
 Chapters_Codec_List;チャプターコーデック
-Chapters_No;チャプター番号
+Chapters_No;チャプターなし
 ChaptersCount;チャプター数
-CheckNewVersion;バージョンチェック
+CheckNewVersion;最新版のチェック
 Choose custom;カスタム選択
 Choose custom sheet;編集するシートを選択してください
 Choose custom text;編集するテキストを選択してください
 Choose export format;出力形式を選択してください
 Choose file(s);開くファイルを選択してください
-Choose filename;ファイル名を選択してください
+Choose filename;ファイル名を入力してください
 Choose language;言語を選択してください
-Choreographer;コアグラファー
-Chroma;クローマ
-ChromaSubsampling;
-ClearList;
+Choreographer;振付
+Chroma;クロマ
+ChromaSubsampling;クロマサブサンプリング
+Classifier;
+ClearList;一覧のクリア
 Close;閉じる
-Close all before open;すべて閉じて開く
-ClosedCaptionsLanguage;
-ClosedCaptionsPresent;
-ClosedCaptionsType;
+Close all before open;すべて閉じてから開く
+ClosedCaptionsLanguage;クローズドキャプションの言語
+ClosedCaptionsPresent;クローズドキャプションの有無
+ClosedCaptionsType;クローズドキャプションの種類
 Codec;コーデック
 Codec_Description;コーデックの説明
 Codec_Info;コーデックの詳細
 Codec_Profile;コーデックのプロファイル
 Codec_Settings;コーデックの設定
-Codec_Settings_BVOP;BVOP
-Codec_Settings_CABAC;CABAC
-Codec_Settings_Endianness;Endianness
-Codec_Settings_Firm;Firm
-Codec_Settings_Floor;Floor
-Codec_Settings_GMC;GMC
-Codec_Settings_ITU;ITU
-Codec_Settings_Law;Law
-Codec_Settings_Matrix;Matrix
-Codec_Settings_PacketBitStream;パケットビットストリーム
-Codec_Settings_QPel;QPel
-Codec_Settings_Sign;Sign
+Codec_Settings_BVOP;コーデックの設定 BVOP
+Codec_Settings_CABAC;コーデックの設定 CABAC
+Codec_Settings_Endianness;コーデックの設定 エンディアン
+Codec_Settings_Firm;コーデックの設定 Firm
+Codec_Settings_Floor;コーデックの設定 Floor
+Codec_Settings_GMC;コーデックの設定 GMC
+Codec_Settings_ITU;コーデックの設定 ITU
+Codec_Settings_Law;コーデックの設定 Law
+Codec_Settings_Matrix;コーデックの設定 Matrix
+Codec_Settings_PacketBitStream;コーデックの設定 パケットビットストリーム
+Codec_Settings_QPel;コーデックの設定 QPel
+Codec_Settings_Sign;コーデックの設定 Sign
 Codec_Url;コーデックの URL
-CodecConfigurationBox;
+CodecConfigurationBox;コーデック構成ボックス
 CodecID;コーデック ID
 CodecID_Description;コーデック ID の説明
-CoDirector;
+CoDirector;共同ディレクター
 Collection;コレクション
-Colorimetry;カラーリメトリ
-ColorSpace;
-colour_primaries;
-colour_range;
+Colorimetry;測色
+ColorSpace;色空間
+colour_primaries;原色
+colour_range;色の範囲
 Comment;コメント
-CommissionedBy;コミッショナー
-Compilation;
-CompleteName;完全名称
-CompletionDate;
-ComplexityIndex;
-Composer;コンポーザ
-Compression_Mode;
-Compression_Mode_Lossless;
-Compression_Mode_Lossy;
-Compression_Ratio;圧縮解像度
-Conductor;コンダクター
-ConformanceCheck;
-ContactEmail;
-ContactTelephoneNumber;
+CommissionedBy;委託
+Compilation;コンピレーション
+CompleteName;完全なパス
+CompletionDate;コンピレーション日
+ComplexityIndex;複雑性指標
+Composer;作曲 (構成)
+Compression_Mode;圧縮方法
+Compression_Mode_Lossless;無劣化
+Compression_Mode_Lossy;非可逆
+Compression_Ratio;圧縮比
+Conductor;指揮
+ConformanceCheck;適合性の確認
+ContactEmail;問い合わせ先メール
+ContactTelephoneNumber;問い合わせ先電話番号
 Container and general information;コンテナと全般情報
-ContentType;コンテンツタイプ
-CoProducer;Co プロデューサ
+ContentType;コンテンツ種別
+CoProducer;共同製作
 Copyright;著作
-CopyrightYear;
+CopyrightYear;著作年
 CostumeDesigner;衣装デザイナー
 Count;数
 Country;国
 Cover;カバー
 Cover_Datas;カバーデータ
-Cover_Description;カバー詳細
-Cover_Mime;カバーの Mime
+Cover_Description;カバー説明
+Cover_Mime;カバーの MIME
 Cover_Type;カバーの種類
-Cropped;クロップ
+Cropped;切り取り
 Custom;カスタム
 Customize;カスタマイズ
-DarkMode;
+DarkMode;ダークモード
 Date;日付
 Debug;デバッグ
-Decimal point;箇条
-Default_Setting;
+Decimal point;小数点
+Default_Setting;システムの規定
+DefaultTargetDeviceConfig;
 Delay;遅延
-Delay_Source;
-Delay_Source_Container;
-Delay_Source_Stream;
+Delay_Source;元の遅延
+Delay_Source_Container;コンテナ
+Delay_Source_Stream;Raw ストリーム
 Delete;削除
 Description;詳細説明
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;デジタル日付
-Dimensions;ディメンション
-Director;ディレクター
-DirectorOfPhotography;フォトディレクター
-Disabled;
-DisplayAspectRatio;解像度
-DisplayAspectRatio_CleanAperture;
-DisplayAspectRatio_Original;元解像度
-DistributedBy;ディストリビュート by
-Distributor;
+Dimensions;寸法
+Director;監督
+DirectorOfPhotography;撮影監督
+Disabled;無効
+DisplayAspectRatio;モニターのアスペクト比
+DisplayAspectRatio_CleanAperture;表示されるモニターのアスペクト比 (Clean aperture)
+DisplayAspectRatio_Original;元のモニターのアスペクト比
+DistributedBy;配給者
+Distributor;配給
+DolbyAtmos;
 Donate;寄付
 DotsPerInch;ドット/インチ
-DrcSets_Count;
-DrcSets_Effects;
-Duration;ながさ
+Downmix;
+DrcSets_Count;DRC の数
+DrcSets_Effects;DRC エフェクトの種類
+Duration;長さ
 Duration_End;終了時間
 Duration_Start;開始時間
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;編集
 EditedBy;編集者
-ElementCount;
-EMail;E-Mail
+EditorialClassification;
+ElementCount;要素数
+EMail;電子メール
 Encoded_Application;使用したエンコーダ
 Encoded_Date;エンコード日
 Encoded_Library;使用したライブラリ
-Encoded_Library_Settings;エンコードライブラリの設定
-Encoded_Original;オリジナル
+Encoded_Library_Settings;エンコードの設定
+Encoded_Original;エンコード元
 EncodedBy;エンコード者
-EPG_Positions;EPG 位置
-EpisodeTitleNumber;
+EPG_Positions;EPG 位置 (内部)
+EpisodeTitleNumber;エピソードのタイトル数
 Error_File;ファイル読み込みエラー
-Error_File_Write;
+Error_File_Write;ファイル書き込みエラー
 ExecutiveProducer;製作総指揮
 Exit;終了
 Exit_Hint;プログラムの終了
 Export;エクスポート
 Export_Hint;カスタム形式でエクスポート
-Extensions;使用する拡張子
-External_Media_NotMounted;
-Family;ファミリ
+Extensions;よく使われる拡張子
+External_Media_NotMounted;外部メディアが挿入されていません
+Family;ファミリー
 Fax;Fax
 File;ファイル
 File size;ファイルサイズ
-File_Append;既存ファイルに上書き (注意 : 同じパラメータは慎重に！)
+File_Append;既存のファイルの末尾に追加 (警告 : 設定値が同じになるよう注意してください)
 File_Created_Date;ファイル作成日
-File_Created_Date_Local;
-File_Hint;このファイルの詳細
-File_Modified_Date;ファイル変更日
-File_Modified_Date_Local;ファイル変更日（ローカル）
+File_Created_Date_Local;ファイル作成日 (現地時間)
+File_Hint;調べたいマルチメディアのファイルを選択
+File_Modified_Date;ファイル更新日
+File_Modified_Date_Local;ファイル更新日 (現地時間)
 FileExtension;拡張子
 FileName;ファイル名
-FileNameExtension;
+FileNameExtension;ファイル名と拡張子
 FileSize;サイズ
+FlatPanelTv;
 Folder;フォルダー
 Folder (R);フォルダー(R)
-Folder (R)_Hint;このフォルダーの詳細(R)
-Folder (Recursively);フォルダー（サブフォルダー含む）
-Folder_Hint;このフォルダーの詳細
+Folder (R)_Hint;フォルダーを選択 (サブフォルダーもすべて読み込みます)
+Folder (Recursively);フォルダー (サブフォルダー含む)
+Folder_Hint;調べるフォルダを選択
 FolderName;フォルダー名
-Format;フォーマット
-Format_Commercial;
-Format_Commercial_IfAny;
-Format_Compression;
-Format_Description;詳細
-Format_Info;情報
-Format_Level;
-Format_Profile;プロファイル
-Format_Settings;設定
-Format_Settings_BVOP;BVOP
-Format_Settings_CABAC;CABAC
-Format_Settings_Emphasis;
-Format_Settings_Endianness;Endianness
-Format_Settings_Firm;Firm
-Format_Settings_Floor;Floor
-Format_Settings_FrameMode;
-Format_Settings_GMC;GMC
-Format_Settings_GOP;
-Format_Settings_ITU;ITU
-Format_Settings_Law;Law
-Format_Settings_Matrix;Matrix 形式の設定
-Format_Settings_Matrix_Custom;カスタム Matrix 形式の設定
-Format_Settings_Matrix_Default;既定の Matrix 形式設定
-Format_Settings_Mode;
-Format_Settings_ModeExtension;
-Format_Settings_PacketBitStream;パケットビットストリーム
-Format_Settings_PictureStructure;
-Format_Settings_PS;PS
-Format_Settings_Pulldown;プルダウン
-Format_Settings_QPel;QPel
-Format_Settings_RefFrames;RefFrames
-Format_Settings_SBR;SBR
-Format_Settings_Sign;Sign
-Format_Settings_Wrapping;
-Format_Tier;
-Format_Url;Url フォーマット
-Format_Version;バージョン
-FpaManufacturer;
-FpaPass;
-FpaVersion;
+Format;形式
+Format_Commercial;一般名
+Format_Commercial_IfAny;一般名
+Format_Compression;圧縮
+Format_Description;説明
+Format_Info;形式の情報
+Format_Level;形式のレベル
+Format_Profile;形式のプロファイル
+Format_Settings;形式の設定
+Format_Settings_BVOP;形式の設定 BVOP
+Format_Settings_CABAC;形式の設定 CABAC
+Format_Settings_Emphasis;形式の設定 Emphasis
+Format_Settings_Endianness;形式の設定 エンディアン
+Format_Settings_Firm;形式の設定 Firm
+Format_Settings_Floor;形式の設定 Floor
+Format_Settings_FrameMode;形式の設定 フレームのモード
+Format_Settings_GMC;形式の設定 GMC
+Format_Settings_GOP;形式の設定 GOP
+Format_Settings_ITU;形式の設定 ITU
+Format_Settings_Law;形式の設定 Law
+Format_Settings_Matrix;形式の設定 Matrix
+Format_Settings_Matrix_Custom;カスタム
+Format_Settings_Matrix_Default;既定
+Format_Settings_Mode;モード
+Format_Settings_ModeExtension;形式の設定 モード拡張
+Format_Settings_PacketBitStream;形式の設定 パケットビットストリーム
+Format_Settings_PictureStructure;形式の設定 画像構造
+Format_Settings_PS;形式の設定 PS
+Format_Settings_Pulldown;形式の設定 プルダウン
+Format_Settings_QPel;形式の設定 QPel
+Format_Settings_RefFrames;形式の設定 参照フレーム
+Format_Settings_SBR;形式の設定 SBR
+Format_Settings_Sign;形式の設定 Sign
+Format_Settings_Wrapping;形式の設定 ラッピング方法
+Format_Tier;形式の層
+Format_Url;形式のURL
+Format_Version;形式 バージョン
+FpaManufacturer;FPA
+FpaPass;FPAパス
+FpaVersion;FPAバージョン
 FrameCount;フレーム数
 FrameRate;フレームレート
-FrameRate_Maximum;最大
-FrameRate_Minimum;最小
-FrameRate_Mode;モード
-FrameRate_Mode_CFR;CFR モード
-FrameRate_Mode_VFR;VFR モード
-FrameRate_Nominal;通常
-FrameRate_Original;オリジナル
+FrameRate_Maximum;最大フレームレート
+FrameRate_Minimum;最小フレームレート
+FrameRate_Mode;フレームレートの種類
+FrameRate_Mode_CFR;固定 (CFR)
+FrameRate_Mode_VFR;可変 (VFR)
+FrameRate_Nominal;フレームレート名
+FrameRate_Original;元のフレームレート
+FrameRate_Real;
 General;全般
 Genre;ジャンル
 Genre_000;ブルース
-Genre_001;ロック
+Genre_001;クラシック・ロック
 Genre_002;カントリー
 Genre_003;ダンス
 Genre_004;ディスコ
@@ -419,776 +447,843 @@ Genre_006;グランジ
 Genre_007;ヒップホップ
 Genre_008;ジャズ
 Genre_009;メタル
-Genre_010;NewAge
-Genre_011;Oldies
-Genre_012;Other
-Genre_013;Pop
+Genre_010;ニューエイジ
+Genre_011;オールディーズ
+Genre_012;ほか
+Genre_013;ポップ
 Genre_014;R&B
-Genre_015;Rap
-Genre_016;Reggae
-Genre_017;Rock
-Genre_018;Techno
-Genre_019;Industrial
-Genre_020;Alternative
-Genre_021;Ska
-Genre_022;Death Metal
-Genre_023;Pranks
-Genre_024;Soundtrack
-Genre_025;Euro-Techno
-Genre_026;Ambient
-Genre_027;Trip-Hop
-Genre_028;Vocal
-Genre_029;Jazz+Funk
-Genre_030;Fusion
-Genre_031;Trance
-Genre_032;Classical
-Genre_033;Instrumental
-Genre_034;Acid
-Genre_035;House
-Genre_036;Game
-Genre_037;Sound Clip
-Genre_038;Gospel
-Genre_039;Noise
-Genre_040;AlternRock
-Genre_041;Bass
-Genre_042;Soul
-Genre_043;Punk
-Genre_044;Space
-Genre_045;Meditative
-Genre_046;Instrumental Pop
-Genre_047;Instrumental Rock
-Genre_048;Ethnic
-Genre_049;Gothic
-Genre_050;Darkwave
-Genre_051;Techno-Industrial
-Genre_052;Electronic
-Genre_053;Pop-Folk
-Genre_054;Eurodance
-Genre_055;Dream
-Genre_056;Southern Rock
-Genre_057;Comedy
-Genre_058;Cult
-Genre_059;Gangsta
-Genre_060;Top 40
-Genre_061;Christian Rap
-Genre_062;Pop/Funk
-Genre_063;Jungle
-Genre_064;Native American
-Genre_065;Cabaret
-Genre_066;New Wave
-Genre_067;Psychadelic
-Genre_068;Rave
-Genre_069;Showtunes
-Genre_070;Trailer
-Genre_071;Lo-Fi
-Genre_072;Tribal
-Genre_073;Acid Punk
-Genre_074;Acid Jazz
-Genre_075;Polka
-Genre_076;Retro
-Genre_077;Musical
-Genre_078;Rock & Roll
-Genre_079;Hard Rock
-Genre_080;Folk
-Genre_081;Folk-Rock
-Genre_082;National Folk
-Genre_083;Swing
-Genre_084;Fast Fusion
-Genre_085;Bebob
-Genre_086;Latin
-Genre_087;Revival
-Genre_088;Celtic
-Genre_089;Bluegrass
-Genre_090;Avantgarde
-Genre_091;Gothic Rock
-Genre_092;Progressive Rock
-Genre_093;Psychedelic Rock
-Genre_094;Symphonic Rock
-Genre_095;Slow Rock
-Genre_096;Big Band
-Genre_097;Chorus
-Genre_098;Easy Listening
-Genre_099;Acoustic
-Genre_100;Humour
-Genre_101;Speech
-Genre_102;Chanson
-Genre_103;Opera
-Genre_104;Chamber Music
-Genre_105;Sonata
-Genre_106;Symphony
-Genre_107;Booty Bass
-Genre_108;Primus
-Genre_109;Porn Groove
-Genre_110;Satire
-Genre_111;Slow Jam
-Genre_112;Club
-Genre_113;Tango
-Genre_114;Samba
-Genre_115;Folklore
-Genre_116;Ballad
-Genre_117;Power Ballad
-Genre_118;Rhythmic Soul
-Genre_119;Freestyle
-Genre_120;Duet
-Genre_121;Punk Rock
-Genre_122;Drum Solo
-Genre_123;A capella
-Genre_124;Euro-House
-Genre_125;Dance Hall
-Genre_126;Goa
-Genre_127;Drum & Bass
-Genre_128;Club-House
-Genre_129;Hardcore
-Genre_130;Terror
-Genre_131;Indie
-Genre_132;Britpop
-Genre_133;Negerpunk
-Genre_134;Polsk Punk
-Genre_135;Beat
-Genre_136;Christian Gangsta Rap
-Genre_137;Heavy Metal
-Genre_138;Black Metal
-Genre_139;Crossover
-Genre_140;Contemporary Christian
-Genre_141;Christian Rock
-Genre_142;Merengue
-Genre_143;Salsa
-Genre_144;Trash Metal
-Genre_145;Anime
+Genre_015;ラップ
+Genre_016;レゲエ
+Genre_017;ロック
+Genre_018;テクノ
+Genre_019;インダストリアル
+Genre_020;オルタナティブ
+Genre_021;スカ
+Genre_022;デスメタル
+Genre_023;プランク
+Genre_024;サウンドトラック
+Genre_025;ユーロテクノ
+Genre_026;アンビエント
+Genre_027;トリップホップ
+Genre_028;ボーカル
+Genre_029;ジャズフンク
+Genre_030;フュージョン
+Genre_031;トランス
+Genre_032;クラシック
+Genre_033;インストゥルメンタル
+Genre_034;アシッド
+Genre_035;ハウス
+Genre_036;ゲーム
+Genre_037;サウンドクリップ
+Genre_038;ゴスペル
+Genre_039;ノイズ
+Genre_040;オルタナロック
+Genre_041;ベース
+Genre_042;ソウル
+Genre_043;パンク
+Genre_044;スペース
+Genre_045;瞑想
+Genre_046;インストゥルメンタル・ポップ
+Genre_047;インストゥルメンタル・ロック
+Genre_048;エスニック
+Genre_049;ゴシック
+Genre_050;ダークウェーブ
+Genre_051;インダストリアルテクノ
+Genre_052;エレクトリック
+Genre_053;フォークポップ
+Genre_054;ユーロダンス
+Genre_055;ドリーム
+Genre_056;サザンロック
+Genre_057;コメディー
+Genre_058;カルト
+Genre_059;ギャグスタ
+Genre_060;トップ40
+Genre_061;クリスチャンラップ
+Genre_062;ポップ/ファンク
+Genre_063;ジャングル
+Genre_064;ネイティブアメリカン
+Genre_065;キャバレー
+Genre_066;ニューウェーブ
+Genre_067;サイケデリック
+Genre_068;レイブ
+Genre_069;ショーチューン
+Genre_070;トレイラー
+Genre_071;ローファイ
+Genre_072;民俗
+Genre_073;アシッドファンク
+Genre_074;アシッドジャズ
+Genre_075;ポルカ
+Genre_076;レトロ
+Genre_077;ミュージカル
+Genre_078;ロックンロール
+Genre_079;ハードロック
+Genre_080;フォーク
+Genre_081;フォークロック
+Genre_082;ナショナルフォーク
+Genre_083;スイング
+Genre_084;ファストフュージョン
+Genre_085;ビバップ
+Genre_086;ラテン
+Genre_087;リバイバル
+Genre_088;ケルト音楽
+Genre_089;ブルーグラス
+Genre_090;アバンギャルド
+Genre_091;ゴシックロック
+Genre_092;プログレッシブロック
+Genre_093;サイケデリックロック
+Genre_094;シンフォニックロック
+Genre_095;スローロック
+Genre_096;ビッグバンド
+Genre_097;コーラス
+Genre_098;イージーリスニング
+Genre_099;アコースティック
+Genre_100;ユーモア
+Genre_101;会話
+Genre_102;シャンソン
+Genre_103;オペラ
+Genre_104;室内楽
+Genre_105;ソナタ
+Genre_106;シンフォニー
+Genre_107;ブーティ・ベース
+Genre_108;プライマス
+Genre_109;ポーングルーブ
+Genre_110;風刺
+Genre_111;スロージャム
+Genre_112;クラブ
+Genre_113;タンゴ
+Genre_114;サンバ
+Genre_115;フォークロア
+Genre_116;バラード
+Genre_117;パワーバラード
+Genre_118;リズミックソウル
+Genre_119;フリースタイル
+Genre_120;デュエット
+Genre_121;パンクロック
+Genre_122;ドラムソロ
+Genre_123;アカペラ
+Genre_124;ユーロハウス
+Genre_125;ダンスホール
+Genre_126;ゴア
+Genre_127;ドラムンベース
+Genre_128;クラブハウス
+Genre_129;ハードコア
+Genre_130;テラー
+Genre_131;インディー
+Genre_132;ブリットポップ
+Genre_133;ニガーパンク
+Genre_134;ポルスカパンク
+Genre_135;ビート
+Genre_136;クリスチャンギャングスタラップ
+Genre_137;ヘビーメタル
+Genre_138;ブラックメタル
+Genre_139;クロスオーバー
+Genre_140;コンテンポラリークリスチャン
+Genre_141;クリスチャンロック
+Genre_142;メレンゲ 
+Genre_143;サルサ
+Genre_144;スラッシュメタル
+Genre_145;アニメ
 Genre_146;JPop
-Genre_147;Synthpop
-Genre_148;
-Genre_149;
-Genre_150;
-Genre_151;
-Genre_152;
-Genre_153;
-Genre_154;
-Genre_155;
-Genre_156;
-Genre_157;
-Genre_158;
-Genre_159;
-Genre_160;
-Genre_161;
-Genre_162;
-Genre_163;
-Genre_164;
-Genre_165;
-Genre_166;
-Genre_167;
-Genre_168;
-Genre_169;
-Genre_170;
-Genre_171;
-Genre_172;
-Genre_173;
-Genre_174;
-Genre_175;
-Genre_176;
-Genre_177;
-Genre_178;
-Genre_179;
-Genre_180;
-Genre_181;
-Genre_182;
-Genre_183;
-Genre_184;
-Genre_185;
-Genre_186;
-Genre_187;
-Genre_188;
-Genre_189;
-Genre_190;
-Genre_191;
-Go to WebSite;Web サイトへ移動
-Gop_OpenClosed;
-Gop_OpenClosed_Closed;
-Gop_OpenClosed_FirstFrame;
-Gop_OpenClosed_Open;
-Grouping;
-h;時
-HDR_Format;
+Genre_147;シンセポップ
+Genre_148;アブストラクト
+Genre_149;アートロック
+Genre_150;バロック
+Genre_151;バングラ
+Genre_152;ビッグビート
+Genre_153;ブレークビーツ
+Genre_154;チルアウト
+Genre_155;ダウンテンポ
+Genre_156;ダブ
+Genre_157;EBM
+Genre_158;エクレクティック
+Genre_159;エレクトロ
+Genre_160;エレクトロクラッシュ
+Genre_161;エモ
+Genre_162;エクスペリメンタル
+Genre_163;ガレージ
+Genre_164;グローバル
+Genre_165;IDM
+Genre_166;イルビエント
+Genre_167;インダストロ・ゴス
+Genre_168;ジャムバンド
+Genre_169;クラウトロック
+Genre_170;レフトフィールド
+Genre_171;ラウンジ
+Genre_172;マスロック
+Genre_173;ニューロマンティック
+Genre_174;ニュースクールブレイクス
+Genre_175;ポストパンク
+Genre_176;ポストロック
+Genre_177;サイケデリックトランス
+Genre_178;シューゲイザー
+Genre_179;スペースロック
+Genre_180;トロピカルロック
+Genre_181;ワールドミュージック
+Genre_182;ネオクラシカル
+Genre_183;オーディオブック
+Genre_184;オーディオシアター
+Genre_185;ノイエドイチェヴェレ
+Genre_186;ポッドキャスト
+Genre_187;インディーロック
+Genre_188;Gファンク
+Genre_189;ダブステップ
+Genre_190;ガレージロック
+Genre_191;サイケデリックアンビエント
+Go to WebSite;ウェブサイトを開く
+Gop_OpenClosed;GOP オープン/クローズド
+Gop_OpenClosed_Closed;クローズド
+Gop_OpenClosed_FirstFrame;GOP 最初のフレームの オープン/クローズド
+Gop_OpenClosed_Open;オープン
+Graph;グラフ
+Group;
+Grouping;グループ化
+GroupPreset;
+h;時間
+HDR_Format;HDR 形式
 Header file;ヘッダーファイルを作成
 Height;高さ
-Height_CleanAperture;
-Height_Original;
+Height_CleanAperture;表示される高さ (Clean aperture)
+Height_Original;元の高さ
 Help;ヘルプ
 Hint;ヒント
-How many audio streams?;音声ストリームの数？
-How many chapters streams?;チャプターストリームの数？
-How many text streams?;テキストストリームの数？
-How many video streams?;ビデオストリームの数？
+HomeTheaterAvr;
+How many audio streams?;音声ストリームは何個にしますか？
+How many chapters streams?;チャプターストリームは何個にしますか？
+How many text streams?;字幕ストリームは何個にしますか？
+How many video streams?;映像ストリームは何個にしますか？
 HTML;HTML
 ID;ID
-IdentClockStart;
-Image;イメージ
-Image stream(s);イメージストリーム
-Image_Codec_List;コーデックのイメージ
-ImageCount;イメージストリームの数
+IdentClockStart;Ident Clock 開始
+IFrameInterval;
+Image;画像
+Image stream(s);画像ストリーム
+Image_Codec_List;画像コーデック
+ImageCount;画像ストリームの数
+ImmersiveStereo;
 Info;情報
-Instruments;インストゥルメンツ
-Interlaced_BFF;ボトムファースト(BFF)
+Instruments;Instruments
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
+Interlaced_BFF;ボトムフィールド (BFF)
 Interlaced_Interlaced;インターレース
-Interlaced_PPF;プログレシッブ(PPF)
-Interlaced_Progressive;プログレシッブ(PPF)
-Interlaced_TFF;トップファースト(TFF)
-Interlacement;インターレスメンツ
-Interleave_Duration;ドゥレイション
-Interleave_Preload;プリロード
-Interleave_VideoFrames;ビデオフレーム
-Interleaved;
-InternetMediaType;
+Interlaced_PPF;プログレシッブ (PPF)
+Interlaced_Progressive;プログレシッブ (PPF)
+Interlaced_TFF;トップフィールド (TFF)
+Interlacement;インターレース
+Interleave_Duration;インターリーブの長さ
+Interleave_Preload;インターリーブの事前時間
+Interleave_VideoFrames;映像フレーム
+Interleaved;インターリーブの有無
+InternetMediaType;ネット用メディアタイプ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
 Keywords;キーワード
-Known codecs;インストール済みコーデック
-Known formats;使用可能なフォーマット
-Known parameters;使用可能なパラメータ
+Known codecs;対応するコーデック
+Known formats;対応する形式
+Known parameters;対応するタグ
 Label;ラベル
 Language;言語
-Language_aa;Afar
-Language_ab;Abkhazian
-Language_ae;Avestan
-Language_af;Afrikaans
-Language_ak;Akan
-Language_am;Amharic
-Language_an;Aragonese
+Language_aa;アファル語
+Language_ab;アブハズ語
+Language_ae;アヴェスタ語
+Language_af;アフリカーンス語
+Language_ak;アカン語
+Language_am;アムハラ語
+Language_an;アラゴン語
 Language_ar;アラビア語
-Language_as;Assamese
-Language_av;Avaric
-Language_ay;Aymara
-Language_az;Azerbaijani
-Language_ba;Bashkir
-Language_be;Belarusian
-Language_bg;Bulgarian
-Language_bh;Bihari
-Language_bi;Bislama
-Language_bm;Bambara
-Language_bn;Bengali
-Language_bo;Tibetan
-Language_br;Breton
-Language_bs;Bosnian
+Language_as;アッサム語
+Language_av;アヴァル語
+Language_ay;アイマラ語
+Language_az;アゼルバイジャン語
+Language_ba;バシキール語
+Language_be;ベラルーシ語
+Language_bg;ブルガリア語
+Language_bh;ビハール語
+Language_bi;ビスラマ語
+Language_bm;バンバラ語
+Language_bn;ベンガル語
+Language_bo;チベット語
+Language_br;ブルトン語
+Language_bs;ボスニア語
 Language_ca;カタルーニャ語
-Language_ce;Chechen
-Language_ch;Chamorro
-Language_co;Corsican
-Language_cr;Cree
-Language_cs;Czech
-Language_cu;Slave
-Language_cv;Chuvash
-Language_cy;Welsh
-Language_da;Danish
+Language_ce;チェチェン語
+Language_ch;チャモロ語
+Language_co;コルシカ語
+Language_cr;クリー語
+Language_cs;チェコ語
+Language_cu;教会スラヴ語
+Language_cv;チュバシュ語
+Language_cy;ウェールズ語
+Language_da;デンマーク語
 Language_de;ドイツ語
-Language_dv;Divehi
-Language_dz;Dzongkha
-Language_ee;Ewe
-Language_el;Greek
+Language_dv;ディベヒ語
+Language_dz;ゾンカ語
+Language_ee;エウェ語
+Language_el;ギリシア語
 Language_en;英語
 Language_en-gb;英語(英国)
 Language_en-us;英語(米国)
-Language_eo;Esperanto
-Language_es;エスパーニャ
-Language_es-419;
-Language_et;Estonian
+Language_eo;エスペラント
+Language_es;スペイン語
+Language_es-419;スペイン語 (南米)
+Language_et;エストニア語
 Language_eu;バスク語
-Language_fa;Persian
-Language_ff;Fulah
-Language_fi;Finnish
-Language_fj;Fijian
-Language_fo;Faroese
+Language_fa;ペルシア語
+Language_ff;フラニ語
+Language_fi;フィンランド語
+Language_fj;フィジー語
+Language_fo;フェロー語
 Language_fr;フランス語
-Language_fy;Frisian
-Language_ga;Irish
-Language_gd;Gaelic
+Language_fy;西フリジア語
+Language_ga;アイルランド語
+Language_gd;スコットランド・ゲール語
 Language_gl;ガリシア語
-Language_gn;Guarani
-Language_gu;Gujarati
-Language_gv;Manx
-Language_ha;Hausa
+Language_gn;グアラニー語
+Language_gu;グジャラート語
+Language_gv;マン島語
+Language_ha;ハウサ語
 Language_he;ヘブライ語
-Language_hi;ヒンディ語
-Language_ho;Hiri Motu
-Language_hr;Croatian
-Language_ht;Haitian
-Language_hu;Hungarian
-Language_hy;Armenian
-Language_hy-az;
-Language_hz;Herero
-Language_ia;Auxiliary Language Association
-Language_id;Indonesian
-Language_ie;Interlingue
-Language_ig;Igbo
-Language_ii;Sichuan Yi
-Language_ik;Inupiaq
+Language_hi;ヒンディー語
+Language_ho;ヒリモツ語
+Language_hr;クロアチア語
+Language_ht;ハイチ語
+Language_hu;ハンガリー語
+Language_hy;アルメニア語
+Language_hy-az;アルメニア語 (アイゼルバジャン)
+Language_hz;ヘレロ語
+Language_ia;インターリングア
+Language_id;インドネシア語
+Language_ie;インターリング
+Language_ig;イボ語
+Language_ii;四川彝語
+Language_ik;イヌピアック語
 Language_Info;言語情報
-Language_io;Ido
-Language_is;Icelandic
+Language_io;イド語
+Language_is;アイスランド語
 Language_it;イタリア語
-Language_iu;Inuktitut
+Language_iu;イヌクティトゥット語
 Language_ja;日本語
-Language_jv;Javanese
-Language_ka;Georgian
-Language_kg;Kongo
-Language_ki;Kikuyu
-Language_kj;Kuanyama
-Language_kk;Kazakh
-Language_kl;Kalaallisut
-Language_km;Khmer
-Language_kn;Kannada
+Language_jv;ジャワ語
+Language_ka;グルジア語
+Language_kg;コンゴ語
+Language_ki;キクユ語
+Language_kj;クワニャマ語
+Language_kk;カザフ語
+Language_kl;グリーンランド語
+Language_km;クメール語
+Language_kn;カンナダ語
 Language_ko;韓国語
-Language_kr;Kanuri
-Language_ks;Kashmiri
-Language_ku;Kurdish
-Language_kv;Komi
-Language_kw;Cornish
-Language_ky;Kirghiz
-Language_la;Latin
-Language_lb;Luxembourgish
-Language_lg;Ganda
-Language_li;Limburgish
-Language_ln;Lingala
-Language_lo;Lao
-Language_lt;Lithuanian
-Language_lu;Luba-Katanga
-Language_lv;Latvian
-Language_mg;Malagasy
-Language_mh;Marshallese
-Language_mi;Maori
-Language_mk;Macedonian
-Language_ml;Malayalam
-Language_mn;Mongolian
-Language_mn-cn;
-Language_mo;Moldavian
+Language_kr;カヌリ語
+Language_ks;カシミール語
+Language_ku;クルド語
+Language_kv;コミ語
+Language_kw;コーンウォール語
+Language_ky;キルギス語
+Language_la;ラテン語
+Language_lb;ルクセンブルク語
+Language_lg;ルガンダ語
+Language_li;リンブルフ語
+Language_ln;リンガラ語
+Language_lo;ラーオ語
+Language_lt;リトアニア語
+Language_lu;ルバカタンガ語
+Language_lv;ラトビア語
+Language_mg;マダガスカル語
+Language_mh;マーシャル語
+Language_mi;マオリ語
+Language_mk;マケドニア語
+Language_ml;マラヤーラム語
+Language_mn;モンゴル語
+Language_mn-cn;モンゴル語 (中国)
+Language_mo;モルダビア語
 Language_More;さらに
-Language_mr;Marathi
-Language_ms;Malay
-Language_ms-bn;
-Language_mt;Maltese
+Language_mr;マラーティー語
+Language_ms;マレー語
+Language_ms-bn;マレー語 (ブルネイ)
+Language_mt;マルタ語
 Language_mul;複数言語
-Language_my;Burmese
-Language_na;Nauru
-Language_nb;Norwegian Bokmal
-Language_nd;Ndebele
-Language_ne;Nepali
-Language_ng;Ndonga
+Language_my;ビルマ語
+Language_na;ナウル語
+Language_nb;ノルウェー語ブークモール
+Language_nd;北ンデベレ語
+Language_ne;ネパール語
+Language_ng;ンドンガ語
 Language_nl;オランダ語
-Language_nl-be;
-Language_nn;Norwegian Nynorsk
-Language_no;Norwegian
-Language_nr;Ndebele
-Language_nv;Navaho
-Language_ny;Nyanja
-Language_oc;Occitan
-Language_oj;Ojibwa
-Language_om;Oromo
-Language_or;Oriya
-Language_os;Ossetic
-Language_pa;Panjabi
-Language_pi;Pali
-Language_pl;Polish
-Language_ps;Pushto
-Language_pt;ポルトガル語(ポルトガル)
-Language_pt-br;BR ポルトガル語(ブラジル)
-Language_qu;Quechua
-Language_rm;Raeto-Romance
-Language_rn;Rundi
+Language_nl-be;フランドル語
+Language_nn;ノルウェー語ニーノシュク
+Language_no;ノルウェー語
+Language_nr;南ンデベレ語
+Language_nv;ナバホ語
+Language_ny;チェワ語
+Language_oc;オック語
+Language_oj;オジブウェー語
+Language_om;オロモ語
+Language_or;オリヤー語
+Language_os;オセット語
+Language_pa;パンジャーブ語
+Language_pi;パーリ語
+Language_pl;ポーランド語
+Language_ps;パシュトー語
+Language_pt;ポルトガル語 (ポルトガル)
+Language_pt-br;ポルトガル語 (ブラジル)
+Language_qu;ケチュア語
+Language_rm;ロマンシュ語
+Language_rn;ルンディ語
 Language_ro;ルーマニア語
 Language_ru;ロシア語
-Language_rw;Kinyarwanda
-Language_sa;Sanskrit
-Language_sc;Sardinian
-Language_sd;Sindhi
-Language_se;Northern Sami
-Language_sg;Sango
-Language_si;Sinhala
-Language_sk;Slovak
-Language_sl;Slovenian
-Language_sm;Samoan
-Language_smi;
-Language_sn;Shona
-Language_so;Somali
-Language_sq;Albanian
-Language_sr;Serbian
-Language_ss;Swati
-Language_st;Sotho
-Language_su;Sundanese
-Language_sv;Swedish
-Language_sw;Swahili
-Language_ta;Tamil
-Language_te;Telugu
-Language_tg;Tajik
-Language_th;Thai
-Language_ti;Tigrinya
-Language_tk;Turkmen
-Language_tl;Tagalog
-Language_tn;Tswana
-Language_to;Tonga
-Language_tr;Turkish
-Language_ts;Tsonga
-Language_tt;Tatar
-Language_tw;Twi
-Language_ty;Tahitian
-Language_ug;Uighur
-Language_uk;Ukrainian
-Language_ur;Urdu
-Language_uz;Uzbek
-Language_ve;Venda
-Language_vi;Vietnamese
-Language_vo;Volapuk
-Language_wa;Walloon
-Language_wo;Wolof
-Language_xh;Xhosa
-Language_yi;Yiddish
-Language_yo;Yoruba
-Language_za;Zhuang
+Language_rw;ルワンダ語
+Language_sa;サンスクリット
+Language_sc;サルデーニャ語
+Language_sd;シンド語
+Language_se;北部サーミ語
+Language_sg;サンゴ語
+Language_si;シンハラ語
+Language_sk;スロバキア語
+Language_sl;スロベニア語
+Language_sm;サモア語
+Language_smi;サーミ語
+Language_sn;ショナ語
+Language_so;ソマリ語
+Language_sq;アルバニア語
+Language_sr;セルビア語
+Language_ss;スワジ語
+Language_st;ソト語
+Language_su;スンダ語
+Language_sv;スウェーデン語
+Language_sw;スワヒリ語
+Language_ta;タミル語
+Language_te;テルグ語
+Language_tg;タジク語
+Language_th;タイ語
+Language_ti;ティグリニャ語
+Language_tk;トルクメン語
+Language_tl;タガログ語
+Language_tn;ツワナ語
+Language_to;トンガ語
+Language_tr;トルコ語
+Language_ts;ツォンガ語
+Language_tt;タタール語
+Language_tw;トウィ語
+Language_ty;タヒチ語
+Language_ug;ウイグル語
+Language_uk;ウクライナ語
+Language_ur;ウルドゥー語
+Language_uz;ウズベク語
+Language_ve;ヴェンダ語
+Language_vi;ベトナム語
+Language_vo;ヴォラピュク
+Language_wa;ワロン語
+Language_wo;ウォロフ語
+Language_xh;コサ語
+Language_yi;イディッシュ語
+Language_yo;ヨルバ語
+Language_za;チワン語
 Language_zh;中国語
-Language_zh-cn;中国語(簡体)
-Language_zh-tw;中国語(繁体)
+Language_zh-cn;中国語 (簡体)
+Language_zh-tw;中国語 (繁体)
 Language_zu;ズールー語
-LawRating;レイティング
+LawRating;規制評価
 LCCN;LCCN
-Library;ライブラリ
+LfeAttenuationKnown;
+LfeMixGain;
+Library;Mux ライブラリ
+Lifetime_Subscribe_Button;生涯の購読料は %PRICE%
 Lightness;明るさ
-LineUpStart;
-List;リスト
-Loudness_Anchor;
-Loudness_Anchor_Album;
-Loudness_Count;
-Loudness_Count_Album;
-Loudness_MaximumMomentary;
-Loudness_MaximumMomentary_Album;
-Loudness_MaximumOfRange;
-Loudness_MaximumOfRange_Album;
-Loudness_MaximumShortTerm;
-Loudness_MaximumShortTerm_Album;
-Loudness_ProductionMixingLevel;
-Loudness_ProductionMixingLevel_Album;
-Loudness_Program;
-Loudness_Program_Album;
-Loudness_Range;
-Loudness_Range_Album;
-Loudness_RoomType;
-Loudness_RoomType_Album;
+LineUpStart;Line Up 開始
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
+List;一覧
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
+Loudness_Anchor;アンカー ラウドネス
+Loudness_Anchor_Album;アンカー ラウドネス (アルバム)
+Loudness_Count;ラウンドネス情報の数
+Loudness_Count_Album;ラウンドネス情報の数 (アルバム)
+Loudness_MaximumMomentary;最大瞬間ラウドネス
+Loudness_MaximumMomentary_Album;最大瞬間ラウドネス (アルバム)
+Loudness_MaximumOfRange;最大ラウドネスレンジ
+Loudness_MaximumOfRange_Album;最大ラウドネスレンジ (アルバム)
+Loudness_MaximumShortTerm;最大短期ラウドネス
+Loudness_MaximumShortTerm_Album;最大短期ラウドネス (アルバム)
+Loudness_ProductionMixingLevel;プロダクションミキシングレベル
+Loudness_ProductionMixingLevel_Album;プロダクションミキシングレベル (アルバム)
+Loudness_Program;プログラム ラウドネス
+Loudness_Program_Album;プログラム ラウドネス (アルバム)
+Loudness_Range;ラウドネスレンジ
+Loudness_Range_Album;ラウドネスレンジ (アルバム)
+Loudness_RoomType;ルームタイプ
+Loudness_RoomType_Album;ルームタイプ (アルバム)
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;作詞
 Lyrics;歌詞
 Mastered_Date;マスタリング日
-MasteredBy;マスタリング by
-MasteringDisplay_ColorPrimaries;
-MasteringDisplay_Luminance;
-Matrix_Channel(s);
-Matrix_ChannelPositions;
-matrix_coefficients;
-Matrix_Format;
-MaxCLL;
-MaxFALL;
-MediaInfo_About; 詳細情報提供者 \r\n マルチメディア ファイル:\r\n Matroska, OGG ( OGM を含む)\r\n MPEG1 ( VCD を含む)\r\n MPEG2 ( DVD , SVCD を含む)\r\n MPEG4 (iTunes の M4A を含む)\r\n Quicktime\r\n RealMedia\r\n WindowsMedia ( WMV , WMA を含む)\r\n Microsoft RIFF ( AVI , WAV を含む)\r\n 音声のみ (AC3 , DTS , AAC , AU , AIFF ...)
-MediaInfo_About_About;
+MasteredBy;マスタリング者
+MasteringDisplay_ColorPrimaries;マスタリングディスプレイの原色
+MasteringDisplay_Luminance;マスタリングディスプレイの輝度
+Matrix_Channel(s);マトリックスエンコーディングのチャンネル
+Matrix_ChannelPositions;マトリックスエンコーディングのチャンネルの位置
+matrix_coefficients;マトリックス係数
+Matrix_Format;マトリックスエンコーディングの形式
+MaxCLL;コンテンツの最大明るさの度合い (MaxCLL)
+MaxFALL;フレームの平均明るさの度合い (MaxFALL)
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
+MediaInfo_About;MediaInfo により、動画ファイルや音声ファイルの技術情報やタグ情報に簡単にアクセスできます。\r\nMac App Store のグラフィカルユーザーインターフェース以外は、オープンソースのソフトウェアです。つまりこのプログラムは最終利用者に無償で提供され、開発者は自由にプログラムを研究、改良、再配布できます (BSDライセンス)。
+MediaInfo_About_About;MediaInfo v%MI_VERSION% (MediaInfoLib v%MIL_VERSION%)
 Menu;メニュー
 Menu stream(s);メニューストリーム
-Menu_Codec_List;メニューコーデック
-Menu_Hint;ヒント
-Menu_No;メニュー番号
+Menu_Codec_List;メニュー コーデック
+Menu_Hint;もっと存在する可能性あり
+Menu_No;メニューなし
 MenuCount;メニューストリーム数
-MenuID;ID
+MenuID;メニュー ID
+MixType;
 mn;分
-Mood;ムード
-More;さらに
-Movie;映画名
-ms;秒
+Mood;気分
+More;詳細
+Movie;動画のタイトル
+ms;ミリ秒
 MSDI;MSDI
+MultipleStream;
 MusicBy;演奏者
-MuxingMode;Muxing モード
-MuxingMode_MoreInfo;Muxing モード 詳細情報
-MuxingMode_PackedBitstream;ビット ストリーム パック
+MuxingMode;Mux 方法
+MuxingMode_MoreInfo;Mux 方法 詳細情報
+MuxingMode_PackedBitstream;ビットストリーム パック
 Name;名前
-Nationality;製作国
+Nationality;国籍
 NetworkName;ネットワーク名
 New;新規
-Newest version;新しいバージョンを確認（要インターネット接続
-NewVersion_Menu;新しいバージョンがあります
-NewVersion_Question_Content;新しいバージョン(v%Version%)があります。更新しますか？
-NewVersion_Question_Title;新しいバージョン
+Newest version;最新バージョンを確認 (要ネット接続)
+NewVersion_Menu;最新版あり
+NewVersion_Question_Content;新しいバージョン (v%Version%) があります。ダウンロードしますか？
+NewVersion_Question_Title;最新版が利用できます
 No;いいえ
 Not yet;準備中です
-NumberOfDynamicObjects;
-NumColors;色
+NumberOfChannelFormats;
+NumberOfContents;
+NumberOfDynamicObjects;ダイナミックオブジェクトの数
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
+NumColors;色の数
+ObjectCount;
 OK;OK
-One output file per input file;入力ファイルを単一ファイルで出力
+One output file per input file;入力ファイルごとに単一ファイルで出力
 Open;開く
-OpenCandy_01;オープンキャンディ
-OpenCandy_02;オープンキャンディ
-OpenCandy_03;オープンキャンディ
-OpenCandy_04;オープンキャンディ
-OpenCandy_05;オープンキャンディ
-OpenCandy_06;オープンキャンディ
-OpenCandy_07;オープンキャンディ
-OpenCandy_08;オープンキャンディ
-OpenCandy_09;オープンキャンディ
-OpenCandy_10;オープンキャンディ
-OpenCandy_11;オープンキャンディ
-OpenCandy_12;オープンキャンディ
-OpenCandy_13;オープンキャンディ
-OpenCandy_14;オープンキャンディ
-OpenCandy_15;オープンキャンディ
-OpenCandy_16;オープンキャンディ
-OpenCandy_17;オープンキャンディ
-OpenCandy_18;オープンキャンディ
-OpenCandy_19;オープンキャンディ
-OpenCandy_20;オープンキャンディ
-OpenCandy_21;オープンキャンディ
-OpenCandy_22;オープンキャンディ
-OpenCandy_23;オープンキャンディ
-OpenCandy_24;オープンキャンディ
-OpenCandy_25;オープンキャンディ
-OpenCandy_26;オープンキャンディ
-OpenCandy_27;オープンキャンディ
-OpenCandy_28;オープンキャンディ
-OpenCandy_29;オープンキャンディ
-OpenCandy_30;オープンキャンディ
-OpenCandy_31;オープンキャンディ
-OpenCandy_32;オープンキャンディ
-OpenCandy_33;オープンキャンディ
-OpenCandy_34;オープンキャンディ
-OpenCandy_35;オープンキャンディ
-OpenCandy_36;オープンキャンディ
-OpenCaptionsLanguage;
-OpenCaptionsPresent;
-OpenCaptionsType;
+OpenCandy_01;ダウンロード中 ________
+OpenCandy_02;__% 完了
+OpenCandy_03;インターネット接続の中断
+OpenCandy_04;________ ダウンロード完了
+OpenCandy_05;クリックでインストール ________
+OpenCandy_06;インストールをキャンセルしますか ?\r\nインストールを後回しにしたい場合は、いいえ を選択してください。\r\n注：メニューから終了を選択すると、次回の再起動後までインストールを延期できます。
+OpenCandy_07;________ のダウンロードは停止しました。\r\nトレイアイコンのクリックでダウンロードを再開します。
+OpenCandy_08;重大なエラーが発生。 _________ のインストールを中止します。
+OpenCandy_09;ダウンロード停止
+OpenCandy_10;インストールをキャンセル
+OpenCandy_11;ダウンロード再開
+OpenCandy_12;インストーラーを終了
+OpenCandy_13;___________ - ____________ による推薦
+OpenCandy_14;ダウンロード中 _________
+OpenCandy_15;___________ は ___________ によりあなたにこのソフトを推薦しています。現在ダウンロード中です。インストールの準備ができたらお知らせします。
+OpenCandy_16;___________ はインストールの準備完了
+OpenCandy_17;___________ は完全にダウンロードされました。インストールをクリックすると続行します。
+OpenCandy_18;___________ / ___________ ダウンロード済み
+OpenCandy_19;Powered by OpenCandy
+OpenCandy_20;OpenCandy.com にて詳細
+OpenCandy_21;インストール
+OpenCandy_22;___________ のインストール
+OpenCandy_23;これは ___________ のインストールをキャンセルします。\r\n本当に終了しますか ?
+OpenCandy_24;停止
+OpenCandy_25;ダウンロードを停止しました。続けるには再開をクリックします。
+OpenCandy_26;再開
+OpenCandy_27;今すぐインストール
+OpenCandy_28;ダウンロード停止
+OpenCandy_29;ダウンロード再開
+OpenCandy_30;インストールをキャンセル
+OpenCandy_31;インストールの設定を選択してください
+OpenCandy_32;インストール ___________
+OpenCandy_33;インストールしない
+OpenCandy_34;インストールの設定を選択してください
+OpenCandy_35;______  はこのソフトウェアを推薦します
+OpenCandy_36;現在のインストールが中断されることはありません
+OpenCaptionsLanguage;オープンキャプションの言語
+OpenCaptionsPresent;オープンキャプションの有無
+OpenCaptionsType;オープンキャプションの種類
 Options;オプション
-Options_Hint;詳細設定
+Options_Hint;設定
 Original;オリジナル
-OriginalNetworkName;オリジナル ネットワーク名
-OriginalSourceForm;オリジナル ソース フォーム
-OriginalSourceMedium;中間ソース フォーム
-OriginalSourceMedium_ID;
-Originator;
+OriginalNetworkName;元のネットワーク名
+OriginalSourceForm;参照元の形態
+OriginalSourceMedium;参照元の媒体
+OriginalSourceMedium_ID;参照元の媒体中の ID
+Originator;発起人
 Other;その他
-OtherIdentifier;
-OtherIdentifierType;
+OtherIdentifier;他の識別子
+OtherIdentifierType;他の識別子の種別
 Output;出力
-Output format;出力フォーマット
-OverallBitRate;オーバルビットレート
-OverallBitRate_Maximum;最大
-OverallBitRate_Minimum;最小
-OverallBitRate_Mode;OBR モード
-OverallBitRate_Nominal;OBR ノミナル
-PackageName;
+Output format;出力形式
+OverallBitRate;総ビットレート
+OverallBitRate_Maximum;最大総ビットレート
+OverallBitRate_Minimum;最小総ビットレート
+OverallBitRate_Mode;総ビットレートの種類
+OverallBitRate_Nominal;総ビットレート名
+PackageName;パッケージ名
 Part;パート
 Part_Count;合計
-PartNumber;
-PartTotal;
-Performer;パフォーマー
-Period;ピリオド
+PartNumber;パート数
+PartTotal;合計パート
+Performer;出演者
+Period;時代
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;電話
-PictureRatio;
-PixelAspectRatio;ピクセル比
-PixelAspectRatio_CleanAperture;
-PixelAspectRatio_Original;ピクセル比
+PictureRatio;画像比率
+PixelAspectRatio;ピクセルアスペクト比
+PixelAspectRatio_CleanAperture;表示されるピクセルアスペクト比 (Clean aperture)
+PixelAspectRatio_Original;元のピクセルアスペクト比
 PlayCounter;再生数カウンター
 Played_Count;再生数
-Played_First_Date;初再生日
+Played_First_Date;初回再生日
 Played_Last_Date;最終再生日
 PlayTime;再生時間
-PodcastCategory;
-Position;ポジション
+PodcastCategory;ポッドキャストのカテゴリ
+PortableHeadphones;
+PortableSpeakers;
+Position;位置
+Position_Cartesian;
+Position_Polar;
 Position_Total;合計
 Preferences;設定
-Premium;
-Premium_Summary;
-PrimaryAudioLanguage;
+PreferredDownmix;
+Premium;プレミアム
+Premium_Summary;プレミアム概要
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
+PrimaryAudioLanguage;音声1の言語
 Producer;プロデューサー
-ProductionDesigner;プロダクション
-ProductionNumber;
+ProductionDesigner;美術監督
+ProductionNumber;製造番号
 ProductionStudio;スタジオ
-ProductPlacement;
-ProgrammeHasText;
-ProgrammeTextLanguage;
-ProgrammeTitle;
+ProductPlacement;スタジオの場所
+ProgrammeHasText;プログラムの字幕の有無
+ProgrammeTextLanguage;プログラムの字幕の言語
+ProgrammeTitle;プログラムのタイトル
 Publisher;発行者
 Purchased_Date;購入日
-Quote character;クオート
+Quote character;クオート文字
 RadioStation;ラジオ局
-Rating;レイティング
+Rating;評価
+RealtimeLoudnessCorrected;
 Recorded_Date;録音日
 Recorded_Location;録音した場所
 Released_Date;リリース日
-RemixedBy;リミックス by
-Renew;
+RemixedBy;リミックス者
+RenderMode;
+Renew;更新
 ReplayGain_Gain;リプレイゲイン ゲイン
-ReplayGain_Peak;リプレイ ゲイン ピーク
-Report;
+ReplayGain_Peak;リプレイゲイン ピーク
+Report;報告
 Resolution;解像度
+RestoreLifetimeSubscription;生涯購読の復元
 s;秒
-SamplePeakLevel;
-SamplePeakLevel_Album;
-SamplesPerFrame;
-SamplingCount;
+SamplePeakLevel;サンプルピーク
+SamplePeakLevel_Album;サンプルピーク (アルバム)
+SamplesPerFrame;フレームあたりのサンプル
+SamplingCount;サンプルカウント
 SamplingRate;サンプルレート
 Save;保存
-ScanOrder;スキャンの並び
-ScanOrder_Original;
-ScanOrder_Stored;
-ScanOrder_StoredDisplayedInverted;
-ScanOrder_StoreMethod;
-ScanType;スキャンの種類
-ScanType_Original;
-ScanType_StoreMethod;
+ScanOrder;走査順序
+ScanOrder_Original;元の走査順序
+ScanOrder_Stored;保存された走査順序
+ScanOrder_StoredDisplayedInverted;走査順序, 逆向きに保管/表示されたもの
+ScanOrder_StoreMethod;走査順序の保存方法
+ScanType;走査方式
+ScanType_Original;元の走査方式
+ScanType_StoreMethod;走査方式の保存方法
 ScreenplayBy;監督
 Season;シーズン
-SecondaryAudioLanguage;
-see below;以下詳細
+SecondaryAudioLanguage;音声2の言語
+see below;詳細は下記
 Send HeaderFile;可能ならヘッダファイルを送信してください: http://sourceforge.net/projects/mediainfo/ (バグセクション)
 Separator_Columns;列の区切り
-Separator_Lines;区切り線
-SeriesTitle;
+Separator_Lines;改行
+SeriesTitle;シリーズ名
 ServiceChannel;チャンネル
-ServiceKind;
-ServiceName;名前
-ServiceProvider;プロバイダ
-ServiceType;種類
+ServiceKind;サービス種別
+ServiceName;サービス名
+ServiceProvider;サービスプロバイダ
+ServiceType;サービス種別
 Set;セット
-Set_Count;セット回数
-Setup;セットアップ
+Set_Count;セット数
+Setup;基本
 Sharpness;シャープネス
 Sheet;シート
 Sheet (Complete);シート (完成)
-Shell extension;シェルに統合 （右クリックメニューに登録)
-Shell extension, folder;シェルに統合 （フォルダー）
-Shell InfoTip;シェルでインフォチップ （対応ファイル上でツールチップを表示）
-ShimName;
-ShimVersion;
-Show menu;メニューを表示する
-Show toolbar;ツール バーを表示する
-SigningPresent;
-SignLanguage;
-Sort;並び替え
-SoundEngineer;サウンドエンジニア
-Source;
-Source_Duration;
-Source_FrameCount;
-Source_SamplingCount;
-Source_StreamSize;
-Source_StreamSize_Encoded;
-Standard;標準
+Shell extension;エクスプローラーに統合 (ファイルの右クリックメニューに登録)
+Shell extension, folder;フォルダーにも追加
+Shell InfoTip;エクスプローラーでツールチップ (対応ファイル上でツールチップを表示)
+ShimName;Shim 名
+ShimVersion;Shim バージョン
+Show menu;メニューを表示
+Show toolbar;ツールバーを表示
+SignalGroup;
+SigningPresent;Sign 有無
+SignLanguage;Sign の言語
+Sort;索引用表記
+SoundCategory;
+SoundEngineer;音響技師
+Source;参照元
+Source_Duration;元の長さ
+Source_FrameCount;元のフレーム数
+Source_SamplingCount;元のサンプルカウント
+Source_StreamSize;元のストリームサイズ
+Source_StreamSize_Encoded;元のエンコードされたストリームサイズ
+SpokenSubtitles;
+Standard;標準化
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
 StoreMethod_SeparatedFields_2;
 Stream;ストリーム
 Stream_MoreInfo;このストリームの詳細情報
-StreamCount;この種類のストリーム数
+StreamCount;この種類のストリームの数
 StreamID;ストリーム ID
-streamIdentifier;
-StreamKind;ストリーム種
+streamIdentifier;ストリーム識別子
+StreamKind;ストリーム種別
 StreamKindID;ID
-StreamKindPos;ポジション
-StreamSize;ストリームサイズ
-StreamSize_Demuxed;
-StreamSize_Encoded;
-StreamSize_Proportion;サイズ整形
+StreamKindPos;位置
+StreamSize;ストリームのサイズ
+StreamSize_Demuxed;Demux 後のストリームサイズ
+StreamSize_Encoded;エンコードされたストリームサイズ
+StreamSize_Proportion;このストリームの割合
 Subject;件名
-Subscribe;
-Subscribe_Button;
-Subscribe_Failed;
-Subscribe_Manage;
-Subscribe_Renew;
-Subscribe_Renew_Price;
-Subscribe_Unaviable;
-Subscribe_Waiting;
-Subscription_Active;
-Subscription_Android;
-Subscription_Ended;
-Subscription_Expired;
-Subscription_Thanks;
+Subscribe;購読
+Subscribe_Button;購読 (1年間 %PRICE%)
+Subscribe_Failed;購入はキャンセルまたは失敗しました
+Subscribe_Manage;購読の管理
+Subscribe_Renew;購読を更新しますか?
+Subscribe_Renew_Price;購読の更新 (1年間 %PRICE%)
+Subscribe_Unaviable;購読の詳細を取得できません
+Subscribe_Waiting;承認を待って購入
+Subscription_Active;購読は %DATE% まで有効です
+Subscription_Android;3日間の無料使用期間があります。
+Subscription_Ended;購読が終了しました
+Subscription_Expired;購読は %DATE% に期限切れしました
+Subscription_Lifetime;生涯の購読を検出
+Subscription_Thanks;ご支援ありがとうございます!
+Substream;
 SubTrack;サブトラック
-Summary;サマリー
-Supported formats;対応フォーマット
-Supported?;サポート？
-SupportUs;
-Synopsis;Synopsis
-SystemId;システム Id
-Tagged_Application;タギングツール
+SubtstreamIdChannel;
+Summary;概要
+Supported formats;対応する形式
+Supported?;対応？
+SupportUs;私たちを支援してください。ダークテーマやさらなる機能につなげましょう。
+SurroundAttenuationKnown;
+SwitchGroup;
+Synopsis;概要
+SystemId;システム ID
+Tagged_Application;タグ付けソフト
 Tagged_Date;タグ付け日
-Technician;テクニシャン
+TargetDeviceConfig;
+Technician;技術者
 TermsOfUse;使用許諾
-TertiaryAudioLanguage;
+TertiaryAudioLanguage;音声3の言語
 Text;テキスト
 Text - Custom;テキスト - カスタム
 Text (HTML);テキスト (HTML)
-Text stream(s);テキストストリーム
-Text streams;テキストストリーム
-Text_Codec_List;テキストコーデック
-Text_No;テキストなし
-Text1;プライマリテキストストリーム
-Text2;セカンダリテキストストリーム
-Text3;サードテキストストリーム
-TextCount;テキストストリーム数
-TextlessElementsExist;
+Text stream(s);字幕ストリーム
+Text streams;字幕ストリーム
+Text_Codec_List;字幕コーデック
+Text_No;字幕なし
+Text1;字幕ストリーム 1
+Text2;字幕ストリーム 2
+Text3;字幕ストリーム 3
+TextCount;字幕ストリームの数
+TextlessElementsExist;Textless 要素の有無
 ThanksTo;謝辞
-Thousands separator;区切り
-TimeCode;
-TimeCode_FirstFrame;
-TimeCode_Settings;
-TimeCode_Source;
-TimeCode_Striped;
-TimeStamp;
+Thousands separator;数値3桁ごとの区切り文字
+TimeCode;タイムコード
+TimeCode_FirstFrame;最初のフレームのタイムコード
+TimeCode_Settings;タイムコードの設定
+TimeCode_Source;タイムコードの参照元
+TimeCode_Striped;タイムコードのストライプ
+TimeStamp;タイムスタンプ
 TimeZone;タイムゾーン
 Title;タイトル
 Title_More;タイトルと詳細情報
 Total;計
-TotalNumberOfParts;
-TotalProgrammeDuration;
-Track;トラック名
+TotalNumberOfParts;パートの合計数
+TotalProgrammeDuration;プログラム全体の長さ
+Track;トラック
 Track_Count;トラック数
-transfer_characteristics;
+transfer_characteristics;転送特性
 Translate_Reports;
 Translator;翻訳者
 Tree;ツリー
 Tree & Text;ツリーとテキスト
-TruePeakLevel;
-TruePeakLevel_Album;
-Type;
-UniqueID;
-UniversalAdID;
-UniversalAdID_Registry;
-UniversalAdID_Value;
+TruePeakLevel;トゥルーピーク
+TruePeakLevel_Album;トゥルーピーク (アルバム)
+Type;種類
+TypeDefinition;
+UniqueID;固有ID
+UniversalAdID;ユニバーサル広告ID
+UniversalAdID_Registry;ユニバーサル広告ID登録
+UniversalAdID_Value;ユニバーサル広告IDの値
 Unknown;不明
-Url;Url
-Video;ビデオ
-Video stream(s);ビデオストリーム
-Video_Codec_List;ビデオコーデック
-Video_Delay;ビデオ ディレイ
-Video_No;ビデオ番号
-Video0_Delay;ビデオ 0 ディレイ
-Video1;ビデオ 1
-VideoComments;
-VideoCount;ビデオストリーム数
+Url;URL
+Video;映像
+Video stream(s);映像ストリーム
+Video_Codec_List;映像コーデック
+Video_Delay;映像遅延
+Video_No;映像なし
+Video0_Delay;映像0 遅延
+Video1;映像ストリーム 1
+VideoComments;映像コメント
+VideoCount;映像ストリーム数
 View;表示
-View_Hint;ヒントを表示する
+View_Hint;情報の表示方法を変更
 Views;
-Warning : more streams in the files;警告 : このファイルにはさらなるストリームが含まれています
+Warning : more streams in the files;警告 : このファイルにはもっと多くのストリームが含まれます
 Web;Web
-WebSite;
-WebSite_Audio;このオーディオコーデックについて
-WebSite_Audio_More; (%Url%) へ移動してこのオーディオコーデックを探す
-WebSite_General;このファイルを再生可能なプレイヤー
-WebSite_General_More;このファイルを再生可能なプレイヤー
-WebSite_Text;このテキストコーデックについて
-WebSite_Text_More; (%Url%) へ移動してこのテキストコーデックを探す
+WebSite;サイト
+WebSite_Audio;この音声コーデックについて
+WebSite_Audio_More; サイト (%Url%) を開きこの音声コーデックを探す
+WebSite_General;このファイルを再生可能なプレイヤーのサイトを開く
+WebSite_General_More;このファイルを再生可能なプレイヤーを開く
+WebSite_Text;この字幕コーデックについて
+WebSite_Text_More; (%Url%) を開きこの字幕コーデックを探す
 WebSite_Url;http://MediaArea.net/MediaInfo
-WebSite_Video;このビデオコーデックについて
-WebSite_Video_More; (%Url%) へ移動してこのビデオコーデックを探す
+WebSite_Video;この映像コーデックについて
+WebSite_Video_More; (%Url%) を開きこの映像コーデックを探す
 Width;幅
-Width_CleanAperture;
-Width_Original;
-WriteMe;メール送信
+Width_CleanAperture;表示される幅 (Clean aperture)
+Width_Original;元の幅
+WriteMe;開発者にメール送信
 WriteToTranslator;翻訳者
 Written_Date;作成日
 Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;78
-ZZ_AutomaticLanguage_Percent;82
+ZZ_Automatic_Percent;92
+ZZ_AutomaticLanguage_Percent;92

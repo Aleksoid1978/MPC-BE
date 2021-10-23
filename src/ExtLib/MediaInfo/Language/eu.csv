@@ -34,6 +34,7 @@
  day1; egun
  day2; egun
  day3; egun
+ dB0;
  dB1; dB
  dB2; dB
  dB3; dB
@@ -117,6 +118,9 @@
  month1; hilabete
  month2; hilabete
  month3; hilabete
+ object1;
+ object2;
+ object3;
  pixel1; pixel
  pixel2; pixel
  pixel3; pixel
@@ -153,9 +157,14 @@ ActiveFormatDescription;Eragin Heuskarri Azalpena
 ActiveFormatDescription_MuxingMode;Eragin Heuskarri Azalpena, Nahasketa modua
 Actor;Antzezlea
 Actor_Character;Pertsonaia
+Add creation date to text output;
+Add version to text output;
 Added_Date;Gehitze eguna
 Address;Helbidea
 AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
 Advanced;Aurreratua
 Advanced mode;Modu aurreratua
 Album;Bilduma
@@ -181,9 +190,12 @@ Audio1;Lehen audioa jarioa
 Audio2;Bigarren audioa jarioa
 AudioComments;
 AudioCount;Audio jario zenbatekoa
+AudioDescription;
 AudioDescriptionPresent;
 AudioDescriptionType;
 AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
 AudioTrackLayout;
 Author;Egilea
 BarCode;BarraKodea
@@ -206,7 +218,10 @@ Bits-(Pixel*Frame);Bit/(Pixel*Frame)
 BufferSize;Buffer neurria
 Cancel;Ezeztatu
 Channel(s);Bide
+ChannelCoded;
+ChannelConfiguration;
 ChannelLayout;
+ChannelMode;
 ChannelPositions;Bide kokapenak
 Chapter(s);Atal
 Chapters;Atalak
@@ -225,6 +240,7 @@ Choose language;Hautatu gogoko duzun hizkuntza
 Choreographer;Dantza-musikaria
 Chroma;Margoa
 ChromaSubsampling;Margo azpilaginketa
+Classifier;
 ClearList;
 Close;Itxi
 Close all before open;Itxi dena ireki aurretik
@@ -294,12 +310,17 @@ Date;Eguna
 Debug;Garbiketa
 Decimal point;Hamarren puntua
 Default_Setting;
+DefaultTargetDeviceConfig;
 Delay;Atzerapena
 Delay_Source;Atzerapena, jatorria
 Delay_Source_Container;Edukiontzia
 Delay_Source_Stream;Raw jarioa
 Delete;Ezabatu
 Description;Azalpena
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
 Digitized_Date;Digitalizatze eguna
 Dimensions;Neurriak
 Director;Zuzendaria
@@ -310,15 +331,20 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Jatorrizko ikuspegi maila
 DistributedBy;Banatzailea
 Distributor;
+DolbyAtmos;
 Donate;Eman dirulaguntza bat
 DotsPerInch;Puntu hatzbeteko
+Downmix;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Iraupena
 Duration_End;Amaiera denbora
 Duration_Start;Hasiera denbora
+DynamicRangeControl;
+Eac3DrcProfile;
 Edit;Editatu
 EditedBy;Editatzailea
+EditorialClassification;
 ElementCount;
 EMail;Post@
 Encoded_Application;Idazketa aplikazioa
@@ -352,6 +378,7 @@ FileExtension;Agiri hedapena
 FileName;Agiri izena
 FileNameExtension;
 FileSize;Agiri neurria
+FlatPanelTv;
 Folder;Agiritegia
 Folder (R);Agiritegia (R)
 Folder (R)_Hint;Hautatu aztertzeko agiritegi bat (agiritegi guztiak jarraian)
@@ -407,6 +434,7 @@ FrameRate_Mode_CFR;Aldagaitza
 FrameRate_Mode_VFR;Aldakorra
 FrameRate_Nominal;Frame neurria izendatua
 FrameRate_Original;Jatorrizko frame neurria
+FrameRate_Real;
 General;Orokorra
 Genre;Mota
 Genre_000;Bluesa
@@ -606,7 +634,10 @@ Gop_OpenClosed;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
 Gop_OpenClosed_Open;
+Graph;
+Group;
 Grouping;
+GroupPreset;
 h; h
 HDR_Format;
 Header file;Sortu idazburu agiria
@@ -615,6 +646,7 @@ Height_CleanAperture;
 Height_Original;Jatorrizko garaiera
 Help;Laguntza
 Hint;Hint
+HomeTheaterAvr;
 How many audio streams?;Zenbat audio jario?
 How many chapters streams?;Zenbat atal jario?
 How many text streams?;Zenbat idazki jario?
@@ -622,12 +654,17 @@ How many video streams?;Zenbat bideo jario?
 HTML;HTML
 ID;ID-a
 IdentClockStart;
+IFrameInterval;
 Image;Irudia
 Image stream(s);Irudi jarioak
 Image_Codec_List;Kodek Irudia
 ImageCount;Irudi jario zenbatekoa
+ImmersiveStereo;
 Info;Argibideak
 Instruments;Tresnak
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
 Interlaced_BFF;Beheko Eremua Lehenik
 Interlaced_Interlaced;Elkarlotuta
 Interlaced_PPF;Aurrerakorra
@@ -849,10 +886,24 @@ Language_zh-tw;Txinera (Taiwan)
 Language_zu;Zuluera
 LawRating;Lege maila
 LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
 Library;Nahasketa liburutegia
+Lifetime_Subscribe_Button;
 Lightness;Argitasuna
 LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackUID_Pos;
 List;Zerrenda
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
 Loudness_Anchor;
 Loudness_Anchor_Album;
 Loudness_Count;
@@ -871,6 +922,8 @@ Loudness_Range;
 Loudness_Range_Album;
 Loudness_RoomType;
 Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
 Lyricist;Abestidazlea
 Lyrics;Abestidatziak
 Mastered_Date;Masterizatze eguna
@@ -883,6 +936,9 @@ matrix_coefficients;Matrize ezaugarriak
 Matrix_Format;
 MaxCLL;
 MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
 MediaInfo_About;MediaInfo-k sarbide erraza eskaintzen du bideo eta audio agirien argibide teknikoetara eta etiketara.\r\nSoftware askea da, honek esanahi du dohainekoa dela erabiltzaileentzat eta garatzaileek askatasuna dutela ikertzeko, hobetzeko eta programa birbanatzeko (BSD baimena)
 MediaInfo_About_About;
 Menu;Menua
@@ -892,12 +948,14 @@ Menu_Hint;Aukera gehiago
 Menu_No;Menurik ez
 MenuCount;Menu jario zenbatekoa
 MenuID;Menu ID-a
+MixType;
 mn; min
 Mood;Modua
 More;Gehiago
 Movie;Filma izena
 ms; sm
 MSDI;MSDI
+MultipleStream;
 MusicBy;Musikaria
 MuxingMode;Nahasketa modua
 MuxingMode_MoreInfo;Nahasketa modua, argibide gehiago
@@ -912,8 +970,18 @@ NewVersion_Question_Content;Bertsio berri bat (v%Version%) eskuragarri dago, jei
 NewVersion_Question_Title;Bertsio berri bat argitaratu da!
 No;Ez
 Not yet;Oraindik ez
+NumberOfChannelFormats;
+NumberOfContents;
 NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfSubstreams;
+NumberOfTrackUIDs;
 NumColors;Margo zenbatekoa
+ObjectCount;
 OK;Ongi
 One output file per input file;Irteera agiri bat sarrera agiriko
 Open;Ireki
@@ -981,6 +1049,8 @@ PartNumber;
 PartTotal;
 Performer;Egilea
 Period;Aldia
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
 Phone;Urrutizkina
 PictureRatio;
 PixelAspectRatio;Pixel ikuspegi maila
@@ -992,11 +1062,23 @@ Played_First_Date;Lehen irakurria
 Played_Last_Date;Azken irakurria
 PlayTime;Irakurketa-Denbora
 PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
 Position;Kokapena
+Position_Cartesian;
+Position_Polar;
 Position_Total;Guztira
 Preferences;Hobespenak
+PreferredDownmix;
 Premium;
 Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
 PrimaryAudioLanguage;
 Producer;Ekoizlea
 ProductionDesigner;Ekoizpen diseinatzailea
@@ -1011,15 +1093,18 @@ Purchased_Date;erosketa eguna
 Quote character;Kakotxa hizkirria
 RadioStation;Irrati katea
 Rating;Mailaketa
+RealtimeLoudnessCorrected;
 Recorded_Date;Grabaketa eguna
 Recorded_Location;Grabaketa helbidea
 Released_Date;Argitaratze eguna
 RemixedBy;Bernahastzailea
+RenderMode;
 Renew;
 ReplayGain_Gain;Berrirakurkea irabazia
 ReplayGain_Peak;Berrirakurkea irabazi gailurra
 Report;
 Resolution;Bereizmena
+RestoreLifetimeSubscription;
 s;s
 SamplePeakLevel;
 SamplePeakLevel_Album;
@@ -1061,9 +1146,11 @@ ShimName;
 ShimVersion;
 Show menu;Erakutsi menua
 Show toolbar;Erakutsi tresnabarra
+SignalGroup;
 SigningPresent;
 SignLanguage;
 Sort;Antolatu honela
+SoundCategory;
 SoundEngineer;Soinu ingeniaria
 Source;Iturburua
 Source_Duration;Iturburu iraupena
@@ -1071,6 +1158,7 @@ Source_FrameCount;Iturburu frame zenbatekoa
 Source_SamplingCount;Iturburu lagin zenbatekoa
 Source_StreamSize;Iturburu jario neurria
 Source_StreamSize_Encoded;Iturburu kodeaketa jario neurria
+SpokenSubtitles;
 Standard;Estandarra
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
@@ -1101,16 +1189,22 @@ Subscription_Active;
 Subscription_Android;
 Subscription_Ended;
 Subscription_Expired;
+Subscription_Lifetime;
 Subscription_Thanks;
+Substream;
 SubTrack;Azpibidea
+SubtstreamIdChannel;
 Summary;Laburpena
 Supported formats;Sostengatutako heuskarriak
 Supported?;Sostengatua?
 SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
 Synopsis;Laburpena
 SystemId;Id-a
 Tagged_Application;Aplikazio etiketatzea
 Tagged_Date;Etiketatze eguna
+TargetDeviceConfig;
 Technician;Teknikaria
 TermsOfUse;Erabilpen baldintzak
 TertiaryAudioLanguage;
@@ -1150,6 +1244,7 @@ Tree & Text;Zuhaitza eta Idazkia
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Mota
+TypeDefinition;
 UniqueID;ID bakarra
 UniversalAdID;
 UniversalAdID_Registry;
@@ -1190,5 +1285,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;79
+ZZ_AutomaticLanguage_Percent;80
