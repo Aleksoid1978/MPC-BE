@@ -23,15 +23,20 @@
 
 extern "C" __declspec(dllexport) int get_icon_index(LPCWSTR _ext)
 {
-	int iconindex = IDI_NONE;
+	wchar_t ext[10]; // must be equal to the length of the longest string being compared + 1 or more
 
-	wchar_t ext[12]; // needs a little more than the length of ":playlist" + 1
+	if (!_ext || wcslen(_ext) >= _countof(ext)) {
+		return IDI_NONE;
+	}
+
 	wcscpy_s(ext, _ext);
 	int i = 0;
 	while (ext[i]) {
 		ext[i] = (wchar_t)towlower(ext[i]);
 		i++;
 	}
+
+	int iconindex = IDI_NONE;
 
 	// icons by type
 	if (wcscmp(ext, L":video") == 0) {
