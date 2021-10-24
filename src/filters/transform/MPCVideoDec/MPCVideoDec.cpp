@@ -1599,6 +1599,8 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 	av_parser_close(m_pParser);
 	m_pParser = nullptr;
 
+	m_pStagingD3D11Texture2D.Release();
+
 	if (m_pAVCtx) {
 		av_freep(&m_pAVCtx->hwaccel_context);
 		avcodec_free_context(&m_pAVCtx);
