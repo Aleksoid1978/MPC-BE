@@ -59,8 +59,8 @@ typedef struct Dav1dLogger {
 } Dav1dLogger;
 
 typedef struct Dav1dSettings {
-    int n_threads;
-    int max_frame_delay; ///< internally clipped to $n_threads. Set to 1 for low-latency decoding.
+    int n_threads; ///< number of threads (0 = auto)
+    int max_frame_delay; ///< Set to 1 for low-latency decoding (0 = auto)
     int apply_grain;
     int operating_point; ///< select an operating point for scalable AV1 bitstreams (0 - 31)
     int all_layers; ///< output all spatial layers of a scalable AV1 biststream
