@@ -3200,9 +3200,10 @@ HRESULT CMPCVideoDecFilter::FillAVPacket(AVPacket *avpkt, const BYTE *buffer, in
 	return S_OK;
 }
 
-#define Continue { av_frame_unref(m_pFrame); av_frame_free(&hw_frame); continue; }
 HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll/* = FALSE*/)
 {
+#define CLEAR_AND_CONTINUE { av_frame_unref(m_pFrame); av_frame_free(&hw_frame); continue; }
+
 	if (avpkt) {
 		if (m_bWaitingForKeyFrame) {
 			if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
@@ -3304,7 +3305,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			}
 
 			if (ret < 0) {
-				Continue;
+				CLEAR_AND_CONTINUE;
 			}
 			av_frame_copy_props(m_pFrame, hw_frame);
 
@@ -3340,10 +3341,10 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		if (UseDXVA2()) {
 			hr = m_pDXVADecoder->DeliverFrame();
-			Continue;
+			CLEAR_AND_CONTINUE;
 		} else if (UseD3D11()) {
 			hr = m_pD3D11Decoder->DeliverFrame();
-			Continue;
+			CLEAR_AND_CONTINUE;
 		}
 
 		GetFrameTimeStamp(m_pFrame, rtStartIn, rtStopIn);
@@ -3356,7 +3357,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		UpdateFrameTime(rtStartIn, rtStopIn);
 
 		if (bPreroll || rtStartIn < 0) {
-			Continue;
+			CLEAR_AND_CONTINUE;
 		}
 
 		CComPtr<IMediaSample> pOut;
@@ -3364,19 +3365,17 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
-			Continue;
+			CLEAR_AND_CONTINUE;
 		}
 
 		if (hw_frame && hw_frame->hw_frames_ctx) {
 			auto frames_ctx = (AVHWFramesContext*)hw_frame->hw_frames_ctx->data;
 
 			if (frames_ctx->format == AV_PIX_FMT_D3D11) {
-				auto format = (frames_ctx->sw_format == AV_PIX_FMT_P010) ? DXGI_FORMAT_P010 :
-							  (frames_ctx->sw_format == AV_PIX_FMT_NV12) ? DXGI_FORMAT_NV12 :
-							  DXGI_FORMAT_UNKNOWN;
-				if (format == DXGI_FORMAT_UNKNOWN) {
-					Continue;
-				}
+				const auto dxgi_format =
+					(frames_ctx->sw_format == AV_PIX_FMT_P010) ? DXGI_FORMAT_P010 :
+					(frames_ctx->sw_format == AV_PIX_FMT_NV12) ? DXGI_FORMAT_NV12 :
+					DXGI_FORMAT_UNKNOWN; // formal assignment
 
 				auto device_hwctx = reinterpret_cast<AVD3D11VADeviceContext*>(frames_ctx->device_ctx->hwctx);
 				auto texture = reinterpret_cast<ID3D11Texture2D*>(hw_frame->data[0]);
@@ -3385,23 +3384,23 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				D3D11_TEXTURE2D_DESC texDesc = {};
 				if (m_pStagingD3D11Texture2D) {
 					m_pStagingD3D11Texture2D->GetDesc(&texDesc);
-					if (texDesc.Format != format || texDesc.Width != frames_ctx->width || texDesc.Height != frames_ctx->height) {
+					if (texDesc.Format != dxgi_format || texDesc.Width != frames_ctx->width || texDesc.Height != frames_ctx->height) {
 						m_pStagingD3D11Texture2D.Release();
 					}
 				}
 				if (!m_pStagingD3D11Texture2D) {
-					texDesc.Width = frames_ctx->width;
-					texDesc.Height = frames_ctx->height;
-					texDesc.MipLevels = 1;
-					texDesc.Format = format;
-					texDesc.SampleDesc = { 1, 0 };
-					texDesc.ArraySize = 1;
-					texDesc.Usage = D3D11_USAGE_STAGING;
+					texDesc.Width          = frames_ctx->width;
+					texDesc.Height         = frames_ctx->height;
+					texDesc.MipLevels      = 1;
+					texDesc.Format         = dxgi_format;
+					texDesc.SampleDesc     = { 1, 0 };
+					texDesc.ArraySize      = 1;
+					texDesc.Usage          = D3D11_USAGE_STAGING;
 					texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 					hr = device_hwctx->device->CreateTexture2D(&texDesc, nullptr, &m_pStagingD3D11Texture2D);
 					if (FAILED(hr)) {
 						DLog(L"CMPCVideoDecFilter::DecodeInternal() : ID3D11Device::CreateTexture2D() failed : %s", HR2Str(hr));
-						Continue;
+						CLEAR_AND_CONTINUE;
 					}
 				}
 
@@ -3413,15 +3412,15 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				hr = device_hwctx->device_context->Map(m_pStagingD3D11Texture2D, 0, D3D11_MAP_READ, 0, &mappedResource);
 				if (FAILED(hr)) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal() : ID3D11DeviceContext::Map() failed : %s", HR2Str(hr));
-					Continue;
+					CLEAR_AND_CONTINUE;
 				}
-				m_pFrame->data[0] = (BYTE*)mappedResource.pData;
-				m_pFrame->data[1] = m_pFrame->data[0] + texDesc.Height * mappedResource.RowPitch;
+				m_pFrame->data[0]     = (BYTE*)mappedResource.pData;
+				m_pFrame->data[1]     = m_pFrame->data[0] + texDesc.Height * mappedResource.RowPitch;
 				m_pFrame->linesize[0] = mappedResource.RowPitch;
 				m_pFrame->linesize[1] = mappedResource.RowPitch;
-				m_pFrame->format = frames_ctx->sw_format;
-				m_pFrame->width = hw_frame->width;
-				m_pFrame->height = hw_frame->height;
+				m_pFrame->format      = frames_ctx->sw_format;
+				m_pFrame->width       = hw_frame->width;
+				m_pFrame->height      = hw_frame->height;
 
 				m_FormatConverter.Converting(pDataOut, m_pFrame);
 
@@ -3434,7 +3433,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			else {
 				ret = av_hwframe_transfer_data(m_pFrame, hw_frame, 0);
 				if (ret < 0) {
-					Continue;
+					CLEAR_AND_CONTINUE;
 				}
 				m_FormatConverter.Converting(pDataOut, m_pFrame);
 			}
@@ -3447,10 +3446,10 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					if ((intptr_t)m_pFrame->data[i] % 16u || m_pFrame->linesize[i] % 16u) {
 						// copy the frame, its not aligned properly and would crash later
 						pTmpFrame = av_frame_alloc();
-						pTmpFrame->format = m_pFrame->format;
-						pTmpFrame->width = m_pFrame->width;
-						pTmpFrame->height = m_pFrame->height;
-						pTmpFrame->colorspace = m_pFrame->colorspace;
+						pTmpFrame->format      = m_pFrame->format;
+						pTmpFrame->width       = m_pFrame->width;
+						pTmpFrame->height      = m_pFrame->height;
+						pTmpFrame->colorspace  = m_pFrame->colorspace;
 						pTmpFrame->color_range = m_pFrame->color_range;
 						av_frame_get_buffer(pTmpFrame, AV_INPUT_BUFFER_PADDING_SIZE);
 						av_image_copy(pTmpFrame->data, pTmpFrame->linesize, (const uint8_t**)m_pFrame->data, m_pFrame->linesize, (AVPixelFormat)m_pFrame->format, m_pFrame->width, m_pFrame->height);
@@ -3482,6 +3481,8 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 	}
 
 	return S_OK;
+
+#undef CLEAR_AND_CONTINUE
 }
 
 HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll)
