@@ -591,7 +591,7 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
             IDXGIFactory1_Release(pDXGIFactory);
 
             if (!pAdapter) {
-                av_log(ctx, AV_LOG_ERROR, "Failed to get DXGI adapter '%s', device\n");
+                av_log(ctx, AV_LOG_ERROR, "Failed to get DXGI adapter '%s'\n", device);
                 return AVERROR_UNKNOWN;
             }
 // ==> End patch MPC
