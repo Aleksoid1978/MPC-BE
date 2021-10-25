@@ -589,6 +589,11 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
             if (FAILED(IDXGIFactory1_EnumAdapters(pDXGIFactory, adapter, &pAdapter)))
                 pAdapter = NULL;
             IDXGIFactory1_Release(pDXGIFactory);
+
+            if (!pAdapter) {
+                av_log(ctx, AV_LOG_ERROR, "Failed to get DXGI adapter '%s', device\n");
+                return AVERROR_UNKNOWN;
+            }
 // ==> End patch MPC
         }
     }
