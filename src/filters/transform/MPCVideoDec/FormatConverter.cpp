@@ -378,8 +378,13 @@ void CFormatConverter::SetConvertFunc()
 				pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
 			}
 		}
-		else if (m_FProps.pftype == PFType_P01x && (m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016)) {
-			pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		else if (m_FProps.pftype == PFType_P01x) {
+			if (m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016) {
+				pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+			}
+			else if (m_out_pixfmt == PixFmt_NV12) {
+				pConvertFn = &CFormatConverter::convert_p010_nv12_direct_sse4;
+			}
 		}
 	}
 }
