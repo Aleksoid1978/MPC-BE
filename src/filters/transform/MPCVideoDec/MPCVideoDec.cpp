@@ -3442,36 +3442,34 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					CLEAR_AND_CONTINUE;
 				}
 				int linesize[4] = {};
-				ret = av_image_fill_linesizes(linesize, frames_ctx->sw_format,
-														FFALIGN(hw_frame->width, 1));
-				CUDA_MEMCPY2D cpy = {};
+				ret = av_image_fill_linesizes(linesize, frames_ctx->sw_format, hw_frame->width);
 
-				cpy.srcPitch      = hw_frame->linesize[0];
-				cpy.dstPitch      = linesize[0];
-				cpy.WidthInBytes  = std::min(cpy.srcPitch, cpy.dstPitch);
-				cpy.Height        = hw_frame->height;
+				int h_shift = 0, v_shift = 0;
+				av_pix_fmt_get_chroma_sub_sample(frames_ctx->sw_format, &h_shift, &v_shift);
 
-				cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
-				cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hw_frame->data[0]);
+				unsigned offset = 0;
+				for (size_t i = 0; i < std::size(hw_frame->data) && hw_frame->data[i]; i++) {
+					CUDA_MEMCPY2D cpy = {};
 
-				cpy.dstMemoryType = CU_MEMORYTYPE_HOST;
-				cpy.dstHost       = pDataOut;
+					cpy.srcPitch      = hw_frame->linesize[i];
+					cpy.dstPitch      = linesize[i];
+					cpy.WidthInBytes  = std::min(cpy.srcPitch, cpy.dstPitch);
+					cpy.Height        = hw_frame->height >> ((i == 0 || i == 3) ? 0 : v_shift);
 
-				cuStatus = cuda_fns->cuMemcpy2DAsync(&cpy, cuda_hwctx->stream);
-				if (cuStatus != CUDA_SUCCESS) {
-					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuMemcpy2DAsync() failed");
-					CLEAR_AND_CONTINUE;
+					cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
+					cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hw_frame->data[i]);
+
+					cpy.dstMemoryType = CU_MEMORYTYPE_HOST;
+					cpy.dstHost       = pDataOut + offset;
+
+					cuStatus = cuda_fns->cuMemcpy2DAsync(&cpy, cuda_hwctx->stream);
+					if (cuStatus != CUDA_SUCCESS) {
+						break;
+					}
+
+					offset += linesize[i] * (hw_frame->height >> (i ? v_shift : 0));
 				}
 
-				cpy.srcPitch      = hw_frame->linesize[1];
-				cpy.dstPitch      = linesize[1];
-				cpy.WidthInBytes  = std::min(cpy.srcPitch, cpy.dstPitch);
-				cpy.Height        = hw_frame->height / 2;
-
-				cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hw_frame->data[1]);
-				cpy.dstHost       = pDataOut + (cpy.dstPitch * hw_frame->height);
-
-				cuStatus = cuda_fns->cuMemcpy2DAsync(&cpy, cuda_hwctx->stream);
 				if (cuStatus != CUDA_SUCCESS) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuMemcpy2DAsync() failed");
 					CLEAR_AND_CONTINUE;
