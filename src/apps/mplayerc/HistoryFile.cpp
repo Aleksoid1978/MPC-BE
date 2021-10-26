@@ -599,3 +599,160 @@ void CFavoritesFile::SaveFavorites()
 {
 	WriteFile();
 }
+
+//
+// CPlaylistListFile
+//
+
+void CPlaylistListFile::IntClearEntries()
+{
+	m_PlaylistInfos.clear();
+}
+
+void CPlaylistListFile::IntAddEntry(const PlaylistInfo& plsInfo)
+{
+	// TODO
+	m_PlaylistInfos.emplace_back(plsInfo);
+}
+
+bool CPlaylistListFile::ReadFile()
+{
+	bool valid = false;
+	FILE* pFile = CheckOpenFileForRead(valid);
+	if (!pFile) {
+		return valid;
+	}
+
+	CStdioFile file(pFile);
+
+	IntClearEntries();
+
+	PlaylistInfo plsInfo;
+	CStringW section;
+	CStringW line;
+
+	while (file.ReadString(line)) {
+		int pos = 0;
+
+		if (line[0] == '[') { // new section
+			if (section.GetLength()) {
+				section.Empty();
+				IntAddEntry(plsInfo);
+				plsInfo = {};
+			}
+
+			pos = line.Find(']');
+			if (pos > 0) {
+				section = line.Mid(1, pos - 1);
+			}
+			continue;
+		}
+
+		if (line[0] == ';' || section.IsEmpty()) {
+			continue;
+		}
+
+		pos = line.Find('=');
+		if (pos > 0 && pos + 1 < line.GetLength()) {
+			CStringW param = line.Mid(0, pos).Trim();
+			CStringW value = line.Mid(pos + 1).Trim();
+			if (value.GetLength()) {
+				if (param == L"Type") {
+					if (value == "basic") {
+						plsInfo.PlsType = PLS_Basic;
+					}
+					else if (value == "explorer") {
+						plsInfo.PlsType = PLS_Explorer;
+					}
+					else if (value == "link") {
+						plsInfo.PlsType = PLS_Link;
+					}
+				}
+				else if (param == L"Path") {
+					plsInfo.Path = value;
+				}
+				else if (param == L"CurItem") {
+					plsInfo.Title = value;
+				}
+				else if (param == L"Title") {
+					plsInfo.Title = value;
+				}
+			}
+		}
+	}
+
+	CloseFile(pFile);
+
+	if (section.GetLength()) {
+		IntAddEntry(plsInfo);
+	}
+
+	return true;
+}
+
+bool CPlaylistListFile::WriteFile()
+{
+	FILE* pFile = OpenFileForWrite();
+	if (!pFile) {
+		return false;
+	}
+
+	bool ret = true;
+
+	CStdioFile file(pFile);
+	CStringW str;
+	try {
+		file.WriteString(L"; MPC-BE List Of Playlists File 0.1\n");
+		int i = 1;
+		for (const auto& plsInfo : m_PlaylistInfos) {
+			if (plsInfo.Path.GetLength()) {
+
+				CStringW type;
+				switch (plsInfo.PlsType) {
+				case PLS_Basic:    type = L"basic";    break;
+				case PLS_Explorer: type = L"explorer"; break;
+				case PLS_Link:     type = L"link";    break;
+				default:
+					continue;
+				}
+
+				str.Format(L"\n[%02d]\n", i++);
+
+				str.AppendFormat(L"Type=%s\n", type);
+				str.AppendFormat(L"Path=%s\n", plsInfo.Path);
+
+				if (plsInfo.Title.GetLength()) {
+					str.AppendFormat(L"Title=%s\n", plsInfo.Title);
+				}
+				if (plsInfo.CurItem.GetLength()) {
+					str.AppendFormat(L"CurItem=%s\n", plsInfo.CurItem);
+				}
+
+				file.WriteString(str);
+			}
+		}
+	}
+	catch (CFileException& e) {
+		// Fail silently if disk is full
+		UNREFERENCED_PARAMETER(e);
+		ASSERT(FALSE);
+		ret = false;
+	}
+
+	CloseFile(pFile);
+
+	return ret;
+}
+
+void CPlaylistListFile::OpenPlaylists()
+{
+	bool ok = ReadFile();
+	if (!ok) {
+		IntClearEntries();
+	}
+}
+
+void CPlaylistListFile::SavePlaylists()
+{
+	WriteFile();
+}

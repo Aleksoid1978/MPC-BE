@@ -148,3 +148,38 @@ public:
 	void OpenFavorites();
 	void SaveFavorites();
 };
+
+//
+// CPlaylistListFile
+//
+
+enum PlaylistType {
+	PLS_Unknown = 0,
+	PLS_Basic,
+	PLS_Explorer,
+	PLS_Link
+};
+
+struct PlaylistInfo
+{
+	PlaylistType PlsType = PLS_Unknown;
+	CStringW Path;
+	CStringW Title;
+	CStringW CurItem;
+};
+
+class CPlaylistListFile : public CMpcLstFile
+{
+	CStringW& m_PlaylistFolder;
+
+	void IntClearEntries() override;
+	void IntAddEntry(const PlaylistInfo& plsInfo);
+	bool ReadFile();
+	bool WriteFile();
+
+public:
+	std::list<PlaylistInfo> m_PlaylistInfos;
+
+	void OpenPlaylists();
+	void SavePlaylists();
+};
