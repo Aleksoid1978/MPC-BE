@@ -196,4 +196,6 @@ public:
 	void Cleanup();
 
 	bool FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2);
+
+	bool DirectCopyPossible(AVPixelFormat avformat);
 };

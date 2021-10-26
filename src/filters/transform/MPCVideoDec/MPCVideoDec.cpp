@@ -53,6 +53,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/mastering_display_metadata.h>
 	#include <ExtLib/ffmpeg/libavutil/opt.h>
 	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
+	#include <ExtLib/ffmpeg/libavutil/hwcontext_cuda_internal.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d11va.h>
 }
 #pragma warning(pop)
@@ -3430,7 +3431,54 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				device_hwctx->unlock(device_hwctx->lock_ctx);
 			}
-			else {
+			else if (frames_ctx->format == AV_PIX_FMT_CUDA && m_FormatConverter.DirectCopyPossible(frames_ctx->sw_format)) {
+				auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
+				auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
+				auto cuda_fns = reinterpret_cast<CudaFunctions*>(cuda_hwctx->internal->cuda_dl);
+
+				auto cuStatus = cuda_fns->cuCtxPushCurrent(cuda_hwctx->cuda_ctx);
+				if (cuStatus != CUDA_SUCCESS) {
+					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuCtxPushCurrent() failed");
+					CLEAR_AND_CONTINUE;
+				}
+				int linesize[4] = {};
+				ret = av_image_fill_linesizes(linesize, frames_ctx->sw_format,
+														FFALIGN(hw_frame->width, 1));
+				CUDA_MEMCPY2D cpy = {};
+
+				cpy.srcPitch      = hw_frame->linesize[0];
+				cpy.dstPitch      = linesize[0];
+				cpy.WidthInBytes  = std::min(cpy.srcPitch, cpy.dstPitch);
+				cpy.Height        = hw_frame->height;
+
+				cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
+				cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hw_frame->data[0]);
+
+				cpy.dstMemoryType = CU_MEMORYTYPE_HOST;
+				cpy.dstHost       = pDataOut;
+
+				cuStatus = cuda_fns->cuMemcpy2DAsync(&cpy, cuda_hwctx->stream);
+				if (cuStatus != CUDA_SUCCESS) {
+					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuMemcpy2DAsync() failed");
+					CLEAR_AND_CONTINUE;
+				}
+
+				cpy.srcPitch      = hw_frame->linesize[1];
+				cpy.dstPitch      = linesize[1];
+				cpy.WidthInBytes  = std::min(cpy.srcPitch, cpy.dstPitch);
+				cpy.Height        = hw_frame->height / 2;
+
+				cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hw_frame->data[1]);
+				cpy.dstHost       = pDataOut + (cpy.dstPitch * hw_frame->height);
+
+				cuStatus = cuda_fns->cuMemcpy2DAsync(&cpy, cuda_hwctx->stream);
+				if (cuStatus != CUDA_SUCCESS) {
+					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuMemcpy2DAsync() failed");
+					CLEAR_AND_CONTINUE;
+				}
+
+				cuda_fns->cuCtxPopCurrent(nullptr);
+			} else {
 				ret = av_hwframe_transfer_data(m_pFrame, hw_frame, 0);
 				if (ret < 0) {
 					CLEAR_AND_CONTINUE;

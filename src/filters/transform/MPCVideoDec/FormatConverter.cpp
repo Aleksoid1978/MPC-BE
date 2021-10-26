@@ -54,7 +54,7 @@ SW_OUT_FMT s_sw_formats[] = {
 	{L"Y416",  FCC('Y416'), &MEDIASUBTYPE_Y416,  64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_Y416
 	// RGB
 	{L"RGB32", BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0, 24,  8}, // PixFmt_RGB32
-	{L"RGB48", FCC('RGB0'), &MEDIASUBTYPE_RGB48, 48, 6, 0, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0, 48, 16}, // PixFmt_RGB32
+	{L"RGB48", FCC('RGB0'), &MEDIASUBTYPE_RGB48, 48, 6, 0, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0, 48, 16}, // PixFmt_RGB48
 	// PS:
 	// AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 	// AV_PIX_FMT_YUV420P16LE not equal to P010, but is used as an intermediate format.
@@ -537,4 +537,11 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 			|| av_pfdesc_fmt1->log2_chroma_w != av_pfdesc_fmt2->log2_chroma_w
 			|| av_pfdesc_fmt1->nb_components != av_pfdesc_fmt2->nb_components
 			|| av_pfdesc_fmt1->comp[0].depth != av_pfdesc_fmt2->comp[0].depth;
+}
+
+bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat)
+{
+	return avformat == AV_PIX_FMT_NV12 && m_out_pixfmt == PixFmt_NV12 ||
+		   avformat == AV_PIX_FMT_P010 && m_out_pixfmt == PixFmt_P010 ||
+		   avformat == AV_PIX_FMT_P016 && m_out_pixfmt == PixFmt_P016;
 }
