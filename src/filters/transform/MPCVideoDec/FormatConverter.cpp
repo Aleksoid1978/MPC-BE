@@ -326,6 +326,8 @@ void CFormatConverter::SetConvertFunc()
 			} else if (m_FProps.pftype == PFType_NV12) {
 				pConvertFn = &CFormatConverter::convert_nv12_yv12;
 				m_RequiredAlignment = 32;
+			} else if (m_FProps.pftype == PFType_P01x) {
+				pConvertFn = &CFormatConverter::convert_p010_nv12_sse2;
 			}
 #if (0) // disabled because not increase performance
 			else if (m_FProps.pftype == PFType_YUV420) {
