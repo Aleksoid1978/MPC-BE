@@ -3447,8 +3447,14 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				int h_shift = 0, v_shift = 0;
 				av_pix_fmt_get_chroma_sub_sample(frames_ctx->sw_format, &h_shift, &v_shift);
 
+				uint8_t* hwdata[4];
+				memcpy(hwdata, hw_frame->data, sizeof(hwdata)); // copy 4 pointers from 8 (AV_NUM_DATA_POINTERS)
+				if (m_FormatConverter.GetOutPixFormat() == PixFmt_YV24) {
+					std::swap(hwdata[1], hwdata[2]); // swap UV when YUV444P to YV24
+				}
+
 				unsigned offset = 0;
-				for (size_t i = 0; i < std::size(hw_frame->data) && hw_frame->data[i]; i++) {
+				for (size_t i = 0; i < std::size(hwdata) && hwdata[i]; i++) {
 					CUDA_MEMCPY2D cpy = {};
 
 					cpy.srcPitch      = hw_frame->linesize[i];
@@ -3457,7 +3463,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					cpy.Height        = hw_frame->height >> ((i == 0 || i == 3) ? 0 : v_shift);
 
 					cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
-					cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hw_frame->data[i]);
+					cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hwdata[i]);
 
 					cpy.dstMemoryType = CU_MEMORYTYPE_HOST;
 					cpy.dstHost       = pDataOut + offset;
