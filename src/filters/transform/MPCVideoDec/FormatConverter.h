@@ -198,4 +198,6 @@ public:
 	bool FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2);
 
 	bool DirectCopyPossible(AVPixelFormat avformat);
+
+	int GetDstStride() const { return m_dstStride; }
 };

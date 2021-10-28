@@ -3442,7 +3442,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					CLEAR_AND_CONTINUE;
 				}
 				int linesize[4] = {};
-				ret = av_image_fill_linesizes(linesize, frames_ctx->sw_format, hw_frame->width);
+				av_image_fill_linesizes(linesize, frames_ctx->sw_format, m_FormatConverter.GetDstStride());
 
 				int h_shift = 0, v_shift = 0;
 				av_pix_fmt_get_chroma_sub_sample(frames_ctx->sw_format, &h_shift, &v_shift);
