@@ -15106,6 +15106,9 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 				int iSelectedLanguage = 0;
 				m_pDVS->get_SelectedLanguage(&iSelectedLanguage);
 
+				DWORD dwGroupPrev = DWORD_MAX;
+				CComQIPtr<IAMStreamSelect> pDVS_SS = m_pDVS;
+
 				for (int i = 0; i < nLangs; i++) {
 					WCHAR *pName = nullptr;
 					m_pDVS->get_LanguageName(i, &pName);
@@ -15115,6 +15118,16 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 					UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
 					if (i == iSelectedLanguage) {
 						flags |= MF_CHECKED | MFT_RADIOCHECK;
+					}
+
+					if (pDVS_SS) {
+						DWORD dwGroup = DWORD_MAX;
+						if (SUCCEEDED(pDVS_SS->Info(i+1, nullptr, nullptr, nullptr, &dwGroup, nullptr, nullptr, nullptr))) {
+							if (dwGroupPrev != DWORD_MAX && dwGroupPrev != dwGroup) {
+								submenu.AppendMenu(MF_SEPARATOR);
+							}
+							dwGroupPrev = dwGroup;
+						}
 					}
 
 					streamName.Replace(L"&", L"&&");
