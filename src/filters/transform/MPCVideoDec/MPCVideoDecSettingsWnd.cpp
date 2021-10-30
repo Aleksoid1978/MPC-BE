@@ -218,12 +218,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	x0 = x0 + group_w + 8;
 	label_w = 60;
 	control_w = 52;
-	row_w = label_w + control_w * 4 + 4;
+	long control_w2 = 76;
+	row_w = label_w + control_w * 3 + control_w2 + 4;
 	group_w = row_w + 8;
 	x1 = x0 + 4;
 	x2 = x1 + label_w;
 	y = 8;
-	CalcRect(rect, x0, y, group_w, 172);
+	CalcRect(rect, x0, y, group_w, 192);
 	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
 	y += 20;
 
@@ -274,6 +275,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbFormat[PixFmt_Y410].Create(L"Y410", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_Y410);
 	CalcTextRect(rect, x2 + control_w * 3, y, control_w);
 	m_cbFormat[PixFmt_Y416].Create(L"Y416", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_Y416);
+	y += 20;
+	CalcTextRect(rect, x2 + control_w * 3, y, control_w2);
+	m_cbFormat[PixFmt_YUV444P16].Create(L"YUV444P16", dwStyle | BS_AUTOCHECKBOX, rect, this, IDC_PP_SW_Y416);
 	y += 20;
 
 	CalcTextRect(rect, x1, y, label_w);
@@ -464,7 +468,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_chDXVA_SD.SetCheck(BST_UNCHECKED);
 
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV || i == PixFmt_RGB48) {
+		if (i == PixFmt_AYUV || i == PixFmt_YUV444P16 || i == PixFmt_RGB48) {
 			m_cbFormat[i].SetCheck(BST_UNCHECKED);
 		} else {
 			m_cbFormat[i].SetCheck(BST_CHECKED);

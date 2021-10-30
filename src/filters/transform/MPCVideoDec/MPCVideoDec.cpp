@@ -1083,7 +1083,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		m_bHwCodecs[i] = true;
 	}
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV || i == PixFmt_RGB48) {
+		if (i == PixFmt_AYUV || i == PixFmt_YUV444P16 || i == PixFmt_RGB48) {
 			m_fPixFmts[i] = false;
 		} else {
 			m_fPixFmts[i] = true;

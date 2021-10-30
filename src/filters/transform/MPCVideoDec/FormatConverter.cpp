@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <mpc_defines.h>
 #include <moreuuids.h>
 #include "FormatConverter.h"
 #include "DSUtil/CPUInfo.h"
@@ -36,25 +37,26 @@ extern "C" {
 #pragma warning(pop)
 
 SW_OUT_FMT s_sw_formats[] = {
-	//name     biCompression  subtype                                         av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
+	//name         biCompression       subtype                                            av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
 	// YUV 8 bit
-	{L"NV12",  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
-	{L"YV12",  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
-	{L"YUY2",  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16,  8}, // PixFmt_YUY2
-	{L"YV16",  FCC('YV16'), &MEDIASUBTYPE_YV16,  16, 1, 3, {1,1,1}, {1,2,2}, AV_PIX_FMT_YUV422P,     1, 0, 16,  8}, // PixFmt_YV16
-	{L"AYUV",  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_AYUV
-	{L"YV24",  FCC('YV24'), &MEDIASUBTYPE_YV24,  24, 1, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_YV24
+	{L"NV12",      FCC('NV12'),      &MEDIASUBTYPE_NV12,      12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
+	{L"YV12",      FCC('YV12'),      &MEDIASUBTYPE_YV12,      12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
+	{L"YUY2",      FCC('YUY2'),      &MEDIASUBTYPE_YUY2,      16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16,  8}, // PixFmt_YUY2
+	{L"YV16",      FCC('YV16'),      &MEDIASUBTYPE_YV16,      16, 1, 3, {1,1,1}, {1,2,2}, AV_PIX_FMT_YUV422P,     1, 0, 16,  8}, // PixFmt_YV16
+	{L"AYUV",      FCC('AYUV'),      &MEDIASUBTYPE_AYUV,      32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_AYUV
+	{L"YV24",      FCC('YV24'),      &MEDIASUBTYPE_YV24,      24, 1, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_YV24
 	// YUV 10 bit
-	{L"P010",  FCC('P010'), &MEDIASUBTYPE_P010,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 15, 10}, // PixFmt_P010
-	{L"P210",  FCC('P210'), &MEDIASUBTYPE_P210,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20, 10}, // PixFmt_P210
-	{L"Y410",  FCC('Y410'), &MEDIASUBTYPE_Y410,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30, 10}, // PixFmt_Y410
+	{L"P010",      FCC('P010'),      &MEDIASUBTYPE_P010,      24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 15, 10}, // PixFmt_P010
+	{L"P210",      FCC('P210'),      &MEDIASUBTYPE_P210,      32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20, 10}, // PixFmt_P210
+	{L"Y410",      FCC('Y410'),      &MEDIASUBTYPE_Y410,      32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30, 10}, // PixFmt_Y410
 	// YUV 16 bit
-	{L"P016",  FCC('P016'), &MEDIASUBTYPE_P016,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 24, 16}, // PixFmt_P016
-	{L"P216",  FCC('P216'), &MEDIASUBTYPE_P216,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 32, 16}, // PixFmt_P216
-	{L"Y416",  FCC('Y416'), &MEDIASUBTYPE_Y416,  64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_Y416
+	{L"P016",      FCC('P016'),      &MEDIASUBTYPE_P016,      24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 24, 16}, // PixFmt_P016
+	{L"P216",      FCC('P216'),      &MEDIASUBTYPE_P216,      32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 32, 16}, // PixFmt_P216
+	{L"Y416",      FCC('Y416'),      &MEDIASUBTYPE_Y416,      64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_Y416
+	{L"YUV444P16", FOURCC_YUV444P16, &MEDIASUBTYPE_YUV444P16, 48, 2, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_YUV444P16
 	// RGB
-	{L"RGB32", BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0, 24,  8}, // PixFmt_RGB32
-	{L"RGB48", FCC('RGB0'), &MEDIASUBTYPE_RGB48, 48, 6, 0, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0, 48, 16}, // PixFmt_RGB48
+	{L"RGB32",     BI_RGB,           &MEDIASUBTYPE_RGB32,     32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0, 24,  8}, // PixFmt_RGB32
+	{L"RGB48",     FOURCC_RGB48,     &MEDIASUBTYPE_RGB48,     48, 6, 0, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0, 48, 16}, // PixFmt_RGB48
 	// PS:
 	// AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 	// AV_PIX_FMT_YUV420P16LE not equal to P010, but is used as an intermediate format.
@@ -541,8 +543,9 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 
 bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat)
 {
-	return avformat == AV_PIX_FMT_NV12    && m_out_pixfmt == PixFmt_NV12 ||
-		   avformat == AV_PIX_FMT_P010    && m_out_pixfmt == PixFmt_P010 ||
-		   avformat == AV_PIX_FMT_P016    && m_out_pixfmt == PixFmt_P016 ||
-		   avformat == AV_PIX_FMT_YUV444P && m_out_pixfmt == PixFmt_YV24;
+	return avformat == AV_PIX_FMT_NV12      && m_out_pixfmt == PixFmt_NV12 ||
+		   avformat == AV_PIX_FMT_P010      && m_out_pixfmt == PixFmt_P010 ||
+		   avformat == AV_PIX_FMT_P016      && m_out_pixfmt == PixFmt_P016 ||
+		   avformat == AV_PIX_FMT_YUV444P   && m_out_pixfmt == PixFmt_YV24 ||
+		   avformat == AV_PIX_FMT_YUV444P16 && m_out_pixfmt == PixFmt_YUV444P16;
 }

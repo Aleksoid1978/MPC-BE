@@ -53,3 +53,7 @@
 // non-standard values for Transfer Matrix
 #define VIDEOTRANSFERMATRIX_FCC   6
 #define VIDEOTRANSFERMATRIX_YCgCo 7
+
+// some FOURCCs
+#define FOURCC_YUV444P16 MAKEFOURCC('Y','3',0,16)
+#define FOURCC_RGB48     MAKEFOURCC('R','G','B',48)
