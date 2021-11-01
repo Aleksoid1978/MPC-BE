@@ -605,10 +605,10 @@ void CFavoritesFile::SaveFavorites()
 }
 
 //
-// CPlaylistListFile
+// CPlaylistConfigFile
 //
 
-bool CPlaylistListFile::BasicPlsContains(LPCWSTR filename)
+bool CPlaylistConfigFile::BasicPlsContains(LPCWSTR filename)
 {
 	for (const auto&pli : m_PlaylistInfos) {
 		if (pli.Type == PLS_Basic && pli.Path.CompareNoCase(filename) == 0) {
@@ -618,12 +618,12 @@ bool CPlaylistListFile::BasicPlsContains(LPCWSTR filename)
 	return false;
 }
 
-void CPlaylistListFile::IntClearEntries()
+void CPlaylistConfigFile::IntClearEntries()
 {
 	m_PlaylistInfos.clear();
 }
 
-void CPlaylistListFile::IntAddEntry(const PlaylistInfo& plsInfo)
+void CPlaylistConfigFile::IntAddEntry(const PlaylistInfo& plsInfo)
 {
 	if (plsInfo.Path.IsEmpty()) {
 		return;
@@ -644,7 +644,7 @@ void CPlaylistListFile::IntAddEntry(const PlaylistInfo& plsInfo)
 	}
 }
 
-bool CPlaylistListFile::ReadFile()
+bool CPlaylistConfigFile::ReadFile()
 {
 	bool valid = false;
 	FILE* pFile = CheckOpenFileForRead(valid);
@@ -719,7 +719,7 @@ bool CPlaylistListFile::ReadFile()
 	return true;
 }
 
-bool CPlaylistListFile::WriteFile()
+bool CPlaylistConfigFile::WriteFile()
 {
 	FILE* pFile = OpenFileForWrite();
 	if (!pFile) {
@@ -773,7 +773,7 @@ bool CPlaylistListFile::WriteFile()
 	return ret;
 }
 
-void CPlaylistListFile::AddLostBasicPlaylists()
+void CPlaylistConfigFile::AddLostBasicPlaylists()
 {
 	WIN32_FIND_DATAW wfd;
 	HANDLE hFile = FindFirstFileW(m_PlaylistFolder + L"*.mpcpl", &wfd);
@@ -789,7 +789,7 @@ void CPlaylistListFile::AddLostBasicPlaylists()
 	}
 }
 
-void CPlaylistListFile::SetFilename(const CStringW& filename)
+void CPlaylistConfigFile::SetFilename(const CStringW& filename)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -797,7 +797,7 @@ void CPlaylistListFile::SetFilename(const CStringW& filename)
 	m_PlaylistFolder = filename.Left(filename.ReverseFind(L'\\')+1) + L"Mpcpls\\";
 }
 
-void CPlaylistListFile::OpenPlaylists()
+void CPlaylistConfigFile::OpenPlaylists()
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -809,7 +809,7 @@ void CPlaylistListFile::OpenPlaylists()
 	AddLostBasicPlaylists();
 }
 
-void CPlaylistListFile::SavePlaylists()
+void CPlaylistConfigFile::SavePlaylists()
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 

@@ -150,7 +150,7 @@ public:
 };
 
 //
-// CPlaylistListFile
+// CPlaylistConfigFile
 //
 
 enum PlaylistType {
@@ -168,7 +168,7 @@ struct PlaylistInfo
 	CStringW CurItem;
 };
 
-class CPlaylistListFile : public CMpcLstFile
+class CPlaylistConfigFile : public CMpcLstFile
 {
 	CStringW m_PlaylistFolder;
 
