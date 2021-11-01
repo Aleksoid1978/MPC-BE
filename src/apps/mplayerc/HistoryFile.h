@@ -90,7 +90,7 @@ protected:
 public:
 	bool Clear(); // Clear list and delete file
 
-	void SetFilename(const CStringW& filename);
+	virtual void SetFilename(const CStringW& filename);
 	void SetMaxCount(unsigned maxcount);
 };
 
@@ -162,7 +162,7 @@ enum PlaylistType {
 
 struct PlaylistInfo
 {
-	PlaylistType PlsType = PLS_Unknown;
+	PlaylistType Type = PLS_Unknown;
 	CStringW Path;
 	CStringW Title;
 	CStringW CurItem;
@@ -170,15 +170,21 @@ struct PlaylistInfo
 
 class CPlaylistListFile : public CMpcLstFile
 {
-	CStringW& m_PlaylistFolder;
+	CStringW m_PlaylistFolder;
+
+	bool BasicPlsContains(LPCWSTR filename);
 
 	void IntClearEntries() override;
 	void IntAddEntry(const PlaylistInfo& plsInfo);
 	bool ReadFile();
 	bool WriteFile();
 
+	void AddLostBasicPlaylists();
+
 public:
 	std::list<PlaylistInfo> m_PlaylistInfos;
+
+	void SetFilename(const CStringW& filename) override;
 
 	void OpenPlaylists();
 	void SavePlaylists();

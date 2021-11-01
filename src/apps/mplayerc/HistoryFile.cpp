@@ -589,6 +589,8 @@ bool CFavoritesFile::WriteFile()
 
 void CFavoritesFile::OpenFavorites()
 {
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
 	bool ok = ReadFile();
 	if (!ok) {
 		IntClearEntries();
@@ -597,12 +599,24 @@ void CFavoritesFile::OpenFavorites()
 
 void CFavoritesFile::SaveFavorites()
 {
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
 	WriteFile();
 }
 
 //
 // CPlaylistListFile
 //
+
+bool CPlaylistListFile::BasicPlsContains(LPCWSTR filename)
+{
+	for (const auto&pli : m_PlaylistInfos) {
+		if (pli.Type == PLS_Basic && pli.Path.CompareNoCase(filename) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
 
 void CPlaylistListFile::IntClearEntries()
 {
@@ -611,8 +625,23 @@ void CPlaylistListFile::IntClearEntries()
 
 void CPlaylistListFile::IntAddEntry(const PlaylistInfo& plsInfo)
 {
-	// TODO
-	m_PlaylistInfos.emplace_back(plsInfo);
+	if (plsInfo.Path.IsEmpty()) {
+		return;
+	}
+
+	switch (plsInfo.Type) {
+	case PLS_Basic:
+		if (BasicPlsContains(plsInfo.Path)) {
+			return;
+		}
+		if (!::PathFileExistsW(m_PlaylistFolder + plsInfo.Path)) {
+			return;
+		}
+		// no break here
+	case PLS_Explorer:
+	case PLS_Link:
+		m_PlaylistInfos.emplace_back(plsInfo);
+	}
 }
 
 bool CPlaylistListFile::ReadFile()
@@ -659,13 +688,13 @@ bool CPlaylistListFile::ReadFile()
 			if (value.GetLength()) {
 				if (param == L"Type") {
 					if (value == "basic") {
-						plsInfo.PlsType = PLS_Basic;
+						plsInfo.Type = PLS_Basic;
 					}
 					else if (value == "explorer") {
-						plsInfo.PlsType = PLS_Explorer;
+						plsInfo.Type = PLS_Explorer;
 					}
 					else if (value == "link") {
-						plsInfo.PlsType = PLS_Link;
+						plsInfo.Type = PLS_Link;
 					}
 				}
 				else if (param == L"Path") {
@@ -708,7 +737,7 @@ bool CPlaylistListFile::WriteFile()
 			if (plsInfo.Path.GetLength()) {
 
 				CStringW type;
-				switch (plsInfo.PlsType) {
+				switch (plsInfo.Type) {
 				case PLS_Basic:    type = L"basic";    break;
 				case PLS_Explorer: type = L"explorer"; break;
 				case PLS_Link:     type = L"link";    break;
@@ -744,15 +773,45 @@ bool CPlaylistListFile::WriteFile()
 	return ret;
 }
 
+void CPlaylistListFile::AddLostBasicPlaylists()
+{
+	WIN32_FIND_DATAW wfd;
+	HANDLE hFile = FindFirstFileW(m_PlaylistFolder + L"*.mpcpl", &wfd);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		do {
+			if (!BasicPlsContains(wfd.cFileName)) {
+				CString title(wfd.cFileName, wcslen(wfd.cFileName) - 6);
+				PlaylistInfo plsInfo = { PLS_Basic, wfd.cFileName, title };
+				m_PlaylistInfos.emplace_back(plsInfo);
+			}
+		} while (FindNextFileW(hFile, &wfd));
+		FindClose(hFile);
+	}
+}
+
+void CPlaylistListFile::SetFilename(const CStringW& filename)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	m_filename = filename;
+	m_PlaylistFolder = filename.Left(filename.ReverseFind(L'\\')+1) + L"Mpcpls\\";
+}
+
 void CPlaylistListFile::OpenPlaylists()
 {
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
 	bool ok = ReadFile();
 	if (!ok) {
 		IntClearEntries();
 	}
+
+	AddLostBasicPlaylists();
 }
 
 void CPlaylistListFile::SavePlaylists()
 {
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
 	WriteFile();
 }
