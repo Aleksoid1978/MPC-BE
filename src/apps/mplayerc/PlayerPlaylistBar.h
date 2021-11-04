@@ -272,7 +272,7 @@ private:
 	struct tab_t {
 		PLAYLIST_TYPE type = PLAYLIST; // playlist type
 		CString name;                  // playlist label
-		CString fn;                    // playlist file name
+		CString mpcpl_fn;              // playlist file name
 		CRect r;                       // layout
 		unsigned id = 0;               // unique id
 		WORD sort = 0;                 // sorted flag

@@ -2539,7 +2539,7 @@ void CPlayerPlaylistBar::LoadPlaylist(const CString& filename)
 		m_nCurPlayListIndex = i;
 		CString base;
 		if (AfxGetMyApp()->GetAppSavePath(base)) {
-			base.Append(m_tabs[i].fn);
+			base.Append(m_tabs[i].mpcpl_fn);
 
 			if (::PathFileExistsW(base)) {
 				if (m_nCurPlayListIndex > 0 || s.bRememberPlaylistItems) {
@@ -2578,7 +2578,7 @@ void CPlayerPlaylistBar::SavePlaylist()
 
 	CString base;
 	if (AfxGetMyApp()->GetAppSavePath(base)) {
-		CString file = base + GetCurTab().fn;
+		CString file = base + GetCurTab().mpcpl_fn;
 
 		if (m_nCurPlayListIndex > 0 || s.bRememberPlaylistItems) {
 			// create this folder when needed only
@@ -4173,7 +4173,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					tab_t tab;
 					tab.type = PLAYLIST;
 					tab.name = strGetName;
-					tab.fn.Format(L"Playlist%u.mpcpl", cnt);
+					tab.mpcpl_fn.Format(L"Playlist%u.mpcpl", cnt);
 					tab.id = GetNextId();
 					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tab);
 
@@ -4210,7 +4210,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					tab_t tab;
 					tab.type = EXPLORER;
 					tab.name = strGetName;
-					tab.fn.Format(L"Explorer%u.mpcpl", cnt);
+					tab.mpcpl_fn.Format(L"Explorer%u.mpcpl", cnt);
 					tab.id = GetNextId();
 					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tab);
 
@@ -4252,7 +4252,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 
 					CString base;
 					if (AfxGetMyApp()->GetAppSavePath(base)) {
-						base.Append(GetCurTab().fn);
+						base.Append(GetCurTab().mpcpl_fn);
 
 						if (::PathFileExistsW(base)) {
 							::DeleteFileW(base);
@@ -4297,7 +4297,7 @@ void CPlayerPlaylistBar::TDeleteAllPlaylists()
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		CString base;
 		if (AfxGetMyApp()->GetAppSavePath(base)) {
-			base.Append(m_tabs[i].fn);
+			base.Append(m_tabs[i].mpcpl_fn);
 
 			if (::PathFileExistsW(base)) {
 				::DeleteFileW(base);
@@ -4580,7 +4580,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
 			CString s;
-			str.AppendFormat(L"%d;%s;%u%s%s", tab.type, RemoveFileExt(tab.fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
+			str.AppendFormat(L"%d;%s;%u%s%s", tab.type, RemoveFileExt(tab.mpcpl_fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
 		}
 	}
 
@@ -4611,7 +4611,7 @@ void CPlayerPlaylistBar::TGetSettings()
 		tab_t tab;
 		tab.type = (PLAYLIST_TYPE)_wtoi(arFields[0]);
 		tab.name = m_pls.empty() ? ResStr(IDS_PLAYLIST_MAIN_NAME) : arFields[1];
-		tab.fn = arFields[1] + (L".mpcpl");
+		tab.mpcpl_fn = arFields[1] + (L".mpcpl");
 		tab.id = GetNextId();
 		if (arFields.size() >= 3) {
 			tab.sort = _wtoi(arFields[2]);
@@ -4631,7 +4631,7 @@ void CPlayerPlaylistBar::TGetSettings()
 		tab_t tab;
 		tab.type = PLAYLIST;
 		tab.name = ResStr(IDS_PLAYLIST_MAIN_NAME);
-		tab.fn = L"Default.mpcpl";
+		tab.mpcpl_fn = L"Default.mpcpl";
 		tab.id = GetNextId();
 		m_tabs.push_back(tab);
 
