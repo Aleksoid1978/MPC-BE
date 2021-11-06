@@ -183,6 +183,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 			case FCC('apcn'): // Apple ProRes 422 Standard Definition
 			case FCC('apcs'): // Apple ProRes 422 LT
 			case FCC('apco'): // Apple ProRes 422 Proxy
+			case FCC('icpf'): // unknown type after matroska splitter
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
 				break;
 			case FCC('ap4h'): // Apple ProRes 4444
