@@ -3225,7 +3225,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		if (m_bHasPalette) {
 			m_bHasPalette = false;
-			uint32_t *pal = (uint32_t *)av_packet_new_side_data(avpkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+			uint8_t* pal = av_packet_new_side_data(avpkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
 			memcpy(pal, m_Palette, AVPALETTE_SIZE);
 		}
 	}

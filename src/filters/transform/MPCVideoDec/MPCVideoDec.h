@@ -190,7 +190,7 @@ private:
 	} m_FilterInfo;
 
 	bool m_bHasPalette = false;
-	unsigned int m_Palette[256] = {};
+	uint32_t m_Palette[256] = {};
 
 	CD3D11Decoder* m_pD3D11Decoder = nullptr;
 
