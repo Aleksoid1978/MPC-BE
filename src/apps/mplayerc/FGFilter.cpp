@@ -594,7 +594,7 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		  pFGF->GetType());
 
 	CString name = pFGF->GetName();
-	if (StartsWith(name, L"MPC ") && pFGF->GetType() != L"CFGFilterInternal") {
+	if (StartsWith(name, L"MPC ") && pFGF->GetType() != L"CFGFilterInternal" && name != L"MPC Video Renderer") {
 		CString external;
 		external.Format(L" (%s)", ResStr(IDS_EXTERNAL));
 
