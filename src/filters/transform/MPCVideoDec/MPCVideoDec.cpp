@@ -2238,7 +2238,7 @@ redo:
 		do {
 			m_bDXVACompatible = false;
 
-			if (!DXVACheckFramesize(m_CodecId, PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion)) { // check frame size
+			if (!DXVACheckFramesize(PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion)) { // check frame size
 				break;
 			}
 

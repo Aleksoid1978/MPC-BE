@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,5 +37,6 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI);
 
 bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
-BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,
-						DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
+
+// check frame size for DXVA for old drivers
+BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
