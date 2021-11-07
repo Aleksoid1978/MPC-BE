@@ -80,7 +80,7 @@ private:
 	AVCodecContext*							m_pAVCtx;
 	AVCodecParserContext*					m_pParser;
 	AVFrame*								m_pFrame;
-	enum AVCodecID							m_nCodecId;
+	enum AVCodecID							m_CodecId;
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
 	bool									m_bCalculateStopTime;
 
