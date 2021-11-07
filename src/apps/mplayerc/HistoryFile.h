@@ -171,6 +171,7 @@ struct PlaylistInfo
 class CPlaylistConfigFile : public CMpcLstFile
 {
 	CStringW m_PlaylistFolder;
+	std::list<PlaylistInfo> m_PlaylistInfos;
 
 	bool BasicPlsContains(LPCWSTR filename);
 
@@ -182,10 +183,8 @@ class CPlaylistConfigFile : public CMpcLstFile
 	void AddLostBasicPlaylists();
 
 public:
-	std::list<PlaylistInfo> m_PlaylistInfos;
-
 	void SetFilename(const CStringW& filename) override;
 
-	void OpenPlaylists();
-	void SavePlaylists();
+	void OpenPlaylists(std::list<PlaylistInfo>& playlistInfos);
+	void SavePlaylists(std::list<PlaylistInfo>& playlistInfos);
 };

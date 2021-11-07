@@ -67,8 +67,6 @@ FILE* CMpcLstFile::OpenFileForWrite()
 		Sleep(100);
 	} while (true);
 
-	ASSERT(pFile);
-
 	return pFile;
 }
 
@@ -731,7 +729,7 @@ bool CPlaylistConfigFile::WriteFile()
 	CStdioFile file(pFile);
 	CStringW str;
 	try {
-		file.WriteString(L"; MPC-BE List Of Playlists File 0.1\n");
+		file.WriteString(L"; MPC-BE Playlist Config File 0.1\n");
 		int i = 1;
 		for (const auto& plsInfo : m_PlaylistInfos) {
 			if (plsInfo.Path.GetLength()) {
@@ -794,10 +792,10 @@ void CPlaylistConfigFile::SetFilename(const CStringW& filename)
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	m_filename = filename;
-	m_PlaylistFolder = filename.Left(filename.ReverseFind(L'\\')+1) + L"Mpcpls\\";
+	m_PlaylistFolder = filename.Left(filename.ReverseFind(L'\\')+1) + L"Playlists\\";
 }
 
-void CPlaylistConfigFile::OpenPlaylists()
+void CPlaylistConfigFile::OpenPlaylists(std::list<PlaylistInfo>& playlistInfos)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -806,12 +804,17 @@ void CPlaylistConfigFile::OpenPlaylists()
 		IntClearEntries();
 	}
 
-	AddLostBasicPlaylists();
+	// TODO
+	//AddLostBasicPlaylists();
+
+	playlistInfos = m_PlaylistInfos;
 }
 
-void CPlaylistConfigFile::SavePlaylists()
+void CPlaylistConfigFile::SavePlaylists(std::list<PlaylistInfo>& playlistInfos)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	m_PlaylistInfos = playlistInfos;
 
 	WriteFile();
 }
