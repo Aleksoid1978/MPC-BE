@@ -291,14 +291,17 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 				}
 			}
 			break;
+		case AV_CODEC_ID_RPZA:
 		case AV_CODEC_ID_CINEPAK:
 		case AV_CODEC_ID_MSRLE:
 		case AV_CODEC_ID_MSVIDEO1:
 		case AV_CODEC_ID_8BPS:
 		case AV_CODEC_ID_QTRLE:
 		case AV_CODEC_ID_TSCC:
+		case AV_CODEC_ID_CSCD:
 		case AV_CODEC_ID_VMNC:
 		case AV_CODEC_ID_MSS1:
+		case AV_CODEC_ID_G2M:
 			pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; // and other RGB formats, but it is not important here
 			break;
 		}
