@@ -328,20 +328,6 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = nullptr*/
 			AGAIN_OR_EXIT
 		}
 
-		if (h.version == 3 && h.layer == 2) {
-			if (h.channels == 3) {
-				if (h.bitrate >= 11 && h.bitrate <= 14) {
-					AGAIN_OR_EXIT
-				}
-			} else {
-				if (h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) {
-					AGAIN_OR_EXIT
-				}
-			}
-		}
-
-		h.layer = 4 - h.layer;
-
 		static int brtbl[][5] = {
 			{  0,   0,   0,   0,   0},
 			{ 32,  32,  32,  32,   8},
@@ -365,6 +351,7 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = nullptr*/
 			{0, 3, 4, 4},
 			{0, 0, 1, 2}
 		};
+		h.layer = 4 - h.layer;
 		bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version & 1][h.layer]];
 		if (bitrate == 0) {
 			AGAIN_OR_EXIT
