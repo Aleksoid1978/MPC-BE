@@ -845,7 +845,7 @@ void CProfile::EnumValueNames(const wchar_t* section, std::vector<CStringW>& val
 				WCHAR achValue[16383];
 
 				for (DWORD i = 0, retCode = ERROR_SUCCESS; i < cValues; i++) {
-					DWORD cchValue = _countof(achValue);
+					DWORD cchValue = std::size(achValue);
 					achValue[0] = '\0';
 					retCode = RegEnumValueW(regkey.m_hKey, i, achValue, &cchValue, NULL, NULL, NULL, NULL);
 					if (retCode == ERROR_SUCCESS) {

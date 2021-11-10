@@ -43,10 +43,6 @@
 #define QI(i)  (riid == __uuidof(i)) ? GetInterface((i*)this, ppv) :
 #define QI2(i) (riid == IID_##i) ? GetInterface((i*)this, ppv) :
 
-//#ifndef _countof
-//#define _countof(array) (sizeof(array)/sizeof(array[0]))
-//#endif
-
 extern int				CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);
 extern bool				IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly = false);
 extern bool				IsMultiplexer(IBaseFilter* pBF, bool fCountConnectedOnly = false);

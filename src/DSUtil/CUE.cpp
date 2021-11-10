@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2020 see Authors.txt
+ * (C) 2011-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,7 +87,7 @@ bool ParseCUESheet(const CString& cueData, std::list<Chapters>& ChaptersList, CS
 			index_cnt = 0;
 
 			WCHAR type[256];
-			swscanf_s(cueLine, L"%d %s", &track_no, type, _countof(type));
+			swscanf_s(cueLine, L"%d %s", &track_no, type, std::size(type));
 			fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
 			TrackTitle.Format(L"Track %02d", track_no);
 		} else if (cmd == L"TITLE") {

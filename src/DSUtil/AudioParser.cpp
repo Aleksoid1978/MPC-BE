@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2020 see Authors.txt
+ * (C) 2011-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -788,7 +788,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 
 			audioframe->param1 = gb.BitRead(5) + 1;
 			exss_sample_rates_index = gb.BitRead(4);
-			if (exss_sample_rates_index < _countof(exss_sample_rates)) {
+			if (exss_sample_rates_index < std::size(exss_sample_rates)) {
 				audioframe->samplerate = exss_sample_rates[exss_sample_rates_index];
 			}
 			audioframe->channels = gb.BitRead(8) + 1;

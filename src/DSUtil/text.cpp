@@ -435,7 +435,7 @@ CString FormatNumber(const CString& szNumber, const bool bNoFractionalDigits /*=
 
 	if (bNoFractionalDigits) {
 		WCHAR szNumberFractionalDigits[2] = {0};
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IDIGITS, szNumberFractionalDigits, _countof(szNumberFractionalDigits));
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IDIGITS, szNumberFractionalDigits, std::size(szNumberFractionalDigits));
 		int nNumberFractionalDigits = wcstol(szNumberFractionalDigits, nullptr, 10);
 		if (nNumberFractionalDigits) {
 			ret.Truncate(ret.GetLength() - nNumberFractionalDigits - 1);

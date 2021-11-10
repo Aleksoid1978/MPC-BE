@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -567,7 +567,7 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 
 	// genre
 	BYTE genre = (BYTE)gb.BitRead(8);
-	if (genre < _countof(s_genre)) {
+	if (genre < std::size(s_genre)) {
 		tag = 'TCON';
 		if (Tags.find(tag) == Tags.cend()) {
 			value = s_genre[genre];

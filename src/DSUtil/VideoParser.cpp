@@ -293,7 +293,7 @@ namespace AVCParser {
 				if (255 == aspect_ratio_idc) {
 					params.sar.num = (WORD)gb.BitRead(16);	// sar_width
 					params.sar.den = (WORD)gb.BitRead(16);	// sar_height
-				} else if (aspect_ratio_idc < _countof(pixel_aspect)) {
+				} else if (aspect_ratio_idc < std::size(pixel_aspect)) {
 					params.sar.num = pixel_aspect[aspect_ratio_idc][0];
 					params.sar.den = pixel_aspect[aspect_ratio_idc][1];
 				} else {
@@ -853,7 +853,7 @@ namespace HEVCParser {
 				if (255 == sar_idx) {
 					params.sar.num = gb.BitRead(16);	// sar_width
 					params.sar.den = gb.BitRead(16);	// sar_height
-				} else if (sar_idx < _countof(pixel_aspect)) {
+				} else if (sar_idx < std::size(pixel_aspect)) {
 					params.sar.num = pixel_aspect[sar_idx][0];
 					params.sar.den = pixel_aspect[sar_idx][1];
 				}

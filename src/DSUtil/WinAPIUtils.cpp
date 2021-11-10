@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2018 see Authors.txt
+ * (C) 2011-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -80,7 +80,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 					if (ls == ERROR_SUCCESS) {
 						DWORD i = 0;
 						for (;;) {// iterate over the child keys
-							DWORD cbName = _countof(DisplayDevice.DeviceKey);
+							DWORD cbName = std::size(DisplayDevice.DeviceKey);
 							ls = RegEnumKeyExW(hKey0, i, DisplayDevice.DeviceKey, &cbName, nullptr, nullptr, nullptr, nullptr);
 							if (ls == ERROR_NO_MORE_ITEMS) {
 								break;
@@ -89,15 +89,15 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 							if (ls == ERROR_SUCCESS) {
 								static wchar_t DeviceName[MAX_PATH] = { 0 };
 								memcpy(DeviceName, gk_szRegCcsEnumDisplay, sizeof(gk_szRegCcsEnumDisplay) - 2);// chop off null character
-								memcpy(DeviceName + _countof(gk_szRegCcsEnumDisplay) - 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
-								wchar_t* pEnd0 = DeviceName + _countof(gk_szRegCcsEnumDisplay) - 1 + cbName;
+								memcpy(DeviceName + std::size(gk_szRegCcsEnumDisplay) - 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
+								wchar_t* pEnd0 = DeviceName + std::size(gk_szRegCcsEnumDisplay) - 1 + cbName;
 								HKEY hKey1;
 								ls = RegOpenKeyExW(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey1);
 
 								if (ls == ERROR_SUCCESS) {
 									DWORD j = 0;
 									for (;;) {// iterate over the grandchild keys
-										cbName = _countof(DisplayDevice.DeviceKey);
+										cbName = std::size(DisplayDevice.DeviceKey);
 										ls = RegEnumKeyExW(hKey1, j, DisplayDevice.DeviceKey, &cbName, nullptr, nullptr, nullptr, nullptr);
 										if (ls == ERROR_NO_MORE_ITEMS) {
 											break;
