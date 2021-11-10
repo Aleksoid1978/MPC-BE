@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -204,7 +204,7 @@ struct lang_type {
 
 int find_lang(unsigned short id)
 {
-	int lo = 0, hi = _countof(lang_tbl) - 1;
+	int lo = 0, hi = std::size(lang_tbl) - 1;
 
 	while (lo < hi) {
 		int mid = (lo + hi) >> 1;

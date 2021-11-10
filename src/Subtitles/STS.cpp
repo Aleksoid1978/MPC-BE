@@ -183,7 +183,7 @@ static struct htmlcolor {
 
 CHtmlColorMap::CHtmlColorMap()
 {
-	for (size_t i = 0; i < _countof(htmlcolors); i++) {
+	for (size_t i = 0; i < std::size(htmlcolors); i++) {
 		SetAt(htmlcolors[i].name, htmlcolors[i].color);
 	}
 }
@@ -238,7 +238,7 @@ WCHAR* CharSetNames[] = {
 	L"BALTIC",
 };
 
-int CharSetLen = _countof(CharSetList);
+int CharSetLen = std::size(CharSetList);
 
 //
 
@@ -488,8 +488,8 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 		int hh1, mm1, ss1, ms1, hh2, mm2, ss2, ms2;
 		WCHAR msStr1[5] = {0}, msStr2[5] = {0};
 		int c = swscanf_s(buff, L"%d%c%d%c%d%4[^-] --> %d%c%d%c%d%4s\n",
-						  &hh1, &sep, 1, &mm1, &sep, 1, &ss1, msStr1, _countof(msStr1),
-						  &hh2, &sep, 1, &mm2, &sep, 1, &ss2, msStr2, _countof(msStr2));
+						  &hh1, &sep, 1, &mm1, &sep, 1, &ss1, msStr1, std::size(msStr1),
+						  &hh2, &sep, 1, &mm2, &sep, 1, &ss2, msStr2, std::size(msStr2));
 
 		if (c == 1) { // numbering
 			num = hh1;

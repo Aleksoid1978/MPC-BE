@@ -63,7 +63,7 @@ void CVobSubFileRipper::Log(log_t type, LPCWSTR lpszFormat, ...)
 
 	va_list args;
 	va_start(args, lpszFormat);
-	_vstprintf_s(buff, _countof(buff), lpszFormat, args);
+	_vstprintf_s(buff, std::size(buff), lpszFormat, args);
 	va_end(args);
 
 	CString msg;
@@ -1075,7 +1075,7 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 
 						m_rd.selids[langnum] = true;
 					} else if (_istalpha(lang[0])) {
-						n = swscanf_s(lang, L"%s", langid, _countof(langid));
+						n = swscanf_s(lang, L"%s", langid, std::size(langid));
 						if (n != 1) {
 							break;
 						}
@@ -1205,7 +1205,7 @@ void VSFRipperData::Copy(VSFRipperData& rd)
 			PGC& src = rd.pgcs[i];
 			PGC& dst = pgcs[i];
 			dst.nAngles = src.nAngles;
-			for (size_t j = 0; j < _countof(dst.angles); j++) {
+			for (size_t j = 0; j < std::size(dst.angles); j++) {
 				dst.angles[j].Copy(src.angles[j]);
 			}
 			dst.iSelAngle = src.iSelAngle;

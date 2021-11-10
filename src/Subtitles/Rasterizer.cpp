@@ -831,9 +831,9 @@ bool Rasterizer::Rasterize(int xsub, int ysub, int fBlur, double fGaussianBlur)
 
 	const tSpanBuffer* pOutline[2] = {&m_pOutlineData->mOutline, &m_pOutlineData->mWideOutline};
 
-	for (ptrdiff_t i = _countof(pOutline)-1; i >= 0; i--) {
-		auto it		= pOutline[i]->cbegin();
-		auto itEnd	= pOutline[i]->cend();
+	for (ptrdiff_t i = std::size(pOutline)-1; i >= 0; i--) {
+		auto it    = pOutline[i]->cbegin();
+		auto itEnd = pOutline[i]->cend();
 		byte* buffer = (i == 0) ? m_pOverlayData->mpOverlayBufferBody : m_pOverlayData->mpOverlayBufferBorder;
 
 		for (; it != itEnd; ++it) {

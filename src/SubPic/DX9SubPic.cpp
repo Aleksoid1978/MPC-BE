@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -258,7 +258,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
 		};
 
-		for (ptrdiff_t i = 0; i < _countof(pVertices); i++) {
+		for (ptrdiff_t i = 0; i < std::size(pVertices); i++) {
 			pVertices[i].x -= 0.5f;
 			pVertices[i].y -= 0.5f;
 		}

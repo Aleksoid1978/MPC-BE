@@ -40,7 +40,7 @@ CHdmvSub::~CHdmvSub()
 	SAFE_DELETE_ARRAY(m_pSegBuffer);
 	SAFE_DELETE_ARRAY(m_DefaultCLUT.Palette);
 
-	for (int i = 0; i < _countof(m_CLUT); i++) {
+	for (int i = 0; i < std::size(m_CLUT); i++) {
 		SAFE_DELETE_ARRAY(m_CLUT[i].Palette);
 	}
 }
@@ -454,7 +454,7 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 	}
 
 	SHORT object_id = pGBuffer->ReadShort();
-	if (object_id > _countof(m_ParsedObjects)) {
+	if (object_id > std::size(m_ParsedObjects)) {
 		TRACE_HDMVSUB(L"CHdmvSub::ParseObject() : FAILED, object_id - %d", object_id);
 		return;
 	}
