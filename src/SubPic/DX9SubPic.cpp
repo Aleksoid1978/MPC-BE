@@ -258,7 +258,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
 		};
 
-		for (ptrdiff_t i = 0; i < std::size(pVertices); i++) {
+		for (size_t i = 0; i < std::size(pVertices); i++) {
 			pVertices[i].x -= 0.5f;
 			pVertices[i].y -= 0.5f;
 		}
