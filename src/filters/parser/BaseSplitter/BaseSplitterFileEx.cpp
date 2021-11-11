@@ -96,13 +96,13 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 
 	h.hdr.fiqm = gb.BitRead(1);
 	if (h.hdr.fiqm)
-		for (int i = 0; i < _countof(h.hdr.iqm); i++) {
+		for (unsigned i = 0; i < std::size(h.hdr.iqm); i++) {
 			h.hdr.iqm[i] = (BYTE)gb.BitRead(8);
 		}
 
 	h.hdr.fniqm = gb.BitRead(1);
 	if (h.hdr.fniqm)
-		for (int i = 0; i < _countof(h.hdr.niqm); i++) {
+		for (unsigned i = 0; i < std::size(h.hdr.niqm); i++) {
 			h.hdr.niqm[i] = (BYTE)gb.BitRead(8);
 		}
 
@@ -798,7 +798,7 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 		wfe.wFormatTag = WAVE_FORMAT_DTS2;
 
 		static WORD channels[] = { 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8 };
-		if (h.amode < _countof(channels)) {
+		if (h.amode < std::size(channels)) {
 			wfe.nChannels = channels[h.amode];
 			if (h.lfe > 0) {
 				++wfe.nChannels;
@@ -806,7 +806,7 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 		}
 
 		static DWORD freq[] = { 0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 0, 0 };
-		if (h.sfreq < _countof(freq)) {
+		if (h.sfreq < std::size(freq)) {
 			wfe.nSamplesPerSec = freq[h.sfreq];
 		}
 
@@ -834,7 +834,7 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 		wfe.nBlockAlign		= h.framebytes;
 
 		static const WORD bits_per_sample[] = { 16, 20, 24, 24 };
-		if (h.bits_per_sample < _countof(bits_per_sample)) {
+		if (h.bits_per_sample < std::size(bits_per_sample)) {
 			wfe.wBitsPerSample	= bits_per_sample[h.bits_per_sample];
 		}
 

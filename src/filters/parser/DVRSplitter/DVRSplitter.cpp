@@ -32,13 +32,13 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] =
 
 const AMOVIESETUP_PIN sudpPins[] =
 {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] =
 {
-	{&__uuidof(CDVRSplitterFilter), DVRSplitterName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CDVRSplitterFilter), DVRSplitterName, MERIT_NORMAL + 1, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CDVRSourceFilter), DVRSourceName, MERIT_NORMAL + 1, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
@@ -48,7 +48,7 @@ CFactoryTemplate g_Templates[] =
 	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CDVRSourceFilter>, nullptr, &sudFilter[1]},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -919,7 +919,7 @@ bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* 
 									hdr.audio.channels = m_pFile->BitRead(8);
 									hdr.audio.codec    = m_pFile->BitRead(8);
 									const BYTE index   = m_pFile->BitRead(8);
-									hdr.audio.sample_rate = (index < _countof(sample_rates)) ? sample_rates[index] : 8000;
+									hdr.audio.sample_rate = (index < std::size(sample_rates)) ? sample_rates[index] : 8000;
 
 									ext_size -= 3;
 								}
@@ -930,7 +930,7 @@ bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* 
 									hdr.audio.channels = m_pFile->BitRead(8);
 									hdr.audio.codec    = m_pFile->BitRead(8);
 									const BYTE index   = m_pFile->BitRead(8);
-									hdr.audio.sample_rate = (index < _countof(sample_rates)) ? sample_rates[index] : 8000;
+									hdr.audio.sample_rate = (index < std::size(sample_rates)) ? sample_rates[index] : 8000;
 
 									m_pFile->Skip(3);
 									ext_size -= 7;

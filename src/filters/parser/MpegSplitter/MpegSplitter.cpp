@@ -51,12 +51,12 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr},
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMpegSplitterFilter), MpegSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMpegSplitterFilter), MpegSplitterName, MERIT_NORMAL+1, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CMpegSourceFilter), MpegSourceName, MERIT_UNLIKELY, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
@@ -66,7 +66,7 @@ CFactoryTemplate g_Templates[] = {
 	{L"CMpegSplitterPropertyPage", &__uuidof(CMpegSplitterSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMpegSplitterSettingsWnd> >},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -525,12 +525,12 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
 		WCHAR buff[256] = { 0 };
-		ULONG len = _countof(buff);
+		ULONG len = std::size(buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioLangOrder, buff, &len)) {
 			m_AudioLanguageOrder = CString(buff);
 		}
 
-		len = _countof(buff);
+		len = std::size(buff);
 		memset(buff, 0, sizeof(buff));
 		if (ERROR_SUCCESS == key.QueryStringValue(OPT_SubLangOrder, buff, &len)) {
 			m_SubtitlesLanguageOrder = CString(buff);
@@ -629,10 +629,10 @@ void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 		WCHAR Filename[_MAX_FNAME] = { 0 };
 		WCHAR Ext[_MAX_EXT] = { 0 };
 
-		if (_wsplitpath_s(pszFileName, Drive, _countof(Drive), Dir, _countof(Dir), Filename, _countof(Filename), Ext, _countof(Ext)) == 0) {
+		if (_wsplitpath_s(pszFileName, Drive, std::size(Drive), Dir, std::size(Dir), Filename, std::size(Filename), Ext, std::size(Ext)) == 0) {
 			CString strClipInfo;
 
-			_wcslwr_s(Ext, _countof(Ext));
+			_wcslwr_s(Ext, std::size(Ext));
 
 			if (wcscmp(Ext, L".ssif") == 0) {
 				if (Drive[0]) {
@@ -973,7 +973,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		SUBTITLEINFO* si = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
 		memset(si, 0, mt.FormatLength());
 		si->dwOffset     = sizeof(SUBTITLEINFO);
-		strncpy_s(si->IsoLang, m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang) - 1);
+		strncpy_s(si->IsoLang, m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : "eng", std::size(si->IsoLang) - 1);
 		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 
 		s.mts.push_back(mt);

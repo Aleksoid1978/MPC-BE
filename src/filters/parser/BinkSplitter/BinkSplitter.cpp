@@ -31,13 +31,13 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] =
 
 const AMOVIESETUP_PIN sudpPins[] =
 {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] =
 {
-	{&__uuidof(CBinkSplitterFilter), BinkSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CBinkSplitterFilter), BinkSplitterName, MERIT_NORMAL+1, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CBinkSourceFilter), BinkSourceName, MERIT_NORMAL+1, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
@@ -47,7 +47,7 @@ CFactoryTemplate g_Templates[] =
 	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CBinkSourceFilter>, nullptr, &sudFilter[1]},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {

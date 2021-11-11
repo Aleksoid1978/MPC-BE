@@ -97,7 +97,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
@@ -113,8 +113,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut2[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins2[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn2), sudPinTypesIn2},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut2), sudPinTypesOut2}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn2), sudPinTypesIn2},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut2), sudPinTypesOut2}
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn3[] = {
@@ -135,15 +135,15 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut3[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins3[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn3), sudPinTypesIn3},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut3), sudPinTypesOut3}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn3), sudPinTypesIn3},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut3), sudPinTypesOut3}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CRealMediaSplitterFilter), RMSplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRealMediaSplitterFilter), RMSplitterName, MERIT_NORMAL, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CRealMediaSourceFilter), RMSourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRealVideoDecoder), L"MPC RealVideo Decoder", MERIT_NORMAL, _countof(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRealAudioDecoder), L"MPC RealAudio Decoder", MERIT_NORMAL, _countof(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRealVideoDecoder), L"MPC RealVideo Decoder", MERIT_NORMAL, std::size(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRealAudioDecoder), L"MPC RealAudio Decoder", MERIT_NORMAL, std::size(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -153,7 +153,7 @@ CFactoryTemplate g_Templates[] = {
 	{sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRealAudioDecoder>, nullptr, &sudFilter[3]},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -1995,7 +1995,7 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 
 		CRegKey key;
 		WCHAR buff[MAX_PATH];
-		ULONG len = _countof(buff);
+		ULONG len = std::size(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Software\\RealNetworks\\Preferences\\DT_Codecs", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && wcslen(buff) > 0) {
 			oldpath = buff;
@@ -2005,7 +2005,7 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 			}
 			key.Close();
 		}
-		len = _countof(buff);
+		len = std::size(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Helix\\HelixSDK\\10.0\\Preferences\\DT_Codecs", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && wcslen(buff) > 0) {
 			newpath = buff;
@@ -2510,7 +2510,7 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 			}
 			key.Close();
 		}
-		len = _countof(buff);
+		len = std::size(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Helix\\HelixSDK\\10.0\\Preferences\\DT_Codecs", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && wcslen(buff) > 0) {
 			newpath = buff;

@@ -51,12 +51,12 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMatroskaSplitterFilter), MatroskaSplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMatroskaSplitterFilter), MatroskaSplitterName, MERIT_NORMAL, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CMatroskaSourceFilter), MatroskaSourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
@@ -65,7 +65,7 @@ CFactoryTemplate g_Templates[] = {
 	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CMatroskaSourceFilter>, nullptr, &sudFilter[1]},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -1403,7 +1403,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.formattype = FORMAT_SubtitleInfo;
 					SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + pTE->CodecPrivate.size());
 					memset(psi, 0, mt.FormatLength());
-					strncpy_s(psi->IsoLang, pTE->Language, _countof(psi->IsoLang) - 1);
+					strncpy_s(psi->IsoLang, pTE->Language, std::size(psi->IsoLang) - 1);
 					CString subtitle_Name = pTE->Name;
 					if (pTE->FlagForced && pTE->FlagDefault) {
 						subtitle_Name += L" [Default, Forced]";
@@ -1414,7 +1414,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					subtitle_Name = subtitle_Name.Trim();
 
-					wcsncpy_s(psi->TrackName, subtitle_Name, _countof(psi->TrackName) - 1);
+					wcsncpy_s(psi->TrackName, subtitle_Name, std::size(psi->TrackName) - 1);
 					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 					mt.subtype =

@@ -56,12 +56,12 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMP4SplitterFilter), MP4SplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMP4SplitterFilter), MP4SplitterName, MERIT_NORMAL, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CMP4SourceFilter), MP4SourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
@@ -70,7 +70,7 @@ CFactoryTemplate g_Templates[] = {
 	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CMP4SourceFilter>, nullptr, &sudFilter[1]},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -764,8 +764,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								SUBTITLEINFO* psi	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
 								memset(psi, 0, mt.FormatLength());
 								psi->dwOffset		= sizeof(SUBTITLEINFO);
-								strncpy_s(psi->IsoLang, TrackLanguage, _countof(psi->IsoLang) - 1);
-								wcsncpy_s(psi->TrackName, TrackName, _countof(psi->TrackName) - 1);
+								strncpy_s(psi->IsoLang, TrackLanguage, std::size(psi->IsoLang) - 1);
+								wcsncpy_s(psi->TrackName, TrackName, std::size(psi->TrackName) - 1);
 								memcpy(psi + 1, (LPCSTR)hdr, hdr.GetLength());
 								mts.push_back(mt);
 							}
@@ -790,14 +790,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						SUBTITLEINFO* si = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO));
 						memset(si, 0, mt.FormatLength());
 						si->dwOffset = sizeof(SUBTITLEINFO);
-						strcpy_s(si->IsoLang, _countof(si->IsoLang), CStringA(TrackLanguage));
+						strcpy_s(si->IsoLang, std::size(si->IsoLang), CStringA(TrackLanguage));
 						if (AP4_Tx3gSampleEntry* tx3g = dynamic_cast<AP4_Tx3gSampleEntry*>(sample_entry)) {
 							const AP4_Tx3gSampleEntry::AP4_Tx3gDescription& description = tx3g->GetDescription();
 							if (description.DisplayFlags & 0x80000000) {
 								TrackName += L" [Forced]";
 							}
 						}
-						wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
+						wcscpy_s(si->TrackName, std::size(si->TrackName), TrackName);
 						mts.push_back(mt);
 
 						iSubtitle++;

@@ -2594,7 +2594,7 @@ bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)
 				return true;
 			}
 		} else if (m_type == MPEG_TYPES::mpeg_ps) {
-			if (pid < _countof(m_psm) && m_psm[pid] != INVALID) {
+			if (pid < std::size(m_psm) && m_psm[pid] != INVALID) {
 				stream_type = m_psm[pid];
 				return true;
 			}
@@ -2613,7 +2613,7 @@ void CMpegSplitterFile::UpdatePSM()
 	Skip(ps_info_length);
 
 	WORD es_map_length	= (WORD)BitRead(16);
-	if (es_map_length <= _countof(m_psm) * 4) {
+	if (es_map_length <= std::size(m_psm) * 4) {
 		while (es_map_length > 4) {
 			BYTE type			= (BYTE)BitRead(8);
 			BYTE es_id			= (BYTE)BitRead(8);

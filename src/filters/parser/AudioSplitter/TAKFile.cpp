@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -208,7 +208,7 @@ bool CTAKFile::ParseTAKStreamInfo(BYTE* buf, int size)
 	if (FrameSizeType <= TAK_FRAME_250ms) {
 		nb_samples     = SampleRate * frame_duration_type_quants[FrameSizeType] >> 5;
 		max_nb_samples = 16384;
-	} else if (FrameSizeType < _countof(frame_duration_type_quants)) {
+	} else if (FrameSizeType < std::size(frame_duration_type_quants)) {
 		nb_samples     = frame_duration_type_quants[FrameSizeType];
 		max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
 	} else {
@@ -407,7 +407,7 @@ int CTAKFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	while (!syncfound) {
 		int len = (int)std::min(1024LL, m_endpos - m_pFile->GetPos());
 
-		if (len <= 0 || size + len >= _countof(buffer) || m_pFile->ByteRead(buffer + size, len) != S_OK) {
+		if (len <= 0 || size + len >= (int)std::size(buffer) || m_pFile->ByteRead(buffer + size, len) != S_OK) {
 			break;
 		}
 		size += len;
