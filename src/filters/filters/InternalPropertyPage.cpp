@@ -536,7 +536,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			CString clsid = CStringFromGUID(FilterClsid);
 
 			WCHAR buff[MAX_PATH] = { 0 };
-			ULONG len = _countof(buff);
+			ULONG len = std::size(buff);
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Open (HKEY_CLASSES_ROOT, L"CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\" + clsid, KEY_READ)
 					&& ERROR_SUCCESS == key.QueryStringValue(L"FriendlyName", buff, &len)) {
@@ -555,7 +555,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				if (it != m_CachedRegistryFilters.end() && ::PathFileExistsW((*it).second)) {
 					module = (*it).second;
 				} else {
-					len = _countof(buff);
+					len = std::size(buff);
 					if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 							&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)
 							&& ::PathFileExistsW(buff)) {
