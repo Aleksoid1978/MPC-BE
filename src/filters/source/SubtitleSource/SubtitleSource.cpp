@@ -38,17 +38,17 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut), sudPinTypesOut},
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CSubtitleSourceASCII), L"MPC SubtitleSource (S_TEXT/ASCII)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CSubtitleSourceUTF8), L"MPC SubtitleSource (S_TEXT/UTF8)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CSubtitleSourceSSA), L"MPC SubtitleSource (S_TEXT/SSA)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CSubtitleSourceASS), L"MPC SubtitleSource (S_TEXT/ASS)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CSubtitleSourceUSF), L"MPC SubtitleSource (S_TEXT/USF)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CSubtitleSourcePreview), L"MPC SubtitleSource (Preview)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CSubtitleSourceARGB), L"MPC SubtitleSource (ARGB)", MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourceASCII),   L"MPC SubtitleSource (S_TEXT/ASCII)", MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourceUTF8),    L"MPC SubtitleSource (S_TEXT/UTF8)",  MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourceSSA),     L"MPC SubtitleSource (S_TEXT/SSA)",   MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourceASS),     L"MPC SubtitleSource (S_TEXT/ASS)",   MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourceUSF),     L"MPC SubtitleSource (S_TEXT/USF)",   MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourcePreview), L"MPC SubtitleSource (Preview)",      MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CSubtitleSourceARGB),    L"MPC SubtitleSource (ARGB)",         MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -61,7 +61,7 @@ CFactoryTemplate g_Templates[] = {
 	{sudFilter[6].strName, sudFilter[6].clsID, CreateInstance<CSubtitleSourceARGB>, nullptr, &sudFilter[6]},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {

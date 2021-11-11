@@ -53,18 +53,18 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CDTSAC3Source), DTSAC3SourceName, MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CDTSAC3Source), DTSAC3SourceName, MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
 };
 
 CFactoryTemplate g_Templates[] = {
 	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CDTSAC3Source>, nullptr, &sudFilter[0]}
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -283,9 +283,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			int zero_bytes = 0;
 
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
-			if (m_file.Read(&buf, _countof(buf)) == _countof(buf)) {
+			if (m_file.Read(&buf, std::size(buf)) == std::size(buf)) {
 				sync = GETU32(buf);
-				HD_size = ParseDTSHDHeader(buf, _countof(buf), &aframe);
+				HD_size = ParseDTSHDHeader(buf, std::size(buf), &aframe);
 				if (HD_size) {
 					m_samplerate     = aframe.samplerate;
 					m_channels       = aframe.channels;
@@ -330,7 +330,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_subtype = MEDIASUBTYPE_DTS2;
 		}
 		// DTS Express
-		else if (m_streamtype == DTSExpress && ParseDTSHDHeader(buf, _countof(buf), &aframe)) {
+		else if (m_streamtype == DTSExpress && ParseDTSHDHeader(buf, std::size(buf), &aframe)) {
 			m_samplerate    = aframe.samplerate;
 			m_channels      = aframe.channels;
 			m_bitdepth      = aframe.param1;
