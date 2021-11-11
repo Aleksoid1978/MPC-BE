@@ -221,12 +221,12 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMpaDecFilter), MPCAudioDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMpaDecFilter), MPCAudioDecName, MERIT_NORMAL + 1, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -234,7 +234,7 @@ CFactoryTemplate g_Templates[] = {
 	{L"CMpaDecPropertyPage", &__uuidof(CMpaDecSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMpaDecSettingsWnd> >},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -764,7 +764,7 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 HRESULT CMpaDecFilter::ProcessHdmvLPCM() // Blu ray LPCM
 {
 	WAVEFORMATEX_HDMV_LPCM* wfein = (WAVEFORMATEX_HDMV_LPCM*)m_pInput->CurrentMediaType().Format();
-	if (wfein->channel_conf >= _countof(s_scmap_hdmv) || !s_scmap_hdmv[wfein->channel_conf].layout) {
+	if (wfein->channel_conf >= std::size(s_scmap_hdmv) || !s_scmap_hdmv[wfein->channel_conf].layout) {
 		return E_FAIL;
 	}
 
@@ -2348,7 +2348,7 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 		}
 	}
 
-	for (int i = 0; i < _countof(sudPinTypesIn); i++) {
+	for (unsigned i = 0; i < std::size(sudPinTypesIn); i++) {
 		if (*sudPinTypesIn[i].clsMajorType == mtIn->majortype
 				&& *sudPinTypesIn[i].clsMinorType == mtIn->subtype) {
 			return S_OK;
@@ -2788,7 +2788,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			if (channels > 2 && layout) {
 				const char* spks[] = { "L", "R", "C", "LFE", "BL", "BR", "FLC", "FRC", "BC", "SL", "SR", "TC" };
 				CStringA str;
-				for (int i = 0; i < _countof(spks); i++) {
+				for (unsigned i = 0; i < std::size(spks); i++) {
 					if (layout & (1 << i)) {
 						if (str.GetLength()) {
 							str.Append(",");

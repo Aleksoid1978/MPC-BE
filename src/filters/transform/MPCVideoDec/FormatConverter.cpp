@@ -192,7 +192,7 @@ CFormatConverter::CFormatConverter()
 	, m_NumThreads(1)
 	, pConvertFn(nullptr)
 {
-	ASSERT(PixFmt_count == _countof(s_sw_formats));
+	ASSERT(PixFmt_count == std::size(s_sw_formats));
 
 	m_FProps.avpixfmt	= AV_PIX_FMT_NONE;
 	m_FProps.width		= 0;

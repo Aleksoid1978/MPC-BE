@@ -956,20 +956,20 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn),  sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesIn),  sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_PIN sudpPinsUncompressed[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesInUncompressed), sudPinTypesInUncompressed},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesInUncompressed), sudPinTypesInUncompressed},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, std::size(sudPinTypesOut), sudPinTypesOut}
 };
 
 CLSID Converter_clsID = GUIDFromCString(L"{0B7FA55E-FA38-4671-A2F2-B8F300C955C4}");
 
 const AMOVIESETUP_FILTER sudFilters[] = {
-	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&Converter_clsID, MPCVideoConvName, MERIT_NORMAL + 1, _countof(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&Converter_clsID, MPCVideoConvName, MERIT_NORMAL + 1, std::size(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory}
 	// merit of video converter must be lower than merit of video renderers
 };
 
@@ -980,7 +980,7 @@ CFactoryTemplate g_Templates[] = {
 	{L"CMPCVideoDecPropertyPage2", &__uuidof(CMPCVideoDecCodecWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecCodecWnd> >},
 };
 
-int g_cTemplates = _countof(g_Templates);
+int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -1007,7 +1007,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	DWORD	procid = 0;
 	WCHAR	WindowClass[40];
 	GetWindowThreadProcessId(hwnd, &procid);
-	GetClassName(hwnd, WindowClass, _countof(WindowClass));
+	GetClassName(hwnd, WindowClass, std::size(WindowClass));
 
 	if (procid == GetCurrentProcessId() && wcscmp(WindowClass, MPC_WND_CLASS_NAMEW) == 0) {
 		HWND* pWnd = (HWND*) lParam;
@@ -1140,7 +1140,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_VCodecs, KEY_READ)) {
 		m_nActiveCodecs = 0;
-		for (size_t i = 0; i < _countof(vcodecs); i++) {
+		for (size_t i = 0; i < std::size(vcodecs); i++) {
 			DWORD dw = 1;
 			key.QueryDWORDValue(vcodecs[i].opt_name, dw);
 			if (dw) {
@@ -1376,7 +1376,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 {
 	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = m_bUseD3D11cb = m_bUseNVDEC = false;
 
-	for (size_t i = 0; i < _countof(ffCodecs); i++) {
+	for (size_t i = 0; i < std::size(ffCodecs); i++) {
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 			if (bForced) { // hack
 				m_bUseFFmpeg = true;
@@ -1626,14 +1626,14 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 
 HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-	for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
+	for (size_t i = 0; i < std::size(sudPinTypesIn); i++) {
 		if ((mtIn->majortype == *sudPinTypesIn[i].clsMajorType) &&
 				(mtIn->subtype == *sudPinTypesIn[i].clsMinorType)) {
 			return S_OK;
 		}
 	}
 
-	for (size_t i = 0; i < _countof(sudPinTypesInUncompressed); i++) {
+	for (size_t i = 0; i < std::size(sudPinTypesInUncompressed); i++) {
 		if ((mtIn->majortype == *sudPinTypesInUncompressed[i].clsMajorType) &&
 				(mtIn->subtype == *sudPinTypesInUncompressed[i].clsMinorType)) {
 			return S_OK;
@@ -4175,7 +4175,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 		key.SetDWORDValue(OPT_SwRGBLevels, m_nSwRGBLevels);
 	}
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VCodecs)) {
-		for (size_t i = 0; i < _countof(vcodecs); i++) {
+		for (size_t i = 0; i < std::size(vcodecs); i++) {
 			DWORD dw = m_nActiveCodecs & vcodecs[i].flag ? 1 : 0;
 			key.SetDWORDValue(vcodecs[i].opt_name, dw);
 		}
@@ -4723,7 +4723,7 @@ namespace MPCVideoDec {
 	{
 		fmts.clear();
 
-		for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
+		for (size_t i = 0; i < std::size(sudPinTypesIn); i++) {
 			FORMAT fmt = { sudPinTypesIn[i].clsMajorType, ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode};
 			fmts.push_back(fmt);
 		}

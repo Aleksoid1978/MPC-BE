@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,10 +20,6 @@
  */
 
 #include "stdafx.h"
-
-#ifndef _countof
-#define _countof(array) (sizeof(array)/sizeof(array[0]))
-#endif
 
 unsigned int CSStab0[11]= {5,0,1,2,3,4,0,1,2,3,4};
 
@@ -258,4 +254,4 @@ unsigned char g_PlayerKeys[][6] = {
 	// TODO: find more player keys
 };
 
-int g_nPlayerKeys = _countof(g_PlayerKeys);
+int g_nPlayerKeys = std::size(g_PlayerKeys);

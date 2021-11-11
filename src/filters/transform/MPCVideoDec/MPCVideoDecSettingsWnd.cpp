@@ -602,7 +602,7 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 
 	m_lstCodecs.Create(dwStyle | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP, CRect (20,30, 320, 270), this, 0);
 
-	for (size_t i = 0; i < _countof(mpc_codecs); i++) {
+	for (size_t i = 0; i < std::size(mpc_codecs); i++) {
 		m_lstCodecs.AddString(mpc_codecs[i].CodeName);
 		m_lstCodecs.SetCheck(nPos++, (nActiveCodecs & mpc_codecs[i].CodecId) != 0);
 	}
@@ -626,7 +626,7 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		ULONGLONG nActiveCodecs	= 0;
 		int nPos				= 0;
 
-		for (size_t i = 0; i < _countof(mpc_codecs); i++) {
+		for (size_t i = 0; i < std::size(mpc_codecs); i++) {
 			if (m_lstCodecs.GetCheck(nPos++)) {
 				nActiveCodecs |= mpc_codecs[i].CodecId;
 			}
