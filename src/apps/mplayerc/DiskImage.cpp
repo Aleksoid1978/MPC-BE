@@ -281,12 +281,12 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 
 			if (ret_code == ERROR_SUCCESS) {
 				WCHAR physicalDriveName[MAX_PATH] = L"";
-				DWORD physicalDriveNameSize = _countof(physicalDriveName);
+				DWORD physicalDriveNameSize = std::size(physicalDriveName);
 
 				ret_code = m_GetVirtualDiskPhysicalPathFunc(m_VHDHandle, &physicalDriveNameSize, physicalDriveName);
 				if (ret_code == ERROR_SUCCESS) {
 					WCHAR volumeNameBuffer[MAX_PATH] = L"";
-					DWORD volumeNameBufferSize = _countof(volumeNameBuffer);
+					DWORD volumeNameBufferSize = std::size(volumeNameBuffer);
 					HANDLE hVol = ::FindFirstVolumeW(volumeNameBuffer, volumeNameBufferSize);
 					if (hVol != INVALID_HANDLE_VALUE) {
 						do {
@@ -320,7 +320,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 													  &query,
 													  sizeof(STORAGE_PROPERTY_QUERY),
 													  &outBuf,
-													  _countof(outBuf),
+													  std::size(outBuf),
 													  &bytesUsed,
 													  nullptr) && bytesUsed) {
 
@@ -350,7 +350,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 										if (physicalDriveName == tmp_physicalDriveName) {
 											volumeNameBuffer[len - 1] = '\\';
 											WCHAR VolumeName[MAX_PATH] = L"";
-											DWORD VolumeNameSize = _countof(VolumeName);
+											DWORD VolumeNameSize = std::size(VolumeName);
 											BOOL bRes = GetVolumePathNamesForVolumeNameW(volumeNameBuffer, VolumeName, VolumeNameSize, &VolumeNameSize);
 											if (bRes) {
 												ISOVolumeName = VolumeName;

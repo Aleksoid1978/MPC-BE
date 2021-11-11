@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2019 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@ double GetNextRate(double rate, int step_pct) // 0..100%
 {
 	if (step_pct == 0) {
 		size_t i = 0;
-		for (; i < _countof(s_autorates) - 1; i++) {
+		for (; i < std::size(s_autorates) - 1; i++) {
 			if (s_autorates[i] > rate) {
 				break;
 			}
@@ -48,7 +48,7 @@ double GetPreviousRate(double rate, int step_pct) // 0..100%
 {
 	if (step_pct == 0) {
 		size_t i = 1;
-		for (; i < _countof(s_autorates); i++) {
+		for (; i < std::size(s_autorates); i++) {
 			if (s_autorates[i] >= rate) {
 				break;
 			}
@@ -67,7 +67,7 @@ double GetPreviousRate(double rate, int step_pct) // 0..100%
 double GetNextDVDRate(double rate)
 {
 	size_t i = 0;
-	for (; i < _countof(s_dvdautorates) - 1; i++) {
+	for (; i < std::size(s_dvdautorates) - 1; i++) {
 		if (s_dvdautorates[i] > rate) {
 			break;
 		}
@@ -79,7 +79,7 @@ double GetNextDVDRate(double rate)
 double GetPreviousDVDRate(double rate)
 {
 	size_t i = 1;
-	for (; i < _countof(s_dvdautorates); i++) {
+	for (; i < std::size(s_dvdautorates); i++) {
 		if (s_dvdautorates[i] >= rate) {
 			break;
 		}

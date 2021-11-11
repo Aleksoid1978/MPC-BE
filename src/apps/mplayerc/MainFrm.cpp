@@ -1257,7 +1257,7 @@ void CMainFrame::ShowTrayIcon(bool fShow)
 			tnid.hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 			tnid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 			tnid.uCallbackMessage = WM_NOTIFYICON;
-			StringCchCopyW(tnid.szTip, _countof(tnid.szTip), L"MPC-BE");
+			StringCchCopyW(tnid.szTip, std::size(tnid.szTip), L"MPC-BE");
 			Shell_NotifyIconW(NIM_ADD, &tnid);
 
 			m_bTrayIcon = true;
@@ -1278,7 +1278,7 @@ void CMainFrame::SetTrayTip(CString str)
 	tnid.hWnd = m_hWnd;
 	tnid.uID = IDR_MAINFRAME;
 	tnid.uFlags = NIF_TIP;
-	StringCchCopyW(tnid.szTip, _countof(tnid.szTip), str);
+	StringCchCopyW(tnid.szTip, std::size(tnid.szTip), str);
 	Shell_NotifyIconW(NIM_MODIFY, &tnid);
 }
 
@@ -1490,8 +1490,8 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 							PostMessageW(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 						} else {
 							touchPoint points[2];
-							int index = 0;
-							for (int i = 0; i < _countof(m_touchScreen.point); i++) {
+							unsigned index = 0;
+							for (unsigned i = 0; i < std::size(m_touchScreen.point); i++) {
 								if (m_touchScreen.point[i].dwID != DWORD_MAX && m_touchScreen.point[i].x_end != 0) {
 									points[index++] = m_touchScreen.point[i];
 								}
@@ -6321,7 +6321,7 @@ bool CMainFrame::IsRendererCompatibleWithSaveImage()
 		CString clsid = L"{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}";
 
 		WCHAR buff[256];
-		ULONG len = _countof(buff);
+		ULONG len = std::size(buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)) {
@@ -7782,9 +7782,9 @@ void CMainFrame::OnViewAspectRatioNext()
 
 	UINT nID = ID_ASPECTRATIO_START;
 
-	for (int i = 0; i < _countof(s_ar); i++) {
+	for (unsigned i = 0; i < std::size(s_ar); i++) {
 		if (ar == s_ar[i]) {
-			nID += (i + 1) % _countof(s_ar);
+			nID += (i + 1) % std::size(s_ar);
 			break;
 		}
 	}
@@ -12632,7 +12632,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 
 	WCHAR buff[MAX_PATH] = { 0 };
 	ULONG len = 0;
-	if (SUCCEEDED(hr = m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+	if (SUCCEEDED(hr = m_pDVDI->GetDVDDirectory(buff, std::size(buff), &len))) {
 		pODD->title = CString(buff) + L"\\VIDEO_TS.IFO";
 		if (pODD->bAddRecent) {
 			AddRecent(pODD->title);
@@ -18078,7 +18078,7 @@ void CMainFrame::SendAPICommand(MPCAPI_COMMAND nCommand, LPCWSTR fmt, ...)
 
 		va_list args;
 		va_start(args, fmt);
-		vswprintf_s(buff, _countof(buff), fmt, args);
+		vswprintf_s(buff, std::size(buff), fmt, args);
 
 		COPYDATASTRUCT CDS;
 		CDS.cbData = (wcslen (buff) + 1) * sizeof(WCHAR);
@@ -19813,7 +19813,7 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 	CString DVDPath(path);
 	if (DVDPath.IsEmpty()
-			&& m_pDVDI && SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+			&& m_pDVDI && SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, std::size(buff), &len))) {
 		DVDPath = buff;
 	}
 

@@ -422,14 +422,14 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		const long speed = m_SaveStats.AddValuesGetSpeed(pos, time);
 
 		double dPos = pos / 1024.0;
-		const unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
+		const unsigned int unitPos = AdaptUnit(dPos, std::size(sizeUnits));
 		double dSpeed = speed / 1024.0;
-		const unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
+		const unsigned int unitSpeed = AdaptUnit(dSpeed, std::size(speedUnits));
 
 		CString str;
 		if (m_len) {
 			double dDur = m_len / 1024.0;
-			const unsigned int unitDur = AdaptUnit(dDur, _countof(sizeUnits));
+			const unsigned int unitDur = AdaptUnit(dDur, std::size(sizeUnits));
 
 			str.Format(L"%.2lf %s / %.2lf %s , %.2lf %s",
 					   dPos, ResStr(sizeUnits[unitPos]),
@@ -485,11 +485,11 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		const REFERENCE_TIME speed = time > 0 ? pos * 10000000 / time : 0;
 
 		double dPos = pos / 1024.0;
-		const unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
+		const unsigned int unitPos = AdaptUnit(dPos, std::size(sizeUnits));
 		double dDur = dur / 1024.0;
-		const unsigned int unitDur = AdaptUnit(dDur, _countof(sizeUnits));
+		const unsigned int unitDur = AdaptUnit(dDur, std::size(sizeUnits));
 		double dSpeed = speed / 1024.0;
-		const unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
+		const unsigned int unitSpeed = AdaptUnit(dSpeed, std::size(speedUnits));
 
 		str.Format(L"%.2lf %s / %.2lf %s , %.2lf %s",
 				   dPos, ResStr(sizeUnits[unitPos]),

@@ -260,7 +260,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 				BITMAPINFOHEADER bihCur;
 				ExtractBIH(&pfe->mt, &bihCur);
 
-				for (size_t j = 0; j < _countof(presets); j++) {
+				for (size_t j = 0; j < std::size(presets); j++) {
 					if (presets[j].cx == bihCur.biWidth
 							&& presets[j].cy == abs(bihCur.biHeight)
 							|| presets[j].cx < pcaps->MinOutputSize.cx

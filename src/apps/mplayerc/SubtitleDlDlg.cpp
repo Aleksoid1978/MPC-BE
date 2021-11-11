@@ -110,7 +110,7 @@ CString CSubtitleDlDlg::LangCodeToName(LPCSTR code)
 		"Tagalog",   "Thai",      "Turkish",   "Ukrainian",  "Urdu",          "Vietnamese", "Romanian",  "Brazilian",
 	};
 
-	for (size_t i = 0; i < _countof(ltable); ++i) {
+	for (size_t i = 0; i < std::size(ltable); ++i) {
 		if (StrMatchA(ltable[i], code) == codeLen) {
 			return CString(ltable[i]);
 		}

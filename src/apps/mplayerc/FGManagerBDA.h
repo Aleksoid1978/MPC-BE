@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,7 +100,7 @@ private :
 			PID_MAP maps[8];
 			ULONG	nbPids = 0;
 
-			if (pEnumMap->Next(_countof(maps), maps, &nbPids)==S_OK) {
+			if (pEnumMap->Next(std::size(maps), maps, &nbPids)==S_OK) {
 				for (ULONG i=0; i<nbPids; i++) {
 					ULONG	pid = maps[i].ulPID;
 
@@ -191,7 +191,7 @@ static void LOG(LPCTSTR fmt, ...)
 	//int		nCount = _vsctprintf(fmt, args) + 1;
 	WCHAR	buff[3000];
 	FILE*	f;
-	vswprintf_s(buff, _countof(buff), fmt, args);
+	vswprintf_s(buff, std::size(buff), fmt, args);
 	if (_wfopen_s(&f, LOG_FILE, L"at") == 0) {
 		fseek(f, 0, 2);
 		fwprintf_s(f, L"%s\n", buff);

@@ -69,7 +69,7 @@ Update_Status UpdateChecker::CheckNewVersion()
 			char buffer[1024] = { 0 }; // limit update file to 1024 bytes
 			DWORD dwBytesRead = 0;
 
-			if (InternetReadFile(hUrl, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == TRUE && dwBytesRead < _countof(buffer)) {
+			if (InternetReadFile(hUrl, (LPVOID)buffer, std::size(buffer), &dwBytesRead) == TRUE && dwBytesRead < std::size(buffer)) {
 				updateinfo = CStringA(buffer);
 			}
 			InternetCloseHandle(hUrl);

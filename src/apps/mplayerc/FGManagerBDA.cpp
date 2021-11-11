@@ -315,7 +315,7 @@ HRESULT CFGManagerBDA::SearchIBDATopology(const CComPtr<IBaseFilter>& pTuner, RE
 	ULONG	NodeTypes;
 	ULONG	NodeType[32];
 
-	HRESULT	hr = pTop->GetNodeTypes(&NodeTypes, _countof(NodeType), NodeType);
+	HRESULT	hr = pTop->GetNodeTypes(&NodeTypes, std::size(NodeType), NodeType);
 
 	if (FAILED(hr)) {
 		return hr;
@@ -325,7 +325,7 @@ HRESULT CFGManagerBDA::SearchIBDATopology(const CComPtr<IBaseFilter>& pTuner, RE
 		ULONG	nInterfaces;
 		GUID	aInterface[32];
 
-		hr = pTop->GetNodeInterfaces(NodeType[i], &nInterfaces, _countof(aInterface), aInterface);
+		hr = pTop->GetNodeInterfaces(NodeType[i], &nInterfaces, std::size(aInterface), aInterface);
 
 		if (FAILED(hr)) {
 			continue;

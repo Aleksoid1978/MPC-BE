@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,13 +42,13 @@ void LCD_UpdateThread(void* Control)
 			// Format the current time structure into a string
 			// using %#x is the long date representation,
 			// appropriate to the current locale
-			if (_wcsftime_l(str, _countof(str), L"%#x", (const struct tm*)&thetime, locale) &&
+			if (_wcsftime_l(str, std::size(str), L"%#x", (const struct tm*)&thetime, locale) &&
 			(ltime > ctrl->nThread_tTimeout || ltime < otime)) { // message displayed, no update until timeout
 				ctrl->m_MonoPage.m_Text[0].SetText(str);
 				ctrl->m_ColorPage.m_Text[0].SetText(str);
 			}
 
-			if (_wcsftime_l(str, _countof(str), L"%X", (const struct tm*)&thetime, locale)) {
+			if (_wcsftime_l(str, std::size(str), L"%X", (const struct tm*)&thetime, locale)) {
 				ctrl->m_MonoPage.m_Text[1].SetText(str);
 				ctrl->m_ColorPage.m_Text[1].SetText(str);
 			}

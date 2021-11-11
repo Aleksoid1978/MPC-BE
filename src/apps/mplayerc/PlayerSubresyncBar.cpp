@@ -255,10 +255,10 @@ void CPlayerSubresyncBar::ResetSubtitle()
 			m_subtimes[i].newstart = m_subtimes[i].orgstart;
 			m_subtimes[i].newend = m_subtimes[i].orgend;
 
-			FormatTime(i, buff, _countof(buff), 0, false);
+			FormatTime(i, buff, std::size(buff), 0, false);
 			m_list.InsertItem(i, buff);
 			m_list.SetItemText(i, COL_PREVSTART, buff);
-			FormatTime(i, buff, _countof(buff), 0, true);
+			FormatTime(i, buff, std::size(buff), 0, true);
 			m_list.SetItemText(i, COL_END, buff);
 			m_list.SetItemText(i, COL_PREVEND, buff);
 
@@ -404,9 +404,9 @@ void CPlayerSubresyncBar::UpdatePreview()
 
 		for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
 			WCHAR buff[32];
-			FormatTime(i, buff, _countof(buff), 2, false);
+			FormatTime(i, buff, std::size(buff), 2, false);
 			m_list.SetItemText(i, COL_PREVSTART, buff);
-			FormatTime(i, buff, _countof(buff), 2, true);
+			FormatTime(i, buff, std::size(buff), 2, true);
 			m_list.SetItemText(i, COL_PREVEND, buff);
 		}
 
@@ -527,9 +527,9 @@ void CPlayerSubresyncBar::SetCheck(int iItem, bool fStart, bool fEnd)
 		m_list.SetItemData(iItem, (DWORD)nCheck);
 
 		WCHAR buff[32];
-		FormatTime(iItem, buff, _countof(buff), fStart, false);
+		FormatTime(iItem, buff, std::size(buff), fStart, false);
 		m_list.SetItemText(iItem, COL_START, buff);
-		FormatTime(iItem, buff, _countof(buff), fEnd, true);
+		FormatTime(iItem, buff, std::size(buff), fEnd, true);
 		m_list.SetItemText(iItem, COL_END, buff);
 	}
 }

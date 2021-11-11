@@ -247,7 +247,7 @@ BOOL CPPageDVD::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	for (int i = 0; i < _countof(LCIDNameList); i++) {
+	for (unsigned i = 0; i < std::size(LCIDNameList); i++) {
 		AddStringData(m_lcids, CString(LCIDNameList[i].name), LCIDNameList[i].lcid);
 	}
 

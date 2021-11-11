@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -436,7 +436,7 @@ void CPPageCapture::FindAnalogDevices()
 
 	// Fill country
 	iSel = 0;
-	for (int j = 0; j < _countof(s_countrycodes); j++) {
+	for (unsigned j = 0; j < std::size(s_countrycodes); j++) {
 		const char* standard;
 		switch (s_countrycodes[j].standard) {
 			case AnalogVideo_NTSC_M:      standard = "NTSC M";      break;

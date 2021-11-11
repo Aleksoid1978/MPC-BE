@@ -165,7 +165,7 @@ void CPlayerToolBar::SwitchTheme()
 			TBBS_CHECKBOX,
 		};
 
-		for (int i = 0; i < _countof(styles); i++) {
+		for (unsigned i = 0; i < std::size(styles); i++) {
 			SetButtonStyle(i, styles[i] | TBBS_DISABLED);
 		}
 

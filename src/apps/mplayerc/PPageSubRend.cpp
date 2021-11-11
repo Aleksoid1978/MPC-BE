@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -94,7 +94,7 @@ s_maxTexRes[] = {
 
 int TexWidth2Index(int w)
 {
-	for (int i = 0; i < _countof(s_maxTexRes); i++) {
+	for (int i = 0; i < (int)std::size(s_maxTexRes); i++) {
 		if (s_maxTexRes[i].width == w) {
 			return i;
 		}
@@ -105,7 +105,7 @@ int TexWidth2Index(int w)
 
 int TexIndex2Width(int i)
 {
-	if (i >= 0 && i < _countof(s_maxTexRes)) {
+	if (i >= 0 && i < (int)std::size(s_maxTexRes)) {
 		return s_maxTexRes[i].width;
 	}
 
@@ -129,7 +129,7 @@ BOOL CPPageSubRend::OnInitDialog()
 	m_nVerPosCtrl.SetRange(-10, 110);
 	m_nSPCSize = s.m_VRSettings.nSubpicCount;
 	m_nSPCSizeCtrl.SetRange(RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
-	for (int i = 0; i < _countof(s_maxTexRes); i++) {
+	for (unsigned i = 0; i < std::size(s_maxTexRes); i++) {
 		m_spmaxres.AddString(s_maxTexRes[i].name);
 	}
 	m_spmaxres.SetCurSel(TexWidth2Index(s.m_VRSettings.iSubpicMaxTexWidth));

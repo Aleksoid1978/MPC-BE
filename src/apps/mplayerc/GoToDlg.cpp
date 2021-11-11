@@ -127,9 +127,9 @@ void CGoToDlg::OnBnClickedOk1()
 	wchar_t c2 = L':'; // delimiter character
 	wchar_t c3[2]; // unnecessary character
 
-	if (((swscanf_s(m_timestr, L"%f%1s", &ss, &c3, _countof(c3)) == 1 || // sss[.ms]
-			swscanf_s(m_timestr, L"%u%c%f%1s", &mm, &c2, sizeof(wchar_t), &ss, &c3, _countof(c3)) == 3 && ss < 60 || // mmm:ss[.ms]
-			(swscanf_s(m_timestr, L"%u%c%u%c%f%1s", &hh, &c1, sizeof(wchar_t), &mm, &c2, sizeof(wchar_t), &ss, &c3, _countof(c3)) == 5 && mm < 60  && ss < 60)) && // hhh:mm:ss[.ms]
+	if (((swscanf_s(m_timestr, L"%f%1s", &ss, &c3, std::size(c3)) == 1 || // sss[.ms]
+			swscanf_s(m_timestr, L"%u%c%f%1s", &mm, &c2, sizeof(wchar_t), &ss, &c3, std::size(c3)) == 3 && ss < 60 || // mmm:ss[.ms]
+			(swscanf_s(m_timestr, L"%u%c%u%c%f%1s", &hh, &c1, sizeof(wchar_t), &mm, &c2, sizeof(wchar_t), &ss, &c3, std::size(c3)) == 5 && mm < 60  && ss < 60)) && // hhh:mm:ss[.ms]
 			c1 == L':' && c2 == L':' && ss >= 0)) {
 
 		int time = (int)(1000*((hh*60+mm)*60+ss)+0.5);
@@ -152,7 +152,7 @@ void CGoToDlg::OnBnClickedOk2()
 	wchar_t c1[2]; // delimiter character
 	wchar_t c2[2]; // unnecessary character
 
-	int result = swscanf_s(m_framestr, L"%u%1s%f%1s", &frame, &c1, _countof(c1), &fps, &c2, _countof(c2));
+	int result = swscanf_s(m_framestr, L"%u%1s%f%1s", &frame, &c1, std::size(c1), &fps, &c2, std::size(c2));
 
 	if (result == 1) {
 		m_time = (REFERENCE_TIME)ceil(10000000.0*frame/m_fps);

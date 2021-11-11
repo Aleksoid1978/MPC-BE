@@ -562,7 +562,7 @@ void CPPageFullscreen::ModesUpdate()
 			{ 59.970, 60.500 }, // 60
 		};
 
-		for (nItem = 0; nItem < _countof(vfr); nItem++) {
+		for (nItem = 0; nItem < (int)std::size(vfr); nItem++) {
 			CString str;
 			str.Format(L"%02d", nItem + 1);
 			m_list.InsertItem(nItem + 1, str);

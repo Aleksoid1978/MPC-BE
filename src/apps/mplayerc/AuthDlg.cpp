@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -76,7 +76,7 @@ BOOL CAuthDlg::OnInitDialog()
 			WCHAR username[256], password[256];
 
 			for (;;) {
-				DWORD unlen = _countof(username);
+				DWORD unlen = std::size(username);
 				DWORD pwlen = sizeof(password);
 				DWORD type = REG_SZ;
 

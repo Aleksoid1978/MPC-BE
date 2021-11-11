@@ -77,7 +77,7 @@ const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_UKRAINIAN,				1058,	L"Ukrainian",				L"ua",	L"ukr"},
 };
 
-const size_t CMPlayerCApp::languageResourcesCount = _countof(CMPlayerCApp::languageResources);
+const size_t CMPlayerCApp::languageResourcesCount = std::size(CMPlayerCApp::languageResources);
 
 typedef struct _PEB_FREE_BLOCK // Size = 8
 {
@@ -638,7 +638,7 @@ BOOL CreateFakeVideoTS(LPCWSTR strIFOPath, LPWSTR strFakeFile, size_t nFakeFileS
 		return FALSE;
 	}
 
-	_wsplitpath_s(strIFOPath, nullptr, 0, nullptr, 0, strFileName, _countof(strFileName), strExt, _countof(strExt));
+	_wsplitpath_s(strIFOPath, nullptr, 0, nullptr, 0, strFileName, std::size(strFileName), strExt, std::size(strExt));
 	_snwprintf_s(strFakeFile, nFakeFileSize, _TRUNCATE, L"%sMPC%s%s", szTempPath, strFileName, strExt);
 
 	if (Ifo.OpenFile(strIFOPath) && Ifo.RemoveUOPs() && Ifo.SaveFile(strFakeFile)) {
@@ -660,7 +660,7 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 
 	if (nLen >= 4 && _wcsicmp(p1 + nLen - 4, L".ifo") == 0) {
 		WCHAR strFakeFile[MAX_PATH];
-		if (CreateFakeVideoTS(p1, strFakeFile, _countof(strFakeFile))) {
+		if (CreateFakeVideoTS(p1, strFakeFile, std::size(strFakeFile))) {
 			hFile = Real_CreateFileW(strFakeFile, p2, p3, p4, p5, p6, p7);
 
 			if (hFile != INVALID_HANDLE_VALUE) {
@@ -1197,7 +1197,7 @@ void CMPlayerCApp::RegisterHotkeys()
 	};
 
 	// Register MCE Remote Control raw input
-	for (unsigned int i=0; i<_countof(MCEInputDevice); i++) {
+	for (unsigned int i=0; i<std::size(MCEInputDevice); i++) {
 		MCEInputDevice[i].hwndTarget = m_pMainWnd->m_hWnd;
 	}
 
@@ -1228,7 +1228,7 @@ void CMPlayerCApp::RegisterHotkeys()
 		}
 	}
 
-	RegisterRawInputDevices(MCEInputDevice, _countof(MCEInputDevice), sizeof(RAWINPUTDEVICE));
+	RegisterRawInputDevices(MCEInputDevice, std::size(MCEInputDevice), sizeof(RAWINPUTDEVICE));
 
 	if (m_s.bGlobalMedia) {
 		for (const auto& wc : m_s.wmcmds) {

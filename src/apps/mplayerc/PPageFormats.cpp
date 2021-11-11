@@ -119,7 +119,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 		// The 2000/XP/10 way
 		CRegKey key;
 		WCHAR   buff[MAX_PATH] = {};
-		ULONG   len = _countof(buff);
+		ULONG   len = std::size(buff);
 
 		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
 			return false;
@@ -136,7 +136,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	if (bIsDefault) {
 		CRegKey key;
 		WCHAR   buff[MAX_PATH] = {};
-		ULONG   len = _countof(buff);
+		ULONG   len = std::size(buff);
 
 		bIsDefault = FALSE;
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open\\command", KEY_READ)) {
@@ -150,7 +150,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	if (bIsDefault && SysVersion::IsWin10orLater() && bCheckProgId) {
 		CRegKey key;
 		WCHAR   buff[MAX_PATH] = {};
-		ULONG   len = _countof(buff);
+		ULONG   len = std::size(buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\UserChoice"), KEY_READ)) {
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ProgId", buff, &len)) {
@@ -513,8 +513,8 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 {
 	CString exe = GetProgramPath();
 
-	int i = (int)ap;
-	if (i < 0 || i >= _countof(handlers)) {
+	unsigned i = (unsigned)ap;
+	if (i >= std::size(handlers)) {
 		return;
 	}
 
@@ -560,8 +560,8 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 
 bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 {
-	int i = (int)ap;
-	if (i < 0 || i >= _countof(handlers)) {
+	unsigned i = (unsigned)ap;
+	if (i >= std::size(handlers)) {
 		return false;
 	}
 
@@ -574,7 +574,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 	}
 
 	WCHAR buff[MAX_PATH] = {};
-	ULONG len = _countof(buff);
+	ULONG len = std::size(buff);
 
 	CString exe = GetProgramPath();
 
@@ -590,7 +590,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 								  KEY_READ)) {
 		return false;
 	}
-	len = _countof(buff);
+	len = std::size(buff);
 	if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len)) {
 		return false;
 	}
@@ -753,7 +753,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	CRegKey key;
 	HRESULT hr = S_OK;
 	WCHAR   buff[MAX_PATH] = {};
-	ULONG   len = _countof(buff);
+	ULONG   len = std::size(buff);
 
 	if (m_pAAR) {
 		// The Vista/7/8 way
@@ -778,7 +778,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				/*
 				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(pszCurrentAssociation) + L"\\DefaultIcon"))
 				{
-					len = _countof(buff);
+					len = std::size(buff);
 					if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty())
 					{
 						if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon"))
@@ -823,7 +823,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			{
 				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, extoldreg + L"\\DefaultIcon"))
 				{
-					len = _countof(buff);
+					len = std::size(buff);
 					if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty())
 						extOldIcon = buff;
 				}

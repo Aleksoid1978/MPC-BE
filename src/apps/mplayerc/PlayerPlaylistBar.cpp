@@ -137,7 +137,7 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 			WCHAR type[256] = {};
 			trackNum = 0;
 			fAudioTrack = FALSE;
-			if (2 == swscanf_s(cueLine, L"%u %s", &trackNum, type, _countof(type))) {
+			if (2 == swscanf_s(cueLine, L"%u %s", &trackNum, type, std::size(type))) {
 				fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
 			}
 		} else if (cmd == L"TITLE") {
@@ -1303,7 +1303,7 @@ void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 							// Possible recontruction of path.
 							&& SUCCEEDED(pShellLink->Resolve(nullptr, SLR_ANY_MATCH | SLR_NO_UI))
 							// Retrieve path.
-							&& SUCCEEDED(pShellLink->GetPath(buffer, _countof(buffer), nullptr, 0))
+							&& SUCCEEDED(pShellLink->GetPath(buffer, std::size(buffer), nullptr, 0))
 							// non-empty buffer
 							&& wcslen(buffer)) {
 						fn = buffer;
@@ -2491,7 +2491,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 	if (pli->m_type == CPlaylistItem::device) {
 		if (OpenDeviceData* p = DNew OpenDeviceData()) {
 			auto it = pli->m_fns.begin();
-			for (int i = 0; i < _countof(p->DisplayName) && it != pli->m_fns.end(); ++i, ++it) {
+			for (unsigned i = 0; i < std::size(p->DisplayName) && it != pli->m_fns.end(); ++i, ++it) {
 				p->DisplayName[i] = (*it).GetName();
 			}
 

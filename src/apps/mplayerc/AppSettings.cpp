@@ -1151,7 +1151,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		UINT mouse, mouseFS, appcmd;
 		WCHAR buff[128];
 		int n;
-		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, _countof(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
+		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, std::size(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
 			break;
 		}
 

@@ -107,11 +107,11 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	CString str(L"MIME\\Database\\Content Type");
 	if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, str, KEY_READ)) {
 		WCHAR buff[256];
-		DWORD len = _countof(buff);
-		for (int i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len); i++, len = _countof(buff)) {
+		DWORD len = std::size(buff);
+		for (int i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len); i++, len = std::size(buff)) {
 			CRegKey mime;
 			WCHAR ext[64];
-			ULONG extlen = _countof(ext);
+			ULONG extlen = std::size(ext);
 			if (ERROR_SUCCESS == mime.Open(HKEY_CLASSES_ROOT, str + L"\\" + buff, KEY_READ)
 					&& ERROR_SUCCESS == mime.QueryStringValue(L"Extension", ext, &extlen)) {
 				m_mimes[CStringA(ext).MakeLower()] = CStringA(buff).MakeLower();

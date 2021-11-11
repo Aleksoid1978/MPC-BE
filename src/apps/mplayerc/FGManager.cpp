@@ -507,13 +507,13 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(protocol), KEY_READ)) {
 				CRegKey exts;
 				if (ERROR_SUCCESS == exts.Open(key, L"Extensions", KEY_READ)) {
-					len = _countof(buff);
+					len = std::size(buff);
 					if (ERROR_SUCCESS == exts.QueryStringValue(CString(ext), buff, &len)) {
 						fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 4);
 					}
 				}
 
-				len = _countof(buff);
+				len = std::size(buff);
 				if (ERROR_SUCCESS == key.QueryStringValue(L"Source Filter", buff, &len)) {
 					fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 5);
 				}
@@ -536,8 +536,8 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Media Type", KEY_READ)) {
 				FILETIME ft;
-				len = _countof(buff);
-				for (DWORD i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len, &ft); i++, len = _countof(buff)) {
+				len = std::size(buff);
+				for (DWORD i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len, &ft); i++, len = std::size(buff)) {
 					GUID majortype;
 					if (FAILED(GUIDFromCString(buff, majortype))) {
 						continue;
@@ -545,8 +545,8 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 					CRegKey majorkey;
 					if (ERROR_SUCCESS == majorkey.Open(key, buff, KEY_READ)) {
-						len = _countof(buff);
-						for (DWORD j = 0; ERROR_SUCCESS == majorkey.EnumKey(j, buff, &len, &ft); j++, len = _countof(buff)) {
+						len = std::size(buff);
+						for (DWORD j = 0; ERROR_SUCCESS == majorkey.EnumKey(j, buff, &len, &ft); j++, len = std::size(buff)) {
 							GUID subtype;
 							if (FAILED(GUIDFromCString(buff, subtype))) {
 								continue;
@@ -554,7 +554,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 							CRegKey subkey;
 							if (ERROR_SUCCESS == subkey.Open(majorkey, buff, KEY_READ)) {
-								len = _countof(buff);
+								len = std::size(buff);
 								if (ERROR_SUCCESS != subkey.QueryStringValue(L"Source Filter", buff, &len)) {
 									continue;
 								}
@@ -562,10 +562,10 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 								GUID clsid = GUIDFromCString(buff);
 
 								DWORD size = sizeof(buff);
-								len2 = _countof(buff2);
+								len2 = std::size(buff2);
 								for (DWORD k = 0, type;
 										clsid != GUID_NULL && ERROR_SUCCESS == RegEnumValueW(subkey, k, buff2, &len2, 0, &type, (BYTE*)buff, &size);
-										k++, size = sizeof(buff), len2 = _countof(buff2)) {
+										k++, size = sizeof(buff), len2 = std::size(buff2)) {
 									if (CheckBytes(hFile, CString(buff))) {
 										CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
 										pFGF->AddType(majortype, subtype);
@@ -585,7 +585,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Media Type\\Extensions\\" + CString(ext), KEY_READ)) {
-				ULONG len = _countof(buff);
+				ULONG len = std::size(buff);
 				memset(buff, 0, sizeof(buff));
 				LONG ret = key.QueryStringValue(L"Source Filter", buff, &len); // QueryStringValue can return ERROR_INVALID_DATA on bogus strings (radlight mpc v1003, fixed in v1004)
 				if (ERROR_SUCCESS == ret || (ERROR_INVALID_DATA == ret && GUIDFromCString(buff) != GUID_NULL)) {
@@ -593,12 +593,12 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 					GUID majortype = GUID_NULL;
 					GUID subtype = GUID_NULL;
 
-					len = _countof(buff);
+					len = std::size(buff);
 					if (ERROR_SUCCESS == key.QueryStringValue(L"Media Type", buff, &len)) {
 						majortype = GUIDFromCString(buff);
 					}
 
-					len = _countof(buff);
+					len = std::size(buff);
 					if (ERROR_SUCCESS == key.QueryStringValue(L"Subtype", buff, &len)) {
 						subtype = GUIDFromCString(buff);
 					}
@@ -1718,7 +1718,7 @@ STDMETHODIMP CFGManager::AddToROT()
 	CComPtr<IRunningObjectTable> pROT;
 	CComPtr<IMoniker> pMoniker;
 	WCHAR wsz[256];
-	swprintf_s(wsz, _countof(wsz), L"FilterGraph %p pid %08x (MPC)", this, GetCurrentProcessId());
+	swprintf_s(wsz, std::size(wsz), L"FilterGraph %p pid %08x (MPC)", this, GetCurrentProcessId());
 	if (SUCCEEDED(hr = GetRunningObjectTable(0, &pROT))
 			&& SUCCEEDED(hr = CreateItemMoniker(L"!", wsz, &pMoniker))) {
 		hr = pROT->Register(ROTFLAGS_REGISTRATIONKEEPSALIVE, (IGraphBuilder2*)this, pMoniker, &m_dwRegister);
@@ -2628,7 +2628,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	{ // DCDSPFilter (early versions crash mpc)
 		CRegKey key;
 		WCHAR buff[256] = { 0 };
-		ULONG len = _countof(buff);
+		ULONG len = std::size(buff);
 		CString clsid = L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}";
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
@@ -2977,7 +2977,7 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 	ULONG len;
 	if (fn.IsEmpty()
 			|| FAILED(hr = pDVDC->SetDVDDirectory(fn))
-			|| FAILED(hr = pDVDI->GetDVDDirectory(buff, _countof(buff), &len))
+			|| FAILED(hr = pDVDI->GetDVDDirectory(buff, std::size(buff), &len))
 			|| len == 0) {
 		return E_INVALIDARG;
 	}

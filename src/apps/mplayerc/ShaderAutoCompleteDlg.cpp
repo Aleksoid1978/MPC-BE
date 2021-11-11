@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -188,7 +188,7 @@ void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 
 	if (auto hlslfunc = (hlslfunc_t*)m_list.GetItemData(i)) {
 
-		wcscpy_s(m_ti.lpszText, _countof(m_text), hlslfunc->desc);
+		wcscpy_s(m_ti.lpszText, std::size(m_text), hlslfunc->desc);
 		CRect r;
 		GetWindowRect(r);
 		::SendMessageW(m_hToolTipWnd, TTM_UPDATETIPTEXTW, 0, (LPARAM)&m_ti);

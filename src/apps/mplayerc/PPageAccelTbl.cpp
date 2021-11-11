@@ -754,7 +754,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			break;
 		}
 		case COL_APPCMD:
-			for (int i = 0; i < _countof(g_CommandList); i++) {
+			for (unsigned i = 0; i < std::size(g_CommandList); i++) {
 				sl.push_back(g_CommandList[i].cmdname);
 				if (wc.appcmd == g_CommandList[i].appcmd) {
 					nSel = i;
@@ -807,7 +807,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 		case COL_APPCMD: {
 			unsigned k = pItem->lParam;
-			if (k >= _countof(g_CommandList)) {
+			if (k >= std::size(g_CommandList)) {
 				break;
 			}
 			wc.appcmd = g_CommandList[k].appcmd;

@@ -136,7 +136,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
 		success = IsFontInstalled(MonospaceFonts[i]) && m_font.CreateFontIndirectW(&lf);
 		i++;
-	} while (!success && i < _countof(MonospaceFonts));
+	} while (!success && i < std::size(MonospaceFonts));
 
 	m_mediainfo.SetFont(&m_font);
 	m_mediainfo.SetWindowTextW(MI_Text);
