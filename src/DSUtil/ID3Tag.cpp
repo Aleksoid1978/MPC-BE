@@ -423,6 +423,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				|| tag == 'COMM'
 				|| tag == 'TRCK'
 				|| tag == 'TCOP'
+				|| tag == 'TXXX'
 				|| tag == '\0TP1'
 				|| tag == '\0TT2'
 				|| tag == '\0PIC' || tag == 'APIC'
@@ -588,7 +589,7 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 		return;
 	}
 
-	const auto Lookup = [&](const DWORD& tag, CString& str) {
+	const auto Lookup = [&](const auto tag, CString& str) {
 		if (const auto it = pID3tag->Tags.find(tag); it != pID3tag->Tags.cend()) {
 			str = it->second;
 			return true;
@@ -596,9 +597,31 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 		return false;
 	};
 
+	bool bCueSheetPresent = false;
+
 	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-		CString str, title;
-		if (Lookup('TIT2', str) || Lookup('\0TT2', str)) {
+		CString str, title, author;
+
+		if (Lookup('TXXX', str)) {
+			if (StartsWith(str, L"CUESHEET")) {
+				std::list<Chapters> ChaptersList;
+				CString _title, _author;
+				if (ParseCUESheet(str, ChaptersList, _title, _author)) {
+					title = _title;
+					author = _author;
+					bCueSheetPresent = true;
+
+					if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+						pCB->ChapRemoveAll();
+						for (const auto& cp : ChaptersList) {
+							pCB->ChapAppend(cp.rt, cp.name);
+						}
+					}
+				}
+			}
+		}
+
+		if (title.IsEmpty() && (Lookup('TIT2', str) || Lookup('\0TT2', str))) {
 			title = str;
 		}
 		if (Lookup('TYER', str) && !title.IsEmpty() && !str.IsEmpty()) {
@@ -607,9 +630,14 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 		if (!title.IsEmpty()) {
 			pPB->SetProperty(L"TITL", title);
 		}
-		if (Lookup('TPE1', str) || Lookup('\0TP1', str)) {
-			pPB->SetProperty(L"AUTH", str);
+
+		if (author.IsEmpty() && (Lookup('TPE1', str) || Lookup('\0TP1', str))) {
+			author = str;
 		}
+		if (!author.IsEmpty()) {
+			pPB->SetProperty(L"AUTH", author);
+		}
+
 		if (Lookup('TCOP', str)) {
 			pPB->SetProperty(L"CPYR", str);
 		}
@@ -633,11 +661,13 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 		}
 	}
 
-	if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
-		if (!pID3tag->ChaptersList.empty()) {
-			pCB->ChapRemoveAll();
-			for (const auto& cp : pID3tag->ChaptersList) {
-				pCB->ChapAppend(cp.rt, cp.name);
+	if (!bCueSheetPresent) {
+		if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+			if (!pID3tag->ChaptersList.empty()) {
+				pCB->ChapRemoveAll();
+				for (const auto& cp : pID3tag->ChaptersList) {
+					pCB->ChapAppend(cp.rt, cp.name);
+				}
 			}
 		}
 	}

@@ -55,7 +55,7 @@ void MakeCUETitle(CString &Title, const CString& title, const CString& performer
 
 bool ParseCUESheet(const CString& cueData, std::list<Chapters>& ChaptersList, CString& Title, CString& Performer)
 {
-	BOOL fAudioTrack;
+	bool bAudioTrack = false;
 	int track_no = -1, /*index, */index_cnt = 0;
 	REFERENCE_TIME rt = _I64_MIN;
 	CString TrackTitle;
@@ -86,9 +86,9 @@ bool ParseCUESheet(const CString& cueData, std::list<Chapters>& ChaptersList, CS
 			rt = _I64_MIN;
 			index_cnt = 0;
 
-			WCHAR type[256];
+			WCHAR type[256] = {};
 			swscanf_s(cueLine, L"%d %s", &track_no, type, std::size(type));
-			fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
+			bAudioTrack = (wcscmp(type, L"AUDIO") == 0);
 			TrackTitle.Format(L"Track %02d", track_no);
 		} else if (cmd == L"TITLE") {
 			cueLine.Trim(L" \"");
@@ -108,7 +108,7 @@ bool ParseCUESheet(const CString& cueData, std::list<Chapters>& ChaptersList, CS
 			unsigned mm, ss, ff;
 			if (3 == swscanf_s(cueLine, L"01 %u:%u:%u", &mm, &ss, &ff)) {
 				// "INDEX 01" is required and denotes the start of the track
-				if (fAudioTrack) {
+				if (bAudioTrack) {
 					index_cnt++;
 					rt = UNITS * (mm*60 + ss) + UNITS * ff / 75;
 				}
