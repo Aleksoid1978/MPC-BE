@@ -1343,10 +1343,12 @@ IBaseFilter* AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB)
 			break;
 		}
 
-		CComPtr<IPin> pPinTo;
-		PIN_DIRECTION dir;
-		if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT || SUCCEEDED(pPin->ConnectedTo(&pPinTo))) {
-			break;
+		{
+			CComPtr<IPin> pPinTo;
+			PIN_DIRECTION dir;
+			if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT || SUCCEEDED(pPin->ConnectedTo(&pPinTo))) {
+				break;
+			}
 		}
 
 		CComPtr<IBindCtx> pBindCtx;

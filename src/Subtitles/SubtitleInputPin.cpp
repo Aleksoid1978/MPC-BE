@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -257,21 +257,21 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 				|| m_mt.subtype == MEDIASUBTYPE_ASS
 				|| m_mt.subtype == MEDIASUBTYPE_ASS2
 				|| m_mt.subtype == MEDIASUBTYPE_WEBVTT))) {
-		CAutoLock cAutoLock(m_pSubLock);
+		CAutoLock cAutoLock2(m_pSubLock);
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 		pRTS->RemoveAll();
 		pRTS->CreateSegments();
 	} else if ((m_mt.majortype == MEDIATYPE_Subtitle && m_mt.subtype == MEDIASUBTYPE_VOBSUB)
 				|| (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
-		CAutoLock cAutoLock(m_pSubLock);
+		CAutoLock cAutoLock2(m_pSubLock);
 		CVobSubStream* pVSS = (CVobSubStream*)m_pSubStream.p;
 		pVSS->RemoveAll();
 	} else if (IsHdmvSub(&m_mt)) {
-		CAutoLock cAutoLock(m_pSubLock);
+		CAutoLock cAutoLock2(m_pSubLock);
 		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)m_pSubStream.p;
 		pHdmvSubtitle->NewSegment(tStart, tStop, dRate);
 	} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
-		CAutoLock cAutoLock(m_pSubLock);
+		CAutoLock cAutoLock2(m_pSubLock);
 		CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)m_pSubStream.p;
 		pXSUBSubtitle->NewSegment(tStart, tStop, dRate);
 	}

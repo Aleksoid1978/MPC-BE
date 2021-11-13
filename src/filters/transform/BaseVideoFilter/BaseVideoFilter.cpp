@@ -253,8 +253,8 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 					if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, nullptr, nullptr, 0))) {
 						AM_MEDIA_TYPE* pmt;
 						if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
-							CMediaType mt = *pmt;
-							m_pOutput->SetMediaType(&mt);
+							CMediaType mt2 = *pmt;
+							m_pOutput->SetMediaType(&mt2);
 							DeleteMediaType(pmt);
 						} else {
 							if (m_bOverlayMixer) {

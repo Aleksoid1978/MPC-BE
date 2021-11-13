@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -96,12 +96,12 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 			HANDLE hFile = FindFirstFileW(path + title + L"*", &wfd);
 			if (hFile != INVALID_HANDLE_VALUE) {
 				do {
-					CString fn = path + wfd.cFileName;
+					CString fname = path + wfd.cFileName;
 					if (std::regex_match(&wfd.cFileName[titleLength], reSub)) {
-						subs.push_back(fn);
+						subs.push_back(fname);
 					} else if (std::regex_match(&wfd.cFileName[titleLength], reVid)) {
 						// Convert to lower-case and cut the extension for easier matching
-						vids.push_back(fn.Left(fn.ReverseFind('.')).MakeLower());
+						vids.push_back(fname.Left(fname.ReverseFind('.')).MakeLower());
 					}
 				} while (FindNextFileW(hFile, &wfd));
 

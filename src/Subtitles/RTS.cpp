@@ -1733,18 +1733,18 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 			return;
 		}
 
-		Effect* e;
+		Effect* ef;
 		try {
-			e = DNew Effect;
+			ef = DNew Effect;
 		} catch (CMemoryException* e) {
 			e->Delete();
 			return;
 		}
 
-		sub->m_effects[e->type = EF_BANNER] = e;
-		e->param[0] = std::lround(std::max(1.0 * delay / sub->m_scalex, 1.0));
-		e->param[1] = lefttoright;
-		e->param[2] = std::lround(sub->m_scalex * fadeawaywidth);
+		sub->m_effects[ef->type = EF_BANNER] = ef;
+		ef->param[0] = std::lround(std::max(1.0 * delay / sub->m_scalex, 1.0));
+		ef->param[1] = lefttoright;
+		ef->param[2] = std::lround(sub->m_scalex * fadeawaywidth);
 
 		sub->m_wrapStyle = 2;
 	} else if (!effect.CompareNoCase(L"Scroll up;") || !effect.CompareNoCase(L"Scroll down;")) {
@@ -1759,20 +1759,20 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 			std::swap(top, bottom);
 		}
 
-		Effect* e;
+		Effect* ef;
 		try {
-			e = DNew Effect;
+			ef = DNew Effect;
 		} catch (CMemoryException* e) {
 			e->Delete();
 			return;
 		}
 
-		sub->m_effects[e->type = EF_SCROLL] = e;
-		e->param[0] = std::lround(sub->m_scaley * top * 8.0);
-		e->param[1] = std::lround(sub->m_scaley * bottom * 8.0);
-		e->param[2] = std::lround(std::max(double(delay) / sub->m_scaley, 1.0));
-		e->param[3] = (effect.GetLength() == 12);
-		e->param[4] = std::lround(sub->m_scaley * fadeawayheight);
+		sub->m_effects[ef->type = EF_SCROLL] = ef;
+		ef->param[0] = std::lround(sub->m_scaley * top * 8.0);
+		ef->param[1] = std::lround(sub->m_scaley * bottom * 8.0);
+		ef->param[2] = std::lround(std::max(double(delay) / sub->m_scaley, 1.0));
+		ef->param[3] = (effect.GetLength() == 12);
+		ef->param[4] = std::lround(sub->m_scaley * fadeawayheight);
 	}
 }
 
@@ -1844,7 +1844,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 	int nTags = 0, nUnrecognizedTags = 0;
 	tagsList.reset(DNew CAtlList<SSATag>());
 
-	for (int i = 0, j; (j = str.Find(L'\\', i)) >= 0; i = j) {
+	for (int pos = 0, j; (j = str.Find(L'\\', pos)) >= 0; pos = j) {
 		int jOld;
 		// find the end of the current tag or the start of its parameters
 		for (jOld = ++j; str[j] && str[j] != L'(' && str[j] != L'\\'; ++j) {
@@ -2918,8 +2918,8 @@ const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double 
 		POSITION pos = s->m_words.GetHeadPosition();
 		while (pos) {
 			if (auto pText = dynamic_cast<const CText*>(s->m_words.GetNext(pos))) {
-				const CString& s = pText->GetText();
-				line.Append(s);
+				const CString& str = pText->GetText();
+				line.Append(str);
 				if (pText->m_fLineBreak && !line.IsEmpty()) {
 					if (!text.IsEmpty()) {
 						text.Append(L"\r\n");
@@ -3022,10 +3022,10 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 		Init(CSize(spd.w, spd.h), spd.vidrect);
 	}
 
-	int t = (int)(rt / 10000);
+	int time = (int)(rt / 10000);
 
 	int segment;
-	const STSSegment* stss = SearchSubs(t, fps, &segment);
+	const STSSegment* stss = SearchSubs(time, fps, &segment);
 	if (!stss) {
 		return S_FALSE;
 	}
@@ -3039,7 +3039,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 			m_subtitleCache.GetNextAssoc(pos, entry, pSub);
 
 			STSEntry& stse = GetAt(entry);
-			if (stse.end < t) {
+			if (stse.end < time) {
 				delete pSub;
 				m_subtitleCache.RemoveKey(entry);
 			}
@@ -3065,7 +3065,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 		{
 			int start = TranslateStart(entry, fps);
-			m_time = t - start;
+			m_time = time - start;
 			m_delay = TranslateEnd(entry, fps) - start;
 		}
 
