@@ -278,17 +278,6 @@ private:
 
 CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(L"CMpeg2DecFilter", lpunk, phr, __uuidof(this), 1)
-	, m_fWaitForKeyFrame(true)
-	, m_ControlThread(nullptr)
-	, m_llLastDecodeTime(0)
-	, m_ditype(DIAuto)
-	, m_bright(0)
-	, m_cont(100)
-	, m_hue(0)
-	, m_sat(100)
-	, m_fForcedSubs(true)
-	, m_fInterlaced(true)
-	, m_bReadARFromStream(true)
 {
 	if (FAILED(*phr)) {
 		return;
@@ -370,8 +359,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	CalcBrCont(m_YTbl, m_bright, m_cont);
 	CalcHueSat(m_UTbl, m_VTbl, m_hue, m_sat);
-	m_rate.Rate = 10000;
-	m_rate.StartTime = 0;
 }
 
 CMpeg2DecFilter::~CMpeg2DecFilter()
@@ -529,9 +516,9 @@ void CMpeg2DecFilter::SetDeinterlaceMethod()
 	ASSERT(m_dec->m_info.m_sequence);
 	ASSERT(m_dec->m_info.m_display_picture);
 
-	DWORD seqflags = m_dec->m_info.m_sequence->flags;
-	DWORD oldflags = m_fb.flags;
-	DWORD newflags = m_dec->m_info.m_display_picture->flags;
+	const uint32_t seqflags = m_dec->m_info.m_sequence->flags;
+	const uint32_t oldflags = m_fb.flags;
+	const uint32_t newflags = m_dec->m_info.m_display_picture->flags;
 
 	if (!(seqflags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)
 			&& !(oldflags & PIC_FLAG_REPEAT_FIRST_FIELD)
@@ -608,10 +595,9 @@ void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 
 HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 {
-	HRESULT hr;
-
 	BYTE* pDataIn = nullptr;
-	if (FAILED(hr = pIn->GetPointer(&pDataIn))) {
+	HRESULT hr = pIn->GetPointer(&pDataIn);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
@@ -806,17 +792,15 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 		return S_OK;
 	}
 
-	HRESULT hr;
-
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = nullptr;
-	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame, &m_dxvaExtFormat))
-			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
+	HRESULT hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame, &m_dxvaExtFormat);
+	if (FAILED(hr) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
 
 	if (m_fb.h == 1088) {
-		memset(m_fb.buf[0] + m_fb.w*(m_fb.h-8), 0xff, m_fb.pitch*8);
+		memset(m_fb.buf[0] + m_fb.w*(m_fb.h-8),   0xff, m_fb.pitch*8);
 		memset(m_fb.buf[1] + m_fb.w*(m_fb.h-8)/4, 0x80, m_fb.pitch*8/4);
 		memset(m_fb.buf[2] + m_fb.w*(m_fb.h-8)/4, 0x80, m_fb.pitch*8/4);
 	}
@@ -1041,9 +1025,8 @@ STDMETHODIMP CMpeg2DecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPag
 		return E_INVALIDARG;
 	}
 
-	HRESULT hr;
-
 	if (guid == __uuidof(CMpeg2DecSettingsWnd)) {
+		HRESULT hr;
 		(*ppPage = DNew CInternalPropertyPageTempl<CMpeg2DecSettingsWnd>(nullptr, &hr))->AddRef();
 	}
 
@@ -1238,9 +1221,6 @@ STDMETHODIMP_(bool) CMpeg2DecFilter::IsReadARFromStreamEnabled()
 CMpeg2DecInputPin::CMpeg2DecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
 	: CDeCSSInputPin(L"CMpeg2DecInputPin", pFilter, phr, pName)
 {
-	m_CorrectTS = 0;
-	m_ratechange.Rate = 10000;
-	m_ratechange.StartTime = _I64_MAX;
 }
 
 // IKsPropertySet
@@ -1424,8 +1404,6 @@ STDMETHODIMP CMpeg2DecInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG*
 
 CSubpicInputPin::CSubpicInputPin(CTransformFilter* pFilter, HRESULT* phr)
 	: CMpeg2DecInputPin(pFilter, phr, L"SubPicture")
-	, m_spon(TRUE)
-	, m_fsppal(false)
 {
 	m_sppal[0].Y = 0x00;
 	m_sppal[0].U = m_sppal[0].V = 0x80;
@@ -1498,17 +1476,17 @@ void CSubpicInputPin::RenderSubpics(REFERENCE_TIME rt, BYTE** yuv, int w, int h)
 
 HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 {
-	HRESULT hr;
-
 	AM_MEDIA_TYPE* pmt;
-	if (SUCCEEDED(pSample->GetMediaType(&pmt)) && pmt) {
+	HRESULT hr = pSample->GetMediaType(&pmt);
+	if (SUCCEEDED(hr) && pmt) {
 		CMediaType mt(*pmt);
 		SetMediaType(&mt);
 		DeleteMediaType(pmt);
 	}
 
 	BYTE* pDataIn = nullptr;
-	if (FAILED(hr = pSample->GetPointer(&pDataIn))) {
+	hr = pSample->GetPointer(&pDataIn);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
@@ -2071,7 +2049,7 @@ void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	int nField = 0;
 	int fAligned = 1;
 
-	DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
+	const DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		BYTE code;
@@ -2170,7 +2148,7 @@ void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int 
 	int nField = 0;
 	int n = 3;
 
-	DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
+	const DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		BYTE code = GetHalfNibble(p, offset, nField, n);
@@ -2229,12 +2207,12 @@ HRESULT CClosedCaptionOutputPin::DecideBufferSize(IMemAllocator* pAllocator, ALL
 {
 	pProperties->cBuffers = 1;
 	pProperties->cbBuffer = 2048;
-	pProperties->cbAlign = 1;
+	pProperties->cbAlign  = 1;
 	pProperties->cbPrefix = 0;
 
-	HRESULT hr;
 	ALLOCATOR_PROPERTIES Actual;
-	if (FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) {
+	HRESULT hr = pAllocator->SetProperties(pProperties, &Actual);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
