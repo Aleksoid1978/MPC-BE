@@ -227,7 +227,7 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 		bool m_fForced = false;
 		REFERENCE_TIME m_rtStart = 0;
 		REFERENCE_TIME m_rtStop = 0;
-		DWORD m_offset[2] = {};
+		uint32_t m_offset[2] = {};
 		AM_PROPERTY_SPHLI m_sphli = {}; // parsed
 		CAutoPtr<AM_PROPERTY_SPHLI> m_psphli; // for the menu (optional)
 		virtual ~spu() {}

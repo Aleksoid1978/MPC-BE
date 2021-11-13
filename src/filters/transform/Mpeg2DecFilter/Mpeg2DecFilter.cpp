@@ -246,9 +246,8 @@ public:
 protected:
 	DWORD ThreadProc() {
 		SetThreadName(DWORD_MAX, "CMpeg2DecFilter Control Thread");
-		DWORD cmd;
 		while (TRUE) {
-			cmd = GetRequest();
+			DWORD cmd = GetRequest();
 			switch (cmd) {
 			case CMpeg2DecFilter::CNTRL_EXIT:
 				Reply(S_OK);
@@ -1679,7 +1678,7 @@ STDMETHODIMP CSubpicInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG* p
 
 // CSubpicInputPin::spu
 
-static __inline BYTE GetNibble(BYTE* p, DWORD* offset, int& nField, int& fAligned)
+static __inline BYTE GetNibble(const BYTE* p, uint32_t* offset, const int& nField, int& fAligned)
 {
 	BYTE ret = (p[offset[nField]] >> (fAligned << 2)) & 0x0f;
 	offset[nField] += 1 - fAligned;
@@ -1687,7 +1686,7 @@ static __inline BYTE GetNibble(BYTE* p, DWORD* offset, int& nField, int& fAligne
 	return ret;
 }
 
-static __inline BYTE GetHalfNibble(BYTE* p, DWORD* offset, int& nField, int& n)
+static __inline BYTE GetHalfNibble(const BYTE* p, uint32_t* offset, const int& nField, int& n)
 {
 	BYTE ret = (p[offset[nField]] >> (n << 1)) & 0x03;
 	if (!n) {
@@ -1893,7 +1892,7 @@ bool CSubpicInputPin::dvdspu::Parse()
 void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
 {
 	BYTE* p = data();
-	DWORD offset[2] = {m_offset[0], m_offset[1]};
+	uint32_t offset[2] = {m_offset[0], m_offset[1]};
 
 	AM_PROPERTY_SPHLI sphli = m_sphli;
 	CPoint pt(sphli.StartX, sphli.StartY);
@@ -1934,7 +1933,7 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	}
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
-		DWORD code;
+		uint32_t code;
 
 		if ((code = GetNibble(p, offset, nField, fAligned)) >= 0x4
 				|| (code = (code << 4) | GetNibble(p, offset, nField, fAligned)) >= 0x10
@@ -2033,7 +2032,7 @@ bool CSubpicInputPin::cvdspu::Parse()
 void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
 {
 	BYTE* p = data();
-	DWORD offset[2] = {m_offset[0], m_offset[1]};
+	uint32_t offset[2] = {m_offset[0], m_offset[1]};
 
 	CRect rcclip(0, 0, w, h);
 
@@ -2049,12 +2048,12 @@ void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	int nField = 0;
 	int fAligned = 1;
 
-	const DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
+	const uint32_t end[2] = {offset[1], (p[2] << 8) | p[3]};
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
-		BYTE code;
+		BYTE code = GetNibble(p, offset, nField, fAligned);
 
-		if ((code = GetNibble(p, offset, nField, fAligned)) >= 0x4) {
+		if (code >= 0x4) {
 			DrawPixels(yuv, w, pt, code >> 2, m_sppal[0][code & 3], rcclip);
 			pt.x += code >> 2;
 			continue;
@@ -2078,7 +2077,7 @@ void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 bool CSubpicInputPin::svcdspu::Parse()
 {
 	BYTE* p = data();
-	BYTE* p0 = p;
+	const BYTE* p0 = p;
 
 	if (size() < 2) {
 		return false;
@@ -2132,7 +2131,7 @@ bool CSubpicInputPin::svcdspu::Parse()
 void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
 {
 	BYTE* p = data();
-	DWORD offset[2] = {m_offset[0], m_offset[1]};
+	uint32_t offset[2] = {m_offset[0], m_offset[1]};
 
 	CRect rcclip(0, 0, w, h);
 
@@ -2148,7 +2147,7 @@ void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int 
 	int nField = 0;
 	int n = 3;
 
-	const DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
+	const uint32_t end[2] = {offset[1], (p[2] << 8) | p[3]};
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		BYTE code = GetHalfNibble(p, offset, nField, n);
