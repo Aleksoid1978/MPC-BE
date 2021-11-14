@@ -357,10 +357,12 @@ void CFavoriteOrganizeDlg::OnKeyPressed(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 {
+	int nItem = 0;
+
 	auto erase_favitem = [&](std::list<SessionInfo>& favlist) {
 		POSITION pos;
 		while (pos = m_list.GetFirstSelectedItemPosition()) {
-			int nItem = m_list.GetNextSelectedItem(pos);
+			nItem = m_list.GetNextSelectedItem(pos);
 			if (nItem < 0 || nItem >= m_list.GetItemCount()) {
 				return;
 			}
@@ -383,7 +385,7 @@ void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 		erase_favitem(AfxGetMyApp()->m_FavoritesFile.m_FavDVDs);
 	}
 
-	int nItem = std::min(nItem, m_list.GetItemCount() - 1);
+	nItem = std::min(nItem, m_list.GetItemCount() - 1);
 	m_list.SetItemState(nItem, LVIS_SELECTED, LVIS_SELECTED);
 }
 
