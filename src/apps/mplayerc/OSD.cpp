@@ -349,7 +349,7 @@ void COSD::DrawRect(CRect& rect, CBrush* pBrush, CPen* pPen)
 void COSD::DrawSeekbar()
 {
 	m_rectCursor.left = m_rectSlider.left;
-	if (m_llSeekStop >= 0) {
+	if (m_llSeekStop > 0) {
 		m_rectCursor.left += (long)((m_rectSlider.Width() - SliderCursorWidth) * m_llSeekPos / m_llSeekStop);
 	}
 	m_rectCursor.right  = m_rectCursor.left + SliderCursorWidth;
