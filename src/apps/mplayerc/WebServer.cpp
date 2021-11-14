@@ -237,12 +237,12 @@ void CWebServer::Deploy(CString dir)
 bool CWebServer::ToLocalPath(CString& path, CString& redir)
 {
 	if (!path.IsEmpty() && m_webroot.IsDirectory()) {
-		CString str = path;
-		str.Replace('/', '\\');
-		str.TrimLeft('\\');
+		CString tmp = path;
+		tmp.Replace('/', '\\');
+		tmp.TrimLeft('\\');
 
 		CPath p;
-		p.Combine(m_webroot, str);
+		p.Combine(m_webroot, tmp);
 		p.Canonicalize();
 
 		if (p.IsDirectory()) {
@@ -372,9 +372,9 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 				mime = "text/html";
 			}
 
-			auto it = pClient->m_get.find(L"redir");
-			if (it != pClient->m_get.end() || (it = pClient->m_post.find(L"redir")) != pClient->m_post.end()) {
-				CString redir = (*it).second;
+			auto it2 = pClient->m_get.find(L"redir");
+			if (it2 != pClient->m_get.end() || (it2 = pClient->m_post.find(L"redir")) != pClient->m_post.end()) {
+				CString redir = (*it2).second;
 				if (redir.IsEmpty()) {
 					redir = '/';
 				}
@@ -592,11 +592,11 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		env.emplace_back(L"SCRIPT_NAME=" + redir);
 		env.emplace_back(L"QUERY_STRING=" + pClient->m_query);
 
-		if (const auto it = pClient->m_hdrlines.find(L"content-type"); it != pClient->m_hdrlines.end()) {
-			env.emplace_back(L"CONTENT_TYPE=" + (*it).second);
+		if (const auto it2 = pClient->m_hdrlines.find(L"content-type"); it2 != pClient->m_hdrlines.end()) {
+			env.emplace_back(L"CONTENT_TYPE=" + (*it2).second);
 		}
-		if (const auto it = pClient->m_hdrlines.find(L"content-length"); it != pClient->m_hdrlines.end()) {
-			env.emplace_back(L"CONTENT_LENGTH=" + (*it).second);
+		if (const auto it2 = pClient->m_hdrlines.find(L"content-length"); it2 != pClient->m_hdrlines.end()) {
+			env.emplace_back(L"CONTENT_LENGTH=" + (*it2).second);
 		}
 
 		for (const auto& [key, value] : pClient->m_hdrlines) {

@@ -191,7 +191,7 @@ void CWebClientSocket::Header()
 		}
 
 		if (m_query.GetLength() > 0) {
-			int k = m_query.Find('#');
+			k = m_query.Find('#');
 			if (k >= 0) {
 				m_query.Truncate(k);
 			}

@@ -202,9 +202,9 @@ CFGFilterRegistry::CFGFilterRegistry(const CLSID& clsid, UINT64 merit)
 			DWORD len = std::size(buff);
 			for (DWORD i = 0; ERROR_SUCCESS == catkey.EnumKey(i, buff, &len, &ft); i++, len = std::size(buff)) {
 				if (ERROR_SUCCESS == key.Open(catkey, buff, KEY_READ)) {
-					WCHAR clsid[256];
-					len = std::size(clsid);
-					if (ERROR_SUCCESS == key.QueryStringValue(L"CLSID", clsid, &len) && GUIDFromCString(clsid) == m_clsid) {
+					WCHAR str[256];
+					len = std::size(str);
+					if (ERROR_SUCCESS == key.QueryStringValue(L"CLSID", str, &len) && GUIDFromCString(str) == m_clsid) {
 						break;
 					}
 

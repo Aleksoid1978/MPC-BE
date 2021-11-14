@@ -199,21 +199,21 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		rts.Render(spd, 0, 25, bbox);
 
-		std::vector<BYTE> dib;
+		std::vector<BYTE> dib_frame;
 		CStringW errmsg;
-		if (S_OK != m_pMainFrm->GetOriginalFrame(dib, errmsg)) {
+		if (S_OK != m_pMainFrm->GetOriginalFrame(dib_frame, errmsg)) {
 			m_iProgress = PROGRESS_E_FAIL;
 			return;
 		}
 
-		const BITMAPINFO* bi = (BITMAPINFO*)dib.data();
+		const BITMAPINFO* bi = (BITMAPINFO*)dib_frame.data();
 		if (bi->bmiHeader.biBitCount != 32) {
 			m_ErrorMsg.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
 			m_iProgress = PROGRESS_E_VIDFMT;
 			return;
 		}
 
-		m_pMainFrm->RenderCurrentSubtitles(dib.data());
+		m_pMainFrm->RenderCurrentSubtitles(dib_frame.data());
 
 		hr = Resample.SetParameters(
 			thumbsize.cx, thumbsize.cy,
