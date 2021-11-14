@@ -365,7 +365,7 @@ void COSD::DrawSeekbar()
 	DrawRect(rect, &m_brushBar);
 
 	if (m_SeekbarFont.GetSafeHandle()) {
-		CStringW text = ReftimeToString2(m_llSeekPos) + L" / " + ReftimeToString2(m_llSeekStop);
+		CStringW text = ReftimeToString2(m_llSeekPos) + (m_llSeekStop > 0 ? L" / " + ReftimeToString2(m_llSeekStop) : L"");
 
 		m_MemDC.SelectObject(m_SeekbarFont);
 		m_MemDC.SetTextColor(OSD_COLOR_CURSOR);
