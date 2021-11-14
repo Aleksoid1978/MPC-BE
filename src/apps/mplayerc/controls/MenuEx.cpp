@@ -174,7 +174,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 			::GetMenuItemInfoW(HMENU(lpDIS->hwndItem), lpDIS->itemID, MF_BYCOMMAND, &mii);
 
 			CRect rcMark;
-			DrawMenuElement(&dc, rect, mii.fType & MFT_RADIOCHECK ? DFCS_MENUBULLET : DFCS_MENUCHECK, bGrayed, bSelected, &rcMark);
+			DrawMenuElement(&dc, rect, (mii.fType & MFT_RADIOCHECK) ? DFCS_MENUBULLET : DFCS_MENUCHECK, bGrayed, bSelected, &rcMark);
 
 			rcMark.left -= 2;
 			rcMark.top -= 2;

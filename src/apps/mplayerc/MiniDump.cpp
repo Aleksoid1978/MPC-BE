@@ -231,7 +231,7 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 				VERIFY(CreateDirectoryW(strDumpPath, nullptr));
 			}
 
-			strDumpPath.AppendFormat(L"%s.exe.%d.%d.%d.%d.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_SVN_NUM);
+			strDumpPath.AppendFormat(L"%s.exe.%s.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_SVN_WSTR);
 
 			HANDLE hFile = ::CreateFileW(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS,
 										 FILE_ATTRIBUTE_NORMAL, nullptr);

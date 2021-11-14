@@ -103,9 +103,9 @@ int TexWidth2Index(int w)
 	return 4; // default 1280x720
 }
 
-int TexIndex2Width(int i)
+int TexIndex2Width(unsigned i)
 {
-	if (i >= 0 && i < (int)std::size(s_maxTexRes)) {
+	if (i < std::size(s_maxTexRes)) {
 		return s_maxTexRes[i].width;
 	}
 

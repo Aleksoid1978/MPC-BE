@@ -286,8 +286,8 @@ bool CHistoryFile::WriteFile()
 					if (sesInfo.DVDState.size()) {
 						int nDestLen = Base64EncodeGetRequiredLength(sesInfo.DVDState.size());
 						CStringA base64;
-						BOOL ret = Base64Encode(sesInfo.DVDState.data(), sesInfo.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-						if (ret) {
+						BOOL ret2 = Base64Encode(sesInfo.DVDState.data(), sesInfo.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+						if (ret2) {
 							base64.ReleaseBufferSetLength(nDestLen);
 							str.AppendFormat(L"DVDState=%hs\n", base64);
 						}
@@ -562,8 +562,8 @@ bool CFavoritesFile::WriteFile()
 				if (sesDvd.DVDState.size()) {
 					int nDestLen = Base64EncodeGetRequiredLength(sesDvd.DVDState.size());
 					CStringA base64;
-					BOOL ret = Base64Encode(sesDvd.DVDState.data(), sesDvd.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-					if (ret) {
+					BOOL ret2 = Base64Encode(sesDvd.DVDState.data(), sesDvd.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
+					if (ret2) {
 						base64.ReleaseBufferSetLength(nDestLen);
 						str.AppendFormat(L"DVDState=%hs\n", base64);
 					}
@@ -810,7 +810,7 @@ void CPlaylistConfigFile::OpenPlaylists(std::list<PlaylistInfo>& playlistInfos)
 	playlistInfos = m_PlaylistInfos;
 }
 
-void CPlaylistConfigFile::SavePlaylists(std::list<PlaylistInfo>& playlistInfos)
+void CPlaylistConfigFile::SavePlaylists(const std::list<PlaylistInfo>& playlistInfos)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 

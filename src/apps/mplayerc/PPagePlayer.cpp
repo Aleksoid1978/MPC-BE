@@ -162,10 +162,8 @@ BOOL CPPagePlayer::OnApply()
 		s.iTitleBarTextStyle = i;
 		pFrame->UpdateWindowTitle();
 	}
-	i = m_cbSeekBarText.GetCurSel();
-	if (s.iSeekBarTextStyle != i) {
-		s.iSeekBarTextStyle = i;
-	}
+
+	s.iSeekBarTextStyle = m_cbSeekBarText.GetCurSel();
 
 	s.bTrayIcon = !!m_bTrayIcon;
 	s.bSavePnSZoom = !!m_bSavePnSZoom;

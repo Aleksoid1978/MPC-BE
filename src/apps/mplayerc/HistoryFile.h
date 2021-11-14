@@ -186,5 +186,5 @@ public:
 	void SetFilename(const CStringW& filename) override;
 
 	void OpenPlaylists(std::list<PlaylistInfo>& playlistInfos);
-	void SavePlaylists(std::list<PlaylistInfo>& playlistInfos);
+	void SavePlaylists(const std::list<PlaylistInfo>& playlistInfos);
 };
