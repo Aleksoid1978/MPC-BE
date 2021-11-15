@@ -263,11 +263,18 @@ namespace Youtube
 													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
-					constexpr auto str = R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "clientScreen": "EMBED"}, )"
-										 R"("thirdParty": {"embedUrl": "https://google.com"} }, "videoId": "%S", "contentCheckOk": true, "racyCheckOk": true})";
+					constexpr auto str = R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "hl": "en"}}, )"
+										 R"("videoId": "%S", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
+										 R"("contentCheckOk": true, "racyCheckOk": true})";
 					requestData.Format(str, videoId);
 
-					if (HttpSendRequestW(hRequest, nullptr, 0, reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
+					static const CStringW lpszHeaders = LR"(X-YouTube-Client-Name: 3\r\n)"
+														LR"(X-YouTube-Client-Version: 16.20\r\n)"
+														LR"(Origin: https://www.youtube.com\r\n)"
+														LR"(content-type: application/json\r\n)";
+
+					if (HttpSendRequestW(hRequest, lpszHeaders.GetString(), lpszHeaders.GetLength(),
+										 reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
 						static std::vector<char> tmp(16 * 1024);
 						for (;;) {
 							DWORD dwSizeRead = 0;
