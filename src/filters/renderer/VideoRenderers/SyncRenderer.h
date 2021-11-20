@@ -550,7 +550,7 @@ namespace GothSync
 		CSyncAP *m_pAllocatorPresenter;
 
 	public:
-		CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter);
+		CSyncRenderer(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter);
 		~CSyncRenderer();
 
 		DECLARE_IUNKNOWN;

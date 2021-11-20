@@ -3805,7 +3805,7 @@ HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISub
 // CSyncRenderer
 //
 
-CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
+CSyncRenderer::CSyncRenderer(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
 {
 	DLog(L"CSyncRenderer::CSyncRenderer()");
 

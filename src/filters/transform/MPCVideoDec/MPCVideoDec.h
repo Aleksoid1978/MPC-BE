@@ -363,7 +363,7 @@ class CVideoDecOutputPin : public CBaseVideoOutputPin
 {
 	CMPCVideoDecFilter* m_pVideoDecFilter;
 public:
-	CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
+	CVideoDecOutputPin(LPCWSTR pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
 	~CVideoDecOutputPin();
 
 	HRESULT InitAllocator(IMemAllocator **ppAlloc);

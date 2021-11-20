@@ -80,7 +80,7 @@ protected:
 	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats) PURE;
 
 public:
-	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
+	CBaseVideoFilter(LPCWSTR pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
 	HRESULT ReconnectOutput(int width, int height, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
@@ -112,7 +112,7 @@ class CBaseVideoInputPin : public CTransformInputPin
 	CBaseVideoInputAllocator* m_pAllocator;
 
 public:
-	CBaseVideoInputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
+	CBaseVideoInputPin(LPCWSTR pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
 	~CBaseVideoInputPin();
 
 	STDMETHODIMP GetAllocator(IMemAllocator** ppAllocator);
@@ -122,7 +122,7 @@ public:
 class CBaseVideoOutputPin : public CTransformOutputPin
 {
 public:
-	CBaseVideoOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
+	CBaseVideoOutputPin(LPCWSTR pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
 
 	HRESULT CheckMediaType(const CMediaType* mtOut);
 };

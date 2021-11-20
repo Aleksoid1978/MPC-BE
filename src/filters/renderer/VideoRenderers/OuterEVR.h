@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,7 @@ namespace DSObjects
 		CEVRAllocatorPresenter* m_pAllocatorPresenter;
 
 	public:
-		COuterEVR(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CEVRAllocatorPresenter* pAllocatorPresenter);
+		COuterEVR(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT& hr, CEVRAllocatorPresenter* pAllocatorPresenter);
 		~COuterEVR();
 
 		DECLARE_IUNKNOWN;

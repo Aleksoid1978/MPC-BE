@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@ class CMacrovisionKicker
 	CComPtr<IUnknown> m_pInner;
 
 public:
-	CMacrovisionKicker(const TCHAR* pName, LPUNKNOWN pUnk);
+	CMacrovisionKicker(LPCWSTR pName, LPUNKNOWN pUnk);
 	virtual ~CMacrovisionKicker();
 
 	void SetInner(IUnknown* pUnk);

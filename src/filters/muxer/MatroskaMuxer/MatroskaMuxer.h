@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -71,7 +71,7 @@ public:
 class CMatroskaMuxerOutputPin : public CBaseOutputPin
 {
 public:
-	CMatroskaMuxerOutputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	CMatroskaMuxerOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CMatroskaMuxerOutputPin();
 
 	DECLARE_IUNKNOWN;

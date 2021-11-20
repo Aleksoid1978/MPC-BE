@@ -80,7 +80,7 @@ CFilterApp theApp;
 class CKsPSInputPin : public CDeCSSInputPin
 {
 public:
-	CKsPSInputPin(TCHAR* pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
+	CKsPSInputPin(LPCWSTR pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
 		: CDeCSSInputPin(pObjectName, pFilter, phr, pName) {
 	}
 
@@ -259,7 +259,7 @@ HRESULT CDeCSSFilter::GetMediaType(int iPosition, CMediaType* pmt)
 // CDeCSSInputPin
 //
 
-CDeCSSInputPin::CDeCSSInputPin(TCHAR* pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPCWSTR pName)
+CDeCSSInputPin::CDeCSSInputPin(LPCWSTR pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CTransformInputPin(pObjectName, pFilter, phr, pName)
 {
 	m_varient = -1;

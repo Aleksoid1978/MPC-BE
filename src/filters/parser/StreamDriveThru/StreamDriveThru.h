@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ class CStreamDriveThruInputPin : public CBasePin
 	CComQIPtr<IAsyncReader> m_pAsyncReader;
 
 public:
-	CStreamDriveThruInputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	CStreamDriveThruInputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CStreamDriveThruInputPin();
 
 	HRESULT GetAsyncReader(IAsyncReader** ppAsyncReader);
@@ -53,7 +53,7 @@ class CStreamDriveThruOutputPin : public CBaseOutputPin
 	CComQIPtr<IStream> m_pStream;
 
 public:
-	CStreamDriveThruOutputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	CStreamDriveThruOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CStreamDriveThruOutputPin();
 
 	HRESULT GetStream(IStream** ppStream);

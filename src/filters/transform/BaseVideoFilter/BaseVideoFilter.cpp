@@ -31,7 +31,7 @@
 // CBaseVideoFilter
 //
 
-CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers)
+CBaseVideoFilter::CBaseVideoFilter(LPCWSTR pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers)
 	: CTransformFilter(pName, lpunk, clsid)
 	, m_cBuffers(cBuffers)
 {
@@ -498,7 +498,7 @@ STDMETHODIMP CBaseVideoInputAllocator::GetBuffer(IMediaSample** ppBuffer, REFERE
 // CBaseVideoInputPin
 //
 
-CBaseVideoInputPin::CBaseVideoInputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
+CBaseVideoInputPin::CBaseVideoInputPin(LPCWSTR pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CTransformInputPin(pObjectName, pFilter, phr, pName)
 	, m_pAllocator(nullptr)
 {
@@ -571,7 +571,7 @@ STDMETHODIMP CBaseVideoInputPin::ReceiveConnection(IPin* pConnector, const AM_ME
 // CBaseVideoOutputPin
 //
 
-CBaseVideoOutputPin::CBaseVideoOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
+CBaseVideoOutputPin::CBaseVideoOutputPin(LPCWSTR pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CTransformOutputPin(pObjectName, pFilter, phr, pName)
 {
 }

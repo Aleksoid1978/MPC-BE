@@ -33,7 +33,7 @@ protected:
 	CStringW m_fn;
 
 public:
-	CBaseSource(TCHAR* name, LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid)
+	CBaseSource(LPCWSTR name, LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid)
 		: CSource(name, lpunk, clsid) {
 		if (phr) {
 			*phr = S_OK;
@@ -116,7 +116,7 @@ private:
 	}
 
 public:
-	CBaseStream(TCHAR* name, CSource* pParent, HRESULT* phr);
+	CBaseStream(LPCWSTR name, CSource* pParent, HRESULT* phr);
 	virtual ~CBaseStream();
 
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

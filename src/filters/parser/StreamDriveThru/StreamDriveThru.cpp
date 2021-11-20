@@ -374,7 +374,7 @@ STDMETHODIMP CStreamDriveThruFilter::GetPreroll(LONGLONG* pllPreroll)
 // CStreamDriveThruInputPin
 //
 
-CStreamDriveThruInputPin::CStreamDriveThruInputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CStreamDriveThruInputPin::CStreamDriveThruInputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBasePin(pName, pFilter, pLock, phr, L"Input", PINDIR_INPUT)
 {
 }
@@ -468,7 +468,7 @@ STDMETHODIMP CStreamDriveThruInputPin::EndFlush()
 // CStreamDriveThruOutputPin
 //
 
-CStreamDriveThruOutputPin::CStreamDriveThruOutputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CStreamDriveThruOutputPin::CStreamDriveThruOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(pName, pFilter, pLock, phr, L"Output")
 {
 }

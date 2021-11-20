@@ -1343,7 +1343,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::EndOfStream()
 // CMatroskaMuxerOutputPin
 //
 
-CMatroskaMuxerOutputPin::CMatroskaMuxerOutputPin(TCHAR* pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CMatroskaMuxerOutputPin::CMatroskaMuxerOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(pName, pFilter, pLock, phr, L"Output")
 {
 }

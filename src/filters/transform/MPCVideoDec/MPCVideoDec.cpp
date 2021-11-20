@@ -4699,7 +4699,7 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 
 // CVideoDecOutputPin
 
-CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
+CVideoDecOutputPin::CVideoDecOutputPin(LPCWSTR pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CBaseVideoOutputPin(pObjectName, pFilter, phr, pName)
 	, m_pVideoDecFilter(static_cast<CMPCVideoDecFilter*>(pFilter))
 {
