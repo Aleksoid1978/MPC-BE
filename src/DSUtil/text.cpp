@@ -154,7 +154,7 @@ CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
 		for (i = 0; i < tag.GetLength() && _istspace(tag[i]); i++) {
 			;
 		}
-		tag = i < tag.GetLength() ? tag.Mid(i) : L"";
+		tag = tag.Mid(i);
 		if (!tag.IsEmpty() && tag[0] == '\"') {
 			tag = tag.Mid(1);
 			i = tag.Find('\"');
@@ -168,7 +168,7 @@ CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
 		if (!param.IsEmpty()) {
 			attribs[attrib] = param;
 		}
-		tag = i+1 < tag.GetLength() ? tag.Mid(i+1) : L"";
+		tag = tag.Mid(i+1);
 	}
 
 	return type;

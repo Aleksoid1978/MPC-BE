@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru).
+ * (C) 2013-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,7 @@ GUID_STRING_ENTRY MPC_g_GuidNames[] = {
 C_MPCGuidNameList m_GuidNames;
 int MPC_g_cGuidNames = sizeof(MPC_g_GuidNames) / sizeof(MPC_g_GuidNames[0]);
 
-char *C_MPCGuidNameList::operator [] (const GUID &guid)
+const char *C_MPCGuidNameList::operator [] (const GUID &guid)
 {
 	for (int i = 0; i < MPC_g_cGuidNames; i++) {
 		if (MPC_g_GuidNames[i].guid == guid) {

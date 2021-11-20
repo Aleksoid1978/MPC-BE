@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru).
+ * (C) 2013-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 
 class C_MPCGuidNameList {
 public:
-	CHAR *operator [] (const GUID& guid);
+	const char *operator [] (const GUID& guid);
 };
 
 extern C_MPCGuidNameList m_GuidNames;
