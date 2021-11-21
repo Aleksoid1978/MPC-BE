@@ -254,7 +254,7 @@ namespace Youtube
 		return false;
 	}
 
-	static bool URLPostData(LPCWSTR videoId, urlData& pData)
+	static bool URLPostData(LPCWSTR videoId, urlData& pData, bool bAgeGate)
 	{
 		if (auto hInet = InternetOpenW(L"Mozilla/5.0 (Windows NT 6.1))", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
 			if (auto hSession = InternetConnectW(hInet, L"www.youtube.com", 443, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 1)) {
@@ -263,10 +263,18 @@ namespace Youtube
 													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
-					constexpr auto str = R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "hl": "en"}}, )"
-										 R"("videoId": "%S", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
-										 R"("contentCheckOk": true, "racyCheckOk": true})";
-					requestData.Format(str, videoId);
+					constexpr char* str[] = {
+						// android player API JSON
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "hl": "en"}}, )"
+						R"("videoId": "%S", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
+						R"("contentCheckOk": true, "racyCheckOk": true})",
+						// android agegate player API JSON
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "clientScreen": "EMBED"}, )"
+						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", )"
+						R"("contentCheckOk": true, "racyCheckOk": true})"
+					};
+
+					requestData.Format(str[bAgeGate ? 1 : 0], videoId);
 
 					static const CStringW lpszHeaders = LR"(X-YouTube-Client-Name: 3\r\n)"
 														LR"(X-YouTube-Client-Version: 16.20\r\n)"
@@ -275,6 +283,7 @@ namespace Youtube
 
 					if (HttpSendRequestW(hRequest, lpszHeaders.GetString(), lpszHeaders.GetLength(),
 										 reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
+						pData.clear();
 						static std::vector<char> tmp(16 * 1024);
 						for (;;) {
 							DWORD dwSizeRead = 0;
@@ -350,7 +359,7 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			bool bParse = false;
 			urlData data;
-			if (URLPostData(videoId.GetString(), data)) {
+			if (URLPostData(videoId.GetString(), data, false)) {
 				rapidjson::Document player_response_jsonDocument;
 				player_response_jsonDocument.Parse(data.data());
 
@@ -508,7 +517,7 @@ namespace Youtube
 			std::list<CStringA> strUrlsLive;
 
 			urlData postData;
-			if (URLPostData(videoId.GetString(), postData)) {
+			if (URLPostData(videoId.GetString(), postData, false)) {
 				player_response_jsonDocument.Parse(postData.data());
 			}
 
@@ -518,8 +527,22 @@ namespace Youtube
 					bStreamingDataExist = true;
 				}
 			}
+			if (!bStreamingDataExist) {
+				player_response_jsonDocument.SetObject();
+				postData.clear();
+				if (URLPostData(videoId.GetString(), postData, true)) {
+					player_response_jsonDocument.Parse(postData.data());
+				}
+
+				if (!player_response_jsonDocument.IsNull()) {
+					if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+						bStreamingDataExist = true;
+					}
+				}
+			}
 
 			if (!bStreamingDataExist) {
+				player_response_jsonDocument.SetObject();
 				auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
 				if (!player_response_jsonData.IsEmpty()) {
 					player_response_jsonData += "}";
