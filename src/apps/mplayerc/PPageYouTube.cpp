@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,6 +45,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
+	DDX_Control(pDX, IDC_COMBO4, m_cbYDLExePath);
 	DDX_Control(pDX, IDC_COMBO3, m_cbYDLMaxHeight);
 	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
 	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
@@ -105,6 +106,23 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chkYDLEnable.SetCheck(s.bYDLEnable ? BST_CHECKED : BST_UNCHECKED);
 
+	bool was_added = false;
+	LPCWSTR ydl_filenames[] = {
+			L"yt-dlp.exe",
+			L"yt-dlp_min.exe",
+			L"youtube-dl.exe"
+	};
+	for (auto& ydl_filename : ydl_filenames) {
+		m_cbYDLExePath.AddString(ydl_filename);
+		if (s.strYDLExePath.CompareNoCase(ydl_filename) == 0) {
+			was_added = true;
+		}
+	}
+	if (!was_added) {
+		m_cbYDLExePath.AddString(s.strYDLExePath);
+	}
+	m_cbYDLExePath.SelectString(0, s.strYDLExePath);
+
 	for (const auto& h : s_CommonVideoHeights) {
 		CString str;
 		str.Format(L"%d", h);
@@ -136,6 +154,8 @@ BOOL CPPageYoutube::OnApply()
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	s.bYDLEnable = !!m_chkYDLEnable.GetCheck();
+	m_cbYDLExePath.GetWindowTextW(s.strYDLExePath);
+	s.strYDLExePath.Trim();
 	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
 	s.bYDLMaximumQuality = !!m_chkYDLMaximumQuality.GetCheck();
 

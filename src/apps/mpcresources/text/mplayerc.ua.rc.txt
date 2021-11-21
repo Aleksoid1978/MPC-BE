@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Липнути до меж екрану"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
 10		"60 кадрів\с"
 11		"HDR"
 12		"Завантажити список відтворення"
-14		"youtube-dl"
-15		"Максимальна висота відео:"
-17		"Обрати макс. кількість кадрів\с або бітрейт"
-18		"Адреса AceStream:"
-20		"Адреса MatriX (TorrServer):"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"Максимальна висота відео:"
+19		"Обрати макс. кількість кадрів\с або бітрейт"
+20		"Адреса AceStream:"
+22		"Адреса MatriX (TorrServer):"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Пропус. перев. level"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Пропус. перев. ref кадрів"
 STRING IDS_VDF_HW_ACCELERATION		"Апаратне прискорення"
 STRING IDS_VDF_HW_CODECS		"Кодеки:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"Тип розгортки"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Нижнє поле спершу"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Прогресивне"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"Вибрано - буде використовувати�
 STRING IDS_VDF_TT_PRESET		"Змінює співвідношення між швидкістю і якістю."
 STRING IDS_VDF_TT_RGB_LEVELS		"Ці налаштування використовуються лише коли фільтр виконує перетворення YCbCr у RGB."
 STRING IDS_VDF_TT_STANDARD		"Ці налаштування використовуються лише коли фільтр виконує перетворення YCbCr<->RGB."
-STRING IDS_VDF_USE_D3D11_DECODER		"Використовувати декодер D3D11"
 STRING IDS_VIDEO_STREAM		"Відео: %s"
 STRING IDS_VIEW_BORDERLESS		"Приховати межі\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Відобразити заголовок та меню\tCtrl+0"

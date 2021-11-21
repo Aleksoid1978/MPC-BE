@@ -149,7 +149,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// HW Decoder
 	CalcTextRect(rect, x1, y, label_w-24);
-	m_txtHWDecoder.Create(L"Preferred hardware decoder", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	m_txtHWDecoder.Create(ResStr(IDS_VDF_PREFERRED_HW_DECODER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
 	CalcRect(rect, x2-24, y, control_w+24, 200); rect.top -= 4;
 	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DEC);
 	m_cbHWDecoder.AddString(L"DXVA2");

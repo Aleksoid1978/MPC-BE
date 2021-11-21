@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Illesztés az asztal széleihez"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Használja a beépített weboldal elemzőt"
 7		"Előnyben részesített formátum:"
 10		"60 fps"
 11		"HDR"
 12		"Lejátszási lista betöltése"
-14		"youtube-dl"
-15		"Maximális videómagasság:"
-17		"Válassza ki a max fps vagy bitrátát"
-18		"AceStream cím:"
-20		"MatriX (TorrServer) cím:"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"Maximális videómagasság:"
+19		"Válassza ki a max fps vagy bitrátát"
+20		"AceStream cím:"
+22		"MatriX (TorrServer) cím:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Szint teszt kihagyása"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Ref. kép teszt kihagyása"
 STRING IDS_VDF_HW_ACCELERATION		"Hardveres gyorsítás"
 STRING IDS_VDF_HW_CODECS		"Kodekek:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"Szkennelés típusa"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Alsó mező az első"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Progresszív"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"Ellenőrizve - az AR felhasználásra kerül a stream-rő
 STRING IDS_VDF_TT_PRESET		"Megváltoztatja a sebesség és a minőség kapcsolatát."
 STRING IDS_VDF_TT_RGB_LEVELS		"Ezt a beállítást csak akkor használjuk, ha a szűrő működik YCbCr-ről RGB-re átalakítása."
 STRING IDS_VDF_TT_STANDARD		"Ezt a beállítást csak akkor használjuk, ha a szűrő működik YCbCr<->RGB átalakítása."
-STRING IDS_VDF_USE_D3D11_DECODER		"Használjon D3D11 dekódert"
 STRING IDS_VIDEO_STREAM		"Videó: %s"
 STRING IDS_VIEW_BORDERLESS		"Szegélyek elrejtése\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Képaláírás megjelenítése&&Menü\tCtrl+0"

@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Ajustar às bordas da área de trabalho"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Usar analisador de página da web integrado"
 7		"Formato preferido:"
 10		"60 fps"
 11		"HDR"
 12		"Carregar lista-reprodução"
-14		"youtube-dl"
-15		"Altura máxima do vídeo:"
-17		"Selecionar fps máximo ou taxa de bits"
-18		"Endereço AceStream:"
-20		"Endereço MatriX (TorrServer):"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"Altura máxima do vídeo:"
+19		"Selecionar fps máximo ou taxa de bits"
+20		"Endereço AceStream:"
+22		"Endereço MatriX (TorrServer):"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Pular verificação de nível"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Pular verificação de ref quadro"
 STRING IDS_VDF_HW_ACCELERATION		"Aceleraçao do hardware"
 STRING IDS_VDF_HW_CODECS		"Codecs:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"Tipo de verificação"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Primeiro campo inferior"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Progressivo"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"Marcado - será usado AR do fluxo.\nDesmarcado - será us
 STRING IDS_VDF_TT_PRESET		"Mudar relação entre velocidade e qualidade."
 STRING IDS_VDF_TT_RGB_LEVELS		"A configuração é usada apenas quando o filtro está fazendo a conversão de YCbCr para RGB."
 STRING IDS_VDF_TT_STANDARD		"A configuração é usada apenas quando o filtro está fazendo a conversão YCbCr<->RGB."
-STRING IDS_VDF_USE_D3D11_DECODER		"Usar decodificador D3D11"
 STRING IDS_VIDEO_STREAM		"Vídeo: %s"
 STRING IDS_VIEW_BORDERLESS		"Ocultar bordas\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Mostrar menu e legenda\tCtrl+0"

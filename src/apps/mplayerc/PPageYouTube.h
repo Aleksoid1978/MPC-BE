@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,6 +37,7 @@ private:
 	CButton m_chkLoadPlaylist;
 
 	CButton   m_chkYDLEnable;
+	CComboBox m_cbYDLExePath;
 	CComboBox m_cbYDLMaxHeight;
 	CButton   m_chkYDLMaximumQuality;
 

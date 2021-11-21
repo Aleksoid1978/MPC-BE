@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"吸附对齐至桌面边缘"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"使用内置网页分析器"
 7		"首选格式:"
 10		"60 fps"
 11		"HDR"
 12		"加载播放列表"
-14		"youtube-dl"
-15		"最大视频高度："
-17		"选择最大帧率或比特率"
-18		"AceStream链接:"
-20		"MatriX (TorrServer)链接:"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"最大视频高度："
+19		"选择最大帧率或比特率"
+20		"AceStream链接:"
+22		"MatriX (TorrServer)链接:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"忽略 H264 Level 检查"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"忽略参考帧检查"
 STRING IDS_VDF_HW_ACCELERATION		"硬件加速"
 STRING IDS_VDF_HW_CODECS		"编码:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"扫描方式"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"偶数场优先"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"逐行"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"检测 - 使用流预置的高宽比。\n不检测 - 使�
 STRING IDS_VDF_TT_PRESET		"改变速度与品质的关系"
 STRING IDS_VDF_TT_RGB_LEVELS		"滤镜做 YCbCr ->RGB 转换时，此选项可用。"
 STRING IDS_VDF_TT_STANDARD		"滤镜做 YCbCr<->RGB 转换时，此选项可用。"
-STRING IDS_VDF_USE_D3D11_DECODER		"使用D3D11解码器"
 STRING IDS_VIDEO_STREAM		"视频: %s"
 STRING IDS_VIEW_BORDERLESS		"隐藏边框\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"显示标题与菜单\tCtrl+0"

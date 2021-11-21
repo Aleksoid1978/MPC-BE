@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"デスクトップの端にスナップさせる"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"内蔵のウェブ ページ パーサーを使用する"
 7		"お気に入りの形式:"
 10		"60 fps"
 11		"HDR"
 12		"プレイリストを読み込む"
-14		"youtube-dl"
-15		"動画の最大縦幅:"
-17		"最大 fps またはビットレートを選択する"
-18		"AceStream アドレス:"
-20		"MatriX (TorrServer) アドレス:"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"動画の最大縦幅:"
+19		"最大 fps またはビットレートを選択する"
+20		"AceStream アドレス:"
+22		"MatriX (TorrServer) アドレス:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"レベル確認を省略"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"参照フレーム確認を省略"
 STRING IDS_VDF_HW_ACCELERATION		"ハードウェア アクセラレーション"
 STRING IDS_VDF_HW_CODECS		"コーデック:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"スキャンの種類"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"ボトムフィールド優先"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"プログレッシブ"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"チェック - ストリームからの AR が使用さ�
 STRING IDS_VDF_TT_PRESET		"速度と品質の関係を変更します。"
 STRING IDS_VDF_TT_RGB_LEVELS		"この設定はフィルターが YCbCr から RGB に変換している場合にのみ使用されます。"
 STRING IDS_VDF_TT_STANDARD		"この設定はフィルターが YCbCr<->RGB の変換をしている場合にのみ使用されます。"
-STRING IDS_VDF_USE_D3D11_DECODER		"D3D11 デコーダーを使用する"
 STRING IDS_VIDEO_STREAM		"ビデオ: %s"
 STRING IDS_VIEW_BORDERLESS		"境界線を隠す\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"タイトルとメニューを表示\tCtrl+0"

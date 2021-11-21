@@ -30,39 +30,35 @@ namespace YoutubeDL
 {
 	std::vector<std::unique_ptr<Youtube::YoutubeProfile>> YoutubeProfiles;
 
-	bool Parse_URL(const CString& url, const int maxHeightOptions, const bool bMaximumQuality, std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields, Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist)
+	bool Parse_URL(const CString& url, const CString& ydlExePath, const int maxHeightOptions, const bool bMaximumQuality,
+		std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields,
+		Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist)
 	{
 		y_fields.Empty();
 		YoutubeProfiles.clear();
 		urls.clear();
 
-		LPCWSTR ydl_filenames[] = {
-			L"yt-dlp.exe",
-			L"yt-dlp_x86.exe",
-			L"youtube-dl.exe"
-		};
 		CStringW ydl_path;
 
-		for (auto& ydl_filename : ydl_filenames) {
-			if (::PathFileExistsW(ydl_filename)) {
-				ydl_path = ydl_filename;
-				break;
-			}
+		CStringW apppath = GetProgramDir() + ydlExePath;
+		if (::PathFileExistsW(apppath)) {
+			ydl_path = apppath;
+		}
+		else {
 			// CreateProcessW and other functions (unlike ShellExecuteExW) does not look for
 			// an executable file in the "App Paths", so we will do it manually.
 
 			// see "App Paths" in HKEY_CURRENT_USER
-			CStringW apppath = GetRegAppPath(ydl_filename, true);
+			apppath = GetRegAppPath(ydlExePath, true);
 			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
 				ydl_path = apppath;
-				break;
 			}
-
-			// see "App Paths" in HKEY_LOCAL_MACHINE
-			apppath = GetRegAppPath(ydl_filename, false);
-			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
-				ydl_path = apppath;
-				break;
+			else {
+				// see "App Paths" in HKEY_LOCAL_MACHINE
+				apppath = GetRegAppPath(ydlExePath, false);
+				if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
+					ydl_path = apppath;
+				}
 			}
 		}
 

@@ -791,6 +791,7 @@ void CAppSettings::ResetSettings()
 	bYoutubeLoadPlaylist = false;
 
 	bYDLEnable = true;
+	strYDLExePath = L"yt-dlp.exe";
 	iYDLMaxHeight = 720;
 	bYDLMaximumQuality = false;
 
@@ -1483,6 +1484,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
+	strYDLExePath.Trim();
 	profile.ReadInt(IDS_R_ONLINESERVICES, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
@@ -1966,6 +1969,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
+	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
 	profile.WriteInt(IDS_R_ONLINESERVICES, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);

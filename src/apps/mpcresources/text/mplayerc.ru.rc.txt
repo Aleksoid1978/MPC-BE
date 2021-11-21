@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Прилипать к границам экрана"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Использовать встроенный парсер веб-страниц"
 7		"Предпочитаемый формат просмотра:"
 10		"60 fps"
 11		"HDR"
 12		"Загружать плейлист"
-14		"youtube-dl"
-15		"Максимальная высота видео:"
-17		"Выбрать максимальную частоту кадров или битрейт"
-18		"AceStream address:"
-20		"MatriX (TorrServer) address:"
+14		"youtube-dl, yt-dlp"
+15		"Исполняемый файл:"
+17		"Максимальная высота видео:"
+19		"Выбрать максимальную частоту кадров или битрейт"
+20		"AceStream address:"
+22		"MatriX (TorrServer) address:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Не проверять Level"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Не проверять ref frames"
 STRING IDS_VDF_HW_ACCELERATION		"Аппаратное ускорение"
 STRING IDS_VDF_HW_CODECS		"Кодеки:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Предпочтительный декодер"
 STRING IDS_VDF_SCANTYPE		"Тип развёртки"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Bottom-Field First"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Прогрессив"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"Включено - пропорции кадра извл
 STRING IDS_VDF_TT_PRESET		"Управляет балансом между скоростью и качеством."
 STRING IDS_VDF_TT_RGB_LEVELS		"Используется при преобразованиях из YUV в RGB."
 STRING IDS_VDF_TT_STANDARD		"Используется при преобразованиях из YUV в RGB и наоборот."
-STRING IDS_VDF_USE_D3D11_DECODER		"Использовать декодер D3D11"
 STRING IDS_VIDEO_STREAM		"Видео: %s"
 STRING IDS_VIEW_BORDERLESS		"Скрыть границы\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Показать заголовок и меню\tCtrl+0"

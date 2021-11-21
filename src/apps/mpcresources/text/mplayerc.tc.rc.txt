@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"貼齊到桌面邊緣"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"使用內部網頁剖析器"
 7		"偏好格式："
 10		"60 fps"
 11		"HDR"
 12		"載入播放清單"
-14		"youtube-dl"
-15		"最大影片高度:"
-17		"選擇最高影格率或位元率"
-18		"AceStream 位址:"
-20		"MatriX (TorrServer) 位址:"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"最大影片高度:"
+19		"選擇最高影格率或位元率"
+20		"AceStream 位址:"
+22		"MatriX (TorrServer) 位址:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"省略層級檢查"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"省略參考影格檢查"
 STRING IDS_VDF_HW_ACCELERATION		"硬體加速"
 STRING IDS_VDF_HW_CODECS		"編碼："
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"掃描順序"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"後場優先"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"漸進式"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"選取：將使用視訊串流的畫面比例。\n不選�
 STRING IDS_VDF_TT_PRESET		"變更速度與品質之間的平衡。"
 STRING IDS_VDF_TT_RGB_LEVELS		"此選項只會在篩選器進行 YCbCr 到 RGB 轉換時使用。"
 STRING IDS_VDF_TT_STANDARD		"此選項只會在篩選器進行 YCbCr<->RGB 轉換時使用。"
-STRING IDS_VDF_USE_D3D11_DECODER		"使用 D3D11 解碼器"
 STRING IDS_VIDEO_STREAM		"影像：%s"
 STRING IDS_VIEW_BORDERLESS		"隱藏邊框\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"顯示標題選單\tCtrl+0"

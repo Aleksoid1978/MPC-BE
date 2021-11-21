@@ -584,7 +584,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Masaüstü kenarlarına yapış"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Yerleşik web sayfası ayrıştırıcısını kullan"
 7		"Tercih edilen biçim:"
@@ -592,10 +592,11 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
 11		"HDR"
 12		"Oynatma listesi yükle"
 14		"youtube-dl, yt-dlp"
-15		"Maks. video yüksekliği:"
-17		"Maksimum fps ya da bit hızı seç"
-18		"AceStream adresi:"
-20		"MatriX (TorrServer) adresi:"
+15		"Executable file:"
+17		"Maks. video yüksekliği:"
+19		"Maksimum fps ya da bit hızı seç"
+20		"AceStream adresi:"
+22		"MatriX (TorrServer) adresi:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Seviye kontrolünü atla"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Referans kare kontrolünü atla"
 STRING IDS_VDF_HW_ACCELERATION		"Donanım hızlandırma"
 STRING IDS_VDF_HW_CODECS		"Çözücüler:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"Tarama tipi"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"İlk Alt Alan"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Aşamalı"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"Seçili - Akıştan En Boy Oranı kullanılacaktır.\nSe�
 STRING IDS_VDF_TT_PRESET		"Hız ve kalite arasındaki ilişkiyi değiştirir."
 STRING IDS_VDF_TT_RGB_LEVELS		"Bu ayar sadece, filtre YCbCr'yi RGB'ye dönüştürme yaptığında kullanılır."
 STRING IDS_VDF_TT_STANDARD		"Bu ayar sadece, filtre YCbCr<->RGB dönüştürme yaptığında kullanılır."
-STRING IDS_VDF_USE_D3D11_DECODER		"D3D11 çözücü kullan"
 STRING IDS_VIDEO_STREAM		"Video: %s"
 STRING IDS_VIEW_BORDERLESS		"Kenarları Gizle\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Başlık && Menü'yü Göster\tCtrl+0"

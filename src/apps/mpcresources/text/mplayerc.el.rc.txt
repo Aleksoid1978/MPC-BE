@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Προσκόλληση στις άκρες της επιφάνειας εργασίας"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Χρήση ενσωματωμένης μορφής στην ιστοσελίδα"
 7		"Προτιμώμενη μορφή:"
 10		"60 fps"
 11		"HDR"
 12		"Φόρτωση λίστας αναπαραγωγής"
-14		"youtube-dl"
-15		"Μέγιστο ύψος βίντεο:"
-17		"Επιλογή μέγιστων fps ή bitrate"
-18		"Διεύθυνση AceStream:"
-20		"Διεύθυνση MatriX (TorrServer):"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"Μέγιστο ύψος βίντεο:"
+19		"Επιλογή μέγιστων fps ή bitrate"
+20		"Διεύθυνση AceStream:"
+22		"Διεύθυνση MatriX (TorrServer):"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2016,6 +2017,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Παράβλεψη ελέγχου επιπ
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Παράβλεψη ελέγχου αναφ. καρέ"
 STRING IDS_VDF_HW_ACCELERATION		"Hardware acceleration"
 STRING IDS_VDF_HW_CODECS		"Codecs:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"Τύπος σάρωσης"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Πρώτα το κάτω πεδίο"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Προοδευτική"
@@ -2032,7 +2034,6 @@ STRING IDS_VDF_TT_AR		"Επιλεγμένο - θα χρησιμοποιηθεί 
 STRING IDS_VDF_TT_PRESET		"Αλλάζει τη σχέση μεταξύ ταχύτητας και ποιότητας."
 STRING IDS_VDF_TT_RGB_LEVELS		"Αυτή η ρύθμιση χρησιμοποιείται μόνο όταν το φίλτρο κάνει μετατροπή YCbCr σε RGB."
 STRING IDS_VDF_TT_STANDARD		"Αυτή η ρύθμιση χρησιμοποιείται μόνο όταν το φίλτρο πραγματοποιεί μετατροπή YCbCr <-> RGB."
-STRING IDS_VDF_USE_D3D11_DECODER		"Use D3D11 decoder"
 STRING IDS_VIDEO_STREAM		"Βίντεο: %s"
 STRING IDS_VIEW_BORDERLESS		"Απόκρυψη περιθωρίων\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Εμφάνιση Λεζάντας && Μενού\tCtrl+0"

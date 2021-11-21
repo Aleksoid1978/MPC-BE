@@ -896,6 +896,7 @@ public:
 	std::map<CString, CString> youtubeSignatureCache;
 
 	bool			bYDLEnable;
+	CStringW		strYDLExePath;
 	int				iYDLMaxHeight;
 	bool			bYDLMaximumQuality;
 

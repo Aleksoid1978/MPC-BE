@@ -584,18 +584,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Snap to desktop edges"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 22
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 5		"YouTube"
 6		"Use the built-in web page parser"
 7		"우선 포맷:"
 10		"60 fps"
 11		"HDR"
 12		"Load playlist"
-14		"youtube-dl"
-15		"Max video height:"
-17		"Select max fps or bitrate"
-18		"AceStream address:"
-20		"MatriX (TorrServer) address:"
+14		"youtube-dl, yt-dlp"
+15		"Executable file:"
+17		"Max video height:"
+19		"Select max fps or bitrate"
+20		"AceStream address:"
+22		"MatriX (TorrServer) address:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -2025,6 +2026,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"레벨검사 건너뛰기"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"레퍼런스프레임검사 건너뛰기"
 STRING IDS_VDF_HW_ACCELERATION		"Hardware acceleration"
 STRING IDS_VDF_HW_CODECS		"Codecs:"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred hardware decoder"
 STRING IDS_VDF_SCANTYPE		"Scan type"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Bottom-Field 우선"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Progressive"
@@ -2041,7 +2043,6 @@ STRING IDS_VDF_TT_AR		"체크 - 스트림으로부터 AR 사용.\n언체크 - �
 STRING IDS_VDF_TT_PRESET		"속도와 품질간의 관계를 바꾼다."
 STRING IDS_VDF_TT_RGB_LEVELS		"이 설정은 필터가 YCbCr to RGB 변환을 할때만 사용된다."
 STRING IDS_VDF_TT_STANDARD		"이 설정은 필터가 YCbCr<->RGB 변환을 할때만 사용된다."
-STRING IDS_VDF_USE_D3D11_DECODER		"Use D3D11 decoder"
 STRING IDS_VIDEO_STREAM		"비디오: %s"
 STRING IDS_VIEW_BORDERLESS		"외곽선 숨기기\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"제목표시줄과 메뉴 보이기\tCtrl+0"
