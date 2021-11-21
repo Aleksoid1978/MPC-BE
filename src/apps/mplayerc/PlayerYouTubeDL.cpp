@@ -56,20 +56,25 @@ namespace YoutubeDL
 
 			// CreateProcessW and other functions (unlike ShellExecuteExW) does not look for
 			// an executable file in the "App Paths", so we will do it manually.
-
-			// see "App Paths" in HKEY_CURRENT_USER
-			apppath = GetRegAppPath(ydlExePath, true);
-			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
-				ydl_path = apppath;
-				break;
+			if (ydlExePath.Find('\\') < 0) {
+				// see "App Paths" in HKEY_CURRENT_USER
+				apppath = GetRegAppPath(ydlExePath, true);
+				if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
+					ydl_path = apppath;
+					break;
+				}
+				// see "App Paths" in HKEY_LOCAL_MACHINE
+				apppath = GetRegAppPath(ydlExePath, false);
+				if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
+					ydl_path = apppath;
+					break;
+				}
 			}
-
-			// see "App Paths" in HKEY_LOCAL_MACHINE
-			apppath = GetRegAppPath(ydlExePath, false);
-			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
-				ydl_path = apppath;
-				break;
-			}
+#if 0
+			// Let's try to send it as is, so that the CreateProcessW function
+			// checks the folders specified in the system PATH variable.
+			ydl_path = ydlExePath;
+#endif
 		} while (0);
 
 		if (ydl_path.IsEmpty()) {
