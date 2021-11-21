@@ -254,13 +254,13 @@ typedef struct tag_ObjectDesc {
     //  Returns the name defined in uuids.h as a string
 
     typedef struct {
-        CHAR   *szName;
+        const CHAR *szName;
         GUID    guid;
     } GUID_STRING_ENTRY;
 
     class CGuidNameList {
     public:
-        CHAR *operator [] (const GUID& guid);
+        const CHAR *operator [] (const GUID& guid);
     };
 
     extern CGuidNameList GuidNames;

@@ -9,7 +9,7 @@
 
 
 #include "streams.h"
-#include <InitGuid.h>
+#include <initguid.h>
 
 #ifdef _DEBUG
 #ifdef UNICODE
@@ -328,7 +328,7 @@ _DllEntryPoint(
 
     	{
     	    SetHeapOptions();
-			// The platform identifier is used to work out whether
+    	    // The platform identifier is used to work out whether
     	    // full unicode support is available or not.  Hence the
     	    // default will be the lowest common denominator - i.e. N/A
                 g_amPlatform = VER_PLATFORM_WIN32_WINDOWS; // win95 assumed in case GetVersionEx fails

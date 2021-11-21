@@ -117,7 +117,7 @@ HRESULT CAMSchedule::Unadvise(DWORD_PTR dwAdviseCookie)
     CAdvisePacket * p_prev = &head;
     CAdvisePacket * p_n;
     m_Serialize.Lock();
-	p_n = p_prev->Next();
+    p_n = p_prev->Next();
     while ( p_n ) // The Next() method returns NULL when it hits z
     {
         if ( p_n->m_dwAdviseCookie == dwAdviseCookie )

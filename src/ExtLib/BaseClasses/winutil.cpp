@@ -13,8 +13,6 @@
 #include <strsafe.h>
 #include "checkbmi.h"
 
-//#define UNREFERENCED_PARAMETER(x) x
-
 static UINT MsgDestroy;
 
 // Constructor
@@ -2685,7 +2683,7 @@ STDAPI ConvertVideoInfoToVideoInfo2(__inout AM_MEDIA_TYPE *pmt)
     if (NULL == pmt->pbFormat || pmt->cbFormat < sizeof(VIDEOINFOHEADER)) {
         return E_INVALIDARG;
     }
-	VIDEOINFO *pVideoInfo = (VIDEOINFO *)pmt->pbFormat;
+    VIDEOINFO *pVideoInfo = (VIDEOINFO *)pmt->pbFormat;
 	UNREFERENCED_PARAMETER(pVideoInfo);
     DWORD dwNewSize;
     HRESULT hr = DWordAdd(pmt->cbFormat, sizeof(VIDEOINFOHEADER2) - sizeof(VIDEOINFOHEADER), &dwNewSize);

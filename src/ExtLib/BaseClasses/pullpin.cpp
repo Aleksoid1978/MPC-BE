@@ -11,8 +11,6 @@
 #include "streams.h"
 #include "pullpin.h"
 
-//#define UNREFERENCED_PARAMETER(x) x
-
 #ifdef DXMPERF
 #include "dxmperf.h"
 #endif // DXMPERF

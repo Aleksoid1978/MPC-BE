@@ -13,7 +13,7 @@
 // in the streams IDL file, but also has (non-virtual) functions
 
 #include "streams.h"
-#include <MMReg.h>
+#include <mmreg.h>
 
 CMediaType::~CMediaType(){
     FreeMediaType(*this);
