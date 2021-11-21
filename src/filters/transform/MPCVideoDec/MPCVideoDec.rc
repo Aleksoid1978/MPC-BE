@@ -125,7 +125,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_HW_ACCELERATION      "Hardware acceleration"
-    IDS_VDF_PREFERRED_HW_DECODER "Preferred hardware decoder"
+    IDS_VDF_PREFERRED_HW_DECODER "Preferred decoder"
     IDS_VDF_HW_CODECS            "Codecs:"
     IDS_VDF_DXVACOMPATIBILITY    "DXVA (H.264) Compatibility check"
     IDS_VDF_DXVA_FULLCHECK       "Full check"
