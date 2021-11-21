@@ -39,12 +39,21 @@ namespace YoutubeDL
 		urls.clear();
 
 		CStringW ydl_path;
+		do {
+			if (StartsWith(ydlExePath, L":\\", 1) || StartsWith(ydlExePath, L"\\\\")) {
+				// looks like full path
+				if (::PathFileExistsW(ydlExePath)) {
+					ydl_path = ydlExePath;
+				}
+				break; // complete the checks anyway
+			}
 
-		CStringW apppath = GetProgramDir() + ydlExePath;
-		if (::PathFileExistsW(apppath)) {
-			ydl_path = apppath;
-		}
-		else {
+			CStringW apppath = GetProgramDir() + ydlExePath;
+			if (::PathFileExistsW(apppath)) {
+				ydl_path = apppath;
+				break;
+			}
+
 			// CreateProcessW and other functions (unlike ShellExecuteExW) does not look for
 			// an executable file in the "App Paths", so we will do it manually.
 
@@ -52,15 +61,16 @@ namespace YoutubeDL
 			apppath = GetRegAppPath(ydlExePath, true);
 			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
 				ydl_path = apppath;
+				break;
 			}
-			else {
-				// see "App Paths" in HKEY_LOCAL_MACHINE
-				apppath = GetRegAppPath(ydlExePath, false);
-				if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
-					ydl_path = apppath;
-				}
+
+			// see "App Paths" in HKEY_LOCAL_MACHINE
+			apppath = GetRegAppPath(ydlExePath, false);
+			if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
+				ydl_path = apppath;
+				break;
 			}
-		}
+		} while (0);
 
 		if (ydl_path.IsEmpty()) {
 			return false;
