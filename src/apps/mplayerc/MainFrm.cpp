@@ -12026,6 +12026,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_strPlaybackRenderedPath.Empty();
 
 	CString youtubeUrl;
+	CString youtubeErrorMessage;
 
 	if (!m_youtubeUrllist.empty()) {
 		youtubeUrl = pOFD->fns.front().GetName();
@@ -12060,8 +12061,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
 			std::list<CString> urls;
-			CString errorMessage;
-			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart, errorMessage)) {
+			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart, youtubeErrorMessage)) {
 				youtubeUrl = fn;
 				Content::Online::Disconnect(fn);
 
@@ -12072,8 +12072,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
-			} else if (!errorMessage.IsEmpty()) {
-				return errorMessage;
 			}
 		}
 	}
@@ -12120,6 +12118,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 			}
 		}
+	}
+
+	if (youtubeUrl.IsEmpty() && !youtubeErrorMessage.IsEmpty()) {
+		return youtubeErrorMessage;
 	}
 
 	if (!::PathIsURLW(pOFD->fns.front())) {
