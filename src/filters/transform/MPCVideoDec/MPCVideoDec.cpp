@@ -3585,6 +3585,7 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 		if (pOutLen > 0) {
 			AVPacket *avpkt = av_packet_alloc();
 			if (FAILED(hr = FillAVPacket(avpkt, pOutBuffer, pOutLen))) {
+				av_packet_free(&avpkt);
 				break;
 			}
 
@@ -3625,6 +3626,7 @@ HRESULT CMPCVideoDecFilter::Decode(const BYTE *buffer, int buflen, REFERENCE_TIM
 
 		AVPacket *avpkt = av_packet_alloc();
 		if (FAILED(FillAVPacket(avpkt, buffer, buflen))) {
+			av_packet_free(&avpkt);
 			return E_OUTOFMEMORY;
 		}
 
