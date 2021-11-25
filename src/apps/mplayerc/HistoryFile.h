@@ -136,17 +136,18 @@ public:
 class CFavoritesFile : public CSessionFile
 {
 private:
+	std::list<SessionInfo> m_Files;
+	std::list<SessionInfo> m_DVDs;
+
 	void IntAddEntry(const SessionInfo& sesInfo) override;
 	void IntClearEntries() override;
 
 	bool WriteFile();
 
 public:
-	std::list<SessionInfo> m_FavFiles;
-	std::list<SessionInfo> m_FavDVDs;
-
-	void OpenFavorites();
-	void SaveFavorites();
+	void GetFavorites(std::list<SessionInfo>& favFiles, std::list<SessionInfo>& favDVDs);
+	void AppendFavorite(const SessionInfo& fav);
+	void SaveFavorites(const std::list<SessionInfo>& favFiles, const std::list<SessionInfo>& favDVDs);
 };
 
 //

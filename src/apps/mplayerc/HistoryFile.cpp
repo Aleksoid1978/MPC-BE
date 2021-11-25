@@ -480,17 +480,17 @@ void CFavoritesFile::IntAddEntry(const SessionInfo& sesInfo)
 {
 	if (sesInfo.Path.GetLength()) {
 		if (sesInfo.DVDId) {
-			m_FavDVDs.emplace_back(sesInfo);
+			m_DVDs.emplace_back(sesInfo);
 		} else {
-			m_FavFiles.emplace_back(sesInfo);
+			m_Files.emplace_back(sesInfo);
 		}
 	}
 }
 
 void CFavoritesFile::IntClearEntries()
 {
-	m_FavFiles.clear();
-	m_FavDVDs.clear();
+	m_Files.clear();
+	m_DVDs.clear();
 }
 
 bool CFavoritesFile::WriteFile()
@@ -507,7 +507,7 @@ bool CFavoritesFile::WriteFile()
 	try {
 		file.WriteString(L"; MPC-BE Favorites File 0.1\n");
 		int i = 1;
-		for (const auto& sesInfo : m_FavFiles) {
+		for (const auto& sesInfo : m_Files) {
 			if (sesInfo.Path.GetLength()) {
 				str.Format(L"\n[%03d]\n", i++);
 
@@ -540,7 +540,7 @@ bool CFavoritesFile::WriteFile()
 			}
 		}
 
-		for (const auto& sesDvd : m_FavDVDs) {
+		for (const auto& sesDvd : m_DVDs) {
 			if (sesDvd.Path.GetLength() && sesDvd.DVDId) {
 				str.Format(L"\n[%03d]\n", i++);
 
@@ -585,7 +585,7 @@ bool CFavoritesFile::WriteFile()
 	return ret;
 }
 
-void CFavoritesFile::OpenFavorites()
+void CFavoritesFile::GetFavorites(std::list<SessionInfo>& favFiles, std::list<SessionInfo>& favDVDs)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -593,11 +593,35 @@ void CFavoritesFile::OpenFavorites()
 	if (!ok) {
 		IntClearEntries();
 	}
+
+	favFiles = m_Files;
+	favDVDs = m_DVDs;
 }
 
-void CFavoritesFile::SaveFavorites()
+void CFavoritesFile::AppendFavorite(const SessionInfo& fav)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	bool ok = ReadFile();
+	if (!ok) {
+		IntClearEntries();
+	}
+
+	if (fav.DVDId) {
+		m_DVDs.emplace_back(fav);
+	} else {
+		m_Files.emplace_back(fav);
+	}
+
+	WriteFile();
+}
+
+void CFavoritesFile::SaveFavorites(const std::list<SessionInfo>& favFiles, const std::list<SessionInfo>& favDVDs)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	m_Files = favFiles;
+	m_DVDs = favDVDs;
 
 	WriteFile();
 }

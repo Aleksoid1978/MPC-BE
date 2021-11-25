@@ -557,6 +557,8 @@ private:
 	DWORD m_iDVDTitle;
 	bool m_bDVDRestorePos = false;
 	std::vector<CStringW> m_RecentPaths; // used in SetupRecentFilesSubMenu and OnRecentFile
+	std::list<SessionInfo> m_FavFiles;   // used in SetupFavoritesSubMenu and OnFavoritesFile
+	std::list<SessionInfo> m_FavDVDs;    // used in SetupFavoritesSubMenu and OnFavoritesDVD
 
 	CStringW m_FileName;
 	bool m_bUpdateTitle = false;

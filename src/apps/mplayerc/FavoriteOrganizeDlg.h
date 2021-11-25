@@ -31,6 +31,9 @@ class CFavoriteOrganizeDlg : public CResizableDialog
 {
 	//DECLARE_DYNAMIC(CFavoriteOrganizeDlg)
 
+	std::list<SessionInfo> m_FavFiles;
+	std::list<SessionInfo> m_FavDVDs;
+
 public:
 	CFavoriteOrganizeDlg(CWnd* pParent = nullptr);
 	virtual ~CFavoriteOrganizeDlg();

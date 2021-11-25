@@ -10123,14 +10123,12 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		sesInfo.Path.SetAt(0, '?');
 	}
 
-	auto& favoritesFile = AfxGetMyApp()->m_FavoritesFile;
-
 	if (GetPlaybackMode() == PM_FILE) {
 		// RememberPos
 		if (s.bFavRememberPos) {
 			sesInfo.Position = GetPos();
 		}
-		favoritesFile.m_FavFiles.emplace_back(sesInfo);
+		AfxGetMyApp()->m_FavoritesFile.AppendFavorite(sesInfo);
 		osdMsg = ResStr(IDS_FILE_FAV_ADDED);
 	}
 	else if (GetPlaybackMode() == PM_DVD) {
@@ -10148,11 +10146,9 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 			sesInfo.DVDTitle = m_iDVDTitle;
 			sesInfo.DVDTimecode = m_SessionInfo.DVDTimecode;
 		}
-		favoritesFile.m_FavDVDs.emplace_back(sesInfo);
+		AfxGetMyApp()->m_FavoritesFile.AppendFavorite(sesInfo);
 		osdMsg = ResStr(IDS_DVD_FAV_ADDED);
 	}
-
-	favoritesFile.SaveFavorites();
 
 	if (bDisplayMessage && !osdMsg.IsEmpty()) {
 		SendStatusMessage(osdMsg, 3000);
@@ -10200,10 +10196,8 @@ void CMainFrame::OnFavoritesFile(UINT nID)
 {
 	nID -= ID_FAVORITES_FILE_START;
 
-	auto& favFiles = AfxGetMyApp()->m_FavoritesFile.m_FavFiles;
-
-	if (nID < favFiles.size()) {
-		auto it = std::next(favFiles.begin(), nID);
+	if (nID < m_FavFiles.size()) {
+		auto it = std::next(m_FavFiles.begin(), nID);
 		PlayFavoriteFile(*it);
 	}
 }
@@ -10275,10 +10269,8 @@ void CMainFrame::OnFavoritesDVD(UINT nID)
 {
 	nID -= ID_FAVORITES_DVD_START;
 
-	auto& favDvds = AfxGetMyApp()->m_FavoritesFile.m_FavDVDs;
-
-	if (nID < favDvds.size()) {
-		auto it = std::next(favDvds.begin(), nID);
+	if (nID < m_FavDVDs.size()) {
+		auto it = std::next(m_FavDVDs.begin(), nID);
 		PlayFavoriteDVD(*it);
 	}
 }
@@ -15768,10 +15760,9 @@ void CMainFrame::SetupFavoritesSubMenu()
 	const UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 	UINT id = ID_FAVORITES_FILE_START;
-	auto& favoritesFile = AfxGetMyApp()->m_FavoritesFile;
-	favoritesFile.OpenFavorites();
+	AfxGetMyApp()->m_FavoritesFile.GetFavorites(m_FavFiles, m_FavDVDs);
 
-	for (const auto& favFile : favoritesFile.m_FavFiles) {
+	for (const auto& favFile : m_FavFiles) {
 		CString favname = favFile.Title.GetLength() ? favFile.Title : favFile.Path;
 		favname.Replace(L"&", L"&&");
 		favname.Replace(L"\t", L" ");
@@ -15807,7 +15798,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 	id = ID_FAVORITES_DVD_START;
 
-	for (const auto& favDvd : favoritesFile.m_FavDVDs) {
+	for (const auto& favDvd : m_FavDVDs) {
 		CString favname = favDvd.Title.GetLength() ? favDvd.Title : favDvd.Path;
 		favname.Replace(L"&", L"&&");
 		favname.Replace(L"\t", L" ");
