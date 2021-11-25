@@ -10126,7 +10126,9 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 	if (GetPlaybackMode() == PM_FILE) {
 		// RememberPos
 		if (s.bFavRememberPos) {
-			sesInfo.Position = GetPos();
+			sesInfo.Position    = GetPos();
+			sesInfo.AudioNum    = GetAudioTrackIdx();
+			sesInfo.SubtitleNum = GetSubtitleTrackIdx();
 		}
 		AfxGetMyApp()->m_FavoritesFile.AppendFavorite(sesInfo);
 		osdMsg = ResStr(IDS_FILE_FAV_ADDED);
