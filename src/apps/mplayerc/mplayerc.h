@@ -50,9 +50,9 @@ enum {
 struct LanguageResource {
 	const UINT resourceID;
 	const LANGID localeID;
-	LPCTSTR name;
-	LPCTSTR strcode;
-	LPCTSTR iso6392;
+	LPCWSTR name;
+	LPCWSTR strcode;
+	LPCWSTR iso6392;
 };
 
 class CMPlayerCApp : public CModApp
@@ -94,7 +94,7 @@ public:
 	static int		GetLanguageIndex(CString langcode);
 	static int		GetDefLanguage();
 
-	static void		RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess);
+	static void		RunAsAdministrator(LPCWSTR strCommand, LPCWSTR strArgs, bool bWaitProcess);
 
 	void			RegisterHotkeys();
 	void			UnregisterHotkeys();

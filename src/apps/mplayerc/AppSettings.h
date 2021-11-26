@@ -875,8 +875,8 @@ public:
 	bool			ExclusiveFSAllowed() const;
 	CString			SelectedAudioRenderer() const;
 
-	void			DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize);
-	CString			SerializeHex(BYTE* pBuffer, int nBufSize) const;
+	void			DeserializeHex(LPCWSTR strVal, BYTE* pBuffer, int nBufSize);
+	CStringW		SerializeHex(BYTE* pBuffer, int nBufSize) const;
 
 	// list of temporary files
 	std::list<CString> slTMPFilesList;

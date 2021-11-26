@@ -424,7 +424,7 @@ CString CAppSettings::SelectedAudioRenderer() const
 	return strResult;
 }
 
-void CAppSettings::DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize)
+void CAppSettings::DeserializeHex(LPCWSTR strVal, BYTE* pBuffer, int nBufSize)
 {
 	long lRes;
 
@@ -434,17 +434,16 @@ void CAppSettings::DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize)
 	}
 }
 
-CString CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
+CStringW CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
 {
-	CString strTemp;
-	CString strResult;
+	CStringW str;
+	str.Preallocate(nBufSize * 2);
 
 	for (int i = 0; i < nBufSize; i++) {
-		strTemp.Format(L"%02x", pBuffer[i]);
-		strResult += strTemp;
+		str.AppendFormat(L"%02x", pBuffer[i]);
 	}
 
-	return strResult;
+	return str;
 }
 
 void CAppSettings::ResetSettings()

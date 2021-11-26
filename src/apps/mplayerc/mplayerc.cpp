@@ -1603,7 +1603,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 	AfxSetResourceHandle(hMod);
 }
 
-void CMPlayerCApp::RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess)
+void CMPlayerCApp::RunAsAdministrator(LPCWSTR strCommand, LPCWSTR strArgs, bool bWaitProcess)
 {
 	SHELLEXECUTEINFOW execinfo;
 	memset(&execinfo, 0, sizeof(execinfo));

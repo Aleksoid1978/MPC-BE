@@ -24,8 +24,8 @@
 #include "DSUtil/DSUtil.h"
 
 static BOOL CALLBACK DSEnumCallback(LPGUID lpGUID,
-	LPCTSTR lpszDesc,
-	LPCTSTR lpszDrvName,
+	LPCWSTR lpszDesc,
+	LPCWSTR lpszDrvName,
 	LPVOID lpContext)
 {
 	auto device = (AudioDevices::device_t*)lpContext;
@@ -67,7 +67,7 @@ namespace AudioDevices
 			InitDSound();
 			if (pDirectSoundEnumerate) {
 				device_t device;
-				pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumCallback, (LPVOID)&device);
+				pDirectSoundEnumerate((LPDSENUMCALLBACKW)DSEnumCallback, (LPVOID)&device);
 
 				if (!device.deviceName.IsEmpty()) {
 					if (deviceList) {
