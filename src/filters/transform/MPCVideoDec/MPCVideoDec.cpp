@@ -58,12 +58,6 @@ extern "C" {
 }
 #pragma warning(pop)
 
-#ifdef _DEBUG
-	#pragma comment(lib, "libmfx_d.lib")
-#else
-	#pragma comment(lib, "libmfx.lib")
-#endif
-
 // option names
 #define OPT_REGKEY_VideoDec  L"Software\\MPC-BE Filters\\MPC Video Decoder"
 #define OPT_SECTION_VideoDec L"Filters\\MPC Video Decoder"

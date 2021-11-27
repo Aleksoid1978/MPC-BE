@@ -126,7 +126,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -157,7 +157,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -172,7 +172,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
@@ -187,28 +187,28 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src\ExtLib\ffmpeg\compat\atomics\win32;$(SolutionDir)src;$(SolutionDir)src\ExtLib\nv-codec-headers\include;$(SolutionDir)src\ExtLib\mfx_dispatch\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference />
@@ -301,6 +301,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
       <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\mfx_dispatch\mfx_dispatch.vcxproj">
+      <Project>{b86606fd-a72d-4af3-8078-a9cdd3b08fdc}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

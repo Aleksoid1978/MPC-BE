@@ -16,15 +16,15 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2016-2019 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2016-2021 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #pragma once
 
 #include <MediaOffset3D.h>
 
-#include "./include/mfxvideo.h"
-#include "./include/mfxmvc.h"
+#include <mfxvideo.h>
+#include <mfxmvc.h>
 #include "growarray.h"
 
 #define ASYNC_DEPTH 8

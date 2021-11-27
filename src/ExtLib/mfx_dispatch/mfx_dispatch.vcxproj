@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\mfxadapter.h" />
+    <ClInclude Include="include\mfxastructures.h" />
+    <ClInclude Include="include\mfxaudio++.h" />
+    <ClInclude Include="include\mfxaudio.h" />
+    <ClInclude Include="include\mfxbrc.h" />
+    <ClInclude Include="include\mfxcamera.h" />
+    <ClInclude Include="include\mfxcommon.h" />
+    <ClInclude Include="include\mfxdefs.h" />
+    <ClInclude Include="include\mfxdispatcherprefixedfunctions.h" />
+    <ClInclude Include="include\mfxenc.h" />
+    <ClInclude Include="include\mfxfei.h" />
+    <ClInclude Include="include\mfxfeihevc.h" />
+    <ClInclude Include="include\mfxjpeg.h" />
+    <ClInclude Include="include\mfxla.h" />
+    <ClInclude Include="include\mfxmvc.h" />
+    <ClInclude Include="include\mfxpak.h" />
+    <ClInclude Include="include\mfxpcp.h" />
+    <ClInclude Include="include\mfxplugin++.h" />
+    <ClInclude Include="include\mfxplugin.h" />
+    <ClInclude Include="include\mfxsc.h" />
+    <ClInclude Include="include\mfxscd.h" />
+    <ClInclude Include="include\mfxsession.h" />
+    <ClInclude Include="include\mfxstructures.h" />
+    <ClInclude Include="include\mfxvideo++.h" />
+    <ClInclude Include="include\mfxvideo.h" />
+    <ClInclude Include="include\mfxvp8.h" />
+    <ClInclude Include="include\mfxvp9.h" />
+    <ClInclude Include="include\mfxvstructures.h" />
+    <ClInclude Include="src\mfxaudio_exposed_functions_list.h" />
+    <ClInclude Include="src\mfx_critical_section.h" />
+    <ClInclude Include="src\mfx_dispatcher.h" />
+    <ClInclude Include="src\mfx_dispatcher_defs.h" />
+    <ClInclude Include="src\mfx_dispatcher_log.h" />
+    <ClInclude Include="src\mfx_dispatcher_uwp.h" />
+    <ClInclude Include="src\mfx_driver_store_loader.h" />
+    <ClInclude Include="src\mfx_dxva2_device.h" />
+    <ClInclude Include="src\mfx_exposed_functions_list.h" />
+    <ClInclude Include="src\mfx_library_iterator.h" />
+    <ClInclude Include="src\mfx_load_dll.h" />
+    <ClInclude Include="src\mfx_load_plugin.h" />
+    <ClInclude Include="src\mfx_plugin_hive.h" />
+    <ClInclude Include="src\mfx_vector.h" />
+    <ClInclude Include="src\mfx_win_reg_key.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mfx_critical_section.cpp" />
+    <ClCompile Include="src\mfx_dispatcher.cpp" />
+    <ClCompile Include="src\mfx_dispatcher_log.cpp" />
+    <ClCompile Include="src\mfx_driver_store_loader.cpp" />
+    <ClCompile Include="src\mfx_dxva2_device.cpp" />
+    <ClCompile Include="src\mfx_function_table.cpp" />
+    <ClCompile Include="src\mfx_library_iterator.cpp" />
+    <ClCompile Include="src\mfx_load_dll.cpp" />
+    <ClCompile Include="src\mfx_load_plugin.cpp" />
+    <ClCompile Include="src\mfx_plugin_hive.cpp" />
+    <ClCompile Include="src\mfx_win_reg_key.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B86606FD-A72D-4AF3-8078-A9CDD3B08FDC}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>mfx_dispatch</RootNamespace>
+    <ProjectName>mfx_dispatch</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)src\platform.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)src\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MFX_VA;MFX_DEPRECATED_OFF;_ALLOW_MSC_VER_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_RUNTIME_LIBRARY_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_ALLOW_MSC_VER_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_RUNTIME_LIBRARY_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">./include</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MFX_VA;MFX_DEPRECATED_OFF;_ALLOW_MSC_VER_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_RUNTIME_LIBRARY_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_ALLOW_MSC_VER_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_RUNTIME_LIBRARY_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">./include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">./include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
