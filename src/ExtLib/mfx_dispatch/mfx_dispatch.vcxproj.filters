@@ -138,6 +138,9 @@
     <ClInclude Include="src\mfxaudio_exposed_functions_list.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\helper.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

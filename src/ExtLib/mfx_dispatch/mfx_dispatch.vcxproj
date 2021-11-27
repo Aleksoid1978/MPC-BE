@@ -47,6 +47,7 @@
     <ClInclude Include="include\mfxvp8.h" />
     <ClInclude Include="include\mfxvp9.h" />
     <ClInclude Include="include\mfxvstructures.h" />
+    <ClInclude Include="src\helper.h" />
     <ClInclude Include="src\mfxaudio_exposed_functions_list.h" />
     <ClInclude Include="src\mfx_critical_section.h" />
     <ClInclude Include="src\mfx_dispatcher.h" />
