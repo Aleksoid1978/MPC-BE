@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "PPageYoutube.h"
 #include "PlayerYouTube.h"
+#include "DSUtil/Filehandle.h"
 
 // CPPageYoutube dialog
 
@@ -155,7 +156,7 @@ BOOL CPPageYoutube::OnApply()
 
 	s.bYDLEnable = !!m_chkYDLEnable.GetCheck();
 	m_cbYDLExePath.GetWindowTextW(s.strYDLExePath);
-	s.strYDLExePath.Trim();
+	CleanPath(s.strYDLExePath);
 	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
 	s.bYDLMaximumQuality = !!m_chkYDLMaximumQuality.GetCheck();
 

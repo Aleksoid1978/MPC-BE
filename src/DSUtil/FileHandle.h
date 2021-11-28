@@ -46,3 +46,5 @@ CStringW GetRegAppPath(LPCWSTR appFileName, const bool bUser);
 // To move a folder, add "\" to the end of the source path.
 // To copy a folder, add "\*" to the end of the source path.
 int FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc);
+
+void CleanPath(CStringW& path);

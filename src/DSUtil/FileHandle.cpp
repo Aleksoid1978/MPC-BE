@@ -226,3 +226,12 @@ int FileOperation(const CStringW& source, const CStringW& target, const UINT wFu
 
 	return SHFileOperationW(&FileOp);
 }
+
+void CleanPath(CStringW& path)
+{
+	// remove double quotes enclosing path
+	path.Trim();
+	if (path.GetLength() >= 2 && path[0] == '\"' && path[path.GetLength() - 1] == '\"') {
+		path = path.Mid(1, path.GetLength() - 2);
+	}
+};

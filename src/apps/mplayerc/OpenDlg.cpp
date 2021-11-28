@@ -240,14 +240,6 @@ void COpenDlg::OnBnClickedOk()
 {
 	UpdateData();
 
-	auto CleanPath = [](CString& path) {
-		// remove double quotes enclosing path
-		path.Trim();
-		if (path.GetLength() >= 2 && path[0] == '\"' && path[path.GetLength() - 1] == '\"') {
-			path = path.Mid(1, path.GetLength() - 2);
-		}
-	};
-
 	CleanPath(m_path);
 	CleanPath(m_path2);
 
