@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ class CMPCPropertySheet: public CPropertySheet
 	DECLARE_DYNAMIC(CMPCPropertySheet)
 
 public:
-	CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);
+	CMPCPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);
 
 	template <class T>
 	void AddPage(T* pPage) {

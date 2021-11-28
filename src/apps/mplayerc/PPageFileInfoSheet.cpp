@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,7 @@
 #include "PPageFileMediaInfo.h"
 
 IMPLEMENT_DYNAMIC(CMPCPropertySheet, CPropertySheet)
-CMPCPropertySheet::CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
+CMPCPropertySheet::CMPCPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
 	: CPropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
 }
@@ -159,7 +159,7 @@ void CPPageFileInfoSheet::OnSaveAs()
 		if (mFile.Open(filedlg.GetPathName(), CFile::modeCreate | CFile::modeWrite)) {
 			const WCHAR bom = 0xFEFF;
 			mFile.Write(&bom, sizeof(WCHAR));
-			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(WCHAR));
+			mFile.Write(LPCWSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(WCHAR));
 			mFile.Close();
 		}
 	}

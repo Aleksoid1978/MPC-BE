@@ -75,7 +75,7 @@ CComPropertySheet::CComPropertySheet(UINT nIDCaption, CWnd* pParentWnd, UINT iSe
 	m_size.SetSize(0, 0);
 }
 
-CComPropertySheet::CComPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
+CComPropertySheet::CComPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
 	: CPropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
 	m_pSite = DNew CComPropertyPageSite(this);

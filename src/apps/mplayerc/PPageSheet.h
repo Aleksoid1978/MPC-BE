@@ -101,7 +101,7 @@ private:
 	CTreeCtrl* CreatePageTreeObject();
 
 public:
-	CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage = 0);
+	CPPageSheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT idPage = 0);
 	virtual ~CPPageSheet();
 	afx_msg void OnContextMenu(CWnd *pWnd, CPoint point);
 

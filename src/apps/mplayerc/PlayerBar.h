@@ -37,7 +37,7 @@ public:
 	CPlayerBar();
 	virtual ~CPlayerBar();
 
-	BOOL Create(LPCTSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT defDockBarID, CString const& strSettingName);
+	BOOL Create(LPCWSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT defDockBarID, CString const& strSettingName);
 
 	virtual void ReloadTranslatableResources() PURE;
 

@@ -36,7 +36,7 @@ BEGIN_MESSAGE_MAP(CPlayerBar, CSizingControlBarG)
 	ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
 
-BOOL CPlayerBar::Create(LPCTSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT defDockBarID, CString const& strSettingName)
+BOOL CPlayerBar::Create(LPCWSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT defDockBarID, CString const& strSettingName)
 {
 	m_defDockBarID = defDockBarID;
 	m_strSettingName = strSettingName;

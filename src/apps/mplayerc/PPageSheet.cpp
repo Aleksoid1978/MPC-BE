@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 
 IMPLEMENT_DYNAMIC(CPPageSheet, CTreePropSheet)
 
-CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
+CPPageSheet::CPPageSheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	: CTreePropSheet(pszCaption, pParentWnd, 0)
 	, m_bLockPage(false)
 {
