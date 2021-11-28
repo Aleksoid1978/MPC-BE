@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -179,7 +179,7 @@ LRESULT CTunerScanDlg::OnNewChannel(WPARAM wParam, LPARAM lParam)
 {
 	CDVBChannel		Channel;
 	CString			strTemp;
-	Channel.FromString ((LPCTSTR) lParam);
+	Channel.FromString ((LPCWSTR) lParam);
 
 	if (!m_bIgnoreEncryptedChannels || !Channel.IsEncrypted()) {
 		int nItem, nChannelNumber;
@@ -209,7 +209,7 @@ LRESULT CTunerScanDlg::OnNewChannel(WPARAM wParam, LPARAM lParam)
 		strTemp = Channel.IsEncrypted() ? ResStr(IDS_DVB_CHANNEL_ENCRYPTED) : ResStr(IDS_DVB_CHANNEL_NOT_ENCRYPTED);
 		m_ChannelList.SetItemText (nItem, TSCC_ENCRYPTED, strTemp);
 
-		m_ChannelList.SetItemText (nItem, TSCC_CHANNEL, (LPCTSTR) lParam);
+		m_ChannelList.SetItemText (nItem, TSCC_CHANNEL, (LPCWSTR) lParam);
 	}
 
 	return TRUE;

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -132,7 +132,7 @@ void CDVBChannel::SetName(BYTE* Value)
 	m_strName = CA2W((LPCSTR)Value);
 }
 
-void CDVBChannel::AddStreamInfo(ULONG ulPID, DVB_STREAM_TYPE nType, PES_STREAM_TYPE nPesType, LPCTSTR strLanguage)
+void CDVBChannel::AddStreamInfo(ULONG ulPID, DVB_STREAM_TYPE nType, PES_STREAM_TYPE nPesType, LPCWSTR strLanguage)
 {
 	switch (nType) {
 		case DVB_MPV :

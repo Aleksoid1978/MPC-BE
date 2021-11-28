@@ -29,11 +29,11 @@ class CItemPropertiesDlg : public CResizableDialog
 	//DECLARE_DYNAMIC(CItemPropertiesDlg)
 
 public:
-	CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent = nullptr);
+	CItemPropertiesDlg(LPCWSTR propName, LPCWSTR propPath, CWnd* pParent = nullptr);
 	virtual ~CItemPropertiesDlg();
 
-	LPCTSTR GetPropertyName() { return m_PropertyName; };
-	LPCTSTR GetPropertyPath() { return m_PropertyPath; };
+	LPCWSTR GetPropertyName() { return m_PropertyName; };
+	LPCWSTR GetPropertyPath() { return m_PropertyPath; };
 
 	enum { IDD = IDD_ITEMPROPERTIES_DIALOG };
 

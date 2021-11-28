@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,7 +59,7 @@ struct filehash {
 	UINT64 size, mpc_filehash;
 };
 
-extern bool mpc_filehash(LPCTSTR fn, filehash& fh);
+extern bool mpc_filehash(LPCWSTR fn, filehash& fh);
 extern void mpc_filehash(CPlaylist& pl, std::list<filehash>& fhs);
 extern CStringA makeargs(CPlaylist& pl);
 extern bool OpenUrl(CInternetSession& is, CString url, CStringA& str);

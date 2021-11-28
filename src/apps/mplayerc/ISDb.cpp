@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include <atlpath.h>
 #include "ISDb.h"
 
-bool mpc_filehash(LPCTSTR fn, filehash& fh)
+bool mpc_filehash(LPCWSTR fn, filehash& fh)
 {
 	CFile f;
 	CFileException fe;
@@ -34,7 +34,7 @@ bool mpc_filehash(LPCTSTR fn, filehash& fh)
 
 	CPath p(fn);
 	p.StripPath();
-	fh.name = (LPCTSTR)p;
+	fh.name = (LPCWSTR)p;
 
 	fh.size = f.GetLength();
 

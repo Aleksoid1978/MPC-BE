@@ -139,7 +139,7 @@ static void DumpStackTrace(HMODULE hDbhHelp, LPCWSTR lpFileName, _EXCEPTION_POIN
 			} else {
 				HMODULE hModule = nullptr;
 				GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-								   (LPCTSTR)(frame.AddrPC.Offset), &hModule);
+								   (LPCWSTR)(frame.AddrPC.Offset), &hModule);
 				if (hModule) {
 					wchar_t module[MAX_PATH] = {};
 					if (GetModuleFileNameW(hModule, module, MAX_PATH)) {

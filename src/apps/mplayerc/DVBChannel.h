@@ -102,7 +102,7 @@ public:
 	void			SetVideoPID(ULONG Value)	{ m_ulVideoPID = Value; };
 	void			SetDefaultAudio(int Value)	{ m_nDefaultAudio = Value;}
 
-	void			AddStreamInfo (ULONG ulPID, DVB_STREAM_TYPE nType, PES_STREAM_TYPE nPesType, LPCTSTR strLanguage);
+	void			AddStreamInfo (ULONG ulPID, DVB_STREAM_TYPE nType, PES_STREAM_TYPE nPesType, LPCWSTR strLanguage);
 
 private :
 	CString			m_strName;
