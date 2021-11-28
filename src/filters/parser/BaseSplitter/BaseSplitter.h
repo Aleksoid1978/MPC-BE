@@ -77,7 +77,7 @@ protected:
 	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, std::vector<CMediaType> mts, BOOL bNeedReconnect = FALSE);
 	virtual HRESULT DeleteOutputs();
 	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) PURE; // override this ...
-	virtual LPCTSTR GetPartFilename(IAsyncReader* pAsyncReader);
+	virtual LPCWSTR GetPartFilename(IAsyncReader* pAsyncReader);
 
 	LONGLONG m_nOpenProgress;
 	bool m_fAbort;
@@ -115,11 +115,11 @@ protected:
 	virtual bool DemuxInit() PURE;
 	virtual void DemuxSeek(REFERENCE_TIME rt) PURE;
 	virtual bool DemuxLoop() PURE;
-	virtual bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items, BOOL bReadMVCExtension = TRUE) { return false; };
-	virtual bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items) { return false; };
+	virtual bool BuildPlaylist(LPCWSTR pszFileName, CHdmvClipInfo::CPlaylist& Items, BOOL bReadMVCExtension = TRUE) { return false; };
+	virtual bool BuildChapters(LPCWSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items) { return false; };
 
 public:
-	CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid);
+	CBaseSplitterFilter(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid);
 	virtual ~CBaseSplitterFilter();
 
 	bool IsSomePinDrying();

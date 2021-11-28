@@ -39,7 +39,7 @@ interface __declspec(uuid("7D55F67A-826E-40B9-8A7D-3DF0CBBD272D"))
 IFileHandle :
 public IUnknown {
 	STDMETHOD_(HANDLE, GetFileHandle)() PURE;
-	STDMETHOD_(LPCTSTR, GetFileName)() PURE;
+	STDMETHOD_(LPCWSTR, GetFileName)() PURE;
 	STDMETHOD_(BOOL, IsValidFileName)() PURE;
 };
 
@@ -63,7 +63,7 @@ protected:
 	LONGLONG m_pos = 0;
 	CString m_url;
 
-	virtual BOOL Open(LPCTSTR lpszFileName) final;
+	virtual BOOL Open(LPCWSTR lpszFileName) final;
 	virtual ULONGLONG GetLength() final;
 
 public:
@@ -94,6 +94,6 @@ public:
 
 	// IFileHandle
 	STDMETHODIMP_(HANDLE) GetFileHandle() { return m_hFile; }
-	STDMETHODIMP_(LPCTSTR) GetFileName() { return !m_url.IsEmpty() ? m_url : (m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0]); }
+	STDMETHODIMP_(LPCWSTR) GetFileName() { return !m_url.IsEmpty() ? m_url : (m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0]); }
 	STDMETHODIMP_(BOOL) IsValidFileName() { return !m_url.IsEmpty() || !m_strFiles.empty(); }
 };

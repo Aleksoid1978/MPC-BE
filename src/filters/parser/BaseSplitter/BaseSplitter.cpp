@@ -29,7 +29,7 @@
 // CBaseSplitterFilter
 //
 
-CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
+CBaseSplitterFilter::CBaseSplitterFilter(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
 	: CBaseFilter(pName, pUnk, this, clsid)
 	, m_rtDuration(0), m_rtStart(0), m_rtStop(0), m_rtCurrent(0)
 	, m_dRate(1.0)
@@ -539,9 +539,9 @@ STDMETHODIMP CBaseSplitterFilter::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TY
 	return S_OK;
 }
 
-LPCTSTR CBaseSplitterFilter::GetPartFilename(IAsyncReader* pAsyncReader)
+LPCWSTR CBaseSplitterFilter::GetPartFilename(IAsyncReader* pAsyncReader)
 {
-	CComQIPtr<IFileHandle>	pFH = pAsyncReader;
+	CComQIPtr<IFileHandle> pFH = pAsyncReader;
 	return pFH && pFH->IsValidFileName() ? pFH->GetFileName() : m_fn;
 }
 

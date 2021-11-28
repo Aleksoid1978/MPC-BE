@@ -1563,7 +1563,7 @@ bool CMpegSplitterFilter::DemuxLoop()
 	return true;
 }
 
-bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items, BOOL bReadMVCExtension/* = TRUE*/)
+bool CMpegSplitterFilter::BuildPlaylist(LPCWSTR pszFileName, CHdmvClipInfo::CPlaylist& Items, BOOL bReadMVCExtension/* = TRUE*/)
 {
 	m_rtPlaylistDuration = 0;
 
@@ -1582,7 +1582,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 	return res;
 }
 
-bool CMpegSplitterFilter::BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items)
+bool CMpegSplitterFilter::BuildChapters(LPCWSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items)
 {
 	return SUCCEEDED(m_ClipInfo.ReadChapters(pszFileName, PlaylistItems, Items)) ? true : false;
 }

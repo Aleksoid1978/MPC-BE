@@ -38,7 +38,7 @@ public:
 	CMultiFiles();
 	virtual ~CMultiFiles();
 
-	virtual BOOL Open(LPCTSTR lpszFileName);
+	virtual BOOL Open(LPCWSTR lpszFileName);
 	virtual BOOL OpenFiles(CHdmvClipInfo::CPlaylist& files);
 
 	virtual ULONGLONG Seek(LONGLONG lOff, UINT nFrom);

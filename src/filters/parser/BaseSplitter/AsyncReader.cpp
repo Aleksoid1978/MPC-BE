@@ -55,7 +55,7 @@ STDMETHODIMP CAsyncFileReader::NonDelegatingQueryInterface(REFIID riid, void** p
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
+BOOL CAsyncFileReader::Open(LPCWSTR lpszFileName)
 {
 	if (::PathIsURLW(lpszFileName)) {
 		CUrlParser urlParser;

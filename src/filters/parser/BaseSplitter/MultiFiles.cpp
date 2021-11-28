@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ CMultiFiles::~CMultiFiles()
 	Close();
 }
 
-BOOL CMultiFiles::Open(LPCTSTR lpszFileName)
+BOOL CMultiFiles::Open(LPCWSTR lpszFileName)
 {
 	Reset();
 	m_strFiles.emplace_back(lpszFileName);
