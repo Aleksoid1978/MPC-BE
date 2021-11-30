@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,7 @@
 #include <sys\stat.h>
 #include <regex>
 
-extern LCID	ISO6392ToLcid(LPCSTR code);
+extern LCID ISO6392ToLcid(LPCSTR code);
 
 CHdmvClipInfo::CHdmvClipInfo()
 {
@@ -706,7 +706,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 
 			PlaylistItem Item;
 			Item.m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
-			if (!::PathFileExists(Item.m_strFileName)) {
+			if (!::PathFileExistsW(Item.m_strFileName)) {
 				DLog(L"    ==> '%s' is missing, skip it", Item.m_strFileName);
 
 				stnssextPos = 0;

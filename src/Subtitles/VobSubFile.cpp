@@ -1446,7 +1446,7 @@ STDMETHODIMP CVobSubFile::SetStream(int iStream)
 
 STDMETHODIMP CVobSubFile::Reload()
 {
-	if (!::PathFileExists(m_title + L".idx")) {
+	if (!::PathFileExistsW(m_title + L".idx")) {
 		return E_FAIL;
 	}
 	return !m_title.IsEmpty() && Open(m_title) ? S_OK : E_FAIL;

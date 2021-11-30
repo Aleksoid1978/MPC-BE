@@ -3342,7 +3342,7 @@ STDMETHODIMP CRenderedTextSubtitle::SetStream(int iStream)
 
 STDMETHODIMP CRenderedTextSubtitle::Reload()
 {
-	if (!::PathFileExists(m_path)) {
+	if (!::PathFileExistsW(m_path)) {
 		return E_FAIL;
 	}
 	return !m_path.IsEmpty() && Open(m_path, DEFAULT_CHARSET, m_name) ? S_OK : E_FAIL;
