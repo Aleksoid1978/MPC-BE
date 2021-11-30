@@ -8,7 +8,7 @@
 13		"FFmpeg コンパイラ :"
 14		"Libavcodec / Libavutil :"
 21		"このプログラムはフリーウェアであり、GNU 一般公衆利用許諾書 (GPL) に基づいて配布されます。"
-22		"日本語への翻訳に多くの人々が貢献しています"
+22		"日本語への翻訳に多くの方が貢献しています。"
 23		"OK"
 END
 
@@ -1288,7 +1288,7 @@ STRING IDS_AG_ZOOM_50		"拡大 50%"
 STRING IDS_AG_ZOOM_AUTO_FIT		"拡大 自動調整"
 STRING IDS_APPLY		"適用する"
 STRING IDS_APP_DESCRIPTION		"Windows OS 用の非常にパワフルな設定可能なマルチメディア プレーヤーの 1 つです。原作者は Gabest というハンガリーの開発者で、このバージョンには、排他フルスクリーン モードや Windows Vista/7 へのサポート強化といった機能の追加があります。"
-STRING IDS_ARS_ALT_CHECK_FORMAT		"Alternative check of supported format"
+STRING IDS_ARS_ALT_CHECK_FORMAT		"対応している形式の代替確認"
 STRING IDS_ARS_BITEXACT_OUTPUT		"bit-exact 出力を許可する"
 STRING IDS_ARS_CHANNELS		"チャンネル:"
 STRING IDS_ARS_CROSSFEED		"ステレオ クロスフィードを有効にする (ヘッドホン用)"
