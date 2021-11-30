@@ -2,19 +2,10 @@
 
 #include <Windows.h>
 
-typedef BOOL(WINAPI* PFNSetThreadErrorMode)(
-    _In_ DWORD dwNewMode,
-    _In_opt_ LPDWORD lpOldMode);
+typedef BOOL(WINAPI* PFNSetThreadErrorMode)(DWORD, LPDWORD);
 
 inline PFNSetThreadErrorMode LoadSetThreadErrorModeFunction()
 {
-    static auto hKernel32 = LoadLibraryW(L"Kernel32.dll");
-    if (hKernel32) {
-        static auto pSetThreadErrorMode = reinterpret_cast<PFNSetThreadErrorMode>(GetProcAddress(hKernel32, "SetThreadErrorMode"));
-        if (pSetThreadErrorMode) {
-            return pSetThreadErrorMode;
-        }
-    }
-
-    return nullptr;
+    static auto pSetThreadErrorMode = reinterpret_cast<PFNSetThreadErrorMode>(GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "SetThreadErrorMode"));
+    return pSetThreadErrorMode;
 }
