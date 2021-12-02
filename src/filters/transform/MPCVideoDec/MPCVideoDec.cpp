@@ -3327,6 +3327,22 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				}
 
 				DXVAState::SetActiveState(GUID_NULL, description);
+
+				auto frames_ctx = (AVHWFramesContext*)hw_frame->hw_frames_ctx->data;
+				if (frames_ctx->format == AV_PIX_FMT_CUDA) {
+					auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
+					auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
+					auto cuda_fns = reinterpret_cast<CudaFunctions*>(cuda_hwctx->internal->cuda_dl);
+
+					char name[256] = {};
+					auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, 0);
+					if (cuStatus == CUDA_SUCCESS) {
+						const auto deviceName = UTF8ToWStr(name);
+						if (!StartsWith(m_strDeviceDescription, deviceName.GetString())) {
+							m_strDeviceDescription = deviceName;
+						}
+					}
+				}
 			}
 		}
 
