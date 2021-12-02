@@ -600,6 +600,14 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 		return E_FAIL;
 	}
 
+	// enable multithreaded protection
+	ID3D10Multithread* pMultithread = nullptr;
+	hr = pDeviceContext->device_context->QueryInterface(&pMultithread);
+	if (SUCCEEDED(hr)) {
+		pMultithread->SetMultithreadProtected(TRUE);
+		SAFE_RELEASE(pMultithread);
+	}
+
 	// check if the connection supports native mode
 	CMediaType& mt = m_pFilter->m_pOutput->CurrentMediaType();
 	if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
