@@ -541,6 +541,10 @@ static void d3d11va_device_uninit(AVHWDeviceContext *hwdev)
         device_hwctx->lock_ctx = INVALID_HANDLE_VALUE;
         device_hwctx->lock = NULL;
     }
+
+// ==> Start patch MPC
+    memset(device_hwctx->device_name, 0, sizeof(device_hwctx->device_name));
+// ==> End patch MPC
 }
 
 static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
@@ -570,6 +574,10 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
         av_log(ctx, AV_LOG_ERROR, "Failed to load D3D11 library or its functions\n");
         return AVERROR_UNKNOWN;
     }
+
+// ==> Start patch MPC
+    memset(device_hwctx->device_name, 0, sizeof(device_hwctx->device_name));
+// ==> End patch MPC
 
     if (device) {
 // ==> Start patch MPC
@@ -602,6 +610,10 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
         DXGI_ADAPTER_DESC desc;
         hr = IDXGIAdapter2_GetDesc(pAdapter, &desc);
         if (!FAILED(hr)) {
+// ==> Start patch MPC
+            snprintf(device_hwctx->device_name, sizeof(device_hwctx->device_name), "%ls (%04X:%04X)",
+                     desc.Description, desc.VendorId, desc.DeviceId);
+// ==> End patch MPC
             av_log(ctx, AV_LOG_INFO, "Using device %04x:%04x (%ls).\n",
                    desc.VendorId, desc.DeviceId, desc.Description);
         }

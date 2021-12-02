@@ -2087,7 +2087,7 @@ redo:
 		m_pAVCtx->get_buffer2       = av_get_buffer;
 		m_pAVCtx->slice_flags      |= SLICE_FLAG_ALLOW_FIELD;
 	} else if ((m_bUseD3D11cb || m_bUseNVDEC) && m_HWPixFmt != AV_PIX_FMT_NONE) {
-		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0) < 0) {
+		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA, "0", nullptr, 0) < 0) {
 			m_HWPixFmt = AV_PIX_FMT_NONE;
 			m_bUseD3D11cb = m_bUseNVDEC = false;
 		} else {
@@ -3341,6 +3341,14 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 						if (!StartsWith(m_strDeviceDescription, deviceName.GetString())) {
 							m_strDeviceDescription = deviceName;
 						}
+					}
+				}
+
+				if (frames_ctx->format == AV_PIX_FMT_D3D11) {
+					auto device_hwctx = reinterpret_cast<AVD3D11VADeviceContext*>(frames_ctx->device_ctx->hwctx);
+					const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
+					if (!deviceName.IsEmpty()) {
+						m_strDeviceDescription = deviceName;
 					}
 				}
 			}

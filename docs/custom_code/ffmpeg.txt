@@ -36,6 +36,7 @@
 * libavfilter/allfilters.c 
 
 * libavutil/hwcontext_d3d11va.c
+* libavutil/hwcontext_d3d11va.h
 * libavutil/hwcontext_dxva2.c
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
