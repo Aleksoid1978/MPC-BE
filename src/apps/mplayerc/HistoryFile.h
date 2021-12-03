@@ -161,12 +161,22 @@ enum PlaylistType {
 	PLS_Link
 };
 
+enum PlaylistSort {
+	PLS_SORT_None = 0,
+	PLS_SORT_Name,
+	PLS_SORT_Date,
+	PLS_SORT_Size,
+	PLS_SORT_DateCreated
+};
+
 struct PlaylistInfo
 {
 	PlaylistType Type = PLS_Unknown;
 	CStringW Path;
 	CStringW Title;
 	CStringW CurItem;
+	int CurIndex = -1;
+	PlaylistSort Sorting = PLS_SORT_None;
 };
 
 class CPlaylistConfigFile : public CMpcLstFile
@@ -177,7 +187,7 @@ class CPlaylistConfigFile : public CMpcLstFile
 	bool BasicPlsContains(LPCWSTR filename);
 
 	void IntClearEntries() override;
-	void IntAddEntry(const PlaylistInfo& plsInfo);
+	void IntAddEntry(PlaylistInfo& plsInfo);
 	bool ReadFile();
 	bool WriteFile();
 

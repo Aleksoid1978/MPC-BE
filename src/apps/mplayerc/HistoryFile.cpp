@@ -645,25 +645,23 @@ void CPlaylistConfigFile::IntClearEntries()
 	m_PlaylistInfos.clear();
 }
 
-void CPlaylistConfigFile::IntAddEntry(const PlaylistInfo& plsInfo)
+void CPlaylistConfigFile::IntAddEntry(PlaylistInfo& plsInfo)
 {
-	if (plsInfo.Path.IsEmpty()) {
+	if (plsInfo.Path.IsEmpty() && plsInfo.Type != PLS_Explorer) {
 		return;
 	}
 
-	switch (plsInfo.Type) {
-	case PLS_Basic:
+	if (plsInfo.Type == PLS_Basic) {
 		if (BasicPlsContains(plsInfo.Path)) {
 			return;
 		}
 		if (!::PathFileExistsW(m_PlaylistFolder + plsInfo.Path)) {
 			return;
 		}
-		// no break here
-	case PLS_Explorer:
-	case PLS_Link:
-		m_PlaylistInfos.emplace_back(plsInfo);
+		plsInfo.Sorting = PLS_SORT_None;
 	}
+
+	m_PlaylistInfos.emplace_back(plsInfo);
 }
 
 bool CPlaylistConfigFile::ReadFile()
@@ -722,11 +720,23 @@ bool CPlaylistConfigFile::ReadFile()
 				else if (param == L"Path") {
 					plsInfo.Path = value;
 				}
-				else if (param == L"CurItem") {
-					plsInfo.Title = value;
-				}
 				else if (param == L"Title") {
 					plsInfo.Title = value;
+				}
+				else if (param == L"CurItem") {
+					plsInfo.CurItem = value;
+				}
+				else if (param == L"CurIndex") {
+					int32_t i32val;
+					if (StrToInt32(value, i32val) && i32val >= 1) {
+						plsInfo.CurIndex = i32val;
+					}
+				}
+				else if (param == L"Sorting") {
+					int32_t i32val;
+					if (StrToInt32(value, i32val) && i32val >= 1) {
+						plsInfo.Sorting = discard<PlaylistSort>((PlaylistSort)i32val, PLS_SORT_None, PLS_SORT_None, PLS_SORT_DateCreated);
+					}
 				}
 			}
 		}
@@ -756,7 +766,7 @@ bool CPlaylistConfigFile::WriteFile()
 		file.WriteString(L"; MPC-BE Playlist Config File 0.1\n");
 		int i = 1;
 		for (const auto& plsInfo : m_PlaylistInfos) {
-			if (plsInfo.Path.GetLength()) {
+			if (plsInfo.Path.GetLength() || plsInfo.Type == PLS_Explorer) {
 
 				CStringW type;
 				switch (plsInfo.Type) {
@@ -777,6 +787,12 @@ bool CPlaylistConfigFile::WriteFile()
 				}
 				if (plsInfo.CurItem.GetLength()) {
 					str.AppendFormat(L"CurItem=%s\n", plsInfo.CurItem);
+				}
+				if (plsInfo.CurIndex > 0) {
+					str.AppendFormat(L"CurIndex=%d\n", plsInfo.CurIndex);
+				}
+				if (plsInfo.Sorting > 0) {
+					str.AppendFormat(L"CurIndex=%d\n", plsInfo.CurIndex);
 				}
 
 				file.WriteString(str);
