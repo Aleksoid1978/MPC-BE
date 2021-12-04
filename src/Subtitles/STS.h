@@ -219,7 +219,7 @@ public:
 };
 
 extern BYTE CharSetList[];
-extern WCHAR* CharSetNames[];
+extern const WCHAR* CharSetNames[];
 extern int CharSetLen;
 
 class CHtmlColorMap : public CAtlMap<CString, DWORD, CStringElementTraits<CString> >

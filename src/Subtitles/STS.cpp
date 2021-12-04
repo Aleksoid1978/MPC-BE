@@ -31,7 +31,7 @@
 using std::wstring;
 
 static struct htmlcolor {
-	WCHAR* name;
+	LPCWSTR name;
 	DWORD color;
 } htmlcolors[] = {
 	{L"white", 0xffffff},
@@ -214,7 +214,7 @@ BYTE CharSetList[] = {
 	BALTIC_CHARSET
 };
 
-WCHAR* CharSetNames[] = {
+const WCHAR* CharSetNames[] = {
 	L"ANSI",
 	L"DEFAULT",
 	L"SYMBOL",
@@ -951,11 +951,11 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 				i = j;
 
 				if (tag == L"font") {
-					font = def.fontName.CompareNoCase(param) ? param : L"";
+					def.fontName.CompareNoCase(param) ? font.SetString(param) : font.Empty();
 				} else if (tag == L"colf") {
-					color = def.colors[0] != (DWORD)wcstol(((LPCWSTR)param)+2, 0, 16) ? param : L"";
+					def.colors[0] != (DWORD)wcstol(((LPCWSTR)param)+2, 0, 16) ? color.SetString(param) : color.Empty();
 				} else if (tag == L"size") {
-					size = def.fontSize != (double)wcstol(param, 0, 10) ? param : L"";
+					def.fontSize != (double)wcstol(param, 0, 10) ? size.SetString(param) : size.Empty();
 				} else if (tag == L"style") {
 					if (param.Find(L"no") >= 0) {
 						fBold = fItalic = fStriked = fUnderline = false;
@@ -3063,7 +3063,7 @@ bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name, CString vi
 	return Open(&f, CharSet, name);
 }
 
-static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s = CString())
+static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s)
 {
 	size_t n = 0;
 	f->Seek(from, CFile::begin);

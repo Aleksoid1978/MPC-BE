@@ -72,7 +72,7 @@ CMyFont::CMyFont(STSStyle& style)
 
 // CWord
 
-CWord::CWord(STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley,
+CWord::CWord(const STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley,
 			 RenderingCaches& renderingCaches)
 	: m_style(style)
 	, m_str(str)
@@ -534,7 +534,7 @@ bool CText::CreatePath()
 
 // CPolygon
 
-CPolygon::CPolygon(STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley, int baseline,
+CPolygon::CPolygon(const STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley, int baseline,
 				   RenderingCaches& renderingCaches)
 	: CWord(style, str, ktype, kstart, kend, scalex, scaley, renderingCaches)
 	, m_baseline(baseline)
@@ -1895,7 +1895,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 					if (!s.IsEmpty()) {
 						tag.params.Add(s);
 					}
-					param = k + 1 < param.GetLength() ? param.Mid(k + 1) : L"";
+					param = param.Mid(k + 1);
 				} else {
 					FastTrim(param);
 					if (!param.IsEmpty()) {

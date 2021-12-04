@@ -150,7 +150,7 @@ public:
 	int m_width, m_ascent, m_descent;
 
 	// str[0] = 0 -> m_fLineBreak = true (in this case we only need and use the height of m_font from the whole class)
-	CWord(STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley,
+	CWord(const STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley,
 		  RenderingCaches& renderingCaches);
 	virtual ~CWord();
 
@@ -190,7 +190,7 @@ protected:
 	virtual bool CreatePath();
 
 public:
-	CPolygon(STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley, int baseline,
+	CPolygon(const STSStyle& style, CStringW str, int ktype, int kstart, int kend, double scalex, double scaley, int baseline,
 			 RenderingCaches& renderingCaches);
 	CPolygon(CPolygon&); // can't use a const reference because we need to use CAtlArray::Copy which expects a non-const reference
 	virtual ~CPolygon();
@@ -223,7 +223,7 @@ public:
 	CClipper(CStringW str, const CSize& size, double scalex, double scaley, bool inverse, const CPoint& cpOffset,
 			 RenderingCaches& renderingCaches);
 
-	void CClipper::SetEffect(const Effect& effect, int effectType) {
+	void SetEffect(const Effect& effect, int effectType) {
 		m_effectType = effectType;
 		m_effect = effect;
 	}
