@@ -48,3 +48,5 @@ CStringW GetRegAppPath(LPCWSTR appFileName, const bool bUser);
 int FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc);
 
 void CleanPath(CStringW& path);
+
+bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);

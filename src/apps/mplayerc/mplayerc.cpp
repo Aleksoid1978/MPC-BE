@@ -30,7 +30,6 @@
 #include <psapi.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
-#include "DSUtil/WinAPIUtils.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/FileVersion.h"

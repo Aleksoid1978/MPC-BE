@@ -23,7 +23,6 @@
 #include "Misc.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/SysVersion.h"
-#include "DSUtil/WinAPIUtils.h"
 #include <psapi.h>
 #include <HighDPI.h>
 #include "PPageFormats.h"

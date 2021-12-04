@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,4 +21,3 @@
 #pragma once
 
 bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
-bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);

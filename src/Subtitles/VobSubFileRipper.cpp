@@ -23,7 +23,7 @@
 #include "VobSubFileRipper.h"
 #include "filters/transform/DeCSSFilter/VobDec.h"
 #include "CCDecoder.h"
-#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/FileHandle.h"
 
 //
 // CVobSubFileRipper

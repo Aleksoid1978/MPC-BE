@@ -26,7 +26,7 @@
 #include "Subtitles/TextFile.h"
 #include "WebClient.h"
 #include "DIB.h"
-#include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/FileHandle.h"
 
 CWebClientSocket::CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame)
 	: m_pWebServer(pWebServer)

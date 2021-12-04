@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFullscreen.h"
-#include "DSUtil/WinAPIUtils.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/std_helper.h"
 #include "MultiMonitor.h"

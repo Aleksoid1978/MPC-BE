@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileMediaInfo.h"
-#include "DSUtil/WinAPIUtils.h"
 
 static String mi_get_lang_file()
 {

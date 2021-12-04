@@ -23,7 +23,6 @@
 #include "Misc.h"
 #include <DbgHelp.h>
 #include "DSUtil/FileHandle.h"
-#include "DSUtil/WinAPIUtils.h"
 
 typedef BOOL(WINAPI* tpSymInitialize)(
 	_In_ HANDLE hProcess,

@@ -26,7 +26,6 @@
 #include <afxglobals.h>
 #include <..\src\mfc\afximpl.h>
 
-#include "DSUtil/WinAPIUtils.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/Filehandle.h"
 #include "DSUtil/FileVersion.h"

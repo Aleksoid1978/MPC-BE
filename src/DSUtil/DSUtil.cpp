@@ -739,16 +739,18 @@ void ShowPPage(IUnknown* pUnk, HWND hParentWnd)
 		return;
 	}
 
-	CString str;
+	CStringW str;
 
-	CComQIPtr<IBaseFilter> pBF = pSPP;
+	CComQIPtr<IBaseFilter> pBF(pSPP);
 	CFilterInfo fi;
-	CComQIPtr<IPin> pPin = pSPP;
-	CPinInfo pi;
 	if (pBF && SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
 		str = fi.achName;
-	} else if (pPin && SUCCEEDED(pPin->QueryPinInfo(&pi))) {
-		str = pi.achName;
+	} else {
+		CComQIPtr<IPin> pPin = pSPP;
+		CPinInfo pi;
+		if (pPin && SUCCEEDED(pPin->QueryPinInfo(&pi))) {
+			str = pi.achName;
+		}
 	}
 
 	CAUUID caGUID;
@@ -757,7 +759,7 @@ void ShowPPage(IUnknown* pUnk, HWND hParentWnd)
 		IUnknown* lpUnk = nullptr;
 		pSPP.QueryInterface(&lpUnk);
 		MyOleCreatePropertyFrame(
-			hParentWnd, 0, 0, CStringW(str),
+			hParentWnd, 0, 0, str,
 			1, (IUnknown**)&lpUnk,
 			caGUID.cElems, caGUID.pElems,
 			0, 0, nullptr);

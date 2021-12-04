@@ -162,9 +162,9 @@ template<class T>
 T& FastTrimRight(T& str)
 {
 	if (!str.IsEmpty()) {
-		T::PCXSTR szStart = str;
-		T::PCXSTR szEnd   = szStart + str.GetLength() - 1;
-		T::PCXSTR szCur   = szEnd;
+		typename T::PCXSTR szStart = str;
+		typename T::PCXSTR szEnd   = szStart + str.GetLength() - 1;
+		typename T::PCXSTR szCur   = szEnd;
 		for (; szCur >= szStart; szCur--) {
 			if (!T::StrTraits::IsSpace(*szCur) || *szCur == 133) { // allow ellipsis character
 				break;
