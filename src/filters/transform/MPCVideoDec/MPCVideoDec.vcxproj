@@ -149,7 +149,6 @@
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
       <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <IgnoreSpecificDefaultLibraries>libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
