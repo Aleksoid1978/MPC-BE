@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -37,59 +35,57 @@ class Vector
 public:
 	float x, y, z;
 
-	Vector() {
-		x = y = z = 0;
-	}
+	Vector() { x = y = z = 0.0f; }
 	Vector(float x, float y, float z);
 	void Set(float x, float y, float z);
 
-	Vector Normal(Vector& a, Vector& b);
-	float Angle(Vector& a, Vector& b);
-	float Angle(Vector& a);
-	void Angle(float& u, float& v);	// returns spherical coords in radian, -M_PI_2 <= u <= M_PI_2, -M_PI <= v <= M_PI
-	Vector Angle();					// does like prev., returns 'u' in 'ret.x', and 'v' in 'ret.y'
+	Vector Normal(const Vector& a, const Vector& b) const;
+	float Angle(const Vector& a, const Vector& b) const;
+	float Angle(const Vector& a) const;
+	void Angle(float& u, float& v) const;   // returns spherical coords in radian, -M_PI_2 <= u <= M_PI_2, -M_PI <= v <= M_PI
+	Vector Angle() const;                   // does like prev., returns 'u' in 'ret.x', and 'v' in 'ret.y'
 
-	Vector Unit();
+	Vector Unit() const;
 	Vector& Unitalize();
-	float Length();
-	float Sum();		// x + y + z
-	float CrossSum();	// xy + xz + yz
-	Vector Cross();		// xy, xz, yz
-	Vector Pow(float exp);
+	float Length() const;
+	float Sum() const;                      // x + y + z
+	float CrossSum() const;                 // xy + xz + yz
+	Vector Cross() const;                   // xy, xz, yz
+	Vector Pow(float exp) const;
 
-	Vector& Min(Vector& a);
-	Vector& Max(Vector& a);
-	Vector Abs();
+	Vector& Min(const Vector& a);
+	Vector& Max(const Vector& a);
+	Vector Abs() const;
 
-	Vector Reflect(Vector& n);
-	Vector Refract(Vector& n, float nFront, float nBack, float* nOut = NULL);
-	Vector Refract2(Vector& n, float nFrom, float nTo, float* nOut = NULL);
+	Vector Reflect(const Vector& n) const;
+	Vector Refract(const Vector& n, float nFront, float nBack, float* nOut = nullptr) const;
+	Vector Refract2(const Vector& n, float nFrom, float nTo, float* nOut = nullptr) const;
 
-	Vector operator - ();
-	float& operator [] (size_t i);
+	Vector operator - () const;
+	float& operator [](size_t i);
 
-	float operator | (Vector& v);	// dot
-	Vector operator % (Vector& v);	// cross
+	float operator | (const Vector& v) const;   // dot
+	Vector operator % (const Vector& v) const;  // cross
 
 	bool operator == (const Vector& v) const;
 	bool operator != (const Vector& v) const;
 
-	Vector operator + (float d);
-	Vector operator + (Vector& v);
-	Vector operator - (float d);
-	Vector operator - (Vector& v);
-	Vector operator * (float d);
-	Vector operator * (Vector& v);
-	Vector operator / (float d);
-	Vector operator / (Vector& v);
+	Vector operator + (float d) const;
+	Vector operator + (const Vector& v) const;
+	Vector operator - (float d) const;
+	Vector operator - (const Vector& v) const;
+	Vector operator * (float d) const;
+	Vector operator * (const Vector& v) const;
+	Vector operator / (float d) const;
+	Vector operator / (const Vector& v) const;
 	Vector& operator += (float d);
-	Vector& operator += (Vector& v);
+	Vector& operator += (const Vector& v);
 	Vector& operator -= (float d);
 	Vector& operator -= (Vector& v);
 	Vector& operator *= (float d);
-	Vector& operator *= (Vector& v);
+	Vector& operator *= (const Vector& v);
 	Vector& operator /= (float d);
-	Vector& operator /= (Vector& v);
+	Vector& operator /= (const Vector& v);
 
 	template<typename T> static float DegToRad(T angle) { return (float)(angle * M_PI / 180); }
 };
@@ -100,13 +96,13 @@ public:
 	Vector p, d;
 
 	Ray() {}
-	Ray(Vector& p, Vector& d);
-	void Set(Vector& p, Vector& d);
+	Ray(const Vector& p, const Vector& d);
+	void Set(const Vector& p, const Vector& d);
 
-	float GetDistanceFrom(Ray& r);		// r = plane
-	float GetDistanceFrom(Vector& v);	// v = point
+	float GetDistanceFrom(const Ray& r) const;      // r = plane
+	float GetDistanceFrom(const Vector& v) const;   // v = point
 
-	Vector operator [] (float t);
+	Vector operator [](float t) const;
 };
 
 class XForm
@@ -117,31 +113,31 @@ class XForm
 		float mat[4][4];
 
 		Matrix();
-		void Initalize();
 
-		Matrix operator * (Matrix& m);
+		Matrix operator * (const Matrix& m) const;
 		Matrix& operator *= (Matrix& m);
+		bool operator == (const Matrix& m) const;
 	} m;
 
 	bool m_isWorldToLocal;
 
 public:
-	XForm() : m_isWorldToLocal(true) {}
-	XForm(Ray& r, Vector& s, bool isWorldToLocal = true);
+	XForm() : m_isWorldToLocal(false) {}
+	XForm(const Ray& r, const Vector& s, bool isWorldToLocal = true);
 
-	void Initalize();
-	void Initalize(Ray& r, Vector& s, bool isWorldToLocal = true);
+	void operator *= (const Vector& s);         // scale
+	void operator += (const Vector& t);         // translate
+	void operator <<= (const Vector& r);        // rotate
 
-	void operator *= (Vector& s);	// scale
-	void operator += (Vector& t);	// translate
-	void operator <<= (Vector& r);	// rotate
+	void operator /= (const Vector& s);         // scale
+	void operator -= (const Vector& t);         // translate
+	void operator >>= (const Vector& r);        // rotate
 
-	void operator /= (Vector& s);	// scale
-	void operator -= (Vector& t);	// translate
-	void operator >>= (Vector& r);	// rotate
+	bool operator == (const XForm& x) const;    // compare
+	bool operator != (const XForm& x) const;
 
-	//	transformations
-	Vector operator < (Vector& n);	// normal
-	Vector operator << (Vector& v);	// vector
-	Ray operator << (Ray& r);		// ray
+	// transformations
+	Vector operator < (const Vector& n) const;  // normal
+	Vector operator << (const Vector& v) const; // vector
+	Ray operator << (const Ray& r) const;       // ray
 };
