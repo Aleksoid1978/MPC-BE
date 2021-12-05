@@ -90,7 +90,7 @@ BOOL CMPCSocket::Connect(const CUrlParser& urlParser, const BOOL bConnectOnly/* 
 	}
 
 	if (!__super::Connect(
-			m_bProxyEnable ? m_sProxyServer : urlParser.GetHostName(),
+			m_bProxyEnable ? m_sProxyServer.GetString() : urlParser.GetHostName(),
 			m_bProxyEnable ? m_nProxyPort : urlParser.GetPortNumber())) {
 		KillTimeOut();
 		return FALSE;

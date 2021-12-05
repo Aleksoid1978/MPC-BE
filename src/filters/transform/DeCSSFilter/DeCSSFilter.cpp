@@ -80,7 +80,7 @@ CFilterApp theApp;
 class CKsPSInputPin : public CDeCSSInputPin
 {
 public:
-	CKsPSInputPin(LPCWSTR pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
+	CKsPSInputPin(LPCWSTR pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 		: CDeCSSInputPin(pObjectName, pFilter, phr, pName) {
 	}
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2020 see Authors.txt
+ * (C) 2011-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@ struct Chapters {
 	CString        name;
 	REFERENCE_TIME rt = 0;
 
-	Chapters::Chapters(const CString& _name, const REFERENCE_TIME _rt)
+	Chapters(const CString& _name, const REFERENCE_TIME _rt)
 		: name(_name)
 		, rt(_rt)
 	{}

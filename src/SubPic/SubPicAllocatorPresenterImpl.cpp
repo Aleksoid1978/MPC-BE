@@ -436,7 +436,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitle
 		return hr;
 	}
 
-	if (CComQIPtr<ISubRenderConsumer> pSubConsumer = m_pSubPicQueue) {
+	if (CComQIPtr<ISubRenderConsumer> pSubConsumer = m_pSubPicQueue.p) {
 		hr = pSubConsumer->Connect(subtitleRenderer);
 	} else {
 		CComPtr<ISubPicProvider> pSubPicProvider = (ISubPicProvider*)DNew CXySubPicProvider(subtitleRenderer);
@@ -463,7 +463,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::DeliverFrame(REFERENCE_TIME start, R
 {
 	HRESULT hr = E_FAIL;
 
-	if (CComQIPtr<IXyCompatProvider> pXyProvider = m_pSubPicProvider) {
+	if (CComQIPtr<IXyCompatProvider> pXyProvider = m_pSubPicProvider.p) {
 		hr = pXyProvider->DeliverFrame(start + m_rtSubtitleDelay, stop + m_rtSubtitleDelay, context, subtitleFrame);
 	}
 

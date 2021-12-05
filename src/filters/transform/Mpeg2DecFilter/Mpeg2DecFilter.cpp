@@ -1217,7 +1217,7 @@ STDMETHODIMP_(bool) CMpeg2DecFilter::IsReadARFromStreamEnabled()
 // CMpeg2DecInputPin
 //
 
-CMpeg2DecInputPin::CMpeg2DecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
+CMpeg2DecInputPin::CMpeg2DecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CDeCSSInputPin(L"CMpeg2DecInputPin", pFilter, phr, pName)
 {
 }

@@ -542,7 +542,7 @@ STDMETHODIMP CBaseSplitterFilter::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TY
 LPCWSTR CBaseSplitterFilter::GetPartFilename(IAsyncReader* pAsyncReader)
 {
 	CComQIPtr<IFileHandle> pFH = pAsyncReader;
-	return pFH && pFH->IsValidFileName() ? pFH->GetFileName() : m_fn;
+	return pFH && pFH->IsValidFileName() ? pFH->GetFileName() : m_fn.GetString();
 }
 
 // IMediaSeeking

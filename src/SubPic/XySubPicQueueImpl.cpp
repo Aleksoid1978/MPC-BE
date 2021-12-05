@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,7 +60,7 @@ STDMETHODIMP_(bool) CXySubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, b
 	CComPtr<ISubPic> pSubPic;
 	CComPtr<ISubPicProvider> pSubPicProvider;
 	GetSubPicProvider(&pSubPicProvider);
-	CComQIPtr<IXyCompatProvider> pXySubPicProvider = pSubPicProvider;
+	CComQIPtr<IXyCompatProvider> pXySubPicProvider(pSubPicProvider);
 
 	{
 		CAutoLock cAutoLock(&m_csLock);

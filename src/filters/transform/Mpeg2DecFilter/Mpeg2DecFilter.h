@@ -201,7 +201,7 @@ class CMpeg2DecInputPin : public CDeCSSInputPin
 	LONG m_CorrectTS = 0;
 
 public:
-	CMpeg2DecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName);
+	CMpeg2DecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPCWSTR pName);
 
 	CCritSec m_csRateLock;
 	AM_SimpleRateChange m_ratechange = { _I64_MAX, 10000 };

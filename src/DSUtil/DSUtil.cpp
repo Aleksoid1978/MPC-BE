@@ -746,7 +746,7 @@ void ShowPPage(IUnknown* pUnk, HWND hParentWnd)
 	if (pBF && SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
 		str = fi.achName;
 	} else {
-		CComQIPtr<IPin> pPin = pSPP;
+		CComQIPtr<IPin> pPin(pSPP);
 		CPinInfo pi;
 		if (pPin && SUCCEEDED(pPin->QueryPinInfo(&pi))) {
 			str = pi.achName;

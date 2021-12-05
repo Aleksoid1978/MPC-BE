@@ -189,7 +189,7 @@ STDMETHODIMP CMatroskaSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 }
 
 #define MATROSKA_VIDEO_STEREOMODE 15
-static const LPWSTR matroska_stereo_mode[MATROSKA_VIDEO_STEREOMODE] = {
+static LPCWSTR matroska_stereo_mode[MATROSKA_VIDEO_STEREOMODE] = {
 	L"mono",
 	L"sbs_lr",
 	L"tb_rl",
