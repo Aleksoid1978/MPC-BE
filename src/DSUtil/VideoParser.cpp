@@ -195,213 +195,217 @@ namespace AVCParser {
 		static BYTE levels[] = { 10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51, 52, 60, 61, 62 };
 
 		CGolombBuffer gb(data, size, true);
-
 		params.clear();
 
-		params.profile = gb.BitRead(8);
-		if (std::find(std::cbegin(profiles), std::cend(profiles), params.profile) == std::cend(profiles)) {
-			goto error;
-		}
-
-		gb.BitRead(8);
-		params.level = gb.BitRead(8);
-		if (std::find(std::cbegin(levels), std::cend(levels), params.level) == std::cend(levels)) {
-			goto error;
-		}
-
-		UINT64 sps_id = gb.UExpGolombRead();	// seq_parameter_set_id
-		if (sps_id >= 32) {
-			goto error;
-		}
-
-		UINT64 chroma_format_idc = 0;
-		if (params.profile >= 100) {					// high profile
-			chroma_format_idc = gb.UExpGolombRead();
-			if (chroma_format_idc == 3) {		// chroma_format_idc
-				gb.BitRead(1);					// residue_transform_flag
+		do {
+			params.profile = gb.BitRead(8);
+			if (std::find(std::cbegin(profiles), std::cend(profiles), params.profile) == std::cend(profiles)) {
+				break;
 			}
 
-			gb.UExpGolombRead();				// bit_depth_luma_minus8
-			gb.UExpGolombRead();				// bit_depth_chroma_minus8
+			gb.BitRead(8);
+			params.level = gb.BitRead(8);
+			if (std::find(std::cbegin(levels), std::cend(levels), params.level) == std::cend(levels)) {
+				break;
+			}
 
-			gb.BitRead(1);						// qpprime_y_zero_transform_bypass_flag
+			UINT64 sps_id = gb.UExpGolombRead();	// seq_parameter_set_id
+			if (sps_id >= 32) {
+				break;
+			}
 
-			if (gb.BitRead(1)) {				// seq_scaling_matrix_present_flag
-				for (int i = 0; i < 8; i++) {
-					if (gb.BitRead(1)) {		// seq_scaling_list_present_flag
-						for (int j = 0, size = i < 6 ? 16 : 64, next = 8; j < size && next != 0; ++j) {
-							next = (next + gb.SExpGolombRead() + 256) & 255;
+			UINT64 chroma_format_idc = 0;
+			if (params.profile >= 100) {			// high profile
+				chroma_format_idc = gb.UExpGolombRead();
+				if (chroma_format_idc == 3) {		// chroma_format_idc
+					gb.BitRead(1);					// residue_transform_flag
+				}
+
+				gb.UExpGolombRead();				// bit_depth_luma_minus8
+				gb.UExpGolombRead();				// bit_depth_chroma_minus8
+
+				gb.BitRead(1);						// qpprime_y_zero_transform_bypass_flag
+
+				if (gb.BitRead(1)) {				// seq_scaling_matrix_present_flag
+					for (int i = 0; i < 8; i++) {
+						if (gb.BitRead(1)) {		// seq_scaling_list_present_flag
+							for (int j = 0, size = i < 6 ? 16 : 64, next = 8; j < size && next != 0; ++j) {
+								next = (next + gb.SExpGolombRead() + 256) & 255;
+							}
 						}
 					}
 				}
 			}
-		}
 
-		gb.UExpGolombRead();					// log2_max_frame_num_minus4
+			gb.UExpGolombRead();					// log2_max_frame_num_minus4
 
-		UINT64 pic_order_cnt_type = gb.UExpGolombRead();
+			UINT64 pic_order_cnt_type = gb.UExpGolombRead();
 
-		if (pic_order_cnt_type == 0) {
-			gb.UExpGolombRead();				// log2_max_pic_order_cnt_lsb_minus4
-		} else if (pic_order_cnt_type == 1) {
-			gb.BitRead(1);						// delta_pic_order_always_zero_flag
-			gb.SExpGolombRead();				// offset_for_non_ref_pic
-			gb.SExpGolombRead();				// offset_for_top_to_bottom_field
-			UINT64 num_ref_frames_in_pic_order_cnt_cycle = gb.UExpGolombRead();
-			if (num_ref_frames_in_pic_order_cnt_cycle >= 256) {
-				goto error;
+			if (pic_order_cnt_type == 0) {
+				gb.UExpGolombRead();				// log2_max_pic_order_cnt_lsb_minus4
 			}
-			for (int i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++) {
-				gb.SExpGolombRead();			// offset_for_ref_frame[i]
-			}
-		} else if (pic_order_cnt_type != 2) {
-			goto error;
-		}
-
-		UINT64 ref_frame_count = gb.UExpGolombRead();	// num_ref_frames
-		if (ref_frame_count > 30) {
-			goto error;
-		}
-		gb.BitRead(1);									// gaps_in_frame_num_value_allowed_flag
-
-		UINT64 pic_width_in_mbs_minus1 = gb.UExpGolombRead();
-		UINT64 pic_height_in_map_units_minus1 = gb.UExpGolombRead();
-		params.interlaced = !gb.BitRead(1);
-
-		if (params.interlaced) {						// !frame_mbs_only_flag
-			gb.BitRead(1);								// mb_adaptive_frame_field_flag
-		}
-
-		BYTE direct_8x8_inference_flag = (BYTE)gb.BitRead(1); // direct_8x8_inference_flag
-		if (params.interlaced && !direct_8x8_inference_flag) {
-			goto error;
-		}
-
-		UINT crop_left, crop_right, crop_top, crop_bottom;
-		crop_left = crop_right = crop_top = crop_bottom = 0;
-		const bool frame_cropping_flag = gb.BitRead(1);
-		if (frame_cropping_flag) {				// frame_cropping_flag
-			crop_left	= gb.UExpGolombRead();	// frame_cropping_rect_left_offset
-			crop_right	= gb.UExpGolombRead();	// frame_cropping_rect_right_offset
-			crop_top	= gb.UExpGolombRead();	// frame_cropping_rect_top_offset
-			crop_bottom	= gb.UExpGolombRead();	// frame_cropping_rect_bottom_offset
-		}
-
-		if (gb.BitRead(1)) {							// vui_parameters_present_flag
-			if (gb.BitRead(1)) {						// aspect_ratio_info_present_flag
-				BYTE aspect_ratio_idc = (BYTE)gb.BitRead(8); // aspect_ratio_idc
-				if (255 == aspect_ratio_idc) {
-					params.sar.num = (WORD)gb.BitRead(16);	// sar_width
-					params.sar.den = (WORD)gb.BitRead(16);	// sar_height
-				} else if (aspect_ratio_idc < std::size(pixel_aspect)) {
-					params.sar.num = pixel_aspect[aspect_ratio_idc][0];
-					params.sar.den = pixel_aspect[aspect_ratio_idc][1];
-				} else {
-					goto error;
+			else if (pic_order_cnt_type == 1) {
+				gb.BitRead(1);						// delta_pic_order_always_zero_flag
+				gb.SExpGolombRead();				// offset_for_non_ref_pic
+				gb.SExpGolombRead();				// offset_for_top_to_bottom_field
+				UINT64 num_ref_frames_in_pic_order_cnt_cycle = gb.UExpGolombRead();
+				if (num_ref_frames_in_pic_order_cnt_cycle >= 256) {
+					break;
+				}
+				for (unsigned i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++) {
+					gb.SExpGolombRead();			// offset_for_ref_frame[i]
 				}
 			}
-
-			if (gb.BitRead(1)) {				// overscan_info_present_flag
-				gb.BitRead(1);					// overscan_appropriate_flag
+			else if (pic_order_cnt_type != 2) {
+				break;
 			}
 
-			if (gb.BitRead(1)) {				// video_signal_type_present_flag
-				gb.BitRead(3);					// video_format
-				gb.BitRead(1);					// video_full_range_flag
-				if (gb.BitRead(1)) {			// colour_description_present_flag
-					gb.BitRead(8);				// colour_primaries
-					gb.BitRead(8);				// transfer_characteristics
-					gb.BitRead(8);				// matrix_coefficients
+			UINT64 ref_frame_count = gb.UExpGolombRead(); // num_ref_frames
+			if (ref_frame_count > 30) {
+				break;
+			}
+			gb.BitRead(1);							// gaps_in_frame_num_value_allowed_flag
+
+			UINT64 pic_width_in_mbs_minus1 = gb.UExpGolombRead();
+			UINT64 pic_height_in_map_units_minus1 = gb.UExpGolombRead();
+			params.interlaced = !gb.BitRead(1);
+
+			if (params.interlaced) {				// !frame_mbs_only_flag
+				gb.BitRead(1);						// mb_adaptive_frame_field_flag
+			}
+
+			BYTE direct_8x8_inference_flag = (BYTE)gb.BitRead(1); // direct_8x8_inference_flag
+			if (params.interlaced && !direct_8x8_inference_flag) {
+				break;
+			}
+
+			UINT crop_left, crop_right, crop_top, crop_bottom;
+			const bool frame_cropping_flag = gb.BitRead(1);
+			if (frame_cropping_flag) {				// frame_cropping_flag
+				crop_left   = gb.UExpGolombRead();	// frame_cropping_rect_left_offset
+				crop_right  = gb.UExpGolombRead();	// frame_cropping_rect_right_offset
+				crop_top    = gb.UExpGolombRead();	// frame_cropping_rect_top_offset
+				crop_bottom = gb.UExpGolombRead();	// frame_cropping_rect_bottom_offset
+			} else {
+				crop_left = crop_right = crop_top = crop_bottom = 0;
+			}
+
+			if (gb.BitRead(1)) {					// vui_parameters_present_flag
+				if (gb.BitRead(1)) {				// aspect_ratio_info_present_flag
+					BYTE aspect_ratio_idc = (BYTE)gb.BitRead(8); // aspect_ratio_idc
+					if (255 == aspect_ratio_idc) {
+						params.sar.num = (WORD)gb.BitRead(16); // sar_width
+						params.sar.den = (WORD)gb.BitRead(16); // sar_height
+					}
+					else if (aspect_ratio_idc < std::size(pixel_aspect)) {
+						params.sar.num = pixel_aspect[aspect_ratio_idc][0];
+						params.sar.den = pixel_aspect[aspect_ratio_idc][1];
+					} else {
+						break;
+					}
 				}
-			}
-			if (gb.BitRead(1)) {				// chroma_location_info_present_flag
-				gb.UExpGolombRead();			// chroma_sample_loc_type_top_field
-				gb.UExpGolombRead();			// chroma_sample_loc_type_bottom_field
-			}
-			if (gb.BitRead(1)) {				// timing_info_present_flag
-				UINT32 num_units_in_tick = gb.BitRead(32);
-				UINT32 time_scale = gb.BitRead(32);
-				BYTE fixed_frame_rate_flag = gb.BitRead(1);
 
-				if (fixed_frame_rate_flag
+				if (gb.BitRead(1)) {				// overscan_info_present_flag
+					gb.BitRead(1);					// overscan_appropriate_flag
+				}
+
+				if (gb.BitRead(1)) {				// video_signal_type_present_flag
+					gb.BitRead(3);					// video_format
+					gb.BitRead(1);					// video_full_range_flag
+					if (gb.BitRead(1)) {			// colour_description_present_flag
+						gb.BitRead(8);				// colour_primaries
+						gb.BitRead(8);				// transfer_characteristics
+						gb.BitRead(8);				// matrix_coefficients
+					}
+				}
+				if (gb.BitRead(1)) {				// chroma_location_info_present_flag
+					gb.UExpGolombRead();			// chroma_sample_loc_type_top_field
+					gb.UExpGolombRead();			// chroma_sample_loc_type_bottom_field
+				}
+				if (gb.BitRead(1)) {				// timing_info_present_flag
+					UINT32 num_units_in_tick = gb.BitRead(32);
+					UINT32 time_scale = gb.BitRead(32);
+					BYTE fixed_frame_rate_flag = gb.BitRead(1);
+
+					if (fixed_frame_rate_flag
 						&& num_units_in_tick && time_scale) {
-					params.AvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * num_units_in_tick * 2 / time_scale);
+						params.AvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * num_units_in_tick * 2 / time_scale);
+					}
+				}
+
+				bool nalflag = !!gb.BitRead(1);		// nal_hrd_parameters_present_flag
+				if (nalflag) {
+					if (!ParseHrdParameters(gb)) {
+						break;
+					}
+				}
+				bool vlcflag = !!gb.BitRead(1);		// vlc_hrd_parameters_present_flag
+				if (vlcflag) {
+					if (!ParseHrdParameters(gb)) {
+						break;
+					}
+				}
+				if (nalflag || vlcflag) {
+					gb.BitRead(1);					// low_delay_hrd_flag
+				}
+
+				gb.BitRead(1);						// pic_struct_present_flag
+				if (!gb.IsEOF() && gb.BitRead(1)) {	// bitstream_restriction_flag
+					gb.BitRead(1);					// motion_vectors_over_pic_boundaries_flag
+					gb.UExpGolombRead();			// max_bytes_per_pic_denom
+					gb.UExpGolombRead();			// max_bits_per_mb_denom
+					gb.UExpGolombRead();			// log2_max_mv_length_horizontal
+					gb.UExpGolombRead();			// log2_max_mv_length_vertical
+
+					UINT64 num_reorder_frames = 0;
+					if (!gb.IsEOF()) {
+						num_reorder_frames = gb.UExpGolombRead(); // num_reorder_frames
+						gb.UExpGolombRead();		// max_dec_frame_buffering
+					}
+					if (num_reorder_frames > 16U) {
+						break;
+					}
 				}
 			}
 
-			bool nalflag = !!gb.BitRead(1);		// nal_hrd_parameters_present_flag
-			if (nalflag) {
-				if (!ParseHrdParameters(gb)) {
-					goto error;
-				}
-			}
-			bool vlcflag = !!gb.BitRead(1);		// vlc_hrd_parameters_present_flag
-			if (vlcflag) {
-				if (!ParseHrdParameters(gb)) {
-					goto error;
-				}
-			}
-			if (nalflag || vlcflag) {
-				gb.BitRead(1);					// low_delay_hrd_flag
-			}
-
-			gb.BitRead(1);						// pic_struct_present_flag
-			if (!gb.IsEOF() && gb.BitRead(1)) {	// bitstream_restriction_flag
-				gb.BitRead(1);					// motion_vectors_over_pic_boundaries_flag
-				gb.UExpGolombRead();			// max_bytes_per_pic_denom
-				gb.UExpGolombRead();			// max_bits_per_mb_denom
-				gb.UExpGolombRead();			// log2_max_mv_length_horizontal
-				gb.UExpGolombRead();			// log2_max_mv_length_vertical
-
-				UINT64 num_reorder_frames = 0;
-				if (!gb.IsEOF()) {
-					num_reorder_frames = gb.UExpGolombRead(); // num_reorder_frames
-					gb.UExpGolombRead();		// max_dec_frame_buffering
-				}
-				if (num_reorder_frames > 16U) {
-					goto error;
-				}
-			}
-		}
-
-		if (!gb.IsEOF() &&
+			if (!gb.IsEOF() &&
 				(params.profile == H264_PROFILE_MULTIVIEW_HIGH ||
-				 params.profile == H264_PROFILE_STEREO_HIGH)) {
-			UINT8 bit_equal_to_one = gb.BitRead(1);	// bit_equal_to_one
-			if (!bit_equal_to_one) {
-				goto error;
+					params.profile == H264_PROFILE_STEREO_HIGH)) {
+				UINT8 bit_equal_to_one = gb.BitRead(1);	// bit_equal_to_one
+				if (!bit_equal_to_one) {
+					break;
+				}
+				gb.UExpGolombRead();					// num_views_minus1
 			}
-			gb.UExpGolombRead();					// num_views_minus1
-		}
 
-		if (!params.sar.num || !params.sar.den) {
-			params.sar.num = params.sar.den = 1;
-		}
+			if (!params.sar.num || !params.sar.den) {
+				params.sar.num = params.sar.den = 1;
+			}
 
-		params.width  = (pic_width_in_mbs_minus1 + 1) * 16;
-		params.height = ((pic_height_in_map_units_minus1 + 1) * (2 - !params.interlaced)) * 16;
+			params.width = (pic_width_in_mbs_minus1 + 1) * 16;
+			params.height = ((pic_height_in_map_units_minus1 + 1) * (2 - !params.interlaced)) * 16;
 
-		if (frame_cropping_flag) {
-			const auto vsub = (chroma_format_idc == 1) ? 1 : 0;
-			const auto hsub = (chroma_format_idc == 1 || chroma_format_idc == 2) ? 1 : 0;
-			const auto step_x = 1 << hsub;
-			const auto step_y = (2 - !params.interlaced) << vsub;
+			if (frame_cropping_flag) {
+				const auto vsub = (chroma_format_idc == 1) ? 1 : 0;
+				const auto hsub = (chroma_format_idc == 1 || chroma_format_idc == 2) ? 1 : 0;
+				const auto step_x = 1 << hsub;
+				const auto step_y = (2 - !params.interlaced) << vsub;
 
-			params.width  -= (crop_left + crop_right)  * step_x;
-			params.height -= (crop_top  + crop_bottom) * step_y;
-		}
+				params.width -= (crop_left + crop_right) * step_x;
+				params.height -= (crop_top + crop_bottom) * step_y;
+			}
 
-		if (params.height < 100 || params.width < 100) {
-			goto error;
-		}
+			if (params.height < 100 || params.width < 100) {
+				break;
+			}
 
-		if (params.height == 1088) {
-			params.height = 1080;	// Prevent blur lines
-		}
+			if (params.height == 1088) {
+				params.height = 1080;	// Prevent blur lines
+			}
 
-		return true;
+			return true;
+		} while (0);
 
-	error:
 		params.clear();
 		return false;
 	}
