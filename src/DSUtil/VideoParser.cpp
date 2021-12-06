@@ -214,7 +214,7 @@ namespace AVCParser {
 				break;
 			}
 
-			UINT64 chroma_format_idc = 0;
+			UINT64 chroma_format_idc = 1;
 			if (params.profile >= 100) {			// high profile
 				chroma_format_idc = gb.UExpGolombRead();
 				if (chroma_format_idc == 3) {		// chroma_format_idc
