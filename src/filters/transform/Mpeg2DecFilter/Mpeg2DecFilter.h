@@ -41,7 +41,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 	CSubpicInputPin* m_pSubpicInput;
 	CClosedCaptionOutputPin* m_pClosedCaptionOutput;
 
-	CAutoPtr<CMpeg2Dec> m_dec;
+	std::unique_ptr<CMpeg2Dec> m_dec;
 
 	REFERENCE_TIME m_AvgTimePerFrame;
 	bool m_fWaitForKeyFrame = true;

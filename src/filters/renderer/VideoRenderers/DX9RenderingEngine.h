@@ -159,7 +159,7 @@ namespace DSObjects
 		int							m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 		bool						m_bFlip; // horizontal flip. for vertical flip use together with a rotation of 180 deg.
 
-		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
+		std::unique_ptr<CPixelShaderCompiler> m_pPSC;
 
 		// Settings
 		VideoSystem						m_InputVideoSystem;

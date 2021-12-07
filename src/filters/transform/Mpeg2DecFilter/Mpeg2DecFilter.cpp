@@ -945,7 +945,7 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 		return hr;
 	}
 
-	m_dec.Attach(DNew CMpeg2Dec());
+	m_dec.reset(DNew CMpeg2Dec());
 	if (!m_dec) {
 		return E_OUTOFMEMORY;
 	}
@@ -959,7 +959,7 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 
 HRESULT CMpeg2DecFilter::StopStreaming()
 {
-	m_dec.Free();
+	delete m_dec.release();
 
 	return __super::StopStreaming();
 }

@@ -161,7 +161,7 @@ namespace GothSync
 
 		// Shaders
 		LPCSTR m_ShaderProfile;
-		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
+		std::unique_ptr<CPixelShaderCompiler> m_pPSC;
 		std::list<CExternalPixelShader>	m_pPixelShaders;
 		std::list<CExternalPixelShader>	m_pPixelShadersScreenSpace;
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];

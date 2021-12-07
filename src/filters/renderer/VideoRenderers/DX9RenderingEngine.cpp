@@ -200,12 +200,12 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	}
 
 	// Initialize the pixel shader compiler
-	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
+	m_pPSC.reset(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
 }
 
 void CDX9RenderingEngine::CleanupRenderingEngine()
 {
-	m_pPSC.Free();
+	delete m_pPSC.release();
 
 	RELEASE_PTR_ARRAY(m_pResizerPixelShaders);
 
@@ -403,7 +403,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 
 			if (!Shader.m_pPixelShader) {
-				Shader.Compile(m_pPSC);
+				Shader.Compile(m_pPSC.get());
 			}
 			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 
@@ -534,7 +534,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 				auto& Shader = *it;
 				if (!Shader.m_pPixelShader) {
-					Shader.Compile(m_pPSC);
+					Shader.Compile(m_pPSC.get());
 				}
 				hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 				TextureCopy(m_pScreenSpaceTextures[src]);
@@ -2265,7 +2265,7 @@ HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode,
 
 	CComPtr<IDirect3DPixelShader9> pPixelShader;
 
-	HRESULT hr = Shader.Compile(m_pPSC);
+	HRESULT hr = Shader.Compile(m_pPSC.get());
 	if (FAILED(hr)) {
 		return hr;
 	}

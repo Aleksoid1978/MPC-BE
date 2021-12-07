@@ -165,7 +165,7 @@ CBaseAP::~CBaseAP()
 	m_pAlphaBitmapTexture.Release();
 
 	m_pD3DDevEx.Release();
-	m_pPSC.Free();
+	delete m_pPSC.release();
 	m_pD3DEx.Release();
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
@@ -336,7 +336,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_pLine.Release();
 	m_Font3D.InvalidateDeviceObjects();
 
-	m_pPSC.Free();
+	delete m_pPSC.release();
 	m_pD3DDevEx.Release();
 
 	for (unsigned i = 0; i < std::size(m_pResizerPixelShaders); i++) {
@@ -501,7 +501,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		return hr;
 	}
 
-	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
+	m_pPSC.reset(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
 
 	if (m_Caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MINFLINEAR && m_Caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MAGFLINEAR) {
 		m_filter = D3DTEXF_LINEAR;
@@ -1209,7 +1209,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				for (auto& Shader : m_pPixelShaders) {
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
 					if (!Shader.m_pPixelShader) {
-						Shader.Compile(m_pPSC);
+						Shader.Compile(m_pPSC.get());
 					}
 					hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 					TextureCopy(m_pVideoTextures[src]);
@@ -1411,7 +1411,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 						auto& Shader = (*it);
 						if (!Shader.m_pPixelShader) {
-							Shader.Compile(m_pPSC);
+							Shader.Compile(m_pPSC.get());
 						}
 						hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 						TextureCopy(m_pScreenSizeTextures[src]);
@@ -2100,7 +2100,7 @@ STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, L
 
 	CComPtr<IDirect3DPixelShader9> pPixelShader;
 
-	HRESULT hr = Shader.Compile(m_pPSC);
+	HRESULT hr = Shader.Compile(m_pPSC.get());
 	if (FAILED(hr)) {
 		return hr;
 	}
