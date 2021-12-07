@@ -796,8 +796,8 @@ void CPlayerSeekBar::ScaleFont()
 	m_scaleY7  = m_pMainFrame->ScaleFloorY(7);
 	m_scaleY14 = m_pMainFrame->ScaleFloorY(14);
 
-	delete m_pEnabledThumb.release();
-	delete m_pDisabledThumb.release();
+	m_pEnabledThumb.reset();
+	m_pDisabledThumb.reset();
 }
 
 void CPlayerSeekBar::SetColor()

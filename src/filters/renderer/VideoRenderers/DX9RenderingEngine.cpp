@@ -205,7 +205,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 
 void CDX9RenderingEngine::CleanupRenderingEngine()
 {
-	delete m_pPSC.release();
+	m_pPSC.reset();
 
 	RELEASE_PTR_ARRAY(m_pResizerPixelShaders);
 

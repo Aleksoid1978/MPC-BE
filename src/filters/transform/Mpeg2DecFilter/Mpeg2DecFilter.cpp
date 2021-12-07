@@ -959,7 +959,7 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 
 HRESULT CMpeg2DecFilter::StopStreaming()
 {
-	delete m_dec.release();
+	m_dec.reset();
 
 	return __super::StopStreaming();
 }

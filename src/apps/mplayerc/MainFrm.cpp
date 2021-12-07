@@ -17269,7 +17269,7 @@ void CMainFrame::StartWebServer(int nPort)
 void CMainFrame::StopWebServer()
 {
 	if (m_pWebServer) {
-		delete m_pWebServer.release();
+		m_pWebServer.reset();
 	}
 }
 

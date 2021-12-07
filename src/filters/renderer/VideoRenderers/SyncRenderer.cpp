@@ -165,7 +165,7 @@ CBaseAP::~CBaseAP()
 	m_pAlphaBitmapTexture.Release();
 
 	m_pD3DDevEx.Release();
-	delete m_pPSC.release();
+	m_pPSC.reset();
 	m_pD3DEx.Release();
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
@@ -336,7 +336,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_pLine.Release();
 	m_Font3D.InvalidateDeviceObjects();
 
-	delete m_pPSC.release();
+	m_pPSC.reset();
 	m_pD3DDevEx.Release();
 
 	for (unsigned i = 0; i < std::size(m_pResizerPixelShaders); i++) {
