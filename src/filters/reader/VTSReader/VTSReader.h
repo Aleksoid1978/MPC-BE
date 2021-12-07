@@ -41,8 +41,8 @@ class CVTSStream : public CAsyncStream
 private:
 	CCritSec m_csLock;
 
-	CAutoPtr<CIfoFile> m_ifo;
-	CAutoPtr<CVobFile> m_vob;
+	std::unique_ptr<CIfoFile> m_ifo;
+	std::unique_ptr<CVobFile> m_vob;
 	int m_off;
 
 public:

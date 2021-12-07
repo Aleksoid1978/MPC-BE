@@ -295,8 +295,8 @@ STDMETHODIMP_(fraction_t) CVTSReader::GetAspectRatio()
 
 CVTSStream::CVTSStream() : m_off(0)
 {
-	m_ifo.Attach(DNew CIfoFile());
-	m_vob.Attach(DNew CVobFile());
+	m_ifo.reset(DNew CIfoFile());
+	m_vob.reset(DNew CVobFile());
 }
 
 CVTSStream::~CVTSStream()
@@ -306,7 +306,7 @@ CVTSStream::~CVTSStream()
 bool CVTSStream::Load(const WCHAR* fnw, bool bEnableTitleSelection)
 {
 	// TODO bEnableTitleSelection
-	return (m_ifo && m_vob && m_ifo->OpenIFO(fnw, 0) && m_ifo->OpenVOB(m_vob));
+	return (m_ifo && m_vob && m_ifo->OpenIFO(fnw, 0) && m_ifo->OpenVOB(m_vob.get()));
 }
 
 HRESULT CVTSStream::SetPointer(LONGLONG llPos)
