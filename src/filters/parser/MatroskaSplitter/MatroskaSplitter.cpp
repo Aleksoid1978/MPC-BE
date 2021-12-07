@@ -234,7 +234,7 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 {
 	const __int64 pos = m_pFile->GetPos();
 
-	CMatroskaNode Root(m_pFile);
+	CMatroskaNode Root(m_pFile.get());
 	m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
@@ -288,24 +288,23 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_pFile.Free();
 	m_pTrackEntryMap.clear();
 	m_pOrderedTrackArray.clear();
 
 	std::vector<CMatroskaSplitterOutputPin*> pinOut;
 	std::vector<TrackEntry*> pinOutTE;
 
-	m_pFile.Attach(DNew CMatroskaFile(pAsyncReader, hr));
+	m_pFile.reset(DNew CMatroskaFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
-	CMatroskaNode Root(m_pFile);
+	CMatroskaNode Root(m_pFile.get());
 	if (!m_pFile
 			|| !(m_pSegment = Root.Child(MATROSKA_ID_SEGMENT))
 			|| !(m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER))) {
@@ -784,7 +783,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				if (framerate > 200.0 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
-					CMatroskaNode Root(m_pFile);
+					CMatroskaNode Root(m_pFile.get());
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
@@ -1118,7 +1117,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					__int64 pos = m_pFile->GetPos();
 
-					CMatroskaNode Root(m_pFile);
+					CMatroskaNode Root(m_pFile.get());
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
@@ -1861,7 +1860,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 {
 	SetThreadName((DWORD)-1, "CMatroskaSplitterFilter");
 
-	CMatroskaNode Root(m_pFile);
+	CMatroskaNode Root(m_pFile.get());
 	if (!m_pFile) {
 		return false;
 	}

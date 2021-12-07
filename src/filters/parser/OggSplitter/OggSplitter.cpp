@@ -165,17 +165,15 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
 
-	HRESULT hres = E_FAIL;
+	HRESULT hr = E_FAIL;
 
-	m_pFile.Free();
-
-	m_pFile.Attach(DNew COggFile(pAsyncReader, hres));
+	m_pFile.reset(DNew COggFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
-	if (FAILED(hres)) {
-		m_pFile.Free();
-		return hres;
+	if (FAILED(hr)) {
+		m_pFile.reset();
+		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
@@ -205,8 +203,6 @@ start:
 			BYTE type = *p++;
 
 			CStringW name;
-
-			HRESULT hr;
 
 			if (type >= 0x80 && type <= 0x82 && !memcmp(p, "theora", 6)) {
 				if (type == 0x80 && PinNotExist) {

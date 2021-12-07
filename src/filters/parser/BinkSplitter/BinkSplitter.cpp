@@ -92,18 +92,17 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
+	m_pFile.reset(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	if (m_pFile->IsStreaming()) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return E_FAIL;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());

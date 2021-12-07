@@ -113,14 +113,12 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_pFile.Free();
-
-	m_pFile.Attach(DNew CMpaSplitterFile(pAsyncReader, hr));
+	m_pFile.reset(DNew CMpaSplitterFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());

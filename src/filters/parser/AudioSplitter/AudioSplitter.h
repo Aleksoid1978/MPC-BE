@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2014 see Authors.txt
+ * (C) 2013-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ class __declspec(uuid("AA77A669-E10F-4C70-BBD7-77923DF34BF3"))
 	REFERENCE_TIME m_rtime;
 
 protected:
-	CAutoPtr<CBaseSplitterFile> m_pFile;
+	std::unique_ptr<CBaseSplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

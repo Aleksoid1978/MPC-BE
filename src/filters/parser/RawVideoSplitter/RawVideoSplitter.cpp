@@ -189,14 +189,13 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM));
+	m_pFile.reset(DNew CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
@@ -897,7 +896,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				auto bFrameFound = false;
 				while (m_pFile->GetPos() <= size) {
 					uint8_t obu_type = 0;
-					const auto obuSize = ParseObuHeader(m_pFile, obu_type);
+					const auto obuSize = ParseObuHeader(m_pFile.get(), obu_type);
 					if (obuSize == -1) {
 						break;
 					}
@@ -1103,7 +1102,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			int64_t len = 0;
 			for (;;) {
 				uint8_t obu_type = 0;
-				const auto size = ParseObuHeader(m_pFile, obu_type);
+				const auto size = ParseObuHeader(m_pFile.get(), obu_type);
 				if (size == -1) {
 					len = 0;
 					break;

@@ -107,21 +107,20 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
+	m_pFile.reset(DNew CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	BYTE buf[28] = {};
 	if (FAILED(m_pFile->ByteRead(buf, sizeof(buf)))) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return E_FAIL;
 	}
 
@@ -147,7 +146,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (!m_bHXVS && !m_bDHAV && !m_bCCTV) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return E_FAIL;
 	}
 
@@ -188,7 +187,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		};
 
 		if (mts.empty()) {
-			m_pFile.Free();
+			m_pFile.reset();
 			return E_FAIL;
 		}
 

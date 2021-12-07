@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@
 class __declspec(uuid("69D5E2F8-55D8-41B9-A95E-24A240F5F127"))
 CDVRSplitterFilter : public CBaseSplitterFilter
 {
-	CAutoPtr<CBaseSplitterFileEx> m_pFile;
+	std::unique_ptr<CBaseSplitterFileEx> m_pFile;
 
 	__int64 m_startpos = 0;
 	__int64 m_endpos   = 0;

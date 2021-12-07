@@ -113,13 +113,12 @@ HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_pFile.Free();
-	m_pFile.Attach(DNew CDSMSplitterFile(pAsyncReader, hr, *this, *this));
+	m_pFile.reset(DNew CDSMSplitterFile(pAsyncReader, hr, *this, *this));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());

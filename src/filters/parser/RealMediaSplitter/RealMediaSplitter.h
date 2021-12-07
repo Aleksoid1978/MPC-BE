@@ -220,7 +220,7 @@ class __declspec(uuid("E21BE468-5C18-43EB-B0CC-DB93A847D769"))
 	CRealMediaSplitterFilter : public CBaseSplitterFilter
 {
 protected:
-	CAutoPtr<CRMFile> m_pFile;
+	std::unique_ptr<CRMFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

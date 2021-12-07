@@ -51,7 +51,7 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 	int				m_framesize			= 0; // for YUV4MPEG2 only
 
 protected:
-	CAutoPtr<CBaseSplitterFileEx> m_pFile;
+	std::unique_ptr<CBaseSplitterFileEx> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

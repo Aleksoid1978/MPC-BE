@@ -220,14 +220,12 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_pFile.Free();
-
-	m_pFile.Attach(DNew CRMFile(pAsyncReader, hr));
+	m_pFile.reset(DNew CRMFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());

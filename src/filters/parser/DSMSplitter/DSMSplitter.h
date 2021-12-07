@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,7 @@ class __declspec(uuid("0912B4DD-A30A-4568-B590-7179EBB420EC"))
 	CDSMSplitterFilter : public CBaseSplitterFilter
 {
 protected:
-	CAutoPtr<CDSMSplitterFile> m_pFile;
+	std::unique_ptr<CDSMSplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

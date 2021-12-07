@@ -282,13 +282,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_trackpos.clear();
 
-	m_pFile.Free();
-	m_pFile.Attach(DNew CMP4SplitterFile(pAsyncReader, hr));
+	m_pFile.reset(DNew CMP4SplitterFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());

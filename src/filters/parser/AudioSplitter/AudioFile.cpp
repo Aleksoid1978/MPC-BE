@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,13 +50,13 @@ CAudioFile::~CAudioFile()
 	m_pFile = nullptr;
 }
 
-CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
+CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 {
 	CAudioFile* pAudioFile = nullptr;
 	BYTE data[40];
 
-	m_pFile->Seek(0);
-	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK) {
+	pFile->Seek(0);
+	if (pFile->ByteRead(data, sizeof(data)) != S_OK) {
 		return nullptr;
 	}
 
@@ -101,8 +101,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	}
 	else if (int id3v2_size = id3v2_match_len(data)) {
 		// skip ID3V2 metadata for formats that can contain it
-		m_pFile->Seek(id3v2_size);
-		if (m_pFile->ByteRead(data, 4) != S_OK) {
+		pFile->Seek(id3v2_size);
+		if (pFile->ByteRead(data, 4) != S_OK) {
 			return nullptr;
 		}
 		if (*id == FCC('TTA1')) {
@@ -121,7 +121,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		return nullptr;
 	}
 
-	if (FAILED(pAudioFile->Open(m_pFile))) {
+	if (FAILED(pAudioFile->Open(pFile))) {
 		SAFE_DELETE(pAudioFile);
 	}
 

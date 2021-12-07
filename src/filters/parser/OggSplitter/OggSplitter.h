@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -219,7 +219,7 @@ class __declspec(uuid("9FF48807-E133-40AA-826F-9B2959E5232D"))
 	COggSplitterFilter : public CBaseSplitterFilter
 {
 protected:
-	CAutoPtr<COggFile> m_pFile;
+	std::unique_ptr<COggFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

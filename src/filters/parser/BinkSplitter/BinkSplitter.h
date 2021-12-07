@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@
 class __declspec(uuid("C14684E8-CCA6-468D-9ABC-1CED631CC31C"))
 CBinkSplitterFilter : public CBaseSplitterFilter
 {
-	CAutoPtr<CBaseSplitterFile> m_pFile;
+	std::unique_ptr<CBaseSplitterFile> m_pFile;
 
 	fraction_t m_fps = { 1, 1 };
 	UINT32 num_audio_tracks = 0;

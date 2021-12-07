@@ -154,7 +154,7 @@ STDMETHODIMP CAviSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 }
 
 template<typename T>
-static void ParseHeader(T& var, CAutoPtr<CAviFile>& pFile, CAviFile::strm_t* s, std::vector<CMediaType>& mts, REFERENCE_TIME AvgTimePerFrame, CSize headerAspect)
+static void ParseHeader(T& var, CAviFile* pFile, CAviFile::strm_t* s, std::vector<CMediaType>& mts, REFERENCE_TIME AvgTimePerFrame, CSize headerAspect)
 {
 	if (s->cs.size()) {
 		__int64 pos = pFile->GetPos();
@@ -185,21 +185,20 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_pFile.Free();
 	m_tFrame.Free();
 
-	m_pFile.Attach(DNew CAviFile(pAsyncReader, hr));
+	m_pFile.reset(DNew CAviFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	if (!m_bBadInterleavedSuport && !m_pFile->IsInterleaved(!!(::GetKeyState(VK_SHIFT)&0x8000))) {
-		m_pFile.Free();
+		m_pFile.reset();
 		hr = E_FAIL;
 	}
 
@@ -411,7 +410,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('HM10'):
 					{
 						CBaseSplitterFileEx::hevchdr h;
-						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
+						ParseHeader(h, m_pFile.get(), s, mts, AvgTimePerFrame, headerAspect);
 					}
 					break;
 				case FCC('mpg2'):
@@ -424,7 +423,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('M705'):
 					{
 						CBaseSplitterFileEx::seqhdr h;
-						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
+						ParseHeader(h, m_pFile.get(), s, mts, AvgTimePerFrame, headerAspect);
 					}
 					break;
 				case FCC('H264'):
@@ -459,7 +458,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					if (mts.size() == 1) {
 						CBaseSplitterFileEx::avchdr h;
-						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
+						ParseHeader(h, m_pFile.get(), s, mts, AvgTimePerFrame, headerAspect);
 					}
 					break;
 			}

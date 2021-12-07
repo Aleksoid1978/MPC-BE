@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,7 +51,7 @@ private:
 
 protected:
 	CCritSec m_csProps;
-	CAutoPtr<CAviFile> m_pFile;
+	std::unique_ptr<CAviFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

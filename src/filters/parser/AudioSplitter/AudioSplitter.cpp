@@ -140,18 +140,18 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
+	m_pFile.reset(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
+
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
 	if (FAILED(hr)) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return hr;
 	}
 	if (m_pFile->IsStreaming()) {
-		m_pFile.Free();
+		m_pFile.reset();
 		return E_FAIL;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
@@ -163,7 +163,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	m_pAudioFile = CAudioFile::CreateFilter(m_pFile);
+	m_pAudioFile = CAudioFile::CreateFilter(m_pFile.get());
 	if (m_pAudioFile) {
 		CMediaType mt;
 		if (m_pAudioFile->SetMediaType(mt)) {

@@ -94,7 +94,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
 
 protected:
-	CAutoPtr<CMatroskaFile> m_pFile;
+	std::unique_ptr<CMatroskaFile> m_pFile;
 
 	bool ReadFirtsBlock(std::vector<byte>& pData, TrackEntry* pTE);
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);

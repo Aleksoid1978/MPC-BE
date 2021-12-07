@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ class __declspec(uuid("0E9D4BF7-CBCB-46C7-BD80-4EF223A3DC2B"))
 	REFERENCE_TIME m_rtime = 0;
 
 protected:
-	CAutoPtr<CMpaSplitterFile> m_pFile;
+	std::unique_ptr<CMpaSplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	STDMETHODIMP GetDuration(LONGLONG* pDuration);

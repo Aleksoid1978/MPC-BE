@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -131,7 +131,7 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	bool ParseAMF0(UINT64 end, const CString key, std::vector<AMF0> &AMF0Array);
 
 protected:
-	CAutoPtr<CBaseSplitterFileEx> m_pFile;
+	std::unique_ptr<CBaseSplitterFileEx> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();

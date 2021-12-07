@@ -56,7 +56,7 @@ public:
 	CAudioFile() = default;
 	virtual ~CAudioFile();
 
-	static CAudioFile* CreateFilter(CBaseSplitterFile* m_pFile);
+	static CAudioFile* CreateFilter(CBaseSplitterFile* pFile);
 
 	__int64 GetStartPos() const { return m_startpos; }
 	__int64 GetEndPos() const { return m_endpos; }

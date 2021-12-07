@@ -62,7 +62,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	REFERENCE_TIME m_rtOffset = MAXLONGLONG;
 
 protected:
-	CAutoPtr<CMP4SplitterFile> m_pFile;
+	std::unique_ptr<CMP4SplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();
