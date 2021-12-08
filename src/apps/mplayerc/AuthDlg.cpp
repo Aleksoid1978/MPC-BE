@@ -68,44 +68,16 @@ BOOL CAuthDlg::OnInitDialog()
 
 	CWinApp* pApp = AfxGetApp();
 
-	if (pApp->m_pszRegistryKey) {
-		CRegKey hSecKey(pApp->GetSectionKey(IDS_R_LOGINS));
+	CProfile& profile = AfxGetProfile();
 
-		if (hSecKey) {
-			int i = 0;
-			WCHAR username[256], password[256];
+	std::vector<CStringW> valuenames;
+	profile.EnumValueNames(IDS_R_LOGINS, valuenames);
 
-			for (;;) {
-				DWORD unlen = std::size(username);
-				DWORD pwlen = sizeof(password);
-				DWORD type = REG_SZ;
-
-				if (ERROR_SUCCESS == RegEnumValueW(hSecKey, i++, username, &unlen, 0, &type, (BYTE*)password, &pwlen)) {
-					m_logins[username] = DEncrypt(password);
-					m_usernamectrl.AddString(username);
-				} else {
-					break;
-				}
-			}
-		}
-	} else {
-		CAutoVectorPtr<WCHAR> buff;
-		buff.Allocate(32767/sizeof(WCHAR));
-
-		DWORD len = GetPrivateProfileSectionW(IDS_R_LOGINS, buff, 32767/sizeof(WCHAR), pApp->m_pszProfileName);
-
-		WCHAR* p = buff;
-		while (*p && len > 0) {
-			CString str = p;
-			p += str.GetLength()+1;
-			len -= str.GetLength()+1;
-			std::list<CString> sl;
-			Explode(str, sl, L'=', 2);
-
-			if (sl.size() == 2) {
-				m_logins[sl.front()] = DEncrypt(sl.back());
-				m_usernamectrl.AddString(sl.front());
-			}
+	for (const auto& username : valuenames) {
+		CStringW password;
+		if (profile.ReadString(IDS_R_YOUTUBECACHE, username, password)) {
+			m_logins[username] = DEncrypt(password);
+			m_usernamectrl.AddString(username);
 		}
 	}
 
