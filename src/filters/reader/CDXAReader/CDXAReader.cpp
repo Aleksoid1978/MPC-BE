@@ -503,10 +503,10 @@ bool CCDXAStream::LookForMediaSubType()
 						if (cb > 0 && val.size() > 0 && cb == val.size()) {
 							if (offset >= 0 && S_OK == SetPointer(offset)
 									|| S_OK == SetPointer(m_llLength + offset)) {
-								CAutoVectorPtr<BYTE> pData;
-								if (pData.Allocate(cb)) {
+								std::unique_ptr<BYTE[]> pData(new(std::nothrow) BYTE[cb]);
+								if (!pData) {
 									DWORD BytesRead = 0;
-									if (S_OK == Read(pData, cb, 1, &BytesRead) && cb == BytesRead) {
+									if (S_OK == Read(pData.get(), cb, 1, &BytesRead) && cb == BytesRead) {
 										if (mask.size() < cb) {
 											size_t x = mask.size();
 											mask.resize(cb);
@@ -519,7 +519,7 @@ bool CCDXAStream::LookForMediaSubType()
 											pData[x] &= (BYTE)mask[x];
 										}
 
-										if (memcmp(pData, val.data(), cb) == 0) {
+										if (memcmp(pData.get(), val.data(), cb) == 0) {
 											nMatches++;
 										}
 									}

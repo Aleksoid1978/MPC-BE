@@ -488,9 +488,10 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	CShoutcastSocket soc;
 
-	CAutoVectorPtr<BYTE> pData;
-	int nSize = std::max((int)m_socket.m_metaint, MAXFRAMESIZE);
-	if (!pData.Allocate(nSize) || !soc.Create()) {
+	const int nSize = std::max((int)m_socket.m_metaint, MAXFRAMESIZE);
+	std::unique_ptr<BYTE[]> pData(new(std::nothrow) BYTE[nSize]);
+
+	if (!pData || !soc.Create()) {
 		return 1;
 	}
 
@@ -521,7 +522,7 @@ UINT CShoutcastStream::SocketThreadProc()
 			}
 		}
 
-		int len = soc.Receive(pData, nSize);
+		int len = soc.Receive(pData.get(), nSize);
 		if (len == 0) {
 			break;
 		}
@@ -532,7 +533,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				break;
 			}
 
-			len = soc.Receive(pData, nSize);
+			len = soc.Receive(pData.get(), nSize);
 			if (len <= 0) {
 				break;
 			}
@@ -544,7 +545,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 		size_t old_size = buffer.size();
 		buffer.resize(old_size + len);
-		memcpy(buffer.data() + old_size, pData, (size_t)len);
+		memcpy(buffer.data() + old_size, pData.get(), (size_t)len);
 
 		BYTE* pos = &buffer.front().value;
 		const BYTE* end = pos + buffer.size();

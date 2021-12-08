@@ -44,7 +44,7 @@ class __declspec(uuid("9736D831-9D6C-4E72-B6E7-560EF9181001"))
 	, public ISpecifyPropertyPages2
 	, public IAviSplitterFilter
 {
-	CAutoVectorPtr<DWORD> m_tFrame;
+	std::vector<DWORD> m_tFrame;
 
 private:
 	bool m_bBadInterleavedSuport, m_bSetReindex;

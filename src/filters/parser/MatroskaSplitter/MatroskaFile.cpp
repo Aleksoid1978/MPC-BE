@@ -1345,12 +1345,14 @@ HRESULT CANSI::Parse(CMatroskaNode* pMN)
 HRESULT CUTF8::Parse(CMatroskaNode* pMN)
 {
 	Empty();
-	CAutoVectorPtr<BYTE> buff;
-	if (!buff.Allocate((UINT)pMN->m_len + 1) || S_OK != pMN->Read(buff, pMN->m_len)) {
+
+	std::unique_ptr<BYTE[]> buff(new(std::nothrow) BYTE[pMN->m_len + 1]);
+	if (!buff || S_OK != pMN->Read(buff.get(), pMN->m_len)) {
 		return E_FAIL;
 	}
+
 	buff[pMN->m_len] = 0;
-	CString::operator = (UTF8ToWStr((LPCSTR)(BYTE*)buff));
+	CString::operator = (UTF8ToWStr((LPCSTR)buff.get()));
 	return S_OK;
 }
 

@@ -185,7 +185,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_tFrame.Free();
+	m_tFrame.clear();
 
 	m_pFile.reset(DNew CAviFile(pAsyncReader, hr));
 	if (!m_pFile) {
@@ -585,7 +585,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	m_tFrame.Attach(DNew DWORD[m_pFile->m_avih.dwStreams]);
+	m_tFrame.resize(m_pFile->m_avih.dwStreams);
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
@@ -700,7 +700,7 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64& Size, DWORD TrackNumber
 
 void CAviSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	memset((DWORD*)m_tFrame, 0, m_pFile->m_avih.dwStreams * sizeof(DWORD));
+	std::fill(m_tFrame.begin(), m_tFrame.end(), 0);
 	m_pFile->Seek(0);
 
 	if (rt > 0) {
