@@ -225,9 +225,9 @@ CFGFilterRegistry::CFGFilterRegistry(const CLSID& clsid, UINT64 merit)
 
 			ULONG nBytes = 0;
 			if (ERROR_SUCCESS == key.QueryBinaryValue(L"FilterData", nullptr, &nBytes)) {
-				CAutoVectorPtr<BYTE> buff;
-				if (buff.Allocate(nBytes) && ERROR_SUCCESS == key.QueryBinaryValue(L"FilterData", buff, &nBytes)) {
-					ExtractFilterData(buff, nBytes);
+				std::unique_ptr<BYTE[]> buff(new(std::nothrow) BYTE[nBytes]);
+				if (buff && ERROR_SUCCESS == key.QueryBinaryValue(L"FilterData", buff.get(), &nBytes)) {
+					ExtractFilterData(buff.get(), nBytes);
 				}
 			}
 

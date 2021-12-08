@@ -331,10 +331,8 @@ LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wPa
 {
 	if (message ==  WM_COMMAND && HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK
 			&& m_fAllowDirSelection) {
-		CAutoVectorPtr<WCHAR> path;
-		path.Allocate(MAX_PATH);
-
-		if (::GetDlgItemTextW(hwnd, cmb13, (WCHAR*)path, MAX_PATH) == 0) {
+		CStringW path;
+		if (::GetDlgItemTextW(hwnd, cmb13, path.GetBuffer(MAX_PATH), MAX_PATH) == 0) {
 			::SendMessageW(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
 		}
 	}

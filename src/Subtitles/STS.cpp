@@ -1626,14 +1626,15 @@ static bool LoadFont(const CString& font)
 {
 	int len = font.GetLength();
 
-	CAutoVectorPtr<BYTE> pData;
-	if (len == 0 || (len & 3) == 1 || !pData.Allocate(len)) {
+	if (len == 0 || (len & 3) == 1) {
 		return false;
 	}
 
+	auto pData = std::make_unique<BYTE[]>(len);
+
 	const WCHAR* s = font;
 	const WCHAR* e = s + len;
-	for (BYTE* p = pData; s < e; s++, p++) {
+	for (BYTE* p = pData.get(); s < e; s++, p++) {
 		*p = *s - 33;
 	}
 
@@ -1654,7 +1655,7 @@ static bool LoadFont(const CString& font)
 
 	HANDLE hFont = INVALID_HANDLE_VALUE;
 	DWORD cFonts;
-	hFont = AddFontMemResourceEx(pData, datalen, NULL, &cFonts);
+	hFont = AddFontMemResourceEx(pData.get(), datalen, NULL, &cFonts);
 
 	if (hFont == INVALID_HANDLE_VALUE) {
 		WCHAR path[MAX_PATH] = { 0 };
@@ -1662,7 +1663,7 @@ static bool LoadFont(const CString& font)
 
 		DWORD chksum = 0;
 		for (ptrdiff_t i = 0, j = datalen>>2; i < j; i++) {
-			chksum += ((DWORD*)(BYTE*)pData)[i];
+			chksum += ((DWORD*)pData.get())[i];
 		}
 
 		CString fn;
@@ -1671,7 +1672,7 @@ static bool LoadFont(const CString& font)
 		if (!::PathFileExistsW(fn)) {
 			CFile f;
 			if (f.Open(fn, CFile::modeCreate|CFile::modeWrite|CFile::typeBinary|CFile::shareDenyNone)) {
-				f.Write(pData, datalen);
+				f.Write(pData.get(), datalen);
 				f.Close();
 			}
 		}

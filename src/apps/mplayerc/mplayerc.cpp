@@ -1185,7 +1185,6 @@ UINT CMPlayerCApp::GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawIn
 
 void CMPlayerCApp::RegisterHotkeys()
 {
-	CAutoVectorPtr<RAWINPUTDEVICELIST> inputDeviceList;
 	UINT nInputDeviceCount = 0, nErrCode;
 	RID_DEVICE_INFO deviceInfo;
 	RAWINPUTDEVICE MCEInputDevice[] = {
@@ -1202,13 +1201,14 @@ void CMPlayerCApp::RegisterHotkeys()
 
 	// Get the size of the device list
 	nErrCode = GetRawInputDeviceList(nullptr, &nInputDeviceCount, sizeof(RAWINPUTDEVICELIST));
-	inputDeviceList.Attach(new RAWINPUTDEVICELIST[nInputDeviceCount]);
-	if (nErrCode == UINT(-1) || !nInputDeviceCount || !inputDeviceList) {
+	if (nErrCode == UINT(-1) || !nInputDeviceCount) {
 		ASSERT(nErrCode != UINT(-1));
 		return;
 	}
 
-	nErrCode = GetRawInputDeviceList(inputDeviceList, &nInputDeviceCount, sizeof(RAWINPUTDEVICELIST));
+	auto inputDeviceList = std::make_unique<RAWINPUTDEVICELIST[]>(nInputDeviceCount);
+
+	nErrCode = GetRawInputDeviceList(inputDeviceList.get(), &nInputDeviceCount, sizeof(RAWINPUTDEVICELIST));
 	if (nErrCode == UINT(-1)) {
 		ASSERT(FALSE);
 		return;

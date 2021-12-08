@@ -434,9 +434,9 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				len += (str.GetLength()+1)*sizeof(WCHAR);
 			}
 
-			CAutoVectorPtr<BYTE> buff;
-			if (buff.Allocate(4+len)) {
-				BYTE* p = buff;
+			std::unique_ptr<BYTE[]> buff(new(std::nothrow) BYTE[4 + len]);
+			if (buff) {
+				BYTE* p = buff.get();
 				*(DWORD*)p = cmdln.size();
 				p += sizeof(DWORD);
 
@@ -448,8 +448,8 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 				COPYDATASTRUCT cds;
 				cds.dwData = 0x6ABE51;
-				cds.cbData = p - buff;
-				cds.lpData = (void*)(BYTE*)buff;
+				cds.cbData = p - buff.get();
+				cds.lpData = (void*)buff.get();
 				m_pMainFrame->SendMessageW(WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 			}
 

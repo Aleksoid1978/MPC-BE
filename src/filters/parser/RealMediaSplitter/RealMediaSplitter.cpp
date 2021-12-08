@@ -1340,11 +1340,12 @@ HRESULT CRMFile::Init()
 				case '.SUB':
 					if (hdr.size > sizeof(hdr)) {
 						int size = hdr.size - sizeof(hdr);
-						CAutoVectorPtr<char> buff;
-						if (!buff.Allocate(size)) {
+						std::unique_ptr<char> buff(new(std::nothrow) char[size]);
+						if (!buff) {
 							return E_OUTOFMEMORY;
 						}
-						char* p = buff;
+
+						char* p = buff.get();
 						if (S_OK != (hr = ByteRead((BYTE*)p, size))) {
 							return hr;
 						}
@@ -2215,16 +2216,14 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 	};
 #pragma pack(pop)
 
-	CAutoVectorPtr<BYTE> pBuff;
-
 	if (pmt->subtype == MEDIASUBTYPE_RAW_AAC1) {
-		pBuff.Allocate(cbSize + 1);
+		auto pBuff = std::make_unique<BYTE[]>(cbSize + 1);
 		pBuff[0] = 0x02;
-		memcpy(pBuff+1, pwfe + 1, cbSize);
+		memcpy(pBuff.get() + 1, pwfe + 1, cbSize);
 		initdata.extralen = cbSize + 1;
-		initdata.extra = pBuff;
+		initdata.extra = pBuff.get();
 	} else {
-		if (pmt->FormatLength() <= sizeof(WAVEFORMATEX) + cbSize) {	// must have type_specific_data appended
+		if (pmt->FormatLength() <= sizeof(WAVEFORMATEX) + cbSize) { // must have type_specific_data appended
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 
