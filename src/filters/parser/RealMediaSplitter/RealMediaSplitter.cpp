@@ -1340,7 +1340,7 @@ HRESULT CRMFile::Init()
 				case '.SUB':
 					if (hdr.size > sizeof(hdr)) {
 						int size = hdr.size - sizeof(hdr);
-						std::unique_ptr<char> buff(new(std::nothrow) char[size]);
+						std::unique_ptr<char[]> buff(new(std::nothrow) char[size]);
 						if (!buff) {
 							return E_OUTOFMEMORY;
 						}
