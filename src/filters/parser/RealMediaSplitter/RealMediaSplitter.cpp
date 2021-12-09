@@ -2191,18 +2191,8 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)pmt->Format();
 	unsigned cbSize = pwfe->cbSize;
 
-	if (cbSize == sizeof(WAVEFORMATEX)) {
-		// someone might be doing cbSize = sizeof(WAVEFORMATEX), chances of
-		// cbSize being really sizeof(WAVEFORMATEX) is less than this,
-		// especially with our rm splitter ;)
-		// update 2021: very strange and possibly outdated code
-		ASSERT(0);
-		cbSize = 0;
-	}
-
-	WORD wBitsPerSample = pwfe->wBitsPerSample;
-	if (!wBitsPerSample) {
-		wBitsPerSample = 16;
+	if (pmt->FormatLength() < sizeof(WAVEFORMATEX) + cbSize) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
 #pragma pack(push, 1)
@@ -2212,10 +2202,14 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 		DWORD bpframe, packetsize, extralen;
 		void* extra;
 	} initdata = {
-		pwfe->nSamplesPerSec, wBitsPerSample, pwfe->nChannels, 100,
+		pwfe->nSamplesPerSec, pwfe->wBitsPerSample, pwfe->nChannels, 100,
 		0, 0, 0, nullptr
 	};
 #pragma pack(pop)
+
+	if (initdata.bpsample == 0) {
+		initdata.bpsample = 16;
+	}
 
 	if (pmt->subtype == MEDIASUBTYPE_RAW_AAC1) {
 		auto pBuff = std::make_unique<BYTE[]>(cbSize + 1);
@@ -2223,11 +2217,10 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 		memcpy(pBuff.get() + 1, pwfe + 1, cbSize);
 		initdata.extralen = cbSize + 1;
 		initdata.extra = pBuff.get();
-	} else {
-		if (pmt->FormatLength() < sizeof(WAVEFORMATEX) + cbSize) { // must have type_specific_data appended
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
 
+		hr = RAInitDecoder(m_dwCookie, &initdata);
+	}
+	else {
 		BYTE* fmt = pmt->Format() + sizeof(WAVEFORMATEX);
 
 		for (unsigned i = 0; i < cbSize-4; i++, fmt++) {
@@ -2263,9 +2256,11 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 		initdata.packetsize = m_rai.coded_frame_size;
 		initdata.extralen = std::min(DWORD(pmt->Format() + pmt->FormatLength() - (p + 4)), *(DWORD*)p);
 		initdata.extra = p + 4;
+
+		hr = RAInitDecoder(m_dwCookie, &initdata);
 	}
 
-	if (FAILED(hr = RAInitDecoder(m_dwCookie, &initdata))) {
+	if (FAILED(hr)) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 

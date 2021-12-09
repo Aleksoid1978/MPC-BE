@@ -2300,6 +2300,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.push_back(pFGF);
 	}
 
+#ifndef _WIN64
 	pFGF = DNew CFGFilterInternal<CRealVideoDecoder>(
 				(video[VDEC_REAL] || IsPreview) ? RMVideoDecoderName : LowMerit(RMVideoDecoderName),
 				(video[VDEC_REAL] || IsPreview) ? MERIT64_ABOVE_DSHOW + 1: MERIT64_DO_USE);
@@ -2308,8 +2309,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV30);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV40);
 	m_transform.push_back(pFGF);
+#endif
 
 	if (!IsPreview) {
+#ifndef _WIN64
 		pFGF = DNew CFGFilterInternal<CRealAudioDecoder>(
 					(audio[ADEC_REAL]) ? RMAudioDecoderName : LowMerit(RMAudioDecoderName),
 					(audio[ADEC_REAL]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2322,6 +2325,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SIPR_WAVE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RAAC);
 		m_transform.push_back(pFGF);
+#endif
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_REAL]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
