@@ -142,15 +142,19 @@ const AMOVIESETUP_PIN sudpPins3[] = {
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(CRealMediaSplitterFilter), RMSplitterName, MERIT_NORMAL, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CRealMediaSourceFilter), RMSourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
+#ifndef _WIN64
 	{&__uuidof(CRealVideoDecoder), L"MPC RealVideo Decoder", MERIT_NORMAL, std::size(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CRealAudioDecoder), L"MPC RealAudio Decoder", MERIT_NORMAL, std::size(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
+#endif
 };
 
 CFactoryTemplate g_Templates[] = {
 	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CRealMediaSplitterFilter>, nullptr, &sudFilter[0]},
 	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CRealMediaSourceFilter>, nullptr, &sudFilter[1]},
+#ifndef _WIN64
 	{sudFilter[2].strName, sudFilter[2].clsID, CreateInstance<CRealVideoDecoder>, nullptr, &sudFilter[2]},
 	{sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRealAudioDecoder>, nullptr, &sudFilter[3]},
+#endif
 };
 
 int g_cTemplates = std::size(g_Templates);
