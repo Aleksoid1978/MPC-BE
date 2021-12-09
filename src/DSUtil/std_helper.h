@@ -54,6 +54,13 @@ bool Contains(const std::vector<T>& vector, const T& item)
 	return std::find(vector.cbegin(), vector.cend(), item) != vector.cend();
 }
 
+template <typename V, typename... T>
+constexpr auto MakeArray(T&&... t)
+->std::array < V, sizeof...(T) >
+{
+	return { { std::forward<T>(t)... } };
+}
+
 template <class T>
 CStringT<T, StrTraitMFC<T>> RegExpParse(const T* szIn, const T* szRE)
 {

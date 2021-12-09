@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -144,9 +144,8 @@ void CBaseSplitterFile::ThreadUpdateLength()
 
 bool CBaseSplitterFile::SetCacheSize(int cachelen)
 {
-	m_pCache.Free();
 	m_cachetotal = 0;
-	m_pCache.Allocate(cachelen);
+	m_pCache.reset(new(std::nothrow) BYTE[cachelen]);
 	if (!m_pCache) {
 		return false;
 	}
@@ -264,7 +263,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 		Exit(hr);
 	}
 
-	BYTE* pCache = m_pCache;
+	BYTE* pCache = m_pCache.get();
 
 	if (m_cachepos <= m_pos && m_pos < m_cachepos + m_cachelen) {
 		int minlen = std::min(len, m_cachelen - (int)(m_pos - m_cachepos));

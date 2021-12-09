@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ class CBaseSplitterFile
 	__int64 m_available       = 0;
 	bool    m_bConnectionLost = false;
 
-	CAutoVectorPtr<BYTE> m_pCache;
+	std::unique_ptr<BYTE> m_pCache;
 	__int64 m_cachepos        = 0;
 	int     m_cachelen        = 0;
 	int     m_cachetotal      = 0;
