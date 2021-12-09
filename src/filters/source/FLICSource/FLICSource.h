@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -152,8 +152,8 @@ class CFLICStream
 private:
 	int m_nLastFrameNum;
 	DWORD m_pPalette[256];
-	CAutoVectorPtr<BYTE> m_pFrameBuffer;
-	int					 m_nBufferSize;
+	std::unique_ptr<BYTE[]> m_pFrameBuffer;
+	int m_nBufferSize;
 
 	void SeekToNearestKeyFrame(int nFrame);
 	void ExtractFrame(int nFrame);

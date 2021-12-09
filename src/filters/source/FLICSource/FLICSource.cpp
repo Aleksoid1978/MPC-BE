@@ -243,7 +243,9 @@ CFLICStream::CFLICStream(const WCHAR* wfn, CFLICSource* pParent, HRESULT* phr)
 	m_nLastFrameNum = -1;
 	memset(m_pPalette, 0, sizeof(m_pPalette));
 	m_nBufferSize = m_hdr.width*m_hdr.height*32>>3;
-	if (!m_pFrameBuffer.Allocate(m_nBufferSize)) {
+
+	m_pFrameBuffer.reset(new(std::nothrow) BYTE[m_nBufferSize]);
+	if (!m_pFrameBuffer) {
 		if (phr) *phr = E_OUTOFMEMORY;
 		return;
 	}
@@ -386,7 +388,7 @@ HRESULT CFLICStream::FillBuffer(IMediaSample* pSample)
 			return S_FALSE;
 		}
 
-		BYTE* pDataIn = m_pFrameBuffer;
+		BYTE* pDataIn = m_pFrameBuffer.get();
 		BYTE* pDataOut = nullptr;
 		if (!pDataIn || FAILED(hr = pSample->GetPointer(&pDataOut)) || !pDataOut) {
 			return S_FALSE;
@@ -598,12 +600,12 @@ void CFLICStream::ExtractFrame(int nFrame)
 
 void CFLICStream::_blackchunk()
 {
-	memset(m_pFrameBuffer, 0, m_nBufferSize);
+	memset(m_pFrameBuffer.get(), 0, m_nBufferSize);
 }
 
 void CFLICStream::_copychunk()
 {
-	m_flic.Read(m_pFrameBuffer, m_nBufferSize);
+	m_flic.Read(m_pFrameBuffer.get(), m_nBufferSize);
 }
 
 bool CFLICStream::_colorchunk(bool f64)
@@ -641,7 +643,7 @@ bool CFLICStream::_colorchunk(bool f64)
 
 void CFLICStream::_brunchunk()
 {
-	BYTE* tmp = m_pFrameBuffer;
+	BYTE* tmp = m_pFrameBuffer.get();
 
 	int lines = m_hdr.height;
 	while (lines--) {
@@ -711,7 +713,7 @@ void CFLICStream::_lcchunk()
 
 void CFLICStream::_deltachunk()
 {
-	BYTE* tmp = m_pFrameBuffer;
+	BYTE* tmp = m_pFrameBuffer.get();
 
 	WORD lines;
 	m_flic.Read(&lines, sizeof(lines));
@@ -743,7 +745,7 @@ void CFLICStream::_deltachunk()
 
 				if (count >= 0) {
 					// Fix vulnerability : http://www.team509.com/modules.php?name=News&file=article&sid=38
-					if ((count << 1) + (long)(ptr - m_pFrameBuffer) < m_nBufferSize) {
+					if ((count << 1) + (long)(ptr - m_pFrameBuffer.get()) < m_nBufferSize) {
 						m_flic.Read(ptr, count << 1);
 					} else {
 						ASSERT(FALSE);
