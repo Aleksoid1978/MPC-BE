@@ -344,7 +344,7 @@ class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E"))
 	REFERENCE_TIME m_tStart;
 
 	rainfo m_rai;
-	CAutoVectorPtr<BYTE> m_buff;
+	std::unique_ptr<BYTE[]> m_buff;
 	int m_bufflen;
 	REFERENCE_TIME m_rtBuffStart;
 	bool m_fBuffDiscontinuity;

@@ -2189,12 +2189,13 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 	}
 
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)pmt->Format();
+	unsigned cbSize = pwfe->cbSize;
 
-	// someone might be doing cbSize = sizeof(WAVEFORMATEX), chances of
-	// cbSize being really sizeof(WAVEFORMATEX) is less than this,
-	// especially with our rm splitter ;)
-	DWORD cbSize = pwfe->cbSize;
 	if (cbSize == sizeof(WAVEFORMATEX)) {
+		// someone might be doing cbSize = sizeof(WAVEFORMATEX), chances of
+		// cbSize being really sizeof(WAVEFORMATEX) is less than this,
+		// especially with our rm splitter ;)
+		// update 2021: very strange and possibly outdated code
 		ASSERT(0);
 		cbSize = 0;
 	}
@@ -2223,13 +2224,13 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 		initdata.extralen = cbSize + 1;
 		initdata.extra = pBuff.get();
 	} else {
-		if (pmt->FormatLength() <= sizeof(WAVEFORMATEX) + cbSize) { // must have type_specific_data appended
+		if (pmt->FormatLength() < sizeof(WAVEFORMATEX) + cbSize) { // must have type_specific_data appended
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 
-		BYTE* fmt = pmt->Format() + sizeof(WAVEFORMATEX) + cbSize;
+		BYTE* fmt = pmt->Format() + sizeof(WAVEFORMATEX);
 
-		for (int i = 0, len = pmt->FormatLength() - (sizeof(WAVEFORMATEX) + cbSize); i < len-4; i++, fmt++) {
+		for (unsigned i = 0; i < cbSize-4; i++, fmt++) {
 			if (fmt[0] == '.' || fmt[1] == 'r' || fmt[2] == 'a') {
 				break;
 			}
@@ -2346,8 +2347,8 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 		if (m_bufflen >= len) {
 			ASSERT(m_bufflen == len);
 
-			src = m_buff;
-			dst = m_buff + len;
+			src = m_buff.get();
+			dst = m_buff.get() + len;
 
 			if (sps > 0
 					&& (m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_COOK
@@ -2360,8 +2361,8 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 					}
 				}
 
-				src = m_buff + len;
-				dst = m_buff + len*2;
+				src = m_buff.get() + len;
+				dst = m_buff.get() + len*2;
 			} else if (m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_SIPR || m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_SIPR_WAVE) {
 				// http://mplayerhq.hu/pipermail/mplayer-dev-eng/2002-August/010569.html
 
@@ -2688,9 +2689,10 @@ HRESULT CRealAudioDecoder::StartStreaming()
 	int sps = m_rai.sub_packet_size;
 	UNREFERENCED_PARAMETER(sps);
 
-	int len = w*h;
+	int size = w*h;
 
-	m_buff.Allocate(len*2);
+	m_buff.reset(new(std::nothrow) BYTE[size*2]);
+
 	m_bufflen = 0;
 	m_rtBuffStart = 0;
 
@@ -2699,7 +2701,7 @@ HRESULT CRealAudioDecoder::StartStreaming()
 
 HRESULT CRealAudioDecoder::StopStreaming()
 {
-	m_buff.Free();
+	m_buff.reset();
 	m_bufflen = 0;
 
 	return __super::StopStreaming();
