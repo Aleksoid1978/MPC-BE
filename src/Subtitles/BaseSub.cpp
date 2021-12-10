@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,29 +24,26 @@
 CBaseSub::CBaseSub(SUBTITLE_TYPE nType)
 	: m_nType(nType)
 	, m_bResizedRender(FALSE)
-	, m_pTempSpdBuff(NULL)
 	, convertType(ColorConvert::convertType::DEFAULT)
 {
 }
 
 CBaseSub::~CBaseSub()
 {
-	m_pTempSpdBuff.Free();
 }
 
 void CBaseSub::InitSpd(SubPicDesc& spd, int nWidth, int nHeight)
 {
-	if (m_spd.w != nWidth || m_spd.h != nHeight || m_pTempSpdBuff == NULL) {
-		m_spd.type		= 0;
-		m_spd.w			= nWidth;
-		m_spd.h			= nHeight;
-		m_spd.bpp		= 32;
-		m_spd.pitch		= m_spd.w * 4;
-		m_spd.vidrect	= CRect(0, 0, m_spd.w, m_spd.h);
+	if (m_spd.w != nWidth || m_spd.h != nHeight || !m_pTempSpdBuff) {
+		m_spd.type    = 0;
+		m_spd.w       = nWidth;
+		m_spd.h       = nHeight;
+		m_spd.bpp     = 32;
+		m_spd.pitch   = m_spd.w * 4;
+		m_spd.vidrect = CRect(0, 0, m_spd.w, m_spd.h);
 
-		m_pTempSpdBuff.Free();
-		m_pTempSpdBuff.Allocate(m_spd.pitch * m_spd.h);
-		m_spd.bits		= m_pTempSpdBuff;
+		m_pTempSpdBuff.reset(new(std::nothrow) BYTE[m_spd.pitch * m_spd.h]);
+		m_spd.bits    = m_pTempSpdBuff.get();
 	}
 
 	if (!m_bResizedRender && (m_spd.w != spd.w || m_spd.h != spd.h)) {

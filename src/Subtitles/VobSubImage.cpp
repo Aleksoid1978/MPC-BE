@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -399,8 +399,8 @@ CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(CPoint& topleft)
 		return nullptr;
 	}
 
-	CAutoVectorPtr<BYTE> p;
-	if (!p.Allocate(len)) {
+	std::unique_ptr<BYTE[]> p(new(std::nothrow) BYTE[len]);
+	if (!p) {
 		return nullptr;
 	}
 
@@ -413,7 +413,7 @@ CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(CPoint& topleft)
 		return nullptr;
 	}
 
-	BYTE* cp = p;
+	BYTE* cp = p.get();
 	RGBQUAD* rgbp = (RGBQUAD*)lpPixels;
 
 	for (int i = 0; i < len; i++, cp++, rgbp++) {
@@ -425,7 +425,7 @@ CAutoPtrList<COutline>* CVobSubImage::GetOutlineList(CPoint& topleft)
 	topleft.x = topleft.y = INT_MAX;
 
 	for (;;) {
-		cp = p;
+		cp = p.get();
 
 		int x = 0;
 		int y = 0;

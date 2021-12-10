@@ -838,14 +838,14 @@ bool CVobSubFile::ReadRar(CString fn)
 		CString subfn(HeaderDataEx.FileNameW);
 
 		if (!subfn.Right(4).CompareNoCase(L".sub")) {
-			CAutoVectorPtr<BYTE> buff;
-			if (!buff.Allocate(HeaderDataEx.UnpSize)) {
+			std::unique_ptr<BYTE[]> buff(new(std::nothrow) BYTE[HeaderDataEx.UnpSize]);
+			if (!buff) {
 				CloseArchive(hrar);
 				FreeLibrary(h);
 				return false;
 			}
 
-			RARbuff = buff;
+			RARbuff = buff.get();
 			RARpos = 0;
 
 			if (ProcessFile(hrar, RAR_TEST, nullptr, nullptr)) {
@@ -857,7 +857,7 @@ bool CVobSubFile::ReadRar(CString fn)
 
 			m_sub.SetLength(HeaderDataEx.UnpSize);
 			m_sub.SeekToBegin();
-			m_sub.Write(buff, HeaderDataEx.UnpSize);
+			m_sub.Write(buff.get(), HeaderDataEx.UnpSize);
 			m_sub.SeekToBegin();
 
 			RARbuff = nullptr;
@@ -1202,15 +1202,14 @@ bool CVobSubFile::GetFrame(int idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1
 	if (m_img.nLang != iLang || m_img.nIdx != idx
 			|| (sp[idx].bAnimated && sp[idx].start + m_img.tCurrent <= rt)) {
 		int packetsize = 0, datasize = 0;
-		CAutoVectorPtr<BYTE> buff;
-		buff.Attach(GetPacket(idx, packetsize, datasize, iLang));
+		std::unique_ptr<BYTE[]> buff(GetPacket(idx, packetsize, datasize, iLang));
 		if (!buff || packetsize <= 0 || datasize <= 0) {
 			return false;
 		}
 
 		m_img.start = sp[idx].start;
 
-		bool ret = m_img.Decode(buff, packetsize, datasize, rt >= 0 ? int(rt - sp[idx].start) : INT_MAX,
+		bool ret = m_img.Decode(buff.get(), packetsize, datasize, rt >= 0 ? int(rt - sp[idx].start) : INT_MAX,
 								m_bCustomPal, m_tridx, m_orgpal, m_cuspal, true);
 
 		m_img.delay = sp[idx].stop - sp[idx].start;
@@ -1725,8 +1724,8 @@ bool CVobSubFile::SaveWinSubMux(CString fn)
 
 	m_img.Invalidate();
 
-	CAutoVectorPtr<BYTE> p4bpp;
-	if (!p4bpp.Allocate(720*576/2)) {
+	std::unique_ptr<BYTE[]> p4bpp(new(std::nothrow) BYTE[720*576/2]);
+	if (!p4bpp) {
 		return false;
 	}
 
@@ -1741,7 +1740,7 @@ bool CVobSubFile::SaveWinSubMux(CString fn)
 		for (int j = 0; j < 5; j++) {
 			if (j == 4 || !m_img.pal[j].tr) {
 				j &= 3;
-				memset(p4bpp, (j<<4)|j, 720*576/2);
+				memset(p4bpp.get(), (j<<4)|j, 720*576/2);
 				pal[j] ^= pal[0], pal[0] ^= pal[j], pal[j] ^= pal[0];
 				break;
 			}
@@ -1835,7 +1834,7 @@ bool CVobSubFile::SaveWinSubMux(CString fn)
 			bmp.Write(&fhdr, sizeof(fhdr));
 			bmp.Write(&ihdr, sizeof(ihdr));
 			bmp.Write(uipal, sizeof(RGBQUAD)*16);
-			bmp.Write(p4bpp, pitch*h);
+			bmp.Write(p4bpp.get(), pitch*h);
 			bmp.Close();
 
 			CompressFile(bmpfn);
@@ -1939,8 +1938,8 @@ bool CVobSubFile::SaveScenarist(CString fn)
 	memcpy(tempCusPal, m_cuspal, sizeof(tempCusPal));
 	memcpy(m_cuspal, newCusPal, sizeof(m_cuspal));
 
-	CAutoVectorPtr<BYTE> p4bpp;
-	if (!p4bpp.Allocate((m_size.cy-2)*360)) {
+	std::unique_ptr<BYTE[]> p4bpp(new(std::nothrow) BYTE[(m_size.cy - 2) * 360]);
+	if (!p4bpp) {
 		return false;
 	}
 
@@ -1975,7 +1974,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 		for (int j = 0; j < 5; j++) {
 			if (j == 4 || !m_img.pal[j].tr) {
 				j &= 3;
-				memset(p4bpp, (j<<4)|j, (m_size.cy-2)*360);
+				memset(p4bpp.get(), (j<<4)|j, (m_size.cy-2)*360);
 				break;
 			}
 		}
@@ -2091,7 +2090,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 			bmp.Write(&fhdr, sizeof(fhdr));
 			bmp.Write(&ihdr, sizeof(ihdr));
 			bmp.Write(newCusPal, sizeof(RGBQUAD)*16);
-			bmp.Write(p4bpp, 360*(m_size.cy-2));
+			bmp.Write(p4bpp.get(), 360*(m_size.cy-2));
 			bmp.Close();
 
 			CompressFile(bmpfn);
@@ -2174,8 +2173,8 @@ bool CVobSubFile::SaveMaestro(CString fn)
 	memcpy(tempCusPal, m_cuspal, sizeof(tempCusPal));
 	memcpy(m_cuspal, newCusPal, sizeof(m_cuspal));
 
-	CAutoVectorPtr<BYTE> p4bpp;
-	if (!p4bpp.Allocate((m_size.cy-2)*360)) {
+	std::unique_ptr<BYTE[]> p4bpp(new(std::nothrow) BYTE[(m_size.cy - 2) * 360]);
+	if (!p4bpp) {
 		return false;
 	}
 
@@ -2205,7 +2204,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 		for (int j = 0; j < 5; j++) {
 			if (j == 4 || !m_img.pal[j].tr) {
 				j &= 3;
-				memset(p4bpp, (j<<4)|j, (m_size.cy-2)*360);
+				memset(p4bpp.get(), (j<<4)|j, (m_size.cy-2)*360);
 				break;
 			}
 		}
@@ -2319,7 +2318,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 			bmp.Write(&fhdr, sizeof(fhdr));
 			bmp.Write(&ihdr, sizeof(ihdr));
 			bmp.Write(newCusPal, sizeof(RGBQUAD)*16);
-			bmp.Write(p4bpp, 360*(m_size.cy-2));
+			bmp.Write(p4bpp.get(), 360*(m_size.cy-2));
 			bmp.Close();
 
 			CompressFile(bmpfn);
