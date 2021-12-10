@@ -71,9 +71,9 @@ namespace YoutubeDL
 				}
 			}
 
-			apppath.Empty();
-			auto length = SearchPathW(nullptr, ydlExePath.GetString(), nullptr, 0, apppath.GetBuffer(), nullptr);
-			if (length > 0 && SearchPathW(nullptr, ydlExePath.GetString(), nullptr, length, apppath.GetBuffer(length), nullptr)) {
+			int length = SearchPathW(nullptr, ydlExePath.GetString(), nullptr, MAX_PATH, apppath.GetBuffer(MAX_PATH), nullptr);
+			if (length <= MAX_PATH) {
+				apppath.ReleaseBufferSetLength(length);
 				ydl_path = apppath;
 			}
 		} while (0);
