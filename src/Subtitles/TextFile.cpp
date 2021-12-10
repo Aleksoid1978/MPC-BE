@@ -37,8 +37,8 @@ CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
 	, m_posInBuffer(0)
 	, m_nInBuffer(0)
 {
-	m_buffer.Allocate(TEXTFILE_BUFFER_SIZE);
-	m_wbuffer.Allocate(TEXTFILE_BUFFER_SIZE);
+	m_buffer.reset(new(std::nothrow) char[TEXTFILE_BUFFER_SIZE]);
+	m_wbuffer.reset(new(std::nothrow) WCHAR[TEXTFILE_BUFFER_SIZE]);
 }
 
 bool CTextFile::Open(LPCWSTR lpszFileName)
@@ -273,7 +273,7 @@ bool CTextFile::FillBuffer()
 {
 	if (m_posInBuffer < m_nInBuffer) {
 		m_nInBuffer -= m_posInBuffer;
-		memcpy(m_buffer, &m_buffer[m_posInBuffer], (size_t)m_nInBuffer * sizeof(char));
+		memcpy(m_buffer.get(), &m_buffer[m_posInBuffer], (size_t)m_nInBuffer * sizeof(char));
 	} else {
 		m_nInBuffer = 0;
 	}
@@ -352,7 +352,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 
 		do {
 			int nCharsRead;
-			char* abuffer = (char*)(WCHAR*)m_wbuffer;
+			char* abuffer = (char*)m_wbuffer.get();
 
 			for (nCharsRead = 0; m_posInBuffer < m_nInBuffer; m_posInBuffer++, nCharsRead++) {
 				if (Utf8::isSingleByte(m_buffer[m_posInBuffer])) { // 0xxxxxxx
@@ -438,7 +438,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 		do {
 			int nCharsRead;
 			WCHAR* wbuffer = (WCHAR*)&m_buffer[m_posInBuffer];
-			char* abuffer = (char*)(WCHAR*)m_wbuffer;
+			char* abuffer = (char*)m_wbuffer.get();
 
 			for (nCharsRead = 0; m_posInBuffer + 1 < m_nInBuffer; nCharsRead++, m_posInBuffer += sizeof(WCHAR)) {
 				if (wbuffer[nCharsRead] == L'\n') {
@@ -477,7 +477,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 
 		do {
 			int nCharsRead;
-			char* abuffer = (char*)(WCHAR*)m_wbuffer;
+			char* abuffer = (char*)m_wbuffer.get();
 
 			for (nCharsRead = 0; m_posInBuffer + 1 < m_nInBuffer; nCharsRead++, m_posInBuffer += sizeof(WCHAR)) {
 				if (!m_buffer[m_posInBuffer]) {
@@ -633,7 +633,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 			}
 
 			if (bValid || m_offset) {
-				str.Append(m_wbuffer, nCharsRead);
+				str.Append(m_wbuffer.get(), nCharsRead);
 
 				if (!bLineEndFound) {
 					bLineEndFound = FillBuffer();
@@ -710,7 +710,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 				}
 			}
 
-			str.Append(m_wbuffer, nCharsRead);
+			str.Append(m_wbuffer.get(), nCharsRead);
 
 			if (!bLineEndFound) {
 				bLineEndFound = FillBuffer();
