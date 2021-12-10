@@ -70,11 +70,12 @@ namespace YoutubeDL
 					break;
 				}
 			}
-#if 0
-			// Let's try to send it as is, so that the CreateProcessW function
-			// checks the folders specified in the system PATH variable.
-			ydl_path = ydlExePath;
-#endif
+
+			apppath.Empty();
+			auto length = SearchPathW(nullptr, ydlExePath.GetString(), nullptr, 0, apppath.GetBuffer(), nullptr);
+			if (length > 0 && SearchPathW(nullptr, ydlExePath.GetString(), nullptr, length, apppath.GetBuffer(length), nullptr)) {
+				ydl_path = apppath;
+			}
 		} while (0);
 
 		if (ydl_path.IsEmpty()) {
