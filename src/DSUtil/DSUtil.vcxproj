@@ -96,6 +96,7 @@
     <ClInclude Include="D3D9Helper.h" />
     <ClInclude Include="DSMPropertyBag.h" />
     <ClInclude Include="DSUtil.h" />
+    <ClInclude Include="ds_defines.h" />
     <ClInclude Include="DXVAState.h" />
     <ClInclude Include="entities.h" />
     <ClInclude Include="ffmpeg_log.h" />
