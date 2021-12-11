@@ -108,3 +108,6 @@ bool StrHexToUInt64(const wchar_t* str, uint64_t& value);
 bool StrToDouble(const wchar_t* str, double& value);
 
 CStringW HR2Str(const HRESULT hr);
+
+// Usage: SetThreadName((DWORD)-1, "MainThread") or SetThreadName(DWORD_MAX, "MainThread")
+void SetThreadName(DWORD dwThreadID, LPCSTR szThreadName);

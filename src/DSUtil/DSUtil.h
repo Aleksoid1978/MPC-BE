@@ -146,8 +146,6 @@ extern CString			GetDXVAMode(const GUID& guidDecoder);
 extern void				TraceFilterInfo(IBaseFilter* pBF);
 extern void				TracePinInfo(IPin* pPin);
 
-extern void				SetThreadName(DWORD dwThreadID, LPCSTR szThreadName);
-
 extern void				getExtraData(const BYTE *format, const GUID *formattype, const ULONG formatlen, BYTE *extra, unsigned int *extralen);
 
 extern int				MakeAACInitData(BYTE* pData, int profile, int freq, int channels);
