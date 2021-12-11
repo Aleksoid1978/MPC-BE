@@ -26,7 +26,7 @@
 
 CompositionObject::CompositionObject()
 {
-	memsetd(m_Colors, 0, sizeof(m_Colors));
+	memset_u32(m_Colors, 0, sizeof(m_Colors));
 }
 
 CompositionObject::~CompositionObject()

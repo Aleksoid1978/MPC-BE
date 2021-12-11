@@ -142,12 +142,12 @@ STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 
 		if (spd.bpp == 16) {
 			while (h-- > 0) {
-				memsetw(ptr, (unsigned short)color, 2 * m_rcDirty.Width());
+				memset_u16(ptr, (unsigned short)color, 2 * m_rcDirty.Width());
 				ptr += spd.pitch;
 			}
 		} else if (spd.bpp == 32) {
 			while (h-- > 0) {
-				memsetd(ptr, color, 4 * m_rcDirty.Width());
+				memset_u32(ptr, color, 4 * m_rcDirty.Width());
 				ptr += spd.pitch;
 			}
 		}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -152,7 +152,7 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect(DWORD color)
 	for (ptrdiff_t j = 0, h = m_rcDirty.Height(); j < h; j++, p += m_spd.pitch) {
 		int w = m_rcDirty.Width();
 #ifdef _WIN64
-		memsetd(p, color, w*4);
+		memset_u32(p, color, w*4);
 #else
 		__asm {
 			mov eax, color

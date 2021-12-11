@@ -108,9 +108,6 @@ extern CString				DVDtimeToString(const DVD_HMSF_TIMECODE& rtVal, bool bAlwaysSh
 extern REFERENCE_TIME		StringToReftime(LPCWSTR strVal);
 extern REFERENCE_TIME		StringToReftime2(LPCWSTR strVal);
 
-extern void				memsetd(void* dst, unsigned int c, size_t nbytes);
-extern void				memsetw(void* dst, unsigned short c, size_t nbytes);
-
 extern CString			GetFriendlyName(CString DisplayName);
 extern HRESULT			LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv);
 extern HRESULT			LoadExternalFilter(LPCWSTR path, REFCLSID clsid, IBaseFilter** ppBF);

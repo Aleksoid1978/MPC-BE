@@ -51,7 +51,7 @@ void CBaseSub::InitSpd(SubPicDesc& spd, int nWidth, int nHeight)
 
 		BYTE* p = m_spd.bits;
 		for (int y = 0; y < m_spd.h; y++, p += m_spd.pitch) {
-			memsetd(p, 0xFF000000, m_spd.w * 4);
+			memset_u32(p, 0xFF000000, m_spd.w * 4);
 		}
 	}
 }

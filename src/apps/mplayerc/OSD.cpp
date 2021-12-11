@@ -508,7 +508,7 @@ void COSD::InvalidateBitmapOSD()
 		return;
 	}
 
-	memsetd(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3));
+	memset_u32(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3));
 
 	if (m_bSeekBarVisible) {
 		DrawSeekbar();

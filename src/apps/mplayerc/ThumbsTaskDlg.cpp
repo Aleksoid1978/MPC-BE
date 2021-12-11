@@ -125,7 +125,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	bih->biBitCount       = 32;
 	bih->biCompression    = BI_RGB;
 	bih->biSizeImage      = DIBSIZE(*bih);
-	memsetd(bih + 1, 0xffffff, bih->biSizeImage);
+	memset_u32(bih + 1, 0xffffff, bih->biSizeImage);
 
 	SubPicDesc spd;
 	spd.w       = width;
