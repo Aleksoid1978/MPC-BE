@@ -23,8 +23,11 @@
 
 #include "stdafx_common_cfg.h"
 #include "stdafx_common.h"
-#include <afxwin.h>                         // MFC core and standard components
-#include "stdafx_common_dshow.h"
+
+#include <afx.h>
+#include <atlbase.h>
+
+#include <ExtLib/BaseClasses/streams.h>
 
 #include <vector>
 
