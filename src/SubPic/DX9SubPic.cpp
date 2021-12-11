@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "DSUtil/Utils.h"
 #include "DX9SubPic.h"
 
 //

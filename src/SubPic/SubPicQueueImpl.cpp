@@ -23,6 +23,7 @@
 #include <chrono>
 #include <cmath>
 #include <intsafe.h>
+#include "DSUtil/Utils.h"
 #include "SubPicQueueImpl.h"
 
 #define SUBPIC_TRACE_LEVEL 0

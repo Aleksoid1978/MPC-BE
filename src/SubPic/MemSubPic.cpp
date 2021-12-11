@@ -20,6 +20,8 @@
  */
 
 #include "stdafx.h"
+#include <mpc_defines.h>
+#include "DSUtil/Utils.h"
 #include "MemSubPic.h"
 
 #include <emmintrin.h>

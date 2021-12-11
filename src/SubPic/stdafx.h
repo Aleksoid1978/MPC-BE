@@ -25,12 +25,13 @@
 #include "stdafx_common.h"
 
 #include <afx.h>
-#include <afxwin.h>			// MFC core and standard components
 
-#include "stdafx_common_dshow.h"
+#include <ExtLib/BaseClasses/streams.h>
+#include <dvdmedia.h>
 
 #include <algorithm>
 #include <vector>
 #include <list>
 
-#include "DSUtil/DSUtil.h"
+#include <d3d9.h>
+#include "DSUtil/ds_defines.h"
