@@ -68,8 +68,8 @@ class COggVorbisOutputPin : public COggSplitterOutputPin
 	DWORD m_blocksize[2], m_lastblocksize;
 	std::vector<bool> m_blockflags;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
@@ -90,8 +90,8 @@ class COggFlacOutputPin : public COggSplitterOutputPin
 	WORD m_wBitsPerSample;
 	int  m_nAvgBytesPerSec;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -99,8 +99,8 @@ public:
 
 class COggDirectShowOutputPin : public COggSplitterOutputPin
 {
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggDirectShowOutputPin(AM_MEDIA_TYPE* pmt, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -111,8 +111,8 @@ class COggStreamOutputPin : public COggSplitterOutputPin
 	__int64 m_time_unit, m_samples_per_unit;
 	DWORD m_default_len;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggStreamOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -150,8 +150,8 @@ class COggTheoraOutputPin : public COggSplitterOutputPin
 	UINT                         m_nVersion;
 	REFERENCE_TIME               m_rtAvgTimePerFrame;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -168,8 +168,8 @@ class COggDiracOutputPin : public COggSplitterOutputPin
 	bool           m_bOldDirac;
 	bool           m_IsInitialized;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -186,8 +186,8 @@ class COggOpusOutputPin : public COggSplitterOutputPin
 	int  m_SampleRate;
 	WORD m_Preskip;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -197,8 +197,8 @@ class COggSpeexOutputPin : public COggSplitterOutputPin
 {
 	int m_SampleRate;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -208,8 +208,8 @@ class COggVP8OutputPin : public COggSplitterOutputPin
 {
 	REFERENCE_TIME m_rtAvgTimePerFrame;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+	HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) override;
+	REFERENCE_TIME GetRefTime(__int64 granule_position) override;
 
 public:
 	COggVP8OutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
