@@ -317,7 +317,7 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		m_pOuterEVR = pOuterEVR;
 
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);
-		CComQIPtr<IBaseFilter> pBF = pUnk;
+		CComQIPtr<IBaseFilter> pBF(pUnk);
 
 		if (FAILED(hr)) {
 			break;
@@ -326,8 +326,8 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		// Set EVR custom presenter
 		CComPtr<IMFVideoPresenter>	pVP;
 		CComPtr<IMFVideoRenderer>	pMFVR;
-		CComQIPtr<IMFGetService>	pMFGS	= pBF;
-		CComQIPtr<IEVRFilterConfig>	pConfig	= pBF;
+		CComQIPtr<IMFGetService>	pMFGS(pBF);
+		CComQIPtr<IEVRFilterConfig>	pConfig(pBF);
 
 		// 3 video streams are required to play DVD-Video with some decoders
 		if (FAILED(pConfig->SetNumberOfStreams(3))) {
@@ -1613,7 +1613,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 		CComPtr<IBaseFilter> pBF;
 		if (SUCCEEDED(m_pOuterEVR->QueryInterface(IID_PPV_ARGS(&pBF)))) {
 			while (pBF = GetUpStreamFilter(pBF)) {
-				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF.p) {
 					CComVariant var;
 
 					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, nullptr)) && var.vt == VT_BSTR) {

@@ -645,7 +645,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		bTryToReset = bTryToReset && m_pD3DDevEx;
 		if (bTryToReset) {
 			bTryToReset = SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx));
-			DLog(L"    => ResetEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+			DLog(L"    => ResetEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
 		if (!bTryToReset) {
@@ -654,7 +654,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES, //D3DCREATE_MANAGED
 					&m_d3dpp, &d3ddmEx, &m_pD3DDevEx);
-			DLog(L"    => CreateDeviceEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+			DLog(L"    => CreateDeviceEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
 		if (m_pD3DDevEx) {
@@ -681,7 +681,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		bTryToReset = bTryToReset && m_pD3DDevEx;
 		if (bTryToReset) {
 			bTryToReset = SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, nullptr));
-			DLog(L"    => ResetEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+			DLog(L"    => ResetEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
 		if (!bTryToReset) {
@@ -692,7 +692,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWndVR ? m_hWndVR : m_hWnd,
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
 					&m_d3dpp, nullptr, &m_pD3DDevEx);
-			DLog(L"    => CreateDeviceEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+			DLog(L"    => CreateDeviceEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
 		if (m_pD3DDevEx) {
@@ -775,7 +775,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 				m_CurrentAdapter, D3DDEVTYPE_HAL, GetShellWindow(),
 				D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
 				&d3dpp, nullptr, &m_pD3DDevExRefresh);
-		DLog(L"    => CreateDeviceEx(m_pD3DDevExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+		DLog(L"    => CreateDeviceEx(m_pD3DDevExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 	}
 
 	if (!bTryToReset) {
@@ -832,7 +832,7 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 		hr = m_pD3DDevEx->ResetEx(&m_d3dpp, nullptr);
 	}
 
-	DLog(L"    => ResetEx() return : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+	DLog(L"    => ResetEx() return : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 
 	while (hr == D3DERR_DEVICELOST) {
 		DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");

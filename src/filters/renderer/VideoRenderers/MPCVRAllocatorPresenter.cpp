@@ -153,20 +153,20 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		return hr;
 	}
 
-	if (CComQIPtr<ISubRender> pSR = m_pMPCVR) {
+	if (CComQIPtr<ISubRender> pSR = m_pMPCVR.p) {
 		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
 
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		CRenderersSettings& rs = GetRenderersSettings();
 
 		hr = pIExFilterConfig->SetBool("lessRedraws", true);
 		hr = pIExFilterConfig->SetBool("d3dFullscreenControl", rs.bMPCVRFullscreenControl);
 	}
 
-	CComQIPtr<IBaseFilter> pBF = m_pMPCVR;
+	CComQIPtr<IBaseFilter> pBF(m_pMPCVR);
 	HookNewSegmentAndReceive(GetFirstPin(pBF), true);
 
 	return S_OK;
@@ -179,12 +179,12 @@ STDMETHODIMP_(CLSID) CMPCVRAllocatorPresenter::GetAPCLSID()
 
 STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 {
-	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR.p) {
 		pBV->SetDefaultSourcePosition();
 		pBV->SetDestinationPosition(v.left, v.top, v.right - v.left, v.bottom - v.top);
 	}
 
-	if (CComQIPtr<IVideoWindow> pVW = m_pMPCVR) {
+	if (CComQIPtr<IVideoWindow> pVW = m_pMPCVR.p) {
 		pVW->SetWindowPosition(w.left, w.top, w.right - w.left, w.bottom - w.top);
 	}
 
@@ -195,7 +195,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
 {
 	if (AngleStep90(rotation)) {
 		HRESULT hr = E_NOTIMPL;
-		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			int curRotation = rotation;
 			hr = pIExFilterConfig->GetInt("rotation", &curRotation);
 			if (SUCCEEDED(hr) && rotation != curRotation) {
@@ -212,7 +212,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
 
 STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetRotation()
 {
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		int rotation = 0;
 		if (SUCCEEDED(pIExFilterConfig->GetInt("rotation", &rotation))) {
 			return rotation;
@@ -224,7 +224,7 @@ STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetRotation()
 STDMETHODIMP CMPCVRAllocatorPresenter::SetFlip(bool flip)
 {
 	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		bool curFlip = false;
 		hr = pIExFilterConfig->GetBool("flip", &curFlip);
 		if (SUCCEEDED(hr) && flip != curFlip) {
@@ -239,7 +239,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetFlip(bool flip)
 
 STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::GetFlip()
 {
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		bool flip = false;
 		if (SUCCEEDED(pIExFilterConfig->GetBool("flip", &flip))) {
 			return flip;
@@ -251,7 +251,7 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::GetFlip()
 STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSize()
 {
 	SIZE size = {0, 0};
-	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR.p) {
 		// Final size of the video, after all scaling and cropping operations
 		// This is also aspect ratio adjusted
 		pBV->GetVideoSize(&size.cx, &size.cy);
@@ -262,7 +262,7 @@ STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSize()
 STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSizeAR()
 {
 	SIZE size = {0, 0};
-	if (CComQIPtr<IBasicVideo2> pBV2 = m_pMPCVR) {
+	if (CComQIPtr<IBasicVideo2> pBV2 = m_pMPCVR.p) {
 		pBV2->GetPreferredAspectRatio(&size.cx, &size.cy);
 	}
 	return size;
@@ -270,7 +270,7 @@ STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSizeAR()
 
 STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::Paint(bool /*bAll*/)
 {
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		return SUCCEEDED(pIExFilterConfig->SetBool("cmd_redraw", true));
 	}
 	return false;
@@ -279,7 +279,7 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::Paint(bool /*bAll*/)
 STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR.p) {
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
 	}
 	return hr;
@@ -287,7 +287,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 STDMETHODIMP CMPCVRAllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
 {
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		unsigned size = 0;
 		HRESULT hr = pIExFilterConfig->GetBin("displayedImage", dibImage, &size);
 
@@ -299,7 +299,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
 
 STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetPixelShaderMode()
 {
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		int rtype = 0;
 		if (S_OK == pIExFilterConfig->GetInt("renderType", &rtype)) {
 			return rtype;
@@ -314,7 +314,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 
 	if (TARGET_SCREEN == target) {
 		// experimental
-		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			hr = pIExFilterConfig->SetBool("cmd_clearPostScaleShaders", true);
 		}
 	}
@@ -350,7 +350,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 
 	if (codesize && TARGET_SCREEN == target) {
 		// experimental
-		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			int rtype = 0;
 			hr = pIExFilterConfig->GetInt("renderType", &rtype);
 			if (S_OK == hr && (rtype == 9 && iProfile == 3 || rtype == 11 && iProfile == 4)) {
@@ -379,7 +379,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 
 STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
 {
-	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		int playbackState;
 		if (SUCCEEDED(pIExFilterConfig->GetInt("playbackState", &playbackState))) {
 			return playbackState == State_Running;

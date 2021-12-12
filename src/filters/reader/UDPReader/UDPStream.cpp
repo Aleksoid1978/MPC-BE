@@ -132,7 +132,12 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 
 									rapidjson::GenericDocument<rapidjson::UTF16<>> d;
 									if (!d.Parse(tmp.GetString()).HasParseError()) {
-										m_icydata.name = (d.HasMember(L"t") && d[L"t"].IsString()) ? d[L"t"].GetString() : ((d.HasMember(L"title") && d[L"title"].IsString()) ? d[L"title"].GetString() : m_icydata.name);
+										if (d.HasMember(L"t") && d[L"t"].IsString()) {
+											m_icydata.name = d[L"t"].GetString();
+										}
+										else if (d.HasMember(L"title") && d[L"title"].IsString()) {
+											m_icydata.name = d[L"title"].GetString();
+										}
 									}
 								}
 							}

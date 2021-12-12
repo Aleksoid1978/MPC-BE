@@ -1964,7 +1964,7 @@ redo:
 			CString fn;
 
 			BeginEnumFilters(m_pGraph, pEF, pBF) {
-				CComQIPtr<IFileSourceFilter> pFSF = pBF;
+				CComQIPtr<IFileSourceFilter> pFSF(pBF);
 				if (pFSF) {
 					LPOLESTR pFN = nullptr;
 					AM_MEDIA_TYPE mt;
@@ -2815,7 +2815,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		if (m_pMSDKDecoder) {
 			m_MVC_Base_View_R_flag = FALSE;
 			BeginEnumFilters(m_pGraph, pEF, pBF) {
-				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF.p) {
 					CComVariant var;
 					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, nullptr)) && var.vt == VT_BSTR) {
 						CString mode(var.bstrVal); mode.MakeLower();

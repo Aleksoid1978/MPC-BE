@@ -82,7 +82,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 		return E_NOTIMPL;
 	}
 
-	if (CComQIPtr<T> pT = pConnected) {
+	if (CComQIPtr<T> pT = pConnected.p) {
 		*ppT = pT.Detach();
 		return S_OK;
 	}
@@ -107,7 +107,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 		CComPtr<IPin> pConnected; \
 		if(FAILED(pPin->ConnectedTo(&pConnected))) \
 			continue; \
-		if(CComQIPtr<IMediaSeeking> pMS = pConnected) \
+		if(CComQIPtr<IMediaSeeking> pMS = pConnected.p) \
 		{ \
 			HRESULT hr2 = pMS->call; \
 			if(pPin == m_pFilter->GetInputPin()) \
@@ -123,7 +123,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 		CComPtr<IPin> pConnected; \
 		if(FAILED(pPin->ConnectedTo(&pConnected))) \
 			continue; \
-		if(CComQIPtr<IMediaPosition> pMP = pConnected) \
+		if(CComQIPtr<IMediaPosition> pMP = pConnected.p) \
 		{ \
 			HRESULT hr2 = pMP->call; \
 			if(pPin == m_pFilter->GetInputPin()) \
@@ -503,7 +503,7 @@ HRESULT CStreamSwitcherInputPin::InitializeOutputSample(IMediaSample* pInSample,
 		return E_FAIL;
 	}
 
-	if (CComQIPtr<IMediaSample2> pOutSample2 = pOutSample) {
+	if (CComQIPtr<IMediaSample2> pOutSample2 = pOutSample.p) {
 		AM_SAMPLE2_PROPERTIES OutProps;
 		EXECUTE_ASSERT(SUCCEEDED(pOutSample2->GetProperties(FIELD_OFFSET(AM_SAMPLE2_PROPERTIES, tStart), (PBYTE)&OutProps)));
 		OutProps.dwTypeSpecificFlags = m_SampleProps.dwTypeSpecificFlags;
@@ -633,7 +633,13 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 
 				if (::PathIsURLW(fileName)) {
 					pinName = GetPinName(pPin);
-					fileName = !trackName.IsEmpty() ? trackName : !pinName.IsEmpty() ? pinName : L"Audio";
+					if (trackName.GetLength()) {
+						fileName = trackName;
+					} else if (pinName.GetLength()) {
+						fileName = pinName;
+					} else {
+						fileName = L"Audio";
+					}
 				} else {
 					if (!pinName.IsEmpty()) {
 						fileName = pinName;
@@ -763,7 +769,12 @@ STDMETHODIMP CStreamSwitcherInputPin::BeginFlush()
 		return hr;
 	}
 
-	return IsActive() ? m_pSSF->DeliverBeginFlush() : Block(false), S_OK;
+	if (IsActive()) {
+		return m_pSSF->DeliverBeginFlush();
+	} else {
+		Block(false);
+		return S_OK;
+	}
 }
 
 STDMETHODIMP CStreamSwitcherInputPin::EndFlush()
@@ -780,7 +791,12 @@ STDMETHODIMP CStreamSwitcherInputPin::EndFlush()
 		return hr;
 	}
 
-	return IsActive() ? m_pSSF->DeliverEndFlush() : Block(true), S_OK;
+	if (IsActive()) {
+		return m_pSSF->DeliverEndFlush();
+	} else {
+		Block(true);
+		return S_OK;
+	}
 }
 
 STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()

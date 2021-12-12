@@ -154,13 +154,13 @@ STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	CHECK_HR(m_pMVR.CoCreateInstance(CLSID_madVR, GetOwner()));
 
-	if (CComQIPtr<ISubRender> pSR = m_pMVR) {
+	if (CComQIPtr<ISubRender> pSR = m_pMVR.p) {
 		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
 
-	CComQIPtr<IBaseFilter> pBF = m_pMVR;
+	CComQIPtr<IBaseFilter> pBF(m_pMVR);
 	HookNewSegmentAndReceive(GetFirstPin(pBF), true);
 
 	return S_OK;
@@ -173,12 +173,12 @@ STDMETHODIMP_(CLSID) CmadVRAllocatorPresenter::GetAPCLSID()
 
 STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 {
-	if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMVR.p) {
 		pBV->SetDefaultSourcePosition();
 		pBV->SetDestinationPosition(v.left, v.top, v.right - v.left, v.bottom - v.top);
 	}
 
-	if (CComQIPtr<IVideoWindow> pVW = m_pMVR) {
+	if (CComQIPtr<IVideoWindow> pVW = m_pMVR.p) {
 		pVW->SetWindowPosition(w.left, w.top, w.right - w.left, w.bottom - w.top);
 	}
 }
@@ -188,10 +188,10 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetRotation(int rotation)
 	if (AngleStep90(rotation)) {
 		HRESULT hr = E_NOTIMPL;
 		int curRotation = rotation;
-		if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
+		if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR.p) {
 			pMVRI->GetInt("rotation", &curRotation);
 		}
-		if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR) {
+		if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR.p) {
 			hr = pMVRC->SendCommandInt("rotate", rotation);
 			if (SUCCEEDED(hr) && curRotation != rotation) {
 				hr = pMVRC->SendCommand("redraw");
@@ -204,7 +204,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetRotation(int rotation)
 
 STDMETHODIMP_(int) CmadVRAllocatorPresenter::GetRotation()
 {
-	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
+	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR.p) {
 		int rotation = 0;
 		if (SUCCEEDED(pMVRI->GetInt("rotation", &rotation))) {
 			return rotation;
@@ -216,7 +216,7 @@ STDMETHODIMP_(int) CmadVRAllocatorPresenter::GetRotation()
 STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize()
 {
 	SIZE size = {0, 0};
-	if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMVR.p) {
 		// Final size of the video, after all scaling and cropping operations
 		// This is also aspect ratio adjusted
 		pBV->GetVideoSize(&size.cx, &size.cy);
@@ -227,7 +227,7 @@ STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize()
 STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSizeAR()
 {
 	SIZE size = {0, 0};
-	if (CComQIPtr<IBasicVideo2> pBV2 = m_pMVR) {
+	if (CComQIPtr<IBasicVideo2> pBV2 = m_pMVR.p) {
 		pBV2->GetPreferredAspectRatio(&size.cx, &size.cy);
 	}
 	return size;
@@ -235,7 +235,7 @@ STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSizeAR()
 
 STDMETHODIMP_(bool) CmadVRAllocatorPresenter::Paint(bool /*bAll*/)
 {
-	if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR) {
+	if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR.p) {
 		return SUCCEEDED(pMVRC->SendCommand("redraw"));
 	}
 	return false;
@@ -244,7 +244,7 @@ STDMETHODIMP_(bool) CmadVRAllocatorPresenter::Paint(bool /*bAll*/)
 STDMETHODIMP CmadVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMVR.p) {
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
 	}
 	return hr;
@@ -252,7 +252,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 STDMETHODIMP CmadVRAllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
 {
-	if (CComQIPtr<IMadVRFrameGrabber> pMadVRFrameGrabber = m_pMVR) {
+	if (CComQIPtr<IMadVRFrameGrabber> pMadVRFrameGrabber = m_pMVR.p) {
 		HRESULT hr = pMadVRFrameGrabber->GrabFrame(ZOOM_PLAYBACK_SIZE, 0, 0, 0, 0, 0, dibImage, 0);
 
 		return hr;
@@ -266,7 +266,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::ClearPixelShaders(int target)
 	ASSERT(TARGET_FRAME == ShaderStage_PreScale && TARGET_SCREEN == ShaderStage_PostScale);
 	HRESULT hr = E_NOTIMPL;
 
-	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR) {
+	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR.p) {
 		hr = pMVREPS->ClearPixelShaders(target);
 	}
 	return hr;
@@ -277,7 +277,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	ASSERT(TARGET_FRAME == ShaderStage_PreScale && TARGET_SCREEN == ShaderStage_PostScale);
 	HRESULT hr = E_NOTIMPL;
 
-	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR) {
+	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR.p) {
 		hr = pMVREPS->AddPixelShader(sourceCode, profile, target, nullptr);
 	}
 	return hr;
@@ -287,7 +287,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 
 STDMETHODIMP_(bool) CmadVRAllocatorPresenter::IsRendering()
 {
-	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
+	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR.p) {
 		int playbackState;
 		if (SUCCEEDED(pMVRI->GetInt("playbackState", &playbackState))) {
 			return playbackState == State_Running;

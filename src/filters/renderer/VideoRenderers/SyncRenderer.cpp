@@ -1670,7 +1670,7 @@ void CBaseAP::DrawStats()
 			if (m_pD3DDevEx) {
 				CComPtr<IDirect3DSwapChain9> pSC;
 				HRESULT hr = m_pD3DDevEx->GetSwapChain(0, &pSC);
-				CComQIPtr<IDirect3DSwapChain9Ex> pSCEx = pSC;
+				CComQIPtr<IDirect3DSwapChain9Ex> pSCEx(pSC);
 				if (pSCEx) {
 					D3DPRESENTSTATS stats;
 					hr = pSCEx->GetPresentStats(&stats);
@@ -2295,7 +2295,7 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 		m_pOuterEVR = pOuterEVR;
 
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);
-		CComQIPtr<IBaseFilter> pBF = pUnk;
+		CComQIPtr<IBaseFilter> pBF(pUnk);
 
 		if (FAILED(hr)) {
 			break;
@@ -2304,8 +2304,8 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 		// Set EVR custom presenter
 		CComPtr<IMFVideoPresenter>	pVP;
 		CComPtr<IMFVideoRenderer>	pMFVR;
-		CComQIPtr<IMFGetService>	pMFGS	= pBF;
-		CComQIPtr<IEVRFilterConfig> pConfig	= pBF;
+		CComQIPtr<IMFGetService>	pMFGS(pBF);
+		CComQIPtr<IEVRFilterConfig> pConfig(pBF);
 
 		// 3 video streams are required to play DVD-Video with some decoders
 		if (FAILED(pConfig->SetNumberOfStreams(3))) {
@@ -3096,7 +3096,7 @@ STDMETHODIMP CSyncAP::GetCurrentImage(BITMAPINFOHEADER *pBih, BYTE **pDib, DWORD
 		|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
 		|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
 		|| (FAILED(hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
-		DLog(L"CSyncAP::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+		DLog(L"CSyncAP::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		CoTaskMemFree(p);
 		return hr;
 	}
@@ -3760,7 +3760,7 @@ HRESULT CSyncAP::BeginStreaming()
 	pEVR->QueryFilterInfo(&filterInfo); // This addref's the pGraph member
 
 	BeginEnumFilters(filterInfo.pGraph, pEF, pBF)
-	if (CComQIPtr<IAMAudioRendererStats> pAS = pBF) {
+	if (CComQIPtr<IAMAudioRendererStats> pAS = pBF.p) {
 		m_pAudioStats = pAS;
 	};
 	EndEnumFilters
@@ -3810,7 +3810,7 @@ CSyncRenderer::CSyncRenderer(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP
 	DLog(L"CSyncRenderer::CSyncRenderer()");
 
 	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
-	CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
+	CComQIPtr<IBaseFilter> pEVRBase(m_pEVR);
 	m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
 	m_pAllocatorPresenter = pAllocatorPresenter;
 }

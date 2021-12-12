@@ -1849,7 +1849,7 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 			rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK);
 #endif
 
-	if (CComQIPtr<IMediaSample2> pMS2 = pOut) {
+	if (CComQIPtr<IMediaSample2> pMS2 = pOut.p) {
 		AM_SAMPLE2_PROPERTIES props;
 		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
 			props.dwTypeSpecificFlags &= ~0x7f;

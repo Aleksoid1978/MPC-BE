@@ -105,7 +105,7 @@ CFilterApp theApp;
 
 #endif
 
-static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInfo::Stream *pClipInfo, const PES_STREAM_TYPE pesStreamType, const CStringA& ISO_639_codes)
+static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInfo::Stream *pClipInfo, const PES_STREAM_TYPE pesStreamType, LPCSTR ISO_639_codes)
 {
 	const WCHAR *pPresentationDesc = nullptr;
 
@@ -1203,8 +1203,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (fullName.IsEmpty()) {
 		// trying to get file name from FileSource
 		BeginEnumFilters(m_pGraph, pEF, pBF) {
-			CComQIPtr<IFileSourceFilter> pFSF = pBF;
-			if (pFSF) {
+			if (CComQIPtr<IFileSourceFilter> pFSF = pBF.p) {
 				LPOLESTR pFN = nullptr;
 				AM_MEDIA_TYPE mt;
 				if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {

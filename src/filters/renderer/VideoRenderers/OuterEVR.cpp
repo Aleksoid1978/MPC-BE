@@ -29,7 +29,7 @@ COuterEVR::COuterEVR(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT& hr, CEVRAllocatorPr
 	: CUnknown(pName, pUnk)
 {
 	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
-	CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
+	CComQIPtr<IBaseFilter> pEVRBase(m_pEVR);
 	m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
 	m_pAllocatorPresenter = pAllocatorPresenter;
 }

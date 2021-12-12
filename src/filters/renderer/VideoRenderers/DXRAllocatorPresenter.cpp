@@ -134,7 +134,7 @@ STDMETHODIMP CDXRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		return E_FAIL;
 	}
 
-	CComQIPtr<ISubRender> pSR = m_pDXR;
+	CComQIPtr<ISubRender> pSR(m_pDXR);
 	if (!pSR) {
 		m_pDXR.Release();
 		return E_FAIL;
@@ -164,12 +164,12 @@ STDMETHODIMP_(CLSID) CDXRAllocatorPresenter::GetAPCLSID()
 
 STDMETHODIMP_(void) CDXRAllocatorPresenter::SetPosition(RECT w, RECT v)
 {
-	if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pDXR.p) {
 		pBV->SetDefaultSourcePosition();
 		pBV->SetDestinationPosition(v.left, v.top, v.right - v.left, v.bottom - v.top);
 	}
 
-	if (CComQIPtr<IVideoWindow> pVW = m_pDXR) {
+	if (CComQIPtr<IVideoWindow> pVW = m_pDXR.p) {
 		pVW->SetWindowPosition(w.left, w.top, w.right - w.left, w.bottom - w.top);
 	}
 }
@@ -177,7 +177,7 @@ STDMETHODIMP_(void) CDXRAllocatorPresenter::SetPosition(RECT w, RECT v)
 STDMETHODIMP_(SIZE) CDXRAllocatorPresenter::GetVideoSize()
 {
 	SIZE size = {0, 0};
-	if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pDXR.p) {
 		// Final size of the video, after all scaling and cropping operations
 		// This is also aspect ratio adjusted
 		pBV->GetVideoSize(&size.cx, &size.cy);
@@ -188,7 +188,7 @@ STDMETHODIMP_(SIZE) CDXRAllocatorPresenter::GetVideoSize()
 STDMETHODIMP_(SIZE) CDXRAllocatorPresenter::GetVideoSizeAR()
 {
 	SIZE size = {0, 0};
-	if (CComQIPtr<IBasicVideo2> pBV2 = m_pDXR) {
+	if (CComQIPtr<IBasicVideo2> pBV2 = m_pDXR.p) {
 		pBV2->GetPreferredAspectRatio(&size.cx, &size.cy);
 	}
 	return size;
@@ -197,7 +197,7 @@ STDMETHODIMP_(SIZE) CDXRAllocatorPresenter::GetVideoSizeAR()
 STDMETHODIMP CDXRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pDXR.p) {
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
 	}
 	return hr;
