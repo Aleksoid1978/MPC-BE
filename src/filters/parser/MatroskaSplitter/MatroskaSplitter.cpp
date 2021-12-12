@@ -1532,13 +1532,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		REFERENCE_TIME rtDur = INVALID_TIME;
 
-		for (auto& it = s.Cues.crbegin(); it != s.Cues.crend() && rtDur == INVALID_TIME; it++) {
+		for (auto it = s.Cues.crbegin(); it != s.Cues.crend() && rtDur == INVALID_TIME; it++) {
 			const auto& pCue = *it;
 
-			for (auto& it2 = pCue->CuePoints.crbegin(); it2 != pCue->CuePoints.crend() && rtDur == INVALID_TIME; it2++) {
+			for (auto it2 = pCue->CuePoints.crbegin(); it2 != pCue->CuePoints.crend() && rtDur == INVALID_TIME; it2++) {
 				const auto& pCuePoint = *it2;
 
-				for (auto& it3 = pCuePoint->CueTrackPositions.crbegin(); it3 != pCuePoint->CueTrackPositions.crend() && rtDur == INVALID_TIME; it3++) {
+				for (auto it3 = pCuePoint->CueTrackPositions.crbegin(); it3 != pCuePoint->CueTrackPositions.crend() && rtDur == INVALID_TIME; it3++) {
 					const auto& pCueTrackPositions = *it3;
 
 					if (TrackNumber != pCueTrackPositions->CueTrack) {

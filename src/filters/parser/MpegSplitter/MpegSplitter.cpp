@@ -973,7 +973,8 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		SUBTITLEINFO* si = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
 		memset(si, 0, mt.FormatLength());
 		si->dwOffset     = sizeof(SUBTITLEINFO);
-		strncpy_s(si->IsoLang, m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : "eng", std::size(si->IsoLang) - 1);
+		CStringA lang = m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : CStringA("eng");
+		strncpy_s(si->IsoLang, lang, std::size(si->IsoLang) - 1);
 		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 
 		s.mts.push_back(mt);
