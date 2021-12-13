@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,20 +25,23 @@
 // CPacketQueue
 //
 
-void CPacketQueue::Add(CAutoPtr<CPacket> p)
+void CPacketQueue::Add(CAutoPtr<CPacket>& p)
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
+
 	if (p) {
 		m_size += p->size();
 	}
-	emplace_back(p);
+	m_deque.emplace_back(p);
 }
 
 CAutoPtr<CPacket> CPacketQueue::Remove()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
-	ASSERT(!empty());
-	CAutoPtr<CPacket> p = front(); pop_front();
+
+	ASSERT(!m_deque.empty());
+	CAutoPtr<CPacket> p = m_deque.front();
+	m_deque.pop_front();
 	if (p) {
 		m_size -= p->size();
 	}
@@ -48,10 +51,11 @@ CAutoPtr<CPacket> CPacketQueue::Remove()
 void CPacketQueue::RemoveSafe(CAutoPtr<CPacket>& p, size_t& count)
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
-	count = size();
 
+	count = m_deque.size();
 	if (count) {
-		p = front(); pop_front();
+		p = m_deque.front();
+		m_deque.pop_front();
 		if (p) {
 			m_size -= p->size();
 		}
@@ -61,24 +65,31 @@ void CPacketQueue::RemoveSafe(CAutoPtr<CPacket>& p, size_t& count)
 void CPacketQueue::RemoveAll()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
+
 	m_size = 0;
-	clear();
+	m_deque.clear();
 }
 
 const size_t CPacketQueue::GetCount()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
-	return size();
+
+	return m_deque.size();
 }
 
 const size_t CPacketQueue::GetSize()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
+
 	return m_size;
 }
 
 const REFERENCE_TIME CPacketQueue::GetDuration()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
-	return !empty() ? (back()->rtStop - front()->rtStart) : 0;
+
+	if (m_deque.size()) {
+		return (m_deque.back()->rtStop - m_deque.front()->rtStart);
+	}
+	return 0;
 }

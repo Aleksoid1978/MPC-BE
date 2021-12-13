@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,13 +70,14 @@ public:
 	}
 };
 
-class CPacketQueue : protected std::deque<CAutoPtr<CPacket>>
+class CPacketQueue
 {
-	size_t m_size = 0;
 	std::mutex m_mutex;
+	size_t m_size = 0;
+	std::deque<CAutoPtr<CPacket>> m_deque;
 
 public:
-	void Add(CAutoPtr<CPacket> p);
+	void Add(CAutoPtr<CPacket>& p);
 	CAutoPtr<CPacket> Remove();
 	void RemoveSafe(CAutoPtr<CPacket>& p, size_t& count);
 	void RemoveAll();
