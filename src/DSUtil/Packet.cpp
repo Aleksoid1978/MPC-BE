@@ -22,6 +22,42 @@
 #include "Packet.h"
 
 //
+// CPacket
+//
+
+CPacket::~CPacket()
+{
+	DeleteMediaType(pmt);
+}
+bool CPacket::SetCount(const size_t newsize) {
+	try {
+		resize(newsize);
+	}
+	catch (...) {
+		return false;
+	}
+	return true;
+}
+void CPacket::SetData(const CPacket& packet) {
+	*this = packet;
+}
+void CPacket::SetData(const void* ptr, const size_t size) {
+	resize(size);
+	memcpy(data(), ptr, size);
+}
+void CPacket::AppendData(const CPacket& packet) {
+	insert(cend(), packet.cbegin(), packet.cend());
+}
+void CPacket::AppendData(const void* ptr, const size_t size) {
+	const size_t oldsize = this->size();
+	resize(oldsize + size);
+	memcpy(data() + oldsize, ptr, size);
+}
+void CPacket::RemoveHead(const size_t size) {
+	erase(begin(), begin() + size);
+}
+
+//
 // CPacketQueue
 //
 

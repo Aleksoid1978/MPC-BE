@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2020 see Authors.txt
+ * (C) 2015-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -507,7 +507,7 @@ CTeletext::CTeletext()
 	ZeroMemory(&m_page_buffer, sizeof(m_page_buffer));
 }
 
-void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart, WORD tlxPage)
+void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart, uint16_t tlxPage)
 {
 	if (tlxPage) {
 		m_nSuitablePage = tlxPage;

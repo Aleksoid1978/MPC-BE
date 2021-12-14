@@ -26,6 +26,8 @@
 
 #define PACKET_AAC_RAW 0x0001
 
+ // CPacket
+
 class CPacket : public std::vector<BYTE>
 {
 public:
@@ -36,39 +38,19 @@ public:
 	REFERENCE_TIME rtStop  = INVALID_TIME;
 	AM_MEDIA_TYPE* pmt     = nullptr;
 
-	DWORD Flag             = 0;
+	UINT32 Flag            = 0;
 
-	virtual ~CPacket() {
-		DeleteMediaType(pmt);
-	}
-	bool SetCount(const size_t newsize) {
-		try {
-			resize(newsize);
-		}
-		catch (...) {
-			return false;
-		}
-		return true;
-	}
-	void SetData(const CPacket& packet) {
-		*this = packet;
-	}
-	void SetData(const void* ptr, const size_t size) {
-		resize(size);
-		memcpy(data(), ptr, size);
-	}
-	void AppendData(const CPacket& packet) {
-		insert(cend(), packet.cbegin(), packet.cend());
-	}
-	void AppendData(const void* ptr, const size_t size) {
-		const size_t oldsize = this->size();
-		resize(oldsize + size);
-		memcpy(data() + oldsize, ptr, size);
-	}
-	void RemoveHead(const size_t size) {
-		erase(begin(), begin() + size);
-	}
+	~CPacket();
+
+	bool SetCount(const size_t newsize);
+	void SetData(const CPacket& packet);
+	void SetData(const void* ptr, const size_t size);
+	void AppendData(const CPacket& packet);
+	void AppendData(const void* ptr, const size_t size);
+	void RemoveHead(const size_t size);
 };
+
+// CPacketQueue
 
 class CPacketQueue
 {

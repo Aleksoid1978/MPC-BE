@@ -708,7 +708,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 }
 
 template<typename T>
-inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, const __int64 nBytes, const T& h, const REFERENCE_TIME rtStartOffset, const BOOL bStreamUsePTS, const DWORD Flag/* = 0*/)
+inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, const __int64 nBytes, const T& h, const REFERENCE_TIME rtStartOffset, const BOOL bStreamUsePTS, const UINT32 Flag/* = 0*/)
 {
 	HRESULT hr = S_OK;
 

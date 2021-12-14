@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2020 see Authors.txt
+ * (C) 2015-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,7 +73,7 @@ class CTeletext
 public:
 	CTeletext();
 
-	void ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart, WORD tlxPage);
+	void ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart, uint16_t tlxPage);
 	void Flush();
 	void SetLCID(const LCID lcid);
 

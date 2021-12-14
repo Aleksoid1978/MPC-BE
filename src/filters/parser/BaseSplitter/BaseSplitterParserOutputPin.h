@@ -56,7 +56,7 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 
 	int   m_adx_block_size = 0;
 
-	DWORD m_packetFlag     = 0;
+	UINT32 m_packetFlag     = 0;
 	BYTE  m_DTSHDProfile   = 0;
 
 protected:
