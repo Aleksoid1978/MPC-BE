@@ -716,7 +716,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseHDMVLPCM(CAutoPtr<CPacket> p)
 	HRESULT hr = S_OK;
 
 	if (ParseHdmvLPCMHeader(p->data())) {
-		p->erase(p->begin(), p->begin()+4);
+		p->RemoveHead(4);
 		hr = __super::DeliverPacket(p);
 	}
 
