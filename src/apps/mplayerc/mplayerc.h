@@ -71,6 +71,7 @@ private:
 	virtual BOOL OnIdle(LONG lCount) override;
 public:
 	CAppSettings m_s;
+
 	CHistoryFile m_HistoryFile;
 	CFavoritesFile m_FavoritesFile;
 

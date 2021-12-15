@@ -241,8 +241,8 @@ private:
 
 #define WIDTH_TABBUTTON 20
 	enum PLAYLIST_TYPE : int {
-		PLAYLIST,
-		EXPLORER
+		PL_BASIC,
+		PL_EXPLORER
 	};
 
 	enum ItemType : int {
@@ -270,7 +270,7 @@ private:
 	};
 
 	struct tab_t {
-		PLAYLIST_TYPE type = PLAYLIST; // playlist type
+		PLAYLIST_TYPE type = PL_BASIC; // playlist type
 		CString name;                  // playlist label
 		CString mpcpl_fn;              // playlist file name
 		CRect r;                       // layout
