@@ -3964,6 +3964,10 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
+	if (!pScrollBar) {
+		return;
+	}
+
 	if (pScrollBar->IsKindOf(RUNTIME_CLASS(CVolumeCtrl))) {
 		OnPlayVolume(0);
 	} else if (pScrollBar->IsKindOf(RUNTIME_CLASS(CPlayerSeekBar)) && m_eMediaLoadState == MLS_LOADED) {
