@@ -2592,8 +2592,6 @@ void CPlayerPlaylistBar::SavePlaylist()
 			::DeleteFileW(file);
 		}
 	}
-
-	TSaveSettings();
 }
 
 BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
@@ -4242,6 +4240,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					}
 					GetCurTab().name = strGetName;
 					SavePlaylist();
+					TSaveSettings();
 				}
 				break;
 			case ID_PLSMENU_DELETE_PLAYLIST:
