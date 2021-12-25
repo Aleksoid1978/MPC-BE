@@ -157,18 +157,7 @@ bool CProfile::StoreSettingsToRegistry()
 
 	OpenRegistryKey();
 
-	if (!m_hAppRegKey) {
-		InitIni();
-		if (_wremove(m_IniPath) == 0) {
-			DWORD dwDisposition = 0;
-			LONG lResult = RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\MPC-BE_TEST", 0, nullptr, 0, KEY_READ, nullptr, &m_hAppRegKey, &dwDisposition);
-			if (lResult == ERROR_SUCCESS) {
-				return true;
-			}
-		}
-	}
-
-	return false;
+	return (m_hAppRegKey != nullptr);
 }
 
 bool CProfile::StoreSettingsToIni()
