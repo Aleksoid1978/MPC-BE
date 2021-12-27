@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,10 +65,10 @@ CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 
 	CString queryInfo;
 	DWORD   dwLen = 0;
-	if (!HttpQueryInfoW(m_hRequest, dwInfoLevel, nullptr, &dwLen, 0) && dwLen) {
+	if (!HttpQueryInfoW(m_hRequest, dwInfoLevel, nullptr, &dwLen, nullptr) && dwLen) {
 		const DWORD dwError = GetLastError();
 		if (dwError == ERROR_INSUFFICIENT_BUFFER
-				&& HttpQueryInfoW(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
+				&& HttpQueryInfoW(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, nullptr)) {
 			queryInfo.ReleaseBuffer(dwLen);
 		}
 	}
@@ -292,7 +292,7 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 
 	DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_KEEP_CONNECTION;
 	if (m_nScheme == INTERNET_SCHEME_HTTPS) {
-		dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
+		dwFlags |= (INTERNET_FLAG_SECURE | SECURITY_IGNORE_ERROR_MASK);
 	}
 
 	m_hRequest = HttpOpenRequestW(m_hConnect,
