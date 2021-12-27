@@ -50,7 +50,7 @@ BOOL CAboutDlg::OnInitDialog()
 
 	m_strVersionNumber.Append(MPC_VERSION_SVN_WSTR);
 #if (MPC_VERSION_STATUS == 0)
-	m_strVersionNumber.Append(L" alpha");
+	m_strVersionNumber.Append(L" beta");
 #endif
 #ifdef _DEBUG
 	m_strVersionNumber.Append(L", Debug");
