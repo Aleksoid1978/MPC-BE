@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Rétablir"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Activer les pixels shaders pré-redimensionnement"
+6		"Activer les pixels shaders post-redimensionnement"
+7		"&Sélectionner les pixels shaders..."
+9		"&Modifier les pixels shaders..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Moitié"
 6		"&Originale"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Les fonctions ""Enregistrer l'image"" et "
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Les fonctions ""Enregistrer l'image"" et ""Enregistrer les miniatures"" pour les fichiers Shockwave."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Etes-vous sûr de vouloir supprimer ce Pixel Shader ?"
-STRING IDS_SHADERS_EDIT		"&Modifier les pixels shaders..."
-STRING IDS_SHADERS_SELECT		"&Sélectionner les pixels shaders..."
-STRING IDS_SHADERS_TOGGLE		"Activer les pixels shaders pré-redimensionnement"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Activer les pixels shaders post-redimensionnement"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
 STRING IDS_SHADER_FOLDER		"Open the shader folder"

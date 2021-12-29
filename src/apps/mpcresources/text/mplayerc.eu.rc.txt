@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Berrezarri"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Gaitu Birneurriratze-Aurreko Itzalak"
+6		"Gaitu Birneurriratze-Ondorengo Itzalak"
+7		"&Hautatu Itzalak..."
+9		"&Editatu itzalak..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"Neurri &Erdia"
 6		"Neurri &Arrunta"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"'Gorde Irudia' eta 'Gorde Txikirudiak' egi
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"'Gorde Irudia' eta 'Gorde Txikirudiak' eginkizunek ez dute lan egiten Shockwave agiriekin."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Zihur zaude itzal hau ezabatzea nahi duzula?"
-STRING IDS_SHADERS_EDIT		"&Editatu itzalak..."
-STRING IDS_SHADERS_SELECT		"&Hautatu Itzalak..."
-STRING IDS_SHADERS_TOGGLE		"Gaitu Birneurriratze-Aurreko Itzalak"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Gaitu Birneurriratze-Ondorengo Itzalak"
 STRING IDS_SHADER_DELETE		"Ezabatu"
 STRING IDS_SHADER_EDITOR		"Itzal Editatzailea"
 STRING IDS_SHADER_FOLDER		"Ireki itzal editatzailea"

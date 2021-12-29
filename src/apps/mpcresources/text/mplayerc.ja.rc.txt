@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"リセット"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"リサイズ前のピクセル シェーダーを有効化"
+6		"リサイズ後のピクセル シェーダーを有効化"
+7		"シェーダーを選択(&S)..."
+9		"シェーダーを編集(&E)..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"1/2 サイズ(&H)"
 6		"標準サイズ(&N)"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"「画像を保存」と「サムネイル
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"「画像を保存」と「サムネイルを保存」機能は、Shockwave ファイルには対応していません。"
 STRING IDS_SEEKBEGIN		"開始時点にジャンプ"
 STRING IDS_SHADEREDITORDLG_0		"このシェーダーを削除しますか?"
-STRING IDS_SHADERS_EDIT		"シェーダーを編集(&E)..."
-STRING IDS_SHADERS_SELECT		"シェーダーを選択(&S)..."
-STRING IDS_SHADERS_TOGGLE		"リサイズ前のピクセル シェーダーを有効化"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"リサイズ後のピクセル シェーダーを有効化"
 STRING IDS_SHADER_DELETE		"削除"
 STRING IDS_SHADER_EDITOR		"シェーダー編集"
 STRING IDS_SHADER_FOLDER		"シェーダー フォルダーを開く"

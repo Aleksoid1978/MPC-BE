@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Obnoviť"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Zapnúť pixel-shadery pre predbežnú zmenu veľkosti"
+6		"Zapnúť pixel-shadery pre dodatočnú zmenu veľkosti"
+7		"&Výber shaderov..."
+9		"&Úpravy shaderov..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Polovičná veľkosť"
 6		"&Normálna veľkosť"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Funkcie 'Uložiť obrázok' a 'Uložiť n�
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Funkcie 'Uložiť obrázok' a 'Uložiť náhľady' nepracujú so súbormi ShockWave."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Naozaj chcete vymazať tento shader?"
-STRING IDS_SHADERS_EDIT		"&Úpravy shaderov..."
-STRING IDS_SHADERS_SELECT		"&Výber shaderov..."
-STRING IDS_SHADERS_TOGGLE		"Zapnúť pixel-shadery pre predbežnú zmenu veľkosti"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Zapnúť pixel-shadery pre dodatočnú zmenu veľkosti"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
 STRING IDS_SHADER_FOLDER		"Open the shader folder"

@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Przywróć &domyślne"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Włącz shadery używane p&rzed skalowaniem"
+6		"Włącz shadery używane &po skalowaniu"
+7		"&Wybierz shadery..."
+9		"&Edytuj shadery..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 8		"Dopasowanie do &rozmiaru okna"
 9		"Dopasowanie do &szerokości okna"
@@ -1864,10 +1871,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Funkcje 'Zapisz obraz' oraz 'Zapisz miniat
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Funkcje 'Zapisz obraz' oraz 'Zapisz miniatury' nie działają z plikami Shockwave."
 STRING IDS_SEEKBEGIN		"Przeskocz do początku"
 STRING IDS_SHADEREDITORDLG_0		"Usunąć shader?"
-STRING IDS_SHADERS_EDIT		"&Edytuj shadery..."
-STRING IDS_SHADERS_SELECT		"&Wybierz shadery..."
-STRING IDS_SHADERS_TOGGLE		"Włącz shadery używane p&rzed skalowaniem"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Włącz shadery używane &po skalowaniu"
 STRING IDS_SHADER_DELETE		"Usuń"
 STRING IDS_SHADER_EDITOR		"Edytor shaderów"
 STRING IDS_SHADER_FOLDER		"Otwórz folder shaderów"

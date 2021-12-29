@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Resetează"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Activează shadere pixel pre-redimensionare"
+6		"Activează shadere pixel post-redimensionare"
+7		"&Selectare shadere..."
+9		"&Editare shadere..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Jumătate din mărime"
 6		"&Mărime normală"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Funcțiile ""Salvează imagine"" și ""Sal
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează pentru fișierele Shockwave."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Sigur doriți să ștergeți acest shader?"
-STRING IDS_SHADERS_EDIT		"&Editare shadere..."
-STRING IDS_SHADERS_SELECT		"&Selectare shadere..."
-STRING IDS_SHADERS_TOGGLE		"Activează shadere pixel pre-redimensionare"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Activează shadere pixel post-redimensionare"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Editor de Shader"
 STRING IDS_SHADER_FOLDER		"Open the shader folder"

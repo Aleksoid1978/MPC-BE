@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Výchozí"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Povolit shadery před změnou velikosti"
+6		"Povolit shadery po změně velikosti"
+7		"Vybrat shadery..."
+9		"&Upravit shadery..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"Poloviční velikost"
 6		"Standardní velikost"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Funkce Uložit obrázek a Uložit miniatur
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Funkce Uložit obrázek a Uložit miniatury nejsou pro Shockwave soubory podporovány."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Opravdu chcete tento shader smazat?"
-STRING IDS_SHADERS_EDIT		"&Upravit shadery..."
-STRING IDS_SHADERS_SELECT		"Vybrat shadery..."
-STRING IDS_SHADERS_TOGGLE		"Povolit shadery před změnou velikosti"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Povolit shadery po změně velikosti"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Editor shaderů"
 STRING IDS_SHADER_FOLDER		"Open the shader folder"

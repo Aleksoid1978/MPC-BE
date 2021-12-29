@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Visszaállítás"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Engedélyezze a pixel árnyékolók előméretezését"
+6		"Engedélyezze a pixel árnyékolók utánméretezését"
+7		"&Árnyékolók kiválasztása..."
+9		"&Árnyékolók szerkesztése..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Felezett méretű"
 6		"&Normál méretű"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"A 'Kép mentése' és a 'Miniatűrök ment
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"A 'Kép mentése' és a 'Miniatűrök mentése' funkciók nem működnek Shockwave fájlok esetén."
 STRING IDS_SEEKBEGIN		"Ugrás az elejére"
 STRING IDS_SHADEREDITORDLG_0		"Biztosan törölni szeretné ezt az árnyékolót?"
-STRING IDS_SHADERS_EDIT		"&Árnyékolók szerkesztése..."
-STRING IDS_SHADERS_SELECT		"&Árnyékolók kiválasztása..."
-STRING IDS_SHADERS_TOGGLE		"Engedélyezze a pixel árnyékolók előméretezését"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Engedélyezze a pixel árnyékolók utánméretezését"
 STRING IDS_SHADER_DELETE		"Törlés"
 STRING IDS_SHADER_EDITOR		"Árnyékoló Szerkesztő"
 STRING IDS_SHADER_FOLDER		"Nyissa meg a árnyékoló mappát"

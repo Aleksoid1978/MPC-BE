@@ -706,6 +706,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
+	m_ShadersMenu.LoadMenuW(IDR_POPUP_SHADERS);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 	m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
@@ -2161,6 +2162,7 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 		m_popupMainMenu.DestroyMenu();
 		m_VideoFrameMenu.DestroyMenu();
 		m_PanScanMenu.DestroyMenu();
+		m_ShadersMenu.DestroyMenu();
 		m_AfterPlaybackMenu.DestroyMenu();
 		m_NavigateMenu.DestroyMenu();
 
@@ -2168,6 +2170,7 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 		m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 		m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 		m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
+		m_ShadersMenu.LoadMenuW(IDR_POPUP_SHADERS);
 		m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 		m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
@@ -4087,8 +4090,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pSubMenu = &m_filtersMenu;
 			break;
 		case ID_SUBMENU_SHADERS:
-			SetupShadersSubMenu();
-			pSubMenu = &m_shadersMenu;
+			pSubMenu = m_ShadersMenu.GetSubMenu(0);
 			break;
 		case ID_SUBMENU_AUDIOLANG:
 			SetupAudioSubMenu();
@@ -15837,18 +15839,6 @@ void CMainFrame::SetupFavoritesSubMenu()
 	nLastGroupStart = submenu.GetMenuItemCount();
 }
 
-void CMainFrame::SetupShadersSubMenu()
-{
-	CMenu& submenu = m_shadersMenu;
-	MakeEmptySubMenu(submenu);
-
-	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SHADERS_TOGGLE, ResStr(IDS_SHADERS_TOGGLE));
-	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SHADERS_TOGGLE_SCREENSPACE, ResStr(IDS_SHADERS_TOGGLE_SCREENSPACE));
-	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SHADERS_SELECT, ResStr(IDS_SHADERS_SELECT));
-	submenu.AppendMenu(MF_SEPARATOR);
-	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_VIEW_SHADEREDITOR, ResStr(IDS_SHADERS_EDIT));
-}
-
 /////////////
 
 void CMainFrame::ShowControls(int nCS, bool fSave)
@@ -17884,6 +17874,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_popupMainMenu.DestroyMenu();
 	m_VideoFrameMenu.DestroyMenu();
 	m_PanScanMenu.DestroyMenu();
+	m_ShadersMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
 	m_NavigateMenu.DestroyMenu();
 
@@ -17891,6 +17882,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
+	m_ShadersMenu.LoadMenuW(IDR_POPUP_SHADERS);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 	m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 
@@ -20327,6 +20319,7 @@ void CMainFrame::ResetMenu()
 	m_popupMainMenu.DestroyMenu();
 	m_VideoFrameMenu.DestroyMenu();
 	m_PanScanMenu.DestroyMenu();
+	m_ShadersMenu.DestroyMenu();
 	m_AfterPlaybackMenu.DestroyMenu();
 	m_NavigateMenu.DestroyMenu();
 
@@ -20334,6 +20327,7 @@ void CMainFrame::ResetMenu()
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 	m_VideoFrameMenu.LoadMenuW(IDR_POPUP_VIDEOFRAME);
 	m_PanScanMenu.LoadMenuW(IDR_POPUP_PANSCAN);
+	m_ShadersMenu.LoadMenuW(IDR_POPUP_SHADERS);
 	m_AfterPlaybackMenu.LoadMenuW(IDR_POPUP_AFTERPLAYBACK);
 	m_NavigateMenu.LoadMenuW(IDR_POPUP_NAVIGATE);
 

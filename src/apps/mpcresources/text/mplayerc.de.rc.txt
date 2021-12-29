@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"&Zurücksetzen"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"P&re-Resize Shader aktivieren"
+6		"P&ost-Resize Shader aktivieren"
+7		"Shader ausw&ahlen..."
+9		"S&hader bearbeiten..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Halbe Größe"
 6		"&Normale Größe"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Die 'Bild speichern' und 'Vorschaubilder s
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Die 'Bild speichern' und 'Vorschaubilder speichern' Funktionen funktionieren nicht mit Shockwave Dateien."
 STRING IDS_SEEKBEGIN		"Zum Anfang springen"
 STRING IDS_SHADEREDITORDLG_0		"Soll dieser Shader wirklich gelöscht werden?"
-STRING IDS_SHADERS_EDIT		"S&hader bearbeiten..."
-STRING IDS_SHADERS_SELECT		"Shader ausw&ählen..."
-STRING IDS_SHADERS_TOGGLE		"P&re-Resize Shader aktivieren"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"P&ost-Resize Shader aktivieren"
 STRING IDS_SHADER_DELETE		"Anwenden"
 STRING IDS_SHADER_EDITOR		"Shader-Editor"
 STRING IDS_SHADER_FOLDER		"Shader Ordner öffnen"

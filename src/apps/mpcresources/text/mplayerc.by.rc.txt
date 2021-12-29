@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Скінуць"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Уключыць Pre-Resize Піксельныя шэйдары"
+6		"Уключыь Post-Resize Піксельныя шэйдары"
+7		"&Select Shaders..."
+9		"&Рэдагаваць шэйдары..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Палавінны памер"
 6		"&Нармалёвы памер"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Функцыі 'Захаваць малю�
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Функцыі 'Захаваць малюнак' і 'Захаваць мініяцюры' не працуюць Shockwave файлаў."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Вы ўпэўнены, што жадаеце выдаліць гэты шэйдар?"
-STRING IDS_SHADERS_EDIT		"&Рэдагаваць шэйдары..."
-STRING IDS_SHADERS_SELECT		"&Select Shaders..."
-STRING IDS_SHADERS_TOGGLE		"Уключыць Pre-Resize Піксельныя шэйдары"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Уключыь Post-Resize Піксельныя шэйдары"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
 STRING IDS_SHADER_FOLDER		"Open the shader folder"

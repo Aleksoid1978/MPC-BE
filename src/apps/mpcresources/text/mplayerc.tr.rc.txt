@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Sıfırla"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Ön Boyutlandırma Piksel Tonlamalarını Kullan"
+6		"Son Boyutlandırma Piksel Tonlamalarını Kullan"
+7		"&Tonlama Seçimi..."
+9		"&Tonlamaları Düzenle..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Yarım Boyut"
 6		"&Normal Boyut"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"'Resim Kaydet' ve 'Küçük Resimler Kayde
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"'Resim Kaydet' ve 'Küçük Resimler Kaydet' özellikleri Shockwave dosyaları ile çalışmaz."
 STRING IDS_SEEKBEGIN		"Başlangıca Atla"
 STRING IDS_SHADEREDITORDLG_0		"Bu tonlayıcıyı silmek istediğinizden emin misiniz?"
-STRING IDS_SHADERS_EDIT		"&Tonlamaları Düzenle..."
-STRING IDS_SHADERS_SELECT		"&Tonlama Seçimi..."
-STRING IDS_SHADERS_TOGGLE		"Ön Boyutlandırma Piksel Tonlamalarını Kullan"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Son Boyutlandırma Piksel Tonlamalarını Kullan"
 STRING IDS_SHADER_DELETE		"Sil"
 STRING IDS_SHADER_EDITOR		"Tonlama Düzenleyicisi"
 STRING IDS_SHADER_FOLDER		"Tonlamalar klasörünü aç"

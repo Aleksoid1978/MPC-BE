@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Скинути"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Ввімкнути перед-масштабовні піксельні шейдери"
+6		"Ввімкнути після-масштабовні піксельні шейдери"
+7		"&Вибрати шейдери..."
+9		"&Редактор шейдерів..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Половинного розміру"
 6		"&Нормального розміру"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"'Зберегти зображення' і
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"'Зберегти зображення' і 'Зберегти мініатюри' не працюють для файлів Shockwave."
 STRING IDS_SEEKBEGIN		"Перейти до початку"
 STRING IDS_SHADEREDITORDLG_0		"Ви дійсно бажаєте видалити цей шейдер?"
-STRING IDS_SHADERS_EDIT		"&Редактор шейдерів..."
-STRING IDS_SHADERS_SELECT		"&Вибрати шейдери..."
-STRING IDS_SHADERS_TOGGLE		"Ввімкнути перед-масштабовні піксельні шейдери"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Ввімкнути після-масштабовні піксельні шейдери"
 STRING IDS_SHADER_DELETE		"Видалити"
 STRING IDS_SHADER_EDITOR		"Редактор шейдерів"
 STRING IDS_SHADER_FOLDER		"Відкрити теку з шейдерами"

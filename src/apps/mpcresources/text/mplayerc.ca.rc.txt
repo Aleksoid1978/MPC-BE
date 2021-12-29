@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Reiniciar"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Enable Pre-Resize Pixel Shaders"
+6		"Enable Post-Resize Pixel Shaders"
+7		"&Select Shaders..."
+9		"&Edit shaders..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Meitat del Tamany"
 6		"Tamany &Original"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"The 'Save Image' and 'Save Thumbnails' fun
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"The 'Save Image' and 'Save Thumbnails' functions do not work for Shockwave files."
 STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Estàs segur que vols borrar aquet shader?"
-STRING IDS_SHADERS_EDIT		"&Edit shaders..."
-STRING IDS_SHADERS_SELECT		"&Select Shaders..."
-STRING IDS_SHADERS_TOGGLE		"Enable Pre-Resize Pixel Shaders"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Enable Post-Resize Pixel Shaders"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
 STRING IDS_SHADER_FOLDER		"Open the shader folder"

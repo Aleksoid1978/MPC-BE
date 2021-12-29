@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Resetten"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Activeer Pre-Resize Pixel Shaders"
+6		"Activeer Post-Resize Pixel Shaders"
+7		"Shaders &selecteren..."
+9		"Shaders b&ewerken..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Halve grootte"
 6		"&Normale grootte"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"De ""Afbeelding opslaan""- en ""Miniatuurw
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"De ""Afbeelding opslaan""- en ""Miniatuurweergaven opslaan""-functies werken niet met Shockwave-bestanden."
 STRING IDS_SEEKBEGIN		"Ga naar het begin"
 STRING IDS_SHADEREDITORDLG_0		"Wilt u deze Pixel Shader daadwerkelijk verwijderen?"
-STRING IDS_SHADERS_EDIT		"Shaders b&ewerken..."
-STRING IDS_SHADERS_SELECT		"Shaders &selecteren..."
-STRING IDS_SHADERS_TOGGLE		"Activeer Pre-Resize Pixel Shaders"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Activeer Post-Resize Pixel Shaders"
 STRING IDS_SHADER_DELETE		"Verwijderen"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
 STRING IDS_SHADER_FOLDER		"Map van shader(s) openen"

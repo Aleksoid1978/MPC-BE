@@ -338,6 +338,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CMenu m_RButtonMenu;
 	CMenu m_VideoFrameMenu;
 	CMenu m_PanScanMenu;
+	CMenu m_ShadersMenu;
 	CMenu m_AfterPlaybackMenu;
 	CMenu m_NavigateMenu;
 
@@ -354,7 +355,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetupVideoStreamsSubMenu();
 	void SetupNavChaptersSubMenu();
 	void SetupFavoritesSubMenu();
-	void SetupShadersSubMenu();
 	void SetupRecentFilesSubMenu();
 	void SetupLanguageMenu();
 

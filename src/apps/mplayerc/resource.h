@@ -9,6 +9,7 @@
 #define IDR_POPUP_PANSCAN               141
 #define IDR_POPUP_AFTERPLAYBACK         142
 #define IDR_POPUP_NAVIGATE              143
+#define IDR_POPUP_SHADERS               144
 #define IDB_W7_AUDIO                    197
 #define IDF_MAIN_ICON                   198
 #define IDB_MEDIAINFO_LANGUAGE          199
@@ -821,7 +822,6 @@
 #define IDS_SUBRESYNC_DECREASE          14133
 #define IDS_SUBRESYNC_INCREASE          14134
 #define IDS_OPTIONS_CAPTION             14135
-#define IDS_SHADERS_SELECT              14136
 #define IDS_AG_AUDIO                    14145
 #define IDS_AG_ZOOM                     14152
 #define IDS_FAVORITES_ADD               14153
@@ -856,7 +856,6 @@
 #define IDS_AUTOPLAY_PLAYDVDMOVIE       14184
 #define IDS_PROPSHEET_PROPERTIES        14185
 #define IDS_GRAPHBUILDER_AUDIOSWITCHER  14186
-#define IDS_SHADERS_EDIT                14187
 #define IDS_SUBTITLES_DEFAULT_STYLE     14188
 #define IDS_SUBTITLES_FORCED            14189
 #define IDS_FAVFILES                    14190
@@ -1035,7 +1034,6 @@
 #define IDS_CMD_AUDIORENDERER           32729
 #define IDS_CMD_CLIPBOARD               32730
 #define IDS_CMD_RESET                   32731
-#define IDS_SHADERS_TOGGLE              32771
 #define IDS_AG_CLOSE                    32830
 #define IDS_SHADEREDITORDLG_0           32831
 #define IDS_AG_NONE                     32832
@@ -1341,7 +1339,6 @@
 #define IDS_SCALE_16_9                  33239
 #define IDS_SCALE_WIDESCREEN            33240
 #define IDS_SCALE_ULTRAWIDE             33241
-#define IDS_SHADERS_TOGGLE_SCREENSPACE  33255
 #define IDS_MAINFRM_PPONSCR             33257
 #define IDS_MAINFRM_PPOFFSCR            33258
 #define IDS_AT_TOGGLE_SHADERSCREENSPACE 33259

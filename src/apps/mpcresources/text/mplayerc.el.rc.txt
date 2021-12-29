@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Επαναφορά"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Ενεργοποίηση προμεγεθυμένων Pixel Shaders"
+6		"Ενεργοποίηση μεταμεγεθυμένων Pixel Shaders"
+7		"Επι&λογή σκιάσεων..."
+9		"Επε&ξεργασία σκιάσεων..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Μισό μέγεθος"
 6		"&Κανονικό μέγεθος"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Οι επιλογές ""Αποθήκευσ
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Οι επιλογές ""Αποθήκευση εικόνας"" και ""Αποθήκευση μικρογραφιών"" δεν λειτουργούν για αρχεία Shockwave."
 STRING IDS_SEEKBEGIN		"Μετάβαση στην αρχή"
 STRING IDS_SHADEREDITORDLG_0		"Είστε βέβαιος για τη διαγραφή αυτού του σκιαστή;"
-STRING IDS_SHADERS_EDIT		"Επε&ξεργασία σκιάσεων..."
-STRING IDS_SHADERS_SELECT		"Επι&λογή σκιάσεων..."
-STRING IDS_SHADERS_TOGGLE		"Ενεργοποίηση προμεγεθυμένων Pixel Shaders"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Ενεργοποίηση μεταμεγεθυμένων Pixel Shaders"
 STRING IDS_SHADER_DELETE		"Διαγραφή"
 STRING IDS_SHADER_EDITOR		"Επεξεργαστής σκίασης"
 STRING IDS_SHADER_FOLDER		"Άνοιγμα του φακέλου σκίασηw"

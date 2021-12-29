@@ -1015,6 +1015,13 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 22		"Resetar"
 END
 
+BEGIN MENU IDR_POPUP_SHADERS LINES 11
+5		"Ativar pixel shaders pré-redimensionar"
+6		"Ativar pixel shaders pós-redimensionar"
+7		"Se&lecionar shaders..."
+9		"&Editar shaders..."
+END
+
 BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 5		"&Metade do tamanho"
 6		"Tamanho n&ormal"
@@ -1870,10 +1877,6 @@ STRING IDS_SCREENSHOT_ERROR_OVERLAY		"As funções 'Salvar imagem' e 'Salvar min
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"As funções 'Salvar imagem' e 'Salvar miniaturas' não funcionam para arquivos Shockwave."
 STRING IDS_SEEKBEGIN		"Pular para o início"
 STRING IDS_SHADEREDITORDLG_0		"Tem certeza e quer apagar este shader?"
-STRING IDS_SHADERS_EDIT		"&Editar shaders..."
-STRING IDS_SHADERS_SELECT		"Se&lecionar shaders..."
-STRING IDS_SHADERS_TOGGLE		"Ativar pixel shaders pré-redimensionar"
-STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Ativar pixel shaders pós-redimensionar"
 STRING IDS_SHADER_DELETE		"Deletar"
 STRING IDS_SHADER_EDITOR		"Editor de shader"
 STRING IDS_SHADER_FOLDER		"Abrir pasta de shader"
