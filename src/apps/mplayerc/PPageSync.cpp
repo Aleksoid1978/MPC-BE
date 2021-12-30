@@ -170,6 +170,11 @@ END_MESSAGE_MAP()
 
 void CPPageSync::OnSyncModeClicked(UINT nID)
 {
+	if (nID != m_iSyncMode + IDC_RADIO1) {
+		UpdateData();
+		SetModified();
+	}
+
 	if (nID == IDC_RADIO1) {
 		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(TRUE);
