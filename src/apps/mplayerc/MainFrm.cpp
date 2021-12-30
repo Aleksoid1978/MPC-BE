@@ -358,10 +358,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_INCREASE, OnViewVSyncOffsetIncrease)
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_DECREASE, OnViewVSyncOffsetDecrease)
-	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE, OnUpdateShaderToggle1)
-	ON_COMMAND(ID_SHADERS_TOGGLE, OnShaderToggle1)
-	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE_SCREENSPACE, OnUpdateShaderToggle2)
-	ON_COMMAND(ID_SHADERS_TOGGLE_SCREENSPACE, OnShaderToggle2)
+	ON_UPDATE_COMMAND_UI(ID_SHADERS_1_ENABLE, OnUpdateShaderToggle1)
+	ON_COMMAND(ID_SHADERS_1_ENABLE, OnShaderToggle1)
+	ON_UPDATE_COMMAND_UI(ID_SHADERS_2_ENABLE, OnUpdateShaderToggle2)
+	ON_COMMAND(ID_SHADERS_2_ENABLE, OnShaderToggle2)
 
 	ON_UPDATE_COMMAND_UI(ID_OSD_LOCAL_TIME, OnUpdateViewOSDLocalTime)
 	ON_UPDATE_COMMAND_UI(ID_OSD_FILE_NAME, OnUpdateViewOSDFileName)
@@ -7112,12 +7112,12 @@ void CMainFrame::OnShaderToggle1()
 	m_bToggleShader = !m_bToggleShader;
 	if (m_bToggleShader) {
 		SetShaders();
-		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_65));
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_SHADERS_1_ON));
 	} else {
 		if (m_pCAP) {
 			m_pCAP->ClearPixelShaders(TARGET_FRAME);
 		}
-		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_66));
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_SHADERS_1_OFF));
 	}
 
 	if (m_pCAP) {
@@ -7130,12 +7130,12 @@ void CMainFrame::OnShaderToggle2()
 	m_bToggleShaderScreenSpace = !m_bToggleShaderScreenSpace;
 	if (m_bToggleShaderScreenSpace) {
 		SetShaders();
-		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPONSCR));
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_SHADERS_2_ON));
 	} else {
 		if (m_pCAP) {
 			m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 		}
-		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPOFFSCR));
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_SHADERS_2_OFF));
 	}
 
 	if (m_pCAP) {
