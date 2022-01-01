@@ -23,7 +23,6 @@
 
 #include <atlbase.h>
 #include "../BaseSplitter/BaseSplitter.h"
-#include "filters/transform/BaseVideoFilter/BaseVideoFilter.h"
 
 #define RMSplitterName     L"MPC RealMedia Splitter"
 #define RMSourceName       L"MPC RealMedia Source"
