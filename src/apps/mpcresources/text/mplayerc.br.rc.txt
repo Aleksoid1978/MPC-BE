@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Sobre"
 7		"MPC-BE"
-8		"Copyright © 2002-2021 - veja o arquivo Authors.txt"
+8		"Copyright © 2002-2022 - veja o arquivo Authors.txt"
 10		"Versão :"
 11		"Compilação SVN :"
 12		"Compilador MPC-BE :"
