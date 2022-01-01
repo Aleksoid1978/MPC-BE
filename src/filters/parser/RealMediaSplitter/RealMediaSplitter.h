@@ -27,7 +27,6 @@
 
 #define RMSplitterName     L"MPC RealMedia Splitter"
 #define RMSourceName       L"MPC RealMedia Source"
-#define RMAudioDecoderName L"MPC RealAudio Decoder"
 
 #pragma pack(push, 1)
 
@@ -249,67 +248,4 @@ class __declspec(uuid("765035B3-5944-4A94-806B-20EE3415F26F"))
 {
 public:
 	CRealMediaSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
-};
-
-////////////
-
-class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E"))
-	CRealAudioDecoder : public CTransformFilter
-{
-	typedef HRESULT (WINAPI *PCloseCodec)(DWORD);
-	typedef HRESULT (WINAPI *PDecode)(DWORD,BYTE*,long,BYTE*,long*,long);
-	typedef HRESULT (WINAPI *PFlush)(DWORD,DWORD,DWORD);
-	typedef HRESULT (WINAPI *PFreeDecoder)(DWORD);
-	typedef void* (WINAPI *PGetFlavorProperty)(void*,DWORD,DWORD,int*);
-	typedef HRESULT (WINAPI *PInitDecoder)(DWORD, void*);
-	typedef HRESULT (WINAPI *POpenCodec)(void*);
-	typedef HRESULT (WINAPI *POpenCodec2)(void*, const char*);
-	typedef HRESULT (WINAPI *PSetFlavor)(DWORD, WORD);
-	typedef void (WINAPI *PSetDLLAccessPath)(const char*);
-	typedef void (WINAPI *PSetPwd)(DWORD, const char*);
-
-	PCloseCodec RACloseCodec;
-	PDecode RADecode;
-	PFlush RAFlush;
-	PFreeDecoder RAFreeDecoder;
-	PGetFlavorProperty RAGetFlavorProperty;
-	PInitDecoder RAInitDecoder;
-	POpenCodec RAOpenCodec;
-	POpenCodec2 RAOpenCodec2;
-	PSetFlavor RASetFlavor;
-	PSetDLLAccessPath RASetDLLAccessPath;
-	PSetPwd RASetPwd;
-
-	CStringA m_dllpath;
-	HMODULE m_hDrvDll;
-	DWORD m_dwCookie;
-
-	HRESULT InitRA(const CMediaType* pmt);
-	void FreeRA();
-
-	REFERENCE_TIME m_tStart;
-
-	rainfo m_rai;
-	std::unique_ptr<BYTE[]> m_buff;
-	int m_bufflen;
-	REFERENCE_TIME m_rtBuffStart;
-	bool m_fBuffDiscontinuity;
-
-public:
-	CRealAudioDecoder(LPUNKNOWN lpunk, HRESULT* phr);
-	virtual ~CRealAudioDecoder();
-
-	HRESULT Receive(IMediaSample* pIn);
-	HRESULT CheckInputType(const CMediaType* mtIn);
-	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
-	HRESULT DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);
-	HRESULT GetMediaType(int iPosition, CMediaType* pMediaType);
-
-	HRESULT StartStreaming();
-	HRESULT StopStreaming();
-
-	HRESULT EndOfStream();
-	HRESULT BeginFlush();
-	HRESULT EndFlush();
-	HRESULT NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 };
