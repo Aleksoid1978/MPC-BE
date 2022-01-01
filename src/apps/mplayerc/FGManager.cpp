@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2299,17 +2299,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PS2_ADPCM);
 		m_transform.push_back(pFGF);
 	}
-
-#ifndef _WIN64
-	pFGF = DNew CFGFilterInternal<CRealVideoDecoder>(
-				(video[VDEC_REAL] || IsPreview) ? RMVideoDecoderName : LowMerit(RMVideoDecoderName),
-				(video[VDEC_REAL] || IsPreview) ? MERIT64_ABOVE_DSHOW + 1: MERIT64_DO_USE);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV10);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV20);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV30);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV40);
-	m_transform.push_back(pFGF);
-#endif
 
 	if (!IsPreview) {
 #ifndef _WIN64

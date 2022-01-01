@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,6 @@
 
 #define RMSplitterName     L"MPC RealMedia Splitter"
 #define RMSourceName       L"MPC RealMedia Source"
-#define RMVideoDecoderName L"MPC RealVideo Decoder"
 #define RMAudioDecoderName L"MPC RealAudio Decoder"
 
 #pragma pack(push, 1)
@@ -253,59 +252,6 @@ public:
 };
 
 ////////////
-
-class __declspec(uuid("238D0F23-5DC9-45A6-9BE2-666160C324DD"))
-	CRealVideoDecoder : public CBaseVideoFilter
-{
-	typedef HRESULT (WINAPI *PRVCustomMessage)(void*, DWORD);
-	typedef HRESULT (WINAPI *PRVFree)(DWORD);
-	typedef HRESULT (WINAPI *PRVHiveMessage)(void*, DWORD);
-	typedef HRESULT (WINAPI *PRVInit)(void*, DWORD* dwCookie);
-	typedef HRESULT (WINAPI *PRVTransform)(BYTE*, BYTE*, void*, void*, DWORD);
-
-	PRVCustomMessage RVCustomMessage;
-	PRVFree RVFree;
-	PRVHiveMessage RVHiveMessage;
-	PRVInit RVInit;
-	PRVTransform RVTransform;
-
-	HMODULE m_hDrvDll;
-	DWORD m_dwCookie;
-	int m_lastBuffSizeDim;
-
-	DWORD m_fcc;
-
-	HRESULT InitRV(const CMediaType* pmt);
-	void FreeRV();
-
-	REFERENCE_TIME m_tStart;
-
-	void Resize(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho);
-	void ResizeWidth(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho);
-	void ResizeHeight(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho);
-	void ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DWORD wo, DWORD dpo);
-
-	BYTE* m_pI420, *m_pI420Tmp;
-
-	void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
-
-public:
-	CRealVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr);
-	virtual ~CRealVideoDecoder();
-
-	HRESULT Transform(IMediaSample* pIn);
-	HRESULT CheckInputType(const CMediaType* mtIn);
-	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
-
-	HRESULT StartStreaming();
-	HRESULT StopStreaming();
-
-	HRESULT NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
-
-	DWORD m_timestamp;
-	bool m_fDropFrames;
-	HRESULT AlterQuality(Quality q);
-};
 
 class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E"))
 	CRealAudioDecoder : public CTransformFilter
