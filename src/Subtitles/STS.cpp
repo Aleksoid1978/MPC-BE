@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2865,6 +2865,8 @@ static CString RemoveHtmlSpecialChars(CString str)
 	str.Replace(L"&lt;", L"<");
 	str.Replace(L"&amp;", L"&");
 	str.Replace(L"&quot;", L"\"");
+	str.Replace(L"&lrm;", L"\x200E");
+	str.Replace(L"&rlm;", L"\x200F");
 
 	return str;
 }
