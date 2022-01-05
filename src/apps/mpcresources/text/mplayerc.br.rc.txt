@@ -592,7 +592,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 11		"HDR"
 12		"Carregar lista-reprodução"
 14		"youtube-dl, yt-dlp"
-15		"Executable file:"
+15		"Arquivo executável:"
 17		"Altura máxima do vídeo:"
 19		"Selecionar fps máximo ou taxa de bits"
 20		"Endereço AceStream:"
@@ -626,8 +626,8 @@ END
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Combinador shader"
 8		"&Adicionar"
-10		"Ativar pixel shaders pré-redimensionar"
-12		"Ativar pixel shaders pós-redimensionar"
+10		"Ativar pixel shaders pré-redimensionado"
+12		"Ativar pixel shaders pós-redimensionado"
 14		"&Remover"
 15		"Mover a&cima"
 16		"Mover a&baixo"
@@ -1016,8 +1016,8 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 END
 
 BEGIN MENU IDR_POPUP_SHADERS LINES 11
-5		"Ativar pixel shaders pré-redimensionar"
-6		"Ativar pixel shaders pós-redimensionar"
+5		"Ativar pixel shaders pré-redimensionado"
+6		"Ativar pixel shaders pós-redimensionado"
 7		"Se&lecionar shaders..."
 9		"&Editar shaders..."
 END
@@ -2020,7 +2020,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Pular verificação de nível"
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Pular verificação de ref quadro"
 STRING IDS_VDF_HW_ACCELERATION		"Aceleraçao do hardware"
 STRING IDS_VDF_HW_CODECS		"Codecs:"
-STRING IDS_VDF_PREFERRED_HW_DECODER		"Preferred decoder"
+STRING IDS_VDF_PREFERRED_HW_DECODER		"Decodificador preferido"
 STRING IDS_VDF_SCANTYPE		"Tipo de verificação"
 STRING IDS_VDF_SCANTYPE_BOTTOM		"Primeiro campo inferior"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"Progressivo"
