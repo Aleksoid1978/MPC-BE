@@ -187,6 +187,27 @@ DAV1D_API int dav1d_send_data(Dav1dContext *c, Dav1dData *in);
 DAV1D_API int dav1d_get_picture(Dav1dContext *c, Dav1dPicture *out);
 
 /**
+ * Apply film grain to a previously decoded picture. If the picture contains no
+ * film grain metadata, then this function merely returns a new reference.
+ *
+ * @param   c Input decoder instance.
+ * @param out Output frame. The caller assumes ownership of the returned
+ *            reference.
+ * @param  in Input frame. No ownership is transferred.
+ *
+ * @return
+ *         0: Success, and a frame is returned.
+ *  other negative DAV1D_ERR codes: Error due to lack of memory or because of
+ *                                  invalid passed-in arguments.
+ *
+ * @note If `Dav1dSettings.apply_grain` is true, film grain was already applied
+ *       by `dav1d_get_picture`, and so calling this function leads to double
+ *       application of film grain. Users should only call this when needed.
+ */
+DAV1D_API int dav1d_apply_grain(Dav1dContext *c, Dav1dPicture *out,
+                                const Dav1dPicture *in);
+
+/**
  * Close a decoder instance and free all associated memory.
  *
  * @param c_out The decoder instance to close. *c_out will be set to NULL.
