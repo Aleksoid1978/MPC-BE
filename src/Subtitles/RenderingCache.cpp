@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2017 see Authors.txt
+ * (C) 2013-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -158,6 +158,10 @@ void COutlineKey::UpdateHash()
 	m_hash += int(m_style->outlineWidthX);
 	m_hash += m_hash << 5;
 	m_hash += int(m_style->outlineWidthY);
+	m_hash += m_hash << 5;
+	m_hash += int(m_style->shadowDepthX);
+	m_hash += m_hash << 5;
+	m_hash += int(m_style->shadowDepthY);
 }
 
 bool COutlineKey::operator==(const COutlineKey& outLineKey) const

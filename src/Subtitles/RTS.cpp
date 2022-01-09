@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -130,16 +130,20 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 	if (m_renderingCaches.overlayCache.Lookup(overlayKey, m_pOverlayData)) {
 		m_fDrawn = m_renderingCaches.outlineCache.Lookup(overlayKey, m_pOutlineData);
 		if (m_style.borderStyle == 1) {
-			if (!CreateOpaqueBox()) {
-				return;
+			if (m_style.outlineWidthX > 0.0 || m_style.shadowDepthX > 0.0 || m_style.outlineWidthY > 0.0 || m_style.shadowDepthY > 0.0) {
+				if (!CreateOpaqueBox()) {
+					return;
+				}
 			}
 		}
 	} else {
 		if (!m_fDrawn) {
 			if (m_renderingCaches.outlineCache.Lookup(overlayKey, m_pOutlineData)) {
 				if (m_style.borderStyle == 1) {
-					if (!CreateOpaqueBox()) {
-						return;
+					if (m_style.outlineWidthX > 0.0 || m_style.shadowDepthX > 0.0 || m_style.outlineWidthY > 0.0 || m_style.shadowDepthY > 0.0) {
+						if (!CreateOpaqueBox()) {
+							return;
+						}
 					}
 				}
 			} else {
@@ -170,8 +174,10 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 						return;
 					}
 				} else if (m_style.borderStyle == 1) {
-					if (!CreateOpaqueBox()) {
-						return;
+					if (m_style.outlineWidthX > 0.0 || m_style.shadowDepthX > 0.0 || m_style.outlineWidthY > 0.0 || m_style.shadowDepthY > 0.0) {
+						if (!CreateOpaqueBox()) {
+							return;
+						}
 					}
 				}
 
@@ -1091,14 +1097,15 @@ CRect CLine::PaintOutline(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CP
 			return bbox;	// should not happen since this class is just a line of text without any breaks
 		}
 
-		if ((w->m_style.outlineWidthX + w->m_style.outlineWidthY > 0 || w->m_style.borderStyle == 1) && !(w->m_ktype == 2 && time < w->m_kstart)) {
+		bool has_outline = w->m_style.outlineWidthX + w->m_style.outlineWidthY > 0.0;
+		if ((has_outline || w->m_style.borderStyle == 1) && !(w->m_ktype == 2 && time < w->m_kstart)) {
 			int x = p.x;
 			int y = p.y + m_ascent - w->m_ascent;
 			DWORD aoutline = w->m_style.alpha[2];
 			if (alpha > 0) {
 				aoutline += alpha*(0xff-w->m_style.alpha[2])/0xff;
 			}
-			COLORREF outline = revcolor(w->m_style.colors[2]) | ((0xff-aoutline)<<24);
+			COLORREF outline = revcolor(has_outline ? w->m_style.colors[2] : w->m_style.colors[3]) | ((0xff - aoutline) << 24);
 			DWORD sw[6] = {outline, DWORD_MAX};
 
 			w->Paint(CPoint(x, y), org);
