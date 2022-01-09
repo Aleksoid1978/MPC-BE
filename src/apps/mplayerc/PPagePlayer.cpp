@@ -167,6 +167,19 @@ BOOL CPPagePlayer::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 	auto pFrame = AfxGetMainFrame();
 
+	if (s.iMultipleInst != m_iMultipleInst && CPPageFormats::ShellExtExists()) {
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
+			key.SetDWORDValue(IDS_RS_MULTIINST, m_iMultipleInst);
+			key.Close();
+		}
+
+		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, shellExtKeyName)) {
+			key.SetDWORDValue(IDS_RS_MULTIINST, m_iMultipleInst);
+			key.Close();
+		}
+	}
+
 	s.iMultipleInst = m_iMultipleInst;
 
 	int i = m_cbTitleBarPrefix.GetCurSel();
