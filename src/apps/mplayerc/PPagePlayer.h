@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,9 @@ public:
 	CPPagePlayer();
 	virtual ~CPPagePlayer() = default;
 
+	int  m_iCurSetsLocation = 0;
+	int  m_iSetsLocation = 0;
+
 	int  m_iMultipleInst;
 	BOOL m_bKeepHistory;
 	BOOL m_bRememberDVDPos;
@@ -44,7 +47,6 @@ public:
 	BOOL m_bShowOSD;
 	BOOL m_bOSDFileName;
 	BOOL m_bOSDSeekTime;
-	BOOL m_bUseIni;
 	BOOL m_bHideCDROMsSubMenu;
 	BOOL m_bPriority;
 

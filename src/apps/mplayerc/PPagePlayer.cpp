@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,7 +39,6 @@ CPPagePlayer::CPPagePlayer()
 	, m_bShowOSD(FALSE)
 	, m_bOSDFileName(FALSE)
 	, m_bOSDSeekTime(FALSE)
-	, m_bUseIni(FALSE)
 	, m_bHideCDROMsSubMenu(FALSE)
 	, m_bPriority(FALSE)
 {
@@ -50,11 +49,11 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Radio(pDX, IDC_RADIO1,   m_iMultipleInst);
+	DDX_Radio(pDX, IDC_RADIO4,   m_iSetsLocation);
 	DDX_Control(pDX, IDC_COMBO1, m_cbTitleBarPrefix);
 	DDX_Control(pDX, IDC_COMBO2, m_cbSeekBarText);
 	DDX_Check(pDX, IDC_CHECK3,   m_bTrayIcon);
 	DDX_Check(pDX, IDC_CHECK11,  m_bSavePnSZoom);
-	DDX_Check(pDX, IDC_CHECK8,   m_bUseIni);
 	DDX_Check(pDX, IDC_CHECK1,   m_bKeepHistory);
 	DDX_Check(pDX, IDC_CHECK10,  m_bHideCDROMsSubMenu);
 	DDX_Check(pDX, IDC_CHECK9,   m_bPriority);
@@ -107,10 +106,20 @@ BOOL CPPagePlayer::OnInitDialog()
 		m_cbSeekBarText.SetCurSel(TEXTBAR_TITLE);
 	}
 
+	auto pWnd = GetDlgItem(IDC_RADIO5);
+	pWnd->EnableWindow(FALSE);
+	CStringW str;
+	pWnd->GetWindowText(str);
+	str.Insert(0, L"TODO: ");
+	pWnd->SetWindowText(str);
+
+	CProfile& profile = AfxGetProfile();
+	m_iCurSetsLocation = profile.IsIniValid() ? 2 : 0;
+	m_iSetsLocation = m_iCurSetsLocation;
+
 	m_iMultipleInst				= s.iMultipleInst;
 	m_bTrayIcon					= s.bTrayIcon;
 	m_bSavePnSZoom				= s.bSavePnSZoom;
-	m_bUseIni					= AfxGetProfile().IsIniValid();
 	m_bKeepHistory				= s.bKeepHistory;
 	m_bHideCDROMsSubMenu		= s.bHideCDROMsSubMenu;
 	m_bPriority					= s.dwPriority != NORMAL_PRIORITY_CLASS;
@@ -141,8 +150,11 @@ BOOL CPPagePlayer::OnInitDialog()
 	CString iniDirPath = GetProgramDir();
 	HANDLE hDir = CreateFileW(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
 							 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-	// gray-out "Store settings in the player folder" option when we don't have writing permissions in the target directory
-	GetDlgItem(IDC_CHECK8)->EnableWindow(hDir != INVALID_HANDLE_VALUE);
+	if (hDir == INVALID_HANDLE_VALUE) {
+		// gray-out "Store settings in the player folder" option when we don't have writing permissions in the target directory
+		GetDlgItem(IDC_RADIO4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO6)->EnableWindow(FALSE);
+	}
 	CloseHandle(hDir);
 
 	return TRUE;
@@ -205,10 +217,12 @@ BOOL CPPagePlayer::OnApply()
 	s.iNetworkTimeout = m_edtNetworkTimeout;
 
 	// Check if the settings location needs to be changed
-	if (AfxGetProfile().IsIniValid() != !!m_bUseIni) {
+	CProfile& profile = AfxGetProfile();
+	if (m_iSetsLocation != m_iCurSetsLocation) {
 		pFrame->m_wndPlaylistBar.TDeleteAllPlaylists();
-		AfxGetMyApp()->ChangeSettingsLocation(!!m_bUseIni);
+		AfxGetMyApp()->ChangeSettingsLocation(m_iSetsLocation == 2);
 		pFrame->m_wndPlaylistBar.TSaveAllPlaylists();
+		m_iCurSetsLocation = m_iSetsLocation;
 	}
 
 	AfxGetMainFrame()->ShowTrayIcon(s.bTrayIcon);
