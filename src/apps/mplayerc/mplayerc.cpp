@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -234,7 +234,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 {
 	path.Empty();
 
-	if (m_Profile.IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
+	if (m_Profile.GetSettingsLocation() == SETS_PROGRAMDIR) { // If settings ini file found, store stuff in the same folder as the exe file
 		path = GetProgramDir();
 	} else {
 		HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(MAX_PATH));
@@ -250,19 +250,15 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 	return true;
 }
 
-bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
+bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 {
 	CString oldpath;
 	AfxGetMyApp()->GetAppSavePath(oldpath);
+	bool needFilesMove = (m_Profile.GetSettingsLocation() == SETS_PROGRAMDIR) != (newSetLocation == SETS_PROGRAMDIR);
 
-	if (useIni) {
-		bool success = m_Profile.StoreSettingsToIni();
-		if (!success) {
-			return false;
-		}
-	} else {
-		m_Profile.StoreSettingsToRegistry();
-		_wremove(m_Profile.GetIniPath());
+	bool success = m_Profile.StoreSettingsTo(newSetLocation);
+	if (!success) {
+		return false;
 	}
 
 	// Save external filters to the new location
@@ -271,53 +267,55 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	// Write settings immediately
 	m_s.SaveSettings();
 
-	const CStringW oldHistoryPath(oldpath + MPC_HISTORY_FILENAME);
-	const CStringW oldFavoritesPath(oldpath + MPC_FAVORITES_FILENAME);
+	if (needFilesMove) {
+		const CStringW oldHistoryPath(oldpath + MPC_HISTORY_FILENAME);
+		const CStringW oldFavoritesPath(oldpath + MPC_FAVORITES_FILENAME);
 
-	CString newpath;
-	AfxGetMyApp()->GetAppSavePath(newpath); // call it after saving the settings
+		CString newpath;
+		AfxGetMyApp()->GetAppSavePath(newpath); // call it after saving the settings
 
-	if (!useIni && !::PathFileExistsW(newpath)) {
-		EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
-	}
-
-	const CStringW newHistoryPath(newpath + MPC_HISTORY_FILENAME);
-	const CStringW newFavoritesPath(newpath + MPC_FAVORITES_FILENAME);
-
-	m_HistoryFile.SetFilename(newHistoryPath);
-	m_FavoritesFile.SetFilename(newFavoritesPath);
-
-	if (::PathFileExistsW(oldHistoryPath)) {
-		// moving history file
-		int ret = FileOperation(oldHistoryPath, newHistoryPath, FO_MOVE);
-		if (ret != 0) {
-			MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
+		if (newSetLocation == SETS_REGISTRY && !::PathFileExistsW(newpath)) {
+			EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
 		}
-	}
-	if (::PathFileExistsW(oldFavoritesPath)) {
-		// moving favorites file
-		int ret = FileOperation(oldFavoritesPath, newFavoritesPath, FO_MOVE);
-		if (ret != 0) {
-			MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
-		}
-	}
 
-	// moving shader files
-	CStringW oldFolderPath = oldpath + L"Shaders\\";
-	if (::PathFileExistsW(oldFolderPath)) {
-		// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-		int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
-		if (ret != 0) {
-			MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
-		}
-	}
+		const CStringW newHistoryPath(newpath + MPC_HISTORY_FILENAME);
+		const CStringW newFavoritesPath(newpath + MPC_FAVORITES_FILENAME);
 
-	oldFolderPath = oldpath + L"Shaders11\\";
-	if (::PathFileExistsW(oldFolderPath)) {
-		// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-		int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
-		if (ret != 0) {
-			MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
+		m_HistoryFile.SetFilename(newHistoryPath);
+		m_FavoritesFile.SetFilename(newFavoritesPath);
+
+		if (::PathFileExistsW(oldHistoryPath)) {
+			// moving history file
+			int ret = FileOperation(oldHistoryPath, newHistoryPath, FO_MOVE);
+			if (ret != 0) {
+				MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
+		}
+		if (::PathFileExistsW(oldFavoritesPath)) {
+			// moving favorites file
+			int ret = FileOperation(oldFavoritesPath, newFavoritesPath, FO_MOVE);
+			if (ret != 0) {
+				MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
+		}
+
+		// moving shader files
+		CStringW oldFolderPath = oldpath + L"Shaders\\";
+		if (::PathFileExistsW(oldFolderPath)) {
+			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
+			if (ret != 0) {
+				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
+		}
+
+		oldFolderPath = oldpath + L"Shaders11\\";
+		if (::PathFileExistsW(oldFolderPath)) {
+			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
+			if (ret != 0) {
+				MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
 		}
 	}
 
@@ -447,7 +445,9 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 
 void CMPlayerCApp::ExportSettings()
 {
-	CString ext = m_Profile.IsIniValid() ? L"ini" : L"reg";
+	const SettingsLocation setsLocation = m_Profile.GetSettingsLocation();
+
+	CString ext = (setsLocation == SETS_REGISTRY) ? L"reg" : L"ini";
 	CString ext_list;
 	ext_list.Format(L"Export files (*.%s)|*.%s|", ext, ext);
 
@@ -475,9 +475,7 @@ void CMPlayerCApp::ExportSettings()
 		bool success = false;
 		s.SaveSettings();
 
-		if (m_Profile.IsIniValid()) {
-			success = !!CopyFileW(m_Profile.GetIniPath(), savePath, FALSE);
-		} else {
+		if (setsLocation == SETS_REGISTRY) {
 			FILE* fStream;
 			errno_t error = _wfopen_s(&fStream, savePath, L"wt,ccs=UNICODE");
 			CStdioFile file(fStream);
@@ -486,6 +484,9 @@ void CMPlayerCApp::ExportSettings()
 			success = !error && ExportRegistryKey(file, HKEY_CURRENT_USER, L"Software\\MPC-BE");
 
 			file.Close();
+		}
+		else {
+			success = !!CopyFileW(m_Profile.GetIniPath(), savePath, FALSE);
 		}
 
 		s.nLastUsedPage = nLastUsedPage;
@@ -816,13 +817,6 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	// select setting location
-	if (m_Profile.IsIniValid()) {
-		m_Profile.StoreSettingsToIni();
-	} else {
-		m_Profile.StoreSettingsToRegistry();
-	}
-
 	// process command line
 	PreProcessCommandLine();
 	m_s.ParseCommandLine(m_cmdln);
@@ -990,7 +984,7 @@ BOOL CMPlayerCApp::InitInstance()
 	CString appSavePath;
 	GetAppSavePath(appSavePath);
 
-	if (!m_Profile.IsIniValid()) {
+	if (m_Profile.GetSettingsLocation() != SETS_PROGRAMDIR) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 			CString path = GetProgramPath();

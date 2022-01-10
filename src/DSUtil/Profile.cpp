@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,22 +21,53 @@
 #include "stdafx.h"
 #include <atlpath.h>
 #include <atlenc.h>
+#include <Shlobj.h>
 #include "FileHandle.h"
 #include "Utils.h"
 #include "Log.h"
 #include "Profile.h"
 
+CStringW GetIniProgramDir()
+{
+	CStringW path = GetModulePath(nullptr);
+	::PathRenameExtensionW(path.GetBuffer(MAX_PATH), L".ini");
+	path.ReleaseBuffer();
+
+	return path;
+}
+
+CStringW GetIniUserProfile()
+{
+	CStringW path = GetIniProgramDir();
+	const CStringW fname = ::PathFindFileNameW(path);
+	HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(MAX_PATH));
+	path.ReleaseBuffer();
+	if (SUCCEEDED(hr)) {
+		path.Append(L"\\MPC-BE\\");
+		path.Append(fname);
+	}
+
+	return path;
+}
+
 // CProfile
 
 CProfile::CProfile()
 {
-	m_IniPath = GetModulePath(nullptr);
-	::PathRenameExtensionW(m_IniPath.GetBuffer(MAX_PATH), L".ini");
-	m_IniPath.ReleaseBuffer();
-
-	if (!::PathFileExistsW(m_IniPath)) {
-		OpenRegistryKey();
+	CStringW path = GetIniProgramDir();
+	if (::PathFileExistsW(path)) {
+		m_IniPath = path;
+		m_bIniProgDir = true;
+		return;
 	}
+
+	path = GetIniUserProfile();
+	if (::PathFileExistsW(path)) {
+		m_IniPath = path;
+		return;
+	}
+
+	OpenRegistryKey();
 }
 
 LONG CProfile::OpenRegistryKey()
@@ -141,34 +172,69 @@ void CProfile::InitIni()
 	m_dwIniLastAccessTick = GetTickCount(); // update the last access tick because reading the file can take a long time
 }
 
-bool CProfile::StoreSettingsToRegistry()
+bool CProfile::StoreSettingsTo(const SettingsLocation newLocation)
 {
-	if (m_hAppRegKey) {
-		DLog(L"StoreSettingsToRegistry(): The settings are already stored in the registry.");
-		return true;
-	}
+	if (newLocation == SETS_REGISTRY) {
+		if (m_hAppRegKey) {
+			DLog(L"StoreSettingsTo: The settings are already stored in the registry.");
+			return true;
+		}
 
-	InitIni();
+		InitIni();
+		if (::PathFileExistsW(m_IniPath) && _wremove(m_IniPath) != 0) {
+			DLog(L"StoreSettingsTo: WARNING! The INI file can not be deleted. Perhaps this is protection against changes in settings. Transfer of settings is canceled.");
+			return false;
+		}
 
-	if (::PathFileExistsW(m_IniPath) && _wremove(m_IniPath) != 0) {
-		DLog(L"StoreSettingsToRegistry(): WARNING! The INI file can not be deleted. Perhaps this is protection against changes in settings. Transfer of settings is canceled.");
+		OpenRegistryKey();
+		if (m_hAppRegKey) {
+			m_IniPath.Empty();
+			m_bIniProgDir = false;
+
+			return true;
+		}
+
 		return false;
 	}
 
-	OpenRegistryKey();
+	if (m_IniPath.GetLength()) {
+		if (newLocation == SETS_USERPROFILE && !m_bIniProgDir) {
+			DLog(L"StoreSettingsTo: The settings are already stored in the user profile.");
+			return true;
+		}
+		if (newLocation == SETS_PROGRAMDIR && m_bIniProgDir) {
+			DLog(L"StoreSettingsTo: The settings are already stored in the program folder.");
+			return true;
+		}
+	}
 
-	return (m_hAppRegKey != nullptr);
-}
-
-bool CProfile::StoreSettingsToIni()
-{
 	if (m_hAppRegKey) {
 		LONG lResult = SHDeleteKeyW(m_hAppRegKey, L"");
 		RegCloseKey(m_hAppRegKey);
 		m_hAppRegKey = nullptr;
 	}
 
-	return true;
+	InitIni();
+	if (::PathFileExistsW(m_IniPath) && _wremove(m_IniPath) != 0) {
+		DLog(L"StoreSettingsToIni(): WARNING! The old INI file can not be deleted. Perhaps this is protection against changes in settings. Transfer of settings is canceled.");
+		return false;
+	}
+
+	const bool bProgramDir = (newLocation == SETS_PROGRAMDIR);
+	const CStringW newIniPath = bProgramDir ? GetIniProgramDir() : GetIniUserProfile();
+	CFile file;
+	if (file.Open(newIniPath, CFile::modeWrite | CFile::modeCreate | CFile::modeNoTruncate)) {
+		// ok. the file can be opened and written.
+		file.Close();
+
+		m_IniPath = newIniPath;
+		m_bIniProgDir = bProgramDir;
+		Flush(true);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool CProfile::ReadBool(const wchar_t* section, const wchar_t* entry, bool& value)
@@ -964,13 +1030,27 @@ void CProfile::Flush(bool bForce)
 void CProfile::Clear()
 {
 	// Remove the settings
-	if (IsIniValid()) {
+	if (m_hAppRegKey) {
+		SHDeleteKeyW(m_hAppRegKey, L"");
+	}
+	else {
+		ASSERT(m_IniPath.GetLength());
 		CFile file;
-		if (file.Open(GetIniPath(), CFile::modeWrite)) {
+		if (file.Open(m_IniPath, CFile::modeWrite)) {
 			file.SetLength(0); // clear, but not delete
 			file.Close();
 		}
-	} else {
-		SHDeleteKeyW(m_hAppRegKey, L"");
 	}
+}
+
+SettingsLocation CProfile::GetSettingsLocation() const
+{
+	if (m_hAppRegKey) {
+		return SETS_REGISTRY;
+	}
+	ASSERT(m_IniPath.GetLength());
+	if (m_bIniProgDir) {
+		return SETS_PROGRAMDIR;
+	}
+	return SETS_USERPROFILE;
 }

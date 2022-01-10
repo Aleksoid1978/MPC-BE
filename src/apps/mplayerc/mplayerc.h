@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -106,8 +106,7 @@ private:
 	bool m_bRunAdmin = false;
 
 public:
-
-	bool			ChangeSettingsLocation(bool useIni);
+	bool			ChangeSettingsLocation(const SettingsLocation newSetLocation);
 	void			ExportSettings();
 	bool			GetAppSavePath(CString& path);
 

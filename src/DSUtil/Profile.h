@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,12 @@
 #include <mutex>
 #include <map>
 
+enum SettingsLocation {
+	SETS_REGISTRY,
+	SETS_USERPROFILE,
+	SETS_PROGRAMDIR
+};
+
 class CProfile
 {
 private:
@@ -33,6 +39,7 @@ private:
 
 	// INI file
 	CStringW m_IniPath;
+	bool     m_bIniProgDir = false;
 	struct KeyCmp {
 		bool operator()(const CStringW& str1, const CStringW& str2) const {
 			return str1.CompareNoCase(str2) < 0;
@@ -52,8 +59,7 @@ private:
 	void InitIni();
 
 public:
-	bool StoreSettingsToRegistry();
-	bool StoreSettingsToIni();
+	bool StoreSettingsTo(const SettingsLocation newLocation);
 
 	bool ReadBool  (const wchar_t* section, const wchar_t* entry, bool&     value);
 	bool ReadInt   (const wchar_t* section, const wchar_t* entry, int&      value);
@@ -87,13 +93,11 @@ public:
 	void Flush(bool bForce);
 	void Clear();
 
+	SettingsLocation GetSettingsLocation() const;
+
 	CStringW GetIniPath() const
 	{
 		return m_IniPath;
-	}
-	bool IsIniValid() const
-	{
-		return !!::PathFileExistsW(m_IniPath);
 	}
 };
 

@@ -106,15 +106,8 @@ BOOL CPPagePlayer::OnInitDialog()
 		m_cbSeekBarText.SetCurSel(TEXTBAR_TITLE);
 	}
 
-	auto pWnd = GetDlgItem(IDC_RADIO5);
-	pWnd->EnableWindow(FALSE);
-	CStringW str;
-	pWnd->GetWindowText(str);
-	str.Insert(0, L"TODO: ");
-	pWnd->SetWindowText(str);
-
 	CProfile& profile = AfxGetProfile();
-	m_iCurSetsLocation = profile.IsIniValid() ? 2 : 0;
+	m_iCurSetsLocation = profile.GetSettingsLocation();
 	m_iSetsLocation = m_iCurSetsLocation;
 
 	m_iMultipleInst				= s.iMultipleInst;
@@ -147,15 +140,30 @@ BOOL CPPagePlayer::OnInitDialog()
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.bKeepHistory);
 	m_spnRecentFiles.EnableWindow(s.bKeepHistory);
 
-	CString iniDirPath = GetProgramDir();
-	HANDLE hDir = CreateFileW(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-							 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-	if (hDir == INVALID_HANDLE_VALUE) {
-		// gray-out "Store settings in the player folder" option when we don't have writing permissions in the target directory
-		GetDlgItem(IDC_RADIO4)->EnableWindow(FALSE);
-		GetDlgItem(IDC_RADIO6)->EnableWindow(FALSE);
+	if (m_iSetsLocation != SETS_REGISTRY && ::PathFileExistsW(profile.GetIniPath())) {
+		HANDLE hDir = CreateFileW(profile.GetIniPath(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+			OPEN_EXISTING, 0, nullptr);
+		if (hDir == INVALID_HANDLE_VALUE) {
+			GetDlgItem(IDC_RADIO4)->EnableWindow(FALSE);
+			if (m_iSetsLocation == SETS_PROGRAMDIR) {
+				GetDlgItem(IDC_RADIO5)->EnableWindow(FALSE);
+				GetDlgItem(IDC_RADIO6)->EnableWindow(FALSE);
+			}
+			return TRUE;
+		}
+		CloseHandle(hDir);
 	}
-	CloseHandle(hDir);
+
+	{
+		CString iniDirPath = GetProgramDir();
+		HANDLE hDir = CreateFileW(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+			OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+		if (hDir == INVALID_HANDLE_VALUE) {
+			GetDlgItem(IDC_RADIO6)->EnableWindow(FALSE);
+		}
+		CloseHandle(hDir);
+	}
+
 
 	return TRUE;
 }
@@ -233,7 +241,7 @@ BOOL CPPagePlayer::OnApply()
 	CProfile& profile = AfxGetProfile();
 	if (m_iSetsLocation != m_iCurSetsLocation) {
 		pFrame->m_wndPlaylistBar.TDeleteAllPlaylists();
-		AfxGetMyApp()->ChangeSettingsLocation(m_iSetsLocation == 2);
+		AfxGetMyApp()->ChangeSettingsLocation((SettingsLocation)m_iSetsLocation);
 		pFrame->m_wndPlaylistBar.TSaveAllPlaylists();
 		m_iCurSetsLocation = m_iSetsLocation;
 	}
