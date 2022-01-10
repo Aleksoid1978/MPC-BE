@@ -276,6 +276,9 @@ SCALE_FUNCS_SSE(sse2);
 SCALE_FUNCS_SSE(ssse3);
 SCALE_FUNCS_SSE(sse4);
 
+SCALE_FUNC(4, 8, 15, avx2);
+SCALE_FUNC(X4, 8, 15, avx2);
+
 #define VSCALEX_FUNC(size, opt) \
 void ff_yuv2planeX_ ## size ## _ ## opt(const int16_t *filter, int filterSize, \
                                         const int16_t **src, uint8_t *dest, int dstW, \
@@ -414,14 +417,14 @@ av_cold void ff_sws_init_swscale_x86(SwsContext *c)
 #define ASSIGN_VSCALEX_FUNC(vscalefn, opt, do_16_case, condition_8bit) \
 switch(c->dstBpc){ \
     case 16:                          do_16_case;                          break; \
-    case 10: if (!isBE(c->dstFormat) && c->dstFormat != AV_PIX_FMT_P010LE) vscalefn = ff_yuv2planeX_10_ ## opt; break; \
+    case 10: if (!isBE(c->dstFormat) && !isSemiPlanarYUV(c->dstFormat)) vscalefn = ff_yuv2planeX_10_ ## opt; break; \
     case 9:  if (!isBE(c->dstFormat)) vscalefn = ff_yuv2planeX_9_  ## opt; break; \
     case 8: if ((condition_8bit) && !c->use_mmx_vfilter) vscalefn = ff_yuv2planeX_8_  ## opt; break; \
     }
 #define ASSIGN_VSCALE_FUNC(vscalefn, opt1, opt2, opt2chk) \
     switch(c->dstBpc){ \
     case 16: if (!isBE(c->dstFormat))            vscalefn = ff_yuv2plane1_16_ ## opt1; break; \
-    case 10: if (!isBE(c->dstFormat) && c->dstFormat != AV_PIX_FMT_P010LE && opt2chk) vscalefn = ff_yuv2plane1_10_ ## opt2; break; \
+    case 10: if (!isBE(c->dstFormat) && !isSemiPlanarYUV(c->dstFormat) && opt2chk) vscalefn = ff_yuv2plane1_10_ ## opt2; break; \
     case 9:  if (!isBE(c->dstFormat) && opt2chk) vscalefn = ff_yuv2plane1_9_  ## opt2;  break; \
     case 8:                                      vscalefn = ff_yuv2plane1_8_  ## opt1;  break; \
     default: av_assert0(c->dstBpc>8); \
@@ -568,6 +571,22 @@ switch(c->dstBpc){ \
     }
 
 #if ARCH_X86_64
+#define ASSIGN_AVX2_SCALE_FUNC(hscalefn, filtersize) \
+    switch (filtersize) { \
+    case 4:  hscalefn = ff_hscale8to15_4_avx2; break; \
+    default:  hscalefn = ff_hscale8to15_X4_avx2; break; \
+             break; \
+    }
+
+    if (EXTERNAL_AVX2_FAST(cpu_flags) && !(cpu_flags & AV_CPU_FLAG_SLOW_GATHER)) {
+        if ((c->srcBpc == 8) && (c->dstBpc <= 14)) {
+            if (c->chrDstW % 16 == 0)
+                ASSIGN_AVX2_SCALE_FUNC(c->hcScale, c->hChrFilterSize);
+            if (c->dstW % 16 == 0)
+                ASSIGN_AVX2_SCALE_FUNC(c->hyScale, c->hLumFilterSize);
+        }
+    }
+
     if (EXTERNAL_AVX2_FAST(cpu_flags)) {
         switch (c->dstFormat) {
         case AV_PIX_FMT_NV12:

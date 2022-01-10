@@ -112,10 +112,6 @@
 #   define STRIDE_ALIGN 8
 #endif
 
-typedef struct DecodeSimpleContext {
-    AVPacket *in_pkt;
-} DecodeSimpleContext;
-
 typedef struct EncodeSimpleContext {
     AVFrame *in_frame;
 } EncodeSimpleContext;
@@ -137,7 +133,15 @@ typedef struct AVCodecInternal {
 
     void *thread_ctx;
 
-    DecodeSimpleContext ds;
+    /**
+     * This packet is used to hold the packet given to decoders
+     * implementing the .decode API; it is unused by the generic
+     * code for decoders implementing the .receive_frame API and
+     * may be freely used (but not freed) by them with the caveat
+     * that the packet will be unreferenced generically in
+     * avcodec_flush_buffers().
+     */
+    AVPacket *in_pkt;
     AVBSFContext *bsf;
 
     /**
@@ -221,7 +225,7 @@ extern const uint8_t ff_log2_run[41];
  */
 int ff_match_2uint16(const uint16_t (*tab)[2], int size, int a, int b);
 
-unsigned int avpriv_toupper4(unsigned int x);
+unsigned int ff_toupper4(unsigned int x);
 
 void ff_color_frame(AVFrame *frame, const int color[4]);
 
@@ -361,11 +365,5 @@ int ff_int_from_list_or_default(void *ctx, const char * val_name, int val,
                                 const int * array_valid_values, int default_value);
 
 void ff_dvdsub_parse_palette(uint32_t *palette, const char *p);
-
-#if defined(_WIN32) && CONFIG_SHARED && !defined(BUILDING_avcodec)
-#    define av_export_avcodec __declspec(dllimport)
-#else
-#    define av_export_avcodec
-#endif
 
 #endif /* AVCODEC_INTERNAL_H */

@@ -86,6 +86,7 @@ static const struct {
     { MKTAG('N', 'V', '1', '2'), AV_PIX_FMT_NV12 },
     { MKTAG('P', '0', '1', '0'), AV_PIX_FMT_P010 },
     { D3DFMT_P8,                 AV_PIX_FMT_PAL8 },
+    { D3DFMT_A8R8G8B8,           AV_PIX_FMT_BGRA },
 };
 
 // ==> Start patch MPC

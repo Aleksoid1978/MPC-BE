@@ -2844,7 +2844,8 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
     return 0;
 }
 
-static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
+static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
+                             int parse_only)
 {
     MpegEncContext *s = &ctx->m;
     int time_incr, time_increment;
@@ -3018,6 +3019,12 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
         ff_init_scantable(s->idsp.idct_permutation, &s->intra_v_scantable, ff_alternate_vertical_scan);
     }
 
+    /* Skip at this point when only parsing since the remaining
+     * data is not useful for a parser and requires the
+     * sprite_trajectory VLC to be initialized. */
+    if (parse_only)
+        goto end;
+
     if (s->pict_type == AV_PICTURE_TYPE_S) {
         if((ctx->vol_sprite_usage == STATIC_SPRITE ||
             ctx->vol_sprite_usage == GMC_SPRITE)) {
@@ -3095,6 +3102,8 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
             skip_bits(gb, 2);  // ref_select_code
         }
     }
+
+end:
     /* detect buggy encoders which don't set the low_delay flag
      * (divx4/xvid/opendivx). Note we cannot detect divx5 without B-frames
      * easily (although it's buggy too) */
@@ -3214,11 +3223,14 @@ static int decode_studiovisualobject(Mpeg4DecContext *ctx, GetBitContext *gb)
  * Decode MPEG-4 headers.
  *
  * @param  header If set the absence of a VOP is not treated as error; otherwise, it is treated as such.
+ * @param  parse_only If set, things only relevant to a decoder may be skipped;
+ *                    furthermore, the VLC tables may be uninitialized.
  * @return <0 if an error occurred
  *         FRAME_SKIPPED if a not coded VOP is found
  *         0 else
  */
-int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb, int header)
+int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb,
+                                   int header, int parse_only)
 {
     MpegEncContext *s = &ctx->m;
     unsigned startcode, v;
@@ -3371,35 +3383,7 @@ end:
         }
         return decode_studio_vop_header(ctx, gb);
     } else
-        return decode_vop_header(ctx, gb);
-}
-
-av_cold void ff_mpeg4videodec_static_init(void) {
-    static int done = 0;
-
-    if (!done) {
-        static uint8_t mpeg4_rvlc_rl_tables[2][2][2 * MAX_RUN + MAX_LEVEL + 3];
-
-        ff_mpeg4_init_rl_intra();
-        ff_rl_init(&ff_rvlc_rl_inter, mpeg4_rvlc_rl_tables[0]);
-        ff_rl_init(&ff_rvlc_rl_intra, mpeg4_rvlc_rl_tables[1]);
-        INIT_FIRST_VLC_RL(ff_mpeg4_rl_intra, 554);
-        INIT_VLC_RL(ff_rvlc_rl_inter, 1072);
-        INIT_FIRST_VLC_RL(ff_rvlc_rl_intra, 1072);
-        INIT_VLC_STATIC(&dc_lum, DC_VLC_BITS, 10 /* 13 */,
-                        &ff_mpeg4_DCtab_lum[0][1], 2, 1,
-                        &ff_mpeg4_DCtab_lum[0][0], 2, 1, 512);
-        INIT_VLC_STATIC(&dc_chrom, DC_VLC_BITS, 10 /* 13 */,
-                        &ff_mpeg4_DCtab_chrom[0][1], 2, 1,
-                        &ff_mpeg4_DCtab_chrom[0][0], 2, 1, 512);
-        INIT_VLC_STATIC_FROM_LENGTHS(&sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 15,
-                                     ff_sprite_trajectory_lens, 1,
-                                     NULL, 0, 0, 0, 0, 128);
-        INIT_VLC_STATIC(&mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 4,
-                        &ff_mb_type_b_tab[0][1], 2, 1,
-                        &ff_mb_type_b_tab[0][0], 2, 1, 16);
-        done = 1;
-    }
+        return decode_vop_header(ctx, gb, parse_only);
 }
 
 int ff_mpeg4_frame_end(AVCodecContext *avctx, const uint8_t *buf, int buf_size)
@@ -3513,6 +3497,8 @@ static int mpeg4_update_thread_context_for_user(AVCodecContext *dst,
 
 static av_cold void mpeg4_init_static(void)
 {
+    static uint8_t mpeg4_rvlc_rl_tables[2][2][2 * MAX_RUN + MAX_LEVEL + 3];
+
     INIT_VLC_STATIC_FROM_LENGTHS(&studio_luma_dc, STUDIO_INTRA_BITS, 19,
                                  &ff_mpeg4_studio_dc_luma[0][1], 2,
                                  &ff_mpeg4_studio_dc_luma[0][0], 2, 1,
@@ -3535,7 +3521,25 @@ static av_cold void mpeg4_init_static(void)
                                  0, INIT_VLC_STATIC_OVERLONG, NULL);
         offset += studio_intra_tab[i].table_size;
     }
-    ff_mpeg4videodec_static_init();
+
+    ff_mpeg4_init_rl_intra();
+    ff_rl_init(&ff_rvlc_rl_inter, mpeg4_rvlc_rl_tables[0]);
+    ff_rl_init(&ff_rvlc_rl_intra, mpeg4_rvlc_rl_tables[1]);
+    INIT_FIRST_VLC_RL(ff_mpeg4_rl_intra, 554);
+    INIT_VLC_RL(ff_rvlc_rl_inter, 1072);
+    INIT_FIRST_VLC_RL(ff_rvlc_rl_intra, 1072);
+    INIT_VLC_STATIC(&dc_lum, DC_VLC_BITS, 10 /* 13 */,
+                    &ff_mpeg4_DCtab_lum[0][1], 2, 1,
+                    &ff_mpeg4_DCtab_lum[0][0], 2, 1, 512);
+    INIT_VLC_STATIC(&dc_chrom, DC_VLC_BITS, 10 /* 13 */,
+                    &ff_mpeg4_DCtab_chrom[0][1], 2, 1,
+                    &ff_mpeg4_DCtab_chrom[0][0], 2, 1, 512);
+    INIT_VLC_STATIC_FROM_LENGTHS(&sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 15,
+                                 ff_sprite_trajectory_lens, 1,
+                                 NULL, 0, 0, 0, 0, 128);
+    INIT_VLC_STATIC(&mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 4,
+                    &ff_mb_type_b_tab[0][1], 2, 1,
+                    &ff_mb_type_b_tab[0][0], 2, 1, 16);
 }
 
 static av_cold int decode_init(AVCodecContext *avctx)

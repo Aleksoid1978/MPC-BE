@@ -811,6 +811,10 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
             *fmt++ = AV_PIX_FMT_YUV420P9;
         break;
     case 10:
+#if CONFIG_H264_VIDEOTOOLBOX_HWACCEL
+        if (h->avctx->colorspace != AVCOL_SPC_RGB)
+            *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
+#endif
         if (CHROMA444(h)) {
             if (h->avctx->colorspace == AVCOL_SPC_RGB) {
                 *fmt++ = AV_PIX_FMT_GBRP10;
@@ -850,6 +854,10 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 #if CONFIG_H264_NVDEC_HWACCEL
         *fmt++ = AV_PIX_FMT_CUDA;
 #endif
+#if CONFIG_H264_VIDEOTOOLBOX_HWACCEL
+        if (h->avctx->colorspace != AVCOL_SPC_RGB)
+            *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
+#endif
         if (CHROMA444(h)) {
             if (h->avctx->colorspace == AVCOL_SPC_RGB)
                 *fmt++ = AV_PIX_FMT_GBRP;
@@ -872,9 +880,6 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 #endif
 #if CONFIG_H264_VAAPI_HWACCEL
             *fmt++ = AV_PIX_FMT_VAAPI;
-#endif
-#if CONFIG_H264_VIDEOTOOLBOX_HWACCEL
-            *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 #endif
             if (h->avctx->codec->pix_fmts)
                 choices = h->avctx->codec->pix_fmts;
@@ -1321,6 +1326,15 @@ static int h264_export_frame_props(H264Context *h)
                                                            AV_FRAME_DATA_DISPLAYMATRIX,
                                                            sizeof(int32_t) * 9);
         if (rotation) {
+            /* av_display_rotation_set() expects the angle in the clockwise
+             * direction, hence the first minus.
+             * The below code applies the flips after the rotation, yet
+             * the H.2645 specs require flipping to be applied first.
+             * Because of R O(phi) = O(-phi) R (where R is flipping around
+             * an arbitatry axis and O(phi) is the proper rotation by phi)
+             * we can create display matrices as desired by negating
+             * the degree once for every flip applied. */
+            angle = -angle * (1 - 2 * !!o->hflip) * (1 - 2 * !!o->vflip);
             av_display_rotation_set((int32_t *)rotation->data, angle);
             av_display_matrix_flip((int32_t *)rotation->data,
                                    o->hflip, o->vflip);

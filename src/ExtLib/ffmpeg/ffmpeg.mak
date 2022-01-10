@@ -91,7 +91,6 @@ SRCS_LC = \
 	libavcodec/aac_ac3_parser.c \
 	libavcodec/aac_adtstoasc_bsf.c \
 	libavcodec/aac_parser.c \
-	libavcodec/aacadtsdec.c \
 	libavcodec/aacdec.c \
 	libavcodec/aacps.c \
 	libavcodec/aacps_common.c \
@@ -100,6 +99,7 @@ SRCS_LC = \
 	libavcodec/aacsbr.c \
 	libavcodec/aactab.c \
 	libavcodec/ac3.c \
+	libavcodec/ac3_channel_layout_tab.c \
 	libavcodec/ac3_parser.c \
 	libavcodec/ac3dec_data.c \
 	libavcodec/ac3dec_float.c \
@@ -174,6 +174,7 @@ SRCS_LC = \
 	libavcodec/dca_exss.c \
 	libavcodec/dca_lbr.c \
 	libavcodec/dca_parser.c \
+	libavcodec/dca_sample_rate_tab.c \
 	libavcodec/dca_xll.c \
 	libavcodec/dcaadpcm.c \
 	libavcodec/dcadata.c \
@@ -195,6 +196,7 @@ SRCS_LC = \
 	libavcodec/dnxhd_parser.c \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
+	libavcodec/dovi_rpu.c \
 	libavcodec/dsd.c \
 	libavcodec/dsddec.c \
 	libavcodec/dstdec.c \
@@ -351,6 +353,7 @@ SRCS_LC = \
 	libavcodec/mpeg12framerate.c \
 	libavcodec/mpeg4_unpack_bframes_bsf.c \
 	libavcodec/mpeg4audio.c \
+	libavcodec/mpeg4audio_sample_rates.c \
 	libavcodec/mpeg4video.c \
 	libavcodec/mpeg4video_parser.c \
 	libavcodec/mpeg4videodec.c \
@@ -366,9 +369,11 @@ SRCS_LC = \
 	libavcodec/mpegaudiodsp_data.c \
 	libavcodec/mpegaudiodsp_fixed.c \
 	libavcodec/mpegaudiodsp_float.c \
+	libavcodec/mpegaudiotabs.c \
 	libavcodec/mpegpicture.c \
 	libavcodec/mpegutils.c \
 	libavcodec/mpegvideo.c \
+	libavcodec/mpegvideo_dec.c \
 	libavcodec/mpegvideo_motion.c \
 	libavcodec/mpegvideo_parser.c \
 	libavcodec/mpegvideodata.c \
@@ -472,6 +477,7 @@ SRCS_LC_B = \
 	libavcodec/texturedsp.c \
 	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
+	libavcodec/to_upper4.c \
 	libavcodec/tpeldsp.c \
 	libavcodec/truespeech.c \
 	libavcodec/tscc.c \
@@ -639,6 +645,7 @@ SRCS_LU = \
 	libavutil/crc.c \
 	libavutil/dict.c \
 	libavutil/display.c \
+	libavutil/dovi_meta.c \
 	libavutil/downmix_info.c \
 	libavutil/error.c \
 	libavutil/eval.c \
@@ -825,6 +832,7 @@ SRCS_YASM_LS = \
 	libswscale/x86/output.asm \
 	libswscale/x86/rgb_2_rgb.asm \
 	libswscale/x86/scale.asm \
+	libswscale/x86/scale_avx2.asm \
 	libswscale/x86/yuv_2_rgb.asm \
 	libswscale/x86/yuv2yuvX.asm
 

@@ -33,6 +33,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/stereo3d.h"
+#include "libavutil/timecode.h"
 #include "libavutil/video_enc_params.h"
 
 #include "avcodec.h"
@@ -69,6 +70,7 @@ typedef struct Mpeg1Context {
     int rc_buffer_size;
     AVRational frame_rate_ext;  /* MPEG-2 specific framerate modificator */
     int sync;                   /* Did we reach a sync point like a GOP/SEQ/KEYFrame? */
+    int closed_gop;
     int tmpgexs;
     int first_slice;
     int extradata_decoded;
@@ -1066,9 +1068,6 @@ static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
     if (!ctx->mpeg_enc_ctx_allocated)
         memcpy(s + 1, s1 + 1, sizeof(Mpeg1Context) - sizeof(MpegEncContext));
 
-    if (!(s->pict_type == AV_PICTURE_TYPE_B || s->low_delay))
-        s->picture_number++;
-
     return 0;
 }
 #endif
@@ -1764,13 +1763,13 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
     if (s->mb_y == 0 && s->mb_x == 0 && (s->first_field || s->picture_structure == PICT_FRAME)) {
         if (s->avctx->debug & FF_DEBUG_PICT_INFO) {
             av_log(s->avctx, AV_LOG_DEBUG,
-                   "qp:%d fc:%2d%2d%2d%2d %s %s %s %s %s dc:%d pstruct:%d fdct:%d cmv:%d qtype:%d ivlc:%d rff:%d %s\n",
+                   "qp:%d fc:%2d%2d%2d%2d %c %s %s %s %s dc:%d pstruct:%d fdct:%d cmv:%d qtype:%d ivlc:%d rff:%d %s\n",
                    s->qscale,
                    s->mpeg_f_code[0][0], s->mpeg_f_code[0][1],
                    s->mpeg_f_code[1][0], s->mpeg_f_code[1][1],
-                   s->pict_type  == AV_PICTURE_TYPE_I ? "I" :
-                   (s->pict_type == AV_PICTURE_TYPE_P ? "P" :
-                   (s->pict_type == AV_PICTURE_TYPE_B ? "B" : "S")),
+                   s->pict_type  == AV_PICTURE_TYPE_I ? 'I' :
+                   (s->pict_type == AV_PICTURE_TYPE_P ? 'P' :
+                   (s->pict_type == AV_PICTURE_TYPE_B ? 'B' : 'S')),
                    s->progressive_sequence ? "ps"  : "",
                    s->progressive_frame    ? "pf"  : "",
                    s->alternate_scan       ? "alt" : "",
@@ -2046,10 +2045,7 @@ static int slice_end(AVCodecContext *avctx, AVFrame *pict)
             ff_print_debug_info(s, s->current_picture_ptr, pict);
             ff_mpv_export_qp_table(s, pict, s->current_picture_ptr, FF_QSCALE_TYPE_MPEG2);
         } else {
-            if (avctx->active_thread_type & FF_THREAD_FRAME)
-                s->picture_number++;
             /* latency of 1 frame for I- and P-frames */
-            /* XXX: use another variable than picture_number */
             if (s->last_picture_ptr) {
                 int ret = av_frame_ref(pict, s->last_picture_ptr->f);
                 if (ret < 0)
@@ -2425,7 +2421,7 @@ static void mpeg_decode_gop(AVCodecContext *avctx,
 
     tc = s-> timecode_frame_start = get_bits(&s->gb, 25);
 
-    s->closed_gop = get_bits1(&s->gb);
+    s1->closed_gop = get_bits1(&s->gb);
     /* broken_link indicates that after editing the
      * reference frames of the first B-Frames after GOP I-Frame
      * are missing (open gop) */
@@ -2436,7 +2432,7 @@ static void mpeg_decode_gop(AVCodecContext *avctx,
         av_timecode_make_mpeg_tc_string(tcbuf, tc);
         av_log(s->avctx, AV_LOG_DEBUG,
                "GOP (%s) closed_gop=%d broken_link=%d\n",
-               tcbuf, s->closed_gop, broken_link);
+               tcbuf, s1->closed_gop, broken_link);
     }
 }
 
@@ -2670,7 +2666,7 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
                     /* Skip B-frames if we do not have reference frames and
                      * GOP is not closed. */
                     if (s2->pict_type == AV_PICTURE_TYPE_B) {
-                        if (!s2->closed_gop) {
+                        if (!s->closed_gop) {
                             skip_frame = 1;
                             av_log(s2->avctx, AV_LOG_DEBUG,
                                    "Skipping B slice due to open GOP\n");
@@ -2858,7 +2854,7 @@ static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
     }
 #endif
 
-    s2->codec_tag = avpriv_toupper4(avctx->codec_tag);
+    s2->codec_tag = ff_toupper4(avctx->codec_tag);
     if (s->mpeg_enc_ctx_allocated == 0 && (   s2->codec_tag == AV_RL32("VCR2")
                                            || s2->codec_tag == AV_RL32("BW10")
                                           ))
@@ -2909,6 +2905,7 @@ static void flush(AVCodecContext *avctx)
     Mpeg1Context *s = avctx->priv_data;
 
     s->sync       = 0;
+    s->closed_gop = 0;
 
     ff_mpeg_flush(avctx);
 }

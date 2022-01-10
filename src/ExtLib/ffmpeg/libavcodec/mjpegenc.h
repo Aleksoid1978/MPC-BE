@@ -57,6 +57,9 @@ typedef struct MJpegHuffmanCode {
  * Holds JPEG frame data and Huffman table data.
  */
 typedef struct MJpegContext {
+    int huffman;
+    /* Force duplication of mjpeg matrices, useful for rtp streaming */
+    int force_duplicated_matrix;
     //FIXME use array [3] instead of lumi / chroma, for easier addressing
     uint8_t huff_size_dc_luminance[12];     ///< DC luminance Huffman table size.
     uint16_t huff_code_dc_luminance[12];    ///< DC luminance Huffman table codes.
@@ -105,7 +108,7 @@ static inline void put_marker(PutBitContext *p, enum JpegMarker code)
 }
 
 int  ff_mjpeg_encode_init(MpegEncContext *s);
-void ff_mjpeg_encode_close(MpegEncContext *s);
+void ff_mjpeg_amv_encode_picture_header(MpegEncContext *s);
 void ff_mjpeg_encode_mb(MpegEncContext *s, int16_t block[12][64]);
 int  ff_mjpeg_encode_stuffing(MpegEncContext *s);
 

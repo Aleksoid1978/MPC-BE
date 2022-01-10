@@ -873,7 +873,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
     // ==> End patch MPC
 
     /* skip B-frames if we don't have reference frames */
-    if (!s->last_picture_ptr && (s->pict_type == AV_PICTURE_TYPE_B || s->droppable)) {
+    if (!s->last_picture_ptr && s->pict_type == AV_PICTURE_TYPE_B) {
         av_log(v->s.avctx, AV_LOG_DEBUG, "Skipping B frame without reference frames\n");
         goto end;
     }

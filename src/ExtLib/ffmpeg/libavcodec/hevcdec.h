@@ -32,6 +32,7 @@
 #include "avcodec.h"
 #include "bswapdsp.h"
 #include "cabac.h"
+#include "dovi_rpu.h"
 #include "get_bits.h"
 #include "hevcpred.h"
 #include "h2645_parse.h"
@@ -572,6 +573,9 @@ typedef struct HEVCContext {
 
     int nal_length_size;    ///< Number of bytes used for nal length (1, 2 or 4)
     int nuh_layer_id;
+
+    AVBufferRef *rpu_buf;       ///< 0 or 1 Dolby Vision RPUs.
+    DOVIContext dovi_ctx;       ///< Dolby Vision decoding context
 } HEVCContext;
 
 /**

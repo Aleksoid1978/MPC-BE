@@ -61,18 +61,18 @@ static int init_default_huffman_tables(MJpegDecodeContext *s)
         const uint8_t *values;
         int length;
     } ht[] = {
-        { 0, 0, avpriv_mjpeg_bits_dc_luminance,
-                avpriv_mjpeg_val_dc, 12 },
-        { 0, 1, avpriv_mjpeg_bits_dc_chrominance,
-                avpriv_mjpeg_val_dc, 12 },
-        { 1, 0, avpriv_mjpeg_bits_ac_luminance,
-                avpriv_mjpeg_val_ac_luminance,   162 },
-        { 1, 1, avpriv_mjpeg_bits_ac_chrominance,
-                avpriv_mjpeg_val_ac_chrominance, 162 },
-        { 2, 0, avpriv_mjpeg_bits_ac_luminance,
-                avpriv_mjpeg_val_ac_luminance,   162 },
-        { 2, 1, avpriv_mjpeg_bits_ac_chrominance,
-                avpriv_mjpeg_val_ac_chrominance, 162 },
+        { 0, 0, ff_mjpeg_bits_dc_luminance,
+                ff_mjpeg_val_dc, 12 },
+        { 0, 1, ff_mjpeg_bits_dc_chrominance,
+                ff_mjpeg_val_dc, 12 },
+        { 1, 0, ff_mjpeg_bits_ac_luminance,
+                ff_mjpeg_val_ac_luminance,   162 },
+        { 1, 1, ff_mjpeg_bits_ac_chrominance,
+                ff_mjpeg_val_ac_chrominance, 162 },
+        { 2, 0, ff_mjpeg_bits_ac_luminance,
+                ff_mjpeg_val_ac_luminance,   162 },
+        { 2, 1, ff_mjpeg_bits_ac_chrominance,
+                ff_mjpeg_val_ac_chrominance, 162 },
     };
     int i, ret;
 
@@ -127,9 +127,7 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
         s->picture_ptr = s->picture;
     }
 
-    s->pkt = av_packet_alloc();
-    if (!s->pkt)
-        return AVERROR(ENOMEM);
+    s->pkt = avctx->internal->in_pkt;
 
     s->avctx = avctx;
     ff_blockdsp_init(&s->bdsp, avctx);
@@ -2898,14 +2896,14 @@ the_end:
                     break;
                 case 5:
                     av_display_rotation_set(matrix, 90.0);
-                    av_display_matrix_flip(matrix, 0, 1);
+                    av_display_matrix_flip(matrix, 1, 0);
                     break;
                 case 6:
                     av_display_rotation_set(matrix, 90.0);
                     break;
                 case 7:
                     av_display_rotation_set(matrix, -90.0);
-                    av_display_matrix_flip(matrix, 0, 1);
+                    av_display_matrix_flip(matrix, 1, 0);
                     break;
                 case 8:
                     av_display_rotation_set(matrix, -90.0);
@@ -2959,8 +2957,6 @@ av_cold int ff_mjpeg_decode_end(AVCodecContext *avctx)
         s->picture_ptr = NULL;
     } else if (s->picture_ptr)
         av_frame_unref(s->picture_ptr);
-
-    av_packet_free(&s->pkt);
 
     av_frame_free(&s->smv_frame);
 

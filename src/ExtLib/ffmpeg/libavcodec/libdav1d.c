@@ -40,6 +40,9 @@
 typedef struct Libdav1dContext {
     AVClass *class;
     Dav1dContext *c;
+    /* This packet coincides with AVCodecInternal.in_pkt
+     * and is not owned by us. */
+    AVPacket *pkt;
     AVBufferPool *pool;
     int pool_size;
 
@@ -214,6 +217,8 @@ static av_cold int libdav1d_init(AVCodecContext *c)
 #endif
     int res;
 
+    dav1d->pkt = c->internal->in_pkt;
+
     av_log(c, AV_LOG_INFO, "libdav1d %s\n", dav1d_version());
 
     dav1d_default_settings(&s);
@@ -231,6 +236,9 @@ static av_cold int libdav1d_init(AVCodecContext *c)
     s.all_layers = dav1d->all_layers;
     if (dav1d->operating_point >= 0)
         s.operating_point = dav1d->operating_point;
+#if FF_DAV1D_VERSION_AT_LEAST(6,2)
+    s.strict_std_compliance = c->strict_std_compliance > 0;
+#endif
 
 #if FF_DAV1D_VERSION_AT_LEAST(6,0)
     if (dav1d->frame_threads || dav1d->tile_threads)
@@ -292,34 +300,35 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     int res;
 
     if (!data->sz) {
-        AVPacket pkt = { 0 };
+        AVPacket *const pkt = dav1d->pkt;
 
-        res = ff_decode_get_packet(c, &pkt);
+        res = ff_decode_get_packet(c, pkt);
         if (res < 0 && res != AVERROR_EOF)
             return res;
 
-        if (pkt.size) {
-            res = dav1d_data_wrap(data, pkt.data, pkt.size, libdav1d_data_free, pkt.buf);
+        if (pkt->size) {
+            res = dav1d_data_wrap(data, pkt->data, pkt->size,
+                                  libdav1d_data_free, pkt->buf);
             if (res < 0) {
-                av_packet_unref(&pkt);
+                av_packet_unref(pkt);
                 return res;
             }
 
-            data->m.timestamp = pkt.pts;
-            data->m.offset = pkt.pos;
-            data->m.duration = pkt.duration;
+            data->m.timestamp = pkt->pts;
+            data->m.offset    = pkt->pos;
+            data->m.duration  = pkt->duration;
 
-            pkt.buf = NULL;
-            av_packet_unref(&pkt);
+            pkt->buf = NULL;
+            av_packet_unref(pkt);
 
             if (c->reordered_opaque != AV_NOPTS_VALUE) {
-                uint8_t *reordered_opaque = av_malloc(sizeof(c->reordered_opaque));
+                uint8_t *reordered_opaque = av_memdup(&c->reordered_opaque,
+                                                      sizeof(c->reordered_opaque));
                 if (!reordered_opaque) {
                     dav1d_data_unref(data);
                     return AVERROR(ENOMEM);
                 }
 
-                memcpy(reordered_opaque, &c->reordered_opaque, sizeof(c->reordered_opaque));
                 res = dav1d_data_wrap_user_data(data, reordered_opaque,
                                                 libdav1d_user_data_free, reordered_opaque);
                 if (res < 0) {
@@ -328,6 +337,9 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
                     return res;
                 }
             }
+        } else if (res >= 0) {
+            av_packet_unref(pkt);
+            return AVERROR(EAGAIN);
         }
     }
 

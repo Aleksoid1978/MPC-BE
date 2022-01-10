@@ -30,7 +30,7 @@
 #include "libavutil/version.h"
 
 #define LIBAVFILTER_VERSION_MAJOR   8
-#define LIBAVFILTER_VERSION_MINOR  15
+#define LIBAVFILTER_VERSION_MINOR  25
 #define LIBAVFILTER_VERSION_MICRO 100
 
 
@@ -50,14 +50,8 @@
  * the public API and may change, break or disappear at any time.
  */
 
-#ifndef FF_API_SWS_PARAM_OPTION
 #define FF_API_SWS_PARAM_OPTION             (LIBAVFILTER_VERSION_MAJOR < 9)
-#endif
-#ifndef FF_API_BUFFERSINK_ALLOC
 #define FF_API_BUFFERSINK_ALLOC             (LIBAVFILTER_VERSION_MAJOR < 9)
-#endif
-#ifndef FF_API_PAD_COUNT
 #define FF_API_PAD_COUNT                    (LIBAVFILTER_VERSION_MAJOR < 9)
-#endif
 
 #endif /* AVFILTER_VERSION_H */

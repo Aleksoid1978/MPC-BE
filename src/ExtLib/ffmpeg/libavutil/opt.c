@@ -920,7 +920,10 @@ int av_opt_get_int(void *obj, const char *name, int search_flags, int64_t *out_v
 
     if ((ret = get_number(obj, name, NULL, &num, &den, &intnum, search_flags)) < 0)
         return ret;
-    *out_val = num * intnum / den;
+    if (num == den)
+        *out_val = intnum;
+    else
+        *out_val = num * intnum / den;
     return 0;
 }
 
@@ -1170,7 +1173,7 @@ static void opt_list(void *obj, void *av_log_obj, const char *unit,
             av_log(av_log_obj, AV_LOG_INFO, "     %-15s ", opt->name);
         else
             av_log(av_log_obj, AV_LOG_INFO, "  %s%-17s ",
-                   (opt->flags & AV_OPT_FLAG_FILTERING_PARAM) ? "" : "-",
+                   (opt->flags & AV_OPT_FLAG_FILTERING_PARAM) ? " " : "-",
                    opt->name);
 
         switch (opt->type) {

@@ -161,7 +161,7 @@ static int decode_plane(FFV1Context *s, uint8_t *src,
     return 0;
 }
 
-static int decode_slice_header(FFV1Context *f, FFV1Context *fs)
+static int decode_slice_header(const FFV1Context *f, FFV1Context *fs)
 {
     RangeCoder *c = &fs->c;
     uint8_t state[CONTEXT_SIZE];
@@ -924,7 +924,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
             fs->c.bytestream_end = buf_p + v;
 
         fs->avctx = avctx;
-        fs->cur = p;
     }
 
     avctx->execute(avctx,
@@ -965,11 +964,8 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
     }
     ff_thread_report_progress(&f->picture, INT_MAX, 0);
 
-    f->picture_number++;
-
     if (f->last_picture.f)
         ff_thread_release_buffer(avctx, &f->last_picture);
-    f->cur = NULL;
     if ((ret = av_frame_ref(data, f->picture.f)) < 0)
         return ret;
 
@@ -978,7 +974,8 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
     return buf_size;
 }
 
-static void copy_fields(FFV1Context *fsdst, FFV1Context *fssrc, FFV1Context *fsrc)
+static void copy_fields(FFV1Context *fsdst, const FFV1Context *fssrc,
+                        const FFV1Context *fsrc)
 {
     fsdst->version             = fsrc->version;
     fsdst->micro_version       = fsrc->micro_version;
@@ -995,7 +992,6 @@ static void copy_fields(FFV1Context *fsdst, FFV1Context *fssrc, FFV1Context *fsr
     fsdst->slice_damaged       = fssrc->slice_damaged;
     fsdst->key_frame_ok        = fsrc->key_frame_ok;
 
-    fsdst->bits_per_raw_sample = fsrc->bits_per_raw_sample;
     fsdst->packed_at_lsb       = fsrc->packed_at_lsb;
     fsdst->slice_count         = fsrc->slice_count;
     if (fsrc->version<3){

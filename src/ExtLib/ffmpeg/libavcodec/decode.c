@@ -296,8 +296,7 @@ static int64_t guess_correct_pts(AVCodecContext *ctx,
 static inline int decode_simple_internal(AVCodecContext *avctx, AVFrame *frame, int64_t *discarded_samples)
 {
     AVCodecInternal   *avci = avctx->internal;
-    DecodeSimpleContext *ds = &avci->ds;
-    AVPacket           *pkt = ds->in_pkt;
+    AVPacket     *const pkt = avci->in_pkt;
     int got_frame, actual_got_frame;
     int ret;
 
@@ -835,8 +834,14 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
             sub->pts = av_rescale_q(avpkt->pts,
                                     avctx->pkt_timebase, AV_TIME_BASE_Q);
         ret = avctx->codec->decode(avctx, sub, got_sub_ptr, pkt);
-        av_assert1((ret >= 0) >= !!*got_sub_ptr &&
-                   !!*got_sub_ptr >= !!sub->num_rects);
+        if (pkt == avci->buffer_pkt) // did we recode?
+            av_packet_unref(avci->buffer_pkt);
+        if (ret < 0) {
+            *got_sub_ptr = 0;
+            avsubtitle_free(sub);
+            return ret;
+        }
+        av_assert1(!sub->num_rects || *got_sub_ptr);
 
         if (sub->num_rects && !sub->end_display_time && avpkt->duration &&
             avctx->pkt_timebase.num) {
@@ -857,16 +862,13 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
                        "Invalid UTF-8 in decoded subtitles text; "
                        "maybe missing -sub_charenc option\n");
                 avsubtitle_free(sub);
-                ret = AVERROR_INVALIDDATA;
-                break;
+                *got_sub_ptr = 0;
+                return AVERROR_INVALIDDATA;
             }
         }
 
         if (*got_sub_ptr)
             avctx->frame_number++;
-
-        if (pkt == avci->buffer_pkt) // did we recode?
-            av_packet_unref(avci->buffer_pkt);
     }
 
     return ret;
@@ -1105,11 +1107,9 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
         avctx->sw_pix_fmt = fmt[n - 1];
     }
 
-    choices = av_malloc_array(n + 1, sizeof(*choices));
+    choices = av_memdup(fmt, (n + 1) * sizeof(*choices));
     if (!choices)
         return AV_PIX_FMT_NONE;
-
-    memcpy(choices, fmt, (n + 1) * sizeof(*choices));
 
     for (;;) {
         // Remove the previous hwaccel, if there was one.
