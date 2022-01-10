@@ -39,7 +39,59 @@ namespace MediaInfoLib
 // Utils
 //***************************************************************************
 
-int64u Ttml_str2timecode(const char* Value)
+double to_float64(const char* s)
+{
+    float64 Value=(float64)0;
+    const float64 Ten=(float64)10;
+    int e=0;
+    char c;
+    while ((c=*s++) && (c>='0' && c<='9'))
+    {
+        Value*=Ten;
+        Value+=(c-'0');
+    }
+    if (c=='.')
+    {
+        while ((c=*s++) && (c>='0' && c<='9'))
+        {
+            Value*=Ten;
+            Value+=(c-'0');
+            e--;
+        }
+    }
+    if (c=='e' || c=='E')
+    {
+        int sign=1;
+        int i=0;
+        c=*s++;
+        if (c=='+')
+            c=*s++;
+        else if (c=='-')
+        {
+            c=*s++;
+            sign=-1;
+        }
+        while (c>='0' && c<='9') {
+            i*=10;
+            i+=(c-'0');
+            c=*s++;
+        }
+        e+=i*sign;
+    }
+    while (e>0)
+    {
+        Value*=Ten;
+        e--;
+    }
+    while (e<0)
+    {
+        Value*=0.1;
+        e++;
+    }
+    return Value;
+}
+
+int64u Ttml_str2timecode(const char* Value, float FrameRate=0)
 {
     size_t Length=strlen(Value);
          if (Length>=8
@@ -72,13 +124,29 @@ int64u Ttml_str2timecode(const char* Value)
                 Value++;
             }
         }
+        if (FrameRate && Length>=9 && Value[8]==':')
+        {
+            const char* Value_End=Value+Length;
+            Value+=9;
+            int64u FrameNumber=0;
+            while (Value<Value_End)
+            {
+                FrameNumber*=10;
+                FrameNumber+=(int64u)(*Value-'0');
+                Value++;
+            }
+            ToReturn+=FrameNumber/FrameRate*1000000000;
+        }
 
         return ToReturn;
     }
     else if (Length>=2
      && Value[Length-1]=='s')
     {
-        return (int64u)(atof(Value)*1000000000);
+        float64 ValueF=to_float64(Value);
+        if (ValueF<0)
+            return 0; //Npt supported
+        return (int64u)float64_int64s(ValueF*1000000000);
     }
     else
         return (int64u)-1;
@@ -181,10 +249,96 @@ void File_Ttml::Read_Buffer_Continue()
         #endif //MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
     }
 
+    // Root attributes
+    int64u FrameRate_Num=0;
+    int64u FrameRate_Den=1;
+    bool IsSmpteTt=false, IsEbuTt=false, IsImsc1=false;
+    const char* Tt_Attribute;
+    Tt_Attribute=Root->Attribute("ttp:frameRate");
+    if (!Tt_Attribute)
+        Tt_Attribute=Root->Attribute("frameRate");
+    if (Tt_Attribute)
+    {
+        FrameRate_Num=atof(Tt_Attribute);
+    }
+    Tt_Attribute=Root->Attribute("ttp:frameRateMultiplier");
+    if (!Tt_Attribute)
+        Tt_Attribute=Root->Attribute("frameRateMultiplier");
+    if (Tt_Attribute)
+    {
+        FrameRate_Num*=atoi(Tt_Attribute);
+        if (const char* Tt_Attribute_Space=strchr(Tt_Attribute, ' '))
+        {
+            FrameRate_Den=atoi(Tt_Attribute_Space+1);
+        }
+    }
+    float64 FrameRate=0;
+    if (FrameRate_Num && FrameRate_Den)
+    {
+        FrameRate=((float64)FrameRate_Num)/FrameRate_Den;
+        Fill(Stream_General, 0, General_FrameRate, FrameRate);
+        Fill(Stream_Text, 0, Text_FrameRate, FrameRate);
+        if (FrameRate_Den!=1)
+        {
+            Fill(Stream_Text, 0, Text_FrameRate_Num, FrameRate_Num);
+            Fill(Stream_Text, 0, Text_FrameRate_Den, FrameRate_Den);
+        }
+    }
+    Tt_Attribute=Root->Attribute("xml:lang");
+    if (!Tt_Attribute)
+        Tt_Attribute=Root->Attribute("lang");
+    if (Tt_Attribute)
+    {
+        Fill(Stream_Text, 0, Text_Language, Tt_Attribute);
+    }
+    Tt_Attribute=Root->Attribute("ttp:timeBase");
+    if (!Tt_Attribute)
+        Tt_Attribute=Root->Attribute("timeBase");
+    if (Tt_Attribute)
+    {
+        Fill(Stream_Text, 0, "Duration_Base", Tt_Attribute);
+    }
+    for (const XMLAttribute* tt_attribute=Root->FirstAttribute(); tt_attribute; tt_attribute=tt_attribute->Next())
+    {
+        if (strstr(tt_attribute->Name(), "smpte"))
+            IsSmpteTt=true;
+        if (strstr(tt_attribute->Name(), "ebutt"))
+            IsEbuTt=true;
+        if (strstr(tt_attribute->Name(), "ittp"))
+            IsImsc1=true;
+        if (strstr(tt_attribute->Name(), "itts"))
+            IsImsc1=true;
+        if (strstr(tt_attribute->Value(), "smpte-tt"))
+            IsSmpteTt=true;
+        if (strstr(tt_attribute->Value(), "ebu:tt"))
+            IsEbuTt=true;
+        if (strstr(tt_attribute->Value(), "imsc1"))
+            IsImsc1=true;
+    }
+    if (IsSmpteTt)
+    {
+        Fill(Stream_General, 0, General_Format_Profile, "SMPTE-TT");
+        Fill(Stream_Text, 0, Text_Format_Profile, "SMPTE-TT");
+    }
+    if (IsEbuTt)
+    {
+        Fill(Stream_General, 0, General_Format_Profile, "EBU-TT");
+        Fill(Stream_Text, 0, Text_Format_Profile, "EBU-TT");
+    }
+    if (IsImsc1)
+    {
+        Fill(Stream_General, 0, General_Format_Profile, "IMSC1");
+        Fill(Stream_Text, 0, Text_Format_Profile, "IMSC1");
+    }
+    
+
     tinyxml2::XMLElement*       div=NULL;
     #if MEDIAINFO_EVENTS
     tinyxml2::XMLElement*       p=NULL;
     #endif //MEDIAINFO_EVENTS
+    int64u Time_Start=(int64u)-1;
+    int64u Time_End=0;
+    int64u FrameCount=0;
     for (XMLElement* tt_element=Root->FirstChildElement(); tt_element; tt_element=tt_element->NextSiblingElement())
     {
         //body
@@ -195,28 +349,108 @@ void File_Ttml::Read_Buffer_Continue()
                 //div
                 if (!strcmp(body_element->Value(), "div"))
                 {
+                    if (const char* Attribute=body_element->Attribute("begin"))
+                    {
+                        int64u DTS=Ttml_str2timecode(Attribute, FrameRate);
+                        if (Time_Start>DTS)
+                            Time_Start=DTS;
+                        if (Time_End<DTS)
+                            Time_End=DTS;
+                    }
+                    if (const char* Attribute=body_element->Attribute("end"))
+                    {
+                        int64u DTS=Ttml_str2timecode(Attribute, FrameRate);
+                        if (Time_Start>DTS)
+                            Time_Start=DTS;
+                        if (Time_End<DTS)
+                            Time_End=DTS;
+                    }
+
                     for (XMLElement* div_element=body_element->FirstChildElement(); div_element; div_element=div_element->NextSiblingElement())
                     {
                         //p
                         if (!strcmp(div_element->Value(), "p"))
                         {
-                            div=body_element;
+                            if (const char* Attribute=div_element->Attribute("begin"))
+                            {
+                                int64u DTS=Ttml_str2timecode(Attribute, FrameRate);
+                                if (Time_Start>DTS)
+                                    Time_Start=DTS;
+                                if (Time_End<DTS)
+                                    Time_End=DTS;
+                            }
+                            if (const char* Attribute=div_element->Attribute("end"))
+                            {
+                                int64u DTS=Ttml_str2timecode(Attribute, FrameRate);
+                                if (Time_Start>DTS)
+                                    Time_Start=DTS;
+                                if (Time_End<DTS)
+                                    Time_End=DTS;
+                            }
+                            if (!div)
+                                div=body_element;
                             #if MEDIAINFO_EVENTS
-                                p=div_element;
+                                if (!p)
+                                    p=div_element;
                             #endif //MEDIAINFO_EVENTS
-                            break;
+                            FrameCount++;
                         }
                     }
-
-                    if (div)
-                        break;
                 }
             }
-
-            if (div)
-                break;
+        }
+        if (!strcmp(tt_element->Value(), "head"))
+        {
+            for (XMLElement* head_element = tt_element->FirstChildElement(); head_element; head_element = head_element->NextSiblingElement())
+            {
+                if (!strcmp(head_element->Value(), "metadata"))
+                {
+                    for (XMLElement* metadata_element = head_element->FirstChildElement(); metadata_element; metadata_element = metadata_element->NextSiblingElement())
+                    {
+                        if (!strcmp(metadata_element->Value(), "smpte:information"))
+                        {
+                            if (const char* Attribute = metadata_element->Attribute("mode"))
+                                Fill(Stream_Text, 0, "608_Mode", Attribute);
+                            if (const char* Attribute = metadata_element->Attribute("m608:channel"))
+                                Fill(Stream_Text, 0, Text_ID, Attribute);
+                            if (const char* Attribute = metadata_element->Attribute("m608:programName"))
+                                Fill(Stream_Text, 0, Text_Title, Attribute);
+                            if (const char* Attribute = metadata_element->Attribute("m608:captionService"))
+                            {
+                                if (strlen(Attribute) == 6
+                                    && Attribute[0] == 'F'
+                                    && Attribute[1] >= '1' && Attribute[1] <= '2'
+                                    && Attribute[2] == 'C'
+                                    && Attribute[3] >= '1' && Attribute[3] <= '2'
+                                    && ((Attribute[4] == 'C' && Attribute[5] == 'C')
+                                     || (Attribute[4] == 'T' && Attribute[5] == 'X'))
+                                    )
+                                {
+                                    string ID = Attribute[4] == 'C' ? "CC" : "T";
+                                    ID +=((Attribute[1] - '1') * 2) + Attribute[3];
+                                    Fill(Stream_Text, 0, "CaptionServiceName", ID);
+                                }
+                                else
+                                    Fill(Stream_Text, 0, "CaptionServiceName", Attribute);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+
+    if (Time_Start!=(int64u)-1)
+    {
+        Fill(Stream_General, 0, General_Duration, (Time_End-Time_Start)/1000000.0);
+        Fill(Stream_Text, 0, Text_Duration, (Time_End-Time_Start)/1000000.0);
+        Fill(Stream_General, 0, General_Duration_Start, Time_Start/1000000.0);
+        Fill(Stream_Text, 0, "Duration_Start", Time_Start/1000000.0);
+        Fill(Stream_General, 0, General_Duration_End, Time_End/1000000.0);
+        Fill(Stream_Text, 0, "Duration_End", Time_End/1000000.0);
+    }
+    Fill(Stream_Text, 0, Text_FrameRate_Mode, "VFR");
+    Fill(Stream_Text, 0, Text_FrameCount, FrameCount);
 
     #if MEDIAINFO_DEMUX
         Demux(Buffer, Buffer_Size, ContentType_MainStream);

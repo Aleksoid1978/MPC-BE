@@ -17,8 +17,6 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include "MediaInfo/File__HasReferences.h"
-#include "MediaInfo/Multiple/File_DcpPkl.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -28,7 +26,7 @@ namespace MediaInfoLib
 // Class File_DolbyAudioMetadata
 //***************************************************************************
 
-class File_DolbyAudioMetadata : public File__Analyze, File__HasReferences
+class File_DolbyAudioMetadata : public File__Analyze
 {
 public:
     //In
@@ -46,6 +44,10 @@ private :
 
     //Buffer - Global
     void Read_Buffer_Continue();
+
+    //Elements
+    void Dolby_Atmos_Metadata_Segment();
+    void Dolby_Atmos_Supplemental_Metadata_Segment();
 };
 
 } //NameSpace

@@ -553,17 +553,34 @@ File_Avc::avcintra_header File_Avc::AVC_Intra_Headers_Data(int32u CodecID)
 }
 
 //---------------------------------------------------------------------------
-int32u File_Avc::AVC_Intra_CodecID_FromMeta(int32u Height, int32u Fields, int32u SampleDuration, int32u TimeScale, int32u SizePerFrame)
+int32u File_Avc::AVC_Intra_CodecID_FromMeta(int32u Width, int32u Height, int32u Fields, int32u SampleDuration, int32u TimeScale, int32u SizePerFrame)
 {
     // Computing bitrate
-    int64u BitRate=((int64u)SizePerFrame)*8*TimeScale/SampleDuration;
-    int64u SampleRate=float64_int64s(((float64)TimeScale)/SampleDuration);
-    int32u Class=BitRate<=75000000?50:100; //Arbitrary choosen. TODO: check real maximumm bitrate, check class 200
+    int64u BitRate=SampleDuration?(((int64u)SizePerFrame)*8*TimeScale/SampleDuration):0;
+    int64u SampleRate=SampleDuration?(float64_int64s(((float64)TimeScale)/SampleDuration)):0;
+    int32u Class;
+    switch (Width)
+    {
+    case 1920:
+        Class=100;
+        break;
+    case 1440:
+    case 1280:
+    case 960:
+        Class=50;
+        break;
+    default:
+        if (!BitRate)
+            return 0x4156696E; //AVin (neutral)
+        Class=BitRate<=75000000?50:100; //Arbitrary choosen. TODO: check real maximumm bitrate, check class 200
+        break;
+    }
     switch (Class)
     {
         case 100 : 
                     switch (Height)
                     {
+                        case 1088 :
                         case 1080 :
                                     switch (Fields)
                                     {
@@ -602,6 +619,7 @@ int32u File_Avc::AVC_Intra_CodecID_FromMeta(int32u Height, int32u Fields, int32u
         case  50 : 
                     switch (Height)
                     {
+                        case 1088 :
                         case 1080 :
                                     switch (Fields)
                                     {

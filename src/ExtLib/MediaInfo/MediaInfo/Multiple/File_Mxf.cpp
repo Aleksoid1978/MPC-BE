@@ -2776,7 +2776,10 @@ void File_Mxf::Streams_Finish()
     if (DolbyAudioMetadata) //Before ADM for having content before all ADM stuff
         Merge(*DolbyAudioMetadata, Stream_Audio, 0, 0);
     if (Adm)
+    {
+        Finish(Adm);
         Merge(*Adm, Stream_Audio, 0, 0);
+    }
     if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
     {
         Clear(Stream_Audio, 0, "AdmProfile");
@@ -6305,6 +6308,11 @@ void File_Mxf::Data_Parse()
                         if (Ztring().From_UTF8(Mxf_EssenceContainer(Descriptor->second.EssenceContainer))==__T("VC-3"))
                             ((File_Vc3*)(*(Essence->second.Parsers.begin())))->FrameRate=Descriptor->second.SampleRate;
                     #endif //MEDIAINFO_VC3_YES
+
+                    #ifdef MEDIAINFO_DEMUX
+                        if (Ztring().From_UTF8(Mxf_EssenceContainer(Descriptor->second.EssenceContainer))==__T("AVC"))
+                            Essence->second.ShouldCheckAvcHeaders=File_Avc::AVC_Intra_CodecID_FromMeta(Descriptor->second.Width, Descriptor->second.Height, Descriptor->second.Is_Interlaced()?2:1, 1, (int32u)(float64_int64s(Descriptor->second.SampleRate)), 0);
+                    #endif //MEDIAINFO_DEMUX
                     break;
                 }
             if (!DescriptorFound)
@@ -6429,7 +6437,50 @@ void File_Mxf::Data_Parse()
                 Frame_Count_NotParsedIncluded=Essence->second.Frame_Count_NotParsedIncluded;
             }
             Demux_random_access=true;
-            Demux(Buffer+Buffer_Offset, (size_t)Element_Size, ContentType_MainStream);
+
+            bool ShouldDemux=true;
+            if (Essence->second.ShouldCheckAvcHeaders)
+            {
+                if (Essence->second.Parsers[0]->Status[IsAccepted])
+                    ShouldDemux=false;
+                else
+                {
+                    //Checking if we need to add SPS/PPS
+                    size_t CheckMax=0x10; //SPS uses to be in the first bytes only
+                    if (CheckMax>Element_Size-4)
+                        CheckMax=Element_Size-4;
+                    ShouldDemux=false;
+                    const int8u* Buffer_Temp=Buffer+(size_t)(Buffer_Offset+Element_Offset);
+                    for (size_t i=0; i<CheckMax; i++)
+                        if (Buffer_Temp[i]==0x00 && Buffer_Temp[i+1]==0x00 && Buffer_Temp[i+2]==0x01 && Buffer_Temp[i+3]==0x67)
+                        {
+                            //Stream_Temp.Demux_Level&=~((1<<7)|(1<<6)); //Remove the flag, SPS/PPS detected
+                            ShouldDemux=true;
+                            break;
+                        }
+                }
+
+                if (!ShouldDemux)
+                {
+                    //Stream_Temp.Demux_Level|= (1<<6); //In case of seek, we need to send again SPS/PPS //Deactivated because Hydra does not decode after a seek + 1 SPS/PPS only.
+                    //Stream_Temp.Demux_Level&=~(1<<7); //Remove the flag, SPS/PPS sent
+                    File_Avc::avcintra_header AvcIntraHeader=File_Avc::AVC_Intra_Headers_Data(Essence->second.ShouldCheckAvcHeaders);
+                    size_t Buffer_Temp_Size=AvcIntraHeader.Size+(size_t)(Element_Size);
+                    int8u* Buffer_Temp_Data=new int8u[Buffer_Temp_Size];
+                    if (AvcIntraHeader.Data)
+                        memcpy(Buffer_Temp_Data, AvcIntraHeader.Data, AvcIntraHeader.Size);
+                    memcpy(Buffer_Temp_Data+AvcIntraHeader.Size, Buffer+Buffer_Offset, (size_t)(Element_Size));
+                    Demux(Buffer_Temp_Data, Buffer_Temp_Size, ContentType_MainStream);
+                    Open_Buffer_Continue(Essence->second.Parsers[0], AvcIntraHeader.Data, AvcIntraHeader.Size);
+                }
+
+                Essence->second.ShouldCheckAvcHeaders=0;
+            }
+            if (ShouldDemux)
+            {
+                Demux(Buffer+Buffer_Offset, (size_t)Element_Size, ContentType_MainStream);
+            }
+
         #endif //MEDIAINFO_DEMUX
 
         if (!Essence->second.Parsers.empty() && !(*(Essence->second.Parsers.begin()))->Status[IsFinished])

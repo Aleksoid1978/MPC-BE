@@ -34,8 +34,8 @@ using namespace ZenLib;
 using std::vector;
 using std::string;
 using std::map;
+using std::set;
 using std::make_pair;
-using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -343,6 +343,25 @@ public :
         bool GraphSvgPluginState();
     #endif //defined(MEDIAINFO_GRAPH_YES)
 
+    #if MEDIAINFO_ADVANCED
+          Ztring    AdmProfile (const Ztring& Value);
+          struct adm_profile
+          {
+              bool Auto;
+              int BS2076;
+              int Ebu3392;
+
+              adm_profile() :
+                  Auto(false),
+                  BS2076(-1),
+                  Ebu3392(-1)
+              {}
+          };
+          adm_profile      AdmProfile();
+          void        WarningError(bool Value);
+          bool        WarningError();
+    #endif
+
     #if defined(MEDIAINFO_LIBCURL_YES)
           bool      CanHandleUrls();
           enum urlencode
@@ -490,6 +509,11 @@ private :
     MediaInfo_Event_CallBackFunction* Event_CallBackFunction; //void Event_Handler(unsigned char* Data_Content, size_t Data_Size, void* UserHandler)
     void*           Event_UserHandler;
     #endif //MEDIAINFO_EVENTS
+
+    #if MEDIAINFO_ADVANCED
+    adm_profile Adm_Profile;
+    bool Warning_Error;
+    #endif
 
     #if defined(MEDIAINFO_LIBCURL_YES)
           urlencode URLEncode;

@@ -482,6 +482,9 @@ void MediaInfo_Config::Init(bool Force)
         Event_CallBackFunction=NULL;
         Event_UserHandler=NULL;
     #endif //MEDIAINFO_EVENTS
+    #if MEDIAINFO_ADVANCED
+        Warning_Error=false;
+    #endif //MEDIAINFO_EVENTS
     #if defined(MEDIAINFO_LIBCURL_YES)
         URLEncode=URLEncode_Guess;
         Ssh_IgnoreSecurity=false;
@@ -1543,6 +1546,29 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         #else // defined(MEDIAINFO_GRAPHVIZ_YES)
             return __T("Graphviz support is disabled due to compilation options");
         #endif // defined(MEDIAINFO_GRAPHVIZ_YES)
+    }
+
+    if (Option_Lower==__T("admprofile"))
+    {
+        #if MEDIAINFO_ADVANCED
+            String Value_Lower(Value);
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+            return AdmProfile(Value_Lower);
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
+
+    if (Option_Lower==__T("warning"))
+    {
+        #if MEDIAINFO_ADVANCED
+            String Value_Lower(Value);
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+            WarningError(Value_Lower==__T("error"));
+            return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
     }
 
     if (Option_Lower==__T("info_canhandleurls"))
@@ -3612,6 +3638,66 @@ bool MediaInfo_Config::GraphSvgPluginState()
     return Export_Graph::Load();
 }
 #endif //defined(MEDIAINFO_GRAPHVIZ_YES)
+
+//***************************************************************************
+// ADM
+//***************************************************************************
+
+#if MEDIAINFO_ADVANCED
+Ztring MediaInfo_Config::AdmProfile(const Ztring& Value)
+{
+    CriticalSectionLocker CSL(CS);
+    ZtringList List;
+    List.Separator_Set(0, __T(","));
+    List.Write(Value);
+    Adm_Profile=adm_profile();
+    for (size_t i=0; i<List.size(); i++)
+    {
+        if (List[i]==__T("auto"))
+            Adm_Profile.Auto=true;
+        else if (List[i]==__T("itu-r_bs.2076-0"))
+            Adm_Profile.BS2076=0;
+        else if (List[i]==__T("itu-r_bs.2076-1"))
+            Adm_Profile.BS2076=1;
+        else if (List[i]==__T("itu-r_bs.2076-2"))
+            Adm_Profile.BS2076=2;
+        else if (List[i].rfind(__T("urn:ebu:tech:3392:1.0:"))==0)
+        {
+            if (List[i].size()>22 && List[i][22]>=__T('1') && List[i][22]<=__T('4'))
+                Adm_Profile.Ebu3392=List[i][22]-__T('0');
+            else
+                return __T("Unknown ADM profile ")+Value;
+        }
+        else
+            return __T("Unknown ADM profile ")+Value;
+    }
+    return Ztring();
+}
+#endif //MEDIAINFO_ADVANCED
+
+#if MEDIAINFO_ADVANCED
+MediaInfo_Config::adm_profile MediaInfo_Config::AdmProfile()
+{
+    CriticalSectionLocker CSL(CS);
+    return Adm_Profile;
+}
+#endif //MEDIAINFO_ADVANCED
+
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config::WarningError(bool Value)
+{
+    CriticalSectionLocker CSL(CS);
+    Warning_Error=Value;
+}
+#endif //MEDIAINFO_ADVANCED
+
+#if MEDIAINFO_ADVANCED
+bool MediaInfo_Config::WarningError()
+{
+    CriticalSectionLocker CSL(CS);
+    return Warning_Error;
+}
+#endif //MEDIAINFO_ADVANCED
 
 //***************************************************************************
 // Curl

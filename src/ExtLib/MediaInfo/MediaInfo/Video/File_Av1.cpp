@@ -199,15 +199,8 @@ void File_Av1::Header_Parse()
     }
     BS_End();
 
-    int64u obu_size = 0;
-    for (int8u i=0; i<8; i++)
-    {
-        int8u uleb128_byte;
-        Get_B1(uleb128_byte,                                    "uleb128_byte");
-        obu_size|=((uleb128_byte & 0x7f) << (i * 7));
-        if (!(uleb128_byte&0x80))
-            break;
-    }
+    int64u obu_size;
+    Get_leb128 (obu_size,                                       "obu_size");
 
     FILLING_BEGIN();
     Header_Fill_Size(Element_Offset+obu_size);
@@ -518,8 +511,8 @@ void File_Av1::tile_group()
 void File_Av1::metadata()
 {
     //Parsing
-    int16u metadata_type;
-    Get_B2 (metadata_type,                                      "metadata_type");
+    int64u metadata_type;
+    Get_leb128 (metadata_type,                                  "metadata_type");
 
     switch (metadata_type)
     {
@@ -663,6 +656,32 @@ std::string File_Av1::GOP_Detect (std::string PictureTypes)
     }
 
     return string();
+}
+
+void File_Av1::Get_leb128(int64u& Info, const char* Name)
+{
+    Info=0;
+    for (int8u i=0; i<8; i++)
+    {
+        if (Element_Offset>=Element_Size)
+            break; // End of stream reached, not normal
+        int8u leb128_byte=BigEndian2int8u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+        Element_Offset++;
+        Info|=((leb128_byte&0x7f)<<(i*7));
+        if (!(leb128_byte&0x80))
+        {
+            #if MEDIAINFO_TRACE
+                if (Trace_Activated)
+                {
+                    Param(Name, Info, i+1);
+                    Param_Info(__T("(")+Ztring::ToZtring(i+1)+__T(" bytes)"));
+                }
+            #endif //MEDIAINFO_TRACE
+            return;
+        }
+    }
+    Trusted_IsNot("Size is wrong");
+    Info=0;
 }
 
 //---------------------------------------------------------------------------

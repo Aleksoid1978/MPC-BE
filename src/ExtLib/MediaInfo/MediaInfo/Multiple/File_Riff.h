@@ -28,7 +28,6 @@ namespace MediaInfoLib
 
 class File_Adm;
 class File_DolbyAudioMetadata;
-
 //***************************************************************************
 // Class File_Riff
 //***************************************************************************
@@ -319,6 +318,7 @@ private :
     void WAVE_axml ();
     void WAVE_bext ();
     void WAVE_bxml () {WAVE_axml();}
+    void WAVE_chna();
     void WAVE_cue_ ();
     void WAVE_data ();
     void WAVE_data_Continue ();

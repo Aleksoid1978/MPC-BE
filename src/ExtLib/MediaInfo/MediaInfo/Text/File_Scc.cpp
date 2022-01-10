@@ -33,6 +33,20 @@ namespace MediaInfoLib
 // Utils
 //***************************************************************************
 
+//---------------------------------------------------------------------------
+static unsigned char Char2Hex (unsigned char Char)
+{
+         if (Char<='9' && Char>='0')
+        Char-='0';
+    else if (Char<='f' && Char>='a')
+        Char-='a'-10;
+    else if (Char<='F' && Char>='A')
+        Char-='A'-10;
+    else
+        Char =0;
+    return Char;
+}
+
 static int64u Scc_str2timecode(const char* Value)
 {
     const size_t Length=strlen(Value);
@@ -62,6 +76,36 @@ static int64u Scc_str2timecode(const char* Value)
     }
     else
         return (int64u)-1;
+}
+
+
+static TimeCode Scc_str2TimeCode(const int8u* Value)
+{
+         if (
+        Value[0]>='0' && Value[0]<='9'
+     && Value[1]>='0' && Value[1]<='9'
+     && Value[2]==':'
+     && Value[3]>='0' && Value[3]<='9'
+     && Value[4]>='0' && Value[4]<='9'
+     && Value[5]==':'
+     && Value[6]>='0' && Value[6]<='9'
+     && Value[7]>='0' && Value[7]<='9'
+     && (Value[8]==':' || Value[8]==';')
+     && Value[9]>='0' && Value[9]<='9'
+     && Value[10]>='0' && Value[10]<='9')
+    {
+        int8u HH=(int64u)(Value[0]-'0')*10
+                +(int64u)(Value[1]-'0')   ;
+        int8u MM=(int64u)(Value[3]-'0')*10
+                +(int64u)(Value[4]-'0')   ;
+        int8u SS=(int64u)(Value[6]-'0')*10
+                +(int64u)(Value[7]-'0')   ;
+        int8u FF=(int64u)(Value[9]-'0')*10
+                +(int64u)(Value[10]-'0')  ;
+        return TimeCode(HH, MM, SS, FF, 30, Value[8]==';');
+    }
+    else
+        return TimeCode();
 }
 
 //***************************************************************************
@@ -119,8 +163,6 @@ void File_Scc::Read_Buffer_Unsynched()
 #if MEDIAINFO_SEEK
 void File_Scc::Read_Buffer_AfterParsing()
 {
-    if (Parser && File_Offset+Buffer_Size==File_Size)
-         Parser->Open_Buffer_Unsynch();
 }
 #endif //MEDIAINFO_SEEK
 
@@ -208,6 +250,96 @@ void File_Scc::FileHeader_Parse()
     //Init
     Parser=new File_Eia608();
     Open_Buffer_Init(Parser);
+
+    // Trying to detect frame rate
+    vector<TimeCode> TimeCodes;
+    vector<int8u> FrameRates;
+    FrameRates.push_back(24);
+    FrameRates.push_back(25);
+    FrameRates.push_back(30);
+    int8u FrameRateSlowDown[2];
+    FrameRateSlowDown[0]=6;
+    FrameRateSlowDown[1]=5;
+    int8u HighestFrame=0;
+    int8u HighestFrame_Adapted=0;
+    size_t Begin=Buffer_Offset+(size_t)Element_Offset;
+    for (size_t End=Begin; End<Buffer_Size; End++)
+    {
+        if (Buffer[End]!=0x0D && Buffer[End]!=0x0A)
+            continue;
+        if (End-Begin>=11)
+        {
+            TimeCode Temp=Scc_str2TimeCode(Buffer+Begin);
+            if (Temp.HasValue())
+            {
+                if (HighestFrame<Temp.Frames)
+                    HighestFrame=Temp.Frames;
+                if (HighestFrame_Adapted<Temp.Frames)
+                    HighestFrame_Adapted=Temp.Frames;
+                if (TimeCodes.empty())
+                {
+                    Fill(Stream_Text, 0, Text_TimeCode_FirstFrame, string((const char*)Buffer+Begin, 11));
+                    Fill(Stream_Text, 0, Text_TimeCode_DropFrame, Temp.DropFrame?"Yes":"No");
+                    TimeCode_FirstFrame=Temp;
+                    Fill(Stream_Text, 0, Text_TimeCode_Source, "Container");
+                    for (size_t i=0; i<FrameRates.size(); i++)
+                    {
+                        Temp.FramesPerSecond=FrameRates[i];
+                        Temp.DropFrame=Buffer[Begin+8]==';';
+                        TimeCodes.push_back(Temp);
+                    }
+                }
+                else
+                {
+                    for (size_t i=0; i<TimeCodes.size(); i++)
+                    {
+                        if ((Temp.Hours<<24)+(Temp.Minutes<<16)+(Temp.Seconds<<8)+Temp.Frames
+                          < (TimeCodes[i].Hours<<24)+(TimeCodes[i].Minutes<<16)+(TimeCodes[i].Seconds<<8)+TimeCodes[i].Frames)
+                            {
+                                int8u NewHighestFrame=TimeCodes[i].FramesPerSecond-1;
+                                TimeCodes[i]--; // Time code of the last frame
+                                while (TimeCodes[i].Frames!=TimeCodes[i].FramesPerSecond-1)
+                                {
+                                    NewHighestFrame++;
+                                    TimeCodes[i]--;
+                                }
+                                if (HighestFrame_Adapted<NewHighestFrame)
+                                    HighestFrame_Adapted=NewHighestFrame;
+                                TimeCodes.erase(TimeCodes.begin()+i);
+                                i--;
+                            }
+                    }
+                }
+
+                Begin+=11;
+                for(; Begin+5<=End; Begin+=5)
+                {
+                    for (size_t i=0; i<TimeCodes.size(); i++)
+                    {
+                        if (i<=1)
+                        {
+                            FrameRateSlowDown[i]++;
+                            if (FrameRateSlowDown[i]>6-i)
+                            {
+                                FrameRateSlowDown[i]=0;
+                                continue;
+                            }
+                        }
+                        TimeCodes[i]++;
+                    }
+                }
+            }
+        }
+        while (End<Buffer_Size && (Buffer[End]==0x0D || Buffer[End]==0x0A))
+            End++;
+        Begin=End;
+    }
+    if (HighestFrame)
+    {
+        Fill(Stream_Text, 0, Text_TimeCode_MaxFrameNumber, HighestFrame);
+        Fill(Stream_Text, 0, Text_TimeCode_MaxFrameNumber_Theory, HighestFrame_Adapted);
+    }
+    Fill(Stream_Text, 0, Text_FrameRate, 30);
 }
 
 //***************************************************************************
@@ -251,18 +383,20 @@ void File_Scc::Data_Parse()
     //Parsing
     string TimeStamp;
     Get_String(11, TimeStamp,                                   "TimeStamp");
+    TimeCode Temp=Scc_str2TimeCode((const int8u*)TimeStamp.c_str());
+    Temp.DropFrame=TimeCode_FirstFrame.DropFrame;
+    Parser->Frame_Count_NotParsedIncluded=Temp.ToFrames()-TimeCode_FirstFrame.ToFrames();
     Parser->FrameInfo.DTS=Scc_str2timecode(TimeStamp.c_str());
+    Parser->FrameInfo.DUR=33333333;
     while (Element_Offset+5<=Element_Size)
     {
         int8u Buffer_Temp[2];
-        Buffer_Temp[0]=(Buffer[Buffer_Offset+(size_t)Element_Offset+1]-(Buffer[Buffer_Offset+(size_t)Element_Offset+1]>='a'?('a'-10):'0'))<<4
-                     | (Buffer[Buffer_Offset+(size_t)Element_Offset+2]-(Buffer[Buffer_Offset+(size_t)Element_Offset+2]>='a'?('a'-10):'0'));
-        Buffer_Temp[1]=(Buffer[Buffer_Offset+(size_t)Element_Offset+3]-(Buffer[Buffer_Offset+(size_t)Element_Offset+3]>='a'?('a'-10):'0'))<<4
-                     | (Buffer[Buffer_Offset+(size_t)Element_Offset+4]-(Buffer[Buffer_Offset+(size_t)Element_Offset+4]>='a'?('a'-10):'0'));
+        Buffer_Temp[0]=Char2Hex(Buffer[Buffer_Offset+(size_t)Element_Offset+1])<<4
+                     | Char2Hex(Buffer[Buffer_Offset+(size_t)Element_Offset+2]);
+        Buffer_Temp[1]=Char2Hex(Buffer[Buffer_Offset+(size_t)Element_Offset+3])<<4
+                     | Char2Hex(Buffer[Buffer_Offset+(size_t)Element_Offset+4]);
         Open_Buffer_Continue(Parser, Buffer_Temp, 2);
         Element_Offset+=5;
-        if (Parser->FrameInfo.DTS!=(int64u)-1)
-            Parser->FrameInfo.DTS+=33333333;
     }
 }
 

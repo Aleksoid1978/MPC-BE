@@ -70,6 +70,7 @@ private :
 
     //Helpers
     std::string GOP_Detect(std::string PictureTypes);
+	void Get_leb128(int64u& Info, const char* Name);
 };
 
 } //NameSpace

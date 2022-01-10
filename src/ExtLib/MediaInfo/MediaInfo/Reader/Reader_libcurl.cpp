@@ -26,8 +26,8 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/Reader/Reader_libcurl.h"
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/Reader/Reader_libcurl.h"
 #if defined MEDIAINFO_LIBCURL_DLL_RUNTIME
     //Copy of cURL include files
     #include "MediaInfo/Reader/Reader_libcurl_Include.h"

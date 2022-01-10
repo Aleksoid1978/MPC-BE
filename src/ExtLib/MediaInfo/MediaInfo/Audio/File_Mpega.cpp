@@ -687,12 +687,12 @@ bool File_Mpega::Synchronize()
                     {
                         //Testing VBRI in a malformed frame
                         bool VbriFound=false;
-                        for (size_t Pos=Buffer_Offset+3; Pos+4<Buffer_Offset+Size0; Pos++)
+                        for (size_t Pos=Buffer_Offset+4; Pos+4<Buffer_Offset+Size0; Pos++)
                         {
-                            if (Buffer[Pos  ]==0x56
-                             && Buffer[Pos+1]==0x42
-                             && Buffer[Pos+2]==0x52
-                             && Buffer[Pos+3]==0x49)
+                           int32u ToTest=CC4(Buffer+Pos);
+                            if (ToTest==0x496E666F  // "Info"
+                             || ToTest==0x56425249  // "VBRI"
+                             || ToTest==0x58696E67) // "Xing"
                             {
                                 VbriFound=true;
                                 break;

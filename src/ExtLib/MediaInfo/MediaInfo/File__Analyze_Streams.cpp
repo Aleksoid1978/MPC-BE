@@ -1155,7 +1155,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         if (StreamKind==Stream_Video && (Parameter==Video_FrameRate || Parameter==Video_FrameRate_Nominal || Parameter==Video_FrameRate_Original)
          && Retrieve(Stream_Video, StreamPos, Video_FrameRate_Original_Num).empty()) // Ignoring when there is a num/den with discrepency between container and raw stream
         {
-            Video_FrameRate_Rounding(StreamPos, (video)Parameter);
+            Video_FrameRate_Rounding(Stream_Video, StreamPos, Parameter);
             if (Retrieve(Stream_Video, StreamPos, Video_FrameRate_Nominal)==Retrieve(Stream_Video, StreamPos, Video_FrameRate))
                 Clear(Stream_Video, StreamPos, Video_FrameRate_Nominal);
             if (Parameter!=Video_FrameRate_Original && Retrieve(Stream_Video, StreamPos, Video_FrameRate_Original)==Retrieve(Stream_Video, StreamPos, Video_FrameRate))
@@ -1343,6 +1343,11 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
             Ztring ToSearch=Parameter_ISO.substr(0, Space);
             for (size_t i=0; i<Stream_More_Item.size(); i++)
             {
+                if (Stream_More_Item(i, Info_Name) == Parameter_ISO)
+                {
+                    LastFound=(size_t)-1;
+                    break;
+                }
                 if (Stream_More_Item(i, Info_Name).rfind(ToSearch, ToSearch.size())==0 && (Stream_More_Item(i, Info_Name).size()==ToSearch.size() || Stream_More_Item(i, Info_Name)[ToSearch.size()]==__T(' ')))
                     LastFound=i;
             }
@@ -2035,9 +2040,9 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void File__Analyze::Video_FrameRate_Rounding(size_t Pos, video Parameter)
+float64 File__Analyze::Video_FrameRate_Rounded(const Ztring& Value)
 {
-    float64 FrameRate=Retrieve(Stream_Video, Pos, Parameter).To_float64();
+    float64 FrameRate=Value.To_float64();
     float64 FrameRate_Sav=FrameRate;
 
          if (FrameRate> 9.990 && FrameRate<=10.010) FrameRate=10.000;
@@ -2057,7 +2062,20 @@ void File__Analyze::Video_FrameRate_Rounding(size_t Pos, video Parameter)
     else if (FrameRate>29.970*2 && FrameRate<=30.030*2) FrameRate=30.000*2;
 
     if (std::fabs(FrameRate-FrameRate_Sav)>=0.000999999)
-        Fill(Stream_Video, Pos, Parameter, FrameRate, 3, true);
+        return FrameRate;
+    else
+        return FrameRate_Sav;
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::Video_FrameRate_Rounding(stream_t StreamKind, size_t Pos, size_t Parameter)
+{
+    const Ztring Value=Retrieve_Const(StreamKind, Pos, Parameter);
+    float64 FrameRate=Video_FrameRate_Rounded(Value);
+    float64 FrameRate_Sav=Value.To_float64();
+
+    if (FrameRate!=FrameRate_Sav)
+        Fill(StreamKind, Pos, Parameter, FrameRate, 3, true);
 }
 
 //---------------------------------------------------------------------------
@@ -2387,11 +2405,16 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
         Fill(StreamKind, StreamPos, Parameter+3, DurationString2); // /String2
         Fill(StreamKind, StreamPos, Parameter+4, DurationString3); // /String3
 
-        if (Parameter==Fill_Parameter(StreamKind, Generic_Duration))
+        if (Retrieve_Const(StreamKind, StreamPos, Parameter+6, Info_Name)==Retrieve_Const(StreamKind, StreamPos, Parameter, Info_Name)+__T("/String5"))
         {
             Ztring DurationString4;
             Ztring FrameRateS=Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameRate));
             Ztring FrameCountS=Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameCount));
+            if (FrameCountS.empty() || StreamKind==Stream_Text)
+            {
+                //FrameCount is not based on frame rate
+                FrameCountS.From_Number(List[Pos].To_int32s()*Video_FrameRate_Rounded(Retrieve_Const(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameRate)))/1000.0, 0);
+            }
             if (!FrameRateS.empty() && !FrameCountS.empty() && FrameRateS.To_int64u() && FrameRateS.To_int64u()<256)
             {
                 bool DropFrame=false;

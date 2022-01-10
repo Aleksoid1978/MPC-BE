@@ -85,6 +85,7 @@ File_Eia608::File_Eia608()
     cc_data_1_Old=0x00;
     cc_data_2_Old=0x00;
     HasContent=false;
+    HasContent_Displayed=false;
 }
 
 //---------------------------------------------------------------------------
@@ -124,7 +125,7 @@ void File_Eia608::Streams_Fill()
                 ID+='1'+(cc_type*2)+(Pos%2);
                 Fill(Stream_Text, StreamPos_Last, Text_ID, ID);
                 Fill(Stream_Text, StreamPos_Last, "CaptionServiceName", ID);
-                Fill_SetOptions(StreamKind_Last, StreamKind_Last, "CaptionServiceName", "N NT");
+                Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceName", "N NT");
             }
             if (Config->ParseSpeed>=1.0)
             {
@@ -151,8 +152,46 @@ void File_Eia608::Streams_Fill()
 }
 
 //---------------------------------------------------------------------------
+static const char* FirstDisplay_Type_Name[]=
+{
+    "PopOn",
+    "RollUp",
+    "PaintOn",
+};
 void File_Eia608::Streams_Finish()
 {
+    if (PTS_End>PTS_Begin)
+        Fill(Stream_General, 0, General_Duration, float64_int64s(((float64)(PTS_End-PTS_Begin))/1000000));
+
+    size_t i=0;
+    for (size_t Pos=0; Pos<Streams.size(); Pos++)
+        if (Streams[Pos] || (Pos<2 && Config->File_Eia608_DisplayEmptyStream_Get()))
+        {
+            Fill(Stream_Text, i, Text_Duration, Retrieve_Const(Stream_General, 0, General_Duration));
+            if (Streams[Pos]->Duration_Start_Command!=FLT_MAX)
+                Fill(Stream_Text, i, Text_Duration_Start_Command, Streams[Pos]->Duration_Start_Command);
+            if (Streams[Pos]->Duration_Start!=FLT_MAX)
+                Fill(Stream_Text, i, Text_Duration_Start, Streams[Pos]->Duration_Start);
+            if (Streams[Pos]->Duration_End_Command!=FLT_MAX)
+                Fill(Stream_Text, i, Text_Duration_End, Streams[Pos]->Duration_End);
+            if (Streams[Pos]->Duration_End_Command!=FLT_MAX)
+                Fill(Stream_Text, i, Text_Duration_End_Command, Streams[Pos]->Duration_End_Command);
+            if (Streams[Pos]->Count_PopOn)
+                Fill(Stream_Text, i, Text_Events_PopOn, Streams[Pos]->Count_PopOn);
+            if (Streams[Pos]->Count_RollUp)
+                Fill(Stream_Text, i, Text_Events_RollUp, Streams[Pos]->Count_RollUp);
+            if (Streams[Pos]->Count_CurrentHasContent)
+                Streams[Pos]->Count_PaintOn++;
+            if (Streams[Pos]->Count_PaintOn)
+                Fill(Stream_Text, i, Text_Events_PaintOn, Streams[Pos]->Count_PaintOn);
+            if ((Streams[Pos]->Count_PopOn?1:0)+(Streams[Pos]->Count_RollUp?1:0)+(Streams[Pos]->Count_PaintOn?1:0)>1)
+                Fill(Stream_Text, i, Text_Events_Total, Streams[Pos]->Count_PopOn + Streams[Pos]->Count_RollUp + Streams[Pos]->Count_PaintOn);
+            if (Streams[Pos]->FirstDisplay_Delay_Frames!=(size_t)-1)
+                Fill(Stream_Text, i, Text_FirstDisplay_Delay_Frames, Streams[Pos]->FirstDisplay_Delay_Frames);
+            if (Streams[Pos]->FirstDisplay_Delay_Type!=(int8u)-1)
+                Fill(Stream_Text, i, Text_FirstDisplay_Type, FirstDisplay_Type_Name[Streams[Pos]->FirstDisplay_Delay_Type]);
+            i++;
+        }
 }
 
 //***************************************************************************
@@ -162,6 +201,7 @@ void File_Eia608::Streams_Finish()
 //---------------------------------------------------------------------------
 void File_Eia608::Read_Buffer_Unsynched()
 {
+    PTS_End=0;
     for (size_t StreamPos=0; StreamPos<Streams.size(); StreamPos++)
         if (Streams[StreamPos])
         {
@@ -262,12 +302,15 @@ void File_Eia608::Read_Buffer_AfterParsing()
         FrameInfo.DTS=(int64u)-1;
         FrameInfo.PTS=(int64u)-1;
     }
+    PTS_End=FrameInfo.PTS;
 }
 
 //---------------------------------------------------------------------------
 void File_Eia608::Read_Buffer_Continue()
 {
     FrameInfo.PTS=FrameInfo.DTS;
+    if (Frame_Count==0)
+        PTS_Begin=FrameInfo.PTS;
 
     if (!Status[IsAccepted])
         Accept("EIA-608");
@@ -619,6 +662,17 @@ void File_Eia608::PreambleAddressCode(int8u cc_data_1, int8u cc_data_2)
     //Horizontal position
     if (!TextMode)
     {
+        if (Streams[StreamPos]->Count_CurrentHasContent && !Streams[StreamPos]->InBack && !Streams[StreamPos]->RollUpLines && Streams[StreamPos]->y!=Eia608_PAC_Row[cc_data_1&0x07]+((cc_data_2&0x20)?1:0))
+        {
+            Streams[StreamPos]->Count_PaintOn++;
+            Streams[StreamPos]->Count_CurrentHasContent=false;
+            if (Streams[StreamPos]->FirstDisplay_Delay_Type==(int8u)-1)
+            {
+                if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+                    Streams[StreamPos]->FirstDisplay_Delay_Frames=Frame_Count_NotParsedIncluded;
+                Streams[StreamPos]->FirstDisplay_Delay_Type=2;
+            }
+        }
         Streams[StreamPos]->y=Eia608_PAC_Row[cc_data_1&0x07]+((cc_data_2&0x20)?1:0);
         if (Streams[StreamPos]->y>=Eia608_Rows)
         {
@@ -862,6 +916,8 @@ void File_Eia608::Special_14(int8u cc_data_2)
                         }
                     }
                     Streams[StreamPos]->Synched=true;
+                    if (Streams[StreamPos]->Duration_Start_Command==FLT_MAX)
+                        Streams[StreamPos]->Duration_Start_Command=FrameInfo.DTS/1000000.0;
 
                     break;
         case 0x2F : //EOC - end of Caption
@@ -876,6 +932,7 @@ void File_Eia608::Special_14(int8u cc_data_2)
     switch (cc_data_2)
     {
         case 0x20 : TextMode=false;
+                    Streams[StreamPos]->RollUpLines=0;
                     Streams[StreamPos]->InBack=true;
                     break; //RCL - Resume Caption Loading (Select pop-on style)
         case 0x21 : if (Streams[StreamPos]->x)
@@ -899,7 +956,9 @@ void File_Eia608::Special_14(int8u cc_data_2)
                     Streams[StreamPos]->InBack=false;
                     break; //RUx - Roll-Up Captions–x Rows
         case 0x28 : break; //FON - Flash On
-        case 0x29 : Streams[StreamPos]->InBack=false;
+        case 0x29 : Streams[StreamPos]->RollUpLines=0;
+                    Streams[StreamPos]->InBack=false;
+                    Streams[StreamPos]->Count_CurrentHasContent=false;
                     break; //RDC - Resume Direct Captioning (paint-on style)
         case 0x2A : TextMode=true;
                     Streams[StreamPos]->RollUpLines=Eia608_Rows; //Roll up all the lines
@@ -924,6 +983,17 @@ void File_Eia608::Special_14(int8u cc_data_2)
                         if (HasChanged_)
                             HasChanged();
                     }
+                    if (Streams[StreamPos]->Count_CurrentHasContent)
+                    {
+                        Streams[StreamPos]->Count_PaintOn++;
+                        Streams[StreamPos]->Count_CurrentHasContent=false;
+                        if (Streams[StreamPos]->FirstDisplay_Delay_Type==(int8u)-1)
+                        {
+                            if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+                                Streams[StreamPos]->FirstDisplay_Delay_Frames=Frame_Count_NotParsedIncluded;
+                            Streams[StreamPos]->FirstDisplay_Delay_Type=2;
+                        }
+                    }
                     break; //EDM - Erase Displayed Memory
         case 0x2D : for (size_t Pos=1; Pos<Streams[StreamPos]->RollUpLines; Pos++)
                     {
@@ -938,6 +1008,16 @@ void File_Eia608::Special_14(int8u cc_data_2)
                     if (!Streams[StreamPos]->InBack)
                         HasChanged();
                     Streams[StreamPos]->x=0;
+                    if (Streams[StreamPos]->RollUpLines && Streams[StreamPos]->Count_CurrentHasContent)
+                    {
+                        Streams[StreamPos]->Count_RollUp++;
+                        if (Streams[StreamPos]->FirstDisplay_Delay_Type==(int8u)-1)
+                        {
+                            if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+                                Streams[StreamPos]->FirstDisplay_Delay_Frames=Frame_Count_NotParsedIncluded;
+                            Streams[StreamPos]->FirstDisplay_Delay_Type=1;
+                        }
+                    }
                     break; //CR  - Carriage Return
         case 0x2E : for (size_t Pos_Y=0; Pos_Y<Streams[StreamPos]->CC_NonDisplayed.size(); Pos_Y++)
                         for (size_t Pos_X=0; Pos_X<Streams[StreamPos]->CC_NonDisplayed[Pos_Y].size(); Pos_X++)
@@ -949,9 +1029,17 @@ void File_Eia608::Special_14(int8u cc_data_2)
         case 0x2F : Streams[StreamPos]->CC_Displayed.swap(Streams[StreamPos]->CC_NonDisplayed);
                     HasChanged();
                     Streams[StreamPos]->Synched=false;
+                    Streams[StreamPos]->Count_PopOn++;
+                    if (Streams[StreamPos]->FirstDisplay_Delay_Type==(int8u)-1)
+                    {
+                        if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+                            Streams[StreamPos]->FirstDisplay_Delay_Frames=Frame_Count_NotParsedIncluded;
+                        Streams[StreamPos]->FirstDisplay_Delay_Type=0;
+                    }
                     break; //EOC - End of Caption
         default   : Illegal(0x14, cc_data_2);
     }
+    Streams[StreamPos]->Duration_End_Command=(FrameInfo.DTS+FrameInfo.DUR)/1000000.0;
 }
 
 //---------------------------------------------------------------------------
@@ -1098,6 +1186,10 @@ void File_Eia608::Character_Fill(wchar_t Character)
     size_t StreamPos=TextMode*2+DataChannelMode;
     if (StreamPos>=Streams.size() || Streams[StreamPos]==NULL || !Streams[StreamPos]->Synched)
         return; //Not synched
+    if (!Streams[StreamPos]->InBack)
+    {
+        Streams[StreamPos]->Count_CurrentHasContent=true;
+    }
 
     if (Streams[StreamPos]->x==Eia608_Columns)
     {
@@ -1125,8 +1217,16 @@ void File_Eia608::Character_Fill(wchar_t Character)
 //---------------------------------------------------------------------------
 void File_Eia608::HasChanged()
 {
+    size_t StreamPos=TextMode*2+DataChannelMode;
+    if (StreamPos>=Streams.size() || Streams[StreamPos]==NULL || !Streams[StreamPos]->Synched)
+        return; //Not synched
+    if (FrameInfo.DTS!=(int64u)-1)
+    {
+        if (Streams[StreamPos]->Duration_Start==FLT_MAX)
+            Streams[StreamPos]->Duration_Start=FrameInfo.DTS/1000000.0;
+        Streams[StreamPos]->Duration_End=(FrameInfo.DTS+FrameInfo.DUR)/1000000.0;
+    }
     #if MEDIAINFO_EVENTS
-            size_t StreamPos=TextMode*2+DataChannelMode;
             if (StreamPos<Streams.size() && Streams[StreamPos])
             EVENT_BEGIN (Eia608, CC_Content, 0)
                 Event.Field=1+cc_type;

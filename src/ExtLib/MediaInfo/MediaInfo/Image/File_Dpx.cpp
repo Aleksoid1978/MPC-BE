@@ -473,6 +473,9 @@ bool File_Dpx::FileHeader_Begin()
 //---------------------------------------------------------------------------
 void File_Dpx::Header_Parse()
 {
+    if (Sizes_Pos==Pos_ImageData)
+        DataMustAlwaysBeComplete=false; //We actually don't need to load the whole ImageData, as we don't parse it
+
     //Filling
     Header_Fill_Code(Sizes_Pos); //We use Sizes_Pos as the unique key
     if (Sizes.empty())
@@ -489,9 +492,6 @@ void File_Dpx::Header_Parse()
     }
     else
         Header_Fill_Size(Sizes[Sizes_Pos]);
-
-    if (Sizes_Pos==Pos_ImageData)
-        DataMustAlwaysBeComplete=false; //We actually don't need to load the whole ImageData, as we don't parse it
 }
 
 //---------------------------------------------------------------------------

@@ -3195,6 +3195,7 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DESCRIPTION")) Segment_Tag_SimpleTag_TagNames[0]=__T("Description");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODED_BY")) Segment_Tag_SimpleTag_TagNames[0]=__T("EncodedBy");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library");
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER_SETTINGS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library_Settings");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("FPS")) return; //Useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("HANDLER_NAME"))
     {

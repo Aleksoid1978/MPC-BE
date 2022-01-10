@@ -28,6 +28,10 @@
 #include <fstream>
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+using namespace std;
+//---------------------------------------------------------------------------
+
 namespace MediaInfoLib
 {
 
@@ -1104,6 +1108,12 @@ void File_DvDif::Errors_Stats_Update()
             Errors_Stats_Line+=__T('N');
             #if MEDIAINFO_EVENTS
                 Event.TimeCode|=1<<30;
+                bool IsLess=Speed_TimeCode_Current.Time.Hours<Speed_TimeCode_Current_Theory.Time.Hours
+                         || Speed_TimeCode_Current.Time.Minutes<Speed_TimeCode_Current_Theory.Time.Minutes
+                         || Speed_TimeCode_Current.Time.Seconds<Speed_TimeCode_Current_Theory.Time.Seconds
+                         || Speed_TimeCode_Current.Time.Frames<Speed_TimeCode_Current_Theory.Time.Frames;
+                if (IsLess)
+                    MoreFlags|=1<<1;
             #endif //MEDIAINFO_EVENTS
             Speed_TimeCode_Current_Theory=Speed_TimeCode_Current;
             TimeCode_Disrupted=true;
@@ -1256,13 +1266,11 @@ void File_DvDif::Errors_Stats_Update()
             Errors_Stats_Line+=__T('N');
             #if MEDIAINFO_EVENTS
                 Event.RecordedDateTime1|=1<<30;
-                bool IsLess = Speed_RecTime_Current.Time.Hours < Speed_RecTime_Current_Theory2.Time.Hours
-                           || Speed_RecTime_Current.Time.Minutes < Speed_RecTime_Current_Theory2.Time.Minutes
-                           || Speed_RecTime_Current.Time.Seconds < Speed_RecTime_Current_Theory2.Time.Seconds;
+                bool IsLess=Speed_RecTime_Current.Time.Hours<Speed_RecTime_Current_Theory2.Time.Hours
+                         || Speed_RecTime_Current.Time.Minutes<Speed_RecTime_Current_Theory2.Time.Minutes
+                         || Speed_RecTime_Current.Time.Seconds<Speed_RecTime_Current_Theory2.Time.Seconds;
                 if (IsLess)
-                {
-                    MoreFlags |= 1 << 0;
-                }
+                    MoreFlags|=1<<0;
             #endif //MEDIAINFO_EVENTS
             if (!REC_IsValid || REC_ST)
             {
@@ -1319,6 +1327,9 @@ void File_DvDif::Errors_Stats_Update()
             Errors_Stats_Line+=__T('N');
             #if MEDIAINFO_EVENTS
                 Event.Arb|=1<<6;
+                bool IsLess=Speed_Arb_Current.Value<Speed_Arb_Current_Theory.Value;
+                if (IsLess)
+                    MoreFlags|=1<<2;
             #endif //MEDIAINFO_EVENTS
             Speed_Arb_Current_Theory=Speed_Arb_Current;
             Arb_AreDetected=true;
