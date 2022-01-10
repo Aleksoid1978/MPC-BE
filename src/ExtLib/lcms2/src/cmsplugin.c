@@ -671,16 +671,64 @@ static struct _cmsContext_struct globalContext = {
 static _cmsMutex _cmsContextPoolHeadMutex = CMS_MUTEX_INITIALIZER;
 static struct _cmsContext_struct* _cmsContextPoolHead = NULL;
 
+
+// Make sure context is initialized (needed on windows)
+static
+cmsBool InitContextMutex(void)
+{
+    // See the comments regarding locking in lcms2_internal.h
+    // for an explanation of why we need the following code.
+#ifndef CMS_NO_PTHREADS
+#ifdef CMS_IS_WINDOWS_
+#ifndef CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
+
+    static cmsBool already_initialized = FALSE;
+
+    if (!already_initialized)
+    {
+        static HANDLE _cmsWindowsInitMutex = NULL;
+        static volatile HANDLE* mutex = &_cmsWindowsInitMutex;
+
+        if (*mutex == NULL)
+        {
+            HANDLE p = CreateMutex(NULL, FALSE, NULL);
+            if (p && InterlockedCompareExchangePointer((void**)mutex, (void*)p, NULL) != NULL)
+                CloseHandle(p);
+        }
+        if (*mutex == NULL || WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED)
+        {
+            cmsSignalError(0, cmsERROR_INTERNAL, "Mutex lock failed");
+            return FALSE;
+        }
+        if (((void**)&_cmsContextPoolHeadMutex)[0] == NULL)
+            InitializeCriticalSection(&_cmsContextPoolHeadMutex);
+        if (*mutex == NULL || !ReleaseMutex(*mutex))
+        {
+            cmsSignalError(0, cmsERROR_INTERNAL, "Mutex unlock failed");
+            return FALSE;
+        }
+        already_initialized = TRUE;
+    }
+#endif
+#endif
+#endif
+
+    return TRUE;
+}
+
+
+
 // Internal, get associated pointer, with guessing. Never returns NULL.
 struct _cmsContext_struct* _cmsGetContext(cmsContext ContextID)
 {
     struct _cmsContext_struct* id = (struct _cmsContext_struct*) ContextID;
     struct _cmsContext_struct* ctx;
 
-
     // On 0, use global settings
     if (id == NULL) 
         return &globalContext;
+
+    InitContextMutex();
 
     // Search
     _cmsEnterCriticalSectionPrimitive(&_cmsContextPoolHeadMutex);
@@ -784,31 +832,7 @@ cmsContext CMSEXPORT cmsCreateContext(void* Plugin, void* UserData)
     struct _cmsContext_struct* ctx;
     struct _cmsContext_struct  fakeContext;
         
-    // See the comments regarding locking in lcms2_internal.h
-    // for an explanation of why we need the following code.
-#ifndef CMS_NO_PTHREADS
-#ifdef CMS_IS_WINDOWS_
-#ifndef CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
-    {
-        static HANDLE _cmsWindowsInitMutex = NULL;
-        static volatile HANDLE* mutex = &_cmsWindowsInitMutex;
-
-        if (*mutex == NULL)
-        {
-            HANDLE p = CreateMutex(NULL, FALSE, NULL);
-            if (p && InterlockedCompareExchangePointer((void **)mutex, (void*)p, NULL) != NULL)
-                CloseHandle(p);
-        }
-        if (*mutex == NULL || WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED)
-            return NULL;
-        if (((void **)&_cmsContextPoolHeadMutex)[0] == NULL)
-            InitializeCriticalSection(&_cmsContextPoolHeadMutex);
-        if (*mutex == NULL || !ReleaseMutex(*mutex))
-            return NULL;
-    }
-#endif
-#endif
-#endif
+    if (!InitContextMutex()) return NULL;
 
     _cmsInstallAllocFunctions(_cmsFindMemoryPlugin(Plugin), &fakeContext.DefaultMemoryManager);
     
@@ -884,6 +908,8 @@ cmsContext CMSEXPORT cmsDupContext(cmsContext ContextID, void* NewUserData)
     if (ctx == NULL)   
         return NULL;     // Something very wrong happened
 
+    if (!InitContextMutex()) return NULL;
+
     // Setup default memory allocators
     memcpy(&ctx->DefaultMemoryManager, &src->DefaultMemoryManager, sizeof(ctx->DefaultMemoryManager));
 
@@ -942,6 +968,9 @@ void CMSEXPORT cmsDeleteContext(cmsContext ContextID)
         struct _cmsContext_struct* ctx = (struct _cmsContext_struct*) ContextID;              
         struct _cmsContext_struct  fakeContext;  
         struct _cmsContext_struct* prev;
+
+
+        InitContextMutex();
 
         memcpy(&fakeContext.DefaultMemoryManager, &ctx->DefaultMemoryManager, sizeof(ctx->DefaultMemoryManager));
 
@@ -1004,6 +1033,8 @@ cmsBool _cmsGetTime(struct tm* ptr_time)
 #elif defined(HAVE_GMTIME_S)
     t = gmtime_s(&tm, &now) == 0 ? &tm : NULL;
 #else
+    if (!InitContextMutex()) return FALSE;
+
     _cmsEnterCriticalSectionPrimitive(&_cmsContextPoolHeadMutex);
     t = gmtime(&now);
     _cmsLeaveCriticalSectionPrimitive(&_cmsContextPoolHeadMutex);

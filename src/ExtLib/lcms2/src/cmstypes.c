@@ -134,14 +134,61 @@ cmsBool _cmsWriteWCharArray(cmsIOHANDLER* io, cmsUInt32Number n, const wchar_t* 
     return TRUE;
 }
 
+// Try to promote correctly to wchar_t when 32 bits
+cmsINLINE cmsBool is_surrogate(cmsUInt32Number uc) { return (uc - 0xd800u) < 2048u; }
+cmsINLINE cmsBool is_high_surrogate(cmsUInt32Number uc) { return (uc & 0xfffffc00) == 0xd800; }
+cmsINLINE cmsBool is_low_surrogate(cmsUInt32Number uc)  { return (uc & 0xfffffc00) == 0xdc00; }
+
+cmsINLINE cmsUInt32Number surrogate_to_utf32(cmsUInt32Number high, cmsUInt32Number low)
+{
+    return (high << 10) + low - 0x35fdc00;
+}
+
+cmsINLINE cmsBool convert_utf16_to_utf32(cmsIOHANDLER* io, cmsInt32Number n, wchar_t* output)
+{
+    cmsUInt16Number uc;
+
+    while (n > 0)
+    {
+        if (!_cmsReadUInt16Number(io, &uc)) return FALSE;
+        n--;
+
+        if (!is_surrogate(uc))
+        {
+            *output++ = (wchar_t)uc;
+        }
+        else {
+
+            cmsUInt16Number low;
+
+            if (!_cmsReadUInt16Number(io, &low)) return FALSE;
+            n--;
+
+            if (is_high_surrogate(uc) && is_low_surrogate(low))
+                *output++ = (wchar_t)surrogate_to_utf32(uc, low);
+            else
+                return FALSE;   // Corrupted string, just ignore
+        }
+    }
+
+    return TRUE;
+}
+
+
 // Auxiliary to read an array of wchar_t
 static
 cmsBool _cmsReadWCharArray(cmsIOHANDLER* io, cmsUInt32Number n, wchar_t* Array)
 {
     cmsUInt32Number i;
     cmsUInt16Number tmp;
+    cmsBool is32 = sizeof(wchar_t) > sizeof(cmsUInt16Number);
 
     _cmsAssert(io != NULL);
+
+    if (is32 && Array != NULL)
+    {
+        return convert_utf16_to_utf32(io, n, Array);
+    }
 
     for (i=0; i < n; i++) {
 
@@ -1307,7 +1354,7 @@ void Type_ParametricCurve_Free(struct _cms_typehandler_struct* self, void* Ptr)
 //
 // All the dateTimeNumber values in a profile shall be in Coordinated Universal Time
 // (UTC, also known as GMT or ZULU Time). Profile writers are required to convert local
-// time to UTC when setting these values. Programmes that display these values may show
+// time to UTC when setting these values. Programs that display these values may show
 // the dateTimeNumber as UTC, show the equivalent local time (at current locale), or
 // display both UTC and local versions of the dateTimeNumber.
 
@@ -1746,7 +1793,7 @@ cmsUInt32Number uipow(cmsUInt32Number n, cmsUInt32Number a, cmsUInt32Number b)
 
 
 // That will create a MPE LUT with Matrix, pre tables, CLUT and post tables.
-// 8 bit lut may be scaled easely to v4 PCS, but we need also to properly adjust
+// 8 bit lut may be scaled easily to v4 PCS, but we need also to properly adjust
 // PCS on BToAxx tags and AtoB if abstract. We need to fix input direction.
 
 static
@@ -3180,6 +3227,10 @@ cmsBool Type_NamedColor_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER
        cmsUInt16Number Colorant[cmsMAXCHANNELS];
        char Root[cmsMAX_PATH];
 
+       memset(Root, 0, sizeof(Root));
+       memset(PCS, 0, sizeof(PCS));
+       memset(Colorant, 0, sizeof(Colorant));
+
         if (!cmsNamedColorInfo(NamedColorList, i, Root, NULL, NULL, PCS, Colorant)) return 0;
         Root[32] = 0;
         if (!io ->Write(io, 32 , Root)) return FALSE;
@@ -3967,41 +4018,44 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
 
            switch (ElementSig) {
 
-            case cmsSigFormulaCurveSeg: {
+           case cmsSigFormulaCurveSeg: {
 
-                cmsUInt16Number Type;
-                cmsUInt32Number ParamsByType[] = {4, 5, 5 };
+               cmsUInt16Number Type;
+               cmsUInt32Number ParamsByType[] = { 4, 5, 5 };
 
-                if (!_cmsReadUInt16Number(io, &Type)) goto Error;
-                if (!_cmsReadUInt16Number(io, NULL)) goto Error;
+               if (!_cmsReadUInt16Number(io, &Type)) goto Error;
+               if (!_cmsReadUInt16Number(io, NULL)) goto Error;
 
-                Segments[i].Type = Type + 6;
-                if (Type > 2) goto Error;
+               Segments[i].Type = Type + 6;
+               if (Type > 2) goto Error;
 
-                for (j=0; j < ParamsByType[Type]; j++) {
+               for (j = 0; j < ParamsByType[Type]; j++) {
 
-                    cmsFloat32Number f;
-                    if (!_cmsReadFloat32Number(io, &f)) goto Error;
-                    Segments[i].Params[j] = f;
-                }
-                }
-                break;
+                   cmsFloat32Number f;
+                   if (!_cmsReadFloat32Number(io, &f)) goto Error;
+                   Segments[i].Params[j] = f;
+               }
+           }
+           break;
 
 
-            case cmsSigSampledCurveSeg: {
-                cmsUInt32Number Count;
+           case cmsSigSampledCurveSeg: {
+               cmsUInt32Number Count;
 
-                if (!_cmsReadUInt32Number(io, &Count)) goto Error;
+               if (!_cmsReadUInt32Number(io, &Count)) goto Error;
 
-                Segments[i].nGridPoints = Count;
-                Segments[i].SampledPoints = (cmsFloat32Number*) _cmsCalloc(self ->ContextID, Count, sizeof(cmsFloat32Number));
-                if (Segments[i].SampledPoints == NULL) goto Error;
+               // The first point is implicit in the last stage, we allocate an extra note to be populated latter on
+               Count++;
+               Segments[i].nGridPoints = Count;
+               Segments[i].SampledPoints = (cmsFloat32Number*)_cmsCalloc(self->ContextID, Count, sizeof(cmsFloat32Number));
+               if (Segments[i].SampledPoints == NULL) goto Error;
 
-                for (j=0; j < Count; j++) {
-                    if (!_cmsReadFloat32Number(io, &Segments[i].SampledPoints[j])) goto Error;
-                }
-                }
-                break;
+               Segments[i].SampledPoints[0] = 0;
+               for (j = 1; j < Count; j++) {
+                   if (!_cmsReadFloat32Number(io, &Segments[i].SampledPoints[j])) goto Error;
+               }
+           }
+           break;
 
             default:
                 {
@@ -4021,6 +4075,17 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
          if (Segments[i].SampledPoints) _cmsFree(self ->ContextID, Segments[i].SampledPoints);
      }
      _cmsFree(self ->ContextID, Segments);
+
+     // Explore for missing implicit points 
+     for (i = 0; i < nSegments; i++) {
+
+         // If sampled curve, fix it
+         if (Curve->Segments[i].Type == 0) {
+
+             Curve->Segments[i].SampledPoints[0] = cmsEvalToneCurveFloat(Curve, Curve->Segments[i].x0);
+         }
+     }
+
      return Curve;
 
 Error:
@@ -4115,12 +4180,12 @@ cmsBool WriteSegmentedCurve(cmsIOHANDLER* io, cmsToneCurve* g)
 
         if (ActualSeg -> Type == 0) {
 
-            // This is a sampled curve
+            // This is a sampled curve. First point is implicit in the ICC format, but not in our representation
             if (!_cmsWriteUInt32Number(io, (cmsUInt32Number) cmsSigSampledCurveSeg)) goto Error;
             if (!_cmsWriteUInt32Number(io, 0)) goto Error;
-            if (!_cmsWriteUInt32Number(io, ActualSeg -> nGridPoints)) goto Error;
+            if (!_cmsWriteUInt32Number(io, ActualSeg -> nGridPoints - 1)) goto Error;
 
-            for (j=0; j < g ->Segments[i].nGridPoints; j++) {
+            for (j=1; j < g ->Segments[i].nGridPoints; j++) {
                 if (!_cmsWriteFloat32Number(io, ActualSeg -> SampledPoints[j])) goto Error;
             }
 
@@ -4497,7 +4562,7 @@ Error:
 
 
 
-// This one is a liitle bit more complex, so we don't use position tables this time.
+// This one is a little bit more complex, so we don't use position tables this time.
 static
 cmsBool Type_MPE_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
 {
@@ -4929,7 +4994,7 @@ cmsBool ReadOneElem(cmsIOHANDLER* io,  _cmsDICelem* e, cmsUInt32Number i, cmsUIn
     if (!_cmsReadUInt32Number(io, &e->Offsets[i])) return FALSE;
     if (!_cmsReadUInt32Number(io, &e ->Sizes[i])) return FALSE;
 
-    // An offset of zero has special meaning and shal be preserved
+    // An offset of zero has special meaning and shall be preserved
     if (e ->Offsets[i] > 0)
         e ->Offsets[i] += BaseOffset;
     return TRUE;

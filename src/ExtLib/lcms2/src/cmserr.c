@@ -79,7 +79,7 @@ long int CMSEXPORT cmsfilelength(FILE* f)
 
 // User may override this behaviour by using a memory plug-in, which basically replaces
 // the default memory management functions. In this case, no check is performed and it
-// is up to the plug-in writter to keep in the safe side. There are only three functions
+// is up to the plug-in writer to keep in the safe side. There are only three functions
 // required to be implemented: malloc, realloc and free, although the user may want to
 // replace the optional mallocZero, calloc and dup as well.
 
@@ -308,7 +308,7 @@ void* CMSEXPORT _cmsDupMem(cmsContext ContextID, const void* Org, cmsUInt32Numbe
 
 // Sub allocation takes care of many pointers of small size. The memory allocated in
 // this way have be freed at once. Next function allocates a single chunk for linked list
-// I prefer this method over realloc due to the big inpact on xput realloc may have if
+// I prefer this method over realloc due to the big impact on xput realloc may have if
 // memory is being swapped to disk. This approach is safer (although that may not be true on all platforms)
 static
 _cmsSubAllocator_chunk* _cmsCreateSubAllocChunk(cmsContext ContextID, cmsUInt32Number Initial)

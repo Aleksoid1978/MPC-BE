@@ -260,7 +260,7 @@ Error:
 
 
 
-// Read the DToAX tag, adjusting the encoding of Lab or XYZ if neded
+// Read the DToAX tag, adjusting the encoding of Lab or XYZ if needed
 static
 cmsPipeline* _cmsReadFloatInputTag(cmsHPROFILE hProfile, cmsTagSignature tagFloat)
 {
@@ -536,7 +536,7 @@ void ChangeInterpolationToTrilinear(cmsPipeline* Lut)
 }
 
 
-// Read the DToAX tag, adjusting the encoding of Lab or XYZ if neded
+// Read the DToAX tag, adjusting the encoding of Lab or XYZ if needed
 static
 cmsPipeline* _cmsReadFloatOutputTag(cmsHPROFILE hProfile, cmsTagSignature tagFloat)
 {
@@ -661,7 +661,7 @@ Error:
 
 // ---------------------------------------------------------------------------------------------------------------
 
-// Read the AToD0 tag, adjusting the encoding of Lab or XYZ if neded
+// Read the AToD0 tag, adjusting the encoding of Lab or XYZ if needed
 static
 cmsPipeline* _cmsReadFloatDevicelinkTag(cmsHPROFILE hProfile, cmsTagSignature tagFloat)
 {

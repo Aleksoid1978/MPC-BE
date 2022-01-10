@@ -414,9 +414,9 @@ void ComputeIncrementsForChunky(cmsUInt32Number Format,
        cmsUInt32Number channelSize = trueBytesSize(Format);
        cmsUInt32Number pixelSize = channelSize * total_chans;
        
-	   // Sanity check
-	   if (total_chans <= 0 || total_chans >= cmsMAXCHANNELS)
-		   return;
+       // Sanity check
+       if (total_chans <= 0 || total_chans >= cmsMAXCHANNELS)
+           return;
 
         memset(channels, 0, sizeof(channels));
 

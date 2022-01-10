@@ -207,7 +207,7 @@ _cmsParametricCurvesCollection *GetParametricCurveByType(cmsContext ContextID, i
 }
 
 // Low level allocate, which takes care of memory details. nEntries may be zero, and in this case
-// no optimation curve is computed. nSegments may also be zero in the inverse case, where only the
+// no optimization curve is computed. nSegments may also be zero in the inverse case, where only the
 // optimization curve is given. Both features simultaneously is an error
 static
 cmsToneCurve* AllocateToneCurveStruct(cmsContext ContextID, cmsUInt32Number nEntries,
@@ -507,28 +507,31 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     // X=Y/c              | Y< (ad+b)^g
     case -4:
     {
-        if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
-            fabs(Params[1]) < MATRIX_DET_TOLERANCE ||
-            fabs(Params[3]) < MATRIX_DET_TOLERANCE)
-        {
-            Val = 0;
-        }
+
+        e = Params[1] * Params[4] + Params[2];
+        if (e < 0)
+            disc = 0;
         else
-        {
-            e = Params[1] * Params[4] + Params[2];
-            if (e < 0)
-                disc = 0;
+            disc = pow(e, Params[0]);
+
+        if (R >= disc) {
+
+            if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
+                fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+
+                Val = 0;
+
             else
-                disc = pow(e, Params[0]);
-
-            if (R >= disc) {
-
                 Val = (pow(R, 1.0 / Params[0]) - Params[2]) / Params[1];
-            }
-            else {
-                Val = R / Params[3];
-            }
         }
+        else {
+
+            if (fabs(Params[3]) < MATRIX_DET_TOLERANCE)
+                Val = 0;
+            else
+                Val = R / Params[3];
+        }
+
     }
     break;
 
@@ -555,26 +558,29 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     // X=(Y-f)/c          | else
     case -5:
     {
-        if (fabs(Params[1]) < MATRIX_DET_TOLERANCE ||
-            fabs(Params[3]) < MATRIX_DET_TOLERANCE)
-        {
-            Val = 0;
-        }
-        else
-        {
-            disc = Params[3] * Params[4] + Params[6];
-            if (R >= disc) {
+        disc = Params[3] * Params[4] + Params[6];
+        if (R >= disc) {
 
-                e = R - Params[5];
-                if (e < 0)
+            e = R - Params[5];
+            if (e < 0)
+                Val = 0;
+            else
+            {
+                if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
+                    fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+
                     Val = 0;
                 else
                     Val = (pow(e, 1.0 / Params[0]) - Params[2]) / Params[1];
             }
-            else {
-                Val = (R - Params[6]) / Params[3];
-            }
         }
+        else {
+            if (fabs(Params[3]) < MATRIX_DET_TOLERANCE)
+                Val = 0;
+            else
+                Val = (R - Params[6]) / Params[3];
+        }
+
     }
     break;
 

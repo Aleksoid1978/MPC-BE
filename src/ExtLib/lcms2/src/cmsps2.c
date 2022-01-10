@@ -475,7 +475,7 @@ void Emit1Gamma(cmsIOHANDLER* m, cmsToneCurve* Table, const char* name)
     _cmsIOPrintf(m, "/lcms2gammatable [");
 
     for (i=0; i < Table->nEntries; i++) {
-	if (i % 10 == 0)
+    if (i % 10 == 0)
             _cmsIOPrintf(m, "\n  ");
         _cmsIOPrintf(m, "%d ", Table->Table16[i]);
     }
@@ -487,7 +487,7 @@ void Emit1Gamma(cmsIOHANDLER* m, cmsToneCurve* Table, const char* name)
 
     // PostScript code                            Stack
     // ===============                            ========================
-                                            	  // v
+                                                  // v
     _cmsIOPrintf(m, "/%s {\n  ", name);
 
     // Bounds check
@@ -554,7 +554,7 @@ void EmitNGamma(cmsIOHANDLER* m, cmsUInt32Number n, cmsToneCurve* g[], const cha
         }
         else {
             snprintf(buffer, sizeof(buffer), "%s%d", nameprefix, (int) i);
-	    buffer[sizeof(buffer)-1] = '\0';
+        buffer[sizeof(buffer)-1] = '\0';
             Emit1Gamma(m, g[i], buffer);
         }
     }

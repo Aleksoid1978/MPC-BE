@@ -1616,7 +1616,7 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
     return Icc -> TagPtrs[n];
 
 
-    // Return error and unlock tha data
+    // Return error and unlock the data
 Error:
     _cmsUnlockMutex(Icc->ContextID, Icc ->UsrMutex);
     return NULL;
