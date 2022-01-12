@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ extern "C" {
 }
 #pragma warning(pop)
 
-static const WORD PCID_ATI_UVD [] = {
+static const UINT16 PCID_ATI_UVD [] = {
 	0x94C7, // ATI Radeon HD 2350
 	0x94C1, // ATI Radeon HD 2400 XT
 	0x94CC, // ATI Radeon HD 2400 Series
@@ -67,9 +67,9 @@ static const WORD PCID_ATI_UVD [] = {
 	0x950F, // ATI Radeon HD 3850 X2
 };
 
-static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
+static bool CheckPCID(UINT pcid, const UINT16* pPCIDs, size_t count)
 {
-	WORD wPCID = (WORD)pcid;
+	UINT16 wPCID = (UINT16)pcid;
 	for (size_t i = 0; i < count; i++) {
 		if (wPCID == pPCIDs[i]) {
 			return true;
@@ -82,7 +82,7 @@ static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 // === H264 functions
 
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-							 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion)
+							 UINT nPCIVendor, UINT nPCIDevice, UINT64 VideoDriverVersion)
 {
 	const H264Context* h           = (H264Context*)pAVCtx->priv_data;
 	const SPS* sps                 = h264_getSPS(h);
@@ -314,12 +314,12 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 	}
 }
 
-bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
+bool IsATIUVD(UINT nPCIVendor, UINT nPCIDevice)
 {
 	return (nPCIVendor == PCIV_ATI && CheckPCID(nPCIDevice, PCID_ATI_UVD, std::size(PCID_ATI_UVD)));
 }
 
-BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion)
+BOOL DXVACheckFramesize(int width, int height, UINT nPCIVendor, UINT nPCIDevice, UINT64 VideoDriverVersion)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;

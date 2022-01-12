@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -116,8 +116,8 @@ private:
 	GUID									m_DXVADecoderGUID;
 	D3DFORMAT								m_DXVASurfaceFormat = D3DFMT_UNKNOWN;
 
-	DWORD									m_nPCIVendor;
-	DWORD									m_nPCIDevice;
+	UINT									m_nPCIVendor;
+	UINT									m_nPCIDevice;
 	UINT64									m_VideoDriverVersion;
 	CString									m_strDeviceDescription;
 
