@@ -41,6 +41,7 @@
 #include <FilterInterfaces.h>
 
 #include "Version.h"
+#include "Utils.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -2104,7 +2105,21 @@ redo:
 		m_pAVCtx->get_buffer2       = av_get_buffer;
 		m_pAVCtx->slice_flags      |= SLICE_FLAG_ALLOW_FIELD;
 	} else if ((m_bUseD3D11cb || m_bUseNVDEC) && m_HWPixFmt != AV_PIX_FMT_NONE) {
-		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA, "0", nullptr, 0) < 0) {
+		CStringA device("0");
+		if (m_bUseD3D11cb && m_HwAdapter.DeviceId && m_HwAdapter.VendorId) {
+			std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
+			if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters))) {
+				unsigned n = 0;
+				for (const auto& dxgi_adapter : dxgi_adapters) {
+					if (dxgi_adapter.DeviceId == m_HwAdapter.DeviceId && dxgi_adapter.VendorId == m_HwAdapter.VendorId) {
+						device.Format("%u", n);
+						break;
+					}
+					++n;
+				}
+			}
+		}
+		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA, device.GetString(), nullptr, 0) < 0) {
 			m_HWPixFmt = AV_PIX_FMT_NONE;
 			m_bUseD3D11cb = m_bUseNVDEC = false;
 		} else {
@@ -4463,11 +4478,12 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 STDMETHODIMP CMPCVideoDecFilter::GetD3D11Adapter(MPC_ADAPTER_ID* pAdapterId)
 {
 	CAutoLock cLock(&m_csInitDec);
+	CheckPointer(pAdapterId, E_FAIL);
 
 	pAdapterId->VendorId = m_HwAdapter.VendorId;
 	pAdapterId->DeviceId = m_HwAdapter.DeviceId;
 
-	return E_FAIL;
+	return S_OK;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetD3D11Adapter(UINT VendorId, UINT DeviceId)
@@ -4477,8 +4493,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetD3D11Adapter(UINT VendorId, UINT DeviceId)
 	m_HwAdapter.VendorId = VendorId;
 	m_HwAdapter.DeviceId = DeviceId;
 
-	// TODO
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)

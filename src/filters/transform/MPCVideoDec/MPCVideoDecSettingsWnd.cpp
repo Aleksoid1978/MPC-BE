@@ -339,8 +339,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_D3D11Adapters.clear();
 
 		std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
-		if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters)) && dxgi_adapters.size()) {
-			// add empty adapter 
+		if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters))) {
+			// add empty adapter
 			dxgi_adapters.emplace_front();
 			wcscpy_s(dxgi_adapters.front().Description, L"Automatic");
 
