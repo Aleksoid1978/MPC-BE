@@ -298,7 +298,7 @@ public:
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP_(int) GetColorSpaceConversion();
 
-	STDMETHODIMP GetD3D11Adapters(MPC_ADAPTER_DESC** ppAdapters, int* pCount, MPC_ADAPTER_ID* pAdapterId);
+	STDMETHODIMP GetD3D11Adapter(MPC_ADAPTER_ID* pAdapterId);
 	STDMETHODIMP SetD3D11Adapter(UINT VendorId, UINT DeviceId);
 
 	// IExFilterConfig

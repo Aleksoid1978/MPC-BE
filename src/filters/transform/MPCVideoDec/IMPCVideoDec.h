@@ -126,12 +126,6 @@ struct MPC_ADAPTER_ID {
 	UINT DeviceId;
 };
 
-struct MPC_ADAPTER_DESC {
-	WCHAR Description[128];
-	UINT VendorId;
-	UINT DeviceId;
-};
-
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
@@ -170,6 +164,6 @@ public IUnknown {
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) PURE;
 	STDMETHOD_(int, GetColorSpaceConversion()) PURE;
 
-	STDMETHOD(GetD3D11Adapters(MPC_ADAPTER_DESC** ppAdapters, int* pCount, MPC_ADAPTER_ID* pAdapterId)) PURE;
+	STDMETHOD(GetD3D11Adapter(MPC_ADAPTER_ID* pAdapterId)) PURE;
 	STDMETHOD(SetD3D11Adapter(UINT VendorId, UINT DeviceId)) PURE;
 };

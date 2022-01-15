@@ -108,6 +108,11 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_btnReset;
 	CEdit		m_txtVersion;
 
+	struct MPC_ADAPTER_DESC {
+		WCHAR Description[128];
+		UINT VendorId;
+		UINT DeviceId;
+	};
 	std::vector<MPC_ADAPTER_DESC>m_D3D11Adapters;
 	int m_iD3D11Adapter = 0;
 

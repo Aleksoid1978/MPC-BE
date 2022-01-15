@@ -4460,68 +4460,20 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 	return 0; // YUV->YUV or RGB->RGB conversion
 }
 
-STDMETHODIMP CMPCVideoDecFilter::GetD3D11Adapters(MPC_ADAPTER_DESC** ppAdapters, int* pCount, MPC_ADAPTER_ID* pAdapterId)
+STDMETHODIMP CMPCVideoDecFilter::GetD3D11Adapter(MPC_ADAPTER_ID* pAdapterId)
 {
-	if (!SysVersion::IsWin8orLater()) {
-		return E_ABORT;
-	}
+	CAutoLock cLock(&m_csInitDec);
 
-	HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
-	if (!hDxgiLib) {
-		return E_FAIL;
-	}
-
-	PFN_CREATE_DXGI_FACTORY1 pfnCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(hDxgiLib, "CreateDXGIFactory1");
-	if (!pfnCreateDXGIFactory1) {
-		return E_FAIL;
-	}
-
-	CComPtr<IDXGIFactory1> pDXGIFactory1;
-	HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&pDXGIFactory1);
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
-
-	UINT index = 0;
-	CComPtr<IDXGIAdapter> pDXGIAdapter;
-	while (SUCCEEDED(hr = pDXGIFactory1->EnumAdapters(index++, &pDXGIAdapter))) {
-		DXGI_ADAPTER_DESC desc = {};
-		pDXGIAdapter->GetDesc(&desc);
-		if (desc.VendorId == 0x1414 && desc.DeviceId == 0x8c) {
-			// skip "Microsoft Basic Render Driver" from end
-			break;
-		}
-		dxgi_adapters.emplace_back(desc);
-
-		pDXGIAdapter.Release();
-	}
-
-	if (dxgi_adapters.size()) {
-		*ppAdapters = (MPC_ADAPTER_DESC*)LocalAlloc(LPTR, dxgi_adapters.size() * sizeof(MPC_ADAPTER_DESC));
-		if (*ppAdapters) {
-			unsigned n = 0;
-			for (const auto& dxgi_adapter : dxgi_adapters) {
-				auto& mpc_adapter = (*ppAdapters)[n];
-				memcpy(&mpc_adapter.Description, &dxgi_adapter.Description, sizeof(dxgi_adapter.Description));
-				mpc_adapter.VendorId = dxgi_adapter.VendorId;
-				mpc_adapter.DeviceId = dxgi_adapter.DeviceId;
-				n++;
-			}
-			*pCount = dxgi_adapters.size();
-			pAdapterId->VendorId = m_HwAdapter.VendorId;
-			pAdapterId->DeviceId = m_HwAdapter.DeviceId;
-
-			return S_OK;
-		}
-	}
+	pAdapterId->VendorId = m_HwAdapter.VendorId;
+	pAdapterId->DeviceId = m_HwAdapter.DeviceId;
 
 	return E_FAIL;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetD3D11Adapter(UINT VendorId, UINT DeviceId)
 {
+	CAutoLock cLock(&m_csInitDec);
+
 	m_HwAdapter.VendorId = VendorId;
 	m_HwAdapter.DeviceId = DeviceId;
 

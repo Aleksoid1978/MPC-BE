@@ -22,6 +22,7 @@
 #include "MPCVideoDecSettingsWnd.h"
 #include "DSUtil/MFCHelper.h"
 #include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+#include "Utils.h"
 
 //
 // CMPCVideoDecSettingsWnd
@@ -307,9 +308,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(L"TV (16-235)");
 	y += 24;
 
-	CalcRect(rect, x0, 348 - 32, 76, 32);
+	CalcRect(rect, x0, 376 - 32, 76, 32);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle | BS_MULTILINE, rect, this, IDC_PP_RESET);
-	CalcTextRect(rect, x0 + 76, 348 - 16, group_w - 76);
+	CalcTextRect(rect, x0 + 76, 376 - 16, group_w - 76);
 	m_txtVersion.Create(WS_CHILD | WS_VISIBLE | ES_READONLY | ES_RIGHT, rect, this, (UINT)IDC_STATIC);
 
 	///////////////////////////////////////
@@ -334,27 +335,31 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		m_cbHWDecoder.SetCurSel(m_pMDF->GetHwDecoder());
 
-		{
-			m_D3D11Adapters.clear();
-			MPC_ADAPTER_DESC* pAdapters = nullptr;
-			int count;
+		m_iD3D11Adapter = 0;
+		m_D3D11Adapters.clear();
+
+		std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
+		if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters)) && dxgi_adapters.size()) {
+			// add empty adapter 
+			dxgi_adapters.emplace_front();
+			wcscpy_s(dxgi_adapters.front().Description, L"Automatic");
+
 			MPC_ADAPTER_ID d3d11AdapterID = {};
-			if (SUCCEEDED(m_pMDF->GetD3D11Adapters(&pAdapters, &count, &d3d11AdapterID))) {
-				m_D3D11Adapters.reserve(count + 1);
+			m_pMDF->GetD3D11Adapter(&d3d11AdapterID);
 
-				// add empty adapter 
-				m_D3D11Adapters.emplace_back();
-				wcscpy_s(m_D3D11Adapters.back().Description, L"Automatic");
-				m_iD3D11Adapter = 0;
+			m_D3D11Adapters.reserve(dxgi_adapters.size());
+			unsigned n = 0;
+			for (const auto& dxgi_adapter : dxgi_adapters) {
+				MPC_ADAPTER_DESC mpc_adapter;
+				memcpy(&mpc_adapter.Description, &dxgi_adapter.Description, sizeof(dxgi_adapter.Description));
+				mpc_adapter.VendorId = dxgi_adapter.VendorId;
+				mpc_adapter.DeviceId = dxgi_adapter.DeviceId;
+				m_D3D11Adapters.emplace_back(mpc_adapter);
 
-				for (int i = 0; i < count; i++) {
-					m_D3D11Adapters.emplace_back(pAdapters[i]);
-					if (d3d11AdapterID.VendorId == pAdapters[i].VendorId && d3d11AdapterID.DeviceId == pAdapters[i].DeviceId) {
-						m_iD3D11Adapter = i + 1;
-					}
+				if (d3d11AdapterID.VendorId == dxgi_adapter.VendorId && d3d11AdapterID.DeviceId == dxgi_adapter.DeviceId) {
+					m_iD3D11Adapter = n;
 				}
-
-				LocalFree(pAdapters);
+				n++;
 			}
 		}
 
