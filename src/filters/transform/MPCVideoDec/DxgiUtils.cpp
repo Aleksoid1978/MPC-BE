@@ -29,7 +29,6 @@ typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY1)(REFIID riid, void** ppFactory)
 std::unique_ptr<CDXGIFactory1> CDXGIFactory1::m_pInstance;
 
 CDXGIFactory1::CDXGIFactory1()
-	: m_pDXGIFactory1(nullptr)
 {
 	if (SysVersion::IsWin8orLater()) {
 		HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");

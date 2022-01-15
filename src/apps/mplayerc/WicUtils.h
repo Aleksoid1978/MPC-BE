@@ -41,7 +41,7 @@ public:
 		return *m_pInstance;
 	}
 
-	virtual IWICImagingFactory* GetFactory() const;
+	IWICImagingFactory* GetFactory() const;
 
 protected:
 	CComPtr<IWICImagingFactory> m_pWICImagingFactory;

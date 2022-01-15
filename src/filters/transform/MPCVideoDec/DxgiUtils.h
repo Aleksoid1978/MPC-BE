@@ -32,7 +32,7 @@ public:
 		return *m_pInstance;
 	}
 
-	virtual IDXGIFactory1* GetFactory() const;
+	IDXGIFactory1* GetFactory() const;
 
 protected:
 	CComPtr<IDXGIFactory1> m_pDXGIFactory1;

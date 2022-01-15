@@ -26,7 +26,6 @@
 std::unique_ptr<CWICImagingFactory> CWICImagingFactory::m_pInstance;
 
 CWICImagingFactory::CWICImagingFactory()
-	: m_pWICImagingFactory(nullptr)
 {
 	HRESULT hr = CoCreateInstance(
 		CLSID_WICImagingFactory1, // we use CLSID_WICImagingFactory1 to support Windows 7 without Platform Update
