@@ -25,40 +25,52 @@
 
 #include "Utils.h"
 
-HRESULT GetDxgiAdapters(std::list<DXGI_ADAPTER_DESC>& dxgi_adapters)
+static IDXGIFactory1* GetDXGIFactory1()
 {
 	if (!SysVersion::IsWin8orLater()) {
-		return E_ABORT;
+		return nullptr;
 	}
 
 	HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
 	if (!hDxgiLib) {
-		return E_FAIL;
+		return nullptr;
 	}
 
-	PFN_CREATE_DXGI_FACTORY1 pfnCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(hDxgiLib, "CreateDXGIFactory1");
+	auto pfnCreateDXGIFactory1 = reinterpret_cast<PFN_CREATE_DXGI_FACTORY1>(GetProcAddress(hDxgiLib, "CreateDXGIFactory1"));
 	if (!pfnCreateDXGIFactory1) {
-		return E_FAIL;
+		return nullptr;
 	}
 
-	CComPtr<IDXGIFactory1> pDXGIFactory1;
-	HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&pDXGIFactory1);
+	IDXGIFactory1* pDXGIFactory1 = nullptr;
+	HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, reinterpret_cast<void**>(&pDXGIFactory1));
 	if (FAILED(hr)) {
-		return hr;
+		return nullptr;
+	}
+
+	return pDXGIFactory1;
+}
+
+HRESULT GetDxgiAdapters(std::list<DXGI_ADAPTER_DESC>& dxgi_adapters)
+{
+	static CComPtr<IDXGIFactory1> pDXGIFactory1 = GetDXGIFactory1();
+	if (!pDXGIFactory1) {
+		return E_FAIL;
 	}
 
 	dxgi_adapters.clear();
 
 	UINT index = 0;
+	HRESULT hr = S_OK;
 	CComPtr<IDXGIAdapter> pDXGIAdapter;
 	while (SUCCEEDED(hr = pDXGIFactory1->EnumAdapters(index++, &pDXGIAdapter))) {
 		DXGI_ADAPTER_DESC desc = {};
-		pDXGIAdapter->GetDesc(&desc);
-		if (desc.VendorId == 0x1414 && desc.DeviceId == 0x8c) {
-			// skip "Microsoft Basic Render Driver" from end
-			break;
+		if (SUCCEEDED(pDXGIAdapter->GetDesc(&desc))) {
+			if (desc.VendorId == 0x1414 && desc.DeviceId == 0x8c) {
+				// skip "Microsoft Basic Render Driver" from end
+				break;
+			}
+			dxgi_adapters.emplace_back(desc);
 		}
-		dxgi_adapters.emplace_back(desc);
 
 		pDXGIAdapter.Release();
 	}
