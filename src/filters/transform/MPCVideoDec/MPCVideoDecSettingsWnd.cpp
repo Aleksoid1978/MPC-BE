@@ -150,7 +150,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// HW Decoder
 	CalcTextRect(rect, x1, y, label_w-24);
-	m_txtHWDecoder.Create(ResStr(IDS_VDF_PREFERRED_HW_DECODER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	m_txtHWDecoder.Create(ResStr(IDS_VDF_HW_PREFERRED_DECODER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
 	CalcRect(rect, x2-24, y, control_w+24, 200); rect.top -= 4;
 	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DECODER);
 	m_cbHWDecoder.AddString(L"DXVA2");
@@ -169,7 +169,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// D3D11 Adapter
 	CalcTextRect(rect, x1, y, label_w - 88);
-	m_txtHWAdapter.Create(L"TODO: Adapter", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	m_txtHWAdapter.Create(ResStr(IDS_VDF_HW_ADAPTER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
 	CalcRect(rect, x2 - 88, y, control_w + 88, 200); rect.top -= 4;
 	m_cbHWAdapter.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_ADAPTER);
 	y += 28;
@@ -342,7 +342,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters))) {
 			// add empty adapter
 			dxgi_adapters.emplace_front();
-			wcscpy_s(dxgi_adapters.front().Description, L"Automatic");
+			wcscpy_s(dxgi_adapters.front().Description, ResStr(IDS_VDF_AUTO));
 
 			MPC_ADAPTER_ID d3d11AdapterID = {};
 			m_pMDF->GetD3D11Adapter(&d3d11AdapterID);
