@@ -39,7 +39,7 @@ protected:
 
 private:
 	CDXGIFactory1();   // Private because singleton
-	static std::unique_ptr<CDXGIFactory1> m_pInstance;
+	inline static std::unique_ptr<CDXGIFactory1> m_pInstance;
 };
 
 ////////////////

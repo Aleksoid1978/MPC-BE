@@ -23,8 +23,6 @@
 
  // CWICImagingFactory
 
-std::unique_ptr<CWICImagingFactory> CWICImagingFactory::m_pInstance;
-
 CWICImagingFactory::CWICImagingFactory()
 {
 	HRESULT hr = CoCreateInstance(
@@ -37,7 +35,7 @@ CWICImagingFactory::CWICImagingFactory()
 	ASSERT(SUCCEEDED(hr));
 }
 
-IWICImagingFactory* CWICImagingFactory::GetFactory()  const
+IWICImagingFactory* CWICImagingFactory::GetFactory() const
 {
 	ASSERT(m_pWICImagingFactory);
 	return m_pWICImagingFactory;

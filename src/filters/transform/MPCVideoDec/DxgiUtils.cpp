@@ -26,8 +26,6 @@
 
 typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY1)(REFIID riid, void** ppFactory);
 
-std::unique_ptr<CDXGIFactory1> CDXGIFactory1::m_pInstance;
-
 CDXGIFactory1::CDXGIFactory1()
 {
 	if (SysVersion::IsWin8orLater()) {
@@ -42,7 +40,7 @@ CDXGIFactory1::CDXGIFactory1()
 	ASSERT(m_pDXGIFactory1);
 }
 
-IDXGIFactory1* CDXGIFactory1::GetFactory()  const
+IDXGIFactory1* CDXGIFactory1::GetFactory() const
 {
 	ASSERT(m_pDXGIFactory1);
 	return m_pDXGIFactory1;
@@ -52,7 +50,7 @@ IDXGIFactory1* CDXGIFactory1::GetFactory()  const
 
 HRESULT GetDxgiAdapters(std::list<DXGI_ADAPTER_DESC>& dxgi_adapters)
 {
-	IDXGIFactory1* pDXGIFactory1 = CDXGIFactory1::GetInstance().GetFactory();
+	auto pDXGIFactory1 = CDXGIFactory1::GetInstance().GetFactory();
 	if (!pDXGIFactory1) {
 		return E_ABORT;
 	}
