@@ -238,7 +238,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="DxgiUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11Decoder\D3D11Decoder.h" />
@@ -268,7 +268,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="DxgiUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MPCVideoDec.rc">

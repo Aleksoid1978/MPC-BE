@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,6 +28,8 @@ DEFINE_GUID(GUID_ContainerFormatWebp, 0xE094B0E2, 0x67F2, 0x45B3, 0xB0, 0xEA, 0x
 DEFINE_GUID(CLSID_WICHeifDecoder,     0xE9A4A80A, 0x44FE, 0x4DE4, 0x89, 0x71, 0x71, 0x50, 0xB1, 0x0A, 0x51, 0x99);
 DEFINE_GUID(CLSID_WICWebpDecoder,     0x7693E886, 0x51C9, 0x4070, 0x84, 0x19, 0x9F, 0x70, 0x73, 0x8E, 0xC8, 0xFA);
 
+// CWICImagingFactory
+
 class CWICImagingFactory
 {
 // http://www.nuonsoft.com/blog/2011/10/17/introduction-to-wic-how-to-use-wic-to-load-an-image-and-draw-it-with-gdi/
@@ -48,6 +50,8 @@ private:
 	CWICImagingFactory();   // Private because singleton
 	static std::unique_ptr<CWICImagingFactory> m_pInstance;
 };
+
+/////////////////////
 
 struct WICCodecInfo_t {
 	GUID containerFormat;

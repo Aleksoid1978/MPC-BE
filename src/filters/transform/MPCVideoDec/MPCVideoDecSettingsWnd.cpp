@@ -22,7 +22,7 @@
 #include "MPCVideoDecSettingsWnd.h"
 #include "DSUtil/MFCHelper.h"
 #include <ExtLib/ffmpeg/libavcodec/avcodec.h>
-#include "Utils.h"
+#include "DxgiUtils.h"
 
 //
 // CMPCVideoDecSettingsWnd

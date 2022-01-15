@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2021 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include "WicUtils.h"
 
+ // CWICImagingFactory
+
 std::unique_ptr<CWICImagingFactory> CWICImagingFactory::m_pInstance;
 
 CWICImagingFactory::CWICImagingFactory()
@@ -41,6 +43,8 @@ IWICImagingFactory* CWICImagingFactory::GetFactory()  const
 	ASSERT(m_pWICImagingFactory);
 	return m_pWICImagingFactory;
 }
+
+/////////////////////
 
 enum ColorSystem_t {
 	CS_YUV,

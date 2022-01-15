@@ -23,7 +23,7 @@
 #include "DSUtil/SysVersion.h"
 #include "D3D11Decoder/D3D11Decoder.h"
 
-#include "Utils.h"
+#include "DxgiUtils.h"
 
 static IDXGIFactory1* GetDXGIFactory1()
 {

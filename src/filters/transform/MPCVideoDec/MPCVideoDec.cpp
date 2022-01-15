@@ -41,7 +41,7 @@
 #include <FilterInterfaces.h>
 
 #include "Version.h"
-#include "Utils.h"
+#include "DxgiUtils.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
