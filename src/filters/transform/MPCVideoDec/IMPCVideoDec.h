@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,6 +121,17 @@ enum MPCInfo {
 	INFO_GraphicsAdapter
 };
 
+struct MPC_ADAPTER_ID {
+	UINT VendorId;
+	UINT DeviceId;
+};
+
+struct MPC_ADAPTER_DESC {
+	WCHAR Description[128];
+	UINT VendorId;
+	UINT DeviceId;
+};
+
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
@@ -158,4 +169,7 @@ public IUnknown {
 
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) PURE;
 	STDMETHOD_(int, GetColorSpaceConversion()) PURE;
+
+	STDMETHOD(GetD3D11Adapters(MPC_ADAPTER_DESC** ppAdapters, int* pCount, MPC_ADAPTER_ID* pAdapterId)) PURE;
+	STDMETHOD(SetD3D11Adapter(UINT VendorId, UINT DeviceId)) PURE;
 };

@@ -62,6 +62,7 @@ private:
 	int										m_nARMode;
 	int										m_nDiscardMode;
 	MPCHwDecoder							m_nHwDecoder;
+	MPC_ADAPTER_ID							m_HwAdapter = {};
 	bool									m_bHwCodecs[HWCodec_count];
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
@@ -296,6 +297,9 @@ public:
 
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP_(int) GetColorSpaceConversion();
+
+	STDMETHODIMP GetD3D11Adapters(MPC_ADAPTER_DESC** ppAdapters, int* pCount, MPC_ADAPTER_ID* pAdapterId);
+	STDMETHODIMP SetD3D11Adapter(UINT VendorId, UINT DeviceId);
 
 	// IExFilterConfig
 	STDMETHODIMP GetInt(LPCSTR field, int* value) override;

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,6 +66,7 @@ extern "C" {
 #define OPT_ScanType         L"ScanType"
 #define OPT_ARMode           L"ARMode"
 #define OPT_HwDecoder        L"HwDecoder"
+#define OPT_HwAdapter        L"HwAdapter"
 #define OPT_DXVACheck        L"DXVACheckCompatibility"
 #define OPT_DisableDXVA_SD   L"DisableDXVA_SD"
 #define OPT_SW_prefix        L"Sw_"
@@ -1090,7 +1091,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	ULONG len = 255;
+	WCHAR buff[256];
+	ULONG len;
+
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_VideoDec, KEY_READ)) {
 		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ThreadNumber, dw)) {
@@ -1113,6 +1116,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_HwDecoder, dw)) {
 			m_nHwDecoder = (MPCHwDecoder)discard<int>(dw, HWDec_D3D11, 0, HWDec_count-1);
+		}
+		if (ERROR_SUCCESS == key.QueryStringValue(OPT_HwAdapter, buff, &len) && len > 3) {
+			UINT a, b;
+			if (swscanf_s(buff, L"%04X:%04X", &a, &b) == 2) {
+				m_HwAdapter.VendorId = a;
+				m_HwAdapter.DeviceId = b;
+			}
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DXVACheck, dw)) {
 			m_nDXVACheckCompatibility = dw;
@@ -1156,6 +1166,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 	if (profile.ReadInt(OPT_SECTION_VideoDec, OPT_HwDecoder, value, 0, HWDec_count - 1)) {
 		m_nHwDecoder = (MPCHwDecoder)value;
+	}
+	if (CStringW str; profile.ReadString(OPT_SECTION_VideoDec, OPT_HwAdapter, str)) {
+		UINT a, b;
+		if (swscanf_s(str, L"%04X:%04X", &a, &b) == 2) {
+			m_HwAdapter.VendorId = a;
+			m_HwAdapter.DeviceId = b;
+		}
 	}
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
@@ -4178,6 +4195,9 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 			key.SetDWORDValue(hwdec_opt_names[i], m_bHwCodecs[i]);
 		}
 		key.SetDWORDValue(OPT_HwDecoder, m_nHwDecoder);
+		CStringW str;
+		str.Format(L"%04X:%04X", m_HwAdapter.VendorId, m_HwAdapter.DeviceId);
+		key.SetStringValue(OPT_HwAdapter, str);
 		key.SetDWORDValue(OPT_DXVACheck, m_nDXVACheckCompatibility);
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
@@ -4204,6 +4224,9 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 		profile.WriteInt(OPT_SECTION_VideoDec, hwdec_opt_names[i], m_bHwCodecs[i]);
 	}
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_HwDecoder, m_nHwDecoder);
+	CStringW str;
+	str.Format(L"%04X:%04X", m_HwAdapter.VendorId, m_HwAdapter.DeviceId);
+	profile.WriteString(OPT_SECTION_VideoDec, OPT_HwAdapter, str);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -4435,6 +4458,75 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 	}
 
 	return 0; // YUV->YUV or RGB->RGB conversion
+}
+
+STDMETHODIMP CMPCVideoDecFilter::GetD3D11Adapters(MPC_ADAPTER_DESC** ppAdapters, int* pCount, MPC_ADAPTER_ID* pAdapterId)
+{
+	if (!SysVersion::IsWin8orLater()) {
+		return E_ABORT;
+	}
+
+	HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
+	if (!hDxgiLib) {
+		return E_FAIL;
+	}
+
+	PFN_CREATE_DXGI_FACTORY1 pfnCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(hDxgiLib, "CreateDXGIFactory1");
+	if (!pfnCreateDXGIFactory1) {
+		return E_FAIL;
+	}
+
+	CComPtr<IDXGIFactory1> pDXGIFactory1;
+	HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&pDXGIFactory1);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
+
+	UINT index = 0;
+	CComPtr<IDXGIAdapter> pDXGIAdapter;
+	while (SUCCEEDED(hr = pDXGIFactory1->EnumAdapters(index++, &pDXGIAdapter))) {
+		DXGI_ADAPTER_DESC desc = {};
+		pDXGIAdapter->GetDesc(&desc);
+		if (desc.VendorId == 0x1414 && desc.DeviceId == 0x8c) {
+			// skip "Microsoft Basic Render Driver" from end
+			break;
+		}
+		dxgi_adapters.emplace_back(desc);
+
+		pDXGIAdapter.Release();
+	}
+
+	if (dxgi_adapters.size()) {
+		*ppAdapters = (MPC_ADAPTER_DESC*)LocalAlloc(LPTR, dxgi_adapters.size() * sizeof(MPC_ADAPTER_DESC));
+		if (*ppAdapters) {
+			unsigned n = 0;
+			for (const auto& dxgi_adapter : dxgi_adapters) {
+				auto& mpc_adapter = (*ppAdapters)[n];
+				memcpy(&mpc_adapter.Description, &dxgi_adapter.Description, sizeof(dxgi_adapter.Description));
+				mpc_adapter.VendorId = dxgi_adapter.VendorId;
+				mpc_adapter.DeviceId = dxgi_adapter.DeviceId;
+				n++;
+			}
+			*pCount = dxgi_adapters.size();
+			pAdapterId->VendorId = m_HwAdapter.VendorId;
+			pAdapterId->DeviceId = m_HwAdapter.DeviceId;
+
+			return S_OK;
+		}
+	}
+
+	return E_FAIL;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetD3D11Adapter(UINT VendorId, UINT DeviceId)
+{
+	m_HwAdapter.VendorId = VendorId;
+	m_HwAdapter.DeviceId = DeviceId;
+
+	// TODO
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)

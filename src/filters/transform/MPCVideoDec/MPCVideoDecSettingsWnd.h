@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,8 @@ enum {
 	IDC_PP_HW_HEVC,
 	IDC_PP_HW_VP9,
 	IDC_PP_HW_AV1,
-	IDC_PP_HW_DEC,
+	IDC_PP_HW_DECODER,
+	IDC_PP_HW_ADAPTER,
 	IDC_PP_DXVA_CHECK,
 	IDC_PP_DXVA_SD,
 	IDC_PP_SW_NV12,
@@ -75,6 +76,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbHWCodec[HWCodec_count];
 	CStatic		m_txtHWDecoder;
 	CComboBox	m_cbHWDecoder;
+	CStatic		m_txtHWAdapter;
+	CComboBox	m_cbHWAdapter;
 	CStatic		m_txtDXVACompatibilityCheck;
 	CComboBox	m_cbDXVACompatibilityCheck;
 	CButton		m_chDXVA_SD;
@@ -105,6 +108,9 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_btnReset;
 	CEdit		m_txtVersion;
 
+	std::vector<MPC_ADAPTER_DESC>m_D3D11Adapters;
+	int m_iD3D11Adapter = 0;
+
 	const UINT_PTR m_nTimerID = 1;
 
 	void		UpdateStatusInfo();
@@ -124,6 +130,7 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 
+	afx_msg void OnCbnChangeHwDec();
 	afx_msg void OnBnClickedYUY2();
 	afx_msg void OnBnClickedRGB32();
 	afx_msg void OnBnClickedReset();

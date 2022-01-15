@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -117,7 +117,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Hardware acceleration //////////
 	y = 120;
-	CalcRect(rect, x0, y, group_w, 136);
+	CalcRect(rect, x0, y, group_w, 164);
 	m_grpHwAcceleration.Create(ResStr(IDS_VDF_HW_ACCELERATION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
 	y += 20;
 
@@ -151,7 +151,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CalcTextRect(rect, x1, y, label_w-24);
 	m_txtHWDecoder.Create(ResStr(IDS_VDF_PREFERRED_HW_DECODER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
 	CalcRect(rect, x2-24, y, control_w+24, 200); rect.top -= 4;
-	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DEC);
+	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DECODER);
 	m_cbHWDecoder.AddString(L"DXVA2");
 	str = L"D3D11";
 	if (!SysVersion::IsWin8orLater()) {
@@ -164,6 +164,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	}
 	m_cbHWDecoder.AddString(str);
 	m_cbHWDecoder.AddString(L"NVDEC (Nvidia only)");
+	y += 28;
+
+	// D3D11 Adapter
+	CalcTextRect(rect, x1, y, label_w - 88);
+	m_txtHWAdapter.Create(L"TODO: Adapter", WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	CalcRect(rect, x2 - 88, y, control_w + 88, 200); rect.top -= 4;
+	m_cbHWAdapter.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_ADAPTER);
 	y += 28;
 
 	// DXVA Compatibility check
@@ -181,12 +188,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CalcTextRect(rect, x1, y, row_w);
 	m_chDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_DXVA_SD);
 	m_chDXVA_SD.SetCheck(FALSE);
+	y += 24;
 
 	////////// Status //////////
 	label_w = 124;
 	control_w = row_w - label_w;
 	x2 = x1 + label_w;
-	y = 260;
 	CalcRect(rect, x0, y, group_w, 88);
 	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
 	y += 20;
@@ -327,6 +334,30 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		m_cbHWDecoder.SetCurSel(m_pMDF->GetHwDecoder());
 
+		{
+			m_D3D11Adapters.clear();
+			MPC_ADAPTER_DESC* pAdapters = nullptr;
+			int count;
+			MPC_ADAPTER_ID d3d11AdapterID = {};
+			if (SUCCEEDED(m_pMDF->GetD3D11Adapters(&pAdapters, &count, &d3d11AdapterID))) {
+				m_D3D11Adapters.reserve(count + 1);
+
+				// add empty adapter 
+				m_D3D11Adapters.emplace_back();
+				wcscpy_s(m_D3D11Adapters.back().Description, L"Automatic");
+				m_iD3D11Adapter = 0;
+
+				for (int i = 0; i < count; i++) {
+					m_D3D11Adapters.emplace_back(pAdapters[i]);
+					if (d3d11AdapterID.VendorId == pAdapters[i].VendorId && d3d11AdapterID.DeviceId == pAdapters[i].DeviceId) {
+						m_iD3D11Adapter = i + 1;
+					}
+				}
+
+				LocalFree(pAdapters);
+			}
+		}
+
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
 		m_chDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
@@ -349,6 +380,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		UpdateStatusInfo();
 	}
+
+	OnCbnChangeHwDec();
 
 	SetCursor(m_hWnd, IDC_ARROW);
 	SetCursor(m_hWnd, IDC_PP_THREAD_NUMBER, IDC_HAND);
@@ -384,6 +417,11 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		}
 
 		m_pMDF->SetHwDecoder(m_cbHWDecoder.GetCurSel());
+
+		if (m_cbHWAdapter.GetCurSel() >= 0) {
+			m_iD3D11Adapter = m_cbHWAdapter.GetCurSel();
+			m_pMDF->SetD3D11Adapter(m_D3D11Adapters[m_iD3D11Adapter].VendorId, m_D3D11Adapters[m_iD3D11Adapter].DeviceId);
+		}
 
 		m_pMDF->SetDXVACheckCompatibility(m_cbDXVACompatibilityCheck.GetCurSel());
 		m_pMDF->SetDXVA_SD(m_chDXVA_SD.GetCheck());
@@ -426,12 +464,31 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 
 BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
+	ON_CBN_SELCHANGE(IDC_PP_HW_DECODER, OnCbnChangeHwDec)
 	ON_BN_CLICKED(IDC_PP_SW_YUY2, OnBnClickedYUY2)
 	ON_BN_CLICKED(IDC_PP_SW_RGB32, OnBnClickedRGB32)
 	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
 	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
+
+void CMPCVideoDecSettingsWnd::OnCbnChangeHwDec()
+{
+	m_cbHWAdapter.ResetContent();
+
+	if (SysVersion::IsWin8orLater() && m_cbHWDecoder.GetCurSel() == HWDec_D3D11cb && m_D3D11Adapters.size()) {
+		for (const auto& adapter : m_D3D11Adapters) {
+			m_cbHWAdapter.AddString(adapter.Description);
+		}
+		m_cbHWAdapter.SetCurSel(m_iD3D11Adapter);
+		m_cbHWAdapter.EnableWindow(TRUE);
+		m_txtHWAdapter.EnableWindow(TRUE);
+	} else {
+		m_cbHWAdapter.ResetContent();
+		m_cbHWAdapter.EnableWindow(FALSE);
+		m_txtHWAdapter.EnableWindow(FALSE);
+	}
+}
 
 void CMPCVideoDecSettingsWnd::OnBnClickedYUY2()
 {
