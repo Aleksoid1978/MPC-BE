@@ -26,6 +26,7 @@
 #include "DSUtil/DXVAState.h"
 #include "D3D11Decoder.h"
 #include "../MPCVideoDec.h"
+#include "../DxgiUtils.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -72,18 +73,6 @@ HRESULT CD3D11Decoder::Init()
 		return E_FAIL;
 	}
 
-	m_dxLib.dxgilib = LoadLibraryW(L"dxgi.dll");
-	if (!m_dxLib.dxgilib) {
-		DLog(L"CD3D11Decoder::Init() : Cannot open dxgi.dll");
-		return E_FAIL;
-	}
-
-	m_dxLib.mCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(m_dxLib.dxgilib, "CreateDXGIFactory1");
-	if (!m_dxLib.mCreateDXGIFactory1) {
-		DLog(L"CD3D11Decoder::Init() : CreateDXGIFactory1() not available");
-		return E_FAIL;
-	}
-
 	return S_OK;
 }
 
@@ -123,17 +112,15 @@ static const D3D_FEATURE_LEVEL s_D3D11Levels[] = {
 
 HRESULT CD3D11Decoder::CreateD3D11Device(UINT nDeviceIndex, ID3D11Device** ppDevice, DXGI_ADAPTER_DESC* pDesc)
 {
-	ID3D11Device* pD3D11Device = nullptr;
-
-	CComPtr<IDXGIFactory1> pDXGIFactory1;
-	HRESULT hr = m_dxLib.mCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&pDXGIFactory1);
-	if (FAILED(hr)) {
-		DLog(L"CD3D11Decoder::CreateD3D11Device() : DXGIFactory creation failed");
-		return hr;
+	IDXGIFactory1* pDXGIFactory1 = CDXGIFactory1::GetInstance().GetFactory();
+	if (!pDXGIFactory1) {
+		return E_ABORT;
 	}
 
+	ID3D11Device* pD3D11Device = nullptr;
+
 	CComPtr<IDXGIAdapter> pDXGIAdapter;
-	hr = pDXGIFactory1->EnumAdapters(nDeviceIndex, &pDXGIAdapter);
+	HRESULT hr = pDXGIFactory1->EnumAdapters(nDeviceIndex, &pDXGIAdapter);
 	if (FAILED(hr)) {
 		DLog(L"CD3D11Decoder::CreateD3D11Device() : Failed to enumerate a valid DXGI device");
 		return hr;
@@ -528,11 +515,6 @@ void CD3D11Decoder::DestroyDecoder(const bool bFull)
 		if (m_dxLib.d3d11lib) {
 			FreeLibrary(m_dxLib.d3d11lib);
 			m_dxLib.d3d11lib = nullptr;
-		}
-
-		if (m_dxLib.dxgilib) {
-			FreeLibrary(m_dxLib.dxgilib);
-			m_dxLib.dxgilib = nullptr;
 		}
 	}
 }

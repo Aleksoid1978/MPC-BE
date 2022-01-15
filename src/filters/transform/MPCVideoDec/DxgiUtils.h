@@ -20,4 +20,28 @@
 
 #pragma once
 
+// CDXGIFactory1
+
+class CDXGIFactory1
+{
+public:
+	inline static CDXGIFactory1& GetInstance()
+	{
+		if (nullptr == m_pInstance.get())
+			m_pInstance.reset(new CDXGIFactory1());
+		return *m_pInstance;
+	}
+
+	virtual IDXGIFactory1* GetFactory() const;
+
+protected:
+	CComPtr<IDXGIFactory1> m_pDXGIFactory1;
+
+private:
+	CDXGIFactory1();   // Private because singleton
+	static std::unique_ptr<CDXGIFactory1> m_pInstance;
+};
+
+////////////////
+
 HRESULT GetDxgiAdapters(std::list<DXGI_ADAPTER_DESC>& dxgi_adapters);

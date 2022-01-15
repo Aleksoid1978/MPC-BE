@@ -19,42 +19,43 @@
  */
 
 #include "stdafx.h"
-
 #include "DSUtil/SysVersion.h"
-#include "D3D11Decoder/D3D11Decoder.h"
-
 #include "DxgiUtils.h"
 
-static IDXGIFactory1* GetDXGIFactory1()
+// CDXGIFactory1
+
+typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY1)(REFIID riid, void** ppFactory);
+
+std::unique_ptr<CDXGIFactory1> CDXGIFactory1::m_pInstance;
+
+CDXGIFactory1::CDXGIFactory1()
+	: m_pDXGIFactory1(nullptr)
 {
-	if (!SysVersion::IsWin8orLater()) {
-		return nullptr;
+	if (SysVersion::IsWin8orLater()) {
+		HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
+		if (hDxgiLib) {
+			PFN_CREATE_DXGI_FACTORY1 pfnCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(hDxgiLib, "CreateDXGIFactory1");
+			if (pfnCreateDXGIFactory1) {
+				HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&m_pDXGIFactory1);
+			}
+		}
 	}
-
-	HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
-	if (!hDxgiLib) {
-		return nullptr;
-	}
-
-	auto pfnCreateDXGIFactory1 = reinterpret_cast<PFN_CREATE_DXGI_FACTORY1>(GetProcAddress(hDxgiLib, "CreateDXGIFactory1"));
-	if (!pfnCreateDXGIFactory1) {
-		return nullptr;
-	}
-
-	IDXGIFactory1* pDXGIFactory1 = nullptr;
-	HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, reinterpret_cast<void**>(&pDXGIFactory1));
-	if (FAILED(hr)) {
-		return nullptr;
-	}
-
-	return pDXGIFactory1;
+	ASSERT(m_pDXGIFactory1);
 }
+
+IDXGIFactory1* CDXGIFactory1::GetFactory()  const
+{
+	ASSERT(m_pDXGIFactory1);
+	return m_pDXGIFactory1;
+}
+
+////////////////
 
 HRESULT GetDxgiAdapters(std::list<DXGI_ADAPTER_DESC>& dxgi_adapters)
 {
-	static CComPtr<IDXGIFactory1> pDXGIFactory1 = GetDXGIFactory1();
+	IDXGIFactory1* pDXGIFactory1 = CDXGIFactory1::GetInstance().GetFactory();
 	if (!pDXGIFactory1) {
-		return E_FAIL;
+		return E_ABORT;
 	}
 
 	dxgi_adapters.clear();

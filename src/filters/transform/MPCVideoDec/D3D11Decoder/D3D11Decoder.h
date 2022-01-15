@@ -25,8 +25,6 @@
 #include <dxgi.h>
 #include "./D3D11Decoder/D3D11SurfaceAllocator.h"
 
-typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY1)(REFIID riid, void** ppFactory);
-
 class CMPCVideoDecFilter;
 struct AVCodecContext;
 struct AVD3D11VAContext;
@@ -58,9 +56,6 @@ private:
 	struct {
 		HMODULE d3d11lib;
 		PFN_D3D11_CREATE_DEVICE mD3D11CreateDevice;
-
-		HMODULE dxgilib;
-		PFN_CREATE_DXGI_FACTORY1 mCreateDXGIFactory1;
 	} m_dxLib = {};
 
 	DXGI_ADAPTER_DESC m_AdapterDesc = {};
