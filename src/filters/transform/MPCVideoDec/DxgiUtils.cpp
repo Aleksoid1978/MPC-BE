@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include "DSUtil/SysVersion.h"
 #include "DxgiUtils.h"
 
 // CDXGIFactory1
@@ -28,13 +27,11 @@ typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY1)(REFIID riid, void** ppFactory)
 
 CDXGIFactory1::CDXGIFactory1()
 {
-	if (SysVersion::IsWin8orLater()) {
-		HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
-		if (hDxgiLib) {
-			PFN_CREATE_DXGI_FACTORY1 pfnCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(hDxgiLib, "CreateDXGIFactory1");
-			if (pfnCreateDXGIFactory1) {
-				HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&m_pDXGIFactory1);
-			}
+	HMODULE hDxgiLib = LoadLibraryW(L"dxgi.dll");
+	if (hDxgiLib) {
+		PFN_CREATE_DXGI_FACTORY1 pfnCreateDXGIFactory1 = (PFN_CREATE_DXGI_FACTORY1)GetProcAddress(hDxgiLib, "CreateDXGIFactory1");
+		if (pfnCreateDXGIFactory1) {
+			HRESULT hr = pfnCreateDXGIFactory1(IID_IDXGIFactory1, (void**)&m_pDXGIFactory1);
 		}
 	}
 	ASSERT(m_pDXGIFactory1);
