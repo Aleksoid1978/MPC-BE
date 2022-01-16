@@ -340,9 +340,11 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
 		if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters))) {
-			// add empty adapter
-			dxgi_adapters.emplace_front();
-			wcscpy_s(dxgi_adapters.front().Description, ResStr(IDS_VDF_AUTO));
+			if (dxgi_adapters.size() > 1) {
+				// add empty adapter
+				dxgi_adapters.emplace_front();
+				wcscpy_s(dxgi_adapters.front().Description, ResStr(IDS_VDF_AUTO));
+			}
 
 			MPC_ADAPTER_ID d3d11AdapterID = {};
 			m_pMDF->GetD3D11Adapter(&d3d11AdapterID);
@@ -490,7 +492,7 @@ void CMPCVideoDecSettingsWnd::OnCbnChangeHwDec()
 		m_txtHWAdapter.EnableWindow(TRUE);
 	} else {
 		if (m_D3D11Adapters.size()) {
-			m_cbHWAdapter.AddString(m_D3D11Adapters.front().Description); // Auto
+			m_cbHWAdapter.AddString(m_D3D11Adapters.front().Description); // Auto or single adapter
 			m_cbHWAdapter.SetCurSel(0);
 		}
 		m_cbHWAdapter.EnableWindow(FALSE);
