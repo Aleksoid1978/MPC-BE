@@ -423,7 +423,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 		m_pMDF->SetHwDecoder(m_cbHWDecoder.GetCurSel());
 
-		if (m_cbHWAdapter.GetCurSel() >= 0) {
+		if (m_cbHWAdapter.GetCount() > 1 && m_cbHWAdapter.GetCurSel() >= 0) {
 			m_iD3D11Adapter = m_cbHWAdapter.GetCurSel();
 			m_pMDF->SetD3D11Adapter(m_D3D11Adapters[m_iD3D11Adapter].VendorId, m_D3D11Adapters[m_iD3D11Adapter].DeviceId);
 		}
@@ -489,7 +489,10 @@ void CMPCVideoDecSettingsWnd::OnCbnChangeHwDec()
 		m_cbHWAdapter.EnableWindow(TRUE);
 		m_txtHWAdapter.EnableWindow(TRUE);
 	} else {
-		m_cbHWAdapter.ResetContent();
+		if (m_D3D11Adapters.size()) {
+			m_cbHWAdapter.AddString(m_D3D11Adapters.front().Description); // Auto
+			m_cbHWAdapter.SetCurSel(0);
+		}
 		m_cbHWAdapter.EnableWindow(FALSE);
 		m_txtHWAdapter.EnableWindow(FALSE);
 	}
@@ -525,6 +528,8 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	}
 
 	m_cbHWDecoder.SetCurSel(SysVersion::IsWin8orLater() ? HWDec_D3D11 : HWDec_DXVA2);
+	m_cbHWAdapter.SetCurSel(0);
+	m_iD3D11Adapter = 0;
 
 	m_cbDXVACompatibilityCheck.SetCurSel(1);
 	m_chDXVA_SD.SetCheck(BST_UNCHECKED);
