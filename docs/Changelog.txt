@@ -2,6 +2,21 @@
 
 1.6.1 (beta)
 =============================
+Removed MPC RealVideo Decoder and MPC RealAudio Decoder.
+
+MPCVideoDec
+Added the ability to select a graphics adapter for the D3D11 copy back decoder.
+
+Subtitles
+Removed "&lrm;" code display for some subtitles.
+Fixed drawing of an opaque frame.
+
+Player
+Added the ability to store the settings file in the user profile.
+Miscellaneous fixes.
+
+MPCBEShellExt (explorer extension)
+Fixed operation of "Open files using" command.
 
 Updated libraries:
 	dav1d git-0.9.2-85-g633c63e;
