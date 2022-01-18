@@ -115,6 +115,7 @@ enum generic
     Generic_Video_Delay_String3,
     Generic_Video_Delay_String4,
     Generic_Video_Delay_String5,
+    Generic_TimeCode_FirstFrame,
     Generic_StreamSize,
     Generic_StreamSize_String,
     Generic_StreamSize_String1,
@@ -1437,6 +1438,7 @@ enum text
     Text_Events_RollUp,
     Text_Events_PaintOn,
     Text_Events_Total,
+    Text_Lines_Count,
     Text_FirstDisplay_Delay_Frames,
     Text_FirstDisplay_Type,
 };

@@ -6543,16 +6543,13 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_clli()
 {
     Element_Name("Content Light Level Info");
 
-    //Parsing
-    int16u  maximum_content_light_level, maximum_frame_average_light_level;
-    Get_B2(maximum_content_light_level,                         "maximum_content_light_level");
-    Get_B2(maximum_frame_average_light_level,                   "maximum_frame_average_light_level");
+    Ztring MaxCLL, MaxFALL;
+
+    Get_LightLevel(MaxCLL, MaxFALL);
 
     FILLING_BEGIN();
-        if (maximum_content_light_level)
-            Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
-        if (maximum_frame_average_light_level)
-            Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
+        Fill(Stream_Video, 0, "MaxCLL", MaxCLL);
+        Fill(Stream_Video, 0, "MaxFALL", MaxFALL);
     FILLING_END();
 }
 

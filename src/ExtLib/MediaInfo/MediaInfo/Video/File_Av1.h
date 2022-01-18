@@ -62,8 +62,8 @@ private :
     //Temp
     Ztring  MasteringDisplay_ColorPrimaries;
     Ztring  MasteringDisplay_Luminance;
-    int16u  maximum_content_light_level;
-    int16u  maximum_frame_average_light_level;
+    Ztring  maximum_content_light_level;
+    Ztring  maximum_frame_average_light_level;
     bool  sequence_header_Parsed;
     bool  SeenFrameHeader;
     string GOP;

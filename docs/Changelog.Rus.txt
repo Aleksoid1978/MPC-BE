@@ -22,7 +22,7 @@ MPCBEShellExt (расширение проводника)
 	dav1d git-0.9.2-85-g633c63e;
 	ffmpeg git-n5.1-dev-188-gdcc9454ab9;
 	Little-CMS git-lcms2.13rc1-1-g2e2055e;
-	MediaInfo git-v21.09-60-gc89ff1985;
+	MediaInfo git-v21.09-72-ge481a58e7;
 
 1.6.0
 =============================

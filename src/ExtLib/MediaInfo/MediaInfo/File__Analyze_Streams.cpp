@@ -68,7 +68,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 #endif
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES)
+#if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES) || defined(MEDIAINFO_MXF_YES)
 struct masteringdisplaycolorvolume_values
 {
     int8u Code; //ISO code
@@ -154,7 +154,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 #endif
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES)
+#if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES) || defined(MEDIAINFO_MXF_YES)
 static const size_t DolbyVision_Profiles_Size=10;
 static const char* DolbyVision_Profiles[DolbyVision_Profiles_Size] = // dv[BL_codec_type].[number_of_layers][bit_depth][cross-compatibility]
 {
@@ -293,6 +293,20 @@ void File__Analyze::dvcC(bool has_dependency_pid, std::map<std::string, Ztring>*
             else
                 Fill(Stream_Video, StreamPos_Last, Video_HDR_Format_Version, dv_version_major);
     FILLING_END();
+}
+#endif
+
+//---------------------------------------------------------------------------
+#if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
+void File__Analyze::Get_LightLevel(Ztring &MaxCLL, Ztring &MaxFALL)
+{
+    //Parsing
+    int16u maximum_content_light_level, maximum_frame_average_light_level;
+    Get_B2(maximum_content_light_level,                         "maximum_content_light_level");
+    Get_B2(maximum_frame_average_light_level,                   "maximum_frame_average_light_level");
+
+    MaxCLL = Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2");
+    MaxFALL = Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2");
 }
 #endif
 
@@ -1778,6 +1792,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
 
     //Specific stuff
     Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Num_Temp, FrameRate_Den_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, HDR_Temp[Video_HDR_Format_Compatibility-Video_HDR_Format+1], Channels_Temp[4], Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
+    Ztring colour_description_present_Temp, colour_primaries_Temp, transfer_characteristics_Temp, matrix_coefficients_Temp;
     if (StreamKind==Stream_Video)
     {
         Width_Temp=Retrieve(Stream_Video, StreamPos_To, Video_Width);
@@ -1790,6 +1805,17 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         FrameRate_Mode_Temp=Retrieve(Stream_Video, StreamPos_To, Video_FrameRate_Mode); //We want to keep the FrameRate_Mode of AVI 120 fps
         ScanType_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanType);
         ScanOrder_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanOrder);
+        colour_description_present_Temp=Retrieve(Stream_Video, StreamPos_To, Video_colour_description_present);
+        if (!colour_description_present_Temp.empty())
+        {
+            colour_primaries_Temp=Retrieve(Stream_Video, StreamPos_To, Video_colour_primaries);
+            transfer_characteristics_Temp=Retrieve(Stream_Video, StreamPos_To, Video_transfer_characteristics);
+            matrix_coefficients_Temp=Retrieve(Stream_Video, StreamPos_To, Video_matrix_coefficients);
+        }
+        Clear(Stream_Video, StreamPos_To, Video_colour_description_present);
+        Clear(Stream_Video, StreamPos_To, Video_colour_primaries);
+        Clear(Stream_Video, StreamPos_To, Video_transfer_characteristics);
+        Clear(Stream_Video, StreamPos_To, Video_matrix_coefficients);
         for (size_t i=Video_HDR_Format; i<=Video_HDR_Format_Compatibility; i++)
             HDR_Temp[i-Video_HDR_Format]=Retrieve(Stream_Video, StreamPos_To, i);
     }
@@ -1938,6 +1964,30 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
             }
             else
                 Fill(Stream_Video, StreamPos_To, Video_ScanOrder, ScanOrder_Temp, true);
+        }
+        if (!colour_description_present_Temp.empty())
+        {
+            if (!Retrieve(Stream_Video, StreamPos_To, Video_colour_description_present).empty()
+             && (colour_primaries_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_colour_primaries)
+              || transfer_characteristics_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_transfer_characteristics)
+              || matrix_coefficients_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_matrix_coefficients)))
+            {
+                Fill(Stream_Video, StreamPos_To, Video_colour_description_present_Original, (*Stream)[Stream_Video][StreamPos_To][Video_colour_description_present], true);
+                Fill(Stream_Video, StreamPos_To, Video_colour_description_present, colour_description_present_Temp, true);
+                Fill(Stream_Video, StreamPos_To, Video_colour_primaries_Original, (*Stream)[Stream_Video][StreamPos_To][Video_colour_primaries], true);
+                Fill(Stream_Video, StreamPos_To, Video_colour_primaries, colour_primaries_Temp, true);
+                Fill(Stream_Video, StreamPos_To, Video_transfer_characteristics_Original, (*Stream)[Stream_Video][StreamPos_To][Video_transfer_characteristics], true);
+                Fill(Stream_Video, StreamPos_To, Video_transfer_characteristics, transfer_characteristics_Temp, true);
+                Fill(Stream_Video, StreamPos_To, Video_matrix_coefficients_Original, (*Stream)[Stream_Video][StreamPos_To][Video_matrix_coefficients], true);
+                Fill(Stream_Video, StreamPos_To, Video_matrix_coefficients, matrix_coefficients_Temp, true);
+            }
+            else
+            {
+                Fill(Stream_Video, StreamPos_To, Video_colour_description_present, colour_description_present_Temp, true);
+                Fill(Stream_Video, StreamPos_To, Video_colour_primaries, colour_primaries_Temp, true);
+                Fill(Stream_Video, StreamPos_To, Video_transfer_characteristics, transfer_characteristics_Temp, true);
+                Fill(Stream_Video, StreamPos_To, Video_matrix_coefficients, matrix_coefficients_Temp, true);
+            }
         }
         if (!HDR_Temp[0].empty() && !ToAdd.Retrieve_Const(Stream_Video, StreamPos_From, Video_HDR_Format).empty() && HDR_Temp[0]!=ToAdd.Retrieve_Const(Stream_Video, StreamPos_From, Video_HDR_Format))
         {
@@ -2151,6 +2201,39 @@ void File__Analyze::Audio_BitRate_Rounding(size_t Pos, audio Parameter)
         if (BitRate>= 501760 && BitRate<= 522240) BitRate= 512000;
         if (BitRate>= 564480 && BitRate<= 587520) BitRate= 576000;
         if (BitRate>= 627200 && BitRate<= 652800) BitRate= 640000;
+    }
+
+    else if (Format.find(__T("DTS"))==0)
+    {
+        if (BitRate>=  31000 && BitRate<=  33000) BitRate=  32000;
+        if (BitRate>=  54000 && BitRate<=  58000) BitRate=  56000;
+        if (BitRate>=  62720 && BitRate<=  65280) BitRate=  64000;
+        if (BitRate>=  94080 && BitRate<=  97920) BitRate=  96000;
+        if (BitRate>= 109760 && BitRate<= 114240) BitRate= 112000;
+        if (BitRate>= 125440 && BitRate<= 130560) BitRate= 128000;
+        if (BitRate>= 188160 && BitRate<= 195840) BitRate= 192000;
+        if (BitRate>= 219520 && BitRate<= 228480) BitRate= 224000;
+        if (BitRate>= 250880 && BitRate<= 261120) BitRate= 256000;
+        if (BitRate>= 313600 && BitRate<= 326400) BitRate= 320000;
+        if (BitRate>= 376320 && BitRate<= 391680) BitRate= 384000;
+        if (BitRate>= 439040 && BitRate<= 456960) BitRate= 448000;
+        if (BitRate>= 501760 && BitRate<= 522240) BitRate= 512000;
+        if (BitRate>= 564480 && BitRate<= 587520) BitRate= 576000;
+        if (BitRate>= 627200 && BitRate<= 652800) BitRate= 640000;
+        if (BitRate>= 752640 && BitRate<= 783360) BitRate= 768000;
+        if (BitRate>= 940800 && BitRate<= 979200) BitRate= 960000;
+        if (BitRate>=1003520 && BitRate<=1044480) BitRate=1024000;
+        if (BitRate>=1128960 && BitRate<=1175040) BitRate=1152000;
+        if (BitRate>=1254400 && BitRate<=1305600) BitRate=1280000;
+        if (BitRate>=1317120 && BitRate<=1370880) BitRate=1344000;
+        if (BitRate>=1379840 && BitRate<=1436160) BitRate=1408000;
+        if (BitRate>=1382976 && BitRate<=1439424) BitRate=1411200;
+        if (BitRate>=1442560 && BitRate<=1501440) BitRate=1472000;
+        if (BitRate>=1505280 && BitRate<=1566720) BitRate=1536000;
+        if (BitRate>=1881600 && BitRate<=1958400) BitRate=1920000;
+        if (BitRate>=2007040 && BitRate<=2088960) BitRate=2048000;
+        if (BitRate>=3010560 && BitRate<=3133440) BitRate=3072000;
+        if (BitRate>=3763200 && BitRate<=3916800) BitRate=3840000;
     }
 
     else if (Format.find(__T("AAC"))==0)
@@ -2421,9 +2504,9 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
                 bool DropFrame_IsValid=false;
 
                 // Testing time code
-                if (StreamKind==Stream_Video)
+                if (!DropFrame_IsValid)
                 {
-                    Ztring TC=Retrieve(Stream_Video, StreamPos, Video_TimeCode_FirstFrame);
+                    Ztring TC=Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_TimeCode_FirstFrame));
                     if (TC.size()>=11 && TC[2]==__T(':') && TC[5]==__T(':'))
                     {
                         switch (TC[8])
@@ -3035,6 +3118,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Delay_Original_Settings : return Video_Delay_Original_Settings;
                                     case Generic_Delay_Original_DropFrame : return Video_Delay_Original_DropFrame;
                                     case Generic_Delay_Original_Source : return Video_Delay_Original_Source;
+                                    case Generic_TimeCode_FirstFrame : return Video_TimeCode_FirstFrame;
                                     case Generic_StreamSize : return Video_StreamSize;
                                     case Generic_StreamSize_String : return Video_StreamSize_String;
                                     case Generic_StreamSize_String1 : return Video_StreamSize_String1;
@@ -3280,6 +3364,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Video_Delay_String2 : return Text_Video_Delay_String2;
                                     case Generic_Video_Delay_String3 : return Text_Video_Delay_String3;
                                     case Generic_Video_Delay_String4 : return Text_Video_Delay_String4;
+                                    case Generic_TimeCode_FirstFrame : return Text_TimeCode_FirstFrame;
                                     case Generic_StreamSize : return Text_StreamSize;
                                     case Generic_StreamSize_String : return Text_StreamSize_String;
                                     case Generic_StreamSize_String1 : return Text_StreamSize_String1;
@@ -3368,6 +3453,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Video_Delay_String2 : return Other_Video_Delay_String2;
                                     case Generic_Video_Delay_String3 : return Other_Video_Delay_String3;
                                     case Generic_Video_Delay_String4 : return Other_Video_Delay_String4;
+                                    case Generic_TimeCode_FirstFrame : return Other_TimeCode_FirstFrame;
                                     case Generic_Language : return Other_Language;
                                     default: return (size_t)-1;
                                 }

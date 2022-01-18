@@ -995,10 +995,10 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
         }
     }
 
-    if (maximum_content_light_level)
-        Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
-    if (maximum_frame_average_light_level)
-        Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
+    if (!maximum_content_light_level.empty())
+        Fill(Stream_Video, 0, Video_MaxCLL, maximum_content_light_level);
+    if (!maximum_frame_average_light_level.empty())
+        Fill(Stream_Video, 0, Video_MaxFALL, maximum_frame_average_light_level);
 }
 
 //---------------------------------------------------------------------------
@@ -1513,8 +1513,6 @@ void File_Avc::Synched_Init()
     FirstPFrameInGop_IsParsed=false;
     Config_IsRepeated=false;
     tc=0;
-    maximum_content_light_level=0;
-    maximum_frame_average_light_level=0;
 
     //Default values
     Streams.resize(0x100);
@@ -2175,7 +2173,7 @@ void File_Avc::slice_header()
 
         //Saving some info
         int32s TemporalReferences_Offset_pic_order_cnt_lsb_Diff=0;
-        if ((*seq_parameter_set_Item)->pic_order_cnt_type!=1 && first_mb_in_slice==0 && (Element_Code!=0x14 || seq_parameter_sets.empty())) //Not slice_layer_extension except if MVC only
+        if ((*seq_parameter_set_Item)->pic_order_cnt_type!=1 && first_mb_in_slice==0 && (Element_Code!=0x14 || seq_parameter_sets.empty()) && TemporalReferences_Reserved) //Not slice_layer_extension except if MVC only
         {
             if (field_pic_flag)
             {
@@ -3511,8 +3509,7 @@ void File_Avc::sei_message_light_level()
     Element_Info1("light_level");
 
     //Parsing
-    Get_B2(maximum_content_light_level, "maximum_content_light_level");
-    Get_B2(maximum_frame_average_light_level, "maximum_frame_average_light_level");
+    Get_LightLevel(maximum_content_light_level, maximum_frame_average_light_level);
 }
 
 //---------------------------------------------------------------------------

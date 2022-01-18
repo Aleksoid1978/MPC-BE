@@ -204,6 +204,160 @@ void TimeCode::MinusOne()
     }
 }
 
+
+//---------------------------------------------------------------------------
+static const int32s PowersOf10[]=
+{
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+    10000000,
+    100000000,
+    1000000000,
+};
+static const int PowersOf10_Size=sizeof(PowersOf10)/sizeof(int32s);
+
+//---------------------------------------------------------------------------
+bool TimeCode::FromString(const char* Value, size_t Length)
+{
+    //hh:mm:ss;ff or hh:mm:ss.zzzzzzzzzSfffffffff formats
+    if (Length>7
+     && Value[0]>='0' && Value[0]<='9'
+     && Value[1]>='0' && Value[1]<='9'
+     && Value[2]==':'
+     && Value[3]>='0' && Value[3]<='9'
+     && Value[4]>='0' && Value[4]<='9'
+     && Value[5]==':'
+     && Value[6]>='0' && Value[6]<='9'
+     && Value[7]>='0' && Value[7]<='9')
+    {
+        if (Length>8)
+        {
+            //hh:mm:ss.zzzzzzzzzSfffffffff format
+            unsigned char c=(unsigned char)Value[8];
+            if (c=='.' || c==',')
+            {
+                if (Length==9)
+                    return true;
+                int i=9;
+                int32s S=0;
+                int TheoriticalMax=i+PowersOf10_Size;
+                int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+                while (i<MaxLength)
+                {
+                    c=(unsigned char)Value[i];
+                    c-='0';
+                    if (c>9)
+                        break;
+                    S*=10;
+                    S+=c;
+                    i++;
+                }
+                if (i==Length)
+                    MoreSamples_Frequency=PowersOf10[i-10];
+                else
+                {
+                    c=(unsigned char)Value[i];
+                    if (c!='S' && c!='/')
+                        return true;
+                    i++;
+                    TheoriticalMax=i+PowersOf10_Size;
+                    MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+                    int32s Multiplier=0;
+                    while (i<Length)
+                    {
+                        c=(unsigned char)Value[i];
+                        c-='0';
+                        if (c>9)
+                            break;
+                        Multiplier*=10;
+                        Multiplier+=c;
+                    }
+                    if (i==MaxLength && i<Length && Value[i]=='0' && Multiplier==100000000)
+                    {
+                        Multiplier=1000000000;
+                        i++;
+                    }
+                    if (i<Length)
+                        return true;
+                    MoreSamples_Frequency=Multiplier;
+                }
+                MoreSamples=S;
+                DropFrame=false;
+            }
+            //hh:mm:ss;ff format
+            else if (Length==11
+             && (Value[8]==':' || Value[8]==';')
+             && Value[9]>='0' && Value[9]<='9'
+             && Value[10]>='0' && Value[10]<='9')
+            {
+                DropFrame=Value[8]==';';
+                Frames=((Value[9]-'0')*10)+(Value[10]-'0');
+            }
+            else
+                return true;
+        }
+        Hours=((Value[0]-'0')*10)+(Value[1]-'0');
+        Minutes=((Value[3]-'0')*10)+(Value[4]-'0');
+        Seconds=((Value[6]-'0')*10)+(Value[7]-'0');
+        return false;
+    }
+    //X.Xs format
+    if (Length>=2
+     && Value[Length-1]=='s')
+    {
+        Length--; //Remove the "s" from the string
+        unsigned char c;
+        int i=0;
+        int32s S=0;
+        int TheoriticalMax=i+PowersOf10_Size;
+        int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+        while (i<MaxLength)
+        {
+            c=(unsigned char)Value[i];
+            c-='0';
+            if (c>9)
+                break;
+            S*=10;
+            S+=c;
+            i++;
+        }
+        Hours=S/3600;
+        Minutes=(S%3600)/60;
+        Seconds=S%60;
+        c=(unsigned char)Value[i];
+        if (c=='.' || c==',')
+        {
+            i++;
+            if (i==Length)
+                return true;
+            S=0;
+            TheoriticalMax=i+PowersOf10_Size;
+            MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+            while (i<MaxLength)
+            {
+                c=(unsigned char)Value[i];
+                c-='0';
+                if (c>9)
+                    break;
+                S*=10;
+                S+=c;
+                i++;
+            }
+            if (i!=Length)
+                return true;
+            MoreSamples_Frequency=PowersOf10[i-10];
+            MoreSamples=S;
+        }
+        return false;
+    }
+
+    return true;
+}
+
 //---------------------------------------------------------------------------
 string TimeCode::ToString()
 {
@@ -221,25 +375,34 @@ string TimeCode::ToString()
     TC+=':';
     TC+=('0'+Seconds/10);
     TC+=('0'+Seconds%10);
-    TC+=DropFrame?';':':';
-    TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))/10);
-    TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))%10);
     if (MoreSamples && MoreSamples_Frequency)
     {
+        int AfterCommaMinus1=0;
         if (MoreSamples>0)
-            TC += '+';
+        {
+            AfterCommaMinus1=PowersOf10_Size;
+            while ((--AfterCommaMinus1)>=0 && PowersOf10[AfterCommaMinus1]!=MoreSamples_Frequency);
+            TC+=AfterCommaMinus1>=0?'.':'+';
+        }
         else
         {
-            TC += '-';
-            MoreSamples = -MoreSamples;
+            AfterCommaMinus1=-1;
+            TC+='-';
+            MoreSamples=-MoreSamples;
         }
         stringstream s;
         s<<MoreSamples;
         TC+=s.str();
-        TC+='/';
+        TC+='S';
         s.str(string());
         s<<MoreSamples_Frequency;
         TC+=s.str();
+    }
+    else
+    {
+        TC+=DropFrame?';':':';
+        TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))/10);
+        TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))%10);
     }
 
     return TC;
@@ -273,9 +436,17 @@ int64s TimeCode::ToFrames()
 int64s TimeCode::ToMilliseconds()
 {
     if (!FramesPerSecond)
-        return 0;
+    {
+        if (!MoreSamples_Frequency)
+            return 0;
+        int64s TC=(int64s(Hours)     *3600
+                 + int64s(Minutes)   *  60
+                 + int64s(Seconds)        )*1000;
+        TC+=((int64s)MoreSamples)*1000/MoreSamples_Frequency;
+        return TC;
+    }
 
-    int64s MS=float64_int64s(ToFrames()*1000*(DropFrame?1.001:1.000)/(FramesPerSecond*(MustUseSecondField?2:1)));
+    int64s MS=float64_int64s(ToFrames()*1000*(FramesPerSecond_Is1001?1.001:1.000)/(FramesPerSecond*(MustUseSecondField?2:1)));
 
     return IsNegative?-MS:MS;
 }

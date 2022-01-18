@@ -17,8 +17,6 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include "MediaInfo/File__HasReferences.h"
-#include "MediaInfo/Multiple/File_DcpPkl.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -28,7 +26,7 @@ namespace MediaInfoLib
 // Class File_DolbyVisionMetadata
 //***************************************************************************
 
-class File_DolbyVisionMetadata : public File__Analyze, File__HasReferences
+class File_DolbyVisionMetadata : public File__Analyze
 {
 public:
     //Constructor/Destructor

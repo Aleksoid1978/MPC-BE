@@ -27,6 +27,7 @@ public:
     TimeCode ();
     TimeCode (int8u Hours, int8u Minutes, int8u Seconds, int8u Frames, int8u FramesPerSecond, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField=false);
     TimeCode (int64s Frames, int8u FramesPerSecond, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField_=false);
+    TimeCode (const string& Value) {FromString(Value);}
 
     //Operators
     TimeCode &operator ++()
@@ -76,6 +77,9 @@ public:
     }
     void PlusOne();
     void MinusOne();
+    bool FromString(const char* Value, size_t Length); // return false if all fine
+    bool FromString(const char* Value) {return FromString(Value, strlen(Value));}
+    bool FromString(const string& Value) {return FromString(Value.c_str(), Value.size());}
     string ToString();
     int64s ToFrames();
     int64s ToMilliseconds();

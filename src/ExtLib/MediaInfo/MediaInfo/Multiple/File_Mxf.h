@@ -1334,7 +1334,7 @@ protected :
 
     // Extra metadata
     int64u ExtraMetadata_Offset;
-    set<int32u> ExtraMetadata_SID;
+    std::set<int32u> ExtraMetadata_SID;
     File_DolbyVisionMetadata* DolbyVisionMetadata;
     File_DolbyAudioMetadata* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)

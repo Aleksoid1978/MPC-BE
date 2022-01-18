@@ -423,8 +423,8 @@ private :
     hdr                                 HDR;
 
 
-    int16u  maximum_content_light_level;
-    int16u  maximum_frame_average_light_level;
+    Ztring  maximum_content_light_level;
+    Ztring  maximum_frame_average_light_level;
 
     void consumer_camera_1();
     void consumer_camera_2();

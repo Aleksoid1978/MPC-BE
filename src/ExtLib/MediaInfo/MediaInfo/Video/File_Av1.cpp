@@ -99,8 +99,6 @@ File_Av1::File_Av1()
     FrameIsAlwaysComplete=false;
 
     //Temp
-    maximum_content_light_level=0;
-    maximum_frame_average_light_level=0;
     sequence_header_Parsed=false;
     SeenFrameHeader=false;
 }
@@ -140,10 +138,10 @@ void File_Av1::Streams_Finish()
         Fill(Stream_Video, 0, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries);
         Fill(Stream_Video, 0, "MasteringDisplay_Luminance", MasteringDisplay_Luminance);
     }
-    if (maximum_content_light_level)
-        Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
-    if (maximum_frame_average_light_level)
-        Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
+    if (!maximum_content_light_level.empty())
+        Fill(Stream_Video, 0, "MaxCLL", maximum_content_light_level);
+    if (!maximum_frame_average_light_level.empty())
+        Fill(Stream_Video, 0, "MaxFALL", maximum_frame_average_light_level);
 }
 
 //***************************************************************************
@@ -526,8 +524,7 @@ void File_Av1::metadata()
 void File_Av1::metadata_hdr_cll()
 {
     //Parsing
-    Get_B2(maximum_content_light_level,                         "maximum_content_light_level");
-    Get_B2(maximum_frame_average_light_level,                   "maximum_frame_average_light_level");
+    Get_LightLevel(maximum_content_light_level, maximum_frame_average_light_level);
 }
 
 //---------------------------------------------------------------------------
