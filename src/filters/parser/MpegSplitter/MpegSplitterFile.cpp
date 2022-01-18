@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_SubEmptyPin(SubEmptyPin)
 	, m_bOpeningCompleted(FALSE)
-	, m_programs(&m_streams)
+	, m_programs(m_streams)
 	, m_bIMKH_CCTV(FALSE)
 	, m_rtMin(0)
 	, m_rtMax(0)

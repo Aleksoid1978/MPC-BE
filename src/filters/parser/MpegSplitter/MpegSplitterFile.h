@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -322,7 +322,7 @@ public:
 
 		CString name;
 
-		size_t streamCount(const CStreamsList& s) {
+		size_t streamCount(const CStreamsList& s) const {
 			size_t cnt = 0;
 			for (const auto& stream : streams) {
 				for (int type = stream_type::video; type <= stream_type::subpic; type++) {
@@ -352,15 +352,15 @@ public:
 
 	class CPrograms : public std::map<WORD, program>
 	{
-		CStreamsList* s;
+		CStreamsList& _s;
 	public:
-		CPrograms(CStreamsList* sList) {
-			s = sList;
-		}
+		CPrograms(CStreamsList& sList)
+			: _s(sList) {}
+
 		size_t GetValidCount() {
 			size_t cnt = 0;
-			for (auto item : (*this)) {
-				if (item.second.streamCount(*s)) {
+			for (const auto& [_, _program] : *this) {
+				if (_program.streamCount(_s)) {
 					cnt++;
 				}
 			}
@@ -369,10 +369,9 @@ public:
 		}
 
 		program* FindProgram(const WORD program_number) {
-			for (auto& item : (*this)) {
-				auto p = &item.second;
-				if (p->program_number == program_number) {
-					return p;
+			for (auto& [_, _program] : *this) {
+				if (_program.program_number == program_number) {
+					return &_program;
 				}
 			}
 
