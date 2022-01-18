@@ -146,7 +146,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_OSD_Font	= s.strOSDFont;
 
 	m_fSmartSeek		= s.fSmartSeek;
-	m_edSmartSeekSize.SetRange(10, 30);
+	m_edSmartSeekSize.SetRange(5, 30);
 	m_edSmartSeekSize	= s.iSmartSeekSize;
 	m_fChapterMarker	= s.fChapterMarker;
 	m_fFlybar			= s.fFlybar;
