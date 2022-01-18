@@ -353,6 +353,117 @@ void ff_yuv2 ## fmt ## cX_ ## opt(enum AVPixelFormat format, const uint8_t *dith
 
 YUV2NV_DECL(nv12, avx2);
 YUV2NV_DECL(nv21, avx2);
+
+#define YUV2GBRP_FN_DECL(fmt, opt)                                                      \
+void ff_yuv2##fmt##_full_X_ ##opt(SwsContext *c, const int16_t *lumFilter,           \
+                                 const int16_t **lumSrcx, int lumFilterSize,         \
+                                 const int16_t *chrFilter, const int16_t **chrUSrcx, \
+                                 const int16_t **chrVSrcx, int chrFilterSize,        \
+                                 const int16_t **alpSrcx, uint8_t **dest,            \
+                                 int dstW, int y)
+
+#define YUV2GBRP_DECL(opt)     \
+YUV2GBRP_FN_DECL(gbrp,       opt); \
+YUV2GBRP_FN_DECL(gbrap,      opt); \
+YUV2GBRP_FN_DECL(gbrp9le,    opt); \
+YUV2GBRP_FN_DECL(gbrp10le,   opt); \
+YUV2GBRP_FN_DECL(gbrap10le,  opt); \
+YUV2GBRP_FN_DECL(gbrp12le,   opt); \
+YUV2GBRP_FN_DECL(gbrap12le,  opt); \
+YUV2GBRP_FN_DECL(gbrp14le,   opt); \
+YUV2GBRP_FN_DECL(gbrp16le,   opt); \
+YUV2GBRP_FN_DECL(gbrap16le,  opt); \
+YUV2GBRP_FN_DECL(gbrpf32le,  opt); \
+YUV2GBRP_FN_DECL(gbrapf32le, opt); \
+YUV2GBRP_FN_DECL(gbrp9be,    opt); \
+YUV2GBRP_FN_DECL(gbrp10be,   opt); \
+YUV2GBRP_FN_DECL(gbrap10be,  opt); \
+YUV2GBRP_FN_DECL(gbrp12be,   opt); \
+YUV2GBRP_FN_DECL(gbrap12be,  opt); \
+YUV2GBRP_FN_DECL(gbrp14be,   opt); \
+YUV2GBRP_FN_DECL(gbrp16be,   opt); \
+YUV2GBRP_FN_DECL(gbrap16be,  opt); \
+YUV2GBRP_FN_DECL(gbrpf32be,  opt); \
+YUV2GBRP_FN_DECL(gbrapf32be, opt);
+
+YUV2GBRP_DECL(sse2);
+YUV2GBRP_DECL(sse4);
+YUV2GBRP_DECL(avx2);
+
+#define INPUT_PLANAR_RGB_Y_FN_DECL(fmt, opt)                               \
+void ff_planar_##fmt##_to_y_##opt(uint8_t *dst,                            \
+                           const uint8_t *src[4], int w, int32_t *rgb2yuv)
+
+#define INPUT_PLANAR_RGB_UV_FN_DECL(fmt, opt)                              \
+void ff_planar_##fmt##_to_uv_##opt(uint8_t *dstU, uint8_t *dstV,           \
+                           const uint8_t *src[4], int w, int32_t *rgb2yuv)
+
+#define INPUT_PLANAR_RGB_A_FN_DECL(fmt, opt)                               \
+void ff_planar_##fmt##_to_a_##opt(uint8_t *dst,                            \
+                           const uint8_t *src[4], int w, int32_t *rgb2yuv)
+
+
+#define INPUT_PLANAR_RGBXX_A_DECL(fmt, opt) \
+INPUT_PLANAR_RGB_A_FN_DECL(fmt##le,  opt);  \
+INPUT_PLANAR_RGB_A_FN_DECL(fmt##be,  opt);
+
+#define INPUT_PLANAR_RGBXX_Y_DECL(fmt, opt) \
+INPUT_PLANAR_RGB_Y_FN_DECL(fmt##le,  opt);  \
+INPUT_PLANAR_RGB_Y_FN_DECL(fmt##be,  opt);
+
+#define INPUT_PLANAR_RGBXX_UV_DECL(fmt, opt) \
+INPUT_PLANAR_RGB_UV_FN_DECL(fmt##le,  opt);  \
+INPUT_PLANAR_RGB_UV_FN_DECL(fmt##be,  opt);
+
+#define INPUT_PLANAR_RGBXX_YUVA_DECL(fmt, opt) \
+INPUT_PLANAR_RGBXX_Y_DECL(fmt,  opt);          \
+INPUT_PLANAR_RGBXX_UV_DECL(fmt, opt);          \
+INPUT_PLANAR_RGBXX_A_DECL(fmt,  opt);
+
+#define INPUT_PLANAR_RGBXX_YUV_DECL(fmt, opt) \
+INPUT_PLANAR_RGBXX_Y_DECL(fmt,  opt);         \
+INPUT_PLANAR_RGBXX_UV_DECL(fmt, opt);
+
+#define INPUT_PLANAR_RGBXX_UVA_DECL(fmt, opt) \
+INPUT_PLANAR_RGBXX_UV_DECL(fmt, opt);         \
+INPUT_PLANAR_RGBXX_A_DECL(fmt,  opt);
+
+#define INPUT_PLANAR_RGB_A_ALL_DECL(opt) \
+INPUT_PLANAR_RGB_A_FN_DECL(rgb,   opt);  \
+INPUT_PLANAR_RGBXX_A_DECL(rgb10,  opt);  \
+INPUT_PLANAR_RGBXX_A_DECL(rgb12,  opt);  \
+INPUT_PLANAR_RGBXX_A_DECL(rgb16,  opt);  \
+INPUT_PLANAR_RGBXX_A_DECL(rgbf32, opt);
+
+#define INPUT_PLANAR_RGB_Y_ALL_DECL(opt) \
+INPUT_PLANAR_RGB_Y_FN_DECL(rgb,   opt);  \
+INPUT_PLANAR_RGBXX_Y_DECL(rgb9,   opt);  \
+INPUT_PLANAR_RGBXX_Y_DECL(rgb10,  opt);  \
+INPUT_PLANAR_RGBXX_Y_DECL(rgb12,  opt);  \
+INPUT_PLANAR_RGBXX_Y_DECL(rgb14,  opt);  \
+INPUT_PLANAR_RGBXX_Y_DECL(rgb16,  opt);  \
+INPUT_PLANAR_RGBXX_Y_DECL(rgbf32, opt);
+
+#define INPUT_PLANAR_RGB_UV_ALL_DECL(opt) \
+INPUT_PLANAR_RGB_UV_FN_DECL(rgb,    opt); \
+INPUT_PLANAR_RGBXX_UV_DECL(rgb9,   opt);  \
+INPUT_PLANAR_RGBXX_UV_DECL(rgb10,  opt);  \
+INPUT_PLANAR_RGBXX_UV_DECL(rgb12,  opt);  \
+INPUT_PLANAR_RGBXX_UV_DECL(rgb14,  opt);  \
+INPUT_PLANAR_RGBXX_UV_DECL(rgb16,  opt);  \
+INPUT_PLANAR_RGBXX_UV_DECL(rgbf32, opt);
+
+INPUT_PLANAR_RGBXX_Y_DECL(rgbf32, sse2);
+INPUT_PLANAR_RGB_UV_ALL_DECL(sse2);
+INPUT_PLANAR_RGB_A_ALL_DECL(sse2);
+
+INPUT_PLANAR_RGB_Y_ALL_DECL(sse4);
+INPUT_PLANAR_RGB_UV_ALL_DECL(sse4);
+INPUT_PLANAR_RGBXX_A_DECL(rgbf32, sse4);
+
+INPUT_PLANAR_RGB_Y_ALL_DECL(avx2);
+INPUT_PLANAR_RGB_UV_ALL_DECL(avx2);
+INPUT_PLANAR_RGB_A_ALL_DECL(avx2);
 #endif
 
 av_cold void ff_sws_init_swscale_x86(SwsContext *c)
@@ -601,5 +712,162 @@ switch(c->dstBpc){ \
             break;
         }
     }
+
+
+#define INPUT_PLANER_RGB_A_FUNC_CASE(fmt, name, opt)                  \
+        case fmt:                                                     \
+            c->readAlpPlanar = ff_planar_##name##_to_a_##opt;
+
+#define INPUT_PLANER_RGBA_YUV_FUNC_CASE(rgb_fmt, rgba_fmt, name, opt) \
+        case rgba_fmt:                                                \
+        case rgb_fmt:                                                 \
+            c->readLumPlanar = ff_planar_##name##_to_y_##opt;         \
+            c->readChrPlanar = ff_planar_##name##_to_uv_##opt;        \
+            break;
+
+#define INPUT_PLANER_RGB_YUV_FUNC_CASE(fmt, name, opt)                \
+        case fmt:                                                     \
+            c->readLumPlanar = ff_planar_##name##_to_y_##opt;         \
+            c->readChrPlanar = ff_planar_##name##_to_uv_##opt;        \
+            break;
+
+#define INPUT_PLANER_RGB_UV_FUNC_CASE(fmt, name, opt)                 \
+        case fmt:                                                     \
+            c->readChrPlanar = ff_planar_##name##_to_uv_##opt;        \
+            break;
+
+#define INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(rgb_fmt, rgba_fmt, name, opt) \
+        INPUT_PLANER_RGB_A_FUNC_CASE(rgba_fmt##LE,  name##le, opt)       \
+        INPUT_PLANER_RGB_YUV_FUNC_CASE(rgb_fmt##LE, name##le, opt)       \
+        INPUT_PLANER_RGB_A_FUNC_CASE(rgba_fmt##BE,  name##be, opt)       \
+        INPUT_PLANER_RGB_YUV_FUNC_CASE(rgb_fmt##BE, name##be, opt)
+
+#define INPUT_PLANER_RGBAXX_UVA_FUNC_CASE(rgb_fmt, rgba_fmt, name, opt) \
+        INPUT_PLANER_RGB_A_FUNC_CASE(rgba_fmt##LE, name##le, opt)       \
+        INPUT_PLANER_RGB_UV_FUNC_CASE(rgb_fmt##LE, name##le, opt)       \
+        INPUT_PLANER_RGB_A_FUNC_CASE(rgba_fmt##BE, name##be, opt)       \
+        INPUT_PLANER_RGB_UV_FUNC_CASE(rgb_fmt##BE, name##be, opt)
+
+#define INPUT_PLANER_RGBAXX_YUV_FUNC_CASE(rgb_fmt, rgba_fmt, name, opt)           \
+        INPUT_PLANER_RGBA_YUV_FUNC_CASE(rgb_fmt##LE, rgba_fmt##LE, name##le, opt) \
+        INPUT_PLANER_RGBA_YUV_FUNC_CASE(rgb_fmt##BE, rgba_fmt##BE, name##be, opt)
+
+#define INPUT_PLANER_RGBXX_YUV_FUNC_CASE(rgb_fmt, name, opt)       \
+        INPUT_PLANER_RGB_YUV_FUNC_CASE(rgb_fmt##LE, name##le, opt) \
+        INPUT_PLANER_RGB_YUV_FUNC_CASE(rgb_fmt##BE, name##be, opt)
+
+#define INPUT_PLANER_RGBXX_UV_FUNC_CASE(rgb_fmt, name, opt)        \
+        INPUT_PLANER_RGB_UV_FUNC_CASE(rgb_fmt##LE, name##le, opt)  \
+        INPUT_PLANER_RGB_UV_FUNC_CASE(rgb_fmt##BE, name##be, opt)
+
+#define INPUT_PLANER_RGB_YUVA_ALL_CASES(opt)                                                     \
+        INPUT_PLANER_RGB_A_FUNC_CASE(      AV_PIX_FMT_GBRAP,                           rgb, opt) \
+        INPUT_PLANER_RGB_YUV_FUNC_CASE(    AV_PIX_FMT_GBRP,                            rgb, opt) \
+        INPUT_PLANER_RGBXX_YUV_FUNC_CASE(  AV_PIX_FMT_GBRP9,                          rgb9, opt) \
+        INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(AV_PIX_FMT_GBRP10,  AV_PIX_FMT_GBRAP10,   rgb10, opt) \
+        INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(AV_PIX_FMT_GBRP12,  AV_PIX_FMT_GBRAP12,   rgb12, opt) \
+        INPUT_PLANER_RGBXX_YUV_FUNC_CASE(  AV_PIX_FMT_GBRP14,                        rgb14, opt) \
+        INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(AV_PIX_FMT_GBRP16,  AV_PIX_FMT_GBRAP16,   rgb16, opt) \
+        INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32, rgbf32, opt)
+
+
+    if (EXTERNAL_SSE2(cpu_flags)) {
+        switch (c->srcFormat) {
+        INPUT_PLANER_RGB_A_FUNC_CASE(      AV_PIX_FMT_GBRAP,                           rgb, sse2);
+        INPUT_PLANER_RGB_UV_FUNC_CASE(     AV_PIX_FMT_GBRP,                            rgb, sse2);
+        INPUT_PLANER_RGBXX_UV_FUNC_CASE(   AV_PIX_FMT_GBRP9,                          rgb9, sse2);
+        INPUT_PLANER_RGBAXX_UVA_FUNC_CASE( AV_PIX_FMT_GBRP10,  AV_PIX_FMT_GBRAP10,   rgb10, sse2);
+        INPUT_PLANER_RGBAXX_UVA_FUNC_CASE( AV_PIX_FMT_GBRP12,  AV_PIX_FMT_GBRAP12,   rgb12, sse2);
+        INPUT_PLANER_RGBXX_UV_FUNC_CASE(   AV_PIX_FMT_GBRP14,                        rgb14, sse2);
+        INPUT_PLANER_RGBAXX_UVA_FUNC_CASE( AV_PIX_FMT_GBRP16,  AV_PIX_FMT_GBRAP16,   rgb16, sse2);
+        INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32, rgbf32, sse2);
+        default:
+            break;
+        }
+    }
+
+    if (EXTERNAL_SSE4(cpu_flags)) {
+        switch (c->srcFormat) {
+        case AV_PIX_FMT_GBRAP:
+        INPUT_PLANER_RGB_YUV_FUNC_CASE(    AV_PIX_FMT_GBRP,                            rgb, sse4);
+        INPUT_PLANER_RGBXX_YUV_FUNC_CASE(  AV_PIX_FMT_GBRP9,                          rgb9, sse4);
+        INPUT_PLANER_RGBAXX_YUV_FUNC_CASE( AV_PIX_FMT_GBRP10,  AV_PIX_FMT_GBRAP10,   rgb10, sse4);
+        INPUT_PLANER_RGBAXX_YUV_FUNC_CASE( AV_PIX_FMT_GBRP12,  AV_PIX_FMT_GBRAP12,   rgb12, sse4);
+        INPUT_PLANER_RGBXX_YUV_FUNC_CASE(  AV_PIX_FMT_GBRP14,                        rgb14, sse4);
+        INPUT_PLANER_RGBAXX_YUV_FUNC_CASE( AV_PIX_FMT_GBRP16,  AV_PIX_FMT_GBRAP16,   rgb16, sse4);
+        INPUT_PLANER_RGBAXX_YUVA_FUNC_CASE(AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32, rgbf32, sse4);
+        default:
+            break;
+        }
+    }
+
+    if (EXTERNAL_AVX2_FAST(cpu_flags)) {
+        switch (c->srcFormat) {
+        INPUT_PLANER_RGB_YUVA_ALL_CASES(avx2)
+        default:
+            break;
+        }
+    }
+
+    if(c->flags & SWS_FULL_CHR_H_INT) {
+
+        /* yuv2gbrp uses the SwsContext for yuv coefficients
+           if struct offsets change the asm needs to be updated too */
+        av_assert0(offsetof(SwsContext, yuv2rgb_y_offset) == 40292);
+
+#define YUV2ANYX_FUNC_CASE(fmt, name, opt)              \
+        case fmt:                                       \
+            c->yuv2anyX = ff_yuv2##name##_full_X_##opt; \
+            break;
+
+#define YUV2ANYX_GBRAP_CASES(opt)                                  \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP,       gbrp,       opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP,      gbrap,      opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP9LE,    gbrp9le,    opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP10LE,   gbrp10le,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP10LE,  gbrap10le,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP12LE,   gbrp12le,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP12LE,  gbrap12le,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP14LE,   gbrp14le,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP16LE,   gbrp16le,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP16LE,  gbrap16le,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRPF32LE,  gbrpf32le,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAPF32LE, gbrapf32le, opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP9BE,    gbrp9be,    opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP10BE,   gbrp10be,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP10BE,  gbrap10be,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP12BE,   gbrp12be,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP12BE,  gbrap12be,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP14BE,   gbrp14be,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRP16BE,   gbrp16be,   opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAP16BE,  gbrap16be,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRPF32BE,  gbrpf32be,  opt) \
+        YUV2ANYX_FUNC_CASE(AV_PIX_FMT_GBRAPF32BE, gbrapf32be, opt)
+
+        if (EXTERNAL_SSE2(cpu_flags)) {
+            switch (c->dstFormat) {
+            YUV2ANYX_GBRAP_CASES(sse2)
+            default:
+                break;
+            }
+        }
+
+        if (EXTERNAL_SSE4(cpu_flags)) {
+            switch (c->dstFormat) {
+            YUV2ANYX_GBRAP_CASES(sse4)
+            default:
+                break;
+            }
+        }
+
+        if (EXTERNAL_AVX2_FAST(cpu_flags)) {
+            switch (c->dstFormat) {
+            YUV2ANYX_GBRAP_CASES(avx2)
+            default:
+                break;
+            }
+        }
+    }
+
 #endif
 }

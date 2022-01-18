@@ -91,6 +91,8 @@ int av_fifo_space(const AVFifoBuffer *f);
  * @param buf_size number of bytes to read
  * @param func generic read function
  * @param dest data destination
+ *
+ * @return a non-negative number on success, a negative error code on failure
  */
 int av_fifo_generic_peek_at(AVFifoBuffer *f, void *dest, int offset, int buf_size, void (*func)(void*, void*, int));
 
@@ -101,6 +103,8 @@ int av_fifo_generic_peek_at(AVFifoBuffer *f, void *dest, int offset, int buf_siz
  * @param buf_size number of bytes to read
  * @param func generic read function
  * @param dest data destination
+ *
+ * @return a non-negative number on success, a negative error code on failure
  */
 int av_fifo_generic_peek(AVFifoBuffer *f, void *dest, int buf_size, void (*func)(void*, void*, int));
 
@@ -110,6 +114,8 @@ int av_fifo_generic_peek(AVFifoBuffer *f, void *dest, int buf_size, void (*func)
  * @param buf_size number of bytes to read
  * @param func generic read function
  * @param dest data destination
+ *
+ * @return a non-negative number on success, a negative error code on failure
  */
 int av_fifo_generic_read(AVFifoBuffer *f, void *dest, int buf_size, void (*func)(void*, void*, int));
 
@@ -124,7 +130,7 @@ int av_fifo_generic_read(AVFifoBuffer *f, void *dest, int buf_size, void (*func)
  * func must return the number of bytes written to dest_buf, or <= 0 to
  * indicate no more data available to write.
  * If func is NULL, src is interpreted as a simple byte array for source data.
- * @return the number of bytes written to the FIFO
+ * @return the number of bytes written to the FIFO or a negative error code on failure
  */
 int av_fifo_generic_write(AVFifoBuffer *f, void *src, int size, int (*func)(void*, void*, int));
 
@@ -156,6 +162,7 @@ int av_fifo_grow(AVFifoBuffer *f, unsigned int additional_space);
  */
 void av_fifo_drain(AVFifoBuffer *f, int size);
 
+#if FF_API_FIFO_PEEK2
 /**
  * Return a pointer to the data stored in a FIFO buffer at a certain offset.
  * The FIFO buffer is not modified.
@@ -165,7 +172,9 @@ void av_fifo_drain(AVFifoBuffer *f, int size);
  *             than the used buffer size or the returned pointer will
  *             point outside to the buffer data.
  *             The used buffer size can be checked with av_fifo_size().
+ * @deprecated use av_fifo_generic_peek_at()
  */
+attribute_deprecated
 static inline uint8_t *av_fifo_peek2(const AVFifoBuffer *f, int offs)
 {
     uint8_t *ptr = f->rptr + offs;
@@ -175,5 +184,6 @@ static inline uint8_t *av_fifo_peek2(const AVFifoBuffer *f, int offs)
         ptr = f->end - (f->buffer - ptr);
     return ptr;
 }
+#endif
 
 #endif /* AVUTIL_FIFO_H */

@@ -24,9 +24,10 @@
 #include "common.h"
 #include "fifo.h"
 
-static AVFifoBuffer *fifo_alloc_common(void *buffer, size_t size)
+AVFifoBuffer *av_fifo_alloc_array(size_t nmemb, size_t size)
 {
     AVFifoBuffer *f;
+    void *buffer = av_realloc_array(NULL, nmemb, size);
     if (!buffer)
         return NULL;
     f = av_mallocz(sizeof(AVFifoBuffer));
@@ -35,21 +36,14 @@ static AVFifoBuffer *fifo_alloc_common(void *buffer, size_t size)
         return NULL;
     }
     f->buffer = buffer;
-    f->end    = f->buffer + size;
+    f->end    = f->buffer + nmemb * size;
     av_fifo_reset(f);
     return f;
 }
 
 AVFifoBuffer *av_fifo_alloc(unsigned int size)
 {
-    void *buffer = av_malloc(size);
-    return fifo_alloc_common(buffer, size);
-}
-
-AVFifoBuffer *av_fifo_alloc_array(size_t nmemb, size_t size)
-{
-    void *buffer = av_malloc_array(nmemb, size);
-    return fifo_alloc_common(buffer, nmemb * size);
+    return av_fifo_alloc_array(size, 1);
 }
 
 void av_fifo_free(AVFifoBuffer *f)
@@ -89,17 +83,31 @@ int av_fifo_realloc2(AVFifoBuffer *f, unsigned int new_size)
     unsigned int old_size = f->end - f->buffer;
 
     if (old_size < new_size) {
-        int len          = av_fifo_size(f);
-        AVFifoBuffer *f2 = av_fifo_alloc(new_size);
+        size_t offset_r = f->rptr - f->buffer;
+        size_t offset_w = f->wptr - f->buffer;
+        uint8_t *tmp;
 
-        if (!f2)
+        tmp = av_realloc(f->buffer, new_size);
+        if (!tmp)
             return AVERROR(ENOMEM);
-        av_fifo_generic_read(f, f2->buffer, len, NULL);
-        f2->wptr += len;
-        f2->wndx += len;
-        av_free(f->buffer);
-        *f = *f2;
-        av_free(f2);
+
+        // move the data from the beginning of the ring buffer
+        // to the newly allocated space
+        // the second condition distinguishes full vs empty fifo
+        if (offset_w <= offset_r && av_fifo_size(f)) {
+            const size_t copy = FFMIN(new_size - old_size, offset_w);
+            memcpy(tmp + old_size, tmp, copy);
+            if (copy < offset_w) {
+                memmove(tmp, tmp + copy , offset_w - copy);
+                offset_w -= copy;
+            } else
+                offset_w = old_size + copy;
+        }
+
+        f->buffer = tmp;
+        f->end    = f->buffer + new_size;
+        f->rptr   = f->buffer + offset_r;
+        f->wptr   = f->buffer + offset_w;
     }
     return 0;
 }
@@ -126,6 +134,9 @@ int av_fifo_generic_write(AVFifoBuffer *f, void *src, int size,
     uint32_t wndx= f->wndx;
     uint8_t *wptr= f->wptr;
 
+    if (size > av_fifo_space(f))
+        return AVERROR(ENOSPC);
+
     do {
         int len = FFMIN(f->end - wptr, size);
         if (func) {
@@ -136,7 +147,6 @@ int av_fifo_generic_write(AVFifoBuffer *f, void *src, int size,
             memcpy(wptr, src, len);
             src = (uint8_t *)src + len;
         }
-// Write memory barrier needed for SMP here in theory
         wptr += len;
         if (wptr >= f->end)
             wptr = f->buffer;
@@ -152,13 +162,8 @@ int av_fifo_generic_peek_at(AVFifoBuffer *f, void *dest, int offset, int buf_siz
 {
     uint8_t *rptr = f->rptr;
 
-    av_assert2(offset >= 0);
-
-    /*
-     * *ndx are indexes modulo 2^32, they are intended to overflow,
-     * to handle *ndx greater than 4gb.
-     */
-    av_assert2(buf_size + (unsigned)offset <= f->wndx - f->rndx);
+    if (offset < 0 || buf_size > av_fifo_size(f) - offset)
+        return AVERROR(EINVAL);
 
     if (offset >= f->end - rptr)
         rptr += offset - (f->end - f->buffer);
@@ -189,8 +194,10 @@ int av_fifo_generic_peek_at(AVFifoBuffer *f, void *dest, int offset, int buf_siz
 int av_fifo_generic_peek(AVFifoBuffer *f, void *dest, int buf_size,
                          void (*func)(void *, void *, int))
 {
-// Read memory barrier needed for SMP here in theory
     uint8_t *rptr = f->rptr;
+
+    if (buf_size > av_fifo_size(f))
+        return AVERROR(EINVAL);
 
     do {
         int len = FFMIN(f->end - rptr, buf_size);
@@ -200,7 +207,6 @@ int av_fifo_generic_peek(AVFifoBuffer *f, void *dest, int buf_size,
             memcpy(dest, rptr, len);
             dest = (uint8_t *)dest + len;
         }
-// memory barrier needed for SMP here in theory
         rptr += len;
         if (rptr >= f->end)
             rptr -= f->end - f->buffer;
@@ -213,7 +219,9 @@ int av_fifo_generic_peek(AVFifoBuffer *f, void *dest, int buf_size,
 int av_fifo_generic_read(AVFifoBuffer *f, void *dest, int buf_size,
                          void (*func)(void *, void *, int))
 {
-// Read memory barrier needed for SMP here in theory
+    if (buf_size > av_fifo_size(f))
+        return AVERROR(EINVAL);
+
     do {
         int len = FFMIN(f->end - f->rptr, buf_size);
         if (func)
@@ -222,7 +230,6 @@ int av_fifo_generic_read(AVFifoBuffer *f, void *dest, int buf_size,
             memcpy(dest, f->rptr, len);
             dest = (uint8_t *)dest + len;
         }
-// memory barrier needed for SMP here in theory
         av_fifo_drain(f, len);
         buf_size -= len;
     } while (buf_size > 0);

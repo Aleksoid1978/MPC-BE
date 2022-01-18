@@ -34,6 +34,7 @@
 #include "mpegvideo.h"
 #include "mpegvideodata.h"
 #include "mpeg4video.h"
+#include "mpeg4videodata.h"
 #include "h263.h"
 #include "profiles.h"
 #include "thread.h"
@@ -55,6 +56,8 @@ static VLC mb_type_b_vlc;
 static VLC studio_intra_tab[12];
 static VLC studio_luma_dc;
 static VLC studio_chroma_dc;
+
+static const uint8_t mpeg4_block_count[4] = { 0, 6, 8, 12 };
 
 static const int mb_type_b_map[4] = {
     MB_TYPE_DIRECT2 | MB_TYPE_L0L1,
@@ -3073,11 +3076,11 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
 
         if (s->avctx->debug & FF_DEBUG_PICT_INFO) {
             av_log(s->avctx, AV_LOG_DEBUG,
-                   "qp:%d fc:%d,%d %s size:%d pro:%d alt:%d top:%d %spel part:%d resync:%d w:%d a:%d rnd:%d vot:%d%s dc:%d ce:%d/%d/%d time:%"PRId64" tincr:%d\n",
+                   "qp:%d fc:%d,%d %c size:%d pro:%d alt:%d top:%d %cpel part:%d resync:%d w:%d a:%d rnd:%d vot:%d%s dc:%d ce:%d/%d/%d time:%"PRId64" tincr:%d\n",
                    s->qscale, s->f_code, s->b_code,
-                   s->pict_type == AV_PICTURE_TYPE_I ? "I" : (s->pict_type == AV_PICTURE_TYPE_P ? "P" : (s->pict_type == AV_PICTURE_TYPE_B ? "B" : "S")),
+                   s->pict_type == AV_PICTURE_TYPE_I ? 'I' : (s->pict_type == AV_PICTURE_TYPE_P ? 'P' : (s->pict_type == AV_PICTURE_TYPE_B ? 'B' : 'S')),
                    gb->size_in_bits,s->progressive_sequence, s->alternate_scan,
-                   s->top_field_first, s->quarter_sample ? "q" : "h",
+                   s->top_field_first, s->quarter_sample ? 'q' : 'h',
                    s->data_partitioning, ctx->resync_marker,
                    ctx->num_sprite_warping_points, s->sprite_warping_accuracy,
                    1 - s->no_rounding, s->vo_type,
@@ -3273,62 +3276,63 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb,
             continue;  // no startcode
 
         if (s->avctx->debug & FF_DEBUG_STARTCODE) {
-            av_log(s->avctx, AV_LOG_DEBUG, "startcode: %3X ", startcode);
+            const char *name;
             if (startcode <= 0x11F)
-                av_log(s->avctx, AV_LOG_DEBUG, "Video Object Start");
+                name = "Video Object Start";
             else if (startcode <= 0x12F)
-                av_log(s->avctx, AV_LOG_DEBUG, "Video Object Layer Start");
+                name = "Video Object Layer Start";
             else if (startcode <= 0x13F)
-                av_log(s->avctx, AV_LOG_DEBUG, "Reserved");
+                name = "Reserved";
             else if (startcode <= 0x15F)
-                av_log(s->avctx, AV_LOG_DEBUG, "FGS bp start");
+                name = "FGS bp start";
             else if (startcode <= 0x1AF)
-                av_log(s->avctx, AV_LOG_DEBUG, "Reserved");
+                name = "Reserved";
             else if (startcode == 0x1B0)
-                av_log(s->avctx, AV_LOG_DEBUG, "Visual Object Seq Start");
+                name = "Visual Object Seq Start";
             else if (startcode == 0x1B1)
-                av_log(s->avctx, AV_LOG_DEBUG, "Visual Object Seq End");
+                name = "Visual Object Seq End";
             else if (startcode == 0x1B2)
-                av_log(s->avctx, AV_LOG_DEBUG, "User Data");
+                name = "User Data";
             else if (startcode == 0x1B3)
-                av_log(s->avctx, AV_LOG_DEBUG, "Group of VOP start");
+                name = "Group of VOP start";
             else if (startcode == 0x1B4)
-                av_log(s->avctx, AV_LOG_DEBUG, "Video Session Error");
+                name = "Video Session Error";
             else if (startcode == 0x1B5)
-                av_log(s->avctx, AV_LOG_DEBUG, "Visual Object Start");
+                name = "Visual Object Start";
             else if (startcode == 0x1B6)
-                av_log(s->avctx, AV_LOG_DEBUG, "Video Object Plane start");
+                name = "Video Object Plane start";
             else if (startcode == 0x1B7)
-                av_log(s->avctx, AV_LOG_DEBUG, "slice start");
+                name = "slice start";
             else if (startcode == 0x1B8)
-                av_log(s->avctx, AV_LOG_DEBUG, "extension start");
+                name = "extension start";
             else if (startcode == 0x1B9)
-                av_log(s->avctx, AV_LOG_DEBUG, "fgs start");
+                name = "fgs start";
             else if (startcode == 0x1BA)
-                av_log(s->avctx, AV_LOG_DEBUG, "FBA Object start");
+                name = "FBA Object start";
             else if (startcode == 0x1BB)
-                av_log(s->avctx, AV_LOG_DEBUG, "FBA Object Plane start");
+                name = "FBA Object Plane start";
             else if (startcode == 0x1BC)
-                av_log(s->avctx, AV_LOG_DEBUG, "Mesh Object start");
+                name = "Mesh Object start";
             else if (startcode == 0x1BD)
-                av_log(s->avctx, AV_LOG_DEBUG, "Mesh Object Plane start");
+                name = "Mesh Object Plane start";
             else if (startcode == 0x1BE)
-                av_log(s->avctx, AV_LOG_DEBUG, "Still Texture Object start");
+                name = "Still Texture Object start";
             else if (startcode == 0x1BF)
-                av_log(s->avctx, AV_LOG_DEBUG, "Texture Spatial Layer start");
+                name = "Texture Spatial Layer start";
             else if (startcode == 0x1C0)
-                av_log(s->avctx, AV_LOG_DEBUG, "Texture SNR Layer start");
+                name = "Texture SNR Layer start";
             else if (startcode == 0x1C1)
-                av_log(s->avctx, AV_LOG_DEBUG, "Texture Tile start");
+                name = "Texture Tile start";
             else if (startcode == 0x1C2)
-                av_log(s->avctx, AV_LOG_DEBUG, "Texture Shape Layer start");
+                name = "Texture Shape Layer start";
             else if (startcode == 0x1C3)
-                av_log(s->avctx, AV_LOG_DEBUG, "stuffing start");
+                name = "stuffing start";
             else if (startcode <= 0x1C5)
-                av_log(s->avctx, AV_LOG_DEBUG, "reserved");
+                name = "Reserved";
             else if (startcode <= 0x1FF)
-                av_log(s->avctx, AV_LOG_DEBUG, "System start");
-            av_log(s->avctx, AV_LOG_DEBUG, " at %d\n", get_bits_count(gb));
+                name = "System start";
+            av_log(s->avctx, AV_LOG_DEBUG, "startcode: %3X %s at %d\n",
+                   startcode, name, get_bits_count(gb));
         }
 
         if (startcode >= 0x120 && startcode <= 0x12F) {

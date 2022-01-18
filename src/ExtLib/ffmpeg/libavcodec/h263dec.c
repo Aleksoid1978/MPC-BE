@@ -83,13 +83,11 @@ av_cold int ff_h263_decode_init(AVCodecContext *avctx)
     s->quant_precision = 5;
     s->decode_mb       = ff_h263_decode_mb;
     s->low_delay       = 1;
-    s->unrestricted_mv = 1;
 
     /* select sub codec */
     switch (avctx->codec->id) {
     case AV_CODEC_ID_H263:
     case AV_CODEC_ID_H263P:
-        s->unrestricted_mv = 0;
         avctx->chroma_sample_location = AVCHROMA_LOC_CENTER;
         break;
     case AV_CODEC_ID_MPEG4:
@@ -602,13 +600,6 @@ retry:
          s->pict_type != AV_PICTURE_TYPE_I)    ||
         avctx->skip_frame >= AVDISCARD_ALL)
         return get_consumed_bytes(s, buf_size);
-
-    if (s->next_p_frame_damaged) {
-        if (s->pict_type == AV_PICTURE_TYPE_B)
-            return get_consumed_bytes(s, buf_size);
-        else
-            s->next_p_frame_damaged = 0;
-    }
 
     if ((!s->no_rounding) || s->pict_type == AV_PICTURE_TYPE_B) {
         s->me.qpel_put = s->qdsp.put_qpel_pixels_tab;

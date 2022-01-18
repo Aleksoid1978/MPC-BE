@@ -98,7 +98,6 @@ typedef struct SVQ3Context {
     int has_watermark;
     uint32_t watermark_key;
     int adaptive_quant;
-    int next_p_frame_damaged;
     int h_edge_pos;
     int v_edge_pos;
     int last_frame_output;
@@ -129,7 +128,6 @@ typedef struct SVQ3Context {
     int8_t (*intra4x4_pred_mode);
 
     unsigned int top_samples_available;
-    unsigned int topright_samples_available;
     unsigned int left_samples_available;
 
     uint8_t *edge_emu_buffer;
@@ -639,15 +637,10 @@ static av_always_inline void hl_decode_mb_predict_luma(SVQ3Context *s,
             const int dir      = s->intra4x4_pred_mode_cache[scan8[i]];
 
             uint8_t *topright;
-            int nnz, tr;
+            int nnz;
             if (dir == DIAG_DOWN_LEFT_PRED || dir == VERT_LEFT_PRED) {
-                const int topright_avail = (s->topright_samples_available << i) & 0x8000;
                 av_assert2(s->mb_y || linesize <= block_offset[i]);
-                if (!topright_avail) {
-                    tr       = ptr[3 - linesize] * 0x01010101u;
-                    topright = (uint8_t *)&tr;
-                } else
-                    topright = ptr + 4 - linesize;
+                topright = ptr + 4 - linesize;
             } else
                 topright = NULL;
 
@@ -722,7 +715,6 @@ static int svq3_decode_mb(SVQ3Context *s, unsigned int mb_type)
 
     s->top_samples_available      = (s->mb_y == 0) ? 0x33FF : 0xFFFF;
     s->left_samples_available     = (s->mb_x == 0) ? 0x5F5F : 0xFFFF;
-    s->topright_samples_available = 0xFFFF;
 
     if (mb_type == 0) {           /* SKIP */
         if (s->pict_type == AV_PICTURE_TYPE_P ||
@@ -1469,13 +1461,6 @@ static int svq3_decode_frame(AVCodecContext *avctx, void *data,
         avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type != AV_PICTURE_TYPE_I ||
         avctx->skip_frame >= AVDISCARD_ALL)
         return 0;
-
-    if (s->next_p_frame_damaged) {
-        if (s->pict_type == AV_PICTURE_TYPE_B)
-            return 0;
-        else
-            s->next_p_frame_damaged = 0;
-    }
 
     if (s->pict_type == AV_PICTURE_TYPE_B) {
         s->frame_num_offset = s->slice_num - s->prev_frame_num;
