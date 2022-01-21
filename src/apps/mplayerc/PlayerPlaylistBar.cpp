@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -3396,7 +3396,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_REMOVEMISSINGFILES, ResStr(IDS_PLAYLIST_REMOVEMISSINGFILES));
 		m.AppendMenu(MF_SEPARATOR);
 	}
-	m.AppendMenu(MF_STRING | (m_list.GetSelectedCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_TOCLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD) + L"\tCltr+C");
+	m.AppendMenu(MF_STRING | (m_list.GetSelectedCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_TOCLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD) + L"\tCtrl+C");
 	if (curTab.type == PL_EXPLORER) {
 		const bool bReverse = !!(curTab.sort >> 8);
 		const auto sort = (SORT)(curTab.sort & 0xF);
@@ -3419,7 +3419,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_SEPARATOR);
 	}
 	else { // (curTab.type == PL_BASIC)
-		m.AppendMenu(MF_STRING | ((::IsClipboardFormatAvailable(CF_UNICODETEXT) || ::IsClipboardFormatAvailable(CF_HDROP)) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_FROMCLIPBOARD, ResStr(IDS_PLAYLIST_PASTEFROMCLIPBOARD) + L"\tCltr+V");
+		m.AppendMenu(MF_STRING | ((::IsClipboardFormatAvailable(CF_UNICODETEXT) || ::IsClipboardFormatAvailable(CF_HDROP)) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_FROMCLIPBOARD, ResStr(IDS_PLAYLIST_PASTEFROMCLIPBOARD) + L"\tCtrl+V");
 		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
 		m.AppendMenu(MF_SEPARATOR);
 		CMenu submenu2;
