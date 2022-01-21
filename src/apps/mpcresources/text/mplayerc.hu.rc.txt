@@ -411,7 +411,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 9		"Címsáv szövege"
 11		"Keresősáv szövege"
 13		"Beállítások helye"
-14		"Windows rendszerleíró adatbázis"
+14		"Windows registry"
 15		"Felhasználói profil"
 16		"Lejátszó mappa"
 17		"Előzmények"
@@ -505,7 +505,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 13		"A feliratfájlok automatikus újratöltése a módosítás észlelése után"
 15		"A Subresync használata"
 16		"Online adatbázis"
-17		"Az internetről elérhető felirat adatbázis bázis URL címe:"
+17		"Az online felirat adatbázis alap URL címe:"
 20		"Tesztelés"
 END
 
