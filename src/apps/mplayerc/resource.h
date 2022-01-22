@@ -1337,6 +1337,7 @@
 #define IDS_SCALE_16_9                  33239
 #define IDS_SCALE_WIDESCREEN            33240
 #define IDS_SCALE_ULTRAWIDE             33241
+#define IDS_AG_SHADERS_SELECT           33252
 #define IDS_AG_SHADERS_1_ENABLE         33253
 #define IDS_AG_SHADERS_2_ENABLE         33254
 #define IDS_OSD_SHADERS_1_ON            33255
@@ -1346,6 +1347,7 @@
 #define IDS_AG_VSYNCINTERNAL            33261
 #define IDS_AG_FULLSCREENGUISUPPORT     33266
 #define IDS_AG_ENABLEFRAMETIMECORRECTION 33275
+#define IDS_AG_MENU_RECENT_FILES        33281
 #define IDS_SHOW_HISTORY                33282
 #define IDS_RECENT_FILES_CLEAR          33283
 #define IDS_RECENT_FILES                33284
