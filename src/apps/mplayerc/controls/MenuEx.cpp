@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -415,6 +415,12 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 {
 	WNDPROC pfnOldProc = (WNDPROC)::GetPropW(hWnd, g_pszOldMenuProc);
 	switch (Msg) {
+		case WM_CREATE:
+			if (SysVersion::IsWin11orLater()) {
+				auto preference = DWMWCP_ROUNDSMALL;
+				DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+			}
+			break;
 		case WM_DESTROY:
 			{
 				::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)pfnOldProc);
@@ -541,7 +547,7 @@ LRESULT CALLBACK CMenuEx::CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		if (nLength == 6 && lstrcmpW(lpClassName, L"#32768") == 0) {
 			CString lpFileName = GetModuleName(pS->lpcs->hInstance);
 			if (lpFileName == m_strModuleName) {
-				WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtr(hWnd, GWLP_WNDPROC);
+				WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
 
 				::SetPropW(hWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
 				::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
