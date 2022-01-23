@@ -624,19 +624,17 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	texDesc.Width = c->coded_width;
 	texDesc.Height = c->coded_height;
 	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 10;
+	texDesc.ArraySize = 20;
 	texDesc.Format = m_SurfaceFormat;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_DECODER | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
 
-	ID3D11Texture2D* pTexture2D = nullptr;
-	hr = pD3D11Device->CreateTexture2D(&texDesc, nullptr, &pTexture2D);
+	hr = pD3D11Device->CreateTexture2D(&texDesc, nullptr, nullptr);
 	if (FAILED(hr)) {
 		return hr;
 	}
-	SAFE_RELEASE(pTexture2D);
 
 	// Notice the connected pin that we're sending D3D11 textures
 	hr = pD3D11DecoderConfiguration->ActivateD3D11Decoding(pDeviceContext->device, pDeviceContext->device_context, pDeviceContext->lock_ctx, 0);
