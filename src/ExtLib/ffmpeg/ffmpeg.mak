@@ -133,6 +133,7 @@ SRCS_LC = \
 	libavcodec/atrac3plusdsp.c \
 	libavcodec/atsc_a53.c \
 	libavcodec/audiodsp.c \
+	libavcodec/av1_frame_split_bsf.c \
 	libavcodec/av1_parse.c \
 	libavcodec/av1_parser.c \
 	libavcodec/av1dec.c \
