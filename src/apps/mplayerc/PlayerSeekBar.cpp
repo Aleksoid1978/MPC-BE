@@ -631,7 +631,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (!s.bStatusBarIsVisible) {
+	if (m_bEnabled && s.bUseDarkTheme && !s.bStatusBarIsVisible) {
 		const CRect rc(GetChannelRect());
 		CRect rt(rc);
 		rt.left  = rc.right - 140;
@@ -642,6 +642,8 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 
 		if (rt.PtInRect(p)) {
 			s.fRemainingTime = !s.fRemainingTime;
+			m_pMainFrame->OnTimer(CMainFrame::TIMER_STREAMPOSPOLLER);
+			Invalidate();
 		}
 	}
 
