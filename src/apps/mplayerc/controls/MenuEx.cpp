@@ -417,8 +417,9 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 	switch (Msg) {
 		case WM_CREATE:
 			if (SysVersion::IsWin11orLater()) {
-				auto preference = DWMWCP_ROUNDSMALL;
-				DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+				// Windows 10 SDK does not contain some parameters, so we set them with numbers.
+				int preference = 3; // DWMWCP_ROUNDSMALL
+				DwmSetWindowAttribute(hWnd, 33 /*DWMWA_WINDOW_CORNER_PREFERENCE*/, &preference, sizeof(preference));
 			}
 			break;
 		case WM_DESTROY:
