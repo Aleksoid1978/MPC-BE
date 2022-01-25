@@ -120,7 +120,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		int cnt = 0, limit = 4;
 
 		BYTE b;
-		while (cnt < limit && GetPos() < (MEGABYTE / 2) && NextMpegStartCode(b)) {
+		while (cnt < limit && GetPos() < MEGABYTE && NextMpegStartCode(b)) {
 			if (b == 0xba) {
 				pshdr h;
 				if (ReadPS(h)) {
