@@ -6,6 +6,7 @@ Removed MPC RealVideo Decoder and MPC RealAudio Decoder.
 
 MPCVideoDec
 Added the ability to select a graphics adapter for the D3D11 copy back decoder.
+Fixed AV1 video decoding.
 
 Subtitles
 Removed "&lrm;" code display for some subtitles.
@@ -13,7 +14,7 @@ Fixed drawing of an opaque frame.
 
 Player
 Added the ability to store the settings file in the user profile.
-Added the ability to call the history window by pressing the key.
+Added the ability to call the recent files menu, history windows and shader selection windows by pressing a key.
 Miscellaneous fixes.
 
 MPCBEShellExt (explorer extension)
