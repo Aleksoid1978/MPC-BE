@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2018 see Authors.txt
+ * (C) 2013-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
