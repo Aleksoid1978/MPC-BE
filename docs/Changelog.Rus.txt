@@ -1,6 +1,6 @@
 ﻿В этом файле отображаются только ключевые изменения между разными версиями Media Player Classic - BE.
 
-1.6.1 (beta)
+1.6.1
 =============================
 Удалены MPC RealVideo Decoder и MPC RealAudio Decoder.
 
