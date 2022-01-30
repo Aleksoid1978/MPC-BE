@@ -68,7 +68,7 @@ FOR %%A IN (%ARG%) DO (
 
 REM pre-build checks
 
-IF NOT EXIST "include\version_rev.h" CALL "update_version.bat"
+IF NOT EXIST "revision.h" CALL "update_version.bat"
 
 IF EXIST "environments.bat" CALL "environments.bat"
 
@@ -464,6 +464,11 @@ EXIT /B
 
 :SubGetVersion
 REM Get the version
+SET VerMajor=0
+SET VerMinor=0
+SET VerPatch=0
+SET VerRev=0
+
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_MAJOR" "include\Version.h"') DO (SET "VerMajor=%%A")
 FOR /F "tokens=3,4 delims= " %%A IN (
@@ -471,7 +476,7 @@ FOR /F "tokens=3,4 delims= " %%A IN (
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_PATCH" "include\Version.h"') DO (SET "VerPatch=%%A")
 FOR /F "tokens=3,4 delims= " %%A IN (
-  'FINDSTR /I /L /C:"define MPC_VERSION_REV" "include\Version_rev.h"') DO (SET "VerRev=%%A")
+  'FINDSTR /I /L /C:"define REV_NUM" "revision.h"') DO (SET "VerRev=%%A")
 
 SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%VerRev%
 EXIT /B

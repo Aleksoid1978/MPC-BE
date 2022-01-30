@@ -9,7 +9,7 @@
 /.vs
 /bin
 /environments.bat
-/include/Version_rev.h
+/revision.h
 /contrib/signinfo.txt
 /src/ExtLib/ffmpeg/obj
 /src/apps/MPCBEShellExt/dlldata.c

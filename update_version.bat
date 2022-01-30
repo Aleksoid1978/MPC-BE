@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2015 see Authors.txt
+REM (C) 2009-2022 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -19,36 +19,37 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SETLOCAL
 PUSHD %~dp0
 
-IF EXIST "SubWCRev.exe" SET "SUBWCREV=SubWCRev.exe"
-FOR %%A IN (SubWCRev.exe) DO (SET SUBWCREV=%%~$PATH:A)
-IF NOT DEFINED SUBWCREV GOTO SubNoSubWCRev
+ECHO #pragma once > revision.h
 
-"%SUBWCREV%" . "include\Version_rev.h.in" "include\Version_rev.h" -f
-IF %ERRORLEVEL% NEQ 0 GOTO SubError
+SET gitexe="git.exe"
+IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\bin\git.exe"
+IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\cmd\git.exe"
 
-"%SUBWCREV%" . "src\apps\mplayerc\res\mpc-be.exe.manifest.conf" "src\apps\mplayerc\res\mpc-be.exe.manifest" -f >NUL
-IF %ERRORLEVEL% NEQ 0 GOTO SubError
+IF NOT EXIST %gitexe% GOTO END
+
+%gitexe% log -1 --date=format:%%Y-%%m-%%d --pretty=format:"#define REV_DATE %%ad%%n" >> revision.h
+REM %gitexe% log -1 --pretty=format:"#define REV_HASH %%h%%n" >> revision.h
+
+SET GIT_REV_HASH=0
+FOR /f "delims=" %%A IN ('%gitexe% rev-parse --short HEAD') DO SET GIT_REV_HASH="%%A"
+ECHO #define REV_HASH %GIT_REV_HASH% >> revision.h
+
+SET GIT_REV_BRANCH=LOCAL
+FOR /f "delims=" %%A IN ('%gitexe% symbolic-ref --short HEAD') DO SET GIT_REV_BRANCH=%%A
+ECHO #define REV_BRANCH "%GIT_REV_BRANCH%" >> revision.h
+
+SET GIT_REV_COUNT=0
+FOR /f "delims=" %%A IN ('%gitexe% rev-list --count HEAD') DO (
+  SET /A GIT_REV_COUNT=%%A + 73
+)
+ECHO #define REV_NUM %GIT_REV_COUNT% >> revision.h
+
+set srcfile="src\apps\mplayerc\res\mpc-be.exe.manifest.conf"
+set dstfile="src\apps\mplayerc\res\mpc-be.exe.manifest"
+if exist %dstfile% del /q %dstfile%
+powershell -Command "(gc %srcfile%) -replace '_REV_NUM_', '%GIT_REV_COUNT%' | Out-File -encoding UTF8 %dstfile%"
 
 :END
 POPD
 ENDLOCAL
 EXIT /B
-
-:SubNoSubWCRev
-ECHO. & ECHO SubWCRev, which is part of TortoiseSVN, wasn't found!
-ECHO You should (re)install TortoiseSVN.
-GOTO SubCommon
-
-:SubError
-ECHO Something went wrong when generating the revision number.
-
-:SubCommon
-ECHO I'll use MPC_VERSION_REV=0 for now.
-
-SET /P RevStr=<"include\Version_rev.h"
-IF "%RevStr%" NEQ "#define MPC_VERSION_REV 0 " (
-  ECHO #define MPC_VERSION_REV 0 > "include\Version_rev.h"
-  TYPE "src\apps\mplayerc\res\mpc-be.exe.manifest.template" > "src\apps\mplayerc\res\mpc-be.exe.manifest"
-)
-
-GOTO END

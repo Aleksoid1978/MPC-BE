@@ -24,11 +24,25 @@
 #ifndef MPC_VERSION_H
 #define MPC_VERSION_H
 
-#include "Version_rev.h"
+#include "../revision.h"
 
-#ifndef MPC_VERSION_REV
-#define MPC_VERSION_REV         0
+#ifndef REV_DATE
+#define REV_DATE       0
 #endif
+
+#ifndef REV_HASH
+#define REV_HASH       0
+#endif
+
+#ifndef REV_NUM
+#define REV_NUM        0
+#endif
+
+#ifndef REV_BRANCH
+#define REV_BRANCH     LOCAL
+#endif
+
+#define MPC_VERSION_REV         REV_NUM
 
 #define DO_MAKE_STR(x)          #x
 #define MAKE_STR(x)             DO_MAKE_STR(x)
