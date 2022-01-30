@@ -5,9 +5,15 @@ rem It will try to patch existing local rc files first, then sync them to mplaye
 rem Then it will overwrite rc files with new rc ones, and after that it will generate the text files.
 rem This is only an example.
 
+SET gitexe="git.exe"
+IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\bin\git.exe"
+IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\cmd\git.exe"
+
+IF NOT EXIST %gitexe% GOTO NOGITCLI
+
 echo Get the latest mplayerc.rc from repository first...
-svn cat -r head ../mplayerc/mplayerc.rc > $$TEMP$$.old
-if %ERRORLEVEL% neq 0 goto NOSVNCLI
+%gitexe% show HEAD:../mplayerc/mplayerc.rc > $$TEMP$$.old
+if %ERRORLEVEL% neq 0 goto NOGITCLI
 echo ----------------------
 
 for %%i in (*.rc) do (
@@ -33,8 +39,8 @@ del mplayerc.rc
 echo ----------------------
 goto END
 
-:NOSVNCLI
-echo You'll need svn command line tool to use this script.
+:NOGITCLI
+echo You'll need Git command line tool to use this script.
 echo Or you can just checkout the head revision of mplayerc.rc file by yourself,
 echo put it somewhere and then use the -b option to point to it.
 del $$TEMP$$.old
