@@ -17,3 +17,7 @@
 /src/apps/MPCBEShellExt/MPCBEShellExt_i.h
 /src/apps/MPCBEShellExt/MPCBEShellExt_p.c
 /src/apps/mplayerc/res/mpc-be.exe.manifest
+/lib/libgcc.a
+/lib/libmingwex.a
+/lib64/libgcc.a
+/lib64/libmingwex.a
