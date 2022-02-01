@@ -257,7 +257,7 @@ HRESULT CMpaSplitterFile::Init()
 	}
 
 	m_startpos = startpos;
-	m_endpos = endpos;
+	m_endpos = IsStreaming() ? INT64_MAX : endpos;
 	Seek(m_startpos);
 
 	if (m_mode == mode::mpa) {
