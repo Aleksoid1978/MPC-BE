@@ -21,9 +21,9 @@ System requirements:
 
 Links:
 -------
-Project Page:        http://sourceforge.net/projects/mpcbe/
-Get code:            svn://svn.code.sf.net/p/mpcbe/code/trunk
-Nightly Builds:      http://sourceforge.net/projects/mpcbe/files/MPC-BE/Nightly Builds (from svn trunk)/
+Project Page:        https://sourceforge.net/projects/mpcbe/
+Get code:            https://github.com/Aleksoid1978/MPC-BE.git
+Nightly Builds:      https://sourceforge.net/projects/mpcbe/files/MPC-BE/Nightly%20Builds
 
 
 For the people involved in the development, see Authors.txt.
