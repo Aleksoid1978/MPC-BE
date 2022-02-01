@@ -30,29 +30,30 @@ Part B: Preparing the GCC environment
 
 Part C: Downloading and compiling the MPC-BE source
 
-1. Use a subversion client to checkout MPC-BE's trunk to "C:\mpc-be" (or anywhere else you like)
-    Repository URL: svn://svn.code.sf.net/p/mpcbe/code/trunk 
-    The recommended SVN client is TortoiseSVN (http://tortoisesvn.net/downloads.html)
-2. When using TortoiseSVN
-    a) Create an empty directory where you want to store the source files. e.g: C:\mpc-be
-    b) Right-click on that directory and choose "SVN checkout".
-    c) Put svn://svn.code.sf.net/p/mpcbe/code/trunk in "URL of Repository" and press OK.
+1. Use a Git client to checkout MPC-BE's trunk to "C:\repos\MPC-BE" (or anywhere else you like)
+    Repository URL: https://github.com/Aleksoid1978/MPC-BE.git
+    Git for Windows: https://git-scm.com/download/win
+    The recommended Git client is TortoiseGit (https://tortoisegit.org/download/)
+2. When using TortoiseGit
+    a) Navigate to the folder where you want to place the local copy of the repository (e.g: C:\repos)
+    b) Right-click on that directory and choose "Git Clone".
+    c) Put https://github.com/Aleksoid1978/MPC-BE.git in "URL" and press OK.
     d) Wait for the source tree to be downloaded.
 
-3. Open folder "C:\mpc-be\"
+3. Open folder "C:\repos\MPC-BE"
    Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
-4. Open the solution file: C:\mpc-be\mpc-be.sln 
+4. Open the solution file: C:\repos\MPC-BE\mpc-be.sln 
    Change the solution's configuration to "Release" (in the toolbar).
 
 5. Press OK to save the changes and close the Properties window.
 6. Press F7 to build the solution.
-7. You now have mpc-be.exe under C:\mpc-be\bin\mpc-be_x86
-8. Open the solution file C:\mpc-be\mpciconlib.sln
+7. You now have mpc-be.exe under C:\repos\MPC-BE\_bin\mpc-be_x86
+8. Open the solution file C:\repos\MPC-BE\mpciconlib.sln
 9. Press F7 to build the solution.
-10. You now have mpciconlib.dll under C:\mpc-be\bin\mpc-be_x86
-11. Open the solution file C:\mpc-be\mpcresources.sln
+10. You now have mpciconlib.dll under C:\repos\MPC-BE\_bin\mpc-be_x86
+11. Open the solution file C:\repos\MPC-BE\mpcresources.sln
     In Visual Studio go to Build->Batch Build->Press Select All->Press Build
-12. You now have mpcresources.XX.dll under C:\mpc-be\bin\mpc-be_x86\Lang
+12. You now have mpcresources.XX.dll under C:\repos\MPC-BE\_bin\mpc-be_x86\Lang
 
 Alternatively, you can use build.bat (run: build.bat help for more info)
 
@@ -62,4 +63,4 @@ Part D: Building the installer
 1a. Download Inno Setup Unicode 5.6.1 (https://files.jrsoftware.org/is/5/)
     Download Inno Download Plugin 1.5.1 (https://mitrichsoftware.wordpress.com/inno-setup-tools/inno-download-plugin/)
 1b. Or download Inno Setup 6.1.2 or never (https://jrsoftware.org/isdl.php)
-2.  Install everything and then go to C:\mpc-be\distrib, open mpc-be_setup.iss with Inno Setup and compile it.
+2.  Install everything and then go to C:\repos\MPC-BE\distrib, open mpc-be_setup.iss with Inno Setup and compile it.
