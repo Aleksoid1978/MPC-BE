@@ -39,18 +39,18 @@ CALL "%VCVARS%" x86 > nul
 :fxc_Ok
 
 CALL :SubColorText "0A" "=== Compiling downscaler shaders ===" & ECHO.
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_simple_x.cso" "Resizers\downscaler_simple.hlsl" /DAXIS=0
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_simple_y.cso" "Resizers\downscaler_simple.hlsl" /DAXIS=1
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_box_x.cso" "Resizers\downscaler_box.hlsl" /DAXIS=0
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_box_y.cso" "Resizers\downscaler_box.hlsl" /DAXIS=1
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_bilinear_x.cso" "Resizers\downscaler.hlsl" /DFILTER=1 /DAXIS=0
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_bilinear_y.cso" "Resizers\downscaler.hlsl" /DFILTER=1 /DAXIS=1
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_hamming_x.cso" "Resizers\downscaler.hlsl" /DFILTER=2 /DAXIS=0
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_hamming_y.cso" "Resizers\downscaler.hlsl" /DFILTER=2 /DAXIS=1
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_bicubic_x.cso" "Resizers\downscaler.hlsl" /DFILTER=3 /DAXIS=0
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_bicubic_y.cso" "Resizers\downscaler.hlsl" /DFILTER=3 /DAXIS=1
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_lanczos_x.cso" "Resizers\downscaler.hlsl" /DFILTER=4 /DAXIS=0
-fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_lanczos_y.cso" "Resizers\downscaler.hlsl" /DFILTER=4 /DAXIS=1
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_simple_x.cso" "Resizers\downscaler_simple.hlsl" /DAXIS=0
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_simple_y.cso" "Resizers\downscaler_simple.hlsl" /DAXIS=1
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_box_x.cso" "Resizers\downscaler_box.hlsl" /DAXIS=0
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_box_y.cso" "Resizers\downscaler_box.hlsl" /DAXIS=1
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_bilinear_x.cso" "Resizers\downscaler.hlsl" /DFILTER=1 /DAXIS=0
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_bilinear_y.cso" "Resizers\downscaler.hlsl" /DFILTER=1 /DAXIS=1
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_hamming_x.cso" "Resizers\downscaler.hlsl" /DFILTER=2 /DAXIS=0
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_hamming_y.cso" "Resizers\downscaler.hlsl" /DFILTER=2 /DAXIS=1
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_bicubic_x.cso" "Resizers\downscaler.hlsl" /DFILTER=3 /DAXIS=0
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_bicubic_y.cso" "Resizers\downscaler.hlsl" /DFILTER=3 /DAXIS=1
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_lanczos_x.cso" "Resizers\downscaler.hlsl" /DFILTER=4 /DAXIS=0
+fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_lanczos_y.cso" "Resizers\downscaler.hlsl" /DFILTER=4 /DAXIS=1
 
 CALL :SubColorText "0A" "=== Compiling Pixel Shaders 2.0 ===" & ECHO.
 set LIST=%LIST% Resizers\resizer_bspline4_x.hlsl
@@ -74,13 +74,13 @@ set LIST=%LIST% Transformation\chroma_422_correction.hlsl
 set LIST=%LIST% Transformation\halfoverunder_to_interlace.hlsl
 
 for %%f in (%LIST%) do (
-  fxc /nologo /T ps_2_0 /Fo ..\..\bin\shaders\ps20_%%~nf.cso %%f
+  fxc /nologo /T ps_2_0 /Fo ..\..\_bin\shaders\ps20_%%~nf.cso %%f
 )
 
-fxc /nologo /T ps_2_0 /Fo "..\..\bin\shaders\ps20_downscaler_simple_x.cso" "Resizers\downscaler_simple.hlsl" /DPS20 /DAXIS=0
-fxc /nologo /T ps_2_0 /Fo "..\..\bin\shaders\ps20_downscaler_simple_y.cso" "Resizers\downscaler_simple.hlsl" /DPS20 /DAXIS=1
-fxc /nologo /T ps_2_0 /Fo "..\..\bin\shaders\ps20_downscaler_box_x.cso" "Resizers\downscaler_box.hlsl" /DPS20 /DAXIS=0
-fxc /nologo /T ps_2_0 /Fo "..\..\bin\shaders\ps20_downscaler_box_y.cso" "Resizers\downscaler_box.hlsl" /DPS20 /DAXIS=1
+fxc /nologo /T ps_2_0 /Fo "..\..\_bin\shaders\ps20_downscaler_simple_x.cso" "Resizers\downscaler_simple.hlsl" /DPS20 /DAXIS=0
+fxc /nologo /T ps_2_0 /Fo "..\..\_bin\shaders\ps20_downscaler_simple_y.cso" "Resizers\downscaler_simple.hlsl" /DPS20 /DAXIS=1
+fxc /nologo /T ps_2_0 /Fo "..\..\_bin\shaders\ps20_downscaler_box_x.cso" "Resizers\downscaler_box.hlsl" /DPS20 /DAXIS=0
+fxc /nologo /T ps_2_0 /Fo "..\..\_bin\shaders\ps20_downscaler_box_y.cso" "Resizers\downscaler_box.hlsl" /DPS20 /DAXIS=1
 
 EXIT /B
 

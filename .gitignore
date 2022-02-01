@@ -7,7 +7,7 @@
 *.user
 *.vspx
 /.vs
-/bin
+/_bin
 /environments.bat
 /revision.h
 /contrib/signinfo.txt

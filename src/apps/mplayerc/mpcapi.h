@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
  to MPC-BE and receive playback notifications, first launch MPC-BE with the /slave command line
  argument followed by a HWnd handle used to receive notification:
 
- ..\bin\mpc-be /slave 125421
+ ..\_bin\mpc-be /slave 125421
 
  After startup, MPC-BE sends a WM_COPYDATA message to host with COPYDATASTRUCT struct filled with:
  - dwData :  CMD_CONNECT

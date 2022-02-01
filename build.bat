@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2020 see Authors.txt
+REM (C) 2009-2022 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -113,7 +113,7 @@ FOR /f "delims=" %%A IN ('!VSWHERE!') DO SET "VCVARS=%%A\Common7\Tools\vsdevcmd.
 
 IF NOT EXIST "%VCVARS%" GOTO MissingVar
 
-SET "BIN=bin"
+SET "BIN=_bin"
 
 IF /I "%SIGN%" == "True" (
   IF NOT EXIST "%~dp0contrib\signinfo.txt" (

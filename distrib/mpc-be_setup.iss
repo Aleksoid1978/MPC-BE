@@ -50,7 +50,7 @@
 #define app_version_svn  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
-#define bin_dir        = "..\bin"
+#define bin_dir        = "..\_bin"
 
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
 #define bindir_x86 = bin_dir + "\mpc-be_x86"

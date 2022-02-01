@@ -1,4 +1,4 @@
-BIN_DIR       = ../../../bin
+BIN_DIR       = ../../../_bin
 ZLIB_DIR      = ../zlib
 OPENJPEG_DIR  = ../openjpeg
 SPEEX_DIR     = ../speex
