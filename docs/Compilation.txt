@@ -39,6 +39,10 @@ Part C: Downloading and compiling the MPC-BE source
     b) Right-click on that directory and choose "Git Clone".
     c) Put https://github.com/Aleksoid1978/MPC-BE.git in "URL" and press OK.
     d) Wait for the source tree to be downloaded.
+   When usin Git client
+    a) open cmd/terminal, cd "c:\repos"
+    b) run command "git clone https://github.com/Aleksoid1978/MPC-BE.git"
+    c) Wait for the source tree to be downloaded.
 
 3. Open folder "C:\repos\MPC-BE"
    Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
