@@ -30,10 +30,6 @@
 #define REV_DATE       0
 #endif
 
-#ifndef REV_HASH
-#define REV_HASH       0
-#endif
-
 #ifndef REV_NUM
 #define REV_NUM        0
 #endif

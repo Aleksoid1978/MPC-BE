@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,6 +50,9 @@ BOOL CAboutDlg::OnInitDialog()
 
 	m_strVersionNumber.Append(MPC_VERSION_SVN_WSTR);
 #if (MPC_VERSION_STATUS == 0)
+#ifdef REV_HASH
+	m_strVersionNumber.AppendFormat(L" (%s)", _CRT_WIDE(REV_HASH));
+#endif
 	m_strVersionNumber.Append(L" alpha");
 #endif
 #ifdef _DEBUG
