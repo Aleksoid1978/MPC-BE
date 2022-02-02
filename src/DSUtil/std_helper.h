@@ -43,15 +43,9 @@ auto FindInListByPointer(std::list<T>& list, const T* p)
 }
 
 template <class T>
-bool Contains(const std::list<T>& list, const T& item)
+[[nodiscard]] bool Contains(const T& container, const typename T::value_type& item)
 {
-	return std::find(list.cbegin(), list.cend(), item) != list.cend();
-}
-
-template <class T>
-bool Contains(const std::vector<T>& vector, const T& item)
-{
-	return std::find(vector.cbegin(), vector.cend(), item) != vector.cend();
+	return std::find(container.cbegin(), container.cend(), item) != container.cend();
 }
 
 template <typename V, typename... T>
