@@ -199,7 +199,6 @@ private:
 	int m_nTimeColWidth;
 	void ResizeListColumn();
 
-	void AddItem(CString fn, CSubtitleItemList* subs);
 	void AddItem(std::list<CString>& fns, CSubtitleItemList* subs);
 	void ParsePlayList(CString fn, CSubtitleItemList* subs, bool bCheck = true);
 	void ParsePlayList(std::list<CString>& fns, CSubtitleItemList* subs, bool bCheck = true);

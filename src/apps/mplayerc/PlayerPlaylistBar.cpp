@@ -1182,13 +1182,6 @@ void CPlayerPlaylistBar::SetHiddenDueToFullscreen(bool bHiddenDueToFullscreen)
 	m_bHiddenDueToFullscreen = bHiddenDueToFullscreen;
 }
 
-void CPlayerPlaylistBar::AddItem(CString fn, CSubtitleItemList* subs)
-{
-	std::list<CString> sl;
-	sl.push_back(fn);
-	AddItem(sl, subs);
-}
-
 void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* subs)
 {
 	CPlaylistItem pli;
