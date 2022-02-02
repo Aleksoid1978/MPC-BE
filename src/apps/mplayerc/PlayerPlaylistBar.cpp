@@ -1168,9 +1168,8 @@ void CPlayerPlaylistBar::SaveState()
 {
 	__super::SaveState();
 
-	CString section = L"ToolBars\\" + m_strSettingName;
-
-	AfxGetProfile().WriteBool(section, L"Visible", IsWindowVisible() || (AfxGetAppSettings().bHidePlaylistFullScreen && m_bHiddenDueToFullscreen));
+	const CString section = L"ToolBars\\" + m_strSettingName;
+	AfxGetProfile().WriteBool(section, L"Visible", IsWindowVisible() || m_bVisible || (AfxGetAppSettings().bHidePlaylistFullScreen && m_bHiddenDueToFullscreen));
 }
 
 bool CPlayerPlaylistBar::IsHiddenDueToFullscreen() const
