@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -200,7 +200,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_nScheme = urlParser.GetScheme();
 
 	CString lpszAgent;
-	lpszAgent.Format(L"MPCBE.%S", MPC_VERSION_SVN_STR);
+	lpszAgent.Format(L"MPCBE.%S", MPC_VERSION_STR);
 	m_hInstance = InternetOpenW(lpszAgent,
 							    INTERNET_OPEN_TYPE_PRECONFIG,
 							    nullptr,
