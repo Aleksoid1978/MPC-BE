@@ -143,7 +143,7 @@ static LPCWSTR s_strPlayerTitle = "MPC-BE "
 #if (MPC_VERSION_STATUS == 1)
 	MPC_VERSION_WSTR;
 #else
-	MPC_VERSION_SVN_WSTR " alpha";
+	MPC_VERSION_FULL_WSTR " alpha";
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -8657,7 +8657,7 @@ void CMainFrame::OnPlayFiltersCopyToClipboard()
 {
 	// Don't translate that output since it's mostly for debugging purpose
 	CStringW filtersList;
-	filtersList.Format(L"%s %s\r\nFilters currently loaded:\r\n", MPC_WND_CLASS_NAMEW, MPC_VERSION_SVN_WSTR);
+	filtersList.Format(L"%s %s\r\nFilters currently loaded:\r\n", MPC_WND_CLASS_NAMEW, MPC_VERSION_FULL_WSTR);
 	// Skip the first two entries since they are the "Copy to clipboard" menu entry and a separator
 	for (int i = 2, count = m_filtersMenu.GetMenuItemCount(); i < count; i++) {
 		CStringW filterName;
@@ -18030,7 +18030,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			JumpOfNSeconds(_wtoi((LPCWSTR)pCDS->lpData));
 			break;
 		case CMD_GETVERSION:
-			SendAPICommand(CMD_VERSION, MPC_VERSION_SVN_WSTR);
+			SendAPICommand(CMD_VERSION, MPC_VERSION_FULL_WSTR);
 			break;
 		case CMD_TOGGLEFULLSCREEN :
 			OnViewFullscreen();

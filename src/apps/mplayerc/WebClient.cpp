@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -764,7 +764,7 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	body.Replace("[size]", UTF8(sizestring));
 	body.Replace("[reloadtime]", UTF8(reloadtime));
 	body.Replace("[hdr]", UTF8(HDR));
-	body.Replace("[version]", UTF8(MPC_VERSION_SVN_WSTR));
+	body.Replace("[version]", UTF8(MPC_VERSION_FULL_WSTR));
 
 	return true;
 }

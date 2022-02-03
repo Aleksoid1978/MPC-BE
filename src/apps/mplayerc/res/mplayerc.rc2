@@ -184,7 +184,7 @@ IDF_MAIN_ICON                    FILE                    "res\\main.png"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MPC_VERSION_SVN_NUM
+ FILEVERSION MPC_VERSION_FULL_NUM
  PRODUCTVERSION MPC_VERSION_NUM
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
@@ -202,7 +202,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "Based on the original MPC v6.4.9.0 © Gabest & MPC-HC"
             VALUE "CompanyName", MPC_COMP_NAME_STR
-            VALUE "FileVersion", MPC_VERSION_SVN_STR
+            VALUE "FileVersion", MPC_VERSION_FULL_STR
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
 #ifdef _WIN64
             VALUE "FileDescription", "MPC-BE x64"

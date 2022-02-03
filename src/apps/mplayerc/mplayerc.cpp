@@ -1558,7 +1558,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 	if (!strSatellite.IsEmpty()) {
 		const FileVersion::Ver SatVersion = FileVersion::GetVer(strSatellite);
 		if (SatVersion.value != 0) {
-			if (SatVersion.value == FileVersion::Ver(MPC_VERSION_SVN_NUM).value) {
+			if (SatVersion.value == FileVersion::Ver(MPC_VERSION_FULL_NUM).value) {
 				hMod = LoadLibraryW(strSatellite);
 				if (bSave) {
 					s.iLanguage = nLanguage;

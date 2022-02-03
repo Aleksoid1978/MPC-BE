@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -320,7 +320,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 	if (!strcmp(field, "name")) {
 		ret = L"MPC-BE";
 	} else if (!strcmp(field, "version")) {
-		ret = MPC_VERSION_SVN_WSTR;
+		ret = MPC_VERSION_FULL_WSTR;
 	} else if (!strcmp(field, "yuvMatrix")) {
 		ret = L"TV.709";
 

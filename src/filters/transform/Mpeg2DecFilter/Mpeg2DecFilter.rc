@@ -52,7 +52,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MPC_VERSION_SVN_NUM
+ FILEVERSION MPC_VERSION_FULL_NUM
  PRODUCTVERSION MPC_VERSION_NUM
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
@@ -71,7 +71,7 @@ BEGIN
             VALUE "Comments", MPC_VERSION_COMMENTS
             VALUE "CompanyName", MPC_COMP_NAME_STR
             VALUE "FileDescription", "MPEG-2/1 Decoder for DirectShow"
-            VALUE "FileVersion", MPC_VERSION_SVN_STR
+            VALUE "FileVersion", MPC_VERSION_FULL_STR
             VALUE "InternalName", " Mpeg2Dec Filter"
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
             VALUE "OriginalFilename", "Mpeg2DecFilter.ax"
