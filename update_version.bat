@@ -25,19 +25,11 @@ IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\cmd\git.exe"
 
 IF NOT EXIST %gitexe% GOTO :SubError
 
-SET REVHASH=0
-SET REVNUM=0
-
 SET GIT_REV_HASH=0
 SET GIT_REV_COUNT=0
 
 SET SrcManifest="src\apps\mplayerc\res\mpc-be.exe.manifest.conf"
 SET DstManifest="src\apps\mplayerc\res\mpc-be.exe.manifest"
-
-FOR /F "tokens=3,4 delims= " %%A IN (
-  'FINDSTR /I /L /C:"define REV_HASH" "revision.h"') DO (SET "REVHASH=%%A")
-FOR /F "tokens=3,4 delims= " %%A IN (
-  'FINDSTR /I /L /C:"define REV_NUM" "revision.h"') DO (SET "REVNUM=%%A")
 
 FOR /f "delims=" %%A IN ('%gitexe% rev-parse --short HEAD') DO (
   SET GIT_REV_HASH="%%A"
@@ -46,11 +38,20 @@ FOR /f "delims=" %%A IN ('%gitexe% rev-list --count HEAD') DO (
   SET /A GIT_REV_COUNT=%%A + 73
 )
 
-IF %REVHASH%==%GIT_REV_HASH% (
-  IF %REVNUM%==%GIT_REV_COUNT% (
-    IF EXIST %DstManifest% GOTO :DoNotUpdate
-  )
-)
+IF NOT EXIST "revision.h" GOTO :UPDATE_REV
+IF NOT EXIST %DstManifest% GOTO :UPDATE_REV
+
+SET REVHASH=0
+SET REVNUM=0
+FOR /F "tokens=3,4 delims= " %%A IN ('FINDSTR /I /L /C:"define REV_HASH" "revision.h"') DO SET "REVHASH=%%A"
+FOR /F "tokens=3,4 delims= " %%A IN ('FINDSTR /I /L /C:"define REV_NUM" "revision.h"') DO SET "REVNUM=%%A"
+
+IF NOT %REVHASH%==%GIT_REV_HASH% GOTO :UPDATE_REV
+IF NOT %REVNUM%==%GIT_REV_COUNT% GOTO :UPDATE_REV
+
+GOTO :DoNotUpdate
+
+:UPDATE_REV
 
 ECHO #pragma once > revision.h
 
