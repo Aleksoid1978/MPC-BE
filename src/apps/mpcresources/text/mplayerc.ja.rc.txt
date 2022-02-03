@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
 10		"高速シーク (キーフレームに)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"指定した時間より短い 000xx.mpls を表示しない:"
 22		"分"
 23		"Logitech (Logicool) LCD サポートを有効にする"
-24		"MiniDump を有効にする"
-25		"更新の確認"
-26		"更新を自動で確認する"
-27		"確認する間隔:"
-30		"日"
-31		"設定の管理"
-32		"リセット"
-33		"エクスポート"
+24		"Use Window Media Controls"
+25		"MiniDump を有効にする"
+26		"更新の確認"
+27		"更新を自動で確認する"
+28		"確認する間隔:"
+31		"日"
+32		"設定の管理"
+33		"リセット"
+34		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

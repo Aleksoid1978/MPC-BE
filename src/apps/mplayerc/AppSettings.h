@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -799,6 +799,7 @@ public:
 	bool			bHideWindowedMousePointer;
 	int				nMinMPlsDuration;
 	bool			fLCDSupport;
+	bool			bWinMediaControls;
 	bool			fMiniDump;
 	bool			bUpdaterAutoCheck;
 	int				nUpdaterDelay;

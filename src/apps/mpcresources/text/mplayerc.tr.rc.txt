@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Atlama uzaklıkları (ms olarak kısa, orta, uzun)"
 9		"Varsayılan"
 10		"Hızlı arama (ref. karede)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Bu süreden daha kısa 000xx.mpls gösterme:"
 22		"dk."
 23		"Logitech LCD desteğini etkinleştir"
-24		"MiniDump etkinleştir"
-25		"Güncelleme kontrolü"
-26		"Otomatik güncelleme kontrolünü etkinleştir"
-27		"Her kontrol arasındaki gecikme:"
-30		"gün"
-31		"Ayar yönetimi"
-32		"Sıfırla"
-33		"Ver"
+24		"Use Window Media Controls"
+25		"MiniDump etkinleştir"
+26		"Güncelleme kontrolü"
+27		"Otomatik güncelleme kontrolünü etkinleştir"
+28		"Her kontrol arasındaki gecikme:"
+31		"gün"
+32		"Ayar yönetimi"
+33		"Sıfırla"
+34		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Răsfoire..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Intervale de sărire (mic, mediu, mare în ms)"
 9		"Implicit"
 10		"Căutare rapidă (la cadru cheie)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Do not show 000xx.mpls shorter than"
 22		"min"
 23		"Activează suportul LCD pentru tastaturi Logitech"
-24		"Enable MiniDump"
-25		"Update check"
-26		"Enable automatic update check"
-27		"Delay between each check:"
-30		"day(s)"
-31		"Administrare setări"
-32		"Resetează"
-33		"Exportă"
+24		"Use Window Media Controls"
+25		"Enable MiniDump"
+26		"Update check"
+27		"Enable automatic update check"
+28		"Delay between each check:"
+31		"day(s)"
+32		"Administrare setări"
+33		"Resetează"
+34		"Exportă"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

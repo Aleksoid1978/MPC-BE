@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Sfoglia..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Intervalli di salto (piccolo, medio, grande in ms)"
 9		"Default"
 10		"Ricerca veloce sul fotogramma"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Do not show 000xx.mpls shorter than"
 22		"min"
 23		"Abilita supporto Logitech LCD"
-24		"Abilita file 'MiniDump'"
-25		"Controllo aggiornamento"
-26		"Abilita controllo aggiornamento automatico"
-27		"Controlla ogni:"
-30		"giorno(i)"
-31		"Gestione impostazioni"
-32		"Reimposta"
-33		"Esporta"
+24		"Use Window Media Controls"
+25		"Abilita file 'MiniDump'"
+26		"Controllo aggiornamento"
+27		"Abilita controllo aggiornamento automatico"
+28		"Controlla ogni:"
+31		"giorno(i)"
+32		"Gestione impostazioni"
+33		"Reimposta"
+34		"Esporta"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

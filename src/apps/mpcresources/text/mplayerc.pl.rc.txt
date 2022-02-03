@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Przeglądaj..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Odstepy skoków (mały, średni, duży w ms)"
 9		"Domyślne"
 10		"Szybkie przewijanie (na klatkę kluczową)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Nie pokazuj 000xx.mpls krótsze niż"
 22		"min"
 23		"Włącz wsparcie dla ekranów LCD Logitech"
-24		"Włącz MiniDump"
-25		"Sprawdzanie aktualizacji"
-26		"Włącz automatyczne sprawdzanie aktualizacji"
-27		"Sprawdzaj co:"
-30		"dni"
-31		"Zarządzanie ustawieniami"
-32		"Resetuj"
-33		"Eksportuj"
+24		"Use Window Media Controls"
+25		"Włącz MiniDump"
+26		"Sprawdzanie aktualizacji"
+27		"Włącz automatyczne sprawdzanie aktualizacji"
+28		"Sprawdzaj co:"
+31		"dni"
+32		"Zarządzanie ustawieniami"
+33		"Resetuj"
+34		"Eksportuj"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

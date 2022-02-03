@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Абраць..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Fast seek (on keyframe)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Do not show 000xx.mpls shorter than"
 22		"min"
 23		"Enable Logitech LCD support"
-24		"Enable MiniDump"
-25		"Update check"
-26		"Enable automatic update check"
-27		"Delay between each check:"
-30		"day(s)"
-31		"Settings management"
-32		"Скід"
-33		"Экспарт"
+24		"Use Window Media Controls"
+25		"Enable MiniDump"
+26		"Update check"
+27		"Enable automatic update check"
+28		"Delay between each check:"
+31		"day(s)"
+32		"Settings management"
+33		"Скід"
+34		"Экспарт"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

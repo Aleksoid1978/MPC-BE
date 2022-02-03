@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"浏览..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"步进距离 (小, 中, 大每毫秒)"
 9		"默认"
 10		"快速搜索 (以关键帧)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"不显示短于此时间的 000xx.mpls"
 22		"分钟"
 23		"开启罗技 LCD 支持"
-24		"使用小型存储器转储 (MiniDump)"
-25		"检查更新"
-26		"启用自动更新检查"
-27		"更新检查间隔:"
-30		"天"
-31		"设置管理"
-32		"重置"
-33		"导出"
+24		"Use Window Media Controls"
+25		"使用小型存储器转储 (MiniDump)"
+26		"检查更新"
+27		"启用自动更新检查"
+28		"更新检查间隔:"
+31		"天"
+32		"设置管理"
+33		"重置"
+34		"导出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

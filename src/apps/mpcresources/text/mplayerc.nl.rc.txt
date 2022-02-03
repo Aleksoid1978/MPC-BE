@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bladeren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Verspring intervallen (kort, middel, lang in ms)"
 9		"Standaard"
 10		"Snel zoeken (op sleutelframe)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Toon 000xx.mpls niet, die korter zijn dan"
 22		"min"
 23		"Activeer Logitech LCD-ondersteuning"
-24		"Activeer MiniDump"
-25		"Op updates controleren"
-26		"Activeer automatische updatecontrole"
-27		"Controleer 1 keer per"
-30		"dag(en)"
-31		"Instellingen beheren"
-32		"Resetten"
-33		"Exporteren"
+24		"Use Window Media Controls"
+25		"Activeer MiniDump"
+26		"Op updates controleren"
+27		"Activeer automatische updatecontrole"
+28		"Controleer 1 keer per"
+31		"dag(en)"
+32		"Instellingen beheren"
+33		"Resetten"
+34		"Exporteren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

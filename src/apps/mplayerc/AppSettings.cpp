@@ -748,6 +748,7 @@ void CAppSettings::ResetSettings()
 	CMiniDump::SetState(fMiniDump);
 
 	fLCDSupport = false;
+	bWinMediaControls = false;
 	fSmartSeek = false;
 	iSmartSeekSize = 15;
 	fChapterMarker = false;
@@ -1421,6 +1422,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	CMiniDump::SetState(fMiniDump);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, fLCDSupport);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WINMEDIACONTROLS, bWinMediaControls);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, fSmartSeek);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize, 5, 30);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
@@ -1757,6 +1759,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, fMiniDump);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, fLCDSupport);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WINMEDIACONTROLS, bWinMediaControls);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, fSmartSeek);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);

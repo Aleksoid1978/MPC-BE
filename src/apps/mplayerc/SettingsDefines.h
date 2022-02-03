@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -325,6 +325,7 @@
 #define IDS_RS_MINI_DUMP					L"MiniDump"
 
 #define IDS_RS_LCD_SUPPORT					L"LcdSupport"
+#define IDS_RS_WINMEDIACONTROLS				L"WinMediaControls"
 #define IDS_RS_SMARTSEEK					L"UseSmartSeek"
 #define IDS_RS_SMARTSEEK_SIZE				L"SmartSeekSize"
 #define IDS_RS_CHAPTER_MARKER				L"ChapterMarker"

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,6 +41,7 @@ private:
 	int  m_nMinMPlsDuration;
 	CSpinButtonCtrl m_spnMinMPlsDuration;
 	BOOL m_fLCDSupport;
+	BOOL m_bWinMediaControls = FALSE;
 	BOOL m_fMiniDump;
 
 	CButton m_updaterAutoCheckCtrl;

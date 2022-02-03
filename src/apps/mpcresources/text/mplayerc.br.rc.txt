@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Procurar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Distâncias do pulo (pequeno, médio, longo em ms)"
 9		"Padrão"
 10		"Busca rápida (no quadro-chave)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Não mostrar 000xx.mpls mais curto que"
 22		"mín"
 23		"Ativar suporte Logitech LCD"
-24		"Ativar MiniDump"
-25		"Verificar atualização"
-26		"Ativar verificação de atualização automática"
-27		"Demora entre cada verificação:"
-30		"dia(s)"
-31		"Gerenciar configurações"
-32		"Resetar"
-33		"Exportar"
+24		"Use Window Media Controls"
+25		"Ativar MiniDump"
+26		"Verificar atualização"
+27		"Ativar verificação de atualização automática"
+28		"Demora entre cada verificação:"
+31		"dia(s)"
+32		"Gerenciar configurações"
+33		"Resetar"
+34		"Exportar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

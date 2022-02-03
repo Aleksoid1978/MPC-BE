@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,6 +62,7 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT5, m_nMinMPlsDuration);
 	DDX_Control(pDX, IDC_SPIN2, m_spnMinMPlsDuration);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
+	DDX_Check(pDX, IDC_CHECK9, m_bWinMediaControls);
 	DDX_Check(pDX, IDC_CHECK2, m_fMiniDump);
 	DDX_Control(pDX, IDC_CHECK3, m_updaterAutoCheckCtrl);
 	DDX_Control(pDX, IDC_EDIT4, m_updaterDelayCtrl);
@@ -100,6 +101,7 @@ BOOL CPPageMisc::OnInitDialog()
 	m_nMinMPlsDuration = s.nMinMPlsDuration;
 	m_spnMinMPlsDuration.SetRange32(0, 20);
 	m_fLCDSupport = s.fLCDSupport;
+	m_bWinMediaControls = s.bWinMediaControls;
 	m_fMiniDump = s.fMiniDump;
 
 	m_updaterAutoCheckCtrl.SetCheck(s.bUpdaterAutoCheck);
@@ -128,6 +130,7 @@ BOOL CPPageMisc::OnApply()
 	s.bHideWindowedMousePointer = !!m_bHideWindowedMousePointer;
 	s.nMinMPlsDuration          = (m_nMinMPlsDuration = std::clamp(m_nMinMPlsDuration, 0, 20));
 	s.fLCDSupport               = !!m_fLCDSupport;
+	s.bWinMediaControls         = !!m_bWinMediaControls;
 	s.fMiniDump                 = !!m_fMiniDump;
 	CMiniDump::SetState(s.fMiniDump);
 

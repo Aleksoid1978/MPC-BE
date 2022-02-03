@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Tallózás..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Ugrás távolságok (kicsi, közepes, nagy, tizedmásodpercben)"
 9		"Alapértelmezett"
 10		"Gyors keresés (kulcspozícióban)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Ne mutasd ha 000xx.mpls rövidebb"
 22		"perc"
 23		"Engedélyezze a Logitech LCD támogatást"
-24		"MiniDump engedélyezése"
-25		"Frissítés ellenőrzése"
-26		"Automatikus frissítésellenőrzés engedélyezése"
-27		"Késleltetés az ellenőrzéseknél:"
-30		"nap(ok)"
-31		"Beállítások kezelése"
-32		"Visszaállítás"
-33		"Export"
+24		"Use Window Media Controls"
+25		"MiniDump engedélyezése"
+26		"Frissítés ellenőrzése"
+27		"Automatikus frissítésellenőrzés engedélyezése"
+28		"Késleltetés az ellenőrzéseknél:"
+31		"nap(ok)"
+32		"Beállítások kezelése"
+33		"Visszaállítás"
+34		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

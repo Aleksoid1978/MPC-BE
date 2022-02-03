@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -934,7 +934,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		InternetSetCookieExW(lpszUrl, L"CONSENT", lpszCookieData.GetString(), INTERNET_COOKIE_HTTPONLY, NULL);
 	}
 
-	m_CMediaControls.Init(this);
+	if (s.bWinMediaControls) {
+		m_CMediaControls.Init(this);
+	}
 
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
 

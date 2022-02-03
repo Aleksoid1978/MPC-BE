@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Öffnen..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 5		"Sprungintervalle (klein, mittel, groß in ms)"
 9		"Zurücksetzen"
 10		"Schnellen Suchlauf verwenden (Keyframes)"
@@ -354,14 +354,15 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 19		"Keine 000xx.mpls anzeigen, die kürzer sind als"
 22		"Min."
 23		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
-24		"MiniDumps aktivieren"
-25		"Programm-Update"
-26		"Automatische Update-Prüfung"
-27		"Nach Programm-Update alle"
-30		"Tag(e) suchen"
-31		"Programmeinstellungen verwalten"
-32		"Zurücksetzen"
-33		"Exportieren..."
+24		"Use Window Media Controls"
+25		"MiniDumps aktivieren"
+26		"Programm-Update"
+27		"Automatische Update-Prüfung"
+28		"Nach Programm-Update alle"
+31		"Tag(e) suchen"
+32		"Programmeinstellungen verwalten"
+33		"Zurücksetzen"
+34		"Exportieren..."
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
