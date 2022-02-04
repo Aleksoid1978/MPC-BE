@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Om"
 7		"MPC-BE"
 8		"Upphovsrätt © 2002-2022 se Authors.txt fil"
 10		"Version :"
-11		"SVN Build :"
-12		"MPC-BE Kompilator :"
-13		"FFmpeg Kompilator :"
-14		"Libavcodec / Libavutil :"
-21		"This program is freeware and released under the GNU General Public License."
-22		"Svensk översättning av JonasNo"
-23		"OK"
+11		"MPC-BE Kompilator :"
+12		"FFmpeg Kompilator :"
+13		"Libavcodec / Libavutil :"
+22		"This program is freeware and released under the GNU General Public License."
+23		"Svensk översättning av JonasNo"
+24		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

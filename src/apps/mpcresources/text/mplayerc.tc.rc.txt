@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"關於"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 詳見 Authors.txt 檔案"
 10		"版本："
-11		"SVN 組建版本："
-12		"MPC-BE 編譯器："
-13		"FFmpeg 編譯器："
-14		"Libavcodec / Libavutil："
-21		"本程式係依 GNU 通用公共授權 (GPL) 發行之自由軟體。"
-22		"本翻譯版本延伸自 Kene Lin 及 roytam \n之譯本，並作多處擴充，特此鳴謝。"
-23		"確認"
+11		"MPC-BE 編譯器："
+12		"FFmpeg 編譯器："
+13		"Libavcodec / Libavutil："
+22		"本程式係依 GNU 通用公共授權 (GPL) 發行之自由軟體。"
+23		"本翻譯版本延伸自 Kene Lin 及 roytam \n之譯本，並作多處擴充，特此鳴謝。"
+24		"確認"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

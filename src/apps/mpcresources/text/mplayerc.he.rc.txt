@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"אודות"
 7		"MPC-BE"
 8		"כל הזכויות שמורות © 2002-2022 קרא את קובץ היוצרים (Authors.txt)"
 10		"Version :"
-11		"SVN Build :"
-12		"מהדר MPC-BE :"
-13		"מהדר FFmpeg :"
-14		"Libavcodec / Libavutil :"
-21		"תוכנה זו הינה חינמית ומשוחררת תחת הרשיון GNU General Public License."
-22		"תרגום עברי ע""י Superb"
-23		"אישור"
+11		"מהדר MPC-BE :"
+12		"מהדר FFmpeg :"
+13		"Libavcodec / Libavutil :"
+22		"תוכנה זו הינה חינמית ומשוחררת תחת הרשיון GNU General Public License."
+23		"תרגום עברי ע""י Superb"
+24		"אישור"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

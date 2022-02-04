@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"O programu"
 7		"MPC-BE"
 8		"Copyright © 2002-2022, viz soubor Authors.txt"
 10		"Version :"
-11		"SVN Build :"
-12		"MPC-BE zkompilován :"
-13		"FFmpeg zkompilován :"
-14		"Libavcodec / Libavutil :"
-21		"Tento program je freeware vydaný pod\nGNU General Public License."
-22		"Překlad: khagaroth"
-23		"OK"
+11		"MPC-BE zkompilován :"
+12		"FFmpeg zkompilován :"
+13		"Libavcodec / Libavutil :"
+22		"Tento program je freeware vydaný pod\nGNU General Public License."
+23		"Překlad: khagaroth"
+24		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

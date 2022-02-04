@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Hakkında"
 7		"MPC-BE"
 8		"Telif Hakkı © 2002-2022, Authors.txt dosyasına bakınız"
 10		"Sürüm :"
-11		"SVN Yapımı :"
-12		"MPC-BE Derleyici :"
-13		"FFmpeg Derleyici :"
-14		"Libavcodec / Libavutil :"
-21		"Bu program ücretsiz olup GNU Genel Kamu Lisansı altında sunulmaktadır."
-22		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiş, cmhrky   (C. Kaya KURTOĞLU) MPC-BE için eklemelerle düzenlemiştir."
-23		"Tamam"
+11		"MPC-BE Derleyici :"
+12		"FFmpeg Derleyici :"
+13		"Libavcodec / Libavutil :"
+22		"Bu program ücretsiz olup GNU Genel Kamu Lisansı altında sunulmaktadır."
+23		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiş, cmhrky   (C. Kaya KURTOĞLU) MPC-BE için eklemelerle düzenlemiştir."
+24		"Tamam"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

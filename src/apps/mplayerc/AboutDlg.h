@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,8 +40,9 @@ public:
 
 	virtual BOOL OnInitDialog();
 
-	afx_msg void OnHomepage(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnAuthors(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnHomepage(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnGitHub(NMHDR *pNMHDR, LRESULT *pResult);
 
 	enum { IDD = IDD_ABOUTBOX };
 

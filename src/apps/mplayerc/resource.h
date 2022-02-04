@@ -929,7 +929,6 @@
 #define IDC_RESET                       22004
 #define IDC_DVD_POS                     22005
 #define IDC_FILE_POS                    22006
-#define IDC_SOURCEFORGE_LINK            22008
 #define IDC_LIBAVCODEC_VERSION          22009
 #define IDC_EVR_BUFFERS                 22010
 #define IDC_VERSION                     22011
@@ -977,7 +976,8 @@
 #define IDC_UPDATE_DLG_TEXT             22057
 #define IDC_UPDATE_ICON                 22058
 #define IDC_AUTHORS_LINK                22059
-#define IDC_SVNBUILD                    22060
+#define IDC_SOURCEFORGE_LINK            22060
+#define IDC_GITHUB_LINK                 22061
 #define IDC_LCDSUPPORT                  22062
 #define IDC_CHECK_LCD                   22063
 #define IDC_CHECK_PRV                   22064

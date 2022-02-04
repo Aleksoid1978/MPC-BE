@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Περί"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 βλέπε Authors.txt"
 10		"Έκδοση :"
-11		"SVN Build :"
-12		"MPC-BE Compiler :"
-13		"FFmpeg Compiler :"
-14		"Libavcodec / Libavutil :"
-21		"Αυτό το πρόγραμμα είναι ελεύθερο και κυκλοφορεί υπό τη Γενική Δημόσια Άδεια GNU."
-22		"Ελληνική μετάφραση : geogeo.gr && Λάμπρος Ζουλούμης && Γιώργος Γεωργίου"
-23		"Εντάξει"
+11		"MPC-BE Compiler :"
+12		"FFmpeg Compiler :"
+13		"Libavcodec / Libavutil :"
+22		"Αυτό το πρόγραμμα είναι ελεύθερο και κυκλοφορεί υπό τη Γενική Δημόσια Άδεια GNU."
+23		"Ελληνική μετάφραση : geogeo.gr && Λάμπρος Ζουλούμης && Γιώργος Γεωργίου"
+24		"Εντάξει"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

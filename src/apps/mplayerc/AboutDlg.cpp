@@ -120,20 +120,28 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	ON_NOTIFY(NM_CLICK, IDC_SOURCEFORGE_LINK, OnHomepage)
 	ON_NOTIFY(NM_CLICK, IDC_AUTHORS_LINK, OnAuthors)
+	ON_NOTIFY(NM_CLICK, IDC_SOURCEFORGE_LINK, OnHomepage)
+	ON_NOTIFY(NM_CLICK, IDC_GITHUB_LINK, OnGitHub)
 END_MESSAGE_MAP()
 
-void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
+void CAboutDlg::OnAuthors(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	ShellExecuteW(m_hWnd, L"open", _CRT_WIDE(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", m_AuthorsPath, nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }
 
-void CAboutDlg::OnAuthors(NMHDR *pNMHDR, LRESULT *pResult)
+void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecuteW(m_hWnd, L"open", m_AuthorsPath, nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", L"https://sourceforge.net/projects/mpcbe/", nullptr, nullptr, SW_SHOWDEFAULT);
+
+	*pResult = 0;
+}
+
+void CAboutDlg::OnGitHub(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	ShellExecuteW(m_hWnd, L"open", L"https://github.com/Aleksoid1978/MPC-BE", nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }

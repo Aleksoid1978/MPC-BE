@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 (Authors.txt ファイルを参照)"
 10		"バージョン :"
-11		"SVN Build :"
-12		"MPC-BE コンパイラ :"
-13		"FFmpeg コンパイラ :"
-14		"Libavcodec / Libavutil :"
-21		"このプログラムはフリーウェアであり、GNU 一般公衆利用許諾書 (GPL) に基づいて配布されます。"
-22		"日本語訳に多くの方が貢献しています。"
-23		"OK"
+11		"MPC-BE コンパイラ :"
+12		"FFmpeg コンパイラ :"
+13		"Libavcodec / Libavutil :"
+22		"このプログラムはフリーウェアであり、GNU 一般公衆利用許諾書 (GPL) に基づいて配布されます。"
+23		"日本語訳に多くの方が貢献しています。"
+24		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

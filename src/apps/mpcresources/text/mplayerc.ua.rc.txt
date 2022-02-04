@@ -1,15 +1,14 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Про програму"
 7		"MPC-BE"
 8		"Copyright © 2002-2022, див. файл Authors.txt"
 10		"Версія :"
-11		"Збірка SVN :"
-12		"MPC-BE Компілятор :"
-13		"FFmpeg Компілятор :"
-14		"Libavcodec / Libavutil :"
-21		"Ця програма безкоштовна та розповсюджується за ліцензією GNU General Public License.\n"
-22		"Локалізація: Ihor Bobalo (http://www.eleks.com)"
-23		"Гаразд"
+11		"MPC-BE Компілятор :"
+12		"FFmpeg Компілятор :"
+13		"Libavcodec / Libavutil :"
+22		"Ця програма безкоштовна та розповсюджується за ліцензією GNU General Public License.\n"
+23		"Локалізація: Ihor Bobalo (http://www.eleks.com)"
+24		"Гаразд"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
