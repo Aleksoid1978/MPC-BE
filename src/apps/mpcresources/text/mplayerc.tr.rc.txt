@@ -353,7 +353,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 19		"Bu süreden daha kısa 000xx.mpls gösterme:"
 22		"dk."
 23		"Logitech LCD desteğini etkinleştir"
-24		"Use Window Media Controls"
+24		"Windows Medya Kontrollerini kullan"
 25		"MiniDump etkinleştir"
 26		"Güncelleme kontrolü"
 27		"Otomatik güncelleme kontrolünü etkinleştir"
