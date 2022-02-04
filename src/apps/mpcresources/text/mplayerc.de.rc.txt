@@ -353,7 +353,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 19		"Keine 000xx.mpls anzeigen, die kürzer sind als"
 22		"Min."
 23		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
-24		"Use Window Media Controls"
+24		"Desktop-Overlay bei Verwendung von Medientasten anzeigen"
 25		"MiniDumps aktivieren"
 26		"Programm-Update"
 27		"Automatische Update-Prüfung"
