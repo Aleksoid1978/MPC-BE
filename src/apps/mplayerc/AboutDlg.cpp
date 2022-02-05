@@ -50,13 +50,13 @@ BOOL CAboutDlg::OnInitDialog()
 
 	m_strVersionNumber.Append(MPC_VERSION_FULL_WSTR);
 #if (MPC_VERSION_STATUS == 0)
-#ifdef REV_HASH
-	m_strVersionNumber.AppendFormat(L" (%S)", REV_HASH);
-#endif
 	m_strVersionNumber.Append(L" alpha");
 #endif
 #ifdef _DEBUG
 	m_strVersionNumber.Append(L", Debug");
+#endif
+#ifdef REV_HASH
+	m_strVersionNumber.AppendFormat(L"\r\ngit %S-%S", REV_DATE, REV_HASH);
 #endif
 
 #if defined(__INTEL_COMPILER)
