@@ -391,8 +391,9 @@ SET PackagesOut=Packages
 IF NOT EXIST "%PackagesOut%\%MPCBE_VER%" MD "%PackagesOut%\%MPCBE_VER%"
 
 SET "PCKG_NAME=%NAME%.%MPCBE_VER%.%ARCH%"
+SET "ZIP_NAME=%NAME%.%MPCBE_VER%%SUFFIX_GIT%.%ARCH%"
 
-IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z"
+IF EXIST "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%.7z"     DEL "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%.7z"
 IF EXIST "%PCKG_NAME%"        RD /Q /S "%PCKG_NAME%"
 
 TITLE Copying %PCKG_NAME%...
@@ -433,28 +434,28 @@ COPY /Y /V "..\docs\Readme.txt"              "%PCKG_NAME%" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
   IF /I "%INSTALLER%" == "True" (
-    TITLE Creating archive %PCKG_NAME%.zip...
-    START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.zip" "%PCKG_NAME%.exe" -mx9
-    IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%-installer.zip!"
-    CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
+    TITLE Creating archive %ZIP_NAME%-installer.zip...
+    START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%-installer.zip" "%PCKG_NAME%.exe" -mx9
+    IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %ZIP_NAME%-installer.zip!"
+    CALL :SubMsg "INFO" "%ZIP_NAME%-installer.zip successfully created"
   )
 )
 
-TITLE Creating archive %PCKG_NAME%.7z...
-START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z" "%PCKG_NAME%"^
+TITLE Creating archive %ZIP_NAME%.7z...
+START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%.7z" "%PCKG_NAME%"^
  -m0=lzma -mx9 -mmt -ms=on
-IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%.7z!"
-CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
+IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %ZIP_NAME%.7z!"
+CALL :SubMsg "INFO" "%ZIP_NAME%.7z successfully created"
 
 IF EXIST "%PCKG_NAME%" RD /Q /S "%PCKG_NAME%"
 
 IF /I "%NAME%" == "MPC-BE" (
-  TITLE Creating archive %PCKG_NAME%-pdb.7z...
+  TITLE Creating archive %ZIP_NAME%-pdb.7z...
   IF /I "%ARCH%" == "x64" (
-    START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-pdb.7z" "%~1_%ARCH%\mpc-be64.pdb"^
+    START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%-pdb.7z" "%~1_%ARCH%\mpc-be64.pdb"^
  -m0=lzma -mx9 -mmt -ms=on
   ) ELSE (
-    START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-pdb.7z" "%~1_%ARCH%\mpc-be.pdb"^
+    START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%-pdb.7z" "%~1_%ARCH%\mpc-be.pdb"^
  -m0=lzma -mx9 -mmt -ms=on
   )
 )
@@ -467,7 +468,7 @@ REM Get the version
 SET VerMajor=0
 SET VerMinor=0
 SET VerPatch=0
-SET VerRev=0
+SET REVNUM=0
 
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_MAJOR" "include\Version.h"') DO (SET "VerMajor=%%A")
@@ -476,9 +477,24 @@ FOR /F "tokens=3,4 delims= " %%A IN (
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_PATCH" "include\Version.h"') DO (SET "VerPatch=%%A")
 FOR /F "tokens=3,4 delims= " %%A IN (
-  'FINDSTR /I /L /C:"define REV_NUM" "revision.h"') DO (SET "VerRev=%%A")
+  'FINDSTR /I /L /C:"define MPC_VERSION_STATUS" "include\Version.h"') DO (SET "VERRELEASE=%%A")
 
-SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%VerRev%
+FOR /F "tokens=3,4 delims= " %%A IN (
+  'FINDSTR /I /L /C:"define REV_NUM" "revision.h"') DO (SET "REVNUM=%%A")
+FOR /F "tokens=3,4 delims= " %%A IN (
+  'FINDSTR /I /L /C:"define REV_DATE" "revision.h"') DO (SET "REVDATE=%%A")
+FOR /F "tokens=3,4 delims= " %%A IN (
+  'FINDSTR /I /L /C:"define REV_HASH" "revision.h"') DO (SET "REVHASH=%%A")
+
+SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%REVNUM%
+
+IF /I "%VERRELEASE%" == "1" (
+  SET "SUFFIX_GIT="
+) ELSE (
+  SET "SUFFIX_GIT=_git%REVDATE%-%REVHASH%"
+)
+
+
 EXIT /B
 
 :SubDetectWinArch
