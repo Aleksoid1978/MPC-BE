@@ -1,4 +1,4 @@
-@ECHO OFF
+rem @ECHO OFF
 REM (C) 2009-2022 see Authors.txt
 REM
 REM This file is part of MPC-BE.
@@ -55,7 +55,7 @@ GOTO :DoNotUpdate
 
 ECHO #pragma once > revision.h
 
-%gitexe% log -1 --date=format:%%Y-%%m-%%d --pretty=format:"#define REV_DATE %%ad%%n" >> revision.h
+%gitexe% log -1 --date=format:%%Y.%%m.%%d --pretty=format:"#define REV_DATE %%x22%%ad%%x22%%n" >> revision.h
 
 SET GIT_REV_BRANCH=LOCAL
 FOR /f "delims=" %%A IN ('%gitexe% symbolic-ref --short HEAD') DO SET GIT_REV_BRANCH=%%A
