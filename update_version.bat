@@ -1,4 +1,4 @@
-rem @ECHO OFF
+@ECHO OFF
 REM (C) 2009-2022 see Authors.txt
 REM
 REM This file is part of MPC-BE.
