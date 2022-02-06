@@ -353,7 +353,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 19		"Не відображати 000xx.mpls коротші за"
 22		"хв."
 23		"Задіяти підтримку Logitech LCD"
-24		"Use Window Media Controls"
+24		"Використовувати Window Media Controls"
 25		"Задіяти створення мінідампів"
 26		"Перевірка оновлень"
 27		"Ввімкнути автоматичну перевірку оновлень"
