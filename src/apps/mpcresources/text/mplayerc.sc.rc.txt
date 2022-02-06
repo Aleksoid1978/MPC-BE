@@ -353,7 +353,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 19		"不显示短于此时间的 000xx.mpls"
 22		"分钟"
 23		"开启罗技 LCD 支持"
-24		"Use Window Media Controls"
+24		"启用窗口播放控件"
 25		"使用小型存储器转储 (MiniDump)"
 26		"检查更新"
 27		"启用自动更新检查"
