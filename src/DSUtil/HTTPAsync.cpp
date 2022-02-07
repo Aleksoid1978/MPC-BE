@@ -199,9 +199,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_nPort   = urlParser.GetPortNumber();
 	m_nScheme = urlParser.GetScheme();
 
-	CString lpszAgent;
-	lpszAgent.Format(L"MPCBE.%S", MPC_VERSION_STR);
-	m_hInstance = InternetOpenW(lpszAgent,
+	m_hInstance = InternetOpenW(L"MPCBE." MPC_VERSION_WSTR,
 							    INTERNET_OPEN_TYPE_PRECONFIG,
 							    nullptr,
 							    nullptr,
