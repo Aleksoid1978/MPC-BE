@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -385,14 +385,16 @@ void CHistoryFile::SaveSessionInfo(const SessionInfo& sesInfo)
 
 	ReadFile();
 
-	auto it = FindSessionInfo(sesInfo, m_SessionInfos.begin());
+	if (m_SessionInfos.size()) {
+		auto it = FindSessionInfo(sesInfo, m_SessionInfos.begin());
 
-	if (it == m_SessionInfos.begin() && sesInfo.Equals(*it)) {
-		return;
-	}
+		if (it == m_SessionInfos.begin() && sesInfo.Equals(*it)) {
+			return;
+		}
 
-	if (it != m_SessionInfos.end()) {
-		m_SessionInfos.erase(it);
+		if (it != m_SessionInfos.end()) {
+			m_SessionInfos.erase(it);
+		}
 	}
 
 	m_SessionInfos.emplace_front(sesInfo); // Writing new data
