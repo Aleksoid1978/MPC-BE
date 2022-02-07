@@ -166,11 +166,24 @@ namespace D3DHook {
 #endif
 						ULONG nChars = 0;
 						if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, nullptr, &nChars) && nChars > 0) {
-							CString pszValue;
-							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue.GetBuffer(nChars), &nChars)) {
-								// we need only the first value
-								pszValue.ReleaseBuffer(nChars);
-								driverDll = pszValue; driverDll.Trim();
+							std::vector<wchar_t> MultiStringBuffer(nChars);
+							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, reinterpret_cast<LPTSTR>(MultiStringBuffer.data()), &nChars)) {
+								// we need only the first, but real value
+								auto begin = MultiStringBuffer.cbegin();
+								auto it = std::find(begin, MultiStringBuffer.cend(), L'\0');
+								while (it != MultiStringBuffer.cend()) {
+									const std::wstring buf(begin, it);
+									if (::PathFileExistsW(buf.c_str())) {
+										driverDll = buf.c_str(); driverDll.Trim();
+										break;
+									}
+
+									begin = it + 1;
+									if (begin == MultiStringBuffer.cend()) {
+										break;
+									}
+									it = std::find(begin, MultiStringBuffer.cend(), L'\0');
+								}
 							}
 						}
 
