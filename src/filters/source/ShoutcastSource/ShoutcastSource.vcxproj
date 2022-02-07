@@ -193,6 +193,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="ShoutcastSource.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -202,6 +203,7 @@
     <None Include="ShoutcastSource.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MPCSocket.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
