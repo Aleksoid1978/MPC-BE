@@ -23,12 +23,23 @@ Part B: Preparing the GCC environment
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
  1. Download and extract "MSYS_MinGW-w64_GCC_1120_x86-x64.7z" to "C:\MSYS" -> https://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_1120_x86-x64.7z
- 2. Create a file named "environments.bat" in "C:\mpc-be\" containing the following entries:
+ 2. Create a file named "environments.bat" in the source code folder of MPC-BE (see part D) containing the following entries:
     @ECHO OFF
     SET "MPCBE_MSYS=C:\MSYS"
     SET "MPCBE_MINGW=C:\MSYS\mingw"
 
-Part C: Downloading and compiling the MPC-BE source
+Part C: Yasm
+
+Download YASM and save it as yasm.exe in a folder that is included in %PATH%. For example C:\Windows.
+    For 64-bit Windows: http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win64.exe (Recommended)
+    For 32-bit Windows: http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win32.exe
+
+ NOTES:
+  * Yasm may require Microsoft Visual C++ 2010 redistributable packages. Download it:
+    For 64-bit Windows: https://download.microsoft.com/download/A/8/0/A80747C3-41BD-45DF-B505-E9710D2744E0/vcredist_x64.exe (Recommended)
+    For 32-bit Windows: https://download.microsoft.com/download/C/6/D/C6D0FD4E-9E53-4897-9B91-836EBA2AACD3/vcredist_x86.exe
+
+Part D: Downloading and compiling the MPC-BE source
 
 1. Use a Git client to checkout MPC-BE's trunk to "C:\repos\MPC-BE" (or anywhere else you like)
     Repository URL: https://github.com/Aleksoid1978/MPC-BE.git
