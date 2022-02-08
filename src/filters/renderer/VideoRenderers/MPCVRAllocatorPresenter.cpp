@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2021 see Authors.txt
+ * (C) 2019-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -154,7 +154,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	}
 
 	if (CComQIPtr<ISubRender> pSR = m_pMPCVR.p) {
-		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
+		EXECUTE_ASSERT(pSR->SetCallback(this));
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
