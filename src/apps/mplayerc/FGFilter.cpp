@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -457,14 +457,14 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 			if (m_name != "EVR - Preview Window") {
 				if (CComQIPtr<IEVRFilterConfig> pConfig = pBF) {
 					// 3 video streams are required to play DVD-Video with some decoders
-					EXECUTE_ASSERT(pConfig->SetNumberOfStreams(3));
+					VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
 				}
 			}
 
 			if (CComQIPtr<IMFGetService> pMFGS = pBF) {
 				CComPtr<IMFVideoDisplayControl> pMFVDC;
 				if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
-					EXECUTE_ASSERT(pMFVDC->SetVideoWindow(m_hWnd));
+					VERIFY(SUCCEEDED(pMFVDC->SetVideoWindow(m_hWnd)));
 				}
 			}
 		}
@@ -488,11 +488,11 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 			if (m_clsid == CLSID_madVRAllocatorPresenter) {
 				if (CComQIPtr<IMadVRSubclassReplacement> pMVRSR = *ppBF) {
-					EXECUTE_ASSERT(pMVRSR->DisableSubclassing());
+					VERIFY(SUCCEEDED(pMVRSR->DisableSubclassing()));
 				}
 				// madVR supports calling IVideoWindow::put_Owner before the pins are connected
 				if (CComQIPtr<IVideoWindow> pVW = *ppBF) {
-					EXECUTE_ASSERT(pVW->put_Owner((OAHWND)m_hWnd));
+					VERIFY(SUCCEEDED(pVW->put_Owner((OAHWND)m_hWnd)));
 				}
 			}
 
@@ -503,7 +503,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 				// MPC VR supports calling IVideoWindow::put_Owner before the pins are connected
 				if (CComQIPtr<IVideoWindow> pVW = *ppBF) {
-					EXECUTE_ASSERT(pVW->put_Owner((OAHWND)m_hWnd));
+					VERIFY(SUCCEEDED(pVW->put_Owner((OAHWND)m_hWnd)));
 				}
 			}
 		}

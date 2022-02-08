@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2021 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,7 +58,7 @@ CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 			if (SUCCEEDED(pDevice->Activate(__uuidof(IAudioSessionManager), CLSCTX_ALL, nullptr,
 											reinterpret_cast<void**>(&pSessionManager)))) {
 				if (SUCCEEDED(pSessionManager->GetSimpleAudioVolume(nullptr, FALSE, &m_pSimpleVolume))) {
-					EXECUTE_ASSERT(m_pSimpleVolume->GetMasterVolume(&m_fInitialVolume));
+					VERIFY(SUCCEEDED(m_pSimpleVolume->GetMasterVolume(&m_fInitialVolume)));
 				}
 			}
 		}
@@ -71,7 +71,7 @@ CShockwaveGraph::~CShockwaveGraph()
 	m_wndDestFrame.DestroyWindow();
 	m_wndWindowFrame.DestroyWindow();
 	if (m_pSimpleVolume) {
-		EXECUTE_ASSERT(m_pSimpleVolume->SetMasterVolume(m_fInitialVolume, nullptr));
+		VERIFY(SUCCEEDED(m_pSimpleVolume->SetMasterVolume(m_fInitialVolume, nullptr)));
 	}
 }
 

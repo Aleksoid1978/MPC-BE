@@ -3273,7 +3273,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									s.lDVDChapter = 0;
 								} else if (pDVDData->pDvdState) {
 									// Set position from favorite
-									EXECUTE_ASSERT(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, nullptr));
+									VERIFY(SUCCEEDED(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, nullptr)));
 									// We don't want to restore the position from the favorite
 									// if the playback is reinitialized so we clear the saved state
 									pDVDData->pDvdState.Release();
@@ -14184,7 +14184,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			m_pMS->GetDuration(&rtDur);
 			if (rtDur > 0 && pFileData->rtStart <= rtDur) {
 				REFERENCE_TIME rtPos = pFileData->rtStart;
-				EXECUTE_ASSERT(m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning));
+				VERIFY(SUCCEEDED(m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning)));
 			}
 		}
 
