@@ -2117,7 +2117,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			AP4_Sample sample;
 			if (AP4_SUCCEEDED(track->GetSample(0, sample))) {
 				const auto rt = RescaleI64x32(sample.GetCts(), UNITS, track->GetMediaTimeScale());
-				m_rtOffset = std::min(m_rtOffset, rt);
+				m_rtOffset = std::min(m_rtOffset, std::max(rt, 0i64));
 			}
 		}
 		if (m_rtOffset == MAXLONGLONG) {
