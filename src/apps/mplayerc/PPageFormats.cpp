@@ -845,7 +845,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				const auto keyName = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + strExt + L"\\UserChoice";
 				if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, keyName.GetString(), KEY_READ)) {
 					// generate UserChoice Hash
-					auto sid = UserChoice::GetCurrentUserStringSid();
+					static auto sid = UserChoice::GetCurrentUserStringSid();
 					SYSTEMTIME systemTime = {};
 					GetSystemTime(&systemTime);
 
