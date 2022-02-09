@@ -426,6 +426,9 @@
     <ClCompile Include="MediaControls.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowsUserChoice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -816,6 +819,9 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="MediaControls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsUserChoice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

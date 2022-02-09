@@ -27,6 +27,7 @@
 #include <HighDPI.h>
 #include "PPageFormats.h"
 #include "SvgHelper.h"
+#include "WindowsUserChoice.h"
 
 static constexpr auto previousRegistration = L"PreviousRegistration";
 static constexpr auto registeredAppName    = L"MPC-BE";
@@ -324,7 +325,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		key.RecurseDeleteKey(strProgID + L"\\DefaultIcon");
 	}
 
-	if (!IsRegistered(ext)) {
+	if (!IsRegistered(ext, true)) {
 		SetFileAssociation(ext, strProgID, true);
 	}
 
@@ -839,6 +840,24 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			if (!extOldIcon.IsEmpty() && (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon")))
 				key.SetStringValue (nullptr, extOldIcon);
 			*/
+
+			if (SysVersion::IsWin10RS4orLater()) {
+				const auto keyName = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + strExt + L"\\UserChoice";
+				if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, keyName.GetString(), KEY_READ)) {
+					// generate UserChoice Hash
+					auto sid = UserChoice::GetCurrentUserStringSid();
+					SYSTEMTIME systemTime = {};
+					GetSystemTime(&systemTime);
+
+					auto hash = UserChoice::GenerateUserChoiceHash(strExt.GetString(), sid.get(), strProgID.GetString(), systemTime);
+					if (hash &&
+							ERROR_SUCCESS == RegDeleteKeyW(HKEY_CURRENT_USER, keyName.GetString()) &&
+							ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, keyName.GetString())) {
+						key.SetStringValue(L"ProgId", strProgID.GetString());
+						key.SetStringValue(L"Hash", hash.get());
+					}
+				}
+			}
 		} else {
 			// Get previous association
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
@@ -1012,7 +1031,7 @@ BOOL CPPageFormats::OnApply()
 	s.bAssociatedWithIcons	= !!m_chAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged) {
-		if (SysVersion::IsWin8orLater()) {
+		if (SysVersion::IsWin8orLater() && !SysVersion::IsWin11orLater()) {
 			RegisterUI();
 		}
 

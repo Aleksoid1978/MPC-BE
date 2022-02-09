@@ -872,7 +872,7 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterShellExt(ShellExt64);
 			}
 
-			if (SysVersion::IsWin8orLater()) {
+			if (SysVersion::IsWin8orLater() && !SysVersion::IsWin11orLater()) {
 				CPPageFormats::RegisterUI();
 			}
 
@@ -901,7 +901,7 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
-			if (SysVersion::IsWin8orLater()) {
+			if (SysVersion::IsWin8orLater() && !SysVersion::IsWin11orLater()) {
 				CPPageFormats::RegisterUI();
 			}
 
