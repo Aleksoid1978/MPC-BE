@@ -202,8 +202,6 @@ EXIT /B
 
 :SubFilters
 TITLE Compiling MPC-BE Filters - %BUILDCFG% Filter^|%1...
-REM Call update_version.bat before building the filters
-CALL "update_version.bat"
 MSBuild.exe mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="%BUILDCFG% Filter";Platform=%1^
  /flp1:LogFile=%LOG_DIR%\filters_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
