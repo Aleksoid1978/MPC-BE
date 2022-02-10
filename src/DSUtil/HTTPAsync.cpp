@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "HTTPAsync.h"
 #include "Log.h"
-#include "Version.h"
 
 void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt DWORD_PTR dwContext,
@@ -199,7 +198,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_nPort   = urlParser.GetPortNumber();
 	m_nScheme = urlParser.GetScheme();
 
-	m_hInstance = InternetOpenW(L"MPCBE." MPC_VERSION_WSTR,
+	m_hInstance = InternetOpenW(L"MPCBE",
 							    INTERNET_OPEN_TYPE_PRECONFIG,
 							    nullptr,
 							    nullptr,
