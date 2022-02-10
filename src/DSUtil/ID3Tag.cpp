@@ -206,14 +206,13 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 		}
 
 		CString mimeStr(mime);
-		if (tag == '\0PIC') {
-			if (CString(mimeStr).MakeUpper() == L"JPG") {
-				mimeStr = L"image/jpeg";
-			} else if (CString(mimeStr).MakeUpper() == L"PNG") {
-				mimeStr = L"image/png";
-			} else {
-				mimeStr.Format(L"image/%s", CString(mime));
-			}
+		CString mimeStrLower(mime); mimeStrLower.MakeLower();
+		if (mimeStrLower == L"jpg") {
+			mimeStr = L"image/jpeg";
+		} else if (mimeStrLower == L"png") {
+			mimeStr = L"image/png";
+		} else if (!StartsWith(mimeStrLower, L"image/")) {
+			mimeStr.Format(L"image/%s", mime);
 		}
 
 		std::vector<BYTE> data;
