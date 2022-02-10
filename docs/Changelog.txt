@@ -1,5 +1,24 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
+1.6.2 alpha
+=============================
+MpaSplitter
+Fixed working with online streams.
+Improved support for embedded images.
+
+MP4Splitter
+Fixed playing files with tracks with negative delay.
+
+Player
+Added option "Use Window Media Controls". It is disabled by default.
+Miscellaneous fixes.
+
+Updated Turkish translation (by cmhrky).
+Updated German translation (by Klaus1189).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Ukrainian translation (by arestarh).
+
+
 1.6.1
 =============================
 Removed MPC RealVideo Decoder and MPC RealAudio Decoder.
