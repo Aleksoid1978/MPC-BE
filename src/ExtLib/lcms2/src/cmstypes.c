@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2020 Marti Maria Saguer
+//  Copyright (c) 1998-2022 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -3213,8 +3213,8 @@ cmsBool Type_NamedColor_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER
     if (!_cmsWriteUInt32Number(io, nColors)) return FALSE;
     if (!_cmsWriteUInt32Number(io, NamedColorList ->ColorantCount)) return FALSE;
 
-    strncpy(prefix, (const char*) NamedColorList->Prefix, 32);
-    strncpy(suffix, (const char*) NamedColorList->Suffix, 32);
+    memcpy(prefix, (const char*) NamedColorList->Prefix, sizeof(prefix));
+    memcpy(suffix, (const char*) NamedColorList->Suffix, sizeof(suffix));
 
     suffix[32] = prefix[32] = 0;
 
@@ -3572,28 +3572,28 @@ void *Type_UcrBg_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cm
 
     // First curve is Under color removal
 
-    if (SignedSizeOfTag < sizeof(cmsUInt32Number)) return NULL;    
+    if (SignedSizeOfTag < (cmsInt32Number) sizeof(cmsUInt32Number)) return NULL;
     if (!_cmsReadUInt32Number(io, &CountUcr)) return NULL;
     SignedSizeOfTag -= sizeof(cmsUInt32Number);
 
     n ->Ucr = cmsBuildTabulatedToneCurve16(self ->ContextID, CountUcr, NULL);
     if (n ->Ucr == NULL) goto error;
 
-    if (SignedSizeOfTag < (cmsInt32Number)CountUcr * sizeof(cmsUInt16Number)) goto error;
+    if (SignedSizeOfTag < (cmsInt32Number)(CountUcr * sizeof(cmsUInt16Number))) goto error;
     if (!_cmsReadUInt16Array(io, CountUcr, n ->Ucr->Table16)) goto error;
   
     SignedSizeOfTag -= CountUcr * sizeof(cmsUInt16Number);
 
     // Second curve is Black generation
 
-    if (SignedSizeOfTag < sizeof(cmsUInt32Number)) goto error;
+    if (SignedSizeOfTag < (cmsInt32Number)sizeof(cmsUInt32Number)) goto error;
     if (!_cmsReadUInt32Number(io, &CountBg)) goto error;
     SignedSizeOfTag -= sizeof(cmsUInt32Number);
 
     n ->Bg = cmsBuildTabulatedToneCurve16(self ->ContextID, CountBg, NULL);
     if (n ->Bg == NULL) goto error;
 
-    if (SignedSizeOfTag < (cmsInt32Number) CountBg * sizeof(cmsUInt16Number)) goto error;
+    if (SignedSizeOfTag < (cmsInt32Number) (CountBg * sizeof(cmsUInt16Number))) goto error;
     if (!_cmsReadUInt16Array(io, CountBg, n ->Bg->Table16)) goto error;
     SignedSizeOfTag -= CountBg * sizeof(cmsUInt16Number);
 
@@ -5033,7 +5033,7 @@ cmsBool ReadOffsetArray(cmsIOHANDLER* io,  _cmsDICarray* a,
     // Read column arrays
     for (i=0; i < Count; i++) {
 
-        if (SignedSizeOfTag < 4 * sizeof(cmsUInt32Number)) return FALSE;
+        if (SignedSizeOfTag < 4 * (cmsInt32Number) sizeof(cmsUInt32Number)) return FALSE;
         SignedSizeOfTag -= 4 * sizeof(cmsUInt32Number);
 
         if (!ReadOneElem(io, &a -> Name, i, BaseOffset)) return FALSE;
@@ -5041,7 +5041,7 @@ cmsBool ReadOffsetArray(cmsIOHANDLER* io,  _cmsDICarray* a,
 
         if (Length > 16) {
 
-            if (SignedSizeOfTag < 2 * sizeof(cmsUInt32Number)) return FALSE;
+            if (SignedSizeOfTag < 2 * (cmsInt32Number) sizeof(cmsUInt32Number)) return FALSE;
             SignedSizeOfTag -= 2 * sizeof(cmsUInt32Number);
 
             if (!ReadOneElem(io, &a ->DisplayName, i, BaseOffset)) return FALSE;
@@ -5050,8 +5050,8 @@ cmsBool ReadOffsetArray(cmsIOHANDLER* io,  _cmsDICarray* a,
 
         if (Length > 24) {
 
-            if (SignedSizeOfTag < 2 * sizeof(cmsUInt32Number)) return FALSE;
-            SignedSizeOfTag -= 2 * sizeof(cmsUInt32Number);
+            if (SignedSizeOfTag < 2 * (cmsInt32Number) sizeof(cmsUInt32Number)) return FALSE;
+            SignedSizeOfTag -= 2 * (cmsInt32Number) sizeof(cmsUInt32Number);
 
             if (!ReadOneElem(io, & a -> DisplayValue, i, BaseOffset)) return FALSE;
         }

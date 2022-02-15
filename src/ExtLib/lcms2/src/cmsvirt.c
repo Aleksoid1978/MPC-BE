@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2020 Marti Maria Saguer
+//  Copyright (c) 1998-2022 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -368,7 +368,7 @@ int InkLimitingSampler(CMSREGISTER const cmsUInt16Number In[], CMSREGISTER cmsUI
 
     InkLimit = (InkLimit * 655.35);
 
-    SumCMY   = In[0]  + In[1] + In[2];
+    SumCMY   = (cmsFloat64Number) In[0]  + In[1] + In[2];
     SumCMYK  = SumCMY + In[3];
 
     if (SumCMYK > InkLimit) {
