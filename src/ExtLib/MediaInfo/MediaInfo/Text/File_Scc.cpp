@@ -47,67 +47,6 @@ static unsigned char Char2Hex (unsigned char Char)
     return Char;
 }
 
-static int64u Scc_str2timecode(const char* Value)
-{
-    const size_t Length=strlen(Value);
-         if (Length==11
-     && Value[0]>='0' && Value[0]<='9'
-     && Value[1]>='0' && Value[1]<='9'
-     && Value[2]==':'
-     && Value[3]>='0' && Value[3]<='9'
-     && Value[4]>='0' && Value[4]<='9'
-     && Value[5]==':'
-     && Value[6]>='0' && Value[6]<='9'
-     && Value[7]>='0' && Value[7]<='9'
-     && (Value[8]==':' || Value[8]==';')
-     && Value[9]>='0' && Value[9]<='9'
-     && Value[10]>='0' && Value[10]<='9')
-    {
-        int64u ToReturn=(int64u)(Value[0]-'0')*10*60*60*1000000000
-                       +(int64u)(Value[1]-'0')   *60*60*1000000000
-                       +(int64u)(Value[3]-'0')   *10*60*1000000000
-                       +(int64u)(Value[4]-'0')      *60*1000000000
-                       +(int64u)(Value[6]-'0')      *10*1000000000
-                       +(int64u)(Value[7]-'0')         *1000000000
-                       +(int64u)(Value[9]-'0')         * 333333333
-                       +(int64u)(Value[10]-'0')        *  33333333;
-
-        return ToReturn;
-    }
-    else
-        return (int64u)-1;
-}
-
-
-static TimeCode Scc_str2TimeCode(const int8u* Value)
-{
-         if (
-        Value[0]>='0' && Value[0]<='9'
-     && Value[1]>='0' && Value[1]<='9'
-     && Value[2]==':'
-     && Value[3]>='0' && Value[3]<='9'
-     && Value[4]>='0' && Value[4]<='9'
-     && Value[5]==':'
-     && Value[6]>='0' && Value[6]<='9'
-     && Value[7]>='0' && Value[7]<='9'
-     && (Value[8]==':' || Value[8]==';')
-     && Value[9]>='0' && Value[9]<='9'
-     && Value[10]>='0' && Value[10]<='9')
-    {
-        int8u HH=(int64u)(Value[0]-'0')*10
-                +(int64u)(Value[1]-'0')   ;
-        int8u MM=(int64u)(Value[3]-'0')*10
-                +(int64u)(Value[4]-'0')   ;
-        int8u SS=(int64u)(Value[6]-'0')*10
-                +(int64u)(Value[7]-'0')   ;
-        int8u FF=(int64u)(Value[9]-'0')*10
-                +(int64u)(Value[10]-'0')  ;
-        return TimeCode(HH, MM, SS, FF, 30, Value[8]==';');
-    }
-    else
-        return TimeCode();
-}
-
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -269,7 +208,10 @@ void File_Scc::FileHeader_Parse()
             continue;
         if (End-Begin>=11)
         {
-            TimeCode Temp=Scc_str2TimeCode(Buffer+Begin);
+            size_t Space=Begin;
+            while (Space<End && Buffer[Space]!=' ' && Buffer[Space]!='\t')
+                Space++;
+            TimeCode Temp((const char*)Buffer+Begin, Space-Begin);
             if (Temp.HasValue())
             {
                 if (HighestFrame<Temp.Frames)
@@ -279,7 +221,6 @@ void File_Scc::FileHeader_Parse()
                 if (TimeCodes.empty())
                 {
                     Fill(Stream_Text, 0, Text_TimeCode_FirstFrame, string((const char*)Buffer+Begin, 11));
-                    Fill(Stream_Text, 0, Text_TimeCode_DropFrame, Temp.DropFrame?"Yes":"No");
                     TimeCode_FirstFrame=Temp;
                     Fill(Stream_Text, 0, Text_TimeCode_Source, "Container");
                     for (size_t i=0; i<FrameRates.size(); i++)
@@ -339,7 +280,25 @@ void File_Scc::FileHeader_Parse()
         Fill(Stream_Text, 0, Text_TimeCode_MaxFrameNumber, HighestFrame);
         Fill(Stream_Text, 0, Text_TimeCode_MaxFrameNumber_Theory, HighestFrame_Adapted);
     }
-    Fill(Stream_Text, 0, Text_FrameRate, 30);
+    #if MEDIAINFO_ADVANCED
+        float64 FrameRate_F=Video_FrameRate_Rounded(Config->File_DefaultFrameRate_Get());
+        if (!FrameRate_F)
+            FrameRate_F=30/1.001;
+    #else //MEDIAINFO_ADVANCED
+        const float64 FrameRate_F=30/1.001;
+    #endif //MEDIAINFO_ADVANCED
+    FrameDurationNanoSeconds=float64_int64s(1000000000/FrameRate_F);
+    if (FrameRate_F>0 && FrameRate_F<0x100)
+    {
+        FrameRate=(int8u)float64_int64s(FrameRate_F);
+        FrameRate_Is1001=FrameRate_F!=FrameRate;
+    }
+    else
+        FrameRate=0;
+    Fill(Stream_Text, 0, Text_FrameRate, FrameRate_F);
+    TimeCode_FirstFrame.FramesPerSecond=FrameRate;
+    TimeCode_FirstFrame.FramesPerSecond_Is1001=FrameRate_Is1001;
+    Fill(Stream_Text, 0, Text_Delay, TimeCode_FirstFrame.ToMilliseconds());
 }
 
 //***************************************************************************
@@ -383,11 +342,12 @@ void File_Scc::Data_Parse()
     //Parsing
     string TimeStamp;
     Get_String(11, TimeStamp,                                   "TimeStamp");
-    TimeCode Temp=Scc_str2TimeCode((const int8u*)TimeStamp.c_str());
-    Temp.DropFrame=TimeCode_FirstFrame.DropFrame;
+    TimeCode Temp(TimeStamp);
+    Temp.FramesPerSecond=FrameRate;
+    Temp.FramesPerSecond_Is1001=FrameRate_Is1001;
     Parser->Frame_Count_NotParsedIncluded=Temp.ToFrames()-TimeCode_FirstFrame.ToFrames();
-    Parser->FrameInfo.DTS=Scc_str2timecode(TimeStamp.c_str());
-    Parser->FrameInfo.DUR=33333333;
+    Parser->FrameInfo.DTS=Temp.ToMilliseconds()*1000000;
+    Parser->FrameInfo.DUR=FrameDurationNanoSeconds;
     while (Element_Offset+5<=Element_Size)
     {
         int8u Buffer_Temp[2];

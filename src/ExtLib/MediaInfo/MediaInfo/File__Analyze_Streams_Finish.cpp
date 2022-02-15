@@ -1268,6 +1268,15 @@ void File__Analyze::Streams_Finish_StreamOnly_Text(size_t Pos)
         if (FrameCount && Duration)
            Fill(Stream_Text, Pos, Text_FrameRate, FrameCount/Duration, 3);
     }
+
+    //FrameCount from Duration and FrameRate
+    if (Retrieve(Stream_Text, Pos, Text_FrameCount).empty())
+    {
+        float64 Duration=Retrieve(Stream_Text, Pos, Text_Duration).To_float64()/1000;
+        float64 FrameRate=Retrieve(Stream_Text, Pos, Text_FrameRate).To_float64();
+        if (Duration && FrameRate)
+           Fill(Stream_Text, Pos, Text_FrameCount, float64_int64s(Duration*FrameRate));
+    }
 }
 
 //---------------------------------------------------------------------------

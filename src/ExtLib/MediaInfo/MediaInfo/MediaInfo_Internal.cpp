@@ -302,7 +302,7 @@ extern const Char* MediaInfo_Version;
 //***************************************************************************
 // Modifiers - ChannelLayout_2018
 //***************************************************************************
-static const size_t ChannelLayout_2018_Size=63;
+static const size_t ChannelLayout_2018_Size=64;
 static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
 {
     { "BC", "Cb" },
@@ -346,6 +346,7 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
     { "Rhr", "Tbr" },
     { "Rhs", "Tfr" },
     { "RI", "Bfr" },
+    { "Rls", "Lb" },
     { "Rrh", "Tbr" },
     { "Rrs", "Rb" },
     { "Rsc", "Rscr" },
@@ -424,7 +425,9 @@ Ztring ChannelLayout_2018_Rename(stream_t StreamKind, size_t Parameter, ZtringLi
         case Stream_Audio:
             switch (Parameter)
             {
-                case Audio_ChannelLayout: return ChannelLayout_2018_Rename(Info[Parameter], StreamFormat);
+                case Audio_ChannelLayout:
+                case Audio_ChannelLayout_Original:
+                    return ChannelLayout_2018_Rename(Info[Parameter], StreamFormat);
                 default:;
             }
             break;
@@ -2533,9 +2536,9 @@ Ztring MediaInfo_Internal::Inform(std::vector<MediaInfo_Internal*>& Info)
         Result+=MediaInfoLib::Config.LineSeparator_Get();
         Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
         Result+=MediaInfoLib::Config.LineSeparator_Get();
-        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"");
+        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace/mediatrace_0_2.xsd\"");
         Result+=MediaInfoLib::Config.LineSeparator_Get();
-        Result+=__T("    version=\"0.1\"");
+        Result+=__T("    version=\"0.2\"");
         Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
         Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
         Result+=MediaInfoLib::Config.LineSeparator_Get();

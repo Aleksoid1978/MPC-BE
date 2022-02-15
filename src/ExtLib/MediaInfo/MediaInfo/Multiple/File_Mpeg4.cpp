@@ -339,6 +339,7 @@ File_Mpeg4::File_Mpeg4()
     StreamOrder=0;
     meta_pitm_item_ID=(int32u)-1;
     meta_iprp_ipco_Buffer=NULL;
+    moov_trak_mdia_minf_stbl_stsd_Pos=0;
     moov_trak_tkhd_TrackID=(int32u)-1;
     mdat_Pos_NormalParsing=false;
     moof_traf_base_data_offset=(int64u)-1;
@@ -425,15 +426,18 @@ void File_Mpeg4::Streams_Finish()
     if (Retrieve(Stream_General, 0, General_Format)==__T("Final Cut EIA-608"))
     {
         for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
-            for (size_t Pos=0; Pos<Streams[(int32u)Element_Code].Parsers.size(); Pos++)
+            for (size_t Pos=0; Pos<Stream->second.Parsers.size(); Pos++)
             {
-                Stream->second.Parsers[Pos]->Finish();
-                if (Stream->second.Parsers[Pos]->Count_Get(Stream_Text))
+                File__Analyze* Parser=Stream->second.Parsers[Pos];
+                if (!Parser)
+                    continue;
+                Parser->Finish();
+                if (Parser->Count_Get(Stream_Text))
                 {
                     Stream_Prepare(Stream_Text);
                     Fill(Stream_Text, StreamPos_Last, Text_ID, Stream->first==1?"608-1":"608-2");
                     Fill(Stream_Text, StreamPos_Last, "MuxingMode", __T("Final Cut"), Unlimited);
-                    Merge(*Stream->second.Parsers[Pos], Stream_Text, 0, StreamPos_Last);
+                    Merge(*Parser, Stream_Text, 0, StreamPos_Last);
                 }
 
                 //Law rating

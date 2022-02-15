@@ -63,10 +63,10 @@ static size_t binaural_render_mode_Name_Size=sizeof(binaural_render_mode_Name)/s
 
 static const char* warp_mode_Name[] =
 {
-    "Normal",
-    "Warping",
-    "Downmix (Pro Logic IIx)",
-    "Downmix (LoRo) mode",
+    "Direct Render",
+    "Direct Render with room balance",
+    "Dolby Pro Logic IIx",
+    "Standard (Lo/Ro)",
     "Not Indicated",
 };
 static size_t warp_mode_Name_Size=sizeof(warp_mode_Name)/sizeof(const char*);
@@ -78,6 +78,35 @@ static const char* trim_bypass_Name[] =
     "Not Indicated",
     NULL,
 };
+
+static const float32 frames_per_second_Values[] =
+{
+    0,
+    24/1.001,
+    24,
+    25,
+    30/1.001, // Drop frame
+    30/1.001,
+    30,
+};
+static size_t frames_per_second_Size=sizeof(frames_per_second_Values)/sizeof(float32);
+
+static const char* downmix_type_5to2_Values[] =
+{
+    NULL,
+    "Standard (Lo/Ro)",
+    "Dolby Pro Logic",
+    "Dolby Pro Logic II",
+    "Direct stereo render",
+};
+static size_t downmix_type_5to2_Size=sizeof(downmix_type_5to2_Values)/sizeof(const char*);
+
+static const char* phaseshift_90deg_5to2_Values[] =
+{
+    "No",
+    "Yes",
+};
+static size_t phaseshift_90deg_5to2_Size=sizeof(phaseshift_90deg_5to2_Values)/sizeof(const char*);
 
 //***************************************************************************
 // Constructor/Destructor
@@ -216,12 +245,24 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Metadata_Segment()
     //Parsing
     Ztring content_creation_tool;
     int32u content_creation_tool_version;
-    int8u warp_mode;
+    int8u warp_mode, frames_per_second, downmix_type_5to2, phaseshift_90deg_5to2;
     Skip_String(32,                                             "reserved");
     Element_Begin1("content_information");
     Get_UTF8(64, content_creation_tool,                         "content_creation_tool");
     Get_B3 (content_creation_tool_version,                      "content_creation_tool_version");
-    Skip_XX(53,                                                 "Unknown");
+    Skip_XX(12,                                                 "Unknown");
+    BS_Begin();
+    Skip_S1(4,                                                  "Unknown");
+    Get_S1 (4, frames_per_second,                               "frames_per_second"); Param_Info1C(frames_per_second<frames_per_second_Size, frames_per_second_Values[frames_per_second]);
+    BS_End();
+    Skip_XX(27,                                                 "Unknown");
+    BS_Begin();
+    Skip_SB(                                                    "Unknown");
+    Get_S1 (2, downmix_type_5to2,                               "downmix_type_5to2"); Param_Info1C(downmix_type_5to2<downmix_type_5to2_Size, downmix_type_5to2_Values[downmix_type_5to2]);
+    Skip_S1(2,                                                  "Unknown");
+    Get_S1 (2, phaseshift_90deg_5to2,                           "phaseshift_90deg_5to2"); Param_Info1C(phaseshift_90deg_5to2<phaseshift_90deg_5to2_Size, phaseshift_90deg_5to2_Values[phaseshift_90deg_5to2]);
+    BS_End();
+    Skip_XX(12,                                                 "Unknown");
     Element_Begin1("additional_rendering_metadata");
     BS_Begin();
     Skip_S1(2,                                                  "bed_distribution");
@@ -237,9 +278,32 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Metadata_Segment()
             +Ztring::ToZtring((content_creation_tool_version>>8)&0xFF)+__T('.')
             +Ztring::ToZtring(content_creation_tool_version&0xFF);
         Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata Encoded_Application", content_creation_tool+__T(", ")+Version);
+        if (downmix_type_5to2 && downmix_type_5to2<downmix_type_5to2_Size)
+            Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata Downmix_5to2", downmix_type_5to2_Values[downmix_type_5to2]);
+        if (phaseshift_90deg_5to2<phaseshift_90deg_5to2_Size)
+            Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata Downmix_5to2_90deg", phaseshift_90deg_5to2_Values[phaseshift_90deg_5to2]);
         if (warp_mode!=4) // Avoid "Not indicated"
-            Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata WarpMode", warp_mode<warp_mode_Name_Size?warp_mode_Name[warp_mode]:Ztring().ToZtring(warp_mode).To_UTF8().c_str());
-    FILLING_END()
+            Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata Downmix_5.1.x", warp_mode<warp_mode_Name_Size?warp_mode_Name[warp_mode]:Ztring().ToZtring(warp_mode).To_UTF8().c_str());
+        if (frames_per_second && frames_per_second<frames_per_second_Size)
+        {
+            Ztring FrameRate; FrameRate.From_Number(frames_per_second_Values[frames_per_second]);
+            Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate", FrameRate);
+            FrameRate+=__T(" FPS");
+            switch (frames_per_second)
+            {
+                case 4:
+                case 5:
+                    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate/String", FrameRate+(frames_per_second==4?__T(" DF"):__T(" NDF")));
+                    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate_DropFrame", frames_per_second==4?"Yes":"No");
+                    break;
+                default:
+                    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate/String", FrameRate);
+            }
+            Fill_SetOptions(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate", "N NTY");
+            Fill_SetOptions(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate/String", "Y NTN");
+            Fill_SetOptions(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate_DropFrame", "N NTY");
+        }
+        FILLING_END()
 }
 
 //---------------------------------------------------------------------------
@@ -273,6 +337,15 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
         TrimAutoSet.set(auto_trim);
         if (auto_trim)
         {
+            switch (cfg)
+            {
+                case 1: // 5.1
+                case 2: // 7.1
+                case 4: // 5.1.2
+                    break;
+                default:
+                    Fill_SetOptions(Stream_Audio, 0, FieldPrefix.c_str(), "N N Y");
+            }
             Skip_XX(14,                                         "reserved");
             Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center").c_str(), "Automatic");
             Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center").c_str(), "N NTY");

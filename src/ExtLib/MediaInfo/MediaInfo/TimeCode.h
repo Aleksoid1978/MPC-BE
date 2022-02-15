@@ -27,7 +27,9 @@ public:
     TimeCode ();
     TimeCode (int8u Hours, int8u Minutes, int8u Seconds, int8u Frames, int8u FramesPerSecond, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField=false);
     TimeCode (int64s Frames, int8u FramesPerSecond, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField_=false);
-    TimeCode (const string& Value) {FromString(Value);}
+    TimeCode(const char* Value, size_t Length); // return false if all fine
+    TimeCode(const char* Value) { *this = TimeCode(Value, strlen(Value)); }
+    TimeCode(const string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
 
     //Operators
     TimeCode &operator ++()

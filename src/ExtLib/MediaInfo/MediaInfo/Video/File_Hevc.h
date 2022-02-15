@@ -349,6 +349,7 @@ private :
     //Elements
     void slice_segment_layer();
     void video_parameter_set();
+    void video_parameter_sets_creating_data(int8u vps_video_parameter_set_id, int8u vps_max_sub_layers_minus1);
     void seq_parameter_set();
     void pic_parameter_set();
     void access_unit_delimiter();

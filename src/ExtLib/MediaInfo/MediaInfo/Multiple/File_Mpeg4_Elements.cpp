@@ -241,14 +241,14 @@ const char* Mpeg4_chan(int16u Ordering)
         case 106 : return "Front: L R (Binaural)";
         case 107 : return "Front: W X Y Z";
         case 108 : return "Front: L R, Side: L R";
-        case 109 : return "Front: L C R, Rear: L R";
-        case 110 : return "Front: L C R, Rear: L C R";
-        case 111 : return "Front: L C R, Side: L R, Rear: L C R";
-        case 112 : return "Front: L R, TopFront: L R, Rear: L R, TopRear: L R";
+        case 109 : return "Front: L C R, Back: L R";
+        case 110 : return "Front: L C R, Back: L C R";
+        case 111 : return "Front: L C R, Side: L R, Back: L C R";
+        case 112 : return "Front: L R, TopFront: L R, Back: L R, TopRear: L R";
         case 113 : return "Front: L C R";
         case 114 : return "Front: L C R";
-        case 115 : return "Front: L C R, Rear: C";
-        case 116 : return "Front: L C R, Rear: C";
+        case 115 : return "Front: L C R, Back: C";
+        case 116 : return "Front: L C R, Back: C";
         case 117 : return "Front: L C R, Side: L R";
         case 118 : return "Front: L C R, Side: L R";
         case 119 : return "Front: L C R, Side: L R";
@@ -260,25 +260,25 @@ const char* Mpeg4_chan(int16u Ordering)
         case 125 : return "Front: L C R, Side: L C R";
         case 126 : return "Front: L Lc C Rc R, Side: L R";
         case 127 : return "Front: L Lc Rc R, Side: L R, LFE";
-        case 128 : return "Front: L C R, Side: L R, Rear: L R, LFE";
-        case 129 : return "Front: L C R, Side: L R, Rear: L R, LFE";
+        case 128 : return "Front: L C R, Side: L R, Back: L R, LFE";
+        case 129 : return "Front: L C R, Side: L R, Back: L R, LFE";
         case 130 : return "Front: L C R, Side: L R, LF, Front: L R (Matrix)";
-        case 131 : return "Front: L R, Rear: C";
+        case 131 : return "Front: L R, Back: C";
         case 132 : return "Front: L R, Side: L R";
         case 133 : return "Front: L R, LFE";
-        case 134 : return "Front: L R, Rear: C, LFE";
+        case 134 : return "Front: L R, Back: C, LFE";
         case 135 : return "Front: L C R, Side: L R, LFE";
         case 136 : return "Front: L C R, LFE";
-        case 137 : return "Front: L C R, Rear: C, LFE";
-        case 138 : return "Front: L R, Rear: L R, LFE";
-        case 139 : return "Front: L C R, Rear: L R, LFE";
-        case 140 : return "Front: L C R, Side: L R, Rear: L R";
-        case 141 : return "Front: L C R, Side: L R, Rear: C";
-        case 142 : return "Front: L C R, Side: L R, Rear: C, LFE";
-        case 143 : return "Front: L C R, Side: L R, Rear: L R";
-        case 144 : return "Front: L C R, Side: L R, Rear: L C R";
-        case 145 : return "Front: Lw L C R Rw, TopFront: L C R, Side: L R, Rear: L C Cd R, LFE: L R"; //d=direct, all must be confirmed
-        case 146 : return "Front: Lw L Lc C Rc R Rw, TopFront: L C R, Side: L R, Rear: L C Cd R, LFE: L R, HI, VI, Haptic"; //d=direct, all must be confirmed
+        case 137 : return "Front: L C R, Back: C, LFE";
+        case 138 : return "Front: L R, Back: L R, LFE";
+        case 139 : return "Front: L C R, Back: L R, LFE";
+        case 140 : return "Front: L C R, Side: L R, Back: L R";
+        case 141 : return "Front: L C R, Side: L R, Back: C";
+        case 142 : return "Front: L C R, Side: L R, Back: C, LFE";
+        case 143 : return "Front: L C R, Side: L R, Back: L R";
+        case 144 : return "Front: L C R, Side: L R, Back: L C R";
+        case 145 : return "Front: Lw L C R Rw, TopFront: L C R, Side: L R, Back: L C Cd R, LFE: L R"; //d=direct, all must be confirmed
+        case 146 : return "Front: Lw L Lc C Rc R Rw, TopFront: L C R, Side: L R, Back: L C Cd R, LFE: L R, HI, VI, Haptic"; //d=direct, all must be confirmed
         default  : return "";
     }
 }
@@ -337,7 +337,7 @@ const char* Mpeg4_chan_Layout(int16u Ordering)
         case 125 : return "L R C LFE Ls Rs Cs";
         case 126 : return "L R C LFE Ls Rs Lc Rc";
         case 127 : return "C Lc Rc L R Ls Rs LFE";
-        case 128 : return "L R C LFE Ls R Rls Rrs";
+        case 128 : return "L R C LFE Ls Rs Lrs Rrs";
         case 129 : return "L R Ls Rs C LFE Lc Rc";
         case 130 : return "L R C LFE Ls Rs Lt Rt";
         case 131 : return "L R Cs";
@@ -349,11 +349,11 @@ const char* Mpeg4_chan_Layout(int16u Ordering)
         case 137 : return "L R C LFE Cs";
         case 138 : return "L R Ls Rs LFE";
         case 139 : return "L R Ls Rs C Cs";
-        case 140 : return "L R Ls Rs C Rls Rrs";
+        case 140 : return "L R Ls Rs C Lrs Rrs";
         case 141 : return "C L R Ls Rs Cs ";
         case 142 : return "C L R Ls Rs Cs LFE";
-        case 143 : return "C L R Ls Rs Rls Rrs";
-        case 144 : return "C L R Ls Rs Rls Rrs Cs";
+        case 143 : return "C L R Ls Rs Lrs Rrs";
+        case 144 : return "C L R Ls Rs Lrs Rrs Cs";
         case 145 : return "L R C Vhc Lsd Rsd Ls Rs Vhl Vhr Lw Rw Csd Cs LFE1 LFE2";
         case 146 : return "L R C Vhc Lsd Rsd Ls Rs Vhl Vhr Lw Rw Csd Cs LFE1 LFE2 Lc Rc HI VI Haptic";
         case 147 : return "";
@@ -522,13 +522,13 @@ static const char* Mpeg4_chan_ChannelBitmap_Layout (int32u ChannelBitmap)
         case   1 : return "R";      // Right
         case   2 : return "C";      // Center
         case   3 : return "LFE";    // LFEScreen
-        case   4 : return "Ls";     // LeftSurround / Back Left
-        case   5 : return "Rs";     // RightSurround / Back Right
+        case   4 : return "Lb";     // LeftSurround / Back Left
+        case   5 : return "Rb";     // RightSurround / Back Right
         case   6 : return "?";      // LeftCenter
         case   7 : return "?";      // RightCenter
-        case   8 : return "Cs";     // CenterSurround / Back Center
-        case   9 : return "Lsd";    // LeftSurroundDirect / Side Left
-        case  10 : return "Rsd";    // RightSurroundDirect / Side Right
+        case   8 : return "Cb";     // CenterSurround / Back Center
+        case   9 : return "Ls";     // LeftSurroundDirect / Side Left
+        case  10 : return "Rs";     // RightSurroundDirect / Side Right
         case  11 : return "?";      // TopCenterSurround
         case  12 : return "?";      // VerticalHeightLeft / Top Front Left
         case  13 : return "?";      // VerticalHeightCenter / Top Front Center
@@ -827,6 +827,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_schm=0x7363686D;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_wave=0x77617665;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_wave_acbf=0x61636266;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_wave_dec3=0x64656333;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_wave_enda=0x656E6461;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_wave_frma=0x66726D61;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_wave_samr=0x73616D72;
@@ -1229,6 +1230,7 @@ void File_Mpeg4::Data_Parse()
                                     ATOM_BEGIN
                                     ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_esds)
                                     ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_wave_acbf)
+                                    ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_wave_dec3)
                                     ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_wave_enda)
                                     ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_wave_frma)
                                     ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_wave_samr)
@@ -2609,6 +2611,9 @@ void File_Mpeg4::meta_iprp_ipma()
         const int8u* Buffer_Save=Buffer;
         size_t Buffer_Offset_Save=Buffer_Offset;
         size_t Buffer_Size_Save=Buffer_Size;
+        int8u* Buffer_Temp_Save=Buffer_Temp;
+        size_t Buffer_Temp_Size_Save=Buffer_Temp_Size;
+        size_t Buffer_Temp_Size_Max_Save=Buffer_Temp_Size_Max;
         int64u File_Offset_Save=File_Offset;
         int64u Element_Size_Save=Element_Size;
         Buffer=meta_iprp_ipco_Buffer;
@@ -2628,6 +2633,9 @@ void File_Mpeg4::meta_iprp_ipma()
         File_Offset=File_Offset_Save;
         Element_Offset=Element_Size_Save;
         Element_Size=Element_Size_Save;
+        Buffer_Temp=Buffer_Temp_Save;
+        Buffer_Temp_Size=Buffer_Temp_Size_Save;
+        Buffer_Temp_Size_Max=Buffer_Temp_Size_Max_Save;
         delete[] meta_iprp_ipco_Buffer; meta_iprp_ipco_Buffer=NULL;
         Element_Begin0();
         Element[Element_Level].Code=Elements::meta_iprp_ipma;
@@ -6445,22 +6453,27 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_chan()
     Get_B4 (ChannelLayoutTag,                                   "ChannelLayoutTag");
     Get_B4 (ChannelBitmap,                                      "ChannelBitmap");
     Get_B4 (NumberChannelDescriptions,                          "NumberChannelDescriptions");
-    if (ChannelLayoutTag==0) //UseChannelDescriptions
+    //if (ChannelLayoutTag==0) //UseChannelDescriptions
     {
         for (int32u Pos=0; Pos<NumberChannelDescriptions; Pos++)
         {
+            Element_Begin1("ChannelDescription");
             int32u ChannelLabel;
             Get_B4 (ChannelLabel,                                   "ChannelLabel");
+            string ChannelLayout=Mpeg4_chan_ChannelDescription_Layout(ChannelLabel);
+            Param_Info1(ChannelLayout);
+            Element_Info1(ChannelLayout);
             if (ChannelLabel<64)
                 ChannelLabels|=(((int64u)1)<<ChannelLabel);
             else
                 ChannelLabels_Valid=false;
-            ChannelDescription_Layout+=Mpeg4_chan_ChannelDescription_Layout(ChannelLabel);
+            ChannelDescription_Layout+=ChannelLayout;
             ChannelDescription_Layout+=__T(' ');
             Skip_B4(                                                "ChannelFlags");
             Skip_BF4(                                               "Coordinates (0)");
             Skip_BF4(                                               "Coordinates (1)");
             Skip_BF4(                                               "Coordinates (2)");
+            Element_End0();
         }
         if (!ChannelDescription_Layout.empty())
             ChannelDescription_Layout.resize(ChannelDescription_Layout.size()-1);
@@ -6470,15 +6483,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_chan()
         return; //Handling only the first description
 
     FILLING_BEGIN();
-        if (ChannelLayoutTag==0) //UseChannelDescriptions
-        {
-            Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, ChannelDescription_Layout.c_str(), Unlimited, true, true);
-            if (ChannelLabels_Valid)
-                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, Mpeg4_chan_ChannelDescription(ChannelLabels), true, true);
-            else
-                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, ChannelDescription_Layout);
-        }
-        else if (ChannelLayoutTag==0x10000) //UseChannelBitmap
+        if (ChannelLayoutTag==0x10000) //UseChannelBitmap
         {
             int8u Channels=0;
             for (size_t Bit=0; Bit<18; Bit++)
@@ -6504,8 +6509,36 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_chan()
             //int16u Channels=ChannelLayoutTag&0x0000FFFF;
             int16u Ordering=(ChannelLayoutTag&0xFFFF0000)>>16;
             //Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Channels, 10, true); //Channel count from this atom should not be used as a primary source, it may be wrong
-            Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, Mpeg4_chan(Ordering), Unlimited, true, true);
-            Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, Mpeg4_chan_Layout(Ordering));
+            if (Ordering==100 && ChannelDescription_Layout=="M")
+            {
+                // ChannelDescription_Layout is more precise, it does the difference between C and Mono
+                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, "Mono", Unlimited, true, true);
+                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, "M", Unlimited, true, true);
+            }
+            else
+            {
+                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, Mpeg4_chan(Ordering), Unlimited, true, true);
+                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, Mpeg4_chan_Layout(Ordering), Unlimited, true, true);
+            }
+        }
+        if (!ChannelDescription_Layout.empty()) //UseChannelDescriptions
+        {
+            Ztring ChannelLayout_Previous=Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_ChannelLayout);
+            ChannelLayout_Previous.FindAndReplace(__T("Rls"), __T("Lrs"), 0, Ztring_Recursive); //TODO: there is a mix of "Rls" and "Lrs", should use "Rls" everywhere in MOV due to specs
+            if (ChannelLayout_Previous.To_UTF8()!=ChannelDescription_Layout)
+                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, ChannelDescription_Layout.c_str());
+            if (ChannelLabels_Valid)
+            {
+                Ztring ChannelPositions_Previous=Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_ChannelPositions);
+                ChannelPositions_Previous.FindAndReplace(__T("Rear:"), __T("Back:"), 0, Ztring_Recursive); //TODO: there is a mix of "Rear" and "Back", should use "Rear" everywhere
+                string ChannelDescription=Mpeg4_chan_ChannelDescription(ChannelLabels);
+                if (ChannelPositions_Previous.To_UTF8()!=ChannelDescription)
+                    Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, ChannelDescription);
+            }
+            else
+            {
+                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, ChannelDescription_Layout);
+            }
         }
     FILLING_END();
 }

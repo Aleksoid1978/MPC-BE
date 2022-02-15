@@ -1202,7 +1202,7 @@ protected :
     void Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, size_t StreamPos, size_t Parameter);
 
     void Tags ();
-    float64 Video_FrameRate_Rounded (const Ztring& Value);
+    float64 Video_FrameRate_Rounded (float64 Value);
     void Video_FrameRate_Rounding (stream_t StreamKind, size_t Pos, size_t Parameter);
     void Video_BitRate_Rounding (size_t Pos, video Parameter);
     void Audio_BitRate_Rounding (size_t Pos, audio Parameter);

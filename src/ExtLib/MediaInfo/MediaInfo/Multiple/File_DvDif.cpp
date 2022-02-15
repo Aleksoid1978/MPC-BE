@@ -275,6 +275,8 @@ File_DvDif::File_DvDif()
     Speed_FrameCount_Stts_Fluctuation=0;
     Speed_FrameCount_system[0]=0;
     Speed_FrameCount_system[1]=0;
+    FSC_WasSet_Sum=0;
+    FSC_WasNotSet_Sum=0;
     AbstBf_Current=(0x7FFFFF)<<1;
     AbstBf_Previous=(0x7FFFFF)<<1;
     AbstBf_Previous_MaxAbst=0xFFFFFF;

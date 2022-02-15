@@ -813,7 +813,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                             Valeur.erase(SeparatorPos);
                         }
                     }
-                    if ((XML_0_7_78 || JSON) && (Nom==__T("Format_Profile") || Nom==__T("SamplingRate") || Nom==__T("Channel(s)") || Nom==__T("ChannelPositions") || Nom==__T("ChannelLayout")))
+                    if ((XML_0_7_78 || JSON) && StreamKind==Stream_Audio && (Nom==__T("Format_Profile") || Nom==__T("SamplingRate") || Nom==__T("Channel(s)") || Nom==__T("ChannelPositions") || Nom==__T("ChannelLayout")))
                     {
                         size_t SlashPos = Valeur.find(__T(" / "));
                         if (SlashPos!=string::npos)

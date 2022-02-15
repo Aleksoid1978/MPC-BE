@@ -131,8 +131,8 @@ static const char*  DTS_ChannelLayout[16]=
     "C L R Ls Rs",
     "Cl Cr L R Ls Rs",
     "C L R Ls Rs",
-    "C L R Ls Rs Rls Rrs",
-    "C L R Ls Rs Rls Rrs",
+    "C L R Ls Rs Lrs Rrs",
+    "C L R Ls Rs Lrs Rrs",
     "L R Ls Rs Rls Cs Cs Rrs",
     "C L R Ls Rs Rls Cs Rrs",
 };
@@ -1074,7 +1074,7 @@ void File_Dts::Data_Parse()
         if (!Word)
             Primary_Frame_Byte_Size=Primary_Frame_Byte_Size*16/14; //Word is on 14 bits
         Param_Info2(Primary_Frame_Byte_Size, " bytes");
-        Get_S1 ( 6, channel_arrangement,                            "Audio Channel Arrangement"); Param_Info2(DTS_Channels[channel_arrangement], " channels");
+        Get_S1 ( 6, channel_arrangement,                            "Audio Channel Arrangement"); Param_Info2C(channel_arrangement<sizeof(DTS_Channels), DTS_Channels[channel_arrangement], " channels");
         Core_Core_AMODE=channel_arrangement;
         Get_S1 ( 4, sample_frequency,                               "Core Audio Sampling Frequency"); Param_Info2(DTS_SamplingRate[sample_frequency], " Hz");
         Get_S1 ( 5, bit_rate,                                       "Transmission Bit Rate"); Param_Info2(DTS_BitRate[bit_rate], " bps");

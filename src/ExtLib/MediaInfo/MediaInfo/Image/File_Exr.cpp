@@ -117,11 +117,12 @@ void File_Exr::FileHeader_Parse()
     bool Deep, Multipart;
     Skip_L4(                                                    "Magic number");
     Get_L1 (Version,                                            "Version field");
+    //Note that bit 0 is unused
     Get_L3 (Flags,                                              "Flags");
-        Skip_Flags(Flags, 0,                                    "Single tile");
-        Get_Flags (Flags, 1, LongName,                          "Long name");
-        Get_Flags (Flags, 2, Deep,                              "Non-image");
-        Get_Flags (Flags, 3, Multipart,                         "Multipart");
+        Skip_Flags(Flags, 1,                                    "Single tile");
+        Get_Flags (Flags, 2, LongName,                          "Long name");
+        Get_Flags (Flags, 3, Deep,                              "Non-image");
+        Get_Flags (Flags, 4, Multipart,                         "Multipart");
 
     //Filling
     if (Frame_Count==0)

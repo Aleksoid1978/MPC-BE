@@ -1458,8 +1458,8 @@ static const char* Mxf_ChannelAssignment_ChannelLayout(const int128u& ChannelLay
                                                     switch (ChannelsCount)
                                                     {
                                                         case  6 : return "L R C LFE Ls Rs";
-                                                        case  8 : return "L R C LFE Ls Rs Rls Rrs";
-                                                        default : return "L R C LFE Ls Rs Rls Rrs HI VI-N";
+                                                        case  8 : return "L R C LFE Ls Rs Lrs Rrs";
+                                                        default : return "L R C LFE Ls Rs Lrs Rrs HI VI-N";
                                                     }
                                         default   : return "";
                                     }
@@ -3662,10 +3662,13 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
         Ztring MasteringDisplay_ColorPrimaries;
         Ztring MasteringDisplay_Luminance;
         Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, MasteringMeta);
-        Descriptor->second.Infos["HDR_Format"]="SMPTE ST 2086";
-        Descriptor->second.Infos["HDR_Format_Compatibility"]="HDR10";
-        Descriptor->second.Infos["MasteringDisplay_ColorPrimaries"]=MasteringDisplay_ColorPrimaries;
-        Descriptor->second.Infos["MasteringDisplay_Luminance"]=MasteringDisplay_Luminance;
+        if (!MasteringDisplay_ColorPrimaries.empty())
+        {
+            Descriptor->second.Infos["HDR_Format"]="SMPTE ST 2086";
+            Descriptor->second.Infos["HDR_Format_Compatibility"]="HDR10";
+            Descriptor->second.Infos["MasteringDisplay_ColorPrimaries"]=MasteringDisplay_ColorPrimaries;
+            Descriptor->second.Infos["MasteringDisplay_Luminance"]=MasteringDisplay_Luminance;
+        }
 
         for (std::map<std::string, Ztring>::iterator Info=Descriptor->second.Infos.begin(); Info!=Descriptor->second.Infos.end(); ++Info)
             if (Info!=Info_MasteringDisplay_Primaries

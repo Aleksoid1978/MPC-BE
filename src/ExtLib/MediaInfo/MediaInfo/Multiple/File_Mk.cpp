@@ -1157,49 +1157,49 @@ void File_Mk::Streams_Finish()
             }
         }
 
-        if (Temp->second.Parser)
+        //Delay
+        if (Temp->second.TimeCode_Start!=(int64u)-1 && TimecodeScale)
         {
-            //Delay
-            if (Temp->second.TimeCode_Start!=(int64u)-1 && TimecodeScale)
+            //From TimeCode
+            float64 Delay=Temp->second.TimeCode_Start*int64u_float64(TimecodeScale)/1000000.0;
+
+            //From stream format
+            if (Temp->second.Parser && StreamKind_Last==Stream_Audio && Count_Get(Stream_Video)==1 && Temp->second.Parser->Count_Get(Stream_General)>0)
             {
-                //From TimeCode
-                float64 Delay=Temp->second.TimeCode_Start*int64u_float64(TimecodeScale)/1000000.0;
-
-                //From stream format
-                if (StreamKind_Last==Stream_Audio && Count_Get(Stream_Video)==1 && Temp->second.Parser->Count_Get(Stream_General)>0)
+                     if (Temp->second.Parser->Buffer_TotalBytes_FirstSynched==0)
+                    ;
+                else if (Temp->second.AvgBytesPerSec!=0)
+                    Delay+=((float64)Temp->second.Parser->Buffer_TotalBytes_FirstSynched)*1000/Temp->second.AvgBytesPerSec;
+                else
                 {
-                         if (Temp->second.Parser->Buffer_TotalBytes_FirstSynched==0)
-                        ;
-                    else if (Temp->second.AvgBytesPerSec!=0)
-                        Delay+=((float64)Temp->second.Parser->Buffer_TotalBytes_FirstSynched)*1000/Temp->second.AvgBytesPerSec;
-                    else
-                    {
-                        int64u BitRate = Temp->second.Parser->Retrieve(Stream_Audio, 0, Audio_BitRate).To_int64u();
-                        if (BitRate == 0)
-                            BitRate = Temp->second.Parser->Retrieve(Stream_Audio, 0, Audio_BitRate_Nominal).To_int64u();
-                        if (BitRate)
-                            Delay += ((float64)Temp->second.Parser->Buffer_TotalBytes_FirstSynched) * 1000 / BitRate;
-                    }
-                }
-
-                //Filling
-                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay), Delay, 0, true);
-                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
-
-                const Ztring &DurationS=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration));
-                float64 Duration=DurationS.To_float64();
-                if (!HasStats && Duration && Duration>=Delay) //Not sure about when tats are present, so for the moment we remove delay from duration only if there is no stats, Duration looks like more lie timestamp of the end of the last frame with the example we got
-                {
-                    Duration-=Delay;
-                    size_t DotPos=DurationS.find(__T('.'));
-                    if (DotPos == (size_t)-1)
-                        DotPos = DurationS.size();
-                    else
-                        DotPos++;
-                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Duration, DurationS.size()-DotPos, true);
+                    int64u BitRate = Temp->second.Parser->Retrieve(Stream_Audio, 0, Audio_BitRate).To_int64u();
+                    if (BitRate == 0)
+                        BitRate = Temp->second.Parser->Retrieve(Stream_Audio, 0, Audio_BitRate_Nominal).To_int64u();
+                    if (BitRate)
+                        Delay += ((float64)Temp->second.Parser->Buffer_TotalBytes_FirstSynched) * 1000 / BitRate;
                 }
             }
 
+            //Filling
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay), Delay, 0, true);
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
+
+            const Ztring &DurationS=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration));
+            float64 Duration=DurationS.To_float64();
+            if (!HasStats && Duration && Duration>=Delay) //Not sure about when tats are present, so for the moment we remove delay from duration only if there is no stats, Duration looks like more lie timestamp of the end of the last frame with the example we got
+            {
+                Duration-=Delay;
+                size_t DotPos=DurationS.find(__T('.'));
+                if (DotPos == (size_t)-1)
+                    DotPos = DurationS.size();
+                else
+                    DotPos++;
+                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Duration, DurationS.size()-DotPos, true);
+            }
+        }
+
+        if (Temp->second.Parser)
+        {
             Ztring Codec_Temp=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec)); //We want to keep the 4CC;
             //if (Duration_Temp.empty()) Duration_Temp=Retrieve(StreamKind_Last, Temp->second.StreamPos, Fill_Parameter(StreamKind_Last, Generic_Duration)); //Duration from stream is sometimes false
             //else Duration_Temp.clear();

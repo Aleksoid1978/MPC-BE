@@ -55,6 +55,8 @@ private :
     //Temp
     File__Analyze* Parser;
     int64u FrameDurationNanoSeconds;
+    int8u FrameRate;
+    bool  FrameRate_Is1001;
     TimeCode TimeCode_FirstFrame;
 };
 

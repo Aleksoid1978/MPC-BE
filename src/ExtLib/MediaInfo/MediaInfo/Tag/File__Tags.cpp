@@ -357,6 +357,7 @@ bool File__Tags_Helper::Synched_Test()
         {
             if (!Parser_Buffer_Size)
             {
+                Base->Element_End0();
                 delete Parser; Parser=NULL;
                 return false; //Probably stuck in a loop, exit
             }

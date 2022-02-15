@@ -2078,7 +2078,7 @@ void File__Analyze::Get_Flags (int64u ValueToPut, int8u &Info, const char* Name)
 void File__Analyze::Skip_Flags(int64u Flags, size_t Order, const char* Name)
 {
     Element_Begin0();
-    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_MICRO_XML) Param(Name, (Flags&((int64u)1<<Order))); //TODO: support flags in XML trace
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_MICRO_XML) Param(Name, (bool)((Flags>>Order)&1));
     Element_End0();
 }
 

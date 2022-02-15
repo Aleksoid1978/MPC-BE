@@ -202,7 +202,7 @@ const char*  DolbyE_ChannelPositions[64]=
     "Front: L R / Front: L R",
     "Front: L R / Front: C / Front: C",
     "Front: C / Front: C / Front: C / Front: C",
-    "Front: L C R, Side: L R, Rear: L R, LFE",
+    "Front: L C R, Side: L R, Back: L R, LFE",
     "Front: L C C C R, Side: L R, LFE",
     "",
     "",
@@ -309,7 +309,7 @@ const char*  DolbyE_ChannelPositions_PerProgram(int8u program_config, int8u prog
         case 17 :
         case 21 :   return "Front: C";
         case 11 :   return "Front: L C R, Side: L R, LFE";
-        case 22 :   return "Front: L C R, Side: L R, Rear: L R, LFE";
+        case 22 :   return "Front: L C R, Side: L R, Back: L R, LFE";
         case 23 :   return "Front: L C C C R, Side: L R, LFE";
         default :   return "";
     }
@@ -963,7 +963,9 @@ File_DolbyE::File_DolbyE()
 
     //Temp
     SMPTE_time_code_StartTimecode=(int64u)-1;
+    frame_rate_code=0;
     FrameInfo.DTS=0;
+    program_config=0;
 }
 
 //***************************************************************************

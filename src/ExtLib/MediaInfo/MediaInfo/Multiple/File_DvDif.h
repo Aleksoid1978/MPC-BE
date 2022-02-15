@@ -209,6 +209,8 @@ protected :
             StoredValues.clear();
         }
     };
+    int16u FSC_WasSet_Sum;
+    int16u FSC_WasNotSet_Sum;
     abst_bf AbstBf_Current_Weighted;
     int32u AbstBf_Current;
     int32u AbstBf_Previous;
@@ -309,8 +311,18 @@ protected :
     bitset<32> Coherency_Flags;
     std::vector<std::vector<int8u> > audio_source_mode; //Per ChannelGroup and Dseq, -1 means not present
     bitset<ChannelGroup_Count*2> ChannelInfo;
-    std::vector<std::vector<size_t> > Audio_Errors; //Per ChannelGroup and Dseq
+    struct audio_errors
+    {
+        size_t Count;
+        std::set<int16u> Values;
+
+        audio_errors():
+            Count(0)
+        {}
+    };
+    std::vector<std::vector<audio_errors> > Audio_Errors; //Per ChannelGroup and Dseq
     std::vector<std::vector<size_t> > Audio_Errors_TotalPerChannel; //Per Channel and Dseq
+
     struct recZ_Single
     {
         int64u FramePos;

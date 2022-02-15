@@ -44,10 +44,10 @@ static const char*  Opus_ChannelPositions[Opus_ChannelLayout_Max]=
     "Front: L R",
     "Front: L C R",
     "Front: L R,   Rear: L R",
-    "Front: L C R, Rear: L R",
-    "Front: L C R, Rear: L R, LFE",
-    "Front: L C R, Side: L R, Rear: C, LFE",
-    "Front: L C R, Side: L R, Rear: L R, LFE",
+    "Front: L C R, Back: L R",
+    "Front: L C R, Back: L R, LFE",
+    "Front: L C R, Side: L R, Back: C, LFE",
+    "Front: L C R, Side: L R, Back: L R, LFE",
 };
 
 //---------------------------------------------------------------------------

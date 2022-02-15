@@ -1383,14 +1383,14 @@ void File_Ac3::Streams_Fill()
     //TimeStamp
     if (TimeStamp_IsPresent)
     {
-        Ztring TimeCode_FrameRate=Ztring::ToZtring((float64)TimeStamp_FirstFrame.FramesPerSecond/((TimeStamp_FirstFrame.DropFrame|TimeStamp_FirstFrame.FramesPerSecond_Is1001)?1.001:1.000), 3);
+        Ztring TimeCode_FrameRate=Ztring::ToZtring((float64)TimeStamp_FirstFrame.FramesPerSecond/((TimeStamp_FirstFrame.DropFrame || TimeStamp_FirstFrame.FramesPerSecond_Is1001)?1.001:1.000), 3);
         if (TimeStamp_FirstFrame.MoreSamples)
             TimeStamp_FirstFrame.MoreSamples_Frequency=Retrieve(Stream_Audio, 0, Audio_SamplingRate).To_int32s();
         Fill(Stream_Audio, 0, "TimeCode_FirstFrame", TimeStamp_FirstFrame.ToString());
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame", "N YCY");
         Fill(Stream_Audio, 0, "TimeCode_FirstFrame/String", TimeStamp_FirstFrame.ToString()+" ("+TimeCode_FrameRate.To_UTF8()+" fps), embedded in stream");
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame/String", "Y NTN");
-        Fill(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", TimeStamp_FirstFrame.ToString());
+        Fill(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", TimeCode_FrameRate);
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", "N YFY");
         Fill(Stream_Audio, 0, "TimeCode_Source", "Stream");
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_Source", "N YTY");
@@ -2570,7 +2570,7 @@ void File_Ac3::Core_Frame()
             TEST_SB_END();
 
             TEST_SB_SKIP(                                           "infomdate");
-                Skip_S1(3,                                          "bsmod");
+                Get_S1 (3, bsmod,                                   "bsmod - Bit Stream Mode"); Param_Info1(AC3_Mode[bsmod]);
                 Skip_SB(                                            "copyrightb - Copyright Bit");
                 Skip_SB(                                            "origbs - Original Bit Stream");
                 if (acmod==0x2)
@@ -4696,7 +4696,7 @@ bool File_Ac3::FrameSynchPoint_Test()
         if (Size>=6)
         {
             size_t Size_Total=Core_Size_Get();
-            if (Element_IsWaitingForMoreData())
+            if (Element_IsWaitingForMoreData() || Buffer_Offset+Size_Total>=Buffer_Size)
                 return false; //Need more data
 
             Save_Buffer=Buffer;
