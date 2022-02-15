@@ -2081,7 +2081,11 @@ FLAC__bool read_frame_(FLAC__StreamDecoder *decoder, FLAC__bool *got_a_frame, FL
 	frame_crc = FLAC__bitreader_get_read_crc16(decoder->private_->input);
 	if(!FLAC__bitreader_read_raw_uint32(decoder->private_->input, &x, FLAC__FRAME_FOOTER_CRC_LEN))
 		return false; /* read_callback_ sets the state for us */
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+	if(1){
+#else
 	if(frame_crc == x) {
+#endif
 		if(do_full_decode) {
 			/* Undo any special channel coding */
 			switch(decoder->private_->frame.header.channel_assignment) {
@@ -2355,9 +2359,16 @@ FLAC__bool read_frame_header_(FLAC__StreamDecoder *decoder)
 			break;
 	}
 
+	if(decoder->private_->frame.header.bits_per_sample == 32 && decoder->private_->frame.header.channel_assignment != FLAC__CHANNEL_ASSIGNMENT_INDEPENDENT){
+		/* Decoder isn't equipped for 33-bit side frame */
+		is_unparseable = true;
+	}
+
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 	/* check to make sure that reserved bit is 0 */
 	if(raw_header[3] & 0x01) /* MAGIC NUMBER */
 		is_unparseable = true;
+#endif
 
 	/* read the frame's starting sample number (or frame number as the case may be) */
 	if(
@@ -2429,11 +2440,13 @@ FLAC__bool read_frame_header_(FLAC__StreamDecoder *decoder)
 		return false; /* read_callback_ sets the state for us */
 	crc8 = (FLAC__byte)x;
 
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 	if(FLAC__crc8(raw_header, raw_header_len) != crc8) {
 		send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_BAD_HEADER);
 		decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
 		return true;
 	}
+#endif
 
 	/* calculate the sample number from the frame number if needed */
 	decoder->private_->next_fixed_block_size = 0;
@@ -2515,7 +2528,19 @@ FLAC__bool read_subframe_(FLAC__StreamDecoder *decoder, uint32_t channel, uint32
 		return true;
 	}
 	else if(x <= 24) {
-		if(!read_subframe_fixed_(decoder, channel, bps, (x>>1)&7, do_full_decode))
+		uint32_t predictor_order = (x>>1)&7;
+		if(decoder->private_->frame.header.bits_per_sample > 24){
+			/* Decoder isn't equipped for fixed subframes with more than 24 bps */
+			send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_UNPARSEABLE_STREAM);
+			decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
+			return true;
+		}
+		if(decoder->private_->frame.header.blocksize <= predictor_order){
+			send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC);
+			decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
+			return true;
+		}
+		if(!read_subframe_fixed_(decoder, channel, bps, predictor_order, do_full_decode))
 			return false;
 		if(decoder->protected_->state == FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC) /* means bad sync or got corruption */
 			return true;
@@ -2526,7 +2551,13 @@ FLAC__bool read_subframe_(FLAC__StreamDecoder *decoder, uint32_t channel, uint32
 		return true;
 	}
 	else {
-		if(!read_subframe_lpc_(decoder, channel, bps, ((x>>1)&31)+1, do_full_decode))
+		uint32_t predictor_order = ((x>>1)&31)+1;
+		if(decoder->private_->frame.header.blocksize <= predictor_order){
+			send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC);
+			decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
+			return true;
+		}
+		if(!read_subframe_lpc_(decoder, channel, bps, predictor_order, do_full_decode))
 			return false;
 		if(decoder->protected_->state == FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC) /* means bad sync or got corruption */
 			return true;
@@ -2594,7 +2625,8 @@ FLAC__bool read_subframe_fixed_(FLAC__StreamDecoder *decoder, uint32_t channel, 
 		case FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2:
 			if(!FLAC__bitreader_read_raw_uint32(decoder->private_->input, &u32, FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ORDER_LEN))
 				return false; /* read_callback_ sets the state for us */
-			if(decoder->private_->frame.header.blocksize >> u32 < order) {
+			if((decoder->private_->frame.header.blocksize >> u32 < order) ||
+			   (decoder->private_->frame.header.blocksize % (1 << u32) > 0)) {
 				send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC);
 				decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
 				return true;
@@ -2683,7 +2715,8 @@ FLAC__bool read_subframe_lpc_(FLAC__StreamDecoder *decoder, uint32_t channel, ui
 		case FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2:
 			if(!FLAC__bitreader_read_raw_uint32(decoder->private_->input, &u32, FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ORDER_LEN))
 				return false; /* read_callback_ sets the state for us */
-			if(decoder->private_->frame.header.blocksize >> u32 < order) {
+			if((decoder->private_->frame.header.blocksize >> u32 < order) ||
+			   (decoder->private_->frame.header.blocksize % (1 << u32) > 0)) {
 				send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC);
 				decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
 				return true;
@@ -2797,10 +2830,12 @@ FLAC__bool read_zero_padding_(FLAC__StreamDecoder *decoder)
 		FLAC__uint32 zero = 0;
 		if(!FLAC__bitreader_read_raw_uint32(decoder->private_->input, &zero, FLAC__bitreader_bits_left_for_byte_alignment(decoder->private_->input)))
 			return false; /* read_callback_ sets the state for us */
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 		if(zero != 0) {
 			send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC);
 			decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
 		}
+#endif
 	}
 	return true;
 }

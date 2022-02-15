@@ -2610,7 +2610,9 @@ FLAC__bool write_bitbuffer_(FLAC__StreamEncoder *encoder, uint32_t samples, FLAC
 			encoder->private_->verify.needs_magic_hack = true;
 		}
 		else {
-			if(!FLAC__stream_decoder_process_single(encoder->private_->verify.decoder)) {
+			if(!FLAC__stream_decoder_process_single(encoder->private_->verify.decoder)
+			    || (!is_last_block
+				    && (FLAC__stream_encoder_get_verify_decoder_state(encoder) == FLAC__STREAM_DECODER_END_OF_STREAM))) {
 				FLAC__bitwriter_release_buffer(encoder->private_->frame);
 				FLAC__bitwriter_clear(encoder->private_->frame);
 				if(encoder->protected_->state != FLAC__STREAM_ENCODER_VERIFY_MISMATCH_IN_AUDIO_DATA)
