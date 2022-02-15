@@ -28,33 +28,26 @@
 #define UNCHECKED_BITSTREAM_READER 1
 
 #include "libavutil/avassert.h"
-#include "libavutil/display.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/opt.h"
-#include "libavutil/stereo3d.h"
+#include "libavutil/thread.h"
 #include "libavutil/video_enc_params.h"
 
 #include "internal.h"
-#include "bytestream.h"
-#include "cabac.h"
-#include "cabac_functions.h"
 #include "error_resilience.h"
 #include "avcodec.h"
 #include "h264.h"
 #include "h264dec.h"
 #include "h2645_parse.h"
 #include "h264data.h"
-#include "h264chroma.h"
-#include "h264_mvpred.h"
 #include "h264_ps.h"
 #include "golomb.h"
 #include "hwconfig.h"
-#include "mathops.h"
-#include "me_cmp.h"
 #include "mpegutils.h"
 #include "profiles.h"
 #include "rectangle.h"
 #include "thread.h"
+#include "threadframe.h"
 
 const uint16_t ff_h264_mb_sizes[4] = { 256, 384, 512, 768 };
 
@@ -308,7 +301,7 @@ static int h264_init_context(AVCodecContext *avctx, H264Context *h)
     h->sei.unregistered.x264_build = -1;
 
     h->next_outputed_poc = INT_MIN;
-    for (i = 0; i < MAX_DELAYED_PIC_COUNT; i++)
+    for (i = 0; i < FF_ARRAY_ELEMS(h->last_pocs); i++)
         h->last_pocs[i] = INT_MIN;
 
     ff_h264_sei_uninit(&h->sei);
@@ -474,7 +467,7 @@ static void idr(H264Context *h)
     h->poc.prev_frame_num_offset = 0;
     h->poc.prev_poc_msb          = 1<<16;
     h->poc.prev_poc_lsb          = -1;
-    for (i = 0; i < MAX_DELAYED_PIC_COUNT; i++)
+    for (i = 0; i < FF_ARRAY_ELEMS(h->last_pocs); i++)
         h->last_pocs[i] = INT_MIN;
 }
 

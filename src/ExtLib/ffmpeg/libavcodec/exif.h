@@ -30,7 +30,7 @@
 
 #include <stdint.h>
 #include "libavutil/dict.h"
-#include "tiff.h"
+#include "bytestream.h"
 
 #define EXIF_MAX_IFD_RECURSION 2
 #define EXIF_TAG_NAME_LENGTH   32

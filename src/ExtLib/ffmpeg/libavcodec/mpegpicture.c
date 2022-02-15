@@ -29,6 +29,25 @@
 #include "motion_est.h"
 #include "mpegpicture.h"
 #include "mpegutils.h"
+#include "threadframe.h"
+
+static void av_noinline free_picture_tables(Picture *pic)
+{
+    pic->alloc_mb_width  =
+    pic->alloc_mb_height = 0;
+
+    av_buffer_unref(&pic->mb_var_buf);
+    av_buffer_unref(&pic->mc_mb_var_buf);
+    av_buffer_unref(&pic->mb_mean_buf);
+    av_buffer_unref(&pic->mbskip_table_buf);
+    av_buffer_unref(&pic->qscale_table_buf);
+    av_buffer_unref(&pic->mb_type_buf);
+
+    for (int i = 0; i < 2; i++) {
+        av_buffer_unref(&pic->motion_val_buf[i]);
+        av_buffer_unref(&pic->ref_index_buf[i]);
+    }
+}
 
 static int make_tables_writable(Picture *pic)
 {
@@ -112,8 +131,8 @@ static int alloc_frame_buffer(AVCodecContext *avctx,  Picture *pic,
             pic->f->height = avctx->height + 2 * EDGE_WIDTH;
         }
 
-        r = ff_thread_get_buffer(avctx, &pic->tf,
-                                 pic->reference ? AV_GET_BUFFER_FLAG_REF : 0);
+        r = ff_thread_get_ext_buffer(avctx, &pic->tf,
+                                     pic->reference ? AV_GET_BUFFER_FLAG_REF : 0);
     } else {
         pic->f->width  = avctx->width;
         pic->f->height = avctx->height;
@@ -240,7 +259,7 @@ int ff_alloc_picture(AVCodecContext *avctx, Picture *pic, MotionEstContext *me,
     if (pic->qscale_table_buf)
         if (   pic->alloc_mb_width  != mb_width
             || pic->alloc_mb_height != mb_height)
-            ff_free_picture_tables(pic);
+            free_picture_tables(pic);
 
     if (shared) {
         av_assert0(pic->f->data[0]);
@@ -285,12 +304,13 @@ int ff_alloc_picture(AVCodecContext *avctx, Picture *pic, MotionEstContext *me,
 fail:
     av_log(avctx, AV_LOG_ERROR, "Error allocating a picture.\n");
     ff_mpeg_unref_picture(avctx, pic);
-    ff_free_picture_tables(pic);
+    free_picture_tables(pic);
     return AVERROR(ENOMEM);
 }
 
 /**
- * Deallocate a picture.
+ * Deallocate a picture; frees the picture tables in case they
+ * need to be reallocated anyway.
  */
 void ff_mpeg_unref_picture(AVCodecContext *avctx, Picture *pic)
 {
@@ -302,19 +322,19 @@ void ff_mpeg_unref_picture(AVCodecContext *avctx, Picture *pic)
     if (avctx->codec_id != AV_CODEC_ID_WMV3IMAGE &&
         avctx->codec_id != AV_CODEC_ID_VC1IMAGE  &&
         avctx->codec_id != AV_CODEC_ID_MSS2)
-        ff_thread_release_buffer(avctx, &pic->tf);
+        ff_thread_release_ext_buffer(avctx, &pic->tf);
     else if (pic->f)
         av_frame_unref(pic->f);
 
     av_buffer_unref(&pic->hwaccel_priv_buf);
 
     if (pic->needs_realloc)
-        ff_free_picture_tables(pic);
+        free_picture_tables(pic);
 
     memset((uint8_t*)pic + off, 0, sizeof(*pic) - off);
 }
 
-int ff_update_picture_tables(Picture *dst, Picture *src)
+int ff_update_picture_tables(Picture *dst, const Picture *src)
 {
     int i, ret;
 
@@ -330,7 +350,7 @@ int ff_update_picture_tables(Picture *dst, Picture *src)
     }
 
     if (ret < 0) {
-        ff_free_picture_tables(dst);
+        free_picture_tables(dst);
         return ret;
     }
 
@@ -399,7 +419,7 @@ static inline int pic_is_unused(Picture *pic)
 {
     if (!pic->f->buf[0])
         return 1;
-    if (pic->needs_realloc && !(pic->reference & DELAYED_PIC_REF))
+    if (pic->needs_realloc)
         return 1;
     return 0;
 }
@@ -443,30 +463,15 @@ int ff_find_unused_picture(AVCodecContext *avctx, Picture *picture, int shared)
 
     if (ret >= 0 && ret < MAX_PICTURE_COUNT) {
         if (picture[ret].needs_realloc) {
-            picture[ret].needs_realloc = 0;
-            ff_free_picture_tables(&picture[ret]);
             ff_mpeg_unref_picture(avctx, &picture[ret]);
         }
     }
     return ret;
 }
 
-void ff_free_picture_tables(Picture *pic)
+void av_cold ff_mpv_picture_free(AVCodecContext *avctx, Picture *pic)
 {
-    int i;
-
-    pic->alloc_mb_width  =
-    pic->alloc_mb_height = 0;
-
-    av_buffer_unref(&pic->mb_var_buf);
-    av_buffer_unref(&pic->mc_mb_var_buf);
-    av_buffer_unref(&pic->mb_mean_buf);
-    av_buffer_unref(&pic->mbskip_table_buf);
-    av_buffer_unref(&pic->qscale_table_buf);
-    av_buffer_unref(&pic->mb_type_buf);
-
-    for (i = 0; i < 2; i++) {
-        av_buffer_unref(&pic->motion_val_buf[i]);
-        av_buffer_unref(&pic->ref_index_buf[i]);
-    }
+    free_picture_tables(pic);
+    ff_mpeg_unref_picture(avctx, pic);
+    av_frame_free(&pic->f);
 }

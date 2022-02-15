@@ -937,7 +937,6 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_EATGQ_DECODER 0
 #define CONFIG_VDPAU 0
-#define CONFIG_XVMC 0
 
 #define CONFIG_ARESAMPLE_FILTER 1
 #define CONFIG_ATEMPO_FILTER 1
@@ -970,7 +969,6 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_MPEG1_VDPAU_HWACCEL 0
 #define CONFIG_MPEG1_NVDEC_HWACCEL 0
-#define CONFIG_MPEG1_XVMC_HWACCEL 0
 
 #define CONFIG_MPEG2_D3D11VA_HWACCEL 1
 #define CONFIG_MPEG2_D3D11VA2_HWACCEL 1
@@ -979,7 +977,6 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MPEG2_VAAPI_HWACCEL 0
 #define CONFIG_MPEG2_VDPAU_HWACCEL 0
 #define CONFIG_MPEG2_VIDEOTOOLBOX_HWACCEL 0
-#define CONFIG_MPEG2_XVMC_HWACCEL 0
 
 #define CONFIG_MPEG4_VAAPI_HWACCEL 0
 #define CONFIG_MPEG4_VDPAU_HWACCEL 0

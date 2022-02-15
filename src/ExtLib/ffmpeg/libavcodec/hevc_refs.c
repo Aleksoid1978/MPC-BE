@@ -22,12 +22,11 @@
  */
 
 #include "libavutil/avassert.h"
-#include "libavutil/pixdesc.h"
 
-#include "internal.h"
 #include "thread.h"
 #include "hevc.h"
 #include "hevcdec.h"
+#include "threadframe.h"
 
 void ff_hevc_unref_frame(HEVCContext *s, HEVCFrame *frame, int flags)
 {
@@ -37,8 +36,8 @@ void ff_hevc_unref_frame(HEVCContext *s, HEVCFrame *frame, int flags)
 
     frame->flags &= ~flags;
     if (!frame->flags) {
-        ff_thread_release_buffer(s->avctx, &frame->tf);
-        ff_thread_release_buffer(s->avctx, &frame->tf_grain);
+        ff_thread_release_ext_buffer(s->avctx, &frame->tf);
+        ff_thread_release_buffer(s->avctx, frame->frame_grain);
         frame->needs_fg = 0;
 
         av_buffer_unref(&frame->tab_mvf_buf);
@@ -89,8 +88,8 @@ static HEVCFrame *alloc_frame(HEVCContext *s)
         if (frame->frame->buf[0])
             continue;
 
-        ret = ff_thread_get_buffer(s->avctx, &frame->tf,
-                                   AV_GET_BUFFER_FLAG_REF);
+        ret = ff_thread_get_ext_buffer(s->avctx, &frame->tf,
+                                       AV_GET_BUFFER_FLAG_REF);
         if (ret < 0)
             return NULL;
 

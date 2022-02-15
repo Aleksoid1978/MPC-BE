@@ -358,6 +358,7 @@ SRCS_LC = \
 	libavcodec/mpeg4video.c \
 	libavcodec/mpeg4video_parser.c \
 	libavcodec/mpeg4videodec.c \
+	libavcodec/mpeg4videoenc.c \
 	libavcodec/mpegaudio.c \
 	libavcodec/mpegaudio_parser.c \
 	libavcodec/mpegaudiodata.c \
@@ -686,6 +687,10 @@ SRCS_LU = \
 	libavutil/threadmessage.c \
 	libavutil/time.c \
 	libavutil/timecode.c \
+	libavutil/tx.c \
+	libavutil/tx_double.c \
+	libavutil/tx_float.c \
+	libavutil/tx_int32.c \
 	libavutil/utils.c \
 	libavutil/video_enc_params.c \
 	\
@@ -693,7 +698,8 @@ SRCS_LU = \
 	libavutil/x86/fixed_dsp_init.c \
 	libavutil/x86/float_dsp_init.c \
 	libavutil/x86/imgutils_init.c \
-	libavutil/x86/lls_init.c
+	libavutil/x86/lls_init.c \
+	libavutil/x86/tx_float_init.c
 
 SRCS_LR = \
 	libswresample/audioconvert.c \
@@ -821,7 +827,8 @@ SRCS_YASM_LU = \
 	libavutil/x86/fixed_dsp.asm \
 	libavutil/x86/float_dsp.asm \
 	libavutil/x86/imgutils.asm \
-	libavutil/x86/lls.asm
+	libavutil/x86/lls.asm \
+	libavutil/x86/tx_float.asm
 
 SRCS_YASM_LR = \
 	libswresample/x86/audio_convert.asm \

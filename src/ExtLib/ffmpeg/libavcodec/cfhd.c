@@ -378,8 +378,7 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
     CFHDContext *s = avctx->priv_data;
     CFHDDSPContext *dsp = &s->dsp;
     GetByteContext gb;
-    ThreadFrame frame = { .f = data };
-    AVFrame *pic = data;
+    AVFrame *const pic = data;
     int ret = 0, i, j, plane, got_buffer = 0;
     int16_t *coeff_data;
 
@@ -681,10 +680,9 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
                     return AVERROR_INVALIDDATA;
                 avctx->height = height;
             }
-            frame.f->width =
-            frame.f->height = 0;
+            pic->width = pic->height = 0;
 
-            if ((ret = ff_thread_get_buffer(avctx, &frame, 0)) < 0)
+            if ((ret = ff_thread_get_buffer(avctx, pic, 0)) < 0)
                 return ret;
 
             s->coded_width = 0;
@@ -692,10 +690,9 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
             s->coded_format = AV_PIX_FMT_NONE;
             got_buffer = 1;
         } else if (tag == FrameIndex && data == 1 && s->sample_type == 1 && s->frame_type == 2) {
-            frame.f->width =
-            frame.f->height = 0;
+            pic->width = pic->height = 0;
 
-            if ((ret = ff_thread_get_buffer(avctx, &frame, 0)) < 0)
+            if ((ret = ff_thread_get_buffer(avctx, pic, 0)) < 0)
                 return ret;
             s->coded_width = 0;
             s->coded_height = 0;
@@ -838,7 +835,7 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
                             const uint16_t q = s->quantisation;
 
                             for (i = 0; i < run; i++) {
-                                *coeff_data |= coeff * 256;
+                                *coeff_data |= coeff * 256U;
                                 *coeff_data++ *= q;
                             }
                         } else {
@@ -869,7 +866,7 @@ static int cfhd_decode(AVCodecContext *avctx, void *data, int *got_frame,
                             const uint16_t q = s->quantisation;
 
                             for (i = 0; i < run; i++) {
-                                *coeff_data |= coeff * 256;
+                                *coeff_data |= coeff * 256U;
                                 *coeff_data++ *= q;
                             }
                         } else {

@@ -31,7 +31,6 @@
 #include "libavutil/buffer.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem_internal.h"
-#include "libavutil/thread.h"
 
 #include "cabac.h"
 #include "error_resilience.h"
@@ -44,18 +43,11 @@
 #include "h264pred.h"
 #include "h264qpel.h"
 #include "h274.h"
-#include "internal.h"
 #include "mpegutils.h"
-#include "parser.h"
-#include "qpeldsp.h"
 #include "rectangle.h"
 #include "videodsp.h"
 
 #define H264_MAX_PICTURE_COUNT 36
-
-#define MAX_MMCO_COUNT         66
-
-#define MAX_DELAYED_PIC_COUNT  16
 
 /* Compiling in interlaced support reduces the speed
  * of progressive decoding by about 2%. */
@@ -102,23 +94,8 @@
 #define CHROMA422(h) ((h)->ps.sps->chroma_format_idc == 2)
 #define CHROMA444(h) ((h)->ps.sps->chroma_format_idc == 3)
 
-#define MB_TYPE_REF0       MB_TYPE_ACPRED // dirty but it fits in 16 bit
-#define MB_TYPE_8x8DCT     0x01000000
 #define IS_REF0(a)         ((a) & MB_TYPE_REF0)
 #define IS_8x8DCT(a)       ((a) & MB_TYPE_8x8DCT)
-
-/**
- * Memory management control operation opcode.
- */
-typedef enum MMCOOpcode {
-    MMCO_END = 0,
-    MMCO_SHORT2UNUSED,
-    MMCO_LONG2UNUSED,
-    MMCO_SHORT2LONG,
-    MMCO_SET_MAX_LONG,
-    MMCO_RESET,
-    MMCO_LONG,
-} MMCOOpcode;
 
 /**
  * Memory management control operation.
@@ -134,7 +111,6 @@ typedef struct H264Picture {
     ThreadFrame tf;
 
     AVFrame *f_grain;
-    ThreadFrame tf_grain;
 
     AVBufferRef *qscale_table_buf;
     int8_t *qscale_table;
@@ -164,6 +140,11 @@ typedef struct H264Picture {
     int mbaff;              ///< 1 -> MBAFF frame 0-> not MBAFF
     int field_picture;      ///< whether or not picture was encoded in separate fields
 
+/**
+ * H264Picture.reference has this flag set,
+ * when the picture is held for delayed output.
+ */
+#define DELAYED_PIC_REF  (1 << 2)
     int reference;
     int recovered;          ///< picture at IDR or recovery point + recovery count
     int invalid_gap;
@@ -333,7 +314,7 @@ typedef struct H264SliceContext {
     uint8_t cabac_state[1024];
     int cabac_init_idc;
 
-    MMCO mmco[MAX_MMCO_COUNT];
+    MMCO mmco[H264_MAX_MMCO_COUNT];
     int  nb_mmco;
     int explicit_ref_marking;
 
@@ -409,7 +390,6 @@ typedef struct H264Context {
     uint8_t (*non_zero_count)[48];
 
 #define LIST_NOT_USED -1 // FIXME rename?
-#define PART_NOT_AVAILABLE -2
 
     /**
      * block_offset[ 0..23] for frame macroblocks
@@ -483,8 +463,8 @@ typedef struct H264Context {
     H264Ref default_ref[2];
     H264Picture *short_ref[32];
     H264Picture *long_ref[32];
-    H264Picture *delayed_pic[MAX_DELAYED_PIC_COUNT + 2]; // FIXME size?
-    int last_pocs[MAX_DELAYED_PIC_COUNT];
+    H264Picture *delayed_pic[H264_MAX_DPB_FRAMES + 2]; // FIXME size?
+    int last_pocs[H264_MAX_DPB_FRAMES];
     H264Picture *next_output_pic;
     int next_outputed_poc;
     int poc_offset;         ///< PicOrderCnt_offset from SMPTE RDD-2006
@@ -492,7 +472,7 @@ typedef struct H264Context {
     /**
      * memory management control operations buffer.
      */
-    MMCO mmco[MAX_MMCO_COUNT];
+    MMCO mmco[H264_MAX_MMCO_COUNT];
     int  nb_mmco;
     int mmco_reset;
     int explicit_ref_marking;
@@ -662,41 +642,6 @@ void ff_h264_filter_mb(const H264Context *h, H264SliceContext *sl, int mb_x, int
 #define LUMA_DC_BLOCK_INDEX   48
 #define CHROMA_DC_BLOCK_INDEX 49
 
-// This table must be here because scan8[constant] must be known at compiletime
-static const uint8_t scan8[16 * 3 + 3] = {
-    4 +  1 * 8, 5 +  1 * 8, 4 +  2 * 8, 5 +  2 * 8,
-    6 +  1 * 8, 7 +  1 * 8, 6 +  2 * 8, 7 +  2 * 8,
-    4 +  3 * 8, 5 +  3 * 8, 4 +  4 * 8, 5 +  4 * 8,
-    6 +  3 * 8, 7 +  3 * 8, 6 +  4 * 8, 7 +  4 * 8,
-    4 +  6 * 8, 5 +  6 * 8, 4 +  7 * 8, 5 +  7 * 8,
-    6 +  6 * 8, 7 +  6 * 8, 6 +  7 * 8, 7 +  7 * 8,
-    4 +  8 * 8, 5 +  8 * 8, 4 +  9 * 8, 5 +  9 * 8,
-    6 +  8 * 8, 7 +  8 * 8, 6 +  9 * 8, 7 +  9 * 8,
-    4 + 11 * 8, 5 + 11 * 8, 4 + 12 * 8, 5 + 12 * 8,
-    6 + 11 * 8, 7 + 11 * 8, 6 + 12 * 8, 7 + 12 * 8,
-    4 + 13 * 8, 5 + 13 * 8, 4 + 14 * 8, 5 + 14 * 8,
-    6 + 13 * 8, 7 + 13 * 8, 6 + 14 * 8, 7 + 14 * 8,
-    0 +  0 * 8, 0 +  5 * 8, 0 + 10 * 8
-};
-
-static av_always_inline uint32_t pack16to32(unsigned a, unsigned b)
-{
-#if HAVE_BIGENDIAN
-    return (b & 0xFFFF) + (a << 16);
-#else
-    return (a & 0xFFFF) + (b << 16);
-#endif
-}
-
-static av_always_inline uint16_t pack8to16(unsigned a, unsigned b)
-{
-#if HAVE_BIGENDIAN
-    return (b & 0xFF) + (a << 8);
-#else
-    return (a & 0xFF) + (b << 8);
-#endif
-}
-
 /**
  * Get the chroma qp.
  */
@@ -833,16 +778,6 @@ static av_always_inline int get_dct8x8_allowed(const H264Context *h, H264SliceCo
         return !(AV_RN64A(sl->sub_mb_type) &
                  ((MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_DIRECT2) *
                   0x0001000100010001ULL));
-}
-
-static inline int find_start_code(const uint8_t *buf, int buf_size,
-                           int buf_index, int next_avc)
-{
-    uint32_t state = -1;
-
-    buf_index = avpriv_find_start_code(buf + buf_index, buf + next_avc + 1, &state) - buf - 1;
-
-    return FFMIN(buf_index, buf_size);
 }
 
 int ff_h264_field_end(H264Context *h, H264SliceContext *sl, int in_setup);

@@ -33,6 +33,7 @@
 #include "mathops.h"
 #include "rectangle.h"
 #include "thread.h"
+#include "threadframe.h"
 #include "vp8.h"
 #include "vp8data.h"
 
@@ -71,8 +72,8 @@ static void free_buffers(VP8Context *s)
 static int vp8_alloc_frame(VP8Context *s, VP8Frame *f, int ref)
 {
     int ret;
-    if ((ret = ff_thread_get_buffer(s->avctx, &f->tf,
-                                    ref ? AV_GET_BUFFER_FLAG_REF : 0)) < 0)
+    if ((ret = ff_thread_get_ext_buffer(s->avctx, &f->tf,
+                                        ref ? AV_GET_BUFFER_FLAG_REF : 0)) < 0)
         return ret;
     if (!(f->seg_map = av_buffer_allocz(s->mb_width * s->mb_height)))
         goto fail;
@@ -89,7 +90,7 @@ static int vp8_alloc_frame(VP8Context *s, VP8Frame *f, int ref)
 
 fail:
     av_buffer_unref(&f->seg_map);
-    ff_thread_release_buffer(s->avctx, &f->tf);
+    ff_thread_release_ext_buffer(s->avctx, &f->tf);
     return AVERROR(ENOMEM);
 }
 
@@ -98,7 +99,7 @@ static void vp8_release_frame(VP8Context *s, VP8Frame *f)
     av_buffer_unref(&f->seg_map);
     av_buffer_unref(&f->hwaccel_priv_buf);
     f->hwaccel_picture_private = NULL;
-    ff_thread_release_buffer(s->avctx, &f->tf);
+    ff_thread_release_ext_buffer(s->avctx, &f->tf);
 }
 
 #if CONFIG_VP8_DECODER
@@ -2825,9 +2826,6 @@ av_cold int ff_vp8_decode_free(AVCodecContext *avctx)
 {
     VP8Context *s = avctx->priv_data;
     int i;
-
-    if (!s)
-        return 0;
 
     vp8_decode_flush_impl(avctx, 1);
     for (i = 0; i < FF_ARRAY_ELEMS(s->frames); i++)

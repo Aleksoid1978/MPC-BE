@@ -18,9 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "internal.h"
 #include "mpegutils.h"
 #include "mpegvideo.h"
-#include "h263.h"
+#include "h263data.h"
+#include "h263dec.h"
 #include "mpegvideodata.h"
 
 /* don't understand why they choose a different header ! */

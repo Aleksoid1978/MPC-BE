@@ -40,10 +40,11 @@
 #include "mpeg_er.h"
 #include "mpegutils.h"
 #include "mpegvideo.h"
+#include "mpeg4videodec.h"
 #include "mpegvideodata.h"
 #include "qpeldsp.h"
-#include "thread.h"
-#include "wmv2.h"
+#include "threadframe.h"
+#include "wmv2dec.h"
 #include <limits.h>
 
 static void dct_unquantize_mpeg1_intra_c(MpegEncContext *s,
@@ -377,11 +378,6 @@ static int init_duplicate_context(MpegEncContext *s)
     }
 
     if (s->out_format == FMT_H263) {
-        if (!(s->block32         = av_mallocz(sizeof(*s->block32))) ||
-            !(s->dpcm_macroblock = av_mallocz(sizeof(*s->dpcm_macroblock))))
-            return AVERROR(ENOMEM);
-        s->dpcm_direction = 0;
-
         /* ac values */
         if (!FF_ALLOCZ_TYPED_ARRAY(s->ac_val_base,  yc_size))
             return AVERROR(ENOMEM);
@@ -433,8 +429,6 @@ static void free_duplicate_context(MpegEncContext *s)
     av_freep(&s->me.map);
     av_freep(&s->me.score_map);
     av_freep(&s->blocks);
-    av_freep(&s->block32);
-    av_freep(&s->dpcm_macroblock);
     av_freep(&s->ac_val_base);
     s->block = NULL;
 }
@@ -461,9 +455,6 @@ static void backup_duplicate_context(MpegEncContext *bak, MpegEncContext *src)
     COPY(me.score_map);
     COPY(blocks);
     COPY(block);
-    COPY(block32);
-    COPY(dpcm_macroblock);
-    COPY(dpcm_direction);
     COPY(start_mb_y);
     COPY(end_mb_y);
     COPY(me.map_generation);
@@ -478,7 +469,7 @@ static void backup_duplicate_context(MpegEncContext *bak, MpegEncContext *src)
 #undef COPY
 }
 
-int ff_update_duplicate_context(MpegEncContext *dst, MpegEncContext *src)
+int ff_update_duplicate_context(MpegEncContext *dst, const MpegEncContext *src)
 {
     MpegEncContext bak;
     int i, ret;
@@ -677,10 +668,7 @@ static void clear_context(MpegEncContext *s)
     s->dct_error_sum = NULL;
     s->block = NULL;
     s->blocks = NULL;
-    s->block32 = NULL;
     memset(s->pblocks, 0, sizeof(s->pblocks));
-    s->dpcm_direction = 0;
-    s->dpcm_macroblock = NULL;
     s->ac_val_base = NULL;
     s->ac_val[0] =
     s->ac_val[1] =
@@ -886,8 +874,6 @@ void ff_mpv_free_context_frame(MpegEncContext *s)
 /* init common structure for both encoder and decoder */
 void ff_mpv_common_end(MpegEncContext *s)
 {
-    int i;
-
     if (!s)
         return;
 
@@ -907,25 +893,14 @@ void ff_mpv_common_end(MpegEncContext *s)
         return;
 
     if (s->picture) {
-        for (i = 0; i < MAX_PICTURE_COUNT; i++) {
-            ff_free_picture_tables(&s->picture[i]);
-            ff_mpeg_unref_picture(s->avctx, &s->picture[i]);
-            av_frame_free(&s->picture[i].f);
-        }
+        for (int i = 0; i < MAX_PICTURE_COUNT; i++)
+            ff_mpv_picture_free(s->avctx, &s->picture[i]);
     }
     av_freep(&s->picture);
-    ff_free_picture_tables(&s->last_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->last_picture);
-    av_frame_free(&s->last_picture.f);
-    ff_free_picture_tables(&s->current_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->current_picture);
-    av_frame_free(&s->current_picture.f);
-    ff_free_picture_tables(&s->next_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->next_picture);
-    av_frame_free(&s->next_picture.f);
-    ff_free_picture_tables(&s->new_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->new_picture);
-    av_frame_free(&s->new_picture.f);
+    ff_mpv_picture_free(s->avctx, &s->last_picture);
+    ff_mpv_picture_free(s->avctx, &s->current_picture);
+    ff_mpv_picture_free(s->avctx, &s->next_picture);
+    ff_mpv_picture_free(s->avctx, &s->new_picture);
 
     s->context_initialized      = 0;
     s->context_reinit           = 0;
@@ -1602,59 +1577,10 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
         } else {
             /* Only MPEG-4 Simple Studio Profile is supported in > 8-bit mode.
                TODO: Integrate 10-bit properly into mpegvideo.c so that ER works properly */
-            if (!is_mpeg12 && s->avctx->bits_per_raw_sample > 8) {
-                const int act_block_size = block_size * 2;
-
-                if(s->dpcm_direction == 0) {
-                    s->idsp.idct_put(dest_y,                           dct_linesize, (int16_t*)(*s->block32)[0]);
-                    s->idsp.idct_put(dest_y              + act_block_size, dct_linesize, (int16_t*)(*s->block32)[1]);
-                    s->idsp.idct_put(dest_y + dct_offset,              dct_linesize, (int16_t*)(*s->block32)[2]);
-                    s->idsp.idct_put(dest_y + dct_offset + act_block_size, dct_linesize, (int16_t*)(*s->block32)[3]);
-
-                    dct_linesize = uvlinesize << s->interlaced_dct;
-                    dct_offset   = s->interlaced_dct ? uvlinesize : uvlinesize*block_size;
-
-                    s->idsp.idct_put(dest_cb,              dct_linesize, (int16_t*)(*s->block32)[4]);
-                    s->idsp.idct_put(dest_cr,              dct_linesize, (int16_t*)(*s->block32)[5]);
-                    s->idsp.idct_put(dest_cb + dct_offset, dct_linesize, (int16_t*)(*s->block32)[6]);
-                    s->idsp.idct_put(dest_cr + dct_offset, dct_linesize, (int16_t*)(*s->block32)[7]);
-                    if(!s->chroma_x_shift){//Chroma444
-                        s->idsp.idct_put(dest_cb + act_block_size,              dct_linesize, (int16_t*)(*s->block32)[8]);
-                        s->idsp.idct_put(dest_cr + act_block_size,              dct_linesize, (int16_t*)(*s->block32)[9]);
-                        s->idsp.idct_put(dest_cb + act_block_size + dct_offset, dct_linesize, (int16_t*)(*s->block32)[10]);
-                        s->idsp.idct_put(dest_cr + act_block_size + dct_offset, dct_linesize, (int16_t*)(*s->block32)[11]);
-                    }
-                } else if(s->dpcm_direction == 1) {
-                    int i, w, h;
-                    uint16_t *dest_pcm[3] = {(uint16_t*)dest_y, (uint16_t*)dest_cb, (uint16_t*)dest_cr};
-                    int linesize[3] = {dct_linesize, uvlinesize, uvlinesize};
-                    for(i = 0; i < 3; i++) {
-                        int idx = 0;
-                        int vsub = i ? s->chroma_y_shift : 0;
-                        int hsub = i ? s->chroma_x_shift : 0;
-                        for(h = 0; h < (16 >> vsub); h++){
-                            for(w = 0; w < (16 >> hsub); w++)
-                                dest_pcm[i][w] = (*s->dpcm_macroblock)[i][idx++];
-                            dest_pcm[i] += linesize[i] / 2;
-                        }
-                    }
-                } else {
-                    int i, w, h;
-                    uint16_t *dest_pcm[3] = {(uint16_t*)dest_y, (uint16_t*)dest_cb, (uint16_t*)dest_cr};
-                    int linesize[3] = {dct_linesize, uvlinesize, uvlinesize};
-                    av_assert2(s->dpcm_direction == -1);
-                    for(i = 0; i < 3; i++) {
-                        int idx = 0;
-                        int vsub = i ? s->chroma_y_shift : 0;
-                        int hsub = i ? s->chroma_x_shift : 0;
-                        dest_pcm[i] += (linesize[i] / 2) * ((16 >> vsub) - 1);
-                        for(h = (16 >> vsub)-1; h >= 1; h--){
-                            for(w = (16 >> hsub)-1; w >= 1; w--)
-                                dest_pcm[i][w] = (*s->dpcm_macroblock)[i][idx++];
-                            dest_pcm[i] -= linesize[i] / 2;
-                        }
-                    }
-                }
+            if (!is_mpeg12 && CONFIG_MPEG4_DECODER && /* s->codec_id == AV_CODEC_ID_MPEG4 && */
+                s->avctx->bits_per_raw_sample > 8) {
+                ff_mpeg4_decode_studio(s, dest_y, dest_cb, dest_cr, block_size,
+                                       uvlinesize, dct_linesize, dct_offset);
             }
             /* dct only in intra block */
             else if (IS_ENCODER(s) || !IS_MPEG12(s)) {
@@ -1718,12 +1644,6 @@ skip_idct:
 
 void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64])
 {
-    if (CONFIG_XVMC &&
-        s->avctx->hwaccel && s->avctx->hwaccel->decode_mb) {
-        s->avctx->hwaccel->decode_mb(s); //xvmc uses pblocks
-        return;
-    }
-
     if (s->avctx->debug & FF_DEBUG_DCT_COEFF) {
        /* print DCT coefficients */
        av_log(s->avctx, AV_LOG_DEBUG, "DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);

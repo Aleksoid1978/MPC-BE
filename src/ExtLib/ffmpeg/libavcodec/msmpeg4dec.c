@@ -27,12 +27,14 @@
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "msmpeg4.h"
+#include "msmpeg4dec.h"
 #include "libavutil/imgutils.h"
 #include "h263.h"
-#include "mpeg4video.h"
+#include "h263data.h"
+#include "h263dec.h"
+#include "mpeg4videodec.h"
 #include "msmpeg4data.h"
-#include "vc1data.h"
-#include "wmv2.h"
+#include "wmv2dec.h"
 
 #define DC_VLC_BITS 9
 #define V2_INTRA_CBPC_VLC_BITS 3

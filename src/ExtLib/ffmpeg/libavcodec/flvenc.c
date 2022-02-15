@@ -18,10 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "flv.h"
+#include "flvenc.h"
 #include "h263data.h"
 #include "mpegvideo.h"
 #include "mpegvideodata.h"
+#include "mpegvideoenc.h"
 
 void ff_flv_encode_picture_header(MpegEncContext *s, int picture_number)
 {

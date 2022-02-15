@@ -24,7 +24,6 @@
 
 #include "libavutil/internal.h"
 #include "libavutil/opt.h"
-#include "libavutil/pixdesc.h"
 #include "libavutil/thread.h"
 #include "error_resilience.h"
 #include "hwconfig.h"
@@ -33,11 +32,15 @@
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "mpegvideodata.h"
+#include "mpegvideodec.h"
 #include "mpeg4video.h"
 #include "mpeg4videodata.h"
+#include "mpeg4videodec.h"
 #include "h263.h"
+#include "h263data.h"
+#include "h263dec.h"
 #include "profiles.h"
-#include "thread.h"
+#include "threadframe.h"
 #include "xvididct.h"
 #include "unary.h"
 
@@ -65,6 +68,69 @@ static const int mb_type_b_map[4] = {
     MB_TYPE_L1      | MB_TYPE_16x16,
     MB_TYPE_L0      | MB_TYPE_16x16,
 };
+
+void ff_mpeg4_decode_studio(MpegEncContext *s, uint8_t *dest_y, uint8_t *dest_cb,
+                            uint8_t *dest_cr, int block_size, int uvlinesize,
+                            int dct_linesize, int dct_offset)
+{
+    Mpeg4DecContext *const ctx = (Mpeg4DecContext*)s;
+    const int act_block_size = block_size * 2;
+
+    if (ctx->dpcm_direction == 0) {
+        s->idsp.idct_put(dest_y,                               dct_linesize, (int16_t*)ctx->block32[0]);
+        s->idsp.idct_put(dest_y              + act_block_size, dct_linesize, (int16_t*)ctx->block32[1]);
+        s->idsp.idct_put(dest_y + dct_offset,                  dct_linesize, (int16_t*)ctx->block32[2]);
+        s->idsp.idct_put(dest_y + dct_offset + act_block_size, dct_linesize, (int16_t*)ctx->block32[3]);
+
+        dct_linesize = uvlinesize << s->interlaced_dct;
+        dct_offset   = s->interlaced_dct ? uvlinesize : uvlinesize*block_size;
+
+        s->idsp.idct_put(dest_cb,              dct_linesize, (int16_t*)ctx->block32[4]);
+        s->idsp.idct_put(dest_cr,              dct_linesize, (int16_t*)ctx->block32[5]);
+        s->idsp.idct_put(dest_cb + dct_offset, dct_linesize, (int16_t*)ctx->block32[6]);
+        s->idsp.idct_put(dest_cr + dct_offset, dct_linesize, (int16_t*)ctx->block32[7]);
+        if (!s->chroma_x_shift){ //Chroma444
+            s->idsp.idct_put(dest_cb + act_block_size,              dct_linesize, (int16_t*)ctx->block32[8]);
+            s->idsp.idct_put(dest_cr + act_block_size,              dct_linesize, (int16_t*)ctx->block32[9]);
+            s->idsp.idct_put(dest_cb + act_block_size + dct_offset, dct_linesize, (int16_t*)ctx->block32[10]);
+            s->idsp.idct_put(dest_cr + act_block_size + dct_offset, dct_linesize, (int16_t*)ctx->block32[11]);
+        }
+    } else if (ctx->dpcm_direction == 1) {
+        uint16_t *dest_pcm[3] = {(uint16_t*)dest_y, (uint16_t*)dest_cb, (uint16_t*)dest_cr};
+        int linesize[3] = {dct_linesize, uvlinesize, uvlinesize};
+        for (int i = 0; i < 3; i++) {
+            const uint16_t *src = ctx->dpcm_macroblock[i];
+            int vsub = i ? s->chroma_y_shift : 0;
+            int hsub = i ? s->chroma_x_shift : 0;
+            int lowres = s->avctx->lowres;
+            int step = 1 << lowres;
+            for (int h = 0; h < (16 >> (vsub + lowres)); h++){
+                for (int w = 0, idx = 0; w < (16 >> (hsub + lowres)); w++, idx += step)
+                    dest_pcm[i][w] = src[idx];
+                dest_pcm[i] += linesize[i] / 2;
+                src         += (16 >> hsub) * step;
+            }
+        }
+    } else {
+        uint16_t *dest_pcm[3] = {(uint16_t*)dest_y, (uint16_t*)dest_cb, (uint16_t*)dest_cr};
+        int linesize[3] = {dct_linesize, uvlinesize, uvlinesize};
+        av_assert2(ctx->dpcm_direction == -1);
+        for (int i = 0; i < 3; i++) {
+            const uint16_t *src = ctx->dpcm_macroblock[i];
+            int vsub = i ? s->chroma_y_shift : 0;
+            int hsub = i ? s->chroma_x_shift : 0;
+            int lowres = s->avctx->lowres;
+            int step = 1 << lowres;
+            dest_pcm[i] += (linesize[i] / 2) * ((16 >> vsub) - 1);
+            for (int h = (16 >> (vsub + lowres)) - 1; h >= 0; h--){
+                for (int w = (16 >> (hsub + lowres)) - 1, idx = 0; w >= 0; w--, idx += step)
+                    dest_pcm[i][w] = src[idx];
+                src += step * (16 >> hsub);
+                dest_pcm[i] -= linesize[i] / 2;
+            }
+        }
+    }
+}
 
 /**
  * Predict the ac.
@@ -1041,7 +1107,8 @@ int ff_mpeg4_decode_partitions(Mpeg4DecContext *ctx)
  * @return <0 if an error occurred
  */
 static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
-                                     int n, int coded, int intra, int rvlc)
+                                     int n, int coded, int intra,
+                                     int use_intra_dc_vlc, int rvlc)
 {
     MpegEncContext *s = &ctx->m;
     int level, i, last, run, qmul, qadd;
@@ -1053,7 +1120,7 @@ static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
     // Note intra & rvlc should be optimized away if this is inlined
 
     if (intra) {
-        if (ctx->use_intra_dc_vlc) {
+        if (use_intra_dc_vlc) {
             /* DC coef */
             if (s->partitioned_frame) {
                 level = s->dc_val[0][s->block_index[n]];
@@ -1293,7 +1360,7 @@ static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
 
 not_coded:
     if (intra) {
-        if (!ctx->use_intra_dc_vlc) {
+        if (!use_intra_dc_vlc) {
             block[0] = ff_mpeg4_pred_dc(s, n, block[0], &dc_pred_dir, 0);
 
             i -= i >> 31;  // if (i == -1) i = 0;
@@ -1314,7 +1381,7 @@ not_coded:
 static int mpeg4_decode_partitioned_mb(MpegEncContext *s, int16_t block[6][64])
 {
     Mpeg4DecContext *ctx = s->avctx->priv_data;
-    int cbp, mb_type;
+    int cbp, mb_type, use_intra_dc_vlc;
     const int xy = s->mb_x + s->mb_y * s->mb_stride;
 
     av_assert2(s == (void*)ctx);
@@ -1322,7 +1389,7 @@ static int mpeg4_decode_partitioned_mb(MpegEncContext *s, int16_t block[6][64])
     mb_type = s->current_picture.mb_type[xy];
     cbp     = s->cbp_table[xy];
 
-    ctx->use_intra_dc_vlc = s->qscale < ctx->intra_dc_threshold;
+    use_intra_dc_vlc = s->qscale < ctx->intra_dc_threshold;
 
     if (s->current_picture.qscale_table[xy] != s->qscale)
         ff_set_qscale(s, s->current_picture.qscale_table[xy]);
@@ -1372,7 +1439,8 @@ static int mpeg4_decode_partitioned_mb(MpegEncContext *s, int16_t block[6][64])
         s->bdsp.clear_blocks(s->block[0]);
         /* decode each block */
         for (i = 0; i < 6; i++) {
-            if (mpeg4_decode_block(ctx, block[i], i, cbp & 32, s->mb_intra, ctx->rvlc) < 0) {
+            if (mpeg4_decode_block(ctx, block[i], i, cbp & 32, s->mb_intra,
+                                   use_intra_dc_vlc, ctx->rvlc) < 0) {
                 av_log(s->avctx, AV_LOG_ERROR,
                        "texture corrupted at %d %d %d\n",
                        s->mb_x, s->mb_y, s->mb_intra);
@@ -1699,6 +1767,8 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
         }
         s->current_picture.mb_type[xy] = mb_type;
     } else { /* I-Frame */
+        int use_intra_dc_vlc;
+
         do {
             cbpc = get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc.table, INTRA_MCBPC_VLC_BITS, 2);
             if (cbpc < 0) {
@@ -1726,7 +1796,7 @@ intra:
         }
         cbp = (cbpc & 3) | (cbpy << 2);
 
-        ctx->use_intra_dc_vlc = s->qscale < ctx->intra_dc_threshold;
+        use_intra_dc_vlc = s->qscale < ctx->intra_dc_threshold;
 
         if (dquant)
             ff_set_qscale(s, s->qscale + quant_tab[get_bits(&s->gb, 2)]);
@@ -1737,7 +1807,8 @@ intra:
         s->bdsp.clear_blocks(s->block[0]);
         /* decode each block */
         for (i = 0; i < 6; i++) {
-            if (mpeg4_decode_block(ctx, block[i], i, cbp & 32, 1, 0) < 0)
+            if (mpeg4_decode_block(ctx, block[i], i, cbp & 32,
+                                   1, use_intra_dc_vlc, 0) < 0)
                 return AVERROR_INVALIDDATA;
             cbp += cbp;
         }
@@ -1746,7 +1817,7 @@ intra:
 
     /* decode each block */
     for (i = 0; i < 6; i++) {
-        if (mpeg4_decode_block(ctx, block[i], i, cbp & 32, 0, 0) < 0)
+        if (mpeg4_decode_block(ctx, block[i], i, cbp & 32, 0, 0, 0) < 0)
             return AVERROR_INVALIDDATA;
         cbp += cbp;
     }
@@ -2015,9 +2086,10 @@ static int mpeg4_decode_dpcm_macroblock(MpegEncContext *s, int16_t macroblock[25
 
 static int mpeg4_decode_studio_mb(MpegEncContext *s, int16_t block_[12][64])
 {
+    Mpeg4DecContext *const ctx = (Mpeg4DecContext*)s;
     int i;
 
-    s->dpcm_direction = 0;
+    ctx->dpcm_direction = 0;
 
     /* StudioMacroblock */
     /* Assumes I-VOP */
@@ -2031,15 +2103,15 @@ static int mpeg4_decode_studio_mb(MpegEncContext *s, int16_t block_[12][64])
         }
 
         for (i = 0; i < mpeg4_block_count[s->chroma_format]; i++) {
-            if (mpeg4_decode_studio_block(s, (*s->block32)[i], i) < 0)
+            if (mpeg4_decode_studio_block(s, ctx->block32[i], i) < 0)
                 return AVERROR_INVALIDDATA;
         }
     } else {
         /* DPCM */
         check_marker(s->avctx, &s->gb, "DPCM block start");
-        s->dpcm_direction = get_bits1(&s->gb) ? -1 : 1;
+        ctx->dpcm_direction = get_bits1(&s->gb) ? -1 : 1;
         for (i = 0; i < 3; i++) {
-            if (mpeg4_decode_dpcm_macroblock(s, (*s->dpcm_macroblock)[i], i) < 0)
+            if (mpeg4_decode_dpcm_macroblock(s, ctx->dpcm_macroblock[i], i) < 0)
                 return AVERROR_INVALIDDATA;
         }
     }
@@ -2214,7 +2286,7 @@ static void extension_and_user_data(MpegEncContext *s, GetBitContext *gb, int id
 static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 {
     MpegEncContext *s = &ctx->m;
-    int width, height;
+    int width, height, aspect_ratio_info;
     int bits_per_raw_sample;
     int rgb, chroma_format;
 
@@ -2269,12 +2341,12 @@ static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
             s->height = height;
         }
     }
-    s->aspect_ratio_info = get_bits(gb, 4);
-    if (s->aspect_ratio_info == FF_ASPECT_EXTENDED) {
+    aspect_ratio_info = get_bits(gb, 4);
+    if (aspect_ratio_info == FF_ASPECT_EXTENDED) {
         s->avctx->sample_aspect_ratio.num = get_bits(gb, 8);  // par_width
         s->avctx->sample_aspect_ratio.den = get_bits(gb, 8);  // par_height
     } else {
-        s->avctx->sample_aspect_ratio = ff_h263_pixel_aspect[s->aspect_ratio_info];
+        s->avctx->sample_aspect_ratio = ff_h263_pixel_aspect[aspect_ratio_info];
     }
     skip_bits(gb, 4); /* frame_rate_code */
     skip_bits(gb, 15); /* first_half_bit_rate */
@@ -2300,19 +2372,19 @@ static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 {
     MpegEncContext *s = &ctx->m;
-    int width, height, vo_ver_id;
+    int width, height, vo_ver_id, aspect_ratio_info;
 
     /* vol header */
     skip_bits(gb, 1);                   /* random access */
-    s->vo_type = get_bits(gb, 8);
+    ctx->vo_type = get_bits(gb, 8);
 
     /* If we are in studio profile (per vo_type), check if its all consistent
      * and if so continue pass control to decode_studio_vol_header().
      * elIf something is inconsistent, error out
      * else continue with (non studio) vol header decpoding.
      */
-    if (s->vo_type == CORE_STUDIO_VO_TYPE ||
-        s->vo_type == SIMPLE_STUDIO_VO_TYPE) {
+    if (ctx->vo_type == CORE_STUDIO_VO_TYPE ||
+        ctx->vo_type == SIMPLE_STUDIO_VO_TYPE) {
         if (s->avctx->profile != FF_PROFILE_UNKNOWN && s->avctx->profile != FF_PROFILE_MPEG4_SIMPLE_STUDIO)
             return AVERROR_INVALIDDATA;
         s->studio_profile = 1;
@@ -2328,12 +2400,12 @@ static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     } else {
         vo_ver_id = 1;
     }
-    s->aspect_ratio_info = get_bits(gb, 4);
-    if (s->aspect_ratio_info == FF_ASPECT_EXTENDED) {
+    aspect_ratio_info = get_bits(gb, 4);
+    if (aspect_ratio_info == FF_ASPECT_EXTENDED) {
         s->avctx->sample_aspect_ratio.num = get_bits(gb, 8);  // par_width
         s->avctx->sample_aspect_ratio.den = get_bits(gb, 8);  // par_height
     } else {
-        s->avctx->sample_aspect_ratio = ff_h263_pixel_aspect[s->aspect_ratio_info];
+        s->avctx->sample_aspect_ratio = ff_h263_pixel_aspect[aspect_ratio_info];
     }
 
     if ((ctx->vol_control_parameters = get_bits1(gb))) { /* vol control parameter */
@@ -2359,7 +2431,7 @@ static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
         /* is setting low delay flag only once the smartest thing to do?
          * low delay detection will not be overridden. */
         if (s->picture_number == 0) {
-            switch(s->vo_type) {
+            switch (ctx->vo_type) {
             case SIMPLE_VO_TYPE:
             case ADV_SIMPLE_VO_TYPE:
                 s->low_delay = 1;
@@ -2744,7 +2816,7 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
     }
 
     if (ctx->xvid_build == -1 && ctx->divx_version == -1 && ctx->lavc_build == -1)
-        if (s->codec_tag == AV_RL32("DIVX") && s->vo_type == 0 &&
+        if (s->codec_tag == AV_RL32("DIVX") && ctx->vo_type == 0 &&
             ctx->vol_control_parameters == 0)
             ctx->divx_version = 400;  // divx 4
 
@@ -3083,7 +3155,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
                    s->top_field_first, s->quarter_sample ? 'q' : 'h',
                    s->data_partitioning, ctx->resync_marker,
                    ctx->num_sprite_warping_points, s->sprite_warping_accuracy,
-                   1 - s->no_rounding, s->vo_type,
+                   1 - s->no_rounding, ctx->vo_type,
                    ctx->vol_control_parameters ? " VOLC" : " ", ctx->intra_dc_threshold,
                    ctx->cplx_estimation_trash_i, ctx->cplx_estimation_trash_p,
                    ctx->cplx_estimation_trash_b,
@@ -3110,7 +3182,7 @@ end:
     /* detect buggy encoders which don't set the low_delay flag
      * (divx4/xvid/opendivx). Note we cannot detect divx5 without B-frames
      * easily (although it's buggy too) */
-    if (s->vo_type == 0 && ctx->vol_control_parameters == 0 &&
+    if (ctx->vo_type == 0 && ctx->vol_control_parameters == 0 &&
         ctx->divx_version == -1 && s->picture_number == 0) {
         av_log(s->avctx, AV_LOG_WARNING,
                "looks like this file was encoded with (divx4/(old)xvid/opendivx) -> forcing low_delay flag\n");
@@ -3464,12 +3536,12 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
     s->new_pred                  = s1->new_pred;
     s->enhancement_type          = s1->enhancement_type;
     s->scalability               = s1->scalability;
-    s->use_intra_dc_vlc          = s1->use_intra_dc_vlc;
     s->intra_dc_threshold        = s1->intra_dc_threshold;
     s->divx_version              = s1->divx_version;
     s->divx_build                = s1->divx_build;
     s->xvid_build                = s1->xvid_build;
     s->lavc_build                = s1->lavc_build;
+    s->vo_type                   = s1->vo_type;
     s->showed_packed_warning     = s1->showed_packed_warning;
     s->vol_control_parameters    = s1->vol_control_parameters;
     s->cplx_estimation_trash_i   = s1->cplx_estimation_trash_i;

@@ -28,17 +28,13 @@
  * FF Video Codec 1 (a lossless codec)
  */
 
-#include "libavutil/crc.h"
-#include "libavutil/opt.h"
 #include "libavutil/imgutils.h"
-#include "libavutil/pixdesc.h"
 #include "avcodec.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "mathops.h"
 #include "put_bits.h"
 #include "rangecoder.h"
-#include "thread.h"
+#include "threadframe.h"
 
 #ifdef __INTEL_COMPILER
 #undef av_flatten

@@ -29,18 +29,15 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
-#include "libavutil/timecode.h"
 #include "libavutil/thread.h"
 
-#include "internal.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
-#include "error_resilience.h"
 #include "mpeg12.h"
 #include "mpeg12data.h"
+#include "mpeg12dec.h"
 #include "mpegvideodata.h"
-#include "bytestream.h"
-#include "thread.h"
+#include "startcode.h"
 
 static const uint8_t table_mb_ptype[7][2] = {
     { 3, 5 }, // 0x01 MB_INTRA
@@ -238,7 +235,7 @@ int ff_mpeg1_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size, 
 
 int ff_mpeg1_decode_block_intra(GetBitContext *gb,
                                 const uint16_t *quant_matrix,
-                                uint8_t *const scantable, int last_dc[3],
+                                const uint8_t *scantable, int last_dc[3],
                                 int16_t *block, int index, int qscale)
 {
     int dc, diff, i = 0, component;

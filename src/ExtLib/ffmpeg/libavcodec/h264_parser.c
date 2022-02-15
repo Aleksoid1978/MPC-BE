@@ -27,7 +27,6 @@
 
 #define UNCHECKED_BITSTREAM_READER 1
 
-#include <assert.h>
 #include <stdint.h>
 
 #include "libavutil/avutil.h"
@@ -40,12 +39,15 @@
 #include "get_bits.h"
 #include "golomb.h"
 #include "h264.h"
+#include "h264dsp.h"
+#include "h264_parse.h"
 #include "h264_sei.h"
 #include "h264_ps.h"
+#include "h2645_parse.h"
 #include "h264data.h"
-#include "internal.h"
 #include "mpegutils.h"
 #include "parser.h"
+#include "startcode.h"
 
 typedef struct H264ParseContext {
     ParseContext pc;
@@ -64,6 +66,15 @@ typedef struct H264ParseContext {
     int last_frame_num, last_picture_structure;
 } H264ParseContext;
 
+static int find_start_code(const uint8_t *buf, int buf_size,
+                                  int buf_index, int next_avc)
+{
+    uint32_t state = -1;
+
+    buf_index = avpriv_find_start_code(buf + buf_index, buf + next_avc + 1, &state) - buf - 1;
+
+    return FFMIN(buf_index, buf_size);
+}
 
 static int h264_find_frame_end(H264ParseContext *p, const uint8_t *buf,
                                int buf_size, void *logctx)
@@ -210,7 +221,7 @@ static int scan_mmco_reset(AVCodecParserContext *s, GetBitContext *gb,
 
     if (get_bits1(gb)) { // adaptive_ref_pic_marking_mode_flag
         int i;
-        for (i = 0; i < MAX_MMCO_COUNT; i++) {
+        for (i = 0; i < H264_MAX_MMCO_COUNT; i++) {
             MMCOOpcode opcode = get_ue_golomb_31(gb);
             if (opcode > (unsigned) MMCO_LONG) {
                 av_log(logctx, AV_LOG_ERROR,
@@ -247,7 +258,6 @@ static inline int parse_nal_units(AVCodecParserContext *s,
                                   const uint8_t * const buf, int buf_size)
 {
     H264ParseContext *p = s->priv_data;
-    H264Context *h = avctx->priv_data;
     H2645RBSP rbsp = { NULL };
     H2645NAL nal = { NULL };
     int buf_index, next_avc;
@@ -553,11 +563,9 @@ static inline int parse_nal_units(AVCodecParserContext *s,
                 p->last_picture_structure = s->picture_structure;
                 p->last_frame_num = p->poc.frame_num;
             }
-            if (h && sps->timing_info_present_flag) {
+            if (sps->timing_info_present_flag) {
                 int64_t den = sps->time_scale;
-                if (p->sei.unregistered.x264_build >= 0)
-                    h->x264_build = p->sei.unregistered.x264_build;
-                if (h->x264_build < 44U)
+                if (p->sei.unregistered.x264_build < 44U)
                     den *= 2;
                 av_reduce(&avctx->framerate.den, &avctx->framerate.num,
                           sps->num_units_in_tick * avctx->ticks_per_frame, den, 1 << 30);

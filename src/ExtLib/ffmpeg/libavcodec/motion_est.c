@@ -32,11 +32,10 @@
 #include <limits.h>
 
 #include "avcodec.h"
-#include "internal.h"
 #include "mathops.h"
 #include "motion_est.h"
 #include "mpegutils.h"
-#include "mpegvideo.h"
+#include "mpegvideoenc.h"
 
 #define P_LEFT P[1]
 #define P_TOP P[2]
@@ -1595,7 +1594,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
 }
 
 /* find best f_code for ME which do unlimited searches */
-int ff_get_best_fcode(MpegEncContext * s, int16_t (*mv_table)[2], int type)
+int ff_get_best_fcode(MpegEncContext * s, const int16_t (*mv_table)[2], int type)
 {
     if (s->motion_est != FF_ME_ZERO) {
         int score[8];
@@ -1614,7 +1613,7 @@ int ff_get_best_fcode(MpegEncContext * s, int16_t (*mv_table)[2], int type)
         for(y=0; y<s->mb_height; y++){
             int x;
             int xy= y*s->mb_stride;
-            for(x=0; x<s->mb_width; x++){
+            for(x=0; x<s->mb_width; x++, xy++){
                 if(s->mb_type[xy] & type){
                     int mx= mv_table[xy][0];
                     int my= mv_table[xy][1];
@@ -1622,16 +1621,15 @@ int ff_get_best_fcode(MpegEncContext * s, int16_t (*mv_table)[2], int type)
                                      fcode_tab[my + MAX_MV]);
                     int j;
 
-                        if(mx >= range || mx < -range ||
-                           my >= range || my < -range)
-                            continue;
+                    if (mx >= range || mx < -range ||
+                        my >= range || my < -range)
+                        continue;
 
                     for(j=0; j<fcode && j<8; j++){
                         if(s->pict_type==AV_PICTURE_TYPE_B || s->current_picture.mc_mb_var[xy] < s->current_picture.mb_var[xy])
                             score[j]-= 170;
                     }
                 }
-                xy++;
             }
         }
 

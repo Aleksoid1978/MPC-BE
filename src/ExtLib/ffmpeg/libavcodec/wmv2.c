@@ -20,26 +20,20 @@
 
 #include "avcodec.h"
 #include "idctdsp.h"
-#include "mpegutils.h"
 #include "mpegvideo.h"
 #include "msmpeg4data.h"
 #include "wmv2.h"
-#include "wmv2data.h"
 
 
-av_cold void ff_wmv2_common_init(Wmv2Context *w)
+av_cold void ff_wmv2_common_init(MpegEncContext *s)
 {
-    MpegEncContext *const s = &w->s;
+    WMV2Context *const w = s->private_ctx;
 
     ff_blockdsp_init(&s->bdsp, s->avctx);
     ff_wmv2dsp_init(&w->wdsp);
     s->idsp.perm_type = w->wdsp.idct_perm;
     ff_init_scantable_permutation(s->idsp.idct_permutation,
                                   w->wdsp.idct_perm);
-    ff_init_scantable(s->idsp.idct_permutation, &w->abt_scantable[0],
-                      ff_wmv2_scantableA);
-    ff_init_scantable(s->idsp.idct_permutation, &w->abt_scantable[1],
-                      ff_wmv2_scantableB);
     ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable,
                       ff_wmv1_scantable[1]);
     ff_init_scantable(s->idsp.idct_permutation, &s->intra_h_scantable,
@@ -58,7 +52,7 @@ void ff_mspel_motion(MpegEncContext *s, uint8_t *dest_y,
                      uint8_t **ref_picture, op_pixels_func (*pix_op)[4],
                      int motion_x, int motion_y, int h)
 {
-    Wmv2Context *const w = (Wmv2Context *) s;
+    WMV2Context *const w = s->private_ctx;
     uint8_t *ptr;
     int dxy, mx, my, src_x, src_y, v_edge_pos;
     ptrdiff_t offset, linesize, uvlinesize;

@@ -35,15 +35,7 @@
  * H261Context
  */
 typedef struct H261Context {
-    MpegEncContext s;
-
-    int current_mba;
-    int mba_diff;
     int mtype;
-    int current_mv_x;
-    int current_mv_y;
-    int gob_number;
-    int gob_start_code_skipped; // 1 if gob start code is already read before gob header is read
 } H261Context;
 
 #define MB_TYPE_H261_FIL 0x800000
@@ -58,12 +50,5 @@ extern const uint8_t ff_h261_cbp_tab[63][2];
 extern RLTable ff_h261_rl_tcoeff;
 
 void ff_h261_loop_filter(MpegEncContext *s);
-
-int ff_h261_get_picture_format(int width, int height);
-void ff_h261_reorder_mb_index(MpegEncContext *s);
-void ff_h261_encode_mb(MpegEncContext *s, int16_t block[6][64],
-                       int motion_x, int motion_y);
-void ff_h261_encode_picture_header(MpegEncContext *s, int picture_number);
-void ff_h261_encode_init(MpegEncContext *s);
 
 #endif /* AVCODEC_H261_H */
