@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Über MPC-BE"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 MPC-BE Team, siehe Authors.txt Datei"
@@ -6,9 +6,9 @@
 11		"MPC-BE Compiler:"
 12		"FFmpeg Compiler:"
 13		"Libavcodec / Libavutil:"
-22		"Dieses Programm ist Freeware und steht\nunter der GNU General Public License."
-23		"Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert"
-24		"&OK"
+23		"Dieses Programm ist Freeware und steht\nunter der GNU General Public License."
+24		"Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert"
+25		"&OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

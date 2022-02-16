@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"O programe"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 viď súbor Authors.txt"
@@ -6,9 +6,9 @@
 11		"Kompilátor MPC-BE :"
 12		"Kompilátor FFmpeg :"
 13		"Libavcodec / Libavutil :"
-22		"Tento program je šírený ako freeware a bol vydaný pod licenciou GNU General Public."
-23		"Preložil: Marián Hikaník"
-24		"OK"
+23		"Tento program je šírený ako freeware a bol vydaný pod licenciou GNU General Public."
+24		"Preložil: Marián Hikaník"
+25		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
