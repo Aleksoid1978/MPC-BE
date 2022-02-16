@@ -166,7 +166,7 @@ void CWebClientSocket::Header()
 							if (sl2.size() == 2) {
 								m_post[sl2.front().MakeLower()] = UTF8ToWStr(UrlDecode(TToA(sl2.back())));
 							} else {
-								m_post[sl2.front().MakeLower()] = L"";
+								m_post[sl2.front().MakeLower()].Empty();
 							}
 						}
 						str.Empty();
@@ -205,7 +205,7 @@ void CWebClientSocket::Header()
 				if (sl2.size() == 2) {
 					m_get[sl2.front()] = UTF8ToWStr(UrlDecode(TToA(sl2.back())));
 				} else {
-					m_get[sl2.front()] = L"";
+					m_get[sl2.front()].Empty();
 				}
 			}
 		}

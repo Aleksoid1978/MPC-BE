@@ -53,7 +53,7 @@ void CMenuEx::ScaleFont()
 	}
 }
 
-void CMenuEx::DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect* rcElement)
+void CMenuEx::DrawMenuElement(CDC* pDC, const CRect& rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect* rcElement)
 {
 	if (rcElement) {
 		rcElement->SetRectEmpty();
@@ -202,7 +202,6 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const LPMENUITEM lpItem)
 {
 	if (bSelected) {
-		GRADIENT_RECT gr[1] = { { 0, 1 } };
 		const CAppSettings& s = AfxGetAppSettings();
 
 		if (bGrayed) {
@@ -219,6 +218,7 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 			if (bGrayed) {
 				pDC->FillSolidRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBS);
 			} else {
+				GRADIENT_RECT gr[1] = { { 0, 1 } };
 				TRIVERTEX tv[2] = {
 					{ rect.left, rect.top, (GetRValue(m_crBR) + 5) * 256, (GetGValue(m_crBR) + 5) * 256, (GetBValue(m_crBR) + 5) * 256, 255 * 256 },
 					{ rect.right, rect.bottom, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
@@ -520,6 +520,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 
 				return 0;
 			}
+			break;
 		case WM_NCPAINT:
 			{
 				if (!m_hMenuLast) {

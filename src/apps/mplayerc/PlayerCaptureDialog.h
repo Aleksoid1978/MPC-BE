@@ -77,7 +77,7 @@ public:
 			CFormat<T>* pf = GetAt(i);
 			for (size_t j = 0; j < pf->GetCount(); ++j) {
 				CFormatElem<T>* pfe = pf->GetAt(j);
-				if (!pmt || (pfe->mt.majortype == pmt->majortype && pfe->mt.subtype == pmt->subtype)) {
+				if (pfe->mt.majortype == pmt->majortype && pfe->mt.subtype == pmt->subtype) {
 					if (ppf) {
 						*ppf = pf;
 					}

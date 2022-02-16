@@ -175,7 +175,7 @@ public:
 	bool OnLButtonDown(UINT nFlags, CPoint point);
 	bool OnLButtonUp(UINT nFlags, CPoint point);
 
-	void SetWndRect(CRect rc) { m_MainWndRect = rc; };
+	void SetWndRect(const CRect& rc) { m_MainWndRect = rc; };
 
 	OSD_TYPE GetOSDType() { return m_OSDType; };
 

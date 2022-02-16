@@ -39,17 +39,17 @@ public:
 	CFileItem() = default;
 	~CFileItem() = default;
 
-	CFileItem(const CString& str) {
-		m_fn = str;
-	}
-	CFileItem(const CString& strFn, const CString& strTitle, const REFERENCE_TIME duration = 0) {
-		m_fn = strFn;
-		m_Title = strTitle;
-		m_duration = duration;
-	}
-	CFileItem(const WCHAR* str) {
-		m_fn = str;
-	}
+	CFileItem(const CString& str)
+		: m_fn(str)
+	{}
+	CFileItem(const CString& strFn, const CString& strTitle, const REFERENCE_TIME duration = 0)
+		: m_fn(strFn)
+		, m_Title(strTitle)
+		, m_duration(duration)
+	{}
+	CFileItem(const WCHAR* str)
+		: m_fn(str)
+	{}
 
 	const CFileItem& operator = (const CFileItem& fi) {
 		m_fn = fi.m_fn;

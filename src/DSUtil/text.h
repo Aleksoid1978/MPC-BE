@@ -56,7 +56,7 @@ ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0
 		if ((*it).IsEmpty()) {
 			sl.erase(it++);
 		} else {
-			it++;
+			++it;
 		}
 	}
 	if (sl.empty()) {

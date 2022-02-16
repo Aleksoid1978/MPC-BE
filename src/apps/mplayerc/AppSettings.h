@@ -436,15 +436,15 @@ class CSubtitleItem
 	CString m_title;
 
 public:
-	CSubtitleItem() {};
-	CSubtitleItem(const CString& fname, const CString& title = L"") {
-		m_fn = fname;
-		m_title = title;
-	}
-	CSubtitleItem(const WCHAR* fname, const WCHAR* title = L"") {
-		m_fn = fname;
-		m_title = title;
-	}
+	CSubtitleItem() = default;
+	CSubtitleItem(const CString& fname, const CString& title = L"")
+		: m_fn(fname)
+		, m_title(title)
+	{}
+	CSubtitleItem(const WCHAR* fname, const WCHAR* title = L"")
+		: m_fn(fname)
+		, m_title(title)
+	{}
 
 	const CSubtitleItem& operator = (const CString& fname) {
 		m_fn = fname;

@@ -2082,9 +2082,9 @@ void CAppSettings::SaveExternalFilters()
 			profile.WriteString(key, L"CLSID", CStringFromGUID(f->clsid));
 		}
 		unsigned i = 0;
-		for (auto it = f->guids.cbegin(); it != f->guids.cend(); it++) {
+		for (auto it = f->guids.cbegin(); it != f->guids.cend(); ++it) {
 			CString value(CStringFromGUID(*it)); // majortype
-			it++;
+			++it;
 			if (it != f->guids.cend()) {
 				value.Append(CStringFromGUID(*it)); // subtype
 				CString entry;
