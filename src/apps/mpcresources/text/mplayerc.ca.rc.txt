@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"En quant a"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 veure l'arxiu Authors.txt"
@@ -6,9 +6,9 @@
 11		"Compilador MPC-BE :"
 12		"Compilador FFmpeg :"
 13		"Libavcodec / Libavutil :"
-22		"Aquet programa és gratuït i distribuït sota la Llicència Pública General de GNU."
-23		"Traducció al català per en PAPU."
-24		"OK"
+23		"Aquet programa és gratuït i distribuït sota la Llicència Pública General de GNU."
+24		"Traducció al català per en PAPU."
+25		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

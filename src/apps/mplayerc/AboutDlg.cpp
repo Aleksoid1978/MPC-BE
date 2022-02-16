@@ -56,7 +56,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_strVersionNumber.Append(L", Debug");
 #endif
 #ifdef REV_HASH
-	m_strVersionNumber.AppendFormat(L"\r\ngit %S-%S", REV_DATE, REV_HASH);
+	m_strGitInfo.AppendFormat(L"git %S - %S", REV_DATE, REV_HASH);
 #endif
 
 #if defined(__INTEL_COMPILER)
@@ -113,6 +113,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_STATIC1, m_appname);
 	DDX_Text(pDX, IDC_VERSION_NUMBER, m_strVersionNumber);
+	DDX_Text(pDX, IDC_EDIT2, m_strGitInfo);
 	DDX_Text(pDX, IDC_MPC_COMPILER, m_MPCCompiler);
 	DDX_Text(pDX, IDC_FFMPEG_COMPILER, m_FFmpegCompiler);
 	DDX_Text(pDX, IDC_LIBAVCODEC_VERSION, m_libavcodecVersion);

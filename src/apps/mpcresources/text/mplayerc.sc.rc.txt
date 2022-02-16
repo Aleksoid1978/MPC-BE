@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"关于"
 7		"MPC-BE"
 8		"版权所有 © 2002-2022 请查看 Authors.txt"
@@ -6,9 +6,9 @@
 11		"MPC-BE 编译器: "
 12		"FFmpeg 编译器: "
 13		"Libavcodec / Libavutil :"
-22		"此程序是遵守 GNU 通用公众授权协议发布的自由软件。"
-23		"简体中文翻译调整：insolo and xikuai"
-24		"确定"
+23		"此程序是遵守 GNU 通用公众授权协议发布的自由软件。"
+24		"简体中文翻译调整：insolo and xikuai"
+25		"确定"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11

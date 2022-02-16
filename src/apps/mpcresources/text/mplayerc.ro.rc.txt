@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2022 vedeți Authors.txt"
@@ -6,9 +6,9 @@
 11		"Compilator MPC-BE :"
 12		"Compilator FFmpeg :"
 13		"Libavcodec / Libavutil :"
-22		"Acesta program este gratuit și eliberat sub licența GNU General Public License."
-23		"Traducerea în română realizată de Daniel Alămiță, actualizată şi corectată de lordkag"
-24		"OK"
+23		"Acesta program este gratuit și eliberat sub licența GNU General Public License."
+24		"Traducerea în română realizată de Daniel Alămiță, actualizată şi corectată de lordkag"
+25		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
