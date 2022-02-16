@@ -1793,12 +1793,12 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 
 	str.Replace(L"\\N", L"\n");
 	str.Replace(L"\\n", (sub->m_wrapStyle < 2 || sub->m_wrapStyle == 3) ? L" " : L"\n");
-	str.Replace(L"\\h", L"\x00A0");
+	str.Replace(L"\\h", L"\x00A0"); // no-break space
 
 	for (int i = 0, j = 0, len = str.GetLength(); j <= len; j++) {
 		WCHAR c = str[j];
 
-		if (c != L'\n' && c != L' ' && c != L'\x00A0' && c != 0) {
+		if (c != L'\n' && c != L' ' && c != 0) {
 			continue;
 		}
 
@@ -1814,7 +1814,7 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
 			}
-		} else if (c == L' ' || c == L'\x00A0') {
+		} else if (c == L' ') {
 			if (CWord* w = DNew CText(style, CStringW(c), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley, m_renderingCaches)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
