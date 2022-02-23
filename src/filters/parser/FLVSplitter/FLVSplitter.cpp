@@ -1204,15 +1204,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	m_pFile->Seek(m_DataOffset);
-
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
-}
-
-bool CFLVSplitterFilter::DemuxInit()
-{
-	SetThreadName((DWORD)-1, "CFLVSplitterFilter");
-
 	if (m_pFile->IsRandomAccess()) {
 		__int64 pos = std::max((__int64)m_DataOffset, m_pFile->GetAvailable() - 256 * KILOBYTE);
 
@@ -1239,6 +1230,19 @@ bool CFLVSplitterFilter::DemuxInit()
 		}
 
 		m_pFile->Seek(m_DataOffset);
+	}
+
+	m_pFile->Seek(m_DataOffset);
+
+	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+}
+
+bool CFLVSplitterFilter::DemuxInit()
+{
+	SetThreadName((DWORD)-1, "CFLVSplitterFilter");
+
+	if (!m_pFile) {
+		return false;
 	}
 
 	return true;
