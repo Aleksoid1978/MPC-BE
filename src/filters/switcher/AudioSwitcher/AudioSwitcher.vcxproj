@@ -244,7 +244,7 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses\BaseClasses.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\filters\filters\Filters.vcxproj">
