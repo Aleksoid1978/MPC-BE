@@ -320,6 +320,7 @@
     <ClInclude Include="PPageSubtitles.h" />
     <ClInclude Include="PPageSync.h" />
     <ClInclude Include="PPageWebServer.h" />
+    <ClInclude Include="rapidjsonHelper.h" />
     <ClInclude Include="RegFilterChooserDlg.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDlg.h" />

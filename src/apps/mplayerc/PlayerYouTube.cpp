@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include "DSUtil/std_helper.h"
 #include "PlayerYouTube.h"
 
-#include <ExtLib/rapidjson/include/rapidjsonHelper.h>
+#include "rapidjsonHelper.h"
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_USER_URL            L"youtube.com/user/"

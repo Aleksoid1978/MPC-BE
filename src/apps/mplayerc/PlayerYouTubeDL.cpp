@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #include "DSUtil/Filehandle.h"
 #include "PlayerYouTubeDL.h"
 
-#include <ExtLib/rapidjson/include/rapidjsonHelper.h>
+#include "rapidjsonHelper.h"
 
 #define bufsize (2ul * KILOBYTE)
 

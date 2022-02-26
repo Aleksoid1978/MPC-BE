@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 #pragma once
 
 #define RAPIDJSON_SSE2
-#include "./rapidjson/document.h"
-#include "./rapidjson/pointer.h"
+#include "ExtLib/rapidjson/include/rapidjson/document.h"
+#include "ExtLib/rapidjson/include/rapidjson/pointer.h"
 
 template <typename T>
 inline bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T& value)
