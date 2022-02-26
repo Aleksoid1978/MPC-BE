@@ -10,3 +10,6 @@
 [submodule "src/ExtLib/nv-codec-headers"]
 	path = src/ExtLib/nv-codec-headers
 	url = https://github.com/FFmpeg/nv-codec-headers.git
+[submodule "src/ExtLib/rapidjson"]
+	path = src/ExtLib/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
