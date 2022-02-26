@@ -7,3 +7,6 @@
 [submodule "src/ExtLib/Detours"]
 	path = src/ExtLib/Detours
 	url = https://github.com/microsoft/Detours.git
+[submodule "src/ExtLib/nv-codec-headers"]
+	path = src/ExtLib/nv-codec-headers
+	url = https://github.com/FFmpeg/nv-codec-headers.git
