@@ -1,0 +1,3 @@
+[submodule "src/ExtLib/nanosvg"]
+	path = src/ExtLib/nanosvg
+	url = https://github.com/memononen/nanosvg.git
