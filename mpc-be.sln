@@ -189,7 +189,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbs2b", "src\ExtLib\libbs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "coolsb", "src\ExtLib\ui\coolsb\coolsb.vcxproj", "{441EC5B6-6450-4A08-A345-3ECD7DBDC6ED}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detours", "src\ExtLib\Detours\Detours.vcxproj", "{2DD13FCC-CB32-4610-B691-6CFC6A022483}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detours", "src\ExtLib\Detours.vcxproj", "{2DD13FCC-CB32-4610-B691-6CFC6A022483}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "speex", "src\ExtLib\speex\speex.vcxproj", "{F4C233D1-297B-4B6B-BD63-A7D38F88AA83}"
 EndProject

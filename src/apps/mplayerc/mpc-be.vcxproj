@@ -441,7 +441,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\Detours\Detours.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\Detours.vcxproj">
       <Project>{2dd13fcc-cb32-4610-b691-6cfc6a022483}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\libbs2b\libbs2b.vcxproj">

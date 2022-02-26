@@ -4,3 +4,6 @@
 [submodule "src/ExtLib/BaseClasses"]
 	path = src/ExtLib/BaseClasses
 	url = https://github.com/v0lt/BaseClasses.git
+[submodule "src/ExtLib/Detours"]
+	path = src/ExtLib/Detours
+	url = https://github.com/microsoft/Detours.git
