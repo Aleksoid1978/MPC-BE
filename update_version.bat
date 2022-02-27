@@ -20,10 +20,14 @@ SETLOCAL
 PUSHD %~dp0
 
 SET gitexe="git.exe"
-IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\bin\git.exe"
-IF NOT EXIST %gitexe% set gitexe="c:\Program Files\Git\cmd\git.exe"
+%gitexe% --version
+IF /I %ERRORLEVEL%==0 GOTO :GitOK
 
+SET gitexe="c:\Program Files\Git\cmd\git.exe"
+IF NOT EXIST %gitexe% SET gitexe="c:\Program Files\Git\bin\git.exe"
 IF NOT EXIST %gitexe% GOTO :SubError
+
+:GitOK
 
 SET GIT_REV_HASH=0
 SET GIT_REV_COUNT=0
@@ -31,10 +35,10 @@ SET GIT_REV_COUNT=0
 SET SrcManifest="src\apps\mplayerc\res\mpc-be.exe.manifest.conf"
 SET DstManifest="src\apps\mplayerc\res\mpc-be.exe.manifest"
 
-FOR /f "delims=" %%A IN ('%gitexe% rev-parse --short HEAD') DO (
+FOR /F "delims=" %%A IN ('%gitexe% rev-parse --short HEAD') DO (
   SET GIT_REV_HASH="%%A"
 )
-FOR /f "delims=" %%A IN ('%gitexe% rev-list --count HEAD') DO (
+FOR /F "delims=" %%A IN ('%gitexe% rev-list --count HEAD') DO (
   SET /A GIT_REV_COUNT=%%A + 73
 )
 
@@ -58,7 +62,7 @@ ECHO #pragma once > revision.h
 %gitexe% log -1 --date=format:%%Y.%%m.%%d --pretty=format:"#define REV_DATE %%x22%%ad%%x22%%n" >> revision.h
 
 SET GIT_REV_BRANCH=LOCAL
-FOR /f "delims=" %%A IN ('%gitexe% symbolic-ref --short HEAD') DO SET GIT_REV_BRANCH=%%A
+FOR /F "delims=" %%A IN ('%gitexe% symbolic-ref --short HEAD') DO SET GIT_REV_BRANCH=%%A
 ECHO #define REV_BRANCH "%GIT_REV_BRANCH%" >> revision.h
 
 ECHO #define REV_HASH %GIT_REV_HASH% >> revision.h
@@ -66,6 +70,8 @@ ECHO #define REV_NUM %GIT_REV_COUNT% >> revision.h
 
 IF EXIST %dstfile% DEL /Q %DstManifest%
 powershell -Command "(gc %SrcManifest%) -replace '_REV_NUM_', '%GIT_REV_COUNT%' | Out-File -encoding UTF8 %DstManifest%"
+
+ECHO The revision number is %GIT_REV_COUNT%.
 
 :END
 POPD
