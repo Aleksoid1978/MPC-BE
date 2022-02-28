@@ -23,8 +23,8 @@ SET gitexe="git.exe"
 %gitexe% --version
 IF /I %ERRORLEVEL%==0 GOTO :GitOK
 
-SET gitexe="c:\Program Files\Git\cmd\git.exe"
-IF NOT EXIST %gitexe% SET gitexe="c:\Program Files\Git\bin\git.exe"
+SET gitexe="%ProgramFiles%\Git\cmd\git.exe"
+IF NOT EXIST %gitexe% SET gitexe="%ProgramFiles%\Git\bin\git.exe"
 IF NOT EXIST %gitexe% GOTO :SubError
 
 :GitOK
