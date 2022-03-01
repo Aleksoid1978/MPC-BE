@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,12 +21,15 @@
 
 #pragma once
 
-#include "muxer/DSMMuxer/DSMMuxer.h"
-#include "muxer/MatroskaMuxer/MatroskaMuxer.h"
-#include "muxer/WavDest/WavDest.h"
+//#include "muxer/DSMMuxer/DSMMuxer.h"
+//#include "muxer/MatroskaMuxer/MatroskaMuxer.h"
+//#include "muxer/WavDest/WavDest.h"
 
+#include "parser/AudioSplitter/AudioSplitter.h"
 #include "parser/AviSplitter/AviSplitter.h"
+#include "parser/BinkSplitter/BinkSplitter.h"
 #include "parser/DSMSplitter/DSMSplitter.h"
+#include "parser/DVRSplitter/DVRSplitter.h"
 #include "parser/FLVSplitter/FLVSplitter.h"
 #include "parser/MatroskaSplitter/MatroskaSplitter.h"
 #include "parser/MP4Splitter/MP4Splitter.h"
@@ -36,18 +39,15 @@
 #include "parser/RawVideoSplitter/RawVideoSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
-#include "parser/AudioSplitter/AudioSplitter.h"
-#include "parser/BinkSplitter/BinkSplitter.h"
-#include "parser/DVRSplitter/DVRSplitter.h"
-#include "parser/StreamDriveThru/StreamDriveThru.h"
+//#include "parser/StreamDriveThru/StreamDriveThru.h"
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
-#include "reader/VTSReader/VTSReader.h"
 #include "reader/UDPReader/UDPReader.h"
+#include "reader/VTSReader/VTSReader.h"
 
 #include "renderer/MpcAudioRenderer/MpcAudioRenderer.h"
-#include "renderer/SyncClock/SyncClock.h"
+//#include "renderer/SyncClock/SyncClock.h"
 
 #include "source/DTSAC3Source/DTSAC3Source.h"
 #include "source/FLICSource/FLICSource.h"
@@ -57,8 +57,8 @@
 #include "switcher/AudioSwitcher/AudioSwitcher.h"
 
 #include "transform/AVI2AC3Filter/AVI2AC3Filter.h"
-#include "transform/BufferFilter/BufferFilter.h"
-#include "transform/DeCSSFilter/DeCSSFilter.h"
+//#include "transform/BufferFilter/BufferFilter.h"
+//#include "transform/DeCSSFilter/DeCSSFilter.h"
 #include "transform/MpaDecFilter/MpaDecFilter.h"
 #include "transform/MPCVideoDec/MPCVideoDec.h"
 #include "transform/Mpeg2DecFilter/Mpeg2DecFilter.h"
