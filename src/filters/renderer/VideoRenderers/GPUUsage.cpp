@@ -379,16 +379,16 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 
 					if (SysVersion::IsWin10RS4orLater() && pD3DKMTQueryAdapterInfo) {
 						D3DKMT_NODEMETADATA metaDataInfo = {};
-						metaDataInfo.NodeOrdinal = i;
+						metaDataInfo.NodeOrdinalAndAdapterIndex = MAKEWORD(i, 0);
 
 						D3DKMT_QUERYADAPTERINFO queryAdapterInfo = {};
-						queryAdapterInfo.AdapterHandle = AdapterHandle;
+						queryAdapterInfo.hAdapter = AdapterHandle;
 						queryAdapterInfo.Type = KMTQAITYPE_NODEMETADATA;
-						queryAdapterInfo.PrivateDriverData = &metaDataInfo;
+						queryAdapterInfo.pPrivateDriverData = &metaDataInfo;
 						queryAdapterInfo.PrivateDriverDataSize = sizeof(D3DKMT_NODEMETADATA);
 
 						if (NT_SUCCESS(pD3DKMTQueryAdapterInfo(&queryAdapterInfo))) {
-							switch (metaDataInfo.EngineType) {
+							switch (metaDataInfo.NodeData.EngineType) {
 								case DXGK_ENGINE_TYPE_3D:
 									gpuNode = i;
 									bUseNode = true;
@@ -425,6 +425,25 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
 }
+
+struct D3DKMT_QUERYSTATISTICS_SEGMENT_INFORMATION_V1
+{
+	ULONG CommitLimit;
+	ULONG BytesCommitted;
+	ULONG BytesResident;
+	D3DKMT_QUERYSTATISTICS_MEMORY Memory;
+	ULONG Aperture; // boolean
+	ULONGLONG TotalBytesEvictedByPriority[D3DKMT_MaxAllocationPriorityClass];
+	ULONG64 SystemMemoryEndAddress;
+	struct
+	{
+		ULONG64 PreservedDuringStandby : 1;
+		ULONG64 PreservedDuringHibernate : 1;
+		ULONG64 PartiallyPreservedDuringHibernate : 1;
+		ULONG64 Reserved : 61;
+	} PowerFlags;
+	ULONG64 Reserved[7];
+};
 
 void CGPUUsage::GetUsage(statistic& gpu_statistic)
 {
@@ -514,8 +533,9 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 							aperture = queryStatistics.QueryResult.SegmentInformation.Aperture;
 							commitLimit = queryStatistics.QueryResult.SegmentInformation.BytesResident;
 						} else {
-							aperture = queryStatistics.QueryResult.SegmentInformationV1.Aperture;
-							commitLimit = queryStatistics.QueryResult.SegmentInformationV1.BytesResident;
+							auto segmentInfo = reinterpret_cast<D3DKMT_QUERYSTATISTICS_SEGMENT_INFORMATION_V1*>(&queryStatistics.QueryResult);
+							aperture = segmentInfo->Aperture;
+							commitLimit = segmentInfo->CommitLimit;
 						}
 
 						if (aperture) {
@@ -556,7 +576,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 				queryStatistics.Type = D3DKMT_QUERYSTATISTICS_NODE;
 				queryStatistics.AdapterLuid = AdapterLuid;
 				for (ULONG i = 0; i < nodeCount; i++) {
-					queryStatistics.QueryProcessNode.NodeId = i;
+					queryStatistics.QueryNode.NodeId = i;
 					if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))
 							&& queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart) {
 						gpuTimeStatistics[i].runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;

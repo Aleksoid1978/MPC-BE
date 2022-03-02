@@ -22,7 +22,8 @@
 #pragma once
 
 #include <adl/adl_sdk.h>
-#include "include/d3dkmt.h"
+#include <winternl.h>
+#include "include/d3dkmthk.h"
 
 class CGPUUsage
 {

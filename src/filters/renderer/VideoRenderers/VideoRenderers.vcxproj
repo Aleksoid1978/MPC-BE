@@ -129,7 +129,8 @@
     <ClInclude Include="EVRAllocatorPresenter.h" />
     <ClInclude Include="FocusThread.h" />
     <ClInclude Include="GPUUsage.h" />
-    <ClInclude Include="Include\d3dkmt.h" />
+    <ClInclude Include="Include\d3dkmdt.h" />
+    <ClInclude Include="Include\d3dkmthk.h" />
     <ClInclude Include="Include\d3dukmdt.h" />
     <ClInclude Include="Include\d3dumddi.h" />
     <ClInclude Include="IPinHook.h" />

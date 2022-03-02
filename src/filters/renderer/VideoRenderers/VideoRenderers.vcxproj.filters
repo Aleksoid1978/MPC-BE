@@ -151,15 +151,6 @@
     <ClInclude Include="Variables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\d3dkmt.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\d3dukmdt.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\d3dumddi.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
     <ClInclude Include="MPCVRAllocatorPresenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -171,6 +162,18 @@
     </ClInclude>
     <ClInclude Include="D3DUtil\FontBitmap.h">
       <Filter>D3DUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dkmdt.h">
+      <Filter>Header Files\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dkmthk.h">
+      <Filter>Header Files\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dukmdt.h">
+      <Filter>Header Files\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dumddi.h">
+      <Filter>Header Files\Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
