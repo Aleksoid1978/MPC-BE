@@ -28,6 +28,7 @@
 #include "DSUtil/FileVersion.h"
 #include "DSUtil/std_helper.h"
 #include "DSUtil/NullRenderers.h"
+#include "DSUtil/FileHandle.h"
 #include "filters/transform/DeCSSFilter/VobFile.h"
 #include <dmodshow.h>
 #include <evr.h>
@@ -355,13 +356,13 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	CString fn = CString(lpcwstrFileName).TrimLeft();
 	CString protocol = fn.Left(fn.Find(':')).MakeLower();
-	CString ext = CPath(fn).GetExtension().MakeLower();
+	CString ext = GetFileExt(fn).MakeLower();
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	std::vector<BYTE> httpbuf;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(L".cda") != 0)) {
-		hFile = CreateFileW(CString(fn), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)nullptr);
+		hFile = CreateFileW(fn, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;
@@ -369,9 +370,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	} else {
 		Content::Online::GetRaw(lpcwstrFileName, httpbuf);
 	}
-
-	WCHAR buff[256], buff2[256];
-	ULONG len, len2;
 
 	// internal filters
 	{
@@ -500,15 +498,18 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	// external
 	{
+		WCHAR buff[256] = {}, buff2[256] = {};
+		ULONG len, len2;
+
 		if (hFile == INVALID_HANDLE_VALUE) {
 			// protocol
 
 			CRegKey key;
-			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(protocol), KEY_READ)) {
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, protocol, KEY_READ)) {
 				CRegKey exts;
 				if (ERROR_SUCCESS == exts.Open(key, L"Extensions", KEY_READ)) {
 					len = std::size(buff);
-					if (ERROR_SUCCESS == exts.QueryStringValue(CString(ext), buff, &len)) {
+					if (ERROR_SUCCESS == exts.QueryStringValue(ext, buff, &len)) {
 						fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 4);
 					}
 				}
