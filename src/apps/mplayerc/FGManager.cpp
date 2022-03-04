@@ -367,6 +367,13 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;
 		}
+
+		LARGE_INTEGER size = {};
+		GetFileSizeEx(hFile, &size);
+		if (!size.QuadPart) {
+			CloseHandle(hFile);
+			return VFW_E_CANNOT_RENDER;
+		}
 	} else {
 		Content::Online::GetRaw(lpcwstrFileName, httpbuf);
 	}
