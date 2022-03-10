@@ -386,10 +386,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					if (!bHasVideo) {
 						mts.push_back(mt);
-						if (mt.subtype == MEDIASUBTYPE_WVC1) {
-							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-							mts.insert(mts.cbegin(), mt);
-						}
 
 						if (mt.subtype == MEDIASUBTYPE_HM10) {
 							std::vector<BYTE> pData;
@@ -848,57 +844,57 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pTE->DefaultDuration.Set((UINT64)((100.0 * UNITS) / framerate + 0.001));
 				}
 
-				CRect sourceRect = {
-					(LONG)pTE->v.VideoPixelCropLeft,
-					(LONG)pTE->v.VideoPixelCropTop,
-					(LONG)(pTE->v.PixelWidth - pTE->v.VideoPixelCropRight),
-					(LONG)(pTE->v.PixelHeight - pTE->v.VideoPixelCropBottom)
-				};
-
-				for (auto& item : mts) {
-					if (item.formattype == FORMAT_VideoInfo
-							|| item.formattype == FORMAT_VideoInfo2
-							|| item.formattype == FORMAT_MPEG2Video
-							|| item.formattype == FORMAT_MPEGVideo) {
-						VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)item.Format();
-						vih->rcSource = vih->rcTarget = sourceRect;
-						vih->AvgTimePerFrame = (UINT64)(UNITS / framerate + 0.001);
-					}
-				}
-
-				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight && !mts.empty()) {
-					CSize displayAR((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
-					ReduceDim(displayAR);
-
+				if (!mts.empty()) {
 					if (mts.front().formattype == FORMAT_VideoInfo) {
-						// VIDEOINFOHEADER does not support aspect ratio. Create an additional media type with VIDEOINFOHEADER2.
-						// The original media type with VIDEOINFOHEADER is needed for some VFW codecs.
-						CSize origAR(pTE->v.PixelWidth, pTE->v.PixelHeight);
-						ReduceDim(origAR);
-						if (origAR != displayAR) {
-							auto it = mts.cbegin();
-							if (it->subtype == MEDIASUBTYPE_WVC1_CYBERLINK) {
-								it++;
-							}
-							CMediaType mt2(*it);
+						// Create an additional media type with VIDEOINFOHEADER2
+						CMediaType mt2(mts.front());
 
-							LONG vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
-							LONG vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
-							LONG bmi = mt2.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
+						LONG vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
+						LONG vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
+						LONG bmi = mt2.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 
-							mt2.formattype = FORMAT_VideoInfo2;
-							mt2.ReallocFormatBuffer(vih2 + bmi);
-							memmove(mt2.Format() + vih2, mt2.Format() + vih1, bmi);
-							memset(mt2.Format() + vih1, 0, vih2 - vih1);
+						mt2.formattype = FORMAT_VideoInfo2;
+						mt2.ReallocFormatBuffer(vih2 + bmi);
+						memmove(mt2.Format() + vih2, mt2.Format() + vih1, bmi);
+						memset(mt2.Format() + vih1, 0, vih2 - vih1);
 
-							mts.insert(mts.cbegin(), mt2);
+						mts.insert(mts.cbegin(), mt2);
+					}
+
+					if (mts.front().subtype == MEDIASUBTYPE_WVC1) {
+						auto mt2(mts.front());
+						mt2.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
+						mts.insert(mts.cbegin(), mt2);
+					}
+
+					CRect sourceRect = {
+						(LONG)pTE->v.VideoPixelCropLeft,
+						(LONG)pTE->v.VideoPixelCropTop,
+						(LONG)(pTE->v.PixelWidth - pTE->v.VideoPixelCropRight),
+						(LONG)(pTE->v.PixelHeight - pTE->v.VideoPixelCropBottom)
+					};
+
+					for (auto& item : mts) {
+						if (item.formattype == FORMAT_VideoInfo
+								|| item.formattype == FORMAT_VideoInfo2
+								|| item.formattype == FORMAT_MPEG2Video
+								|| item.formattype == FORMAT_MPEGVideo) {
+							auto vih = (VIDEOINFOHEADER*)item.Format();
+							vih->rcSource = vih->rcTarget = sourceRect;
+							vih->AvgTimePerFrame = (UINT64)(UNITS / framerate + 0.001);
 						}
 					}
 
+					CSize AspectRatio((LONG)pTE->v.PixelWidth, (LONG)pTE->v.PixelHeight);
+					if (pTE->v.DisplayWidth && pTE->v.DisplayHeight) {
+						AspectRatio = { (LONG)pTE->v.DisplayWidth, (LONG)pTE->v.DisplayHeight };
+					}
+					ReduceDim(AspectRatio);
+
 					for (auto& item : mts) {
 						if (item.formattype == FORMAT_VideoInfo2 || item.formattype == FORMAT_MPEG2Video) {
-							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioX = displayAR.cx;
-							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioY = displayAR.cy;
+							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioX = AspectRatio.cx;
+							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioY = AspectRatio.cy;
 						}
 					}
 
@@ -907,130 +903,130 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						strRotation.Format(L"%.0f", (double)pTE->v.Projection.ProjectionPoseRoll);
 						SetProperty(L"ROTATION", strRotation);
 					}
-				}
 
-				if (pTE->v.FlagInterlaced == 1) {
-					switch (pTE->v.FieldOrder) {
-					case 0: // progressive
-						m_interlaced = 0;
-						break;
-					case 1:
-					case 9: // top field stored first
-						m_interlaced = 1;
-						break;
-					case 6:
-					case 14: // bottom field stored first
-						m_interlaced = 2;
-						break;
-					default:
-						m_interlaced = -1; // not supported
+					if (pTE->v.FlagInterlaced == 1) {
+						switch (pTE->v.FieldOrder) {
+						case 0: // progressive
+							m_interlaced = 0;
+							break;
+						case 1:
+						case 9: // top field stored first
+							m_interlaced = 1;
+							break;
+						case 6:
+						case 14: // bottom field stored first
+							m_interlaced = 2;
+							break;
+						default:
+							m_interlaced = -1; // not supported
+						}
 					}
-				}
 
-				if (pTE->v.StereoMode && pTE->v.StereoMode < MATROSKA_VIDEO_STEREOMODE) {
-					SetProperty(L"STEREOSCOPIC3DMODE", matroska_stereo_mode[pTE->v.StereoMode]);
-				}
-
-				if (pTE->v.Colour.IsValid()) {
-					m_ColorSpace = DNew(ColorSpace);
-					ZeroMemory(m_ColorSpace, sizeof(ColorSpace));
-
-					if (pTE->v.Colour.MatrixCoefficients != AVCOL_SPC_RESERVED) {
-						m_ColorSpace->MatrixCoefficients = pTE->v.Colour.MatrixCoefficients;
+					if (pTE->v.StereoMode && pTE->v.StereoMode < MATROSKA_VIDEO_STEREOMODE) {
+						SetProperty(L"STEREOSCOPIC3DMODE", matroska_stereo_mode[pTE->v.StereoMode]);
 					}
-					if (pTE->v.Colour.Primaries != AVCOL_PRI_RESERVED
+
+					if (pTE->v.Colour.IsValid()) {
+						m_ColorSpace = DNew(ColorSpace);
+						ZeroMemory(m_ColorSpace, sizeof(ColorSpace));
+
+						if (pTE->v.Colour.MatrixCoefficients != AVCOL_SPC_RESERVED) {
+							m_ColorSpace->MatrixCoefficients = pTE->v.Colour.MatrixCoefficients;
+						}
+						if (pTE->v.Colour.Primaries != AVCOL_PRI_RESERVED
 							&& pTE->v.Colour.Primaries != AVCOL_PRI_RESERVED0) {
-						m_ColorSpace->Primaries = pTE->v.Colour.Primaries;
-					}
-					if (pTE->v.Colour.Range != AVCOL_RANGE_UNSPECIFIED
+							m_ColorSpace->Primaries = pTE->v.Colour.Primaries;
+						}
+						if (pTE->v.Colour.Range != AVCOL_RANGE_UNSPECIFIED
 							&& pTE->v.Colour.Range <= AVCOL_RANGE_JPEG) {
-						m_ColorSpace->Range = pTE->v.Colour.Range;
-					}
-					if (pTE->v.Colour.TransferCharacteristics != AVCOL_TRC_RESERVED
+							m_ColorSpace->Range = pTE->v.Colour.Range;
+						}
+						if (pTE->v.Colour.TransferCharacteristics != AVCOL_TRC_RESERVED
 							&& pTE->v.Colour.TransferCharacteristics != AVCOL_TRC_RESERVED0) {
-						m_ColorSpace->TransferCharacteristics = pTE->v.Colour.TransferCharacteristics;
-					}
+							m_ColorSpace->TransferCharacteristics = pTE->v.Colour.TransferCharacteristics;
+						}
 
-					enum MatroskaColourChromaSitingHorz {
-						MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED = 0,
-						MATROSKA_COLOUR_CHROMASITINGHORZ_LEFT         = 1,
-						MATROSKA_COLOUR_CHROMASITINGHORZ_HALF         = 2,
-						MATROSKA_COLOUR_CHROMASITINGHORZ_NB
-					};
+						enum MatroskaColourChromaSitingHorz {
+							MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED = 0,
+							MATROSKA_COLOUR_CHROMASITINGHORZ_LEFT = 1,
+							MATROSKA_COLOUR_CHROMASITINGHORZ_HALF = 2,
+							MATROSKA_COLOUR_CHROMASITINGHORZ_NB
+						};
 
-					enum MatroskaColourChromaSitingVert {
-						MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED = 0,
-						MATROSKA_COLOUR_CHROMASITINGVERT_TOP          = 1,
-						MATROSKA_COLOUR_CHROMASITINGVERT_HALF         = 2,
-						MATROSKA_COLOUR_CHROMASITINGVERT_NB
-					};
+						enum MatroskaColourChromaSitingVert {
+							MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED = 0,
+							MATROSKA_COLOUR_CHROMASITINGVERT_TOP = 1,
+							MATROSKA_COLOUR_CHROMASITINGVERT_HALF = 2,
+							MATROSKA_COLOUR_CHROMASITINGVERT_NB
+						};
 
-					if (pTE->v.Colour.ChromaSitingHorz != MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED
+						if (pTE->v.Colour.ChromaSitingHorz != MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED
 							&& pTE->v.Colour.ChromaSitingVert != MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED
 							&& pTE->v.Colour.ChromaSitingHorz < MATROSKA_COLOUR_CHROMASITINGHORZ_NB
 							&& pTE->v.Colour.ChromaSitingVert < MATROSKA_COLOUR_CHROMASITINGVERT_NB) {
-						m_ColorSpace->ChromaLocation =
-							chroma_pos_to_enum((pTE->v.Colour.ChromaSitingHorz - 1) << 7,
-											   (pTE->v.Colour.ChromaSitingVert - 1) << 7);
-					}
-
-				}
-
-				if (pTE->v.Colour.MaxCLL.IsValid() && pTE->v.Colour.MaxFALL.IsValid()) {
-					m_HDRContentLightLevel = DNew(MediaSideDataHDRContentLightLevel);
-					ZeroMemory(m_HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
-
-					m_HDRContentLightLevel->MaxCLL  = pTE->v.Colour.MaxCLL;
-					m_HDRContentLightLevel->MaxFALL = pTE->v.Colour.MaxFALL;
-				}
-
-				if (pTE->v.Colour.MasteringMetadata.IsValid()) {
-					CMasteringMetadata& metadata = pTE->v.Colour.MasteringMetadata;
-
-					m_MasterDataHDR = DNew(MediaSideDataHDR);
-					ZeroMemory(m_MasterDataHDR, sizeof(MediaSideDataHDR));
-
-					m_MasterDataHDR->display_primaries_x[0] = metadata.PrimaryGChromaticityX;
-					m_MasterDataHDR->display_primaries_y[0] = metadata.PrimaryGChromaticityY;
-					m_MasterDataHDR->display_primaries_x[1] = metadata.PrimaryBChromaticityX;
-					m_MasterDataHDR->display_primaries_y[1] = metadata.PrimaryBChromaticityY;
-					m_MasterDataHDR->display_primaries_x[2] = metadata.PrimaryRChromaticityX;
-					m_MasterDataHDR->display_primaries_y[2] = metadata.PrimaryRChromaticityY;
-
-					m_MasterDataHDR->white_point_x = metadata.WhitePointChromaticityX;
-					m_MasterDataHDR->white_point_y = metadata.WhitePointChromaticityY;
-					m_MasterDataHDR->max_display_mastering_luminance = metadata.LuminanceMax;
-					m_MasterDataHDR->min_display_mastering_luminance = metadata.LuminanceMin;
-				}
-
-				if (mt.subtype == MEDIASUBTYPE_VP90 && m_profile != -1 && m_pix_fmt != -1) {
-					for (const auto& item : mts) {
-						BYTE* extra = nullptr;
-						if (item.formattype == FORMAT_VideoInfo2) {
-							mt = item;
-							auto vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
-							extra = (BYTE*)(vih2 + 1);
-						} else if (item.formattype == FORMAT_VideoInfo) {
-							mt = item;
-							auto vih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 16);
-							extra = (BYTE*)(vih + 1);
+							m_ColorSpace->ChromaLocation =
+								chroma_pos_to_enum((pTE->v.Colour.ChromaSitingHorz - 1) << 7,
+									(pTE->v.Colour.ChromaSitingVert - 1) << 7);
 						}
 
-						if (extra) {
-							memcpy(extra, "vpcC", 4);
-							// use code from LAV
-							AV_WB8 (extra +  4, 1); // version
-							AV_WB24(extra +  5, 0); // flags
-							AV_WB8 (extra +  8, m_profile);
-							AV_WB8 (extra +  9, 0);
-							AV_WB8 (extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
-							AV_WB8 (extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
-							AV_WB8 (extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
-							AV_WB8 (extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
-							AV_WB16(extra + 14, 0); // no codec init data
+					}
 
-							mts.insert(mts.cbegin(), mt);
-							break;
+					if (pTE->v.Colour.MaxCLL.IsValid() && pTE->v.Colour.MaxFALL.IsValid()) {
+						m_HDRContentLightLevel = DNew(MediaSideDataHDRContentLightLevel);
+						ZeroMemory(m_HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
+
+						m_HDRContentLightLevel->MaxCLL = pTE->v.Colour.MaxCLL;
+						m_HDRContentLightLevel->MaxFALL = pTE->v.Colour.MaxFALL;
+					}
+
+					if (pTE->v.Colour.MasteringMetadata.IsValid()) {
+						CMasteringMetadata& metadata = pTE->v.Colour.MasteringMetadata;
+
+						m_MasterDataHDR = DNew(MediaSideDataHDR);
+						ZeroMemory(m_MasterDataHDR, sizeof(MediaSideDataHDR));
+
+						m_MasterDataHDR->display_primaries_x[0] = metadata.PrimaryGChromaticityX;
+						m_MasterDataHDR->display_primaries_y[0] = metadata.PrimaryGChromaticityY;
+						m_MasterDataHDR->display_primaries_x[1] = metadata.PrimaryBChromaticityX;
+						m_MasterDataHDR->display_primaries_y[1] = metadata.PrimaryBChromaticityY;
+						m_MasterDataHDR->display_primaries_x[2] = metadata.PrimaryRChromaticityX;
+						m_MasterDataHDR->display_primaries_y[2] = metadata.PrimaryRChromaticityY;
+
+						m_MasterDataHDR->white_point_x = metadata.WhitePointChromaticityX;
+						m_MasterDataHDR->white_point_y = metadata.WhitePointChromaticityY;
+						m_MasterDataHDR->max_display_mastering_luminance = metadata.LuminanceMax;
+						m_MasterDataHDR->min_display_mastering_luminance = metadata.LuminanceMin;
+					}
+
+					if (mt.subtype == MEDIASUBTYPE_VP90 && m_profile != -1 && m_pix_fmt != -1) {
+						for (const auto& item : mts) {
+							BYTE* extra = nullptr;
+							if (item.formattype == FORMAT_VideoInfo2) {
+								mt = item;
+								auto vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
+								extra = (BYTE*)(vih2 + 1);
+							} else if (item.formattype == FORMAT_VideoInfo) {
+								mt = item;
+								auto vih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 16);
+								extra = (BYTE*)(vih + 1);
+							}
+
+							if (extra) {
+								memcpy(extra, "vpcC", 4);
+								// use code from LAV
+								AV_WB8(extra + 4, 1); // version
+								AV_WB24(extra + 5, 0); // flags
+								AV_WB8(extra + 8, m_profile);
+								AV_WB8(extra + 9, 0);
+								AV_WB8(extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
+								AV_WB8(extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
+								AV_WB8(extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
+								AV_WB8(extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
+								AV_WB16(extra + 14, 0); // no codec init data
+
+								mts.insert(mts.cbegin(), mt);
+								break;
+							}
 						}
 					}
 				}
