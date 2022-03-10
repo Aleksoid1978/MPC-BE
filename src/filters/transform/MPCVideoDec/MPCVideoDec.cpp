@@ -1235,6 +1235,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 CMPCVideoDecFilter::~CMPCVideoDecFilter()
 {
 	Cleanup();
+	SAFE_DELETE(m_pD3D11Decoder);
 }
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
@@ -1580,7 +1581,6 @@ void CMPCVideoDecFilter::Cleanup()
 
 	SAFE_DELETE(m_pMSDKDecoder);
 	SAFE_DELETE(m_pDXVADecoder);
-	SAFE_DELETE(m_pD3D11Decoder);
 	m_VideoOutputFormats.clear();
 
 	CleanupD3DResources();
@@ -2972,7 +2972,7 @@ HRESULT CMPCVideoDecFilter::BreakConnect(PIN_DIRECTION dir)
 		Cleanup();
 	}
 
-	return __super::BreakConnect (dir);
+	return __super::BreakConnect(dir);
 }
 
 void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
