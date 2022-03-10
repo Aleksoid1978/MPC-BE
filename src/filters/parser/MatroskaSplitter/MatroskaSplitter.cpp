@@ -870,7 +870,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					CSize displayAR((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 					ReduceDim(displayAR);
 
-					if (mts.back().formattype == FORMAT_VideoInfo) {
+					if (mts.front().formattype == FORMAT_VideoInfo) {
 						// VIDEOINFOHEADER does not support aspect ratio. Create an additional media type with VIDEOINFOHEADER2.
 						// The original media type with VIDEOINFOHEADER is needed for some VFW codecs.
 						CSize origAR(pTE->v.PixelWidth, pTE->v.PixelHeight);
