@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -866,18 +866,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight) {
+				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight && !mts.empty()) {
 					CSize displayAR((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 					ReduceDim(displayAR);
 
-					if (mts.size() == 1 && mts.front().formattype == FORMAT_VideoInfo) {
+					if (mts.back().formattype == FORMAT_VideoInfo) {
 						// VIDEOINFOHEADER does not support aspect ratio. Create an additional media type with VIDEOINFOHEADER2.
 						// The original media type with VIDEOINFOHEADER is needed for some VFW codecs.
-						CSize origAR = sourceRect.Size();
+						CSize origAR(pTE->v.PixelWidth, pTE->v.PixelHeight);
 						ReduceDim(origAR);
-
 						if (origAR != displayAR) {
-							CMediaType mt2(mts.front());
+							auto it = mts.cbegin();
+							if (it->subtype == MEDIASUBTYPE_WVC1_CYBERLINK) {
+								it++;
+							}
+							CMediaType mt2(*it);
 
 							LONG vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 							LONG vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
