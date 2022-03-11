@@ -2025,7 +2025,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				if (m_wsResizer) {
 					strText.AppendFormat(L" %s", m_wsResizer);
 					if (m_wsResizer2) {
-						strText.AppendFormat(L":Õ + %s:Y", m_wsResizer2);
+						strText.AppendFormat(L":X + %s:Y", m_wsResizer2);
 					}
 				}
 			}
