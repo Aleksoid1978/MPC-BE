@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -825,6 +825,69 @@ HRESULT CBaseAP::TextureCopy(IDirect3DTexture9* pTexture)
 	}
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	return TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
+}
+
+HRESULT CBaseAP::TextureCopyRect(
+	IDirect3DTexture9* pTexture,
+	const CRect& srcRect, const CRect& dstRect,
+	const D3DTEXTUREFILTERTYPE filter,
+	const int iRotation, const bool bFlip)
+{
+	HRESULT hr;
+
+	D3DSURFACE_DESC desc;
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
+		return E_FAIL;
+	}
+
+	float dx = 1.0f / desc.Width;
+	float dy = 1.0f / desc.Height;
+
+	POINT points[4];
+	switch (iRotation) {
+	case 90:
+		points[0] = { dstRect.right, dstRect.top };
+		points[1] = { dstRect.right, dstRect.bottom };
+		points[2] = { dstRect.left,  dstRect.top };
+		points[3] = { dstRect.left,  dstRect.bottom };
+		break;
+	case 180:
+		points[0] = { dstRect.right, dstRect.bottom };
+		points[1] = { dstRect.left,  dstRect.bottom };
+		points[2] = { dstRect.right, dstRect.top };
+		points[3] = { dstRect.left,  dstRect.top };
+		break;
+	case 270:
+		points[0] = { dstRect.left,  dstRect.bottom };
+		points[1] = { dstRect.left,  dstRect.top };
+		points[2] = { dstRect.right, dstRect.bottom };
+		points[3] = { dstRect.right, dstRect.top };
+		break;
+	default:
+		points[0] = { dstRect.left,  dstRect.top };
+		points[1] = { dstRect.right, dstRect.top };
+		points[2] = { dstRect.left,  dstRect.bottom };
+		points[3] = { dstRect.right, dstRect.bottom };
+		break;
+	}
+
+	if (bFlip) {
+		std::swap(points[0], points[1]);
+		std::swap(points[2], points[3]);
+	}
+
+	MYD3DVERTEX<1> v[] = {
+		{(float)points[0].x - 0.5f, (float)points[0].y - 0.5f, 0.5f, 2.0f, {srcRect.left * dx, srcRect.top * dy} },
+		{(float)points[1].x - 0.5f, (float)points[1].y - 0.5f, 0.5f, 2.0f, {srcRect.right * dx, srcRect.top * dy} },
+		{(float)points[2].x - 0.5f, (float)points[2].y - 0.5f, 0.5f, 2.0f, {srcRect.left * dx, srcRect.bottom * dy} },
+		{(float)points[3].x - 0.5f, (float)points[3].y - 0.5f, 0.5f, 2.0f, {srcRect.right * dx, srcRect.bottom * dy} },
+	};
+
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
+	hr = m_pD3DDevEx->SetPixelShader(nullptr);
+	hr = TextureBlt(m_pD3DDevEx, v, filter);
+
+	return hr;
 }
 
 HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
