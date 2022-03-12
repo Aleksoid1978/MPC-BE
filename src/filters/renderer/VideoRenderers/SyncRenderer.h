@@ -190,15 +190,27 @@ namespace GothSync
 
 		HRESULT DrawRectBase(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<0> v[4]);
 		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
+
 		HRESULT TextureCopy(IDirect3DTexture9* pTexture);
 		HRESULT TextureCopyRect(
 			IDirect3DTexture9* pTexture,
 			const CRect& srcRect, const CRect& dstRect,
 			const D3DTEXTUREFILTERTYPE filter,
 			const int iRotation, const bool bFlip);
+
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter);
 		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader);
 		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1);
+		HRESULT TextureResizeShader(
+			IDirect3DTexture9* pTexture,
+			const CRect& srcRect, const CRect& dstRect,
+			IDirect3DPixelShader9* pShader,
+			const int iRotation, const bool bFlip);
+
+		HRESULT ResizeShaderPass(
+			IDirect3DTexture9* pTexture, IDirect3DSurface9* pRenderTarget,
+			const CRect& srcRect, const CRect& dstRect,
+			const int iShaderX);
 
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 

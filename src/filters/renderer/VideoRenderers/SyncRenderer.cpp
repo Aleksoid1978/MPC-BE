@@ -1032,6 +1032,191 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRe
 	return hr;
 }
 
+HRESULT CBaseAP::TextureResizeShader(
+	IDirect3DTexture9* pTexture,
+	const CRect& srcRect, const CRect& dstRect,
+	IDirect3DPixelShader9* pShader,
+	const int iRotation, const bool bFlip)
+{
+	HRESULT hr = S_OK;
+
+	D3DSURFACE_DESC desc;
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
+		return E_FAIL;
+	}
+
+	const float dx = 1.0f / desc.Width;
+	const float dy = 1.0f / desc.Height;
+
+	float scale_x = (float)srcRect.Width();
+	float scale_y = (float)srcRect.Height();
+	if (iRotation == 90 || iRotation == 270) {
+		scale_x /= dstRect.Height();
+		scale_y /= dstRect.Width();
+	} else {
+		scale_x /= dstRect.Width();
+		scale_y /= dstRect.Height();
+	}
+
+	//const float steps_x = floor(scale_x + 0.5f);
+	//const float steps_y = floor(scale_y + 0.5f);
+
+	const float tx0 = (float)srcRect.left - 0.5f;
+	const float ty0 = (float)srcRect.top - 0.5f;
+	const float tx1 = (float)srcRect.right - 0.5f;
+	const float ty1 = (float)srcRect.bottom - 0.5f;
+
+	POINT points[4];
+	switch (iRotation) {
+	case 90:
+		points[0] = { dstRect.right, dstRect.top };
+		points[1] = { dstRect.right, dstRect.bottom };
+		points[2] = { dstRect.left,  dstRect.top };
+		points[3] = { dstRect.left,  dstRect.bottom };
+		break;
+	case 180:
+		points[0] = { dstRect.right, dstRect.bottom };
+		points[1] = { dstRect.left,  dstRect.bottom };
+		points[2] = { dstRect.right, dstRect.top };
+		points[3] = { dstRect.left,  dstRect.top };
+		break;
+	case 270:
+		points[0] = { dstRect.left,  dstRect.bottom };
+		points[1] = { dstRect.left,  dstRect.top };
+		points[2] = { dstRect.right, dstRect.bottom };
+		points[3] = { dstRect.right, dstRect.top };
+		break;
+	default:
+		points[0] = { dstRect.left,  dstRect.top };
+		points[1] = { dstRect.right, dstRect.top };
+		points[2] = { dstRect.left,  dstRect.bottom };
+		points[3] = { dstRect.right, dstRect.bottom };
+		break;
+	}
+
+	if (bFlip) {
+		std::swap(points[0], points[1]);
+		std::swap(points[2], points[3]);
+	}
+
+	MYD3DVERTEX<1> v[] = {
+		{ (float)points[0].x - 0.5f, (float)points[0].y - 0.5f, 0.5f, 2.0f, {tx0, ty0} },
+		{ (float)points[1].x - 0.5f, (float)points[1].y - 0.5f, 0.5f, 2.0f, {tx1, ty0} },
+		{ (float)points[2].x - 0.5f, (float)points[2].y - 0.5f, 0.5f, 2.0f, {tx0, ty1} },
+		{ (float)points[3].x - 0.5f, (float)points[3].y - 0.5f, 0.5f, 2.0f, {tx1, ty1} },
+	};
+
+	float fConstData[][4] = {
+		{ dx, dy, 0, 0 },
+		{ scale_x, scale_y, 0, 0 },
+	};
+	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
+	hr = m_pD3DDevEx->SetPixelShader(pShader);
+
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
+	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
+	m_pD3DDevEx->SetPixelShader(nullptr);
+
+	return hr;
+}
+
+HRESULT CBaseAP::ResizeShaderPass(
+	IDirect3DTexture9* pTexture, IDirect3DSurface9* pRenderTarget,
+	const CRect& srcRect, const CRect& dstRect,
+	const int iShaderX)
+{
+	HRESULT hr = S_OK;
+	const int w2 = dstRect.Width();
+	const int h2 = dstRect.Height();
+	const int k = 2;
+
+	IDirect3DPixelShader9* pShaderUpscaleX = m_pResizerPixelShaders[iShaderX];
+	IDirect3DPixelShader9* pShaderUpscaleY = m_pResizerPixelShaders[iShaderX+1];
+	IDirect3DPixelShader9* pShaderDownscaleX = m_pResizerPixelShaders[shader_downscaling_x];
+	IDirect3DPixelShader9* pShaderDownscaleY = m_pResizerPixelShaders[shader_downscaling_y];
+
+	int w1, h1;
+	IDirect3DPixelShader9* resizerX;
+	IDirect3DPixelShader9* resizerY;
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		w1 = srcRect.Height();
+		h1 = srcRect.Width();
+		resizerX = (w1 == w2) ? nullptr : (w1 > 2 * w2) ? pShaderDownscaleY : pShaderUpscaleY; // use Y scaling here
+		if (resizerX) {
+			resizerY = (h1 == h2) ? nullptr : (h1 > 2 * h2) ? pShaderDownscaleY : pShaderUpscaleY;
+		} else {
+			resizerY = (h1 == h2) ? nullptr : (h1 > 2 * h2) ? pShaderDownscaleX : pShaderUpscaleX; // use X scaling here
+		}
+	} else {
+		w1 = srcRect.Width();
+		h1 = srcRect.Height();
+		resizerX = (w1 == w2) ? nullptr : (w1 > 2 * w2) ? pShaderDownscaleX : pShaderUpscaleX;
+		resizerY = (h1 == h2) ? nullptr : (h1 > 2 * h2) ? pShaderDownscaleY : pShaderUpscaleY;
+	}
+
+	if (resizerX && resizerY) {
+		// two pass resize
+
+		D3DSURFACE_DESC desc;
+		pRenderTarget->GetDesc(&desc);
+
+		// check intermediate texture
+		const UINT texWidth = desc.Width;
+		const UINT texHeight = h1;
+
+		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
+			if (texWidth != desc.Width || texHeight != desc.Height) {
+				m_pResizeTexture.Release(); // need new texture
+			}
+		}
+
+		if (!m_pResizeTexture) {
+			hr = m_pD3DDevEx->CreateTexture(
+				texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
+				D3DFMT_A16B16G16R16F, // use only float textures here
+				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
+			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
+				m_pResizeTexture.Release();
+				DLog(L"CDX9VideoProcessor::ProcessTex() : m_TexResize.Create() failed with error {}", HR2Str(hr));
+				return TextureCopyRect(pTexture, srcRect, dstRect, D3DTEXF_LINEAR, m_iRotation, m_bFlip);
+			}
+		}
+
+		CRect resizeRect(dstRect.left, 0, dstRect.right, texHeight);
+		CComPtr<IDirect3DSurface9> pResizeSurface;
+		hr = m_pResizeTexture->GetSurfaceLevel(0, &pResizeSurface);
+
+		// resize width
+		hr = m_pD3DDevEx->SetRenderTarget(0, pResizeSurface);
+		hr = TextureResizeShader(pTexture, srcRect, resizeRect, resizerX, m_iRotation, m_bFlip);
+
+		// resize height
+		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+		hr = TextureResizeShader(m_pResizeTexture, resizeRect, dstRect, resizerY, 0, false);
+	}
+	else {
+		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+
+		if (resizerX) {
+			// one pass resize for width
+			hr = TextureResizeShader(pTexture, srcRect, dstRect, resizerX, m_iRotation, m_bFlip);
+		}
+		else if (resizerY) {
+			// one pass resize for height
+			hr = TextureResizeShader(pTexture, srcRect, dstRect, resizerY, m_iRotation, m_bFlip);
+		}
+		else {
+			// no resize
+			hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+			hr = TextureCopyRect(pTexture, srcRect, dstRect, D3DTEXF_POINT, m_iRotation, m_bFlip);
+		}
+	}
+
+	DLogIf(FAILED(hr), L"CDX9VideoProcessor::ResizeShaderPass() : failed with error {}", HR2Str(hr));
+
+	return hr;
+}
+
 HRESULT CBaseAP::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture)
 {
 	if (!pSrc || !pDst) {
