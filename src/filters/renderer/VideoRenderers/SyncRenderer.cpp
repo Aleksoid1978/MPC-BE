@@ -577,8 +577,6 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 		m_pVideoTextures[i].Release();
 		m_pVideoSurfaces[i].Release();
 	}
-	m_pRotateTexture.Release();
-	m_pRotateSurface.Release();
 	m_pResizeTexture.Release();
 	m_pScreenSizeTextures[0].Release();
 	m_pScreenSizeTextures[1].Release();
@@ -599,15 +597,6 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 		}
 	}
 
-	UINT a = std::max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
-	if (FAILED(hr = m_pD3DDevEx->CreateTexture(
-		a, a, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pRotateTexture, nullptr))) {
-		return hr;
-	}
-	if (FAILED(hr = m_pRotateTexture->GetSurfaceLevel(0, &m_pRotateSurface))) {
-		return hr;
-	}
-
 	hr = m_pD3DDevEx->ColorFill(m_pVideoSurfaces[m_iCurSurface], nullptr, 0);
 	return S_OK;
 }
@@ -621,8 +610,6 @@ void CBaseAP::DeleteSurfaces()
 		m_pVideoTextures[i].Release();
 		m_pVideoSurfaces[i].Release();
 	}
-	m_pRotateTexture.Release();
-	m_pRotateSurface.Release();
 	m_pResizeTexture.Release();
 }
 
@@ -904,132 +891,6 @@ HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 		v[i].y -= 0.5;
 	}
 	return DrawRectBase(m_pD3DDevEx, v);
-}
-
-HRESULT CBaseAP::TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter)
-{
-	HRESULT hr;
-
-	D3DSURFACE_DESC desc;
-	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
-		return E_FAIL;
-	}
-
-	float dx = 1.0f / desc.Width;
-	float dy = 1.0f / desc.Height;
-
-	MYD3DVERTEX<1> v[] = {
-		{(float)destRect.left - 0.5f,  (float)destRect.top - 0.5f,    0.5f, 2.0f, {srcRect.left  * dx, srcRect.top    * dy} },
-		{(float)destRect.right - 0.5f, (float)destRect.top - 0.5f,    0.5f, 2.0f, {srcRect.right * dx, srcRect.top    * dy} },
-		{(float)destRect.left - 0.5f,  (float)destRect.bottom - 0.5f, 0.5f, 2.0f, {srcRect.left  * dx, srcRect.bottom * dy} },
-		{(float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f, {srcRect.right * dx, srcRect.bottom * dy} },
-	};
-
-	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	hr = m_pD3DDevEx->SetPixelShader(nullptr);
-	hr = TextureBlt(m_pD3DDevEx, v, filter);
-
-	return hr;
-}
-
-HRESULT CBaseAP::TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader)
-{
-	HRESULT hr = S_OK;
-
-	D3DSURFACE_DESC desc;
-	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
-		return E_FAIL;
-	}
-
-	const float dx = 1.0f / desc.Width;
-	const float dy = 1.0f / desc.Height;
-
-	const float rx = (float)srcRect.Width() / destRect.Width();
-	const float ry = (float)srcRect.Height() / destRect.Height();
-
-	const float tx0 = (float)srcRect.left - 0.5f;
-	const float ty0 = (float)srcRect.top - 0.5f;
-	const float tx1 = (float)srcRect.right - 0.5f;
-	const float ty1 = (float)srcRect.bottom - 0.5f;
-
-	MYD3DVERTEX<1> v[] = {
-		{ (float)destRect.left - 0.5f,  (float)destRect.top - 0.5f,    0.5f, 2.0f,{ tx0, ty0 } },
-		{ (float)destRect.right - 0.5f, (float)destRect.top - 0.5f,    0.5f, 2.0f,{ tx1, ty0 } },
-		{ (float)destRect.left - 0.5f,  (float)destRect.bottom - 0.5f, 0.5f, 2.0f,{ tx0, ty1 } },
-		{ (float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f,{ tx1, ty1 } },
-	};
-
-	float fConstData[][4] = { { dx, dy, 0, 0 },{ rx, ry, 0, 0 } };
-	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
-	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
-
-	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
-	m_pD3DDevEx->SetPixelShader(nullptr);
-
-	return hr;
-}
-
-HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1)
-{
-	HRESULT hr = S_OK;
-
-	int w1 = srcRect.Width();
-	int h1 = srcRect.Height();
-	int w2 = destRect.Width();
-	int h2 = destRect.Height();
-	ASSERT(w1 != w2 || h1 != h2);
-
-	if (w1 != w2 && h1 != h2) { // need two pass
-		D3DSURFACE_DESC desc;
-
-		UINT texWidth = std::min((DWORD)w2, m_Caps.MaxTextureWidth);
-		UINT texHeight = std::min((DWORD)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
-
-		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
-			if (texWidth != desc.Width || texHeight != desc.Height) {
-				m_pResizeTexture.Release(); // need new texture
-			}
-		}
-
-		if (!m_pResizeTexture) {
-			hr = m_pD3DDevEx->CreateTexture(
-				texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
-				D3DFMT_A16B16G16R16F, // use only float textures here
-				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
-			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-				m_pResizeTexture.Release();
-				return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
-			}
-		}
-
-		const CRect resizeRect(0, 0, desc.Width, desc.Height);
-
-		// remember current RenderTarget
-		CComPtr<IDirect3DSurface9> pRenderTarget;
-		hr = m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
-		// set temp RenderTarget
-		CComPtr<IDirect3DSurface9> pResizeSurface;
-		hr = m_pResizeTexture->GetSurfaceLevel(0, &pResizeSurface);
-		hr = m_pD3DDevEx->SetRenderTarget(0, pResizeSurface);
-
-		// resize width
-		hr = TextureResizeShader(pTexture, srcRect, resizeRect, (w1 > w2 * 2) ? shader_downscaling_x : iShader1);
-
-		// restore current RenderTarget
-		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
-
-		// resize height
-		hr = TextureResizeShader(m_pResizeTexture, resizeRect, destRect, (h1 > h2 * 2) ? shader_downscaling_y : iShader1 + 1);
-	}
-	else if (w1 != w2) {
-		hr = TextureResizeShader(pTexture, srcRect, destRect, (w1 > w2 * 2) ? shader_downscaling_x : iShader1);
-	}
-	else { // if (h1 != h2)
-		hr = TextureResizeShader(pTexture, srcRect, destRect, (h1 > h2 * 2) ? shader_downscaling_y : iShader1 + 1);
-	}
-
-	return hr;
 }
 
 HRESULT CBaseAP::TextureResizeShader(
@@ -1365,8 +1226,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	REFERENCE_TIME llCurRefTime = 0;
 	REFERENCE_TIME llSyncOffset = 0;
 	double dSyncOffset = 0.0;
-	int iRotation = m_iRotation;
-	bool bFlip = m_bFlip;
 
 	CAutoLock cRenderLock(&m_allocatorLock);
 
@@ -1473,64 +1332,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = m_pD3DDevEx->SetPixelShader(nullptr);
 			}
 
-			if (iRotation || bFlip) {
-				Vector dest[4];
-
-				switch (iRotation) {
-				case 0:
-					dest[0].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					dest[2].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					dest[3].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurfaces + 1]);
-					break;
-				case 90:
-					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dest[2].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dest[3].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pRotateSurface);
-					break;
-				case 180:
-					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dest[1].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					dest[2].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					dest[3].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurfaces + 1]);
-					break;
-				case 270:
-					dest[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					dest[1].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dest[2].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dest[3].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pRotateSurface);
-					break;
-				}
-				if (bFlip) {
-					std::swap(dest[0], dest[1]);
-					std::swap(dest[2], dest[3]);
-				}
-
-				MYD3DVERTEX<1> v[] = {
-					{ dest[0].x - 0.5f, dest[0].y- 0.5f, 0.5f, 2.0f, 0.0f, 0.0f },
-					{ dest[1].x - 0.5f, dest[1].y- 0.5f, 0.5f, 2.0f, 1.0f, 0.0f },
-					{ dest[2].x - 0.5f, dest[2].y- 0.5f, 0.5f, 2.0f, 0.0f, 1.0f },
-					{ dest[3].x - 0.5f, dest[3].y- 0.5f, 0.5f, 2.0f, 1.0f, 1.0f },
-				};
-				hr = m_pD3DDevEx->SetTexture(0, pVideoTexture);
-				hr = m_pD3DDevEx->SetPixelShader(nullptr);
-				hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
-
-				if (iRotation == 90 || iRotation == 270) {
-					pVideoTexture = m_pRotateTexture;
-				}
-				else { // 0+flip and 180
-					pVideoTexture = m_pVideoTextures[m_nSurfaces + 1];
-				}
-
-				m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-			}
-
 			// init resizer
 			DWORD iResizer = rs.iResizer;
 			hr = InitShaderResizer();
@@ -1557,8 +1358,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 			}
 
+			CComPtr<IDirect3DSurface9> pRT(pBackBuffer);
+
 			if (bScreenSpacePixelShaders) {
-				CComPtr<IDirect3DSurface9> pRT;
 				hr = m_pScreenSizeTextures[1]->GetSurfaceLevel(0, &pRT);
 				if (hr != S_OK) {
 					bScreenSpacePixelShaders = false;
@@ -1577,48 +1379,48 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				switch (iResizer) {
 				case RESIZER_NEAREST:
 					m_wsResizer = L"Nearest neighbor";
-					hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_POINT);
+					hr = TextureCopyRect(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_POINT, m_iRotation, m_bFlip);
 					break;
 				case RESIZER_BILINEAR:
 					m_wsResizer = L"Bilinear";
-					hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_LINEAR);
+					hr = TextureCopyRect(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_LINEAR, m_iRotation, m_bFlip);
 					break;
 				case RESIZER_SHADER_BSPLINE:
 					m_wsResizer = L"B-spline";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bspline_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_bspline_x);
 					break;
 				case RESIZER_SHADER_MITCHELL:
 					m_wsResizer = L"Mitchell-Netravali";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_mitchell_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_mitchell_x);
 					break;
 				case RESIZER_SHADER_CATMULL:
 					m_wsResizer = L"Catmull-Rom";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_catmull_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_catmull_x);
 					break;
 				case RESIZER_SHADER_BICUBIC06:
 					m_wsResizer = L"Bicubic A=-0.6";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bicubic06_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_bicubic06_x);
 					break;
 				case RESIZER_SHADER_BICUBIC08:
 					m_wsResizer = L"Bicubic A=-0.8";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bicubic08_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_bicubic08_x);
 					break;
 				case RESIZER_SHADER_BICUBIC10:
 					m_wsResizer = L"Bicubic A=-1.0";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bicubic10_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_bicubic10_x);
 					break;
 				case RESIZER_SHADER_LANCZOS2:
 					m_wsResizer = L"Lanczos2";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_lanczos2_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_lanczos2_x);
 					break;
 				case RESIZER_SHADER_LANCZOS3:
 					m_wsResizer = L"Lanczos3";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_lanczos3_x);
+					hr = ResizeShaderPass(pVideoTexture, pRT, rSrcVid, rDstVid, shader_lanczos3_x);
 					break;
 				}
 			} else {
 				m_wsResizer = L""; // empty string, not nullptr
-				hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_POINT);
+				hr = TextureCopyRect(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_POINT, m_iRotation, m_bFlip);
 			}
 
 			// post-resize pixel shaders
