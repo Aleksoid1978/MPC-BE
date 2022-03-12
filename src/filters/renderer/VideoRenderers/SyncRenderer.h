@@ -149,8 +149,6 @@ namespace GothSync
 
 		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_PICTURE_SLOTS];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_PICTURE_SLOTS];
-		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
-		CComPtr<IDirect3DSurface9>	m_pRotateSurface;
 		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
 		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
 		CComPtr<IDirect3DTexture9>	m_pScreenSizeTextures[2];
@@ -198,9 +196,6 @@ namespace GothSync
 			const D3DTEXTUREFILTERTYPE filter,
 			const int iRotation, const bool bFlip);
 
-		HRESULT TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter);
-		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader);
-		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1);
 		HRESULT TextureResizeShader(
 			IDirect3DTexture9* pTexture,
 			const CRect& srcRect, const CRect& dstRect,
