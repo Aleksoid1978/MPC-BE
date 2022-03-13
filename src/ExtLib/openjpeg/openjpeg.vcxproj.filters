@@ -74,6 +74,9 @@
     <ClCompile Include="sparse_array.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ht_dec.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bio.h">

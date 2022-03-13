@@ -24,6 +24,7 @@
     <ClCompile Include="dwt.c" />
     <ClCompile Include="event.c" />
     <ClCompile Include="function_list.c" />
+    <ClCompile Include="ht_dec.c" />
     <ClCompile Include="image.c" />
     <ClCompile Include="invert.c" />
     <ClCompile Include="j2k.c" />
