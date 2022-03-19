@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2021 see Authors.txt
+ * (C) 2013-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -173,8 +173,15 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			std::vector<CMediaType> mts;
 			mts.push_back(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, m_pAudioFile->GetName() + L" Audio Output", this, this, &hr));
+
+			const CStringW name = m_pAudioFile->GetName();
+
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name + L" Audio Output", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
+
+			if (name == L"Flac") {
+				m_pFile->SetCacheSize(256 * KILOBYTE);
+			}
 		}
 	}
 
