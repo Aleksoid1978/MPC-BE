@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -149,8 +149,13 @@ bool CBaseSplitterFile::SetCacheSize(int cachelen)
 	if (!m_pCache) {
 		return false;
 	}
-	m_cachetotal = cachelen;
-	m_cachelen = 0;
+	m_cachetotalPrevious = 0;
+	m_pCachePrevious.reset(new(std::nothrow) BYTE[cachelen]);
+	if (!m_pCachePrevious) {
+		return false;
+	}
+	m_cachetotal = m_cachetotalPrevious = cachelen;
+	m_cachelen = m_cachelenPrevious = 0;
 	return true;
 }
 
@@ -263,10 +268,19 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 		Exit(hr);
 	}
 
-	BYTE* pCache = m_pCache.get();
+	if (m_cacheposPrevious <= m_pos && m_pos < m_cacheposPrevious + m_cachelenPrevious) {
+		int minlen = std::min<int>(len, m_cachelenPrevious - (m_pos - m_cacheposPrevious));
 
+		memcpy(pData, &m_pCachePrevious.get()[m_pos - m_cacheposPrevious], minlen);
+
+		len -= minlen;
+		m_pos += minlen;
+		pData += minlen;
+	}
+
+	BYTE* pCache = m_pCache.get();
 	if (m_cachepos <= m_pos && m_pos < m_cachepos + m_cachelen) {
-		int minlen = std::min(len, m_cachelen - (int)(m_pos - m_cachepos));
+		int minlen = std::min<int>(len, m_cachelen - (m_pos - m_cachepos));
 
 		memcpy(pData, &pCache[m_pos - m_cachepos], minlen);
 
@@ -286,12 +300,22 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 		pData += m_cachetotal;
 	}
 
+	if (len) {
+		m_cacheposPrevious = m_cachelenPrevious = 0;
+	}
+
 	while (len > 0) {
 		const __int64 tmplen = IsStreaming() ? m_cachetotal: m_available - m_pos;
-		int maxlen = (int)std::min(tmplen, (__int64)m_cachetotal);
+		int maxlen = (int)std::min<__int64>(tmplen, m_cachetotal);
 		int minlen = std::min(len, maxlen);
 		if (minlen <= 0) {
 			Exit(S_FALSE);
+		}
+
+		if (len == minlen && m_pos > m_cachepos) {
+			memcpy(m_pCachePrevious.get(), pCache, m_cachelen);
+			m_cacheposPrevious = m_cachepos;
+			m_cachelenPrevious = m_cachelen;
 		}
 
 		hr = SyncRead(pCache, maxlen);

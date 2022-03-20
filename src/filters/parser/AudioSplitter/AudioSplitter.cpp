@@ -180,7 +180,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 
 			if (name == L"Flac") {
-				m_pFile->SetCacheSize(256 * KILOBYTE);
+				m_pFile->SetCacheSize(64 * KILOBYTE);
 			}
 		}
 	}

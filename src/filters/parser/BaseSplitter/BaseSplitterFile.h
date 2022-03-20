@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,6 +42,11 @@ class CBaseSplitterFile
 	__int64 m_cachepos        = 0;
 	int     m_cachelen        = 0;
 	int     m_cachetotal      = 0;
+	std::unique_ptr<BYTE> m_pCachePrevious;
+	__int64 m_cacheposPrevious   = 0;
+	int     m_cachelenPrevious   = 0;
+	int     m_cachetotalPrevious = 0;
+
 	UINT64  m_bitbuff         = 0;
 	int     m_bitlen          = 0;
 
