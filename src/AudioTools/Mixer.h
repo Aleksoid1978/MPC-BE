@@ -37,8 +37,8 @@ private:
 
 	SampleFormat m_in_sf;
 	SampleFormat m_out_sf;
-	int64_t m_in_layout;
-	DWORD   m_out_layout;
+	uint64_t m_in_layout;
+	uint32_t m_out_layout;
 	int     m_in_samplerate;
 	int     m_out_samplerate;
 
@@ -54,8 +54,8 @@ private:
 
 public:
 	void SetOptions(double center_level, double suround_level, bool normalize_matrix, bool dummy_channels);
-	void UpdateInput (SampleFormat  in_sf, int64_t in_layout, int  in_samplerate = 48000);
-	void UpdateOutput(SampleFormat out_sf, DWORD  out_layout, int out_samplerate = 48000);
+	void UpdateInput (SampleFormat  in_sf, uint64_t in_layout, int  in_samplerate = 48000);
+	void UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samplerate = 48000);
 
 	int  Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples);
 

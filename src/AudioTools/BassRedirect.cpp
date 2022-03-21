@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,7 +83,7 @@ void CBassRedirect::SetOptions(int cutoff_freq)
 	}
 }
 
-void CBassRedirect::UpdateInput(SampleFormat sf, DWORD layout, int samplerate)
+void CBassRedirect::UpdateInput(SampleFormat sf, uint32_t layout, int samplerate)
 {
 	m_sf = sf;
 

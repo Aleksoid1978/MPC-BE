@@ -283,7 +283,7 @@ void CMixer::SetOptions(double center_level, double suround_level, bool normaliz
 	}
 }
 
-void CMixer::UpdateInput(SampleFormat in_sf, int64_t in_layout, int in_samplerate)
+void CMixer::UpdateInput(SampleFormat in_sf, uint64_t in_layout, int in_samplerate)
 {
 	if (in_sf != m_in_sf || in_layout != m_in_layout || in_samplerate != m_in_samplerate) {
 		m_in_layout     = in_layout;
@@ -293,7 +293,7 @@ void CMixer::UpdateInput(SampleFormat in_sf, int64_t in_layout, int in_samplerat
 	}
 }
 
-void CMixer::UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate)
+void CMixer::UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samplerate)
 {
 	if (out_sf != m_out_sf || out_layout != m_out_layout || out_samplerate != m_out_samplerate) {
 		m_out_layout     = out_layout;

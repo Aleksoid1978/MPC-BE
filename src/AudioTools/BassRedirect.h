@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,7 +45,7 @@
 class CBassRedirect
 {
 	SampleFormat m_sf          = SAMPLE_FMT_NONE;
-	DWORD        m_layout      = 0;
+	uint32_t     m_layout      = 0;
 	unsigned     m_chanels     = 0;
 	unsigned     m_lfepos      = 0;
 	int          m_samplerate  = 0;
@@ -68,7 +68,7 @@ class CBassRedirect
 
 public:
 	void SetOptions(int cutoff_freq);
-	void UpdateInput(SampleFormat sf, DWORD layout, int samplerate);
+	void UpdateInput(SampleFormat sf, uint32_t layout, int samplerate);
 
 	void Process(BYTE* p, const int samples);
 };
