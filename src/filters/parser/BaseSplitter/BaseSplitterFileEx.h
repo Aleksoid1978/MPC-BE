@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -150,6 +150,9 @@ public:
 	{
 		int samplerate;
 		int channels;
+
+		int FrameSize, FrameSamples;
+		REFERENCE_TIME rtDuration;
 
 		bool operator == (const struct latm_aachdr& h) const {
 			return (samplerate == h.samplerate

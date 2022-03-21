@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -444,13 +444,24 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 		return false;
 	}
 
+	auto pos = GetPos();
 	std::vector<BYTE> buf(std::min(len, 32));
 	ByteRead(buf.data(), buf.size());
+	Seek(pos);
 
 	std::vector<BYTE> extra;
-	if (!ParseAACLatmHeader(buf.data(), buf.size(), h.samplerate, h.channels, extra)) {
+	audioframe_t audioframe = {};
+	auto frameSize = ParseAACLatmHeader(buf.data(), buf.size(), &audioframe, pmt ? &extra : nullptr);
+	if (!frameSize) {
 		return false;
 	}
+
+	h.channels = audioframe.channels;
+	h.samplerate = audioframe.samplerate;
+	h.FrameSize = frameSize;
+
+	h.FrameSamples = 1024; // ok?
+	h.rtDuration = 10000000i64 * h.FrameSamples / h.samplerate;
 
 	if (pmt) {
 		WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + extra.size()];

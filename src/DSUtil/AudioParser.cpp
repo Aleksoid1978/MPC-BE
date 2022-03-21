@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2021 see Authors.txt
+ * (C) 2011-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -958,7 +958,6 @@ int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE hdmvlpcm_channels[16]   = { 0, 1, 0, 2, 3, 3, 4, 4, 5, 6, 7, 8, 0, 0, 0, 0 };
 	static const BYTE hdmvlpcm_bitdepth[4]    = { 0, 16, 20, 24 };
 
-
 	int frame_size = buf[0] << 8 | buf[1];
 	frame_size += 4; // add header size;
 
@@ -1068,20 +1067,18 @@ static bool StreamMuxConfig(CGolombBuffer& gb, int& samplingFrequency, int& chan
 	return false;
 }
 
-bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, std::vector<BYTE>& extra)
+int ParseAACLatmHeader(const BYTE* buf, int len, audioframe_t* audioframe/* = nullptr*/, std::vector<BYTE>* extra/* = nullptr*/)
 {
-	if ((GETU16(buf) & 0xe0FF) != 0xe056) {
-		return false;
+	if ((GETU16(buf) & 0xE0FF) != 0xE056) {
+		return 0;
 	}
 
-	samplerate = channels = 0;
-	extra.clear();
-
+	int samplerate = 0, channels = 0;
 	int nExtraPos = 0;
 
 	CGolombBuffer gb(buf, len);
 	gb.BitRead(11); // sync
-	gb.BitRead(13); // muxlength
+	int muxlength = gb.BitRead(13) + 3;
 	BYTE use_same_mux = gb.BitRead(1);
 	if (!use_same_mux) {
 		bool ret = StreamMuxConfig(gb, samplerate, channels, nExtraPos);
@@ -1089,21 +1086,27 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels
 			return ret;
 		}
 	} else {
-		return false;
+		return 0;
 	}
 
 	if (samplerate < 8000 || samplerate > 96000 || channels < 1 || (channels > 8 && channels != 24)) {
-		return false;
+		return 0;
 	}
 
-	if (nExtraPos) {
+	if (audioframe) {
+		audioframe->size = muxlength;
+		audioframe->channels = channels;
+		audioframe->samplerate = samplerate;
+	}
+
+	if (extra && nExtraPos) {
 		const int extralen = gb.GetPos() - nExtraPos;
 		gb.Reset();
 		gb.SkipBytes(nExtraPos);
 
-		extra.resize(extralen);
-		gb.ReadBuffer(extra.data(), extra.size());
+		extra->resize(extralen);
+		gb.ReadBuffer(extra->data(), extra->size());
 	}
 
-	return true;
+	return muxlength;
 }

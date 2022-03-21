@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2020 see Authors.txt
+ * (C) 2011-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -125,4 +125,4 @@ int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = nullptr)
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
-bool ParseAACLatmHeader    (const BYTE* buf, int len, int& samplerate, int& channels, std::vector<BYTE>& extra);
+int ParseAACLatmHeader     (const BYTE* buf, int len, audioframe_t* audioframe = nullptr, std::vector<BYTE>* extra = nullptr);
