@@ -36,12 +36,14 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 	enum mode {
 		none,
 		mpa,
-		mp4a
+		mp4a,
+		latm
 	};
 	mode m_mode;
 
 	mpahdr m_mpahdr;
 	aachdr m_aachdr;
+	latm_aachdr m_latmhdr;
 
 	__int64 m_startpos = 0;
 	__int64 m_endpos   = 0;

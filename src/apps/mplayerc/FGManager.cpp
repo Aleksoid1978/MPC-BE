@@ -1965,8 +1965,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_MPA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>(MpaSourceName);
-		pFGF->m_chkbytes.emplace_back(L"0,2,FFE0,FFE0");
+		pFGF->m_chkbytes.emplace_back(L"0,2,FFE0,FFE0");               // Mpeg Audio
 		pFGF->m_chkbytes.emplace_back(L"0,10,FFFFFF00000080808080,49443300000000000000");
+		pFGF->m_chkbytes.emplace_back(L"0,2,FFE0,56E0");               // AAC LATM
 		pFGF->m_extensions.emplace_back(L".mp3");
 		pFGF->m_extensions.emplace_back(L".aac");
 		m_source.push_back(pFGF);
