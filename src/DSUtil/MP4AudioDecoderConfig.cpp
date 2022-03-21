@@ -256,8 +256,8 @@ bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
 
     if (parser.BitsLeft() < 4) return false;
     m_ChannelConfiguration = parser.BitRead(4);
-    if (m_ChannelConfiguration < 8) {
-        static const BYTE channels[8] = { 0, 1, 2, 3, 4, 5, 6, 8 };
+    if (m_ChannelConfiguration < 14) {
+        static const BYTE channels[] = { 0, 1, 2, 3, 4, 5, 6, 8, 0, 0, 0, 7, 8, 24 };
         m_ChannelCount = channels[m_ChannelConfiguration];
     }
 
