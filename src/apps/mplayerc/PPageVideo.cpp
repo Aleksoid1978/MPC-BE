@@ -333,7 +333,7 @@ void CPPageVideo::UpdateResizerList(int select)
 	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-0.8", RESIZER_SHADER_BICUBIC08);
 	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-1.0", RESIZER_SHADER_BICUBIC10);
 	AddStringData(m_cbDX9Resizer, L"PS: Lanczos2", RESIZER_SHADER_LANCZOS2);
-	AddStringData(m_cbDX9Resizer, L"PS 3.0: Lanczos3", RESIZER_SHADER_LANCZOS3);
+	AddStringData(m_cbDX9Resizer, L"PS: Lanczos3", RESIZER_SHADER_LANCZOS3);
 
 	m_cbDX9Resizer.SetCurSel(1); // default
 	SelectByItemData(m_cbDX9Resizer, select);
@@ -359,10 +359,10 @@ void CPPageVideo::UpdateDownscalerList(int select)
 #endif
 	AddStringData(m_cbDownscaler, L"PS: Simple averaging", DOWNSCALER_SIMPLE);
 	AddStringData(m_cbDownscaler, L"PS: Box", DOWNSCALER_BOX);
-	AddStringData(m_cbDownscaler, L"PS 3.0: Bilinear", DOWNSCALER_BILINEAR);
-	AddStringData(m_cbDownscaler, L"PS 3.0: Hamming", DOWNSCALER_HAMMING);
-	AddStringData(m_cbDownscaler, L"PS 3.0: Bicubic", DOWNSCALER_BICUBIC);
-	AddStringData(m_cbDownscaler, L"PS 3.0: Lanczos", DOWNSCALER_LANCZOS);
+	AddStringData(m_cbDownscaler, L"PS: Bilinear", DOWNSCALER_BILINEAR);
+	AddStringData(m_cbDownscaler, L"PS: Hamming", DOWNSCALER_HAMMING);
+	AddStringData(m_cbDownscaler, L"PS: Bicubic", DOWNSCALER_BICUBIC);
+	AddStringData(m_cbDownscaler, L"PS: Lanczos", DOWNSCALER_LANCZOS);
 
 	m_cbDownscaler.SetCurSel(1); // default
 	SelectByItemData(m_cbDownscaler, select);
