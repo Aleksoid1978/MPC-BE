@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,7 +89,7 @@ bool CMixer::Init()
 	//av_opt_set_int(m_pSWRCxt, "precision",          28,               0); // SOXR_VHQ
 
 	// Create Matrix
-	const int in_ch  = av_popcount(m_in_layout);
+	const int in_ch  = av_popcount64(m_in_layout);
 	const int out_ch = av_popcount(m_out_layout);
 	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
 
@@ -283,7 +283,7 @@ void CMixer::SetOptions(double center_level, double suround_level, bool normaliz
 	}
 }
 
-void CMixer::UpdateInput(SampleFormat in_sf, DWORD in_layout, int in_samplerate)
+void CMixer::UpdateInput(SampleFormat in_sf, int64_t in_layout, int in_samplerate)
 {
 	if (in_sf != m_in_sf || in_layout != m_in_layout || in_samplerate != m_in_samplerate) {
 		m_in_layout     = in_layout;
@@ -310,7 +310,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 		return 0;
 	}
 
-	const int in_ch  = av_popcount(m_in_layout);
+	const int in_ch  = av_popcount64(m_in_layout);
 	const int out_ch = av_popcount(m_out_layout);
 
 	int32_t* buf1 = nullptr;
