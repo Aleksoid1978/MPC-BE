@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -181,20 +181,6 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	// Define the shader profile.
 	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
 		m_ShaderProfile = "ps_3_0";
-	} else if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
-		// http://en.wikipedia.org/wiki/High-level_shader_language
-
-		if (m_Caps.PS20Caps.NumTemps >= 32 && (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
-			m_ShaderProfile = "ps_2_b";
-		}
-		else if (m_Caps.PS20Caps.NumTemps >= 22
-			&& (m_Caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
-				D3DPS20CAPS_PREDICATION | D3DPS20CAPS_NODEPENDENTREADLIMIT | D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))) {
-			m_ShaderProfile = "ps_2_a";
-		}
-		else {
-			m_ShaderProfile = "ps_2_0";
-		}
 	} else {
 		m_ShaderProfile = nullptr;
 	}
@@ -354,8 +340,6 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 	unsigned src = 1;
 	unsigned dst = 0;
 	bool first = true;
-
-	bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
 
 	// fix incorrect conversion in EVR mixer
 	if (m_pPSCorrection) {
@@ -567,7 +551,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget, const CRect& destRect)
 {
-	if (destRect.IsRectEmpty()) {
+	if (destRect.IsRectEmpty() || m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		return S_OK;
 	}
 
@@ -575,12 +559,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 
 	if (GetRenderersSettings().iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		if (!m_pConvertToInterlacePixelShader) {
-			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_PS20_CONVERT_TO_INTERLACE);
-			}
-			else {
-				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_CONVERT_TO_INTERLACE);
-			}
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_CONVERT_TO_INTERLACE);
 		}
 
 		if (m_pConvertToInterlacePixelShader) {
@@ -1225,46 +1204,29 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 		return S_OK;
 	}
 
-	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		return E_FAIL;
 	}
 
 	UINT resid = 0;
 
-	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-		switch (iShader) {
-		case shader_bspline_x:           resid = IDF_SHADER_PS20_BSPLINE4_X;          break;
-		case shader_mitchell_x:          resid = IDF_SHADER_PS20_MITCHELL4_X;         break;
-		case shader_catmull_x:           resid = IDF_SHADER_PS20_CATMULL4_X;          break;
-		case shader_bicubic06_x:         resid = IDF_SHADER_PS20_BICUBIC06_X;         break;
-		case shader_bicubic08_x:         resid = IDF_SHADER_PS20_BICUBIC08_X;         break;
-		case shader_bicubic10_x:         resid = IDF_SHADER_PS20_BICUBIC10_X;         break;
-		case shader_lanczos2_x:          resid = IDF_SHADER_PS20_LANCZOS2_X;          break;
-		case shader_downscaler_simple_x: resid = IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X; break;
-		case shader_downscaler_box_x:    resid = IDF_SHADER_PS20_DOWNSCALER_BOX_X;    break;
-		default:
-			return E_INVALIDARG;
-		}
-	}
-	else {
-		switch (iShader) {
-		case shader_bspline_x:             resid = IDF_SHADER_RESIZER_BSPLINE4_X;    break;
-		case shader_mitchell_x:            resid = IDF_SHADER_RESIZER_MITCHELL4_X;   break;
-		case shader_catmull_x:             resid = IDF_SHADER_RESIZER_CATMULL4_X;    break;
-		case shader_bicubic06_x:           resid = IDF_SHADER_RESIZER_BICUBIC06_X;   break;
-		case shader_bicubic08_x:           resid = IDF_SHADER_RESIZER_BICUBIC08_X;   break;
-		case shader_bicubic10_x:           resid = IDF_SHADER_RESIZER_BICUBIC10_X;   break;
-		case shader_lanczos2_x:            resid = IDF_SHADER_RESIZER_LANCZOS2_X;    break;
-		case shader_lanczos3_x:            resid = IDF_SHADER_RESIZER_LANCZOS3_X;    break;
-		case shader_downscaler_simple_x:   resid = IDF_SHADER_DOWNSCALER_SIMPLE_X;   break;
-		case shader_downscaler_box_x:      resid = IDF_SHADER_DOWNSCALER_BOX_X;      break;
-		case shader_downscaler_bilinear_x: resid = IDF_SHADER_DOWNSCALER_BILINEAR_X; break;
-		case shader_downscaler_hamming_x:  resid = IDF_SHADER_DOWNSCALER_HAMMING_X;  break;
-		case shader_downscaler_bicubic_x:  resid = IDF_SHADER_DOWNSCALER_BICUBIC_X;  break;
-		case shader_downscaler_lanczos_x:  resid = IDF_SHADER_DOWNSCALER_LANCZOS_X;  break;
-		default:
-			return E_INVALIDARG;
-		}
+	switch (iShader) {
+	case shader_bspline_x:             resid = IDF_SHADER_RESIZER_BSPLINE4_X;    break;
+	case shader_mitchell_x:            resid = IDF_SHADER_RESIZER_MITCHELL4_X;   break;
+	case shader_catmull_x:             resid = IDF_SHADER_RESIZER_CATMULL4_X;    break;
+	case shader_bicubic06_x:           resid = IDF_SHADER_RESIZER_BICUBIC06_X;   break;
+	case shader_bicubic08_x:           resid = IDF_SHADER_RESIZER_BICUBIC08_X;   break;
+	case shader_bicubic10_x:           resid = IDF_SHADER_RESIZER_BICUBIC10_X;   break;
+	case shader_lanczos2_x:            resid = IDF_SHADER_RESIZER_LANCZOS2_X;    break;
+	case shader_lanczos3_x:            resid = IDF_SHADER_RESIZER_LANCZOS3_X;    break;
+	case shader_downscaler_simple_x:   resid = IDF_SHADER_DOWNSCALER_SIMPLE_X;   break;
+	case shader_downscaler_box_x:      resid = IDF_SHADER_DOWNSCALER_BOX_X;      break;
+	case shader_downscaler_bilinear_x: resid = IDF_SHADER_DOWNSCALER_BILINEAR_X; break;
+	case shader_downscaler_hamming_x:  resid = IDF_SHADER_DOWNSCALER_HAMMING_X;  break;
+	case shader_downscaler_bicubic_x:  resid = IDF_SHADER_DOWNSCALER_BICUBIC_X;  break;
+	case shader_downscaler_lanczos_x:  resid = IDF_SHADER_DOWNSCALER_LANCZOS_X;  break;
+	default:
+		return E_INVALIDARG;
 	}
 
 	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader], resid);
@@ -2279,6 +2241,10 @@ HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode,
 
 HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 {
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+		return E_ABORT;
+	}
+
 	HRESULT hr = S_OK;
 
 	DXVA2_ExtendedFormat extformat = {};
@@ -2292,22 +2258,21 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 		// DXVA2_ExtendedFormat was chaged
 		m_inputExtFormat.value = extformat.value;
 		m_pPSCorrection.Release();
-		bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
 
 		if (extformat.VideoTransferMatrix == VIDEOTRANSFERMATRIX_YCgCo) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, IDF_SHADER_CORRECTION_YCGCO);
 			m_wsCorrection = L"Fix YCgCo";
 		}
 		else if (extformat.VideoTransferFunction == MFVideoTransFunc_2084) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CONVERT_PQ_TO_SDR : IDF_SHADER_PS20_CONVERT_PQ_TO_SDR);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, IDF_SHADER_CONVERT_PQ_TO_SDR);
 			m_wsCorrection = L"Convert PQ to SDR";
 		}
 		else if (extformat.VideoPrimaries == MFVideoPrimaries_BT2020) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CONVERT_2020_TO_709 : IDF_SHADER_PS20_CONVERT_2020_TO_709);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, IDF_SHADER_CONVERT_2020_TO_709);
 			m_wsCorrection = L"Convert BT.2020 to BT.709";
 		}
 		else if (m_D3D9VendorId == PCIV_nVidia && (input_mt.subtype == MEDIASUBTYPE_YUY2 || input_mt.subtype == MEDIASUBTYPE_UYVY)) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_422 : IDF_SHADER_PS20_CORRECTION_422);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, IDF_SHADER_CORRECTION_422);
 			m_wsCorrection = L"Fix Nvidia YUY2";
 		}
 	}

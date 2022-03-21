@@ -113,30 +113,6 @@ IDF_SHADER_CONVERT_2020_TO_709   FILE                    "..\\..\\..\\_bin\\shad
 IDF_SHADER_CORRECTION_422        FILE                    "..\\..\\..\\_bin\\shaders\\chroma_422_correction.cso"
 IDF_SHADER_CONVERT_TO_INTERLACE  FILE                    "..\\..\\..\\_bin\\shaders\\halfoverunder_to_interlace.cso"
 
-IDF_SHADER_PS20_BSPLINE4_X       FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bspline4_x.cso"
-IDF_SHADER_PS20_BSPLINE4_Y       FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bspline4_y.cso"
-IDF_SHADER_PS20_MITCHELL4_X      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_mitchell4_x.cso"
-IDF_SHADER_PS20_MITCHELL4_Y      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_mitchell4_y.cso"
-IDF_SHADER_PS20_CATMULL4_X       FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_catmull4_x.cso"
-IDF_SHADER_PS20_CATMULL4_Y       FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_catmull4_y.cso"
-IDF_SHADER_PS20_BICUBIC06_X      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bicubic06_x.cso"
-IDF_SHADER_PS20_BICUBIC06_Y      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bicubic06_y.cso"
-IDF_SHADER_PS20_BICUBIC08_X      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bicubic08_x.cso"
-IDF_SHADER_PS20_BICUBIC08_Y      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bicubic08_y.cso"
-IDF_SHADER_PS20_BICUBIC10_X      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bicubic10_x.cso"
-IDF_SHADER_PS20_BICUBIC10_Y      FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_bicubic10_y.cso"
-IDF_SHADER_PS20_LANCZOS2_X       FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_lanczos2_x.cso"
-IDF_SHADER_PS20_LANCZOS2_Y       FILE                    "..\\..\\..\\_bin\\shaders\\ps20_resizer_lanczos2_y.cso"
-IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X  FILE                "..\\..\\..\\_bin\\shaders\\ps20_downscaler_simple_x.cso"
-IDF_SHADER_PS20_DOWNSCALER_SIMPLE_Y  FILE                "..\\..\\..\\_bin\\shaders\\ps20_downscaler_simple_y.cso"
-IDF_SHADER_PS20_DOWNSCALER_BOX_X     FILE                "..\\..\\..\\_bin\\shaders\\ps20_downscaler_box_x.cso"
-IDF_SHADER_PS20_DOWNSCALER_BOX_Y     FILE                "..\\..\\..\\_bin\\shaders\\ps20_downscaler_box_y.cso"
-IDF_SHADER_PS20_CORRECTION_YCGCO     FILE                "..\\..\\..\\_bin\\shaders\\ps20_ycgco_correction.cso"
-IDF_SHADER_PS20_CONVERT_PQ_TO_SDR    FILE                "..\\..\\..\\_bin\\shaders\\ps20_convert_pq_to_sdr.cso"
-IDF_SHADER_PS20_CONVERT_2020_TO_709  FILE                "..\\..\\..\\_bin\\shaders\\ps20_convert_bt2020_to_bt709.cso"
-IDF_SHADER_PS20_CORRECTION_422       FILE                "..\\..\\..\\_bin\\shaders\\ps20_chroma_422_correction.cso"
-IDF_SHADER_PS20_CONVERT_TO_INTERLACE FILE                "..\\..\\..\\_bin\\shaders\\ps20_halfoverunder_to_interlace.cso"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // HTML

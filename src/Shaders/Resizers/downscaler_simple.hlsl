@@ -1,12 +1,7 @@
 // downscaler "Simple Average"
 
-#ifdef PS20
-    #define GetFrom(s, t) tex2D(s, t)
-    #define MAXSTEPS 8
-#else
-    #define GetFrom(s, t) tex2Dlod(s, float4(t, 0, 0))
-    #define MAXSTEPS 10
-#endif
+#define GetFrom(s, t) tex2Dlod(s, float4(t, 0, 0))
+#define MAXSTEPS 10
 
 #ifndef AXIS
     #define AXIS 0

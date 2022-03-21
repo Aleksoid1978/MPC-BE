@@ -134,20 +134,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	// Define the shader profile.
 	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
 		m_ShaderProfile = "ps_3_0";
-	} else if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
-		// http://en.wikipedia.org/wiki/High-level_shader_language
-
-		if (m_Caps.PS20Caps.NumTemps >= 32 && (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
-			m_ShaderProfile = "ps_2_b";
-		}
-		else if (m_Caps.PS20Caps.NumTemps >= 22
-			&& (m_Caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
-				D3DPS20CAPS_PREDICATION | D3DPS20CAPS_NODEPENDENTREADLIMIT | D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))) {
-			m_ShaderProfile = "ps_2_a";
-		}
-		else {
-			m_ShaderProfile = "ps_2_0";
-		}
 	} else {
 		m_ShaderProfile = nullptr;
 	}
@@ -734,38 +720,23 @@ HRESULT CBaseAP::InitShaderResizer()
 		return S_OK;
 	}
 
-	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		return E_FAIL;
 	}
 
 	UINT resid = 0;
 
-	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-		switch (iShader) {
-		case shader_bspline_x:   resid = IDF_SHADER_PS20_BSPLINE4_X;  break;
-		case shader_mitchell_x:  resid = IDF_SHADER_PS20_MITCHELL4_X; break;
-		case shader_catmull_x:   resid = IDF_SHADER_PS20_CATMULL4_X;  break;
-		case shader_bicubic06_x: resid = IDF_SHADER_PS20_BICUBIC06_X; break;
-		case shader_bicubic08_x: resid = IDF_SHADER_PS20_BICUBIC08_X; break;
-		case shader_bicubic10_x: resid = IDF_SHADER_PS20_BICUBIC10_X; break;
-		case shader_lanczos2_x:  resid = IDF_SHADER_PS20_LANCZOS2_X;  break;
-		default:
-			return E_INVALIDARG;
-		}
-	}
-	else {
-		switch (iShader) {
-		case shader_bspline_x:   resid = IDF_SHADER_RESIZER_BSPLINE4_X;  break;
-		case shader_mitchell_x:  resid = IDF_SHADER_RESIZER_MITCHELL4_X; break;
-		case shader_catmull_x:   resid = IDF_SHADER_RESIZER_CATMULL4_X;  break;
-		case shader_bicubic06_x: resid = IDF_SHADER_RESIZER_BICUBIC06_X; break;
-		case shader_bicubic08_x: resid = IDF_SHADER_RESIZER_BICUBIC08_X; break;
-		case shader_bicubic10_x: resid = IDF_SHADER_RESIZER_BICUBIC10_X; break;
-		case shader_lanczos2_x:  resid = IDF_SHADER_RESIZER_LANCZOS2_X;  break;
-		case shader_lanczos3_x:  resid = IDF_SHADER_RESIZER_LANCZOS3_X;  break;
-		default:
-			return E_INVALIDARG;
-		}
+	switch (iShader) {
+	case shader_bspline_x:   resid = IDF_SHADER_RESIZER_BSPLINE4_X;  break;
+	case shader_mitchell_x:  resid = IDF_SHADER_RESIZER_MITCHELL4_X; break;
+	case shader_catmull_x:   resid = IDF_SHADER_RESIZER_CATMULL4_X;  break;
+	case shader_bicubic06_x: resid = IDF_SHADER_RESIZER_BICUBIC06_X; break;
+	case shader_bicubic08_x: resid = IDF_SHADER_RESIZER_BICUBIC08_X; break;
+	case shader_bicubic10_x: resid = IDF_SHADER_RESIZER_BICUBIC10_X; break;
+	case shader_lanczos2_x:  resid = IDF_SHADER_RESIZER_LANCZOS2_X;  break;
+	case shader_lanczos3_x:  resid = IDF_SHADER_RESIZER_LANCZOS3_X;  break;
+	default:
+		return E_INVALIDARG;
 	}
 
 	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader], resid);
@@ -778,7 +749,7 @@ HRESULT CBaseAP::InitShaderResizer()
 	}
 
 	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
-		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X : IDF_SHADER_DOWNSCALER_SIMPLE_X;
+		resid = IDF_SHADER_DOWNSCALER_SIMPLE_X;
 		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_x], resid);
 		if (S_OK == hr) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
@@ -1271,12 +1242,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 			if (m_inputExtFormat.VideoTransferMatrix == VIDEOTRANSFERMATRIX_YCgCo) {
 				if (!m_pPSCorrectionYCgCo) {
-					if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_PS20_CORRECTION_YCGCO);
-					}
-					else {
-						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_CORRECTION_YCGCO);
-					}
+					hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_CORRECTION_YCGCO);
 				}
 
 				if (m_pPSCorrectionYCgCo) {
