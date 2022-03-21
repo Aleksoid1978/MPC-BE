@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -215,6 +215,7 @@ CFFAudioDecoder::CFFAudioDecoder(CMpaDecFilter* pFilter)
 	, m_bNeedSyncpoint(false)
 	, m_bStereoDownmix(false)
 	, m_bNeedReinit(false)
+	, m_bNeedMix(false)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 
@@ -266,6 +267,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	unsigned extralen  = 0;
 
 	m_bNeedReinit      = false;
+	m_bNeedMix         = false;
 
 	if (codecID == AV_CODEC_ID_NONE || mediaType == nullptr) {
 		if (m_pAVCodec == nullptr || m_pAVCtx == nullptr || m_pAVCtx->codec_id == AV_CODEC_ID_NONE) {
@@ -330,7 +332,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 
 	m_pAVCodec = avcodec_find_decoder(codec_id);
 	if (m_pAVCodec) {
-
 		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 		CheckPointer(m_pAVCtx, false);
 
@@ -426,6 +427,14 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 				}
 				gb.SkipBytes(metadata_size);
 			}
+		}
+
+		if ((codec_id == AV_CODEC_ID_AAC || codec_id == AV_CODEC_ID_AAC_LATM) && m_pAVCtx->channels == 24 && m_pAVCtx->channel_layout) {
+			m_bNeedMix = true;
+			m_MixerChannels = 8;
+			m_MixerChannelLayout = GetDefChannelMask(8);
+			m_Mixer.UpdateInput(SAMPLE_FMT_FLTP, m_pAVCtx->channel_layout, m_pAVCtx->sample_rate);
+			m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_pAVCtx->sample_rate);
 		}
 	}
 
@@ -533,7 +542,7 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& s
 {
 	HRESULT hr = E_FAIL;
 	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
-	if (m_pAVCtx->channels > 8) {
+	if (m_pAVCtx->channels > 8 && !m_bNeedMix) {
 		// sometimes avcodec_receive_frame() cannot identify the garbage and produces incorrect data.
 		// this code does not solve the problem, it only reduces the likelihood of crash.
 		// do it better!
@@ -546,16 +555,33 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& s
 			const WORD nChannels = m_pAVCtx->channels;
 			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
 			const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
-			BuffOut.resize(monosize * nChannels);
+
+			auto* pBuffOut = &BuffOut;
+			std::vector<BYTE> tmp;
+			if (m_bNeedMix) {
+				pBuffOut = &tmp;
+			}
+			pBuffOut->resize(monosize * nChannels);
 
 			if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
-				BYTE* pOut = BuffOut.data();
+				BYTE* pOut = pBuffOut->data();
 				for (int ch = 0; ch < nChannels; ++ch) {
 					memcpy(pOut, m_pFrame->extended_data[ch], monosize);
 					pOut += monosize;
 				}
 			} else {
-				memcpy(BuffOut.data(), m_pFrame->data[0], BuffOut.size());
+				memcpy(pBuffOut->data(), m_pFrame->data[0], pBuffOut->size());
+			}
+
+			if (m_bNeedMix) {
+				samplefmt = SAMPLE_FMT_FLT;
+				auto out_samples = m_Mixer.CalcOutSamples(nSamples);
+				BuffOut.resize(static_cast<size_t>(out_samples) * m_MixerChannels * av_get_bytes_per_sample(m_pAVCtx->sample_fmt));
+				out_samples = m_Mixer.Mixing(BuffOut.data(), out_samples, tmp.data(), nSamples);
+				if (!out_samples) {
+					av_frame_unref(m_pFrame);
+					return E_INVALIDARG;
+				}
 			}
 		}
 
@@ -758,12 +784,12 @@ DWORD CFFAudioDecoder::GetSampleRate()
 
 WORD CFFAudioDecoder::GetChannels()
 {
-	return (WORD)m_pAVCtx->channels;
+	return m_bNeedMix ? (WORD)m_MixerChannels : (WORD)m_pAVCtx->channels;
 }
 
 DWORD CFFAudioDecoder::GetChannelMask()
 {
-	return get_lav_channel_layout(m_pAVCtx->channel_layout);
+	return get_lav_channel_layout(m_bNeedMix ? m_MixerChannelLayout : m_pAVCtx->channel_layout);
 }
 
 WORD CFFAudioDecoder::GetCoddedBitdepth()

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 
 #include "PaddedBuffer.h"
 #include "AudioTools/SampleFormat.h"
+#include "AudioTools/Mixer.h"
 
 struct AVCodec;
 struct AVCodecContext;
@@ -57,6 +58,11 @@ protected:
 	bool m_bNeedSyncpoint;
 	bool m_bStereoDownmix;
 	bool m_bNeedReinit;
+
+	bool m_bNeedMix;
+	int m_MixerChannels;
+	uint64_t m_MixerChannelLayout;
+	CMixer m_Mixer;
 
 	CMpaDecFilter* m_pFilter;
 
