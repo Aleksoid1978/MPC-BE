@@ -3324,9 +3324,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				m_pFrame->format = hw_frame->format;
 				m_pFrame->width = hw_frame->width;
 				m_pFrame->height = hw_frame->height;
-				m_pFrame->channels = hw_frame->channels;
-				m_pFrame->channel_layout = hw_frame->channel_layout;
-				m_pFrame->nb_samples = hw_frame->nb_samples;
 				av_frame_get_buffer(m_pFrame, 32);
 				ret = av_frame_copy(m_pFrame, hw_frame);
 			}
