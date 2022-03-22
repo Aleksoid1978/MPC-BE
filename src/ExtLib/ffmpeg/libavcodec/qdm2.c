@@ -43,6 +43,7 @@
 #include "avcodec.h"
 #include "get_bits.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "internal.h"
 #include "mpegaudio.h"
 #include "mpegaudiodsp.h"
@@ -1687,13 +1688,13 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
 
     bytestream2_skip(&gb, 4);
 
-    avctx->channels = s->nb_channels = s->channels = bytestream2_get_be32(&gb);
+    s->nb_channels = s->channels = bytestream2_get_be32(&gb);
     if (s->channels <= 0 || s->channels > MPA_MAX_CHANNELS) {
         av_log(avctx, AV_LOG_ERROR, "Invalid number of channels\n");
         return AVERROR_INVALIDDATA;
     }
-    avctx->channel_layout = avctx->channels == 2 ? AV_CH_LAYOUT_STEREO :
-                                                   AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    av_channel_layout_default(&avctx->ch_layout, s->channels);
 
     avctx->sample_rate = bytestream2_get_be32(&gb);
     avctx->bit_rate = bytestream2_get_be32(&gb);
@@ -1869,15 +1870,15 @@ static int qdm2_decode_frame(AVCodecContext *avctx, void *data,
     return s->checksum_size;
 }
 
-const AVCodec ff_qdm2_decoder = {
-    .name             = "qdm2",
-    .long_name        = NULL_IF_CONFIG_SMALL("QDesign Music Codec 2"),
-    .type             = AVMEDIA_TYPE_AUDIO,
-    .id               = AV_CODEC_ID_QDM2,
+const FFCodec ff_qdm2_decoder = {
+    .p.name           = "qdm2",
+    .p.long_name      = NULL_IF_CONFIG_SMALL("QDesign Music Codec 2"),
+    .p.type           = AVMEDIA_TYPE_AUDIO,
+    .p.id             = AV_CODEC_ID_QDM2,
     .priv_data_size   = sizeof(QDM2Context),
     .init             = qdm2_decode_init,
     .close            = qdm2_decode_close,
     .decode           = qdm2_decode_frame,
-    .capabilities     = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
+    .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE,
 };

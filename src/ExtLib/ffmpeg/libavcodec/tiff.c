@@ -39,8 +39,10 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/opt.h"
+#include "libavutil/reverse.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "faxcompr.h"
 #include "internal.h"
 #include "lzw.h"
@@ -1241,8 +1243,8 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
             value  = ff_tget(&s->gb, TIFF_LONG, s->le);
             value2 = ff_tget(&s->gb, TIFF_LONG, s->le);
             if (!value2) {
-                av_log(s->avctx, AV_LOG_ERROR, "Invalid denominator in rational\n");
-                return AVERROR_INVALIDDATA;
+                av_log(s->avctx, AV_LOG_WARNING, "Invalid denominator in rational\n");
+                value2 = 1;
             }
 
             break;
@@ -1421,8 +1423,8 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
                 value  = ff_tget(&s->gb, TIFF_LONG, s->le);
                 value2 = ff_tget(&s->gb, TIFF_LONG, s->le);
                 if (!value2) {
-                    av_log(s->avctx, AV_LOG_ERROR, "Invalid black level denominator\n");
-                    return AVERROR_INVALIDDATA;
+                    av_log(s->avctx, AV_LOG_WARNING, "Invalid black level denominator\n");
+                    value2 = 1;
                 }
 
                 s->black_level = value / value2;
@@ -2176,16 +2178,16 @@ static const AVClass tiff_decoder_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVCodec ff_tiff_decoder = {
-    .name           = "tiff",
-    .long_name      = NULL_IF_CONFIG_SMALL("TIFF image"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_TIFF,
+const FFCodec ff_tiff_decoder = {
+    .p.name         = "tiff",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("TIFF image"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_TIFF,
     .priv_data_size = sizeof(TiffContext),
     .init           = tiff_init,
     .close          = tiff_end,
     .decode         = decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
-    .priv_class     = &tiff_decoder_class,
+    .p.priv_class   = &tiff_decoder_class,
 };

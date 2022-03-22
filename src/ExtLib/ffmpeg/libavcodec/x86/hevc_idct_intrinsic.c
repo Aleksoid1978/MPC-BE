@@ -1,5 +1,6 @@
 #include "config.h"
 #include "libavutil/avassert.h"
+#include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
 #include "libavcodec/hevc.h"
 #include "libavcodec/x86/hevcdsp.h"
@@ -13,8 +14,7 @@
 #include <emmintrin.h>
 #endif
 
-DECLARE_ALIGNED(16, static const int16_t, transform4x4_luma[8][8] )=
-{
+DECLARE_ALIGNED(16, static const int16_t, transform4x4_luma)[8][8] = {
     {   29, +84, 29,  +84,  29, +84,  29, +84 },
     {  +74, +55, +74, +55, +74, +55, +74, +55 },
     {   55, -29,  55, -29,  55, -29,  55, -29 },

@@ -39,6 +39,7 @@
 
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "fft.h"
 #include "get_bits.h"
 #include "internal.h"
@@ -129,8 +130,8 @@ static av_cold int decode_init(AVCodecContext * avctx) {
     s->scale_bias = 1.0/(32768*8);
     avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
 
-    avctx->channels       = 1;
-    avctx->channel_layout = AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout      = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 
     /* Generate overlap window */
     ff_init_ff_sine_windows(7);
@@ -186,17 +187,17 @@ static av_cold int decode_end(AVCodecContext * avctx) {
     return 0;
 }
 
-const AVCodec ff_nellymoser_decoder = {
-    .name           = "nellymoser",
-    .long_name      = NULL_IF_CONFIG_SMALL("Nellymoser Asao"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_NELLYMOSER,
+const FFCodec ff_nellymoser_decoder = {
+    .p.name         = "nellymoser",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Nellymoser Asao"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_NELLYMOSER,
     .priv_data_size = sizeof(NellyMoserDecodeContext),
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_tag,
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_PARAM_CHANGE | AV_CODEC_CAP_CHANNEL_CONF,
-    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLT,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_PARAM_CHANGE | AV_CODEC_CAP_CHANNEL_CONF,
+    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLT,
                                                       AV_SAMPLE_FMT_NONE },
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

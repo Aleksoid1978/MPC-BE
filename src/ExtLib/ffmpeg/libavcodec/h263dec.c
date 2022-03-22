@@ -27,7 +27,10 @@
 
 #define UNCHECKED_BITSTREAM_READER 1
 
+#include "config_components.h"
+
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "error_resilience.h"
 #include "flvdec.h"
 #include "h263.h"
@@ -703,17 +706,11 @@ frame_end:
     if (s->last_picture_ptr || s->low_delay) {
         if (   pict->format == AV_PIX_FMT_YUV420P
             && (s->codec_tag == AV_RL32("GEOV") || s->codec_tag == AV_RL32("GEOX"))) {
-            int x, y, p;
-            av_frame_make_writable(pict);
-            for (p=0; p<3; p++) {
-                int w = AV_CEIL_RSHIFT(pict-> width, !!p);
+            for (int p = 0; p < 3; p++) {
                 int h = AV_CEIL_RSHIFT(pict->height, !!p);
-                int linesize = pict->linesize[p];
-                for (y=0; y<(h>>1); y++)
-                    for (x=0; x<w; x++)
-                        FFSWAP(int,
-                               pict->data[p][x + y*linesize],
-                               pict->data[p][x + (h-1-y)*linesize]);
+
+                pict->data[p]     += (h - 1) * pict->linesize[p];
+                pict->linesize[p] *= -1;
             }
         }
         *got_frame = 1;
@@ -758,44 +755,46 @@ static const AVCodecHWConfigInternal *const h263_hw_config_list[] = {
     NULL
 };
 
-const AVCodec ff_h263_decoder = {
-    .name           = "h263",
-    .long_name      = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_H263,
+const FFCodec ff_h263_decoder = {
+    .p.name         = "h263",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_H263,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_h263_decode_init,
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
+    .p.capabilities = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
 #if FF_API_FLAG_TRUNCATED
                       AV_CODEC_CAP_TRUNCATED |
 #endif
                       AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush          = ff_mpeg_flush,
-    .max_lowres     = 3,
-    .pix_fmts       = ff_h263_hwaccel_pixfmt_list_420,
+    .p.max_lowres   = 3,
+    .p.pix_fmts     = ff_h263_hwaccel_pixfmt_list_420,
     .hw_configs     = h263_hw_config_list,
 };
 
-const AVCodec ff_h263p_decoder = {
-    .name           = "h263p",
-    .long_name      = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_H263P,
+const FFCodec ff_h263p_decoder = {
+    .p.name         = "h263p",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_H263P,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = ff_h263_decode_init,
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
+    .p.capabilities = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
 #if FF_API_FLAG_TRUNCATED
                       AV_CODEC_CAP_TRUNCATED |
 #endif
                       AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
+                      FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush          = ff_mpeg_flush,
-    .max_lowres     = 3,
-    .pix_fmts       = ff_h263_hwaccel_pixfmt_list_420,
+    .p.max_lowres   = 3,
+    .p.pix_fmts     = ff_h263_hwaccel_pixfmt_list_420,
     .hw_configs     = h263_hw_config_list,
 };

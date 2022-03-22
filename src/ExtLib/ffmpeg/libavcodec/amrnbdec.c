@@ -55,6 +55,7 @@
 #include "acelp_pitch_delay.h"
 #include "lsp.h"
 #include "amr.h"
+#include "codec_internal.h"
 #include "internal.h"
 
 #include "amrnbdata.h"
@@ -166,20 +167,20 @@ static av_cold int amrnb_decode_init(AVCodecContext *avctx)
     AMRChannelsContext *s = avctx->priv_data;
     int i;
 
-    if (avctx->channels > 2) {
+    if (avctx->ch_layout.nb_channels > 2) {
         avpriv_report_missing_feature(avctx, ">2 channel AMR");
         return AVERROR_PATCHWELCOME;
     }
 
-    if (!avctx->channels) {
-        avctx->channels       = 1;
-        avctx->channel_layout = AV_CH_LAYOUT_MONO;
+    if (!avctx->ch_layout.nb_channels) {
+        av_channel_layout_uninit(&avctx->ch_layout);
+        avctx->ch_layout      = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     }
     if (!avctx->sample_rate)
         avctx->sample_rate = 8000;
     avctx->sample_fmt     = AV_SAMPLE_FMT_FLTP;
 
-    for (int ch = 0; ch < avctx->channels; ch++) {
+    for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++) {
         AMRContext *p = &s->ch[ch];
         // p->excitation always points to the same position in p->excitation_buf
         p->excitation = &p->excitation_buf[PITCH_DELAY_MAX + LP_FILTER_ORDER + 1];
@@ -969,7 +970,7 @@ static int amrnb_decode_frame(AVCodecContext *avctx, void *data,
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
 
-    for (int ch = 0; ch < avctx->channels; ch++) {
+    for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++) {
         AMRContext *p = &s->ch[ch];
         float fixed_gain_factor;
         AMRFixed fixed_sparse = {0};             // fixed vector up to anti-sparseness processing
@@ -1096,16 +1097,16 @@ static int amrnb_decode_frame(AVCodecContext *avctx, void *data,
 }
 
 
-const AVCodec ff_amrnb_decoder = {
-    .name           = "amrnb",
-    .long_name      = NULL_IF_CONFIG_SMALL("AMR-NB (Adaptive Multi-Rate NarrowBand)"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_AMR_NB,
+const FFCodec ff_amrnb_decoder = {
+    .p.name         = "amrnb",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("AMR-NB (Adaptive Multi-Rate NarrowBand)"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_AMR_NB,
     .priv_data_size = sizeof(AMRChannelsContext),
     .init           = amrnb_decode_init,
     .decode         = amrnb_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
+    .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
                                                      AV_SAMPLE_FMT_NONE },
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

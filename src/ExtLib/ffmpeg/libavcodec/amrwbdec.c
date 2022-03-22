@@ -36,6 +36,7 @@
 #include "acelp_filters.h"
 #include "acelp_vectors.h"
 #include "acelp_pitch_delay.h"
+#include "codec_internal.h"
 #include "internal.h"
 
 #define AMR_USE_16BIT_TABLES
@@ -102,20 +103,20 @@ static av_cold int amrwb_decode_init(AVCodecContext *avctx)
     AMRWBChannelsContext *s = avctx->priv_data;
     int i;
 
-    if (avctx->channels > 2) {
+    if (avctx->ch_layout.nb_channels > 2) {
         avpriv_report_missing_feature(avctx, ">2 channel AMR");
         return AVERROR_PATCHWELCOME;
     }
 
-    if (!avctx->channels) {
-        avctx->channels       = 1;
-        avctx->channel_layout = AV_CH_LAYOUT_MONO;
+    if (!avctx->ch_layout.nb_channels) {
+        av_channel_layout_uninit(&avctx->ch_layout);
+        avctx->ch_layout      = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     }
     if (!avctx->sample_rate)
         avctx->sample_rate = 16000;
     avctx->sample_fmt     = AV_SAMPLE_FMT_FLTP;
 
-    for (int ch = 0; ch < avctx->channels; ch++) {
+    for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++) {
         AMRWBContext *ctx = &s->ch[ch];
 
         av_lfg_init(&ctx->prng, 1);
@@ -1115,7 +1116,7 @@ static int amrwb_decode_frame(AVCodecContext *avctx, void *data,
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
 
-    for (int ch = 0; ch < avctx->channels; ch++) {
+    for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++) {
         AMRWBContext *ctx  = &s->ch[ch];
         AMRWBFrame   *cf   = &ctx->frame;
         int expected_fr_size, header_size;
@@ -1292,16 +1293,16 @@ static int amrwb_decode_frame(AVCodecContext *avctx, void *data,
     return avpkt->size;
 }
 
-const AVCodec ff_amrwb_decoder = {
-    .name           = "amrwb",
-    .long_name      = NULL_IF_CONFIG_SMALL("AMR-WB (Adaptive Multi-Rate WideBand)"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_AMR_WB,
+const FFCodec ff_amrwb_decoder = {
+    .p.name         = "amrwb",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("AMR-WB (Adaptive Multi-Rate WideBand)"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_AMR_WB,
     .priv_data_size = sizeof(AMRWBChannelsContext),
     .init           = amrwb_decode_init,
     .decode         = amrwb_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLT,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
+    .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLT,
                                                      AV_SAMPLE_FMT_NONE },
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

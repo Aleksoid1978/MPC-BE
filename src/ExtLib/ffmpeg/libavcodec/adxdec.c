@@ -22,6 +22,7 @@
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "adx.h"
+#include "codec_internal.h"
 #include "get_bits.h"
 #include "internal.h"
 
@@ -46,7 +47,7 @@ static av_cold int adx_decode_init(AVCodecContext *avctx)
             av_log(avctx, AV_LOG_ERROR, "error parsing ADX header\n");
             return AVERROR_INVALIDDATA;
         }
-        c->channels      = avctx->channels;
+        c->channels      = avctx->ch_layout.nb_channels;
         c->header_parsed = 1;
     }
 
@@ -132,7 +133,7 @@ static int adx_decode_frame(AVCodecContext *avctx, void *data,
             av_log(avctx, AV_LOG_ERROR, "error parsing ADX header\n");
             return AVERROR_INVALIDDATA;
         }
-        c->channels      = avctx->channels;
+        c->channels      = avctx->ch_layout.nb_channels;
         c->header_parsed = 1;
         if (buf_size < header_size)
             return AVERROR_INVALIDDATA;
@@ -147,7 +148,7 @@ static int adx_decode_frame(AVCodecContext *avctx, void *data,
 
     /* if the packet is not an even multiple of BLOCK_SIZE, check for an EOF
        packet */
-    if (!num_blocks || buf_size % (BLOCK_SIZE * avctx->channels)) {
+    if (!num_blocks || buf_size % (BLOCK_SIZE * c->channels)) {
         if (buf_size >= 4 && (AV_RB16(buf) & 0x8000)) {
             c->eof = 1;
             *got_frame_ptr = 0;
@@ -190,18 +191,18 @@ static void adx_decode_flush(AVCodecContext *avctx)
     c->eof = 0;
 }
 
-const AVCodec ff_adpcm_adx_decoder = {
-    .name           = "adpcm_adx",
-    .long_name      = NULL_IF_CONFIG_SMALL("SEGA CRI ADX ADPCM"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_ADPCM_ADX,
+const FFCodec ff_adpcm_adx_decoder = {
+    .p.name         = "adpcm_adx",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("SEGA CRI ADX ADPCM"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_ADPCM_ADX,
     .priv_data_size = sizeof(ADXContext),
     .init           = adx_decode_init,
     .decode         = adx_decode_frame,
     .flush          = adx_decode_flush,
-    .capabilities   = AV_CODEC_CAP_CHANNEL_CONF |
+    .p.capabilities = AV_CODEC_CAP_CHANNEL_CONF |
                       AV_CODEC_CAP_DR1,
-    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

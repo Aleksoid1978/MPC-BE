@@ -30,6 +30,7 @@
 #include "avcodec.h"
 #include "bswapdsp.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "internal.h"
 #include "get_bits.h"
 #include "unary.h"
@@ -233,13 +234,14 @@ static av_cold int ape_decode_close(AVCodecContext *avctx)
 static av_cold int ape_decode_init(AVCodecContext *avctx)
 {
     APEContext *s = avctx->priv_data;
+    int channels = avctx->ch_layout.nb_channels;
     int i;
 
     if (avctx->extradata_size != 6) {
         av_log(avctx, AV_LOG_ERROR, "Incorrect extradata\n");
         return AVERROR(EINVAL);
     }
-    if (avctx->channels > 2) {
+    if (channels > 2) {
         av_log(avctx, AV_LOG_ERROR, "Only mono and stereo is supported\n");
         return AVERROR(EINVAL);
     }
@@ -261,7 +263,7 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
         return AVERROR_PATCHWELCOME;
     }
     s->avctx             = avctx;
-    s->channels          = avctx->channels;
+    s->channels          = channels;
     s->fileversion       = AV_RL16(avctx->extradata);
     s->compression_level = AV_RL16(avctx->extradata + 2);
     s->flags             = AV_RL16(avctx->extradata + 4);
@@ -313,7 +315,9 @@ static av_cold int ape_decode_init(AVCodecContext *avctx)
 
     ff_bswapdsp_init(&s->bdsp);
     ff_llauddsp_init(&s->adsp);
-    avctx->channel_layout = (avctx->channels==2) ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout = (channels == 2) ? (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO
+                                       : (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 
     return 0;
 }
@@ -1655,22 +1659,22 @@ static const AVClass ape_decoder_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVCodec ff_ape_decoder = {
-    .name           = "ape",
-    .long_name      = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_APE,
+const FFCodec ff_ape_decoder = {
+    .p.name         = "ape",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_APE,
     .priv_data_size = sizeof(APEContext),
     .init           = ape_decode_init,
     .close          = ape_decode_close,
     .decode         = ape_decode_frame,
-    .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY |
+    .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY |
                       AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
     .flush          = ape_flush,
-    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
+    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                       AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },
-    .priv_class     = &ape_decoder_class,
+    .p.priv_class   = &ape_decoder_class,
 };

@@ -32,6 +32,7 @@
 #include "libavutil/mem_internal.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "internal.h"
 #include "get_bits.h"
 #include "put_bits.h"
@@ -475,8 +476,8 @@ static av_cold int wmavoice_decode_init(AVCodecContext *ctx)
                                   2 * (s->block_conv_table[1] - 2 * s->min_pitch_val);
     s->block_pitch_nbits        = av_ceil_log2(s->block_pitch_range);
 
-    ctx->channels               = 1;
-    ctx->channel_layout         = AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&ctx->ch_layout);
+    ctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     ctx->sample_fmt             = AV_SAMPLE_FMT_FLT;
 
     return 0;
@@ -1997,16 +1998,16 @@ static av_cold int wmavoice_decode_end(AVCodecContext *ctx)
     return 0;
 }
 
-const AVCodec ff_wmavoice_decoder = {
-    .name             = "wmavoice",
-    .long_name        = NULL_IF_CONFIG_SMALL("Windows Media Audio Voice"),
-    .type             = AVMEDIA_TYPE_AUDIO,
-    .id               = AV_CODEC_ID_WMAVOICE,
+const FFCodec ff_wmavoice_decoder = {
+    .p.name           = "wmavoice",
+    .p.long_name      = NULL_IF_CONFIG_SMALL("Windows Media Audio Voice"),
+    .p.type           = AVMEDIA_TYPE_AUDIO,
+    .p.id             = AV_CODEC_ID_WMAVOICE,
     .priv_data_size   = sizeof(WMAVoiceContext),
     .init             = wmavoice_decode_init,
     .close            = wmavoice_decode_end,
     .decode           = wmavoice_decode_packet,
-    .capabilities     = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    .p.capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
     .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
     .flush            = wmavoice_flush,
 };

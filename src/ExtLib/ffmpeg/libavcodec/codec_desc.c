@@ -19,10 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdlib.h>
 #include <string.h>
 
-#include "libavutil/common.h"
 #include "libavutil/internal.h"
+#include "libavutil/macros.h"
 
 #include "codec_id.h"
 #include "codec_desc.h"
@@ -3235,6 +3236,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "msnsiren",
         .long_name = NULL_IF_CONFIG_SMALL("MSN Siren"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_DFPWM,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "dfpwm",
+        .long_name = NULL_IF_CONFIG_SMALL("DFPWM (Dynamic Filter Pulse Width Modulation)"),
+        .props     = AV_CODEC_PROP_LOSSY,
     },
 
     /* subtitle codecs */

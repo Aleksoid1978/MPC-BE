@@ -35,72 +35,12 @@
 #include "bsf.h"
 #include "config.h"
 
-/**
- * The codec does not modify any global variables in the init function,
- * allowing to call the init function without locking any global mutexes.
- */
-#define FF_CODEC_CAP_INIT_THREADSAFE        (1 << 0)
-/**
- * The codec allows calling the close function for deallocation even if
- * the init function returned a failure. Without this capability flag, a
- * codec does such cleanup internally when returning failures from the
- * init function and does not expect the close function to be called at
- * all.
- */
-#define FF_CODEC_CAP_INIT_CLEANUP           (1 << 1)
-/**
- * Decoders marked with FF_CODEC_CAP_SETS_PKT_DTS want to set
- * AVFrame.pkt_dts manually. If the flag is set, decode.c won't overwrite
- * this field. If it's unset, decode.c tries to guess the pkt_dts field
- * from the input AVPacket.
- */
-#define FF_CODEC_CAP_SETS_PKT_DTS           (1 << 2)
-/**
- * The decoder extracts and fills its parameters even if the frame is
- * skipped due to the skip_frame setting.
- */
-#define FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM  (1 << 3)
-/**
- * The decoder sets the cropping fields in the output frames manually.
- * If this cap is set, the generic code will initialize output frame
- * dimensions to coded rather than display values.
- */
-#define FF_CODEC_CAP_EXPORTS_CROPPING       (1 << 4)
-/**
- * Codec initializes slice-based threading with a main function
- */
-#define FF_CODEC_CAP_SLICE_THREAD_HAS_MF    (1 << 5)
-/*
- * The codec supports frame threading and has inter-frame dependencies, so it
- * uses ff_thread_report/await_progress().
- */
-#define FF_CODEC_CAP_ALLOCATE_PROGRESS      (1 << 6)
-/**
- * Codec handles avctx->thread_count == 0 (auto) internally.
- */
-#define FF_CODEC_CAP_AUTO_THREADS           (1 << 7)
-/**
- * Codec handles output frame properties internally instead of letting the
- * internal logic derive them from AVCodecInternal.last_pkt_props.
- */
-#define FF_CODEC_CAP_SETS_FRAME_PROPS       (1 << 8)
-
-/**
- * AVCodec.codec_tags termination value
- */
-#define FF_CODEC_TAGS_END -1
-
-
-#define FF_DEFAULT_QUANT_BIAS 999999
-
 #define FF_QSCALE_TYPE_MPEG1 0
 #define FF_QSCALE_TYPE_MPEG2 1
 #define FF_QSCALE_TYPE_H264  2
 #define FF_QSCALE_TYPE_VP56  3
 
 #define FF_SANE_NB_CHANNELS 512U
-
-#define FF_SIGNBIT(x) ((x) >> CHAR_BIT * sizeof(x) - 1)
 
 #if HAVE_SIMD_ALIGN_64
 #   define STRIDE_ALIGN 64 /* AVX-512 */
@@ -169,7 +109,7 @@ typedef struct AVCodecInternal {
     EncodeSimpleContext es;
 
     /**
-     * If this is set, then AVCodec->close (if existing) needs to be called
+     * If this is set, then FFCodec->close (if existing) needs to be called
      * for the parent AVCodecContext.
      */
     int needs_close;
@@ -208,16 +148,12 @@ typedef struct AVCodecInternal {
     int initial_format;
     int initial_width, initial_height;
     int initial_sample_rate;
+#if FF_API_OLD_CHANNEL_LAYOUT
     int initial_channels;
     uint64_t initial_channel_layout;
+#endif
+    AVChannelLayout initial_ch_layout;
 } AVCodecInternal;
-
-struct AVCodecDefault {
-    const uint8_t *key;
-    const uint8_t *value;
-};
-
-extern const uint8_t ff_log2_run[41];
 
 /**
  * Return the index into tab at which {a,b} match elements {[0],[1]} of tab.

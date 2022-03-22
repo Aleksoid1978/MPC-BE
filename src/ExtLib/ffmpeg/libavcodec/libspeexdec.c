@@ -26,6 +26,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "internal.h"
 
 typedef struct LibSpeexContext {
@@ -42,7 +43,7 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
     LibSpeexContext *s = avctx->priv_data;
     const SpeexMode *mode;
     SpeexHeader *header = NULL;
-    int spx_mode;
+    int spx_mode, channels;
 
     if (avctx->extradata && avctx->extradata_size >= 80) {
         header = speex_packet_to_header(avctx->extradata,
@@ -68,7 +69,7 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
         spx_mode           = 0;
     } else if (header) {
         avctx->sample_rate = header->rate;
-        avctx->channels    = header->nb_channels;
+        channels           = header->nb_channels;
         spx_mode           = header->mode;
         speex_header_free(header);
     } else {
@@ -94,14 +95,15 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
     if (!avctx->sample_rate)
         avctx->sample_rate = 8000 << spx_mode;
 
-    if (avctx->channels < 1 || avctx->channels > 2) {
+    if (channels < 1 || channels > 2) {
         /* libspeex can handle mono or stereo if initialized as stereo */
         av_log(avctx, AV_LOG_ERROR, "Invalid channel count: %d.\n"
-                                    "Decoding as stereo.\n", avctx->channels);
-        avctx->channels = 2;
+                                    "Decoding as stereo.\n", channels);
+        channels = 2;
     }
-    avctx->channel_layout = avctx->channels == 2 ? AV_CH_LAYOUT_STEREO :
-                                                   AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout = channels == 2 ? (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO :
+                                       (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 
     speex_bits_init(&s->bits);
     s->dec_state = speex_decoder_init(mode);
@@ -110,7 +112,7 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
         return -1;
     }
 
-    if (avctx->channels == 2) {
+    if (channels == 2) {
         SpeexCallback callback;
         callback.callback_id = SPEEX_INBAND_STEREO;
         callback.func = speex_std_stereo_request_handler;
@@ -163,7 +165,7 @@ static int libspeex_decode_frame(AVCodecContext *avctx, void *data,
         av_log(avctx, AV_LOG_ERROR, "Error decoding Speex frame.\n");
         return AVERROR_INVALIDDATA;
     }
-    if (avctx->channels == 2)
+    if (avctx->ch_layout.nb_channels == 2)
         speex_decode_stereo_int(output, s->frame_size, &s->stereo);
 
     *got_frame_ptr = 1;
@@ -189,16 +191,16 @@ static av_cold void libspeex_decode_flush(AVCodecContext *avctx)
     speex_bits_reset(&s->bits);
 }
 
-const AVCodec ff_libspeex_decoder = {
-    .name           = "libspeex",
-    .long_name      = NULL_IF_CONFIG_SMALL("libspeex Speex"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_SPEEX,
+const FFCodec ff_libspeex_decoder = {
+    .p.name         = "libspeex",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("libspeex Speex"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_SPEEX,
+    .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
+    .p.wrapper_name = "libspeex",
     .priv_data_size = sizeof(LibSpeexContext),
     .init           = libspeex_decode_init,
     .close          = libspeex_decode_close,
     .decode         = libspeex_decode_frame,
     .flush          = libspeex_decode_flush,
-    .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .wrapper_name   = "libspeex",
 };

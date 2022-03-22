@@ -26,8 +26,11 @@
  * VC-1 and WMV3 decoder
  */
 
+#include "config_components.h"
+
 #include "avcodec.h"
 #include "blockdsp.h"
+#include "codec_internal.h"
 #include "get_bits.h"
 #include "hwconfig.h"
 #include "internal.h"
@@ -1218,11 +1221,11 @@ static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
     AV_PIX_FMT_NONE
 };
 
-const AVCodec ff_vc1_decoder = {
-    .name           = "vc1",
-    .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VC1,
+const FFCodec ff_vc1_decoder = {
+    .p.name         = "vc1",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("SMPTE VC-1"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_VC1,
     .priv_data_size = sizeof(VC1Context),
     .init           = vc1_decode_init,
     .close          = ff_vc1_decode_end,
@@ -1230,8 +1233,9 @@ const AVCodec ff_vc1_decoder = {
     // ==> Start patch MPC
     .flush          = vc1_decode_flush/*ff_mpeg_flush*/,
     // ==> End patch MPC
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
+    .p.pix_fmts     = vc1_hwaccel_pixfmt_list_420,
     .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_VC1_DXVA2_HWACCEL
                         HWACCEL_DXVA2(vc1),
@@ -1253,15 +1257,15 @@ const AVCodec ff_vc1_decoder = {
 #endif
                         NULL
                     },
-    .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
+    .p.profiles     = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
 };
 
 #if CONFIG_WMV3_DECODER
-const AVCodec ff_wmv3_decoder = {
-    .name           = "wmv3",
-    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_WMV3,
+const FFCodec ff_wmv3_decoder = {
+    .p.name         = "wmv3",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Windows Media Video 9"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_WMV3,
     .priv_data_size = sizeof(VC1Context),
     .init           = vc1_decode_init,
     .close          = ff_vc1_decode_end,
@@ -1269,8 +1273,9 @@ const AVCodec ff_wmv3_decoder = {
     // ==> Start patch MPC
     .flush          = vc1_decode_flush/*ff_mpeg_flush*/,
     // ==> End patch MPC
-    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
+    .p.pix_fmts     = vc1_hwaccel_pixfmt_list_420,
     .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_WMV3_DXVA2_HWACCEL
                         HWACCEL_DXVA2(wmv3),
@@ -1292,25 +1297,26 @@ const AVCodec ff_wmv3_decoder = {
 #endif
                         NULL
                     },
-    .profiles       = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
+    .p.profiles     = NULL_IF_CONFIG_SMALL(ff_vc1_profiles)
 };
 #endif
 
 #if CONFIG_WMV3IMAGE_DECODER
-const AVCodec ff_wmv3image_decoder = {
-    .name           = "wmv3image",
-    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 Image"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_WMV3IMAGE,
+const FFCodec ff_wmv3image_decoder = {
+    .p.name         = "wmv3image",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Windows Media Video 9 Image"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_WMV3IMAGE,
     .priv_data_size = sizeof(VC1Context),
     .init           = vc1_decode_init,
     .close          = ff_vc1_decode_end,
     .decode         = vc1_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     // ==> Start patch MPC
     //.flush          = vc1_sprite_flush,
     // ==> end patch MPC
-    .pix_fmts       = (const enum AVPixelFormat[]) {
+    .p.pix_fmts     = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_NONE
     },
@@ -1318,20 +1324,21 @@ const AVCodec ff_wmv3image_decoder = {
 #endif
 
 #if CONFIG_VC1IMAGE_DECODER
-const AVCodec ff_vc1image_decoder = {
-    .name           = "vc1image",
-    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 Image v2"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VC1IMAGE,
+const FFCodec ff_vc1image_decoder = {
+    .p.name         = "vc1image",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Windows Media Video 9 Image v2"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_VC1IMAGE,
     .priv_data_size = sizeof(VC1Context),
     .init           = vc1_decode_init,
     .close          = ff_vc1_decode_end,
     .decode         = vc1_decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     // ==> Start patch MPC
     //.flush          = vc1_sprite_flush,
     // ==> end patch MPC
-    .pix_fmts       = (const enum AVPixelFormat[]) {
+    .p.pix_fmts     = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_NONE
     },

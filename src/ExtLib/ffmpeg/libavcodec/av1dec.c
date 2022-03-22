@@ -18,12 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/film_grain_params.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "av1dec.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "hwconfig.h"
 #include "internal.h"
 #include "profiles.h"
@@ -394,6 +397,9 @@ static int get_tiles_info(AVCodecContext *avctx, const AV1RawTileGroup *tile_gro
                      tile_group->tile_data.data_size);
     s->tg_start = tile_group->tg_start;
     s->tg_end = tile_group->tg_end;
+
+    if (s->raw_frame_header->tile_cols == 0)
+        return AVERROR_INVALIDDATA;
 
     for (tile_num = tile_group->tg_start; tile_num <= tile_group->tg_end; tile_num++) {
         tile_row = tile_num / s->raw_frame_header->tile_cols;
@@ -1235,22 +1241,22 @@ static const AVClass av1_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVCodec ff_av1_decoder = {
-    .name                  = "av1",
-    .long_name             = NULL_IF_CONFIG_SMALL("Alliance for Open Media AV1"),
-    .type                  = AVMEDIA_TYPE_VIDEO,
-    .id                    = AV_CODEC_ID_AV1,
+const FFCodec ff_av1_decoder = {
+    .p.name                = "av1",
+    .p.long_name           = NULL_IF_CONFIG_SMALL("Alliance for Open Media AV1"),
+    .p.type                = AVMEDIA_TYPE_VIDEO,
+    .p.id                  = AV_CODEC_ID_AV1,
     .priv_data_size        = sizeof(AV1DecContext),
     .init                  = av1_decode_init,
     .close                 = av1_decode_free,
     .decode                = av1_decode_frame,
-    .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_AVOID_PROBING,
+    .p.capabilities        = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_AVOID_PROBING,
     .caps_internal         = FF_CODEC_CAP_INIT_THREADSAFE |
                              FF_CODEC_CAP_INIT_CLEANUP |
                              FF_CODEC_CAP_SETS_PKT_DTS,
     .flush                 = av1_decode_flush,
-    .profiles              = NULL_IF_CONFIG_SMALL(ff_av1_profiles),
-    .priv_class            = &av1_class,
+    .p.profiles            = NULL_IF_CONFIG_SMALL(ff_av1_profiles),
+    .p.priv_class          = &av1_class,
     .bsfs                  = "av1_frame_split",
     .hw_configs            = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_AV1_DXVA2_HWACCEL

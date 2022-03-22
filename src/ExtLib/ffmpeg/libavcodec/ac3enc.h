@@ -34,8 +34,8 @@
 #include "ac3.h"
 #include "ac3dsp.h"
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "fft.h"
-#include "internal.h"
 #include "mathops.h"
 #include "me_cmp.h"
 #include "put_bits.h"
@@ -266,11 +266,13 @@ typedef struct AC3EncodeContext {
     void (*output_frame_header)(struct AC3EncodeContext *s);
 } AC3EncodeContext;
 
-
+#if FF_API_OLD_CHANNEL_LAYOUT
 extern const uint64_t ff_ac3_channel_layouts[19];
+#endif
+extern const AVChannelLayout ff_ac3_ch_layouts[19];
 extern const AVOption ff_ac3_enc_options[];
 extern const AVClass ff_ac3enc_class;
-extern const AVCodecDefault ff_ac3_enc_defaults[];
+extern const FFCodecDefault ff_ac3_enc_defaults[];
 
 int ff_ac3_encode_init(AVCodecContext *avctx);
 int ff_ac3_float_encode_init(AVCodecContext *avctx);

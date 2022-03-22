@@ -31,6 +31,7 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
+#include "codec_internal.h"
 #include "get_bits.h"
 #include "internal.h"
 
@@ -248,13 +249,14 @@ static av_cold int qdmc_decode_init(AVCodecContext *avctx)
     }
     bytestream2_skipu(&b, 4);
 
-    avctx->channels = s->nb_channels = bytestream2_get_be32u(&b);
+    s->nb_channels = bytestream2_get_be32u(&b);
     if (s->nb_channels <= 0 || s->nb_channels > 2) {
         av_log(avctx, AV_LOG_ERROR, "invalid number of channels\n");
         return AVERROR_INVALIDDATA;
     }
-    avctx->channel_layout = avctx->channels == 2 ? AV_CH_LAYOUT_STEREO :
-                                                   AV_CH_LAYOUT_MONO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout = s->nb_channels == 2 ? (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO :
+                                             (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 
     avctx->sample_rate = bytestream2_get_be32u(&b);
     avctx->bit_rate = bytestream2_get_be32u(&b);
@@ -280,7 +282,7 @@ static av_cold int qdmc_decode_init(AVCodecContext *avctx)
     s->frame_size = 1 << s->frame_bits;
     s->subframe_size = s->frame_size >> 5;
 
-    if (avctx->channels == 2)
+    if (avctx->ch_layout.nb_channels == 2)
         x = 3 * x / 2;
     s->band_index = noise_bands_selector[FFMIN(6, llrint(floor(avctx->bit_rate * 3.0 / (double)x + 0.5)))];
 
@@ -727,16 +729,16 @@ static int qdmc_decode_frame(AVCodecContext *avctx, void *data,
     return ret;
 }
 
-const AVCodec ff_qdmc_decoder = {
-    .name             = "qdmc",
-    .long_name        = NULL_IF_CONFIG_SMALL("QDesign Music Codec 1"),
-    .type             = AVMEDIA_TYPE_AUDIO,
-    .id               = AV_CODEC_ID_QDMC,
+const FFCodec ff_qdmc_decoder = {
+    .p.name           = "qdmc",
+    .p.long_name      = NULL_IF_CONFIG_SMALL("QDesign Music Codec 1"),
+    .p.type           = AVMEDIA_TYPE_AUDIO,
+    .p.id             = AV_CODEC_ID_QDMC,
     .priv_data_size   = sizeof(QDMCContext),
     .init             = qdmc_decode_init,
     .close            = qdmc_decode_close,
     .decode           = qdmc_decode_frame,
     .flush            = qdmc_flush,
-    .capabilities     = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
+    .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE,
 };

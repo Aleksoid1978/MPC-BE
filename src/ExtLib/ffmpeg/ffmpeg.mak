@@ -213,6 +213,7 @@ SRCS_LC = \
 	libavcodec/dxva2_mpeg2.c \
 	libavcodec/dxva2_vc1.c \
 	libavcodec/dxva2_vp9.c \
+	libavcodec/dynamic_hdr_vivid.c \
 	libavcodec/dynamic_hdr10_plus.c \
 	libavcodec/eac3_data.c \
 	libavcodec/eac3dec.c \
@@ -503,6 +504,7 @@ SRCS_LC_B = \
 	libavcodec/vc1dec.c \
 	libavcodec/vc1dsp.c \
 	libavcodec/videodsp.c \
+	libavcodec/vlc.c \
 	libavcodec/vmnc.c \
 	libavcodec/vorbis.c \
 	libavcodec/vorbis_data.c \
@@ -552,6 +554,7 @@ SRCS_LC_B = \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
 	libavcodec/xvididct.c \
+	libavcodec/zlib_wrapper.c \
 	\
 	libavcodec/x86/aacpsdsp_init.c \
 	libavcodec/x86/ac3dsp_init.c \
@@ -639,6 +642,7 @@ SRCS_LF = \
 
 SRCS_LU = \
 	libavutil/audio_fifo.c \
+	libavutil/avsscanf.c \
 	libavutil/avstring.c \
 	libavutil/bprint.c \
 	libavutil/buffer.c \
@@ -658,6 +662,7 @@ SRCS_LU = \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
 	libavutil/hdr_dynamic_metadata.c \
+	libavutil/hdr_dynamic_vivid_metadata.c \
 	libavutil/hwcontext.c \
 	libavutil/hwcontext_cuda.c \
 	libavutil/hwcontext_d3d11va.c \

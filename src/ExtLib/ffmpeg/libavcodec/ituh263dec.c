@@ -29,11 +29,14 @@
 
 #define UNCHECKED_BITSTREAM_READER 1
 
+#include "config_components.h"
+
 #include "libavutil/attributes.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/mem_internal.h"
+#include "libavutil/thread.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
 #include "h263.h"
@@ -103,35 +106,35 @@ static VLC cbpc_b_vlc;
 
 /* init vlcs */
 
-/* XXX: find a better solution to handle static init */
+static av_cold void h263_decode_init_vlc(void)
+{
+    INIT_VLC_STATIC(&ff_h263_intra_MCBPC_vlc, INTRA_MCBPC_VLC_BITS, 9,
+                    ff_h263_intra_MCBPC_bits, 1, 1,
+                    ff_h263_intra_MCBPC_code, 1, 1, 72);
+    INIT_VLC_STATIC(&ff_h263_inter_MCBPC_vlc, INTER_MCBPC_VLC_BITS, 28,
+                    ff_h263_inter_MCBPC_bits, 1, 1,
+                    ff_h263_inter_MCBPC_code, 1, 1, 198);
+    INIT_VLC_STATIC(&ff_h263_cbpy_vlc, CBPY_VLC_BITS, 16,
+                    &ff_h263_cbpy_tab[0][1], 2, 1,
+                    &ff_h263_cbpy_tab[0][0], 2, 1, 64);
+    INIT_VLC_STATIC(&ff_h263_mv_vlc, H263_MV_VLC_BITS, 33,
+                    &ff_mvtab[0][1], 2, 1,
+                    &ff_mvtab[0][0], 2, 1, 538);
+    ff_h263_init_rl_inter();
+    INIT_VLC_RL(ff_h263_rl_inter, 554);
+    INIT_FIRST_VLC_RL(ff_rl_intra_aic, 554);
+    INIT_VLC_STATIC(&h263_mbtype_b_vlc, H263_MBTYPE_B_VLC_BITS, 15,
+                    &ff_h263_mbtype_b_tab[0][1], 2, 1,
+                    &ff_h263_mbtype_b_tab[0][0], 2, 1, 80);
+    INIT_VLC_STATIC(&cbpc_b_vlc, CBPC_B_VLC_BITS, 4,
+                    &ff_cbpc_b_tab[0][1], 2, 1,
+                    &ff_cbpc_b_tab[0][0], 2, 1, 8);
+}
+
 av_cold void ff_h263_decode_init_vlc(void)
 {
-    static volatile int done = 0;
-
-    if (!done) {
-        INIT_VLC_STATIC(&ff_h263_intra_MCBPC_vlc, INTRA_MCBPC_VLC_BITS, 9,
-                 ff_h263_intra_MCBPC_bits, 1, 1,
-                 ff_h263_intra_MCBPC_code, 1, 1, 72);
-        INIT_VLC_STATIC(&ff_h263_inter_MCBPC_vlc, INTER_MCBPC_VLC_BITS, 28,
-                 ff_h263_inter_MCBPC_bits, 1, 1,
-                 ff_h263_inter_MCBPC_code, 1, 1, 198);
-        INIT_VLC_STATIC(&ff_h263_cbpy_vlc, CBPY_VLC_BITS, 16,
-                 &ff_h263_cbpy_tab[0][1], 2, 1,
-                 &ff_h263_cbpy_tab[0][0], 2, 1, 64);
-        INIT_VLC_STATIC(&ff_h263_mv_vlc, H263_MV_VLC_BITS, 33,
-                 &ff_mvtab[0][1], 2, 1,
-                 &ff_mvtab[0][0], 2, 1, 538);
-        ff_h263_init_rl_inter();
-        INIT_VLC_RL(ff_h263_rl_inter, 554);
-        INIT_FIRST_VLC_RL(ff_rl_intra_aic, 554);
-        INIT_VLC_STATIC(&h263_mbtype_b_vlc, H263_MBTYPE_B_VLC_BITS, 15,
-                 &ff_h263_mbtype_b_tab[0][1], 2, 1,
-                 &ff_h263_mbtype_b_tab[0][0], 2, 1, 80);
-        INIT_VLC_STATIC(&cbpc_b_vlc, CBPC_B_VLC_BITS, 4,
-                 &ff_cbpc_b_tab[0][1], 2, 1,
-                 &ff_cbpc_b_tab[0][0], 2, 1, 8);
-        done = 1;
-    }
+    static AVOnce init_static_once = AV_ONCE_INIT;
+    ff_thread_once(&init_static_once, h263_decode_init_vlc);
 }
 
 int ff_h263_decode_mba(MpegEncContext *s)

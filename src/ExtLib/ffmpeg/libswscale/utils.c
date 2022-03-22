@@ -59,6 +59,7 @@
 #include "rgb2rgb.h"
 #include "swscale.h"
 #include "swscale_internal.h"
+#include "version.h"
 
 static SwsVector *sws_getIdentityVec(void);
 static void sws_addVec(SwsVector *a, SwsVector *b);
@@ -278,39 +279,48 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_P416LE]      = { 1, 1 },
 };
 
-void ff_shuffle_filter_coefficients(SwsContext *c, int *filterPos, int filterSize, int16_t *filter, int dstW){
+int ff_shuffle_filter_coefficients(SwsContext *c, int *filterPos,
+                                   int filterSize, int16_t *filter,
+                                   int dstW)
+{
 #if ARCH_X86_64
-    int i, j, k, l;
+    int i, j, k;
     int cpu_flags = av_get_cpu_flags();
+    // avx2 hscale filter processes 16 pixel blocks.
+    if (!filter || dstW % 16 != 0)
+        return 0;
     if (EXTERNAL_AVX2_FAST(cpu_flags) && !(cpu_flags & AV_CPU_FLAG_SLOW_GATHER)) {
-        if ((c->srcBpc == 8) && (c->dstBpc <= 14)){
-            if (dstW % 16 == 0){
-                if (filter != NULL){
-                    for (i = 0; i < dstW; i += 8){
-                        FFSWAP(int, filterPos[i + 2], filterPos[i+4]);
-                        FFSWAP(int, filterPos[i + 3], filterPos[i+5]);
-                    }
-                    if (filterSize > 4){
-                        int16_t *tmp2 = av_malloc(dstW * filterSize * 2);
-                        memcpy(tmp2, filter, dstW * filterSize * 2);
-                        for (i = 0; i < dstW; i += 16){//pixel
-                            for (k = 0; k < filterSize / 4; ++k){//fcoeff
-                                for (j = 0; j < 16; ++j){//inner pixel
-                                    for (l = 0; l < 4; ++l){//coeff
-                                        int from = i * filterSize + j * filterSize + k * 4 + l;
-                                        int to = (i) * filterSize + j * 4 + l + k * 64;
-                                        filter[to] = tmp2[from];
-                                    }
-                                }
-                            }
-                        }
-                        av_free(tmp2);
-                    }
-                }
-            }
+        if ((c->srcBpc == 8) && (c->dstBpc <= 14)) {
+           int16_t *filterCopy = NULL;
+           if (filterSize > 4) {
+               if (!FF_ALLOC_TYPED_ARRAY(filterCopy, dstW * filterSize))
+                   return AVERROR(ENOMEM);
+               memcpy(filterCopy, filter, dstW * filterSize * sizeof(int16_t));
+           }
+           // Do not swap filterPos for pixels which won't be processed by
+           // the main loop.
+           for (i = 0; i + 8 <= dstW; i += 8) {
+               FFSWAP(int, filterPos[i + 2], filterPos[i + 4]);
+               FFSWAP(int, filterPos[i + 3], filterPos[i + 5]);
+           }
+           if (filterSize > 4) {
+               // 16 pixels are processed at a time.
+               for (i = 0; i + 16 <= dstW; i += 16) {
+                   // 4 filter coeffs are processed at a time.
+                   for (k = 0; k + 4 <= filterSize; k += 4) {
+                       for (j = 0; j < 16; ++j) {
+                           int from = (i + j) * filterSize + k;
+                           int to = i * filterSize + j * 4 + k * 16;
+                           memcpy(&filter[to], &filterCopy[from], 4 * sizeof(int16_t));
+                       }
+                   }
+               }
+           }
+           av_free(filterCopy);
         }
     }
 #endif
+    return 0;
 }
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)
@@ -1028,11 +1038,16 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
                                      srcRange, table, dstRange,
                                      brightness, contrast, saturation);
 
-            c->cascaded_context[1] = sws_getContext(tmp_width, tmp_height, tmp_format,
-                                                    dstW, dstH, c->dstFormat,
-                                                    c->flags, NULL, NULL, c->param);
+            c->cascaded_context[1] = sws_alloc_set_opts(tmp_width, tmp_height, tmp_format,
+                                                        dstW, dstH, c->dstFormat,
+                                                        c->flags, c->param);
             if (!c->cascaded_context[1])
                 return -1;
+            c->cascaded_context[1]->srcRange = srcRange;
+            c->cascaded_context[1]->dstRange = dstRange;
+            ret = sws_init_context(c->cascaded_context[1], NULL , NULL);
+            if (ret < 0)
+                return ret;
             sws_setColorspaceDetails(c->cascaded_context[1], inv_table,
                                      srcRange, table, dstRange,
                                      0, 1 << 16, 1 << 16);
@@ -1836,7 +1851,8 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
                            get_local_pos(c, 0, 0, 0),
                            get_local_pos(c, 0, 0, 0))) < 0)
                 goto fail;
-            ff_shuffle_filter_coefficients(c, c->hLumFilterPos, c->hLumFilterSize, c->hLumFilter, dstW);
+            if (ff_shuffle_filter_coefficients(c, c->hLumFilterPos, c->hLumFilterSize, c->hLumFilter, dstW) < 0)
+                goto nomem;
             if ((ret = initFilter(&c->hChrFilter, &c->hChrFilterPos,
                            &c->hChrFilterSize, c->chrXInc,
                            c->chrSrcW, c->chrDstW, filterAlign, 1 << 14,
@@ -1846,7 +1862,8 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
                            get_local_pos(c, c->chrSrcHSubSample, c->src_h_chr_pos, 0),
                            get_local_pos(c, c->chrDstHSubSample, c->dst_h_chr_pos, 0))) < 0)
                 goto fail;
-            ff_shuffle_filter_coefficients(c, c->hChrFilterPos, c->hChrFilterSize, c->hChrFilter, c->chrDstW);
+            if (ff_shuffle_filter_coefficients(c, c->hChrFilterPos, c->hChrFilterSize, c->hChrFilter, c->chrDstW) < 0)
+                goto nomem;
         }
     } // initialize horizontal stuff
 

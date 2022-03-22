@@ -32,6 +32,7 @@
 #include "libavutil/thread.h"
 
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "get_bits.h"
 #include "internal.h"
 #include "mpegaudiodsp.h"
@@ -79,8 +80,8 @@ static av_cold int mpc7_decode_init(AVCodecContext * avctx)
     LOCAL_ALIGNED_16(uint8_t, buf, [16]);
 
     /* Musepack SV7 is always stereo */
-    if (avctx->channels != 2) {
-        avpriv_request_sample(avctx, "%d channels", avctx->channels);
+    if (avctx->ch_layout.nb_channels != 2) {
+        avpriv_request_sample(avctx, "%d channels", avctx->ch_layout.nb_channels);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -110,7 +111,8 @@ static av_cold int mpc7_decode_init(AVCodecContext * avctx)
     c->frames_to_skip = 0;
 
     avctx->sample_fmt = AV_SAMPLE_FMT_S16P;
-    avctx->channel_layout = AV_CH_LAYOUT_STEREO;
+    av_channel_layout_uninit(&avctx->ch_layout);
+    avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
 
     ff_thread_once(&init_static_once, mpc7_init_static);
 
@@ -308,18 +310,18 @@ static av_cold int mpc7_decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-const AVCodec ff_mpc7_decoder = {
-    .name           = "mpc7",
-    .long_name      = NULL_IF_CONFIG_SMALL("Musepack SV7"),
-    .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = AV_CODEC_ID_MUSEPACK7,
+const FFCodec ff_mpc7_decoder = {
+    .p.name         = "mpc7",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Musepack SV7"),
+    .p.type         = AVMEDIA_TYPE_AUDIO,
+    .p.id           = AV_CODEC_ID_MUSEPACK7,
     .priv_data_size = sizeof(MPCContext),
     .init           = mpc7_decode_init,
     .close          = mpc7_decode_close,
     .decode         = mpc7_decode_frame,
     .flush          = mpc7_decode_flush,
-    .capabilities   = AV_CODEC_CAP_DR1,
-    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+    .p.capabilities = AV_CODEC_CAP_DR1,
+    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
 #include "parser.h"
@@ -90,8 +92,19 @@ get_next:
         if (avctx->codec_id != AV_CODEC_ID_AAC) {
             avctx->sample_rate = s->sample_rate;
             if (!CONFIG_EAC3_DECODER || avctx->codec_id != AV_CODEC_ID_EAC3) {
-                avctx->channels = s->channels;
+                av_channel_layout_uninit(&avctx->ch_layout);
+                if (s->channel_layout) {
+                    av_channel_layout_from_mask(&avctx->ch_layout, s->channel_layout);
+                } else {
+                    avctx->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
+                    avctx->ch_layout.nb_channels = s->channels;
+                }
+#if FF_API_OLD_CHANNEL_LAYOUT
+FF_DISABLE_DEPRECATION_WARNINGS
+                avctx->channels = avctx->ch_layout.nb_channels;
                 avctx->channel_layout = s->channel_layout;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
             }
             s1->duration = s->samples;
             avctx->audio_service_type = s->service_type;

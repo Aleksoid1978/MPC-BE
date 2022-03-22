@@ -33,6 +33,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
+#include "codec_internal.h"
 #include "copy_block.h"
 #include "bytestream.h"
 #include "get_bits.h"
@@ -1133,15 +1134,15 @@ static av_cold int decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-const AVCodec ff_indeo3_decoder = {
-    .name           = "indeo3",
-    .long_name      = NULL_IF_CONFIG_SMALL("Intel Indeo 3"),
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_INDEO3,
+const FFCodec ff_indeo3_decoder = {
+    .p.name         = "indeo3",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Intel Indeo 3"),
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_INDEO3,
     .priv_data_size = sizeof(Indeo3DecodeContext),
     .init           = decode_init,
     .close          = decode_close,
     .decode         = decode_frame,
-    .capabilities   = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
