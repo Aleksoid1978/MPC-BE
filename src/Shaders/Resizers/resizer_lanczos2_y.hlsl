@@ -1,8 +1,6 @@
 // compensated Lanczos2, pass Y
 
-#if Ml
 #define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))
-#endif
 
 #define PI acos(-1.)
 

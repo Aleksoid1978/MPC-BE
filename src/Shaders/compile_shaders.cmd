@@ -52,27 +52,6 @@ fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_bicubic_y.cso" "Resizer
 fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_lanczos_x.cso" "Resizers\downscaler.hlsl" /DFILTER=4 /DAXIS=0
 fxc /nologo /T ps_3_0 /Fo "..\..\_bin\shaders\downscaler_lanczos_y.cso" "Resizers\downscaler.hlsl" /DFILTER=4 /DAXIS=1
 
-CALL :SubColorText "0A" "=== Compiling Pixel Shaders 2.0 ===" & ECHO.
-set LIST=%LIST% Resizers\resizer_bspline4_x.hlsl
-set LIST=%LIST% Resizers\resizer_bspline4_y.hlsl
-set LIST=%LIST% Resizers\resizer_mitchell4_x.hlsl
-set LIST=%LIST% Resizers\resizer_mitchell4_y.hlsl
-set LIST=%LIST% Resizers\resizer_catmull4_x.hlsl
-set LIST=%LIST% Resizers\resizer_catmull4_y.hlsl
-set LIST=%LIST% Resizers\resizer_bicubic06_x.hlsl
-set LIST=%LIST% Resizers\resizer_bicubic06_y.hlsl
-set LIST=%LIST% Resizers\resizer_bicubic08_x.hlsl
-set LIST=%LIST% Resizers\resizer_bicubic08_y.hlsl
-set LIST=%LIST% Resizers\resizer_bicubic10_x.hlsl
-set LIST=%LIST% Resizers\resizer_bicubic10_y.hlsl
-set LIST=%LIST% Resizers\resizer_lanczos2_x.hlsl
-set LIST=%LIST% Resizers\resizer_lanczos2_y.hlsl
-set LIST=%LIST% Transformation\ycgco_correction.hlsl
-set LIST=%LIST% Transformation\convert_bt2020_to_bt709.hlsl
-set LIST=%LIST% Transformation\convert_pq_to_sdr.hlsl
-set LIST=%LIST% Transformation\chroma_422_correction.hlsl
-set LIST=%LIST% Transformation\halfoverunder_to_interlace.hlsl
-
 EXIT /B
 
 :SubColorText

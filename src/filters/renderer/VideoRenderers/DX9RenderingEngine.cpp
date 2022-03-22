@@ -1672,10 +1672,9 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		return E_FAIL;
 	}
 
-	D3D_SHADER_MACRO ShaderMacros[6] = {};
+	D3D_SHADER_MACRO ShaderMacros[5] = {}; // number of macros + 1 
 	size_t i = 0;
 
-	ShaderMacros[i++] = { "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" };
 	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0" }; // 10-bit or 8-bit
 	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1" : "0" };
 	static char lut3DSizeStr[8];

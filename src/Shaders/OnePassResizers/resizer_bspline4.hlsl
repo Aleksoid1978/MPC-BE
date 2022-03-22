@@ -1,8 +1,6 @@
 // B-spline4
 
-#if Ml
 #define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))
-#endif
 
 #define sp(a, b, c) float4 a = tex2D(s0, tex+dxdy*float2(b, c));
 
