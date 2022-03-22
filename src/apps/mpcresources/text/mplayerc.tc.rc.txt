@@ -353,7 +353,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 19		"不顯示短於設定長度的 000xx.mpls："
 22		"分鐘"
 23		"啟用 Logitech LCD 支援"
-24		"Use Window Media Controls"
+24		"啟用 Windows 媒體控制項"
 25		"啟用小型記憶體傾印 (MiniDump)"
 26		"檢查更新"
 27		"啟用更新檢查"
