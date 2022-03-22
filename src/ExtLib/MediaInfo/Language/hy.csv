@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;Ծրագրի մասին
 About_Hint;Կապնվել ծրագրի հեղինակի հետ կամ բացել ծրագրի կայքը
 Accompaniment;Ուղեկցումը
@@ -180,6 +181,7 @@ Arranger;Կազմակերպիչը
 ArtDirector;ArtDirector
 AspectRatio;Հարաբերակցությունը
 AssistantDirector;Ռեժիսորի օգնականը
+AssociatedVideo_FrameRate;
 at;ընդ.
 At least one file;Ընտրեք որևէ ֆայլ
 Audio;Ձայնը
@@ -203,6 +205,7 @@ Basic;Կարճ
 Basic_Note;Ուշադր. լրացուցիչ տեղեկությունների համար ընտրեք այլ տարբերակ (աղյուսակ, ծառի տեսքով,...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Բիթայնությունը
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Նոմինալ բիթրեյթը
 Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
+CaptionServiceName;
 Channel(s);Ալիք(ներ)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Կողմերի հարաբեր-ը օրիգինալում
 DistributedBy;Տարածողը
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Օժանդակություն
 DotsPerInch;Կետեր դյույմի վրա
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Տևողությունը
 Duration_End;Ավարտվելու ժ-ը
+Duration_End_Command;
 Duration_Start;Սկսվելու ժ-ը
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Փոփոխել
@@ -357,6 +368,10 @@ EPG_Positions;EPG-ի դիրքը (ներքին)
 EpisodeTitleNumber;
 Error_File;Սխալ ֆայլում
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Ռեժիսորի օգնականը
 Exit;Ելք
 Exit_Hint;Ելք ծրագրից
@@ -378,7 +393,10 @@ FileExtension;Տեսակը
 FileName;Ֆայլի անունը
 FileNameExtension;
 FileSize;Ֆայլի չափը
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Թղթապանակը
 Folder (R);Թղթապանակը (R)
 Folder (R)_Hint;Ընտրեք թղթապանակը (բոլոր ենթաթղթապանակներով)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Կադրերի հաշվիչ
 FrameRate;Կադրերի հաճախականությունը
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
 FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
 FrameRate_Mode;Կադրերի հաճախականության եղանակը
@@ -679,6 +698,21 @@ InternetMediaType;Կրիչի ինտերնետային տեսակ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Հիմնաբառերը
 Known codecs;Հայտնի կոդավորիչները
 Known formats;Հայտնի տեսակները
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Շտեմարանը
 Lifetime_Subscribe_Button;
 Lightness;Պայծառությունը
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Ցանկը
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Լրացուցիչ հնարավորություններ
 Menu_No;Չկա Ընտրացանկ
 MenuCount;Ընտրացանկի հոսքերի ք-ը
 MenuID;Ընտրացանկի ID-ին
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; ր.
 Mood;Կարգավորված
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Գույների քանակը
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Շնորհակալ ենք
 Thousands separator;Հազարյակի բաժանիչը
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Շավիղը
 Track_Count;Շավիղների ք-ը
+TrackIndex;
+TrackUID;
 transfer_characteristics;Փոխանցման բնութագրումը
 Translate_Reports;
 Translator;Hrant Ohanyan
+Transport;
 Tree;Ծառի տեսքով
 Tree & Text;Ծառի տեսքով և տեքստ
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;74
-ZZ_AutomaticLanguage_Percent;78
+ZZ_Automatic_Percent;72
+ZZ_AutomaticLanguage_Percent;75

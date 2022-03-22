@@ -150,6 +150,7 @@
 : ;: 
 3D;3D
 3DType;Tipus 3D
+608_Mode;
 About;Quant a...
 About_Hint;Com contactar-me i trobar l'última versió
 Accompaniment;Acompanyament
@@ -180,6 +181,7 @@ Arranger;Arranjador
 ArtDirector;Director artístic
 AspectRatio;Relació d'aspecte
 AssistantDirector;Assistent del director
+AssociatedVideo_FrameRate;
 at;a
 At least one file;(Has d'obrir al menys un arxiu)
 Audio;Àudio
@@ -203,6 +205,7 @@ Basic;Bàsic
 Basic_Note;Nota: Per a més informació quant aquest arxiu, has de triar una vista diferent (fulla, arbre...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Profunditat de bits
 BitDepth_Detected;
 BitDepth_Stored;Profunditat bits emmagatzemada
@@ -217,6 +220,7 @@ BitRate_Nominal;Taxa de bits nominal
 Bits-(Pixel*Frame);Bits/(píxel*fotograma)
 BufferSize;Mida búfer
 Cancel;Cancel·la
+CaptionServiceName;
 Channel(s);Canal(s)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;Relació d'aspecte d'obertura neta
 DisplayAspectRatio_Original;Relació d'aspecte original
 DistributedBy;Distribuït per
 Distributor;Distribuïdor
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donació
 DotsPerInch;Punts per polçada
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Durada
 Duration_End;Temps final
+Duration_End_Command;
 Duration_Start;Temps inicial
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Edita
@@ -357,6 +368,10 @@ EPG_Positions;Posicions EPG (internes)
 EpisodeTitleNumber;Número títol episodi
 Error_File;Error en llegir l'arxiu
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Productor executiu
 Exit;Surt
 Exit_Hint;Tanca el programa
@@ -378,7 +393,10 @@ FileExtension;Extensió d'arxiu
 FileName;Nom de l'arxiu
 FileNameExtension;
 FileSize;Mida de l'arxiu
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Carpeta
 Folder (R);Carpeta (R)
 Folder (R)_Hint;Tria una carpeta (i les seves subcarpetes)
@@ -427,6 +445,7 @@ FpaPass;Passada FPA
 FpaVersion;Versió FPA
 FrameCount;Quantitat fotogrames
 FrameRate;Fotogrames per segon
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Fotogrames per segon màxims
 FrameRate_Minimum;Fotogrames per segon mínims
 FrameRate_Mode;Mode fotogrames per segon
@@ -679,6 +698,21 @@ InternetMediaType;Tipus medis Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Paraules clau
 Known codecs;Còdecs coneguts
 Known formats;Formats coneguts
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Llibreria multiplexat
 Lifetime_Subscribe_Button;
 Lightness;Lleugeresa
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;Alineació inicial
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Llista
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Més possibilitats
 Menu_No;Sense menú
 MenuCount;Nombre de pistes al menú
 MenuID;ID menú
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Humor
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Nombre de colors
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Agraïments a
 Thousands separator;Separador de milers
 TimeCode;Codi de temps
 TimeCode_FirstFrame;Codi de temps del primer fotograma
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Ajustos del codi de temps
 TimeCode_Source;Origen del codi de temps
 TimeCode_Striped;Codi de temps, ratllat
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;Nombre total parts
 TotalProgrammeDuration;Duració total programa
 Track;Nom de la pista
 Track_Count;Total de pistes
+TrackIndex;
+TrackUID;
 transfer_characteristics;Característiques transferència
 Translate_Reports;
 Translator;Traductor
+Transport;
 Tree;Arbre
 Tree & Text;Arbre i text
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;83

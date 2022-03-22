@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;Πληροφορίες
 About_Hint;Πως θα επικοινωνήσετε μαζί μου και θα βρείτε νεότερη έκδoση
 Accompaniment;Συνοδεία
@@ -180,6 +181,7 @@ Arranger;Arranger
 ArtDirector;ArtDirector
 AspectRatio;Λόγος εικόνας
 AssistantDirector;AssistantDirector
+AssociatedVideo_FrameRate;
 at;at
 At least one file;(Πρέπει να ανοίξετε τουλάχιστον ένα αρχείο)
 Audio;Ήχος
@@ -203,6 +205,7 @@ Basic;Βασική
 Basic_Note;Σημείωση : για περισσότερες πληροφορίες σχετικά με το αρχείο, επιλέξτε διαφορετική προβολή (Φύλλο, Δένδρο...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;
 Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
 BufferSize;
 Cancel;Άκυρο
+CaptionServiceName;
 Channel(s);Κανάλι(α)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
 DistributedBy;Distributed by
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Δωρεές
 DotsPerInch;
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;
 Duration_End;
+Duration_End_Command;
 Duration_Start;
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Επεξεργασία
@@ -357,6 +368,10 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Παρουσιάστηκε σφάλμα κατά το διάβασμα του αρχείου
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Executive producer
 Exit;Έξοδος
 Exit_Hint;Κλείνει το πρόγραμμα
@@ -378,7 +393,10 @@ FileExtension;Επέκταση αρχείου
 FileName;Όνομα αρχείου
 FileNameExtension;
 FileSize;Μέγεθος αρχείου
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Φάκελος
 Folder (R);Φάκελος (R)
 Folder (R)_Hint;Επιλέξτε έναν φάκελο για εξέταση (με τους υποφακέλους αναδρομικά)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Ρυθμός ανανέωσης πλαισίου
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Μέγιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Minimum;Ελάχιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Mode;
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Λέξεις κλειδιά
 Known codecs;Γνωστοί συμπιεστές
 Known formats;Γνωστές μορφοποιήσεις
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Muxing library
 Lifetime_Subscribe_Button;
 Lightness;
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Περισσότερες πιθανότητες
 Menu_No;Χωρίς μενού
 MenuCount;Αριθμός των ροών μενού
 MenuID;
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Mood
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Ευχαριστώ τους
 Thousands separator;Διαχωριστής χιλιάδων
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Track name
 Track_Count;Track count
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Μεταφραστής
+Transport;
 Tree;Δένδρο
 Tree & Text;Δένδρο & Κείμενο
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Τοποθεσία καταγραφής
 WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
-ZZ_Automatic_Percent;59
-ZZ_AutomaticLanguage_Percent;66
+ZZ_Automatic_Percent;57
+ZZ_AutomaticLanguage_Percent;64

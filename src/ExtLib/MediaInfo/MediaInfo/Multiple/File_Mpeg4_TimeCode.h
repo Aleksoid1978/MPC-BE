@@ -28,6 +28,11 @@ public :
     bool    DropFrame;
     bool    NegativeTimes;
     int64s  FirstEditOffset;
+    int64u  FirstEditDuration;
+    int64u  tkhd_Duration;
+    int64u  mvhd_Duration_TimeScale;
+    int64u  mdhd_Duration;
+    int64u  mdhd_Duration_TimeScale;
 
     //Out
     int64s  Pos;

@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;정보
 About_Hint;연락처와 최신 버전 확인
 Accompaniment;반주
@@ -180,6 +181,7 @@ Arranger;편곡자
 ArtDirector;미술 감독
 AspectRatio;종횡비
 AssistantDirector;조감독
+AssociatedVideo_FrameRate;
 at;at
 At least one file;(최소한 하나의 파일을 열어야 합니다)
 Audio;오디오
@@ -203,6 +205,7 @@ Basic;기본
 Basic_Note;노트 : 이 파일에 관한 더 자세한 정보를 원하시면 다른 보기를 선택하세요(시트, 트리...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;명목상의 비트레이트
 Bits-(Pixel*Frame);비트/(픽셀*프레임)
 BufferSize;
 Cancel;취소
+CaptionServiceName;
 Channel(s);채널
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;원본 화면 종횡비
 DistributedBy;배포
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;기부하기
 DotsPerInch;인치당 도트
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;길이
 Duration_End;종료 시간
+Duration_End_Command;
 Duration_Start;시작 시간
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;편집
@@ -357,6 +368,10 @@ EPG_Positions;EPG 포지션 (내부)
 EpisodeTitleNumber;
 Error_File;파일을 읽는 중 에러
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;제작 감독
 Exit;종료
 Exit_Hint;프로그램을 종료합니다
@@ -378,7 +393,10 @@ FileExtension;파일 확장자
 FileName;파일명
 FileNameExtension;
 FileSize;파일 크기
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;폴더
 Folder (R);폴더 (R)
 Folder (R)_Hint;조사할 폴더를 선택 (모든 하위 폴더를 포함)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;포맷 개수
 FrameRate;프레임레이트
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;최대 프레임레이트
 FrameRate_Minimum;최소 프레임레이트
 FrameRate_Mode;프레임레이트 모드
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;키워드
 Known codecs;알고 있는 코덱
 Known formats;알고 있는 포맷
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Muxing 라이브러리
 Lifetime_Subscribe_Button;
 Lightness;밝기
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;목록
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;더 자세히
 Menu_No;메뉴 없음
 MenuCount;메뉴 스트림 개수
 MenuID;메뉴 ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn;분
 Mood;무드
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;색상수
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;감사
 Thousands separator;천단위 구분자
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;트랙 이름
 Track_Count;트랙 개수
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;번역
+Transport;
 Tree;트리
 Tree & Text;트리 & 텍스트
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;74

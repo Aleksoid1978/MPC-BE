@@ -150,6 +150,7 @@
 : ;: 
 3D;3D
 3DType;3D 类型
+608_Mode;
 About;关于
 About_Hint;联系作者；获取最新版
 Accompaniment;伴奏
@@ -180,6 +181,7 @@ Arranger;编曲
 ArtDirector;艺术指导
 AspectRatio;宽高比
 AssistantDirector;副导演
+AssociatedVideo_FrameRate;
 at;@
 At least one file;(至少要打开一个文件)
 Audio;音频
@@ -203,6 +205,7 @@ Basic;基本
 Basic_Note;提示：请选择表格、树状图等其他视图了解更多文件信息
 BedChannelConfiguration;音床声道配置
 BedChannelCount;音床声道数
+BinauralRenderMode;
 BitDepth;位深
 BitDepth_Detected;检测到的位深
 BitDepth_Stored;存储的位深
@@ -217,6 +220,7 @@ BitRate_Nominal;额定码率
 Bits-(Pixel*Frame);数据密度 [码率/(像素*帧率)]
 BufferSize;缓冲大小
 Cancel;取消
+CaptionServiceName;
 Channel(s);声道数
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;干净光圈画面比例
 DisplayAspectRatio_Original;原始画面比例
 DistributedBy;发行商
 Distributor;发行商
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;赞助
 DotsPerInch;DPI
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;DRC 组数
 DrcSets_Effects;DRC 效果类型
 Duration;时长
 Duration_End;结束时间
+Duration_End_Command;
 Duration_Start;开始时间
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;编辑
@@ -357,6 +368,10 @@ EPG_Positions;EPG 位置 (内部)
 EpisodeTitleNumber;集数标题
 Error_File;读取文件出错
 Error_File_Write;写入文件出错
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;出品人
 Exit;退出
 Exit_Hint;退出程序
@@ -378,7 +393,10 @@ FileExtension;扩展名
 FileName;文件名
 FileNameExtension;文件名和扩展名
 FileSize;文件大小
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;文件夹
 Folder (R);文件夹 (R)
 Folder (R)_Hint;选择一个文件夹 (包含所有子文件夹)
@@ -427,6 +445,7 @@ FpaPass;FPA 通过
 FpaVersion;FPA 版本
 FrameCount;总帧数
 FrameRate;帧率
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最高帧率
 FrameRate_Minimum;最低帧率
 FrameRate_Mode;帧率模式
@@ -679,6 +698,21 @@ InternetMediaType;网络媒体类型
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;关键词
 Known codecs;已知解码器
 Known formats;已知格式
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;混流函数库
 Lifetime_Subscribe_Button;
 Lightness;亮度
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;Line Up 起始点
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;列表
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;更多选择
 Menu_No;无菜单
 MenuCount;菜单流总数
 MenuID;菜单 ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; 分
 Mood;情绪
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;色彩数量
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;鸣谢
 Thousands separator;千位分隔符
 TimeCode;时间码
 TimeCode_FirstFrame;第一帧时间码
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;时间码设置
 TimeCode_Source;时间码源
 TimeCode_Striped;时间码, 条带化
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;分段总数
 TotalProgrammeDuration;节目时长总计
 Track;轨道名
 Track_Count;轨道数
+TrackIndex;
+TrackUID;
 transfer_characteristics;传输特性
 Translate_Reports;翻译报告
 Translator;翻译
+Transport;
 Tree;树状图
 Tree & Text;树状图和文本
 TruePeakLevel;真实峰值等级
@@ -1285,5 +1332,5 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;89

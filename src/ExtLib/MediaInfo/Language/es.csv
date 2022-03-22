@@ -150,6 +150,7 @@
 : ;";"
 3D;3D
 3DType;Tipo 3D
+608_Mode;
 About;Acerca de 
 About_Hint;Cómo contactar con el autor y buscar la última versión
 Accompaniment;Acompañamiento
@@ -180,6 +181,7 @@ Arranger;Adaptador
 ArtDirector;Director de arte
 AspectRatio;Relación de aspecto
 AssistantDirector;Asistente director
+AssociatedVideo_FrameRate;
 at;en
 At least one file;(Abre al menos un archivo)
 Audio;Audio
@@ -203,6 +205,7 @@ Basic;Básico
 Basic_Note;Nota: Para más información sobre este archivo, selecciona una vista diferente (hoja, árbol...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Profundidad bits
 BitDepth_Detected;
 BitDepth_Stored;Prof. bits almacenada
@@ -217,6 +220,7 @@ BitRate_Nominal;Tasa de bits nominal
 Bits-(Pixel*Frame);Bits/(píxel*fotograma)
 BufferSize;Tamaño búfer
 Cancel;Cancelar
+CaptionServiceName;
 Channel(s);Canal(es)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;Relación aspecto abertura limpia
 DisplayAspectRatio_Original;Relación de aspecto original
 DistributedBy;Distribuido por
 Distributor;Distribuidor
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donación
 DotsPerInch;Puntos por pulgada
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Duración
 Duration_End;Tiempo final
+Duration_End_Command;
 Duration_Start;Tiempo inicial
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Editar
@@ -357,6 +368,10 @@ EPG_Positions;Posiciones EPG (internas)
 EpisodeTitleNumber;Número título episodio
 Error_File;Error al leer el archivo
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Productor ejecutivo
 Exit;Salir
 Exit_Hint;Salir del programa
@@ -378,7 +393,10 @@ FileExtension;Extensión del archivo
 FileName;Nombre de archivo
 FileNameExtension;
 FileSize;Tamaño de archivo
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Carpeta
 Folder (R);Carpeta (R)
 Folder (R)_Hint;Selecciona carpeta para examinar (con todas las subcarpetas)
@@ -427,6 +445,7 @@ FpaPass;Paso FPA
 FpaVersion;Versión FPA
 FrameCount;Recuento fotogramas
 FrameRate;Velocidad de fotogramas
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Velocidad fotogramas máxima
 FrameRate_Minimum;Velocidad fotogramas mínima
 FrameRate_Mode;Modo velocidad fotogramas
@@ -679,6 +698,21 @@ InternetMediaType;Tipo medios Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Palabras clave
 Known codecs;Códecs conocidos
 Known formats;Formatos conocidos
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Librería multiplexado
 Lifetime_Subscribe_Button;
 Lightness;Claridad
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;Inicio alineamiento
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lista
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Más posibilidades
 Menu_No;Sin menú
 MenuCount;Número de pistas de menú
 MenuID;ID menú
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Humor
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Número de colores
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Gracias a
 Thousands separator;Separador de miles
 TimeCode;Código de tiempo
 TimeCode_FirstFrame;Código tiempo primer fotograma
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Opciones código tiempo
 TimeCode_Source;Código tiempo origen
 TimeCode_Striped;Código tiempo, rayado
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;Número total de partes
 TotalProgrammeDuration;Duración total programa
 Track;Nombre de pista
 Track_Count;Número de pista
+TrackIndex;
+TrackUID;
 transfer_characteristics;Características transferencia
 Translate_Reports;
 Translator;Traductor
+Transport;
 Tree;Árbol
 Tree & Text;Árbol de texto
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Escrito en
 WrittenBy;Escrito por
 Yes;Sí
 Your system;Tu sistema
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;73
+ZZ_AutomaticLanguage_Percent;83

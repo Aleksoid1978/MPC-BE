@@ -58,11 +58,12 @@ private :
     void Read_Buffer_Continue();
 
     //Temp
-    TimeCode Time_Start;
+    TimeCode Time_Begin;
     TimeCode Time_End;
     int64u FrameCount;
     int64u LineCount;
     int64u LineMaxCountPerEvent;
+    int64u EmptyCount;
     int64u FrameRate_Int;
     int64u FrameRateMultiplier_Num;
     int64u FrameRateMultiplier_Den;

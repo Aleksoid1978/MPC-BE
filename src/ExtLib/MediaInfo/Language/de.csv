@@ -150,6 +150,7 @@
 : ;:
 3D;
 3DType;
+608_Mode;
 About;Über
 About_Hint;Kontakt und Infos zur neuesten Version
 Accompaniment;Begleitung
@@ -180,6 +181,7 @@ Arranger;Arrangeur
 ArtDirector;ArtDirector
 AspectRatio;Bildseitenverhältnis
 AssistantDirector;Regie-Assistent
+AssociatedVideo_FrameRate;
 at;bei
 At least one file;(Mindestens eine Datei muss geöffnet werden)
 Audio;Audio
@@ -203,6 +205,7 @@ Basic;Einfach
 Basic_Note;Hinweis: Für mehr Informationen über diese Datei eine andere Ansicht wählen (Baumstruktur, Tabelle...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;nominale Bitrate
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BufferSize;
 Cancel;Abbrechen
+CaptionServiceName;
 Channel(s);Kanäle
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Ursprüngliches Bildseitenverhältnis
 DistributedBy;Vertrieb durch
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;MediaInfo unterstützen
 DotsPerInch;DPI
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Dauer
 Duration_End;Endzeit
+Duration_End_Command;
 Duration_Start;Anfangszeit
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Bearbeiten
@@ -357,6 +368,10 @@ EPG_Positions;EPG Positionen (inter)
 EpisodeTitleNumber;
 Error_File;Fehler beim Lesen der Datei
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Ausführender Produzent
 Exit;Beenden
 Exit_Hint;Beendet das Programm
@@ -378,7 +393,10 @@ FileExtension;Dateierweiterung
 FileName;Dateiname
 FileNameExtension;
 FileSize;Dateigröße
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Verzeichnis
 Folder (R);Verzeichnis (R)
 Folder (R)_Hint;Verzeichnis zum Betrachten auswählen (rekursiv mit allen Unterverzeichnissen)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Anzahl der Frames
 FrameRate;Bildwiederholungsrate
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;maximale Bildwiederholungsrate
 FrameRate_Minimum;minimale Bildwiederholungsrate
 FrameRate_Mode;Modus der Bildwiederholungsrate
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Schlüsselwörter
 Known codecs;Bekannte Codecs
 Known formats;Bekannte Formate
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Muxing-Bibliothek
 Lifetime_Subscribe_Button;
 Lightness;Helligkeit
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Liste
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Weitere Möglichkeiten
 Menu_No;Kein Menü
 MenuCount;Anzahl der Menü-Streams
 MenuID;Menü-ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Stimmung
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Farbanzahl
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Dank an
 Thousands separator;Tausender-Markierung
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Track-Name
 Track_Count;Anzahl der Tracks
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Übersetzer
+Transport;
 Tree;Baumstruktur
 Tree & Text;Baumstruktur & Text
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;74

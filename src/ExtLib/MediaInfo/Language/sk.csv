@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;O programe
 About_Hint;O programe
 Accompaniment;Accompaniment
@@ -180,6 +181,7 @@ Arranger;Arranger
 ArtDirector;ArtDirector
 AspectRatio;Pomer strán
 AssistantDirector;AssistantDirector
+AssociatedVideo_FrameRate;
 at;pri
 At least one file;(Musíš najprv otvoriť súbor)
 Audio;Audio
@@ -203,6 +205,7 @@ Basic;Základné
 Basic_Note;Info : Pre viac detailov vyberte iný režim zobrazenia (List, Strom...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;
 Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
 BufferSize;
 Cancel;Zrušiť
+CaptionServiceName;
 Channel(s);Kanál(y)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Pôvodný pomer strán pre zobrazenie
 DistributedBy;Distribútor
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Zaslat finančný dar
 DotsPerInch;Bodov na palec
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Trvanie
 Duration_End;
+Duration_End_Command;
 Duration_Start;
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Upraviť
@@ -357,6 +368,10 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Zlyhalo načítavanie súboru
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Executive producer
 Exit;Koniec
 Exit_Hint;Ukončiť program
@@ -378,7 +393,10 @@ FileExtension;Prípona súboru
 FileName;Názov súboru
 FileNameExtension;
 FileSize;Veľkosť súboru
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Adresár
 Folder (R);Adresár (R)
 Folder (R)_Hint;Select a folder to study (with all folders recursively)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Frekvencia snímok
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maximálna frekvencia snímok
 FrameRate_Minimum;Minimálna frekvencia snímok
 FrameRate_Mode;Režim frekvencie snímok
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Identifikujúce slová
 Known codecs;Známe kodeky
 Known formats;Známe formáty
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Muxing library
 Lifetime_Subscribe_Button;
 Lightness;
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Zoznam
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;More possibilities
 Menu_No;Žiadne menu
 MenuCount;Count of menu streams
 MenuID;Označenie menu
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Mood
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Poďakovanie
 Thousands separator;Oddeľovač tisícok
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Názov stopy
 Track_Count;Počet stôp
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Preložil
+Transport;
 Tree;Strom
 Tree & Text;Strom a text
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;64
-ZZ_AutomaticLanguage_Percent;70
+ZZ_Automatic_Percent;62
+ZZ_AutomaticLanguage_Percent;67

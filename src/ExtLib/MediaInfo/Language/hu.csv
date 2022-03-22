@@ -150,6 +150,7 @@
 : ;:
 3D;
 3DType;
+608_Mode;
 About;Névjegy
 About_Hint;Hogyan léphet velem kapcsolatba, illetve a legfrissebb változat lelőhelye
 Accompaniment;Kíséret
@@ -180,6 +181,7 @@ Arranger;Szerkesztő
 ArtDirector;Művészeti vezető
 AspectRatio;Képarány
 AssistantDirector;Segédrendező
+AssociatedVideo_FrameRate;
 at;, képsebesség:
 At least one file;(Legalább egy fájlt meg kell nyitni)
 Audio;Hang
@@ -203,6 +205,7 @@ Basic;Egyszerű
 Basic_Note;Megjegyzés: a többi nézet (Táblázat, Fa ...) bővebb adatokat mutat a fájlról
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Névleges adatsebesség
 Bits-(Pixel*Frame);Bit/(képpont*képkocka)
 BufferSize;
 Cancel;Mégsem
+CaptionServiceName;
 Channel(s);Csatornák száma
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Eredeti képarány
 DistributedBy;Terjesztő
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Adomány
 DotsPerInch;
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Időtartam
 Duration_End;
+Duration_End_Command;
 Duration_Start;
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Szerkesztés
@@ -357,6 +368,10 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Fájlolvasási hiba
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Gyártó
 Exit;Kilépés
 Exit_Hint;Kilépés a programból
@@ -378,7 +393,10 @@ FileExtension;Fájl kiterjesztés
 FileName;Fájlnév
 FileNameExtension;
 FileSize;Fájlméret
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Mappa
 Folder (R);Mappa (R)
 Folder (R)_Hint;Adja meg az almappáival együtt vizsgálandó mappát
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Képkockaszám
 FrameRate;Képkockasebesség
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Legnagyobb képkockasebesség
 FrameRate_Minimum;Legkisebb képkockasebesség
 FrameRate_Mode;Képkockasebességi mód
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Kulcsszavak
 Known codecs;Ismert kódekek
 Known formats;Ismert formátumok
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Keverőkönyvtár
 Lifetime_Subscribe_Button;
 Lightness;Fényesség
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lista
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;További lehetőségek
 Menu_No;Menüszám
 MenuCount;Menüsávok száma
 MenuID;Menü azonosító
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; perc
 Mood;Hangnem
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Színek száma
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Köszönetnyilvánítás
 Thousands separator;Ezres elválasztó jel
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Sáv
 Track_Count;Sávok száma
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Fordító
+Transport;
 Tree;Fa
 Tree & Text;Fa és szöveg
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;66
-ZZ_AutomaticLanguage_Percent;75
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;72

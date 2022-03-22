@@ -803,6 +803,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dvvC=0x64767643;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_esds=0x65736473;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_fiel=0x6669656C;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_gama=0x67616D61;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_glbl=0x676C626C;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC=0x68766343;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_hvcE=0x68766345;
@@ -1208,6 +1209,7 @@ void File_Mpeg4::Data_Parse()
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dvvC)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_esds)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_fiel)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_gama)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_glbl)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_hvcE)
@@ -5082,6 +5084,10 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tmcd()
         Parser->NumberOfFrames=NumberOfFrames; //tc->FrameDuration?(((float64)tc->TimeScale)/tc->FrameDuration):0;
         Parser->DropFrame=tc->DropFrame;
         Parser->NegativeTimes=tc->NegativeTimes;
+        Parser->tkhd_Duration=Streams[moov_trak_tkhd_TrackID].tkhd_Duration;
+        Parser->mvhd_Duration_TimeScale=moov_mvhd_TimeScale;
+        Parser->mdhd_Duration=Streams[moov_trak_tkhd_TrackID].mdhd_Duration;
+        Parser->mdhd_Duration_TimeScale=Streams[moov_trak_tkhd_TrackID].mdhd_TimeScale;
 
         //Get delay from timecode track's edit list
         int64s FrameDurationInMediaUnits = tc->FrameDuration * Streams[moov_trak_tkhd_TrackID].mdhd_TimeScale;
@@ -5094,6 +5100,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tmcd()
                 {
                     //Inform parser of offset (in TC frames) due to edit list
                     Parser->FirstEditOffset = Edit.Delay * tc->TimeScale / FrameDurationInMediaUnits;
+                    Parser->FirstEditDuration = Edit.Duration * tc->TimeScale / FrameDurationInMediaUnits;
                     break;
                 }
             }
@@ -7155,6 +7162,18 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_fiel()
                         break;
             default   : ;
         }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_gama()
+{
+    float32 Data;
+    Get_BFP4 (16, Data,                                          "Data");
+
+    FILLING_BEGIN();
+        if (Data)
+            Fill(Stream_Video, StreamPos_Last, "Gamma", Data);
     FILLING_END();
 }
 

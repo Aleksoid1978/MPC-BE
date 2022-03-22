@@ -1048,7 +1048,6 @@ void File_Mpeg4::Streams_Finish()
                 else
                 {
                     //Temp->second.Parsers[0]->Clear(StreamKind_Last, StreamPos_Last, "Delay"); //DV TimeCode is removed
-                    Temp->second.Parsers[0]->Clear(StreamKind_Last, StreamPos_Last, "FrameCount");
                     size_t New_Count=Temp->second.Parsers[0]->Count_Get(StreamKind_Last);
                     Ztring ID;
                     ZtringList StreamSave;

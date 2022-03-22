@@ -34,9 +34,13 @@ public:
     
     //Out
     bool HasSegment9;
+    vector<int8u> BinauralRenderModes;
 
     //Constructor/Destructor
     File_DolbyAudioMetadata();
+
+    //Delayed
+    void Merge(File__Analyze& In, size_t StreamPos);
 
 private :
     //Buffer - File header

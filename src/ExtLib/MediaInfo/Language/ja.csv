@@ -150,6 +150,7 @@
 : ;: 
 3D;3D
 3DType;3D種別
+608_Mode;
 About;このソフトの情報
 About_Hint;連絡方法と最新版チェック
 Accompaniment;伴奏
@@ -180,6 +181,7 @@ Arranger;編曲者
 ArtDirector;美術監督
 AspectRatio;アスペクト比
 AssistantDirector;助監督
+AssociatedVideo_FrameRate;
 at;at
 At least one file;( 1つ以上のファイルを開いてください )
 Audio;音声
@@ -203,6 +205,7 @@ Basic;基本
 Basic_Note;注 : このファイルの詳細情報は、別の表示方法で開いて確認してください (シート、ツリーなど)
 BedChannelConfiguration;ベッドチャンネルの構成
 BedChannelCount;ベッドチャンネルの数
+BinauralRenderMode;
 BitDepth;ビット深度
 BitDepth_Detected;検出したビット深度
 BitDepth_Stored;保存されたビット深度
@@ -217,6 +220,7 @@ BitRate_Nominal;ビットレート名
 Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
 BufferSize;バッファサイズ
 Cancel;キャンセル
+CaptionServiceName;
 Channel(s);チャンネル
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;表示されるモニターのアスペクト�
 DisplayAspectRatio_Original;元のモニターのアスペクト比
 DistributedBy;配給者
 Distributor;配給
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;寄付
 DotsPerInch;ドット/インチ
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;DRC の数
 DrcSets_Effects;DRC エフェクトの種類
 Duration;長さ
 Duration_End;終了時間
+Duration_End_Command;
 Duration_Start;開始時間
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;編集
@@ -357,6 +368,10 @@ EPG_Positions;EPG 位置 (内部)
 EpisodeTitleNumber;エピソードのタイトル数
 Error_File;ファイル読み込みエラー
 Error_File_Write;ファイル書き込みエラー
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;製作総指揮
 Exit;終了
 Exit_Hint;プログラムの終了
@@ -378,7 +393,10 @@ FileExtension;拡張子
 FileName;ファイル名
 FileNameExtension;ファイル名と拡張子
 FileSize;サイズ
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;フォルダー
 Folder (R);フォルダー(R)
 Folder (R)_Hint;フォルダーを選択 (サブフォルダーもすべて読み込みます)
@@ -427,6 +445,7 @@ FpaPass;FPAパス
 FpaVersion;FPAバージョン
 FrameCount;フレーム数
 FrameRate;フレームレート
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最大フレームレート
 FrameRate_Minimum;最小フレームレート
 FrameRate_Mode;フレームレートの種類
@@ -679,6 +698,21 @@ InternetMediaType;ネット用メディアタイプ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;キーワード
 Known codecs;対応するコーデック
 Known formats;対応する形式
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Mux ライブラリ
 Lifetime_Subscribe_Button;生涯の購読料は %PRICE%
 Lightness;明るさ
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;Line Up 開始
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;一覧
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;もっと存在する可能性あり
 Menu_No;メニューなし
 MenuCount;メニューストリーム数
 MenuID;メニュー ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn;分
 Mood;気分
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;色の数
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;謝辞
 Thousands separator;数値3桁ごとの区切り文字
 TimeCode;タイムコード
 TimeCode_FirstFrame;最初のフレームのタイムコード
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;タイムコードの設定
 TimeCode_Source;タイムコードの参照元
 TimeCode_Striped;タイムコードのストライプ
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;パートの合計数
 TotalProgrammeDuration;プログラム全体の長さ
 Track;トラック
 Track_Count;トラック数
+TrackIndex;
+TrackUID;
 transfer_characteristics;転送特性
 Translate_Reports;
 Translator;翻訳者
+Transport;
 Tree;ツリー
 Tree & Text;ツリーとテキスト
 TruePeakLevel;トゥルーピーク
@@ -1285,5 +1332,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;89

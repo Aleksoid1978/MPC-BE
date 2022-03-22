@@ -157,6 +157,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
         File_IgnoreSequenceFilesCount=false;
         File_SequenceFilesSkipFrames=0;
         File_DefaultFrameRate=0;
+        File_DefaultTimeCodeDropFrame=(int8u)-1;
         File_Source_List=false;
         File_RiskyBitRateEstimation=false;
         File_MergeBitRateInfo=true;
@@ -496,6 +497,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
             return Ztring();
         #else //MEDIAINFO_ADVANCED
             return __T("File_DefaultTimeCode is disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
+    }
+    else if (Option_Lower==__T("file_defaulttimecodedropframe"))
+    {
+        #if MEDIAINFO_ADVANCED
+            return File_DefaultTimeCodeDropFrame_Set(Value);
+            return Ztring();
+        #else //MEDIAINFO_ADVANCED
+            return __T("File_DefaultTimeCodeDropFrame is disabled due to compilation options");
         #endif //MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("file_source_list"))
@@ -1899,6 +1909,30 @@ string MediaInfo_Config_MediaInfo::File_DefaultTimeCode_Get()
 {
     CriticalSectionLocker CSL(CS);
     return File_DefaultTimeCode;
+}
+#endif //MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+Ztring MediaInfo_Config_MediaInfo::File_DefaultTimeCodeDropFrame_Set(const String& NewValue)
+{
+    int8u NewValueI;
+    if (NewValue.empty())
+        NewValueI=(int8u)-1;
+    else if (NewValue.size()==1 && NewValue[0]>=__T('0') && NewValue[0] <=__T('1'))
+        NewValueI=NewValue[0]-__T('0');
+    else
+        return __T("File_DefaultTimeCodeDropFrame value must be empty, 0 or 1");
+
+    CriticalSectionLocker CSL(CS);
+    File_DefaultTimeCodeDropFrame=NewValueI;
+    return Ztring();
+}
+
+int8u MediaInfo_Config_MediaInfo::File_DefaultTimeCodeDropFrame_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_DefaultTimeCodeDropFrame;
 }
 #endif //MEDIAINFO_ADVANCED
 

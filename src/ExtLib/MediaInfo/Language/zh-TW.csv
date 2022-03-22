@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;關於
 About_Hint;如何聯絡作者以及尋找最新版
 Accompaniment;伴奏
@@ -180,6 +181,7 @@ Arranger;編曲
 ArtDirector;藝術指導
 AspectRatio;長寬比例
 AssistantDirector;副導演
+AssociatedVideo_FrameRate;
 at;於
 At least one file;(您最少要開啟一個檔案)
 Audio;音訊
@@ -203,6 +205,7 @@ Basic;基本
 Basic_Note;注意: 想知道更多關於此檔案的資訊, 您得選擇不同的視點 (表格, 樹狀圖 ...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;正常流量
 Bits-(Pixel*Frame);位元/(像素*影格)
 BufferSize;
 Cancel;取消
+CaptionServiceName;
 Channel(s);聲道數
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;原始顯示長寬比例
 DistributedBy;發布者
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;贊助
 DotsPerInch;每吋點數 (DPI)
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;時間長度
 Duration_End;結束時間
+Duration_End_Command;
 Duration_Start;開始時間
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;編輯
@@ -357,6 +368,10 @@ EPG_Positions;EPG 電子節目表位置 (內部)
 EpisodeTitleNumber;
 Error_File;讀取檔案錯誤
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;監製
 Exit;離開
 Exit_Hint;退出此程式
@@ -378,7 +393,10 @@ FileExtension;副檔名
 FileName;檔案
 FileNameExtension;
 FileSize;檔案大小
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;資料夾
 Folder (R);資料夾 (R)
 Folder (R)_Hint;選擇要檢視的資料夾 (遞迴所有資料夾)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;影格數
 FrameRate;影格頻率
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最大影格頻率
 FrameRate_Minimum;最小影格頻率
 FrameRate_Mode;影格頻率模式
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;關鍵字
 Known codecs;已知編解碼器
 Known formats;已知格式
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;合成函式庫
 Lifetime_Subscribe_Button;
 Lightness;亮度
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;清單
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;更多可能
 Menu_No;無選單
 MenuCount;選單串流數
 MenuID;選單ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn;分
 Mood;情緒
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;色彩數
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;感謝
 Thousands separator;千位分隔符號
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;音軌
 Track_Count;音軌數
+TrackIndex;
+TrackUID;
 transfer_characteristics;傳輸特性
 Translate_Reports;
 Translator;翻譯
+Transport;
 Tree;樹狀圖
 Tree & Text;樹狀圖與文字
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;77
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;74

@@ -144,6 +144,8 @@ public :
         float64       File_DefaultFrameRate_Get ();
         void          File_DefaultTimeCode_Set (string NewValue);
         string        File_DefaultTimeCode_Get ();
+        Ztring        File_DefaultTimeCodeDropFrame_Set (const String& NewValue);
+        int8u         File_DefaultTimeCodeDropFrame_Get ();
     #endif //MEDIAINFO_ADVANCED
 
     #if MEDIAINFO_ADVANCED
@@ -449,6 +451,7 @@ private :
         int64u              File_SequenceFilesSkipFrames;
         float64             File_DefaultFrameRate;
         string              File_DefaultTimeCode;
+        int8u               File_DefaultTimeCodeDropFrame;
         bool                File_Source_List;
         bool                File_RiskyBitRateEstimation;
         bool                File_MergeBitRateInfo;

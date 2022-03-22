@@ -194,9 +194,11 @@ void File_Riff::Streams_Finish ()
         Merge(*DolbyAudioMetadata, Stream_Audio, 0, 0);
     if (Adm)
     {
-        Adm->Finish();
+        Finish(Adm);
         Merge(*Adm, Stream_Audio, 0, 0);
     }
+    if (DolbyAudioMetadata) //After ADM for having content inside ADM stuff
+        DolbyAudioMetadata->Merge(*this, 0);
     if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
     {
         Clear(Stream_Audio, 0, "AdmProfile");

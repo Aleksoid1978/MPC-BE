@@ -513,7 +513,8 @@ int tfsxml_leave(tfsxml_string* priv)
                 {
                     while (priv->len && *priv->buf != '>')
                         next_char(priv);
-                    next_char(priv);
+                    if (priv->len)
+                        next_char(priv);
                     set_flag(priv, 1);
                     return 0;
                 }
@@ -584,7 +585,8 @@ int tfsxml_leave(tfsxml_string* priv)
                 }
                 while (priv->len && *priv->buf != '>')
                     next_char(priv);
-                next_char(priv);
+                if (priv->len)
+                    next_char(priv);
                 break;
             }
             for (;;)

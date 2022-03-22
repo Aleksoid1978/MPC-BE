@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;Про програму
 About_Hint;Контакти та пошук нової версії
 Accompaniment;Супровід
@@ -180,6 +181,7 @@ Arranger;Розміщено
 ArtDirector;Режисер
 AspectRatio;Співвідношення сторін
 AssistantDirector;Помічник режисера
+AssociatedVideo_FrameRate;
 at;@
 At least one file;Як мінімум один файл
 Audio;Аудіо
@@ -203,6 +205,7 @@ Basic;Стисло
 Basic_Note;Примітка: Для додаткової інформації оберіть інший вигляд (Таблиця, Дерево,...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Бітова глибина
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Номінальний бітрейт
 Bits-(Pixel*Frame);Біт/(Пікселі*Кадри)
 BufferSize;Розмір буфера
 Cancel;Відміна
+CaptionServiceName;
 Channel(s);Кількість каналів
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Оригінальне співвідношення сторін екрану
 DistributedBy;Розповсюджувач
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Пожертвування
 DotsPerInch;Точок на дюйм
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Тривалість
 Duration_End;Кінець
+Duration_End_Command;
 Duration_Start;Початок
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Редагувати
@@ -357,6 +368,10 @@ EPG_Positions;EPG положення (внутрішні)
 EpisodeTitleNumber;
 Error_File;Помилка при читанні файлу
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Виконавчий продюсер
 Exit;Вихід
 Exit_Hint;Вихід з програми
@@ -378,7 +393,10 @@ FileExtension;Розширення файлу
 FileName;Назва файлу
 FileNameExtension;
 FileSize;Розмір файлу
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Каталог
 Folder (R);Каталог (R)
 Folder (R)_Hint;Вибір каталогу (рекурсивно з усіма підкаталогами)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Кількість кадрів
 FrameRate;Частота кадрів
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максимальна частота кадрів
 FrameRate_Minimum;Мінімальна частота кадрів
 FrameRate_Mode;Режим частоти кадрів
@@ -679,6 +698,21 @@ InternetMediaType;MIME-тип
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Ключові слова
 Known codecs;Відомі кодеки
 Known formats;Відомі формати
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Бібліотека мультиплексування
 Lifetime_Subscribe_Button;
 Lightness;Яскравість
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Список
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Більше можливостей
 Menu_No;Меню відсутнє
 MenuCount;Підрахунок меню потоків
 MenuID;Ідентифікатор меню
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; хв.
 Mood;Тональність
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Число кольорів
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Подяка
 Thousands separator;Роздільник розрядів
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Назва доріжки
 Track_Count;Кількість доріжок
+TrackIndex;
+TrackUID;
 transfer_characteristics;Характеристики трансферу
 Translate_Reports;
 Translator;Перекладач
+Transport;
 Tree;Дерево
 Tree & Text;Дерево і текст
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;79
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;76

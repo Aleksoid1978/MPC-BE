@@ -32,6 +32,24 @@ public:
     TimeCode(const string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
 
     //Operators
+    TimeCode& operator +=(const TimeCode& b)
+    {
+        return operator+=(b.ToFrames());
+    }
+    TimeCode& operator +=(const int64s Frames)
+    {
+        FromFrames(ToFrames()+Frames);
+        return *this;
+    }
+    TimeCode& operator -=(const TimeCode& b)
+    {
+        return operator-=(b.ToFrames());
+    }
+    TimeCode& operator -=(const int64s)
+    {
+        FromFrames(ToFrames()-Frames);
+        return *this;
+    }
     TimeCode &operator ++()
     {
         PlusOne();
@@ -51,6 +69,26 @@ public:
     {
         MinusOne();
         return *this;
+    }
+    friend TimeCode operator +(TimeCode a, const TimeCode& b)
+    {
+        a+=b;
+        return a;
+    }
+    friend TimeCode operator +(TimeCode a, const int64s b)
+    {
+        a+=b;
+        return a;
+    }
+    friend TimeCode operator -(TimeCode a, const TimeCode& b)
+    {
+        a-=b;
+        return a;
+    }
+    friend TimeCode operator -(TimeCode a, const int64s b)
+    {
+        a-=b;
+        return a;
     }
     bool operator== (const TimeCode &tc) const
     {
@@ -82,9 +120,10 @@ public:
     bool FromString(const char* Value, size_t Length); // return false if all fine
     bool FromString(const char* Value) {return FromString(Value, strlen(Value));}
     bool FromString(const string& Value) {return FromString(Value.c_str(), Value.size());}
-    string ToString();
-    int64s ToFrames();
-    int64s ToMilliseconds();
+    bool FromFrames(int64s Value);
+    string ToString() const;
+    int64s ToFrames() const;
+    int64s ToMilliseconds() const;
 
 public:
     int8u Hours;

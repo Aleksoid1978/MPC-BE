@@ -1211,8 +1211,7 @@ protected :
         int64u SDTI_PackageMetadataSet_Trace_Count;
         int64u Padding_Trace_Count;
     #endif // MEDIAINFO_TRACE
-    string SystemScheme1_TimeCodeArray_StartTimecode;
-    int64u SystemScheme1_TimeCodeArray_StartTimecode_ms;
+    TimeCode SystemScheme1_TimeCodeArray_StartTimecode;
     int64u SystemScheme1_FrameRateFromDescriptor;
     bool   Essences_FirstEssence_Parsed;
     bool   MayHaveCaptionsInStream;

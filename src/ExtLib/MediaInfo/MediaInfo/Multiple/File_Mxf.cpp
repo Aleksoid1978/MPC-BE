@@ -2312,8 +2312,6 @@ File_Mxf::File_Mxf()
         SDTI_PackageMetadataSet_Trace_Count=0;
         Padding_Trace_Count=0;
     #endif // MEDIAINFO_TRACE
-    SystemScheme1_TimeCodeArray_StartTimecode_ms=(int64u)-1;
-    SystemScheme1_FrameRateFromDescriptor=0;
     Essences_FirstEssence_Parsed=false;
     MayHaveCaptionsInStream=false;
     StereoscopicPictureSubDescriptor_IsPresent=false;
@@ -2534,7 +2532,7 @@ void File_Mxf::Streams_Finish()
             Fill(Stream_Other, StreamPos_Last, Other_FrameRate, SDTI_TimeCode_StartTimecode.FramesPerSecond/(SDTI_TimeCode_StartTimecode.DropFrame?1.001:1.000)*(SDTI_TimeCode_StartTimecode.MustUseSecondField?2:1));
         }
     }
-    if (SystemScheme1_TimeCodeArray_StartTimecode_ms!=(int64u)-1)
+    if (SystemScheme1_TimeCodeArray_StartTimecode.HasValue())
     {
         bool IsDuplicate=false;
         for (size_t Pos2=0; Pos2<Count_Get(Stream_Other); Pos2++)
@@ -2547,7 +2545,7 @@ void File_Mxf::Streams_Finish()
             Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
             Fill(Stream_Other, StreamPos_Last, Other_Format, "SMPTE TC");
             Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "System scheme 1");
-            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, SystemScheme1_TimeCodeArray_StartTimecode.c_str());
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, SystemScheme1_TimeCodeArray_StartTimecode.ToString());
         }
     }
 
@@ -2780,6 +2778,8 @@ void File_Mxf::Streams_Finish()
         Finish(Adm);
         Merge(*Adm, Stream_Audio, 0, 0);
     }
+    if (DolbyAudioMetadata) //After ADM for having content inside ADM stuff
+        DolbyAudioMetadata->Merge(*this, 0);
     if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
     {
         Clear(Stream_Audio, 0, "AdmProfile");
@@ -3043,9 +3043,9 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_FirstFrame), SDTI_TimeCode_StartTimecode.c_str());
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_Source), "SDTI");
     }
-    if (SystemScheme1_TimeCodeArray_StartTimecode_ms!=(int64u)-1)
+    if (SystemScheme1_TimeCodeArray_StartTimecode.HasValue())
     {
-        Fill(StreamKind_Last, StreamPos_Last, "Delay_SystemScheme1", SystemScheme1_TimeCodeArray_StartTimecode_ms);
+        Fill(StreamKind_Last, StreamPos_Last, "Delay_SystemScheme1", SystemScheme1_TimeCodeArray_StartTimecode.ToMilliseconds());
         if (StreamKind_Last!=Stream_Max)
             Fill_SetOptions(StreamKind_Last, StreamPos_Last, "Delay_SystemScheme1", "N NT");
 
@@ -11538,34 +11538,13 @@ void File_Mxf::SystemScheme1_TimeCodeArray()
 
         BS_End();
 
-        int64u TimeCode=(int64u)(Hours_Tens     *10*60*60*1000
-                               + Hours_Units       *60*60*1000
-                               + Minutes_Tens      *10*60*1000
-                               + Minutes_Units        *60*1000
-                               + Seconds_Tens         *10*1000
-                               + Seconds_Units           *1000
-                               + (SystemScheme1_FrameRateFromDescriptor?float64_int32s((Frames_Tens*10+Frames_Units)*1000/(float64)SystemScheme1_FrameRateFromDescriptor):0));
-
-        Element_Info1(Ztring().Duration_From_Milliseconds(TimeCode));
-
+        Element_Info1(TimeCode(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, 0, DropFrame).ToString());
         Element_End0();
 
         //TimeCode
-        if (SystemScheme1_TimeCodeArray_StartTimecode_ms==(int64u)-1 && !IsParsingEnd && IsParsingMiddle_MaxOffset==(int64u)-1)
+        if (!SystemScheme1_TimeCodeArray_StartTimecode.HasValue() && !IsParsingEnd && IsParsingMiddle_MaxOffset==(int64u)-1)
         {
-            SystemScheme1_TimeCodeArray_StartTimecode_ms=TimeCode;
-
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Hours_Tens);
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Hours_Units);
-            SystemScheme1_TimeCodeArray_StartTimecode+=':';
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Minutes_Tens);
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Minutes_Units);
-            SystemScheme1_TimeCodeArray_StartTimecode+=':';
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Seconds_Tens);
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Seconds_Units);
-            SystemScheme1_TimeCodeArray_StartTimecode+=DropFrame?';':':';
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Frames_Tens);
-            SystemScheme1_TimeCodeArray_StartTimecode+=('0'+Frames_Units);
+            SystemScheme1_TimeCodeArray_StartTimecode=TimeCode(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, 0, DropFrame);
         }
     }
 

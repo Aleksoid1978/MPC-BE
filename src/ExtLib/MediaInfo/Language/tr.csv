@@ -150,6 +150,7 @@
 : ;: 
 3D;3B
 3DType;3B Türü
+608_Mode;
 About;Hakkında
 About_Hint;Bana nasıl ulaşacak ve son sürümü nasıl bulacaksınız
 Accompaniment;Eşlik eden
@@ -180,6 +181,7 @@ Arranger;Düzenleyici
 ArtDirector;Sanat Yönetmeni
 AspectRatio;En-Boy oranı
 AssistantDirector;Yardımcı Yönetmen
+AssociatedVideo_FrameRate;
 at;de
 At least one file;(En az bir dosya açmak zorundasınız)
 Audio;Ses
@@ -203,6 +205,7 @@ Basic;Temel
 Basic_Note;Not : Bu dosya hakkında daha fazla bilgi için farklı görünüm seçmek zorundasınız (Sayfa, Ağaç...)
 BedChannelConfiguration;Yatak kanalı yapılandırması
 BedChannelCount;Yatak kanalı sayısı
+BinauralRenderMode;
 BitDepth;Bit derinliği
 BitDepth_Detected;Algılanan bit derinliği
 BitDepth_Stored;Saklanan bit derinliği
@@ -217,6 +220,7 @@ BitRate_Nominal;Düşük bit oranı
 Bits-(Pixel*Frame);Bit/(Piksel*Kare)
 BufferSize;Arabellek boyutu
 Cancel;İptal
+CaptionServiceName;
 Channel(s);Kanal
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;Temiz diyafram görüntüsü en-boy oranı
 DisplayAspectRatio_Original;Orijinal görüntü en-boy oranı
 DistributedBy;Dağıtan
 Distributor;Dağıtıcı
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Bağış
 DotsPerInch;İnç başına nokta
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Süre
 Duration_End;Bitiş zamanı
+Duration_End_Command;
 Duration_Start;Başlangıç zamanı
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Düzenle
@@ -357,6 +368,10 @@ EPG_Positions;EPG konumları (dahili)
 EpisodeTitleNumber;Bölüm Başlık Numarası
 Error_File;Dosya okunurken hata
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;İdari yapımcı
 Exit;Çıkış
 Exit_Hint;Programdan çık
@@ -378,7 +393,10 @@ FileExtension;Dosya uzantısı
 FileName;Dosya adı
 FileNameExtension;Dosya adı uzantısı
 FileSize;Dosya boyutu
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Klasör
 Folder (R);Klasör (R)
 Folder (R)_Hint;Çalışmak için klasör seç (yinelemeli tüm klasörler ile)
@@ -427,6 +445,7 @@ FpaPass;FPA Pass
 FpaVersion;FPA Sürümü
 FrameCount;Kare sayısı
 FrameRate;Kare hızı
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;En fazla kare hızı
 FrameRate_Minimum;En az kare hızı
 FrameRate_Mode;Kare hızı kipi
@@ -679,6 +698,21 @@ InternetMediaType;Internet medya türü
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Anahtar kelime
 Known codecs;Bilinen kodekler
 Known formats;Bilinen biçimler
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Çoklama kütüphanesi
 Lifetime_Subscribe_Button;
 Lightness;Canlılık
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;Sıra Başlangıcı
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Liste
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Daha fazla olasılık
 Menu_No;Menü yok
 MenuCount;Meni sayısı
 MenuID;Menü ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; dk
 Mood;Mizaç
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Renk sayısı
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Teşekkürler
 Thousands separator;Binlik basamak ayırıcı
 TimeCode;Zaman kodu
 TimeCode_FirstFrame;İlk karenin zaman kodu
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Zaman kodu ayarları
 TimeCode_Source;Zaman kodu kaynağı
 TimeCode_Striped;Zaman kodu, şeritli
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;Parçaların Toplam Sayısı
 TotalProgrammeDuration;Toplam Program Süresi
 Track;Parça adı
 Track_Count;Parça sayısı
+TrackIndex;
+TrackUID;
 transfer_characteristics;Aktarım nitelikleri
 Translate_Reports;
 Translator;Çevirmen
+Transport;
 Tree;Ağaç
 Tree & Text;Ağaç ve Metin
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;88
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;84
+ZZ_AutomaticLanguage_Percent;85

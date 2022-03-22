@@ -150,6 +150,7 @@
 : ;
 3D;
 3DType;
+608_Mode;
 About;Despre
 About_Hint;Sfaturi
 Accompaniment;Acompaniament
@@ -180,6 +181,7 @@ Arranger;Regizor
 ArtDirector;Director artistic
 AspectRatio;Raport imagine
 AssistantDirector;Director asistent
+AssociatedVideo_FrameRate;
 at;la
 At least one file;(Trebuie sa fie deschis cel putin un fisier)
 Audio;Audio
@@ -203,6 +205,7 @@ Basic;Principal
 Basic_Note;Nota: pentru mai multe informatii despre acest fisier, tebuie sa selectati modul avansat
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;
 Bits-(Pixel*Frame);
 BufferSize;
 Cancel;Anulare
+CaptionServiceName;
 Channel(s);Canal(e)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
 DistributedBy;Distribuit de
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donatii
 DotsPerInch;
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;
 Duration_End;
+Duration_End_Command;
 Duration_Start;
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Editare
@@ -357,6 +368,10 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Eroare la citirea fisierului
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Director executiv
 Exit;Iesire
 Exit_Hint;Parasire program
@@ -378,7 +393,10 @@ FileExtension;Extensia fisierului
 FileName;Numele fisierului
 FileNameExtension;
 FileSize;Dimensiunea fisierului
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Director
 Folder (R);Director (R)
 Folder (R)_Hint;Selectati un director pentru analiza (cu toate subdirecoarele incluse)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Frecventa cadre
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;
 FrameRate_Minimum;
 FrameRate_Mode;
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;
 ISBN;
 ISRC;
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Cuvinte cheie
 Known codecs;Codecuri cunoscute
 Known formats;Formate cunoscute
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Biblioteca muxing
 Lifetime_Subscribe_Button;
 Lightness;
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Mai multe posibilitati
 Menu_No;
 MenuCount;
 MenuID;
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Mod
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Multumita
 Thousands separator;Separator mii
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Nume pista
 Track_Count;Numar piste
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Traducator
+Transport;
 Tree;Arbore
 Tree & Text;Arbore si text
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
-ZZ_Automatic_Percent;26
-ZZ_AutomaticLanguage_Percent;59
+ZZ_Automatic_Percent;25
+ZZ_AutomaticLanguage_Percent;57

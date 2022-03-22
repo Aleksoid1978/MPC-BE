@@ -272,6 +272,7 @@ protected :
     dvtime Speed_TimeCode_Last;
     dvtime Speed_TimeCode_Current;
     dvtime Speed_TimeCode_Current_Theory;
+    dvtime Speed_TimeCode_Current_Theory2;
     Ztring Speed_TimeCodeZ_First;
     Ztring Speed_TimeCodeZ_Last;
     Ztring Speed_TimeCodeZ_Current;
@@ -283,6 +284,7 @@ protected :
     Ztring Speed_RecTimeZ_Last;
     Ztring Speed_RecTimeZ_Current;
     dvdate Speed_RecDate_Current;
+    dvdate Speed_RecDate_Current_Theory2;
     Ztring Speed_RecDateZ_First;
     Ztring Speed_RecDateZ_Last;
     Ztring Speed_RecDateZ_Current;

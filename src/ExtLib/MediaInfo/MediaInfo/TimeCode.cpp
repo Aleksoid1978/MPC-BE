@@ -75,14 +75,19 @@ TimeCode::TimeCode (int64s Frames_, int8u FramesPerSecond_, bool DropFrame_, boo
     MustUseSecondField(MustUseSecondField_),
     IsSecondField(IsSecondField_)
 {
-    if (!FramesPerSecond_)
+    FromFrames(Frames_);
+}
+
+bool TimeCode::FromFrames(int64s Frames_)
+{
+    if (!FramesPerSecond)
     {
         Frames  = 0;
         Seconds = 0;
         Minutes = 0;
         Hours   = 0;
-        IsNegative = true; //Forcing a weird display
-        return;
+        IsNegative = false;
+        return true;
     }
 
     if (Frames_<0)
@@ -94,31 +99,33 @@ TimeCode::TimeCode (int64s Frames_, int8u FramesPerSecond_, bool DropFrame_, boo
         IsNegative=false;
 
     int8u Dropped=0;
-    if (DropFrame_)
+    if (DropFrame)
     {
         Dropped=2;
-        if (FramesPerSecond_>30)
+        if (FramesPerSecond>30)
             Dropped+=2;
-        if (FramesPerSecond_>60)
+        if (FramesPerSecond>60)
             Dropped+=2;
-        if (FramesPerSecond_>90)
+        if (FramesPerSecond>90)
             Dropped+=2;
-        if (FramesPerSecond_>120)
+        if (FramesPerSecond>120)
             Dropped+=2;
     }
 
-    int64u Minutes_Tens = Frames_/(600*FramesPerSecond_-Dropped*9); //Count of 10 minutes
-    int64u Minutes_Units = (Frames_-Minutes_Tens*(600*FramesPerSecond_-Dropped*9))/(60*FramesPerSecond_-Dropped);
+    int64u Minutes_Tens = Frames_/(600*FramesPerSecond-Dropped*9); //Count of 10 minutes
+    int64u Minutes_Units = (Frames_-Minutes_Tens*(600*FramesPerSecond-Dropped*9))/(60*FramesPerSecond-Dropped);
 
     Frames_ += 9*Dropped*Minutes_Tens+Dropped*Minutes_Units;
-    if (Minutes_Units && ((Frames_/FramesPerSecond_)%60)==0 && (Frames_%FramesPerSecond_)<Dropped) // If Minutes_Tens is not 0 (drop) but count of remaining seconds is 0 and count of remaining frames is less than 2, 1 additional drop was actually counted, removing it
+    if (Minutes_Units && ((Frames_/FramesPerSecond)%60)==0 && (Frames_%FramesPerSecond)<Dropped) // If Minutes_Tens is not 0 (drop) but count of remaining seconds is 0 and count of remaining frames is less than 2, 1 additional drop was actually counted, removing it
         Frames_-=Dropped;
 
-    Frames  =    Frames_ % FramesPerSecond_;
-    Seconds =   (Frames_ / FramesPerSecond_) % 60;
-    Minutes =  ((Frames_ / FramesPerSecond_) / 60) % 60;
-    int64s Temp = (((Frames_ / FramesPerSecond_) / 60) / 60);
+    Frames  =    Frames_ % FramesPerSecond;
+    Seconds =   (Frames_ / FramesPerSecond) % 60;
+    Minutes =  ((Frames_ / FramesPerSecond) / 60) % 60;
+    int64s Temp = (((Frames_ / FramesPerSecond) / 60) / 60);
     Hours = (Temp>99 || Temp<-99)?(Temp%24):Temp;
+
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -306,6 +313,7 @@ bool TimeCode::FromString(const char* Value, size_t Length)
                         return true;
                     MoreSamples_Frequency=Multiplier;
                 }
+                Frames=(int8u)-1;
                 MoreSamples=S;
                 DropFrame=false;
             }
@@ -318,7 +326,6 @@ bool TimeCode::FromString(const char* Value, size_t Length)
                 DropFrame=Value[8]==';';
                 Frames=((Value[9]-'0')*10)+(Value[10]-'0');
                 MoreSamples=0;
-                MoreSamples_Frequency=0;
             }
             else
                 return true;
@@ -326,7 +333,6 @@ bool TimeCode::FromString(const char* Value, size_t Length)
         else
         {
             MoreSamples=0;
-            MoreSamples_Frequency=0;
         }
         Hours=((Value[0]-'0')*10)+(Value[1]-'0');
         Minutes=((Value[3]-'0')*10)+(Value[4]-'0');
@@ -356,7 +362,7 @@ bool TimeCode::FromString(const char* Value, size_t Length)
         Hours=S/3600;
         Minutes=(S%3600)/60;
         Seconds=S%60;
-        Frames=0;
+        Frames=(int8u)-1;
         c=(unsigned char)Value[i];
         if (c=='.' || c==',')
         {
@@ -419,6 +425,40 @@ bool TimeCode::FromString(const char* Value, size_t Length)
         Minutes=(S%OneHourInFrames)/OneMinuteInFrames;
         Seconds=(S%OneMinuteInFrames)/FramesPerSecond;
         Frames=S%FramesPerSecond;
+        MoreSamples=0;
+        return false;
+    }
+    //Xt format
+    if (Length>=2
+     && Value[Length-1]=='t')
+    {
+        Length--; //Remove the "t" from the string
+        unsigned char c;
+        int i=0;
+        int64s S=0;
+        int TheoriticalMax=i+PowersOf10_Size;
+        int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+        while (i<MaxLength)
+        {
+            c=(unsigned char)Value[i];
+            c-='0';
+            if (c>9)
+                break;
+            S*=10;
+            S+=c;
+            i++;
+        }
+        if (i!=Length)
+            return true;
+        if (!MoreSamples_Frequency)
+            MoreSamples_Frequency=1; // Arbitrary choosen
+        int64s OneHourInFrequency=3600*MoreSamples_Frequency;
+        int64s OneMinuteInFrequency=60*MoreSamples_Frequency;
+        Hours=S/OneHourInFrequency;
+        Minutes=(S%OneHourInFrequency)/OneMinuteInFrequency;
+        Seconds=(S%OneMinuteInFrequency)/MoreSamples_Frequency;
+        Frames=0; // (int8u)-1;
+        MoreSamples=S%MoreSamples_Frequency;
         return false;
     }
 
@@ -426,11 +466,8 @@ bool TimeCode::FromString(const char* Value, size_t Length)
 }
 
 //---------------------------------------------------------------------------
-string TimeCode::ToString()
+string TimeCode::ToString() const
 {
-    if (!FramesPerSecond)
-        return string();
-
     string TC;
     if (IsNegative)
         TC+='-';
@@ -442,41 +479,51 @@ string TimeCode::ToString()
     TC+=':';
     TC+=('0'+Seconds/10);
     TC+=('0'+Seconds%10);
-    if (MoreSamples && MoreSamples_Frequency)
-    {
-        int AfterCommaMinus1=0;
-        if (MoreSamples>0)
-        {
-            AfterCommaMinus1=PowersOf10_Size;
-            while ((--AfterCommaMinus1)>=0 && PowersOf10[AfterCommaMinus1]!=MoreSamples_Frequency);
-            TC+=AfterCommaMinus1>=0?'.':'+';
-        }
-        else
-        {
-            AfterCommaMinus1=-1;
-            TC+='-';
-            MoreSamples=-MoreSamples;
-        }
-        stringstream s;
-        s<<MoreSamples;
-        TC+=s.str();
-        TC+='S';
-        s.str(string());
-        s<<MoreSamples_Frequency;
-        TC+=s.str();
-    }
-    else
+    if (Frames!=(int8u)-1)
     {
         TC+=DropFrame?';':':';
         TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))/10);
         TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))%10);
+    }
+    if (MoreSamples_Frequency)
+    {
+        int AfterCommaMinus1;
+        int32s MoreSamples_Temp;
+        if (MoreSamples<0)
+        {
+            AfterCommaMinus1=-1;
+            TC+='-';
+            MoreSamples_Temp=-MoreSamples;
+        }
+        else
+        {
+            AfterCommaMinus1=PowersOf10_Size;
+            while ((--AfterCommaMinus1)>=0 && PowersOf10[AfterCommaMinus1]!=MoreSamples_Frequency);
+            TC+=(Frames!=(int8u)-1 || AfterCommaMinus1<0)?'+':'.';
+            MoreSamples_Temp=MoreSamples;
+        }
+        if ((Frames!=(int8u)-1 || AfterCommaMinus1<0))
+        {
+            stringstream s;
+            s<<MoreSamples_Temp;
+            TC+=s.str();
+            TC+='S';
+            s.str(string());
+            s<<MoreSamples_Frequency;
+            TC+=s.str();
+        }
+        else
+        {
+            for (int i=0; i<=AfterCommaMinus1;i++)
+                TC+='0'+(MoreSamples_Temp/(i==AfterCommaMinus1?1:PowersOf10[AfterCommaMinus1-i-1])%10);
+        }
     }
 
     return TC;
 }
 
 //---------------------------------------------------------------------------
-int64s TimeCode::ToFrames()
+int64s TimeCode::ToFrames() const
 {
     if (!FramesPerSecond)
         return 0;
@@ -488,9 +535,19 @@ int64s TimeCode::ToFrames()
 
     if (DropFrame)
     {
-        TC-= int64s(Hours)      *108
-          + (int64s(Minutes)/10)*18
-          + (int64s(Minutes)%10)*2;
+        int Dropped=0;
+        int FramesPerSecond2=FramesPerSecond-1;
+        for (;;)
+        {
+            Dropped++;
+            FramesPerSecond2-=30;
+            if (FramesPerSecond2<0)
+                break;
+        }
+
+        TC-= int64s(Hours)      *108*Dropped
+          + (int64s(Minutes)/10)*18*Dropped
+          + (int64s(Minutes)%10)* 2*Dropped;
     }
 
     TC*=(MustUseSecondField?2:1);
@@ -500,19 +557,37 @@ int64s TimeCode::ToFrames()
 }
 
 //---------------------------------------------------------------------------
-int64s TimeCode::ToMilliseconds()
+int64s TimeCode::ToMilliseconds() const
 {
-    if (!FramesPerSecond)
+    if (!FramesPerSecond || Frames==(int8u)-1)
     {
         int64s TC=(int64s(Hours)     *3600
                  + int64s(Minutes)   *  60
                  + int64s(Seconds)        )*1000;
+        if (Frames!=(int8u)-1)
+        {
+            if (MoreSamples_Frequency)
+            {
+                int32s MoreSamples_Frequency_Duplicate=MoreSamples_Frequency;
+                if (!(MoreSamples_Frequency_Duplicate%1000))
+                    MoreSamples_Frequency_Duplicate/=1000;
+                if (MoreSamples_Frequency_Duplicate<=0xFF)
+                {
+                    TimeCode Duplicate(*this);
+                    Duplicate.FramesPerSecond=(int8u)MoreSamples_Frequency_Duplicate;
+                    return Duplicate.ToMilliseconds();
+                }
+            }
+            TC+=(((int64u)Frames)*1000+0xFF/2)/0xFF;
+        }
         if (MoreSamples_Frequency)
-            TC+=((int64s)MoreSamples)*1000/MoreSamples_Frequency;
+            TC+=(((int64s)MoreSamples)*1000+MoreSamples_Frequency/2)/MoreSamples_Frequency;
         return TC;
     }
 
     int64s MS=float64_int64s(ToFrames()*1000*((DropFrame || FramesPerSecond_Is1001)?1.001:1.000)/(FramesPerSecond*(MustUseSecondField?2:1)));
+    if (MoreSamples_Frequency)
+        MS+=(((int64s)MoreSamples)*1000+MoreSamples_Frequency/2)/MoreSamples_Frequency;
 
     return IsNegative?-MS:MS;
 }

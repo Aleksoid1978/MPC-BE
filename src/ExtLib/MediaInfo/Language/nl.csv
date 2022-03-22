@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;Info
 About_Hint;Hoe neemt u contact met mij op en vindt u de nieuwste versie
 Accompaniment;Begeleiding
@@ -180,6 +181,7 @@ Arranger;Arrangeur
 ArtDirector;Artdirector
 AspectRatio;Beeldverhouding
 AssistantDirector;Assistant-regisseur
+AssociatedVideo_FrameRate;
 at;met
 At least one file;(U moet tenminste één bestand openen)
 Audio;Audio
@@ -203,6 +205,7 @@ Basic;Elementair
 Basic_Note;Let op : voor meer informatie over dit bestand, moet u een ander beeld kiezen (Blad, Boomstructuur,...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Nominale bitrate
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BufferSize;
 Cancel;Annuleren
+CaptionServiceName;
 Channel(s);Kanaal(en)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Originele beeldverhouding
 DistributedBy;Gedistribueerd door
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Doneren
 DotsPerInch;Punten per inch
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Duur
 Duration_End;
+Duration_End_Command;
 Duration_Start;
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Bewerken
@@ -357,6 +368,10 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Fout tijdens lezen bestand
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Uitvoerend producent
 Exit;Afsluiten
 Exit_Hint;Beëindig het programma
@@ -378,7 +393,10 @@ FileExtension;Bestandsextensie
 FileName;Bestandsnaam
 FileNameExtension;
 FileSize;Bestandsgrootte
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Map
 Folder (R);Map (R)
 Folder (R)_Hint;Kies een te onderzoeken map (inclusief onderliggende mappen)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Framecount
 FrameRate;Framerate
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maximale framrate
 FrameRate_Minimum;Minimale framrate
 FrameRate_Mode;Frameratemodus
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Sleutelwoorden
 Known codecs;Bekende codecs
 Known formats;Bekende formaten
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Muxingbibliotheek
 Lifetime_Subscribe_Button;
 Lightness;Helderheid
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lijst
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Meer mogelijkheden
 Menu_No;Geen menu
 MenuCount;Telling van menustromen
 MenuID;Menu-ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Stemming
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Aantal kleuren
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Dank aan
 Thousands separator;Scheidingsteken duizendtallen
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Tracknaam
 Track_Count;Tracktelling
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Vertaler
+Transport;
 Tree;Boomstructuur
 Tree & Text;Boomstructuur & Tekst
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;72
-ZZ_AutomaticLanguage_Percent;75
+ZZ_Automatic_Percent;69
+ZZ_AutomaticLanguage_Percent;73

@@ -150,6 +150,7 @@
 : ;:
 3D;3D
 3DType;3D-typ
+608_Mode;
 About;Om
 About_Hint;Kontakt - och versionsinformation
 Accompaniment;Ackompanjemang
@@ -180,6 +181,7 @@ Arranger;Arrangör
 ArtDirector;Formgivare
 AspectRatio;Bildförhållande
 AssistantDirector;Assisterande regissör
+AssociatedVideo_FrameRate;
 at;hos
 At least one file;(Du måste öppna minst en fil)
 Audio;Ljud
@@ -203,6 +205,7 @@ Basic;Enkel
 Basic_Note;OBS! För mer information om den här filen, måste du välja en annan vy (Lista, Träd...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Bitdjup
 BitDepth_Detected;
 BitDepth_Stored;Lagrat 
@@ -217,6 +220,7 @@ BitRate_Nominal;Nominellt dataflöde
 Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
 BufferSize;Buffertstorlek
 Cancel;Avbryt
+CaptionServiceName;
 Channel(s);Kanal(er)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Ursprungligt skärmbildförhållande
 DistributedBy;Distribuerad av
 Distributor;Distributör
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donera
 DotsPerInch;Punkter per inch
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Varaktighet
 Duration_End;Sluttid
+Duration_End_Command;
 Duration_Start;Starttid
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Redigera
@@ -357,6 +368,10 @@ EPG_Positions;EPG-positioner (interna)
 EpisodeTitleNumber;Episodnummer
 Error_File;Fel vid inläsning av fil
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Verkställande producent
 Exit;Avsluta
 Exit_Hint;Stäng programmet
@@ -378,7 +393,10 @@ FileExtension;Filändelse
 FileName;Filnamn
 FileNameExtension;
 FileSize;Filstorlek
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Mapp
 Folder (R);Mapp (R)
 Folder (R)_Hint;Välj en mapp (med alla undermappar rekursivt)
@@ -427,6 +445,7 @@ FpaPass;FPA Pass
 FpaVersion;FPA Version
 FrameCount;Antal bildrutor
 FrameRate;Bildfrekvens
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Max. bildfrekvens
 FrameRate_Minimum;Min. bildfrekvens
 FrameRate_Mode;Bildfrekvensläge
@@ -679,6 +698,21 @@ InternetMediaType;Internetmediatyp
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Nyckelord
 Known codecs;Kända kodekar
 Known formats;Kända format
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Muxningsbibliotek
 Lifetime_Subscribe_Button;
 Lightness;Ljus
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lista
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Fler möjligheter
 Menu_No;Ingen meny
 MenuCount;Antal menyströmmar
 MenuID;Meny-ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Läge
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Antal färger
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Tack till
 Thousands separator;Tusentalseparator
 TimeCode;Tidskod
 TimeCode_FirstFrame;Tidskod för första bildrutan
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Tidskodinställningar
 TimeCode_Source;Tidskodskälla
 TimeCode_Striped;Tidskod, förinspelad
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;Totalt antal delar
 TotalProgrammeDuration;Totalt programvaraktighet
 Track;Spårnamn
 Track_Count;Antal spår
+TrackIndex;
+TrackUID;
 transfer_characteristics;Överföringsegenskaper
 Translate_Reports;
 Translator;Översättare
+Transport;
 Tree;Träd
 Tree & Text;Träd & Text
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;82

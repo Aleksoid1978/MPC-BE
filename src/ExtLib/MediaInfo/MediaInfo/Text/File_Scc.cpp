@@ -112,6 +112,8 @@ void File_Scc::Read_Buffer_AfterParsing()
 //---------------------------------------------------------------------------
 void File_Scc::Streams_Finish()
 {
+    if (TimeCode_FirstFrame.FramesPerSecond && Frame_Count_NotParsedIncluded!=(int64u)-1)
+        Fill(Stream_Text, 0, Text_TimeCode_LastFrame, (TimeCode_FirstFrame+(Frame_Count_NotParsedIncluded-1)).ToString());
     if (Parser && Parser->Status[IsAccepted])
     {
         Finish(Parser);
@@ -120,6 +122,11 @@ void File_Scc::Streams_Finish()
             Stream_Prepare(Stream_Text);
             Merge(*Parser, Stream_Text, StreamPos_Last, Pos2);
             Fill(Stream_Text, StreamPos_Last, Text_ID, Parser->Retrieve(Stream_Text, Pos2, Text_ID), true);
+            if (Pos2)
+            {
+                Fill(Stream_Text, StreamPos_Last, Text_TimeCode_FirstFrame, Retrieve_Const(Stream_Text, 0, Text_TimeCode_FirstFrame));
+                Fill(Stream_Text, StreamPos_Last, Text_TimeCode_LastFrame, Retrieve_Const(Stream_Text, 0, Text_TimeCode_LastFrame));
+            }
         }
     }
 }
@@ -358,6 +365,7 @@ void File_Scc::Data_Parse()
         Open_Buffer_Continue(Parser, Buffer_Temp, 2);
         Element_Offset+=5;
     }
+    Frame_Count_NotParsedIncluded=Parser->Frame_Count_NotParsedIncluded;
 }
 
 //***************************************************************************

@@ -150,6 +150,7 @@
 : ;: 
 3D;3D
 3DType;Тип 3D
+608_Mode;
 About;О программе
 About_Hint;Как связаться со мной и найти последнюю версию программы
 Accompaniment;Сопровождение
@@ -180,6 +181,7 @@ Arranger;Аранжировщик
 ArtDirector;Арт-директор
 AspectRatio;Соотношение
 AssistantDirector;Помощник режиссёра
+AssociatedVideo_FrameRate;
 at;в
 At least one file;Необходимо открыть как минимум один файл
 Audio;Аудио
@@ -203,6 +205,7 @@ Basic;Кратко
 Basic_Note;Примечание: для дополнительной информации выберите другую закладку (таблица, дерево,...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Битовая глубина
 BitDepth_Detected;
 BitDepth_Stored;Сохранённая битовая глубина
@@ -217,6 +220,7 @@ BitRate_Nominal;Номинальный битрейт
 Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
 BufferSize;Размер буфера
 Cancel;Отмена
+CaptionServiceName;
 Channel(s);Каналы
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;Соотношение сторон диспл�
 DisplayAspectRatio_Original;Соотношение сторон в оригинале
 DistributedBy;Распространитель
 Distributor;Распространитель
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Сделать пожертвование
 DotsPerInch;Точек на дюйм
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Продолжительность
 Duration_End;Время окончания
+Duration_End_Command;
 Duration_Start;Время начала
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Править
@@ -357,6 +368,10 @@ EPG_Positions;Позиции EPG (внутренние)
 EpisodeTitleNumber;Номер заголовка эпизода
 Error_File;Ошибка в файле
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Исполнительный продюсер
 Exit;Выход
 Exit_Hint;Выход из программы
@@ -378,7 +393,10 @@ FileExtension;Расширение
 FileName;Имя файла
 FileNameExtension;
 FileSize;Размер файла
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Папка
 Folder (R);Папка (R)
 Folder (R)_Hint;Выберите папку для обработки (со всеми вложенными папками)
@@ -427,6 +445,7 @@ FpaPass;Пароль FPA
 FpaVersion;Версия FPA
 FrameCount;Счётчик кадров
 FrameRate;Частота кадров
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максимальная частота кадров
 FrameRate_Minimum;Минимальная частота кадров
 FrameRate_Mode;Режим частоты кадров
@@ -679,6 +698,21 @@ InternetMediaType;Интернет-тип носителя
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Ключевые слова
 Known codecs;Известные кодеки
 Known formats;Известные форматы
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Библиотека смешивания
 Lifetime_Subscribe_Button;
 Lightness;Якрость
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;Начало построения
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Список
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Дополнительные возможности
 Menu_No;Нет меню
 MenuCount;Количество потоков меню
 MenuID;Идентификатор меню
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; м.
 Mood;Настроение
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Количество цветов
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Благодарности
 Thousands separator;Разделитель тысяч
 TimeCode;Временной код
 TimeCode_FirstFrame;Временной код первого кадра
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Параметры временного кода
 TimeCode_Source;Оригинал временного кода
 TimeCode_Striped;Временной код, чередующийся
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;Общее количество частей
 TotalProgrammeDuration;Общая продолжительность программы
 Track;Трек
 Track_Count;Количество треков
+TrackIndex;
+TrackUID;
 transfer_characteristics;Характеристики трансфера
 Translate_Reports;
 Translator;Переводчик
+Transport;
 Tree;Дерево
 Tree & Text;Дерево и текст
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;55
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;53
+ZZ_AutomaticLanguage_Percent;83

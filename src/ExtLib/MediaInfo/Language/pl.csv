@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;O programie
 About_Hint;Kontakt i informacje o nowych wersjach
 Accompaniment;Akompaniament
@@ -180,6 +181,7 @@ Arranger;Aranżer
 ArtDirector;Dyrektor artystyczny
 AspectRatio;Proporcje
 AssistantDirector;Asystent dyrektora
+AssociatedVideo_FrameRate;
 at;przy
 At least one file;(Musisz wczytać co najmniej jeden plik)
 Audio;Audio
@@ -203,6 +205,7 @@ Basic;Podstawowy
 Basic_Note;Uwaga: Aby uzyskać więcej informacji musisz wybrać inny widok (Karta, Drzewo...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Nominalna przepływaność
 Bits-(Pixel*Frame);bity/(piksele*ramki)
 BufferSize;
 Cancel;Anuluj
+CaptionServiceName;
 Channel(s);Kanały
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Oryginalne proporcje obrazu
 DistributedBy;Rozpowszechnianie
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donacja
 DotsPerInch;punktów na cal
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Czas trwania
 Duration_End;Czas rozpoczęcia
+Duration_End_Command;
 Duration_Start;Czas zakończenia
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Edytuj
@@ -357,6 +368,10 @@ EPG_Positions;Pozycje EPG (wewnętrzne)
 EpisodeTitleNumber;
 Error_File;Błąd przy odczycie pliku
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Kierownik produkcji
 Exit;Wyjście
 Exit_Hint;Wyjście z programu
@@ -378,7 +393,10 @@ FileExtension;Rzoszerzenie pliku
 FileName;Nazwa pliku
 FileNameExtension;
 FileSize;Rozmiar pliku
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Folder
 Folder (R);Folder (R)
 Folder (R)_Hint;Wybierz foldery do przeanalizowania (wraz z rekurencyjnymi)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Liczba klatek
 FrameRate;Szybkość wyświetlania klatek
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maksymalna szybkość wyświetlania klatek
 FrameRate_Minimum;Minimalna szybkość wyświetlania klatek
 FrameRate_Mode;Tryb wyświetlania klatek
@@ -679,6 +698,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Słowa kluczowa
 Known codecs;Znane kodeki
 Known formats;Znane formaty
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Bibloteka multipleksująca
 Lifetime_Subscribe_Button;
 Lightness;Jasność
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lista
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Więcej możliwosci
 Menu_No;Brak menu
 MenuCount;Liczba strumieni menu
 MenuID;ID menu
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Nastrój
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Liczba kolorów
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Podziękowania dla
 Thousands separator;Separator tysiecy
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Tytuł nagrania
 Track_Count;Liczba nagrań
+TrackIndex;
+TrackUID;
 transfer_characteristics;
 Translate_Reports;
 Translator;Tłumacz
+Transport;
 Tree;Drzewo
 Tree & Text;Drzewo i tekst
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Lokalizacja
 WrittenBy;Napisał
 Yes;Tak
 Your system;System
-ZZ_Automatic_Percent;65
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;62
+ZZ_AutomaticLanguage_Percent;74

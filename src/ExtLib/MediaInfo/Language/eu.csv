@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;Honi buruz
 About_Hint;Nola jarri harremanetan nirekin eta azken bertsioa aurkitu
 Accompaniment;Laguntza
@@ -180,6 +181,7 @@ Arranger;Konpontzailea
 ArtDirector;Arte-Zuzendaria
 AspectRatio;Ikuspegi maila
 AssistantDirector;Laguntzaile-Zuzendaria
+AssociatedVideo_FrameRate;
 at;
 At least one file;(Agiri bat gutxienez ireki behar duzu)
 Audio;Audioa
@@ -203,6 +205,7 @@ Basic;Ohinarrizkoa
 Basic_Note;Oharra: Agiri honi buruzko argibide gehiagorako, ikuspegi ezberdin bat hautatu behar duzu (Orria, Zuhaitza...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;Bit sakonera
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Bit neurri izendatua
 Bits-(Pixel*Frame);Bit/(Pixel*Frame)
 BufferSize;Buffer neurria
 Cancel;Ezeztatu
+CaptionServiceName;
 Channel(s);Bide
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Jatorrizko ikuspegi maila
 DistributedBy;Banatzailea
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Eman dirulaguntza bat
 DotsPerInch;Puntu hatzbeteko
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Iraupena
 Duration_End;Amaiera denbora
+Duration_End_Command;
 Duration_Start;Hasiera denbora
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Editatu
@@ -357,6 +368,10 @@ EPG_Positions;EPG kokapenak (barnean)
 EpisodeTitleNumber;
 Error_File;Akatsa agiria irakurtzerakoan
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Ekintza ekoizlea
 Exit;Irten
 Exit_Hint;Utzi programa
@@ -378,7 +393,10 @@ FileExtension;Agiri hedapena
 FileName;Agiri izena
 FileNameExtension;
 FileSize;Agiri neurria
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Agiritegia
 Folder (R);Agiritegia (R)
 Folder (R)_Hint;Hautatu aztertzeko agiritegi bat (agiritegi guztiak jarraian)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Frame zenbatekoa
 FrameRate;Frame neurria
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Gehienezko frame neurria
 FrameRate_Minimum;Gutxienezko frame neurria
 FrameRate_Mode;Frame neurri modua
@@ -679,6 +698,21 @@ InternetMediaType;Internet multimedia mota
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Laterteklak
 Known codecs;Ezagutu kodekak
 Known formats;Ezagutu heuskarriak
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Nahasketa liburutegia
 Lifetime_Subscribe_Button;
 Lightness;Argitasuna
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Zerrenda
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Aukera gehiago
 Menu_No;Menurik ez
 MenuCount;Menu jario zenbatekoa
 MenuID;Menu ID-a
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn; min
 Mood;Modua
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Margo zenbatekoa
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Eskerrak
 Thousands separator;Milaka bananatzaile
 TimeCode;Denbora-kodea
 TimeCode_FirstFrame;Denbora-kodea, lehen Framea
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Denbora-kodea, ezarpenak
 TimeCode_Source;Denbora-kodea, iturburua
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Bide izena
 Track_Count;Bide zenbatekoa
+TrackIndex;
+TrackUID;
 transfer_characteristics;Eskualdaketa ezaugarriak
 Translate_Reports;
 Translator;Itzultzailea
+Transport;
 Tree;Zuhaitza
 Tree & Text;Zuhaitza eta Idazkia
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;79
-ZZ_AutomaticLanguage_Percent;80
+ZZ_Automatic_Percent;76
+ZZ_AutomaticLanguage_Percent;77

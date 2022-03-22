@@ -150,6 +150,7 @@
 : ;: 
 3D;
 3DType;
+608_Mode;
 About;Пра праграму
 About_Hint;Як звязацца са мной і знайсці апошнюю версію праграмы
 Accompaniment;Суправаджэнне
@@ -180,6 +181,7 @@ Arranger;Размясціў
 ArtDirector;Рэжысёр
 AspectRatio;Суадносіны
 AssistantDirector;Памагаты рэжысёра
+AssociatedVideo_FrameRate;
 at;у
 At least one file;Як мінімум адзін файл
 Audio;Аўдыё
@@ -203,6 +205,7 @@ Basic;Каротка
 Basic_Note;Падказка: для дадатковай інфармацыі абярыце іншую закладку (Табліца, Дрэва,...)
 BedChannelConfiguration;
 BedChannelCount;
+BinauralRenderMode;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -217,6 +220,7 @@ BitRate_Nominal;Намінальны бітрэйт
 Bits-(Pixel*Frame);Біт/(Пікселі*Кадры)
 BufferSize;Памер буфера
 Cancel;Адмена
+CaptionServiceName;
 Channel(s);Канал(ы)
 ChannelCoded;
 ChannelConfiguration;
@@ -331,15 +335,22 @@ DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Арыгінальныя суадносіны бакоў
 DistributedBy;Распаўсюджвальнік
 Distributor;
+Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Ахвяраваць
 DotsPerInch;Кропак на дзюйм
 Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Працягласць
 Duration_End;Час канчатку
+Duration_End_Command;
 Duration_Start;Час пачатку
+Duration_Start_Command;
+Duration_Start2End;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Змяніць
@@ -357,6 +368,10 @@ EPG_Positions;EPG пазіцыіі (унутр)
 EpisodeTitleNumber;
 Error_File;Памылка ў файле
 Error_File_Write;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
 ExecutiveProducer;Выканаўчы прадзюсар
 Exit;Выхад
 Exit_Hint;Выхад з праграмы
@@ -378,7 +393,10 @@ FileExtension;Пашырэнне
 FileName;Імя файла
 FileNameExtension;
 FileSize;Памер файла
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
 FlatPanelTv;
+FlowID;
 Folder;Тэчку
 Folder (R);Тэчка (Р)
 Folder (R)_Hint;Абярыце тэчку для апрацоўкі (са ўсімі ўкладзенымі тэчкамі)
@@ -427,6 +445,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Лічыльнік кадраў
 FrameRate;Частата кадраў
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максімальная частата кадраў
 FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Mode;Рэжым частаты кадраў
@@ -679,6 +698,21 @@ InternetMediaType;Інтэрнэт-тып носьбіта
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Ключавыя словы
 Known codecs;Вядомыя кодэкі
 Known formats;Вядомыя фарматы
@@ -891,6 +925,8 @@ LfeMixGain;
 Library;Бібліятэка
 Lifetime_Subscribe_Button;
 Lightness;Яркасць
+Lines_Count;
+Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
@@ -900,6 +936,7 @@ LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
 LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Спіс
 LoRoCenterMixGain;
@@ -948,6 +985,9 @@ Menu_Hint;Дадатковыя магчымасці
 Menu_No;Няма меню
 MenuCount;Коль-ць струменяў меню
 MenuID;Ідэнтыфікатар меню
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
 MixType;
 mn;хв.
 Mood;Настрой
@@ -978,7 +1018,9 @@ NumberOfObjects;
 NumberOfPackFormats;
 NumberOfPresentations;
 NumberOfProgrammes;
+NumberOfStreamFormats;
 NumberOfSubstreams;
+NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Колькасць колераў
 ObjectCount;
@@ -1224,6 +1266,8 @@ ThanksTo;Падзякі
 Thousands separator;Падзельнік тысяч
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
 TimeCode_Striped;
@@ -1236,9 +1280,12 @@ TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Сцежка
 Track_Count;Коль-ць дарожак
+TrackIndex;
+TrackUID;
 transfer_characteristics;Характарыстыкі трансферу
 Translate_Reports;
 Translator;Перакладчык
+Transport;
 Tree;Дрэва
 Tree & Text;Дрэва і тэкст
 TruePeakLevel;
@@ -1285,5 +1332,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;74
-ZZ_AutomaticLanguage_Percent;78
+ZZ_Automatic_Percent;71
+ZZ_AutomaticLanguage_Percent;75
