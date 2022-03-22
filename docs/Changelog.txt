@@ -6,11 +6,28 @@ MpaSplitter
 Fixed working with online streams.
 Improved support for embedded images.
 
+AudioSplitter
+Improved FLAC playback via HTTP.
+
 MP4Splitter
 Fixed playing files with tracks with negative delay.
 
+MatroskaSplitter
+Fixed aspect ratio setting for VFW codecs.
+
+MpaDecFilter
+Added support for AAC 22.2 audio decoding with automatic mixing in 7.1.
+
+MPCVideoDec
+Fixed D3D11 decoder in some situations.
+
+VideoRenderers
+Fixed frame rotating for SyncVR.
+Removed PS 2.x shader support for EVR-CP and SyncVR.
+
 Player
 Added option "Use Window Media Controls". It is disabled by default.
+Added shaders to convert stereo 3D to red-cyan anaglyph for Direct3D9. 
 Miscellaneous fixes.
 
 Updated Turkish translation (by cmhrky).
