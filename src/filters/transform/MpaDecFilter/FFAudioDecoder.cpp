@@ -26,6 +26,7 @@
 #pragma warning(disable: 4005)
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include "ExtLib/ffmpeg/libavutil/bprint.h"
 	#include <ExtLib/ffmpeg/libavutil/channel_layout.h>
 	#include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
 	#include <ExtLib/ffmpeg/libavutil/opt.h>
@@ -266,6 +267,8 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	BYTE* extradata    = nullptr;
 	unsigned extralen  = 0;
 
+	AVChannelLayout ch_layout = {};
+
 	m_bNeedReinit      = false;
 	m_bNeedMix         = false;
 
@@ -277,7 +280,8 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		// use the previous info
 		codec_id	= m_pAVCtx->codec_id;
 		samplerate	= m_pAVCtx->sample_rate;
-		channels	= m_pAVCtx->channels;
+		channels	= m_pAVCtx->ch_layout.nb_channels;
+		ch_layout   = m_pAVCtx->ch_layout;
 		bitdeph		= m_pAVCtx->bits_per_coded_sample;
 		block_align	= m_pAVCtx->block_align;
 		bitrate		= m_pAVCtx->bit_rate;
@@ -335,9 +339,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 		CheckPointer(m_pAVCtx, false);
 
+		if (!ch_layout.nb_channels) {
+			av_channel_layout_from_mask(&ch_layout, GetDefChannelMask(channels));
+		}
+
 		m_pAVCtx->codec_id				= codec_id;
 		m_pAVCtx->sample_rate			= samplerate;
-		m_pAVCtx->channels				= channels;
+		m_pAVCtx->ch_layout				= ch_layout;
 		m_pAVCtx->bits_per_coded_sample	= bitdeph;
 		m_pAVCtx->block_align			= block_align;
 		m_pAVCtx->bit_rate				= bitrate;
@@ -346,7 +354,15 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx->thread_type			= 0;
 
 		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
-			m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
+			AVBPrint bp = {};
+			av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
+			AVChannelLayout ch_layout = {};
+			av_channel_layout_from_mask(&ch_layout, AV_CH_LAYOUT_STEREO);
+			av_channel_layout_describe_bprint(&ch_layout, &bp);
+
+			av_opt_set(&m_pAVCtx, "downmix", bp.str, 0);
+
+			av_bprint_finalize(&bp, nullptr);
 		}
 
 		m_pParser = av_parser_init(codec_id);
@@ -413,8 +429,8 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 							CString tagValue;
 							if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
 								uint64_t channel_layout = wcstol(tagValue, nullptr, 0);
-								if (channel_layout && av_get_channel_layout_nb_channels(channel_layout) == m_pAVCtx->channels) {
-									m_pAVCtx->channel_layout = channel_layout;
+								if (channel_layout && av_popcount64(channel_layout) == m_pAVCtx->ch_layout.nb_channels) {
+									av_channel_layout_from_mask(&m_pAVCtx->ch_layout, channel_layout);
 								}
 								break;
 							}
@@ -429,11 +445,11 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 			}
 		}
 
-		if ((codec_id == AV_CODEC_ID_AAC || codec_id == AV_CODEC_ID_AAC_LATM) && m_pAVCtx->channels == 24 && m_pAVCtx->channel_layout) {
+		if ((codec_id == AV_CODEC_ID_AAC || codec_id == AV_CODEC_ID_AAC_LATM) && m_pAVCtx->ch_layout.nb_channels == 24) {
 			m_bNeedMix = true;
 			m_MixerChannels = 8;
 			m_MixerChannelLayout = GetDefChannelMask(8);
-			m_Mixer.UpdateInput(SAMPLE_FMT_FLTP, m_pAVCtx->channel_layout, m_pAVCtx->sample_rate);
+			m_Mixer.UpdateInput(SAMPLE_FMT_FLTP, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
 			m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_pAVCtx->sample_rate);
 		}
 	}
@@ -542,7 +558,7 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& s
 {
 	HRESULT hr = E_FAIL;
 	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
-	if (m_pAVCtx->channels > 8 && !m_bNeedMix) {
+	if (m_pAVCtx->ch_layout.nb_channels > 8 && !m_bNeedMix) {
 		// sometimes avcodec_receive_frame() cannot identify the garbage and produces incorrect data.
 		// this code does not solve the problem, it only reduces the likelihood of crash.
 		// do it better!
@@ -552,7 +568,7 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& s
 
 		const size_t nSamples = m_pFrame->nb_samples;
 		if (nSamples) {
-			const WORD nChannels = m_pAVCtx->channels;
+			const WORD nChannels = m_pAVCtx->ch_layout.nb_channels;
 			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
 			const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
 
@@ -784,12 +800,12 @@ DWORD CFFAudioDecoder::GetSampleRate()
 
 WORD CFFAudioDecoder::GetChannels()
 {
-	return m_bNeedMix ? (WORD)m_MixerChannels : (WORD)m_pAVCtx->channels;
+	return m_bNeedMix ? (WORD)m_MixerChannels : (WORD)m_pAVCtx->ch_layout.nb_channels;
 }
 
 DWORD CFFAudioDecoder::GetChannelMask()
 {
-	return get_lav_channel_layout(m_bNeedMix ? m_MixerChannelLayout : m_pAVCtx->channel_layout);
+	return get_lav_channel_layout(m_bNeedMix ? m_MixerChannelLayout : m_pAVCtx->ch_layout.u.mask);
 }
 
 WORD CFFAudioDecoder::GetCoddedBitdepth()

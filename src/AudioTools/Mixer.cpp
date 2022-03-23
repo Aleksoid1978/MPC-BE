@@ -74,23 +74,26 @@ bool CMixer::Init()
 	av_freep(&m_matrix_dbl);
 	int ret = 0;
 
+	const int in_ch = av_popcount64(m_in_layout);
+	const int out_ch = av_popcount(m_out_layout);
+	const AVChannelLayout in_ch_layout = { AV_CHANNEL_ORDER_NATIVE, in_ch, m_in_layout };
+	const AVChannelLayout out_ch_layout = { AV_CHANNEL_ORDER_NATIVE, out_ch, m_out_layout };
+
 	// Close SWR Context
 	swr_close(m_pSWRCxt);
 
 	// Set options
-	av_opt_set_int(m_pSWRCxt, "in_sample_fmt",      m_in_avsf,        0);
-	av_opt_set_int(m_pSWRCxt, "out_sample_fmt",     m_out_avsf,       0);
-	av_opt_set_int(m_pSWRCxt, "in_channel_layout",  m_in_layout,      0);
-	av_opt_set_int(m_pSWRCxt, "out_channel_layout", m_out_layout,     0);
-	av_opt_set_int(m_pSWRCxt, "in_sample_rate",     m_in_samplerate,  0);
-	av_opt_set_int(m_pSWRCxt, "out_sample_rate",    m_out_samplerate, 0);
+	av_opt_set_int(m_pSWRCxt,      "in_sample_fmt",   m_in_avsf,        0);
+	av_opt_set_int(m_pSWRCxt,      "out_sample_fmt",  m_out_avsf,       0);
+	av_opt_set_chlayout(m_pSWRCxt, "in_chlayout",     &in_ch_layout,    0);
+	av_opt_set_chlayout(m_pSWRCxt, "out_chlayout",    &out_ch_layout,   0);
+	av_opt_set_int(m_pSWRCxt,      "in_sample_rate",  m_in_samplerate,  0);
+	av_opt_set_int(m_pSWRCxt,      "out_sample_rate", m_out_samplerate, 0);
 
-	av_opt_set    (m_pSWRCxt, "resampler",          "soxr",           0); // use soxr library
-	//av_opt_set_int(m_pSWRCxt, "precision",          28,               0); // SOXR_VHQ
+	av_opt_set    (m_pSWRCxt,      "resampler",       "soxr",           0); // use soxr library
+	//av_opt_set_int(m_pSWRCxt,      "precision",       28,               0); // SOXR_VHQ
 
 	// Create Matrix
-	const int in_ch  = av_popcount64(m_in_layout);
-	const int out_ch = av_popcount(m_out_layout);
 	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
 
 	// special mode that adds empty channels to existing channels
@@ -183,8 +186,9 @@ bool CMixer::Init()
 		const double lfe_mix_level      = 1.0;
 		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
 		const double rematrix_volume    = 0.0; // not to do a rematrix.
-		ret = swr_build_matrix(
-			m_in_layout, m_out_layout,
+
+		swr_build_matrix2(
+			&in_ch_layout, &out_ch_layout,
 			center_mix_level, surround_mix_level, lfe_mix_level,
 			rematrix_maxval, rematrix_volume,
 			m_matrix_dbl, in_ch,

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,7 @@ extern "C"
 {
 	#include <libavfilter/buffersink.h>
 	#include <libavfilter/buffersrc.h>
+	#include "libavutil/bprint.h"
 	#include <libavutil/opt.h>
 }
 
@@ -136,12 +137,18 @@ HRESULT CAudioFilter::Initialize(
 
 	int ret = 0;
 	do {
+		AVBPrint bp = {};
+		av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
+		AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
+		av_channel_layout_describe_bprint(&ch_layout, &bp);
+
 		char args[256] = { 0 };
-		_snprintf_s(args, sizeof(args), "time_base=1/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%x",
+		_snprintf_s(args, sizeof(args), "time_base=1/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
 			m_inSamplerate,
 			m_inSamplerate,
 			av_get_sample_fmt_name(m_inAvSampleFmt),
-			m_inLayout);
+			bp.str);
+		av_bprint_finalize(&bp, nullptr);
 		ret = avfilter_graph_create_filter(&m_pFilterBufferSrc,
 			buffersrc,
 			"in",
@@ -169,9 +176,12 @@ HRESULT CAudioFilter::Initialize(
 			break;
 		}
 
-		ret = av_opt_set_bin(m_pFilterBufferSink, "channel_layouts",
-			(uint8_t*)&m_outLayout, sizeof(m_outLayout),
-			AV_OPT_SEARCH_CHILDREN);
+		av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
+		ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
+		av_channel_layout_describe_bprint(&ch_layout, &bp);
+		ret = av_opt_set(m_pFilterBufferSink, "ch_layouts",
+			bp.str, AV_OPT_SEARCH_CHILDREN);
+		av_bprint_finalize(&bp, nullptr);
 		if (ret < 0) {
 			break;
 		}
@@ -240,8 +250,7 @@ HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const s
 
 	m_pFrame->nb_samples     = nSamples;
 	m_pFrame->format         = m_inAvSampleFmt;
-	m_pFrame->channels       = m_inChannels;
-	m_pFrame->channel_layout = m_inLayout;
+	m_pFrame->ch_layout      = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
 	m_pFrame->sample_rate    = m_inSamplerate;
 	m_pFrame->pts            = av_rescale(time_start, m_time_base.den, m_time_base.num * UNITS);
 
@@ -285,17 +294,17 @@ HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 
 	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
 	if (ret >= 0) {
-		ASSERT(m_pFrame->format == m_outAvSampleFmt && m_pFrame->channels == m_outChannels);
+		ASSERT(m_pFrame->format == m_outAvSampleFmt && m_pFrame->ch_layout.nb_channels == m_outChannels);
 
 		p->rtStart = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
 		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pFrame->nb_samples, m_pFrame->sample_rate, 0);
 
 		if (m_outSampleFmt == SAMPLE_FMT_S24 && m_outAvSampleFmt == AV_SAMPLE_FMT_S32) {
-			const size_t size = m_pFrame->nb_samples * m_pFrame->channels * 3;
+			const size_t size = m_pFrame->nb_samples * m_pFrame->ch_layout.nb_channels * 3;
 			p->resize(size);
 			convert_int32_to_int24(p->data(), (int32_t*)m_pFrame->data[0], size);
 		} else {
-			const int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_outAvSampleFmt, 1);
+			const int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->ch_layout.nb_channels, m_pFrame->nb_samples, m_outAvSampleFmt, 1);
 			p->SetData(m_pFrame->data[0], buffersize);
 		}
 	}
@@ -315,10 +324,10 @@ HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& sim
 
 	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
 	if (ret >= 0) {
-		ASSERT(m_pFrame->format == m_outAvSampleFmt && m_pFrame->channels == m_outChannels);
+		ASSERT(m_pFrame->format == m_outAvSampleFmt && m_pFrame->ch_layout.nb_channels == m_outChannels);
 
 		time_start = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
-		allsamples = m_pFrame->nb_samples * m_pFrame->channels;
+		allsamples = m_pFrame->nb_samples * m_pFrame->ch_layout.nb_channels;
 		simpleBuffer.WriteData(0, (float*)m_pFrame->data[0], allsamples);
 	}
 	av_frame_unref(m_pFrame);
