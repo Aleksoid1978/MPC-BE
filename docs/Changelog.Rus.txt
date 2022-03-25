@@ -39,7 +39,7 @@ VideoRenderers
 Обновлены библиотеки:
 	dav1d git-1.0.0;
 	Detours git-v4.0.1-97-g66d6f2d;
-	ffmpeg git-n5.1-dev-1298-g1728ad8293;
+	ffmpeg git-n5.1-dev-1312-gfa12d808d7;
 	libflac git-1.3.3-93-ga2fe43f6;
 	Little-CMS git-lcms2.13.1-18-g784a047;
 	MediaInfo git-v21.09-162-gdc7c37c2b;
