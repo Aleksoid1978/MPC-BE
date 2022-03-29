@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -197,6 +197,9 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_MPC7,            "MPC7"},
 	{MEDIASUBTYPE_MPC8,            "MPC8"},
 	{MEDIASUBTYPE_DOLBY_AC3_SPDIF, "S/PDIF"},
+	{MEDIASUBTYPE_ATRAC3,          "ATRAC3"},
+	{MEDIASUBTYPE_ATRAC3plus,      "ATRAC3plus"},
+	{MEDIASUBTYPE_ATRAC9,          "ATRAC9"},
 };
 
 static const std::map<GUID, LPCSTR> subtitleguids = {
@@ -804,7 +807,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 		sl.emplace_back(str);
 
 		if (wfe.wFormatTag != WAVE_FORMAT_PCM && wfe.cbSize > 0 && formattype == FORMAT_WaveFormatEx) {
-			if (wfe.wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe.cbSize == sizeof(WAVEFORMATEXTENSIBLE)-sizeof(WAVEFORMATEX)) {
+			if (wfe.wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe.cbSize >= sizeof(WAVEFORMATEXTENSIBLE)-sizeof(WAVEFORMATEX)) {
 				sl.emplace_back(L"");
 
 				fmtsize = sizeof(WAVEFORMATEXTENSIBLE);

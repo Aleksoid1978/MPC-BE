@@ -94,6 +94,7 @@ static const FFCodec * const codec_list[] = {
     &ff_ape_decoder,
     &ff_atrac3_decoder,
     &ff_atrac3p_decoder,
+    &ff_atrac9_decoder,
     &ff_binkaudio_dct_decoder,
     &ff_binkaudio_rdft_decoder,
     &ff_cook_decoder,

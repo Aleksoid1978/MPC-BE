@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -160,6 +160,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// ATRAC3
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ATRAC3},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ATRAC3plus},
+	// ATRAC9
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ATRAC9},
 	// QDesign Music
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_QDMC},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_QDM2},

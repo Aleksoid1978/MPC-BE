@@ -96,6 +96,8 @@ static const struct {
 	// ATRAC3, ATRAC3plus
 	{ &MEDIASUBTYPE_ATRAC3,            AV_CODEC_ID_ATRAC3 },
 	{ &MEDIASUBTYPE_ATRAC3plus,        AV_CODEC_ID_ATRAC3P},
+	// ATRAC9
+	{ &MEDIASUBTYPE_ATRAC9,            AV_CODEC_ID_ATRAC9 },
 	// DTS
 	{ &MEDIASUBTYPE_DTS,               AV_CODEC_ID_DTS },
 	{ &MEDIASUBTYPE_DTS2,              AV_CODEC_ID_DTS },

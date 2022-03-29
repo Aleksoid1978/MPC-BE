@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2633,10 +2633,16 @@ void getExtraData(const BYTE *format, const GUID *formattype, const ULONG format
 	const BYTE *extraposition = nullptr;
 	ULONG extralength = 0;
 	if (*formattype == FORMAT_WaveFormatEx) {
-		//WAVEFORMATEX *wfex = (WAVEFORMATEX *)format;
-		extraposition = format + sizeof(WAVEFORMATEX);
-		// Protected against over-reads
-		extralength   = formatlen - sizeof(WAVEFORMATEX);
+		const auto wfex = (WAVEFORMATEX *)format;
+		if (wfex->wFormatTag == WAVE_FORMAT_EXTENSIBLE && formatlen >= sizeof(WAVEFORMATEXTENSIBLE)) {
+			extraposition = format + sizeof(WAVEFORMATEXTENSIBLE);
+			// Protected against over-reads
+			extralength = formatlen - sizeof(WAVEFORMATEXTENSIBLE);
+		} else {
+			extraposition = format + sizeof(WAVEFORMATEX);
+			// Protected against over-reads
+			extralength = formatlen - sizeof(WAVEFORMATEX);
+		}
 	} else if (*formattype == FORMAT_VorbisFormat2) {
 		VORBISFORMAT2 *vf2 = (VORBISFORMAT2 *)format;
 		unsigned offset = 1;
