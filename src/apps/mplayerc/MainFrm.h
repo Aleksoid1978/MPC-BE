@@ -323,6 +323,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	HBRUSH m_hMainMenuBrush = nullptr;
 	HBRUSH m_hPopupMenuBrush = nullptr;
 
+	COLORREF m_colTitleBk = {};
+	COLORREF m_colTitleBkSystem = {};
+
 	CMenu m_popupMainMenu;
 	CMenu m_popupMenu;
 	CMenu m_openCDsMenu;
@@ -466,6 +469,8 @@ public:
 
 	void SetColorMenu();
 	void SetColorMenu(CMenu& menu);
+
+	void SetColorTitle();
 
 	void StartWebServer(int nPort);
 	void StopWebServer();

@@ -657,6 +657,7 @@ void CAppSettings::ResetSettings()
 	nThemeGreen = 255;
 	nThemeBlue  = 255;
 	bDarkMenu = true;
+	bDarkTitle = true;
 	nOSDTransparent = 100;
 	nOSDBorder = 1;
 
@@ -1259,6 +1260,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, *(unsigned*)&clrFaceABGR);
 	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, *(unsigned*)&clrOutlineABGR);
 	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
+	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKTITLE, bDarkTitle);
 
 	// FullScreen
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
@@ -1874,6 +1876,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, clrFaceABGR);
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, clrOutlineABGR);
 	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
+	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKTITLE, bDarkTitle);
 
 	// FullScreen
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);

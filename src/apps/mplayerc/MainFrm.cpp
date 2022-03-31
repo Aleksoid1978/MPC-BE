@@ -701,6 +701,22 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		SetColorMenu();
 	}
 
+	if (SysVersion::IsWin11orLater()) {
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\DWM", KEY_READ)) {
+			DWORD prevalenceFlag = 0;
+			key.QueryDWORDValue(L"ColorPrevalence", prevalenceFlag);
+			if (prevalenceFlag) {
+				COLORREF dwAccentColor = {};
+				if (ERROR_SUCCESS == key.QueryDWORDValue(L"AccentColor", dwAccentColor)) {
+					m_colTitleBkSystem = dwAccentColor & 0x00FFFFFF;
+				}
+			}
+		}
+
+		SetColorTitle();
+	}
+
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 
@@ -20276,6 +20292,19 @@ void CMainFrame::SetColorMenu(CMenu& menu)
 		SetMenuInfo(menu.GetSafeHmenu(), &MenuInfo);
 
 		CMenuEx::ChangeStyle(&menu);
+	}
+}
+
+void CMainFrame::SetColorTitle()
+{
+	if (SysVersion::IsWin11orLater()) {
+		const auto& s = AfxGetAppSettings();
+		if (s.bUseDarkTheme && s.bDarkTitle) {
+			m_colTitleBk = ThemeRGB(45, 50, 55);
+			DwmSetWindowAttribute(m_hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &m_colTitleBk, sizeof(m_colTitleBk));
+		} else {
+			DwmSetWindowAttribute(m_hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &m_colTitleBkSystem, sizeof(m_colTitleBkSystem));
+		}
 	}
 }
 
