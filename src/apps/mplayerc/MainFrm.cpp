@@ -495,6 +495,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_ADDTOPLAYLISTROMCLIPBOARD, OnAddToPlaylistFromClipboard)
 
 	ON_WM_WTSSESSION_CHANGE()
+
+	ON_WM_SETTINGCHANGE()
 END_MESSAGE_MAP()
 
 #ifdef DEBUG_OR_LOG
@@ -702,18 +704,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	if (SysVersion::IsWin11orLater()) {
-		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\DWM", KEY_READ)) {
-			DWORD prevalenceFlag = 0;
-			key.QueryDWORDValue(L"ColorPrevalence", prevalenceFlag);
-			if (prevalenceFlag) {
-				COLORREF dwAccentColor = {};
-				if (ERROR_SUCCESS == key.QueryDWORDValue(L"AccentColor", dwAccentColor)) {
-					m_colTitleBkSystem = dwAccentColor & 0x00FFFFFF;
-				}
-			}
-		}
-
+		GetSystemTitleColor();
 		SetColorTitle();
 	}
 
@@ -18981,6 +18972,12 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 	}
 }
 
+void CMainFrame::OnSettingChange(UINT, LPCTSTR)
+{
+	GetSystemTitleColor();
+	SetColorTitle(true);
+}
+
 #define NOTIFY_FOR_THIS_SESSION 0
 void CMainFrame::WTSRegisterSessionNotification()
 {
@@ -20295,13 +20292,15 @@ void CMainFrame::SetColorMenu(CMenu& menu)
 	}
 }
 
-void CMainFrame::SetColorTitle()
+void CMainFrame::SetColorTitle(const bool bSystemOnly/* = false*/)
 {
 	if (SysVersion::IsWin11orLater()) {
 		const auto& s = AfxGetAppSettings();
 		if (s.bUseDarkTheme && s.bDarkTitle) {
-			m_colTitleBk = ThemeRGB(45, 50, 55);
-			DwmSetWindowAttribute(m_hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &m_colTitleBk, sizeof(m_colTitleBk));
+			if (!bSystemOnly) {
+				m_colTitleBk = ThemeRGB(45, 50, 55);
+				DwmSetWindowAttribute(m_hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &m_colTitleBk, sizeof(m_colTitleBk));
+			}
 		} else {
 			DwmSetWindowAttribute(m_hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &m_colTitleBkSystem, sizeof(m_colTitleBkSystem));
 		}
@@ -20630,6 +20629,25 @@ void CMainFrame::OnUpdateRepeatForever(CCmdUI* pCmdUI)
 
 	if (pCmdUI->m_pMenu) {
 		pCmdUI->m_pMenu->CheckMenuItem(ID_REPEAT_FOREVER, MF_BYCOMMAND | (s.fLoopForever ? MF_CHECKED : MF_UNCHECKED));
+	}
+}
+
+void CMainFrame::GetSystemTitleColor()
+{
+	if (SysVersion::IsWin11orLater()) {
+		m_colTitleBkSystem = {};
+
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\DWM", KEY_READ)) {
+			DWORD prevalenceFlag = 0;
+			key.QueryDWORDValue(L"ColorPrevalence", prevalenceFlag);
+			if (prevalenceFlag) {
+				COLORREF dwAccentColor = {};
+				if (ERROR_SUCCESS == key.QueryDWORDValue(L"AccentColor", dwAccentColor)) {
+					m_colTitleBkSystem = dwAccentColor & 0x00FFFFFF;
+				}
+			}
+		}
 	}
 }
 

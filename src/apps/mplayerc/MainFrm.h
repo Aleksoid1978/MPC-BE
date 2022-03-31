@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -325,6 +325,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	COLORREF m_colTitleBk = {};
 	COLORREF m_colTitleBkSystem = {};
+	void GetSystemTitleColor();
 
 	CMenu m_popupMainMenu;
 	CMenu m_popupMenu;
@@ -470,7 +471,7 @@ public:
 	void SetColorMenu();
 	void SetColorMenu(CMenu& menu);
 
-	void SetColorTitle();
+	void SetColorTitle(const bool bSystemOnly = false);
 
 	void StartWebServer(int nPort);
 	void StopWebServer();
@@ -1357,6 +1358,7 @@ private:
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);
+	afx_msg void OnSettingChange(UINT, LPCTSTR);
 
 	void EnableShaders1(bool enable);
 	void EnableShaders2(bool enable);
