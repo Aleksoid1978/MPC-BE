@@ -303,7 +303,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
 16		"G:"
 17		"B:"
 21		"Dunkles Menü aktivieren"
-22		"Enable dark title (Windows 11)"
+22		"Dunkle Titelleiste aktivieren (Windows 11)"
 24		"Zeit-Tooltip anzeigen:"
 26		"Vorschau bei der Suche anzeigen"
 27		"Größe bezogen auf Bildschirmbreite:"
