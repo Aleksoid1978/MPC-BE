@@ -3,8 +3,12 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
+/* @(#) $Id$ */
+
 #ifndef ZCONF_H
 #define ZCONF_H
+/* #undef Z_PREFIX */
+/* #undef Z_HAVE_UNISTD_H */
 
 /*
  * If you *really* need a unique prefix for all types and library functions,

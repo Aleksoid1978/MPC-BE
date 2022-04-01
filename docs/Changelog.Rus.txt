@@ -45,6 +45,7 @@ VideoRenderers
 	MediaInfo git-v21.09-162-gdc7c37c2b;
 	openjpeg git-v2.4.0-89-g6a29f5a9;
 	rapidjson git-v1.1.0-685-ge4bde977;
+	zlib 1.2.12;
 
 1.6.1
 =============================
