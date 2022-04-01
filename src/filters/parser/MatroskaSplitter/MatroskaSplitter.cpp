@@ -1286,7 +1286,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfe->wFormatTag = WAVE_FORMAT_PCM;
 					} else {
 						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-						if (pTE->a.BitDepth&7) {
+						if (pTE->a.BitDepth & 7) {
 							wfex->Format.wBitsPerSample = (WORD)(pTE->a.BitDepth + 7) & 0xFFF8;
 							wfex->Format.nBlockAlign = wfex->Format.nChannels * wfex->Format.wBitsPerSample / 8;
 							wfex->Format.nAvgBytesPerSec = wfex->Format.nSamplesPerSec * wfex->Format.nBlockAlign;
@@ -1327,10 +1327,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				} else if (CodecID == "A_MS/ACM") {
 					wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(pTE->CodecPrivate.size());
 					memcpy(wfe, (WAVEFORMATEX*)pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
-					if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == 22) {
+					if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize >= 22) {
 						mt.subtype = ((WAVEFORMATEXTENSIBLE*)wfe)->SubFormat;
+					} else {
+						mt.subtype = FOURCCMap(wfe->wFormatTag);
 					}
-					else mt.subtype = FOURCCMap(wfe->wFormatTag);
 					mts.push_back(mt);
 				} else if (CodecID == "A_VORBIS") {
 					CreateVorbisMediaType(mt, mts,
