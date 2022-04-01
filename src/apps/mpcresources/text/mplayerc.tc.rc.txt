@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
-6		"使用「Dark」主題（預設）"
+6		"使用暗黑主題（預設）"
 7		"亮度："
 9		"設定音量控制器色彩："
 10		"填充："
@@ -302,13 +302,13 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
 15		"R:"
 16		"G:"
 17		"B:"
-21		"啟用黑色選單"
-22		"Enable dark title (Windows 11)"
+21		"啟用暗色選單"
+22		"啟用暗色標題列（Windows 11）"
 24		"使用時間工具提示："
 26		"搜尋列顯示預覽縮圖"
 27		"相對於螢幕寬度的縮圖大小："
 30		"搜尋列顯示章節標籤"
-31		"使用浮動工具列 (flybar)"
+31		"使用浮動工具列（flybar）"
 32		"播放清單字型大小"
 35		"OSD"
 36		"字型："
