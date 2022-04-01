@@ -1439,7 +1439,7 @@ private:
 
 	bool		m_bAltDownClean = false;
 
-	CComPropertySheet* m_ps = nullptr;
+	CComPropertySheet* m_pFilterPropSheet = nullptr;
 
 	static inline CMainFrame* m_pThis = nullptr;
 	static inline HHOOK m_MenuHook = nullptr;

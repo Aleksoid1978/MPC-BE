@@ -8718,10 +8718,10 @@ void CMainFrame::OnPlayFilters(UINT nID)
 	}
 
 	if (ps.GetPageCount() > 0) {
-		m_ps = &ps;
+		m_pFilterPropSheet = &ps;
 		ps.DoModal();
 		OpenSetupStatusBar();
-		m_ps = nullptr;
+		m_pFilterPropSheet = nullptr;
 	}
 }
 
@@ -17456,10 +17456,10 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 
 	DLog(L"CMainFrame::CloseMedia() : start");
 
-	if (m_ps) {
-		m_ps->EndDialog(0);
-		//m_ps->DestroyWindow();
-		m_ps = nullptr;
+	if (m_pFilterPropSheet) {
+		m_pFilterPropSheet->EndDialog(0);
+		//m_pFilterPropSheet->DestroyWindow();
+		m_pFilterPropSheet = nullptr;
 	}
 
 	m_bNextIsOpened = bNextIsOpened;
