@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
-6		"Gebruik ""Dark""-thema (standaard)"
+6		"Gebruik Donker thema (standaard)"
 7		"Helderheid :"
 9		"Kleur van de geluidindicator:"
 10		"Vulling:"
@@ -302,8 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
 15		"R:"
 16		"G:"
 17		"B:"
-21		"Zwarte menu inschakelen"
-22		"Enable dark title (Windows 11)"
+21		"Donker menu inschakelen"
+22		"Activeer donkere titelbalk (Windows 11)"
 24		"Toon scherminfo voor tijd:"
 26		"Activeer voorvertoning op zoekbalk"
 27		"Grootte op basis v/d schermbreedte:"

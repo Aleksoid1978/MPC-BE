@@ -303,7 +303,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
 16		"绿:"
 17		"蓝:"
 21		"使用暗黑菜单"
-22		"Enable dark title (Windows 11)"
+22		"使用暗黑标题 (Windows 11)"
 24		"使用时间工具提示:"
 26		"搜索时显示预览"
 27		"相对于屏幕宽度的缩略图大小："
