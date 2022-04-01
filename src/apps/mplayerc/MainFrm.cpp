@@ -14296,10 +14296,17 @@ void CMainFrame::CloseMediaPrivate()
 	Content::Online::Clear();
 
 	if (m_pMC) {
+		if (GetPlaybackMode() == PM_FILE) {
+			// Requires a position reset so that the EVR-CP stops waiting for the next frame
+			// when playback ends immediately after the first frame.
+			LONGLONG pos = 0;
+			m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
+		}
 		OAFilterState fs;
 		m_pMC->GetState(0, &fs);
 		if (fs != State_Stopped) {
-			m_pMC->Stop(); // Some filters, such as Microsoft StreamBufferSource, need to call IMediaControl::Stop() before close the graph;
+			// Some filters, such as Microsoft StreamBufferSource, need to call IMediaControl::Stop() before close the graph;
+			m_pMC->Stop();
 		}
 	}
 	m_bCapturing = false;
