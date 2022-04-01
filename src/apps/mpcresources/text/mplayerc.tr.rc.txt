@@ -303,7 +303,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
 16		"G:"
 17		"B:"
 21		"Koyu menüyü etkinleştir"
-22		"Enable dark title (Windows 11)"
+22		"Koyu başlığı etkinleştir (Windows 11)"
 24		"Süre bilgi ipucunu göster:"
 26		"Arama Çubuğu üzerinde ön izleme resimi göster"
 27		"Ekran genişliğine göre boyut:"
