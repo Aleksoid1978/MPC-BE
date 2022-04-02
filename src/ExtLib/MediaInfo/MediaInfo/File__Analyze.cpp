@@ -2179,6 +2179,7 @@ bool File__Analyze::FileHeader_Manage()
         #if MEDIAINFO_TRACE
         Element[Element_Level].TraceNode.Init();
         #endif //MEDIAINFO_TRACE
+        Element_Offset=0;
         return false;
     }
 

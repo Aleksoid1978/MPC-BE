@@ -4022,6 +4022,13 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
             Open_Buffer_Continue(Temp.Parsers[Pos], Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
             if (IsSub && Temp.Parsers[Pos]->Frame_Count_NotParsedIncluded!=(int64u)-1)
                 Frame_Count_NotParsedIncluded=Temp.Parsers[Pos]->Frame_Count_NotParsedIncluded;
+            if (Temp.Parsers[Pos]->Status[IsAccepted])
+            {
+                if (Temp.Parsers[Pos]->FrameInfo.PTS!=(int64u)-1)
+                    Streams[stream_id].TimeStamp_End.PTS.TimeStamp=float64_int64s(((float64)Temp.Parsers[Pos]->FrameInfo.PTS)*9/100000);
+                if (Temp.Parsers[Pos]->FrameInfo.DTS!=(int64u)-1)
+                    Streams[stream_id].TimeStamp_End.DTS.TimeStamp=float64_int64s(((float64)Temp.Parsers[Pos]->FrameInfo.DTS)*9/100000);
+            }
             if (!MustExtendParsingDuration && Temp.Parsers[Pos]->MustExtendParsingDuration)
             {
                 SizeToAnalyze*=4; //Normally 4 seconds, now 16 seconds

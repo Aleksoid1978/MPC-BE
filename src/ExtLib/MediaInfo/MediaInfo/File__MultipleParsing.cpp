@@ -98,6 +98,9 @@
 #if defined(MEDIAINFO_MXF_YES)
     #include "MediaInfo/Multiple/File_Mxf.h"
 #endif
+#if defined(MEDIAINFO_NSV_YES)
+    #include "MediaInfo/Multiple/File_Nsv.h"
+#endif
 #if defined(MEDIAINFO_NUT_YES)
     #include "MediaInfo/Multiple/File_Nut.h"
 #endif
@@ -497,6 +500,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_MXF_YES)
         Parser.push_back(new File_Mxf());
+    #endif
+    #if defined(MEDIAINFO_NSV_YES)
+        Parser.push_back(new File_Nsv());
     #endif
     #if defined(MEDIAINFO_NUT_YES)
         Parser.push_back(new File_Nut());

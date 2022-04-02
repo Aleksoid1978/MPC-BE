@@ -548,6 +548,9 @@
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_MXF_NO) && !defined(MEDIAINFO_MXF_YES)
     #define MEDIAINFO_MXF_YES
 #endif
+#if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_NSV_NO) && !defined(MEDIAINFO_NSV_YES)
+    #define MEDIAINFO_NSV_YES
+#endif
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_NUT_NO) && !defined(MEDIAINFO_NUT_YES)
     #define MEDIAINFO_NUT_YES
 #endif

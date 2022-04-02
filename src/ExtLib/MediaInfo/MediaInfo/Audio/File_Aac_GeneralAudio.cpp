@@ -317,6 +317,12 @@ void File_Aac::program_config_element()
 //---------------------------------------------------------------------------
 void File_Aac::raw_data_block()
 {
+    if (Frame_Count>Frame_Count_Valid)
+    {
+        Skip_BS(Data_BS_Remain(),                               "Data");
+        return; //Parsing completely only first frames
+    }
+
     raw_data_block_Pos=0;
 
     if (audioObjectType!=2)

@@ -343,6 +343,7 @@ private :
     void RDVO();
     void RDVS();
     void RED1();
+    void RED2() {RED1();}
     void REDA();
     void REDV();
     void REOB();

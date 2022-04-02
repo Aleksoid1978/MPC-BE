@@ -752,6 +752,9 @@
     <ClInclude Include="MediaInfo\Audio\File_Iab.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Nsv.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1446,6 +1449,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_Iab.cpp">
       <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_Nsv.cpp">
+      <Filter>Source Files\Multiple</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

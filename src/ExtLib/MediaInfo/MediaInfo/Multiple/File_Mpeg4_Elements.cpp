@@ -940,6 +940,7 @@ namespace Elements
     const int64u RDVO=0x5244564F;
     const int64u RDVS=0x52445653;
     const int64u RED1=0x52454431;
+    const int64u RED2=0x52454432;
     const int64u REDA=0x52454441;
     const int64u REDV=0x52454456;
     const int64u REOB=0x52454F42;
@@ -1379,6 +1380,7 @@ void File_Mpeg4::Data_Parse()
     ATOM(RDVO)
     ATOM(RDVS)
     ATOM(RED1)
+    ATOM(RED2)
     ATOM(REDA)
     ATOM(REDV)
     ATOM(REOB)
@@ -9058,6 +9060,7 @@ void File_Mpeg4::RED1()
         Accept("R3D");
 
         Fill(Stream_General, 0, General_Format, "R3D");
+        Fill(Stream_General, 0, General_Format_Version, Element_Code==Elements::RED1?"Version 1":"Version 2");
         //Source: http://peter.schlaile.de/redcode/
 
         Finish();

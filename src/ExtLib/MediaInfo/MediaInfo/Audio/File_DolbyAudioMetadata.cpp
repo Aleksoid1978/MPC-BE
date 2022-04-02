@@ -54,7 +54,7 @@ static size_t metadata_segment_Name_Size=sizeof(metadata_segment_Name)/sizeof(co
 
 static const char* binaural_render_mode_Name[] =
 {
-    "Bypass",
+    "Off",
     "Near",
     "Far",
     "Mid",
@@ -66,9 +66,9 @@ static const char* warp_mode_Name[] =
 {
     "Direct Render",
     "Direct Render with room balance",
-    "Lt/Rt (Dolby Pro Logic IIx)",
-    "Lo/Ro",
-    "Not Indicated",
+    "Dolby Pro Logic IIx",
+    "Standard (Lo/Ro)",
+    NULL,
 };
 static size_t warp_mode_Name_Size=sizeof(warp_mode_Name)/sizeof(const char*);
 
@@ -94,10 +94,10 @@ static size_t frames_per_second_Size=sizeof(frames_per_second_Values)/sizeof(flo
 
 static const char* downmix_type_5to2_Values[] =
 {
-    NULL,
+    "Not indicated (Lo/Ro)",
     "Lo/Ro",
-    "Lt/Rt (Pro Logic)",
-    "Lt/Rt (Pro Logic II)",
+    "Lt/Rt (Dolby Pro Logic)",
+    "Lt/Rt (Dolby Pro Logic II)",
     "Direct stereo render",
 };
 static size_t downmix_type_5to2_Size=sizeof(downmix_type_5to2_Values)/sizeof(const char*);
@@ -352,7 +352,7 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
     Skip_L1(                                                    "reserved");
     bitset<2> TrimAutoSet;
     bool TrimNotAlwaysManual=false;
-    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata JocTrimMode", "Yes");
+    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata TrimMode", "Yes");
     for (int cfg=0; cfg<9; cfg++)
     {
         Element_Begin1("config_trim");
@@ -361,7 +361,7 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
         Skip_S1(7,                                              "reserved");
         Get_SB (   auto_trim,                                   "auto_trim");
         BS_End();
-        string FieldPrefix="Dolby_Atmos_Metadata JocTrimMode JocTrimMode"+Ztring::ToZtring(cfg).To_UTF8()+'i';
+        string FieldPrefix="Dolby_Atmos_Metadata TrimMode TrimMode"+Ztring::ToZtring(cfg).To_UTF8()+'i';
         Fill(Stream_Audio, 0, FieldPrefix.c_str(), auto_trim?"Automatic":"Manual");
         TrimAutoSet.set(auto_trim);
         if (auto_trim)
@@ -376,12 +376,12 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
                     Fill_SetOptions(Stream_Audio, 0, FieldPrefix.c_str(), "N N Y");
             }
             Skip_XX(14,                                         "reserved");
-            Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center").c_str(), "Automatic");
-            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center").c_str(), "N NTY");
-            Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Surround").c_str(), "Automatic");
-            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Surround").c_str(), "N NTY");
-            Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Height").c_str(), "Automatic");
-            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Height").c_str(), "N NTY");
+            Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Center").c_str(), "Automatic");
+            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Center").c_str(), "N NTY");
+            Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Surround").c_str(), "Automatic");
+            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Surround").c_str(), "N NTY");
+            Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Height").c_str(), "Automatic");
+            Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Height").c_str(), "N NTY");
         }
         else
         {
@@ -399,38 +399,38 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
             BS_End();
             if (center_trim)
             {
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center").c_str(), center_trim);
-                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center").c_str(), "N NTY");
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center/String").c_str(), Ztring::ToZtring(center_trim, 2)+__T(" dB"));
-                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Center/String").c_str(), "Y NTN");
+                Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Center").c_str(), center_trim);
+                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Center").c_str(), "N NTY");
+                Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Center/String").c_str(), Ztring::ToZtring(center_trim, 2)+__T(" dB"));
+                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Center/String").c_str(), "Y NTN");
             }
             if (surround_trim)
             {
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Surround").c_str(), surround_trim);
-                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Surround").c_str(), "N NTY");
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Surround/String").c_str(), Ztring::ToZtring(surround_trim, 2)+__T(" dB"));
-                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Surround/String").c_str(), "Y NTN");
+                Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Surround").c_str(), surround_trim);
+                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Surround").c_str(), "N NTY");
+                Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Surround/String").c_str(), Ztring::ToZtring(surround_trim, 2)+__T(" dB"));
+                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Surround/String").c_str(), "Y NTN");
             }
             if (height_trim)
             {
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Height").c_str(), height_trim);
-                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Height").c_str(), "N NTY");
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocTrim_Height/String").c_str(), Ztring::ToZtring(height_trim, 2)+__T(" dB"));
-                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" JocTrim_Height/String").c_str(), "Y NTN");
+                Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Height").c_str(), height_trim);
+                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Height").c_str(), "N NTY");
+                Fill(Stream_Audio, 0, (FieldPrefix+" Trim_Height/String").c_str(), Ztring::ToZtring(height_trim, 2)+__T(" dB"));
+                Fill_SetOptions(Stream_Audio, 0, (FieldPrefix+" Trim_Height/String").c_str(), "Y NTN");
             }
             if (frontback_balance_ohfl_amount)
             {
                 float32 frontback_balance_ohfl=((float32)frontback_balance_ohfl_amount)/127;
                 if (frontback_balance_ohfl_direction)
                     frontback_balance_ohfl=-frontback_balance_ohfl;
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocBalance_FrontBackOverheadFloor").c_str(), frontback_balance_ohfl, 2);
+                Fill(Stream_Audio, 0, (FieldPrefix+" Balance_FrontBackOverheadFloor").c_str(), frontback_balance_ohfl, 2);
             }
             if (frontback_balance_lstr_amount)
             {
                 float32 frontback_balance_lstr=((float32)frontback_balance_lstr_amount)/127;
                 if (frontback_balance_lstr_direction)
                     frontback_balance_lstr=-frontback_balance_lstr;
-                Fill(Stream_Audio, 0, (FieldPrefix+" JocBalance_FrontBackListener").c_str(), frontback_balance_lstr, 2);
+                Fill(Stream_Audio, 0, (FieldPrefix+" Balance_FrontBackListener").c_str(), frontback_balance_lstr, 2);
             }
         }
         Element_End0();
@@ -446,11 +446,11 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
         {
             for (int cfg=0; cfg<9; cfg++)
             {
-                Fill_SetOptions(Stream_Audio, 0, (string("Dolby_Atmos_Metadata JocTrimMode JocTrimMode")+Ztring::ToZtring(cfg).To_UTF8()+'i').c_str(), "N NTY");
+                Fill_SetOptions(Stream_Audio, 0, (string("Dolby_Atmos_Metadata TrimMode TrimMode")+Ztring::ToZtring(cfg).To_UTF8()+'i').c_str(), "N NTY");
             }
         }
     }
-    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata JocTrimMode", List.Read(), true);
+    Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata TrimMode", List.Read(), true);
 
     if (object_count)
     {
@@ -538,4 +538,3 @@ void File_DolbyAudioMetadata::Merge(File__Analyze& In, size_t StreamPos)
 } //NameSpace
 
 #endif //defined(MEDIAINFO_RIFF_YES) || defined(MEDIAINFO_MXF_YES)
-
