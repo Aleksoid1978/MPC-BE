@@ -101,7 +101,6 @@ typedef struct MpegEncContext {
     int max_b_frames; ///< max number of B-frames for encoding
     int luma_elim_threshold;
     int chroma_elim_threshold;
-    int strict_std_compliance; ///< strictly follow the std (MPEG-4, ...)
     int workaround_bugs;       ///< workaround bugs in encoders which cannot be detected automatically
     int codec_tag;             ///< internal codec_tag upper case converted from avctx codec_tag
     /* the following fields are managed internally by the encoder */
@@ -154,10 +153,10 @@ typedef struct MpegEncContext {
     Picture next_picture;
 
     /**
-     * copy of the source picture structure for encoding.
+     * Reference to the source picture for encoding.
      * note, linesize & data, might not match the source picture (for field pictures)
      */
-    Picture new_picture;
+    AVFrame *new_picture;
 
     /**
      * copy of the current picture structure.
@@ -416,9 +415,6 @@ typedef struct MpegEncContext {
     int esc3_run_length;
     int inter_intra_pred;
     int mspel;
-
-    /* SpeedHQ specific */
-    int slice_start;
 
     /* decompression specific */
     GetBitContext gb;

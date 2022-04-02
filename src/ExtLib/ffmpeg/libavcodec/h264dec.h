@@ -170,9 +170,9 @@ typedef struct H264Ref {
 } H264Ref;
 
 typedef struct H264SliceContext {
-    struct H264Context *h264;
+    const struct H264Context *h264;
     GetBitContext gb;
-    ERContext er;
+    ERContext *er;
 
     int slice_num;
     int slice_type;
@@ -273,7 +273,6 @@ typedef struct H264SliceContext {
     unsigned int pps_id;
 
     const uint8_t *intra_pcm_ptr;
-    int16_t *dc_val_base;
 
     uint8_t *bipred_scratchpad;
     uint8_t *edge_emu_buffer;
@@ -545,6 +544,8 @@ typedef struct H264Context {
     int height_from_caller;
 
     int enable_er;
+    ERContext er;
+    int16_t *dc_val_base;
 
     H264SEIContext sei;
 
@@ -786,7 +787,7 @@ int ff_h264_ref_picture(H264Context *h, H264Picture *dst, H264Picture *src);
 int ff_h264_replace_picture(H264Context *h, H264Picture *dst, const H264Picture *src);
 void ff_h264_unref_picture(H264Context *h, H264Picture *pic);
 
-int ff_h264_slice_context_init(H264Context *h, H264SliceContext *sl);
+void ff_h264_slice_context_init(H264Context *h, H264SliceContext *sl);
 
 void ff_h264_draw_horiz_band(const H264Context *h, H264SliceContext *sl, int y, int height);
 
