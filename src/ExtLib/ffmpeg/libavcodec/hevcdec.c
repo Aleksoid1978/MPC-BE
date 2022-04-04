@@ -452,6 +452,12 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
 #endif
         break;
     case AV_PIX_FMT_YUV444P:
+// ==> Start patch MPC
+#if CONFIG_HEVC_D3D11VA_HWACCEL
+        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmt++ = AV_PIX_FMT_D3D11;
+#endif
+// ==> End patch MPC
 #if CONFIG_HEVC_VDPAU_HWACCEL
         *fmt++ = AV_PIX_FMT_VDPAU;
 #endif
@@ -464,6 +470,12 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
         break;
     case AV_PIX_FMT_YUV422P:
     case AV_PIX_FMT_YUV422P10LE:
+// ==> Start patch MPC
+#if CONFIG_HEVC_D3D11VA_HWACCEL
+        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmt++ = AV_PIX_FMT_D3D11;
+#endif
+// ==> End patch MPC
 #if CONFIG_HEVC_VAAPI_HWACCEL
        *fmt++ = AV_PIX_FMT_VAAPI;
 #endif
@@ -471,12 +483,26 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
         *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 #endif
         break;
+// ==> Start patch MPC
+    case AV_PIX_FMT_YUV422P12:
+#if CONFIG_HEVC_D3D11VA_HWACCEL
+        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmt++ = AV_PIX_FMT_D3D11;
+#endif
+        break;
+// ==> End patch MPC
     case AV_PIX_FMT_YUV444P10:
 #if CONFIG_HEVC_VIDEOTOOLBOX_HWACCEL
         *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 #endif
     case AV_PIX_FMT_YUV420P12:
     case AV_PIX_FMT_YUV444P12:
+// ==> Start patch MPC
+#if CONFIG_HEVC_D3D11VA_HWACCEL
+        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmt++ = AV_PIX_FMT_D3D11;
+#endif
+// ==> End patch MPC
 #if CONFIG_HEVC_VDPAU_HWACCEL
         *fmt++ = AV_PIX_FMT_VDPAU;
 #endif

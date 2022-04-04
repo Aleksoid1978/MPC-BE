@@ -12,8 +12,10 @@
 * libavcodec/bsf_list.c
 * libavcodec/codec_list.c
 * libavcodec/decode.c
+* libavcodec/d3d11va.h
 * libavcodec/dxva2.c
 * libavcodec/dxva2_av1.c
+* libavcodec/dxva2_hevc.c
 * libavcodec/h264_refs.c
 * libavcodec/h264_slice.c
 * libavcodec/h264dec.c
