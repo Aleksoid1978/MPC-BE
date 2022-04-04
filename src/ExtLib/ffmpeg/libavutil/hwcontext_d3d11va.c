@@ -99,7 +99,7 @@ static const struct {
     { DXGI_FORMAT_NV12,         AV_PIX_FMT_NV12      },
     { DXGI_FORMAT_P010,         AV_PIX_FMT_P010      },
 // ==> Start patch MPC
-    // 422 12bit
+    // 420 12bit
     { DXGI_FORMAT_P016,         AV_PIX_FMT_YUV420P12 },
     // 422 8/10/12 bit
     { DXGI_FORMAT_YUY2,         AV_PIX_FMT_YUV422P   },
