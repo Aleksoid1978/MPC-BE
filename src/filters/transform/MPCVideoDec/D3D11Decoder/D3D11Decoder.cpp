@@ -97,6 +97,20 @@ static DXGI_FORMAT d3d11va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
 		case AV_PIX_FMT_YUV420P10:
 		case AV_PIX_FMT_P010:
 			return DXGI_FORMAT_P010;
+		case AV_PIX_FMT_YUV420P12:
+			return DXGI_FORMAT_P016;
+		case AV_PIX_FMT_YUV422P:
+			return DXGI_FORMAT_YUY2;
+		case AV_PIX_FMT_YUV422P10:
+			return DXGI_FORMAT_Y210;
+		case AV_PIX_FMT_YUV422P12:
+			return DXGI_FORMAT_Y216;
+		case AV_PIX_FMT_YUV444P:
+			return DXGI_FORMAT_AYUV;
+		case AV_PIX_FMT_YUV444P10:
+			return DXGI_FORMAT_Y410;
+		case AV_PIX_FMT_YUV444P12:
+			return DXGI_FORMAT_Y416;
 		case AV_PIX_FMT_NV12:
 		default:
 			return DXGI_FORMAT_NV12;
@@ -299,7 +313,7 @@ HRESULT CD3D11Decoder::AllocateFramesContext(AVCodecContext* c, int width, int h
 
 	AVHWFramesContext* pFrames = (AVHWFramesContext*)(*ppFramesCtx)->data;
 	pFrames->format = AV_PIX_FMT_D3D11;
-	pFrames->sw_format = (format == AV_PIX_FMT_YUV420P10) ? AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
+	pFrames->sw_format = (format == AV_PIX_FMT_YUV420P10) ? AV_PIX_FMT_P010 : (format == AV_PIX_FMT_YUV420P ? AV_PIX_FMT_NV12 : format);
 	pFrames->width = width;
 	pFrames->height = height;
 	pFrames->initial_pool_size = nSurfaces;
@@ -323,8 +337,9 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	HRESULT hr = S_OK;
 
 	const int depth = GetLumaBits(c->sw_pix_fmt);
-	m_pFilter->m_bHighBitdepth = (depth == 10) && ((codec == AV_CODEC_ID_HEVC && c->profile == FF_PROFILE_HEVC_MAIN_10)
-												|| (codec == AV_CODEC_ID_VP9 && c->profile == FF_PROFILE_VP9_2));
+	m_pFilter->m_bHighBitdepth = (depth == 10) && ((codec == AV_CODEC_ID_HEVC && (c->profile == FF_PROFILE_HEVC_MAIN_10 || c->profile == FF_PROFILE_HEVC_REXT))
+												|| (codec == AV_CODEC_ID_VP9 && c->profile == FF_PROFILE_VP9_2)
+												|| (codec == AV_CODEC_ID_AV1 && c->profile == FF_PROFILE_AV1_MAIN));
 
 	UINT nProfiles = pDeviceContext->video_device->GetVideoDecoderProfileCount();
 	std::vector<GUID> supportedDecoderGuids;
@@ -549,7 +564,7 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 
 	CComPtr<ID3D11DecoderConfiguration> pD3D11DecoderConfiguration;
 	HRESULT hr = pPin->QueryInterface(&pD3D11DecoderConfiguration);
-	if (FAILED(hr))	{
+	if (FAILED(hr)) {
 		DLog(L"CD3D11Decoder::PostConnect() : ID3D11DecoderConfiguration not available");
 		return hr;
 	}
@@ -594,7 +609,13 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	CMediaType& mt = m_pFilter->m_pOutput->CurrentMediaType();
 	if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
 		(m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
-		(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016)) {
+		(m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016) ||
+		(m_SurfaceFormat == DXGI_FORMAT_YUY2 && mt.subtype != MEDIASUBTYPE_YUY2) ||
+		(m_SurfaceFormat == DXGI_FORMAT_Y210 && mt.subtype != MEDIASUBTYPE_Y210) ||
+		(m_SurfaceFormat == DXGI_FORMAT_Y216 && mt.subtype != MEDIASUBTYPE_Y216) ||
+		(m_SurfaceFormat == DXGI_FORMAT_AYUV && mt.subtype != MEDIASUBTYPE_AYUV) ||
+		(m_SurfaceFormat == DXGI_FORMAT_Y410 && mt.subtype != MEDIASUBTYPE_Y410) ||
+		(m_SurfaceFormat == DXGI_FORMAT_Y416 && mt.subtype != MEDIASUBTYPE_Y416)) {
 		DLog(L"-> Connection is not the appropriate pixel format '%s' for D3D11 Native", GetGUIDString(mt.subtype));
 		return E_FAIL;
 	}
@@ -655,7 +676,11 @@ void CD3D11Decoder::FillHWContext(AVD3D11VAContext* ctx)
 
 	ctx->context_mutex = pDeviceContext->lock_ctx;
 
-	ctx->workaround = 0;
+	if (m_pFilter && m_pFilter->m_pAVCtx && m_pFilter->m_CodecId == AV_CODEC_ID_HEVC && m_pFilter->m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
+		ctx->workaround = FF_DXVA2_WORKAROUND_HEVC_REXT;
+	} else {
+		ctx->workaround = 0;
+	}
 }
 
 void CD3D11Decoder::AdditionaDecoderInit(AVCodecContext* c)

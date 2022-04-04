@@ -149,14 +149,22 @@ struct {
 	const enum AVCodecID nCodecId;
 	const GUID           decoderGUID;
 	const bool           bHighBitdepth;
-} DXVAModes [] = {
+	const AVPixelFormat  pixFormat = AV_PIX_FMT_NONE;
+} DXVAModes[] = {
 	// H.264
 	{ AV_CODEC_ID_H264, DXVA2_ModeH264_E, false },
 	{ AV_CODEC_ID_H264, DXVA2_ModeH264_F, false },
 	{ AV_CODEC_ID_H264, DXVA2_Intel_H264_ClearVideo, false },
+	// HEVC Intel
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main_12bit_Intel,    false, AV_PIX_FMT_YUV420P12 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10bit_Intel, false, AV_PIX_FMT_YUV422P10 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_12bit_Intel, false, AV_PIX_FMT_YUV422P12 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_Intel,       false, AV_PIX_FMT_YUV444P   },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_10bit_Intel, false, AV_PIX_FMT_YUV444P10 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_12bit_Intel, false, AV_PIX_FMT_YUV444P12 },
 	// HEVC
-	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main10, true },
-	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main, false },
+	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main10, true},
+	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main, false},
 	// MPEG2
 	{ AV_CODEC_ID_MPEG2VIDEO, DXVA2_ModeMPEG2_VLD, false },
 	// VC1
@@ -1834,6 +1842,10 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			}
 			break;
 		case AV_CODEC_ID_HEVC:
+			if (m_bUseD3D11 && profile == FF_PROFILE_HEVC_REXT) {
+				return true;
+			}
+
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
 				return false;
 			}
@@ -2253,7 +2265,7 @@ redo:
 	m_nSurfaceHeight = FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 
 	const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
-	m_bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
+	m_bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 || m_pAVCtx->profile == FF_PROFILE_HEVC_REXT))
 										|| (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2)
 										|| (m_CodecId == AV_CODEC_ID_AV1 && m_pAVCtx->profile == FF_PROFILE_AV1_MAIN));
 
@@ -2323,12 +2335,19 @@ redo:
 	return S_OK;
 }
 
-static const VIDEO_OUTPUT_FORMATS DXVAFormats[]      = { // DXVA2 8bit
-	{&MEDIASUBTYPE_NV12, FCC('dxva'), 12, 1},
-};
-static const VIDEO_OUTPUT_FORMATS DXVAFormats10bit[] = { // DXVA2 10bit
-	{&MEDIASUBTYPE_P010, FCC('dxva'), 24, 2},
-};
+static const VIDEO_OUTPUT_FORMATS DXVA_NV12 = { &MEDIASUBTYPE_NV12, FCC('dxva'), 12, 1 };
+static const VIDEO_OUTPUT_FORMATS DXVA_P010 = { &MEDIASUBTYPE_P010, FCC('dxva'), 24, 2 };
+
+// 420 12 bit
+static const VIDEO_OUTPUT_FORMATS DXVA_P016 = { &MEDIASUBTYPE_P016, FCC('dxva'), 24, 2 };
+// 422 8/10/12 bit
+static const VIDEO_OUTPUT_FORMATS DXVA_YUY2 = { &MEDIASUBTYPE_YUY2, FCC('dxva'), 16, 2 };
+static const VIDEO_OUTPUT_FORMATS DXVA_Y210 = { &MEDIASUBTYPE_Y210, FCC('dxva'), 32, 2 };
+static const VIDEO_OUTPUT_FORMATS DXVA_Y216 = { &MEDIASUBTYPE_Y216, FCC('dxva'), 32, 2 };
+// 444 8/10/12 bit
+static const VIDEO_OUTPUT_FORMATS DXVA_AYUV = { &MEDIASUBTYPE_AYUV, FCC('dxva'), 32, 4 };
+static const VIDEO_OUTPUT_FORMATS DXVA_Y410 = { &MEDIASUBTYPE_Y410, FCC('dxva'), 32, 4 };
+static const VIDEO_OUTPUT_FORMATS DXVA_Y416 = { &MEDIASUBTYPE_Y416, FCC('dxva'), 64, 8 };
 
 void CMPCVideoDecFilter::BuildOutputFormat()
 {
@@ -2422,20 +2441,26 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 	int OutputCount = m_bUseFFmpeg ? nSwCount : 0;
 	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
-		OutputCount += m_bHighBitdepth ? std::size(DXVAFormats10bit) : std::size(DXVAFormats);
+		OutputCount++;
 	}
 	m_VideoOutputFormats.reserve(OutputCount);
 
 	int nPos = 0;
 	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
-		if (m_bHighBitdepth) {
-			for (const auto& fmt : DXVAFormats10bit) {
-				m_VideoOutputFormats.push_back(fmt);
+		if (m_bUseD3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
+			switch (pix_fmt) {
+				case AV_PIX_FMT_YUV420P12: m_VideoOutputFormats.push_back(DXVA_P016); break;
+				case AV_PIX_FMT_YUV422P:   m_VideoOutputFormats.push_back(DXVA_YUY2); break;
+				case AV_PIX_FMT_YUV422P10: m_VideoOutputFormats.push_back(DXVA_Y210); break;
+				case AV_PIX_FMT_YUV422P12: m_VideoOutputFormats.push_back(DXVA_Y216); break;
+				case AV_PIX_FMT_YUV444P:   m_VideoOutputFormats.push_back(DXVA_AYUV); break;
+				case AV_PIX_FMT_YUV444P10: m_VideoOutputFormats.push_back(DXVA_Y410); break;
+				case AV_PIX_FMT_YUV444P12: m_VideoOutputFormats.push_back(DXVA_Y416); break;
 			}
+		} else if (m_bHighBitdepth) {
+			m_VideoOutputFormats.push_back(DXVA_P010);
 		} else {
-			for (const auto& fmt : DXVAFormats) {
-				m_VideoOutputFormats.push_back(fmt);
-			}
+			m_VideoOutputFormats.push_back(DXVA_NV12);
 		}
 	}
 
@@ -2732,7 +2757,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		HRESULT hr = S_OK;
 		if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 			const auto& mt = m_pOutput->CurrentMediaType();
-			if (mt.subtype != MEDIASUBTYPE_NV12 && mt.subtype != MEDIASUBTYPE_P010) {
+			if (!(m_bUseD3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT)
+					&& mt.subtype != MEDIASUBTYPE_NV12 && mt.subtype != MEDIASUBTYPE_P010) {
 				DLog(L"CMPCVideoDecFilter::CompleteConnect() - wrong output media type '%s' for H/W decoding, fallback to software decoding", GetGUIDString(mt.subtype));
 
 				CleanupDXVAVariables();
@@ -3851,9 +3877,15 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 		for (const auto& mode : DXVAModes) {
 			if (mode.nCodecId == m_CodecId
-					&& mode.decoderGUID == decoderGUID
-					&& mode.bHighBitdepth == !!m_bHighBitdepth) {
-				return TRUE;
+					&& mode.decoderGUID == decoderGUID) {
+				if (mode.pixFormat != AV_PIX_FMT_NONE && m_bUseD3D11 && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
+					const enum AVPixelFormat pix_fmt = m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
+					if (mode.pixFormat == pix_fmt) {
+						return TRUE;
+					}
+				} else if (mode.bHighBitdepth == !!m_bHighBitdepth) {
+					return TRUE;
+				}
 			}
 		}
 	}
