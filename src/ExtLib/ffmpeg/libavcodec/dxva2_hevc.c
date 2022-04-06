@@ -482,15 +482,12 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
 
 static int dxva2_hevc_end_frame(AVCodecContext *avctx)
 {
-// ==> Start patch MPC
-    AVDXVAContext *ctx = DXVA_CONTEXT(avctx);
-// ==> End patch MPC
     HEVCContext *h = avctx->priv_data;
     struct hevc_dxva2_picture_context *ctx_pic = h->ref->hwaccel_picture_private;
 // ==> Start patch MPC
     //int scale = ctx_pic->pp.dwCodingParamToolFlags & 1;
     int scale = ctx_pic->pp.main.dwCodingParamToolFlags & 1;
-    int rext = (DXVA_CONTEXT_WORKAROUND(avctx, ctx) & FF_DXVA2_WORKAROUND_HEVC_REXT);
+    int rext = avctx->profile == FF_PROFILE_HEVC_REXT && ff_dxva2_is_d3d11(avctx);
 // ==> End patch MPC
     int ret;
 

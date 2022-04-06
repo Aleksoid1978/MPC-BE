@@ -676,11 +676,7 @@ void CD3D11Decoder::FillHWContext(AVD3D11VAContext* ctx)
 
 	ctx->context_mutex = pDeviceContext->lock_ctx;
 
-	if (m_pFilter && m_pFilter->m_pAVCtx && m_pFilter->m_CodecId == AV_CODEC_ID_HEVC && m_pFilter->m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
-		ctx->workaround = FF_DXVA2_WORKAROUND_HEVC_REXT;
-	} else {
-		ctx->workaround = 0;
-	}
+	ctx->workaround = 0;
 }
 
 void CD3D11Decoder::AdditionaDecoderInit(AVCodecContext* c)
