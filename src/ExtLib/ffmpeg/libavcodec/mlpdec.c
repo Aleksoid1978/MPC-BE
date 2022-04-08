@@ -1164,7 +1164,7 @@ static int output_data(MLPDecodeContext *m, unsigned int substr,
  *  @return negative on error, 0 if not enough data is present in the input stream,
  *  otherwise the number of bytes consumed. */
 
-static int read_access_unit(AVCodecContext *avctx, void* data,
+static int read_access_unit(AVCodecContext *avctx, AVFrame *frame,
                             int *got_frame_ptr, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -1356,7 +1356,7 @@ skip_substr:
         buf += substream_data_len[substr];
     }
 
-    if ((ret = output_data(m, m->max_decoded_substream, data, got_frame_ptr)) < 0)
+    if ((ret = output_data(m, m->max_decoded_substream, frame, got_frame_ptr)) < 0)
         return ret;
 
     for (substr = 0; substr <= m->max_decoded_substream; substr++){
@@ -1424,7 +1424,7 @@ const FFCodec ff_mlp_decoder = {
     .priv_data_size = sizeof(MLPDecodeContext),
     .p.priv_class   = &mlp_decoder_class,
     .init           = mlp_decode_init,
-    .decode         = read_access_unit,
+    FF_CODEC_DECODE_CB(read_access_unit),
     .flush          = mlp_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
@@ -1439,7 +1439,7 @@ const FFCodec ff_truehd_decoder = {
     .priv_data_size = sizeof(MLPDecodeContext),
     .p.priv_class   = &truehd_decoder_class,
     .init           = mlp_decode_init,
-    .decode         = read_access_unit,
+    FF_CODEC_DECODE_CB(read_access_unit),
     .flush          = mlp_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,

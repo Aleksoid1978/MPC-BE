@@ -446,9 +446,8 @@ static av_cold int qtrle_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int qtrle_decode_frame(AVCodecContext *avctx,
-                              void *data, int *got_frame,
-                              AVPacket *avpkt)
+static int qtrle_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
+                              int *got_frame, AVPacket *avpkt)
 {
     QtrleContext *s = avctx->priv_data;
     int header, start_line;
@@ -558,7 +557,7 @@ done:
             return ret;
     }
 
-    if ((ret = av_frame_ref(data, s->frame)) < 0)
+    if ((ret = av_frame_ref(rframe, s->frame)) < 0)
         return ret;
     *got_frame      = 1;
 
@@ -590,7 +589,7 @@ const FFCodec ff_qtrle_decoder = {
     .priv_data_size = sizeof(QtrleContext),
     .init           = qtrle_decode_init,
     .close          = qtrle_decode_end,
-    .decode         = qtrle_decode_frame,
+    FF_CODEC_DECODE_CB(qtrle_decode_frame),
     .flush          = qtrle_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,

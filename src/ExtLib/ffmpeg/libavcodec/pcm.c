@@ -326,13 +326,12 @@ static av_cold int pcm_decode_init(AVCodecContext *avctx)
         }                                                                      \
     }
 
-static int pcm_decode_frame(AVCodecContext *avctx, void *data,
-                            int *got_frame_ptr, AVPacket *avpkt)
+static int pcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
+            int *got_frame_ptr, AVPacket *avpkt)
 {
     const uint8_t *src = avpkt->data;
     int buf_size       = avpkt->size;
     PCMDecode *s       = avctx->priv_data;
-    AVFrame *frame     = data;
     int channels       = avctx->ch_layout.nb_channels;
     int sample_size, c, n, ret, samples_per_block;
     uint8_t *samples;
@@ -562,7 +561,7 @@ const FFCodec ff_ ## name_ ## _encoder = {                                  \
     .p.id         = AV_CODEC_ID_ ## id_,                                    \
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE,    \
     .init         = pcm_encode_init,                                        \
-    .encode2      = pcm_encode_frame,                                       \
+    FF_CODEC_ENCODE_CB(pcm_encode_frame),                                   \
     .p.sample_fmts = (const enum AVSampleFormat[]){ sample_fmt_,             \
                                                    AV_SAMPLE_FMT_NONE },    \
     .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,                          \
@@ -584,7 +583,7 @@ const FFCodec ff_ ## name_ ## _decoder = {                                  \
     .p.id           = AV_CODEC_ID_ ## id_,                                  \
     .priv_data_size = sizeof(PCMDecode),                                    \
     .init           = pcm_decode_init,                                      \
-    .decode         = pcm_decode_frame,                                     \
+    FF_CODEC_DECODE_CB(pcm_decode_frame),                                    \
     .p.capabilities = AV_CODEC_CAP_DR1,                                     \
     .p.sample_fmts  = (const enum AVSampleFormat[]){ sample_fmt_,           \
                                                      AV_SAMPLE_FMT_NONE },  \

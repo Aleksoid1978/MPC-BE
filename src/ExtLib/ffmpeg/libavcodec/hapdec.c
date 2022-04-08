@@ -301,11 +301,10 @@ static int decompress_texture2_thread(AVCodecContext *avctx, void *arg,
     return decompress_texture_thread_internal(avctx, arg, slice, thread_nb, 1);
 }
 
-static int hap_decode(AVCodecContext *avctx, void *data,
+static int hap_decode(AVCodecContext *avctx, AVFrame *frame,
                       int *got_frame, AVPacket *avpkt)
 {
     HapContext *ctx = avctx->priv_data;
-    AVFrame *const frame = data;
     int ret, i, t;
     int section_size;
     enum HapSectionType section_type;
@@ -479,7 +478,7 @@ const FFCodec ff_hap_decoder = {
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_HAP,
     .init           = hap_init,
-    .decode         = hap_decode,
+    FF_CODEC_DECODE_CB(hap_decode),
     .close          = hap_close,
     .priv_data_size = sizeof(HapContext),
     .p.capabilities = AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS |

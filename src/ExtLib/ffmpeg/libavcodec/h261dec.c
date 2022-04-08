@@ -594,7 +594,7 @@ static int get_consumed_bytes(MpegEncContext *s, int buf_size)
     return pos;
 }
 
-static int h261_decode_frame(AVCodecContext *avctx, void *data,
+static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
                              int *got_frame, AVPacket *avpkt)
 {
     H261DecContext *const h = avctx->priv_data;
@@ -602,7 +602,6 @@ static int h261_decode_frame(AVCodecContext *avctx, void *data,
     int buf_size       = avpkt->size;
     MpegEncContext *s  = &h->s;
     int ret;
-    AVFrame *pict = data;
 
     ff_dlog(avctx, "*****frame %d size=%d\n", avctx->frame_number, buf_size);
     ff_dlog(avctx, "bytes=%x %x %x %x\n", buf[0], buf[1], buf[2], buf[3]);
@@ -689,7 +688,7 @@ const FFCodec ff_h261_decoder = {
     .priv_data_size = sizeof(H261DecContext),
     .init           = h261_decode_init,
     .close          = h261_decode_end,
-    .decode         = h261_decode_frame,
+    FF_CODEC_DECODE_CB(h261_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .p.max_lowres   = 3,

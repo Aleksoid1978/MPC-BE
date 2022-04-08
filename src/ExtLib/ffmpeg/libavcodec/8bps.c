@@ -54,10 +54,9 @@ typedef struct EightBpsContext {
     uint32_t pal[256];
 } EightBpsContext;
 
-static int decode_frame(AVCodecContext *avctx, void *data,
+static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
                         int *got_frame, AVPacket *avpkt)
 {
-    AVFrame *frame = data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     EightBpsContext * const c = avctx->priv_data;
@@ -181,7 +180,7 @@ const FFCodec ff_eightbps_decoder = {
     .p.id           = AV_CODEC_ID_8BPS,
     .priv_data_size = sizeof(EightBpsContext),
     .init           = decode_init,
-    .decode         = decode_frame,
+    FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

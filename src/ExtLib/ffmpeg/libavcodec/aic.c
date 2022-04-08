@@ -381,8 +381,8 @@ static int aic_decode_slice(AICContext *ctx, int mb_x, int mb_y,
     return 0;
 }
 
-static int aic_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
-                            AVPacket *avpkt)
+static int aic_decode_frame(AVCodecContext *avctx, AVFrame *frame,
+                            int *got_frame, AVPacket *avpkt)
 {
     AICContext *ctx    = avctx->priv_data;
     const uint8_t *buf = avpkt->data;
@@ -392,7 +392,7 @@ static int aic_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     int x, y, ret;
     int slice_size;
 
-    ctx->frame            = data;
+    ctx->frame            = frame;
     ctx->frame->pict_type = AV_PICTURE_TYPE_I;
     ctx->frame->key_frame = 1;
 
@@ -503,7 +503,7 @@ const FFCodec ff_aic_decoder = {
     .priv_data_size = sizeof(AICContext),
     .init           = aic_decode_init,
     .close          = aic_decode_close,
-    .decode         = aic_decode_frame,
+    FF_CODEC_DECODE_CB(aic_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

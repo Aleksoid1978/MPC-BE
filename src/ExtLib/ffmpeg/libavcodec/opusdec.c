@@ -412,11 +412,10 @@ finish:
     return output_samples;
 }
 
-static int opus_decode_packet(AVCodecContext *avctx, void *data,
+static int opus_decode_packet(AVCodecContext *avctx, AVFrame *frame,
                               int *got_frame_ptr, AVPacket *avpkt)
 {
     OpusContext *c      = avctx->priv_data;
-    AVFrame *frame      = data;
     const uint8_t *buf  = avpkt->data;
     int buf_size        = avpkt->size;
     int coded_samples   = 0;
@@ -714,7 +713,7 @@ const FFCodec ff_opus_decoder = {
     .priv_data_size  = sizeof(OpusContext),
     .init            = opus_decode_init,
     .close           = opus_decode_close,
-    .decode          = opus_decode_packet,
+    FF_CODEC_DECODE_CB(opus_decode_packet),
     .flush           = opus_decode_flush,
     .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal   = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,

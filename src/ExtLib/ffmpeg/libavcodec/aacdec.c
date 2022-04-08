@@ -480,7 +480,7 @@ static int read_audio_mux_element(struct LATMContext *latmctx,
 }
 
 
-static int latm_decode_frame(AVCodecContext *avctx, void *out,
+static int latm_decode_frame(AVCodecContext *avctx, AVFrame *out,
                              int *got_frame_ptr, AVPacket *avpkt)
 {
     struct LATMContext *latmctx = avctx->priv_data;
@@ -560,7 +560,7 @@ const FFCodec ff_aac_decoder = {
     .priv_data_size  = sizeof(AACContext),
     .init            = aac_decode_init,
     .close           = aac_decode_close,
-    .decode          = aac_decode_frame,
+    FF_CODEC_DECODE_CB(aac_decode_frame),
     .p.sample_fmts   = (const enum AVSampleFormat[]) {
         AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
     },
@@ -588,7 +588,7 @@ const FFCodec ff_aac_latm_decoder = {
     .priv_data_size  = sizeof(struct LATMContext),
     .init            = latm_decode_init,
     .close           = aac_decode_close,
-    .decode          = latm_decode_frame,
+    FF_CODEC_DECODE_CB(latm_decode_frame),
     .p.sample_fmts   = (const enum AVSampleFormat[]) {
         AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
     },

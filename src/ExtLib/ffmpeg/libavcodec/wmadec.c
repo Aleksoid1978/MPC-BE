@@ -820,10 +820,9 @@ static int wma_decode_frame(WMACodecContext *s, float **samples,
     return 0;
 }
 
-static int wma_decode_superframe(AVCodecContext *avctx, void *data,
+static int wma_decode_superframe(AVCodecContext *avctx, AVFrame *frame,
                                  int *got_frame_ptr, AVPacket *avpkt)
 {
-    AVFrame *frame = data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     WMACodecContext *s = avctx->priv_data;
@@ -974,9 +973,9 @@ static int wma_decode_superframe(AVCodecContext *avctx, void *data,
         samples_offset += s->frame_len;
     }
 
-    ff_dlog(s->avctx, "%d %d %d %d outbytes:%"PTRDIFF_SPECIFIER" eaten:%d\n",
+    ff_dlog(s->avctx, "%d %d %d %d eaten:%d\n",
             s->frame_len_bits, s->block_len_bits, s->frame_len, s->block_len,
-            (int8_t *) samples - (int8_t *) data, avctx->block_align);
+            avctx->block_align);
 
     *got_frame_ptr = 1;
 
@@ -1008,7 +1007,7 @@ const FFCodec ff_wmav1_decoder = {
     .priv_data_size = sizeof(WMACodecContext),
     .init           = wma_decode_init,
     .close          = ff_wma_end,
-    .decode         = wma_decode_superframe,
+    FF_CODEC_DECODE_CB(wma_decode_superframe),
     .flush          = flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
@@ -1025,7 +1024,7 @@ const FFCodec ff_wmav2_decoder = {
     .priv_data_size = sizeof(WMACodecContext),
     .init           = wma_decode_init,
     .close          = ff_wma_end,
-    .decode         = wma_decode_superframe,
+    FF_CODEC_DECODE_CB(wma_decode_superframe),
     .flush          = flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,

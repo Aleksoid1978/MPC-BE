@@ -400,11 +400,10 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg,
     return decode_slice(ctx, slice_no);
 }
 
-static int hqx_decode_frame(AVCodecContext *avctx, void *data,
+static int hqx_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                             int *got_picture_ptr, AVPacket *avpkt)
 {
     HQXContext *ctx = avctx->priv_data;
-    AVFrame *const frame = data;
     uint8_t *src = avpkt->data;
     uint32_t info_tag;
     int data_start;
@@ -433,7 +432,7 @@ static int hqx_decode_frame(AVCodecContext *avctx, void *data,
     data_start     = src - avpkt->data;
     ctx->data_size = avpkt->size - data_start;
     ctx->src       = src;
-    ctx->pic       = data;
+    ctx->pic       = frame;
 
     if (ctx->data_size < HQX_HEADER_SIZE) {
         av_log(avctx, AV_LOG_ERROR, "Frame too small.\n");
@@ -542,7 +541,7 @@ const FFCodec ff_hqx_decoder = {
     .p.id           = AV_CODEC_ID_HQX,
     .priv_data_size = sizeof(HQXContext),
     .init           = hqx_decode_init,
-    .decode         = hqx_decode_frame,
+    FF_CODEC_DECODE_CB(hqx_decode_frame),
     .close          = hqx_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_FRAME_THREADS,

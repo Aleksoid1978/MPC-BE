@@ -534,13 +534,12 @@ static int lag_decode_arith_plane(LagarithContext *l, uint8_t *dst,
  * @param avpkt input packet
  * @return number of consumed bytes on success or negative if decode fails
  */
-static int lag_decode_frame(AVCodecContext *avctx,
-                            void *data, int *got_frame, AVPacket *avpkt)
+static int lag_decode_frame(AVCodecContext *avctx, AVFrame *p,
+                            int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     unsigned int buf_size = avpkt->size;
     LagarithContext *l = avctx->priv_data;
-    AVFrame *const p  = data;
     uint8_t frametype;
     uint32_t offset_gu = 0, offset_bv = 0, offset_ry = 9;
     uint32_t offs[4];
@@ -733,7 +732,7 @@ const FFCodec ff_lagarith_decoder = {
     .p.id           = AV_CODEC_ID_LAGARITH,
     .priv_data_size = sizeof(LagarithContext),
     .init           = lag_decode_init,
-    .decode         = lag_decode_frame,
+    FF_CODEC_DECODE_CB(lag_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

@@ -520,11 +520,10 @@ static av_cold int sipr_decoder_init(AVCodecContext * avctx)
     return 0;
 }
 
-static int sipr_decode_frame(AVCodecContext *avctx, void *data,
+static int sipr_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                              int *got_frame_ptr, AVPacket *avpkt)
 {
     SiprContext *ctx = avctx->priv_data;
-    AVFrame *frame   = data;
     const uint8_t *buf=avpkt->data;
     SiprParameters parm;
     const SiprModeParam *mode_par = &modes[ctx->mode];
@@ -570,7 +569,7 @@ const FFCodec ff_sipr_decoder = {
     .p.id           = AV_CODEC_ID_SIPR,
     .priv_data_size = sizeof(SiprContext),
     .init           = sipr_decoder_init,
-    .decode         = sipr_decode_frame,
+    FF_CODEC_DECODE_CB(sipr_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

@@ -1627,7 +1627,7 @@ static int dsd_channel(AVCodecContext *avctx, void *frmptr, int jobnr, int threa
     return 0;
 }
 
-static int wavpack_decode_frame(AVCodecContext *avctx, void *data,
+static int wavpack_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                                 int *got_frame_ptr, AVPacket *avpkt)
 {
     WavpackContext *s  = avctx->priv_data;
@@ -1685,7 +1685,7 @@ static int wavpack_decode_frame(AVCodecContext *avctx, void *data,
 
     ff_thread_report_progress(&s->curr_frame, INT_MAX, 0);
 
-    if ((ret = av_frame_ref(data, s->frame)) < 0)
+    if ((ret = av_frame_ref(rframe, s->frame)) < 0)
         return ret;
 
     *got_frame_ptr = 1;
@@ -1710,7 +1710,7 @@ const FFCodec ff_wavpack_decoder = {
     .priv_data_size = sizeof(WavpackContext),
     .init           = wavpack_decode_init,
     .close          = wavpack_decode_end,
-    .decode         = wavpack_decode_frame,
+    FF_CODEC_DECODE_CB(wavpack_decode_frame),
     .flush          = wavpack_decode_flush,
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |

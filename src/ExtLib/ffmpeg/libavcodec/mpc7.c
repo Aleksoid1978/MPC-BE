@@ -172,10 +172,9 @@ static int get_scale_idx(GetBitContext *gb, int ref)
     return ref + t;
 }
 
-static int mpc7_decode_frame(AVCodecContext * avctx, void *data,
+static int mpc7_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                              int *got_frame_ptr, AVPacket *avpkt)
 {
-    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int buf_size;
     MPCContext *c = avctx->priv_data;
@@ -318,7 +317,7 @@ const FFCodec ff_mpc7_decoder = {
     .priv_data_size = sizeof(MPCContext),
     .init           = mpc7_decode_init,
     .close          = mpc7_decode_close,
-    .decode         = mpc7_decode_frame,
+    FF_CODEC_DECODE_CB(mpc7_decode_frame),
     .flush          = mpc7_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,

@@ -324,8 +324,8 @@ static void reset_buffers(VmncContext *c)
 
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
-                        AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
+                        int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
@@ -518,7 +518,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         }
     }
     *got_frame = 1;
-    if ((ret = av_frame_ref(data, c->pic)) < 0)
+    if ((ret = av_frame_ref(rframe, c->pic)) < 0)
         return ret;
 
     /* always report that the buffer was completely consumed */
@@ -581,7 +581,7 @@ const FFCodec ff_vmnc_decoder = {
     .priv_data_size = sizeof(VmncContext),
     .init           = decode_init,
     .close          = decode_end,
-    .decode         = decode_frame,
+    FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

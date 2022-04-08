@@ -1102,11 +1102,10 @@ static void update_sub_state(AMRWBContext *ctx)
             LP_ORDER_16k * sizeof(float));
 }
 
-static int amrwb_decode_frame(AVCodecContext *avctx, void *data,
+static int amrwb_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                               int *got_frame_ptr, AVPacket *avpkt)
 {
     AMRWBChannelsContext *s  = avctx->priv_data;
-    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     int sub, i, ret;
@@ -1300,7 +1299,7 @@ const FFCodec ff_amrwb_decoder = {
     .p.id           = AV_CODEC_ID_AMR_WB,
     .priv_data_size = sizeof(AMRWBChannelsContext),
     .init           = amrwb_decode_init,
-    .decode         = amrwb_decode_frame,
+    FF_CODEC_DECODE_CB(amrwb_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLT,
                                                      AV_SAMPLE_FMT_NONE },

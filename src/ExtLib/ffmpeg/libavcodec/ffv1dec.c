@@ -831,7 +831,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
+                        int *got_frame, AVPacket *avpkt)
 {
     uint8_t *buf        = avpkt->data;
     int buf_size        = avpkt->size;
@@ -969,7 +970,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPac
 
     if (f->last_picture.f)
         ff_thread_release_ext_buffer(avctx, &f->last_picture);
-    if ((ret = av_frame_ref(data, f->picture.f)) < 0)
+    if ((ret = av_frame_ref(rframe, f->picture.f)) < 0)
         return ret;
 
     *got_frame = 1;
@@ -1059,7 +1060,7 @@ const FFCodec ff_ffv1_decoder = {
     .priv_data_size = sizeof(FFV1Context),
     .init           = decode_init,
     .close          = ff_ffv1_close,
-    .decode         = decode_frame,
+    FF_CODEC_DECODE_CB(decode_frame),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .p.capabilities = AV_CODEC_CAP_DR1 /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/ |
                       AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,

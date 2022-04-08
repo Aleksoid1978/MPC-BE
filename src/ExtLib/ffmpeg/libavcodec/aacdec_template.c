@@ -3247,7 +3247,7 @@ static int aac_decode_er_frame(AVCodecContext *avctx, void *data,
     return 0;
 }
 
-static int aac_decode_frame_int(AVCodecContext *avctx, void *data,
+static int aac_decode_frame_int(AVCodecContext *avctx, AVFrame *frame,
                                 int *got_frame_ptr, GetBitContext *gb,
                                 const AVPacket *avpkt)
 {
@@ -3260,7 +3260,7 @@ static int aac_decode_frame_int(AVCodecContext *avctx, void *data,
     int payload_alignment;
     uint8_t che_presence[4][MAX_ELEM_ID] = {{0}};
 
-    ac->frame = data;
+    ac->frame = frame;
 
     if (show_bits(gb, 12) == 0xfff) {
         if ((err = parse_adts_frame_header(ac, gb)) < 0) {
@@ -3452,9 +3452,9 @@ static int aac_decode_frame_int(AVCodecContext *avctx, void *data,
                                           &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO);
     if (is_dmono) {
         if (ac->dmono_mode == 1)
-            ((AVFrame *)data)->data[1] =((AVFrame *)data)->data[0];
+            frame->data[1] = frame->data[0];
         else if (ac->dmono_mode == 2)
-            ((AVFrame *)data)->data[0] =((AVFrame *)data)->data[1];
+            frame->data[0] = frame->data[1];
     }
 
     return 0;
@@ -3463,7 +3463,7 @@ fail:
     return err;
 }
 
-static int aac_decode_frame(AVCodecContext *avctx, void *data,
+static int aac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                             int *got_frame_ptr, AVPacket *avpkt)
 {
     AACContext *ac = avctx->priv_data;
@@ -3510,10 +3510,10 @@ static int aac_decode_frame(AVCodecContext *avctx, void *data,
     case AOT_ER_AAC_LTP:
     case AOT_ER_AAC_LD:
     case AOT_ER_AAC_ELD:
-        err = aac_decode_er_frame(avctx, data, got_frame_ptr, &gb);
+        err = aac_decode_er_frame(avctx, frame, got_frame_ptr, &gb);
         break;
     default:
-        err = aac_decode_frame_int(avctx, data, got_frame_ptr, &gb, avpkt);
+        err = aac_decode_frame_int(avctx, frame, got_frame_ptr, &gb, avpkt);
     }
     if (err < 0)
         return err;

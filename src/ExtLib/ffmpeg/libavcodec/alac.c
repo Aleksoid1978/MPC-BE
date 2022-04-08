@@ -413,11 +413,10 @@ static int decode_element(AVCodecContext *avctx, AVFrame *frame, int ch_index,
     return 0;
 }
 
-static int alac_decode_frame(AVCodecContext *avctx, void *data,
+static int alac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                              int *got_frame_ptr, AVPacket *avpkt)
 {
     ALACContext *alac = avctx->priv_data;
-    AVFrame *frame    = data;
     enum AlacRawDataBlockType element;
     int channels;
     int ch, ret, got_end;
@@ -619,7 +618,7 @@ const FFCodec ff_alac_decoder = {
     .priv_data_size = sizeof(ALACContext),
     .init           = alac_decode_init,
     .close          = alac_decode_close,
-    .decode         = alac_decode_frame,
+    FF_CODEC_DECODE_CB(alac_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
     .p.priv_class   = &alac_class

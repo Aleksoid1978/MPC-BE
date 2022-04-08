@@ -136,13 +136,12 @@ static int v210_decode_slice(AVCodecContext *avctx, void *arg, int jobnr, int th
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
-                        AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, AVFrame *pic,
+                        int *got_frame, AVPacket *avpkt)
 {
     V210DecContext *s = avctx->priv_data;
     ThreadData td;
     int ret, stride, aligned_input;
-    AVFrame *pic = data;
     const uint8_t *psrc = avpkt->data;
 
     if (s->custom_stride )
@@ -219,7 +218,7 @@ const FFCodec ff_v210_decoder = {
     .p.id           = AV_CODEC_ID_V210,
     .priv_data_size = sizeof(V210DecContext),
     .init           = decode_init,
-    .decode         = decode_frame,
+    FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 |
                       AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_FRAME_THREADS,

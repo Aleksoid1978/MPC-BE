@@ -1062,10 +1062,9 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
     return nb_samples;
 }
 
-static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
+static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                               int *got_frame_ptr, AVPacket *avpkt)
 {
-    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     ADPCMDecodeContext *c = avctx->priv_data;
@@ -2295,7 +2294,7 @@ const FFCodec ff_ ## name_ ## _decoder = {                  \
     .p.sample_fmts  = sample_fmts_,                         \
     .priv_data_size = sizeof(ADPCMDecodeContext),           \
     .init           = adpcm_decode_init,                    \
-    .decode         = adpcm_decode_frame,                   \
+    FF_CODEC_DECODE_CB(adpcm_decode_frame),                 \
     .flush          = adpcm_flush,                          \
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,         \
 };

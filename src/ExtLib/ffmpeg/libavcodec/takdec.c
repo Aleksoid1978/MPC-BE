@@ -674,11 +674,10 @@ static int decorrelate(TAKDecContext *s, int c1, int c2, int length)
     return 0;
 }
 
-static int tak_decode_frame(AVCodecContext *avctx, void *data,
+static int tak_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                             int *got_frame_ptr, AVPacket *pkt)
 {
     TAKDecContext *s  = avctx->priv_data;
-    AVFrame *frame    = data;
     GetBitContext *gb = &s->gb;
     int chan, i, ret, hsize;
 
@@ -950,7 +949,7 @@ const FFCodec ff_tak_decoder = {
     .priv_data_size   = sizeof(TAKDecContext),
     .init             = tak_decode_init,
     .close            = tak_decode_close,
-    .decode           = tak_decode_frame,
+    FF_CODEC_DECODE_CB(tak_decode_frame),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
     .p.sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,

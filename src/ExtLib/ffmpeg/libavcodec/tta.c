@@ -224,10 +224,9 @@ static av_cold int tta_decode_init(AVCodecContext * avctx)
     return allocate_buffers(avctx);
 }
 
-static int tta_decode_frame(AVCodecContext *avctx, void *data,
+static int tta_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                             int *got_frame_ptr, AVPacket *avpkt)
 {
-    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     TTAContext *s = avctx->priv_data;
@@ -429,7 +428,7 @@ const FFCodec ff_tta_decoder = {
     .priv_data_size = sizeof(TTAContext),
     .init           = tta_decode_init,
     .close          = tta_decode_close,
-    .decode         = tta_decode_frame,
+    FF_CODEC_DECODE_CB(tta_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
     .p.priv_class   = &tta_decoder_class,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,

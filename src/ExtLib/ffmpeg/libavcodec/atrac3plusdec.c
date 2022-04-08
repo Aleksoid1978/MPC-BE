@@ -331,11 +331,10 @@ static void reconstruct_frame(ATRAC3PContext *ctx, Atrac3pChanUnitCtx *ch_unit,
     FFSWAP(Atrac3pWaveSynthParams *, ch_unit->waves_info, ch_unit->waves_info_prev);
 }
 
-static int atrac3p_decode_frame(AVCodecContext *avctx, void *data,
+static int atrac3p_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                                 int *got_frame_ptr, AVPacket *avpkt)
 {
     ATRAC3PContext *ctx = avctx->priv_data;
-    AVFrame *frame      = data;
     int i, ret, ch_unit_id, ch_block = 0, out_ch_index = 0, channels_to_process;
     float **samples_p = (float **)frame->extended_data;
 
@@ -401,7 +400,7 @@ const FFCodec ff_atrac3p_decoder = {
     .priv_data_size = sizeof(ATRAC3PContext),
     .init           = atrac3p_decode_init,
     .close          = atrac3p_decode_close,
-    .decode         = atrac3p_decode_frame,
+    FF_CODEC_DECODE_CB(atrac3p_decode_frame),
 };
 
 const FFCodec ff_atrac3pal_decoder = {
@@ -414,5 +413,5 @@ const FFCodec ff_atrac3pal_decoder = {
     .priv_data_size = sizeof(ATRAC3PContext),
     .init           = atrac3p_decode_init,
     .close          = atrac3p_decode_close,
-    .decode         = atrac3p_decode_frame,
+    FF_CODEC_DECODE_CB(atrac3p_decode_frame),
 };

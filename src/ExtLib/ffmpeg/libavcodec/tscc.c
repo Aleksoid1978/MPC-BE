@@ -64,8 +64,8 @@ typedef struct TsccContext {
     uint32_t pal[256];
 } CamtasiaContext;
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
-                        AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
+                        int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
@@ -114,7 +114,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         memcpy(frame->data[1], c->pal, AVPALETTE_SIZE);
     }
 
-    if ((ret = av_frame_ref(data, frame)) < 0)
+    if ((ret = av_frame_ref(rframe, frame)) < 0)
         return ret;
     *got_frame      = 1;
 
@@ -178,7 +178,7 @@ const FFCodec ff_tscc_decoder = {
     .priv_data_size = sizeof(CamtasiaContext),
     .init           = decode_init,
     .close          = decode_end,
-    .decode         = decode_frame,
+    FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };

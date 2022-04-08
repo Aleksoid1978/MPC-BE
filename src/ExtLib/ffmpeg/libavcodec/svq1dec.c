@@ -617,13 +617,12 @@ static int svq1_decode_frame_header(AVCodecContext *avctx, AVFrame *frame)
     return 0;
 }
 
-static int svq1_decode_frame(AVCodecContext *avctx, void *data,
+static int svq1_decode_frame(AVCodecContext *avctx, AVFrame *cur,
                              int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     SVQ1Context     *s = avctx->priv_data;
-    AVFrame       *cur = data;
     uint8_t *current;
     int result, i, x, y, width, height;
     int ret;
@@ -852,7 +851,7 @@ const FFCodec ff_svq1_decoder = {
     .priv_data_size = sizeof(SVQ1Context),
     .init           = svq1_decode_init,
     .close          = svq1_decode_end,
-    .decode         = svq1_decode_frame,
+    FF_CODEC_DECODE_CB(svq1_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
     .flush          = svq1_flush,
     .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV410P,

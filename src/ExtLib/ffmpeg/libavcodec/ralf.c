@@ -410,11 +410,10 @@ static int decode_block(AVCodecContext *avctx, GetBitContext *gb,
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame_ptr,
-                        AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
+                        int *got_frame_ptr, AVPacket *avpkt)
 {
     RALFContext *ctx = avctx->priv_data;
-    AVFrame *frame   = data;
     int16_t *samples0;
     int16_t *samples1;
     int ret;
@@ -522,7 +521,7 @@ const FFCodec ff_ralf_decoder = {
     .priv_data_size = sizeof(RALFContext),
     .init           = decode_init,
     .close          = decode_close,
-    .decode         = decode_frame,
+    FF_CODEC_DECODE_CB(decode_frame),
     .flush          = decode_flush,
     .p.capabilities = AV_CODEC_CAP_CHANNEL_CONF |
                       AV_CODEC_CAP_DR1,

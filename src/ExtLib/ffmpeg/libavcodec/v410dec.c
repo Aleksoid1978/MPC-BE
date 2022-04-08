@@ -85,11 +85,10 @@ static int v410_decode_slice(AVCodecContext *avctx, void *arg, int jobnr, int th
     return 0;
 }
 
-static int v410_decode_frame(AVCodecContext *avctx, void *data,
+static int v410_decode_frame(AVCodecContext *avctx, AVFrame *pic,
                              int *got_frame, AVPacket *avpkt)
 {
     ThreadData td;
-    AVFrame *pic = data;
     uint8_t *src = avpkt->data;
     int ret;
     int thread_count = av_clip(avctx->thread_count, 1, avctx->height/4);
@@ -121,7 +120,7 @@ const FFCodec ff_v410_decoder = {
     .p.type       = AVMEDIA_TYPE_VIDEO,
     .p.id         = AV_CODEC_ID_V410,
     .init         = v410_decode_init,
-    .decode       = v410_decode_frame,
+    FF_CODEC_DECODE_CB(v410_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS |
                     AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,
