@@ -84,7 +84,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	}
 	m_pFrame->nb_samples = m_pAVCtx->frame_size;
 	m_pFrame->format     = m_pAVCtx->sample_fmt;
-	m_pFrame->ch_layout  = m_pAVCtx->ch_layout;
+	av_channel_layout_copy(&m_pFrame->ch_layout, &m_pAVCtx->ch_layout);
 
 	// the codec gives us the frame size, in samples,
 	// we calculate the size of the samples buffer in bytes
@@ -196,12 +196,9 @@ void CAC3Encoder::StreamFinish()
 DWORD CAC3Encoder::SelectLayout(DWORD layout)
 {
 	// check supported layouts
-	if (m_pAVCodec) {
-		AVChannelLayout ch_layout = {};
-		av_channel_layout_from_mask(&m_pAVCtx->ch_layout, static_cast<uint64_t>(layout));
-		if (av_channel_layout_compare(m_pAVCodec->ch_layouts, &ch_layout)) {
-			return layout;
-		}
+	if (m_pAVCtx &&
+			m_pAVCtx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE && m_pAVCtx->ch_layout.u.mask == static_cast<uint64_t>(layout)) {
+		return layout;
 	}
 
 	// select the suitable format
