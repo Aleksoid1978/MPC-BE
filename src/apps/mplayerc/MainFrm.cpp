@@ -10396,16 +10396,21 @@ void CMainFrame::OnSubtitleSize(UINT nID)
 		CAppSettings& s = AfxGetAppSettings();
 
 		if (nID == ID_SUB_SIZE_DEC && s.subdefstyle.fontSize > 8) {
-			s.subdefstyle.fontSize = std::ceil(s.subdefstyle.fontSize) - 1;
+			s.subdefstyle.fontSize--;
 		}
-		else if (nID == ID_SUB_SIZE_INC && s.subdefstyle.fontSize < 8) {
-			s.subdefstyle.fontSize = std::floor(s.subdefstyle.fontSize) + 1;
+		else if (nID == ID_SUB_SIZE_INC && s.subdefstyle.fontSize < 48) {
+			s.subdefstyle.fontSize++;
 		}
 		else {
 			return;
 		}
 
+		s.subdefstyle.fontSize = std::round(s.subdefstyle.fontSize);
+
 		UpdateSubDefaultStyle();
+		CStringW str;
+		str.Format(L"Subtitle text size: %.0f", s.subdefstyle.fontSize);
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, str);
 	}
 }
 
