@@ -492,6 +492,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_SUB_COPYTOCLIPBOARD, OnSubCopyClipboard)
 
+	ON_COMMAND_RANGE(ID_SUB_SIZE_DEC, ID_SUB_SIZE_INC, OnSubtitleSize)
+
 	ON_COMMAND(ID_ADDTOPLAYLISTROMCLIPBOARD, OnAddToPlaylistFromClipboard)
 
 	ON_WM_WTSSESSION_CHANGE()
@@ -10385,6 +10387,25 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);
 		}
+	}
+}
+
+void CMainFrame::OnSubtitleSize(UINT nID)
+{
+	if (m_pCAP) {
+		CAppSettings& s = AfxGetAppSettings();
+
+		if (nID == ID_SUB_SIZE_DEC && s.subdefstyle.fontSize > 8) {
+			s.subdefstyle.fontSize = std::ceil(s.subdefstyle.fontSize) - 1;
+		}
+		else if (nID == ID_SUB_SIZE_INC && s.subdefstyle.fontSize < 8) {
+			s.subdefstyle.fontSize = std::floor(s.subdefstyle.fontSize) + 1;
+		}
+		else {
+			return;
+		}
+
+		UpdateSubDefaultStyle();
 	}
 }
 

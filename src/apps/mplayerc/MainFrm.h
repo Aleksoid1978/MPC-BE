@@ -1208,6 +1208,7 @@ public:
 
 	// Subtitle position
 	afx_msg void OnSubtitlePos(UINT nID);
+	afx_msg void OnSubtitleSize(UINT nID);
 
 	afx_msg void OnSubCopyClipboard();
 

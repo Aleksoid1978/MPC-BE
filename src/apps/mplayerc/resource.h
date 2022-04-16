@@ -341,6 +341,8 @@
 #define ID_SUB_POS_RIGHT                1103
 #define ID_SUB_POS_RESTORE              1104
 #define ID_SUB_COPYTOCLIPBOARD          1106
+#define ID_SUB_SIZE_DEC                 1107
+#define ID_SUB_SIZE_INC                 1108
 #define ID_STEREO3D_AUTO                1110
 #define ID_STEREO3D_MONO                1111
 #define ID_STEREO3D_ROW_INTERLEAVED     1112
@@ -1400,6 +1402,8 @@
 #define IDS_SUB_POS_RESTORE             34014
 //
 #define IDS_SUB_COPYTOCLIPBOARD         34016
+#define IDS_SUB_SIZE_DEC                34017
+#define IDS_SUB_SIZE_INC                34018
 // subtitle renderer
 #define IDS_SUB_NOT_USE                 34020
 #define IDS_SUB_USE_INTERNAL            34021
