@@ -35,6 +35,7 @@
 #define YOUTUBE_URL_V               L"youtube.com/v/"
 #define YOUTUBE_URL_EMBED           L"youtube.com/embed/"
 #define YOUTUBE_URL_SHORTS          L"youtube.com/shorts/"
+#define YOUTUBE_URL_CLIP            L"youtube.com/clip/"
 #define YOUTU_BE_URL                L"youtu.be/"
 
 #define MATCH_STREAM_MAP_START      "\"url_encoded_fmt_stream_map\":\""
@@ -154,36 +155,6 @@ namespace Youtube
 		return "";
 	}
 
-	static void HandleURL(CString& url)
-	{
-		url = UrlDecode(url);
-
-		int pos = url.Find(L"youtube.com/");
-		if (pos == -1) {
-			pos = url.Find(L"youtu.be/");
-		}
-
-		if (pos != -1) {
-			url.Delete(0, pos);
-			url = L"https://www." + url;
-
-			if (url.Find(YOUTU_BE_URL) != -1) {
-				url.Replace(YOUTU_BE_URL, YOUTUBE_URL);
-				url.Replace(L"watch?", L"watch?v=");
-				url.Replace(L"?list=", L"&list=");
-			} else if (url.Find(YOUTUBE_URL_V) != -1) {
-				url.Replace(L"v/", L"watch?v=");
-				url.Replace(L"?list=", L"&list=");
-			} else if (url.Find(YOUTUBE_URL_EMBED) != -1) {
-				url.Replace(L"embed/", L"watch?v=");
-				url.Replace(L"?list=", L"&list=");
-			} else if (url.Find(YOUTUBE_URL_SHORTS) != -1) {
-				url.Replace(L"shorts/", L"watch?v=");
-				url.Replace(L"?list=", L"&list=");
-			}
-		}
-	}
-
 	bool CheckURL(CString url)
 	{
 		url.MakeLower();
@@ -193,6 +164,7 @@ namespace Youtube
 				|| url.Find(YOUTUBE_URL_V) != -1
 				|| url.Find(YOUTUBE_URL_EMBED) != -1
 				|| url.Find(YOUTUBE_URL_SHORTS) != -1
+				|| url.Find(YOUTUBE_URL_CLIP) != -1
 				|| url.Find(YOUTU_BE_URL) != -1) {
 			return true;
 		}
@@ -351,6 +323,69 @@ namespace Youtube
 		}
 
 		return bParse;
+	}
+
+	static void HandleURL(CString& url)
+	{
+		url = UrlDecode(url);
+
+		if (url.Find(YOUTUBE_URL_CLIP) != -1) {
+			urlData data;
+			if (URLReadData(url.GetString(), data)) {
+				rapidjson::Document player_response_jsonDocument;
+				auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonData += "}";
+					player_response_jsonData.Replace(R"(\/)", "/");
+					player_response_jsonData.Replace(R"(\")", R"(")");
+					player_response_jsonData.Replace(R"(\\)", R"(\)");
+				} else {
+					player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+					if (!player_response_jsonData.IsEmpty()) {
+						player_response_jsonData += "}";
+					}
+				}
+				if (!player_response_jsonData.IsEmpty()) {
+					player_response_jsonDocument.Parse(player_response_jsonData);
+				}
+
+				if (!player_response_jsonDocument.IsNull()) {
+					if (auto videoDetails = GetJsonObject(player_response_jsonDocument, "videoDetails")) {
+						CString videoId;
+						if (getJsonValue(*videoDetails, "videoId", videoId)) {
+							url = L"https://www.youtube.com/watch?v=" + videoId;
+						}
+					}
+				}
+			}
+
+			return;
+		}
+
+		int pos = url.Find(L"youtube.com/");
+		if (pos == -1) {
+			pos = url.Find(L"youtu.be/");
+		}
+
+		if (pos != -1) {
+			url.Delete(0, pos);
+			url = L"https://www." + url;
+
+			if (url.Find(YOUTU_BE_URL) != -1) {
+				url.Replace(YOUTU_BE_URL, YOUTUBE_URL);
+				url.Replace(L"watch?", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
+			} else if (url.Find(YOUTUBE_URL_V) != -1) {
+				url.Replace(L"v/", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
+			} else if (url.Find(YOUTUBE_URL_EMBED) != -1) {
+				url.Replace(L"embed/", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
+			} else if (url.Find(YOUTUBE_URL_SHORTS) != -1) {
+				url.Replace(L"shorts/", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
+			}
+		}
 	}
 
 	static bool ParseMetadata(const CString& videoId, YoutubeFields& y_fields)

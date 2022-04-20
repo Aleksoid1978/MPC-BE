@@ -15747,7 +15747,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 
 			if (PathIsURLW(str)) {
 				if (session.Title.GetLength()
-					&& (StartsWith(str, L"https://www.youtube.com/watch?") || StartsWith(str, L"https://youtu.be/"))) {
+						&& (Youtube::CheckURL(str))) {
 					str.SetString(L"YouTube - " + session.Title);
 					EllipsisText(str, 100);
 				}
