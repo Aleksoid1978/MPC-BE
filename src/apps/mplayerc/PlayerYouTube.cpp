@@ -332,28 +332,17 @@ namespace Youtube
 		if (url.Find(YOUTUBE_URL_CLIP) != -1) {
 			urlData data;
 			if (URLReadData(url.GetString(), data)) {
-				rapidjson::Document player_response_jsonDocument;
-				auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonData += "}";
-					player_response_jsonData.Replace(R"(\/)", "/");
-					player_response_jsonData.Replace(R"(\")", R"(")");
-					player_response_jsonData.Replace(R"(\\)", R"(\)");
-				} else {
-					player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
-					if (!player_response_jsonData.IsEmpty()) {
-						player_response_jsonData += "}";
-					}
-				}
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonDocument.Parse(player_response_jsonData);
-				}
+				auto jsonEntry = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+				if (!jsonEntry.IsEmpty()) {
+					jsonEntry += "}";
 
-				if (!player_response_jsonDocument.IsNull()) {
-					if (auto videoDetails = GetJsonObject(player_response_jsonDocument, "videoDetails")) {
-						CString videoId;
-						if (getJsonValue(*videoDetails, "videoId", videoId)) {
-							url = L"https://www.youtube.com/watch?v=" + videoId;
+					rapidjson::Document json;
+					if (!json.Parse(jsonEntry).HasParseError()) {
+						if (auto videoDetails = GetJsonObject(json, "videoDetails")) {
+							CString videoId;
+							if (getJsonValue(*videoDetails, "videoId", videoId)) {
+								url = L"https://www.youtube.com/watch?v=" + videoId;
+							}
 						}
 					}
 				}
@@ -1435,6 +1424,32 @@ namespace Youtube
 
 			auto channelId = RegExpParse(url.GetString(), L"www.youtube.com(?:/channel|/c|/user)/([^/]+)");
 			if (!channelId.IsEmpty()) {
+				if (url.Find(L"/live") != -1) {
+					urlData data;
+					if (URLReadData(url.GetString(), data)) {
+						auto jsonEntry = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+						if (!jsonEntry.IsEmpty()) {
+							jsonEntry += "}";
+
+							rapidjson::Document json;
+							if (!json.Parse(jsonEntry).HasParseError()) {
+								if (auto videoDetails = GetJsonObject(json, "videoDetails")) {
+									CString videoId;
+									if (getJsonValue(*videoDetails, "videoId", videoId)) {
+										auto url = L"https://www.youtube.com/watch?v=" + videoId;
+										CString title;
+										getJsonValue(*videoDetails, "title", title);
+
+										youtubePlaylist.emplace_back(url, title, 0);
+										idx_CurrentPlay = 0;
+										return true;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				if (url.Find(YOUTUBE_CHANNEL_URL) == -1) {
 					DLog(L"Youtube::Parse_Playlist() : downloading user page '%s'", url);
 
