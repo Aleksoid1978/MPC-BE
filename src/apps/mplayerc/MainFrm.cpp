@@ -3686,7 +3686,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (!IsZoomed() && AfxGetAppSettings().bMouseEasyMove) {
+	if (AfxGetAppSettings().bMouseEasyMove) {
 		SetCapture();
 		m_bBeginCapture = true;
 		m_beginCapturePoint = point;
