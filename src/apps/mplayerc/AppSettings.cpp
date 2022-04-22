@@ -931,7 +931,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	SIZE wndSize;
 	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPECIFIEDWINDOWSIZE, str)
 			&& swscanf_s(str, L"%d;%d", &wndSize.cx, &wndSize.cy) == 2) {
-		if (wndSize.cx >= 480 && wndSize.cx <= 3840 && wndSize.cy >= 240 && wndSize.cy <= 2160) {
+		if (wndSize.cx >= 300 && wndSize.cx <= 3840 && wndSize.cy >= 200 && wndSize.cy <= 2160) {
 			szSpecifiedWndSize = wndSize;
 		}
 	}
