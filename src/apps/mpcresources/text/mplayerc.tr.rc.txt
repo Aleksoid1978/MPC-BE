@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Hakkında"
 7		"MPC-BE"
 8		"Telif Hakkı © 2002-2022, Authors.txt dosyasına bakınız"
@@ -812,7 +812,7 @@ BEGIN MENU IDR_POPUP LINES 135
 61		"&Süzgeçler"
 62		"T&onlamalar"
 64		"Ses"
-65		"Al&tyazılar"
+65		"Al&t Yazılar"
 68		"Se&s"
 70		"&Arttır"
 71		"&Azalt"
@@ -1966,7 +1966,7 @@ STRING IDS_SUB_POS_RESTORE		"Alt Yazı Konumunu Sıfırla"
 STRING IDS_SUB_POS_RIGHT		"Alt Yazı Konumu Sağa"
 STRING IDS_SUB_POS_UP		"Alt Yazı Konumu Yukarı"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Özel biçimi kaydet"
-STRING IDS_SUB_SIZE		"Subtitle text size: %d"
+STRING IDS_SUB_SIZE		"Alt Yazı Metin Boyutu: %d"
 STRING IDS_SUB_SIZE_DEC		"Alt Yazı Metin Boyutunu Küçült"
 STRING IDS_SUB_SIZE_INC		"Alt Yazı Metin Boyutunu Büyüt"
 STRING IDS_SUB_USE_INTERNAL		"Dahili alt yazı işleyici"
