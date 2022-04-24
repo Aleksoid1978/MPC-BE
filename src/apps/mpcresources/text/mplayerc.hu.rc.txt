@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Névjegy"
 7		"MPC-BE"
 8		"Szerzői jog © 2002-2022 lásd Authors.txt fájl"
@@ -1966,6 +1966,7 @@ STRING IDS_SUB_POS_RESTORE		"Feliratok pozíciójának visszaállítása"
 STRING IDS_SUB_POS_RIGHT		"Feliratpozíció elmozdítása jobbra"
 STRING IDS_SUB_POS_UP		"Feliratpozíció elmozdítása felfele"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Egyéni stílus mentése"
+STRING IDS_SUB_SIZE		"Subtitle text size: %d"
 STRING IDS_SUB_SIZE_DEC		"Csökkentse a felirat szövegének méretét"
 STRING IDS_SUB_SIZE_INC		"Növelje a felirat szövegének méretét"
 STRING IDS_SUB_USE_INTERNAL		"belső felirat-megjelenítő"

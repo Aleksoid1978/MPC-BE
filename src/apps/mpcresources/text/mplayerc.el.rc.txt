@@ -1966,6 +1966,7 @@ STRING IDS_SUB_POS_RESTORE		"Επαναφορά της θέσης των υπό�
 STRING IDS_SUB_POS_RIGHT		"Μετατόπιση θέσης υποτίτλων προς τα δεξιά"
 STRING IDS_SUB_POS_UP		"Μετατόπιση θέσης υποτίτλων προς τα πάνω"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Αποθήκευση προσαρμοσμένου στυλ"
+STRING IDS_SUB_SIZE		"Subtitle text size: %d"
 STRING IDS_SUB_SIZE_DEC		"Decrease subtitle text size"
 STRING IDS_SUB_SIZE_INC		"Increase subtitle text size"
 STRING IDS_SUB_USE_INTERNAL		"εσωτερική απόδοση υποτίτλων"

@@ -10421,11 +10421,11 @@ void CMainFrame::OnSubtitleSize(UINT nID)
 			if (GetMediaState() != State_Running) {
 				m_pCAP->Paint(false);
 			}
-		}
 
-		CStringW str;
-		str.Format(L"Subtitle text size: %.0f", s.subdefstyle.fontSize);
-		m_OSD.DisplayMessage(OSD_TOPRIGHT, str);
+			CStringW str;
+			str.Format(ResStr(IDS_SUB_SIZE), (int)s.subdefstyle.fontSize);
+			m_OSD.DisplayMessage(OSD_TOPRIGHT, str);
+		}
 	}
 }
 

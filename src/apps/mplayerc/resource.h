@@ -1404,6 +1404,7 @@
 #define IDS_SUB_COPYTOCLIPBOARD         34016
 #define IDS_SUB_SIZE_DEC                34017
 #define IDS_SUB_SIZE_INC                34018
+#define IDS_SUB_SIZE                    34019
 // subtitle renderer
 #define IDS_SUB_NOT_USE                 34020
 #define IDS_SUB_USE_INTERNAL            34021
