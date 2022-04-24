@@ -1966,7 +1966,7 @@ STRING IDS_SUB_POS_RESTORE		"Восстановить позицию субти�
 STRING IDS_SUB_POS_RIGHT		"Сдвиг позиции субтитров вправо"
 STRING IDS_SUB_POS_UP		"Сдвиг позиции субтитров вверх"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Сохранить пользовательский стиль"
-STRING IDS_SUB_SIZE		"Subtitle text size: %d"
+STRING IDS_SUB_SIZE		"Размер субтитров: %d"
 STRING IDS_SUB_SIZE_DEC		"Уменьшить размер субтитров"
 STRING IDS_SUB_SIZE_INC		"Увеличить размер субтитров"
 STRING IDS_SUB_USE_INTERNAL		"встроенный рендерер субтитров"
