@@ -26,7 +26,6 @@
 #pragma warning(disable: 4005)
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
-	#include "ExtLib/ffmpeg/libavutil/bprint.h"
 	#include <ExtLib/ffmpeg/libavutil/channel_layout.h>
 	#include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
 	#include <ExtLib/ffmpeg/libavutil/opt.h>
@@ -356,15 +355,8 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx->thread_type			= 0;
 
 		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
-			AVBPrint bp = {};
-			av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
-			AVChannelLayout ch_layout = {};
-			av_channel_layout_from_mask(&ch_layout, AV_CH_LAYOUT_STEREO);
-			av_channel_layout_describe_bprint(&ch_layout, &bp);
-
-			av_opt_set(&m_pAVCtx, "downmix", bp.str, 0);
-
-			av_bprint_finalize(&bp, nullptr);
+			int ret = av_opt_set(&m_pAVCtx, "downmix", "stereo", 0);
+			DLogIf(ret < 0, L"CFFAudioDecoder::Init() Set downmix to stereo FAILED!");
 		}
 
 		m_pParser = av_parser_init(codec_id);
