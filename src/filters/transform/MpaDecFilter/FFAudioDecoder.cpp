@@ -355,8 +355,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx->thread_type			= 0;
 
 		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
+#if 0
 			int ret = av_opt_set(&m_pAVCtx, "downmix", "stereo", 0);
 			DLogIf(ret < 0, L"CFFAudioDecoder::Init() Set downmix to stereo FAILED!");
+#else
+			// Let's use the old working way.
+			m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
+#endif
 		}
 
 		m_pParser = av_parser_init(codec_id);
