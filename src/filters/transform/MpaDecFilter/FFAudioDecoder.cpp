@@ -354,14 +354,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx->thread_count			= 1;
 		m_pAVCtx->thread_type			= 0;
 
+		AVDictionary* options = nullptr;
 		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
-#if 0
-			int ret = av_opt_set(&m_pAVCtx, "downmix", "stereo", 0);
-			DLogIf(ret < 0, L"CFFAudioDecoder::Init() Set downmix to stereo FAILED!");
-#else
-			// Let's use the old working way.
-			m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
-#endif
+			int ret = av_dict_set(&options, "downmix", "stereo", 0);
+			DLogIf(ret < 0, L"CFFAudioDecoder::Init() : Set downmix to stereo FAILED!");
 		}
 
 		m_pParser = av_parser_init(codec_id);
@@ -397,12 +393,20 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		}
 
 		avcodec_lock;
-		if (avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr) >= 0) {
+		if (avcodec_open2(m_pAVCtx, m_pAVCodec, &options) >= 0) {
+			if (options) {
+				av_dict_free(&options);
+			}
+
 			m_pFrame = av_frame_alloc();
 			CheckPointer(m_pFrame, false);
 			bRet = true;
 		}
 		avcodec_unlock;
+
+		if (options) {
+			av_dict_free(&options);
+		}
 
 		if (bRet && m_pAVCtx->codec_id == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETU32(m_pAVCtx->extradata) == FCC('fLaC')) {
 			BYTE metadata_last, metadata_type;
