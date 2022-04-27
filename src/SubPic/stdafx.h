@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,4 +34,5 @@
 #include <list>
 
 #include <d3d9.h>
+#include <d3d11_1.h>
 #include "DSUtil/ds_defines.h"

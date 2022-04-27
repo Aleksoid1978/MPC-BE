@@ -47,6 +47,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CoordGeom.cpp" />
+    <ClCompile Include="DX11SubPic.cpp" />
     <ClCompile Include="DX9SubPic.cpp" />
     <ClCompile Include="MemSubPic.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -61,9 +62,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoordGeom.h" />
+    <ClInclude Include="DX11SubPic.h" />
     <ClInclude Include="DX9SubPic.h" />
     <ClInclude Include="ISubPic.h" />
     <ClInclude Include="ISubRender.h" />
+    <ClInclude Include="ISubRender11.h" />
     <ClInclude Include="MemSubPic.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SubPicAllocatorPresenterImpl.h" />
