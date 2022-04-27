@@ -140,16 +140,15 @@ STDMETHODIMP CDX11SubPic::GetDesc(SubPicDesc& spd)
 	D3D11_TEXTURE2D_DESC d3dsd = {};
 	
 	m_pTexture->GetDesc(&d3dsd);
-	if (!(d3dsd.Width >0)) {
+	ASSERT(d3dsd.Format == DXGI_FORMAT_B8G8R8A8_UNORM);
+	if (!d3dsd.Width) {
 		return E_FAIL;
 	}
 
 	spd.type = 0;
 	spd.w = m_size.cx;
 	spd.h = m_size.cy;
-	spd.bpp =
-		d3dsd.Format == D3DFMT_A8R8G8B8 ? 32 :
-		d3dsd.Format == D3DFMT_A4R4G4B4 ? 16 : 0;
+	spd.bpp = 32;
 	spd.pitch = 0;
 	spd.bits = nullptr;
 	spd.vidrect = m_vidrect;
@@ -224,27 +223,22 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 	
 #if 1
 	if (SUCCEEDED(Lock(spd))) {
+		ASSERT(spd.bpp == 32);
 		int h = desc.Height;
 
-		BYTE* ptr = spd.bits + spd.pitch * 0 + (0 * 32 >> 3);
+		BYTE* ptr = spd.bits;
 		while (h-- > 0) {
 			memset_u32(ptr, color, 4 * desc.Width);
 			ptr += spd.pitch;
 		}
 #else
 	if (SUCCEEDED(Lock(spd))) {
+		ASSERT(spd.bpp == 32);
 		int h = m_rcDirty.Height();
-		BYTE* ptr = spd.bits + spd.pitch * m_rcDirty.top + (m_rcDirty.left * spd.bpp >> 3);
-		if (spd.bpp == 16) {
-			while (h-- > 0) {
-				memset_u16(ptr, (unsigned short)color, 2 * m_rcDirty.Width());
-				ptr += spd.pitch;
-			}
-		} else if (spd.bpp == 32) {
-			while (h-- > 0) {
-				memset_u32(ptr, color, 4 * m_rcDirty.Width());
-				ptr += spd.pitch;
-			}
+		BYTE* ptr = spd.bits + spd.pitch * m_rcDirty.top + (m_rcDirty.left * 4);
+		while (h-- > 0) {
+			memset_u32(ptr, color, 4 * m_rcDirty.Width());
+			ptr += spd.pitch;
 		}
 #endif
 		Unlock(NULL);
