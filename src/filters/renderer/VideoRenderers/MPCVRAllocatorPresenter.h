@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2021 see Authors.txt
+ * (C) 2019-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,10 +23,15 @@
 #include "AllocatorCommon.h"
 #include "SubPic/SubPicAllocatorPresenterImpl.h"
 #include "SubPic/ISubRender.h"
+#include <d3d11_1.h>
+#include "SubPic/ISubRender11.h"
 
 namespace DSObjects
 {
-	class CMPCVRAllocatorPresenter : public CSubPicAllocatorPresenterImpl, ISubRenderCallback4
+	class CMPCVRAllocatorPresenter
+		: public CSubPicAllocatorPresenterImpl
+		, ISubRenderCallback4
+		, ISubRender11Callback
 	{
 		CComPtr<IUnknown> m_pMPCVR;
 
@@ -65,6 +70,16 @@ namespace DSObjects
 							   RECT originalVideoRect, RECT viewportRect,
 							   const double videoStretchFactor = 1.0,
 							   int xOffsetInPixels = 0, DWORD flags = 0) override;
+
+
+		// ISubRender11Callback
+		STDMETHODIMP SetDevice11(ID3D11Device1* pD3DDev);
+
+		STDMETHODIMP Render11(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
+							  REFERENCE_TIME atpf, RECT croppedVideoRect,
+							  RECT originalVideoRect, RECT viewportRect,
+							  const double videoStretchFactor = 1.0,
+							  int xOffsetInPixels = 0, DWORD flags = 0) override;
 
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;

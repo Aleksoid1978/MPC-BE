@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2021 see Authors.txt
+ * (C) 2019-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MPCVRAllocatorPresenter.h"
 #include "SubPic/DX9SubPic.h"
+#include "SubPic/DX11SubPic.h"
 #include "SubPic/SubPicQueueImpl.h"
 #include "RenderersSettings.h"
 #include "Variables.h"
@@ -65,6 +66,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, 
 		   QI(ISubRenderCallback2)
 		   QI(ISubRenderCallback3)
 		   QI(ISubRenderCallback4)
+		   QI(ISubRender11Callback)
 		   __super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -141,6 +143,67 @@ HRESULT CMPCVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 	return AlphaBltSubPic(viewportRect, croppedVideoRect, xOffsetInPixels);
 }
 
+// ISubRender11Callback
+
+HRESULT CMPCVRAllocatorPresenter::SetDevice11(ID3D11Device1* pD3DDev)
+{
+	if (!pD3DDev) {
+		// release all resources
+		m_pSubPicQueue.Release();
+		m_pAllocator.Release();
+		return S_OK;
+	}
+
+	CRenderersSettings& rs = GetRenderersSettings();
+
+	CSize screenSize;
+	MONITORINFO mi = { sizeof(MONITORINFO) };
+	if (GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
+		screenSize.SetSize(mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top);
+	}
+	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, screenSize);
+
+	if (m_pAllocator) {
+		m_pAllocator->ChangeDevice(pD3DDev);
+	}
+	else {
+		m_pAllocator = DNew CDX11SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
+		if (!m_pAllocator) {
+			return E_FAIL;
+		}
+	}
+
+	HRESULT hr = S_OK;
+	if (!m_pSubPicQueue) {
+		CAutoLock cAutoLock(this);
+		m_pSubPicQueue = rs.nSubpicCount > 0
+			? (ISubPicQueue*)DNew CSubPicQueue(rs.nSubpicCount, !rs.bSubpicAnimationWhenBuffering, rs.bSubpicAllowDrop, m_pAllocator, &hr)
+			: (ISubPicQueue*)DNew CSubPicQueueNoThread(!rs.bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
+	}
+	else {
+		m_pSubPicQueue->Invalidate();
+	}
+
+	if (SUCCEEDED(hr) && m_pSubPicQueue && m_pSubPicProvider) {
+		m_pSubPicQueue->SetSubPicProvider(m_pSubPicProvider);
+	}
+
+	return hr;
+}
+
+HRESULT CMPCVRAllocatorPresenter::Render11(
+	REFERENCE_TIME rtStart,
+	REFERENCE_TIME rtStop,
+	REFERENCE_TIME atpf,
+	RECT croppedVideoRect,
+	RECT originalVideoRect,
+	RECT viewportRect,
+	const double videoStretchFactor,
+	int xOffsetInPixels, DWORD flags)
+{
+	return RenderEx3(rtStart, rtStop, atpf, croppedVideoRect, originalVideoRect, viewportRect, videoStretchFactor, xOffsetInPixels, flags);
+}
+
 // ISubPicAllocatorPresenter3
 
 STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
@@ -155,6 +218,9 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	if (CComQIPtr<ISubRender> pSR = m_pMPCVR.p) {
 		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
+	}
+	if (CComQIPtr<ISubRender11> pSR11 = m_pMPCVR.p) {
+		VERIFY(SUCCEEDED(pSR11->SetCallback11(this)));
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
