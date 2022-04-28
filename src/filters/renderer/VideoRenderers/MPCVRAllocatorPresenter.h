@@ -73,7 +73,7 @@ namespace DSObjects
 
 
 		// ISubRender11Callback
-		STDMETHODIMP SetDevice11(ID3D11Device1* pD3DDev);
+		STDMETHODIMP SetDevice11(ID3D11Device* pD3DDev);
 
 		STDMETHODIMP Render11(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
 							  REFERENCE_TIME atpf, RECT croppedVideoRect,

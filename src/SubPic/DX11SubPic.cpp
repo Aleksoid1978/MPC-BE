@@ -33,16 +33,6 @@ HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
 {
 	ASSERT(ppVertexBuffer);
 	ASSERT(*ppVertexBuffer == nullptr);
-	
-	/*RECT srcRect;
-	srcRect.left = 0;
-	srcRect.right = 1920;
-	srcRect.bottom = 1080;
-	srcRect.top = 0;
-
-	UINT srcW, srcH;
-	srcW = 1920;
-	srcH = 1080;*/
 	const float src_dx = 1.0f / srcW;
 	const float src_dy = 1.0f / srcH;
 	float src_l = src_dx * srcRect.left;
@@ -126,12 +116,6 @@ CDX11SubPic::~CDX11SubPic()
 STDMETHODIMP_(void*) CDX11SubPic::GetObject()
 {
 	return (void*)m_pTexture;
-	/*CComPtr<IDirect3DTexture9> pTexture;
-	if (SUCCEEDED(m_pTexture->GetContainer(IID_IDirect3DTexture9, (void**)&pTexture))) {
-		return (void*)(IDirect3DTexture9*)pTexture;
-	}
-
-	return NULL;*/
 }
 
 
@@ -188,12 +172,8 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 	D3D11_BOX srcBox = { 0, 0, 0, std::min(srcDesc.Width, dstDesc.Width), std::min(srcDesc.Height, dstDesc.Height), 1 };
 	if (srcDesc.Width != dstDesc.Width || srcDesc.Height != dstDesc.Height)
 		ASSERT(0);
-	//RECT r;
-	//SetRect(&r, 0, 0, std::min(srcDesc.Width, dstDesc.Width), std::min(srcDesc.Height, dstDesc.Height));
-	//POINT p = { 0, 0 };
 	
 	pDeviceContext->CopySubresourceRegion(pDstTex, 0, 0, 0, 0, pSrcTex, 0, &srcBox);
-	//hr = pD3DDev->UpdateSurface(pSrcSurf, &r, pDstSurf, &p);
 
 	return SUCCEEDED(hr) ? S_OK : E_FAIL;
 }
@@ -205,23 +185,12 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 	}
 
 	CComPtr<ID3D11Device> pD3DDev;
-	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	//ID3D11RenderTargetView* pRenderTargetView;
-	m_pTexture->GetDevice(&pD3DDev);
 	D3D11_TEXTURE2D_DESC desc = {};
+	m_pTexture->GetDevice(&pD3DDev);
+	
 	m_pTexture->GetDesc(&desc);
 
-	pD3DDev->GetImmediateContext(&pDeviceContext);
-	if (!pDeviceContext) {
-		return E_FAIL;
-	}
-	//const FLOAT ClearColorInv[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//ID3D11Texture2D* pSrcTex = (ID3D11Texture2D*)GetObject();
-	//HRESULT hr = pD3DDev->CreateRenderTargetView(pSrcTex, nullptr, &pRenderTargetView);
-	//pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColorInv);
 	SubPicDesc spd;
-	
-#if 1
 	if (SUCCEEDED(Lock(spd))) {
 		ASSERT(spd.bpp == 32);
 		int h = desc.Height;
@@ -231,21 +200,8 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 			memset_u32(ptr, color, 4 * desc.Width);
 			ptr += spd.pitch;
 		}
-#else
-	if (SUCCEEDED(Lock(spd))) {
-		ASSERT(spd.bpp == 32);
-		int h = m_rcDirty.Height();
-		BYTE* ptr = spd.bits + spd.pitch * m_rcDirty.top + (m_rcDirty.left * 4);
-		while (h-- > 0) {
-			memset_u32(ptr, color, 4 * m_rcDirty.Width());
-			ptr += spd.pitch;
-		}
-#endif
 		Unlock(NULL);
 	}
-
-	//		HRESULT hr = pD3DDev->ColorFill(m_pTexture, m_rcDirty, color);
-
 	m_rcDirty.SetRectEmpty();
 
 	return S_OK;
@@ -348,6 +304,14 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 
 		float w = (float)d3dsd.Width;
 		float h = (float)d3dsd.Height;
+		D3D11_VIEWPORT vp = {};
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		vp.MaxDepth = 1.0f;
+		vp.Width = d3dsd.Width;
+		vp.Height = d3dsd.Height;
+
+		pDeviceContext->RSSetViewports(1, &vp);
 		CRect src2;
 		src2.left = 0;
 		src2.top = 0;
@@ -360,10 +324,10 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 
 		CreateVertexBuffer(pD3DDev, &pVertexBuffer, w, h, src2);
 		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
-		
 		pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource);
 		pDeviceContext->Draw(4, 0);
 		pVertexBuffer->Release();
+
 		return S_OK;
 	} while (0);
 	return E_FAIL;
@@ -374,13 +338,13 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 // CDX11SubPicAllocator
 //
 
-CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device1* pD3DDev, SIZE maxsize, bool bExternalRenderer)
+CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pD3DDev, SIZE maxsize, bool bExternalRenderer)
 	: CSubPicAllocatorImpl(maxsize, true)
 	, m_pD3DDev(pD3DDev)
 	, m_maxsize(maxsize)
 	, m_bExternalRenderer(bExternalRenderer)
 {
-	m_pD3DDev->GetImmediateContext1(&m_pDeviceContext);
+	m_pD3DDev->GetImmediateContext(&m_pDeviceContext);
 	if (!m_pDeviceContext)
 		ASSERT(0);
 }
@@ -417,7 +381,7 @@ void CDX11SubPicAllocator::ClearCache()
 STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 {
 	ClearCache();
-	CComQIPtr<ID3D11Device1> pD3DDev = pDev;
+	CComQIPtr<ID3D11Device> pD3DDev = pDev;
 	if (!pD3DDev) {
 		return E_NOINTERFACE;
 	}

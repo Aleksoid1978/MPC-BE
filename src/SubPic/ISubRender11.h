@@ -30,7 +30,7 @@ interface ID3D11DeviceContext1;
 DECLARE_INTERFACE_IID_(ISubRender11Callback, IUnknown, "1B430F17-4CB2-4C6B-A850-1847F9677C75")
 {
 	// NULL means release current device, textures and other resources
-	STDMETHOD(SetDevice11)(ID3D11Device1* dev) PURE;
+	STDMETHOD(SetDevice11)(ID3D11Device* dev) PURE;
 
 	// destination video rectangle, will be inside (0, 0)-(width, height)
 	// width,height is the size of the entire output window

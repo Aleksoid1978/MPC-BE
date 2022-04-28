@@ -145,7 +145,7 @@ HRESULT CMPCVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 
 // ISubRender11Callback
 
-HRESULT CMPCVRAllocatorPresenter::SetDevice11(ID3D11Device1* pD3DDev)
+HRESULT CMPCVRAllocatorPresenter::SetDevice11(ID3D11Device* pD3DDev)
 {
 	if (!pD3DDev) {
 		// release all resources
