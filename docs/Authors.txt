@@ -10,6 +10,7 @@ szl/alexins (Software Engineer Technologist) - mpcbe@outlook.com, icq:6531931, R
 v0lt (Admin, Forum moderator, Code) - Russia
 judelaw (Code) - judelaw@mpc-next.ru, Ukraine
 Ivan Shatsky (vector graphics) - ivan@shatsky.net
+Ti-BEN (Code) - https://github.com/tiben20
 
 Inactive:
 ----------

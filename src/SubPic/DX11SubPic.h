@@ -1,7 +1,7 @@
 // EXPERIMENTAL!
 
 /*
- * (C) 2022 Ti-BEN
+ * (C) 2022 see Authors.txt
  * This file is part of MPC-BE.
  *
  * MPC-BE is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ class CDX11SubPicAllocator;
 class CDX11SubPic : public CSubPicImpl
 {
 	CComPtr<ID3D11Texture2D> m_pTexture;
-	ID3D11ShaderResourceView* m_pShaderResource = nullptr;
+	CComPtr<ID3D11ShaderResourceView> m_pShaderResource;
 
 protected:
 	STDMETHODIMP_(void*) GetObject(); // returns ID3D11Texture2D*
@@ -49,8 +49,6 @@ public:
 	STDMETHODIMP Lock(SubPicDesc& spd) override;
 	STDMETHODIMP Unlock(RECT* pDirtyRect) override;
 	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;
-
-	void* GetShaderResource();
 };
 
 // CDX11SubPicAllocator
@@ -62,7 +60,7 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
 
-	bool Alloc(bool fStatic, ISubPic** ppSubPic);
+	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:
 	static CCritSec ms_SurfaceQueueLock;
