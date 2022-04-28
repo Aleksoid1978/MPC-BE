@@ -200,7 +200,7 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 			memset_u32(ptr, color, 4 * desc.Width);
 			ptr += spd.pitch;
 		}
-		Unlock(NULL);
+		Unlock(nullptr);
 	}
 	m_rcDirty.SetRectEmpty();
 
@@ -276,42 +276,41 @@ STDMETHODIMP CDX11SubPic::Unlock(RECT* pDirtyRect)
 
 STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 {
-
-	ASSERT(pTarget == NULL);
+	ASSERT(pTarget == nullptr);
 
 	if (!pSrc || !pDst) {
 		return E_POINTER;
 	}
 	CRect src(*pSrc), dst(*pDst);
-	CComPtr<ID3D11Device> pD3DDev;
-	CComPtr<ID3D11Texture2D> pTexture = (ID3D11Texture2D*)GetObject();
-	
-	CComPtr<ID3D11DeviceContext> pDeviceContext;
 
+	CComPtr<ID3D11Texture2D> pTexture = (ID3D11Texture2D*)GetObject();
+	if (!pTexture) {
+		return E_NOINTERFACE;
+	}
+
+	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11DeviceContext> pDeviceContext;
 	pTexture->GetDevice(&pD3DDev);
 	pD3DDev->GetImmediateContext(&pDeviceContext);
-	
-	if (!pTexture || !pD3DDev)
-		return E_NOINTERFACE;
-
 
 	do {
 		D3D11_TEXTURE2D_DESC d3dsd = {};
 		pTexture->GetDesc(&d3dsd);
-		if (!(d3dsd.Width)) {
+		if (!d3dsd.Width) {
 			break;
 		}
 
-		float w = (float)d3dsd.Width;
-		float h = (float)d3dsd.Height;
-		D3D11_VIEWPORT vp = {};
+		const float w = (float)d3dsd.Width;
+		const float h = (float)d3dsd.Height;
+		D3D11_VIEWPORT vp;
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
-		vp.MaxDepth = 1.0f;
 		vp.Width = d3dsd.Width;
 		vp.Height = d3dsd.Height;
-
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
 		pDeviceContext->RSSetViewports(1, &vp);
+
 		CRect src2;
 		src2.left = 0;
 		src2.top = 0;
@@ -321,17 +320,19 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		UINT Stride = sizeof(VERTEX);
 		UINT Offset = 0;
 		ID3D11Buffer* pVertexBuffer = nullptr;
-
 		CreateVertexBuffer(pD3DDev, &pVertexBuffer, w, h, src2);
 		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
+
 		pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource);
+
 		pDeviceContext->Draw(4, 0);
+
 		pVertexBuffer->Release();
 
 		return S_OK;
 	} while (0);
-	return E_FAIL;
 
+	return E_FAIL;
 }
 
 //
@@ -369,7 +370,7 @@ void CDX11SubPicAllocator::ClearCache()
 		// Clear the allocator of any remaining subpics
 		CAutoLock Lock(&ms_SurfaceQueueLock);
 		for (auto& pSubPic : m_AllocatedSurfaces) {
-			pSubPic->m_pAllocator = NULL;
+			pSubPic->m_pAllocator = nullptr;
 		}
 		m_AllocatedSurfaces.clear();
 		m_FreeSurfaces.clear();
@@ -423,7 +424,7 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	CAutoLock cAutoLock(this);
 
-	*ppSubPic = NULL;
+	*ppSubPic = nullptr;
 
 	CComPtr<ID3D11Texture2D> pTexture;
 
