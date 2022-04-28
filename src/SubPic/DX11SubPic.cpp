@@ -300,27 +300,19 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			break;
 		}
 
-		const float w = (float)d3dsd.Width;
-		const float h = (float)d3dsd.Height;
 		D3D11_VIEWPORT vp;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-		vp.Width = d3dsd.Width;
-		vp.Height = d3dsd.Height;
+		vp.TopLeftX = dst.left;
+		vp.TopLeftY = dst.top;
+		vp.Width    = dst.Width();
+		vp.Height   = dst.Height();
 		vp.MinDepth = 0.0f;
 		vp.MaxDepth = 1.0f;
 		pDeviceContext->RSSetViewports(1, &vp);
 
-		CRect src2;
-		src2.left = 0;
-		src2.top = 0;
-		src2.right = w;
-		src2.bottom = h;
-
 		UINT Stride = sizeof(VERTEX);
 		UINT Offset = 0;
 		ID3D11Buffer* pVertexBuffer = nullptr;
-		CreateVertexBuffer(pD3DDev, &pVertexBuffer, w, h, src2);
+		CreateVertexBuffer(pD3DDev, &pVertexBuffer, d3dsd.Width, d3dsd.Height, src);
 		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 
 		pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource);
