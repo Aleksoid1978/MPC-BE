@@ -69,6 +69,14 @@ HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
 	return hr;
 }
 
+inline void D3DCOLORtoFLOAT4(FLOAT(&float4)[4], const D3DCOLOR color)
+{
+	float4[0] = (float)((color & 0x00FF0000) >> 16) / 255;
+	float4[1] = (float)((color & 0x0000FF00) >> 8) / 255;
+	float4[2] = (float)(color & 0x000000FF) / 255;
+	float4[3] = (float)((color & 0xFF000000) >> 24) / 255;
+}
+
 HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
 {
 	if (!src || !filename) {
@@ -316,7 +324,7 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 	pD3DDev->GetImmediateContext(&pDeviceContext);
 
 	D3D11_MAPPED_SUBRESOURCE mr = {};
-	HRESULT hr = pDeviceContext->Map(m_pTexture, 0, D3D11_MAP_WRITE, 0, &mr);
+	HRESULT hr = pDeviceContext->Map(m_pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
 	if (FAILED(hr)) {
 		return E_FAIL;
 	}
