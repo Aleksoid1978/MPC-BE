@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,9 @@
 //
 
 CDX9SubPic::CDX9SubPic(IDirect3DSurface9* pSurface, CDX9SubPicAllocator *pAllocator, bool bExternalRenderer)
-	: m_pSurface(pSurface), m_pAllocator(pAllocator), m_bExternalRenderer(bExternalRenderer)
+	: m_pSurface(pSurface)
+	, m_pAllocator(pAllocator)
+	, m_bExternalRenderer(bExternalRenderer)
 {
 	D3DSURFACE_DESC d3dsd;
 	ZeroMemory(&d3dsd, sizeof(d3dsd));
@@ -64,25 +66,17 @@ STDMETHODIMP_(void*) CDX9SubPic::GetObject()
 		return (void*)(IDirect3DTexture9*)pTexture;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 STDMETHODIMP CDX9SubPic::GetDesc(SubPicDesc& spd)
 {
-	D3DSURFACE_DESC d3dsd;
-	ZeroMemory(&d3dsd, sizeof(d3dsd));
-	if (FAILED(m_pSurface->GetDesc(&d3dsd))) {
-		return E_FAIL;
-	}
-
-	spd.type = 0;
-	spd.w = m_size.cx;
-	spd.h = m_size.cy;
-	spd.bpp =
-		d3dsd.Format == D3DFMT_A8R8G8B8 ? 32 :
-		d3dsd.Format == D3DFMT_A4R4G4B4 ? 16 : 0;
-	spd.pitch = 0;
-	spd.bits = nullptr;
+	spd.type    = 0;
+	spd.w       = m_size.cx;
+	spd.h       = m_size.cy;
+	spd.bpp     = 32;
+	spd.pitch   = 0;
+	spd.bits    = nullptr;
 	spd.vidrect = m_vidrect;
 
 	return S_OK;
@@ -137,30 +131,24 @@ STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 
 	SubPicDesc spd;
 	if (SUCCEEDED(Lock(spd))) {
+		const int linesize = m_rcDirty.Width() * 4;
 		int h = m_rcDirty.Height();
 
-		BYTE* ptr = spd.bits + spd.pitch*m_rcDirty.top + (m_rcDirty.left*spd.bpp>>3);
+		BYTE* ptr = spd.bits + spd.pitch*m_rcDirty.top + (m_rcDirty.left*4);
 
-		if (spd.bpp == 16) {
-			while (h-- > 0) {
-				memset_u16(ptr, (unsigned short)color, 2 * m_rcDirty.Width());
-				ptr += spd.pitch;
-			}
-		} else if (spd.bpp == 32) {
-			while (h-- > 0) {
-				memset_u32(ptr, color, 4 * m_rcDirty.Width());
-				ptr += spd.pitch;
-			}
+		while (h-- > 0) {
+			memset_u32(ptr, color, linesize);
+			ptr += spd.pitch;
 		}
 		/*
-				DWORD* ptr = (DWORD*)bm.bits;
-				DWORD* end = ptr + bm.h*bm.wBytes/4;
-				while (ptr < end) *ptr++ = color;
+		DWORD* ptr = (DWORD*)bm.bits;
+		DWORD* end = ptr + bm.h*bm.wBytes/4;
+		while (ptr < end) *ptr++ = color;
 		*/
-		Unlock(NULL);
+		Unlock(nullptr);
 	}
 
-	//		HRESULT hr = pD3DDev->ColorFill(m_pSurface, m_rcDirty, color);
+	//HRESULT hr = pD3DDev->ColorFill(m_pSurface, m_rcDirty, color);
 
 	m_rcDirty.SetRectEmpty();
 
@@ -169,26 +157,18 @@ STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 
 STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 {
-	D3DSURFACE_DESC d3dsd;
-	ZeroMemory(&d3dsd, sizeof(d3dsd));
-	if (FAILED(m_pSurface->GetDesc(&d3dsd))) {
-		return E_FAIL;
-	}
-
 	D3DLOCKED_RECT LockedRect;
 	ZeroMemory(&LockedRect, sizeof(LockedRect));
-	if (FAILED(m_pSurface->LockRect(&LockedRect, NULL, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK))) {
+	if (FAILED(m_pSurface->LockRect(&LockedRect, nullptr, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK))) {
 		return E_FAIL;
 	}
 
 	spd.type = 0;
-	spd.w = m_size.cx;
-	spd.h = m_size.cy;
-	spd.bpp =
-		d3dsd.Format == D3DFMT_A8R8G8B8 ? 32 :
-		d3dsd.Format == D3DFMT_A4R4G4B4 ? 16 : 0;
-	spd.pitch = LockedRect.Pitch;
-	spd.bits = (BYTE*)LockedRect.pBits;
+	spd.w       = m_size.cx;
+	spd.h       = m_size.cy;
+	spd.bpp     = 32;
+	spd.pitch   = LockedRect.Pitch;
+	spd.bits    = (BYTE*)LockedRect.pBits;
 	spd.vidrect = m_vidrect;
 
 	return S_OK;
@@ -222,7 +202,7 @@ STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 
 STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 {
-	ASSERT(pTarget == NULL);
+	ASSERT(pTarget == nullptr);
 
 	if (!pSrc || !pDst) {
 		return E_POINTER;
@@ -301,8 +281,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		hr = pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
 		hr = pD3DDev->SetSamplerState(0, D3DSAMP_BORDERCOLOR, m_bInvAlpha ? 0x00000000 : 0xFF000000);
 
-		/*//
-
+		/*
 		D3DCAPS9 d3dcaps9;
 		hr = pD3DDev->GetDeviceCaps(&d3dcaps9);
 		if (d3dcaps9.AlphaCmpCaps & D3DPCMPCAPS_LESS)
@@ -311,23 +290,24 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			hr = pD3DDev->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 			hr = pD3DDev->SetRenderState(D3DRS_ALPHAFUNC, D3DPCMPCAPS_LESS);
 		}
+		*/
 
-		*///
+		hr = pD3DDev->SetPixelShader(nullptr);
 
-		hr = pD3DDev->SetPixelShader(NULL);
-
-		if ((m_bExternalRenderer) && (FAILED(hr = pD3DDev->BeginScene())))
+		if ((m_bExternalRenderer) && (FAILED(hr = pD3DDev->BeginScene()))) {
 			break;
+		}
 
 		hr = pD3DDev->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
 		hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
 
-		if (m_bExternalRenderer)
+		if (m_bExternalRenderer) {
 			hr = pD3DDev->EndScene();
+		}
 
 		//
 
-		pD3DDev->SetTexture(0, NULL);
+		pD3DDev->SetTexture(0, nullptr);
 
 		pD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, abe);
 		pD3DDev->SetRenderState(D3DRS_SRCBLEND, sb);
@@ -371,7 +351,7 @@ void CDX9SubPicAllocator::ClearCache()
 		// Clear the allocator of any remaining subpics
 		CAutoLock Lock(&ms_SurfaceQueueLock);
 		for (auto& pSubPic : m_AllocatedSurfaces) {
-			pSubPic->m_pAllocator = NULL;
+			pSubPic->m_pAllocator = nullptr;
 		}
 		m_AllocatedSurfaces.clear();
 		m_FreeSurfaces.clear();
@@ -391,9 +371,9 @@ STDMETHODIMP CDX9SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	CAutoLock cAutoLock(this);
 	HRESULT hr = S_FALSE;
 	if (m_pD3DDev != pD3DDev) {
-	    ClearCache();
-	    m_pD3DDev = pD3DDev;
-	    hr = __super::ChangeDevice(pDev);
+		ClearCache();
+		m_pD3DDev = pD3DDev;
+		hr = __super::ChangeDevice(pDev);
 	}
 
 	return hr;
@@ -425,7 +405,7 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	CAutoLock cAutoLock(this);
 
-	*ppSubPic = NULL;
+	*ppSubPic = nullptr;
 
 	CComPtr<IDirect3DSurface9> pSurface;
 
@@ -439,7 +419,7 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	if (!pSurface) {
 		CComPtr<IDirect3DTexture9> pTexture;
-		if (FAILED(m_pD3DDev->CreateTexture(m_maxsize.cx, m_maxsize.cy, 1, 0, D3DFMT_A8R8G8B8, fStatic?D3DPOOL_SYSTEMMEM:D3DPOOL_DEFAULT, &pTexture, NULL))) {
+		if (FAILED(m_pD3DDev->CreateTexture(m_maxsize.cx, m_maxsize.cy, 1, 0, D3DFMT_A8R8G8B8, fStatic?D3DPOOL_SYSTEMMEM:D3DPOOL_DEFAULT, &pTexture, nullptr))) {
 			return false;
 		}
 
