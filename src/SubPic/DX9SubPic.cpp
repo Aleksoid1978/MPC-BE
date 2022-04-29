@@ -141,9 +141,9 @@ STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 			ptr += spd.pitch;
 		}
 		/*
-		DWORD* ptr = (DWORD*)bm.bits;
-		DWORD* end = ptr + bm.h*bm.wBytes/4;
-		while (ptr < end) *ptr++ = color;
+		DWORD* ptr = (DWORD*)spd.bits;
+		const DWORD* end = ptr + spd.pitch * spd.h;
+		while (ptr < end) { *ptr++ = color; }
 		*/
 		Unlock(nullptr);
 	}

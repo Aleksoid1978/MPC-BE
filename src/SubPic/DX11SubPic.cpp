@@ -176,18 +176,16 @@ HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2D* pTex
 // CDX11SubPic
 //
 
-CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pSurface, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
-	: m_pTexture(pSurface)
+CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
+	: m_pTexture(pTexture)
 	, m_pAllocator(pAllocator)
 	, m_bExternalRenderer(bExternalRenderer)
 {
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	m_pTexture->GetDesc(&texDesc);
 
-	if (texDesc.Width > 0) {
-		m_maxsize.SetSize(texDesc.Width, texDesc.Height);
-		m_rcDirty.SetRect(0, 0, texDesc.Width, texDesc.Height);
-	}
+	m_maxsize.SetSize(texDesc.Width, texDesc.Height);
+	m_rcDirty.SetRect(0, 0, texDesc.Width, texDesc.Height);
 
 	CComPtr<ID3D11Device> pD3DDev;
 	m_pTexture->GetDevice(&pD3DDev);
@@ -226,10 +224,6 @@ STDMETHODIMP_(void*) CDX11SubPic::GetObject()
 
 STDMETHODIMP CDX11SubPic::GetDesc(SubPicDesc& spd)
 {
-	if (!m_pTexture) {
-		return E_FAIL;
-	}
-
 	spd.type    = 0;
 	spd.w       = m_size.cx;
 	spd.h       = m_size.cy;
@@ -285,21 +279,26 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 		return S_FALSE;
 	}
 
-	D3D11_TEXTURE2D_DESC texDesc = {};
-	m_pTexture->GetDesc(&texDesc);
-
 	SubPicDesc spd;
 	if (SUCCEEDED(Lock(spd))) {
-		ASSERT(spd.bpp == 32);
-		int h = texDesc.Height;
+		const int linesize = m_rcDirty.Width() * 4;
+		int h = m_rcDirty.Height();
 
-		BYTE* ptr = spd.bits;
+		BYTE* ptr = spd.bits + spd.pitch * m_rcDirty.top + (m_rcDirty.left * 4);
+
 		while (h-- > 0) {
-			memset_u32(ptr, color, 4 * texDesc.Width);
+			memset_u32(ptr, color, linesize);
 			ptr += spd.pitch;
 		}
+
+		/*
+		DWORD* ptr = (DWORD*)spd.bits;
+		const DWORD* end = ptr + spd.pitch * spd.h;
+		while (ptr < end) { *ptr++ = color; }
+		*/
 		Unlock(nullptr);
 	}
+
 	m_rcDirty.SetRectEmpty();
 
 	return S_OK;
@@ -316,8 +315,8 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 	m_pTexture->GetDevice(&pD3DDev);
 	pD3DDev->GetImmediateContext(&pDeviceContext);
 
-	D3D11_MAPPED_SUBRESOURCE map = {};
-	HRESULT hr = pDeviceContext->Map(m_pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &map);
+	D3D11_MAPPED_SUBRESOURCE mr = {};
+	HRESULT hr = pDeviceContext->Map(m_pTexture, 0, D3D11_MAP_WRITE, 0, &mr);
 	if (FAILED(hr)) {
 		return E_FAIL;
 	}
@@ -326,8 +325,8 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 	spd.w       = m_size.cx;
 	spd.h       = m_size.cy;
 	spd.bpp     = 32;
-	spd.pitch   = map.RowPitch;
-	spd.bits    = (BYTE*)map.pData;
+	spd.pitch   = mr.RowPitch;
+	spd.bits    = (BYTE*)mr.pData;
 	spd.vidrect = m_vidrect;
 
 	return S_OK;
@@ -539,11 +538,10 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		//verify its the good one
 		texDesc.SampleDesc = { 1, 0 };
+
 		HRESULT hr = m_pD3DDev->CreateTexture2D(&texDesc, nullptr, &pTexture);
-		if (FAILED(hr))
-		{
+		if (FAILED(hr)) {
 			return false;
 		}
 	}

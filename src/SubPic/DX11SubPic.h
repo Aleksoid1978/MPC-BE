@@ -39,7 +39,7 @@ protected:
 public:
 	CDX11SubPicAllocator *m_pAllocator;
 	bool m_bExternalRenderer;
-	CDX11SubPic(ID3D11Texture2D* pSurface, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
+	CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
 	~CDX11SubPic();
 
 	// ISubPic
