@@ -24,6 +24,8 @@
 #include "DX11SubPic.h"
 #include <DirectXMath.h>
 
+#define ENABLE_DUMP_SUBPIC 0
+
 struct VERTEX {
 	DirectX::XMFLOAT3 Pos;
 	DirectX::XMFLOAT2 TexCoord;
@@ -63,6 +65,109 @@ HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
 	D3D11_SUBRESOURCE_DATA InitData = { Vertices, 0, 0 };
 
 	HRESULT hr = pDevice->CreateBuffer(&BufferDesc, &InitData, ppVertexBuffer);
+
+	return hr;
+}
+
+HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
+{
+	if (!src || !filename) {
+		return E_POINTER;
+	}
+
+	if (!src_pitch || !width || !height || bitdepth != 32) {
+		return E_ABORT;
+	}
+
+	const UINT dst_pitch = width * bitdepth / 8;
+	const UINT len = dst_pitch * height;
+	ASSERT(dst_pitch <= src_pitch);
+
+	BITMAPFILEHEADER bfh;
+	bfh.bfType      = 0x4d42;
+	bfh.bfOffBits   = sizeof(bfh) + sizeof(BITMAPINFOHEADER);
+	bfh.bfSize      = bfh.bfOffBits + len;
+	bfh.bfReserved1 = bfh.bfReserved2 = 0;
+
+	BITMAPINFOHEADER bih = {};
+	bih.biSize      = sizeof(BITMAPINFOHEADER);
+	bih.biWidth     = width;
+	bih.biHeight    = -(LONG)height;
+	bih.biBitCount  = bitdepth;
+	bih.biPlanes    = 1;
+	bih.biSizeImage = DIBSIZE(bih);
+
+	ASSERT(len == bih.biSizeImage);
+
+	FILE* fp;
+	if (_wfopen_s(&fp, filename, L"wb") == 0 && fp) {
+		fwrite(&bfh, sizeof(bfh), 1, fp);
+		fwrite(&bih, sizeof(bih), 1, fp);
+
+		if (dst_pitch == src_pitch) {
+			fwrite(src, len, 1, fp);
+		}
+		else if (dst_pitch < src_pitch) {
+			for (UINT y = 0; y < height; ++y) {
+				fwrite(src, dst_pitch, 1, fp);
+				src += src_pitch;
+			}
+		}
+		fclose(fp);
+
+		return S_OK;
+	}
+
+	return E_FAIL;
+}
+
+HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2D* pTexture2D, const wchar_t* filename)
+{
+	D3D11_TEXTURE2D_DESC desc;
+	pTexture2D->GetDesc(&desc);
+
+	if (desc.Format != DXGI_FORMAT_B8G8R8X8_UNORM && desc.Format != DXGI_FORMAT_B8G8R8A8_UNORM) {
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr = S_OK;
+	CComPtr<ID3D11Texture2D> pTexture2DShared;
+
+	if (desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ) {
+		pTexture2DShared = pTexture2D;
+	}
+	else {
+		ID3D11Device* pDevice;
+		pTexture2D->GetDevice(&pDevice);
+
+		D3D11_TEXTURE2D_DESC desc2;
+		desc2.Width = desc.Width;
+		desc2.Height = desc.Height;
+		desc2.MipLevels = 1;
+		desc2.ArraySize = 1;
+		desc2.Format = desc.Format;
+		desc2.SampleDesc = { 1, 0 };
+		desc2.Usage = D3D11_USAGE_STAGING;
+		desc2.BindFlags = 0;
+		desc2.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		desc2.MiscFlags = 0;
+		hr = pDevice->CreateTexture2D(&desc2, nullptr, &pTexture2DShared);
+		pDevice->Release();
+
+		//pDeviceContext->CopyResource(pTexture2DShared, pTexture2D);
+		pDeviceContext->CopySubresourceRegion(pTexture2DShared, 0, 0, 0, 0, pTexture2D, 0, nullptr);
+	}
+
+	if (SUCCEEDED(hr)) {
+		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+		hr = pDeviceContext->Map(pTexture2DShared, 0, D3D11_MAP_READ, 0, &mappedResource);
+
+		if (SUCCEEDED(hr)) {
+			hr = SaveToBMP((BYTE*)mappedResource.pData, mappedResource.RowPitch, desc.Width, desc.Height, 32, filename);
+
+			pDeviceContext->Unmap(pTexture2DShared, 0);
+		}
+	}
 
 	return hr;
 }
@@ -278,6 +383,15 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
 	pTexture->GetDevice(&pD3DDev);
 	pD3DDev->GetImmediateContext(&pDeviceContext);
+
+#if _DEBUG & ENABLE_DUMP_SUBPIC
+	{
+		static int counter = 0;
+		CString filepath;
+		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
+		DumpTexture2D(pDeviceContext, m_pTexture, filepath);
+	}
+#endif
 
 	do {
 		D3D11_TEXTURE2D_DESC texDesc = {};
