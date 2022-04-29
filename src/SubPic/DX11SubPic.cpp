@@ -164,7 +164,9 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 	D3D11_TEXTURE2D_DESC dstDesc;
 	pDstTex->GetDesc(&dstDesc);
 
-	ASSERT(srcDesc.Width == dstDesc.Width && srcDesc.Height == dstDesc.Height);
+	DLogIf(srcDesc.Width != dstDesc.Width || srcDesc.Height != dstDesc.Height,
+		L"CDX11SubPic::CopyTo() - SrcTex(%ux%u) is not equal DstTex(%ux%u)",
+		srcDesc.Width, srcDesc.Height, dstDesc.Width, dstDesc.Height);
 
 	D3D11_BOX srcBox = { 0, 0, 0, std::min(srcDesc.Width, dstDesc.Width), std::min(srcDesc.Height, dstDesc.Height), 1 };
 	pDeviceContext->CopySubresourceRegion(pDstTex, 0, 0, 0, 0, pSrcTex, 0, &srcBox);
