@@ -268,7 +268,7 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 	m_pTexture->GetDevice(&pD3DDev);
 	pD3DDev->GetImmediateContext(&pDeviceContext);
 
-	ID3D11Texture2D* pSrcTex = (ID3D11Texture2D*)GetObject();
+	ID3D11Texture2D* pSrcTex = m_pTexture.p;
 	D3D11_TEXTURE2D_DESC srcDesc;
 	pSrcTex->GetDesc(&srcDesc);
 
@@ -377,7 +377,7 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 	CRect src(*pSrc), dst(*pDst);
 
-	CComPtr<ID3D11Texture2D> pTexture = (ID3D11Texture2D*)GetObject();
+	CComPtr<ID3D11Texture2D> pTexture = m_pTexture;
 	if (!pTexture) {
 		return E_NOINTERFACE;
 	}
@@ -392,42 +392,35 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		static int counter = 0;
 		CString filepath;
 		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
-		DumpTexture2D(pDeviceContext, m_pTexture, filepath);
+		DumpTexture2D(pDeviceContext, pTexture, filepath);
 	}
 #endif
 
-	do {
-		D3D11_TEXTURE2D_DESC texDesc = {};
-		pTexture->GetDesc(&texDesc);
-		if (!texDesc.Width) {
-			break;
-		}
+	D3D11_TEXTURE2D_DESC texDesc = {};
+	pTexture->GetDesc(&texDesc);
 
-		D3D11_VIEWPORT vp;
-		vp.TopLeftX = dst.left;
-		vp.TopLeftY = dst.top;
-		vp.Width    = dst.Width();
-		vp.Height   = dst.Height();
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		pDeviceContext->RSSetViewports(1, &vp);
+	D3D11_VIEWPORT vp;
+	vp.TopLeftX = dst.left;
+	vp.TopLeftY = dst.top;
+	vp.Width    = dst.Width();
+	vp.Height   = dst.Height();
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	pDeviceContext->RSSetViewports(1, &vp);
 
-		UINT Stride = sizeof(VERTEX);
-		UINT Offset = 0;
-		ID3D11Buffer* pVertexBuffer = nullptr;
-		CreateVertexBuffer(pD3DDev, &pVertexBuffer, texDesc.Width, texDesc.Height, src);
-		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
+	UINT Stride = sizeof(VERTEX);
+	UINT Offset = 0;
+	ID3D11Buffer* pVertexBuffer = nullptr;
+	CreateVertexBuffer(pD3DDev, &pVertexBuffer, texDesc.Width, texDesc.Height, src);
+	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 
-		pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource.p);
+	pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource.p);
 
-		pDeviceContext->Draw(4, 0);
+	pDeviceContext->Draw(4, 0);
 
-		pVertexBuffer->Release();
+	pVertexBuffer->Release();
 
-		return S_OK;
-	} while (0);
-
-	return E_FAIL;
+	return S_OK;
 }
 
 //

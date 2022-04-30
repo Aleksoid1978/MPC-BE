@@ -38,7 +38,7 @@ class CDX11SubPic : public CSubPicImpl
 	CComPtr<ID3D11ShaderResourceView> m_pShaderResource;
 
 protected:
-	STDMETHODIMP_(void*) GetObject(); // returns ID3D11Texture2D*
+	STDMETHODIMP_(void*) GetObject() override; // returns ID3D11Texture2D*
 
 public:
 	CDX11SubPicAllocator *m_pAllocator;
