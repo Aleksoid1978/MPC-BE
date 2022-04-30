@@ -178,9 +178,12 @@ STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 {
 	m_pSurface->UnlockRect();
 
+	bool dirtyRecOk = false;
+
 	if (pDirtyRect) {
 		m_rcDirty = *pDirtyRect;
-		if (!((CRect*)pDirtyRect)->IsRectEmpty()) {
+		if (!m_rcDirty.IsRectEmpty()) {
+			dirtyRecOk = true;
 			m_rcDirty.InflateRect(1, 1);
 			m_rcDirty.left &= ~127;
 			m_rcDirty.top &= ~63;
@@ -192,9 +195,11 @@ STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 		m_rcDirty = CRect(CPoint(0, 0), m_size);
 	}
 
-	CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
-	if (pTexture && !((CRect*)pDirtyRect)->IsRectEmpty()) {
-		pTexture->AddDirtyRect(&m_rcDirty);
+	if (dirtyRecOk) {
+		CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
+		if (pTexture) {
+			pTexture->AddDirtyRect(&m_rcDirty);
+		}
 	}
 
 	return S_OK;
