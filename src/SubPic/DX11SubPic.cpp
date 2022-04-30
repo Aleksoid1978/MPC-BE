@@ -375,7 +375,12 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if (!pSrc || !pDst) {
 		return E_POINTER;
 	}
-	CRect src(*pSrc), dst(*pDst);
+	CRect rSrc(*pSrc), rDst(*pDst);
+
+	if (rSrc.IsRectEmpty()) { // or rDst.IsRectEmpty() or m_rcDirty.IsRectEmpty()
+		// optimization for XySubFilter
+		return S_FALSE;
+	}
 
 	CComPtr<ID3D11Texture2D> pTexture = m_pTexture;
 	if (!pTexture) {
@@ -400,10 +405,10 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	pTexture->GetDesc(&texDesc);
 
 	D3D11_VIEWPORT vp;
-	vp.TopLeftX = dst.left;
-	vp.TopLeftY = dst.top;
-	vp.Width    = dst.Width();
-	vp.Height   = dst.Height();
+	vp.TopLeftX = rDst.left;
+	vp.TopLeftY = rDst.top;
+	vp.Width    = rDst.Width();
+	vp.Height   = rDst.Height();
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	pDeviceContext->RSSetViewports(1, &vp);
@@ -411,7 +416,7 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	UINT Stride = sizeof(VERTEX);
 	UINT Offset = 0;
 	ID3D11Buffer* pVertexBuffer = nullptr;
-	CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, src);
+	CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, rSrc);
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 
 	pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource.p);

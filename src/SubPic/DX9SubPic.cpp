@@ -195,8 +195,12 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if (!pSrc || !pDst) {
 		return E_POINTER;
 	}
+	CRect rSrc(*pSrc), rDst(*pDst);
 
-	CRect src(*pSrc), dst(*pDst);
+	if (rSrc.IsRectEmpty()) { // or rDst.IsRectEmpty() or m_rcDirty.IsRectEmpty()
+		// optimization for XySubFilter
+		return S_FALSE;
+	}
 
 	CComPtr<IDirect3DDevice9> pD3DDev;
 	CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
@@ -221,10 +225,10 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			float tu, tv;
 		}
 		pVertices[] = {
-			{(float)dst.left, (float)dst.top, 0.5f, 2.0f, (float)src.left / w, (float)src.top / h},
-			{(float)dst.right, (float)dst.top, 0.5f, 2.0f, (float)src.right / w, (float)src.top / h},
-			{(float)dst.left, (float)dst.bottom, 0.5f, 2.0f, (float)src.left / w, (float)src.bottom / h},
-			{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
+			{(float)rDst.left, (float)rDst.top, 0.5f, 2.0f, (float)rSrc.left / w, (float)rSrc.top / h},
+			{(float)rDst.right, (float)rDst.top, 0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.top / h},
+			{(float)rDst.left, (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.left / w, (float)rSrc.bottom / h},
+			{(float)rDst.right, (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.bottom / h},
 		};
 
 		for (size_t i = 0; i < std::size(pVertices); i++) {
@@ -255,7 +259,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		hr = pD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 		hr = pD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 
-		if (src == dst) {
+		if (rSrc == rDst) {
 			hr = pD3DDev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 			hr = pD3DDev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 		}
