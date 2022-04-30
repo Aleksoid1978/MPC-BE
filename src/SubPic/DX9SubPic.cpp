@@ -120,37 +120,11 @@ STDMETHODIMP CDX9SubPic::CopyTo(ISubPic* pSubPic)
 
 STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 {
+	m_ClearColor = color;
+
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
-
-	CComPtr<IDirect3DDevice9> pD3DDev;
-	if (!m_pSurface || FAILED(m_pSurface->GetDevice(&pD3DDev)) || !pD3DDev) {
-		return E_FAIL;
-	}
-
-	SubPicDesc spd;
-	if (SUCCEEDED(Lock(spd))) {
-		const int linesize = m_rcDirty.Width() * 4;
-		int h = m_rcDirty.Height();
-
-		BYTE* ptr = spd.bits + spd.pitch*m_rcDirty.top + (m_rcDirty.left*4);
-
-		while (h-- > 0) {
-			memset_u32(ptr, color, linesize);
-			ptr += spd.pitch;
-		}
-		/*
-		DWORD* ptr = (DWORD*)spd.bits;
-		const DWORD* end = ptr + spd.pitch * spd.h;
-		while (ptr < end) { *ptr++ = color; }
-		*/
-		Unlock(nullptr);
-	}
-
-	//HRESULT hr = pD3DDev->ColorFill(m_pSurface, m_rcDirty, color);
-
-	m_rcDirty.SetRectEmpty();
 
 	return S_OK;
 }
@@ -161,6 +135,20 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 	ZeroMemory(&LockedRect, sizeof(LockedRect));
 	if (FAILED(m_pSurface->LockRect(&LockedRect, nullptr, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK))) {
 		return E_FAIL;
+	}
+
+	if (!m_rcDirty.IsRectEmpty()) {
+		const int linesize = m_rcDirty.Width() * 4;
+		int h = m_rcDirty.Height();
+
+		BYTE* ptr = (BYTE*)LockedRect.pBits + LockedRect.Pitch * m_rcDirty.top + (m_rcDirty.left * 4);
+
+		while (h-- > 0) {
+			memset_u32(ptr, m_ClearColor, linesize);
+			ptr += LockedRect.Pitch;
+		}
+
+		m_rcDirty.SetRectEmpty();
 	}
 
 	spd.type = 0;
