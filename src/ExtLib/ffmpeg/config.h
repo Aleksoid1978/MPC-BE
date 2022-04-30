@@ -589,6 +589,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_DXVA2 1
 #define CONFIG_NVDEC 1
 #define CONFIG_D3D11VA 1
+#define CONFIG_D3D12 1
 
 #define CONFIG_DIRAC_PARSE 1
 

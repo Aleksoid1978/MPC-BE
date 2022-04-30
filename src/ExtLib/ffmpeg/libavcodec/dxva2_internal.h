@@ -29,7 +29,6 @@
 
 /* define the proper COM entries before forcing desktop APIs */
 #include <objbase.h>
-
 #if CONFIG_DXVA2
 #include "dxva2.h"
 #include "libavutil/hwcontext_dxva2.h"
@@ -37,6 +36,14 @@
 #if CONFIG_D3D11VA
 #include "d3d11va.h"
 #include "libavutil/hwcontext_d3d11va.h"
+#endif
+#if CONFIG_D3D12
+#include "d3d12va.h"
+#ifdef __MINGW32__
+#define  D3D12_COMMAND_LIST_TYPE_VIDEO_DECODE 4
+#define D3D12_RESOURCE_STATE_VIDEO_DECODE_READ  0x10000
+#define D3D12_RESOURCE_STATE_VIDEO_DECODE_WRITE 0x20000
+#endif
 #endif
 #if HAVE_DXVA_H
 /* When targeting WINAPI_FAMILY_PHONE_APP or WINAPI_FAMILY_APP, dxva.h
@@ -61,6 +68,9 @@ typedef union {
 #endif
 #if CONFIG_DXVA2
     struct dxva_context      dxva2;
+#endif
+#if CONFIG_D3D12
+    struct AVD3D12VAContext  d3d12;
 #endif
 } AVDXVAContext;
 
@@ -89,6 +99,20 @@ typedef struct FFDXVASharedContext {
     DXVA2_ConfigPictureDecode       dxva2_config;
 #endif
 
+#if CONFIG_D3D12
+    ID3D12Device1                *d3d12_device;
+
+    ID3D12VideoDecodeCommandList *d3d12_cmd_list;
+    ID3D12CommandAllocator       *d3d12_cmd_allocator;
+    ID3D12CommandQueue           *d3d12_cmd_queue;
+
+    ID3D12VideoDecoderHeap       *d3d12_decoder_heap;
+
+    ID3D12Fence                  *d3dRenderFence;
+    UINT64                       fenceCounter;
+    HANDLE                       fenceReached;
+#endif
+
     // Legacy (but used by code outside of setup)
     // In generic mode, DXVA_CONTEXT() will return a pointer to this.
     AVDXVAContext ctx;
@@ -100,19 +124,21 @@ typedef struct FFDXVASharedContext {
 
 #define D3D11VA_CONTEXT(ctx) (&ctx->d3d11va)
 #define DXVA2_CONTEXT(ctx)   (&ctx->dxva2)
+#define D3D12_CONTEXT(ctx)   (&ctx->d3d12)
 
-#if CONFIG_D3D11VA && CONFIG_DXVA2
-#define DXVA_CONTEXT_WORKAROUND(avctx, ctx)     (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.workaround : ctx->dxva2.workaround)
-#define DXVA_CONTEXT_COUNT(avctx, ctx)          (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.surface_count : ctx->dxva2.surface_count)
-#define DXVA_CONTEXT_DECODER(avctx, ctx)        (ff_dxva2_is_d3d11(avctx) ? (void *)ctx->d3d11va.decoder : (void *)ctx->dxva2.decoder)
-#define DXVA_CONTEXT_REPORT_ID(avctx, ctx)      (*(ff_dxva2_is_d3d11(avctx) ? &ctx->d3d11va.report_id : &ctx->dxva2.report_id))
-#define DXVA_CONTEXT_CFG(avctx, ctx)            (ff_dxva2_is_d3d11(avctx) ? (void *)ctx->d3d11va.cfg : (void *)ctx->dxva2.cfg)
-#define DXVA_CONTEXT_CFG_BITSTREAM(avctx, ctx)  (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.cfg->ConfigBitstreamRaw : ctx->dxva2.cfg->ConfigBitstreamRaw)
-#define DXVA_CONTEXT_CFG_INTRARESID(avctx, ctx) (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.cfg->ConfigIntraResidUnsigned : ctx->dxva2.cfg->ConfigIntraResidUnsigned)
-#define DXVA_CONTEXT_CFG_RESIDACCEL(avctx, ctx) (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.cfg->ConfigResidDiffAccelerator : ctx->dxva2.cfg->ConfigResidDiffAccelerator)
+#if CONFIG_D3D11VA && CONFIG_DXVA2 && CONFIG_D3D12
+#define DXVA_CONTEXT_WORKAROUND(avctx, ctx)     (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.workaround : (ff_dxva2_is_d3d12(avctx) ? ctx->d3d12.workaround : ctx->dxva2.workaround))
+#define DXVA_CONTEXT_COUNT(avctx, ctx)          (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.surface_count : (ff_dxva2_is_d3d12(avctx) ? ctx->d3d12.surfaces.NumTexture2Ds : ctx->dxva2.surface_count))
+#define DXVA_CONTEXT_DECODER(avctx, ctx)        (ff_dxva2_is_d3d11(avctx) ? (void *)ctx->d3d11va.decoder : (ff_dxva2_is_d3d12(avctx) ? (void *)ctx->d3d12.decoder : ctx->dxva2.decoder))
+#define DXVA_CONTEXT_REPORT_ID(avctx, ctx)      (*(ff_dxva2_is_d3d11(avctx) ? &ctx->d3d11va.report_id : (ff_dxva2_is_d3d12(avctx) ? &ctx->d3d12.report_id : &ctx->dxva2.report_id)))
+#define DXVA_CONTEXT_CFG(avctx, ctx)            (ff_dxva2_is_d3d11(avctx) ? (void *)ctx->d3d11va.cfg : ctx->dxva2.cfg)
+#define DXVA_CONTEXT_CFG_BITSTREAM(avctx, ctx)  (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.cfg->ConfigBitstreamRaw : (ff_dxva2_is_d3d12(avctx) ? (2) : ctx->dxva2.cfg->ConfigBitstreamRaw))
+#define DXVA_CONTEXT_CFG_INTRARESID(avctx, ctx) (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.cfg->ConfigIntraResidUnsigned : (ff_dxva2_is_d3d12(avctx) ? (0) : ctx->dxva2.cfg->ConfigIntraResidUnsigned))
+#define DXVA_CONTEXT_CFG_RESIDACCEL(avctx, ctx) (ff_dxva2_is_d3d11(avctx) ? ctx->d3d11va.cfg->ConfigResidDiffAccelerator : (ff_dxva2_is_d3d12(avctx) ? (0) : ctx->dxva2.cfg->ConfigResidDiffAccelerator))
 #define DXVA_CONTEXT_VALID(avctx, ctx)          (DXVA_CONTEXT_DECODER(avctx, ctx) && \
-                                                 DXVA_CONTEXT_CFG(avctx, ctx)     && \
-                                                 (ff_dxva2_is_d3d11(avctx) || ctx->dxva2.surface_count))
+                                                 (DXVA_CONTEXT_CFG(avctx, ctx)     && \
+                                                  (ff_dxva2_is_d3d11(avctx) || ctx->dxva2.surface_count)) || \
+                                                 ff_dxva2_is_d3d12(avctx))
 #elif CONFIG_DXVA2
 #define DXVA_CONTEXT_WORKAROUND(avctx, ctx)     (ctx->dxva2.workaround)
 #define DXVA_CONTEXT_COUNT(avctx, ctx)          (ctx->dxva2.surface_count)
@@ -133,6 +159,15 @@ typedef struct FFDXVASharedContext {
 #define DXVA_CONTEXT_CFG_INTRARESID(avctx, ctx) (ctx->d3d11va.cfg->ConfigIntraResidUnsigned)
 #define DXVA_CONTEXT_CFG_RESIDACCEL(avctx, ctx) (ctx->d3d11va.cfg->ConfigResidDiffAccelerator)
 #define DXVA_CONTEXT_VALID(avctx, ctx)          (ctx->d3d11va.decoder && ctx->d3d11va.cfg)
+#elif CONFIG_D3D12
+#define DXVA_CONTEXT_WORKAROUND(avctx, ctx)     (ctx->d3d12.workaround)
+#define DXVA_CONTEXT_COUNT(avctx, ctx)          (ctx->d3d12.surfaces.NumTexture2Ds)
+#define DXVA_CONTEXT_DECODER(avctx, ctx)        (ctx->d3d12.decoder)
+#define DXVA_CONTEXT_REPORT_ID(avctx, ctx)      (*(&ctx->d3d12.report_id))
+#define DXVA_CONTEXT_CFG_BITSTREAM(avctx, ctx)  (2)
+#define DXVA_CONTEXT_CFG_INTRARESID(avctx, ctx) (0)
+#define DXVA_CONTEXT_CFG_RESIDACCEL(avctx, ctx) (0)
+#define DXVA_CONTEXT_VALID(avctx, ctx)          (ctx->d3d12.decoder)
 #endif
 
 unsigned ff_dxva2_get_surface_index(const AVCodecContext *avctx,
@@ -160,5 +195,6 @@ int ff_dxva2_common_frame_params(AVCodecContext *avctx,
                                  AVBufferRef *hw_frames_ctx);
 
 int ff_dxva2_is_d3d11(const AVCodecContext *avctx);
+int ff_dxva2_is_d3d12(const AVCodecContext *avctx);
 
 #endif /* AVCODEC_DXVA2_INTERNAL_H */

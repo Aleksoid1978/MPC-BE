@@ -791,6 +791,7 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 {
 #define HWACCEL_MAX (CONFIG_H264_DXVA2_HWACCEL + \
                      (CONFIG_H264_D3D11VA_HWACCEL * 2) + \
+					 CONFIG_H264_D3D12_HWACCEL + \
                      CONFIG_H264_NVDEC_HWACCEL + \
                      CONFIG_H264_VAAPI_HWACCEL + \
                      CONFIG_H264_VIDEOTOOLBOX_HWACCEL + \
@@ -878,6 +879,9 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 #if CONFIG_H264_D3D11VA_HWACCEL
             *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
             *fmt++ = AV_PIX_FMT_D3D11;
+#endif
+#if CONFIG_H264_D3D12_HWACCEL
+            *fmt++ = AV_PIX_FMT_D3D12_VLD;
 #endif
 #if CONFIG_H264_VAAPI_HWACCEL
             *fmt++ = AV_PIX_FMT_VAAPI;
@@ -1101,8 +1105,10 @@ static int h264_init_ps(H264Context *h, const H264SliceContext *sl, int first_sl
         || (non_j_pixfmt(h->avctx->pix_fmt) != non_j_pixfmt(get_pixel_format(h, 0))))
         must_reinit = 1;
 
-    if (first_slice && av_cmp_q(sps->sar, h->avctx->sample_aspect_ratio))
+    if (first_slice && av_cmp_q(sps->sar, h->avctx->sample_aspect_ratio)) {
         must_reinit = 1;
+		ff_set_sar(h->avctx, sps->sar);
+	}
 
     if (!h->setup_finished) {
         h->avctx->profile = ff_h264_get_profile(sps);

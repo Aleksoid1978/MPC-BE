@@ -209,6 +209,9 @@ static int update_size(AVCodecContext *avctx, int w, int h)
             *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
             *fmtp++ = AV_PIX_FMT_D3D11;
 #endif
+#if CONFIG_VP9_D3D12_HWACCEL
+            *fmtp++ = AV_PIX_FMT_D3D12_VLD;
+#endif
 #if CONFIG_VP9_NVDEC_HWACCEL
             *fmtp++ = AV_PIX_FMT_CUDA;
 #endif
@@ -1896,6 +1899,9 @@ const FFCodec ff_vp9_decoder = {
 #endif
 #if CONFIG_VP9_D3D11VA2_HWACCEL
                                HWACCEL_D3D11VA2(vp9),
+#endif
+#if CONFIG_VP9_D3D12_HWACCEL
+                               HWACCEL_D3D12(vp9),
 #endif
 #if CONFIG_VP9_NVDEC_HWACCEL
                                HWACCEL_NVDEC(vp9),

@@ -32,6 +32,8 @@
 #include <basestruct.h>
 #include <mpc_defines.h>
 #include <d3d11.h>
+#include <d3d12.h>
+#include <d3d12video.h>
 
 #include "./MSDKDecoder/MSDKDecoder.h"
 

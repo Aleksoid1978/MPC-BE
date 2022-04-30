@@ -5,6 +5,7 @@ SPEEX_DIR     = ../speex
 SOXR_DIR      = ../soxr
 DAV1_DIR      = ../dav1d
 FFNVCODEC_DIR = ../nv-codec-headers/include
+D3D12_DIR     = ../d3d12
 
 ifeq ($(64BIT),yes)
 	PLATFORM = x64
@@ -31,6 +32,7 @@ ARSCRIPT          = $(OBJ_DIR)script.ar
 
 # Compiler and yasm flags
 CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) \
+	   -I$(D3D12_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
@@ -170,6 +172,7 @@ SRCS_LC = \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/d3d11va.c \
+	libavcodec/d3d12va.c \
 	libavcodec/dca.c \
 	libavcodec/dca_core.c \
 	libavcodec/dca_core_bsf.c \

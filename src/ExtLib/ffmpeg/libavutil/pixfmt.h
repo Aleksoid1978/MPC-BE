@@ -340,6 +340,11 @@ enum AVPixelFormat {
     AV_PIX_FMT_NV24,      ///< planar YUV 4:4:4, 24bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
     AV_PIX_FMT_NV42,      ///< as above, but U and V bytes are swapped
 
+    /*
+     * Direct3D12 hardware decoder
+     */
+    AV_PIX_FMT_D3D12_VLD,  ///< HW decoding through Direct3D12, Picture.data[3] contains the resource index in the AVD3D12VAContext.surfaces
+	
     /**
      * Vulkan hardware images.
      *

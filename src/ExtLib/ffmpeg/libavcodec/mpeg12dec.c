@@ -1109,6 +1109,9 @@ static const enum AVPixelFormat mpeg2_hwaccel_pixfmt_list_420[] = {
     AV_PIX_FMT_D3D11VA_VLD,
     AV_PIX_FMT_D3D11,
 #endif
+#if CONFIG_MPEG2_D3D12_HWACCEL
+    AV_PIX_FMT_D3D12_VLD,
+#endif
 #if CONFIG_MPEG2_VAAPI_HWACCEL
     AV_PIX_FMT_VAAPI,
 #endif
@@ -2951,6 +2954,9 @@ const FFCodec ff_mpeg2video_decoder = {
 #endif
 #if CONFIG_MPEG2_D3D11VA2_HWACCEL
                         HWACCEL_D3D11VA2(mpeg2),
+#endif
+#if CONFIG_MPEG2_D3D12_HWACCEL
+                        HWACCEL_D3D12(mpeg2),
 #endif
 #if CONFIG_MPEG2_NVDEC_HWACCEL
                         HWACCEL_NVDEC(mpeg2),
