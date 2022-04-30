@@ -59,7 +59,7 @@ public:
 
 class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 {
-	CComPtr<ID3D11Device> m_pD3DDev;
+	CComPtr<ID3D11Device> m_pDevice;
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
 
@@ -72,7 +72,7 @@ public:
 
 	void GetStats(int &_nFree, int &_nAlloc);
 
-	CDX11SubPicAllocator(ID3D11Device* pD3DDev, SIZE maxsize, bool bExternalRenderer);
+	CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize, bool bExternalRenderer);
 	~CDX11SubPicAllocator();
 	void ClearCache();
 

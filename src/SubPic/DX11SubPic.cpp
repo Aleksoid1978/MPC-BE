@@ -195,20 +195,20 @@ CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAlloc
 	m_maxsize.SetSize(texDesc.Width, texDesc.Height);
 	m_rcDirty.SetRect(0, 0, texDesc.Width, texDesc.Height);
 
-	CComPtr<ID3D11Device> pD3DDev;
-	m_pTexture->GetDevice(&pD3DDev);
+	CComPtr<ID3D11Device> pDevice;
+	m_pTexture->GetDevice(&pDevice);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format = texDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	pD3DDev->CreateShaderResourceView(m_pTexture, &srvDesc, &m_pShaderResource);
+	pDevice->CreateShaderResourceView(m_pTexture, &srvDesc, &m_pShaderResource);
 
 	texDesc.Usage = D3D11_USAGE_STAGING;
 	texDesc.BindFlags = 0;
 	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	pD3DDev->CreateTexture2D(&texDesc, nullptr, &m_pStagingTexture);
+	pDevice->CreateTexture2D(&texDesc, nullptr, &m_pStagingTexture);
 }
 
 CDX11SubPic::~CDX11SubPic()
@@ -263,10 +263,10 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 		return E_FAIL;
 	}
 
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	m_pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	m_pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
 	ID3D11Texture2D* pSrcTex = m_pTexture.p;
 	D3D11_TEXTURE2D_DESC srcDesc;
@@ -303,10 +303,10 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 		return E_FAIL;
 	}
 
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	m_pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	m_pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
 	D3D11_MAPPED_SUBRESOURCE mr = {};
 	HRESULT hr = pDeviceContext->Map(m_pStagingTexture, 0, D3D11_MAP_WRITE, 0, &mr);
@@ -341,10 +341,10 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 
 STDMETHODIMP CDX11SubPic::Unlock(RECT* pDirtyRect)
 {
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	m_pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	m_pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
 	pDeviceContext->Unmap(m_pStagingTexture, 0);
 
@@ -382,10 +382,10 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		return E_NOINTERFACE;
 	}
 
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
 #if _DEBUG & ENABLE_DUMP_SUBPIC
 	{
@@ -411,7 +411,7 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	UINT Stride = sizeof(VERTEX);
 	UINT Offset = 0;
 	ID3D11Buffer* pVertexBuffer = nullptr;
-	CreateVertexBuffer(pD3DDev, &pVertexBuffer, texDesc.Width, texDesc.Height, src);
+	CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, src);
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 
 	pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource.p);
@@ -427,9 +427,9 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 // CDX11SubPicAllocator
 //
 
-CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pD3DDev, SIZE maxsize, bool bExternalRenderer)
+CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize, bool bExternalRenderer)
 	: CSubPicAllocatorImpl(maxsize, true)
-	, m_pD3DDev(pD3DDev)
+	, m_pDevice(pDevice)
 	, m_maxsize(maxsize)
 	, m_bExternalRenderer(bExternalRenderer)
 {
@@ -467,16 +467,16 @@ void CDX11SubPicAllocator::ClearCache()
 STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 {
 	ClearCache();
-	CComQIPtr<ID3D11Device> pD3DDev = pDev;
-	if (!pD3DDev) {
+	CComQIPtr<ID3D11Device> pDevice = pDev;
+	if (!pDevice) {
 		return E_NOINTERFACE;
 	}
 
 	CAutoLock cAutoLock(this);
 	HRESULT hr = S_FALSE;
-	if (m_pD3DDev != pD3DDev) {
+	if (m_pDevice != pDevice) {
 		ClearCache();
-		m_pD3DDev = pD3DDev;
+		m_pDevice = pDevice;
 		hr = __super::ChangeDevice(pDev);
 	}
 
@@ -534,7 +534,7 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 		texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		texDesc.SampleDesc = { 1, 0 };
 
-		HRESULT hr = m_pD3DDev->CreateTexture2D(&texDesc, nullptr, &pTexture);
+		HRESULT hr = m_pDevice->CreateTexture2D(&texDesc, nullptr, &pTexture);
 		if (FAILED(hr)) {
 			return false;
 		}
