@@ -204,6 +204,11 @@ CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAlloc
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	pD3DDev->CreateShaderResourceView(m_pTexture, &srvDesc, &m_pShaderResource);
+
+	texDesc.Usage = D3D11_USAGE_STAGING;
+	texDesc.BindFlags = 0;
+	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	pD3DDev->CreateTexture2D(&texDesc, nullptr, &m_pStagingTexture);
 }
 
 CDX11SubPic::~CDX11SubPic()
@@ -283,38 +288,18 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 
 STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 {
+	m_ClearColor = color;
+
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
-
-	SubPicDesc spd;
-	if (SUCCEEDED(Lock(spd))) {
-		const int linesize = m_rcDirty.Width() * 4;
-		int h = m_rcDirty.Height();
-
-		BYTE* ptr = spd.bits + spd.pitch * m_rcDirty.top + (m_rcDirty.left * 4);
-
-		while (h-- > 0) {
-			memset_u32(ptr, color, linesize);
-			ptr += spd.pitch;
-		}
-
-		/*
-		DWORD* ptr = (DWORD*)spd.bits;
-		const DWORD* end = ptr + spd.pitch * spd.h;
-		while (ptr < end) { *ptr++ = color; }
-		*/
-		Unlock(nullptr);
-	}
-
-	m_rcDirty.SetRectEmpty();
 
 	return S_OK;
 }
 
 STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 {
-	if (!m_pTexture) {
+	if (!m_pTexture || !m_pStagingTexture) {
 		return E_FAIL;
 	}
 
@@ -324,9 +309,23 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 	pD3DDev->GetImmediateContext(&pDeviceContext);
 
 	D3D11_MAPPED_SUBRESOURCE mr = {};
-	HRESULT hr = pDeviceContext->Map(m_pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+	HRESULT hr = pDeviceContext->Map(m_pStagingTexture, 0, D3D11_MAP_WRITE, 0, &mr);
 	if (FAILED(hr)) {
 		return E_FAIL;
+	}
+
+	if (!m_rcDirty.IsRectEmpty()) {
+		const int linesize = m_rcDirty.Width() * 4;
+		int h = m_rcDirty.Height();
+
+		BYTE* ptr = (BYTE*)mr.pData + mr.RowPitch * m_rcDirty.top + (m_rcDirty.left * 4);
+
+		while (h-- > 0) {
+			memset_u32(ptr, m_ClearColor, linesize);
+			ptr += mr.RowPitch;
+		}
+
+		m_rcDirty.SetRectEmpty();
 	}
 
 	spd.type    = 0;
@@ -347,27 +346,24 @@ STDMETHODIMP CDX11SubPic::Unlock(RECT* pDirtyRect)
 	m_pTexture->GetDevice(&pD3DDev);
 	pD3DDev->GetImmediateContext(&pDeviceContext);
 
-	pDeviceContext->Unmap(m_pTexture, 0);
+	pDeviceContext->Unmap(m_pStagingTexture, 0);
 
 	if (pDirtyRect) {
 		m_rcDirty = *pDirtyRect;
-		if (!((CRect*)pDirtyRect)->IsRectEmpty()) {
+		if (!m_rcDirty.IsRectEmpty()) {
 			m_rcDirty.InflateRect(1, 1);
 			m_rcDirty.left &= ~127;
 			m_rcDirty.top &= ~63;
 			m_rcDirty.right = (m_rcDirty.right + 127) & ~127;
 			m_rcDirty.bottom = (m_rcDirty.bottom + 63) & ~63;
 			m_rcDirty &= CRect(CPoint(0, 0), m_size);
+
+			D3D11_BOX srcBox = { m_rcDirty.left, m_rcDirty.top, 0, m_rcDirty.right, m_rcDirty.bottom, 1 };
+			pDeviceContext->CopySubresourceRegion(m_pTexture, 0, m_rcDirty.left, m_rcDirty.top, 0, m_pStagingTexture, 0, &srcBox);
 		}
 	} else {
 		m_rcDirty = CRect(CPoint(0, 0), m_size);
 	}
-
-	//CComPtr<ID3D11Texture2D> pTexture = (ID3D11Texture2D*)GetObject();
-	//TODO don't know the equivalence in d3d11 and d3d12
-	//if (pTexture && !((CRect*)pDirtyRect)->IsRectEmpty()) {
-	//	pTexture->AddDirtyRect(&m_rcDirty);
-	//}
 
 	return S_OK;
 }
@@ -534,9 +530,9 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	if (!pTexture) {
 		D3D11_TEXTURE2D_DESC texDesc = {};
-		texDesc.Usage = D3D11_USAGE_DYNAMIC;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 		texDesc.Width = m_maxsize.cx;
 		texDesc.Height = m_maxsize.cy;

@@ -30,6 +30,10 @@ class CDX11SubPicAllocator;
 
 class CDX11SubPic : public CSubPicImpl
 {
+	DWORD m_ClearColor = 0xff000000;
+
+	CComPtr<ID3D11Texture2D> m_pStagingTexture;
+
 	CComPtr<ID3D11Texture2D> m_pTexture;
 	CComPtr<ID3D11ShaderResourceView> m_pShaderResource;
 
