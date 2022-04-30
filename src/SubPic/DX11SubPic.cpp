@@ -444,9 +444,6 @@ CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pD3DDev, SIZE maxsize, 
 	, m_maxsize(maxsize)
 	, m_bExternalRenderer(bExternalRenderer)
 {
-	m_pD3DDev->GetImmediateContext(&m_pDeviceContext);
-	if (!m_pDeviceContext)
-		ASSERT(0);
 }
 
 CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;

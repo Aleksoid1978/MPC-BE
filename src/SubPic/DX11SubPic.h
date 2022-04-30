@@ -56,7 +56,6 @@ public:
 class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 {
 	CComPtr<ID3D11Device> m_pD3DDev;
-	CComPtr<ID3D11DeviceContext> m_pDeviceContext;
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
 
