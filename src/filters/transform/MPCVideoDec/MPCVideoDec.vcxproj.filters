@@ -28,6 +28,9 @@
     <Filter Include="D3D11Decoder">
       <UniqueIdentifier>{4685cb13-4cc9-4ce8-895a-42a6b2c1fdb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3D12Decoder">
+      <UniqueIdentifier>{d37727d6-ee1f-4e6f-b9f6-ca1a1de112a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ffmpegContext.cpp">
@@ -92,6 +95,18 @@
     </ClCompile>
     <ClCompile Include="DxgiUtils.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D12Decoder\D3D12SurfaceAllocator.cpp">
+      <Filter>D3D12Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D12Decoder\D3D12Decoder.cpp">
+      <Filter>D3D12Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D12Decoder\D3D12Format.cpp">
+      <Filter>D3D12Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D12Decoder\D3D12Commands.cpp">
+      <Filter>D3D12Decoder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +187,21 @@
     </ClInclude>
     <ClInclude Include="DxgiUtils.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Decoder\D3D12SurfaceAllocator.h">
+      <Filter>D3D12Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Decoder\D3D12Decoder.h">
+      <Filter>D3D12Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Decoder\D3D12Commands.h">
+      <Filter>D3D12Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Decoder\D3D12Format.h">
+      <Filter>D3D12Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Decoder\ID3D12VideoMemoryConfiguration.h">
+      <Filter>D3D12Decoder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

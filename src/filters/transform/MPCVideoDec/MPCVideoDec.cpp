@@ -25,7 +25,7 @@
 #include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"
 #include "./D3D11Decoder/D3D11Decoder.h"
-
+#include "./D3D12Decoder/d3d12dec.h"
 #include "DSUtil/CPUInfo.h"
 #include "DSUtil/D3D9Helper.h"
 #include "DSUtil/DSUtil.h"
