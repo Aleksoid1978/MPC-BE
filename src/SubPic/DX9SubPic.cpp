@@ -120,37 +120,11 @@ STDMETHODIMP CDX9SubPic::CopyTo(ISubPic* pSubPic)
 
 STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
 {
+	m_ClearColor = color;
+
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
-
-	CComPtr<IDirect3DDevice9> pD3DDev;
-	if (!m_pSurface || FAILED(m_pSurface->GetDevice(&pD3DDev)) || !pD3DDev) {
-		return E_FAIL;
-	}
-
-	SubPicDesc spd;
-	if (SUCCEEDED(Lock(spd))) {
-		const int linesize = m_rcDirty.Width() * 4;
-		int h = m_rcDirty.Height();
-
-		BYTE* ptr = spd.bits + spd.pitch*m_rcDirty.top + (m_rcDirty.left*4);
-
-		while (h-- > 0) {
-			memset_u32(ptr, color, linesize);
-			ptr += spd.pitch;
-		}
-		/*
-		DWORD* ptr = (DWORD*)spd.bits;
-		const DWORD* end = ptr + spd.pitch * spd.h;
-		while (ptr < end) { *ptr++ = color; }
-		*/
-		Unlock(nullptr);
-	}
-
-	//HRESULT hr = pD3DDev->ColorFill(m_pSurface, m_rcDirty, color);
-
-	m_rcDirty.SetRectEmpty();
 
 	return S_OK;
 }
@@ -161,6 +135,20 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 	ZeroMemory(&LockedRect, sizeof(LockedRect));
 	if (FAILED(m_pSurface->LockRect(&LockedRect, nullptr, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK))) {
 		return E_FAIL;
+	}
+
+	if (!m_rcDirty.IsRectEmpty()) {
+		const int linesize = m_rcDirty.Width() * 4;
+		int h = m_rcDirty.Height();
+
+		BYTE* ptr = (BYTE*)LockedRect.pBits + LockedRect.Pitch * m_rcDirty.top + (m_rcDirty.left * 4);
+
+		while (h-- > 0) {
+			memset_u32(ptr, m_ClearColor, linesize);
+			ptr += LockedRect.Pitch;
+		}
+
+		m_rcDirty.SetRectEmpty();
 	}
 
 	spd.type = 0;
@@ -180,21 +168,21 @@ STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 
 	if (pDirtyRect) {
 		m_rcDirty = *pDirtyRect;
-		if (!((CRect*)pDirtyRect)->IsRectEmpty()) {
+		if (!m_rcDirty.IsRectEmpty()) {
 			m_rcDirty.InflateRect(1, 1);
 			m_rcDirty.left &= ~127;
 			m_rcDirty.top &= ~63;
 			m_rcDirty.right = (m_rcDirty.right + 127) & ~127;
 			m_rcDirty.bottom = (m_rcDirty.bottom + 63) & ~63;
 			m_rcDirty &= CRect(CPoint(0, 0), m_size);
+
+			CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
+			if (pTexture) {
+				pTexture->AddDirtyRect(&m_rcDirty);
+			}
 		}
 	} else {
 		m_rcDirty = CRect(CPoint(0, 0), m_size);
-	}
-
-	CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
-	if (pTexture && !((CRect*)pDirtyRect)->IsRectEmpty()) {
-		pTexture->AddDirtyRect(&m_rcDirty);
 	}
 
 	return S_OK;
@@ -207,8 +195,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if (!pSrc || !pDst) {
 		return E_POINTER;
 	}
-
-	CRect src(*pSrc), dst(*pDst);
+	CRect rSrc(*pSrc), rDst(*pDst);
 
 	CComPtr<IDirect3DDevice9> pD3DDev;
 	CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
@@ -233,10 +220,10 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			float tu, tv;
 		}
 		pVertices[] = {
-			{(float)dst.left, (float)dst.top, 0.5f, 2.0f, (float)src.left / w, (float)src.top / h},
-			{(float)dst.right, (float)dst.top, 0.5f, 2.0f, (float)src.right / w, (float)src.top / h},
-			{(float)dst.left, (float)dst.bottom, 0.5f, 2.0f, (float)src.left / w, (float)src.bottom / h},
-			{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
+			{(float)rDst.left, (float)rDst.top, 0.5f, 2.0f, (float)rSrc.left / w, (float)rSrc.top / h},
+			{(float)rDst.right, (float)rDst.top, 0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.top / h},
+			{(float)rDst.left, (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.left / w, (float)rSrc.bottom / h},
+			{(float)rDst.right, (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.bottom / h},
 		};
 
 		for (size_t i = 0; i < std::size(pVertices); i++) {
@@ -267,7 +254,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		hr = pD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 		hr = pD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 
-		if (src == dst) {
+		if (rSrc == rDst) {
 			hr = pD3DDev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 			hr = pD3DDev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 		}

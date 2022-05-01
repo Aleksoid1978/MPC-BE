@@ -29,6 +29,8 @@
 class CDX9SubPicAllocator;
 class CDX9SubPic : public CSubPicImpl
 {
+	DWORD m_ClearColor = 0xff000000;
+
 	CComPtr<IDirect3DSurface9> m_pSurface;
 
 protected:

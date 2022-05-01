@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -115,6 +115,11 @@ STDMETHODIMP CSubPicImpl::GetDirtyRect(RECT* pDirtyRect)
 
 STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPositionRelative, CPoint ShiftPos, RECT* pRcSource, RECT* pRcDest, int xOffsetInPixels, const BOOL bUseSpecialCase) const
 {
+	if (m_rcDirty.IsRectEmpty()) {
+		// for some reason needed for XySubFilter
+		return E_ABORT;
+	}
+
 	CheckPointer(pRcSource, E_POINTER);
 	CheckPointer(pRcDest, E_POINTER);
 

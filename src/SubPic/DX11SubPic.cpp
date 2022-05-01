@@ -195,15 +195,20 @@ CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAlloc
 	m_maxsize.SetSize(texDesc.Width, texDesc.Height);
 	m_rcDirty.SetRect(0, 0, texDesc.Width, texDesc.Height);
 
-	CComPtr<ID3D11Device> pD3DDev;
-	m_pTexture->GetDevice(&pD3DDev);
+	CComPtr<ID3D11Device> pDevice;
+	m_pTexture->GetDevice(&pDevice);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format = texDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	pD3DDev->CreateShaderResourceView(m_pTexture, &srvDesc, &m_pShaderResource);
+	pDevice->CreateShaderResourceView(m_pTexture, &srvDesc, &m_pShaderResource);
+
+	texDesc.Usage = D3D11_USAGE_STAGING;
+	texDesc.BindFlags = 0;
+	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	pDevice->CreateTexture2D(&texDesc, nullptr, &m_pStagingTexture);
 }
 
 CDX11SubPic::~CDX11SubPic()
@@ -258,12 +263,12 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 		return E_FAIL;
 	}
 
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	m_pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	m_pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
-	ID3D11Texture2D* pSrcTex = (ID3D11Texture2D*)GetObject();
+	ID3D11Texture2D* pSrcTex = m_pTexture.p;
 	D3D11_TEXTURE2D_DESC srcDesc;
 	pSrcTex->GetDesc(&srcDesc);
 
@@ -283,50 +288,44 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 
 STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 {
+	m_ClearColor = color;
+
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
-
-	SubPicDesc spd;
-	if (SUCCEEDED(Lock(spd))) {
-		const int linesize = m_rcDirty.Width() * 4;
-		int h = m_rcDirty.Height();
-
-		BYTE* ptr = spd.bits + spd.pitch * m_rcDirty.top + (m_rcDirty.left * 4);
-
-		while (h-- > 0) {
-			memset_u32(ptr, color, linesize);
-			ptr += spd.pitch;
-		}
-
-		/*
-		DWORD* ptr = (DWORD*)spd.bits;
-		const DWORD* end = ptr + spd.pitch * spd.h;
-		while (ptr < end) { *ptr++ = color; }
-		*/
-		Unlock(nullptr);
-	}
-
-	m_rcDirty.SetRectEmpty();
 
 	return S_OK;
 }
 
 STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 {
-	if (!m_pTexture) {
+	if (!m_pTexture || !m_pStagingTexture) {
 		return E_FAIL;
 	}
 
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	m_pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	m_pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
 	D3D11_MAPPED_SUBRESOURCE mr = {};
-	HRESULT hr = pDeviceContext->Map(m_pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+	HRESULT hr = pDeviceContext->Map(m_pStagingTexture, 0, D3D11_MAP_WRITE, 0, &mr);
 	if (FAILED(hr)) {
 		return E_FAIL;
+	}
+
+	if (!m_rcDirty.IsRectEmpty()) {
+		const int linesize = m_rcDirty.Width() * 4;
+		int h = m_rcDirty.Height();
+
+		BYTE* ptr = (BYTE*)mr.pData + mr.RowPitch * m_rcDirty.top + (m_rcDirty.left * 4);
+
+		while (h-- > 0) {
+			memset_u32(ptr, m_ClearColor, linesize);
+			ptr += mr.RowPitch;
+		}
+
+		m_rcDirty.SetRectEmpty();
 	}
 
 	spd.type    = 0;
@@ -342,32 +341,29 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 
 STDMETHODIMP CDX11SubPic::Unlock(RECT* pDirtyRect)
 {
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	m_pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	m_pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
-	pDeviceContext->Unmap(m_pTexture, 0);
+	pDeviceContext->Unmap(m_pStagingTexture, 0);
 
 	if (pDirtyRect) {
 		m_rcDirty = *pDirtyRect;
-		if (!((CRect*)pDirtyRect)->IsRectEmpty()) {
+		if (!m_rcDirty.IsRectEmpty()) {
 			m_rcDirty.InflateRect(1, 1);
 			m_rcDirty.left &= ~127;
 			m_rcDirty.top &= ~63;
 			m_rcDirty.right = (m_rcDirty.right + 127) & ~127;
 			m_rcDirty.bottom = (m_rcDirty.bottom + 63) & ~63;
 			m_rcDirty &= CRect(CPoint(0, 0), m_size);
+
+			D3D11_BOX srcBox = { m_rcDirty.left, m_rcDirty.top, 0, m_rcDirty.right, m_rcDirty.bottom, 1 };
+			pDeviceContext->CopySubresourceRegion(m_pTexture, 0, m_rcDirty.left, m_rcDirty.top, 0, m_pStagingTexture, 0, &srcBox);
 		}
 	} else {
 		m_rcDirty = CRect(CPoint(0, 0), m_size);
 	}
-
-	//CComPtr<ID3D11Texture2D> pTexture = (ID3D11Texture2D*)GetObject();
-	//TODO don't know the equivalence in d3d11 and d3d12
-	//if (pTexture && !((CRect*)pDirtyRect)->IsRectEmpty()) {
-	//	pTexture->AddDirtyRect(&m_rcDirty);
-	//}
 
 	return S_OK;
 }
@@ -379,74 +375,65 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if (!pSrc || !pDst) {
 		return E_POINTER;
 	}
-	CRect src(*pSrc), dst(*pDst);
+	CRect rSrc(*pSrc), rDst(*pDst);
 
-	CComPtr<ID3D11Texture2D> pTexture = (ID3D11Texture2D*)GetObject();
+	CComPtr<ID3D11Texture2D> pTexture = m_pTexture;
 	if (!pTexture) {
 		return E_NOINTERFACE;
 	}
 
-	CComPtr<ID3D11Device> pD3DDev;
+	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	pTexture->GetDevice(&pD3DDev);
-	pD3DDev->GetImmediateContext(&pDeviceContext);
+	pTexture->GetDevice(&pDevice);
+	pDevice->GetImmediateContext(&pDeviceContext);
 
 #if _DEBUG & ENABLE_DUMP_SUBPIC
 	{
 		static int counter = 0;
 		CString filepath;
 		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
-		DumpTexture2D(pDeviceContext, m_pTexture, filepath);
+		DumpTexture2D(pDeviceContext, pTexture, filepath);
 	}
 #endif
 
-	do {
-		D3D11_TEXTURE2D_DESC texDesc = {};
-		pTexture->GetDesc(&texDesc);
-		if (!texDesc.Width) {
-			break;
-		}
+	D3D11_TEXTURE2D_DESC texDesc = {};
+	pTexture->GetDesc(&texDesc);
 
-		D3D11_VIEWPORT vp;
-		vp.TopLeftX = dst.left;
-		vp.TopLeftY = dst.top;
-		vp.Width    = dst.Width();
-		vp.Height   = dst.Height();
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		pDeviceContext->RSSetViewports(1, &vp);
+	D3D11_VIEWPORT vp;
+	vp.TopLeftX = rDst.left;
+	vp.TopLeftY = rDst.top;
+	vp.Width    = rDst.Width();
+	vp.Height   = rDst.Height();
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	pDeviceContext->RSSetViewports(1, &vp);
 
-		UINT Stride = sizeof(VERTEX);
-		UINT Offset = 0;
-		ID3D11Buffer* pVertexBuffer = nullptr;
-		CreateVertexBuffer(pD3DDev, &pVertexBuffer, texDesc.Width, texDesc.Height, src);
-		pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
+	UINT Stride = sizeof(VERTEX);
+	UINT Offset = 0;
+	ID3D11Buffer* pVertexBuffer = nullptr;
+	CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, rSrc);
+	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
+	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-		pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource.p);
+	pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResource.p);
 
-		pDeviceContext->Draw(4, 0);
+	pDeviceContext->Draw(4, 0);
 
-		pVertexBuffer->Release();
+	pVertexBuffer->Release();
 
-		return S_OK;
-	} while (0);
-
-	return E_FAIL;
+	return S_OK;
 }
 
 //
 // CDX11SubPicAllocator
 //
 
-CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pD3DDev, SIZE maxsize, bool bExternalRenderer)
+CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize, bool bExternalRenderer)
 	: CSubPicAllocatorImpl(maxsize, true)
-	, m_pD3DDev(pD3DDev)
+	, m_pDevice(pDevice)
 	, m_maxsize(maxsize)
 	, m_bExternalRenderer(bExternalRenderer)
 {
-	m_pD3DDev->GetImmediateContext(&m_pDeviceContext);
-	if (!m_pDeviceContext)
-		ASSERT(0);
 }
 
 CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
@@ -481,16 +468,16 @@ void CDX11SubPicAllocator::ClearCache()
 STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 {
 	ClearCache();
-	CComQIPtr<ID3D11Device> pD3DDev = pDev;
-	if (!pD3DDev) {
+	CComQIPtr<ID3D11Device> pDevice = pDev;
+	if (!pDevice) {
 		return E_NOINTERFACE;
 	}
 
 	CAutoLock cAutoLock(this);
 	HRESULT hr = S_FALSE;
-	if (m_pD3DDev != pD3DDev) {
+	if (m_pDevice != pDevice) {
 		ClearCache();
-		m_pD3DDev = pD3DDev;
+		m_pDevice = pDevice;
 		hr = __super::ChangeDevice(pDev);
 	}
 
@@ -537,9 +524,9 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	if (!pTexture) {
 		D3D11_TEXTURE2D_DESC texDesc = {};
-		texDesc.Usage = D3D11_USAGE_DYNAMIC;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 		texDesc.Width = m_maxsize.cx;
 		texDesc.Height = m_maxsize.cy;
@@ -548,7 +535,7 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 		texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		texDesc.SampleDesc = { 1, 0 };
 
-		HRESULT hr = m_pD3DDev->CreateTexture2D(&texDesc, nullptr, &pTexture);
+		HRESULT hr = m_pDevice->CreateTexture2D(&texDesc, nullptr, &pTexture);
 		if (FAILED(hr)) {
 			return false;
 		}
