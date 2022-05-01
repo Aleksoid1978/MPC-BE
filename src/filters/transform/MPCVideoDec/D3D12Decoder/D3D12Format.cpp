@@ -19,11 +19,11 @@
 
 #include "stdafx.h"
 #include "D3D12Format.h"
-#include "../dxva2/dxva_common.h"
+#include "DSUtil/DSUtil.h"
 #include <memory>
 CD3D12Format::~CD3D12Format()
 {
-    SafeRelease(&m_pVideoDevice);
+    SAFE_RELEASE(m_pVideoDevice);
 }
 
 void CD3D12Format::CheckFeatureSupport(D3D12_FEATURE_VIDEO FeatureVideo, void* pFeatureSupportData, UINT FeatureSupportDataSize)
@@ -125,7 +125,7 @@ STDMETHODIMP CD3D12Format::FindVideoServiceConversion(struct AVCodecContext* c, 
     }
     D3D12_FEATURE_DATA_VIDEO_DECODE_SUPPORT decode_support = { 0 };
 
-    
+#if 0
     for (unsigned i = 0; dxva_modes[i].name; i++)
     {
         const dxva_mode_t* mode = &dxva_modes[i];
@@ -173,7 +173,9 @@ STDMETHODIMP CD3D12Format::FindVideoServiceConversion(struct AVCodecContext* c, 
             return S_OK;
         }
     }
-       
+#else
+
+#endif
     
     return E_FAIL;
 }

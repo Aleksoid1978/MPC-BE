@@ -21,6 +21,7 @@
 #include <d3d12video.h>
 #include <dxgi1_3.h>
 #include <vector>
+#include <list>
 #include "D3D12Commands.h"
 #include "D3D12Format.h"
 
@@ -28,10 +29,13 @@
 #define MAX_SURFACE_COUNT (64)
 #include "./D3D12Decoder/D3D12SurfaceAllocator.h"
 
-
+extern "C"
+{
+  #include <ExtLib/ffmpeg/libavcodec/d3d12va.h>
+}
 class CMPCVideoDecFilter;
 struct AVCodecContext;
-struct AVD3D11VAContext;
+struct AVD3D12VAContext;
 struct AVBufferRef;
 
 typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY2)(UINT Flags, REFIID riid, _COM_Outptr_ void** ppFactory);
@@ -54,6 +58,8 @@ public:
 
   GUID* GetDecoderGuid() { return m_DecoderGUID != GUID_NULL ? &m_DecoderGUID : nullptr; }
   DXGI_ADAPTER_DESC* GetAdapterDesc() { return &m_AdapterDesc; }
+
+  void log_callback_null(void* ptr, int level, const char* fmt, va_list vl);
 private:
   friend class CD3D12SurfaceAllocator;
   CMPCVideoDecFilter* m_pFilter = nullptr;
@@ -90,6 +96,7 @@ private:
   D3D12_HEAP_PROPERTIES m_pStagingProp;
   D3D12_RESOURCE_DESC m_pStagingDesc;
   d3d12_footprint_t m_pStagingLayout;
+  HRESULT UpdateStaging();
   AVFrame* m_pFrame = nullptr;
 
   IDXGIAdapter* m_pDxgiAdapter = nullptr;
@@ -110,11 +117,12 @@ private:
   HRESULT CreateD3D12Device(UINT nDeviceIndex);
   HRESULT CreateD3D12Decoder(AVCodecContext* c);
   
-
   HRESULT FindVideoServiceConversion(AVCodecContext* c, enum AVCodecID codec, int profile, DXGI_FORMAT surface_format, GUID* input);
+#if 0
   HRESULT FindDecoderConfiguration(AVCodecContext* c, const D3D11_VIDEO_DECODER_DESC* desc, D3D11_VIDEO_DECODER_CONFIG* pConfig);
+#endif
 
-  HRESULT ReInitD3D11Decoder(AVCodecContext* c);
+  HRESULT ReInitD3D12Decoder(AVCodecContext* c);
 
   void DestroyDecoder(const bool bFull);
 

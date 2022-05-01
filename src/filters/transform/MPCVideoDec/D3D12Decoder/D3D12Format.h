@@ -26,7 +26,10 @@
 #include "d3d12video.h"
 //#include "LAVPixFmtConverter.h"
 #include <vector>
-
+extern "C"
+{
+#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+}
 #define DXGI_MAX_SHADER_VIEW 4
 typedef struct
 {

@@ -35,3 +35,5 @@
 #include <list>
 #include <deque>
 #include <map>
+
+#define USE_D3D12

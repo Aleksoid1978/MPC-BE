@@ -18,7 +18,7 @@
 
 #include "stdafx.h"
 #include "D3D12Commands.h"
-
+#include "DSUtil/DSUtil.h"
 
 CD3D12Commands::CD3D12Commands(ID3D12Device* d3d_dev)
 {
@@ -28,9 +28,9 @@ CD3D12Commands::CD3D12Commands(ID3D12Device* d3d_dev)
 }
 CD3D12Commands::~CD3D12Commands()
 {
-    SafeRelease(&m_pD3DDevice);
-    SafeRelease(&m_pCommandAllocator);
-    SafeRelease(&m_pCommandQueue);
+  SAFE_RELEASE(m_pD3DDevice);
+  SAFE_RELEASE(m_pCommandAllocator);
+  SAFE_RELEASE(m_pCommandQueue);
 
 }
 
@@ -49,14 +49,21 @@ void CD3D12Commands::Init(ID3D12Device* d3d_dev)
     m_GPUSyncFence->SetName(L"GPUSync fence");
 
     
-    CHECK_HR(m_pD3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
-        __uuidof(ID3D12CommandAllocator), (void**)&m_pCommandAllocator));
-
+    HRESULT hr = S_OK;
+    hr = m_pD3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
+        __uuidof(ID3D12CommandAllocator), (void**)&m_pCommandAllocator);
+    if (FAILED(hr)) {
+      DLog(L"{} : CreateCommandAllocator failed",__FUNCTIONW__);
+      ASSERT(0);
+    }
     m_pCommandAllocator->SetName(L"Command allocator");
 
-    CHECK_HR(m_pD3DDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator, NULL,
-        __uuidof(ID3D12GraphicsCommandList), (void**)&m_pDebugList));
-
+    hr = m_pD3DDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator, NULL,
+        __uuidof(ID3D12GraphicsCommandList), (void**)&m_pDebugList);
+    if (FAILED(hr)) {
+      DLog(L"{} : CreateCommandList failed", __FUNCTIONW__);
+      ASSERT(0);
+    }
     // command buffers are allocated opened, close it immediately.
     m_pDebugList->Close();
 
@@ -71,14 +78,14 @@ void CD3D12Commands::Init(ID3D12Device* d3d_dev)
     heap_desc.NumDescriptors = 32;
     heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 
-    CHECK_HR(m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pRTV));
+    hr = m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pRTV);
 
     m_pRTV->SetName(L"RTV heap");
 
     heap_desc.NumDescriptors = 1;
     heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 
-    CHECK_HR(m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pDSV));
+    hr = m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pDSV);
 
     m_pDSV->SetName(L"DSV heap");
 
@@ -87,33 +94,35 @@ void CD3D12Commands::Init(ID3D12Device* d3d_dev)
     heap_desc.NumDescriptors = 8;
     heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
 
-    CHECK_HR(m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pSampler));
+    hr = m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pSampler);
 
     m_pSampler->SetName(L"Sampler heap");
 
     heap_desc.NumDescriptors = 1030;
     heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     
-    CHECK_HR(m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pCBVUAVSRV));
+    hr = m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pCBVUAVSRV);
 
     m_pCBVUAVSRV->SetName(L"CBV/UAV/SRV heap");
 
     heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    CHECK_HR(m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pClear));
+    hr = m_pD3DDevice->CreateDescriptorHeap(&heap_desc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pClear);
     m_pClear->SetName(L"UAV clear heap");
-    return;
-done:
-    assert(0);
-    
 }
 
 ID3D12GraphicsCommandList* CD3D12Commands::GetCommandBuffer()
 {
+  HRESULT hr = S_OK;
     if (m_pFreeGraphicsCommand.empty())
     {
         ID3D12GraphicsCommandList* list = NULL;
-        CHECK_HR(m_pD3DDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator, NULL,
-            __uuidof(ID3D12GraphicsCommandList), (void**)&list));
+        hr = m_pD3DDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator, NULL,
+            __uuidof(ID3D12GraphicsCommandList), (void**)&list);
+        if (FAILED(hr))
+        {
+          ASSERT(0);
+          return nullptr;
+        }
         // list starts opened, close it
         list->Close();
         m_pFreeGraphicsCommand.push_back(list);
@@ -123,8 +132,6 @@ ID3D12GraphicsCommandList* CD3D12Commands::GetCommandBuffer()
     m_pFreeGraphicsCommand.pop_back();
 
     return ret;
-done:
-    return nullptr;
 }
 
 void CD3D12Commands::Reset(ID3D12GraphicsCommandList* cmd)

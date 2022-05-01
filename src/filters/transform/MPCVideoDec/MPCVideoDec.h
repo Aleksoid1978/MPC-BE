@@ -32,9 +32,10 @@
 #include <basestruct.h>
 #include <mpc_defines.h>
 #include <d3d11.h>
+#ifdef USE_D3D12
 #include <d3d12.h>
 #include <d3d12video.h>
-
+#endif
 #include "./MSDKDecoder/MSDKDecoder.h"
 
 #define MPCVideoDecName L"MPC Video Decoder"
@@ -48,6 +49,9 @@ struct AVPacket;
 struct AVBufferRef;
 class CD3D11Decoder;
 
+#ifdef USE_D3D12
+class CD3D12Decoder;
+#endif
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
@@ -136,6 +140,9 @@ private:
 
 	BOOL									m_bFailDXVA2Decode = FALSE;
 	BOOL									m_bFailD3D11Decode = FALSE;
+#ifdef USE_D3D12
+	BOOL									m_bFailD3D12Decode = FALSE;
+#endif
 
 	bool									m_bReinit = false;
 
@@ -196,7 +203,9 @@ private:
 	uint32_t m_Palette[256] = {};
 
 	CD3D11Decoder* m_pD3D11Decoder = nullptr;
-
+#ifdef USE_D3D12
+	CD3D12Decoder* m_pD3D12Decoder = nullptr;
+#endif
 	// === Private functions
 	void			Cleanup();
 	void			CleanupD3DResources();
@@ -351,7 +360,9 @@ private:
 	friend class CDXVA2Decoder;
 	friend class CMSDKDecoder;
 	friend class CD3D11Decoder;
-
+#ifdef USE_D3D12
+	friend class CD3D12Decoder;
+#endif
 	BOOL m_bInInit = FALSE;
 
 	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;

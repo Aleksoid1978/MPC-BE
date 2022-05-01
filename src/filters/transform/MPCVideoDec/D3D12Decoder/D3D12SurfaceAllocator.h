@@ -52,15 +52,11 @@ class CD3D12MediaSample
 
     // LAV Interface
     STDMETHODIMP GetAVFrameBuffer(AVFrame *pFrame);
-    void SetD3D12Texture(ID3D12Resource* tex)
-    {
-        m_pFrame->data[2] = (uint8_t*)tex;
-    }
 
-    int GetTextureIndex()
-    {
-        return (int)m_pFrame->data[3];
-    }
+    void SetD3D12Texture(ID3D12Resource* tex);
+    
+
+    int GetTextureIndex();
   private:
     AVFrame *m_pFrame = nullptr;
 };
@@ -99,7 +95,7 @@ class CD3D12SurfaceAllocator : public CBaseAllocator
         CD3D12MediaSample* GetFreeSample()
         {
             if (m_pFreeList.size() == 0)
-                assert(0);
+                ASSERT(0);
             CD3D12MediaSample* freesample = m_pFreeList.front();
             m_pFreeList.pop();
             return freesample;
@@ -114,7 +110,7 @@ class CD3D12SurfaceAllocator : public CBaseAllocator
     };
 
   public:
-    CD3D12SurfaceAllocator(CDecD3D12 *pDec, HRESULT *phr);
+    CD3D12SurfaceAllocator(CD3D12Decoder*pDec, HRESULT *phr);
     virtual ~CD3D12SurfaceAllocator();
 
     STDMETHODIMP SetProperties(__in ALLOCATOR_PROPERTIES* pRequest, __out ALLOCATOR_PROPERTIES* pActual);
@@ -157,7 +153,7 @@ class CD3D12SurfaceAllocator : public CBaseAllocator
     virtual HRESULT Alloc(void);
 
   private:
-    CDecD3D12 *m_pDec = nullptr;
+    CD3D12Decoder *m_pDec = nullptr;
 
     friend class CD3D12MediaSample;
 };

@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "D3D12SurfaceAllocator.h"
 #include "D3D12Decoder.h"
+#include "DSUtil/DSUtil.h"
 
 extern "C"
 {
@@ -39,7 +40,7 @@ CD3D12MediaSample::CD3D12MediaSample(CD3D12SurfaceAllocator *pAllocator, AVFrame
 CD3D12MediaSample::~CD3D12MediaSample()
 {
     av_frame_free(&m_pFrame);
-    SafeRelease(&m_pAllocator);
+    SAFE_RELEASE(m_pAllocator);
 }
 
 // Note: CMediaSample does not derive from CUnknown, so we cannot use the
@@ -142,7 +143,17 @@ STDMETHODIMP CD3D12MediaSample::GetAVFrameBuffer(AVFrame *pFrame)
     return S_OK;
 }
 
-CD3D12SurfaceAllocator::CD3D12SurfaceAllocator(CDecD3D12 *pDec, HRESULT *phr)
+void CD3D12MediaSample::SetD3D12Texture(ID3D12Resource* tex)
+{
+    m_pFrame->data[2] = (uint8_t*)tex;
+}
+
+int CD3D12MediaSample::GetTextureIndex()
+{
+  return (int)m_pFrame->data[3];
+}
+
+CD3D12SurfaceAllocator::CD3D12SurfaceAllocator(CD3D12Decoder*pDec, HRESULT *phr)
     : CBaseAllocator(NAME("CD3D12SurfaceAllocator"), nullptr, phr)
     , m_pDec(pDec)
 {

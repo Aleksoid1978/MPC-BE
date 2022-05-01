@@ -25,7 +25,7 @@
 #include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"
 #include "./D3D11Decoder/D3D11Decoder.h"
-#include "./D3D12Decoder/d3d12dec.h"
+#include "./D3D12Decoder/D3D12Decoder.h"
 #include "DSUtil/CPUInfo.h"
 #include "DSUtil/D3D9Helper.h"
 #include "DSUtil/DSUtil.h"
@@ -1070,6 +1070,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dxva_pix_fmt(AV_PIX_FMT_NONE)
 	, m_HWPixFmt(AV_PIX_FMT_NONE)
 {
+#ifdef USE_D3D12
+	//only for testing will remove
+	m_nHwDecoder = HWDec_D3D12;
+#endif
 	if (phr) {
 		*phr = S_OK;
 	}
@@ -1224,6 +1228,14 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			SAFE_DELETE(m_pD3D11Decoder);
 		}
 	}
+#ifdef USE_D3D12
+	else if (SysVersion::IsWin8orLater() && m_nHwDecoder == HWDec_D3D12) {
+		m_pD3D12Decoder = DNew CD3D12Decoder(this);
+		if (FAILED(m_pD3D12Decoder->Init())) {
+			SAFE_DELETE(m_pD3D12Decoder);
+		}
+	}
+#endif
 
 #ifdef _DEBUG
 	// Check codec definition table

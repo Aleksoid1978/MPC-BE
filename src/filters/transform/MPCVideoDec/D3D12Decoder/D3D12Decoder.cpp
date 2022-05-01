@@ -30,6 +30,7 @@
 #include "../MPCVideoDec.h"
 #include "../DxgiUtils.h"
 
+
 #pragma warning(push)
 #pragma warning(disable: 4005)
 
@@ -42,86 +43,38 @@ extern "C"
 #include <ExtLib/ffmpeg/libavcodec/d3d12va.h>
 }
 
+#define countof(array) (sizeof(array) / sizeof(array[0]))
+
 #define ROUND_UP_128(num) (((num) + 127) & ~127)
-#if 0
-HRESULT VerifyD3D12Device(DWORD& dwIndex, DWORD dwDeviceId)
+
+#define DXVA_SURFACE_BASE_ALIGN 16
+static DWORD dxva_align_dimensions(AVCodecID codec, DWORD dim)
 {
-    HRESULT hr = S_OK;
-    DXGI_ADAPTER_DESC desc;
+  int align = DXVA_SURFACE_BASE_ALIGN;
 
-    HMODULE dxgi = LoadLibrary(L"dxgi.dll");
-    if (dxgi == nullptr)
-    {
-        hr = E_FAIL;
-        goto done;
-    }
-    
-    PFN_CREATE_DXGI_FACTORY2 mCreateDXGIFactory2 = (PFN_CREATE_DXGI_FACTORY2)GetProcAddress(dxgi, "CreateDXGIFactory2");
-    if (mCreateDXGIFactory2 == nullptr)
-    {
-        hr = E_FAIL;
-        goto done;
-    }
+  // MPEG-2 needs higher alignment on Intel cards, and it doesn't seem to harm anything to do it for all cards.
+  if (codec == AV_CODEC_ID_MPEG2VIDEO)
+    align <<= 1;
+  else if (codec == AV_CODEC_ID_HEVC || codec == AV_CODEC_ID_AV1)
+    align = 128;
 
-    IDXGIAdapter* pDXGIAdapter = nullptr;
-    IDXGIFactory2* pDXGIFactory = nullptr;
-
-    hr = mCreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&pDXGIFactory));
-    if (FAILED(hr))
-        goto done;
-
-    // check the adapter specified by dwIndex
-    hr = pDXGIFactory->EnumAdapters(dwIndex, &pDXGIAdapter);
-    if (FAILED(hr))
-        goto done;
-
-    // if it matches the device id, then all is well and we're done
-    pDXGIAdapter->GetDesc(&desc);
-    if (desc.DeviceId == dwDeviceId)
-        goto done;
-
-    SafeRelease(&pDXGIAdapter);
-
-    // try to find a device that matches this device id
-    UINT i = 0;
-    while (SUCCEEDED(pDXGIFactory->EnumAdapters(i, &pDXGIAdapter)))
-    {
-        pDXGIAdapter->GetDesc(&desc);
-        SafeRelease(&pDXGIAdapter);
-
-        if (desc.DeviceId == dwDeviceId)
-        {
-            dwIndex = i;
-            goto done;
-        }
-        i++;
-    }
-
-    // if none is found, fail
-    hr = E_FAIL;
-
-done:
-    SafeRelease(&pDXGIAdapter);
-    SafeRelease(&pDXGIFactory);
-    FreeLibrary(dxgi);
-    return hr;
+  return FFALIGN(dim, align);
 }
 
 static DXGI_FORMAT d3d12va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
 {
-    switch (pix_fmt)
-    {
-    case AV_PIX_FMT_YUV420P10:
-    case AV_PIX_FMT_P010: return DXGI_FORMAT_P010;
-    case AV_PIX_FMT_NV12:
-    default: return DXGI_FORMAT_NV12;
-    }
+  switch (pix_fmt)
+  {
+  case AV_PIX_FMT_YUV420P10:
+  case AV_PIX_FMT_P010: return DXGI_FORMAT_P010;
+  case AV_PIX_FMT_NV12:
+  default: return DXGI_FORMAT_NV12;
+  }
 }
-#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // D3D12 decoder implementation
 ////////////////////////////////////////////////////////////////////////////////
-
 
 CD3D12Decoder::CD3D12Decoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
@@ -156,63 +109,63 @@ void CD3D12Decoder::DestroyDecoder(const bool bFull)
    
     
     m_pD3DCommands = nullptr;
-    SafeRelease(&m_pD3DDebug);
-    SafeRelease(&m_pDxgiAdapter);
-    SafeRelease(&m_pD3DDebug1);
-    SafeRelease(&m_pD3DDebug);
-    SafeRelease(&m_pStagingTexture);
+    SAFE_RELEASE(m_pD3DDebug);
+    SAFE_RELEASE(m_pDxgiAdapter);
+    SAFE_RELEASE(m_pD3DDebug1);
+    SAFE_RELEASE(m_pD3DDebug);
+    SAFE_RELEASE(m_pStagingTexture);
     for (int x = 0; x < MAX_SURFACE_COUNT; x++)
-        SafeRelease(&m_pTexture[x]);
+        SAFE_RELEASE(m_pTexture[x]);
 
-    SafeRelease(&m_pVideoDevice);
-    SafeRelease(&m_pDxgiAdapter);
-    SafeRelease(&m_pDxgiFactory);
-    SafeRelease(&m_pD3DDebug);
-    SafeRelease(&m_pD3DDevice);
-    SafeRelease(&m_pVideoDecoder);
+    SAFE_RELEASE(m_pVideoDevice);
+    SAFE_RELEASE(m_pDxgiAdapter);
+    SAFE_RELEASE(m_pDxgiFactory);
+    SAFE_RELEASE(m_pD3DDebug);
+    SAFE_RELEASE(m_pD3DDevice);
+    SAFE_RELEASE(m_pVideoDecoder);
     
     av_frame_free(&m_pFrame);
     
-    SafeRelease(&m_pD3D12VAContext.decoder);
+    SAFE_RELEASE(m_pD3D12VAContext.decoder);
     //todo add free libs
 }
 
 // ILAVDecoder
 STDMETHODIMP CD3D12Decoder::Init()
 {
-    // D3D12 decoding requires Windows 8 or newer
+  // D3D12 decoding requires Windows 8 or newer
   if (!SysVersion::IsWin8orLater())
-        return E_NOINTERFACE;
+    return E_NOINTERFACE;
 
-    dx.d3d12lib = LoadLibrary(L"d3d12.dll");
-    if (dx.d3d12lib == nullptr)
-    {
-        DbgLog((LOG_TRACE, 10, L"Cannot open d3d11.dll"));
-        return E_FAIL;
-    }
+  m_dxLib.d3d12lib = LoadLibrary(L"d3d12.dll");
+  if (m_dxLib.d3d12lib == nullptr)
+  {
+    DbgLog((LOG_TRACE, 10, L"Cannot open d3d11.dll"));
+    return E_FAIL;
+  }
 
-    dx.mD3D12CreateDevice = (PFN_D3D12_CREATE_DEVICE)GetProcAddress(dx.d3d12lib, "D3D12CreateDevice");
-    if (dx.mD3D12CreateDevice == nullptr)
-    {
-        DbgLog((LOG_TRACE, 10, L"D3D11CreateDevice not available"));
-        return E_FAIL;
-    }
+  m_dxLib.mD3D12CreateDevice = (PFN_D3D12_CREATE_DEVICE)GetProcAddress(m_dxLib.d3d12lib, "D3D12CreateDevice");
+  if (m_dxLib.mD3D12CreateDevice == nullptr)
+  {
+    DbgLog((LOG_TRACE, 10, L"D3D12CreateDevice not available"));
+    return E_FAIL;
+  }
 
-    dx.dxgilib = LoadLibrary(L"dxgi.dll");
-    if (dx.dxgilib == nullptr)
-    {
-        DbgLog((LOG_TRACE, 10, L"Cannot open dxgi.dll"));
-        return E_FAIL;
-    }
+  m_dxLib.dxgilib = LoadLibrary(L"dxgi.dll");
+  if (m_dxLib.dxgilib == nullptr)
+  {
+    DbgLog((LOG_TRACE, 10, L"Cannot open dxgi.dll"));
+    return E_FAIL;
+  }
 
-    dx.mCreateDXGIFactory2 = (PFN_CREATE_DXGI_FACTORY2)GetProcAddress(dx.dxgilib, "CreateDXGIFactory2");
-    if (dx.mCreateDXGIFactory2 == nullptr)
-    {
-        DbgLog((LOG_TRACE, 10, L"CreateDXGIFactory1 not available"));
-        return E_FAIL;
-    }
+  m_dxLib.mCreateDXGIFactory2 = (PFN_CREATE_DXGI_FACTORY2)GetProcAddress(m_dxLib.dxgilib, "CreateDXGIFactory2");
+  if (m_dxLib.mCreateDXGIFactory2 == nullptr)
+  {
+    DbgLog((LOG_TRACE, 10, L"CreateDXGIFactory1 not available"));
+    return E_FAIL;
+  }
 
-    return S_OK;
+  return S_OK;
 }
 
 STDMETHODIMP CD3D12Decoder::InitAllocator(IMemAllocator **ppAlloc)
@@ -238,7 +191,7 @@ STDMETHODIMP CD3D12Decoder::InitAllocator(IMemAllocator **ppAlloc)
 STDMETHODIMP CD3D12Decoder::CreateD3D12Device(UINT nDeviceIndex)
 {
     HRESULT hr = S_OK;
-
+#ifdef TODO
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&m_pD3DDebug))))
     {
         m_pD3DDebug->EnableDebugLayer();
@@ -246,15 +199,14 @@ STDMETHODIMP CD3D12Decoder::CreateD3D12Device(UINT nDeviceIndex)
         //m_pD3DDebug1->SetEnableGPUBasedValidation(true);
         m_pD3DDebug1->SetEnableSynchronizedCommandQueueValidation(1);
     }
-
+#endif
     // create DXGI factory
     IDXGIAdapter* pDXGIAdapter = nullptr;
     IDXGIFactory1* pDXGIFactory = nullptr;
-    hr = dx.mCreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&m_pDxgiFactory));
+    hr = m_dxLib.mCreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&m_pDxgiFactory));
     if (FAILED(hr))
     {
         DbgLog((LOG_ERROR, 10, L"-> DXGIFactory creation failed"));
-        //goto fail;
     }
     
     //hr = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&m_pDxgiFactory));
@@ -264,22 +216,19 @@ STDMETHODIMP CD3D12Decoder::CreateD3D12Device(UINT nDeviceIndex)
     if (DXGI_ERROR_NOT_FOUND == m_pDxgiFactory->EnumAdapters(nDeviceIndex, &m_pDxgiAdapter))
     {
         hr = S_FALSE;
-        assert(0);
+        ASSERT(0);
     }
     DXGI_ADAPTER_DESC desc;
     hr = m_pDxgiAdapter->GetDesc(&desc);
     if FAILED (hr)
-        assert(0);
+      ASSERT(0);
     const D3D_FEATURE_LEVEL *levels = NULL;
     D3D_FEATURE_LEVEL max_level = D3D_FEATURE_LEVEL_12_1;
     //int level_count = s_GetD3D12FeatureLevels(max_level, &levels);
 
-    hr = dx.mD3D12CreateDevice(m_pDxgiAdapter, max_level, IID_PPV_ARGS(&m_pD3DDevice));
+    hr = m_dxLib.mD3D12CreateDevice(m_pDxgiAdapter, max_level, IID_PPV_ARGS(&m_pD3DDevice));
     if FAILED (hr)
-        assert(0);
-    
-    
-    
+        ASSERT(0);
     hr = m_pD3DDevice->QueryInterface(IID_PPV_ARGS(&m_pVideoDevice));
     return hr;
 }
@@ -305,84 +254,77 @@ static int s_GetD3D12FeatureLevels(int max_fl, const D3D_FEATURE_LEVEL **out)
     return levels_len - start;
 }
 
-STDMETHODIMP CD3D12Decoder::PostConnect(IPin *pPin)
+STDMETHODIMP CD3D12Decoder::PostConnect(AVCodecContext* c, IPin *pPin)
 {
 
-    DbgLog((LOG_TRACE, 10, L"CD3D12Decoder::PostConnect()"));
-    HRESULT hr = S_OK;
-    ID3D12DecoderConfiguration* pD3D12DecoderConfiguration = nullptr;
-    hr = pPin->QueryInterface(&pD3D12DecoderConfiguration);
-    if (FAILED(hr))
-    {
-        DbgLog((LOG_ERROR, 10, L"-> ID3D11DecoderConfiguration not available, using fallback mode"));
-    }
-    m_pCallback->ReleaseAllDXVAResources();
-    UINT nDevice;
-    DWORD wDevice = -1;
-    nDevice = m_pSettings->GetHWAccelDeviceIndex(HWAccel_D3D12, &wDevice);
+  DbgLog((LOG_TRACE, 10, L"CD3D12Decoder::PostConnect()"));
 
-    //If we get a device back just use it
-    if (wDevice != -1 && pD3D12DecoderConfiguration)
-    {
-        nDevice = pD3D12DecoderConfiguration->GetD3D12AdapterIndex();
-    }
-    else
-    {
-        // if a device is specified manually, fallback to copy-back and use the selected device
-        SafeRelease(&pD3D12DecoderConfiguration);
+  if (m_pAllocator) {
+    m_pAllocator->DecoderDestruct();
+    SAFE_RELEASE(m_pAllocator);
+  }
 
-        // use the configured device
-        if (nDevice == LAVHWACCEL_DEVICE_DEFAULT)
-            nDevice = 0;
-    }
-    //UINT nDevice = LAVHWACCEL_DEVICE_DEFAULT;
-    
-    if (!m_pD3DDevice)
-    {
-        hr = CreateD3D12Device(nDevice);
-    }
+  HRESULT hr = S_OK;
+  ID3D12DecoderConfiguration* pD3D12DecoderConfiguration = nullptr;
+  hr = pPin->QueryInterface(&pD3D12DecoderConfiguration);
+  if (FAILED(hr))
+  {
+    DbgLog((LOG_ERROR, 10, L"-> ID3D11DecoderConfiguration not available, using fallback mode"));
+  }
 
-    // enable multithreaded protection
-    //not in d3d12 ?
-    ID3D10Multithread* pMultithread = nullptr;
-    hr = m_pD3DDevice->QueryInterface(&pMultithread);
-    if (SUCCEEDED(hr))
-    {
-        pMultithread->SetMultithreadProtected(TRUE);
-        SafeRelease(&pMultithread);
-    }
+  UINT nDevice;
 
-    // check if the connection supports native mode
-    if (pD3D12DecoderConfiguration)
-    {
-        CMediaType mt = m_pCallback->GetOutputMediaType();
-        if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
-            (m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
-            (m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016))
-        {
-            DbgLog((LOG_ERROR, 10, L"-> Connection is not the appropriate pixel format for D3D11 Native"));
+  //If we get a device back just use it
+  if (pD3D12DecoderConfiguration)
+  {
+    nDevice = pD3D12DecoderConfiguration->GetD3D12AdapterIndex();
+  }
+  else
+  {
+    // if a device is specified manually, fallback to copy-back and use the selected device
+    SAFE_RELEASE(pD3D12DecoderConfiguration);
+    nDevice = 0;
+  }
 
-            SafeRelease(&pD3D12DecoderConfiguration);
-        }
-    }
+  if (!m_pD3DDevice)
+  {
+    hr = CreateD3D12Device(nDevice);
+  }
 
-    // Notice the connected pin that we're sending D3D11 textures
-    if (pD3D12DecoderConfiguration)
-    {
-        hr = pD3D12DecoderConfiguration->ActivateD3D12Decoding(m_pD3DDevice, (HANDLE)0/*directLock*/, 0);
-        SafeRelease(&pD3D12DecoderConfiguration);
+  // enable multithreaded protection
+  ID3D10Multithread* pMultithread = nullptr;
+  hr = m_pD3DDevice->QueryInterface(&pMultithread);
+  if (SUCCEEDED(hr))
+  {
+    pMultithread->SetMultithreadProtected(TRUE);
+    SAFE_RELEASE(pMultithread);
+  }
 
-        m_bReadBackFallback = FAILED(hr);
-    }
-    else
+  // check if the connection supports native mode
+  if (pD3D12DecoderConfiguration)
+  {
+    CMediaType& mt = m_pFilter->m_pOutput->CurrentMediaType();
+    if ((m_SurfaceFormat == DXGI_FORMAT_NV12 && mt.subtype != MEDIASUBTYPE_NV12) ||
+      (m_SurfaceFormat == DXGI_FORMAT_P010 && mt.subtype != MEDIASUBTYPE_P010) ||
+      (m_SurfaceFormat == DXGI_FORMAT_P016 && mt.subtype != MEDIASUBTYPE_P016))
     {
-        m_bReadBackFallback = true;
+      DbgLog((LOG_ERROR, 10, L"-> Connection is not the appropriate pixel format for D3D11 Native"));
+
+      SAFE_RELEASE(pD3D12DecoderConfiguration);
     }
-    return S_OK;
+  }
+
+  // Notice the connected pin that we're sending D3D12 textures
+  if (pD3D12DecoderConfiguration)
+  {
+    hr = pD3D12DecoderConfiguration->ActivateD3D12Decoding(m_pD3DDevice, (HANDLE)0/*directLock*/, 0);
+    SAFE_RELEASE(pD3D12DecoderConfiguration);
+  }
+  return S_OK;
 fail:
-    return E_FAIL;
+  return E_FAIL;
 }
-
+#if 0
 STDMETHODIMP CD3D12Decoder::BreakConnect()
 {
     if (m_bReadBackFallback)
@@ -397,6 +339,7 @@ STDMETHODIMP CD3D12Decoder::BreakConnect()
 
     return S_OK;
 }
+#endif
 
 void CD3D12Decoder::log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
@@ -405,7 +348,7 @@ void CD3D12Decoder::log_callback_null(void *ptr, int level, const char *fmt, va_
     DbgLog((LOG_TRACE, 10, out));
     
 }
-
+#if 0
 STDMETHODIMP CD3D12Decoder::InitDecoder(AVCodecID codec, const CMediaType *pmt)
 {
     HRESULT hr = S_OK;
@@ -437,7 +380,7 @@ STDMETHODIMP CD3D12Decoder::InitDecoder(AVCodecID codec, const CMediaType *pmt)
 
     return S_OK;
 }
-
+#endif
 void CD3D12Decoder::AdditionaDecoderInit(AVCodecContext* c)
 {
     AVD3D12VAContext *ctx = av_d3d12va_alloc_context();
@@ -448,20 +391,19 @@ void CD3D12Decoder::AdditionaDecoderInit(AVCodecContext* c)
     if (m_pVideoDecoder)
     {
         FillHWContext(ctx);
-        m_pAVCtx->hwaccel_context = ctx;
+        c->hwaccel_context = ctx;
     }
 
     //TODO FIX FORMAT
-    m_pAVCtx->thread_count = 1;
-    m_pAVCtx->get_format = get_d3d12_format;
-    m_pAVCtx->get_buffer2 = get_d3d12_buffer;
-    m_pAVCtx->opaque = this;
-    m_pAVCtx->slice_flags |= SLICE_FLAG_ALLOW_FIELD;
+    c->thread_count = 1;
+    c->get_format = get_d3d12_format;
+    c->get_buffer2 = get_d3d12_buffer;
+    c->opaque = this;
+    c->slice_flags |= SLICE_FLAG_ALLOW_FIELD;
     // disable error concealment in hwaccel mode, it doesn't work either way
-    m_pAVCtx->error_concealment = 0;
-    av_opt_set_int(m_pAVCtx, "enable_er", 0, AV_OPT_SEARCH_CHILDREN);
+    c->error_concealment = 0;
+    av_opt_set_int(c, "enable_er", 0, AV_OPT_SEARCH_CHILDREN);
     // ctx->test_buffer = TestBuffer;
-    return S_OK;
 }
 
 enum AVPixelFormat CD3D12Decoder::get_d3d12_format(struct AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
@@ -480,7 +422,7 @@ enum AVPixelFormat CD3D12Decoder::get_d3d12_format(struct AVCodecContext *s, con
             HRESULT hr = pDec->ReInitD3D12Decoder(s);
             if (FAILED(hr))
             {
-                pDec->m_bFailHWDecode = TRUE;
+                pDec->m_pFilter->m_bFailD3D12Decode = TRUE;
                 continue;
             }
             else
@@ -491,42 +433,23 @@ enum AVPixelFormat CD3D12Decoder::get_d3d12_format(struct AVCodecContext *s, con
     }
     return *p;
 }
-void CD3D12Decoder::ReleaseFrame12(void* opaque, uint8_t* data)
-{
-    (void)data;
-
-    //LAVFrame* pFrame = (LAVFrame*)opaque;
-   
-#if 0
-    if (pFrame->destruct)
-    {
-        pFrame->destruct(pFrame);
-        pFrame->destruct = nullptr;
-        pFrame->priv_data = nullptr;
-    }
-
-    memset(pFrame->data, 0, sizeof(pFrame->data));
-    memset(pFrame->stereo, 0, sizeof(pFrame->stereo));
-    memset(pFrame->stride, 0, sizeof(pFrame->stride));
-
-    for (int i = 0; i < pFrame->side_data_count; i++)
-    {
-        SAFE_CO_FREE(pFrame->side_data[i].data);
-    }
-    SAFE_CO_FREE(pFrame->side_data);
-
-    pFrame->side_data_count = 0;
-#endif
-    //SAFE_CO_FREE(pFrame);
-
-    
-}
 
 int CD3D12Decoder::get_d3d12_buffer(struct AVCodecContext *c, AVFrame *frame, int flags)
 {
     CD3D12Decoder *pDec = (CD3D12Decoder *)c->opaque;
 
-    frame->opaque = NULL;
+    if (frame->format != AV_PIX_FMT_D3D12_VLD){ 
+      DLog(L"CD3D12Decoder::get_d3d12_buffer() : D3D12 buffer request, but not AV_PIX_FMT_D3D12_VLD");
+      return -1;
+    }
+    //av1 not implemented for d3d12
+    if (!pDec->m_pFilter->CheckDXVACompatible(c->codec_id, c->sw_pix_fmt, c->profile)) {
+      DLog(L"CD3D11Decoder::get_d3d11_buffer() : format not compatible with DXVA");
+      pDec->m_pFilter->m_bDXVACompatible = false;
+      return -1;
+    }
+
+    
     HRESULT hr = S_OK;
     
     UINT freeindex=-1;
@@ -535,27 +458,12 @@ int CD3D12Decoder::get_d3d12_buffer(struct AVCodecContext *c, AVFrame *frame, in
 
     if (FAILED(hr))
     {
-        pDec->m_bFailHWDecode = TRUE;
-        return -1;
+      pDec->m_pFilter->m_bFailD3D12Decode = TRUE;
+      return -1;
     }
     
-    if (pDec->m_bReadBackFallback)
+    if (pDec->m_pAllocator)
     {
-        if (pDec->ref_free_index.size() == 0)
-            return E_OUTOFMEMORY;
-        frame->buf[0] = av_buffer_create(frame->data[0], 0, ReleaseFrame12, nullptr, 0);
-        if (!frame->buf[0])
-            assert(0);
-        frame->data[0] = (uint8_t*)pDec->m_pD3D12VAContext.surfaces.NumTexture2Ds;//array size
-        frame->data[3] = (uint8_t*)pDec->ref_free_index.front();//output index of the frame
-        pDec->ref_free_index.pop_front();
-        frame->width = c->coded_width;
-        frame->height = c->coded_height;
-        return 0;
-    }
-    else if (pDec->m_bReadBackFallback == false && pDec->m_pAllocator)
-    {
-        
         IMediaSample* pSample = nullptr;
         hr = pDec->m_pAllocator->GetBuffer(& pSample, nullptr, nullptr, 0);
         if (SUCCEEDED(hr))
@@ -569,9 +477,7 @@ int CD3D12Decoder::get_d3d12_buffer(struct AVCodecContext *c, AVFrame *frame, in
             frame->height = c->coded_height;
             frame->data[0] = (uint8_t*) "go";
             
-            int frameindex = (int)frame->data[3];
-                
-            // the frame holds the sample now, can release the direct interface
+            //frame->data[3] this hold the index of the surface
             pD3D12Sample->Release();
             return 0;
         }
@@ -600,9 +506,9 @@ STDMETHODIMP_(long) CD3D12Decoder::GetBufferCount(long *pMaxBuffers)
     // Native decoding should use 16 buffers to enable seamless codec changes
 
         // Buffers based on max ref frames
-        if (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC)
+        if (m_pFilter->m_CodecId == AV_CODEC_ID_H264 || m_pFilter->m_CodecId == AV_CODEC_ID_HEVC)
             buffers = 16;
-        else if (m_nCodecId == AV_CODEC_ID_VP9 || m_nCodecId == AV_CODEC_ID_AV1)
+        else if (m_pFilter->m_CodecId == AV_CODEC_ID_VP9 || m_pFilter->m_CodecId == AV_CODEC_ID_AV1)
             buffers = 8;
         else
             buffers = 2;
@@ -612,55 +518,20 @@ STDMETHODIMP_(long) CD3D12Decoder::GetBufferCount(long *pMaxBuffers)
     //if (m_nCodecId != AV_CODEC_ID_H264 && m_nCodecId != AV_CODEC_ID_HEVC)
     buffers += 4;
 
-    if (m_bReadBackFallback)
-    {
-        //not implemented yet
-        buffers += m_DisplayDelay;
-    }
-
-    if (m_pCallback->GetDecodeFlags() & LAV_VIDEO_DEC_FLAG_DVD)
-    {
-        buffers += 4;
-    }
-
     if (pMaxBuffers)
     {
         // cap at 127, because it needs to fit into the 7-bit DXVA structs
         *pMaxBuffers = 127;
 
         // VC-1 and VP9 decoding has stricter requirements (decoding flickers otherwise)
-        if (m_nCodecId == AV_CODEC_ID_VC1 || m_nCodecId == AV_CODEC_ID_VP9 || m_nCodecId == AV_CODEC_ID_AV1)
+        if (m_pFilter->m_CodecId == AV_CODEC_ID_VC1 || m_pFilter->m_CodecId == AV_CODEC_ID_VP9 || m_pFilter->m_CodecId == AV_CODEC_ID_AV1)
             *pMaxBuffers = 32;
     }
     
     return buffers;
 
 }
-
-STDMETHODIMP CD3D12Decoder::FlushDisplayQueue(BOOL bDeliver)
-{
-    /*for (int i = 0; i < m_DisplayDelay; ++i)
-    {
-        if (m_FrameQueue[m_FrameQueuePosition])
-        {
-            if (bDeliver)
-            {
-                DeliverD3D12Frame(m_FrameQueue[m_FrameQueuePosition]);
-                m_FrameQueue[m_FrameQueuePosition] = nullptr;
-            }
-            else
-            {
-                //ReleaseFrame(&m_FrameQueue[m_FrameQueuePosition]);
-            }
-        }
-        m_FrameQueuePosition = (m_FrameQueuePosition + 1) % m_DisplayDelay;
-    }*/
-
-    return S_OK;
-    DbgLog((LOG_TRACE, 10, L"FlushDisplayQueue"));
-    return S_OK;
-}
-
+#if 0
 STDMETHODIMP CD3D12Decoder::Flush()
 {
     DbgLog((LOG_TRACE, 10, L"CD3D12Decoder::Flush"));
@@ -697,8 +568,9 @@ HRESULT CD3D12Decoder::PostDecode()
     }
     return S_OK;
 }
+#endif
 
-STDMETHODIMP CD3D12Decoder::FindVideoServiceConversion(AVCodecID codec, int profile, DXGI_FORMAT surface_format, GUID* input)
+STDMETHODIMP CD3D12Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCodecID codec, int profile, DXGI_FORMAT surface_format, GUID* input)
 {
     
     
@@ -710,16 +582,16 @@ STDMETHODIMP CD3D12Decoder::FindVideoServiceConversion(AVCodecID codec, int prof
     if (codec == AV_CODEC_ID_HEVC)
     {
         //need some testing
-        if (!HEVC_CHECK_PROFILE(profile))
+        if (!((profile) <= FF_PROFILE_HEVC_MAIN_10))
             *input = D3D12_VIDEO_DECODE_PROFILE_HEVC_MAIN;
         else
             *input = D3D12_VIDEO_DECODE_PROFILE_HEVC_MAIN10;
     }
-    const int h264mb_count = (m_pAVCtx->coded_width / 16) * (m_pAVCtx->coded_height / 16);
+    const int h264mb_count = (c->coded_width / 16) * (c->coded_height / 16);
 
     if (codec == AV_CODEC_ID_H264)
     {
-        if (profile != FF_PROFILE_UNKNOWN && !H264_CHECK_PROFILE(profile))
+        if (profile != FF_PROFILE_UNKNOWN && !(((profile) & ~FF_PROFILE_H264_CONSTRAINED) <= FF_PROFILE_H264_HIGH))
             *input = D3D12_VIDEO_DECODE_PROFILE_H264;
         *input = D3D12_VIDEO_DECODE_PROFILE_H264;
     }
@@ -755,15 +627,15 @@ STDMETHODIMP CD3D12Decoder::ReInitD3D12Decoder(AVCodecContext* s)
 {
     HRESULT hr = S_OK;
     // Don't allow decoder creation during first init
-    if (m_bInInit)
+    if (m_pFilter->m_bInInit)
         return S_FALSE;
 
     // we need an allocator at this point
-    if (m_bReadBackFallback == false && m_pAllocator == nullptr)
-        return E_FAIL;
+    if (m_pAllocator == nullptr)
+      return E_FAIL;
 
     DXGI_FORMAT surface_format;
-    switch (m_pAVCtx->sw_pix_fmt)
+    switch (s->sw_pix_fmt)
     {
     case AV_PIX_FMT_YUV420P10LE:
     case AV_PIX_FMT_P010:
@@ -786,7 +658,7 @@ STDMETHODIMP CD3D12Decoder::ReInitD3D12Decoder(AVCodecContext* s)
         if (SUCCEEDED(hr))
             formats = fmt->GetDecodeSupport();
         if (SUCCEEDED(hr))
-            CreateD3D12Decoder();
+            CreateD3D12Decoder(s);
         else
         {
             DbgLog((LOG_ERROR, 10, L"-> No video service profile found"));
@@ -801,7 +673,7 @@ STDMETHODIMP CD3D12Decoder::ReInitD3D12Decoder(AVCodecContext* s)
 
 
         //m_SurfaceFormat = fmt->GetSupportedFormat();
-        m_SurfaceFormat = d3d12va_map_sw_to_hw_format(m_pAVCtx->sw_pix_fmt);
+        m_SurfaceFormat = d3d12va_map_sw_to_hw_format(s->sw_pix_fmt);
 
 
         CD3DX12_HEAP_PROPERTIES m_textureProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_CUSTOM, 1, 1);
@@ -851,9 +723,9 @@ STDMETHODIMP CD3D12Decoder::ReInitD3D12Decoder(AVCodecContext* s)
         m_pVideoDecoderCfg.Format = m_SurfaceFormat;
         m_pVideoDecoderCfg.MaxDecodePictureBufferCount = GetBufferCount();
         m_pD3D12VAContext.cfg = &m_pVideoDecoderCfg;
-        m_pVideoDecoderCfg.FrameRate.Denominator = m_pAVCtx->framerate.den;
-        m_pVideoDecoderCfg.FrameRate.Numerator = m_pAVCtx->framerate.num;
-        m_pAVCtx->hwaccel_context = &m_pD3D12VAContext;
+        m_pVideoDecoderCfg.FrameRate.Denominator = s->framerate.den;
+        m_pVideoDecoderCfg.FrameRate.Numerator = s->framerate.num;
+        s->hwaccel_context = &m_pD3D12VAContext;
         ref_free_index.clear();
         ref_free_index.resize(0);
         for (int i = 0; i < GetBufferCount(); i++)
@@ -863,19 +735,6 @@ STDMETHODIMP CD3D12Decoder::ReInitD3D12Decoder(AVCodecContext* s)
     }
     return S_OK;
 
-}
-#define DXVA_SURFACE_BASE_ALIGN 16
-static DWORD dxva_align_dimensions(AVCodecID codec, DWORD dim)
-{
-  int align = DXVA_SURFACE_BASE_ALIGN;
-
-  // MPEG-2 needs higher alignment on Intel cards, and it doesn't seem to harm anything to do it for all cards.
-  if (codec == AV_CODEC_ID_MPEG2VIDEO)
-    align <<= 1;
-  else if (codec == AV_CODEC_ID_HEVC || codec == AV_CODEC_ID_AV1)
-    align = 128;
-
-  return FFALIGN(dim, align);
 }
 
 STDMETHODIMP CD3D12Decoder::CreateD3D12Decoder(AVCodecContext* c)
@@ -900,151 +759,13 @@ STDMETHODIMP CD3D12Decoder::CreateD3D12Decoder(AVCodecContext* c)
     
     return E_FAIL;
 }
-
-
-HRESULT CD3D12Decoder::HandleDXVA2Frame(LAVFrame *pFrame)
-{
-    
-    if (pFrame->flags & LAV_FRAME_FLAG_FLUSH)
-    {
-        if (m_bReadBackFallback)
-        {
-            FlushDisplayQueue(TRUE);
-        }
-        Deliver(pFrame);
-        return S_OK;
-    }
-
-    ASSERT(pFrame->format == LAVPixFmt_D3D12);
-
-    if (m_bReadBackFallback == false)
-    {
-        DeliverD3D12Frame(pFrame);
-    }
-    else
-    {
-        DeliverD3D12Frame(pFrame);
-        
-    }
-
-    return S_OK;
-}
-
-HRESULT CD3D12Decoder::DeliverD3D12Frame(LAVFrame *pFrame)
-{
-    if (m_bReadBackFallback)
-    {
-        if (m_bDirect)
-            DeliverD3D12ReadbackDirect(pFrame);
-        else
-            DeliverD3D12Readback(pFrame);
-    }
-    else
-    {
-        AVFrame* pAVFrame = (AVFrame*)pFrame->priv_data;
-        int textureindex = (int)pAVFrame->data[3];
-        CD3D12MediaSample* pD3D12Sample = (CD3D12MediaSample*)(pAVFrame->data[1]);
-        pD3D12Sample->SetD3D12Texture(m_pTexture[textureindex]);
-        pFrame->data[0] = pAVFrame->data[1];
-        
-        //pFrame->data[1] = pFrame->data[2] = nullptr;
-        pFrame->data[1] = nullptr;
-        //need to keep data[3] its the index of the surface used
-
-        GetPixelFormat(&pFrame->format, &pFrame->bpp);
-
-        Deliver(pFrame);
-        //FILTER_STATE state;
-        //m_pCallback->GetOutputPin().m_pFilter->GetState(0, &state);
-        
-        if (m_pCallback->GetOutputPin()->IsStopped())
-            assert(0);
-    }
-    
-    return S_OK;
-}
-
-HRESULT CD3D12Decoder::DeliverD3D12Readback(LAVFrame *pFrame)
-{
-    
-    return Deliver(pFrame);
-}
-
-struct D3D12DirectPrivate
-{
-    //AVBufferRef *pDeviceContex;
-    d3d12_footprint_t pStagingLayout;
-    ID3D12Resource *pStagingTexture;
-    int frame_index;
-    CD3D12Decoder* pDec;
-    CRITICAL_SECTION crit;
-};
-
-static bool d3d12_direct_lock(LAVFrame *pFrame, LAVDirectBuffer *pBuffer)
-{
-    D3D12DirectPrivate* c = (D3D12DirectPrivate*)pFrame->priv_data;
-    
-    D3D12_RESOURCE_DESC desc;
-    
-
-    ASSERT(pFrame && pBuffer);
-
-    // lock the device context
-    EnterCriticalSection(&c->crit);
-
-    desc = c->pStagingTexture->GetDesc();
-
-    // map
-    HRESULT hr = S_OK;// pDeviceContext->device_context->Map(c->pStagingTexture, 0, D3D11_MAP_READ, 0, &map);
-
-    void* pData;
-    D3D12_RANGE readRange;
-    readRange.Begin = 0;
-    readRange.End = c->pStagingLayout.RequiredSize;
-    
-    hr = c->pStagingTexture->Map(0, &readRange,&pData);
-    if (FAILED(hr))
-    {
-        LeaveCriticalSection(&c->crit);
-        return false;
-    }
-    //D3D12_BOX pSrcBox;
-    //675840 the data stop at that
-    //hr = c->pStagingTexture->ReadFromSubresource(&pData, c->pStagingLayout.layoutplane[0].Footprint.RowPitch, 1,(UINT)0,nullptr);
-    pBuffer->data[0] = (BYTE*)pData;
-    pBuffer->data[1] = pBuffer->data[0] + c->pStagingLayout.layoutplane[0].Footprint.Height * c->pStagingLayout.layoutplane[0].Footprint.RowPitch;// map.RowPitch;
-
-    pBuffer->stride[0] = c->pStagingLayout.layoutplane[0].Footprint.RowPitch;
-    pBuffer->stride[1] = c->pStagingLayout.layoutplane[0].Footprint.RowPitch;
-    
-    //c->pStagingTexture->Unmap(0, nullptr);
-    return true;
-}
-
-static void d3d12_direct_unlock(LAVFrame *pFrame)
-{
-    D3D12DirectPrivate* c = (D3D12DirectPrivate*)pFrame->priv_data;
-    c->pStagingTexture->Unmap(0, nullptr);
-    LeaveCriticalSection(&c->crit);
-}
-
-static void d3d12_direct_free(LAVFrame *pFrame)
-{
-    D3D12DirectPrivate *c = (D3D12DirectPrivate *)pFrame->priv_data;
-    
-    c->pStagingTexture->Release();
-    c->pStagingLayout = c->pStagingLayout;
-    
-    c->pDec->free_buffer(c->frame_index);
-    delete c;
-}
-
+#if 0
 void CD3D12Decoder::free_buffer(int idx)
 {
     std::list<int>::iterator it;
     //stupid hack in case we lost some index
-    if (ref_free_index.size() == 1)
-        printf("yo");
+    //if (ref_free_index.size() == 1)
+    //    printf("yo");
     it = std::find(ref_free_index.begin(), ref_free_index.end(), idx);
     if (it != ref_free_index.end())
         ref_free_index.erase(it);
@@ -1052,14 +773,14 @@ void CD3D12Decoder::free_buffer(int idx)
         ref_free_index.push_back(idx);
     
 }
-
+#endif
 HRESULT CD3D12Decoder::UpdateStaging()
 {
     
     HRESULT hr = S_OK;
     if (m_pStagingTexture)
     {
-        SafeRelease(&m_pStagingTexture);
+        SAFE_RELEASE(m_pStagingTexture);
     }
     
     if (!m_pD3DCommands)
@@ -1067,7 +788,6 @@ HRESULT CD3D12Decoder::UpdateStaging()
     m_pStagingDesc = {};
         
     m_pStagingProp = {};
-    UINT64 sss;
     D3D12_RESOURCE_DESC indesc = ref_table[0]->GetDesc();
     //nv12
     //DXGI_FORMAT_R8_UNORM first plane
@@ -1090,68 +810,7 @@ HRESULT CD3D12Decoder::UpdateStaging()
 
 }
 
-
-
-HRESULT CD3D12Decoder::DeliverD3D12ReadbackDirect(LAVFrame *pFrame)
-{
-    AVFrame* srcframe = (AVFrame*)pFrame->priv_data;
-    UINT outputindex;
-
-    outputindex = (UINT)srcframe->data[3];
-    ID3D12Resource* out = m_pTexture[outputindex];
-    D3D12_RESOURCE_DESC desc = m_pTexture[outputindex]->GetDesc();
-    UINT outsub = m_pD3D12VAContext.surfaces.pSubresources[outputindex];
-    
-    D3D12_PLACED_SUBRESOURCE_FOOTPRINT layouts[2] = {};
-    UINT numrows[2] = {};
-    UINT64 rowsizes[2] = {};
-    UINT64 totalbytes = 0;
-    D3D12_FEATURE_DATA_FORMAT_INFO info;
-    if (m_pStagingDesc.Width != desc.Width || m_pStagingDesc.Height != desc.Height ||
-        m_pStagingDesc.Format != desc.Format || !m_pStagingTexture)
-        UpdateStaging();
-    
-    HRESULT hr;
-    ID3D12GraphicsCommandList *cmd = m_pD3DCommands->GetCommandBuffer();
-    m_pD3DCommands->Reset(cmd);
-    D3D12_TEXTURE_COPY_LOCATION dst;
-    D3D12_TEXTURE_COPY_LOCATION src;   
-    for (int i = 0; i < 2; i++) {
-        dst = CD3DX12_TEXTURE_COPY_LOCATION(m_pStagingTexture, m_pStagingLayout.layoutplane[i]);
-        src = CD3DX12_TEXTURE_COPY_LOCATION(out, i);
-        cmd->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
-    }
-    uint8_t* pdata;
-    D3D12_RANGE range;
-    range.Begin = 0;
-    range.End = m_pStagingLayout.RequiredSize;
-
-    hr = cmd->Close();
-    m_pD3DCommands->Submit({ cmd });
-    m_pD3DCommands->GPUSync();
-    //we are done with this reference frame we can free it
-
-    av_frame_free(&srcframe);
-    D3D12DirectPrivate* c = new D3D12DirectPrivate;
-    
-    c->pStagingTexture = m_pStagingTexture;
-    c->pStagingLayout = m_pStagingLayout;
-    c->frame_index = (int)outputindex;
-    c->pDec = this;
-    c->crit = directLock;
-    m_pStagingTexture->AddRef();
-    pFrame->priv_data = c;
-    pFrame->destruct = d3d12_direct_free;
-
-    GetPixelFormat(&pFrame->format, &pFrame->bpp);
-
-    pFrame->direct = true;
-    pFrame->direct_lock = d3d12_direct_lock;
-    pFrame->direct_unlock = d3d12_direct_unlock;
-
-    return Deliver(pFrame);
-}
-
+#if 0
 STDMETHODIMP CD3D12Decoder::GetPixelFormat(LAVPixelFormat *pPix, int *pBpp)
 {
     //*pPix = LAVPixFmt_D3D12;
@@ -1181,7 +840,7 @@ STDMETHODIMP_(DWORD) CD3D12Decoder::GetHWAccelNumDevices()
     while (SUCCEEDED(pDXGIFactory->EnumAdapters(i, &pDXGIAdapter)))
     {
         pDXGIAdapter->GetDesc(&desc);
-        SafeRelease(&pDXGIAdapter);
+        SAFE_RELEASE(pDXGIAdapter);
 
         // stop when we hit the MS software device
         if (desc.VendorId == 0x1414 && desc.DeviceId == 0x8c)
@@ -1193,7 +852,7 @@ STDMETHODIMP_(DWORD) CD3D12Decoder::GetHWAccelNumDevices()
     nDevices = i;
 
 fail:
-    SafeRelease(&pDXGIFactory);
+    SAFE_RELEASE(pDXGIFactory);
     return nDevices;
 }
 
@@ -1227,8 +886,8 @@ STDMETHODIMP CD3D12Decoder::GetHWAccelDeviceInfo(DWORD dwIndex, BSTR *pstrDevice
         *dwDeviceIdentifier = desc.DeviceId;
 
 fail:
-    SafeRelease(&pDXGIFactory);
-    SafeRelease(&pDXGIAdapter);
+    SAFE_RELEASE(pDXGIFactory);
+    SAFE_RELEASE(pDXGIAdapter);
     return hr;
 }
 
@@ -1242,3 +901,4 @@ STDMETHODIMP CD3D12Decoder::GetHWAccelActiveDevice(BSTR *pstrDeviceName)
     *pstrDeviceName = SysAllocString(m_AdapterDesc.Description);
     return S_OK;
 }
+#endif
