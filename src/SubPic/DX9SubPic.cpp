@@ -197,11 +197,6 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 	CRect rSrc(*pSrc), rDst(*pDst);
 
-	if (rSrc.IsRectEmpty()) { // or rDst.IsRectEmpty() or m_rcDirty.IsRectEmpty()
-		// optimization for XySubFilter
-		return S_FALSE;
-	}
-
 	CComPtr<IDirect3DDevice9> pD3DDev;
 	CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
 	if (!pTexture || FAILED(pTexture->GetDevice(&pD3DDev)) || !pD3DDev) {

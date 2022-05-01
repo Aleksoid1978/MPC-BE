@@ -377,11 +377,6 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 	CRect rSrc(*pSrc), rDst(*pDst);
 
-	if (rSrc.IsRectEmpty()) { // or rDst.IsRectEmpty() or m_rcDirty.IsRectEmpty()
-		// optimization for XySubFilter
-		return S_FALSE;
-	}
-
 	CComPtr<ID3D11Texture2D> pTexture = m_pTexture;
 	if (!pTexture) {
 		return E_NOINTERFACE;
