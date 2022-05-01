@@ -108,6 +108,9 @@ private:
 	bool									m_bUseFFmpeg;
 	bool									m_bUseDXVA;
 	bool									m_bUseD3D11;
+#ifdef USE_D3D12
+	bool                  m_bUseD3D12;
+#endif
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
 
@@ -329,6 +332,7 @@ public:
 
 	inline bool					UseDXVA2() const { return m_nDecoderMode == MODE_DXVA2; }
 	inline bool					UseD3D11() const { return m_nDecoderMode == MODE_D3D11; }
+	inline bool         UseD3D12() const { return m_nDecoderMode == MODE_D3D12; }
 
 	bool						IsDXVASupported(const bool bMode);
 	void						UpdateAspectRatio();

@@ -59,7 +59,7 @@ public:
   GUID* GetDecoderGuid() { return m_DecoderGUID != GUID_NULL ? &m_DecoderGUID : nullptr; }
   DXGI_ADAPTER_DESC* GetAdapterDesc() { return &m_AdapterDesc; }
 
-  void log_callback_null(void* ptr, int level, const char* fmt, va_list vl);
+  static void log_callback_null(void* ptr, int level, const char* fmt, va_list vl);
 private:
   friend class CD3D12SurfaceAllocator;
   CMPCVideoDecFilter* m_pFilter = nullptr;

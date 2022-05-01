@@ -75,22 +75,14 @@ STDMETHODIMP_(ULONG) CD3D12MediaSample::Release()
 
 STDMETHODIMP CD3D12MediaSample::GetD3D12Texture(ID3D12Resource **ppResource, int* iTextureIndex)
 {
-    //CheckPointer(ppTexture, E_POINTER);
-
-
-    
+    CheckPointer(ppResource, E_POINTER);
     if (m_pFrame)
     {
-        
         *ppResource = (ID3D12Resource*)m_pFrame->data[2];
-        *iTextureIndex =(int) m_pFrame->data[3];
-        //*pArraySlice = (UINT)(intptr_t)m_pFrame->data[1];
-
+        *iTextureIndex =(int) m_pFrame->data[1];
         (*ppResource)->AddRef();
-
         return S_OK;
     }
-
     return E_FAIL;
 }
 
@@ -133,10 +125,15 @@ STDMETHODIMP CD3D12MediaSample::GetAVFrameBuffer(AVFrame *pFrame)
     //pFrame->hw_frames_ctx = av_buffer_ref(m_pFrame->hw_frames_ctx);
 
     // copy data into the new frame
-    pFrame->data[0] = m_pFrame->data[0];
+    /*in lavfilters*/
+    /*pFrame->data[0] = m_pFrame->data[0];
     pFrame->data[1] = (uint8_t*)this;
     pFrame->data[2] = m_pFrame->data[2];
-    pFrame->data[3] = m_pFrame->data[3];
+    pFrame->data[3] = m_pFrame->data[3];*/
+    pFrame->data[0] = m_pFrame->data[0];
+    pFrame->data[1] = m_pFrame->data[1];
+    pFrame->data[2] = m_pFrame->data[2];
+    pFrame->data[3] = (uint8_t*)this;
 
     pFrame->format = AV_PIX_FMT_D3D12_VLD;
 
@@ -197,8 +194,8 @@ HRESULT CD3D12SurfaceAllocator::Alloc(void)
             Free();
             return E_FAIL;
         }
-
-        pFrame->data[3] = (uint8_t*)i;// index in the array
+        
+        pFrame->data[1] = (uint8_t*)i;// index in the array
         CD3D12MediaSample *pSample = new CD3D12MediaSample(this, pFrame, &hr);
         if (pSample == nullptr || FAILED(hr))
         {

@@ -42,7 +42,8 @@ enum DECODER_MODE {
 	MODE_NONE = 0,
 	MODE_SOFTWARE,
 	MODE_DXVA2,
-	MODE_D3D11
+	MODE_D3D11,
+	MODE_D3D12
 };
 
 class CBaseVideoFilter : public CTransformFilter

@@ -1070,10 +1070,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dxva_pix_fmt(AV_PIX_FMT_NONE)
 	, m_HWPixFmt(AV_PIX_FMT_NONE)
 {
-#ifdef USE_D3D12
-	//only for testing will remove
-	m_nHwDecoder = HWDec_D3D12;
-#endif
 	if (phr) {
 		*phr = S_OK;
 	}
@@ -1256,6 +1252,9 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 {
 	Cleanup();
 	SAFE_DELETE(m_pD3D11Decoder);
+#ifdef USE_D3D12
+	SAFE_DELETE(m_pD3D12Decoder);
+#endif
 }
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
@@ -1954,7 +1953,9 @@ redo:
 		}
 		m_CodecId = ffCodecs[nNewCodec].nFFCodec;
 		m_bUseD3D11 = m_bUseDXVA && m_pD3D11Decoder;
-
+#ifdef USE_D3D12
+		m_bUseD3D12 = m_bUseDXVA && m_pD3D12Decoder;
+#endif
 		if (m_bUseDXVA && (m_nHwDecoder == HWDec_D3D11cb || m_nHwDecoder == HWDec_NVDEC)) {
 			m_bUseDXVA = m_bUseD3D11 = false;
 			m_bUseD3D11cb = (m_nHwDecoder == HWDec_D3D11cb);
@@ -1962,6 +1963,7 @@ redo:
 		}
 	}
 
+	//D3D12 dont have av1 implemented yet
 	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11)) {
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
 	} else {
@@ -2121,8 +2123,13 @@ redo:
 	m_pAVCtx->skip_frame            = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->opaque                = this;
 
-	if (IsDXVASupported(m_bUseD3D11)) {
-		m_pD3D11Decoder->AdditionaDecoderInit(m_pAVCtx);
+	if (IsDXVASupported(m_bUseD3D11 || m_bUseD3D12)) {
+		if (m_pD3D11Decoder)
+			m_pD3D11Decoder->AdditionaDecoderInit(m_pAVCtx);
+#ifdef USE_D3D12
+		else if (m_pD3D12Decoder)
+			m_pD3D12Decoder->AdditionaDecoderInit(m_pAVCtx);
+#endif
 	} else if (IsDXVASupported(m_bUseDXVA)) {
 		m_pAVCtx->hwaccel_context   = (dxva_context *)av_mallocz(sizeof(dxva_context));
 		m_pAVCtx->get_format        = av_get_format;
@@ -2284,7 +2291,7 @@ redo:
 	m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 	m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
 
-	if (bMediaTypeChanged && IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+	if (bMediaTypeChanged && IsDXVASupported(m_bUseDXVA || m_bUseD3D11 || m_bUseD3D12)) {
 		do {
 			m_bDXVACompatible = false;
 
@@ -2338,8 +2345,15 @@ redo:
 		m_pDXVADecoder->FillHWContext();
 	}
 
-	if (bMediaTypeChanged && IsDXVASupported(m_bUseD3D11)) {
-		m_pD3D11Decoder->PostInitDecoder(m_pAVCtx);
+	if (bMediaTypeChanged && IsDXVASupported(m_bUseD3D11 || m_bUseD3D12)) {
+
+		if (m_pD3D11Decoder)
+			m_pD3D11Decoder->PostInitDecoder(m_pAVCtx);
+#ifdef USE_D3D12
+		else if (m_pD3D12Decoder)
+			m_pD3D12Decoder->PostInitDecoder(m_pAVCtx);
+#endif
+		
 	}
 
 	m_bFailDXVA2Decode = m_bFailD3D11Decode = FALSE;
@@ -2452,7 +2466,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	}
 
 	int OutputCount = m_bUseFFmpeg ? nSwCount : 0;
-	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11 || m_bUseD3D12)) {
 		OutputCount++;
 	}
 	m_VideoOutputFormats.reserve(OutputCount);
@@ -2781,16 +2795,28 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				m_bUseDXVA = m_bUseD3D11 = false;
 
 				hr = VFW_E_TYPE_NOT_ACCEPTED;
-			} else if (IsDXVASupported(m_bUseD3D11)) {
-				hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
-				if (SUCCEEDED(hr)) {
+			} else if (IsDXVASupported(m_bUseD3D11 || m_bUseD3D12)) {
+				if (m_pD3D11Decoder)
+					hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
+#ifdef USE_D3D12
+				else if (m_pD3D12Decoder)
+					hr = m_pD3D12Decoder->PostConnect(m_pAVCtx, pReceivePin);
+#endif
+				if (SUCCEEDED(hr) && m_pD3D11Decoder) {
 					m_nDecoderMode = MODE_D3D11;
-					DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
-
 					auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
 					m_nPCIVendor = adapterDesc->VendorId;
 					m_nPCIDevice = adapterDesc->DeviceId;
 					m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
+#ifdef USE_D3D12
+				}	else if (SUCCEEDED(hr) && m_pD3D12Decoder) {
+					m_nDecoderMode = MODE_D3D12;
+
+					auto adapterDesc = m_pD3D12Decoder->GetAdapterDesc();
+					m_nPCIVendor = adapterDesc->VendorId;
+					m_nPCIDevice = adapterDesc->DeviceId;
+					m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
+#endif
 				} else {
 					m_nDecoderMode = MODE_SOFTWARE;
 					DXVAState::ClearState();
@@ -2906,13 +2932,16 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties)
 {
-	if (UseDXVA2() || UseD3D11()) {
+	if (UseDXVA2() || UseD3D11() || UseD3D12()) {
 		if (m_pInput->IsConnected() == FALSE) {
 			return E_UNEXPECTED;
 		}
 
 		pProperties->cBuffers = 22;
-
+#ifdef USE_D3D12
+		//we need to have the same size as the number of buffer in the d3d12 decoder
+		pProperties->cBuffers = 20;
+#endif
 		HRESULT hr = S_OK;
 		ALLOCATOR_PROPERTIES Actual;
 
@@ -3432,6 +3461,12 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			hr = m_pD3D11Decoder->DeliverFrame();
 			CLEAR_AND_CONTINUE;
 		}
+#ifdef USE_D3D12
+		else if (UseD3D12()) {
+			hr = m_pD3D12Decoder->DeliverFrame();
+			CLEAR_AND_CONTINUE;
+		}
+#endif
 
 		GetFrameTimeStamp(m_pFrame, rtStartIn, rtStopIn);
 		if (m_bRVDropBFrameTimings && m_pFrame->pict_type == AV_PICTURE_TYPE_B) {
@@ -3475,13 +3510,13 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					}
 				}
 				if (!m_pStagingD3D11Texture2D) {
-					texDesc.Width          = frames_ctx->width;
-					texDesc.Height         = frames_ctx->height;
-					texDesc.MipLevels      = 1;
-					texDesc.Format         = dxgi_format;
-					texDesc.SampleDesc     = { 1, 0 };
-					texDesc.ArraySize      = 1;
-					texDesc.Usage          = D3D11_USAGE_STAGING;
+					texDesc.Width = frames_ctx->width;
+					texDesc.Height = frames_ctx->height;
+					texDesc.MipLevels = 1;
+					texDesc.Format = dxgi_format;
+					texDesc.SampleDesc = { 1, 0 };
+					texDesc.ArraySize = 1;
+					texDesc.Usage = D3D11_USAGE_STAGING;
 					texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 					hr = device_hwctx->device->CreateTexture2D(&texDesc, nullptr, &m_pStagingD3D11Texture2D);
 					if (FAILED(hr)) {
@@ -3500,13 +3535,13 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					DLog(L"CMPCVideoDecFilter::DecodeInternal() : ID3D11DeviceContext::Map() failed : %s", HR2Str(hr));
 					CLEAR_AND_CONTINUE;
 				}
-				m_pFrame->data[0]     = (BYTE*)mappedResource.pData;
-				m_pFrame->data[1]     = m_pFrame->data[0] + texDesc.Height * mappedResource.RowPitch;
+				m_pFrame->data[0] = (BYTE*)mappedResource.pData;
+				m_pFrame->data[1] = m_pFrame->data[0] + texDesc.Height * mappedResource.RowPitch;
 				m_pFrame->linesize[0] = mappedResource.RowPitch;
 				m_pFrame->linesize[1] = mappedResource.RowPitch;
-				m_pFrame->format      = frames_ctx->sw_format;
-				m_pFrame->width       = hw_frame->width;
-				m_pFrame->height      = hw_frame->height;
+				m_pFrame->format = frames_ctx->sw_format;
+				m_pFrame->width = hw_frame->width;
+				m_pFrame->height = hw_frame->height;
 
 				m_FormatConverter.Converting(pDataOut, m_pFrame);
 
@@ -3516,6 +3551,28 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				device_hwctx->unlock(device_hwctx->lock_ctx);
 			}
+#ifdef USE_D3D12
+			if (frames_ctx->format == AV_PIX_FMT_D3D12_VLD) {
+			const auto dxgi_format =
+				(frames_ctx->sw_format == AV_PIX_FMT_P010) ? DXGI_FORMAT_P010 :
+				(frames_ctx->sw_format == AV_PIX_FMT_NV12) ? DXGI_FORMAT_NV12 :
+				DXGI_FORMAT_UNKNOWN; // formal assignment
+
+			auto texture = reinterpret_cast<ID3D12Resource*>(hw_frame->data[0]);
+			auto index = reinterpret_cast<intptr_t>(hw_frame->data[1]);
+
+			m_pFrame->data[0] = (BYTE*)texture;
+			m_pFrame->data[1] = (uint8_t*)index;
+			//m_pFrame->linesize[0] = mappedResource.RowPitch;
+			//m_pFrame->linesize[1] = mappedResource.RowPitch;
+			m_pFrame->format = frames_ctx->sw_format;
+			m_pFrame->width = hw_frame->width;
+			m_pFrame->height = hw_frame->height;
+
+			m_pFrame->data[0] = m_pFrame->data[1] = nullptr;
+
+		}
+#endif
 			else if (frames_ctx->format == AV_PIX_FMT_CUDA && m_FormatConverter.DirectCopyPossible(frames_ctx->sw_format)) {
 				auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
 				auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
@@ -3783,7 +3840,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
-		if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11) || m_CodecId == AV_CODEC_ID_MPEG4) {
+		if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11 || m_bUseD3D12) || m_CodecId == AV_CODEC_ID_MPEG4) {
 			m_pAVCtx->thread_count = 1;
 		} else {
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber();
@@ -4098,9 +4155,14 @@ HRESULT CMPCVideoDecFilter::InitAllocator(IMemAllocator **ppAlloc)
 
 		// Return the IMemAllocator interface.
 		return m_pDXVA2Allocator->QueryInterface(IID_PPV_ARGS(ppAlloc));
-	} else {
+	} else if (m_pD3D11Decoder) {
 		return m_pD3D11Decoder->InitAllocator(ppAlloc);
 	}
+#ifdef USE_D3D12
+	else if (m_pD3D12Decoder) {
+		return m_pD3D12Decoder->InitAllocator(ppAlloc);
+	}
+#endif
 }
 
 HRESULT CMPCVideoDecFilter::RecommitAllocator()
@@ -4825,7 +4887,7 @@ CVideoDecOutputPin::~CVideoDecOutputPin()
 
 HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 {
-	if (m_pVideoDecFilter && (m_pVideoDecFilter->UseDXVA2() || m_pVideoDecFilter->UseD3D11())) {
+	if (m_pVideoDecFilter && (m_pVideoDecFilter->UseDXVA2() || m_pVideoDecFilter->UseD3D11() || m_pVideoDecFilter->UseD3D12())) {
 		return m_pVideoDecFilter->InitAllocator(ppAlloc);
 	}
 

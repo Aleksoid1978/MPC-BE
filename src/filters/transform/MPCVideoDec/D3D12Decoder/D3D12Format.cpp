@@ -124,7 +124,17 @@ STDMETHODIMP CD3D12Format::FindVideoServiceConversion(struct AVCodecContext* c, 
         CheckFeatureSupport(D3D12_FEATURE_VIDEO_DECODE_FORMATS, &formats, sizeof(formats));
     }
     D3D12_FEATURE_DATA_VIDEO_DECODE_SUPPORT decode_support = { 0 };
-
+    decode_support.Configuration.BitstreamEncryption = D3D12_BITSTREAM_ENCRYPTION_TYPE_NONE;
+    decode_support.Configuration.InterlaceType = D3D12_VIDEO_FRAME_CODED_INTERLACE_TYPE_NONE;
+    decode_support.Width = c->coded_width;
+    decode_support.Height = c->coded_height;
+    decode_support.DecodeFormat = DXGI_FORMAT_NV12;
+    decode_support.Configuration.DecodeProfile = D3D12_VIDEO_DECODE_PROFILE_H264;
+    DXGI_RATIONAL framerate = { (UINT)c->framerate.den, (UINT)c->framerate.num };
+    decode_support.FrameRate = framerate;
+    hr = m_pVideoDevice->CheckFeatureSupport(D3D12_FEATURE_VIDEO_DECODE_SUPPORT, &decode_support, sizeof(decode_support));
+    m_pDecodeSupport = decode_support;
+    return hr;
 #if 0
     for (unsigned i = 0; dxva_modes[i].name; i++)
     {

@@ -726,6 +726,8 @@ d3d12_done:
                 ID3D12VideoDevice_Release(d3d12_video_device);
             if (FAILED(hr))
                 goto fail;
+            else
+                av_log(avctx, AV_LOG_ERROR, "D3D12 device created successfully!\n");
         }
 #endif
 		return 0;
@@ -860,6 +862,12 @@ static void *get_surface(const AVCodecContext *avctx, const AVFrame *frame)
         }
         return D3D11VA_CONTEXT(ctx)->surface[index];
 // ==> End patch MPC
+    }
+#endif
+#if CONFIG_D3D12
+//mpcbe use data[1] for surface index
+    if (frame->format == AV_PIX_FMT_D3D12_VLD) {
+        return frame->data[1];
     }
 #endif
     return frame->data[3];
@@ -1122,12 +1130,14 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
     if (ff_dxva2_is_d3d11(avctx)) {
         buffer       = &buffer11[buffer_count + 0];
         buffer_slice = &buffer11[buffer_count + 1];
+        buffer_count += 2;
     }
 #endif
 #if CONFIG_DXVA2
     if (avctx->pix_fmt == AV_PIX_FMT_DXVA2_VLD) {
         buffer       = &buffer2[buffer_count + 0];
         buffer_slice = &buffer2[buffer_count + 1];
+        buffer_count += 2;
     }
 #endif
 #if CONFIG_D3D12
@@ -1135,6 +1145,7 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
         buffer       = &buffer12.CompressedBitstream;
         buffer_slice = &buffer12.FrameArguments[buffer_count];
         buffer_count += 1;
+        av_log(avctx, AV_LOG_ERROR, "buffer count d3d12 %d qm_size %d\n", (int)buffer_count, (int)qm_size);
     }
 #endif
 
@@ -1146,11 +1157,10 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
                "Failed to add bitstream or slice control buffer\n");
         goto end;
     }
-    buffer_count += 2;
 
     /* TODO Film Grain when possible */
-
-    assert(buffer_count == 1 + (qm_size > 0) + 2);
+    /*av_log(avctx, AV_LOG_ERROR, "buffer count d3d12 %d qm_size %d\n", (int)buffer_count, (int)qm_size);*/
+    /*assert(buffer_count == 1 + (qm_size > 0) + 2);*/
 
 #if CONFIG_D3D11VA
     if (ff_dxva2_is_d3d11(avctx))
@@ -1194,6 +1204,8 @@ end:
         ID3D12VideoDecodeCommandList_Reset(sctx->d3d12_cmd_list, sctx->d3d12_cmd_allocator);
 
         uintptr_t out_index = (uintptr_t)get_surface(avctx, frame);
+        /*for testing purpose*/
+        /*av_log(avctx, AV_LOG_ERROR, "d3d12 common end frame surface: %d\n", (int)out_index);*/
         memcpy(&buffer12.ReferenceFrames, &ctx->d3d12.surfaces, sizeof(buffer12.ReferenceFrames));
 
         D3D12_VIDEO_DECODE_OUTPUT_STREAM_ARGUMENTS output = {
