@@ -541,6 +541,8 @@ STDMETHODIMP CD3D12Decoder::CreateD3D12Decoder(AVCodecContext* c)
   formats_video.Height = c->coded_height;
   formats_video.DecodeFormat = d3d12va_map_sw_to_hw_format(c->sw_pix_fmt);
   formats_video.Configuration.DecodeProfile = profileGUID;
+
+  m_DecoderGUID = profileGUID;
   framerate = { (UINT)c->framerate.den, (UINT)c->framerate.num };
   formats_video.FrameRate = framerate;
 
