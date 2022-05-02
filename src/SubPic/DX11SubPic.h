@@ -32,9 +32,8 @@ class CDX11SubPic : public CSubPicImpl
 {
 	DWORD m_ClearColor = 0xff000000;
 
-	CComPtr<ID3D11Texture2D> m_pStagingTexture;
-
 	CComPtr<ID3D11Texture2D> m_pTexture;
+	ID3D11Texture2D* m_pStagingTexture = nullptr;
 	CComPtr<ID3D11ShaderResourceView> m_pShaderResource;
 
 protected:
@@ -43,7 +42,7 @@ protected:
 public:
 	CDX11SubPicAllocator *m_pAllocator;
 	bool m_bExternalRenderer;
-	CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
+	CDX11SubPic(ID3D11Texture2D* pTexture, ID3D11Texture2D* pStagingTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
 	~CDX11SubPic();
 
 	// ISubPic
@@ -62,6 +61,8 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	CComPtr<ID3D11Device> m_pDevice;
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
+
+	CComPtr<ID3D11Texture2D> m_pStagingTexture;
 
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 

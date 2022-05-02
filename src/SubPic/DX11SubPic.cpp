@@ -31,7 +31,7 @@ struct VERTEX {
 	DirectX::XMFLOAT2 TexCoord;
 };
 
-HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
+static HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
 	const UINT srcW, const UINT srcH, const RECT& srcRect)
 {
 	ASSERT(ppVertexBuffer);
@@ -69,7 +69,7 @@ HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
 	return hr;
 }
 
-inline void D3DCOLORtoFLOAT4(FLOAT(&float4)[4], const D3DCOLOR color)
+static inline void D3DCOLORtoFLOAT4(FLOAT(&float4)[4], const D3DCOLOR color)
 {
 	float4[0] = (float)((color & 0x00FF0000) >> 16) / 255;
 	float4[1] = (float)((color & 0x0000FF00) >> 8) / 255;
@@ -77,7 +77,7 @@ inline void D3DCOLORtoFLOAT4(FLOAT(&float4)[4], const D3DCOLOR color)
 	float4[3] = (float)((color & 0xFF000000) >> 24) / 255;
 }
 
-HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
+static HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
 {
 	if (!src || !filename) {
 		return E_POINTER;
@@ -129,7 +129,7 @@ HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT 
 	return E_FAIL;
 }
 
-HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2D* pTexture2D, const wchar_t* filename)
+static HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2D* pTexture2D, const wchar_t* filename)
 {
 	D3D11_TEXTURE2D_DESC desc;
 	pTexture2D->GetDesc(&desc);
@@ -184,8 +184,9 @@ HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2D* pTex
 // CDX11SubPic
 //
 
-CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
+CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, ID3D11Texture2D* pStagingTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
 	: m_pTexture(pTexture)
+	, m_pStagingTexture(pStagingTexture)
 	, m_pAllocator(pAllocator)
 	, m_bExternalRenderer(bExternalRenderer)
 {
@@ -204,11 +205,6 @@ CDX11SubPic::CDX11SubPic(ID3D11Texture2D* pTexture, CDX11SubPicAllocator *pAlloc
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	pDevice->CreateShaderResourceView(m_pTexture, &srvDesc, &m_pShaderResource);
-
-	texDesc.Usage = D3D11_USAGE_STAGING;
-	texDesc.BindFlags = 0;
-	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	pDevice->CreateTexture2D(&texDesc, nullptr, &m_pStagingTexture);
 }
 
 CDX11SubPic::~CDX11SubPic()
@@ -452,15 +448,15 @@ void CDX11SubPicAllocator::GetStats(int &_nFree, int &_nAlloc)
 
 void CDX11SubPicAllocator::ClearCache()
 {
-	{
-		// Clear the allocator of any remaining subpics
-		CAutoLock Lock(&ms_SurfaceQueueLock);
-		for (auto& pSubPic : m_AllocatedSurfaces) {
-			pSubPic->m_pAllocator = nullptr;
-		}
-		m_AllocatedSurfaces.clear();
-		m_FreeSurfaces.clear();
+	// Clear the allocator of any remaining subpics
+	CAutoLock Lock(&ms_SurfaceQueueLock);
+	for (auto& pSubPic : m_AllocatedSurfaces) {
+		pSubPic->m_pAllocator = nullptr;
 	}
+	m_AllocatedSurfaces.clear();
+	m_FreeSurfaces.clear();
+
+	m_pStagingTexture.Release();
 }
 
 // ISubPicAllocator
@@ -539,9 +535,16 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 		if (FAILED(hr)) {
 			return false;
 		}
+
+		if (!m_pStagingTexture) {
+			texDesc.Usage = D3D11_USAGE_STAGING;
+			texDesc.BindFlags = 0;
+			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pStagingTexture);
+		}
 	}
 
-	*ppSubPic = DNew CDX11SubPic(pTexture, fStatic ? 0 : this, m_bExternalRenderer);
+	*ppSubPic = DNew CDX11SubPic(pTexture, m_pStagingTexture, fStatic ? 0 : this, m_bExternalRenderer);
 	if (!(*ppSubPic)) {
 		return false;
 	}
