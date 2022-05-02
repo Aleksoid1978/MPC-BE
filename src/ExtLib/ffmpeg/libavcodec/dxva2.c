@@ -672,7 +672,7 @@ int ff_dxva2_decode_init(AVCodecContext *avctx)
 #if CONFIG_D3D12
         if (avctx->hwaccel->pix_fmt == AV_PIX_FMT_D3D12_VLD) {
             ret = -1;
-
+            av_log(avctx, AV_LOG_INFO, "%s Starting!\n",__FUNCTION__);
             struct AVD3D12VAContext *d3d12 = avctx->hwaccel_context;
             HRESULT hr;
             ID3D12VideoDevice *d3d12_video_device = NULL;
@@ -683,7 +683,7 @@ int ff_dxva2_decode_init(AVCodecContext *avctx)
             hr = ID3D12VideoDecoder_GetDevice(d3d12->decoder, &IID_ID3D12VideoDevice, (void**)&d3d12_video_device);
             if (FAILED(hr))
                 goto d3d12_done;
-
+            av_log(avctx, AV_LOG_INFO, "%s Got device!\n",__FUNCTION__);
             hr = ID3D12Device1_CreateFence(sctx->d3d12_device, 0, D3D12_FENCE_FLAG_NONE, &IID_ID3D12Fence, (void**)&sctx->d3dRenderFence);
             if (FAILED(hr))
                 goto d3d12_done;
@@ -700,6 +700,7 @@ int ff_dxva2_decode_init(AVCodecContext *avctx)
             hr = ID3D12Device1_CreateCommandList(sctx->d3d12_device, 0, D3D12_COMMAND_LIST_TYPE_VIDEO_DECODE,
                                                  sctx->d3d12_cmd_allocator, NULL,
                                                  &IID_ID3D12VideoDecodeCommandList, (void**)&sctx->d3d12_cmd_list);
+            av_log(avctx, AV_LOG_INFO, "%s Command list created!\n",__FUNCTION__);
             if (FAILED(hr))
                 goto d3d12_done;
 
@@ -727,7 +728,7 @@ d3d12_done:
             if (FAILED(hr))
                 goto fail;
             else
-                av_log(avctx, AV_LOG_ERROR, "D3D12 device created successfully!\n");
+                av_log(avctx, AV_LOG_INFO, "D3D12 device created successfully!\n");
         }
 #endif
 		return 0;
@@ -816,6 +817,7 @@ int ff_dxva2_decode_uninit(AVCodecContext *avctx)
 #endif
 
 #if CONFIG_D3D12
+    av_log(avctx, AV_LOG_INFO, "%s Releasing d3d12 decoder!\n",__FUNCTION__);
     if (sctx->d3d12_decoder_heap)
         ID3D12VideoDecoderHeap_Release(sctx->d3d12_decoder_heap);
 
@@ -867,6 +869,7 @@ static void *get_surface(const AVCodecContext *avctx, const AVFrame *frame)
 #if CONFIG_D3D12
 //mpcbe use data[1] for surface index
     if (frame->format == AV_PIX_FMT_D3D12_VLD) {
+        /*av_log((void *)avctx, AV_LOG_INFO, "%s!\n",__FUNCTION__);*/
         return frame->data[1];
     }
 #endif
@@ -1205,11 +1208,15 @@ end:
 
         uintptr_t out_index = (uintptr_t)get_surface(avctx, frame);
         /*for testing purpose*/
-        /*av_log(avctx, AV_LOG_ERROR, "d3d12 common end frame surface: %d\n", (int)out_index);*/
+        av_log(avctx, AV_LOG_INFO, "d3d12 common end frame surface: %d\n", (int)out_index);
         memcpy(&buffer12.ReferenceFrames, &ctx->d3d12.surfaces, sizeof(buffer12.ReferenceFrames));
-
+        /* if we use a single array of resource instead of individual we se this*/
+        /* the only problem is its not supported with older cards and also*/
+        /* you can have a problem getting the second plane during the copy*/
+        /*setting the OutputSubresource to 0 most be done on the application side*/
         D3D12_VIDEO_DECODE_OUTPUT_STREAM_ARGUMENTS output = {
             .pOutputTexture2D = ctx->d3d12.surfaces.ppTexture2Ds[out_index],
+            
             .OutputSubresource= ctx->d3d12.surfaces.pSubresources[out_index],
         };
 

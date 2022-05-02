@@ -93,7 +93,7 @@ private:
   ID3D12VideoDecoder* m_pVideoDecoder = nullptr;
 
   /* avcodec internals */
-  struct AVD3D12VAContext m_pD3D12VAContext;
+  struct AVD3D12VAContext* m_pD3D12VAContext;
 
   int m_nOutputViews = 0;
 
