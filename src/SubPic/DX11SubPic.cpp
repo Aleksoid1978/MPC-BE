@@ -459,7 +459,7 @@ bool CDX11SubPicAllocator::CreateOutputTex()
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = 0;
 	texDesc.Width = m_maxsize.cx;
 	texDesc.Height = m_maxsize.cy;
