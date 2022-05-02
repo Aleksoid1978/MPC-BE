@@ -24,7 +24,6 @@
 #include <vector>
 #include <list>
 
-/*comptr*/
 #define MAX_SURFACE_COUNT (64)
 #include "./D3D12Decoder/D3D12SurfaceAllocator.h"
 
