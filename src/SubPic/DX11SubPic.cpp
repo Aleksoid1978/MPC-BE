@@ -177,29 +177,27 @@ static HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2
 // CDX11SubPic
 //
 
-CDX11SubPic::CDX11SubPic(std::shared_ptr<MemPic_t> pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
-	: m_pMemPic(pMemPic)
+CDX11SubPic::CDX11SubPic(MemPic_t&& pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
+	: m_MemPic(std::move(pMemPic))
 	, m_pAllocator(pAllocator)
 	, m_bExternalRenderer(bExternalRenderer)
 {
-	m_maxsize.SetSize(m_pMemPic->w, m_pMemPic->h);
+	m_maxsize.SetSize(m_MemPic.w, m_MemPic.h);
 	m_rcDirty.SetRect(0, 0, m_maxsize.cx, m_maxsize.cy);
 }
 
 CDX11SubPic::~CDX11SubPic()
 {
-	{
-		CAutoLock Lock(&CDX11SubPicAllocator::ms_SurfaceQueueLock);
-		// Add surface to cache
-		if (m_pAllocator) {
-			for (auto it = m_pAllocator->m_AllocatedSurfaces.begin(), end = m_pAllocator->m_AllocatedSurfaces.end(); it != end; ++it) {
-				if (*it == this) {
-					m_pAllocator->m_AllocatedSurfaces.erase(it);
-					break;
-				}
+	CAutoLock Lock(&CDX11SubPicAllocator::ms_SurfaceQueueLock);
+	// Add surface to cache
+	if (m_pAllocator) {
+		for (auto it = m_pAllocator->m_AllocatedSurfaces.begin(), end = m_pAllocator->m_AllocatedSurfaces.end(); it != end; ++it) {
+			if (*it == this) {
+				m_pAllocator->m_AllocatedSurfaces.erase(it);
+				break;
 			}
-			m_pAllocator->m_FreeSurfaces.push_back(m_pMemPic);
 		}
+		m_pAllocator->m_FreeSurfaces.push_back(std::move(m_MemPic));
 	}
 }
 
@@ -207,7 +205,7 @@ CDX11SubPic::~CDX11SubPic()
 
 STDMETHODIMP_(void*) CDX11SubPic::GetObject()
 {
-	return (void*)m_pMemPic.get();
+	return reinterpret_cast<void*>(&m_MemPic);
 }
 
 STDMETHODIMP CDX11SubPic::GetDesc(SubPicDesc& spd)
@@ -234,26 +232,25 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 		return S_FALSE;
 	}
 
-	MemPic_t* pSrcMemPic = m_pMemPic.get();
-	MemPic_t* pDstMemPic = (MemPic_t*)pSubPic->GetObject();
+	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
 
-	if (pSrcMemPic->w != pDstMemPic->w || pSrcMemPic->h != pDstMemPic->h) {
+	if (m_MemPic.w != pDstMemPic->w || m_MemPic.h != pDstMemPic->h) {
 		DLog(L"CDX11SubPic::CopyTo() - SrcTex(%ux%u) is not equal DstTex(%ux%u)",
-			pSrcMemPic->w, pSrcMemPic->h, pDstMemPic->w, pDstMemPic->h);
+			m_MemPic.w, m_MemPic.h, pDstMemPic->w, pDstMemPic->h);
 
-		UINT minW_bytes = std::min(pSrcMemPic->w, pDstMemPic->w) * 4;
-		UINT minH = std::min(pSrcMemPic->h, pDstMemPic->h);
-		auto src = pSrcMemPic->data.get();
+		UINT minW_bytes = std::min(m_MemPic.w, pDstMemPic->w) * 4;
+		UINT minH = std::min(m_MemPic.h, pDstMemPic->h);
+		auto src = m_MemPic.data.get();
 		auto dst = pDstMemPic->data.get();
 		while (minH--) {
 			memcpy(dst, src, minW_bytes);
-			src += pSrcMemPic->w;
+			src += m_MemPic.w;
 			dst += pDstMemPic->w;
 		}
 	} else {
-		auto src = pSrcMemPic->data.get();
+		auto src = m_MemPic.data.get();
 		auto dst = pDstMemPic->data.get();
-		memcpy(dst, src, (size_t)pSrcMemPic->w * pSrcMemPic->h * 4);
+		memcpy(dst, src, (size_t)m_MemPic.w * m_MemPic.h * 4);
 	}
 
 	return SUCCEEDED(hr) ? S_OK : E_FAIL;
@@ -267,11 +264,11 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 
 	const UINT dirtyW_bytes = m_rcDirty.Width() * 4;
 	UINT dirtyH = m_rcDirty.Height();
-	uint32_t* ptr = m_pMemPic->data.get() + m_pMemPic->w * m_rcDirty.top + m_rcDirty.left;
+	uint32_t* ptr = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
 
 	while (dirtyH-- > 0) {
 		memset_u32(ptr, color, dirtyW_bytes);
-		ptr += m_pMemPic->w;
+		ptr += m_MemPic.w;
 	}
 
 	m_rcDirty.SetRectEmpty();
@@ -282,7 +279,7 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 
 STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 {
-	if (!m_pMemPic) {
+	if (!m_MemPic.data) {
 		return E_FAIL;
 	}
 
@@ -290,8 +287,8 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 	spd.w       = m_size.cx;
 	spd.h       = m_size.cy;
 	spd.bpp     = 32;
-	spd.pitch   = m_pMemPic->w * 4;
-	spd.bits    = (BYTE*)m_pMemPic->data.get();
+	spd.pitch   = m_MemPic.w * 4;
+	spd.bits    = (BYTE*)m_MemPic.data.get();
 	spd.vidrect = m_vidrect;
 
 	return S_OK;
@@ -345,12 +342,12 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		const UINT dirtyW_bytes = m_rcDirty.Width() * 4;
 		UINT dirtyH = m_rcDirty.Height();
 
-		uint32_t* src = m_pMemPic->data.get() + m_pMemPic->w * m_rcDirty.top + m_rcDirty.left;
+		uint32_t* src = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
 		BYTE* dst = (BYTE*)mr.pData + mr.RowPitch * m_rcDirty.top + (m_rcDirty.left * 4);
 
 		while (dirtyH-- > 0) {
 			memcpy(dst, src, dirtyW_bytes);
-			src += m_pMemPic->w;
+			src += m_MemPic.w;
 			dst += mr.RowPitch;
 		}
 
@@ -422,18 +419,16 @@ void CDX11SubPicAllocator::GetStats(int &_nFree, int &_nAlloc)
 
 void CDX11SubPicAllocator::ClearCache()
 {
-	{
-		// Clear the allocator of any remaining subpics
-		CAutoLock Lock(&ms_SurfaceQueueLock);
-		for (auto& pSubPic : m_AllocatedSurfaces) {
-			pSubPic->m_pAllocator = nullptr;
-		}
-		m_AllocatedSurfaces.clear();
-		m_FreeSurfaces.clear();
-
-		m_pOutputShaderResource.Release();
-		m_pOutputTexture.Release();
+	// Clear the allocator of any remaining subpics
+	CAutoLock Lock(&ms_SurfaceQueueLock);
+	for (auto& pSubPic : m_AllocatedSurfaces) {
+		pSubPic->m_pAllocator = nullptr;
 	}
+	m_AllocatedSurfaces.clear();
+	m_FreeSurfaces.clear();
+
+	m_pOutputShaderResource.Release();
+	m_pOutputTexture.Release();
 }
 
 // ISubPicAllocator
@@ -522,30 +517,29 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	*ppSubPic = nullptr;
 
-	std::shared_ptr<MemPic_t> pMemPic;
+	MemPic_t pMemPic;
 
 	if (!fStatic) {
 		CAutoLock cAutoLock(&ms_SurfaceQueueLock);
 		if (!m_FreeSurfaces.empty()) {
-			pMemPic = m_FreeSurfaces.front();
+			pMemPic = std::move(m_FreeSurfaces.front());
 			m_FreeSurfaces.pop_front();
 		}
 	}
 
-	if (!pMemPic) {
+	if (!pMemPic.data) {
 		const UINT picSize = m_maxsize.cx * m_maxsize.cy;
 		auto data = new(std::nothrow) uint32_t[picSize];
 		if (!data) {
 			return false;
 		}
 
-		pMemPic = std::make_shared<MemPic_t>();
-		pMemPic->data.reset(data);
-		pMemPic->w = m_maxsize.cx;
-		pMemPic->h = m_maxsize.cy;
+		pMemPic.data.reset(data);
+		pMemPic.w = m_maxsize.cx;
+		pMemPic.h = m_maxsize.cy;
 	}
 
-	*ppSubPic = DNew CDX11SubPic(pMemPic, fStatic ? 0 : this, m_bExternalRenderer);
+	*ppSubPic = DNew CDX11SubPic(std::move(pMemPic), fStatic ? 0 : this, m_bExternalRenderer);
 	if (!(*ppSubPic)) {
 		return false;
 	}

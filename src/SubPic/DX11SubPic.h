@@ -36,7 +36,7 @@ struct MemPic_t {
 
 class CDX11SubPic : public CSubPicImpl
 {
-	std::shared_ptr<MemPic_t> m_pMemPic;
+	MemPic_t m_MemPic;
 
 protected:
 	STDMETHODIMP_(void*) GetObject() override; // returns ID3D11Texture2D*
@@ -44,7 +44,7 @@ protected:
 public:
 	CDX11SubPicAllocator *m_pAllocator;
 	bool m_bExternalRenderer;
-	CDX11SubPic(std::shared_ptr<MemPic_t> pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
+	CDX11SubPic(MemPic_t&& pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
 	~CDX11SubPic();
 
 	// ISubPic
@@ -73,7 +73,7 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 
 public:
 	static CCritSec ms_SurfaceQueueLock;
-	std::list<std::shared_ptr<MemPic_t>> m_FreeSurfaces;
+	std::list<MemPic_t> m_FreeSurfaces;
 	std::list<CDX11SubPic*> m_AllocatedSurfaces;
 
 	ID3D11Texture2D* GetOutputTexture() { return m_pOutputTexture.p; }
