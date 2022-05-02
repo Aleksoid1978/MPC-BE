@@ -28,13 +28,15 @@
 
 class CDX11SubPicAllocator;
 
+struct MemPic_t {
+	std::unique_ptr<uint32_t> data;
+	UINT w = 0;
+	UINT h = 0;
+};
+
 class CDX11SubPic : public CSubPicImpl
 {
-	DWORD m_ClearColor = 0xff000000;
-
-	CComPtr<ID3D11Texture2D> m_pTexture;
-	ID3D11Texture2D* m_pStagingTexture = nullptr;
-	CComPtr<ID3D11ShaderResourceView> m_pShaderResource;
+	std::shared_ptr<MemPic_t> m_pMemPic;
 
 protected:
 	STDMETHODIMP_(void*) GetObject() override; // returns ID3D11Texture2D*
@@ -42,7 +44,7 @@ protected:
 public:
 	CDX11SubPicAllocator *m_pAllocator;
 	bool m_bExternalRenderer;
-	CDX11SubPic(ID3D11Texture2D* pTexture, ID3D11Texture2D* pStagingTexture, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
+	CDX11SubPic(std::shared_ptr<MemPic_t> pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
 	~CDX11SubPic();
 
 	// ISubPic
@@ -62,14 +64,20 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
 
-	CComPtr<ID3D11Texture2D> m_pStagingTexture;
+	CComPtr<ID3D11Texture2D> m_pOutputTexture;
+	CComPtr<ID3D11ShaderResourceView> m_pOutputShaderResource;
 
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
+	bool CreateOutputTex();
+
 public:
 	static CCritSec ms_SurfaceQueueLock;
-	std::list<CComPtr<ID3D11Texture2D> > m_FreeSurfaces;
+	std::list<std::shared_ptr<MemPic_t>> m_FreeSurfaces;
 	std::list<CDX11SubPic*> m_AllocatedSurfaces;
+
+	ID3D11Texture2D* GetOutputTexture() { return m_pOutputTexture.p; }
+	ID3D11ShaderResourceView* GetShaderResource() { return m_pOutputShaderResource.p; }
 
 	void GetStats(int &_nFree, int &_nAlloc);
 
