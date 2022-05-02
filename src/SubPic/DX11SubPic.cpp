@@ -335,27 +335,10 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	pTexture->GetDevice(&pDevice);
 	pDevice->GetImmediateContext(&pDeviceContext);
 
-	D3D11_MAPPED_SUBRESOURCE mr = {};
-	HRESULT hr = pDeviceContext->Map(pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+	uint32_t* srcData = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
+	D3D11_BOX dstBox = { m_rcDirty.left, m_rcDirty.top, 0, m_rcDirty.right, m_rcDirty.bottom, 1 };
 
-	if (SUCCEEDED(hr)) {
-		const UINT dirtyW_bytes = m_rcDirty.Width() * 4;
-		UINT dirtyH = m_rcDirty.Height();
-
-		uint32_t* src = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
-		BYTE* dst = (BYTE*)mr.pData + mr.RowPitch * m_rcDirty.top + (m_rcDirty.left * 4);
-
-		while (dirtyH-- > 0) {
-			memcpy(dst, src, dirtyW_bytes);
-			src += m_MemPic.w;
-			dst += mr.RowPitch;
-		}
-
-		pDeviceContext->Unmap(pTexture, 0);
-	}
-	else {
-		return hr;
-	}
+	pDeviceContext->UpdateSubresource(pTexture, 0, &dstBox, srcData, m_MemPic.w * 4, 0);
 
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = rDst.left;
@@ -474,7 +457,7 @@ STDMETHODIMP CDX11SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
 bool CDX11SubPicAllocator::CreateOutputTex()
 {
 	D3D11_TEXTURE2D_DESC texDesc = {};
-	texDesc.Usage = D3D11_USAGE_DYNAMIC;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	texDesc.MiscFlags = 0;
