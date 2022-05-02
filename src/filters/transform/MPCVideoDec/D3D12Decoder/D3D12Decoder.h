@@ -58,8 +58,8 @@ public:
 
   GUID* GetDecoderGuid() { return m_DecoderGUID != GUID_NULL ? &m_DecoderGUID : nullptr; }
   DXGI_ADAPTER_DESC* GetAdapterDesc() { return &m_AdapterDesc; }
-
-  static void log_callback_null(void* ptr, int level, const char* fmt, va_list vl);
+  void Flush();
+  void DestroyDecoder(const bool bFull);
 private:
   friend class CD3D12SurfaceAllocator;
   CMPCVideoDecFilter* m_pFilter = nullptr;
@@ -76,10 +76,6 @@ private:
   DXGI_ADAPTER_DESC m_AdapterDesc = {};
 
   CD3D12SurfaceAllocator* m_pAllocator = nullptr;
-
-  AVBufferRef* m_pDevCtx = nullptr;
-  AVBufferRef* m_pFramesCtx = nullptr;
-
   CD3D12Commands* m_pD3DCommands;
   ID3D12Debug* m_pD3DDebug = nullptr;
   ID3D12Debug1* m_pD3DDebug1 = nullptr;
@@ -91,13 +87,6 @@ private:
   ID3D12Resource* ref_table[MAX_SURFACE_COUNT];//ref frame
   UINT                            ref_index[MAX_SURFACE_COUNT];//ref frame index
   std::list<int>                  ref_free_index;
-  /*Staging*/
-  ID3D12Resource* m_pStagingTexture;
-  D3D12_HEAP_PROPERTIES m_pStagingProp;
-  D3D12_RESOURCE_DESC m_pStagingDesc;
-  d3d12_footprint_t m_pStagingLayout;
-  HRESULT UpdateStaging();
-  AVFrame* m_pFrame = nullptr;
 
   IDXGIAdapter* m_pDxgiAdapter = nullptr;
   IDXGIFactory2* m_pDxgiFactory = nullptr;
@@ -124,14 +113,13 @@ private:
 
   HRESULT ReInitD3D12Decoder(AVCodecContext* c);
 
-  void DestroyDecoder(const bool bFull);
-
-  void FillHWContext(AVD3D12VAContext* ctx);
+  
 
   static enum AVPixelFormat get_d3d12_format(struct AVCodecContext* s, const enum AVPixelFormat* pix_fmts);
   static int get_d3d12_buffer(struct AVCodecContext* c, AVFrame* pic, int flags);
 
   STDMETHODIMP_(long) GetBufferCount(long* pMaxBuffers = nullptr);
+  
 };
 #if 0
 

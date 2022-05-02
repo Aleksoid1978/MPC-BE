@@ -1632,7 +1632,10 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 	m_pParser = nullptr;
 
 	m_pStagingD3D11Texture2D.Release();
-
+	#ifdef USE_D3D12
+	if (m_pD3D12Decoder)
+		m_pD3D12Decoder->DestroyDecoder(TRUE);
+#endif
 	if (m_pAVCtx) {
 		av_freep(&m_pAVCtx->hwaccel_context);
 		avcodec_free_context(&m_pAVCtx);
@@ -1853,7 +1856,7 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			}
 			break;
 		case AV_CODEC_ID_HEVC:
-			if (m_bUseD3D11 && profile == FF_PROFILE_HEVC_REXT) {
+			if ((m_bUseD3D11 || m_bUseD3D12) && profile == FF_PROFILE_HEVC_REXT) {
 				return true;
 			}
 
@@ -2472,7 +2475,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	m_VideoOutputFormats.reserve(OutputCount);
 
 	int nPos = 0;
-	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+	if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11 || m_bUseD3D12)) {
 		if (m_bUseD3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
 			switch (pix_fmt) {
 				case AV_PIX_FMT_YUV420P12: m_VideoOutputFormats.push_back(DXVA_P016); break;
@@ -2804,6 +2807,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 #endif
 				if (SUCCEEDED(hr) && m_pD3D11Decoder) {
 					m_nDecoderMode = MODE_D3D11;
+					DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
 					auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
 					m_nPCIVendor = adapterDesc->VendorId;
 					m_nPCIDevice = adapterDesc->DeviceId;
@@ -2992,6 +2996,11 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	if (m_pMSDKDecoder) {
 		m_pMSDKDecoder->Flush();
 	}
+#ifdef USE_D3D12
+	if (m_pD3D12Decoder) {
+		m_pD3D12Decoder->Flush();
+	}
+#endif
 
 	m_dRate	= dRate;
 
@@ -3008,7 +3017,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	}
 
 	if (m_bDecodingStart && m_pAVCtx) {
-		if (m_CodecId == AV_CODEC_ID_H264 || m_CodecId == AV_CODEC_ID_MPEG2VIDEO) {
+		if ((m_CodecId == AV_CODEC_ID_H264 || m_CodecId == AV_CODEC_ID_MPEG2VIDEO) && m_pAVCtx->pix_fmt != AV_PIX_FMT_D3D12_VLD) {
 			InitDecoder(&m_pCurrentMediaType);
 		}
 
