@@ -62,9 +62,6 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidt
 		case 0:
 			m_maxSubtitleTextureSize = desktopSize;
 			break;
-		case 384:
-			m_maxSubtitleTextureSize.SetSize(384, 288);
-			break;
 		case 512:
 			m_maxSubtitleTextureSize.SetSize(512, 384);
 			break;

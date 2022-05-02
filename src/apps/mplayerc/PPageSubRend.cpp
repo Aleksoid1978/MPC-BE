@@ -89,7 +89,6 @@ s_maxTexRes[] = {
 	{ 800, L"800x600"  },
 	{ 640, L"640x480"  },
 	{ 512, L"512x384"  },
-	{ 384, L"384x288"  }
 };
 
 int TexWidth2Index(int w)
