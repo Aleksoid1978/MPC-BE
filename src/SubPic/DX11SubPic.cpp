@@ -70,14 +70,6 @@ static HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertex
 	return hr;
 }
 
-static inline void D3DCOLORtoFLOAT4(FLOAT(&float4)[4], const D3DCOLOR color)
-{
-	float4[0] = (float)((color & 0x00FF0000) >> 16) / 255;
-	float4[1] = (float)((color & 0x0000FF00) >> 8) / 255;
-	float4[2] = (float)(color & 0x000000FF) / 255;
-	float4[3] = (float)((color & 0xFF000000) >> 24) / 255;
-}
-
 static HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
 {
 	if (!src || !filename) {
@@ -333,15 +325,6 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 	CRect rSrc(*pSrc), rDst(*pDst);
 
-#if _DEBUG & ENABLE_DUMP_SUBPIC
-	{
-		static int counter = 0;
-		CString filepath;
-		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
-		DumpTexture2D(pDeviceContext, pTexture, filepath);
-	}
-#endif
-
 	ID3D11Texture2D* pTexture = m_pAllocator->GetOutputTexture();
 	if (!pTexture) {
 		return E_FAIL;
@@ -398,6 +381,15 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	pDeviceContext->Draw(4, 0);
 
 	pVertexBuffer->Release();
+
+#if _DEBUG & ENABLE_DUMP_SUBPIC
+	{
+		static int counter = 0;
+		CString filepath;
+		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
+		DumpTexture2D(pDeviceContext, pTexture, filepath);
+	}
+#endif
 
 	return S_OK;
 }
