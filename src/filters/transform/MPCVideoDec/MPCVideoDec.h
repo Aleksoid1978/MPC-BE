@@ -20,6 +20,8 @@
 
 #pragma once
 
+
+
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "filters/filters/FilterInterfacesImpl.h"
 #include "IMPCVideoDec.h"
@@ -32,7 +34,7 @@
 #include <basestruct.h>
 #include <mpc_defines.h>
 #include <d3d11.h>
-#ifdef USE_D3D12
+#if USE_D3D12
 #include <d3d12.h>
 #include <d3d12video.h>
 #endif
@@ -40,6 +42,8 @@
 
 #define MPCVideoDecName L"MPC Video Decoder"
 #define MPCVideoConvName L"MPC Video Converter"
+
+
 
 struct AVCodec;
 struct AVCodecContext;
@@ -49,7 +53,7 @@ struct AVPacket;
 struct AVBufferRef;
 class CD3D11Decoder;
 
-#ifdef USE_D3D12
+#if USE_D3D12
 class CD3D12Decoder;
 #endif
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
@@ -108,9 +112,8 @@ private:
 	bool									m_bUseFFmpeg;
 	bool									m_bUseDXVA;
 	bool									m_bUseD3D11;
-#ifdef USE_D3D12
+	//easier to not define USE_D3D12
 	bool                  m_bUseD3D12;
-#endif
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
 
@@ -143,7 +146,7 @@ private:
 
 	BOOL									m_bFailDXVA2Decode = FALSE;
 	BOOL									m_bFailD3D11Decode = FALSE;
-#ifdef USE_D3D12
+#if USE_D3D12
 	BOOL									m_bFailD3D12Decode = FALSE;
 #endif
 
@@ -206,7 +209,7 @@ private:
 	uint32_t m_Palette[256] = {};
 
 	CD3D11Decoder* m_pD3D11Decoder = nullptr;
-#ifdef USE_D3D12
+#if USE_D3D12
 	CD3D12Decoder* m_pD3D12Decoder = nullptr;
 #endif
 	// === Private functions
@@ -364,7 +367,7 @@ private:
 	friend class CDXVA2Decoder;
 	friend class CMSDKDecoder;
 	friend class CD3D11Decoder;
-#ifdef USE_D3D12
+#if USE_D3D12
 	friend class CD3D12Decoder;
 #endif
 	BOOL m_bInInit = FALSE;

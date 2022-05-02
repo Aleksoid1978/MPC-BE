@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#if USE_D3D12
 #include <d3d12.h>
 #include <d3d12video.h>
 #include <dxgi1_3.h>
@@ -121,3 +122,4 @@ private:
   STDMETHODIMP_(long) GetBufferCount(long* pMaxBuffers = nullptr);
   
 };
+#endif

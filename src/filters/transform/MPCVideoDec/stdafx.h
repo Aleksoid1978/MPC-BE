@@ -36,4 +36,6 @@
 #include <deque>
 #include <map>
 
-#define USE_D3D12
+// EXPERIMENTAL!
+//needed here and not in mpcvideodec.h since were using it in the settings wnd
+#define USE_D3D12 0

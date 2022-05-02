@@ -15,9 +15,8 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-
 #include "stdafx.h"
+#if USE_D3D12
 #include "D3D12Format.h"
 #include "DSUtil/DSUtil.h"
 #include <memory>
@@ -189,3 +188,4 @@ STDMETHODIMP CD3D12Format::FindVideoServiceConversion(struct AVCodecContext* c, 
     
     return E_FAIL;
 }
+#endif

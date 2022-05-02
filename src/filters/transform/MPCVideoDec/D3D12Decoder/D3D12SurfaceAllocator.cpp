@@ -16,8 +16,8 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 #include "stdafx.h"
+#if USE_D3D12
 #include "D3D12SurfaceAllocator.h"
 #include "D3D12Decoder.h"
 #include "DSUtil/DSUtil.h"
@@ -538,3 +538,4 @@ CD3D12SurfaceAllocator::Decommit()
     }
     return NOERROR;
 }
+#endif

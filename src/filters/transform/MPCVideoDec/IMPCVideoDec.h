@@ -86,7 +86,7 @@ enum MPCHwDecoder {
 	HWDec_D3D11,
 	HWDec_D3D11cb,
 	HWDec_NVDEC,
-#ifdef USE_D3D12
+#if USE_D3D12
 	HWDec_D3D12,
 #endif
 	HWDec_count

@@ -21,7 +21,7 @@
 
  //#include "ID3DVideoMemoryConfiguration.h"
  //#include "dxva2/dxva_common.h"
-
+#if USE_D3D12
 #include "d3dx12.h"
 #include <moreuuids.h>
 #include "DSUtil/DSUtil.h"
@@ -624,3 +624,4 @@ STDMETHODIMP CD3D12Decoder::CreateD3D12Decoder(AVCodecContext* c)
 
   return S_OK;
 }
+#endif

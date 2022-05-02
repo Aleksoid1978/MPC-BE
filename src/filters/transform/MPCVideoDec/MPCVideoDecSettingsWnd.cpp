@@ -165,6 +165,14 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	}
 	m_cbHWDecoder.AddString(str);
 	m_cbHWDecoder.AddString(L"NVDEC (Nvidia only)");
+#if USE_D3D12
+	str = L"D3D12 Experimental";
+	if (!SysVersion::IsWin10orLater()) {
+		str.Append(L" (not available)");
+	}
+	m_cbHWDecoder.AddString(str);
+#endif
+
 	y += 28;
 
 	// D3D11 Adapter

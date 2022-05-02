@@ -16,7 +16,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
+#if USE_D3D12
 #pragma once
 
 #include <d3d12.h>
@@ -157,3 +157,4 @@ class CD3D12SurfaceAllocator : public CBaseAllocator
 
     friend class CD3D12MediaSample;
 };
+#endif

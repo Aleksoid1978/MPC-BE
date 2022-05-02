@@ -1052,6 +1052,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nARY(0)
 	, m_bUseDXVA(true)
 	, m_bUseD3D11(true)
+	, m_bUseD3D12(false)
 	, m_bUseFFmpeg(true)
 	, m_pDXVADecoder(nullptr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
@@ -1218,14 +1219,14 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
-	if (SysVersion::IsWin8orLater() && m_nHwDecoder == HWDec_D3D11) {
+	if (SysVersion::IsWin8orLater() && (m_nHwDecoder == HWDec_D3D11) ) {
 		m_pD3D11Decoder = DNew CD3D11Decoder(this);
 		if (FAILED(m_pD3D11Decoder->Init())) {
 			SAFE_DELETE(m_pD3D11Decoder);
 		}
 	}
-#ifdef USE_D3D12
-	else if (SysVersion::IsWin8orLater() && m_nHwDecoder == HWDec_D3D12) {
+#if USE_D3D12
+	else if (SysVersion::IsWin10orLater() && m_nHwDecoder == HWDec_D3D12) {
 		m_pD3D12Decoder = DNew CD3D12Decoder(this);
 		if (FAILED(m_pD3D12Decoder->Init())) {
 			SAFE_DELETE(m_pD3D12Decoder);
@@ -1252,7 +1253,7 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 {
 	Cleanup();
 	SAFE_DELETE(m_pD3D11Decoder);
-#ifdef USE_D3D12
+#if USE_D3D12
 	SAFE_DELETE(m_pD3D12Decoder);
 #endif
 }
@@ -1952,7 +1953,7 @@ redo:
 		}
 		m_CodecId = ffCodecs[nNewCodec].nFFCodec;
 		m_bUseD3D11 = m_bUseDXVA && m_pD3D11Decoder;
-#ifdef USE_D3D12
+#if USE_D3D12
 		m_bUseD3D12 = m_bUseDXVA && m_pD3D12Decoder;
 #endif
 		if (m_bUseDXVA && (m_nHwDecoder == HWDec_D3D11cb || m_nHwDecoder == HWDec_NVDEC)) {
@@ -2125,7 +2126,7 @@ redo:
 	if (IsDXVASupported(m_bUseD3D11 || m_bUseD3D12)) {
 		if (m_pD3D11Decoder)
 			m_pD3D11Decoder->AdditionaDecoderInit(m_pAVCtx);
-#ifdef USE_D3D12
+#if USE_D3D12
 		else if (m_pD3D12Decoder)
 			m_pD3D12Decoder->AdditionaDecoderInit(m_pAVCtx);
 #endif
@@ -2348,7 +2349,7 @@ redo:
 
 		if (m_pD3D11Decoder)
 			m_pD3D11Decoder->PostInitDecoder(m_pAVCtx);
-#ifdef USE_D3D12
+#if USE_D3D12
 		else if (m_pD3D12Decoder)
 			m_pD3D12Decoder->PostInitDecoder(m_pAVCtx);
 #endif
@@ -2797,7 +2798,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			} else if (IsDXVASupported(m_bUseD3D11 || m_bUseD3D12)) {
 				if (m_pD3D11Decoder)
 					hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
-#ifdef USE_D3D12
+#if USE_D3D12
 				else if (m_pD3D12Decoder)
 					hr = m_pD3D12Decoder->PostConnect(m_pAVCtx, pReceivePin);
 #endif
@@ -2808,7 +2809,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 					m_nPCIVendor = adapterDesc->VendorId;
 					m_nPCIDevice = adapterDesc->DeviceId;
 					m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
-#ifdef USE_D3D12
+#if USE_D3D12
 				}	else if (SUCCEEDED(hr) && m_pD3D12Decoder) {
 					m_nDecoderMode = MODE_D3D12;
 
@@ -2938,7 +2939,7 @@ HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATO
 		}
 
 		pProperties->cBuffers = 22;
-#ifdef USE_D3D12
+#if USE_D3D12
 		//we need to have the same size as the number of buffer in the d3d12 decoder
 		pProperties->cBuffers = 20;
 #endif
@@ -2992,7 +2993,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	if (m_pMSDKDecoder) {
 		m_pMSDKDecoder->Flush();
 	}
-#ifdef USE_D3D12
+#if USE_D3D12
 	if (m_pD3D12Decoder) {
 		m_pD3D12Decoder->Flush();
 	}
@@ -3466,7 +3467,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			hr = m_pD3D11Decoder->DeliverFrame();
 			CLEAR_AND_CONTINUE;
 		}
-#ifdef USE_D3D12
+#if USE_D3D12
 		else if (UseD3D12()) {
 			hr = m_pD3D12Decoder->DeliverFrame();
 			CLEAR_AND_CONTINUE;
@@ -3556,7 +3557,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				device_hwctx->unlock(device_hwctx->lock_ctx);
 			}
-#ifdef USE_D3D12
+#if USE_D3D12
 			if (frames_ctx->format == AV_PIX_FMT_D3D12_VLD) {
 			const auto dxgi_format =
 				(frames_ctx->sw_format == AV_PIX_FMT_P010) ? DXGI_FORMAT_P010 :
@@ -4163,7 +4164,7 @@ HRESULT CMPCVideoDecFilter::InitAllocator(IMemAllocator **ppAlloc)
 	} else if (m_pD3D11Decoder) {
 		return m_pD3D11Decoder->InitAllocator(ppAlloc);
 	}
-#ifdef USE_D3D12
+#if USE_D3D12
 	else if (m_pD3D12Decoder) {
 		return m_pD3D12Decoder->InitAllocator(ppAlloc);
 	}
