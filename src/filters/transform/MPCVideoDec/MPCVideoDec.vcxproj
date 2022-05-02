@@ -215,9 +215,7 @@
   <ItemGroup>
     <ClCompile Include="D3D11Decoder\D3D11Decoder.cpp" />
     <ClCompile Include="D3D11Decoder\D3D11SurfaceAllocator.cpp" />
-    <ClCompile Include="D3D12Decoder\D3D12Commands.cpp" />
     <ClCompile Include="D3D12Decoder\D3D12Decoder.cpp" />
-    <ClCompile Include="D3D12Decoder\D3D12Format.cpp" />
     <ClCompile Include="D3D12Decoder\D3D12SurfaceAllocator.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp" />
     <ClCompile Include="DXVADecoder\DXVAAllocator.cpp" />
@@ -248,9 +246,7 @@
     <ClInclude Include="D3D11Decoder\D3D11Decoder.h" />
     <ClInclude Include="D3D11Decoder\D3D11SurfaceAllocator.h" />
     <ClInclude Include="D3D11Decoder\ID3DVideoMemoryConfiguration.h" />
-    <ClInclude Include="D3D12Decoder\D3D12Commands.h" />
     <ClInclude Include="D3D12Decoder\D3D12Decoder.h" />
-    <ClInclude Include="D3D12Decoder\D3D12Format.h" />
     <ClInclude Include="D3D12Decoder\D3D12SurfaceAllocator.h" />
     <ClInclude Include="D3D12Decoder\ID3D12VideoMemoryConfiguration.h" />
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />

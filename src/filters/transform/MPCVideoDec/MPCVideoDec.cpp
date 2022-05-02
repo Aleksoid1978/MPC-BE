@@ -2993,11 +2993,6 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	if (m_pMSDKDecoder) {
 		m_pMSDKDecoder->Flush();
 	}
-#if USE_D3D12
-	if (m_pD3D12Decoder) {
-		m_pD3D12Decoder->Flush();
-	}
-#endif
 
 	m_dRate	= dRate;
 
@@ -4169,6 +4164,7 @@ HRESULT CMPCVideoDecFilter::InitAllocator(IMemAllocator **ppAlloc)
 		return m_pD3D12Decoder->InitAllocator(ppAlloc);
 	}
 #endif
+	return E_FAIL;
 }
 
 HRESULT CMPCVideoDecFilter::RecommitAllocator()

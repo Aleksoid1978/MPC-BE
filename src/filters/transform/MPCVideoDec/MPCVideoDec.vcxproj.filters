@@ -102,12 +102,6 @@
     <ClCompile Include="D3D12Decoder\D3D12Decoder.cpp">
       <Filter>D3D12Decoder</Filter>
     </ClCompile>
-    <ClCompile Include="D3D12Decoder\D3D12Format.cpp">
-      <Filter>D3D12Decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D12Decoder\D3D12Commands.cpp">
-      <Filter>D3D12Decoder</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ffmpegContext.h">
@@ -192,12 +186,6 @@
       <Filter>D3D12Decoder</Filter>
     </ClInclude>
     <ClInclude Include="D3D12Decoder\D3D12Decoder.h">
-      <Filter>D3D12Decoder</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D12Decoder\D3D12Commands.h">
-      <Filter>D3D12Decoder</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D12Decoder\D3D12Format.h">
       <Filter>D3D12Decoder</Filter>
     </ClInclude>
     <ClInclude Include="D3D12Decoder\ID3D12VideoMemoryConfiguration.h">
