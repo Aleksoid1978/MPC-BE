@@ -1632,10 +1632,7 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 	m_pParser = nullptr;
 
 	m_pStagingD3D11Texture2D.Release();
-	#ifdef USE_D3D12
-	if (m_pD3D12Decoder)
-		m_pD3D12Decoder->DestroyDecoder(TRUE);
-#endif
+	
 	if (m_pAVCtx) {
 		av_freep(&m_pAVCtx->hwaccel_context);
 		avcodec_free_context(&m_pAVCtx);
@@ -1914,7 +1911,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 
 redo:
 	CleanupFFmpeg();
-
 	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y8, I420)
 	CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected());
 	if (pFilter && IsVideoDecoder(pFilter, true)) {

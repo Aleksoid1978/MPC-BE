@@ -1148,7 +1148,7 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
         buffer       = &buffer12.CompressedBitstream;
         buffer_slice = &buffer12.FrameArguments[buffer_count];
         buffer_count += 1;
-        av_log(avctx, AV_LOG_ERROR, "buffer count d3d12 %d qm_size %d\n", (int)buffer_count, (int)qm_size);
+        //av_log(avctx, AV_LOG_ERROR, "buffer count d3d12 %d qm_size %d\n", (int)buffer_count, (int)qm_size);
     }
 #endif
 
@@ -1208,7 +1208,7 @@ end:
 
         uintptr_t out_index = (uintptr_t)get_surface(avctx, frame);
         /*for testing purpose*/
-        av_log(avctx, AV_LOG_INFO, "d3d12 common end frame surface: %d\n", (int)out_index);
+        //av_log(avctx, AV_LOG_INFO, "d3d12 common end frame surface: %d\n", (int)out_index);
         memcpy(&buffer12.ReferenceFrames, &ctx->d3d12.surfaces, sizeof(buffer12.ReferenceFrames));
         /* if we use a single array of resource instead of individual we se this*/
         /* the only problem is its not supported with older cards and also*/
