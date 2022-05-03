@@ -66,6 +66,7 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 
 	CComPtr<ID3D11Texture2D> m_pOutputTexture;
 	CComPtr<ID3D11ShaderResourceView> m_pOutputShaderResource;
+	UINT m_pOutputRowPitch = 0;
 
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
@@ -78,6 +79,7 @@ public:
 
 	ID3D11Texture2D* GetOutputTexture() { return m_pOutputTexture.p; }
 	ID3D11ShaderResourceView* GetShaderResource() { return m_pOutputShaderResource.p; }
+	UINT GetTexRowPitch() { m_pOutputRowPitch; }
 
 	void GetStats(int &_nFree, int &_nAlloc);
 
