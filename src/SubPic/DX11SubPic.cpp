@@ -354,6 +354,7 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	ID3D11Buffer* pVertexBuffer = nullptr;
 	CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, rSrc);
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
+	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	auto pShaderResource = m_pAllocator->GetShaderResource();;
 	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResource);
