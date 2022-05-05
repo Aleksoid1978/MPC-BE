@@ -231,29 +231,28 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 		return hr;
 	}
 
-	if (m_rcDirty.IsRectEmpty()) {
+	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
+
+	CRect copyRect;
+	pSubPic->GetDirtyRect(&copyRect);
+	if (!copyRect.UnionRect(m_rcDirty, copyRect)) {
+		return S_FALSE;
+	}
+	
+	RECT subpicRect = { 0, 0, std::min(m_MemPic.w, pDstMemPic->w), std::min(m_MemPic.h, pDstMemPic->h) };
+	if (!copyRect.IntersectRect(&subpicRect, copyRect)) {
 		return S_FALSE;
 	}
 
-	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
+	const UINT copyW_bytes = copyRect.Width() * 4;
+	UINT copyH = copyRect.Height();
+	auto src = m_MemPic.data.get() + m_MemPic.w * copyRect.top + copyRect.left;
+	auto dst = pDstMemPic->data.get() + pDstMemPic->w * copyRect.top + copyRect.left;
 
-	if (m_MemPic.w != pDstMemPic->w || m_MemPic.h != pDstMemPic->h) {
-		DLog(L"CDX11SubPic::CopyTo() - SrcTex(%ux%u) is not equal DstTex(%ux%u)",
-			m_MemPic.w, m_MemPic.h, pDstMemPic->w, pDstMemPic->h);
-
-		UINT minW_bytes = std::min(m_MemPic.w, pDstMemPic->w) * 4;
-		UINT minH = std::min(m_MemPic.h, pDstMemPic->h);
-		auto src = m_MemPic.data.get();
-		auto dst = pDstMemPic->data.get();
-		while (minH--) {
-			memcpy(dst, src, minW_bytes);
-			src += m_MemPic.w;
-			dst += pDstMemPic->w;
-		}
-	} else {
-		auto src = m_MemPic.data.get();
-		auto dst = pDstMemPic->data.get();
-		memcpy(dst, src, (size_t)m_MemPic.w * m_MemPic.h * 4);
+	while (copyH--) {
+		memcpy(dst, src, copyW_bytes);
+		src += m_MemPic.w;
+		dst += pDstMemPic->w;
 	}
 
 	return SUCCEEDED(hr) ? S_OK : E_FAIL;
