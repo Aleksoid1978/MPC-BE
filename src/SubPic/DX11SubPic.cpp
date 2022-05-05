@@ -226,18 +226,20 @@ STDMETHODIMP CDX11SubPic::GetDesc(SubPicDesc& spd)
 
 STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 {
-	HRESULT hr;
-	if (FAILED(hr = __super::CopyTo(pSubPic))) {
+	CRect copyRect;
+	pSubPic->GetDirtyRect(&copyRect); // get the destination rectangle before CSubPicImpl::CopyTo
+
+	HRESULT hr = __super::CopyTo(pSubPic);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
-	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
-
-	CRect copyRect;
-	pSubPic->GetDirtyRect(&copyRect);
 	if (!copyRect.UnionRect(m_rcDirty, copyRect)) {
+		// nothing to copy
 		return S_FALSE;
 	}
+
+	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
 	
 	RECT subpicRect = { 0, 0, std::min(m_MemPic.w, pDstMemPic->w), std::min(m_MemPic.h, pDstMemPic->h) };
 	if (!copyRect.IntersectRect(&subpicRect, copyRect)) {
