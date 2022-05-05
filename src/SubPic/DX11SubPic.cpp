@@ -226,23 +226,20 @@ STDMETHODIMP CDX11SubPic::GetDesc(SubPicDesc& spd)
 
 STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 {
-	CRect copyRect;
-	pSubPic->GetDirtyRect(&copyRect); // get the destination rectangle before CSubPicImpl::CopyTo
-
 	HRESULT hr = __super::CopyTo(pSubPic);
 	if (FAILED(hr)) {
 		return hr;
 	}
 
-	if (!copyRect.UnionRect(m_rcDirty, copyRect)) {
-		// nothing to copy
+	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
 
 	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
 	
-	RECT subpicRect = { 0, 0, std::min(m_MemPic.w, pDstMemPic->w), std::min(m_MemPic.h, pDstMemPic->h) };
-	if (!copyRect.IntersectRect(&subpicRect, copyRect)) {
+	CRect copyRect;
+	RECT subpicRect = { 0, 0, pDstMemPic->w, pDstMemPic->h };
+	if (!copyRect.IntersectRect(m_rcDirty, &subpicRect)) {
 		return S_FALSE;
 	}
 
@@ -257,7 +254,7 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 		dst += pDstMemPic->w;
 	}
 
-	return SUCCEEDED(hr) ? S_OK : E_FAIL;
+	return S_OK;
 }
 
 STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
