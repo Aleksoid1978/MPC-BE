@@ -236,7 +236,7 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 	}
 
 	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
-	
+
 	CRect copyRect;
 	RECT subpicRect = { 0, 0, pDstMemPic->w, pDstMemPic->h };
 	if (!copyRect.IntersectRect(m_rcDirty, &subpicRect)) {
