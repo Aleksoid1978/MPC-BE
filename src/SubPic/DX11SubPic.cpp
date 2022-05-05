@@ -66,10 +66,12 @@ static HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertex
 	D3D11_SUBRESOURCE_DATA InitData = { Vertices, 0, 0 };
 
 	HRESULT hr = pDevice->CreateBuffer(&BufferDesc, &InitData, ppVertexBuffer);
+	DLogIf(FAILED(hr), L"CDX11SubPic : CreateVertexBuffer() failed with error %s", HR2Str(hr));
 
 	return hr;
 }
 
+#if _DEBUG & ENABLE_DUMP_SUBPIC
 static HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
 {
 	if (!src || !filename) {
@@ -172,6 +174,7 @@ static HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2
 
 	return hr;
 }
+#endif
 
 //
 // CDX11SubPic
@@ -273,7 +276,6 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 
 	m_rcDirty.SetRectEmpty();
 
-
 	return S_OK;
 }
 
@@ -322,7 +324,7 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 	CRect rSrc(*pSrc), rDst(*pDst);
 
-	ID3D11Texture2D* pTexture = m_pAllocator->GetOutputTexture();
+	auto pTexture = m_pAllocator->GetOutputTexture();
 	if (!pTexture) {
 		return E_FAIL;
 	}
@@ -352,11 +354,14 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	UINT Stride = sizeof(VERTEX);
 	UINT Offset = 0;
 	ID3D11Buffer* pVertexBuffer = nullptr;
-	CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, rSrc);
+	auto hr = CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, rSrc);
+	if (FAILED(hr)) {
+		return E_FAIL;
+	}
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	auto pShaderResource = m_pAllocator->GetShaderResource();;
+	auto pShaderResource = m_pAllocator->GetShaderResource();
 	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResource);
 
 	pDeviceContext->Draw(4, 0);
@@ -394,7 +399,7 @@ CDX11SubPicAllocator::~CDX11SubPicAllocator()
 	ClearCache();
 }
 
-void CDX11SubPicAllocator::GetStats(int &_nFree, int &_nAlloc)
+void CDX11SubPicAllocator::GetStats(int& _nFree, int& _nAlloc)
 {
 	CAutoLock Lock(&ms_SurfaceQueueLock);
 	_nFree = (int)m_FreeSurfaces.size();

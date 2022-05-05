@@ -81,7 +81,7 @@ public:
 	ID3D11ShaderResourceView* GetShaderResource() { return m_pOutputShaderResource.p; }
 	UINT GetTexRowPitch() { m_pOutputRowPitch; }
 
-	void GetStats(int &_nFree, int &_nAlloc);
+	void GetStats(int& _nFree, int& _nAlloc);
 
 	CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize, bool bExternalRenderer);
 	~CDX11SubPicAllocator();
