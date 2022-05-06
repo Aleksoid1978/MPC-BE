@@ -43,8 +43,8 @@ protected:
 
 public:
 	CDX11SubPicAllocator *m_pAllocator;
-	bool m_bExternalRenderer;
-	CDX11SubPic(MemPic_t&& pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer);
+
+	CDX11SubPic(MemPic_t&& pMemPic, CDX11SubPicAllocator *pAllocator);
 	~CDX11SubPic();
 
 	// ISubPic
@@ -62,7 +62,6 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 {
 	CComPtr<ID3D11Device> m_pDevice;
 	CSize m_maxsize;
-	bool m_bExternalRenderer;
 
 	CComPtr<ID3D11Texture2D> m_pOutputTexture;
 	CComPtr<ID3D11ShaderResourceView> m_pOutputShaderResource;
@@ -81,7 +80,7 @@ public:
 
 	void GetStats(int& _nFree, int& _nAlloc);
 
-	CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize, bool bExternalRenderer);
+	CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize);
 	~CDX11SubPicAllocator();
 	void ClearCache();
 

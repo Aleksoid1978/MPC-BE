@@ -167,7 +167,7 @@ HRESULT CMPCVRAllocatorPresenter::SetDevice11(ID3D11Device* pD3DDev)
 		m_pAllocator->ChangeDevice(pD3DDev);
 	}
 	else {
-		m_pAllocator = DNew CDX11SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
+		m_pAllocator = DNew CDX11SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize);
 		if (!m_pAllocator) {
 			return E_FAIL;
 		}

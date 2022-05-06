@@ -180,10 +180,9 @@ static HRESULT DumpTexture2D(ID3D11DeviceContext* pDeviceContext, ID3D11Texture2
 // CDX11SubPic
 //
 
-CDX11SubPic::CDX11SubPic(MemPic_t&& pMemPic, CDX11SubPicAllocator *pAllocator, bool bExternalRenderer)
+CDX11SubPic::CDX11SubPic(MemPic_t&& pMemPic, CDX11SubPicAllocator *pAllocator)
 	: m_MemPic(std::move(pMemPic))
 	, m_pAllocator(pAllocator)
-	, m_bExternalRenderer(bExternalRenderer)
 {
 	m_maxsize.SetSize(m_MemPic.w, m_MemPic.h);
 	m_rcDirty.SetRect(0, 0, m_maxsize.cx, m_maxsize.cy);
@@ -382,11 +381,10 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 // CDX11SubPicAllocator
 //
 
-CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize, bool bExternalRenderer)
+CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize)
 	: CSubPicAllocatorImpl(maxsize, true)
 	, m_pDevice(pDevice)
 	, m_maxsize(maxsize)
-	, m_bExternalRenderer(bExternalRenderer)
 {
 }
 
@@ -531,7 +529,7 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 		pMemPic.data.reset(data);
 	}
 
-	*ppSubPic = DNew CDX11SubPic(std::move(pMemPic), fStatic ? 0 : this, m_bExternalRenderer);
+	*ppSubPic = DNew CDX11SubPic(std::move(pMemPic), fStatic ? 0 : this);
 	if (!(*ppSubPic)) {
 		return false;
 	}
