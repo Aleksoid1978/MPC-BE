@@ -118,15 +118,13 @@ STDMETHODIMP CDX9SubPic::CopyTo(ISubPic* pSubPic)
 	return SUCCEEDED(hr) ? S_OK : E_FAIL;
 }
 
-STDMETHODIMP CDX9SubPic::ClearDirtyRect(DWORD color)
+STDMETHODIMP CDX9SubPic::ClearDirtyRect()
 {
-	m_ClearColor = color;
-
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
 
-	return S_OK;
+	return S_OK; // will be cleared in Lock
 }
 
 STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
@@ -144,7 +142,7 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 		BYTE* ptr = (BYTE*)LockedRect.pBits + LockedRect.Pitch * m_rcDirty.top + (m_rcDirty.left * 4);
 
 		while (h-- > 0) {
-			memset_u32(ptr, m_ClearColor, linesize);
+			memset_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, linesize);
 			ptr += LockedRect.Pitch;
 		}
 

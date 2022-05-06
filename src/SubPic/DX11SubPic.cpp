@@ -256,7 +256,7 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 	return S_OK;
 }
 
-STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
+STDMETHODIMP CDX11SubPic::ClearDirtyRect()
 {
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
@@ -267,7 +267,7 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect(DWORD color)
 	uint32_t* ptr = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
 
 	while (dirtyH-- > 0) {
-		memset_u32(ptr, color, dirtyW_bytes);
+		memset_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, dirtyW_bytes);
 		ptr += m_MemPic.w;
 	}
 

@@ -117,11 +117,7 @@ HRESULT CSubPicQueueImpl::RenderTo(ISubPic* pSubPic, REFERENCE_TIME rtStart, REF
 		return hr;
 	}
 
-	if (pSubPic->GetInverseAlpha()) {
-		hr = pSubPic->ClearDirtyRect(0x00000000);
-	} else {
-		hr = pSubPic->ClearDirtyRect(0xFF000000);
-	}
+	hr = pSubPic->ClearDirtyRect();
 
 	SubPicDesc spd;
 	if (SUCCEEDED(hr)) {

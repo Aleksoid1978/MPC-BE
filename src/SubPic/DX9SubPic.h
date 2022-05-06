@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,8 +29,6 @@
 class CDX9SubPicAllocator;
 class CDX9SubPic : public CSubPicImpl
 {
-	DWORD m_ClearColor = 0xff000000;
-
 	CComPtr<IDirect3DSurface9> m_pSurface;
 
 protected:
@@ -43,12 +41,12 @@ public:
 	~CDX9SubPic();
 
 	// ISubPic
-	STDMETHODIMP GetDesc(SubPicDesc& spd);
-	STDMETHODIMP CopyTo(ISubPic* pSubPic);
-	STDMETHODIMP ClearDirtyRect(DWORD color);
-	STDMETHODIMP Lock(SubPicDesc& spd);
-	STDMETHODIMP Unlock(RECT* pDirtyRect);
-	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget);
+	STDMETHODIMP GetDesc(SubPicDesc& spd) override;;
+	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;;
+	STDMETHODIMP ClearDirtyRect() override;;
+	STDMETHODIMP Lock(SubPicDesc& spd) override;;
+	STDMETHODIMP Unlock(RECT* pDirtyRect) override;;
+	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;;
 };
 
 // CDX9SubPicAllocator
@@ -59,7 +57,7 @@ class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
 
-	bool Alloc(bool fStatic, ISubPic** ppSubPic);
+	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:
 	static CCritSec ms_SurfaceQueueLock;
@@ -73,6 +71,6 @@ public:
 	void ClearCache();
 
 	// ISubPicAllocator
-	STDMETHODIMP ChangeDevice(IUnknown* pDev);
-	STDMETHODIMP SetMaxTextureSize(SIZE MaxTextureSize);
+	STDMETHODIMP ChangeDevice(IUnknown* pDev) override;
+	STDMETHODIMP SetMaxTextureSize(SIZE MaxTextureSize) override;
 };

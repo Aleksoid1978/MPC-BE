@@ -6178,7 +6178,7 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			m_pMS->GetCurrentPosition(&rtNow);
 
 			CMemSubPic memSubPic(spdRender);
-			memSubPic.ClearDirtyRect(0xFF000000);
+			memSubPic.ClearDirtyRect();
 
 			RECT bbox = {};
 			hr = pSubPicProvider->Render(spdRender, rtNow, m_pCAP->GetFPS(), bbox);

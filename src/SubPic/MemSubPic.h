@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,12 +39,12 @@ public:
 	virtual ~CMemSubPic();
 
 	// ISubPic
-	STDMETHODIMP GetDesc(SubPicDesc& spd);
-	STDMETHODIMP CopyTo(ISubPic* pSubPic);
-	STDMETHODIMP ClearDirtyRect(DWORD color);
-	STDMETHODIMP Lock(SubPicDesc& spd);
-	STDMETHODIMP Unlock(RECT* pDirtyRect);
-	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget);
+	STDMETHODIMP GetDesc(SubPicDesc& spd) override;;
+	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;;
+	STDMETHODIMP ClearDirtyRect() override;;
+	STDMETHODIMP Lock(SubPicDesc& spd) override;;
+	STDMETHODIMP Unlock(RECT* pDirtyRect) override;;
+	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;;
 };
 
 // CMemSubPicAllocator
@@ -54,7 +54,7 @@ class CMemSubPicAllocator : public CSubPicAllocatorImpl
 	int m_type;
 	CSize m_maxsize;
 
-	bool Alloc(bool fStatic, ISubPic** ppSubPic);
+	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:
 	CMemSubPicAllocator(int type, SIZE maxsize);

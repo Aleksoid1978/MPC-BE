@@ -50,7 +50,7 @@ public:
 	// ISubPic
 	STDMETHODIMP GetDesc(SubPicDesc& spd) override;
 	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;
-	STDMETHODIMP ClearDirtyRect(DWORD color) override;
+	STDMETHODIMP ClearDirtyRect() override;
 	STDMETHODIMP Lock(SubPicDesc& spd) override;
 	STDMETHODIMP Unlock(RECT* pDirtyRect) override;
 	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;
