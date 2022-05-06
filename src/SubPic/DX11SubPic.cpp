@@ -416,7 +416,6 @@ void CDX11SubPicAllocator::ClearCache()
 
 	m_pOutputShaderResource.Release();
 	m_pOutputTexture.Release();
-	m_pOutputRowPitch = 0;
 }
 
 // ISubPicAllocator
@@ -487,29 +486,6 @@ bool CDX11SubPicAllocator::CreateOutputTex()
 		return false;
 	}
 
-	texDesc.Usage          = D3D11_USAGE_DYNAMIC;
-	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	CComPtr<ID3D11Texture2D> pTestTexture;
-
-	hr = m_pDevice->CreateTexture2D(&texDesc, nullptr, &pTestTexture);
-	if (SUCCEEDED(hr)) {
-		CComPtr<ID3D11DeviceContext> pDeviceContext;
-		m_pDevice->GetImmediateContext(&pDeviceContext);
-		D3D11_MAPPED_SUBRESOURCE mr = {};
-
-		hr = pDeviceContext->Map(pTestTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
-		if (SUCCEEDED(hr)) {
-			m_pOutputRowPitch = mr.RowPitch;
-			pDeviceContext->Unmap(pTestTexture, 0);
-		}
-	}
-
-	if (!m_pOutputRowPitch) {
-		m_pOutputTexture.Release();
-		m_pOutputShaderResource.Release();
-		return false;
-	}
-
 	return true;
 }
 
@@ -543,7 +519,7 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 			}
 		}
 
-		pMemPic.w = m_pOutputRowPitch / 4;
+		pMemPic.w = ALIGN(m_maxsize.cx, 16/sizeof(uint32_t));
 		pMemPic.h = m_maxsize.cy;
 
 		const UINT picSize = pMemPic.w * pMemPic.h;
