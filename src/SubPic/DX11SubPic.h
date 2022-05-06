@@ -39,7 +39,7 @@ class CDX11SubPic : public CSubPicImpl
 	MemPic_t m_MemPic;
 
 protected:
-	STDMETHODIMP_(void*) GetObject() override; // returns ID3D11Texture2D*
+	STDMETHODIMP_(void*) GetObject() override; // returns MemPic_t*
 
 public:
 	CDX11SubPicAllocator *m_pAllocator;
