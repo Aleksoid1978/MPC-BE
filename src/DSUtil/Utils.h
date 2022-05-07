@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,6 +59,7 @@ inline void expand_range(T const& val, T& lo, T& hi)
 uint32_t CountBits(uint32_t v);
 uint32_t BitNum(uint32_t v, uint32_t b);
 
+void fill_u32(void* dst, uint32_t c, size_t count);
 void memset_u32(void* dst, uint32_t c, size_t nbytes);
 void memset_u16(void* dst, uint16_t c, size_t nbytes);
 

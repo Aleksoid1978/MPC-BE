@@ -150,20 +150,13 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect()
 		return S_FALSE;
 	}
 
-	BYTE* p = m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*(m_spd.bpp>>3);
-	for (ptrdiff_t j = 0, h = m_rcDirty.Height(); j < h; j++, p += m_spd.pitch) {
-		int w = m_rcDirty.Width();
-#ifdef _WIN64
-		memset_u32(p, m_bInvAlpha ? 0x00000000 : 0xFF000000, w*4);
-#else
-		__asm {
-			mov eax, color
-			mov ecx, w
-			mov edi, p
-			cld
-			rep stosd
-		}
-#endif
+	BYTE* ptr = m_spd.bits + m_spd.pitch * m_rcDirty.top + m_rcDirty.left * 4;
+	const UINT dirtyW = m_rcDirty.Width();
+	UINT dirtyH = m_rcDirty.Height();
+
+	while (dirtyH-- > 0) {
+		fill_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, dirtyW);
+		ptr += m_spd.pitch;
 	}
 
 	m_rcDirty.SetRectEmpty();

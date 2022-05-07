@@ -262,12 +262,12 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect()
 		return S_FALSE;
 	}
 
-	const UINT dirtyW_bytes = m_rcDirty.Width() * 4;
-	UINT dirtyH = m_rcDirty.Height();
 	uint32_t* ptr = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
+	const UINT dirtyW = m_rcDirty.Width();
+	UINT dirtyH = m_rcDirty.Height();
 
 	while (dirtyH-- > 0) {
-		memset_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, dirtyW_bytes);
+		fill_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, dirtyW);
 		ptr += m_MemPic.w;
 	}
 

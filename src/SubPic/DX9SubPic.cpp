@@ -136,13 +136,12 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 	}
 
 	if (!m_rcDirty.IsRectEmpty()) {
-		const int linesize = m_rcDirty.Width() * 4;
-		int h = m_rcDirty.Height();
-
 		BYTE* ptr = (BYTE*)LockedRect.pBits + LockedRect.Pitch * m_rcDirty.top + (m_rcDirty.left * 4);
+		const UINT dirtyW = m_rcDirty.Width();
+		UINT dirtyH = m_rcDirty.Height();
 
-		while (h-- > 0) {
-			memset_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, linesize);
+		while (dirtyH-- > 0) {
+			fill_u32(ptr, m_bInvAlpha ? 0x00000000 : 0xFF000000, dirtyW);
 			ptr += LockedRect.Pitch;
 		}
 

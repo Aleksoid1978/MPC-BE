@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,20 +42,18 @@ uint32_t BitNum(uint32_t v, uint32_t b)
 	return CountBits(v & (b - 1));
 }
 
-void memset_u32(void* dst, uint32_t c, size_t nbytes)
+void fill_u32(void* dst, uint32_t c, size_t count)
 {
 #ifndef _WIN64
 	__asm {
 		mov eax, c
-		mov ecx, nbytes
-		shr ecx, 2
+		mov ecx, count
 		mov edi, dst
 		cld
 		rep stosd
 	}
-	return;
-#endif
-	size_t n = nbytes / 4;
+#else
+	size_t& n = count;
 	size_t o = n - (n % 4);
 
 	__m128i val = _mm_set1_epi32((int)c);
@@ -78,6 +76,12 @@ void memset_u32(void* dst, uint32_t c, size_t nbytes)
 	case 1:
 		((DWORD*)dst)[o + 0] = c;
 	}
+#endif
+}
+
+void memset_u32(void* dst, uint32_t c, size_t nbytes)
+{
+	fill_u32(dst, c, nbytes / 4);
 }
 
 void memset_u16(void* dst, uint16_t c, size_t nbytes)
