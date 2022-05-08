@@ -677,6 +677,7 @@ bool CMemSubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 	}
 
 	(*ppSubPic)->AddRef();
+	(*ppSubPic)->SetInverseAlpha(m_bInvAlpha);
 
 	return true;
 }

@@ -445,6 +445,8 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitle
 			pSubPicQueue->SetSubPicProvider(pSubPicProvider);
 			m_pSubPicProvider = pSubPicProvider;
 			m_pSubPicQueue = pSubPicQueue;
+
+			m_pAllocator->SetInverseAlpha(true);
 		}
 	}
 

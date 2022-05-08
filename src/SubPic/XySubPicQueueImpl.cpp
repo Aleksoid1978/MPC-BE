@@ -108,11 +108,11 @@ STDMETHODIMP_(bool) CXySubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, b
 				if (!bAllocSubPic && m_llSubId == id) { // same subtitle as last time
 					pSubPic->SetStop(rtStop);
 					ppSubPic = pSubPic;
-				} else if (m_pAllocator->IsDynamicWriteOnly()) {
+				}
+				else if (m_pAllocator->IsDynamicWriteOnly()) {
 					CComPtr<ISubPic> pStatic;
 					hr = m_pAllocator->GetStatic(&pStatic);
 					if (SUCCEEDED(hr)) {
-						pStatic->SetInverseAlpha(true);
 						hr = RenderTo(pStatic, rtStart, rtStop, fps, true);
 					}
 					if (SUCCEEDED(hr)) {
@@ -122,12 +122,10 @@ STDMETHODIMP_(bool) CXySubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, b
 						ppSubPic = pSubPic;
 						m_llSubId = id;
 					}
-				} else {
-					pSubPic->SetInverseAlpha(true);
-					if (SUCCEEDED(RenderTo(pSubPic, rtStart, rtStop, fps, true))) {
-						ppSubPic = pSubPic;
-						m_llSubId = id;
-					}
+				}
+				else if (SUCCEEDED(RenderTo(pSubPic, rtStart, rtStop, fps, true))) {
+					ppSubPic = pSubPic;
+					m_llSubId = id;
 				}
 
 				if (ppSubPic) {

@@ -107,7 +107,6 @@ public:
 	STDMETHODIMP SetType(SUBTITLE_TYPE subtitleType);
 	STDMETHODIMP GetType(SUBTITLE_TYPE* pSubtitleType);
 
-	STDMETHODIMP_(bool) GetInverseAlpha() const;
 	STDMETHODIMP_(void) SetInverseAlpha(bool bInverted);
 };
 
@@ -120,9 +119,11 @@ private:
 
 	CSize m_cursize;
 	CRect m_curvidrect;
-	bool m_fDynamicWriteOnly;
-
+	bool  m_fDynamicWriteOnly;
 	virtual bool Alloc(bool fStatic, ISubPic** ppSubPic) PURE;
+
+protected:
+	bool  m_bInvAlpha = false;
 
 public:
 	CSubPicAllocatorImpl(SIZE cursize, bool fDynamicWriteOnly);
@@ -140,4 +141,5 @@ public:
 	STDMETHODIMP ChangeDevice(IUnknown* pDev);
 	STDMETHODIMP SetMaxTextureSize(SIZE MaxTextureSize) { return E_NOTIMPL; };
 	STDMETHODIMP Reset();
+	STDMETHODIMP_(void) SetInverseAlpha(bool bInverted);
 };

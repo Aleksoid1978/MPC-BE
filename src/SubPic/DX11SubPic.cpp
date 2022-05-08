@@ -535,6 +535,7 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 	}
 
 	(*ppSubPic)->AddRef();
+	(*ppSubPic)->SetInverseAlpha(m_bInvAlpha);
 
 	if (!fStatic) {
 		CAutoLock cAutoLock(&ms_SurfaceQueueLock);

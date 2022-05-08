@@ -89,7 +89,6 @@ public IUnknown {
 	STDMETHOD (SetType) (SUBTITLE_TYPE subtitleType /*[in]*/) PURE;
 	STDMETHOD (GetType) (SUBTITLE_TYPE* pSubtitleType /*[out]*/) PURE;
 
-	STDMETHOD_(bool, GetInverseAlpha)() const PURE;
 	STDMETHOD_(void, SetInverseAlpha)(bool bInverted) PURE;
 };
 
@@ -112,6 +111,8 @@ public IUnknown {
 	STDMETHOD (SetMaxTextureSize) (SIZE MaxTextureSize) PURE;
 
 	STDMETHOD (Reset) () PURE;
+
+	STDMETHOD_(void, SetInverseAlpha)(bool bInverted) PURE;
 };
 
 //
