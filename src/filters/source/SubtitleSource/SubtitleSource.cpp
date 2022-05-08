@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -447,7 +447,7 @@ HRESULT CSubtitleStream::FillBuffer(IMediaSample* pSample)
 			len = spd.h*spd.pitch;
 
 			for (int y = 0; y < spd.h; y++) {
-				memset_u32((DWORD*)(pData + spd.pitch*y), 0xff000000, spd.w*4);
+				fill_u32((DWORD*)(pData + spd.pitch*y), 0xff000000, spd.w);
 			}
 
 			RECT bbox;
@@ -483,7 +483,7 @@ HRESULT CSubtitleStream::FillBuffer(IMediaSample* pSample)
 				}
 				DWORD* p = (DWORD*)(pData + spd.pitch*y);
 				for (int x = 0; x < spd.w; x+=32, p+=32) {
-					memset_u32(p, (x&32) ? c1 : c2, std::min(spd.w-x, 32) * 4);
+					fill_u32(p, (x&32) ? c1 : c2, std::min(spd.w-x, 32));
 				}
 			}
 

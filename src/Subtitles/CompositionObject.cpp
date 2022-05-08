@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 
 CompositionObject::CompositionObject()
 {
-	memset_u32(m_Colors, 0, sizeof(m_Colors));
+	fill_u32(m_Colors, 0, std::size(m_Colors));
 }
 
 CompositionObject::~CompositionObject()

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,7 +51,7 @@ void CBaseSub::InitSpd(SubPicDesc& spd, int nWidth, int nHeight)
 
 		BYTE* p = m_spd.bits;
 		for (int y = 0; y < m_spd.h; y++, p += m_spd.pitch) {
-			memset_u32(p, 0xFF000000, m_spd.w * 4);
+			fill_u32(p, 0xFF000000, m_spd.w);
 		}
 	}
 }
