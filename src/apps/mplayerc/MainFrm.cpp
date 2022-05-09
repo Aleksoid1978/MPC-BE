@@ -12128,43 +12128,46 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	if (s.bYDLEnable
 			&& youtubeUrl.IsEmpty()
 			&& pOFD->fns.size() == 1
-			&& ::PathIsURLW(pOFD->fns.front())
-			&& Content::Online::CheckConnect(pOFD->fns.front())) {
+			&& ::PathIsURLW(pOFD->fns.front())) {
 		const CString fn = pOFD->fns.front().GetName();
-		CString online_hdr;
-		Content::Online::GetHeader(fn, online_hdr);
-		if (!online_hdr.IsEmpty()) {
-			online_hdr.Trim(L"\r\n "); online_hdr.Replace(L"\r", L"");
-			std::list<CString> params;
-			Explode(online_hdr, params, L'\n');
-			bool bIsHtml = false;
-			for (const auto& param : params) {
-				int k = param.Find(L':');
-				if (k > 0) {
-					const CString key = param.Left(k).Trim().MakeLower();
-					const CString value = param.Mid(k).MakeLower();
-					if (key == L"content-type") {
-						bIsHtml = (value.Find(L"text/html") != -1);
-						break;
+		const auto ext = GetFileExt(fn.GetString()).MakeLower();
+		if (!(ext == L".m3u" || ext == L".m3u8")
+				&& Content::Online::CheckConnect(fn)) {
+			CString online_hdr;
+			Content::Online::GetHeader(fn, online_hdr);
+			if (!online_hdr.IsEmpty()) {
+				online_hdr.Trim(L"\r\n "); online_hdr.Replace(L"\r", L"");
+				std::list<CString> params;
+				Explode(online_hdr, params, L'\n');
+				bool bIsHtml = false;
+				for (const auto& param : params) {
+					int k = param.Find(L':');
+					if (k > 0) {
+						const CString key = param.Left(k).Trim().MakeLower();
+						const CString value = param.Mid(k).MakeLower();
+						if (key == L"content-type") {
+							bIsHtml = (value.Find(L"text/html") != -1);
+							break;
+						}
 					}
 				}
-			}
 
-			if (bIsHtml) {
-				std::list<CString> urls;
-				if (YoutubeDL::Parse_URL(fn, s.strYDLExePath, s.iYDLMaxHeight, s.bYDLMaximumQuality,
-						urls, pOFD->subs, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist)) {
-					youtubeUrl = fn;
-					Content::Online::Disconnect(youtubeUrl);
+				if (bIsHtml) {
+					std::list<CString> urls;
+					if (YoutubeDL::Parse_URL(fn, s.strYDLExePath, s.iYDLMaxHeight, s.bYDLMaximumQuality,
+							urls, pOFD->subs, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist)) {
+						youtubeUrl = fn;
+						Content::Online::Disconnect(youtubeUrl);
 
-					pOFD->fns.clear();
+						pOFD->fns.clear();
 
-					for (const auto& url : urls) {
-						pOFD->fns.push_back(url);
+						for (const auto& url : urls) {
+							pOFD->fns.push_back(url);
+						}
+
+						m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
+						m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 					}
-
-					m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
-					m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 				}
 			}
 		}
