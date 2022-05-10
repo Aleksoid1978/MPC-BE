@@ -262,6 +262,14 @@ STDMETHODIMP CDX11SubPic::ClearDirtyRect()
 		return S_FALSE;
 	}
 
+	m_rcDirty.InflateRect(1, 1);
+#ifdef _WIN64
+	const LONG a = 16 / sizeof(uint32_t) - 1;
+	m_rcDirty.left &= ~a;
+	m_rcDirty.right = (m_rcDirty.right + a) & ~a;
+#endif
+	m_rcDirty.IntersectRect(m_rcDirty, CRect(0, 0, m_MemPic.w, m_MemPic.h));
+
 	uint32_t* ptr = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
 	const UINT dirtyW = m_rcDirty.Width();
 	UINT dirtyH = m_rcDirty.Height();
@@ -296,15 +304,7 @@ STDMETHODIMP CDX11SubPic::Lock(SubPicDesc& spd)
 STDMETHODIMP CDX11SubPic::Unlock(RECT* pDirtyRect)
 {
 	if (pDirtyRect) {
-		m_rcDirty = *pDirtyRect;
-		if (!m_rcDirty.IsRectEmpty()) {
-			m_rcDirty.InflateRect(1, 1);
-			m_rcDirty.left &= ~127;
-			m_rcDirty.top &= ~63;
-			m_rcDirty.right = (m_rcDirty.right + 127) & ~127;
-			m_rcDirty.bottom = (m_rcDirty.bottom + 63) & ~63;
-			m_rcDirty &= CRect(CPoint(0, 0), m_size);
-		}
+		m_rcDirty.IntersectRect(pDirtyRect, CRect(0, 0, m_size.cx, m_size.cy));
 	} else {
 		m_rcDirty = CRect(CPoint(0, 0), m_size);
 	}
