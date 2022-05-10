@@ -113,7 +113,11 @@ STDMETHODIMP CSubPicImpl::GetDirtyRect(RECT* pDirtyRect)
 	return pDirtyRect ? *pDirtyRect = m_rcDirty, S_OK : E_POINTER;
 }
 
-STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPositionRelative, CPoint ShiftPos, RECT* pRcSource, RECT* pRcDest, int xOffsetInPixels, const BOOL bUseSpecialCase) const
+STDMETHODIMP CSubPicImpl::GetSourceAndDest(
+	RECT rcWindow, RECT rcVideo,
+	RECT* pRcSource, RECT* pRcDest,
+	BOOL bPositionRelative, CPoint ShiftPos,
+	int xOffsetInPixels, const BOOL bUseSpecialCase) const
 {
 	if (m_rcDirty.IsRectEmpty()) {
 		// for some reason needed for XySubFilter

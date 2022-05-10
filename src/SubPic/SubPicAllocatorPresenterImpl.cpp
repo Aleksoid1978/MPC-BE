@@ -136,7 +136,7 @@ HRESULT CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const C
 {
 	CRect rcSource, rcDest;
 	const CRenderersSettings& rs = GetRenderersSettings();
-	HRESULT hr = pSubPic->GetSourceAndDest(windowRect, videoRect, rs.iSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest, xOffsetInPixels, bUseSpecialCase);
+	HRESULT hr = pSubPic->GetSourceAndDest(windowRect, videoRect, rcSource, rcDest, rs.iSubpicPosRelative, rs.SubpicShiftPos, xOffsetInPixels, bUseSpecialCase);
 	if (SUCCEEDED(hr)) {
 		return pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
