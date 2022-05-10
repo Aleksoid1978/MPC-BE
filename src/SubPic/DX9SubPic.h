@@ -53,7 +53,7 @@ public:
 
 class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 {
-	CComPtr<IDirect3DDevice9> m_pD3DDev;
+	CComPtr<IDirect3DDevice9> m_pDevice;
 	CSize m_maxsize;
 	bool m_bExternalRenderer;
 
@@ -66,7 +66,7 @@ public:
 
 	void GetStats(int &_nFree, int &_nAlloc);
 
-	CDX9SubPicAllocator(IDirect3DDevice9* pD3DDev, SIZE maxsize, bool bExternalRenderer);
+	CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, bool bExternalRenderer);
 	~CDX9SubPicAllocator();
 	void ClearCache();
 
