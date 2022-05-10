@@ -124,6 +124,22 @@ STDMETHODIMP CDX9SubPic::ClearDirtyRect()
 		return S_FALSE;
 	}
 
+#if 0 // the code is disabled because never works
+	D3DSURFACE_DESC desc;
+	if (SUCCEEDED(m_pSurface->GetDesc(&desc)) && desc.Pool == D3DPOOL_DEFAULT) {
+		CComPtr<IDirect3DDevice9> pDevice;
+		HRESULT hr = m_pSurface->GetDevice(&pDevice);
+		if (SUCCEEDED(hr)) {
+			hr = pDevice->ColorFill(m_pSurface, m_rcDirty, m_bInvAlpha ? 0x00000000 : 0xFF000000);
+			if (SUCCEEDED(hr)) {
+				m_rcDirty.SetRectEmpty();
+			}
+		}
+
+		return hr;
+	}
+#endif
+
 	return S_OK; // will be cleared in Lock
 }
 
