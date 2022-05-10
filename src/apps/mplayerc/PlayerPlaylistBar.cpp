@@ -368,6 +368,9 @@ void CPlaylistItem::AutoLoadFiles()
 
 	CString BDLabel, empty;
 	AfxGetMainFrame()->MakeBDLabel(fn, empty, &BDLabel);
+	if (!BDLabel.IsEmpty()) {
+		FixFilename(BDLabel);
+	}
 
 	CAppSettings& s = AfxGetAppSettings();
 
