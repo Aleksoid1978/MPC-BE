@@ -361,7 +361,9 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
+	auto pSampler = m_pAllocator->GetSamplerState(rSrc != rDst);
 	auto pShaderResource = m_pAllocator->GetShaderResource();
+	pDeviceContext->PSSetSamplers(0, 1, &pSampler);
 	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResource);
 
 	pDeviceContext->Draw(4, 0);
@@ -390,6 +392,7 @@ CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize)
 	, m_maxsize(maxsize)
 {
 	CreateBlendState();
+	CreateSamplerState();
 }
 
 CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
@@ -397,6 +400,8 @@ CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
 CDX11SubPicAllocator::~CDX11SubPicAllocator()
 {
 	m_pAlphaBlendState.Release();
+	m_pSamplerPoint.Release();
+	m_pSamplerLinear.Release();
 	ClearCache();
 }
 
@@ -435,10 +440,15 @@ STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	HRESULT hr = S_FALSE;
 	if (m_pDevice != pDevice) {
 		m_pAlphaBlendState.Release();
+		m_pSamplerPoint.Release();
+		m_pSamplerLinear.Release();
 		ClearCache();
+
 		m_pDevice = pDevice;
 		hr = __super::ChangeDevice(pDev);
+
 		CreateBlendState();
+		CreateSamplerState();
 	}
 
 	return hr;
@@ -515,6 +525,22 @@ void CDX11SubPicAllocator::CreateBlendState()
 	bdesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	bdesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	EXECUTE_ASSERT(S_OK == m_pDevice->CreateBlendState(&bdesc, &m_pAlphaBlendState));
+}
+
+void CDX11SubPicAllocator::CreateSamplerState()
+{
+	D3D11_SAMPLER_DESC SampDesc = {};
+	SampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	SampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	SampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	SampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	SampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	SampDesc.MinLOD = 0;
+	SampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	EXECUTE_ASSERT(S_OK == m_pDevice->CreateSamplerState(&SampDesc, &m_pSamplerPoint));
+
+	SampDesc.Filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT; // linear interpolation for magnification
+	EXECUTE_ASSERT(S_OK == m_pDevice->CreateSamplerState(&SampDesc, &m_pSamplerLinear));
 }
 
 // ISubPicAllocatorImpl
