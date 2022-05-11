@@ -32,45 +32,6 @@ struct VERTEX {
 	DirectX::XMFLOAT2 TexCoord;
 };
 
-static HRESULT CreateVertexBuffer(ID3D11Device* pDevice, ID3D11Buffer** ppVertexBuffer,
-	const UINT srcW, const UINT srcH, const RECT& srcRect)
-{
-	ASSERT(ppVertexBuffer);
-	ASSERT(*ppVertexBuffer == nullptr);
-	const float src_dx = 1.0f / srcW;
-	const float src_dy = 1.0f / srcH;
-	const float src_l = src_dx * srcRect.left;
-	const float src_r = src_dx * srcRect.right;
-	const float src_t = src_dy * srcRect.top;
-	const float src_b = src_dy * srcRect.bottom;
-
-	POINT points[4] = {
-		{ -1, -1 },
-		{ -1, +1 },
-		{ +1, -1 },
-		{ +1, +1 }
-	};
-
-	VERTEX Vertices[4] = {
-		// Vertices for drawing whole texture
-		// 2 ___4
-		//  |\ |
-		// 1|_\|3
-		{ {(float)points[0].x, (float)points[0].y, 0}, {src_l, src_b} },
-		{ {(float)points[1].x, (float)points[1].y, 0}, {src_l, src_t} },
-		{ {(float)points[2].x, (float)points[2].y, 0}, {src_r, src_b} },
-		{ {(float)points[3].x, (float)points[3].y, 0}, {src_r, src_t} },
-	};
-
-	D3D11_BUFFER_DESC BufferDesc = { sizeof(Vertices), D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
-	D3D11_SUBRESOURCE_DATA InitData = { Vertices, 0, 0 };
-
-	HRESULT hr = pDevice->CreateBuffer(&BufferDesc, &InitData, ppVertexBuffer);
-	DLogIf(FAILED(hr), L"CDX11SubPic : CreateVertexBuffer() failed with error %s", HR2Str(hr));
-
-	return hr;
-}
-
 #if _DEBUG & ENABLE_DUMP_SUBPIC
 static HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
 {
@@ -321,65 +282,7 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 	CRect rSrc(*pSrc), rDst(*pDst);
 
-	auto pTexture = m_pAllocator->GetOutputTexture();
-	if (!pTexture) {
-		return E_FAIL;
-	}
-
-	D3D11_TEXTURE2D_DESC texDesc = {};
-	pTexture->GetDesc(&texDesc);
-
-	CComPtr<ID3D11Device> pDevice;
-	CComPtr<ID3D11DeviceContext> pDeviceContext;
-	pTexture->GetDevice(&pDevice);
-	pDevice->GetImmediateContext(&pDeviceContext);
-
-	uint32_t* srcData = m_MemPic.data.get() + m_MemPic.w * m_rcDirty.top + m_rcDirty.left;
-	D3D11_BOX dstBox = { m_rcDirty.left, m_rcDirty.top, 0, m_rcDirty.right, m_rcDirty.bottom, 1 };
-
-	pDeviceContext->UpdateSubresource(pTexture, 0, &dstBox, srcData, m_MemPic.w * 4, 0);
-
-	D3D11_VIEWPORT vp;
-	vp.TopLeftX = rDst.left;
-	vp.TopLeftY = rDst.top;
-	vp.Width    = rDst.Width();
-	vp.Height   = rDst.Height();
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	pDeviceContext->RSSetViewports(1, &vp);
-
-	UINT Stride = sizeof(VERTEX);
-	UINT Offset = 0;
-	ID3D11Buffer* pVertexBuffer = nullptr;
-	auto hr = CreateVertexBuffer(pDevice, &pVertexBuffer, texDesc.Width, texDesc.Height, rSrc);
-	if (FAILED(hr)) {
-		return E_FAIL;
-	}
-
-	pDeviceContext->OMSetBlendState(m_pAllocator->GetAlphaBlendState(), nullptr, D3D11_DEFAULT_SAMPLE_MASK);
-
-	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
-	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-	auto pSampler = m_pAllocator->GetSamplerState(rSrc != rDst);
-	auto pShaderResource = m_pAllocator->GetShaderResource();
-	pDeviceContext->PSSetSamplers(0, 1, &pSampler);
-	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResource);
-
-	pDeviceContext->Draw(4, 0);
-
-	pVertexBuffer->Release();
-
-#if _DEBUG & ENABLE_DUMP_SUBPIC
-	{
-		static int counter = 0;
-		CString filepath;
-		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
-		DumpTexture2D(pDeviceContext, pTexture, filepath);
-	}
-#endif
-
-	return S_OK;
+	return m_pAllocator->Render(m_MemPic, m_rcDirty, rSrc, rDst);
 }
 
 //
@@ -392,7 +295,7 @@ CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize)
 	, m_maxsize(maxsize)
 {
 	CreateBlendState();
-	CreateSamplerState();
+	CreateOtherStates();
 }
 
 CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
@@ -400,6 +303,7 @@ CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
 CDX11SubPicAllocator::~CDX11SubPicAllocator()
 {
 	m_pAlphaBlendState.Release();
+	m_pVertexBuffer.Release();
 	m_pSamplerPoint.Release();
 	m_pSamplerLinear.Release();
 	ClearCache();
@@ -440,6 +344,7 @@ STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	HRESULT hr = S_FALSE;
 	if (m_pDevice != pDevice) {
 		m_pAlphaBlendState.Release();
+		m_pVertexBuffer.Release();
 		m_pSamplerPoint.Release();
 		m_pSamplerLinear.Release();
 		ClearCache();
@@ -448,7 +353,7 @@ STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 		hr = __super::ChangeDevice(pDev);
 
 		CreateBlendState();
-		CreateSamplerState();
+		CreateOtherStates();
 	}
 
 	return hr;
@@ -479,7 +384,7 @@ STDMETHODIMP_(void) CDX11SubPicAllocator::SetInverseAlpha(bool bInverted)
 	}
 }
 
-bool CDX11SubPicAllocator::CreateOutputTex()
+HRESULT CDX11SubPicAllocator::CreateOutputTex()
 {
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	texDesc.Usage          = D3D11_USAGE_DEFAULT;
@@ -495,7 +400,7 @@ bool CDX11SubPicAllocator::CreateOutputTex()
 
 	HRESULT hr = m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pOutputTexture);
 	if (FAILED(hr)) {
-		return false;
+		return hr;
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -507,10 +412,9 @@ bool CDX11SubPicAllocator::CreateOutputTex()
 	hr = m_pDevice->CreateShaderResourceView(m_pOutputTexture, &srvDesc, &m_pOutputShaderResource);
 	if (FAILED(hr)) {
 		m_pOutputTexture.Release();
-		return false;
 	}
 
-	return true;
+	return hr;
 }
 
 void CDX11SubPicAllocator::CreateBlendState()
@@ -527,8 +431,11 @@ void CDX11SubPicAllocator::CreateBlendState()
 	EXECUTE_ASSERT(S_OK == m_pDevice->CreateBlendState(&bdesc, &m_pAlphaBlendState));
 }
 
-void CDX11SubPicAllocator::CreateSamplerState()
+void CDX11SubPicAllocator::CreateOtherStates()
 {
+	D3D11_BUFFER_DESC BufferDesc = { sizeof(VERTEX) * 4, D3D11_USAGE_DYNAMIC, D3D11_BIND_VERTEX_BUFFER, D3D11_CPU_ACCESS_WRITE, 0, 0 };
+	EXECUTE_ASSERT(S_OK == m_pDevice->CreateBuffer(&BufferDesc, nullptr, &m_pVertexBuffer));
+
 	D3D11_SAMPLER_DESC SampDesc = {};
 	SampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	SampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -541,6 +448,95 @@ void CDX11SubPicAllocator::CreateSamplerState()
 
 	SampDesc.Filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT; // linear interpolation for magnification
 	EXECUTE_ASSERT(S_OK == m_pDevice->CreateSamplerState(&SampDesc, &m_pSamplerLinear));
+}
+
+HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyRect, const CRect& srcRect, const CRect& dstRect)
+{
+	HRESULT hr = S_OK;
+
+	if (!m_pOutputTexture) {
+		hr = CreateOutputTex();
+		if (FAILED(hr)) {
+			return hr;
+		}
+	}
+
+	CComPtr<ID3D11DeviceContext> pDeviceContext;
+	m_pDevice->GetImmediateContext(&pDeviceContext);
+
+	uint32_t* srcData = memPic.data.get() + memPic.w * dirtyRect.top + dirtyRect.left;
+	D3D11_BOX dstBox = { dirtyRect.left, dirtyRect.top, 0, dirtyRect.right, dirtyRect.bottom, 1 };
+
+	pDeviceContext->UpdateSubresource(m_pOutputTexture, 0, &dstBox, srcData, memPic.w * 4, 0);
+
+	D3D11_TEXTURE2D_DESC texDesc = {};
+	m_pOutputTexture->GetDesc(&texDesc);
+
+	const float src_dx = 1.0f / texDesc.Width;
+	const float src_dy = 1.0f / texDesc.Height;
+	const float src_l = src_dx * srcRect.left;
+	const float src_r = src_dx * srcRect.right;
+	const float src_t = src_dy * srcRect.top;
+	const float src_b = src_dy * srcRect.bottom;
+
+	const POINT points[4] = {
+		{ -1, -1 },
+		{ -1, +1 },
+		{ +1, -1 },
+		{ +1, +1 }
+	};
+
+	const VERTEX Vertices[4] = {
+		// Vertices for drawing whole texture
+		// 2 ___4
+		//  |\ |
+		// 1|_\|3
+		{ {(float)points[0].x, (float)points[0].y, 0}, {src_l, src_b} },
+		{ {(float)points[1].x, (float)points[1].y, 0}, {src_l, src_t} },
+		{ {(float)points[2].x, (float)points[2].y, 0}, {src_r, src_b} },
+		{ {(float)points[3].x, (float)points[3].y, 0}, {src_r, src_t} },
+	};
+
+	D3D11_MAPPED_SUBRESOURCE mr;
+	hr = pDeviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	memcpy(mr.pData, &Vertices, sizeof(Vertices));
+	pDeviceContext->Unmap(m_pVertexBuffer, 0);
+
+	UINT Stride = sizeof(VERTEX);
+	UINT Offset = 0;
+	pDeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer.p, &Stride, &Offset);
+	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	D3D11_VIEWPORT vp;
+	vp.TopLeftX = dstRect.left;
+	vp.TopLeftY = dstRect.top;
+	vp.Width    = dstRect.Width();
+	vp.Height   = dstRect.Height();
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	pDeviceContext->RSSetViewports(1, &vp);
+
+	pDeviceContext->OMSetBlendState(m_pAlphaBlendState, nullptr, D3D11_DEFAULT_SAMPLE_MASK);
+
+	pDeviceContext->PSSetSamplers(0, 1, &(srcRect == dstRect ? m_pSamplerPoint.p : m_pSamplerLinear.p));
+	pDeviceContext->PSSetShaderResources(0, 1, &m_pOutputShaderResource.p);
+
+	pDeviceContext->Draw(4, 0);
+
+#if _DEBUG & ENABLE_DUMP_SUBPIC
+	{
+		static int counter = 0;
+		CString filepath;
+		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
+		DumpTexture2D(pDeviceContext, m_pOutputTexture, filepath);
+	}
+#endif
+
+	return hr;
 }
 
 // ISubPicAllocatorImpl
@@ -566,13 +562,6 @@ bool CDX11SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 	}
 
 	if (!pMemPic.data) {
-		if (!m_pOutputShaderResource) {
-			bool texOk = CreateOutputTex();
-			if (!texOk) {
-				return false;
-			}
-		}
-
 		pMemPic.w = ALIGN(m_maxsize.cx, 16/sizeof(uint32_t));
 		pMemPic.h = m_maxsize.cy;
 

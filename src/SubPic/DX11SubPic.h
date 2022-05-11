@@ -66,24 +66,22 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	CComPtr<ID3D11Texture2D> m_pOutputTexture;
 	CComPtr<ID3D11ShaderResourceView> m_pOutputShaderResource;
 	CComPtr<ID3D11BlendState> m_pAlphaBlendState;
+	CComPtr<ID3D11Buffer> m_pVertexBuffer;
 	CComPtr<ID3D11SamplerState> m_pSamplerPoint;
 	CComPtr<ID3D11SamplerState> m_pSamplerLinear;
 
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
-	bool CreateOutputTex();
+	HRESULT CreateOutputTex();
 	void CreateBlendState();
-	void CreateSamplerState();
+	void CreateOtherStates();
 
 public:
 	static CCritSec ms_SurfaceQueueLock;
 	std::list<MemPic_t> m_FreeSurfaces;
 	std::list<CDX11SubPic*> m_AllocatedSurfaces;
 
-	ID3D11Texture2D* GetOutputTexture() { return m_pOutputTexture.p; }
-	ID3D11ShaderResourceView* GetShaderResource() { return m_pOutputShaderResource.p; }
-	ID3D11BlendState* GetAlphaBlendState() { return m_pAlphaBlendState.p; }
-	ID3D11SamplerState* GetSamplerState(const bool linear) { return linear ? m_pSamplerLinear.p : m_pSamplerPoint.p; }
+	HRESULT Render(const MemPic_t& memPic, const CRect& dirtyRect, const CRect& srcRect, const CRect& dstRect);
 
 	void GetStats(int& _nFree, int& _nAlloc);
 
