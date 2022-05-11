@@ -65,10 +65,12 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 
 	CComPtr<ID3D11Texture2D> m_pOutputTexture;
 	CComPtr<ID3D11ShaderResourceView> m_pOutputShaderResource;
+	CComPtr<ID3D11BlendState> m_pAlphaBlendState;
 
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 	bool CreateOutputTex();
+	void CreateBlendState();
 
 public:
 	static CCritSec ms_SurfaceQueueLock;
@@ -77,6 +79,7 @@ public:
 
 	ID3D11Texture2D* GetOutputTexture() { return m_pOutputTexture.p; }
 	ID3D11ShaderResourceView* GetShaderResource() { return m_pOutputShaderResource.p; }
+	ID3D11BlendState* GetAlphaBlendState() { return m_pAlphaBlendState.p; }
 
 	void GetStats(int& _nFree, int& _nAlloc);
 
@@ -87,4 +90,5 @@ public:
 	// ISubPicAllocator
 	STDMETHODIMP ChangeDevice(IUnknown* pDev) override;
 	STDMETHODIMP SetMaxTextureSize(SIZE MaxTextureSize) override;
+	STDMETHODIMP_(void) SetInverseAlpha(bool bInverted) override;
 };

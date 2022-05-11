@@ -355,6 +355,9 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if (FAILED(hr)) {
 		return E_FAIL;
 	}
+
+	pDeviceContext->OMSetBlendState(m_pAllocator->GetAlphaBlendState(), nullptr, D3D11_DEFAULT_SAMPLE_MASK);
+
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
@@ -386,12 +389,14 @@ CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize)
 	, m_pDevice(pDevice)
 	, m_maxsize(maxsize)
 {
+	CreateBlendState();
 }
 
 CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
 
 CDX11SubPicAllocator::~CDX11SubPicAllocator()
 {
+	m_pAlphaBlendState.Release();
 	ClearCache();
 }
 
@@ -429,9 +434,11 @@ STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	CAutoLock cAutoLock(this);
 	HRESULT hr = S_FALSE;
 	if (m_pDevice != pDevice) {
+		m_pAlphaBlendState.Release();
 		ClearCache();
 		m_pDevice = pDevice;
 		hr = __super::ChangeDevice(pDev);
+		CreateBlendState();
 	}
 
 	return hr;
@@ -451,6 +458,15 @@ STDMETHODIMP CDX11SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
 	SetCurVidRect(CRect(CPoint(0,0), MaxTextureSize));
 
 	return S_OK;
+}
+
+STDMETHODIMP_(void) CDX11SubPicAllocator::SetInverseAlpha(bool bInverted)
+{
+	if (m_bInvAlpha != bInverted) {
+		m_bInvAlpha = bInverted;
+		m_pAlphaBlendState.Release();
+		CreateBlendState();
+	}
 }
 
 bool CDX11SubPicAllocator::CreateOutputTex()
@@ -485,6 +501,20 @@ bool CDX11SubPicAllocator::CreateOutputTex()
 	}
 
 	return true;
+}
+
+void CDX11SubPicAllocator::CreateBlendState()
+{
+	D3D11_BLEND_DESC bdesc = {};
+	bdesc.RenderTarget[0].BlendEnable = TRUE;
+	bdesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	bdesc.RenderTarget[0].DestBlend = m_bInvAlpha ? D3D11_BLEND_INV_SRC_ALPHA : D3D11_BLEND_SRC_ALPHA;
+	bdesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	bdesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	bdesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	bdesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	bdesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	EXECUTE_ASSERT(S_OK == m_pDevice->CreateBlendState(&bdesc, &m_pAlphaBlendState));
 }
 
 // ISubPicAllocatorImpl
