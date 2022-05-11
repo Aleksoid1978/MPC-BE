@@ -128,22 +128,28 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(
 	CheckPointer(pRcDest, E_POINTER);
 
 	if (m_size.cx > 0 && m_size.cy > 0) {
-		CPoint offset(0, 0);
 		double scaleX = 1.0, scaleY = 1.0;
 
-		const CRect rcTarget = bPositionRelative || m_eSubtitleType == SUBTITLE_TYPE::ST_VOBSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC ? rcVideo : rcWindow;
+		const CRect rcTarget = bPositionRelative || m_eSubtitleType != SUBTITLE_TYPE::ST_TEXT ? rcVideo : rcWindow;
 		const CSize szTarget = rcTarget.Size();
 		const bool bNeedSpecialCase = !!bUseSpecialCase && (m_eSubtitleType == SUBTITLE_TYPE::ST_HDMV || m_eSubtitleType == SUBTITLE_TYPE::ST_DVB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC) && m_virtualTextureSize.cx > 720;
+		bool bMatchesAR = true;
 		if (bNeedSpecialCase) {
 			const double subtitleAR	= double(m_virtualTextureSize.cx) / m_virtualTextureSize.cy;
 			const double videoAR	= double(szTarget.cx) / szTarget.cy;
 
-			scaleX = scaleY = videoAR < subtitleAR ? double(szTarget.cx) / m_virtualTextureSize.cx : double(szTarget.cy) / m_virtualTextureSize.cy;
+			const auto diffAR = std::abs(videoAR - subtitleAR);
+			bMatchesAR = diffAR < 0.001;
+			if (bMatchesAR || videoAR > subtitleAR) {
+				scaleX = scaleY = double(szTarget.cx) / m_virtualTextureSize.cx;
+			} else {
+				scaleX = scaleY = double(szTarget.cy) / m_virtualTextureSize.cy;
+			}
 		} else {
 			scaleX = double(szTarget.cx) / m_virtualTextureSize.cx;
 			scaleY = double(szTarget.cy) / m_virtualTextureSize.cy;
 		}
-		offset += rcTarget.TopLeft();
+		CPoint offset = rcTarget.TopLeft();
 
 		CRect rcTemp = m_rcDirty;
 		*pRcSource = rcTemp;
@@ -155,16 +161,10 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(
 					   lround(rcTemp.bottom * scaleY));
 		rcTemp.OffsetRect(offset);
 
-		if (bNeedSpecialCase) {
-			offset.SetPoint(0, 0);
-			CSize szSourceScaled(m_virtualTextureSize.cx * scaleX, m_virtualTextureSize.cy * scaleY);
-			if (szTarget.cx > szSourceScaled.cx) {
-				offset.x = lround((szTarget.cx - szSourceScaled.cx) / 2.0);
-			}
-
-			if (szTarget.cy > szSourceScaled.cy) {
-				offset.y = lround((szTarget.cy - szSourceScaled.cy) / 2.0);
-			}
+		if (bNeedSpecialCase && !bMatchesAR) {
+			const auto extraHeight = szTarget.cy - m_virtualTextureSize.cy * scaleY;
+			const auto extraWidth = szTarget.cx - m_virtualTextureSize.cx * scaleX;
+			offset.SetPoint(lround(extraWidth / 2.), lround(extraHeight / 2.));
 			rcTemp.OffsetRect(offset);
 		}
 
