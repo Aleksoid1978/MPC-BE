@@ -462,11 +462,13 @@ HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyR
 		}
 	}
 
+	bool stretching = (srcRect.Size() != dstRect.Size());
+
 	CRect copyRect(dirtyRect);
-	copyRect.InflateRect(1, 1);
-	RECT subpicRect = { 0, 0, memPic.w, memPic.h };
-	if (!copyRect.IntersectRect(copyRect, &subpicRect)) {
-		return S_FALSE;
+	if (stretching) {
+		copyRect.InflateRect(1, 1);
+		RECT subpicRect = { 0, 0, memPic.w, memPic.h };
+		EXECUTE_ASSERT(copyRect.IntersectRect(copyRect, &subpicRect));
 	}
 
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
@@ -530,7 +532,7 @@ HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyR
 
 	pDeviceContext->OMSetBlendState(m_pAlphaBlendState, nullptr, D3D11_DEFAULT_SAMPLE_MASK);
 
-	pDeviceContext->PSSetSamplers(0, 1, &(srcRect == dstRect ? m_pSamplerPoint.p : m_pSamplerLinear.p));
+	pDeviceContext->PSSetSamplers(0, 1, &(stretching ? m_pSamplerLinear.p : m_pSamplerPoint.p));
 	pDeviceContext->PSSetShaderResources(0, 1, &m_pOutputShaderResource.p);
 
 	pDeviceContext->Draw(4, 0);
