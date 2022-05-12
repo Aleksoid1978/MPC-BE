@@ -197,9 +197,10 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 
 	auto pDstMemPic = reinterpret_cast<MemPic_t*>(pSubPic->GetObject());
 
-	CRect copyRect;
+	CRect copyRect(m_rcDirty);
+	copyRect.InflateRect(1, 1);
 	RECT subpicRect = { 0, 0, pDstMemPic->w, pDstMemPic->h };
-	if (!copyRect.IntersectRect(m_rcDirty, &subpicRect)) {
+	if (!copyRect.IntersectRect(copyRect, &subpicRect)) {
 		return S_FALSE;
 	}
 
@@ -461,11 +462,18 @@ HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyR
 		}
 	}
 
+	CRect copyRect(dirtyRect);
+	copyRect.InflateRect(1, 1);
+	RECT subpicRect = { 0, 0, memPic.w, memPic.h };
+	if (!copyRect.IntersectRect(copyRect, &subpicRect)) {
+		return S_FALSE;
+	}
+
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
 	m_pDevice->GetImmediateContext(&pDeviceContext);
 
-	uint32_t* srcData = memPic.data.get() + memPic.w * dirtyRect.top + dirtyRect.left;
-	D3D11_BOX dstBox = { dirtyRect.left, dirtyRect.top, 0, dirtyRect.right, dirtyRect.bottom, 1 };
+	uint32_t* srcData = memPic.data.get() + memPic.w * copyRect.top + copyRect.left;
+	D3D11_BOX dstBox = { copyRect.left, copyRect.top, 0, copyRect.right, copyRect.bottom, 1 };
 
 	pDeviceContext->UpdateSubresource(m_pOutputTexture, 0, &dstBox, srcData, memPic.w * 4, 0);
 
