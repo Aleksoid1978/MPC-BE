@@ -20686,7 +20686,7 @@ void CMainFrame::OnUpdateRepeatForever(CCmdUI* pCmdUI)
 void CMainFrame::GetSystemTitleColor()
 {
 	if (SysVersion::IsWin11orLater()) {
-		m_colTitleBkSystem = {};
+		m_colTitleBkSystem = 0x00FFFFFF;
 
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\DWM", KEY_READ)) {
