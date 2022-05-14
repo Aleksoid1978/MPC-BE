@@ -81,7 +81,7 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	void ReleaseAllStates();
 
 public:
-	static CCritSec ms_SurfaceQueueLock;
+	inline static CCritSec ms_SurfaceQueueLock;
 	std::list<MemPic_t> m_FreeSurfaces;
 	std::list<CDX11SubPic*> m_AllocatedSurfaces;
 

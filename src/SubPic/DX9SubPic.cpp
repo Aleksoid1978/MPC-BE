@@ -331,8 +331,6 @@ CDX9SubPicAllocator::CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize
 {
 }
 
-CCritSec CDX9SubPicAllocator::ms_SurfaceQueueLock;
-
 CDX9SubPicAllocator::~CDX9SubPicAllocator()
 {
 	ClearCache();

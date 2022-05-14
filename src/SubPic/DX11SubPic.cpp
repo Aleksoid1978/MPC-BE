@@ -493,8 +493,6 @@ CDX11SubPicAllocator::CDX11SubPicAllocator(ID3D11Device* pDevice, SIZE maxsize)
 	CreateOtherStates();
 }
 
-CCritSec CDX11SubPicAllocator::ms_SurfaceQueueLock;
-
 CDX11SubPicAllocator::~CDX11SubPicAllocator()
 {
 	ReleaseAllStates();
@@ -535,7 +533,7 @@ STDMETHODIMP CDX11SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	CAutoLock cAutoLock(this);
 	HRESULT hr = S_FALSE;
 	if (m_pDevice != pDevice) {
-		ReleaseAllStates();;
+		ReleaseAllStates();
 		ClearCache();
 
 		m_pDevice = pDevice;

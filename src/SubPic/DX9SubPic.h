@@ -60,7 +60,7 @@ class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:
-	static CCritSec ms_SurfaceQueueLock;
+	inline static CCritSec ms_SurfaceQueueLock;
 	std::list<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
 	std::list<CDX9SubPic*> m_AllocatedSurfaces;
 
