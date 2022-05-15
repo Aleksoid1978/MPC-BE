@@ -573,10 +573,34 @@ STDMETHODIMP_(void) CDX11SubPicAllocator::SetInverseAlpha(bool bInverted)
 
 HRESULT CDX11SubPicAllocator::CreateOutputTex()
 {
+	bool bDynamicTex = false;
+
+	CComPtr<IDXGIDevice> pDxgiDevice;
+	HRESULT hr = m_pDevice->QueryInterface(IID_PPV_ARGS(&pDxgiDevice));
+	if (SUCCEEDED(hr)) {
+		CComPtr<IDXGIAdapter> pDxgiAdapter;
+		hr = pDxgiDevice->GetAdapter(&pDxgiAdapter);
+		if (SUCCEEDED(hr)) {
+			DXGI_ADAPTER_DESC desc;
+			hr = pDxgiAdapter->GetDesc(&desc);
+			if (SUCCEEDED(hr)) {
+				if (desc.VendorId == 0x8086) {
+					// workaround for an Intel driver bug where frequent UpdateSubresource calls caused high memory consumption
+					bDynamicTex = true;
+				}
+			}
+		}
+	}
+
 	D3D11_TEXTURE2D_DESC texDesc = {};
-	texDesc.Usage          = D3D11_USAGE_DEFAULT;
+	if (bDynamicTex) {
+		texDesc.Usage = D3D11_USAGE_DYNAMIC;
+		texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	} else {
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.CPUAccessFlags = 0;
+	}
 	texDesc.BindFlags      = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags      = 0;
 	texDesc.Width          = m_maxsize.cx;
 	texDesc.Height         = m_maxsize.cy;
@@ -585,7 +609,7 @@ HRESULT CDX11SubPicAllocator::CreateOutputTex()
 	texDesc.Format         = DXGI_FORMAT_B8G8R8A8_UNORM;
 	texDesc.SampleDesc     = { 1, 0 };
 
-	HRESULT hr = m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pOutputTexture);
+	hr = m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pOutputTexture);
 	if (FAILED(hr)) {
 		return hr;
 	}
@@ -679,13 +703,30 @@ HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyR
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
 	m_pDevice->GetImmediateContext(&pDeviceContext);
 
-	uint32_t* srcData = memPic.data.get() + memPic.w * copyRect.top + copyRect.left;
-	D3D11_BOX dstBox = { copyRect.left, copyRect.top, 0, copyRect.right, copyRect.bottom, 1 };
-
-	pDeviceContext->UpdateSubresource(m_pOutputTexture, 0, &dstBox, srcData, memPic.w * 4, 0);
-
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	m_pOutputTexture->GetDesc(&texDesc);
+
+	uint32_t* src = memPic.data.get() + memPic.w * copyRect.top + copyRect.left;
+	if (texDesc.Usage == D3D11_USAGE_DYNAMIC) {
+		// workaround for an Intel driver bug where frequent UpdateSubresource calls caused high memory consumption
+		D3D11_MAPPED_SUBRESOURCE mr;
+		hr = pDeviceContext->Map(m_pOutputTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+		if (SUCCEEDED(hr)) {
+			BYTE* dst = (BYTE*)mr.pData + mr.RowPitch * copyRect.top + (copyRect.left * 4);
+			const UINT copyW_bytes = copyRect.Width() * 4;
+			UINT copyH = copyRect.Height();
+			while (copyH-- > 0) {
+				memcpy(dst, src, copyW_bytes);
+				src += memPic.w;
+				dst += mr.RowPitch;
+			}
+			pDeviceContext->Unmap(m_pOutputTexture, 0);
+		}
+	}
+	else {
+		D3D11_BOX dstBox = { copyRect.left, copyRect.top, 0, copyRect.right, copyRect.bottom, 1 };
+		pDeviceContext->UpdateSubresource(m_pOutputTexture, 0, &dstBox, src, memPic.w * 4, 0);
+	}
 
 	const float src_dx = 1.0f / texDesc.Width;
 	const float src_dy = 1.0f / texDesc.Height;
