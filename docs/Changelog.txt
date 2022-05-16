@@ -18,6 +18,7 @@ Fixed aspect ratio setting for VFW codecs.
 MpaDecFilter
 Added support for AAC 22.2 audio decoding with automatic mixing in 7.1.
 Added support for ATRAC9.
+Fixed "stereodownmix" setting.
 
 MPCVideoDec
 Fixed D3D11 decoder in some situations.
@@ -27,11 +28,20 @@ VideoRenderers
 Fixed frame rotating for SyncVR.
 Removed PS 2.x shader support for EVR-CP and SyncVR.
 
+Subtitles
+Added support for outputting subtitles in DirectX 11 mode. Used together with MPC Video Renderer 0.6.0.
+Slight optimization of subtitles output in DirectX 9 mode.
+
+Youtube
+Added support for links "youtube.com/clip/", "youtube.com/c/.../live" and "youtube.com/channel/.../live".
+
 Player
 Added option "Use Window Media Controls". It is disabled by default.
 Added shaders to convert stereo 3D to red-cyan anaglyph for Direct3D9.
 Added the ability to set the color of the program window title on Windows 11.
 Fixed EVR-CP bug with "Failed to RegisterClass" error for the case when playback is forced to end after the first frame.
+Fixed remembering the starting window size for some situations.
+Moving a window outside the video area now also works for a maximized window.
 Miscellaneous fixes.
 
 Updated Turkish translation (by cmhrky).
@@ -40,6 +50,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Ukrainian translation (by arestarh).
 Updated Japanese translation.
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated Hungarian translation (by mickey).
 
 Updated libraries:
 	dav1d git-1.0.0;
