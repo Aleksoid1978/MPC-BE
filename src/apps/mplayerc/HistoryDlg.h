@@ -75,6 +75,7 @@ protected:
 	virtual BOOL OnInitDialog();
 
 	void SetupList();
+	void RemoveFromJumpList(const std::list<SessionInfo>& sessions);
 	void RemoveSelected();
 	int  RemoveMissingFiles();
 	void ClearHistory();

@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "HistoryFile.h"
 #include <atlenc.h>
-#include <Shobjidl.h>
 
 //
 // CMpcLstFile
@@ -415,9 +414,6 @@ bool CHistoryFile::DeleteSessions(const std::list<SessionInfo>& sessions)
 		return false;
 	}
 
-	CComPtr<IApplicationDestinations> pDests;
-	auto hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
-
 	bool changed = false;
 
 	for (const auto& sesInfo : sessions) {
@@ -425,13 +421,6 @@ bool CHistoryFile::DeleteSessions(const std::list<SessionInfo>& sessions)
 
 		// delete what was found and all unexpected duplicates (for example, after manual editing)
 		while (it != m_SessionInfos.end()) {
-			if (hr == S_OK) {
-				CComPtr<IShellItem> pShellItem;
-				if (SUCCEEDED(SHCreateItemFromParsingName(it->Path, nullptr, IID_PPV_ARGS(&pShellItem)))) {
-					pDests->RemoveDestination(pShellItem);
-				}
-			}
-
 			m_SessionInfos.erase(it++);
 			changed = true;
 			it = FindSessionInfo(sesInfo, it);

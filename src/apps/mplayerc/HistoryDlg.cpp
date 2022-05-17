@@ -100,8 +100,24 @@ void CHistoryDlg::SetupList()
 	m_list.RedrawWindow();
 }
 
+void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
+{
+	CComPtr<IApplicationDestinations> pDests;
+	HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
+	if (hr == S_OK) {
+		for (auto& ses : sessions) {
+			CComPtr<IShellItem> pShellItem;
+			if (SUCCEEDED(SHCreateItemFromParsingName(ses.Path, nullptr, IID_PPV_ARGS(&pShellItem)))) {
+				pDests->RemoveDestination(pShellItem);
+			}
+		}
+	}
+}
+
 void CHistoryDlg::RemoveSelected()
 {
+	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
+
 	std::list<SessionInfo> selSessions;
 
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
@@ -116,8 +132,9 @@ void CHistoryDlg::RemoveSelected()
 	}
 
 	if (selSessions.size()) {
-		if (AfxGetMyApp()->m_HistoryFile.DeleteSessions(selSessions)) {
-			AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
+		if (historyFile.DeleteSessions(selSessions)) {
+			RemoveFromJumpList(selSessions);
+			historyFile.GetRecentSessions(m_recentSessions, INT_MAX);
 			SetupList();
 		}
 	}
@@ -146,6 +163,7 @@ int CHistoryDlg::RemoveMissingFiles()
 
 	if (missingFiles.size()) {
 		if (historyFile.DeleteSessions(missingFiles)) {
+			RemoveFromJumpList(missingFiles);
 			count = missingFiles.size();
 			historyFile.GetRecentSessions(m_recentSessions, INT_MAX);
 			SetupList();
@@ -159,6 +177,11 @@ void CHistoryDlg::ClearHistory()
 {
 	if (IDYES == AfxMessageBox(ResStr(IDS_RECENT_FILES_QUESTION), MB_ICONQUESTION | MB_YESNO)) {
 		if (AfxGetMyApp()->m_HistoryFile.Clear()) {
+			CComPtr<IApplicationDestinations> pDests;
+			HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
+			if (SUCCEEDED(hr)) {
+				hr = pDests->RemoveAllDestinations();
+			}
 			m_recentSessions.clear();
 			SetupList();
 		}
