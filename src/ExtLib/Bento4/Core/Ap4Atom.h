@@ -331,6 +331,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_MP2  = AP4_ATOM_TYPE('.','m','p','2');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_GLBL = AP4_ATOM_TYPE('g','l','b','l');
 
+const AP4_Atom::Type AP4_ATOM_TYPE_pcmC = AP4_ATOM_TYPE('p','c','m','C');
+
 /////////////////////////////// Video ///////////////////////////////////
 // MPEG 4 ASP
 const AP4_Atom::Type AP4_ATOM_TYPE_MP4V = AP4_ATOM_TYPE('m','p','4','v');

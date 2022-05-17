@@ -37,6 +37,7 @@
 #include "Ap4SampleDescription.h"
 #include "Ap4FtabAtom.h"
 #include "Ap4EndaAtom.h"
+#include "Ap4DataInfoAtom.h"
 
 /*----------------------------------------------------------------------
 |       AP4_SampleEntry::AP4_SampleEntry
@@ -401,6 +402,15 @@ AP4_AudioSampleEntry::AP4_AudioSampleEntry(AP4_Atom::Type   format,
         if(AP4_ContainerAtom* wave = dynamic_cast<AP4_ContainerAtom*>(child))
             if (AP4_EndaAtom* endian = dynamic_cast<AP4_EndaAtom*>(wave->GetChild(AP4_ATOM_TYPE_ENDA)))
                 m_Endian = endian->ReadEndian();
+
+    // read AP4_ATOM_TYPE_pcmC
+    if (AP4_DataInfoAtom* pcmCAtom = dynamic_cast<AP4_DataInfoAtom*>(GetChild(AP4_ATOM_TYPE_pcmC))) {
+        const auto di = pcmCAtom->GetData();
+        if (di->GetDataSize() == 6) {
+            const auto data = di->GetData();
+            m_Endian = data[4];
+        }
+    }
 }
 
 /*----------------------------------------------------------------------

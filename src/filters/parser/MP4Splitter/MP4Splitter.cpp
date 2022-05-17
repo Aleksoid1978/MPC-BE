@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1549,18 +1549,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = 0xa109;
 						} else if ((type == AP4_ATOM_TYPE_NONE || type == AP4_ATOM_TYPE_RAW) && bitspersample == 8 ||
 								    type == AP4_ATOM_TYPE_SOWT && bitspersample == 16 ||
-								   (type == AP4_ATOM_TYPE_IN24 || type == AP4_ATOM_TYPE_IN32) && ase->GetEndian()==ENDIAN_LITTLE) {
+								   (type == AP4_ATOM_TYPE_IN24 || type == AP4_ATOM_TYPE_IN32) && ase->GetEndian() == ENDIAN_LITTLE) {
 							if (type == AP4_ATOM_TYPE_IN24) {
 								bitspersample = 24;
 							} else if (type == AP4_ATOM_TYPE_IN32) {
 								bitspersample = 32;
 							}
 							fourcc = type = WAVE_FORMAT_PCM;
-						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian()==ENDIAN_LITTLE) {
+						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian() == ENDIAN_LITTLE) {
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 						} else if (type == AP4_ATOM_TYPE_LPCM || type == AP4_ATOM_TYPE_IPCM) {
 							DWORD flags = ase->GetFormatSpecificFlags();
-							if ((flags & 2) || (type == AP4_ATOM_TYPE_IPCM)) { // big endian
+							const bool BigEndian = (flags & 2) || ase->GetEndian() != ENDIAN_LITTLE;
+							if (BigEndian) {
 								if (flags & 1) { // floating point
 									if      (bitspersample == 32) type = AP4_ATOM_TYPE_FL32;
 									else if (bitspersample == 64) type = AP4_ATOM_TYPE_FL64;
@@ -1573,7 +1574,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										 ((type >>  8) & 0x0000ff00) |
 										 ((type <<  8) & 0x00ff0000) |
 										 ((type << 24) & 0xff000000);
-							} else {         // little endian
+							} else {
 								if (flags & 1) { // floating point
 									fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 								} else {
