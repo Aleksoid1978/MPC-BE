@@ -94,7 +94,7 @@ public:
 	STDMETHODIMP Lock(SubPicDesc& spd) PURE;
 	STDMETHODIMP Unlock(RECT* pDirtyRect) PURE;
 
-	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget = NULL) PURE;
+	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget = nullptr) PURE;
 
 	STDMETHODIMP SetVirtualTextureSize(const SIZE pSize, const POINT pTopLeft);
 	STDMETHODIMP GetSourceAndDest(

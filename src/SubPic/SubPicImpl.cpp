@@ -27,7 +27,7 @@
 //
 
 CSubPicImpl::CSubPicImpl()
-	: CUnknown(L"CSubPicImpl", NULL)
+	: CUnknown(L"CSubPicImpl", nullptr)
 	, m_rtStart(0)
 	, m_rtStop(0)
 	, m_rtSegmentStart(0)
@@ -253,7 +253,7 @@ STDMETHODIMP_(void) CSubPicImpl::SetInverseAlpha(bool bInverted)
 //
 
 CSubPicAllocatorImpl::CSubPicAllocatorImpl(SIZE cursize, bool fDynamicWriteOnly)
-	: CUnknown(L"ISubPicAllocatorImpl", NULL)
+	: CUnknown(L"ISubPicAllocatorImpl", nullptr)
 	, m_cursize(cursize)
 	, m_fDynamicWriteOnly(fDynamicWriteOnly)
 {

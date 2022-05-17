@@ -28,7 +28,7 @@
 #include <dxva2api.h>
 
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
-	: CUnknown(L"CSubPicAllocatorPresenterImpl", NULL)
+	: CUnknown(L"CSubPicAllocatorPresenterImpl", nullptr)
 	, m_hWnd(hWnd)
 {
 	if (!IsWindow(m_hWnd)) {
@@ -107,7 +107,7 @@ HRESULT CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, c
 				CRect rcTempVideo(videoRect);
 				rcTempVideo.right -= rcTempVideo.Width() / 2;
 
-				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, -xOffsetInPixels, FALSE);
+				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, nullptr, -xOffsetInPixels, FALSE);
 
 				rcWindow.left += rcWindow.Width() / 2;
 				rcVideo.left += rcVideo.Width() / 2;
@@ -118,14 +118,14 @@ HRESULT CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, c
 				CRect rcTempVideo(videoRect);
 				rcTempVideo.bottom -= rcTempVideo.Height() / 2;
 
-				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, -xOffsetInPixels, FALSE);
+				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, nullptr, -xOffsetInPixels, FALSE);
 
 				rcWindow.top += rcWindow.Height() / 2;
 				rcVideo.top += rcVideo.Height() / 2;
 
 			}
 
-			return AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rs.iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
+			return AlphaBlt(rcWindow, rcVideo, pSubPic, nullptr, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rs.iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
 		}
 	}
 
@@ -455,7 +455,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitle
 
 STDMETHODIMP CSubPicAllocatorPresenterImpl::Disconnect()
 {
-	m_pSubPicProvider = NULL;
+	m_pSubPicProvider.Release();
 	return m_pSubPicQueue->SetSubPicProvider(m_pSubPicProvider);
 }
 

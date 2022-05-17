@@ -34,7 +34,7 @@
 const double CSubPicQueueImpl::DEFAULT_FPS = 24/1.001;
 
 CSubPicQueueImpl::CSubPicQueueImpl(ISubPicAllocator* pAllocator, HRESULT* phr)
-	: CUnknown(L"CSubPicQueueImpl", NULL)
+	: CUnknown(L"CSubPicQueueImpl", nullptr)
 	, m_pAllocator(pAllocator)
 	, m_rtNow(0)
 	, m_fps(DEFAULT_FPS)
@@ -175,7 +175,7 @@ CSubPicQueue::CSubPicQueue(int nMaxSubPic, bool bDisableAnim, bool bAllowDropSub
 CSubPicQueue::~CSubPicQueue()
 {
 	m_bExitThread = true;
-	SetSubPicProvider(NULL);
+	SetSubPicProvider(nullptr);
 	CAMThread::Close();
 }
 
@@ -690,7 +690,7 @@ STDMETHODIMP CSubPicQueueNoThread::Invalidate(REFERENCE_TIME rtInvalidate)
 	CAutoLock cQueueLock(&m_csLock);
 
 	if (m_pSubPic && m_pSubPic->GetStop() > rtInvalidate) {
-		m_pSubPic = NULL;
+		m_pSubPic.Release();
 	}
 
 	return S_OK;

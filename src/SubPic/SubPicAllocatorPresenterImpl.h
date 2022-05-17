@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,7 +57,7 @@ protected:
 
 	void InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize);
 	HRESULT AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
-	HRESULT AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
+	HRESULT AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = nullptr, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
 
 public:
 	CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError);

@@ -77,7 +77,7 @@ public IUnknown {
 	STDMETHOD (Lock) (SubPicDesc& spd /*[out]*/) PURE;
 	STDMETHOD (Unlock) (RECT* pDirtyRect /*[in]*/) PURE;
 
-	STDMETHOD (AlphaBlt) (RECT* pSrc, RECT* pDst, SubPicDesc* pTarget = NULL /*[in]*/) PURE;
+	STDMETHOD (AlphaBlt) (RECT* pSrc, RECT* pDst, SubPicDesc* pTarget = nullptr /*[in]*/) PURE;
 	STDMETHOD (GetSourceAndDest) (
 		RECT rcWindow /*[in]*/, RECT rcVideo /*[in]*/,
 		RECT* pRcSource /*[out]*/, RECT* pRcDest /*[out]*/,
