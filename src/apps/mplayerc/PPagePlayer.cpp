@@ -222,15 +222,17 @@ BOOL CPPagePlayer::OnApply()
 	s.bRememberPlaylistItems = !!m_bRememberPlaylistItems;
 
 	if (!m_bKeepHistory) {
-		// Empty the "Recent" jump list
-		CComPtr<IApplicationDestinations> pDests;
-		HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
-		if (SUCCEEDED(hr)) {
-			hr = pDests->RemoveAllDestinations();
-		}
-
 		auto& historyFile = AfxGetMyApp()->m_HistoryFile;
-		historyFile.Clear();
+		if (historyFile.Clear()) {
+			// Empty the "Recent" jump list
+			CComPtr<IApplicationDestinations> pDests;
+			HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
+			if (SUCCEEDED(hr)) {
+				hr = pDests->RemoveAllDestinations();
+			}
+
+			// Don't clear AfxGetAppSettings().strLastOpenFile here.
+		}
 	}
 
 	s.iRecentFilesNumber = m_edtRecentFiles;

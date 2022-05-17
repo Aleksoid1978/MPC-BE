@@ -10192,17 +10192,17 @@ void CMainFrame::OnRecentFileClear()
 		return;
 	}
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	// Empty the "Recent" jump list
-	CComPtr<IApplicationDestinations> pDests;
-	HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
-	if (SUCCEEDED(hr)) {
-		hr = pDests->RemoveAllDestinations();
-	}
-
 	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
-	historyFile.Clear();
+	if (historyFile.Clear()) {
+		// Empty the "Recent" jump list
+		CComPtr<IApplicationDestinations> pDests;
+		HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
+		if (SUCCEEDED(hr)) {
+			hr = pDests->RemoveAllDestinations();
+		}
+
+		AfxGetAppSettings().strLastOpenFile.Empty();
+	}
 }
 
 void CMainFrame::OnUpdateRecentFileClear(CCmdUI* pCmdUI)

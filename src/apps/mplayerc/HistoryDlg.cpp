@@ -159,6 +159,14 @@ void CHistoryDlg::RemoveSelected()
 			RemoveFromJumpList(selSessions);
 			historyFile.GetRecentSessions(m_recentSessions, INT_MAX);
 			SetupList();
+
+			auto& strLastOpenFile = AfxGetAppSettings().strLastOpenFile;
+			for (auto& ses : selSessions) {
+				if (ses.Path.CompareNoCase(strLastOpenFile) == 0) {
+					strLastOpenFile.Empty();
+					break;
+				}
+			}
 		}
 	}
 }
@@ -190,6 +198,11 @@ int CHistoryDlg::RemoveMissingFiles()
 			count = missingFiles.size();
 			historyFile.GetRecentSessions(m_recentSessions, INT_MAX);
 			SetupList();
+
+			auto& strLastOpenFile = AfxGetAppSettings().strLastOpenFile;
+			if (!::PathFileExistsW(strLastOpenFile)) {
+				strLastOpenFile.Empty();
+			}
 		}
 	}
 
@@ -207,6 +220,8 @@ void CHistoryDlg::ClearHistory()
 			}
 			m_recentSessions.clear();
 			SetupList();
+
+			AfxGetAppSettings().strLastOpenFile.Empty();
 		}
 	}
 }
