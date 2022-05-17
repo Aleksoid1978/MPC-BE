@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -107,7 +107,8 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 	if (hr == S_OK) {
 		for (auto& ses : sessions) {
 			CComPtr<IShellItem> pShellItem;
-			if (SUCCEEDED(SHCreateItemFromParsingName(ses.Path, nullptr, IID_PPV_ARGS(&pShellItem)))) {
+			hr = SHCreateItemFromParsingName(ses.Path, nullptr, IID_PPV_ARGS(&pShellItem));
+			if (SUCCEEDED(hr)) {
 				pDests->RemoveDestination(pShellItem);
 			}
 		}
