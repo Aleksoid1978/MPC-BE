@@ -105,12 +105,40 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 	CComPtr<IApplicationDestinations> pDests;
 	HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
 	if (hr == S_OK) {
-		for (auto& ses : sessions) {
-			CComPtr<IShellItem> pShellItem;
-			hr = SHCreateItemFromParsingName(ses.Path, nullptr, IID_PPV_ARGS(&pShellItem));
-			if (SUCCEEDED(hr)) {
-				pDests->RemoveDestination(pShellItem);
+		std::list<CComPtr<IShellItem>> shellItems;
+
+		CComPtr<IApplicationDocumentLists> pDocLists;
+		hr = pDocLists.CoCreateInstance(CLSID_ApplicationDocumentLists, nullptr, CLSCTX_INPROC_SERVER);
+		if (hr == S_OK) {
+			CComPtr<IObjectArray> pItems;
+			hr = pDocLists->GetList(ADLT_RECENT, 0, IID_PPV_ARGS(&pItems));
+			if (hr == S_OK) {
+				UINT cObjects = 0;
+				hr = pItems->GetCount(&cObjects);
+				if (hr == S_OK && cObjects) {
+					for (UINT i = 0; i < cObjects; i++) {
+						CComPtr<IShellItem> pShellItem;
+						hr = pItems->GetAt(i, IID_PPV_ARGS(&pShellItem));
+						if (hr == S_OK) {
+							LPWSTR pszName = nullptr;
+							hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+							if (hr == S_OK) {
+								for (auto& ses : sessions) {
+									if (ses.Path == pszName) {
+										shellItems.emplace_back(pShellItem);
+										break;
+									}
+								}
+								CoTaskMemFree(pszName);
+							}
+						}
+					}
+				}
 			}
+		}
+
+		for (const auto& item : shellItems) {
+			pDests->RemoveDestination(item);
 		}
 	}
 }
