@@ -43,8 +43,8 @@
 #define ISPP_INVOKED
 #include "..\include\Version.h"
 
+#define app_name         "MPC-BE"
 #define copyright_year   str(MPC_YEAR_COMMENTS)
-#define app_name         str(MPC_WND_CLASS_NAME)
 #define app_url          str(MPC_VERSION_COMMENTS)
 #define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH)
 #define app_version_svn  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
@@ -130,7 +130,7 @@ ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
 MinVersion=6.0.6000
-AppMutex={#MPC_WND_CLASS_NAME}
+AppMutex={#app_name}
 ChangesAssociations=true
 #ifdef Sign
 SignTool=OpenSourceSign

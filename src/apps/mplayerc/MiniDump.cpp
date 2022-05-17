@@ -24,6 +24,8 @@
 #include <DbgHelp.h>
 #include "DSUtil/FileHandle.h"
 
+#include "Version.h"
+
 typedef BOOL(WINAPI* tpSymInitialize)(
 	_In_ HANDLE hProcess,
 	_In_opt_ PCSTR UserSearchPath,

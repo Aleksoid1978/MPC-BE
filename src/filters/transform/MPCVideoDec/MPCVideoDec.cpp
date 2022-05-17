@@ -40,7 +40,6 @@
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
 
-#include "Version.h"
 #include "DxgiUtils.h"
 
 #pragma warning(push)
@@ -58,6 +57,8 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d11va.h>
 }
 #pragma warning(pop)
+
+#include "Version.h"
 
 // option names
 #define OPT_REGKEY_VideoDec  L"Software\\MPC-BE Filters\\MPC Video Decoder"
@@ -1008,12 +1009,12 @@ CFilterApp theApp;
 
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
-	DWORD	procid = 0;
-	WCHAR	WindowClass[40];
-	GetWindowThreadProcessId(hwnd, &procid);
-	GetClassName(hwnd, WindowClass, std::size(WindowClass));
+	DWORD procId = 0;
+	WCHAR wndClassName[40];
+	GetWindowThreadProcessId(hwnd, &procId);
+	GetClassNameW(hwnd, wndClassName, std::size(wndClassName));
 
-	if (procid == GetCurrentProcessId() && wcscmp(WindowClass, MPC_WND_CLASS_NAMEW) == 0) {
+	if (procId == GetCurrentProcessId() && wcscmp(wndClassName, MPC_WND_CLASS_NAMEW) == 0) {
 		HWND* pWnd = (HWND*) lParam;
 		*pWnd = hwnd;
 		return FALSE;

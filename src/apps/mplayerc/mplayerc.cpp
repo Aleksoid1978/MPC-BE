@@ -39,6 +39,8 @@
 #include <atlsync.h>
 #include "UpdateChecker.h"
 
+#include "Version.h"
+
 extern "C" {
 	// hack to avoid error "unresolved external symbol" when linking
 	int mingw_app_type = 1;

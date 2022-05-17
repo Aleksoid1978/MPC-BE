@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -445,8 +445,8 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		body.Replace("[controlspath]", "/controls.html");
 		body.Replace("[indexpath]", "/index.html");
 		body.Replace("[path]", CStringA(pClient->m_path));
-		body.Replace("[setposcommand]", MAKE_STR(CMD_SETPOS));
-		body.Replace("[setvolumecommand]", MAKE_STR(CMD_SETVOLUME));
+		body.Replace("[setposcommand]", _CRT_STRINGIZE(CMD_SETPOS));
+		body.Replace("[setvolumecommand]", _CRT_STRINGIZE(CMD_SETVOLUME));
 		body.Replace("[wmcname]", "wm_command");
 	}
 

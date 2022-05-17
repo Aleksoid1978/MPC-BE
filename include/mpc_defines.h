@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,6 +19,8 @@
  */
 
 #pragma once
+
+#define MPC_WND_CLASS_NAMEW L"MPC-BE"
 
 #define KILOBYTE          1024
 #define MEGABYTE       1048576

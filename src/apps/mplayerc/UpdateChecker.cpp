@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2021 see Authors.txt
+ * (C) 2013-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,8 @@
 #include <afxinet.h>
 #include "DSUtil/SysVersion.h"
 #include "UpdateChecker.h"
+
+#include "Version.h"
 
 // UpdateChecker
 

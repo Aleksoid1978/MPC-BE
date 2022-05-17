@@ -50,13 +50,10 @@
 #define MPC_VERSION_STATUS      0
 // MPC_VERSION_STATUS: 0 - alpha/beta; 1 - stable
 
-#define MPC_WND_CLASS_NAME      "MPC-BE"
 #define MPC_YEAR_COMMENTS       "2002-2022"
 #define MPC_VERSION_COMMENTS    "https://sourceforge.net/projects/mpcbe/"
 
 #ifndef ISPP_INVOKED
-
-#define MPC_WND_CLASS_NAMEW     _CRT_WIDE(MPC_WND_CLASS_NAME)
 
 #define MPC_COMP_NAME_STR       L"MPC-BE Team"
 #define MPC_COPYRIGHT_STR       L"Copyright © 2002-2022 all contributors, see Authors.txt"

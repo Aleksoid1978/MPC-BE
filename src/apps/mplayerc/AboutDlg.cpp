@@ -22,6 +22,8 @@
 #include "AboutDlg.h"
 #include "DSUtil/FileHandle.h"
 
+#include "Version.h"
+
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
 

@@ -28,6 +28,8 @@
 #include "DIB.h"
 #include "DSUtil/FileHandle.h"
 
+#include "Version.h"
+
 CWebClientSocket::CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame)
 	: m_pWebServer(pWebServer)
 	, m_pMainFrame(pMainFrame)

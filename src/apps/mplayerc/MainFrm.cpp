@@ -99,6 +99,8 @@ namespace LAVVideo
 #include "PlayerYouTubeDL.h"
 #include "./Controls/MenuEx.h"
 
+#include "Version.h"
+
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
 #define MENUBARBREAK	30
