@@ -105,8 +105,6 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 	CComPtr<IApplicationDestinations> pDests;
 	HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
 	if (hr == S_OK) {
-		std::list<CComPtr<IShellItem>> shellItems;
-
 		CComPtr<IApplicationDocumentLists> pDocLists;
 		hr = pDocLists.CoCreateInstance(CLSID_ApplicationDocumentLists, nullptr, CLSCTX_INPROC_SERVER);
 		if (hr == S_OK) {
@@ -125,7 +123,7 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 							if (hr == S_OK) {
 								for (auto& ses : sessions) {
 									if (ses.Path.CompareNoCase(pszName) == 0) {
-										shellItems.emplace_back(pShellItem);
+										pDests->RemoveDestination(pShellItem);
 										break;
 									}
 								}
@@ -135,10 +133,6 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 					}
 				}
 			}
-		}
-
-		for (const auto& item : shellItems) {
-			pDests->RemoveDestination(item);
 		}
 	}
 }
