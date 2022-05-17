@@ -115,7 +115,7 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 			if (hr == S_OK) {
 				UINT cObjects = 0;
 				hr = pItems->GetCount(&cObjects);
-				if (hr == S_OK && cObjects) {
+				if (hr == S_OK) {
 					for (UINT i = 0; i < cObjects; i++) {
 						CComPtr<IShellItem> pShellItem;
 						hr = pItems->GetAt(i, IID_PPV_ARGS(&pShellItem));
@@ -124,7 +124,7 @@ void CHistoryDlg::RemoveFromJumpList(const std::list<SessionInfo>& sessions)
 							hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
 							if (hr == S_OK) {
 								for (auto& ses : sessions) {
-									if (ses.Path == pszName) {
+									if (ses.Path.CompareNoCase(pszName) == 0) {
 										shellItems.emplace_back(pShellItem);
 										break;
 									}
