@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -151,7 +151,7 @@ void CAddCommandDlg::OnTimer(UINT_PTR nIDEvent)
 void CAddCommandDlg::OnChangeFilterEdit()
 {
 	KillTimer(m_nFilterTimerID);
-	m_nFilterTimerID = SetTimer(2, 100, NULL);
+	m_nFilterTimerID = SetTimer(2, 100, nullptr);
 }
 
 void CAddCommandDlg::OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)

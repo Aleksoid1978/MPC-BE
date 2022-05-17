@@ -308,7 +308,7 @@ void CHistoryDlg::OnTimer(UINT_PTR nIDEvent)
 void CHistoryDlg::OnChangeFilterEdit()
 {
 	KillTimer(m_nFilterTimerID);
-	m_nFilterTimerID = SetTimer(2, 100, NULL);
+	m_nFilterTimerID = SetTimer(2, 100, nullptr);
 }
 
 void CHistoryDlg::OnBnClickedMenu()

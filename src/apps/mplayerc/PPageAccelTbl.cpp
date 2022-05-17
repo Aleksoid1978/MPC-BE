@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -901,7 +901,7 @@ void CPPageAccelTbl::OnTimer(UINT_PTR nIDEvent)
 void CPPageAccelTbl::OnChangeFilterEdit()
 {
 	KillTimer(m_nFilterTimerID);
-	m_nFilterTimerID = SetTimer(2, 100, NULL);
+	m_nFilterTimerID = SetTimer(2, 100, nullptr);
 }
 
 HBRUSH CPPageAccelTbl::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
