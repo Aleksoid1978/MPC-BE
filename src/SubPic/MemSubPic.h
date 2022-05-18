@@ -31,29 +31,30 @@ class CMemSubPic : public CSubPicImpl
 {
 	SubPicDesc m_spd;
 
-protected:
-	STDMETHODIMP_(void*) GetObject(); // returns SubPicDesc*
-
 public:
 	CMemSubPic(SubPicDesc& spd);
 	virtual ~CMemSubPic();
 
 	// ISubPic
-	STDMETHODIMP GetDesc(SubPicDesc& spd) override;;
-	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;;
-	STDMETHODIMP ClearDirtyRect() override;;
-	STDMETHODIMP Lock(SubPicDesc& spd) override;;
-	STDMETHODIMP Unlock(RECT* pDirtyRect) override;;
-	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;;
+protected:
+	STDMETHODIMP_(void*) GetObject() override; // returns SubPicDesc*
+public:
+	STDMETHODIMP GetDesc(SubPicDesc& spd) override;
+	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;
+	STDMETHODIMP ClearDirtyRect() override;
+	STDMETHODIMP Lock(SubPicDesc& spd) override;
+	STDMETHODIMP Unlock(RECT* pDirtyRect) override;
+	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;
 };
 
 // CMemSubPicAllocator
 
 class CMemSubPicAllocator : public CSubPicAllocatorImpl
 {
-	int m_type;
+	const int m_type;
 	CSize m_maxsize;
 
+	// CSubPicAllocatorImpl
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:

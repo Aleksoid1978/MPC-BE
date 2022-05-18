@@ -108,14 +108,14 @@ STDMETHODIMP_(void*) CMemSubPic::GetObject()
 
 STDMETHODIMP CMemSubPic::GetDesc(SubPicDesc& spd)
 {
-	spd.type = m_spd.type;
-	spd.w = m_size.cx;
-	spd.h = m_size.cy;
-	spd.bpp = m_spd.bpp;
-	spd.pitch = m_spd.pitch;
-	spd.bits = m_spd.bits;
-	spd.bitsU = m_spd.bitsU;
-	spd.bitsV = m_spd.bitsV;
+	spd.type    = m_spd.type;
+	spd.w       = m_size.cx;
+	spd.h       = m_size.cy;
+	spd.bpp     = m_spd.bpp;
+	spd.pitch   = m_spd.pitch;
+	spd.bits    = m_spd.bits;
+	spd.bitsU   = m_spd.bitsU;
+	spd.bitsV   = m_spd.bitsV;
 	spd.vidrect = m_vidrect;
 
 	return S_OK;
@@ -133,12 +133,18 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 		return E_FAIL;
 	}
 
-	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
-	BYTE* s = src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left * 4;
-	BYTE* d = dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left * 4;
+	ASSERT(src.bpp == 32 && dst.bpp == 32);
 
-	for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
-		memcpy(d, s, w * 4);
+	const UINT copyW_bytes = m_rcDirty.Width() * 4;
+	UINT copyH = m_rcDirty.Height();
+
+	BYTE* s = src.bits + src.pitch * m_rcDirty.top + m_rcDirty.left * 4;
+	BYTE* d = dst.bits + dst.pitch * m_rcDirty.top + m_rcDirty.left * 4;
+
+	while (copyH--) {
+		memcpy(d, s, copyW_bytes);
+		s += src.pitch;
+		d += dst.pitch;
 	}
 
 	return S_OK;
@@ -149,6 +155,8 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect()
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
+
+	ASSERT(m_spd.bpp == 32);
 
 	BYTE* ptr = m_spd.bits + m_spd.pitch * m_rcDirty.top + m_rcDirty.left * 4;
 	const UINT dirtyW = m_rcDirty.Width();
@@ -205,7 +213,7 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 			DWORD* e = s + w;
 			for (; s < e; s++) {
 				*s = ((*s>>3)&0x1f000000)|((*s>>8)&0xf800)|((*s>>5)&0x07e0)|((*s>>3)&0x001f);
-				//				*s = (*s&0xff000000)|((*s>>8)&0xf800)|((*s>>5)&0x07e0)|((*s>>3)&0x001f);
+				//*s = (*s&0xff000000)|((*s>>8)&0xf800)|((*s>>5)&0x07e0)|((*s>>3)&0x001f);
 			}
 		}
 	} else if (m_spd.type == MSP_RGB15) {
@@ -214,7 +222,7 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 			DWORD* e = s + w;
 			for (; s < e; s++) {
 				*s = ((*s>>3)&0x1f000000)|((*s>>9)&0x7c00)|((*s>>6)&0x03e0)|((*s>>3)&0x001f);
-				//				*s = (*s&0xff000000)|((*s>>9)&0x7c00)|((*s>>6)&0x03e0)|((*s>>3)&0x001f);
+				//*s = (*s&0xff000000)|((*s>>9)&0x7c00)|((*s>>6)&0x03e0)|((*s>>3)&0x001f);
 			}
 		}
 	} else if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
