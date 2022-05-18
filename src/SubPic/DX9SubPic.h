@@ -30,23 +30,24 @@ class CDX9SubPicAllocator;
 class CDX9SubPic : public CSubPicImpl
 {
 	CComPtr<IDirect3DSurface9> m_pSurface;
-
-protected:
-	STDMETHODIMP_(void*) GetObject(); // returns IDirect3DTexture9*
+	const bool m_bExternalRenderer;
 
 public:
 	CDX9SubPicAllocator *m_pAllocator;
-	bool m_bExternalRenderer;
+
 	CDX9SubPic(IDirect3DSurface9* pSurface, CDX9SubPicAllocator *pAllocator, bool bExternalRenderer);
 	~CDX9SubPic();
 
 	// ISubPic
-	STDMETHODIMP GetDesc(SubPicDesc& spd) override;;
-	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;;
-	STDMETHODIMP ClearDirtyRect() override;;
-	STDMETHODIMP Lock(SubPicDesc& spd) override;;
-	STDMETHODIMP Unlock(RECT* pDirtyRect) override;;
-	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;;
+protected:
+	STDMETHODIMP_(void*) GetObject() override; // returns IDirect3DTexture9*
+public:
+	STDMETHODIMP GetDesc(SubPicDesc& spd) override;
+	STDMETHODIMP CopyTo(ISubPic* pSubPic) override;
+	STDMETHODIMP ClearDirtyRect() override;
+	STDMETHODIMP Lock(SubPicDesc& spd) override;
+	STDMETHODIMP Unlock(RECT* pDirtyRect) override;
+	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;
 };
 
 // CDX9SubPicAllocator
@@ -55,8 +56,9 @@ class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 {
 	CComPtr<IDirect3DDevice9> m_pDevice;
 	CSize m_maxsize;
-	bool m_bExternalRenderer;
+	const bool m_bExternalRenderer;
 
+	// CSubPicAllocatorImpl
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:
@@ -64,10 +66,10 @@ public:
 	std::list<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
 	std::list<CDX9SubPic*> m_AllocatedSurfaces;
 
-	void GetStats(int &_nFree, int &_nAlloc);
-
 	CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, bool bExternalRenderer);
 	~CDX9SubPicAllocator();
+
+	void GetStats(int &_nFree, int &_nAlloc);
 	void ClearCache();
 
 	// ISubPicAllocator

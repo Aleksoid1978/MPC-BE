@@ -110,8 +110,7 @@ STDMETHODIMP CDX9SubPic::CopyTo(ISubPic* pSubPic)
 	D3DSURFACE_DESC dstDesc;
 	pDstSurf->GetDesc(&dstDesc);
 
-	RECT r;
-	SetRect(&r, 0, 0, std::min(srcDesc.Width, dstDesc.Width), std::min(srcDesc.Height, dstDesc.Height));
+	RECT r = { 0, 0, std::min(srcDesc.Width, dstDesc.Width), std::min(srcDesc.Height, dstDesc.Height) };
 	POINT p = { 0, 0 };
 	hr = pDevice->UpdateSurface(pSrcSurf, &r, pDstSurf, &p);
 
@@ -164,7 +163,7 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 		m_rcDirty.SetRectEmpty();
 	}
 
-	spd.type = 0;
+	spd.type    = 0;
 	spd.w       = m_size.cx;
 	spd.h       = m_size.cy;
 	spd.bpp     = 32;
@@ -195,7 +194,7 @@ STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 			}
 		}
 	} else {
-		m_rcDirty = CRect(CPoint(0, 0), m_size);
+		m_rcDirty.SetRect(0, 0, m_size.cx, m_size.cy);
 	}
 
 	return S_OK;
@@ -233,9 +232,9 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			float tu, tv;
 		}
 		pVertices[] = {
-			{(float)rDst.left, (float)rDst.top, 0.5f, 2.0f, (float)rSrc.left / w, (float)rSrc.top / h},
-			{(float)rDst.right, (float)rDst.top, 0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.top / h},
-			{(float)rDst.left, (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.left / w, (float)rSrc.bottom / h},
+			{(float)rDst.left,  (float)rDst.top,    0.5f, 2.0f, (float)rSrc.left  / w, (float)rSrc.top    / h},
+			{(float)rDst.right, (float)rDst.top,    0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.top    / h},
+			{(float)rDst.left,  (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.left  / w, (float)rSrc.bottom / h},
 			{(float)rDst.right, (float)rDst.bottom, 0.5f, 2.0f, (float)rSrc.right / w, (float)rSrc.bottom / h},
 		};
 
@@ -249,12 +248,15 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		// GetRenderState fails for devices created with D3DCREATE_PUREDEVICE
 		// so we need to provide default values in case GetRenderState fails
 		DWORD abe, sb, db;
-		if (FAILED(pDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &abe)))
+		if (FAILED(pDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &abe))) {
 			abe = FALSE;
-		if (FAILED(pDevice->GetRenderState(D3DRS_SRCBLEND, &sb)))
+		}
+		if (FAILED(pDevice->GetRenderState(D3DRS_SRCBLEND, &sb))) {
 			sb = D3DBLEND_ONE;
-		if (FAILED(pDevice->GetRenderState(D3DRS_DESTBLEND, &db)))
+		}
+		if (FAILED(pDevice->GetRenderState(D3DRS_DESTBLEND, &db))) {
 			db = D3DBLEND_ZERO;
+		}
 
 		hr = pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 		hr = pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
@@ -284,8 +286,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		/*
 		D3DCAPS9 d3dcaps9;
 		hr = pDevice->GetDeviceCaps(&d3dcaps9);
-		if (d3dcaps9.AlphaCmpCaps & D3DPCMPCAPS_LESS)
-		{
+		if (d3dcaps9.AlphaCmpCaps & D3DPCMPCAPS_LESS) {
 			hr = pDevice->SetRenderState(D3DRS_ALPHAREF, (DWORD)0x000000FE);
 			hr = pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 			hr = pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DPCMPCAPS_LESS);
@@ -294,7 +295,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 
 		hr = pDevice->SetPixelShader(nullptr);
 
-		if ((m_bExternalRenderer) && (FAILED(hr = pDevice->BeginScene()))) {
+		if (m_bExternalRenderer && FAILED(hr = pDevice->BeginScene())) {
 			break;
 		}
 
@@ -388,7 +389,7 @@ STDMETHODIMP CDX9SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
 	}
 
 	SetCurSize(MaxTextureSize);
-	SetCurVidRect(CRect(CPoint(0,0), MaxTextureSize));
+	SetCurVidRect(CRect(0,0, MaxTextureSize.cx, MaxTextureSize.cy));
 
 	return S_OK;
 }
@@ -436,7 +437,7 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	if (!fStatic) {
 		CAutoLock cAutoLock(&ms_SurfaceQueueLock);
-		m_AllocatedSurfaces.push_front((CDX9SubPic *)*ppSubPic);
+		m_AllocatedSurfaces.push_front((CDX9SubPic*)*ppSubPic);
 	}
 
 	return true;
