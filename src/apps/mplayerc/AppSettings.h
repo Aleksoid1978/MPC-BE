@@ -514,7 +514,7 @@ public:
 
 	int				iMonitor;
 
-	CString			ParseFileName(const CString& param);
+	CStringW		ParseFileName(const CStringW& param);
 	void			ParseCommandLine(cmdLine& cmdln);
 
 	// Added a Debug display to the screen (/debug option)

@@ -2185,17 +2185,29 @@ void CAppSettings::ExtractDVDStartPos(CString& strParam)
 	}
 }
 
-CString CAppSettings::ParseFileName(const CString& param)
+CStringW CAppSettings::ParseFileName(const CStringW& param)
 {
-	CString fullPathName;
-
-	// Try to transform relative pathname into full pathname
 	if (param.Find(L':') < 0) {
+		// try to convert relative path to full path
+		CStringW fullPathName;
 		fullPathName.ReleaseBuffer(GetFullPathNameW(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), nullptr));
 
 		CFileStatus fs;
 		if (!fullPathName.IsEmpty() && CFileGetStatus(fullPathName, fs)) {
 			return fullPathName;
+		}
+	}
+	else if (param.GetLength() > MAX_PATH && !::PathIsURLW(param) && !::PathIsUNCW(param)) {
+		// trying to shorten a long local path
+		CStringW longpath = StartsWith(param, L"\\\\?\\") ? param : L"\\\\?\\" + param;
+		auto length = GetShortPathNameW(longpath, nullptr, 0);
+		if (length > 0) {
+			CStringW shortPathName;
+			length = GetShortPathNameW(longpath, shortPathName.GetBuffer(length), length);
+			if (length > 0) {
+				shortPathName.ReleaseBuffer(length);
+				return shortPathName;
+			}
 		}
 	}
 
