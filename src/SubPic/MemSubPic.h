@@ -23,12 +23,11 @@
 
 #include "SubPicImpl.h"
 
-enum {MSP_P010,MSP_P016,MSP_RGB32,MSP_RGB24,MSP_RGB16,MSP_RGB15,MSP_YUY2,MSP_NV12,MSP_YV12,MSP_IYUV,MSP_AYUV,MSP_RGBA};
-
 // CMemSubPic
 
 class CMemSubPic : public CSubPicImpl
 {
+protected:
 	SubPicDesc m_spd;
 
 public:
@@ -51,6 +50,7 @@ public:
 
 class CMemSubPicAllocator : public CSubPicAllocatorImpl
 {
+protected:
 	const int m_type;
 	CSize m_maxsize;
 
