@@ -24,8 +24,6 @@
 #include "DSUtil/Utils.h"
 #include "MemSubPic.h"
 
-#include <emmintrin.h>
-
 //
 // CMemSubPic
 //
@@ -122,11 +120,7 @@ STDMETHODIMP CMemSubPic::Lock(SubPicDesc& spd)
 
 STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 {
-	m_rcDirty = pDirtyRect ? *pDirtyRect : CRect(0,0,m_spd.w,m_spd.h);
-
-	if (m_rcDirty.IsRectEmpty()) {
-		return S_OK;
-	}
+	m_rcDirty = pDirtyRect ? *pDirtyRect : CRect(0, 0, m_spd.w, m_spd.h);
 
 	return S_OK;
 }
@@ -158,31 +152,34 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		return E_INVALIDARG;
 	}
 
-	int w = rs.Width(), h = rs.Height();
-	BYTE* s = src.bits + src.pitch * rs.top + ((rs.left * src.bpp) >> 3); //rs.left * 4;
-	BYTE* d = dst.bits + dst.pitch * rd.top + ((rd.left * dst.bpp) >> 3);
+	ASSERT(src.bpp == 32 && dst.bpp == 32);
+
+	const int w = rs.Width();
+	const int h = rs.Height();
+	BYTE* s = src.bits + src.pitch * rs.top + (rs.left * 4);
+	BYTE* d = dst.bits + dst.pitch * rd.top + (rd.left * 4);
 
 	if (rd.top > rd.bottom) {
-		d = dst.bits + dst.pitch * (rd.top - 1) + (rd.left * dst.bpp >> 3);
+		d = dst.bits + dst.pitch * (rd.top - 1) + (rd.left * 4);
 		dst.pitch = -dst.pitch;
 	}
 
-	for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
+	for (int j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 		BYTE* s2 = s;
-		BYTE* s2end = s2 + w*4;
+		BYTE* s2end = s2 + w * 4;
 
-		DWORD* d2 = (DWORD*)d;
+		uint32_t* d2 = (uint32_t*)d;
 		for (; s2 < s2end; s2 += 4, d2++) {
 #ifdef _WIN64
-			DWORD ia = 256-s2[3];
+			uint32_t ia = 256-s2[3];
 			if (s2[3] < 0xff) {
-				*d2 = ((((*d2&0x00ff00ff)*s2[3])>>8) + (((*((DWORD*)s2)&0x00ff00ff)*ia)>>8)&0x00ff00ff)
-						| ((((*d2&0x0000ff00)*s2[3])>>8) + (((*((DWORD*)s2)&0x0000ff00)*ia)>>8)&0x0000ff00);
+				*d2 = ((((*d2&0x00ff00ff)*s2[3])>>8) + (((*((uint32_t*)s2)&0x00ff00ff)*ia)>>8)&0x00ff00ff)
+					| ((((*d2&0x0000ff00)*s2[3])>>8) + (((*((uint32_t*)s2)&0x0000ff00)*ia)>>8)&0x0000ff00);
 			}
 #else
 			if (s2[3] < 0xff) {
-				*d2 = ((((*d2&0x00ff00ff)*s2[3])>>8) + (*((DWORD*)s2)&0x00ff00ff)&0x00ff00ff)
-						| ((((*d2&0x0000ff00)*s2[3])>>8) + (*((DWORD*)s2)&0x0000ff00)&0x0000ff00);
+				*d2 = ((((*d2&0x00ff00ff)*s2[3])>>8) + (*((uint32_t*)s2)&0x00ff00ff)&0x00ff00ff)
+					| ((((*d2&0x0000ff00)*s2[3])>>8) + (*((uint32_t*)s2)&0x0000ff00)&0x0000ff00);
 			}
 #endif
 		}
