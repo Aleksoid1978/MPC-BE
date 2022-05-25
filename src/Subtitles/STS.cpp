@@ -2192,7 +2192,7 @@ const static OpenFunctStruct s_OpenFuncts[] = {
 	Subtitle::LRC,  TIME,  OpenLRC,
 	Subtitle::TTML, TIME,  OpenTTML,
 	Subtitle::SUB,  TIME,  OpenSubViewer,
-	Subtitle::SSA,  FRAME, OpenMicroDVD,
+	Subtitle::SUB,  FRAME, OpenMicroDVD,
 	Subtitle::SMI,  TIME,  OpenSami,
 	Subtitle::SRT,  TIME,  OpenVPlayer,
 	Subtitle::XSS,  TIME,  OpenXombieSub,
