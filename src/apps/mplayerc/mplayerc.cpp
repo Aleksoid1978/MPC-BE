@@ -239,14 +239,14 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 	if (m_Profile.GetSettingsLocation() == SETS_PROGRAMDIR) { // If settings ini file found, store stuff in the same folder as the exe file
 		path = GetProgramDir();
 	} else {
-		HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(MAX_PATH));
-		path.ReleaseBuffer();
+		PWSTR pathRoamingAppData = nullptr;
+		HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pathRoamingAppData);
+		path = CStringW(pathRoamingAppData) + L"\\MPC-BE\\";
+		CoTaskMemFree(pathRoamingAppData);
+
 		if (FAILED(hr)) {
 			return false;
 		}
-		CPath p;
-		p.Combine(path, L"MPC-BE");
-		path = AddSlash(p);
 	}
 
 	return true;
@@ -998,10 +998,10 @@ BOOL CMPlayerCApp::InitInstance()
 
 		// restore shaders if the shader folders is missing only, existing folders do not overwrite
 		if (!bShaderDirExists || !bShader11DirExists) {
-			CString appStorage;
-			SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, appStorage.GetBuffer(MAX_PATH));
-			appStorage.ReleaseBuffer();
-			appStorage.Append(L"\\MPC-BE\\");
+			PWSTR pathProgramData = nullptr;
+			SHGetKnownFolderPath(FOLDERID_ProgramData, 0, nullptr, &pathProgramData);
+			CString appStorage = CStringW(pathProgramData) + L"\\MPC-BE\\";
+			CoTaskMemFree(pathProgramData);
 
 			if (!bShaderDirExists) {
 				hr = FileOperation(appStorage + L"Shaders", appSavePath, nullptr, FO_COPY);

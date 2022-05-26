@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -655,17 +655,20 @@ void CPlayerCaptureDialog::InitControls()
 		// Overwrite m_file if it isn't a valid path
 		if (!PathFileExistsW(dir) || dir.IsEmpty()) {
 			m_file.Empty();
-			HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_PERSONAL, nullptr, 0, m_file.GetBuffer(MAX_PATH));
-			m_file.ReleaseBuffer();
+
+			PWSTR pathVideos = nullptr;
+			HRESULT hr = SHGetKnownFolderPath(FOLDERID_Videos, 0, nullptr, &pathVideos);
 			if (SUCCEEDED(hr)) {
-				m_file.Append(L"\\MPC-BE Capture");
+				m_file = CStringW(pathVideos) + L"\\MPC-BE Capture";
 				if (!PathFileExistsW(m_file)) {
 					VERIFY(CreateDirectoryW(m_file, nullptr));
 				}
 			} else {
 				// Use current directory
-				m_file.ReleaseBufferSetLength(GetCurrentDirectory(MAX_PATH, dir.GetBuffer(MAX_PATH)));
+				m_file.ReleaseBufferSetLength(GetCurrentDirectoryW(MAX_PATH, dir.GetBuffer(MAX_PATH)));
 			}
+			CoTaskMemFree(pathVideos);
+
 			m_file.AppendFormat(L"\\%s_capture_[time].avi", AfxGetApp()->m_pszExeName);
 		}
 

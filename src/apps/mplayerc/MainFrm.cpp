@@ -6382,10 +6382,11 @@ CString CMainFrame::CreateSnapShotFileName()
 {
 	CString path(AfxGetAppSettings().strSnapShotPath);
 	if (!::PathFileExistsW(path)) {
-		WCHAR szPath[MAX_PATH] = { 0 };
-		if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
-			path = CString(szPath) + L"\\";
-		}
+		PWSTR pathPictures = nullptr;
+		SHGetKnownFolderPath(FOLDERID_Pictures, 0, nullptr, &pathPictures);
+
+		path = CString(pathPictures) + L"\\";
+		CoTaskMemFree(pathPictures);
 	}
 
 	CString prefix = L"snapshot";

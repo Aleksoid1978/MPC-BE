@@ -21,7 +21,8 @@
 #include "stdafx.h"
 #include <atlpath.h>
 #include <atlenc.h>
-#include <Shlobj.h>
+#include <ShlObj_core.h>
+#include <KnownFolders.h>
 #include "FileHandle.h"
 #include "Utils.h"
 #include "Log.h"
@@ -40,12 +41,13 @@ CStringW GetIniUserProfile()
 {
 	CStringW path = GetIniProgramDir();
 	const CStringW fname = ::PathFindFileNameW(path);
-	HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(MAX_PATH));
-	path.ReleaseBuffer();
+
+	PWSTR pathRoamingAppData = nullptr;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pathRoamingAppData);
 	if (SUCCEEDED(hr)) {
-		path.Append(L"\\MPC-BE\\");
-		path.Append(fname);
+		path = CStringW(pathRoamingAppData) + L"\\MPC-BE\\" + fname;
 	}
+	CoTaskMemFree(pathRoamingAppData);
 
 	return path;
 }

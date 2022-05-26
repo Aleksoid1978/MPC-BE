@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,9 +31,10 @@ HINSTANCE GetD3dcompilerDll()
 #ifdef _DEBUG
 	if (s_hD3dcompilerDll == nullptr) {
 		// try an absolute path (needed when running the debug version outside of Visual Studio)
-		CString path;
-		SHGetFolderPathW(nullptr, CSIDL_PROGRAM_FILESX86, nullptr, 0, path.GetBuffer(MAX_PATH));
-		path.ReleaseBuffer();
+		PWSTR pathProgramFilesX86 = nullptr;
+		HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramFilesX86, 0, nullptr, &pathProgramFilesX86);
+		CString path = pathProgramFilesX86;
+		CoTaskMemFree(pathProgramFilesX86);
 	#ifdef _WIN64
 		path.Append(L"\\Windows Kits\\8.1\\bin\\x64\\d3dcompiler_47.dll");
 	#else

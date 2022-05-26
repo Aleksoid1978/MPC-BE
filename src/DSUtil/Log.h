@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2020 see Authors.txt
+ * (C) 2011-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,16 +25,21 @@
 //#define _DEBUG_LOGFILE // Allow output to the log file
 
 #ifdef _DEBUG_LOGFILE
-#include <Shlobj.h>
+#include <ShlObj_core.h>
+#include <KnownFolders.h>
 
 static const CString GetLogFileName()
 {
-	CString ret = L"mpc-be.log";
+	CString ret;
 
-	WCHAR szPath[MAX_PATH] = {};
-	if(SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_DESKTOP, nullptr, 0, szPath))) {
-		ret = CString(szPath) + L"\\mpc-be.log";
+	PWSTR pathDesktop = nullptr;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Desktop, 0, nullptr, &pathDesktop);
+	if (SUCCEEDED(hr)) {
+		ret = CStringW(pathDesktop) + L"\\mpc-be.log";
+	} else {
+		ret = L"mpc-be.log";
 	}
+	CoTaskMemFree(pathDesktop);
 
 	return ret;
 }

@@ -708,13 +708,12 @@ void CAppSettings::ResetSettings()
 	strWebDefIndex = L"index.html;index.php";
 	strWebServerCGI.Empty();
 
-	CString MyPictures;
-	WCHAR szPath[MAX_PATH] = { 0 };
-	if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
-		MyPictures = CString(szPath) + L"\\";
-	}
+	PWSTR pathPictures = nullptr;
+	SHGetKnownFolderPath(FOLDERID_Pictures, 0, nullptr, &pathPictures);
 
-	strSnapShotPath = MyPictures;
+	strSnapShotPath = CString(pathPictures) + L"\\";
+	CoTaskMemFree(pathPictures);
+
 	strSnapShotExt = L".jpg";
 	bSnapShotSubtitles = false;
 
@@ -1357,12 +1356,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_DVD, IDS_RS_DVD_CLOSEDCAPTIONS, bClosedCaptions);
 	profile.ReadBool(IDS_R_DVD, IDS_RS_DVD_STARTMAINTITLE, bStartMainTitle);
 	bNormalStartDVD = true;
-
-	CString MyPictures;
-	WCHAR szPath[MAX_PATH] = { 0 };
-	if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
-		MyPictures = CString(szPath) + L"\\";
-	}
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, strSnapShotPath);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
