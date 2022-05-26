@@ -42,11 +42,6 @@ CStringW GetProgramDir();
 // Get application path from "App Paths" subkey
 CStringW GetRegAppPath(LPCWSTR appFileName, const bool bUser);
 
-// wFunc can be FO_MOVE or FO_COPY.
-// To move a folder, add "\" to the end of the source path.
-// To copy a folder, add "\*" to the end of the source path.
-int FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc);
-
 void CleanPath(CStringW& path);
 
 bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
@@ -54,4 +49,5 @@ bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
 /////
 
 HRESULT FileOperationDelete(const CStringW& path);
-HRESULT FileOperationMove(const CStringW& source, const CStringW& target);
+// wFunc can be FO_MOVE or FO_COPY
+HRESULT FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc);

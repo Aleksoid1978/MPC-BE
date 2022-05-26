@@ -204,30 +204,6 @@ CStringW GetRegAppPath(LPCWSTR appFileName, const bool bCurrentUser)
 	return appPath;
 }
 
-// wFunc can be FO_MOVE or FO_COPY.
-// To move a folder, add "\" to the end of the source path.
-// To copy a folder, add "\*" to the end of the source path.
-int FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc)
-{
-	auto from_str = std::make_unique<WCHAR[]>(source.GetLength() + 2);
-	wcscpy_s(from_str.get(), source.GetLength()+1, source);
-
-	auto to_str = std::make_unique<WCHAR[]>(target.GetLength() + 2);
-	wcscpy_s(to_str.get(), target.GetLength()+1, target);
-
-	// set double null-terminated string
-	from_str[wcslen(from_str.get())+1] = 0;
-	to_str[wcslen(to_str.get())+1] = 0;
-
-	SHFILEOPSTRUCTW FileOp = { 0 };
-	FileOp.wFunc  = wFunc;
-	FileOp.pFrom  = from_str.get();
-	FileOp.pTo    = to_str.get();
-	FileOp.fFlags = FOF_NO_UI;
-
-	return SHFileOperationW(&FileOp);
-}
-
 void CleanPath(CStringW& path)
 {
 	// remove double quotes enclosing path
@@ -279,7 +255,7 @@ HRESULT FileOperationDelete(const CStringW& path)
 	return hr;
 }
 
-HRESULT FileOperationMove(const CStringW& source, const CStringW& target)
+HRESULT FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc)
 {
 	CComPtr<IFileOperation> pFileOperation;
 	CComPtr<IShellItem> psiItem;
@@ -305,7 +281,14 @@ HRESULT FileOperationMove(const CStringW& source, const CStringW& target)
 		hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO);
 	}
 	if (SUCCEEDED(hr)) {
-		hr = pFileOperation->MoveItem(psiItem, psiDestinationFolder, pszNewName, nullptr);
+		if (wFunc == FO_MOVE) {
+			hr = pFileOperation->MoveItem(psiItem, psiDestinationFolder, pszNewName, nullptr);
+		}
+		else if (wFunc == FO_COPY) {
+			hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszNewName, nullptr);
+		}
+		
+		
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->PerformOperations();

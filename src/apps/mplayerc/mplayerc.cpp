@@ -288,14 +288,14 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 
 		if (::PathFileExistsW(oldHistoryPath)) {
 			// moving history file
-			int ret = FileOperationMove(oldHistoryPath, newHistoryPath);
+			int ret = FileOperation(oldHistoryPath, newHistoryPath, FO_MOVE);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 		if (::PathFileExistsW(oldFavoritesPath)) {
 			// moving favorites file
-			int ret = FileOperationMove(oldFavoritesPath, newFavoritesPath);
+			int ret = FileOperation(oldFavoritesPath, newFavoritesPath, FO_MOVE);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -304,8 +304,8 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 		// moving shader files
 		CStringW oldFolderPath = oldpath + L"Shaders\\";
 		if (::PathFileExistsW(oldFolderPath)) {
-			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			int ret = FileOperationMove(oldFolderPath, newpath);
+			// use IFileOperation::MoveItem, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -313,8 +313,8 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 
 		oldFolderPath = oldpath + L"Shaders11\\";
 		if (::PathFileExistsW(oldFolderPath)) {
-			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			int ret = FileOperationMove(oldFolderPath, newpath);
+			// use IFileOperation::MoveItem, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -1008,7 +1008,7 @@ BOOL CMPlayerCApp::InitInstance()
 			shaderstorage.Append(L"\\MPC-BE\\");
 
 			if (!bShaderDirExists) {
-				int ret = FileOperation(shaderstorage + L"Shaders\\*", shaderpath, FO_COPY);
+				int ret = FileOperation(shaderstorage + L"Shaders\\", shaderpath, FO_COPY);
 				if (ret == 0) {
 					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder restored");
 				} else {
@@ -1017,7 +1017,7 @@ BOOL CMPlayerCApp::InitInstance()
 			}
 
 			if (!bShader11DirExists) {
-				int ret = FileOperation(shaderstorage + L"Shaders11\\*", shaderpath11, FO_COPY);
+				int ret = FileOperation(shaderstorage + L"Shaders11\\", shaderpath11, FO_COPY);
 				if (ret == 0) {
 					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder restored");
 				} else {
