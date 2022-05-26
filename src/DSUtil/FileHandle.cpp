@@ -264,13 +264,46 @@ HRESULT FileOperationDelete(const CStringW& path)
 		IID_PPV_ARGS(&pFileOperation));
 
 	if (SUCCEEDED(hr)) {
-		hr = SHCreateItemFromParsingName(path, NULL, IID_PPV_ARGS(&psiItem));
+		hr = SHCreateItemFromParsingName(path, nullptr, IID_PPV_ARGS(&psiItem));
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO);
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->DeleteItem(psiItem, nullptr);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pFileOperation->PerformOperations();
+	}
+
+	return hr;
+}
+
+HRESULT FileOperationMoveFile(const CStringW& source, const CStringW& target)
+{
+	CComPtr<IFileOperation> pFileOperation;
+	CComPtr<IShellItem> psiItem;
+	CComPtr<IShellItem> psiDestinationFolder;
+	LPCWSTR pszNewName = nullptr;
+
+	HRESULT hr = CoCreateInstance(CLSID_FileOperation,
+		nullptr,
+		CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&pFileOperation));
+
+	if (SUCCEEDED(hr)) {
+		hr = SHCreateItemFromParsingName(source, nullptr, IID_PPV_ARGS(&psiItem));
+	}
+	if (SUCCEEDED(hr)) {
+		pszNewName = PathFindFileNameW(target);
+		const CStringW destinationFolder = GetFolderOnly(target);
+		hr = SHCreateItemFromParsingName(destinationFolder, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pFileOperation->MoveItem(psiItem, psiDestinationFolder, pszNewName, nullptr);
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->PerformOperations();

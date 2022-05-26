@@ -288,14 +288,14 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 
 		if (::PathFileExistsW(oldHistoryPath)) {
 			// moving history file
-			int ret = FileOperation(oldHistoryPath, newHistoryPath, FO_MOVE);
+			int ret = FileOperationMoveFile(oldHistoryPath, newHistoryPath);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 		if (::PathFileExistsW(oldFavoritesPath)) {
 			// moving favorites file
-			int ret = FileOperation(oldFavoritesPath, newFavoritesPath, FO_MOVE);
+			int ret = FileOperationMoveFile(oldFavoritesPath, newFavoritesPath);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
