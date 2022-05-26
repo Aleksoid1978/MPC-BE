@@ -2010,17 +2010,8 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 
 			CString filesToDelete;
 			for (const auto& fn : fns) {
-				filesToDelete.Append(fn);
-				filesToDelete.AppendChar(0);
+				FileOperationDelete(fn);
 			}
-			filesToDelete.AppendChar(0);
-
-			SHFILEOPSTRUCTW shfoDelete = {};
-			shfoDelete.hwnd = m_hWnd;
-			shfoDelete.wFunc = FO_DELETE;
-			shfoDelete.pFrom = filesToDelete;
-			shfoDelete.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO;
-			SHFileOperationW(&shfoDelete);
 
 			if (bWasPlaying) {
 				m_list.Invalidate();

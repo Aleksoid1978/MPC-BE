@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2021 see Authors.txt
+ * (C) 2011-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -249,4 +249,32 @@ bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status)
 		e->Delete();
 		return false;
 	}
+}
+
+/////
+
+HRESULT FileOperationDelete(const CStringW& path)
+{
+	CComPtr<IFileOperation> pFileOperation;
+	CComPtr<IShellItem> psiItem;
+
+	HRESULT hr = CoCreateInstance(CLSID_FileOperation,
+		nullptr,
+		CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&pFileOperation));
+
+	if (SUCCEEDED(hr)) {
+		hr = SHCreateItemFromParsingName(path, NULL, IID_PPV_ARGS(&psiItem));
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pFileOperation->DeleteItem(psiItem, nullptr);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = pFileOperation->PerformOperations();
+	}
+
+	return hr;
 }

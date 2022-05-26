@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2021 see Authors.txt
+ * (C) 2011-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,3 +50,7 @@ int FileOperation(const CStringW& source, const CStringW& target, const UINT wFu
 void CleanPath(CStringW& path);
 
 bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
+
+/////
+
+HRESULT FileOperationDelete(const CStringW& path);
