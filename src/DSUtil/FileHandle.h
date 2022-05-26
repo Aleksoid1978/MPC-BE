@@ -54,4 +54,4 @@ bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
 /////
 
 HRESULT FileOperationDelete(const CStringW& path);
-HRESULT FileOperationMoveFile(const CStringW& source, const CStringW& target);
+HRESULT FileOperationMove(const CStringW& source, const CStringW& target);

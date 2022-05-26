@@ -279,7 +279,7 @@ HRESULT FileOperationDelete(const CStringW& path)
 	return hr;
 }
 
-HRESULT FileOperationMoveFile(const CStringW& source, const CStringW& target)
+HRESULT FileOperationMove(const CStringW& source, const CStringW& target)
 {
 	CComPtr<IFileOperation> pFileOperation;
 	CComPtr<IShellItem> psiItem;
@@ -295,7 +295,9 @@ HRESULT FileOperationMoveFile(const CStringW& source, const CStringW& target)
 		hr = SHCreateItemFromParsingName(source, nullptr, IID_PPV_ARGS(&psiItem));
 	}
 	if (SUCCEEDED(hr)) {
-		pszNewName = PathFindFileNameW(target);
+		if (!PathIsDirectoryW(source)) {
+			pszNewName = PathFindFileNameW(target);
+		}
 		const CStringW destinationFolder = GetFolderOnly(target);
 		hr = SHCreateItemFromParsingName(destinationFolder, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
 	}

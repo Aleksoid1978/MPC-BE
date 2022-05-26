@@ -288,14 +288,14 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 
 		if (::PathFileExistsW(oldHistoryPath)) {
 			// moving history file
-			int ret = FileOperationMoveFile(oldHistoryPath, newHistoryPath);
+			int ret = FileOperationMove(oldHistoryPath, newHistoryPath);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 		if (::PathFileExistsW(oldFavoritesPath)) {
 			// moving favorites file
-			int ret = FileOperationMoveFile(oldFavoritesPath, newFavoritesPath);
+			int ret = FileOperationMove(oldFavoritesPath, newFavoritesPath);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -305,7 +305,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 		CStringW oldFolderPath = oldpath + L"Shaders\\";
 		if (::PathFileExistsW(oldFolderPath)) {
 			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
+			int ret = FileOperationMove(oldFolderPath, newpath);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -314,7 +314,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 		oldFolderPath = oldpath + L"Shaders11\\";
 		if (::PathFileExistsW(oldFolderPath)) {
 			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
+			int ret = FileOperationMove(oldFolderPath, newpath);
 			if (ret != 0) {
 				MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
