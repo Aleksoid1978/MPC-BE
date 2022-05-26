@@ -255,12 +255,22 @@ HRESULT FileOperationDelete(const CStringW& path)
 	return hr;
 }
 
-HRESULT FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc)
+HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func)
+{
+	LPCWSTR pszNewName = nullptr;
+	if (!PathIsDirectoryW(source)) {
+		pszNewName = PathFindFileNameW(target);
+	}
+	const CStringW destinationFolder = GetFolderOnly(target);
+
+	return FileOperation(source, destinationFolder, pszNewName, func);
+}
+
+HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const UINT func)
 {
 	CComPtr<IFileOperation> pFileOperation;
 	CComPtr<IShellItem> psiItem;
 	CComPtr<IShellItem> psiDestinationFolder;
-	LPCWSTR pszNewName = nullptr;
 
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation,
 		nullptr,
@@ -271,24 +281,18 @@ HRESULT FileOperation(const CStringW& source, const CStringW& target, const UINT
 		hr = SHCreateItemFromParsingName(source, nullptr, IID_PPV_ARGS(&psiItem));
 	}
 	if (SUCCEEDED(hr)) {
-		if (!PathIsDirectoryW(source)) {
-			pszNewName = PathFindFileNameW(target);
-		}
-		const CStringW destinationFolder = GetFolderOnly(target);
-		hr = SHCreateItemFromParsingName(destinationFolder, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
+		hr = SHCreateItemFromParsingName(destFolder, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO);
 	}
 	if (SUCCEEDED(hr)) {
-		if (wFunc == FO_MOVE) {
-			hr = pFileOperation->MoveItem(psiItem, psiDestinationFolder, pszNewName, nullptr);
+		if (func == FO_MOVE) {
+			hr = pFileOperation->MoveItem(psiItem, psiDestinationFolder, newName, nullptr);
 		}
-		else if (wFunc == FO_COPY) {
-			hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszNewName, nullptr);
+		else if (func == FO_COPY) {
+			hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, newName, nullptr);
 		}
-		
-		
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->PerformOperations();

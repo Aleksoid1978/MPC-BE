@@ -50,4 +50,6 @@ bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
 
 HRESULT FileOperationDelete(const CStringW& path);
 // wFunc can be FO_MOVE or FO_COPY
-HRESULT FileOperation(const CStringW& source, const CStringW& target, const UINT wFunc);
+HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func);
+// func can be FO_MOVE or FO_COPY
+HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const UINT func);
