@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,48 +41,6 @@ static unsigned int AdaptUnit(double& val, size_t unitsNb)
 	}
 
 	return unit;
-}
-
-static HRESULT CopyFiles(CString sourceFile, CString destFile)
-{
-	HRESULT hr = S_OK;
-
-	CComPtr<IShellItem> psiItem;
-	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, nullptr, IID_PPV_ARGS(&psiItem));
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	CComPtr<IShellItem> psiDestinationFolder;
-	CString pszPath = AddSlash(GetFolderOnly(destFile));
-	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	CComPtr<IFileOperation> pFileOperation;
-	hr = CoCreateInstance(CLSID_FileOperation,
-						  nullptr,
-						  CLSCTX_INPROC_SERVER,
-						  IID_PPV_ARGS(&pFileOperation));
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX);
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	CString pszCopyName = GetFileOnly(destFile);
-	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, nullptr);
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	hr = pFileOperation->PerformOperations();
-
-	return hr;
 }
 
 enum {
@@ -246,7 +204,7 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 
 		if (!pReader) {
-			CopyFiles(m_in, m_out);
+			FileOperation(m_in, m_out, FO_COPY);
 			return E_ABORT;
 		}
 	}
