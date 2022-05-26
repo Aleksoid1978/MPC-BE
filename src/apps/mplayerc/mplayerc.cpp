@@ -270,6 +270,8 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 	m_s.SaveSettings();
 
 	if (needFilesMove) {
+		HRESULT hr = S_OK;
+
 		const CStringW oldHistoryPath(oldpath + MPC_HISTORY_FILENAME);
 		const CStringW oldFavoritesPath(oldpath + MPC_FAVORITES_FILENAME);
 
@@ -280,42 +282,39 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 			EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
 		}
 
-		const CStringW newHistoryPath(newpath + MPC_HISTORY_FILENAME);
-		const CStringW newFavoritesPath(newpath + MPC_FAVORITES_FILENAME);
-
-		m_HistoryFile.SetFilename(newHistoryPath);
-		m_FavoritesFile.SetFilename(newFavoritesPath);
+		m_HistoryFile.SetFilename(newpath + MPC_HISTORY_FILENAME);
+		m_FavoritesFile.SetFilename(newpath + MPC_FAVORITES_FILENAME);
 
 		if (::PathFileExistsW(oldHistoryPath)) {
 			// moving history file
-			int ret = FileOperation(oldHistoryPath, newHistoryPath, FO_MOVE);
-			if (ret != 0) {
+			hr = FileOperation(oldHistoryPath, newpath, nullptr, FO_MOVE);
+			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 		if (::PathFileExistsW(oldFavoritesPath)) {
 			// moving favorites file
-			int ret = FileOperation(oldFavoritesPath, newFavoritesPath, FO_MOVE);
-			if (ret != 0) {
+			hr = FileOperation(oldFavoritesPath, newpath, nullptr, FO_MOVE);
+			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 
 		// moving shader files
-		CStringW oldFolderPath = oldpath + L"Shaders\\";
+		CStringW oldFolderPath = oldpath + L"Shaders";
 		if (::PathFileExistsW(oldFolderPath)) {
 			// use IFileOperation::MoveItem, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
-			if (ret != 0) {
+			hr = FileOperation(oldFolderPath, newpath, nullptr, FO_MOVE);
+			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 
-		oldFolderPath = oldpath + L"Shaders11\\";
+		oldFolderPath = oldpath + L"Shaders11";
 		if (::PathFileExistsW(oldFolderPath)) {
 			// use IFileOperation::MoveItem, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			int ret = FileOperation(oldFolderPath, newpath, FO_MOVE);
-			if (ret != 0) {
+			hr = FileOperation(oldFolderPath, newpath, nullptr, FO_MOVE);
+			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
@@ -994,34 +993,31 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 
 		// checking for the existence of the Shader and Shaders11 folders
-		CString shaderpath(appSavePath + L"Shaders");
-		CString shaderpath11(shaderpath + L"11");
-
-		BOOL bShaderDirExists = ::PathFileExistsW(shaderpath);
-		BOOL bShader11DirExists = ::PathFileExistsW(shaderpath11);
+		BOOL bShaderDirExists = ::PathFileExistsW(appSavePath + L"Shaders");
+		BOOL bShader11DirExists = ::PathFileExistsW(appSavePath + L"Shaders11");
 
 		// restore shaders if the shader folders is missing only, existing folders do not overwrite
 		if (!bShaderDirExists || !bShader11DirExists) {
-			CString shaderstorage;
-			SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, shaderstorage.GetBuffer(MAX_PATH));
-			shaderstorage.ReleaseBuffer();
-			shaderstorage.Append(L"\\MPC-BE\\");
+			CString appStorage;
+			SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, appStorage.GetBuffer(MAX_PATH));
+			appStorage.ReleaseBuffer();
+			appStorage.Append(L"\\MPC-BE\\");
 
 			if (!bShaderDirExists) {
-				int ret = FileOperation(shaderstorage + L"Shaders\\", shaderpath, FO_COPY);
-				if (ret == 0) {
+				hr = FileOperation(appStorage + L"Shaders", appSavePath, nullptr, FO_COPY);
+				if (SUCCEEDED(hr)) {
 					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder restored");
 				} else {
-					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder are not copied. Error: %x", ret);
+					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder are not copied. Error: %s", HR2Str(hr));
 				}
 			}
 
 			if (!bShader11DirExists) {
-				int ret = FileOperation(shaderstorage + L"Shaders11\\", shaderpath11, FO_COPY);
-				if (ret == 0) {
+				hr = FileOperation(appStorage + L"Shaders11", appSavePath, nullptr, FO_COPY);
+				if (SUCCEEDED(hr)) {
 					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder restored");
 				} else {
-					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder are not copied. Error: %x", ret);
+					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder are not copied. Error: %s", HR2Str(hr));
 				}
 			}
 		}

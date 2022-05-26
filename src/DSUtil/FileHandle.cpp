@@ -257,10 +257,7 @@ HRESULT FileOperationDelete(const CStringW& path)
 
 HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func)
 {
-	LPCWSTR pszNewName = nullptr;
-	if (!PathIsDirectoryW(source)) {
-		pszNewName = PathFindFileNameW(target);
-	}
+	LPCWSTR pszNewName = PathFindFileNameW(target);
 	const CStringW destinationFolder = GetFolderOnly(target);
 
 	return FileOperation(source, destinationFolder, pszNewName, func);

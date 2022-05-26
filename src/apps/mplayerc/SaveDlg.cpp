@@ -204,7 +204,7 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 
 		if (!pReader) {
-			FileOperation(m_in, m_out, FO_COPY);
+			hr = FileOperation(m_in, m_out, FO_COPY);
 			return E_ABORT;
 		}
 	}
