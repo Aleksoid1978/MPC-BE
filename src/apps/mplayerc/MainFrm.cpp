@@ -1567,15 +1567,15 @@ void CMainFrame::UpdateTitle()
 				if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 					if (m_SessionInfo.Title != bstr.m_str) {
 						m_SessionInfo.Title = bstr.m_str;
+
 						UpdateWindowTitle();
+						m_wndSeekBar.Invalidate();
+						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_SessionInfo.Title);
+
 						break;
 					}
 				}
 			}
-		}
-
-		if (m_wndInfoBar.IsWindowVisible()) {
-			OpenSetupInfoBar();
 		}
 	}
 }
