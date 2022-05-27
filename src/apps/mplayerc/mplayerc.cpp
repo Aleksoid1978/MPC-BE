@@ -271,7 +271,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 
 	if (needFilesMove) {
 		HRESULT hr = S_OK;
-		const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO;
 
 		const CStringW oldHistoryPath(oldpath + MPC_HISTORY_FILENAME);
 		const CStringW oldFavoritesPath(oldpath + MPC_FAVORITES_FILENAME);
@@ -288,14 +287,14 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 
 		if (::PathFileExistsW(oldHistoryPath)) {
 			// moving history file
-			hr = FileOperation(oldHistoryPath, newpath, nullptr, FO_MOVE, fileOpflags);
+			hr = FileOperation(oldHistoryPath, newpath, nullptr, FO_MOVE, FOF_NO_UI);
 			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving History file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 		if (::PathFileExistsW(oldFavoritesPath)) {
 			// moving favorites file
-			hr = FileOperation(oldFavoritesPath, newpath, nullptr, FO_MOVE, fileOpflags);
+			hr = FileOperation(oldFavoritesPath, newpath, nullptr, FO_MOVE, FOF_NO_UI);
 			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving Favorites file failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -305,7 +304,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 		CStringW oldFolderPath = oldpath + L"Shaders";
 		if (::PathFileExistsW(oldFolderPath)) {
 			// use IFileOperation::MoveItem, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			hr = FileOperation(oldFolderPath, newpath, nullptr, FO_MOVE, fileOpflags);
+			hr = FileOperation(oldFolderPath, newpath, nullptr, FO_MOVE, FOF_NO_UI);
 			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -314,7 +313,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 		oldFolderPath = oldpath + L"Shaders11";
 		if (::PathFileExistsW(oldFolderPath)) {
 			// use IFileOperation::MoveItem, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			hr = FileOperation(oldFolderPath, newpath, nullptr, FO_MOVE, fileOpflags);
+			hr = FileOperation(oldFolderPath, newpath, nullptr, FO_MOVE, FOF_NO_UI);
 			if (FAILED(hr)) {
 				MessageBoxW(nullptr, L"Moving shader 11 files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
@@ -1004,10 +1003,8 @@ BOOL CMPlayerCApp::InitInstance()
 			CString appStorage = CStringW(pathProgramData) + L"\\MPC-BE\\";
 			CoTaskMemFree(pathProgramData);
 
-			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO;
-
 			if (!bShaderDirExists) {
-				hr = FileOperation(appStorage + L"Shaders", appSavePath, nullptr, FO_COPY, fileOpflags);
+				hr = FileOperation(appStorage + L"Shaders", appSavePath, nullptr, FO_COPY, FOF_NO_UI);
 				if (SUCCEEDED(hr)) {
 					DLog(L"CMPlayerCApp::InitInstance(): default Shaders folder restored");
 				} else {
@@ -1016,7 +1013,7 @@ BOOL CMPlayerCApp::InitInstance()
 			}
 
 			if (!bShader11DirExists) {
-				hr = FileOperation(appStorage + L"Shaders11", appSavePath, nullptr, FO_COPY, fileOpflags);
+				hr = FileOperation(appStorage + L"Shaders11", appSavePath, nullptr, FO_COPY, FOF_NO_UI);
 				if (SUCCEEDED(hr)) {
 					DLog(L"CMPlayerCApp::InitInstance(): default Shaders11 folder restored");
 				} else {
