@@ -205,7 +205,8 @@ HRESULT CSaveDlg::InitFileCopy()
 
 		if (!pReader) {
 			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX;
-			EXECUTE_ASSERT(S_OK == FileOperation(m_in, m_out, FO_COPY, fileOpflags));
+			hr = FileOperation(m_in, m_out, FO_COPY, fileOpflags);
+			DLogIf(FAILED(hr), L"CSaveDlg : file copy was aborted with error %s", HR2Str(hr));
 
 			return E_ABORT;
 		}

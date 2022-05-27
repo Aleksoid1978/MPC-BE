@@ -251,6 +251,13 @@ HRESULT FileOperationDelete(const CStringW& path)
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->PerformOperations();
 	}
+	if (SUCCEEDED(hr)) {
+		BOOL opAborted = FALSE;
+		pFileOperation->GetAnyOperationsAborted(&opAborted);
+		if (opAborted) {
+			hr = E_ABORT;
+		}
+	}
 
 	return hr;
 }
@@ -293,6 +300,13 @@ HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const
 	}
 	if (SUCCEEDED(hr)) {
 		hr = pFileOperation->PerformOperations();
+	}
+	if (SUCCEEDED(hr)) {
+		BOOL opAborted = FALSE;
+		pFileOperation->GetAnyOperationsAborted(&opAborted);
+		if (opAborted) {
+			hr = E_ABORT;
+		}
 	}
 
 	return hr;
