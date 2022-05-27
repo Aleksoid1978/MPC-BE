@@ -255,15 +255,15 @@ HRESULT FileOperationDelete(const CStringW& path)
 	return hr;
 }
 
-HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func)
+HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func, const DWORD flags)
 {
 	LPCWSTR pszNewName = PathFindFileNameW(target);
 	const CStringW destinationFolder = GetFolderOnly(target);
 
-	return FileOperation(source, destinationFolder, pszNewName, func);
+	return FileOperation(source, destinationFolder, pszNewName, func, flags);
 }
 
-HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const UINT func)
+HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const UINT func, const DWORD flags)
 {
 	CComPtr<IFileOperation> pFileOperation;
 	CComPtr<IShellItem> psiItem;
@@ -281,7 +281,7 @@ HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const
 		hr = SHCreateItemFromParsingName(destFolder, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
 	}
 	if (SUCCEEDED(hr)) {
-		hr = pFileOperation->SetOperationFlags(FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO);
+		hr = pFileOperation->SetOperationFlags(flags);
 	}
 	if (SUCCEEDED(hr)) {
 		if (func == FO_MOVE) {

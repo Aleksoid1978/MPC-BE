@@ -52,9 +52,9 @@ HRESULT FileOperationDelete(const CStringW& path);
 
 // Copy or move file.
 // 'func' can be FO_MOVE or FO_COPY
-HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func);
+HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func, const DWORD flags);
 
 // Copy or move file or folder.
 // If 'newName' is nullptr then the original name does not change
 // func can be FO_MOVE or FO_COPY
-HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const UINT func);
+HRESULT FileOperation(LPCWSTR source, LPCWSTR destFolder, LPCWSTR newName, const UINT func, const DWORD flags);

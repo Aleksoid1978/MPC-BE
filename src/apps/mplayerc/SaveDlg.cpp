@@ -204,7 +204,9 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 
 		if (!pReader) {
-			hr = FileOperation(m_in, m_out, FO_COPY);
+			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX;
+			EXECUTE_ASSERT(S_OK == FileOperation(m_in, m_out, FO_COPY, fileOpflags));
+
 			return E_ABORT;
 		}
 	}
