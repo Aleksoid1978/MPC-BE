@@ -381,6 +381,7 @@ CStringW HR2Str(const HRESULT hr)
 		// some COM Error Codes (UI, Audio, DirectX, Codec) https://docs.microsoft.com/en-us/windows/win32/com/com-error-codes-10
 		UNPACK_VALUE(WINCODEC_ERR_UNSUPPORTEDPIXELFORMAT);
 		// some System Error Codes https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes
+		UNPACK_HR_WIN32(ERROR_FILE_NOT_FOUND)
 		UNPACK_HR_WIN32(ERROR_MOD_NOT_FOUND);
 		UNPACK_HR_WIN32(ERROR_INVALID_WINDOW_HANDLE);
 		UNPACK_HR_WIN32(ERROR_CLASS_ALREADY_EXISTS);

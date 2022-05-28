@@ -278,7 +278,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 		CString newpath;
 		AfxGetMyApp()->GetAppSavePath(newpath); // call it after saving the settings
 
-		if (newSetLocation == SETS_REGISTRY && !::PathFileExistsW(newpath)) {
+		if (newSetLocation != SETS_PROGRAMDIR && !::PathFileExistsW(newpath)) {
 			EXECUTE_ASSERT(::CreateDirectoryW(newpath, nullptr));
 		}
 
@@ -998,6 +998,10 @@ BOOL CMPlayerCApp::InitInstance()
 
 		// restore shaders if the shader folders is missing only, existing folders do not overwrite
 		if (!bShaderDirExists || !bShader11DirExists) {
+			if (!::PathFileExistsW(appSavePath)) {
+				EXECUTE_ASSERT(::CreateDirectoryW(appSavePath, nullptr));
+			}
+
 			PWSTR pathProgramData = nullptr;
 			SHGetKnownFolderPath(FOLDERID_ProgramData, 0, nullptr, &pathProgramData);
 			CString appStorage = CStringW(pathProgramData) + L"\\MPC-BE\\";
