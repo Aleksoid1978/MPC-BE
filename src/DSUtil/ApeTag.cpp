@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,33 +73,19 @@ void CAPETag::Clear()
 	m_TagSize = m_TagFields = 0;
 }
 
-bool CAPETag::ReadFooter(BYTE *buf, const size_t len, const bool bSkipHeader/* = false*/)
+bool CAPETag::ReadFooter(BYTE *buf, const size_t len)
 {
 	m_TagSize = m_TagFields = 0;
 
-	if (bSkipHeader) {
-		if (len < APE_TAG_FOOTER_BYTES - 8) {
-			return false;
-		}
-
-		if (memcmp(buf + 16, "\0\0\0\0\0\0\0\0", 8)) {
-			return false;
-		}
-
-	} else {
-		if (len < APE_TAG_FOOTER_BYTES) {
-			return false;
-		}
-
-		if (memcmp(buf, "APETAGEX", 8) || memcmp(buf + 24, "\0\0\0\0\0\0\0\0", 8)) {
-			return false;
-		}
+	if (len < APE_TAG_FOOTER_BYTES) {
+		return false;
 	}
 
-	auto start = buf;
-	if (!bSkipHeader) {
-		start += 8;
+	if (memcmp(buf, "APETAGEX", 8) || memcmp(buf + 24, "\0\0\0\0\0\0\0\0", 8)) {
+		return false;
 	}
+
+	auto start = buf + 8;
 
 	CGolombBuffer gb(start, APE_TAG_FOOTER_BYTES - 8);
 	const DWORD ver = gb.ReadDwordLE();
@@ -115,7 +101,7 @@ bool CAPETag::ReadFooter(BYTE *buf, const size_t len, const bool bSkipHeader/* =
 		return false;
 	}
 
-	if (!bSkipHeader && (flags & APE_TAG_FLAG_IS_HEADER)) {
+	if (flags & APE_TAG_FLAG_IS_HEADER) {
 		return false;
 	}
 
@@ -215,4 +201,38 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 		if (!Year.IsEmpty())    pPB->SetProperty(L"YEAR", Year);
 		if (!Album.IsEmpty())   pPB->SetProperty(L"ALBUM", Album);
 	}
+}
+
+bool CAPEChapters::ReadFooter(BYTE *buf, const size_t len)
+{
+	m_TagSize = m_TagFields = 0;
+
+	if (len < APE_TAG_FOOTER_BYTES - 8) {
+		return false;
+	}
+
+	if (memcmp(buf + 16, "\0\0\0\0\0\0\0\0", 8)) {
+		return false;
+	}
+
+	auto start = buf;
+
+	CGolombBuffer gb(start, APE_TAG_FOOTER_BYTES - 8);
+	const DWORD ver = gb.ReadDwordLE();
+	if (ver != APE_TAG_VERSION) {
+		return false;
+	}
+
+	const DWORD tag_size = gb.ReadDwordLE();
+	const DWORD fields   = gb.ReadDwordLE();
+	const DWORD flags    = gb.ReadDwordLE();
+
+	if (fields > 65536) {
+		return false;
+	}
+
+	m_TagSize   = tag_size;
+	m_TagFields = fields;
+
+	return true;
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -254,12 +254,12 @@ void CMPC8File::ReadChapter(const uint64_t size)
 	const auto buf_size = end - m_pFile->GetPos();
 	std::unique_ptr<BYTE[]> ptr(new(std::nothrow) BYTE[buf_size]);
 	if (ptr && m_pFile->ByteRead(ptr.get(), buf_size) == S_OK) {
-		CAPETag APETag;
-		if (APETag.ReadFooter(ptr.get(), footer_size, true) && APETag.GetTagSize()) {
-			const auto tag_size = APETag.GetTagSize();
-			if (tag_size == (buf_size - footer_size) && APETag.ReadTags(ptr.get() + footer_size, tag_size)) {
+		CAPEChapters APEChapters;
+		if (APEChapters.ReadFooter(ptr.get(), footer_size) && APEChapters.GetTagSize()) {
+			const auto tag_size = APEChapters.GetTagSize();
+			if (tag_size == (buf_size - footer_size) && APEChapters.ReadTags(ptr.get() + footer_size, tag_size)) {
 				CString track, title;
-				for (const auto& [type, key, value] : APETag.TagItems) {
+				for (const auto& [type, key, value] : APEChapters.TagItems) {
 					if (type == CAPETag::APE_TYPE_STRING) {
 						CString tagKey(key); tagKey.MakeLower();
 						if (tagKey == L"track") {
