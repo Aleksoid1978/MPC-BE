@@ -1560,8 +1560,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 						} else if (type == AP4_ATOM_TYPE_LPCM || type == AP4_ATOM_TYPE_IPCM) {
 							DWORD flags = ase->GetFormatSpecificFlags();
-							const bool BigEndian = (flags & 2) || ase->GetEndian() != ENDIAN_LITTLE;
-							if (BigEndian) {
+							const bool bBigEndian = (flags & 2) || (type == AP4_ATOM_TYPE_IPCM && ase->GetEndian() != ENDIAN_LITTLE);
+							if (bBigEndian) {
 								if (flags & 1) { // floating point
 									if      (bitspersample == 32) type = AP4_ATOM_TYPE_FL32;
 									else if (bitspersample == 64) type = AP4_ATOM_TYPE_FL64;
