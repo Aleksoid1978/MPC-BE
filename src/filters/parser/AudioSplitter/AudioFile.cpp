@@ -166,10 +166,10 @@ void CAudioFile::SetProperties(IBaseFilter* pBF)
 bool CAudioFile::ReadApeTag(size_t& size)
 {
 	size = 0;
+	const auto end_pos = m_endpos ? m_endpos : m_pFile->GetLength();
 
-	if (m_pFile->GetLength() > APE_TAG_FOOTER_BYTES) {
+	if (end_pos > APE_TAG_FOOTER_BYTES) {
 		BYTE buf[APE_TAG_FOOTER_BYTES] = {};
-		const auto end_pos = m_pFile->GetLength();
 		m_pFile->Seek(end_pos - APE_TAG_FOOTER_BYTES);
 		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
 			SAFE_DELETE(m_pAPETag);
