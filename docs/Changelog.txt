@@ -8,9 +8,11 @@ Improved support for embedded images.
 
 AudioSplitter
 Improved FLAC playback via HTTP.
+Fixed APE Tag reading in some situations.
 
 MP4Splitter
 Fixed playing files with tracks with negative delay.
+Improved work with PCM audio.
 
 MatroskaSplitter
 Fixed aspect ratio setting for VFW codecs.
@@ -30,7 +32,8 @@ Removed PS 2.x shader support for EVR-CP and SyncVR.
 
 Subtitles
 Added support for outputting subtitles in DirectX 11 mode. Used together with MPC Video Renderer 0.6.0.
-Slight optimization of subtitles output in DirectX 9 mode.
+Various subtitle output optimizations in DirectX 9 mode.
+Fixed positioning of subtitles in MicroDVD format.
 
 Youtube
 Added support for links "youtube.com/clip/", "youtube.com/c/.../live" and "youtube.com/channel/.../live".
@@ -42,6 +45,8 @@ Added the ability to set the color of the program window title on Windows 11.
 Fixed EVR-CP bug with "Failed to RegisterClass" error for the case when playback is forced to end after the first frame.
 Fixed remembering the starting window size for some situations.
 Moving a window outside the video area now also works for a maximized window.
+Deleting from history also removes entries from the list of recent files in the taskbar.
+Added the ability to open local files with a long path (more than 260 characters).
 Miscellaneous fixes.
 
 Updated Turkish translation (by cmhrky).
