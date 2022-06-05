@@ -1964,6 +1964,9 @@ redo:
 		for (int i = 0;; i++) {
 			auto config = avcodec_get_hw_config(m_pAVCodec, i);
 			if (!config) {
+				DLog(L"CMPCVideoDecFilter::InitDecoder : %s decoder initialization FAILED.", m_bUseD3D11cb ? L"D3D11-copyback" : L"NVDEC");
+				m_bUseD3D11cb = false;
+				m_bUseNVDEC = false;
 				break;
 			}
 			if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
