@@ -1309,6 +1309,19 @@ int CMPlayerCApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
+BOOL CMPlayerCApp::SaveAllModified()
+{
+	// CWinApp::SaveAllModified
+	// Called by the framework to save all documents
+	// when the application's main frame window is to be closed,
+	// or through a WM_QUERYENDSESSION message.
+	if (auto pMainFrame = AfxFindMainFrame()) {
+		pMainFrame->CloseMedia();
+	}
+
+	return TRUE;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMPlayerCApp message handlers
 // App command to run the dialog

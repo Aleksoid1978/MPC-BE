@@ -113,6 +113,7 @@ public:
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
+	virtual BOOL SaveAllModified() override;
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnAppAbout();
