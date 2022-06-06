@@ -1951,7 +1951,7 @@ redo:
 		}
 	}
 
-	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11)) {
+	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11 || m_bUseD3D11cb || m_bUseNVDEC)) {
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
 	} else {
 		m_pAVCodec = avcodec_find_decoder(m_CodecId);
@@ -1964,7 +1964,7 @@ redo:
 		for (int i = 0;; i++) {
 			auto config = avcodec_get_hw_config(m_pAVCodec, i);
 			if (!config) {
-				DLog(L"CMPCVideoDecFilter::InitDecoder : %s decoder initialization FAILED.", m_bUseD3D11cb ? L"D3D11-copyback" : L"NVDEC");
+				DLog(L"CMPCVideoDecFilter::InitDecoder() : %s decoder initialization FAILED.", m_bUseD3D11cb ? L"D3D11-copyback" : L"NVDEC");
 				m_bUseD3D11cb = false;
 				m_bUseNVDEC = false;
 				break;
@@ -2015,7 +2015,7 @@ redo:
 				CFile f;
 				CFileException fileException;
 				if (!f.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {
-					DLog(L"CMPCVideoDecFilter::ReadSource() : Can't open file '%s', error = %u", fn, fileException.m_cause);
+					DLog(L"CMPCVideoDecFilter::InitDecoder() : Can't open file '%s', error = %d", fn, fileException.m_cause);
 					return;
 				}
 
