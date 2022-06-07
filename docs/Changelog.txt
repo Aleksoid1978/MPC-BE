@@ -31,7 +31,7 @@ Fixed frame rotating for SyncVR.
 Removed PS 2.x shader support for EVR-CP and SyncVR.
 
 Subtitles
-Added support for outputting subtitles in DirectX 11 mode. Used together with MPC Video Renderer 0.6.0.
+Added support for outputting subtitles in DirectX 11 mode. Used together with MPC Video Renderer 0.6.0.1896 or later.
 Various subtitle output optimizations in DirectX 9 mode.
 Fixed positioning of subtitles in MicroDVD format.
 

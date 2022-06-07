@@ -69,9 +69,6 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 	CComPtr<ID3D11Buffer> m_pVertexBuffer;
 	CComPtr<ID3D11SamplerState> m_pSamplerPoint;
 	CComPtr<ID3D11SamplerState> m_pSamplerLinear;
-	CComPtr<ID3D11InputLayout>  m_pInputLayout;
-	CComPtr<ID3D11VertexShader> m_pVertexShader;
-	CComPtr<ID3D11PixelShader>  m_pPixelShader;
 
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
