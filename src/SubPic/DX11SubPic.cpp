@@ -463,7 +463,7 @@ void CDX11SubPicAllocator::CreateOtherStates()
 	SampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	EXECUTE_ASSERT(S_OK == m_pDevice->CreateSamplerState(&SampDesc, &m_pSamplerPoint));
 
-	SampDesc.Filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT; // linear interpolation for magnification
+	SampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT; // linear interpolation for minification and magnification
 	EXECUTE_ASSERT(S_OK == m_pDevice->CreateSamplerState(&SampDesc, &m_pSamplerLinear));
 }
 
