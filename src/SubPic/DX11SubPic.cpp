@@ -32,200 +32,6 @@ struct VERTEX {
 	DirectX::XMFLOAT2 TexCoord;
 };
 
-static const BYTE vertex_shader[] =
-{
-	 68,  88,  66,  67, 119,  76,
-	129,  53, 139, 143, 201, 108,
-	 78,  31,  90,  10,  57, 206,
-	  5,  93,   1,   0,   0,   0,
-	 24,   2,   0,   0,   5,   0,
-	  0,   0,  52,   0,   0,   0,
-	128,   0,   0,   0, 212,   0,
-	  0,   0,  44,   1,   0,   0,
-	156,   1,   0,   0,  82,  68,
-	 69,  70,  68,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	 28,   0,   0,   0,   0,   4,
-	254, 255,   0,   1,   0,   0,
-	 28,   0,   0,   0,  77, 105,
-	 99, 114, 111, 115, 111, 102,
-	116,  32,  40,  82,  41,  32,
-	 72,  76,  83,  76,  32,  83,
-	104,  97, 100, 101, 114,  32,
-	 67, 111, 109, 112, 105, 108,
-	101, 114,  32,  49,  48,  46,
-	 49,   0,  73,  83,  71,  78,
-	 76,   0,   0,   0,   2,   0,
-	  0,   0,   8,   0,   0,   0,
-	 56,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  3,   0,   0,   0,   0,   0,
-	  0,   0,  15,  15,   0,   0,
-	 65,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  3,   0,   0,   0,   1,   0,
-	  0,   0,   3,   3,   0,   0,
-	 80,  79,  83,  73,  84,  73,
-	 79,  78,   0,  84,  69,  88,
-	 67,  79,  79,  82,  68,   0,
-	171, 171,  79,  83,  71,  78,
-	 80,   0,   0,   0,   2,   0,
-	  0,   0,   8,   0,   0,   0,
-	 56,   0,   0,   0,   0,   0,
-	  0,   0,   1,   0,   0,   0,
-	  3,   0,   0,   0,   0,   0,
-	  0,   0,  15,   0,   0,   0,
-	 68,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  3,   0,   0,   0,   1,   0,
-	  0,   0,   3,  12,   0,   0,
-	 83,  86,  95,  80,  79,  83,
-	 73,  84,  73,  79,  78,   0,
-	 84,  69,  88,  67,  79,  79,
-	 82,  68,   0, 171, 171, 171,
-	 83,  72,  68,  82, 104,   0,
-	  0,   0,  64,   0,   1,   0,
-	 26,   0,   0,   0,  95,   0,
-	  0,   3, 242,  16,  16,   0,
-	  0,   0,   0,   0,  95,   0,
-	  0,   3,  50,  16,  16,   0,
-	  1,   0,   0,   0, 103,   0,
-	  0,   4, 242,  32,  16,   0,
-	  0,   0,   0,   0,   1,   0,
-	  0,   0, 101,   0,   0,   3,
-	 50,  32,  16,   0,   1,   0,
-	  0,   0,  54,   0,   0,   5,
-	242,  32,  16,   0,   0,   0,
-	  0,   0,  70,  30,  16,   0,
-	  0,   0,   0,   0,  54,   0,
-	  0,   5,  50,  32,  16,   0,
-	  1,   0,   0,   0,  70,  16,
-	 16,   0,   1,   0,   0,   0,
-	 62,   0,   0,   1,  83,  84,
-	 65,  84, 116,   0,   0,   0,
-	  3,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  4,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   1,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   2,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0
-};
-
-static const BYTE pixel_shader[] =
-{
-	 68,  88,  66,  67,  32,  70,
-	217,  59,  23, 217, 111,  68,
-	220, 166, 168, 235,  83,   9,
-	237, 244,   1,   0,   0,   0,
-	 64,   2,   0,   0,   5,   0,
-	  0,   0,  52,   0,   0,   0,
-	204,   0,   0,   0,  36,   1,
-	  0,   0,  88,   1,   0,   0,
-	196,   1,   0,   0,  82,  68,
-	 69,  70, 144,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   2,   0,   0,   0,
-	 28,   0,   0,   0,   0,   4,
-	255, 255,   0,   1,   0,   0,
-	101,   0,   0,   0,  92,   0,
-	  0,   0,   3,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   1,   0,
-	  0,   0,   1,   0,   0,   0,
-	 97,   0,   0,   0,   2,   0,
-	  0,   0,   5,   0,   0,   0,
-	  4,   0,   0,   0, 255, 255,
-	255, 255,   0,   0,   0,   0,
-	  1,   0,   0,   0,  13,   0,
-	  0,   0, 115,  97, 109, 112,
-	  0, 116, 101, 120,   0,  77,
-	105,  99, 114, 111, 115, 111,
-	102, 116,  32,  40,  82,  41,
-	 32,  72,  76,  83,  76,  32,
-	 83, 104,  97, 100, 101, 114,
-	 32,  67, 111, 109, 112, 105,
-	108, 101, 114,  32,  49,  48,
-	 46,  49,   0, 171, 171, 171,
-	 73,  83,  71,  78,  80,   0,
-	  0,   0,   2,   0,   0,   0,
-	  8,   0,   0,   0,  56,   0,
-	  0,   0,   0,   0,   0,   0,
-	  1,   0,   0,   0,   3,   0,
-	  0,   0,   0,   0,   0,   0,
-	 15,   0,   0,   0,  68,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   3,   0,
-	  0,   0,   1,   0,   0,   0,
-	  3,   3,   0,   0,  83,  86,
-	 95,  80,  79,  83,  73,  84,
-	 73,  79,  78,   0,  84,  69,
-	 88,  67,  79,  79,  82,  68,
-	  0, 171, 171, 171,  79,  83,
-	 71,  78,  44,   0,   0,   0,
-	  1,   0,   0,   0,   8,   0,
-	  0,   0,  32,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   3,   0,   0,   0,
-	  0,   0,   0,   0,  15,   0,
-	  0,   0,  83,  86,  95,  84,
-	 97, 114, 103, 101, 116,   0,
-	171, 171,  83,  72,  68,  82,
-	100,   0,   0,   0,  64,   0,
-	  0,   0,  25,   0,   0,   0,
-	 90,   0,   0,   3,   0,  96,
-	 16,   0,   0,   0,   0,   0,
-	 88,  24,   0,   4,   0, 112,
-	 16,   0,   0,   0,   0,   0,
-	 85,  85,   0,   0,  98,  16,
-	  0,   3,  50,  16,  16,   0,
-	  1,   0,   0,   0, 101,   0,
-	  0,   3, 242,  32,  16,   0,
-	  0,   0,   0,   0,  69,   0,
-	  0,   9, 242,  32,  16,   0,
-	  0,   0,   0,   0,  70,  16,
-	 16,   0,   1,   0,   0,   0,
-	 70, 126,  16,   0,   0,   0,
-	  0,   0,   0,  96,  16,   0,
-	  0,   0,   0,   0,  62,   0,
-	  0,   1,  83,  84,  65,  84,
-	116,   0,   0,   0,   2,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   2,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   1,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  1,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0,
-	  0,   0,   0,   0,   0,   0
-};
-
 #if _DEBUG & ENABLE_DUMP_SUBPIC
 static HRESULT SaveToBMP(BYTE* src, const UINT src_pitch, const UINT width, const UINT height, const UINT bitdepth, const wchar_t* filename)
 {
@@ -659,14 +465,6 @@ void CDX11SubPicAllocator::CreateOtherStates()
 
 	SampDesc.Filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT; // linear interpolation for magnification
 	EXECUTE_ASSERT(S_OK == m_pDevice->CreateSamplerState(&SampDesc, &m_pSamplerLinear));
-
-	D3D11_INPUT_ELEMENT_DESC Layout[] = {
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
-	EXECUTE_ASSERT(S_OK == m_pDevice->CreateInputLayout(Layout, std::size(Layout), vertex_shader, sizeof(vertex_shader), &m_pInputLayout));
-	EXECUTE_ASSERT(S_OK == m_pDevice->CreateVertexShader(vertex_shader, sizeof(vertex_shader), nullptr, &m_pVertexShader));
-	EXECUTE_ASSERT(S_OK == m_pDevice->CreatePixelShader(pixel_shader, sizeof(pixel_shader), nullptr, &m_pPixelShader));
 }
 
 void CDX11SubPicAllocator::ReleaseAllStates()
@@ -675,9 +473,6 @@ void CDX11SubPicAllocator::ReleaseAllStates()
 	m_pVertexBuffer.Release();
 	m_pSamplerPoint.Release();
 	m_pSamplerLinear.Release();
-	m_pInputLayout.Release();
-	m_pVertexShader.Release();
-	m_pPixelShader.Release();
 }
 
 HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyRect, const CRect& srcRect, const CRect& dstRect)
@@ -766,13 +561,9 @@ HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyR
 	UINT Offset = 0;
 	pDeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer.p, &Stride, &Offset);
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	pDeviceContext->IASetInputLayout(m_pInputLayout);
-
-	pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);
 
 	pDeviceContext->PSSetSamplers(0, 1, &(stretching ? m_pSamplerLinear.p : m_pSamplerPoint.p));
 	pDeviceContext->PSSetShaderResources(0, 1, &m_pOutputShaderResource.p);
-	pDeviceContext->PSSetShader(m_pPixelShader, nullptr, 0);
 
 	pDeviceContext->OMSetBlendState(m_pAlphaBlendState, nullptr, D3D11_DEFAULT_SAMPLE_MASK);
 
