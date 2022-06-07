@@ -28,11 +28,9 @@
 
 #include "libavutil/buffer.h"
 #include "libavutil/channel_layout.h"
-#include "libavutil/fifo.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/pixfmt.h"
 #include "avcodec.h"
-#include "bsf.h"
 #include "config.h"
 
 #define FF_SANE_NB_CHANNELS 512U
@@ -46,10 +44,6 @@
 #else
 #   define STRIDE_ALIGN 8
 #endif
-
-typedef struct EncodeSimpleContext {
-    AVFrame *in_frame;
-} EncodeSimpleContext;
 
 typedef struct AVCodecInternal {
     /**
@@ -77,14 +71,14 @@ typedef struct AVCodecInternal {
      * avcodec_flush_buffers().
      */
     AVPacket *in_pkt;
-    AVBSFContext *bsf;
+    struct AVBSFContext *bsf;
 
     /**
      * Properties (timestamps+side data) extracted from the last packet passed
      * for decoding.
      */
     AVPacket *last_pkt_props;
-    AVFifo *pkt_props;
+    struct AVFifo *pkt_props;
 
     /**
      * temporary buffer used for encoders to store their bitstream
@@ -101,7 +95,13 @@ typedef struct AVCodecInternal {
 
     void *frame_thread_encoder;
 
-    EncodeSimpleContext es;
+    /**
+     * The input frame is stored here for encoders implementing the simple
+     * encode API.
+     *
+     * Not allocated in other cases.
+     */
+    AVFrame *in_frame;
 
     /**
      * If this is set, then FFCodec->close (if existing) needs to be called

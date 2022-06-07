@@ -96,8 +96,8 @@ static const struct {
     DXGI_FORMAT d3d_format;
     enum AVPixelFormat pix_fmt;
 } supported_formats[] = {
-    { DXGI_FORMAT_NV12,         AV_PIX_FMT_NV12      },
-    { DXGI_FORMAT_P010,         AV_PIX_FMT_P010      },
+    { DXGI_FORMAT_NV12,         AV_PIX_FMT_NV12 },
+    { DXGI_FORMAT_P010,         AV_PIX_FMT_P010 },
 // ==> Start patch MPC
     // 420 12bit
     { DXGI_FORMAT_P016,         AV_PIX_FMT_YUV420P12 },
@@ -112,7 +112,7 @@ static const struct {
 // ==> End patch MPC
     // Special opaque formats. The pix_fmt is merely a place holder, as the
     // opaque format cannot be accessed directly.
-    { DXGI_FORMAT_420_OPAQUE,   AV_PIX_FMT_YUV420P   },
+    { DXGI_FORMAT_420_OPAQUE,   AV_PIX_FMT_YUV420P },
 };
 
 static void d3d11va_default_lock(void *ctx)
@@ -363,7 +363,7 @@ static int d3d11va_transfer_get_formats(AVHWFramesContext *ctx,
     return 0;
 }
 
-static int d3d11va_create_staging_texture(AVHWFramesContext *ctx)
+static int d3d11va_create_staging_texture(AVHWFramesContext *ctx, DXGI_FORMAT format)
 {
     AVD3D11VADeviceContext *device_hwctx = ctx->device_ctx->hwctx;
     D3D11VAFramesContext              *s = ctx->internal->priv;
@@ -372,7 +372,7 @@ static int d3d11va_create_staging_texture(AVHWFramesContext *ctx)
         .Width          = ctx->width,
         .Height         = ctx->height,
         .MipLevels      = 1,
-        .Format         = s->format,
+        .Format         = format,
         .SampleDesc     = { .Count = 1 },
         .ArraySize      = 1,
         .Usage          = D3D11_USAGE_STAGING,
@@ -428,7 +428,8 @@ static int d3d11va_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
     device_hwctx->lock(device_hwctx->lock_ctx);
 
     if (!s->staging_texture) {
-        int res = d3d11va_create_staging_texture(ctx);
+        ID3D11Texture2D_GetDesc((ID3D11Texture2D *)texture, &desc);
+        int res = d3d11va_create_staging_texture(ctx, desc.Format);
         if (res < 0)
             return res;
     }

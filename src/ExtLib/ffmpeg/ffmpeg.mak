@@ -242,6 +242,7 @@ SRCS_LC = \
 	libavcodec/frame_thread_encoder.c \
 	libavcodec/fraps.c \
 	libavcodec/g2meet.c \
+	libavcodec/get_buffer.c \
 	libavcodec/golomb.c \
 	libavcodec/h263.c \
 	libavcodec/h263_parser.c \
@@ -504,6 +505,7 @@ SRCS_LC_B = \
 	libavcodec/vc1data.c \
 	libavcodec/vc1dec.c \
 	libavcodec/vc1dsp.c \
+	libavcodec/version.c \
 	libavcodec/videodsp.c \
 	libavcodec/vlc.c \
 	libavcodec/vmnc.c \
@@ -639,6 +641,7 @@ SRCS_LF = \
 	libavfilter/framequeue.c \
 	libavfilter/graphparser.c \
 	libavfilter/pthread.c \
+	libavfilter/version.c \
 	libavfilter/video.c
 
 SRCS_LU = \
@@ -698,6 +701,7 @@ SRCS_LU = \
 	libavutil/tx_float.c \
 	libavutil/tx_int32.c \
 	libavutil/utils.c \
+	libavutil/version.c \
 	libavutil/video_enc_params.c \
 	\
 	libavutil/x86/cpu.c \
@@ -717,6 +721,7 @@ SRCS_LR = \
 	libswresample/soxr_resample.c \
 	libswresample/swresample.c \
 	libswresample/swresample_frame.c \
+	libswresample/version.c \
 	\
 	libswresample/x86/audio_convert_init.c \
 	libswresample/x86/rematrix_init.c \
@@ -735,6 +740,7 @@ SRCS_LS = \
 	libswscale/swscale.c \
 	libswscale/swscale_unscaled.c \
 	libswscale/utils.c \
+	libswscale/version.c \
 	libswscale/vscale.c \
 	libswscale/yuv2rgb.c \
 	\

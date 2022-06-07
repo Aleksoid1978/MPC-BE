@@ -28,8 +28,6 @@
 #ifndef AVCODEC_MPEGVIDEO_H
 #define AVCODEC_MPEGVIDEO_H
 
-#include <float.h>
-
 #include "avcodec.h"
 #include "blockdsp.h"
 #include "error_resilience.h"
@@ -538,10 +536,6 @@ typedef struct MpegEncContext {
     int noise_reduction;
 
     int intra_penalty;
-
-#if FF_API_MPEGVIDEO_OPTS || FF_API_MJPEG_PRED
-    int dummy;               ///< used as target for deprecated options
-#endif
 } MpegEncContext;
 
 

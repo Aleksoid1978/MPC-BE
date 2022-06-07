@@ -23,6 +23,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
+#include "encode.h"
 #include "me_cmp.h"
 #include "snow_dwt.h"
 #include "internal.h"
@@ -76,8 +77,11 @@ int ff_snow_get_buffer(SnowContext *s, AVFrame *frame)
     if (edges_needed) {
         frame->width  += 2 * EDGE_WIDTH;
         frame->height += 2 * EDGE_WIDTH;
-    }
-    if ((ret = ff_get_buffer(s->avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
+
+        ret = ff_encode_alloc_frame(s->avctx, frame);
+    } else
+        ret = ff_get_buffer(s->avctx, frame, AV_GET_BUFFER_FLAG_REF);
+    if (ret < 0)
         return ret;
     if (edges_needed) {
         for (i = 0; frame->data[i]; i++) {
@@ -513,16 +517,20 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
     int ret, emu_buf_size;
 
     if(!s->scratchbuf) {
-        if ((ret = ff_get_buffer(s->avctx, s->mconly_picture,
-                                 AV_GET_BUFFER_FLAG_REF)) < 0)
-            return ret;
+        if (av_codec_is_decoder(avctx->codec)) {
+            if ((ret = ff_get_buffer(s->avctx, s->mconly_picture,
+                                     AV_GET_BUFFER_FLAG_REF)) < 0)
+                return ret;
+        }
+
         emu_buf_size = FFMAX(s->mconly_picture->linesize[0], 2*avctx->width+256) * (2 * MB_SIZE + HTAPS_MAX - 1);
         if (!FF_ALLOCZ_TYPED_ARRAY(s->scratchbuf,      FFMAX(s->mconly_picture->linesize[0], 2*avctx->width+256) * 7 * MB_SIZE) ||
             !FF_ALLOCZ_TYPED_ARRAY(s->emu_edge_buffer, emu_buf_size))
             return AVERROR(ENOMEM);
     }
 
-    if(s->mconly_picture->format != avctx->pix_fmt) {
+    if (av_codec_is_decoder(avctx->codec) &&
+        s->mconly_picture->format != avctx->pix_fmt) {
         av_log(avctx, AV_LOG_ERROR, "pixel format changed\n");
         return AVERROR_INVALIDDATA;
     }
