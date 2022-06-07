@@ -3175,7 +3175,7 @@ void File_Mpeg4::IsParsing_mdat_Set()
                                              (TimeCode_String[ 3]-'0') * 10 + (TimeCode_String[ 4]-'0'),
                                              (TimeCode_String[ 6]-'0') * 10 + (TimeCode_String[ 7]-'0'),
                                              (TimeCode_String[ 9]-'0') * 10 + (TimeCode_String[10]-'0'),
-                                             tc->NumberOfFrames,
+                                             tc->NumberOfFrames-1,
                                               TimeCode_String[ 8]==';').ToFrames();
 
             

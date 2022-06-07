@@ -36,6 +36,7 @@
 #endif
 #include "MediaInfo/File_Unknown.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include "MediaInfo/TimeCode.h"
 #include <algorithm>
 #include <limits>
 using namespace std;
@@ -382,9 +383,6 @@ void File_Nsv::FileHeader_Parse()
     if (Element_Offset<header_size)
         Skip_XX(header_size-Element_Offset,                     "header_padding");
     Element_End0();
-
-    //Synched is OK
-    Synched=true;
 }
 
 //***************************************************************************
@@ -395,44 +393,66 @@ void File_Nsv::FileHeader_Parse()
 bool File_Nsv::Synchronize()
 {
     //Synchronizing
-    while (Buffer_Size-Buffer_Offset>=4)
-    {
-        if (BigEndian2int32u(Buffer+Buffer_Offset)==Elements::NSVs)
-        {
-            if (Buffer_Size-Buffer_Offset<24)
-                return false;
-            auto aux_plus_video_len=LittleEndian2int24u(Buffer+Buffer_Offset+19);
-            auto video_len=aux_plus_video_len>>4;
-            auto audio_len=LittleEndian2int16u(Buffer+Buffer_Offset+22);
-            auto Size=24+video_len+audio_len;
-            if (File_Size-(File_Offset+Buffer_Offset)==Size)
-                break;
-            if (Buffer_Size-Buffer_Offset<Size+4)
-                return false;
-            auto sync_hdr=BigEndian2int32u(Buffer+Buffer_Offset+Size);
-            if (!(sync_hdr!=Elements::NSVs && (sync_hdr>>16)!=0xEFBE))
-                break;
-        }
-        Buffer_Offset++;
-    }
-
-    //Parsing last bytes if needed
-    if (Buffer_Offset+3==Buffer_Size && BigEndian2int24u(Buffer+Buffer_Offset)!=(Elements::NSVs>>8))
-    {
-        Buffer_Offset++;
-        if (BigEndian2int16u(Buffer+Buffer_Offset)!=(Elements::NSVs>>16))
-        {
-            Buffer_Offset++;
-            if (BigEndian2int8u(Buffer+Buffer_Offset)!=(Elements::NSVs>>24))
-                Buffer_Offset++;
-        }
-    }
-
     if (Buffer_Size-Buffer_Offset<4)
         return false;
+    auto sync_hdr0=BigEndian2int32u(Buffer+Buffer_Offset);
+    bool Accepted=Status[IsAccepted];
+    auto Buffer_Size_m4=Buffer_Size-4;
+    for (;;)
+    {
+        // Check sync
+        auto IsMainSync=sync_hdr0==Elements::NSVs;
+        if (IsMainSync || (Accepted && (sync_hdr0>>16)==0xEFBE))
+        {
+            size_t HeaderBeginSize=IsMainSync?19:2;
+            size_t HeaderSize=HeaderBeginSize+5;
+            if (Buffer_Size-Buffer_Offset<HeaderSize)
+                return false;
+            auto Buffer_Temp=Buffer+Buffer_Offset+HeaderBeginSize;
+            auto aux_plus_video_len=LittleEndian2int24u(Buffer_Temp);
+            Buffer_Temp+=3;
+            auto video_len=aux_plus_video_len>>4;
+            auto audio_len=LittleEndian2int16u(Buffer_Temp);
+            Buffer_Temp+=2;
+            auto Size=HeaderSize+video_len+audio_len;
+            if (File_Size-(File_Offset+Buffer_Offset)==Size)
+                break;
+            if (Buffer_Size_m4-Buffer_Offset<Size)
+                return false;
+            auto sync_hdr1=BigEndian2int32u(Buffer+Buffer_Offset+Size);
+            if (sync_hdr1==Elements::NSVs || (sync_hdr1>>16)==0xEFBE)
+                break;
+        }
+
+        // Next byte
+        if (Buffer_Offset<Buffer_Size_m4)
+        {
+            sync_hdr0=(sync_hdr0<<8)|Buffer[Buffer_Offset+4];
+            Buffer_Offset++;
+            continue;
+        }
+
+        //Parsing last bytes if needed
+        Buffer_Offset++;
+        auto sync_hdr0_3=sync_hdr0&0xFFFFFF;
+        if (sync_hdr0_3!=(Elements::NSVs>>8) && (sync_hdr0_3>>8)!=0xEFBE)
+        {
+            Buffer_Offset++;
+            auto sync_hdr0_2=sync_hdr0&0xFFFF;
+            if (sync_hdr0_2!=(Elements::NSVs>>16) && sync_hdr0_2!=0xEFBE)
+            {
+                Buffer_Offset++;
+                auto sync_hdr0_1=sync_hdr0&0xFF;
+                if (sync_hdr0_1!=(Elements::NSVs>>24) && sync_hdr0_1!=0xEF)
+                    Buffer_Offset++;
+            }
+        }
+
+        return false;
+    }
 
     //Synched is OK
-    Synched=true;
+    Buffer_TotalBytes_LastSynched=Buffer_Offset;
     return true;
 }
 
@@ -466,6 +486,9 @@ void File_Nsv::Header_Parse()
     Peek_B4(sync_hdr);
     if (sync_hdr==Elements::NSVs)
     {
+        Element_Level--;
+        Element_Info1("Sync");
+        Element_Level++;
         int32u vidfmt, audfmt;
         int16u width, height, syncoffs;
         int8u framerate_idx;
@@ -490,8 +513,9 @@ void File_Nsv::Header_Parse()
             P->Streams[1].codecid=audfmt==Elements::NONE?0:audfmt;
             if (framerate_idx)
             {
+                float64 FrameRate;
                 if (!(framerate_idx>>7))
-                    FrameInfo.DUR=1000000000/framerate_idx;
+                    FrameRate=framerate_idx;
                 else
                 {
                     int8u T=(framerate_idx&0x7F)>>2;
@@ -502,8 +526,10 @@ void File_Nsv::Header_Parse()
                         S=T-1;
                     if (framerate_idx&1)
                         S=S/1.001;
-                    FrameInfo.DUR=float64_int64s(1000000000/(S*Nsv_FrameRate_Multiplier[framerate_idx&3]));
+                    FrameRate=S*Nsv_FrameRate_Multiplier[framerate_idx&3];
                 }
+                if (FrameRate)
+                    FrameInfo.DUR=float64_int64s(1000000000/FrameRate);
                 FrameInfo.PTS=0;
             }
             if (width)
@@ -541,8 +567,20 @@ void File_Nsv::Header_Parse()
             return;
         }
         video_len-=AuxTotalLen;
-        P->Streams[0].len=video_len;
-        P->Streams[1].len=audio_len;
+        if (video_len<=0x80000)
+            P->Streams[0].len=video_len;
+        else
+        {
+            P->Streams[0].len=(int32u)-1;
+            video_len=0;
+        }
+        if (audio_len<=0x8000)
+            P->Streams[1].len=audio_len;
+        else
+        {
+            P->Streams[1].len=(int32u)-1;
+            audio_len=0; // Found in some files, content is missing
+        }
         P->AuxTotalLen=AuxTotalLen;
         Header_Fill_Code(0, "Frame");
         Header_Fill_Size(Element_Offset+video_len+audio_len);
@@ -562,15 +600,20 @@ void File_Nsv::Data_Parse()
         auto& Stream=P->Streams[i];
         if (Stream.len)
         {
+            int32u len=Stream.len!=(int32u)-1?Stream.len:0;
+
             // Init
             if (!Stream.Parser)
             {
                 if (!P->IsMajorSynched)
                 {
-                    auto NewBuffer=new int8u[Stream.len];
-                    memcpy(NewBuffer, Buffer+Buffer_Offset+(size_t)Element_Offset, Stream.len);
-                    Stream.Buffers.emplace_back(NewBuffer, Stream.len);
-                    Skip_XX(Stream.len,                         "stream"); Param_Info1(i);
+                    if (len)
+                    {
+                        auto NewBuffer=new int8u[Stream.len];
+                        memcpy(NewBuffer, Buffer+Buffer_Offset+(size_t)Element_Offset, len);
+                        Stream.Buffers.emplace_back(NewBuffer, Stream.len);
+                        Skip_XX(Stream.len,                     "stream"); Param_Info1(i);
+                    }
                     continue;
                 }
 
@@ -673,7 +716,7 @@ void File_Nsv::Data_Parse()
                                                                     Open_Buffer_Init(Parser);
                                                                     Parser->Stream_Prepare(Stream_Audio);
                                                                     Parser->Fill(Stream_Audio, 0, Audio_Format, "PCM");
-                                                                    if (Stream.len>=4)
+                                                                    if (len>=4)
                                                                     {
                                                                         auto AudioBuffer=Buffer+Buffer_Offset+(size_t)Element_Offset;
                                                                         Parser->Fill(Stream_Audio, 0, Audio_BitDepth, LittleEndian2int8u(AudioBuffer++));
@@ -690,8 +733,10 @@ void File_Nsv::Data_Parse()
                                             default            :    Parser=new File_Unknown();
                                         }
                                         break;
+                    default          :  Parser=new File_Unknown();
                 }
                 Open_Buffer_Init(Parser);
+                Parser->FrameInfo.PTS=i?P->AudioDelay:0;
                 Stream.Parser=Parser;
             }
 
@@ -725,10 +770,10 @@ void File_Nsv::Data_Parse()
                 }
                 Stream.Buffers.clear();
             }
-            Open_Buffer_Continue(Stream.Parser, Stream.len);
+            Open_Buffer_Continue(Stream.Parser, len);
             if (Stream.Parser->Status[IsAccepted])
             {
-                Demux(Buffer+Buffer_Offset+(size_t)Element_Offset-Stream.len, Stream.len, ContentType_MainStream);
+                Demux(Buffer+Buffer_Offset+(size_t)Element_Offset-len, len, ContentType_MainStream);
                 if (FrameInfo.DUR!=-1)
                 {
                     switch(Stream_Type[i])
@@ -750,8 +795,8 @@ void File_Nsv::Data_Parse()
             else
             {
                 Element_Show();
-                Element_Offset-=Stream.len;
-                Skip_XX(Stream.len,                             "Can not be decoded");
+                Element_Offset-=len;
+                Skip_XX(len,                                    "Can not be decoded");
             }
             #endif //MEDIAINFO_TRACE
             Element_End0();
@@ -1001,16 +1046,22 @@ void File_StarDiva::Read_Buffer_Continue()
             Element_Begin1("Offsets");
                 for (size_t i=0; i<Times.size(); i++)
                 {
-                    int32u Offset;
+                    int32s Offset;
                     if (OffsetValueSize==4)
                     {
-                        Get_L4(Offset,                          "Offset");
+                        int32u Offset32;
+                        Get_L4(Offset32,                        "Offset");
+                        Offset=(int32s)Offset32;
                     }
                     else
                     {
                         int16u Offset16;
                         Get_L2(Offset16,                        "Offset");
-                        Offset=Offset16;
+                        Offset=(int16s)Offset16;
+                    }
+                    if (Offset<0)
+                    {
+                        Offset+=48*3600*1000; // Hack: add 24 hours in order to keep the description
                     }
                     Offsets.push_back(Offset);
                 }
@@ -1314,28 +1365,12 @@ void File_StarDiva::Read_Buffer_Continue()
 
             if (!SeqAgendas[i].empty())
             {
-                int32u Offset=Offsets[i];
-                int8u HH=(int8u)(Offset/(60*60*1000));
-                Offset%=60*60*1000;
-                int8u MM=(int8u)(Offset/(   60*1000));
-                Offset%=60*1000;
-                int8u SS=(int8u)(Offset/(      1000));
-                Offset%=1000;
-                string Time;
-                Time+='0'+(HH/10);
-                Time+='0'+(HH%10);
-                Time+=':';
-                Time+='0'+(MM/10);
-                Time+='0'+(MM%10);
-                Time+=':';
-                Time+='0'+(SS/10);
-                Time+='0'+(SS%10);
-                Time+='.';
-                Time+='0'+(Offset/100);
-                Offset%=100;
-                Time+='0'+(Offset/10);
-                Offset%=10;
-                Time+='0'+(Offset);
+                int32s Offset=Offsets[i];
+                TimeCode TC;
+                TC.SetFramesMax(999);
+                TC.SetIsTime(true);
+                TC.FromFrames(Offset);
+                string Time=TC.ToString();
                 string Content;
                 Content+=Times[i];
                 Content+=" - ";
@@ -1364,28 +1399,12 @@ void File_StarDiva::Read_Buffer_Continue()
 
             if (!Speakers[i].empty())
             {
-                int32u Offset = Offsets[i];
-                int8u HH = (int8u)(Offset / (60 * 60 * 1000));
-                Offset %= 60 * 60 * 1000;
-                int8u MM = (int8u)(Offset / (60 * 1000));
-                Offset %= 60 * 1000;
-                int8u SS = (int8u)(Offset / (1000));
-                Offset %= 1000;
-                string Time;
-                Time += '0' + (HH / 10);
-                Time += '0' + (HH % 10);
-                Time += ':';
-                Time += '0' + (MM / 10);
-                Time += '0' + (MM % 10);
-                Time += ':';
-                Time += '0' + (SS / 10);
-                Time += '0' + (SS % 10);
-                Time += '.';
-                Time += '0' + (Offset / 100);
-                Offset %= 100;
-                Time += '0' + (Offset / 10);
-                Offset %= 10;
-                Time += '0' + (Offset);
+                int32s Offset=Offsets[i];
+                TimeCode TC;
+                TC.SetFramesMax(999);
+                TC.SetIsTime(true);
+                TC.FromFrames(Offset);
+                string Time=TC.ToString();
                 string Content;
                 Content += Times[i];
                 Content += " - ";

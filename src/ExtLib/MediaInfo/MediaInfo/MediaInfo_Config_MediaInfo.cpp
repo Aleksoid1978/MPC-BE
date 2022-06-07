@@ -233,7 +233,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
         File_DvDif_Analysis=false;
     #endif //defined(MEDIAINFO_DVDIF_ANALYZE_YES)
     #if MEDIAINFO_MACROBLOCKS
-        File_Macroblocks_Parse=false;
+        File_Macroblocks_Parse=0;
     #endif //MEDIAINFO_MACROBLOCKS
     File_GrowingFile_Delay=10;
     File_GrowingFile_Force=false;
@@ -1141,7 +1141,7 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     else if (Option_Lower==__T("file_macroblocks_parse"))
     {
         #if MEDIAINFO_MACROBLOCKS
-            File_Macroblocks_Parse_Set(!(Value==__T("0") || Value.empty()));
+            File_Macroblocks_Parse_Set(Ztring(Value).To_int32s());
             return __T("");
         #else //MEDIAINFO_MACROBLOCKS
             return __T("Macroblock parsing is disabled due to compilation options");
@@ -1150,7 +1150,7 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     else if (Option_Lower==__T("file_macroblocks_parse_get"))
     {
         #if MEDIAINFO_MACROBLOCKS
-            return File_Macroblocks_Parse_Get()?"1":"0";
+            return Ztring::ToZtring(File_Macroblocks_Parse_Get());
         #else //MEDIAINFO_MACROBLOCKS
             return __T("Macroblock parsing is disabled due to compilation options");
         #endif //MEDIAINFO_MACROBLOCKS
@@ -3441,13 +3441,13 @@ bool MediaInfo_Config_MediaInfo::File_DvDif_Analysis_Get ()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_MACROBLOCKS
-void MediaInfo_Config_MediaInfo::File_Macroblocks_Parse_Set (bool NewValue)
+void MediaInfo_Config_MediaInfo::File_Macroblocks_Parse_Set (int NewValue)
 {
     CriticalSectionLocker CSL(CS);
     File_Macroblocks_Parse=NewValue;
 }
 
-bool MediaInfo_Config_MediaInfo::File_Macroblocks_Parse_Get ()
+int MediaInfo_Config_MediaInfo::File_Macroblocks_Parse_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return File_Macroblocks_Parse;

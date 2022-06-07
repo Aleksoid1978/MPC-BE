@@ -1261,13 +1261,7 @@ void File_Gxf::map()
                     TimeCodes[TrackID].Milliseconds=Hours  *60*60*1000
                                                    +Minutes   *60*1000
                                                    +Seconds      *1000;
-                    MediaInfoLib::TimeCode TC;
-                    TC.Hours=Hours;
-                    TC.Minutes=Minutes;
-                    TC.Seconds=Seconds;
-                    TC.Frames=Fields/2;
-                    TC.DropFrame=DropFrame;
-                    TimeCodes[TrackID].String=TC.ToString();
+                    TimeCodes[TrackID].String= MediaInfoLib::TimeCode(Hours, Minutes, Seconds, Fields/2, 0, DropFrame, false, Fields%2).ToString();
 
                     if (!FrameRate)
                     {

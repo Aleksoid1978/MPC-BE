@@ -1627,37 +1627,7 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
     else if (List_Measure_Value==__T("Yes"))
         YesNo_YesNo(StreamKind, StreamPos, Parameter);
     else
-    {
         Value_Value123(StreamKind, StreamPos, Parameter);
-
-        //Special cases - 120 fps 24/30 mode
-        if (StreamKind==Stream_Video
-         && List_Measure_Value==__T(" fps")
-         && Retrieve(StreamKind, StreamPos, Video_FrameRate).To_int32u()==120
-         && Retrieve(StreamKind, StreamPos, Video_FrameRate_Minimum).To_int32u()==24
-         && Retrieve(StreamKind, StreamPos, Video_FrameRate_Maximum).To_int32u()==30)
-            Fill(Stream_Video, StreamPos_Last, Video_FrameRate_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate)+__T(" (24/30)"), __T(" fps")), true);
-
-        //Special cases - Frame rate
-        if (StreamKind==Stream_Video
-         && Parameter==Video_FrameRate
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate).empty()
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Num).empty()
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Den).empty())
-            Fill(Stream_Video, StreamPos, Video_FrameRate_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Den)+__T(")"), __T(" fps")), true);
-        if (StreamKind==Stream_Video
-         && Parameter==Video_FrameRate_Original
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original).empty()
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num).empty()
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty())
-            Fill(Stream_Video, StreamPos, Video_FrameRate_Original_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den)+__T(")"), __T(" fps")), true);
-        if (StreamKind==Stream_Other
-         && Parameter==Other_FrameRate
-         && !Retrieve(StreamKind, StreamPos, Other_FrameRate).empty()
-         && !Retrieve(StreamKind, StreamPos, Other_FrameRate_Num).empty()
-         && !Retrieve(StreamKind, StreamPos, Other_FrameRate_Den).empty())
-            Fill(Stream_Other, StreamPos, Other_FrameRate_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Other_FrameRate)+__T(" (")+Retrieve(StreamKind, StreamPos, Other_FrameRate_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Other_FrameRate_Den)+__T(")"), __T(" fps")), true);
-    }
 
     //BitRate_Mode / OverallBitRate_Mode
     if (ParameterName==(StreamKind==Stream_General?__T("OverallBitRate_Mode"):__T("BitRate_Mode")) && MediaInfoLib::Config.ReadByHuman_Get())

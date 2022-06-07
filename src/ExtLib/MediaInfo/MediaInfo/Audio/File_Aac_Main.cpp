@@ -1404,7 +1404,10 @@ void File_Aac::adts_fixed_header()
             Infos["ChannelLayout"].From_UTF8(Aac_ChannelLayout_GetString(channelConfiguration));
             if (IsSub)
                 Infos["MuxingMode"].From_UTF8("ADTS");
+            ChannelCount_Temp=Aac_Channels_Get(channelConfiguration);
         }
+    FILLING_ELSE();
+        ChannelCount_Temp=0;
     FILLING_END();
 }
 

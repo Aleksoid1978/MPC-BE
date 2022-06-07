@@ -204,6 +204,7 @@ public :
         struct servicedescriptor
         {
             string language;
+            std::bitset<2> wide_aspect_ratio;
         };
         typedef std::map<int8u, servicedescriptor> servicedescriptors608;
         typedef std::map<int8u, servicedescriptor> servicedescriptors708;

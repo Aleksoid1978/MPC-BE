@@ -22,8 +22,8 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Text/File_Ttml.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
 #include "tinyxml2.h"
@@ -182,8 +182,6 @@ void File_Ttml::Streams_Accept()
     Stream_Prepare(Stream_Text);
     Fill(Stream_Text, 0, "Format", "TTML");
 
-    Time_Begin=TimeCode(0xFF, 0xFF, 0xFF, 0xFF, 0, false);
-    Time_End=TimeCode(0, 0, 0, 0, 0, false);
     FrameCount=0;
     LineCount=0;
     LineMaxCountPerEvent=0;
@@ -198,24 +196,13 @@ void File_Ttml::Streams_Accept()
 //---------------------------------------------------------------------------
 void File_Ttml::Streams_Finish()
 {
-    if (FrameRate)
-    {
-        Fill(Stream_General, 0, General_FrameRate, FrameRate);
-        Fill(Stream_Text, 0, Text_FrameRate, FrameRate);
-    }
-    if (FrameRateMultiplier_Den!=1)
-    {
-        Fill(Stream_Text, 0, Text_FrameRate_Num, FrameRate_Int*FrameRateMultiplier_Num);
-        Fill(Stream_Text, 0, Text_FrameRate_Den, FrameRateMultiplier_Den);
-    }
-
-    if (Time_Begin!=TimeCode(0xFF, 0xFF, 0xFF, 0xFF, 0, false))
+    if (Time_End.HasValue() && Time_Begin.HasValue())
     {
         Fill(Stream_General, 0, General_Duration, Time_End.ToMilliseconds()-Time_Begin.ToMilliseconds());
         Fill(Stream_Text, 0, Text_Duration, Time_End.ToMilliseconds()-Time_Begin.ToMilliseconds());
-        if (!Time_Begin.MoreSamples_Frequency)
+        if (!Time_Begin.GetIsTime())
             Fill(Stream_Text, 0, Text_TimeCode_FirstFrame, Time_Begin.ToString());
-        if (!Time_End.MoreSamples_Frequency && Time_End.FramesPerSecond)
+        if (!Time_End.GetIsTime() && Time_End>Time_Begin)
         {
             TimeCode LastFrame=Time_End;
             LastFrame--;
@@ -347,12 +334,41 @@ void File_Ttml::Read_Buffer_Continue()
             FrameRateMultiplier_Den=atoi(Tt_Attribute_Space+1);
         }
     }
+    Tt_Attribute=Root->Attribute("ttp:tickRate");
+    if (Tt_Attribute)
+        tickRate=atoi(Tt_Attribute);
     if (FrameRate_Int && FrameRateMultiplier_Num && FrameRateMultiplier_Den)
     {
         FrameRate=((float64)FrameRate_Int)*FrameRateMultiplier_Num/FrameRateMultiplier_Den;
         if ((FrameRateMultiplier_Num==1000 && FrameRateMultiplier_Den==1001)
          || (FrameRateMultiplier_Num==999 && FrameRateMultiplier_Den==1000)) // Seen in a 23.976 file, mistake?
             FrameRate_Is1001=true;
+    }
+    if (FrameRate)
+    {
+        Fill(Stream_General, 0, General_FrameRate, FrameRate);
+        Fill(Stream_Text, 0, Text_FrameRate, FrameRate);
+    }
+    if (FrameRate_Int && FrameRateMultiplier_Den!=1)
+    {
+        Fill(Stream_Text, 0, Text_FrameRate_Num, FrameRate_Int*FrameRateMultiplier_Num, 10, true);
+        Fill(Stream_Text, 0, Text_FrameRate_Den, FrameRateMultiplier_Den, 10, true);
+    }
+    if (!FrameRate_Int && !tickRate)
+    {
+        #if MEDIAINFO_ADVANCED
+            float64 FrameRate_F=Video_FrameRate_Rounded(Config->File_DefaultFrameRate_Get());
+            if (!FrameRate_F)
+                FrameRate_F=30/1.001;
+        #else //MEDIAINFO_ADVANCED
+            const float64 FrameRate_F=30/1.001;
+        #endif //MEDIAINFO_ADVANCED
+        FrameRate_Int=float64_int64s(FrameRate_F);
+        if (FrameRate_Int != FrameRate_F)
+        {
+            FrameRateMultiplier_Num=1000;
+            FrameRateMultiplier_Den=float64_int64s(FrameRate_Int/FrameRate_F*1000);
+        }
     }
     Tt_Attribute=Root->Attribute("xml:lang");
     if (!Tt_Attribute)
@@ -368,9 +384,6 @@ void File_Ttml::Read_Buffer_Continue()
     {
         Fill(Stream_Text, 0, "Duration_Base", Tt_Attribute);
     }
-    Tt_Attribute=Root->Attribute("ttp:tickRate");
-    if (Tt_Attribute)
-        tickRate=atoi(Tt_Attribute);
     for (const XMLAttribute* tt_attribute=Root->FirstAttribute(); tt_attribute; tt_attribute=tt_attribute->Next())
     {
         if (strstr(tt_attribute->Name(), "smpte"))
@@ -415,37 +428,48 @@ void File_Ttml::Read_Buffer_Continue()
         //body
         if (!strcmp(tt_element->Value(), "body"))
         {
+            TimeCode Time_Template;
+            Time_Template.SetFramesMax((int32u)(FrameRate_Int?(FrameRate_Int-1):(tickRate?(tickRate-1):0)));
+            Time_Template.Set1001(FrameRate_Is1001);
+
             for (XMLElement* body_element=tt_element->FirstChildElement(); body_element; body_element=body_element->NextSiblingElement())
             {
                 //div
                 if (!strcmp(body_element->Value(), "div"))
                 {
-                    TimeCode Time_Begin_New(0xFF, 0xFF, 0xFF, 0xFF, 0, false);
-                    TimeCode Time_End_New(0, 0, 0, 0, 0, false);
+                    TimeCode Time_Begin_New=Time_Template;
+                    TimeCode Time_End_New=Time_Template;
 
                     if (const char* Attribute=body_element->Attribute("begin"))
                     {
-                        Time_Begin_New.FramesPerSecond=(int8u)FrameRate_Int;
-                        Time_Begin_New.FramesPerSecond_Is1001=FrameRate_Is1001;
-                        Time_Begin_New.MoreSamples_Frequency=tickRate;
                         if (!Time_Begin_New.FromString(Attribute))
                         {
-                            if (Time_Begin.ToMilliseconds()>Time_Begin_New.ToMilliseconds())
+                            if (!Time_Begin.HasValue() || Time_Begin>Time_Begin_New)
                                 Time_Begin=Time_Begin_New;
-                            if (Time_End.ToMilliseconds()<Time_Begin_New.ToMilliseconds())
+                            if (!Time_End.HasValue() || Time_End<Time_Begin_New)
                                 Time_End=Time_Begin_New;
                         }
                     }
                     if (const char* Attribute=body_element->Attribute("end"))
                     {
-                        Time_End_New.FramesPerSecond=(int8u)FrameRate_Int;
-                        Time_End_New.FramesPerSecond_Is1001=FrameRate_Is1001;
-                        Time_End_New.MoreSamples_Frequency=tickRate;
                         if (!Time_End_New.FromString(Attribute))
                         {
-                            if (Time_Begin.ToMilliseconds()>Time_End_New.ToMilliseconds())
+                            if (!Time_Begin.HasValue() || Time_Begin>Time_End_New)
                                 Time_Begin=Time_End_New;
-                            if (Time_End.ToMilliseconds()<Time_End_New.ToMilliseconds())
+                            if (!Time_End.HasValue() || Time_End<Time_End_New)
+                                Time_End=Time_End_New;
+                        }
+                    }
+                    if (const char* Attribute=body_element->Attribute("dur"))
+                    {
+                        TimeCode Time_Dur_New=Time_Template;
+                        if (Time_Begin.HasValue() && !Time_Dur_New.FromString(Attribute))
+                        {
+                            Time_End_New=Time_Begin_New;
+                            Time_End_New+=Time_Dur_New;
+                            if (!Time_Begin.HasValue() || Time_Begin>Time_End_New)
+                                Time_Begin=Time_End_New;
+                            if (!Time_End.HasValue() || Time_End<Time_End_New)
                                 Time_End=Time_End_New;
                         }
                     }
@@ -457,27 +481,34 @@ void File_Ttml::Read_Buffer_Continue()
                         {
                             if (const char* Attribute=div_element->Attribute("begin"))
                             {
-                                Time_Begin_New.FramesPerSecond=(int8u)FrameRate_Int;
-                                Time_Begin_New.FramesPerSecond_Is1001=FrameRate_Is1001;
-                                Time_Begin_New.MoreSamples_Frequency=tickRate;
                                 if (!Time_Begin_New.FromString(Attribute))
                                 {
-                                    if (Time_Begin.ToMilliseconds()>Time_Begin_New.ToMilliseconds())
+                                    if (!Time_Begin.HasValue() || Time_Begin>Time_Begin_New)
                                         Time_Begin=Time_Begin_New;
-                                    if (Time_End.ToMilliseconds()<Time_Begin_New.ToMilliseconds())
+                                    if (!Time_End.HasValue() || Time_End<Time_Begin_New)
                                         Time_End=Time_Begin_New;
                                 }
                             }
                             if (const char* Attribute=div_element->Attribute("end"))
                             {
-                                Time_End_New.FramesPerSecond=(int8u)FrameRate_Int;
-                                Time_End_New.FramesPerSecond_Is1001=FrameRate_Is1001;
-                                Time_End_New.MoreSamples_Frequency=tickRate;
                                 if (!Time_End_New.FromString(Attribute))
                                 {
-                                    if (Time_Begin.ToMilliseconds()>Time_End_New.ToMilliseconds())
+                                    if (!Time_Begin.HasValue() || Time_Begin>Time_End_New)
                                         Time_Begin=Time_End_New;
-                                    if (Time_End.ToMilliseconds()<Time_End_New.ToMilliseconds())
+                                    if (!Time_End.HasValue() || Time_End<Time_End_New)
+                                        Time_End=Time_End_New;
+                                }
+                            }
+                            if (const char* Attribute=div_element->Attribute("dur"))
+                            {
+                                TimeCode Time_Dur_New=Time_Template;
+                                if (Time_Begin.HasValue() && !Time_Dur_New.FromString(Attribute))
+                                {
+                                    Time_End_New=Time_Begin_New;
+                                    Time_End_New+=Time_Dur_New;
+                                    if (!Time_Begin.HasValue() || Time_Begin>Time_End_New)
+                                        Time_Begin=Time_End_New;
+                                    if (!Time_End.HasValue() || Time_End<Time_End_New)
                                         Time_End=Time_End_New;
                                 }
                             }
@@ -495,7 +526,7 @@ void File_Ttml::Read_Buffer_Continue()
                             }
                             LineCount+=LineCount_New;
 
-                            if (Time_Begin_New!=TimeCode(0xFF, 0xFF, 0xFF, 0xFF, 0, false))
+                            if (Time_Begin_New.HasValue())
                             {
                                 // Not supporting back to the past
                                 for (size_t i=0; i<TimeLine.size(); i++)
@@ -509,7 +540,7 @@ void File_Ttml::Read_Buffer_Continue()
                                 }
 
                                 // Empty
-                                if (!TimeLine.empty() && TimeLine[TimeLine.size()-1].Time_End.ToMilliseconds()<Time_Begin_New.ToMilliseconds() && TimeLine[TimeLine.size()-1].Time_End!=TimeCode(0, 0, 0, 0, 0, false))
+                                if (!TimeLine.empty() && TimeLine[TimeLine.size()-1].Time_End.HasValue() && TimeLine[TimeLine.size()-1].Time_End.ToMilliseconds()<Time_Begin_New.ToMilliseconds())
                                     EmptyCount++;
 
                                 // Checking same times
@@ -531,10 +562,10 @@ void File_Ttml::Read_Buffer_Continue()
                                     for (size_t i=0; i<TimeLine.size(); i++)
                                     {
                                         if (Time_Begin_New.ToMilliseconds()==TimeLine[i].Time_Begin.ToMilliseconds()
-                                         || (Time_Begin_New.ToMilliseconds()==TimeLine[i].Time_End.ToMilliseconds() && TimeLine[i].Time_End!=TimeCode(0, 0, 0, 0, 0, false)))
+                                         || (TimeLine[i].Time_End.HasValue() && Time_Begin_New.ToMilliseconds()==TimeLine[i].Time_End.ToMilliseconds()))
                                             CreateFrame_Begin=0;
                                         if (Time_End_New.ToMilliseconds()!=TimeLine[i].Time_Begin.ToMilliseconds()
-                                         && (Time_End_New.ToMilliseconds()!=TimeLine[i].Time_End.ToMilliseconds() && TimeLine[i].Time_End!=TimeCode(0, 0, 0, 0, 0, false)))
+                                         && (TimeLine[i].Time_End.HasValue() && Time_End_New.ToMilliseconds()!=TimeLine[i].Time_End.ToMilliseconds()))
                                             CreateFrame_End=1;
                                     }
                                     FrameCount+=CreateFrame_Begin;

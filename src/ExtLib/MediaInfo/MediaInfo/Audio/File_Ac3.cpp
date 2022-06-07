@@ -820,7 +820,7 @@ static const int32u AC3_MLP_Resolution[16]=
 };
 
 //---------------------------------------------------------------------------
-extern const char* Ac3_emdf_payload_id[16]=
+const char* Ac3_emdf_payload_id[16]=
 {
     "Container End",
     "Programme loudness data",
@@ -1383,20 +1383,31 @@ void File_Ac3::Streams_Fill()
     //TimeStamp
     if (TimeStamp_IsPresent)
     {
-        Ztring TimeCode_FrameRate=Ztring::ToZtring((float64)TimeStamp_FirstFrame.FramesPerSecond/((TimeStamp_FirstFrame.DropFrame || TimeStamp_FirstFrame.FramesPerSecond_Is1001)?1.001:1.000), 3);
-        if (TimeStamp_FirstFrame.MoreSamples)
-            TimeStamp_FirstFrame.MoreSamples_Frequency=Retrieve(Stream_Audio, 0, Audio_SamplingRate).To_int32s();
-        Fill(Stream_Audio, 0, "TimeCode_FirstFrame", TimeStamp_FirstFrame.ToString());
+        Ztring TimeCode_FrameRate=Ztring::ToZtring(TimeStamp_FirstFrame.GetFrameRate(), 3);
+        auto TimeStamp_FirstFrame_String=TimeStamp_FirstFrame.ToString();
+        auto TimeStamp_FirstFrame_Milliseconds=TimeStamp_FirstFrame.ToMilliseconds();
+        if (TimeStamp_FirstFrame_SampleNumber)
+        {
+            TimeStamp_FirstFrame_String+='-'+to_string(TimeStamp_FirstFrame_SampleNumber);
+            auto SamplingRate=Retrieve(Stream_Audio, 0, Audio_SamplingRate).To_int32u();
+            if (SamplingRate)
+            {
+                TimeStamp_FirstFrame_String+='S';
+                TimeStamp_FirstFrame_String+=to_string(SamplingRate);
+                TimeStamp_FirstFrame_Milliseconds+=((int32u)TimeStamp_FirstFrame_SampleNumber)*1000/SamplingRate;
+            }
+        }
+        Fill(Stream_Audio, 0, "TimeCode_FirstFrame", TimeStamp_FirstFrame_String);
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame", "N YCY");
-        Fill(Stream_Audio, 0, "TimeCode_FirstFrame/String", TimeStamp_FirstFrame.ToString()+" ("+TimeCode_FrameRate.To_UTF8()+" fps), embedded in stream");
+        Fill(Stream_Audio, 0, "TimeCode_FirstFrame/String", TimeStamp_FirstFrame_String+" ("+TimeCode_FrameRate.To_UTF8()+" fps), embedded in stream");
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame/String", "Y NTN");
         Fill(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", TimeCode_FrameRate);
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_FirstFrame_FrameRate", "N YFY");
         Fill(Stream_Audio, 0, "TimeCode_Source", "Stream");
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_Source", "N YTY");
-        Fill(Stream_Audio, 0, Audio_Delay, TimeStamp_FirstFrame.ToMilliseconds());
+        Fill(Stream_Audio, 0, Audio_Delay, TimeStamp_FirstFrame_Milliseconds);
         Fill(Stream_Audio, 0, Audio_Delay_Source, "Stream");
-        Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_FirstFrame.DropFrame?"drop_frame_flag=1":"drop_frame_flag=0");
+        Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_FirstFrame.GetDropFrame()?"drop_frame_flag=1":"drop_frame_flag=0");
     }
 
     //Samples per frame
@@ -4542,16 +4553,22 @@ void File_Ac3::TimeStamp()
     Skip_B2(                                                    "User private");
 
     FILLING_BEGIN();
-        TimeCode Temp(H1*10+H2, M1*10+M2, S1*10+S2, F1*10+F2, (int8u)float64_int64s(Mpegv_frame_rate[FrameRate]), DropFrame);
+        TimeCode Temp(H1*10+H2, M1*10+M2, S1*10+S2, F1*10+F2, (int32u)(float64_int64s(Mpegv_frame_rate[FrameRate])-1), DropFrame);
         if (float64_int64s(Mpegv_frame_rate[FrameRate])!=Mpegv_frame_rate[FrameRate])
-            Temp.FramesPerSecond_Is1001=true;
-        Temp.MoreSamples=SampleNumber;
-        #ifdef MEDIAINFO_TRACE
-           Element_Info1(Temp.ToString());
+            Temp.Set1001();
+        #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            auto Temp_String=Temp.ToString();
+            if (SampleNumber)
+                Temp_String+='-'+to_string(SampleNumber);
+            Element_Info1(Temp_String);
+        }
         #endif //MEDIAINFO_TRACE
         if (TimeStamp_Count==0)
         {
             TimeStamp_FirstFrame=Temp;
+            TimeStamp_FirstFrame_SampleNumber=SampleNumber;
         }
         TimeStamp_IsParsing=false;
         TimeStamp_Parsed=true;

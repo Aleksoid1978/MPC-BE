@@ -350,8 +350,8 @@ public :
     bool          File_DvDif_Analysis_Get ();
     #endif //defined(MEDIAINFO_DVDIF_ANALYZE_YES)
     #if MEDIAINFO_MACROBLOCKS
-    void          File_Macroblocks_Parse_Set (bool NewValue);
-    bool          File_Macroblocks_Parse_Get ();
+    void          File_Macroblocks_Parse_Set (int NewValue);
+    int           File_Macroblocks_Parse_Get ();
     #endif //MEDIAINFO_MACROBLOCKS
     void          File_GrowingFile_Delay_Set(float64 Value);
     float64       File_GrowingFile_Delay_Get();
@@ -580,7 +580,7 @@ private :
     bool                    File_DvDif_Analysis;
     #endif //defined(MEDIAINFO_DVDIF_ANALYZE_YES)
     #if MEDIAINFO_MACROBLOCKS
-    bool                    File_Macroblocks_Parse;
+    int                     File_Macroblocks_Parse;
     #endif //MEDIAINFO_MACROBLOCKS
     float64                 File_GrowingFile_Delay;
     bool                    File_GrowingFile_Force;

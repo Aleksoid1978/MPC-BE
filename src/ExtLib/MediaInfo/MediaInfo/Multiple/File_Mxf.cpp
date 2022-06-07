@@ -2515,7 +2515,7 @@ void File_Mxf::Streams_Finish()
     Fill(Stream_General, 0, General_Format_Profile, Mxf_OperationalPattern(OperationalPattern));
 
     //Time codes
-    if (SDTI_TimeCode_StartTimecode.IsValid())
+    if (SDTI_TimeCode_StartTimecode.HasValue())
     {
         bool IsDuplicate=false;
         for (size_t Pos2=0; Pos2<Count_Get(Stream_Other); Pos2++)
@@ -2529,7 +2529,7 @@ void File_Mxf::Streams_Finish()
             Fill(Stream_Other, StreamPos_Last, Other_Format, "SMPTE TC");
             Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "SDTI");
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, SDTI_TimeCode_StartTimecode.ToString());
-            Fill(Stream_Other, StreamPos_Last, Other_FrameRate, SDTI_TimeCode_StartTimecode.FramesPerSecond/(SDTI_TimeCode_StartTimecode.DropFrame?1.001:1.000)*(SDTI_TimeCode_StartTimecode.MustUseSecondField?2:1));
+            Fill(Stream_Other, StreamPos_Last, Other_FrameRate, SDTI_TimeCode_StartTimecode.GetFrameRate());
         }
     }
     if (SystemScheme1_TimeCodeArray_StartTimecode.HasValue())
@@ -2566,9 +2566,6 @@ void File_Mxf::Streams_Finish()
         else
             Fill(Stream_General, 0, "IsTruncated", "Yes", Unlimited, true, true);
     #endif //MEDIAINFO_ADVANCED
-
-    //Commercial names
-    Streams_Finish_CommercialNames();
 
     //Handling separate streams
     for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
@@ -2786,6 +2783,9 @@ void File_Mxf::Streams_Finish()
         Clear(Stream_Audio, 0, "AdmProfile_Format");
         Clear(Stream_Audio, 0, "AdmProfile_Version");
     }
+
+    //Commercial names
+    Streams_Finish_CommercialNames();
 }
 
 //---------------------------------------------------------------------------
@@ -3034,8 +3034,10 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_FirstFrame), TC.ToString().c_str());
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_Source), "Time code track (stripped)");
     }
-    if (SDTI_TimeCode_StartTimecode.IsValid())
+    size_t SDTI_TimeCode_StartTimecode_StreamPos_Last;
+    if (SDTI_TimeCode_StartTimecode.HasValue())
     {
+        SDTI_TimeCode_StartTimecode_StreamPos_Last=StreamPos_Last;
         Fill(StreamKind_Last, StreamPos_Last, "Delay_SDTI", SDTI_TimeCode_StartTimecode.ToMilliseconds());
         if (StreamKind_Last!=Stream_Max)
             Fill_SetOptions(StreamKind_Last, StreamPos_Last, "Delay_SDTI", "N NT");
@@ -3043,8 +3045,10 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_FirstFrame), SDTI_TimeCode_StartTimecode.c_str());
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_Source), "SDTI");
     }
+    size_t SystemScheme1_TimeCodeArray_StartTimecode_StreamPos_Last;
     if (SystemScheme1_TimeCodeArray_StartTimecode.HasValue())
     {
+        SystemScheme1_TimeCodeArray_StartTimecode_StreamPos_Last=StreamPos_Last;
         Fill(StreamKind_Last, StreamPos_Last, "Delay_SystemScheme1", SystemScheme1_TimeCodeArray_StartTimecode.ToMilliseconds());
         if (StreamKind_Last!=Stream_Max)
             Fill_SetOptions(StreamKind_Last, StreamPos_Last, "Delay_SystemScheme1", "N NT");
@@ -3340,6 +3344,23 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         }
 
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Stream_Size);
+    }
+
+    if (SDTI_TimeCode_StartTimecode.HasValue())
+    {
+        TimeCode TC=SDTI_TimeCode_StartTimecode;
+        int32u FrameRate=float32_int32s(Retrieve_Const(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameRate)).To_float32());
+        if (FrameRate)
+            TC.SetFramesMax((int16u)(FrameRate-1));
+        Fill(StreamKind_Last, SDTI_TimeCode_StartTimecode_StreamPos_Last, "Delay_SDTI", TC.ToMilliseconds(), true, true);
+    }
+    if (SystemScheme1_TimeCodeArray_StartTimecode.HasValue())
+    {
+        TimeCode TC=SystemScheme1_TimeCodeArray_StartTimecode;
+        int32u FrameRate=float32_int32s(Retrieve_Const(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameRate)).To_float32());
+        if (FrameRate)
+            TC.SetFramesMax((int16u)(FrameRate-1));
+        Fill(StreamKind_Last, SystemScheme1_TimeCodeArray_StartTimecode_StreamPos_Last, "Delay_SystemScheme1", TC.ToMilliseconds(), true, true);
     }
 
     //Done
@@ -4190,14 +4211,14 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
         if (Component2!=Components.end() && Component2->second.MxfTimeCode.StartTimecode!=(int64u)-1 && !Config->File_IsReferenced_Get())
         {
             //Note: Origin is not part of the StartTimecode for the first frame in the source package. From specs: "For a Timecode Track with a single Timecode Component and with origin N, where N greater than 0, the timecode value at the Zero Point of the Track equals the start timecode of the Timecode Component incremented by N units."
-            TimeCode TC(Component2->second.MxfTimeCode.StartTimecode+Config->File_IgnoreEditsBefore, (int8u)Component2->second.MxfTimeCode.RoundedTimecodeBase, Component2->second.MxfTimeCode.DropFrame);
+            TimeCode TC=Component2->second.MxfTimeCode.RoundedTimecodeBase<0x8000?TimeCode(Component2->second.MxfTimeCode.StartTimecode+Config->File_IgnoreEditsBefore, Component2->second.MxfTimeCode.RoundedTimecodeBase-1, Component2->second.MxfTimeCode.DropFrame):TimeCode();
             bool IsHybridTimeCode=false;
             if (Component->second.StructuralComponents.size()==2 && !Pos)
             {
                 components::iterator Component_TC2=Components.find(Component->second.StructuralComponents[1]);
                 if (Component_TC2!=Components.end() && Component_TC2->second.MxfTimeCode.StartTimecode!=(int64u)-1)
                 {
-                    TimeCode TC2(Component_TC2->second.MxfTimeCode.StartTimecode+Config->File_IgnoreEditsBefore, (int8u)Component_TC2->second.MxfTimeCode.RoundedTimecodeBase, Component2->second.MxfTimeCode.DropFrame);
+                    TimeCode TC2=Component_TC2->second.MxfTimeCode.RoundedTimecodeBase<0x8000?TimeCode(Component_TC2->second.MxfTimeCode.StartTimecode+Config->File_IgnoreEditsBefore, Component_TC2->second.MxfTimeCode.RoundedTimecodeBase-1, Component2->second.MxfTimeCode.DropFrame):TimeCode();
                     if (TC2.ToFrames()-TC.ToFrames()==2)
                     {
                         TC++;
@@ -4215,7 +4236,7 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
             if (Component2->second.Duration && Component2->second.Duration!=(int64u)-1)
             {
                 Fill(Stream_Other, StreamPos_Last, Other_FrameCount, Component2->second.Duration);
-                if (TC.FramesPerSecond)
+                if (TC.GetFramesMax())
                 {
                     TC+=Component2->second.Duration-1;
                     Fill(Stream_Other, StreamPos_Last, Other_TimeCode_LastFrame, TC.ToString().c_str());
@@ -4366,14 +4387,14 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
                                                     if (AS11->second.PartNumber!=(int16u)-1 && AS11->second.PartTotal!=(int16u)-1)
                                                     {
                                                         string S;
-                                                        S+=TimeCode(TC_Temp+Duration_CurrentPos, FrameRate_TempI, DropFrame_Temp).ToString();
+                                                        S+=TimeCode(TC_Temp+Duration_CurrentPos, FrameRate_TempI-1, DropFrame_Temp).ToString();
                                                         if (DMSegment->second.Duration!=(int64u)-1)
                                                         {
                                                             S+=" + ";
-                                                            S+=TimeCode(DMSegment->second.Duration, FrameRate_TempI, DropFrame_Temp).ToString();
+                                                            S+=TimeCode(DMSegment->second.Duration, FrameRate_TempI-1, DropFrame_Temp).ToString();
                                                             S+=" = ";
                                                             Duration_CurrentPos+=DMSegment->second.Duration;
-                                                            S+=TimeCode(TC_Temp+Duration_CurrentPos, FrameRate_TempI, DropFrame_Temp).ToString();
+                                                            S+=TimeCode(TC_Temp+Duration_CurrentPos, FrameRate_TempI-1, DropFrame_Temp).ToString();
                                                             Duration_Programme+=DMSegment->second.Duration;
                                                         }
                                                         Fill(Stream_Other, StreamPos_Last, Ztring::ToZtring(AS11->second.PartNumber).To_UTF8().c_str(), S);
@@ -4411,13 +4432,13 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
                                                         Fill(Stream_Other, StreamPos_Last, "AudioLoudnessStandard", Mxf_AS11_AudioLoudnessStandard[AS11->second.AudioLoudnessStandard]);
                                                     Fill(Stream_Other, StreamPos_Last, "AudioComments", AS11->second.AudioComments);
                                                     if (AS11->second.LineUpStart!=(int64u)-1)
-                                                        Fill(Stream_Other, StreamPos_Last, "LineUpStart", Ztring().From_UTF8(TimeCode(TC_Temp+AS11->second.LineUpStart, FrameRate_TempI, DropFrame_Temp).ToString()));
+                                                        Fill(Stream_Other, StreamPos_Last, "LineUpStart", Ztring().From_UTF8(TimeCode(TC_Temp+AS11->second.LineUpStart, FrameRate_TempI-1, DropFrame_Temp).ToString()));
                                                     if (AS11->second.IdentClockStart!=(int64u)-1)
-                                                        Fill(Stream_Other, StreamPos_Last, "IdentClockStart", Ztring().From_UTF8(TimeCode(TC_Temp+AS11->second.IdentClockStart, FrameRate_TempI, DropFrame_Temp).ToString()));
+                                                        Fill(Stream_Other, StreamPos_Last, "IdentClockStart", Ztring().From_UTF8(TimeCode(TC_Temp+AS11->second.IdentClockStart, FrameRate_TempI-1, DropFrame_Temp).ToString()));
                                                     if (AS11->second.TotalNumberOfParts!=(int16u)-1)
                                                         Fill(Stream_Other, StreamPos_Last, "TotalNumberOfParts", AS11->second.TotalNumberOfParts);
                                                     if (AS11->second.TotalProgrammeDuration!=(int64u)-1)
-                                                        Fill(Stream_Other, StreamPos_Last, "TotalProgrammeDuration", Ztring().From_UTF8(TimeCode(AS11->second.TotalProgrammeDuration, FrameRate_TempI, DropFrame_Temp).ToString()));
+                                                        Fill(Stream_Other, StreamPos_Last, "TotalProgrammeDuration", Ztring().From_UTF8(TimeCode(AS11->second.TotalProgrammeDuration, FrameRate_TempI-1, DropFrame_Temp).ToString()));
                                                     if (AS11->second.AudioDescriptionPresent!=(int8u)-1)
                                                         Fill(Stream_Other, StreamPos_Last, "AudioDescriptionPresent", AS11->second.AudioDescriptionPresent?__T("Yes"):__T("No"));
                                                     if (AS11->second.AudioDescriptionType<Mxf_AS11_AudioDescriptionType_Count)
@@ -4449,7 +4470,7 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
         }
     }
     if (Duration_Programme)
-        Fill(Stream_Other, StreamPos_Last, "TotalProgrammeDuration", TimeCode(Duration_Programme, FrameRate_TempI, DropFrame_Temp).ToString());
+        Fill(Stream_Other, StreamPos_Last, "TotalProgrammeDuration", TimeCode(Duration_Programme, FrameRate_TempI-1, DropFrame_Temp).ToString());
 }
 
 //---------------------------------------------------------------------------
@@ -8780,23 +8801,19 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
     Skip_B2(                                                    "continuity count");
 
     //Some computing
-    int8u  FrameRate;
+    static int8u FrameRates_List[3] = { 24, 25, 30 };
+    int8u  FramesMax;
     int8u  RepetitionMaxCount;
-    switch (CPR_Rate) //See SMPTE 326M
+    if (CPR_Rate && CPR_Rate<=0x0C) //See SMPTE 326M)
     {
-        case 0x01 : FrameRate=24;  RepetitionMaxCount=0; break;
-        case 0x02 : FrameRate=25;  RepetitionMaxCount=0; break;
-        case 0x03 : FrameRate=30;  RepetitionMaxCount=0; break;
-        case 0x04 : FrameRate=48;  RepetitionMaxCount=1; break;
-        case 0x05 : FrameRate=50;  RepetitionMaxCount=1; break;
-        case 0x06 : FrameRate=60;  RepetitionMaxCount=1; break;
-        case 0x07 : FrameRate=72;  RepetitionMaxCount=2; break;
-        case 0x08 : FrameRate=75;  RepetitionMaxCount=2; break;
-        case 0x09 : FrameRate=90;  RepetitionMaxCount=2; break;
-        case 0x0A : FrameRate=96;  RepetitionMaxCount=3; break;
-        case 0x0B : FrameRate=100; RepetitionMaxCount=3; break;
-        case 0x0C : FrameRate=120; RepetitionMaxCount=3; break;
-        default   : FrameRate=0;   RepetitionMaxCount=0; break;
+        CPR_Rate--;
+        RepetitionMaxCount=CPR_Rate/3;
+        FramesMax=FrameRates_List[CPR_Rate%3]*(RepetitionMaxCount+1)-1;
+    }
+    else
+    {
+        FramesMax=0;
+        RepetitionMaxCount=0;
     }
 
     //Parsing
@@ -8854,22 +8871,21 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
         TimeCode TimeCode_Current(  Hours_Tens  *10+Hours_Units,
                                     Minutes_Tens*10+Minutes_Units,
                                     Seconds_Tens*10+Seconds_Units,
-                                    Frames_Tens *10+Frames_Units,
-                                    FrameRate/(RepetitionMaxCount+1),
-                                    DropFrame,
-                                    RepetitionMaxCount?true:false);
+                                    (Frames_Tens *10+Frames_Units)*(RepetitionMaxCount+1),
+                                    FramesMax,
+                                    DropFrame);
         if (RepetitionMaxCount)
         {
-            if (SDTI_TimeCode_Previous.IsValid() && TimeCode_Current==SDTI_TimeCode_Previous)
+            if (SDTI_TimeCode_Previous.HasValue() && TimeCode_Current==SDTI_TimeCode_Previous)
             {
                 SDTI_TimeCode_RepetitionCount++;
                 TimeCode_Current++;
-                if (!SDTI_TimeCode_StartTimecode.IsValid() && SDTI_TimeCode_RepetitionCount>=RepetitionMaxCount)
+                if (!SDTI_TimeCode_StartTimecode.HasValue() && SDTI_TimeCode_RepetitionCount>=RepetitionMaxCount)
                     SDTI_TimeCode_StartTimecode=SDTI_TimeCode_Previous; //The first time code was the first one of the repetition sequence
             }
             else
             {
-                if (!SDTI_TimeCode_StartTimecode.IsValid() && SDTI_TimeCode_Previous.IsValid())
+                if (!SDTI_TimeCode_StartTimecode.HasValue() && SDTI_TimeCode_Previous.HasValue())
                 {
                     SDTI_TimeCode_StartTimecode=SDTI_TimeCode_Previous;
                     while(SDTI_TimeCode_RepetitionCount<RepetitionMaxCount)
@@ -8882,7 +8898,7 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
                 SDTI_TimeCode_Previous=TimeCode_Current;
             }
         }
-        else if (!SDTI_TimeCode_StartTimecode.IsValid())
+        else if (!SDTI_TimeCode_StartTimecode.HasValue())
             SDTI_TimeCode_StartTimecode=TimeCode_Current;
 
         Element_Info1(Ztring().From_UTF8(TimeCode_Current.ToString().c_str()));

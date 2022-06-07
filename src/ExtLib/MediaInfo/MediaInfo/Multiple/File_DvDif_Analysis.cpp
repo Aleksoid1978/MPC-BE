@@ -1007,7 +1007,7 @@ void File_DvDif::Errors_Stats_Update()
             Errors_Stats_Line+=__T("XX:XX:XX:XX");
             #if MEDIAINFO_EVENTS
                 Event.TimeCode|=0x7FFFF<<8;
-                //Event.TimeCode|=Speed_TimeCode_Current.Time.DropFrame<<7;
+                //Event.TimeCode|=Speed_TimeCode_Current.Time.DropFrame()<<7;
                 Event.TimeCode|=0x3F;
             #endif //MEDIAINFO_EVENTS
         }

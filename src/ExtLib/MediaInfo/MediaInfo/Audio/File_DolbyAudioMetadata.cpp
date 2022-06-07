@@ -320,15 +320,18 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Metadata_Segment()
             TimeCode TC;
             if (((int8s)first_action_time_HH)<0)
             {
-                TC.IsNegative=true;
-                TC.Hours=-((int8s)first_action_time_HH);
+                TC.SetNegative();
+                TC.SetHours(-((int8s)first_action_time_HH));
             }
             else
-                TC.Hours=first_action_time_HH;
-            TC.Minutes=first_action_time_MM;
-            TC.Seconds=first_action_time_SS/100000;
-            TC.MoreSamples_Frequency=100000;
-            TC.MoreSamples=first_action_time_SS%100000;
+                TC.SetHours(first_action_time_HH);
+            const int32u FrameRate=100000;
+            TC.SetMinutes(first_action_time_MM);
+            TC.SetSeconds(first_action_time_SS/FrameRate);
+            TC.SetFrames(first_action_time_SS%FrameRate);
+            TC.SetFramesMax(FrameRate-1);
+            TC.SetIsTime();
+            TC.SetIsValid();
             Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata FirstFrameOfAction", TC.ToString());
             Fill_SetOptions(Stream_Audio, 0, "Dolby_Atmos_Metadata FirstFrameOfAction", "Y NTY");
         }

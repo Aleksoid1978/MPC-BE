@@ -989,6 +989,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
             case Video_MasteringDisplay_Luminance:
                 Ignore = Retrieve_Const(Stream_Video, 0, Item->first) == Item->second;
                 break;
+            default:
+                Ignore = false;
             }
             if (!Ignore)
                 Fill(Stream_Video, 0, Item->first, Item->second);

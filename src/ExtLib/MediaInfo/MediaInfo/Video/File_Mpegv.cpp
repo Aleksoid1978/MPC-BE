@@ -1584,25 +1584,14 @@ void File_Mpegv::Streams_Finish()
     }
     else if (!TimeCodeIsNotTrustable && Time_End_Seconds!=Error && FrameRate)
     {
-        TimeCode Time_Begin_TC;
-        const int8u ceilFrameRate=(int8u)ceil(FrameRate);
-        Time_Begin_TC.FramesPerSecond=ceilFrameRate;
-        Time_Begin_TC.DropFrame=group_start_IsParsed?group_start_drop_frame_flag:((FrameRate-ceilFrameRate)?true:false);
-        Time_Begin_TC.Hours=(int8u)(Time_Begin_Seconds/3600);
-        Time_Begin_TC.Minutes=(int8u)((Time_Begin_Seconds%3600)/60);
-        Time_Begin_TC.Seconds=(int8u)(Time_Begin_Seconds%60);
-        Time_Begin_TC.Frames=(int8u)Time_Begin_Frames;
-        TimeCode Time_End_TC;
-        Time_End_TC.FramesPerSecond=ceilFrameRate;
-        Time_End_TC.DropFrame=Time_Begin_TC.DropFrame;
-        Time_End_TC.Hours=(int8u)(Time_End_Seconds/3600);
-        Time_End_TC.Minutes=(int8u)((Time_End_Seconds%3600)/60);
-        Time_End_TC.Seconds=(int8u)(Time_End_Seconds%60);
-        Time_End_TC.Frames=(int8u)Time_End_Frames;
-        int64u Time_Begin_FrameCount=Time_Begin_TC.ToFrames();
-        int64u Time_End_FrameCount = Time_End_TC.ToFrames();
-        Fill(Stream_Video, 0, Video_FrameCount, Time_End_FrameCount-Time_Begin_FrameCount, 0);
-        Fill(Stream_Video, 0, Video_Duration, (Time_End_FrameCount-Time_Begin_FrameCount)/FrameRate*1000, 0);
+        const int32u ceilFrameRate=(int32u)ceil(FrameRate);
+        bool DropFrame=group_start_IsParsed?group_start_drop_frame_flag:((FrameRate==ceilFrameRate)?true:false);
+        int32u FramesMax=ceilFrameRate-1;
+        TimeCode Time_Begin_TC(Time_Begin_Seconds/3600, (int8u)((Time_Begin_Seconds%3600)/60), (int8u)(Time_Begin_Seconds%60), Time_Begin_Frames, FramesMax, DropFrame);
+        TimeCode Time_End_TC  (Time_End_Seconds  /3600, (int8u)((Time_End_Seconds  %3600)/60), (int8u)(Time_End_Seconds  %60), Time_End_Frames  , FramesMax, DropFrame);
+        int64u FrameCount=Time_End_TC.ToFrames()-Time_Begin_TC.ToFrames();
+        Fill(Stream_Video, 0, Video_FrameCount, FrameCount, 0);
+        Fill(Stream_Video, 0, Video_Duration, FrameCount/FrameRate*1000, 0);
     }
 
     //picture_coding_types

@@ -511,10 +511,10 @@ void File_DvDif::Streams_Fill()
         Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
 
     //Delay
-    TimeCode_FirstFrame.FramesPerSecond=(system?25:30);
+    TimeCode_FirstFrame.SetFramesMax(system?24:29);
     if (FrameRate_Multiplicator>=2)
-        TimeCode_FirstFrame.MustUseSecondField=true;
-    if (TimeCode_FirstFrame.IsValid())
+        TimeCode_FirstFrame.SetMustUseSecondField();
+    if (TimeCode_FirstFrame.HasValue())
     {
         string TimeCode_FirstFrame_String=TimeCode_FirstFrame.ToString();
         int64u TimeCode_FirstFrame_ms=TimeCode_FirstFrame.ToMilliseconds();

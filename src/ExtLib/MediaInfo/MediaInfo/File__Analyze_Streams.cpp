@@ -1219,46 +1219,27 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 //---------------------------------------------------------------------------
 void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float64 Value, int8u AfterComma, bool Replace)
 {
-    if (StreamKind==Stream_Video && Parameter==Video_FrameRate)
+    if (Parameter==Fill_Parameter(StreamKind, Generic_FrameRate))
     {
-        Clear(StreamKind, StreamPos, Video_FrameRate_Num);
-        Clear(StreamKind, StreamPos, Video_FrameRate_Den);
+        size_t FrameRate_Num=Fill_Parameter(StreamKind, Generic_FrameRate_Num);
+        size_t FrameRate_Den=Fill_Parameter(StreamKind, Generic_FrameRate_Den);
+
+        Clear(StreamKind, StreamPos, FrameRate_Num);
+        Clear(StreamKind, StreamPos, FrameRate_Den);
 
         if (Value)
         {
             if (float64_int64s(Value) - Value*1.001000 > -0.000002
              && float64_int64s(Value) - Value*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 64-bit float
             {
-                Fill(StreamKind, StreamPos, Video_FrameRate_Num,  Value*1001, 0, Replace);
-                Fill(StreamKind, StreamPos, Video_FrameRate_Den,   1001, 10, Replace);
+                Fill(StreamKind, StreamPos, FrameRate_Num, Value*1001,  0, Replace);
+                Fill(StreamKind, StreamPos, FrameRate_Den,       1001, 10, Replace);
             }
             if (float64_int64s(Value) - Value*1.001001 > -0.000002
              && float64_int64s(Value) - Value*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 64-bit float
             {
-                Fill(StreamKind, StreamPos, Video_FrameRate_Num,  Value*1000, 0, Replace);
-                Fill(StreamKind, StreamPos, Video_FrameRate_Den,   1000, 10, Replace);
-            }
-        }
-    }
-
-    if (StreamKind==Stream_Other && Parameter==Other_FrameRate)
-    {
-        Clear(StreamKind, StreamPos, Other_FrameRate_Num);
-        Clear(StreamKind, StreamPos, Other_FrameRate_Den);
-
-        if (Value)
-        {
-            if (float32_int32s(Value) - Value*1.001000 > -0.000002
-             && float32_int32s(Value) - Value*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 32-bit float
-            {
-                Fill(StreamKind, StreamPos, Other_FrameRate_Num,  Value*1001, 0, Replace);
-                Fill(StreamKind, StreamPos, Other_FrameRate_Den,   1001, 10, Replace);
-            }
-            if (float32_int32s(Value) - Value*1.001001 > -0.000002
-             && float32_int32s(Value) - Value*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 32-bit float
-            {
-                Fill(StreamKind, StreamPos, Other_FrameRate_Num,  Value*1000, 0, Replace);
-                Fill(StreamKind, StreamPos, Other_FrameRate_Den,   1000, 10, Replace);
+                Fill(StreamKind, StreamPos, FrameRate_Num,  Value*1000,  0, Replace);
+                Fill(StreamKind, StreamPos, FrameRate_Den,        1000, 10, Replace);
             }
         }
     }
@@ -2613,8 +2594,8 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
                     }
                 }
 
-                TimeCode TC(FrameCountS.To_int64s(), (int8u)float32_int32s(FrameRateS.To_float32()), DropFrame && FrameRateI!=FrameRateF);
-                TC.DropFrame=DropFrame;
+                TimeCode TC(FrameCountS.To_int64s(), (int32u)float32_int32s(FrameRateS.To_float32()-1), DropFrame && FrameRateI!=FrameRateF);
+                TC.SetDropFrame(DropFrame);
                 DurationString4.From_UTF8(TC.ToString());
 
                 Fill(StreamKind, StreamPos, Parameter+5, DurationString4); // /String4
@@ -2847,21 +2828,51 @@ void File__Analyze::Value_Value123(stream_t StreamKind, size_t StreamPos, size_t
                 List2[List2.size()-1]+=__T(")");
             }
         }
-    }
 
-    //Special case : audio with samples per frames
-    if (StreamKind == Stream_Audio && List2.size() == 1 && Parameter == Audio_FrameRate)
-    {
-        const Ztring &SamplesPerFrame = Retrieve(Stream_Audio, StreamPos, Audio_SamplesPerFrame);
-        if (!SamplesPerFrame.empty())
+        //Special cases - Frame rate
+        auto FrameRate_Index=Fill_Parameter(StreamKind, Generic_FrameRate);
+        if (Parameter==FrameRate_Index)
         {
-            List2[0] += __T(" (");
-            List2[0] += SamplesPerFrame;
-            List2[0] += __T(" SPF)");
+            ZtringList Temp;
+            Temp.Separator_Set(0, __T(" / "));
+            Temp.Write(Retrieve_Const(StreamKind, StreamPos, FrameRate_Index));
+            const auto& FrameRate=Temp.Read(List2.size()-1);
+            const auto& FrameRate_Num=Retrieve_Const(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameRate_Num));
+            const auto& FrameRate_Den=Retrieve_Const(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameRate_Den));
+            if (!FrameRate.empty()
+             && !FrameRate_Num.empty()
+             && !FrameRate_Den.empty())
+                List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(FrameRate+__T(" (")+FrameRate_Num+__T("/")+FrameRate_Den+__T(")"), __T(" fps"));
+        }
+        if (StreamKind==Stream_Video
+         && Parameter==Video_FrameRate_Original
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original).empty()
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num).empty()
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty())
+            List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den)+__T(")"), __T(" fps"));
+
+        //Special cases - 120 fps 24/30 mode
+        if (StreamKind==Stream_Video
+         && Parameter==Video_FrameRate
+         && Retrieve(Stream_Video, StreamPos, Video_FrameRate).To_int32u()==120
+         && Retrieve(Stream_Video, StreamPos, Video_FrameRate_Minimum).To_int32u()==24
+         && Retrieve(Stream_Video, StreamPos, Video_FrameRate_Maximum).To_int32u()==30)
+            List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(Retrieve(Stream_Video, StreamPos, Video_FrameRate)+__T(" (24/30)"), __T(" fps"));
+
+        //Special case : audio with samples per frames
+        if (StreamKind==Stream_Audio && Parameter==Audio_FrameRate)
+        {
+            const Ztring &SamplesPerFrame = Retrieve(Stream_Audio, StreamPos, Audio_SamplesPerFrame);
+            if (!SamplesPerFrame.empty())
+            {
+                List2[List2.size()-1]+=__T(" (");
+                List2[List2.size()-1]+=SamplesPerFrame;
+                List2[List2.size()-1]+=__T(" SPF)");
+            }
         }
     }
 
-    Fill(StreamKind, StreamPos, Parameter+1, List2.Read());
+    Fill(StreamKind, StreamPos, Parameter+1, List2.Read(), true);
 }
 
 //---------------------------------------------------------------------------
@@ -3031,6 +3042,9 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Duration_String4 : return General_Duration_String4;
                                     case Generic_Duration_String5 : return General_Duration_String5;
                                     case Generic_FrameRate : return General_FrameRate;
+                                    case Generic_FrameRate_String: return General_FrameRate_String;
+                                    case Generic_FrameRate_Num: return General_FrameRate_Num;
+                                    case Generic_FrameRate_Den: return General_FrameRate_Den;
                                     case Generic_FrameCount : return General_FrameCount;
                                     case Generic_Delay : return General_Delay;
                                     case Generic_Delay_String : return General_Delay_String;
@@ -3108,6 +3122,9 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_BitRate_Encoded : return Video_BitRate_Encoded;
                                     case Generic_BitRate_Encoded_String : return Video_BitRate_Encoded_String;
                                     case Generic_FrameRate : return Video_FrameRate;
+                                    case Generic_FrameRate_String: return Video_FrameRate_String;
+                                    case Generic_FrameRate_Num: return Video_FrameRate_Num;
+                                    case Generic_FrameRate_Den: return Video_FrameRate_Den;
                                     case Generic_FrameCount : return Video_FrameCount;
                                     case Generic_Source_FrameCount : return Video_Source_FrameCount;
                                     case Generic_ColorSpace : return Video_ColorSpace;
@@ -3230,6 +3247,9 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_BitRate_Encoded : return Audio_BitRate_Encoded;
                                     case Generic_BitRate_Encoded_String : return Audio_BitRate_Encoded_String;
                                     case Generic_FrameRate : return Audio_FrameRate;
+                                    case Generic_FrameRate_String: return Audio_FrameRate_String;
+                                    case Generic_FrameRate_Num: return Audio_FrameRate_Num;
+                                    case Generic_FrameRate_Den: return Audio_FrameRate_Den;
                                     case Generic_FrameCount : return Audio_FrameCount;
                                     case Generic_Source_FrameCount : return Audio_Source_FrameCount;
                                     case Generic_Resolution : return Audio_Resolution;
@@ -3355,6 +3375,9 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_BitRate_Encoded : return Text_BitRate_Encoded;
                                     case Generic_BitRate_Encoded_String : return Text_BitRate_Encoded_String;
                                     case Generic_FrameRate : return Text_FrameRate;
+                                    case Generic_FrameRate_String: return Text_FrameRate_String;
+                                    case Generic_FrameRate_Num: return Text_FrameRate_Num;
+                                    case Generic_FrameRate_Den: return Text_FrameRate_Den;
                                     case Generic_FrameCount : return Text_FrameCount;
                                     case Generic_Source_FrameCount : return Text_Source_FrameCount;
                                     case Generic_ColorSpace : return Text_ColorSpace;
@@ -3457,6 +3480,9 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Duration_String4 : return Other_Duration_String4;
                                     case Generic_Duration_String5 : return Other_Duration_String5;
                                     case Generic_FrameRate : return Other_FrameRate;
+                                    case Generic_FrameRate_String: return Other_FrameRate_String;
+                                    case Generic_FrameRate_Num: return Other_FrameRate_Num;
+                                    case Generic_FrameRate_Den: return Other_FrameRate_Den;
                                     case Generic_FrameCount : return Other_FrameCount;
                                     case Generic_Delay : return Other_Delay;
                                     case Generic_Delay_String : return Other_Delay_String;

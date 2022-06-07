@@ -5084,6 +5084,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tmcd()
         mdat_Pos_ToParseInPriority_StreamIDs.push_back(moov_trak_tkhd_TrackID);
         Streams[moov_trak_tkhd_TrackID].IsPriorityStream=true;
         Parser->NumberOfFrames=NumberOfFrames; //tc->FrameDuration?(((float64)tc->TimeScale)/tc->FrameDuration):0;
+        if (tc->FrameDuration && NumberOfFrames)
+            Parser->FrameMultiplier=((int64u)tc->TimeScale+tc->FrameDuration/2)/tc->FrameDuration/NumberOfFrames;
         Parser->DropFrame=tc->DropFrame;
         Parser->NegativeTimes=tc->NegativeTimes;
         Parser->tkhd_Duration=Streams[moov_trak_tkhd_TrackID].tkhd_Duration;
@@ -7849,9 +7851,15 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stts()
     }
 
     FILLING_BEGIN();
-        if (StreamKind_Last==Stream_Video)
+        if (StreamKind_Last==Stream_Video || StreamKind_Last==Stream_Text)
         {
-            Fill(Stream_Video, StreamPos_Last, Video_FrameCount, Stream->second.stts_FrameCount);
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount), Stream->second.stts_FrameCount);
+            if (NumberOfEntries==1 && Stream->second.mdhd_Duration && Stream->second.mdhd_TimeScale)
+            {
+                auto FrameRate=(((float64)Stream->second.mdhd_Duration)/Stream->second.mdhd_TimeScale);
+                if (FrameRate)
+                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameRate), Stream->second.stts_FrameCount/FrameRate);
+            }
 
             #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
                 if (Streams[moov_trak_tkhd_TrackID].IsDvDif)

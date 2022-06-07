@@ -188,6 +188,7 @@ private :
     bool   IgnoreCrc_Done;
     bool   IgnoreCrc;
     TimeCode TimeStamp_FirstFrame;
+    int16u   TimeStamp_FirstFrame_SampleNumber;
     size_t TimeStamp_Count;
 };
 

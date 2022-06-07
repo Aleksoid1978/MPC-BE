@@ -18,6 +18,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/TimeCode.h"
+#include <limits>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -33,115 +34,84 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 TimeCode::TimeCode ()
-:   Hours((int8u)-1),
-    Minutes((int8u)-1),
-    Seconds((int8u)-1),
-    Frames((int8u)-1),
-    MoreSamples(0),
-    MoreSamples_Frequency(0),
-    FramesPerSecond_Is1001(false),
-    FramesPerSecond(0),
-    DropFrame(false),
-    MustUseSecondField(false),
-    IsSecondField(false),
-    IsNegative(false)
 {
+    memset(this, 0, sizeof(TimeCode));
 }
 
 //---------------------------------------------------------------------------
-TimeCode::TimeCode (int8u Hours_, int8u Minutes_, int8u Seconds_, int8u Frames_, int8u FramesPerSecond_, bool DropFrame_, bool MustUseSecondField_, bool IsSecondField_)
+TimeCode::TimeCode (int32u Hours_, int8u Minutes_, int8u Seconds_, int32u Frames_, int32u FramesMax_, bool DropFrame_, bool MustUseSecondField_, bool IsSecondField_)
 :   Hours(Hours_),
     Minutes(Minutes_),
     Seconds(Seconds_),
     Frames(Frames_),
-    MoreSamples(0),
-    MoreSamples_Frequency(0),
-    FramesPerSecond_Is1001(false),
-    FramesPerSecond(FramesPerSecond_),
-    DropFrame(DropFrame_),
-    MustUseSecondField(MustUseSecondField_),
-    IsSecondField(IsSecondField_),
-    IsNegative(false)
+    FramesMax(FramesMax_)
 {
+    if (DropFrame_)
+        Flags.set(DropFrame);
+    if (MustUseSecondField_)
+        Flags.set(MustUseSecondField);
+    if (IsSecondField_)
+        Flags.set(IsSecondField);
+    Flags.set(IsValid);
 }
 
 //---------------------------------------------------------------------------
-TimeCode::TimeCode (int64s Frames_, int8u FramesPerSecond_, bool DropFrame_, bool MustUseSecondField_, bool IsSecondField_)
-:   FramesPerSecond(FramesPerSecond_),
-    MoreSamples(0),
-    MoreSamples_Frequency(0),
-    FramesPerSecond_Is1001(false),
-    DropFrame(DropFrame_),
-    MustUseSecondField(MustUseSecondField_),
-    IsSecondField(IsSecondField_)
+TimeCode::TimeCode (int64s Frames_, int32u FramesMax_, bool DropFrame_, bool MustUseSecondField_, bool IsSecondField_)
+:   FramesMax(FramesMax_)
 {
+    if (DropFrame_)
+        Flags.set(DropFrame);
+    if (MustUseSecondField_)
+        Flags.set(MustUseSecondField);
+    if (IsSecondField_)
+        Flags.set(IsSecondField);
     FromFrames(Frames_);
 }
 
 bool TimeCode::FromFrames(int64s Frames_)
 {
-    if (!FramesPerSecond)
-    {
-        Frames  = 0;
-        Seconds = 0;
-        Minutes = 0;
-        Hours   = 0;
-        IsNegative = false;
-        return true;
-    }
-
     if (Frames_<0)
     {
-        IsNegative=true;
+        Flags.set(IsNegative);
         Frames_=-Frames_;
     }
     else
-        IsNegative=false;
+        Flags.reset(IsNegative);
 
-    int8u Dropped=0;
-    if (DropFrame)
+    int64u Dropped=Flags.test(DropFrame)?(1+FramesMax/30):0;
+    int32u FrameRate=(int32u)FramesMax+1;
+    int64u Dropped2=Dropped*2;
+    int64u Dropped18=Dropped*18;
+
+    int64u Minutes_Tens = ((int64u)Frames_)/(600*FrameRate-Dropped18); //Count of 10 minutes
+    int64u Minutes_Units = (Frames_-Minutes_Tens*(600*FrameRate-Dropped18))/(60*FrameRate-Dropped2);
+
+    Frames_+=Dropped18*Minutes_Tens+Dropped2*Minutes_Units;
+    if (Minutes_Units && ((Frames_/FrameRate)%60)==0 && (Frames_%FrameRate)<Dropped2) // If Minutes_Tens is not 0 (drop) but count of remaining seconds is 0 and count of remaining frames is less than 2, 1 additional drop was actually counted, removing it
+        Frames_-=Dropped2;
+
+    int64s HoursTemp=(((Frames_/FrameRate)/60)/60);
+    if (HoursTemp>(int32u)-1)
     {
-        Dropped=2;
-        if (FramesPerSecond>30)
-            Dropped+=2;
-        if (FramesPerSecond>60)
-            Dropped+=2;
-        if (FramesPerSecond>90)
-            Dropped+=2;
-        if (FramesPerSecond>120)
-            Dropped+=2;
+        Hours=(int32u)-1;
+        Minutes=59;
+        Seconds=59;
+        Frames=FramesMax;
+        return true;
     }
-
-    int64u Minutes_Tens = Frames_/(600*FramesPerSecond-Dropped*9); //Count of 10 minutes
-    int64u Minutes_Units = (Frames_-Minutes_Tens*(600*FramesPerSecond-Dropped*9))/(60*FramesPerSecond-Dropped);
-
-    Frames_ += 9*Dropped*Minutes_Tens+Dropped*Minutes_Units;
-    if (Minutes_Units && ((Frames_/FramesPerSecond)%60)==0 && (Frames_%FramesPerSecond)<Dropped) // If Minutes_Tens is not 0 (drop) but count of remaining seconds is 0 and count of remaining frames is less than 2, 1 additional drop was actually counted, removing it
-        Frames_-=Dropped;
-
-    Frames  =    Frames_ % FramesPerSecond;
-    Seconds =   (Frames_ / FramesPerSecond) % 60;
-    Minutes =  ((Frames_ / FramesPerSecond) / 60) % 60;
-    int64s Temp = (((Frames_ / FramesPerSecond) / 60) / 60);
-    Hours = (Temp>99 || Temp<-99)?(Temp%24):Temp;
+    Hours=(int8u)HoursTemp;
+    Minutes=((Frames_/FrameRate)/60)%60;
+    Seconds=(Frames_/FrameRate)%60;
+    Frames=(int32u)(Frames_%FrameRate);
+    Flags.reset(IsTime);
+    Flags.set(IsValid);
 
     return false;
 }
 
 //---------------------------------------------------------------------------
 TimeCode::TimeCode (const char* Value, size_t Length)
-:   Hours((int8u)-1),
-    Minutes((int8u)-1),
-    Seconds((int8u)-1),
-    Frames((int8u)-1),
-    MoreSamples(0),
-    MoreSamples_Frequency(0),
-    FramesPerSecond_Is1001(false),
-    FramesPerSecond(0),
-    DropFrame(false),
-    MustUseSecondField(false),
-    IsSecondField(false),
-    IsNegative(false)
+:   FramesMax(0)
 {
     FromString(Value, Length);
 }
@@ -155,21 +125,22 @@ void TimeCode::PlusOne()
 {
     //TODO: negative values
 
-    if (FramesPerSecond==0)
+    if (Flags.test(HasNoFramesInfo))
         return;
-    if (MustUseSecondField)
+
+    if (Flags.test(MustUseSecondField))
     {
-        if (IsSecondField)
+        if (Flags.test(IsSecondField))
         {
             Frames++;
-            IsSecondField=false;
+            Flags.reset(IsSecondField);
         }
         else
-            IsSecondField=true;
+            Flags.set(IsSecondField);
     }
     else
         Frames++;
-    if (Frames>=FramesPerSecond)
+    if (Frames>FramesMax || !Frames)
     {
         Seconds++;
         Frames=0;
@@ -178,8 +149,8 @@ void TimeCode::PlusOne()
             Seconds=0;
             Minutes++;
 
-            if (DropFrame && Minutes%10)
-                Frames=2; //frames 0 and 1 are dropped for every minutes except 00 10 20 30 40 50
+            if (Flags.test(DropFrame) && Minutes%10)
+                Frames=(1+FramesMax/30)*2; //frames 0 and 1 (at 30 fps) are dropped for every minutes except 00 10 20 30 40 50
 
             if (Minutes>=60)
             {
@@ -199,36 +170,45 @@ void TimeCode::MinusOne()
 {
     //TODO: negative values
 
-    if (FramesPerSecond==0)
+    if (Flags.test(HasNoFramesInfo))
         return;
-    if (MustUseSecondField && IsSecondField)
-        IsSecondField=false;
-    else
+
+    if (Flags.test(MustUseSecondField) && Flags.test(IsSecondField))
     {
-        if (Frames==0 || (DropFrame && Minutes%10 && Frames<=2))
-        {
-            Frames=FramesPerSecond;
-            if (Seconds==0)
-            {
-                Seconds=60;
-                if (Minutes==0)
-                {
-                    Minutes=60;
-                    if (Hours==0)
-                        Hours=24;
-                    Hours--;
-                }
-                Minutes--;
-            }
-            Seconds--;
-        }
-        Frames--;
-
-        if (MustUseSecondField)
-            IsSecondField=true;
+        Flags.reset(IsSecondField);
+        return;
     }
-}
 
+    bool d=Flags.test(DropFrame);
+    if (!FramesMax && (!Frames || d))
+        return;
+    if (Flags.test(MustUseSecondField))
+        Flags.set(IsSecondField);
+
+    if (Frames && !(d && Minutes%10 && Frames<(1+FramesMax/30)*2))
+    {
+        Frames--;
+        return;
+    }
+
+    Frames=FramesMax;
+    if (!Seconds)
+    {
+        Seconds=59;
+        if (!Minutes)
+        {
+            Minutes=59;
+            if (!Hours)
+                Hours=24;
+            else
+                Hours--;
+        }
+        else
+            Minutes--;
+    }
+    else
+        Seconds--;
+}
 
 //---------------------------------------------------------------------------
 static const int32s PowersOf10[]=
@@ -248,9 +228,6 @@ static const int PowersOf10_Size=sizeof(PowersOf10)/sizeof(int32s);
 //---------------------------------------------------------------------------
 bool TimeCode::FromString(const char* Value, size_t Length)
 {
-    IsSecondField=false;
-    IsNegative=false;
-
     //hh:mm:ss;ff or hh:mm:ss.zzzzzzzzzSfffffffff formats
     if (Length>7
      && Value[0]>='0' && Value[0]<='9'
@@ -285,7 +262,7 @@ bool TimeCode::FromString(const char* Value, size_t Length)
                     i++;
                 }
                 if (i==Length)
-                    MoreSamples_Frequency=PowersOf10[i-10];
+                    FramesMax=PowersOf10[i-10]-1;
                 else
                 {
                     c=(unsigned char)Value[i];
@@ -294,7 +271,7 @@ bool TimeCode::FromString(const char* Value, size_t Length)
                     i++;
                     TheoriticalMax=i+PowersOf10_Size;
                     MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
-                    int32s Multiplier=0;
+                    int32u Multiplier=0;
                     while (i<Length)
                     {
                         c=(unsigned char)Value[i];
@@ -311,11 +288,16 @@ bool TimeCode::FromString(const char* Value, size_t Length)
                     }
                     if (i<Length)
                         return true;
-                    MoreSamples_Frequency=Multiplier;
+                    FramesMax=Multiplier-1;
                 }
-                Frames=(int8u)-1;
-                MoreSamples=S;
-                DropFrame=false;
+                Frames=S;
+                Flags.reset(DropFrame);
+                Flags.reset(FramesPerSecond_Is1001);
+                Flags.reset(MustUseSecondField);
+                Flags.reset(IsSecondField);
+                Flags.reset(IsNegative);
+                Flags.reset(HasNoFramesInfo);
+                Flags.set(IsTime);
             }
             //hh:mm:ss;ff format
             else if (Length==11
@@ -323,56 +305,204 @@ bool TimeCode::FromString(const char* Value, size_t Length)
              && Value[9]>='0' && Value[9]<='9'
              && Value[10]>='0' && Value[10]<='9')
             {
-                DropFrame=Value[8]==';';
                 Frames=((Value[9]-'0')*10)+(Value[10]-'0');
-                MoreSamples=0;
+                Flags.set(DropFrame, Value[8]==';');
+                if (Value[8])
+                    Flags.set(FramesPerSecond_Is1001);
+                Flags.reset(IsSecondField);
+                Flags.reset(IsNegative);
+                Flags.reset(HasNoFramesInfo);
+                Flags.reset(IsTime);
             }
             else
+            {
+                *this=TimeCode();
                 return true;
+            }
         }
         else
         {
-            MoreSamples=0;
+            Frames=0;
+            FramesMax=0;
+            Flags.reset(IsSecondField);
+            Flags.reset(IsNegative);
+            Flags.set(HasNoFramesInfo);
+            Flags.reset(IsTime);
         }
         Hours=((Value[0]-'0')*10)+(Value[1]-'0');
         Minutes=((Value[3]-'0')*10)+(Value[4]-'0');
         Seconds=((Value[6]-'0')*10)+(Value[7]-'0');
+        Flags.set(IsValid);
         return false;
     }
-    //X.Xs format
-    if (Length>=2
-     && Value[Length-1]=='s')
+
+    //Get unit
+    if (!Length)
     {
-        Length--; //Remove the "s" from the string
-        unsigned char c;
-        int i=0;
-        int32s S=0;
-        int TheoriticalMax=i+PowersOf10_Size;
-        int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
-        while (i<MaxLength)
-        {
+        *this=TimeCode();
+        return true;
+    }
+    char Unit=Value[Length-1];
+    Length--; //Remove the unit from the string
+
+    switch (Unit)
+    {
+        //X.X format based on time
+        case 's':
+        case 'm':
+        case 'h':
+            {
+            if (Unit=='s' && Length && Value[Length-1]=='m')
+            {
+                Length--; //Remove the unit from the string
+                Unit='n'; //Magic value for ms
+            }
+            unsigned char c;
+            int i=0;
+            int32s S=0;
+            int TheoriticalMax=i+PowersOf10_Size;
+            int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+            while (i<MaxLength)
+            {
+                c=(unsigned char)Value[i];
+                c-='0';
+                if (c>9)
+                    break;
+                S*=10;
+                S+=c;
+                i++;
+            }
+            switch (Unit)
+            {
+                case 'n':
+                    Hours=S/3600000;
+                    Minutes=(S%3600000)/60000;
+                    Seconds=(S%60000)/1000;
+                    S%=1000;
+                    break;
+                case 's':
+                    Hours=S/3600;
+                    Minutes=(S%3600)/60;
+                    Seconds=S%60;
+                    break;
+                case 'm':
+                    Hours=S/60;
+                    Minutes=S%60;
+                    break;
+                case 'h':
+                    Hours=S;
+                    break;
+            }
+            Flags.reset();
+            Flags.set(IsTime);
+            Flags.set(IsValid);
             c=(unsigned char)Value[i];
-            c-='0';
-            if (c>9)
-                break;
-            S*=10;
-            S+=c;
-            i++;
-        }
-        Hours=S/3600;
-        Minutes=(S%3600)/60;
-        Seconds=S%60;
-        Frames=(int8u)-1;
-        c=(unsigned char)Value[i];
-        if (c=='.' || c==',')
-        {
-            i++;
-            if (i==Length)
-                return true;
-            size_t i_Start=i;
-            S=0;
-            TheoriticalMax=i+PowersOf10_Size;
-            MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+            if (c=='.' || c==',')
+            {
+                i++;
+                if (i==Length)
+                    return true;
+                size_t i_Start=i;
+                int64u T=0;
+                TheoriticalMax=i+PowersOf10_Size;
+                MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
+                while (i<MaxLength)
+                {
+                    c=(unsigned char)Value[i];
+                    c-='0';
+                    if (c>9)
+                        break;
+                    T*=10;
+                    T+=c;
+                    i++;
+                }
+                if (i!=Length)
+                    return true;
+                int FramesRate_Index=i-1-i_Start;
+                int64u FramesRate=PowersOf10[FramesRate_Index];
+                FramesMax=(int32u)(FramesRate-1);
+                switch (Unit)
+                {
+                    case 'h':
+                    {
+                        T*=3600;
+                        int64u T_Divider=PowersOf10[2];
+                        T=(T+T_Divider/2)/T_Divider;
+                        FramesRate/=T_Divider;
+                        int64u Temp2=T/FramesRate;
+                        Minutes=Temp2/60;
+                        if (Minutes>=60)
+                        {
+                            Minutes=0;
+                            Hours++;
+                        }
+                        Seconds=Temp2%60;
+                        T%=FramesRate;
+                        FramesMax=FramesRate-1;
+                        break;
+                    }
+                    case 'm':
+                    {
+                        T*=60;
+                        int64u T_Divider=PowersOf10[0];
+                        T=(T+T_Divider/2)/T_Divider;
+                        FramesRate/=T_Divider;
+                        Seconds=T/FramesRate;
+                        if (Seconds>=60)
+                        {
+                            Seconds=0;
+                            Minutes++;
+                            if (Minutes>=60)
+                            {
+                                Hours++;
+                                Minutes=0;
+                            }
+                        }
+                        T%=FramesRate;
+                        FramesMax=FramesRate-1;
+                        break;
+                    }
+                    case 'n':
+                    {
+                        FramesRate*=1000;
+                        T+=((int64u)S)*FramesRate;
+                        int64u T_Divider=PowersOf10[1];
+                        if (FramesRate_Index>5)
+                        {
+                            int64u T_Divider=PowersOf10[8-FramesRate_Index];
+                            T=(T+T_Divider/2)/T_Divider;
+                            FramesRate=PowersOf10[8];
+                        }
+                        FramesMax=(int32u)(FramesRate-1);
+                        break;
+                    }
+                }
+                Frames=T;
+            }
+            else if (Unit=='n')
+            {
+                Frames=S;
+                FramesMax=1000;
+            }
+            else
+            {
+                Frames=0;
+                FramesMax=0;
+            }
+            Flags.set(IsValid);
+            return false;
+            }
+            break;
+
+        //X format based on rate
+        case 'f':
+        case 't':
+            {
+            unsigned char c;
+            int i=0;
+            int32s S=0;
+            int TheoriticalMax=i+PowersOf10_Size;
+            int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
             while (i<MaxLength)
             {
                 c=(unsigned char)Value[i];
@@ -385,137 +515,105 @@ bool TimeCode::FromString(const char* Value, size_t Length)
             }
             if (i!=Length)
                 return true;
-            MoreSamples_Frequency=PowersOf10[i-1-i_Start];
-            MoreSamples=S;
-        }
-        else
-        {
-            MoreSamples=0;
-            MoreSamples_Frequency=1; // Indicates that it comes from a timestamp
-        }
-        return false;
-    }
-    //X.Xf format
-    if (Length>=2
-     && Value[Length-1]=='f')
-    {
-        Length--; //Remove the "f" from the string
-        unsigned char c;
-        int i=0;
-        int32s S=0;
-        int TheoriticalMax=i+PowersOf10_Size;
-        int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
-        while (i<MaxLength)
-        {
-            c=(unsigned char)Value[i];
-            c-='0';
-            if (c>9)
-                break;
-            S*=10;
-            S+=c;
-            i++;
-        }
-        if (i!=Length)
-            return true;
-        if (!FramesPerSecond)
-            FramesPerSecond=1; // Arbitrary choosen
-        int32s OneHourInFrames=3600*FramesPerSecond;
-        int32s OneMinuteInFrames=60*FramesPerSecond;
-        Hours=S/OneHourInFrames;
-        Minutes=(S%OneHourInFrames)/OneMinuteInFrames;
-        Seconds=(S%OneMinuteInFrames)/FramesPerSecond;
-        Frames=S%FramesPerSecond;
-        MoreSamples=0;
-        return false;
-    }
-    //Xt format
-    if (Length>=2
-     && Value[Length-1]=='t')
-    {
-        Length--; //Remove the "t" from the string
-        unsigned char c;
-        int i=0;
-        int64s S=0;
-        int TheoriticalMax=i+PowersOf10_Size;
-        int MaxLength=Length>TheoriticalMax?TheoriticalMax:Length;
-        while (i<MaxLength)
-        {
-            c=(unsigned char)Value[i];
-            c-='0';
-            if (c>9)
-                break;
-            S*=10;
-            S+=c;
-            i++;
-        }
-        if (i!=Length)
-            return true;
-        if (!MoreSamples_Frequency)
-            MoreSamples_Frequency=1; // Arbitrary choosen
-        int64s OneHourInFrequency=3600*MoreSamples_Frequency;
-        int64s OneMinuteInFrequency=60*MoreSamples_Frequency;
-        Hours=S/OneHourInFrequency;
-        Minutes=(S%OneHourInFrequency)/OneMinuteInFrequency;
-        Seconds=(S%OneMinuteInFrequency)/MoreSamples_Frequency;
-        Frames=0; // (int8u)-1;
-        MoreSamples=S%MoreSamples_Frequency;
-        return false;
+            int32u FrameRate=(int32u)FramesMax+1;
+            int32s OneHourInFrames=3600*FrameRate;
+            int32s OneMinuteInFrames=60*FrameRate;
+            Hours=S/OneHourInFrames;
+            Minutes=(S%OneHourInFrames)/OneMinuteInFrames;
+            Seconds=(S%OneMinuteInFrames)/FrameRate;
+            Frames=S%FrameRate;
+            Flags.reset(MustUseSecondField);
+            Flags.reset(IsSecondField);
+            Flags.reset(IsNegative);
+            Flags.reset(HasNoFramesInfo);
+            Flags.set(IsTime, Unit=='t');
+            Flags.set(IsValid);
+            return false;
+            }
+            break;
     }
 
+    *this=TimeCode();
     return true;
 }
 
 //---------------------------------------------------------------------------
 string TimeCode::ToString() const
 {
+    if (!HasValue())
+        return string();
     string TC;
-    if (IsNegative)
+    if (Flags.test(IsNegative))
         TC+='-';
-    TC+=('0'+Hours/10);
-    TC+=('0'+Hours%10);
-    TC+=':';
-    TC+=('0'+Minutes/10);
-    TC+=('0'+Minutes%10);
-    TC+=':';
-    TC+=('0'+Seconds/10);
-    TC+=('0'+Seconds%10);
-    if (Frames!=(int8u)-1)
+    int8u HH=Hours;
+    if (HH>100)
     {
-        TC+=DropFrame?';':':';
-        TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))/10);
-        TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))%10);
+        TC+=to_string(HH/100);
+        HH%=100;
     }
-    if (MoreSamples_Frequency)
+    TC+=('0'+HH/10);
+    TC+=('0'+HH%10);
+    TC+=':';
+    int8u MM=Minutes;
+    if (MM>100)
+    {
+        TC+=('0'+MM/100);
+        MM%=100;
+    }
+    TC+=('0'+MM/10);
+    TC+=('0'+MM%10);
+    TC+=':';
+    int8u SS=Seconds;
+    if (SS>100)
+    {
+        TC+=('0'+SS/100);
+        SS%=100;
+    }
+    TC+=('0'+SS/10);
+    TC+=('0'+SS%10);
+    bool d=Flags.test(DropFrame);
+    bool t=Flags.test(IsTime);
+    if (!t && d)
+        TC+=';';
+    if (t)
     {
         int AfterCommaMinus1;
-        int32s MoreSamples_Temp;
-        if (MoreSamples<0)
-        {
-            AfterCommaMinus1=-1;
-            TC+='-';
-            MoreSamples_Temp=-MoreSamples;
-        }
-        else
-        {
-            AfterCommaMinus1=PowersOf10_Size;
-            while ((--AfterCommaMinus1)>=0 && PowersOf10[AfterCommaMinus1]!=MoreSamples_Frequency);
-            TC+=(Frames!=(int8u)-1 || AfterCommaMinus1<0)?'+':'.';
-            MoreSamples_Temp=MoreSamples;
-        }
-        if ((Frames!=(int8u)-1 || AfterCommaMinus1<0))
+        AfterCommaMinus1=PowersOf10_Size;
+        auto FrameRate=FramesMax+1;
+        while ((--AfterCommaMinus1)>=0 && PowersOf10[AfterCommaMinus1]!=FrameRate);
+        TC+='.';
+        if (AfterCommaMinus1<0)
         {
             stringstream s;
-            s<<MoreSamples_Temp;
+            s<<Frames;
             TC+=s.str();
             TC+='S';
             s.str(string());
-            s<<MoreSamples_Frequency;
+            s<<FrameRate;
             TC+=s.str();
         }
         else
         {
             for (int i=0; i<=AfterCommaMinus1;i++)
-                TC+='0'+(MoreSamples_Temp/(i==AfterCommaMinus1?1:PowersOf10[AfterCommaMinus1-i-1])%10);
+                TC+='0'+(Frames/(i==AfterCommaMinus1?1:PowersOf10[AfterCommaMinus1-i-1])%10);
+        }
+    }
+    else if (!Flags.test(HasNoFramesInfo))
+    {
+        if (!d)
+            TC+=':';
+        auto FF=Frames;
+        if (FF>=100)
+        {
+            TC+=to_string(FF/100);
+            FF%=100;
+        }
+        TC+=('0'+(FF/10));
+        TC+=('0'+(FF%10));
+        if (Flags.test(MustUseSecondField) || Flags.test(IsSecondField))
+        {
+            TC+='.';
+            TC+=('0'+Flags.test(IsSecondField));
         }
     }
 
@@ -525,71 +623,46 @@ string TimeCode::ToString() const
 //---------------------------------------------------------------------------
 int64s TimeCode::ToFrames() const
 {
-    if (!FramesPerSecond)
+    if (!HasValue())
         return 0;
 
     int64s TC=(int64s(Hours)     *3600
              + int64s(Minutes)   *  60
-             + int64s(Seconds)        )*int64s(FramesPerSecond)
-             + int64s(Frames);
+             + int64s(Seconds)        )*(FramesMax+1);
 
-    if (DropFrame)
+    if (Flags.test(DropFrame) && FramesMax)
     {
-        int Dropped=0;
-        int FramesPerSecond2=FramesPerSecond-1;
-        for (;;)
-        {
-            Dropped++;
-            FramesPerSecond2-=30;
-            if (FramesPerSecond2<0)
-                break;
-        }
+        int64u Dropped=FramesMax/30+1;
 
         TC-= int64s(Hours)      *108*Dropped
           + (int64s(Minutes)/10)*18*Dropped
           + (int64s(Minutes)%10)* 2*Dropped;
     }
 
-    TC*=(MustUseSecondField?2:1);
-    TC+=(IsSecondField?1:0);
+    if (!Flags.test(HasNoFramesInfo) && FramesMax)
+        TC+=Frames;
+    if (Flags.test(MustUseSecondField))
+        TC<<=1;
+    if (Flags.test(IsSecondField))
+        TC++;
+    if (Flags.test(IsNegative))
+        TC=-TC;
 
-    return IsNegative?-TC:TC;
+    return TC;
 }
 
 //---------------------------------------------------------------------------
 int64s TimeCode::ToMilliseconds() const
 {
-    if (!FramesPerSecond || Frames==(int8u)-1)
-    {
-        int64s TC=(int64s(Hours)     *3600
-                 + int64s(Minutes)   *  60
-                 + int64s(Seconds)        )*1000;
-        if (Frames!=(int8u)-1)
-        {
-            if (MoreSamples_Frequency)
-            {
-                int32s MoreSamples_Frequency_Duplicate=MoreSamples_Frequency;
-                if (!(MoreSamples_Frequency_Duplicate%1000))
-                    MoreSamples_Frequency_Duplicate/=1000;
-                if (MoreSamples_Frequency_Duplicate<=0xFF)
-                {
-                    TimeCode Duplicate(*this);
-                    Duplicate.FramesPerSecond=(int8u)MoreSamples_Frequency_Duplicate;
-                    return Duplicate.ToMilliseconds();
-                }
-            }
-            TC+=(((int64u)Frames)*1000+0xFF/2)/0xFF;
-        }
-        if (MoreSamples_Frequency)
-            TC+=(((int64s)MoreSamples)*1000+MoreSamples_Frequency/2)/MoreSamples_Frequency;
-        return TC;
-    }
+    if (!HasValue())
+        return 0;
 
-    int64s MS=float64_int64s(ToFrames()*1000*((DropFrame || FramesPerSecond_Is1001)?1.001:1.000)/(FramesPerSecond*(MustUseSecondField?2:1)));
-    if (MoreSamples_Frequency)
-        MS+=(((int64s)MoreSamples)*1000+MoreSamples_Frequency/2)/MoreSamples_Frequency;
+    int64s MS=float64_int64s(ToFrames()*1000*(FramesMax && (Flags.test(DropFrame) || Flags.test(FramesPerSecond_Is1001))?1.001:1.000)/((((int64u)FramesMax)+1)*(Flags.test(MustUseSecondField)?2:1)));
 
-    return IsNegative?-MS:MS;
+    if (Flags.test(IsNegative))
+        MS=-MS;
+
+    return MS;
 }
 
 //***************************************************************************

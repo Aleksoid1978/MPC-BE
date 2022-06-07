@@ -27,6 +27,7 @@ public :
     int8u   NumberOfFrames;
     bool    DropFrame;
     bool    NegativeTimes;
+    int64u  FrameMultiplier;
     int64s  FirstEditOffset;
     int64u  FirstEditDuration;
     int64u  tkhd_Duration;

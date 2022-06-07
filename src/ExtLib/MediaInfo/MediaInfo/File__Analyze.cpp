@@ -2086,7 +2086,7 @@ bool File__Analyze::Synchro_Manage_Test()
         {
             if (Status[IsFinished])
                 Finish(); //Finish
-            if (!IsSub && File_Offset_FirstSynched==(int64u)-1 && Buffer_TotalBytes+Buffer_Offset>=Buffer_TotalBytes_FirstSynched_Max)
+            if (!IsSub && File_Offset_FirstSynched==(int64u)-1 && Buffer_TotalBytes+Buffer_Offset>=Buffer_TotalBytes_LastSynched+Buffer_TotalBytes_FirstSynched_Max)
                 Reject();
             return false; //Wait for more data
         }
@@ -3699,9 +3699,6 @@ void File__Analyze::Event_Prepare(struct MediaInfo_Event_Generic* Event, int32u 
 void File__Analyze::Demux (const int8u* Buffer, size_t Buffer_Size, contenttype Content_Type, const int8u* xx, size_t xxx)
 {
     if (!(Config_Demux&Demux_Level))
-        return;
-
-    if (!Buffer_Size)
         return;
 
     #if MEDIAINFO_DEMUX && MEDIAINFO_SEEK

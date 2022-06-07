@@ -43,6 +43,7 @@ File_Mpeg4_TimeCode::File_Mpeg4_TimeCode()
     FirstEditOffset=0;
     FirstEditDuration=(int64u)-1;
     NumberOfFrames=0;
+    FrameMultiplier=1;
     DropFrame=false;
     NegativeTimes=false;
     tkhd_Duration=0;
@@ -75,7 +76,14 @@ void File_Mpeg4_TimeCode::Streams_Fill()
 
         Fill(Stream_General, 0, "Delay", Pos_Temp*1000/FrameRate_WithDF, 0);
 
-        TimeCode TC(Pos_Temp, NumberOfFrames, DropFrame);
+        TimeCode TC(Pos_Temp, NumberOfFrames-1, DropFrame);
+        if (FrameMultiplier>1)
+        {
+            int64s Frames=TC.GetFrames();
+            TC-=TC.GetFrames();
+            TC=TimeCode(TC.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+            TC+=Frames*FrameMultiplier;
+        }
         Stream_Prepare(Stream_Other);
         Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
         Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, TC.ToString().c_str());
@@ -97,7 +105,7 @@ void File_Mpeg4_TimeCode::Streams_Fill()
             }
             else
             {
-                float64 FrameCountF=(float64)tkhd_Duration/mvhd_Duration_TimeScale*FrameRate_WithDF;
+                float64 FrameCountF=(float64)tkhd_Duration/mvhd_Duration_TimeScale*FrameRate_WithDF*FrameMultiplier;
                 FrameCount=(int64u)FrameCountF;
                 if (FrameCount!=FrameCountF && FrameCount*1000!=float64_int64s(FrameCountF*1000000/1001)) // TODO: better catch of 1/1.001
                     FrameCount++;

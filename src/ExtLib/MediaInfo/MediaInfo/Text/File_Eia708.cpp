@@ -110,6 +110,8 @@ void File_Eia708::Streams_Fill()
                 if (ServiceDescriptor!=ServiceDescriptors->ServiceDescriptors708.end())
                 {
                     Fill(Stream_Text, StreamPos_Last, Text_Language, ServiceDescriptor->second.language, true);
+                    if (ServiceDescriptor->second.wide_aspect_ratio[0])
+                        Fill(Stream_Text, StreamPos_Last, Text_DisplayAspectRatio, ServiceDescriptor->second.wide_aspect_ratio[1]?(16.0/9.0):(4.0/3.0), 3, true);
                     Fill(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "Yes", Unlimited, true, true);
                     Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "N NT");
                 }
