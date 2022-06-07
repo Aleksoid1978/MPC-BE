@@ -781,6 +781,43 @@ cmsUInt32Number CMSEXPORT _cmsGetTransformFlags(struct _cmstransform_struct* CMM
     return CMMcargo->dwOriginalFlags;
 }
 
+// Returns the worker callback for parallelization plug-ins
+_cmsTransform2Fn CMSEXPORT _cmsGetTransformWorker(struct _cmstransform_struct* CMMcargo)
+{
+    _cmsAssert(CMMcargo != NULL);
+    return CMMcargo->Worker;
+}
+
+// This field holds maximum number of workers or -1 to auto 
+cmsInt32Number CMSEXPORT _cmsGetTransformMaxWorkers(struct _cmstransform_struct* CMMcargo)
+{
+    _cmsAssert(CMMcargo != NULL);
+    return CMMcargo->MaxWorkers;
+}
+
+// This field is actually unused and reserved
+cmsUInt32Number CMSEXPORT _cmsGetTransformWorkerFlags(struct _cmstransform_struct* CMMcargo)
+{
+    _cmsAssert(CMMcargo != NULL);
+    return CMMcargo->WorkerFlags;
+}
+
+// In the case there is a parallelization plug-in, let it to do its job
+static
+void ParalellizeIfSuitable(_cmsTRANSFORM* p)
+{
+    _cmsParallelizationPluginChunkType* ctx = (_cmsParallelizationPluginChunkType*)_cmsContextGetClientChunk(p->ContextID, ParallelizationPlugin);
+
+    _cmsAssert(p != NULL);
+    if (ctx != NULL && ctx->SchedulerFn != NULL) {
+
+        p->Worker = p->xform;
+        p->xform = ctx->SchedulerFn;
+        p->MaxWorkers = ctx->MaxWorkers;
+        p->WorkerFlags = ctx->WorkerFlags;
+    }
+}
+
 // Allocate transform struct and set it to defaults. Ask the optimization plug-in about if those formats are proper
 // for separated transforms. If this is the case,
 static
@@ -836,6 +873,7 @@ _cmsTRANSFORM* AllocEmptyTransform(cmsContext ContextID, cmsPipeline* lut,
                            p->xform = _cmsTransform2toTransformAdaptor;
                        }
 
+                       ParalellizeIfSuitable(p);
                        return p;
                    }
                }
@@ -924,6 +962,7 @@ _cmsTRANSFORM* AllocEmptyTransform(cmsContext ContextID, cmsPipeline* lut,
     p ->dwOriginalFlags = *dwFlags;
     p ->ContextID       = ContextID;
     p ->UserData        = NULL;
+    ParalellizeIfSuitable(p);
     return p;
 }
 

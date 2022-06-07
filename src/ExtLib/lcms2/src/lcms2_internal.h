@@ -283,38 +283,38 @@ typedef CRITICAL_SECTION _cmsMutex;
 
 cmsINLINE int _cmsLockPrimitive(_cmsMutex *m)
 {
-	EnterCriticalSection(m);
-	return 0;
+    EnterCriticalSection(m);
+    return 0;
 }
 
 cmsINLINE int _cmsUnlockPrimitive(_cmsMutex *m)
 {
-	LeaveCriticalSection(m);
-	return 0;
+    LeaveCriticalSection(m);
+    return 0;
 }
-	
+    
 cmsINLINE int _cmsInitMutexPrimitive(_cmsMutex *m)
 {
-	InitializeCriticalSection(m);
-	return 0;
+    InitializeCriticalSection(m);
+    return 0;
 }
 
 cmsINLINE int _cmsDestroyMutexPrimitive(_cmsMutex *m)
 {
-	DeleteCriticalSection(m);
-	return 0;
+    DeleteCriticalSection(m);
+    return 0;
 }
 
 cmsINLINE int _cmsEnterCriticalSectionPrimitive(_cmsMutex *m)
 {
-	EnterCriticalSection(m);
-	return 0;
+    EnterCriticalSection(m);
+    return 0;
 }
 
 cmsINLINE int _cmsLeaveCriticalSectionPrimitive(_cmsMutex *m)
 {
-	LeaveCriticalSection(m);
-	return 0;
+    LeaveCriticalSection(m);
+    return 0;
 }
 
 #else
@@ -328,32 +328,32 @@ typedef pthread_mutex_t _cmsMutex;
 
 cmsINLINE int _cmsLockPrimitive(_cmsMutex *m)
 {
-	return pthread_mutex_lock(m);
+    return pthread_mutex_lock(m);
 }
 
 cmsINLINE int _cmsUnlockPrimitive(_cmsMutex *m)
 {
-	return pthread_mutex_unlock(m);
+    return pthread_mutex_unlock(m);
 }
-	
+    
 cmsINLINE int _cmsInitMutexPrimitive(_cmsMutex *m)
 {
-	return pthread_mutex_init(m, NULL);
+    return pthread_mutex_init(m, NULL);
 }
 
 cmsINLINE int _cmsDestroyMutexPrimitive(_cmsMutex *m)
 {
-	return pthread_mutex_destroy(m);
+    return pthread_mutex_destroy(m);
 }
 
 cmsINLINE int _cmsEnterCriticalSectionPrimitive(_cmsMutex *m)
 {
-	return pthread_mutex_lock(m);
+    return pthread_mutex_lock(m);
 }
 
 cmsINLINE int _cmsLeaveCriticalSectionPrimitive(_cmsMutex *m)
 {
-	return pthread_mutex_unlock(m);
+    return pthread_mutex_unlock(m);
 }
 
 #endif
@@ -366,37 +366,37 @@ typedef int _cmsMutex;
 cmsINLINE int _cmsLockPrimitive(_cmsMutex *m)
 {
     cmsUNUSED_PARAMETER(m);
-	return 0;
+    return 0;
 }
 
 cmsINLINE int _cmsUnlockPrimitive(_cmsMutex *m)
 {
     cmsUNUSED_PARAMETER(m);
-	return 0;
+    return 0;
 }
-	
+    
 cmsINLINE int _cmsInitMutexPrimitive(_cmsMutex *m)
 {
     cmsUNUSED_PARAMETER(m);
-	return 0;
+    return 0;
 }
 
 cmsINLINE int _cmsDestroyMutexPrimitive(_cmsMutex *m)
 {
     cmsUNUSED_PARAMETER(m);
-	return 0;
+    return 0;
 }
 
 cmsINLINE int _cmsEnterCriticalSectionPrimitive(_cmsMutex *m)
 {
     cmsUNUSED_PARAMETER(m);
-	return 0;
+    return 0;
 }
 
 cmsINLINE int _cmsLeaveCriticalSectionPrimitive(_cmsMutex *m)
 {
     cmsUNUSED_PARAMETER(m);
-	return 0;
+    return 0;
 }
 #endif
 
@@ -437,6 +437,9 @@ cmsBool  _cmsRegisterTransformPlugin(cmsContext ContextID, cmsPluginBase* Plugin
 
 // Mutex
 cmsBool _cmsRegisterMutexPlugin(cmsContext ContextID, cmsPluginBase* Plugin);
+
+// Paralellization
+cmsBool _cmsRegisterParallelizationPlugin(cmsContext ContextID, cmsPluginBase* Plugin);
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -485,6 +488,7 @@ typedef enum {
     OptimizationPlugin,
     TransformPlugin,
     MutexPlugin,
+    ParallelizationPlugin,
 
     // Last in list
     MemoryClientMax
@@ -719,6 +723,24 @@ extern  _cmsMutexPluginChunkType _cmsMutexPluginChunk;
 // Allocate and init mutex container.
 void _cmsAllocMutexPluginChunk(struct _cmsContext_struct* ctx, 
                                         const struct _cmsContext_struct* src);
+
+// Container for parallelization plug-in
+typedef struct {
+
+    cmsInt32Number      MaxWorkers;       // Number of workers to do as maximum
+    cmsInt32Number      WorkerFlags;      // reserved
+    _cmsTransform2Fn    SchedulerFn;      // callback to setup functions 
+    
+} _cmsParallelizationPluginChunkType;
+
+// The global Context0 storage for parallelization plug-in
+extern  _cmsParallelizationPluginChunkType _cmsParallelizationPluginChunk;
+
+// Allocate parallelization container.
+void _cmsAllocParallelizationPluginChunk(struct _cmsContext_struct* ctx,
+                                         const struct _cmsContext_struct* src);
+
+
 
 // ----------------------------------------------------------------------------------
 // MLU internal representation
@@ -1080,6 +1102,11 @@ typedef struct _cmstransform_struct {
 
     // A way to provide backwards compatibility with full xform plugins
     _cmsTransformFn OldXform;
+
+    // A one-worker transform entry for parallelization 
+    _cmsTransform2Fn Worker;
+    cmsInt32Number   MaxWorkers;
+    cmsUInt32Number  WorkerFlags;
 
 } _cmsTRANSFORM;
 

@@ -374,18 +374,52 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromFile(cmsContext ContextID, const cha
 {
     cmsIOHANDLER* iohandler = NULL;
     FILE* fm = NULL;
-    cmsInt32Number fileLen;
+    cmsInt32Number fileLen;    
+    char mode[4] = { 0,0,0,0 };
 
     _cmsAssert(FileName != NULL);
     _cmsAssert(AccessMode != NULL);
 
     iohandler = (cmsIOHANDLER*) _cmsMallocZero(ContextID, sizeof(cmsIOHANDLER));
     if (iohandler == NULL) return NULL;
+           
+    // Validate access mode
+    while (*AccessMode) {
 
-    switch (*AccessMode) {
+        switch (*AccessMode)
+        {        
+        case 'r':
+        case 'w':
+
+            if (mode[0] == 0) {
+                mode[0] = *AccessMode;
+                mode[1] = 'b';                
+            }
+            else {
+                _cmsFree(ContextID, iohandler);
+                cmsSignalError(ContextID, cmsERROR_FILE, "Access mode already specified '%c'", *AccessMode);
+                return NULL;
+            }
+            break;
+
+        // Close on exec. Not all runtime supports that. Up to the caller to decide.
+        case 'e':
+            mode[2] = 'e';
+            break;
+
+        default:
+            _cmsFree(ContextID, iohandler);
+            cmsSignalError(ContextID, cmsERROR_FILE, "Wrong access mode '%c'", *AccessMode);
+            return NULL;
+        }
+
+        AccessMode++;
+    }
+        
+    switch (mode[0]) {
 
     case 'r':
-        fm = fopen(FileName, "rb");
+        fm = fopen(FileName, mode);
         if (fm == NULL) {
             _cmsFree(ContextID, iohandler);
              cmsSignalError(ContextID, cmsERROR_FILE, "File '%s' not found", FileName);
@@ -399,12 +433,11 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromFile(cmsContext ContextID, const cha
             cmsSignalError(ContextID, cmsERROR_FILE, "Cannot get size of file '%s'", FileName);
             return NULL;
         }
-
         iohandler -> ReportedSize = (cmsUInt32Number) fileLen;
         break;
 
     case 'w':
-        fm = fopen(FileName, "wb");
+        fm = fopen(FileName, mode);
         if (fm == NULL) {
             _cmsFree(ContextID, iohandler);
              cmsSignalError(ContextID, cmsERROR_FILE, "Couldn't create '%s'", FileName);
@@ -414,8 +447,7 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromFile(cmsContext ContextID, const cha
         break;
 
     default:
-        _cmsFree(ContextID, iohandler);
-         cmsSignalError(ContextID, cmsERROR_FILE, "Unknown access mode '%c'", *AccessMode);
+        _cmsFree(ContextID, iohandler);   // Would never reach      
         return NULL;
     }
 

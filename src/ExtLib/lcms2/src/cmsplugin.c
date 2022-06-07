@@ -621,6 +621,10 @@ cmsBool CMSEXPORT cmsPluginTHR(cmsContext id, void* Plug_in)
                     if (!_cmsRegisterMutexPlugin(id, Plugin)) return FALSE;
                     break;
 
+                case cmsPluginParalellizationSig:
+                    if (!_cmsRegisterParallelizationPlugin(id, Plugin)) return FALSE;
+                    break;
+
                 default:
                     cmsSignalError(id, cmsERROR_UNKNOWN_EXTENSION, "Unrecognized plugin type '%X'", Plugin -> Type);
                     return FALSE;
@@ -643,24 +647,25 @@ void CMSEXPORT cmsUnregisterPlugins(void)
 // pointers structure. All global vars are referenced here.
 static struct _cmsContext_struct globalContext = {
 
-    NULL,                              // Not in the linked list
-    NULL,                              // No suballocator
-    {
-        NULL,                          //  UserPtr,            
-        &_cmsLogErrorChunk,            //  Logger,
-        &_cmsAlarmCodesChunk,          //  AlarmCodes,
-        &_cmsAdaptationStateChunk,     //  AdaptationState, 
-        &_cmsMemPluginChunk,           //  MemPlugin,
-        &_cmsInterpPluginChunk,        //  InterpPlugin,
-        &_cmsCurvesPluginChunk,        //  CurvesPlugin,
-        &_cmsFormattersPluginChunk,    //  FormattersPlugin,
-        &_cmsTagTypePluginChunk,       //  TagTypePlugin,
-        &_cmsTagPluginChunk,           //  TagPlugin,
-        &_cmsIntentsPluginChunk,       //  IntentPlugin,
-        &_cmsMPETypePluginChunk,       //  MPEPlugin,
-        &_cmsOptimizationPluginChunk,  //  OptimizationPlugin,
-        &_cmsTransformPluginChunk,     //  TransformPlugin,
-        &_cmsMutexPluginChunk          //  MutexPlugin
+    NULL,                                // Not in the linked list
+    NULL,                                // No suballocator
+    {                                    
+        NULL,                            //  UserPtr,            
+        &_cmsLogErrorChunk,              //  Logger,
+        &_cmsAlarmCodesChunk,            //  AlarmCodes,
+        &_cmsAdaptationStateChunk,       //  AdaptationState, 
+        &_cmsMemPluginChunk,             //  MemPlugin,
+        &_cmsInterpPluginChunk,          //  InterpPlugin,
+        &_cmsCurvesPluginChunk,          //  CurvesPlugin,
+        &_cmsFormattersPluginChunk,      //  FormattersPlugin,
+        &_cmsTagTypePluginChunk,         //  TagTypePlugin,
+        &_cmsTagPluginChunk,             //  TagPlugin,
+        &_cmsIntentsPluginChunk,         //  IntentPlugin,
+        &_cmsMPETypePluginChunk,         //  MPEPlugin,
+        &_cmsOptimizationPluginChunk,    //  OptimizationPlugin,
+        &_cmsTransformPluginChunk,       //  TransformPlugin,
+        &_cmsMutexPluginChunk,           //  MutexPlugin,
+        &_cmsParallelizationPluginChunk  //  ParallelizationPlugin
     },
     
     { NULL, NULL, NULL, NULL, NULL, NULL } // The default memory allocator is not used for context 0
@@ -798,6 +803,7 @@ void CMSEXPORT cmsUnregisterPluginsTHR(cmsContext ContextID)
     _cmsRegisterOptimizationPlugin(ContextID, NULL);
     _cmsRegisterTransformPlugin(ContextID, NULL);    
     _cmsRegisterMutexPlugin(ContextID, NULL);
+    _cmsRegisterParallelizationPlugin(ContextID, NULL);
 }
 
 
@@ -881,6 +887,7 @@ cmsContext CMSEXPORT cmsCreateContext(void* Plugin, void* UserData)
     _cmsAllocOptimizationPluginChunk(ctx, NULL);
     _cmsAllocTransformPluginChunk(ctx, NULL);
     _cmsAllocMutexPluginChunk(ctx, NULL);
+    _cmsAllocParallelizationPluginChunk(ctx, NULL);
 
     // Setup the plug-ins
     if (!cmsPluginTHR(ctx, Plugin)) {
@@ -944,6 +951,7 @@ cmsContext CMSEXPORT cmsDupContext(cmsContext ContextID, void* NewUserData)
     _cmsAllocOptimizationPluginChunk(ctx, src);
     _cmsAllocTransformPluginChunk(ctx, src);
     _cmsAllocMutexPluginChunk(ctx, src);
+    _cmsAllocParallelizationPluginChunk(ctx, src);
 
     // Make sure no one failed
     for (i=Logger; i < MemoryClientMax; i++) {
