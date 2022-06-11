@@ -199,7 +199,7 @@ STDMETHODIMP CDX11SubPic::CopyTo(ISubPic* pSubPic)
 
 	CRect copyRect(m_rcDirty);
 	copyRect.InflateRect(1, 1);
-	RECT subpicRect = { 0, 0, pDstMemPic->w, pDstMemPic->h };
+	RECT subpicRect = { 0, 0, std::min(pDstMemPic->w, m_MemPic.w), std::min(pDstMemPic->h, m_MemPic.h) };
 	if (!copyRect.IntersectRect(copyRect, &subpicRect)) {
 		return S_FALSE;
 	}
