@@ -13,6 +13,7 @@ Fixed APE Tag reading in some situations.
 MP4Splitter
 Fixed playing files with tracks with negative delay.
 Improved work with PCM audio.
+Fixed opening of some corrupted files.
 
 MatroskaSplitter
 Fixed aspect ratio setting for VFW codecs.
@@ -25,6 +26,7 @@ Fixed "stereodownmix" setting.
 MPCVideoDec
 Fixed D3D11 decoder in some situations.
 Added support for Intel D3D11 hardware acceleration for HEVC 4:2:0 12bit, 4:2:2 10/12bit, 4:4:4 8/10/12bit decoding.
+Fixed support for AV1 hardware decoding in D3D11 Copy-Back and NVDEC modes.
 
 VideoRenderers
 Fixed frame rotating for SyncVR.
@@ -47,6 +49,8 @@ Fixed remembering the starting window size for some situations.
 Moving a window outside the video area now also works for a maximized window.
 Deleting from history also removes entries from the list of recent files in the taskbar.
 Added the ability to open local files with a long path (more than 260 characters).
+Fixed saving position in history when shutting down Windows.
+Improved blocking the computer from going to sleep.
 Miscellaneous fixes.
 
 Updated Turkish translation (by cmhrky).
