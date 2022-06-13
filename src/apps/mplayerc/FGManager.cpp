@@ -2970,6 +2970,8 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 		return E_INVALIDARG;
 	}
 
+	pDVDC->SetOption(DVD_EnablePortableBookmarks, TRUE); // DVD bookmarks can be used on another computer
+
 	pDVDC->SetOption(DVD_ResetOnStop, FALSE);
 	pDVDC->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
 
