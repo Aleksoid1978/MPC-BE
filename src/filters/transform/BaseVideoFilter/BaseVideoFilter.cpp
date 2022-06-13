@@ -291,7 +291,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		m_aryout = m_ary;
 
 		// some renderers don't send this
-		if (m_nDecoderMode != MODE_DXVA2) {
+		if (m_nDecoderMode == MODE_SOFTWARE) {
 			NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(width, height), 0);
 		}
 
