@@ -62,6 +62,7 @@ Updated Ukrainian translation (by arestarh).
 Updated Japanese translation.
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Hungarian translation (by mickey).
+Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	dav1d git-1.0.0;
