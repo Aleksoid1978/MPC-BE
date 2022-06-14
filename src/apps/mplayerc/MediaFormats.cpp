@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -191,7 +191,7 @@ void CMediaFormats::UpdateData(const bool bSave)
 		ADDFMT((L"avisynth",    ResStr(IDS_MFMT_AVISYNTH),    L"avs", TScript));
 		ADDFMT((L"vapoursynth", ResStr(IDS_MFMT_VAPOURSYNTH), L"vpy", TScript));
 		// audio files
-		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3 eac3", TAudio));
+		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3 ec3 eac3", TAudio));
 		ADDFMT((L"dts",         ResStr(IDS_MFMT_DTS),         L"dts dtshd dtsma", TAudio));
 		ADDFMT((L"aiff",        ResStr(IDS_MFMT_AIFF),        L"aif aifc aiff", TAudio));
 		ADDFMT((L"alac",        ResStr(IDS_MFMT_ALAC),        L"alac", TAudio));

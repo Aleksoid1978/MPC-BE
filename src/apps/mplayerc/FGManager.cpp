@@ -1980,6 +1980,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBB");               // MLP
 		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBA");               // TrueHD
 		pFGF->m_extensions.emplace_back(L".ac3");
+		pFGF->m_extensions.emplace_back(L".ec3");
 		pFGF->m_extensions.emplace_back(L".eac3");
 		pFGF->m_extensions.emplace_back(L".thd");
 		m_source.push_back(pFGF);

@@ -52,6 +52,7 @@ Added the ability to open local files with a long path (more than 260 characters
 Fixed saving position in history when shutting down Windows.
 Improved blocking the computer from going to sleep.
 Added the ability to use DVD bookmarks with a position on another computer.
+Added extension .ec3 in group of formats AC-3.
 Miscellaneous fixes.
 
 Updated Turkish translation (by cmhrky).

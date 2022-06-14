@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -215,7 +215,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		{ // search first audio frame
 			bool deepsearch = false;
-			if (ext == L".dts" || ext == L".dtshd" || ext == L".dtsma" || ext == L".ac3" || ext == L".eac3" || ext == L".thd") { //check only specific extensions
+			if (ext == L".dts" || ext == L".dtshd" || ext == L".dtsma"
+					|| ext == L".ac3" || ext == L".ec3" || ext == L".eac3"
+					|| ext == L".thd") { //check only specific extensions
 				deepsearch = true; // deep search for specific extensions only
 			}
 
