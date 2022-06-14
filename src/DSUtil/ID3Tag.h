@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include "CUE.h"
 #include "GolombBuffer.h"
 
@@ -42,11 +43,11 @@ public:
 		, m_tag(tag)
 		, m_value(value) {}
 
-	CID3TagItem(const DWORD tag, const std::vector<BYTE>& data, const CString& mime, const CString& value)
+	CID3TagItem(const DWORD tag, std::vector<BYTE>&& data, const CString& mime, const CString& value)
 		: m_type(ID3_TYPE_BINARY)
 		, m_tag(tag)
 		, m_Mime(mime)
-		, m_Data(data)
+		, m_Data(std::move(data))
 		, m_value(value) {}
 
 	DWORD GetTag()        const { return m_tag; }
@@ -73,6 +74,8 @@ protected:
 // ID3Tag class
 //
 
+using pID3TagItem = std::unique_ptr<CID3TagItem>;
+
 class CID3Tag
 {
 protected:
@@ -82,18 +85,16 @@ protected:
 	CString ReadText(CGolombBuffer& gb, DWORD size, const BYTE encoding);
 	CString ReadField(CGolombBuffer& gb, DWORD &size, const BYTE encoding);
 
-	void ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item);
+	pID3TagItem ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size);
 	void ReadChapter(CGolombBuffer& gbData, DWORD &size);
 
 public:
 	std::map<DWORD, CString> Tags;
-	std::list<CID3TagItem*>  TagItems;
+	std::list<pID3TagItem>   TagItems;
 	std::list<Chapters>      ChaptersList;
 
 	CID3Tag(BYTE major = 0, BYTE flags = 0);
-	virtual ~CID3Tag();
-
-	void Clear();
+	~CID3Tag() = default;
 
 	// tag reading
 	BOOL ReadTagsV2(BYTE *buf, size_t len);

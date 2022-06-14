@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,19 +30,6 @@ CID3Tag::CID3Tag(BYTE major/* = 0*/, BYTE flags/* = 0*/)
 	: m_major(major)
 	, m_flags(flags)
 {
-}
-
-CID3Tag::~CID3Tag()
-{
-	Clear();
-}
-
-void CID3Tag::Clear()
-{
-	for (auto& item : TagItems) {
-		SAFE_DELETE(item);
-	}
-	TagItems.clear();
 }
 
 // text encoding:
@@ -176,7 +163,7 @@ static LPCWSTR picture_types[] = {
 	L"Publisher(Studio) logo"
 };
 
-void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
+pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size)
 {
 	BYTE encoding = (BYTE)gbData.BitRead(8);
 	size--;
@@ -190,13 +177,13 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 		if (mime_len == std::size(mime)) {
 			gbData.SkipBytes(size);
 			size = 0;
-			return;
+			return {};
 		}
 
 		BYTE pict_type = (BYTE)gbData.BitRead(8);
 		size--;
 		CString pictStr(L"cover");
-		if (pict_type < sizeof(picture_types)) {
+		if (pict_type < std::size(picture_types)) {
 			pictStr = picture_types[pict_type];
 		}
 
@@ -219,7 +206,7 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 		data.resize(size);
 		gbData.ReadBuffer(data.data(), size);
 
-		*item = DNew CID3TagItem(tag, data, mimeStr, pictStr);
+		return std::make_unique<CID3TagItem>(tag, std::move(data), mimeStr, pictStr);
 	} else {
 		if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
 			ReadLang(gbData, size);
@@ -244,9 +231,11 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 		}
 
 		if (!text.IsEmpty()) {
-			*item = DNew CID3TagItem(tag, text);
+			return std::make_unique<CID3TagItem>(tag, text);
 		}
 	}
+
+	return {};
 }
 
 void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
@@ -282,15 +271,13 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 		size -= len;
 
 		if (((char*)&tag)[3] == 'T') {
-			CID3TagItem* item = nullptr;
-			ReadTag(tag, gbData, len, &item);
+			auto item = ReadTag(tag, gbData, len);
 			if (item && item->GetType() == ID3Type::ID3_TYPE_STRING) {
 				if (chapterName.IsEmpty()) {
 					chapterName = item->GetValue();
 				} else {
 					chapterName += L" / " + item->GetValue();
 				}
-				delete item;
 			}
 		}
 	}
@@ -427,11 +414,9 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				|| tag == '\0TT2'
 				|| tag == '\0PIC' || tag == 'APIC'
 				|| tag == '\0ULT' || tag == 'USLT') {
-			CID3TagItem* item = nullptr;
-			ReadTag(tag, gbData, size, &item);
-
+			auto item = ReadTag(tag, gbData, size);
 			if (item) {
-				TagItems.emplace_back(item);
+				TagItems.emplace_back(std::move(item));
 			}
 		} else if (tag == 'CHAP') {
 			ReadChapter(gbData, size);
