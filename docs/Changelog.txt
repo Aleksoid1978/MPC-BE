@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.6.2 alpha
+1.6.3
 =============================
 MpaSplitter
 Fixed working with online streams.

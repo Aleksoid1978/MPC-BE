@@ -143,9 +143,13 @@ static LPCWSTR s_strPlayerTitle = "MPC-BE "
 	L"x64 "
 #endif
 #if (MPC_VERSION_STATUS == 1)
-	MPC_VERSION_WSTR;
+	#if (MPC_VERSION_REV == 0)
+		MPC_VERSION_WSTR;
+	#else
+		MPC_VERSION_FULL_WSTR;
+	#endif
 #else
-	MPC_VERSION_FULL_WSTR " alpha";
+	MPC_VERSION_FULL_WSTR " beta";
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

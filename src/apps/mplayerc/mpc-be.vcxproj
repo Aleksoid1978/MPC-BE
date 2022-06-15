@@ -49,7 +49,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <PreBuildEvent>
-      <Command>..\..\..\update_version.bat</Command>
+      <Command>..\..\..\update_revision.cmd</Command>
     </PreBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

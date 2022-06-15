@@ -46,8 +46,11 @@
 #define app_name         "MPC-BE"
 #define copyright_year   str(MPC_YEAR_COMMENTS)
 #define app_url          str(MPC_VERSION_COMMENTS)
-#define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH)
-#define app_version_svn  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
+#if MPC_VERSION_STATUS == 1 && MPC_VERSION_REV == 0
+  #define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH)
+#else
+  #define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
+#endif  
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
 #define bin_dir        = "..\_bin"
@@ -61,7 +64,7 @@
   #define mpcbe_ini    = "mpc-be64.ini"
   #define mpcbe_reg    = "mpc-be64"
   #define dxdir        = "DirectX\x64"
-  #define BeveledLabel = app_name + " x64 " + app_version_svn
+  #define BeveledLabel = app_name + " x64 " + app_version
   #define Description  = app_name + " x64 " + app_version
   #define msdk_dll     = "libmfxsw64.dll"
   #define msdk_dll_zip = "libmfxsw64.dll.zip"
@@ -72,7 +75,7 @@
   #define mpcbe_ini    = "mpc-be.ini"
   #define mpcbe_reg    = "mpc-be"
   #define dxdir        = "DirectX\x86"
-  #define BeveledLabel = app_name + " " + app_version_svn
+  #define BeveledLabel = app_name + " " + app_version
   #define Description  = app_name + " " + app_version
   #define msdk_dll     = "libmfxsw32.dll"
   #define msdk_dll_zip = "libmfxsw32.dll.zip"
@@ -83,25 +86,25 @@
 #ifdef x64Build
 AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
-OutputBaseFilename={#app_name}.{#app_version_svn}.x64
-UninstallDisplayName={#app_name} x64 {#app_version_svn}
+OutputBaseFilename={#app_name}.{#app_version}.x64
+UninstallDisplayName={#app_name} x64 {#app_version}
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64 ia64
 AppName={#app_name} x64
-AppVerName={#app_name} x64 {#app_version_svn}
+AppVerName={#app_name} x64 {#app_version}
 VersionInfoDescription={#app_name} x64 Setup
 VersionInfoProductName={#app_name} x64
 #else
 AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
 DefaultGroupName={#app_name}
-OutputBaseFilename={#app_name}.{#app_version_svn}.x86
-UninstallDisplayName={#app_name} {#app_version_svn}
+OutputBaseFilename={#app_name}.{#app_version}.x86
+UninstallDisplayName={#app_name} {#app_version}
 AppName={#app_name}
-AppVerName={#app_name} {#app_version_svn}
+AppVerName={#app_name} {#app_version}
 VersionInfoDescription={#app_name} Setup
 VersionInfoProductName={#app_name}
 #endif
-AppVersion={#app_version_svn}
+AppVersion={#app_version}
 AppPublisher={#app_name} Team
 AppPublisherURL={#app_url}
 AppSupportURL={#app_url}
@@ -110,10 +113,10 @@ AppContact={#app_url}
 AppCopyright=Copyright © {#copyright_year} all contributors, see Authors.txt
 VersionInfoCompany={#app_name} Team
 VersionInfoCopyright=Copyright © {#copyright_year}, {#app_name} Team
-VersionInfoProductVersion={#app_version_svn}
-VersionInfoProductTextVersion={#app_version_svn}
-VersionInfoTextVersion={#app_version_svn}
-VersionInfoVersion={#app_version_svn}
+VersionInfoProductVersion={#app_version}
+VersionInfoProductTextVersion={#app_version}
+VersionInfoTextVersion={#app_version}
+VersionInfoVersion={#app_version}
 UninstallDisplayIcon={app}\{#mpcbe_exe}
 DefaultDirName={code:GetInstallFolder}
 LicenseFile=..\docs\COPYING.txt

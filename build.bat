@@ -68,7 +68,7 @@ FOR %%A IN (%ARG%) DO (
 
 REM pre-build checks
 
-IF NOT EXIST "revision.h" CALL "update_version.bat"
+IF NOT EXIST "revision.h" CALL "update_revision.cmd"
 
 IF EXIST "environments.bat" CALL "environments.bat"
 
@@ -485,11 +485,13 @@ FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define REV_HASH" "revision.h"') DO (SET "REVHASH=%%A")
 
 SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%REVNUM%
+SET "SUFFIX_GIT=_git%REVDATE%-%REVHASH%"
 
 IF /I "%VERRELEASE%" == "1" (
+  IF /I "%REVNUM%" == "0" (
+    SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%
+  )
   SET "SUFFIX_GIT="
-) ELSE (
-  SET "SUFFIX_GIT=_git%REVDATE%-%REVHASH%"
 )
 
 

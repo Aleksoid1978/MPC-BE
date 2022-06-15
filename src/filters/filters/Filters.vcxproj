@@ -45,7 +45,7 @@
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PreBuildEvent>
-      <Command>..\..\..\update_version.bat</Command>
+      <Command>..\..\..\update_revision.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
