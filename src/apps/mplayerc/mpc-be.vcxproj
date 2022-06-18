@@ -63,6 +63,8 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)src;$(SolutionDir)src\ExtLib\MediaInfo;$(SolutionDir)src\ExtLib\ZenLib;$(SolutionDir)src\ExtLib\mfx_dispatch\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Manifest>
       <EnableDpiAwareness>false</EnableDpiAwareness>
