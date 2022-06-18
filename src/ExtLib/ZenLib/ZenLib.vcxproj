@@ -45,7 +45,6 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221</AdditionalOptions>
