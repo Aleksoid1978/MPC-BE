@@ -38,37 +38,12 @@
     <Import Project="$(SolutionDir)src\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>..\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;PNG_INTEL_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PrecompiledHeaderFile>pngpriv.h</PrecompiledHeaderFile>
-      <EnablePREfast>false</EnablePREfast>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;PNG_INTEL_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PrecompiledHeaderFile>pngpriv.h</PrecompiledHeaderFile>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;PNG_INTEL_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PrecompiledHeaderFile>pngpriv.h</PrecompiledHeaderFile>
-      <EnablePREfast>false</EnablePREfast>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;PNG_INTEL_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pngpriv.h</PrecompiledHeaderFile>
     </ClCompile>
   </ItemDefinitionGroup>

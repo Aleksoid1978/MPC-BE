@@ -38,10 +38,11 @@
     <Import Project="$(SolutionDir)src\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <EnablePREfast>false</EnablePREfast>
@@ -49,34 +50,6 @@
     <Lib>
       <AdditionalOptions>/ignore:4221</AdditionalOptions>
     </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-    </ClCompile>
-    <Lib>
-      <AdditionalOptions>/ignore:4221</AdditionalOptions>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <EnablePREfast>false</EnablePREfast>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ZenLib\Conf.cpp" />
