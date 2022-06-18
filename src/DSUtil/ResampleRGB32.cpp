@@ -1,5 +1,5 @@
 /*
-* (C) 2017 see Authors.txt
+* (C) 2017-2022 see Authors.txt
 *
 * This file is part of MPC-BE.
 *
@@ -19,7 +19,6 @@
 */
 
 #include "stdafx.h"
-#include <math.h>
 #include <ppl.h>
 #include "ResampleRGB32.h"
 

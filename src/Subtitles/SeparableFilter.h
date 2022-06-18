@@ -1,6 +1,6 @@
 /*
 * (C) 2007 Niels Martin Hansen
-* (C) 2013-2017 see Authors.txt
+* (C) 2013-2022 see Authors.txt
 *
 * This file is part of MPC-BE.
 *
@@ -20,8 +20,6 @@
 */
 
 #pragma once
-
-#include <math.h>
 
 #define LIBDIVIDE_USE_SSE2 1
 #include "libdivide.h"

@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2021 see Authors.txt
+ * (C) 2009-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include <map>
 #include <moreuuids.h>
-#include <math.h>
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/AudioTools.h"

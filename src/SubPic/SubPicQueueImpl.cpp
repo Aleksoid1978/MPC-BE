@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include <chrono>
-#include <cmath>
 #include <intsafe.h>
 #include "DSUtil/Utils.h"
 #include "SubPicQueueImpl.h"

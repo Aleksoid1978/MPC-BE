@@ -28,7 +28,6 @@
 #include <evr.h>
 #include <mfapi.h>
 #include <Mferror.h>
-#include <cmath>
 #include "SubPic/DX9SubPic.h"
 #include "SubPic/SubPicQueueImpl.h"
 #include <clsids.h>

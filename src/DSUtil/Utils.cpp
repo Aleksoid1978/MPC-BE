@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include <basestruct.h>
-#include <cmath>
 #include <d3d9.h>
 #include <Mferror.h>
 #include "Utils.h"

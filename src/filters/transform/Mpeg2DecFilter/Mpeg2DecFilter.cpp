@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,6 @@
 #include <atlbase.h>
 #include <ks.h>
 #include <ksmedia.h>
-#include <math.h>
 #include "libmpeg2.h"
 #include "Mpeg2DecFilter.h"
 

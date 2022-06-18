@@ -23,7 +23,6 @@
 #include <MMreg.h>
 #include <moreuuids.h>
 #include <basestruct.h>
-#include <cmath>
 #include "DSUtil/GolombBuffer.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/MP4AudioDecoderConfig.h"

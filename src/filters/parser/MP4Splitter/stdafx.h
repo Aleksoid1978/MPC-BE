@@ -26,6 +26,7 @@
 #include <afxwin.h>                         // MFC core and standard components
 #include "stdafx_common_dshow.h"
 
+#include <cmath>
 #include <algorithm>
 #include <vector>
 #include <list>

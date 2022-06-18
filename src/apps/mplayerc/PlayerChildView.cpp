@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <cmath>
 #include "MainFrm.h"
 #include "WicUtils.h"
 #include "DSUtil/FileHandle.h"

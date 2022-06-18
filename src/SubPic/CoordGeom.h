@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,10 +20,6 @@
  */
 
 #pragma once
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 #define EPSILON		(1e-7)
 #define BIGNUMBER	(1e+9)

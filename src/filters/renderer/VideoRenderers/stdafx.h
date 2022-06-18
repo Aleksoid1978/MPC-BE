@@ -30,6 +30,7 @@
 #include <ExtLib/BaseClasses/streams.h>
 #include <dvdmedia.h>
 
+#include <cmath>
 #include <algorithm>
 #include <vector>
 #include <list>
