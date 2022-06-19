@@ -94,7 +94,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		dc.SetBkColor(0);
 	}
 
-	UINT format = DT_VCENTER | DT_SINGLELINE;
+	UINT format = DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX;
 	if (m_fAddEllipses) {
 		format |= DT_END_ELLIPSIS;
 	}
