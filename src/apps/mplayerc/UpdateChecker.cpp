@@ -133,11 +133,11 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVer
 		m_text.LoadString(IDS_UPDATE_ERROR);
 		break;
 	case UPDATER_NO_NEW_VERSION:
-		VersionStr.Format(L"%s (build %d)", MPC_VERSION_WSTR, MPC_VERSION_REV);
+		VersionStr.SetString(MPC_VERSION_FULL_WSTR);
 		m_text.Format(IDS_USING_NEWER_VERSION, VersionStr);
 		break;
 	case UPDATER_NEW_VERSION_IS_AVAILABLE:
-		VersionStr.Format(L"%u.%u.%u (build %u)", UpdateVersion.major, UpdateVersion.minor, UpdateVersion.patch, UpdateVersion.revision);
+		VersionStr.Format(L"%u.%u.%u.%u", UpdateVersion.major, UpdateVersion.minor, UpdateVersion.patch, UpdateVersion.revision);
 		m_text.Format(IDS_NEW_UPDATE_AVAILABLE, VersionStr);
 		m_latestURL = UpdateURL;
 		break;
