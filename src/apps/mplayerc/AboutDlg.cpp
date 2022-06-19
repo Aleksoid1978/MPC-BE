@@ -50,7 +50,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_appname += L" (64-bit)";
 #endif
 
-	m_strVersionNumber.Append(MPC_VERSION_FULL_WSTR);
+	m_strVersionNumber.Append(MPC_VERSION_WSTR);
 #if (MPC_VERSION_STATUS == 0)
 	m_strVersionNumber.Append(L" beta");
 #endif
