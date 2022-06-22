@@ -174,7 +174,8 @@ namespace YoutubeDL
 
 		if (!exitcode && buf_out.GetLength()) {
 			rapidjson::Document d;
-			if (!d.Parse(buf_out.GetString()).HasParseError()) {
+			const int k = buf_out.Find("{\"id\": ", 64); // check presence of second JSON root element and ignore it
+			if (!d.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
 				int iTag = 1;
 				if (auto formats = GetJsonArray(d, "formats")) {
 					int vid_height = 0;
