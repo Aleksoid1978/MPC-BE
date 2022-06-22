@@ -5915,17 +5915,16 @@ void CMainFrame::OnFileSaveAs()
 	ext_list.Append(ResStr(IDS_MAINFRM_48));
 
 	CFileDialog fd(FALSE, 0, out,
-				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
 				   ext_list, GetModalParent(), 0);
 
 	if (fd.DoModal() != IDOK || !in.CompareNoCase(fd.GetPathName())) {
 		return;
 	}
 
-	CPath p(fd.GetPathName());
-
+	CString savedFileName(fd.GetPathName());
 	if (!ext.IsEmpty()) {
-		p.AddExtension(ext);
+		savedFileName = AddExtension(savedFileName, ext);
 	}
 
 	OAFilterState fs = State_Stopped;
@@ -5940,27 +5939,63 @@ void CMainFrame::OnFileSaveAs()
 		name = GetAltFileName();
 	}
 
-	HRESULT hr;
-	CSaveDlg save_dlg(in, name, p, hr);
+	HRESULT hr = S_OK;
+	CSaveDlg save_dlg(in, name, savedFileName, hr);
 	if (SUCCEEDED(hr)) {
 		save_dlg.DoModal();
 		if (save_dlg.IsCompleteOk() && !m_youtubeFields.fname.IsEmpty()) {
 			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
 			if (pFileData && pFileData->fns.size() == 2) {
-				ext = p.GetExtension().MakeLower();
+				CString fileName(savedFileName);
+
+				ext = GetFileExt(savedFileName);
 				if (ext == L".mp4") {
-					p.RenameExtension(L".audio.m4a");
+					savedFileName = RenameFileExt(savedFileName, L".audio.m4a");
 				} else {
-					p.RenameExtension(L".audio.mka");
+					savedFileName = RenameFileExt(savedFileName, L".audio.mka");
 				}
 
 				auto it = pFileData->fns.begin();
 				++it;
-				in = (*it).GetName();
+				in = it->GetName();
 
-				CSaveDlg save_dlg2(in, name, p, hr);
+				CSaveDlg save_dlg2(in, name, savedFileName, hr);
 				if (SUCCEEDED(hr)) {
 					save_dlg2.DoModal();
+					if (save_dlg2.IsCompleteOk()) {
+						CString ffmpegpath;
+						int length = SearchPathW(nullptr, L"ffmpeg.exe", nullptr, MAX_PATH, ffmpegpath.GetBuffer(MAX_PATH), nullptr);
+						if (length > 0 && length <= MAX_PATH) {
+							ffmpegpath.ReleaseBufferSetLength(length);
+
+							CString outFileName = fileName.GetString();
+							if (MoveFileW(fileName, fileName + L".tmp")) {
+								fileName += L".tmp";
+
+								CString strArgs;
+								strArgs.Format(LR"(-y -i "%s" -i "%s" -c copy "%s")",
+											   fileName.GetString(), savedFileName.GetString(), outFileName.GetString());
+
+								SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
+								execinfo.lpFile = ffmpegpath.GetString();
+								execinfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
+								execinfo.nShow = SW_HIDE;
+								execinfo.lpParameters = strArgs.GetString();
+
+								if (ShellExecuteExW(&execinfo)) {
+									WaitForSingleObject(execinfo.hProcess, INFINITE);
+									CloseHandle(execinfo.hProcess);
+								}
+
+								if (PathFileExistsW(outFileName)) {
+									DeleteFileW(fileName);
+									DeleteFileW(savedFileName);
+								} else {
+									MoveFileW(fileName, outFileName);
+								}
+							}
+						}
+					}
 				}
 			}
 		}

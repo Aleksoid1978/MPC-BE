@@ -98,6 +98,13 @@ CStringW RemoveFileExt(LPCWSTR Path)
 	return cs;
 }
 
+CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext)
+{
+	CStringW cs = Path;
+	::PathAddExtensionW(cs.GetBuffer(MAX_PATH), Ext);
+	return cs;
+}
+
 //
 // Generate temporary files with any extension
 //

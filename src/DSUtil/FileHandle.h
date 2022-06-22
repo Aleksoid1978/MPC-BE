@@ -27,6 +27,7 @@ CStringW RemoveSlash(LPCWSTR Path);
 CStringW GetFileExt(LPCWSTR Path);
 CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext);
 CStringW RemoveFileExt(LPCWSTR Path);
+CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext);
 BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);
 CStringW CompactPath(LPCWSTR Path, UINT cchMax);
 
