@@ -174,7 +174,7 @@ namespace YoutubeDL
 
 		if (!exitcode && buf_out.GetLength()) {
 			rapidjson::Document d;
-			const int k = buf_out.Find("{\"id\": ", 64); // check presence of second JSON root element and ignore it
+			const int k = buf_out.Find("\n{\"id\": ", 64); // check presence of second JSON root element and ignore it
 			if (!d.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
 				int iTag = 1;
 				if (auto formats = GetJsonArray(d, "formats")) {
