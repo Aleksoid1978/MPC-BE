@@ -34,6 +34,7 @@ SET ARGPL=0
 SET ARGPA=0
 SET ARGIN=0
 SET ARGZI=0
+SET ARGPDB=0
 SET INPUT=0
 SET ARGSIGN=0
 
@@ -63,6 +64,7 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"            & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
+  IF /I "%%A" == "PDB"        SET "PDB=True"            & SET /A ARGPDB+=1
   IF /I "%%A" == "Sign"       SET "SIGN=True"           & SET /A ARGSIGN+=1
 )
 
@@ -76,7 +78,7 @@ IF NOT DEFINED MPCBE_MINGW GOTO MissingVar
 IF NOT DEFINED MPCBE_MSYS  GOTO MissingVar
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
-SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGSIGN%+%ARGCOMP%
+SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGSIGN%+%ARGCOMP%+%ARGPDB%
 
 IF %VALID% NEQ %INPUT% GOTO UnsupportedSwitch
 
@@ -447,7 +449,7 @@ CALL :SubMsg "INFO" "%ZIP_NAME%.7z successfully created"
 
 IF EXIST "%PCKG_NAME%" RD /Q /S "%PCKG_NAME%"
 
-IF /I "%NAME%" == "MPC-BE" (
+IF /I "%NAME%" == "MPC-BE" IF /I "%PDB%" == "True" (
   TITLE Creating archive %ZIP_NAME%-pdb.7z...
   IF /I "%ARCH%" == "x64" (
     START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%ZIP_NAME%-pdb.7z" "%~1_%ARCH%\mpc-be64.pdb"^
