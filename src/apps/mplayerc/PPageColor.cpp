@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -144,7 +144,8 @@ BOOL CPPageColor::OnSetActive()
 {
 	CRenderersSettings& rs = AfxGetAppSettings().m_VRSettings;
 
-	if (rs.iVideoRenderer == VIDRNDT_EVR_CP && rs.iSurfaceFormat == D3DFMT_A16B16G16R16F) {
+	if (rs.iVideoRenderer == VIDRNDT_EVR_CP
+			&& (rs.iSurfaceFormat == D3DFMT_A2R10G10B10 || rs.iSurfaceFormat == D3DFMT_A16B16G16R16F)) {
 		m_chkColorManagment.EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
 		UpdateColorManagment();

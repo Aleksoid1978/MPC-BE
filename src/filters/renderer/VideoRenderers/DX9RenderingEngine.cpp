@@ -1502,7 +1502,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	HRESULT hr;
 	CRenderersSettings& rs = GetRenderersSettings();
 
-	const bool bColorManagement = m_bFP16Support && rs.bColorManagementEnable;
+	const bool bColorManagement = m_bFP16Support && rs.bColorManagementEnable && m_SurfaceFmt != D3DFMT_X8R8G8B8;
 	VideoSystem inputVideoSystem = (VideoSystem)rs.iColorManagementInput;
 	AmbientLight ambientLight = (AmbientLight)rs.iColorManagementAmbientLight;
 	ColorRenderingIntent renderingIntent = (ColorRenderingIntent)rs.iColorManagementIntent;
