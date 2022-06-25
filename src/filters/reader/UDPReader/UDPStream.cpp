@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2021 see Authors.txt
+ * (C) 2017-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -111,7 +111,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 
 					CString str = UTF8orLocalToWStr((LPCSTR)buff);
 
-					DbgLog((LOG_TRACE, 3, L"CUDPStream::HTTPRead(): Metainfo: %s", str));
+					DLog(L"CUDPStream::HTTPRead(): Metainfo: %s", str);
 
 					int i = str.Find(L"StreamTitle='");
 					if (i >= 0) {
@@ -143,7 +143,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 							}
 						}
 					} else {
-						DbgLog((LOG_TRACE, 3, L"CUDPStream::HTTPRead(): StreamTitle is missing"));
+						DLog(L"CUDPStream::HTTPRead(): StreamTitle is missing");
 					}
 
 					i = str.Find(L"StreamUrl='");
@@ -300,14 +300,13 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = protocol::PR_HTTP;
 		BOOL bConnected = FALSE;
-		if (m_HTTPAsync.Connect(m_url_str, 10000, L"Icy-MetaData:1\r\n") == S_OK
-				&& !m_HTTPAsync.GetLenght()) { // only streams without content length
-			const CString hdr = m_HTTPAsync.GetHeader();
-#ifdef DEBUG
-			DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%S", hdr));
-#endif
+		HRESULT hr = m_HTTPAsync.Connect(m_url_str, 10000, L"Icy-MetaData:1\r\n");
+		DLogIf(hr == S_OK, L"CUDPStream::Load() - HTTP content type: %s", m_HTTPAsync.GetContentType());
 
+		if (hr == S_OK && !m_HTTPAsync.GetLenght()) { // only streams without content length
 			BOOL bIcyFound = FALSE;
+			const CString hdr = m_HTTPAsync.GetHeader();
+			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", hdr);
 
 			std::list<CString> sl;
 			Explode(hdr, sl, '\n');
