@@ -2,7 +2,15 @@
 
 1.6.3.x beta
 =============================
+VideoRenderers
+Сolor management now works for 10-bit surfaces as well.
 
+Youtube
+Fixed work with yt-dlp on some sites.
+Use "ffmpeg.exe" to merge individual video and audio files obtained using the "Save As" command.
+
+Player
+Fixed display of text with "&" symbols in the "Information" panel.
 
 
 1.6.3
