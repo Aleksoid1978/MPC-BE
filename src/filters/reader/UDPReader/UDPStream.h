@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2021 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -109,12 +109,12 @@ public:
 	bool Load(const WCHAR* fnw);
 
 	// CAsyncStream
-	HRESULT SetPointer(LONGLONG llPos);
-	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead);
-	LONGLONG Size(LONGLONG* pSizeAvailable);
-	DWORD Alignment();
-	void Lock();
-	void Unlock();
+	HRESULT SetPointer(LONGLONG llPos) override;
+	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead) override;
+	LONGLONG Size(LONGLONG* pSizeAvailable) override;
+	DWORD Alignment() override;
+	void Lock() override;
+	void Unlock() override;
 
 	GUID GetSubtype() const { return m_subtype; }
 	protocol GetProtocol() const { return m_protocol; }
