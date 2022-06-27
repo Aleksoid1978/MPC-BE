@@ -14377,10 +14377,15 @@ void CMainFrame::CloseMediaPrivate()
 
 	if (m_pMC) {
 		if (GetPlaybackMode() == PM_FILE) {
-			// Requires a position reset so that the EVR-CP stops waiting for the next frame
-			// when playback ends immediately after the first frame.
-			LONGLONG pos = 0;
-			m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
+			LONGLONG dur = 0;
+			m_pMS->GetDuration(&dur);
+			// LAV Splitter may hang when calling IMediaSeeking::SetPositions if duration is unknown
+			if (dur > 0) {
+				// Requires a position reset so that the EVR-CP stops waiting for the next frame
+				// when playback ends immediately after the first frame.
+				LONGLONG pos = 0;
+				m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
+			}
 		}
 		OAFilterState fs;
 		m_pMC->GetState(0, &fs);
