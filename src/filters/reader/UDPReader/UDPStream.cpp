@@ -305,7 +305,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 		if (hr == S_OK && !m_HTTPAsync.GetLenght()) { // only streams without content length
 			BOOL bIcyFound = FALSE;
-			const CString hdr = m_HTTPAsync.GetHeader();
+			const CString& hdr = m_HTTPAsync.GetHeader();
 			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", hdr);
 
 			std::list<CString> sl;

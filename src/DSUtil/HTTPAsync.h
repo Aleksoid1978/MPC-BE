@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -75,8 +75,8 @@ public:
 	HRESULT SendRequest(LPCWSTR lpszCustomHeader = L"", DWORD dwTimeOut = INFINITE);
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
-	CString GetHeader() const;
-	CString GetContentType() const;
+	const CString& GetHeader() const;
+	const CString& GetContentType() const;
 	UINT64 GetLenght() const;
 };
 

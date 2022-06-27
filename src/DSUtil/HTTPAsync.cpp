@@ -401,12 +401,12 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 	return _dwSizeRead ? S_OK : S_FALSE;
 }
 
-CString CHTTPAsync::GetHeader() const
+const CString& CHTTPAsync::GetHeader() const
 {
 	return m_header;
 }
 
-CString CHTTPAsync::GetContentType() const
+const CString& CHTTPAsync::GetContentType() const
 {
 	return m_contentType;
 }
