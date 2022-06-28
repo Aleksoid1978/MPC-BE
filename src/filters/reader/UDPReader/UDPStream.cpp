@@ -407,11 +407,16 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		}
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = protocol::PR_HTTP;
-		BOOL bConnected = FALSE;
 		HRESULT hr = m_HTTPAsync.Connect(m_url_str, 10000, L"Icy-MetaData:1\r\n");
-		DLogIf(hr == S_OK, L"CUDPStream::Load() - HTTP content type: %s", m_HTTPAsync.GetContentType());
+		if (FAILED(hr)) {
+			return false;
+		}
 
-		if (hr == S_OK && !m_HTTPAsync.GetLenght()) { // only streams without content length
+		DLog(L"CUDPStream::Load() - HTTP content type: %s", m_HTTPAsync.GetContentType());
+
+		BOOL bConnected = FALSE;
+
+		if (!m_HTTPAsync.GetLenght()) { // only streams without content length
 			BOOL bIcyFound = FALSE;
 			const CString& hdr = m_HTTPAsync.GetHeader();
 			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", hdr);
