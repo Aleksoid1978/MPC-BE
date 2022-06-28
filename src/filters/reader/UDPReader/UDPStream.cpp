@@ -176,7 +176,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 	return E_FAIL;
 }
 
-static void GetType(BYTE* buf, int size, GUID& subtype)
+static void GetType(const BYTE* buf, int size, GUID& subtype)
 {
 	if (size >= 188 && buf[0] == 0x47) {
 		BOOL bIsMPEGTS = TRUE;
@@ -387,14 +387,14 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			DWORD res = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 100, FALSE);
 			if (res == WSA_WAIT_EVENT_0) {
 				WSAResetEvent(m_WSAEvent);
-				BYTE buf[MAXBUFSIZE] = {};
-				int len = recvfrom(m_UdpSocket, (PCHAR)buf, MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &m_addr_size);
+				std::vector<BYTE> buf(MAXBUFSIZE);
+				int len = recvfrom(m_UdpSocket, (PCHAR)buf.data(), MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &m_addr_size);
 				if (len <= 0) {
 					timeout += 100;
 					continue;
 				}
-				GetType(buf, len, m_subtype);
-				Append(buf, len);
+				GetType(buf.data(), len, m_subtype);
+				Append(buf.data(), len);
 				break;
 			} else {
 				timeout += 100;
@@ -711,7 +711,8 @@ DWORD CUDPStream::ThreadProc()
 			case CMD::CMD_INIT:
 			case CMD::CMD_RUN:
 				Reply(S_OK);
-				BYTE buff[MAXBUFSIZE * 2] = {};
+
+				std::vector<BYTE> buff(MAXBUFSIZE * 2);
 				int  buffsize = 0;
 				UINT attempts = 0;
 				int  len      = 0;
@@ -832,7 +833,7 @@ DWORD CUDPStream::ThreadProc()
 							fwrite(buff, buffsize, 1, dump);
 						}
 #endif
-						Append(buff, (UINT)buffsize);
+						Append(buff.data(), (UINT)buffsize);
 						buffsize = 0;
 					}
 				}
