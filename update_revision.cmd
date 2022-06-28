@@ -1,4 +1,3 @@
-REM Experimental!
 @ECHO OFF
 SETLOCAL
 PUSHD %~dp0
