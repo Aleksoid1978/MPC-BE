@@ -24,8 +24,7 @@
 #include <ExtLib/AsyncReader/asyncio.h>
 #include "DSUtil/HTTPAsync.h"
 
-#define UDPReaderName   L"MPC UDP/HTTP Reader"
-#define STDInReaderName L"MPC Std input Reader"
+#include <chrono>
 
 class CUDPStream
 	: public CAsyncStream
@@ -36,7 +35,8 @@ public:
 		PR_NONE,
 		PR_UDP,
 		PR_HTTP,
-		PR_PIPE
+		PR_PIPE,
+		PR_HLS
 	};
 
 private:
@@ -68,6 +68,7 @@ private:
 
 	ULONGLONG          m_pos = 0;
 	ULONGLONG          m_len = 0;
+	DWORD              m_nBytesRead = 0;
 
 	std::deque<CPacket*> m_packets;
 
@@ -83,7 +84,16 @@ private:
 		CString description;
 		CString url;
 	} m_icydata;
-	DWORD m_nBytesRead = 0;
+
+	struct hlsData_t {
+		std::deque<CString> Segments;
+		std::list<CString>  DiscontinuitySegments;
+		uint64_t            SequenceNumber = {};
+		CString             PlaylistUrl;
+		int64_t             SegmentDuration = {};
+		bool                bEndList = {};
+		std::chrono::high_resolution_clock::time_point PlaylistParsingTime = {};
+	} m_hlsData;
 
 	void Clear();
 	void Append(const BYTE* buff, UINT len);
@@ -94,6 +104,8 @@ private:
 	void EmptyBuffer();
 
 	DWORD ThreadProc();
+
+	bool ParseM3U8(const CString& url, CString& realUrl);
 
 public:
 	CUDPStream() = default;

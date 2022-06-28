@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 
 #define UDPReaderName   L"MPC UDP/HTTP Reader"
 #define STDInReaderName L"MPC Std input Reader"
+#define HLSReaderName   L"MPC HLS Live Reader"
 
 class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))
 	CUDPReader
@@ -54,7 +55,7 @@ public:
 	STDMETHODIMP Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt);
 	STDMETHODIMP GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt);
 
-	//IAMMediaContent
+	// IAMMediaContent
 	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo) { return E_NOTIMPL; }
 	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo) { return E_NOTIMPL; }
 	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) { return E_NOTIMPL; }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -92,7 +92,14 @@ STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
 	CheckPointer(pInfo, E_POINTER);
 	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
 
-	wcscpy_s(pInfo->achName, m_stream.GetProtocol() == CUDPStream::protocol::PR_PIPE ? STDInReaderName : UDPReaderName);
+	const wchar_t* readerName;
+	switch (m_stream.GetProtocol()) {
+		case CUDPStream::protocol::PR_PIPE: readerName = STDInReaderName; break;
+		case CUDPStream::protocol::PR_HLS:  readerName = HLSReaderName;   break;
+		default:                            readerName = UDPReaderName;   break;
+	}
+
+	wcscpy_s(pInfo->achName, readerName);
 	pInfo->pGraph = m_pGraph;
 	if (m_pGraph) {
 		m_pGraph->AddRef();

@@ -67,6 +67,9 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\AsyncReader\AsyncReader.vcxproj">
       <Project>{9f31d122-e84d-485a-a58d-09dad01a56ce}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\Subtitles\Subtitles.vcxproj">
+      <Project>{5e56335f-0fb1-4eea-b240-d8dc5e0608e4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

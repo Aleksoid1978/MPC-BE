@@ -28,6 +28,7 @@
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/UrlParser.h"
 #include "DSUtil/entities.h"
+#include "Subtitles/TextFile.h"
 
 #define RAPIDJSON_SSE2
 #include <ExtLib/rapidjson/include/rapidjson/document.h>
@@ -60,6 +61,11 @@ void CUDPStream::Clear()
 		}
 
 		WSACleanup();
+	} else if (m_protocol == protocol::PR_HLS) {
+		m_HTTPAsync.Close();
+		m_hlsData.Segments.clear();
+		m_hlsData.DiscontinuitySegments.clear();
+		m_hlsData.SequenceNumber = {};
 	}
 
 	m_HTTPAsync.Close();
@@ -202,11 +208,113 @@ static void GetType(BYTE* buf, int size, GUID& subtype)
 	}
 }
 
+bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
+{
+	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
+	if (!f.Open(url)) {
+		return false;
+	}
+
+	realUrl = url;
+
+	CString base(url);
+	base.Truncate(base.ReverseFind('/'));
+
+	uint64_t sequenceNumber = {};
+	bool bDiscontinuity = false;
+
+	m_hlsData.SegmentDuration = {};
+
+	CString str;
+	while (f.ReadString(str)) {
+		FastTrim(str);
+
+		if (str.IsEmpty()) {
+			continue;
+		}
+
+		auto DeleteLeft = [](const auto pos, auto& str) {
+			str = str.Mid(pos, str.GetLength() - pos);
+			str.TrimLeft();
+		};
+
+		if (StartsWith(str, L"#EXT-X-TARGETDURATION:")) {
+			DeleteLeft(22, str);
+			StrToInt64(str, m_hlsData.SegmentDuration);
+			continue;
+		} else if (StartsWith(str, L"#EXT-X-MEDIA-SEQUENCE:")) {
+			DeleteLeft(22, str);
+			StrToUInt64(str, sequenceNumber);
+			continue;
+		} else if (str == L"#EXT-X-DISCONTINUITY") {
+			bDiscontinuity = true;
+			continue;
+		} else if (str == L"#EXT-X-ENDLIST") {
+			m_hlsData.bEndList = true;
+			continue;
+		} else if (str.GetAt(0) == L'#') {
+			continue;
+		}
+
+		auto CombinePath = [](const CString& base, const CString& path) {
+			CUrlParser urlParser(path.GetString());
+			if (urlParser.IsValid()) {
+				return path;
+			}
+
+			CString output(base);
+			if (path.GetAt(0) == L'/') {
+				output.Append(path);
+			} else {
+				output.Append(L'/' + path);
+			}
+
+			return output;
+		};
+
+		if (sequenceNumber > m_hlsData.SequenceNumber || bDiscontinuity) {
+			if (bDiscontinuity) {
+				auto fullUrl = CombinePath(base, str);
+				auto it = std::find(m_hlsData.DiscontinuitySegments.cbegin(), m_hlsData.DiscontinuitySegments.cend(), fullUrl);
+				if (it == m_hlsData.DiscontinuitySegments.cend()) {
+					m_hlsData.Segments.emplace_back(fullUrl);
+					m_hlsData.DiscontinuitySegments.emplace_back(fullUrl);
+				}
+			} else {
+				m_hlsData.Segments.emplace_back(CombinePath(base, str));
+			}
+			m_hlsData.SequenceNumber = sequenceNumber;
+		}
+
+		if (!bDiscontinuity) {
+			sequenceNumber++;
+		}
+	}
+
+	if (!bDiscontinuity) {
+		m_hlsData.DiscontinuitySegments.clear();
+	}
+
+	m_hlsData.PlaylistParsingTime = std::chrono::high_resolution_clock::now();
+
+	if (m_hlsData.SegmentDuration && (sequenceNumber || bDiscontinuity)) {
+		return !m_hlsData.Segments.empty();
+	}
+
+	if (m_hlsData.Segments.size() == 1) {
+		CString newUrl = m_hlsData.Segments.front();
+		m_hlsData.Segments.clear();
+		return ParseM3U8(newUrl, realUrl);
+	}
+
+	return false;
+}
+
 bool CUDPStream::Load(const WCHAR* fnw)
 {
 	Clear();
 
-	m_url_str = CString(fnw);
+	m_url_str = fnw;
 	CUrlParser urlParser;
 	CString str_protocol;
 
@@ -363,6 +471,30 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			} else if (!bIcyFound) { // other ...
 					// not supported content-type
 				bConnected = FALSE;
+			}
+		}
+
+		if (!bConnected && (m_HTTPAsync.GetLenght() || m_HTTPAsync.GetContentType().Find(L"mpegurl") > 0)) {
+			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", m_HTTPAsync.GetHeader());
+
+			BYTE body[8] = {};
+			DWORD dwSizeRead = 0;
+			if (m_HTTPAsync.Read(body, 7, &dwSizeRead) == S_OK) {
+				if (memcmp(body, "#EXTM3U", 7) == 0) {
+					ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
+				}
+			}
+			m_HTTPAsync.Close();
+
+			if (!m_hlsData.Segments.empty()) {
+				m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+				bConnected = TRUE;
+				m_protocol = protocol::PR_HLS;
+
+				if (FAILED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+					bConnected = FALSE;
+				}
+				m_hlsData.Segments.pop_front();
 			}
 		}
 
@@ -568,16 +700,38 @@ DWORD CUDPStream::ThreadProc()
 				return 0;
 			case CMD::CMD_STOP:
 				Reply(S_OK);
+
+				if (m_protocol == protocol::PR_HLS) {
+					m_HTTPAsync.Close();
+					m_hlsData.Segments.clear();
+					m_hlsData.DiscontinuitySegments.clear();
+					m_hlsData.SequenceNumber = {};
+				}
 				break;
 			case CMD::CMD_INIT:
 			case CMD::CMD_RUN:
 				Reply(S_OK);
-				BYTE buff[MAXBUFSIZE * 2];
+				BYTE buff[MAXBUFSIZE * 2] = {};
 				int  buffsize = 0;
 				UINT attempts = 0;
 				int  len      = 0;
 
 				BOOL bEndOfStream = FALSE;
+
+				if (m_protocol == protocol::PR_HLS) {
+					if (m_hlsData.Segments.empty()) {
+						if (m_hlsData.bEndList || !ParseM3U8(m_hlsData.PlaylistUrl, m_hlsData.PlaylistUrl)) {
+							m_bEndOfStream = TRUE;
+							break;
+						}
+						if (FAILED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+							bEndOfStream = TRUE;
+							break;
+						}
+						m_hlsData.Segments.pop_front();
+					}
+				}
+
 				while (!CheckRequest(nullptr)
 						&& attempts < 200 && !bEndOfStream) {
 
@@ -636,6 +790,38 @@ DWORD CUDPStream::ThreadProc()
 								continue;
 							}
 						}
+					} else if (m_protocol == protocol::PR_HLS) {
+						if (!m_hlsData.bEndList) {
+							auto now = std::chrono::high_resolution_clock::now();
+							auto seconds = std::chrono::duration_cast<std::chrono::seconds>(now - m_hlsData.PlaylistParsingTime).count();
+							if (seconds > static_cast<int64_t>(m_hlsData.SegmentDuration)) {
+								ParseM3U8(m_hlsData.PlaylistUrl, m_hlsData.PlaylistUrl);
+							}
+						}
+
+						DWORD dwSizeRead = 0;
+						m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
+						if (dwSizeRead == 0) {
+							m_HTTPAsync.Close();
+
+							if (m_hlsData.Segments.empty()) {
+								if (m_hlsData.bEndList) {
+									bEndOfStream = TRUE;
+									break;
+								}
+								attempts++;
+								Sleep(50);
+							} else {
+								if (FAILED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+									bEndOfStream = TRUE;
+									break;
+								}
+								m_hlsData.Segments.pop_front();
+							}
+
+							continue;
+						}
+						len = dwSizeRead;
 					}
 
 					attempts = 0;
