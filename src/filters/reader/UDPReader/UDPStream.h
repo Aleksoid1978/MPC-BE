@@ -43,13 +43,10 @@ private:
 	class CPacket
 	{
 	public:
-		BYTE*     m_buff;
+		std::unique_ptr<BYTE[]> m_buff;
 		ULONGLONG m_start, m_end;
 
 		CPacket(const BYTE* p, ULONGLONG start, UINT size);
-		virtual ~CPacket() {
-			delete [] m_buff;
-		}
 	};
 
 	CCritSec           m_csLock;
@@ -70,7 +67,7 @@ private:
 	ULONGLONG          m_len = 0;
 	DWORD              m_nBytesRead = 0;
 
-	std::deque<CPacket*> m_packets;
+	std::deque<CPacket> m_packets;
 
 	CAMEvent           m_EventComplete;
 

@@ -80,7 +80,7 @@ void CUDPStream::Append(const BYTE* buff, UINT len)
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	m_packets.emplace_back(DNew CPacket(buff, m_len, len));
+	m_packets.emplace_back(buff, m_len, len);
 	m_len += len;
 
 	if (m_SizeComplete && m_len >= m_SizeComplete) {
@@ -550,9 +550,9 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	m_pos = llPos;
 
-	const __int64 start = m_packets.empty() ? 0 : m_packets.front()->m_start;
+	const __int64 start = m_packets.empty() ? 0 : m_packets.front().m_start;
 	if (llPos < start) {
-		DLog(L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.back()->m_end);
+		DLog(L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.back().m_end);
 		return S_FALSE;
 	}
 
@@ -565,11 +565,11 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	BYTE* ptr = pbBuffer;
 
 	if (!m_packets.empty()
-			&& m_pos + len > m_packets.back()->m_end) {
+			&& m_pos + len > m_packets.back().m_end) {
 		m_SizeComplete = m_pos + len;
 
 #if DEBUG
-		DLog(L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.back()->m_end, m_packets.back()->m_end, m_SizeComplete);
+		DLog(L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.back().m_end, m_packets.back().m_end, m_SizeComplete);
 		const ULONGLONG start = GetPerfCounter();
 #endif
 
@@ -595,12 +595,12 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 	auto it = m_packets.cbegin();
 	while (it != m_packets.cend() && len > 0) {
-		const CPacket* p = *it++;
+		const auto& p = *it++;
 
-		DLogIf(m_pos < p->m_start, L"CUDPStream::Read(): requested data is no longer available, %llu - %llu", m_pos, p->m_start);
-		if (p->m_start <= m_pos && m_pos < p->m_end) {
-			const DWORD size = (DWORD)std::min((ULONGLONG)len, p->m_end - m_pos);
-			memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
+		DLogIf(m_pos < p.m_start, L"CUDPStream::Read(): requested data is no longer available, %llu - %llu", m_pos, p.m_start);
+		if (p.m_start <= m_pos && m_pos < p.m_end) {
+			const DWORD size = std::min<DWORD>((ULONGLONG)len, p.m_end - m_pos);
+			memcpy(ptr, &p.m_buff.get()[m_pos - p.m_start], size);
 
 			m_pos += size;
 
@@ -648,7 +648,7 @@ inline const ULONGLONG CUDPStream::GetPacketsSize()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	return m_packets.empty() ? 0 : m_packets.back()->m_end - m_packets.front()->m_start;
+	return m_packets.empty() ? 0 : m_packets.back().m_end - m_packets.front().m_start;
 }
 
 void CUDPStream::CheckBuffer()
@@ -657,8 +657,7 @@ void CUDPStream::CheckBuffer()
 		CAutoLock cPacketLock(&m_csPacketsLock);
 
 		if (m_pos > 256 * KILOBYTE) {
-			while (!m_packets.empty() && m_packets.front()->m_start < m_pos - 256 * KILOBYTE) {
-				delete m_packets.front();
+			while (!m_packets.empty() && m_packets.front().m_start < m_pos - 256 * KILOBYTE) {
 				m_packets.pop_front();
 			}
 		}
@@ -669,11 +668,7 @@ void CUDPStream::EmptyBuffer()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	while (!m_packets.empty()) {
-		delete m_packets.front();
-		m_packets.pop_front();
-	}
-
+	m_packets.clear();
 	m_len = m_pos;
 }
 
@@ -860,6 +855,6 @@ CUDPStream::CPacket::CPacket(const BYTE* p, ULONGLONG start, UINT size)
 	, m_end(start + size)
 {
 	ASSERT(size > 0);
-	m_buff = DNew BYTE[size];
-	memcpy(m_buff, p, size);
+	m_buff = std::make_unique<BYTE[]>(size);
+	memcpy(m_buff.get(), p, size);
 }
