@@ -215,17 +215,26 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 		return false;
 	}
 
+	CString str;
+	if (!f.ReadString(str) || str != L"#EXTM3U") {
+		return false;
+	}
+
 	realUrl = url;
 
 	CString base(url);
 	base.Truncate(base.ReverseFind('/'));
 
+	bool bMediaSequence = false;
 	uint64_t sequenceNumber = {};
+
 	bool bDiscontinuity = false;
+
+	int32_t bandwidth = {};
+	std::list<std::pair<uint32_t, CString>> PlaylistItems;
 
 	m_hlsData.SegmentDuration = {};
 
-	CString str;
 	while (f.ReadString(str)) {
 		FastTrim(str);
 
@@ -244,13 +253,22 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			continue;
 		} else if (StartsWith(str, L"#EXT-X-MEDIA-SEQUENCE:")) {
 			DeleteLeft(22, str);
-			StrToUInt64(str, sequenceNumber);
+			if (StrToUInt64(str, sequenceNumber)) {
+				bMediaSequence = true;
+			}
 			continue;
 		} else if (str == L"#EXT-X-DISCONTINUITY") {
 			bDiscontinuity = true;
 			continue;
 		} else if (str == L"#EXT-X-ENDLIST") {
 			m_hlsData.bEndList = true;
+			continue;
+		} else if (StartsWith(str, L"#EXT-X-STREAM-INF:")) {
+			auto pos = str.Find(L"BANDWIDTH=");
+			if (pos > 0) {
+				DeleteLeft(pos + 10, str);
+				StrToInt32(str, bandwidth);
+			};
 			continue;
 		} else if (str.GetAt(0) == L'#') {
 			continue;
@@ -272,7 +290,10 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			return output;
 		};
 
-		if (sequenceNumber > m_hlsData.SequenceNumber || bDiscontinuity) {
+		if (!bMediaSequence) {
+			PlaylistItems.emplace_back(bandwidth, CombinePath(base, str));
+			bandwidth = {};
+		} else {
 			if (bDiscontinuity) {
 				auto fullUrl = CombinePath(base, str);
 				auto it = std::find(m_hlsData.DiscontinuitySegments.cbegin(), m_hlsData.DiscontinuitySegments.cend(), fullUrl);
@@ -281,29 +302,32 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 					m_hlsData.DiscontinuitySegments.emplace_back(fullUrl);
 				}
 			} else {
-				m_hlsData.Segments.emplace_back(CombinePath(base, str));
+				if (bMediaSequence && sequenceNumber > m_hlsData.SequenceNumber) {
+					m_hlsData.Segments.emplace_back(CombinePath(base, str));
+					m_hlsData.SequenceNumber = sequenceNumber;
+				}
+				sequenceNumber++;
 			}
-			m_hlsData.SequenceNumber = sequenceNumber;
-		}
-
-		if (!bDiscontinuity) {
-			sequenceNumber++;
 		}
 	}
 
-	if (!bDiscontinuity) {
+	if (bDiscontinuity) {
+		m_hlsData.SequenceNumber = {};
+	} else {
 		m_hlsData.DiscontinuitySegments.clear();
 	}
 
 	m_hlsData.PlaylistParsingTime = std::chrono::high_resolution_clock::now();
 
-	if (m_hlsData.SegmentDuration && (sequenceNumber || bDiscontinuity)) {
+	if (m_hlsData.SegmentDuration && (bMediaSequence || bDiscontinuity)) {
 		return !m_hlsData.Segments.empty();
 	}
 
-	if (m_hlsData.Segments.size() == 1) {
-		CString newUrl = m_hlsData.Segments.front();
-		m_hlsData.Segments.clear();
+	if (!PlaylistItems.empty()) {
+		PlaylistItems.sort([](const auto& itemleft, const auto& itemright) {
+			return itemleft.first > itemright.first;
+		});
+		CString newUrl = PlaylistItems.front().second;
 		return ParseM3U8(newUrl, realUrl);
 	}
 
