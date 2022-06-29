@@ -1545,7 +1545,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		memcpy(p->data(), pDataIn, len);
 
 		if (m_sphli && p->m_rtStart == PTS2RT(m_sphli->StartPTM)) {
-			p->m_psphli.reset(m_sphli.release());
+			p->m_psphli = std::move(m_sphli);
 		}
 
 		m_sps.AddTail(p);
