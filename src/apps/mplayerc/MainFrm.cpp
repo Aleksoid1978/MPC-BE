@@ -4035,7 +4035,9 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 {
-	__super::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
+	if (!pPopupMenu || !::IsMenu(pPopupMenu->m_hMenu)) {
+		return;
+	}
 
 	UINT uiMenuCount = pPopupMenu->GetMenuItemCount();
 	if (uiMenuCount == UINT(-1)) {
@@ -4055,18 +4057,16 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 	MENUITEMINFOW mii = { sizeof(mii) };
 
 	for (UINT i = 0; i < uiMenuCount; ++i) {
-		UINT firstSubItemID = 0;
 		CMenu* sm = pPopupMenu->GetSubMenu(i);
-		if (sm) {
-			firstSubItemID= sm->GetMenuItemID(0);
-		}
-
-		if (firstSubItemID == ID_VIEW_ZOOM_50) { // is "Zoom" submenu
-			UINT fState = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly)
-						  ? MF_ENABLED
-						  : (MF_DISABLED | MF_GRAYED);
-			pPopupMenu->EnableMenuItem(i, MF_BYPOSITION|fState);
-			continue;
+		if (sm && ::IsMenu(sm->m_hMenu)) {
+			auto firstSubItemID = sm->GetMenuItemID(0);
+			if (firstSubItemID == ID_VIEW_ZOOM_50) { // is "Zoom" submenu
+				UINT uState = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly)
+					? MF_ENABLED
+					: (MF_DISABLED | MF_GRAYED);
+				pPopupMenu->EnableMenuItem(i, MF_BYPOSITION | uState);
+				continue;
+			}
 		}
 
 		UINT itemID = pPopupMenu->GetMenuItemID(i);
@@ -4118,7 +4118,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			const CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
 			mii.fMask = MIIM_STRING;
 			mii.dwTypeData = (LPWSTR)menu_str.GetString();
-			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
+			pPopupMenu->SetMenuItemInfoW(i, &mii, TRUE);
 			SetupVideoStreamsSubMenu();
 			pSubMenu = &m_VideoStreamsMenu;
 		}

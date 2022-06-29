@@ -264,7 +264,9 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 
 void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 {
-	ASSERT(pMenu);
+	if (!pMenu || !::IsMenu(pMenu->m_hMenu)) {
+		return;
+	}
 
 	for (int i = 0; i < pMenu->GetMenuItemCount(); i++) {
 		MENUITEMINFOW mii = { sizeof(mii), MIIM_ID | MIIM_TYPE };
