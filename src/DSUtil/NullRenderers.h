@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,10 +89,10 @@ class __declspec(uuid("655D7613-C26C-4A25-BBBD-3C9C516122CC"))
 		HRESULT CheckMediaType(const CMediaType* pmt);
 	};
 
-	CAutoPtr<CTextInputPin> m_pInput;
+	std::unique_ptr<CTextInputPin> m_pInput;
 
 public:
 	CNullTextRenderer(LPUNKNOWN pUnk, HRESULT* phr);
-	int GetPinCount() { return (int)!!m_pInput; }
-	CBasePin* GetPin(int n) { return n == 0 ? (CBasePin*)m_pInput : nullptr; }
+	int GetPinCount() { return m_pInput.get() ? 1 : 0; }
+	CBasePin* GetPin(int n) { return n == 0 ? (CBasePin*)m_pInput.get() : nullptr; }
 };

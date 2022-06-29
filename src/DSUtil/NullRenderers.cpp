@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -567,5 +567,5 @@ HRESULT CNullTextRenderer::CTextInputPin::CheckMediaType(const CMediaType* pmt)
 CNullTextRenderer::CNullTextRenderer(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseFilter(L"CNullTextRenderer", pUnk, this, __uuidof(this), phr)
 {
-	m_pInput.Attach(DNew CTextInputPin(this, this, phr));
+	m_pInput.reset(DNew CTextInputPin(this, this, phr));
 }
