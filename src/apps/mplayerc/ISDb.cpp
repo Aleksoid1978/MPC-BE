@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,12 +103,10 @@ bool OpenUrl(CInternetSession& is, CString url, CStringA& str)
 	str.Empty();
 
 	try {
-		CAutoPtr<CStdioFile> f(is.OpenURL(url, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT));
+		std::unique_ptr<CStdioFile> f(is.OpenURL(url, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT));
 
 		char buff[1024];
-		for (int len; (len = f->Read(buff, sizeof(buff))) > 0; str += CStringA(buff, len)) {
-			;
-		}
+		for (int len; (len = f->Read(buff, sizeof(buff))) > 0; str.Append(buff, len));
 
 		f->Close();
 	} catch (CInternetException* ie) {
