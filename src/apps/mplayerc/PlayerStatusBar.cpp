@@ -234,8 +234,8 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 
 void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool bShowMilliSecs, const GUID& timeFormat)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	REFERENCE_TIME rt = s.fRemainingTime ? rtDur - rtNow : rtNow;
+	const bool bRemainingTime = AfxGetAppSettings().fRemainingTime && rtDur > 0;
+	REFERENCE_TIME rt = bRemainingTime ? rtDur - rtNow : rtNow;
 	CString strPos, strDur;
 
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
@@ -253,7 +253,7 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 
 	CString str;
 	if (rtDur > 0 && rtNow < rtDur) {
-		if (s.fRemainingTime) {
+		if (bRemainingTime) {
 			str = L"- " + strPos + L" / " + strDur;
 		} else {
 			str = strPos + L" / " + strDur;
