@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -219,7 +219,7 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 	AM_PROPERTY_COMPOSIT_ON m_spon = TRUE;
 	AM_DVD_YUV m_sppal[16];
 	bool m_fsppal = false;
-	CAutoPtr<AM_PROPERTY_SPHLI> m_sphli; // temp
+	std::unique_ptr<AM_PROPERTY_SPHLI> m_sphli; // temp
 
 	class spu : public std::vector<BYTE>
 	{
@@ -229,7 +229,7 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 		REFERENCE_TIME m_rtStop = 0;
 		uint32_t m_offset[2] = {};
 		AM_PROPERTY_SPHLI m_sphli = {}; // parsed
-		CAutoPtr<AM_PROPERTY_SPHLI> m_psphli; // for the menu (optional)
+		std::unique_ptr<AM_PROPERTY_SPHLI> m_psphli; // for the menu (optional)
 		virtual ~spu() {}
 		virtual bool Parse() PURE;
 		virtual void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) PURE;

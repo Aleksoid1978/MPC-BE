@@ -1545,7 +1545,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		memcpy(p->data(), pDataIn, len);
 
 		if (m_sphli && p->m_rtStart == PTS2RT(m_sphli->StartPTM)) {
-			p->m_psphli = m_sphli;
+			p->m_psphli.reset(m_sphli.release());
 		}
 
 		m_sps.AddTail(p);
@@ -1606,17 +1606,15 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
 					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop
-							&& !IsSPHLIEqual(pSPHLI, sp->m_psphli)) {
+							&& !IsSPHLIEqual(pSPHLI, sp->m_psphli.get())) {
 						bRefresh = true;
-						sp->m_psphli.Free();
-						sp->m_psphli.Attach(DNew AM_PROPERTY_SPHLI(*pSPHLI));
+						sp->m_psphli.reset(DNew AM_PROPERTY_SPHLI(*pSPHLI));
 					}
 				}
 
-				if (!bRefresh && !IsSPHLIEqual(pSPHLI, m_sphli)) {
+				if (!bRefresh && !IsSPHLIEqual(pSPHLI, m_sphli.get())) {
 					// save it for later, a subpic might be late for this hli
-					m_sphli.Free();
-					m_sphli.Attach(DNew AM_PROPERTY_SPHLI(*pSPHLI));
+					m_sphli.reset(DNew AM_PROPERTY_SPHLI(*pSPHLI));
 				}
 
 				if (bRefresh) {
@@ -1625,11 +1623,11 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 							pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY);
 				}
 			} else {
-				m_sphli.Free();
+				m_sphli.reset();
 				POSITION pos = m_sps.GetHeadPosition();
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
-					sp->m_psphli.Free();
+					sp->m_psphli.reset();
 				}
 			}
 		}
