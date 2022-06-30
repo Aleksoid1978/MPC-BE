@@ -58,7 +58,7 @@ class CWebServer
 	DWORD m_ThreadId;
 	HANDLE m_hThread;
 
-	CAutoPtrList<CWebClientSocket> m_clients;
+	std::list<std::unique_ptr<CWebClientSocket>> m_clients;
 
 	typedef bool (CWebClientSocket::*RequestHandler)(CStringA& hdr, CStringA& body, CStringA& mime);
 	static const std::map<CString, CWebServer::RequestHandler> m_internalpages;

@@ -292,7 +292,7 @@ bool CWebServer::LoadPage(UINT resid, CStringA& str, CString path)
 
 void CWebServer::OnAccept(CWebServerSocket* pServer)
 {
-	CAutoPtr<CWebClientSocket> p(DNew CWebClientSocket(this, m_pMainFrame));
+	std::unique_ptr<CWebClientSocket> p(DNew CWebClientSocket(this, m_pMainFrame));
 	if (pServer->Accept(*p)) {
 		CString name;
 		UINT port;
@@ -301,17 +301,15 @@ void CWebServer::OnAccept(CWebServerSocket* pServer)
 			return;
 		}
 
-		m_clients.AddTail(p);
+		m_clients.emplace_back(std::move(p));
 	}
 }
 
 void CWebServer::OnClose(CWebClientSocket* pClient)
 {
-	POSITION pos = m_clients.GetHeadPosition();
-	while (pos) {
-		POSITION cur = pos;
-		if (m_clients.GetNext(pos) == pClient) {
-			m_clients.RemoveAt(cur);
+	for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
+		if ((*it).get() == pClient) {
+			m_clients.erase(it);
 			break;
 		}
 	}
