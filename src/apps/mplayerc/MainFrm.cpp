@@ -4035,10 +4035,6 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 {
-	if (!pPopupMenu || !::IsMenu(pPopupMenu->m_hMenu)) {
-		return;
-	}
-
 	UINT uiMenuCount = pPopupMenu->GetMenuItemCount();
 	if (uiMenuCount == UINT(-1)) {
 		return;
@@ -4226,6 +4222,8 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->InsertMenu(ID_VIEW_RESET, MF_BYCOMMAND | MF_SEPARATOR);
 		}
 	}
+
+	__super::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
 
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		CMenuEx::ChangeStyle(pPopupMenu);

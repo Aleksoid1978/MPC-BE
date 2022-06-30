@@ -264,7 +264,8 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 
 void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 {
-	if (!pMenu || !::IsMenu(pMenu->m_hMenu)) {
+	ASSERT(pMenu);
+	if (!::IsMenu(pMenu->m_hMenu)) {
 		return;
 	}
 
