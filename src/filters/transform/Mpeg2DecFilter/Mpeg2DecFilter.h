@@ -269,7 +269,7 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) override;
 	};
 
-	CAutoPtrList<spu> m_sps;
+	std::list<std::unique_ptr<spu>> m_sps;
 
 protected:
 	HRESULT Transform(IMediaSample* pSample) override;

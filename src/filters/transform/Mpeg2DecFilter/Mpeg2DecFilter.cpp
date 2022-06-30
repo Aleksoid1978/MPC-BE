@@ -1435,9 +1435,7 @@ bool CSubpicInputPin::HasAnythingToRender(REFERENCE_TIME rt)
 
 	CAutoLock cAutoLock(&m_csReceive);
 
-	POSITION pos = m_sps.GetHeadPosition();
-	while (pos) {
-		spu* sp = m_sps.GetNext(pos);
+	for (const auto& sp : m_sps) {
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop && (/*sp->m_psphli ||*/ sp->m_fForced || m_spon)) {
 			return true;
 		}
@@ -1450,21 +1448,16 @@ void CSubpicInputPin::RenderSubpics(REFERENCE_TIME rt, BYTE** yuv, int w, int h)
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	POSITION pos;
-
 	// remove no longer needed things first
-	pos = m_sps.GetHeadPosition();
-	while (pos) {
-		POSITION cur = pos;
-		spu* sp = m_sps.GetNext(pos);
-		if (sp->m_rtStop <= rt) {
-			m_sps.RemoveAt(cur);
+	for (auto it = m_sps.begin(); it != m_sps.end();) {
+		if ((*it)->m_rtStop <= rt) {
+			it = m_sps.erase(it);
+		} else {
+			++it;
 		}
 	}
 
-	pos = m_sps.GetHeadPosition();
-	while (pos) {
-		spu* sp = m_sps.GetNext(pos);
+	for (const auto& sp : m_sps) {
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop
 				&& (m_spon || (sp->m_fForced && ((static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled()) || sp->m_psphli))) {
 			sp->Render(rt, yuv, w, h, m_sppal, m_fsppal);
@@ -1511,29 +1504,28 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 	hr = pSample->GetTime(&rtStart, &rtStop);
 
 	if (FAILED(hr)) {
-		if (!m_sps.IsEmpty()) {
-			spu* sp = m_sps.GetTail();
+		if (m_sps.size()) {
+			auto& sp = m_sps.back();
 			sp->resize(sp->size() + len);
 			memcpy(sp->data() + sp->size() - len, pDataIn, len);
 		}
 	} else {
-		POSITION pos = m_sps.GetTailPosition();
-		while (pos) {
-			spu* sp = m_sps.GetPrev(pos);
+		for (auto& it = m_sps.rbegin(); it != m_sps.rend(); ++it) {
+			auto& sp = *it;
 			if (sp->m_rtStop == _I64_MAX) {
 				sp->m_rtStop = rtStart;
 				break;
 			}
 		}
 
-		CAutoPtr<spu> p;
+		std::unique_ptr<spu> p;
 
 		if (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
-			p.Attach(DNew dvdspu());
+			p.reset(DNew dvdspu());
 		} else if (m_mt.subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
-			p.Attach(DNew cvdspu());
+			p.reset(DNew cvdspu());
 		} else if (m_mt.subtype == MEDIASUBTYPE_SVCD_SUBPICTURE) {
-			p.Attach(DNew svcdspu());
+			p.reset(DNew svcdspu());
 		} else {
 			return E_FAIL;
 		}
@@ -1548,11 +1540,11 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 			p->m_psphli = std::move(m_sphli);
 		}
 
-		m_sps.AddTail(p);
+		m_sps.emplace_back(p.release());
 	}
 
-	if (!m_sps.IsEmpty()) {
-		m_sps.GetTail()->Parse();
+	if (m_sps.size()) {
+		m_sps.back()->Parse();
 	}
 
 	return S_FALSE;
@@ -1561,7 +1553,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 STDMETHODIMP CSubpicInputPin::EndFlush()
 {
 	CAutoLock cAutoLock(&m_csReceive);
-	m_sps.RemoveAll();
+	m_sps.clear();
 	return S_OK;
 }
 
@@ -1602,9 +1594,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			AM_PROPERTY_SPHLI* pSPHLI = (AM_PROPERTY_SPHLI*)pPropertyData;
 
 			if (pSPHLI->HLISS) {
-				POSITION pos = m_sps.GetHeadPosition();
-				while (pos) {
-					spu* sp = m_sps.GetNext(pos);
+				for (const auto& sp : m_sps) {
 					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop
 							&& !IsSPHLIEqual(pSPHLI, sp->m_psphli.get())) {
 						bRefresh = true;
@@ -1624,9 +1614,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 				}
 			} else {
 				m_sphli.reset();
-				POSITION pos = m_sps.GetHeadPosition();
-				while (pos) {
-					spu* sp = m_sps.GetNext(pos);
+				for (const auto& sp : m_sps) {
 					sp->m_psphli.reset();
 				}
 			}
