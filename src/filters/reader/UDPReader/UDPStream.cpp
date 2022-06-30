@@ -28,6 +28,7 @@
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/UrlParser.h"
 #include "DSUtil/entities.h"
+#include "DSUtil/std_helper.h"
 #include "Subtitles/TextFile.h"
 
 #define RAPIDJSON_SSE2
@@ -270,6 +271,12 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 				StrToInt32(str, bandwidth);
 			};
 			continue;
+		} else if (StartsWith(str, L"#EXT-X-KEY:")) {
+			auto method = RegExpParse(str.GetString(), L"METHOD=([^,]+)");
+			if (method != L"NONE") {
+				DLog(L"CUDPStream::ParseM3U8() : encrypted playlist is not supported yet.");
+				return false;
+			}
 		} else if (str.GetAt(0) == L'#') {
 			continue;
 		}
