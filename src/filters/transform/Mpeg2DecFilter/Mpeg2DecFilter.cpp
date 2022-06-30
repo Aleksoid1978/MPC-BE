@@ -1540,7 +1540,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 			p->m_psphli = std::move(m_sphli);
 		}
 
-		m_sps.emplace_back(p.release());
+		m_sps.emplace_back(std::move(p));
 	}
 
 	if (m_sps.size()) {
