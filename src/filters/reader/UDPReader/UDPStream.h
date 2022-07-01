@@ -97,7 +97,6 @@ private:
 		std::chrono::high_resolution_clock::time_point PlaylistParsingTime = {};
 
 		bool                bAes128 = {};
-		std::vector<BYTE>   DecryptedData;
 		std::unique_ptr<CAESDecryptor> pAESDecryptor;
 
 		[[nodiscard]] bool IsEndOfSegment() const { return SegmentPos == SegmentSize; }

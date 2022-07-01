@@ -49,7 +49,7 @@ public:
 	~CAESDecryptor();
 
 	[[nodiscard]] bool SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size_t ivSize);
-	[[nodiscard]] bool Decrypt(const BYTE* data, size_t size, std::vector<BYTE>& pDecryptedData, size_t& decryptedSize, bool bPadding);
+	[[nodiscard]] bool Decrypt(const BYTE* encryptedData, size_t encryptedSize, BYTE* decryptedData, size_t& decryptedSize, bool bPadding);
 
 	[[nodiscard]] bool IsInitialized() const { return m_hAesAlg != nullptr; }
 	[[nodiscard]] bool IsReadyDecrypt() const { return m_bReadyDecrypt; }

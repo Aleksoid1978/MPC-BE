@@ -89,23 +89,20 @@ bool CAESDecryptor::SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size
 	return true;
 }
 
-bool CAESDecryptor::Decrypt(const BYTE* data, size_t size, std::vector<BYTE>& pDecryptedData, size_t& decryptedSize, bool bPadding)
+bool CAESDecryptor::Decrypt(const BYTE* encryptedData, size_t encryptedSize, BYTE* decryptedData, size_t& decryptedSize, bool bPadding)
 {
 	if (!m_bReadyDecrypt) {
 		return false;
 	}
 
-	decryptedSize = size;
-	if (decryptedSize > pDecryptedData.size()) {
-		pDecryptedData.resize(decryptedSize);
-	}
+	decryptedSize = encryptedSize;
 	auto ret = BCryptDecrypt(m_hKey,
-							 const_cast<PUCHAR>(data),
-							 size,
+							 const_cast<PUCHAR>(encryptedData),
+							 encryptedSize,
 							 nullptr,
 							 m_pIV ? m_pIV.get() : nullptr,
 							 m_pIV ? m_BlockLen : 0,
-							 reinterpret_cast<PUCHAR>(pDecryptedData.data()),
+							 decryptedData,
 							 decryptedSize,
 							 reinterpret_cast<PULONG>(&decryptedSize),
 							 bPadding ? BCRYPT_BLOCK_PADDING : 0);

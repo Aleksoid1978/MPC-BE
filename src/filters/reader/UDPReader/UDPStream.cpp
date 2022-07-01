@@ -828,14 +828,20 @@ DWORD CUDPStream::ThreadProc()
 
 				BOOL bEndOfStream = FALSE;
 
+				std::unique_ptr<BYTE[]> encryptedBuff;
+
 				if (m_protocol == protocol::PR_HLS) {
+					if (m_hlsData.bAes128) {
+						encryptedBuff.reset(DNew BYTE[MAXBUFSIZE]);
+					}
+
 					if (m_hlsData.Segments.empty()) {
 						if (m_hlsData.bEndList || !ParseM3U8(m_hlsData.PlaylistUrl, m_hlsData.PlaylistUrl)) {
 							m_bEndOfStream = TRUE;
 							break;
 						}
 						if (!OpenHLSSegment()) {
-							bEndOfStream = TRUE;
+							m_bEndOfStream = TRUE;
 							break;
 						}
 					}
@@ -928,21 +934,22 @@ DWORD CUDPStream::ThreadProc()
 						}
 
 						DWORD dwSizeRead = 0;
-						if (FAILED(m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead))) {
+						auto ptr = m_hlsData.bAes128 ? encryptedBuff.get() : &buff[buffsize];
+						if (FAILED(m_HTTPAsync.Read(ptr, MAXBUFSIZE, &dwSizeRead))) {
 							bEndOfStream = TRUE;
 							break;
 						}
 
 						m_hlsData.SegmentPos += dwSizeRead;
-						len = dwSizeRead;
 						if (m_hlsData.bAes128) {
 							size_t decryptedSize = {};
-							if (m_hlsData.pAESDecryptor->Decrypt(&buff[buffsize], dwSizeRead, m_hlsData.DecryptedData, decryptedSize, m_hlsData.IsEndOfSegment())) {
+							if (m_hlsData.pAESDecryptor->Decrypt(ptr, dwSizeRead, &buff[buffsize], decryptedSize, m_hlsData.IsEndOfSegment())) {
 								len = decryptedSize;
-								memcpy(&buff[buffsize], m_hlsData.DecryptedData.data(), decryptedSize);
 							} else {
 								len = 0;
 							}
+						} else {
+							len = dwSizeRead;
 						}
 					}
 
