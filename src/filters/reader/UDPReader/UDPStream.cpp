@@ -304,7 +304,7 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 					if (!m_hlsData.pAESDecryptor->IsInitialized()) {
 						return false;
 					}
-					if (!uri.IsEmpty()) {
+					if (!uri.IsEmpty() && !iv.IsEmpty()) {
 						uri.Trim(L'"');
 						CHTTPAsync http;
 						if (SUCCEEDED(http.Connect(uri))) {
@@ -316,21 +316,19 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 							DWORD dwSizeRead = 0;
 							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBLOCKSIZE, &dwSizeRead))) {
 								std::vector<BYTE> pIV;
-								if (!iv.IsEmpty()) {
-									iv.Delete(0, 2);
-									if (iv.GetLength() != (CAESDecryptor::AESBLOCKSIZE * 2)) {
-										DLog(L"CUDPStream::ParseM3U8() : wrong AES IV.");
-										return false;
-									}
-									CStringToBin(iv, pIV);
+								iv.Delete(0, 2);
+								if (iv.GetLength() != (CAESDecryptor::AESBLOCKSIZE * 2)) {
+									DLog(L"CUDPStream::ParseM3U8() : wrong AES IV.");
+									return false;
 								}
+								CStringToBin(iv, pIV);
 
 								if (!m_hlsData.pAESDecryptor->SetKey(key, std::size(key), pIV.data(), pIV.size())) {
 									DLog(L"CUDPStream::ParseM3U8() : can't initialize decrypting engine.");
 									return false;
 								}
-								m_hlsData.bAes128 = true;
 
+								m_hlsData.bAes128 = true;
 								continue;
 							}
 						}

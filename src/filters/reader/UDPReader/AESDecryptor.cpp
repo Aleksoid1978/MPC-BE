@@ -25,6 +25,8 @@
 #include <Windows.h>
 #include <winternl.h>
 
+#pragma comment(lib, "Bcrypt.lib")
+
 CAESDecryptor::CAESDecryptor()
 {
 	auto ret = BCryptOpenAlgorithmProvider(&m_hAesAlg, BCRYPT_AES_ALGORITHM, nullptr, 0);
@@ -50,7 +52,7 @@ bool CAESDecryptor::SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size
 	if (keySize != AESBLOCKSIZE) {
 		return false;
 	}
-	if (ivSize && ivSize != AESBLOCKSIZE) {
+	if (ivSize != AESBLOCKSIZE) {
 		return false;
 	}
 
@@ -80,10 +82,8 @@ bool CAESDecryptor::SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size
 		return false;
 	}
 
-	if (ivSize) {
-		m_pIV.reset((PUCHAR)HeapAlloc(GetProcessHeap(), 0, m_BlockLen));
-		memcpy(m_pIV.get(), iv, ivSize);
-	}
+	m_pIV.reset((PUCHAR)HeapAlloc(GetProcessHeap(), 0, m_BlockLen));
+	memcpy(m_pIV.get(), iv, ivSize);
 
 	m_bReadyDecrypt = true;
 	return true;
@@ -100,8 +100,8 @@ bool CAESDecryptor::Decrypt(const BYTE* encryptedData, size_t encryptedSize, BYT
 							 const_cast<PUCHAR>(encryptedData),
 							 encryptedSize,
 							 nullptr,
-							 m_pIV ? m_pIV.get() : nullptr,
-							 m_pIV ? m_BlockLen : 0,
+							 m_pIV.get(),
+							 m_BlockLen,
 							 decryptedData,
 							 decryptedSize,
 							 reinterpret_cast<PULONG>(&decryptedSize),

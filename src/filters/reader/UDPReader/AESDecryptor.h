@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef AESDECRYPTOR_HPP
-#define AESDECRYPTOR_HPP
+#ifndef AESDECRYPTOR_H
+#define AESDECRYPTOR_H
 
 #include <bcrypt.h>
 #include <memory>
