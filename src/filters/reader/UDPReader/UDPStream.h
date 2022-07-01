@@ -23,6 +23,7 @@
 #include <deque>
 #include <ExtLib/AsyncReader/asyncio.h>
 #include "DSUtil/HTTPAsync.h"
+#include "AESDecryptor.h"
 
 #include <chrono>
 
@@ -89,7 +90,14 @@ private:
 		CString             PlaylistUrl;
 		int64_t             SegmentDuration = {};
 		bool                bEndList = {};
+		bool                bInit = {};
 		std::chrono::high_resolution_clock::time_point PlaylistParsingTime = {};
+
+		bool                bAes128 = {};
+		UINT64              SegmentSize = {};
+		UINT64              SegmentPos = {};
+		std::vector<BYTE>   DecryptedData;
+		std::unique_ptr<CAESDecryptor> pAESDecryptor;
 	} m_hlsData;
 
 	void Clear();
@@ -103,6 +111,8 @@ private:
 	DWORD ThreadProc();
 
 	bool ParseM3U8(const CString& url, CString& realUrl);
+
+	bool OpenHLSSegment();
 
 public:
 	CUDPStream() = default;

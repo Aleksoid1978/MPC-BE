@@ -28,7 +28,6 @@
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/UrlParser.h"
 #include "DSUtil/entities.h"
-#include "DSUtil/std_helper.h"
 #include "Subtitles/TextFile.h"
 
 #define RAPIDJSON_SSE2
@@ -67,6 +66,10 @@ void CUDPStream::Clear()
 		m_hlsData.Segments.clear();
 		m_hlsData.DiscontinuitySegments.clear();
 		m_hlsData.SequenceNumber = {};
+		m_hlsData.SegmentDuration = {};
+		m_hlsData.bInit = {};
+
+		m_hlsData.SegmentPos = m_hlsData.SegmentSize = {};
 	}
 
 	m_HTTPAsync.Close();
@@ -272,11 +275,72 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			};
 			continue;
 		} else if (StartsWith(str, L"#EXT-X-KEY:")) {
-			auto method = RegExpParse(str.GetString(), L"METHOD=([^,]+)");
-			if (method != L"NONE") {
-				DLog(L"CUDPStream::ParseM3U8() : encrypted playlist is not supported yet.");
+			if (!m_hlsData.bInit) {
+				DeleteLeft(11, str);
+
+				CString method, uri, iv;
+
+				std::list<CString> attributes;
+				Explode(str, attributes, L',');
+				for (const auto& attribute : attributes) {
+					const auto pos = attribute.Find(L'=');
+					if (pos > 0) {
+						const auto key = attribute.Left(pos);
+						const auto value = attribute.Mid(pos + 1);
+						if (key == L"METHOD") {
+							method = value;
+						} else if (key == L"URI") {
+							uri = value;
+						} else if (key == L"IV") {
+							iv = value;
+						}
+					}
+				}
+
+				if (method == L"NONE") {
+					continue;
+				} else if (method == L"AES-128") {
+					m_hlsData.pAESDecryptor.reset(DNew CAESDecryptor());
+					if (!m_hlsData.pAESDecryptor->IsInitialized()) {
+						return false;
+					}
+					if (!uri.IsEmpty()) {
+						uri.Trim(L'"');
+						CHTTPAsync http;
+						if (SUCCEEDED(http.Connect(uri))) {
+							if (http.GetLenght() != CAESDecryptor::AESBlockSize) {
+								DLog(L"CUDPStream::ParseM3U8() : wrong AES key.");
+								return false;
+							}
+							BYTE key[CAESDecryptor::AESBlockSize] = {};
+							DWORD dwSizeRead = 0;
+							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBlockSize, &dwSizeRead))) {
+								std::vector<BYTE> pIV;
+								if (!iv.IsEmpty()) {
+									iv.Delete(0, 2);
+									if (iv.GetLength() != (CAESDecryptor::AESBlockSize * 2)) {
+										DLog(L"CUDPStream::ParseM3U8() : wrong AES IV.");
+										return false;
+									}
+									CStringToBin(iv, pIV);
+								}
+
+								if (!m_hlsData.pAESDecryptor->SetKey(key, std::size(key), pIV.data(), pIV.size())) {
+									DLog(L"CUDPStream::ParseM3U8() : can't initialize decrypting engine.");
+									return false;
+								}
+								m_hlsData.bAes128 = true;
+
+								continue;
+							}
+						}
+					}
+				}
+
+				DLog(L"CUDPStream::ParseM3U8() : not supported encrypted playlist.");
 				return false;
 			}
+			continue;
 		} else if (str.GetAt(0) == L'#') {
 			continue;
 		}
@@ -327,6 +391,7 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 	m_hlsData.PlaylistParsingTime = std::chrono::high_resolution_clock::now();
 
 	if (m_hlsData.SegmentDuration && (bMediaSequence || bDiscontinuity)) {
+		m_hlsData.bInit = true;
 		return !m_hlsData.Segments.empty();
 	}
 
@@ -336,6 +401,20 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 		});
 		CString newUrl = PlaylistItems.front().second;
 		return ParseM3U8(newUrl, realUrl);
+	}
+
+	return false;
+}
+
+bool CUDPStream::OpenHLSSegment()
+{
+	if (!m_hlsData.Segments.empty()) {
+		if (SUCCEEDED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+			m_hlsData.Segments.pop_front();
+			m_hlsData.SegmentSize = m_HTTPAsync.GetLenght();
+			m_hlsData.SegmentPos = {};
+			return true;
+		}
 	}
 
 	return false;
@@ -527,10 +606,9 @@ bool CUDPStream::Load(const WCHAR* fnw)
 				bConnected = TRUE;
 				m_protocol = protocol::PR_HLS;
 
-				if (FAILED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+				if (!OpenHLSSegment()) {
 					bConnected = FALSE;
 				}
-				m_hlsData.Segments.pop_front();
 			}
 		}
 
@@ -756,11 +834,10 @@ DWORD CUDPStream::ThreadProc()
 							m_bEndOfStream = TRUE;
 							break;
 						}
-						if (FAILED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+						if (!OpenHLSSegment()) {
 							bEndOfStream = TRUE;
 							break;
 						}
-						m_hlsData.Segments.pop_front();
 					}
 				}
 
@@ -844,16 +921,27 @@ DWORD CUDPStream::ThreadProc()
 								attempts++;
 								Sleep(50);
 							} else {
-								if (FAILED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
+								if (!OpenHLSSegment()) {
 									bEndOfStream = TRUE;
 									break;
 								}
-								m_hlsData.Segments.pop_front();
 							}
 
 							continue;
 						}
+
 						len = dwSizeRead;
+						if (m_hlsData.bAes128) {
+							m_hlsData.SegmentPos += dwSizeRead;
+
+							size_t dectyptedSize = {};
+							if (m_hlsData.pAESDecryptor->Decrypt(&buff[buffsize], dwSizeRead, m_hlsData.DecryptedData, dectyptedSize, m_hlsData.SegmentSize == m_hlsData.SegmentPos)) {
+								len = dectyptedSize;
+								memcpy(&buff[buffsize], m_hlsData.DecryptedData.data(), dectyptedSize);
+							} else {
+								len = 0;
+							}
+						}
 					}
 
 					attempts = 0;
