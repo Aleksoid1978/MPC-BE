@@ -95,33 +95,20 @@ bool CAESDecryptor::Decrypt(const BYTE* data, size_t size, std::vector<BYTE>& pD
 		return false;
 	}
 
+	decryptedSize = size;
+	if (decryptedSize > pDecryptedData.size()) {
+		pDecryptedData.resize(decryptedSize);
+	}
 	auto ret = BCryptDecrypt(m_hKey,
 							 const_cast<PUCHAR>(data),
 							 size,
 							 nullptr,
 							 m_pIV ? m_pIV.get() : nullptr,
 							 m_pIV ? m_BlockLen : 0,
-							 nullptr,
-							 0,
+							 reinterpret_cast<PUCHAR>(pDecryptedData.data()),
+							 decryptedSize,
 							 reinterpret_cast<PULONG>(&decryptedSize),
 							 bPadding ? BCRYPT_BLOCK_PADDING : 0);
-	if (!NT_SUCCESS(ret)) {
-		return false;
-	}
-
-	if (decryptedSize > pDecryptedData.size()) {
-		pDecryptedData.resize(decryptedSize);
-	}
-	ret = BCryptDecrypt(m_hKey,
-						const_cast<PUCHAR>(data),
-						size,
-						nullptr,
-						m_pIV ? m_pIV.get() : nullptr,
-						m_pIV ? m_BlockLen : 0,
-						reinterpret_cast<PUCHAR>(pDecryptedData.data()),
-						decryptedSize,
-						reinterpret_cast<PULONG>(&decryptedSize),
-						bPadding ? BCRYPT_BLOCK_PADDING : 0);
 	if (!NT_SUCCESS(ret)) {
 		return false;
 	}
