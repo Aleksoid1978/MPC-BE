@@ -934,10 +934,10 @@ DWORD CUDPStream::ThreadProc()
 						if (m_hlsData.bAes128) {
 							m_hlsData.SegmentPos += dwSizeRead;
 
-							size_t dectyptedSize = {};
-							if (m_hlsData.pAESDecryptor->Decrypt(&buff[buffsize], dwSizeRead, m_hlsData.DecryptedData, dectyptedSize, m_hlsData.SegmentSize == m_hlsData.SegmentPos)) {
-								len = dectyptedSize;
-								memcpy(&buff[buffsize], m_hlsData.DecryptedData.data(), dectyptedSize);
+							size_t decryptedSize = {};
+							if (m_hlsData.pAESDecryptor->Decrypt(&buff[buffsize], dwSizeRead, m_hlsData.DecryptedData, decryptedSize, m_hlsData.SegmentSize == m_hlsData.SegmentPos)) {
+								len = decryptedSize;
+								memcpy(&buff[buffsize], m_hlsData.DecryptedData.data(), decryptedSize);
 							} else {
 								len = 0;
 							}
