@@ -256,7 +256,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	DLog(L"CHTTPAsync::Connect() : return header:\n%s", m_header);
 #endif
 
-	m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE);
+	m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE).MakeLower();
 
 	const CString queryInfo = QueryInfoStr(HTTP_QUERY_CONTENT_LENGTH);
 	if (!queryInfo.IsEmpty()) {

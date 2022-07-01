@@ -76,6 +76,7 @@ public:
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	const CString& GetHeader() const;
+	// get content type in lowercase
 	const CString& GetContentType() const;
 	UINT64 GetLenght() const;
 };

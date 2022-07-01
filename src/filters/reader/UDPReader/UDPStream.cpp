@@ -559,7 +559,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 			bConnected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
-			contentType.MakeLower();
+
 			if (contentType == L"application/octet-stream"
 					|| contentType == L"video/unknown" || contentType == L"none"
 					|| contentType.IsEmpty()) {
