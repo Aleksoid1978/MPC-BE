@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -153,9 +153,9 @@ bool CComPropertySheet::AddPage(IPropertyPage* pPage, IUnknown* pUnk)
 	hr = pPage->GetPageInfo(&ppi);
 	m_size.cx = std::max(m_size.cx, ppi.size.cx);
 	m_size.cy = std::max(m_size.cy, ppi.size.cy);
-	CAutoPtr<CComPropertyPage> p(DNew CComPropertyPage(pPage));
-	__super::AddPage(p);
-	m_pages.AddTail(p);
+	std::unique_ptr<CComPropertyPage> p(DNew CComPropertyPage(pPage));
+	__super::AddPage(p.get());
+	m_pages.emplace_back(std::move(p));
 
 	return true;
 }

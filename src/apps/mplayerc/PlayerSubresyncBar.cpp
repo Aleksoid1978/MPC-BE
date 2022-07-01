@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1065,7 +1065,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						m_sts[iItem].style = s;
 						m_list.SetItemText(iItem, lpnmlv->iSubItem, s);
 					} else if (id == STYLEEDIT) {
-						CAutoPtrArray<CPPageSubStyle> pages;
+						std::vector<std::unique_ptr<CPPageSubStyle>> pages;
 						std::vector<STSStyle*> styles;
 
 						STSStyle* stss = m_sts.GetStyle(iItem);
@@ -1077,9 +1077,9 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							STSStyle* val;
 							m_sts.m_styles.GetNextAssoc(pos, key, val);
 
-							CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
+							std::unique_ptr<CPPageSubStyle> page(DNew CPPageSubStyle());
 							page->InitSubStyle(key, val);
-							pages.Add(page);
+							pages.emplace_back(std::move(page));
 							styles.push_back(val);
 
 							if (stss == val) {
@@ -1088,12 +1088,12 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						}
 
 						CPropertySheet dlg(L"Styles...", this, iSelPage);
-						for (size_t i = 0, l = pages.GetCount(); i < l; i++) {
-							dlg.AddPage(pages[i]);
+						for (const auto& page : pages) {
+							dlg.AddPage(page.get());
 						}
 
 						if (dlg.DoModal() == IDOK) {
-							for (size_t j = 0, l = pages.GetCount(); j < l; j++) {
+							for (size_t j = 0, l = pages.size(); j < l; j++) {
 								stss = styles[j];
 								pages[j]->GetSubStyle(stss);
 
