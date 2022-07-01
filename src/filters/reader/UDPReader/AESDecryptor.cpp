@@ -47,10 +47,10 @@ bool CAESDecryptor::SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size
 		return false;
 	}
 
-	if (keySize != AESBlockSize) {
+	if (keySize != AESBLOCKSIZE) {
 		return false;
 	}
-	if (ivSize && ivSize != AESBlockSize) {
+	if (ivSize && ivSize != AESBLOCKSIZE) {
 		return false;
 	}
 
@@ -66,7 +66,7 @@ bool CAESDecryptor::SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size
 	if (!NT_SUCCESS(ret)) {
 		return false;
 	}
-	if (m_BlockLen != AESBlockSize) {
+	if (m_BlockLen != AESBLOCKSIZE) {
 		return false;
 	}
 

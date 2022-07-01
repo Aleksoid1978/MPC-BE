@@ -43,13 +43,13 @@ class CAESDecryptor final
 	BCRYPT_KEY_HANDLE m_hKey = nullptr;
 
 public:
-	constexpr static size_t AESBlockSize = 16;
+	constexpr static size_t AESBLOCKSIZE = 16;
 
 	CAESDecryptor();
 	~CAESDecryptor();
 
-	bool SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size_t ivSize);
-	bool Decrypt(const BYTE* data, size_t size, std::vector<BYTE>& pDecryptedData, size_t& decryptedSize, bool bPadding);
+	[[nodiscard]] bool SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size_t ivSize);
+	[[nodiscard]] bool Decrypt(const BYTE* data, size_t size, std::vector<BYTE>& pDecryptedData, size_t& decryptedSize, bool bPadding);
 
 	[[nodiscard]] bool IsInitialized() const { return m_hAesAlg != nullptr; }
 	[[nodiscard]] bool IsReadyDecrypt() const { return m_bReadyDecrypt; }

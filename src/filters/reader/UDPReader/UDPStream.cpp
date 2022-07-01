@@ -308,17 +308,17 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 						uri.Trim(L'"');
 						CHTTPAsync http;
 						if (SUCCEEDED(http.Connect(uri))) {
-							if (http.GetLenght() != CAESDecryptor::AESBlockSize) {
+							if (http.GetLenght() != CAESDecryptor::AESBLOCKSIZE) {
 								DLog(L"CUDPStream::ParseM3U8() : wrong AES key.");
 								return false;
 							}
-							BYTE key[CAESDecryptor::AESBlockSize] = {};
+							BYTE key[CAESDecryptor::AESBLOCKSIZE] = {};
 							DWORD dwSizeRead = 0;
-							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBlockSize, &dwSizeRead))) {
+							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBLOCKSIZE, &dwSizeRead))) {
 								std::vector<BYTE> pIV;
 								if (!iv.IsEmpty()) {
 									iv.Delete(0, 2);
-									if (iv.GetLength() != (CAESDecryptor::AESBlockSize * 2)) {
+									if (iv.GetLength() != (CAESDecryptor::AESBLOCKSIZE * 2)) {
 										DLog(L"CUDPStream::ParseM3U8() : wrong AES IV.");
 										return false;
 									}
