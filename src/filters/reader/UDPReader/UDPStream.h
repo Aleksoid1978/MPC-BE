@@ -84,20 +84,23 @@ private:
 	} m_icydata;
 
 	struct hlsData_t {
+		bool                bInit = {};
+
 		std::deque<CString> Segments;
 		std::list<CString>  DiscontinuitySegments;
 		uint64_t            SequenceNumber = {};
 		CString             PlaylistUrl;
 		int64_t             SegmentDuration = {};
+		uint64_t            SegmentSize = {};
+		uint64_t            SegmentPos = {};
 		bool                bEndList = {};
-		bool                bInit = {};
 		std::chrono::high_resolution_clock::time_point PlaylistParsingTime = {};
 
 		bool                bAes128 = {};
-		UINT64              SegmentSize = {};
-		UINT64              SegmentPos = {};
 		std::vector<BYTE>   DecryptedData;
 		std::unique_ptr<CAESDecryptor> pAESDecryptor;
+
+		[[nodiscard]] bool IsEndOfSegment() const { return SegmentPos == SegmentSize; }
 	} m_hlsData;
 
 	void Clear();

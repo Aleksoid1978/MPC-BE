@@ -908,9 +908,7 @@ DWORD CUDPStream::ThreadProc()
 							}
 						}
 
-						DWORD dwSizeRead = 0;
-						m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
-						if (dwSizeRead == 0) {
+						if (m_hlsData.IsEndOfSegment()) {
 							m_HTTPAsync.Close();
 
 							if (m_hlsData.Segments.empty()) {
@@ -920,22 +918,26 @@ DWORD CUDPStream::ThreadProc()
 								}
 								attempts++;
 								Sleep(50);
+								continue;
 							} else {
 								if (!OpenHLSSegment()) {
 									bEndOfStream = TRUE;
 									break;
 								}
 							}
-
-							continue;
 						}
 
+						DWORD dwSizeRead = 0;
+						if (FAILED(m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead))) {
+							bEndOfStream = TRUE;
+							break;
+						}
+
+						m_hlsData.SegmentPos += dwSizeRead;
 						len = dwSizeRead;
 						if (m_hlsData.bAes128) {
-							m_hlsData.SegmentPos += dwSizeRead;
-
 							size_t decryptedSize = {};
-							if (m_hlsData.pAESDecryptor->Decrypt(&buff[buffsize], dwSizeRead, m_hlsData.DecryptedData, decryptedSize, m_hlsData.SegmentSize == m_hlsData.SegmentPos)) {
+							if (m_hlsData.pAESDecryptor->Decrypt(&buff[buffsize], dwSizeRead, m_hlsData.DecryptedData, decryptedSize, m_hlsData.IsEndOfSegment())) {
 								len = decryptedSize;
 								memcpy(&buff[buffsize], m_hlsData.DecryptedData.data(), decryptedSize);
 							} else {
