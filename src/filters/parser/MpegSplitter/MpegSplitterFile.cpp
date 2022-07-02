@@ -65,29 +65,29 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (ByteRead(data, sizeof(data)) != S_OK) {
 		return E_FAIL;
 	}
-	DWORD id = GETU32(data);
-	DWORD id2 = GETU32(data + 4);
+	const DWORD id = GETU32(data);
+	const DWORD id2 = GETU32(data + 4);
 
 	if (id == FCC('RIFF') && GETU32(data+8) != FCC('CDXA') // AVI, WAVE, AMV and other
-			|| id == 0xA3DF451A         // Matroska
-			|| id2 == FCC('ftyp')       // MP4
-			|| id2 == FCC('moov')       // MOV
-			|| id2 == FCC('mdat')       // MOV
-			|| id2 == FCC('wide')       // MOV
-			|| id2 == FCC('skip')       // MOV
-			|| id2 == FCC('free')       // MOV
-			|| id2 == FCC('pnot')       // MOV
-			|| id == FCC('Rar!')        // RAR
-			|| id == 0x04034B50         // ZIP
-			|| id == 0xAFBC7A37         // 7-Zip
+			|| id == 0xA3DF451A        // Matroska
+			|| id2 == FCC('ftyp')      // MP4
+			|| id2 == FCC('moov')      // MOV
+			|| id2 == FCC('mdat')      // MOV
+			|| id2 == FCC('wide')      // MOV
+			|| id2 == FCC('skip')      // MOV
+			|| id2 == FCC('free')      // MOV
+			|| id2 == FCC('pnot')      // MOV
+			|| id == FCC('Rar!')       // RAR
+			|| id == 0x04034B50        // ZIP
+			|| id == 0xAFBC7A37        // 7-Zip
 			|| GETU16(data) == 'ZM') { // EXE, DLL
 		return E_FAIL;
 	}
 
-	Seek(0);
-	m_bIMKH_CCTV = (BitRead(32, true) == 'IMKH');
+	m_bIMKH_CCTV = (id == FCC('IMKH'));
 
 	{
+		Seek(0);
 		byte b = 0;
 		while (GetPos() < (65 * KILOBYTE) && (b = BitRead(8)) != 0x47 && GetRemaining());
 
