@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2021 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,7 +43,7 @@ BOOL CUrlParser::Parse(LPCWSTR lpszUrl)
 	components.dwExtraInfoLength = (DWORD)-1;
 
 	const auto ret = InternetCrackUrlW(lpszUrl, wcslen(lpszUrl), 0, &components);
-	if (ret) {
+	if (ret && components.dwHostNameLength) {
 		m_szUrl = lpszUrl;
 
 		m_szSchemeName.SetString(components.lpszScheme, components.dwSchemeLength);
