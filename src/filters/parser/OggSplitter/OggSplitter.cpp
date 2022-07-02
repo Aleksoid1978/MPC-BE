@@ -203,11 +203,11 @@ start:
 			BYTE type = *p++;
 
 			CStringW name;
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 
 			if (type >= 0x80 && type <= 0x82 && !memcmp(p, "theora", 6)) {
 				if (type == 0x80 && PinNotExist) {
 					name.Format(L"Theora %d", streamId++);
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					pPinOut.reset(DNew COggTheoraOutputPin(page, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
@@ -218,8 +218,6 @@ start:
 				}
 			} else if (type == 1 && (page.m_hdr.header_type_flag & OggPageHeader::first)) {
 				if (PinNotExist) {
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
-
 					if (!memcmp(p, "vorbis", 6)) {
 						if ((*(OggVorbisIdHeader*)(p + 6)).audio_sample_rate == 0) {
 							return E_FAIL; // fix crash on broken files
@@ -256,7 +254,6 @@ start:
 			} else if (type == 0x7F && page.size() > 12 && GETU32(p + 8) == FCC('fLaC')) {	// Flac
 				if (PinNotExist) {
 					// Ogg Flac : method 1
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					name.Format(L"FLAC %d", streamId++);
 					pPinOut.reset(DNew COggFlacOutputPin(p + 12, page.size() - 14, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
@@ -264,7 +261,6 @@ start:
 			} else if (GETU32(p-1) == FCC('fLaC')) {
 				// Ogg Flac : method 2
 				if (PinNotExist && m_pFile->Read(page)) {
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					name.Format(L"FLAC %d", streamId++);
 					p = page.data();
 					pPinOut.reset(DNew COggFlacOutputPin(p, page.size(), name, this, this, &hr));
@@ -273,7 +269,6 @@ start:
 			} else if (!memcmp(page.data(), "BBCD\x00", 5) || !memcmp(page.data(), "KW-DIRAC\x00", 9)) {
 				if (PinNotExist) {
 					name.Format(L"Dirac %d", streamId++);
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					pPinOut.reset(DNew COggDiracOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
@@ -281,7 +276,6 @@ start:
 			} else if (!memcmp(page.data(), "OpusHead", 8) && page.size() > 8) {
 				if (PinNotExist) {
 					name.Format(L"Opus %d", streamId++);
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					pPinOut.reset(DNew COggOpusOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
@@ -292,7 +286,6 @@ start:
 			} else if (!memcmp(page.data(), "Speex   ", 8) && page.size() > 8) {
 				if (PinNotExist) {
 					name.Format(L"Speex %d", streamId++);
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					pPinOut.reset(DNew COggSpeexOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
@@ -303,7 +296,6 @@ start:
 					lang.ReleaseBuffer();
 
 					name.Format(L"Kate %d (%hS)", streamId++, lang);
-					std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 					pPinOut.reset(DNew COggKateOutputPin((OggStreamHeader*)p, name, this, this, &hr));
 					// TODO
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
@@ -315,7 +307,6 @@ start:
 								&& page.size() >= 26
 								&& p[5] == 0x01) {
 							name.Format(L"VP8 %d", streamId++);
-							std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
 							pPinOut.reset(DNew COggVP8OutputPin(page.data(), page.size(), name, this, this, &hr));
 							AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 
