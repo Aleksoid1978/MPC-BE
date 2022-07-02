@@ -188,6 +188,19 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 		SearchStreams(0, stop);
 
+		if (m_type == MPEG_TYPES::mpeg_ps) {
+			// ignoring wrong empty block at the beginning of some VOB files
+			for (auto& [track_num, sps] : m_SyncPoints) {
+				if (sps.size() > 2) {
+					auto dur0 = sps[1].rt - sps[0].rt;
+					auto dur1 = sps[2].rt - sps[1].rt;
+					if (dur0 > dur1 * 1000) {
+						sps.erase(sps.begin());
+					}
+				}
+			}
+		}
+
 		const int step_size = 512 * KILOBYTE;
 
 		int num = std::min(steps, (len - stop) / step_size);
