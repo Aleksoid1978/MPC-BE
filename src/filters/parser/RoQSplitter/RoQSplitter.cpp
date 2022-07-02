@@ -354,7 +354,7 @@ CRoQSourceFilter::CRoQSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CRoQSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
-	m_pInput.Free();
+	m_pInput.reset();
 }
 
 STDMETHODIMP CRoQSourceFilter::QueryFilterInfo(FILTER_INFO* pInfo)

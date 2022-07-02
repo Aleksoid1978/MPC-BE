@@ -272,5 +272,5 @@ CAudioSourceFilter::CAudioSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CAudioSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
-	m_pInput.Free();
+	m_pInput.reset();
 }

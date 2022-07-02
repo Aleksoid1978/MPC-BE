@@ -2589,7 +2589,7 @@ CMatroskaSourceFilter::CMatroskaSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CMatroskaSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
-	m_pInput.Free();
+	m_pInput.reset();
 }
 
 // ITrackInfo
