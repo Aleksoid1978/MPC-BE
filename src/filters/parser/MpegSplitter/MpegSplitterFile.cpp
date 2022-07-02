@@ -89,7 +89,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	{
 		Seek(0);
 		byte b = 0;
-		while (GetPos() < (65 * KILOBYTE) && (b = BitRead(8)) != 0x47 && GetRemaining());
+		while (GetPos() < (65 * KILOBYTE) && S_OK == ByteRead(&b, 1) && b != 0x47);
 
 		if (b == 0x47) {
 			Seek(GetPos() - 1);
