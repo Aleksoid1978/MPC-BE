@@ -1409,23 +1409,23 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 	AddItem(fns, subs);
 }
 
-static CString CombinePath(CPath p, const CString& fn)
+static CString CombinePath(CPath base, const CString& relative)
 {
-	if (StartsWith(fn, L":\\", 1) || StartsWith(fn, L"\\")) {
-		return fn;
+	if (StartsWith(relative, L":\\", 1) || StartsWith(relative, L"\\")) {
+		return relative;
 	}
 
-	CUrlParser urlParser(fn.GetString());
+	CUrlParser urlParser(relative.GetString());
 	if (urlParser.IsValid()) {
-		return fn;
+		return relative;
 	}
 
-	p.Append(fn);
-	CString out(p);
-	if (out.Find(L"://")) {
-		out.Replace('\\', '/');
+	if (urlParser.Parse(base)) {
+		return CUrlParser::CombineUrl(base, relative);
 	}
-	return out;
+
+	base.Append(relative);
+	return base;
 }
 
 bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)

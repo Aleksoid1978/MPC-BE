@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,4 +66,6 @@ public:
 	INTERNET_SCHEME GetScheme() const { return m_nScheme; }
 
 	BOOL IsValid() const { return !m_szUrl.IsEmpty(); }
+
+	static CString CombineUrl(CString pszBase, const CString& pszRelative);
 };

@@ -227,7 +227,7 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 	realUrl = url;
 
 	CString base(url);
-	base.Truncate(base.ReverseFind('/'));
+	base.Truncate(base.ReverseFind('/') + 1);
 
 	bool bMediaSequence = false;
 	uint64_t sequenceNumber = {};
@@ -343,20 +343,13 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			continue;
 		}
 
-		auto CombinePath = [](const CString& base, const CString& path) {
-			CUrlParser urlParser(path.GetString());
+		auto CombinePath = [](const CString& base, const CString& relative) {
+			CUrlParser urlParser(relative.GetString());
 			if (urlParser.IsValid()) {
-				return path;
+				return relative;
 			}
 
-			CString output(base);
-			if (path.GetAt(0) == L'/') {
-				output.Append(path);
-			} else {
-				output.Append(L'/' + path);
-			}
-
-			return output;
+			return CUrlParser::CombineUrl(base, relative);
 		};
 
 		if (!bMediaSequence) {

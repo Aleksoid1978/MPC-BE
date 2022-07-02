@@ -21,8 +21,10 @@
 #include "stdafx.h"
 #include "DSUtil.h"
 #include "UrlParser.h"
+#include <shlwapi.h>
 
 #pragma comment(lib, "WinInet.Lib")
+#pragma comment(lib, "Shlwapi.lib")
 
 CUrlParser::CUrlParser(LPCWSTR lpszUrl)
 {
@@ -81,4 +83,19 @@ void CUrlParser::Clear()
 
 	m_nPortNumber = 0;
 	m_nScheme = INTERNET_SCHEME_UNKNOWN;
+}
+
+CString CUrlParser::CombineUrl(CString pszBase, const CString& pszRelative)
+{
+	if (pszBase.GetAt(pszBase.GetLength() - 1) != L'/') {
+		pszBase += L'/';
+	}
+	auto dwLength = static_cast<DWORD>(wcslen(pszBase) + wcslen(pszRelative) + 1);
+	CString combined;
+	auto hr = UrlCombineW(pszBase,
+						  pszRelative,
+						  combined.GetBuffer(dwLength),
+						  &dwLength, 0);
+	combined.ReleaseBuffer(-1);
+	return combined;
 }
