@@ -239,6 +239,15 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 
 	m_hlsData.SegmentDuration = {};
 
+	auto CombinePath = [](const CString& base, const CString& relative) {
+		CUrlParser urlParser(relative.GetString());
+		if (urlParser.IsValid()) {
+			return relative;
+		}
+
+		return CUrlParser::CombineUrl(base, relative);
+	};
+
 	while (f.ReadString(str)) {
 		FastTrim(str);
 
@@ -306,15 +315,12 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 					}
 					if (!uri.IsEmpty() && !iv.IsEmpty()) {
 						uri.Trim(L'"');
+						uri = CombinePath(base, uri);
 						CHTTPAsync http;
 						if (SUCCEEDED(http.Connect(uri))) {
-							if (http.GetLenght() != CAESDecryptor::AESBLOCKSIZE) {
-								DLog(L"CUDPStream::ParseM3U8() : wrong AES key.");
-								return false;
-							}
 							BYTE key[CAESDecryptor::AESBLOCKSIZE] = {};
 							DWORD dwSizeRead = 0;
-							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBLOCKSIZE, &dwSizeRead))) {
+							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBLOCKSIZE, &dwSizeRead)) && dwSizeRead == CAESDecryptor::AESBLOCKSIZE) {
 								std::vector<BYTE> pIV;
 								iv.Delete(0, 2);
 								if (iv.GetLength() != (CAESDecryptor::AESBLOCKSIZE * 2)) {
@@ -342,15 +348,6 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 		} else if (str.GetAt(0) == L'#') {
 			continue;
 		}
-
-		auto CombinePath = [](const CString& base, const CString& relative) {
-			CUrlParser urlParser(relative.GetString());
-			if (urlParser.IsValid()) {
-				return relative;
-			}
-
-			return CUrlParser::CombineUrl(base, relative);
-		};
 
 		if (!bMediaSequence) {
 			PlaylistItems.emplace_back(bandwidth, CombinePath(base, str));
