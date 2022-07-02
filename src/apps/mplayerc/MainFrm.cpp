@@ -5416,12 +5416,12 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
 
-		CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+		std::unique_ptr<OpenDVDData> p(DNew OpenDVDData());
 		if (p && CheckDVD(s.slFiles.front())) {
 			p->path = s.slFiles.front();
 			p->subs = s.slSubs;
 		}
-		OpenMedia(p);
+		OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
 	} else if (s.nCLSwitches & CLSW_CD) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
@@ -5481,12 +5481,13 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
 
-			CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+			std::unique_ptr<OpenDVDData> p(DNew OpenDVDData());
 			if (p) {
 				p->path = s.slFiles.front();
 				p->subs = s.slSubs;
 			}
-			OpenMedia(p);
+
+			OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
 		} else {
 			std::list<CString> sl;
 			sl = s.slFiles;
@@ -5720,12 +5721,12 @@ void CMainFrame::OnFileOpenDevice()
 	m_wndPlaylistBar.SelectDefaultPlaylist();
 	m_wndPlaylistBar.Empty();
 
-	CAutoPtr<OpenDeviceData> p(DNew OpenDeviceData());
+	std::unique_ptr<OpenDeviceData> p(DNew OpenDeviceData());
 	if (p) {
 		p->DisplayName[0] = s.strAnalogVideo;
 		p->DisplayName[1] = s.strAnalogAudio;
 	}
-	OpenMedia(p);
+	OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
 	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && m_eMediaLoadState == MLS_LOADED && s.iDefaultCaptureDevice == 1) {
 		m_wndNavigationBar.m_navdlg.UpdateElementList();
 		ShowControlBarInternal(&m_wndNavigationBar, !s.fHideNavigation);
@@ -10349,12 +10350,12 @@ void CMainFrame::PlayFavoriteDVD(SessionInfo fav) // use a copy of SessionInfo
 
 	AfxGetAppSettings().bNormalStartDVD = false;
 
-	CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+	std::unique_ptr<OpenDVDData> p(DNew OpenDVDData());
 	if (p) {
 		p->path = fav.Path;
 		p->pDvdState = pDvdState;
 	}
-	OpenMedia(p);
+	OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
 }
 
 void CMainFrame::OnUpdateFavoritesDVD(CCmdUI* pCmdUI)
@@ -13876,7 +13877,7 @@ void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 }
 
 #define BREAK(msg) {err = msg; break;}
-bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
+bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 {
 	ASSERT(m_eMediaLoadState == MLS_LOADING);
 	CAppSettings& s = AfxGetAppSettings();
@@ -13885,9 +13886,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	m_bValidDVDOpen = false;
 
-	OpenFileData* pFileData		= dynamic_cast<OpenFileData*>(pOMD.m_p);
-	OpenDVDData* pDVDData		= dynamic_cast<OpenDVDData*>(pOMD.m_p);
-	OpenDeviceData* pDeviceData	= dynamic_cast<OpenDeviceData*>(pOMD.m_p);
+	OpenFileData*   pFileData   = dynamic_cast<OpenFileData*>(pOMD.get());
+	OpenDVDData*    pDVDData    = dynamic_cast<OpenDVDData*>(pOMD.get());
+	OpenDeviceData* pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD.get());
 	ASSERT(pFileData || pDVDData || pDeviceData);
 
 	m_ExtSubFiles.clear();
@@ -14083,7 +14084,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		err = OpenCreateGraphObject(pOMD);
+		err = OpenCreateGraphObject(pOMD.get());
 		if (!err.IsEmpty()) {
 			break;
 		}
@@ -14243,7 +14244,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		UpdateWindowTitle();
 
-		OpenSetupSubStream(pOMD);
+		OpenSetupSubStream(pOMD.get());
 
 		m_pSwitcherFilter = FindSwitcherFilter();
 
@@ -14283,7 +14284,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	EndWaitCursor();
 
 	m_closingmsg = err;
-	WPARAM wp    = (WPARAM)pOMD.Detach();
+	WPARAM wp    = (WPARAM)pOMD.release();
 	if (::GetCurrentThreadId() == AfxGetApp()->m_nThreadID) {
 		OnPostOpen(wp, 0);
 	} else {
@@ -17418,7 +17419,7 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 		}
 	}
 
-	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
+	std::unique_ptr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
 		p->bAddRecent = bAddRecent;
 		OpenMedia(p);
@@ -17429,9 +17430,9 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 
 BOOL CMainFrame::OpenFile(const CString fname, REFERENCE_TIME rtStart/* = INVALID_TIME*/, BOOL bAddRecent/* = TRUE*/)
 {
-	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
+	std::unique_ptr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
-		auto pFileData = dynamic_cast<OpenFileData*>(p.m_p);
+		auto pFileData = dynamic_cast<OpenFileData*>(p.get());
 		if (pFileData->fns.empty()) {
 			pFileData->fns.push_front(fname);
 		} else {
@@ -17459,10 +17460,10 @@ void CMainFrame::AddCurDevToPlaylist()
 	}
 }
 
-void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
+void CMainFrame::OpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 {
-	auto pFileData   = dynamic_cast<const OpenFileData*>(pOMD.m_p);
-	auto pDeviceData = dynamic_cast<const OpenDeviceData*>(pOMD.m_p);
+	auto pFileData   = dynamic_cast<const OpenFileData*>(pOMD.get());
+	auto pDeviceData = dynamic_cast<const OpenDeviceData*>(pOMD.get());
 
 	// shortcut
 	if (pDeviceData
@@ -17499,7 +17500,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	if (bUseThread) {
 		m_hGraphThreadEventOpen.ResetEvent();
-		m_pGraphThread->PostThreadMessage(CGraphThread::TM_OPEN, 0, (LPARAM)pOMD.Detach());
+		m_pGraphThread->PostThreadMessage(CGraphThread::TM_OPEN, 0, (LPARAM)pOMD.release());
 		m_bOpenedThruThread = true;
 	} else {
 		OpenMediaPrivate(pOMD);
@@ -20007,10 +20008,10 @@ BOOL CMainFrame::OpenIso(const CString& pathName, REFERENCE_TIME rtStart/* = INV
 			}
 
 			if (::PathFileExistsW(CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO")) {
-				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+				std::unique_ptr<OpenDVDData> p(DNew OpenDVDData());
 				p->path = CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO";
 				p->bAddRecent = FALSE;
-				OpenMedia(p);
+				OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
 
 				AddRecent(pathName);
 				return TRUE;
@@ -20783,7 +20784,7 @@ void CGraphThread::OnOpen(WPARAM wParam, LPARAM lParam)
 	if (m_pMainFrame) {
 		ASSERT(WaitForSingleObject(m_pMainFrame->m_hGraphThreadEventOpen, 0) == WAIT_TIMEOUT);
 		if (m_pMainFrame->m_eMediaLoadState == MLS_LOADING) {
-			CAutoPtr<OpenMediaData> pOMD((OpenMediaData*)lParam);
+			std::unique_ptr<OpenMediaData> pOMD((OpenMediaData*)lParam);
 			m_pMainFrame->OpenMediaPrivate(pOMD);
 		}
 		m_pMainFrame->m_hGraphThreadEventOpen.SetEvent();

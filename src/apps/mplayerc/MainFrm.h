@@ -592,7 +592,7 @@ private:
 	bool m_bOpening = false;
 
 	// Operations
-	bool OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD);
+	bool OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD);
 	void CloseMediaPrivate();
 	void DoTunerScan(TunerScanData* pTSD);
 
@@ -740,7 +740,7 @@ private:
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	BOOL OpenFile(const CString fname, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
-	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
+	void OpenMedia(std::unique_ptr<OpenMediaData>& pOMD);
 	void PlayFavoriteFile(SessionInfo fav);
 	void PlayFavoriteDVD(SessionInfo fav);
 	bool ResizeDevice();
