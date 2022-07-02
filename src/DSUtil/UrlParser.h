@@ -67,5 +67,5 @@ public:
 
 	BOOL IsValid() const { return !m_szUrl.IsEmpty(); }
 
-	static CString CombineUrl(CString pszBase, const CString& pszRelative);
+	static CString CombineUrl(CString strBase, const CString& strRelative);
 };

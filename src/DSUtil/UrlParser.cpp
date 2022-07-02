@@ -85,15 +85,15 @@ void CUrlParser::Clear()
 	m_nScheme = INTERNET_SCHEME_UNKNOWN;
 }
 
-CString CUrlParser::CombineUrl(CString pszBase, const CString& pszRelative)
+CString CUrlParser::CombineUrl(CString strBase, const CString& strRelative)
 {
-	if (pszBase.GetAt(pszBase.GetLength() - 1) != L'/') {
-		pszBase += L'/';
+	if (strBase.GetAt(strBase.GetLength() - 1) != L'/') {
+		strBase += L'/';
 	}
-	auto dwLength = static_cast<DWORD>(wcslen(pszBase) + wcslen(pszRelative) + 1);
+	auto dwLength = static_cast<DWORD>(strBase.GetLength() + strRelative.GetLength() + 1);
 	CString combined;
-	auto hr = UrlCombineW(pszBase,
-						  pszRelative,
+	auto hr = UrlCombineW(strBase.GetString(),
+						  strRelative.GetString(),
 						  combined.GetBuffer(dwLength),
 						  &dwLength, 0);
 	combined.ReleaseBuffer(-1);
