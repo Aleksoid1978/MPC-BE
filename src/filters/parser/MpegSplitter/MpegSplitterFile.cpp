@@ -194,7 +194,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				if (sps.size() > 2) {
 					auto dur0 = sps[1].rt - sps[0].rt;
 					auto dur1 = sps[2].rt - sps[1].rt;
-					if (dur0 > dur1 * 1000) {
+					if (dur0 > dur1 * 100) {
 						sps.erase(sps.begin());
 					}
 				}
