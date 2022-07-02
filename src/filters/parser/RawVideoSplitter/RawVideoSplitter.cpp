@@ -962,7 +962,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				vih2->AvgTimePerFrame = 400000;
 			}
 		}
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterParserOutputPin(mts, pName, this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterParserOutputPin(mts, pName, this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 	}
 
@@ -970,7 +970,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_iQueueDuration = 200; // hack. equivalent to 240 packets
 	}
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CRawVideoSplitterFilter::DemuxInit()

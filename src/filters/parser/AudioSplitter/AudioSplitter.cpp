@@ -176,7 +176,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			const CStringW name = m_pAudioFile->GetName();
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name + L" Audio Output", this, this, &hr));
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name + L" Audio Output", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 
 			if (name == L"Flac") {
@@ -185,7 +185,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_pOutputs.GetCount() == 0) {
+	if (m_pOutputs.size() == 0) {
 		return E_FAIL;
 	}
 

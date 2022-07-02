@@ -1152,7 +1152,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (mt.subtype != GUID_NULL) {
 			std::vector<CMediaType> mts;
 			mts.push_back(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name, this, this, &hr));
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name, this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(t.TagType, pPinOut)));
 		}
 
@@ -1162,7 +1162,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (mtAAC.subtype != GUID_NULL) {
 		std::vector<CMediaType> mts;
 		mts.push_back(mtAAC);
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio AAC", this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio AAC", this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(FLV_AUDIODATA, pPinOut)));
 	}
 
@@ -1234,7 +1234,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pFile->Seek(m_DataOffset);
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CFLVSplitterFilter::DemuxInit()

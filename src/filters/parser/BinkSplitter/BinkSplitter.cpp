@@ -174,7 +174,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		mt.SetSampleSize(0);
 		mt.SetTemporalCompression(FALSE);
 		mts.push_back(mt);
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
 		AddOutputPin(0, pPinOut);
 	}
 
@@ -200,7 +200,8 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
 			mt.lSampleSize = 1;
 			mts.push_back(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 			AddOutputPin(i + 1, pPinOut);
 		}
 
@@ -248,7 +249,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 10000000i64 * num_frames * fps_den / fps_num;
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CBinkSplitterFilter::DemuxInit()

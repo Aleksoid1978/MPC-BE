@@ -1240,7 +1240,8 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for(size_t i = 0; i < s.mts.size(); i++) {
 				mts.push_back(s.mts[i]);
 			}
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, (CMpegSplitterFile::stream_type)type, str, this, this, &hr));
+
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, (CMpegSplitterFile::stream_type)type, str, this, this, &hr));
 
 			if (type == CMpegSplitterFile::stream_type::audio) {
 				if (audio_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
@@ -1333,7 +1334,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 STDMETHODIMP CMpegSplitterFilter::GetDuration(LONGLONG* pDuration)

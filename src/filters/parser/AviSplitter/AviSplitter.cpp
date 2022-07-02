@@ -564,7 +564,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		HRESULT hr;
 
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CAviSplitterOutputPin(mts, name, this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CAviSplitterOutputPin(mts, name, this, this, &hr));
 		AddOutputPin(i, pPinOut);
 	}
 
@@ -587,7 +587,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_tFrame.resize(m_pFile->m_avih.dwStreams);
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CAviSplitterFilter::DemuxInit()

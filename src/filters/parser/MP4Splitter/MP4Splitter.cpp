@@ -1884,7 +1884,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMP4SplitterOutputPin(mts, pinName, this, this, &hr));
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CMP4SplitterOutputPin(mts, pinName, this, this, &hr));
 
 			if (!TrackName.IsEmpty()) {
 				pPinOut->SetProperty(L"NAME", TrackName);
@@ -2108,7 +2108,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-	if (m_pOutputs.GetCount()) {
+	if (m_pOutputs.size()) {
 		AP4_Movie* movie = m_pFile->GetMovie();
 
 		for (auto& [id, tp] : m_trackpos) {
@@ -2151,7 +2151,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	SetID3TagProperties(this, m_pFile->m_pID3Tag);
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CMP4SplitterFilter::DemuxInit()

@@ -261,7 +261,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 
 		if (m_rtOffsetAudio != INVALID_TIME) {
@@ -273,7 +273,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mts.clear();
 			mts.push_back(mt);
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(1, pPinOut)));
 		}
 	} else if (m_bDHAV) {
@@ -374,7 +374,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 
-					CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+					std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
 					EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 				}
 			} else if (DHAV_AUDIO(hdr)) {
@@ -430,7 +430,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.clear();
 						mts.push_back(mt);
 
-						CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+						std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 						EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(1, pPinOut)));
 					}
 				}
@@ -521,7 +521,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(hdr.stream_id, pPinOut)));
 
 			m_rtNewStart = m_rtCurrent = 0;
@@ -546,7 +546,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CDVRSplitterFilter::DemuxInit()

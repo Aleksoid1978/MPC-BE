@@ -1502,8 +1502,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	for (size_t i = 0; i < pinOut.size(); i++) {
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-		pPinOut.Attach(pinOut[i]);
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
+		pPinOut.reset(pinOut[i]);
 		TrackEntry* pTE = pinOutTE[i];
 
 		if (pTE != nullptr) {
@@ -1699,7 +1699,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(L"TITL", Title);
 	}
 
-	if (!m_pOutputs.IsEmpty() && !m_pFile->m_segment.Cues.empty()) {
+	if (!m_pOutputs.empty() && !m_pFile->m_segment.Cues.empty()) {
 		auto& s = m_pFile->m_segment;
 		const UINT64 TrackNumber = s.GetMasterTrack();
 		UINT64 lastCueClusterPosition = ULONGLONG_MAX;
@@ -1732,7 +1732,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int level)

@@ -62,18 +62,18 @@ class CBaseSplitterFilter
 	CCritSec m_csmtnew;
 	std::map<DWORD, CMediaType> m_mtnew;
 
-	CAutoPtrList<CBaseSplitterOutputPin> m_pRetiredOutputs;
+	std::list<std::unique_ptr<CBaseSplitterOutputPin>> m_pRetiredOutputs;
 
 protected:
 	CHdmvClipInfo::CPlaylist m_Items;
 	CStringW m_fn;
 
 	std::unique_ptr<CBaseSplitterInputPin> m_pInput;
-	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputs;
+	std::list<std::unique_ptr<CBaseSplitterOutputPin>> m_pOutputs;
 
 	CBaseSplitterOutputPin* GetOutputPin(DWORD TrackNum);
 	DWORD GetOutputTrackNum(CBaseSplitterOutputPin* pPin);
-	HRESULT AddOutputPin(DWORD TrackNum, CAutoPtr<CBaseSplitterOutputPin> pPin);
+	HRESULT AddOutputPin(DWORD TrackNum, std::unique_ptr<CBaseSplitterOutputPin>& pPin);
 	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, std::vector<CMediaType> mts, BOOL bNeedReconnect = FALSE);
 	virtual HRESULT DeleteOutputs();
 	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) PURE; // override this ...

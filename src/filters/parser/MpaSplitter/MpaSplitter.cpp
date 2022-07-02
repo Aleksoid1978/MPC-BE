@@ -126,7 +126,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	std::vector<CMediaType> mts;
 	mts.push_back(m_pFile->GetMediaType());
 
-	CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+	std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 	AddOutputPin(0, pPinOut);
 
 	m_rtNewStart = m_rtCurrent = 0;
@@ -135,7 +135,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	SetID3TagProperties(this, m_pFile->m_pID3Tag);
 	SetAPETagProperties(this, m_pFile->m_pAPETag);
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 STDMETHODIMP CMpaSplitterFilter::GetDuration(LONGLONG* pDuration)

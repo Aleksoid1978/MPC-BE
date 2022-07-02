@@ -161,15 +161,15 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 	return E_FAIL;
 }
 
-HRESULT CBaseSplitterFilter::AddOutputPin(DWORD TrackNum, CAutoPtr<CBaseSplitterOutputPin> pPin)
+HRESULT CBaseSplitterFilter::AddOutputPin(DWORD TrackNum, std::unique_ptr<CBaseSplitterOutputPin>& pPin)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
 	if (!pPin) {
 		return E_INVALIDARG;
 	}
-	m_pPinMap[TrackNum] = pPin;
-	m_pOutputs.AddTail(pPin);
+	m_pPinMap[TrackNum] = pPin.get();
+	m_pOutputs.emplace_back(std::move(pPin));
 	return S_OK;
 }
 
@@ -177,21 +177,23 @@ HRESULT CBaseSplitterFilter::DeleteOutputs()
 {
 	m_rtDuration = 0;
 
-	m_pRetiredOutputs.RemoveAll();
+	m_pRetiredOutputs.clear();
 
 	CAutoLock cAutoLockF(this);
 	if (m_State != State_Stopped) {
 		return VFW_E_NOT_STOPPED;
 	}
 
-	while (m_pOutputs.GetCount()) {
-		CAutoPtr<CBaseSplitterOutputPin> pPin = m_pOutputs.RemoveHead();
+	while (m_pOutputs.size()) {
+		std::unique_ptr<CBaseSplitterOutputPin> pPin = std::move(m_pOutputs.front());
+		m_pOutputs.pop_front();
+
 		if (IPin* pPinTo = pPin->GetConnected()) {
 			pPinTo->Disconnect();
 		}
 		pPin->Disconnect();
 		// we can't just let it be deleted now, something might have AddRefed on it (graphedit...)
-		m_pRetiredOutputs.AddTail(pPin);
+		m_pRetiredOutputs.emplace_back(std::move(pPin));
 	}
 
 	CAutoLock cAutoLockPM(&m_csPinMap);
@@ -214,17 +216,15 @@ HRESULT CBaseSplitterFilter::DeleteOutputs()
 void CBaseSplitterFilter::DeliverBeginFlush()
 {
 	m_fFlushing = true;
-	POSITION pos = m_pOutputs.GetHeadPosition();
-	while (pos) {
-		m_pOutputs.GetNext(pos)->DeliverBeginFlush();
+	for (auto& pPin : m_pOutputs) {
+		pPin->DeliverBeginFlush();
 	}
 }
 
 void CBaseSplitterFilter::DeliverEndFlush()
 {
-	POSITION pos = m_pOutputs.GetHeadPosition();
-	while (pos) {
-		m_pOutputs.GetNext(pos)->DeliverEndFlush();
+	for (auto& pPin : m_pOutputs) {
+		pPin->DeliverEndFlush();
 	}
 	m_fFlushing = false;
 	m_eEndFlush.Set();
@@ -274,11 +274,12 @@ DWORD CBaseSplitterFilter::ThreadProc()
 
 		m_pActivePins.clear();
 
-		POSITION pos = m_pOutputs.GetHeadPosition();
-		while (pos && !m_fFlushing) {
-			CBaseSplitterOutputPin* pPin = m_pOutputs.GetNext(pos);
+		for(auto& pPin : m_pOutputs) {
+			if (m_fFlushing) {
+				break;
+			}
 			if (pPin->IsConnected() && pPin->IsActive()) {
-				m_pActivePins.push_back(pPin);
+				m_pActivePins.push_back(pPin.get());
 				pPin->DeliverNewSegment(m_rtStart, m_rtStop, m_dRate);
 			}
 		}
@@ -402,7 +403,7 @@ HRESULT CBaseSplitterFilter::CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin)
 
 		m_pSyncReader = pAsyncReader;
 	} else if (dir == PINDIR_OUTPUT) {
-		m_pRetiredOutputs.RemoveAll();
+		m_pRetiredOutputs.clear();
 	} else {
 		return E_UNEXPECTED;
 	}
@@ -412,20 +413,21 @@ HRESULT CBaseSplitterFilter::CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin)
 
 int CBaseSplitterFilter::GetPinCount()
 {
-	return (m_pInput ? 1 : 0) + (int)m_pOutputs.GetCount();
+	return (m_pInput ? 1 : 0) + (int)m_pOutputs.size();
 }
 
 CBasePin* CBaseSplitterFilter::GetPin(int n)
 {
 	CAutoLock cAutoLock(this);
 
-	if (n >= 0 && n < (int)m_pOutputs.GetCount()) {
-		if (POSITION pos = m_pOutputs.FindIndex(n)) {
-			return m_pOutputs.GetAt(pos);
-		}
+	if (n >= 0 && n < (int)m_pOutputs.size()) {
+		auto it = m_pOutputs.begin();
+		std::advance(it, n);
+
+		return (*it).get();
 	}
 
-	if (n == (int)m_pOutputs.GetCount() && m_pInput) {
+	if (n == (int)m_pOutputs.size() && m_pInput) {
 		return m_pInput.get();
 	}
 
@@ -848,15 +850,18 @@ STDMETHODIMP_(int) CBaseSplitterFilter::GetCount()
 {
 	CAutoLock cAutoLock(m_pLock);
 
-	return (int)m_pOutputs.GetCount();
+	return (int)m_pOutputs.size();
 }
 
 STDMETHODIMP CBaseSplitterFilter::GetStatus(int i, int& samples, int& size)
 {
 	CAutoLock cAutoLock(m_pLock);
 
-	if (POSITION pos = m_pOutputs.FindIndex(i)) {
-		CBaseSplitterOutputPin* pPin = m_pOutputs.GetAt(pos);
+	if (i >=0 && i < m_pOutputs.size()) {
+		auto it = m_pOutputs.begin();
+		std::advance(it, i);
+
+		auto& pPin = *it;
 		samples = pPin->QueueCount();
 		size = pPin->QueueSize();
 		return pPin->IsConnected() ? S_OK : S_FALSE;
@@ -929,34 +934,26 @@ void CBaseSplitterFilter::SortOutputPin()
 {
 	// Sorting output pin - video at the beginning of the list.
 
-	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputsVideo;
-	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputsOther;
+	std::list<std::unique_ptr<CBaseSplitterOutputPin>> pVideoOutputs;
+	std::list<std::unique_ptr<CBaseSplitterOutputPin>> pOtherOutputs;
 
-	POSITION pos = m_pOutputs.GetHeadPosition();
-	while (pos) {
-		CAutoPtr<CBaseSplitterOutputPin> pin;
-		pin.Attach(m_pOutputs.GetNext(pos).Detach());
+	for (auto& pPin : m_pOutputs) {
 		CMediaType mt;
-		if (SUCCEEDED(pin->GetMediaType(0, &mt))) {
+		if (SUCCEEDED(pPin->GetMediaType(0, &mt))) {
 			if (mt.majortype == MEDIATYPE_Video) {
-				m_pOutputsVideo.AddTail(pin);
+				pVideoOutputs.emplace_back(std::move(pPin));
 			} else {
-				m_pOutputsOther.AddTail(pin);
+				pOtherOutputs.emplace_back(std::move(pPin));
 			}
 		}
 	}
+	m_pOutputs.clear();
 
-	m_pOutputs.RemoveAll();
-	pos = m_pOutputsVideo.GetHeadPosition();
-	while (pos) {
-		CAutoPtr<CBaseSplitterOutputPin> pin;
-		pin.Attach(m_pOutputsVideo.GetNext(pos).Detach());
-		m_pOutputs.AddTail(pin);
+	for (auto& pPin : pVideoOutputs) {
+		m_pOutputs.emplace_back(std::move(pPin));
 	}
-	pos = m_pOutputsOther.GetHeadPosition();
-	while (pos) {
-		CAutoPtr<CBaseSplitterOutputPin> pin;
-		pin.Attach(m_pOutputsOther.GetNext(pos).Detach());
-		m_pOutputs.AddTail(pin);
+
+	for (auto& pPin : pOtherOutputs) {
+		m_pOutputs.emplace_back(std::move(pPin));
 	}
 }

@@ -510,7 +510,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		HRESULT hr;
 
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRealMediaSplitterOutputPin(mts, name, this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CRealMediaSplitterOutputPin(mts, name, this, this, &hr));
 		if (SUCCEEDED(AddOutputPin((DWORD)pmp->stream, pPinOut))) {
 			if (!m_rtStop) {
 				m_pFile->m_p.tDuration = std::max(m_pFile->m_p.tDuration, pmp->tDuration);
@@ -537,7 +537,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		HRESULT hr;
 
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRealMediaSplitterOutputPin(mts, name, this, this, &hr));
+		std::unique_ptr<CBaseSplitterOutputPin> pPinOut(DNew CRealMediaSplitterOutputPin(mts, name, this, this, &hr));
 		AddOutputPin((DWORD)~stream, pPinOut);
 	}
 
@@ -548,7 +548,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	SetProperty(L"CPYR", CStringW(m_pFile->m_cd.copyright));
 	SetProperty(L"DESC", CStringW(m_pFile->m_cd.comment));
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CRealMediaSplitterFilter::DemuxInit()
