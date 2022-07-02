@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,7 +46,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT*
 		*phr = S_OK;
 	}
 
-	m_pInput.Attach(DNew CBaseSplitterInputPin(L"CBaseSplitterInputPin", this, this, phr));
+	m_pInput.reset(DNew CBaseSplitterInputPin(L"CBaseSplitterInputPin", this, this, phr));
 }
 
 CBaseSplitterFilter::~CBaseSplitterFilter()
@@ -426,7 +426,7 @@ CBasePin* CBaseSplitterFilter::GetPin(int n)
 	}
 
 	if (n == (int)m_pOutputs.GetCount() && m_pInput) {
-		return m_pInput;
+		return m_pInput.get();
 	}
 
 	return nullptr;

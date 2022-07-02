@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -409,7 +409,7 @@ CBinkSourceFilter::CBinkSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBinkSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
-	m_pInput.Free();
+	m_pInput.reset();
 }
 
 STDMETHODIMP CBinkSourceFilter::QueryFilterInfo(FILTER_INFO* pInfo)

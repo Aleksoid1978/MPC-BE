@@ -1046,7 +1046,7 @@ CRealMediaSourceFilter::CRealMediaSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CRealMediaSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
-	m_pInput.Free();
+	m_pInput.reset();
 }
 
 //

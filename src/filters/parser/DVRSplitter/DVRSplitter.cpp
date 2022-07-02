@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1062,7 +1062,7 @@ CDVRSourceFilter::CDVRSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CDVRSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
-	m_pInput.Free();
+	m_pInput.reset();
 }
 
 STDMETHODIMP CDVRSourceFilter::QueryFilterInfo(FILTER_INFO* pInfo)
