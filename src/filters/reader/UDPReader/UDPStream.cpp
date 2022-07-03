@@ -401,6 +401,7 @@ bool CUDPStream::OpenHLSSegment()
 			m_hlsData.Segments.pop_front();
 			m_hlsData.SegmentSize = m_HTTPAsync.GetLenght();
 			m_hlsData.SegmentPos = {};
+			m_hlsData.bEndOfSegment = {};
 			return true;
 		}
 	}
@@ -926,6 +927,9 @@ DWORD CUDPStream::ThreadProc()
 						if (FAILED(m_HTTPAsync.Read(ptr, MAXBUFSIZE, &dwSizeRead))) {
 							bEndOfStream = TRUE;
 							break;
+						} else if (dwSizeRead == 0) {
+							m_hlsData.bEndOfSegment = true;
+							continue;
 						}
 
 						m_hlsData.SegmentPos += dwSizeRead;
