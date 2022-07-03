@@ -548,7 +548,7 @@ private:
 	BOOL			m_bNextIsOpened = FALSE;
 
 	CString					m_LastOpenFile;
-	CAutoPtr<OpenMediaData>	m_lastOMD;
+	std::unique_ptr<OpenMediaData> m_lastOMD;
 
 	CString m_LastOpenBDPath, m_BDLabel;
 	HMONITOR m_LastWindow_HM;
@@ -1220,7 +1220,7 @@ public:
 
 	CString UpdatePlayerStatus();
 
-	void OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD);
+	void OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD);
 	void OnFilePostCloseMedia();
 
 	// Main Window

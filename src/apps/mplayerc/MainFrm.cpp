@@ -3185,7 +3185,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			case EC_DVD_DOMAIN_CHANGE:
 				if (m_pDVDC) {
 					m_iDVDDomain = (DVD_DOMAIN)evParam1;
-					OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(m_lastOMD.m_p);
+					OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(m_lastOMD.get());
 					ASSERT(pDVDData);
 
 					CString Domain('-');
@@ -3550,8 +3550,7 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 {
-	CAutoPtr<OpenMediaData> pOMD;
-	pOMD.Attach((OpenMediaData*)wParam);
+	std::unique_ptr<OpenMediaData> pOMD((OpenMediaData*)wParam);
 
 	const auto& s = AfxGetAppSettings();
 
@@ -3568,7 +3567,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 
 		if (m_closingmsg != aborted) {
 
-			if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(pOMD.m_p)) {
+			if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(pOMD.get())) {
 				m_wndPlaylistBar.SetCurValid(false);
 
 				if (GetAsyncKeyState(VK_ESCAPE)) {
@@ -4335,7 +4334,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 	pCmdUI->SetText(UpdatePlayerStatus());
 }
 
-void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
+void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 {
 	ASSERT(m_eMediaLoadState == MLS_LOADING);
 	SetLoadState(MLS_LOADED);
@@ -4347,8 +4346,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	// remember OpenMediaData for later use
-	m_lastOMD.Free();
-	m_lastOMD.Attach(pOMD.Detach());
+	m_lastOMD = std::move(pOMD);
 
 	if (m_bIsBDPlay == FALSE) {
 		m_BDPlaylists.clear();
@@ -4372,7 +4370,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	rs.bStereo3DSwapLR = s.bStereo3DSwapLR;
 
-	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.m_p)) {
+	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.get())) {
 		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
 		m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
 		m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
@@ -5943,7 +5941,7 @@ void CMainFrame::OnFileSaveAs()
 	if (SUCCEEDED(hr)) {
 		save_dlg.DoModal();
 		if (save_dlg.IsCompleteOk() && !m_youtubeFields.fname.IsEmpty()) {
-			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
+			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.get());
 			if (pFileData && pFileData->fns.size() == 2) {
 				CString fileName(savedFileName);
 
