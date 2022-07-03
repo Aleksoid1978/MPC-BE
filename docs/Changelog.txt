@@ -2,15 +2,24 @@
 
 1.6.3.x beta
 =============================
+HTTP/UDP Reader
+Added support for HLS Live.
+
+MPegSplitter
+Fixed playback of VOB files with an incorrect empty block at the beginning.
+
 VideoRenderers
 Сolor management now works for 10-bit surfaces as well.
 
-Youtube
+Youtube and other online services
 Fixed work with yt-dlp on some sites.
 Use "ffmpeg.exe" to merge individual video and audio files obtained using the "Save As" command.
+Disable SSL certificate verification in yt-dlp.
+Improved support for online playlists.
 
 Player
 Fixed display of text with "&" symbols in the "Information" panel.
+Fixed LAV Splitter freezing when watching some Live broadcasts.
 
 
 1.6.3
