@@ -189,12 +189,14 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		SearchStreams(0, stop);
 
 		if (m_type == MPEG_TYPES::mpeg_ps) {
-			// ignoring wrong empty block at the beginning of some VOB files
+			// ignoring first wrong empty block at the beginning of some VOB files
 			for (auto& [track_num, sps] : m_SyncPoints) {
-				if (sps.size() > 2) {
-					auto dur0 = sps[1].rt - sps[0].rt;
-					auto dur1 = sps[2].rt - sps[1].rt;
-					if (dur0 > dur1 * 100) {
+				if (sps.size() >= 3) {
+					auto dur0 = std::abs(sps[1].rt - sps[0].rt);
+					auto dur1 = std::abs(sps[2].rt - sps[1].rt);
+					auto dur2 = std::abs(sps[3].rt - sps[2].rt);
+					if (dur0 > dur1 * 100 && dur0 > dur2 * 100) {
+						// check the first block with the second and third, to exclude corrupted data in the second block
 						sps.erase(sps.begin());
 					}
 				}
