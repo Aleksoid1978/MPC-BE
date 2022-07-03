@@ -857,7 +857,7 @@ STDMETHODIMP CBaseSplitterFilter::GetStatus(int i, int& samples, int& size)
 {
 	CAutoLock cAutoLock(m_pLock);
 
-	if (i >=0 && i < m_pOutputs.size()) {
+	if (i >= 0 && i < static_cast<int>(m_pOutputs.size())) {
 		auto it = m_pOutputs.begin();
 		std::advance(it, i);
 
