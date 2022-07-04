@@ -657,7 +657,8 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	const clock_t start = clock();
-	while (clock() - start < 500 && m_len < 64 * KILOBYTE) {
+	const ULONGLONG len = (m_subtype == MEDIASUBTYPE_MPEG2_TRANSPORT ? 128 : 64) * KILOBYTE;
+	while (clock() - start < 500 && m_len < len) {
 		Sleep(50);
 	}
 
@@ -809,6 +810,12 @@ DWORD CUDPStream::ThreadProc()
 	FILE* dump = _wfopen(fname, L"wb");
 #endif
 
+	auto buff = std::make_unique<BYTE[]>(MAXBUFSIZE * 2);
+	int  buffsize = 0;
+	int  len = 0;
+
+	auto encryptedBuff = m_hlsData.bAes128 ? std::make_unique<BYTE[]>(MAXBUFSIZE) : nullptr;
+
 	for (;;) {
 		m_RequestCmd = GetRequest();
 
@@ -832,33 +839,27 @@ DWORD CUDPStream::ThreadProc()
 					m_hlsData.Segments.clear();
 					m_hlsData.DiscontinuitySegments.clear();
 					m_hlsData.SequenceNumber = {};
+					m_hlsData.bRunning = {};
 				}
+
+				buffsize = len = 0;
 				break;
 			case CMD::CMD_INIT:
 			case CMD::CMD_RUN:
 				Reply(S_OK);
 
-				auto buff = std::make_unique<BYTE[]>(MAXBUFSIZE * 2);
-				int  buffsize = 0;
 				UINT attempts = 0;
-				int  len      = 0;
-
 				BOOL bEndOfStream = FALSE;
 
-				std::unique_ptr<BYTE[]> encryptedBuff;
-
 				if (m_protocol == protocol::PR_HLS) {
-					if (m_hlsData.bAes128) {
-						encryptedBuff.reset(DNew BYTE[MAXBUFSIZE]);
-					}
+					if (!m_hlsData.bRunning) {
+						m_hlsData.bRunning = true;
 
-					if (m_hlsData.Segments.empty()) {
-						if (m_hlsData.bEndList || !ParseM3U8(m_hlsData.PlaylistUrl, m_hlsData.PlaylistUrl)) {
-							m_bEndOfStream = TRUE;
-							break;
-						}
-						if (!OpenHLSSegment()) {
-							m_bEndOfStream = TRUE;
+						if (m_hlsData.Segments.empty() &&
+							(m_hlsData.bEndList
+							 || !ParseM3U8(m_hlsData.PlaylistUrl, m_hlsData.PlaylistUrl)
+							 || !OpenHLSSegment())) {
+							m_bEndOfStream = true;
 							break;
 						}
 					}

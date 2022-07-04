@@ -94,6 +94,7 @@ private:
 		uint64_t            SegmentSize = {};
 		uint64_t            SegmentPos = {};
 		bool                bEndList = {};
+		bool                bRunning = {};
 		std::chrono::high_resolution_clock::time_point PlaylistParsingTime = {};
 
 		bool                bAes128 = {};
