@@ -90,7 +90,7 @@ private:
 		std::list<CString>  DiscontinuitySegments;
 		uint64_t            SequenceNumber = {};
 		CString             PlaylistUrl;
-		int64_t             SegmentDuration = {};
+		int64_t             PlaylistDuration = {};
 		uint64_t            SegmentSize = {};
 		uint64_t            SegmentPos = {};
 		bool                bEndList = {};

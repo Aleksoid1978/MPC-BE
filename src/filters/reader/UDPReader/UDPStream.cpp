@@ -66,7 +66,7 @@ void CUDPStream::Clear()
 		m_hlsData.Segments.clear();
 		m_hlsData.DiscontinuitySegments.clear();
 		m_hlsData.SequenceNumber = {};
-		m_hlsData.SegmentDuration = {};
+		m_hlsData.PlaylistDuration = {};
 		m_hlsData.bInit = {};
 
 		m_hlsData.SegmentPos = m_hlsData.SegmentSize = {};
@@ -231,13 +231,16 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 
 	bool bMediaSequence = false;
 	uint64_t sequenceNumber = {};
+	int64_t segmentsDuration = {};
 
 	bool bDiscontinuity = false;
+
+	auto segmentsCount = m_hlsData.Segments.size();
 
 	int32_t bandwidth = {};
 	std::list<std::pair<uint32_t, CString>> PlaylistItems;
 
-	m_hlsData.SegmentDuration = {};
+	m_hlsData.PlaylistDuration = {};
 
 	auto CombinePath = [](const CString& base, const CString& relative) {
 		CUrlParser urlParser(relative.GetString());
@@ -262,7 +265,8 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 
 		if (StartsWith(str, L"#EXT-X-TARGETDURATION:")) {
 			DeleteLeft(22, str);
-			StrToInt64(str, m_hlsData.SegmentDuration);
+			StrToInt64(str, m_hlsData.PlaylistDuration);
+			m_hlsData.PlaylistDuration *= 1000;
 			continue;
 		} else if (StartsWith(str, L"#EXT-X-MEDIA-SEQUENCE:")) {
 			DeleteLeft(22, str);
@@ -345,6 +349,14 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 				return false;
 			}
 			continue;
+		} else if (StartsWith(str, L"#EXTINF:")) {
+			DeleteLeft(8, str);
+			double value = {};
+			if (StrToDouble(str, value) && value > 0.) {
+				segmentsDuration += std::llround(value * 1000.);
+			}
+
+			continue;
 		} else if (str.GetAt(0) == L'#') {
 			continue;
 		}
@@ -378,9 +390,24 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 
 	m_hlsData.PlaylistParsingTime = std::chrono::high_resolution_clock::now();
 
-	if (m_hlsData.SegmentDuration && (bMediaSequence || bDiscontinuity)) {
+	if (segmentsDuration) {
+		m_hlsData.PlaylistDuration = std::min(m_hlsData.PlaylistDuration, segmentsDuration);
+	}
+	if (m_hlsData.PlaylistDuration >= 2000) {
+		m_hlsData.PlaylistDuration /= 2;
+	}
+
+	if (m_hlsData.PlaylistDuration && (bMediaSequence || bDiscontinuity)) {
 		m_hlsData.bInit = true;
-		return !m_hlsData.Segments.empty();
+		bool ret = segmentsCount < m_hlsData.Segments.size();
+		if (!ret) {
+			/* If we need to reload the playlist again
+			 * (if there are no new segments),
+			 * then we use an interval of half the duration. */
+			m_hlsData.PlaylistDuration /= 2;
+		}
+
+		return ret;
 	}
 
 	if (!PlaylistItems.empty()) {
@@ -898,8 +925,8 @@ DWORD CUDPStream::ThreadProc()
 					} else if (m_protocol == protocol::PR_HLS) {
 						if (!m_hlsData.bEndList) {
 							auto now = std::chrono::high_resolution_clock::now();
-							auto seconds = std::chrono::duration_cast<std::chrono::seconds>(now - m_hlsData.PlaylistParsingTime).count();
-							if (seconds > static_cast<int64_t>(m_hlsData.SegmentDuration)) {
+							auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_hlsData.PlaylistParsingTime).count();
+							if (milliseconds > static_cast<int64_t>(m_hlsData.PlaylistDuration)) {
 								ParseM3U8(m_hlsData.PlaylistUrl, m_hlsData.PlaylistUrl);
 							}
 						}
