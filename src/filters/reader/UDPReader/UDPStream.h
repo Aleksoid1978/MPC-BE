@@ -100,7 +100,7 @@ private:
 		std::unique_ptr<CAESDecryptor> pAESDecryptor;
 
 		bool                bEndOfSegment = {};
-		[[nodiscard]] bool IsEndOfSegment() const { return bEndOfSegment || SegmentPos == SegmentSize; }
+		[[nodiscard]] bool IsEndOfSegment() const { return bEndOfSegment || (SegmentSize && SegmentPos == SegmentSize); }
 	} m_hlsData;
 
 	void Clear();

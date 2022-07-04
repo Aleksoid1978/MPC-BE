@@ -397,8 +397,9 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 bool CUDPStream::OpenHLSSegment()
 {
 	if (!m_hlsData.Segments.empty()) {
-		if (SUCCEEDED(m_HTTPAsync.Connect(m_hlsData.Segments.front()))) {
-			m_hlsData.Segments.pop_front();
+		auto hr = m_HTTPAsync.Connect(m_hlsData.Segments.front());
+		m_hlsData.Segments.pop_front();
+		if (SUCCEEDED(hr)) {
 			m_hlsData.SegmentSize = m_HTTPAsync.GetLenght();
 			m_hlsData.SegmentPos = {};
 			m_hlsData.bEndOfSegment = {};
@@ -916,8 +917,7 @@ DWORD CUDPStream::ThreadProc()
 								continue;
 							} else {
 								if (!OpenHLSSegment()) {
-									bEndOfStream = TRUE;
-									break;
+									continue;
 								}
 							}
 						}
