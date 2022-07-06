@@ -1052,17 +1052,10 @@ CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s
 
 __int64 CMpegSplitterFilter::SeekBD(const REFERENCE_TIME rt)
 {
-	if (!m_Items.empty()) {
-		for (const auto& Item : m_Items) {
-			if (!Item.m_sps.empty()
-					&& rt >= Item.m_rtStartTime && rt <= (Item.m_rtStartTime + Item.Duration())) {
-
-				const auto rtSeek = rt - Item.m_rtStartTime + Item.m_rtIn;
-				const int i = range_bsearch(Item.m_sps, rtSeek);
-				if (i >= 0) {
-					return Item.m_sps[i].fp + Item.m_SizeIn;
-				}
-			}
+	if (!m_sps.empty()) {
+		const int i = range_bsearch(m_sps, rt);
+		if (i >= 0) {
+			return m_sps[i].fp;
 		}
 	}
 
@@ -1276,60 +1269,69 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-	if (m_bUseMVCExtension && !m_Items.empty()) {
-		SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
+	if (!m_Items.empty()) {
+		if (m_bUseMVCExtension) {
+			SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
 
-		// PG offsets
-		const auto& Item = m_Items.begin();
-		if (Item->m_pg_offset_sequence_id.size()) {
-			std::list<BYTE> pg_offsets;
-			for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
-				if (*it != 0xff) {
-					pg_offsets.push_back(*it);
+			// PG offsets
+			const auto& Item = m_Items.begin();
+			if (Item->m_pg_offset_sequence_id.size()) {
+				std::list<BYTE> pg_offsets;
+				for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
+					if (*it != 0xff) {
+						pg_offsets.push_back(*it);
 
-					CString offset; offset.Format(L"%u", *it);
-					SetProperty(L"stereo_subtitle_offset_id", offset);
-				}
-			}
-			if (pg_offsets.size()) {
-				CString offsets;
-
-				pg_offsets.sort();
-				pg_offsets.unique();
-				for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
-					if (offsets.IsEmpty()) {
-						offsets.Format(L"%u", *it);
-					} else {
-						offsets.AppendFormat(L",%u", *it);
+						CString offset; offset.Format(L"%u", *it);
+						SetProperty(L"stereo_subtitle_offset_id", offset);
 					}
 				}
+				if (pg_offsets.size()) {
+					CString offsets;
 
-				SetProperty(L"stereo_subtitle_offset_ids", offsets);
+					pg_offsets.sort();
+					pg_offsets.unique();
+					for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
+						if (offsets.IsEmpty()) {
+							offsets.Format(L"%u", *it);
+						} else {
+							offsets.AppendFormat(L",%u", *it);
+						}
+					}
+
+					SetProperty(L"stereo_subtitle_offset_ids", offsets);
+				}
+			}
+
+			// IG offsets
+			if (Item->m_ig_offset_sequence_id.size()) {
+				std::list<BYTE> ig_offsets;
+				for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); it++) {
+					if (*it != 0xff) {
+						ig_offsets.push_back(*it);
+					}
+				}
+				if (ig_offsets.size()) {
+					CString offsets;
+
+					ig_offsets.sort();
+					ig_offsets.unique();
+					for (auto it = ig_offsets.begin(); it != ig_offsets.end(); it++) {
+						if (offsets.IsEmpty()) {
+							offsets.Format(L"%u", *it);
+						} else {
+							offsets.AppendFormat(L",%u", *it);
+						}
+					}
+
+					SetProperty(L"stereo_interactive_offset_ids", offsets);
+				}
 			}
 		}
 
-		// IG offsets
-		if (Item->m_ig_offset_sequence_id.size()) {
-			std::list<BYTE> ig_offsets;
-			for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); it++) {
-				if (*it != 0xff) {
-					ig_offsets.push_back(*it);
-				}
-			}
-			if (ig_offsets.size()) {
-				CString offsets;
-
-				ig_offsets.sort();
-				ig_offsets.unique();
-				for (auto it = ig_offsets.begin(); it != ig_offsets.end(); it++) {
-					if (offsets.IsEmpty()) {
-						offsets.Format(L"%u", *it);
-					} else {
-						offsets.AppendFormat(L",%u", *it);
-					}
-				}
-
-				SetProperty(L"stereo_interactive_offset_ids", offsets);
+		for (const auto& Item : m_Items) {
+			for (const auto& sps : Item.m_sps) {
+				SyncPoint sp = { Item.m_rtStartTime + sps.rt - Item.m_rtIn, Item.m_SizeIn + sps.fp };
+				m_sps.push_back(sp);
 			}
 		}
 	}
@@ -1985,6 +1987,32 @@ STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetSubEmptyPin()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_SubEmptyPin;
+}
+
+// IKeyFrameInfo
+
+STDMETHODIMP CMpegSplitterFilter::GetKeyFrameCount(UINT& nKFs)
+{
+	CheckPointer(m_pFile, E_UNEXPECTED);
+	nKFs = m_sps.size();
+	return S_OK;
+}
+
+STDMETHODIMP CMpegSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs)
+{
+	CheckPointer(pFormat, E_POINTER);
+	CheckPointer(pKFs, E_POINTER);
+	CheckPointer(m_pFile, E_UNEXPECTED);
+
+	if (*pFormat != TIME_FORMAT_MEDIA_TIME) {
+		return E_INVALIDARG;
+	}
+
+	for (nKFs = 0; nKFs < m_sps.size(); nKFs++) {
+		pKFs[nKFs] = m_sps[nKFs].rt;
+	}
+
+	return S_OK;
 }
 
 //

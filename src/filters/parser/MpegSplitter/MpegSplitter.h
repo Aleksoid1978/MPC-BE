@@ -73,6 +73,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	DWORD m_dwMasterH264TrackNumber   = DWORD_MAX;
 	DWORD m_dwMVCExtensionTrackNumber = DWORD_MAX;
 
+	std::vector<SyncPoint> m_sps;
+
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 	void	ReadClipInfo(LPCOLESTR pszFileName);
 
@@ -146,6 +148,10 @@ public:
 
 	STDMETHODIMP SetSubEmptyPin(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetSubEmptyPin();
+
+	// IKeyFrameInfo
+	STDMETHODIMP_(HRESULT) GetKeyFrameCount(UINT& nKFs);
+	STDMETHODIMP_(HRESULT) GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
 };
 
 class __declspec(uuid("1365BE7A-C86A-473C-9A41-C0A6E82C9FA3"))
