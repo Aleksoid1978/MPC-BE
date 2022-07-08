@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -269,9 +269,9 @@ BOOL CPPageExternalFilters::OnInitDialog()
 	m_pFilters.RemoveAll();
 
 	m_filters.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
-	POSITION pos = s.m_filters.GetHeadPosition();
+	POSITION pos = s.m_ExternalFilters.GetHeadPosition();
 	while (pos) {
-		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
+		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_ExternalFilters.GetNext(pos)));
 
 		CString name(L"<unknown>");
 
@@ -307,13 +307,13 @@ BOOL CPPageExternalFilters::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_filters.RemoveAll();
+	s.m_ExternalFilters.RemoveAll();
 
 	for (int i = 0; i < m_filters.GetCount(); i++) {
 		if (POSITION pos = (POSITION)m_filters.GetItemData(i)) {
 			CAutoPtr<FilterOverride> f(DNew FilterOverride(m_pFilters.GetAt(pos)));
 			f->fDisabled = !m_filters.GetCheck(i);
-			s.m_filters.AddTail(f);
+			s.m_ExternalFilters.AddTail(f);
 		}
 	}
 

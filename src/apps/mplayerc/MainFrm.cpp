@@ -5379,9 +5379,9 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 						f->fTemporary = true;
 						bool bFound = false;
 
-						POSITION pos2 = s.m_filters.GetHeadPosition();
+						POSITION pos2 = s.m_ExternalFilters.GetHeadPosition();
 						while (pos2) {
-							FilterOverride* f2 = s.m_filters.GetNext(pos2);
+							FilterOverride* f2 = s.m_ExternalFilters.GetNext(pos2);
 							if (f2->type == FilterOverride::EXTERNAL && !f2->path.CompareNoCase(f->path)) {
 								bFound = true;
 								delete f;
@@ -5391,7 +5391,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 						if (!bFound) {
 							CAutoPtr<FilterOverride> p(f);
-							s.m_filters.AddHead(p);
+							s.m_ExternalFilters.AddHead(p);
 						}
 					}
 				}

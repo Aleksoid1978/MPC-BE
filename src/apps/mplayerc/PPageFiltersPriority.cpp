@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -151,9 +151,9 @@ void CPPageFiltersPriority::Init()
 
 	m_pFilters.RemoveAll();
 
-	POSITION pos = s.m_filters.GetHeadPosition();
+	POSITION pos = s.m_ExternalFilters.GetHeadPosition();
 	while (pos) {
-		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
+		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_ExternalFilters.GetNext(pos)));
 
 		if (f->iLoadType == FilterOverride::BLOCK) {
 			continue;

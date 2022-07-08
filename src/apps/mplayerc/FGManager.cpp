@@ -2696,9 +2696,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Overrides
 	WORD merit_low = 1;
 
-	POSITION pos = s.m_filters.GetTailPosition();
+	POSITION pos = s.m_ExternalFilters.GetTailPosition();
 	while (pos) {
-		FilterOverride* fo = s.m_filters.GetPrev(pos);
+		FilterOverride* fo = s.m_ExternalFilters.GetPrev(pos);
 
 		if (fo->fDisabled || (fo->type == FilterOverride::EXTERNAL && !CPath(MakeFullPath(fo->path)).FileExists())) {
 			continue;

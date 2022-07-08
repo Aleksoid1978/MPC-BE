@@ -630,7 +630,7 @@ void CAppSettings::ResetSettings()
 	bAudioFilters = false;
 	strAudioFilter1.Empty();
 
-	m_filters.RemoveAll();
+	m_ExternalFilters.RemoveAll();
 
 	// Keys
 	strWinLircAddr = L"127.0.0.1:8765";
@@ -1044,7 +1044,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	{
-		m_filters.RemoveAll();
+		m_ExternalFilters.RemoveAll();
 		for (unsigned int i = 0; ; i++) {
 			CString key;
 			key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
@@ -1114,7 +1114,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			f->dwMerit = MERIT_DO_NOT_USE + 1;
 			profile.ReadUInt(key, L"Merit", *(unsigned*)&f->dwMerit);
 
-			m_filters.AddTail(f);
+			m_ExternalFilters.AddTail(f);
 		}
 	}
 
@@ -2051,9 +2051,9 @@ void CAppSettings::SaveExternalFilters()
 	}
 
 	unsigned int k = 0;
-	POSITION pos = m_filters.GetHeadPosition();
+	POSITION pos = m_ExternalFilters.GetHeadPosition();
 	while (pos) {
-		FilterOverride* f = m_filters.GetNext(pos);
+		FilterOverride* f = m_ExternalFilters.GetNext(pos);
 
 		if (f->fTemporary) {
 			continue;
