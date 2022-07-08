@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ class CPPageFiltersPriority : public CPPageBase
 	DECLARE_DYNAMIC(CPPageFiltersPriority)
 
 private:
-	CAutoPtrList<FilterOverride> m_pFilters;
+	std::list<CLSID> m_ExtSrcFilters;
 
 public:
 	CPPageFiltersPriority();
