@@ -944,7 +944,7 @@ public:
 	int				GetMultiInst();
 	engine_t		GetFileEngine(CString path);
 
-	CFiltersPrioritySettings	FiltersPrioritySettings;
+	CFiltersPrioritySettings	FiltersPriority;
 
 	std::list<CString>			slSubtitlePathsAddons;
 	std::list<CString>			slAudioPathsAddons;

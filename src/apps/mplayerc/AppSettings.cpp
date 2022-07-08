@@ -845,7 +845,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	CMPlayerCApp::SetLanguage(iLanguage, false);
 
-	FiltersPrioritySettings.LoadSettings();
+	FiltersPriority.LoadSettings();
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode, MODE_SHOWCAPTIONMENU, MODE_BORDERLESS);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
@@ -1560,7 +1560,7 @@ void CAppSettings::SaveSettings()
 
 	CString str;
 
-	FiltersPrioritySettings.SaveSettings();
+	FiltersPriority.SaveSettings();
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);

@@ -446,7 +446,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CMediaFormatCategory* mfc = s.m_Formats.FindMediaByExt(ext);
 		if (mfc || protocol == L"udp" || httpbuf.size()) {
 			CString type = httpbuf.size() ? L"http" : (protocol == L"udp" ? L"udp" : mfc->GetLabel());
-			if (const auto it = s.FiltersPrioritySettings.values.find(type); it != s.FiltersPrioritySettings.values.cend() && it->second != CLSID_NULL) {
+			if (const auto it = s.FiltersPriority.values.find(type); it != s.FiltersPriority.values.cend() && it->second != CLSID_NULL) {
 				const auto& clsid_value = it->second;
 
 				for (const auto& pFGF : m_override) {
