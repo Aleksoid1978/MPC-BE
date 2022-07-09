@@ -219,7 +219,12 @@ void CPPageExternalFilters::StepDown(CCheckListBox& list)
 FilterOverride* CPPageExternalFilters::GetCurFilter()
 {
 	int i = m_filters.GetCurSel();
-	return i >= 0 ? (FilterOverride*)m_pFilters.GetAt((POSITION)m_filters.GetItemDataPtr(i)) : (FilterOverride*)nullptr;
+	auto it = FindInListByPointer(m_ExtFilters, (FilterOverride*)m_filters.GetItemDataPtr(i));
+	if (it != m_ExtFilters.end()) {
+		return (*it).get();
+	}
+
+	return nullptr;
 }
 
 BEGIN_MESSAGE_MAP(CPPageExternalFilters, CPPageBase)
@@ -266,13 +271,14 @@ BOOL CPPageExternalFilters::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_pFilters.RemoveAll();
+	m_ExtFilters.clear();
+	for (const auto& f : s.m_ExternalFilters) {
+		m_ExtFilters.emplace_back(DNew FilterOverride(f.get())); // make an independent copy
+	}
 
 	m_filters.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
-	POSITION pos = s.m_ExternalFilters.GetHeadPosition();
-	while (pos) {
-		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_ExternalFilters.GetNext(pos)));
 
+	for (const auto& f : m_ExtFilters) {
 		CString name(L"<unknown>");
 
 		if (f->type == FilterOverride::REGISTERED) {
@@ -291,8 +297,8 @@ BOOL CPPageExternalFilters::OnInitDialog()
 		}
 
 		int i = m_filters.AddString(name);
-		m_filters.SetCheck(i, f->fDisabled ? 0 : 1);
-		m_filters.SetItemDataPtr(i, m_pFilters.AddTail(f));
+		m_filters.SetItemDataPtr(i, f.get());
+		m_filters.SetCheck(i, f->fDisabled ? BST_UNCHECKED : BST_CHECKED);
 	}
 
 	UpdateData(FALSE);
@@ -307,13 +313,13 @@ BOOL CPPageExternalFilters::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_ExternalFilters.RemoveAll();
+	s.m_ExternalFilters.clear();
 
 	for (int i = 0; i < m_filters.GetCount(); i++) {
-		if (POSITION pos = (POSITION)m_filters.GetItemData(i)) {
-			CAutoPtr<FilterOverride> f(DNew FilterOverride(m_pFilters.GetAt(pos)));
-			f->fDisabled = !m_filters.GetCheck(i);
-			s.m_ExternalFilters.AddTail(f);
+		auto it = FindInListByPointer(m_ExtFilters, (FilterOverride*)m_filters.GetItemDataPtr(i));
+		if (it != m_ExtFilters.end()) {
+			(*it)->fDisabled = !m_filters.GetCheck(i);
+			s.m_ExternalFilters.emplace_back(DNew FilterOverride((*it).get())); // make an independent copy
 		}
 	}
 
@@ -367,7 +373,7 @@ void CPPageExternalFilters::OnAddRegistered()
 			dlg.m_filters.pop_front();
 
 			if (f) {
-				CAutoPtr<FilterOverride> p(f);
+				std::unique_ptr<FilterOverride> p(f);
 
 				if (f->name.IsEmpty() && !f->guids.size() && !f->dwMerit) {
 					// skip something strange
@@ -383,8 +389,9 @@ void CPPageExternalFilters::OnAddRegistered()
 				}
 
 				int i = m_filters.AddString(name);
-				m_filters.SetItemDataPtr(i, m_pFilters.AddTail(p));
-				m_filters.SetCheck(i, 1);
+				m_ExtFilters.emplace_back(std::move(p));
+				m_filters.SetItemDataPtr(i, m_ExtFilters.back().get());
+				m_filters.SetCheck(i, BST_CHECKED);
 
 				if (dlg.m_filters.empty()) {
 					m_filters.SetCurSel(i);
@@ -400,7 +407,10 @@ void CPPageExternalFilters::OnAddRegistered()
 void CPPageExternalFilters::OnRemoveFilter()
 {
 	int i = m_filters.GetCurSel();
-	m_pFilters.RemoveAt((POSITION)m_filters.GetItemDataPtr(i));
+	auto it = FindInListByPointer(m_ExtFilters, (FilterOverride*)m_filters.GetItemDataPtr(i));
+	if (it != m_ExtFilters.end()) {
+		m_ExtFilters.erase(it);
+	}
 	m_filters.DeleteString(i);
 
 	if (i >= m_filters.GetCount()) {
@@ -761,8 +771,9 @@ void CPPageExternalFilters::OnDropFiles(HDROP hDropInfo)
 			if (f) {
 				CAutoPtr<FilterOverride> p(f);
 				int i = m_filters.AddString(f->name);
-				m_filters.SetItemDataPtr(i, m_pFilters.AddTail(p));
-				m_filters.SetCheck(i, 1);
+				m_ExtFilters.emplace_back(std::move(p));
+				m_filters.SetItemDataPtr(i, m_ExtFilters.back().get());
+				m_filters.SetCheck(i, BST_CHECKED);
 
 				if (fm2.m_filters.empty()) {
 					m_filters.SetCurSel(i);

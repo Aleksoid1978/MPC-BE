@@ -371,9 +371,8 @@ std::map<CLSID, CString> CPinInfoWnd::m_CachedRegistryFilters;
 CPinInfoWnd::CPinInfoWnd()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	POSITION pos = s.m_ExternalFilters.GetHeadPosition();
-	while (pos) {
-		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_ExternalFilters.GetNext(pos)));
+
+	for (const auto& f : s.m_ExternalFilters) {
 		if (::PathFileExistsW(f->path)) {
 			m_CachedExternalFilters[f->clsid] = f->path;
 		}

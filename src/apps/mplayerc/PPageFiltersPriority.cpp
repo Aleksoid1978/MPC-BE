@@ -151,10 +151,7 @@ void CPPageFiltersPriority::Init()
 
 	m_ExtSrcFilters.clear();
 
-	POSITION pos = s.m_ExternalFilters.GetHeadPosition();
-	while (pos) {
-		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_ExternalFilters.GetNext(pos)));
-
+	for (const auto& f : s.m_ExternalFilters) {
 		if (f->iLoadType == FilterOverride::BLOCK) {
 			continue;
 		}

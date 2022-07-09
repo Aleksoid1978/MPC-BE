@@ -736,7 +736,7 @@ public:
 	CStringA		strAudioFilter1;
 
 	// External Filters
-	CAutoPtrList<FilterOverride> m_ExternalFilters;
+	std::list<std::unique_ptr<FilterOverride>> m_ExternalFilters;
 
 	// Subtitles
 	int				iSubtitleRenderer;

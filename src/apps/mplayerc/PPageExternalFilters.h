@@ -35,7 +35,7 @@ private:
 	void StepUp(CCheckListBox& list);
 	void StepDown(CCheckListBox& list);
 
-	CAutoPtrList<FilterOverride> m_pFilters;
+	std::list<std::unique_ptr<FilterOverride>> m_ExtFilters;
 	FilterOverride* m_pLastSelFilter;
 	FilterOverride* GetCurFilter();
 

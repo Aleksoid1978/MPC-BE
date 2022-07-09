@@ -630,7 +630,7 @@ void CAppSettings::ResetSettings()
 	bAudioFilters = false;
 	strAudioFilter1.Empty();
 
-	m_ExternalFilters.RemoveAll();
+	m_ExternalFilters.clear();
 
 	// Keys
 	strWinLircAddr = L"127.0.0.1:8765";
@@ -1044,11 +1044,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	{
-		m_ExternalFilters.RemoveAll();
+		m_ExternalFilters.clear();
 		for (unsigned int i = 0; ; i++) {
 			CString key;
 			key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
-			CAutoPtr<FilterOverride> f(DNew FilterOverride);
+			std::unique_ptr<FilterOverride> f(DNew FilterOverride);
 
 			bool enabled = false;
 			profile.ReadBool(key, L"Enabled", enabled);
@@ -1114,7 +1114,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			f->dwMerit = MERIT_DO_NOT_USE + 1;
 			profile.ReadUInt(key, L"Merit", *(unsigned*)&f->dwMerit);
 
-			m_ExternalFilters.AddTail(f);
+			m_ExternalFilters.emplace_back(std::move(f));
 		}
 	}
 
@@ -2051,10 +2051,7 @@ void CAppSettings::SaveExternalFilters()
 	}
 
 	unsigned int k = 0;
-	POSITION pos = m_ExternalFilters.GetHeadPosition();
-	while (pos) {
-		FilterOverride* f = m_ExternalFilters.GetNext(pos);
-
+	for (const auto& f : m_ExternalFilters) {
 		if (f->fTemporary) {
 			continue;
 		}
