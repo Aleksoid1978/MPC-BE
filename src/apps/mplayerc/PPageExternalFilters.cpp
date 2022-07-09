@@ -769,7 +769,7 @@ void CPPageExternalFilters::OnDropFiles(HDROP hDropInfo)
 			fm2.m_filters.pop_front();
 
 			if (f) {
-				CAutoPtr<FilterOverride> p(f);
+				std::unique_ptr<FilterOverride> p(f);
 				int i = m_filters.AddString(f->name);
 				m_ExtFilters.emplace_back(std::move(p));
 				m_filters.SetItemDataPtr(i, m_ExtFilters.back().get());
