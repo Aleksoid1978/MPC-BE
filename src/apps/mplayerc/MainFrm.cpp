@@ -8809,7 +8809,7 @@ void CMainFrame::OnUpdateSubtitlesEnable(CCmdUI* pCmdUI)
 void CMainFrame::OnMenuSubtitlesStyle()
 {
 	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>(m_pCurrentSubStream.p)) {
-		CAutoPtrArray<CPPageSubStyle> pages;
+		std::vector<std::unique_ptr<CPPageSubStyle>> pages;
 		std::vector<STSStyle*> styles;
 
 		POSITION pos = pRTS->m_styles.GetStartPosition();
@@ -8818,9 +8818,9 @@ void CMainFrame::OnMenuSubtitlesStyle()
 			STSStyle* val;
 			pRTS->m_styles.GetNextAssoc(pos, key, val);
 
-			CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
+			std::unique_ptr<CPPageSubStyle> page(DNew CPPageSubStyle());
 			page->InitSubStyle(key, val);
-			pages.Add(page);
+			pages.emplace_back(std::move(page));
 			styles.push_back(val);
 		}
 
@@ -8828,12 +8828,12 @@ void CMainFrame::OnMenuSubtitlesStyle()
 		caption.Replace(L"&", nullptr);
 
 		CPropertySheet dlg(caption, GetModalParent());
-		for (size_t i = 0; i < pages.GetCount(); i++) {
-			dlg.AddPage(pages[i]);
+		for (size_t i = 0; i < pages.size(); i++) {
+			dlg.AddPage(pages[i].get());
 		}
 
 		if (dlg.DoModal() == IDOK) {
-			for (size_t i = 0; i < pages.GetCount(); i++) {
+			for (size_t i = 0; i < pages.size(); i++) {
 				pages[i]->GetSubStyle(styles[i]);
 			}
 			UpdateSubtitle(false, false);
