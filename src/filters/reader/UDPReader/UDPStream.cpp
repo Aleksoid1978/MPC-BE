@@ -251,6 +251,8 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 		return CUrlParser::CombineUrl(base, relative);
 	};
 
+	bool bItemsFound = false;
+
 	while (f.ReadString(str)) {
 		FastTrim(str);
 
@@ -275,7 +277,9 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			}
 			continue;
 		} else if (str == L"#EXT-X-DISCONTINUITY") {
-			bDiscontinuity = true;
+			if (!bItemsFound) {
+				bDiscontinuity = true;
+			}
 			continue;
 		} else if (str == L"#EXT-X-ENDLIST") {
 			m_hlsData.bEndList = true;
@@ -360,6 +364,8 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 		} else if (str.GetAt(0) == L'#') {
 			continue;
 		}
+
+		bItemsFound = true;
 
 		if (!bMediaSequence) {
 			PlaylistItems.emplace_back(bandwidth, CombinePath(base, str));
