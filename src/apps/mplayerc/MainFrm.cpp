@@ -8669,6 +8669,8 @@ void CMainFrame::SetSubtitleDelay(int delay_ms)
 		m_pCAP->SetSubtitleDelay(delay_ms);
 	}
 
+	RepaintVideo();
+
 	CString strSubDelay;
 	strSubDelay.Format(ResStr(IDS_MAINFRM_139), delay_ms);
 	SendStatusMessage(strSubDelay, 3000);
