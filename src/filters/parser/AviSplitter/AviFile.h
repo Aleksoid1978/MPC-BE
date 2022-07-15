@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ public:
 		AVISTREAMHEADER strh;
 		std::vector<BYTE> strf;
 		CStringA strn;
-		CAutoPtr<AVISUPERINDEX> indx;
+		std::unique_ptr<AVISUPERINDEX> indx;
 		struct chunk {
 			UINT64 fKeyFrame:1, fChunkHdr:1, size:62;
 			UINT64 filepos;
@@ -83,9 +83,9 @@ public:
 		};
 		std::vector<chunk2> cs2;
 	};
-	CAutoPtrArray<strm_t> m_strms;
+	std::vector<std::unique_ptr<strm_t>> m_strms;
 	std::map<DWORD, CStringA> m_info;
-	CAutoPtr<AVIOLDINDEX> m_idx1;
+	std::unique_ptr<AVIOLDINDEX> m_idx1;
 
 	std::list<UINT64> m_movis;
 	bool m_isamv;

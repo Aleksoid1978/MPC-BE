@@ -55,16 +55,16 @@ HRESULT CAviFile::Init()
 		return E_FAIL;
 	}
 
-	if (m_avih.dwStreams == 0 && m_strms.GetCount() > 0) {
-		m_avih.dwStreams = (DWORD)m_strms.GetCount();
+	if (m_avih.dwStreams == 0 && m_strms.size() > 0) {
+		m_avih.dwStreams = (DWORD)m_strms.size();
 	}
 
-	if (m_avih.dwStreams != m_strms.GetCount()) {
+	if (m_avih.dwStreams != m_strms.size()) {
 		return E_FAIL;
 	}
 
 	for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
-		strm_t* s = m_strms[i];
+		strm_t* s = m_strms[i].get();
 		if (s->strh.fccType != FCC('auds')) {
 			continue;
 		}
@@ -125,7 +125,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 {
 	HRESULT hr = S_OK;
 
-	CAutoPtr<strm_t> strm;
+	std::unique_ptr<strm_t> strm;
 
 	while (S_OK == hr && GetPos() < end) {
 		UINT64 pos = GetPos();
@@ -223,7 +223,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					break;
 				case FCC('strh'):
 					if (!strm) {
-						strm.Attach(DNew strm_t());
+						strm.reset(DNew strm_t());
 					}
 					strm->strh.fcc = FCC('strh');
 					strm->strh.cb = size;
@@ -232,7 +232,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					if (m_isamv) {
 						// First alway video, second always audio
-						strm->strh.fccType = m_strms.GetCount() == 0 ? FCC('vids') : FCC('amva');
+						strm->strh.fccType = m_strms.size() == 0 ? FCC('vids') : FCC('amva');
 						strm->strh.dwRate  = m_avih.dwReserved[0]*1000; // dwReserved[0] = fps!
 						strm->strh.dwScale = 1000;
 					}
@@ -244,7 +244,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					break;
 				case FCC('strf'):
 					if (!strm) {
-						strm.Attach(DNew strm_t());
+						strm.reset(DNew strm_t());
 					}
 					strm->strf.resize(size);
 					if (S_OK != ByteRead(strm->strf.data(), size)) {
@@ -262,13 +262,13 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 							pbmi->biBitCount    = 24;
 							pbmi->biSizeImage   = DIBSIZE(*pbmi);
 						}
-						m_strms.Add(strm);
+						m_strms.emplace_back(std::move(strm));
 					}
 
 					break;
 				case FCC('indx'):
 					if (!strm) {
-						strm.Attach(DNew strm_t());
+						strm.reset(DNew strm_t());
 					}
 					ASSERT(strm->indx == nullptr);
 					if (size < MAXDWORD-8) {
@@ -282,10 +282,10 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 						}
 						END_CATCH
 						if (pSuperIndex) {
-							strm->indx.Attach(pSuperIndex);
+							strm->indx.reset(std::move(pSuperIndex));
 							strm->indx->fcc = FCC('indx');
 							strm->indx->cb = size;
-							if (S_OK != ByteRead((BYTE*)(AVISUPERINDEX*)strm->indx + 8, size)) {
+							if (S_OK != ByteRead((BYTE*)strm->indx.get() + 8, size)) {
 								return E_FAIL;
 							}
 							ASSERT(strm->indx->wLongsPerEntry == 4 && strm->indx->bIndexType == AVI_INDEX_OF_INDEXES);
@@ -304,10 +304,10 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					break;
 				case FCC('idx1'):
 					ASSERT(m_idx1 == nullptr);
-					m_idx1.Attach((AVIOLDINDEX*)DNew BYTE[size + 8]);
+					m_idx1.reset((AVIOLDINDEX*)DNew BYTE[size + 8]);
 					m_idx1->fcc = FCC('idx1');
 					m_idx1->cb = size;
-					if (S_OK != ByteRead((BYTE*)(AVIOLDINDEX*)m_idx1 + 8, size)) {
+					if (S_OK != ByteRead((BYTE*)m_idx1.get() + 8, size)) {
 						return E_FAIL;
 					}
 					break;
@@ -327,7 +327,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 	}
 
 	if (strm) {
-		m_strms.Add(strm);
+		m_strms.emplace_back(std::move(strm));
 	}
 
 	return hr;
@@ -339,7 +339,7 @@ REFERENCE_TIME CAviFile::GetTotalTime()
 
 	// first - try to get the length of the video track
 	for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
-		strm_t* s = m_strms[i];
+		strm_t* s = m_strms[i].get();
 		if (s->strh.fccType == FCC('vids')) {
 			ASSERT(s->strf.size() >= sizeof(BITMAPINFOHEADER));
 
@@ -354,7 +354,7 @@ REFERENCE_TIME CAviFile::GetTotalTime()
 	if (!total) {
 		// second - try to get the length of the audio track
 		for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
-			strm_t* s = m_strms[i];
+			strm_t* s = m_strms[i].get();
 			if (s->strh.fccType == FCC('auds') || s->strh.fccType == FCC('amva')) {
 				REFERENCE_TIME t = s->GetRefTime((DWORD)s->cs.size(), s->totalsize);
 				total = std::max(total, t);
@@ -376,7 +376,7 @@ HRESULT CAviFile::BuildIndex()
 	DWORD nSuperIndexes = 0;
 
 	for (DWORD track = 0; track < m_avih.dwStreams; track++) {
-		strm_t* s = m_strms[track];
+		strm_t* s = m_strms[track].get();
 		if (s->indx && s->indx->nEntriesInUse > 0) {
 			nSuperIndexes++;
 		}
@@ -384,9 +384,9 @@ HRESULT CAviFile::BuildIndex()
 
 	if (nSuperIndexes == m_avih.dwStreams) {
 		for (DWORD track = 0; track < m_avih.dwStreams; track++) {
-			strm_t* s = m_strms[track];
+			strm_t* s = m_strms[track].get();
 
-			AVISUPERINDEX* idx = (AVISUPERINDEX*)s->indx;
+			AVISUPERINDEX* idx = (AVISUPERINDEX*)s->indx.get();
 
 			DWORD nEntriesInUse = 0;
 
@@ -448,7 +448,7 @@ HRESULT CAviFile::BuildIndex()
 
 			s->totalsize = size;
 		}
-	} else if (AVIOLDINDEX* idx = m_idx1) {
+	} else if (AVIOLDINDEX* idx = m_idx1.get()) {
 		size_t len    = idx->cb / sizeof(idx->aIndex[0]);
 
 		UINT64 offset = m_movis.front() + 8;
@@ -465,7 +465,7 @@ HRESULT CAviFile::BuildIndex()
 		}
 
 		for (DWORD track = 0; track < m_avih.dwStreams; track++) {
-			strm_t* s = m_strms[track];
+			strm_t* s = m_strms[track].get();
 
 			// calculate the number of frames and set index size before using it
 			size_t nFrames = 0;
@@ -498,9 +498,9 @@ HRESULT CAviFile::BuildIndex()
 		}
 	}
 
-	m_idx1.Free();
+	m_idx1.reset();
 	for (DWORD track = 0; track < m_avih.dwStreams; track++) {
-		m_strms[track]->indx.Free();
+		m_strms[track]->indx.reset();
 	}
 
 	return S_OK;
@@ -510,7 +510,7 @@ void CAviFile::EmptyIndex(LONG TrackNum)
 {
 	if (TrackNum > -1) {
 		if ((DWORD)TrackNum < m_avih.dwStreams) {
-			strm_t* s = m_strms[TrackNum];
+			strm_t* s = m_strms[TrackNum].get();
 			s->cs.clear();
 			s->totalsize = 0;
 		}
@@ -518,7 +518,7 @@ void CAviFile::EmptyIndex(LONG TrackNum)
 	}
 
 	for (DWORD track = 0; track < m_avih.dwStreams; track++) {
-		strm_t* s = m_strms[track];
+		strm_t* s = m_strms[track].get();
 		s->cs.clear();
 		s->totalsize = 0;
 	}
@@ -526,7 +526,7 @@ void CAviFile::EmptyIndex(LONG TrackNum)
 
 bool CAviFile::IsInterleaved(bool fKeepInfo)
 {
-	if (m_strms.GetCount() < 2) {
+	if (m_strms.size() < 2) {
 		return true;
 	}
 	/*
@@ -565,7 +565,7 @@ bool CAviFile::IsInterleaved(bool fKeepInfo)
 			break;
 		}
 
-		strm_t* s = m_strms[n];
+		strm_t* s = m_strms[n].get();
 		DWORD& curchunk = curchunks[n];
 		UINT64& cursize = cursizes[n];
 
