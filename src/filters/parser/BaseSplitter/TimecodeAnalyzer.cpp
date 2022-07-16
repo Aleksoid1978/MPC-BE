@@ -63,7 +63,7 @@ REFERENCE_TIME TimecodeAnalyzer::FrameDuration_RoundToStandard(REFERENCE_TIME Fr
 	return FrameDuration;
 }
 
-bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num)
+bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num, const int feeze)
 {
 	if (timecodes.size() < 2) {
 		return false;
@@ -108,7 +108,7 @@ bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, uint
 	uint64_t sum = durations[0];
 	unsigned count = 1;
 	for (size_t i = 1; i < durations.size(); i++) {
-		if (abs(durations[i - 1] - durations[i]) <= 1) {
+		if (abs(durations[i - 1] - durations[i]) <= feeze) {
 			sum += durations[i];
 			count++;
 
@@ -129,24 +129,24 @@ bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, uint
 	return true;
 }
 
-REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timecodes, const unsigned timecodescaleRF)
+REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timecodes, const unsigned timecodescaleRF, const int feeze)
 {
 	uint64_t interval;
 	unsigned num;
 
-	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
+	if (GetMonotoneInterval(timecodes, interval, num, feeze) && num >= 10) {
 		return FrameDuration_RoundToStandard((interval * timecodescaleRF) / num);
 	}
 
 	return 0;
 }
 
-double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond)
+double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond, const int feeze)
 {
 	uint64_t interval;
 	unsigned num;
 
-	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
+	if (GetMonotoneInterval(timecodes, interval, num, feeze) && num >= 10) {
 		return FrameRate_RoundToStandard((double)num * timecodespersecond / interval);
 	}
 

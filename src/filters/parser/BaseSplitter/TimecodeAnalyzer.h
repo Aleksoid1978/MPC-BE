@@ -30,8 +30,8 @@ namespace TimecodeAnalyzer
 	// A sufficient number of frames for calculating the average fps in most cases.
 	const unsigned DefaultFrameNum = 120;
 
-	bool GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num);
+	bool GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num, const int feeze = 1);
 
-	REFERENCE_TIME CalculateFrameTime(std::vector<int64_t>& timecodes, const unsigned timecodescaleRF);
-	double CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond);
+	REFERENCE_TIME CalculateFrameTime(std::vector<int64_t>& timecodes, const unsigned timecodescaleRF, const int feeze = 1);
+	double CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond, const int feeze = 1);
 }

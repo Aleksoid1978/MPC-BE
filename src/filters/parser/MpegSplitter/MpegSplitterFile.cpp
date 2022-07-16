@@ -1530,11 +1530,8 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						Seek(nextPos);
 					}
 
-					if (timecodes.size() >= 2) {
-						rtAvgTimePerFrame = (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
-						rtAvgTimePerFrame = TimecodeAnalyzer::FrameDuration_RoundToStandard(rtAvgTimePerFrame);
-					}
-					else {
+					rtAvgTimePerFrame = TimecodeAnalyzer::CalculateFrameTime(timecodes, 1, 10000);
+					if (rtAvgTimePerFrame == 0) {
 						rtAvgTimePerFrame = 333666; // 29.97 fps
 					}
 
