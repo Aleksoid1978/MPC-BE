@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "TimecodeAnalyzer.h"
 
-static double Video_FrameRate_Rounding(double FrameRate)
+double TimecodeAnalyzer::FrameRate_RoundToStandard(double FrameRate)
 {
 	// rounded up to the standard values if the difference is not more than 0.05%
 	     if (FrameRate > 14.993 && FrameRate <  15.008) FrameRate = 15;
@@ -42,7 +42,7 @@ static double Video_FrameRate_Rounding(double FrameRate)
 	return FrameRate;
 }
 
-static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
+REFERENCE_TIME TimecodeAnalyzer::FrameDuration_RoundToStandard(REFERENCE_TIME FrameDuration)
 {
 	// rounded up to the standard values if the difference is not more than 0.05%
 	     if (FrameDuration > 666333 && FrameDuration < 667000) FrameDuration = UNITS / 15;
@@ -135,7 +135,7 @@ REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timeco
 	unsigned num;
 
 	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
-		return Video_FrameDuration_Rounding((interval * timecodescaleRF) / num);
+		return FrameDuration_RoundToStandard((interval * timecodescaleRF) / num);
 	}
 
 	return 0;
@@ -147,7 +147,7 @@ double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const uns
 	unsigned num;
 
 	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
-		return Video_FrameRate_Rounding((double)num * timecodespersecond / interval);
+		return FrameRate_RoundToStandard((double)num * timecodespersecond / interval);
 	}
 
 	return 0.0;

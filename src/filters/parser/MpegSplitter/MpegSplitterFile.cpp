@@ -1522,7 +1522,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 							break;
 						}
 
-						timecodes.push_back((rt + 100) / 200); // get a real precision for time codes (need for some files)
+						timecodes.push_back(rt);
 						if (timecodes.size() >= TimecodeAnalyzer::DefaultFrameNum) {
 							break;
 						}
@@ -1530,8 +1530,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						Seek(nextPos);
 					}
 
-					rtAvgTimePerFrame = TimecodeAnalyzer::CalculateFrameTime(timecodes, 200);
-					if (rtAvgTimePerFrame == 0) {
+					if (timecodes.size() >= 2) {
+						rtAvgTimePerFrame = (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
+						rtAvgTimePerFrame = TimecodeAnalyzer::FrameDuration_RoundToStandard(rtAvgTimePerFrame);
+					}
+					else {
 						rtAvgTimePerFrame = 333666; // 29.97 fps
 					}
 

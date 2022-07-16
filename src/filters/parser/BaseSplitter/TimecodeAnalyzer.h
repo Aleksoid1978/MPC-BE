@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,11 @@
 
 namespace TimecodeAnalyzer
 {
+	double FrameRate_RoundToStandard(double FrameRate);
+	REFERENCE_TIME FrameDuration_RoundToStandard(REFERENCE_TIME FrameDuration);
+
 	// A sufficient number of frames for calculating the average fps in most cases.
 	const unsigned DefaultFrameNum = 120;
-
 
 	bool GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num);
 
