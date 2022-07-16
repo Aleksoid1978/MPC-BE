@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,9 +34,9 @@ class CBaseMuxerFilter
 	, public IDSMChapterBagImpl
 {
 private:
-	CAutoPtrList<CBaseMuxerInputPin> m_pInputs;
-	CAutoPtr<CBaseMuxerOutputPin> m_pOutput;
-	CAutoPtrList<CBaseMuxerRawOutputPin> m_pRawOutputs;
+	std::list<std::unique_ptr<CBaseMuxerInputPin>> m_pInputs;
+	std::unique_ptr<CBaseMuxerOutputPin> m_pOutput;
+	std::list<std::unique_ptr<CBaseMuxerRawOutputPin>> m_pRawOutputs;
 
 	enum { CMD_EXIT, CMD_RUN };
 	DWORD ThreadProc();
@@ -52,7 +52,7 @@ private:
 
 protected:
 	std::list<CBaseMuxerInputPin*> m_pPins;
-	CBaseMuxerOutputPin* GetOutputPin() { return m_pOutput; }
+	CBaseMuxerOutputPin* GetOutputPin() { return m_pOutput.get(); }
 
 	virtual void MuxInit() = 0;
 

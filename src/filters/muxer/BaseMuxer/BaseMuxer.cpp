@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ CBaseMuxerFilter::CBaseMuxerFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& cl
 	if (phr) {
 		*phr = S_OK;
 	}
-	m_pOutput.Attach(DNew CBaseMuxerOutputPin(L"Output", this, this, phr));
+	m_pOutput.reset(DNew CBaseMuxerOutputPin(L"Output", this, this, phr));
 	AddInput();
 }
 
@@ -61,9 +61,7 @@ STDMETHODIMP CBaseMuxerFilter::NonDelegatingQueryInterface(REFIID riid, void** p
 
 void CBaseMuxerFilter::AddInput()
 {
-	POSITION pos = m_pInputs.GetHeadPosition();
-	while (pos) {
-		CBasePin* pPin = m_pInputs.GetNext(pos);
+	for (const auto& pPin : m_pInputs) {
 		if (!pPin->IsConnected()) {
 			return;
 		}
@@ -71,29 +69,29 @@ void CBaseMuxerFilter::AddInput()
 
 	CStringW name;
 
-	name.Format(L"Input %u", m_pInputs.GetCount() + 1);
+	name.Format(L"Input %u", m_pInputs.size() + 1);
 
 	CBaseMuxerInputPin* pInputPin = nullptr;
 	if (FAILED(CreateInput(name, &pInputPin)) || !pInputPin) {
 		ASSERT(0);
 		return;
 	}
-	CAutoPtr<CBaseMuxerInputPin> pAutoPtrInputPin(pInputPin);
+	std::unique_ptr<CBaseMuxerInputPin> pAutoPtrInputPin(pInputPin);
 
-	name.Format(L"~Output %u", m_pRawOutputs.GetCount() + 1);
+	name.Format(L"~Output %u", m_pRawOutputs.size() + 1);
 
 	CBaseMuxerRawOutputPin* pRawOutputPin = nullptr;
 	if (FAILED(CreateRawOutput(name, &pRawOutputPin)) || !pRawOutputPin) {
 		ASSERT(0);
 		return;
 	}
-	CAutoPtr<CBaseMuxerRawOutputPin> pAutoPtrRawOutputPin(pRawOutputPin);
+	std::unique_ptr<CBaseMuxerRawOutputPin> pAutoPtrRawOutputPin(pRawOutputPin);
 
 	pInputPin->SetRelatedPin(pRawOutputPin);
 	pRawOutputPin->SetRelatedPin(pInputPin);
 
-	m_pInputs.AddTail(pAutoPtrInputPin);
-	m_pRawOutputs.AddTail(pAutoPtrRawOutputPin);
+	m_pInputs.emplace_back(std::move(pAutoPtrInputPin));
+	m_pRawOutputs.emplace_back(std::move(pAutoPtrRawOutputPin));
 }
 
 HRESULT CBaseMuxerFilter::CreateInput(CStringW name, CBaseMuxerInputPin** ppPin)
@@ -120,8 +118,6 @@ DWORD CBaseMuxerFilter::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_ABOVE_NORMAL);
 
-	POSITION pos;
-
 	for (;;) {
 		DWORD cmd = GetRequest();
 
@@ -136,12 +132,10 @@ DWORD CBaseMuxerFilter::ThreadProc()
 				m_pActivePins.clear();
 				m_pPins.clear();
 
-				pos = m_pInputs.GetHeadPosition();
-				while (pos) {
-					CBaseMuxerInputPin* pPin = m_pInputs.GetNext(pos);
+				for (const auto& pPin : m_pInputs) {
 					if (pPin->IsConnected()) {
-						m_pActivePins.push_back(pPin);
-						m_pPins.push_back(pPin);
+						m_pActivePins.push_back(pPin.get());
+						m_pPins.push_back(pPin.get());
 					}
 				}
 
@@ -187,9 +181,8 @@ DWORD CBaseMuxerFilter::ThreadProc()
 
 				m_pOutput->DeliverEndOfStream();
 
-				pos = m_pRawOutputs.GetHeadPosition();
-				while (pos) {
-					m_pRawOutputs.GetNext(pos)->DeliverEndOfStream();
+				for (const auto& pRawOutput : m_pRawOutputs) {
+					pRawOutput->DeliverEndOfStream();
 				}
 
 				m_pActivePins.clear();
@@ -312,31 +305,33 @@ CAutoPtr<MuxerPacket> CBaseMuxerFilter::GetPacket()
 
 int CBaseMuxerFilter::GetPinCount()
 {
-	return int(m_pInputs.GetCount()) + (m_pOutput ? 1 : 0) + int(m_pRawOutputs.GetCount());
+	return int(m_pInputs.size()) + (m_pOutput ? 1 : 0) + int(m_pRawOutputs.size());
 }
 
 CBasePin* CBaseMuxerFilter::GetPin(int n)
 {
 	CAutoLock cAutoLock(this);
 
-	if (n >= 0 && n < (int)m_pInputs.GetCount()) {
-		if (POSITION pos = m_pInputs.FindIndex(n)) {
-			return m_pInputs.GetAt(pos);
-		}
+	if (n >= 0 && n < (int)m_pInputs.size()) {
+		auto it = m_pInputs.begin();
+		std::advance(it, n);
+
+		return (*it).get();
 	}
 
-	n -= int(m_pInputs.GetCount());
+	n -= int(m_pInputs.size());
 
 	if (n == 0 && m_pOutput) {
-		return m_pOutput;
+		return m_pOutput.get();
 	}
 
 	n--;
 
-	if (n >= 0 && n < (int)m_pRawOutputs.GetCount()) {
-		if (POSITION pos = m_pRawOutputs.FindIndex(n)) {
-			return m_pRawOutputs.GetAt(pos);
-		}
+	if (n >= 0 && n < (int)m_pRawOutputs.size()) {
+		auto it = m_pRawOutputs.begin();
+		std::advance(it, n);
+
+		return (*it).get();
 	}
 
 	//n -= int(m_pRawOutputs.GetCount());
@@ -445,9 +440,8 @@ STDMETHODIMP CBaseMuxerFilter::GetDuration(LONGLONG* pDuration)
 {
 	CheckPointer(pDuration, E_POINTER);
 	*pDuration = 0;
-	POSITION pos = m_pInputs.GetHeadPosition();
-	while (pos) {
-		REFERENCE_TIME rt = m_pInputs.GetNext(pos)->GetDuration();
+	for (const auto& pPin : m_pInputs) {
+		REFERENCE_TIME rt = pPin->GetDuration();
 		if (rt > *pDuration) {
 			*pDuration = rt;
 		}
@@ -477,9 +471,7 @@ STDMETHODIMP CBaseMuxerFilter::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentF
 	FILTER_STATE fs;
 
 	if (SUCCEEDED(GetState(0, &fs)) && fs == State_Stopped) {
-		POSITION pos = m_pInputs.GetHeadPosition();
-		while (pos) {
-			CBasePin* pPin = m_pInputs.GetNext(pos);
+		for (const auto& pPin : m_pInputs) {
 			CComQIPtr<IMediaSeeking> pMS = pPin->GetConnected();
 			if (!pMS) {
 				pMS = GetFilterFromPin(pPin->GetConnected());
