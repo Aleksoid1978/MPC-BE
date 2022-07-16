@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2020 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -138,7 +138,7 @@ REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timeco
 		return Video_FrameDuration_Rounding((interval * timecodescaleRF) / num);
 	}
 
-	return 417083;
+	return 0;
 }
 
 double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond)
@@ -150,5 +150,5 @@ double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const uns
 		return Video_FrameRate_Rounding((double)num * timecodespersecond / interval);
 	}
 
-	return 24/1.001;
+	return 0.0;
 }

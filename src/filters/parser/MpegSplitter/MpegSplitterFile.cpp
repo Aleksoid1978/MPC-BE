@@ -1531,6 +1531,9 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					}
 
 					rtAvgTimePerFrame = TimecodeAnalyzer::CalculateFrameTime(timecodes, 200);
+					if (rtAvgTimePerFrame == 0) {
+						rtAvgTimePerFrame = 333666; // 29.97 fps
+					}
 
 					if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
 						((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;

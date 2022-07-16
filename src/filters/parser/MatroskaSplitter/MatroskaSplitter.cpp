@@ -822,6 +822,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pCluster.Free();
 
 					framerate = TimecodeAnalyzer::CalculateFPS(timecodes, 1000000000ui64 / m_pFile->m_segment.SegmentInfo.TimeCodeScale);
+					if (framerate == 0.0) {
+						framerate = 24 / 1.001;
+					}
 				}
 
 				if (bInterlaced && codecAvgTimePerFrame) {

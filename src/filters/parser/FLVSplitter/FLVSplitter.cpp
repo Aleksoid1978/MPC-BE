@@ -1132,6 +1132,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							rtAvgTimePerFrame = TimecodeAnalyzer::CalculateFrameTime(timecodes, 10000);
+							if (rtAvgTimePerFrame == 0) {
+								rtAvgTimePerFrame = 417083; // 23.976 fps
+							}
 
 							if (mt.formattype == FORMAT_MPEG2_VIDEO) {
 								((MPEG2VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
