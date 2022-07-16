@@ -1511,8 +1511,9 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 				__int64 nextPos;
 				REFERENCE_TIME rt = NextPTS(s, s.codec, nextPos);
 				if (rt != INVALID_TIME) {
+					const size_t timestamp_num = 30;
 					std::vector<REFERENCE_TIME> timecodes;
-					timecodes.reserve(TimecodeAnalyzer::DefaultFrameNum);
+					timecodes.reserve(timestamp_num);
 
 					Seek(nextPos);
 					int count = 0;
@@ -1523,7 +1524,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						}
 
 						timecodes.push_back(rt);
-						if (timecodes.size() >= TimecodeAnalyzer::DefaultFrameNum) {
+						if (timecodes.size() >= timestamp_num) {
 							break;
 						}
 
