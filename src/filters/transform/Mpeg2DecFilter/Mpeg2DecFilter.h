@@ -104,8 +104,6 @@ protected:
 	virtual bool IsVideoInterlaced() override { return IsInterlacedEnabled(); }
 	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats) override;
 
-	void UpdateAspectRatio();
-
 public:
 	CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CMpeg2DecFilter();
@@ -148,7 +146,6 @@ protected:
 	BYTE m_YTbl[256], m_UTbl[256*256], m_VTbl[256*256];
 	bool m_fForcedSubs       = true;
 	bool m_fInterlaced       = true;
-	bool m_bReadARFromStream = true;
 
 	void ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int w, int h, int pitch);
 
@@ -177,8 +174,6 @@ public:
 	STDMETHODIMP_(bool) IsForcedSubtitlesEnabled();
 	STDMETHODIMP EnableInterlaced(bool fEnable);
 	STDMETHODIMP_(bool) IsInterlacedEnabled();
-	STDMETHODIMP EnableReadARFromStream(bool fEnable);
-	STDMETHODIMP_(bool) IsReadARFromStreamEnabled();
 
 	STDMETHODIMP Apply();
 

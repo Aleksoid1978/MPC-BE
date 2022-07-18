@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,9 +52,6 @@ public IUnknown {
 
 	STDMETHOD(EnableInterlaced(bool fEnable)) PURE;
 	STDMETHOD_(bool, IsInterlacedEnabled()) PURE;
-
-	STDMETHOD(EnableReadARFromStream(bool fEnable)) PURE;
-	STDMETHOD_(bool, IsReadARFromStreamEnabled()) PURE;
 
 	STDMETHOD(Apply()) PURE;
 };

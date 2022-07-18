@@ -47,7 +47,6 @@
 #define OPT_Saturation      L"ProcAmpSaturation"
 #define OPT_ForcedSubs      L"ForcedSubtitles"
 #define OPT_Interlaced      L"Interlaced"
-#define OPT_ReadStreamAR    L"ReadARFromStream"
 
 #define EPSILON 1e-4
 
@@ -339,9 +338,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Interlaced, dw)) {
 			m_fInterlaced = !!dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReadStreamAR, dw)) {
-			m_bReadARFromStream = !!dw;
-		}
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -352,7 +348,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Saturation, m_sat, 0, 200);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
-	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
 
 	CalcBrCont(m_YTbl, m_bright, m_cont);
@@ -378,7 +373,6 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 		key.SetDWORDValue(OPT_Saturation, m_sat);
 		key.SetDWORDValue(OPT_ForcedSubs, m_fForcedSubs);
 		key.SetDWORDValue(OPT_Interlaced, m_fInterlaced);
-		key.SetDWORDValue(OPT_ReadStreamAR, m_bReadARFromStream);
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -389,7 +383,6 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Saturation, m_sat);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
-	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
 
 	return S_OK;
@@ -684,7 +677,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 						m_fb.rtStop = m_fb.rtStart + m_AvgTimePerFrame * picture->nb_fields / (m_dec->m_info.m_display_picture_2nd ? 1 : 2);
 
 						SetDeinterlaceMethod();
-						UpdateAspectRatio();
 
 						hr = Deliver();
 						if (hr != S_OK) {
@@ -699,16 +691,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 	}
 
 	return S_OK;
-}
-
-void CMpeg2DecFilter::UpdateAspectRatio()
-{
-	if (m_bReadARFromStream && m_dec->m_info.m_sequence->pixel_width && m_dec->m_info.m_sequence->pixel_height) {
-		CSize dar(m_dec->m_info.m_sequence->picture_width * m_dec->m_info.m_sequence->pixel_width,
-				  m_dec->m_info.m_sequence->picture_height * m_dec->m_info.m_sequence->pixel_height);
-		ReduceDim(dar);
-		SetAspect(dar);
-	}
 }
 
 HRESULT CMpeg2DecFilter::Deliver()
@@ -1197,19 +1179,6 @@ STDMETHODIMP_(bool) CMpeg2DecFilter::IsInterlacedEnabled()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_fInterlaced;
-}
-
-STDMETHODIMP CMpeg2DecFilter::EnableReadARFromStream(bool fEnable)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_bReadARFromStream = fEnable;
-	return S_OK;
-}
-
-STDMETHODIMP_(bool) CMpeg2DecFilter::IsReadARFromStreamEnabled()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_bReadARFromStream;
 }
 
 //

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,6 @@ class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 	int m_procamp[4];
 	bool m_interlaced;
 	bool m_forcedsubs;
-	bool m_readARFromStream;
 
 	enum {
 		IDC_PP_COMBO1 = 10000,
@@ -45,7 +44,6 @@ class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 		IDC_PP_CHECK1,
 		IDC_PP_CHECK2,
 		IDC_PP_CHECK3,
-		IDC_PP_CHECK4,
 		IDC_PP_BUTTON1,
 		IDC_PP_BUTTON2
 	};
@@ -60,7 +58,6 @@ class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 	CButton m_planaryuv_check;
 	CButton m_interlaced_check;
 	CButton m_forcedsubs_check;
-	CButton m_readARFromStream_check;
 	CStatic m_note_static;
 
 	void UpdateProcampValues();

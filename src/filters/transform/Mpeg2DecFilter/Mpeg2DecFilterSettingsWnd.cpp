@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,7 +62,6 @@ bool CMpeg2DecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknow
 	m_procamp[3] = m_pM2DF->GetSaturation();
 	m_forcedsubs = m_pM2DF->IsForcedSubtitlesEnabled();
 	m_interlaced = m_pM2DF->IsInterlacedEnabled();
-	m_readARFromStream = m_pM2DF->IsReadARFromStreamEnabled();
 
 	return true;
 }
@@ -86,10 +85,6 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 	m_forcedsubs_check.Create(ResStr(IDS_MPEG2_FORCED_SUBS), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(300), m_fontheight)), this, IDC_PP_CHECK3);
 	m_forcedsubs_check.SetCheck(m_forcedsubs ? BST_CHECKED : BST_UNCHECKED);
 	p.y += h20;
-
-	m_readARFromStream_check.Create(ResStr(IDS_MPEG2_READ_AR), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(300), m_fontheight)), this, IDC_PP_CHECK4);
-	m_readARFromStream_check.SetCheck(m_readARFromStream ? BST_CHECKED : BST_UNCHECKED);
-	p.y += h25;
 
 	m_ditype_static.Create(ResStr(IDS_MPEG2_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(100), m_fontheight)), this);
 	m_ditype_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CSize(ScaleX(110), -4), CSize(ScaleX(100), 200)), this, IDC_PP_COMBO1);
@@ -154,7 +149,6 @@ void CMpeg2DecSettingsWnd::OnDeactivate()
 	m_procamp[3] = (float)m_procamp_slider[3].GetPos();
 	m_interlaced = !!IsDlgButtonChecked(m_interlaced_check.GetDlgCtrlID());
 	m_forcedsubs = !!IsDlgButtonChecked(m_forcedsubs_check.GetDlgCtrlID());
-	m_readARFromStream = !!IsDlgButtonChecked(m_readARFromStream_check.GetDlgCtrlID());
 }
 
 bool CMpeg2DecSettingsWnd::OnApply()
@@ -169,7 +163,6 @@ bool CMpeg2DecSettingsWnd::OnApply()
 		m_pM2DF->SetSaturation(m_procamp[3]);
 		m_pM2DF->EnableForcedSubtitles(m_forcedsubs);
 		m_pM2DF->EnableInterlaced(m_interlaced);
-		m_pM2DF->EnableReadARFromStream(m_readARFromStream);
 		m_pM2DF->Apply();
 	}
 
