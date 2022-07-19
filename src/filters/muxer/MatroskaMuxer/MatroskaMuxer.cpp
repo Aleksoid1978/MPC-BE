@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,7 +78,7 @@ CMatroskaMuxerFilter::CMatroskaMuxerFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		*phr = S_OK;
 	}
 
-	m_pOutput.Attach(DNew CMatroskaMuxerOutputPin(L"CMatroskaMuxerOutputPin", this, this, phr));
+	m_pOutput.reset(DNew CMatroskaMuxerOutputPin(L"CMatroskaMuxerOutputPin", this, this, phr));
 
 	AddInput();
 
@@ -107,10 +107,9 @@ UINT CMatroskaMuxerFilter::GetTrackNumber(const CBasePin* pPin)
 {
 	UINT nTrackNumber = 0;
 
-	POSITION pos = m_pInputs.GetHeadPosition();
-	while (pos) {
+	for (const auto& pInput : m_pInputs) {
 		nTrackNumber++;
-		if (m_pInputs.GetNext(pos) == pPin) {
+		if (pInput.get() == pPin) {
 			return nTrackNumber;
 		}
 	}
@@ -120,39 +119,37 @@ UINT CMatroskaMuxerFilter::GetTrackNumber(const CBasePin* pPin)
 
 void CMatroskaMuxerFilter::AddInput()
 {
-	POSITION pos = m_pInputs.GetHeadPosition();
-	while (pos) {
-		CBasePin* pPin = m_pInputs.GetNext(pos);
+	for (const auto& pPin : m_pInputs) {
 		if (!pPin->IsConnected()) {
 			return;
 		}
 	}
 
 	CStringW name;
-	name.Format(L"Track %u", m_pInputs.GetCount() + 1);
+	name.Format(L"Track %u", m_pInputs.size() + 1);
 
 	HRESULT hr;
-	CAutoPtr<CMatroskaMuxerInputPin> pPin(DNew CMatroskaMuxerInputPin(name, this, this, &hr));
-	m_pInputs.AddTail(pPin);
+	m_pInputs.emplace_back(DNew CMatroskaMuxerInputPin(name, this, this, &hr));
 }
 
 int CMatroskaMuxerFilter::GetPinCount()
 {
-	return (int)m_pInputs.GetCount() + (m_pOutput ? 1 : 0);
+	return (int)m_pInputs.size() + (m_pOutput ? 1 : 0);
 }
 
 CBasePin* CMatroskaMuxerFilter::GetPin(int n)
 {
 	CAutoLock cAutoLock(this);
 
-	if (n >= 0 && n < (int)m_pInputs.GetCount()) {
-		if (POSITION pos = m_pInputs.FindIndex(n)) {
-			return m_pInputs.GetAt(pos);
-		}
+	if (n >= 0 && n < (int)m_pInputs.size()) {
+		auto it = m_pInputs.begin();
+		std::advance(it, n);
+
+		return (*it).get();
 	}
 
-	if (n == (int)m_pInputs.GetCount() && m_pOutput) {
-		return m_pOutput;
+	if (n == (int)m_pInputs.size() && m_pOutput) {
+		return m_pOutput.get();
 	}
 
 	return nullptr;
@@ -269,9 +266,8 @@ STDMETHODIMP CMatroskaMuxerFilter::GetDuration(LONGLONG* pDuration)
 {
 	CheckPointer(pDuration, E_POINTER);
 	*pDuration = 0;
-	POSITION pos = m_pInputs.GetHeadPosition();
-	while (pos) {
-		REFERENCE_TIME rt = m_pInputs.GetNext(pos)->m_rtDur;
+	for (const auto& pInput : m_pInputs) {
+		REFERENCE_TIME rt = pInput->m_rtDur;
 		if (rt > *pDuration) {
 			*pDuration = rt;
 		}
@@ -465,11 +461,9 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 
 	std::list<CMatroskaMuxerInputPin*> pActivePins;
 
-	POSITION pos = m_pInputs.GetHeadPosition();
-	while (pos) {
-		CMatroskaMuxerInputPin* pPin = m_pInputs.GetNext(pos);
+	for (const auto& pPin : m_pInputs) {
 		if (pPin->IsConnected()) {
-			pActivePins.push_back(pPin);
+			pActivePins.push_back(pPin.get());
 		}
 	}
 
@@ -763,7 +757,7 @@ HRESULT CMatroskaMuxerInputPin::BreakConnect()
 		return hr;
 	}
 
-	m_pTE.Free();
+	m_pTE.reset();
 
 	return hr;
 }
@@ -782,8 +776,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 		pMS->GetDuration(&m_rtDur);
 	}
 
-	m_pTE.Free();
-	m_pTE.Attach(DNew TrackEntry());
+	m_pTE.reset(DNew TrackEntry());
 
 	m_pTE->TrackUID.Set(rand());
 	m_pTE->MinCache.Set(1);
@@ -1169,7 +1162,7 @@ HRESULT CMatroskaMuxerInputPin::Inactive()
 	m_fActive = false;
 	CAutoLock cAutoLock(&m_csQueue);
 	m_blocks.RemoveAll();
-	m_pVorbisHdrs.RemoveAll();
+	m_pVorbisHdrs.clear();
 	return __super::Inactive();
 }
 
@@ -1246,13 +1239,13 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 		  pSample->IsPreroll() == S_OK ? 1 : 0,
 		  pSample->IsSyncPoint() == S_OK ? 1 : 0);
 
-	if (m_mt.subtype == MEDIASUBTYPE_Vorbis && m_pVorbisHdrs.GetCount() < 3) {
-		CAutoPtr<CBinary> data(DNew CBinary(0));
+	if (m_mt.subtype == MEDIASUBTYPE_Vorbis && m_pVorbisHdrs.size() < 3) {
+		std::unique_ptr<CBinary> data(DNew CBinary(0));
 		data->resize(inputLen);
 		memcpy(data->data(), pData, inputLen);
-		m_pVorbisHdrs.Add(data);
+		m_pVorbisHdrs.emplace_back(std::move(data));
 
-		if (m_pVorbisHdrs.GetCount() == 3) {
+		if (m_pVorbisHdrs.size() == 3) {
 			int len = 1;
 			for (size_t i = 0; i < 2; i++) {
 				len += (int)m_pVorbisHdrs[i]->size() / 255 + 1;
