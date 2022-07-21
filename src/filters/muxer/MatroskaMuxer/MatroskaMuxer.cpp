@@ -565,7 +565,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 
 					{
 						CAutoLock cAutoLock(&pPin->m_csQueue);
-						b.reset(pPin->m_blocks.front().release());
+						b = std::move(pPin->m_blocks.front());
 						pPin->m_blocks.pop_front();
 					}
 
