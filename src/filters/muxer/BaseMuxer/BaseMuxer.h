@@ -44,7 +44,7 @@ private:
 	REFERENCE_TIME m_rtCurrent;
 	std::list<CBaseMuxerInputPin*> m_pActivePins;
 
-	CAutoPtr<MuxerPacket> GetPacket();
+	std::unique_ptr<MuxerPacket> GetPacket();
 
 	void MuxHeaderInternal();
 	void MuxPacketInternal(const MuxerPacket* pPacket);

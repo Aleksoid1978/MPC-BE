@@ -154,7 +154,7 @@ DWORD CBaseMuxerFilter::ThreadProc()
 							continue;
 						}
 
-						CAutoPtr<MuxerPacket> pPacket(GetPacket().Detach());
+						std::unique_ptr<MuxerPacket> pPacket(GetPacket());
 						if (!pPacket) {
 							Sleep(1);
 							continue;
@@ -171,7 +171,7 @@ DWORD CBaseMuxerFilter::ThreadProc()
 							}
 						}
 
-						MuxPacketInternal(pPacket);
+						MuxPacketInternal(pPacket.get());
 					}
 
 					MuxFooterInternal();
@@ -260,7 +260,7 @@ void CBaseMuxerFilter::MuxFooterInternal()
 	}
 }
 
-CAutoPtr<MuxerPacket> CBaseMuxerFilter::GetPacket()
+std::unique_ptr<MuxerPacket> CBaseMuxerFilter::GetPacket()
 {
 	REFERENCE_TIME rtMin = _I64_MAX;
 	CBaseMuxerInputPin* pPinMin = nullptr;
@@ -268,11 +268,11 @@ CAutoPtr<MuxerPacket> CBaseMuxerFilter::GetPacket()
 
 	for (const auto& pPin : m_pActivePins) {
 		CAutoLock cAutoLock(&pPin->m_csQueue);
-		if (!pPin->m_queue.GetCount()) {
+		if (!pPin->m_queue.size()) {
 			continue;
 		}
 
-		MuxerPacket* p = pPin->m_queue.GetHead();
+		MuxerPacket* p = pPin->m_queue.front().get();
 
 		if (p->IsBogus() || !p->IsTimeValid() || p->IsEOS()) {
 			pPinMin = pPin;
@@ -288,10 +288,10 @@ CAutoPtr<MuxerPacket> CBaseMuxerFilter::GetPacket()
 		i--;
 	}
 
-	CAutoPtr<MuxerPacket> pPacket;
+	std::unique_ptr<MuxerPacket> pPacket;
 
 	if (pPinMin && i == 0) {
-		pPacket.Attach(pPinMin->PopPacket().Detach());
+		pPacket = std::move(pPinMin->PopPacket());
 	} else {
 		for (const auto& pPin : m_pActivePins) {
 			pPin->m_evAcceptPacket.Set();

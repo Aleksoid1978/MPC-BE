@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,9 +66,9 @@ private:
 	int m_iPacketIndex;
 
 	CCritSec m_csQueue;
-	CAutoPtrList<MuxerPacket> m_queue;
-	void PushPacket(CAutoPtr<MuxerPacket> pPacket);
-	CAutoPtr<MuxerPacket> PopPacket();
+	std::list<std::unique_ptr<MuxerPacket>> m_queue;
+	void PushPacket(std::unique_ptr<MuxerPacket>& pPacket);
+	std::unique_ptr<MuxerPacket> PopPacket();
 	CAMEvent m_evAcceptPacket;
 
 	friend class CBaseMuxerFilter;

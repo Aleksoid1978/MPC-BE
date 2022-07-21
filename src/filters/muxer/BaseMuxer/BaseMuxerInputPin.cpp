@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,7 +64,7 @@ bool CBaseMuxerInputPin::IsSubtitleStream()
 	return m_mt.majortype == MEDIATYPE_Subtitle || m_mt.majortype == MEDIATYPE_Text;
 }
 
-void CBaseMuxerInputPin::PushPacket(CAutoPtr<MuxerPacket> pPacket)
+void CBaseMuxerInputPin::PushPacket(std::unique_ptr<MuxerPacket>& pPacket)
 {
 	for (int i = 0; m_pFilter->IsActive() && !m_bFlushing
 			&& !m_evAcceptPacket.Wait(1)
@@ -79,24 +79,25 @@ void CBaseMuxerInputPin::PushPacket(CAutoPtr<MuxerPacket> pPacket)
 
 	CAutoLock cAutoLock(&m_csQueue);
 
-	m_queue.AddTail(pPacket);
+	m_queue.emplace_back(std::move(pPacket));
 
-	if (m_queue.GetCount() >= MAXQUEUESIZE) {
+	if (m_queue.size() >= MAXQUEUESIZE) {
 		m_evAcceptPacket.Reset();
 	}
 }
 
-CAutoPtr<MuxerPacket> CBaseMuxerInputPin::PopPacket()
+std::unique_ptr<MuxerPacket> CBaseMuxerInputPin::PopPacket()
 {
-	CAutoPtr<MuxerPacket> pPacket;
+	std::unique_ptr<MuxerPacket> pPacket;
 
 	CAutoLock cAutoLock(&m_csQueue);
 
-	if (m_queue.GetCount()) {
-		pPacket.Attach(m_queue.RemoveHead().Detach());
+	if (m_queue.size()) {
+		pPacket = std::move(m_queue.front());
+		m_queue.pop_front();
 	}
 
-	if (m_queue.GetCount() < MAXQUEUESIZE) {
+	if (m_queue.size() < MAXQUEUESIZE) {
 		m_evAcceptPacket.Set();
 	}
 
@@ -200,7 +201,7 @@ HRESULT CBaseMuxerInputPin::Active()
 HRESULT CBaseMuxerInputPin::Inactive()
 {
 	CAutoLock cAutoLock(&m_csQueue);
-	m_queue.RemoveAll();
+	m_queue.clear();
 	return __super::Inactive();
 }
 
@@ -220,7 +221,7 @@ STDMETHODIMP CBaseMuxerInputPin::Receive(IMediaSample* pSample)
 		return hr;
 	}
 
-	CAutoPtr<MuxerPacket> pPacket(DNew MuxerPacket(this));
+	std::unique_ptr<MuxerPacket> pPacket(DNew MuxerPacket(this));
 
 	long len = pSample->GetActualDataLength();
 
@@ -275,7 +276,7 @@ STDMETHODIMP CBaseMuxerInputPin::EndOfStream()
 
 	ASSERT(!m_fEOS);
 
-	CAutoPtr<MuxerPacket> pPacket(DNew MuxerPacket(this));
+	std::unique_ptr<MuxerPacket> pPacket(DNew MuxerPacket(this));
 	pPacket->flags |= MuxerPacket::eos;
 	PushPacket(pPacket);
 
