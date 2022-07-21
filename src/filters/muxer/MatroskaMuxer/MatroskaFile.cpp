@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -672,19 +672,14 @@ UINT64 CBlock::Size(bool fWithHeader)
 {
 	UINT64 len = 0;
 	len += TrackNumber.Size() + 2 + 1; // TrackNumber + TimeCode + Lacing
-	if (BlockData.GetCount() > 1) {
+	if (BlockData.size() > 1) {
 		len += 1; // nBlockData
-		POSITION pos = BlockData.GetHeadPosition();
-		while (pos) {
-			CBinary* b = BlockData.GetNext(pos);
-			if (pos) {
-				len += b->size() / 255 + 1;
-			}
+
+		for (auto it = BlockData.cbegin(), ce = std::prev(BlockData.cend()); it != ce; ++it) {
+			len += (*it)->size() / 255 + 1;
 		}
 	}
-	POSITION pos = BlockData.GetHeadPosition();
-	while (pos) {
-		CBinary* b = BlockData.GetNext(pos);
+	for (const auto& b : BlockData) {
 		len += b->size();
 	}
 	if (fWithHeader) {
@@ -701,29 +696,23 @@ HRESULT CBlock::Write(IStream* pStream)
 	bswap((BYTE*)&t, 2);
 	pStream->Write(&t, 2, nullptr);
 	BYTE Lacing = 0;
-	BYTE n = (BYTE)BlockData.GetCount();
+	BYTE n = (BYTE)BlockData.size();
 	if (n > 1) {
 		Lacing |= 2;
 	}
 	pStream->Write(&Lacing, 1, nullptr);
 	if (n > 1) {
 		pStream->Write(&n, 1, nullptr);
-		POSITION pos = BlockData.GetHeadPosition();
-		while (pos) {
-			CBinary* b = BlockData.GetNext(pos);
-			if (pos) {
-				INT_PTR len = b->size();
-				while (len >= 0) {
-					n = (BYTE)std::min<INT_PTR>(len, 255);
-					pStream->Write(&n, 1, nullptr);
-					len -= 255;
-				}
+		for (auto it = BlockData.cbegin(), ce = std::prev(BlockData.cend()); it != ce; ++it) {
+			INT_PTR len = (*it)->size();
+			while (len >= 0) {
+				n = (BYTE)std::min<INT_PTR>(len, 255);
+				pStream->Write(&n, 1, nullptr);
+				len -= 255;
 			}
 		}
 	}
-	POSITION pos = BlockData.GetHeadPosition();
-	while (pos) {
-		CBinary* b = BlockData.GetNext(pos);
+	for (const auto& b : BlockData) {
 		pStream->Write(b->data(), (ULONG)b->size(), nullptr);
 	}
 	return S_OK;

@@ -52,7 +52,7 @@ public:
 	REFERENCE_TIME m_rtDur;
 
 	CCritSec m_csQueue;
-	CAutoPtrList<MatroskaWriter::BlockGroup> m_blocks;
+	std::list<std::unique_ptr<MatroskaWriter::BlockGroup>> m_blocks;
 	bool m_fEndOfStreamReceived;
 
 	HRESULT CheckMediaType(const CMediaType* pmt);

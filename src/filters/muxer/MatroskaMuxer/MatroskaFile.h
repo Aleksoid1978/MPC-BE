@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -159,22 +159,20 @@ namespace MatroskaWriter
 	};
 
 	template<class T>
-	class CNode : public CAutoPtrList<T>
+	class CNode : public std::list<std::unique_ptr<T>>
 	{
 	public:
 		UINT64 Size(bool fWithHeader = true) {
 			UINT64 len = 0;
-			POSITION pos = GetHeadPosition();
-			while (pos) {
-				len += GetNext(pos)->Size(fWithHeader);
+			for (const auto& item : *this) {
+				len += item->Size(fWithHeader);
 			}
 			return len;
 		}
 		HRESULT Write(IStream* pStream) {
-			POSITION pos = GetHeadPosition();
-			while (pos) {
-				HRESULT hr;
-				if (FAILED(hr = GetNext(pos)->Write(pStream))) {
+			for (const auto& item : *this) {
+				HRESULT hr = item->Write(pStream);
+				if (FAILED(hr)) {
 					return hr;
 				}
 			}
