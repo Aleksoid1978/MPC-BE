@@ -133,18 +133,18 @@ class CShoutcastStream : public CSourceStream
 		}
 	};
 
-	class ShoutCastqueue
-		: public CAutoPtrList<CShoutCastPacket>
+	class ShoutCastQueue
+		: public std::list<std::unique_ptr<CShoutCastPacket>>
 		, public CCritSec
 	{
 	public:
 		REFERENCE_TIME GetDuration() {
 			CAutoLock cAutoLock(this);
-			return GetCount() ? (GetTail()->rtStop - GetHead()->rtStart) : 0;
+			return size() ? (back()->rtStop - front()->rtStart) : 0;
 		}
 	};
 
-	ShoutCastqueue m_queue;
+	ShoutCastQueue m_queue;
 
 	class CShoutcastSocket : public CMPCSocket
 	{

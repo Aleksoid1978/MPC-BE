@@ -299,7 +299,7 @@ CShoutcastStream::~CShoutcastStream()
 void CShoutcastStream::EmptyBuffer()
 {
 	CAutoLock cAutoLock(&m_queue);
-	m_queue.RemoveAll();
+	m_queue.clear();
 }
 
 LONGLONG CShoutcastStream::GetBufferFullness()
@@ -308,7 +308,7 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 	if (!m_fBuffering) {
 		return 100;
 	}
-	if (m_queue.IsEmpty()) {
+	if (m_queue.empty()) {
 		return 0;
 	}
 	LONGLONG ret = 100i64*(m_queue.GetDuration()) / AVGBUFFERLENGTH;
@@ -397,9 +397,10 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 
 	{
 		CAutoLock cAutoLock(&m_queue);
-		ASSERT(!m_queue.IsEmpty());
-		if (!m_queue.IsEmpty()) {
-			CAutoPtr<CShoutCastPacket> p = m_queue.RemoveHead();
+		ASSERT(!m_queue.empty());
+		if (!m_queue.empty()) {
+			std::unique_ptr<CShoutCastPacket> p = std::move(m_queue.front());
+			m_queue.pop_front();
 			long len = std::min(pSample->GetSize(), (long)p->size());
 			memcpy(pData, p->data(), len);
 			pSample->SetActualDataLength(len);
@@ -507,15 +508,15 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc.Attach(m_hSocket);
 	soc = m_socket;
 
-	m_title			= soc.m_title;
-	m_description	= soc.m_description;
+	m_title       = soc.m_title;
+	m_description = soc.m_description;
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 	std::vector<NoInitByte> buffer;
 
 	while (!fExitThread) {
 		{
-			if (m_queue.GetDuration() > MAXBUFFERLENGTH || m_queue.GetCount() >= 500) {
+			if (m_queue.GetDuration() > MAXBUFFERLENGTH || m_queue.size() >= 500) {
 				// Buffer is full
 				Sleep(100);
 				continue;
@@ -577,7 +578,7 @@ UINT CShoutcastStream::SocketThreadProc()
 					}
 				}
 
-				CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
+				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket());
 				p2->SetData(pos, size);
 				p2->rtStart = m_rtSampleTime;
 				p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
@@ -586,7 +587,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 				{
 					CAutoLock cAutoLock(&m_queue);
-					m_queue.AddTail(p2);
+					m_queue.emplace_back(std::move(p2));
 				}
 
 				pos += size;
@@ -620,7 +621,7 @@ UINT CShoutcastStream::SocketThreadProc()
 					}
 				}
 
-				CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
+				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket());
 				p2->SetData(pos + aframe.param1, size - aframe.param1);
 				p2->rtStart = m_rtSampleTime;
 				p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
@@ -629,7 +630,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 				{
 					CAutoLock cAutoLock(&m_queue);
-					m_queue.AddTail(p2);
+					m_queue.emplace_back(std::move(p2));
 				}
 
 				pos += size;
