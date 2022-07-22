@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1293,25 +1293,22 @@ CStreamSwitcherFilter::CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, cons
 	HRESULT hr = S_OK;
 
 	do {
-		CAutoPtr<CStreamSwitcherInputPin> pInput;
-		CAutoPtr<CStreamSwitcherOutputPin> pOutput;
-
 		hr = S_OK;
-		pInput.Attach(DNew CStreamSwitcherInputPin(this, &hr, L"Channel 1"));
+		std::unique_ptr<CStreamSwitcherInputPin> pInput(DNew CStreamSwitcherInputPin(this, &hr, L"Channel 1"));
 		if (!pInput || FAILED(hr)) {
 			break;
 		}
 
 		hr = S_OK;
-		pOutput.Attach(DNew CStreamSwitcherOutputPin(this, &hr));
+		std::unique_ptr<CStreamSwitcherOutputPin> pOutput(DNew CStreamSwitcherOutputPin(this, &hr));
 		if (!pOutput || FAILED(hr)) {
 			break;
 		}
 
 		CAutoLock cAutoLock(&m_csPins);
 
-		m_pInputs.push_front(m_pInput = pInput.Detach());
-		m_pOutput = pOutput.Detach();
+		m_pInputs.push_front(m_pInput = pInput.release());
+		m_pOutput = pOutput.release();
 
 		return;
 	} while (false);

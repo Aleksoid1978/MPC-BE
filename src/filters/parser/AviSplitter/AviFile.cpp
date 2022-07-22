@@ -410,8 +410,10 @@ HRESULT CAviFile::BuildIndex()
 			for (DWORD j = 0; j < idx->nEntriesInUse; ++j) {
 				Seek(idx->aIndex[j].qwOffset);
 
-				CAutoPtr<AVISTDINDEX> p((AVISTDINDEX*)DNew BYTE[idx->aIndex[j].dwSize]);
-				if (!p || S_OK != ByteRead((BYTE*)(AVISTDINDEX*)p, idx->aIndex[j].dwSize) || p->qwBaseOffset >= (DWORDLONG)GetLength()) {
+				std::unique_ptr<BYTE[]> pBuf(new(std::nothrow) BYTE[idx->aIndex[j].dwSize]);
+				AVISTDINDEX* p = (AVISTDINDEX*)pBuf.get();
+
+				if (!p || S_OK != ByteRead(pBuf.get(), idx->aIndex[j].dwSize) || p->qwBaseOffset >= (DWORDLONG)GetLength()) {
 					EmptyIndex();
 					return E_FAIL;
 				}
