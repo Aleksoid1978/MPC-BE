@@ -230,10 +230,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtStop = 10000i64*m_pFile->m_p.tDuration;
 
-	POSITION pos = m_pFile->m_mps.GetHeadPosition();
-	while (pos) {
-		MediaProperies* pmp = m_pFile->m_mps.GetNext(pos);
-
+	for (const auto& pmp : m_pFile->m_mps) {
 		CStringW name;
 		name.Format(L"Output %02d", pmp->stream);
 		if (!pmp->name.IsEmpty()) {
@@ -560,7 +557,7 @@ bool CRealMediaSplitterFilter::DemuxInit()
 	}
 
 	// reindex if needed
-	if (m_pFile->m_irs.GetCount() == 0) {
+	if (m_pFile->m_irs.size() == 0) {
 		m_nOpenProgress = 0;
 
 		int stream = m_pFile->GetMasterStream();
@@ -588,11 +585,11 @@ bool CRealMediaSplitterFilter::DemuxInit()
 					m_rtDuration = std::max((__int64)(10000i64*mph.tStart), m_rtDuration);
 
 					if (mph.flags&MediaPacketHeader::PN_KEYFRAME_FLAG && tLastStart != mph.tStart) {
-						CAutoPtr<IndexRecord> pir(DNew IndexRecord);
+						std::unique_ptr<IndexRecord> pir(DNew IndexRecord);
 						pir->tStart = mph.tStart;
 						pir->ptrFilePos = (UINT32)filepos;
 						pir->packet = nPacket;
-						m_pFile->m_irs.AddTail(pir);
+						m_pFile->m_irs.emplace_back(std::move(pir));
 
 						tLastStart = mph.tStart;
 					}
@@ -614,7 +611,7 @@ bool CRealMediaSplitterFilter::DemuxInit()
 		m_nOpenProgress = 100;
 
 		if (m_fAbort) {
-			m_pFile->m_irs.RemoveAll();
+			m_pFile->m_irs.clear();
 		}
 
 		m_fAbort = false;
@@ -636,13 +633,12 @@ void CRealMediaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	} else {
 		m_seekpos = nullptr;
 
-		POSITION pos = m_pFile->m_irs.GetTailPosition();
-		while (pos && !m_seekpos) {
-			IndexRecord* pir = m_pFile->m_irs.GetPrev(pos);
+		for (auto it = m_pFile->m_irs.crbegin(); it != m_pFile->m_irs.crend() && !m_seekpos; ++it) {
+			auto& pir = *it;
 			if (pir->tStart < rt/10000) {
 				m_seekpacket = pir->packet;
 
-				pos = m_pFile->m_dcs.GetTailPosition();
+				POSITION pos = m_pFile->m_dcs.GetTailPosition();
 				while (pos && !m_seekpos) {
 					POSITION tmp = pos;
 
@@ -782,7 +778,7 @@ STDMETHODIMP CRealMediaSplitterFilter::GetKeyFrameCount(UINT& nKFs)
 	if (!m_pFile) {
 		return E_UNEXPECTED;
 	}
-	nKFs = m_pFile->m_irs.GetCount();
+	nKFs = m_pFile->m_irs.size();
 	return S_OK;
 }
 
@@ -799,9 +795,8 @@ STDMETHODIMP CRealMediaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFEREN
 	}
 
 	UINT nKFsTmp = 0;
-	POSITION pos = m_pFile->m_irs.GetHeadPosition();
-	for (int i = 0; pos && nKFsTmp < nKFs; i++) {
-		pKFs[nKFsTmp++] = 10000i64*m_pFile->m_irs.GetNext(pos)->tStart;
+	for (auto it = m_pFile->m_irs.cbegin(); it != m_pFile->m_irs.cend() && nKFsTmp < nKFs; ++it) {
+		pKFs[nKFsTmp++] = 10000i64 * (*it)->tStart;
 	}
 	nKFs = nKFsTmp;
 
@@ -1234,7 +1229,7 @@ HRESULT CRMFile::Init()
 					m_p.flags = (Properies::flags_t)flags;
 					break;
 				case 'MDPR': {
-					CAutoPtr<MediaProperies> mp(DNew MediaProperies);
+					std::unique_ptr<MediaProperies> mp(DNew MediaProperies);
 					if (S_OK != (hr = Read(mp->stream))) {
 						return hr;
 					}
@@ -1282,7 +1277,7 @@ HRESULT CRMFile::Init()
 					}
 					mp->width = mp->height = 0;
 					mp->interlaced = mp->top_field_first = false;
-					m_mps.AddTail(mp);
+					m_mps.emplace_back(std::move(mp));
 					break;
 				}
 				case 'DATA': {
@@ -1316,7 +1311,7 @@ HRESULT CRMFile::Init()
 							return hr;
 						}
 						if (object_version == 0) {
-							CAutoPtr<IndexRecord> ir(DNew IndexRecord);
+							std::unique_ptr<IndexRecord> ir(DNew IndexRecord);
 							if (S_OK != (hr = Read(ir->tStart))) {
 								return hr;
 							}
@@ -1327,7 +1322,7 @@ HRESULT CRMFile::Init()
 								return hr;
 							}
 							if (ich.stream == stream) {
-								m_irs.AddTail(ir);
+								m_irs.emplace_back(std::move(ir));
 							}
 						}
 					}
@@ -1511,11 +1506,9 @@ static void GetDimensions_X10(unsigned char* p, unsigned int* wi, unsigned int* 
 
 void CRMFile::GetDimensions()
 {
-	POSITION pos = m_mps.GetHeadPosition();
-	while (pos) {
+	for (const auto& pmp : m_mps) {
 		UINT64 filepos = GetPos();
 
-		MediaProperies* pmp = m_mps.GetNext(pos);
 		if (pmp->mime == "video/x-pn-realvideo") {
 			pmp->width = pmp->height = 0;
 
@@ -1603,9 +1596,7 @@ int CRMFile::GetMasterStream()
 {
 	int s1 = -1, s2 = -1;
 
-	POSITION pos = m_mps.GetHeadPosition();
-	while (pos) {
-		MediaProperies* pmp = m_mps.GetNext(pos);
+	for (const auto& pmp : m_mps) {
 		if (pmp->mime == "video/x-pn-realvideo") {
 			s1 = pmp->stream;
 			break;

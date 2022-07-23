@@ -166,9 +166,9 @@ public:
 	RMFF::FileHdr m_fh;
 	RMFF::ContentDesc m_cd;
 	RMFF::Properies m_p;
-	CAutoPtrList<RMFF::MediaProperies> m_mps;
+	std::list<std::unique_ptr<RMFF::MediaProperies>> m_mps;
 	CAutoPtrList<RMFF::DataChunk> m_dcs;
-	CAutoPtrList<RMFF::IndexRecord> m_irs;
+	std::list<std::unique_ptr<RMFF::IndexRecord>> m_irs;
 
 	struct subtitle {
 		CStringA name, data;
