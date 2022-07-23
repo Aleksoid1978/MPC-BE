@@ -186,7 +186,7 @@ private:
 		DWORD offset;
 	};
 
-	class CSegments : public CAutoPtrList<segment>, public CCritSec
+	class CSegments : public std::list<std::unique_ptr<segment>>, public CCritSec
 	{
 	public:
 		REFERENCE_TIME rtStart;
@@ -195,7 +195,7 @@ private:
 			CAutoLock cAutoLock(this);
 			rtStart = 0;
 			fDiscontinuity = fSyncPoint = fMerged = false;
-			RemoveAll();
+			clear();
 		}
 	} m_segments;
 

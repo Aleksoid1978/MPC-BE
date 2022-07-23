@@ -828,7 +828,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverEndFlush()
 
 HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 {
-	if (m_segments.GetCount() == 0) {
+	if (m_segments.empty()) {
 		m_segments.Clear();
 		return S_OK;
 	}
@@ -841,22 +841,20 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 	p->rtStart			= m_segments.rtStart;
 	p->rtStop			= m_segments.rtStart + 1;
 
-	DWORD len = 0, total = 0;;
-	POSITION pos = m_segments.GetHeadPosition();
-	while (pos) {
-		const segment* s = m_segments.GetNext(pos);
+	DWORD len = 0, total = 0;
+	for (const auto& s : m_segments) {
 		len = std::max(len, s->offset + (DWORD)s->data.size());
 		total += s->data.size();
 	}
 	ASSERT(len == total);
 
-	len += 1 + 2 * 4 * (!m_segments.fMerged ? m_segments.GetCount() : 1);
+	len += 1 + 2 * 4 * (!m_segments.fMerged ? m_segments.size() : 1);
 
 	p->resize(len);
 
 	BYTE* pData = p->data();
 
-	*pData++ = m_segments.fMerged ? 0 : (BYTE)(m_segments.GetCount() - 1);
+	*pData++ = m_segments.fMerged ? 0 : (BYTE)(m_segments.size() - 1);
 
 	if (m_segments.fMerged) {
 		*((DWORD*)pData) = 1;
@@ -864,19 +862,15 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 		*((DWORD*)pData) = 0;
 		pData += 4;
 	} else {
-		pos = m_segments.GetHeadPosition();
-		while (pos) {
+		for (const auto& s : m_segments) {
 			*((DWORD*)pData) = 1;
 			pData += 4;
-			const segment* s = m_segments.GetNext(pos);
 			*((DWORD*)pData) = s->offset;
 			pData += 4;
 		}
 	}
 
-	pos = m_segments.GetHeadPosition();
-	while (pos) {
-		const segment* s = m_segments.GetNext(pos);
+	for (const auto& s : m_segments) {
 		memcpy(pData + s->offset, s->data.data(), s->data.size());
 	}
 	m_segments.Clear();
@@ -967,15 +961,15 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			if (len2 <= 0) {
 				return E_FAIL;
 			}
-			if (m_segments.IsEmpty()) {
+			if (m_segments.empty()) {
 				packetoffset = 0;
 			}
 
-			CAutoPtr<segment> s(DNew segment);
+			std::unique_ptr<segment> s(DNew segment);
 			s->offset = packetoffset;
 			s->data.resize(len2);
 			memcpy(s->data.data(), pIn, len2);
-			m_segments.AddTail(s);
+			m_segments.emplace_back(std::move(s));
 
 			pIn += len2;
 
