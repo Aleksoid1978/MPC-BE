@@ -405,9 +405,10 @@ begin
   Log('PinToTaskbar done.');
 end;
 
-procedure Unzip(ZipFile, TargetFolder: String); 
+procedure Unzip(ZipFile, FileName, TargetFolder: String); 
 var
-  ShellObj, SrcFile, DestFolder: Variant;
+  ShellObj, SrcFile, Item, DestFolder: Variant;
+  str: String;
 begin
   if FileExists(ZipFile) then
   begin
@@ -415,11 +416,20 @@ begin
     try
       ShellObj := CreateOleObject('Shell.Application');
       SrcFile := ShellObj.NameSpace(ZipFile);
+      ForceDirectories(TargetFolder);
       DestFolder := ShellObj.NameSpace(TargetFolder);
-      DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+      if Length(FileName)>0 then
+      begin
+        Item := SrcFile.ParseName(FileName);
+        DestFolder.CopyHere(Item, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+      end
+      else
+        DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
     except
       Log('ERROR: unziping failed');
-      MsgBox('Unable to extract ' + ZipFile, mbError, MB_OK);
+      str := 'Unable to extract ' + ZipFile;
+      if Length(Item)>0 then str := str + '\' + FileName;
+      MsgBox(str, mbError, MB_OK);
       Exit;
     end;
     Log('Unzip done.');
@@ -550,7 +560,7 @@ begin
     end;
 
     if IsComponentSelected('intel_msdk') then
-      Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), ExpandConstant('{app}'));
+      Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), '', ExpandConstant('{app}'));
   end;
 end;
 
