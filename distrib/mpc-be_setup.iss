@@ -405,36 +405,36 @@ begin
   Log('PinToTaskbar done.');
 end;
 
-procedure Unzip(ZipFile, FileName, TargetFolder: String); 
+procedure Unzip(ZipPath, FileName, TargetPath: String); 
 var
-  ShellObj, SrcFile, Item, DestFolder: Variant;
+  ShellObj, ZipFile, Item, TargetFolder: Variant;
   str: String;
 begin
-  if FileExists(ZipFile) then
+  if FileExists(ZipPath) then
   begin
-    Log('Start unziping ' + ZipFile);
+    Log('Start unziping ' + ZipPath);
     try
       ShellObj := CreateOleObject('Shell.Application');
-      SrcFile := ShellObj.NameSpace(ZipFile);
-      ForceDirectories(TargetFolder);
-      DestFolder := ShellObj.NameSpace(TargetFolder);
+      ZipFile := ShellObj.NameSpace(ZipPath);
+      ForceDirectories(TargetPath);
+      TargetFolder := ShellObj.NameSpace(TargetPath);
       if Length(FileName)>0 then
       begin
-        Item := SrcFile.ParseName(FileName);
-        DestFolder.CopyHere(Item, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+        Item := ZipFile.ParseName(FileName);
+        TargetFolder.CopyHere(Item, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
       end
       else
-        DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+        TargetFolder.CopyHere(ZipFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
     except
       Log('ERROR: unziping failed');
-      str := 'Unable to extract ' + ZipFile;
+      str := 'Unable to extract ' + ZipPath;
       if Length(Item)>0 then str := str + '\' + FileName;
       MsgBox(str, mbError, MB_OK);
       Exit;
     end;
     Log('Unzip done.');
   end else
-    Log('ERROR: File ' + ZipFile + ' not found');
+    Log('ERROR: File ' + ZipPath + ' not found');
 end;
 
 function GetInstallFolder(Default: String): String;
