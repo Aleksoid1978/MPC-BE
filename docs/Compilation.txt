@@ -75,7 +75,5 @@ Alternatively, you can use build.bat (run: build.bat help for more info)
 
 Part D: Building the installer
 
-1a. Download Inno Setup Unicode 5.6.1 (https://files.jrsoftware.org/is/5/)
-    Download Inno Download Plugin 1.5.1 (https://mitrichsoftware.wordpress.com/inno-setup-tools/inno-download-plugin/)
-1b. Or download Inno Setup 6.1.2 or never (https://jrsoftware.org/isdl.php)
-2.  Install everything and then go to C:\repos\MPC-BE\distrib, open mpc-be_setup.iss with Inno Setup and compile it.
+1. Download Inno Setup 6.2.1 or never (https://jrsoftware.org/isdl.php)
+2. Install everything and then go to C:\repos\MPC-BE\distrib, open mpc-be_setup.iss with Inno Setup and compile it.

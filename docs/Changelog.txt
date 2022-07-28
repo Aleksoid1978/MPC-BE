@@ -7,9 +7,17 @@ Added support for HLS Live.
 
 MPegSplitter
 Fixed playback of VOB files with an incorrect empty block at the beginning.
+Faster navigation for Blu-ray files, added support for keyframes.
+Optimized calculation of unknown frame rate.
+
+Mpeg2DecFilter
+Removed option to read aspect ratio from video stream. This option is not required when playing DVD-Video.
 
 VideoRenderers
 Сolor management now works for 10-bit surfaces as well.
+
+Subtitles
+Subtitle delay is now applied on pause.
 
 Youtube and other online services
 Fixed work with yt-dlp on some sites.
@@ -20,6 +28,10 @@ Improved support for online playlists.
 Player
 Fixed display of text with "&" symbols in the "Information" panel.
 Fixed LAV Splitter freezing when watching some Live broadcasts.
+
+Installer
+Compiling the installer requires InnoSetup 6.1.0 or later.
+Updated installer translation files.
 
 
 1.6.3
