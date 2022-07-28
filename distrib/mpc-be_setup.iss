@@ -608,17 +608,14 @@ end;
 procedure InitializeWizard();
 Var
   DeltaY : Integer;
-  Page: TWizardPage;
+  Idx: Integer;
 begin
   DeltaY := ScaleY(1);
 
   WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height + DeltaY;
 
-#ifdef localize
-  WizardForm.ComponentsList.Checked[7] := False;
-#else
-  WizardForm.ComponentsList.Checked[6] := False;
-#endif
+  Idx := WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:comp_intel_msdk}'));
+  WizardForm.ComponentsList.Checked[Idx] := False;
 
   DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
