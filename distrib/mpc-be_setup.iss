@@ -156,10 +156,10 @@ Name: nl; MessagesFile: compiler:Languages\Dutch.isl
 Name: pl; MessagesFile: compiler:Languages\Polish.isl
 Name: ro; MessagesFile: Languages\Romanian.isl
 Name: ru; MessagesFile: compiler:Languages\Russian.isl
-Name: sc; MessagesFile: Languages\ChineseSimplified.islu
+Name: sc; MessagesFile: Languages\ChineseSimplified.isl
 Name: sv; MessagesFile: Languages\Swedish.isl
 Name: sk; MessagesFile: compiler:Languages\Slovak.isl
-Name: tc; MessagesFile: Languages\ChineseTraditional.islu
+Name: tc; MessagesFile: Languages\ChineseTraditional.isl
 Name: tr; MessagesFile: compiler:Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 #endif
