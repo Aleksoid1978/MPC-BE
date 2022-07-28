@@ -16,9 +16,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#if VER < EncodeVer(5,5,8)
-  #error A more recent version of Inno Setup 5 is required to compile this script (5.5.8 or newer)
-#elif VER >= EncodeVer(6,0,0) && VER < EncodeVer(6,1,0)
+#if VER < EncodeVer(6,1,0)
   #error A more recent version of Inno Setup 6 is required to compile this script (6.1.0 or newer)
 #endif
 #ifndef UNICODE
@@ -27,10 +25,6 @@
 
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
-; IDP: Download plugin for Inno Setup : https://bitbucket.org/mitrich_k/inno-download-plugin/downloads
-#if VER < EncodeVer(6,1,0)
-  #include <idp.iss>
-#endif
 
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
 #define localize
@@ -143,33 +137,6 @@ SignTool=OpenSourceSign
 Name: en; MessagesFile: compiler:Default.isl
 
 #ifdef localize
-#if VER < EncodeVer(6,0,0)
-Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
-Name: by; MessagesFile: Languages\Belarusian.isl
-Name: ca; MessagesFile: compiler:Languages\Catalan.isl
-Name: cz; MessagesFile: compiler:Languages\Czech.isl
-Name: de; MessagesFile: compiler:Languages\German.isl
-Name: el; MessagesFile: compiler:Languages\Greek.isl
-Name: es; MessagesFile: compiler:Languages\Spanish.isl
-Name: eu; MessagesFile: Languages\Basque.isl
-Name: fr; MessagesFile: compiler:Languages\French.isl
-Name: he; MessagesFile: compiler:Languages\Hebrew.isl
-Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
-Name: hy; MessagesFile: compiler:Languages\Armenian.islu
-Name: it; MessagesFile: compiler:Languages\Italian.isl
-Name: ja; MessagesFile: compiler:Languages\Japanese.isl
-Name: kr; MessagesFile: Languages\Korean.isl
-Name: nl; MessagesFile: compiler:Languages\Dutch.isl
-Name: pl; MessagesFile: compiler:Languages\Polish.isl
-Name: ro; MessagesFile: Languages\Romanian.isl
-Name: ru; MessagesFile: compiler:Languages\Russian.isl
-Name: sc; MessagesFile: Languages\ChineseSimplified.islu
-Name: sv; MessagesFile: Languages\Swedish.isl
-Name: sk; MessagesFile: Languages\Slovak.isl
-Name: tc; MessagesFile: Languages\ChineseTraditional.islu
-Name: tr; MessagesFile: compiler:Languages\Turkish.isl
-Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
-#else
 Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
@@ -196,25 +163,9 @@ Name: tc; MessagesFile: Languages\ChineseTraditional.islu
 Name: tr; MessagesFile: compiler:Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 #endif
-#endif
 
 ; Include installer's custom messages
 #include "custom_messages.iss"
-
-#if VER < EncodeVer(6,1,0)
-  #ifdef localize
-    #include <idplang\czech.iss>
-    #include <idplang\default.iss>
-    #include <idplang\french.iss>
-    #include <idplang\german.iss>
-    #include <idplang\hungarian.iss>
-    #include <idplang\italian.iss>
-    #include <idplang\polish.iss>
-    #include <idplang\russian.iss>
-    #include <idplang\slovak.iss>
-    #include <idplang\spanish.iss>
-  #endif
-#endif
 
 [Messages]
 BeveledLabel = {#BeveledLabel}
@@ -338,10 +289,8 @@ const
 function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THandle; external 'LoadLibraryExW@kernel32.dll stdcall';
 function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
 
-#if VER >= EncodeVer(6,1,0)
 var
   DownloadPage: TDownloadWizardPage;
-#endif
 
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
@@ -564,19 +513,6 @@ begin
   end;
 end;
 
-procedure CurPageChanged(CurPageID: Integer);
-begin
-  if CurPageID = wpReady then
-  begin
-#if VER < EncodeVer(6,1,0)
-    idpClearFiles;
-    if IsComponentSelected('intel_msdk') then
-      idpAddFile('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', ExpandConstant('{tmp}\{#msdk_dll_zip}'));
-#endif
-  end;
-end;
-
-#if VER >= EncodeVer(6,1,0)
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   if CurPageID = wpReady then
@@ -599,7 +535,6 @@ begin
 
   Result := True;
 end;
-#endif
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
@@ -675,25 +610,9 @@ Var
   DeltaY : Integer;
   Page: TWizardPage;
 begin
-#if VER < EncodeVer(6,0,0)
-  DeltaY := ScaleY(10);
-#endif
   DeltaY := ScaleY(1);
 
-#if VER < EncodeVer(6,0,0)
-  WizardForm.Height := WizardForm.Height + DeltaY;
-  WizardForm.NextButton.Top := WizardForm.NextButton.Top + DeltaY;
-  WizardForm.BackButton.Top := WizardForm.BackButton.Top + DeltaY;
-  WizardForm.CancelButton.Top := WizardForm.CancelButton.Top + DeltaY;
-#endif
   WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height + DeltaY;
-#if VER < EncodeVer(6,0,0)
-  WizardForm.OuterNotebook.Height := WizardForm.OuterNotebook.Height + DeltaY;
-  WizardForm.InnerNotebook.Height := WizardForm.InnerNotebook.Height + DeltaY;
-  WizardForm.Bevel.Top := WizardForm.Bevel.Top + DeltaY;
-  WizardForm.BeveledLabel.Top := WizardForm.BeveledLabel.Top + DeltaY;
-  WizardForm.ComponentsDiskSpaceLabel.Top := WizardForm.ComponentsDiskSpaceLabel.Top + DeltaY;
-#endif
 
 #ifdef localize
   WizardForm.ComponentsList.Checked[7] := False;
@@ -701,9 +620,5 @@ begin
   WizardForm.ComponentsList.Checked[6] := False;
 #endif
 
-#if VER < EncodeVer(6,1,0)
-  idpDownloadAfter(wpReady);
-#else
   DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
-#endif
 end;
