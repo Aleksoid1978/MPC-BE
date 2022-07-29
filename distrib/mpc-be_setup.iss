@@ -291,6 +291,7 @@ function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBuff
 
 var
   DownloadPage: TDownloadWizardPage;
+  url_intel_msdk: String;
 
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
@@ -480,6 +481,7 @@ var
   sLanguage: String;
   sRegParams: String;
   resCode: integer;
+  sPath: String;
 begin
   if CurStep = ssPostInstall then
   begin
@@ -509,7 +511,13 @@ begin
     end;
 
     if IsComponentSelected('intel_msdk') then
-      Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), '', ExpandConstant('{app}'));
+    begin
+      if Length(url_intel_msdk)>0 then
+        sPath := ExpandConstant('{tmp}\{#msdk_dll_zip}')
+      else
+        sPath := ExpandConstant('{src}\{#msdk_dll_zip}');
+      Unzip(sPath, '{#msdk_dll}', ExpandConstant('{app}'));
+    end;
   end;
 end;
 
@@ -518,8 +526,9 @@ begin
   if CurPageID = wpReady then
   begin
     DownloadPage.Clear;
-    if IsComponentSelected('intel_msdk') then begin
-      DownloadPage.Add('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', '{#msdk_dll_zip}', '');
+    if IsComponentSelected('intel_msdk') and (Length(url_intel_msdk)>0) then
+    begin
+      DownloadPage.Add(url_intel_msdk, '{#msdk_dll_zip}', '');
       DownloadPage.Show;
       try
         try
@@ -616,6 +625,16 @@ begin
 
   Idx := WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:comp_intel_msdk}'));
   WizardForm.ComponentsList.Checked[Idx] := False;
+  if FileExists(ExpandConstant('{src}\{#msdk_dll_zip}')) then
+  begin
+    WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentAlreadyDownloaded})');
+    url_intel_msdk := '';
+  end
+  else
+  begin
+    WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentWillBeDownloaded})');
+    url_intel_msdk := 'http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}';
+  end;
 
   DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
