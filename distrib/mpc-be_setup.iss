@@ -377,7 +377,7 @@ begin
     except
       Log('ERROR: unziping failed');
       str := 'Unable to extract ' + ZipPath;
-      if Length(Item)>0 then str := str + '\' + FileName;
+      if Length(FileName)>0 then str := str + '\' + FileName;
       MsgBox(str, mbError, MB_OK);
       Exit;
     end;
