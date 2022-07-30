@@ -59,9 +59,9 @@
   #define dxdir        = "DirectX\x64"
   #define BeveledLabel = app_name + " x64 " + app_version
   #define Description  = app_name + " x64 " + app_version
+  #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
   #define msdk_dll     = "libmfxsw64.dll"
   #define msdk_dll_zip = "libmfxsw64.dll.zip"
-  #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #else
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
@@ -69,9 +69,9 @@
   #define dxdir        = "DirectX\x86"
   #define BeveledLabel = app_name + " " + app_version
   #define Description  = app_name + " " + app_version
+  #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
   #define msdk_dll     = "libmfxsw32.dll"
   #define msdk_dll_zip = "libmfxsw32.dll.zip"
-  #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
 #endif
 
 [Setup]
@@ -287,7 +287,8 @@ function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBuff
 var
   TasksList: TNewCheckListBox;
   DownloadPage: TDownloadWizardPage;
-  url_intel_msdk: String;
+
+  path_intel_msdk: String;
 
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
@@ -495,7 +496,6 @@ var
   sLanguage: String;
   sRegParams: String;
   resCode: integer;
-  sPath: String;
 begin
   if CurStep = ssPostInstall then
   begin
@@ -524,14 +524,8 @@ begin
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), sRegParams, ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
     end;
 
-    if IsComponentSelected('intel_msdk') then
-    begin
-      if Length(url_intel_msdk)>0 then
-        sPath := ExpandConstant('{tmp}\{#msdk_dll_zip}')
-      else
-        sPath := ExpandConstant('{src}\{#msdk_dll_zip}');
-      Unzip(sPath, '{#msdk_dll}', ExpandConstant('{app}'));
-    end;
+    if IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)>0) then
+      Unzip(path_intel_msdk, '{#msdk_dll}', ExpandConstant('{app}'));
   end;
 end;
 
@@ -540,13 +534,14 @@ begin
   if CurPageID = wpReady then
   begin
     DownloadPage.Clear;
-    if IsComponentSelected('intel_msdk') and (Length(url_intel_msdk)>0) then
+    if IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)=0) then
     begin
-      DownloadPage.Add(url_intel_msdk, '{#msdk_dll_zip}', '');
+      DownloadPage.Add('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', '{#msdk_dll_zip}', '');
       DownloadPage.Show;
       try
         try
           DownloadPage.Download;
+          path_intel_msdk := ExpandConstant('{tmp}\{#msdk_dll_zip}');
         except
           SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
         end;
@@ -631,7 +626,8 @@ end;
 procedure InitializeWizard();
 Var
   DeltaY : Integer;
-  Idx: Integer;
+  Idx : Integer;
+  Path : String;
   CustomSelectTasksPage: TWizardPage;
 begin
   DeltaY := ScaleY(1);
@@ -640,15 +636,15 @@ begin
 
   Idx := WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:comp_intel_msdk}'));
   WizardForm.ComponentsList.Checked[Idx] := False;
-  if FileExists(ExpandConstant('{src}\{#msdk_dll_zip}')) then
+  Path := ExpandConstant('{src}\{#msdk_dll_zip}')
+  if FileExists(Path) then
   begin
     WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentAlreadyDownloaded})');
-    url_intel_msdk := '';
+    path_intel_msdk := Path;
   end
   else
   begin
     WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentWillBeDownloaded})');
-    url_intel_msdk := 'http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}';
   end;
 
   CustomSelectTasksPage := CreateCustomPage(wpSelectTasks, SetupMessage(msgWizardSelectTasks), SetupMessage(msgSelectTasksDesc));
