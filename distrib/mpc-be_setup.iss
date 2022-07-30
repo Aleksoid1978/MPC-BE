@@ -548,6 +548,7 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 var
   need_dl_intel_msdk: Boolean;
   need_dl_mpcvr: Boolean;
+  new_path: String;
 begin
   if CurPageID = wpReady then
   begin
@@ -566,9 +567,19 @@ begin
         try
           DownloadPage.Download;
           if need_dl_intel_msdk then
+          begin
             path_intel_msdk := ExpandConstant('{tmp}\{#intel_msdk_zip}');
+            new_path := ExpandConstant('{src}\{#intel_msdk_zip}');
+            if RenameFile(path_intel_msdk, new_path) then
+              path_intel_msdk :=new_path;
+          end;
           if need_dl_mpcvr then
+          begin
             path_mpcvr := ExpandConstant('{tmp}\{#mpcvr_zip}');
+            new_path := ExpandConstant('{src}\{#mpcvr_zip}');
+            if RenameFile(path_mpcvr, new_path) then
+              path_mpcvr := new_path;
+          end;
         except
           SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
         end;
