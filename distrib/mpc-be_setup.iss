@@ -62,6 +62,7 @@
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
   #define intel_msdk_dll = "libmfxsw64.dll"
   #define intel_msdk_zip = "libmfxsw64.dll.zip"
+  #define intel_msdk_zip_sha1 = "70fed38c0def17fef6a11d4fba27254b0cc3ccf5"
   #define mpcvr_ax     = "MpcVideoRenderer64.ax"
 #else
   #define bindir       = bin_dir + "\mpc-be_x86"
@@ -73,11 +74,13 @@
   #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
   #define intel_msdk_dll = "libmfxsw32.dll"
   #define intel_msdk_zip = "libmfxsw32.dll.zip"
+  #define intel_msdk_zip_sha1 = "b31b6a26dac9b7b7d88b11b1846f7693c5ff616d"
   #define mpcvr_ax     = "MpcVideoRenderer.ax"
 #endif
 #define intel_msdk_url = "http://mpc-be.org/Intel_MSDK/" + intel_msdk_zip
 #define mpcvr_desc     = "MPC Video Renderer 0.6.1"
 #define mpcvr_zip      = "MpcVideoRenderer-0.6.1.1931.zip"
+#define mpcvr_zip_sha1 = "82836300f2810406ad0d9bc7baa3ab6b97397dfa"
 #define mpcvr_url      = "https://github.com/Aleksoid1978/VideoRenderer/releases/download/0.6.1/" + mpcvr_zip
 
 [Setup]
@@ -505,6 +508,7 @@ var
   sLanguage: String;
   sRegParams: String;
   resCode: integer;
+  checksum: String;
 begin
   if CurStep = ssPostInstall then
   begin
@@ -534,12 +538,24 @@ begin
     end;
 
     if IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)>0) then
-      Unzip(path_intel_msdk, '{#intel_msdk_dll}', ExpandConstant('{app}'));
+    begin
+      checksum := GetSHA1OfFile(path_intel_msdk);
+      if checksum = '{#intel_msdk_zip_sha1}' then
+        Unzip(path_intel_msdk, '{#intel_msdk_dll}', ExpandConstant('{app}'))
+      else
+        SuppressibleMsgBox('Non-original {#intel_msdk_dll} !', mbError, MB_OK, IDOK);
+    end;
 
     if IsComponentSelected('mpcvr') and (Length(path_mpcvr)>0) then
     begin
-      Unzip(path_mpcvr, '{#mpcvr_ax}', ExpandConstant('{app}\Filters'));
-      RegisterServer(Is64BitInstallMode, ExpandConstant('{app}\Filters\{#mpcvr_ax}'), False);
+      checksum := GetSHA1OfFile(path_mpcvr);
+      if checksum = '{#mpcvr_zip_sha1}' then
+      begin
+        Unzip(path_mpcvr, '{#mpcvr_ax}', ExpandConstant('{app}\Filters'));
+        RegisterServer(Is64BitInstallMode, ExpandConstant('{app}\Filters\{#mpcvr_ax}'), False);
+      end
+      else
+        SuppressibleMsgBox('Non-original {#mpcvr_zip} !', mbError, MB_OK, IDOK);
     end;
   end;
 end;
@@ -581,7 +597,7 @@ begin
               path_mpcvr := new_path;
           end;
         except
-          SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
+          SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_OK, IDOK);
         end;
       finally
         DownloadPage.Hide;
