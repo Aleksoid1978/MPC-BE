@@ -56,7 +56,6 @@
   #define bindir       = bin_dir + "\mpc-be_x64"
   #define mpcbe_exe    = "mpc-be64.exe"
   #define mpcbe_ini    = "mpc-be64.ini"
-  #define mpcbe_reg    = "mpc-be64"
   #define dxdir        = "DirectX\x64"
   #define BeveledLabel = app_name + " x64 " + app_version
   #define Description  = app_name + " x64 " + app_version
@@ -67,7 +66,6 @@
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
   #define mpcbe_ini    = "mpc-be.ini"
-  #define mpcbe_reg    = "mpc-be"
   #define dxdir        = "DirectX\x86"
   #define BeveledLabel = app_name + " " + app_version
   #define Description  = app_name + " " + app_version
@@ -180,9 +178,6 @@ Name: "mpciconlib";    Description: "{cm:comp_mpciconlib}";     Types: default c
 #ifdef localize
 Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default custom; Flags: disablenouninstallwarning
 #endif
-Name: "mpcberegvid";   Description: "{cm:AssociationVideo}";    Types: custom;         Flags: disablenouninstallwarning;
-Name: "mpcberegaud";   Description: "{cm:AssociationAudio}";    Types: custom;         Flags: disablenouninstallwarning;
-Name: "mpcberegpl";    Description: "{cm:AssociationPlaylist}"; Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
 #ifdef x64Build
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 8186280;
@@ -290,6 +285,7 @@ function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THan
 function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
 
 var
+  TasksList: TNewCheckListBox;
   DownloadPage: TDownloadWizardPage;
   url_intel_msdk: String;
 
@@ -452,6 +448,11 @@ begin
     Result := False;
 end;
 
+function GetCustomTask(TaskIndex: Integer): Boolean;
+begin 
+  Result := TasksList.Checked[TaskIndex];
+end;
+
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   // Hide the License page
@@ -474,6 +475,19 @@ begin
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
   RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
   Log('CleanUpSettingsAndFiles done.');
+end;
+
+procedure CurPageChanged(CurPageID: Integer); 
+  begin 
+  if CurPageID = wpReady then 
+  begin 
+  if GetCustomTask(0) then 
+      WizardForm.ReadyMemo.Lines.Add(ExpandConstant('      {cm:AssociationVideo}'));
+	if GetCustomTask(1) then 
+      WizardForm.ReadyMemo.Lines.Add(ExpandConstant('      {cm:AssociationAudio}')); 
+	if GetCustomTask(2) then 
+      WizardForm.ReadyMemo.Lines.Add(ExpandConstant('      {cm:AssociationPlaylist}')); 
+  end; 
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -499,13 +513,13 @@ begin
     else
       RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
 
-    if IsComponentSelected('mpcberegvid') or IsComponentSelected('mpcberegaud') or IsComponentSelected('mpcberegpl') then
+    if GetCustomTask(0) or GetCustomTask(1) or GetCustomTask(2) then
     begin
-      if IsComponentSelected('mpcberegvid') then
+      if GetCustomTask(0) then
         sRegParams := sRegParams + ' /regvid';
-      if IsComponentSelected('mpcberegaud') then 
+      if GetCustomTask(1) then 
         sRegParams := sRegParams + ' /regaud';
-      if IsComponentSelected('mpcberegpl') then
+      if GetCustomTask(2) then
         sRegParams := sRegParams + ' /regpl';
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), sRegParams, ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
     end;
@@ -618,6 +632,7 @@ procedure InitializeWizard();
 Var
   DeltaY : Integer;
   Idx: Integer;
+  CustomSelectTasksPage: TWizardPage;
 begin
   DeltaY := ScaleY(1);
 
@@ -635,6 +650,24 @@ begin
     WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentWillBeDownloaded})');
     url_intel_msdk := 'http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}';
   end;
+
+  CustomSelectTasksPage := CreateCustomPage(wpSelectTasks, SetupMessage(msgWizardSelectTasks), SetupMessage(msgSelectTasksDesc));
+  TasksList := TNewCheckListBox.Create(WizardForm);
+  TasksList.Left := WizardForm.TasksList.Left; 
+  TasksList.Top := WizardForm.SelectTasksLabel.Top; 
+  TasksList.Width := WizardForm.TasksList.Width; 
+  TasksList.Height := WizardForm.TasksList.Top + WizardForm.TasksList.Height - WizardForm.SelectTasksLabel.Top; 
+  TasksList.BorderStyle := WizardForm.TasksList.BorderStyle;
+  TasksList.Color := WizardForm.TasksList.Color;
+  TasksList.ShowLines := WizardForm.TasksList.ShowLines;
+  TasksList.MinItemHeight := WizardForm.TasksList.MinItemHeight;
+  TasksList.ParentColor := WizardForm.TasksList.ParentColor;
+  TasksList.WantTabs := WizardForm.TasksList.WantTabs;
+  TasksList.Parent := CustomSelectTasksPage.Surface;
+
+  TasksList.AddCheckBox(ExpandConstant('{cm:AssociationVideo}'),    '', 0, False, True, False, True, nil);
+  TasksList.AddCheckBox(ExpandConstant('{cm:AssociationAudio}'),    '', 0, False, True, False, True, nil);
+  TasksList.AddCheckBox(ExpandConstant('{cm:AssociationPlaylist}'), '', 0, False, True, False, True, nil);
 
   DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
