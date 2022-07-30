@@ -60,8 +60,9 @@
   #define BeveledLabel = app_name + " x64 " + app_version
   #define Description  = app_name + " x64 " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
-  #define msdk_dll     = "libmfxsw64.dll"
-  #define msdk_dll_zip = "libmfxsw64.dll.zip"
+  #define intel_msdk_dll = "libmfxsw64.dll"
+  #define intel_msdk_zip = "libmfxsw64.dll.zip"
+  #define mpcvr_ax     = "MpcVideoRenderer64.ax"
 #else
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
@@ -70,9 +71,14 @@
   #define BeveledLabel = app_name + " " + app_version
   #define Description  = app_name + " " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
-  #define msdk_dll     = "libmfxsw32.dll"
-  #define msdk_dll_zip = "libmfxsw32.dll.zip"
+  #define intel_msdk_dll = "libmfxsw32.dll"
+  #define intel_msdk_zip = "libmfxsw32.dll.zip"
+  #define mpcvr_ax     = "MpcVideoRenderer.ax"
 #endif
+#define intel_msdk_url = "http://mpc-be.org/Intel_MSDK/" + intel_msdk_zip
+#define mpcvr_desc     = "MPC Video Renderer 0.6.1"
+#define mpcvr_zip      = "MpcVideoRenderer-0.6.1.1931.zip"
+#define mpcvr_url      = "https://github.com/Aleksoid1978/VideoRenderer/releases/download/0.6.1/" + mpcvr_zip
 
 [Setup]
 #ifdef x64Build
@@ -184,6 +190,7 @@ Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;  
 #else
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 7183272;
 #endif
+Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; 
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -258,7 +265,7 @@ Type: files; Name: "{app}\mpcresources.??.dll"
 #endif
 
 [UninstallDelete]
-Type: files; Name: {app}\{#msdk_dll}
+Type: files; Name: {app}\{#intel_msdk_dll}
 
 ;[UninstallRun]
 ;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
@@ -289,6 +296,7 @@ var
   DownloadPage: TDownloadWizardPage;
 
   path_intel_msdk: String;
+  path_mpcvr: String;
 
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
@@ -525,23 +533,41 @@ begin
     end;
 
     if IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)>0) then
-      Unzip(path_intel_msdk, '{#msdk_dll}', ExpandConstant('{app}'));
+      Unzip(path_intel_msdk, '{#intel_msdk_dll}', ExpandConstant('{app}'));
+
+    if IsComponentSelected('mpcvr') and (Length(path_mpcvr)>0) then
+    begin
+      Unzip(path_mpcvr, '{#mpcvr_ax}', ExpandConstant('{app}\Filters'));
+      RegisterServer(Is64BitInstallMode, ExpandConstant('{app}\Filters\{#mpcvr_ax}'), False);
+    end;
   end;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  need_dl_intel_msdk: Boolean;
+  need_dl_mpcvr: Boolean;
 begin
   if CurPageID = wpReady then
   begin
+    need_dl_intel_msdk := IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)=0);
+    need_dl_mpcvr := IsComponentSelected('mpcvr') and (Length(path_mpcvr)=0);
+
     DownloadPage.Clear;
-    if IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)=0) then
+    if need_dl_intel_msdk or need_dl_mpcvr then
     begin
-      DownloadPage.Add('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', '{#msdk_dll_zip}', '');
+      if need_dl_intel_msdk then
+        DownloadPage.Add('{#intel_msdk_url}', '{#intel_msdk_zip}', '');
+      if need_dl_mpcvr then
+        DownloadPage.Add('{#mpcvr_url}', '{#mpcvr_zip}', '');
       DownloadPage.Show;
       try
         try
           DownloadPage.Download;
-          path_intel_msdk := ExpandConstant('{tmp}\{#msdk_dll_zip}');
+          if need_dl_intel_msdk then
+            path_intel_msdk := ExpandConstant('{tmp}\{#intel_msdk_zip}');
+          if need_dl_mpcvr then
+            path_mpcvr := ExpandConstant('{tmp}\{#mpcvr_zip}');
         except
           SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
         end;
@@ -636,11 +662,24 @@ begin
 
   Idx := WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:comp_intel_msdk}'));
   WizardForm.ComponentsList.Checked[Idx] := False;
-  Path := ExpandConstant('{src}\{#msdk_dll_zip}')
+  Path := ExpandConstant('{src}\{#intel_msdk_zip}')
   if FileExists(Path) then
   begin
     WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentAlreadyDownloaded})');
     path_intel_msdk := Path;
+  end
+  else
+  begin
+    WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentWillBeDownloaded})');
+  end;
+
+  Idx := WizardForm.ComponentsList.Items.IndexOf('{#mpcvr_desc}');
+  WizardForm.ComponentsList.Checked[Idx] := False;
+  Path := ExpandConstant('{src}\{#mpcvr_zip}')
+  if FileExists(Path) then
+  begin
+    WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentAlreadyDownloaded})');
+    path_mpcvr := Path;
   end
   else
   begin
