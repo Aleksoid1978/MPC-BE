@@ -32,6 +32,8 @@ Fixed LAV Splitter freezing when watching some Live broadcasts.
 Installer
 Compiling the installer requires InnoSetup 6.1.0 or later.
 Updated installer translation files.
+Added the ability to install "MPC Video Renderer 0.6.1".
+Added the ability to offline install previously downloaded components.
 
 
 1.6.3
