@@ -28,7 +28,7 @@
 
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
 #define localize
-; #define x64Build
+#define x64Build
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
@@ -294,6 +294,7 @@ const
 
 function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THandle; external 'LoadLibraryExW@kernel32.dll stdcall';
 function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
+function SetFileAttributes(lpFileName: String; dwFileAttributes: Cardinal): Integer; external 'SetFileAttributesW@kernel32.dll stdcall';
 
 var
   TasksList: TNewCheckListBox;
@@ -587,14 +588,20 @@ begin
             path_intel_msdk := ExpandConstant('{tmp}\{#intel_msdk_zip}');
             new_path := ExpandConstant('{src}\{#intel_msdk_zip}');
             if RenameFile(path_intel_msdk, new_path) then
-              path_intel_msdk :=new_path;
+            begin
+              SetFileAttributes(new_path, FILE_ATTRIBUTE_READONLY);
+              path_intel_msdk := new_path;
+            end;
           end;
           if need_dl_mpcvr then
           begin
             path_mpcvr := ExpandConstant('{tmp}\{#mpcvr_zip}');
             new_path := ExpandConstant('{src}\{#mpcvr_zip}');
             if RenameFile(path_mpcvr, new_path) then
+            begin
+              SetFileAttributes(new_path, FILE_ATTRIBUTE_READONLY);
               path_mpcvr := new_path;
+            end;
           end;
         except
           SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_OK, IDOK);
