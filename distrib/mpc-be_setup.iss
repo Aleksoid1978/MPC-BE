@@ -26,9 +26,9 @@
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
 
-; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
+; If you want to compile the 32-bit version define "Win32Build" (uncomment the define below or use build.bat)
 #define localize
-;#define x64Build
+;#define Win32Build
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
@@ -52,19 +52,7 @@
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
 #define bindir_x86 = bin_dir + "\mpc-be_x86"
 
-#ifdef x64Build
-  #define bindir       = bin_dir + "\mpc-be_x64"
-  #define mpcbe_exe    = "mpc-be64.exe"
-  #define mpcbe_ini    = "mpc-be64.ini"
-  #define dxdir        = "DirectX\x64"
-  #define BeveledLabel = app_name + " x64 " + app_version
-  #define Description  = app_name + " x64 " + app_version
-  #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
-  #define intel_msdk_dll = "libmfxsw64.dll"
-  #define intel_msdk_zip = "libmfxsw64.dll.zip"
-  #define intel_msdk_zip_sha1 = "70fed38c0def17fef6a11d4fba27254b0cc3ccf5"
-  #define mpcvr_ax     = "MpcVideoRenderer64.ax"
-#else
+#ifdef Win32Build
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
   #define mpcbe_ini    = "mpc-be.ini"
@@ -76,6 +64,18 @@
   #define intel_msdk_zip = "libmfxsw32.dll.zip"
   #define intel_msdk_zip_sha1 = "b31b6a26dac9b7b7d88b11b1846f7693c5ff616d"
   #define mpcvr_ax     = "MpcVideoRenderer.ax"
+#else
+  #define bindir       = bin_dir + "\mpc-be_x64"
+  #define mpcbe_exe    = "mpc-be64.exe"
+  #define mpcbe_ini    = "mpc-be64.ini"
+  #define dxdir        = "DirectX\x64"
+  #define BeveledLabel = app_name + " x64 " + app_version
+  #define Description  = app_name + " x64 " + app_version
+  #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
+  #define intel_msdk_dll = "libmfxsw64.dll"
+  #define intel_msdk_zip = "libmfxsw64.dll.zip"
+  #define intel_msdk_zip_sha1 = "70fed38c0def17fef6a11d4fba27254b0cc3ccf5"
+  #define mpcvr_ax     = "MpcVideoRenderer64.ax"
 #endif
 #define intel_msdk_url = "http://mpc-be.org/Intel_MSDK/" + intel_msdk_zip
 #define mpcvr_desc     = "MPC Video Renderer 0.6.1"
@@ -84,7 +84,16 @@
 #define mpcvr_url      = "https://github.com/Aleksoid1978/VideoRenderer/releases/download/0.6.1/" + mpcvr_zip
 
 [Setup]
-#ifdef x64Build
+#ifdef Win32Build
+AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
+DefaultGroupName={#app_name}
+OutputBaseFilename={#app_name}.{#app_version}.x86
+UninstallDisplayName={#app_name} {#app_version}
+AppName={#app_name}
+AppVerName={#app_name} {#app_version}
+VersionInfoDescription={#app_name} Setup
+VersionInfoProductName={#app_name}
+#else
 AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
 OutputBaseFilename={#app_name}.{#app_version}.x64
@@ -95,15 +104,6 @@ AppName={#app_name} x64
 AppVerName={#app_name} x64 {#app_version}
 VersionInfoDescription={#app_name} x64 Setup
 VersionInfoProductName={#app_name} x64
-#else
-AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
-DefaultGroupName={#app_name}
-OutputBaseFilename={#app_name}.{#app_version}.x86
-UninstallDisplayName={#app_name} {#app_version}
-AppName={#app_name}
-AppVerName={#app_name} {#app_version}
-VersionInfoDescription={#app_name} Setup
-VersionInfoProductName={#app_name}
 #endif
 AppVersion={#app_version}
 AppPublisher={#app_name} Team
@@ -188,12 +188,12 @@ Name: "mpciconlib";    Description: "{cm:comp_mpciconlib}";     Types: default c
 Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default custom; Flags: disablenouninstallwarning
 #endif
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
-#ifdef x64Build
-Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 8186280;
-Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 913072; 
-#else
+#ifdef Win32Build
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 7183272;
 Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 831152; 
+#else
+Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 8186280;
+Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 913072; 
 #endif
 
 [Tasks]
@@ -231,18 +231,18 @@ Source: "VisualElements\*.png";            DestDir: "{app}";                    
 Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 
 [Icons]
-#ifdef x64Build
-Name: {group}\{#app_name} x64;                       Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
-Name: {commondesktop}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
-Name: {userdesktop}\{#app_name} x64;                 Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
-Name: {group}\{cm:UninstallProgram,{#app_name} x64}; Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name} x64}; WorkingDir: {app}
-#else
+#ifdef Win32Build
 Name: {group}\{#app_name};                           Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};                   Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name};                     Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
 Name: {#quick_launch}\{#app_name};                   Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
 Name: {group}\{cm:UninstallProgram,{#app_name}};     Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name}};     WorkingDir: {app}
+#else
+Name: {group}\{#app_name} x64;                       Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
+Name: {commondesktop}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
+Name: {userdesktop}\{#app_name} x64;                 Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
+Name: {#quick_launch}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {group}\{cm:UninstallProgram,{#app_name} x64}; Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name} x64}; WorkingDir: {app}
 #endif
 Name: {group}\Changelog;                             Filename: {app}\Changelog.txt;     Comment: {cm:ViewChangelog};                    WorkingDir: {app}
 Name: {group}\ChangelogRus;                          Filename: {app}\Changelog.Rus.txt; Comment: {cm:ViewChangelog};                    WorkingDir: {app}
@@ -409,10 +409,10 @@ begin
 
   if (Result = '') or not DirExists(Result) then
   begin
-    #ifdef x64Build
-    Result := ExpandConstant('{pf}\{#app_name} x64');
-    #else
+    #ifdef Win32Build
     Result := ExpandConstant('{pf}\{#app_name}');
+    #else
+    Result := ExpandConstant('{pf}\{#app_name} x64');
     #endif
   end;
 end;
