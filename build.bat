@@ -342,7 +342,7 @@ POPD
 EXIT /B
 
 :SubCreateInstaller
-IF "%~1" == "Win32" SET ISDefs=/DWin32Build
+IF "%~1" == "Win32" (SET ISDefs=/DWin32Build) ELSE (SET ISDefs=)
 IF /I "%SIGN%" == "True" SET ISDefsSign=/DSign
 
 CALL :SubDetectInnoSetup
