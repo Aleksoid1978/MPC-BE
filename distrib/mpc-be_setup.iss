@@ -254,9 +254,9 @@ Filename: "{app}\Changelog.txt";     WorkingDir: "{app}"; Flags: nowait postinst
 Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Languages: ru
 
 [InstallDelete]
-Type: files; Name: "{userdesktop}\{#app_name}.lnk";   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
-Type: files; Name: "{commondesktop}\{#app_name}.lnk"; Check: not IsTaskSelected('desktopicon\common') and IsUpgrade()
-Type: files; Name: "{#quick_launch}\{#app_name}.lnk"; OnlyBelowVersion: 0,6.1; Check: not IsTaskSelected('quicklaunchicon') and IsUpgrade()
+Type: files; Name: "{userdesktop}\{#app_name}.lnk";   Check: not WizardIsTaskSelected('desktopicon\user')   and IsUpgrade()
+Type: files; Name: "{commondesktop}\{#app_name}.lnk"; Check: not WizardIsTaskSelected('desktopicon\common') and IsUpgrade()
+Type: files; Name: "{#quick_launch}\{#app_name}.lnk"; OnlyBelowVersion: 0,6.1; Check: not WizardIsTaskSelected('quicklaunchicon') and IsUpgrade()
 Type: files; Name: "{app}\AUTHORS";                   Check: IsUpgrade()
 Type: files; Name: "{app}\ChangeLog";                 Check: IsUpgrade()
 Type: files; Name: "{app}\ChangeLogRus";              Check: IsUpgrade()
@@ -513,16 +513,16 @@ var
 begin
   if CurStep = ssPostInstall then
   begin
-     if IsTaskSelected('pintotaskbar') then
+     if WizardIsTaskSelected('pintotaskbar') then
       PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
 
-    if IsTaskSelected('reset_settings') then
+    if WizardIsTaskSelected('reset_settings') then
       CleanUpSettingsAndFiles();
 
     sLanguage := ExpandConstant('{cm:langcode}');
     RegWriteStringValue(HKLM, 'SOFTWARE\{#app_name}', 'ExePath', ExpandConstant('{app}\{#mpcbe_exe}'));
 
-    if IsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
+    if WizardIsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
       SetIniString('Settings', 'Language', sLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
       RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
@@ -538,7 +538,7 @@ begin
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), sRegParams, ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
     end;
 
-    if IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)>0) then
+    if WizardIsComponentSelected('intel_msdk') and (Length(path_intel_msdk)>0) then
     begin
       checksum := GetSHA1OfFile(path_intel_msdk);
       if checksum = '{#intel_msdk_zip_sha1}' then
@@ -547,7 +547,7 @@ begin
         SuppressibleMsgBox('Non-original {#intel_msdk_dll} !', mbError, MB_OK, IDOK);
     end;
 
-    if IsComponentSelected('mpcvr') and (Length(path_mpcvr)>0) then
+    if WizardIsComponentSelected('mpcvr') and (Length(path_mpcvr)>0) then
     begin
       checksum := GetSHA1OfFile(path_mpcvr);
       if checksum = '{#mpcvr_zip_sha1}' then
@@ -569,8 +569,8 @@ var
 begin
   if CurPageID = wpReady then
   begin
-    need_dl_intel_msdk := IsComponentSelected('intel_msdk') and (Length(path_intel_msdk)=0);
-    need_dl_mpcvr := IsComponentSelected('mpcvr') and (Length(path_mpcvr)=0);
+    need_dl_intel_msdk := WizardIsComponentSelected('intel_msdk') and (Length(path_intel_msdk)=0);
+    need_dl_mpcvr := WizardIsComponentSelected('mpcvr') and (Length(path_mpcvr)=0);
 
     DownloadPage.Clear;
     if need_dl_intel_msdk or need_dl_mpcvr then
