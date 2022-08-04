@@ -211,6 +211,8 @@ br.AssociationMPCPlayMusicFilesS=Music Files
 br.AssociationMPCPlayVideoFilesF=Play Video
 br.AssociationMPCPlayVideoFilesS=Video Files
 br.PinToTaskBar=Pin to TaskBar
+br.ComponentWillBeDownloaded=will be downloaded
+br.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Belarusian
@@ -246,6 +248,8 @@ by.AssociationMPCPlayMusicFilesS=Music Files
 by.AssociationMPCPlayVideoFilesF=Play Video
 by.AssociationMPCPlayVideoFilesS=Video Files
 by.PinToTaskBar=Pin to TaskBar
+by.ComponentWillBeDownloaded=will be downloaded
+by.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Basque
@@ -253,6 +257,8 @@ eu.langid=00001069
 eu.langcode=eu
 eu.comp_mpciconlib=Ikur Liburutegia
 eu.comp_mpcresources=Itzulpenak
+eu.comp_mpcbeshellext=Install the shell extension
+eu.comp_intel_msdk=H.264 MVC 3D Decoder
 eu.msg_DeleteSettings=MPC-BE ezarpenak kentzea ere nahi dituzu?%n%nMPC-BE berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
 eu.msg_NoD3DX9DLL_found=Azken DirectX bertsioa ez dago ezarrita!%n%nMesedez jeitsi eta ezarri azken DirectX bertsioa June 2010 sistema eragileari kasu egin gabe.
 eu.msg_SetupIsRunningWarning=MPC-BE ezarpena jadanik ekinean dago!
@@ -279,6 +285,8 @@ eu.AssociationMPCPlayMusicFilesS=Music Files
 eu.AssociationMPCPlayVideoFilesF=Play Video
 eu.AssociationMPCPlayVideoFilesS=Video Files
 eu.PinToTaskBar=Pin to TaskBar
+eu.ComponentWillBeDownloaded=will be downloaded
+eu.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Catalan
@@ -314,6 +322,8 @@ ca.AssociationMPCPlayMusicFilesS=Music Files
 ca.AssociationMPCPlayVideoFilesF=Play Video
 ca.AssociationMPCPlayVideoFilesS=Video Files
 ca.PinToTaskBar=Pin to TaskBar
+ca.ComponentWillBeDownloaded=will be downloaded
+ca.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Czech
@@ -349,6 +359,8 @@ cz.AssociationMPCPlayMusicFilesS=Music Files
 cz.AssociationMPCPlayVideoFilesF=Play Video
 cz.AssociationMPCPlayVideoFilesS=Video Files
 cz.PinToTaskBar=Pin to TaskBar
+cz.ComponentWillBeDownloaded=will be downloaded
+cz.ComponentAlreadyDownloaded=already downloaded
 
 
 ;German
@@ -384,6 +396,8 @@ de.AssociationMPCPlayMusicFilesS=Audiodateien
 de.AssociationMPCPlayVideoFilesF=Videodateien wiedergeben
 de.AssociationMPCPlayVideoFilesS=Videodateien
 de.PinToTaskBar=An Taskleiste anheften
+de.ComponentWillBeDownloaded=will be downloaded
+de.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Greek
@@ -419,6 +433,8 @@ el.AssociationMPCPlayMusicFilesS=Music Files
 el.AssociationMPCPlayVideoFilesF=Play Video
 el.AssociationMPCPlayVideoFilesS=Video Files
 el.PinToTaskBar=Pin to TaskBar
+el.ComponentWillBeDownloaded=will be downloaded
+el.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Spanish
@@ -454,6 +470,8 @@ es.AssociationMPCPlayMusicFilesS=Music Files
 es.AssociationMPCPlayVideoFilesF=Play Video
 es.AssociationMPCPlayVideoFilesS=Video Files
 es.PinToTaskBar=Pin to TaskBar
+es.ComponentWillBeDownloaded=will be downloaded
+es.ComponentAlreadyDownloaded=already downloaded
 
 
 ;French
@@ -489,6 +507,8 @@ fr.AssociationMPCPlayMusicFilesS=Music Files
 fr.AssociationMPCPlayVideoFilesF=Play Video
 fr.AssociationMPCPlayVideoFilesS=Video Files
 fr.PinToTaskBar=Pin to TaskBar
+fr.ComponentWillBeDownloaded=will be downloaded
+fr.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Hebrew
@@ -524,6 +544,8 @@ he.AssociationMPCPlayMusicFilesS=Music Files
 he.AssociationMPCPlayVideoFilesF=Play Video
 he.AssociationMPCPlayVideoFilesS=Video Files
 he.PinToTaskBar=Pin to TaskBar
+he.ComponentWillBeDownloaded=will be downloaded
+he.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Hungarian
@@ -559,6 +581,8 @@ hu.AssociationMPCPlayMusicFilesS=Zene Fájlok
 hu.AssociationMPCPlayVideoFilesF=Video Lejátszás
 hu.AssociationMPCPlayVideoFilesS=Video Fájlok
 hu.PinToTaskBar=Rögzítés a tálcához
+hu.ComponentWillBeDownloaded=will be downloaded
+hu.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Armenian
@@ -594,6 +618,8 @@ hy.AssociationMPCPlayMusicFilesS=Music Files
 hy.AssociationMPCPlayVideoFilesF=Play Video
 hy.AssociationMPCPlayVideoFilesS=Video Files
 hy.PinToTaskBar=Pin to TaskBar
+hy.ComponentWillBeDownloaded=will be downloaded
+hy.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Italian
@@ -614,6 +640,11 @@ it.tsk_ResetSettings=Ripristina impostazioni
 it.types_DefaultInstallation=Installazione predefinita
 it.types_CustomInstallation=Installazione personalizzata
 it.ViewChangelog=Visualizza Changelog
+it.AssociationFormatsAV=Configuring associations with video and audio files:
+it.AssociationFormats=Association with video and audio files
+it.AssociationVideo=Association with video files
+it.AssociationAudio=Association with audio files
+it.AssociationPlaylist=Association with playlists
 it.AutoPlayType=Auto play:
 it.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
 it.AssociationMPCPlayCDAudioS=Audio CD
@@ -624,6 +655,8 @@ it.AssociationMPCPlayMusicFilesS=Music Files
 it.AssociationMPCPlayVideoFilesF=Play Video
 it.AssociationMPCPlayVideoFilesS=Video Files
 it.PinToTaskBar=Pin to TaskBar
+it.ComponentWillBeDownloaded=will be downloaded
+it.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Japanese
@@ -659,6 +692,8 @@ ja.AssociationMPCPlayMusicFilesS=音楽ファイル
 ja.AssociationMPCPlayVideoFilesF=動画の再生
 ja.AssociationMPCPlayVideoFilesS=動画ファイル
 ja.PinToTaskBar=タスクバーにピン留めする
+ja.ComponentWillBeDownloaded=will be downloaded
+ja.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Korean
@@ -694,6 +729,8 @@ kr.AssociationMPCPlayMusicFilesS=음악 파일
 kr.AssociationMPCPlayVideoFilesF=비디오 재생
 kr.AssociationMPCPlayVideoFilesS=비디오 파일
 kr.PinToTaskBar=Pin to TaskBar
+kr.ComponentWillBeDownloaded=will be downloaded
+kr.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Dutch
@@ -729,6 +766,8 @@ nl.AssociationMPCPlayMusicFilesS=Muziekbestanden
 nl.AssociationMPCPlayVideoFilesF=Video afspelen
 nl.AssociationMPCPlayVideoFilesS=Videobestanden
 nl.PinToTaskBar=Aan de taakbalk vastmaken
+nl.ComponentWillBeDownloaded=will be downloaded
+nl.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Polish
@@ -764,6 +803,8 @@ pl.AssociationMPCPlayMusicFilesS=Music Files
 pl.AssociationMPCPlayVideoFilesF=Play Video
 pl.AssociationMPCPlayVideoFilesS=Video Files
 pl.PinToTaskBar=Pin to TaskBar
+pl.ComponentWillBeDownloaded=will be downloaded
+pl.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Romanian
@@ -771,8 +812,10 @@ ro.langid=00001048
 ro.langcode=ro
 ro.comp_mpciconlib=Bibliotecă de pictograme
 ro.comp_mpcresources=Traduceri
+ro.comp_mpcbeshellext=Install the shell extension
 ro.comp_intel_msdk=H.264 MVC 3D Decoder
 ro.msg_DeleteSettings=Doriţi de asemenea să ştergeţi setările MPC-BE?%n%nDacă doriţi a reinstala MPC-BE, atunci nu este necesar să le ştergeţi.
+ro.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
 ro.msg_SetupIsRunningWarning=Instalatorul MPC-BE rulează deja!
 ro.msg_simd_sse2=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE2.%n%nProcesorul dumneavoastră nu are aceste capacităţi.
 ro.tsk_AllUsers=Pentru toţi utilizatorii
@@ -797,6 +840,8 @@ ro.AssociationMPCPlayMusicFilesS=Music Files
 ro.AssociationMPCPlayVideoFilesF=Play Video
 ro.AssociationMPCPlayVideoFilesS=Video Files
 ro.PinToTaskBar=Pin to TaskBar
+ro.ComponentWillBeDownloaded=will be downloaded
+ro.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Russian
@@ -869,6 +914,8 @@ sc.AssociationMPCPlayMusicFilesS=音乐文件
 sc.AssociationMPCPlayVideoFilesF=播放视频
 sc.AssociationMPCPlayVideoFilesS=视频文件
 sc.PinToTaskBar=锁定到任务栏
+sc.ComponentWillBeDownloaded=will be downloaded
+sc.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Swedish
@@ -904,6 +951,8 @@ sv.AssociationMPCPlayMusicFilesS=Music Files
 sv.AssociationMPCPlayVideoFilesF=Play Video
 sv.AssociationMPCPlayVideoFilesS=Video Files
 sv.PinToTaskBar=Pin to TaskBar
+sv.ComponentWillBeDownloaded=will be downloaded
+sv.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Slovakian
@@ -939,6 +988,8 @@ sk.AssociationMPCPlayMusicFilesS=Music Files
 sk.AssociationMPCPlayVideoFilesF=Play Video
 sk.AssociationMPCPlayVideoFilesS=Video Files
 sk.PinToTaskBar=Pin to TaskBar
+sk.ComponentWillBeDownloaded=will be downloaded
+sk.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Chinese Traditional
@@ -974,6 +1025,8 @@ tc.AssociationMPCPlayMusicFilesS=音樂檔案
 tc.AssociationMPCPlayVideoFilesF=播放視訊
 tc.AssociationMPCPlayVideoFilesS=視訊檔案
 tc.PinToTaskBar=釘選到工作列
+tc.ComponentWillBeDownloaded=will be downloaded
+tc.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Turkish
@@ -1009,6 +1062,8 @@ tr.AssociationMPCPlayMusicFilesS=Music Dosyaları
 tr.AssociationMPCPlayVideoFilesF=Video Oynat
 tr.AssociationMPCPlayVideoFilesS=Video Dosyaları
 tr.PinToTaskBar=Görev Çubuğuna sabitle
+tr.ComponentWillBeDownloaded=will be downloaded
+tr.ComponentAlreadyDownloaded=already downloaded
 
 
 ;Ukrainian
@@ -1044,5 +1099,7 @@ ua.AssociationMPCPlayMusicFilesS=Music Files
 ua.AssociationMPCPlayVideoFilesF=Play Video
 ua.AssociationMPCPlayVideoFilesS=Video Files
 ua.PinToTaskBar=Pin to TaskBar
+ua.ComponentWillBeDownloaded=will be downloaded
+ua.ComponentAlreadyDownloaded=already downloaded
 
 #endif
