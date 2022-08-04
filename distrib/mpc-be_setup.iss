@@ -697,7 +697,7 @@ begin
 
   Idx := WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:comp_intel_msdk}'));
   WizardForm.ComponentsList.Checked[Idx] := False;
-  Path := ExpandConstant('{src}\{#intel_msdk_zip}')
+  Path := ExpandConstant('{src}\{#intel_msdk_zip}');
   if FileExists(Path) then
   begin
     WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentAlreadyDownloaded})');
@@ -710,7 +710,7 @@ begin
 
   Idx := WizardForm.ComponentsList.Items.IndexOf('{#mpcvr_desc}');
   WizardForm.ComponentsList.Checked[Idx] := False;
-  Path := ExpandConstant('{src}\{#mpcvr_zip}')
+  Path := ExpandConstant('{src}\{#mpcvr_zip}');
   if FileExists(Path) then
   begin
     WizardForm.ComponentsList.ItemCaption[Idx] := WizardForm.ComponentsList.ItemCaption[Idx] + ExpandConstant(' ({cm:ComponentAlreadyDownloaded})');
