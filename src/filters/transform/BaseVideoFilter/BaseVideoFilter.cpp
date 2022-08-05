@@ -279,6 +279,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 					m_bSendMediaType = true;
 				} else {
 					DLog(L"    ReceiveConnection() failed (hr: %x); QueryAccept: %x", hr, hrQA);
+					return E_FAIL;
 				}
 
 				break;
