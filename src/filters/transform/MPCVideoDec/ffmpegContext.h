@@ -40,3 +40,6 @@ bool IsATIUVD(UINT nPCIVendor, UINT nPCIDevice);
 
 // check frame size for DXVA for old drivers
 BOOL DXVACheckFramesize(int width, int height, UINT nPCIVendor, UINT nPCIDevice, UINT64 VideoDriverVersion);
+
+void FixFrameSize(enum AVPixelFormat pixfmt, int& width, int& height);
+void FixFrameSize(struct AVCodecContext* pAVCtx, int& width, int& height);
