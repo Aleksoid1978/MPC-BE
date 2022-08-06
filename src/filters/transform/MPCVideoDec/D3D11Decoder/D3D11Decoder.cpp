@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2021 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2021-2022 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -642,8 +642,8 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 
 	// test creating a texture
 	D3D11_TEXTURE2D_DESC texDesc = {};
-	texDesc.Width = c->coded_width;
-	texDesc.Height = c->coded_height;
+	texDesc.Width = FFALIGN(c->coded_width, 2);
+	texDesc.Height = FFALIGN(c->coded_height, 2);
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 20;
 	texDesc.Format = m_SurfaceFormat;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -188,6 +188,12 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		if (abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
 			bNeedReconnect = true;
 		}
+	}
+
+	if (m_nDecoderMode != MODE_SOFTWARE) {
+		int arx = 0;
+		int ary = 0;
+		GetOutputSize(width, height, arx, ary);
 	}
 
 	if (width != m_wout || height != m_hout || m_arx != m_arxout || m_ary != m_aryout) {

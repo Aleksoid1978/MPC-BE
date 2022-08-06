@@ -3795,7 +3795,7 @@ void CMPCVideoDecFilter::SetThreadCount()
 void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary)
 {
 	if (m_pAVCtx) {
-		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
+		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt);
 		if (av_pfdesc->log2_chroma_w == 1 && (w & 1)) {
 			w += 1;
 		}
