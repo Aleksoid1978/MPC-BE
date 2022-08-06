@@ -3442,7 +3442,15 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		BYTE* pDataOut = nullptr;
 		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 
-		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
+		int w = m_pAVCtx->width;
+		int h = m_pAVCtx->height;
+		{
+			int arx = 0;
+			int ary = 0;
+			GetOutputSize(w, h, arx, ary);
+		}
+
+		if (FAILED(hr = GetDeliveryBuffer(w, h, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			CLEAR_AND_CONTINUE;
 		}
 
@@ -3780,6 +3788,19 @@ void CMPCVideoDecFilter::SetThreadCount()
 		} else {
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber();
 			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
+		}
+	}
+}
+
+void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary)
+{
+	if (m_pAVCtx) {
+		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
+		if (av_pfdesc->log2_chroma_w == 1 && (w & 1)) {
+			w += 1;
+		}
+		if (av_pfdesc->log2_chroma_h == 1 && (h & 1)) {
+			h += 1;
 		}
 	}
 }
