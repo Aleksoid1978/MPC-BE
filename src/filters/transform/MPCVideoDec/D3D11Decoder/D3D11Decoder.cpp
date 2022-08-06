@@ -718,7 +718,9 @@ HRESULT CD3D11Decoder::DeliverFrame()
 
 	DXVA2_ExtendedFormat dxvaExtFormat = m_pFilter->GetDXVA2ExtendedFormat(m_pFilter->m_pAVCtx, pFrame);
 
-	m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight(), false, m_pFilter->GetFrameDuration(), &dxvaExtFormat);
+	int w, h;
+	m_pFilter->GetPictSize(w, h);
+	m_pFilter->ReconnectOutput(w, h, false, m_pFilter->GetFrameDuration(), &dxvaExtFormat);
 
 	m_pFilter->SetTypeSpecificFlags(pSample);
 	pSample->SetTime(&rtStart, &rtStop);

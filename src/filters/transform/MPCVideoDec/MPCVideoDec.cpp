@@ -1374,15 +1374,12 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 	return false;
 }
 
-// some codecs can reset the values width/height on initialization
-int CMPCVideoDecFilter::PictWidth()
+void CMPCVideoDecFilter::GetPictSize(int& width, int& height)
 {
-	return m_pAVCtx->width ? m_pAVCtx->width : m_pAVCtx->coded_width;
-}
-
-int CMPCVideoDecFilter::PictHeight()
-{
-	return m_pAVCtx->height ? m_pAVCtx->height : m_pAVCtx->coded_height;
+	// some codecs can reset the values width/height on initialization
+	width  = m_pAVCtx->width  ? m_pAVCtx->width  : m_pAVCtx->coded_width;
+	height = m_pAVCtx->height ? m_pAVCtx->height : m_pAVCtx->coded_height;
+	FixFrameSize(m_pAVCtx, width, height);
 }
 
 static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC_COUNT])
@@ -2280,7 +2277,9 @@ redo:
 		do {
 			m_bDXVACompatible = false;
 
-			if (!DXVACheckFramesize(PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion)) { // check frame size
+			int w, h;
+			GetPictSize(w, h);
+			if (!DXVACheckFramesize(w, h, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion)) { // check frame size
 				break;
 			}
 

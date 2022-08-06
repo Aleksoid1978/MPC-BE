@@ -312,8 +312,7 @@ public:
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
 	BOOL						IsSupportedDecoderMode(const GUID& decoderGUID);
-	int							PictWidth();
-	int							PictHeight();
+	void						GetPictSize(int& width, int& height);
 
 	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 

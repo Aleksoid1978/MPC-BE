@@ -190,12 +190,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		}
 	}
 
-	if (m_nDecoderMode != MODE_SOFTWARE) {
-		int arx = 0;
-		int ary = 0;
-		GetOutputSize(width, height, arx, ary);
-	}
-
 	if (width != m_wout || height != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
 		bNeedReconnect = true;
 	}
