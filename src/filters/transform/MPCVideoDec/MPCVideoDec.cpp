@@ -3800,7 +3800,7 @@ void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary)
 			w += 1;
 		}
 		if (av_pfdesc->log2_chroma_h == 1 && (h & 1)) {
-			h += 1;
+			h -= 1;
 		}
 	}
 }
