@@ -396,8 +396,8 @@ de.AssociationMPCPlayMusicFilesS=Audiodateien
 de.AssociationMPCPlayVideoFilesF=Videodateien wiedergeben
 de.AssociationMPCPlayVideoFilesS=Videodateien
 de.PinToTaskBar=An Taskleiste anheften
-de.ComponentWillBeDownloaded=will be downloaded
-de.ComponentAlreadyDownloaded=already downloaded
+de.ComponentWillBeDownloaded=wird heruntergeladen
+de.ComponentAlreadyDownloaded=bereits heruntergeladen
 
 
 ;Greek
