@@ -35,6 +35,8 @@ Updated installer translation files.
 Added the ability to install "MPC Video Renderer 0.6.1".
 Added the ability to offline install previously downloaded components.
 
+Updated libraries:
+	dav1d git-1.0.0-45-ga029d68;
 
 1.6.3
 =============================
