@@ -1062,8 +1062,8 @@ tr.AssociationMPCPlayMusicFilesS=Music Dosyaları
 tr.AssociationMPCPlayVideoFilesF=Video Oynat
 tr.AssociationMPCPlayVideoFilesS=Video Dosyaları
 tr.PinToTaskBar=Görev Çubuğuna sabitle
-tr.ComponentWillBeDownloaded=will be downloaded
-tr.ComponentAlreadyDownloaded=already downloaded
+tr.ComponentWillBeDownloaded=indirilecek
+tr.ComponentAlreadyDownloaded=daha önce indirildi
 
 
 ;Ukrainian
