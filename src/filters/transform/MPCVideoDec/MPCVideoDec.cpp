@@ -3444,7 +3444,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		int w = m_pAVCtx->width;
 		int h = m_pAVCtx->height;
 		FixFrameSize(m_pAVCtx, w, h);
-	
+
 		if (FAILED(hr = GetDeliveryBuffer(w, h, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			CLEAR_AND_CONTINUE;
 		}
