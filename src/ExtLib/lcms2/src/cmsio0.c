@@ -689,6 +689,27 @@ cmsBool CMSEXPORT cmsIsTag(cmsHPROFILE hProfile, cmsTagSignature sig)
        return _cmsSearchTag(Icc, sig, FALSE) >= 0;
 }
 
+
+
+// Checks for link compatibility
+static
+cmsBool CompatibleTypes(const cmsTagDescriptor* desc1, const cmsTagDescriptor* desc2)
+{
+    cmsUInt32Number i;
+
+    if (desc1 == NULL || desc2 == NULL) return FALSE;
+
+    if (desc1->nSupportedTypes != desc2->nSupportedTypes) return FALSE;
+    if (desc1->ElemCount != desc2->ElemCount) return FALSE;
+
+    for (i = 0; i < desc1->nSupportedTypes; i++)
+    {
+        if (desc1->SupportedTypes[i] != desc2->SupportedTypes[i]) return FALSE;
+    }
+
+    return TRUE;
+}
+
 // Enforces that the profile version is per. spec.
 // Operates on the big endian bytes from the profile.
 // Called before converting to platform endianness.
@@ -783,6 +804,7 @@ cmsBool _cmsReadHeader(_cmsICCPROFILE* Icc)
         if (!_cmsReadUInt32Number(io, &Tag.size)) return FALSE;
 
         // Perform some sanity check. Offset + size should fall inside file.
+        if (Tag.size == 0 || Tag.offset == 0) continue;
         if (Tag.offset + Tag.size > HeaderSize ||
             Tag.offset + Tag.size < Tag.offset)
                   continue;
@@ -793,16 +815,34 @@ cmsBool _cmsReadHeader(_cmsICCPROFILE* Icc)
 
        // Search for links
         for (j=0; j < Icc ->TagCount; j++) {
-
+           
             if ((Icc ->TagOffsets[j] == Tag.offset) &&
                 (Icc ->TagSizes[j]   == Tag.size)) {
 
-                Icc ->TagLinked[Icc ->TagCount] = Icc ->TagNames[j];
+                // Check types. 
+                if (CompatibleTypes(_cmsGetTagDescriptor(Icc->ContextID, Icc->TagNames[j]),
+                                    _cmsGetTagDescriptor(Icc->ContextID, Tag.sig))) {
+
+                    Icc->TagLinked[Icc->TagCount] = Icc->TagNames[j];
+                }
             }
 
         }
 
         Icc ->TagCount++;
+    }
+
+
+    for (i = 0; i < Icc->TagCount; i++) {
+        for (j = 0; j < Icc->TagCount; j++) {
+
+            // Tags cannot be duplicate
+            if ((i != j) && (Icc->TagNames[i] == Icc->TagNames[j])) {
+                cmsSignalError(Icc->ContextID, cmsERROR_RANGE, "Duplicate tag found");
+                return FALSE;
+            }
+
+        }
     }
 
     return TRUE;
@@ -1824,6 +1864,9 @@ cmsUInt32Number CMSEXPORT cmsReadRawTag(cmsHPROFILE hProfile, cmsTagSignature si
     cmsUInt32Number rc;
     cmsUInt32Number Offset, TagSize;
 
+    // Sanity check
+    if (data != NULL && BufferSize == 0) return 0;
+
     if (!_cmsLockMutex(Icc->ContextID, Icc ->UsrMutex)) return 0;
 
     // Search for given tag in ICC profile directory
@@ -1843,7 +1886,7 @@ cmsUInt32Number CMSEXPORT cmsReadRawTag(cmsHPROFILE hProfile, cmsTagSignature si
         if (data != NULL) {
 
             if (BufferSize < TagSize)
-                TagSize = BufferSize;
+                goto Error;
 
             if (!Icc ->IOhandler ->Seek(Icc ->IOhandler, Offset)) goto Error;
             if (!Icc ->IOhandler ->Read(Icc ->IOhandler, data, 1, TagSize)) goto Error;
@@ -1865,7 +1908,7 @@ cmsUInt32Number CMSEXPORT cmsReadRawTag(cmsHPROFILE hProfile, cmsTagSignature si
 
             TagSize  = Icc ->TagSizes[i];
             if (BufferSize < TagSize)
-                TagSize = BufferSize;
+                goto Error;
 
             memmove(data, Icc ->TagPtrs[i], TagSize);
 

@@ -542,10 +542,14 @@ cmsBool  GrowNamedColorList(cmsNAMEDCOLORLIST* v)
 // Allocate a list for n elements
 cmsNAMEDCOLORLIST* CMSEXPORT cmsAllocNamedColorList(cmsContext ContextID, cmsUInt32Number n, cmsUInt32Number ColorantCount, const char* Prefix, const char* Suffix)
 {
-    cmsNAMEDCOLORLIST* v = (cmsNAMEDCOLORLIST*) _cmsMallocZero(ContextID, sizeof(cmsNAMEDCOLORLIST));
-
+    cmsNAMEDCOLORLIST* v;
+    
+    if (ColorantCount > cmsMAXCHANNELS) 
+        return NULL;
+   
+    v = (cmsNAMEDCOLORLIST*)_cmsMallocZero(ContextID, sizeof(cmsNAMEDCOLORLIST));
     if (v == NULL) return NULL;
-
+    
     v ->List      = NULL;
     v ->nColors   = 0;
     v ->ContextID  = ContextID;

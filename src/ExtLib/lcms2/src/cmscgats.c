@@ -390,7 +390,7 @@ void StringAppend(string* s, char c)
         char* new_ptr;
 
         s->max *= 10;
-        new_ptr = AllocChunk(s->it8, s->max);
+        new_ptr = (char*) AllocChunk(s->it8, s->max);
         memcpy(new_ptr, s->begin, s->len);
         s->begin = new_ptr;
     }

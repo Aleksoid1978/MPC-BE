@@ -1425,9 +1425,9 @@ void *Type_Measurement_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* 
 {
     cmsICCMeasurementConditions mc;
 
-	
+    
     memset(&mc, 0, sizeof(mc));
-	
+    
     if (!_cmsReadUInt32Number(io, &mc.Observer)) return NULL;
     if (!_cmsReadXYZNumber(io,    &mc.Backing)) return NULL;
     if (!_cmsReadUInt32Number(io, &mc.Geometry)) return NULL;
@@ -1951,13 +1951,13 @@ cmsBool  Type_LUT8_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
 
     if (MatMPE != NULL) {
         
-		for (i = 0; i < 9; i++)
-		{
-			if (!_cmsWrite15Fixed16Number(io, MatMPE->Double[i])) return FALSE;
-		}
+        for (i = 0; i < 9; i++)
+        {
+            if (!_cmsWrite15Fixed16Number(io, MatMPE->Double[i])) return FALSE;
+        }
     }
     else {
-		
+        
         if (!_cmsWrite15Fixed16Number(io, 1)) return FALSE;
         if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
         if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
@@ -2234,17 +2234,17 @@ cmsBool Type_LUT16_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) OutputChannels)) return FALSE;
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) clutPoints)) return FALSE;
     if (!_cmsWriteUInt8Number(io, 0)) return FALSE; // Padding
-	
+    
     if (MatMPE != NULL) {
                 
-		for (i = 0; i < 9; i++)
-		{
-			if (!_cmsWrite15Fixed16Number(io, MatMPE->Double[i])) return FALSE;
-		}
+        for (i = 0; i < 9; i++)
+        {
+            if (!_cmsWrite15Fixed16Number(io, MatMPE->Double[i])) return FALSE;
+        }
       
     }
     else {
-		
+        
         if (!_cmsWrite15Fixed16Number(io, 1)) return FALSE;
         if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
         if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
@@ -2586,31 +2586,31 @@ Error:
 static
 cmsBool  WriteMatrix(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsStage* mpe)
 {
-	cmsUInt32Number i, n;
+    cmsUInt32Number i, n;
 
     _cmsStageMatrixData* m = (_cmsStageMatrixData*) mpe -> Data;
 
-	n = mpe->InputChannels * mpe->OutputChannels;
+    n = mpe->InputChannels * mpe->OutputChannels;
 
-	// Write the Matrix
-	for (i = 0; i < n; i++)
-	{
-		if (!_cmsWrite15Fixed16Number(io, m->Double[i])) return FALSE;
-	}
+    // Write the Matrix
+    for (i = 0; i < n; i++)
+    {
+        if (!_cmsWrite15Fixed16Number(io, m->Double[i])) return FALSE;
+    }
 
-	if (m->Offset != NULL) {
+    if (m->Offset != NULL) {
 
-		for (i = 0; i < mpe->OutputChannels; i++)
-		{
-			if (!_cmsWrite15Fixed16Number(io, m->Offset[i])) return FALSE;
-		}
-	}
-	else {
-		for (i = 0; i < mpe->OutputChannels; i++)
-		{
-			if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
-		}
-	}
+        for (i = 0; i < mpe->OutputChannels; i++)
+        {
+            if (!_cmsWrite15Fixed16Number(io, m->Offset[i])) return FALSE;
+        }
+    }
+    else {
+        for (i = 0; i < mpe->OutputChannels; i++)
+        {
+            if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
+        }
+    }
 
 
     return TRUE;
@@ -3141,7 +3141,6 @@ void Type_ColorantTable_Free(struct _cms_typehandler_struct* self, void* Ptr)
 static
 void *Type_NamedColor_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsUInt32Number* nItems, cmsUInt32Number SizeOfTag)
 {
-
     cmsUInt32Number      vendorFlag;     // Bottom 16 bits for ICC use
     cmsUInt32Number      count;          // Count of named colors
     cmsUInt32Number      nDeviceCoords;  // Num of device coordinates
@@ -5383,6 +5382,64 @@ void Type_Dictionary_Free(struct _cms_typehandler_struct* self, void* Ptr)
     cmsUNUSED_PARAMETER(self);
 }
 
+// cicp VideoSignalType
+
+static
+void* Type_VideoSignal_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsUInt32Number* nItems, cmsUInt32Number SizeOfTag)
+{
+    cmsVideoSignalType* cicp = NULL;
+
+    if (SizeOfTag != 8) return NULL; 
+
+    if (!_cmsReadUInt32Number(io, NULL)) return NULL;
+
+    cicp = (cmsVideoSignalType*)_cmsCalloc(self->ContextID, 1, sizeof(cmsVideoSignalType));
+    if (cicp == NULL) return NULL;
+
+    if (!_cmsReadUInt8Number(io, &cicp->ColourPrimaries)) goto Error;
+    if (!_cmsReadUInt8Number(io, &cicp->TransferCharacteristics)) goto Error;
+    if (!_cmsReadUInt8Number(io, &cicp->MatrixCoefficients)) goto Error;
+    if (!_cmsReadUInt8Number(io, &cicp->VideoFullRangeFlag)) goto Error;
+
+    // Success
+    *nItems = 1;
+    return cicp;
+
+Error:
+    if (cicp != NULL) _cmsFree(self->ContextID, cicp);
+    return NULL;
+}
+
+static
+cmsBool Type_VideoSignal_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
+{
+    cmsVideoSignalType* cicp = (cmsVideoSignalType*)Ptr;
+
+    if (!_cmsWriteUInt32Number(io, 0)) return FALSE;
+    if (!_cmsWriteUInt8Number(io, cicp->ColourPrimaries)) return FALSE;
+    if (!_cmsWriteUInt8Number(io, cicp->TransferCharacteristics)) return FALSE;
+    if (!_cmsWriteUInt8Number(io, cicp->MatrixCoefficients)) return FALSE;
+    if (!_cmsWriteUInt8Number(io, cicp->VideoFullRangeFlag)) return FALSE;
+
+    return TRUE;
+
+    cmsUNUSED_PARAMETER(self);
+    cmsUNUSED_PARAMETER(nItems);
+}
+
+void* Type_VideoSignal_Dup(struct _cms_typehandler_struct* self, const void* Ptr, cmsUInt32Number n)
+{
+    return _cmsDupMem(self->ContextID, Ptr, sizeof(cmsVideoSignalType));
+
+    cmsUNUSED_PARAMETER(n);
+}
+
+
+static
+void Type_VideoSignal_Free(struct _cms_typehandler_struct* self, void* Ptr)
+{
+    _cmsFree(self->ContextID, Ptr);
+}
 
 // ********************************************************************************
 // Type support main routines
@@ -5422,6 +5479,7 @@ static const _cmsTagTypeLinkedList SupportedTagTypes[] = {
 {TYPE_HANDLER(cmsMonacoBrokenCurveType,        Curve),              (_cmsTagTypeLinkedList*) &SupportedTagTypes[28] },
 {TYPE_HANDLER(cmsSigProfileSequenceIdType,     ProfileSequenceId),  (_cmsTagTypeLinkedList*) &SupportedTagTypes[29] },
 {TYPE_HANDLER(cmsSigDictType,                  Dictionary),         (_cmsTagTypeLinkedList*) &SupportedTagTypes[30] },
+{TYPE_HANDLER(cmsSigcicpType,                  VideoSignal),        (_cmsTagTypeLinkedList*) &SupportedTagTypes[31] },
 {TYPE_HANDLER(cmsSigVcgtType,                  vcgt),                NULL }
 };
 
@@ -5616,6 +5674,8 @@ static _cmsTagLinkedList SupportedTags[] = {
     { cmsSigProfileSequenceIdTag,   { 1, 1, { cmsSigProfileSequenceIdType},  NULL }, &SupportedTags[62]},
 
     { cmsSigProfileDescriptionMLTag,{ 1, 1, { cmsSigMultiLocalizedUnicodeType}, NULL}, &SupportedTags[63]},
+    { cmsSigcicpTag,                { 1, 1, { cmsSigcicpType},               NULL },   &SupportedTags[64]},
+
     { cmsSigArgyllArtsTag,          { 9, 1, { cmsSigS15Fixed16ArrayType},    NULL}, NULL}
 
 };

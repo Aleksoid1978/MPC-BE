@@ -168,18 +168,21 @@ cmsBool CMSEXPORT  _cmsReadUInt32Number(cmsIOHANDLER* io, cmsUInt32Number* n)
 
 cmsBool CMSEXPORT  _cmsReadFloat32Number(cmsIOHANDLER* io, cmsFloat32Number* n)
 {
-    cmsUInt32Number tmp;
+    union typeConverter {
+        cmsUInt32Number integer;
+        cmsFloat32Number floating_point;
+    } tmp;
 
     _cmsAssert(io != NULL);
 
-    if (io->Read(io, &tmp, sizeof(cmsUInt32Number), 1) != 1)
+    if (io->Read(io, &tmp.integer, sizeof(cmsUInt32Number), 1) != 1)
         return FALSE;
 
     if (n != NULL) {
 
-        tmp = _cmsAdjustEndianess32(tmp);
-        *n = *(cmsFloat32Number*)(void*)&tmp;
-        
+        tmp.integer = _cmsAdjustEndianess32(tmp.integer);
+        *n = tmp.floating_point;
+
         // Safeguard which covers against absurd values
         if (*n > 1E+20 || *n < -1E+20) return FALSE;
 
@@ -305,13 +308,14 @@ cmsBool CMSEXPORT  _cmsWriteUInt32Number(cmsIOHANDLER* io, cmsUInt32Number n)
 
 cmsBool CMSEXPORT  _cmsWriteFloat32Number(cmsIOHANDLER* io, cmsFloat32Number n)
 {
-    cmsUInt32Number tmp;
+    union typeConverter {
+        cmsUInt32Number integer;
+        cmsFloat32Number floating_point;
+    } tmp;
 
-    _cmsAssert(io != NULL);
-
-    tmp = *(cmsUInt32Number*) (void*) &n;
-    tmp = _cmsAdjustEndianess32(tmp);
-    if (io -> Write(io, sizeof(cmsUInt32Number), &tmp) != 1)
+    tmp.floating_point = n;
+    tmp.integer = _cmsAdjustEndianess32(tmp.integer);
+    if (io -> Write(io, sizeof(cmsUInt32Number), &tmp.integer) != 1)
             return FALSE;
 
     return TRUE;
@@ -792,6 +796,8 @@ void* _cmsContextGetClientChunk(cmsContext ContextID, _cmsMemoryClient mc)
 // identify which plug-in to unregister.
 void CMSEXPORT cmsUnregisterPluginsTHR(cmsContext ContextID)
 {
+    struct _cmsContext_struct* ctx = _cmsGetContext(ContextID);
+
     _cmsRegisterMemHandlerPlugin(ContextID, NULL);
     _cmsRegisterInterpPlugin(ContextID, NULL);
     _cmsRegisterTagTypePlugin(ContextID, NULL);
@@ -804,6 +810,10 @@ void CMSEXPORT cmsUnregisterPluginsTHR(cmsContext ContextID)
     _cmsRegisterTransformPlugin(ContextID, NULL);    
     _cmsRegisterMutexPlugin(ContextID, NULL);
     _cmsRegisterParallelizationPlugin(ContextID, NULL);
+
+   if (ctx->MemPool != NULL)
+       _cmsSubAllocDestroy(ctx->MemPool);
+   ctx->MemPool = NULL;
 }
 
 
