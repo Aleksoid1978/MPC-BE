@@ -2461,10 +2461,6 @@ bool File_Mpeg4::BookMark_Needed()
                        continue;
              }
 
-            // TODO: correctly demux timecodes spanned accross the file
-            if (Temp->second.TimeCode && Temp->second.stco.size()>1)
-                Temp->second.stco.resize(1);
-
             if (!Temp->second.stsz.empty() || Temp->second.stsz_Sample_Size)
             {
                 if (!stco_IsDifferent)
@@ -2798,6 +2794,7 @@ bool File_Mpeg4::BookMark_Needed()
                 Element_Begin1("Priority streams");
 
                 mdat_Pos_Temp=Temp;
+                mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.push_back(Temp-&mdat_Pos[0]);
                 GoTo(Temp->Offset);
                 IsParsing_mdat_Set();
             }
@@ -2813,9 +2810,17 @@ bool File_Mpeg4::BookMark_Needed()
         Element_Begin1("Second pass");
         Element_WantNextLevel=true;
 
-        mdat_Pos_Temp=mdat_Pos_Temp_ToJump?mdat_Pos_Temp_ToJump:&mdat_Pos[0];
-        ToJump=mdat_Pos_Temp->Offset;
-        GoTo(ToJump);
+        // Don't parse twice
+        sort(mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.begin(), mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.end());
+        for (int i=mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.size()-1; i>=0; i--)
+            mdat_Pos.erase(mdat_Pos.begin()+i);
+
+        if (!mdat_Pos.empty())
+        {
+            mdat_Pos_Temp=mdat_Pos_Temp_ToJump?mdat_Pos_Temp_ToJump:&mdat_Pos[0];
+            ToJump=mdat_Pos_Temp->Offset;
+            GoTo(ToJump);
+        }
         IsParsing_mdat_Set();
         mdat_Pos_NormalParsing=true;
     }

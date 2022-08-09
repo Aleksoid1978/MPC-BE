@@ -32,6 +32,7 @@ class File_DvDif : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
+    bool   FrameIsAlwaysComplete;
     int8u  AuxToAnalyze; //Only Aux must be parsed
     bool   IgnoreAudio;
 
@@ -60,6 +61,7 @@ protected :
 
     //Buffer - Global
     #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
+    void Read_Buffer_Init();
     void Read_Buffer_Continue();
     #endif //MEDIAINFO_DVDIF_ANALYZE_YES
     void Read_Buffer_Unsynched();
@@ -222,6 +224,7 @@ protected :
     bool   REC_ST;
     bool   REC_END;
     bool   REC_IsValid;
+    std::vector<int8u> DirectionSpeed;
     struct dvdate
     {
         int8u  Days;

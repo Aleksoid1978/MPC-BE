@@ -1065,7 +1065,7 @@ void File_Adm::Streams_Fill()
     size_t TotalCount = 0;
     for (size_t i = 0; i < item_Max; i++)
         TotalCount += File_Adm_Private->Items[i].Items.size();
-    bool Full = TotalCount < 0x100 ? true : false;
+    bool Full = TotalCount < 0x1000 ? true : false;
     FILL_COUNT(audioProgramme, "Programme");
     FILL_COUNT(audioContent, "Content");
     FILL_COUNT(audioObject, "Object");

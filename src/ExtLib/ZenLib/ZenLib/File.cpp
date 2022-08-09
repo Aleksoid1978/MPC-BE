@@ -690,7 +690,8 @@ size_t File::Read (int8u* Buffer, size_t Buffer_Size_Max)
                 DWORD Buffer_Size;
                 if (ReadFile(File_Handle, Buffer, (DWORD)Buffer_Size_Max, &Buffer_Size, NULL))
                 {
-                    Position+=Buffer_Size;
+                    if (Position!=(int64u)-1)
+                        Position+=Buffer_Size;
 
                     ZENLIB_DEBUG2(      "File Read",
                                         Debug+=", new position ";Debug+=Ztring::ToZtring(Position).To_UTF8();;Debug+=", returns ";Debug+=Ztring::ToZtring((int64u)Buffer_Size).To_UTF8();)

@@ -26,9 +26,10 @@
 #endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/FileName.h"
 #include "ZenLib/BitStream_LE.h"
-#include <cmath>
-#include <cfloat>
 #include <cassert>
+#include <cfloat>
+#include <cmath>
+#include <cstdlib>
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -43,6 +44,29 @@ const char* Mpegv_colour_primaries(int8u colour_primaries);
 //***************************************************************************
 // Others, specialized, parsing
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+static const char* add_dec_cache =
+"00010203040506070809"
+"10111213141516171819"
+"20212223242526272829"
+"30313233343536373839"
+"40414243444546474849"
+"50515253545556575859"
+"60616263646566676869"
+"70717273747576777879"
+"80818283848586878889"
+"90919293949596979899";
+inline void add_dec_2chars(string& In, uint8_t Value)
+{
+    if (Value>=100)
+    {
+        auto Value100=div(Value, 100);
+        Value=(uint8_t)Value100.rem;
+        In+='0'+Value100.quot;
+    }
+    In.append(add_dec_cache+(Value<<1), 2);
+}
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
@@ -155,23 +179,69 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES) || defined(MEDIAINFO_MXF_YES)
-static const size_t DolbyVision_Profiles_Size=10;
-static const char* DolbyVision_Profiles[DolbyVision_Profiles_Size] = // dv[BL_codec_type].[number_of_layers][bit_depth][cross-compatibility]
+enum class dolbyvision_profile : uint8_t
 {
-    "dvav",
-    "dvav",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvhe",
-    "dvav",
+    dav1,
+    davc,
+    dvav,
+    dvh8,
+    dvhe,
+    max,
 };
-
-extern const size_t DolbyVision_Compatibility_Size = 7;
-extern const char* DolbyVision_Compatibility[DolbyVision_Compatibility_Size] =
+static const char DolbyVision_Profiles_Names[] = // dv[BL_codec_type].[number_of_layers][bit_depth][cross-compatibility]
+"dav1davcdvavdvh8dvhe";
+static_assert(sizeof(DolbyVision_Profiles_Names)==4*((size_t)dolbyvision_profile::max)+1, "");
+static dolbyvision_profile DolbyVision_Profiles[]=
+{
+    dolbyvision_profile::dvav,
+    dolbyvision_profile::dvav,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvhe,
+    dolbyvision_profile::dvav,
+    dolbyvision_profile::dav1,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::max,
+    dolbyvision_profile::davc,
+    dolbyvision_profile::max,
+    dolbyvision_profile::dvh8,
+};
+static const size_t DolbyVision_Profiles_Size=sizeof(DolbyVision_Profiles)/sizeof(decltype(*DolbyVision_Profiles));
+static void DolbyVision_Profiles_Append(string& Profile, int8u i)
+{
+    dolbyvision_profile j;
+    if (i>=DolbyVision_Profiles_Size)
+        j=dolbyvision_profile::max;
+    else
+        j=DolbyVision_Profiles[i];
+    if (j>=dolbyvision_profile::max)
+        return add_dec_2chars(Profile, i);
+    Profile.append(DolbyVision_Profiles_Names+((size_t)j)*4, 4);
+}
+extern const char* DolbyVision_Compatibility[] =
 {
     "",
     "HDR10",
@@ -181,6 +251,7 @@ extern const char* DolbyVision_Compatibility[DolbyVision_Compatibility_Size] =
     NULL,
     "Blu-ray",
 };
+static const size_t DolbyVision_Compatibility_Size=sizeof(DolbyVision_Compatibility)/sizeof(const char*);
 void File__Analyze::dvcC(bool has_dependency_pid, std::map<std::string, Ztring>* Infos)
 {
     Element_Name("Dolby Vision Configuration");
@@ -233,13 +304,10 @@ void File__Analyze::dvcC(bool has_dependency_pid, std::map<std::string, Ztring>*
             else
                 Fill(Stream_Video, StreamPos_Last, Video_HDR_Format_Version, Summary);
             string Profile, Level;
-            if (dv_profile<DolbyVision_Profiles_Size)
-                Profile+=DolbyVision_Profiles[dv_profile];
-            else
-                Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
-            Profile+=__T('.');
-            Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
-            Level+=Ztring().From_CC1(dv_level).To_UTF8();
+            DolbyVision_Profiles_Append(Profile, dv_profile);
+            Profile+='.';
+            add_dec_2chars(Profile, dv_profile);
+            add_dec_2chars(Level, dv_level);
             if (Infos)
             {
                 (*Infos)["HDR_Format_Profile"].From_UTF8(Profile);

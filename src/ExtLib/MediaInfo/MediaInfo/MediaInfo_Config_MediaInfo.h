@@ -162,6 +162,8 @@ public :
         bool          File_HighestFormat_Get ();
         void          File_ChannelLayout_Set(bool NewValue);
         bool          File_ChannelLayout_Get();
+        void          File_FrameIsAlwaysComplete_Set(bool NewValue) { File_FrameIsAlwaysComplete = NewValue; }
+        bool          File_FrameIsAlwaysComplete_Get() { return File_FrameIsAlwaysComplete; }
 #endif //MEDIAINFO_ADVANCED
 
     #if MEDIAINFO_DEMUX
@@ -457,6 +459,7 @@ private :
         bool                File_MergeBitRateInfo;
         bool                File_HighestFormat;
         bool                File_ChannelLayout;
+        bool                File_FrameIsAlwaysComplete;
         #if MEDIAINFO_DEMUX
             bool                File_Demux_Unpacketize_StreamLayoutChange_Skip;
         #endif //MEDIAINFO_DEMUX

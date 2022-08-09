@@ -102,6 +102,8 @@ public:
 
     void Byte_Align()
     {
+        if (endbit)
+            Get(endbit);
     };
 
     size_t Offset_Get()

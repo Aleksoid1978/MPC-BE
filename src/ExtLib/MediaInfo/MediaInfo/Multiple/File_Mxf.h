@@ -223,6 +223,7 @@ protected :
     void Dolby_PHDRMetadataTrackSubDescriptor();
     void Omneon_010201010100();
     void Omneon_010201020100();
+    void FFV1PictureSubDescriptor();
 
     //Common
     void GenerationInterchangeObject();
@@ -352,6 +353,12 @@ protected :
     void JPEG2000PictureSubDescriptor_PictureComponentSizing(); //800B
     void JPEG2000PictureSubDescriptor_CodingStyleDefault();     //
     void JPEG2000PictureSubDescriptor_QuantizationDefault();    //
+    void FFV1PictureSubDescriptor_InitializationMetadata();     //
+    void FFV1PictureSubDescriptor_IdenticalGOP();               //
+    void FFV1PictureSubDescriptor_MaxGOP();                     //
+    void FFV1PictureSubDescriptor_MaximumBitRate();             //
+    void FFV1PictureSubDescriptor_Version();                    //
+    void FFV1PictureSubDescriptor_MicroVersion();               //
     void MpegAudioDescriptor_BitRate();                         //
     void MultipleDescriptor_FileDescriptors();                  //3F01
     void PrimaryExtendedSpokenLanguage();                       //
@@ -803,6 +810,7 @@ protected :
         Ztring  ScanType;
         stream_t StreamKind;
         size_t   StreamPos;
+        File__Analyze* Parser;
         float64 SampleRate;
         float64 DisplayAspectRatio;
         int128u InstanceUID;
@@ -875,6 +883,7 @@ protected :
         {
             StreamKind=Stream_Max;
             StreamPos=(size_t)-1;
+            Parser=NULL;
             SampleRate=0;
             DisplayAspectRatio=0;
             InstanceUID.hi=(int64u)-1;
@@ -922,6 +931,10 @@ protected :
             //AudioChannelLabelSubDescriptor specific
             SoundfieldGroupLinkID.hi=(int64u)-1;
             SoundfieldGroupLinkID.lo=(int64u)-1;
+        }
+        ~descriptor()
+        {
+            delete Parser;
         }
 		bool Is_Interlaced() const
         {
@@ -1175,6 +1188,7 @@ protected :
     void           ChooseParser_SmpteSt0337(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Jpeg2000(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_ProRes(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
+    void           ChooseParser_Ffv1(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_DolbyVisionFrameData(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Iab(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
 

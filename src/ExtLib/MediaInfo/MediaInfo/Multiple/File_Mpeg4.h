@@ -638,6 +638,7 @@ private :
     mdat_Pos_Type* mdat_Pos_Temp_ToJump;
     mdat_Pos_Type* mdat_Pos_Max;
     std::vector<int32u> mdat_Pos_ToParseInPriority_StreamIDs;
+    std::vector<size_t> mdat_Pos_ToParseInPriority_StreamIDs_ToRemove;
     bool                mdat_Pos_NormalParsing;
     void Skip_NulString(const char* Name);
 

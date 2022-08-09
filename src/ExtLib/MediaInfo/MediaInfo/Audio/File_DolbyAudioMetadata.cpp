@@ -499,42 +499,89 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Supplemental_Metadata_Segment()
 //---------------------------------------------------------------------------
 void File_DolbyAudioMetadata::Merge(File__Analyze& In, size_t StreamPos)
 {
-    int64u NumberOfTrackFormats=In.Retrieve_Const(Stream_Audio, 0, "NumberOfTrackFormats").To_int64u();
-    if (NumberOfTrackFormats && NumberOfTrackFormats!=BinauralRenderModes.size())
-        return;
-    for (size_t i=0; i<BinauralRenderModes.size(); i++)
+    const auto& FirstFrameOfAction=In.Retrieve_Const(Stream_Audio, 0, "Dolby_Atmos_Metadata FirstFrameOfAction");
+    if (!FirstFrameOfAction.empty())
     {
-        string Name="TrackFormat"+Ztring::ToZtring(i).To_UTF8();
-        if (!NumberOfTrackFormats)
-            In.Fill(Stream_Audio, 0, Name.c_str(), "Yes");
-        Name+=" BinauralRenderMode";
-        int8u binaural_render_mode=BinauralRenderModes[i];
-        In.Fill(Stream_Audio, 0, Name.c_str(), binaural_render_mode<binaural_render_mode_Name_Size?binaural_render_mode_Name[binaural_render_mode]:Ztring().ToZtring(binaural_render_mode).To_UTF8().c_str());
+        TimeCode TC(FirstFrameOfAction.To_UTF8());
+        const auto& Start=In.Retrieve_Const(Stream_Audio, 0, "Programme0 Start");
+        if (!Start.empty())
+        {
+            TimeCode TC2(Start.To_UTF8());
+            TC+=TC2;
+        }
+        auto FramesPerSecond=In.Retrieve_Const(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate").To_int64u();
+        auto DropFrame=In.Retrieve_Const(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate_DropFrame")==__T("Yes");
+        if (FramesPerSecond)
+        {
+            TimeCode TC_Frames(0, FramesPerSecond-1, DropFrame);
+            TC_Frames+=TC;
+            if (TC_Frames.ToMilliseconds()<TC.ToMilliseconds())
+            {
+                TC_Frames++;
+                string Warning("First frame of action ");
+                Warning+=TC.ToString();
+                Warning+=" has been rounded to nearest frame ";
+                Warning+=TC_Frames.ToString();
+                In.Fill(Stream_Audio, 0, "Warning", Warning);
+            }
+            TC=TC_Frames;
+        }
+        In.Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata FirstFrameOfAction", TC.ToString(), false, true);
     }
-        
+
+    if (BinauralRenderModes.empty())
+        return;
+
+    auto TransportEmpty = In.Retrieve_Const(Stream_Audio, 0, "Transport0").empty();
+    ZtringList TrackUID_Pos;
+    TrackUID_Pos.Separator_Set(0, " + ");
+    static const auto BinauralRenderMode_String=" BinauralRenderMode";
+    static const auto LinkedTo_TrackUID_Pos_String=" LinkedTo_TrackUID_Pos";
+    static const auto TrackUID_String="TrackUID";
+
+    for (size_t TrackIndex=0; TrackIndex<BinauralRenderModes.size(); TrackIndex++)
+    {
+        if (TransportEmpty)
+            TrackUID_Pos.Write(Ztring().From_Number(TrackIndex)); // Fallback
+        else
+        {
+            TrackUID_Pos.Write(In.Retrieve_Const(Stream_Audio, 0, ("Transport0 TrackIndex"+to_string(TrackIndex)+LinkedTo_TrackUID_Pos_String).c_str()));
+            if (TrackUID_Pos.empty())
+                TrackUID_Pos.Write(Ztring().From_Number(TrackIndex)); // Fallback
+        }
+        auto binaural_render_mode=BinauralRenderModes[TrackIndex];
+        auto BinauralRenderMode=binaural_render_mode<binaural_render_mode_Name_Size?Ztring().From_UTF8(binaural_render_mode_Name[binaural_render_mode]):Ztring().ToZtring(binaural_render_mode).To_UTF8().c_str();
+        for (const auto& Pos : TrackUID_Pos)
+        {
+            string Name=TrackUID_String+Pos.To_UTF8();
+            auto PosI=(size_t)Pos.To_int64u();
+            Name+=BinauralRenderMode_String;
+            In.Fill(Stream_Audio, 0, Name.c_str(), BinauralRenderMode);
+        }
+    }
+
     int64u NumberOfObjects=In.Retrieve_Const(Stream_Audio, 0, "NumberOfObjects").To_int64u();
     for (size_t i=0; i<NumberOfObjects; i++)
     {
         string Name="Object"+Ztring::ToZtring(i).To_UTF8();
-        Ztring LinkedTos=In.Retrieve_Const(Stream_Audio, 0, (Name+" LinkedTo_TrackUID_Pos").c_str());
+        const Ztring& LinkedTos=In.Retrieve_Const(Stream_Audio, 0, (Name+LinkedTo_TrackUID_Pos_String).c_str());
         ZtringList LinkedToList;
         LinkedToList.Separator_Set(0, " + ");
         LinkedToList.Write(LinkedTos);
-        Name+=" BinauralRenderMode";
-        ZtringList BinauralRenderMode;
-        set<int8u> BinauralRenderMode_Diffs;
-        BinauralRenderMode.Separator_Set(0, " + ");
+        Name+=BinauralRenderMode_String;
+        ZtringList BinauralRenderModes;
+        set<Ztring> BinauralRenderMode_Diffs;
+        BinauralRenderModes.Separator_Set(0, " + ");
         for (size_t i=0; i<LinkedToList.size(); i++)
         {
-            const Ztring& LinkedTo=LinkedToList[i];
-            int64u TrackUID_Pos=LinkedTo.To_int64u();
-            int8u binaural_render_mode=BinauralRenderModes[TrackUID_Pos];
-            BinauralRenderMode.push_back(binaural_render_mode<binaural_render_mode_Name_Size?binaural_render_mode_Name[binaural_render_mode]:Ztring().ToZtring(binaural_render_mode).To_UTF8().c_str());
-            BinauralRenderMode_Diffs.insert(binaural_render_mode);
+            const auto& LinkedTo=LinkedToList[i].To_UTF8();
+            const Ztring& BinauralRenderMode=In.Retrieve_Const(Stream_Audio, 0, (TrackUID_String+LinkedTo+BinauralRenderMode_String).c_str());
+            BinauralRenderModes.push_back(BinauralRenderMode);
+            BinauralRenderMode_Diffs.insert(BinauralRenderMode);
         }
         if (BinauralRenderMode_Diffs.size()==1)
-            BinauralRenderMode.resize(1);
-        In.Fill(Stream_Audio, 0, Name.c_str(), BinauralRenderMode.Read());
+            BinauralRenderModes.resize(1);
+        In.Fill(Stream_Audio, 0, Name.c_str(), BinauralRenderModes.Read());
     }
 }
 

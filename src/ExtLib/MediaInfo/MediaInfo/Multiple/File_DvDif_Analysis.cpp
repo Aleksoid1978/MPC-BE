@@ -40,15 +40,20 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_DvDif::Read_Buffer_Init()
+{
+    Analyze_Activated=Config->File_DvDif_Analysis_Get();
+    if (!IsSub)
+        FrameIsAlwaysComplete=Config->File_FrameIsAlwaysComplete_Get();
+    else
+        FrameIsAlwaysComplete=false;
+}
+
+//---------------------------------------------------------------------------
 void File_DvDif::Read_Buffer_Continue()
 {
     if (!Analyze_Activated)
-    {
-        if (Config->File_DvDif_Analysis_Get())
-            Analyze_Activated=true;
-        else
-            return;
-    }
+        return;
 
     #if MEDIAINFO_DEMUX
         if (Demux_UnpacketizeContainer && !Synchro_Manage()) // We need to manage manually synchronization in case of demux
@@ -85,7 +90,11 @@ void File_DvDif::Read_Buffer_Continue()
                                 if ((Buffer[Buffer_Offset+1]&0x04)==0x04) //FSP=1
                                 {
                                     //Errors stats update
-                                    if (Speed_FrameCount_StartOffset!=(int64u)-1)
+                                    if (Speed_FrameCount_StartOffset!=(int64u)-1
+                                        #if MEDIAINFO_ADVANCED
+                                         && !FrameIsAlwaysComplete
+                                        #endif
+                                    )
                                         Errors_Stats_Update();
                                     Speed_FrameCount_StartOffset=File_Offset+Buffer_Offset;
 
@@ -142,7 +151,7 @@ void File_DvDif::Read_Buffer_Continue()
                         //Try to find a suitable and trustable Abst
                         if (Speed_FrameCount_StartOffset==-1)
                             Speed_FrameCount_StartOffset=0;
-                        int32s Abst_First;
+                        int32s Abst_First=INT_MAX;
                         int32s Abst_Previous=(AbstBf_Previous>>1)&0x7FFFFF;
                         int32s Abst_Theory_Max=Abst_Previous+(DSF?12:10)*(FSC_WasSet?2:1)*2; //Max 2x the expected gap
                         for (int i=0; i<2; i++)
@@ -510,6 +519,8 @@ void File_DvDif::Read_Buffer_Continue()
                         REC_END=(Buffer[Buffer_Offset+3+2]&0x40)?true:false;
                         REC_IsValid=true;
                         Coherency_Flags.set(Coherency_audio_control);
+
+                        DirectionSpeed.push_back(Buffer[Buffer_Offset+3+3]);
                     }
 
                     //audio_recdate
@@ -694,6 +705,11 @@ void File_DvDif::Read_Buffer_Continue()
     if (!Status[IsAccepted])
         File__Analyze::Buffer_Offset=0;
     Config->State_Set(((float)File_Offset)/File_Size);
+    #if MEDIAINFO_ADVANCED
+        if (FrameIsAlwaysComplete && Speed_FrameCount_StartOffset!=(int64u)-1)
+            Errors_Stats_Update();
+    #endif
+    SCT_Old=4; // For sync
 }
 
 void File_DvDif::Errors_Stats_Update()
@@ -1839,6 +1855,17 @@ void File_DvDif::Errors_Stats_Update()
                 Event1.Audio_Data_Errors_Count=16;
                 Event1.Audio_Data_Errors=Audio_Errors_PerDseq;
             }
+            if (!DirectionSpeed.empty())
+            {
+                if (!MoreData)
+                    MoreData=new int8u[4096]+sizeof(size_t); // TODO: more dynamic allocation
+                MoreData[MoreData_Offset++]=DirectionSpeed.size();
+                MoreData[MoreData_Offset++]=2; // DirectionSpeed values
+                for (std::vector<int8u>::iterator DirectionSpeed_Item=DirectionSpeed.begin(); DirectionSpeed_Item!=DirectionSpeed.end(); ++DirectionSpeed_Item)
+                {
+                    MoreData[MoreData_Offset++]=*DirectionSpeed_Item;
+                }
+            }
             Event1.Captions_Errors=Captions_Flags[1]?1:0;
             Captions_Flags.reset(1);
             Event1.Coherency_Flags=(Coherency_Flags[Coherency_PackInSub]?0:(1<<0))
@@ -1957,6 +1984,7 @@ void File_DvDif::Errors_Stats_Update()
     Speed_FrameCount++;
     Speed_FrameCount_system[system]++;
     REC_IsValid=false;
+    DirectionSpeed.clear();
     audio_source_mode.clear();
     Speed_Contains_NULL=0;
     Video_STA_Errors.clear();

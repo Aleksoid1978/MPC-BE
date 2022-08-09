@@ -38,6 +38,8 @@ Added the ability to offline install previously downloaded components.
 Updated libraries:
 	dav1d git-1.0.0-45-ga029d68;
 	Little-CMS git-lcms2.13.1-57-gd12e8f6;
+	MediaInfo git-v22.06-10-g62322b871;
+	ZenLib git-v0.4.39-12-gde2787a;
 
 1.6.3
 =============================

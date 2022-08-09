@@ -36,6 +36,9 @@
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
+#if defined(MEDIAINFO_FFV1_YES)
+    #include "MediaInfo/Video/File_Ffv1.h"
+#endif
 #if defined(MEDIAINFO_MPEG4V_YES)
     #include "MediaInfo/Video/File_Mpeg4v.h"
 #endif
@@ -279,6 +282,14 @@ namespace Elements
     UUID(060E2B34, 01010105, 04010606, 01110000, 0000, "SMPTE ST 381-3", AVCDescriptor_PictureParameterSetFlag, "")
     UUID(060E2B34, 01010105, 04010606, 01140000, 0000, "SMPTE ST 381-3", AVCDescriptor_AverageBitRate, "")
 
+    //                             0C - FFV1 Parameters
+    UUID(060E2B34, 01010105, 0401060C, 01000000, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor_InitializationMetadata, "InitializationMetadata")
+    UUID(060E2B34, 01010105, 0401060C, 02000000, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor_IdenticalGOP, "IdenticalGOP")
+    UUID(060E2B34, 01010105, 0401060C, 03000000, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor_MaxGOP, "MaxGOP")
+    UUID(060E2B34, 01010105, 0401060C, 04000000, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor_MaximumBitRate, "MaximumBitRate")
+    UUID(060E2B34, 01010105, 0401060C, 05000000, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor_Version, "Version")
+    UUID(060E2B34, 01010105, 0401060C, 06000000, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor_MicroVersion, "MicroVersion")
+
     //                         02 - Audio Essence Characteristics
     //                           04 - Audio Compression Parameters
     //                             03 - MPEG Coding Parameters
@@ -375,6 +386,7 @@ namespace Elements
     UUID(060E2B34, 02530101, 0D010101, 01016E00, 0000, "SMPTE ST 381-3", AVCSubDescriptor, "AVC Sub-Descriptor")
     UUID(060E2B34, 02530101, 0D010101, 01017B00, 0000, "SMPTE ST 207-201", IABEssenceDescriptor, "IAB Essence Descriptor")
     UUID(060E2B34, 02530101, 0D010101, 01017C00, 0000, "SMPTE ST 207-201", IABSoundfieldLabelSubDescriptor, "IAB Soundfield Label SubDescriptor")
+    UUID(060E2B34, 02530101, 0D010101, 01018103, 0000, "RDD 48 Amd1", FFV1PictureSubDescriptor, "FFV1 Picture Sub-Descriptor")
 
     //                           02 - MXF File Structure
     //                             01 - Version 1
@@ -708,6 +720,8 @@ static const char* Mxf_EssenceElement(const int128u EssenceElement)
                         case 0x07 : return "MPEG stream (Custom)";
                         case 0x08 : return "JPEG 2000";
                         case 0x17 : return "ProRes";
+                        case 0x1D :
+                        case 0x1E : return "FFV1";
                         default   : return "Unknown stream";
                     }
         case 0x16 : //GC Sound
@@ -784,6 +798,7 @@ static const char* Mxf_EssenceContainer(const int128u EssenceContainer)
                                                                                         case 0x13 : return "Timed Text";
                                                                                         case 0x1C : return "ProRes";
                                                                                         case 0x1D : return "IAB";
+                                                                                        case 0x23 : return "FFV1";
                                                                                         default   : return "";
                                                                                     }
                                                                         default   : return "";
@@ -939,6 +954,13 @@ static const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u 
                         case 0x01 : return "Clip";
                         default   : return "";
                     }
+        case 0x23 : //FFV1
+                    switch (Code7)
+                    {
+                        case 0x01 : return "Frame";
+                        case 0x02 : return "Clip";
+                        default   : return "";
+                    }
         default   : return "";
     }
 }
@@ -1012,6 +1034,7 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
                                                                                     {
                                                                                         case 0x01 : return "JPEG 2000";
                                                                                         case 0x06 : return "ProRes";
+                                                                                        case 0x09 : return "FFV1";
                                                                                         default   : return "";
                                                                                     }
                                                                         case 0x71 : return "VC-3";
@@ -6139,6 +6162,7 @@ void File_Mxf::Data_Parse()
     ELEMENT(Dolby_PHDRMetadataTrackSubDescriptor,               "Dolby PHDRMetadataTrackSubDescriptor")
     ELEMENT(Omneon_010201010100,                                "Omneon .01.02.01.01.01.00")
     ELEMENT(Omneon_010201020100,                                "Omneon .01.02.01.02.01.00")
+    ELEMENT(FFV1PictureSubDescriptor,                           "FFV1 Picture Sub-Descriptor")
     else if (Code_Compare1==Elements::GenericContainer_Aaf1
           && ((Code_Compare2)&0xFFFFFF00)==(Elements::GenericContainer_Aaf2&0xFFFFFF00)
           && (Code_Compare3==Elements::GenericContainer_Aaf3
@@ -7225,6 +7249,30 @@ void File_Mxf::JPEG2000PictureSubDescriptor()
             ELEMENT_UUID(JPEG2000PictureSubDescriptor_PictureComponentSizing, "Picture Component Sizing")
             ELEMENT_UUID(JPEG2000PictureSubDescriptor_CodingStyleDefault, "Coding Style Default")
             ELEMENT_UUID(JPEG2000PictureSubDescriptor_QuantizationDefault, "Quantization Default")
+        }
+    }
+
+    GenerationInterchangeObject();
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::FFV1PictureSubDescriptor()
+{
+    {
+        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
+        if (Primer_Value!=Primer_Values.end())
+        {
+            int32u Code_Compare1=Primer_Value->second.hi>>32;
+            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
+            int32u Code_Compare3=Primer_Value->second.lo>>32;
+            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
+            if(0);
+            ELEMENT_UUID(FFV1PictureSubDescriptor_InitializationMetadata, "Initialization Metadata")
+            ELEMENT_UUID(FFV1PictureSubDescriptor_IdenticalGOP, "Identical GOP")
+            ELEMENT_UUID(FFV1PictureSubDescriptor_MaxGOP, "Max GOP")
+            ELEMENT_UUID(FFV1PictureSubDescriptor_MaximumBitRate, "Maximum bit rate")
+            ELEMENT_UUID(FFV1PictureSubDescriptor_Version, "Version")
+            ELEMENT_UUID(FFV1PictureSubDescriptor_MicroVersion, "Micro version")
         }
     }
 
@@ -9543,6 +9591,7 @@ void File_Mxf::InterchangeObject_InstanceUID()
             std::map<std::string, Ztring> Infos_Temp=Descriptors[InstanceUID].Infos; //Quick method for copying the whole descriptor without erasing the modifications made by Descriptor_Fill(). TODO: a better method in order to be more generic
             Descriptors[InstanceUID]=Descriptor->second;
             Descriptors[InstanceUID].Infos=Infos_Temp;
+            Descriptor->second.Parser=nullptr; //TODO: safer move from one key to another
             Descriptors.erase(Descriptor);
         }
         locators::iterator Locator=Locators.find(0);
@@ -10702,6 +10751,58 @@ void File_Mxf::JPEG2000PictureSubDescriptor_CodingStyleDefault()
 void File_Mxf::JPEG2000PictureSubDescriptor_QuantizationDefault()
 {
     Skip_XX(Length2,                                            "Data");
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::FFV1PictureSubDescriptor_InitializationMetadata()
+{
+    #if defined(MEDIAINFO_FFV1_YES)
+        File_Ffv1* Parser=new File_Ffv1;
+        Open_Buffer_Init(Parser);
+        Open_Buffer_OutOfBand(Parser);
+        
+        descriptor& Descriptor=Descriptors[InstanceUID];
+        delete Descriptor.Parser;
+        Descriptor.Parser=Parser;
+    #else
+        Skip_XX(Element_Size,                                   "Data");
+    #endif
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::FFV1PictureSubDescriptor_IdenticalGOP()
+{
+    Skip_B1(                                                    "Data");
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::FFV1PictureSubDescriptor_MaxGOP()
+{
+    Skip_B2(                                                    "Data");
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::FFV1PictureSubDescriptor_MaximumBitRate()
+{
+    Skip_B4(                                                    "Data");
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::FFV1PictureSubDescriptor_Version()
+{
+    Skip_B2(                                                    "Data");
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::FFV1PictureSubDescriptor_MicroVersion()
+{
+    Skip_B2(                                                    "Data");
 }
 
 //---------------------------------------------------------------------------
@@ -15597,9 +15698,22 @@ void File_Mxf::Info_UL_040101_Values()
                                                     Skip_B1(    "Profile");
                                                     Skip_B1(    "Unused");
                                                     break;
+                                                case 0x09 :
+                                                    Param_Info1("FFV1");
+                                                    Info_B1(Version,"Version"); Param_Info1(Version-1);
+                                                    Skip_B1(    "Unused");
+                                                    break;
                                                 default   :
                                                     Skip_B2(    "Unknown");
                                             }
+                                            }
+                                            break;
+                                        case 0x04 :
+                                            {
+                                            Param_Info1("FFV1");
+                                            Skip_B1(    "Version");
+                                            Skip_B1(    "Unused");
+                                            Skip_B1(    "Unused");
                                             }
                                             break;
                                         case 0x71 :
@@ -16041,6 +16155,13 @@ void File_Mxf::Info_UL_040101_Values()
                                                     Param_Info1("ProRes");
                                                     Info_B1(Code7,      "Content Kind"); Param_Info1(Mxf_EssenceContainer_Mapping(Code6, Code7, 0xFF));
                                                     Skip_B1(            "Unknown");
+                                                    }
+                                                    break;
+                                                case 0x1E :
+                                                    {
+                                                    Param_Info1("FFV1");
+                                                    Info_B1(Code7,      "Content Kind"); Param_Info1(Mxf_EssenceContainer_Mapping(Code6, Code7, 0xFF));
+                                                    Skip_B1(            "Reserved");
                                                     }
                                                     break;
                                                 case 0x7F :
@@ -16991,6 +17112,10 @@ void File_Mxf::ChooseParser__Aaf_GC_Picture(const essences::iterator &Essence, c
         case 0x17 : //ProRes
                     ChooseParser_ProRes(Essence, Descriptor);
                     break;
+        case 0x1D : //FFV1 (Frame)
+        case 0x1E : //FFV1 (Clip)
+                    ChooseParser_Ffv1(Essence, Descriptor);
+                    break;
         default   : //Unknown
                     ;
     }
@@ -17667,6 +17792,49 @@ void File_Mxf::ChooseParser_ProRes(const essences::iterator &Essence, const desc
         Parser->Fill(Stream_Video, 0, Video_Format, "ProRes");
     #endif
     Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_Ffv1(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
+{
+    Essence->second.StreamKind=Stream_Video;
+
+    //Filling
+    #if defined(MEDIAINFO_FFV1_YES)
+        File__Analyze* Parser=NULL;
+        if (Descriptor->second.Parser)
+        {
+            Essence->second.Parsers.push_back(Descriptor->second.Parser);
+            Descriptor->second.Parser=NULL;
+        }
+        else
+        {
+            for (size_t i=0; i<Descriptor->second.SubDescriptors.size(); i++)
+            {
+                descriptors::iterator Sub=Descriptors.find(Descriptor->second.SubDescriptors[i]);
+                if (Sub!=Descriptors.end() && Sub->second.Parser)
+                {
+                    Essence->second.Parsers.push_back(Sub->second.Parser);
+                    Sub->second.Parser=NULL;
+                }
+            }
+        }
+        if (Essence->second.Parsers.empty())
+            Essence->second.Parsers.push_back(new File_Ffv1);
+        for (size_t i=0; i<Essence->second.Parsers.size(); i++)
+        {
+            File_Ffv1* Parser=(File_Ffv1*)Essence->second.Parsers[i]; // TODO
+            Parser->Width=Descriptor->second.Width;
+            Parser->Height=Descriptor->second.Height;
+        }
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Video);
+        Parser->Fill(Stream_Video, 0, Video_Format, "FFV1");
+        Essence->second.Parsers.push_back(Parser);
+    #endif
 }
 
 //---------------------------------------------------------------------------
