@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "config.h"
 #include "libavutil/avassert.h"
@@ -152,6 +152,7 @@ void ff_acelp_filter_init(ACELPFContext *c)
     c->acelp_interpolatef                      = ff_acelp_interpolatef;
     c->acelp_apply_order_2_transfer_function   = ff_acelp_apply_order_2_transfer_function;
 
-    if(HAVE_MIPSFPU)
-        ff_acelp_filter_init_mips(c);
+#if HAVE_MIPSFPU
+    ff_acelp_filter_init_mips(c);
+#endif
 }

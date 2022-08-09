@@ -21,7 +21,7 @@
 #include "libavutil/common.h"
 #include "mpegvideodsp.h"
 
-static void gmc1_c(uint8_t *dst, uint8_t *src, int stride, int h,
+static void gmc1_c(uint8_t *dst, const uint8_t *src, int stride, int h,
                    int x16, int y16, int rounder)
 {
     const int A = (16 - x16) * (16 - y16);
@@ -44,7 +44,7 @@ static void gmc1_c(uint8_t *dst, uint8_t *src, int stride, int h,
     }
 }
 
-void ff_gmc_c(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
+void ff_gmc_c(uint8_t *dst, const uint8_t *src, int stride, int h, int ox, int oy,
               int dxx, int dxy, int dyx, int dyy, int shift, int r,
               int width, int height)
 {
@@ -112,8 +112,9 @@ av_cold void ff_mpegvideodsp_init(MpegVideoDSPContext *c)
     c->gmc1 = gmc1_c;
     c->gmc  = ff_gmc_c;
 
-    if (ARCH_PPC)
-        ff_mpegvideodsp_init_ppc(c);
-    if (ARCH_X86)
-        ff_mpegvideodsp_init_x86(c);
+#if ARCH_PPC
+    ff_mpegvideodsp_init_ppc(c);
+#elif ARCH_X86
+    ff_mpegvideodsp_init_x86(c);
+#endif
 }

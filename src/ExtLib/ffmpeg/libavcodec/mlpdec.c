@@ -220,7 +220,7 @@ static VLC huff_vlc[3];
 static av_cold void init_static(void)
 {
     for (int i = 0; i < 3; i++) {
-        static VLC_TYPE vlc_buf[3 * VLC_STATIC_SIZE][2];
+        static VLCElem vlc_buf[3 * VLC_STATIC_SIZE];
         huff_vlc[i].table           = &vlc_buf[i * VLC_STATIC_SIZE];
         huff_vlc[i].table_allocated = VLC_STATIC_SIZE;
         init_vlc(&huff_vlc[i], VLC_BITS, 18,
@@ -1427,7 +1427,6 @@ const FFCodec ff_mlp_decoder = {
     FF_CODEC_DECODE_CB(read_access_unit),
     .flush          = mlp_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif
 #if CONFIG_TRUEHD_DECODER
@@ -1442,6 +1441,5 @@ const FFCodec ff_truehd_decoder = {
     FF_CODEC_DECODE_CB(read_access_unit),
     .flush          = mlp_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif /* CONFIG_TRUEHD_DECODER */

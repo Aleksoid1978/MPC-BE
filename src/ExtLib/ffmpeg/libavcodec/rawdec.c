@@ -234,7 +234,7 @@ static int raw_decode(AVCodecContext *avctx, AVFrame *frame,
         return res;
 
     frame->pkt_pos      = avctx->internal->last_pkt_props->pos;
-    frame->pkt_duration = avctx->internal->last_pkt_props->duration;
+    frame->duration     = avctx->internal->last_pkt_props->duration;
 
     if (context->tff >= 0) {
         frame->interlaced_frame = 1;
@@ -491,5 +491,4 @@ const FFCodec ff_rawvideo_decoder = {
     FF_CODEC_DECODE_CB(raw_decode),
     .p.priv_class   = &rawdec_class,
     .p.capabilities = AV_CODEC_CAP_PARAM_CHANGE,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

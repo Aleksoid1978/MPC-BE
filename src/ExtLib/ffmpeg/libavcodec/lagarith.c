@@ -409,6 +409,9 @@ output_zeros:
         if (zero_run) {
             zero_run = 0;
             i += esc_count;
+            if (i >  end - dst ||
+                i >= src_end - src)
+                return AVERROR_INVALIDDATA;
             memcpy(dst, src, i);
             dst += i;
             l->zeros_rem = lag_calc_zero_run(src[i]);
@@ -734,5 +737,4 @@ const FFCodec ff_lagarith_decoder = {
     .init           = lag_decode_init,
     FF_CODEC_DECODE_CB(lag_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

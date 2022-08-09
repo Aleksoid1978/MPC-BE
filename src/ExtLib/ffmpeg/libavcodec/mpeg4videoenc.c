@@ -639,7 +639,7 @@ void ff_mpeg4_encode_mb(MpegEncContext *s, int16_t block[6][64],
                 if (s->max_b_frames > 0) {
                     int i;
                     int x, y, offset;
-                    uint8_t *p_pic;
+                    const uint8_t *p_pic;
 
                     x = s->mb_x * 16;
                     y = s->mb_y * 16;
@@ -649,7 +649,7 @@ void ff_mpeg4_encode_mb(MpegEncContext *s, int16_t block[6][64],
 
                     s->mb_skipped = 1;
                     for (i = 0; i < s->max_b_frames; i++) {
-                        uint8_t *b_pic;
+                        const uint8_t *b_pic;
                         int diff;
                         Picture *pic = s->reordered_input_picture[i + 1];
 
@@ -1081,8 +1081,8 @@ int ff_mpeg4_encode_picture_header(MpegEncContext *s, int picture_number)
     time_mod  = FFUMOD(s->time, s->avctx->time_base.den);
     time_incr = time_div - s->last_time_base;
 
-    // This limits the frame duration to max 1 hour
-    if (time_incr > 3600) {
+    // This limits the frame duration to max 1 day
+    if (time_incr > 3600*24) {
         av_log(s->avctx, AV_LOG_ERROR, "time_incr %"PRIu64" too large\n", time_incr);
         return AVERROR(EINVAL);
     }
@@ -1402,6 +1402,6 @@ const FFCodec ff_mpeg4_encoder = {
     .close          = ff_mpv_encode_end,
     .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.priv_class   = &mpeg4enc_class,
 };

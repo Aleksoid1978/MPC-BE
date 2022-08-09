@@ -81,7 +81,7 @@ static int rv34_decode_mv(RV34DecContext *r, int block_type);
  * @{
  */
 
-static VLC_TYPE table_data[117592][2];
+static VLCElem table_data[117592];
 
 /**
  * Generate VLC from codeword lengths.
@@ -703,7 +703,7 @@ static inline void rv34_mc(RV34DecContext *r, const int block_type,
     if (HAVE_THREADS && (s->avctx->active_thread_type & FF_THREAD_FRAME)) {
         /* wait for the referenced mb row to be finished */
         int mb_row = s->mb_y + ((yoff + my + 5 + 8 * height) >> 4);
-        ThreadFrame *f = dir ? &s->next_picture_ptr->tf : &s->last_picture_ptr->tf;
+        const ThreadFrame *f = dir ? &s->next_picture_ptr->tf : &s->last_picture_ptr->tf;
         ff_thread_await_progress(f, mb_row, 0);
     }
 
@@ -1445,7 +1445,7 @@ static int rv34_decode_slice(RV34DecContext *r, int end, const uint8_t* buf, int
 
     ff_init_block_index(s);
     while(!check_slice_end(r, s)) {
-        ff_update_block_index(s);
+        ff_update_block_index(s, 8, 0, 1);
 
         if(r->si.type)
             res = rv34_decode_inter_macroblock(r, r->intra_types + s->mb_x * 4 + 4);

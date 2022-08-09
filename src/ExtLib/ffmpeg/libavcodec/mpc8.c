@@ -92,7 +92,7 @@ static av_cold void build_vlc(VLC *vlc, unsigned *buf_offset,
                               const uint8_t codes_counts[16],
                               const uint8_t **syms, int offset)
 {
-    static VLC_TYPE vlc_buf[9296][2];
+    static VLCElem vlc_buf[9296];
     uint8_t len[MPC8_MAX_VLC_SIZE];
     unsigned num = 0;
 
@@ -395,5 +395,4 @@ const FFCodec ff_mpc8_decoder = {
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

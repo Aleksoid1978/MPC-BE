@@ -151,7 +151,7 @@ static int dcadec_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                                int *got_frame_ptr, AVPacket *avpkt)
 {
     DCAContext *s = avctx->priv_data;
-    uint8_t *input = avpkt->data;
+    const uint8_t *input = avpkt->data;
     int input_size = avpkt->size;
     int i, ret, prev_packet = s->packet;
     uint32_t mrk;
@@ -425,5 +425,5 @@ const FFCodec ff_dca_decoder = {
                                                       AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE },
     .p.priv_class   = &dcadec_class,
     .p.profiles     = NULL_IF_CONFIG_SMALL(ff_dca_profiles),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

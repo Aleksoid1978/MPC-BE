@@ -232,6 +232,16 @@ typedef struct RcOverride{
  */
 #define AV_CODEC_FLAG_DROPCHANGED     (1 <<  5)
 /**
+ * Request the encoder to output reconstructed frames, i.e. frames that would be
+ * produced by decoding the encoded bistream. These frames may be retrieved by
+ * calling avcodec_receive_frame() immediately after a successful call to
+ * avcodec_receive_packet().
+ *
+ * Should only be used with encoders flagged with the
+ * AV_CODEC_CAP_ENCODER_RECON_FRAME capability.
+ */
+#define AV_CODEC_FLAG_RECON_FRAME     (1 <<  6)
+/**
  * Use internal 2pass ratecontrol in first pass mode.
  */
 #define AV_CODEC_FLAG_PASS1           (1 <<  9)
@@ -331,13 +341,12 @@ typedef struct RcOverride{
  * Do not reset ASS ReadOrder field on flush (subtitles decoding)
  */
 #define AV_CODEC_FLAG2_RO_FLUSH_NOOP  (1 << 30)
-
-/* Unsupported options :
- *              Syntax Arithmetic coding (SAC)
- *              Reference Picture Selection
- *              Independent Segment Decoding */
-/* /Fx */
-/* codec capabilities */
+/**
+ * Generate/parse ICC profiles on encode/decode, as appropriate for the type of
+ * file. No effect on codecs which cannot contain embedded ICC profiles, or
+ * when compiled without support for lcms2.
+ */
+#define AV_CODEC_FLAG2_ICC_PROFILES   (1U << 31)
 
 /* Exported side data.
    These flags can be passed in AVCodecContext.export_side_data before initialization.
@@ -1518,7 +1527,6 @@ typedef struct AVCodecContext {
      * It will return only after finishing all tasks.
      * The user may replace this with some multithreaded implementation,
      * the default implementation will execute the parts serially.
-     * Also see avcodec_thread_init and e.g. the --enable-pthread configure option.
      * @param c context passed also to func
      * @param count the number of things to execute
      * @param arg2 argument passed unchanged to func
@@ -2596,21 +2604,23 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
 int avcodec_send_packet(AVCodecContext *avctx, const AVPacket *avpkt);
 
 /**
- * Return decoded output data from a decoder.
+ * Return decoded output data from a decoder or encoder (when the
+ * AV_CODEC_FLAG_RECON_FRAME flag is used).
  *
  * @param avctx codec context
  * @param frame This will be set to a reference-counted video or audio
  *              frame (depending on the decoder type) allocated by the
- *              decoder. Note that the function will always call
+ *              codec. Note that the function will always call
  *              av_frame_unref(frame) before doing anything else.
  *
  * @return
  *      0:                 success, a frame was returned
  *      AVERROR(EAGAIN):   output is not available in this state - user must try
  *                         to send new input
- *      AVERROR_EOF:       the decoder has been fully flushed, and there will be
+ *      AVERROR_EOF:       the codec has been fully flushed, and there will be
  *                         no more output frames
- *      AVERROR(EINVAL):   codec not opened, or it is an encoder
+ *      AVERROR(EINVAL):   codec not opened, or it is an encoder without
+ *                         the AV_CODEC_FLAG_RECON_FRAME flag enabled
  *      AVERROR_INPUT_CHANGED:   current decoded frame has changed parameters
  *                               with respect to first decoded frame. Applicable
  *                               when flag AV_CODEC_FLAG_DROPCHANGED is set.

@@ -258,7 +258,8 @@ static int decode_slice(MpegEncContext *s)
         for (; s->mb_x < s->mb_width; s->mb_x++) {
             int ret;
 
-            ff_update_block_index(s);
+            ff_update_block_index(s, s->avctx->bits_per_raw_sample,
+                                  s->avctx->lowres, s->chroma_x_shift);
 
             if (s->resync_mb_x == s->mb_x && s->resync_mb_y + 1 == s->mb_y)
                 s->first_slice_line = 0;
@@ -501,7 +502,7 @@ retry:
     /* let's go :-) */
     if (CONFIG_WMV2_DECODER && s->msmpeg4_version == 5) {
         ret = ff_wmv2_decode_picture_header(s);
-    } else if (CONFIG_MSMPEG4_DECODER && s->msmpeg4_version) {
+    } else if (CONFIG_MSMPEG4DEC && s->msmpeg4_version) {
         ret = ff_msmpeg4_decode_picture_header(s);
     } else if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4) {
         if (s->avctx->extradata_size && s->picture_number == 0) {
@@ -665,7 +666,7 @@ retry:
 
     if (s->msmpeg4_version && s->msmpeg4_version < 4 &&
         s->pict_type == AV_PICTURE_TYPE_I)
-        if (!CONFIG_MSMPEG4_DECODER ||
+        if (!CONFIG_MSMPEG4DEC ||
             ff_msmpeg4_decode_ext_header(s, buf_size) < 0)
             s->er.error_status_table[s->mb_num - 1] = ER_MB_ERROR;
 
@@ -768,8 +769,7 @@ const FFCodec ff_h263_decoder = {
                       AV_CODEC_CAP_TRUNCATED |
 #endif
                       AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush          = ff_mpeg_flush,
     .p.max_lowres   = 3,
     .p.pix_fmts     = ff_h263_hwaccel_pixfmt_list_420,
@@ -790,8 +790,7 @@ const FFCodec ff_h263p_decoder = {
                       AV_CODEC_CAP_TRUNCATED |
 #endif
                       AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush          = ff_mpeg_flush,
     .p.max_lowres   = 3,
     .p.pix_fmts     = ff_h263_hwaccel_pixfmt_list_420,

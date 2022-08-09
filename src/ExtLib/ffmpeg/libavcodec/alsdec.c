@@ -361,6 +361,9 @@ static av_cold int read_specific_config(ALSDecContext *ctx)
         return AVERROR_PATCHWELCOME;
     }
 
+    if (avctx->ch_layout.nb_channels == 0)
+        return AVERROR_INVALIDDATA;
+
     ctx->cur_frame_length = sconf->frame_length;
 
     // read channel config
@@ -2186,5 +2189,5 @@ const FFCodec ff_als_decoder = {
     FF_CODEC_DECODE_CB(decode_frame),
     .flush          = flush,
     .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

@@ -340,7 +340,7 @@ static av_cold void rv10_build_vlc(VLC *vlc, const uint16_t len_count[15],
 
 static av_cold void rv10_init_static(void)
 {
-    static VLC_TYPE table[1472 + 992][2];
+    static VLCElem table[1472 + 992];
 
     rv_dc_lum.table             = table;
     rv_dc_lum.table_allocated   = 1472;
@@ -349,8 +349,8 @@ static av_cold void rv10_init_static(void)
     for (int i = 0; i < 1 << (DC_VLC_BITS - 7 /* Length of skip prefix */); i++) {
         /* All codes beginning with 0x7F have the same length and value.
          * Modifying the table directly saves us the useless subtables. */
-        rv_dc_lum.table[(0x7F << (DC_VLC_BITS - 7)) + i][0] = 255;
-        rv_dc_lum.table[(0x7F << (DC_VLC_BITS - 7)) + i][1] = 18;
+        rv_dc_lum.table[(0x7F << (DC_VLC_BITS - 7)) + i].sym = 255;
+        rv_dc_lum.table[(0x7F << (DC_VLC_BITS - 7)) + i].len = 18;
     }
     rv_dc_chrom.table           = &table[1472];
     rv_dc_chrom.table_allocated = 992;
@@ -358,8 +358,8 @@ static av_cold void rv10_init_static(void)
                    rv_sym_run_len, FF_ARRAY_ELEMS(rv_sym_run_len) - 2);
     for (int i = 0; i < 1 << (DC_VLC_BITS - 9 /* Length of skip prefix */); i++) {
         /* Same as above. */
-        rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i][0] = 255;
-        rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i][1] = 18;
+        rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i].sym = 255;
+        rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i].len = 18;
     }
     ff_h263_decode_init_vlc();
 }
@@ -531,7 +531,7 @@ static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
     /* decode each macroblock */
     for (s->mb_num_left = mb_count; s->mb_num_left > 0; s->mb_num_left--) {
         int ret;
-        ff_update_block_index(s);
+        ff_update_block_index(s, 8, s->avctx->lowres, 1);
         ff_tlog(avctx, "**mb x=%d y=%d\n", s->mb_x, s->mb_y);
 
         s->mv_dir  = MV_DIR_FORWARD;
@@ -691,7 +691,6 @@ const FFCodec ff_rv10_decoder = {
     .close          = rv10_decode_end,
     FF_CODEC_DECODE_CB(rv10_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .p.max_lowres   = 3,
     .p.pix_fmts     = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
@@ -709,7 +708,6 @@ const FFCodec ff_rv20_decoder = {
     .close          = rv10_decode_end,
     FF_CODEC_DECODE_CB(rv10_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .flush          = ff_mpeg_flush,
     .p.max_lowres   = 3,
     .p.pix_fmts     = (const enum AVPixelFormat[]) {

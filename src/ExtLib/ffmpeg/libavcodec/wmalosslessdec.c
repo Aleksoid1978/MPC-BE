@@ -191,13 +191,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
 
-    av_assert0(avctx->ch_layout.nb_channels >= 0);
-    if (avctx->ch_layout.nb_channels > WMALL_MAX_CHANNELS) {
-        avpriv_request_sample(avctx,
-                              "More than " AV_STRINGIFY(WMALL_MAX_CHANNELS) " channels");
-        return AVERROR_PATCHWELCOME;
-    }
-
     if (avctx->extradata_size >= 18) {
         s->decode_flags    = AV_RL16(edata_ptr + 14);
         channel_mask       = AV_RL32(edata_ptr +  2);
@@ -225,6 +218,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
     if (channel_mask) {
         av_channel_layout_uninit(&avctx->ch_layout);
         av_channel_layout_from_mask(&avctx->ch_layout, channel_mask);
+    }
+    av_assert0(avctx->ch_layout.nb_channels >= 0);
+    if (avctx->ch_layout.nb_channels > WMALL_MAX_CHANNELS) {
+        avpriv_request_sample(avctx,
+                            "More than " AV_STRINGIFY(WMALL_MAX_CHANNELS) " channels");
+        return AVERROR_PATCHWELCOME;
     }
 
     s->num_channels = avctx->ch_layout.nb_channels;
@@ -1339,7 +1338,7 @@ const FFCodec ff_wmalossless_decoder = {
     FF_CODEC_DECODE_CB(decode_packet),
     .flush          = flush,
     .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },

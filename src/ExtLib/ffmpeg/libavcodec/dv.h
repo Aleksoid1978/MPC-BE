@@ -30,7 +30,6 @@
 #include "avcodec.h"
 #include "dv_profile.h"
 #include "me_cmp.h"
-#include "vlc.h"
 #include "idctdsp.h"
 
 typedef struct DVwork_chunk {
@@ -110,8 +109,8 @@ static inline int dv_work_pool_size(const AVDVProfile *d)
     return size;
 }
 
-static inline void dv_calculate_mb_xy(DVVideoContext *s,
-                                      DVwork_chunk *work_chunk,
+static inline void dv_calculate_mb_xy(const DVVideoContext *s,
+                                      const DVwork_chunk *work_chunk,
                                       int m, int *mb_x, int *mb_y)
 {
     *mb_x = work_chunk->mb_coordinates[m] & 0xff;

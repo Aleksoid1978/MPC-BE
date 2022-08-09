@@ -33,6 +33,10 @@
 #include "avcodec.h"
 #include "config.h"
 
+#if CONFIG_LCMS2
+# include "fflcms2.h"
+#endif
+
 #define FF_SANE_NB_CHANNELS 512U
 
 #if HAVE_SIMD_ALIGN_64
@@ -104,6 +108,14 @@ typedef struct AVCodecInternal {
     AVFrame *in_frame;
 
     /**
+     * When the AV_CODEC_FLAG_RECON_FRAME flag is used. the encoder should store
+     * here the reconstructed frame corresponding to the last returned packet.
+     *
+     * Not allocated in other cases.
+     */
+    AVFrame *recon_frame;
+
+    /**
      * If this is set, then FFCodec->close (if existing) needs to be called
      * for the parent AVCodecContext.
      */
@@ -133,8 +145,6 @@ typedef struct AVCodecInternal {
 
     int showed_multi_packet_warning;
 
-    int skip_samples_multiplier;
-
     /* to prevent infinite loop on errors when draining */
     int nb_draining_errors;
 
@@ -148,6 +158,10 @@ typedef struct AVCodecInternal {
     uint64_t initial_channel_layout;
 #endif
     AVChannelLayout initial_ch_layout;
+
+#if CONFIG_LCMS2
+    FFIccContext icc; /* used to read and write embedded ICC profiles */
+#endif
 } AVCodecInternal;
 
 /**
@@ -211,8 +225,6 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags);
  * if available.
  */
 int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame, int flags);
-
-int ff_thread_can_start_frame(AVCodecContext *avctx);
 
 int avpriv_h264_has_num_reorder_frames(AVCodecContext *avctx);
 

@@ -20,12 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <inttypes.h>
+#include <stdint.h>
 
+#include "config.h"
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
 #include "libavutil/float_dsp.h"
-#include "avcodec.h"
 #include "acelp_vectors.h"
 
 const uint8_t ff_fc_2pulses_9bits_track1_gray[16] =
@@ -259,6 +259,7 @@ void ff_acelp_vectors_init(ACELPVContext *c)
 {
     c->weighted_vector_sumf   = ff_weighted_vector_sumf;
 
-    if(HAVE_MIPSFPU)
-        ff_acelp_vectors_init_mips(c);
+#if HAVE_MIPSFPU
+    ff_acelp_vectors_init_mips(c);
+#endif
 }

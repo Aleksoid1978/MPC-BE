@@ -38,7 +38,7 @@ SECTION .text
     psubw           %1, %2
 %endmacro
 
-; %1=uint8_t *pix1, %2=uint8_t *pix2, %3=static offset, %4=stride, %5=stride*3
+; %1=const uint8_t *pix1, %2=const uint8_t *pix2, %3=static offset, %4=stride, %5=stride*3
 ; %6=temporary storage location
 ; this macro requires $mmsize stack space (aligned) on %6 (except on SSE+x86-64)
 %macro DIFF_PIXELS_8 6
@@ -214,8 +214,8 @@ hadamard8x8_diff %+ SUFFIX:
 hadamard8_16_wrapper %1, 3
 %elif cpuflag(mmx)
 ALIGN 16
-; int ff_hadamard8_diff_ ## cpu(MpegEncContext *s, uint8_t *src1,
-;                               uint8_t *src2, ptrdiff_t stride, int h)
+; int ff_hadamard8_diff_ ## cpu(MpegEncContext *s, const uint8_t *src1,
+;                               const uint8_t *src2, ptrdiff_t stride, int h)
 ; r0 = void *s = unused, int h = unused (always 8)
 ; note how r1, r2 and r3 are not clobbered in this function, so 16x16
 ; can simply call this 2x2x (and that's why we access rsp+gprsize
@@ -261,11 +261,10 @@ hadamard8_16_wrapper 0, 14
 %endif
 %endmacro
 
-INIT_MMX mmx
-HADAMARD8_DIFF
-
+%if HAVE_ALIGNED_STACK == 0
 INIT_MMX mmxext
 HADAMARD8_DIFF
+%endif
 
 INIT_XMM sse2
 %if ARCH_X86_64
@@ -279,7 +278,7 @@ INIT_XMM ssse3
 %define ABS_SUM_8x8 ABS_SUM_8x8_64
 HADAMARD8_DIFF 9
 
-; int ff_sse*_*(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2,
+; int ff_sse*_*(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
 ;               ptrdiff_t line_size, int h)
 
 %macro SUM_SQUARED_ERRORS 1
@@ -358,7 +357,7 @@ INIT_XMM sse2
 SUM_SQUARED_ERRORS 16
 
 ;-----------------------------------------------
-;int ff_sum_abs_dctelem(int16_t *block)
+;int ff_sum_abs_dctelem(const int16_t *block)
 ;-----------------------------------------------
 ; %1 = number of xmm registers used
 ; %2 = number of inline loops
@@ -385,17 +384,13 @@ cglobal sum_abs_dctelem, 1, 1, %1, block
     RET
 %endmacro
 
-INIT_MMX mmx
-SUM_ABS_DCTELEM 0, 4
-INIT_MMX mmxext
-SUM_ABS_DCTELEM 0, 4
 INIT_XMM sse2
 SUM_ABS_DCTELEM 7, 2
 INIT_XMM ssse3
 SUM_ABS_DCTELEM 6, 2
 
 ;------------------------------------------------------------------------------
-; int ff_hf_noise*_mmx(uint8_t *pix1, ptrdiff_t lsize, int h)
+; int ff_hf_noise*_mmx(const uint8_t *pix1, ptrdiff_t lsize, int h)
 ;------------------------------------------------------------------------------
 ; %1 = 8/16. %2-5=m#
 %macro HF_NOISE_PART1 5
@@ -471,7 +466,7 @@ HF_NOISE 8
 HF_NOISE 16
 
 ;---------------------------------------------------------------------------------------
-;int ff_sad_<opt>(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2, ptrdiff_t stride, int h);
+;int ff_sad_<opt>(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
 ;---------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD 1
@@ -526,7 +521,7 @@ INIT_XMM sse2
 SAD 16
 
 ;------------------------------------------------------------------------------------------
-;int ff_sad_x2_<opt>(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2, ptrdiff_t stride, int h);
+;int ff_sad_x2_<opt>(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
 ;------------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD_X2 1
@@ -603,7 +598,7 @@ INIT_XMM sse2
 SAD_X2 16
 
 ;------------------------------------------------------------------------------------------
-;int ff_sad_y2_<opt>(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2, ptrdiff_t stride, int h);
+;int ff_sad_y2_<opt>(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
 ;------------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD_Y2 1
@@ -673,7 +668,7 @@ INIT_XMM sse2
 SAD_Y2 16
 
 ;-------------------------------------------------------------------------------------------
-;int ff_sad_approx_xy2_<opt>(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2, ptrdiff_t stride, int h);
+;int ff_sad_approx_xy2_<opt>(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
 ;-------------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD_APPROX_XY2 1
@@ -774,7 +769,7 @@ INIT_XMM sse2
 SAD_APPROX_XY2 16
 
 ;--------------------------------------------------------------------
-;int ff_vsad_intra(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2,
+;int ff_vsad_intra(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
 ;                  ptrdiff_t line_size, int h);
 ;--------------------------------------------------------------------
 ; %1 = 8/16
@@ -835,7 +830,7 @@ INIT_XMM sse2
 VSAD_INTRA 16
 
 ;---------------------------------------------------------------------
-;int ff_vsad_approx(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2,
+;int ff_vsad_approx(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
 ;                   ptrdiff_t line_size, int h);
 ;---------------------------------------------------------------------
 ; %1 = 8/16

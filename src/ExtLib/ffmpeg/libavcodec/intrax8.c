@@ -25,7 +25,6 @@
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "get_bits.h"
-#include "idctdsp.h"
 #include "msmpeg4data.h"
 #include "intrax8huf.h"
 #include "intrax8.h"
@@ -52,7 +51,7 @@ static VLC j_orient_vlc[2][4]; // [quant], [select]
 static av_cold void x8_init_vlc(VLC *vlc, int nb_bits, int nb_codes,
                                 int *offset, const uint8_t table[][2])
 {
-    static VLC_TYPE vlc_buf[VLC_BUFFER_SIZE][2];
+    static VLCElem vlc_buf[VLC_BUFFER_SIZE];
 
     vlc->table           = &vlc_buf[*offset];
     vlc->table_allocated = VLC_BUFFER_SIZE - *offset;
@@ -92,9 +91,9 @@ static av_cold void x8_vlc_init(void)
 
 static void x8_reset_vlc_tables(IntraX8Context *w)
 {
-    memset(w->j_dc_vlc, 0, sizeof(w->j_dc_vlc));
-    memset(w->j_ac_vlc, 0, sizeof(w->j_ac_vlc));
-    w->j_orient_vlc = NULL;
+    memset(w->j_dc_vlc_table, 0, sizeof(w->j_dc_vlc_table));
+    memset(w->j_ac_vlc_table, 0, sizeof(w->j_ac_vlc_table));
+    w->j_orient_vlc_table = NULL;
 }
 
 static inline void x8_select_ac_table(IntraX8Context *const w, int mode)
@@ -103,23 +102,23 @@ static inline void x8_select_ac_table(IntraX8Context *const w, int mode)
 
     av_assert2(mode < 4);
 
-    if (w->j_ac_vlc[mode])
+    if (w->j_ac_vlc_table[mode])
         return;
 
     table_index       = get_bits(w->gb, 3);
     // 2 modes use same tables
-    w->j_ac_vlc[mode] = &j_ac_vlc[w->quant < 13][mode >> 1][table_index];
+    w->j_ac_vlc_table[mode] = j_ac_vlc[w->quant < 13][mode >> 1][table_index].table;
     av_assert2(w->j_ac_vlc[mode]);
 }
 
 static inline int x8_get_orient_vlc(IntraX8Context *w)
 {
-    if (!w->j_orient_vlc) {
+    if (!w->j_orient_vlc_table) {
         int table_index = get_bits(w->gb, 1 + (w->quant < 13));
-        w->j_orient_vlc = &j_orient_vlc[w->quant < 13][table_index];
+        w->j_orient_vlc_table = j_orient_vlc[w->quant < 13][table_index].table;
     }
 
-    return get_vlc2(w->gb, w->j_orient_vlc->table, OR_VLC_BITS, OR_VLC_MTD);
+    return get_vlc2(w->gb, w->j_orient_vlc_table, OR_VLC_BITS, OR_VLC_MTD);
 }
 
 #define extra_bits(eb)  (eb)        // 3 bits
@@ -175,7 +174,7 @@ static void x8_get_ac_rlf(IntraX8Context *const w, const int mode,
     int i, e;
 
 //    x8_select_ac_table(w, mode);
-    i = get_vlc2(w->gb, w->j_ac_vlc[mode]->table, AC_VLC_BITS, AC_VLC_MTD);
+    i = get_vlc2(w->gb, w->j_ac_vlc_table[mode], AC_VLC_BITS, AC_VLC_MTD);
 
     if (i < 46) { // [0-45]
         int t, l;
@@ -255,13 +254,13 @@ static int x8_get_dc_rlf(IntraX8Context *const w, const int mode,
     int i, e, c;
 
     av_assert2(mode < 3);
-    if (!w->j_dc_vlc[mode]) {
+    if (!w->j_dc_vlc_table[mode]) {
         int table_index = get_bits(w->gb, 3);
         // 4 modes, same table
-        w->j_dc_vlc[mode] = &j_dc_vlc[w->quant < 13][table_index];
+        w->j_dc_vlc_table[mode] = j_dc_vlc[w->quant < 13][table_index].table;
     }
 
-    i = get_vlc2(w->gb, w->j_dc_vlc[mode]->table, DC_VLC_BITS, DC_VLC_MTD);
+    i = get_vlc2(w->gb, w->j_dc_vlc_table[mode], DC_VLC_BITS, DC_VLC_MTD);
 
     /* (i >= 17) { i -= 17; final =1; } */
     c      = i > 16;
@@ -692,7 +691,7 @@ static void x8_init_block_index(IntraX8Context *w, AVFrame *frame)
 }
 
 av_cold int ff_intrax8_common_init(AVCodecContext *avctx,
-                                   IntraX8Context *w, IDCTDSPContext *idsp,
+                                   IntraX8Context *w,
                                    int16_t (*block)[64],
                                    int block_last_index[12],
                                    int mb_width, int mb_height)
@@ -700,7 +699,6 @@ av_cold int ff_intrax8_common_init(AVCodecContext *avctx,
     static AVOnce init_static_once = AV_ONCE_INIT;
 
     w->avctx = avctx;
-    w->idsp = *idsp;
     w->mb_width  = mb_width;
     w->mb_height = mb_height;
     w->block = block;

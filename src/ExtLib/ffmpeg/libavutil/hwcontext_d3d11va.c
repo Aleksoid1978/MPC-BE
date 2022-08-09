@@ -190,6 +190,17 @@ static AVBufferRef *wrap_texture_buf(AVHWFramesContext *ctx, ID3D11Texture2D *te
         return NULL;
     }
 
+    if (s->nb_surfaces <= s->nb_surfaces_used) {
+        frames_hwctx->texture_infos = av_realloc_f(frames_hwctx->texture_infos,
+                                                   s->nb_surfaces_used + 1,
+                                                   sizeof(*frames_hwctx->texture_infos));
+        if (!frames_hwctx->texture_infos) {
+            ID3D11Texture2D_Release(tex);
+            return NULL;
+        }
+        s->nb_surfaces = s->nb_surfaces_used + 1;
+    }
+
     frames_hwctx->texture_infos[s->nb_surfaces_used].texture = tex;
     frames_hwctx->texture_infos[s->nb_surfaces_used].index = index;
     s->nb_surfaces_used++;
@@ -300,6 +311,10 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
             av_log(ctx, AV_LOG_ERROR, "User-provided texture has mismatching parameters\n");
             return AVERROR(EINVAL);
         }
+
+        ctx->initial_pool_size = texDesc2.ArraySize;
+        hwctx->BindFlags = texDesc2.BindFlags;
+        hwctx->MiscFlags = texDesc2.MiscFlags;
     } else if (!(texDesc.BindFlags & D3D11_BIND_RENDER_TARGET) && texDesc.ArraySize > 0) {
         hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &hwctx->texture);
         if (FAILED(hr)) {
@@ -308,7 +323,7 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
         }
     }
 
-    hwctx->texture_infos = av_calloc(ctx->initial_pool_size, sizeof(*hwctx->texture_infos));
+    hwctx->texture_infos = av_realloc_f(NULL, ctx->initial_pool_size, sizeof(*hwctx->texture_infos));
     if (!hwctx->texture_infos)
         return AVERROR(ENOMEM);
     s->nb_surfaces = ctx->initial_pool_size;
@@ -421,6 +436,7 @@ static int d3d11va_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
     D3D11_TEXTURE2D_DESC desc;
     D3D11_MAPPED_SUBRESOURCE map;
     HRESULT hr;
+    int res;
 
     if (frame->hw_frames_ctx->data != (uint8_t *)ctx || other->format != ctx->sw_format)
         return AVERROR(EINVAL);
@@ -429,7 +445,7 @@ static int d3d11va_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
 
     if (!s->staging_texture) {
         ID3D11Texture2D_GetDesc((ID3D11Texture2D *)texture, &desc);
-        int res = d3d11va_create_staging_texture(ctx, desc.Format);
+        res = d3d11va_create_staging_texture(ctx, desc.Format);
         if (res < 0)
             return res;
     }

@@ -57,7 +57,7 @@ static av_cold void tscc2_init_vlc(VLC *vlc, int *offset, int nb_codes,
                                    const uint8_t *lens, const void *syms,
                                    int sym_length)
 {
-    static VLC_TYPE vlc_buf[15442][2];
+    static VLCElem vlc_buf[15442];
 
     vlc->table           = &vlc_buf[*offset];
     vlc->table_allocated = FF_ARRAY_ELEMS(vlc_buf) - *offset;
@@ -366,5 +366,5 @@ const FFCodec ff_tscc2_decoder = {
     .close          = tscc2_decode_end,
     FF_CODEC_DECODE_CB(tscc2_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

@@ -521,7 +521,6 @@ SRCS_LC_B = \
 	libavcodec/vp56.c \
 	libavcodec/vp56data.c \
 	libavcodec/vp56dsp.c \
-	libavcodec/vp56rac.c \
 	libavcodec/vp6.c \
 	libavcodec/vp6dsp.c \
 	libavcodec/vp8.c \
@@ -542,6 +541,7 @@ SRCS_LC_B = \
 	libavcodec/vp9mvs.c \
 	libavcodec/vp9prob.c \
 	libavcodec/vp9recon.c \
+	libavcodec/vpx_rac.c\
 	libavcodec/wavpack.c \
 	libavcodec/wavpackdata.c \
 	libavcodec/wma.c \

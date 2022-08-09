@@ -404,7 +404,7 @@ static int hqx_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                             int *got_picture_ptr, AVPacket *avpkt)
 {
     HQXContext *ctx = avctx->priv_data;
-    uint8_t *src = avpkt->data;
+    const uint8_t *src = avpkt->data;
     uint32_t info_tag;
     int data_start;
     int i, ret;
@@ -545,6 +545,5 @@ const FFCodec ff_hqx_decoder = {
     .close          = hqx_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

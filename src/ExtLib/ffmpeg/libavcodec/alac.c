@@ -574,13 +574,15 @@ static av_cold int alac_decode_init(AVCodecContext * avctx)
     avctx->bits_per_raw_sample = alac->sample_size;
     avctx->sample_rate         = alac->sample_rate;
 
-    if (alac->channels < 1 || alac->channels > ALAC_MAX_CHANNELS) {
+    if (alac->channels < 1) {
         av_log(avctx, AV_LOG_WARNING, "Invalid channel count\n");
+        if (avctx->ch_layout.nb_channels < 1)
+            return AVERROR(EINVAL);
         alac->channels = avctx->ch_layout.nb_channels;
     }
-    if (avctx->ch_layout.nb_channels > ALAC_MAX_CHANNELS || avctx->ch_layout.nb_channels <= 0 ) {
+    if (alac->channels > ALAC_MAX_CHANNELS) {
         avpriv_report_missing_feature(avctx, "Channel count %d",
-                                      avctx->ch_layout.nb_channels);
+                                      alac->channels);
         return AVERROR_PATCHWELCOME;
     }
     av_channel_layout_uninit(&avctx->ch_layout);
@@ -620,6 +622,6 @@ const FFCodec ff_alac_decoder = {
     .close          = alac_decode_close,
     FF_CODEC_DECODE_CB(alac_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.priv_class   = &alac_class
 };

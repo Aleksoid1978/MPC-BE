@@ -104,7 +104,7 @@ SECTION .text
 %define extra_regs 0
 %endif ; rv40
 ; void ff_put/avg_h264_chroma_mc8_*(uint8_t *dst /* align 8 */,
-;                                   uint8_t *src /* align 1 */,
+;                                   const uint8_t *src /* align 1 */,
 ;                                   ptrdiff_t stride, int h, int mx, int my)
 cglobal %1_%2_chroma_mc8%3, 6, 7 + extra_regs, 0
     mov          r6d, r5d
@@ -445,13 +445,6 @@ chroma_mc8_mmx_func avg, rv40
 chroma_mc4_mmx_func avg, h264
 chroma_mc4_mmx_func avg, rv40
 chroma_mc2_mmx_func avg, h264
-
-INIT_MMX 3dnow
-chroma_mc8_mmx_func avg, h264, _rnd
-chroma_mc8_mmx_func avg, vc1,  _nornd
-chroma_mc8_mmx_func avg, rv40
-chroma_mc4_mmx_func avg, h264
-chroma_mc4_mmx_func avg, rv40
 
 %macro chroma_mc8_ssse3_func 2-3
 cglobal %1_%2_chroma_mc8%3, 6, 7, 8

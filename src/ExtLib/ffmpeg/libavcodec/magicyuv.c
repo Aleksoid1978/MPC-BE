@@ -115,7 +115,7 @@ static void magicyuv_median_pred16(uint16_t *dst, const uint16_t *src1,
 static int magy_decode_slice10(AVCodecContext *avctx, void *tdata,
                                int j, int threadnr)
 {
-    MagicYUVContext *s = avctx->priv_data;
+    const MagicYUVContext *s = avctx->priv_data;
     int interlaced = s->interlaced;
     const int bps = s->bps;
     const int max = s->max - 1;
@@ -247,7 +247,7 @@ static int magy_decode_slice10(AVCodecContext *avctx, void *tdata,
 static int magy_decode_slice(AVCodecContext *avctx, void *tdata,
                              int j, int threadnr)
 {
-    MagicYUVContext *s = avctx->priv_data;
+    const MagicYUVContext *s = avctx->priv_data;
     int interlaced = s->interlaced;
     AVFrame *p = s->p;
     int i, k, x, min_width;
@@ -705,5 +705,4 @@ const FFCodec ff_magicyuv_decoder = {
     .p.capabilities   = AV_CODEC_CAP_DR1 |
                         AV_CODEC_CAP_FRAME_THREADS |
                         AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE,
 };

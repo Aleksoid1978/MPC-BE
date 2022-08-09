@@ -43,7 +43,7 @@ static av_cold int libspeex_decode_init(AVCodecContext *avctx)
     LibSpeexContext *s = avctx->priv_data;
     const SpeexMode *mode;
     SpeexHeader *header = NULL;
-    int spx_mode, channels;
+    int spx_mode, channels = avctx->ch_layout.nb_channels;
 
     if (avctx->extradata && avctx->extradata_size >= 80) {
         header = speex_packet_to_header(avctx->extradata,
@@ -197,6 +197,7 @@ const FFCodec ff_libspeex_decoder = {
     .p.id           = AV_CODEC_ID_SPEEX,
     .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .p.wrapper_name = "libspeex",
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE,
     .priv_data_size = sizeof(LibSpeexContext),
     .init           = libspeex_decode_init,
     .close          = libspeex_decode_close,

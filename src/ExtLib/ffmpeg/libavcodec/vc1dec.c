@@ -391,7 +391,7 @@ av_cold int ff_vc1_decode_init_alloc_tables(VC1Context *v)
                 goto error;
     }
 
-    ret = ff_intrax8_common_init(s->avctx, &v->x8, &s->idsp,
+    ret = ff_intrax8_common_init(s->avctx, &v->x8,
                                  s->block, s->block_last_index,
                                  s->mb_width, s->mb_height);
     if (ret < 0)
@@ -1233,7 +1233,6 @@ const FFCodec ff_vc1_decoder = {
     .flush          = vc1_decode_flush/*ff_mpeg_flush*/,
     // ==> End patch MPC
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .p.pix_fmts     = vc1_hwaccel_pixfmt_list_420,
     .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_VC1_DXVA2_HWACCEL
@@ -1273,7 +1272,6 @@ const FFCodec ff_wmv3_decoder = {
     .flush          = vc1_decode_flush/*ff_mpeg_flush*/,
     // ==> End patch MPC
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     .p.pix_fmts     = vc1_hwaccel_pixfmt_list_420,
     .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_WMV3_DXVA2_HWACCEL
@@ -1311,7 +1309,6 @@ const FFCodec ff_wmv3image_decoder = {
     .close          = ff_vc1_decode_end,
     FF_CODEC_DECODE_CB(vc1_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     // ==> Start patch MPC
     //.flush          = vc1_sprite_flush,
     // ==> end patch MPC
@@ -1333,7 +1330,6 @@ const FFCodec ff_vc1image_decoder = {
     .close          = ff_vc1_decode_end,
     FF_CODEC_DECODE_CB(vc1_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
     // ==> Start patch MPC
     //.flush          = vc1_sprite_flush,
     // ==> end patch MPC

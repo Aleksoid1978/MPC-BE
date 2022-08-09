@@ -37,6 +37,7 @@ Youtube и другие онлайн сервисы
 
 Обновлены библиотеки:
 	dav1d git-1.0.0-45-ga029d68;
+	ffmpeg git-n5.2-dev-337-gd931554f66;
 	Little-CMS git-lcms2.13.1-57-gd12e8f6;
 	MediaInfo git-v22.06-10-g62322b871;
 	ZenLib git-v0.4.39-12-gde2787a;

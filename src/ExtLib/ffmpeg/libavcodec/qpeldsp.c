@@ -199,7 +199,7 @@ static void OPNAME ## qpel8_mc01_c(uint8_t *dst, const uint8_t *src,          \
     uint8_t full[16 * 9];                                                     \
     uint8_t half[64];                                                         \
                                                                               \
-    copy_block9(full, src, 16, stride, 9);                                    \
+    copy_block8(full, src, 16, stride, 9);                                    \
     put ## RND ## mpeg4_qpel8_v_lowpass(half, full, 8, 16);                   \
     OPNAME ## pixels8_l2_8(dst, full, half, stride, 16, 8, 8);                \
 }                                                                             \
@@ -209,7 +209,7 @@ static void OPNAME ## qpel8_mc02_c(uint8_t *dst, const uint8_t *src,          \
 {                                                                             \
     uint8_t full[16 * 9];                                                     \
                                                                               \
-    copy_block9(full, src, 16, stride, 9);                                    \
+    copy_block8(full, src, 16, stride, 9);                                    \
     OPNAME ## mpeg4_qpel8_v_lowpass(dst, full, stride, 16);                   \
 }                                                                             \
                                                                               \
@@ -219,7 +219,7 @@ static void OPNAME ## qpel8_mc03_c(uint8_t *dst, const uint8_t *src,          \
     uint8_t full[16 * 9];                                                     \
     uint8_t half[64];                                                         \
                                                                               \
-    copy_block9(full, src, 16, stride, 9);                                    \
+    copy_block8(full, src, 16, stride, 9);                                    \
     put ## RND ## mpeg4_qpel8_v_lowpass(half, full, 8, 16);                   \
     OPNAME ## pixels8_l2_8(dst, full + 16, half, stride, 16, 8, 8);           \
 }                                                                             \
@@ -459,7 +459,7 @@ static void OPNAME ## qpel16_mc01_c(uint8_t *dst, const uint8_t *src,         \
     uint8_t full[24 * 17];                                                    \
     uint8_t half[256];                                                        \
                                                                               \
-    copy_block17(full, src, 24, stride, 17);                                  \
+    copy_block16(full, src, 24, stride, 17);                                  \
     put ## RND ## mpeg4_qpel16_v_lowpass(half, full, 16, 24);                 \
     OPNAME ## pixels16_l2_8(dst, full, half, stride, 24, 16, 16);             \
 }                                                                             \
@@ -469,7 +469,7 @@ static void OPNAME ## qpel16_mc02_c(uint8_t *dst, const uint8_t *src,         \
 {                                                                             \
     uint8_t full[24 * 17];                                                    \
                                                                               \
-    copy_block17(full, src, 24, stride, 17);                                  \
+    copy_block16(full, src, 24, stride, 17);                                  \
     OPNAME ## mpeg4_qpel16_v_lowpass(dst, full, stride, 24);                  \
 }                                                                             \
                                                                               \
@@ -479,7 +479,7 @@ static void OPNAME ## qpel16_mc03_c(uint8_t *dst, const uint8_t *src,         \
     uint8_t full[24 * 17];                                                    \
     uint8_t half[256];                                                        \
                                                                               \
-    copy_block17(full, src, 24, stride, 17);                                  \
+    copy_block16(full, src, 24, stride, 17);                                  \
     put ## RND ## mpeg4_qpel16_v_lowpass(half, full, 16, 24);                 \
     OPNAME ## pixels16_l2_8(dst, full + 24, half, stride, 24, 16, 16);        \
 }                                                                             \
@@ -810,8 +810,9 @@ av_cold void ff_qpeldsp_init(QpelDSPContext *c)
     dspfunc(avg_qpel, 0, 16);
     dspfunc(avg_qpel, 1, 8);
 
-    if (ARCH_X86)
-        ff_qpeldsp_init_x86(c);
-    if (ARCH_MIPS)
-        ff_qpeldsp_init_mips(c);
+#if ARCH_X86
+    ff_qpeldsp_init_x86(c);
+#elif ARCH_MIPS
+    ff_qpeldsp_init_mips(c);
+#endif
 }

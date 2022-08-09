@@ -127,7 +127,6 @@ typedef struct SnowContext{
     AVFrame *input_picture;              ///< new_picture with the internal linesizes
     AVFrame *current_picture;
     AVFrame *last_picture[MAX_REF_FRAMES];
-    uint8_t *halfpel_plane[MAX_REF_FRAMES][4][4];
     AVFrame *mconly_picture;
 //     uint8_t q_context[16];
     uint8_t header_state[32];
@@ -487,7 +486,7 @@ static inline void set_blocks(SnowContext *s, int level, int x, int y, int l, in
     }
 }
 
-static inline void init_ref(MotionEstContext *c, uint8_t *src[3], uint8_t *ref[3], uint8_t *ref2[3], int x, int y, int ref_index){
+static inline void init_ref(MotionEstContext *c, const uint8_t *const src[3], uint8_t *const ref[3], uint8_t *const ref2[3], int x, int y, int ref_index){
     SnowContext *s = c->avctx->priv_data;
     const int offset[3]= {
           y*c->  stride + x,

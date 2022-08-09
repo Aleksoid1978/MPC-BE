@@ -137,7 +137,7 @@ static RL_VLC_ELEM dv_rl_vlc[1664];
 
 static void dv_init_static(void)
 {
-    VLC_TYPE vlc_buf[FF_ARRAY_ELEMS(dv_rl_vlc)][2] = { 0 };
+    VLCElem vlc_buf[FF_ARRAY_ELEMS(dv_rl_vlc)] = { 0 };
     VLC dv_vlc = { .table = vlc_buf, .table_allocated = FF_ARRAY_ELEMS(vlc_buf) };
     uint16_t  new_dv_vlc_bits[NB_DV_VLC * 2];
     uint8_t    new_dv_vlc_len[NB_DV_VLC * 2];
@@ -171,8 +171,8 @@ static void dv_init_static(void)
     av_assert1(dv_vlc.table_size == 1664);
 
     for (int i = 0; i < dv_vlc.table_size; i++) {
-        int code = dv_vlc.table[i][0];
-        int len  = dv_vlc.table[i][1];
+        int code = dv_vlc.table[i].sym;
+        int len  = dv_vlc.table[i].len;
         int level, run;
 
         if (len < 0) { // more bits needed
@@ -345,7 +345,7 @@ static av_always_inline void put_block_8x4(int16_t *block, uint8_t *av_restrict 
     }
 }
 
-static void dv100_idct_put_last_row_field_chroma(DVVideoContext *s, uint8_t *data,
+static void dv100_idct_put_last_row_field_chroma(const DVVideoContext *s, uint8_t *data,
                                                  int stride, int16_t *blocks)
 {
     s->idsp.idct(blocks + 0*64);
@@ -357,7 +357,7 @@ static void dv100_idct_put_last_row_field_chroma(DVVideoContext *s, uint8_t *dat
     put_block_8x4(blocks+1*64 + 4*8, data + 8 + stride, stride<<1);
 }
 
-static void dv100_idct_put_last_row_field_luma(DVVideoContext *s, uint8_t *data,
+static void dv100_idct_put_last_row_field_luma(const DVVideoContext *s, uint8_t *data,
                                                int stride, int16_t *blocks)
 {
     s->idsp.idct(blocks + 0*64);
@@ -378,7 +378,7 @@ static void dv100_idct_put_last_row_field_luma(DVVideoContext *s, uint8_t *data,
 /* mb_x and mb_y are in units of 8 pixels */
 static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
 {
-    DVVideoContext *s = avctx->priv_data;
+    const DVVideoContext *s = avctx->priv_data;
     DVwork_chunk *work_chunk = arg;
     int quant, dc, dct_mode, class1, j;
     int mb_index, mb_x, mb_y, last_index;
@@ -691,5 +691,4 @@ const FFCodec ff_dvvideo_decoder = {
     FF_CODEC_DECODE_CB(dvvideo_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,
     .p.max_lowres   = 3,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

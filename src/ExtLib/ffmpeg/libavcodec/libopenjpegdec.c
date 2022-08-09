@@ -321,7 +321,7 @@ static av_cold int libopenjpeg_decode_init(AVCodecContext *avctx)
 static int libopenjpeg_decode_frame(AVCodecContext *avctx, AVFrame *picture,
                                     int *got_frame, AVPacket *avpkt)
 {
-    uint8_t *buf            = avpkt->data;
+    const uint8_t *buf      = avpkt->data;
     int buf_size            = avpkt->size;
     LibOpenJPEGContext *ctx = avctx->priv_data;
     const AVPixFmtDescriptor *desc;
@@ -509,6 +509,7 @@ const FFCodec ff_libopenjpeg_decoder = {
     .p.max_lowres   = 31,
     .p.priv_class   = &openjpeg_class,
     .p.wrapper_name = "libopenjpeg",
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE,
     .priv_data_size = sizeof(LibOpenJPEGContext),
     .init           = libopenjpeg_decode_init,
     FF_CODEC_DECODE_CB(libopenjpeg_decode_frame),

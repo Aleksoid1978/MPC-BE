@@ -308,6 +308,53 @@ static int encode_receive_packet_internal(AVCodecContext *avctx, AVPacket *avpkt
     return ret;
 }
 
+#if CONFIG_LCMS2
+static int encode_generate_icc_profile(AVCodecContext *avctx, AVFrame *frame)
+{
+    enum AVColorTransferCharacteristic trc = frame->color_trc;
+    enum AVColorPrimaries prim = frame->color_primaries;
+    const FFCodec *const codec = ffcodec(avctx->codec);
+    AVCodecInternal *avci = avctx->internal;
+    cmsHPROFILE profile;
+    int ret;
+
+    /* don't generate ICC profiles if disabled or unsupported */
+    if (!(avctx->flags2 & AV_CODEC_FLAG2_ICC_PROFILES))
+        return 0;
+    if (!(codec->caps_internal & FF_CODEC_CAP_ICC_PROFILES))
+        return 0;
+
+    if (trc == AVCOL_TRC_UNSPECIFIED)
+        trc = avctx->color_trc;
+    if (prim == AVCOL_PRI_UNSPECIFIED)
+        prim = avctx->color_primaries;
+    if (trc == AVCOL_TRC_UNSPECIFIED || prim == AVCOL_PRI_UNSPECIFIED)
+        return 0; /* can't generate ICC profile with missing csp tags */
+
+    if (av_frame_get_side_data(frame, AV_FRAME_DATA_ICC_PROFILE))
+        return 0; /* don't overwrite existing ICC profile */
+
+    if (!avci->icc.avctx) {
+        ret = ff_icc_context_init(&avci->icc, avctx);
+        if (ret < 0)
+            return ret;
+    }
+
+    ret = ff_icc_profile_generate(&avci->icc, prim, trc, &profile);
+    if (ret < 0)
+        return ret;
+
+    ret = ff_icc_profile_attach(&avci->icc, profile, frame);
+    cmsCloseProfile(profile);
+    return ret;
+}
+#else /* !CONFIG_LCMS2 */
+static int encode_generate_icc_profile(av_unused AVCodecContext *c, av_unused AVFrame *f)
+{
+    return 0;
+}
+#endif
+
 static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
 {
     AVCodecInternal *avci = avctx->internal;
@@ -339,6 +386,7 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
                     return ret;
 
                 avctx->internal->last_audio_frame = 1;
+                goto finish;
             } else if (src->nb_samples > avctx->frame_size) {
                 av_log(avctx, AV_LOG_ERROR, "nb_samples (%d) != frame_size (%d)\n", src->nb_samples, avctx->frame_size);
                 return AVERROR(EINVAL);
@@ -346,10 +394,23 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
         }
     }
 
-    if (!dst->data[0]) {
-        ret = av_frame_ref(dst, src);
+    ret = av_frame_ref(dst, src);
+    if (ret < 0)
+        return ret;
+
+finish:
+
+#if FF_API_PKT_DURATION
+FF_DISABLE_DEPRECATION_WARNINGS
+    if (dst->pkt_duration && dst->pkt_duration != dst->duration)
+        dst->duration = dst->pkt_duration;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
+    if (avctx->codec->type == AVMEDIA_TYPE_VIDEO) {
+        ret = encode_generate_icc_profile(avctx, dst);
         if (ret < 0)
-             return ret;
+            return ret;
     }
 
     return 0;
@@ -595,6 +656,18 @@ int ff_encode_preinit(AVCodecContext *avctx)
             return AVERROR(ENOMEM);
     }
 
+    if ((avctx->flags & AV_CODEC_FLAG_RECON_FRAME)) {
+        if (!(avctx->codec->capabilities & AV_CODEC_CAP_ENCODER_RECON_FRAME)) {
+            av_log(avctx, AV_LOG_ERROR, "Reconstructed frame output requested "
+                   "from an encoder not supporting it\n");
+            return AVERROR(ENOSYS);
+        }
+
+        avci->recon_frame = av_frame_alloc();
+        if (!avci->recon_frame)
+            return AVERROR(ENOMEM);
+    }
+
     return 0;
 }
 
@@ -629,5 +702,18 @@ int ff_encode_alloc_frame(AVCodecContext *avctx, AVFrame *frame)
         return ret;
     }
 
+    return 0;
+}
+
+int ff_encode_receive_frame(AVCodecContext *avctx, AVFrame *frame)
+{
+    AVCodecInternal *avci = avctx->internal;
+
+    if (!avci->recon_frame)
+        return AVERROR(EINVAL);
+    if (!avci->recon_frame->buf[0])
+        return avci->draining_done ? AVERROR_EOF : AVERROR(EAGAIN);
+
+    av_frame_move_ref(frame, avci->recon_frame);
     return 0;
 }

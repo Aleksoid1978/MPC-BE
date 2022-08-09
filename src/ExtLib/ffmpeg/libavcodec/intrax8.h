@@ -27,9 +27,9 @@
 #include "mpegpicture.h"
 
 typedef struct IntraX8Context {
-    VLC *j_ac_vlc[4]; // they point to the static j_mb_vlc
-    VLC *j_orient_vlc;
-    VLC *j_dc_vlc[3];
+    const VLCElem *j_ac_vlc_table[4]; // they point to the static j_mb_vlc.table
+    const VLCElem *j_orient_vlc_table;
+    const VLCElem *j_dc_vlc_table[3];
 
     int use_quant_matrix;
 
@@ -44,7 +44,6 @@ typedef struct IntraX8Context {
 
     // set by the caller codec
     IntraX8DSPContext dsp;
-    IDCTDSPContext idsp;
     BlockDSPContext bdsp;
     int quant;
     int dquant;
@@ -86,7 +85,7 @@ typedef struct IntraX8Context {
  * @return 0 on success, a negative AVERROR value on error
  */
 int ff_intrax8_common_init(AVCodecContext *avctx,
-                           IntraX8Context *w, IDCTDSPContext *idsp,
+                           IntraX8Context *w,
                            int16_t (*block)[64],
                            int block_last_index[12],
                            int mb_width, int mb_height);

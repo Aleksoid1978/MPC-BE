@@ -44,7 +44,7 @@ static VLC scfi_vlc, dscf_vlc, hdr_vlc, quant_vlc[MPC7_QUANT_VLC_TABLES][2];
 
 static av_cold void mpc7_init_static(void)
 {
-    static VLC_TYPE quant_tables[7224][2];
+    static VLCElem quant_tables[7224];
     const uint8_t *raw_quant_table = mpc7_quant_vlcs;
 
     INIT_VLC_STATIC_FROM_LENGTHS(&scfi_vlc, MPC7_SCFI_BITS, MPC7_SCFI_SIZE,
@@ -322,5 +322,4 @@ const FFCodec ff_mpc7_decoder = {
     .p.capabilities = AV_CODEC_CAP_DR1,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_NONE },
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
