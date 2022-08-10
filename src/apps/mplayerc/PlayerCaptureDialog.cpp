@@ -230,11 +230,11 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 
 		if (iSize == sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
 			for (size_t i = 0, cnt = tfa.GetCount(); i < cnt; i++) {
-				if (tfa[i]->GetCount() != 1) {
+				if (tfa[i]->size() != 1) {
 					continue;
 				}
 
-				CFormatElem<T>* pfe = tfa[i]->GetAt(0);
+				CFormatElem<T>* pfe = tfa[i]->front().get();
 
 				if (pfe->mt.formattype != FORMAT_VideoInfo
 						&& pfe->mt.formattype != FORMAT_VideoInfo2) {
@@ -345,7 +345,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 
 	if (!pcurmt) {
 		pf = tfa[0];
-		pfeCurrent = pf->GetAt(0);
+		pfeCurrent = pf->front().get();
 	} else if (!tfa.FindFormat(pcurmt, nullptr, &pf, &pfeCurrent) && !tfa.FindFormat(pcurmt, &pf)) {
 		if (pcurmt) {
 			DeleteMediaType(pcurmt);
@@ -353,9 +353,8 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		return;
 	}
 
-	for (size_t i = 0, cnt = pf->GetCount(); i < cnt; i++) {
-		CFormatElem<T>* pfe = pf->GetAt(i);
-		AddStringData(dim, tfa.MakeDimensionName(pfe), (DWORD_PTR)pfe);
+	for (const auto& pfe : *pf) {
+		AddStringData(dim, tfa.MakeDimensionName(pfe.get()), (DWORD_PTR)pfe.get());
 	}
 
 	int iType = type.SetCurSel(type.FindStringExact(0, pf->name));
@@ -398,9 +397,8 @@ static bool SetupDimension(CFormatArray<T>& tfa, CComboBox& type, CComboBox& dim
 
 	CFormat<T>* pf = (CFormat<T>*)type.GetItemData(iSel);
 
-	for (int i = 0; i < (int)pf->GetCount(); i++) {
-		CFormatElem<T>* pfe = pf->GetAt(i);
-		AddStringData(dim, tfa.MakeDimensionName(pfe), (DWORD_PTR)pfe);
+	for (const auto& pfe : *pf) {
+		AddStringData(dim, tfa.MakeDimensionName(pfe.get()), (DWORD_PTR)pfe.get());
 	}
 
 	CorrectComboListWidth(dim);

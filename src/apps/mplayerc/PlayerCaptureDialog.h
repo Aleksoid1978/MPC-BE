@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ struct CFormatElem
 };
 
 template<class T>
-class CFormat : public CAutoPtrArray<CFormatElem<T> >
+class CFormat : public std::vector<std::unique_ptr<CFormatElem<T>>>
 {
 public:
 	CString name;
@@ -75,8 +75,7 @@ public:
 
 		for (size_t i = 0; i < GetCount(); ++i) {
 			CFormat<T>* pf = GetAt(i);
-			for (size_t j = 0; j < pf->GetCount(); ++j) {
-				CFormatElem<T>* pfe = pf->GetAt(j);
+			for (const auto& pfe : *pf) {
 				if (pfe->mt.majortype == pmt->majortype && pfe->mt.subtype == pmt->subtype) {
 					if (ppf) {
 						*ppf = pf;
@@ -96,14 +95,13 @@ public:
 
 		for (size_t i = 0; i < GetCount(); ++i) {
 			CFormat<T>* pf = GetAt(i);
-			for (size_t j = 0; j < pf->GetCount(); ++j) {
-				CFormatElem<T>* pfe = pf->GetAt(j);
+			for (const auto& pfe : *pf) {
 				if ((!pmt || pfe->mt == *pmt) && (!pcaps || !memcmp(pcaps, &pfe->caps, sizeof(T)))) {
 					if (ppf) {
 						*ppf = pf;
 					}
 					if (ppfe) {
-						*ppfe = pfe;
+						*ppfe = pfe.get();
 					}
 					return true;
 				}
@@ -130,10 +128,10 @@ public:
 			return false;
 		}
 
-		CAutoPtr<CFormatElem<T> > pfe(DNew CFormatElem<T>());
+		std::unique_ptr<CFormatElem<T>> pfe(DNew CFormatElem<T>());
 		pfe->mt = *pmt;
 		pfe->caps = caps;
-		pf->Add(pfe);
+		pf->emplace_back(std::move(pfe));
 
 		return true;
 	}
