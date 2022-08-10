@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,7 +58,7 @@ private:
 	DWORD m_dwRegister;
 
 	CStreamPath m_streampath;
-	CAutoPtrArray<CStreamDeadEnd> m_deadends;
+	std::vector<std::unique_ptr<CStreamDeadEnd>> m_deadends;
 
 protected:
 	CComPtr<IFilterMapper2> m_pFM;

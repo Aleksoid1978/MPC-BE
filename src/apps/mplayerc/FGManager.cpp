@@ -1152,7 +1152,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	}
 
 	if (fDeadEnd) {
-		CAutoPtr<CStreamDeadEnd> psde(DNew CStreamDeadEnd());
+		std::unique_ptr<CStreamDeadEnd> psde(DNew CStreamDeadEnd());
 		psde->insert(psde->end(), m_streampath.begin(), m_streampath.end());
 		int skip = 0;
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
@@ -1163,7 +1163,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		}
 		EndEnumMediaTypes(pmt)
 		if (skip < (int)psde->mts.size()) {
-			m_deadends.Add(psde);
+			m_deadends.emplace_back(std::move(psde));
 		}
 	}
 
@@ -1187,7 +1187,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 	CAutoLock cAutoLock(this);
 
 	m_streampath.clear();
-	m_deadends.RemoveAll();
+	m_deadends.clear();
 
 	HRESULT hr;
 
@@ -1204,7 +1204,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 		return hr;
 	}
 
-	CAutoPtrArray<CStreamDeadEnd> deadends;
+	std::vector<std::unique_ptr<CStreamDeadEnd>> deadends;
 
 	hr = VFW_E_CANNOT_RENDER;
 
@@ -1214,7 +1214,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 
 		if (SUCCEEDED(hr = AddSourceFilter(pFGF, lpcwstrFileName, pFGF->GetName(), &pBF))) {
 			m_streampath.clear();
-			m_deadends.RemoveAll();
+			m_deadends.clear();
 
 			hr = ConnectFilter(pBF, nullptr);
 			if (SUCCEEDED(hr)) {
@@ -1225,14 +1225,16 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			NukeDownstream(pBF);
 			RemoveFilter(pBF);
 
-			deadends.Append(m_deadends);
+			for (auto& de : m_deadends) {
+				deadends.emplace_back(std::move(de));
+			}
 		} else if (hr == E_ABORT) {
 			m_bOpeningAborted = false;
 			return hr;
 		}
 	}
 
-	m_deadends.Copy(deadends);
+	m_deadends = std::move(deadends);
 	m_bOpeningAborted = false;
 
 	return hr;
@@ -1324,7 +1326,7 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 	CAutoLock cAutoLock(this);
 
 	m_streampath.clear();
-	m_deadends.RemoveAll();
+	m_deadends.clear();
 
 	if (!pPinOut || dwFlags > AM_RENDEREX_RENDERTOEXISTINGRENDERERS || pvContext) {
 		return E_INVALIDARG;
@@ -1577,9 +1579,11 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			}
 
 			if (SUCCEEDED(hr)) {
-				for (ptrdiff_t i = m_deadends.GetCount() - 1; i >= 0; i--) {
+				for (ptrdiff_t i = m_deadends.size() - 1; i >= 0; i--) {
 					if (m_deadends[i]->Compare(m_streampath)) {
-						m_deadends.RemoveAt(i);
+						auto it = m_deadends.begin();
+						std::advance(it, i);
+						m_deadends.erase(it);
 					}
 				}
 				nRendered++;
@@ -1760,14 +1764,14 @@ STDMETHODIMP_(size_t) CFGManager::GetCount()
 {
 	CAutoLock cAutoLock(this);
 
-	return m_deadends.GetCount();
+	return m_deadends.size();
 }
 
 STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, std::list<CStringW>& path, std::list<CMediaType>& mts)
 {
 	CAutoLock cAutoLock(this);
 
-	if (iIndex < 0 || iIndex >= (int)m_deadends.GetCount()) {
+	if (iIndex < 0 || iIndex >= (int)m_deadends.size()) {
 		return E_FAIL;
 	}
 
@@ -1804,7 +1808,7 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 	CComPtr<IBaseFilter> pBF;
 	if (SUCCEEDED(hr = AddSourceFilter(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
 		m_streampath.clear();
-		m_deadends.RemoveAll();
+		m_deadends.clear();
 
 		hr = ConnectFilter(pBF, nullptr);
 	}
