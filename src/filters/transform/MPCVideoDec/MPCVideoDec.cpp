@@ -1309,8 +1309,8 @@ void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtSt
 		rtStop  = m_tBFrameDelay[m_nBFramePos].rtStop;
 	} else {
 		rtStart = pFrame->best_effort_timestamp;
-		if (pFrame->pkt_duration) {
-			rtStop = rtStart + pFrame->pkt_duration;
+		if (pFrame->duration) {
+			rtStop = rtStart + pFrame->duration;
 		} else {
 			rtStop = INVALID_TIME;
 		}
