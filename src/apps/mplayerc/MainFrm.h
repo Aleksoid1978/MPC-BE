@@ -747,7 +747,7 @@ public:
 	bool ResetDevice();
 	bool DisplayChange();
 	void CloseMedia(BOOL bNextIsOpened = FALSE);
-	void StartTunerScan(CAutoPtr<TunerScanData> pTSD);
+	void StartTunerScan(std::unique_ptr<TunerScanData>& pTSD);
 	void StopTunerScan();
 
 	void AddCurDevToPlaylist();

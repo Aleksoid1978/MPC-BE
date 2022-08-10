@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,16 +124,16 @@ void CTunerScanDlg::OnBnClickedStart()
 {
 	if (!m_bInProgress) {
 		UpdateData(true);
-		CAutoPtr<TunerScanData>		pTSD (DNew TunerScanData);
-		pTSD->Hwnd				= m_hWnd;
-		pTSD->FrequencyStart	= m_ulFrequencyStart;
-		pTSD->FrequencyStop		= m_ulFrequencyEnd;
-		pTSD->Bandwidth			= m_ulBandwidth;
-		pTSD->Offset			= m_bUseOffset ? m_lOffset : 0;
+		std::unique_ptr<TunerScanData> pTSD(DNew TunerScanData);
+		pTSD->Hwnd           = m_hWnd;
+		pTSD->FrequencyStart = m_ulFrequencyStart;
+		pTSD->FrequencyStop  = m_ulFrequencyEnd;
+		pTSD->Bandwidth      = m_ulBandwidth;
+		pTSD->Offset         = m_bUseOffset ? m_lOffset : 0;
 		SaveScanSettings();
 
 		m_ChannelList.DeleteAllItems();
-		AfxGetMainFrame()->StartTunerScan (pTSD);
+		AfxGetMainFrame()->StartTunerScan(pTSD);
 
 		SetProgress (true);
 	} else {
@@ -234,10 +234,10 @@ void CTunerScanDlg::SaveScanSettings()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.iBDAScanFreqStart = m_ulFrequencyStart;
-	s.iBDAScanFreqEnd = m_ulFrequencyEnd;
+	s.iBDAScanFreqEnd   = m_ulFrequencyEnd;
 	div_t bdw = div(m_ulBandwidth, 1000);
 	s.iBDABandwidth = bdw.quot;
 	s.fBDAUseOffset = !!m_bUseOffset;
-	s.iBDAOffset = m_lOffset;
+	s.iBDAOffset    = m_lOffset;
 	s.fBDAIgnoreEncryptedChannels = !!m_bIgnoreEncryptedChannels;
 }

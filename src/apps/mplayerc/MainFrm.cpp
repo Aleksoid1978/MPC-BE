@@ -14631,14 +14631,14 @@ void CMainFrame::DoTunerScan(TunerScanData* pTSD)
 	if (GetPlaybackMode() == PM_CAPTURE) {
 		CComQIPtr<IBDATuner>	pTun = m_pGB;
 		if (pTun) {
-			BOOLEAN				bPresent;
-			BOOLEAN				bLocked;
-			LONG				lStrength;
-			LONG				lQuality;
-			int					nProgress;
-			int					nOffset = pTSD->Offset ? 3 : 1;
-			LONG				lOffsets[3] = {0, pTSD->Offset, -pTSD->Offset};
-			bool				bSucceeded;
+			BOOLEAN bPresent;
+			BOOLEAN bLocked;
+			LONG    lStrength;
+			LONG    lQuality;
+			int     nProgress;
+			int     nOffset = pTSD->Offset ? 3 : 1;
+			LONG    lOffsets[3] = { 0, pTSD->Offset, -pTSD->Offset };
+			bool    bSucceeded;
 			m_bStopTunerScan = false;
 
 			for (ULONG ulFrequency = pTSD->FrequencyStart; ulFrequency <= pTSD->FrequencyStop; ulFrequency += pTSD->Bandwidth) {
@@ -17610,12 +17610,12 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 	DLog(L"CMainFrame::CloseMedia() : end");
 }
 
-void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
+void CMainFrame::StartTunerScan(std::unique_ptr<TunerScanData>& pTSD)
 {
 	if (m_pGraphThread) {
-		m_pGraphThread->PostThreadMessage(CGraphThread::TM_TUNER_SCAN, 0, (LPARAM)pTSD.Detach());
+		m_pGraphThread->PostThreadMessage(CGraphThread::TM_TUNER_SCAN, 0, (LPARAM)pTSD.release());
 	} else {
-		DoTunerScan(pTSD);
+		DoTunerScan(pTSD.get());
 	}
 }
 
@@ -20831,8 +20831,8 @@ void CGraphThread::OnReset(WPARAM wParam, LPARAM lParam)
 void CGraphThread::OnTunerScan(WPARAM wParam, LPARAM lParam)
 {
 	if (m_pMainFrame) {
-		CAutoPtr<TunerScanData> pTSD((TunerScanData*)lParam);
-		m_pMainFrame->DoTunerScan(pTSD);
+		std::unique_ptr<TunerScanData> pTSD((TunerScanData*)lParam);
+		m_pMainFrame->DoTunerScan(pTSD.get());
 	}
 }
 
