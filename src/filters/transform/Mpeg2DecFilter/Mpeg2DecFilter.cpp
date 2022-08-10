@@ -1479,7 +1479,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 			memcpy(sp->data() + sp->size() - len, pDataIn, len);
 		}
 	} else {
-		for (auto& it = m_sps.rbegin(); it != m_sps.rend(); ++it) {
+		for (auto it = m_sps.rbegin(); it != m_sps.rend(); ++it) {
 			auto& sp = *it;
 			if (sp->m_rtStop == _I64_MAX) {
 				sp->m_rtStop = rtStart;
