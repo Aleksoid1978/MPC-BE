@@ -204,7 +204,7 @@ static void SetupDefaultCaps(AM_MEDIA_TYPE* pmt, AUDIO_STREAM_CONFIG_CAPS& caps)
 template<class T>
 static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CComboBox& type, CComboBox& dim, CMediaType& mt)
 {
-	tfa.RemoveAll();
+	tfa.clear();
 	type.ResetContent();
 	dim.ResetContent();
 	type.EnableWindow(FALSE);
@@ -229,7 +229,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		}
 
 		if (iSize == sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
-			for (size_t i = 0, cnt = tfa.GetCount(); i < cnt; i++) {
+			for (size_t i = 0, cnt = tfa.size(); i < cnt; i++) {
 				if (tfa[i]->size() != 1) {
 					continue;
 				}
@@ -319,7 +319,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		}
 	}
 
-	if (tfa.IsEmpty()) {
+	if (tfa.empty()) {
 		if (pcurmt && (pcurmt->majortype == MEDIATYPE_Video || pcurmt->majortype == MEDIATYPE_Audio)) {
 			AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
 			CopyMediaType(pmt, pcurmt);
@@ -335,16 +335,15 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		}
 	}
 
-	for (size_t i = 0, cnt = tfa.GetCount(); i < cnt; i++) {
-		CFormat<T>* pf = tfa[i];
-		AddStringData(type, pf->name, (DWORD_PTR)pf);
+	for (const auto& pf : tfa) {
+		AddStringData(type, pf->name, (DWORD_PTR)pf.get());
 	}
 
 	CFormat<T>* pf = nullptr;
 	CFormatElem<T>* pfeCurrent = nullptr;
 
 	if (!pcurmt) {
-		pf = tfa[0];
+		pf = tfa.front().get();
 		pfeCurrent = pf->front().get();
 	} else if (!tfa.FindFormat(pcurmt, nullptr, &pf, &pfeCurrent) && !tfa.FindFormat(pcurmt, &pf)) {
 		if (pcurmt) {
@@ -690,7 +689,7 @@ void CPlayerCaptureDialog::EmptyVideo()
 		AfxGetProfile().WriteInt(IDS_R_CAPTURE, L"Channel", lChannel);
 	}
 
-	m_vfa.RemoveAll();
+	m_vfa.clear();
 
 	m_pAMXB.Release();
 	m_pAMTuner.Release();
@@ -717,7 +716,7 @@ void CPlayerCaptureDialog::EmptyVideo()
 
 void CPlayerCaptureDialog::EmptyAudio()
 {
-	m_afa.RemoveAll();
+	m_afa.clear();
 
 	m_pAMASC = nullptr;
 	m_pAMAIM.RemoveAll();
