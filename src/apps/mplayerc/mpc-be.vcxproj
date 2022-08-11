@@ -546,7 +546,7 @@
     <ProjectReference Include="$(SolutionDir)src\filters\reader\CDXAReader\CDXAReader.vcxproj">
       <Project>{4d3b4ff4-535a-4201-ab7d-9aec1e737a95}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\filters\reader\UDPReader\UDPReader.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\filters\reader\StreamReader\MPCStreamReader.vcxproj">
       <Project>{3020ff9b-8202-488d-b137-11decc510e6e}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\filters\reader\VTSReader\VTSReader.vcxproj">

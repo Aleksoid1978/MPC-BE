@@ -93,7 +93,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDDAReader", "src\filters\r
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDXAReader", "src\filters\reader\CDXAReader\CDXAReader.vcxproj", "{4D3B4FF4-535A-4201-AB7D-9AEC1E737A95}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UDPReader", "src\filters\reader\UDPReader\UDPReader.vcxproj", "{3020FF9B-8202-488D-B137-11DECC510E6E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPCStreamReader", "src\filters\reader\StreamReader\MPCStreamReader.vcxproj", "{3020FF9B-8202-488D-B137-11DECC510E6E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VTSReader", "src\filters\reader\VTSReader\VTSReader.vcxproj", "{664E726B-EEEE-403A-AC15-345D9C9E1375}"
 EndProject

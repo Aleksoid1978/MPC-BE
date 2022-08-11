@@ -1855,7 +1855,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_UDP] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CUDPReader>(UDPReaderName);
+		pFGF = DNew CFGFilterInternal<CUDPReader>(StreamReaderName);
 		pFGF->m_protocols.emplace_back(L"udp");
 		pFGF->m_protocols.emplace_back(L"http");
 		pFGF->m_protocols.emplace_back(L"https");
@@ -1863,7 +1863,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_STDINPUT] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CUDPReader>(STDInReaderName);
+		pFGF = DNew CFGFilterInternal<CUDPReader>(StreamReaderName);
 		pFGF->m_protocols.emplace_back(L"pipe");
 		m_source.push_back(pFGF);
 	}

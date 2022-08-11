@@ -43,7 +43,7 @@
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
-#include "reader/UDPReader/UDPReader.h"
+#include "reader/StreamReader/MPCStreamReader.h"
 #include "reader/VTSReader/VTSReader.h"
 
 #include "renderer/MpcAudioRenderer/MpcAudioRenderer.h"

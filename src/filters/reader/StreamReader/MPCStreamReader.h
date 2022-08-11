@@ -22,14 +22,12 @@
 #pragma once
 
 #include <qnetwork.h>
-#include "UDPStream.h"
+#include "LiveStream.h"
 #include <ExtLib/AsyncReader/asyncrdr.h>
 
-#define UDPReaderName   L"MPC UDP/HTTP Reader"
-#define STDInReaderName L"MPC Std input Reader"
-#define HLSReaderName   L"MPC HLS Live Reader"
+#define StreamReaderName L"MPC Stream Reader"
 
-class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))
+class __declspec(uuid("0E49B128-9547-4423-88F9-897837E298F5"))
 	CUDPReader
 	: public CAsyncReader
 	, public IFileSourceFilter

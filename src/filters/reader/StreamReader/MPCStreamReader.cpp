@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "DSUtil/DSUtil.h"
-#include "UDPReader.h"
+#include "MPCStreamReader.h"
 
 #ifdef REGISTER_FILTER
 
@@ -34,7 +34,7 @@ const AMOVIESETUP_PIN sudOpPin[] = {
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CUDPReader), UDPReaderName, MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CUDPReader), StreamReaderName, MERIT_NORMAL, std::size(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -94,9 +94,21 @@ STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
 
 	const wchar_t* readerName;
 	switch (m_stream.GetProtocol()) {
-		case CUDPStream::protocol::PR_PIPE: readerName = STDInReaderName; break;
-		case CUDPStream::protocol::PR_HLS:  readerName = HLSReaderName;   break;
-		default:                            readerName = UDPReaderName;   break;
+		case CUDPStream::protocol::PR_UDP:
+			readerName = StreamReaderName L" [UDP]";
+			break;
+		case CUDPStream::protocol::PR_HTTP:
+			readerName = StreamReaderName L" [HTTP]";
+			break;
+		case CUDPStream::protocol::PR_PIPE:
+			readerName = StreamReaderName L" [stdin]";
+			break;
+		case CUDPStream::protocol::PR_HLS:
+			readerName = StreamReaderName L" [HLS-Live]";
+			break;
+		default:
+			readerName = StreamReaderName;
+			break;
 	}
 
 	wcscpy_s(pInfo->achName, readerName);

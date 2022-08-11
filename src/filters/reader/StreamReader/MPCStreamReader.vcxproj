@@ -2,9 +2,9 @@
 <Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3020FF9B-8202-488D-B137-11DECC510E6E}</ProjectGuid>
-    <RootNamespace>UDPReader</RootNamespace>
+    <RootNamespace>MPCStreamReader</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>UDPReader</ProjectName>
+    <ProjectName>MPCStreamReader</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(SolutionDir)src\platform.props" />
@@ -36,11 +36,11 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="UDPReader.cpp" />
-    <ClCompile Include="UDPStream.cpp" />
+    <ClCompile Include="MPCStreamReader.cpp" />
+    <ClCompile Include="LiveStream.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="UDPReader.def" />
+    <None Include="MPCStreamReader.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AESDecryptor.h" />
@@ -48,11 +48,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="UDPReader.h" />
-    <ClInclude Include="UDPStream.h" />
+    <ClInclude Include="MPCStreamReader.h" />
+    <ClInclude Include="LiveStream.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="UDPReader.rc">
+    <ResourceCompile Include="MPCStreamReader.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>

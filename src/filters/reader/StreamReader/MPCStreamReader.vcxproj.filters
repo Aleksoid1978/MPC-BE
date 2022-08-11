@@ -18,10 +18,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UDPReader.cpp">
+    <ClCompile Include="MPCStreamReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UDPStream.cpp">
+    <ClCompile Include="LiveStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AESDecryptor.cpp">
@@ -29,7 +29,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="UDPReader.def">
+    <None Include="MPCStreamReader.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
@@ -40,10 +40,10 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UDPReader.h">
+    <ClInclude Include="MPCStreamReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UDPStream.h">
+    <ClInclude Include="LiveStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AESDecryptor.h">
@@ -51,7 +51,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="UDPReader.rc">
+    <ResourceCompile Include="MPCStreamReader.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
