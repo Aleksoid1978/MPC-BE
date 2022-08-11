@@ -2,7 +2,7 @@
 
 1.6.3.x beta
 =============================
-HTTP/UDP Reader
+MPCStreamReader (MPC UDP/HTTP Reader)
 Added support for HLS Live.
 
 MPegSplitter
@@ -10,8 +10,11 @@ Fixed playback of VOB files with an incorrect empty block at the beginning.
 Faster navigation for Blu-ray files, added support for keyframes.
 Optimized calculation of unknown frame rate.
 
-Mpeg2DecFilter
+MpcDvdVideoDecoder (Mpeg2DecFilter)
 Removed option to read aspect ratio from video stream. This option is not required when playing DVD-Video.
+
+MPCVideoDec
+Implemented correct output of YUV 4:2:0 and 4:2:2 formats when odd sizes are specified for the video stream.
 
 VideoRenderers
 Сolor management now works for 10-bit surfaces as well.
