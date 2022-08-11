@@ -782,9 +782,7 @@
 #define IDS_SRC_VTS                     14004
 #define IDS_SRC_ROQ                     14011
 #define IDS_SRC_MPA                     14016
-#define IDS_TRA_RV                      14018
-#define IDS_TRA_RA                      14019
-#define IDS_TRA_MPEG2                   14021
+#define IDS_TRA_DVD_VIDEO               14021
 #define IDS_TRA_LPCM                    14023
 #define IDS_TRA_PS2AUD                  14028
 #define IDS_TRA_FFMPEG                  14029

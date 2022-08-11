@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Hakkında"
 7		"MPC-BE"
 8		"Telif Hakkı © 2002-2022, Authors.txt dosyasına bakınız"
@@ -2005,10 +2005,8 @@ STRING IDS_TOUCH_WINDOW_FROM_INSIDE		"Pencereyi İçeriden Uyarla"
 STRING IDS_TOUCH_WINDOW_FROM_OUTSIDE		"Pencereyi Dışarıdan Uyarla"
 STRING IDS_TRA_FFMPEG		"FFmpeg tabanlıdır, http://ffmpeg.org/"
 STRING IDS_TRA_INTEL_MSDK		"Intel Media SDK tabanlıdır, harici kütüphane dosyası gereklidir(libmfxsw32.dll/libmfxsw64.dll)"
-STRING IDS_TRA_MPEG2		"libmpeg2 tabanlıdır"
+STRING IDS_TRA_DVD_VIDEO		"libmpeg2 tabanlıdır"
 STRING IDS_TRA_PS2AUD		"PSS dosyalarının seslerini çözer"
-STRING IDS_TRA_RA		"RealAudio çözücü dll dosyaları gereklidir ya da FFmpeg ile çalışır (http://ffmpeg.org/)"
-STRING IDS_TRA_RV		"RealVideo çözücü dll dosyaları gereklidir ya da FFmpeg ile çalışır (http://ffmpeg.org/)"
 STRING IDS_UNDETERMINED		"Tanımlanmamış"
 STRING IDS_UNKNOWN_SWITCH		"Komut satırında geçersiz anahtar(lar) bulundu: \n\n"
 STRING IDS_UPDATE_CLOSE		"&Kapat"

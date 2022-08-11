@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Névjegy"
 7		"MPC-BE"
 8		"Szerzői jog © 2002-2022 lásd Authors.txt fájl"
@@ -2005,10 +2005,8 @@ STRING IDS_TOUCH_WINDOW_FROM_INSIDE		"Ablak érintése belülről"
 STRING IDS_TOUCH_WINDOW_FROM_OUTSIDE		"Ablak érintése kívülről"
 STRING IDS_TRA_FFMPEG		"A FFmpeg alapján, http://ffmpeg.org/"
 STRING IDS_TRA_INTEL_MSDK		"Az Intel Media SDK alapján, külső könyvtárat igényel(libmfxsw32.dll/libmfxsw64.dll)"
-STRING IDS_TRA_MPEG2		"A libmpeg2 alapján"
+STRING IDS_TRA_DVD_VIDEO		"A libmpeg2 alapján"
 STRING IDS_TRA_PS2AUD		"Dekódolja a PSS fájlok audió sávjait"
-STRING IDS_TRA_RA		"Szükséges RealAudio dekóder dll-ek, vagy működik FFmpeg-el (http://ffmpeg.org/)"
-STRING IDS_TRA_RV		"Szükséges RealVideo dekóder dll-ek, vagy működik FFmpeg-el (http://ffmpeg.org/)"
 STRING IDS_UNDETERMINED		"meghatározatlan"
 STRING IDS_UNKNOWN_SWITCH		"Nem felismerhető kapcsoló(k) találhatóak a parancssortól kapott szövegben: \n\n"
 STRING IDS_UPDATE_CLOSE		"&Bezárás"
