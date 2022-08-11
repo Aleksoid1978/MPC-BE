@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"Ajustes del\nLector CDDA"
 14		"Ajustes del\nLector VTS(IFO)"
 15		"Ajustes del\nDecodificador de Video"
-16		"Ajustes del\nDecodificador\nMPEG-2/DVD"
+16		"Ajustes del\nDecodificador\nDVD-Video"
 17		"Ajustes del\nDecodificador de Audio"
 18		"Longitud del búfer:"
 21		"seg."

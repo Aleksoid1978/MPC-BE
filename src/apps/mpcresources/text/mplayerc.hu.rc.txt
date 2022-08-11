@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"CDDA Reader\nkonfiguráció"
 14		"VTS(IFO) Reader\nkonfiguráció"
 15		"Video decoder\nkonfiguráció"
-16		"MPEG-2/DVD\ndecoder\nkonfiguráció"
+16		"DVD-Video\ndecoder\nkonfiguráció"
 17		"Audio decoder\nkonfiguráció"
 18		"Puffer hossza:"
 21		"mp."

@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"CDDA 讀取器\n選項"
 14		"VTS(IFO) 讀取器\n選項"
 15		"影片解碼器\n選項"
-16		"MPEG-2/DVD\n解碼器\n選項"
+16		"DVD-Video\n解碼器\n選項"
 17		"音訊解碼器\n選項"
 18		"緩衝長度："
 21		"秒"

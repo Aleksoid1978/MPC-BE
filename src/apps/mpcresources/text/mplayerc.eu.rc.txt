@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"CDDA Reader\nconfiguration"
 14		"VTS(IFO) Irakurtzaile\nitxurapena"
 15		"Bideo dekodeatzaile\nitxurapena"
-16		"MPEG-2/DVD\ndekodeatzaile\nitxurapena"
+16		"DVD-Video\ndekodeatzaile\nitxurapena"
 17		"Audio dekodeatzaile\nitxurapena"
 18		"Oroimen luzera:"
 21		"seg."

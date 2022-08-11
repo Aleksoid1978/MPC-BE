@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"CDDA 读取器\n设置"
 14		"VTS(IFO) 读取器\n设置"
 15		"视频解码器\n设置"
-16		"MPEG-2/DVD\n解码器\n设置"
+16		"DVD-Video\n解码器\n设置"
 17		"音频解码器\n设置"
 18		"缓冲长度:"
 21		"秒"

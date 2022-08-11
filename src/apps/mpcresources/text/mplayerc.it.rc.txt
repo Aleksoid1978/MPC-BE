@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"CDDA Reader\nconfiguration"
 14		"VTS(IFO) Reader\nconfigurazione"
 15		"Video decoder\nconfigurazione"
-16		"MPEG-2/DVD\ndecoder\nconfigurazione"
+16		"DVD-Video\ndecoder\nconfigurazione"
 17		"Audio decoder\nconfigurazione"
 18		"Buffer length:"
 21		"sec."

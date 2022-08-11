@@ -331,7 +331,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 13		"CDDA Reader\nρύθμιση"
 14		"VTS(IFO) Reader\nρύθμιση"
 15		"Video decoder\nρύθμιση"
-16		"MPEG-2/DVD\ndecoder\nρύθμιση"
+16		"DVD-Video\ndecoder\nρύθμιση"
 17		"Audio decoder\nρύθμιση"
 18		"Μέγεθος μνήμης:"
 21		"δευτ."
