@@ -53,9 +53,14 @@
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
-	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},  // used by DVD Navigator for MPEG-2 and MPEG-1
-	{&MEDIATYPE_MPEG2_PACK,         &MEDIASUBTYPE_MPEG2_VIDEO},
+	// Base video type of DVD Navigator filter
+	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},  // used for MPEG-2 and MPEG-1
+	// Extended video types of DVD Navigator filter
+	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG2_VIDEO},
 	{&MEDIATYPE_MPEG2_PES,          &MEDIASUBTYPE_MPEG2_VIDEO},
+	// Video CD?
+	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Packet},
+	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Payload},
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -897,14 +902,17 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 		}
 	}
 
-	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO // used by DVD Navigator for MPEG-2 and MPEG-1
-			|| mtIn->majortype == MEDIATYPE_MPEG2_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
-			|| mtIn->majortype == MEDIATYPE_MPEG2_PES && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
+	return (// Base video type of DVD Navigator filter
+			mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO // used for MPEG-2 and MPEG-1
+			// Extended video types of DVD Navigator filter
 			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
-			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Packet
-			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Payload)
-		   ? S_OK
-		   : VFW_E_TYPE_NOT_ACCEPTED;
+			|| mtIn->majortype == MEDIATYPE_MPEG2_PES && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
+			// Video CD?
+			//|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Packet
+			//|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Payload)
+		)
+			? S_OK
+			: VFW_E_TYPE_NOT_ACCEPTED;
 }
 
 HRESULT CMpeg2DecFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
@@ -1381,7 +1389,9 @@ CSubpicInputPin::CSubpicInputPin(CTransformFilter* pFilter, HRESULT* phr)
 
 HRESULT CSubpicInputPin::CheckMediaType(const CMediaType* mtIn)
 {
-	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
+	return (// Base subpicture type of DVD Navigator filter
+			mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
+			// Video CD?
 			|| (mtIn->majortype == MEDIATYPE_Video
 				&& (mtIn->subtype == MEDIASUBTYPE_CVD_SUBPICTURE || mtIn->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE))
 		   ? S_OK
