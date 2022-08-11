@@ -23,7 +23,7 @@
 
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "../BaseVideoFilter/BaseVideoFilter.h"
-#include "IMpeg2DecFilter.h"
+#include "IMpcDvdVideoDec.h"
 #include "SettingsWnd.h"
 
 #define DvdVideoDecoderName L"MPC DVD Video Decoder"
@@ -35,7 +35,7 @@ class CMpeg2Dec;
 class __declspec(uuid("39F81046-93AC-486D-882F-4ADD1CB068C6"))
 	CMpeg2DecFilter
 	: public CBaseVideoFilter
-	, public IMpeg2DecFilter
+	, public IMpcDvdVideoDec
 	, public ISpecifyPropertyPages2
 {
 	CSubpicInputPin* m_pSubpicInput;
@@ -156,7 +156,7 @@ public:
 	STDMETHODIMP GetPages(CAUUID* pPages);
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
-	// IMpeg2DecFilter
+	// IMpcDvdVideoDec
 
 	STDMETHODIMP SetDeinterlaceMethod(ditype di);
 	STDMETHODIMP_(ditype) GetDeinterlaceMethod();

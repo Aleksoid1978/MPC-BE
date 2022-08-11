@@ -78,7 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="attributes.h" />
-    <ClInclude Include="IMpeg2DecFilter.h" />
+    <ClInclude Include="IMpcDvdVideoDec.h" />
     <ClInclude Include="libmpeg2.h" />
     <ClInclude Include="MpcDvdVideoDecoder.h" />
     <ClInclude Include="SettingsWnd.h" />

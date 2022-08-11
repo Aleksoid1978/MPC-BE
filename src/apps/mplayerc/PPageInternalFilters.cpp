@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@
 #include "filters/reader/CDDAReader/CDDAReader.h"
 #include "filters/reader/VTSReader/VTSReader.h"
 #include "filters/transform/MPCVideoDec/MPCVideoDec.h"
-#include "filters/transform/Mpeg2DecFilter/Mpeg2DecFilter.h"
+#include "filters/transform/DVDVideoDecoder/MpcDvdVideoDecoder.h"
 #include "filters/transform/MpaDecFilter/MpaDecFilter.h"
 
 static filter_t s_source_filters[] = {

@@ -29,7 +29,7 @@ enum ditype : int {
 };
 
 interface __declspec(uuid("0ABEAA65-0317-47B9-AE1D-D9EA905AFD25"))
-IMpeg2DecFilter :
+IMpcDvdVideoDec :
 public IUnknown {
 	STDMETHOD(SetDeinterlaceMethod(ditype di)) PURE;
 	STDMETHOD_(ditype, GetDeinterlaceMethod()) PURE;

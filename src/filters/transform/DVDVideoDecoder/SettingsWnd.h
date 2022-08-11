@@ -22,13 +22,13 @@
 #pragma once
 
 #include "filters/filters/InternalPropertyPage.h"
-#include "IMpeg2DecFilter.h"
+#include "IMpcDvdVideoDec.h"
 #include "resource.h"
 
 class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 	CMpeg2DecSettingsWnd : public CInternalPropertyPageWnd
 {
-	CComQIPtr<IMpeg2DecFilter> m_pM2DF;
+	CComQIPtr<IMpcDvdVideoDec> m_pM2DF;
 
 	ditype m_ditype;
 	int m_procamp[4];

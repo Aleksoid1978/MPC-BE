@@ -38,7 +38,7 @@
     <ClInclude Include="attributes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IMpeg2DecFilter.h">
+    <ClInclude Include="IMpcDvdVideoDec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libmpeg2.h">

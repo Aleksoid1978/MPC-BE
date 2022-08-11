@@ -396,7 +396,7 @@ void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary)
 STDMETHODIMP CMpeg2DecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
-		QI(IMpeg2DecFilter)
+		QI(IMpcDvdVideoDec)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -1010,7 +1010,7 @@ STDMETHODIMP CMpeg2DecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPag
 	return *ppPage ? S_OK : E_FAIL;
 }
 
-// IMpeg2DecFilter
+// IMpcDvdVideoDec
 
 STDMETHODIMP CMpeg2DecFilter::SetDeinterlaceMethod(ditype di)
 {
