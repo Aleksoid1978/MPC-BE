@@ -130,7 +130,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_MJPEG]			= L"vdec_mjpeg";
 	VideoFiltersKeys[VDEC_MPEG1]			= L"vdec_mpeg1";
 	VideoFiltersKeys[VDEC_MPEG2]			= L"vdec_mpeg2";
-	VideoFiltersKeys[VDEC_DVD_LIBMPEG2]		= L"vdec_dvd_libmpeg2";
+	VideoFiltersKeys[VDEC_DVD]				= L"vdec_dvd";
 	VideoFiltersKeys[VDEC_MSMPEG4]			= L"vdec_msmpeg4";
 	VideoFiltersKeys[VDEC_PNG]				= L"vdec_png";
 	VideoFiltersKeys[VDEC_QT]				= L"vdec_qt";

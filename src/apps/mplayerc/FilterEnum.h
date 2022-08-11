@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2021 see Authors.txt
+ * (C) 2010-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,7 +85,7 @@ enum VIDEO_FILTER {
 	VDEC_MJPEG,
 	VDEC_MPEG1,
 	VDEC_MPEG2,
-	VDEC_DVD_LIBMPEG2,
+	VDEC_DVD,
 	VDEC_MSMPEG4,
 	VDEC_PNG,
 	VDEC_QT,
