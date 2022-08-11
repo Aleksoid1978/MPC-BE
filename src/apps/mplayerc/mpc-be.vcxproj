@@ -600,7 +600,7 @@
     <ProjectReference Include="$(SolutionDir)src\filters\transform\MPCVideoDec\MPCVideoDec.vcxproj">
       <Project>{58e36bf5-4a06-47e4-bd40-4ccef8c634df}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\filters\transform\Mpeg2DecFilter\Mpeg2DecFilter.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\filters\transform\DVDVideoDecoder\MpcDvdVideoDecoder.vcxproj">
       <Project>{305bab2d-0d75-4fbc-8bcd-a2917392b48c}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\SubPic\SubPic.vcxproj">

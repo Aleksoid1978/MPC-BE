@@ -24,10 +24,10 @@
     <ClCompile Include="mc_sse2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mpeg2DecFilter.cpp">
+    <ClCompile Include="MpcDvdVideoDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mpeg2DecFilterSettingsWnd.cpp">
+    <ClCompile Include="SettingsWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -44,10 +44,10 @@
     <ClInclude Include="libmpeg2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mpeg2DecFilter.h">
+    <ClInclude Include="MpcDvdVideoDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mpeg2DecFilterSettingsWnd.h">
+    <ClInclude Include="SettingsWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -67,7 +67,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Mpeg2DecFilter.rc">
+    <ResourceCompile Include="MpcDvdVideoDecoder.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

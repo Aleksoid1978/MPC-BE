@@ -24,7 +24,7 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include "libmpeg2.h"
-#include "Mpeg2DecFilter.h"
+#include "MpcDvdVideoDecoder.h"
 
 #include <xmmintrin.h>
 #include <emmintrin.h>
@@ -38,8 +38,8 @@
 #include <IFilterVersion.h>
 
 // option names
-#define OPT_REGKEY_MPEGDec  L"Software\\MPC-BE Filters\\MPEG Video Decoder"
-#define OPT_SECTION_MPEGDec L"Filters\\MPEG Video Decoder"
+#define OPT_REGKEY_MPEGDec  L"Software\\MPC-BE Filters\\DVD Video Decoder"
+#define OPT_SECTION_MPEGDec L"Filters\\DVD Video Decoder"
 #define OPT_DeintMethod     L"DeinterlaceMethod"
 #define OPT_Brightness      L"ProcAmpBrightness"
 #define OPT_Contrast        L"ProcAmpContrast"
@@ -56,9 +56,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},  // used by DVD Navigator for MPEG-2 and MPEG-1
 	{&MEDIATYPE_MPEG2_PACK,         &MEDIASUBTYPE_MPEG2_VIDEO},
 	{&MEDIATYPE_MPEG2_PES,          &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Packet},
-	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Payload},
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -73,7 +70,7 @@ const AMOVIESETUP_PIN sudpPins[] = {
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMpeg2DecFilter), Mpeg2DecFilterName, 0x00600001, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMpeg2DecFilter), DvdVideoDecoderName, 0x00600001, std::size(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {

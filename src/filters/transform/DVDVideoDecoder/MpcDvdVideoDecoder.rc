@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileVersion", MPC_VERSION_FULL_STR
             VALUE "InternalName", " Mpeg2Dec Filter"
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
-            VALUE "OriginalFilename", "Mpeg2DecFilter.ax"
+            VALUE "OriginalFilename", "MpcDvdVideoDecoder.ax"
             VALUE "ProductName", " Mpeg2Dec Filter"
             VALUE "ProductVersion", MPC_VERSION_STR
         END

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Mpeg2DecFilter.rc
+// Used by MpcDvdVideoDecoder.rc
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
 #define IDS_MPEG2_INTERLACE_FLAG        7501

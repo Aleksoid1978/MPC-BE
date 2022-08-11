@@ -24,15 +24,15 @@
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMpeg2DecFilter.h"
-#include "Mpeg2DecFilterSettingsWnd.h"
+#include "SettingsWnd.h"
 
-#define Mpeg2DecFilterName L"MPC DVD Video Decoder"
+#define DvdVideoDecoderName L"MPC DVD Video Decoder"
 
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;
 class CMpeg2Dec;
 
-class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
+class __declspec(uuid("39F81046-93AC-486D-882F-4ADD1CB068C6"))
 	CMpeg2DecFilter
 	: public CBaseVideoFilter
 	, public IMpeg2DecFilter

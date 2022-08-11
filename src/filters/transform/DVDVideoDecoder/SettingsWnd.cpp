@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include "Mpeg2DecFilterSettingsWnd.h"
+#include "SettingsWnd.h"
 #include "DSUtil/MFCHelper.h"
 
 //
