@@ -167,7 +167,7 @@ public:
 	RMFF::ContentDesc m_cd;
 	RMFF::Properies m_p;
 	std::list<std::unique_ptr<RMFF::MediaProperies>> m_mps;
-	std::list<std::unique_ptr<RMFF::DataChunk>> m_dcs;
+	CAutoPtrList<RMFF::DataChunk> m_dcs;
 	std::list<std::unique_ptr<RMFF::IndexRecord>> m_irs;
 
 	struct subtitle {
