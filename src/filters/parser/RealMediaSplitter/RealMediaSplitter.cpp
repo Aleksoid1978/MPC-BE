@@ -1275,7 +1275,7 @@ HRESULT CRMFile::Init()
 					break;
 				}
 				case 'DATA': {
-					CAutoPtr<DataChunk> dc(DNew DataChunk);
+					std::unique_ptr<DataChunk> dc(DNew DataChunk);
 					if (S_OK != (hr = Read(dc->nPackets))) {
 						return hr;
 					}
@@ -1283,7 +1283,7 @@ HRESULT CRMFile::Init()
 						return hr;
 					}
 					dc->pos = GetPos();
-					m_dcs.AddTail(dc);
+					m_dcs.emplace_back(std::move(dc));
 					GetDimensions();
 					break;
 				}
