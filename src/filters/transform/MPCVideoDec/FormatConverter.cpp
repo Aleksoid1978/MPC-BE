@@ -549,3 +549,8 @@ bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat)
 		   avformat == AV_PIX_FMT_YUV444P   && m_out_pixfmt == PixFmt_YV24 ||
 		   avformat == AV_PIX_FMT_YUV444P16 && m_out_pixfmt == PixFmt_YUV444P16;
 }
+
+void CFormatConverter::Clear()
+{
+	m_FProps = {};
+}

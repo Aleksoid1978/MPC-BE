@@ -1692,8 +1692,9 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			BuildOutputFormat();
 		}
 
-		m_bDecodingStart    = FALSE;
-		m_pCurrentMediaType = *pmt;
+		m_bDecodingStart       = FALSE;
+		m_bDecoderAcceptFormat = FALSE;
+		m_pCurrentMediaType    = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
 		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
@@ -3304,7 +3305,8 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
-		} else if (m_bUseD3D11cb || m_bUseNVDEC) {
+		} else if ((m_bUseD3D11cb || m_bUseNVDEC) && !m_bDecoderAcceptFormat) {
+			m_FormatConverter.Clear();
 			DXVAState::ClearState();
 			m_HWPixFmt = AV_PIX_FMT_NONE;
 			m_bUseD3D11cb = m_bUseNVDEC = false;
@@ -3611,6 +3613,8 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		av_frame_unref(m_pFrame);
 		av_frame_free(&hw_frame);
+
+		m_bDecoderAcceptFormat = TRUE;
 	}
 
 	return S_OK;

@@ -148,6 +148,7 @@ private:
 	CMediaType								m_pCurrentMediaType;
 
 	BOOL									m_bDecodingStart;
+	BOOL									m_bDecoderAcceptFormat = FALSE;
 
 	BOOL									m_bHighBitdepth;
 
