@@ -1101,8 +1101,10 @@ HRESULT CRMFile::Read(MediaPacketHeader& mph, bool fFull)
 	len -= sizeof(object_version);
 	len -= FIELD_OFFSET(MediaPacketHeader, flags);
 	len -= sizeof(flags);
-	ASSERT(len >= 0);
-	len = std::max(len, 0L);
+	//ASSERT(len >= 0);
+	if (len < 0) {
+		len = 0;
+	}
 
 	if (fFull) {
 		mph.pData.resize(len);
@@ -1353,7 +1355,7 @@ HRESULT CRMFile::Init()
 			hdr.size = GetPos() - pos;
 		}
 
-		ASSERT(hdr.object_id == 'DATA'
+		ASSERT(hdr.object_id == 'DATA' || hdr.object_id == 'INDX'
 			   || GetPos() == pos + hdr.size
 			   || GetPos() == pos + sizeof(hdr));
 
