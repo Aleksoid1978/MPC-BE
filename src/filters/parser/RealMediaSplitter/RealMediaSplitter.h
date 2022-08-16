@@ -167,7 +167,7 @@ public:
 	RMFF::ContentDesc m_cd;
 	RMFF::Properies m_p;
 	std::list<std::unique_ptr<RMFF::MediaProperies>> m_mps;
-	CAutoPtrList<RMFF::DataChunk> m_dcs;
+	std::vector<std::unique_ptr<RMFF::DataChunk>> m_dcs;
 	std::list<std::unique_ptr<RMFF::IndexRecord>> m_irs;
 
 	struct subtitle {
@@ -224,7 +224,7 @@ protected:
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	POSITION m_seekpos;
+	UINT32 m_seekdc;
 	UINT32 m_seekpacket;
 	UINT64 m_seekfilepos;
 
