@@ -4566,12 +4566,12 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 
 		if (wcscmp(decoderName, L"avcodec") == 0) {
 			DXVAState::ClearState();
-		}
-		else {
+		} else {
 			static const struct {
 				const WCHAR* name;
 				const WCHAR* friendlyname;
 			} LAVDecoderNames[] = {
+				{L"dxva2cb",         L"DXVA2 Copy-back"},
 				{L"dxva2cb direct",  L"DXVA2 Copy-back (direct)"},
 				{L"d3d11 cb",        L"D3D11 Copy-back"},
 				{L"d3d11 cb direct", L"D3D11 Copy-back (direct)"},
