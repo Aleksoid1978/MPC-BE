@@ -249,10 +249,10 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 			CBlockGroupNode bgn;
 
 			if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-				bgn.Parse(m_pBlock, true);
+				bgn.Parse(m_pBlock.get(), true);
 			} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-				bg->Block.Parse(m_pBlock, true);
+				bg->Block.Parse(m_pBlock.get(), true);
 				bgn.emplace_back(bg);
 			}
 
@@ -270,11 +270,11 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 			}
 		} while (m_pBlock->NextBlock() && !CheckRequest(nullptr) && pData.empty());
 
-		m_pBlock.Free();
+		m_pBlock.reset();
 	} while (m_pFile->GetPos() < (__int64)std::min(m_pFile->m_segment.pos + m_pFile->m_segment.len, 1024ULL * MEGABYTE)
 		&& m_pCluster->Next(true) && !CheckRequest(nullptr) && pData.empty());
 
-	m_pCluster.Free();
+	m_pCluster.reset();
 
 	m_pFile->Seek(pos);
 
@@ -789,18 +789,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					do {
 						Cluster c;
-						c.ParseTimeCode(m_pCluster);
+						c.ParseTimeCode(m_pCluster.get());
 
-						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
+						std::unique_ptr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock();
+						if (pBlock) {
 							do {
 								CBlockGroupNode bgn;
 
 								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-									bgn.Parse(pBlock, true);
+									bgn.Parse(pBlock.get(), true);
 								}
 								else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-									bg->Block.Parse(pBlock, true);
+									bg->Block.Parse(pBlock.get(), true);
 									bgn.emplace_back(bg);
 								}
 
@@ -819,7 +820,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					} while (readmore && m_pCluster->Next(true));
 
-					m_pCluster.Free();
+					m_pCluster.reset();
 
 					framerate = TimecodeAnalyzer::CalculateFPS(timecodes, 1000000000ui64 / m_pFile->m_segment.SegmentInfo.TimeCodeScale);
 					if (framerate == 0.0) {
@@ -1123,7 +1124,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 					Cluster c;
-					c.ParseTimeCode(m_pCluster);
+					c.ParseTimeCode(m_pCluster.get());
 
 					if (!m_pBlock) {
 						m_pBlock = m_pCluster->GetFirstBlock();
@@ -1134,10 +1135,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CBlockGroupNode bgn;
 
 						if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-							bgn.Parse(m_pBlock, true);
+							bgn.Parse(m_pBlock.get(), true);
 						} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 							CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-							bg->Block.Parse(m_pBlock, true);
+							bg->Block.Parse(m_pBlock.get(), true);
 							bgn.emplace_back(bg);
 						}
 
@@ -1191,8 +1192,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr) && !bIsParse);
 
-					m_pBlock.Free();
-					m_pCluster.Free();
+					m_pBlock.reset();
+					m_pCluster.reset();
 
 					m_pFile->Seek(pos);
 
@@ -1527,7 +1528,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		// calculate duration from video track;
 		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-		m_pBlock.Free();
+		m_pBlock.reset();
 
 		Segment& s = m_pFile->m_segment;
 		UINT64 TrackNumber = s.GetMasterTrack();
@@ -1554,18 +1555,18 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					do {
 						Cluster c;
-						c.ParseTimeCode(m_pCluster);
+						c.ParseTimeCode(m_pCluster.get());
 
-						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
-
+						std::unique_ptr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock();
+						if (pBlock) {
 							do {
 								CBlockGroupNode bgn;
 
 								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-									bgn.Parse(pBlock, true);
+									bgn.Parse(pBlock.get(), true);
 								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-									bg->Block.Parse(pBlock, true);
+									bg->Block.Parse(pBlock.get(), true);
 									bgn.emplace_back(bg);
 								}
 
@@ -1594,8 +1595,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		}
-		m_pCluster.Free();
-		m_pBlock.Free();
+		m_pCluster.reset();
+		m_pBlock.reset();
 
 		if (rtDur != INVALID_TIME) {
 			m_rtDuration = std::min(m_rtDuration, rtDur);
@@ -1883,7 +1884,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 
 		do {
 			Cluster c;
-			c.ParseTimeCode(m_pCluster);
+			c.ParseTimeCode(m_pCluster.get());
 
 			const auto clusterTime = s.GetRefTime(c.TimeCode);
 			const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
@@ -1910,7 +1911,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			}
 		} while (!m_fAbort && m_pCluster->Next(true));
 
-		m_pCluster.Free();
+		m_pCluster.reset();
 
 		m_nOpenProgress = 100;
 
@@ -1982,7 +1983,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-	m_pBlock.Free();
+	m_pBlock.reset();
 
 	if (!m_pCluster) {
 		return;
@@ -2008,7 +2009,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			}
 
 			Cluster c;
-			c.ParseTimeCode(m_pCluster);
+			c.ParseTimeCode(m_pCluster.get());
 
 			const auto clusterTime = s.GetRefTime(c.TimeCode);
 			const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
@@ -2026,7 +2027,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 			do {
 				Cluster c;
-				if (FAILED(c.ParseTimeCode(m_pCluster))) {
+				if (FAILED(c.ParseTimeCode(m_pCluster.get()))) {
 					continue;
 				}
 
@@ -2045,7 +2046,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 				do {
 					Cluster c;
-					if (FAILED(c.ParseTimeCode(m_pCluster))) {
+					if (FAILED(c.ParseTimeCode(m_pCluster.get()))) {
 						continue;
 					}
 
@@ -2065,7 +2066,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	end:
 		Cluster c;
-		c.ParseTimeCode(m_pCluster);
+		c.ParseTimeCode(m_pCluster.get());
 		m_Cluster_seek_rt = s.GetRefTime(c.TimeCode);
 		const auto rtOffset = (m_Cluster_seek_rt >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 		m_Cluster_seek_pos = m_pCluster->m_filepos;
@@ -2080,10 +2081,10 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			do {
 				CBlockGroupNode bgn;
 				if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-					bgn.Parse(m_pBlock, true);
+					bgn.Parse(m_pBlock.get(), true);
 				} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 					CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-					bg->Block.Parse(m_pBlock, true);
+					bg->Block.Parse(m_pBlock.get(), true);
 					bgn.emplace_back(bg);
 				}
 
@@ -2101,7 +2102,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 							m_pBlock->SeekTo(block_pos);
 							m_pBlock->Parse();
 						} else {
-							m_pBlock.Free();
+							m_pBlock.reset();
 							m_pCluster->SeekTo(m_Cluster_seek_pos);
 						}
 						bFound = true;
@@ -2113,7 +2114,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			} while (!bFound && m_pBlock->NextBlock());
 
 			if (!bFound) {
-				m_pBlock.Free();
+				m_pBlock.reset();
 				m_pCluster->SeekTo(m_Cluster_seek_pos);
 			}
 		}
@@ -2151,7 +2152,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	};
 
 	if (m_Cluster_seek_rt > 0 && m_bSupportSubtitlesCueDuration) {
-		CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+		std::unique_ptr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 		if (pCluster) {
 			bool bBreak = false;
 			UINT64 lastCueRelativePosition = ULONGLONG_MAX;
@@ -2194,22 +2195,22 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 							lastCueRelativePosition = pos + pCueTrackPositions->CueRelativePosition;
 
 							pCluster->SeekTo(pos + pCueTrackPositions->CueRelativePosition);
-							CAutoPtr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster));
+							std::unique_ptr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster.get()));
 							if (!pBlock) {
 								continue;
 							}
 
 							Cluster c;
-							c.ParseTimeCode(pCluster);
+							c.ParseTimeCode(pCluster.get());
 							const auto clusterTime = s.GetRefTime(c.TimeCode);
 							const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 
 							CBlockGroupNode bgn;
 							if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-								bgn.Parse(pBlock, true);
+								bgn.Parse(pBlock.get(), true);
 							} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 								CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-								bg->Block.Parse(pBlock, true);
+								bg->Block.Parse(pBlock.get(), true);
 								if (!(bg->Block.Lacing & 0x80)) {
 									bg->ReferenceBlock.Set(0); // not a kf
 								}
@@ -2261,7 +2262,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 		}
 
 		Cluster c;
-		c.ParseTimeCode(m_pCluster);
+		c.ParseTimeCode(m_pCluster.get());
 		const auto clusterTime = s.GetRefTime(c.TimeCode);
 		const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 
@@ -2269,10 +2270,10 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			CBlockGroupNode bgn;
 
 			if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-				bgn.Parse(m_pBlock, true);
+				bgn.Parse(m_pBlock.get(), true);
 			} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-				bg->Block.Parse(m_pBlock, true);
+				bg->Block.Parse(m_pBlock.get(), true);
 				if (!(bg->Block.Lacing & 0x80)) {
 					bg->ReferenceBlock.Set(0); // not a kf
 				}
@@ -2302,11 +2303,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			}
 		} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr));
 
-		m_pBlock.Free();
+		m_pBlock.reset();
 	} while (m_pFile->GetPos() < (__int64)(m_pFile->m_segment.pos + m_pFile->m_segment.len)
 			 && m_pCluster->Next(true) && SUCCEEDED(hr) && !CheckRequest(nullptr));
 
-	m_pCluster.Free();
+	m_pCluster.reset();
 
 	CAutoLock cAutoLock(&m_csPackets);
 	for (auto& [TrackNumber, packets] : m_packets) {

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,7 +66,9 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	void InstallFonts();
 	void SendVorbisHeaderSample();
 
-	CAutoPtr<CMatroskaNode> m_pSegment, m_pCluster, m_pBlock;
+	std::unique_ptr<CMatroskaNode> m_pSegment;
+	std::unique_ptr<CMatroskaNode> m_pCluster;
+	std::unique_ptr<CMatroskaNode> m_pBlock;
 
 	REFERENCE_TIME m_Cluster_seek_rt;
 	UINT64 m_Cluster_seek_pos;

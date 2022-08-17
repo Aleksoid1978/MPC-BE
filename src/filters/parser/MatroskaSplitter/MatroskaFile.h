@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -707,7 +707,7 @@ namespace MatroskaReader
 		CMatroskaNode* Parent() {
 			return m_pParent;
 		}
-		CAutoPtr<CMatroskaNode> Child(DWORD id = 0, bool fSearch = true);
+		std::unique_ptr<CMatroskaNode> Child(DWORD id = 0, bool fSearch = true);
 		bool Next(bool fSame = false);
 		bool Find(DWORD id, bool fSearch = true);
 
@@ -718,9 +718,9 @@ namespace MatroskaReader
 		template <class T> HRESULT Read(T& var);
 		HRESULT Read(BYTE* pData, UINT64 len);
 
-		CAutoPtr<CMatroskaNode> Copy();
+		std::unique_ptr<CMatroskaNode> Copy();
 
-		CAutoPtr<CMatroskaNode> GetFirstBlock();
+		std::unique_ptr<CMatroskaNode> GetFirstBlock();
 		bool NextBlock();
 
 		bool IsRandomAccess() {

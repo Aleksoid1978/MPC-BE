@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,8 @@ using namespace MatroskaReader;
 #define BeginChunk	\
 	CheckPointer(pMN0, E_POINTER); \
 \
-	CAutoPtr<CMatroskaNode> pMN = pMN0->Child(); \
+	std::unique_ptr<CMatroskaNode> pMNChild = pMN0->Child(); \
+	CMatroskaNode* pMN = pMNChild.get(); \
 	if (!pMN) return S_FALSE; \
 \
 	do \
@@ -97,12 +98,14 @@ HRESULT CMatroskaFile::Init()
 	}
 
 	if (bCanPlayback) {
-		CAutoPtr<CMatroskaNode> pSegment, pCluster;
-		if ((pSegment = Root.Child(MATROSKA_ID_SEGMENT))
-				&& (pCluster = pSegment->Child(MATROSKA_ID_CLUSTER))) {
-			Cluster c0;
-			c0.ParseTimeCode(pCluster);
-			m_rtOffset = m_segment.GetRefTime(c0.TimeCode);
+		std::unique_ptr<CMatroskaNode> pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+		if (pSegment) {
+			std::unique_ptr<CMatroskaNode> pCluster = pSegment->Child(MATROSKA_ID_CLUSTER);
+			if (pCluster) {
+				Cluster c0;
+				c0.ParseTimeCode(pCluster.get());
+				m_rtOffset = m_segment.GetRefTime(c0.TimeCode);
+			}
 		}
 	}
 
@@ -204,7 +207,7 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	pos = pMN0->GetPos();
 	len = pMN0->m_len;
 
-	CAutoPtr<CMatroskaNode> pMN = pMN0->Child();
+	std::unique_ptr<CMatroskaNode> pMN = pMN0->Child();
 	if (!pMN) {
 		return S_FALSE;
 	}
@@ -213,25 +216,25 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	do {
 		switch (pMN->m_id) {
 			case MATROSKA_ID_INFO:
-				SegmentInfo.Parse(pMN);
+				SegmentInfo.Parse(pMN.get());
 				break;
 			case MATROSKA_ID_SEEKHEAD:
-				MetaSeekInfo.Parse(pMN);
+				MetaSeekInfo.Parse(pMN.get());
 				break;
 			case MATROSKA_ID_TRACKS:
-				Tracks.Parse(pMN);
+				Tracks.Parse(pMN.get());
 				break;
 			case MATROSKA_ID_CUES:
-				Cues.Parse(pMN);
+				Cues.Parse(pMN.get());
 				break;
 			case MATROSKA_ID_CHAPTERS:
-				Chapters.Parse(pMN);
+				Chapters.Parse(pMN.get());
 				break;
 			case MATROSKA_ID_ATTACHMENTS:
-				Attachments.Parse(pMN);
+				Attachments.Parse(pMN.get());
 				break;
 			case MATROSKA_ID_TAGS:
-				Tags.Parse(pMN);
+				Tags.Parse(pMN.get());
 				break;
 			default:
 				break;
@@ -248,26 +251,26 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) > pMN->GetLength()) {
 			break; // a broken file
 		}
-		MetaSeekInfo.Parse(pMN);
+		MetaSeekInfo.Parse(pMN.get());
 	}
 
 	// trying to read items that have not been read before
 	if (Tracks.empty() && (pMN = pMN0->Child(MATROSKA_ID_TRACKS, false))) {
-		Tracks.Parse(pMN);
+		Tracks.Parse(pMN.get());
 	}
 	if (Cues.empty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
 		do {
-			Cues.Parse(pMN);
+			Cues.Parse(pMN.get());
 		} while (pMN->Next(true));
 	}
 	if (Chapters.empty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
-		Chapters.Parse(pMN);
+		Chapters.Parse(pMN.get());
 	}
 	if (Attachments.empty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
-		Attachments.Parse(pMN);
+		Attachments.Parse(pMN.get());
 	}
 	if (Tags.empty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
-		Tags.Parse(pMN);
+		Tags.Parse(pMN.get());
 	}
 
 	return S_OK;
@@ -1661,15 +1664,15 @@ HRESULT CMatroskaNode::Parse()
 	return S_OK;
 }
 
-CAutoPtr<CMatroskaNode> CMatroskaNode::Child(DWORD id, bool fSearch)
+std::unique_ptr<CMatroskaNode> CMatroskaNode::Child(DWORD id, bool fSearch)
 {
 	if (m_len == 0) {
-		return CAutoPtr<CMatroskaNode>();
+		return std::unique_ptr<CMatroskaNode>();
 	}
 	SeekTo(m_start);
-	CAutoPtr<CMatroskaNode> pMN(DNew CMatroskaNode(this));
+	std::unique_ptr<CMatroskaNode> pMN(DNew CMatroskaNode(this));
 	if (id && !pMN->Find(id, fSearch)) {
-		pMN.Free();
+		pMN.reset();
 	}
 	return pMN;
 }
@@ -1765,9 +1768,9 @@ UINT64 CMatroskaNode::FindPos(DWORD id, UINT64 start)
 	return 0;
 }
 
-CAutoPtr<CMatroskaNode> CMatroskaNode::Copy()
+std::unique_ptr<CMatroskaNode> CMatroskaNode::Copy()
 {
-	CAutoPtr<CMatroskaNode> pNewNode(DNew CMatroskaNode(m_pMF));
+	std::unique_ptr<CMatroskaNode> pNewNode(DNew CMatroskaNode(m_pMF));
 	pNewNode->m_pParent = m_pParent;
 	pNewNode->m_id.Set(m_id);
 	pNewNode->m_len.Set(m_len);
@@ -1776,15 +1779,15 @@ CAutoPtr<CMatroskaNode> CMatroskaNode::Copy()
 	return pNewNode;
 }
 
-CAutoPtr<CMatroskaNode> CMatroskaNode::GetFirstBlock()
+std::unique_ptr<CMatroskaNode> CMatroskaNode::GetFirstBlock()
 {
-	CAutoPtr<CMatroskaNode> pNode = Child();
+	std::unique_ptr<CMatroskaNode> pNode = Child();
 	do {
 		if (pNode->m_id == MATROSKA_ID_BLOCKGROUP || pNode->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 			return pNode;
 		}
 	} while (pNode->Next());
-	return CAutoPtr<CMatroskaNode>();
+	return std::unique_ptr<CMatroskaNode>();
 }
 
 bool CMatroskaNode::NextBlock()
