@@ -972,10 +972,10 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 		if ((__int64)len < 0) {
 			continue;
 		}
-		CAutoPtr<CBinary> p(DNew CBinary());
+		std::unique_ptr<CBinary> p(DNew CBinary());
 		p->resize((size_t)len);
 		pMN->Read(p->data(), len);
-		BlockData.emplace_back(p);
+		BlockData.emplace_back(std::move(p));
 	}
 
 	return S_OK;

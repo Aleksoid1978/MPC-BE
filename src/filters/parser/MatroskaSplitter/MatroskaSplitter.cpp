@@ -1148,7 +1148,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							if (!bg->Block.BlockData.empty()) {
-								const auto& pb = bg->Block.BlockData.cbegin()->m_p;
+								const auto& pb = bg->Block.BlockData.front();
 								pTE->Expand(*pb, ContentEncoding::AllFrameContents);
 
 								BYTE* start	= pb->data();
@@ -2369,7 +2369,7 @@ static bool ParseWavpack(const CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>&
 		}
 	}
 
-	CAutoPtr<CBinary> ptr(DNew CBinary());
+	CBinary buf;
 
 	while (gb.RemainingSize() >= 8) {
 		DWORD flags     = gb.ReadDwordLE();
@@ -2388,8 +2388,8 @@ static bool ParseWavpack(const CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>&
 			return false;
 		}
 
-		ptr->resize(dstlen + blocksize + 32);
-		BYTE *dst = ptr->data();
+		buf.resize(dstlen + blocksize + 32);
+		BYTE *dst = buf.data();
 
 		dstlen += blocksize + 32;
 
@@ -2408,7 +2408,7 @@ static bool ParseWavpack(const CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>&
 		offset += blocksize + 32;
 	}
 
-	p->SetData(ptr->data(), ptr->size());
+	p->SetData(buf.data(), buf.size());
 
 	return true;
 }
@@ -2453,7 +2453,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 			pOutput->SetData(start_code, sizeof(start_code));
 			pOutput->AppendData(pb->data(), pb->size());
 		} else if (mt.subtype == MEDIASUBTYPE_WAVPACK4) {
-			if (!ParseWavpack(&mt, pb, pOutput)) {
+			if (!ParseWavpack(&mt, pb.get(), pOutput)) {
 				continue;
 			}
 		} else if (mt.subtype == MEDIASUBTYPE_icpf) {

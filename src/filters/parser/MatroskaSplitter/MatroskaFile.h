@@ -210,7 +210,7 @@ namespace MatroskaReader
 		CLength TrackNumber;
 		CInt TimeCode;
 		CByte Lacing;
-		std::list<CAutoPtr<CBinary>> BlockData;
+		std::list<std::unique_ptr<CBinary>> BlockData;
 
 		HRESULT Parse(CMatroskaNode* pMN, bool fFull);
 	};
