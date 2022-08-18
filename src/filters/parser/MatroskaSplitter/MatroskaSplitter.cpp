@@ -1880,7 +1880,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		m_nOpenProgress = 0;
 		s.SegmentInfo.Duration.Set(0);
 
-		CAutoPtr<Cue> pCue(DNew Cue());
+		std::unique_ptr<Cue> pCue(DNew Cue());
 
 		do {
 			Cluster c;
@@ -1891,13 +1891,13 @@ bool CMatroskaSplitterFilter::DemuxInit()
 
 			s.SegmentInfo.Duration.Set((float)c.TimeCode - rtOffset / 10000);
 
-			CAutoPtr<CuePoint> pCuePoint(DNew CuePoint());
-			CAutoPtr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
+			std::unique_ptr<CuePoint> pCuePoint(DNew CuePoint());
+			std::unique_ptr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
 			pCuePoint->CueTime.Set(c.TimeCode);
 			pCueTrackPosition->CueTrack.Set(TrackNumber);
 			pCueTrackPosition->CueClusterPosition.Set(m_pCluster->m_filepos - m_pSegment->m_start);
-			pCuePoint->CueTrackPositions.emplace_back(pCueTrackPosition);
-			pCue->CuePoints.emplace_back(pCuePoint);
+			pCuePoint->CueTrackPositions.emplace_back(std::move(pCueTrackPosition));
+			pCue->CuePoints.emplace_back(std::move(pCuePoint));
 
 			m_nOpenProgress = m_pFile->GetPos() * 100 / m_pFile->GetLength();
 
@@ -1916,7 +1916,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		m_nOpenProgress = 100;
 
 		if (!m_fAbort) {
-			s.Cues.emplace_back(pCue);
+			s.Cues.emplace_back(std::move(pCue));
 		}
 
 		m_fAbort = false;
