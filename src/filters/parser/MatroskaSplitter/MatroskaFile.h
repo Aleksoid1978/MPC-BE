@@ -139,7 +139,7 @@ namespace MatroskaReader
 	};
 
 	template<class T>
-	class CNode : public std::list<CAutoPtr<T>>
+	class CNode : public std::list<std::unique_ptr<T>>
 	{
 	public:
 		HRESULT Parse(CMatroskaNode* pMN);

@@ -59,7 +59,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	class CMatroskaPacket : public CPacket
 	{
 	public:
-		CAutoPtr<BlockGroup> bg;
+		std::unique_ptr<BlockGroup> bg;
 	};
 
 	void SetupChapters(LPCSTR lng, ChapterAtom* parent, int level = 0);

@@ -251,9 +251,9 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 			if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 				bgn.Parse(m_pBlock.get(), true);
 			} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+				std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 				bg->Block.Parse(m_pBlock.get(), true);
-				bgn.emplace_back(bg);
+				bgn.emplace_back(std::move(bg));
 			}
 
 			for (const auto& bg : bgn) {
@@ -388,7 +388,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (mt.subtype == MEDIASUBTYPE_HM10) {
 							std::vector<BYTE> pData;
-							if (ReadFirtsBlock(pData, pTE)) {
+							if (ReadFirtsBlock(pData, pTE.get())) {
 								CBaseSplitterFileEx::hevchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
@@ -431,7 +431,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.insert(mts.cbegin(), mt);
 						} else if (pTE->CodecPrivate.empty()) {
 							std::vector<BYTE> pData;
-							if (ReadFirtsBlock(pData, pTE)) {
+							if (ReadFirtsBlock(pData, pTE.get())) {
 								CBaseSplitterFileEx::avchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
@@ -553,7 +553,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.push_back(mt);
 						if (pTE->CodecPrivate.empty()) {
 							std::vector<BYTE> pData;
-							if (ReadFirtsBlock(pData, pTE)) {
+							if (ReadFirtsBlock(pData, pTE.get())) {
 								CBaseSplitterFileEx::hevchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
@@ -666,7 +666,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mts.insert(mts.cbegin(), mt);
 								} else {
 									std::vector<BYTE> pData;
-									if (ReadFirtsBlock(pData, pTE)) {
+									if (ReadFirtsBlock(pData, pTE.get())) {
 										AV1Parser::AV1SequenceParameters seq_params;
 										std::vector<uint8_t> obu_sequence_header;
 										if (AV1Parser::ParseOBU(pData.data(), pData.size(), seq_params, obu_sequence_header)) {
@@ -695,7 +695,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							} else if (mt.subtype == MEDIASUBTYPE_VP90) {
 								std::vector<BYTE> pData;
-								if (ReadFirtsBlock(pData, pTE)) {
+								if (ReadFirtsBlock(pData, pTE.get())) {
 									CGolombBuffer gb(pData.data(), pData.size());
 									const BYTE marker = gb.BitRead(2);
 									if (marker == 0x2) {
@@ -800,9 +800,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									bgn.Parse(pBlock.get(), true);
 								}
 								else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 									bg->Block.Parse(pBlock.get(), true);
-									bgn.emplace_back(bg);
+									bgn.emplace_back(std::move(bg));
 								}
 
 								for (const auto& bg : bgn) {
@@ -1073,7 +1073,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
 
 					std::vector<BYTE> pData;
-					if (ReadFirtsBlock(pData, pTE)) {
+					if (ReadFirtsBlock(pData, pTE.get())) {
 						audioframe_t aframe;
 						const int size = ParseAC3Header(pData.data(), &aframe);
 						if (size && aframe.param1) {
@@ -1086,7 +1086,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
 
 					std::vector<BYTE> pData;
-					if (ReadFirtsBlock(pData, pTE)) {
+					if (ReadFirtsBlock(pData, pTE.get())) {
 						audioframe_t aframe;
 						int size = ParseEAC3Header(pData.data(), &aframe);
 						if (!size || aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
@@ -1137,9 +1137,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 							bgn.Parse(m_pBlock.get(), true);
 						} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-							CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+							std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 							bg->Block.Parse(m_pBlock.get(), true);
-							bgn.emplace_back(bg);
+							bgn.emplace_back(std::move(bg));
 						}
 
 						for (const auto& bg : bgn) {
@@ -1497,10 +1497,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			if (!isSub) {
 				pinOut.insert(pinOut.begin() + (iVideo + iAudio - 3), pPinOut);
-				pinOutTE.insert(pinOutTE.begin() + (iVideo + iAudio - 3), pTE);
+				pinOutTE.insert(pinOutTE.begin() + (iVideo + iAudio - 3), pTE.get());
 			} else {
 				pinOut.push_back(pPinOut);
-				pinOutTE.push_back(pTE);
+				pinOutTE.push_back(pTE.get());
 			}
 		}
 	}
@@ -1565,9 +1565,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 									bgn.Parse(pBlock.get(), true);
 								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 									bg->Block.Parse(pBlock.get(), true);
-									bgn.emplace_back(bg);
+									bgn.emplace_back(std::move(bg));
 								}
 
 								for (const auto& bg : bgn) {
@@ -2083,9 +2083,9 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 					bgn.Parse(m_pBlock.get(), true);
 				} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-					CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+					std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 					bg->Block.Parse(m_pBlock.get(), true);
-					bgn.emplace_back(bg);
+					bgn.emplace_back(std::move(bg));
 				}
 
 				for (const auto& bg : bgn) {
@@ -2209,17 +2209,17 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 							if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 								bgn.Parse(pBlock.get(), true);
 							} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-								CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+								std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 								bg->Block.Parse(pBlock.get(), true);
 								if (!(bg->Block.Lacing & 0x80)) {
 									bg->ReferenceBlock.Set(0); // not a kf
 								}
-								bgn.emplace_back(bg);
+								bgn.emplace_back(std::move(bg));
 							}
 
 							for (auto &bg : bgn) {
 								CAutoPtr<CMatroskaPacket> p(DNew CMatroskaPacket());
-								p->bg = bg;
+								p->bg = std::move(bg);
 
 								if (!Contains(m_subtitlesTrackNumbers, (UINT64)p->bg->Block.TrackNumber)) {
 									continue;
@@ -2272,17 +2272,17 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 				bgn.Parse(m_pBlock.get(), true);
 			} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+				std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
 				bg->Block.Parse(m_pBlock.get(), true);
 				if (!(bg->Block.Lacing & 0x80)) {
 					bg->ReferenceBlock.Set(0); // not a kf
 				}
-				bgn.emplace_back(bg);
+				bgn.emplace_back(std::move(bg));
 			}
 
 			for (auto &bg : bgn) {
 				CAutoPtr<CMatroskaPacket> p(DNew CMatroskaPacket());
-				p->bg = bg;
+				p->bg = std::move(bg);
 
 				p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
 				p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
