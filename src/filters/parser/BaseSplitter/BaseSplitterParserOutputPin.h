@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,6 +58,9 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 
 	UINT32 m_packetFlag     = 0;
 	BYTE  m_DTSHDProfile   = 0;
+
+	HRESULT DeliverParsed(const BYTE* start, const size_t size);
+	void HandlePacket(CAutoPtr<CPacket>& p);
 
 protected:
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);

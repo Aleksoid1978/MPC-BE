@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -115,57 +115,55 @@ void CBaseSplitterParserOutputPin::InitPacket(CPacket* pSource)
 	}
 }
 
-#define HandlePacket(offset) \
-	CAutoPtr<CPacket> p2(DNew CPacket());		\
-	p2->TrackNumber		= m_p->TrackNumber;		\
-	p2->bDiscontinuity	= m_p->bDiscontinuity;	\
-	m_p->bDiscontinuity	= FALSE;				\
-	\
-	p2->bSyncPoint	= m_p->bSyncPoint;			\
-	m_p->bSyncPoint	= FALSE;					\
-	\
-	p2->rtStart		= m_p->rtStart;				\
-	m_p->rtStart	= INVALID_TIME;				\
-	\
-	p2->rtStop		= m_p->rtStop;				\
-	m_p->rtStop		= INVALID_TIME;				\
-	\
-	p2->pmt		= m_p->pmt;						\
-	m_p->pmt	= nullptr;							\
-	\
-	p2->SetData(start + offset, size - offset);	\
-	\
-	if (!p2->pmt && m_bFlushed) {				\
-		p2->pmt		= CreateMediaType(&m_mt);	\
-		m_bFlushed	= false;					\
-	}											\
-	\
-	HRESULT hr = __super::DeliverPacket(p2);	\
-	if (hr != S_OK) {							\
-		return hr;								\
-	}											\
-	\
-	if (m_p->pmt) {								\
-		DeleteMediaType(m_p->pmt);				\
-	}											\
-	if (p) {									\
-		if (p->rtStart != INVALID_TIME) {		\
-			m_p->rtStart	= p->rtStart;		\
-			m_p->rtStop		= p->rtStop;		\
-			p->rtStart		= INVALID_TIME;		\
-		}										\
-		if (p->bDiscontinuity) {				\
-			m_p->bDiscontinuity	= p->bDiscontinuity;\
-			p->bDiscontinuity	= FALSE;			\
-		}											\
-		if (p->bSyncPoint) {					\
-			m_p->bSyncPoint	= p->bSyncPoint;	\
-			p->bSyncPoint	= FALSE;			\
-		}										\
-		m_p->pmt	= p->pmt;					\
-		p->pmt		= nullptr;						\
+HRESULT CBaseSplitterParserOutputPin::DeliverParsed(const BYTE* start, const size_t size)
+{
+	CAutoPtr<CPacket> p2(DNew CPacket());
+	p2->TrackNumber    = m_p->TrackNumber;
+	p2->bDiscontinuity = m_p->bDiscontinuity;
+	p2->bSyncPoint     = m_p->bSyncPoint;
+	p2->rtStart        = m_p->rtStart;
+	p2->rtStop         = m_p->rtStop;
+	p2->pmt            = m_p->pmt;
+
+	m_p->bDiscontinuity = FALSE;
+	m_p->bSyncPoint     = FALSE;
+	m_p->rtStart        = INVALID_TIME;
+	m_p->rtStop         = INVALID_TIME;
+	m_p->pmt            = nullptr;
+
+	p2->SetData(start, size);
+
+	if (!p2->pmt && m_bFlushed) {
+		p2->pmt = CreateMediaType(&m_mt);
+		m_bFlushed = false;
 	}
 
+	return __super::DeliverPacket(p2);
+}
+
+void CBaseSplitterParserOutputPin::HandlePacket(CAutoPtr<CPacket>& p)
+{
+	if (m_p->pmt) {
+		DeleteMediaType(m_p->pmt);
+	}
+	if (p) {
+		if (p->rtStart != INVALID_TIME) {
+			m_p->rtStart = p->rtStart;
+			m_p->rtStop  = p->rtStop;
+			p->rtStart   = INVALID_TIME;
+		}
+		if (p->bDiscontinuity) {
+			m_p->bDiscontinuity = p->bDiscontinuity;
+			p->bDiscontinuity   = FALSE;
+		}
+		if (p->bSyncPoint) {
+			m_p->bSyncPoint = p->bSyncPoint;
+			p->bSyncPoint   = FALSE;
+		}
+		m_p->pmt = p->pmt;
+		p->pmt   = nullptr;
+	}
+}
 
 HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 {
@@ -239,7 +237,7 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	return m_bEndOfStream ? S_OK : __super::DeliverPacket(p);
 }
 
-#define HandleInvalidPacket(SIZE) if (m_p->size() < SIZE) { return S_OK; } // Should be invalid packet
+#define HandleInvalidPacket(len) if (m_p->size() < len) { return S_OK; } // Should be invalid packet
 
 #define BEGINDATA										\
 		BYTE* const base = m_p->data();					\
@@ -292,7 +290,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 				}
 			}
 
-			HandlePacket(aframe.param1);
+			HRESULT hr = DeliverParsed(start + aframe.param1, size - aframe.param1);
+			if (hr != S_OK) {
+				return hr;
+			}
+			HandlePacket(p);
 
 			start += size;
 		} else {
@@ -336,7 +338,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAACLATM(CAutoPtr<CPacket> p)
 				}
 			}
 
-			HandlePacket(0);
+			HRESULT hr = DeliverParsed(start, size);
+			if (hr != S_OK) {
+				return hr;
+			}
+			HandlePacket(p);
 
 			start += size;
 		} else {
@@ -628,7 +634,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(CAutoPtr<CPacket> p)
 				size += nBufferPos;
 			}
 
-			HandlePacket(0);
+			HRESULT hr = DeliverParsed(start, size);
+			if (hr != S_OK) {
+				return hr;
+			}
+			HandlePacket(p);
 
 			start += size;
 			nBufferPos = 0;
@@ -696,7 +706,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 
 		int size = next - start;
 
-		HandlePacket(0);
+		HRESULT hr = DeliverParsed(start, size);
+		if (hr != S_OK) {
+			return hr;
+		}
+		HandlePacket(p);
 
 		start		= next;
 		bSeqFound	= (GETU32(start) == 0x0D010000);
@@ -759,7 +773,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<CPacket> p)
 				}
 			}
 
-			HandlePacket(0);
+			HRESULT hr = DeliverParsed(start, size);
+			if (hr != S_OK) {
+				return hr;
+			}
+			HandlePacket(p);
 
 			start += size;
 		} else {
@@ -821,7 +839,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(CAutoPtr<CPacket> p, BOOL bChe
 			break;
 		}
 
-		HandlePacket(0);
+		HRESULT hr = DeliverParsed(start, size);
+		if (hr != S_OK) {
+			return hr;
+		}
+		HandlePacket(p);
 
 		start += size;
 	}
@@ -864,7 +886,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseDirac(CAutoPtr<CPacket> p)
 
 		int size = next - start;
 
-		HandlePacket(0);
+		HRESULT hr = DeliverParsed(start, size);
+		if (hr != S_OK) {
+			return hr;
+		}
+		HandlePacket(p);
 
 		start = next;
 	}
@@ -954,7 +980,12 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 
 					BYTE* start	= buf + i - 7;
 					int size	= headersize + m_adx_block_size;
-					HandlePacket(0);
+
+					HRESULT hr = DeliverParsed(start, size);
+					if (hr != S_OK) {
+						return hr;
+					}
+					HandlePacket(p);
 
 					m_p->RemoveHead(i - 7 + headersize + m_adx_block_size);
 					break;
@@ -975,7 +1006,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 		BYTE* start	= m_p->data();
 		int size	= m_adx_block_size;
 
-		HandlePacket(0);
+		HRESULT hr = DeliverParsed(start, size);
+		if (hr != S_OK) {
+			return hr;
+		}
+		HandlePacket(p);
 
 		m_p->RemoveHead(size);
 	}
@@ -1029,7 +1064,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 
 				size += sizehd;
 
-				HandlePacket(0);
+				HRESULT hr = DeliverParsed(start, size);
+				if (hr != S_OK) {
+					return hr;
+				}
+				HandlePacket(p);
 
 				start += size;
 			} else {
@@ -1061,7 +1100,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 					}
 				}
 
-				HandlePacket(0);
+				HRESULT hr = DeliverParsed(start, size);
+				if (hr != S_OK) {
+					return hr;
+				}
+				HandlePacket(p);
 
 				start += size;
 			}
@@ -1147,7 +1190,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseMpegVideo(CAutoPtr<CPacket> p)
 
 		int size = next - start;
 
-		HandlePacket(0);
+		HRESULT hr = DeliverParsed(start, size);
+		if (hr != S_OK) {
+			return hr;
+		}
+		HandlePacket(p);
 
 		start = next;
 	}
