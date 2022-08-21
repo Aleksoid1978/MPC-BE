@@ -3784,6 +3784,7 @@ void CMPCVideoDecFilter::SetThreadCount()
 	if (m_pAVCtx) {
 		if (IsDXVASupported(m_bUseDXVA || m_bUseD3D11) || m_CodecId == AV_CODEC_ID_MPEG4) {
 			m_pAVCtx->thread_count = 1;
+			m_pAVCtx->thread_type  = 0;
 		} else {
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber();
 			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
