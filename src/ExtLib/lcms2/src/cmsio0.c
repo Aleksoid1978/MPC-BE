@@ -531,6 +531,9 @@ cmsHPROFILE CMSEXPORT cmsCreateProfilePlaceholder(cmsContext ContextID)
     // Set default version
     Icc ->Version =  0x02100000;
     
+    // Set default device class
+    Icc->DeviceClass = cmsSigDisplayClass;
+
     // Set creation date/time
     if (!_cmsGetTime(&Icc->Created))
         goto Error;
@@ -735,6 +738,28 @@ cmsUInt32Number _validatedVersion(cmsUInt32Number DWord)
     return DWord;
 }
 
+// Check device class
+static 
+cmsBool validDeviceClass(cmsProfileClassSignature cl)
+{
+    switch (cl)
+    {
+    case 0: // We allow zero because older lcms versions defaulted to that.
+    case cmsSigInputClass:
+    case cmsSigDisplayClass:
+    case cmsSigOutputClass:
+    case cmsSigLinkClass:
+    case cmsSigAbstractClass:
+    case cmsSigColorSpaceClass:
+    case cmsSigNamedColorClass:
+        return TRUE;
+
+    default:
+        return FALSE;
+    }
+
+}
+
 // Read profile header and validate it
 cmsBool _cmsReadHeader(_cmsICCPROFILE* Icc)
 {
@@ -770,6 +795,16 @@ cmsBool _cmsReadHeader(_cmsICCPROFILE* Icc)
     
     _cmsAdjustEndianess64(&Icc -> attributes, &Header.attributes);
     Icc -> Version         = _cmsAdjustEndianess32(_validatedVersion(Header.version));
+
+    if (Icc->Version > 0x5000000) {
+        cmsSignalError(Icc->ContextID, cmsERROR_UNKNOWN_EXTENSION, "Unsupported profile version '0x%x'", Icc->Version);
+        return FALSE;
+    }
+
+    if (!validDeviceClass(Icc->DeviceClass)) {
+        cmsSignalError(Icc->ContextID, cmsERROR_UNKNOWN_EXTENSION, "Unsupported device class '0x%x'", Icc->DeviceClass);
+        return FALSE;
+    }
 
     // Get size as reported in header
     HeaderSize = _cmsAdjustEndianess32(Header.size);

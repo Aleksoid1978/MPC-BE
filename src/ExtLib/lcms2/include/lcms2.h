@@ -152,7 +152,7 @@ typedef double               cmsFloat64Number;
 #endif
 
 // Handle "register" keyword
-#if defined(CMS_NO_REGISTER_KEYWORD) && !defined(CMS_DLL) && !defined(CMS_DLL_BUILD) 
+#if defined(CMS_NO_REGISTER_KEYWORD)
 #  define CMSREGISTER
 #else
 #  define CMSREGISTER register

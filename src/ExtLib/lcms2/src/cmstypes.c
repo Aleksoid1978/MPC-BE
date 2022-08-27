@@ -1935,17 +1935,25 @@ cmsBool  Type_LUT8_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
 
     // That should be all
     if (mpe != NULL) {
-        cmsSignalError(mpe->ContextID, cmsERROR_UNKNOWN_EXTENSION, "LUT is not suitable to be saved as LUT8");
+        cmsSignalError(self->ContextID, cmsERROR_UNKNOWN_EXTENSION, "LUT is not suitable to be saved as LUT8");
         return FALSE;
     }
 
     if (clut == NULL)
         clutPoints = 0;
-    else
-        clutPoints    = clut->Params->nSamples[0];
-
-    if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) NewLUT ->InputChannels)) return FALSE;
-    if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) NewLUT ->OutputChannels)) return FALSE;
+    else {
+        // Lut8 only allows same CLUT points in all dimensions        
+        clutPoints = clut->Params->nSamples[0];
+        for (i = 1; i < cmsPipelineInputChannels(NewLUT); i++) {
+            if (clut->Params->nSamples[i] != clutPoints) {
+                cmsSignalError(self->ContextID, cmsERROR_UNKNOWN_EXTENSION, "LUT with different samples per dimension not suitable to be saved as LUT16");
+                return FALSE;
+            }
+        }
+    }
+        
+    if (!_cmsWriteUInt8Number(io, (cmsUInt8Number)cmsPipelineInputChannels(NewLUT))) return FALSE;
+    if (!_cmsWriteUInt8Number(io, (cmsUInt8Number)cmsPipelineOutputChannels(NewLUT))) return FALSE;
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) clutPoints)) return FALSE;
     if (!_cmsWriteUInt8Number(io, 0)) return FALSE; // Padding
 
@@ -2071,10 +2079,10 @@ cmsBool Write16bitTables(cmsContext ContextID, cmsIOHANDLER* io, _cmsStageToneCu
     cmsUInt32Number nEntries;
 
     _cmsAssert(Tables != NULL);
-
-    nEntries = Tables->TheCurves[0]->nEntries;
-
+   
     for (i=0; i < Tables ->nCurves; i++) {
+
+        nEntries = Tables->TheCurves[i]->nEntries;
 
         for (j=0; j < nEntries; j++) {
 
@@ -2218,7 +2226,7 @@ cmsBool Type_LUT16_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
 
     // That should be all
     if (mpe != NULL) {
-        cmsSignalError(mpe->ContextID, cmsERROR_UNKNOWN_EXTENSION, "LUT is not suitable to be saved as LUT16");
+        cmsSignalError(self->ContextID, cmsERROR_UNKNOWN_EXTENSION, "LUT is not suitable to be saved as LUT16");
         return FALSE;
     }
 
@@ -2227,8 +2235,16 @@ cmsBool Type_LUT16_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
 
     if (clut == NULL)
         clutPoints = 0;
-    else
-        clutPoints    = clut->Params->nSamples[0];
+    else {
+        // Lut16 only allows same CLUT points in all dimensions        
+        clutPoints = clut->Params->nSamples[0];
+        for (i = 1; i < InputChannels; i++) {
+            if (clut->Params->nSamples[i] != clutPoints) {
+                cmsSignalError(self->ContextID, cmsERROR_UNKNOWN_EXTENSION, "LUT with different samples per dimension not suitable to be saved as LUT16");
+                return FALSE;
+            }
+        }
+    }
 
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) InputChannels)) return FALSE;
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) OutputChannels)) return FALSE;
