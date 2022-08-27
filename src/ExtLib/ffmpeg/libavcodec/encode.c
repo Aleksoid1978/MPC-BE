@@ -107,6 +107,23 @@ fail:
     return ret;
 }
 
+static int encode_make_refcounted(AVCodecContext *avctx, AVPacket *avpkt)
+{
+    uint8_t *data = avpkt->data;
+    int ret;
+
+    if (avpkt->buf)
+        return 0;
+
+    avpkt->data = NULL;
+    ret = ff_get_encode_buffer(avctx, avpkt, avpkt->size, 0);
+    if (ret < 0)
+        return ret;
+    memcpy(avpkt->data, data, avpkt->size);
+
+    return 0;
+}
+
 /**
  * Pad last frame with silence.
  */
@@ -172,6 +189,48 @@ int ff_encode_get_frame(AVCodecContext *avctx, AVFrame *frame)
     return 0;
 }
 
+int ff_encode_encode_cb(AVCodecContext *avctx, AVPacket *avpkt,
+                        const AVFrame *frame, int *got_packet)
+{
+    const FFCodec *const codec = ffcodec(avctx->codec);
+    int ret;
+
+    ret = codec->cb.encode(avctx, avpkt, frame, got_packet);
+    emms_c();
+    av_assert0(ret <= 0);
+
+    if (!ret && *got_packet) {
+        if (avpkt->data) {
+            ret = encode_make_refcounted(avctx, avpkt);
+            if (ret < 0)
+                goto unref;
+            // Date returned by encoders must always be ref-counted
+            av_assert0(avpkt->buf);
+        }
+
+        if (avctx->codec->type == AVMEDIA_TYPE_VIDEO &&
+            !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY))
+            avpkt->pts = avpkt->dts = frame->pts;
+        if (!(avctx->codec->capabilities & AV_CODEC_CAP_DELAY)) {
+            if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
+                if (avpkt->pts == AV_NOPTS_VALUE)
+                    avpkt->pts = frame->pts;
+                if (!avpkt->duration)
+                    avpkt->duration = ff_samples_to_time_base(avctx,
+                                                              frame->nb_samples);
+            }
+        }
+        if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
+            avpkt->dts = avpkt->pts;
+        }
+    } else {
+unref:
+        av_packet_unref(avpkt);
+    }
+
+    return ret;
+}
+
 static int encode_simple_internal(AVCodecContext *avctx, AVPacket *avpkt)
 {
     AVCodecInternal   *avci = avctx->internal;
@@ -192,7 +251,7 @@ static int encode_simple_internal(AVCodecContext *avctx, AVPacket *avpkt)
 
     if (!frame->buf[0]) {
         if (!(avctx->codec->capabilities & AV_CODEC_CAP_DELAY ||
-              (avci->frame_thread_encoder && avctx->active_thread_type & FF_THREAD_FRAME)))
+              avci->frame_thread_encoder))
             return AVERROR_EOF;
 
         // Flushing is signaled with a NULL frame
@@ -203,60 +262,18 @@ static int encode_simple_internal(AVCodecContext *avctx, AVPacket *avpkt)
 
     av_assert0(codec->cb_type == FF_CODEC_CB_TYPE_ENCODE);
 
-    if (CONFIG_FRAME_THREAD_ENCODER &&
-        avci->frame_thread_encoder && (avctx->active_thread_type & FF_THREAD_FRAME))
-        /* This might modify frame, but it doesn't matter, because
-         * the frame properties used below are not used for video
-         * (due to the delay inherent in frame threaded encoding, it makes
-         *  no sense to use the properties of the current frame anyway). */
+    if (CONFIG_FRAME_THREAD_ENCODER && avci->frame_thread_encoder)
+        /* This might unref frame. */
         ret = ff_thread_video_encode_frame(avctx, avpkt, frame, &got_packet);
     else {
-        ret = codec->cb.encode(avctx, avpkt, frame, &got_packet);
-        if (avctx->codec->type == AVMEDIA_TYPE_VIDEO && !ret && got_packet &&
-            !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY))
-            avpkt->pts = avpkt->dts = frame->pts;
-    }
-
-    av_assert0(ret <= 0);
-
-    emms_c();
-
-    if (!ret && got_packet) {
-        if (avpkt->data) {
-            ret = av_packet_make_refcounted(avpkt);
-            if (ret < 0)
-                goto end;
-        }
-
-        if (frame && !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY)) {
-            if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
-                if (avpkt->pts == AV_NOPTS_VALUE)
-                    avpkt->pts = frame->pts;
-                if (!avpkt->duration)
-                    avpkt->duration = ff_samples_to_time_base(avctx,
-                                                              frame->nb_samples);
-            }
-        }
-        if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
-            avpkt->dts = avpkt->pts;
-        }
-        avpkt->flags |= avci->intra_only_flag;
+        ret = ff_encode_encode_cb(avctx, avpkt, frame, &got_packet);
     }
 
     if (avci->draining && !got_packet)
         avci->draining_done = 1;
 
-end:
-    if (ret < 0 || !got_packet)
-        av_packet_unref(avpkt);
-
     if (frame)
         av_frame_unref(frame);
-
-    if (got_packet)
-        // Encoders must always return ref-counted buffers.
-        // Side-data only packets have no data and can be not ref-counted.
-        av_assert0(!avpkt->data || avpkt->buf);
 
     return ret;
 }
@@ -301,6 +318,8 @@ static int encode_receive_packet_internal(AVCodecContext *avctx, AVPacket *avpkt
             av_assert0(!avpkt->data || avpkt->buf);
     } else
         ret = encode_simple_receive_packet(avctx, avpkt);
+    if (ret >= 0)
+        avpkt->flags |= avci->intra_only_flag;
 
     if (ret == AVERROR_EOF)
         avci->draining_done = 1;
@@ -666,6 +685,12 @@ int ff_encode_preinit(AVCodecContext *avctx)
         avci->recon_frame = av_frame_alloc();
         if (!avci->recon_frame)
             return AVERROR(ENOMEM);
+    }
+
+    if (CONFIG_FRAME_THREAD_ENCODER) {
+        ret = ff_frame_thread_encoder_init(avctx);
+        if (ret < 0)
+            return ret;
     }
 
     return 0;

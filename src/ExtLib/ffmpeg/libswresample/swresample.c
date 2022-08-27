@@ -83,8 +83,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
 int swr_alloc_set_opts2(struct SwrContext **ps,
-                        AVChannelLayout *out_ch_layout, enum AVSampleFormat out_sample_fmt, int out_sample_rate,
-                        AVChannelLayout *in_ch_layout, enum AVSampleFormat  in_sample_fmt, int  in_sample_rate,
+                        const AVChannelLayout *out_ch_layout, enum AVSampleFormat out_sample_fmt, int out_sample_rate,
+                        const AVChannelLayout *in_ch_layout, enum AVSampleFormat  in_sample_fmt, int  in_sample_rate,
                         int log_offset, void *log_ctx) {
     struct SwrContext *s = *ps;
     int ret;
@@ -385,8 +385,8 @@ av_cold int swr_init(struct SwrContext *s){
         goto fail;
     }
 
+    av_channel_layout_describe(&s->out_ch_layout, l2, sizeof(l2));
 #if FF_API_OLD_CHANNEL_LAYOUT
-    av_channel_layout_describe(&s->out_ch_layout, l1, sizeof(l1));
     if (s->out_ch_layout.order != AV_CHANNEL_ORDER_UNSPEC && s->out.ch_count != s->out_ch_layout.nb_channels) {
         av_log(s, AV_LOG_ERROR, "Output channel layout %s mismatches specified channel count %d\n", l2, s->out.ch_count);
         ret = AVERROR(EINVAL);

@@ -237,6 +237,7 @@ SRCS_LC = \
 	libavcodec/flacdec.c \
 	libavcodec/flacdsp.c \
 	libavcodec/flashsv.c \
+	libavcodec/float2half.c \
 	libavcodec/flvdec.c \
 	libavcodec/fmtconvert.c \
 	libavcodec/frame_thread_encoder.c \
@@ -271,6 +272,7 @@ SRCS_LC = \
 	libavcodec/h264qpel.c \
 	libavcodec/h2645_parse.c \
 	libavcodec/h274.c \
+	libavcodec/half2float.c \
 	libavcodec/hap.c \
 	libavcodec/hapdec.c \
 	libavcodec/hevc_cabac.c \
@@ -664,7 +666,9 @@ SRCS_LU = \
 	libavutil/film_grain_params.c \
 	libavutil/fixed_dsp.c \
 	libavutil/float_dsp.c \
+	libavutil/float2half.c \
 	libavutil/frame.c \
+	libavutil/half2float.c \
 	libavutil/hdr_dynamic_metadata.c \
 	libavutil/hdr_dynamic_vivid_metadata.c \
 	libavutil/hwcontext.c \
@@ -730,6 +734,7 @@ SRCS_LR = \
 SRCS_LS = \
 	libswscale/alphablend.c \
 	libswscale/gamma.c \
+	libswscale/half2float.c \
 	libswscale/hscale.c \
 	libswscale/hscale_fast_bilinear.c \
 	libswscale/input.c \

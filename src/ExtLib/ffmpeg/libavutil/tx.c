@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "avassert.h"
 #include "cpu.h"
 #include "qsort.h"
 #include "bprint.h"
@@ -44,7 +45,6 @@ int ff_tx_gen_compound_mapping(AVTXContext *s, int n, int m)
     int *in_map, *out_map;
     const int inv = s->inv;
     const int len = n*m;    /* Will not be equal to s->len for MDCTs */
-    const int mdct = TYPE_IS(MDCT, s->type);
     int m_inv, n_inv;
 
     /* Make sure the numbers are coprime */
@@ -63,8 +63,7 @@ int ff_tx_gen_compound_mapping(AVTXContext *s, int n, int m)
     /* Ruritanian map for input, CRT map for output, can be swapped */
     for (int j = 0; j < m; j++) {
         for (int i = 0; i < n; i++) {
-            /* Shifted by 1 to simplify MDCTs */
-            in_map[j*n + i] = ((i*m + j*n) % len) << mdct;
+            in_map[j*n + i] = (i*m + j*n) % len;
             out_map[(i*m*m_inv + j*n*n_inv) % len] = i*m + j;
         }
     }
@@ -458,6 +457,9 @@ av_cold int ff_tx_init_subtx(AVTXContext *s, enum AVTXType type,
         ff_tx_null_list,
 #if HAVE_X86ASM
         ff_tx_codelet_list_float_x86,
+#endif
+#if ARCH_AARCH64
+        ff_tx_codelet_list_float_aarch64,
 #endif
     };
     int codelet_list_num = FF_ARRAY_ELEMS(codelet_list);

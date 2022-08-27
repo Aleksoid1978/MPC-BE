@@ -543,16 +543,11 @@ retry:
             return ret;
     }
 
-    if (!s->current_picture_ptr || s->current_picture_ptr->f->data[0]) {
-        int i = ff_find_unused_picture(s->avctx, s->picture, 0);
-        if (i < 0)
-            return i;
-        s->current_picture_ptr = &s->picture[i];
-    }
-
     avctx->has_b_frames = !s->low_delay;
 
     if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4) {
+        if (s->pict_type != AV_PICTURE_TYPE_B && s->mb_num/2 > get_bits_left(&s->gb))
+            return AVERROR_INVALIDDATA;
         if (ff_mpeg4_workaround_bugs(avctx) == 1)
             goto retry;
         if (s->studio_profile != (s->idsp.idct == NULL))
@@ -589,10 +584,6 @@ retry:
         s->codec_id == AV_CODEC_ID_H263P ||
         s->codec_id == AV_CODEC_ID_H263I)
         s->gob_index = H263_GOB_HEIGHT(s->height);
-
-    // for skipping the frame
-    s->current_picture.f->pict_type = s->pict_type;
-    s->current_picture.f->key_frame = s->pict_type == AV_PICTURE_TYPE_I;
 
     /* skip B-frames if we don't have reference frames */
     if (!s->last_picture_ptr &&
