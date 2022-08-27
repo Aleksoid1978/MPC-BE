@@ -349,7 +349,7 @@ void File_Ttml::Read_Buffer_Continue()
         Fill(Stream_General, 0, General_FrameRate, FrameRate);
         Fill(Stream_Text, 0, Text_FrameRate, FrameRate);
     }
-    if (FrameRate_Int && FrameRateMultiplier_Den!=1)
+    if (FrameRate_Int && FrameRateMultiplier_Num && FrameRateMultiplier_Den)
     {
         Fill(Stream_Text, 0, Text_FrameRate_Num, FrameRate_Int*FrameRateMultiplier_Num, 10, true);
         Fill(Stream_Text, 0, Text_FrameRate_Den, FrameRateMultiplier_Den, 10, true);

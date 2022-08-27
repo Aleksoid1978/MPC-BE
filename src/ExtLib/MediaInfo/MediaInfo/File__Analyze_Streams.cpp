@@ -1309,6 +1309,11 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                 Fill(StreamKind, StreamPos, FrameRate_Num,  Value*1000,  0, Replace);
                 Fill(StreamKind, StreamPos, FrameRate_Den,        1000, 10, Replace);
             }
+            if (!(Value - (int)Value)) // Detection of integer values
+            {
+                Fill(StreamKind, StreamPos, FrameRate_Num, (int)Value, 10, Replace);
+                Fill(StreamKind, StreamPos, FrameRate_Den,          1, 10, Replace);
+            }
         }
     }
 
@@ -1884,6 +1889,13 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         Channels_Temp[3]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelPositions_String2);
         Channels_Temp[1]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelLayout);
     }
+    if (StreamKind==Stream_Text)
+    {
+        FrameRate_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate);
+        FrameRate_Num_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Num);
+        FrameRate_Den_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Den);
+        FrameRate_Mode_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Mode);
+    }
     if (ToAdd.Retrieve(StreamKind, StreamPos_From, Fill_Parameter(StreamKind, Generic_Delay_Source))==__T("Container"))
     {
         Fill(StreamKind, StreamPos_To, "Delay_Original", Retrieve(StreamKind, StreamPos_To, "Delay"), true);
@@ -2075,6 +2087,31 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
                         Fill_SetOptions(Stream_Audio, StreamPos_To, Original.c_str(), Retrieve_Const(Stream_Audio, StreamPos_To, AudioField[i], Info_Options).To_UTF8().c_str());
                         Fill(Stream_Audio, StreamPos_To, AudioField[i], Channels_Temp[i], true);
                     }
+    }
+    if (StreamKind==Stream_Text)
+    {
+        if (!FrameRate_Temp.empty())
+        {
+            const Ztring& FramesPerContainerBlock=Retrieve(Stream_Text, StreamPos_To, "FramesPerContainerBlock");
+            if (!FramesPerContainerBlock.empty())
+                FrameRate_Temp.From_Number(FrameRate_Temp.To_float64()*FramesPerContainerBlock.To_float64());
+        }
+        if ((!FrameRate_Temp.empty() && FrameRate_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate))
+         || (!FrameRate_Num_Temp.empty() && FrameRate_Num_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Num))
+         || (!FrameRate_Den_Temp.empty() && FrameRate_Den_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Den)))
+        {
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Original, ToAdd.Retrieve(Stream_Text, StreamPos_To, Text_FrameRate), true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Original_Num, ToAdd.Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Num), true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Original_Den, ToAdd.Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Den), true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate, FrameRate_Temp, true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Num, FrameRate_Num_Temp, true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Den, FrameRate_Den_Temp, true);
+        }
+        if (!FrameRate_Mode_Temp.empty() && FrameRate_Mode_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Mode))
+        {
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Mode_Original, (*Stream)[Stream_Text][StreamPos_To][Text_FrameRate_Mode], true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Mode, FrameRate_Mode_Temp, true);
+        }
     }
     if (!Delay_Source_Temp.empty() && Delay_Source_Temp!=Retrieve(StreamKind, StreamPos_To, "Delay_Source"))
     {
@@ -2909,15 +2946,24 @@ void File__Analyze::Value_Value123(stream_t StreamKind, size_t StreamPos, size_t
             const auto& FrameRate_Den=Retrieve_Const(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameRate_Den));
             if (!FrameRate.empty()
              && !FrameRate_Num.empty()
-             && !FrameRate_Den.empty())
+             && !FrameRate_Den.empty()
+             && FrameRate_Den.To_int32u()!=1)
                 List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(FrameRate+__T(" (")+FrameRate_Num+__T("/")+FrameRate_Den+__T(")"), __T(" fps"));
         }
         if (StreamKind==Stream_Video
          && Parameter==Video_FrameRate_Original
          && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original).empty()
          && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num).empty()
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty())
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty()
+         && Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).To_int32u()!=1)
             List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den)+__T(")"), __T(" fps"));
+        if (StreamKind==Stream_Text
+         && Parameter==Text_FrameRate_Original
+         && !Retrieve(StreamKind, StreamPos, Text_FrameRate_Original).empty()
+         && !Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Num).empty()
+         && !Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Den).empty()
+         && Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Den).To_int32u()!=1)
+            List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Text_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Den)+__T(")"), __T(" fps"));
 
         //Special cases - 120 fps 24/30 mode
         if (StreamKind==Stream_Video

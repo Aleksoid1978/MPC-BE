@@ -1017,16 +1017,19 @@ void File_Mpeg4::Streams_Finish()
                     for (size_t StreamPos=0; StreamPos<New_Count; StreamPos++)
                     {
                         Stream_Prepare(NewKind, NewPos1+StreamPos);
+                        for (size_t Pos=0; Pos<StreamSave.size(); Pos++)
+                            if (Pos!=General_ID && Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
+                                Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
+                        for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
+                        {
+                            Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, 1));
+                            Fill_SetOptions(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, Info_Options).To_UTF8().c_str());
+                        }
                         Merge(*Temp->second.Parsers[0], StreamKind_Last, StreamPos, StreamPos_Last);
                         Ztring Parser_ID=ID+__T('-')+Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
                         if (ID.size()+1==Parser_ID.size())
                             Parser_ID.resize(ID.size());
                         Fill(StreamKind_Last, StreamPos_Last, General_ID, Parser_ID, true);
-                        for (size_t Pos=0; Pos<StreamSave.size(); Pos++)
-                            if (Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
-                                Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
-                        for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
-                            Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, 1));
                         if (StreamPos)
                         {
                             if (StreamSize_Encoded)
@@ -1189,6 +1192,9 @@ void File_Mpeg4::Streams_Finish()
                         Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, 0); //Included in the DV stream size
                         Ztring ID=Retrieve(Stream_Audio, Pos, Audio_ID);
                         Fill(Stream_Audio, Pos, Audio_ID, Retrieve(Stream_Video, Temp->second.StreamPos, Video_ID)+__T("-")+ID, true);
+                        Fill(Stream_Audio, Pos, "Delay", Retrieve(Stream_Video, Temp->second.StreamPos, "Delay"), true);
+                        Fill(Stream_Audio, Pos, "Delay_DropFrame", Retrieve(Stream_Video, Temp->second.StreamPos, "Delay_DropFrame"), true);
+                        Fill(Stream_Audio, Pos, "Delay_Source", Retrieve(Stream_Video, Temp->second.StreamPos, "Delay_Source"), true);
                         Fill(Stream_Audio, Pos, "Source", Retrieve(Stream_Video, Temp->second.StreamPos, "Source"));
                         Fill(Stream_Audio, Pos, "Source_Info", Retrieve(Stream_Video, Temp->second.StreamPos, "Source_Info"));
                     }
@@ -1207,6 +1213,9 @@ void File_Mpeg4::Streams_Finish()
                         Fill(Stream_Text, Pos, Text_StreamSize_Encoded, 0); //Included in the DV stream size
                         Ztring ID=Retrieve(Stream_Text, Pos, Text_ID);
                         Fill(Stream_Text, Pos, Text_ID, Retrieve(Stream_Video, Temp->second.StreamPos, Video_ID)+__T("-")+ID, true);
+                        Fill(Stream_Text, Pos, "Delay_Source", Retrieve(Stream_Video, Temp->second.StreamPos, "Delay_Source"), true);
+                        Fill(Stream_Text, Pos, "Source", Retrieve(Stream_Video, Temp->second.StreamPos, "Source"));
+                        Fill(Stream_Text, Pos, "Source_Info", Retrieve(Stream_Video, Temp->second.StreamPos, "Source_Info"));
                         Fill(Stream_Text, Pos, "Source", Retrieve(Stream_Video, Temp->second.StreamPos, "Source"));
                         Fill(Stream_Text, Pos, "Source_Info", Retrieve(Stream_Video, Temp->second.StreamPos, "Source_Info"));
                     }
@@ -1410,6 +1419,7 @@ void File_Mpeg4::Streams_Finish()
             {
                 switch (i)
                 {
+                    case Video_FrameRate:
                     case Video_Sampled_Width:
                     case Video_Sampled_Height:
                         continue;
@@ -2420,6 +2430,7 @@ bool File_Mpeg4::BookMark_Needed()
         #endif //MEDIAINFO_DEMUX
         size_t  stco_Count=(size_t)-1;
         bool    stco_IsDifferent=false;
+        int64u  LocalPTS=0;
 
         //For each stream
         for (std::map<int32u, stream>::iterator Temp=Streams.begin(); Temp!=Streams.end(); ++Temp)
@@ -2569,7 +2580,21 @@ bool File_Mpeg4::BookMark_Needed()
                                 mdat_Pos_Temp2.Offset = *stco_Current + Chunk_Offset;
                                 mdat_Pos_Temp2.StreamID = Temp->first;
                                 mdat_Pos_Temp2.Size = Size;
-                                mdat_Pos.push_back(mdat_Pos_Temp2);
+                                bool UseIt=true;
+                                if (Temp->second.TimeCode && Temp->second.edts.size()==1 && Temp->second.edts[0].Delay && Temp->second.stts.size()==1 && Temp->second.stts[0].SampleCount!=1 && Temp->second.stts[0].SampleDuration)
+                                {
+                                    LocalPTS+=Temp->second.stts[0].SampleDuration;
+                                    if (LocalPTS<Temp->second.edts[0].Delay
+                                     || LocalPTS*moov_mvhd_TimeScale>=Temp->second.edts[0].Delay*moov_mvhd_TimeScale+Temp->second.edts[0].Duration*Temp->second.mdhd_TimeScale)
+                                        UseIt=false;
+                                }
+                                if (UseIt)
+                                {
+                                    Temp->second.LastUsedOffset=mdat_Pos_Temp2.Offset;
+                                    if (Temp->second.FirstUsedOffset==(int64u)-1)
+                                        Temp->second.FirstUsedOffset=mdat_Pos_Temp2.Offset;
+                                    mdat_Pos.push_back(mdat_Pos_Temp2);
+                                }
                                 Chunk_Offset += Size;
                                 if (Chunk_Offset >= File_Size)
                                 {
@@ -2578,7 +2603,7 @@ bool File_Mpeg4::BookMark_Needed()
                                 }
                                 Chunk_FrameCount++;
                                 }
-                            if (Chunk_FrameCount >= FrameCount_MaxPerStream)
+                            if (!Temp->second.TimeCode && Chunk_FrameCount >= FrameCount_MaxPerStream)
                                 break;
                         }
 
@@ -2783,20 +2808,37 @@ bool File_Mpeg4::BookMark_Needed()
         if (!Streams[mdat_Pos_ToParseInPriority_StreamIDs[0]].stco.empty())
         {
             mdat_Pos_Type* Temp=&mdat_Pos[0];
-            int64u stco_ToFind=Streams[mdat_Pos_ToParseInPriority_StreamIDs[0]].stco[0];
+            int64u stco_ToFind=Streams[mdat_Pos_ToParseInPriority_StreamIDs[0]].FirstUsedOffset;
             while (Temp<mdat_Pos_Max && Temp->Offset!=stco_ToFind)
                 Temp++;
             if (Temp<mdat_Pos_Max && Temp->Offset<File_Size) //Skipping data not in a truncated file
             {
                 Element_Show();
-                while (Element_Level>0)
-                    Element_End0();
-                Element_Begin1("Priority streams");
+                if (mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.empty())
+                {
+                    while (Element_Level>0)
+                        Element_End0();
+                    Element_Begin1("Priority streams");
+                }
 
                 mdat_Pos_Temp=Temp;
-                mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.push_back(Temp-&mdat_Pos[0]);
+                mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.push_back(Temp->StreamID);
                 GoTo(Temp->Offset);
                 IsParsing_mdat_Set();
+
+                //Remove offset if it is not stripped
+                const auto& StreamTemp=Streams[mdat_Pos_ToParseInPriority_StreamIDs[0]];
+                if (StreamTemp.TimeCode && (StreamTemp.stts.size()>1 || (!StreamTemp.stts.empty() && StreamTemp.stts[0].SampleCount>1 && StreamTemp.Parsers.size()==1)))
+                {
+                    ((File_Mpeg4_TimeCode*)StreamTemp.Parsers[0])->FirstEditOffset=0;
+                    if (Config->ParseSpeed<=0.5)
+                    {
+                        auto StreamID=Temp->StreamID;
+                        for (int j=mdat_Pos.size()-1; j>=0; j--)
+                            if (StreamID==mdat_Pos[j].StreamID && mdat_Pos[j].Offset!=StreamTemp.FirstUsedOffset && mdat_Pos[j].Offset!=StreamTemp.LastUsedOffset)
+                                mdat_Pos.erase(mdat_Pos.begin()+j);
+                    }
+                }
             }
         }
         mdat_Pos_ToParseInPriority_StreamIDs.erase(mdat_Pos_ToParseInPriority_StreamIDs.begin());
@@ -2812,12 +2854,22 @@ bool File_Mpeg4::BookMark_Needed()
 
         // Don't parse twice
         sort(mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.begin(), mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.end());
-        for (int i=mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.size()-1; i>=0; i--)
-            mdat_Pos.erase(mdat_Pos.begin()+i);
+        if (!mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.empty())
+        {
+            for (int i=mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.size()-1; i>=0; i--)
+            {
+                auto StreamID=mdat_Pos_ToParseInPriority_StreamIDs_ToRemove[i];
+                for (int j=mdat_Pos.size()-1; j>=0; j--)
+                    if (StreamID==mdat_Pos[j].StreamID)
+                        mdat_Pos.erase(mdat_Pos.begin()+j);
+            }
+            mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.clear();
+        }
 
         if (!mdat_Pos.empty())
         {
             mdat_Pos_Temp=mdat_Pos_Temp_ToJump?mdat_Pos_Temp_ToJump:&mdat_Pos[0];
+            mdat_Pos_Max=&mdat_Pos[0]+mdat_Pos.size();
             ToJump=mdat_Pos_Temp->Offset;
             GoTo(ToJump);
         }
@@ -3083,6 +3135,7 @@ void File_Mpeg4::TimeCode_Associate(int32u TrackID)
     for (std::map<int32u, stream>::iterator Strea=Streams.begin(); Strea!=Streams.end(); ++Strea)
         if ((!Streams[TrackID].Parsers.empty() && (IsGeneral && Strea->second.StreamKind!=Stream_Max)) || Strea->second.TimeCode_TrackID==TrackID)
         {
+            Streams[TrackID].Parsers[0]->Fill();
             if (Strea->second.StreamKind==Stream_Video)
             {
                 Fill(Stream_Video, Strea->second.StreamPos, Video_Delay_Settings, Ztring(__T("DropFrame="))+(Streams[TrackID].TimeCode->DropFrame?__T("Yes"):__T("No")));

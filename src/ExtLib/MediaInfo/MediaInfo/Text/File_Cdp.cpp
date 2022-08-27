@@ -55,19 +55,19 @@ static const char* Cdp_cc_type(int8u cc_type)
 }
 
 //---------------------------------------------------------------------------
-static float32 Cdp_cdp_frame_rate(int8u cdp_frame_rate)
+static float64 Cdp_cdp_frame_rate(int8u cdp_frame_rate)
 {
     switch (cdp_frame_rate)
     {
-        case  1 : return (float32)23.976;
-        case  2 : return (float32)24.000;
-        case  3 : return (float32)25.000;
-        case  4 : return (float32)29.970;
-        case  5 : return (float32)30.000;
-        case  6 : return (float32)50.000;
-        case  7 : return (float32)59.940;
-        case  8 : return (float32)60.000;
-        default : return (float32) 0.000;
+        case  1 : return (float64)24/1.001;
+        case  2 : return (float64)24;
+        case  3 : return (float64)25;
+        case  4 : return (float64)30/1.001;
+        case  5 : return (float64)30;
+        case  6 : return (float64)50;
+        case  7 : return (float64)60/1.001;
+        case  8 : return (float64)60;
+        default : return (float64) 0;
     }
 }
 
