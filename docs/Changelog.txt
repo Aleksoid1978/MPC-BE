@@ -44,6 +44,7 @@ Updated libraries:
 	Little-CMS git-lcms2.13.1-70-gf3f6b7b;
 	MediaInfo git-v22.06-34-g90e59c5ed;
 	ZenLib git-v0.4.39-12-gde2787a;
+	nanosvg git-bd16c4e;
 
 1.6.3
 =============================
