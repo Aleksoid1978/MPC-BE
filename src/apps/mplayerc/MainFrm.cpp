@@ -14413,6 +14413,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_kfs.clear();
 	m_pCB.Release();
 	m_chapterTitleNum = 0;
+	m_bFrameSteppingActive = false;
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);

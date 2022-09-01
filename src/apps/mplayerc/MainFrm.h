@@ -410,7 +410,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CComPtr<ISubClock> m_pSubClock;
 
-	int m_bFrameSteppingActive;
+	bool m_bFrameSteppingActive;
 	int m_nStepForwardCount;
 	REFERENCE_TIME m_rtStepForwardStart;
 	int m_nVolumeBeforeFrameStepping;
