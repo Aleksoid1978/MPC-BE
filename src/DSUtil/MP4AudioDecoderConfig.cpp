@@ -56,6 +56,7 @@ bool CMP4AudioDecoderConfig::ParseExtension(CGolombBuffer& parser)
         bool result = ParseAudioObjectType(parser, m_Extension.m_ObjectType);
         if (!result) return result;
         if (m_Extension.m_ObjectType == AOT_SBR) {
+            if (parser.BitsLeft() < 1) return false;
             m_Extension.m_SbrPresent = (parser.BitRead(1) == 1);
             if (m_Extension.m_SbrPresent) {
                 result = ParseSamplingFrequency(parser,
@@ -70,6 +71,7 @@ bool CMP4AudioDecoderConfig::ParseExtension(CGolombBuffer& parser)
                 }
             }
         } else if (m_Extension.m_ObjectType == AOT_ER_BSAC) {
+            if (parser.BitsLeft() < 1 + 4) return false;
             m_Extension.m_SbrPresent = (parser.BitRead(1) == 1);
             if (m_Extension.m_SbrPresent) {
                 result = ParseSamplingFrequency(parser,
