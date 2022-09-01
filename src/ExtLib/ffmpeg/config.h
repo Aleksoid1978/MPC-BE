@@ -597,6 +597,7 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_LIBSOXR 1
 
+#define CONFIG_LIBOPENCORE_AMRNB 1
 
 #define CONFIG_CBS 1
 #define CONFIG_CBS_AV1 1

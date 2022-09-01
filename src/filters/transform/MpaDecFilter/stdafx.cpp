@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,3 +24,5 @@
 #pragma comment(lib, "winmm.lib")
 
 #pragma comment(lib, "libdav1d.a")
+#pragma comment(lib, "libopencore-amrnb.a")
+#pragma comment(lib, "libopencore-amrwb.a")
