@@ -89,6 +89,8 @@ static const FFCodec * const codec_list[] = {
     &ff_ac3_decoder,
     &ff_alac_decoder,
     &ff_als_decoder,
+    &ff_amrnb_decoder,
+    &ff_amrwb_decoder,
     &ff_ape_decoder,
     &ff_atrac3_decoder,
     &ff_atrac3p_decoder,
@@ -156,8 +158,6 @@ static const FFCodec * const codec_list[] = {
 
     &ff_libspeex_decoder,
     &ff_libdav1d_decoder,
-    &ff_libopencore_amrnb_decoder,
-    &ff_libopencore_amrwb_decoder,
 
     &ff_av1_decoder,
     NULL };

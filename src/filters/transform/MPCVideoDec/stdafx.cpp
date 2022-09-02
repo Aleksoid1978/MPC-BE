@@ -24,5 +24,3 @@
 #pragma comment(lib, "version.lib")
 
 #pragma comment(lib, "libdav1d.a")
-#pragma comment(lib, "libopencore-amrnb.a")
-#pragma comment(lib, "libopencore-amrwb.a")
