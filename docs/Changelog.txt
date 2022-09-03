@@ -15,12 +15,15 @@ Removed option to read aspect ratio from video stream. This option is not requir
 
 MPCVideoDec
 Implemented correct output of YUV 4:2:0 and 4:2:2 formats when odd sizes are specified for the video stream.
+Improved operation of D3D11 Copy Back and NVDEC decoders in some situations.
+Added support for MEDIASUBTYPE_av01.
 
 VideoRenderers
 Сolor management now works for 10-bit surfaces as well.
 
 Subtitles
 Subtitle delay is now applied on pause.
+Fixed display of symbols in some external fonts.
 
 Youtube and other online services
 Fixed work with yt-dlp on some sites.
@@ -31,11 +34,13 @@ Improved support for online playlists.
 Player
 Fixed display of text with "&" symbols in the "Information" panel.
 Fixed LAV Splitter freezing when watching some Live broadcasts.
+Fixed detection of "dxva2cb" mode when using LAV Video Decoder.
+Fixed player crash during frame-by-frame navigation at the end of playback.
 
 Installer
 Compiling the installer requires InnoSetup 6.1.0 or later.
 Updated installer translation files.
-Added the ability to install "MPC Video Renderer 0.6.1".
+Added the ability to install "MPC Video Renderer 0.6.3".
 Added the ability to offline install previously downloaded components.
 
 Updated libraries:
