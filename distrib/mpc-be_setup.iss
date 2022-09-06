@@ -148,6 +148,7 @@ Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
 Name: cz; MessagesFile: compiler:Languages\Czech.isl
+Name: hr; MessagesFile: Languages\Croatian.isl
 Name: de; MessagesFile: compiler:Languages\German.isl
 Name: el; MessagesFile: Languages\Greek.isl
 Name: es; MessagesFile: compiler:Languages\Spanish.isl

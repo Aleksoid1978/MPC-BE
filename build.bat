@@ -296,7 +296,7 @@ EXIT /B
 )
 
 FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
- "Chinese Traditional" "Czech" "Dutch" "French" "German" "Greek" "Hebrew" "Hungarian"
+ "Chinese Traditional" "Czech" "Croatian" "Dutch" "French" "German" "Greek" "Hebrew" "Hungarian"
  "Italian" "Japanese" "Korean" "Polish" "Portuguese" "Romanian" "Russian" "Slovak" "Spanish"
  "Swedish" "Turkish" "Ukrainian"
 ) DO (

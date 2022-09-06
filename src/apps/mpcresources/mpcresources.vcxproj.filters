@@ -27,6 +27,9 @@
     <ResourceCompile Include="mplayerc.cz.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="mplayerc.hr.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.de.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>

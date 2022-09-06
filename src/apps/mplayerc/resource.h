@@ -442,6 +442,7 @@
 #define ID_LANGUAGE_BASQUE              5024
 #define ID_LANGUAGE_GREEK               5025
 #define ID_LANGUAGE_ROMANIAN            5026
+#define ID_LANGUAGE_CROATIAN            5027
 #define ID_LANGUAGE_LAST                5050
 ////////////////////////////////////////////
 // strings for built-in filters
