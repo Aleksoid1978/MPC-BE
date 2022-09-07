@@ -144,7 +144,7 @@ static LPCWSTR s_strPlayerTitle = "MPC-BE "
 #endif
 	MPC_VERSION_WSTR
 #if (MPC_VERSION_STATUS == 0)
-	" beta"
+	" dev"
 #endif
 	;
 

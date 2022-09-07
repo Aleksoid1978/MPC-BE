@@ -47,8 +47,8 @@
 #define MPC_VERSION_MINOR       6
 #define MPC_VERSION_PATCH       4
 
-#define MPC_VERSION_STATUS      1
-// MPC_VERSION_STATUS: 0 - alpha/beta; 1 - stable
+#define MPC_VERSION_STATUS      0
+// MPC_VERSION_STATUS: 0 - dev; 1 - stable
 
 #define MPC_YEAR_COMMENTS       "2002-2022"
 #define MPC_VERSION_COMMENTS    "https://sourceforge.net/projects/mpcbe/"
