@@ -3204,12 +3204,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 	}
 
 	// Color Range, 0-255 or 16-235
-	if (color_range == AVCOL_RANGE_JPEG
-			|| frame->format == AV_PIX_FMT_YUVJ420P
-			|| frame->format == AV_PIX_FMT_YUVJ422P
-			|| frame->format == AV_PIX_FMT_YUVJ444P
-			|| frame->format == AV_PIX_FMT_YUVJ440P
-			|| frame->format == AV_PIX_FMT_YUVJ411P) {
+	if (color_range == AVCOL_RANGE_JPEG) {
 		fmt.NominalRange = DXVA2_NominalRange_0_255;
 	} else {
 		fmt.NominalRange = DXVA2_NominalRange_16_235;

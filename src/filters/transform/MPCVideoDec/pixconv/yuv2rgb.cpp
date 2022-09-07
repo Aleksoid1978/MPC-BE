@@ -699,8 +699,8 @@ const RGBCoeffs* CFormatConverter::getRGBCoeffs(int width, int height)
             }
         }
 
-        BOOL inFullRange =(m_FProps.colorrange == AVCOL_RANGE_JPEG || m_FProps.avpixfmt == AV_PIX_FMT_YUVJ420P || m_FProps.avpixfmt == AV_PIX_FMT_YUVJ422P || m_FProps.avpixfmt == AV_PIX_FMT_YUVJ444P);
-        BOOL outFullRange =  m_dstRGBRange;
+        BOOL inFullRange = (m_FProps.colorrange == AVCOL_RANGE_JPEG);
+        BOOL outFullRange = m_dstRGBRange;
 
         int inputWhite, inputBlack, inputChroma, outputWhite, outputBlack;
         if (inFullRange)

@@ -210,7 +210,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; // most common format
 			break;
 		case AV_CODEC_ID_MJPEG:
-			pAVCtx->pix_fmt = AV_PIX_FMT_YUVJ422P; // most common format
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format
 			pAVCtx->color_range = AVCOL_RANGE_JPEG;
 			break;
 		case AV_CODEC_ID_DNXHD:
