@@ -1,6 +1,6 @@
 ﻿В этом файле отображаются только ключевые изменения между разными версиями Media Player Classic - BE.
 
-1.6.3.x beta
+1.6.4
 =============================
 MPCStreamReader (MPC UDP/HTTP Reader)
 Добавлена поддержка HLS Live.
