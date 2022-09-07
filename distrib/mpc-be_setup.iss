@@ -148,13 +148,13 @@ Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
 Name: cz; MessagesFile: compiler:Languages\Czech.isl
-Name: hr; MessagesFile: Languages\Croatian.isl
 Name: de; MessagesFile: compiler:Languages\German.isl
 Name: el; MessagesFile: Languages\Greek.isl
 Name: es; MessagesFile: compiler:Languages\Spanish.isl
 Name: eu; MessagesFile: Languages\Basque.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
 Name: he; MessagesFile: compiler:Languages\Hebrew.isl
+Name: hr; MessagesFile: Languages\Croatian.isl
 Name: hu; MessagesFile: Languages\Hungarian.isl
 Name: hy; MessagesFile: compiler:Languages\Armenian.isl
 Name: it; MessagesFile: compiler:Languages\Italian.isl
