@@ -315,7 +315,7 @@ public:
 	BOOL						IsSupportedDecoderMode(const GUID& decoderGUID);
 	void						GetPictSize(int& width, int& height);
 
-	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
+	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(const AVCodecContext *ctx, const AVFrame *frame);
 
 	inline bool					UseDXVA2() const { return m_nDecoderMode == MODE_DXVA2; }
 	inline bool					UseD3D11() const { return m_nDecoderMode == MODE_D3D11; }

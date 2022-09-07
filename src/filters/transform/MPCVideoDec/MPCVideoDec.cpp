@@ -3069,9 +3069,9 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 }
 
 // from LAVVideo
-DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame)
+DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecContext *ctx, const AVFrame *frame)
 {
-	DXVA2_ExtendedFormat fmt = { 0 };
+	DXVA2_ExtendedFormat fmt = {};
 
 	if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32 || m_FormatConverter.GetOutPixFormat() == PixFmt_RGB48) {
 		return fmt;
