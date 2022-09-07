@@ -43,6 +43,13 @@ Updated installer translation files.
 Added the ability to install "MPC Video Renderer 0.6.3".
 Added the ability to offline install previously downloaded components.
 
+Updated German translation (by Klaus1189).
+Updated Turkish translation (by cmhrky).
+Updated Spanish translation (by pruebaz).
+Updated Catalan translation (by pruebaz).
+Updated Japanese translation.
+Added Croatian translation.
+
 Updated libraries:
 	dav1d git-1.0.0-45-ga029d68;
 	ffmpeg git-n5.2-dev-506-g5c217119c8;
