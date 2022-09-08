@@ -1,4 +1,4 @@
-;
+﻿;
 ; (C) 2009-2022 see Authors.txt
 ;
 ; This file is part of MPC-BE.
