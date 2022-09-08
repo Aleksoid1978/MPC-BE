@@ -105,7 +105,6 @@
     <ClCompile Include="FormatConverter.cpp" />
     <ClCompile Include="MPCVideoDec.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
-    <ClCompile Include="MSDKDecoder\ByteParser.cpp" />
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp" />
     <ClCompile Include="pixconv\convert_direct.cpp" />
     <ClCompile Include="pixconv\convert_generic.cpp" />
@@ -132,15 +131,7 @@
     <ClInclude Include="IMPCVideoDec.h" />
     <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
-    <ClInclude Include="MSDKDecoder\ByteParser.h" />
     <ClInclude Include="MSDKDecoder\growarray.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxcommon.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxdefs.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxmvc.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxsession.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxstructures.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxvideo.h" />
-    <ClInclude Include="MSDKDecoder\include\mfxvstructures.h" />
     <ClInclude Include="MSDKDecoder\MSDKDecoder.h" />
     <ClInclude Include="pixconv\pixconv_internal.h" />
     <ClInclude Include="pixconv\pixconv_sse2_templates.h" />

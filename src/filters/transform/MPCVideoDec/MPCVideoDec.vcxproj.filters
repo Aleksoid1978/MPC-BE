@@ -19,9 +19,6 @@
     <Filter Include="MSDKDecoder">
       <UniqueIdentifier>{d8b16008-2ead-42d6-a093-54d31b847a4a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MSDKDecoder\include">
-      <UniqueIdentifier>{6dcd5a6f-58d7-47b6-bf30-e20e765f189d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="pixconv">
       <UniqueIdentifier>{f14b2a0f-1719-46f8-ae06-bf1b7228f2b5}</UniqueIdentifier>
     </Filter>
@@ -53,9 +50,6 @@
     </ClCompile>
     <ClCompile Include="DXVADecoder\MediaSampleSideData.cpp">
       <Filter>DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="MSDKDecoder\ByteParser.cpp">
-      <Filter>MSDKDecoder</Filter>
     </ClCompile>
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp">
       <Filter>MSDKDecoder</Filter>
@@ -116,27 +110,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxcommon.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxdefs.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxmvc.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxsession.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxstructures.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxvideo.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\include\mfxvstructures.h">
-      <Filter>MSDKDecoder\include</Filter>
-    </ClInclude>
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h">
       <Filter>DXVADecoder</Filter>
     </ClInclude>
@@ -145,9 +118,6 @@
     </ClInclude>
     <ClInclude Include="DXVADecoder\MediaSampleSideData.h">
       <Filter>DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\ByteParser.h">
-      <Filter>MSDKDecoder</Filter>
     </ClInclude>
     <ClInclude Include="MSDKDecoder\growarray.h">
       <Filter>MSDKDecoder</Filter>

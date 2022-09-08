@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2016-2019 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2016-2022 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -36,7 +36,7 @@ extern "C" {
 #include "DSUtil/D3D9Helper.h"
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/SysVersion.h"
-#include "ByteParser.h"
+#include "DSUtil/GolombBuffer.h"
 
 #include "../MPCVideoDec.h"
 #include "../pixconv/pixconv_sse2_templates.h"
@@ -277,38 +277,38 @@ HRESULT CMSDKDecoder::InitDecoder(const CMediaType *pmt)
 
 HRESULT CMSDKDecoder::ParseSEI(const BYTE *buffer, size_t size, mfxU64 timestamp)
 {
-  CByteParser seiParser(buffer, size);
-  while (seiParser.RemainingBits() > 16 && seiParser.BitRead(16, true)) {
+  CGolombBuffer seiParser(buffer, size);
+  while (seiParser.BitsLeft() > 16 && seiParser.BitRead(16, true)) {
     int type = 0;
     unsigned size = 0;
 
     do {
-      if (seiParser.RemainingBits() < 8)
+      if (seiParser.BitsLeft() < 8)
         return E_FAIL;
       type += seiParser.BitRead(8, true);
     } while (seiParser.BitRead(8) == 0xFF);
 
     do {
-      if (seiParser.RemainingBits() < 8)
+      if (seiParser.BitsLeft() < 8)
         return E_FAIL;
       size += seiParser.BitRead(8, true);
     } while (seiParser.BitRead(8) == 0xFF);
 
-    if (size > seiParser.Remaining()) {
-      DLog(L"CMSDKDecoder::ParseSEI(): SEI type %d size %d truncated, available: %d", type, size, seiParser.Remaining());
+    if (size > static_cast<unsigned>(seiParser.RemainingSize())) {
+      DLog(L"CMSDKDecoder::ParseSEI(): SEI type %d size %d truncated, available: %d", type, size, seiParser.RemainingSize());
       return E_FAIL;
     }
 
     switch (type) {
     case 5:
-      ParseUnregUserDataSEI(buffer + seiParser.Pos(), size, timestamp);
+      ParseUnregUserDataSEI(buffer + seiParser.GetPos(), size, timestamp);
       break;
     case 37:
-      ParseMVCNestedSEI(buffer + seiParser.Pos(), size, timestamp);
+      ParseMVCNestedSEI(buffer + seiParser.GetPos(), size, timestamp);
       break;
     }
 
-    seiParser.BitSkip(size * 8);
+    seiParser.SkipBytes(size);
   }
 
   return S_OK;
@@ -316,7 +316,7 @@ HRESULT CMSDKDecoder::ParseSEI(const BYTE *buffer, size_t size, mfxU64 timestamp
 
 HRESULT CMSDKDecoder::ParseMVCNestedSEI(const BYTE *buffer, size_t size, mfxU64 timestamp)
 {
-  CByteParser seiParser(buffer, size);
+  CGolombBuffer seiParser(buffer, size);
 
   // Parse the MVC Scalable Nesting SEI first
   int op_flag = seiParser.BitRead(1);
@@ -339,7 +339,7 @@ HRESULT CMSDKDecoder::ParseMVCNestedSEI(const BYTE *buffer, size_t size, mfxU64 
   seiParser.BitByteAlign();
 
   // Parse nested SEI
-  ParseSEI(buffer + seiParser.Pos(), seiParser.Remaining(), timestamp);
+  ParseSEI(buffer + seiParser.GetPos(), seiParser.RemainingSize(), timestamp);
 
   return S_OK;
 }
@@ -374,8 +374,8 @@ HRESULT CMSDKDecoder::ParseOffsetMetadata(const BYTE *buffer, size_t size, mfxU6
     return E_FAIL;
 
   // Skip PTS part, its not used. Start parsing at first marker bit after the PTS
-  CByteParser offset(buffer + 6, size - 6);
-  offset.BitSkip(2); // Skip marker and re served
+  CGolombBuffer offset(buffer + 6, size - 6);
+  offset.BitRead(2); // Skip marker and re served
 
   unsigned int nOffsets = offset.BitRead(6);
   unsigned int nFrames = offset.BitRead(8);
@@ -386,7 +386,7 @@ HRESULT CMSDKDecoder::ParseOffsetMetadata(const BYTE *buffer, size_t size, mfxU6
     return E_FAIL;
   }
 
-  offset.BitSkip(16); // Skip marker and reserved
+  offset.SkipBytes(2); // Skip marker and reserved
   if (nOffsets * nFrames > (size - 10)) {
     DLog(L"CMSDKDecoder::ParseOffsetMetadata(): not enough data for all offsets (need %d, have %d)", nOffsets * nFrames, size - 4);
     return E_FAIL;
