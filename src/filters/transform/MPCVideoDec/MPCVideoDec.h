@@ -146,6 +146,7 @@ private:
 	DWORD									m_dwSYNC2;
 
 	CMediaType								m_pCurrentMediaType;
+	DXVA2_ExtendedFormat					m_inputDxvaExtFormat = {};
 
 	BOOL									m_bDecodingStart;
 	BOOL									m_bDecoderAcceptFormat = FALSE;

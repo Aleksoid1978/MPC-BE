@@ -2066,6 +2066,7 @@ redo:
 
 	BITMAPINFOHEADER *pBMI = nullptr;
 	bool bInterlacedFieldPerSample = false;
+	m_inputDxvaExtFormat.value = 0;
 	if (pmt->formattype == FORMAT_VideoInfo) {
 		VIDEOINFOHEADER* vih	= (VIDEOINFOHEADER*)pmt->pbFormat;
 		pBMI					= &vih->bmiHeader;
@@ -2073,13 +2074,19 @@ redo:
 		VIDEOINFOHEADER2* vih2	= (VIDEOINFOHEADER2*)pmt->pbFormat;
 		pBMI					= &vih2->bmiHeader;
 		bInterlacedFieldPerSample = vih2->dwInterlaceFlags & AMINTERLACE_IsInterlaced && vih2->dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
+		if (vih2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+			m_inputDxvaExtFormat.value = vih2->dwControlFlags & 0xFFFFFF00;
+		}
 	} else if (pmt->formattype == FORMAT_MPEGVideo) {
 		MPEG1VIDEOINFO* mpgv	= (MPEG1VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpgv->hdr.bmiHeader;
 	} else if (pmt->formattype == FORMAT_MPEG2Video) {
-		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
-		pBMI					= &mpg2v->hdr.bmiHeader;
-		bInterlacedFieldPerSample = mpg2v->hdr.dwInterlaceFlags & AMINTERLACE_IsInterlaced && mpg2v->hdr.dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
+		VIDEOINFOHEADER2& vih2	= ((MPEG2VIDEOINFO*)pmt->pbFormat)->hdr;
+		pBMI					= &vih2.bmiHeader;
+		bInterlacedFieldPerSample = vih2.dwInterlaceFlags & AMINTERLACE_IsInterlaced && vih2.dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
+		if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+			m_inputDxvaExtFormat.value = vih2.dwControlFlags & 0xFFFFFF00;
+		}
 	} else {
 		return VFW_E_INVALIDMEDIATYPE;
 	}
@@ -3112,6 +3119,10 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 			// DCI-P3
 			fmt.VideoPrimaries = MFVideoPrimaries_DCI_P3;
 			break;
+		case AVCOL_PRI_UNSPECIFIED:
+			if (m_CodecId == AV_CODEC_ID_RAWVIDEO && m_inputDxvaExtFormat.VideoPrimaries) {
+				fmt.VideoPrimaries = m_inputDxvaExtFormat.VideoPrimaries;
+			}
 	}
 
 	// Color Space / Transfer Matrix
@@ -3144,7 +3155,10 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 			fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_YCgCo;
 			break;
 		case AVCOL_SPC_UNSPECIFIED:
-			if (ctx->width <= 1024 && ctx->height <= 576) { // SD
+			if (m_CodecId == AV_CODEC_ID_RAWVIDEO && m_inputDxvaExtFormat.VideoTransferMatrix) {
+				fmt.VideoTransferMatrix = m_inputDxvaExtFormat.VideoTransferMatrix;
+			}
+			else if (ctx->width <= 1024 && ctx->height <= 576) { // SD
 				fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT601;
 			} else { // HD
 				fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT709;
@@ -3184,6 +3198,10 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 		case AVCOL_TRC_ARIB_STD_B67:
 			fmt.VideoTransferFunction = MFVideoTransFunc_HLG;
 			break;
+		case AVCOL_TRC_UNSPECIFIED:
+			if (m_CodecId == AV_CODEC_ID_RAWVIDEO && m_inputDxvaExtFormat.VideoTransferFunction) {
+				fmt.VideoTransferFunction = m_inputDxvaExtFormat.VideoTransferFunction;
+			}
 	}
 
 	if (frame->format == AV_PIX_FMT_XYZ12LE || frame->format == AV_PIX_FMT_XYZ12BE) {
@@ -3201,12 +3219,20 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 		case AVCHROMA_LOC_TOPLEFT:
 			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_Cosited;
 			break;
+		case AVCHROMA_LOC_UNSPECIFIED:
+			if (m_CodecId == AV_CODEC_ID_RAWVIDEO && m_inputDxvaExtFormat.VideoChromaSubsampling) {
+				fmt.VideoChromaSubsampling = m_inputDxvaExtFormat.VideoChromaSubsampling;
+			}
 	}
 
 	// Color Range, 0-255 or 16-235
 	if (color_range == AVCOL_RANGE_JPEG) {
 		fmt.NominalRange = DXVA2_NominalRange_0_255;
-	} else {
+	}
+	else if (color_range == AVCOL_RANGE_UNSPECIFIED && m_CodecId == AV_CODEC_ID_RAWVIDEO && m_inputDxvaExtFormat.NominalRange) {
+		fmt.NominalRange = m_inputDxvaExtFormat.NominalRange;
+	}
+	else {
 		fmt.NominalRange = DXVA2_NominalRange_16_235;
 	}
 
