@@ -1,4 +1,4 @@
-﻿;
+;
 ; (C) 2009-2022 see Authors.txt
 ;
 ; This file is part of MPC-BE.
@@ -581,8 +581,8 @@ hu.AssociationMPCPlayMusicFilesS=Zene Fájlok
 hu.AssociationMPCPlayVideoFilesF=Video Lejátszás
 hu.AssociationMPCPlayVideoFilesS=Video Fájlok
 hu.PinToTaskBar=Rögzítés a tálcához
-hu.ComponentWillBeDownloaded=will be downloaded
-hu.ComponentAlreadyDownloaded=already downloaded
+hu.ComponentWillBeDownloaded=letöltésre kerül
+hu.ComponentAlreadyDownloaded=már letöltve
 
 
 ;Armenian
