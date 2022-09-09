@@ -1419,7 +1419,6 @@ public:
 
 private:
 	CDiskImage	m_DiskImage;
-	CStringW	m_IsoFileName;
 	BOOL		m_bNeedUnmountImage = TRUE;
 	BOOL		OpenIso(const CString& pathName, REFERENCE_TIME rtStart = INVALID_TIME);
 

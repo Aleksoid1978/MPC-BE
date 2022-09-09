@@ -43,6 +43,7 @@ private:
 
 	CEdit m_edAceStreamAddress;
 	CEdit m_edTorrServerAddress;
+	CEdit m_edUserAgent;
 
 public:
 	CPPageYoutube();

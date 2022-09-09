@@ -144,6 +144,8 @@
 #define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
 #define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
 
+#define IDS_RS_USER_AGENT					L"UserAgent"
+
 // Capture
 #define IDS_R_CAPTURE						L"Capture"
 #define IDS_RS_DEFAULT_CAPTURE				L"DefaultCapture"

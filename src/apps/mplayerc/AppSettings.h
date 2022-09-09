@@ -902,8 +902,10 @@ public:
 	int				iYDLMaxHeight;
 	bool			bYDLMaximumQuality;
 
-	CString			strAceStreamAddress;
-	CString			strTorrServerAddress;
+	CStringW		strAceStreamAddress;
+	CStringW		strTorrServerAddress;
+
+	CStringW		strUserAgent;
 
 	DWORD			nLastFileInfoPage;
 

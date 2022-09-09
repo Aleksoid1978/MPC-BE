@@ -51,6 +51,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
 	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
 	DDX_Control(pDX, IDC_EDIT2,  m_edTorrServerAddress);
+	DDX_Control(pDX, IDC_EDIT3,  m_edUserAgent);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
@@ -135,6 +136,8 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_edAceStreamAddress.SetWindowTextW(s.strAceStreamAddress);
 	m_edTorrServerAddress.SetWindowTextW(s.strTorrServerAddress);
+	m_edUserAgent.SetWindowTextW(s.strUserAgent);
+	m_edUserAgent.EnableWindow(FALSE);
 
 	UpdateData(FALSE);
 
@@ -171,6 +174,8 @@ BOOL CPPageYoutube::OnApply()
 	if (::PathIsURLW(str)) {
 		s.strTorrServerAddress = str;
 	}
+
+	m_edUserAgent.GetWindowTextW(s.strUserAgent);
 
 	return __super::OnApply();
 }

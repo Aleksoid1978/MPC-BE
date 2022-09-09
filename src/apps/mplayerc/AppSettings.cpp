@@ -803,6 +803,8 @@ void CAppSettings::ResetSettings()
 	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
 	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u";
 
+	strUserAgent = L"Mozilla/5.0";
+
 	nLastFileInfoPage = 0;
 
 	bUpdaterAutoCheck = false;
@@ -1493,6 +1495,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
 
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_USER_AGENT, strUserAgent);
+
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(unsigned*)&nLastFileInfoPage);
 
 	profile.ReadBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
@@ -1977,6 +1981,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_MAXIMUM_QUALITY, bYDLMaximumQuality);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
+
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_USER_AGENT, strUserAgent);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
