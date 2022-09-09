@@ -67,7 +67,7 @@ BOOL CUrlParser::Parse(LPCWSTR lpszUrl)
 		Clear();
 	}
 
-	return ret;
+	return IsValid();
 }
 
 void CUrlParser::Clear()
