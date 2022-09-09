@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@ struct SessionInfo {
 	CStringW AudioPath;
 	CStringW SubtitlePath;
 
-	void NewPath(CStringW path) {
+	void NewPath(const CStringW& path) {
 		*this = {};
 		Path = path;
 	}

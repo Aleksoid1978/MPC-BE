@@ -4686,6 +4686,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetAudioPicture(FALSE);
 
 	if (m_bNeedUnmountImage) {
+		m_IsoFileName.Empty();
 		m_DiskImage.UnmountDiskImage();
 	}
 	m_bNeedUnmountImage = TRUE;
@@ -12449,17 +12450,23 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.front();
 
 		if (!StartsWith(fn, L"pipe:")) {
-			m_SessionInfo.NewPath(fn);
+			if (!m_IsoFileName.IsEmpty()) {
+				m_SessionInfo.NewPath(m_IsoFileName);
+			} else {
+				m_SessionInfo.NewPath(fn);
+			}
 
 			if (m_youtubeFields.title.GetLength()) {
 				m_SessionInfo.Title = m_youtubeFields.title;
 			}
 			else if (m_LastOpenBDPath.GetLength()) {
 				CString fn2 = L"Blu-ray";
-				if (m_BDLabel.GetLength()) {
-					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
-				} else {
-					MakeBDLabel(pOFD->fns.front(), fn2);
+				if (m_IsoFileName.IsEmpty()) {
+					if (m_BDLabel.GetLength()) {
+						fn2.AppendFormat(L" \"%s\"", m_BDLabel);
+					} else {
+						MakeBDLabel(pOFD->fns.front(), fn2);
+					}
 				}
 				m_SessionInfo.Title = fn2;
 			}
@@ -12474,7 +12481,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					}
 				}
 
-				if (m_SessionInfo.Title.IsEmpty()) {
+				if (m_SessionInfo.Title.IsEmpty() && m_IsoFileName.IsEmpty()) {
 					CPlaylistItem pli;
 					if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.empty() && !pli.m_label.IsEmpty()) {
 						m_SessionInfo.Title = pli.m_label;
@@ -20000,6 +20007,8 @@ BOOL CMainFrame::OpenIso(const CString& pathName, REFERENCE_TIME rtStart/* = INV
 
 		WCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 		if (diskletter) {
+			m_IsoFileName = pathName;
+
 			if (::PathFileExistsW(CString(diskletter) + L":\\BDMV\\index.bdmv")) {
 				OpenBD(CString(diskletter) + L":\\BDMV\\index.bdmv", rtStart, FALSE);
 				AddRecent(pathName);
@@ -20034,6 +20043,7 @@ BOOL CMainFrame::OpenIso(const CString& pathName, REFERENCE_TIME rtStart/* = INV
 				}
 			}
 
+			m_IsoFileName.Empty();
 			m_DiskImage.UnmountDiskImage();
 		}
 	}
