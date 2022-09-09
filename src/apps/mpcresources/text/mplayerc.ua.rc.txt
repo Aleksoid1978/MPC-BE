@@ -588,7 +588,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Липнути до меж екрану"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 5		"YouTube"
 6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
@@ -601,6 +601,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 24
 19		"Обрати макс. кількість кадрів\с або бітрейт"
 20		"Адреса AceStream:"
 22		"Адреса MatriX (TorrServer):"
+25		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
