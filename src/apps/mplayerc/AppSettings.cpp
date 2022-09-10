@@ -804,7 +804,7 @@ void CAppSettings::ResetSettings()
 	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
 	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u";
 
-	strUserAgent = http::userAgent.GetString();
+	strUserAgent = http::userAgent;
 
 	nLastFileInfoPage = 0;
 
