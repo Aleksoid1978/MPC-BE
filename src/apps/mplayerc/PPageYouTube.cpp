@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 #include "PPageYoutube.h"
 #include "PlayerYouTube.h"
 #include "DSUtil/Filehandle.h"
+#include "DSUtil/HTTPAsync.h"
 
 // CPPageYoutube dialog
 
@@ -137,7 +138,6 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_edAceStreamAddress.SetWindowTextW(s.strAceStreamAddress);
 	m_edTorrServerAddress.SetWindowTextW(s.strTorrServerAddress);
 	m_edUserAgent.SetWindowTextW(s.strUserAgent);
-	m_edUserAgent.EnableWindow(FALSE);
 
 	UpdateData(FALSE);
 
@@ -176,6 +176,7 @@ BOOL CPPageYoutube::OnApply()
 	}
 
 	m_edUserAgent.GetWindowTextW(s.strUserAgent);
+	http::userAgent = s.strUserAgent;
 
 	return __super::OnApply();
 }

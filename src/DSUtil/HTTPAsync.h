@@ -24,6 +24,10 @@
 #include <mutex>
 #include "UrlParser.h"
 
+namespace http {
+	inline CStringW userAgent = L"Mozilla/5.0";
+}
+
 class CHTTPAsync
 {
 protected:

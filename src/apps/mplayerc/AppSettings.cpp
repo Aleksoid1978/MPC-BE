@@ -31,6 +31,7 @@
 #include "DSUtil/std_helper.h"
 #include "filters/switcher/AudioSwitcher/IAudioSwitcherFilter.h"
 #include "AppSettings.h"
+#include "DSUtil/HTTPAsync.h"
 
 const LPCWSTR channel_mode_sets[] = {
 	//         ID          Name
@@ -803,7 +804,7 @@ void CAppSettings::ResetSettings()
 	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
 	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u";
 
-	strUserAgent = L"Mozilla/5.0";
+	strUserAgent = http::userAgent.GetString();
 
 	nLastFileInfoPage = 0;
 
@@ -1496,6 +1497,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_USER_AGENT, strUserAgent);
+	http::userAgent = strUserAgent;
 
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(unsigned*)&nLastFileInfoPage);
 
@@ -1983,6 +1985,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_USER_AGENT, strUserAgent);
+	http::userAgent = strUserAgent;
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 

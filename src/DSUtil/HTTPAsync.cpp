@@ -198,7 +198,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_nPort   = urlParser.GetPortNumber();
 	m_nScheme = urlParser.GetScheme();
 
-	m_hInstance = InternetOpenW(L"Mozilla/5.0",
+	m_hInstance = InternetOpenW(http::userAgent.GetString(),
 							    INTERNET_OPEN_TYPE_PRECONFIG,
 							    nullptr,
 							    nullptr,
