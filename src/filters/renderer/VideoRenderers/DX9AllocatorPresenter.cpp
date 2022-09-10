@@ -1306,7 +1306,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
-	const bool bStereo3DTransform = rs.iStereo3DTransform != STEREO3D_AsIs;
+	const bool bStereo3DTransform = (rs.iStereo3DTransform != STEREO3D_AsIs);
 
 	m_pD3DDevEx->BeginScene();
 

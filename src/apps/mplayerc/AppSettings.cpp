@@ -1375,11 +1375,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
-	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
-		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
-	} else {
-		GetRenderersSettings().iStereo3DTransform = STEREO3D_AsIs;
-	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
 
 	{ // load shader list

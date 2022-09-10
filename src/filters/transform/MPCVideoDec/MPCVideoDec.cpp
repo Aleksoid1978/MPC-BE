@@ -4659,7 +4659,9 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 			*value = m_nDecoderMode;
 		}
 		return S_OK;
-	} else if (!strcmp(field, "mvc_mode")) {
+	}
+
+	if (!strcmp(field, "mvc_mode")) {
 		// 0 - no, 1 - software decode, 2 - h/w decode
 		*value = (m_pMSDKDecoder ? 1 + m_pMSDKDecoder->GetHwAcceleration() : 0);
 		return S_OK;
@@ -4744,7 +4746,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetInt(LPCSTR field, int value)
 		CAutoLock cLock(&m_csInitDec);
 
 		int nMode = value >> 16;
-		bool bSwapLR = !!(value && 0xFFFF);
+		bool bSwapLR = (value & 1);
 
 		if (nMode < 0 || nMode > MVC_OUTPUT_TopBottom) {
 			return E_INVALIDARG;

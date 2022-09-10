@@ -7851,23 +7851,21 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 	CRenderersSettings& rs = s.m_VRSettings;
 
 	s.iStereo3DMode = nID - ID_STEREO3D_AUTO;
-
-	int iMvcOutputMode;
-	switch (s.iStereo3DMode) {
-	case STEREO3D_AUTO:              iMvcOutputMode = MVC_OUTPUT_Auto;          break;
-	case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
-	case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-	case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
-	case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-	case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
-	default:
-		ASSERT(0);
-		return;
-	}
+	ASSERT(s.iStereo3DMode >= STEREO3D_AUTO && s.iStereo3DMode <= STEREO3D_OVERUNDER);
 
 	BOOL bMvcActive = FALSE;
 	if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
-		pEFC->SetInt("mvc_mode", iMvcOutputMode << 16 | (int)s.bStereo3DSwapLR);
+		int iMvcOutputMode = MVC_OUTPUT_Auto;
+		switch (s.iStereo3DMode) {
+		case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+		case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+		case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+		case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+		case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+		}
+		const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
+
+		pEFC->SetInt("mvc_mode", mvc_mode_value);
 		pEFC->GetInt("mvc_mode", &bMvcActive);
 	}
 
@@ -7898,7 +7896,17 @@ void CMainFrame::OnViewSwapLeftRight()
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
 		if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), pFG)) {
-			pEFC->SetInt("mvc_mode", (s.iStereo3DMode == STEREO3D_HALFOVERUNDER ? MVC_OUTPUT_HalfTopBottom : s.iStereo3DMode) << 16 | (int)s.bStereo3DSwapLR);
+			int iMvcOutputMode = MVC_OUTPUT_Auto;
+			switch (s.iStereo3DMode) {
+			case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+			case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+			case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+			case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+			case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+			}
+			const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
+
+			pEFC->SetInt("mvc_mode", mvc_mode_value);
 		}
 	}
 }

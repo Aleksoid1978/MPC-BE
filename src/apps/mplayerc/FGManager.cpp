@@ -121,8 +121,9 @@ public:
 				case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
 				case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
 			}
+			const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
 
-			pEFC->SetInt("mvc_mode", iMvcOutputMode << 16 | (int)s.bStereo3DSwapLR);
+			pEFC->SetInt("mvc_mode", mvc_mode_value);
 		}
 
 		*ppBF = pBF.Detach();
