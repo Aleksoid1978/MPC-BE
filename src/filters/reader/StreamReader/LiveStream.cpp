@@ -282,6 +282,10 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			}
 			continue;
 		} else if (str == L"#EXT-X-ENDLIST") {
+			if (!m_hlsData.bInit) {
+				DLog(L"CUDPStream::ParseM3U8() : support only LIVE stream.");
+				return false;
+			}
 			m_hlsData.bEndList = true;
 			continue;
 		} else if (StartsWith(str, L"#EXT-X-STREAM-INF:")) {
@@ -617,14 +621,15 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 			BYTE body[8] = {};
 			DWORD dwSizeRead = 0;
+			bool ret = {};
 			if (m_HTTPAsync.Read(body, 7, &dwSizeRead) == S_OK) {
 				if (memcmp(body, "#EXTM3U", 7) == 0) {
-					ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
+					ret = ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
 				}
 			}
 			m_HTTPAsync.Close();
 
-			if (!m_hlsData.Segments.empty()) {
+			if (ret && !m_hlsData.Segments.empty()) {
 				m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
 				bConnected = TRUE;
 				m_protocol = protocol::PR_HLS;
