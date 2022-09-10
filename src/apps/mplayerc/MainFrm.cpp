@@ -4358,7 +4358,7 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 
 	BOOL bMvcActive = FALSE;
 	if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
-		pEFC->GetInt("mvc_mode", &bMvcActive);
+		pEFC->GetInt("decode_mode_mvc", &bMvcActive);
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
@@ -7866,7 +7866,7 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 		const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
 
 		pEFC->SetInt("mvc_mode", mvc_mode_value);
-		pEFC->GetInt("mvc_mode", &bMvcActive);
+		pEFC->GetInt("decode_mode_mvc", &bMvcActive);
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X

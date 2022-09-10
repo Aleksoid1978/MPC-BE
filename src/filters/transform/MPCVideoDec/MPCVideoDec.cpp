@@ -4661,7 +4661,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 		return S_OK;
 	}
 
-	if (!strcmp(field, "mvc_mode")) {
+	if (!strcmp(field, "decode_mode_mvc")) {
 		// 0 - no, 1 - software decode, 2 - h/w decode
 		*value = (m_pMSDKDecoder ? 1 + m_pMSDKDecoder->GetHwAcceleration() : 0);
 		return S_OK;
