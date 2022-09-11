@@ -2,6 +2,19 @@
 
 1.6.4.x dev
 =============================
+MPCStreamReader
+The filter will not connect to completed broadcasts.
+
+MPCVideoDec
+Fixed output media type properties for RAW video when MPC Video Converter is used.
+Fixed angle switching for Stereo 3D.
+
+Player
+Added the ability to specify "User agent". The default is "Mozilla/5.0".
+Fixed blinking of the preview window.
+
+Updated Hungarian translation (by mickey).
+Updated Turkish translation (by cmhrky).
 
 1.6.4
 =============================
