@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -422,9 +422,10 @@ HRESULT CFGFilterFile::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_
 // CFGFilterVideoRenderer
 //
 
-CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name, UINT64 merit)
+CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name, UINT64 merit, bool bIsPreview)
 	: CFGFilter(clsid, name, merit)
 	, m_hWnd(hWnd)
+	, m_bIsPreview(bIsPreview)
 {
 	AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 }
@@ -454,7 +455,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		}
 
 		if (m_clsid == CLSID_EnhancedVideoRenderer) {
-			if (m_name != "EVR - Preview Window") {
+			if (!m_bIsPreview) {
 				if (CComQIPtr<IEVRFilterConfig> pConfig = pBF) {
 					// 3 video streams are required to play DVD-Video with some decoders
 					VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
@@ -465,6 +466,9 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 				CComPtr<IMFVideoDisplayControl> pMFVDC;
 				if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
 					VERIFY(SUCCEEDED(pMFVDC->SetVideoWindow(m_hWnd)));
+					if (m_bIsPreview) {
+						pMFVDC->SetRenderingPrefs(MFVideoRenderPrefs_DoNotRepaintOnStop);
+					}
 				}
 			}
 		}
