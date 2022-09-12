@@ -14937,19 +14937,13 @@ void CMainFrame::SetupLanguageMenu()
 		const LanguageResource& lr	= CMPlayerCApp::languageResources[i];
 		CString strSatellite		= CMPlayerCApp::GetSatelliteDll(i);
 
-		if (!strSatellite.IsEmpty() || lr.resourceID == ID_LANGUAGE_ENGLISH) {
-			HMODULE lib = LoadLibraryW(strSatellite);
-			if (lib != nullptr || lr.resourceID == ID_LANGUAGE_ENGLISH) {
-				if (lib) {
-					FreeLibrary(lib);
-				}
-				UINT uFlags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-				if (i == s.iLanguage) {
-					uFlags |= MF_CHECKED | MFT_RADIOCHECK;
-				}
-				submenu.AppendMenu(uFlags, i + ID_LANGUAGE_ENGLISH, lr.name);
-				iCount++;
+		if (lr.resourceID == ID_LANGUAGE_ENGLISH || ::PathFileExistsW(strSatellite)) {
+			UINT uFlags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+			if (i == s.iLanguage) {
+				uFlags |= MF_CHECKED | MFT_RADIOCHECK;
 			}
+			submenu.AppendMenu(uFlags, i + ID_LANGUAGE_ENGLISH, lr.name);
+			iCount++;
 		}
 	}
 
