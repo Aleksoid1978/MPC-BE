@@ -12457,7 +12457,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.front();
 
 		if (!StartsWith(fn, L"pipe:")) {
-			m_SessionInfo.NewPath(fn);
+			const bool diskImage = m_DiskImage.GetDriveLetter() && m_SessionInfo.Path.GetLength();
+			if (!diskImage) {
+				m_SessionInfo.NewPath(fn);
+			}
 
 			if (m_youtubeFields.title.GetLength()) {
 				m_SessionInfo.Title = m_youtubeFields.title;
