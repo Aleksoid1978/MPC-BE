@@ -7957,7 +7957,9 @@ void CMainFrame::OnPlayPlay()
 				SendMessageW(WM_COMMAND, ID_PLAY_STOP);
 				SendMessageW(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 			}
-			m_pMS->SetRate(m_PlaybackRate);
+			if (FAILED(m_pMS->SetRate(m_PlaybackRate))) {
+				m_PlaybackRate = 1.0;
+			};
 			m_pMC->Run();
 		} else if (GetPlaybackMode() == PM_DVD) {
 			if (m_PlaybackRate >= 0.0) {
