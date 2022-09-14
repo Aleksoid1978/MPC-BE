@@ -180,10 +180,14 @@ CStringW GetProgramPath()
 //
 CStringW GetProgramDir()
 {
-	CStringW path = GetModulePath(nullptr);
-	path.Truncate(path.ReverseFind('\\') + 1); // do not use this method for random paths
+	auto get_prog_dir = []() {
+		CStringW path = GetModulePath(nullptr);
+		path.Truncate(path.ReverseFind('\\') + 1); // do not use this method for random paths
+		return path;
+	};
+	static const CStringW progDir = get_prog_dir();
 
-	return path;
+	return progDir;
 }
 
 //
