@@ -1451,4 +1451,6 @@ private:
 	bool IsNavigateSkipEnabled();
 
 	CMediaControls m_CMediaControls;
+
+	bool m_bIsLiveOnline = false;
 };

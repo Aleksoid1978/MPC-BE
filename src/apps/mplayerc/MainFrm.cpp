@@ -4494,6 +4494,18 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 	m_bfirstPlay   = true;
 	m_LastOpenFile = m_lastOMD->title;
 
+	if (GetPlaybackMode() == PM_FILE) {
+		REFERENCE_TIME rtDur = {};
+		m_pMS->GetDuration(&rtDur);
+		if (rtDur == 0) {
+			auto fname = GetCurFileName();
+			CUrlParser urlParser(fname);
+			if (urlParser.IsValid()) {
+				m_bIsLiveOnline = true;
+			}
+		}
+	}
+
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		if (s.fullScreenModes.bEnabled == 1
 				&& (m_bFullScreen || IsD3DFullScreenMode())
@@ -7957,7 +7969,7 @@ void CMainFrame::OnPlayPlay()
 				SendMessageW(WM_COMMAND, ID_PLAY_STOP);
 				SendMessageW(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 			}
-			if (FAILED(m_pMS->SetRate(m_PlaybackRate))) {
+			if (m_bIsLiveOnline || FAILED(m_pMS->SetRate(m_PlaybackRate))) {
 				m_PlaybackRate = 1.0;
 			};
 			m_pMC->Run();
@@ -8525,7 +8537,7 @@ void CMainFrame::SetPlayingRate(double rate)
 	}
 	HRESULT hr = E_FAIL;
 
-	if (GetPlaybackMode() == PM_FILE) {
+	if (GetPlaybackMode() == PM_FILE && !m_bIsLiveOnline) {
 		if (rate < 0.125) {
 			if (GetMediaState() != State_Paused) {
 				SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
@@ -8571,7 +8583,7 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 
 	HRESULT hr = E_FAIL;
 	double PlaybackRate = 0;
-	if (GetPlaybackMode() == PM_FILE) {
+	if (GetPlaybackMode() == PM_FILE && !m_bIsLiveOnline) {
 		if (nID == ID_PLAY_INCRATE) {
 			PlaybackRate = GetNextRate(m_PlaybackRate, s.nSpeedStep);
 		} else if (nID == ID_PLAY_DECRATE) {
@@ -8603,23 +8615,23 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 
 void CMainFrame::OnUpdatePlayChangeRate(CCmdUI* pCmdUI)
 {
-	bool enable = false;
+	BOOL enable = FALSE;
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		bool bIncRate = (pCmdUI->m_nID == ID_PLAY_INCRATE);
 		bool bDecRate = (pCmdUI->m_nID == ID_PLAY_DECRATE);
 
 		if (GetPlaybackMode() == PM_CAPTURE && m_wndCaptureBar.m_capdlg.IsTunerActive() && !m_bCapturing) {
-			enable = true;
+			enable = TRUE;
 		}
-		else if (GetPlaybackMode() == PM_FILE) {
+		else if (GetPlaybackMode() == PM_FILE && !m_bIsLiveOnline) {
 			if (bIncRate && m_PlaybackRate < MAXRATE || bDecRate && m_PlaybackRate > MINRATE) {
-				enable = true;
+				enable = TRUE;
 			}
 		}
 		else if (GetPlaybackMode() == PM_DVD && m_iDVDDomain == DVD_DOMAIN_Title) {
 			if (bIncRate && m_PlaybackRate < MAXDVDRATE || bDecRate && m_PlaybackRate > MINDVDRATE) {
-				enable = true;
+				enable = TRUE;
 			}
 		}
 	}
@@ -14523,6 +14535,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_FontInstaller.UninstallFonts();
 
 	m_CMediaControls.Update();
+
+	m_bIsLiveOnline = false;
 
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
