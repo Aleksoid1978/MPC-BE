@@ -8532,12 +8532,13 @@ void CMainFrame::OnUpdateGoto(CCmdUI* pCmdUI)
 
 void CMainFrame::SetPlayingRate(double rate)
 {
-	if (m_eMediaLoadState != MLS_LOADED) {
+	if (m_eMediaLoadState != MLS_LOADED || m_bIsLiveOnline) {
 		return;
 	}
+
 	HRESULT hr = E_FAIL;
 
-	if (GetPlaybackMode() == PM_FILE && !m_bIsLiveOnline) {
+	if (GetPlaybackMode() == PM_FILE) {
 		if (rate < 0.125) {
 			if (GetMediaState() != State_Paused) {
 				SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
@@ -8571,7 +8572,7 @@ void CMainFrame::SetPlayingRate(double rate)
 
 void CMainFrame::OnPlayChangeRate(UINT nID)
 {
-	if (m_eMediaLoadState != MLS_LOADED) {
+	if (m_eMediaLoadState != MLS_LOADED || m_bIsLiveOnline) {
 		return;
 	}
 
@@ -8583,7 +8584,7 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 
 	HRESULT hr = E_FAIL;
 	double PlaybackRate = 0;
-	if (GetPlaybackMode() == PM_FILE && !m_bIsLiveOnline) {
+	if (GetPlaybackMode() == PM_FILE) {
 		if (nID == ID_PLAY_INCRATE) {
 			PlaybackRate = GetNextRate(m_PlaybackRate, s.nSpeedStep);
 		} else if (nID == ID_PLAY_DECRATE) {
@@ -8617,14 +8618,14 @@ void CMainFrame::OnUpdatePlayChangeRate(CCmdUI* pCmdUI)
 {
 	BOOL enable = FALSE;
 
-	if (m_eMediaLoadState == MLS_LOADED) {
+	if (m_eMediaLoadState == MLS_LOADED && !m_bIsLiveOnline) {
 		bool bIncRate = (pCmdUI->m_nID == ID_PLAY_INCRATE);
 		bool bDecRate = (pCmdUI->m_nID == ID_PLAY_DECRATE);
 
 		if (GetPlaybackMode() == PM_CAPTURE && m_wndCaptureBar.m_capdlg.IsTunerActive() && !m_bCapturing) {
 			enable = TRUE;
 		}
-		else if (GetPlaybackMode() == PM_FILE && !m_bIsLiveOnline) {
+		else if (GetPlaybackMode() == PM_FILE) {
 			if (bIncRate && m_PlaybackRate < MAXRATE || bDecRate && m_PlaybackRate > MINRATE) {
 				enable = TRUE;
 			}
