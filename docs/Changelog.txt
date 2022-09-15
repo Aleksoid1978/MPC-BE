@@ -12,9 +12,15 @@ Fixed angle switching for Stereo 3D.
 Player
 Added the ability to specify "User agent". The default is "Mozilla/5.0".
 Fixed blinking of the preview window.
+Fixed remembering history when opening BD ISO.
+The display of the list of player translations has been optimized.
+Fixed player operation in case of impossibility to change the playback speed.
 
 Updated Hungarian translation (by mickey).
 Updated Turkish translation (by cmhrky).
+Updated German translation (by Klaus1189).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 1.6.4
 =============================
