@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -756,20 +756,30 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 				return false;
 			}
 
-			BYTE buffer[1024] = {};
-			DWORD dwSizeRead  = 0;
-			DWORD totalSize   = 0;
-			do {
-				if (m_HTTPAsync.Read(buffer, 1024, &dwSizeRead) != S_OK) {
-					break;
+			if (m_HTTPAsync.IsCompressed()) {
+				if (m_HTTPAsync.GetLenght() <= 10 * MEGABYTE) {
+					std::vector<BYTE> body;
+					if (m_HTTPAsync.GetUncompressed(body)) {
+						temp.Write(body.data(), static_cast<UINT>(body.size()));
+						m_tempfn = fn;
+					}
 				}
-				temp.Write(buffer, dwSizeRead);
-				totalSize += dwSizeRead;
-			} while (dwSizeRead && totalSize < m_llMaxSize);
-			temp.Close();
+			} else {
+				BYTE buffer[1024] = {};
+				DWORD dwSizeRead = 0;
+				DWORD totalSize = 0;
+				do {
+					if (m_HTTPAsync.Read(buffer, 1024, &dwSizeRead) != S_OK) {
+						break;
+					}
+					temp.Write(buffer, dwSizeRead);
+					totalSize += dwSizeRead;
+				} while (dwSizeRead && totalSize < m_llMaxSize);
+				temp.Close();
 
-			if (totalSize) {
-				m_tempfn = fn;
+				if (totalSize) {
+					m_tempfn = fn;
+				}
 			}
 		}
 

@@ -619,14 +619,25 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		if (!bConnected && (m_HTTPAsync.GetLenght() || m_HTTPAsync.GetContentType().Find(L"mpegurl") > 0)) {
 			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", m_HTTPAsync.GetHeader());
 
-			BYTE body[8] = {};
-			DWORD dwSizeRead = 0;
 			bool ret = {};
-			if (m_HTTPAsync.Read(body, 7, &dwSizeRead) == S_OK) {
-				if (memcmp(body, "#EXTM3U", 7) == 0) {
-					ret = ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
+			if (m_HTTPAsync.IsCompressed()) {
+				if (m_HTTPAsync.GetLenght() <= 10 * MEGABYTE) {
+					std::vector<BYTE> body;
+					ret = m_HTTPAsync.GetUncompressed(body);
+					if (ret && memcmp(body.data(), "#EXTM3U", 7) == 0) {
+						ret = ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
+					}
+				}
+			} else {
+				BYTE body[8] = {};
+				DWORD dwSizeRead = 0;
+				if (m_HTTPAsync.Read(body, 7, &dwSizeRead) == S_OK) {
+					if (memcmp(body, "#EXTM3U", 7) == 0) {
+						ret = ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
+					}
 				}
 			}
+
 			m_HTTPAsync.Close();
 
 			if (ret && !m_hlsData.Segments.empty()) {

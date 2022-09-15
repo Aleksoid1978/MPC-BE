@@ -58,7 +58,10 @@ protected:
 
 	CString m_header;
 	CString m_contentType;
+	CString m_contentEncoding;
 	UINT64 m_lenght = 0;
+
+	bool m_bIsCompressed = false;
 
 	static void CALLBACK Callback(__in HINTERNET hInternet,
 								  __in_opt DWORD_PTR dwContext,
@@ -80,8 +83,15 @@ public:
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	const CString& GetHeader() const;
+
 	// get content type in lowercase
 	const CString& GetContentType() const;
+	// get content encoding in lowercase
+	const CString& GetContentEncoding() const;
+	const bool IsCompressed() const;
+
+	bool GetUncompressed(std::vector<BYTE>& buffer);
+
 	UINT64 GetLenght() const;
 };
 
