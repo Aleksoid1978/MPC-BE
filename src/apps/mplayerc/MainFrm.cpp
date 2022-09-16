@@ -11905,19 +11905,9 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
 		engine_t engine = s.GetFileEngine(pFileData->fns.front());
 
-		const CString ct = Content::GetType(pFileData->fns.front());
-
-		if (ct == L"video/x-ms-asf") {
-			// TODO: put something here to make the windows media source filter load later
-		} else if (ct == L"application/x-shockwave-flash") {
-			engine = ShockWave;
-		}
-
-		HRESULT hr = E_FAIL;
-		CComPtr<IUnknown> pUnk;
-
 		if (engine == ShockWave) {
-			pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew DSObjects::CShockwaveGraph(m_pVideoWnd->m_hWnd, hr);
+			HRESULT hr = E_FAIL;
+			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew DSObjects::CShockwaveGraph(m_pVideoWnd->m_hWnd, hr);
 			if (!pUnk) {
 				return ResStr(IDS_AG_OUT_OF_MEMORY);
 			}
