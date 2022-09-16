@@ -881,7 +881,7 @@ void CPlayerPlaylistBar::ReloadTranslatableResources()
 
 void CPlayerPlaylistBar::ScaleFontInternal()
 {
-	NONCLIENTMETRICS ncm = { sizeof(NONCLIENTMETRICS) };
+	NONCLIENTMETRICSW ncm = { sizeof(NONCLIENTMETRICSW) };
 	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
 
 	auto& lf = ncm.lfMessageFont;

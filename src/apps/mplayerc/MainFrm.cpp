@@ -2337,7 +2337,7 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 					DWORD cbNeeded;
 
 					if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
-						module.ReleaseBufferSetLength(GetModuleFileNameEx(hProcess, hModule, module.GetBuffer(MAX_PATH), MAX_PATH));
+						module.ReleaseBufferSetLength(GetModuleFileNameExW(hProcess, hModule, module.GetBuffer(MAX_PATH), MAX_PATH));
 					}
 
 					CloseHandle(hProcess);
@@ -4740,10 +4740,10 @@ void CMainFrame::OnBossKey()
 
 	// Disable animation
 	ANIMATIONINFO AnimationInfo = { sizeof(AnimationInfo) };
-	::SystemParametersInfo(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+	::SystemParametersInfoW(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 	const int WindowAnimationType = AnimationInfo.iMinAnimate;
 	AnimationInfo.iMinAnimate = 0;
-	::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+	::SystemParametersInfoW(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
 	if (State_Running == GetMediaState()) {
 		SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
@@ -4755,7 +4755,7 @@ void CMainFrame::OnBossKey()
 
 	// Enable animation
 	AnimationInfo.iMinAnimate = WindowAnimationType;
-	::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+	::SystemParametersInfoW(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 }
 
 void CMainFrame::OnStreamAudio(UINT nID)
@@ -12016,16 +12016,16 @@ HRESULT CMainFrame::PreviewWindowHide()
 		// Disable animation
 		ANIMATIONINFO AnimationInfo;
 		AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
-		::SystemParametersInfo(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+		::SystemParametersInfoW(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 		int WindowAnimationType = AnimationInfo.iMinAnimate;
 		AnimationInfo.iMinAnimate = 0;
-		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+		::SystemParametersInfoW(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
 		m_wndPreView.ShowWindow(SW_HIDE);
 
 		// Enable animation
 		AnimationInfo.iMinAnimate = WindowAnimationType;
-		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+		::SystemParametersInfoW(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
 		if (m_pGB_preview) {
 			m_pMC_preview->Pause();
