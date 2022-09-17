@@ -540,7 +540,6 @@ public:
 private:
 	void SetDispMode(const dispmode& dm, const CString& DisplayName, const BOOL bForceRegistryMode = FALSE);
 
-	bool			m_bUseSmartSeek;
 	MPC_LOADSTATE	m_eMediaLoadState;
 	bool			m_bClosingState;
 	bool			m_bAudioOnly;
