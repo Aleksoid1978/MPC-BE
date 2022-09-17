@@ -12055,56 +12055,48 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	rtCur2 = GetClosestKeyFrame(rtCur2);
 
 	if (GetPlaybackMode() == PM_DVD && m_pDVDC_preview) {
-		DVD_PLAYBACK_LOCATION2 Loc, Loc2;
-		double fps = 0;
+		DVD_DOMAIN domain;
+		DVD_PLAYBACK_LOCATION2 location;
 
-		hr = m_pDVDI->GetCurrentLocation(&Loc);
+		hr = m_pDVDI->GetCurrentDomain(&domain);
+		if (SUCCEEDED(hr)) {
+			hr = m_pDVDI->GetCurrentLocation(&location);
+		}
 		if (FAILED(hr)) {
 			return hr;
 		}
 
-		hr = m_pDVDI_preview->GetCurrentLocation(&Loc2);
+		DVD_DOMAIN domain2;
+		DVD_PLAYBACK_LOCATION2 location2;
+		hr = m_pDVDI_preview->GetCurrentDomain(&domain2);
+		if (SUCCEEDED(hr)) {
+			hr = m_pDVDI_preview->GetCurrentLocation(&location2);
+		}
 
-		fps = Loc.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
-			: Loc.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
-			: Loc.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
-			: 25.0;
-
-		DVD_HMSF_TIMECODE dvdTo = RT2HMSF(rtCur2, fps);
-
-		if (FAILED(hr) || (Loc.TitleNum != Loc2.TitleNum)) {
-			hr = m_pDVDC_preview->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, nullptr);
-			if (FAILED(hr)) {
-				return hr;
-			}
-			m_pDVDC_preview->Resume(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
+		if (FAILED(hr) || domain != domain2 || location.TitleNum != location2.TitleNum) {
+			CComPtr<IDvdState> pStateData;
+			hr = m_pDVDI->GetState(&pStateData);
 			if (SUCCEEDED(hr)) {
-				hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, nullptr);
-				if (FAILED(hr)) {
-					return hr;
-				}
-			} else {
-				hr = m_pDVDC_preview->PlayChapterInTitle(Loc.TitleNum, 1, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
-				hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, nullptr);
-				if (FAILED(hr)) {
-					hr = m_pDVDC_preview->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
-					if (FAILED(hr)) {
-						return hr;
-					}
-				}
-			}
-		} else {
-			hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, nullptr);
-			if (FAILED(hr)) {
-				return hr;
+				hr = m_pDVDC_preview->SetState(pStateData, DVD_CMD_FLAG_Flush, nullptr);
 			}
 		}
 
-		m_pDVDI_preview->GetCurrentLocation(&Loc2);
+		if (SUCCEEDED(hr)) {
+			const double fps = location.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
+				: location.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
+				: location.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
+				: 25.0;
+			DVD_HMSF_TIMECODE dvdTo = RT2HMSF(rtCur2, fps);
 
-		m_pDVDC_preview->Pause(FALSE);
-		m_pMC_preview->Run();
-	} else if (GetPlaybackMode() == PM_FILE && m_pMS_preview) {
+			hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, nullptr);
+		}
+
+		if (SUCCEEDED(hr)) {
+			m_pDVDC_preview->Pause(FALSE);
+			m_pMC_preview->Run();
+		}
+	}
+	else if (GetPlaybackMode() == PM_FILE && m_pMS_preview) {
 		hr = m_pMS_preview->SetPositions(&rtCur2, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
 	}
 
