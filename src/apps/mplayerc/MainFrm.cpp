@@ -19388,8 +19388,7 @@ bool CMainFrame::CanPreviewUse()
 {
 	return (m_pGB_preview
 			&& m_eMediaLoadState == MLS_LOADED
-			&& !m_bAudioOnly
-			&& AfxGetAppSettings().fSmartSeek);
+			&& !m_bAudioOnly);
 }
 
 CStringW GetCoverImgFromPath(CString fullfilename)

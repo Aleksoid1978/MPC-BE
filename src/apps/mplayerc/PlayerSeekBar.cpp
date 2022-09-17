@@ -993,7 +993,7 @@ void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	if (m_pMainFrame->m_wndPreView.IsWindowVisible()) {
 		m_pMainFrame->PreviewWindowHide();
-		AfxGetAppSettings().fSmartSeek = !AfxGetAppSettings().fSmartSeek;
+		m_pMainFrame->ReleasePreviewGraph();
 		OnMouseMove(nFlags,point);
 	}
 }
