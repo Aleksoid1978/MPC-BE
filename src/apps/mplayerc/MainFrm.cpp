@@ -11892,7 +11892,9 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	CAppSettings& s = AfxGetAppSettings();
 
 	ReleasePreviewGraph(); // Hmm, most likely it is no longer needed
+
 	bool bUseSmartSeek = s.fSmartSeek;
+
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
 		CString fn = pFileData->fns.front();
 		if (!fn.IsEmpty() && (fn.Find(L"://") >= 0)) { // disable SmartSeek for streaming data.
@@ -11965,6 +11967,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 		m_pVW_preview = m_pGB_preview;
 		m_pBV_preview = m_pGB_preview;
+
+		m_bWndPreViewOn = true;
+	} else {
+		m_bWndPreViewOn = false;
 	}
 
 	if (!(m_pMC && m_pME && m_pMS)
@@ -19386,9 +19392,19 @@ CString CMainFrame::FillMessage()
 
 bool CMainFrame::CanPreviewUse()
 {
-	return (m_pGB_preview
+	return (m_pGB_preview && m_bWndPreViewOn
 			&& m_eMediaLoadState == MLS_LOADED
 			&& !m_bAudioOnly);
+}
+
+bool CMainFrame::TogglePreview()
+{
+	if (m_pGB_preview && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly) {
+		m_bWndPreViewOn = !m_bWndPreViewOn;
+
+		return m_bWndPreViewOn;
+	}
+	return false;
 }
 
 CStringW GetCoverImgFromPath(CString fullfilename)

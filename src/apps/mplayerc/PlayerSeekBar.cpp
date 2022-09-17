@@ -991,10 +991,18 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
 {
+	bool needShow = m_pMainFrame->TogglePreview();
+
 	if (m_pMainFrame->m_wndPreView.IsWindowVisible()) {
-		m_pMainFrame->PreviewWindowHide();
-		m_pMainFrame->ReleasePreviewGraph();
-		OnMouseMove(nFlags,point);
+		if (!needShow) {
+			m_pMainFrame->PreviewWindowHide();
+			OnMouseMove(nFlags, point);
+		}
+	}
+	else {
+		if (needShow) {
+			PreviewWindowShow();
+		}
 	}
 }
 

@@ -1232,6 +1232,7 @@ public:
 	CPlayerPlaylistBar	m_wndPlaylistBar;
 	CFlyBar				m_wndFlyBar;
 	CPreView			m_wndPreView; // SmartSeek
+	bool				m_bWndPreViewOn = false;
 
 	bool m_bIsMadVRExclusiveMode = false;
 	bool m_bIsMPCVRExclusiveMode = false;
@@ -1248,6 +1249,7 @@ public:
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 	bool CanPreviewUse();
+	bool TogglePreview();
 
 	CFullscreenWnd* m_pFullscreenWnd;
 
