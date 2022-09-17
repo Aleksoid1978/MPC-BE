@@ -1245,6 +1245,7 @@ public:
 	bool OSDBarSetPos();
 	void DestroyOSDBar();
 
+	void ReleasePreviewGraph();
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 	bool CanPreviewUse();

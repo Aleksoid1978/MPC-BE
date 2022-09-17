@@ -11892,7 +11892,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_pGB_preview.Release();
+	ReleasePreviewGraph(); // Hmm, most likely it is no longer needed
 
 	m_bUseSmartSeek = s.fSmartSeek;
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
@@ -11992,6 +11992,27 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	m_pCB = DNew CDSMChapterBag(nullptr, nullptr);
 
 	return L"";
+}
+
+void CMainFrame::ReleasePreviewGraph()
+{
+	if (m_pGB_preview) {
+		m_pMFVDC_preview.Release();
+
+		m_pMC_preview.Release();
+		m_pMS_preview.Release();
+		m_pVW_preview.Release();
+		m_pBV_preview.Release();
+
+		if (m_pDVDC_preview) {
+			m_pDVDC_preview.Release();
+			m_pDVDI_preview.Release();
+		}
+
+		m_pGB_preview->RemoveFromROT();
+		m_pGB_preview.Release();
+	}
+	m_bUseSmartSeek = false;
 }
 
 HRESULT CMainFrame::PreviewWindowHide()
@@ -12369,23 +12390,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			EndEnumFilters;
 
 			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(fn, nullptr))) {
-				if (m_pGB_preview) {
-					m_pMFVDC_preview.Release();
-
-					m_pMC_preview.Release();
-					m_pMS_preview.Release();
-					m_pVW_preview.Release();
-					m_pBV_preview.Release();
-
-					if (m_pDVDC_preview) {
-						m_pDVDC_preview.Release();
-						m_pDVDI_preview.Release();
-					}
-
-					m_pGB_preview->RemoveFromROT();
-					m_pGB_preview.Release();
-				}
-				m_bUseSmartSeek = false;
+				ReleasePreviewGraph();
 			}
 		}
 
@@ -14496,23 +14501,8 @@ void CMainFrame::CloseMediaPrivate()
 		m_pGB.Release();
 	}
 
-	if (m_pGB_preview) {
-		PreviewWindowHide();
-		m_pMFVDC_preview.Release();
-
-		m_pMS_preview.Release();
-		m_pBV_preview.Release();
-		m_pVW_preview.Release();
-		m_pMC_preview.Release();
-
-		if (m_pDVDC_preview) {
-			m_pDVDC_preview.Release();
-			m_pDVDI_preview.Release();
-		}
-
-		m_pGB_preview->RemoveFromROT();
-		m_pGB_preview.Release();
-	}
+	PreviewWindowHide();
+	ReleasePreviewGraph();
 
 	m_pProv.Release();
 
