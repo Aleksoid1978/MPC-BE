@@ -24,6 +24,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	Little-CMS git-lcms2.13.1-84-g55068d3;
+	MediaInfo git-v22.06-43-gfd11029ef;
 
 1.6.4
 =============================

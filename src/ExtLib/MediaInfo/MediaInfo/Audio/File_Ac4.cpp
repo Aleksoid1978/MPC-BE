@@ -34,6 +34,8 @@ using namespace std;
 namespace MediaInfoLib
 {
 
+typedef File_Ac4::dmx::cdmx::gain::type gain;
+    
 //***************************************************************************
 // Infos
 //***************************************************************************
@@ -1056,6 +1058,51 @@ static const int8s de_hcb_diff_1[120][2] = {
     {  -7,   -8}
 };
 
+//---------------------------------------------------------------------------
+static const char* out_ch_config_Values[] =
+{
+    "5.1",
+    "5.1.2",
+    "5.1.4",
+    "7.1",
+    "7.1.2",
+};
+static constexpr size_t out_ch_config_Size=sizeof(out_ch_config_Values)/sizeof(const char*);
+
+//---------------------------------------------------------------------------
+static const float32 gain_f1_Values(int8u code)
+{
+    if (code>=7)
+        return -INFINITY;
+    return 1.5*(-((int)code)+2);
+};
+
+//---------------------------------------------------------------------------
+static const float32 gain_xx_Values(int8u code)
+{
+    if (code>=7)
+        return -INFINITY;
+    if (code>=4)
+        return 3*(-((int)code)+2);
+    return 1.5*(-((int)code));
+};
+
+//---------------------------------------------------------------------------
+static const char* gain_Text[] =
+{
+    "ScreenToCenter",
+    "ScreenToFront",
+    "Back4ToBack2",
+    "Top4ToTop2",
+    "TopFrontToFront",
+    "TopFrontToSide",
+    "TopFrontToBack",
+    "TopBackToFront",
+    "TopBackToSide",
+    "TopBackToBack",
+};
+static constexpr size_t gain_Size=sizeof(gain_Text)/sizeof(const char*);
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -1386,6 +1433,21 @@ void File_Ac4::Streams_Fill()
                     Fill_Measure(Stream_Audio, 0, (P+" Downmix LfeMixGain").c_str(), Ztring::ToZtring(10-D.lfe_mixgain).To_UTF8(), " dB");
                 if (D.preferred_dmx_method!=(int8u)-1)
                     Fill(Stream_Audio, 0, (P+" Downmix PreferredDownmix").c_str(), Value(Ac4_preferred_dmx_method, D.preferred_dmx_method));
+            }
+            if (!D.Cdmxs.empty())
+            {
+                Fill(Stream_Audio, 0, (P+" Downmix CustomDownmixTargets").c_str(), "Yes");
+                for (size_t c=0; c<D.Cdmxs.size(); c++)
+                {
+                    const auto& C=D.Cdmxs[c];
+                    const auto Pdc=P+" Downmix CustomDownmixTargets "+string(out_ch_config_Values[C.out_ch_config])+"ch";
+                    Fill(Stream_Audio, 0, Pdc.c_str(), "Yes");
+                    for (size_t g=0; g<C.Gains.size(); g++)
+                    {
+                        const auto& G=C.Gains[g];
+                        Fill_Measure(Stream_Audio, 0, (Pdc+' '+gain_Text[(size_t)G.Type]).c_str(), gain_xx_Values(G.Value), " dB", 1);
+                    }
+                }
             }
         }
 
@@ -4093,15 +4155,21 @@ void File_Ac4::custom_dmx_data(dmx& D, int8u pres_ch_mode, int8u pres_ch_mode_co
             Get_S1(2, n_cdmx_configs,                           "n_cdmx_configs_minus1");
             n_cdmx_configs++;
 
+            Presentations.back().Dmx.Cdmxs.reserve(n_cdmx_configs);
             for (int8u Pos=0; Pos<n_cdmx_configs; Pos++)
             {
+                Element_Begin1("cdmx_config");
                 int8u out_ch_config;
                 if (bs_ch_config==2 || bs_ch_config == 5)
-                    Get_S1 (1, out_ch_config,                   "out_ch_config[dc]");
+                    Get_S1 (1, out_ch_config,                   "out_ch_config");
                 else
-                    Get_S1 (3, out_ch_config,                   "out_ch_config[dc]");
+                    Get_S1 (3, out_ch_config,                   "out_ch_config");
+                Param_Info1C(out_ch_config<out_ch_config_Size, out_ch_config_Values[out_ch_config]);
 
+                Presentations.back().Dmx.Cdmxs.resize(Presentations.back().Dmx.Cdmxs.size()+1);
+                Presentations.back().Dmx.Cdmxs.back().out_ch_config=out_ch_config;
                 cdmx_parameters(bs_ch_config, out_ch_config);
+                Element_End0();
             }
         TEST_SB_END();
     }
@@ -4200,9 +4268,9 @@ void File_Ac4::tool_scr_to_c_l()
 {
     Element_Begin1("tool_scr_to_c_l");
         TESTELSE_SB_SKIP(                                       "b_put_screen_to_c");
-            Skip_S1(3,                                          "gain_f1_code");
+            Get_Gain(3, gain::f1_code,                          "gain_f1_code");
         TESTELSE_SB_ELSE(                                       "b_put_screen_to_c");
-            Skip_S1(3,                                          "gain_f2_code");
+            Get_Gain(3, gain::f2_code,                          "gain_f2_code");
         TESTELSE_SB_END();
     Element_End0();
 }
@@ -4211,7 +4279,7 @@ void File_Ac4::tool_scr_to_c_l()
 void File_Ac4::tool_b4_to_b2()
 {
     Element_Begin1("tool_b4_to_b2");
-    Skip_S1(3,                                                  "gain_b_code");
+    Get_Gain(3, gain::b_code,                                   "gain_b_code");
     Element_End0();
 }
 
@@ -4219,7 +4287,7 @@ void File_Ac4::tool_b4_to_b2()
 void File_Ac4::tool_t4_to_t2()
 {
     Element_Begin1("tool_t4_to_t2");
-    Skip_S1(3,                                                  "gain_t1_code");
+    Get_Gain(3, gain::t1_code,                                  "gain_t1_code");
     Element_End0();
 }
 
@@ -4228,24 +4296,26 @@ void File_Ac4::tool_t4_to_f_s_b()
 {
     Element_Begin1("tool_t4_to_f_s_b");
     TESTELSE_SB_SKIP(                                           "b_top_front_to_front");
-        Skip_S1(3,                                              "gain_t2a_code");
+        Get_Gain(3, gain::t2a_code,                             "gain_t2a_code");
+        Get_Gain(0, gain::t2b_code,                             nullptr);
     TESTELSE_SB_ELSE(                                           "b_top_front_to_front");
         TESTELSE_SB_SKIP(                                       "b_top_front_to_side");
-        Skip_S1(3,                                              "gain_t2b_code");
+            Get_Gain(3, gain::t2b_code,                         "gain_t2b_code");
         TESTELSE_SB_ELSE(                                       "b_top_front_to_side");
-        Skip_S1(3,                                              "gain_t2c_code");
+            Get_Gain(0, gain::t2b_code,                         nullptr);
+            Get_Gain(3, gain::t2c_code,                         "gain_t2c_code");
         TESTELSE_SB_END();
     TESTELSE_SB_END();
 
-
-
     TESTELSE_SB_SKIP(                                           "b_top_back_to_front");
-        Skip_S1(3,                                              "gain_t2d_code");
+        Get_Gain(3, gain::t2d_code,                              "gain_t2d_code");
+        Get_Gain(0, gain::t2e_code,                              nullptr);
     TESTELSE_SB_ELSE(                                           "b_top_back_to_front");
         TESTELSE_SB_SKIP(                                       "b_top_back_to_side");
-        Skip_S1(3,                                              "gain_t2e_code");
+           Get_Gain(3, gain::t2e_code,                           "gain_t2e_code");
         TESTELSE_SB_ELSE(                                       "b_top_back_to_side");
-        Skip_S1(3,                                              "gain_t2f_code");
+            Get_Gain(0, gain::t2e_code,                          nullptr);
+            Get_Gain(3, gain::t2f_code,                          "gain_t2f_code");
         TESTELSE_SB_END();
     TESTELSE_SB_END();
     Element_End0();
@@ -4256,15 +4326,17 @@ void File_Ac4::tool_t4_to_f_s()
 {
     Element_Begin1("tool_t4_to_f_s");
     TESTELSE_SB_SKIP(                                           "b_top_front_to_front");
-        Skip_S1(3,                                              "gain_t2a_code");
+        Get_Gain(3, gain::t2a_code,                             "gain_t2a_code");
+        Get_Gain(0, gain::t2b_code,                             nullptr);
     TESTELSE_SB_ELSE(                                           "b_top_front_to_front");
-        Skip_S1(3,                                              "gain_t2b_code");
+        Get_Gain(3, gain::t2b_code,                             "gain_t2b_code");
     TESTELSE_SB_END();
 
     TESTELSE_SB_SKIP(                                           "b_top_back_to_front");
-        Skip_S1(3,                                              "gain_t2d_code");
+        Get_Gain(3, gain::t2d_code,                             "gain_t2d_code");
+        Get_Gain(0, gain::t2e_code,                             nullptr);
     TESTELSE_SB_ELSE(                                           "b_top_back_to_front");
-        Skip_S1(3,                                              "gain_t2e_code");
+        Get_Gain(3, gain::t2e_code,                             "gain_t2e_code");
     TESTELSE_SB_END();
     Element_End0();
 }
@@ -4274,12 +4346,14 @@ void File_Ac4::tool_t2_to_f_s_b()
 {
     Element_Begin1("tool_t2_to_f_s_b");
     TESTELSE_SB_SKIP(                                           "b_top_to_front");
-        Skip_S1(3,                                              "gain_t2a_code");
+        Get_Gain(3, gain::t2a_code,                             "gain_t2a_code");
+        Get_Gain(0, gain::t2b_code,                             nullptr);
     TESTELSE_SB_ELSE(                                           "b_top_to_front");
         TESTELSE_SB_SKIP(                                       "b_top_to_side");
-            Skip_S1(3,                                          "gain_t2b_code");
+            Get_Gain(3, gain::t2b_code,                         "gain_t2b_code");
         TESTELSE_SB_ELSE(                                       "b_top_to_side");
-            Skip_S1(3,                                          "gain_t2c_code");
+            Get_Gain(0, gain::t2b_code,                         nullptr);
+            Get_Gain(3, gain::t2c_code,                         "gain_t2c_code");
         TESTELSE_SB_END();
     TESTELSE_SB_END();
     Element_End0();
@@ -4290,9 +4364,10 @@ void File_Ac4::tool_t2_to_f_s()
 {
     Element_Begin1("tool_t2_to_f_s");
     TESTELSE_SB_SKIP(                                           "b_top_to_front");
-        Skip_S1(3,                                              "gain_t2a_code");
+        Get_Gain(3, gain::t2a_code,                             "gain_t2a_code");
+        Get_Gain(0, gain::t2b_code,                             nullptr);
     TESTELSE_SB_ELSE(                                           "b_top_to_front");
-        Skip_S1(3,                                              "gain_t2b_code");
+        Get_Gain(3, gain::t2b_code,                             "gain_t2b_code");
     TESTELSE_SB_END();
     Element_End0();
 }
@@ -5290,6 +5365,19 @@ int16u File_Ac4::Huffman_Decode(const ac4_huffman& Table, const char* Name)
     Element_End0();
 
     return index+64;
+}
+
+void File_Ac4::Get_Gain(int8u Bits, gain Type, const char* Name)
+{
+    dmx::cdmx::gain Gain;
+    Gain.Type=Type;
+    if (Bits)
+    {
+        Get_S1(Bits, Gain.Value,                                Name); Param_Info3(Gain.Type==gain::f1_code?gain_f1_Values(Gain.Value):gain_xx_Values(Gain.Value), " dB", 1);
+    }
+    else
+        Gain.Value=7;
+    Presentations.back().Dmx.Cdmxs.back().Gains.push_back(Gain);
 }
 
 } //NameSpace

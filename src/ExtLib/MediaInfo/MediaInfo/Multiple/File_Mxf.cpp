@@ -110,6 +110,10 @@ using namespace std;
 namespace MediaInfoLib
 {
 
+#if defined(MEDIAINFO_IAB_YES)
+    Ztring ChannelLayout_2018_Rename(const Ztring& Channels, const Ztring& Format);
+#endif
+
 //***************************************************************************
 //
 //  PartitionPack
@@ -2356,6 +2360,7 @@ File_Mxf::File_Mxf()
     DolbyAudioMetadata=NULL;
     #if defined(MEDIAINFO_ADM_YES)
         Adm=NULL;
+        Adm_ForLaterMerge=NULL;
     #endif
 
     #if MEDIAINFO_DEMUX
@@ -2798,6 +2803,35 @@ void File_Mxf::Streams_Finish()
         Finish(Adm);
         Merge(*Adm, Stream_Audio, 0, 0);
     }
+    if (Adm_ForLaterMerge)
+    {
+        auto& S=*Adm_ForLaterMerge->Stream_More;
+        size_t Start=(Stream_Audio<S.size() && !S[Stream_Audio].empty())?S[Stream_Audio][0].size():0;
+        Adm_ForLaterMerge->Streams_Fill_ForAdm();
+        if (Adm)
+        {
+            //Check if compatible
+            size_t End=(Stream_Audio<S.size() && !S[Stream_Audio].empty())?S[Stream_Audio][0].size():0;
+            for (size_t i=Start; i<End; i++)
+            {
+                const auto& Field_Name=S[Stream_Audio][0][i][Info_Name];
+                const auto& Field_Text_Iab=S[Stream_Audio][0][i][Info_Text];
+                const auto& Field_Text_Adm=Retrieve_Const(Stream_Audio, 0, Field_Name.To_UTF8().c_str());
+                if ((Field_Text_Iab==__T("Yes") && Field_Text_Adm.empty())
+                 || (Field_Text_Iab!=__T("Yes") && Field_Text_Iab!=Field_Text_Adm && (Field_Name.find(__T(" ChannelLayout"))==string::npos
+                                                                                   || ChannelLayout_2018_Rename(Field_Text_Iab, __T("IAB"))!=ChannelLayout_2018_Rename(Field_Text_Adm, __T("ADM")))))
+                {
+                    Fill(Stream_Audio, 0, "Warnings", "Potential IAB/ADM coherency issues detected");
+                }
+
+            }
+        }
+        else
+        {
+            //Merge
+            Merge(*Adm_ForLaterMerge, Stream_Audio, 0, 0);
+        }
+    }
     if (DolbyAudioMetadata) //After ADM for having content inside ADM stuff
         DolbyAudioMetadata->Merge(*this, 0);
     if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
@@ -3184,6 +3218,8 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
                     Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Descriptor->second.ChannelCount);
                     break;
                 }
+        if (!Adm_ForLaterMerge && (*Parser)->Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("IAB"))
+            Adm_ForLaterMerge=(File_Iab*)*Parser; // Will be used later for ADM
 
         MergedStreams_Last.clear(); //TODO: better way to do this
 

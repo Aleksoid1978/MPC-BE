@@ -33,6 +33,7 @@ namespace MediaInfoLib
 
 class File_DolbyVisionMetadata;
 class File_Adm;
+class File_Iab;
 class File_DolbyAudioMetadata;
 
 //***************************************************************************
@@ -1352,6 +1353,9 @@ protected :
     File_DolbyAudioMetadata* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
     File_Adm* Adm;
+    #endif
+    #if defined(MEDIAINFO_IAB_YES)
+    File_Iab* Adm_ForLaterMerge;
     #endif
 
     //Demux

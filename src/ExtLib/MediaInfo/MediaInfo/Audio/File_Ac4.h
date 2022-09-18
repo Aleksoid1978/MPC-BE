@@ -152,6 +152,30 @@ public :
         int8u ltrt_surround_mixgain;
         int8u lfe_mixgain;
         int8u preferred_dmx_method;
+        struct cdmx
+        {
+            struct gain
+            {
+                enum class type : int8u
+                {
+                    f1_code,
+                    f2_code,
+                    b_code,
+                    t1_code,
+                    t2a_code,
+                    t2b_code,
+                    t2c_code,
+                    t2d_code,
+                    t2e_code,
+                    t2f_code,
+                };
+                type        Type;
+                int8u       Value;
+            };
+            int8u out_ch_config=(int8u)-1;
+            vector<gain> Gains;
+        };
+        vector<cdmx> Cdmxs;
 
         dmx() :
             loro_centre_mixgain((int8u)-1),
@@ -466,6 +490,7 @@ private :
     void ac4_toc_Compute(vector<presentation>& Ps, vector<group>& Gs, bool FromDac4);
     int8u Superset(int8u Ch_Mode1, int8u Ch_Mode2);
     int16u Huffman_Decode(const ac4_huffman& Table, const char* Name);
+    void Get_Gain(int8u Bits, dmx::cdmx::gain::type Type, const char* Name);
 
     //Temp
     int32u frame_size;

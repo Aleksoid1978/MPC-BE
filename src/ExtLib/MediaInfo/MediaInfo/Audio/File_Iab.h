@@ -25,9 +25,13 @@ class File_Iab : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
+
     //Constructor/Destructor
     File_Iab();
     ~File_Iab();
+
+    //Extra
+    void Streams_Fill_ForAdm();
 
 private :
     //Streams management
@@ -38,18 +42,28 @@ private :
     void Data_Parse();
 
     //Elements
-    void FrameHeader();
+    void IAFrame();
     void BedDefinition();
+    void ObjectDefinition();
     void BedRemap();
+    void AudioDataPCM();
 
     //Temp
     int8u Version;
     int8u SampleRate;
     int8u BitDepth;
     int8u FrameRate;
+    struct object
+    {
+        vector<int32u> ChannelLayout;
+    };
+    vector<object> Objects;
 
     //Helpers
-    void Get_Flex8(int32u& Info, const char* Name);
+    void Get_Plex(int8u Bits, int32u& Info, const char* Name);
+    void Get_Plex8(int32u& Info, const char* Name);
+    void Skip_Plex(int8u Bits, const char* Name) { int32u Info; Get_Plex(Bits, Info, Name); }
+    void Skip_Plex8(const char* Name) { int32u Info; Get_Plex8(Info, Name); }
 };
 
 } //NameSpace
