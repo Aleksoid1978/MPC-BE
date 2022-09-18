@@ -30,16 +30,13 @@
  *         : RGB32 (RGB 32bpp, 4th plane is alpha)
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
+#include "libavutil/bswap.h"
 #include "libavutil/internal.h"
-#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "decode.h"
-#include "internal.h"
 
 
 static const enum AVPixelFormat pixfmt_rgb24[] = {
@@ -70,6 +67,9 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
     unsigned int planes     = c->planes;
     unsigned char *planemap = c->planemap;
     int ret;
+
+    if (buf_size < planes * height * 2)
+        return AVERROR_INVALIDDATA;
 
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
@@ -175,7 +175,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_eightbps_decoder = {
     .p.name         = "8bps",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("QuickTime 8BPS video"),
+    CODEC_LONG_NAME("QuickTime 8BPS video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_8BPS,
     .priv_data_size = sizeof(EightBpsContext),

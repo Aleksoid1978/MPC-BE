@@ -41,7 +41,6 @@
 #include "codec_internal.h"
 #include "config_components.h"
 #include "encode.h"
-#include "internal.h"
 #include "me_cmp.h"
 #include "put_bits.h"
 #include "audiodsp.h"

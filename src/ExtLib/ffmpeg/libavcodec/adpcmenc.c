@@ -614,7 +614,7 @@ static int adpcm_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         avctx->codec_id == AV_CODEC_ID_ADPCM_IMA_ALP ||
         avctx->codec_id == AV_CODEC_ID_ADPCM_IMA_APM ||
         avctx->codec_id == AV_CODEC_ID_ADPCM_IMA_WS)
-        pkt_size = (frame->nb_samples * channels) / 2;
+        pkt_size = (frame->nb_samples * channels + 1) / 2;
     else
         pkt_size = avctx->block_align;
     if ((ret = ff_get_encode_buffer(avctx, avpkt, pkt_size, 0)) < 0)
@@ -998,7 +998,7 @@ static const AVClass adpcm_encoder_class = {
 #define ADPCM_ENCODER_1(id_, name_, sample_fmts_, capabilities_, long_name_) \
 const FFCodec ff_ ## name_ ## _encoder = {                                 \
     .p.name         = #name_,                                              \
-    .p.long_name    = NULL_IF_CONFIG_SMALL(long_name_),                    \
+    CODEC_LONG_NAME(long_name_),                                           \
     .p.type         = AVMEDIA_TYPE_AUDIO,                                  \
     .p.id           = id_,                                                 \
     .p.sample_fmts  = sample_fmts_,                                        \

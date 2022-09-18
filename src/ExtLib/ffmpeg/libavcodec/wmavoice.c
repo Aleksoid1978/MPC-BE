@@ -33,7 +33,7 @@
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "put_bits.h"
 #include "wmavoice_data.h"
@@ -320,18 +320,10 @@ static av_cold void wmavoice_init_static_data(void)
         10, 10, 10, 12, 12, 12,
         14, 14, 14, 14
     };
-    static const uint16_t codes[] = {
-          0x0000, 0x0001, 0x0002,        //              00/01/10
-          0x000c, 0x000d, 0x000e,        //           11+00/01/10
-          0x003c, 0x003d, 0x003e,        //         1111+00/01/10
-          0x00fc, 0x00fd, 0x00fe,        //       111111+00/01/10
-          0x03fc, 0x03fd, 0x03fe,        //     11111111+00/01/10
-          0x0ffc, 0x0ffd, 0x0ffe,        //   1111111111+00/01/10
-          0x3ffc, 0x3ffd, 0x3ffe, 0x3fff // 111111111111+xx
-    };
 
-    INIT_VLC_STATIC(&frame_type_vlc, VLC_NBITS, sizeof(bits),
-                    bits, 1, 1, codes, 2, 2, 132);
+    INIT_VLC_STATIC_FROM_LENGTHS(&frame_type_vlc, VLC_NBITS,
+                                 FF_ARRAY_ELEMS(bits), bits,
+                                 1, NULL, 0, 0, 0, 0, 132);
 }
 
 static av_cold void wmavoice_flush(AVCodecContext *ctx)
@@ -2000,7 +1992,7 @@ static av_cold int wmavoice_decode_end(AVCodecContext *ctx)
 
 const FFCodec ff_wmavoice_decoder = {
     .p.name           = "wmavoice",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("Windows Media Audio Voice"),
+    CODEC_LONG_NAME("Windows Media Audio Voice"),
     .p.type           = AVMEDIA_TYPE_AUDIO,
     .p.id             = AV_CODEC_ID_WMAVOICE,
     .priv_data_size   = sizeof(WMAVoiceContext),

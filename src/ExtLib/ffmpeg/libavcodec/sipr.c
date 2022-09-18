@@ -32,8 +32,8 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "lsp.h"
 #include "acelp_vectors.h"
 #include "acelp_pitch_delay.h"
@@ -564,7 +564,7 @@ static int sipr_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_sipr_decoder = {
     .p.name         = "sipr",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("RealAudio SIPR / ACELP.NET"),
+    CODEC_LONG_NAME("RealAudio SIPR / ACELP.NET"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_SIPR,
     .priv_data_size = sizeof(SiprContext),

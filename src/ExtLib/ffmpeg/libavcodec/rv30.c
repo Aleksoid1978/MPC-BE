@@ -293,7 +293,7 @@ static av_cold int rv30_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_rv30_decoder = {
     .p.name                = "rv30",
-    .p.long_name           = NULL_IF_CONFIG_SMALL("RealVideo 3.0"),
+    CODEC_LONG_NAME("RealVideo 3.0"),
     .p.type                = AVMEDIA_TYPE_VIDEO,
     .p.id                  = AV_CODEC_ID_RV30,
     .priv_data_size        = sizeof(RV34DecContext),
@@ -307,6 +307,6 @@ const FFCodec ff_rv30_decoder = {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_NONE
     },
-    .update_thread_context = ONLY_IF_THREADS_ENABLED(ff_rv34_decode_update_thread_context),
+    UPDATE_THREAD_CONTEXT(ff_rv34_decode_update_thread_context),
     .caps_internal         = FF_CODEC_CAP_ALLOCATE_PROGRESS,
 };

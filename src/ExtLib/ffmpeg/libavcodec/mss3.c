@@ -27,7 +27,7 @@
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "mathops.h"
 #include "mss34dsp.h"
 
@@ -862,7 +862,7 @@ static av_cold int mss3_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_msa1_decoder = {
     .p.name         = "msa1",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("MS ATC Screen"),
+    CODEC_LONG_NAME("MS ATC Screen"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_MSA1,
     .priv_data_size = sizeof(MSS3Context),

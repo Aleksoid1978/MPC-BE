@@ -26,15 +26,13 @@
 
 #include "config_components.h"
 
-#include "libavutil/imgutils.h"
 #include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "hwconfig.h"
-#include "internal.h"
 #include "mathops.h"
-#include "rectangle.h"
 #include "thread.h"
 #include "threadframe.h"
 #include "vp8.h"
@@ -44,14 +42,6 @@
 
 #if ARCH_ARM
 #   include "arm/vp8.h"
-#endif
-
-#if CONFIG_VP7_DECODER && CONFIG_VP8_DECODER
-#define VPX(vp7, f) (vp7 ? vp7_ ## f : vp8_ ## f)
-#elif CONFIG_VP7_DECODER
-#define VPX(vp7, f) vp7_ ## f
-#else // CONFIG_VP8_DECODER
-#define VPX(vp7, f) vp8_ ## f
 #endif
 
 // fixme: add 1 bit to all the calls to this?
@@ -590,6 +580,7 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
     int height = s->avctx->height;
     int alpha = 0;
     int beta  = 0;
+    int fade_present = 1;
 
     if (buf_size < 4) {
         return AVERROR_INVALIDDATA;
@@ -691,7 +682,6 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
 
     s->update_last          = 1;
     s->update_probabilities = 1;
-    s->fade_present         = 1;
 
     if (s->profile > 0) {
         s->update_probabilities = vp89_rac_get(c);
@@ -699,13 +689,13 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
             s->prob[1] = s->prob[0];
 
         if (!s->keyframe)
-            s->fade_present = vp89_rac_get(c);
+            fade_present = vp89_rac_get(c);
     }
 
     if (vpx_rac_is_end(c))
         return AVERROR_INVALIDDATA;
     /* E. Fading information for previous frame */
-    if (s->fade_present && vp89_rac_get(c)) {
+    if (fade_present && vp89_rac_get(c)) {
         alpha = (int8_t) vp89_rac_get_uint(c, 8);
         beta  = (int8_t) vp89_rac_get_uint(c, 8);
     }
@@ -2979,7 +2969,7 @@ static int vp8_decode_update_thread_context(AVCodecContext *dst,
 #if CONFIG_VP7_DECODER
 const FFCodec ff_vp7_decoder = {
     .p.name                = "vp7",
-    .p.long_name           = NULL_IF_CONFIG_SMALL("On2 VP7"),
+    CODEC_LONG_NAME("On2 VP7"),
     .p.type                = AVMEDIA_TYPE_VIDEO,
     .p.id                  = AV_CODEC_ID_VP7,
     .priv_data_size        = sizeof(VP8Context),
@@ -2994,7 +2984,7 @@ const FFCodec ff_vp7_decoder = {
 #if CONFIG_VP8_DECODER
 const FFCodec ff_vp8_decoder = {
     .p.name                = "vp8",
-    .p.long_name           = NULL_IF_CONFIG_SMALL("On2 VP8"),
+    CODEC_LONG_NAME("On2 VP8"),
     .p.type                = AVMEDIA_TYPE_VIDEO,
     .p.id                  = AV_CODEC_ID_VP8,
     .priv_data_size        = sizeof(VP8Context),
@@ -3005,7 +2995,7 @@ const FFCodec ff_vp8_decoder = {
                              AV_CODEC_CAP_SLICE_THREADS,
     .caps_internal         = FF_CODEC_CAP_ALLOCATE_PROGRESS,
     .flush                 = vp8_decode_flush,
-    .update_thread_context = ONLY_IF_THREADS_ENABLED(vp8_decode_update_thread_context),
+    UPDATE_THREAD_CONTEXT(vp8_decode_update_thread_context),
     .hw_configs            = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_VP8_VAAPI_HWACCEL
                                HWACCEL_VAAPI(vp8),

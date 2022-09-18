@@ -206,23 +206,24 @@ static void parity_revtab_generator(int *revtab, int n, int inv, int offset,
                             1, 1, len >> 1, basis, dual_stride, inv_lookup);
 }
 
-int ff_tx_gen_split_radix_parity_revtab(AVTXContext *s, int invert_lookup,
-                                        int basis, int dual_stride)
+int ff_tx_gen_split_radix_parity_revtab(AVTXContext *s, int len, int inv,
+                                        int inv_lookup, int basis, int dual_stride)
 {
-    int len = s->len;
-    int inv = s->inv;
-
-    if (!(s->map = av_mallocz(len*sizeof(*s->map))))
-        return AVERROR(ENOMEM);
-
     basis >>= 1;
     if (len < basis)
         return AVERROR(EINVAL);
 
+    if (!(s->map = av_mallocz((inv_lookup == -1 ? 2 : 1)*len*sizeof(*s->map))))
+        return AVERROR(ENOMEM);
+
     av_assert0(!dual_stride || !(dual_stride & (dual_stride - 1)));
     av_assert0(dual_stride <= basis);
+
     parity_revtab_generator(s->map, len, inv, 0, 0, 0, len,
-                            basis, dual_stride, invert_lookup);
+                            basis, dual_stride, inv_lookup != 0);
+    if (inv_lookup == -1)
+        parity_revtab_generator(s->map + len, len, inv, 0, 0, 0, len,
+                                basis, dual_stride, 0);
 
     return 0;
 }
@@ -313,6 +314,8 @@ static void print_flags(AVBPrint *bp, uint64_t f)
         av_bprintf(bp, "%spreshuf", prev > 1 ? sep : "");
     if ((f & AV_TX_FULL_IMDCT) && ++prev)
         av_bprintf(bp, "%simdct_full", prev > 1 ? sep : "");
+    if ((f & FF_TX_ASM_CALL) && ++prev)
+        av_bprintf(bp, "%sasm_call", prev > 1 ? sep : "");
     av_bprintf(bp, "]");
 }
 
@@ -484,7 +487,7 @@ av_cold int ff_tx_init_subtx(AVTXContext *s, enum AVTXType type,
     uint64_t req_flags = flags;
 
     /* Flags the codelet may require to be present */
-    uint64_t inv_req_mask = AV_TX_FULL_IMDCT | FF_TX_PRESHUFFLE;
+    uint64_t inv_req_mask = AV_TX_FULL_IMDCT | FF_TX_PRESHUFFLE | FF_TX_ASM_CALL;
 
     /* Unaligned codelets are compatible with the aligned flag */
     if (req_flags & FF_TX_ALIGNED)
@@ -617,7 +620,7 @@ av_cold int ff_tx_init_subtx(AVTXContext *s, enum AVTXType type,
         sctx->len        = len;
         sctx->inv        = inv;
         sctx->type       = type;
-        sctx->flags      = flags;
+        sctx->flags      = cd->flags | flags;
         sctx->cd_self    = cd;
 
         s->fn[s->nb_sub] = cd->function;

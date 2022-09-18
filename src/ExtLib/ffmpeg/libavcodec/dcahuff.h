@@ -27,40 +27,49 @@
 
 #include "libavutil/attributes.h"
 
-#include "put_bits.h"
 #include "vlc.h"
 
 #define DCA_CODE_BOOKS      10
 #define DCA_BITALLOC_12_COUNT    5
+#define DCA_NUM_BITALLOC_CODES (1 * 3 + \
+                                3 * (5 + 7 + 9 + 13) \
+                                + 7 * (17 + 25 + 33 + 65 + 129))
 
-typedef struct DCAVLC {
-    int offset;         ///< Code values offset
-    int max_depth;      ///< Parameter for get_vlc2()
-    VLC vlc[7];         ///< Actual codes
-} DCAVLC;
+extern VLC  ff_dca_vlc_bit_allocation[5];
+#define DCA_TMODE_VLC_BITS 3
+extern VLC  ff_dca_vlc_transition_mode[4];
+#define DCA_SCALES_VLC_BITS 9
+extern VLC  ff_dca_vlc_scale_factor[5];
+extern VLC  ff_dca_vlc_quant_index[DCA_CODE_BOOKS][7];
 
-extern DCAVLC   ff_dca_vlc_bit_allocation;
-extern DCAVLC   ff_dca_vlc_transition_mode;
-extern DCAVLC   ff_dca_vlc_scale_factor;
-extern DCAVLC   ff_dca_vlc_quant_index[DCA_CODE_BOOKS];
-
+#define DCA_TNL_GRP_VLC_BITS 9
 extern VLC  ff_dca_vlc_tnl_grp[5];
+#define DCA_TNL_SCF_VLC_BITS 9
 extern VLC  ff_dca_vlc_tnl_scf;
+#define DCA_DAMP_VLC_BITS 6
 extern VLC  ff_dca_vlc_damp;
+#define DCA_DPH_VLC_BITS 6
 extern VLC  ff_dca_vlc_dph;
+#define DCA_FST_RSD_VLC_BITS 9
 extern VLC  ff_dca_vlc_fst_rsd_amp;
+#define DCA_RSD_APPRX_VLC_BITS 5
 extern VLC  ff_dca_vlc_rsd_apprx;
+#define DCA_RSD_AMP_VLC_BITS 9
 extern VLC  ff_dca_vlc_rsd_amp;
+#define DCA_AVG_G3_VLC_BITS 9
 extern VLC  ff_dca_vlc_avg_g3;
+#define DCA_ST_GRID_VLC_BITS 9
 extern VLC  ff_dca_vlc_st_grid;
+#define DCA_GRID_VLC_BITS 9
 extern VLC  ff_dca_vlc_grid_2;
 extern VLC  ff_dca_vlc_grid_3;
+#define DCA_RSD_VLC_BITS 6
 extern VLC  ff_dca_vlc_rsd;
 
+extern const int8_t  ff_dca_bitalloc_offsets[DCA_CODE_BOOKS];
+extern const uint8_t ff_dca_bitalloc_sizes[DCA_CODE_BOOKS];
+extern const uint8_t ff_dca_vlc_src_tables[][2];
+
 av_cold void ff_dca_init_vlcs(void);
-uint32_t ff_dca_vlc_calc_quant_bits(int *values, uint8_t n, uint8_t sel, uint8_t abits);
-void ff_dca_vlc_enc_quant(PutBitContext *pb, int *values, uint8_t n, uint8_t sel, uint8_t abits);
-uint32_t ff_dca_vlc_calc_alloc_bits(int *values, uint8_t n, uint8_t sel);
-void ff_dca_vlc_enc_alloc(PutBitContext *pb, int *values, uint8_t n, uint8_t sel);
 
 #endif /* AVCODEC_DCAHUFF_H */

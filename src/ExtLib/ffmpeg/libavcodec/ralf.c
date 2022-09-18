@@ -30,9 +30,9 @@
 #include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "golomb.h"
-#include "internal.h"
 #include "unary.h"
 #include "ralfdata.h"
 
@@ -63,7 +63,6 @@ typedef struct RALFContext {
 
     unsigned bias[2];        ///< a constant value added to channel data after filtering
 
-    int num_blocks;          ///< number of blocks inside the frame
     int sample_offset;
     int block_size[1 << 12]; ///< size of the blocks
     int block_pts[1 << 12];  ///< block start time (in milliseconds)
@@ -418,7 +417,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
     int16_t *samples1;
     int ret;
     GetBitContext gb;
-    int table_size, table_bytes, i;
+    int table_size, table_bytes, num_blocks;
     const uint8_t *src, *block_pointer;
     int src_size;
     int bytes_left;
@@ -451,12 +450,6 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         src_size = avpkt->size;
     }
 
-    frame->nb_samples = ctx->max_frame_size;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
-        return ret;
-    samples0 = (int16_t *)frame->data[0];
-    samples1 = (int16_t *)frame->data[1];
-
     if (src_size < 5) {
         av_log(avctx, AV_LOG_ERROR, "too short packets are too short!\n");
         return AVERROR_INVALIDDATA;
@@ -468,23 +461,28 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return AVERROR_INVALIDDATA;
     }
     init_get_bits(&gb, src + 2, table_size);
-    ctx->num_blocks = 0;
+    num_blocks = 0;
     while (get_bits_left(&gb) > 0) {
-        if (ctx->num_blocks >= FF_ARRAY_ELEMS(ctx->block_size))
+        if (num_blocks >= FF_ARRAY_ELEMS(ctx->block_size))
             return AVERROR_INVALIDDATA;
-        ctx->block_size[ctx->num_blocks] = get_bits(&gb, 13 + avctx->ch_layout.nb_channels);
+        ctx->block_size[num_blocks] = get_bits(&gb, 13 + avctx->ch_layout.nb_channels);
         if (get_bits1(&gb)) {
-            ctx->block_pts[ctx->num_blocks] = get_bits(&gb, 9);
+            ctx->block_pts[num_blocks] = get_bits(&gb, 9);
         } else {
-            ctx->block_pts[ctx->num_blocks] = 0;
+            ctx->block_pts[num_blocks] = 0;
         }
-        ctx->num_blocks++;
+        num_blocks++;
     }
 
+    frame->nb_samples = ctx->max_frame_size;
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+        return ret;
+    samples0 = (int16_t *)frame->data[0];
+    samples1 = (int16_t *)frame->data[1];
     block_pointer = src      + table_bytes + 2;
     bytes_left    = src_size - table_bytes - 2;
     ctx->sample_offset = 0;
-    for (i = 0; i < ctx->num_blocks; i++) {
+    for (int i = 0; i < num_blocks; i++) {
         if (bytes_left < ctx->block_size[i]) {
             av_log(avctx, AV_LOG_ERROR, "I'm pedaling backwards\n");
             break;
@@ -515,7 +513,7 @@ static void decode_flush(AVCodecContext *avctx)
 
 const FFCodec ff_ralf_decoder = {
     .p.name         = "ralf",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("RealAudio Lossless"),
+    CODEC_LONG_NAME("RealAudio Lossless"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_RALF,
     .priv_data_size = sizeof(RALFContext),

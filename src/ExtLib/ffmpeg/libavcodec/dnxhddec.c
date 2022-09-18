@@ -24,17 +24,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/imgutils.h"
 #include "libavutil/mem_internal.h"
+#include "libavutil/pixdesc.h"
 
 #include "avcodec.h"
 #include "blockdsp.h"
 #include "codec_internal.h"
+#include "decode.h"
 #define  UNCHECKED_BITSTREAM_READER 1
 #include "get_bits.h"
 #include "dnxhddata.h"
 #include "idctdsp.h"
-#include "internal.h"
 #include "profiles.h"
 #include "thread.h"
 
@@ -726,7 +726,7 @@ static av_cold int dnxhd_decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_dnxhd_decoder = {
     .p.name         = "dnxhd",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
+    CODEC_LONG_NAME("VC3/DNxHD"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_DNXHD,
     .priv_data_size = sizeof(DNXHDContext),

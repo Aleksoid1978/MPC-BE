@@ -36,19 +36,19 @@
  */
 
 #include "libavutil/avassert.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/mem_internal.h"
-#include "libavutil/pixdesc.h"
 #include "libavutil/thread.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "dv.h"
+#include "dv_internal.h"
 #include "dv_profile_internal.h"
 #include "dvdata.h"
 #include "get_bits.h"
-#include "internal.h"
+#include "idctdsp.h"
 #include "put_bits.h"
 #include "simple_idct.h"
 #include "thread.h"
@@ -62,6 +62,19 @@ typedef struct BlockInfo {
     uint32_t partial_bit_buffer;
     int shift_offset;
 } BlockInfo;
+
+typedef struct DVDecContext {
+    const AVDVProfile *sys;
+    const AVFrame     *frame;
+    const uint8_t     *buf;
+
+    uint8_t      dv_zigzag[2][64];
+    DVwork_chunk work_chunks[4 * 12 * 27];
+    uint32_t     idct_factor[2 * 4 * 16 * 64];
+    void       (*idct_put[2])(uint8_t *dest, ptrdiff_t stride, int16_t *block);
+
+    IDCTDSPContext idsp;
+} DVDecContext;
 
 static const int dv_iweight_bits = 14;
 
@@ -135,39 +148,35 @@ static const uint16_t dv_iweight_720_c[64] = {
 /* XXX: also include quantization */
 static RL_VLC_ELEM dv_rl_vlc[1664];
 
-static void dv_init_static(void)
+static av_cold void dv_init_static(void)
 {
     VLCElem vlc_buf[FF_ARRAY_ELEMS(dv_rl_vlc)] = { 0 };
     VLC dv_vlc = { .table = vlc_buf, .table_allocated = FF_ARRAY_ELEMS(vlc_buf) };
-    uint16_t  new_dv_vlc_bits[NB_DV_VLC * 2];
-    uint8_t    new_dv_vlc_len[NB_DV_VLC * 2];
-    uint8_t    new_dv_vlc_run[NB_DV_VLC * 2];
-    int16_t  new_dv_vlc_level[NB_DV_VLC * 2];
+    const unsigned offset = FF_ARRAY_ELEMS(dv_rl_vlc) - (2 * NB_DV_VLC - NB_DV_ZERO_LEVEL_ENTRIES);
+    RL_VLC_ELEM *tmp = dv_rl_vlc + offset;
     int i, j;
 
     /* it's faster to include sign bit in a generic VLC parsing scheme */
     for (i = 0, j = 0; i < NB_DV_VLC; i++, j++) {
-        new_dv_vlc_bits[j]  = ff_dv_vlc_bits[i];
-        new_dv_vlc_len[j]   = ff_dv_vlc_len[i];
-        new_dv_vlc_run[j]   = ff_dv_vlc_run[i];
-        new_dv_vlc_level[j] = ff_dv_vlc_level[i];
+        tmp[j].len   = ff_dv_vlc_len[i];
+        tmp[j].run   = ff_dv_vlc_run[i];
+        tmp[j].level = ff_dv_vlc_level[i];
 
         if (ff_dv_vlc_level[i]) {
-            new_dv_vlc_bits[j] <<= 1;
-            new_dv_vlc_len[j]++;
+            tmp[j].len++;
 
             j++;
-            new_dv_vlc_bits[j]  = (ff_dv_vlc_bits[i] << 1) | 1;
-            new_dv_vlc_len[j]   =  ff_dv_vlc_len[i] + 1;
-            new_dv_vlc_run[j]   =  ff_dv_vlc_run[i];
-            new_dv_vlc_level[j] = -ff_dv_vlc_level[i];
+            tmp[j].len   =  ff_dv_vlc_len[i] + 1;
+            tmp[j].run   =  ff_dv_vlc_run[i];
+            tmp[j].level = -ff_dv_vlc_level[i];
         }
     }
 
     /* NOTE: as a trick, we use the fact the no codes are unused
      * to accelerate the parsing of partial codes */
-    init_vlc(&dv_vlc, TEX_VLC_BITS, j, new_dv_vlc_len,
-             1, 1, new_dv_vlc_bits, 2, 2, INIT_VLC_USE_NEW_STATIC);
+    ff_init_vlc_from_lengths(&dv_vlc, TEX_VLC_BITS, j,
+                             &tmp[0].len, sizeof(tmp[0]),
+                             NULL, 0, 0, 0, INIT_VLC_USE_NEW_STATIC, NULL);
     av_assert1(dv_vlc.table_size == 1664);
 
     for (int i = 0; i < dv_vlc.table_size; i++) {
@@ -179,8 +188,9 @@ static void dv_init_static(void)
             run   = 0;
             level = code;
         } else {
-            run   = new_dv_vlc_run[code] + 1;
-            level = new_dv_vlc_level[code];
+            av_assert1(i <= code + offset);
+            run   = tmp[code].run + 1;
+            level = tmp[code].level;
         }
         dv_rl_vlc[i].len   = len;
         dv_rl_vlc[i].level = level;
@@ -188,7 +198,7 @@ static void dv_init_static(void)
     }
 }
 
-static void dv_init_weight_tables(DVVideoContext *ctx, const AVDVProfile *d)
+static void dv_init_weight_tables(DVDecContext *ctx, const AVDVProfile *d)
 {
     int j, i, c, s;
     uint32_t *factor1 = &ctx->idct_factor[0],
@@ -237,8 +247,10 @@ static void dv_init_weight_tables(DVVideoContext *ctx, const AVDVProfile *d)
 static av_cold int dvvideo_decode_init(AVCodecContext *avctx)
 {
     static AVOnce init_static_once = AV_ONCE_INIT;
-    DVVideoContext *s = avctx->priv_data;
+    DVDecContext *s = avctx->priv_data;
     int i;
+
+    avctx->chroma_sample_location = AVCHROMA_LOC_TOPLEFT;
 
     ff_idctdsp_init(&s->idsp, avctx);
 
@@ -258,7 +270,7 @@ static av_cold int dvvideo_decode_init(AVCodecContext *avctx)
 
     ff_thread_once(&init_static_once, dv_init_static);
 
-    return ff_dvvideo_init(avctx);
+    return 0;
 }
 
 /* decode AC coefficients */
@@ -345,7 +357,7 @@ static av_always_inline void put_block_8x4(int16_t *block, uint8_t *av_restrict 
     }
 }
 
-static void dv100_idct_put_last_row_field_chroma(const DVVideoContext *s, uint8_t *data,
+static void dv100_idct_put_last_row_field_chroma(const DVDecContext *s, uint8_t *data,
                                                  int stride, int16_t *blocks)
 {
     s->idsp.idct(blocks + 0*64);
@@ -357,7 +369,7 @@ static void dv100_idct_put_last_row_field_chroma(const DVVideoContext *s, uint8_
     put_block_8x4(blocks+1*64 + 4*8, data + 8 + stride, stride<<1);
 }
 
-static void dv100_idct_put_last_row_field_luma(const DVVideoContext *s, uint8_t *data,
+static void dv100_idct_put_last_row_field_luma(const DVDecContext *s, uint8_t *data,
                                                int stride, int16_t *blocks)
 {
     s->idsp.idct(blocks + 0*64);
@@ -378,7 +390,7 @@ static void dv100_idct_put_last_row_field_luma(const DVVideoContext *s, uint8_t 
 /* mb_x and mb_y are in units of 8 pixels */
 static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
 {
-    const DVVideoContext *s = avctx->priv_data;
+    const DVDecContext *s = avctx->priv_data;
     DVwork_chunk *work_chunk = arg;
     int quant, dc, dct_mode, class1, j;
     int mb_index, mb_x, mb_y, last_index;
@@ -393,7 +405,7 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
     LOCAL_ALIGNED_16(int16_t, sblock, [5 * DV_MAX_BPM], [64]);
     LOCAL_ALIGNED_16(uint8_t, mb_bit_buffer, [80     + AV_INPUT_BUFFER_PADDING_SIZE]); /* allow some slack */
     LOCAL_ALIGNED_16(uint8_t, vs_bit_buffer, [80 * 5 + AV_INPUT_BUFFER_PADDING_SIZE]); /* allow some slack */
-    const int log2_blocksize = 3-s->avctx->lowres;
+    const int log2_blocksize = 3 - avctx->lowres;
     int is_field_mode[5];
     int vs_bit_buffer_damaged = 0;
     int mb_bit_buffer_damaged[5] = {0};
@@ -533,7 +545,7 @@ retry:
     block = &sblock[0][0];
     mb    = mb_data;
     for (mb_index = 0; mb_index < 5; mb_index++) {
-        dv_calculate_mb_xy(s, work_chunk, mb_index, &mb_x, &mb_y);
+        dv_calculate_mb_xy(s->sys, s->buf, work_chunk, mb_index, &mb_x, &mb_y);
 
         /* idct_put'ting luminance */
         if ((s->sys->pix_fmt == AV_PIX_FMT_YUV420P)                      ||
@@ -612,7 +624,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 {
     uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
-    DVVideoContext *s = avctx->priv_data;
+    DVDecContext *s = avctx->priv_data;
     const uint8_t *vsc_pack;
     int apt, is16_9, ret;
     const AVDVProfile *sys;
@@ -624,7 +636,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     }
 
     if (sys != s->sys) {
-        ret = ff_dv_init_dynamic_tables(s, sys);
+        ret = ff_dv_init_dynamic_tables(s->work_chunks, sys);
         if (ret < 0) {
             av_log(avctx, AV_LOG_ERROR, "Error initializing the work tables.\n");
             return ret;
@@ -645,7 +657,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
     /* Determine the codec's sample_aspect ratio from the packet */
     vsc_pack = buf + 80 * 5 + 48 + 5;
-    if (*vsc_pack == dv_video_control) {
+    if (*vsc_pack == DV_VIDEO_CONTROL) {
         apt    = buf[4] & 0x07;
         is16_9 = (vsc_pack[2] & 0x07) == 0x02 ||
                  (!apt && (vsc_pack[2] & 0x07) == 0x07);
@@ -656,7 +668,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return ret;
 
     /* Determine the codec's field order from the packet */
-    if ( *vsc_pack == dv_video_control ) {
+    if ( *vsc_pack == DV_VIDEO_CONTROL ) {
         if (avctx->height == 720) {
             frame->interlaced_frame = 0;
             frame->top_field_first = 0;
@@ -683,10 +695,10 @@ static int dvvideo_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_dvvideo_decoder = {
     .p.name         = "dvvideo",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
+    CODEC_LONG_NAME("DV (Digital Video)"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_DVVIDEO,
-    .priv_data_size = sizeof(DVVideoContext),
+    .priv_data_size = sizeof(DVDecContext),
     .init           = dvvideo_decode_init,
     FF_CODEC_DECODE_CB(dvvideo_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,

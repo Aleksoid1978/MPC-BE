@@ -26,7 +26,6 @@
 
 #define BITSTREAM_READER_LE
 
-#include "config.h"
 #include "config_components.h"
 #include "libavutil/attributes.h"
 #include "libavutil/mem_internal.h"
@@ -34,9 +33,9 @@
 #include "avcodec.h"
 #include "blockdsp.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "idctdsp.h"
-#include "internal.h"
 #include "libavutil/thread.h"
 #include "mathops.h"
 #include "mpeg12dec.h"
@@ -499,7 +498,7 @@ static int speedhq_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     uint32_t second_field_offset;
     int ret;
 
-    if (buf_size < 4 || avctx->width < 8)
+    if (buf_size < 4 || avctx->width < 8 || avctx->width % 8 != 0)
         return AVERROR_INVALIDDATA;
 
     quality = buf[0];
@@ -726,7 +725,7 @@ static av_cold int speedhq_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_speedhq_decoder = {
     .p.name         = "speedhq",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("NewTek SpeedHQ"),
+    CODEC_LONG_NAME("NewTek SpeedHQ"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_SPEEDHQ,
     .priv_data_size = sizeof(SHQContext),

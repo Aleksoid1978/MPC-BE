@@ -23,7 +23,7 @@
 #include "dcadata.h"
 #include "dcamath.h"
 #include "dca_syncwords.h"
-#include "internal.h"
+#include "decode.h"
 #include "unary.h"
 
 static int get_linear(GetBitContext *gb, int n)

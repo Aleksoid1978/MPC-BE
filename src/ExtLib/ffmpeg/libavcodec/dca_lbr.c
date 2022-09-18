@@ -28,7 +28,7 @@
 #include "dcahuff.h"
 #include "dca_syncwords.h"
 #include "bytestream.h"
-#include "internal.h"
+#include "decode.h"
 
 #define AMP_MAX     56
 
@@ -119,7 +119,17 @@ static const uint16_t channel_layouts[7] = {
 };
 
 static float    cos_tab[256];
-static float    lpc_tab[16];
+static const float lpc_tab[16] = {
+    /* lpc_tab[i] = sin((i - 8) * (M_PI / ((i < 8) ? 17 : 15))) */
+    -0.995734176295034521871191178905, -0.961825643172819070408796290732,
+    -0.895163291355062322067016499754, -0.798017227280239503332805112796,
+    -0.673695643646557211712691912426, -0.526432162877355800244607799141,
+    -0.361241666187152948744714596184, -0.183749517816570331574408839621,
+     0.0,                               0.207911690817759337101742284405,
+     0.406736643075800207753985990341,  0.587785252292473129168705954639,
+     0.743144825477394235014697048974,  0.866025403784438646763723170753,
+     0.951056516295153572116439333379,  0.994521895368273336922691944981
+};
 
 av_cold void ff_dca_lbr_init_tables(void)
 {
@@ -127,9 +137,6 @@ av_cold void ff_dca_lbr_init_tables(void)
 
     for (i = 0; i < 256; i++)
         cos_tab[i] = cos(M_PI * i / 128);
-
-    for (i = 0; i < 16; i++)
-        lpc_tab[i] = sin((i - 8) * (M_PI / ((i < 8) ? 17 : 15)));
 }
 
 static int parse_lfe_24(DCALbrDecoder *s)
@@ -260,11 +267,12 @@ static int parse_lfe_chunk(DCALbrDecoder *s, LBRChunk *chunk)
     return AVERROR_INVALIDDATA;
 }
 
-static inline int parse_vlc(GetBitContext *s, VLC *vlc, int max_depth)
+static inline int parse_vlc(GetBitContext *s, const VLC *vlc,
+                            int nb_bits, int max_depth)
 {
-    int v = get_vlc2(s, vlc->table, vlc->bits, max_depth);
-    if (v > 0)
-        return v - 1;
+    int v = get_vlc2(s, vlc->table, nb_bits, max_depth);
+    if (v >= 0)
+        return v;
     // Rare value
     return get_bits(s, get_bits(s, 3) + 1);
 }
@@ -289,7 +297,7 @@ static int parse_tonal(DCALbrDecoder *s, int group)
                 return AVERROR_INVALIDDATA;
             }
 
-            diff = parse_vlc(&s->gb, &ff_dca_vlc_tnl_grp[group], 2);
+            diff = parse_vlc(&s->gb, &ff_dca_vlc_tnl_grp[group], DCA_TNL_GRP_VLC_BITS, 2);
             if (diff >= FF_ARRAY_ELEMS(ff_dca_fst_amp)) {
                 av_log(s->avctx, AV_LOG_ERROR, "Invalid tonal frequency diff\n");
                 return AVERROR_INVALIDDATA;
@@ -307,7 +315,7 @@ static int parse_tonal(DCALbrDecoder *s, int group)
 
             // Main channel
             main_ch = get_bitsz(&s->gb, ch_nbits);
-            main_amp = parse_vlc(&s->gb, &ff_dca_vlc_tnl_scf, 2)
+            main_amp = parse_vlc(&s->gb, &ff_dca_vlc_tnl_scf, DCA_TNL_SCF_VLC_BITS, 2)
                 + s->tonal_scf[ff_dca_freq_to_sb[freq >> (7 - group)]]
                 + s->limited_range - 2;
             amp[main_ch] = main_amp < AMP_MAX ? main_amp : 0;
@@ -318,8 +326,8 @@ static int parse_tonal(DCALbrDecoder *s, int group)
                 if (ch == main_ch)
                     continue;
                 if (get_bits1(&s->gb)) {
-                    amp[ch] = amp[main_ch] - parse_vlc(&s->gb, &ff_dca_vlc_damp, 1);
-                    phs[ch] = phs[main_ch] - parse_vlc(&s->gb, &ff_dca_vlc_dph,  1);
+                    amp[ch] = amp[main_ch] - parse_vlc(&s->gb, &ff_dca_vlc_damp, DCA_DAMP_VLC_BITS, 1);
+                    phs[ch] = phs[main_ch] - parse_vlc(&s->gb, &ff_dca_vlc_dph,  DCA_DPH_VLC_BITS,  1);
                 } else {
                     amp[ch] = 0;
                     phs[ch] = 0;
@@ -423,7 +431,7 @@ static int parse_scale_factors(DCALbrDecoder *s, uint8_t *scf)
         return 0;
 
     // Initial scale factor
-    prev = parse_vlc(&s->gb, &ff_dca_vlc_fst_rsd_amp, 2);
+    prev = parse_vlc(&s->gb, &ff_dca_vlc_fst_rsd_amp, DCA_FST_RSD_VLC_BITS, 2);
 
     for (sf = 0; sf < 7; sf += dist) {
         scf[sf] = prev; // Store previous value
@@ -432,7 +440,7 @@ static int parse_scale_factors(DCALbrDecoder *s, uint8_t *scf)
             return 0;
 
         // Interpolation distance
-        dist = parse_vlc(&s->gb, &ff_dca_vlc_rsd_apprx, 1) + 1;
+        dist = parse_vlc(&s->gb, &ff_dca_vlc_rsd_apprx, DCA_RSD_APPRX_VLC_BITS, 1) + 1;
         if (dist > 7 - sf) {
             av_log(s->avctx, AV_LOG_ERROR, "Invalid scale factor distance\n");
             return AVERROR_INVALIDDATA;
@@ -442,7 +450,7 @@ static int parse_scale_factors(DCALbrDecoder *s, uint8_t *scf)
             return 0;
 
         // Final interpolation point
-        next = parse_vlc(&s->gb, &ff_dca_vlc_rsd_amp, 2);
+        next = parse_vlc(&s->gb, &ff_dca_vlc_rsd_amp, DCA_RSD_AMP_VLC_BITS, 2);
 
         if (next & 1)
             next = prev + ((next + 1) >> 1);
@@ -486,7 +494,7 @@ static int parse_scale_factors(DCALbrDecoder *s, uint8_t *scf)
 
 static int parse_st_code(GetBitContext *s, int min_v)
 {
-    unsigned int v = parse_vlc(s, &ff_dca_vlc_st_grid, 2) + min_v;
+    unsigned int v = parse_vlc(s, &ff_dca_vlc_st_grid, DCA_ST_GRID_VLC_BITS, 2) + min_v;
 
     if (v & 1)
         v = 16 + (v >> 1);
@@ -527,10 +535,10 @@ static int parse_grid_1_chunk(DCALbrDecoder *s, LBRChunk *chunk, int ch1, int ch
 
     // Average values for third grid
     for (sb = 0; sb < s->nsubbands - 4; sb++) {
-        s->grid_3_avg[ch1][sb] = parse_vlc(&s->gb, &ff_dca_vlc_avg_g3, 2) - 16;
+        s->grid_3_avg[ch1][sb] = parse_vlc(&s->gb, &ff_dca_vlc_avg_g3, DCA_AVG_G3_VLC_BITS, 2) - 16;
         if (ch1 != ch2) {
             if (sb + 4 < s->min_mono_subband)
-                s->grid_3_avg[ch2][sb] = parse_vlc(&s->gb, &ff_dca_vlc_avg_g3, 2) - 16;
+                s->grid_3_avg[ch2][sb] = parse_vlc(&s->gb, &ff_dca_vlc_avg_g3, DCA_AVG_G3_VLC_BITS, 2) - 16;
             else
                 s->grid_3_avg[ch2][sb] = s->grid_3_avg[ch1][sb];
         }
@@ -585,7 +593,7 @@ static int parse_grid_1_sec_ch(DCALbrDecoder *s, int ch2)
         if (sb + 4 >= s->min_mono_subband) {
             if (ensure_bits(&s->gb, 20))
                 return 0;
-            s->grid_3_avg[ch2][sb] = parse_vlc(&s->gb, &ff_dca_vlc_avg_g3, 2) - 16;
+            s->grid_3_avg[ch2][sb] = parse_vlc(&s->gb, &ff_dca_vlc_avg_g3, DCA_AVG_G3_VLC_BITS, 2) - 16;
         }
     }
 
@@ -606,7 +614,7 @@ static void parse_grid_3(DCALbrDecoder *s, int ch1, int ch2, int sb, int flag)
         for (i = 0; i < 8; i++) {
             if (ensure_bits(&s->gb, 20))
                 return;
-            s->grid_3_scf[ch][sb][i] = parse_vlc(&s->gb, &ff_dca_vlc_grid_3, 2) - 16;
+            s->grid_3_scf[ch][sb][i] = parse_vlc(&s->gb, &ff_dca_vlc_grid_3, DCA_GRID_VLC_BITS, 2) - 16;
         }
 
         // Flag scale factors for this subband parsed
@@ -889,7 +897,7 @@ static int parse_grid_2(DCALbrDecoder *s, int ch1, int ch2,
                     for (j = 0; j < 8; j++) {
                         if (ensure_bits(&s->gb, 20))
                             break;
-                        g2_scf[j] = parse_vlc(&s->gb, &ff_dca_vlc_grid_2, 2);
+                        g2_scf[j] = parse_vlc(&s->gb, &ff_dca_vlc_grid_2, DCA_GRID_VLC_BITS, 2);
                     }
                 } else {
                     memset(g2_scf, 0, 8);

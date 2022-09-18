@@ -33,9 +33,8 @@
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "encode.h"
-#include "internal.h"
-#include "mathops.h"
 #include "pcm_tablegen.h"
 
 static av_cold int pcm_encode_init(AVCodecContext *avctx)
@@ -556,7 +555,7 @@ static int pcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 #define PCM_ENCODER_1(id_, sample_fmt_, name_, long_name_)                  \
 const FFCodec ff_ ## name_ ## _encoder = {                                  \
     .p.name       = #name_,                                                 \
-    .p.long_name  = NULL_IF_CONFIG_SMALL(long_name_),                       \
+    CODEC_LONG_NAME(long_name_),                                            \
     .p.type       = AVMEDIA_TYPE_AUDIO,                                     \
     .p.id         = AV_CODEC_ID_ ## id_,                                    \
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE,    \
@@ -577,7 +576,7 @@ const FFCodec ff_ ## name_ ## _encoder = {                                  \
 #define PCM_DECODER_1(id_, sample_fmt_, name_, long_name_)                  \
 const FFCodec ff_ ## name_ ## _decoder = {                                  \
     .p.name         = #name_,                                               \
-    .p.long_name    = NULL_IF_CONFIG_SMALL(long_name_),                     \
+    CODEC_LONG_NAME(long_name_),                                            \
     .p.type         = AVMEDIA_TYPE_AUDIO,                                   \
     .p.id           = AV_CODEC_ID_ ## id_,                                  \
     .priv_data_size = sizeof(PCMDecode),                                    \

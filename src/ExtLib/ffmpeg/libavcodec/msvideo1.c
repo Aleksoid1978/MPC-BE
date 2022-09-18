@@ -26,8 +26,6 @@
  *   http://www.pcisys.net/~melanson/codecs/
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "libavutil/internal.h"
@@ -35,7 +33,6 @@
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "decode.h"
-#include "internal.h"
 
 #define PALETTE_COUNT 256
 #define CHECK_STREAM_PTR(n) \
@@ -343,7 +340,7 @@ static av_cold int msvideo1_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_msvideo1_decoder = {
     .p.name         = "msvideo1",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Microsoft Video 1"),
+    CODEC_LONG_NAME("Microsoft Video 1"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_MSVIDEO1,
     .priv_data_size = sizeof(Msvideo1Context),

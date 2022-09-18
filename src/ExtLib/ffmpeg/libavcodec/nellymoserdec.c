@@ -35,14 +35,13 @@
 #include "libavutil/float_dsp.h"
 #include "libavutil/lfg.h"
 #include "libavutil/mem_internal.h"
-#include "libavutil/random_seed.h"
 
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "fft.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "nellymoser.h"
 #include "sinewin.h"
 
@@ -188,7 +187,7 @@ static av_cold int decode_end(AVCodecContext * avctx) {
 
 const FFCodec ff_nellymoser_decoder = {
     .p.name         = "nellymoser",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Nellymoser Asao"),
+    CODEC_LONG_NAME("Nellymoser Asao"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_NELLYMOSER,
     .priv_data_size = sizeof(NellyMoserDecodeContext),

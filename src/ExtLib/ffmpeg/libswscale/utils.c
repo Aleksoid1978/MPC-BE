@@ -53,6 +53,7 @@
 #include "libavutil/ppc/cpu.h"
 #include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
+#include "libavutil/loongarch/cpu.h"
 
 #include "rgb2rgb.h"
 #include "swscale.h"
@@ -236,6 +237,8 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_AYUV64LE]    = { 1, 1},
     [AV_PIX_FMT_P010LE]      = { 1, 1 },
     [AV_PIX_FMT_P010BE]      = { 1, 1 },
+    [AV_PIX_FMT_P012LE]      = { 1, 1 },
+    [AV_PIX_FMT_P012BE]      = { 1, 1 },
     [AV_PIX_FMT_P016LE]      = { 1, 1 },
     [AV_PIX_FMT_P016BE]      = { 1, 1 },
     [AV_PIX_FMT_GRAYF32LE]   = { 1, 1 },
@@ -246,7 +249,8 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_YUVA444P12LE] = { 1, 1 },
     [AV_PIX_FMT_NV24]        = { 1, 1 },
     [AV_PIX_FMT_NV42]        = { 1, 1 },
-    [AV_PIX_FMT_Y210LE]      = { 1, 0 },
+    [AV_PIX_FMT_Y210LE]      = { 1, 1 },
+    [AV_PIX_FMT_Y212LE]      = { 1, 1 },
     [AV_PIX_FMT_X2RGB10LE]   = { 1, 1 },
     [AV_PIX_FMT_X2BGR10LE]   = { 1, 1 },
     [AV_PIX_FMT_P210BE]      = { 1, 1 },
@@ -262,6 +266,8 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_VUYX]        = { 1, 1 },
     [AV_PIX_FMT_RGBAF16BE]   = { 1, 0 },
     [AV_PIX_FMT_RGBAF16LE]   = { 1, 0 },
+    [AV_PIX_FMT_XV30LE]      = { 1, 1 },
+    [AV_PIX_FMT_XV36LE]      = { 1, 1 },
 };
 
 int ff_shuffle_filter_coefficients(SwsContext *c, int *filterPos,
@@ -651,6 +657,15 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
     if (HAVE_MMX && cpu_flags & AV_CPU_FLAG_MMX) {
         // special case for unscaled vertical filtering
         if (minFilterSize == 1 && filterAlign == 2)
+            filterAlign = 1;
+    }
+
+    if (have_lasx(cpu_flags)) {
+        int reNum = minFilterSize & (0x07);
+
+        if (minFilterSize < 5)
+            filterAlign = 4;
+        if (reNum < 3)
             filterAlign = 1;
     }
 
@@ -1839,7 +1854,8 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         {
             const int filterAlign = X86_MMX(cpu_flags)     ? 4 :
                                     PPC_ALTIVEC(cpu_flags) ? 8 :
-                                    have_neon(cpu_flags)   ? 4 : 1;
+                                    have_neon(cpu_flags)   ? 4 :
+                                    have_lasx(cpu_flags)   ? 8 : 1;
 
             if ((ret = initFilter(&c->hLumFilter, &c->hLumFilterPos,
                            &c->hLumFilterSize, c->lumXInc,

@@ -31,6 +31,7 @@
 
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "error_resilience.h"
 #include "flvdec.h"
 #include "h263.h"
@@ -39,10 +40,10 @@
 #include "h263_parser.h"
 #endif
 #include "hwconfig.h"
-#include "internal.h"
 #include "mpeg_er.h"
 #include "mpeg4video.h"
 #include "mpeg4videodec.h"
+#include "mpeg4videodefs.h"
 #if FF_API_FLAG_TRUNCATED
 #include "mpeg4video_parser.h"
 #endif
@@ -748,7 +749,7 @@ static const AVCodecHWConfigInternal *const h263_hw_config_list[] = {
 
 const FFCodec ff_h263_decoder = {
     .p.name         = "h263",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
+    CODEC_LONG_NAME("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_H263,
     .priv_data_size = sizeof(MpegEncContext),
@@ -769,7 +770,7 @@ const FFCodec ff_h263_decoder = {
 
 const FFCodec ff_h263p_decoder = {
     .p.name         = "h263p",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
+    CODEC_LONG_NAME("H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_H263P,
     .priv_data_size = sizeof(MpegEncContext),

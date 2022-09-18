@@ -26,13 +26,13 @@
 #include "libavutil/attributes.h"
 #include "libavutil/buffer.h"
 #include "libavutil/common.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
-#include "libavutil/opt.h"
+#include "libavutil/pixdesc.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "internal.h"
 #include "thread.h"
@@ -819,7 +819,7 @@ static int cfhd_decode(AVCodecContext *avctx, AVFrame *pic,
                                    VLC_BITS, 3, 1);
 
                         /* escape */
-                        if (level == 64)
+                        if (!run)
                             break;
 
                         count += run;
@@ -850,7 +850,7 @@ static int cfhd_decode(AVCodecContext *avctx, AVFrame *pic,
                                    VLC_BITS, 3, 1);
 
                         /* escape */
-                        if (level == 255 && run == 2)
+                        if (!run)
                             break;
 
                         count += run;
@@ -1404,9 +1404,6 @@ static av_cold int cfhd_close(AVCodecContext *avctx)
 
     free_buffers(s);
 
-    ff_free_vlc(&s->vlc_9);
-    ff_free_vlc(&s->vlc_18);
-
     return 0;
 }
 
@@ -1457,14 +1454,14 @@ static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
 
 const FFCodec ff_cfhd_decoder = {
     .p.name           = "cfhd",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("GoPro CineForm HD"),
+    CODEC_LONG_NAME("GoPro CineForm HD"),
     .p.type           = AVMEDIA_TYPE_VIDEO,
     .p.id             = AV_CODEC_ID_CFHD,
     .priv_data_size   = sizeof(CFHDContext),
     .init             = cfhd_init,
     .close            = cfhd_close,
     FF_CODEC_DECODE_CB(cfhd_decode),
-    .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
+    UPDATE_THREAD_CONTEXT(update_thread_context),
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
 };

@@ -23,6 +23,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
+	ffmpeg git-n5.2-dev-790-ged83a3a5bd;
 	Little-CMS git-lcms2.13.1-84-g55068d3;
 	MediaInfo git-v22.06-43-gfd11029ef;
 

@@ -35,16 +35,15 @@
 
 #include "config_components.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <zlib.h>
 
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "zlib_wrapper.h"
 
 typedef struct BlockInfo {
@@ -503,7 +502,7 @@ static int flashsv_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
 #if CONFIG_FLASHSV_DECODER
 const FFCodec ff_flashsv_decoder = {
     .p.name         = "flashsv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Flash Screen Video v1"),
+    CODEC_LONG_NAME("Flash Screen Video v1"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_FLASHSV,
     .priv_data_size = sizeof(FlashSVContext),
@@ -571,7 +570,7 @@ static av_cold int flashsv2_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_flashsv2_decoder = {
     .p.name         = "flashsv2",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Flash Screen Video v2"),
+    CODEC_LONG_NAME("Flash Screen Video v2"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_FLASHSV2,
     .priv_data_size = sizeof(FlashSVContext),

@@ -25,8 +25,8 @@
 #include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "ra144.h"
 
 
@@ -128,7 +128,7 @@ static int ra144_decode_frame(AVCodecContext * avctx, AVFrame *frame,
 
 const FFCodec ff_ra_144_decoder = {
     .p.name         = "real_144",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("RealAudio 1.0 (14.4K)"),
+    CODEC_LONG_NAME("RealAudio 1.0 (14.4K)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_RA_144,
     .priv_data_size = sizeof(RA144Context),

@@ -23,6 +23,7 @@
 
 #include "libavutil/attributes.h"
 #include "codec.h"
+#include "config.h"
 
 /**
  * The codec is not known to be init-threadsafe (i.e. it might be unsafe
@@ -256,6 +257,24 @@ typedef struct FFCodec {
      */
     const uint32_t *codec_tags;
 } FFCodec;
+
+#if CONFIG_SMALL
+#define CODEC_LONG_NAME(str) .p.long_name = NULL
+#else
+#define CODEC_LONG_NAME(str) .p.long_name = str
+#endif
+
+#if HAVE_THREADS
+#define UPDATE_THREAD_CONTEXT(func) \
+        .update_thread_context          = (func)
+#define UPDATE_THREAD_CONTEXT_FOR_USER(func) \
+        .update_thread_context_for_user = (func)
+#else
+#define UPDATE_THREAD_CONTEXT(func) \
+        .update_thread_context          = NULL
+#define UPDATE_THREAD_CONTEXT_FOR_USER(func) \
+        .update_thread_context_for_user = NULL
+#endif
 
 #define FF_CODEC_DECODE_CB(func)                          \
     .cb_type           = FF_CODEC_CB_TYPE_DECODE,         \

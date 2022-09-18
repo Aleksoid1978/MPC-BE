@@ -233,6 +233,7 @@ SRCS_LC = \
 	libavcodec/ffv1dec.c \
 	libavcodec/fic.c \
 	libavcodec/flac.c \
+	libavcodec/flac_parser.c \
 	libavcodec/flacdata.c \
 	libavcodec/flacdec.c \
 	libavcodec/flacdsp.c \

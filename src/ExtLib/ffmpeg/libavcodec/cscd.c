@@ -18,12 +18,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "libavutil/common.h"
 
 #if CONFIG_ZLIB
@@ -169,7 +167,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_cscd_decoder = {
     .p.name         = "camstudio",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("CamStudio"),
+    CODEC_LONG_NAME("CamStudio"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_CSCD,
     .priv_data_size = sizeof(CamStudioContext),

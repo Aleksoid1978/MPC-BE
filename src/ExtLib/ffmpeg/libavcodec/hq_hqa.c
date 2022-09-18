@@ -21,14 +21,13 @@
 #include <stdint.h>
 
 #include "libavutil/attributes.h"
-#include "libavutil/intreadwrite.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "canopus.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 
 #include "hq_hqa.h"
 #include "hq_hqadsp.h"
@@ -385,7 +384,7 @@ static av_cold int hq_hqa_decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_hq_hqa_decoder = {
     .p.name         = "hq_hqa",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Canopus HQ/HQA"),
+    CODEC_LONG_NAME("Canopus HQ/HQA"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_HQ_HQA,
     .priv_data_size = sizeof(HQContext),

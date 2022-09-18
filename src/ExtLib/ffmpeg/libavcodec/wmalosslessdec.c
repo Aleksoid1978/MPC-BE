@@ -30,11 +30,10 @@
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "put_bits.h"
 #include "lossless_audiodsp.h"
-#include "wma.h"
 #include "wma_common.h"
 
 /** current decoder limitations */
@@ -1328,7 +1327,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_wmalossless_decoder = {
     .p.name         = "wmalossless",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Windows Media Audio Lossless"),
+    CODEC_LONG_NAME("Windows Media Audio Lossless"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_WMALOSSLESS,
     .priv_data_size = sizeof(WmallDecodeCtx),

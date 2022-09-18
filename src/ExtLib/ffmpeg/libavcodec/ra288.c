@@ -28,8 +28,8 @@
 #include "avcodec.h"
 #include "celp_filters.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "lpc.h"
 #include "ra288.h"
 
@@ -239,7 +239,7 @@ static int ra288_decode_frame(AVCodecContext * avctx, AVFrame *frame,
 
 const FFCodec ff_ra_288_decoder = {
     .p.name         = "real_288",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("RealAudio 2.0 (28.8K)"),
+    CODEC_LONG_NAME("RealAudio 2.0 (28.8K)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_RA_288,
     .priv_data_size = sizeof(RA288Context),

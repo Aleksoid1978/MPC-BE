@@ -28,8 +28,8 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/thread.h"
-#include "internal.h"
 #include "avcodec.h"
+#include "decode.h"
 #include "mpegvideo.h"
 #include "vc1.h"
 #include "vc1data.h"

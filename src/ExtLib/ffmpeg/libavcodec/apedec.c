@@ -31,7 +31,7 @@
 #include "bswapdsp.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "unary.h"
 
@@ -934,7 +934,7 @@ static av_always_inline int filter_3800(APEPredictor *p,
     p->coeffsB[filter][0] += (((d3 >> 29) & 4) - 2) * sign;
     p->coeffsB[filter][1] -= (((d4 >> 30) & 2) - 1) * sign;
 
-    p->filterB[filter] = p->lastA[filter] + (predictionB >> shift);
+    p->filterB[filter] = p->lastA[filter] + (unsigned)(predictionB >> shift);
     p->filterA[filter] = p->filterB[filter] + (unsigned)((int)(p->filterA[filter] * 31U) >> 5);
 
     return p->filterA[filter];
@@ -1659,7 +1659,7 @@ static const AVClass ape_decoder_class = {
 
 const FFCodec ff_ape_decoder = {
     .p.name         = "ape",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Monkey's Audio"),
+    CODEC_LONG_NAME("Monkey's Audio"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_APE,
     .priv_data_size = sizeof(APEContext),

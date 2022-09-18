@@ -38,6 +38,7 @@
 #include "mpeg4video.h"
 #include "mpeg4videodata.h"
 #include "mpeg4videodec.h"
+#include "mpeg4videodefs.h"
 #include "h263.h"
 #include "h263data.h"
 #include "h263dec.h"
@@ -3667,7 +3668,7 @@ static const AVClass mpeg4_class = {
 
 const FFCodec ff_mpeg4_decoder = {
     .p.name                = "mpeg4",
-    .p.long_name           = NULL_IF_CONFIG_SMALL("MPEG-4 part 2"),
+    CODEC_LONG_NAME("MPEG-4 part 2"),
     .p.type                = AVMEDIA_TYPE_VIDEO,
     .p.id                  = AV_CODEC_ID_MPEG4,
     .priv_data_size        = sizeof(Mpeg4DecContext),
@@ -3685,8 +3686,8 @@ const FFCodec ff_mpeg4_decoder = {
     .p.max_lowres          = 3,
     .p.pix_fmts            = ff_h263_hwaccel_pixfmt_list_420,
     .p.profiles            = NULL_IF_CONFIG_SMALL(ff_mpeg4_video_profiles),
-    .update_thread_context = ONLY_IF_THREADS_ENABLED(mpeg4_update_thread_context),
-    .update_thread_context_for_user = ONLY_IF_THREADS_ENABLED(mpeg4_update_thread_context_for_user),
+    UPDATE_THREAD_CONTEXT(mpeg4_update_thread_context),
+    UPDATE_THREAD_CONTEXT_FOR_USER(mpeg4_update_thread_context_for_user),
     .p.priv_class = &mpeg4_class,
     .hw_configs            = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_MPEG4_NVDEC_HWACCEL

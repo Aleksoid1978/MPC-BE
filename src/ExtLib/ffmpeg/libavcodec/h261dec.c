@@ -29,12 +29,12 @@
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "mpeg_er.h"
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "mpegvideodec.h"
 #include "h261.h"
-#include "internal.h"
 
 #define H261_MBA_VLC_BITS 8
 #define H261_MTYPE_VLC_BITS 6
@@ -682,7 +682,7 @@ static av_cold int h261_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_h261_decoder = {
     .p.name         = "h261",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("H.261"),
+    CODEC_LONG_NAME("H.261"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_H261,
     .priv_data_size = sizeof(H261DecContext),

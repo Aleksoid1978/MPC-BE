@@ -76,6 +76,18 @@ int ff_alloc_packet(AVCodecContext *avctx, AVPacket *avpkt, int64_t size);
 int ff_encode_preinit(AVCodecContext *avctx);
 
 int ff_encode_encode_cb(AVCodecContext *avctx, AVPacket *avpkt,
-                        const AVFrame *frame, int *got_packet);
+                        AVFrame *frame, int *got_packet);
+
+/**
+ * Rescale from sample rate to AVCodecContext.time_base.
+ */
+static av_always_inline int64_t ff_samples_to_time_base(const AVCodecContext *avctx,
+                                                        int64_t samples)
+{
+    if (samples == AV_NOPTS_VALUE)
+        return AV_NOPTS_VALUE;
+    return av_rescale_q(samples, (AVRational){ 1, avctx->sample_rate },
+                        avctx->time_base);
+}
 
 #endif /* AVCODEC_ENCODE_H */
