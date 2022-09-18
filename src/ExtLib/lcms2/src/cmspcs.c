@@ -874,7 +874,7 @@ int CMSEXPORT _cmsLCMScolorSpace(cmsColorSpaceSignature ProfileSpace)
 }
 
 
-cmsUInt32Number CMSEXPORT cmsChannelsOf(cmsColorSpaceSignature ColorSpace)
+cmsInt32Number CMSEXPORT cmsChannelsOfColorSpace(cmsColorSpaceSignature ColorSpace)
 {
     switch (ColorSpace) {
 
@@ -935,6 +935,16 @@ cmsUInt32Number CMSEXPORT cmsChannelsOf(cmsColorSpaceSignature ColorSpace)
     case cmsSigMCHFData:
     case cmsSig15colorData: return 15;
 
-    default: return 3;
+    default: return -1;
     }
+}
+
+/**
+* DEPRECATED: Provided for compatibility only
+*/
+cmsUInt32Number CMSEXPORT cmsChannelsOf(cmsColorSpaceSignature ColorSpace)
+{
+    int n = cmsChannelsOfColorSpace(ColorSpace);
+    if (n < 0) return 3;
+    return (cmsUInt32Number)n;
 }

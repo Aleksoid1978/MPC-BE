@@ -22,6 +22,9 @@ MPCVideoDec
 Обновлен китайский (Simplified) перевод (автор wushantao).
 Обновлены голландский и китайский (Traditional) переводы (автор beter).
 
+Обновлены библиотеки:
+	Little-CMS git-lcms2.13.1-84-g55068d3;
+
 1.6.4
 =============================
 MPCStreamReader (MPC UDP/HTTP Reader)

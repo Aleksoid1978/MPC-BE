@@ -839,6 +839,7 @@ void InSymbol(cmsIT8* it8)
                             if ((cmsFloat64Number) it8->inum * 16.0 + (cmsFloat64Number) j > (cmsFloat64Number)+2147483647.0)
                             {
                                 SynError(it8, "Invalid hexadecimal number");
+                                it8->sy = SEOF;
                                 return;
                             }
 
@@ -860,6 +861,7 @@ void InSymbol(cmsIT8* it8)
                             if ((cmsFloat64Number) it8->inum * 2.0 + j > (cmsFloat64Number)+2147483647.0)
                             {
                                 SynError(it8, "Invalid binary number");
+                                it8->sy = SEOF;
                                 return;
                             }
 
@@ -928,13 +930,9 @@ void InSymbol(cmsIT8* it8)
             }
             else
                 switch ((int) it8->ch) {
-
-        // EOF marker -- ignore it
-        case '\x1a':
-            NextCh(it8);
-            break;
-
+        
         // Eof stream markers
+        case '\x1a':
         case 0:
         case -1:
             it8->sy = SEOF;
@@ -974,6 +972,7 @@ void InSymbol(cmsIT8* it8)
 
         default:
             SynError(it8, "Unrecognized character: 0x%x", it8 ->ch);
+            it8->sy = SEOF;
             return;
             }
 
@@ -988,11 +987,16 @@ void InSymbol(cmsIT8* it8)
                 if(it8 -> IncludeSP >= (MAXINCLUDE-1)) {
 
                     SynError(it8, "Too many recursion levels");
+                    it8->sy = SEOF;
                     return;
                 }
 
                 InStringSymbol(it8);
-                if (!Check(it8, SSTRING, "Filename expected")) return;
+                if (!Check(it8, SSTRING, "Filename expected"))
+                {
+                    it8->sy = SEOF;
+                    return;
+                }
 
                 FileNest = it8 -> FileStack[it8 -> IncludeSP + 1];
                 if(FileNest == NULL) {
@@ -1000,6 +1004,7 @@ void InSymbol(cmsIT8* it8)
                     FileNest = it8 ->FileStack[it8 -> IncludeSP + 1] = (FILECTX*)AllocChunk(it8, sizeof(FILECTX));
                     if (FileNest == NULL) {
                         SynError(it8, "Out of memory");
+                        it8->sy = SEOF;
                         return;
                     }
                 }
@@ -1008,6 +1013,7 @@ void InSymbol(cmsIT8* it8)
                                       it8->FileStack[it8->IncludeSP]->FileName,
                                       FileNest->FileName, cmsMAX_PATH-1) == FALSE) {
                     SynError(it8, "File path too long");
+                    it8->sy = SEOF;
                     return;
                 }
 
@@ -1015,6 +1021,7 @@ void InSymbol(cmsIT8* it8)
                 if (FileNest->Stream == NULL) {
 
                         SynError(it8, "File %s not found", FileNest->FileName);
+                        it8->sy = SEOF;
                         return;
                 }
                 it8->IncludeSP++;
@@ -1178,7 +1185,8 @@ void* AllocChunk(cmsIT8* it8, cmsUInt32Number size)
         it8 ->Allocator.Block = (cmsUInt8Number*) AllocBigBlock(it8, it8 ->Allocator.BlockSize);       
     }
 
-    if (it8->Allocator.Block == NULL) return NULL;
+    if (it8->Allocator.Block == NULL)
+        return NULL;
 
     ptr = it8 ->Allocator.Block + it8 ->Allocator.Used;
     it8 ->Allocator.Used += size;
@@ -1520,28 +1528,45 @@ const char* CMSEXPORT cmsIT8GetPropertyMulti(cmsHANDLE hIT8, const char* Key, co
 
 // ----------------------------------------------------------------- Datasets
 
+// A safe atoi that returns 0 when NULL input is given
+static
+cmsInt32Number satoi(const char* b)
+{
+    int n;
+
+    if (b == NULL) return 0;
+
+    n = atoi(b);
+    if (n > 0x7fffffffL) return 0x7fffffffL;
+    if (n < -0x7ffffffeL) return -0x7ffffffeL;
+
+    return (cmsInt32Number)n;
+}
+
 
 static
-void AllocateDataFormat(cmsIT8* it8)
+cmsBool AllocateDataFormat(cmsIT8* it8)
 {
     TABLE* t = GetTable(it8);
 
-    if (t -> DataFormat) return;    // Already allocated
+    if (t -> DataFormat) return TRUE;    // Already allocated
 
-    t -> nSamples  = (int) cmsIT8GetPropertyDbl(it8, "NUMBER_OF_FIELDS");
+    t -> nSamples  = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_FIELDS"));
 
     if (t -> nSamples <= 0) {
 
         SynError(it8, "AllocateDataFormat: Unknown NUMBER_OF_FIELDS");
-        t -> nSamples = 10;
+        return FALSE;        
         }
 
     t -> DataFormat = (char**) AllocChunk (it8, ((cmsUInt32Number) t->nSamples + 1) * sizeof(char *));
     if (t->DataFormat == NULL) {
 
         SynError(it8, "AllocateDataFormat: Unable to allocate dataFormat array");
+        return FALSE;
     }
 
+    return TRUE;
 }
 
 static
@@ -1560,8 +1585,11 @@ cmsBool SetDataFormat(cmsIT8* it8, int n, const char *label)
 {
     TABLE* t = GetTable(it8);
 
-    if (!t->DataFormat)
-        AllocateDataFormat(it8);
+    if (!t->DataFormat) {
+
+        if (!AllocateDataFormat(it8))
+            return FALSE;
+    }
 
     if (n > t -> nSamples) {
         SynError(it8, "More than NUMBER_OF_FIELDS fields.");
@@ -1570,6 +1598,7 @@ cmsBool SetDataFormat(cmsIT8* it8, int n, const char *label)
 
     if (t->DataFormat) {
         t->DataFormat[n] = AllocString(it8, label);
+        if (t->DataFormat[n] == NULL) return FALSE;
     }
 
     return TRUE;
@@ -1580,14 +1609,6 @@ cmsBool CMSEXPORT cmsIT8SetDataFormat(cmsHANDLE  h, int n, const char *Sample)
 {
     cmsIT8* it8 = (cmsIT8*)h;
     return SetDataFormat(it8, n, Sample);
-}
-
-// A safe atoi that returns 0 when NULL input is given
-static
-cmsInt32Number satoi(const char* b)
-{
-    if (b == NULL) return 0;
-    return atoi(b);
 }
 
 // Convert to binary
@@ -1610,11 +1631,11 @@ const char* satob(const char* v)
 
 
 static
-void AllocateDataSet(cmsIT8* it8)
+cmsBool AllocateDataSet(cmsIT8* it8)
 {
     TABLE* t = GetTable(it8);
 
-    if (t -> Data) return;    // Already allocated
+    if (t -> Data) return TRUE;    // Already allocated
 
     t-> nSamples   = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_FIELDS"));
     t-> nPatches   = satoi(cmsIT8GetProperty(it8, "NUMBER_OF_SETS"));
@@ -1622,6 +1643,7 @@ void AllocateDataSet(cmsIT8* it8)
     if (t -> nSamples < 0 || t->nSamples > 0x7ffe || t->nPatches < 0 || t->nPatches > 0x7ffe)
     {
         SynError(it8, "AllocateDataSet: too much data");
+        return FALSE;
     }
     else {
         // Some dumb analizers warns of possible overflow here, just take a look couple of lines above.
@@ -1629,9 +1651,11 @@ void AllocateDataSet(cmsIT8* it8)
         if (t->Data == NULL) {
 
             SynError(it8, "AllocateDataSet: Unable to allocate data array");
+            return FALSE;
         }
     }
 
+    return TRUE;
 }
 
 static
@@ -1653,8 +1677,9 @@ cmsBool SetData(cmsIT8* it8, int nSet, int nField, const char *Val)
 {
     TABLE* t = GetTable(it8);
 
-    if (!t->Data)
-        AllocateDataSet(it8);
+    if (!t->Data) {
+        if (!AllocateDataSet(it8)) return FALSE;
+    }
 
     if (!t->Data) return FALSE;
 
@@ -1997,8 +2022,9 @@ cmsBool DataSection (cmsIT8* it8)
     InSymbol(it8);   // Eats "BEGIN_DATA"
     CheckEOLN(it8);
 
-    if (!t->Data)
-        AllocateDataSet(it8);
+    if (!t->Data) {
+        if (!AllocateDataSet(it8)) return FALSE;
+    }
 
     while (it8->sy != SEND_DATA && it8->sy != SEOF)
     {
@@ -2331,19 +2357,19 @@ void CookPointers(cmsIT8* it8)
                             snprintf(Buffer, 255, "%s %d %s", Label, nTable, Type);
 
                             SetData(it8, i, idField, Buffer);
-                        }
-                    }
+						}
+					}
 
 
-                }
+				}
 
-            }
+			}
 
 
-        }
+		}
 
-    }
-    }
+	}
+	}
 
     it8 ->nTable = nOldTable;
 }
@@ -2771,8 +2797,12 @@ cmsBool CMSEXPORT cmsIT8SetData(cmsHANDLE hIT8, const char* cPatch, const char* 
 
     if (t-> nPatches == 0) {
 
-        AllocateDataFormat(it8);
-        AllocateDataSet(it8);
+        if (!AllocateDataFormat(it8))
+            return FALSE;
+
+        if (!AllocateDataSet(it8))
+            return FALSE;
+
         CookPointers(it8);
     }
 

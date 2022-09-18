@@ -22,6 +22,9 @@ Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 
+Updated libraries:
+	Little-CMS git-lcms2.13.1-84-g55068d3;
+
 1.6.4
 =============================
 MPCStreamReader (MPC UDP/HTTP Reader)

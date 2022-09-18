@@ -592,8 +592,11 @@ cmsUInt8Number* UnrollAnyWordsPremul(CMSREGISTER _cmsTRANSFORM* info,
         if (SwapEndian)
             v = CHANGE_ENDIAN(v);
 
-        v = (v << 16) / alpha_factor;
-        if (v > 0xffff) v = 0xffff;
+        if (alpha_factor > 0) {
+
+            v = (v << 16) / alpha_factor;
+            if (v > 0xffff) v = 0xffff;
+        }
 
         wIn[index] = (cmsUInt16Number) (Reverse ? REVERSE_FLAVOR_16(v) : v);
 
@@ -674,8 +677,11 @@ cmsUInt8Number* UnrollPlanarWordsPremul(CMSREGISTER _cmsTRANSFORM* info,
         if (SwapEndian)
             v = CHANGE_ENDIAN(v);
 
-        v = (v << 16) / alpha_factor;
-        if (v > 0xffff) v = 0xffff;
+        if (alpha_factor > 0) {
+
+            v = (v << 16) / alpha_factor;
+            if (v > 0xffff) v = 0xffff;
+        }
 
         wIn[index] = (cmsUInt16Number) (Reverse ? REVERSE_FLAVOR_16(v) : v);
 
@@ -3799,6 +3805,11 @@ cmsFormatter CMSEXPORT _cmsGetFormatter(cmsContext ContextID,
     _cmsFormattersPluginChunkType* ctx = ( _cmsFormattersPluginChunkType*) _cmsContextGetClientChunk(ContextID, FormattersPlugin);
     cmsFormattersFactoryList* f;
 
+    if (T_CHANNELS(Type) == 0) {
+        static const cmsFormatter nullFormatter = { 0 };
+        return nullFormatter;
+    }
+
     for (f =ctx->FactoryList; f != NULL; f = f ->Next) {
 
         cmsFormatter fn = f ->Factory(Type, Dir, dwFlags);
@@ -3833,8 +3844,11 @@ cmsUInt32Number CMSEXPORT cmsFormatterForColorspaceOfProfile(cmsHPROFILE hProfil
 
     cmsColorSpaceSignature ColorSpace      = cmsGetColorSpace(hProfile);
     cmsUInt32Number        ColorSpaceBits  = (cmsUInt32Number) _cmsLCMScolorSpace(ColorSpace);
-    cmsUInt32Number        nOutputChans    = cmsChannelsOf(ColorSpace);
+    cmsInt32Number         nOutputChans    = cmsChannelsOfColorSpace(ColorSpace);
     cmsUInt32Number        Float           = lIsFloat ? 1U : 0;
+
+    // Unsupported color space?
+    if (nOutputChans < 0) return 0;
 
     // Create a fake formatter for result
     return FLOAT_SH(Float) | COLORSPACE_SH(ColorSpaceBits) | BYTES_SH(nBytes) | CHANNELS_SH(nOutputChans);
@@ -3849,6 +3863,9 @@ cmsUInt32Number CMSEXPORT cmsFormatterForPCSOfProfile(cmsHPROFILE hProfile, cmsU
     cmsUInt32Number ColorSpaceBits = (cmsUInt32Number) _cmsLCMScolorSpace(ColorSpace);
     cmsUInt32Number nOutputChans = cmsChannelsOf(ColorSpace);
     cmsUInt32Number Float = lIsFloat ? 1U : 0;
+
+    // Unsupported color space?
+    if (nOutputChans < 0) return 0;
 
     // Create a fake formatter for result
     return FLOAT_SH(Float) | COLORSPACE_SH(ColorSpaceBits) | BYTES_SH(nBytes) | CHANNELS_SH(nOutputChans);

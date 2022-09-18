@@ -297,7 +297,8 @@ cmsPipeline* _cmsCreateGamutCheckPipeline(cmsContext ContextID,
     cmsStage* CLUT;
     cmsUInt32Number dwFormat;
     GAMUTCHAIN Chain;
-    cmsUInt32Number nChannels, nGridpoints;
+    cmsUInt32Number nGridpoints;
+    cmsInt32Number nChannels;
     cmsColorSpaceSignature ColorSpace;
     cmsUInt32Number i;
     cmsHPROFILE ProfileList[256];
@@ -346,8 +347,7 @@ cmsPipeline* _cmsCreateGamutCheckPipeline(cmsContext ContextID,
 
 
     ColorSpace  = cmsGetColorSpace(hGamut);
-
-    nChannels   = cmsChannelsOf(ColorSpace);
+    nChannels   = cmsChannelsOfColorSpace(ColorSpace);
     nGridpoints = _cmsReasonableGridpointsByColorspace(ColorSpace, cmsFLAGS_HIGHRESPRECALC);
     dwFormat    = (CHANNELS_SH(nChannels)|BYTES_SH(2));
 
@@ -471,6 +471,9 @@ cmsFloat64Number CMSEXPORT cmsDetectTAC(cmsHPROFILE hProfile)
 
     // Create a fake formatter for result
     dwFormatter = cmsFormatterForColorspaceOfProfile(hProfile, 4, TRUE);
+
+    // Unsupported color space?
+    if (dwFormatter == 0) return 0;
 
     bp.nOutputChans = T_CHANNELS(dwFormatter);
     bp.MaxTAC = 0;    // Initial TAC is 0
