@@ -11885,6 +11885,7 @@ void CMainFrame::SetBalance(int balance)
 CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 {
 	ASSERT(m_pGB == nullptr);
+	ASSERT(m_pGB_preview == nullptr);
 
 	m_bCustomGraph = false;
 	m_bShockwaveGraph = false;
@@ -12004,10 +12005,8 @@ void CMainFrame::ReleasePreviewGraph()
 		m_pVW_preview.Release();
 		m_pBV_preview.Release();
 
-		if (m_pDVDC_preview) {
-			m_pDVDC_preview.Release();
-			m_pDVDI_preview.Release();
-		}
+		m_pDVDC_preview.Release();
+		m_pDVDI_preview.Release();
 
 		m_pGB_preview->RemoveFromROT();
 		m_pGB_preview.Release();
