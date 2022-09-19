@@ -692,8 +692,8 @@ ja.AssociationMPCPlayMusicFilesS=音楽ファイル
 ja.AssociationMPCPlayVideoFilesF=動画の再生
 ja.AssociationMPCPlayVideoFilesS=動画ファイル
 ja.PinToTaskBar=タスクバーにピン留めする
-ja.ComponentWillBeDownloaded=will be downloaded
-ja.ComponentAlreadyDownloaded=already downloaded
+ja.ComponentWillBeDownloaded=ダウンロードされます
+ja.ComponentAlreadyDownloaded=既にダウンロード済み
 
 
 ;Korean
