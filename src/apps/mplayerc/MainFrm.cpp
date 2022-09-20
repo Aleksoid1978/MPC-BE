@@ -20249,7 +20249,7 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 					continue;
 				}
 				const CString ext = GetFileExt(wfd.cFileName).MakeLower();
-				if (mf.FindExt(ext)) {
+				if (auto mfc = mf.FindMediaByExt(ext); mfc && mfc->GetFileType() != TPlaylist) {
 					files.emplace_back(wfd.cFileName);
 				}
 			} while (FindNextFileW(hFile, &wfd));
