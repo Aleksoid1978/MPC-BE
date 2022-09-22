@@ -82,43 +82,37 @@ HRESULT CMpaSplitterFile::Init()
 
 	Seek(0);
 
-	for (;;) {
-		if (BitRead(24, true) == 'ID3') {
-			BitRead(24);
+	while (BitRead(24, true) == 'ID3') {
+		BitRead(24);
 
-			BYTE major = (BYTE)BitRead(8);
-			BYTE revision = (BYTE)BitRead(8);
-			UNREFERENCED_PARAMETER(revision);
+		BYTE major = (BYTE)BitRead(8);
+		BYTE revision = (BYTE)BitRead(8);
+		UNREFERENCED_PARAMETER(revision);
 
-			BYTE flags = (BYTE)BitRead(8);
+		BYTE flags = (BYTE)BitRead(8);
 
-			DWORD size = BitRead(32);
-			size = hexdec2uint(size);
+		DWORD size = BitRead(32);
+		size = hexdec2uint(size);
 
-			m_startpos = GetPos() + size;
+		m_startpos = GetPos() + size;
 
-			// TODO: read extended header
-			if (major <= 4) {
-				BYTE* buf = DNew BYTE[size];
-				ByteRead(buf, size);
+		// TODO: read extended header
+		if (major <= 4) {
+			BYTE* buf = DNew BYTE[size];
+			ByteRead(buf, size);
 
-				if (!m_pID3Tag) {
-					m_pID3Tag = DNew CID3Tag();
-				}
-
-				m_pID3Tag->ReadTagsV2(buf, size);
-				delete[] buf;
+			if (!m_pID3Tag) {
+				m_pID3Tag = DNew CID3Tag();
 			}
 
-			Seek(m_startpos);
-			for (int i = 0; i < (1 << 20) && m_startpos < endpos && BitRead(8, true) == 0; i++) {
-				BitRead(8), m_startpos++;
-			}
-
-			continue;
+			m_pID3Tag->ReadTagsV2(buf, size);
+			delete[] buf;
 		}
 
-		break;
+		Seek(m_startpos);
+		for (int i = 0; i < (1 << 20) && m_startpos < endpos && BitRead(8, true) == 0; i++) {
+			BitRead(8), m_startpos++;
+		}
 	}
 
 	endpos = GetLength();
