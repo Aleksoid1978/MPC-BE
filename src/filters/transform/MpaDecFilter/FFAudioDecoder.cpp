@@ -323,8 +323,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		StreamFinish();
 	}
 
-	bool bRet = false;
-
 	m_pAVCodec = avcodec_find_decoder(codec_id);
 	if (m_pAVCodec) {
 		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -384,79 +382,72 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 
 		avcodec_lock;
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, &options) >= 0) {
-			if (options) {
-				av_dict_free(&options);
-			}
-
 			m_pFrame = av_frame_alloc();
 			m_pDecodePacket = av_packet_alloc();
-			if (m_pFrame == nullptr || m_pDecodePacket == nullptr) {
-				return false;
-			}
-			bRet = true;
 		}
 		avcodec_unlock;
 
 		if (options) {
 			av_dict_free(&options);
 		}
-
-		if (bRet && m_pAVCtx->codec_id == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETU32(m_pAVCtx->extradata) == FCC('fLaC')) {
-			BYTE metadata_last, metadata_type;
-			DWORD metadata_size;
-			CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);
-
-			while (flac_parse_block_header(gb, metadata_last, metadata_type, metadata_size)) {
-				if (metadata_type == 4) { // FLAC_METADATA_TYPE_VORBIS_COMMENT
-					int vendor_length = gb.ReadDwordLE();
-					if (gb.RemainingSize() >= vendor_length) {
-						gb.SkipBytes(vendor_length);
-						int num_comments = gb.ReadDwordLE();
-						for (int i = 0; i < num_comments; i++) {
-							int comment_lenght = gb.ReadDwordLE();
-							if (comment_lenght > gb.RemainingSize()) {
-								break;
-							}
-							BYTE* comment = DNew BYTE[comment_lenght + 1];
-							ZeroMemory(comment, comment_lenght + 1);
-							gb.ReadBuffer(comment, comment_lenght);
-							CString vorbisTag = AltUTF8ToWStr((LPCSTR)comment);
-							delete [] comment;
-							CString tagValue;
-							if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
-								uint64_t channel_layout = wcstol(tagValue, nullptr, 0);
-								if (channel_layout && av_popcount64(channel_layout) == m_pAVCtx->ch_layout.nb_channels) {
-									av_channel_layout_from_mask(&m_pAVCtx->ch_layout, channel_layout);
-								}
-								break;
-							}
-						}
-					}
-					break;
-				}
-				if (metadata_last) {
-					break;
-				}
-				gb.SkipBytes(metadata_size);
-			}
-		}
-
-		if ((codec_id == AV_CODEC_ID_AAC || codec_id == AV_CODEC_ID_AAC_LATM) && m_pAVCtx->ch_layout.nb_channels == 24) {
-			m_bNeedMix = true;
-			m_MixerChannels = 8;
-			m_MixerChannelLayout = GetDefChannelMask(8);
-			m_Mixer.UpdateInput(SAMPLE_FMT_FLTP, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
-			m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_pAVCtx->sample_rate);
-		}
 	}
 
-	if (!bRet) {
+	if (!m_pFrame || !m_pDecodePacket) {
 		StreamFinish();
+
+		return false;
+	}
+
+	if (m_pAVCtx->codec_id == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETU32(m_pAVCtx->extradata) == FCC('fLaC')) {
+		BYTE metadata_last, metadata_type;
+		DWORD metadata_size;
+		CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);
+
+		while (flac_parse_block_header(gb, metadata_last, metadata_type, metadata_size)) {
+			if (metadata_type == 4) { // FLAC_METADATA_TYPE_VORBIS_COMMENT
+				int vendor_length = gb.ReadDwordLE();
+				if (gb.RemainingSize() >= vendor_length) {
+					gb.SkipBytes(vendor_length);
+					int num_comments = gb.ReadDwordLE();
+					for (int i = 0; i < num_comments; i++) {
+						int comment_lenght = gb.ReadDwordLE();
+						if (comment_lenght > gb.RemainingSize()) {
+							break;
+						}
+						BYTE* comment = DNew BYTE[comment_lenght + 1];
+						ZeroMemory(comment, comment_lenght + 1);
+						gb.ReadBuffer(comment, comment_lenght);
+						CString vorbisTag = AltUTF8ToWStr((LPCSTR)comment);
+						delete [] comment;
+						CString tagValue;
+						if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
+							uint64_t channel_layout = wcstol(tagValue, nullptr, 0);
+							if (channel_layout && av_popcount64(channel_layout) == m_pAVCtx->ch_layout.nb_channels) {
+								av_channel_layout_from_mask(&m_pAVCtx->ch_layout, channel_layout);
+							}
+							break;
+						}
+					}
+				}
+				break;
+			}
+			if (metadata_last) {
+				break;
+			}
+			gb.SkipBytes(metadata_size);
+		}
+	}
+	else if ((codec_id == AV_CODEC_ID_AAC || codec_id == AV_CODEC_ID_AAC_LATM) && m_pAVCtx->ch_layout.nb_channels == 24) {
+		m_bNeedMix = true;
+		m_MixerChannels = 8;
+		m_MixerChannelLayout = GetDefChannelMask(8);
+		m_Mixer.UpdateInput(SAMPLE_FMT_FLTP, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
+		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_pAVCtx->sample_rate);
 	}
 
 	m_bNeedSyncpoint = (m_raData.deint_id != 0);
 
-	return bRet;
+	return true;
 }
 
 void CFFAudioDecoder::SetDRC(bool bDRC)
