@@ -28,6 +28,7 @@ struct AVCodec;
 struct AVCodecContext;
 struct AVCodecParserContext;
 struct AVFrame;
+struct AVPacket;
 
 enum AVCodecID FindCodec(const GUID subtype);
 const char* GetCodecDescriptorName(enum AVCodecID codec_id);
@@ -43,6 +44,7 @@ private:
 	AVCodecContext*       m_pAVCtx   = nullptr;
 	AVCodecParserContext* m_pParser  = nullptr;
 	AVFrame*              m_pFrame   = nullptr;
+	AVPacket*             m_pDecodePacket = nullptr;
 
 	struct {
 		int flavor;

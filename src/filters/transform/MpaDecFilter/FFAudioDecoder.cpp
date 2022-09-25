@@ -489,7 +489,11 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		return hr;
 	}
 
-	if (AVPacket* avpkt = av_packet_alloc()) {
+	if (m_pDecodePacket == nullptr) {
+		m_pDecodePacket = av_packet_alloc();
+	}
+
+	if (m_pDecodePacket) {
 		int ret = 0;
 		if (m_pParser) {
 			BYTE* pOut = nullptr;
@@ -498,7 +502,6 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 			if (used_bytes < 0) {
 				DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
-				av_packet_free(&avpkt);
 				return E_FAIL;
 			} else if (used_bytes == 0 && pOut_size == 0) {
 				DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
@@ -515,18 +518,18 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 			hr = S_FALSE;
 
 			if (pOut_size > 0) {
-				avpkt->data = pOut;
-				avpkt->size = pOut_size;
-				avpkt->dts  = m_pFilter->m_rtStartInputCache;
+				m_pDecodePacket->data = pOut;
+				m_pDecodePacket->size = pOut_size;
+				m_pDecodePacket->dts  = m_pFilter->m_rtStartInputCache;
 
-				ret = avcodec_send_packet(m_pAVCtx, avpkt);
+				ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
 			}
 		} else {
-			avpkt->data = p;
-			avpkt->size = size;
-			avpkt->dts  = m_pFilter->m_rtStartInput;
+			m_pDecodePacket->data = p;
+			m_pDecodePacket->size = size;
+			m_pDecodePacket->dts  = m_pFilter->m_rtStartInput;
 
-			ret = avcodec_send_packet(m_pAVCtx, avpkt);
+			ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
 		}
 
 		if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
@@ -537,7 +540,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 			hr = S_OK;
 		}
 
-		av_packet_free(&avpkt);
+		av_packet_unref(m_pDecodePacket);
 	}
 
 	if (hr == E_FAIL) {
@@ -624,6 +627,7 @@ void CFFAudioDecoder::StreamFinish()
 	avcodec_free_context(&m_pAVCtx);
 
 	av_frame_free(&m_pFrame);
+	av_packet_free(&m_pDecodePacket);
 
 	m_bNeedSyncpoint = false;
 }
