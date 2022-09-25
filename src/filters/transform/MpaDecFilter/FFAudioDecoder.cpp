@@ -444,6 +444,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_Mixer.UpdateInput(SAMPLE_FMT_FLTP, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_pAVCtx->sample_rate);
 	}
+	else if (codec_id == AV_CODEC_ID_VORBIS) {
+		// Strange hack to correct Vorbis decoding after https://github.com/FFmpeg/FFmpeg/commit/8fc2dedfe6e8fcc58dd052bf3b85cd4754133b17
+		m_pDecodePacket->pts = 0;
+	}
 
 	m_bNeedSyncpoint = (m_raData.deint_id != 0);
 
