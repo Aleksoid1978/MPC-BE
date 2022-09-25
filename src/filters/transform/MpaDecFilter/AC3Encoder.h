@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,14 +26,14 @@ struct AVFrame;
 
 class CAC3Encoder
 {
-protected:
-	const AVCodec*  m_pAVCodec;
-	AVCodecContext* m_pAVCtx;
-	AVFrame*        m_pFrame;
+private:
+	const AVCodec*  m_pAVCodec = nullptr;
+	AVCodecContext* m_pAVCtx   = nullptr;
+	AVFrame*        m_pFrame   = nullptr;
 
-	float*          m_pSamples;
-	int             m_buffersize;
-	int             m_framesize;
+	float*          m_pSamples = nullptr;
+	int             m_buffersize = 0;
+	int             m_framesize  = 0;
 
 public:
 	CAC3Encoder();

@@ -36,12 +36,6 @@ extern "C" {
 // CFFAudioEncoder
 
 CAC3Encoder::CAC3Encoder()
-	: m_pAVCodec(nullptr)
-	, m_pAVCtx(nullptr)
-	, m_pFrame(nullptr)
-	, m_pSamples(nullptr)
-	, m_buffersize(0)
-	, m_framesize(0)
 {
 #ifdef DEBUG_OR_LOG
 	av_log_set_callback(ff_log);

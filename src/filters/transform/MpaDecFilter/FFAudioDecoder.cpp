@@ -210,17 +210,7 @@ static DWORD get_lav_channel_layout(uint64_t layout)
 
 CFFAudioDecoder::CFFAudioDecoder(CMpaDecFilter* pFilter)
 	: m_pFilter(pFilter)
-	, m_pAVCodec(nullptr)
-	, m_pAVCtx(nullptr)
-	, m_pParser(nullptr)
-	, m_pFrame(nullptr)
-	, m_bNeedSyncpoint(false)
-	, m_bStereoDownmix(false)
-	, m_bNeedReinit(false)
-	, m_bNeedMix(false)
 {
-	memset(&m_raData, 0, sizeof(m_raData));
-
 #ifdef DEBUG_OR_LOG
 	av_log_set_callback(ff_log);
 #else

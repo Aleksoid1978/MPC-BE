@@ -38,11 +38,11 @@ class CMpaDecFilter;
 
 class CFFAudioDecoder
 {
-protected:
-	const AVCodec*        m_pAVCodec;
-	AVCodecContext*       m_pAVCtx;
-	AVCodecParserContext* m_pParser;
-	AVFrame*              m_pFrame;
+private:
+	const AVCodec*        m_pAVCodec = nullptr;
+	AVCodecContext*       m_pAVCtx   = nullptr;
+	AVCodecParserContext* m_pParser  = nullptr;
+	AVFrame*              m_pFrame   = nullptr;
 
 	struct {
 		int flavor;
@@ -51,17 +51,17 @@ protected:
 		int sub_packet_h;
 		int sub_packet_size;
 		unsigned int deint_id;
-	} m_raData;
+	} m_raData = {};
 
 	HRESULT ParseRealAudioHeader(const BYTE* extra, const int extralen);
 
-	bool m_bNeedSyncpoint;
-	bool m_bStereoDownmix;
-	bool m_bNeedReinit;
+	bool m_bNeedSyncpoint = false;
+	bool m_bStereoDownmix = false;
+	bool m_bNeedReinit    = false;
 
-	bool m_bNeedMix;
-	int m_MixerChannels;
-	uint64_t m_MixerChannelLayout;
+	bool m_bNeedMix       = false;
+	int m_MixerChannels   = 0;
+	uint64_t m_MixerChannelLayout = 0;
 	CMixer m_Mixer;
 
 	CMpaDecFilter* m_pFilter;
