@@ -389,7 +389,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 			}
 
 			m_pFrame = av_frame_alloc();
-			CheckPointer(m_pFrame, false);
+			m_pDecodePacket = av_packet_alloc();
+			if (m_pFrame == nullptr || m_pDecodePacket == nullptr) {
+				return false;
+			}
 			bRet = true;
 		}
 		avcodec_unlock;
@@ -489,58 +492,52 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		return hr;
 	}
 
-	if (m_pDecodePacket == nullptr) {
-		m_pDecodePacket = av_packet_alloc();
-	}
+	int ret = 0;
+	if (m_pParser) {
+		BYTE* pOut = nullptr;
+		int pOut_size = 0;
 
-	if (m_pDecodePacket) {
-		int ret = 0;
-		if (m_pParser) {
-			BYTE* pOut = nullptr;
-			int pOut_size = 0;
+		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+		if (used_bytes < 0) {
+			DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
+			return E_FAIL;
+		} else if (used_bytes == 0 && pOut_size == 0) {
+			DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
+		}
 
-			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-			if (used_bytes < 0) {
-				DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
-				return E_FAIL;
-			} else if (used_bytes == 0 && pOut_size == 0) {
-				DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
-			}
+		if (used_bytes >= pOut_size && m_pFilter->m_bUpdateTimeCache) {
+			m_pFilter->UpdateCacheTimeStamp();
+		}
 
-			if (used_bytes >= pOut_size && m_pFilter->m_bUpdateTimeCache) {
-				m_pFilter->UpdateCacheTimeStamp();
-			}
+		if (out_size) {
+			*out_size = used_bytes;
+		}
 
-			if (out_size) {
-				*out_size = used_bytes;
-			}
+		hr = S_FALSE;
 
-			hr = S_FALSE;
-
-			if (pOut_size > 0) {
-				m_pDecodePacket->data = pOut;
-				m_pDecodePacket->size = pOut_size;
-				m_pDecodePacket->dts  = m_pFilter->m_rtStartInputCache;
-
-				ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
-			}
-		} else {
-			m_pDecodePacket->data = p;
-			m_pDecodePacket->size = size;
-			m_pDecodePacket->dts  = m_pFilter->m_rtStartInput;
+		if (pOut_size > 0) {
+			m_pDecodePacket->data = pOut;
+			m_pDecodePacket->size = pOut_size;
+			m_pDecodePacket->dts  = m_pFilter->m_rtStartInputCache;
 
 			ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
 		}
+	} else {
+		m_pDecodePacket->data = p;
+		m_pDecodePacket->size = size;
+		m_pDecodePacket->dts  = m_pFilter->m_rtStartInput;
 
-		if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-			if (!m_pParser && out_size) {
-				*out_size = size;
-			}
+		ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
+	}
 
-			hr = S_OK;
+	av_packet_unref(m_pDecodePacket);
+
+	if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+		if (!m_pParser && out_size) {
+			*out_size = size;
 		}
 
-		av_packet_unref(m_pDecodePacket);
+		hr = S_OK;
 	}
 
 	if (hr == E_FAIL) {
