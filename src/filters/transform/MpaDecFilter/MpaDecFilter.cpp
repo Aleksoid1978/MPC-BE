@@ -75,6 +75,8 @@
 #define BS_MAT_OFFSET        2560
 #define BS_DTSHD_SIZE       32768
 
+#define MAX_JITTER  100000i64 // +-10ms jitter is allowed
+
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// DVD Audio
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK,	&MEDIASUBTYPE_DOLBY_AC3},
@@ -286,33 +288,17 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(L"CMpaDecFilter", lpunk, __uuidof(this))
-	, m_Subtype(GUID_NULL)
 	, m_CodecId(AV_CODEC_ID_NONE)
-	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
-	, m_rtStart(0)
-	, m_dStartOffset(0.0)
-	, m_bDiscontinuity(FALSE)
-	, m_bResync(FALSE)
-	, m_bResyncTimestamp(FALSE)
 	, m_buff(PADDING_SIZE)
-	, m_bNeedBitstreamCheck(TRUE)
-	, m_bHasVideo(FALSE)
-	, m_dRate(1.0)
-	, m_bFlushing(FALSE)
-	, m_bNeedSyncPoint(FALSE)
-	, m_DTSHDProfile(0)
+	, m_JitterLimit(MAX_JITTER)
 	, m_rtStartInput(INVALID_TIME)
 	, m_rtStopInput(INVALID_TIME)
 	, m_rtStartInputCache(INVALID_TIME)
 	, m_rtStopInputCache(INVALID_TIME)
-	, m_bUpdateTimeCache(TRUE)
 	, m_FFAudioDec(this)
-	, m_bAVSync(true)
-	, m_bDRC(false)
 {
-	if (phr) {
-		*phr = S_OK;
-	}
+	ASSERT(phr);
+	*phr = S_OK;
 
 	m_pInput = DNew CDeCSSInputPin(L"CDeCSSInputPin", this, phr, L"In");
 	if (!m_pInput) {

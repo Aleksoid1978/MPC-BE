@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@ class CPaddedBuffer
 {
 private:
 	std::vector<NoInitByte> m_data;
-	size_t m_padsize;
+	const size_t m_padsize;
 
 public:
 	CPaddedBuffer(size_t padsize)

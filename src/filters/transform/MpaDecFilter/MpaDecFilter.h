@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,8 +35,6 @@
 
 #define MPCAudioDecName L"MPC Audio Decoder"
 
-#define MAX_JITTER 100000i64 // +-10ms jitter is allowed
-
 struct ps2_state_t {
 	bool sync;
 	int a[2], b[2];
@@ -56,30 +54,29 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	, public CExFilterConfigImpl
 	, public ISpecifyPropertyPages2
 {
-	GUID            m_Subtype;
+	GUID            m_Subtype = GUID_NULL;
 	AVCodecID       m_CodecId;
-	SampleFormat    m_InternalSampleFormat;
+	SampleFormat    m_InternalSampleFormat = SAMPLE_FMT_NONE;
 
-protected:
 	// settings
 	CCritSec        m_csProps;
 #ifdef REGISTER_FILTER
 	bool            m_bSampleFmt[sfcount] = {};
 #endif
-	bool            m_bAVSync;
-	bool            m_bDRC;
+	bool            m_bAVSync = true;
+	bool            m_bDRC    = false;
 
 	bool            m_bSPDIF[etcount] = {};
 
 	CCritSec        m_csReceive;
 	CPaddedBuffer   m_buff;
 
-	REFERENCE_TIME  m_rtStart;
-	double          m_dStartOffset;
+	REFERENCE_TIME  m_rtStart = 0;
+	double          m_dStartOffset = 0.0;
 
-	BOOL            m_bDiscontinuity;
-	BOOL            m_bResync;
-	BOOL            m_bResyncTimestamp;
+	BOOL            m_bDiscontinuity = FALSE;
+	BOOL            m_bResync        = FALSE;
+	BOOL            m_bResyncTimestamp = FALSE;
 
 	ps2_state_t     m_ps2_state;
 
@@ -119,25 +116,24 @@ protected:
 
 	CFFAudioDecoder m_FFAudioDec;
 
-	BOOL            m_bNeedBitstreamCheck;
-	BOOL            m_bHasVideo;
+	BOOL            m_bNeedBitstreamCheck = TRUE;
+	BOOL            m_bHasVideo = FALSE;
 
-	double          m_dRate;
+	double          m_dRate = 1.0;
 
-	BOOL            m_bFlushing;
-	BOOL            m_bNeedSyncPoint;
+	BOOL            m_bFlushing      = FALSE;
+	BOOL            m_bNeedSyncPoint = FALSE;
 
-	BYTE            m_DTSHDProfile;
+	BYTE            m_DTSHDProfile = 0;
 
 	REFERENCE_TIME  m_rtStartInput;
 	REFERENCE_TIME  m_rtStopInput;
 	REFERENCE_TIME  m_rtStartInputCache;
 	REFERENCE_TIME  m_rtStopInputCache;
-	BOOL            m_bUpdateTimeCache;
+	BOOL            m_bUpdateTimeCache = TRUE;
 
 	FloatingAverage<REFERENCE_TIME> m_faJitter{50};
-	REFERENCE_TIME m_JitterLimit = MAX_JITTER;
-
+	REFERENCE_TIME m_JitterLimit;
 
 	enum BitstreamType {
 		SPDIF,
