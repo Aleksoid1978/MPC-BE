@@ -13405,6 +13405,8 @@ BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pat
 					if (!bSkip) {
 						nLangMatch++;
 					}
+				} else if (bSkip) {
+					nLangMatch++;
 				}
 			}
 
