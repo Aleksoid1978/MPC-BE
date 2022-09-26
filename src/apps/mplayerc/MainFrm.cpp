@@ -1570,9 +1570,8 @@ void CMainFrame::UpdateTitle()
 						UpdateWindowTitle();
 						m_wndSeekBar.Invalidate();
 						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_SessionInfo.Title);
-
-						break;
 					}
+					break;
 				}
 			}
 		}
@@ -12540,6 +12539,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	SetupChapters();
 	LoadKeyFrames();
+
+	m_wndSeekBar.Invalidate();
 
 	return L"";
 }
