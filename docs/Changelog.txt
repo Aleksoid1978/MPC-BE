@@ -5,6 +5,9 @@
 MPCStreamReader
 The filter will not connect to completed broadcasts.
 
+MpaSplitter
+Added support for multiple ID3 tags at the beginning of a file or stream.
+
 MPCVideoDec
 Fixed output media type properties for RAW video when MPC Video Converter is used.
 Fixed angle switching for Stereo 3D.
@@ -15,12 +18,16 @@ Fixed blinking of the preview window.
 Fixed remembering history when opening BD ISO.
 The display of the list of player translations has been optimized.
 Fixed player operation in case of impossibility to change the playback speed.
+Added the ability to temporarily disable (and re-enable) the preview window for the current file by clicking the middle mouse button.
+The function to add all files from a folder now ignores playlists.
+Various interface fixes.
 
 Updated Hungarian translation (by mickey).
 Updated Turkish translation (by cmhrky).
 Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated Japanese translation.
 
 Updated libraries:
 	ffmpeg git-n5.2-dev-790-ged83a3a5bd;
