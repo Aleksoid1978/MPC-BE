@@ -383,7 +383,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		avcodec_lock;
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, &options) >= 0) {
 			m_pFrame = av_frame_alloc();
-			m_pDecodePacket = av_packet_alloc();
+			m_pPacket = av_packet_alloc();
 		}
 		avcodec_unlock;
 
@@ -392,7 +392,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		}
 	}
 
-	if (!m_pFrame || !m_pDecodePacket) {
+	if (!m_pFrame || !m_pPacket) {
 		StreamFinish();
 
 		return false;
@@ -446,7 +446,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	}
 	else if (codec_id == AV_CODEC_ID_VORBIS) {
 		// Strange hack to correct Vorbis decoding after https://github.com/FFmpeg/FFmpeg/commit/8fc2dedfe6e8fcc58dd052bf3b85cd4754133b17
-		m_pDecodePacket->pts = 0;
+		m_pPacket->pts = 0;
 	}
 
 	m_bNeedSyncpoint = (m_raData.deint_id != 0);
@@ -511,21 +511,21 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		hr = S_FALSE;
 
 		if (pOut_size > 0) {
-			m_pDecodePacket->data = pOut;
-			m_pDecodePacket->size = pOut_size;
-			m_pDecodePacket->dts  = m_pFilter->m_rtStartInputCache;
+			m_pPacket->data = pOut;
+			m_pPacket->size = pOut_size;
+			m_pPacket->dts  = m_pFilter->m_rtStartInputCache;
 
-			ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
+			ret = avcodec_send_packet(m_pAVCtx, m_pPacket);
 		}
 	} else {
-		m_pDecodePacket->data = p;
-		m_pDecodePacket->size = size;
-		m_pDecodePacket->dts  = m_pFilter->m_rtStartInput;
+		m_pPacket->data = p;
+		m_pPacket->size = size;
+		m_pPacket->dts  = m_pFilter->m_rtStartInput;
 
-		ret = avcodec_send_packet(m_pAVCtx, m_pDecodePacket);
+		ret = avcodec_send_packet(m_pAVCtx, m_pPacket);
 	}
 
-	av_packet_unref(m_pDecodePacket);
+	av_packet_unref(m_pPacket);
 
 	if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
 		if (!m_pParser && out_size) {
@@ -619,7 +619,7 @@ void CFFAudioDecoder::StreamFinish()
 	avcodec_free_context(&m_pAVCtx);
 
 	av_frame_free(&m_pFrame);
-	av_packet_free(&m_pDecodePacket);
+	av_packet_free(&m_pPacket);
 
 	m_bNeedSyncpoint = false;
 }

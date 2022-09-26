@@ -44,7 +44,7 @@ private:
 	AVCodecContext*       m_pAVCtx   = nullptr;
 	AVCodecParserContext* m_pParser  = nullptr;
 	AVFrame*              m_pFrame   = nullptr;
-	AVPacket*             m_pDecodePacket = nullptr;
+	AVPacket*             m_pPacket  = nullptr;
 
 	struct {
 		int flavor;
