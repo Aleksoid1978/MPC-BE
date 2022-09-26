@@ -72,10 +72,14 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	}
 
 	m_pFrame = av_frame_alloc();
-	if (!m_pFrame) {
-		DLog(L"CAC3Encoder::Init() : avcodec_alloc_frame() failed");
+	m_pPacket = av_packet_alloc();
+
+	if (!m_pFrame || m_pPacket) {
+		DLog(L"CAC3Encoder::Init() : avcodec_alloc_frame() or av_packet_alloc() failed");
+		StreamFinish();
 		return false;
 	}
+
 	m_pFrame->nb_samples = m_pAVCtx->frame_size;
 	m_pFrame->format     = m_pAVCtx->sample_fmt;
 	av_channel_layout_copy(&m_pFrame->ch_layout, &m_pAVCtx->ch_layout);
@@ -144,30 +148,26 @@ HRESULT CAC3Encoder::Encode(std::vector<float>& BuffIn, std::vector<BYTE>& BuffO
 		}
 	}
 
-	if (AVPacket* avpkt = av_packet_alloc()) {
-		int got_packet = 0;
-		int ret = encode(m_pAVCtx, m_pFrame, &got_packet, avpkt);
-		if (ret < 0) {
-			av_packet_free(&avpkt);
-			return E_FAIL;
-		}
-		if (got_packet) {
-			BuffOut.resize(avpkt->size);
-			memcpy(BuffOut.data(), avpkt->data, avpkt->size);
-		}
-		av_packet_free(&avpkt);
-
-		size_t old_size = BuffIn.size() * sizeof(float);
-		size_t new_size = old_size - m_framesize;
-		size_t new_count = new_size / sizeof(float);
-
-		memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
-		BuffIn.resize(new_count);
-
-		return S_OK;
-	} else {
+	int got_packet = 0;
+	int ret = encode(m_pAVCtx, m_pFrame, &got_packet, m_pPacket);
+	if (ret < 0) {
+		av_packet_unref(m_pPacket);
 		return E_FAIL;
 	}
+	if (got_packet) {
+		BuffOut.resize(m_pPacket->size);
+		memcpy(BuffOut.data(), m_pPacket->data, m_pPacket->size);
+	}
+	av_packet_unref(m_pPacket);
+
+	size_t old_size = BuffIn.size() * sizeof(float);
+	size_t new_size = old_size - m_framesize;
+	size_t new_count = new_size / sizeof(float);
+
+	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
+	BuffIn.resize(new_count);
+
+	return S_OK;
 }
 
 void CAC3Encoder::FlushBuffers()
@@ -182,6 +182,7 @@ void CAC3Encoder::StreamFinish()
 	avcodec_free_context(&m_pAVCtx);
 
 	av_frame_free(&m_pFrame);
+	av_packet_free(&m_pPacket);
 
 	av_freep(&m_pSamples);
 	m_buffersize = 0;

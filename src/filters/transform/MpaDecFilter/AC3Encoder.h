@@ -23,6 +23,7 @@
 struct AVCodec;
 struct AVCodecContext;
 struct AVFrame;
+struct AVPacket;
 
 class CAC3Encoder
 {
@@ -30,6 +31,7 @@ private:
 	const AVCodec*  m_pAVCodec = nullptr;
 	AVCodecContext* m_pAVCtx   = nullptr;
 	AVFrame*        m_pFrame   = nullptr;
+	AVPacket*       m_pPacket  = nullptr;
 
 	float*          m_pSamples = nullptr;
 	int             m_buffersize = 0;
