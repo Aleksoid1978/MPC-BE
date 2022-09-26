@@ -662,12 +662,12 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 		// Tag info in v4
 		if (version == 4) {
 			int len = *fmt++;
-			m_raData.deint_id = AV_RB32(fmt);
+			m_raData.deint_id = AV_RN32(fmt);
 			fmt += len;
 			len = *fmt++;
 			fmt += len;
 		} else if (version == 5) {
-			m_raData.deint_id = AV_RB32(fmt);
+			m_raData.deint_id = AV_RN32(fmt);
 			fmt += 4;
 			fmt += 4;
 		}
@@ -692,7 +692,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 
 HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffOut)
 {
-	if (m_raData.deint_id == MAKEFOURCC('r', 'n', 'e', 'g') || m_raData.deint_id == MAKEFOURCC('r', 'p', 'i', 's')) {
+	if (m_raData.deint_id == FCC('genr') || m_raData.deint_id == FCC('sipr')) {
 
 		int w   = m_raData.audio_framesize;
 		int h   = m_raData.sub_packet_h;
@@ -703,7 +703,7 @@ HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffO
 			BYTE* dest = BuffOut.Data();
 
 			int sps = m_raData.sub_packet_size;
-			if (sps > 0 && m_raData.deint_id == MAKEFOURCC('r', 'n', 'e', 'g')) { // COOK and ATRAC codec
+			if (sps > 0 && m_raData.deint_id == FCC('genr')) { // COOK and ATRAC codec
 				for (int y = 0; y < h; y++) {
 					for (int x = 0, w2 = w / sps; x < w2; x++) {
 						memcpy(dest + sps * (h * x + ((h + 1) / 2) * (y & 1) + (y >> 1)), p, sps);
@@ -713,7 +713,7 @@ HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffO
 				return S_OK;
 			}
 
-			if (m_raData.deint_id == MAKEFOURCC('r', 'p', 'i', 's')) { // SIPR codec
+			if (m_raData.deint_id == FCC('sipr')) { // SIPR codec
 				memcpy(dest, p, len);
 
 				// http://mplayerhq.hu/pipermail/mplayer-dev-eng/2002-August/010569.html
