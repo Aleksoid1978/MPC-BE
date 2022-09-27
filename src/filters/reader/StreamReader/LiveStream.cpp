@@ -214,7 +214,7 @@ static void GetType(const BYTE* buf, int size, GUID& subtype)
 
 bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 {
-	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
+	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI, 10 * MEGABYTE);
 	if (!f.Open(url)) {
 		return false;
 	}
