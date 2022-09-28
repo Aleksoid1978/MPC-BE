@@ -19502,6 +19502,8 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 									if (SUCCEEDED(hr)) {
 										bLoadRes = true;
 									}
+									DLogIf(FAILED(hr), L"Loading image '%s' (%s) failed with error %s",
+										name, mime, HR2Str(hr));
 								}
 
 								CoTaskMemFree(pData);
