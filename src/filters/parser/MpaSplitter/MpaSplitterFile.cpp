@@ -102,7 +102,7 @@ HRESULT CMpaSplitterFile::Init()
 			ByteRead(buf, size);
 
 			if (!m_pID3Tag) {
-				m_pID3Tag = DNew CID3Tag();
+				m_pID3Tag = DNew CID3Tag(major, flags);
 			}
 
 			m_pID3Tag->ReadTagsV2(buf, size);
