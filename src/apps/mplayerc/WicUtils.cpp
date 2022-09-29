@@ -264,8 +264,19 @@ HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_v
 		WICDecodeMetadataCacheOnLoad,
 		&pDecoder
 	);
+
 	if (SUCCEEDED(hr)) {
 		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
+	}
+	else if (hr == WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE) {
+		CComPtr <IWICStream> pStream;
+		hr = pWICFactory->CreateStream(&pStream);
+		if (SUCCEEDED(hr)) {
+			hr = pStream->InitializeFromFilename(filename.data(), GENERIC_READ);
+			if (SUCCEEDED(hr)) {
+				hr = WicDecodeImageOle(pWICFactory, ppBitmap, pma, pStream);
+			}
+		}
 	}
 
 	return hr;
