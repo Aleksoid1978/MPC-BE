@@ -175,6 +175,47 @@ HRESULT WicCheckComponent(const GUID guid)
 	return hr;
 }
 
+// Workaround when IWICImagingFactory::CreateDecoderFromStream fails with WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE error for some JPEGs.
+HRESULT WicDecodeImageOle(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap, const bool pma, IStream* pIStream)
+{
+	const WICPixelFormatGUID dstPixelFormat = pma ? GUID_WICPixelFormat32bppPBGRA : GUID_WICPixelFormat32bppBGRA;
+	CComPtr<IWICBitmap> pTempBitmap;
+
+	LPPICTURE pPicture = nullptr;
+	HRESULT hr = ::OleLoadPicture(pIStream, 0, TRUE, IID_IPicture, (LPVOID*)&pPicture);
+	if (SUCCEEDED(hr)) {
+		HBITMAP hBitmap = nullptr;
+		hr = pPicture->get_Handle((OLE_HANDLE*)&hBitmap);
+		if (SUCCEEDED(hr)) {
+			hr = pWICFactory->CreateBitmapFromHBITMAP(hBitmap, nullptr, WICBitmapIgnoreAlpha, &pTempBitmap);
+		}
+		pPicture->Release();
+	}
+
+	WICPixelFormatGUID pixelFormat = {};
+	if (SUCCEEDED(hr)) {
+		hr = pTempBitmap->GetPixelFormat(&pixelFormat);
+		if (SUCCEEDED(hr)) {
+			if (IsEqualGUID(pixelFormat, dstPixelFormat)) {
+				*ppBitmap = pTempBitmap.Detach();
+
+				return hr;
+			}
+		}
+	}
+
+	CComPtr<IWICBitmapSource> pBitmapSource;
+	if (SUCCEEDED(hr)) {
+		hr = WICConvertBitmapSource(dstPixelFormat, pTempBitmap, &pBitmapSource);
+	}
+
+	if (SUCCEEDED(hr)) {
+		hr = pWICFactory->CreateBitmapFromSource(pBitmapSource, WICBitmapCacheOnLoad, ppBitmap);
+	}
+
+	return hr;
+}
+
 HRESULT WicDecodeImage(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap, const bool pma, IWICBitmapDecoder* pDecoder)
 {
 	CComPtr<IWICBitmapFrameDecode> pFrameDecode;
@@ -248,11 +289,15 @@ HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, BYTE* input, const s
 	if (SUCCEEDED(hr)) {
 		hr = pStream->InitializeFromMemory(input, size);
 	}
+
 	if (SUCCEEDED(hr)) {
 		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
-	}
-	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
+		if (SUCCEEDED(hr)) {
+			hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
+		}
+		else if (hr == WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE) {
+			hr = WicDecodeImageOle(pWICFactory, ppBitmap, pma, pStream);
+		}
 	}
 
 	return hr;
@@ -276,11 +321,15 @@ HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, IStream* pIStream)
 	if (SUCCEEDED(hr)) {
 		hr = pStream->InitializeFromIStream(pIStream);
 	}
+
 	if (SUCCEEDED(hr)) {
 		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
-	}
-	if (SUCCEEDED(hr)) {
-		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
+		if (SUCCEEDED(hr)) {
+			hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
+		}
+		else if (hr == WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE) {
+			hr = WicDecodeImageOle(pWICFactory, ppBitmap, pma, pStream);
+		}
 	}
 
 	return hr;
