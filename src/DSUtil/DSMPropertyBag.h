@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,8 @@
  */
 
 #pragma once
+
+#include "IDSMResourceBag.h"
 
 #include <map>
 
@@ -68,19 +70,6 @@ public:
 	STDMETHODIMP GetProperty(LPCWSTR key, BSTR* value);
 	STDMETHODIMP DelAllProperties();
 	STDMETHODIMP DelProperty(LPCWSTR key);
-};
-
-// IDSMResourceBag
-
-interface __declspec(uuid("EBAFBCBE-BDE0-489A-9789-05D5692E3A93"))
-IDSMResourceBag :
-public IUnknown {
-	STDMETHOD_(DWORD, ResGetCount) () PURE;
-	STDMETHOD(ResGet) (DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag) PURE;
-	STDMETHOD(ResSet) (DWORD iIndex, LPCWSTR pName, LPCWSTR pDesc, LPCWSTR pMime, BYTE* pData, DWORD len, DWORD_PTR tag) PURE;
-	STDMETHOD(ResAppend) (LPCWSTR pName, LPCWSTR pDesc, LPCWSTR pMime, BYTE* pData, DWORD len, DWORD_PTR tag) PURE;
-	STDMETHOD(ResRemoveAt) (DWORD iIndex) PURE;
-	STDMETHOD(ResRemoveAll) (DWORD_PTR tag) PURE;
 };
 
 class CDSMResource
