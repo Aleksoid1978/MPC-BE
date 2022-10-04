@@ -175,6 +175,7 @@ HRESULT WicCheckComponent(const GUID guid)
 	return hr;
 }
 
+#if 0
 // Workaround when IWICImagingFactory::CreateDecoderFromStream fails with WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE error for some JPEGs.
 HRESULT WicDecodeImageOle(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap, const bool pma, IStream* pIStream)
 {
@@ -215,6 +216,7 @@ HRESULT WicDecodeImageOle(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap
 
 	return hr;
 }
+#endif
 
 HRESULT WicDecodeImage(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap, const bool pma, IWICBitmapDecoder* pDecoder)
 {
@@ -261,22 +263,13 @@ HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_v
 		filename.data(),
 		nullptr,
 		GENERIC_READ,
-		WICDecodeMetadataCacheOnLoad,
+		// Specify WICDecodeMetadataCacheOnDemand or some JPEGs will fail to load with a WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE error.
+		WICDecodeMetadataCacheOnDemand,
 		&pDecoder
 	);
 
 	if (SUCCEEDED(hr)) {
 		hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
-	}
-	else if (hr == WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE) {
-		CComPtr <IWICStream> pStream;
-		hr = pWICFactory->CreateStream(&pStream);
-		if (SUCCEEDED(hr)) {
-			hr = pStream->InitializeFromFilename(filename.data(), GENERIC_READ);
-			if (SUCCEEDED(hr)) {
-				hr = WicDecodeImageOle(pWICFactory, ppBitmap, pma, pStream);
-			}
-		}
 	}
 
 	return hr;
@@ -302,12 +295,10 @@ HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, BYTE* input, const s
 	}
 
 	if (SUCCEEDED(hr)) {
-		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
+		// Specify WICDecodeMetadataCacheOnDemand or some JPEGs will fail to load with a WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE error.
+		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnDemand, &pDecoder);
 		if (SUCCEEDED(hr)) {
 			hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
-		}
-		else if (hr == WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE) {
-			hr = WicDecodeImageOle(pWICFactory, ppBitmap, pma, pStream);
 		}
 	}
 
@@ -334,12 +325,10 @@ HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, IStream* pIStream)
 	}
 
 	if (SUCCEEDED(hr)) {
-		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnLoad, &pDecoder);
+		// Specify WICDecodeMetadataCacheOnDemand or some JPEGs will fail to load with a WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE error
+		hr = pWICFactory->CreateDecoderFromStream(pStream, nullptr, WICDecodeMetadataCacheOnDemand, &pDecoder);
 		if (SUCCEEDED(hr)) {
 			hr = WicDecodeImage(pWICFactory, ppBitmap, pma, pDecoder);
-		}
-		else if (hr == WINCODEC_ERR_PROPERTYUNEXPECTEDTYPE) {
-			hr = WicDecodeImageOle(pWICFactory, ppBitmap, pma, pStream);
 		}
 	}
 
