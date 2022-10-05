@@ -224,7 +224,7 @@ start:
 						}
 						name.Format(L"Vorbis %d", streamId++);
 						pPinOut.reset(DNew COggVorbisOutputPin((OggVorbisIdHeader*)(p + 6), name, this, this, &hr));
-						m_bitstream_serial_number_start = m_bitstream_serial_number_last = page.m_hdr.bitstream_serial_number;
+						m_bitstream_serial_number_start = page.m_hdr.bitstream_serial_number;
 						streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
 					} else if (!memcmp(p, "video", 5)) {
 						name.Format(L"Video %d", streamId++);
@@ -257,6 +257,7 @@ start:
 					name.Format(L"FLAC %d", streamId++);
 					pPinOut.reset(DNew COggFlacOutputPin(p + 12, page.size() - 14, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+					m_bitstream_serial_number_start = page.m_hdr.bitstream_serial_number;
 				}
 			} else if (GETU32(p-1) == FCC('fLaC')) {
 				// Ogg Flac : method 2
@@ -265,6 +266,7 @@ start:
 					p = page.data();
 					pPinOut.reset(DNew COggFlacOutputPin(p, page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+					m_bitstream_serial_number_start = page.m_hdr.bitstream_serial_number;
 				}
 			} else if (!memcmp(page.data(), "BBCD\x00", 5) || !memcmp(page.data(), "KW-DIRAC\x00", 9)) {
 				if (PinNotExist) {
@@ -364,7 +366,7 @@ start:
 	}
 
 	if (m_pOutputs.size() > 1) {
-		m_bitstream_serial_number_start = m_bitstream_serial_number_last = 0;
+		m_bitstream_serial_number_start = 0;
 	}
 
 	// verify that stream contain data, not only header
@@ -677,8 +679,7 @@ bool COggSplitterFilter::DemuxLoop()
 		}
 
 		if (m_pOutputs.size() == 1 && m_bitstream_serial_number_start && m_bitstream_serial_number_start != page.m_hdr.bitstream_serial_number) {
-			m_bitstream_serial_number_last		= page.m_hdr.bitstream_serial_number;
-			page.m_hdr.bitstream_serial_number	= m_bitstream_serial_number_start;
+			page.m_hdr.bitstream_serial_number = m_bitstream_serial_number_start;
 		}
 
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));

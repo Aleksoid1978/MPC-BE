@@ -227,7 +227,6 @@ protected:
 	bool DemuxLoop();
 
 	DWORD m_bitstream_serial_number_start = 0;
-	DWORD m_bitstream_serial_number_last = 0;
 	DWORD m_bitstream_serial_number_Video = DWORD_MAX;
 
 public:
