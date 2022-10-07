@@ -1805,7 +1805,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		const auto& fn = pli.m_fns.front();
 		const auto ext = GetFileExt(fn).MakeLower();
 
-		if (ext == L".m3u" || ext == L".m3u8") {
+		if (StartsWith(ext, L".m3u")) {
 			Content::Online::Clear(fn);
 			std::list<CString> redir;
 			const auto ct = Content::GetType(fn, &redir);
