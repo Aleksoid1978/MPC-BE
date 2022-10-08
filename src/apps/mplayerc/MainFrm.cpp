@@ -1569,7 +1569,33 @@ void CMainFrame::UpdateTitle()
 
 						UpdateWindowTitle();
 						m_wndSeekBar.Invalidate();
+
+						m_wndInfoBar.RemoveAllLines();
 						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_SessionInfo.Title);
+
+						if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
+							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), bstr.m_str);
+							bstr.Empty();
+						}
+						if (SUCCEEDED(pAMMC->get_Copyright(&bstr)) && bstr.Length()) {
+							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_COPYRIGHT), bstr.m_str);
+							bstr.Empty();
+						}
+						if (SUCCEEDED(pAMMC->get_Rating(&bstr)) && bstr.Length()) {
+							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_RATING), bstr.m_str);
+							bstr.Empty();
+						}
+						if (SUCCEEDED(pAMMC->get_Description(&bstr)) && bstr.Length()) {
+							// show only the first description line
+							CString str(bstr.m_str);
+							int k = str.Find(L"\r\n");
+							if (k > 0) {
+								str.Truncate(k);
+								str.Append(L" \x2026");
+							}
+							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), str);
+							bstr.Empty();
+						}
 					}
 					break;
 				}
