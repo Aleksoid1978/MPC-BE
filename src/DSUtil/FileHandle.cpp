@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <filesystem>
 #include "Log.h"
 #include "FileHandle.h"
 
@@ -74,8 +75,15 @@ CStringW RemoveSlash(LPCWSTR Path)
 //
 CStringW GetFileExt(LPCWSTR Path)
 {
-	CStringW cs = ::PathFindExtensionW(Path);
-	return cs;
+	if (::PathIsURLW(Path)) {
+		auto q = wcschr(Path, '?');
+		if (q) {
+			CStringW ext = ::PathFindExtensionW(CStringW(Path, q - Path));
+			return ext;
+		}
+	}
+	CStringW ext = ::PathFindExtensionW(Path);
+	return ext;
 }
 
 //
