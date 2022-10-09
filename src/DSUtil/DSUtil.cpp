@@ -907,6 +907,20 @@ cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 	path.Format(L"%c:", drive);
 
 	if (GetDriveTypeW(path + L"\\") == DRIVE_CDROM) {
+		// Check if it contains a disc
+		HANDLE hDevice = CreateFileW(LR"(\\.\)" + path, FILE_READ_ATTRIBUTES,
+									 FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+		if (hDevice == INVALID_HANDLE_VALUE) {
+			return CDROM_Unknown;
+		}
+		DWORD cbBytesReturned = {};
+		BOOL bSuccess = DeviceIoControl(hDevice, IOCTL_STORAGE_CHECK_VERIFY2,
+										nullptr, 0, nullptr, 0, &cbBytesReturned, nullptr);
+		CloseHandle(hDevice);
+		if (!bSuccess) {
+			return CDROM_Unknown;
+		}
+
 		// CDROM_DVDVideo
 		FindFiles(path + L"\\VIDEO_TS\\VIDEO_TS.IFO", files);
 		if (files.size() > 0) {
