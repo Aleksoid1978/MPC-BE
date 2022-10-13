@@ -81,8 +81,8 @@ hy.WelcomeLabel2=Սա կտեղակայի [name]-ը Ձեր համակարգչու
 hy.WinVersionTooLowError=[name]-ը պահանջում է Windows Vista կամ ավելի բարձր։
 
 ;Italian
-it.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
-it.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
+it.WelcomeLabel2=Questo installerà [name] sul tuo computer.%n%nSi consiglia di chiudere tutte le altre applicazioni prima di continuare.
+it.WinVersionTooLowError=[name] richiede Windows Vista o versioni successive per l'esecuzione.
 
 ;Japanese
 ja.WelcomeLabel2=このプログラムはお使いのコンピューターに [name] をインストールします。%n%nセットアップを続行する前に他のすべてのアプリケーションを閉じることをお勧めします。
