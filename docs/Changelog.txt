@@ -20,6 +20,10 @@ The display of the list of player translations has been optimized.
 Fixed player operation in case of impossibility to change the playback speed.
 Added the ability to temporarily disable (and re-enable) the preview window for the current file by clicking the middle mouse button.
 The function to add all files from a folder now ignores playlists.
+Fixed decoding error for some JPEG files.
+Fixed update of the "Information" panel for Ogg radio.
+Fixed detection of file extensions for URLs.
+Optimized CD/DVD presence detection for some drives.
 Various interface fixes.
 
 Updated Hungarian translation (by mickey).
@@ -28,6 +32,7 @@ Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation.
+Updated Italian translation (by mapi68).
 
 Updated libraries:
 	ffmpeg git-n5.2-dev-790-ged83a3a5bd;
