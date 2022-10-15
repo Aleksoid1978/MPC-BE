@@ -569,7 +569,7 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 // additional functions
 void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 {
-	if (!pID3tag || pID3tag->Tags.empty()) {
+	if (!pID3tag || (pID3tag->Tags.empty() && pID3tag->TagItems.empty())) {
 		return;
 	}
 
