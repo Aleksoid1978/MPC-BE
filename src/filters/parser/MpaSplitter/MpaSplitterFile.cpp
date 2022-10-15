@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -110,8 +110,8 @@ HRESULT CMpaSplitterFile::Init()
 		}
 
 		Seek(m_startpos);
-		for (int i = 0; i < (1 << 20) && m_startpos < endpos && BitRead(8, true) == 0; i++) {
-			BitRead(8), m_startpos++;
+		for (int i = 0; i < (1 << 20) && m_startpos < endpos && !BitRead(8); i++) {
+			m_startpos++;
 		}
 	}
 

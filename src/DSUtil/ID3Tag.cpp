@@ -355,8 +355,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			const int save_pos = gb.GetPos();
 
 			gb.Seek(pos);
-			while (!gb.IsEOF() && !gb.BitRead(8, true)) {
-				gb.SkipBytes(1);
+			while (pos < gb.GetSize() && !gb.BitRead(8)) {
 				pos++;
 			}
 
