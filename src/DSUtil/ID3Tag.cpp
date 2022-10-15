@@ -358,7 +358,6 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			while (!gb.IsEOF() && !gb.BitRead(8, true)) {
 				gb.SkipBytes(1);
 				pos++;
-				size++;
 			}
 
 			gb.Seek(save_pos);
