@@ -131,6 +131,16 @@ public:
 // COggSplitterFilter
 //
 
+static const std::pair<CStringW, CStringW> tags[] = {
+	{ L"TITLE",                  L"TITL"  },
+	{ L"ARTIST",                 L"AUTH"  },
+	{ L"COPYRIGHT",              L"CPYR"  },
+	{ L"DESCRIPTION",            L"DESC"  },
+	{ L"ENCODER",                L"DESC"  },
+	{ L"ALBUM",                  L"ALBUM" },
+	{ L"METADATA_BLOCK_PICTURE", L""      }
+};
+
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"COggSplitterFilter", pUnk, phr, __uuidof(this))
 {
@@ -433,17 +443,7 @@ start:
 
 	// comments
 	{
-		std::map<CStringW, CStringW> tagmap = {
-			{ L"TITLE",                  L"TITL"  },
-			{ L"ARTIST",                 L"AUTH"  },
-			{ L"COPYRIGHT",              L"CPYR"  },
-			{ L"DESCRIPTION",            L"DESC"  },
-			{ L"ENCODER",                L"DESC"  },
-			{ L"ALBUM",                  L"ALBUM" },
-			{ L"METADATA_BLOCK_PICTURE", L""      }
-		};
-
-		for (const auto& [oggtag, dsmtag] : tagmap) {
+		for (const auto& [oggtag, dsmtag] : tags) {
 			for (auto& pOutputPin : m_pOutputs) {
 				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>((CBaseOutputPin*)pOutputPin.get());
 				if (!pOggPin) {
@@ -694,6 +694,17 @@ bool COggSplitterFilter::DemuxLoop()
 			break;
 		}
 
+		if (pOggPin->IsMetadataUpdate()) {
+			for (const auto& [oggtag, dsmtag] : tags) {
+				if (!dsmtag.IsEmpty()) {
+					CStringW value = pOggPin->GetComment(oggtag);
+					if (!value.IsEmpty()) {
+						SetProperty(dsmtag, value);
+					}
+				}
+			}
+		}
+
 		CAutoPtr<CPacket> p;
 		while (!CheckRequest(nullptr) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
 			hr = DeliverPacket(p);
@@ -880,6 +891,16 @@ HRESULT COggSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENC
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
+bool COggSplitterOutputPin::IsMetadataUpdate()
+{
+	if (m_bMetadataUpdate) {
+		m_bMetadataUpdate = false;
+		return true;
+	}
+
+	return false;
+}
+
 //
 // COggVorbisOutputPin
 //
@@ -983,6 +1004,11 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 {
 	if (len >= 7 && !memcmp(pData + 1, "vorbis", 6)) {
 		if (IsInitialized()) {
+			if (pData[0] == 3) {
+				// vorbis comment
+				AddComment(pData + 7, len - 7);
+				m_bMetadataUpdate = true;
+			}
 			return E_FAIL; // skip Vorbis header packets ...
 		}
 	}

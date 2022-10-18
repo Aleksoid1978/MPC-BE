@@ -44,6 +44,8 @@ protected:
 
 	COggSplitterFilter* m_pFilter = nullptr;
 
+	bool m_bMetadataUpdate = false;
+
 public:
 	COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 
@@ -58,6 +60,8 @@ public:
 
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
+
+	bool IsMetadataUpdate();
 };
 
 class COggVorbisOutputPin : public COggSplitterOutputPin
