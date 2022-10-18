@@ -290,6 +290,7 @@ start:
 					name.Format(L"Opus %d", streamId++);
 					pPinOut.reset(DNew COggOpusOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+					m_bitstream_serial_number_start = page.m_hdr.bitstream_serial_number;
 				}
 			} else if (!memcmp(page.data(), "OpusTags", 8) && page.size() > 8) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
@@ -1718,6 +1719,10 @@ REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
 {
 	if (len > 8 && !memcmp(pData, "Opus", 4)) {
+		if (!memcmp(pData, "OpusTags", 8)) {
+			AddComment(pData + 8, len - 8);
+			m_bMetadataUpdate = true;
+		}
 		return E_FAIL; // skip Opus header packets ...
 	}
 
