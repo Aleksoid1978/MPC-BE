@@ -24,6 +24,7 @@
 #include "IDSMResourceBag.h"
 
 #include <map>
+#include <mutex>
 
 // IDSMPropertyBag
 
@@ -39,6 +40,8 @@ public IPropertyBag2 {
 
 class IDSMPropertyBagImpl : public ATL::CSimpleMap<CStringW, CStringW>, public IDSMPropertyBag, public IPropertyBag
 {
+	std::mutex m_mutex;
+
 	BOOL Add(const CStringW& key, const CStringW& val) {
 		return __super::Add(key, val);
 	}
@@ -47,8 +50,8 @@ class IDSMPropertyBagImpl : public ATL::CSimpleMap<CStringW, CStringW>, public I
 	}
 
 public:
-	IDSMPropertyBagImpl();
-	virtual ~IDSMPropertyBagImpl();
+	IDSMPropertyBagImpl() = default;
+	~IDSMPropertyBagImpl() = default;
 
 	// IPropertyBag
 

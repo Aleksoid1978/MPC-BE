@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,14 +27,6 @@
 // IDSMPropertyBagImpl
 //
 
-IDSMPropertyBagImpl::IDSMPropertyBagImpl()
-{
-}
-
-IDSMPropertyBagImpl::~IDSMPropertyBagImpl()
-{
-}
-
 // IPropertyBag
 
 STDMETHODIMP IDSMPropertyBagImpl::Read(LPCOLESTR pszPropName, VARIANT* pVar, IErrorLog* pErrorLog)
@@ -43,6 +35,9 @@ STDMETHODIMP IDSMPropertyBagImpl::Read(LPCOLESTR pszPropName, VARIANT* pVar, IEr
 	if (pVar->vt != VT_EMPTY) {
 		return E_INVALIDARG;
 	}
+
+	std::lock_guard lock(m_mutex);
+
 	CStringW value = Lookup(pszPropName);
 	if (value.IsEmpty()) {
 		return E_FAIL;
@@ -63,6 +58,9 @@ STDMETHODIMP IDSMPropertyBagImpl::Read(ULONG cProperties, PROPBAG2* pPropBag, IE
 	CheckPointer(pPropBag, E_POINTER);
 	CheckPointer(pvarValue, E_POINTER);
 	CheckPointer(phrError, E_POINTER);
+
+	std::lock_guard lock(m_mutex);
+
 	for (ULONG i = 0; i < cProperties; phrError[i] = S_OK, i++) {
 		CComVariant(Lookup(pPropBag[i].pstrName)).Detach(pvarValue);
 	}
@@ -82,6 +80,9 @@ STDMETHODIMP IDSMPropertyBagImpl::Write(ULONG cProperties, PROPBAG2* pPropBag, V
 STDMETHODIMP IDSMPropertyBagImpl::CountProperties(ULONG* pcProperties)
 {
 	CheckPointer(pcProperties, E_POINTER);
+
+	std::lock_guard lock(m_mutex);
+
 	*pcProperties = GetSize();
 	return S_OK;
 }
@@ -90,6 +91,9 @@ STDMETHODIMP IDSMPropertyBagImpl::GetPropertyInfo(ULONG iProperty, ULONG cProper
 {
 	CheckPointer(pPropBag, E_POINTER);
 	CheckPointer(pcProperties, E_POINTER);
+
+	std::lock_guard lock(m_mutex);
+
 	for (ULONG i = 0; i < cProperties; i++, iProperty++, (*pcProperties)++) {
 		CStringW key = GetKeyAt(iProperty);
 		pPropBag[i].pstrName = (BSTR)CoTaskMemAlloc((key.GetLength()+1)*sizeof(WCHAR));
@@ -112,6 +116,9 @@ HRESULT IDSMPropertyBagImpl::SetProperty(LPCWSTR key, LPCWSTR value)
 {
 	CheckPointer(key, E_POINTER);
 	CheckPointer(value, E_POINTER);
+
+	std::lock_guard lock(m_mutex);
+
 	if (!Lookup(key).IsEmpty()) {
 		SetAt(key, value);
 	} else {
@@ -134,6 +141,9 @@ HRESULT IDSMPropertyBagImpl::GetProperty(LPCWSTR key, BSTR* value)
 {
 	CheckPointer(key, E_POINTER);
 	CheckPointer(value, E_POINTER);
+
+	std::lock_guard lock(m_mutex);
+
 	int i = FindKey(key);
 	if (i < 0) {
 		return E_FAIL;
@@ -144,12 +154,16 @@ HRESULT IDSMPropertyBagImpl::GetProperty(LPCWSTR key, BSTR* value)
 
 HRESULT IDSMPropertyBagImpl::DelAllProperties()
 {
+	std::lock_guard lock(m_mutex);
+
 	RemoveAll();
 	return S_OK;
 }
 
 HRESULT IDSMPropertyBagImpl::DelProperty(LPCWSTR key)
 {
+	std::lock_guard lock(m_mutex);
+
 	return Remove(key) ? S_OK : S_FALSE;
 }
 
