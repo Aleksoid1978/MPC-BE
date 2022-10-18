@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -86,6 +86,10 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 				m_descText = bstr.m_str;
 				m_descText.Replace(L";", L"\r\n");
 				bstr.Empty();
+			}
+
+			if (m_clip != L"None") {
+				break;
 			}
 		}
 	}
