@@ -66,10 +66,6 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 			}
 
 			CComBSTR bstr;
-			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-				m_clip = bstr.m_str;
-				bstr.Empty();
-			}
 			if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
 				m_author = bstr.m_str;
 				bstr.Empty();
@@ -87,8 +83,9 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 				m_descText.Replace(L";", L"\r\n");
 				bstr.Empty();
 			}
-
-			if (m_clip != L"None") {
+			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+				m_clip = bstr.m_str;
+				bstr.Empty();
 				break;
 			}
 		}
