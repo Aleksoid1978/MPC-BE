@@ -1124,7 +1124,16 @@ REFERENCE_TIME COggFlacOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggFlacOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
 {
+	if (!len) {
+		return S_FALSE;
+	}
+
 	if (pData[0] != 0xFF || (pData[1] & 0xFE) != 0xF8) {
+		if (len > 4 && (pData[0] & 0x7F) == 4) {
+			// flac vorbis comment
+			AddComment(pData + 4, len - 4);
+			m_bMetadataUpdate = true;
+		}
 		return S_FALSE;
 	}
 
