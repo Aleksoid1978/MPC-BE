@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 vedi Authors.txt"
@@ -246,7 +246,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 13		"MP4:"
 14		"FLV:"
 15		"WMV:"
-25		"Per utilizzare questa funzionalità, aggiungi i filtri sorgente desiderati a "Filtri esterni" e fai clic su "Applica". Successivamente, puoi specificare il filtro di origine desiderato per un formato di file specifico."
+25		"Per utilizzare questa funzionalità, aggiungi i filtri sorgente desiderati a ""Filtri esterni"" e fai clic su ""Applica"". Successivamente, puoi specificare il filtro di origine desiderato per un formato di file specifico."
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
@@ -1051,7 +1051,7 @@ STRING IDC_CHECK_SUBRESYNC		"Consente di visualizzare e modificare i sottotitoli
 STRING IDC_D3D9DEVICE_CHECK		"Specifica una scheda video per il rendering. Attenzione: potrebbe non funzionare se lo schermo viene collegato ad un altra scheda video."
 STRING IDC_DX9RESIZER_COMBO		"Se non è disponibile il supporto per Pixel Shader 2.0, viene utilizzato automaticamente il semplice bilineare."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Riduce lo strappo ma impedisce la visualizzazione della barra degli strumenti. Per uscire dallo schermo intero in questa modalità, premi Alt+Invio, Ctrl+Invio o Ctrl+C."
-STRING IDC_REGULARSURF		"La superficie video verrà assegnata come una normale superficie fuori schermo".
+STRING IDC_REGULARSURF		"La superficie video sarà allocata come una superficie regolare su schermo."
 STRING IDC_VSYNC		"Abilita VSync tramite Direct3D9"
 STRING IDC_VSYNC_INTERNAL		"Abilita il meccanismo interno VSync"
 STRING IDD_FILEMEDIAINFO		"MediaInfo"
@@ -1619,7 +1619,7 @@ STRING IDS_MFMT_APE		"Monkey's audio"
 STRING IDS_MFMT_AU		"AU/SND"
 STRING IDS_MFMT_AVI		"AVI"
 STRING IDS_MFMT_AVISYNTH		"Script AviSynth"
-pSTRING IDS_MFMT_BDPLS		"Playlist Blu-ray"
+STRING IDS_MFMT_BDPLS		"Blu-ray playlist"
 STRING IDS_MFMT_BINK		"Video Smacker/Bink"
 STRING IDS_MFMT_CDA		"Traccia CD audio"
 STRING IDS_MFMT_CUE		"Cue sheet"
@@ -2058,7 +2058,7 @@ STRING IDS_VOLUME_GAIN_OFF		"Guadagno del volume disattivato"
 STRING IDS_VOLUME_OSD		"Vol: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Muto]"
 STRING IDS_VTSREADER_LOAD_PGC		"Abilita la scelta del titolo"
-STRING IDS_WEBSERVER_ERROR_TEST		"È necessario applicare le nuove impostazioni prima di testarle".
+STRING IDS_WEBSERVER_ERROR_TEST		"È necessario applicare le nuove impostazioni prima di poterle testare."
 STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"L'anteprima è attualmente disabilitata. Puoi abilitarla nelle opzioni di MPC-BE."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
