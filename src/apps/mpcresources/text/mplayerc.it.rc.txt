@@ -830,10 +830,9 @@ BEGIN MENU IDR_POPUP LINES 135
 88		"Cont&rolli"
 89		"&Informazioni"
 90		"S&tatistiche"
-91		"Subresync"
-93		"S&tato"
-			   
-92		"Playlist"
+91		"S&tato"
+92		"Subresync"
+93		"Playlist"
 94		"Cattura"
 95		"Editor shader"
 96		"Navigazione"
