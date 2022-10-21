@@ -1108,13 +1108,21 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			}
 		}
 
-		// A-law PCM
 		if (type == unknown && m_type == MPEG_TYPES::mpeg_ps
 				&& m_bIMKH_CCTV && pesid == 0xc0
 				&& stream_type != MPEG_AUDIO && stream_type != AAC_AUDIO) {
 			pcm_law_hdr h;
-			if (Read(h, pes_stream_type == 0x91 ? false : true, &s.mt)) {
-				type = audio;
+			if (pes_stream_type == 0x91) {
+				// Mu-law PCM
+				if (Read(h, false, &s.mt)) {
+					type = audio;
+				}
+			}
+			else if (len > 80) {
+				// A-law PCM
+				if (Read(h, true, &s.mt)) {
+					type = audio;
+				}
 			}
 		}
 	}
