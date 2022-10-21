@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -347,13 +347,13 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	}
 
 	if (p->rtStart != INVALID_TIME && (m_pSplitter->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
+		if (m_rtPrev == INVALID_TIME && m_pSplitter->m_rtOffset == INVALID_TIME) {
+			m_rtPrev = 0;
+			m_pSplitter->m_rtOffset = 0;
+		}
+
 		// Filter invalid PTS value (if too different from previous packet)
 		if (!IsDiscontinuous()) {
-			if (m_rtPrev == INVALID_TIME && m_pSplitter->m_rtOffset == INVALID_TIME) {
-				m_rtPrev = 0;
-				m_pSplitter->m_rtOffset = 0;
-			}
-
 			if (m_rtPrev != INVALID_TIME) {
 				const REFERENCE_TIME rt = p->rtStart + m_pSplitter->m_rtOffset;
 				if (llabs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
