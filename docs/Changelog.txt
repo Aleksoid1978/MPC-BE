@@ -2,11 +2,20 @@
 
 1.6.4.x dev
 =============================
+Splitters
+Fixed reading images from ID3v2 tags.
+
 MPCStreamReader
 The filter will not connect to completed broadcasts.
 
 MpaSplitter
 Added support for multiple ID3 tags at the beginning of a file or stream.
+
+OggSplitter
+Added update of metadata while playing radio broadcasts.
+
+MpegSplitter
+Unsupported G.722.1 audio tracks for Hikvision (IMKH) camera files will be ignored.
 
 MPCVideoDec
 Fixed output media type properties for RAW video when MPC Video Converter is used.
