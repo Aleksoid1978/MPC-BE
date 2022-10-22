@@ -23,6 +23,7 @@
 #include <moreuuids.h>
 #include "RawVideoSplitter.h"
 #include "DSUtil/BitsWriter.h"
+#include "dxva2api.h"
 
 #ifdef REGISTER_FILTER
 
@@ -231,6 +232,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		FOURCC fourcc_2    = 0;
 		WORD   bpp         = 12;
 		DWORD  interlFlags = 0;
+		DXVA2_ExtendedFormat exfmt = {};
 
 		int k;
 		std::list<CStringA> sl;
@@ -284,7 +286,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 				break;
 			case 'C':
-				CStringA cs = str.Mid(1);
+			{
+				const CStringA cs = str.Mid(1);
 				// 8-bit
 				if (cs == "mono") {
 					fourcc		= FCC('Y800');
@@ -318,8 +321,18 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					bpp			= 0;
 				}
 				break;
-			//case 'X':
-			//	break;
+			}
+			case 'X':
+				if (StartsWith(str, "XCOLORRANGE=")) {
+					const CStringA range = str.Mid(12);
+					if (range == "LIMITED") {
+						exfmt.NominalRange = DXVA2_NominalRange_16_235;
+					}
+					else if (range == "FULL") {
+						exfmt.NominalRange = DXVA2_NominalRange_0_255;
+					}
+				}
+				break;
 			}
 		}
 
@@ -348,6 +361,10 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		//vih2->dwBitRate = m_framesize * 8 * fpsnum / fpsden;
 		vih2->AvgTimePerFrame       = m_AvgTimePerFrame;
 		vih2->dwInterlaceFlags      = interlFlags;
+		if (exfmt.value) {
+			exfmt.value |= (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT);
+			vih2->dwControlFlags = exfmt.value;
+		}
 
 		sar_x *= width;
 		sar_y *= height;
