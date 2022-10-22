@@ -57,7 +57,7 @@ END
 BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Aggiungi ai Preferiti"
 6		"Scegli un nome per il collegamento:"
-8		"Ricorda la posizione"
+8		"Ricorda posizione"
 9		"Drive relativo"
 10		"OK"
 11		"Annulla"
@@ -401,7 +401,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 36		"Aggiungi in più alla playlist:"
 38		"Usa il thread di lavoro per costruire il grafico del filtro"
 40		"Segnala pin che non vengono visualizzati"
-41		"Ricorda i brani selezionati nella playlist"
+41		"Ricorda brani selezionati nella playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
@@ -420,8 +420,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 20		"Numero di file recenti:"
 23		"Ricorda posizione DVD"
 24		"Ricorda posizione File"
-25		"Ricorda l'ultimo zoom Pan&&Scan"
-26		"Ricorda la playlist principale"
+25		"Ricorda ultimo zoom Pan&&Scan"
+26		"Ricorda playlist principale"
 27		"Altro"
 28		"Icona nell'area di notifica"
 29		"Mostra OSD"
@@ -572,7 +572,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 5		"Dimensioni della finestra all'avvio"
 6		"Dimensioni finestra standard"
-7		"Ricorda la dimensione dell'ultima finestra"
+7		"Ricorda dimensione dell'ultima finestra"
 8		"Imposta dimensione finestra"
 9		"Imposta area video specificata"
 11		"×"
@@ -583,7 +583,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 17		"adatta finestra allo schermo"
 22		"Solo più grande"
 23		"Ritorna alla posizione e alle dimensioni della finestra dopo la chiusura del file"
-25		"Ricorda l'ultima posizione della finestra"
+25		"Ricorda ultima posizione della finestra"
 26		"Limita proporzioni finestra al ridimensionamento"
 27		"Aggancia ai bordi del desktop"
 END
@@ -984,7 +984,7 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 12		"Non fare niente"
 13		"------------- Sempre -------------"
 14		"Esci"
-15		"Close file"
+15		"Chiudi file"
 16		"Riproduci successivo nella cartella"
 17		"Riproduci successivo nella cartella (in loop)"
 18		"Non fare niente"
