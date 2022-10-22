@@ -290,35 +290,44 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				const CStringA cs = str.Mid(1);
 				// 8-bit
 				if (cs == "mono") {
-					fourcc		= FCC('Y800');
-					bpp			= 8;
+					fourcc = FCC('Y800');
+					bpp    = 8;
 				}
-				else if (cs == "420" || cs == "420jpeg" || cs == "420mpeg2" || cs == "420paldv") {
-					fourcc		= FCC('I420');
-					bpp			= 12;
+				else if (StartsWith(cs, "420")) {
+					fourcc = FCC('I420');
+					bpp    = 12;
+					if (cs == "420jpeg") {
+						exfmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_Vertically_AlignedChromaPlanes;
+					}
+					else if (cs == "420mpeg2") {
+						exfmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_MPEG2;
+					}
+					else if (cs == "420paldv") {
+						exfmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_DV_PAL;
+					}
 				}
 				else if (cs == "411") {
-					fourcc		= FCC('Y41B');
-					bpp			= 12;
+					fourcc = FCC('Y41B');
+					bpp    = 12;
 				}
 				else if (cs == "422") {
-					fourcc		= FCC('Y42B');
-					bpp			= 16;
+					fourcc = FCC('Y42B');
+					bpp    = 16;
 				}
 				else if (cs == "444") {
-					fourcc		= FCC('444P'); // for libavcodec
-					fourcc_2	= FCC('I444'); // for madVR
-					bpp			= 24;
+					fourcc   = FCC('444P'); // for libavcodec
+					fourcc_2 = FCC('I444'); // for madVR
+					bpp      = 24;
 				}
 				// 10-bit
 				else if (cs == "420p10") {
-					fourcc		= MAKEFOURCC('Y', '3', 11 , 10 );
-					bpp			= 24;
-					mt.subtype	= MEDIASUBTYPE_LAV_RAWVIDEO;
+					fourcc = MAKEFOURCC('Y', '3', 11 , 10 );
+					bpp    = 24;
+					mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
 				}
 				else { // unsuppurted colour space
-					fourcc		= 0;
-					bpp			= 0;
+					fourcc = 0;
+					bpp    = 0;
 				}
 				break;
 			}
