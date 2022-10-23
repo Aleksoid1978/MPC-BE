@@ -232,19 +232,34 @@ FF_DISABLE_DEPRECATION_WARNINGS
     if (avctx->channel_layout && !avctx->channels)
         avctx->channels = av_popcount64(avctx->channel_layout);
 
-    if ((avctx->channels > 0 && avctx->ch_layout.nb_channels != avctx->channels) ||
+    if ((avctx->channels && avctx->ch_layout.nb_channels != avctx->channels) ||
         (avctx->channel_layout && (avctx->ch_layout.order != AV_CHANNEL_ORDER_NATIVE ||
                                    avctx->ch_layout.u.mask != avctx->channel_layout))) {
+        av_channel_layout_uninit(&avctx->ch_layout);
         if (avctx->channel_layout) {
             av_channel_layout_from_mask(&avctx->ch_layout, avctx->channel_layout);
         } else {
             avctx->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
-            avctx->ch_layout.nb_channels = avctx->channels;
         }
+        avctx->ch_layout.nb_channels = avctx->channels;
     }
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
+    /* AV_CODEC_CAP_CHANNEL_CONF is a decoder-only flag; so the code below
+     * in particular checks that nb_channels is set for all audio encoders. */
+    if (avctx->codec_type == AVMEDIA_TYPE_AUDIO && !avctx->ch_layout.nb_channels
+        && !(codec->capabilities & AV_CODEC_CAP_CHANNEL_CONF)) {
+        av_log(avctx, AV_LOG_ERROR, "%s requires channel layout to be set\n",
+               av_codec_is_decoder(codec) ? "Decoder" : "Encoder");
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }
+    if (avctx->ch_layout.nb_channels && !av_channel_layout_check(&avctx->ch_layout)) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid channel layout\n");
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }
     if (avctx->ch_layout.nb_channels > FF_SANE_NB_CHANNELS) {
         av_log(avctx, AV_LOG_ERROR, "Too many channels: %d\n", avctx->ch_layout.nb_channels);
         ret = AVERROR(EINVAL);
@@ -321,24 +336,12 @@ FF_DISABLE_DEPRECATION_WARNINGS
         avctx->channels = avctx->ch_layout.nb_channels;
         avctx->channel_layout = avctx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE ?
                                 avctx->ch_layout.u.mask : 0;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
         /* validate channel layout from the decoder */
-        if (avctx->channel_layout) {
-            int channels = av_get_channel_layout_nb_channels(avctx->channel_layout);
-            if (!avctx->channels)
-                avctx->channels = channels;
-            else if (channels != avctx->channels) {
-                char buf[512];
-                av_get_channel_layout_string(buf, sizeof(buf), -1, avctx->channel_layout);
-                av_log(avctx, AV_LOG_WARNING,
-                       "Channel layout '%s' with %d channels does not match specified number of channels %d: "
-                       "ignoring specified channel layout\n",
-                       buf, channels, avctx->channels);
-                avctx->channel_layout = 0;
-            }
-        }
-        if (avctx->channels && avctx->channels < 0 ||
-            avctx->channels > FF_SANE_NB_CHANNELS) {
+        if ((avctx->ch_layout.nb_channels && !av_channel_layout_check(&avctx->ch_layout)) ||
+            avctx->ch_layout.nb_channels > FF_SANE_NB_CHANNELS) {
             ret = AVERROR(EINVAL);
             goto free_and_end;
         }
@@ -346,8 +349,6 @@ FF_DISABLE_DEPRECATION_WARNINGS
             ret = AVERROR(EINVAL);
             goto free_and_end;
         }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
 #if FF_API_AVCTX_TIMEBASE
         if (avctx->framerate.num > 0 && avctx->framerate.den > 0)

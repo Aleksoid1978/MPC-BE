@@ -127,12 +127,12 @@ static int encode_make_refcounted(AVCodecContext *avctx, AVPacket *avpkt)
 /**
  * Pad last frame with silence.
  */
-static int pad_last_frame(AVCodecContext *s, AVFrame *frame, const AVFrame *src)
+static int pad_last_frame(AVCodecContext *s, AVFrame *frame, const AVFrame *src, int out_samples)
 {
     int ret;
 
     frame->format         = src->format;
-    frame->nb_samples     = s->frame_size;
+    frame->nb_samples     = out_samples;
     ret = av_channel_layout_copy(&frame->ch_layout, &s->ch_layout);
     if (ret < 0)
         goto fail;
@@ -157,6 +157,7 @@ static int pad_last_frame(AVCodecContext *s, AVFrame *frame, const AVFrame *src)
 
 fail:
     av_frame_unref(frame);
+    s->internal->last_audio_frame = 0;
     return ret;
 }
 
@@ -208,21 +209,24 @@ int ff_encode_encode_cb(AVCodecContext *avctx, AVPacket *avpkt,
             av_assert0(avpkt->buf);
         }
 
-        if (avctx->codec->type == AVMEDIA_TYPE_VIDEO &&
-            !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY))
-            avpkt->pts = avpkt->dts = frame->pts;
+        // set the timestamps for the simple no-delay case
+        // encoders with delay have to set the timestamps themselves
         if (!(avctx->codec->capabilities & AV_CODEC_CAP_DELAY)) {
+            if (avpkt->pts == AV_NOPTS_VALUE)
+                avpkt->pts = frame->pts;
+
             if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
-                if (avpkt->pts == AV_NOPTS_VALUE)
-                    avpkt->pts = frame->pts;
                 if (!avpkt->duration)
                     avpkt->duration = ff_samples_to_time_base(avctx,
                                                               frame->nb_samples);
             }
         }
-        if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
+
+        // dts equals pts unless there is reordering
+        // there can be no reordering if there is no encoder delay
+        if (!(avctx->codec_descriptor->props & AV_CODEC_PROP_REORDER) ||
+            !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY))
             avpkt->dts = avpkt->pts;
-        }
     } else {
 unref:
         av_packet_unref(avpkt);
@@ -392,28 +396,29 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
             avctx->audio_service_type = *(enum AVAudioServiceType*)sd->data;
 
         /* check for valid frame size */
-        if (avctx->codec->capabilities & AV_CODEC_CAP_SMALL_LAST_FRAME) {
-            if (src->nb_samples > avctx->frame_size) {
-                av_log(avctx, AV_LOG_ERROR, "more samples than frame size\n");
-                return AVERROR(EINVAL);
-            }
-        } else if (!(avctx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)) {
+        if (!(avctx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)) {
             /* if we already got an undersized frame, that must have been the last */
             if (avctx->internal->last_audio_frame) {
                 av_log(avctx, AV_LOG_ERROR, "frame_size (%d) was not respected for a non-last frame\n", avctx->frame_size);
                 return AVERROR(EINVAL);
             }
-
-            if (src->nb_samples < avctx->frame_size) {
-                ret = pad_last_frame(avctx, dst, src);
-                if (ret < 0)
-                    return ret;
-
-                avctx->internal->last_audio_frame = 1;
-                goto finish;
-            } else if (src->nb_samples > avctx->frame_size) {
-                av_log(avctx, AV_LOG_ERROR, "nb_samples (%d) != frame_size (%d)\n", src->nb_samples, avctx->frame_size);
+            if (src->nb_samples > avctx->frame_size) {
+                av_log(avctx, AV_LOG_ERROR, "nb_samples (%d) > frame_size (%d)\n", src->nb_samples, avctx->frame_size);
                 return AVERROR(EINVAL);
+            }
+            if (src->nb_samples < avctx->frame_size) {
+                avctx->internal->last_audio_frame = 1;
+                if (!(avctx->codec->capabilities & AV_CODEC_CAP_SMALL_LAST_FRAME)) {
+                    int pad_samples = avci->pad_samples ? avci->pad_samples : avctx->frame_size;
+                    int out_samples = (src->nb_samples + pad_samples - 1) / pad_samples * pad_samples;
+
+                    if (out_samples != src->nb_samples) {
+                        ret = pad_last_frame(avctx, dst, src, out_samples);
+                        if (ret < 0)
+                            return ret;
+                        goto finish;
+                    }
+                }
             }
         }
     }
@@ -600,11 +605,6 @@ static int encode_preinit_audio(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
     if (avctx->codec->ch_layouts) {
-        if (!av_channel_layout_check(&avctx->ch_layout)) {
-            av_log(avctx, AV_LOG_WARNING, "Channel layout not specified correctly\n");
-            return AVERROR(EINVAL);
-        }
-
         for (i = 0; avctx->codec->ch_layouts[i].nb_channels; i++) {
             if (!av_channel_layout_compare(&avctx->ch_layout, &avctx->codec->ch_layouts[i]))
                 break;
@@ -617,28 +617,6 @@ static int encode_preinit_audio(AVCodecContext *avctx)
             return AVERROR(EINVAL);
         }
     }
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (avctx->channel_layout && avctx->channels) {
-        int channels = av_get_channel_layout_nb_channels(avctx->channel_layout);
-        if (channels != avctx->channels) {
-            char buf[512];
-            av_get_channel_layout_string(buf, sizeof(buf), -1, avctx->channel_layout);
-            av_log(avctx, AV_LOG_ERROR,
-                   "Channel layout '%s' with %d channels does not match number of specified channels %d\n",
-                   buf, channels, avctx->channels);
-            return AVERROR(EINVAL);
-        }
-    } else if (avctx->channel_layout) {
-        avctx->channels = av_get_channel_layout_nb_channels(avctx->channel_layout);
-    }
-    if (avctx->channels < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Specified number of channels %d is not supported\n",
-                avctx->channels);
-        return AVERROR(EINVAL);
-    }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     if (!avctx->bits_per_raw_sample)
         avctx->bits_per_raw_sample = 8 * av_get_bytes_per_sample(avctx->sample_fmt);

@@ -40,6 +40,7 @@
 #include "get_bits.h"
 #include "vorbis.h"
 #include "vorbisdsp.h"
+#include "vorbis_data.h"
 #include "xiph.h"
 
 #define V_NB_BITS 8
@@ -1579,30 +1580,6 @@ static inline int vorbis_residue_decode(vorbis_context *vc, vorbis_residue *vr,
     }
 }
 
-void ff_vorbis_inverse_coupling(float *mag, float *ang, intptr_t blocksize)
-{
-    int i;
-    for (i = 0;  i < blocksize;  i++) {
-        if (mag[i] > 0.0) {
-            if (ang[i] > 0.0) {
-                ang[i] = mag[i] - ang[i];
-            } else {
-                float temp = ang[i];
-                ang[i]     = mag[i];
-                mag[i]    += temp;
-            }
-        } else {
-            if (ang[i] > 0.0) {
-                ang[i] += mag[i];
-            } else {
-                float temp = ang[i];
-                ang[i]     = mag[i];
-                mag[i]    -= temp;
-            }
-        }
-    }
-}
-
 // Decode the audio packet using the functions above
 
 static int vorbis_parse_audio_packet(vorbis_context *vc, float **floor_ptr)
@@ -1900,9 +1877,7 @@ const FFCodec ff_vorbis_decoder = {
     .flush           = vorbis_decode_flush,
     .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
-#if FF_API_OLD_CHANNEL_LAYOUT
-    .p.channel_layouts = ff_vorbis_channel_layouts,
-#endif
+    CODEC_OLD_CHANNEL_LAYOUTS_ARRAY(ff_vorbis_channel_layouts)
     .p.ch_layouts    = ff_vorbis_ch_layouts,
     .p.sample_fmts   = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                        AV_SAMPLE_FMT_NONE },

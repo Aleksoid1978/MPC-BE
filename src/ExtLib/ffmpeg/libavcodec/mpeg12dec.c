@@ -47,6 +47,7 @@
 #include "internal.h"
 #include "mpeg_er.h"
 #include "mpeg12.h"
+#include "mpeg12codecs.h"
 #include "mpeg12data.h"
 #include "mpeg12dec.h"
 #include "mpegutils.h"
@@ -1765,7 +1766,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
             return ret;
 
         // Note motion_val is normally NULL unless we want to extract the MVs.
-        if (s->current_picture.motion_val[0] && !s->encoding) {
+        if (s->current_picture.motion_val[0]) {
             const int wrap = s->b8_stride;
             int xy         = s->mb_x * 2 + s->mb_y * 2 * wrap;
             int b8_xy      = 4 * (s->mb_x + s->mb_y * s->mb_stride);
@@ -2759,7 +2760,7 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
     /* we need some permutation to store matrices,
      * until the decoder sets the real permutation. */
     ff_mpv_idct_init(s2);
-    ff_mpeg12_common_init(&s->mpeg_enc_ctx);
+//    ff_mpeg12_common_init(&s->mpeg_enc_ctx);
     ff_mpeg12_init_vlcs();
 
     s2->chroma_format              = 1;
@@ -3103,7 +3104,6 @@ static av_cold int ipu_decode_init(AVCodecContext *avctx)
 
     ff_mpv_decode_init(m, avctx);
     ff_mpv_idct_init(m);
-    ff_mpeg12_common_init(m);
     ff_mpeg12_init_vlcs();
 
     for (int i = 0; i < 64; i++) {

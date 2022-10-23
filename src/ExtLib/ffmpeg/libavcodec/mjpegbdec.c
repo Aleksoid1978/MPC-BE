@@ -64,10 +64,8 @@ read_header:
     s->restart_count = 0;
     s->mjpb_skiptosod = 0;
 
-    if (buf_end - buf_ptr >= 1 << 28)
-        return AVERROR_INVALIDDATA;
-
-    init_get_bits(&hgb, buf_ptr, /*buf_size*/(buf_end - buf_ptr)*8);
+    if ((ret = init_get_bits8(&hgb, buf_ptr, /*buf_size*/(buf_end - buf_ptr))) < 0)
+        return ret;
 
     skip_bits(&hgb, 32); /* reserved zeros */
 
@@ -144,8 +142,8 @@ read_header:
         return buf_size;
     }
 
-    if ((ret = av_frame_ref(rframe, s->picture_ptr)) < 0)
-        return ret;
+    av_frame_move_ref(rframe, s->picture_ptr);
+    s->got_picture = 0;
     *got_frame = 1;
 
     if (!s->lossless && avctx->debug & FF_DEBUG_QP) {

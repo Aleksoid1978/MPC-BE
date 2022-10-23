@@ -364,6 +364,7 @@ SRCS_LC = \
 	libavcodec/mpeg4video.c \
 	libavcodec/mpeg4video_parser.c \
 	libavcodec/mpeg4videodec.c \
+	libavcodec/mpeg4videodsp.c \
 	libavcodec/mpeg4videoenc.c \
 	libavcodec/mpegaudio.c \
 	libavcodec/mpegaudio_parser.c \
@@ -385,7 +386,6 @@ SRCS_LC = \
 	libavcodec/mpegvideo_motion.c \
 	libavcodec/mpegvideo_parser.c \
 	libavcodec/mpegvideodata.c \
-	libavcodec/mpegvideodsp.c \
 	libavcodec/mpegvideoencdsp.c \
 	libavcodec/msmpeg4.c \
 	libavcodec/msmpeg4data.c \
@@ -414,13 +414,14 @@ SRCS_LC_B = \
 	libavcodec/nvdec_vc1.c \
 	libavcodec/nvdec_vp9.c \
 	libavcodec/options.c \
-	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
+	libavcodec/opus_parse.c \
 	libavcodec/opus_parser.c \
 	libavcodec/opus_pvq.c \
 	libavcodec/opus_rc.c \
 	libavcodec/opus_silk.c \
 	libavcodec/opusdec.c \
+	libavcodec/opusdec_celt.c \
 	libavcodec/opusdsp.c \
 	libavcodec/opustab.c \
 	libavcodec/parser.c \
@@ -472,6 +473,7 @@ SRCS_LC_B = \
 	libavcodec/snow.c \
 	libavcodec/sp5xdec.c \
 	libavcodec/speedhq.c \
+	libavcodec/speedhqdec.c \
 	libavcodec/startcode.c \
 	libavcodec/svq1.c \
 	libavcodec/svq13.c \
@@ -597,9 +599,9 @@ SRCS_LC_B = \
 	libavcodec/x86/mdct15_init.c \
 	libavcodec/x86/me_cmp_init.c \
 	libavcodec/x86/mlpdsp_init.c \
+	libavcodec/x86/mpeg4videodsp.c \
 	libavcodec/x86/mpegaudiodsp.c \
 	libavcodec/x86/mpegvideo.c \
-	libavcodec/x86/mpegvideodsp.c \
 	libavcodec/x86/mpegvideoencdsp_init.c \
 	libavcodec/x86/opusdsp_init.c \
 	libavcodec/x86/pixblockdsp_init.c \

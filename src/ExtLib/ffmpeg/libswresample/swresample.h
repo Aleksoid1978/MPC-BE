@@ -73,7 +73,7 @@
  *
  * Once all values have been set, it must be initialized with swr_init(). If
  * you need to change the conversion parameters, you can change the parameters
- * using @ref AVOptions, as described above in the first example; or by using
+ * using @ref avoptions, as described above in the first example; or by using
  * swr_alloc_set_opts2(), but with the first argument the allocated context.
  * You must then call swr_init() again.
  *
@@ -354,8 +354,8 @@ int swr_convert(struct SwrContext *s, uint8_t **out, int out_count,
  *              in this case the output timestamps will match output sample numbers.
  *              See ffmpeg-resampler(1) for the two modes of compensation.
  *
- * @param s[in]     initialized Swr context
- * @param pts[in]   timestamp for the next input sample, INT64_MIN if unknown
+ * @param[in] s     initialized Swr context
+ * @param[in] pts   timestamp for the next input sample, INT64_MIN if unknown
  * @see swr_set_compensation(), swr_drop_output(), and swr_inject_silence() are
  *      function used internally for timestamp compensation.
  * @return the output timestamp for the next output sample
@@ -636,8 +636,8 @@ int swr_convert_frame(SwrContext *swr,
  * @see swr_close();
  *
  * @param swr             audio resample context
- * @param output          output AVFrame
- * @param input           input AVFrame
+ * @param out             output AVFrame
+ * @param in              input AVFrame
  * @return                0 on success, AVERROR on failure.
  */
 int swr_config_frame(SwrContext *swr, const AVFrame *out, const AVFrame *in);

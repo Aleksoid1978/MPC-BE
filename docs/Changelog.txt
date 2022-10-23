@@ -44,7 +44,7 @@ Updated Japanese translation.
 Updated Italian translation (by mapi68).
 
 Updated libraries:
-	ffmpeg git-n5.2-dev-790-ged83a3a5bd;
+	ffmpeg git-n5.2-dev-1381-g65f96a965a;
 	Little-CMS git-lcms2.14rc1-3-g496293a;
 	MediaInfo git-v22.09-8-gb4863b677;
 

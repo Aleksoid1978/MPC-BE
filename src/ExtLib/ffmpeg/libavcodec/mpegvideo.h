@@ -40,7 +40,6 @@
 #include "me_cmp.h"
 #include "motion_est.h"
 #include "mpegpicture.h"
-#include "mpegvideodsp.h"
 #include "mpegvideoencdsp.h"
 #include "pixblockdsp.h"
 #include "put_bits.h"
@@ -209,7 +208,6 @@ typedef struct MpegEncContext {
     HpelDSPContext hdsp;
     IDCTDSPContext idsp;
     MECmpContext mecc;
-    MpegVideoDSPContext mdsp;
     MpegvideoEncDSPContext mpvencdsp;
     PixblockDSPContext pdsp;
     QpelDSPContext qdsp;
@@ -378,13 +376,9 @@ typedef struct MpegEncContext {
     uint16_t pb_time;               ///< time distance between the last b and p,s,i frame
     uint16_t pp_field_time;
     uint16_t pb_field_time;         ///< like above, just for interlaced
-    int real_sprite_warping_points;
-    int sprite_offset[2][2];         ///< sprite offset[isChroma][isMVY]
-    int sprite_delta[2][2];          ///< sprite_delta [isY][isMVY]
     int mcsel;
     int quant_precision;
     int quarter_sample;              ///< 1->qpel, 0->half pel ME/MC
-    int sprite_warping_accuracy;
     int data_partitioning;           ///< data partitioning flag from header
     int partitioned_frame;           ///< is current frame partitioned
     int low_delay;                   ///< no reordering needed / has no B-frames
@@ -445,12 +439,6 @@ typedef struct MpegEncContext {
     int brd_scale;
     int intra_vlc_format;
     int alternate_scan;
-#define VIDEO_FORMAT_COMPONENT   0
-#define VIDEO_FORMAT_PAL         1
-#define VIDEO_FORMAT_NTSC        2
-#define VIDEO_FORMAT_SECAM       3
-#define VIDEO_FORMAT_MAC         4
-#define VIDEO_FORMAT_UNSPECIFIED 5
     int repeat_first_field;
     int chroma_420_type;
     int chroma_format;
@@ -581,8 +569,6 @@ int ff_mpv_init_context_frame(MpegEncContext *s);
 void ff_mpv_free_context_frame(MpegEncContext *s);
 
 void ff_mpv_common_end(MpegEncContext *s);
-
-void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64]);
 
 void ff_clean_intra_table_entries(MpegEncContext *s);
 

@@ -183,41 +183,11 @@ static av_cold void ac3_tables_init(void)
 #endif
 }
 
-/**
- * AVCodec initialization
- */
-static av_cold int ac3_decode_init(AVCodecContext *avctx)
+static void ac3_downmix(AVCodecContext *avctx)
 {
-    static AVOnce init_static_once = AV_ONCE_INIT;
     AC3DecodeContext *s = avctx->priv_data;
     const AVChannelLayout mono   = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
     const AVChannelLayout stereo = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
-    int i, ret;
-
-    s->avctx = avctx;
-
-    if ((ret = ff_mdct_init(&s->imdct_256, 8, 1, 1.0)) < 0 ||
-        (ret = ff_mdct_init(&s->imdct_512, 9, 1, 1.0)) < 0)
-        return ret;
-    AC3_RENAME(ff_kbd_window_init)(s->window, 5.0, 256);
-    ff_bswapdsp_init(&s->bdsp);
-
-#if (USE_FIXED)
-    s->fdsp = avpriv_alloc_fixed_dsp(avctx->flags & AV_CODEC_FLAG_BITEXACT);
-#else
-    ff_fmt_convert_init(&s->fmt_conv, avctx);
-    s->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
-#endif
-    if (!s->fdsp)
-        return AVERROR(ENOMEM);
-
-    ff_ac3dsp_init(&s->ac3dsp, avctx->flags & AV_CODEC_FLAG_BITEXACT);
-    av_lfg_init(&s->dith_state, 0);
-
-    if (USE_FIXED)
-        avctx->sample_fmt = AV_SAMPLE_FMT_S16P;
-    else
-        avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
     /* allow downmixing to stereo or mono */
 #if FF_API_OLD_CHANNEL_LAYOUT
@@ -238,6 +208,43 @@ FF_ENABLE_DEPRECATION_WARNINGS
         avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
     }
     s->downmixed = 1;
+}
+
+/**
+ * AVCodec initialization
+ */
+static av_cold int ac3_decode_init(AVCodecContext *avctx)
+{
+    static AVOnce init_static_once = AV_ONCE_INIT;
+    AC3DecodeContext *s = avctx->priv_data;
+    int i, ret;
+
+    s->avctx = avctx;
+
+    if ((ret = ff_mdct_init(&s->imdct_256, 8, 1, 1.0)) < 0 ||
+        (ret = ff_mdct_init(&s->imdct_512, 9, 1, 1.0)) < 0)
+        return ret;
+    AC3_RENAME(ff_kbd_window_init)(s->window, 5.0, 256);
+    ff_bswapdsp_init(&s->bdsp);
+
+#if (USE_FIXED)
+    s->fdsp = avpriv_alloc_fixed_dsp(avctx->flags & AV_CODEC_FLAG_BITEXACT);
+#else
+    ff_fmt_convert_init(&s->fmt_conv);
+    s->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
+#endif
+    if (!s->fdsp)
+        return AVERROR(ENOMEM);
+
+    ff_ac3dsp_init(&s->ac3dsp);
+    av_lfg_init(&s->dith_state, 0);
+
+    if (USE_FIXED)
+        avctx->sample_fmt = AV_SAMPLE_FMT_S16P;
+    else
+        avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+
+    ac3_downmix(avctx);
 
     for (i = 0; i < AC3_MAX_CHANNELS; i++) {
         s->xcfptr[i] = s->transform_coeffs[i];
@@ -1751,7 +1758,7 @@ skip:
                     if (index < 0)
                         return AVERROR_INVALIDDATA;
                     if (extend >= channel_map_size)
-                        return AVERROR_INVALIDDATA;
+                        break;
 
                     extended_channel_map[index] = offset + channel_map[extend++];
                 } else {
@@ -1763,7 +1770,7 @@ skip:
                             if (index < 0)
                                 return AVERROR_INVALIDDATA;
                             if (extend >= channel_map_size)
-                                return AVERROR_INVALIDDATA;
+                                break;
 
                             extended_channel_map[index] = offset + channel_map[extend++];
                         }
@@ -1771,6 +1778,8 @@ skip:
                 }
             }
         }
+
+        ac3_downmix(avctx);
     }
 
     /* get output buffer */

@@ -425,12 +425,18 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
                         mh.stream_type);
             return AVERROR_PATCHWELCOME;
         }
+        m->substream[1].mask = mh.channel_layout_thd_stream1;
         if (mh.channels_thd_stream1 == 2 &&
             mh.channels_thd_stream2 == 2 &&
             m->avctx->ch_layout.nb_channels == 2)
             m->substream[0].mask = AV_CH_LAYOUT_STEREO;
         if ((substr = (mh.num_substreams > 1)))
             m->substream[0].mask = AV_CH_LAYOUT_STEREO;
+        if (mh.num_substreams == 1 &&
+            mh.channels_thd_stream1 == 1 &&
+            mh.channels_thd_stream2 == 1 &&
+            m->avctx->ch_layout.nb_channels == 1)
+            m->substream[0].mask = AV_CH_LAYOUT_MONO;
         if (mh.num_substreams > 2)
             if (mh.channel_layout_thd_stream2)
                 m->substream[2].mask = mh.channel_layout_thd_stream2;
@@ -438,16 +444,6 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
                 m->substream[2].mask = mh.channel_layout_thd_stream1;
         if (m->avctx->ch_layout.nb_channels > 2)
             m->substream[mh.num_substreams > 1].mask = mh.channel_layout_thd_stream1;
-
-        if (m->avctx->ch_layout.nb_channels <= 2 &&
-            m->substream[substr].mask == AV_CH_LAYOUT_MONO && m->max_decoded_substream == 1) {
-            av_log(m->avctx, AV_LOG_DEBUG, "Mono stream with 2 substreams, ignoring 2nd\n");
-            m->max_decoded_substream = 0;
-            if (m->avctx->ch_layout.nb_channels == 2) {
-                av_channel_layout_uninit(&m->avctx->ch_layout);
-                m->avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
-            }
-        }
     }
 
     m->needs_reordering = mh.channel_arrangement >= 18 && mh.channel_arrangement <= 20;
@@ -541,12 +537,6 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
         return AVERROR_INVALIDDATA;
     }
 
-    if (max_channel != max_matrix_channel) {
-        av_log(m->avctx, AV_LOG_ERROR,
-               "Max channel must be equal max matrix channel.\n");
-        return AVERROR_INVALIDDATA;
-    }
-
     /* This should happen for TrueHD streams with >6 channels and MLP's noise
      * type. It is not yet known if this is allowed. */
     if (max_channel > MAX_MATRIX_CHANNEL_MLP && !noise_type) {
@@ -557,11 +547,8 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
         return AVERROR_PATCHWELCOME;
     }
 
-    if (min_channel > max_channel) {
-        av_log(m->avctx, AV_LOG_ERROR,
-               "Substream min channel cannot be greater than max channel.\n");
+    if (max_channel + 1 > MAX_CHANNELS || max_channel + 1 < min_channel)
         return AVERROR_INVALIDDATA;
-    }
 
     s->min_channel        = min_channel;
     s->max_channel        = max_channel;
