@@ -150,7 +150,12 @@
 : ;: 
 3D;
 3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;O programe
 About_Hint;O programe
 Accompaniment;Accompaniment
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;
 Author;Autor
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;BarCode
 Basic;Základné
 Basic_Note;Info : Pre viac detailov vyberte iný režim zobrazenia (List, Strom...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Kanál(y)
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;Channel positions
@@ -281,6 +290,7 @@ colour_range;
 Comment;Komentár
 CommissionedBy;Commissioned by
 Compilation;
+ComplementaryObject;
 CompleteName;Celý názov a cesta
 CompletionDate;
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;
 Compression_Ratio;
 Conductor;Conductor
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Hlavné informácie
+Content;
 ContentType;Typ obsahu
 CoProducer;sPoluproducent
 Copyright;Autorské práva
@@ -308,6 +322,7 @@ Cover_Mime;
 Cover_Type;Typ obalu
 Cropped;
 Custom;Vlastné
+CustomDownmixTargets;
 Customize;Prispôsobiť
 DarkMode;
 Date;Dátum
@@ -342,7 +357,6 @@ DotsPerInch;Bodov na palec
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Trvanie
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Upraviť
 EditedBy;Upravil
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;E-Mail
 Encoded_Application;Použitý software
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;Veľkosť súboru
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Adresár
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;
 Format_Version;
+FormatDefinition;
 FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Frekvencia snímok
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maximálna frekvencia snímok
 FrameRate_Minimum;Minimálna frekvencia snímok
 FrameRate_Mode;Režim frekvencie snímok
@@ -681,6 +698,7 @@ ImageCount;Count of image streams
 ImmersiveStereo;
 Info;Info
 Instruments;Instruments
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Identifikujúce slová
 Known codecs;Známe kodeky
 Known formats;Známe formáty
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;
+Object;
 ObjectCount;
 OK;OK
 One output file per input file;One output file per input file
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
 PackageName;
+PackFormat;
 Part;Časť
 Part_Count;Celkový počet
 PartNumber;
@@ -1127,6 +1134,7 @@ ProductionDesigner;ProductionDesigner
 ProductionNumber;
 ProductionStudio;ProductionStudio
 ProductPlacement;
+Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
 ProgrammeTitle;
@@ -1163,6 +1171,8 @@ ScanType;
 ScanType_Original;
 ScanType_StoreMethod;
 ScreenplayBy;Screenplay by
+ScreenToCenter;
+ScreenToFront;
 Season;Season
 SecondaryAudioLanguage;
 see below;pozri nižšie
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;
 Stream;Dátový stream
 Stream_MoreInfo;More information about the stream
 StreamCount;Count of stream of this kind
+StreamFormat;
 StreamID;Stream ID
 streamIdentifier;
 StreamKind;Kind of stream
@@ -1266,20 +1277,28 @@ ThanksTo;Poďakovanie
 Thousands separator;Oddeľovač tisícok
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
-TimeCode_Striped;
+TimeCode_Stripped;
 TimeStamp;
 TimeZone;Časová zóna
 Title;Titul
 Title_More;Titul, ďalšie informácie
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Celkom
 TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Názov stopy
 Track_Count;Počet stôp
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
@@ -1288,6 +1307,19 @@ Translator;Preložil
 Transport;
 Tree;Strom
 Tree & Text;Strom a text
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
@@ -1332,5 +1364,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;62
-ZZ_AutomaticLanguage_Percent;67
+ZZ_Automatic_Percent;60
+ZZ_AutomaticLanguage_Percent;66

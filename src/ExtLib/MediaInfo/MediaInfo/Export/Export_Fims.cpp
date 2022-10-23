@@ -985,7 +985,7 @@ Ztring Fims_Transform_TimeCode(Ztring &ToReturn, MediaInfo_Internal &MI, size_t 
     }
 
     if (!MI.Get(Stream_Other, StreamPos, Other_ID).empty())
-        ToReturn+=__T("\t\t\t\t\t<ebucore:technicalAttributeBoolean typeLabel=\"Stripped\">")+Ztring(MI.Get(Stream_Other, StreamPos, __T("TimeCode_Striped"))==__T("Yes")?__T("true"):__T("false"))+__T("</ebucore:technicalAttributeBoolean>\n");
+        ToReturn+=__T("\t\t\t\t\t<ebucore:technicalAttributeBoolean typeLabel=\"Stripped\">")+Ztring(MI.Get(Stream_Other, StreamPos, __T("TimeCode_Stripped"))==__T("Yes")?__T("true"):__T("false"))+__T("</ebucore:technicalAttributeBoolean>\n");
 
     ToReturn+=__T("\t\t\t\t</ebucore:timecodeFormat>\n");
 

@@ -81,13 +81,14 @@ Ztring Xml_Name_Escape_0_7_78 (const Ztring &Name)
         if (!(ToReturn[ToReturn_Pos]>=__T('A') && ToReturn[ToReturn_Pos]<=__T('Z'))
          && !(ToReturn[ToReturn_Pos]>=__T('a') && ToReturn[ToReturn_Pos]<=__T('z'))
          && !(ToReturn[ToReturn_Pos]>=__T('0') && ToReturn[ToReturn_Pos]<=__T('9'))
+         && !(ToReturn[ToReturn_Pos]==__T('-')) // Authorized if not first pos
          && !(ToReturn[ToReturn_Pos]==__T('_')))
             ToReturn.erase(ToReturn_Pos, 1);
         else
             ToReturn_Pos++;
     }
 
-    if (ToReturn.operator()(0)>='0' && ToReturn.operator()(0)<='9')
+    if ((ToReturn.operator()(0)>='0' && ToReturn.operator()(0)<='9') || ToReturn.operator()(0)=='-')
         ToReturn.insert(0, 1, __T('_'));
 
     if (ToReturn.empty())
@@ -720,6 +721,10 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                         size_t NumbersPos=SubName.find_first_of("0123456789");
                         if (NumbersPos!=(size_t)-1)
                             SubName.resize(NumbersPos);
+                        if (XML_0_7_78 || JSON)
+                            SubName=Xml_Name_Escape_0_7_78(Ztring().From_UTF8(SubName)).To_UTF8();
+                        else
+                            SubName=Xml_Name_Escape(Ztring().From_UTF8(SubName)).To_UTF8();
                         bool IsArray=NumbersPos!=(size_t)-1;
                         Node* Node_Sub=new Node(SubName.c_str(), IsArray);
                         Fields_Current->push_back(Node_Sub);
@@ -944,7 +949,12 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 Elements_Index=2;
         }
         else
-            Elements_Index=2;
+        {
+            if (!Get(StreamKind, StreamPos, Elements(0)).empty())
+                Elements_Index=1;
+            else
+                Elements_Index=2;
+        }
 
         //Replace
         while (Elements(Elements_Index).SubString(__T("%"), __T("%")).size()>0)

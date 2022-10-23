@@ -22,9 +22,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Audio/File_Pcm.h"
-#if MEDIAINFO_DEMUX
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
-#endif //MEDIAINFO_DEMUX
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -297,6 +295,9 @@ bool File_Pcm::FileHeader_Begin()
         Accept();
         Finish();
     }
+
+    if (Frame_Count_Valid==16 && Config->ParseSpeed<0.5)
+        Frame_Count_Valid=1;
 
     return true;
 }

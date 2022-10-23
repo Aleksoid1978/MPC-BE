@@ -23,6 +23,8 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Audio/File_Aac.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include <string>
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -33,6 +35,8 @@ namespace MediaInfoLib
 //***************************************************************************
 
 extern const size_t Aac_sampling_frequency_Size;
+extern const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[];
+extern const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[];
 
 //***************************************************************************
 // Constructor/Destructor
@@ -64,6 +68,11 @@ File_Aac::File_Aac()
     Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
     Mode=Mode_Unknown;
+    
+    //Conformance
+    #if MEDIAINFO_CONFORMANCE
+        SamplingRate=0;
+    #endif
 
     audioObjectType=(int8u)-1;
     extensionAudioObjectType=(int8u)-1;
@@ -214,6 +223,25 @@ void File_Aac::Streams_Finish()
 
     if (Mode==Mode_ADTS && !ChannelCount_Temp && ChannelPos_Temp && Retrieve_Const(Stream_Audio, 0, Audio_Channel_s_).empty())
         Fill(Stream_Audio, 0, Audio_Channel_s_, ChannelPos_Temp);
+
+    #if MEDIAINFO_CONFORMANCE
+        if (audioObjectType==42 && !ConformanceFlags) {
+            ConformanceFlags.set(Usac);
+            if (Profile==AudioProfile_Max) {
+                ConformanceFlags.set(xHEAAC); // TODO: is xHEAAC profiled detectable in LATM? or just ignore xHEAAC in case of LATM
+            }
+        }
+        if (Retrieve_Const(Stream_Audio, 0, "ConformanceErrors").empty()) //TODO: check why called twice in some cases
+        {
+        if (Profile && Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[Profile]
+            && ((audioObjectType==42 && !ConformanceFlags[BaselineUsac] && !ConformanceFlags[xHEAAC])
+             || (audioObjectType!=42 && (ConformanceFlags[BaselineUsac] || ConformanceFlags[xHEAAC])))) {
+            auto ProfileString=string(Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[Profile]);
+            Fill_Conformance("Crosscheck InitialObjectDescriptor-AudioSpecificConfig audioProfileLevelIndication-audioObjectType", ('\"' + ProfileString + "\" vs " + to_string(audioObjectType) + " are not coherent").c_str(), bitset8().set(Usac).set(BaselineUsac).set(xHEAAC));
+        }
+        }
+        Streams_Finish_Conformance();
+    #endif
 }
 
 //***************************************************************************

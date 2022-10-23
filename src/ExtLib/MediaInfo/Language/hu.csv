@@ -150,7 +150,12 @@
 : ;:
 3D;
 3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;Névjegy
 About_Hint;Hogyan léphet velem kapcsolatba, illetve a legfrissebb változat lelőhelye
 Accompaniment;Kíséret
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;
 Author;Szerző
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;Vonalkód
 Basic;Egyszerű
 Basic_Note;Megjegyzés: a többi nézet (Táblázat, Fa ...) bővebb adatokat mutat a fájlról
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Csatornák száma
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;Csatorna kiosztás
@@ -281,6 +290,7 @@ colour_range;
 Comment;Megjegyzés
 CommissionedBy;Megbízó
 Compilation;
+ComplementaryObject;
 CompleteName;Teljes név
 CompletionDate;
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;
 Compression_Ratio;Tömörítési arány
 Conductor;Vezényel
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Gyűjtő és általános adatok
+Content;
 ContentType;Tartalom típusa
 CoProducer;Gyártó
 Copyright;Jogok
@@ -308,6 +322,7 @@ Cover_Mime;Borító MIME
 Cover_Type;Borító típusa
 Cropped;Méretek
 Custom;Egyedi
+CustomDownmixTargets;
 Customize;Testreszabás
 DarkMode;
 Date;Dátum
@@ -342,7 +357,6 @@ DotsPerInch;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Időtartam
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Szerkesztés
 EditedBy;Szerkesztő
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;Email
 Encoded_Application;Kódoló szoftver
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;Fájlméret
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Mappa
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Formátum weblapja
 Format_Version;Formátum változat
+FormatDefinition;
 FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Képkockaszám
 FrameRate;Képkockasebesség
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Legnagyobb képkockasebesség
 FrameRate_Minimum;Legkisebb képkockasebesség
 FrameRate_Mode;Képkockasebességi mód
@@ -681,6 +698,7 @@ ImageCount;Állóképsávok száma
 ImmersiveStereo;
 Info;adatok
 Instruments;Hangszerek
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Kulcsszavak
 Known codecs;Ismert kódekek
 Known formats;Ismert formátumok
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Színek száma
+Object;
 ObjectCount;
 OK;OK
 One output file per input file;Bemeneti fájlonként egy kimeneti fájl
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;Legkisebb adatsebesség
 OverallBitRate_Mode;Teljes adatsebesség
 OverallBitRate_Nominal;Névleges adatsebesség
 PackageName;
+PackFormat;
 Part;Rész
 Part_Count;Részek száma
 PartNumber;
@@ -1127,6 +1134,7 @@ ProductionDesigner;Tervező
 ProductionNumber;
 ProductionStudio;Gyártó stúdió
 ProductPlacement;
+Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
 ProgrammeTitle;
@@ -1163,6 +1171,8 @@ ScanType;Sorváltás típusa
 ScanType_Original;
 ScanType_StoreMethod;
 ScreenplayBy;Forgatókönyvíró
+ScreenToCenter;
+ScreenToFront;
 Season;Évad
 SecondaryAudioLanguage;
 see below;lásd alant
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;
 Stream;Sáv
 Stream_MoreInfo;Több adat a sávról
 StreamCount;A hasonló fajtájú sávok száma
+StreamFormat;
 StreamID;Sávazonosító
 streamIdentifier;
 StreamKind;Sáv fajtája
@@ -1266,20 +1277,28 @@ ThanksTo;Köszönetnyilvánítás
 Thousands separator;Ezres elválasztó jel
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
-TimeCode_Striped;
+TimeCode_Stripped;
 TimeStamp;
 TimeZone;
 Title;Cím
 Title_More;Cím, több adat
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Összesen
 TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Sáv
 Track_Count;Sávok száma
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
@@ -1288,6 +1307,19 @@ Translator;Fordító
 Transport;
 Tree;Fa
 Tree & Text;Fa és szöveg
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
@@ -1332,5 +1364,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;64
-ZZ_AutomaticLanguage_Percent;72
+ZZ_Automatic_Percent;63
+ZZ_AutomaticLanguage_Percent;71

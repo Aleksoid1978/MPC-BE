@@ -680,7 +680,8 @@ void File_Ancillary::Data_Parse()
                                         if (!Rdd18_Parser->Status[IsFinished])
                                         {
                                             Rdd18_Parser->Frame_Count=Frame_Count;
-                                            Open_Buffer_Continue(Rdd18_Parser, Payload+1, (size_t)DataCount-1);
+                                            if (DataCount)
+                                                Open_Buffer_Continue(Rdd18_Parser, Payload+1, (size_t)DataCount-1);
                                         }
                                         #endif //defined(MEDIAINFO_MXF_YES)
                                         break;

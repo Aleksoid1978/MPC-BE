@@ -150,7 +150,12 @@
 : ;: 
 3D;
 3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;關於
 About_Hint;如何聯絡作者以及尋找最新版
 Accompaniment;伴奏
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;
 Author;作者
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;條碼
 Basic;基本
 Basic_Note;注意: 想知道更多關於此檔案的資訊, 您得選擇不同的視點 (表格, 樹狀圖 ...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);聲道數
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;聲道位置
@@ -281,6 +290,7 @@ colour_range;
 Comment;註釋
 CommissionedBy;委託
 Compilation;
+ComplementaryObject;
 CompleteName;完整檔名
 CompletionDate;
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;
 Compression_Ratio;壓縮比
 Conductor;指揮
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;容器格式與一般訊息
+Content;
 ContentType;內容型態
 CoProducer;製作協力
 Copyright;著作權
@@ -308,6 +322,7 @@ Cover_Mime;封面 MIME
 Cover_Type;封面類型
 Cropped;裁切維度
 Custom;自訂
+CustomDownmixTargets;
 Customize;自訂
 DarkMode;
 Date;日期
@@ -342,7 +357,6 @@ DotsPerInch;每吋點數 (DPI)
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;時間長度
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;開始時間
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;編輯
 EditedBy;編輯者
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;電子信箱
 Encoded_Application;使用編碼程式
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;檔案大小
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;資料夾
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;該格式的網址
 Format_Version;格式版本
+FormatDefinition;
 FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;影格數
 FrameRate;影格頻率
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最大影格頻率
 FrameRate_Minimum;最小影格頻率
 FrameRate_Mode;影格頻率模式
@@ -681,6 +698,7 @@ ImageCount;圖片串流數
 ImmersiveStereo;
 Info;相關資訊
 Instruments;樂器
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;關鍵字
 Known codecs;已知編解碼器
 Known formats;已知格式
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;色彩數
+Object;
 ObjectCount;
 OK;確認
 One output file per input file;一個輸入檔對應一個輸出檔
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;最小整體流量
 OverallBitRate_Mode;整體流量模式
 OverallBitRate_Nominal;正常整體流量
 PackageName;
+PackFormat;
 Part;部分
 Part_Count;總數
 PartNumber;
@@ -1127,6 +1134,7 @@ ProductionDesigner;美術指導
 ProductionNumber;
 ProductionStudio;製作中心
 ProductPlacement;
+Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
 ProgrammeTitle;
@@ -1163,6 +1171,8 @@ ScanType;掃描型態
 ScanType_Original;
 ScanType_StoreMethod;
 ScreenplayBy;編劇
+ScreenToCenter;
+ScreenToFront;
 Season;季期
 SecondaryAudioLanguage;
 see below;詳見下述
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;
 Stream;串流
 Stream_MoreInfo;更多有關此串流的資訊
 StreamCount;此串流數量
+StreamFormat;
 StreamID;串流ID
 streamIdentifier;
 StreamKind;串流類型
@@ -1266,20 +1277,28 @@ ThanksTo;感謝
 Thousands separator;千位分隔符號
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
-TimeCode_Striped;
+TimeCode_Stripped;
 TimeStamp;
 TimeZone;時區
 Title;標題
 Title_More;標題, 詳細資訊
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;總和
 TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;音軌
 Track_Count;音軌數
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;傳輸特性
@@ -1288,6 +1307,19 @@ Translator;翻譯
 Transport;
 Tree;樹狀圖
 Tree & Text;樹狀圖與文字
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
@@ -1332,5 +1364,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;70
-ZZ_AutomaticLanguage_Percent;74
+ZZ_Automatic_Percent;69
+ZZ_AutomaticLanguage_Percent;72

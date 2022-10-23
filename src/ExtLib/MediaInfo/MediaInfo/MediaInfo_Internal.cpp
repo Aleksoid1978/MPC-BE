@@ -338,7 +338,7 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
     { "Lv", "Tfl" },
     { "Lvh", "Tfl" },
     { "Lvr", "Tbl" },
-    { "Lvss", "Tll" },
+    { "Lvss", "Tsl" },
     { "Oh", "Tc" },
     { "Rc", "Rscr" },
     { "Rfh", "Tfrr" },

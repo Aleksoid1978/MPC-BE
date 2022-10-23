@@ -144,7 +144,7 @@ bool File_DcpCpl::FileHeader_Begin()
             Sequence->StreamKind=Stream_Other;
             Sequence->Infos["Type"]=__T("Time code");
             Sequence->Infos["Format"]=__T("CPL TC");
-            Sequence->Infos["TimeCode_Striped"]=__T("Yes");
+            Sequence->Infos["TimeCode_Stripped"]=__T("Yes");
             bool IsDropFrame=false;
 
             for (XMLElement* CompositionTimecode_Item=CompositionPlaylist_Item->FirstChildElement(); CompositionTimecode_Item; CompositionTimecode_Item=CompositionTimecode_Item->NextSiblingElement())

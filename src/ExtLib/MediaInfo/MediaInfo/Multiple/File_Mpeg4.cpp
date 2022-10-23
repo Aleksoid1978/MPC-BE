@@ -1396,11 +1396,11 @@ void File_Mpeg4::Streams_Finish()
             if (ES_ID_Info->first==Temp->first && ES_ID_Info->second.StreamKind==Temp->second.StreamKind)
             {
                 if (Retrieve_Const(StreamKind_Last, StreamPos_Last, "Format_Profile").empty())
-                    Fill(StreamKind_Last, StreamPos_Last, "Format_Profile", ES_ID_Info->second.ProfileLevel);
+                    Fill(StreamKind_Last, StreamPos_Last, "Format_Profile", ES_ID_Info->second.ProfileLevelString);
                 else if (StreamKind_Last==Stream_Audio && Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_Format).find(__T("AAC"))!=string::npos && Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_Format_Level).empty())
                 {
                     //Legacy issue with AAC, "Format_Profile" was used for something else, cheating with "Format_Level" for storing profile+level
-                    Fill(Stream_Audio, StreamPos_Last, Audio_Format_Level, ES_ID_Info->second.ProfileLevel);
+                    Fill(Stream_Audio, StreamPos_Last, Audio_Format_Level, ES_ID_Info->second.ProfileLevelString);
                 }
             }
         }
@@ -3072,6 +3072,10 @@ void File_Mpeg4::Descriptors()
     MI.KindOfStream=StreamKind_Last;
     MI.PosOfStream=StreamPos_Last;
     MI.Parser_DoNotFreeIt=true;
+    MI.ES_ID_Infos=ES_ID_Infos;
+    #if MEDIAINFO_CONFORMANCE
+        MI.SamplingRate=Retrieve_Const(Stream_Audio, 0, Audio_SamplingRate).To_int16u();
+    #endif
 
     int64u Elemen_Code_Save=Element_Code;
     Element_Code=moov_trak_tkhd_TrackID; //Element_Code is use for stream identifier

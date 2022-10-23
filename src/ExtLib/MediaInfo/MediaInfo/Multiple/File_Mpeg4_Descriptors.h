@@ -22,6 +22,38 @@
 namespace MediaInfoLib
 {
 
+enum audio_profile
+{
+    NoProfile,
+    Main_Audio,
+    Scalable_Audio,
+    Speech_Audio,
+    Synthesis_Audio,
+    High_Quality_Audio,
+    Low_Delay_Audio,
+    Natural_Audio,
+    Mobile_Audio_Internetworking,
+    AAC,
+    High_Efficiency_AAC,
+    High_Efficiency_AAC_v2,
+    Low_Delay_AAC,
+    Baseline_MPEG_Surround,
+    High_Definition_AAC,
+    ALS_Simple,
+    Baseline_USAC,
+    Extended_HE_AAC,
+    AudioProfile_Max,
+    #if MEDIAINFO_CONFORMANCE
+    AudioProfile_Unspecified,
+    AudioProfile_NoAudio,
+#endif
+};
+struct profilelevel_struct
+{
+    audio_profile profile;
+    int8u level;
+};
+
 //***************************************************************************
 // Class File_Mpeg4_Descriptors
 //***************************************************************************
@@ -41,7 +73,8 @@ public :
     struct es_id_info
     {
         stream_t    StreamKind;
-        Ztring      ProfileLevel;
+        Ztring      ProfileLevelString;
+        int8u       ProfileLevel[5];
 
         es_id_info() :
             StreamKind(Stream_Max)
@@ -49,6 +82,11 @@ public :
     };
     typedef map<int32u, es_id_info> es_id_infos;
     es_id_infos ES_ID_Infos;
+
+    // Conformance
+    #if MEDIAINFO_CONFORMANCE
+        int16u SamplingRate;
+    #endif
 
     struct slconfig
     {

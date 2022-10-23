@@ -150,7 +150,12 @@
 : ;: 
 3D;3D
 3DType;3D種別
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;このソフトの情報
 About_Hint;連絡方法と最新版チェック
 Accompaniment;伴奏
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;音声トラックの配置
 Author;製作者
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;バーコード
 Basic;基本
 Basic_Note;注 : このファイルの詳細情報は、別の表示方法で開いて確認してください (シート、ツリーなど)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);チャンネル
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;チャンネルの配置
 ChannelMode;
 ChannelPositions;チャンネルの位置
@@ -281,6 +290,7 @@ colour_range;色の範囲
 Comment;コメント
 CommissionedBy;委託
 Compilation;コンピレーション
+ComplementaryObject;
 CompleteName;完全なパス
 CompletionDate;コンピレーション日
 ComplexityIndex;複雑性指標
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;非可逆
 Compression_Ratio;圧縮比
 Conductor;指揮
 ConformanceCheck;適合性の確認
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;問い合わせ先メール
 ContactTelephoneNumber;問い合わせ先電話番号
 Container and general information;コンテナと全般情報
+Content;
 ContentType;コンテンツ種別
 CoProducer;共同製作
 Copyright;著作
@@ -308,6 +322,7 @@ Cover_Mime;カバーの MIME
 Cover_Type;カバーの種類
 Cropped;切り取り
 Custom;カスタム
+CustomDownmixTargets;
 Customize;カスタマイズ
 DarkMode;ダークモード
 Date;日付
@@ -342,7 +357,6 @@ DotsPerInch;ドット/インチ
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;DRC の数
 DrcSets_Effects;DRC エフェクトの種類
 Duration;長さ
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;開始時間
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;編集
 EditedBy;編集者
 EditorialClassification;
+ElementaryStream;
 ElementCount;要素数
 EMail;電子メール
 Encoded_Application;使用したエンコーダ
@@ -395,6 +411,7 @@ FileNameExtension;ファイル名と拡張子
 FileSize;サイズ
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;フォルダー
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;形式の設定 ラッピング方法
 Format_Tier;形式の層
 Format_Url;形式のURL
 Format_Version;形式 バージョン
+FormatDefinition;
 FpaManufacturer;FPA
 FpaPass;FPAパス
 FpaVersion;FPAバージョン
 FrameCount;フレーム数
 FrameRate;フレームレート
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最大フレームレート
 FrameRate_Minimum;最小フレームレート
 FrameRate_Mode;フレームレートの種類
@@ -681,6 +698,7 @@ ImageCount;画像ストリームの数
 ImmersiveStereo;
 Info;情報
 Instruments;Instruments
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;ネット用メディアタイプ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;キーワード
 Known codecs;対応するコーデック
 Known formats;対応する形式
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;Line Up 開始
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;色の数
+Object;
 ObjectCount;
 OK;OK
 One output file per input file;入力ファイルごとに単一ファイルで出力
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;最小総ビットレート
 OverallBitRate_Mode;総ビットレートの種類
 OverallBitRate_Nominal;総ビットレート名
 PackageName;パッケージ名
+PackFormat;
 Part;パート
 Part_Count;合計
 PartNumber;パート数
@@ -1127,6 +1134,7 @@ ProductionDesigner;美術監督
 ProductionNumber;製造番号
 ProductionStudio;スタジオ
 ProductPlacement;スタジオの場所
+Programme;
 ProgrammeHasText;プログラムの字幕の有無
 ProgrammeTextLanguage;プログラムの字幕の言語
 ProgrammeTitle;プログラムのタイトル
@@ -1163,6 +1171,8 @@ ScanType;走査方式
 ScanType_Original;元の走査方式
 ScanType_StoreMethod;走査方式の保存方法
 ScreenplayBy;監督
+ScreenToCenter;
+ScreenToFront;
 Season;シーズン
 SecondaryAudioLanguage;音声2の言語
 see below;詳細は下記
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;
 Stream;ストリーム
 Stream_MoreInfo;このストリームの詳細情報
 StreamCount;この種類のストリームの数
+StreamFormat;
 StreamID;ストリーム ID
 streamIdentifier;ストリーム識別子
 StreamKind;ストリーム種別
@@ -1266,20 +1277,28 @@ ThanksTo;謝辞
 Thousands separator;数値3桁ごとの区切り文字
 TimeCode;タイムコード
 TimeCode_FirstFrame;最初のフレームのタイムコード
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;タイムコードの設定
 TimeCode_Source;タイムコードの参照元
-TimeCode_Striped;タイムコードのストライプ
+TimeCode_Stripped;タイムコードのストライプ
 TimeStamp;タイムスタンプ
 TimeZone;タイムゾーン
 Title;タイトル
 Title_More;タイトルと詳細情報
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;計
 TotalNumberOfParts;パートの合計数
 TotalProgrammeDuration;プログラム全体の長さ
 Track;トラック
 Track_Count;トラック数
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;転送特性
@@ -1288,6 +1307,19 @@ Translator;翻訳者
 Transport;
 Tree;ツリー
 Tree & Text;ツリーとテキスト
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;トゥルーピーク
 TruePeakLevel_Album;トゥルーピーク (アルバム)
 Type;種類
@@ -1332,5 +1364,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;87
+ZZ_AutomaticLanguage_Percent;87

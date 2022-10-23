@@ -262,6 +262,9 @@ File_Mpegh3da::File_Mpegh3da()
     //In
     MustParse_mhaC=false;
     MustParse_mpegh3daFrame=false;
+    #if MEDIAINFO_CONFORMANCE
+        ConformanceFlags.set(MpegH);
+    #endif
 
     //Temp
     audioSceneInfoID=0;
@@ -621,6 +624,7 @@ void File_Mpegh3da::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Mpegh3da::Streams_Finish()
 {
+    Streams_Finish_Conformance();
 }
 
 //***************************************************************************

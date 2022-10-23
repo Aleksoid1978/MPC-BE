@@ -150,7 +150,12 @@
 : ;: 
 3D;
 3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;Пра праграму
 About_Hint;Як звязацца са мной і знайсці апошнюю версію праграмы
 Accompaniment;Суправаджэнне
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;
 Author;Аўтар
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;Штрыхкод
 Basic;Каротка
 Basic_Note;Падказка: для дадатковай інфармацыі абярыце іншую закладку (Табліца, Дрэва,...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Канал(ы)
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;Размяшчэнне каналаў
@@ -281,6 +290,7 @@ colour_range;
 Comment;Каментар
 CommissionedBy;Даручальнік
 Compilation;Кампіляцыя
+ComplementaryObject;
 CompleteName;Поўнае імя
 CompletionDate;
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;Са стратамі
 Compression_Ratio;Ступень сціску
 Conductor;Дырыжор
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Агульная інфармацыя
+Content;
 ContentType;Тып змесціва
 CoProducer;Сапрадзюсар
 Copyright;Праваўладальнік
@@ -308,6 +322,7 @@ Cover_Mime;MIME-тып вокладкі
 Cover_Type;Тып вокладкі
 Cropped;Памеры падрэзкі
 Custom;Выбаркова
+CustomDownmixTargets;
 Customize;Фармат вываду
 DarkMode;
 Date;Дата
@@ -342,7 +357,6 @@ DotsPerInch;Кропак на дзюйм
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Працягласць
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;Час пачатку
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Змяніць
 EditedBy;Зменена
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;Пошта
 Encoded_Application;Праграма-кадавальнік
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;Памер файла
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Тэчку
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Спасылка на фармат
 Format_Version;Версія фармату
+FormatDefinition;
 FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Лічыльнік кадраў
 FrameRate;Частата кадраў
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максімальная частата кадраў
 FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Mode;Рэжым частаты кадраў
@@ -681,6 +698,7 @@ ImageCount;Коль-ць струменяў малюнкаў
 ImmersiveStereo;
 Info;Інфармацыя
 Instruments;Прылады
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;Інтэрнэт-тып носьбіта
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Ключавыя словы
 Known codecs;Вядомыя кодэкі
 Known formats;Вядомыя фарматы
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Колькасць колераў
+Object;
 ObjectCount;
 OK;Добра
 One output file per input file;Адзін файл на кожны зыходны
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;Мінімальны агульны бітрэйт
 OverallBitRate_Mode;Рэжым агульнага бітрэйту
 OverallBitRate_Nominal;Намінальны агульны бітрэйт
 PackageName;
+PackFormat;
 Part;Частка
 Part_Count;Коль-ць частак
 PartNumber;
@@ -1127,6 +1134,7 @@ ProductionDesigner;Распрацоўнік афармлення
 ProductionNumber;
 ProductionStudio;Студыя афармлення
 ProductPlacement;
+Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
 ProgrammeTitle;
@@ -1163,6 +1171,8 @@ ScanType;Тып разгорткі
 ScanType_Original;
 ScanType_StoreMethod;
 ScreenplayBy;Сцэнарыст
+ScreenToCenter;
+ScreenToFront;
 Season;Сезон
 SecondaryAudioLanguage;
 see below;гл. ніжэй
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;
 Stream;Струмень
 Stream_MoreInfo;Дадатковая інфармацыя аб струмені
 StreamCount;Коль-ць струменяў
+StreamFormat;
 StreamID;Ідэнтыфікатар струменя
 streamIdentifier;
 StreamKind;Тып струменя
@@ -1266,20 +1277,28 @@ ThanksTo;Падзякі
 Thousands separator;Падзельнік тысяч
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
-TimeCode_Striped;
+TimeCode_Stripped;
 TimeStamp;
 TimeZone;Гадзінная зона
 Title;Загаловак
 Title_More;Загаловак
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Усяго
 TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Сцежка
 Track_Count;Коль-ць дарожак
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Характарыстыкі трансферу
@@ -1288,6 +1307,19 @@ Translator;Перакладчык
 Transport;
 Tree;Дрэва
 Tree & Text;Дрэва і тэкст
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
@@ -1332,5 +1364,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;71
-ZZ_AutomaticLanguage_Percent;75
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;73

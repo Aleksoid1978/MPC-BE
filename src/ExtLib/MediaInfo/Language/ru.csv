@@ -150,7 +150,12 @@
 : ;: 
 3D;3D
 3DType;Тип 3D
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;О программе
 About_Hint;Как связаться со мной и найти последнюю версию программы
 Accompaniment;Сопровождение
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;Макет аудиодорожки
 Author;Автор
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;Штрих-код
 Basic;Кратко
 Basic_Note;Примечание: для дополнительной информации выберите другую закладку (таблица, дерево,...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Каналы
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;Расположение каналов
@@ -281,6 +290,7 @@ colour_range;Цветовой диапазон
 Comment;Примечание
 CommissionedBy;Поручитель
 Compilation;Компиляция
+ComplementaryObject;
 CompleteName;Полное имя
 CompletionDate;Дата завершения
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;С потерями
 Compression_Ratio;Степень сжатия
 Conductor;Дирижёр
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;Контактный почтовый адрес
 ContactTelephoneNumber;Контактный телефон
 Container and general information;Общая информация
+Content;
 ContentType;Тип содержимого
 CoProducer;Сопродюсер
 Copyright;Авторское право
@@ -308,6 +322,7 @@ Cover_Mime;MIME-тип обложки
 Cover_Type;Тип обложки
 Cropped;Размеры подрезки
 Custom;Выборочно
+CustomDownmixTargets;
 Customize;Настройка
 DarkMode;
 Date;Дата
@@ -342,7 +357,6 @@ DotsPerInch;Точек на дюйм
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Продолжительность
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;Время начала
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Править
 EditedBy;Изменено
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;Почта
 Encoded_Application;Программа кодирования
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;Размер файла
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Папка
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;Режим переноса
 Format_Tier;
 Format_Url;Ссылка на формат
 Format_Version;Версия формата
+FormatDefinition;
 FpaManufacturer;Производитель FPA
 FpaPass;Пароль FPA
 FpaVersion;Версия FPA
 FrameCount;Счётчик кадров
 FrameRate;Частота кадров
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максимальная частота кадров
 FrameRate_Minimum;Минимальная частота кадров
 FrameRate_Mode;Режим частоты кадров
@@ -681,6 +698,7 @@ ImageCount;Количество потоков изображений
 ImmersiveStereo;
 Info;Информация
 Instruments;Инструменты
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;Интернет-тип носителя
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Ключевые слова
 Known codecs;Известные кодеки
 Known formats;Известные форматы
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;Начало построения
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Количество цветов
+Object;
 ObjectCount;
 OK;OK
 One output file per input file;Новый файл для каждого исходного
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;Минимальный общий битрейт
 OverallBitRate_Mode;Режим общего битрейта
 OverallBitRate_Nominal;Номинальный общий битрейт
 PackageName;
+PackFormat;
 Part;Часть
 Part_Count;Количество частей
 PartNumber;Номер части
@@ -1127,6 +1134,7 @@ ProductionDesigner;Художник-постановщик
 ProductionNumber;Номер постановки
 ProductionStudio;Студия-производитель
 ProductPlacement;Размещение постановки
+Programme;
 ProgrammeHasText;Текст в программе
 ProgrammeTextLanguage;Язык текста в программе
 ProgrammeTitle;Заголовок программы
@@ -1163,6 +1171,8 @@ ScanType;Тип развёртки
 ScanType_Original;Тип развёртки в оригинале
 ScanType_StoreMethod;Метод сохранения типа развёртки
 ScreenplayBy;Сценарист
+ScreenToCenter;
+ScreenToFront;
 Season;Сезон
 SecondaryAudioLanguage;Второй язык аудио
 see below;см. ниже
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;Раздельные поля (2-ое поле в 
 Stream;Поток
 Stream_MoreInfo;Дополнительная информация о потоке
 StreamCount;Количество потоков такого типа
+StreamFormat;
 StreamID;Идентификатор потока
 streamIdentifier;
 StreamKind;Тип потока
@@ -1266,20 +1277,28 @@ ThanksTo;Благодарности
 Thousands separator;Разделитель тысяч
 TimeCode;Временной код
 TimeCode_FirstFrame;Временной код первого кадра
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Параметры временного кода
 TimeCode_Source;Оригинал временного кода
-TimeCode_Striped;Временной код, чередующийся
+TimeCode_Stripped;Временной код, чередующийся
 TimeStamp;Временная метка
 TimeZone;Часовой пояс
 Title;Заголовок
 Title_More;Заголовок, дополнительно
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Всего
 TotalNumberOfParts;Общее количество частей
 TotalProgrammeDuration;Общая продолжительность программы
 Track;Трек
 Track_Count;Количество треков
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Характеристики трансфера
@@ -1288,6 +1307,19 @@ Translator;Переводчик
 Transport;
 Tree;Дерево
 Tree & Text;Дерево и текст
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Тип
@@ -1332,5 +1364,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;53
-ZZ_AutomaticLanguage_Percent;83
+ZZ_Automatic_Percent;52
+ZZ_AutomaticLanguage_Percent;81

@@ -346,6 +346,11 @@ File_Mpega::File_Mpega()
 //---------------------------------------------------------------------------
 void File_Mpega::Streams_Fill()
 {
+    File__Tags_Helper::Stream_Prepare(Stream_Audio);
+    Fill(Stream_Audio, 0, Audio_Format, "MPEG Audio");
+    if (!Frame_Count)
+        return;
+
     //VBR detection without header
     if (VBR_Frames==0)
     {
@@ -354,8 +359,6 @@ void File_Mpega::Streams_Fill()
             BitRate_Mode=__T("VBR");
     }
 
-    File__Tags_Helper::Stream_Prepare(Stream_Audio);
-    Fill(Stream_Audio, 0, Audio_Format, "MPEG Audio");
     Fill(Stream_Audio, 0, Audio_Format_Version, Mpega_Format_Profile_Version[ID]);
     Fill(Stream_Audio, 0, Audio_Format_Profile, Mpega_Format_Profile_Layer[layer]);
     if (mode && mode<4)

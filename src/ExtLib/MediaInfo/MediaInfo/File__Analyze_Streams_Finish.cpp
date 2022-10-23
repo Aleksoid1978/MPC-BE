@@ -1255,6 +1255,12 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
         if (!Z1.empty())
             Fill(Stream_Audio, Pos, Audio_BitRate_Mode, Z1);
     }
+
+    //Commercial name
+    if (Retrieve(Stream_Audio, Pos, Audio_Format_Commercial_IfAny).empty() && Retrieve(Stream_Audio, Pos, Audio_Format)==__T("USAC") && Retrieve(Stream_Audio, Pos, Audio_Format_Profile).rfind(__T("Extended HE AAC@"), 0)==0)
+    {
+        Fill(Stream_Audio, Pos, Audio_Format_Commercial_IfAny, "xHE-AAC");
+    }
 }
 
 //---------------------------------------------------------------------------

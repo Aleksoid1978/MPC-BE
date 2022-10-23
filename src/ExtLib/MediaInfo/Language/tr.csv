@@ -150,7 +150,12 @@
 : ;: 
 3D;3B
 3DType;3B Türü
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;Hakkında
 About_Hint;Bana nasıl ulaşacak ve son sürümü nasıl bulacaksınız
 Accompaniment;Eşlik eden
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;Ses İzi Düzeni
 Author;Hazırlayan
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;BarKod
 Basic;Temel
 Basic_Note;Not : Bu dosya hakkında daha fazla bilgi için farklı görünüm seçmek zorundasınız (Sayfa, Ağaç...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Kanal
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;Kanal düzeni
 ChannelMode;
 ChannelPositions;Kanal konumları
@@ -281,6 +290,7 @@ colour_range;Renk aralığı
 Comment;Yorum
 CommissionedBy;Görevlendiren
 Compilation;Derleme
+ComplementaryObject;
 CompleteName;Tam ad
 CompletionDate;Tamamlama Tarihi
 ComplexityIndex;Karmaşıklık indeksi
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;Kayıplı
 Compression_Ratio;Sıkıştırma oranı
 Conductor;Orkestra şefi
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;İletişim E-postası
 ContactTelephoneNumber;İletişim Telefon Numarası
 Container and general information;Kapsayıcı ve genel bilgiler
+Content;
 ContentType;İçerik Türü
 CoProducer;Yardımcı yapımcı
 Copyright;Telif Hakkı
@@ -308,6 +322,7 @@ Cover_Mime;Kapak MIME
 Cover_Type;Kapak türü
 Cropped;Kırpma boyutları
 Custom;Özel
+CustomDownmixTargets;
 Customize;Özelleştir
 DarkMode;
 Date;Tarih
@@ -342,7 +357,6 @@ DotsPerInch;İnç başına nokta
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Süre
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;Başlangıç zamanı
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Düzenle
 EditedBy;Düzenleyen
 EditorialClassification;
+ElementaryStream;
 ElementCount;Öğe sayısı
 EMail;E-Posta
 Encoded_Application;Yazma uygulaması
@@ -395,6 +411,7 @@ FileNameExtension;Dosya adı uzantısı
 FileSize;Dosya boyutu
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Klasör
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;Biçim ayarları, kaydırma kipi
 Format_Tier;Biçim katmanı
 Format_Url;Biçim için web bağlantısı
 Format_Version;Biçim sürümü
+FormatDefinition;
 FpaManufacturer;FPA Üreticisi
 FpaPass;FPA Pass
 FpaVersion;FPA Sürümü
 FrameCount;Kare sayısı
 FrameRate;Kare hızı
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;En fazla kare hızı
 FrameRate_Minimum;En az kare hızı
 FrameRate_Mode;Kare hızı kipi
@@ -681,6 +698,7 @@ ImageCount;Resim akışları sayısı
 ImmersiveStereo;
 Info;Bilgi
 Instruments;Enstrüman
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;Internet medya türü
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Anahtar kelime
 Known codecs;Bilinen kodekler
 Known formats;Bilinen biçimler
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;Sıra Başlangıcı
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Renk sayısı
+Object;
 ObjectCount;
 OK;TAMAM
 One output file per input file;Girdi dosyası başına bir çıktı dosyası
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;En Az Kapsamlı bit hızı
 OverallBitRate_Mode;Kapsamlı bit hızı kipi
 OverallBitRate_Nominal;Düşük Kapsamlı bit hızı
 PackageName;Paket adı
+PackFormat;
 Part;Parça
 Part_Count;Toplam sayı
 PartNumber;Parça Numarası
@@ -1127,6 +1134,7 @@ ProductionDesigner;Üretim tasarımcısı
 ProductionNumber;Üretim Numarası
 ProductionStudio;Üretim sütüdyosu
 ProductPlacement;Ürün Yerleştirme
+Programme;
 ProgrammeHasText;Programda Metin Var
 ProgrammeTextLanguage;Program Metin Dili
 ProgrammeTitle;Program Başlığı
@@ -1163,6 +1171,8 @@ ScanType;Tarama türü
 ScanType_Original;Orijinal tarama türü
 ScanType_StoreMethod;Tarama türü, saklama yöntemi
 ScreenplayBy;Senaryo
+ScreenToCenter;
+ScreenToFront;
 Season;Sezon
 SecondaryAudioLanguage;İkincil Ses Dili
 see below;aşağı bakın
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;Ayrılmış alanlar (blok başına 2 alan)
 Stream;Akış
 Stream_MoreInfo;Akış hakkında daha fazla bilgi
 StreamCount;Bu çeşidin akış sayısı
+StreamFormat;
 StreamID;Akış ID
 streamIdentifier;
 StreamKind;Akış çeşidi
@@ -1266,20 +1277,28 @@ ThanksTo;Teşekkürler
 Thousands separator;Binlik basamak ayırıcı
 TimeCode;Zaman kodu
 TimeCode_FirstFrame;İlk karenin zaman kodu
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Zaman kodu ayarları
 TimeCode_Source;Zaman kodu kaynağı
-TimeCode_Striped;Zaman kodu, şeritli
+TimeCode_Stripped;Zaman kodu, şeritli
 TimeStamp;Zaman damgası
 TimeZone;Saat dilimi
 Title;Başlık
 Title_More;Başlık, daha fazla bilgi
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Toplam
 TotalNumberOfParts;Parçaların Toplam Sayısı
 TotalProgrammeDuration;Toplam Program Süresi
 Track;Parça adı
 Track_Count;Parça sayısı
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Aktarım nitelikleri
@@ -1288,6 +1307,19 @@ Translator;Çevirmen
 Transport;
 Tree;Ağaç
 Tree & Text;Ağaç ve Metin
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Tür
@@ -1332,5 +1364,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;85
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;83

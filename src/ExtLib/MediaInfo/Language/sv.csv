@@ -150,7 +150,12 @@
 : ;:
 3D;3D
 3DType;3D-typ
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;Om
 About_Hint;Kontakt - och versionsinformation
 Accompaniment;Ackompanjemang
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;Ljudspårslayout
 Author;Författare
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;Streckkod
 Basic;Enkel
 Basic_Note;OBS! För mer information om den här filen, måste du välja en annan vy (Lista, Träd...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Kanal(er)
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;Kanalpositioner
@@ -281,6 +290,7 @@ colour_range;Färgskala
 Comment;Kommentar
 CommissionedBy;På uppdrag av
 Compilation;Kompilering
+ComplementaryObject;
 CompleteName;Fullständigt namn
 CompletionDate;Färdigställd
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;Förstörande
 Compression_Ratio;Komprimeringsförhållande
 Conductor;Dirigent
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;E-postkontakt
 ContactTelephoneNumber;Telefonkontakt
 Container and general information;Behållare och allmän information
+Content;
 ContentType;Innehållstyp
 CoProducer;Medproducent
 Copyright;Copyright
@@ -308,6 +322,7 @@ Cover_Mime;Omslagsformat
 Cover_Type;Omslagstyp
 Cropped;Beskärningsstorlek
 Custom;Anpassad
+CustomDownmixTargets;
 Customize;Anpassa
 DarkMode;
 Date;Datum
@@ -342,7 +357,6 @@ DotsPerInch;Punkter per inch
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Varaktighet
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;Starttid
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Redigera
 EditedBy;Redigerad av
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;E-post
 Encoded_Application;Skrivande program
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;Filstorlek
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Mapp
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;Formatinställningar, Omslagsläge
 Format_Tier;
 Format_Url;Webblänk för format
 Format_Version;Formatversion
+FormatDefinition;
 FpaManufacturer;FPA Tillverkare
 FpaPass;FPA Pass
 FpaVersion;FPA Version
 FrameCount;Antal bildrutor
 FrameRate;Bildfrekvens
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Max. bildfrekvens
 FrameRate_Minimum;Min. bildfrekvens
 FrameRate_Mode;Bildfrekvensläge
@@ -681,6 +698,7 @@ ImageCount;Antal bildströmmar
 ImmersiveStereo;
 Info;Info
 Instruments;Instrument
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;Internetmediatyp
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Nyckelord
 Known codecs;Kända kodekar
 Known formats;Kända format
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Antal färger
+Object;
 ObjectCount;
 OK;OK
 One output file per input file;En utdatafil per indatafil
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;Min. sammanlagt dataflöde
 OverallBitRate_Mode;Sammanlagt dataflödesläge
 OverallBitRate_Nominal;Nominellt sammanlagt dataflöde
 PackageName;
+PackFormat;
 Part;Del
 Part_Count;Totalt antal
 PartNumber;Delnummer
@@ -1127,6 +1134,7 @@ ProductionDesigner;Produktionsdesigner
 ProductionNumber;Produktionsnummer
 ProductionStudio;Produktionsstudio
 ProductPlacement;Produktplacering
+Programme;
 ProgrammeHasText;Programmet har text
 ProgrammeTextLanguage;Textspråk
 ProgrammeTitle;Programtitel
@@ -1163,6 +1171,8 @@ ScanType;Skanningstyp
 ScanType_Original;Ursprunglig skanningstyp
 ScanType_StoreMethod;Skanningsordning, lagringsmetod
 ScreenplayBy;Framträdande av
+ScreenToCenter;
+ScreenToFront;
 Season;Säsong
 SecondaryAudioLanguage;Sekundärt ljudspråk
 see below;Se nedan
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;Separerade fält (2 fält per block)
 Stream;Ström
 Stream_MoreInfo;Mer information om strömmen
 StreamCount;Antal strömmar av den här typen
+StreamFormat;
 StreamID;Ström-ID
 streamIdentifier;
 StreamKind;Strömtyp
@@ -1266,20 +1277,28 @@ ThanksTo;Tack till
 Thousands separator;Tusentalseparator
 TimeCode;Tidskod
 TimeCode_FirstFrame;Tidskod för första bildrutan
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;Tidskodinställningar
 TimeCode_Source;Tidskodskälla
-TimeCode_Striped;Tidskod, förinspelad
+TimeCode_Stripped;Tidskod, förinspelad
 TimeStamp;Tidsstämpel
 TimeZone;Tidszon
 Title;Ttitel
 Title_More;Title, mer info
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Totalt
 TotalNumberOfParts;Totalt antal delar
 TotalProgrammeDuration;Totalt programvaraktighet
 Track;Spårnamn
 Track_Count;Antal spår
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Överföringsegenskaper
@@ -1288,6 +1307,19 @@ Translator;Översättare
 Transport;
 Tree;Träd
 Tree & Text;Träd & Text
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Typ
@@ -1332,5 +1364,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;82
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;80

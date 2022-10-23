@@ -1,7 +1,7 @@
   Language_ISO639;zh-CN
   Author_Email;stevenlele@outlook.com
   Author_Name;stevenlele
-  Author_OldNames;chriszxl, erabbit, weiq530
+  Author_OldNames;chriszxl, erabbit, weiq530, nkh0472
   Language_Name;简体中文
   Config_Text_ColumnSize;30
   Config_Text_Separator; : 
@@ -34,7 +34,7 @@
  day1; 天
  day2; 天
  day3; 天
- dB0;
+ dB0;0 dB
  dB1; dB
  dB2; dB
  dB3; dB
@@ -118,9 +118,9 @@
  month1; 月
  month2; 月
  month3; 月
- object1;
- object2;
- object3;
+ object1; 个对象
+ object2; 个对象
+ object3; 个对象
  pixel1; 像素
  pixel2; 像素
  pixel3; 像素
@@ -150,22 +150,27 @@
 : ;: 
 3D;3D
 3DType;3D 类型
-608_Mode;
+5.1.2ch;5.1.2
+5.1.4ch;5.1.4
+5.1ch;5.1
+608_Mode;EIA-608转换模式
+7.1.2ch;7.1.2
+7.1ch;7.1
 About;关于
-About_Hint;联系作者；获取最新版
+About_Hint;联系作者并获取最新版
 Accompaniment;伴奏
 ActiveFormatDescription;活动图像标识符 (AFD)
 ActiveFormatDescription_MuxingMode;活动图像标识符 (AFD), 混流模式
 Actor;演员
 Actor_Character;饰演角色
-Add creation date to text output;
-Add version to text output;
+Add creation date to text output;将创建日期添加到文本输出
+Add version to text output;将版本添加到文本输出
 Added_Date;添加日期
 Address;地址
 AdID;广告 ID 标识符
-ADM: Show ChannelFormats;
-ADM: Show TrackUIDs;
-AdmProfile;
+ADM: Show ChannelFormats;ADM：显示频道格式
+ADM: Show TrackUIDs;ADM：显示 TrackUID
+AdmProfile;ADM 配置文件
 Advanced;高级
 Advanced mode;高级模式
 Album;专辑
@@ -181,7 +186,7 @@ Arranger;编曲
 ArtDirector;艺术指导
 AspectRatio;宽高比
 AssistantDirector;副导演
-AssociatedVideo_FrameRate;
+AssociatedVideo_FrameRate;相关视频帧率
 at;@
 At least one file;(至少要打开一个文件)
 Audio;音频
@@ -192,20 +197,23 @@ Audio1;音频 1
 Audio2;音频 2
 AudioComments;音频注释
 AudioCount;音频流总数
-AudioDescription;
+AudioDescription;音频说明
 AudioDescriptionPresent;含有音频说明
 AudioDescriptionType;音频说明类型
 AudioLoudnessStandard;音频响度标准
-AudioRenderingIndication;
-AudioSceneInfoID;
+AudioRenderingIndication;音频渲染指示
+AudioSceneInfoID;音频场景信息 ID
 AudioTrackLayout;音轨格式
 Author;作者
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;条形码
 Basic;基本
 Basic_Note;提示：请选择表格、树状图等其他视图了解更多文件信息
 BedChannelConfiguration;音床声道配置
 BedChannelCount;音床声道数
-BinauralRenderMode;
+BinauralRenderMode;双耳渲染模式
 BitDepth;位深
 BitDepth_Detected;检测到的位深
 BitDepth_Stored;存储的位深
@@ -220,12 +228,13 @@ BitRate_Nominal;额定码率
 Bits-(Pixel*Frame);数据密度 [码率/(像素*帧率)]
 BufferSize;缓冲大小
 Cancel;取消
-CaptionServiceName;
+CaptionServiceName;字幕服务名称
 Channel(s);声道数
-ChannelCoded;
-ChannelConfiguration;
-ChannelLayout;声道格式
-ChannelMode;
+ChannelCoded;通道编码
+ChannelConfiguration;通道配置
+ChannelFormat;频道格式
+ChannelLayout;频道布局
+ChannelMode;频道模式
 ChannelPositions;声道位置
 Chapter(s);章节数
 Chapters;章节
@@ -244,7 +253,7 @@ Choose language;选择语言
 Choreographer;动作指导
 Chroma;色度
 ChromaSubsampling;色度抽样
-Classifier;
+Classifier;内容分类器
 ClearList;清除列表
 Close;关闭
 Close all before open;打开新文件前关闭其他文件
@@ -281,6 +290,7 @@ colour_range;色彩范围
 Comment;注释
 CommissionedBy;委托人
 Compilation;选集
+ComplementaryObject;互补对象
 CompleteName;完整名称
 CompletionDate;完整日期
 ComplexityIndex;复杂度指数
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;有损
 Compression_Ratio;压缩率
 Conductor;指挥
 ConformanceCheck;符合性检查
+ConformanceErrors;符合性错误
+ConformanceInfos;符合性信息
+ConformanceWarnings;符合性警告
 ContactEmail;联络邮件
 ContactTelephoneNumber;联络电话号码
 Container and general information;容器格式和一般信息
+Content;内容
 ContentType;内容类型
 CoProducer;联合制片人
 Copyright;版权
@@ -308,23 +322,24 @@ Cover_Mime;封面 MIME
 Cover_Type;封面类型
 Cropped;裁剪信息
 Custom;自定义
+CustomDownmixTargets;自定义缩混目标
 Customize;自定义
 DarkMode;深色模式
 Date;日期
 Debug;调试
 Decimal point;小数点
 Default_Setting;系统默认
-DefaultTargetDeviceConfig;
+DefaultTargetDeviceConfig;默认目标设备配置
 Delay;延迟
 Delay_Source;延迟来源
 Delay_Source_Container;容器
 Delay_Source_Stream;媒体流
 Delete;删除
 Description;说明
-dialnorm;
-DialogueCorrected;
-DialogueEnhancement;
-DialogueNormalization;
+dialnorm;对话规范化
+DialogueCorrected;对话更正
+DialogueEnhancement;对话增强
+DialogueNormalization;对话标准化
 Digitized_Date;数字化日期
 Dimensions;尺寸
 Director;导演
@@ -335,27 +350,28 @@ DisplayAspectRatio_CleanAperture;干净光圈画面比例
 DisplayAspectRatio_Original;原始画面比例
 DistributedBy;发行商
 Distributor;发行商
-Dolby_Atmos_Metadata;
-DolbyAtmos;
+Dolby_Atmos_Metadata;杜比全景声元数据
+DolbyAtmos;杜比全景声
 Donate;赞助
 DotsPerInch;DPI
-Downmix;
-Downmix_5.1.x;
-Downmix_5to2;
-Downmix_5to2_90deg;
+Downmix;缩混
+Downmix_5.1.x;5.1 和 5.1.x 缩混
+Downmix_5to2;5.1 到 2.0 缩混
 DrcSets_Count;DRC 组数
 DrcSets_Effects;DRC 效果类型
 Duration;时长
 Duration_End;结束时间
-Duration_End_Command;
+Duration_End_Command;结束时间（命令）
 Duration_Start;开始时间
-Duration_Start_Command;
-Duration_Start2End;
-DynamicRangeControl;
-Eac3DrcProfile;
+Duration_Start_Command;开始时间（命令）
+Duration_Start2End;可见内容的持续时间
+DynamicObject;动态对象
+DynamicRangeControl;动态范围控制
+Eac3DrcProfile;E-AC-3 DRC 配置文件
 Edit;编辑
 EditedBy;编辑者
-EditorialClassification;
+EditorialClassification;编辑分类
+ElementaryStream;基本码流
 ElementCount;元素总数
 EMail;电子邮件
 Encoded_Application;编码程序
@@ -368,10 +384,10 @@ EPG_Positions;EPG 位置 (内部)
 EpisodeTitleNumber;集数标题
 Error_File;读取文件出错
 Error_File_Write;写入文件出错
-Events_PaintOn;
-Events_PopOn;
-Events_RollUp;
-Events_Total;
+Events_PaintOn;PaintOn 事件的计数
+Events_PopOn;PopOn 事件的计数
+Events_RollUp;RollUp 事件的计数
+Events_Total;事件总计数
 ExecutiveProducer;出品人
 Exit;退出
 Exit_Hint;退出程序
@@ -393,10 +409,11 @@ FileExtension;扩展名
 FileName;文件名
 FileNameExtension;文件名和扩展名
 FileSize;文件大小
-FirstDisplay_Delay_Frames;
-FirstDisplay_Type;
-FlatPanelTv;
-FlowID;
+FirstDisplay_Delay_Frames;第一个事件之前的帧数
+FirstDisplay_Type;第一个事件的类型
+FirstFrameOfAction;动作的第一帧
+FlatPanelTv;平板电视
+FlowID;流 ID
 Folder;文件夹
 Folder (R);文件夹 (R)
 Folder (R)_Hint;选择一个文件夹 (包含所有子文件夹)
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;格式设置, 封装模式
 Format_Tier;格式等级 (Tier)
 Format_Url;格式网址
 Format_Version;格式版本
+FormatDefinition;格式定义
 FpaManufacturer;FPA 制造商
 FpaPass;FPA 通过
 FpaVersion;FPA 版本
 FrameCount;总帧数
 FrameRate;帧率
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最高帧率
 FrameRate_Minimum;最低帧率
 FrameRate_Mode;帧率模式
@@ -453,7 +470,7 @@ FrameRate_Mode_CFR;恒定帧率 (CFR)
 FrameRate_Mode_VFR;动态帧率 (VFR)
 FrameRate_Nominal;额定帧率
 FrameRate_Original;原始帧率
-FrameRate_Real;
+FrameRate_Real;真实帧率
 General;概览
 Genre;流派
 Genre_000;Blues
@@ -653,10 +670,10 @@ Gop_OpenClosed;GOP 开闭
 Gop_OpenClosed_Closed;封闭 (Closed)
 Gop_OpenClosed_FirstFrame;第一帧 GOP 开闭
 Gop_OpenClosed_Open;开放 (Open)
-Graph;
+Graph;图形
 Group;
 Grouping;分组
-GroupPreset;
+GroupPreset;组预设
 h; 时
 HDR_Format;HDR 格式
 Header file;创建头文件
@@ -665,7 +682,7 @@ Height_CleanAperture;干净光圈高度
 Height_Original;原始高度
 Help;帮助
 Hint;提示
-HomeTheaterAvr;
+HomeTheaterAvr;家庭影院 AVR
 How many audio streams?;有多少个音频流？
 How many chapters streams?;有多少个章节流？
 How many text streams?;有多少个字幕流？
@@ -673,17 +690,18 @@ How many video streams?;有多少个视频流？
 HTML;网页
 ID;ID
 IdentClockStart;报时画面起始点
-IFrameInterval;
+IFrameInterval;I帧间隔
 Image;图像
 Image stream(s);图像流
 Image_Codec_List;图像解码器
 ImageCount;图像流总数
-ImmersiveStereo;
+ImmersiveStereo;沉浸式立体声
 Info;信息
 Instruments;乐器
-IntegratedLoudness_Level;
-IntegratedLoudness_Speech;
-InteractivityEnabled;
+IntegratedLoudness;综合响度
+IntegratedLoudness_Level;综合响度 (level gated)
+IntegratedLoudness_Speech;综合响度 (speech gated)
+InteractivityEnabled;启用交互
 Interlaced_BFF;底场优先 (BFF)
 Interlaced_Interlaced;隔行扫描 (交错)
 Interlaced_PPF;逐行扫描 (连续)
@@ -698,21 +716,6 @@ InternetMediaType;网络媒体类型
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;关键词
 Known codecs;已知解码器
 Known formats;已知格式
@@ -921,23 +924,25 @@ Language_zu;祖鲁语 (Zulu)
 LawRating;分级
 LCCN;LCCN
 LfeAttenuationKnown;
-LfeMixGain;
+LfeMixGain;LFE 混合增益
 Library;混流函数库
-Lifetime_Subscribe_Button;
+Lifetime_Subscribe_Button;终身订阅价格 %PRICE%
 Lightness;亮度
-Lines_Count;
-Lines_MaxCountPerEvent;
+Lines_Count;行数
+Lines_MaxCountPerEvent;每个事件的最大行数
 LineUpStart;Line Up 起始点
 LinkedTo_Bed_Pos;
-LinkedTo_ChannelFormat_Pos;
-LinkedTo_Content_Pos;
+LinkedTo_ChannelFormat_Pos;频道格式 #s
+LinkedTo_ComplementaryObject_Pos;
+LinkedTo_Content_Pos;内容 #s
 LinkedTo_Group_Pos;
-LinkedTo_Object_Pos;
-LinkedTo_PackFormat_Pos;
-LinkedTo_SignalGroup_Pos;
-LinkedTo_Substream_Pos;
-LinkedTo_TrackFormat_Pos;
-LinkedTo_TrackUID_Pos;
+LinkedTo_Object_Pos;对象 #s
+LinkedTo_PackFormat_Pos;包格式 #s
+LinkedTo_SignalGroup_Pos;信号组 #s
+LinkedTo_StreamFormat_Pos;流格式 #s
+LinkedTo_Substream_Pos;子流 #s
+LinkedTo_TrackFormat_Pos;轨道格式 #s
+LinkedTo_TrackUID_Pos;轨道UID #s
 List;列表
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
@@ -973,9 +978,9 @@ matrix_coefficients;矩阵系数
 Matrix_Format;矩阵编码, 格式
 MaxCLL;最大内容亮度 (CLL)
 MaxFALL;最大帧平均亮度 (FALL)
-MaxGain;
-MaximumMomentaryLoudness;
-MaxTruePeak;
+MaxGain;最大增益
+MaximumMomentaryLoudness;最大瞬时响度
+MaxTruePeak;最大真实峰值
 MediaInfo_About;使用 MediaInfo 可以轻松读取音视频文件的编码和标签信息。\r\n本软件按 BSD 授权协议开源，用户可以免费使用，开发者也可以自由地学习、修改、重新发布本软件。（Mac App Store 图形界面除外）
 MediaInfo_About_About;MediaInfo v%MI_VERSION%，内置 MediaInfoLib v%MIL_VERSION%
 Menu;菜单
@@ -985,9 +990,9 @@ Menu_Hint;更多选择
 Menu_No;无菜单
 MenuCount;菜单流总数
 MenuID;菜单 ID
-Metadata_Format;
-Metadata_Format_Type;
-Metadata_MuxingMode;
+Metadata_Format;元数据格式
+Metadata_Format_Type;元数据帧类型
+Metadata_MuxingMode;元数据复用模式
 MixType;
 mn; 分
 Mood;情绪
@@ -1010,20 +1015,21 @@ NewVersion_Question_Content;有新版本 (v%Version%)，要下载吗？
 NewVersion_Question_Title;新版本已发布！
 No;否
 Not yet;尚无
-NumberOfChannelFormats;
-NumberOfContents;
+NumberOfChannelFormats;频道格式数
+NumberOfContents;内容数
 NumberOfDynamicObjects;动态对象总数
-NumberOfElementaryStreams;
-NumberOfObjects;
-NumberOfPackFormats;
+NumberOfElementaryStreams;基本码流的数量
+NumberOfObjects;对象数
+NumberOfPackFormats;包格式数量
 NumberOfPresentations;
 NumberOfProgrammes;
-NumberOfStreamFormats;
-NumberOfSubstreams;
-NumberOfTrackFormats;
-NumberOfTrackUIDs;
+NumberOfStreamFormats;流格式数
+NumberOfSubstreams;子流数
+NumberOfTrackFormats;轨道格式数
+NumberOfTrackUIDs;轨道 UID 数量
 NumColors;色彩数量
-ObjectCount;
+Object;对象
+ObjectCount;对象计数
 OK;确定
 One output file per input file;一个输入文件对应一个输出文件
 Open;打开
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;最低总体码率
 OverallBitRate_Mode;总体码率模式
 OverallBitRate_Nominal;额定总体码率
 PackageName;包名
+PackFormat;包格式
 Part;分段
 Part_Count;总数
 PartNumber;分段编号
@@ -1104,14 +1111,14 @@ Played_First_Date;首次播放时间
 Played_Last_Date;上次播放时间
 PlayTime;播放时长
 PodcastCategory;播客类别
-PortableHeadphones;
-PortableSpeakers;
+PortableHeadphones;便携式耳机
+PortableSpeakers;便携式扬声器
 Position;位置
-Position_Cartesian;
-Position_Polar;
+Position_Cartesian;位置（笛卡尔）
+Position_Polar;位置（极性）
 Position_Total;总数
 Preferences;设置
-PreferredDownmix;
+PreferredDownmix;首选缩混
 Premium;高级版
 Premium_Summary;高级版订阅功能
 PreselectionLabel;
@@ -1127,6 +1134,7 @@ ProductionDesigner;制作设计师
 ProductionNumber;制作编号
 ProductionStudio;出品工作室
 ProductPlacement;产品布置
+Programme;节目
 ProgrammeHasText;节目含有文本
 ProgrammeTextLanguage;节目文本语言
 ProgrammeTitle;节目标题
@@ -1135,18 +1143,18 @@ Purchased_Date;购买日期
 Quote character;引号
 RadioStation;广播电台
 Rating;分级
-RealtimeLoudnessCorrected;
+RealtimeLoudnessCorrected;实时响度校正
 Recorded_Date;录制日期
 Recorded_Location;录制地点
 Released_Date;发行日期
 RemixedBy;混音者
-RenderMode;
+RenderMode;渲染模式
 Renew;续订
 ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益峰值
 Report;报告
 Resolution;分辨率
-RestoreLifetimeSubscription;
+RestoreLifetimeSubscription;恢复终身订阅
 s; 秒
 SamplePeakLevel;采样峰值等级
 SamplePeakLevel_Album;采样峰值等级 (专辑)
@@ -1163,6 +1171,8 @@ ScanType;扫描类型
 ScanType_Original;原始扫描类型
 ScanType_StoreMethod;扫描类型储存方式
 ScreenplayBy;编剧
+ScreenToCenter;屏幕居中
+ScreenToFront;屏幕置前
 Season;季期
 SecondaryAudioLanguage;第二音频语言
 see below;点击展开详情
@@ -1188,11 +1198,11 @@ ShimName;Shim 名称
 ShimVersion;Shim 版本
 Show menu;显示菜单
 Show toolbar;显示工具栏
-SignalGroup;
+SignalGroup;信号组
 SigningPresent;含有签名
 SignLanguage;签名语言
 Sort;排序
-SoundCategory;
+SoundCategory;声音类别
 SoundEngineer;录音师
 Source;源
 Source_Duration;源, 时长
@@ -1200,7 +1210,7 @@ Source_FrameCount;源, 帧数
 Source_SamplingCount;源, 采样数
 Source_StreamSize;源, 流大小
 Source_StreamSize_Encoded;源, 编码后流大小
-SpokenSubtitles;
+SpokenSubtitles;语音字幕
 Standard;标准
 StoreMethod_InterleavedFields;交错场
 StoreMethod_SeparatedFields;单独场
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;单独场（每分块 2 场）
 Stream;流
 Stream_MoreInfo;关于此流的更多信息
 StreamCount;此类型流的数量
+StreamFormat;流格式
 StreamID;流 ID
 streamIdentifier;流标识符
 StreamKind;流类型
@@ -1231,11 +1242,11 @@ Subscription_Active;订阅有效期至 %DATE%
 Subscription_Android;%PRICE%/年（免费试用 3 天）
 Subscription_Ended;你的订购刚刚到期。
 Subscription_Expired;订购过期时间 %DATE%
-Subscription_Lifetime;
+Subscription_Lifetime;检测到终身订阅
 Subscription_Thanks;已检测到订阅。感谢您的支持！
-Substream;
-SubTrack;副轨道
-SubtstreamIdChannel;
+Substream;子流
+SubTrack;子轨道
+SubtstreamIdChannel;子流开始ID & 频道索引
 Summary;摘要
 Supported formats;支持格式
 Supported?;是否支持
@@ -1246,7 +1257,7 @@ Synopsis;系统摘要
 SystemId;ID
 Tagged_Application;标记软件
 Tagged_Date;标记日期
-TargetDeviceConfig;
+TargetDeviceConfig;目标设备配置
 Technician;技术员
 TermsOfUse;使用条款
 TertiaryAudioLanguage;第三音频语言
@@ -1266,32 +1277,53 @@ ThanksTo;鸣谢
 Thousands separator;千位分隔符
 TimeCode;时间码
 TimeCode_FirstFrame;第一帧时间码
-TimeCode_MaxFrameNumber;
-TimeCode_MaxFrameNumber_Theory;
+TimeCode_LastFrame;最后一帧时间码
+TimeCode_MaxFrameNumber;时间码中的最大帧数
+TimeCode_MaxFrameNumber_Theory;时间码中的理论最大帧数
 TimeCode_Settings;时间码设置
 TimeCode_Source;时间码源
-TimeCode_Striped;时间码, 条带化
+TimeCode_Stripped;时间码, 条带化
 TimeStamp;时间戳
 TimeZone;时区
 Title;标题
 Title_More;标题, 更多信息
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;总计
 TotalNumberOfParts;分段总数
 TotalProgrammeDuration;节目时长总计
 Track;轨道名
 Track_Count;轨道数
-TrackIndex;
-TrackUID;
+TrackFormat;轨道格式
+TrackIndex;轨道索引
+TrackUID;轨道UID
 transfer_characteristics;传输特性
 Translate_Reports;翻译报告
 Translator;翻译
 Transport;
 Tree;树状图
 Tree & Text;树状图和文本
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;真实峰值等级
 TruePeakLevel_Album;真实峰值等级 (专辑)
 Type;类型
-TypeDefinition;
+TypeDefinition;类型定义
 UniqueID;特征 ID
 UniversalAdID;通用广告 ID
 UniversalAdID_Registry;通用广告 ID 登记处
@@ -1332,5 +1364,5 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;87
+ZZ_AutomaticLanguage_Percent;87

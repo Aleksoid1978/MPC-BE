@@ -37,6 +37,7 @@ private :
     void Streams_Fill();
 
     //Buffer - Global
+    void Read_Buffer_OutOfBand();
     void Read_Buffer_Continue ();
 };
 

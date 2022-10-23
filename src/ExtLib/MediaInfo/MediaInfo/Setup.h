@@ -68,6 +68,9 @@
     #if !defined (MEDIAINFO_TRACE_NO) && !defined (MEDIAINFO_TRACE_YES)
         #define MEDIAINFO_TRACE_NO
     #endif
+    #if !defined (MEDIAINFO_CONFORMANCE_NO) && !defined (MEDIAINFO_CONFORMANCE_YES)
+        #define MEDIAINFO_CONFORMANCE_NO
+    #endif
     #if !defined (MEDIAINFO_FILTER_NO) && !defined (MEDIAINFO_FILTER_YES)
         #define MEDIAINFO_FILTER_NO
     #endif
@@ -246,6 +249,16 @@
         #define MEDIAINFO_ADVANCED2 1
     #else
         #define MEDIAINFO_ADVANCED2 0
+    #endif
+#endif
+#if !defined(MEDIAINFO_CONFORMANCE)
+    #if defined(MEDIAINFO_CONFORMANCE_NO) && defined(MEDIAINFO_CONFORMANCE_YES)
+        #undef MEDIAINFO_CONFORMANCE_NO //MEDIAINFO_CONFORMANCE_YES has priority
+    #endif
+    #if defined(MEDIAINFO_CONFORMANCE_NO)
+        #define MEDIAINFO_CONFORMANCE 0
+    #else
+        #define MEDIAINFO_CONFORMANCE 1
     #endif
 #endif
 #if !defined(MEDIAINFO_MD5)

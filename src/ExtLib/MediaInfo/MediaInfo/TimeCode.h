@@ -63,6 +63,9 @@ public:
         size_t const pos;
     };
 
+    constexpr14 bitset8() : stored(0) {}
+    constexpr14 bitset8(int8u val) : stored(val) {}
+
     constexpr14 bitset8& reset() noexcept
     {
         stored=0;
@@ -101,9 +104,31 @@ public:
         return test(pos);
     }
 
+    constexpr14 int8u to_int8u() const noexcept
+    {
+        return stored;
+    }
+
+    constexpr14 explicit operator bool() const noexcept
+    {
+        return stored;
+    }
+
 private:
     int8u stored=0;
 };
+
+inline int8u operator | (const bitset8 a, const bitset8 b) noexcept
+{
+    return a.to_int8u() | b.to_int8u();
+}
+
+inline int8u operator & (const bitset8 a, const bitset8 b) noexcept
+{
+    return a.to_int8u() & b.to_int8u();
+}
+
+
 
 //***************************************************************************
 // Class TimeCode

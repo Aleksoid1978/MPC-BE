@@ -188,7 +188,6 @@ void File_Other::Read_Buffer_Continue()
         return;
     }
     else if (CC4(Buffer)==0x504C5646) {Format=__T("PlayLater Video");}
-    else if (CC4(Buffer)==CC4("")) {Format=__T("");}
 
     if (Format.empty())
     {

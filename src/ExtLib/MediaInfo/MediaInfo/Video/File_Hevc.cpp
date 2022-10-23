@@ -971,6 +971,7 @@ void File_Hevc::Read_Buffer_Unsynched()
     TemporalReferences_Offset=0;
     TemporalReferences_Offset_pic_order_cnt_lsb_Last=0;
     TemporalReferences_pic_order_cnt_Min=0;
+    pic_order_cnt_DTS_Ref=(int64u)-1;
 
     //Text
     #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
@@ -3002,8 +3003,14 @@ void File_Hevc::slice_segment_header()
         FrameRate=0;
     if (first_slice_segment_in_pic_flag && pic_order_cnt_DTS_Ref!=(int64u)-1 && FrameInfo.PTS!=(int64u)-1 && FrameRate && TemporalReferences_Reserved)
     {
+        int64s pic_order_cnt=float64_int64s(int64s(FrameInfo.PTS-pic_order_cnt_DTS_Ref)*FrameRate/1000000000);
+        if (pic_order_cnt>=TemporalReferences.size()/4 || pic_order_cnt<=-((int64s)TemporalReferences.size()/4))
+            pic_order_cnt_DTS_Ref=(int64u)-1; // Incoherency in DTS? Disabling compute by DTS, TODO: more generic test (all formats)
+    }
+    if (first_slice_segment_in_pic_flag && pic_order_cnt_DTS_Ref!=(int64u)-1 && FrameInfo.PTS!=(int64u)-1 && FrameRate && TemporalReferences_Reserved)
+    {
         //Frame order detection
-        int64s pic_order_cnt=float64_int64s((FrameInfo.PTS-pic_order_cnt_DTS_Ref)*FrameRate/1000000000);
+        int64s pic_order_cnt=float64_int64s(int64s(FrameInfo.PTS-pic_order_cnt_DTS_Ref)*FrameRate/1000000000);
         if (pic_order_cnt<TemporalReferences_pic_order_cnt_Min)
         {
             if (pic_order_cnt<0)

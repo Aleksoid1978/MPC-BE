@@ -161,13 +161,13 @@ void File_Mpeg4_TimeCode::Streams_Finish()
         Fill(Stream_Other, StreamPos_Last, Other_FrameCount, FrameCount);
         if (Frame_Count==1)
         {
-            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Striped, "Yes");
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "Yes");
             if (FrameCount)
                 Fill(Stream_Other, StreamPos_Last, Other_TimeCode_LastFrame, (TC+(FrameCount-1)).ToString().c_str());
         }
         else
         {
-            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Striped, "No");
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "No");
             TimeCode TC_Last(Pos_Last, NumberOfFrames-1, DropFrame);
             if (FrameMultiplier>1)
             {

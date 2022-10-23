@@ -150,7 +150,12 @@
 : ;:
 3D;
 3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
 608_Mode;
+7.1.2ch;
+7.1ch;
 About;Über
 About_Hint;Kontakt und Infos zur neuesten Version
 Accompaniment;Begleitung
@@ -200,6 +205,9 @@ AudioRenderingIndication;
 AudioSceneInfoID;
 AudioTrackLayout;
 Author;Autor
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
 BarCode;Barcode
 Basic;Einfach
 Basic_Note;Hinweis: Für mehr Informationen über diese Datei eine andere Ansicht wählen (Baumstruktur, Tabelle...)
@@ -224,6 +232,7 @@ CaptionServiceName;
 Channel(s);Kanäle
 ChannelCoded;
 ChannelConfiguration;
+ChannelFormat;
 ChannelLayout;
 ChannelMode;
 ChannelPositions;Kanal-Positionen
@@ -281,6 +290,7 @@ colour_range;
 Comment;Kommentar
 CommissionedBy;In Auftrag gegeben von
 Compilation;
+ComplementaryObject;
 CompleteName;Vollständiger Name
 CompletionDate;
 ComplexityIndex;
@@ -291,9 +301,13 @@ Compression_Mode_Lossy;
 Compression_Ratio;Kompressions-Verhältnis
 Conductor;Leiter
 ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
 ContactEmail;
 ContactTelephoneNumber;
 Container and general information;Containerformat und allgemeine Informationen
+Content;
 ContentType;Typ des Inhalts
 CoProducer;Coproduzent
 Copyright;Copyright
@@ -308,6 +322,7 @@ Cover_Mime;Cover-MIME
 Cover_Type;Cover-Typ
 Cropped;Schnitt-Dimensionen
 Custom;Benutzerdefiniert
+CustomDownmixTargets;
 Customize;Anpassen
 DarkMode;
 Date;Datum
@@ -342,7 +357,6 @@ DotsPerInch;DPI
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Dauer
@@ -351,11 +365,13 @@ Duration_End_Command;
 Duration_Start;Anfangszeit
 Duration_Start_Command;
 Duration_Start2End;
+DynamicObject;
 DynamicRangeControl;
 Eac3DrcProfile;
 Edit;Bearbeiten
 EditedBy;Bearbeitet von
 EditorialClassification;
+ElementaryStream;
 ElementCount;
 EMail;Email
 Encoded_Application;Kodierendes Programm
@@ -395,6 +411,7 @@ FileNameExtension;
 FileSize;Dateigröße
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
+FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
 Folder;Verzeichnis
@@ -440,12 +457,12 @@ Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Web-Link zum Format
 Format_Version;Format-Version
+FormatDefinition;
 FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Anzahl der Frames
 FrameRate;Bildwiederholungsrate
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;maximale Bildwiederholungsrate
 FrameRate_Minimum;minimale Bildwiederholungsrate
 FrameRate_Mode;Modus der Bildwiederholungsrate
@@ -681,6 +698,7 @@ ImageCount;Anzahl der Bild-Streams
 ImmersiveStereo;
 Info;Info
 Instruments;Instrumente
+IntegratedLoudness;
 IntegratedLoudness_Level;
 IntegratedLoudness_Speech;
 InteractivityEnabled;
@@ -698,21 +716,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Schlüsselwörter
 Known codecs;Bekannte Codecs
 Known formats;Bekannte Formate
@@ -930,11 +933,13 @@ Lines_MaxCountPerEvent;
 LineUpStart;
 LinkedTo_Bed_Pos;
 LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
 LinkedTo_Content_Pos;
 LinkedTo_Group_Pos;
 LinkedTo_Object_Pos;
 LinkedTo_PackFormat_Pos;
 LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
 LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
@@ -1023,6 +1028,7 @@ NumberOfSubstreams;
 NumberOfTrackFormats;
 NumberOfTrackUIDs;
 NumColors;Farbanzahl
+Object;
 ObjectCount;
 OK;OK
 One output file per input file;Je eine eigene Ausgabedatei pro Eingabedatei
@@ -1085,6 +1091,7 @@ OverallBitRate_Minimum;minimale Gesamtbitrate
 OverallBitRate_Mode;Modus der Gesamtbitrate
 OverallBitRate_Nominal;nominale Gesamtbitrate
 PackageName;
+PackFormat;
 Part;Teil
 Part_Count;Gesamtanzahl
 PartNumber;
@@ -1127,6 +1134,7 @@ ProductionDesigner;Produktionsdesigner
 ProductionNumber;
 ProductionStudio;Produktionsstudio
 ProductPlacement;
+Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
 ProgrammeTitle;
@@ -1163,6 +1171,8 @@ ScanType;Scantyp
 ScanType_Original;
 ScanType_StoreMethod;
 ScreenplayBy;Drehbuch von
+ScreenToCenter;
+ScreenToFront;
 Season;Staffel
 SecondaryAudioLanguage;
 see below;siehe unten
@@ -1209,6 +1219,7 @@ StoreMethod_SeparatedFields_2;
 Stream;Stream
 Stream_MoreInfo;Mehr Informationen über den Stream
 StreamCount;Anzahl der Streams dieser Art
+StreamFormat;
 StreamID;Stream-ID
 streamIdentifier;
 StreamKind;Art des Streams
@@ -1266,20 +1277,28 @@ ThanksTo;Dank an
 Thousands separator;Tausender-Markierung
 TimeCode;
 TimeCode_FirstFrame;
+TimeCode_LastFrame;
 TimeCode_MaxFrameNumber;
 TimeCode_MaxFrameNumber_Theory;
 TimeCode_Settings;
 TimeCode_Source;
-TimeCode_Striped;
+TimeCode_Stripped;
 TimeStamp;
 TimeZone;Zeitzone
 Title;Titel
 Title_More;Titel, mehr Informationen
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
 Total;Gesamt
 TotalNumberOfParts;
 TotalProgrammeDuration;
 Track;Track-Name
 Track_Count;Anzahl der Tracks
+TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
@@ -1288,6 +1307,19 @@ Translator;Übersetzer
 Transport;
 Tree;Baumstruktur
 Tree & Text;Baumstruktur & Text
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
@@ -1332,5 +1364,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;70
-ZZ_AutomaticLanguage_Percent;74
+ZZ_Automatic_Percent;68
+ZZ_AutomaticLanguage_Percent;72

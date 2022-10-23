@@ -498,15 +498,10 @@ static void Apply_SubStreams(File__Analyze& F, const string& P_And_LinkedTo, Ite
                 if (LinkedTo_Pos) {
                     auto Sub_Pos = P_And_LinkedTo.rfind(' ', LinkedTo_Pos - 1);
                     if (Sub_Pos != string::npos) {
-                        Message += '!';
-                        Message.append(P_And_LinkedTo, 0, Sub_Pos);
-                        while (!Message.empty() && isdigit(Message.back())) {
-                            Message.pop_back();
-                        }
-                        Message += '!';
+                        Message += ":transportTrackFormat:audioTrack:audioTrackUIDRef:\"";
                         Message += ID;
-                        Message += " is referenced but is missing";
-                        Source.Errors[Error].push_back(Message);
+                        Message += "\" is referenced but its description is missing";
+                        Source.Errors[Warning].push_back(Message);
                     }
                 }
             }
@@ -611,7 +606,7 @@ void file_adm_private::parse()
 
     #define ELEMENT_MIDDLE(NAME) \
                 else if (!Items[item_audioProgramme].Items.empty() && &NAME##_Content == &Items[item_audioProgramme].Items.back()) { \
-                    NAME##_Content.Errors[Warning].push_back("Attribute \"" + tfsxml_decode(b) + "\" is out of specs"); \
+                    NAME##_Content.Errors[Warning].push_back(":XmlAttributes:\"" + tfsxml_decode(b) + "\" is not part of specs"); \
                 } \
             } \
         if (!tfsxml_enter(&p)) \
@@ -624,7 +619,7 @@ void file_adm_private::parse()
 
     #define ELEMENT_END(NAME) \
                     else if (!Items[item_audioProgramme].Items.empty() && &NAME##_Content == &Items[item_audioProgramme].Items.back()) { \
-                        NAME##_Content.Errors[Warning].push_back("Element \"" + tfsxml_decode(b) + "\" is out of specs"); \
+                        NAME##_Content.Errors[Warning].push_back(":XmlElements:\"" + tfsxml_decode(b) + "\" is not part of specs"); \
                     } \
                 } \
             } \
@@ -635,7 +630,13 @@ void file_adm_private::parse()
             NAME##_Content.Strings[NAME##_##ATTR].assign(tfsxml_decode(v)); \
         } \
 
-    #define ATTRIBUTE_I(NAME,ATTR) \
+    #define ATTRIB_ID(NAME,ATTR) \
+        else if (!tfsxml_strcmp_charp(b, #ATTR)) { \
+            CheckErrors_Formating(this, tfsxml_decode(v), item_Info[item_##NAME], *this->Items[item_##NAME].Items.back().Errors, #NAME":"#ATTR); \
+            NAME##_Content.Strings[NAME##_##ATTR].assign(tfsxml_decode(v)); \
+        } \
+
+#define ATTRIBUTE_I(NAME,ATTR) \
         else if (!tfsxml_strcmp_charp(b, #ATTR)) { \
         } \
 
@@ -773,7 +774,7 @@ void file_adm_private::audioFormatExtended()
         if (tfsxml_next(&p, &b))
             break;
         ELEMENT_START(audioProgramme)
-            ATTRIBUTE(audioProgramme, audioProgrammeID)
+            ATTRIB_ID(audioProgramme, audioProgrammeID)
             ATTRIBUTE(audioProgramme, audioProgrammeName)
             ATTRIBUTE(audioProgramme, audioProgrammeLanguage)
             ATTRIBUTE(audioProgramme, start)
@@ -844,7 +845,7 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioProgramme, alternativeValueSetIDRef)
         ELEMENT_END(audioProgramme)
         ELEMENT_START(audioContent)
-            ATTRIBUTE(audioContent, audioContentID)
+            ATTRIB_ID(audioContent, audioContentID)
             ATTRIBUTE(audioContent, audioContentName)
             ATTRIBUTE(audioContent, audioContentLanguage)
             ATTRIBUTE(audioContent, typeLabel)
@@ -960,7 +961,7 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioContent, dialogue)
         ELEMENT_END(audioContent)
         ELEMENT_START(audioObject)
-            ATTRIBUTE(audioObject, audioObjectID)
+            ATTRIB_ID(audioObject, audioObjectID)
             ATTRIBUTE(audioObject, audioObjectName)
             ATTRIBUTE(audioObject, duration)
             ATTRIBUTE(audioObject, startTime)
@@ -972,7 +973,7 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioObject, audioComplementaryObjectIDRef)
         ELEMENT_END(audioObject)
         ELEMENT_START(audioPackFormat)
-            ATTRIBUTE(audioPackFormat, audioPackFormatID)
+            ATTRIB_ID(audioPackFormat, audioPackFormatID)
             ATTRIBUTE(audioPackFormat, audioPackFormatName)
             ATTRIBUTE(audioPackFormat, typeDefinition)
             ATTRIBUTE(audioPackFormat, typeLabel)
@@ -980,7 +981,7 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioPackFormat, audioChannelFormatIDRef)
         ELEMENT_END(audioPackFormat)
         ELEMENT_START(audioChannelFormat)
-            ATTRIBUTE(audioChannelFormat, audioChannelFormatID)
+            ATTRIB_ID(audioChannelFormat, audioChannelFormatID)
             ATTRIBUTE(audioChannelFormat, audioChannelFormatName)
             ATTRIBUTE(audioChannelFormat, typeDefinition)
             ATTRIBUTE(audioChannelFormat, typeLabel)
@@ -992,7 +993,7 @@ void file_adm_private::audioFormatExtended()
                     if (false) {
                     }
                     else if (!tfsxml_strcmp_charp(b, "audioBlockFormatID")) {
-                        CheckErrors_Formating(this, tfsxml_decode(v), item_Info[item_audioBlockFormat], *this->Items[item_audioChannelFormat].Items.back().Errors, "BlockFormat");
+                        CheckErrors_Formating(this, tfsxml_decode(v), item_Info[item_audioBlockFormat], *this->Items[item_audioChannelFormat].Items.back().Errors, "audioBlockFormat:audioBlockFormatID");
                     }
                 }
                 if (!tfsxml_enter(&p))
@@ -1035,7 +1036,7 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioTrackUID, audioTrackFormatIDRef)
         ELEMENT_END(audioTrackUID)
         ELEMENT_START(audioTrackFormat)
-            ATTRIBUTE(audioTrackFormat, audioTrackFormatID)
+            ATTRIB_ID(audioTrackFormat, audioTrackFormatID)
             ATTRIBUTE(audioTrackFormat, audioTrackFormatName)
             ATTRIBUTE(audioTrackFormat, formatDefinition)
             ATTRIBUTE(audioTrackFormat, typeDefinition)
@@ -1044,7 +1045,7 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioTrackFormat, audioStreamFormatIDRef)
         ELEMENT_END(audioTrackFormat)
         ELEMENT_START(audioStreamFormat)
-            ATTRIBUTE(audioStreamFormat, audioStreamFormatID)
+            ATTRIB_ID(audioStreamFormat, audioStreamFormatID)
             ATTRIBUTE(audioStreamFormat, audioStreamFormatName)
             ATTRIBUTE(audioStreamFormat, formatDefinition)
             ATTRIBUTE(audioStreamFormat, formatLabel)
@@ -1127,12 +1128,21 @@ static void FillErrors(file_adm_private* File_Adm_Private, const item Item, size
                     }
                 }
                 if (!Value.empty() && Value[0] == ':') {
-                    auto End = Value.find(':', 1);
-                    if (End != string::npos)
+                    Field.clear();
+                    auto End = Value.rfind(':');
+                    if (End)
                     {
-                        Field += ' ';
+                        if (!Field.empty())
+                            Field += ' ';
                         Field += Value.substr(1, End - 1);
                         Value.erase(0, End + 1);
+                        for (;;)
+                        {
+                            auto Next = Field.find(':');
+                            if (Next == string::npos)
+                                break;
+                            Field[Next] = ' ';
+                        }
                     }
                 }
                 Errors_Field[WarningError ? Error : k].push_back(Field);
@@ -1174,7 +1184,7 @@ static void CheckErrors_Formating(file_adm_private* File_Adm_Private, const stri
         if (EndSize) {
             End.append(EndSize, 'z');
         }
-        string Message = (Sub ? (':' + string(Sub) + ':') : string()) + ID;
+        string Message = (Sub ? (':' + string(Sub) + ':') : string()) + '"' + ID + '"';
         Message += " is not a valid form (";
         if (BeginSize) {
             Message.append(ID_Start.ID_Begin, BeginSize);
@@ -1217,7 +1227,7 @@ static void CheckErrors_Formating(file_adm_private* File_Adm_Private, Items_Stru
 static void CheckErrors(file_adm_private* File_Adm_Private)
 {
     for (size_t t=0; t<item_Max; t++) {
-        CheckErrors_Formating(File_Adm_Private, File_Adm_Private->Items[t], item_Info[t]);
+        //CheckErrors_Formating(File_Adm_Private, File_Adm_Private->Items[t], item_Info[t]);
     }
 }
 
@@ -1544,19 +1554,28 @@ void File_Adm::Streams_Fill()
             FillErrors(File_Adm_Private, (item)t, i, item_Info[t].Name, &Errors_Field[0], &Errors_Value[0], WarningError); \
         }
     }
+
+    //Conformance
     for (size_t k = 0; k < error_Type_Max; k++) {
         if (!Errors_Field[k].empty()) {
-            Fill(StreamKind_Last, StreamPos_Last, error_Type_String[k], Errors_Field[k].size());
+            auto FieldPrefix = "Conformance" + string(error_Type_String[k]);
+            Fill(StreamKind_Last, StreamPos_Last, FieldPrefix.c_str(), Errors_Field[k].size());
+            FieldPrefix += ' ';
             for (size_t i = 0; i < Errors_Field[k].size(); i++) {
-                size_t Space = Errors_Field[k][i].find(' ');
-                if (Space != string::npos) {
-                    const auto Field = string(error_Type_String[k]) + ' ' + Errors_Field[k][i].substr(0, Space);
+                size_t Space = 0;
+                for (;;)
+                {
+                    Space = Errors_Field[k][i].find(' ', Space + 1);
+                    if (Space == string::npos) {
+                        break;
+                    }
+                    const auto Field = FieldPrefix + Errors_Field[k][i].substr(0, Space);
                     const auto& Value = Retrieve_Const(StreamKind_Last, StreamPos_Last, Field.c_str());
                     if (Value.empty()) {
                         Fill(StreamKind_Last, StreamPos_Last, Field.c_str(), "Yes");
                     }
                 }
-                const auto Field = string(error_Type_String[k]) + ' ' + Errors_Field[k][i];
+                const auto Field = FieldPrefix + Errors_Field[k][i];
                 const auto& Value = Retrieve_Const(StreamKind_Last, StreamPos_Last, Field.c_str());
                 if (Value == __T("Yes")) {
                     Clear(StreamKind_Last, StreamPos_Last, Field.c_str());

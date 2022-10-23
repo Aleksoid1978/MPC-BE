@@ -36,6 +36,7 @@ const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
 const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
+const char* Mk_Video_Colour_Range(int8u range);
 
 //---------------------------------------------------------------------------
 static const char* ProRes_chrominance_factor(int8u chrominance_factor)
@@ -110,6 +111,45 @@ void File_ProRes::Streams_Fill()
 //***************************************************************************
 // Buffer - Global
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_ProRes::Read_Buffer_OutOfBand()
+{
+    //Handling FFmpeg style (glbl atom)
+    while (Element_Offset<Element_Size)
+    {
+        Element_Begin1("Atom");
+            int32u  Size, Name;
+            Element_Begin1("Header");
+                Get_C4 (Size,                                   "Size");
+                Get_C4 (Name,                                   "Name");
+            Element_End();
+            Element_Name(Ztring().From_CC4(Name));
+            switch (Name)
+            {
+                case 0x41434C52: //ACLR
+                    {
+                    Get_C4(Name,                                "Name");
+                    if (Name==0x41434C52 && Size==24)
+                    {
+                        int8u Range;
+                        Skip_C4(                                "Text?");
+                        Skip_B3(                                "Reserved");
+                        Get_B1 (Range,                          "Range");
+                        Fill(Stream_Video, 0, Video_colour_range, Mk_Video_Colour_Range(Range));
+                        Skip_B4(                                "Reserved");
+                    }
+                    else if (Size>12)
+                        Skip_XX(Size-12,                        "Unknown");
+                    }
+                    break;
+                default:
+                        if (Size>8)
+                            Skip_XX(Size-8,                    "Unknown");
+            }
+        Element_End();
+    }
+}
 
 //---------------------------------------------------------------------------
 void File_ProRes::Read_Buffer_Continue()

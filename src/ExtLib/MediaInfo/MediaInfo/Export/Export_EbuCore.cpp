@@ -1397,7 +1397,7 @@ void EbuCore_Transform_TimeCode(Node* Parent, MediaInfo_Internal &MI, size_t Str
     }
 
     if (!MI.Get(Stream_Other, StreamPos, Other_ID).empty())
-        Add_TechnicalAttributeBoolean(Child, MI.Get(Stream_Other, StreamPos, __T("TimeCode_Striped")), "Stripped");
+        Add_TechnicalAttributeBoolean(Child, MI.Get(Stream_Other, StreamPos, __T("TimeCode_Stripped")), "Stripped");
 
     if (Is1_5)
         Child->XmlCommentOut="(timecodeFormat not in XSD)";

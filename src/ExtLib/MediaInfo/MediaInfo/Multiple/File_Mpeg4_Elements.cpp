@@ -2025,7 +2025,7 @@ void File_Mpeg4::mdat_xxxx()
         #endif //MEDIAINFO_DEMUX
         Element_Show();
 
-        if (!Stream_Temp.IsFilled && Stream_Temp.Parsers[Pos]->Status[IsFilled])
+        if (!Stream_Temp.IsFilled && (Stream_Temp.Parsers[Pos]->Status[IsFilled] || Stream_Temp.Parsers[Pos]->Status[IsFinished]))
         {
             #if MEDIAINFO_DEMUX
                 if (Stream_Temp.TimeCode) //If this is a TimeCode track
@@ -5345,8 +5345,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
         {
             Channels=Channels16;
             SampleSize=SampleSize16;
-            SampleRate=SampleRate16;
         }
+        SampleRate=SampleRate16;
     }
     else
     {
@@ -7226,7 +7226,16 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_glbl()
 
     //Parsing
     for (size_t Pos=0; Pos<Streams[moov_trak_tkhd_TrackID].Parsers.size(); Pos++)
-        Open_Buffer_OutOfBand(Streams[moov_trak_tkhd_TrackID].Parsers[Pos]);
+    {
+        auto& Sub = Streams[moov_trak_tkhd_TrackID].Parsers[Pos];
+        Open_Buffer_OutOfBand(Sub);
+        if (Sub->Status[IsFinished])
+        {
+            delete Sub; //Sub = nullptr;
+            Streams[moov_trak_tkhd_TrackID].Parsers.erase(Streams[moov_trak_tkhd_TrackID].Parsers.begin()+Pos);
+            Pos--;
+        }
+    }
 }
 
 //---------------------------------------------------------------------------

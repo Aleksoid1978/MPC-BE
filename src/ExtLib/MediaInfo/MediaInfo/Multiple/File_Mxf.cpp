@@ -2352,7 +2352,6 @@ File_Mxf::File_Mxf()
     #endif //MEDIAINFO_NEXTPACKET
     #if defined(MEDIAINFO_ANCILLARY_YES)
         Ancillary=NULL;
-        Ancillary_IsBinded=false;
     #endif //defined(MEDIAINFO_ANCILLARY_YES)
 
     ExtraMetadata_Offset=(int64u)-1;
@@ -2392,8 +2391,14 @@ File_Mxf::File_Mxf()
 File_Mxf::~File_Mxf()
 {
     #if defined(MEDIAINFO_ANCILLARY_YES)
-        if (!Ancillary_IsBinded)
+        if (Ancillary)
+        {
+            for (essences::iterator Essence=Essences.begin(); Essence!=Essences.end(); ++Essence)
+                for (parsers::iterator Parser=Essence->second.Parsers.begin(); Parser!=Essence->second.Parsers.end(); ++Parser)
+                    if (*Parser == Ancillary)
+                        *Parser = nullptr;
             delete Ancillary;
+        }
     #endif //defined(MEDIAINFO_ANCILLARY_YES)
 	
     for (size_t i = 0; i < AcquisitionMetadataLists.size(); i++)
@@ -4302,7 +4307,7 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
                 }
             }
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Settings, IsSourcePackage?__T("Source Package"):__T("Material Package"));
-            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Striped, "Yes");
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "Yes");
             Fill(Stream_Other, StreamPos_Last, Other_Title, TrackName);
 
             if ((!TimeCodeFromMaterialPackage && IsSourcePackage) || (TimeCodeFromMaterialPackage && !IsSourcePackage))
@@ -6279,7 +6284,10 @@ void File_Mxf::Data_Parse()
 
         essences::iterator Essence=Essences.find(Code_Compare4);
         if (Essence==Essences.end())
-            Essence=Essences.insert(make_pair(Code_Compare4,essence())).first;
+        {
+            Essences[Code_Compare4];
+            Essence=Essences.find(Code_Compare4);
+        }
 
         #if MEDIAINFO_TRACE
             if (Trace_Activated)
@@ -6398,11 +6406,6 @@ void File_Mxf::Data_Parse()
                     ChooseParser(Essence, Descriptor); //Searching by the descriptor
                     if (Essence->second.Parsers.empty())
                         ChooseParser__FromEssence(Essence, Descriptor); //Searching by the track identifier
-
-                    #ifdef MEDIAINFO_VC3_YES
-                        if (Ztring().From_UTF8(Mxf_EssenceContainer(Descriptor->second.EssenceContainer))==__T("VC-3"))
-                            ((File_Vc3*)(*(Essence->second.Parsers.begin())))->FrameRate=Descriptor->second.SampleRate;
-                    #endif //MEDIAINFO_VC3_YES
 
                     #ifdef MEDIAINFO_DEMUX
                         if (Ztring().From_UTF8(Mxf_EssenceContainer(Descriptor->second.EssenceContainer))==__T("AVC"))
@@ -6534,7 +6537,7 @@ void File_Mxf::Data_Parse()
             Demux_random_access=true;
 
             bool ShouldDemux=true;
-            if (Essence->second.ShouldCheckAvcHeaders)
+            if (!Essence->second.Parsers.empty() && Essence->second.ShouldCheckAvcHeaders)
             {
                 if (Essence->second.Parsers[0]->Status[IsAccepted])
                     ShouldDemux=false;
@@ -17102,7 +17105,8 @@ void File_Mxf::ChooseParser__Aaf_14(const essences::iterator &Essence, const des
     switch (Code_Compare4_3)
     {
         case 0x01 : //MXF in MXF?
-                    Essence->second.Parsers.push_back(new File_Mxf());
+                    if (!IsSub)
+                        Essence->second.Parsers.push_back(new File_Mxf());
                     break;
         default   : ;
     }
@@ -17220,12 +17224,9 @@ void File_Mxf::ChooseParser__Aaf_GC_Data(const essences::iterator &Essence, cons
         case 0x02 : //Ancillary
                     #if defined(MEDIAINFO_ANCILLARY_YES)
                         if (!Ancillary)
-                        {
                             Ancillary=new File_Ancillary();
-                            MayHaveCaptionsInStream=true;
-                        }
+                        MayHaveCaptionsInStream=true;
                         Essence->second.Parsers.push_back(Ancillary);
-                        Ancillary_IsBinded=true;
                     #endif //defined(MEDIAINFO_ANCILLARY_YES)
                     break;
         case 0x08 : //Line Wrapped Data Element, SMPTE 384M

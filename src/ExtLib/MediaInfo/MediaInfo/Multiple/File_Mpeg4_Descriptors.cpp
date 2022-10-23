@@ -199,7 +199,7 @@ static const char* Mpeg4_Descriptors_SceneProfileLevelIndication(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
+const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
 {
     "",
     "Main Audio",
@@ -219,35 +219,14 @@ static const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
     "ALS Simple",
     "Baseline USAC",
     "Extended HE AAC",
-};
-enum profile
-{
-    NoProfile,
-    Main_Audio,
-    Scalable_Audio,
-    Speech_Audio,
-    Synthesis_Audio,
-    High_Quality_Audio,
-    Low_Delay_Audio,
-    Natural_Audio,
-    Mobile_Audio_Internetworking,
-    AAC,
-    High_Efficiency_AAC,
-    High_Efficiency_AAC_v2,
-    Low_Delay_AAC,
-    Baseline_MPEG_Surround,
-    High_Definition_AAC,
-    ALS_Simple,
-    Baseline_USAC,
-    Extended_HE_AAC,
-};
-struct profilelevel_struct
-{
-    int8u profile;
-    int8u level;
+    #if MEDIAINFO_CONFORMANCE
+    nullptr,
+    nullptr,
+    "No audio capability required",
+    #endif
 };
 static const size_t Mpeg4_Descriptors_AudioProfileLevelIndication_Size=0x58;
-static const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[Mpeg4_Descriptors_AudioProfileLevelIndication_Size]=
+const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[Mpeg4_Descriptors_AudioProfileLevelIndication_Size]=
 {
     { NoProfile, 0 },
     { Main_Audio, 1 },
@@ -397,6 +376,11 @@ File_Mpeg4_Descriptors::File_Mpeg4_Descriptors()
 
     //Temp
     ObjectTypeId=0x00;
+    
+    //Conformance
+    #if MEDIAINFO_CONFORMANCE
+        SamplingRate=0;
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -547,29 +531,30 @@ void File_Mpeg4_Descriptors::Descriptor_01()
             for (int8u i=0; i<5; i++)
                 if (ProfileLevel[i]!=0xFF)
                     ProfileLevel_Count++;
+            es_id_info& ES_ID_Info=ES_ID_Infos[(int32u)-1];
             if (ProfileLevel_Count==1)
             {
                 for (int8u i=0; i<5; i++)
                 {
                     if (ProfileLevel[i]!=0xFF)
                     {
-                        es_id_info& ES_ID_Info=ES_ID_Infos[(int32u)-1];
                         switch (i)
                         {
                             case  2 :   ES_ID_Info.StreamKind=Stream_Audio; 
-                                        ES_ID_Info.ProfileLevel=Mpeg4_Descriptors_AudioProfileLevelIndication(ProfileLevel[i]);
+                                        ES_ID_Info.ProfileLevelString=Mpeg4_Descriptors_AudioProfileLevelIndication(ProfileLevel[i]);
                                         break;
                             case  3 :
                                         ES_ID_Info.StreamKind=Stream_Video;
-                                        ES_ID_Info.ProfileLevel=Mpeg4v_Profile_Level(ProfileLevel[i]);
+                                        ES_ID_Info.ProfileLevelString=Mpeg4v_Profile_Level(ProfileLevel[i]);
                                         break;
                             default :   ;
                         }
-                        if (ES_ID_Info.ProfileLevel.empty() && ProfileLevel[i]!=0xFE)
-                            ES_ID_Info.ProfileLevel.From_Number(ProfileLevel[i]);
+                        if (ES_ID_Info.ProfileLevelString.empty() && ProfileLevel[i]!=0xFE)
+                            ES_ID_Info.ProfileLevelString.From_Number(ProfileLevel[i]);
                     }
                 }
             }
+            memcpy(ES_ID_Info.ProfileLevel, ProfileLevel, sizeof(ProfileLevel));
         }
         Element_ThisIsAList();
     FILLING_END();
@@ -806,6 +791,36 @@ void File_Mpeg4_Descriptors::Descriptor_04()
                             Parser=new File_Aac;
                             ((File_Aac*)Parser)->Mode=File_Aac::Mode_AudioSpecificConfig;
                             ((File_Aac*)Parser)->FrameIsAlwaysComplete=true;
+                            #if MEDIAINFO_CONFORMANCE
+                                ((File_Aac*)Parser)->SamplingRate=SamplingRate;
+                                if (ES_ID)
+                                {
+                                    auto const ES_ID_Info=ES_ID_Infos.find(ES_ID);
+                                    if (ES_ID_Info!=ES_ID_Infos.end())
+                                    {
+                                        auto AudioProfileLevelIndication=ES_ID_Info->second.ProfileLevel[2];
+                                        audio_profile AudioProfile;
+                                        if (AudioProfileLevelIndication==0xFE)
+                                            AudioProfile=AudioProfile_Unspecified;
+                                        else if (AudioProfileLevelIndication==0xFF)
+                                            AudioProfile=AudioProfile_NoAudio;
+                                        else if (AudioProfileLevelIndication<Mpeg4_Descriptors_AudioProfileLevelIndication_Size)
+                                            AudioProfile=Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].profile;
+                                        else
+                                            AudioProfile=NoProfile;
+                                        ((File_Aac*)Parser)->Profile=AudioProfile;
+                                        File_Aac::conformance_flags Profile;
+                                        switch (AudioProfile)
+                                        {
+                                            case Baseline_USAC: Profile=File_Aac::BaselineUsac; break;
+                                            case Extended_HE_AAC: Profile=File_Aac::xHEAAC; break;
+                                            default: Profile=File_Aac::Conformance_Max;
+                                        }
+                                        if (Profile!=File_Aac::Conformance_Max)
+                                            ((File_Aac*)Parser)->ConformanceFlags.set(Profile);
+                                    }
+                                }
+                            #endif
                         #endif
                         break;
             case 0x60 :
