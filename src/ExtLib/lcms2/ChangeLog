@@ -1,3 +1,12 @@
+-----------------------
+2.14 Featured release
+-----------------------
+lcms2 now implements ICC specification 4.4
+New multi-threaded plug-in
+several fixes to keep fuzzers happy
+Remove check on DLL when CMS_NO_REGISTER_KEYWORD is used 
+Added more validation against broken profiles
+Add more help to several tools
 
 -----------------------
 2.13.1 Hot fix

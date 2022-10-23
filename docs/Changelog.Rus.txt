@@ -46,7 +46,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	ffmpeg git-n5.2-dev-790-ged83a3a5bd;
-	Little-CMS git-lcms2.13.1-84-g55068d3;
+	Little-CMS git-lcms2.14rc1-3-g496293a;
 	MediaInfo git-v22.06-43-gfd11029ef;
 
 1.6.4
