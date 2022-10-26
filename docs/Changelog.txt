@@ -17,6 +17,9 @@ Added update of metadata while playing radio broadcasts.
 MpegSplitter
 Unsupported G.722.1 audio tracks for Hikvision (IMKH) camera files will be ignored.
 
+RawVideoSplitter
+Added support for color range and color location for YUV4MPEG2.
+
 MPCVideoDec
 Fixed output media type properties for RAW video when MPC Video Converter is used.
 Fixed angle switching for Stereo 3D.
