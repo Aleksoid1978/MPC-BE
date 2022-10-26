@@ -169,15 +169,16 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 	size--;
 
 	if (tag == 'APIC' || tag == '\0PIC') {
-		WCHAR mime[64] = {};
-		size_t mime_len = 0;
 
-		while (size-- && mime_len < std::size(mime) && (mime[mime_len++] = gbData.BitRead(8)) != 0);
-
-		if (mime_len == std::size(mime)) {
-			gbData.SkipBytes(size);
-			size = 0;
-			return {};
+		CString mime;
+		if (tag == '\0PIC') {
+			mime.AppendChar((wchar_t)gbData.BitRead(8));
+			mime.AppendChar((wchar_t)gbData.BitRead(8));
+			mime.AppendChar((wchar_t)gbData.BitRead(8));
+			size -= 3;
+		}
+		else {
+			mime = ReadField(gbData, size, encoding);
 		}
 
 		BYTE pict_type = (BYTE)gbData.BitRead(8);
@@ -187,26 +188,23 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 			pictStr = picture_types[pict_type];
 		}
 
-		if (tag == 'APIC') {
-			CString Desc = ReadField(gbData, size, encoding);
-			UNREFERENCED_PARAMETER(Desc);
-		}
+		CString Desc = ReadField(gbData, size, encoding);
+		UNREFERENCED_PARAMETER(Desc);
 
-		CString mimeStr(mime);
 		CString mimeStrLower(mime); mimeStrLower.MakeLower();
 		if (mimeStrLower == L"jpg") {
-			mimeStr = L"image/jpeg";
+			mime = L"image/jpeg";
 		} else if (mimeStrLower == L"png") {
-			mimeStr = L"image/png";
+			mime = L"image/png";
 		} else if (!StartsWith(mimeStrLower, L"image/")) {
-			mimeStr.Format(L"image/%s", mime);
+			mime.Format(L"image/%s", mime);
 		}
 
 		std::vector<BYTE> data;
 		data.resize(size);
 		gbData.ReadBuffer(data.data(), size);
 
-		return std::make_unique<CID3TagItem>(tag, std::move(data), mimeStr, pictStr);
+		return std::make_unique<CID3TagItem>(tag, std::move(data), mime, pictStr);
 	} else {
 		if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
 			ReadLang(gbData, size);
