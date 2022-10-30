@@ -602,6 +602,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
 					} else if (CodecID == "V_FFV1") {
 						fourcc = FCC('FFV1');
+					} else if (CodecID == "V_AVS3") {
+						fourcc = FCC('AVS3');
 					} else if (CodecID == "V_UNCOMPRESSED") {
 						fourcc = FCC((DWORD)pTE->v.ColourSpace);
 						switch (fourcc) {

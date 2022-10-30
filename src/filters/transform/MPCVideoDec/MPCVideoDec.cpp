@@ -527,6 +527,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_SHQ7, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, HWCodec_None },
 	{ &MEDIASUBTYPE_SHQ9, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, HWCodec_None },
 
+	// AVS3
+	{ &MEDIASUBTYPE_AVS3, AV_CODEC_ID_AVS3, VDEC_AVS3, HWCodec_None },
+
 	// uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, VDEC_UNCOMPRESSED, HWCodec_None },
 	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, VDEC_UNCOMPRESSED, HWCodec_None },
@@ -904,6 +907,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ5 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ7 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ9 },
+
+	// AVS3
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AVS3 }
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
@@ -1984,6 +1990,7 @@ redo:
 
 		m_bCalculateStopTime = (m_CodecId == AV_CODEC_ID_H264 ||
 								m_CodecId == AV_CODEC_ID_DIRAC ||
+								m_CodecId == AV_CODEC_ID_AVS3 ||
 								(m_CodecId == AV_CODEC_ID_MPEG4 && pmt->formattype == FORMAT_MPEG2Video)
 								|| bNotTrustSourceTimeStamp);
 
@@ -2037,7 +2044,7 @@ redo:
 
 		// Enable B-Frame reorder
 		m_bReorderBFrame = !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))
-							&& !(m_pAVCodec->capabilities & AV_CODEC_CAP_FRAME_THREADS)
+							&& !(m_pAVCodec->capabilities & (AV_CODEC_CAP_DELAY | AV_CODEC_CAP_FRAME_THREADS))
 							&& !(m_CodecId == AV_CODEC_ID_MPEG1VIDEO || m_CodecId == AV_CODEC_ID_MPEG2VIDEO)
 							|| (m_CodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video)
 							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
@@ -2050,6 +2057,7 @@ redo:
 
 	if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_CodecId == AV_CODEC_ID_MPEG1VIDEO
+			|| m_CodecId == AV_CODEC_ID_AVS3
 			|| pmt->subtype == MEDIASUBTYPE_H264
 			|| pmt->subtype == MEDIASUBTYPE_h264
 			|| pmt->subtype == MEDIASUBTYPE_X264
