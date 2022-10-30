@@ -439,7 +439,14 @@ namespace MatroskaReader
 	class TrackEntry
 	{
 	public:
-		enum {TypeVideo = 1, TypeAudio = 2, TypeComplex = 3, TypeLogo = 0x10, TypeSubtitle = 0x11, TypeControl = 0x20};
+		enum {
+			TypeVideo = 1,
+			TypeAudio = 2,
+			TypeComplex = 3,
+			TypeLogo = 0x10,
+			TypeSubtitle = 0x11,
+			TypeControl = 0x20
+		};
 		CUInt TrackNumber, TrackUID, TrackType;
 		CUInt FlagEnabled, FlagDefault, FlagLacing, FlagForced;
 		CUInt MinCache, MaxCache;
