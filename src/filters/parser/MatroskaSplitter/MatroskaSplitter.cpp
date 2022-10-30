@@ -290,8 +290,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pTrackEntryMap.clear();
 	m_pOrderedTrackArray.clear();
 
-	std::vector<CMatroskaSplitterOutputPin*> pinOut;
-	std::vector<TrackEntry*> pinOutTE;
+	std::list<std::pair<CMatroskaSplitterOutputPin*, TrackEntry*>> VideoTrackPins;
+	std::list<std::pair<CMatroskaSplitterOutputPin*, TrackEntry*>> AudioTrackPins;
+	std::list<std::pair<CMatroskaSplitterOutputPin*, TrackEntry*>> SubtitleTrackPins;
 
 	m_pFile.reset(DNew CMatroskaFile(pAsyncReader, hr));
 	if (!m_pFile) {
@@ -313,7 +314,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	int iVideo = 1, iAudio = 1, iSubtitle = 1;
+	int nVideo = 0, nAudio = 0, nSubtitle = 0;
 	bool bHasVideo = false;
 
 	REFERENCE_TIME codecAvgTimePerFrame = 0;
@@ -337,11 +338,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			// Video
 			if (pTE->TrackType == TrackEntry::TypeVideo) {
+				nVideo++;
+				outputDesc.Format(L"Video %d", nVideo);
+
 				if (bHasVideo) {
 					DLog(L"CMatroskaSplitterFilter::CreateOutputs() :Additional video stream '%S' (%I64u) is ignored", CodecID, (UINT64)pTE->TrackType);
 					continue;
 				}
-				outputDesc.Format(L"Video %d", iVideo++);
 
 				mt.majortype = MEDIATYPE_Video;
 				mt.SetSampleSize(1); // variable frame size?
@@ -1041,7 +1044,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 			// Audio
 			else if (pTE->TrackType == TrackEntry::TypeAudio) {
-				outputDesc.Format(L"Audio %d", iAudio++);
+				nAudio++;
+				outputDesc.Format(L"Audio %d", nAudio);
 
 				mt.majortype = MEDIATYPE_Audio;
 				mt.formattype = FORMAT_WaveFormatEx;
@@ -1395,7 +1399,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 			// Subtitle
 			else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
-				outputDesc.Format(L"Subtitle %d", iSubtitle++);
+				nSubtitle++;
+				outputDesc.Format(L"Subtitle %d", nSubtitle);
 
 				mt.SetSampleSize(1);
 
@@ -1455,7 +1460,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (mts.empty()) {
-				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported or multiple TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
+				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
 				continue;
 			}
 
@@ -1506,22 +1511,28 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pPinOut->SetProperty(L"LANG", CString(pTE->Language));
 			}
 
-			if (!isSub && (size_t)(iVideo + iAudio - 3) <= pinOut.size()) {
-				pinOut.insert(pinOut.begin() + (iVideo + iAudio - 3), pPinOut);
-				pinOutTE.insert(pinOutTE.begin() + (iVideo + iAudio - 3), pTE.get());
-			} else {
-				pinOut.push_back(pPinOut);
-				pinOutTE.push_back(pTE.get());
+			switch (pTE->TrackType) {
+			case TrackEntry::TypeVideo:
+				VideoTrackPins.emplace_back(pPinOut, pTE.get());
+				break;
+			case TrackEntry::TypeAudio:
+				AudioTrackPins.emplace_back(pPinOut, pTE.get());
+				break;
+			case TrackEntry::TypeSubtitle:
+				SubtitleTrackPins.emplace_back(pPinOut, pTE.get());
+				break;
 			}
 		}
 	}
 
-	for (size_t i = 0; i < pinOut.size(); i++) {
-		std::unique_ptr<CBaseSplitterOutputPin> pPinOut;
-		pPinOut.reset(pinOut[i]);
-		TrackEntry* pTE = pinOutTE[i];
+	std::list<std::pair<CMatroskaSplitterOutputPin*, TrackEntry*>> TrackPins;
+	TrackPins.splice(TrackPins.end(), VideoTrackPins);
+	TrackPins.splice(TrackPins.end(), AudioTrackPins);
+	TrackPins.splice(TrackPins.end(), SubtitleTrackPins);
 
+	for (auto& [pPO, pTE]: TrackPins) {
 		if (pTE != nullptr) {
+			std::unique_ptr<CBaseSplitterOutputPin> pPinOut(pPO);
 			AddOutputPin((DWORD)pTE->TrackNumber, pPinOut);
 			m_pTrackEntryMap[(DWORD)pTE->TrackNumber] = pTE;
 			m_pOrderedTrackArray.push_back(pTE);
