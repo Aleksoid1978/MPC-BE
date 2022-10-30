@@ -335,7 +335,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMediaType mt;
 			std::vector<CMediaType> mts;
 
-			if (pTE->TrackType == TrackEntry::TypeVideo && !bHasVideo) {
+			// Video
+			if (pTE->TrackType == TrackEntry::TypeVideo) {
+				if (bHasVideo) {
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs() :Additional video stream '%S' (%I64u) is ignored", CodecID, (UINT64)pTE->TrackType);
+					continue;
+				}
 				outputDesc.Format(L"Video %d", iVideo++);
 
 				mt.majortype = MEDIATYPE_Video;
@@ -1033,7 +1038,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 				}
-			} else if (pTE->TrackType == TrackEntry::TypeAudio) {
+			}
+			// Audio
+			else if (pTE->TrackType == TrackEntry::TypeAudio) {
 				outputDesc.Format(L"Audio %d", iAudio++);
 
 				mt.majortype = MEDIATYPE_Audio;
@@ -1385,7 +1392,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(p + 12, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				}
-			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
+			}
+			// Subtitle
+			else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
 				outputDesc.Format(L"Subtitle %d", iSubtitle++);
 
 				mt.SetSampleSize(1);
@@ -1439,7 +1448,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 				}
-			} else {
+			}
+			// Unknown
+			else {
 				outputDesc.Format(L"Output %I64u", (UINT64)pTE->TrackNumber);
 			}
 
