@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\decoder\bitstream.c" />
+    <ClCompile Include="source\decoder\dec_util.c" />
+    <ClCompile Include="source\decoder\parser.c" />
+    <ClCompile Include="source\decoder\uavs3d.c" />
+    <ClCompile Include="source\decore\alf.c" />
+    <ClCompile Include="source\decore\avx2\alf_avx2.c" />
+    <ClCompile Include="source\decore\avx2\avx2.c" />
+    <ClCompile Include="source\decore\avx2\inter_pred_avx2.c" />
+    <ClCompile Include="source\decore\avx2\intra_pred_avx2.c" />
+    <ClCompile Include="source\decore\avx2\itrans_avx2.c" />
+    <ClCompile Include="source\decore\avx2\pixel_avx2.c" />
+    <ClCompile Include="source\decore\avx2\sao_avx2.c" />
+    <ClCompile Include="source\decore\com_table.c" />
+    <ClCompile Include="source\decore\com_util.c" />
+    <ClCompile Include="source\decore\deblock.c" />
+    <ClCompile Include="source\decore\inter_pred.c" />
+    <ClCompile Include="source\decore\intra_pred.c" />
+    <ClCompile Include="source\decore\inv_trans.c" />
+    <ClCompile Include="source\decore\pic_manager.c" />
+    <ClCompile Include="source\decore\recon.c" />
+    <ClCompile Include="source\decore\sao.c" />
+    <ClCompile Include="source\decore\sse\alf_sse.c" />
+    <ClCompile Include="source\decore\sse\deblock_sse.c" />
+    <ClCompile Include="source\decore\sse\inter_pred_sse.c" />
+    <ClCompile Include="source\decore\sse\intra_pred_sse.c" />
+    <ClCompile Include="source\decore\sse\itrans_sse.c" />
+    <ClCompile Include="source\decore\sse\pixel_sse.c" />
+    <ClCompile Include="source\decore\sse\sao_sse.c" />
+    <ClCompile Include="source\decore\sse\sse.c" />
+    <ClCompile Include="source\decore\threadpool.c" />
+    <ClCompile Include="source\decore\win32thread.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\decoder\bitstream.h" />
+    <ClInclude Include="source\decoder\dec_type.h" />
+    <ClInclude Include="source\decoder\dec_util.h" />
+    <ClInclude Include="source\decoder\parser.h" />
+    <ClInclude Include="source\decoder\uavs3d.h" />
+    <ClInclude Include="source\decore\avx2\avx2.h" />
+    <ClInclude Include="source\decore\com_def.h" />
+    <ClInclude Include="source\decore\com_sys.h" />
+    <ClInclude Include="source\decore\com_table.h" />
+    <ClInclude Include="source\decore\com_type.h" />
+    <ClInclude Include="source\decore\com_util.h" />
+    <ClInclude Include="source\decore\contributor.h" />
+    <ClInclude Include="source\decore\modules.h" />
+    <ClInclude Include="source\decore\sse\sse.h" />
+    <ClInclude Include="source\decore\threadpool.h" />
+    <ClInclude Include="source\decore\win32thread.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1CDBE640-BB75-422C-B63A-8C70C4D48BEA}</ProjectGuid>
+    <RootNamespace>uavs3d</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>uavs3d</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)src\platform.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)src\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;COMPILE_10BIT=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>source\decore;source\decoder</AdditionalIncludeDirectories>
+      <AdditionalOptions>/arch:AVX %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -57,6 +57,7 @@ RapidJSON           MIT License                https://github.com/Tencent/rapidj
 ResizableLib        Artistic License           https://github.com/ppescher/resizablelib
 soxr                LGPL                       https://sourceforge.net/projects/soxr/
 TreePropSheet       -                          -
+uavs3d              BSD License                https://github.com/uavs3/uavs3d
 VirtualDub          GPLv2                      https://virtualdub.org/
 ZenLib              zlib License               https://github.com/MediaArea/ZenLib
 zlib                zlib License               https://zlib.net/

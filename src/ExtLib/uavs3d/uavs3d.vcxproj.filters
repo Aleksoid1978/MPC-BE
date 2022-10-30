@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{69cdd4c2-e41f-4516-8169-4248fcf638ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\avx2">
+      <UniqueIdentifier>{9c83ee1a-1bce-4c37-9538-633bac08893d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\sse">
+      <UniqueIdentifier>{365b433f-5f43-4d32-b81d-0418a66f7b7d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\decore\alf.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\com_table.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\com_util.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\deblock.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\inter_pred.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\intra_pred.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\inv_trans.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\pic_manager.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\recon.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sao.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\threadpool.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\win32thread.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\alf_avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\inter_pred_avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\intra_pred_avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\itrans_avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\pixel_avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\avx2\sao_avx2.c">
+      <Filter>common\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\alf_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\deblock_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\inter_pred_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\intra_pred_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\itrans_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\pixel_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\sao_sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+    <ClCompile Include="source\decore\sse\sse.c">
+      <Filter>common\sse</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\decore\com_def.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\com_sys.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\com_table.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\com_type.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\com_util.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\contributor.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\modules.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\threadpool.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\win32thread.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\avx2\avx2.h">
+      <Filter>common\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="source\decore\sse\sse.h">
+      <Filter>common\sse</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

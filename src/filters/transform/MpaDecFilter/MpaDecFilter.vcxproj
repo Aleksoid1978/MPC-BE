@@ -148,6 +148,9 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\speex\speex.vcxproj">
       <Project>{f4c233d1-297b-4b6b-bd63-a7d38f88aa83}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\uavs3d\uavs3d.vcxproj">
+      <Project>{1cdbe640-bb75-422c-b63a-8c70c4d48bea}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

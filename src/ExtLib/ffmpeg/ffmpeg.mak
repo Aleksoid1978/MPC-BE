@@ -5,6 +5,7 @@ SPEEX_DIR     = ../speex
 SOXR_DIR      = ../soxr
 DAV1_DIR      = ../dav1d
 FFNVCODEC_DIR = ../nv-codec-headers/include
+UAVS3D_DIR    = ../uavs3d/source/decoder
 
 ifeq ($(64BIT),yes)
 	PLATFORM = x64
@@ -30,7 +31,7 @@ TARGET_LIB        = $(TARGET_LIB_DIR)/ffmpeg.lib
 ARSCRIPT          = $(OBJ_DIR)script.ar
 
 # Compiler and yasm flags
-CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) \
+CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
@@ -143,6 +144,7 @@ SRCS_LC = \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
 	libavcodec/avpicture.c \
+	libavcodec/avs3_parser.c \
 	libavcodec/bgmc.c \
 	libavcodec/bink.c \
 	libavcodec/binkaudio.c \
@@ -324,6 +326,7 @@ SRCS_LC = \
 	libavcodec/libdav1d.c \
 	libavcodec/libopenjpegdec.c \
 	libavcodec/libspeexdec.c \
+	libavcodec/libuavs3d.c \
 	libavcodec/lossless_audiodsp.c \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \

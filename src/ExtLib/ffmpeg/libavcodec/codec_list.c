@@ -158,6 +158,7 @@ static const FFCodec * const codec_list[] = {
 
     &ff_libspeex_decoder,
     &ff_libdav1d_decoder,
+    &ff_libuavs3d_decoder,
 
     &ff_av1_decoder,
     NULL };
