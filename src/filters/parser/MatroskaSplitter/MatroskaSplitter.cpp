@@ -315,7 +315,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
 	int nVideo = 0, nAudio = 0, nSubtitle = 0;
-	bool bHasVideo = false;
 
 	REFERENCE_TIME codecAvgTimePerFrame = 0;
 	BOOL bInterlaced = FALSE;
@@ -341,7 +340,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				nVideo++;
 				outputDesc.Format(L"Video %d", nVideo);
 
-				if (bHasVideo) {
+				if (VideoTrackPins.size()) {
 					DLog(L"CMatroskaSplitterFilter::CreateOutputs() :Additional video stream '%S' (%I64u) is ignored", CodecID, (UINT64)pTE->TrackType);
 					continue;
 				}
@@ -391,26 +390,24 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
 					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fix frame size
 
-					if (!bHasVideo) {
-						mts.push_back(mt);
+					mts.push_back(mt);
 
-						if (mt.subtype == MEDIASUBTYPE_HM10) {
-							std::vector<BYTE> pData;
-							if (ReadFirtsBlock(pData, pTE.get())) {
-								CBaseSplitterFileEx::hevchdr h;
-								CMediaType mt2;
-								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									mts.insert(mts.cbegin(), mt2);
-								}
+					if (mt.subtype == MEDIASUBTYPE_HM10) {
+						std::vector<BYTE> pData;
+						if (ReadFirtsBlock(pData, pTE.get())) {
+							CBaseSplitterFileEx::hevchdr h;
+							CMediaType mt2;
+							if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+								mts.insert(mts.cbegin(), mt2);
 							}
 						}
-
-						if (mt.subtype == MEDIASUBTYPE_H264 || mt.subtype == MEDIASUBTYPE_h264) {
-							m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
-						}
 					}
-					bHasVideo = true;
-				} else if (CodecID == "V_MPEG4/ISO/AVC") {
+
+					if (mt.subtype == MEDIASUBTYPE_H264 || mt.subtype == MEDIASUBTYPE_h264) {
+						m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
+					}
+				}
+				else if (CodecID == "V_MPEG4/ISO/AVC") {
 					if (pTE->CodecPrivate.size() > 9) {
 						vc_params_t params;
 						AVCParser::ParseSequenceParameterSet(pTE->CodecPrivate.data() + 9, pTE->CodecPrivate.size() - 9, params);
@@ -432,24 +429,22 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					ReduceDim(aspect);
 					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
-					if (!bHasVideo) {
-						mts.push_back(mt);
+					mts.push_back(mt);
 
-						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size()))) {
-							mts.insert(mts.cbegin(), mt);
-						} else if (pTE->CodecPrivate.empty()) {
-							std::vector<BYTE> pData;
-							if (ReadFirtsBlock(pData, pTE.get())) {
-								CBaseSplitterFileEx::avchdr h;
-								CMediaType mt2;
-								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									mts.insert(mts.cbegin(), mt2);
-								}
+					if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size()))) {
+						mts.insert(mts.cbegin(), mt);
+					} else if (pTE->CodecPrivate.empty()) {
+						std::vector<BYTE> pData;
+						if (ReadFirtsBlock(pData, pTE.get())) {
+							CBaseSplitterFileEx::avchdr h;
+							CMediaType mt2;
+							if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+								mts.insert(mts.cbegin(), mt2);
 							}
 						}
 					}
-					bHasVideo = true;
-				} else if (StartsWith(CodecID, "V_MPEG4/ISO/")) {
+				}
+				else if (StartsWith(CodecID, "V_MPEG4/ISO/")) {
 					BITMAPINFOHEADER pbmi;
 					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
 					pbmi.biSize			= sizeof(pbmi);
@@ -463,10 +458,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
 					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
-					if (!bHasVideo)
-						mts.push_back(mt);
-					bHasVideo = true;
-				} else if (CodecID == "V_DIRAC") {
+
+					mts.push_back(mt);
+				}
+				else if (CodecID == "V_DIRAC") {
 					mt.subtype = MEDIASUBTYPE_DiracVideo;
 					mt.formattype = FORMAT_DiracVideoInfo;
 					DIRACINFOHEADER* dvih = (DIRACINFOHEADER*)mt.AllocFormatBuffer(FIELD_OFFSET(DIRACINFOHEADER, dwSequenceHeader) + pTE->CodecPrivate.size());
@@ -484,19 +479,16 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(pSequenceHeader, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					dvih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.size();
 
-					if (!bHasVideo)
-						mts.push_back(mt);
-					bHasVideo = true;
-				} else if (CodecID == "V_MPEG2") {
+					mts.push_back(mt);
+				}
+				else if (CodecID == "V_MPEG2") {
 					BYTE* seqhdr = pTE->CodecPrivate.data();
 					DWORD len = (DWORD)pTE->CodecPrivate.size();
 					int w = (int)pTE->v.PixelWidth;
 					int h = (int)pTE->v.PixelHeight;
 
 					if (MakeMPEG2MediaType(mt, seqhdr, len, w, h)) {
-						if (!bHasVideo)
-							mts.push_back(mt);
-						bHasVideo = true;
+						mts.push_back(mt);
 
 						std::vector<BYTE> buf;
 						buf.resize(len);
@@ -507,7 +499,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							bInterlaced = TRUE;
 						}
 					}
-				} else if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
+				}
+				else if (CodecID == "V_MPEG1" || CodecID == "V_DSHOW/MPEG1VIDEO") {
 					mt.majortype	= MEDIATYPE_Video;
 					mt.subtype		= MEDIASUBTYPE_MPEG1Payload;
 					mt.formattype	= FORMAT_MPEGVideo;
@@ -523,10 +516,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pm1vi->hdr.bmiHeader.biSizeImage	= DIBSIZE(pm1vi->hdr.bmiHeader);
 
 					mt.SetSampleSize(pm1vi->hdr.bmiHeader.biWidth * pm1vi->hdr.bmiHeader.biHeight * 4);
-					if (!bHasVideo)
-						mts.push_back(mt);
-					bHasVideo = true;
-				} else if (CodecID == "V_MPEGH/ISO/HEVC") {
+
+					mts.push_back(mt);
+				}
+				else if (CodecID == "V_MPEGH/ISO/HEVC") {
 					BITMAPINFOHEADER pbmi;
 					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
 					pbmi.biSize			= sizeof(pbmi);
@@ -557,21 +550,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 
-					if (!bHasVideo) {
-						mts.push_back(mt);
-						if (pTE->CodecPrivate.empty()) {
-							std::vector<BYTE> pData;
-							if (ReadFirtsBlock(pData, pTE.get())) {
-								CBaseSplitterFileEx::hevchdr h;
-								CMediaType mt2;
-								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									mts.insert(mts.cbegin(), mt2);
-								}
+					mts.push_back(mt);
+					if (pTE->CodecPrivate.empty()) {
+						std::vector<BYTE> pData;
+						if (ReadFirtsBlock(pData, pTE.get())) {
+							CBaseSplitterFileEx::hevchdr h;
+							CMediaType mt2;
+							if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+								mts.insert(mts.cbegin(), mt2);
 							}
 						}
 					}
-					bHasVideo = true;
-				} else {
+				}
+				else {
 					DWORD fourcc = 0;
 					WORD bitdepth = 0;
 					if (CodecID == "V_MJPEG") {
@@ -655,121 +646,117 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biCompression = fourcc;
 						pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
 
-						if (!bHasVideo) {
-							mts.push_back(mt);
+						mts.push_back(mt);
 
-							if (StartsWith(CodecID, "V_REAL/RV") && pTE->CodecPrivate.size() > 26) {
-								const BYTE* extra = pTE->CodecPrivate.data() + 26;
-								const size_t extralen = pTE->CodecPrivate.size() - 26;
+						if (StartsWith(CodecID, "V_REAL/RV") && pTE->CodecPrivate.size() > 26) {
+							const BYTE* extra = pTE->CodecPrivate.data() + 26;
+							const size_t extralen = pTE->CodecPrivate.size() - 26;
 
-								VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
-								memcpy(pvih + 1, extra, extralen);
+							VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
+							memcpy(pvih + 1, extra, extralen);
+							mts.insert(mts.cbegin(), mt);
+						}
+
+						if (mt.subtype == MEDIASUBTYPE_AV01) {
+							if (pTE->CodecPrivate.size() >= 4 && pTE->CodecPrivate.front() == 0x81) { // marker = 1(1), version = 1(7)
+								pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size());
+								BYTE* extra = (BYTE*)(pvih + 1);
+								memcpy(extra, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
+
 								mts.insert(mts.cbegin(), mt);
-							}
-
-							if (mt.subtype == MEDIASUBTYPE_AV01) {
-								if (pTE->CodecPrivate.size() >= 4 && pTE->CodecPrivate.front() == 0x81) { // marker = 1(1), version = 1(7)
-									pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size());
-									BYTE* extra = (BYTE*)(pvih + 1);
-									memcpy(extra, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
-
-									mts.insert(mts.cbegin(), mt);
-								} else {
-									std::vector<BYTE> pData;
-									if (ReadFirtsBlock(pData, pTE.get())) {
-										AV1Parser::AV1SequenceParameters seq_params;
-										std::vector<uint8_t> obu_sequence_header;
-										if (AV1Parser::ParseOBU(pData.data(), pData.size(), seq_params, obu_sequence_header)) {
-											pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 4 + obu_sequence_header.size());
-											BYTE* extra = (BYTE*)(pvih + 1);
-
-											CBitsWriter bw(extra, 4);
-											bw.writeBits(1, 1); // marker
-											bw.writeBits(7, 1); // version
-											bw.writeBits(3, seq_params.profile);
-											bw.writeBits(5, seq_params.level);
-											bw.writeBits(1, seq_params.tier);
-											bw.writeBits(1, seq_params.bitdepth > 8);
-											bw.writeBits(1, seq_params.bitdepth == 12);
-											bw.writeBits(1, seq_params.monochrome);
-											bw.writeBits(1, seq_params.chroma_subsampling_x);
-											bw.writeBits(1, seq_params.chroma_subsampling_y);
-											bw.writeBits(2, seq_params.chroma_sample_position);
-											bw.writeBits(8, 0); // padding
-
-											memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
-
-											mts.insert(mts.cbegin(), mt);
-										}
-									}
-								}
-							} else if (mt.subtype == MEDIASUBTYPE_VP90) {
+							} else {
 								std::vector<BYTE> pData;
 								if (ReadFirtsBlock(pData, pTE.get())) {
-									CGolombBuffer gb(pData.data(), pData.size());
-									const BYTE marker = gb.BitRead(2);
-									if (marker == 0x2) {
-										BYTE profile = gb.BitRead(1);
-										profile |= gb.BitRead(1) << 1;
-										if (profile == 3) {
-											profile += gb.BitRead(1);
-										}
+									AV1Parser::AV1SequenceParameters seq_params;
+									std::vector<uint8_t> obu_sequence_header;
+									if (AV1Parser::ParseOBU(pData.data(), pData.size(), seq_params, obu_sequence_header)) {
+										pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 4 + obu_sequence_header.size());
+										BYTE* extra = (BYTE*)(pvih + 1);
 
-										#define VP9_SYNCCODE 0x498342
+										CBitsWriter bw(extra, 4);
+										bw.writeBits(1, 1); // marker
+										bw.writeBits(7, 1); // version
+										bw.writeBits(3, seq_params.profile);
+										bw.writeBits(5, seq_params.level);
+										bw.writeBits(1, seq_params.tier);
+										bw.writeBits(1, seq_params.bitdepth > 8);
+										bw.writeBits(1, seq_params.bitdepth == 12);
+										bw.writeBits(1, seq_params.monochrome);
+										bw.writeBits(1, seq_params.chroma_subsampling_x);
+										bw.writeBits(1, seq_params.chroma_subsampling_y);
+										bw.writeBits(2, seq_params.chroma_sample_position);
+										bw.writeBits(8, 0); // padding
 
-										AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
-										int bits = 0;
-										if (!gb.BitRead(1)) {
-											const BYTE keyframe = !gb.BitRead(1);
-											gb.BitRead(1);
-											gb.BitRead(1);
+										memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
 
-											if (keyframe) {
-												if (VP9_SYNCCODE == gb.BitRead(24)) {
-													static const enum AVColorSpace colorspaces[8] = {
-														AVCOL_SPC_UNSPECIFIED, AVCOL_SPC_BT470BG, AVCOL_SPC_BT709, AVCOL_SPC_SMPTE170M,
-														AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
+										mts.insert(mts.cbegin(), mt);
+									}
+								}
+							}
+						} else if (mt.subtype == MEDIASUBTYPE_VP90) {
+							std::vector<BYTE> pData;
+							if (ReadFirtsBlock(pData, pTE.get())) {
+								CGolombBuffer gb(pData.data(), pData.size());
+								const BYTE marker = gb.BitRead(2);
+								if (marker == 0x2) {
+									BYTE profile = gb.BitRead(1);
+									profile |= gb.BitRead(1) << 1;
+									if (profile == 3) {
+										profile += gb.BitRead(1);
+									}
+
+									#define VP9_SYNCCODE 0x498342
+
+									AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+									int bits = 0;
+									if (!gb.BitRead(1)) {
+										const BYTE keyframe = !gb.BitRead(1);
+										gb.BitRead(1);
+										gb.BitRead(1);
+
+										if (keyframe) {
+											if (VP9_SYNCCODE == gb.BitRead(24)) {
+												static const enum AVColorSpace colorspaces[8] = {
+													AVCOL_SPC_UNSPECIFIED, AVCOL_SPC_BT470BG, AVCOL_SPC_BT709, AVCOL_SPC_SMPTE170M,
+													AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
+												};
+
+												bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
+												const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
+												if (colorspace == AVCOL_SPC_RGB) {
+													static const enum AVPixelFormat pix_fmt_rgb[3] = {
+														AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
+													};
+													pix_fmt = pix_fmt_rgb[bits];
+												} else {
+													static const enum AVPixelFormat pix_fmt_for_ss[3][2 /* v */][2 /* h */] = {
+														{ { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P },
+															{ AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV420P } },
+														{ { AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV422P10 },
+															{ AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV420P10 } },
+														{ { AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12 },
+															{ AV_PIX_FMT_YUV440P12, AV_PIX_FMT_YUV420P12 } }
 													};
 
-													bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
-													const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
-													if (colorspace == AVCOL_SPC_RGB) {
-														static const enum AVPixelFormat pix_fmt_rgb[3] = {
-															AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
-														};
-														pix_fmt = pix_fmt_rgb[bits];
+													gb.BitRead(1);
+													if (profile & 1) {
+														const BYTE h = gb.BitRead(1);
+														const BYTE v = gb.BitRead(1);
+														pix_fmt = pix_fmt_for_ss[bits][v][h];
 													} else {
-														static const enum AVPixelFormat pix_fmt_for_ss[3][2 /* v */][2 /* h */] = {
-															{ { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P },
-																{ AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV420P } },
-															{ { AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV422P10 },
-																{ AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV420P10 } },
-															{ { AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12 },
-																{ AV_PIX_FMT_YUV440P12, AV_PIX_FMT_YUV420P12 } }
-														};
-
-														gb.BitRead(1);
-														if (profile & 1) {
-															const BYTE h = gb.BitRead(1);
-															const BYTE v = gb.BitRead(1);
-															pix_fmt = pix_fmt_for_ss[bits][v][h];
-														} else {
-															pix_fmt = pix_fmt_for_ss[bits][1][1];
-														}
+														pix_fmt = pix_fmt_for_ss[bits][1][1];
 													}
 												}
 											}
 										}
-
-										m_profile = profile;
-										m_pix_fmt = pix_fmt;
-										m_bits    = bits == 0 ? 8 : bits == 1 ? 10 : 12;
 									}
+
+									m_profile = profile;
+									m_pix_fmt = pix_fmt;
+									m_bits    = bits == 0 ? 8 : bits == 1 ? 10 : 12;
 								}
 							}
 						}
-
-						bHasVideo = true;
 					}
 				}
 
@@ -1526,6 +1513,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 	}
+
+	bool bHasVideo = (VideoTrackPins.size() > 0);
 
 	std::list<std::pair<CMatroskaSplitterOutputPin*, TrackEntry*>> TrackPins;
 	TrackPins.splice(TrackPins.end(), VideoTrackPins);
