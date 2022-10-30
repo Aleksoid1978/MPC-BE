@@ -1495,7 +1495,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pPinOut->SetProperty(L"LANG", CString(pTE->Language));
 			}
 
-			if (!isSub) {
+			if (!isSub && (size_t)(iVideo + iAudio - 3) <= pinOut.size()) {
 				pinOut.insert(pinOut.begin() + (iVideo + iAudio - 3), pPinOut);
 				pinOutTE.insert(pinOutTE.begin() + (iVideo + iAudio - 3), pTE.get());
 			} else {
