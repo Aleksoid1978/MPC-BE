@@ -1977,6 +1977,26 @@ bool CBaseSplitterFileEx::Read(avs3_ts_hdr& h, int len, CMediaType* pmt/* = null
 	static constexpr BYTE AVS3_PROFILE_BASELINE_MAIN = 0x20;
 	static constexpr BYTE AVS3_PROFILE_BASELINE_MAIN10 = 0x22;
 
+	static constexpr fraction_t frame_rates[16] = {
+		{ 0    , 0   }, // forbid
+		{ 24000, 1001},
+		{ 24   , 1   },
+		{ 25   , 1   },
+		{ 30000, 1001},
+		{ 30   , 1   },
+		{ 50   , 1   },
+		{ 60000, 1001},
+		{ 60   , 1   },
+		{ 100  , 1   },
+		{ 120  , 1   },
+		{ 200  , 1   },
+		{ 240  , 1   },
+		{ 300  , 1   },
+		{ 0    , 0   }, // reserved
+		{ 0    , 0   }  // reserved
+	};
+
+
 	BYTE id = {};
 	if (!NextMpegStartCode(id) || id != AVS3_SEQ_START_CODE) {
 		return false;
@@ -1987,10 +2007,17 @@ bool CBaseSplitterFileEx::Read(avs3_ts_hdr& h, int len, CMediaType* pmt/* = null
 		return false;
 	}
 
-	BitRead(8); // level
+	BitRead(8); // level_id
 	BitRead(1); // progressive_sequence
 	BitRead(1); // field_coded_sequence
-	BitRead(2); // library
+
+	BYTE library_stream_flag = BitRead(1);
+	if (!library_stream_flag) {
+		BYTE library_picture_enable_flag = BitRead(1);
+		if (library_picture_enable_flag) {
+			BitRead(1); // duplicate_sequence_header_flag
+		}
+	}
 
 	BitRead(1); // marker_bit
 	int width = BitRead(14);
@@ -2013,30 +2040,11 @@ bool CBaseSplitterFileEx::Read(avs3_ts_hdr& h, int len, CMediaType* pmt/* = null
 	BitRead(1); // marker_bit
 	BitRead(4); // aspect_ratio
 
-	BYTE rate_code = BitRead(4);
-
-	static const fraction_t frame_rates[16] = {
-		{ 0    , 0   }, // forbid
-		{ 24000, 1001},
-		{ 24   , 1   },
-		{ 25   , 1   },
-		{ 30000, 1001},
-		{ 30   , 1   },
-		{ 50   , 1   },
-		{ 60000, 1001},
-		{ 60   , 1   },
-		{ 100  , 1   },
-		{ 120  , 1   },
-		{ 200  , 1   },
-		{ 240  , 1   },
-		{ 300  , 1   },
-		{ 0    , 0   }, // reserved
-		{ 0    , 0   }  // reserved
-	};
+	BYTE frame_rate_code = BitRead(4);
 
 	fraction_t frame_rate = {};
-	frame_rate.num = frame_rates[rate_code].num;
-	frame_rate.den = frame_rates[rate_code].den;
+	frame_rate.num = frame_rates[frame_rate_code].num;
+	frame_rate.den = frame_rates[frame_rate_code].den;
 	if (!frame_rate.num || !frame_rate.den) {
 		return false;
 	}
