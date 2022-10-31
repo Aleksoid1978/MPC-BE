@@ -27,6 +27,8 @@
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/MP4AudioDecoderConfig.h"
 
+#include <libavutil/pixfmt.h>
+
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)
 	, m_type(MPEG_TYPES::mpeg_invalid)
@@ -1053,6 +1055,8 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
 				s.codec = stream_codec::AVS3;
 				type = stream_type::video;
+
+				m_pix_fmt = h.bitdepth == 10 ? AV_PIX_FMT_YUV420P10 : AV_PIX_FMT_YUV420P;
 			}
 		}
 	}

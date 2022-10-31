@@ -1984,6 +1984,8 @@ bool CBaseSplitterFileEx::Read(avs3_ts_hdr& h, int len, CMediaType* pmt/* = null
 		return false;
 	}
 
+	h.bitdepth = seq_header.bitdepth;
+
 	if (pmt) {
 		CSize aspect = CSize(seq_header.width, seq_header.height);
 		ReduceDim(aspect);

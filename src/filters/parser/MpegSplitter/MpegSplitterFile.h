@@ -442,4 +442,6 @@ public:
 	std::map<DWORD, streamData> m_streamData;
 
 	std::vector<program::stream> m_pmt_streams;
+
+	int m_pix_fmt = -1;
 };

@@ -37,6 +37,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	, public IAMStreamSelect
 	, public ISpecifyPropertyPages2
 	, public IMpegSplitterFilter
+	, public CExFilterInfoImpl
 {
 	REFERENCE_TIME	m_rtStartOffset;
 	REFERENCE_TIME	m_rtSeekOffset;
@@ -152,6 +153,9 @@ public:
 	// IKeyFrameInfo
 	STDMETHODIMP_(HRESULT) GetKeyFrameCount(UINT& nKFs);
 	STDMETHODIMP_(HRESULT) GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
+
+	// IExFilterInfo
+	STDMETHODIMP GetPropertyInt(LPCSTR field, int* value) override;
 };
 
 class __declspec(uuid("1365BE7A-C86A-473C-9A41-C0A6E82C9FA3"))

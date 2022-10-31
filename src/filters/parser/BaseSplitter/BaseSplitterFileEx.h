@@ -319,6 +319,7 @@ public:
 	};
 
 	struct avs3_ts_hdr {
+		uint8_t bitdepth = 0;
 	};
 
 #pragma pack(pop)

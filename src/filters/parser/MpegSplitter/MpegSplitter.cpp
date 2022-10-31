@@ -588,6 +588,7 @@ STDMETHODIMP CMpegSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void*
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		QI(IAMStreamSelect)
+		QI(IExFilterInfo)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -2013,6 +2014,23 @@ STDMETHODIMP CMpegSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TI
 	}
 
 	return S_OK;
+}
+
+// IExFilterInfo
+
+STDMETHODIMP CMpegSplitterFilter::GetPropertyInt(LPCSTR field, int* value)
+{
+	CheckPointer(value, E_POINTER);
+
+	if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
+		if (m_pFile && m_pFile->m_pix_fmt != -1) {
+			*value = m_pFile->m_pix_fmt;
+			return S_OK;
+		}
+		return E_ABORT;
+	}
+
+	return E_INVALIDARG;
 }
 
 //
