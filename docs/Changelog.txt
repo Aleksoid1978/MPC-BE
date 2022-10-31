@@ -16,6 +16,11 @@ Added update of metadata while playing radio broadcasts.
 
 MpegSplitter
 Unsupported G.722.1 audio tracks for Hikvision (IMKH) camera files will be ignored.
+Added support for AVS3 video codec.
+
+MatroskaSplitter
+Fixed a crash on some MKVs.
+Added support for AVS3 video codec.
 
 RawVideoSplitter
 Added support for color range and color location for YUV4MPEG2.
@@ -23,6 +28,7 @@ Added support for color range and color location for YUV4MPEG2.
 MPCVideoDec
 Fixed output media type properties for RAW video when MPC Video Converter is used.
 Fixed angle switching for Stereo 3D.
+Added support for AVS3 video decoding.
 
 Player
 Added the ability to specify "User agent". The default is "Mozilla/5.0".
