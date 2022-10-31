@@ -807,6 +807,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define MPEG4_VIDEO       (1ULL << 15)
 #define AC4_AUDIO         (1ULL << 16)
 #define AES3_AUDIO        (1ULL << 17)
+#define AVS3_VIDEO        (1ULL << 18)
 
 #define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO)
 
@@ -863,7 +864,9 @@ static const struct StreamType {
 	// Teletext Subtitle
 	{ PES_PRIVATE,							TELETEXT_SUB},
 	// MPEG4 Video
-	{ VIDEO_STREAM_MPEG4,					MPEG4_VIDEO}
+	{ VIDEO_STREAM_MPEG4,					MPEG4_VIDEO },
+	// MPEG4 Video
+	{ VIDEO_STREAM_AVS3,					AVS3_VIDEO  }
 };
 
 static const struct {
@@ -1040,6 +1043,16 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						type = stream_type::audio;
 					}
 				}
+			}
+		}
+
+		// AVS3 Video
+		if (type == stream_type::unknown && (stream_type & AVS3_VIDEO) && m_type == MPEG_TYPES::mpeg_ts) {
+			Seek(start);
+			avs3_ts_hdr h;
+			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
+				s.codec = stream_codec::AVS3;
+				type = stream_type::video;
 			}
 		}
 	}

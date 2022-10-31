@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -71,6 +71,7 @@ enum PES_STREAM_TYPE {
 	SECONDARY_AUDIO_AC3_PLUS			= 0xA1,
 	SECONDARY_AUDIO_DTS_HD				= 0xA2,
 	VIDEO_STREAM_DIRAC					= 0xD1,
+	VIDEO_STREAM_AVS3					= 0xD4,
 	VIDEO_STREAM_VC1					= 0xEA,
 };
 

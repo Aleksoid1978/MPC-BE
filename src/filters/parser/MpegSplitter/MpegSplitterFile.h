@@ -203,7 +203,8 @@ public:
 		DVDLPCM,
 		MPEG4Video,
 		AC4,
-		AES3
+		AES3,
+		AVS3
 	};
 
 	enum stream_type {

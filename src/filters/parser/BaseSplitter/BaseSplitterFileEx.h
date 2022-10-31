@@ -318,6 +318,9 @@ public:
 	struct aes3_ts_hdr {
 	};
 
+	struct avs3_ts_hdr {
+	};
+
 #pragma pack(pop)
 
 	bool Read(seqhdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
@@ -356,6 +359,8 @@ public:
 	bool Read(pcm_law_hdr& h, bool bAlaw, CMediaType* pmt = nullptr);
 	bool Read(opus_ts_hdr& h, int len, const std::vector<BYTE>& extradata, CMediaType* pmt = nullptr);
 	bool Read(aes3_ts_hdr& h, int len, CMediaType* pmt = nullptr);
+
+	bool Read(avs3_ts_hdr& h, int len, CMediaType* pmt = nullptr);
 
 	// LPCM
 	bool ReadDVDLPCMHdr(CMediaType* pmt = nullptr);
