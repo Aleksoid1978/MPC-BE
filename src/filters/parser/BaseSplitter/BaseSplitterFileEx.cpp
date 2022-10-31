@@ -1973,84 +1973,19 @@ bool CBaseSplitterFileEx::Read(aes3_ts_hdr& h, int len, CMediaType* pmt/* = null
 
 bool CBaseSplitterFileEx::Read(avs3_ts_hdr& h, int len, CMediaType* pmt/* = nullptr*/)
 {
-	static constexpr BYTE AVS3_SEQ_START_CODE = 0xB0;
-	static constexpr BYTE AVS3_PROFILE_BASELINE_MAIN = 0x20;
-	static constexpr BYTE AVS3_PROFILE_BASELINE_MAIN10 = 0x22;
-
-	static constexpr fraction_t frame_rates[16] = {
-		{ 0    , 0   }, // forbid
-		{ 24000, 1001},
-		{ 24   , 1   },
-		{ 25   , 1   },
-		{ 30000, 1001},
-		{ 30   , 1   },
-		{ 50   , 1   },
-		{ 60000, 1001},
-		{ 60   , 1   },
-		{ 100  , 1   },
-		{ 120  , 1   },
-		{ 200  , 1   },
-		{ 240  , 1   },
-		{ 300  , 1   },
-		{ 0    , 0   }, // reserved
-		{ 0    , 0   }  // reserved
-	};
-
-
-	BYTE id = {};
-	if (!NextMpegStartCode(id) || id != AVS3_SEQ_START_CODE) {
+	std::vector<BYTE> pData;
+	pData.resize(len);
+	if (S_OK != ByteRead(pData.data(), len)) {
 		return false;
 	}
 
-	BYTE profile = BitRead(8);
-	if (profile != AVS3_PROFILE_BASELINE_MAIN && profile != AVS3_PROFILE_BASELINE_MAIN10) {
-		return false;
-	}
-
-	BitRead(8); // level_id
-	BitRead(1); // progressive_sequence
-	BitRead(1); // field_coded_sequence
-
-	BYTE library_stream_flag = BitRead(1);
-	if (!library_stream_flag) {
-		BYTE library_picture_enable_flag = BitRead(1);
-		if (library_picture_enable_flag) {
-			BitRead(1); // duplicate_sequence_header_flag
-		}
-	}
-
-	BitRead(1); // marker_bit
-	int width = BitRead(14);
-	BitRead(1); // marker_bit
-	int height = BitRead(14);
-	if (!width || !height) {
-		return false;
-	}
-
-	BitRead(2); // chroma_format
-	BitRead(3); // sample_precision
-
-	if (profile == AVS3_PROFILE_BASELINE_MAIN10) {
-		BYTE encoding_precision = BitRead(3);
-		if (encoding_precision != 1 && encoding_precision != 2) {
-			return false;
-		}
-	}
-
-	BitRead(1); // marker_bit
-	BitRead(4); // aspect_ratio
-
-	BYTE frame_rate_code = BitRead(4);
-
-	fraction_t frame_rate = {};
-	frame_rate.num = frame_rates[frame_rate_code].num;
-	frame_rate.den = frame_rates[frame_rate_code].den;
-	if (!frame_rate.num || !frame_rate.den) {
+	AVS3Parser::AVS3SequenceHeader seq_header;
+	if (!AVS3Parser::ParseSequenceHeader(pData.data(), len, seq_header)) {
 		return false;
 	}
 
 	if (pmt) {
-		CSize aspect = CSize(width, height);
+		CSize aspect = CSize(seq_header.width, seq_header.height);
 		ReduceDim(aspect);
 
 		pmt->majortype = MEDIATYPE_Video;
@@ -2060,18 +1995,18 @@ bool CBaseSplitterFileEx::Read(avs3_ts_hdr& h, int len, CMediaType* pmt/* = null
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
 		memset(vih2, 0, pmt->FormatLength());
 
-		vih2->AvgTimePerFrame = static_cast<REFERENCE_TIME>(10000000.0 * frame_rate.den / frame_rate.num);
+		vih2->AvgTimePerFrame = seq_header.AvgTimePerFrame;
 		vih2->dwPictAspectRatioX = aspect.cx;
 		vih2->dwPictAspectRatioY = aspect.cy;
 		vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		vih2->bmiHeader.biWidth = width;
-		vih2->bmiHeader.biHeight = height;
+		vih2->bmiHeader.biWidth = seq_header.width;
+		vih2->bmiHeader.biHeight = seq_header.height;
 		vih2->bmiHeader.biCompression = pmt->subtype.Data1;
 		vih2->bmiHeader.biPlanes = 1;
 		vih2->bmiHeader.biBitCount = 24;
 		vih2->bmiHeader.biCompression = FCC('AVS3');
 		vih2->bmiHeader.biSizeImage = DIBSIZE(vih2->bmiHeader);
-		vih2->rcSource = vih2->rcTarget = { 0, 0, width, height };
+		vih2->rcSource = vih2->rcTarget = { 0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight };
 	}
 
 	return true;

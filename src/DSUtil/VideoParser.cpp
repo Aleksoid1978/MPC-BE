@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1458,3 +1458,93 @@ namespace AV1Parser {
 		return false;
 	}
 } // namespace AV1Parser
+
+namespace AVS3Parser {
+	static constexpr BYTE SEQ_START_CODE = 0xB0;
+	static constexpr BYTE PROFILE_BASELINE_MAIN = 0x20;
+	static constexpr BYTE PROFILE_BASELINE_MAIN10 = 0x22;
+
+	static constexpr fraction_t frame_rates[16] = {
+		{ 0    , 0   }, // forbid
+		{ 24000, 1001},
+		{ 24   , 1   },
+		{ 25   , 1   },
+		{ 30000, 1001},
+		{ 30   , 1   },
+		{ 50   , 1   },
+		{ 60000, 1001},
+		{ 60   , 1   },
+		{ 100  , 1   },
+		{ 120  , 1   },
+		{ 200  , 1   },
+		{ 240  , 1   },
+		{ 300  , 1   },
+		{ 0    , 0   }, // reserved
+		{ 0    , 0   }  // reserved
+	};
+
+	bool ParseSequenceHeader(const BYTE* data, const int size, AVS3SequenceHeader& seq_header)
+	{
+		CGolombBuffer gb(data, size);
+
+		BYTE id = {};
+		if (!gb.NextMpegStartCode(id) || id != SEQ_START_CODE) {
+			return false;
+		}
+
+		seq_header.profile = gb.BitRead(8);
+		if (seq_header.profile != PROFILE_BASELINE_MAIN && seq_header.profile != PROFILE_BASELINE_MAIN10) {
+			return false;
+		}
+
+		gb.BitRead(8); // level_id
+		gb.BitRead(1); // progressive_sequence
+		gb.BitRead(1); // field_coded_sequence
+
+		BYTE library_stream_flag = gb.BitRead(1);
+		if (!library_stream_flag) {
+			BYTE library_picture_enable_flag = gb.BitRead(1);
+			if (library_picture_enable_flag) {
+				gb.BitRead(1); // duplicate_sequence_header_flag
+			}
+		}
+
+		gb.BitRead(1); // marker_bit
+		seq_header.width = gb.BitRead(14);
+		gb.BitRead(1); // marker_bit
+		seq_header.height = gb.BitRead(14);
+		if (!seq_header.width || !seq_header.height) {
+			return false;
+		}
+
+		gb.BitRead(2); // chroma_format
+		gb.BitRead(3); // sample_precision
+
+		if (seq_header.profile == PROFILE_BASELINE_MAIN10) {
+			BYTE encoding_precision = gb.BitRead(3);
+			if (encoding_precision == 1) {
+				seq_header.bitdepth = 8;
+			} else if (encoding_precision == 2) {
+				seq_header.bitdepth = 10;
+			} else {
+				return false;
+			}
+		} else {
+			seq_header.bitdepth = 8;
+		}
+
+		gb.BitRead(1); // marker_bit
+		gb.BitRead(4); // aspect_ratio
+
+		BYTE frame_rate_code = gb.BitRead(4);
+
+		auto& frame_rate = frame_rates[frame_rate_code];
+		if (!frame_rate.num || !frame_rate.den) {
+			return false;
+		}
+
+		seq_header.AvgTimePerFrame = llMulDiv(UNITS, frame_rate.den, frame_rate.num, 0);
+
+		return true;
+	}
+} // namespace AVS3Parser

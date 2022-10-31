@@ -756,6 +756,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									m_bits    = bits == 0 ? 8 : bits == 1 ? 10 : 12;
 								}
 							}
+						} else if (mt.subtype == MEDIASUBTYPE_AVS3) {
+							std::vector<BYTE> pData;
+							if (ReadFirtsBlock(pData, pTE.get())) {
+								AVS3Parser::AVS3SequenceHeader seq_header;
+								if (AVS3Parser::ParseSequenceHeader(pData.data(), pData.size(), seq_header)) {
+									m_pix_fmt = seq_header.bitdepth == 10 ? AV_PIX_FMT_YUV420P10 : AV_PIX_FMT_YUV420P;
+								}
+							}
 						}
 					}
 				}

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,3 +121,16 @@ namespace AV1Parser {
 	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size, uint8_t& obu_type);
 	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header);
 } // namespace AV1Parser
+
+namespace AVS3Parser {
+	struct AVS3SequenceHeader {
+		uint8_t profile  = 0;
+		uint8_t bitdepth = 0;
+		uint32_t width   = 0;
+		uint32_t height  = 0;
+
+		REFERENCE_TIME AvgTimePerFrame = 0;
+	};
+
+	bool ParseSequenceHeader(const BYTE* data, const int size, AVS3SequenceHeader& seq_header);
+} // namespace AVS3Parser
