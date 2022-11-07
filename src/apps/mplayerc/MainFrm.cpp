@@ -5755,8 +5755,21 @@ void CMainFrame::OnFileOpenDevice()
 
 	std::unique_ptr<OpenDeviceData> p(DNew OpenDeviceData());
 	if (p) {
-		p->DisplayName[0] = s.strAnalogVideo;
-		p->DisplayName[1] = s.strAnalogAudio;
+		if (s.strAnalogVideo.IsEmpty() && s.strAnalogAudio.IsEmpty()) {
+			BeginEnumSysDev(CLSID_VideoInputDeviceCategory, pMoniker) {
+				LPOLESTR strName = nullptr;
+				if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
+					p->DisplayName[0] = strName;
+					CoTaskMemFree(strName);
+					break;
+				}
+			}
+			EndEnumSysDev
+		}
+		else {
+			p->DisplayName[0] = s.strAnalogVideo;
+			p->DisplayName[1] = s.strAnalogAudio;
+		}
 	}
 	OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
 	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && m_eMediaLoadState == MLS_LOADED && s.iDefaultCaptureDevice == 1) {
