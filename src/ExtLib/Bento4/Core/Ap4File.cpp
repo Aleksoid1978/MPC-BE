@@ -82,6 +82,11 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                 delete atom;
                 break;
             case AP4_ATOM_TYPE_FTYP:
+                if (m_FileType) {
+                    delete atom;
+                    bBreak = true;
+                    break;
+                }
                 m_FileType = AP4_DYNAMIC_CAST(AP4_FtypAtom, atom);
                 m_OtherAtoms.Add(atom);
                 break;
@@ -113,7 +118,7 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                 m_OtherAtoms.Add(atom);
         }
     }
-    
+
     if (m_Movie && AP4_SUCCEEDED(m_Movie->SetSidxAtoms(sidxAtoms, stream))) {
         m_Movie->SwitchFirstMoof();
         return;
