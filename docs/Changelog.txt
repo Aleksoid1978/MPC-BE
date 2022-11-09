@@ -22,6 +22,9 @@ MatroskaSplitter
 Fixed a crash on some MKVs.
 Added support for AVS3 video codec.
 
+MP4Splitter
+Added support for MP4 with multiple headers.
+
 RawVideoSplitter
 Added support for color range and color location for YUV4MPEG2.
 
@@ -42,6 +45,7 @@ Fixed decoding error for some JPEG files.
 Fixed update of the "Information" panel for Ogg radio.
 Fixed detection of file extensions for URLs.
 Optimized CD/DVD presence detection for some drives.
+Fixed playback from the webcam after resetting the settings.
 Various interface fixes.
 
 Updated Hungarian translation (by mickey).
