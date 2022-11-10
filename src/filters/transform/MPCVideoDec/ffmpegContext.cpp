@@ -129,7 +129,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 					max_ref_frames = 16;
 				}
 			}
-		} else if (nPCIVendor == PCIV_S3_Graphics || nPCIVendor == PCIV_Intel) {
+		} else if (nPCIVendor == PCIV_S3_Graphics || nPCIVendor == PCIV_Intel || nPCIVendor == PCIV_Qualcomm) {
 			no_level51_support = 0;
 			max_ref_frames = 16;
 		}
@@ -347,6 +347,9 @@ BOOL DXVACheckFramesize(int width, int height, UINT nPCIVendor, UINT nPCIDevice,
 	}
 	else if (nPCIVendor == PCIV_Intel && VideoDriverVersion >= FileVersion::Ver(10, 18, 10, 4061).value) {
 		// For Intel graphics cards with support for 4k, you must install the driver v15.33.32.4061 or newer.
+		return TRUE;
+	}
+	else if (nPCIVendor == PCIV_Qualcomm) {
 		return TRUE;
 	}
 	else if ((width <= 1920 && height <= 1088)
