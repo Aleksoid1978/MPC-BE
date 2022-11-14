@@ -1,8 +1,8 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.6.5.x dev
+1.6.5.3
 =============================
-
+Fixed crash when playing AVS3 video on CPU without AVX instructions.
 
 1.6.5
 =============================
