@@ -2058,6 +2058,7 @@ redo:
 	if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_CodecId == AV_CODEC_ID_MPEG1VIDEO
 			|| m_CodecId == AV_CODEC_ID_AVS3
+			|| m_CodecId == AV_CODEC_ID_MPEG4
 			|| pmt->subtype == MEDIASUBTYPE_H264
 			|| pmt->subtype == MEDIASUBTYPE_h264
 			|| pmt->subtype == MEDIASUBTYPE_X264
