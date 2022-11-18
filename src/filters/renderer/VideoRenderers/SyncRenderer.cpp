@@ -480,7 +480,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_filter = D3DTEXF_NONE;
 	}
 
-	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
+	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDevEx);

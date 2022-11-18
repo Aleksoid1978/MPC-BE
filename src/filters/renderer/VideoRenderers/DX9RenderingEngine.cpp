@@ -578,8 +578,10 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 	return hr;
 }
 
-#if DXVA2VP
+#if DXVA2VP || DXVAHDVP
 const UINT VIDEO_FPS     = 60;
+#endif
+#if DXVA2VP
 const UINT VIDEO_MSPF    = (1000 + VIDEO_FPS / 2) / VIDEO_FPS;
 const UINT VIDEO_100NSPF = VIDEO_MSPF * 10000;
 

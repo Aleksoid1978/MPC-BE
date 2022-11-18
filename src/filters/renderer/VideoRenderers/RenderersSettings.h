@@ -194,7 +194,7 @@ public:
 	}
 };
 
-extern CRenderersSettings&	GetRenderersSettings();
+extern CRenderersSettings& GetRenderersSettings();
 
 extern bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 

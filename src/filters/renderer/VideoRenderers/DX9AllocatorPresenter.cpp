@@ -727,11 +727,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	if (!bTryToReset) {
+#if DXVAHDVP
 		m_pDXVAHD_VP.Release();
 		m_pDXVAHD_Device.Release();
-
+#endif
+#if DXVA2VP
 		m_pDXVA2_VP.Release();
 		m_pDXVA2_VPService.Release();
+#endif
 	}
 
 	m_MainThreadId = GetCurrentThreadId();

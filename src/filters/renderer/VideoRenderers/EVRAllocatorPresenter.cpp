@@ -1014,7 +1014,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		}
 
 		memset(&Buffer, 0, sizeof(Buffer));
-		Buffer.pSample	= pSample;
+		Buffer.pSample = pSample;
 		pSample->GetUINT32(GUID_SURFACE_INDEX, &iSurface);
 
 		{
