@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -120,7 +120,6 @@ void CRenderersSettings::SetDefault()
 
 	bTearingTest					= false;
 	iDisplayStats					= 0;
-	bResetStats						= false;
 	iStereo3DTransform				= STEREO3D_AsIs;
 	bStereo3DSwapLR					= false;
 }

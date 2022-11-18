@@ -93,6 +93,7 @@ public:
 	STDMETHODIMP_(bool) ResetDevice() { return false; }
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
 	STDMETHODIMP_(bool) IsRendering() { return true; }
+	STDMETHODIMP_(void) ResetStats() {}
 
 	// ISubRenderOptions
 	STDMETHODIMP GetBool(LPCSTR field, bool* value);

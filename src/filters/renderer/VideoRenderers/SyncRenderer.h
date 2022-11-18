@@ -303,8 +303,6 @@ namespace GothSync
 		CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CBaseAP();
 
-		void ResetStats();
-
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
@@ -320,6 +318,7 @@ namespace GothSync
 		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
+		STDMETHODIMP_(void) ResetStats() override;
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value);

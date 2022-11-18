@@ -264,20 +264,6 @@ MFVideoArea CBaseAP::GetArea(float x, float y, DWORD width, DWORD height)
 	return area;
 }
 
-void CBaseAP::ResetStats()
-{
-	m_pGenlock->ResetStats();
-	m_lAudioLag = 0;
-	m_lAudioLagMin = 10000;
-	m_lAudioLagMax = -10000;
-	m_MinJitter = MAXLONG64;
-	m_MaxJitter = MINLONG64;
-	m_MinSyncOffset = MAXLONG64;
-	m_MaxSyncOffset = MINLONG64;
-	m_uSyncGlitches = 0;
-	m_pcFramesDropped = 0;
-}
-
 bool CBaseAP::SettingsNeedResetDevice()
 {
 	CRenderersSettings& New = GetRenderersSettings();
@@ -1519,11 +1505,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		m_pAudioStats->GetStatParam(AM_AUDREND_STAT_PARAM_SLAVE_MODE, &m_lAudioSlaveMode, &tmp);
 	}
 
-	if (rs.bResetStats) {
-		ResetStats();
-		rs.bResetStats = false;
-	}
-
 	bool bResetDevice = m_bPendingResetDevice;
 	if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->TestCooperativeLevel() == D3DERR_DEVICENOTRESET || hr == S_PRESENT_MODE_CHANGED) {
 		bResetDevice = true;
@@ -1599,6 +1580,22 @@ STDMETHODIMP_(bool) CBaseAP::ResetDevice()
 STDMETHODIMP_(bool) CBaseAP::DisplayChange()
 {
 	return true;
+}
+
+STDMETHODIMP_(void) CBaseAP::ResetStats()
+{
+	CAutoLock cRenderLock(&m_allocatorLock);
+
+	m_pGenlock->ResetStats();
+	m_lAudioLag = 0;
+	m_lAudioLagMin = 10000;
+	m_lAudioLagMax = -10000;
+	m_MinJitter = MAXLONG64;
+	m_MaxJitter = MINLONG64;
+	m_MinSyncOffset = MAXLONG64;
+	m_MaxSyncOffset = MINLONG64;
+	m_uSyncGlitches = 0;
+	m_pcFramesDropped = 0;
 }
 
 // ISubRenderOptions

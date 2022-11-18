@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1398,11 +1398,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		Stereo3DTransform(pBackBuffer, rDstVid);
 	}
 
-	if (rs.bResetStats) {
-		ResetStats();
-		rs.bResetStats = false;
-	}
-
 	if (rs.iDisplayStats) {
 		DrawStats();
 	}
@@ -1725,6 +1720,28 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 	return true;
 }
 
+STDMETHODIMP_(void) CDX9AllocatorPresenter::ResetStats()
+{
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	LONGLONG Time = GetPerfCounter();
+
+	m_PaintTime = 0;
+	m_PaintTimeMin = 0;
+	m_PaintTimeMax = 0;
+
+	m_RasterStatusWaitTime = 0;
+	m_RasterStatusWaitTimeMin = 0;
+	m_RasterStatusWaitTimeMax = 0;
+
+	m_MinSyncOffset = 0;
+	m_MaxSyncOffset = 0;
+	m_fSyncOffsetAvr = 0;
+	m_fSyncOffsetStdDev = 0;
+
+	CalculateJitter(Time);
+}
+
 STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
 {
 	const auto bWindowSizeChanged = m_windowRect.Size() != CRect(w).Size();
@@ -1743,26 +1760,6 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
 	if (bWindowSizeChanged) {
 		m_bFont3DUpdate = true; // do not set "false" here
 	}
-}
-
-void CDX9AllocatorPresenter::ResetStats()
-{
-	LONGLONG Time = GetPerfCounter();
-
-	m_PaintTime = 0;
-	m_PaintTimeMin = 0;
-	m_PaintTimeMax = 0;
-
-	m_RasterStatusWaitTime = 0;
-	m_RasterStatusWaitTimeMin = 0;
-	m_RasterStatusWaitTimeMax = 0;
-
-	m_MinSyncOffset = 0;
-	m_MaxSyncOffset = 0;
-	m_fSyncOffsetAvr = 0;
-	m_fSyncOffsetStdDev = 0;
-
-	CalculateJitter(Time);
 }
 
 void CDX9AllocatorPresenter::DrawStats()

@@ -6974,15 +6974,17 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewResetStats()
 {
-	GetRenderersSettings().bResetStats = true; // Reset by "consumer"
+	if (m_pCAP) {
+		m_pCAP->ResetStats();
+	}
 }
 
 void CMainFrame::OnViewDisplayStatsSC()
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		CRenderersSettings& rs = GetRenderersSettings();
-		if (!rs.iDisplayStats) {
-			rs.bResetStats = true; // to Reset statistics on first call ...
+		if (!rs.iDisplayStats && m_pCAP) {
+			m_pCAP->ResetStats(); // to Reset statistics on first call ...
 		}
 
 		++rs.iDisplayStats;

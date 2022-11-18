@@ -208,6 +208,7 @@ public IUnknown {
 	STDMETHOD_(bool, ResizeDevice) () PURE;
 	STDMETHOD_(bool, ResetDevice) () PURE;
 	STDMETHOD_(bool, DisplayChange) () PURE;
+	STDMETHOD_(void, ResetStats) () PURE;
 
 	STDMETHOD_(bool, IsRendering)() PURE;
 };

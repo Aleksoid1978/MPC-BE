@@ -167,7 +167,6 @@ public:
 
 	bool	bTearingTest;       // not saved
 	int		iDisplayStats;      // not saved
-	bool	bResetStats;        // not saved. Set to reset the presentation statistics
 	int		iStereo3DTransform; // not saved
 	bool	bStereo3DSwapLR;    // not saved
 

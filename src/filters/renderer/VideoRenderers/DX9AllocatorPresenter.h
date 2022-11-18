@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,7 +98,6 @@ namespace DSObjects
 		virtual void OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter) {}
 
 		// Casimir666
-		void				ResetStats();
 		void				DrawStats();
 		virtual void		OnResetDevice() {};
 		void				SendResetRequest();
@@ -248,6 +247,7 @@ namespace DSObjects
 		STDMETHODIMP_(bool) ResizeDevice() override;
 		STDMETHODIMP_(bool) ResetDevice() override;
 		STDMETHODIMP_(bool) DisplayChange() override;
+		STDMETHODIMP_(void) ResetStats() override;
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
 
 		// ID3DFullscreenControl
