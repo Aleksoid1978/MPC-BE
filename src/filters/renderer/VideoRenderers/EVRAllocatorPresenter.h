@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -255,7 +255,7 @@ namespace DSObjects
 		bool				GetImageFromMixer();
 		void				RenderThread();
 		static DWORD WINAPI	PresentThread(LPVOID lpParam);
-		void				ResetStats();
+		void				ResetQualProps();
 		void				StartWorkerThreads();
 		void				StopWorkerThreads();
 		HRESULT				CheckShutdown() const;

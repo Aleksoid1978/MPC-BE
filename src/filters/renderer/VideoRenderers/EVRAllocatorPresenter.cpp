@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -111,7 +111,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	ZeroMemory(m_VSyncOffsetHistory, sizeof(m_VSyncOffsetHistory));
-	ResetStats();
+	ResetQualProps();
 
 	if (FAILED(hr)) {
 		_Error += L"DX9AllocatorPresenter failed\n";
@@ -223,7 +223,7 @@ STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 	return hr;
 }
 
-void CEVRAllocatorPresenter::ResetStats()
+void CEVRAllocatorPresenter::ResetQualProps()
 {
 	m_pcFrames			= 0;
 	m_nDroppedUpdate	= 0;
@@ -650,7 +650,7 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 		case MFVP_MESSAGE_BEGINSTREAMING :			// The EVR switched from stopped to paused. The presenter should allocate resources
 			TRACE_EVR("EVR: MFVP_MESSAGE_BEGINSTREAMING\n");
 			m_nRenderState = Paused;
-			ResetStats();
+			ResetQualProps();
 			m_bStreamChanged = TRUE;
 			break;
 
