@@ -284,8 +284,6 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 	HRESULT hr = S_OK;
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	// Initialize the processing pipeline
 	bool bCustomPixelShaders = false;
 	bool bCustomScreenSpacePixelShaders = false;

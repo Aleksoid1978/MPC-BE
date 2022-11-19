@@ -542,8 +542,6 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	CAutoLock cAutoLock(this);
 	CAutoLock cRenderLock(&m_allocatorLock);
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	for (unsigned i = 0; i < m_nSurfaces+2; i++) {
 		m_pVideoTextures[i].Release();
 		m_pVideoSurfaces[i].Release();

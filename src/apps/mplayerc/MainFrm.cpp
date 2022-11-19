@@ -6404,7 +6404,6 @@ static CString MakeSnapshotFileName(LPCWSTR prefix)
 bool CMainFrame::IsRendererCompatibleWithSaveImage()
 {
 	bool result = true;
-	const CRenderersSettings& rs = GetRenderersSettings();
 
 	if (m_bShockwaveGraph) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_SHOCKWAVE), MB_ICONEXCLAMATION | MB_OK);
