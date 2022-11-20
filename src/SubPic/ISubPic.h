@@ -168,52 +168,6 @@ public IUnknown {
 };
 
 //
-// ISubPicAllocatorPresenter3 (under development)
-//
-#define TARGET_FRAME 0
-#define TARGET_SCREEN 1
-
-interface __declspec(uuid("AD863F43-83F9-4B8E-962C-426F2BDBEAEF"))
-ISubPicAllocatorPresenter3 :
-public IUnknown {
-	STDMETHOD (CreateRenderer) (IUnknown** ppRenderer) PURE;
-
-	STDMETHOD_(CLSID, GetAPCLSID) () PURE;
-
-	STDMETHOD_(SIZE, GetVideoSize) () PURE;
-	STDMETHOD_(SIZE, GetVideoSizeAR) () PURE;
-	STDMETHOD_(void, SetPosition) (RECT w, RECT v) PURE;
-	STDMETHOD (SetRotation) (int rotation) PURE;
-	STDMETHOD_(int, GetRotation) () PURE;
-	STDMETHOD (SetFlip) (bool flip) PURE;
-	STDMETHOD_(bool, GetFlip) () PURE;
-	STDMETHOD_(bool, Paint) (bool fAll) PURE;
-
-	STDMETHOD_(void, SetTime) (REFERENCE_TIME rtNow) PURE;
-	STDMETHOD_(void, SetSubtitleDelay) (int delay_ms) PURE;
-	STDMETHOD_(int, GetSubtitleDelay) () PURE;
-	STDMETHOD_(double, GetFPS) () PURE;
-
-	STDMETHOD_(void, SetSubPicProvider) (ISubPicProvider* pSubPicProvider) PURE;
-	STDMETHOD_(void, Invalidate) (REFERENCE_TIME rtInvalidate = -1) PURE;
-
-	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE; // may be deleted in the future
-	STDMETHOD (GetVideoFrame) (BYTE* lpDib, DWORD* size) PURE;
-	STDMETHOD (GetDisplayedImage) (LPVOID* dibImage) PURE;
-
-	STDMETHOD_(int, GetPixelShaderMode) () PURE;
-	STDMETHOD (ClearPixelShaders) (int target) PURE;
-	STDMETHOD (AddPixelShader) (int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) PURE;
-
-	STDMETHOD_(bool, ResizeDevice) () PURE;
-	STDMETHOD_(bool, ResetDevice) () PURE;
-	STDMETHOD_(bool, DisplayChange) () PURE;
-	STDMETHOD_(void, ResetStats) () PURE;
-
-	STDMETHOD_(bool, IsRendering)() PURE;
-};
-
-//
 // ISubStream
 //
 

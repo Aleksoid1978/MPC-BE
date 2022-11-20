@@ -88,5 +88,8 @@
     <ClInclude Include="ISubRender11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ISubPicAllocatorPresenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

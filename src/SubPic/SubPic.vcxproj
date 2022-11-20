@@ -67,6 +67,7 @@
     <ClInclude Include="DX11SubPic.h" />
     <ClInclude Include="DX9SubPic.h" />
     <ClInclude Include="ISubPic.h" />
+    <ClInclude Include="ISubPicAllocatorPresenter.h" />
     <ClInclude Include="ISubRender.h" />
     <ClInclude Include="ISubRender11.h" />
     <ClInclude Include="MemSubPic.h" />

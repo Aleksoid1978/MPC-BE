@@ -22,7 +22,7 @@
 #pragma once
 
 #include <atlbase.h>
-#include "ISubPic.h"
+#include "ISubPicAllocatorPresenter.h"
 #include <SubRenderIntf.h>
 
 class CSubPicAllocatorPresenterImpl
