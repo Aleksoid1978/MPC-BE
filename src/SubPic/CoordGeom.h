@@ -21,11 +21,6 @@
 
 #pragma once
 
-#define EPSILON		(1e-7)
-#define BIGNUMBER	(1e+9)
-#define IsZero(d)	(fabs(d) < EPSILON)
-#define Sgn(d)		(IsZero(d) ? 0 : (d) > 0 ? 1 : -1)
-
 class Vector
 {
 public:
