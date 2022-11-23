@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,9 @@
 #include "stdafx.h"
 #include "H264Nalu.h"
 
+constexpr DWORD NALU_START_CODE      = 0x00010000;
+constexpr DWORD NALU_START_CODE_MASK = 0x00FFFFFF;
+
 void CH264Nalu::SetBuffer(const BYTE* pBuffer, const size_t nSize, const int nNALSize/* = 0*/)
 {
 	m_pBuffer      = pBuffer;
@@ -37,6 +40,11 @@ void CH264Nalu::SetBuffer(const BYTE* pBuffer, const size_t nSize, const int nNA
 	}
 }
 
+static bool CheckNaluStartCode(const BYTE* pBuffer)
+{
+	return (*(reinterpret_cast<const DWORD*>(pBuffer)) & NALU_START_CODE_MASK) == NALU_START_CODE;
+}
+
 bool CH264Nalu::MoveToNextAnnexBStartcode()
 {
 	if (m_nSize < 4) {
@@ -45,7 +53,7 @@ bool CH264Nalu::MoveToNextAnnexBStartcode()
 	const size_t nBuffEnd = m_nSize - 4;
 
 	for (size_t i = m_nCurPos; i < nBuffEnd; i++) {
-		if ((*((DWORD*)(m_pBuffer + i)) & 0x00FFFFFF) == 0x00010000) {
+		if (CheckNaluStartCode(m_pBuffer + i)) {
 			// Find next AnnexB Nal
 			m_nCurPos = i;
 			return true;
@@ -85,7 +93,7 @@ bool CH264Nalu::ReadNext()
 		MoveToNextRTPStartcode();
 	} else {
 		// Remove trailing bits
-		while (m_pBuffer[m_nCurPos] == 0x00 && ((*((DWORD*)(m_pBuffer + m_nCurPos)) & 0x00FFFFFF) != 0x00010000)) {
+		while (m_pBuffer[m_nCurPos] == 0x00 && !CheckNaluStartCode(m_pBuffer + m_nCurPos)) {
 			m_nCurPos++;
 		}
 
