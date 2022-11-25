@@ -63,12 +63,6 @@ using namespace DSObjects;
 
 CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CDX9AllocatorPresenter(hWnd, bFullscreen, hr, _Error)
-	, pfDXVA2CreateDirect3DDeviceManager9(nullptr)
-	, pfMFCreateVideoSampleFromSurface(nullptr)
-	, pfMFCreateVideoMediaType(nullptr)
-	, pfAvSetMmThreadCharacteristicsW(nullptr)
-	, pfAvSetMmThreadPriority(nullptr)
-	, pfAvRevertMmThreadCharacteristics(nullptr)
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	ResetQualProps();

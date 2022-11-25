@@ -62,7 +62,7 @@ namespace DSObjects
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
 		HMODULE m_hD3D9;
-		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
+		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
 
 		CCritSec m_RenderLock;
 
@@ -110,7 +110,7 @@ namespace DSObjects
 		HRESULT (__stdcall *m_pfD3DXCreateLine)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXLINE        *ppLine
-		);
+		) = nullptr;
 
 		long					m_nUsedBuffer = 0;
 

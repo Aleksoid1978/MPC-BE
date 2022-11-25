@@ -282,12 +282,12 @@ namespace DSObjects
 		LPCWSTR				GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
 
 		// === Functions pointers
-		PTR_DXVA2CreateDirect3DDeviceManager9	pfDXVA2CreateDirect3DDeviceManager9;
-		PTR_MFCreateVideoSampleFromSurface		pfMFCreateVideoSampleFromSurface;
-		PTR_MFCreateVideoMediaType				pfMFCreateVideoMediaType;
+		PTR_DXVA2CreateDirect3DDeviceManager9 pfDXVA2CreateDirect3DDeviceManager9 = nullptr;
+		PTR_MFCreateVideoSampleFromSurface    pfMFCreateVideoSampleFromSurface    = nullptr;
+		PTR_MFCreateVideoMediaType            pfMFCreateVideoMediaType            = nullptr;
 
-		PTR_AvSetMmThreadCharacteristicsW		pfAvSetMmThreadCharacteristicsW;
-		PTR_AvSetMmThreadPriority				pfAvSetMmThreadPriority;
-		PTR_AvRevertMmThreadCharacteristics		pfAvRevertMmThreadCharacteristics;
+		PTR_AvSetMmThreadCharacteristicsW     pfAvSetMmThreadCharacteristicsW   = nullptr;
+		PTR_AvSetMmThreadPriority             pfAvSetMmThreadPriority           = nullptr;
+		PTR_AvRevertMmThreadCharacteristics   pfAvRevertMmThreadCharacteristics = nullptr;
 	};
 }

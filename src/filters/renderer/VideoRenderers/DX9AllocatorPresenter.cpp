@@ -53,8 +53,6 @@ static const wchar_t g_szClassName[] = L"MPCVRWindow";
 CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CDX9RenderingEngine(hWnd, hr, &_Error)
 	, m_bIsFullscreen(bFullscreen)
-	, m_pfDirect3DCreate9Ex(nullptr)
-	, m_pfD3DXCreateLine(nullptr)
 {
 	DLog(L"CDX9AllocatorPresenter::CDX9AllocatorPresenter()");
 
