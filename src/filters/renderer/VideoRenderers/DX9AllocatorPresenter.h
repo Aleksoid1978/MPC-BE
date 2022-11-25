@@ -45,16 +45,16 @@ namespace DSObjects
 		, public ID3DFullscreenControl
 	{
 	protected:
-		UINT	m_CurrentAdapter;
-		UINT	m_AdapterCount;
+		UINT	m_CurrentAdapter = UINT_MAX;
+		UINT	m_AdapterCount   = 0;
 
 		BOOL	m_bCompositionEnabled;
-		int		m_OrderedPaint;
-		int		m_VSyncMode;
+		int		m_OrderedPaint = 0;
+		int		m_VSyncMode    = 0;
 		bool	m_bIsFullscreen;
-		bool	m_bNeedCheckSample;
-		DWORD	m_MainThreadId;
-		bool	m_bResizingDevice;
+		bool	m_bNeedCheckSample = true;
+		DWORD	m_MainThreadId     = 0;
+		bool	m_bResizingDevice  = false;
 
 		HWND	m_hWndVR = nullptr;
 		bool	m_bNeedCreateWindow = true;
@@ -105,14 +105,14 @@ namespace DSObjects
 		double GetFrameTime();
 		double GetFrameRate();
 
-		long					m_nTearingPos;
+		long					m_nTearingPos = 0;
 
 		HRESULT (__stdcall *m_pfD3DXCreateLine)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXLINE        *ppLine
 		);
 
-		long					m_nUsedBuffer;
+		long					m_nUsedBuffer = 0;
 
 		double					m_fAvrFps;						// Estimate the real FPS
 		double					m_fJitterStdDev;				// Estimate the Jitter std dev
@@ -145,7 +145,7 @@ namespace DSObjects
 		LONGLONG				m_MinSyncOffset;
 		unsigned				m_nNextJitter;
 		unsigned				m_nNextSyncOffset;
-		REFERENCE_TIME			m_rtTimePerFrame;
+		REFERENCE_TIME			m_rtTimePerFrame = 0;
 		double					m_DetectedFrameRate;
 		double					m_DetectedFrameTime;
 		double					m_DetectedFrameTimeStdDev;
@@ -154,7 +154,7 @@ namespace DSObjects
 		double					m_DetectedFrameTimeHistoryHistory[500];
 		unsigned				m_DetectedFrameTimePos;
 
-		double					m_TextScale;
+		double					m_TextScale = 1.0;
 
 		int						m_VBlankEndWait;
 		int						m_VBlankStartWait;
@@ -193,10 +193,10 @@ namespace DSObjects
 		double					m_ModeratedTimeSpeedPrim;
 		double					m_ModeratedTimeSpeedDiff;
 
-		bool					m_bCorrectedFrameTime;
-		int						m_FrameTimeCorrection;
-		LONGLONG				m_LastFrameDuration;
-		LONGLONG				m_LastSampleTime;
+		bool					m_bCorrectedFrameTime = false;
+		int						m_FrameTimeCorrection = 0;
+		LONGLONG				m_LastFrameDuration   = 0;
+		LONGLONG				m_LastSampleTime      = 0;
 
 		CString					m_strInputFmt;
 		CString					m_strProcessingFmt;
@@ -210,7 +210,8 @@ namespace DSObjects
 		void					OnChangeInput(CComPtr<IPin> pPin);
 
 		CString					m_MonitorName;
-		UINT16					m_nMonitorHorRes, m_nMonitorVerRes;
+		UINT16					m_nMonitorHorRes = 0;
+		UINT16					m_nMonitorVerRes = 0;
 
 		CRect					m_rcMonitor;
 
@@ -220,21 +221,21 @@ namespace DSObjects
 		CGPUUsage				m_GPUUsage;
 		CMemUsage				m_MemUsage;
 
-		CFocusThread*			m_FocusThread;
+		CFocusThread*			m_FocusThread = nullptr;
 
-		bool					m_bMVC_Base_View_R_flag;
-		int						m_nStereoOffsetInPixels;
+		bool					m_bMVC_Base_View_R_flag = false;
+		int						m_nStereoOffsetInPixels = 4;
 
 		CComQIPtr<IAMStreamSelect> m_pSS;
-		int                        m_nCurrentSubtitlesStream;
+		int                        m_nCurrentSubtitlesStream = 0;
 		std::vector<int>           m_stereo_subtitle_offset_ids;
 		std::deque<MediaOffset3D>  m_mediaOffsetQueue;
 		std::mutex                 m_mutexOffsetQueue;
 
-		bool                       m_bDisplayChanged;
+		bool                       m_bDisplayChanged = false;
 
 	public:
-		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
+		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CDX9AllocatorPresenter();
 
 		// ISubPicAllocatorPresenter3

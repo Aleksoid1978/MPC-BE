@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,28 +78,28 @@ namespace DSObjects
 		bool m_bDeviceResetRequested = false;
 		bool m_bPendingResetDevice   = false;
 
-		D3DFORMAT					m_BackbufferFmt;
-		D3DFORMAT					m_DisplayFmt;
+		D3DFORMAT					m_BackbufferFmt = D3DFMT_X8R8G8B8;
+		D3DFORMAT					m_DisplayFmt    = D3DFMT_X8R8G8B8;
 		CSize						m_ScreenSize;
-		unsigned					m_nSurfaces;   // Total number of DX Surfaces
-		UINT32						m_iCurSurface; // Surface currently displayed
-		DWORD						m_D3D9VendorId;
-		bool						m_bFP16Support;
+		unsigned					m_nSurfaces    = 1; // Total number of DX Surfaces
+		UINT32						m_iCurSurface  = 0; // Surface currently displayed
+		DWORD						m_D3D9VendorId = 0;
+		bool						m_bFP16Support = true; // don't disable hardware features before initializing a renderer
 
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
-		D3DFORMAT					m_VideoBufferFmt;
-		D3DFORMAT					m_SurfaceFmt;
+		D3DFORMAT					m_VideoBufferFmt = D3DFMT_X8R8G8B8;
+		D3DFORMAT					m_SurfaceFmt     = D3DFMT_X8R8G8B8;
 
 		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_VIDEO_SURFACES];
 
-		bool						m_bColorManagement;
-		bool						m_bDither;
-		DXVA2_ExtendedFormat		m_inputExtFormat;
+		bool						m_bColorManagement = false;
+		bool						m_bDither          = false;
+		DXVA2_ExtendedFormat		m_inputExtFormat = {};
 		CString						m_strMixerOutputFmt;
-		const wchar_t*				m_wsResizer;
-		const wchar_t*				m_wsResizer2;
-		const wchar_t*				m_wsCorrection;
+		const wchar_t*				m_wsResizer    = nullptr;
+		const wchar_t*				m_wsResizer2   = nullptr;
+		const wchar_t*				m_wsCorrection = nullptr;
 		CString						m_strFinalPass;
 
 		HMODULE m_hDxva2Lib = nullptr;
@@ -128,19 +128,19 @@ namespace DSObjects
 	private:
 		friend class CDX9AllocatorPresenter;
 
-		D3DCAPS9					m_Caps;
-		LPCSTR						m_ShaderProfile; // for shader compiler
+		D3DCAPS9					m_Caps = {};
+		LPCSTR						m_ShaderProfile = nullptr; // for shader compiler
 
 #if DXVA2VP
 		CComPtr<IDirectXVideoProcessorService> m_pDXVA2_VPService;
 		CComPtr<IDirectXVideoProcessor> m_pDXVA2_VP;
 
-		DXVA2_VideoDesc          m_VideoDesc;
-		DXVA2_VideoProcessorCaps m_VPCaps;
+		DXVA2_VideoDesc          m_VideoDesc = {};
+		DXVA2_VideoProcessorCaps m_VPCaps    = {};
 
-		DXVA2_Fixed32 m_ProcAmpValues[4];
-		DXVA2_Fixed32 m_NFilterValues[6];
-		DXVA2_Fixed32 m_DFilterValues[6];
+		DXVA2_Fixed32 m_ProcAmpValues[4] = {};
+		DXVA2_Fixed32 m_NFilterValues[6] = {};
+		DXVA2_Fixed32 m_DFilterValues[6] = {};
 #endif
 #if DXVAHDVP
 		CComPtr<IDXVAHD_Device>         m_pDXVAHD_Device;
@@ -151,20 +151,20 @@ namespace DSObjects
 		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
 		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
 		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
-		unsigned					m_iScreenTex;
+		unsigned					m_iScreenTex = 0;
 
-		int							m_ScreenSpaceTexWidth;
-		int							m_ScreenSpaceTexHeight;
+		int							m_ScreenSpaceTexWidth  = 0;
+		int							m_ScreenSpaceTexHeight = 0;
 
-		int							m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
-		bool						m_bFlip; // horizontal flip. for vertical flip use together with a rotation of 180 deg.
+		int							m_iRotation = 0; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		bool						m_bFlip = false; // horizontal flip. for vertical flip use together with a rotation of 180 deg.
 
 		std::unique_ptr<CPixelShaderCompiler> m_pPSC;
 
 		// Settings
-		VideoSystem						m_InputVideoSystem;
-		AmbientLight					m_AmbientLight;
-		ColorRenderingIntent			m_RenderingIntent;
+		VideoSystem						m_InputVideoSystem = VIDEO_SYSTEM_UNKNOWN;
+		AmbientLight					m_AmbientLight     = AMBIENT_LIGHT_BRIGHT;
+		ColorRenderingIntent			m_RenderingIntent  = COLOR_RENDERING_INTENT_PERCEPTUAL;
 
 		// Custom pixel shaders
 		CComPtr<IDirect3DPixelShader9>	m_pPSCorrection;
@@ -174,7 +174,7 @@ namespace DSObjects
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
 
 		// Final pass
-		bool							m_bFinalPass;
+		bool							m_bFinalPass = false;
 		const unsigned					m_Lut3DSize = 64; // 64x64x64 LUT is enough for high-quality color management
 		const unsigned					m_Lut3DEntryCount = 64 * 64 * 64;
 		CComPtr<IDirect3DVolumeTexture9> m_pLut3DTexture;

@@ -70,54 +70,54 @@ namespace DSObjects
 			Started		= State_Running,
 			Shutdown	= State_Running + 1
 		};
-		RENDER_STATE						m_nRenderState;
+		RENDER_STATE						m_nRenderState = Shutdown;
 
-		HANDLE								m_hRenderThread;
-		HANDLE								m_hGetMixerThread;
-		HANDLE								m_hVSyncThread;
+		HANDLE								m_hRenderThread   = nullptr;
+		HANDLE								m_hGetMixerThread = nullptr;
+		HANDLE								m_hVSyncThread    = nullptr;
 
-		HANDLE								m_hEvtQuit;			// Stop rendering thread event
-		bool								m_bEvtQuit;
-		HANDLE								m_hEvtFlush;		// Discard all buffers
-		bool								m_bEvtFlush;
-		HANDLE								m_hEvtRenegotiate;
+		HANDLE								m_hEvtQuit  = nullptr; // Stop rendering thread event
+		bool								m_bEvtQuit  = false;
+		HANDLE								m_hEvtFlush = nullptr; // Discard all buffers
+		bool								m_bEvtFlush = false;
+		HANDLE								m_hEvtRenegotiate = nullptr;
 
-		COuterEVR*							m_pOuterEVR;
+		COuterEVR*							m_pOuterEVR = nullptr;
 		CComPtr<IMFClock>					m_pClock;
 		CComPtr<IDirect3DDeviceManager9>	m_pD3DManager;
 		CComPtr<IMFTransform>				m_pMixer;
 		CComPtr<IMediaEventSink>			m_pSink;
 		CComPtr<IMFVideoMediaType>			m_pMediaType;
-		MFVideoAspectRatioMode				m_dwVideoAspectRatioMode;
-		MFVideoRenderPrefs					m_dwVideoRenderPrefs;
-		COLORREF							m_BorderColor;
+		MFVideoAspectRatioMode				m_dwVideoAspectRatioMode = MFVideoARMode_PreservePicture;
+		MFVideoRenderPrefs					m_dwVideoRenderPrefs     = (MFVideoRenderPrefs)0;
+		COLORREF							m_BorderColor = RGB(0, 0, 0);
 
-		bool								m_fUseInternalTimer;
-		int									m_LastSetOutputRange;
-		bool								m_bPendingMediaFinished;
+		bool								m_fUseInternalTimer     = false;
+		int									m_LastSetOutputRange    = -1;
+		bool								m_bPendingMediaFinished = false;
 
 		CCritSec							m_SampleQueueLock;
 		CCritSec							m_ImageProcessingLock;
 
 		std::deque<CComPtr<IMFSample>>		m_FreeSamples;
 		std::deque<CComPtr<IMFSample>>		m_ScheduledSamples;
-		IMFSample*							m_pCurrentDisplaydSample;
-		bool								m_bWaitingSample;
-		bool								m_bLastSampleOffsetValid;
-		LONGLONG							m_LastScheduledSampleTime;
-		double								m_LastScheduledSampleTimeFP;
-		LONGLONG							m_LastScheduledUncorrectedSampleTime;
-		LONGLONG							m_MaxSampleDuration;
-		LONGLONG							m_LastSampleOffset;
-		LONGLONG							m_VSyncOffsetHistory[5];
-		LONGLONG							m_LastPredictedSync;
-		unsigned							m_VSyncOffsetHistoryPos;
+		IMFSample*							m_pCurrentDisplaydSample = nullptr;
+		bool								m_bWaitingSample         = false;
+		bool								m_bLastSampleOffsetValid = false;
+		LONGLONG							m_LastScheduledSampleTime = -1;
+		double								m_LastScheduledSampleTimeFP = -1;
+		LONGLONG							m_LastScheduledUncorrectedSampleTime = -1;
+		LONGLONG							m_MaxSampleDuration      = 0;
+		LONGLONG							m_LastSampleOffset       = 0;
+		LONGLONG							m_VSyncOffsetHistory[5]  = {};
+		LONGLONG							m_LastPredictedSync      = 0;
+		unsigned							m_VSyncOffsetHistoryPos  = 0;
 
-		UINT								m_nResetToken;
-		int									m_nStepCount;
+		UINT								m_nResetToken = 0;
+		int									m_nStepCount  = 0;
 
-		bool								m_bSignaledStarvation;
-		LONGLONG							m_StarvationClock;
+		bool								m_bSignaledStarvation = false;
+		LONGLONG							m_StarvationClock = 0;
 
 		// Stats variable for IQualProp
 		UINT									m_pcFrames;
@@ -126,15 +126,15 @@ namespace DSObjects
 		UINT									m_piAvg;
 		UINT									m_piDev;
 
-		BOOL									m_bStreamChanged;
+		BOOL									m_bStreamChanged = TRUE;
 
-		bool									m_bChangeMT;
+		bool									m_bChangeMT = false;
 
-		double			m_ModeratedTime;
-		LONGLONG		m_ModeratedTimeLast;
-		LONGLONG		m_ModeratedClockLast;
-		LONGLONG		m_ModeratedTimer;
-		MFCLOCK_STATE	m_LastClockState;
+		double			m_ModeratedTime      = 0.0;
+		LONGLONG		m_ModeratedTimeLast  = -1;
+		LONGLONG		m_ModeratedClockLast = -1;
+		LONGLONG		m_ModeratedTimer     = 0;
+		MFCLOCK_STATE	m_LastClockState     = MFCLOCK_STATE_INVALID;
 
 	public:
 		CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);

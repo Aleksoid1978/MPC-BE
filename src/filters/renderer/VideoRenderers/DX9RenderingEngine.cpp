@@ -125,44 +125,9 @@ using namespace DSObjects;
 
 CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, _pError)
-	, m_BackbufferFmt(D3DFMT_X8R8G8B8)
-	, m_DisplayFmt(D3DFMT_X8R8G8B8)
-	, m_ScreenSize(0, 0)
-	, m_nSurfaces(1)
-	, m_iCurSurface(0)
-	, m_D3D9VendorId(0)
-	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
-	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
-	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
-	, m_inputExtFormat({})
-	, m_wsResizer(nullptr)
-	, m_wsResizer2(nullptr)
-	, m_wsCorrection(nullptr)
-	, m_Caps({})
-	, m_ShaderProfile(nullptr)
-#if DXVA2VP
-	, m_VideoDesc({})
-	, m_VPCaps({})
-#endif
-	, m_iScreenTex(0)
-	, m_ScreenSpaceTexWidth(0)
-	, m_ScreenSpaceTexHeight(0)
-	, m_iRotation(0)
-	, m_bFlip(false)
-	, m_bColorManagement(false)
-	, m_InputVideoSystem(VIDEO_SYSTEM_UNKNOWN)
-	, m_AmbientLight(AMBIENT_LIGHT_BRIGHT)
-	, m_RenderingIntent(COLOR_RENDERING_INTENT_PERCEPTUAL)
-	, m_bFinalPass(false)
-	, m_bDither(false)
 {
 	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
 	DLogIf(!m_hDxva2Lib, L"Failed to load dxva2.dll");
-#if DXVA2VP
-	ZeroMemory(m_ProcAmpValues, sizeof(m_ProcAmpValues));
-	ZeroMemory(m_NFilterValues, sizeof(m_NFilterValues));
-	ZeroMemory(m_DFilterValues, sizeof(m_DFilterValues));
-#endif
 }
 
 CDX9RenderingEngine::~CDX9RenderingEngine()
