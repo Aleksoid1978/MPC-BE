@@ -147,12 +147,8 @@ HRESULT CSubPicQueueImpl::RenderTo(ISubPic* pSubPic, REFERENCE_TIME rtStart, REF
 CSubPicQueue::CSubPicQueue(int nMaxSubPic, bool bDisableAnim, bool bAllowDropSubPic, ISubPicAllocator* pAllocator, HRESULT* phr)
 	: CSubPicQueueImpl(pAllocator, phr)
 	, m_nMaxSubPic(nMaxSubPic)
-	, m_bExitThread(false)
 	, m_bDisableAnim(bDisableAnim)
 	, m_bAllowDropSubPic(bAllowDropSubPic)
-	, m_rtNowLast(LONGLONG_ERROR)
-	, m_bInvalidate(false)
-	, m_rtInvalidate(0)
 {
 	if (phr && FAILED(*phr)) {
 		return;
