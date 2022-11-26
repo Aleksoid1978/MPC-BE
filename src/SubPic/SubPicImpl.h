@@ -26,16 +26,18 @@
 class CSubPicImpl : public CUnknown, public ISubPic
 {
 protected:
-	REFERENCE_TIME	m_rtStart, m_rtStop;
-	REFERENCE_TIME	m_rtSegmentStart, m_rtSegmentStop;
+	REFERENCE_TIME	m_rtStart = 0;
+	REFERENCE_TIME	m_rtStop  = 0;
+	REFERENCE_TIME	m_rtSegmentStart = 0;
+	REFERENCE_TIME	m_rtSegmentStop  = 0;
 	CRect			m_rcDirty;
 	CSize			m_maxsize;
 	CSize			m_size;
 	CRect			m_vidrect;
 	CSize			m_virtualTextureSize;
 	CPoint			m_virtualTextureTopLeft;
-	SUBTITLE_TYPE	m_eSubtitleType;
-	bool			m_bInvAlpha;
+	SUBTITLE_TYPE	m_eSubtitleType = SUBTITLE_TYPE::ST_TEXT;
+	bool			m_bInvAlpha = false;
 
 	/*
 

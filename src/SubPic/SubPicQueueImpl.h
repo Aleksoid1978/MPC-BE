@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,9 +87,9 @@ private:
 	std::shared_ptr<SubPicProviderWithSharedLock> m_pSubPicProviderWithSharedLock;
 
 protected:
-	double m_fps;
-	REFERENCE_TIME m_rtTimePerFrame;
-	REFERENCE_TIME m_rtNow;
+	double m_fps = DEFAULT_FPS;
+	REFERENCE_TIME m_rtTimePerFrame = std::llround(10000000.0 / DEFAULT_FPS);
+	REFERENCE_TIME m_rtNow = 0;
 
 	CComPtr<ISubPicAllocator> m_pAllocator;
 

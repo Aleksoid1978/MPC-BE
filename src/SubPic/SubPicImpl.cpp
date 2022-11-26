@@ -28,18 +28,6 @@
 
 CSubPicImpl::CSubPicImpl()
 	: CUnknown(L"CSubPicImpl", nullptr)
-	, m_rtStart(0)
-	, m_rtStop(0)
-	, m_rtSegmentStart(0)
-	, m_rtSegmentStop(0)
-	, m_rcDirty(0, 0, 0, 0)
-	, m_maxsize(0, 0)
-	, m_size(0, 0)
-	, m_vidrect(0, 0, 0, 0)
-	, m_virtualTextureSize(0, 0)
-	, m_virtualTextureTopLeft(0, 0)
-	, m_eSubtitleType(SUBTITLE_TYPE::ST_TEXT)
-	, m_bInvAlpha(false)
 {
 }
 
