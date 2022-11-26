@@ -35,6 +35,8 @@ const double CSubPicQueueImpl::DEFAULT_FPS = 24/1.001;
 CSubPicQueueImpl::CSubPicQueueImpl(ISubPicAllocator* pAllocator, HRESULT* phr)
 	: CUnknown(L"CSubPicQueueImpl", nullptr)
 	, m_pAllocator(pAllocator)
+	, m_fps(DEFAULT_FPS)
+	, m_rtTimePerFrame(std::llround(10000000.0 / DEFAULT_FPS))
 {
 	if (phr) {
 		*phr = S_OK;
