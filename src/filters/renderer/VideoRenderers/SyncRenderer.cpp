@@ -54,42 +54,6 @@ using namespace D3D9Helper;
 
 CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
-	, m_ScreenSize(0, 0)
-	, m_iRotation(0)
-	, m_bFlip(false)
-	, m_inputExtFormat({0})
-	, m_wsResizer(L"") // empty string, not nullptr
-	, m_nSurfaces(1)
-	, m_iCurSurface(0)
-	, m_bSnapToVSync(false)
-	, m_nUsedBuffer(0)
-	, m_TextScale(1.0)
-	, m_bIsFullscreen(bFullscreen)
-	, m_uSyncGlitches(0)
-	, m_pGenlock(nullptr)
-	, m_lAudioLag(0)
-	, m_lAudioLagMin(10000)
-	, m_lAudioLagMax(-10000)
-	, m_pAudioStats(nullptr)
-	, m_nNextJitter(0)
-	, m_nNextSyncOffset(0)
-	, m_llLastSyncTime(0)
-	, m_fAvrFps(0.0)
-	, m_fJitterStdDev(0.0)
-	, m_fSyncOffsetStdDev(0.0)
-	, m_fSyncOffsetAvr(0.0)
-	, m_llHysteresis(0)
-	, m_dD3DRefreshCycle(0)
-	, m_dDetectedScanlineTime(0.0)
-	, m_dEstRefreshCycle(0.0)
-	, m_dFrameCycle(0.0)
-	, m_dOptimumDisplayCycle(0.0)
-	, m_dCycleDifference(1.0)
-	, m_llEstVBlankTime(0)
-	, m_CurrentAdapter(0)
-	, m_FocusThread(nullptr)
-	, m_pfDirect3DCreate9Ex(nullptr)
-	, m_pfD3DXCreateLine(nullptr)
 {
 	DLog(L"CBaseAP::CBaseAP()");
 
@@ -120,10 +84,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 		_Error += L"Failed to create Direct3D 9Ex\n";
 		return;
 	}
-
-	m_bAlphaBitmapEnable = false;
-	m_pAlphaBitmapTexture.Release();
-	m_AlphaBitmapParams = {};
 
 	CRenderersSettings& rs = GetRenderersSettings();
 
@@ -2124,26 +2084,10 @@ STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, L
 
 CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CBaseAP(hWnd, bFullscreen, hr, _Error)
-	, pfDXVA2CreateDirect3DDeviceManager9(nullptr)
-	, pfMFCreateVideoSampleFromSurface(nullptr)
-	, pfMFCreateVideoMediaType(nullptr)
-	, pfAvSetMmThreadCharacteristicsW(nullptr)
-	, pfAvSetMmThreadPriority(nullptr)
-	, pfAvRevertMmThreadCharacteristics(nullptr)
 {
 	DLog(L"CSyncAP::CSyncAP()");
 
 	CRenderersSettings& rs = GetRenderersSettings();
-
-	m_nResetToken   = 0;
-	m_hRenderThread = nullptr;
-	m_hMixerThread  = nullptr;
-	m_hEvtQuit      = nullptr;
-	m_hEvtFlush     = nullptr;
-	m_hEvtSkip      = nullptr;
-	m_bEvtQuit      = false;
-	m_bEvtFlush     = false;
-	m_bEvtSkip      = false;
 
 	if (FAILED (hr)) {
 		_Error += L"SyncAP failed\n";
@@ -2198,21 +2142,6 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 
 	// Bufferize frame only with 3D texture
 	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
-
-	m_nRenderState = Shutdown;
-	m_bStepping = false;
-	m_bUseInternalTimer = false;
-	m_LastSetOutputRange = -1;
-	m_bPendingRenegotiate = false;
-	m_bPendingMediaFinished = false;
-	m_pCurrentDisplaydSample = nullptr;
-	m_nStepCount = 0;
-	m_dwVideoAspectRatioMode = MFVideoARMode_PreservePicture;
-	m_dwVideoRenderPrefs = (MFVideoRenderPrefs)0;
-	m_BorderColor = RGB (0,0,0);
-	m_pOuterEVR = nullptr;
-	m_bPrerolled = false;
-	m_lShiftToNearest = -1; // Illegal value to start with
 }
 
 CSyncAP::~CSyncAP(void)

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,6 @@ using namespace DSObjects;
 
 CDXRAllocatorPresenter::CDXRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
-	, m_ScreenSize(0, 0)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";

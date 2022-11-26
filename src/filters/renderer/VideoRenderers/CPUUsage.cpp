@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2018 see Authors.txt
+ * (C) 2013-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,16 +24,7 @@
 #include "CPUUsage.h"
 
 CCPUUsage::CCPUUsage()
-	: m_nCPUUsage(0)
-	, m_dwLastRun(0)
-	, m_lRunCount(0)
 {
-	ZeroMemory(&m_ftPrevSysKernel, sizeof(FILETIME));
-	ZeroMemory(&m_ftPrevSysUser, sizeof(FILETIME));
-
-	ZeroMemory(&m_ftPrevProcKernel, sizeof(FILETIME));
-	ZeroMemory(&m_ftPrevProcUser, sizeof(FILETIME));
-
 	GetUsage();
 }
 

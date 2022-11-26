@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2018 see Authors.txt
+ * (C) 2015-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,8 +27,8 @@ class CFocusThread : public CWinThread
 	DECLARE_DYNCREATE(CFocusThread)
 
 private:
-	HWND m_hWnd;
-	HANDLE m_hEvtInit;
+	HWND m_hWnd = nullptr;
+	HANDLE m_hEvtInit = nullptr;
 
 protected:
 	CFocusThread(void); // protected constructor used by dynamic creation

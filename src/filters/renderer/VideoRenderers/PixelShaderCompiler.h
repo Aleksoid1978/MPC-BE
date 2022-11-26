@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,8 +29,8 @@
 
 class CPixelShaderCompiler
 {
-	pD3DCompile m_fnD3DCompile;
-	pD3DDisassemble m_fnD3DDisassemble;
+	pD3DCompile m_fnD3DCompile = nullptr;
+	pD3DDisassemble m_fnD3DDisassemble = nullptr;
 
 	CComPtr<IDirect3DDevice9> m_pD3DDev;
 

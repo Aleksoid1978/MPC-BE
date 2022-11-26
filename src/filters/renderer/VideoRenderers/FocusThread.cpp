@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2018 see Authors.txt
+ * (C) 2015-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,8 +35,6 @@ LRESULT CALLBACK FocusWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 }
 
 CFocusThread::CFocusThread()
-	: m_hWnd(nullptr)
-	, m_hEvtInit(nullptr)
 {
 	WNDCLASS wndclass;
 

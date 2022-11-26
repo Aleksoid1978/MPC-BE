@@ -51,8 +51,6 @@ HINSTANCE GetD3dcompilerDll()
 
 CPixelShaderCompiler::CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStaySilent)
 	: m_pD3DDev(pD3DDev)
-	, m_fnD3DCompile(nullptr)
-	, m_fnD3DDisassemble(nullptr)
 {
 	HINSTANCE hDll;
 	hDll = GetD3dcompilerDll();

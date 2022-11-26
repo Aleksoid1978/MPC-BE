@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2018 see Authors.txt
+ * (C) 2013-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,15 +34,15 @@ private:
 	inline bool IsFirstRun() const { return (m_dwLastRun == 0); }
 
 	//system total times
-	FILETIME m_ftPrevSysKernel;
-	FILETIME m_ftPrevSysUser;
+	FILETIME m_ftPrevSysKernel = {};
+	FILETIME m_ftPrevSysUser   = {};
 
 	//process times
-	FILETIME m_ftPrevProcKernel;
-	FILETIME m_ftPrevProcUser;
+	FILETIME m_ftPrevProcKernel = {};
+	FILETIME m_ftPrevProcUser   = {};
 
-	short m_nCPUUsage;
-	DWORD m_dwLastRun;
+	short m_nCPUUsage = 0;
+	DWORD m_dwLastRun = 0;
 
-	volatile LONG m_lRunCount;
+	volatile LONG m_lRunCount = 0;
 };
