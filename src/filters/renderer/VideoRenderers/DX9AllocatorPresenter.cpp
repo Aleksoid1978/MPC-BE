@@ -72,12 +72,12 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	if (m_pfDirect3DCreate9Ex) {
-		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
-		if (!m_pD3DEx) {
-			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
+		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3D9Ex);
+		if (!m_pD3D9Ex) {
+			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3D9Ex);
 		}
 	}
-	if (!m_pD3DEx) {
+	if (!m_pD3D9Ex) {
 		hr = E_FAIL;
 		_Error += L"Failed to create Direct3D 9Ex\n";
 		return;
@@ -117,9 +117,9 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	m_pAlphaBitmapTexture.Release();
 	CleanupRenderingEngine();
 
-	m_pD3DDevEx.Release();
-	m_pD3DDevExRefresh.Release();
-	m_pD3DEx.Release();
+	m_pDevice9Ex.Release();
+	m_pDevice9ExRefresh.Release();
+	m_pD3D9Ex.Release();
 
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
@@ -372,8 +372,8 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 HANDLE CDX9AllocatorPresenter::LockD3DDevice()
 {
-	if (m_pD3DDevEx) {
-		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
+	if (m_pDevice9Ex) {
+		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pDevice9Ex.p + sizeof(size_t));
 
 		if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
 			&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
@@ -388,8 +388,8 @@ HANDLE CDX9AllocatorPresenter::LockD3DDevice()
 
 void CDX9AllocatorPresenter::UnlockD3DDevice(HANDLE& lockOwner)
 {
-	if (m_pD3DDevEx) {
-		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
+	if (m_pDevice9Ex) {
+		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pDevice9Ex.p + sizeof(size_t));
 
 		if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
 			&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
@@ -505,14 +505,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	CleanupRenderingEngine();
 
-	if (!m_pD3DEx) {
+	if (!m_pD3D9Ex) {
 		_Error += L"Failed to create D3D9 Ex\n";
 		return E_UNEXPECTED;
 	}
 
-	m_AdapterCount = m_pD3DEx->GetAdapterCount();
+	m_AdapterCount = m_pD3D9Ex->GetAdapterCount();
 
-	UINT currentAdapter = GetAdapter(m_pD3DEx);
+	UINT currentAdapter = GetAdapter(m_pD3D9Ex);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
 	if (m_bNeedCreateWindow || !bTryToReset) {
@@ -547,8 +547,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	if (!bTryToReset) {
-		m_pD3DDevEx.Release();
-		m_pD3DDevExRefresh.Release();
+		m_pDevice9Ex.Release();
+		m_pDevice9ExRefresh.Release();
 		m_CurrentAdapter = currentAdapter;
 
 		m_GPUUsage.Init(m_D3D9DeviceName, m_D3D9Device);
@@ -560,7 +560,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	DwmIsCompositionEnabled(&m_bCompositionEnabled);
 
 	// detect FP 16-bit textures support
-	m_bFP16Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
+	m_bFP16Support = SUCCEEDED(m_pD3D9Ex->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
 
 	// set surface formats
 	switch (rs.iSurfaceFormat) {
@@ -570,7 +570,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			break;
 		}
 	case D3DFMT_A2R10G10B10: {
-		bool b10bitSupport = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
+		bool b10bitSupport = SUCCEEDED(m_pD3D9Ex->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
 		if (b10bitSupport) {
 			m_SurfaceFmt = D3DFMT_A2R10G10B10;
 			break;
@@ -581,11 +581,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	D3DDISPLAYMODEEX d3ddmEx = { sizeof(d3ddmEx) };
-	m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &d3ddmEx, nullptr);
+	m_pD3D9Ex->GetAdapterDisplayModeEx(m_CurrentAdapter, &d3ddmEx, nullptr);
 	m_ScreenSize.SetSize(d3ddmEx.Width, d3ddmEx.Height);
 
 	CSize backBufferSize;
-	GetMaxResolution(m_pD3DEx, backBufferSize);
+	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 
@@ -595,7 +595,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	if (m_bIsFullscreen) {
 		// detect 10-bit device support
-		bool b10BitOutputSupport = SUCCEEDED(m_pD3DEx->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
+		bool b10BitOutputSupport = SUCCEEDED(m_pD3D9Ex->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
 
 		if (b10BitOutputSupport && rs.b10BitOutput) {
 			m_d3dpp.BackBufferFormat = D3DFMT_A2R10G10B10;
@@ -618,22 +618,22 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 		d3ddmEx.Format = m_d3dpp.BackBufferFormat;
 
-		bTryToReset = bTryToReset && m_pD3DDevEx;
+		bTryToReset = bTryToReset && m_pDevice9Ex;
 		if (bTryToReset) {
-			bTryToReset = SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx));
+			bTryToReset = SUCCEEDED(hr = m_pDevice9Ex->ResetEx(&m_d3dpp, &d3ddmEx));
 			DLog(L"    => ResetEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
 		if (!bTryToReset) {
-			m_pD3DDevEx.Release();
-			hr = m_pD3DEx->CreateDeviceEx(
+			m_pDevice9Ex.Release();
+			hr = m_pD3D9Ex->CreateDeviceEx(
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES, //D3DCREATE_MANAGED
-					&m_d3dpp, &d3ddmEx, &m_pD3DDevEx);
+					&m_d3dpp, &d3ddmEx, &m_pDevice9Ex);
 			DLog(L"    => CreateDeviceEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
-		if (m_pD3DDevEx) {
+		if (m_pDevice9Ex) {
 			m_BackbufferFmt = m_d3dpp.BackBufferFormat;
 			m_DisplayFmt = d3ddmEx.Format;
 		}
@@ -654,42 +654,42 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_d3dpp.BackBufferWidth = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cx : m_windowRect.Width();
 		m_d3dpp.BackBufferHeight = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cy : m_windowRect.Height();
 
-		bTryToReset = bTryToReset && m_pD3DDevEx;
+		bTryToReset = bTryToReset && m_pDevice9Ex;
 		if (bTryToReset) {
-			bTryToReset = SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, nullptr));
+			bTryToReset = SUCCEEDED(hr = m_pDevice9Ex->ResetEx(&m_d3dpp, nullptr));
 			DLog(L"    => ResetEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
 		if (!bTryToReset) {
-			m_pD3DDevEx.Release();
+			m_pDevice9Ex.Release();
 			// We can get 0x8876086a here when switching from two displays to one display using Win + P (Windows 7)
 			// Cause: We might not reinitialize dx correctly during the switch
-			hr = m_pD3DEx->CreateDeviceEx(
+			hr = m_pD3D9Ex->CreateDeviceEx(
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWndVR ? m_hWndVR : m_hWnd,
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
-					&m_d3dpp, nullptr, &m_pD3DDevEx);
+					&m_d3dpp, nullptr, &m_pDevice9Ex);
 			DLog(L"    => CreateDeviceEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		}
 
-		if (m_pD3DDevEx) {
+		if (m_pDevice9Ex) {
 			m_DisplayFmt = d3ddmEx.Format;
 		}
 
 		m_BackbufferFmt = m_d3dpp.BackBufferFormat;
 	}
 
-	if (m_pD3DDevEx) {
+	if (m_pDevice9Ex) {
 		while (hr == D3DERR_DEVICELOST) {
 			DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");
-			hr = m_pD3DDevEx->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
+			hr = m_pDevice9Ex->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
 		}
 		if (hr == D3DERR_DEVICENOTRESET) {
 			DLog(L"    => D3DERR_DEVICENOTRESET");
-			hr = m_pD3DDevEx->ResetEx(&m_d3dpp, m_bIsFullscreen ? &d3ddmEx : nullptr);
+			hr = m_pDevice9Ex->ResetEx(&m_d3dpp, m_bIsFullscreen ? &d3ddmEx : nullptr);
 		}
 
-		if (m_pD3DDevEx) {
-			m_pD3DDevEx->SetGPUThreadPriority(7);
+		if (m_pDevice9Ex) {
+			m_pDevice9Ex->SetGPUThreadPriority(7);
 		}
 	}
 
@@ -740,7 +740,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_strProcessingFmt = GetD3DFormatStr(m_SurfaceFmt);
 	m_strBackbufferFmt = GetD3DFormatStr(m_BackbufferFmt);
 
-	if (!m_pD3DDevExRefresh) {
+	if (!m_pDevice9ExRefresh) {
 		D3DPRESENT_PARAMETERS d3dpp = { 0 };
 		d3dpp.Windowed = TRUE;
 		d3dpp.BackBufferWidth = 640;
@@ -750,16 +750,16 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 
-		hr = m_pD3DEx->CreateDeviceEx(
+		hr = m_pD3D9Ex->CreateDeviceEx(
 				m_CurrentAdapter, D3DDEVTYPE_HAL, GetShellWindow(),
 				D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
-				&d3dpp, nullptr, &m_pD3DDevExRefresh);
-		DLog(L"    => CreateDeviceEx(m_pD3DDevExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
+				&d3dpp, nullptr, &m_pDevice9ExRefresh);
+		DLog(L"    => CreateDeviceEx(m_pDevice9ExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 	}
 
 	if (!bTryToReset) {
 		m_Font3D.InvalidateDeviceObjects();
-		HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pD3DDevEx);
+		HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pDevice9Ex);
 		DLogIf(FAILED(hr2), L"m_Font3D initialization failed with error %s", HR2Str(hr2));
 		m_bFont3DUpdate = true;
 
@@ -784,10 +784,10 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 	CAutoLock cRenderLock(&m_RenderLock);
 
 	CSize backBufferSize;
-	GetMaxResolution(m_pD3DEx, backBufferSize);
+	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
 	D3DDISPLAYMODEEX d3ddmEx = { sizeof(d3ddmEx) };
-	m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &d3ddmEx, nullptr);
+	m_pD3D9Ex->GetAdapterDisplayModeEx(m_CurrentAdapter, &d3ddmEx, nullptr);
 
 	if (m_ScreenSize.cx != d3ddmEx.Width || m_ScreenSize.cy != d3ddmEx.Height) {
 		m_ScreenSize.SetSize(d3ddmEx.Width, d3ddmEx.Height);
@@ -802,20 +802,20 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 		m_d3dpp.BackBufferWidth = m_ScreenSize.cx;
 		m_d3dpp.BackBufferHeight = m_ScreenSize.cy;
 
-		hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx);
+		hr = m_pDevice9Ex->ResetEx(&m_d3dpp, &d3ddmEx);
 	} else {
 		m_refreshRate = d3ddmEx.RefreshRate;
 		m_d3dpp.BackBufferWidth = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cx : m_windowRect.Width();
 		m_d3dpp.BackBufferHeight = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cy : m_windowRect.Height();
 
-		hr = m_pD3DDevEx->ResetEx(&m_d3dpp, nullptr);
+		hr = m_pDevice9Ex->ResetEx(&m_d3dpp, nullptr);
 	}
 
 	DLog(L"    => ResetEx() return : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 
 	while (hr == D3DERR_DEVICELOST) {
 		DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");
-		hr = m_pD3DDevEx->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
+		hr = m_pDevice9Ex->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -838,9 +838,9 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString& _Error, const CSize& desk
 	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, desktopSize);
 
 	if (m_pAllocator) {
-		m_pAllocator->ChangeDevice(m_pD3DDevEx);
+		m_pAllocator->ChangeDevice(m_pDevice9Ex);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDevEx, m_maxSubtitleTextureSize, false);
+		m_pAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
 	}
 	if (!m_pAllocator) {
 		_Error += L"CDX9SubPicAllocator failed\n";
@@ -937,7 +937,7 @@ DWORD CDX9AllocatorPresenter::GetVertexProcessing()
 	HRESULT hr;
 	D3DCAPS9 caps;
 
-	hr = m_pD3DEx->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &caps);
+	hr = m_pD3D9Ex->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &caps);
 	if (FAILED(hr)) {
 		return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 	}
@@ -1004,7 +1004,7 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 	_ScanLine = 0;
 	_bInVBlank = 0;
 	D3DRASTER_STATUS RasterStatus;
-	if (m_pD3DDevEx->GetRasterStatus(0, &RasterStatus) != S_OK) {
+	if (m_pDevice9Ex->GetRasterStatus(0, &RasterStatus) != S_OK) {
 		return false;
 	}
 	ScanLine = RasterStatus.ScanLine;
@@ -1287,14 +1287,14 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	HRESULT hr = S_OK;
 	const bool bStereo3DTransform = (rs.iStereo3DTransform != STEREO3D_AsIs);
 
-	m_pD3DDevEx->BeginScene();
+	m_pDevice9Ex->BeginScene();
 
 	CComPtr<IDirect3DSurface9> pBackBuffer;
-	m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+	m_pDevice9Ex->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 
 	// Clear the backbuffer
-	m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-	hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
+	m_pDevice9Ex->SetRenderTarget(0, pBackBuffer);
+	hr = m_pDevice9Ex->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 	CRect rSrcVid(CPoint(0, 0), m_nativeVideoSize);
 	CRect rDstVid(m_videoRect);
@@ -1381,7 +1381,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		DrawStats();
 	}
 
-	m_pD3DDevEx->EndScene();
+	m_pDevice9Ex->EndScene();
 
 	bool bDoVSyncInPresent = !m_bCompositionEnabled || !rs.bVSyncInternal;
 
@@ -1389,7 +1389,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	CComPtr<IDirect3DQuery9> pEventQuery;
 
-	m_pD3DDevEx->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
+	m_pDevice9Ex->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
 	if (pEventQuery) {
 		pEventQuery->Issue(D3DISSUE_END);
 	}
@@ -1442,13 +1442,13 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	// Create a query object
 	{
 		CComPtr<IDirect3DQuery9> pEventQuery;
-		m_pD3DDevEx->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
+		m_pDevice9Ex->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
 
 		LONGLONG llPerf = GetPerfCounter();
 		if (m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY) {
-			hr = m_pD3DDevEx->PresentEx(rSrcPri, rDstPri, nullptr, nullptr, 0);
+			hr = m_pDevice9Ex->PresentEx(rSrcPri, rDstPri, nullptr, nullptr, 0);
 		} else {
-			hr = m_pD3DDevEx->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
+			hr = m_pDevice9Ex->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 		}
 
 		// Issue an End event
@@ -1529,7 +1529,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			bResetDevice = true;
 		}
 
-		if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd) == D3DERR_DEVICENOTRESET) {
+		if (hr == D3DERR_DEVICELOST && m_pDevice9Ex->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd) == D3DERR_DEVICENOTRESET) {
 			DLog(L"CDX9AllocatorPresenter::Paint() : D3DERR_DEVICELOST - need Reset Device");
 			bResetDevice = true;
 		}
@@ -1565,17 +1565,17 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				m_LastAdapterCheck = time;
 #ifdef _DEBUG
 				D3DDEVICE_CREATION_PARAMETERS Parameters;
-				if (SUCCEEDED(m_pD3DDevEx->GetCreationParameters(&Parameters))) {
+				if (SUCCEEDED(m_pDevice9Ex->GetCreationParameters(&Parameters))) {
 					ASSERT(Parameters.AdapterOrdinal == m_CurrentAdapter);
 				}
 #endif
-				if (m_CurrentAdapter != GetAdapter(m_pD3DEx)) {
+				if (m_CurrentAdapter != GetAdapter(m_pD3D9Ex)) {
 					DLog(L"CDX9AllocatorPresenter::Paint() : D3D adapter changed - need Reset Device");
 					bResetDevice = true;
 				}
 #ifdef _DEBUG
 				else {
-					ASSERT(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter) == m_pD3DEx->GetAdapterMonitor(GetAdapter(m_pD3DEx)));
+					ASSERT(m_pD3D9Ex->GetAdapterMonitor(m_CurrentAdapter) == m_pD3D9Ex->GetAdapterMonitor(GetAdapter(m_pD3D9Ex)));
 				}
 #endif
 			}
@@ -1683,7 +1683,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 		const UINT adapterCount = pD3DEx->GetAdapterCount();
 		if (adapterCount != m_AdapterCount) {
 			m_AdapterCount = adapterCount;
-			m_pD3DEx = pD3DEx;
+			m_pD3D9Ex = pD3DEx;
 		}
 	}
 
@@ -1775,7 +1775,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	}
 
 	if (!m_pLine && m_pfD3DXCreateLine) {
-		m_pfD3DXCreateLine(m_pD3DDevEx, &m_pLine);
+		m_pfD3DXCreateLine(m_pDevice9Ex, &m_pLine);
 	}
 
 	{
@@ -2156,7 +2156,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	HRESULT hr;
 	CComPtr<IDirect3DSurface9> pRGB32Surface;
-	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pRGB32Surface, nullptr))) {
+	if (FAILED(hr = m_pDevice9Ex->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pRGB32Surface, nullptr))) {
 		return hr;
 	}
 
@@ -2166,18 +2166,18 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 		m_pVideoTextures[m_iCurSurface]->GetLevelDesc(0, &videoDesc);
 
 		const float fConstData[4] = { 1.0f / videoDesc.Width, 1.0f / videoDesc.Height, 0, 0 };
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, fConstData, 1);
+		hr = m_pDevice9Ex->SetPixelShaderConstantF(0, fConstData, 1);
 
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		hr = m_pFrameTextures[0]->GetSurfaceLevel(0, &pTemporarySurface);
-		hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-		hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrection);
+		hr = m_pDevice9Ex->SetRenderTarget(0, pTemporarySurface);
+		hr = m_pDevice9Ex->SetPixelShader(m_pPSCorrection);
 		TextureCopy(m_pVideoTextures[m_iCurSurface]);
 		pVideoTexture = m_pFrameTextures[0];
 	}
 
 	D3DLOCKED_RECT r = {};
-	if (FAILED(hr = m_pD3DDevEx->SetRenderTarget(0, pRGB32Surface))
+	if (FAILED(hr = m_pDevice9Ex->SetRenderTarget(0, pRGB32Surface))
 			|| FAILED(hr = Resize(pVideoTexture, { CPoint(0, 0), m_nativeVideoSize }, { CPoint(0, 0), framesize }))
 			|| FAILED(hr = pRGB32Surface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
 		return hr;
@@ -2238,11 +2238,11 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 STDMETHODIMP CDX9AllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
 {
-	CheckPointer(m_pD3DDevEx, E_ABORT);
+	CheckPointer(m_pDevice9Ex, E_ABORT);
 
 	// use the back buffer, because the display profile is applied to the front buffer
 	CComPtr<IDirect3DSurface9> pBackBuffer;
-	HRESULT hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+	HRESULT hr = m_pDevice9Ex->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 	if (FAILED(hr)) {
 		return hr;
 	}
@@ -2250,12 +2250,12 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
 	const UINT width  = m_windowRect.Width();
 	const UINT height = m_windowRect.Height();
 	CComPtr<IDirect3DSurface9> pDestSurface;
-	hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr);
+	hr = m_pDevice9Ex->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr);
 	if (FAILED(hr)) {
 		return hr;
 	}
 
-	hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE);
+	hr = m_pDevice9Ex->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE);
 	if (FAILED(hr)) {
 		return hr;
 	}

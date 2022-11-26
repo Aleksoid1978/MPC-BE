@@ -71,9 +71,9 @@ namespace DSObjects
 		static const int MAX_VIDEO_SURFACES = RS_EVRBUFFERS_MAX;
 
 		// Variables initialized/managed by the allocator-presenter!
-		CComPtr<IDirect3D9Ex>		m_pD3DEx;
-		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
-		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevExRefresh;
+		CComPtr<IDirect3D9Ex>		m_pD3D9Ex;
+		CComPtr<IDirect3DDevice9Ex>	m_pDevice9Ex;
+		CComPtr<IDirect3DDevice9Ex>	m_pDevice9ExRefresh;
 
 		bool m_bDeviceResetRequested = false;
 		bool m_bPendingResetDevice   = false;

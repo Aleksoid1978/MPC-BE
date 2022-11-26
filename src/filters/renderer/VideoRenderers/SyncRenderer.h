@@ -133,8 +133,8 @@ namespace GothSync
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
 
 		CCritSec m_allocatorLock;
-		CComPtr<IDirect3D9Ex>		m_pD3DEx;
-		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
+		CComPtr<IDirect3D9Ex>		m_pD3D9Ex;
+		CComPtr<IDirect3DDevice9Ex>	m_pDevice9Ex;
 
 		bool m_bDeviceResetRequested = false;
 		bool m_bPendingResetDevice   = false;

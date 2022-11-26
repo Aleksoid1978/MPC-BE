@@ -74,13 +74,13 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	if (m_pfDirect3DCreate9Ex) {
-		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
-		if (!m_pD3DEx) {
-			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
+		m_pfDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3D9Ex);
+		if (!m_pD3D9Ex) {
+			m_pfDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3D9Ex);
 		}
 	}
 
-	if (!m_pD3DEx) {
+	if (!m_pD3D9Ex) {
 		hr = E_FAIL;
 		_Error += L"Failed to create Direct3D 9Ex\n";
 		return;
@@ -107,9 +107,9 @@ CBaseAP::~CBaseAP()
 	m_Font3D.InvalidateDeviceObjects();
 	m_pAlphaBitmapTexture.Release();
 
-	m_pD3DDevEx.Release();
+	m_pDevice9Ex.Release();
 	m_pPSC.reset();
-	m_pD3DEx.Release();
+	m_pD3D9Ex.Release();
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
 		m_hD3D9 = nullptr;
@@ -266,7 +266,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_Font3D.InvalidateDeviceObjects();
 
 	m_pPSC.reset();
-	m_pD3DDevEx.Release();
+	m_pDevice9Ex.Release();
 
 	for (unsigned i = 0; i < std::size(m_pResizerPixelShaders); i++) {
 		m_pResizerPixelShaders[i].Release();
@@ -280,27 +280,27 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		Shader.m_pPixelShader.Release();
 	}
 
-	UINT currentAdapter = GetAdapter(m_pD3DEx, m_hWnd);
+	UINT currentAdapter = GetAdapter(m_pD3D9Ex, m_hWnd);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
 	if (!bTryToReset) {
-		m_pD3DDevEx.Release();
+		m_pDevice9Ex.Release();
 		m_CurrentAdapter = currentAdapter;
 	}
 
-	if (!m_pD3DEx) {
+	if (!m_pD3D9Ex) {
 		_Error += L"Failed to create Direct3D device\n";
 		return E_UNEXPECTED;
 	}
 
 	D3DDISPLAYMODE d3ddm;
 	ZeroMemory(&d3ddm, sizeof(d3ddm));
-	if (FAILED(m_pD3DEx->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm))) {
+	if (FAILED(m_pD3D9Ex->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm))) {
 		_Error += L"Can not retrieve display mode data\n";
 		return E_UNEXPECTED;
 	}
 
-	if (FAILED(m_pD3DEx->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &m_Caps))) {
+	if (FAILED(m_pD3D9Ex->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &m_Caps))) {
 		if ((m_Caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
 			_Error += L"Video card does not have scanline access. Display synchronization is not possible.\n";
 			return E_UNEXPECTED;
@@ -315,7 +315,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	DwmIsCompositionEnabled(&m_bCompositionEnabled);
 
 	CSize backBufferSize;
-	GetMaxResolution(m_pD3DEx, backBufferSize);
+	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
 	ZeroMemory(&m_pp, sizeof(m_pp));
 	if (m_bIsFullscreen) { // Exclusive mode fullscreen
@@ -330,7 +330,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
 		m_b10BitOutput = rs.b10BitOutput;
 		if (m_b10BitOutput) {
-			if (FAILED(m_pD3DEx->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
+			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
 				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
 				m_b10BitOutput = false;
 			}
@@ -349,23 +349,23 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		D3DDISPLAYMODEEX DisplayMode;
 		ZeroMemory(&DisplayMode, sizeof(DisplayMode));
 		DisplayMode.Size = sizeof(DisplayMode);
-		m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, nullptr);
+		m_pD3D9Ex->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, nullptr);
 
 		DisplayMode.Format = m_pp.BackBufferFormat;
 		m_pp.FullScreen_RefreshRateInHz = DisplayMode.RefreshRate;
 
-		bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_pp, &DisplayMode));
+		bTryToReset = bTryToReset && m_pDevice9Ex && SUCCEEDED(hr = m_pDevice9Ex->ResetEx(&m_pp, &DisplayMode));
 
 		if (!bTryToReset) {
-			m_pD3DDevEx.Release();
+			m_pDevice9Ex.Release();
 
-			hr = m_pD3DEx->CreateDeviceEx(
+			hr = m_pD3D9Ex->CreateDeviceEx(
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
 					D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES,
-					&m_pp, &DisplayMode, &m_pD3DDevEx);
+					&m_pp, &DisplayMode, &m_pDevice9Ex);
 		}
 
-		if (m_pD3DDevEx) {
+		if (m_pDevice9Ex) {
 			m_BackbufferFmt = m_pp.BackBufferFormat;
 			m_DisplayFmt = DisplayMode.Format;
 		}
@@ -381,7 +381,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_DisplayFmt = d3ddm.Format;
 		m_b10BitOutput = rs.b10BitOutput;
 		if (m_b10BitOutput) {
-			if (FAILED(m_pD3DEx->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
+			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
 				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
 				m_b10BitOutput = false;
 			}
@@ -398,30 +398,30 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			m_pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 		}
 
-		bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_pp, nullptr));
+		bTryToReset = bTryToReset && m_pDevice9Ex && SUCCEEDED(hr = m_pDevice9Ex->ResetEx(&m_pp, nullptr));
 
 		if (!bTryToReset) {
-			m_pD3DDevEx.Release();
+			m_pDevice9Ex.Release();
 
-			hr = m_pD3DEx->CreateDeviceEx(
+			hr = m_pD3D9Ex->CreateDeviceEx(
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS,
-					&m_pp, nullptr, &m_pD3DDevEx);
+					&m_pp, nullptr, &m_pDevice9Ex);
 		}
 	}
 
-	if (m_pD3DDevEx) {
+	if (m_pDevice9Ex) {
 		while (hr == D3DERR_DEVICELOST) {
 			DLog(L"D3DERR_DEVICELOST. Trying to Reset.");
-			hr = m_pD3DDevEx->TestCooperativeLevel();
+			hr = m_pDevice9Ex->TestCooperativeLevel();
 		}
 		if (hr == D3DERR_DEVICENOTRESET) {
 			DLog(L"D3DERR_DEVICENOTRESET");
-			hr = m_pD3DDevEx->Reset(&m_pp);
+			hr = m_pDevice9Ex->Reset(&m_pp);
 		}
 
-		if (m_pD3DDevEx) {
-			m_pD3DDevEx->SetGPUThreadPriority(7);
+		if (m_pDevice9Ex) {
+			m_pDevice9Ex->SetGPUThreadPriority(7);
 		}
 	}
 
@@ -430,7 +430,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		return hr;
 	}
 
-	m_pPSC.reset(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
+	m_pPSC.reset(DNew CPixelShaderCompiler(m_pDevice9Ex, true));
 
 	if (m_Caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MINFLINEAR && m_Caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MAGFLINEAR) {
 		m_filter = D3DTEXF_LINEAR;
@@ -441,9 +441,9 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
 
 	if (m_pAllocator) {
-		m_pAllocator->ChangeDevice(m_pD3DDevEx);
+		m_pAllocator->ChangeDevice(m_pDevice9Ex);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDevEx, m_maxSubtitleTextureSize, false);
+		m_pAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
 		if (!m_pAllocator) {
 			_Error += L"CDX9SubPicAllocator failed\n";
 			return E_FAIL;
@@ -473,7 +473,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pSubPicQueue->SetSubPicProvider(pSubPicProvider);
 	}
 
-	HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pD3DDevEx);
+	HRESULT hr2 = m_Font3D.InitDeviceObjects(m_pDevice9Ex);
 	if (SUCCEEDED(hr2)) {
 		const long minWidth = 1600;
 		int baseWidth = std::min(m_ScreenSize.cx, minWidth);
@@ -489,7 +489,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	DLogIf(FAILED(hr2), L"m_Font3D failed with error %s", HR2Str(hr2));
 
 	if (m_pfD3DXCreateLine) {
-		m_pfD3DXCreateLine (m_pD3DDevEx, &m_pLine);
+		m_pfD3DXCreateLine (m_pDevice9Ex, &m_pLine);
 	}
 	m_LastAdapterCheck = GetPerfCounter();
 	return S_OK;
@@ -514,7 +514,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	unsigned nTexturesNeeded = m_nSurfaces+2;
 
 	for (unsigned i = 0; i < nTexturesNeeded; i++) {
-		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
+		if (FAILED(hr = m_pDevice9Ex->CreateTexture(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTextures[i], nullptr))) {
 			return hr;
 		}
@@ -524,7 +524,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 		}
 	}
 
-	hr = m_pD3DDevEx->ColorFill(m_pVideoSurfaces[m_iCurSurface], nullptr, 0);
+	hr = m_pDevice9Ex->ColorFill(m_pVideoSurfaces[m_iCurSurface], nullptr, 0);
 	return S_OK;
 }
 
@@ -680,9 +680,9 @@ HRESULT CBaseAP::InitShaderResizer()
 		return E_INVALIDARG;
 	}
 
-	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader], resid);
+	HRESULT hr = CreateShaderFromResource(m_pDevice9Ex, &m_pResizerPixelShaders[iShader], resid);
 	if (S_OK == hr) {
-		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader + 1], resid + 1);
+		hr = CreateShaderFromResource(m_pDevice9Ex, &m_pResizerPixelShaders[iShader + 1], resid + 1);
 	}
 	if (FAILED(hr)) {
 		ASSERT(0);
@@ -691,9 +691,9 @@ HRESULT CBaseAP::InitShaderResizer()
 
 	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
 		resid = IDF_SHADER_DOWNSCALER_SIMPLE_X;
-		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_x], resid);
+		hr = CreateShaderFromResource(m_pDevice9Ex, &m_pResizerPixelShaders[shader_downscaling_x], resid);
 		if (S_OK == hr) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
+			hr = CreateShaderFromResource(m_pDevice9Ex, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
 		}
 		ASSERT(S_OK == hr);
 	}
@@ -722,8 +722,8 @@ HRESULT CBaseAP::TextureCopy(IDirect3DTexture9* pTexture)
 		v[i].x -= 0.5;
 		v[i].y -= 0.5;
 	}
-	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	return TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
+	hr = m_pDevice9Ex->SetTexture(0, pTexture);
+	return TextureBlt(m_pDevice9Ex, v, D3DTEXF_POINT);
 }
 
 HRESULT CBaseAP::TextureCopyRect(
@@ -782,9 +782,9 @@ HRESULT CBaseAP::TextureCopyRect(
 		{(float)points[3].x - 0.5f, (float)points[3].y - 0.5f, 0.5f, 2.0f, {srcRect.right * dx, srcRect.bottom * dy} },
 	};
 
-	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	hr = m_pD3DDevEx->SetPixelShader(nullptr);
-	hr = TextureBlt(m_pD3DDevEx, v, filter);
+	hr = m_pDevice9Ex->SetTexture(0, pTexture);
+	hr = m_pDevice9Ex->SetPixelShader(nullptr);
+	hr = TextureBlt(m_pDevice9Ex, v, filter);
 
 	return hr;
 }
@@ -802,7 +802,7 @@ HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 		v[i].x -= 0.5;
 		v[i].y -= 0.5;
 	}
-	return DrawRectBase(m_pD3DDevEx, v);
+	return DrawRectBase(m_pDevice9Ex, v);
 }
 
 HRESULT CBaseAP::TextureResizeShader(
@@ -883,12 +883,12 @@ HRESULT CBaseAP::TextureResizeShader(
 		{ dx, dy, 0, 0 },
 		{ scale_x, scale_y, 0, 0 },
 	};
-	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
-	hr = m_pD3DDevEx->SetPixelShader(pShader);
+	hr = m_pDevice9Ex->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
+	hr = m_pDevice9Ex->SetPixelShader(pShader);
 
-	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
-	m_pD3DDevEx->SetPixelShader(nullptr);
+	hr = m_pDevice9Ex->SetTexture(0, pTexture);
+	hr = TextureBlt(m_pDevice9Ex, v, D3DTEXF_POINT);
+	m_pDevice9Ex->SetPixelShader(nullptr);
 
 	return hr;
 }
@@ -944,7 +944,7 @@ HRESULT CBaseAP::ResizeShaderPass(
 		}
 
 		if (!m_pResizeTexture) {
-			hr = m_pD3DDevEx->CreateTexture(
+			hr = m_pDevice9Ex->CreateTexture(
 				texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
 				D3DFMT_A16B16G16R16F, // use only float textures here
 				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
@@ -960,15 +960,15 @@ HRESULT CBaseAP::ResizeShaderPass(
 		hr = m_pResizeTexture->GetSurfaceLevel(0, &pResizeSurface);
 
 		// resize width
-		hr = m_pD3DDevEx->SetRenderTarget(0, pResizeSurface);
+		hr = m_pDevice9Ex->SetRenderTarget(0, pResizeSurface);
 		hr = TextureResizeShader(pTexture, srcRect, resizeRect, resizerX, m_iRotation, m_bFlip);
 
 		// resize height
-		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+		hr = m_pDevice9Ex->SetRenderTarget(0, pRenderTarget);
 		hr = TextureResizeShader(m_pResizeTexture, resizeRect, dstRect, resizerY, 0, false);
 	}
 	else {
-		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+		hr = m_pDevice9Ex->SetRenderTarget(0, pRenderTarget);
 
 		if (resizerX) {
 			// one pass resize for width
@@ -980,7 +980,7 @@ HRESULT CBaseAP::ResizeShaderPass(
 		}
 		else {
 			// no resize
-			hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+			hr = m_pDevice9Ex->SetRenderTarget(0, pRenderTarget);
 			hr = TextureCopyRect(pTexture, srcRect, dstRect, D3DTEXF_POINT, m_iRotation, m_bFlip);
 		}
 	}
@@ -1021,46 +1021,46 @@ HRESULT CBaseAP::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture)
 			{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
 		};
 
-		hr = m_pD3DDevEx->SetTexture(0, pTexture);
+		hr = m_pDevice9Ex->SetTexture(0, pTexture);
 
 		// GetRenderState fails for devices created with D3DCREATE_PUREDEVICE
 		// so we need to provide default values in case GetRenderState fails
 		DWORD abe, sb, db;
-		if (FAILED(m_pD3DDevEx->GetRenderState(D3DRS_ALPHABLENDENABLE, &abe)))
+		if (FAILED(m_pDevice9Ex->GetRenderState(D3DRS_ALPHABLENDENABLE, &abe)))
 			abe = FALSE;
-		if (FAILED(m_pD3DDevEx->GetRenderState(D3DRS_SRCBLEND, &sb)))
+		if (FAILED(m_pDevice9Ex->GetRenderState(D3DRS_SRCBLEND, &sb)))
 			sb = D3DBLEND_ONE;
-		if (FAILED(m_pD3DDevEx->GetRenderState(D3DRS_DESTBLEND, &db)))
+		if (FAILED(m_pDevice9Ex->GetRenderState(D3DRS_DESTBLEND, &db)))
 			db = D3DBLEND_ZERO;
 
-		hr = m_pD3DDevEx->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-		hr = m_pD3DDevEx->SetRenderState(D3DRS_LIGHTING, FALSE);
-		hr = m_pD3DDevEx->SetRenderState(D3DRS_ZENABLE, FALSE);
-		hr = m_pD3DDevEx->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		hr = m_pD3DDevEx->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE); // pre-multiplied src and ...
-		hr = m_pD3DDevEx->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
+		hr = m_pDevice9Ex->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+		hr = m_pDevice9Ex->SetRenderState(D3DRS_LIGHTING, FALSE);
+		hr = m_pDevice9Ex->SetRenderState(D3DRS_ZENABLE, FALSE);
+		hr = m_pDevice9Ex->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		hr = m_pDevice9Ex->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE); // pre-multiplied src and ...
+		hr = m_pDevice9Ex->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
 
-		hr = m_pD3DDevEx->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		hr = m_pD3DDevEx->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		hr = m_pD3DDevEx->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+		hr = m_pDevice9Ex->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+		hr = m_pDevice9Ex->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		hr = m_pDevice9Ex->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 
-		hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-		hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-		hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+		hr = m_pDevice9Ex->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+		hr = m_pDevice9Ex->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+		hr = m_pDevice9Ex->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-		hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-		hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+		hr = m_pDevice9Ex->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+		hr = m_pDevice9Ex->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
-		hr = m_pD3DDevEx->SetPixelShader(nullptr);
+		hr = m_pDevice9Ex->SetPixelShader(nullptr);
 
-		hr = m_pD3DDevEx->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
-		hr = m_pD3DDevEx->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
+		hr = m_pDevice9Ex->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+		hr = m_pDevice9Ex->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
 
-		m_pD3DDevEx->SetTexture(0, nullptr);
+		m_pDevice9Ex->SetTexture(0, nullptr);
 
-		m_pD3DDevEx->SetRenderState(D3DRS_ALPHABLENDENABLE, abe);
-		m_pD3DDevEx->SetRenderState(D3DRS_SRCBLEND, sb);
-		m_pD3DDevEx->SetRenderState(D3DRS_DESTBLEND, db);
+		m_pDevice9Ex->SetRenderState(D3DRS_ALPHABLENDENABLE, abe);
+		m_pDevice9Ex->SetRenderState(D3DRS_SRCBLEND, sb);
+		m_pDevice9Ex->SetRenderState(D3DRS_DESTBLEND, db);
 
 		return S_OK;
 	} while (0);
@@ -1145,7 +1145,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	// accurate within one ms why there should not be any need for a more accurate one. The wiggly line seen
 	// when using sync to nearest and sync display is most likely due to inaccuracies in the audio-card-based
 	// reference clock. The wiggles are not seen with the perfcounter-based reference clock of the sync to video option.
-	m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+	m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 	m_uScanLineEnteringPaint = rasterStatus.ScanLine;
 	if (m_pRefClock) {
 		m_pRefClock->GetTime(&llCurRefTime);
@@ -1167,12 +1167,12 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	CRect rSrcPri(CPoint(0, 0), m_windowRect.Size());
 	CRect rDstPri(m_windowRect);
 
-	m_pD3DDevEx->BeginScene();
+	m_pDevice9Ex->BeginScene();
 
 	CComPtr<IDirect3DSurface9> pBackBuffer;
-	m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-	m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-	hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
+	m_pDevice9Ex->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+	m_pDevice9Ex->SetRenderTarget(0, pBackBuffer);
+	hr = m_pDevice9Ex->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 	if (!rDstVid.IsRectEmpty()) {
 		if (m_pVideoTextures[m_iCurSurface]) {
@@ -1183,19 +1183,19 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 			if (m_inputExtFormat.VideoTransferMatrix == VIDEOTRANSFERMATRIX_YCgCo) {
 				if (!m_pPSCorrectionYCgCo) {
-					hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_CORRECTION_YCGCO);
+					hr = CreateShaderFromResource(m_pDevice9Ex, &m_pPSCorrectionYCgCo, IDF_SHADER_CORRECTION_YCGCO);
 				}
 
 				if (m_pPSCorrectionYCgCo) {
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
-					hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionYCgCo);
+					hr = m_pDevice9Ex->SetRenderTarget(0, m_pVideoSurfaces[dst]);
+					hr = m_pDevice9Ex->SetPixelShader(m_pPSCorrectionYCgCo);
 					TextureCopy(m_pVideoTextures[src]);
 					pVideoTexture = m_pVideoTextures[dst];
 					src = dst;
 					dst++;
 
-					hr = m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-					hr = m_pD3DDevEx->SetPixelShader(nullptr);
+					hr = m_pDevice9Ex->SetRenderTarget(0, pBackBuffer);
+					hr = m_pDevice9Ex->SetPixelShader(nullptr);
 				}
 			}
 
@@ -1218,14 +1218,14 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 					{1.0f / desc.Width, 1.0f / desc.Height, 0, 0},
 				};
-				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
+				hr = m_pDevice9Ex->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 				for (auto& Shader : m_pPixelShaders) {
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
+					hr = m_pDevice9Ex->SetRenderTarget(0, m_pVideoSurfaces[dst]);
 					if (!Shader.m_pPixelShader) {
 						Shader.Compile(m_pPSC.get());
 					}
-					hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
+					hr = m_pDevice9Ex->SetPixelShader(Shader.m_pPixelShader);
 					TextureCopy(m_pVideoTextures[src]);
 					pVideoTexture = m_pVideoTextures[dst];
 
@@ -1235,8 +1235,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					}
 				}
 
-				hr = m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-				hr = m_pD3DDevEx->SetPixelShader(nullptr);
+				hr = m_pDevice9Ex->SetRenderTarget(0, pBackBuffer);
+				hr = m_pDevice9Ex->SetPixelShader(nullptr);
 			}
 
 			// init resizer
@@ -1252,10 +1252,10 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				UINT texWidth = std::min((DWORD)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
 				UINT texHeight = std::min((DWORD)m_ScreenSize.cy, m_Caps.MaxTextureHeight);
 
-				if (D3D_OK != m_pD3DDevEx->CreateTexture(
+				if (D3D_OK != m_pDevice9Ex->CreateTexture(
 							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 							D3DPOOL_DEFAULT, &m_pScreenSizeTextures[0], nullptr)
-					|| D3D_OK != m_pD3DDevEx->CreateTexture(
+					|| D3D_OK != m_pDevice9Ex->CreateTexture(
 							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 							D3DPOOL_DEFAULT, &m_pScreenSizeTextures[1], nullptr)) {
 					ASSERT(0);
@@ -1273,11 +1273,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					bScreenSpacePixelShaders = false;
 				}
 				if (bScreenSpacePixelShaders) {
-					hr = m_pD3DDevEx->SetRenderTarget(0, pRT);
+					hr = m_pDevice9Ex->SetRenderTarget(0, pRT);
 					if (hr != S_OK) {
 						bScreenSpacePixelShaders = false;
 					}
-					hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
+					hr = m_pDevice9Ex->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 				}
 			}
 
@@ -1349,7 +1349,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 					{1.0f / desc.Width, 1.0f / desc.Height, 0, 0},
 				};
-				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
+				hr = m_pDevice9Ex->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 
 				int src = 1, dst = 0;
 
@@ -1358,26 +1358,26 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 					for (auto it = m_pPixelShadersScreenSpace.begin(), end = m_pPixelShadersScreenSpace.end(); it != end; ++it) {
 						if (it == it_last) {
-							m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
+							m_pDevice9Ex->SetRenderTarget(0, pBackBuffer);
 						}
 						else {
 							CComPtr<IDirect3DSurface9> pRT;
 							hr = m_pScreenSizeTextures[dst]->GetSurfaceLevel(0, &pRT);
-							m_pD3DDevEx->SetRenderTarget(0, pRT);
+							m_pDevice9Ex->SetRenderTarget(0, pRT);
 						}
 
 						auto& Shader = (*it);
 						if (!Shader.m_pPixelShader) {
 							Shader.Compile(m_pPSC.get());
 						}
-						hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
+						hr = m_pDevice9Ex->SetPixelShader(Shader.m_pPixelShader);
 						TextureCopy(m_pScreenSizeTextures[src]);
 
 						std::swap(src, dst);
 					}
 				}
 
-				hr = m_pD3DDevEx->SetPixelShader(nullptr);
+				hr = m_pDevice9Ex->SetPixelShader(nullptr);
 			}
 		} else {
 			if (pBackBuffer) {
@@ -1387,7 +1387,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				rSrcVid.right &= ~1;
 				rSrcVid.top &= ~1;
 				rSrcVid.bottom &= ~1;
-				hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_iCurSurface], rSrcVid, pBackBuffer, rDstVid, m_filter);
+				hr = m_pDevice9Ex->StretchRect(m_pVideoSurfaces[m_iCurSurface], rSrcVid, pBackBuffer, rDstVid, m_filter);
 				if (FAILED(hr)) {
 					return false;
 				}
@@ -1405,12 +1405,12 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		AlphaBlt(rSrcPri, rDstPri, m_pAlphaBitmapTexture);
 	}
 
-	m_pD3DDevEx->EndScene();
+	m_pDevice9Ex->EndScene();
 
 	if (m_bIsFullscreen) {
-		hr = m_pD3DDevEx->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
+		hr = m_pDevice9Ex->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 	} else {
-		hr = m_pD3DDevEx->PresentEx(rSrcPri, rDstPri, nullptr, nullptr, 0);
+		hr = m_pDevice9Ex->PresentEx(rSrcPri, rDstPri, nullptr, nullptr, 0);
 	}
 	if (FAILED(hr)) {
 		DLog(L"CBaseAP::Paint : Device lost or something");
@@ -1462,7 +1462,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	}
 
 	bool bResetDevice = m_bPendingResetDevice;
-	if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->TestCooperativeLevel() == D3DERR_DEVICENOTRESET || hr == S_PRESENT_MODE_CHANGED) {
+	if (hr == D3DERR_DEVICELOST && m_pDevice9Ex->TestCooperativeLevel() == D3DERR_DEVICENOTRESET || hr == S_PRESENT_MODE_CHANGED) {
 		bResetDevice = true;
 	}
 	if (SettingsNeedResetDevice()) {
@@ -1486,16 +1486,16 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			m_LastAdapterCheck = time;
 #ifdef _DEBUG
 			D3DDEVICE_CREATION_PARAMETERS Parameters;
-			if (SUCCEEDED(m_pD3DDevEx->GetCreationParameters(&Parameters))) {
+			if (SUCCEEDED(m_pDevice9Ex->GetCreationParameters(&Parameters))) {
 				ASSERT(Parameters.AdapterOrdinal == m_CurrentAdapter);
 			}
 #endif
-			if (m_CurrentAdapter != GetAdapter(m_pD3DEx, m_hWnd)) {
+			if (m_CurrentAdapter != GetAdapter(m_pD3D9Ex, m_hWnd)) {
 				bResetDevice = true;
 			}
 #ifdef _DEBUG
 			else {
-				ASSERT(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter) == m_pD3DEx->GetAdapterMonitor(GetAdapter(m_pD3DEx, m_hWnd)));
+				ASSERT(m_pD3D9Ex->GetAdapterMonitor(m_CurrentAdapter) == m_pD3D9Ex->GetAdapterMonitor(GetAdapter(m_pD3D9Ex, m_hWnd)));
 			}
 #endif
 		}
@@ -1525,7 +1525,7 @@ STDMETHODIMP_(bool) CBaseAP::ResetDevice()
 		m_bDeviceResetRequested = false;
 		return false;
 	}
-	m_pGenlock->SetMonitor(GetAdapter(m_pD3DEx, m_hWnd));
+	m_pGenlock->SetMonitor(GetAdapter(m_pD3D9Ex, m_hWnd));
 	m_pGenlock->GetTiming();
 	OnResetDevice();
 	m_bDeviceResetRequested = false;
@@ -1635,9 +1635,9 @@ void CBaseAP::DrawStats()
 			}
 
 #ifdef _DEBUG
-			if (m_pD3DDevEx) {
+			if (m_pDevice9Ex) {
 				CComPtr<IDirect3DSwapChain9> pSC;
-				HRESULT hr = m_pD3DDevEx->GetSwapChain(0, &pSC);
+				HRESULT hr = m_pDevice9Ex->GetSwapChain(0, &pSC);
 				CComQIPtr<IDirect3DSwapChain9Ex> pSCEx(pSC);
 				if (pSCEx) {
 					D3DPRESENTSTATS stats;
@@ -1829,16 +1829,16 @@ double CBaseAP::GetCycleDifference()
 
 void CBaseAP::EstimateRefreshTimings()
 {
-	if (m_pD3DDevEx) {
+	if (m_pDevice9Ex) {
 		D3DRASTER_STATUS rasterStatus;
-		m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+		m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 		while (rasterStatus.ScanLine != 0) {
-			m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+			m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 		}
 		while (rasterStatus.ScanLine == 0) {
-			m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+			m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 		}
-		m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+		m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 		LONGLONG startTime = GetPerfCounter();
 		UINT startLine = rasterStatus.ScanLine;
 		LONGLONG endTime = 0;
@@ -1847,7 +1847,7 @@ void CBaseAP::EstimateRefreshTimings()
 		UINT line = 0;
 		bool done = false;
 		while (!done) { // Estimate time for one scan line
-			m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+			m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 			line = rasterStatus.ScanLine;
 			time = GetPerfCounter();
 			if (line > 0) {
@@ -1860,20 +1860,20 @@ void CBaseAP::EstimateRefreshTimings()
 		m_dDetectedScanlineTime = (endTime - startTime) /((endLine - startLine) * 10000.0);
 
 		// Estimate the display refresh rate from the vsyncs
-		m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+		m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 		while (rasterStatus.ScanLine != 0) {
-			m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+			m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 		}
 		// Now we're at the start of a vsync
 		startTime = GetPerfCounter();
 		UINT i;
 		for (i = 1; i <= 50; i++) {
-			m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+			m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 			while (rasterStatus.ScanLine == 0) {
-				m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+				m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 			}
 			while (rasterStatus.ScanLine != 0) {
-				m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+				m_pDevice9Ex->GetRasterStatus(0, &rasterStatus);
 			}
 			// Now we're at the next vsync
 		}
@@ -1908,9 +1908,9 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY);
 	if (FAILED(hr)) {
 		pSurface.Release();
-		hr = m_pD3DDevEx->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, nullptr);
+		hr = m_pDevice9Ex->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, nullptr);
 		if (SUCCEEDED(hr)) {
-			hr = m_pD3DDevEx->GetRenderTargetData(m_pVideoSurfaces[m_iCurSurface], pSurface);
+			hr = m_pDevice9Ex->GetRenderTargetData(m_pVideoSurfaces[m_iCurSurface], pSurface);
 			if (SUCCEEDED(hr)) {
 				hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY);
 			}
@@ -1975,11 +1975,11 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 
 STDMETHODIMP CBaseAP::GetDisplayedImage(LPVOID* dibImage)
 {
-	CheckPointer(m_pD3DDevEx, E_ABORT);
+	CheckPointer(m_pDevice9Ex, E_ABORT);
 
 	// use the back buffer, because the display profile is applied to the front buffer
 	CComPtr<IDirect3DSurface9> pBackBuffer;
-	HRESULT hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+	HRESULT hr = m_pDevice9Ex->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 	if (FAILED(hr)) {
 		return hr;
 	}
@@ -1987,12 +1987,12 @@ STDMETHODIMP CBaseAP::GetDisplayedImage(LPVOID* dibImage)
 	const UINT width  = m_windowRect.Width();
 	const UINT height = m_windowRect.Height();
 	CComPtr<IDirect3DSurface9> pDestSurface;
-	hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr);
+	hr = m_pDevice9Ex->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr);
 	if (FAILED(hr)) {
 		return hr;
 	}
 
-	hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE);
+	hr = m_pDevice9Ex->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE);
 	if (FAILED(hr)) {
 		return hr;
 	}
@@ -2040,7 +2040,7 @@ STDMETHODIMP CBaseAP::ClearPixelShaders(int target)
 	} else {
 		return E_INVALIDARG;
 	}
-	m_pD3DDevEx->SetPixelShader(nullptr);
+	m_pDevice9Ex->SetPixelShader(nullptr);
 
 	return S_OK;
 }
@@ -2130,7 +2130,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
 	if (SUCCEEDED (hr)) {
-		hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
+		hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
 		if (!SUCCEEDED (hr)) {
 			_Error += L"m_pD3DManager->ResetDevice failed\n";
 		}
@@ -2830,11 +2830,11 @@ bool CSyncAP::GetSampleFromMixer()
 			rcTearing.top = 0;
 			rcTearing.right = rcTearing.left + 4;
 			rcTearing.bottom = m_nativeVideoSize.cy;
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pDevice9Ex->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
 			rcTearing.left = (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right = rcTearing.left + 4;
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pDevice9Ex->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 		MoveToScheduledList(pSample, false); // Schedule, then go back to see if there is more where that came from
@@ -2934,7 +2934,7 @@ STDMETHODIMP CSyncAP::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMax)
 		D3DDISPLAYMODE d3ddm;
 
 		ZeroMemory(&d3ddm, sizeof(d3ddm));
-		if (SUCCEEDED(m_pD3DEx->GetAdapterDisplayMode(GetAdapter(m_pD3DEx, m_hWnd), &d3ddm))) {
+		if (SUCCEEDED(m_pD3D9Ex->GetAdapterDisplayMode(GetAdapter(m_pD3D9Ex, m_hWnd), &d3ddm))) {
 			pszMax->cx = d3ddm.Width;
 			pszMax->cy = d3ddm.Height;
 		}
@@ -3006,7 +3006,7 @@ STDMETHODIMP CSyncAP::GetCurrentImage(BITMAPINFOHEADER *pBih, BYTE **pDib, DWORD
 	if (!pBih || !pDib || !pcbDib) {
 		return E_POINTER;
 	}
-	CheckPointer(m_pD3DDevEx, E_ABORT);
+	CheckPointer(m_pDevice9Ex, E_ABORT);
 
 	HRESULT hr = S_OK;
 	const unsigned width  = m_windowRect.Width();
@@ -3029,9 +3029,9 @@ STDMETHODIMP CSyncAP::GetCurrentImage(BITMAPINFOHEADER *pBih, BYTE **pDib, DWORD
 	CComPtr<IDirect3DSurface9> pBackBuffer;
 	CComPtr<IDirect3DSurface9> pDestSurface;
 	D3DLOCKED_RECT r;
-	if (FAILED(hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer))
-		|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
-		|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
+	if (FAILED(hr = m_pDevice9Ex->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer))
+		|| FAILED(hr = m_pDevice9Ex->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
+		|| (FAILED(hr = m_pDevice9Ex->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
 		|| (FAILED(hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
 		DLog(L"CSyncAP::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		CoTaskMemFree(p);
@@ -3113,7 +3113,7 @@ STDMETHODIMP CSyncAP::SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms)
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock cRenderLock(&m_allocatorLock);
 
-	CheckPointer(m_pD3DDevEx, E_ABORT);
+	CheckPointer(m_pDevice9Ex, E_ABORT);
 	HRESULT hr = S_OK;
 
 	if (pBmpParms->GetBitmapFromDC && pBmpParms->bitmap.hdc) {
@@ -3139,7 +3139,7 @@ STDMETHODIMP CSyncAP::SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms)
 		}
 
 		if (!m_pAlphaBitmapTexture) {
-			hr = m_pD3DDevEx->CreateTexture(bm.bmWidth, bm.bmHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pAlphaBitmapTexture, nullptr);
+			hr = m_pDevice9Ex->CreateTexture(bm.bmWidth, bm.bmHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pAlphaBitmapTexture, nullptr);
 		}
 
 		if (SUCCEEDED(hr)) {
@@ -3587,7 +3587,7 @@ void CSyncAP::OnResetDevice()
 {
 	DLog(L"--> CSyncAP::OnResetDevice on thread: %u", GetCurrentThreadId());
 	HRESULT hr;
-	hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
+	hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
 	if (m_pSink) {
 		m_pSink->Notify(EC_DISPLAY_CHANGED, 0, 0);
 	}
@@ -3706,7 +3706,7 @@ HRESULT CSyncAP::BeginStreaming()
 	if (filterInfo.pGraph) {
 		filterInfo.pGraph->Release();
 	}
-	m_pGenlock->SetMonitor(GetAdapter(m_pD3DEx, m_hWnd));
+	m_pGenlock->SetMonitor(GetAdapter(m_pD3D9Ex, m_hWnd));
 	m_pGenlock->GetTiming();
 
 	ResetStats();
@@ -3893,7 +3893,7 @@ STDMETHODIMP CSyncAP::Stop()
 {
 	for (unsigned i = 0; i < m_nSurfaces + 2; i++) {
 		if (m_pVideoSurfaces[i]) {
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
+			m_pDevice9Ex->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
 		}
 	}
 

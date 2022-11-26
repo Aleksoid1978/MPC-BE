@@ -109,7 +109,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
 	if (SUCCEEDED(hr)) {
-		hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
+		hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
 		if (!SUCCEEDED(hr)) {
 			_Error += L"m_pD3DManager->ResetDevice() failed\n";
 		}
@@ -1001,11 +1001,11 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
 			rcTearing.bottom	= m_nativeVideoSize.cy;
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_pDevice9Ex->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 
 			rcTearing.left		= (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right		= rcTearing.left + 4;
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_pDevice9Ex->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 			m_nTearingPos		= (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 
@@ -1139,7 +1139,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMa
 
 	if (pszMax) {
 		D3DDISPLAYMODE d3ddm = { 0 };
-		if (SUCCEEDED(m_pD3DEx->GetAdapterDisplayMode(GetAdapter(m_pD3DEx), &d3ddm))) {
+		if (SUCCEEDED(m_pD3D9Ex->GetAdapterDisplayMode(GetAdapter(m_pD3D9Ex), &d3ddm))) {
 			pszMax->cx = d3ddm.Width;
 			pszMax->cy = d3ddm.Height;
 		}
@@ -1216,7 +1216,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetCurrentImage(BITMAPINFOHEADER *pBih, BYT
 	if (!pBih || !pDib || !pcbDib) {
 		return E_POINTER;
 	}
-	CheckPointer(m_pD3DDevEx, E_ABORT);
+	CheckPointer(m_pDevice9Ex, E_ABORT);
 
 	HRESULT hr = S_OK;
 	const unsigned width  = m_windowRect.Width();
@@ -1239,9 +1239,9 @@ STDMETHODIMP CEVRAllocatorPresenter::GetCurrentImage(BITMAPINFOHEADER *pBih, BYT
 	CComPtr<IDirect3DSurface9> pBackBuffer;
 	CComPtr<IDirect3DSurface9> pDestSurface;
 	D3DLOCKED_RECT r;
-	if (FAILED(hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer))
-			|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
-			|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
+	if (FAILED(hr = m_pDevice9Ex->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer))
+			|| FAILED(hr = m_pDevice9Ex->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
+			|| (FAILED(hr = m_pDevice9Ex->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
 			|| (FAILED(hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
 		DLog(L"CEVRAllocatorPresenter::GetCurrentImage filed : %s", GetWindowsErrorMessage(hr, m_hD3D9));
 		CoTaskMemFree(p);
@@ -1323,7 +1323,7 @@ STDMETHODIMP CEVRAllocatorPresenter::SetAlphaBitmap(const MFVideoAlphaBitmap *pB
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock cRenderLock(&m_RenderLock);
 
-	CheckPointer(m_pD3DDevEx, E_ABORT);
+	CheckPointer(m_pDevice9Ex, E_ABORT);
 	HRESULT hr = S_OK;
 
 	if (pBmpParms->GetBitmapFromDC && pBmpParms->bitmap.hdc) {
@@ -1349,7 +1349,7 @@ STDMETHODIMP CEVRAllocatorPresenter::SetAlphaBitmap(const MFVideoAlphaBitmap *pB
 		}
 
 		if (!m_pAlphaBitmapTexture) {
-			hr = m_pD3DDevEx->CreateTexture(bm.bmWidth, bm.bmHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pAlphaBitmapTexture, nullptr);
+			hr = m_pDevice9Ex->CreateTexture(bm.bmWidth, bm.bmHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pAlphaBitmapTexture, nullptr);
 		}
 
 		if (SUCCEEDED(hr)) {
@@ -1505,7 +1505,7 @@ STDMETHODIMP CEVRAllocatorPresenter::Stop()
 {
 	for (unsigned i = 0; i < m_nSurfaces; i++) {
 		if (m_pVideoSurfaces[i]) {
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
+			m_pDevice9Ex->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
 		}
 	}
 
@@ -2299,7 +2299,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					prevSL = UINT_MAX;
 				}
 				// Do our stuff
-				if (m_pD3DDevEx && rs.bVSyncInternal) {
+				if (m_pDevice9Ex && rs.bVSyncInternal) {
 					ScanLinePos = 0;
 					filled = false;
 
@@ -2414,20 +2414,20 @@ void CEVRAllocatorPresenter::VSyncThread()
 						}
 					}
 				}
-				else if (m_pD3DDevExRefresh && rs.iDisplayStats == 1) {
+				else if (m_pDevice9ExRefresh && rs.iDisplayStats == 1) {
 					if (prevSL == UINT_MAX) {
 						D3DRASTER_STATUS rasterStatus;
-						if (S_OK == m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus)) {
+						if (S_OK == m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus)) {
 							while (rasterStatus.ScanLine == 0) { // skip zero scanline with unknown start time
 								Sleep(1);
-								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
+								m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							while (rasterStatus.ScanLine != 0) { // find new zero scanline
-								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
+								m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG times0 = GetPerfCounter();
 							while (rasterStatus.ScanLine == 0) {
-								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
+								m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG times1 = GetPerfCounter();
 
@@ -2435,7 +2435,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 							prevSL = 0;
 							while (rasterStatus.ScanLine != 0) {
 								prevSL = rasterStatus.ScanLine;
-								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
+								m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG timesLast = GetPerfCounter();
 
@@ -2445,7 +2445,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					}
 					else {
 						D3DRASTER_STATUS rasterStatus;
-						if (S_OK == m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus)) {
+						if (S_OK == m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus)) {
 							const LONGLONG time = GetPerfCounter();
 							if (rasterStatus.ScanLine) { // ignore the zero scan line, it coincides with VBlanc and therefore is very long in time
 								if (rasterStatus.ScanLine < prevSL) {
@@ -2498,7 +2498,7 @@ void CEVRAllocatorPresenter::OnResetDevice()
 	CAutoLock cRenderLock(&m_RenderLock);
 
 	// Reset DXVA Manager, and get new buffers
-	HRESULT hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
+	HRESULT hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
 
 	// Not necessary, but Microsoft documentation say Presenter should send this message...
 	if (m_pSink) {
