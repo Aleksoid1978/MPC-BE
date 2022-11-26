@@ -678,15 +678,14 @@ class CFakeDirectXVideoDecoder : public CUnknown, public IDirectXVideoDecoder
 {
 private :
 	CComPtr<IDirectXVideoDecoder> m_pDec;
-	BYTE*                         m_ppBuffer[MAX_BUFFER_TYPE];
-	UINT                          m_ppBufferLen[MAX_BUFFER_TYPE];
+	BYTE* m_ppBuffer[MAX_BUFFER_TYPE] = {};
+	UINT  m_ppBufferLen[MAX_BUFFER_TYPE] = {};
 
 public :
 	CFakeDirectXVideoDecoder(LPUNKNOWN pUnk, IDirectXVideoDecoder* pDec)
 		: CUnknown(L"Fake DXVA2 Dec", pUnk)
 	{
 		m_pDec.Attach(pDec);
-		memset(m_ppBuffer, 0, sizeof(m_ppBuffer));
 	}
 
 	~CFakeDirectXVideoDecoder() {

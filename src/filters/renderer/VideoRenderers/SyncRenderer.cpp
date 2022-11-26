@@ -97,9 +97,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	} else {
 		m_ShaderProfile = nullptr;
 	}
-
-	memset (m_pllJitter, 0, sizeof(m_pllJitter));
-	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
 }
 
 CBaseAP::~CBaseAP()
