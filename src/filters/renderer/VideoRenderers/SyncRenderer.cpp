@@ -54,6 +54,7 @@ using namespace D3D9Helper;
 
 CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
+	, m_bIsFullscreen(bFullscreen)
 {
 	DLog(L"CBaseAP::CBaseAP()");
 
