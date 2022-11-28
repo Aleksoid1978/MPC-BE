@@ -105,20 +105,6 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		pfAvSetMmThreadPriority           = (PTR_AvSetMmThreadPriority)GetProcAddress(m_hAvrtLib, "AvSetMmThreadPriority");
 		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hAvrtLib, "AvRevertMmThreadCharacteristics");
 	}
-
-	// Init DXVA manager
-	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
-	if (SUCCEEDED(hr)) {
-		hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
-		if (!SUCCEEDED(hr)) {
-			_Error += L"m_pD3DManager->ResetDevice() failed\n";
-		}
-	} else {
-		_Error += L"DXVA2CreateDirect3DDeviceManager9() failed\n";
-	}
-
-	// Bufferize frame only with 3D texture!
-	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
 }
 
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
@@ -257,11 +243,37 @@ void CEVRAllocatorPresenter::StopWorkerThreads()
 
 STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
-	CheckPointer(ppRenderer, E_POINTER);
+	ASSERT(m_pD3D9Ex && m_pDevice9Ex == nullptr && m_pD3DManager == nullptr);
 
+	CheckPointer(ppRenderer, E_POINTER);
 	*ppRenderer = nullptr;
 
 	HRESULT hr = E_FAIL;
+	CStringW _Error;
+	CRenderersSettings& rs = GetRenderersSettings();
+
+	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
+
+	// Init DXVA manager
+	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
+	if (FAILED(hr)) {
+		_Error = L"DXVA2CreateDirect3DDeviceManager9 failed\n";
+		DLog(_Error);
+		return hr;
+	}
+
+	hr = CreateDevice(_Error);
+	if (FAILED(hr)) {
+		DLog(_Error);
+		return hr;
+	}
+
+	hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
+	if (FAILED(hr)) {
+		_Error = L"m_pD3DManager->ResetDevice failed\n";
+		DLog(_Error);
+		return hr;
+	}
 
 	do {
 		CMacrovisionKicker*	pMK  = DNew CMacrovisionKicker(L"CMacrovisionKicker", nullptr);

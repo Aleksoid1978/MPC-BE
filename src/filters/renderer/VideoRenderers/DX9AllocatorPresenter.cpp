@@ -98,8 +98,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 	DLog(L"Registering '%s' class completed successfully.", g_szClassName);
-
-	hr = CreateDevice(_Error);
 }
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
