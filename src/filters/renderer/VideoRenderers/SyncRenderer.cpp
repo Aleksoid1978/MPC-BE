@@ -85,18 +85,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 		_Error += L"Failed to create Direct3D 9Ex\n";
 		return;
 	}
-
-	CRenderersSettings& rs = GetRenderersSettings();
-
-	m_pGenlock = DNew CGenlock(rs.dTargetSyncOffset, rs.dControlLimit, rs.iLineDelta, rs.iColumnDelta, rs.dCycleDelta, 0); // Must be done before CreateDXDevice
-	hr = CreateDXDevice(_Error);
-
-	// Define the shader profile.
-	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-		m_ShaderProfile = "ps_3_0";
-	} else {
-		m_ShaderProfile = nullptr;
-	}
 }
 
 CBaseAP::~CBaseAP()
@@ -2085,8 +2073,6 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 {
 	DLog(L"CSyncAP::CSyncAP()");
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	if (FAILED (hr)) {
 		_Error += L"SyncAP failed\n";
 		return;
@@ -2126,20 +2112,6 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 		pfAvSetMmThreadPriority           = (PTR_AvSetMmThreadPriority)GetProcAddress(m_hAvrtLib, "AvSetMmThreadPriority");
 		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hAvrtLib, "AvRevertMmThreadCharacteristics");
 	}
-
-	// Init DXVA manager
-	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
-	if (SUCCEEDED (hr)) {
-		hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
-		if (!SUCCEEDED (hr)) {
-			_Error += L"m_pD3DManager->ResetDevice failed\n";
-		}
-	} else {
-		_Error += L"DXVA2CreateDirect3DDeviceManager9 failed\n";
-	}
-
-	// Bufferize frame only with 3D texture
-	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
 }
 
 CSyncAP::~CSyncAP(void)
@@ -2220,9 +2192,46 @@ void CSyncAP::StopWorkerThreads()
 
 STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 {
+	ASSERT(m_pD3D9Ex && m_pDevice9Ex == nullptr && m_pD3DManager == nullptr && m_pGenlock == nullptr);
+
 	CheckPointer(ppRenderer, E_POINTER);
 	*ppRenderer = nullptr;
+
 	HRESULT hr = E_FAIL;
+	CStringW _Error;
+	CRenderersSettings& rs = GetRenderersSettings();
+
+	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS - 2);
+
+	m_pGenlock = DNew CGenlock(rs.dTargetSyncOffset, rs.dControlLimit, rs.iLineDelta, rs.iColumnDelta, rs.dCycleDelta, 0); // Must be done before CreateDXDevice
+
+	hr = CreateDXDevice(_Error);
+	if (FAILED(hr)) {
+		DLog(_Error);
+		return hr;
+	}
+
+	// Define the shader profile.
+	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+		m_ShaderProfile = "ps_3_0";
+	} else {
+		m_ShaderProfile = nullptr;
+	}
+
+	// Init DXVA manager
+	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
+	if (FAILED(hr)) {
+		_Error = L"DXVA2CreateDirect3DDeviceManager9 failed\n";
+		DLog(_Error);
+		return hr;
+	}
+
+	hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
+	if (FAILED(hr)) {
+		_Error = L"m_pD3DManager->ResetDevice failed\n";
+		DLog(_Error);
+		return hr;
+	}
 
 	do {
 		CMacrovisionKicker* pMK = DNew CMacrovisionKicker(L"CMacrovisionKicker", nullptr);
