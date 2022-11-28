@@ -2203,6 +2203,14 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 
 	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS - 2);
 
+	// Init DXVA manager
+	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
+	if (FAILED(hr)) {
+		_Error = L"DXVA2CreateDirect3DDeviceManager9 failed\n";
+		DLog(_Error);
+		return hr;
+	}
+
 	m_pGenlock = DNew CGenlock(rs.dTargetSyncOffset, rs.dControlLimit, rs.iLineDelta, rs.iColumnDelta, rs.dCycleDelta, 0); // Must be done before CreateDXDevice
 
 	hr = CreateDXDevice(_Error);
@@ -2216,14 +2224,6 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 		m_ShaderProfile = "ps_3_0";
 	} else {
 		m_ShaderProfile = nullptr;
-	}
-
-	// Init DXVA manager
-	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
-	if (FAILED(hr)) {
-		_Error = L"DXVA2CreateDirect3DDeviceManager9 failed\n";
-		DLog(_Error);
-		return hr;
 	}
 
 	hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
