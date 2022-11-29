@@ -124,7 +124,7 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 using namespace DSObjects;
 
 CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError)
-	: CSubPicAllocatorPresenterImpl(hWnd, hr, _pError)
+	: CAllocatorPresenterImpl(hWnd, hr, _pError)
 {
 	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
 	DLogIf(!m_hDxva2Lib, L"Failed to load dxva2.dll");
@@ -2244,7 +2244,7 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 	return hr;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSize()
 {

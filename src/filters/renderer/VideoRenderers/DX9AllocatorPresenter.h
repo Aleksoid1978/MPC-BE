@@ -238,7 +238,7 @@ namespace DSObjects
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CDX9AllocatorPresenter();
 
-		// ISubPicAllocatorPresenter3
+		// IAllocatorPresenter
 		STDMETHODIMP_(bool) Paint(bool fAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP GetDisplayedImage(LPVOID* dibImage) override;

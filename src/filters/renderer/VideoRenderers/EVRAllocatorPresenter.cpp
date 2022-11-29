@@ -239,7 +239,7 @@ void CEVRAllocatorPresenter::StopWorkerThreads()
 	m_nRenderState = Shutdown;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
@@ -1941,7 +1941,7 @@ void CEVRAllocatorPresenter::RenderThread()
 
 	auto SubPicSetTime = [&] {
 		if (!g_bExternalSubtitleTime) {
-			CSubPicAllocatorPresenterImpl::SetTime(g_tSegmentStart + nsSampleTime * (g_bExternalSubtitle ? g_dRate : 1));
+			CAllocatorPresenterImpl::SetTime(g_tSegmentStart + nsSampleTime * (g_bExternalSubtitle ? g_dRate : 1));
 		}
 	};
 

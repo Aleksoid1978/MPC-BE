@@ -436,7 +436,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 	auto pMainFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 	const bool bFullscreen = pMainFrame && pMainFrame->IsD3DFullScreenMode();
-	CComPtr<ISubPicAllocatorPresenter3> pCAP;
+	CComPtr<IAllocatorPresenter> pCAP;
 
 	HRESULT hr = CreateAllocatorPresenter(m_clsid, m_hWnd, bFullscreen, &pCAP);
 	

@@ -21,7 +21,7 @@
 #pragma once
 
 #include "AllocatorCommon.h"
-#include "SubPicAllocatorPresenterImpl.h"
+#include "AllocatorPresenterImpl.h"
 #include "SubPic/ISubRender.h"
 #include <d3d11_1.h>
 #include "SubPic/ISubRender11.h"
@@ -29,7 +29,7 @@
 namespace DSObjects
 {
 	class CMPCVRAllocatorPresenter
-		: public CSubPicAllocatorPresenterImpl
+		: public CAllocatorPresenterImpl
 		, ISubRenderCallback4
 		, ISubRender11Callback
 	{
@@ -81,7 +81,7 @@ namespace DSObjects
 							  const double videoStretchFactor = 1.0,
 							  int xOffsetInPixels = 0, DWORD flags = 0) override;
 
-		// ISubPicAllocatorPresenter3
+		// IAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
 		STDMETHODIMP_(CLSID) GetAPCLSID() override;
 		STDMETHODIMP_(SIZE) GetVideoSize() override;

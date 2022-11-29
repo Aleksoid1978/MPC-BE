@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,13 +21,13 @@
 #pragma once
 
 #include <atlbase.h>
-#include "ISubPicAllocatorPresenter.h"
+#include "IAllocatorPresenter.h"
 #include <SubRenderIntf.h>
 
-class CSubPicAllocatorPresenterImpl
+class CAllocatorPresenterImpl
 	: public CUnknown
 	, public CCritSec
-	, public ISubPicAllocatorPresenter3
+	, public IAllocatorPresenter
 	, public ISubRenderConsumer2
 {
 private:
@@ -60,13 +59,13 @@ protected:
 	HRESULT AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = nullptr, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
 
 public:
-	CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError);
-	virtual ~CSubPicAllocatorPresenterImpl();
+	CAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError);
+	virtual ~CAllocatorPresenterImpl();
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	// ISubPicAllocatorPresenter3
+	// IAllocatorPresenter
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) { return E_NOTIMPL; }
 	STDMETHODIMP_(CLSID) GetAPCLSID() { return GUID_NULL; }
 	STDMETHODIMP_(SIZE) GetVideoSize();

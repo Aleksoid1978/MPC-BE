@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,21 +19,21 @@
  */
 
 #include "stdafx.h"
-#include "SubPicAllocatorPresenterImpl.h"
+#include "AllocatorPresenterImpl.h"
 #include "filters/renderer/VideoRenderers/RenderersSettings.h"
 #include <Version.h>
 #include "SubPic/XySubPicQueueImpl.h"
 #include "SubPic/XySubPicProvider.h"
 #include <dxva2api.h>
 
-CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
-	: CUnknown(L"CSubPicAllocatorPresenterImpl", nullptr)
+CAllocatorPresenterImpl::CAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
+	: CUnknown(L"CAllocatorPresenterImpl", nullptr)
 	, m_hWnd(hWnd)
 {
 	if (!IsWindow(m_hWnd)) {
 		hr = E_INVALIDARG;
 		if (_pError) {
-			*_pError += L"Invalid window handle in ISubPicAllocatorPresenterImpl\n";
+			*_pError += L"Invalid window handle in IAllocatorPresenterImpl\n";
 		}
 		return;
 	}
@@ -42,21 +41,21 @@ CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT&
 	hr = S_OK;
 }
 
-CSubPicAllocatorPresenterImpl::~CSubPicAllocatorPresenterImpl()
+CAllocatorPresenterImpl::~CAllocatorPresenterImpl()
 {
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+STDMETHODIMP CAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
-		QI(ISubPicAllocatorPresenter3)
+		QI(IAllocatorPresenter)
 		QI(ISubRenderOptions)
 		QI(ISubRenderConsumer)
 		QI(ISubRenderConsumer2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize)
+void CAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize)
 {
 	switch (maxWidth) {
 		case 0:
@@ -90,7 +89,7 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidt
 	}
 }
 
-HRESULT CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels/* = 0*/)
+HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels/* = 0*/)
 {
 	if (m_pSubPicProvider) {
 		CComPtr<ISubPic> pSubPic;
@@ -132,7 +131,7 @@ HRESULT CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, c
 	return E_FAIL;
 }
 
-HRESULT CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels/* = 0*/, const BOOL bUseSpecialCase/* = TRUE*/)
+HRESULT CAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels/* = 0*/, const BOOL bUseSpecialCase/* = TRUE*/)
 {
 	CRect rcSource, rcDest;
 	const CRenderersSettings& rs = GetRenderersSettings();
@@ -144,14 +143,14 @@ HRESULT CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const C
 	return hr;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
-STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize()
+STDMETHODIMP_(SIZE) CAllocatorPresenterImpl::GetVideoSize()
 {
 	return m_nativeVideoSize;
 }
 
-STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSizeAR()
+STDMETHODIMP_(SIZE) CAllocatorPresenterImpl::GetVideoSizeAR()
 {
 	SIZE size = m_nativeVideoSize;
 
@@ -162,7 +161,7 @@ STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSizeAR()
 	return size;
 }
 
-STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
+STDMETHODIMP_(void) CAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 {
 	const bool bWindowPosChanged  = !!(m_windowRect != w);
 	const bool bWindowSizeChanged = !!(m_windowRect.Size() != CRect(w).Size());
@@ -188,7 +187,7 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 	}
 }
 
-STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetTime(REFERENCE_TIME rtNow)
+STDMETHODIMP_(void) CAllocatorPresenterImpl::SetTime(REFERENCE_TIME rtNow)
 {
 	m_rtNow = rtNow - m_rtSubtitleDelay;
 
@@ -197,22 +196,22 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetTime(REFERENCE_TIME rtNow)
 	}
 }
 
-STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetSubtitleDelay(int delay_ms)
+STDMETHODIMP_(void) CAllocatorPresenterImpl::SetSubtitleDelay(int delay_ms)
 {
 	m_rtSubtitleDelay = delay_ms * 10000i64;
 }
 
-STDMETHODIMP_(int) CSubPicAllocatorPresenterImpl::GetSubtitleDelay()
+STDMETHODIMP_(int) CAllocatorPresenterImpl::GetSubtitleDelay()
 {
 	return (int)(m_rtSubtitleDelay / 10000);
 }
 
-STDMETHODIMP_(double) CSubPicAllocatorPresenterImpl::GetFPS()
+STDMETHODIMP_(double) CAllocatorPresenterImpl::GetFPS()
 {
 	return m_fps;
 }
 
-STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetSubPicProvider(ISubPicProvider* pSubPicProvider)
+STDMETHODIMP_(void) CAllocatorPresenterImpl::SetSubPicProvider(ISubPicProvider* pSubPicProvider)
 {
 	CAutoLock cAutoLock(&m_csSubPicProvider);
 
@@ -234,7 +233,7 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetSubPicProvider(ISubPicProv
 	Paint(false);
 }
 
-STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::Invalidate(REFERENCE_TIME rtInvalidate)
+STDMETHODIMP_(void) CAllocatorPresenterImpl::Invalidate(REFERENCE_TIME rtInvalidate)
 {
 	if (m_pSubPicQueue) {
 		m_pSubPicQueue->Invalidate(rtInvalidate);
@@ -243,19 +242,19 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::Invalidate(REFERENCE_TIME rtI
 
 // ISubRenderOptions
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetBool(LPCSTR field, bool* value)
+STDMETHODIMP CAllocatorPresenterImpl::GetBool(LPCSTR field, bool* value)
 {
 	CheckPointer(value, E_POINTER);
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetInt(LPCSTR field, int* value)
+STDMETHODIMP CAllocatorPresenterImpl::GetInt(LPCSTR field, int* value)
 {
 	CheckPointer(value, E_POINTER);
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetSize(LPCSTR field, SIZE* value)
+STDMETHODIMP CAllocatorPresenterImpl::GetSize(LPCSTR field, SIZE* value)
 {
 	CheckPointer(value, E_POINTER);
 	if (!strcmp(field, "originalVideoSize")) {
@@ -269,7 +268,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetSize(LPCSTR field, SIZE* value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetRect(LPCSTR field, RECT* value)
+STDMETHODIMP CAllocatorPresenterImpl::GetRect(LPCSTR field, RECT* value)
 {
 	CheckPointer(value, E_POINTER);
 	if (!strcmp(field, "videoOutputRect") || !strcmp(field, "subtitleTargetRect")) {
@@ -287,7 +286,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetRect(LPCSTR field, RECT* value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetUlonglong(LPCSTR field, ULONGLONG* value)
+STDMETHODIMP CAllocatorPresenterImpl::GetUlonglong(LPCSTR field, ULONGLONG* value)
 {
 	CheckPointer(value, E_POINTER);
 	if (!strcmp(field, "frameRate")) {
@@ -298,7 +297,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetUlonglong(LPCSTR field, ULONGLONG
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetDouble(LPCSTR field, double* value)
+STDMETHODIMP CAllocatorPresenterImpl::GetDouble(LPCSTR field, double* value)
 {
 	CheckPointer(value, E_POINTER);
 	if (!strcmp(field, "refreshRate")) {
@@ -309,7 +308,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetDouble(LPCSTR field, double* valu
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* value, int* chars)
+STDMETHODIMP CAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* value, int* chars)
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(chars, E_POINTER);
@@ -365,63 +364,63 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetBin(LPCSTR field, LPVOID* value, int* size)
+STDMETHODIMP CAllocatorPresenterImpl::GetBin(LPCSTR field, LPVOID* value, int* size)
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(size, E_POINTER);
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetBool(LPCSTR field, bool value)
+STDMETHODIMP CAllocatorPresenterImpl::SetBool(LPCSTR field, bool value)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetInt(LPCSTR field, int value)
+STDMETHODIMP CAllocatorPresenterImpl::SetInt(LPCSTR field, int value)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetSize(LPCSTR field, SIZE value)
+STDMETHODIMP CAllocatorPresenterImpl::SetSize(LPCSTR field, SIZE value)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetRect(LPCSTR field, RECT value)
+STDMETHODIMP CAllocatorPresenterImpl::SetRect(LPCSTR field, RECT value)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetUlonglong(LPCSTR field, ULONGLONG value)
+STDMETHODIMP CAllocatorPresenterImpl::SetUlonglong(LPCSTR field, ULONGLONG value)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetDouble(LPCSTR field, double value)
+STDMETHODIMP CAllocatorPresenterImpl::SetDouble(LPCSTR field, double value)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetString(LPCSTR field, LPWSTR value, int chars)
+STDMETHODIMP CAllocatorPresenterImpl::SetString(LPCSTR field, LPWSTR value, int chars)
 {
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetBin(LPCSTR field, LPVOID value, int size)
+STDMETHODIMP CAllocatorPresenterImpl::SetBin(LPCSTR field, LPVOID value, int size)
 {
 	return E_INVALIDARG;
 }
 
 // ISubRenderConsumer
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::GetMerit(ULONG* plMerit)
+STDMETHODIMP CAllocatorPresenterImpl::GetMerit(ULONG* plMerit)
 {
 	CheckPointer(plMerit, E_POINTER);
 	*plMerit = 4 << 16;
 	return S_OK;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitleRenderer)
+STDMETHODIMP CAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitleRenderer)
 {
 	HRESULT hr = E_FAIL;
 
@@ -453,13 +452,13 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitle
 	return hr;
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::Disconnect()
+STDMETHODIMP CAllocatorPresenterImpl::Disconnect()
 {
 	m_pSubPicProvider.Release();
 	return m_pSubPicQueue->SetSubPicProvider(m_pSubPicProvider);
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::DeliverFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context, ISubRenderFrame* subtitleFrame)
+STDMETHODIMP CAllocatorPresenterImpl::DeliverFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context, ISubRenderFrame* subtitleFrame)
 {
 	HRESULT hr = E_FAIL;
 
@@ -472,7 +471,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::DeliverFrame(REFERENCE_TIME start, R
 
 // ISubRenderConsumer2
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::Clear(REFERENCE_TIME clearNewerThan /* = 0 */)
+STDMETHODIMP CAllocatorPresenterImpl::Clear(REFERENCE_TIME clearNewerThan /* = 0 */)
 {
 	return m_pSubPicQueue->Invalidate(clearNewerThan);
 }

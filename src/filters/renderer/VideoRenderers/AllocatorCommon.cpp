@@ -31,7 +31,7 @@
 static bool bIsErrorShowing   = false;
 static bool bIsWarningShowing = false;
 
-HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
+HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen, IAllocatorPresenter** ppAP)
 {
 	CheckPointer(ppAP, E_POINTER);
 

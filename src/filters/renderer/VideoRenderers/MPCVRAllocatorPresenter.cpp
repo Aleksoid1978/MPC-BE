@@ -36,10 +36,10 @@ using namespace DSObjects;
 //
 
 CMPCVRAllocatorPresenter::CMPCVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error)
-	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
+	: CAllocatorPresenterImpl(hWnd, hr, &_Error)
 {
 	if (FAILED(hr)) {
-		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
+		_Error += L"IAllocatorPresenterImpl failed\n";
 		return;
 	}
 
@@ -204,7 +204,7 @@ HRESULT CMPCVRAllocatorPresenter::Render11(
 	return RenderEx3(rtStart, rtStop, atpf, croppedVideoRect, originalVideoRect, viewportRect, videoStretchFactor, xOffsetInPixels, flags);
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {

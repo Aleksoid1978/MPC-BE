@@ -26,11 +26,11 @@
 #define TARGET_SCREEN 1
 
 //
-// ISubPicAllocatorPresenter3 (MPC-BE internal interface)
+// IAllocatorPresenter (MPC-BE internal interface)
 //
 
 interface __declspec(uuid("AD863F43-83F9-4B8E-962C-426F2BDBEAEF"))
-ISubPicAllocatorPresenter3 :
+IAllocatorPresenter :
 public IUnknown {
 	STDMETHOD (CreateRenderer) (IUnknown** ppRenderer) PURE;
 

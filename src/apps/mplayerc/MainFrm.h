@@ -267,7 +267,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CComPtr<IMadVRTextOsd>			m_pMVTO;
 
-	CComPtr<ISubPicAllocatorPresenter3>	m_pCAP;
+	CComPtr<IAllocatorPresenter>	m_pCAP;
 	CLSID m_clsidCAP = GUID_NULL;
 
 	CComPtr<IMadVRSubclassReplacement> m_pMVRSR;

@@ -143,7 +143,7 @@ namespace DSObjects
 		DECLARE_IUNKNOWN;
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		// ISubPicAllocatorPresenter3
+		// IAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
 		STDMETHODIMP_(CLSID) GetAPCLSID() override;
 		STDMETHODIMP_(bool) ResizeDevice() override;

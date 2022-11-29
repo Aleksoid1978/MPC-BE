@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "filters/renderer/VideoRenderers/ISubPicAllocatorPresenter.h"
+#include "filters/renderer/VideoRenderers/IAllocatorPresenter.h"
 #include <afxwin.h>
 
 
@@ -47,7 +47,7 @@ private:
 	void InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI);
 
 public:
-	CPPageFileInfoDetails(const CString& fn, IFilterGraph* pFG, ISubPicAllocatorPresenter3* pCAP, IDvdInfo2* pDVDI);
+	CPPageFileInfoDetails(const CString& fn, IFilterGraph* pFG, IAllocatorPresenter* pCAP, IDvdInfo2* pDVDI);
 	virtual ~CPPageFileInfoDetails();
 
 	enum { IDD = IDD_FILEPROPDETAILS };

@@ -32,10 +32,10 @@ using namespace DSObjects;
 //
 
 CDXRAllocatorPresenter::CDXRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error)
-	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
+	: CAllocatorPresenterImpl(hWnd, hr, &_Error)
 {
 	if (FAILED(hr)) {
-		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
+		_Error += L"IAllocatorPresenterImpl failed\n";
 		return;
 	}
 
@@ -119,7 +119,7 @@ HRESULT CDXRAllocatorPresenter::Render(
 	return S_OK;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP CDXRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {

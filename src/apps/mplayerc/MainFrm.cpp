@@ -6190,7 +6190,7 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 		}
 
 		if (FAILED(hr)) {
-			errmsg.Format(L"ISubPicAllocatorPresenter3::GetDIB() failed, 0x%08x", hr);
+			errmsg.Format(L"IAllocatorPresenter::GetDIB() failed, 0x%08x", hr);
 		}
 	}
 	else if (m_pBV) {
@@ -14239,7 +14239,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 		}
 
 		if (m_pCAP) {
-			CComQIPtr<ISubPicAllocatorPresenter3> pCap;
+			CComQIPtr<IAllocatorPresenter> pCap;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (pCap = pBF) { // video renderer found
 					while (pBF = GetUpStreamFilter(pBF)) {

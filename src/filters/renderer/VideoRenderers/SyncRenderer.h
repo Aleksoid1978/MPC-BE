@@ -22,7 +22,7 @@
 #pragma once
 #include <ID3DFullscreenControl.h>
 #include "SubPic/ISubPic.h"
-#include "SubPicAllocatorPresenterImpl.h"
+#include "AllocatorPresenterImpl.h"
 #include "RenderersSettings.h"
 #include "AllocatorCommon.h"
 #include <dxva2api.h>
@@ -122,7 +122,7 @@ namespace GothSync
 	// Base allocator-presenter
 
 	class CBaseAP:
-		public CSubPicAllocatorPresenterImpl
+		public CAllocatorPresenterImpl
 	{
 	protected:
 		static const int MAX_PICTURE_SLOTS = RS_EVRBUFFERS_MAX + 2; // Last 2 for pixels shader!
@@ -304,7 +304,7 @@ namespace GothSync
 		CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CBaseAP();
 
-		// ISubPicAllocatorPresenter3
+		// IAllocatorPresenter
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP SetRotation(int rotation) override;
@@ -360,7 +360,7 @@ namespace GothSync
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP InitializeDevice(AM_MEDIA_TYPE* pMediaType);
 
-		// ISubPicAllocatorPresenter3
+		// IAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
 		STDMETHODIMP_(CLSID) GetAPCLSID() override;
 		STDMETHODIMP_(bool) ResetDevice() override;

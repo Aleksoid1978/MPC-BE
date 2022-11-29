@@ -52,13 +52,13 @@ using namespace D3D9Helper;
 //
 
 CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
-	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
+	: CAllocatorPresenterImpl(hWnd, hr, &_Error)
 	, m_bIsFullscreen(bFullscreen)
 {
 	DLog(L"CBaseAP::CBaseAP()");
 
 	if (FAILED(hr)) {
-		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
+		_Error += L"IAllocatorPresenterImpl failed\n";
 		return;
 	}
 
@@ -527,7 +527,7 @@ void CBaseAP::DeleteSurfaces()
 	m_pResizeTexture.Release();
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP_(SIZE) CBaseAP::GetVideoSize()
 {
@@ -3388,7 +3388,7 @@ void CSyncAP::RenderThread()
 
 	auto SubPicSetTime = [&] {
 		if (!g_bExternalSubtitleTime) {
-			CSubPicAllocatorPresenterImpl::SetTime(g_tSegmentStart + m_llSampleTime * (g_bExternalSubtitle ? g_dRate : 1));
+			CAllocatorPresenterImpl::SetTime(g_tSegmentStart + m_llSampleTime * (g_bExternalSubtitle ? g_dRate : 1));
 		}
 	};
 

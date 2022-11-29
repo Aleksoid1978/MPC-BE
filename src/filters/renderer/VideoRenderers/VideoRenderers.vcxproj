@@ -69,7 +69,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SubPicAllocatorPresenterImpl.cpp" />
+    <ClCompile Include="AllocatorPresenterImpl.cpp" />
     <ClCompile Include="SyncRenderer.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
@@ -92,7 +92,7 @@
     <ClInclude Include="Include\d3dukmdt.h" />
     <ClInclude Include="Include\d3dumddi.h" />
     <ClInclude Include="IPinHook.h" />
-    <ClInclude Include="ISubPicAllocatorPresenter.h" />
+    <ClInclude Include="IAllocatorPresenter.h" />
     <ClInclude Include="MacrovisionKicker.h" />
     <ClInclude Include="madVRAllocatorPresenter.h" />
     <ClInclude Include="MemUsage.h" />
@@ -101,7 +101,7 @@
     <ClInclude Include="PixelShaderCompiler.h" />
     <ClInclude Include="RenderersSettings.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SubPicAllocatorPresenterImpl.h" />
+    <ClInclude Include="AllocatorPresenterImpl.h" />
     <ClInclude Include="SyncRenderer.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Variables.h" />

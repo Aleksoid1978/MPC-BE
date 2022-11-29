@@ -28,7 +28,7 @@
 #if DXVAHDVP
 #include <dxvahd.h>
 #endif
-#include "SubPicAllocatorPresenterImpl.h"
+#include "AllocatorPresenterImpl.h"
 
 namespace DSObjects
 {
@@ -65,7 +65,7 @@ namespace DSObjects
 	};
 
 	class CDX9RenderingEngine
-		: public CSubPicAllocatorPresenterImpl
+		: public CAllocatorPresenterImpl
 	{
 	protected:
 		static const int MAX_VIDEO_SURFACES = RS_EVRBUFFERS_MAX;
@@ -219,7 +219,7 @@ namespace DSObjects
 		bool ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d);
 
 	public:
-		// ISubPicAllocatorPresenter3
+		// IAllocatorPresenter
 		STDMETHODIMP_(SIZE) GetVideoSize() override;
 		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
 		STDMETHODIMP SetRotation(int rotation) override;

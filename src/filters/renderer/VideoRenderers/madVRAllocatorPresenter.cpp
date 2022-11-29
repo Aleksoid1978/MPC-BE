@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,10 +35,10 @@ using namespace DSObjects;
 //
 
 CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error)
-	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
+	: CAllocatorPresenterImpl(hWnd, hr, &_Error)
 {
 	if (FAILED(hr)) {
-		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
+		_Error += L"IAllocatorPresenterImpl failed\n";
 		return;
 	}
 
@@ -143,7 +143,7 @@ HRESULT CmadVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 	return S_OK;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
@@ -283,7 +283,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	return hr;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 STDMETHODIMP_(bool) CmadVRAllocatorPresenter::IsRendering()
 {

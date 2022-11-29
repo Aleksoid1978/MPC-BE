@@ -57,7 +57,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	DLog(L"CDX9AllocatorPresenter::CDX9AllocatorPresenter()");
 
 	if (FAILED(hr)) {
-		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
+		_Error += L"IAllocatorPresenterImpl failed\n";
 		return;
 	}
 
@@ -948,7 +948,7 @@ DWORD CDX9AllocatorPresenter::GetVertexProcessing()
 	return D3DCREATE_HARDWARE_VERTEXPROCESSING;
 }
 
-// ISubPicAllocatorPresenter3
+// IAllocatorPresenter
 
 void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 {
