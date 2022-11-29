@@ -28,7 +28,7 @@
 #if DXVAHDVP
 #include <dxvahd.h>
 #endif
-#include "SubPic/SubPicAllocatorPresenterImpl.h"
+#include "SubPicAllocatorPresenterImpl.h"
 
 namespace DSObjects
 {

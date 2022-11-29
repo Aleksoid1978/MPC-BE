@@ -23,8 +23,8 @@
 #include "SubPicAllocatorPresenterImpl.h"
 #include "filters/renderer/VideoRenderers/RenderersSettings.h"
 #include <Version.h>
-#include "XySubPicQueueImpl.h"
-#include "XySubPicProvider.h"
+#include "SubPic/XySubPicQueueImpl.h"
+#include "SubPic/XySubPicProvider.h"
 #include <dxva2api.h>
 
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)

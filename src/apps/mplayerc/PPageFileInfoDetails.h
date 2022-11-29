@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "SubPic/ISubPicAllocatorPresenter.h"
+#include "filters/renderer/VideoRenderers/ISubPicAllocatorPresenter.h"
 #include <afxwin.h>
 
 

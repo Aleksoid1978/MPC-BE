@@ -23,9 +23,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SubPicAllocatorPresenterImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SubPicImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -64,9 +61,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SubPicAllocatorPresenterImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SubPicImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,9 +80,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISubRender11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ISubPicAllocatorPresenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

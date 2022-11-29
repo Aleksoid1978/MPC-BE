@@ -55,7 +55,6 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SubPicAllocatorPresenterImpl.cpp" />
     <ClCompile Include="SubPicImpl.cpp" />
     <ClCompile Include="SubPicProviderImpl.cpp" />
     <ClCompile Include="SubPicQueueImpl.cpp" />
@@ -67,12 +66,10 @@
     <ClInclude Include="DX11SubPic.h" />
     <ClInclude Include="DX9SubPic.h" />
     <ClInclude Include="ISubPic.h" />
-    <ClInclude Include="ISubPicAllocatorPresenter.h" />
     <ClInclude Include="ISubRender.h" />
     <ClInclude Include="ISubRender11.h" />
     <ClInclude Include="MemSubPic.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SubPicAllocatorPresenterImpl.h" />
     <ClInclude Include="SubPicImpl.h" />
     <ClInclude Include="SubPicProviderImpl.h" />
     <ClInclude Include="SubPicQueueImpl.h" />

@@ -22,7 +22,7 @@
 #pragma once
 #include <ID3DFullscreenControl.h>
 #include "SubPic/ISubPic.h"
-#include "SubPic/SubPicAllocatorPresenterImpl.h"
+#include "SubPicAllocatorPresenterImpl.h"
 #include "RenderersSettings.h"
 #include "AllocatorCommon.h"
 #include <dxva2api.h>

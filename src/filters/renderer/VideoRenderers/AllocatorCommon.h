@@ -22,7 +22,7 @@
 #pragma once
 
 #include <d3d9.h>
-#include "SubPic/ISubPicAllocatorPresenter.h"
+#include "ISubPicAllocatorPresenter.h"
 
 HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
 

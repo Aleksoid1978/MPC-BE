@@ -83,6 +83,9 @@
     <ClCompile Include="D3DUtil\D3D9Font.cpp">
       <Filter>D3DUtil</Filter>
     </ClCompile>
+    <ClCompile Include="SubPicAllocatorPresenterImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h">
@@ -171,6 +174,12 @@
     </ClInclude>
     <ClInclude Include="Include\d3dumddi.h">
       <Filter>Header Files\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="ISubPicAllocatorPresenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SubPicAllocatorPresenterImpl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

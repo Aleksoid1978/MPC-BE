@@ -21,7 +21,7 @@
 #pragma once
 
 #include "AllocatorCommon.h"
-#include "SubPic/SubPicAllocatorPresenterImpl.h"
+#include "SubPicAllocatorPresenterImpl.h"
 #include "SubPic/ISubRender.h"
 #include <d3d11_1.h>
 #include "SubPic/ISubRender11.h"
