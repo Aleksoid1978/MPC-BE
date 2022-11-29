@@ -70,7 +70,6 @@
 #include "filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include "filters/transform/MPCVideoDec/MPCVideoDec.h"
 #include "filters/filters/InternalPropertyPage.h"
-#include <filters/renderer/VideoRenderers/SyncAllocatorPresenter.h>
 #include <filters/renderer/VideoRenderers/IPinHook.h>
 #include "ComPropertySheet.h"
 #include <comdef.h>

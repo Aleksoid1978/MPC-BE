@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include "../SyncClock/ISyncClock.h"
 #include <strsafe.h> // Required in CGenlock
 #include <d3d9.h>
 #include <dx/d3dx9.h>
@@ -3724,27 +3723,6 @@ HRESULT CSyncAP::BeginStreaming()
 		m_dCycleDifference = GetCycleDifference();    // Might have moved to another display
 	}
 	return S_OK;
-}
-
-HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
-{
-	HRESULT hr = E_FAIL;
-	if (clsid == CLSID_SyncAllocatorPresenter) {
-		CString Error;
-		*ppAP = DNew CSyncAP(hWnd, bFullscreen, hr, Error);
-		(*ppAP)->AddRef();
-
-		if (FAILED(hr)) {
-			Error += L"\n";
-			Error += GetWindowsErrorMessage(hr, nullptr);
-			MessageBoxW(hWnd, Error, L"Error creating EVR Sync", MB_OK | MB_ICONERROR);
-			(*ppAP)->Release();
-			*ppAP = nullptr;
-		} else if (!Error.IsEmpty()) {
-			MessageBoxW(hWnd, Error, L"Warning creating EVR Sync", MB_OK|MB_ICONWARNING);
-		}
-	}
-	return hr;
 }
 
 //

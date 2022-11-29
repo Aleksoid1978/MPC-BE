@@ -99,7 +99,6 @@
     <ClInclude Include="PixelShaderCompiler.h" />
     <ClInclude Include="RenderersSettings.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SyncAllocatorPresenter.h" />
     <ClInclude Include="SyncRenderer.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Variables.h" />

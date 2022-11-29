@@ -115,9 +115,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SyncAllocatorPresenter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SyncRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>

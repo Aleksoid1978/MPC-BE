@@ -23,7 +23,6 @@
 #include <mpconfig.h>
 #include "FGFilter.h"
 #include "MainFrm.h"
-#include <filters/renderer/VideoRenderers/SyncAllocatorPresenter.h>
 #include <clsids.h>
 #include <moreuuids.h>
 
@@ -435,19 +434,13 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 	DLog(L"CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId());
 	CheckPointer(ppBF, E_POINTER);
 
-	HRESULT hr = S_OK;
-	CComPtr<ISubPicAllocatorPresenter3> pCAP;
-
 	auto pMainFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 	const bool bFullscreen = pMainFrame && pMainFrame->IsD3DFullScreenMode();
+	CComPtr<ISubPicAllocatorPresenter3> pCAP;
 
-	if (m_clsid == CLSID_EVRAllocatorPresenter) {
-		hr = CreateEVR(m_clsid, m_hWnd, bFullscreen, &pCAP);
-	} else if (m_clsid == CLSID_SyncAllocatorPresenter) {
-		hr = CreateSyncRenderer(m_clsid, m_hWnd, bFullscreen, &pCAP);
-	} else if (m_clsid == CLSID_DXRAllocatorPresenter || m_clsid == CLSID_madVRAllocatorPresenter || m_clsid == CLSID_MPCVRAllocatorPresenter) {
-		hr = CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP);
-	} else {
+	HRESULT hr = CreateAllocatorPresenter(m_clsid, m_hWnd, bFullscreen, &pCAP);
+	
+	if (hr == E_NOTIMPL) {
 		CComPtr<IBaseFilter> pBF;
 		hr = pBF.CoCreateInstance(m_clsid);
 		if (FAILED(hr)) {
@@ -483,8 +476,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 		*ppBF = pBF.Detach();
 	}
-
-	if (pCAP) {
+	else if (pCAP) {
 		CComPtr<IUnknown> pRenderer;
 		if (SUCCEEDED(hr = pCAP->CreateRenderer(&pRenderer))) {
 			*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();

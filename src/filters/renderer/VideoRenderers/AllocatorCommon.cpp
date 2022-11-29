@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,11 +26,12 @@
 #include "madVRAllocatorPresenter.h"
 #include "MPCVRAllocatorPresenter.h"
 #include "EVRAllocatorPresenter.h"
+#include "SyncRenderer.h"
 
 static bool bIsErrorShowing   = false;
 static bool bIsWarningShowing = false;
 
-HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
+HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
 {
 	CheckPointer(ppAP, E_POINTER);
 
@@ -40,18 +41,30 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 
 	HRESULT hr = E_FAIL;
 	CString Error;
+	LPCWSTR ap_name = nullptr;
 
-	if (IsEqualCLSID(clsid, CLSID_DXRAllocatorPresenter)) {
+	if (clsid == CLSID_EVRAllocatorPresenter) {
+		*ppAP = DNew DSObjects::CEVRAllocatorPresenter(hWnd, bFullscreen, hr, Error);
+		ap_name = L"EVR Custom Presenter";
+	}
+	else if (clsid == CLSID_SyncAllocatorPresenter) {
+		*ppAP = DNew GothSync::CSyncAP(hWnd, bFullscreen, hr, Error);
+		ap_name = L"EVR Sync";
+	}
+	else if (clsid == CLSID_DXRAllocatorPresenter) {
 		*ppAP = DNew CDXRAllocatorPresenter(hWnd, hr, Error);
+		ap_name = L"DXR allocator presenter";
 	}
-	else if (IsEqualCLSID(clsid, CLSID_madVRAllocatorPresenter)) {
+	else if (clsid == CLSID_madVRAllocatorPresenter) {
 		*ppAP = DNew CmadVRAllocatorPresenter(hWnd, hr, Error);
+		ap_name = L"madVR allocator presenter";
 	}
-	else if (IsEqualCLSID(clsid, CLSID_MPCVRAllocatorPresenter)) {
+	else if (clsid == CLSID_MPCVRAllocatorPresenter) {
 		*ppAP = DNew CMPCVRAllocatorPresenter(hWnd, hr, Error);
+		ap_name = L"MPC VR allocator presenter";
 	}
 	else {
-		return E_FAIL;
+		return E_NOTIMPL;
 	}
 
 	if (*ppAP == nullptr) {
@@ -65,7 +78,9 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 			Error += L"\n";
 			Error += GetWindowsErrorMessage(hr, nullptr);
 
-			MessageBoxW(hWnd, Error, L"Error creating DX9 allocation presenter", MB_OK | MB_ICONERROR);
+			CStringW caption(L"Error creating ");
+			caption.Append(ap_name);
+			MessageBoxW(hWnd, Error, caption, MB_OK | MB_ICONERROR);
 		}
 		bIsErrorShowing = true;
 		(*ppAP)->Release();
@@ -73,41 +88,13 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 	}
 	else if (!Error.IsEmpty()) {
 		if (!bIsWarningShowing) {
-			MessageBoxW(hWnd, Error, L"Warning creating DX9 allocation presenter", MB_OK | MB_ICONWARNING);
+			CStringW caption(L"Warning creating ");
+			caption.Append(ap_name);
+			MessageBoxW(hWnd, Error, caption, MB_OK | MB_ICONWARNING);
 		}
 		bIsWarningShowing = true;
 	} else {
 		bIsErrorShowing = bIsWarningShowing = false;
-	}
-
-	return hr;
-}
-
-HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
-{
-	HRESULT hr = E_FAIL;
-	if (clsid == CLSID_EVRAllocatorPresenter) {
-		CString Error;
-		*ppAP = DNew DSObjects::CEVRAllocatorPresenter(hWnd, bFullscreen, hr, Error);
-		(*ppAP)->AddRef();
-
-		if (FAILED(hr)) {
-			if (!bIsErrorShowing) {
-				Error += L"\n";
-				Error += GetWindowsErrorMessage(hr, nullptr);
-				MessageBoxW(hWnd, Error, L"Error creating EVR Custom renderer", MB_OK | MB_ICONERROR);
-			}
-			bIsErrorShowing = true;
-			(*ppAP)->Release();
-			*ppAP = nullptr;
-		} else if (!Error.IsEmpty()) {
-			if (!bIsWarningShowing) {
-				MessageBoxW(hWnd, Error, L"Warning creating EVR Custom renderer", MB_OK | MB_ICONWARNING);
-			}
-			bIsWarningShowing = true;
-		} else {
-			bIsErrorShowing = bIsWarningShowing = false;
-		}
 	}
 
 	return hr;

@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2014 see Authors.txt
+ * (C) 2009-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,4 +30,11 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE SetBias(DOUBLE bias) PURE;
 	virtual HRESULT STDMETHODCALLTYPE GetBias(DOUBLE *bias) PURE;
 	virtual HRESULT STDMETHODCALLTYPE GetStartTime(REFERENCE_TIME *startTime);
+};
+
+
+interface __declspec(uuid("F891C2A9-1DFF-45e0-9129-30C0990C5A9F"))
+	ISyncClockAdviser :
+	public IUnknown {
+	STDMETHOD(AdviseSyncClock)(ISyncClock* sC) PURE;
 };

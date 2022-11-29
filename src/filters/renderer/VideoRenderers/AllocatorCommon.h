@@ -24,8 +24,7 @@
 #include <d3d9.h>
 #include "SubPic/ISubPicAllocatorPresenter.h"
 
-HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
-HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
+HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
 
 CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module);
 const wchar_t* D3DFormatToString(D3DFORMAT format);

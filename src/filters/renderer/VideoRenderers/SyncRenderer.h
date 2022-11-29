@@ -24,10 +24,10 @@
 #include "SubPic/ISubPic.h"
 #include "SubPic/SubPicAllocatorPresenterImpl.h"
 #include "RenderersSettings.h"
-#include "SyncAllocatorPresenter.h"
 #include "AllocatorCommon.h"
 #include <dxva2api.h>
 #include "D3DUtil/D3D9Font.h"
+#include "../SyncClock/ISyncClock.h"
 
 #define MFVBITMAP_DISABLE 0x40000000 // TODO remake without it
 #define MFVBITMAP_UPDATE  0x80000000
