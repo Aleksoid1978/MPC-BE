@@ -443,7 +443,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	bool IsRendererCompatibleWithSaveImage();
 	void SaveImage(LPCWSTR fn, bool displayed);
 	void SaveThumbnails(LPCWSTR fn);
-
 	//
 
 	std::unique_ptr<CWebServer> m_pWebServer;
@@ -777,6 +776,8 @@ public:
 	void MatroskaLoadKeyFrames();
 
 	bool GetBufferingProgress(int* Progress = nullptr);
+
+	void ApplySubpicSettings();
 
 	// subtitle streams order function
 	bool LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream = nullptr);

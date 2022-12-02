@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "AllocatorPresenterImpl.h"
-#include "filters/renderer/VideoRenderers/RenderersSettings.h"
 #include <Version.h>
 #include "SubPic/XySubPicQueueImpl.h"
 #include "SubPic/XySubPicProvider.h"
@@ -98,9 +97,7 @@ HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const C
 			CRect rcWindow(windowRect);
 			CRect rcVideo(videoRect);
 
-			const CRenderersSettings& rs = GetRenderersSettings();
-
-			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
+			if (m_Stereo3DSets.iMode == SUBPIC_STEREO_SIDEBYSIDE) {
 				CRect rcTempWindow(windowRect);
 				rcTempWindow.right -= rcTempWindow.Width() / 2;
 				CRect rcTempVideo(videoRect);
@@ -111,7 +108,7 @@ HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const C
 				rcWindow.left += rcWindow.Width() / 2;
 				rcVideo.left += rcVideo.Width() / 2;
 
-			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rs.iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+			} else if (m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM || m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 				CRect rcTempWindow(windowRect);
 				rcTempWindow.bottom -= rcTempWindow.Height() / 2;
 				CRect rcTempVideo(videoRect);
@@ -124,7 +121,7 @@ HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const C
 
 			}
 
-			return AlphaBlt(rcWindow, rcVideo, pSubPic, nullptr, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rs.iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
+			return AlphaBlt(rcWindow, rcVideo, pSubPic, nullptr, xOffsetInPixels, m_Stereo3DSets.iMode == SUBPIC_STEREO_NONE && m_Stereo3DSets.iTransform != STEREO3D_HalfOverUnder_to_Interlace);
 		}
 	}
 
@@ -134,8 +131,8 @@ HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const C
 HRESULT CAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels/* = 0*/, const BOOL bUseSpecialCase/* = TRUE*/)
 {
 	CRect rcSource, rcDest;
-	const CRenderersSettings& rs = GetRenderersSettings();
-	HRESULT hr = pSubPic->GetSourceAndDest(windowRect, videoRect, rcSource, rcDest, rs.iSubpicPosRelative, rs.SubpicShiftPos, xOffsetInPixels, bUseSpecialCase);
+
+	HRESULT hr = pSubPic->GetSourceAndDest(windowRect, videoRect, rcSource, rcDest, m_SubpicSets.iPosRelative, m_SubpicSets.ShiftPos, xOffsetInPixels, bUseSpecialCase);
 	if (SUCCEEDED(hr)) {
 		return pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
@@ -237,6 +234,20 @@ STDMETHODIMP_(void) CAllocatorPresenterImpl::Invalidate(REFERENCE_TIME rtInvalid
 {
 	if (m_pSubPicQueue) {
 		m_pSubPicQueue->Invalidate(rtInvalidate);
+	}
+}
+
+STDMETHODIMP_(void) CAllocatorPresenterImpl::SetSubpicSettings(SubpicSettings* pSubpicSets)
+{
+	if (pSubpicSets) {
+		m_SubpicSets = *pSubpicSets;
+	}
+}
+
+STDMETHODIMP_(void) CAllocatorPresenterImpl::SetStereo3DSettings(Stereo3DSettings* pStereo3DSets)
+{
+	if (pStereo3DSets) {
+		m_Stereo3DSets = *pStereo3DSets;
 	}
 }
 

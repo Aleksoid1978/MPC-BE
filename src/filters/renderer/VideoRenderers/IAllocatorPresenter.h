@@ -25,6 +25,36 @@
 #define TARGET_FRAME 0
 #define TARGET_SCREEN 1
 
+#define RS_SPCSIZE_MIN		0
+#define RS_SPCSIZE_DEF		10
+#define RS_SPCSIZE_MAX		60
+
+enum {
+	SUBPIC_STEREO_NONE = 0,
+	SUBPIC_STEREO_SIDEBYSIDE,
+	SUBPIC_STEREO_TOPANDBOTTOM,
+};
+
+enum {
+	STEREO3D_AsIs = 0,
+	STEREO3D_HalfOverUnder_to_Interlace,
+};
+
+struct SubpicSettings {
+	int   iPosRelative       = 0;        // not saved
+	POINT ShiftPos           = { 0, 0 }; // not saved
+	int   nCount             = RS_SPCSIZE_DEF;
+	int   iMaxTexWidth       = 1280;
+	bool  bAnimationWhenBuffering = true;
+	bool  bAllowDrop         = true;
+};
+
+struct Stereo3DSettings {
+	int   iMode      = SUBPIC_STEREO_NONE;
+	int   iTransform = STEREO3D_AsIs; // not saved
+	bool  bSwapLR    = false;    // not saved
+};
+
 //
 // IAllocatorPresenter (MPC-BE internal interface)
 //
@@ -67,4 +97,7 @@ public IUnknown {
 	STDMETHOD_(void, ResetStats) () PURE;
 
 	STDMETHOD_(bool, IsRendering)() PURE;
+
+	STDMETHOD_(void, SetSubpicSettings) (SubpicSettings* pSubpicSets) PURE;
+	STDMETHOD_(void, SetStereo3DSettings) (Stereo3DSettings* pStereo3DSets) PURE;
 };

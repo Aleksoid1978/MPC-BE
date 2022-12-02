@@ -48,6 +48,9 @@ protected:
 	double m_fps           = 25.0;
 	UINT m_refreshRate     = 0;
 
+	SubpicSettings m_SubpicSets;
+	Stereo3DSettings m_Stereo3DSets;
+
 	CMediaType m_inputMediaType;
 
 	CComPtr<ISubPicProvider> m_pSubPicProvider;
@@ -93,6 +96,8 @@ public:
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
 	STDMETHODIMP_(bool) IsRendering() { return true; }
 	STDMETHODIMP_(void) ResetStats() {}
+	STDMETHODIMP_(void) SetSubpicSettings(SubpicSettings* pSubpicSets) override;
+	STDMETHODIMP_(void) SetStereo3DSettings(Stereo3DSettings* pStereo3DSets) override;
 
 	// ISubRenderOptions
 	STDMETHODIMP GetBool(LPCSTR field, bool* value);

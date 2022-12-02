@@ -520,7 +520,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 
 	HRESULT hr = S_OK;
 
-	if (GetRenderersSettings().iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+	if (m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		if (!m_pConvertToInterlacePixelShader) {
 			hr = CreateShaderFromResource(m_pDevice9Ex, &m_pConvertToInterlacePixelShader, IDF_SHADER_CONVERT_TO_INTERLACE);
 		}

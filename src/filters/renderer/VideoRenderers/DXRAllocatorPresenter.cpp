@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include "RenderersSettings.h"
 #include "DXRAllocatorPresenter.h"
 #include "SubPic/DX9SubPic.h"
 #include "SubPic/SubPicQueueImpl.h"
@@ -69,9 +68,8 @@ STDMETHODIMP CDXRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 HRESULT CDXRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 {
 	CheckPointer(pD3DDev, E_POINTER);
-	CRenderersSettings& rs = GetRenderersSettings();
 
-	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, m_ScreenSize);
+	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(pD3DDev);
@@ -85,9 +83,9 @@ HRESULT CDXRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	HRESULT hr = S_OK;
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
-		m_pSubPicQueue = rs.nSubpicCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(rs.nSubpicCount, !rs.bSubpicAnimationWhenBuffering, rs.bSubpicAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!rs.bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
+		m_pSubPicQueue = m_SubpicSets.nCount > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}

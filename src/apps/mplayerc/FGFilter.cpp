@@ -477,6 +477,10 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		*ppBF = pBF.Detach();
 	}
 	else if (pCAP) {
+		if (!m_bIsPreview) {
+			pCAP->SetSubpicSettings(&GetRenderersSettings().SubpicSets);
+		}
+
 		CComPtr<IUnknown> pRenderer;
 		if (SUCCEEDED(hr = pCAP->CreateRenderer(&pRenderer))) {
 			*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();

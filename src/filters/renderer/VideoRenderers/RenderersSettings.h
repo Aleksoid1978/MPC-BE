@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "IAllocatorPresenter.h"
+
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
 #define DXVA2VP 1
 #define DXVAHDVP 1
@@ -28,9 +30,6 @@
 #define RS_EVRBUFFERS_MIN	4
 #define RS_EVRBUFFERS_DEF	5
 #define RS_EVRBUFFERS_MAX	30
-#define RS_SPCSIZE_MIN		0
-#define RS_SPCSIZE_DEF		10
-#define RS_SPCSIZE_MAX		60
 
 enum : int {
 	//VIDRNDT_VMR7 = 0, // obsolete
@@ -99,17 +98,6 @@ enum {
 	SYNCHRONIZE_DISPLAY,
 };
 
-enum {
-	SUBPIC_STEREO_NONE = 0,
-	SUBPIC_STEREO_SIDEBYSIDE,
-	SUBPIC_STEREO_TOPANDBOTTOM,
-};
-
-enum {
-	STEREO3D_AsIs = 0,
-	STEREO3D_HalfOverUnder_to_Interlace,
-};
-
 class CRenderersSettings
 {
 public:
@@ -157,18 +145,11 @@ public:
 	int		iColorManagementIntent;
 
 	// subtitles
-	int		iSubpicPosRelative; // not saved
-	CPoint	SubpicShiftPos;     // not saved
-	int		nSubpicCount;
-	int		iSubpicMaxTexWidth;
-	bool	bSubpicAnimationWhenBuffering;
-	bool	bSubpicAllowDrop;
-	int		iSubpicStereoMode;
+	SubpicSettings SubpicSets;
+	Stereo3DSettings Stereo3DSets;
 
 	bool	bTearingTest;       // not saved
 	int		iDisplayStats;      // not saved
-	int		iStereo3DTransform; // not saved
-	bool	bStereo3DSwapLR;    // not saved
 
 	CRenderersSettings();
 

@@ -110,18 +110,10 @@ void CRenderersSettings::SetDefault()
 	iColorManagementAmbientLight	= AMBIENT_LIGHT_BRIGHT;
 	iColorManagementIntent			= COLOR_RENDERING_INTENT_PERCEPTUAL;
 
-	iSubpicPosRelative				= 0;
-	SubpicShiftPos.SetPoint(0, 0);
-	nSubpicCount					= RS_SPCSIZE_DEF;
-	iSubpicMaxTexWidth				= 1280;
-	bSubpicAnimationWhenBuffering	= true;
-	bSubpicAllowDrop				= true;
-	iSubpicStereoMode				= 0;
+	SubpicSets						= {};
 
 	bTearingTest					= false;
 	iDisplayStats					= 0;
-	iStereo3DTransform				= STEREO3D_AsIs;
-	bStereo3DSwapLR					= false;
 }
 
 void CRenderersSettings::Load()
@@ -181,13 +173,13 @@ void CRenderersSettings::Load()
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, iColorManagementAmbientLight);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, iColorManagementIntent);
 
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, nSubpicCount);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, iSubpicMaxTexWidth);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ANIMBUFFERING, bSubpicAnimationWhenBuffering);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, bSubpicAllowDrop);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, iSubpicStereoMode);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, SubpicSets.nCount);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, SubpicSets.iMaxTexWidth);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ANIMBUFFERING, SubpicSets.bAnimationWhenBuffering);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, SubpicSets.bAllowDrop);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, Stereo3DSets.iMode);
 
-	iSubpicPosRelative = 0;
+	SubpicSets.iPosRelative = 0;
 }
 
 void CRenderersSettings::Save()
@@ -231,11 +223,11 @@ void CRenderersSettings::Save()
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, iColorManagementAmbientLight);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, iColorManagementIntent);
 
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, nSubpicCount);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, iSubpicMaxTexWidth);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ANIMBUFFERING, bSubpicAnimationWhenBuffering);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, bSubpicAllowDrop);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, iSubpicStereoMode);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, SubpicSets.nCount);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, SubpicSets.iMaxTexWidth);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ANIMBUFFERING, SubpicSets.bAnimationWhenBuffering);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, SubpicSets.bAllowDrop);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, Stereo3DSets.iMode);
 }
 
 /////////////////////////////////////////////////////////////////////////////

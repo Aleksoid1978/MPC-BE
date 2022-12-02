@@ -22,7 +22,6 @@
 #include "madVRAllocatorPresenter.h"
 #include "SubPic/DX9SubPic.h"
 #include "SubPic/SubPicQueueImpl.h"
-#include "RenderersSettings.h"
 #include "Variables.h"
 #include <clsids.h>
 #include <mvrInterfaces.h>
@@ -77,14 +76,12 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 		return S_OK;
 	}
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	CSize screenSize;
 	MONITORINFO mi = { sizeof(MONITORINFO) };
 	if (GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
 		screenSize.SetSize(mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top);
 	}
-	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, screenSize);
+	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, screenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(pD3DDev);
@@ -98,9 +95,9 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	HRESULT hr = S_OK;
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
-		m_pSubPicQueue = rs.nSubpicCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(rs.nSubpicCount, !rs.bSubpicAnimationWhenBuffering, rs.bSubpicAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!rs.bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
+		m_pSubPicQueue = m_SubpicSets.nCount > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}

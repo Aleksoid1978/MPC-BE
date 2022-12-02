@@ -4386,12 +4386,14 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
 			|| (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
-		rs.iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+		rs.Stereo3DSets.iTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
-		rs.iStereo3DTransform = STEREO3D_AsIs;
+		rs.Stereo3DSets.iTransform = STEREO3D_AsIs;
 	}
-
-	rs.bStereo3DSwapLR = s.bStereo3DSwapLR;
+	rs.Stereo3DSets.bSwapLR = s.bStereo3DSwapLR;
+	if (m_pCAP) {
+		m_pCAP->SetStereo3DSettings(&rs.Stereo3DSets);
+	}
 
 	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.get())) {
 		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
@@ -7920,12 +7922,14 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
 			|| (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
-		rs.iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+		rs.Stereo3DSets.iTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
-		rs.iStereo3DTransform = STEREO3D_AsIs;
+		rs.Stereo3DSets.iTransform = STEREO3D_AsIs;
 	}
-
-	rs.bStereo3DSwapLR = s.bStereo3DSwapLR;
+	rs.Stereo3DSets.bSwapLR = s.bStereo3DSwapLR;
+	if (m_pCAP) {
+		m_pCAP->SetStereo3DSettings(&rs.Stereo3DSets);
+	}
 
 	RepaintVideo();
 }
@@ -7940,7 +7944,7 @@ void CMainFrame::OnViewSwapLeftRight()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.bStereo3DSwapLR = !s.bStereo3DSwapLR;
-	GetRenderersSettings().bStereo3DSwapLR = s.bStereo3DSwapLR;
+	s.m_VRSettings.Stereo3DSets.bSwapLR = s.bStereo3DSwapLR;
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
@@ -7957,6 +7961,10 @@ void CMainFrame::OnViewSwapLeftRight()
 
 			pEFC->SetInt("mvc_mode", mvc_mode_value);
 		}
+	}
+
+	if (m_pCAP) {
+		m_pCAP->SetStereo3DSettings(&s.m_VRSettings.Stereo3DSets);
 	}
 }
 
@@ -8972,26 +8980,27 @@ void CMainFrame::OnUpdateSubtitlesForcedOnly(CCmdUI* pCmdUI)
 
 void CMainFrame::OnStereoSubtitles(UINT nID)
 {
-	CAppSettings& s = AfxGetAppSettings();
+	auto& rs = GetRenderersSettings();
 
 	CString osd = ResStr(IDS_SUBTITLES_STEREO);
 
 	switch (nID) {
 	case ID_SUBTITLES_STEREO_DONTUSE:
-		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
+		rs.Stereo3DSets.iMode = SUBPIC_STEREO_NONE;
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
 		break;
 	case ID_SUBTITLES_STEREO_SIDEBYSIDE:
-		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
+		rs.Stereo3DSets.iMode = SUBPIC_STEREO_SIDEBYSIDE;
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
 		break;
 	case ID_SUBTITLES_STEREO_TOPBOTTOM:
-		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
+		rs.Stereo3DSets.iMode = SUBPIC_STEREO_TOPANDBOTTOM;
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
 		break;
 	}
 
 	if (m_pCAP) {
+		m_pCAP->SetStereo3DSettings(&rs.Stereo3DSets);
 		m_pCAP->Invalidate();
 		RepaintVideo();
 	}
@@ -10457,25 +10466,26 @@ void CMainFrame::OnHelpDonate()
 void CMainFrame::OnSubtitlePos(UINT nID)
 {
 	if (m_pCAP) {
-		CAppSettings& s = AfxGetAppSettings();
+		auto& rs = GetRenderersSettings();
 		switch (nID) {
 			case ID_SUB_POS_UP:
-				s.m_VRSettings.SubpicShiftPos.y--;
+				rs.SubpicSets.ShiftPos.y--;
 				break;
 			case ID_SUB_POS_DOWN:
-				s.m_VRSettings.SubpicShiftPos.y++;
+				rs.SubpicSets.ShiftPos.y++;
 				break;
 			case ID_SUB_POS_LEFT:
-				s.m_VRSettings.SubpicShiftPos.x--;
+				rs.SubpicSets.ShiftPos.x--;
 				break;
 			case ID_SUB_POS_RIGHT:
-				s.m_VRSettings.SubpicShiftPos.x++;
+				rs.SubpicSets.ShiftPos.x++;
 				break;
 			case ID_SUB_POS_RESTORE:
-				s.m_VRSettings.SubpicShiftPos.x = 0;
-				s.m_VRSettings.SubpicShiftPos.y = 0;
+				rs.SubpicSets.ShiftPos = { 0, 0 };
 				break;
 		}
+
+		m_pCAP->SetSubpicSettings(&rs.SubpicSets);
 
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);
@@ -15024,7 +15034,7 @@ void CMainFrame::SetupSubtitlesSubMenu()
 	submenu.AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu2.Detach(), ResStr(IDS_AG_ADVANCED));
 
 	auto SetFlags = [](int smode) {
-		if (AfxGetAppSettings().m_VRSettings.iSubpicStereoMode == smode) {
+		if (AfxGetAppSettings().m_VRSettings.Stereo3DSets.iMode == smode) {
 			return MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_CHECKED | MFT_RADIOCHECK;
 		} else {
 			return MF_BYCOMMAND | MF_STRING | MF_ENABLED;
@@ -15056,7 +15066,7 @@ void CMainFrame::SetupSubtitlesRButtonMenu()
 	submenu.AppendMenu(MF_SEPARATOR);
 
 	auto SetFlags = [](int smode) {
-		if (AfxGetAppSettings().m_VRSettings.iSubpicStereoMode == smode) {
+		if (AfxGetAppSettings().m_VRSettings.Stereo3DSets.iMode == smode) {
 			return MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_CHECKED | MFT_RADIOCHECK;
 		}
 		else {
@@ -16160,6 +16170,13 @@ void CMainFrame::AddTextPassThruFilter()
 	EndEnumFilters;
 }
 
+void CMainFrame::ApplySubpicSettings()
+{
+	if (m_pCAP) {
+		m_pCAP->SetSubpicSettings(&GetRenderersSettings().SubpicSets);
+	}
+}
+
 bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 {
 	CAppSettings& s = AfxGetAppSettings();
@@ -16290,8 +16307,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_VRSettings.iSubpicPosRelative = 0;
-	s.m_VRSettings.SubpicShiftPos = {0, 0};
+	s.m_VRSettings.SubpicSets.iPosRelative = 0;
+	s.m_VRSettings.SubpicSets.ShiftPos = {0, 0};
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
@@ -16336,7 +16353,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 				pRTS->Deinit();
 			} else if (clsid == __uuidof(CRenderedHdmvSubtitle)) {
-				s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
+				s.m_VRSettings.SubpicSets.iPosRelative = s.subdefstyle.relativeTo;
 			}
 
 			CComQIPtr<ISubRenderOptions> pSRO = m_pCAP;
@@ -16420,6 +16437,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 	}
 
 	if (m_pCAP) {
+		m_pCAP->SetSubpicSettings(&s.m_VRSettings.SubpicSets);
+
 		g_bExternalSubtitle = (std::find(m_ExternalSubstreams.cbegin(), m_ExternalSubstreams.cend(), pSubStream) != m_ExternalSubstreams.cend());
 		m_pCAP->SetSubPicProvider(CComQIPtr<ISubPicProvider>(pSubStream));
 		if (s.fUseSybresync) {
@@ -16531,7 +16550,10 @@ void CMainFrame::UpdateSubDefaultStyle()
 			m_pCAP->Paint(false);
 		}
 	} else if (dynamic_cast<CRenderedHdmvSubtitle*>(m_pCurrentSubStream.p)) {
-		s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
+		s.m_VRSettings.SubpicSets.iPosRelative = s.subdefstyle.relativeTo;
+		if (m_pCAP) {
+			m_pCAP->SetSubpicSettings(&s.m_VRSettings.SubpicSets);
+		}
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);

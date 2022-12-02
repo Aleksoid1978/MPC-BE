@@ -831,9 +831,7 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString& _Error, const CSize& desk
 		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
 	}
 
-	const CRenderersSettings& rs = GetRenderersSettings();
-
-	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, desktopSize);
+	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, desktopSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pDevice9Ex);
@@ -848,9 +846,9 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString& _Error, const CSize& desk
 	HRESULT hr = S_OK;
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
-		m_pSubPicQueue = rs.nSubpicCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(rs.nSubpicCount, !rs.bSubpicAnimationWhenBuffering, rs.bSubpicAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!rs.bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
+		m_pSubPicQueue = m_SubpicSets.nCount > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}
@@ -1283,7 +1281,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
-	const bool bStereo3DTransform = (rs.iStereo3DTransform != STEREO3D_AsIs);
+	const bool bStereo3DTransform = (m_Stereo3DSets.iTransform != STEREO3D_AsIs);
 
 	m_pDevice9Ex->BeginScene();
 
@@ -1326,9 +1324,9 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	int xOffsetInPixels = 0;
-	if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE
-			|| rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM
-			|| rs.iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+	if (m_Stereo3DSets.iMode == SUBPIC_STEREO_SIDEBYSIDE
+			|| m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM
+			|| m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		if (offset3D.timestamp != INVALID_TIME) {
 			int idx = m_nCurrentSubtitlesStream;
 			if (!m_stereo_subtitle_offset_ids.empty() && (size_t)m_nCurrentSubtitlesStream < m_stereo_subtitle_offset_ids.size()) {
@@ -1339,7 +1337,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			}
 		}
 
-		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rs.bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;
+		xOffsetInPixels = (m_bMVC_Base_View_R_flag != m_Stereo3DSets.bSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;
 	}
 	AlphaBltSubPic(rSrcPri, rDstVid, xOffsetInPixels);
 
@@ -1348,7 +1346,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		const int xOffsetInPixels = 4;
 
 		CRect rcDst(rSrcPri);
-		if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
+		if (m_Stereo3DSets.iMode == SUBPIC_STEREO_SIDEBYSIDE) {
 			CRect rcTemp(rcDst);
 			rcTemp.right -= rcTemp.Width() / 2;
 			rcTemp.OffsetRect(-xOffsetInPixels, 0);
@@ -1357,7 +1355,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 			rcDst.left += rcDst.Width() / 2;
 			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
-		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rs.iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+		} else if (m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM || m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 			CRect rcTemp(rcDst);
 			rcTemp.bottom -= rcTemp.Height() / 2;
 			rcTemp.OffsetRect(-xOffsetInPixels, 0);

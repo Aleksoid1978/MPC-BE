@@ -425,7 +425,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_filter = D3DTEXF_NONE;
 	}
 
-	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
+	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pDevice9Ex);
@@ -445,9 +445,9 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	hr = S_OK;
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
-		m_pSubPicQueue = rs.nSubpicCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(rs.nSubpicCount, !rs.bSubpicAnimationWhenBuffering, rs.bSubpicAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!rs.bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
+		m_pSubPicQueue = m_SubpicSets.nCount > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}
