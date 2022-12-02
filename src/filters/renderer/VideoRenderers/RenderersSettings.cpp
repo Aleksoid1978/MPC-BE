@@ -111,6 +111,7 @@ void CRenderersSettings::SetDefault()
 	iColorManagementIntent			= COLOR_RENDERING_INTENT_PERCEPTUAL;
 
 	SubpicSets						= {};
+	Stereo3DSets					= {};
 
 	bTearingTest					= false;
 	iDisplayStats					= 0;
