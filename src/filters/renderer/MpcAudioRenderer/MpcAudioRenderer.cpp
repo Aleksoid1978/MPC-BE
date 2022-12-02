@@ -3008,6 +3008,18 @@ void CMpcAudioRenderer::WaitFinish()
 		}
 	}
 
+	if (!m_bIsBitstream && m_dRate != 1.0) {
+		HRESULT hr = SetupAudioFilter();
+
+		if (SUCCEEDED(hr)) {
+			m_Filter.PushEnd();
+			CAutoPtr<CPacket> p;
+			while (SUCCEEDED(m_Filter.Pull(p))) {
+				PushToQueue(p);
+			}
+		}
+	}
+
 	for (;;) {
 		if (m_bNeedReinitialize || m_bNeedReinitializeFull
 				|| m_filterState == State_Stopped || !m_hRenderThread
