@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,6 @@
 #pragma once
 
 #include <afxwin.h>
-
-#define EDIT_BUTTON_LEFTCLICKED (WM_APP + 842)
 
 // CEditWithButton_Base
 

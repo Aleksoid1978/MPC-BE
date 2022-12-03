@@ -134,7 +134,6 @@ void CPPageFileInfoClip::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT7, m_desc);
 }
 
-#define SETPAGEFOCUS WM_APP+252 // arbitrary number, can be changed if necessary
 BEGIN_MESSAGE_MAP(CPPageFileInfoClip, CPropertyPage)
 	ON_WM_SIZE()
 	ON_MESSAGE(SETPAGEFOCUS, OnSetPageFocus)

@@ -44,11 +44,6 @@ enum : int {
 	VIDRNDT_NULL_UNCOMP,
 };
 
-enum {
-	WM_RESIZE_DEVICE = WM_APP + 1,
-	WM_RESET_DEVICE,
-};
-
 enum :int {
 	RESIZER_NEAREST = 0,
 	RESIZER_BILINEAR,

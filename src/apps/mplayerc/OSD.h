@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,9 +26,6 @@
 #include <mvrInterfaces.h>
 #include <HighDPI.h>
 #include "DSUtil/DSMPropertyBag.h"
-
-#define WM_HIDE			(WM_USER + 1001)
-#define WM_OSD_DRAW		(WM_USER + 1002)
 
 enum OSD_COLORS {
 	OSD_TRANSPARENT,

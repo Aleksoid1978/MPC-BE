@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2021 see Authors.txt
+ * (C) 2017-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,6 @@
  */
 
 #pragma once
-
-#define WM_DXVASTATE_CHANGE (WM_USER + 301)
 
 namespace DXVAState {
 	void ClearState();

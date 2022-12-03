@@ -150,10 +150,6 @@ static LPCWSTR s_strPlayerTitle = "MPC-BE "
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
-#define WM_HANDLE_CMDLINE (WM_USER + 300)
-
-#define WM_MPCVR_SWITCH_FULLSCREEN (WM_APP + 0x1000)
-
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)

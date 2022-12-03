@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2021 see Authors.txt
+ * (C) 2017-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "DXVAState.h"
+#include "apps/mplayerc/mpc_messages.h"
 #include "DSUtil.h"
 
 namespace DXVAState {

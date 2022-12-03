@@ -187,7 +187,6 @@ public:
 	BOOL InitInstance();
 	int ExitInstance();
 
-	enum {TM_EXIT=WM_APP, TM_INDEX, TM_BREAK};
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnExit(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnIndex(WPARAM wParam, LPARAM lParam);

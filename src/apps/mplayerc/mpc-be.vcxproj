@@ -245,6 +245,7 @@
     <ClInclude Include="ItemPropertiesDlg.h" />
     <ClInclude Include="MediaControls.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="mpc_messages.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerFlyBar.h" />

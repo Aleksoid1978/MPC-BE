@@ -54,4 +54,5 @@
 
 #include "resource.h"
 #include "DSUtil/DSUtil.h"
+#include "mpc_messages.h"
 #include "mplayerc.h"

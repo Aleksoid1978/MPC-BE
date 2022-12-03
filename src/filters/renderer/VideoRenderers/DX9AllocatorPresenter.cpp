@@ -35,6 +35,7 @@
 #include "D3DHook.h"
 #include "Variables.h"
 #include "Utils.h"
+#include "apps/mplayerc/mpc_messages.h"
 
 #define FRAMERATE_MAX_DELTA 3000
 

@@ -40,6 +40,7 @@
 #include "DSUtil/D3D9Helper.h"
 #include "DSUtil/DXVAState.h"
 #include "apps/mplayerc/resource.h"
+#include "apps/mplayerc/mpc_messages.h"
 
 using namespace GothSync;
 using namespace D3D9Helper;

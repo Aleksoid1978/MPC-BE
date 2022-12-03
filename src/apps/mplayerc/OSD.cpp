@@ -107,7 +107,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 IMPLEMENT_DYNAMIC(COSD, CWnd)
 
 BEGIN_MESSAGE_MAP(COSD, CWnd)
-	ON_MESSAGE_VOID(WM_HIDE, OnHide)
+	ON_MESSAGE_VOID(WM_OSD_HIDE, OnHide)
 	ON_MESSAGE_VOID(WM_OSD_DRAW, OnDrawWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
@@ -705,7 +705,7 @@ void COSD::ClearMessage(bool hide)
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
 	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
-		PostMessageW(WM_HIDE);
+		PostMessageW(WM_OSD_HIDE);
 	}
 }
 
