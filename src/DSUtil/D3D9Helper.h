@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,4 +26,5 @@ namespace D3D9Helper
 {
 	UINT GetAdapter(IDirect3D9* pD3D, HWND hWnd);
 	IDirect3D9* Direct3DCreate9();
+	HINSTANCE GetD3X9Dll();
 }

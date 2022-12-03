@@ -173,5 +173,3 @@ public:
 extern CRenderersSettings& GetRenderersSettings();
 
 extern bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
-
-HINSTANCE GetD3X9Dll();

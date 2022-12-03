@@ -43,7 +43,6 @@
 #include "apps/mplayerc/mpc_messages.h"
 
 using namespace GothSync;
-using namespace D3D9Helper;
 
 //#undef DLog
 //#define DLog(...) Log2File(__VA_ARGS__)
@@ -63,7 +62,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 		return;
 	}
 
-	HINSTANCE hDll = GetD3X9Dll();
+	HINSTANCE hDll = D3D9Helper::GetD3X9Dll();
 	if (hDll) {
 		(FARPROC&)m_pfD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 	}
@@ -268,7 +267,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		Shader.m_pPixelShader.Release();
 	}
 
-	UINT currentAdapter = GetAdapter(m_pD3D9Ex, m_hWnd);
+	UINT currentAdapter = D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
 	if (!bTryToReset) {
@@ -1478,12 +1477,12 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				ASSERT(Parameters.AdapterOrdinal == m_CurrentAdapter);
 			}
 #endif
-			if (m_CurrentAdapter != GetAdapter(m_pD3D9Ex, m_hWnd)) {
+			if (m_CurrentAdapter != D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd)) {
 				bResetDevice = true;
 			}
 #ifdef _DEBUG
 			else {
-				ASSERT(m_pD3D9Ex->GetAdapterMonitor(m_CurrentAdapter) == m_pD3D9Ex->GetAdapterMonitor(GetAdapter(m_pD3D9Ex, m_hWnd)));
+				ASSERT(m_pD3D9Ex->GetAdapterMonitor(m_CurrentAdapter) == m_pD3D9Ex->GetAdapterMonitor(D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd)));
 			}
 #endif
 		}
@@ -1513,7 +1512,7 @@ STDMETHODIMP_(bool) CBaseAP::ResetDevice()
 		m_bDeviceResetRequested = false;
 		return false;
 	}
-	m_pGenlock->SetMonitor(GetAdapter(m_pD3D9Ex, m_hWnd));
+	m_pGenlock->SetMonitor(D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd));
 	m_pGenlock->GetTiming();
 	OnResetDevice();
 	m_bDeviceResetRequested = false;
@@ -2943,7 +2942,7 @@ STDMETHODIMP CSyncAP::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMax)
 		D3DDISPLAYMODE d3ddm;
 
 		ZeroMemory(&d3ddm, sizeof(d3ddm));
-		if (SUCCEEDED(m_pD3D9Ex->GetAdapterDisplayMode(GetAdapter(m_pD3D9Ex, m_hWnd), &d3ddm))) {
+		if (SUCCEEDED(m_pD3D9Ex->GetAdapterDisplayMode(D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd), &d3ddm))) {
 			pszMax->cx = d3ddm.Width;
 			pszMax->cy = d3ddm.Height;
 		}
@@ -3715,7 +3714,7 @@ HRESULT CSyncAP::BeginStreaming()
 	if (filterInfo.pGraph) {
 		filterInfo.pGraph->Release();
 	}
-	m_pGenlock->SetMonitor(GetAdapter(m_pD3D9Ex, m_hWnd));
+	m_pGenlock->SetMonitor(D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd));
 	m_pGenlock->GetTiming();
 
 	ResetStats();

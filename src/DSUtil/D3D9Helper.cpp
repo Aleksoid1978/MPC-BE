@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,4 +58,11 @@ IDirect3D9* D3D9Helper::Direct3DCreate9()
 	}
 
 	return nullptr;
+}
+
+HINSTANCE D3D9Helper::GetD3X9Dll()
+{
+	static HINSTANCE s_hD3DX9Dll = LoadLibraryW(L"d3dx9_43.dll"); // load latest compatible version of the DLL that is available
+
+	return s_hD3DX9Dll;
 }

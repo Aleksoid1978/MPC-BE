@@ -230,12 +230,3 @@ void CRenderersSettings::Save()
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, SubpicSets.bAllowDrop);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, Stereo3DSets.iMode);
 }
-
-/////////////////////////////////////////////////////////////////////////////
-
-HINSTANCE GetD3X9Dll()
-{
-	static HINSTANCE s_hD3DX9Dll = LoadLibraryW(L"d3dx9_43.dll"); // load latest compatible version of the DLL that is available
-
-	return s_hD3DX9Dll;
-}

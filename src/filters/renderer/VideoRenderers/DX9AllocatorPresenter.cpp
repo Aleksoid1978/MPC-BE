@@ -29,6 +29,7 @@
 #include "IPinHook.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/WinAPIUtils.h"
+#include "DSUtil/D3D9Helper.h"
 #include "DSUtil/DXVAState.h"
 #include "IDirectVobSub.h"
 #include "FocusThread.h"
@@ -62,7 +63,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	HINSTANCE hDll = GetD3X9Dll();
+	HINSTANCE hDll = D3D9Helper::GetD3X9Dll();
 	if (hDll) {
 		(FARPROC&)m_pfD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
 	}
