@@ -74,7 +74,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	m_pFrame = av_frame_alloc();
 	m_pPacket = av_packet_alloc();
 
-	if (!m_pFrame || m_pPacket) {
+	if (!m_pFrame || !m_pPacket) {
 		DLog(L"CAC3Encoder::Init() : avcodec_alloc_frame() or av_packet_alloc() failed");
 		StreamFinish();
 		return false;
