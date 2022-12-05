@@ -2,6 +2,11 @@
 
 1.6.5.x dev
 =============================
+MPCVideoDec
+Fixed decoding of some MPEG-4 ASP.
+
+MpcAudioRenderer
+Fixed audio dropout when changing speed at the end of playback.
 
 
 1.6.5.3
