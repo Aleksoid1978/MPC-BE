@@ -38,20 +38,18 @@ enum : int {
 class CRenderersSettings
 {
 public:
-	int		iVideoRenderer;
+	int  iVideoRenderer = VIDRNDT_EVR_CP;
 
-	bool	bExclusiveFullscreen;
+	bool bExclusiveFullscreen = false;
 
 	// subtitles
 	SubpicSettings SubpicSets;
 	Stereo3DSettings Stereo3DSets;
 	ExtraRendererSettings ExtraSets;
 
-	CRenderersSettings();
-
-	void	SetDefault();
-	void	Load();
-	void	Save();
+	void SetDefault();
+	void Load();
+	void Save();
 };
 
 extern CRenderersSettings& GetRenderersSettings();

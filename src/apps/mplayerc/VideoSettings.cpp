@@ -64,14 +64,9 @@
 #define IDS_RS_SUBPIC_ALLOWDROP		L"SubpicAllowDrop"
 #define IDS_RS_SUBPIC_STEREOMODE	L"SubpicStereoMode"
 
-CRenderersSettings::CRenderersSettings()
-{
-	SetDefault();
-}
-
 void CRenderersSettings::SetDefault()
 {
-	iVideoRenderer       = VIDRNDT_EVR_CP;
+	iVideoRenderer = VIDRNDT_EVR_CP;
 
 	bExclusiveFullscreen = false;
 
@@ -176,6 +171,7 @@ void CRenderersSettings::Save()
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, ExtraSets.iEVROutputRange);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, ExtraSets.nEVRBuffers);
 
+	// player does not change "MPCVRFullscreenControl" setting
 	//profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, ExtraSets.iSynchronizeMode);
