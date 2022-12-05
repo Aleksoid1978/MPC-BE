@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,9 +20,7 @@
 
 #pragma once
 
-#include "IAllocatorPresenter.h"
-
-#define WM_MYMOUSELAST WM_XBUTTONDBLCLK
+#include "filters/renderer/VideoRenderers/IAllocatorPresenter.h"
 
 enum : int {
 	//VIDRNDT_VMR7 = 0, // obsolete

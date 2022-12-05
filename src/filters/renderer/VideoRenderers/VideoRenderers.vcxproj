@@ -65,7 +65,6 @@
     <ClCompile Include="MPCVRAllocatorPresenter.cpp" />
     <ClCompile Include="OuterEVR.cpp" />
     <ClCompile Include="PixelShaderCompiler.cpp" />
-    <ClCompile Include="RenderersSettings.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -99,7 +98,6 @@
     <ClInclude Include="MPCVRAllocatorPresenter.h" />
     <ClInclude Include="OuterEVR.h" />
     <ClInclude Include="PixelShaderCompiler.h" />
-    <ClInclude Include="RenderersSettings.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="AllocatorPresenterImpl.h" />
     <ClInclude Include="SyncRenderer.h" />

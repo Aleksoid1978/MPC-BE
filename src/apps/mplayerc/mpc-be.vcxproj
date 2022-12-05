@@ -191,6 +191,7 @@
     <ClCompile Include="PPageWebServer.cpp" />
     <ClCompile Include="RateControl.cpp" />
     <ClCompile Include="RegFilterChooserDlg.cpp" />
+    <ClCompile Include="VideoSettings.cpp" />
     <ClCompile Include="SaveDlg.cpp" />
     <ClCompile Include="SaveTextFileDialog.cpp" />
     <ClCompile Include="SaveImageDialog.cpp" />
@@ -325,6 +326,7 @@
     <ClInclude Include="PPageWebServer.h" />
     <ClInclude Include="rapidjsonHelper.h" />
     <ClInclude Include="RegFilterChooserDlg.h" />
+    <ClInclude Include="VideoSettings.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDlg.h" />
     <ClInclude Include="SaveTextFileDialog.h" />

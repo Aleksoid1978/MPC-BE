@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,8 +19,7 @@
  */
 
 #include "stdafx.h"
-#include "RenderersSettings.h"
-#include "apps/mplayerc/mplayerc.h"
+#include "VideoSettings.h"
 
 #define IDS_RS_VIDEORENDERER		L"VideoRenderer"
 
