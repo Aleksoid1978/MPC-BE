@@ -734,11 +734,6 @@ void CAppSettings::ResetSettings()
 	iStereo3DMode = STEREO3D_AUTO;
 	bStereo3DSwapLR = false;
 
-	iBrightness = 0;
-	iContrast = 0;
-	iHue = 0;
-	iSaturation = 0;
-
 	ShaderList.clear();
 	ShaderListScreenSpace.clear();
 	Shaders11PostScale.clear();
@@ -1003,12 +998,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
-
-	// Video
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness, -100, 100);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_CONTRAST, iContrast, -100, 100);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_HUE, iHue, -180, 180);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_SATURATION, iSaturation, -100, 100);
 
 	// Audio
 	profile.ReadInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume, 0, 100);
@@ -1673,12 +1662,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_SUBRESYNC, fUseSybresync);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
-
-	// Video
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_CONTRAST, iContrast);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_HUE, iHue);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_SATURATION, iSaturation);
 
 	// Audio
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume);

@@ -67,14 +67,6 @@
 #define IDS_RS_LIMITWINDOWPROPORTIONS		L"LimitWindowProportions"
 #define IDS_RS_SNAPTODESKTOPEDGES			L"SnapToDesktopEdges"
 
-// Video
-#define IDS_R_VIDEO							L"Video"
-#define IDS_RS_COLOR_BRIGHTNESS				L"ColorBrightness"
-#define IDS_RS_COLOR_CONTRAST				L"ColorContrast"
-#define IDS_RS_COLOR_HUE					L"ColorHue"
-#define IDS_RS_COLOR_SATURATION				L"ColorSaturation"
-// the rest of the Video settings are in RenderersSettings.cpp
-
 // Audio
 #define IDS_R_AUDIO							L"Audio"
 #define IDS_RS_VOLUME						L"Volume"

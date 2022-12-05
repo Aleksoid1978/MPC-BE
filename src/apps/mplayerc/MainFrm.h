@@ -1409,7 +1409,7 @@ public:
 
 	GUID		GetTimeFormat();
 
-	CColorControl	m_ColorCintrol;
+	CColorControl	m_ColorControl;
 
 	void		StopAutoHideCursor();
 	void		StartAutoHideCursor();

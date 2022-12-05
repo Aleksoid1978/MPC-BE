@@ -661,12 +661,6 @@ public:
 	int				iStereo3DMode;
 	bool			bStereo3DSwapLR;
 
-	// Color control
-	int				iBrightness;
-	int				iContrast;
-	int				iHue;
-	int				iSaturation;
-
 	// Fullscreen
 	bool			fLaunchfullscreen;
 	bool			fShowBarsWhenFullScreen;

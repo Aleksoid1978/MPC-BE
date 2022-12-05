@@ -76,14 +76,13 @@ BOOL CPPageColor::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO5, IDC_HAND);
 	CreateToolTip();
 
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_VRSettings;
+	auto& rs = GetRenderersSettings();
 
 	// Color control
-	m_iBrightness = s.iBrightness;
-	m_iContrast   = s.iContrast;
-	m_iHue        = s.iHue;
-	m_iSaturation = s.iSaturation;
+	m_iBrightness = rs.iBrightness;
+	m_iContrast   = rs.iContrast;
+	m_iHue        = rs.iHue;
+	m_iSaturation = rs.iSaturation;
 
 	m_SliBrightness.SetRange		(-100, 100, TRUE);
 	m_SliBrightness.SetTic			(0);
@@ -142,7 +141,7 @@ BOOL CPPageColor::OnInitDialog()
 
 BOOL CPPageColor::OnSetActive()
 {
-	CRenderersSettings& rs = AfxGetAppSettings().m_VRSettings;
+	auto& rs = GetRenderersSettings();
 
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CP
 			&& (rs.ExtraSets.iSurfaceFormat == D3DFMT_A2R10G10B10 || rs.ExtraSets.iSurfaceFormat == D3DFMT_A16B16G16R16F)) {
@@ -167,14 +166,13 @@ BOOL CPPageColor::OnApply()
 {
 	UpdateData();
 
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_VRSettings;
+	auto& rs = GetRenderersSettings();
 
 	// Color control
-	s.iBrightness = m_iBrightness;
-	s.iContrast   = m_iContrast;
-	s.iHue        = m_iHue;
-	s.iSaturation = m_iSaturation;
+	rs.iBrightness = m_iBrightness;
+	rs.iContrast   = m_iContrast;
+	rs.iHue        = m_iHue;
+	rs.iSaturation = m_iSaturation;
 
 	// Color managment
 	rs.ExtraSets.bColorManagementEnable       = !!m_chkColorManagment.GetCheck();
@@ -254,7 +252,7 @@ void CPPageColor::OnBnClickedReset()
 	CMainFrame* pMainFrame = AfxGetMainFrame();
 
 	// Color control
-	pMainFrame->m_ColorCintrol.GetDefaultValues(m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+	pMainFrame->m_ColorControl.GetDefaultValues(m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 
 	m_SliBrightness.SetPos	(m_iBrightness);
 	m_SliContrast.SetPos	(m_iContrast);
@@ -282,9 +280,9 @@ void CPPageColor::OnBnClickedReset()
 
 void CPPageColor::OnCancel()
 {
-	CAppSettings& s = AfxGetAppSettings();
+	auto& rs = GetRenderersSettings();
 
-	AfxGetMainFrame()->SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
+	AfxGetMainFrame()->SetColorControl(ProcAmp_All, rs.iBrightness, rs.iContrast, rs.iHue, rs.iSaturation);
 
 	__super::OnCancel();
 }

@@ -42,6 +42,12 @@ public:
 
 	bool bExclusiveFullscreen = false;
 
+	// Color control
+	int  iBrightness = 0;
+	int  iContrast   = 0;
+	int  iHue        = 0;
+	int  iSaturation = 0;
+
 	// subtitles
 	SubpicSettings SubpicSets;
 	Stereo3DSettings Stereo3DSets;

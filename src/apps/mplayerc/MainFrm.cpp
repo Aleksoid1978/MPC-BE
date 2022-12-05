@@ -9278,11 +9278,11 @@ void CMainFrame::OnPlayCenterLevel(UINT nID)
 void CMainFrame::OnPlayColor(UINT nID)
 {
 	if (m_pVMRMC9 || m_pMFVP) {
-		CAppSettings& s = AfxGetAppSettings();
-		int& brightness = s.iBrightness;
-		int& contrast   = s.iContrast;
-		int& hue        = s.iHue;
-		int& saturation = s.iSaturation;
+		auto& rs = GetRenderersSettings();
+		int& brightness = rs.iBrightness;
+		int& contrast   = rs.iContrast;
+		int& hue        = rs.iHue;
+		int& saturation = rs.iSaturation;
 		CString tmp, str;
 
 		switch (nID) {
@@ -9324,7 +9324,7 @@ void CMainFrame::OnPlayColor(UINT nID)
 			break;
 
 		case ID_COLOR_RESET:
-			m_ColorCintrol.GetDefaultValues(brightness, contrast, hue, saturation);
+			m_ColorControl.GetDefaultValues(brightness, contrast, hue, saturation);
 			SetColorControl(ProcAmp_All, brightness, contrast, hue, saturation);
 			str = ResStr(IDS_OSD_RESET_COLOR);
 			break;
@@ -17879,28 +17879,28 @@ void CMainFrame::DestroyD3DWindow()
 void CMainFrame::SetupEVRColorControl()
 {
 	if (m_pMFVP) {
-		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Brightness, m_ColorCintrol.GetEVRColorControl(ProcAmp_Brightness)))) return;
-		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Contrast,   m_ColorCintrol.GetEVRColorControl(ProcAmp_Contrast))))   return;
-		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Hue,        m_ColorCintrol.GetEVRColorControl(ProcAmp_Hue))))        return;
-		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Saturation, m_ColorCintrol.GetEVRColorControl(ProcAmp_Saturation)))) return;
-		m_ColorCintrol.EnableEVRColorControl();
+		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Brightness, m_ColorControl.GetEVRColorControl(ProcAmp_Brightness)))) return;
+		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Contrast,   m_ColorControl.GetEVRColorControl(ProcAmp_Contrast))))   return;
+		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Hue,        m_ColorControl.GetEVRColorControl(ProcAmp_Hue))))        return;
+		if (FAILED(m_pMFVP->GetProcAmpRange(DXVA2_ProcAmp_Saturation, m_ColorControl.GetEVRColorControl(ProcAmp_Saturation)))) return;
+		m_ColorControl.EnableEVRColorControl();
 
-		auto& s = AfxGetAppSettings();
-		SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
+		auto& rs = GetRenderersSettings();
+		SetColorControl(ProcAmp_All, rs.iBrightness, rs.iContrast, rs.iHue, rs.iSaturation);
 	}
 }
 
 void CMainFrame::SetupVMR9ColorControl()
 {
 	if (m_pVMRMC9) {
-		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorCintrol.GetVMR9ColorControl(ProcAmp_Brightness)))) return;
-		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorCintrol.GetVMR9ColorControl(ProcAmp_Contrast))))   return;
-		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorCintrol.GetVMR9ColorControl(ProcAmp_Hue))))        return;
-		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorCintrol.GetVMR9ColorControl(ProcAmp_Saturation)))) return;
-		m_ColorCintrol.EnableVMR9ColorControl();
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorControl.GetVMR9ColorControl(ProcAmp_Brightness)))) return;
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorControl.GetVMR9ColorControl(ProcAmp_Contrast))))   return;
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorControl.GetVMR9ColorControl(ProcAmp_Hue))))        return;
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, m_ColorControl.GetVMR9ColorControl(ProcAmp_Saturation)))) return;
+		m_ColorControl.EnableVMR9ColorControl();
 
-		auto& s = AfxGetAppSettings();
-		SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
+		auto& rs = GetRenderersSettings();
+		SetColorControl(ProcAmp_All, rs.iBrightness, rs.iContrast, rs.iHue, rs.iSaturation);
 	}
 }
 
@@ -17920,11 +17920,11 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 	}
 
 	if (m_pVMRMC9) {
-		VMR9ProcAmpControl ClrControl = m_ColorCintrol.GetVMR9ProcAmpControl(flags, brightness, contrast, hue, saturation);
+		VMR9ProcAmpControl ClrControl = m_ColorControl.GetVMR9ProcAmpControl(flags, brightness, contrast, hue, saturation);
 		m_pVMRMC9->SetProcAmpControl(0, &ClrControl);
 	}
 	else if (m_pMFVP) {
-		DXVA2_ProcAmpValues ClrValues = m_ColorCintrol.GetEVRProcAmpValues(brightness, contrast, hue, saturation);
+		DXVA2_ProcAmpValues ClrValues = m_ColorControl.GetEVRProcAmpValues(brightness, contrast, hue, saturation);
 		m_pMFVP->SetProcAmpValues(flags, &ClrValues);
 	}
 }

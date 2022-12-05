@@ -21,6 +21,12 @@
 #include "stdafx.h"
 #include "VideoSettings.h"
 
+#define IDS_R_VIDEO					L"Video"
+#define IDS_RS_COLOR_BRIGHTNESS		L"ColorBrightness"
+#define IDS_RS_COLOR_CONTRAST		L"ColorContrast"
+#define IDS_RS_COLOR_HUE			L"ColorHue"
+#define IDS_RS_COLOR_SATURATION		L"ColorSaturation"
+
 #define IDS_RS_VIDEORENDERER		L"VideoRenderer"
 
 #define IDS_RS_RENDERDEVICE			L"RenderDevice"
@@ -94,8 +100,12 @@ void CRenderersSettings::Load()
 		VIDRNDT_NULL_ANY,
 		VIDRNDT_NULL_UNCOMP,
 		});
-
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
+
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness, -100, 100);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_CONTRAST, iContrast, -100, 100);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_HUE, iHue, -180, 180);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_SATURATION, iSaturation, -100, 100);
 
 	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, ExtraSets.sD3DRenderDevice);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, ExtraSets.bResetDevice);
@@ -151,6 +161,11 @@ void CRenderersSettings::Save()
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
+
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_CONTRAST, iContrast);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_HUE, iHue);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLOR_SATURATION, iSaturation);
 
 	profile.WriteString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, ExtraSets.sD3DRenderDevice);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, ExtraSets.bResetDevice);
