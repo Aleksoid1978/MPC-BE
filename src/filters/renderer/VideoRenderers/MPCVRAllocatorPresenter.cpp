@@ -23,7 +23,6 @@
 #include "SubPic/DX9SubPic.h"
 #include "SubPic/DX11SubPic.h"
 #include "SubPic/SubPicQueueImpl.h"
-#include "RenderersSettings.h"
 #include "Variables.h"
 #include <clsids.h>
 #include "IPinHook.h"
@@ -222,10 +221,8 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
 
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-		CRenderersSettings& rs = GetRenderersSettings();
-
 		hr = pIExFilterConfig->SetBool("lessRedraws", true);
-		hr = pIExFilterConfig->SetBool("d3dFullscreenControl", rs.bMPCVRFullscreenControl);
+		hr = pIExFilterConfig->SetBool("d3dFullscreenControl", m_bMPCVRFullscreenControl);
 	}
 
 	CComQIPtr<IBaseFilter> pBF(m_pMPCVR);
@@ -449,4 +446,11 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
 	}
 
 	return false;
+}
+
+STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetExtraSettings(ExtraRendererSettings* pExtraSets)
+{
+	if (pExtraSets && !m_pMPCVR) {
+		m_bMPCVRFullscreenControl = pExtraSets->bMPCVRFullscreenControl;
+	}
 }

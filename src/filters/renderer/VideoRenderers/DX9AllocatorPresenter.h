@@ -59,8 +59,6 @@ namespace DSObjects
 		HWND	m_hWndVR = nullptr;
 		bool	m_bNeedCreateWindow = true;
 
-		CAffectingRenderersSettings m_LastAffectingSettings;
-
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
 
@@ -73,8 +71,6 @@ namespace DSObjects
 		bool                       m_bAlphaBitmapEnable = false;
 		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;
 		MFVideoAlphaBitmapParams   m_AlphaBitmapParams = {};
-
-		bool SettingsNeedResetDevice();
 
 		HANDLE LockD3DDevice();
 		void UnlockD3DDevice(HANDLE& lockOwner);
@@ -250,6 +246,7 @@ namespace DSObjects
 		STDMETHODIMP_(bool) DisplayChange() override;
 		STDMETHODIMP_(void) ResetStats() override;
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
+		STDMETHODIMP_(void) SetExtraSettings(ExtraRendererSettings* pExtraSets) override;
 
 		// ID3DFullscreenControl
 		STDMETHODIMP SetD3DFullscreen(bool fEnabled);

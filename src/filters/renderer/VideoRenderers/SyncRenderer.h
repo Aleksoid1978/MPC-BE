@@ -23,7 +23,6 @@
 #include <ID3DFullscreenControl.h>
 #include "SubPic/ISubPic.h"
 #include "AllocatorPresenterImpl.h"
-#include "RenderersSettings.h"
 #include "AllocatorCommon.h"
 #include <dxva2api.h>
 #include "D3DUtil/D3D9Font.h"
@@ -127,8 +126,6 @@ namespace GothSync
 	protected:
 		static const int MAX_PICTURE_SLOTS = RS_EVRBUFFERS_MAX + 2; // Last 2 for pixels shader!
 
-		CAffectingRenderersSettings m_LastAffectingSettings;
-
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
 
@@ -136,8 +133,11 @@ namespace GothSync
 		CComPtr<IDirect3D9Ex>		m_pD3D9Ex;
 		CComPtr<IDirect3DDevice9Ex>	m_pDevice9Ex;
 
+		ExtraRendererSettings m_ExtraSets;
+
 		bool m_bDeviceResetRequested = false;
 		bool m_bPendingResetDevice   = false;
+		bool m_bNeedResetDevice      = false;
 
 		UINT						m_CurrentAdapter = 0;
 		D3DCAPS9					m_Caps;
@@ -165,7 +165,6 @@ namespace GothSync
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
 		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionYCgCo;
 
-		bool SettingsNeedResetDevice();
 		void SendResetRequest();
 		virtual HRESULT CreateDXDevice(CString &_Error);
 		virtual HRESULT AllocSurfaces(D3DFORMAT Format = D3DFMT_A8R8G8B8);
@@ -222,7 +221,7 @@ namespace GothSync
 		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;
 		MFVideoAlphaBitmapParams   m_AlphaBitmapParams = {};
 
-		unsigned m_nSurfaces = 1; // Total number of DX Surfaces
+		unsigned m_nSurfaces = 4; // Total number of DX Surfaces
 		UINT32 m_iCurSurface = 0; // Surface currently displayed
 		long m_nUsedBuffer = 0;
 
@@ -320,6 +319,7 @@ namespace GothSync
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
 		STDMETHODIMP_(void) ResetStats() override;
+		STDMETHODIMP_(void) SetExtraSettings(ExtraRendererSettings* pExtraSets) override;
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value);

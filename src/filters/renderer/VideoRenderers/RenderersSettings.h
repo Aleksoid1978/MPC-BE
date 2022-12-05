@@ -24,12 +24,6 @@
 #include "IAllocatorPresenter.h"
 
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
-#define DXVA2VP 1
-#define DXVAHDVP 1
-
-#define RS_EVRBUFFERS_MIN	4
-#define RS_EVRBUFFERS_DEF	5
-#define RS_EVRBUFFERS_MAX	30
 
 enum : int {
 	//VIDRNDT_VMR7 = 0, // obsolete
@@ -44,107 +38,17 @@ enum : int {
 	VIDRNDT_NULL_UNCOMP,
 };
 
-enum :int {
-	RESIZER_NEAREST = 0,
-	RESIZER_BILINEAR,
-	RESIZER_DXVA2,
-	RESIZER_SHADER_BICUBIC06,
-	RESIZER_SHADER_BICUBIC08,
-	RESIZER_SHADER_BICUBIC10,
-	RESIZER_SHADER_SMOOTHERSTEP, // no longer used
-	RESIZER_SHADER_BSPLINE,
-	RESIZER_SHADER_MITCHELL,
-	RESIZER_SHADER_CATMULL,
-	RESIZER_SHADER_LANCZOS2,
-	RESIZER_SHADER_LANCZOS3,
-	RESIZER_DXVAHD = 50,
-
-	DOWNSCALER_SIMPLE = 100,
-	DOWNSCALER_BOX,
-	DOWNSCALER_BILINEAR,
-	DOWNSCALER_HAMMING,
-	DOWNSCALER_BICUBIC,
-	DOWNSCALER_LANCZOS,
-};
-
-enum VideoSystem {
-	VIDEO_SYSTEM_UNKNOWN = 0,
-	VIDEO_SYSTEM_HDTV,
-	VIDEO_SYSTEM_SDTV_NTSC,
-	VIDEO_SYSTEM_SDTV_PAL,
-};
-
-enum AmbientLight {
-	AMBIENT_LIGHT_BRIGHT = 0,
-	AMBIENT_LIGHT_DIM,
-	AMBIENT_LIGHT_DARK,
-};
-
-enum ColorRenderingIntent {
-	COLOR_RENDERING_INTENT_PERCEPTUAL = 0,
-	COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC,
-	COLOR_RENDERING_INTENT_SATURATION,
-	COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC,
-};
-
-enum {
-	SYNCHRONIZE_NEAREST = 0,
-	SYNCHRONIZE_VIDEO,
-	SYNCHRONIZE_DISPLAY,
-};
-
 class CRenderersSettings
 {
 public:
 	int		iVideoRenderer;
 
-	// device
-	CString	sD3DRenderDevice;
-	bool	bResetDevice;
-
 	bool	bExclusiveFullscreen;
-	bool	b10BitOutput;
-
-	// surfaces and resizer
-	int		iPresentMode;
-	D3DFORMAT iSurfaceFormat;
-	int		iResizer;
-	int		iDownscaler;
-
-	// frame synchronization
-	bool	bVSync;
-	bool	bVSyncInternal;
-	bool	bEVRFrameTimeCorrection;
-	bool	bFlushGPUBeforeVSync;
-	bool	bFlushGPUAfterPresent;
-	bool	bFlushGPUWait;
-
-	// EVR
-	int		iEVROutputRange;
-	int		nEVRBuffers;
-
-	bool	bMPCVRFullscreenControl = false; // experimental, changes only in the registry 
-
-	// SyncRenderer settings
-	int		iSynchronizeMode;
-	int		iLineDelta;
-	int		iColumnDelta;
-	double	dCycleDelta;
-	double	dTargetSyncOffset;
-	double	dControlLimit;
-
-	// color management
-	bool	bColorManagementEnable;
-	int		iColorManagementInput;
-	int		iColorManagementAmbientLight;
-	int		iColorManagementIntent;
 
 	// subtitles
 	SubpicSettings SubpicSets;
 	Stereo3DSettings Stereo3DSets;
-
-	bool	bTearingTest;       // not saved
-	int		iDisplayStats;      // not saved
+	ExtraRendererSettings ExtraSets;
 
 	CRenderersSettings();
 
@@ -153,23 +57,4 @@ public:
 	void	Save();
 };
 
-class CAffectingRenderersSettings // used in SettingsNeedResetDevice()
-{
-public:
-	int iPresentMode                = 0;
-	D3DFORMAT iSurfaceFormat        = D3DFMT_X8R8G8B8;
-	bool b10BitOutput               = false;
-	bool bVSync                     = false;
-
-	void Fill(const CRenderersSettings& rs)
-	{
-		iPresentMode               = rs.iPresentMode;
-		iSurfaceFormat             = rs.iSurfaceFormat;
-		b10BitOutput               = rs.b10BitOutput;
-		bVSync                     = rs.bVSync;
-	}
-};
-
 extern CRenderersSettings& GetRenderersSettings();
-
-extern bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype);

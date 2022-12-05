@@ -25,6 +25,10 @@
 #define TARGET_FRAME 0
 #define TARGET_SCREEN 1
 
+#define RS_EVRBUFFERS_MIN	4
+#define RS_EVRBUFFERS_DEF	5
+#define RS_EVRBUFFERS_MAX	30
+
 #define RS_SPCSIZE_MIN		0
 #define RS_SPCSIZE_DEF		10
 #define RS_SPCSIZE_MAX		60
@@ -40,6 +44,55 @@ enum {
 	STEREO3D_HalfOverUnder_to_Interlace,
 };
 
+enum :int {
+	RESIZER_NEAREST = 0,
+	RESIZER_BILINEAR,
+	RESIZER_DXVA2,
+	RESIZER_SHADER_BICUBIC06,
+	RESIZER_SHADER_BICUBIC08,
+	RESIZER_SHADER_BICUBIC10,
+	RESIZER_SHADER_SMOOTHERSTEP, // no longer used
+	RESIZER_SHADER_BSPLINE,
+	RESIZER_SHADER_MITCHELL,
+	RESIZER_SHADER_CATMULL,
+	RESIZER_SHADER_LANCZOS2,
+	RESIZER_SHADER_LANCZOS3,
+	RESIZER_DXVAHD = 50,
+
+	DOWNSCALER_SIMPLE = 100,
+	DOWNSCALER_BOX,
+	DOWNSCALER_BILINEAR,
+	DOWNSCALER_HAMMING,
+	DOWNSCALER_BICUBIC,
+	DOWNSCALER_LANCZOS,
+};
+
+enum VideoSystem {
+	VIDEO_SYSTEM_UNKNOWN = 0,
+	VIDEO_SYSTEM_HDTV,
+	VIDEO_SYSTEM_SDTV_NTSC,
+	VIDEO_SYSTEM_SDTV_PAL,
+};
+
+enum AmbientLight {
+	AMBIENT_LIGHT_BRIGHT = 0,
+	AMBIENT_LIGHT_DIM,
+	AMBIENT_LIGHT_DARK,
+};
+
+enum ColorRenderingIntent {
+	COLOR_RENDERING_INTENT_PERCEPTUAL = 0,
+	COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC,
+	COLOR_RENDERING_INTENT_SATURATION,
+	COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC,
+};
+
+enum {
+	SYNCHRONIZE_NEAREST = 0,
+	SYNCHRONIZE_VIDEO,
+	SYNCHRONIZE_DISPLAY,
+};
+
 struct SubpicSettings {
 	int   iPosRelative       = 0;        // not saved
 	POINT ShiftPos           = { 0, 0 }; // not saved
@@ -52,7 +105,47 @@ struct SubpicSettings {
 struct Stereo3DSettings {
 	int   iMode      = SUBPIC_STEREO_NONE;
 	int   iTransform = STEREO3D_AsIs; // not saved
-	bool  bSwapLR    = false;    // not saved
+	bool  bSwapLR    = false;         // not saved
+};
+
+struct ExtraRendererSettings {
+	int       iPresentMode   = 0;
+	D3DFORMAT iSurfaceFormat = D3DFMT_X8R8G8B8;
+	bool      b10BitOutput   = false;
+	bool      bVSync         = false;
+
+	CStringW  sD3DRenderDevice;
+	bool      bResetDevice   = false;
+
+	bool      bVSyncInternal = false;
+	bool      bFlushGPUBeforeVSync = false;
+	bool      bFlushGPUAfterPresent = false;
+	bool      bFlushGPUWait  = false;
+
+	int       iResizer       = RESIZER_SHADER_CATMULL;
+	int       iDownscaler    = DOWNSCALER_SIMPLE;
+	int       iEVROutputRange = 0;
+	int       nEVRBuffers    = 5;
+	bool      bEVRFrameTimeCorrection = false;
+
+	int       iDisplayStats  = 0;     // not saved
+	bool      bTearingTest   = false; // not saved
+
+	// color management
+	bool      bColorManagementEnable       = false;
+	int       iColorManagementInput        = VIDEO_SYSTEM_UNKNOWN;
+	int       iColorManagementAmbientLight = AMBIENT_LIGHT_BRIGHT;
+	int       iColorManagementIntent       = COLOR_RENDERING_INTENT_PERCEPTUAL;
+
+	// SyncRenderer settings
+	int       iSynchronizeMode  = SYNCHRONIZE_NEAREST;
+	int       iLineDelta        = 0;
+	int       iColumnDelta      = 0;
+	double    dCycleDelta       = 0.0012;
+	double    dTargetSyncOffset = 12.0;
+	double    dControlLimit     = 2.0;
+
+	bool      bMPCVRFullscreenControl = false;
 };
 
 //
@@ -100,4 +193,5 @@ public IUnknown {
 
 	STDMETHOD_(void, SetSubpicSettings) (SubpicSettings* pSubpicSets) PURE;
 	STDMETHOD_(void, SetStereo3DSettings) (Stereo3DSettings* pStereo3DSets) PURE;
+	STDMETHOD_(void, SetExtraSettings) (ExtraRendererSettings* pExtraSets) PURE;
 };

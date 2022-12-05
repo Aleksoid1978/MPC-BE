@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,21 +83,21 @@ void CPPageSync::InitDialogPrivate()
 
 	CMainFrame* pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 
-	m_chkVSync.SetCheck(rs.bVSync);
-	m_chkVSyncInternal.SetCheck(rs.bVSyncInternal);
-	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
-	m_chkFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
-	m_chkFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
-	m_chkFlushGPUWait.SetCheck(rs.bFlushGPUWait);
+	m_chkVSync.SetCheck(rs.ExtraSets.bVSync);
+	m_chkVSyncInternal.SetCheck(rs.ExtraSets.bVSyncInternal);
+	m_chkEnableFrameTimeCorrection.SetCheck(rs.ExtraSets.bEVRFrameTimeCorrection);
+	m_chkFlushGPUBeforeVSync.SetCheck(rs.ExtraSets.bFlushGPUBeforeVSync);
+	m_chkFlushGPUAfterPresent.SetCheck(rs.ExtraSets.bFlushGPUAfterPresent);
+	m_chkFlushGPUWait.SetCheck(rs.ExtraSets.bFlushGPUWait);
 
-	m_iSyncMode = rs.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
-				: rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
+	m_iSyncMode = rs.ExtraSets.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
+				: rs.ExtraSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
 				: 2;
-	m_iLineDelta = rs.iLineDelta;
-	m_iColumnDelta = rs.iColumnDelta;
-	m_edtCycleDelta = rs.dCycleDelta;
-	m_edtTargetSyncOffset = rs.dTargetSyncOffset;
-	m_edtControlLimit = rs.dControlLimit;
+	m_iLineDelta          = rs.ExtraSets.iLineDelta;
+	m_iColumnDelta        = rs.ExtraSets.iColumnDelta;
+	m_edtCycleDelta       = rs.ExtraSets.dCycleDelta;
+	m_edtTargetSyncOffset = rs.ExtraSets.dTargetSyncOffset;
+	m_edtControlLimit     = rs.ExtraSets.dControlLimit;
 
 	if (pFrame->m_clsidCAP != CLSID_SyncAllocatorPresenter) {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
@@ -145,21 +145,24 @@ BOOL CPPageSync::OnApply()
 	UpdateData();
 	CRenderersSettings& rs = GetRenderersSettings();
 
-	rs.bVSync						= !!m_chkVSync.GetCheck();
-	rs.bVSyncInternal				= !!m_chkVSyncInternal.GetCheck();
-	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
-	rs.bFlushGPUBeforeVSync			= !!m_chkFlushGPUBeforeVSync.GetCheck();
-	rs.bFlushGPUAfterPresent		= !!m_chkFlushGPUAfterPresent.GetCheck();
-	rs.bFlushGPUWait				= !!m_chkFlushGPUWait.GetCheck();
+	rs.ExtraSets.bVSync						= !!m_chkVSync.GetCheck();
+	rs.ExtraSets.bVSyncInternal				= !!m_chkVSyncInternal.GetCheck();
+	rs.ExtraSets.bEVRFrameTimeCorrection	= !!m_chkEnableFrameTimeCorrection.GetCheck();
+	rs.ExtraSets.bFlushGPUBeforeVSync		= !!m_chkFlushGPUBeforeVSync.GetCheck();
+	rs.ExtraSets.bFlushGPUAfterPresent		= !!m_chkFlushGPUAfterPresent.GetCheck();
+	rs.ExtraSets.bFlushGPUWait				= !!m_chkFlushGPUWait.GetCheck();
 
-	rs.iSynchronizeMode	= m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
-							: m_iSyncMode == 1 ? SYNCHRONIZE_DISPLAY
-							: SYNCHRONIZE_NEAREST;
-	rs.iLineDelta			= m_iLineDelta;
-	rs.iColumnDelta			= m_iColumnDelta;
-	rs.dCycleDelta			= m_edtCycleDelta;
-	rs.dTargetSyncOffset	= m_edtTargetSyncOffset;
-	rs.dControlLimit		= m_edtControlLimit;
+	rs.ExtraSets.iSynchronizeMode	=
+		m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
+		: m_iSyncMode == 1 ? SYNCHRONIZE_DISPLAY
+		: SYNCHRONIZE_NEAREST;
+	rs.ExtraSets.iLineDelta			= m_iLineDelta;
+	rs.ExtraSets.iColumnDelta		= m_iColumnDelta;
+	rs.ExtraSets.dCycleDelta		= m_edtCycleDelta;
+	rs.ExtraSets.dTargetSyncOffset	= m_edtTargetSyncOffset;
+	rs.ExtraSets.dControlLimit		= m_edtControlLimit;
+
+	AfxGetMainFrame()->ApplyExraRendererSettings();
 
 	return __super::OnApply();
 }

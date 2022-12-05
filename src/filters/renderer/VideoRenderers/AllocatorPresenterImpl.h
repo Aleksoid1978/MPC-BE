@@ -98,6 +98,7 @@ public:
 	STDMETHODIMP_(void) ResetStats() {}
 	STDMETHODIMP_(void) SetSubpicSettings(SubpicSettings* pSubpicSets) override;
 	STDMETHODIMP_(void) SetStereo3DSettings(Stereo3DSettings* pStereo3DSets) override;
+	STDMETHODIMP_(void) SetExtraSettings(ExtraRendererSettings* pExtraSets) override {}
 
 	// ISubRenderOptions
 	STDMETHODIMP GetBool(LPCSTR field, bool* value);

@@ -1377,9 +1377,8 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 	m_wsResizer = nullptr;
 	m_wsResizer2 = nullptr;
 
-	CRenderersSettings& rs = GetRenderersSettings();
-	int iResizer = rs.iResizer;
-	int iDownscaler = rs.iDownscaler;
+	int iResizer = m_ExtraSets.iResizer;
+	int iDownscaler = m_ExtraSets.iDownscaler;
 	if (FAILED(InitShaderResizer(iResizer))) {
 		iResizer = RESIZER_BILINEAR;
 	}
@@ -1465,12 +1464,11 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 HRESULT CDX9RenderingEngine::InitFinalPass()
 {
 	HRESULT hr;
-	CRenderersSettings& rs = GetRenderersSettings();
 
-	const bool bColorManagement = m_bFP16Support && rs.bColorManagementEnable && m_SurfaceFmt != D3DFMT_X8R8G8B8;
-	VideoSystem inputVideoSystem = (VideoSystem)rs.iColorManagementInput;
-	AmbientLight ambientLight = (AmbientLight)rs.iColorManagementAmbientLight;
-	ColorRenderingIntent renderingIntent = (ColorRenderingIntent)rs.iColorManagementIntent;
+	const bool bColorManagement = m_bFP16Support && m_ExtraSets.bColorManagementEnable && m_SurfaceFmt != D3DFMT_X8R8G8B8;
+	VideoSystem inputVideoSystem = (VideoSystem)m_ExtraSets.iColorManagementInput;
+	AmbientLight ambientLight = (AmbientLight)m_ExtraSets.iColorManagementAmbientLight;
+	ColorRenderingIntent renderingIntent = (ColorRenderingIntent)m_ExtraSets.iColorManagementIntent;
 
 	const bool bDither = (m_bFP16Support && m_SurfaceFmt != D3DFMT_X8R8G8B8 && m_SurfaceFmt != m_DisplayFmt);
 
@@ -2314,7 +2312,7 @@ STDMETHODIMP CDX9RenderingEngine::GetInt(LPCSTR field, int* value)
 	}
 
 	if (strcmp(field, "supportedLevels") == 0) {
-		if (GetRenderersSettings().iEVROutputRange == 1) {
+		if (m_ExtraSets.iEVROutputRange == 1) {
 			*value = 3; // TV preferred
 		} else {
 			*value = 2; // PC preferred

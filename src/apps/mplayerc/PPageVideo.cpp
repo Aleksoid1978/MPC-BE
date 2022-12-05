@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,7 @@
 #include "MainFrm.h"
 #include "PPageVideo.h"
 #include "ComPropertySheet.h"
+#include "filters/renderer/VideoRenderers/EVRAllocatorPresenter.h"
 
 // CPPageVideo dialog
 
@@ -121,16 +122,16 @@ BOOL CPPageVideo::OnInitDialog()
 
 	m_chkD3DFullscreen.SetCheck(rs.bExclusiveFullscreen);
 	m_chk10bitOutput.EnableWindow(rs.bExclusiveFullscreen);
-	m_chk10bitOutput.SetCheck(rs.b10BitOutput);
+	m_chk10bitOutput.SetCheck(rs.ExtraSets.b10BitOutput);
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
-	m_cbEVROutputRange.SetCurSel(rs.iEVROutputRange);
+	m_cbEVROutputRange.SetCurSel(rs.ExtraSets.iEVROutputRange);
 
-	m_iEvrBuffers = rs.nEVRBuffers;
+	m_iEvrBuffers = rs.ExtraSets.nEVRBuffers;
 	m_spnEvrBuffers.SetRange(RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 
-	m_bResetDevice = s.m_VRSettings.bResetDevice;
+	m_bResetDevice = s.m_VRSettings.ExtraSets.bResetDevice;
 
 	auto pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
@@ -156,7 +157,7 @@ BOOL CPPageVideo::OnInitDialog()
 					if (!bExists) {
 						m_cbD3D9RenderDevice.AddString(d3ddevice_str);
 						m_D3D9GUIDNames.Add(cstrGUID);
-						if (rs.sD3DRenderDevice == cstrGUID) {
+						if (rs.ExtraSets.sD3DRenderDevice == cstrGUID) {
 							m_iD3D9RenderDevice = m_cbD3D9RenderDevice.GetCount() - 1;
 						}
 					}
@@ -224,18 +225,18 @@ BOOL CPPageVideo::OnInitDialog()
 	AddStringData(m_cbDX9PresentMode, L"Copy", 0);
 	AddStringData(m_cbDX9PresentMode, L"Flip/FlipEx", 1);
 	m_cbDX9PresentMode.SetCurSel(0); // default
-	SelectByItemData(m_cbDX9PresentMode, rs.iPresentMode);
+	SelectByItemData(m_cbDX9PresentMode, rs.ExtraSets.iPresentMode);
 	CorrectComboListWidth(m_cbDX9PresentMode);
 
 	AddStringData(m_cbDX9SurfaceFormat, L"8-bit Integer", D3DFMT_X8R8G8B8);
 	AddStringData(m_cbDX9SurfaceFormat, L"10-bit Integer", D3DFMT_A2R10G10B10);
 	AddStringData(m_cbDX9SurfaceFormat, L"16-bit Floating Point", D3DFMT_A16B16G16R16F);
 	m_cbDX9SurfaceFormat.SetCurSel(0); // default
-	SelectByItemData(m_cbDX9SurfaceFormat, rs.iSurfaceFormat);
+	SelectByItemData(m_cbDX9SurfaceFormat, rs.ExtraSets.iSurfaceFormat);
 	CorrectComboListWidth(m_cbDX9SurfaceFormat);
 
-	UpdateResizerList(rs.iResizer);
-	UpdateDownscalerList(rs.iDownscaler);
+	UpdateResizerList(rs.ExtraSets.iResizer);
+	UpdateDownscalerList(rs.ExtraSets.iDownscaler);
 
 	CheckDlgButton(IDC_D3D9DEVICE_CHECK, BST_UNCHECKED);
 	GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(FALSE);
@@ -288,23 +289,25 @@ BOOL CPPageVideo::OnApply()
 	CRenderersSettings& rs = s.m_VRSettings;
 
 	rs.iVideoRenderer		= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
-	rs.iResizer				= GetCurItemData(m_cbDX9Resizer);
-	rs.iDownscaler			= GetCurItemData(m_cbDownscaler);
+	rs.ExtraSets.iResizer				= GetCurItemData(m_cbDX9Resizer);
+	rs.ExtraSets.iDownscaler			= GetCurItemData(m_cbDownscaler);
 	rs.bExclusiveFullscreen = !!m_chkD3DFullscreen.GetCheck();
-	rs.bResetDevice			= !!m_bResetDevice;
+	rs.ExtraSets.bResetDevice			= !!m_bResetDevice;
 
-	rs.iPresentMode		= (int)GetCurItemData(m_cbDX9PresentMode);
-	rs.iSurfaceFormat	= (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
-	rs.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
-	rs.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
+	rs.ExtraSets.iPresentMode		= (int)GetCurItemData(m_cbDX9PresentMode);
+	rs.ExtraSets.iSurfaceFormat	= (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
+	rs.ExtraSets.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
+	rs.ExtraSets.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
 
-	rs.nEVRBuffers = m_iEvrBuffers;
+	rs.ExtraSets.nEVRBuffers = m_iEvrBuffers;
 
-	rs.sD3DRenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
+	rs.ExtraSets.sD3DRenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
 
 	s.iDefaultVideoSize = m_cbFrameMode.GetCurSel();
 	s.bNoSmallUpscale = !!m_chkNoSmallUpscale.GetCheck();
 	s.bNoSmallDownscale = !!m_chkNoSmallDownscale.GetCheck();
+
+	AfxGetMainFrame()->ApplyExraRendererSettings();
 
 	return __super::OnApply();
 }
@@ -406,8 +409,8 @@ void CPPageVideo::OnDSRendererChange()
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE_CHECK));
 			}
 
-			UpdateResizerList(rs.iResizer);
-			UpdateDownscalerList(rs.iDownscaler);
+			UpdateResizerList(rs.ExtraSets.iResizer);
+			UpdateDownscalerList(rs.ExtraSets.iDownscaler);
 
 			GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
 			m_cbDX9PresentMode.EnableWindow(TRUE);

@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include "RenderersSettings.h"
 #include "DX9AllocatorPresenter.h"
 #include <utility>
 #include <clsids.h>
@@ -351,25 +350,6 @@ public:
 };
 #endif
 
-bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
-{
-	CRenderersSettings& New = GetRenderersSettings();
-	CAffectingRenderersSettings& Current = m_LastAffectingSettings;
-
-	bool bRet = false;
-
-	bRet = bRet || (!m_bIsFullscreen && New.bVSync != Current.bVSync);
-	bRet = bRet || (!m_bIsFullscreen && New.iPresentMode != Current.iPresentMode);
-	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
-	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
-
-	m_bNeedCreateWindow = (!m_bIsFullscreen && New.iPresentMode != Current.iPresentMode);
-
-	Current.Fill(New);
-
-	return bRet;
-}
-
 HANDLE CDX9AllocatorPresenter::LockD3DDevice()
 {
 	if (m_pDevice9Ex) {
@@ -422,8 +402,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	// extern variable
 	g_nFrameType = PICT_NONE;
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	CAutoLock lock(&m_RenderLock);
 
 	ZeroMemory(m_DetectedFrameTimeHistory, sizeof(m_DetectedFrameTimeHistory));
@@ -469,8 +447,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_PresentWaitTime				= 0;
 	m_PresentWaitTimeMin			= 3000000000;
 	m_PresentWaitTimeMax			= 0;
-
-	m_LastAffectingSettings.Fill(rs);
 
 	m_VBlankEndPresent				= -100000;
 	m_VBlankStartMeasureTime		= 0;
@@ -527,7 +503,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			}
 		}
 
-		if (!m_bIsFullscreen && rs.iPresentMode) {
+		if (!m_bIsFullscreen && m_ExtraSets.iPresentMode) {
 			m_hWndVR = CreateWindowExW(
 				0,
 				g_szClassName,
@@ -563,7 +539,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_bFP16Support = SUCCEEDED(m_pD3D9Ex->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
 
 	// set surface formats
-	switch (rs.iSurfaceFormat) {
+	switch (m_ExtraSets.iSurfaceFormat) {
 	case D3DFMT_A16B16G16R16F:
 		if (m_bFP16Support) {
 			m_SurfaceFmt = D3DFMT_A16B16G16R16F;
@@ -597,7 +573,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		// detect 10-bit device support
 		bool b10BitOutputSupport = SUCCEEDED(m_pD3D9Ex->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
 
-		if (b10BitOutputSupport && rs.b10BitOutput) {
+		if (b10BitOutputSupport && m_ExtraSets.b10BitOutput) {
 			m_d3dpp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		} else {
 			m_d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
@@ -640,14 +616,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	} else {
 		m_d3dpp.Windowed = TRUE;
 		m_d3dpp.hDeviceWindow = m_hWndVR ? m_hWndVR : m_hWnd;
-		m_d3dpp.SwapEffect = rs.iPresentMode == 0 ? D3DSWAPEFFECT_COPY : (SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP);
+		m_d3dpp.SwapEffect = m_ExtraSets.iPresentMode == 0 ? D3DSWAPEFFECT_COPY : (SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP);
 		m_d3dpp.BackBufferCount = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? 1 : 3;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 		// Desktop composition takes care of the VSYNC
 		if (m_bCompositionEnabled) {
-			m_d3dpp.PresentationInterval = rs.bVSync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+			m_d3dpp.PresentationInterval = m_ExtraSets.bVSync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 		} else {
-			m_d3dpp.PresentationInterval = rs.bVSync ? D3DPRESENT_INTERVAL_IMMEDIATE : D3DPRESENT_INTERVAL_ONE;
+			m_d3dpp.PresentationInterval = m_ExtraSets.bVSync ? D3DPRESENT_INTERVAL_IMMEDIATE : D3DPRESENT_INTERVAL_ONE;
 		}
 
 		m_refreshRate = d3ddmEx.RefreshRate;
@@ -885,14 +861,13 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D)
 	m_D3D9DeviceName.Empty();
 	m_D3D9VendorId = 0;
 
-	const CRenderersSettings& rs = GetRenderersSettings();
-	if (pD3D->GetAdapterCount() > 1 && rs.sD3DRenderDevice.GetLength() > 0) {
+	if (pD3D->GetAdapterCount() > 1 && m_ExtraSets.sD3DRenderDevice.GetLength() > 0) {
 		WCHAR strGUID[50] = { 0 };
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 
 		for (UINT adp = 0, num_adp = pD3D->GetAdapterCount(); adp < num_adp; ++adp) {
 			if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
-				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (rs.sD3DRenderDevice == strGUID)) {
+				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (m_ExtraSets.sD3DRenderDevice == strGUID)) {
 					m_D3D9Device     = adapterIdentifier.Description;
 					m_D3D9DeviceName = adapterIdentifier.DeviceName;
 					m_D3D9VendorId   = adapterIdentifier.VendorId;
@@ -1226,8 +1201,7 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 
 bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, HANDLE& lockOwner)
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-	if (!rs.bVSyncInternal) {
+	if (!m_ExtraSets.bVSyncInternal) {
 		_Waited = true;
 		m_VBlankWaitTime = 0;
 		m_VBlankLockTime = 0;
@@ -1259,8 +1233,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	if (m_bResizingDevice) {
 		return false;
 	}
-
-	CRenderersSettings& rs = GetRenderersSettings();
 
 #if 0
 	if (TryEnterCriticalSection (&(CRITICAL_SECTION &)(*((CCritSec *)this)))) {
@@ -1375,13 +1347,13 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		Stereo3DTransform(pBackBuffer, rDstVid);
 	}
 
-	if (rs.iDisplayStats) {
+	if (m_ExtraSets.iDisplayStats) {
 		DrawStats();
 	}
 
 	m_pDevice9Ex->EndScene();
 
-	bool bDoVSyncInPresent = !m_bCompositionEnabled || !rs.bVSyncInternal;
+	bool bDoVSyncInPresent = !m_bCompositionEnabled || !m_ExtraSets.bVSyncInternal;
 
 	LONGLONG PresentWaitTime = 0;
 
@@ -1392,13 +1364,13 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		pEventQuery->Issue(D3DISSUE_END);
 	}
 
-	if (rs.bFlushGPUBeforeVSync && pEventQuery) {
+	if (m_ExtraSets.bFlushGPUBeforeVSync && pEventQuery) {
 		LONGLONG llPerf = GetPerfCounter();
 		BOOL Data;
 		//Sleep(5);
 		LONGLONG FlushStartTime = GetPerfCounter();
 		while (S_FALSE == pEventQuery->GetData( &Data, sizeof(Data), D3DGETDATA_FLUSH )) {
-			if (!rs.bFlushGPUWait) {
+			if (!m_ExtraSets.bFlushGPUWait) {
 				break;
 			}
 			Sleep(1);
@@ -1406,7 +1378,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				break;    // timeout after 50 ms
 			}
 		}
-		if (rs.bFlushGPUWait) {
+		if (m_ExtraSets.bFlushGPUWait) {
 			m_WaitForGPUTime = GetPerfCounter() - llPerf;
 		} else {
 			m_WaitForGPUTime = 0;
@@ -1456,10 +1428,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 		BOOL Data;
 
-		if (rs.bFlushGPUAfterPresent && pEventQuery) {
+		if (m_ExtraSets.bFlushGPUAfterPresent && pEventQuery) {
 			LONGLONG FlushStartTime = GetPerfCounter();
 			while (S_FALSE == pEventQuery->GetData( &Data, sizeof(Data), D3DGETDATA_FLUSH )) {
-				if (!rs.bFlushGPUWait) {
+				if (!m_ExtraSets.bFlushGPUWait) {
 					break;
 				}
 				if (GetPerfCounter() - FlushStartTime > 500000) {
@@ -1538,7 +1510,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		//	bResetDevice = true;
 		//}
 
-		if (SettingsNeedResetDevice()) {
+		if (m_bNeedResetDevice) {
+			m_bNeedResetDevice = false;
 			DLog(L"CDX9AllocatorPresenter::Paint() : Settings Changed - need Reset Device");
 			bResetDevice = true;
 		}
@@ -1557,7 +1530,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			}
 		}
 
-		if (rs.bResetDevice) {
+		if (m_ExtraSets.bResetDevice) {
 			LONGLONG time = GetPerfCounter();
 			if (time > m_LastAdapterCheck + 20000000) { // check every 2 sec.
 				m_LastAdapterCheck = time;
@@ -1739,12 +1712,29 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
 	}
 }
 
+STDMETHODIMP_(void) CDX9AllocatorPresenter::SetExtraSettings(ExtraRendererSettings* pExtraSets)
+{
+	if (pExtraSets) {
+		CAutoLock cRenderLock(&m_RenderLock);
+
+		if ((!m_bIsFullscreen && pExtraSets->bVSync != m_ExtraSets.bVSync)
+				|| (!m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode)
+				|| pExtraSets->b10BitOutput != m_ExtraSets.b10BitOutput
+				|| pExtraSets->iSurfaceFormat != m_ExtraSets.iSurfaceFormat) {
+			m_bNeedResetDevice = true;
+		}
+
+		m_bNeedCreateWindow = (!m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode);
+
+		m_ExtraSets = *pExtraSets;
+		m_nSurfaces = std::clamp(m_ExtraSets.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
+	}
+}
+
 void CDX9AllocatorPresenter::DrawStats()
 {
-	const CRenderersSettings& rs = GetRenderersSettings();
-
 	int iDetailedStats = 2;
-	switch (rs.iDisplayStats) {
+	switch (m_ExtraSets.iDisplayStats) {
 		case 1:
 			iDetailedStats = 2;
 			break;
@@ -1841,29 +1831,29 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText += L" DisDC";
 			}
 
-			if (rs.bVSync) {
+			if (m_ExtraSets.bVSync) {
 				strText += L" VSync";
 			}
-			if (rs.bVSyncInternal) {
-				strText += rs.bVSync ? L"+Internal" : L" IntVSync";
+			if (m_ExtraSets.bVSyncInternal) {
+				strText += m_ExtraSets.bVSync ? L"+Internal" : L" IntVSync";
 			}
 
-			if (rs.bFlushGPUBeforeVSync) {
+			if (m_ExtraSets.bFlushGPUBeforeVSync) {
 				strText += L" GPUFlushBV";
 			}
-			if (rs.bFlushGPUAfterPresent) {
+			if (m_ExtraSets.bFlushGPUAfterPresent) {
 				strText += L" GPUFlushAP";
 			}
-			if (rs.bFlushGPUWait) {
+			if (m_ExtraSets.bFlushGPUWait) {
 				strText += L" GPUFlushWt";
 			}
 
-			if (rs.bEVRFrameTimeCorrection) {
+			if (m_ExtraSets.bEVRFrameTimeCorrection) {
 				strText += L" FTC";
 			}
-			if (rs.iEVROutputRange == 0) {
+			if (m_ExtraSets.iEVROutputRange == 0) {
 				strText += L" 0-255";
-			} else if (rs.iEVROutputRange == 1) {
+			} else if (m_ExtraSets.iEVROutputRange == 1) {
 				strText += L" 16-235";
 			}
 
@@ -1921,7 +1911,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			strText.AppendFormat(L"\nSubtitles    : Free %d     Allocated %d     Buffered %d     QueueStart %7.3f     QueueEnd %7.3f", nFree, nAlloc, nSubPic, (double(QueueStart)/10000000.0), (double(QueueEnd)/10000000.0));
 		}
 
-		if (rs.bVSyncInternal) {
+		if (m_ExtraSets.bVSyncInternal) {
 			if (iDetailedStats > 1) {
 				if (m_VBlankEndPresent == -100000) {
 					strText.AppendFormat(L"\nVBlank Wait  : Start %4d   End %4d   Wait %7.3f ms   Lock %7.3f ms   Offset %4d   Max %4d", m_VBlankStartWait, m_VBlankEndWait, (double(m_VBlankWaitTime)/10000.0), (double(m_VBlankLockTime)/10000.0), m_VBlankMin, m_VBlankMax - m_VBlankMin);
@@ -1937,7 +1927,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 		}
 
-		bool bDoVSyncInPresent = !m_bCompositionEnabled || !rs.bVSyncInternal;
+		bool bDoVSyncInPresent = !m_bCompositionEnabled || !m_ExtraSets.bVSyncInternal;
 		if (iDetailedStats > 1 && bDoVSyncInPresent) {
 			strText.AppendFormat(L"\nPresent Wait : Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_PresentWaitTime)/10000.0), (double(m_PresentWaitTimeMin)/10000.0), (double(m_PresentWaitTimeMax)/10000.0));
 		}
@@ -1956,7 +1946,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 		}
 
-		if (iDetailedStats > 1 && rs.bVSyncInternal) {
+		if (iDetailedStats > 1 && m_ExtraSets.bVSyncInternal) {
 			strText.AppendFormat(L"\nRaster Status: Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_RasterStatusWaitTime)/10000.0), (double(m_RasterStatusWaitTimeMin)/10000.0), (double(m_RasterStatusWaitTimeMax)/10000.0));
 		}
 

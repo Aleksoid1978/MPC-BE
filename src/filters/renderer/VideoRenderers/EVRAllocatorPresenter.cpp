@@ -64,7 +64,6 @@ using namespace DSObjects;
 CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CDX9AllocatorPresenter(hWnd, bFullscreen, hr, _Error)
 {
-	CRenderersSettings& rs = GetRenderersSettings();
 	ResetQualProps();
 
 	if (FAILED(hr)) {
@@ -250,9 +249,6 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	HRESULT hr = E_FAIL;
 	CStringW _Error;
-	CRenderersSettings& rs = GetRenderersSettings();
-
-	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
@@ -731,7 +727,7 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	UINT32 nominalRange;
 	pMixerInputType->GetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, &nominalRange);
 
-	const int iOutputRange = GetRenderersSettings().iEVROutputRange;
+	const int iOutputRange = m_ExtraSets.iEVROutputRange;
 	if (nominalRange == MFNominalRange_0_255) {
 		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_48_208 : MFNominalRange_16_235); // fix EVR bug
 	} else {
@@ -1006,7 +1002,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		REFERENCE_TIME nsDuration;
 		pSample->GetSampleDuration(&nsDuration);
 
-		if (GetRenderersSettings().bTearingTest) {
+		if (m_ExtraSets.bTearingTest) {
 			RECT rcTearing;
 
 			rcTearing.left		= m_nTearingPos;
@@ -1937,8 +1933,6 @@ void CEVRAllocatorPresenter::RenderThread()
 	const UINT wTimerRes = std::max(tc.wPeriodMin, 1u);
 	timeBeginPeriod(wTimerRes);
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	auto SubPicSetTime = [&] {
 		if (!g_bExternalSubtitleTime) {
 			CAllocatorPresenterImpl::SetTime(g_tSegmentStart + nsSampleTime * (g_bExternalSubtitle ? g_dRate : 1));
@@ -1981,7 +1975,7 @@ void CEVRAllocatorPresenter::RenderThread()
 				TRACE_EVR("EVR: NewSegment\n");
 				break;
 			case WAIT_TIMEOUT :
-				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != rs.iEVROutputRange) {
+				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != m_ExtraSets.iEVROutputRange) {
 					{
 						CAutoLock Lock(&m_csExternalMixerLock);
 						CAutoLock cRenderLock(&m_RenderLock);
@@ -2080,7 +2074,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									DetectedScanlineTime = DetectedRefreshTime / double(m_ScreenSize.cy);
 								}
 
-								if (rs.bVSyncInternal) {
+								if (m_ExtraSets.bVSyncInternal) {
 									bVSyncCorrection = true;
 									double TargetVSyncPos = GetVBlackPos();
 									double RefreshLines = DetectedScanlinesPerFrame;
@@ -2280,8 +2274,6 @@ void CEVRAllocatorPresenter::RenderThread()
 
 void CEVRAllocatorPresenter::VSyncThread()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-
 	struct {
 		LONGLONG time;
 		UINT scanline;
@@ -2311,7 +2303,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					prevSL = UINT_MAX;
 				}
 				// Do our stuff
-				if (m_pDevice9Ex && rs.bVSyncInternal) {
+				if (m_pDevice9Ex && m_ExtraSets.bVSyncInternal) {
 					ScanLinePos = 0;
 					filled = false;
 
@@ -2426,7 +2418,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 						}
 					}
 				}
-				else if (m_pDevice9ExRefresh && rs.iDisplayStats == 1) {
+				else if (m_pDevice9ExRefresh && m_ExtraSets.iDisplayStats == 1) {
 					if (prevSL == UINT_MAX) {
 						D3DRASTER_STATUS rasterStatus;
 						if (S_OK == m_pDevice9ExRefresh->GetRasterStatus(0, &rasterStatus)) {
@@ -2711,7 +2703,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, const bool 
 
 			if (m_DetectedFrameTime != 0.0
 					//&& PredictedDiff > MIN_FRAME_TIME
-					&& m_DetectedLock && GetRenderersSettings().bEVRFrameTimeCorrection) {
+					&& m_DetectedLock && m_ExtraSets.bEVRFrameTimeCorrection) {
 				double CurrentTime = Time / 10000000.0;
 				double LastTime = m_LastScheduledSampleTimeFP;
 				double PredictedTime = LastTime + m_DetectedFrameTime;

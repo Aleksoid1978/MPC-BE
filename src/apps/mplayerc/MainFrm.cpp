@@ -6927,7 +6927,7 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		pCmdUI->Enable(TRUE);
-		pCmdUI->SetCheck(GetRenderersSettings().bTearingTest);
+		pCmdUI->SetCheck(GetRenderersSettings().ExtraSets.bTearingTest);
 
 		return;
 	}
@@ -6939,14 +6939,18 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 void CMainFrame::OnViewTearingTest()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bTearingTest = !rs.bTearingTest;
+	rs.ExtraSets.bTearingTest = !rs.ExtraSets.bTearingTest;
+
+	if (m_pCAP) {
+		m_pCAP->SetExtraSettings(&rs.ExtraSets);
+	}
 }
 
 void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		pCmdUI->Enable(TRUE);
-		pCmdUI->SetCheck(GetRenderersSettings().iDisplayStats > 0);
+		pCmdUI->SetCheck(GetRenderersSettings().ExtraSets.iDisplayStats > 0);
 
 		return;
 	}
@@ -6979,13 +6983,17 @@ void CMainFrame::OnViewDisplayStatsSC()
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter || m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		CRenderersSettings& rs = GetRenderersSettings();
-		if (!rs.iDisplayStats && m_pCAP) {
+		if (!rs.ExtraSets.iDisplayStats && m_pCAP) {
 			m_pCAP->ResetStats(); // to Reset statistics on first call ...
 		}
 
-		++rs.iDisplayStats;
-		if (rs.iDisplayStats > 3) {
-			rs.iDisplayStats = 0;
+		++rs.ExtraSets.iDisplayStats;
+		if (rs.ExtraSets.iDisplayStats > 3) {
+			rs.ExtraSets.iDisplayStats = 0;
+		}
+
+		if (m_pCAP) {
+			m_pCAP->SetExtraSettings(&rs.ExtraSets);
 		}
 
 		RepaintVideo();
@@ -7019,7 +7027,7 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 {
 	if (m_clsidCAP == CLSID_EVRAllocatorPresenter) {
 		pCmdUI->Enable(TRUE);
-		pCmdUI->SetCheck(GetRenderersSettings().bEVRFrameTimeCorrection);
+		pCmdUI->SetCheck(GetRenderersSettings().ExtraSets.bEVRFrameTimeCorrection);
 
 		return;
 	}
@@ -7031,19 +7039,25 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 void CMainFrame::OnViewVSync()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bVSync = !rs.bVSync;
+	rs.ExtraSets.bVSync = !rs.ExtraSets.bVSync;
 	rs.Save();
+	if (m_pCAP) {
+		m_pCAP->SetExtraSettings(&rs.ExtraSets);
+	}
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bVSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
+						 rs.ExtraSets.bVSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewVSyncInternal()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bVSyncInternal = !rs.bVSyncInternal;
+	rs.ExtraSets.bVSyncInternal = !rs.ExtraSets.bVSyncInternal;
 	rs.Save();
+	if (m_pCAP) {
+		m_pCAP->SetExtraSettings(&rs.ExtraSets);
+	}
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bVSyncInternal ? ResStr(IDS_OSD_RS_INTERNAL_VSYNC_ON) : ResStr(IDS_OSD_RS_INTERNAL_VSYNC_OFF));
+						 rs.ExtraSets.bVSyncInternal ? ResStr(IDS_OSD_RS_INTERNAL_VSYNC_ON) : ResStr(IDS_OSD_RS_INTERNAL_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewD3DFullScreen()
@@ -7080,10 +7094,13 @@ void CMainFrame::OnUpdateViewResetDefault(CCmdUI* pCmdUI)
 void CMainFrame::OnViewEnableFrameTimeCorrection()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bEVRFrameTimeCorrection = !rs.bEVRFrameTimeCorrection;
+	rs.ExtraSets.bEVRFrameTimeCorrection = !rs.ExtraSets.bEVRFrameTimeCorrection;
 	rs.Save();
+	if (m_pCAP) {
+		m_pCAP->SetExtraSettings(&rs.ExtraSets);
+	}
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bEVRFrameTimeCorrection ? ResStr(IDS_OSD_RS_FT_CORRECTION_ON) : ResStr(IDS_OSD_RS_FT_CORRECTION_OFF));
+						 rs.ExtraSets.bEVRFrameTimeCorrection ? ResStr(IDS_OSD_RS_FT_CORRECTION_ON) : ResStr(IDS_OSD_RS_FT_CORRECTION_OFF));
 }
 
 void CMainFrame::OnViewVSyncOffsetIncrease()
@@ -7091,10 +7108,13 @@ void CMainFrame::OnViewVSyncOffsetIncrease()
 
 	if (m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		CRenderersSettings& rs = GetRenderersSettings();
-		CString strOSD;
-		rs.dTargetSyncOffset = rs.dTargetSyncOffset - 0.5; // Yeah, it should be a "-"
-		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
+		rs.ExtraSets.dTargetSyncOffset -= 0.5; // Yeah, it should be a "-"
 		rs.Save();
+		if (m_pCAP) {
+			m_pCAP->SetExtraSettings(&rs.ExtraSets);
+		}
+		CString strOSD;
+		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.ExtraSets.dTargetSyncOffset);
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 	}
 }
@@ -7103,10 +7123,13 @@ void CMainFrame::OnViewVSyncOffsetDecrease()
 {
 	if (m_clsidCAP == CLSID_SyncAllocatorPresenter) {
 		CRenderersSettings& rs = GetRenderersSettings();
-		CString strOSD;
-		rs.dTargetSyncOffset = rs.dTargetSyncOffset + 0.5;
-		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
+		rs.ExtraSets.dTargetSyncOffset += 0.5;
 		rs.Save();
+		if (m_pCAP) {
+			m_pCAP->SetExtraSettings(&rs.ExtraSets);
+		}
+		CString strOSD;
+		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.ExtraSets.dTargetSyncOffset);
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 	}
 }
@@ -13021,7 +13044,7 @@ void CMainFrame::OpenCustomizeGraph()
 	}
 
 	const CRenderersSettings& rs = s.m_VRSettings;
-	if (rs.iVideoRenderer == VIDRNDT_SYNC && rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
+	if (rs.iVideoRenderer == VIDRNDT_SYNC && rs.ExtraSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 		HRESULT hr;
 		m_pRefClock = DNew CSyncClockFilter(nullptr, &hr);
 		CStringW name;
@@ -16170,6 +16193,13 @@ void CMainFrame::ApplySubpicSettings()
 {
 	if (m_pCAP) {
 		m_pCAP->SetSubpicSettings(&GetRenderersSettings().SubpicSets);
+	}
+}
+
+void CMainFrame::ApplyExraRendererSettings()
+{
+	if (m_pCAP) {
+		m_pCAP->SetExtraSettings(&GetRenderersSettings().ExtraSets);
 	}
 }
 

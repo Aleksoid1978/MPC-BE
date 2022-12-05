@@ -34,6 +34,7 @@ namespace DSObjects
 		, ISubRender11Callback
 	{
 		CComPtr<IUnknown> m_pMPCVR;
+		bool m_bMPCVRFullscreenControl = false;
 
 	public:
 		CMPCVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString& _Error);
@@ -98,5 +99,6 @@ namespace DSObjects
 		STDMETHODIMP ClearPixelShaders(int target) override;
 		STDMETHODIMP AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode) override;
 		STDMETHODIMP_(bool) IsRendering() override;
+		STDMETHODIMP_(void) SetExtraSettings(ExtraRendererSettings* pExtraSets) override;
 	};
 }

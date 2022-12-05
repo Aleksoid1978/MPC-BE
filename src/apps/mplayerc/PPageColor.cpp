@@ -112,24 +112,24 @@ BOOL CPPageColor::OnInitDialog()
 
 	// Color managment
 	CorrectCWndWidth(&m_chkColorManagment);
-	m_chkColorManagment.SetCheck(rs.bColorManagementEnable);
+	m_chkColorManagment.SetCheck(rs.ExtraSets.bColorManagementEnable);
 
 	m_cbCMInputType.AddString(ResStr(IDS_CM_INPUT_AUTO));
 	m_cbCMInputType.AddString(L"HDTV");
 	m_cbCMInputType.AddString(L"SDTV NTSC");
 	m_cbCMInputType.AddString(L"SDTV PAL");
-	m_cbCMInputType.SetCurSel(rs.iColorManagementInput);
+	m_cbCMInputType.SetCurSel(rs.ExtraSets.iColorManagementInput);
 
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_BRIGHT));
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DIM));
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DARK));
-	m_cbCMAmbientLight.SetCurSel(rs.iColorManagementAmbientLight);
+	m_cbCMAmbientLight.SetCurSel(rs.ExtraSets.iColorManagementAmbientLight);
 
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_PERCEPTUAL));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_RELATIVECM));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_SATURATION));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_ABSOLUTECM));
-	m_cbCMRenderingIntent.SetCurSel(rs.iColorManagementIntent);
+	m_cbCMRenderingIntent.SetCurSel(rs.ExtraSets.iColorManagementIntent);
 
 	CorrectComboListWidth(m_cbCMInputType);
 	CorrectComboListWidth(m_cbCMAmbientLight);
@@ -145,7 +145,7 @@ BOOL CPPageColor::OnSetActive()
 	CRenderersSettings& rs = AfxGetAppSettings().m_VRSettings;
 
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CP
-			&& (rs.iSurfaceFormat == D3DFMT_A2R10G10B10 || rs.iSurfaceFormat == D3DFMT_A16B16G16R16F)) {
+			&& (rs.ExtraSets.iSurfaceFormat == D3DFMT_A2R10G10B10 || rs.ExtraSets.iSurfaceFormat == D3DFMT_A16B16G16R16F)) {
 		m_chkColorManagment.EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
 		UpdateColorManagment();
@@ -177,10 +177,12 @@ BOOL CPPageColor::OnApply()
 	s.iSaturation = m_iSaturation;
 
 	// Color managment
-	rs.bColorManagementEnable       = !!m_chkColorManagment.GetCheck();
-	rs.iColorManagementInput        = m_cbCMInputType.GetCurSel();
-	rs.iColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
-	rs.iColorManagementIntent       = m_cbCMRenderingIntent.GetCurSel();
+	rs.ExtraSets.bColorManagementEnable       = !!m_chkColorManagment.GetCheck();
+	rs.ExtraSets.iColorManagementInput        = m_cbCMInputType.GetCurSel();
+	rs.ExtraSets.iColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
+	rs.ExtraSets.iColorManagementIntent       = m_cbCMRenderingIntent.GetCurSel();
+
+	AfxGetMainFrame()->ApplyExraRendererSettings();
 
 	return __super::OnApply();
 }

@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "apps/mplayerc/resource.h"
-#include "RenderersSettings.h"
 #include "PixelShaderCompiler.h"
 
 HINSTANCE GetD3dcompilerDll()

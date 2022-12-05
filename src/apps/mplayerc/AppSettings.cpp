@@ -412,7 +412,7 @@ bool CAppSettings::ExclusiveFSAllowed() const
 	if (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP && (m_VRSettings.bExclusiveFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN))) {
 		return true;
 	}
-	if (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && m_VRSettings.bExclusiveFullscreen && m_VRSettings.bMPCVRFullscreenControl) {
+	if (m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && m_VRSettings.bExclusiveFullscreen && m_VRSettings.ExtraSets.bMPCVRFullscreenControl) {
 		return true;
 	}
 

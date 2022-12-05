@@ -20,9 +20,11 @@
 
 #pragma once
 
+#define DXVA2VP 1
+#define DXVAHDVP 1
+
 #include "AllocatorCommon.h"
 #include "PixelShaderCompiler.h"
-#include "RenderersSettings.h"
 #include <d3d9.h>
 #include <dxva2api.h>
 #if DXVAHDVP
@@ -75,13 +77,16 @@ namespace DSObjects
 		CComPtr<IDirect3DDevice9Ex>	m_pDevice9Ex;
 		CComPtr<IDirect3DDevice9Ex>	m_pDevice9ExRefresh;
 
+		ExtraRendererSettings m_ExtraSets;
+
 		bool m_bDeviceResetRequested = false;
 		bool m_bPendingResetDevice   = false;
+		bool m_bNeedResetDevice      = false;
 
 		D3DFORMAT					m_BackbufferFmt = D3DFMT_X8R8G8B8;
 		D3DFORMAT					m_DisplayFmt    = D3DFMT_X8R8G8B8;
 		CSize						m_ScreenSize;
-		unsigned					m_nSurfaces    = 1; // Total number of DX Surfaces
+		unsigned					m_nSurfaces    = 4; // Total number of DX Surfaces
 		UINT32						m_iCurSurface  = 0; // Surface currently displayed
 		DWORD						m_D3D9VendorId = 0;
 		bool						m_bFP16Support = true; // don't disable hardware features before initializing a renderer
@@ -124,9 +129,6 @@ namespace DSObjects
 		HRESULT AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
 		HRESULT InitCorrectionPass(const AM_MEDIA_TYPE& mt);
-
-	private:
-		friend class CDX9AllocatorPresenter;
 
 		D3DCAPS9					m_Caps = {};
 		LPCSTR						m_ShaderProfile = nullptr; // for shader compiler
@@ -206,7 +208,6 @@ namespace DSObjects
 		HRESULT ApplyResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int resizer, int y);
 	protected:
 		HRESULT Resize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
-	private:
 
 		// Final pass
 		HRESULT InitFinalPass();

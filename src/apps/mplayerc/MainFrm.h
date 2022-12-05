@@ -777,6 +777,7 @@ public:
 	bool GetBufferingProgress(int* Progress = nullptr);
 
 	void ApplySubpicSettings();
+	void ApplyExraRendererSettings();
 
 	// subtitle streams order function
 	bool LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream = nullptr);

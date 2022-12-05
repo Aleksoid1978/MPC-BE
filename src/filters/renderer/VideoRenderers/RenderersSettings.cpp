@@ -73,48 +73,17 @@ CRenderersSettings::CRenderersSettings()
 
 void CRenderersSettings::SetDefault()
 {
-	iVideoRenderer					= VIDRNDT_EVR_CP;
+	iVideoRenderer       = VIDRNDT_EVR_CP;
 
-	sD3DRenderDevice.Empty();
-	bResetDevice					= false;
+	bExclusiveFullscreen = false;
 
-	bExclusiveFullscreen			= false;
-	b10BitOutput					= false;
+	auto& tmp = ExtraSets.bMPCVRFullscreenControl;
 
-	iPresentMode					= 0;
-	iSurfaceFormat					= D3DFMT_X8R8G8B8;
-	iResizer						= RESIZER_SHADER_CATMULL;
-	iDownscaler						= DOWNSCALER_SIMPLE;
+	SubpicSets   = {};
+	Stereo3DSets = {};
+	ExtraSets    = {};
 
-	bVSync							= false;
-	bVSyncInternal					= false;
-	bEVRFrameTimeCorrection			= false;
-	bFlushGPUBeforeVSync			= false;
-	bFlushGPUAfterPresent			= false;
-	bFlushGPUWait					= false;
-
-	iEVROutputRange					= 0;
-	nEVRBuffers						= 5;
-
-	//bMPCVRFullscreenControl			= false;
-
-	iSynchronizeMode				= SYNCHRONIZE_NEAREST;
-	iLineDelta						= 0;
-	iColumnDelta					= 0;
-	dCycleDelta						= 0.0012;
-	dTargetSyncOffset				= 12.0;
-	dControlLimit					= 2.0;
-
-	bColorManagementEnable			= false;
-	iColorManagementInput			= VIDEO_SYSTEM_UNKNOWN;
-	iColorManagementAmbientLight	= AMBIENT_LIGHT_BRIGHT;
-	iColorManagementIntent			= COLOR_RENDERING_INTENT_PERCEPTUAL;
-
-	SubpicSets						= {};
-	Stereo3DSets					= {};
-
-	bTearingTest					= false;
-	iDisplayStats					= 0;
+	ExtraSets.bMPCVRFullscreenControl = tmp;
 }
 
 void CRenderersSettings::Load()
@@ -133,46 +102,46 @@ void CRenderersSettings::Load()
 		VIDRNDT_NULL_UNCOMP,
 		});
 
-	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
-
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
 
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
+	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, ExtraSets.sD3DRenderDevice);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, ExtraSets.bResetDevice);
+
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, ExtraSets.b10BitOutput);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, ExtraSets.iPresentMode);
 	int val;
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, val);
 	if (val == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
-		iSurfaceFormat = D3DFMT_A16B16G16R16F;
+		ExtraSets.iSurfaceFormat = D3DFMT_A16B16G16R16F;
 	} else {
-		iSurfaceFormat = discard((D3DFORMAT)val, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
+		ExtraSets.iSurfaceFormat = discard((D3DFORMAT)val, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
 	}
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_RESIZER, iResizer);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_RESIZER, ExtraSets.iResizer);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, ExtraSets.iDownscaler);
 
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, bVSyncInternal);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, bFlushGPUWait);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC, ExtraSets.bVSync);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, ExtraSets.bVSyncInternal);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, ExtraSets.bEVRFrameTimeCorrection);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, ExtraSets.bFlushGPUBeforeVSync);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, ExtraSets.bFlushGPUAfterPresent);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, ExtraSets.bFlushGPUWait);
 
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, ExtraSets.iEVROutputRange);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, ExtraSets.nEVRBuffers);
 
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, bMPCVRFullscreenControl);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
 
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
-	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, dCycleDelta);
-	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, dTargetSyncOffset);
-	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, dControlLimit);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, ExtraSets.iSynchronizeMode);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, ExtraSets.iLineDelta);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, ExtraSets.iColumnDelta);
+	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, ExtraSets.dCycleDelta);
+	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, ExtraSets.dTargetSyncOffset);
+	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, ExtraSets.dControlLimit);
 
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_COLMAN, bColorManagementEnable);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, iColorManagementInput);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, iColorManagementAmbientLight);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, iColorManagementIntent);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_COLMAN, ExtraSets.bColorManagementEnable);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, ExtraSets.iColorManagementInput);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, ExtraSets.iColorManagementAmbientLight);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, ExtraSets.iColorManagementIntent);
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, SubpicSets.nCount);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, SubpicSets.iMaxTexWidth);
@@ -188,41 +157,40 @@ void CRenderersSettings::Save()
 	CProfile& profile = AfxGetProfile();
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
-
-	profile.WriteString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
-
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
 
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, iSurfaceFormat);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_RESIZER, iResizer);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
+	profile.WriteString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, ExtraSets.sD3DRenderDevice);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, ExtraSets.bResetDevice);
 
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, bVSyncInternal);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, bFlushGPUWait);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, ExtraSets.b10BitOutput);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, ExtraSets.iPresentMode);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, ExtraSets.iSurfaceFormat);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_RESIZER, ExtraSets.iResizer);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, ExtraSets.iDownscaler);
 
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC, ExtraSets.bVSync);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, ExtraSets.bVSyncInternal);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, ExtraSets.bEVRFrameTimeCorrection);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, ExtraSets.bFlushGPUBeforeVSync);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, ExtraSets.bFlushGPUAfterPresent);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, ExtraSets.bFlushGPUWait);
 
-	//profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, bMPCVRFullscreenControl);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, ExtraSets.iEVROutputRange);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, ExtraSets.nEVRBuffers);
 
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
-	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, dCycleDelta);
-	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, dTargetSyncOffset);
-	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, dControlLimit);
+	//profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
 
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_COLMAN, bColorManagementEnable);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, iColorManagementInput);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, iColorManagementAmbientLight);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, iColorManagementIntent);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, ExtraSets.iSynchronizeMode);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, ExtraSets.iLineDelta);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, ExtraSets.iColumnDelta);
+	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, ExtraSets.dCycleDelta);
+	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, ExtraSets.dTargetSyncOffset);
+	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, ExtraSets.dControlLimit);
+
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_COLMAN, ExtraSets.bColorManagementEnable);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, ExtraSets.iColorManagementInput);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, ExtraSets.iColorManagementAmbientLight);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, ExtraSets.iColorManagementIntent);
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, SubpicSets.nCount);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, SubpicSets.iMaxTexWidth);

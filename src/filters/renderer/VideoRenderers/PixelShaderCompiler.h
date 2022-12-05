@@ -64,3 +64,5 @@ public:
 //
 
 HRESULT CreateShaderFromResource(IDirect3DDevice9* pD3DDev, IDirect3DPixelShader9** ppPixelShader, UINT resid);
+
+extern bool LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
