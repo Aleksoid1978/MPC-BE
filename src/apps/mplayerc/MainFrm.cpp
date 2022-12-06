@@ -13500,12 +13500,16 @@ void CMainFrame::OpenSetupAudioStream()
 	}
 
 	if (m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack != -1) {
-		SetAudioTrackIdx(m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack);
+		if (m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack != 0) {
+			SetAudioTrackIdx(m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack);
+		}
 		return;
 	}
 
 	if (m_nAudioTrackStored != -1) {
-		SetAudioTrackIdx(m_nAudioTrackStored);
+		if (m_nAudioTrackStored != 0) {
+			SetAudioTrackIdx(m_nAudioTrackStored);
+		}
 		return;
 	}
 
