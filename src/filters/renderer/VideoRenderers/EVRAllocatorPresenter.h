@@ -101,7 +101,10 @@ namespace DSObjects
 
 		std::deque<CComPtr<IMFSample>>		m_FreeSamples;
 		std::deque<CComPtr<IMFSample>>		m_ScheduledSamples;
-		IMFSample*							m_pCurrentDisplaydSample = nullptr;
+
+		LONGLONG m_CurrentSampleTime     = INVALID_TIME;
+		LONGLONG m_CurrentSampleDuration = INVALID_TIME;
+
 		bool								m_bWaitingSample         = false;
 		bool								m_bLastSampleOffsetValid = false;
 		LONGLONG							m_LastScheduledSampleTime = -1;

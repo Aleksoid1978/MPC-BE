@@ -1852,26 +1852,28 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 
 void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter)
 {
-	if (!m_pCurrentDisplaydSample || !m_OrderedPaint || !fAll) {
+	if (!m_OrderedPaint || !fAll) {
+		return;
+	}
+
+	LONGLONG nsSampleTime   = m_CurrentSampleTime;
+	LONGLONG SampleDuration = m_CurrentSampleDuration;
+	if (SampleDuration < 0) {
 		return;
 	}
 
 	LONGLONG llClockTime;
-	LONGLONG nsSampleTime;
-	LONGLONG SampleDuration = 0;
 	if (!m_bSignaledStarvation) {
 		llClockTime = GetClockTime(PerformanceCounter);
 		m_StarvationClock = llClockTime;
 	} else {
 		llClockTime = m_StarvationClock;
 	}
-	if (FAILED(m_pCurrentDisplaydSample->GetSampleDuration(&SampleDuration))) {
-		SampleDuration = 0;
-	}
 
-	if (FAILED(m_pCurrentDisplaydSample->GetSampleTime(&nsSampleTime))) {
+	if (nsSampleTime < 0) {
 		nsSampleTime = llClockTime;
 	}
+
 	LONGLONG TimePerFrame = m_rtTimePerFrame;
 	if (!TimePerFrame) {
 		return;
@@ -2000,17 +2002,18 @@ void CEVRAllocatorPresenter::RenderThread()
 					int nSamplesLeft = 0;
 					if (SUCCEEDED(GetScheduledSample(&pMFSample, nSamplesLeft))) {
 						//pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
-						m_pCurrentDisplaydSample = pMFSample;
 
-						bool bForcePaint2 = false;
+						LONGLONG SampleDuration = 0;
+
 						HRESULT hrGetSampleTime = pMFSample->GetSampleTime(&nsSampleTime);
-						if (hrGetSampleTime != S_OK || nsSampleTime == 0) {
-							bForcePaint2 = true; // The sample does not have a presentation time or first sample
+						pMFSample->GetSampleDuration(&SampleDuration); // We assume that all samples have the same duration
+						{
+							m_CurrentSampleTime = nsSampleTime;
+							m_CurrentSampleDuration = SampleDuration;
 						}
 
-						// We assume that all samples have the same duration
-						LONGLONG SampleDuration = 0;
-						pMFSample->GetSampleDuration(&SampleDuration);
+						// The sample does not have a presentation time or first sample
+						const bool bForcePaint2 = (hrGetSampleTime != S_OK || nsSampleTime == 0);
 
 						//TRACE_EVR("EVR: RenderThread ==>> Presenting surface %u  (%I64d)\n", m_iCurSurface, nsSampleTime);
 
@@ -2229,17 +2232,20 @@ void CEVRAllocatorPresenter::RenderThread()
 									}
 								}
 							}
-							} else if (m_nRenderState == Paused) {
-								if (bForcePaint) {
-									bStepForward = true;
-									// Ensure that the renderer is properly updated after seeking when paused
-									SubPicSetTime();
-									Paint(false);
-								}
-								NextSleepTime = int(SampleDuration / 10000 - 2);
+						} else if (m_nRenderState == Paused) {
+							if (bForcePaint) {
+								bStepForward = true;
+								// Ensure that the renderer is properly updated after seeking when paused
+								SubPicSetTime();
+								Paint(false);
 							}
+							NextSleepTime = int(SampleDuration / 10000 - 2);
+						}
 
-						m_pCurrentDisplaydSample = nullptr;
+						{
+							m_CurrentSampleTime = INVALID_TIME;
+							m_CurrentSampleDuration = INVALID_TIME;
+						}
 						if (bStepForward) {
 							MoveToFreeList(pMFSample, true);
 							CheckWaitingSampleFromMixer();
@@ -2545,7 +2551,8 @@ HRESULT CEVRAllocatorPresenter::GetScheduledSample(IMFSample** ppSample, int &_C
 
 	_Count = (int)m_ScheduledSamples.size();
 	if (_Count > 0) {
-		*ppSample = m_ScheduledSamples.front().Detach(); m_ScheduledSamples.pop_front();
+		*ppSample = m_ScheduledSamples.front().Detach();
+		m_ScheduledSamples.pop_front();
 		--_Count;
 	} else {
 		hr = MF_E_SAMPLEALLOCATOR_EMPTY;

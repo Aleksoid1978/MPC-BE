@@ -510,7 +510,6 @@ namespace GothSync
 
 		CInterfaceList<IMFSample, &IID_IMFSample> m_FreeSamples;
 		CInterfaceList<IMFSample, &IID_IMFSample> m_ScheduledSamples;
-		IMFSample *m_pCurrentDisplaydSample = nullptr;
 		UINT m_nResetToken = 0;
 		int  m_nStepCount  = 0;
 
