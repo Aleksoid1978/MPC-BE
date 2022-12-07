@@ -27,6 +27,7 @@ class CFLACFile : public CAudioFile
 	void* m_pDecoder = nullptr;
 
 	uint64_t m_offset = 0;
+	uint64_t m_curPos = 0;
 	uint64_t m_totalsamples = 0;
 
 	struct {

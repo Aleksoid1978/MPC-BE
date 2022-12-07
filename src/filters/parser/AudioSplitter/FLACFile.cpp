@@ -104,6 +104,8 @@ HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
+	m_offset = m_pFile->GetPos();
+
 	m_pFile->Seek(start_pos);
 
 	m_pDecoder = FLAC__stream_decoder_new();
@@ -141,15 +143,11 @@ HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
 		if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
 			return E_FAIL;
 		}
+
+		m_offset = metadataend;
 	}
 
-	if (!FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0)) {
-		return E_FAIL;
-	}
-
-	if (!FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &m_offset)) {
-		return E_FAIL;
-	}
+	m_curPos = m_offset;
 
 	return S_OK;
 }
@@ -158,11 +156,19 @@ REFERENCE_TIME CFLACFile::Seek(REFERENCE_TIME rt)
 {
 	if (rt <= 0) {
 		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0);
+		m_curPos = m_offset;
 		return 0;
 	}
 
 	if (m_rtduration) {
-		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, FLAC__uint64((1.0 * rt * m_totalsamples) / m_rtduration));
+		auto sample = static_cast<FLAC__uint64>(llMulDiv(rt, m_totalsamples, m_rtduration, 0));
+		if (sample > 0) {
+			sample--;
+		}
+		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, sample);
+
+		FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &m_curPos);
+		FLAC__stream_decoder_skip_single_frame(FLAC_DECODER);
 	}
 
 	return rt;
@@ -170,20 +176,18 @@ REFERENCE_TIME CFLACFile::Seek(REFERENCE_TIME rt)
 
 int CFLACFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
-	FLAC__uint64 curpos;
 	FLAC__uint64 nextpos;
+	if (!FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &nextpos)) {
+		return 0;
+	}
 
-	FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &curpos);
-	FLAC__stream_decoder_skip_single_frame(FLAC_DECODER);
-	FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &nextpos);
-
-	if (nextpos <= curpos) {
+	if (nextpos <= m_curPos) {
 		return 0;
 	}
 
 	auto pos = m_pFile->GetPos();
-	const auto size = nextpos - curpos;
-	m_pFile->Seek(curpos);
+	const auto size = nextpos - m_curPos;
+	m_pFile->Seek(m_curPos);
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
@@ -199,6 +203,9 @@ int CFLACFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	packet->rtStop = rtStart + nAvgTimePerFrame;
 
 	m_pFile->Seek(pos);
+
+	FLAC__stream_decoder_skip_single_frame(FLAC_DECODER);
+	m_curPos = nextpos;
 
 	return size;
 }
