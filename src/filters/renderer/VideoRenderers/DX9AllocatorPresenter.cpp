@@ -1717,14 +1717,16 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetExtraSettings(ExtraRendererSettin
 	if (pExtraSets) {
 		CAutoLock cRenderLock(&m_RenderLock);
 
-		if ((!m_bIsFullscreen && pExtraSets->bVSync != m_ExtraSets.bVSync)
+		if (m_pDevice9Ex) {
+			if ((!m_bIsFullscreen && pExtraSets->bVSync != m_ExtraSets.bVSync)
 				|| (!m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode)
 				|| pExtraSets->b10BitOutput != m_ExtraSets.b10BitOutput
 				|| pExtraSets->iSurfaceFormat != m_ExtraSets.iSurfaceFormat) {
-			m_bNeedResetDevice = true;
-		}
+				m_bNeedResetDevice = true;
+			}
 
-		m_bNeedCreateWindow = (!m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode);
+			m_bNeedCreateWindow = (!m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode);
+		}
 
 		m_ExtraSets = *pExtraSets;
 		m_nSurfaces = std::clamp(m_ExtraSets.nEVRBuffers, 4, MAX_VIDEO_SURFACES);

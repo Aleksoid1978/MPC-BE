@@ -1525,8 +1525,10 @@ STDMETHODIMP_(void) CBaseAP::SetExtraSettings(ExtraRendererSettings* pExtraSets)
 	if (pExtraSets) {
 		CAutoLock cRenderLock(&m_allocatorLock);
 
-		if (pExtraSets->b10BitOutput != m_ExtraSets.b10BitOutput || pExtraSets->iSurfaceFormat != m_ExtraSets.iSurfaceFormat) {
-			m_bNeedResetDevice = true;
+		if (m_pDevice9Ex) {
+			if (pExtraSets->b10BitOutput != m_ExtraSets.b10BitOutput || pExtraSets->iSurfaceFormat != m_ExtraSets.iSurfaceFormat) {
+				m_bNeedResetDevice = true;
+			}
 		}
 
 		m_ExtraSets = *pExtraSets;
