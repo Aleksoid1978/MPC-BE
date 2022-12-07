@@ -1729,7 +1729,7 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetExtraSettings(ExtraRendererSettin
 		}
 
 		m_ExtraSets = *pExtraSets;
-		m_nSurfaces = std::clamp(m_ExtraSets.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
+		m_nSurfaces = std::clamp(m_ExtraSets.nEVRBuffers, 2, MAX_VIDEO_SURFACES);
 	}
 }
 

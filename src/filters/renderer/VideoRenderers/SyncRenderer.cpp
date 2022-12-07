@@ -1532,7 +1532,7 @@ STDMETHODIMP_(void) CBaseAP::SetExtraSettings(ExtraRendererSettings* pExtraSets)
 		}
 
 		m_ExtraSets = *pExtraSets;
-		m_nSurfaces = std::clamp(m_ExtraSets.nEVRBuffers, 4, MAX_PICTURE_SLOTS - 2);
+		m_nSurfaces = std::clamp(m_ExtraSets.nEVRBuffers, 2, MAX_PICTURE_SLOTS - 2);
 	}
 }
 
