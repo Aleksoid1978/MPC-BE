@@ -487,7 +487,15 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 			*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();
 			pUnks.AddTail(pCAP);
 
-			if (m_clsid == CLSID_madVRAllocatorPresenter) {
+			if (m_clsid == CLSID_EVRAllocatorPresenter || m_clsid == CLSID_SyncAllocatorPresenter) {
+				if (!m_bIsPreview) {
+					if (CComQIPtr<IEVRFilterConfig> pConfig = *ppBF) {
+						// 3 video streams are required to play DVD-Video with some decoders
+						VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
+					}
+				}
+			}
+			else if (m_clsid == CLSID_madVRAllocatorPresenter) {
 				if (CComQIPtr<IMadVRSubclassReplacement> pMVRSR = *ppBF) {
 					VERIFY(SUCCEEDED(pMVRSR->DisableSubclassing()));
 				}
@@ -496,12 +504,10 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 					VERIFY(SUCCEEDED(pVW->put_Owner((OAHWND)m_hWnd)));
 				}
 			}
-
-			if (m_clsid == CLSID_MPCVRAllocatorPresenter) {
+			else if (m_clsid == CLSID_MPCVRAllocatorPresenter) {
 				if (CComQIPtr<ID3DFullscreenControl> pD3DFS = *ppBF) {
 					pD3DFS->SetD3DFullscreen(bFullscreen);
 				}
-
 				// MPC VR supports calling IVideoWindow::put_Owner before the pins are connected
 				if (CComQIPtr<IVideoWindow> pVW = *ppBF) {
 					VERIFY(SUCCEEDED(pVW->put_Owner((OAHWND)m_hWnd)));

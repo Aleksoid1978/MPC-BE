@@ -291,12 +291,6 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		CComQIPtr<IMFGetService>	pMFGS(pBF);
 		CComQIPtr<IEVRFilterConfig>	pConfig(pBF);
 
-		// 3 video streams are required to play DVD-Video with some decoders
-		if (FAILED(pConfig->SetNumberOfStreams(3))) {
-			DLog(L"IEVRFilterConfig->SetNumberOfStreams(3) fail");
-			break;
-		}
-
 		hr = pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVR));
 		if (SUCCEEDED(hr)) {
 			hr = QueryInterface(IID_PPV_ARGS(&pVP));
