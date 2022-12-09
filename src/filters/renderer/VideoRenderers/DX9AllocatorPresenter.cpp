@@ -811,12 +811,12 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString& _Error, const CSize& desk
 
 	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, desktopSize);
 
-	if (m_pAllocator) {
-		m_pAllocator->ChangeDevice(m_pDevice9Ex);
+	if (m_pSubPicAllocator) {
+		m_pSubPicAllocator->ChangeDevice(m_pDevice9Ex);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
+		m_pSubPicAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
 	}
-	if (!m_pAllocator) {
+	if (!m_pSubPicAllocator) {
 		_Error += L"CDX9SubPicAllocator failed\n";
 		return E_FAIL;
 	}
@@ -825,8 +825,8 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString& _Error, const CSize& desk
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
 		m_pSubPicQueue = m_SubpicSets.nCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pSubPicAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pSubPicAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}
@@ -1888,8 +1888,8 @@ void CDX9AllocatorPresenter::DrawStats()
 			strText.AppendFormat(L"\nJitter       : Min = %+8.3f ms, Max = %+8.3f ms, StdDev = %7.3f ms", (double(llMinJitter)/10000.0), (double(llMaxJitter)/10000.0), m_fJitterStdDev/10000.0);
 		}
 
-		if (m_pAllocator && m_pSubPicProvider && iDetailedStats > 1) {
-			CDX9SubPicAllocator *pAlloc = (CDX9SubPicAllocator *)m_pAllocator.p;
+		if (m_pSubPicAllocator && m_pSubPicProvider && iDetailedStats > 1) {
+			CDX9SubPicAllocator *pAlloc = (CDX9SubPicAllocator *)m_pSubPicAllocator.p;
 			int nFree = 0;
 			int nAlloc = 0;
 			int nSubPic = 0;

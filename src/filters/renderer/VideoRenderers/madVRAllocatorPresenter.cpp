@@ -48,7 +48,7 @@ CmadVRAllocatorPresenter::~CmadVRAllocatorPresenter()
 {
 	// the order is important here
 	m_pSubPicQueue.Release();
-	m_pAllocator.Release();
+	m_pSubPicAllocator.Release();
 	m_pMVR.Release();
 }
 
@@ -72,7 +72,7 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	if (!pD3DDev) {
 		// release all resources
 		m_pSubPicQueue.Release();
-		m_pAllocator.Release();
+		m_pSubPicAllocator.Release();
 		return S_OK;
 	}
 
@@ -83,11 +83,11 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	}
 	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, screenSize);
 
-	if (m_pAllocator) {
-		m_pAllocator->ChangeDevice(pD3DDev);
+	if (m_pSubPicAllocator) {
+		m_pSubPicAllocator->ChangeDevice(pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
-		if (!m_pAllocator) {
+		m_pSubPicAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
+		if (!m_pSubPicAllocator) {
 			return E_FAIL;
 		}
 	}
@@ -96,8 +96,8 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
 		m_pSubPicQueue = m_SubpicSets.nCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pSubPicAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pSubPicAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}

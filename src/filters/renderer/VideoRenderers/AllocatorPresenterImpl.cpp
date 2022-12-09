@@ -168,9 +168,9 @@ STDMETHODIMP_(void) CAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 	m_videoRect = v;
 
 	if (bWindowSizeChanged || bVideoRectChanged) {
-		if (m_pAllocator) {
-			m_pAllocator->SetCurSize(m_windowRect.Size());
-			m_pAllocator->SetCurVidRect(m_videoRect);
+		if (m_pSubPicAllocator) {
+			m_pSubPicAllocator->SetCurSize(m_windowRect.Size());
+			m_pSubPicAllocator->SetCurVidRect(m_videoRect);
 		}
 
 		if (m_pSubPicQueue) {
@@ -216,11 +216,11 @@ STDMETHODIMP_(void) CAllocatorPresenterImpl::SetSubPicProvider(ISubPicProvider* 
 
 	// Reset the default state to be sure text subtitles will be displayed right.
 	// Subtitles with specific requirements will adapt those values later.
-	if (m_pAllocator) {
-		m_pAllocator->SetMaxTextureSize(m_maxSubtitleTextureSize);
-		m_pAllocator->SetCurSize(m_windowRect.Size());
-		m_pAllocator->SetCurVidRect(m_videoRect);
-		m_pAllocator->Reset();
+	if (m_pSubPicAllocator) {
+		m_pSubPicAllocator->SetMaxTextureSize(m_maxSubtitleTextureSize);
+		m_pSubPicAllocator->SetCurSize(m_windowRect.Size());
+		m_pSubPicAllocator->SetCurVidRect(m_videoRect);
+		m_pSubPicAllocator->Reset();
 	}
 
 	if (m_pSubPicQueue) {
@@ -448,7 +448,7 @@ STDMETHODIMP CAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitleRender
 		hr = pSubConsumer->Connect(subtitleRenderer);
 	} else {
 		CComPtr<ISubPicProvider> pSubPicProvider = (ISubPicProvider*)DNew CXySubPicProvider(subtitleRenderer);
-		CComPtr<ISubPicQueue> pSubPicQueue = (ISubPicQueue*)DNew CXySubPicQueueNoThread(m_pAllocator, &hr);
+		CComPtr<ISubPicQueue> pSubPicQueue = (ISubPicQueue*)DNew CXySubPicQueueNoThread(m_pSubPicAllocator, &hr);
 
 		if (SUCCEEDED(hr)) {
 			CAutoLock cAutoLock(this);
@@ -456,7 +456,7 @@ STDMETHODIMP CAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitleRender
 			m_pSubPicProvider = pSubPicProvider;
 			m_pSubPicQueue = pSubPicQueue;
 
-			m_pAllocator->SetInverseAlpha(true);
+			m_pSubPicAllocator->SetInverseAlpha(true);
 		}
 	}
 

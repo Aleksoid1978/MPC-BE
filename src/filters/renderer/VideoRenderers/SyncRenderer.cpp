@@ -410,11 +410,11 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 
 	InitMaxSubtitleTextureSize(m_SubpicSets.iMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
 
-	if (m_pAllocator) {
-		m_pAllocator->ChangeDevice(m_pDevice9Ex);
+	if (m_pSubPicAllocator) {
+		m_pSubPicAllocator->ChangeDevice(m_pDevice9Ex);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
-		if (!m_pAllocator) {
+		m_pSubPicAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
+		if (!m_pSubPicAllocator) {
 			_Error += L"CDX9SubPicAllocator failed\n";
 			return E_FAIL;
 		}
@@ -429,8 +429,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
 		m_pSubPicQueue = m_SubpicSets.nCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pAllocator, &hr);
+						 ? (ISubPicQueue*)DNew CSubPicQueue(m_SubpicSets.nCount, !m_SubpicSets.bAnimationWhenBuffering, m_SubpicSets.bAllowDrop, m_pSubPicAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_SubpicSets.bAnimationWhenBuffering, m_pSubPicAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}

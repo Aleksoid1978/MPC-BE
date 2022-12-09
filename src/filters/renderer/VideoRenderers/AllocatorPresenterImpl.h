@@ -54,7 +54,7 @@ protected:
 	CMediaType m_inputMediaType;
 
 	CComPtr<ISubPicProvider> m_pSubPicProvider;
-	CComPtr<ISubPicAllocator> m_pAllocator;
+	CComPtr<ISubPicAllocator> m_pSubPicAllocator;
 	CComPtr<ISubPicQueue> m_pSubPicQueue;
 
 	void InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize);
