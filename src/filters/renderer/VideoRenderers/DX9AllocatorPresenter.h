@@ -59,7 +59,7 @@ namespace DSObjects
 		HWND	m_hWndVR = nullptr;
 		bool	m_bNeedCreateWindow = true;
 
-		bool	m_bEnableSubPicAllocator = true;
+		bool	m_bEnableSubPic = true;
 
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
