@@ -309,6 +309,8 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	} while (0);
 
+	DwmEnableMMCSS(TRUE);
+
 	return hr;
 }
 

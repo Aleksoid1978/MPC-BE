@@ -84,8 +84,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	DwmEnableMMCSS(TRUE);
-
 	WNDCLASSEXW wc = {};
 	wc.cbSize = sizeof(wc);
 	wc.lpfnWndProc = ::DefWindowProcW;
