@@ -83,20 +83,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		_Error += L"Failed to create Direct3D 9Ex\n";
 		return;
 	}
-
-	WNDCLASSEXW wc = {};
-	wc.cbSize = sizeof(wc);
-	wc.lpfnWndProc = ::DefWindowProcW;
-	wc.hInstance = AfxGetApp()->m_hInstance;
-	wc.lpszClassName = g_szClassName;
-	if (!RegisterClassExW(&wc)) {
-		DWORD dwError = GetLastError();
-		hr = HRESULT_FROM_WIN32(dwError);
-		_Error.AppendFormat(L"Failed to RegisterClass (%s)\n", HR2Str(hr));
-		DLog(L"Registering '%s' class failed (%s)!", g_szClassName, HR2Str(hr));
-		return;
-	}
-	DLog(L"Registering '%s' class completed successfully.", g_szClassName);
 }
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
@@ -140,6 +126,25 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 
 	ret = UnregisterClassW(g_szClassName, AfxGetApp()->m_hInstance);
 	DLog(L"Unregistering '%s' class %s.", g_szClassName, ret ? L"completed successfully" : L"failed");
+}
+
+HRESULT CDX9AllocatorPresenter::RegisterWindowClass()
+{
+	WNDCLASSEXW wc = {};
+	wc.cbSize = sizeof(wc);
+	wc.lpfnWndProc = ::DefWindowProcW;
+	wc.hInstance = AfxGetApp()->m_hInstance;
+	wc.lpszClassName = g_szClassName;
+
+	if (!RegisterClassExW(&wc)) {
+		DWORD dwError = GetLastError();
+		HRESULT hr = HRESULT_FROM_WIN32(dwError);
+		DLog(L"Registering '%s' class failed (%s)!", g_szClassName, HR2Str(hr));
+		return hr;
+	}
+
+	DLog(L"Registering '%s' class completed successfully.", g_szClassName);
+	return S_OK;
 }
 
 #if 0

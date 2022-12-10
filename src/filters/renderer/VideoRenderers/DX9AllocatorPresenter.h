@@ -232,10 +232,12 @@ namespace DSObjects
 
 		bool                       m_bDisplayChanged = false;
 
-	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CDX9AllocatorPresenter();
 
+		HRESULT RegisterWindowClass();
+
+	public:
 		// IAllocatorPresenter
 		STDMETHODIMP DisableSubPicInitialization() override;
 		STDMETHODIMP_(bool) Paint(bool fAll) override;

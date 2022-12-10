@@ -250,6 +250,9 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	HRESULT hr = E_FAIL;
 	CStringW _Error;
 
+	hr = RegisterWindowClass();
+	ASSERT(SUCCEEDED(hr));
+
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
 	if (FAILED(hr)) {
