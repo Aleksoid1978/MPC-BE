@@ -90,7 +90,7 @@ void CAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidth, con
 
 HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels/* = 0*/)
 {
-	if (m_pSubPicProvider) {
+	if (m_pSubPicQueue) {
 		CComPtr<ISubPic> pSubPic;
 		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
 

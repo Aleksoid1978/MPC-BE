@@ -155,6 +155,8 @@ struct ExtraRendererSettings {
 interface __declspec(uuid("AD863F43-83F9-4B8E-962C-426F2BDBEAEF"))
 IAllocatorPresenter :
 public IUnknown {
+	STDMETHOD(DisableSubPicInitialization) () PURE;
+
 	STDMETHOD (CreateRenderer) (IUnknown** ppRenderer) PURE;
 
 	STDMETHOD_(CLSID, GetAPCLSID) () PURE;

@@ -477,7 +477,13 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		*ppBF = pBF.Detach();
 	}
 	else if (pCAP) {
-		if (!m_bIsPreview) {
+		if (m_bIsPreview) {
+			pCAP->DisableSubPicInitialization();
+			ExtraRendererSettings ExtraSets;
+			ExtraSets.nEVRBuffers = 2;
+			pCAP->SetExtraSettings(&ExtraSets);
+		}
+		else {
 			pCAP->SetSubpicSettings(&GetRenderersSettings().SubpicSets);
 			pCAP->SetExtraSettings(&GetRenderersSettings().ExtraSets);
 		}

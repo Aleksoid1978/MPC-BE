@@ -59,6 +59,8 @@ namespace DSObjects
 		HWND	m_hWndVR = nullptr;
 		bool	m_bNeedCreateWindow = true;
 
+		bool	m_bEnableSubPicAllocator = true;
+
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
 
@@ -235,6 +237,7 @@ namespace DSObjects
 		~CDX9AllocatorPresenter();
 
 		// IAllocatorPresenter
+		STDMETHODIMP DisableSubPicInitialization() override;
 		STDMETHODIMP_(bool) Paint(bool fAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP GetDisplayedImage(LPVOID* dibImage) override;

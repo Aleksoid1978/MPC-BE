@@ -694,9 +694,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	// Initialize the rendering engine
 	InitRenderingEngine();
 
-	hr = InitializeISR(_Error, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
-	if (FAILED(hr)) {
-		return hr;
+	if (m_bEnableSubPicAllocator) {
+		hr = InitializeISR(_Error, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
+		if (FAILED(hr)) {
+			return hr;
+		}
 	}
 
 	m_LastAdapterCheck = GetPerfCounter();
@@ -794,7 +796,7 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 		hr = m_pDevice9Ex->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
 	}
 
-	if (SUCCEEDED(hr)) {
+	if (SUCCEEDED(hr) && m_bEnableSubPicAllocator) {
 		CString _Error;
 		hr = InitializeISR(_Error, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
 	}
@@ -1221,6 +1223,17 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, HANDLE& lockOwner)
 		WaitForVBlankRange(WaitFor, 0, false, true, true, lockOwner);
 		return false;
 	}
+}
+
+STDMETHODIMP CDX9AllocatorPresenter::DisableSubPicInitialization()
+{
+	if (m_pDevice9Ex) {
+		// must be called before calling CreateRenderer
+		return E_ILLEGAL_METHOD_CALL;
+	}
+
+	m_bEnableSubPicAllocator = false;
+	return S_OK;
 }
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)

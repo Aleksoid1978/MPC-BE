@@ -53,9 +53,9 @@ protected:
 
 	CMediaType m_inputMediaType;
 
-	CComPtr<ISubPicProvider> m_pSubPicProvider;
+	CComPtr<ISubPicProvider>  m_pSubPicProvider;
 	CComPtr<ISubPicAllocator> m_pSubPicAllocator;
-	CComPtr<ISubPicQueue> m_pSubPicQueue;
+	CComPtr<ISubPicQueue>     m_pSubPicQueue;
 
 	void InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize);
 	HRESULT AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
@@ -69,6 +69,7 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// IAllocatorPresenter
+	STDMETHODIMP DisableSubPicInitialization() { return E_NOTIMPL; }
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) { return E_NOTIMPL; }
 	STDMETHODIMP_(CLSID) GetAPCLSID() { return GUID_NULL; }
 	STDMETHODIMP_(SIZE) GetVideoSize();
