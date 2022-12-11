@@ -302,7 +302,9 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 			hr = pMFVR->InitializeRenderer(nullptr, pVP);
 		}
 
-		m_fUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
+		if (m_bEnableSubPic) {
+			m_fUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
+		}
 
 		if (FAILED(hr)) {
 			*ppRenderer = nullptr;

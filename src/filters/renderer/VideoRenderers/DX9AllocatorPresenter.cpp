@@ -1236,6 +1236,7 @@ STDMETHODIMP CDX9AllocatorPresenter::DisableSubPicInitialization()
 	}
 
 	m_bEnableSubPic = false;
+
 	return S_OK;
 }
 

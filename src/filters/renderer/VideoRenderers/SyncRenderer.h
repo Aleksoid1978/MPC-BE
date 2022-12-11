@@ -133,6 +133,8 @@ namespace GothSync
 		CComPtr<IDirect3D9Ex>		m_pD3D9Ex;
 		CComPtr<IDirect3DDevice9Ex>	m_pDevice9Ex;
 
+		bool m_bEnableSubPic = true;
+
 		ExtraRendererSettings m_ExtraSets;
 
 		bool m_bDeviceResetRequested = false;
@@ -304,6 +306,7 @@ namespace GothSync
 		~CBaseAP();
 
 		// IAllocatorPresenter
+		STDMETHODIMP DisableSubPicInitialization() override;
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP SetRotation(int rotation) override;

@@ -512,6 +512,18 @@ void CBaseAP::DeleteSurfaces()
 
 // IAllocatorPresenter
 
+STDMETHODIMP CBaseAP::DisableSubPicInitialization()
+{
+	if (m_pDevice9Ex) {
+		// must be called before calling CreateRenderer
+		return E_ILLEGAL_METHOD_CALL;
+	}
+
+	m_bEnableSubPic = false;
+
+	return S_OK;
+}
+
 STDMETHODIMP_(SIZE) CBaseAP::GetVideoSize()
 {
 	SIZE size = __super::GetVideoSize();
@@ -2253,7 +2265,9 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 			hr = pMFVR->InitializeRenderer(nullptr, pVP);
 		}
 
-		m_bUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
+		if (m_bEnableSubPic) {
+			m_bUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
+		}
 
 		if (FAILED(hr)) {
 			*ppRenderer = nullptr;
