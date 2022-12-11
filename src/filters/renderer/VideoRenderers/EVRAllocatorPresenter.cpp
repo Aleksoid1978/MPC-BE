@@ -250,8 +250,10 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	HRESULT hr = E_FAIL;
 	CStringW _Error;
 
-	hr = RegisterWindowClass();
-	ASSERT(SUCCEEDED(hr));
+	if (!m_bPreviewMode) {
+		hr = RegisterWindowClass();
+		ASSERT(SUCCEEDED(hr));
+	}
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
@@ -1201,7 +1203,7 @@ STDMETHODIMP CEVRAllocatorPresenter::SetVideoWindow(HWND hwndVideo)
 	if (m_hWnd != hwndVideo) {
 		m_hWnd = hwndVideo;
 		m_bPendingResetDevice = true;
-		m_bNeedCreateWindow = true;
+		m_bNeedCreateWindow = !m_bPreviewMode;
 		SendResetRequest();
 	}
 	return S_OK;

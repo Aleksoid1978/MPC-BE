@@ -60,6 +60,7 @@ namespace DSObjects
 		bool	m_bNeedCreateWindow = true;
 
 		bool	m_bEnableSubPic = true;
+		bool	m_bPreviewMode = false;
 
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
@@ -240,6 +241,7 @@ namespace DSObjects
 	public:
 		// IAllocatorPresenter
 		STDMETHODIMP DisableSubPicInitialization() override;
+		STDMETHODIMP EnablePreviewModeInitialization() override;
 		STDMETHODIMP_(bool) Paint(bool fAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP GetDisplayedImage(LPVOID* dibImage) override;

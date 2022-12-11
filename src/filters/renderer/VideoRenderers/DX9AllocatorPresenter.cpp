@@ -619,7 +619,12 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	} else {
 		m_d3dpp.Windowed = TRUE;
 		m_d3dpp.hDeviceWindow = m_hWndVR ? m_hWndVR : m_hWnd;
-		m_d3dpp.SwapEffect = m_ExtraSets.iPresentMode == 0 ? D3DSWAPEFFECT_COPY : (SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP);
+		if (m_ExtraSets.iPresentMode == 0 || m_bPreviewMode) {
+			m_d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
+		}
+		else {
+			m_d3dpp.SwapEffect = SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP;
+		}
 		m_d3dpp.BackBufferCount = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? 1 : 3;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 		// Desktop composition takes care of the VSYNC
@@ -1240,6 +1245,19 @@ STDMETHODIMP CDX9AllocatorPresenter::DisableSubPicInitialization()
 	return S_OK;
 }
 
+STDMETHODIMP CDX9AllocatorPresenter::EnablePreviewModeInitialization()
+{
+	if (m_pDevice9Ex) {
+		// must be called before calling CreateRenderer
+		return E_ILLEGAL_METHOD_CALL;
+	}
+
+	m_bPreviewMode = true;
+	m_bNeedCreateWindow = false;
+
+	return S_OK;
+}
+
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 {
 	if (m_bPendingResetDevice) {
@@ -1272,7 +1290,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
-	const bool bStereo3DTransform = (m_Stereo3DSets.iTransform != STEREO3D_AsIs);
+	const bool bStereo3DTransform = (m_Stereo3DSets.iTransform != STEREO3D_AsIs && !m_bPreviewMode);
 
 	m_pDevice9Ex->BeginScene();
 
@@ -1743,7 +1761,7 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetExtraSettings(ExtraRendererSettin
 				m_bNeedResetDevice = true;
 			}
 
-			m_bNeedCreateWindow = (!m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode);
+			m_bNeedCreateWindow = (!m_bPreviewMode && !m_bIsFullscreen && pExtraSets->iPresentMode != m_ExtraSets.iPresentMode);
 		}
 
 		m_ExtraSets = *pExtraSets;

@@ -70,6 +70,7 @@ public:
 
 	// IAllocatorPresenter
 	STDMETHODIMP DisableSubPicInitialization() { return E_NOTIMPL; }
+	STDMETHODIMP EnablePreviewModeInitialization() { return E_NOTIMPL; }
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) { return E_NOTIMPL; }
 	STDMETHODIMP_(CLSID) GetAPCLSID() { return GUID_NULL; }
 	STDMETHODIMP_(SIZE) GetVideoSize();

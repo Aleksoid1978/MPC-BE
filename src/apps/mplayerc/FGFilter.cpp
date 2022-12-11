@@ -479,6 +479,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 	else if (pCAP) {
 		if (m_bIsPreview) {
 			pCAP->DisableSubPicInitialization();
+			pCAP->EnablePreviewModeInitialization();
 			ExtraRendererSettings ExtraSets;
 			ExtraSets.nEVRBuffers = 2;
 			pCAP->SetExtraSettings(&ExtraSets);
