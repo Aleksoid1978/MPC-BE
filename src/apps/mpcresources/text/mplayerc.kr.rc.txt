@@ -3,12 +3,13 @@
 7		"MPC-BE"
 8		"Copyright © 2002-2022 'Authors.txt' 파일 참조"
 10		"버젼 :"
-11		"MPC-BE 컴파일러 :"
-12		"FFmpeg 컴파일러 :"
-13		"Libavcodec / Libavutil :"
-23		"이 프로그램은 프리웨어이며 GNU GPL 라이센스로 릴리즈됩니다."
-24		"한글화 : XNeo (xneokr@naver.com)\n　　　　Hack茶ん (https://blog.naver.com/jhacker)"
-25		"확인"
+11		"SVN Build :"
+12		"MPC-BE 컴파일러 :"
+13		"FFmpeg 컴파일러 :"
+14		"Libavcodec / Libavutil :"
+21		"이 프로그램은 프리웨어이며 GNU GPL 라이센스로 릴리즈됩니다."
+23		"한글화 : XNeo (xneokr@naver.com)\n　　　 Hack茶ん (https://blog.naver.com/jhacker)"
+23		"확인"
 END
 
 BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
@@ -26,11 +27,11 @@ BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
 END
 
 BEGIN DIALOGEX IDD_AUTH_DLG LINES 15
-3		"인증 필요"
+3		"인증이 필요함"
 6		"확인"
 7		"취소"
 9		"제한 구역"
-10		"사용자 이름:"
+10		"사용자명 :"
 11		"암호 :"
 14		"암호 기억"
 END
@@ -50,8 +51,8 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 END
 
 BEGIN DIALOGEX IDD_CMD_LINE_HELP LINES 9
-3		"명령입력 스위치 옵션"
-8		"OK"
+3		"명령 입력 스위치 옵션"
+8		"확인"
 END
 
 BEGIN DIALOGEX IDD_FAVADD LINES 12
@@ -66,15 +67,15 @@ END
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"즐겨찾기 편집"
 8		"편집"
-9		"위로"
-10		"아래로"
+9		"위로 이동"
+10		"아래로 이동"
 11		"삭제"
 12		"확인"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
-8		"클립 :"
-10		"만든이 :"
+8		"제목 :"
+10		"작성자 :"
 12		"앨범 :"
 14		"저작권 :"
 16		"등급 :"
@@ -83,11 +84,11 @@ BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 END
 
 BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20
-8		"형식 :"
+8		"파일 형식 :"
 10		"크기 :"
 12		"미디어 길이 :"
 14		"비디오 크기 :"
-16		"제작 :"
+16		"작성일 :"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPRES LINES 10
@@ -95,19 +96,19 @@ BEGIN DIALOGEX IDD_FILEPROPRES LINES 10
 END
 
 BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
-3		"이동..."
+3		"지정된 위치로 이동..."
 6		"특정 시간으로 이동하기 위해서는 [hh:]mm:ss.ms 형식으로 타임 코드를 설정하세요.명시적으로 구분기호를 넣을 필요는 없습니다."
-7		"시간:"
+7		"시간 :"
 9		"이동"
-10		"프레임이나 프레임률을 입력하면 특정 프레임으로 이동, 재생할수 있습니다.\n예)12345, 20.25 -> 12345프레임 20.25fps"
-11		"프레임:"
+10		"프레임이나 프레임률을 입력하면 특정 프레임으로 이동, 재생할수 있습니다.\n예) 12345, 20.25 → 12345프레임 20.25fps"
+11		"프레임 :"
 13		"이동"
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"기록 (실험적)"
 6		"메뉴"
-8		"선택 삭제"
+8		"선택 항목 삭제"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
@@ -138,7 +139,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 13		"찾아보기..."
 14		"확인"
 15		"취소"
-16		"열지않고 재생목록에만 추가"
+16		"열지 않고 재생목록에만 추가"
 17		"클립보드에서 URL 붙여넣기"
 END
 
@@ -150,7 +151,7 @@ BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
-3		"확대/축소"
+3		"팬 & 스캔 프리셋"
 12		"새로 만들기"
 13		"삭제"
 14		"위로"
@@ -166,9 +167,9 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 5		"필터 :"
 9		"WinLIRC :"
 12		"uICE :"
-14		"멀티미디어 기능키"
+14		"멀티미디어키"
 15		"모두 선택"
-16		"선택 초기화"
+16		"선택 항목 초기화"
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
@@ -192,13 +193,13 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 15		"디지털 설정 (BDA)"
 16		"네트워크 공급자"
 17		"튜너"
-18		"리시버"
+18		"수신기"
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"색 제어 (EVR, madVR 및 MPC VR용)"
-6		"밝기"
-7		"대조"
+6		"명도"
+7		"대비"
 8		"색조"
 9		"채도"
 18		"초기화"
@@ -211,7 +212,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"DVD 드라이브의 위치 또는 ""VIDEO_TS"" 폴더의 위치"
 6		"기본값"
-7		"사용자 정의 위치:"
+7		"사용자 정의 위치 :"
 10		"DVD 네비게이터 언어 설정"
 11		"메뉴"
 12		"오디오"
@@ -226,7 +227,7 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 7		"제거"
 8		"사용(최우선)"
 9		"차단"
-10		"우선 순위 설정:"
+10		"우선 순위 설정 :"
 12		"위로"
 13		"아래로"
 16		"미디어 형식 추가..."
@@ -258,9 +259,9 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 12		"오디오(&U)"
 13		"수정(&M)"
 14		"모두(&L)"
-15		"&None"
+15		"없음(&N)"
 16		"아이콘 사용"
-17		"자동 실행 (XP 전용)"
+17		"자동 실행 (윈도XP 전용)"
 18		"비디오"
 19		"음악"
 20		"DVD"
@@ -271,10 +272,10 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
-5		"전체화면으로 재생시작"
-6		"전체화면 시 컨트롤 표시 시간"
+5		"전체화면 보기에서 파일 열기"
+6		"전체 화면 보기에서 컨트롤 표시"
 9		"초 동안 컨트롤 표시"
-10		" 0 : 자동 숨김　;-1 : 항상 표시"
+10		" 0 : 자동 숨김; -1 : 항상 표시"
 11		"재생이 끝나면 전체화면 종료"
 13		"포커스를 잃으면 전체화면 종료"
 14		"전체화면 모니터"
@@ -286,24 +287,24 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 24		"지연 :"
 27		"초"
 28		"재생을 시작하기 전, 디스플레이 모드 변경"
-30		"전체화면 종료시 기본값 모니터 모드로 적용"
+30		"전체화면 종료 시, 기본값 모니터 모드로 적용"
 32		"종료 후, 해상도 복원"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 6		"<<dark>> 테마 사용 (기본값)"
-7		"밝기:"
-9		"소리 조정막대 색상 설정:"
-10		"채움:"
+7		"명도 :"
+9		"볼륨 조절 색 설정:"
+10		"볼륨 :"
 11		"B"
-12		"배경:"
+12		"배경 :"
 13		"O"
 14		"기본값"
 15		"R :"
 16		"G :"
 17		"B :"
 21		"다크 메뉴 활성화"
-22		"Enable dark title (Windows 11)"
+22		"다크 타이틀 활성화 (윈도11)"
 24		"시간 툴팁 사용 :"
 26		"탐색바에서 미리보기 사용"
 27		"화면 너비 대비 크기 :"
@@ -320,11 +321,11 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 45		"경계 크기 :"
 48		"그림자"
 49		"안티알라이싱"
-50		"윈도7(이상) 작업표시줄 기능 사용"
+50		"(윈도7 이상) 작업표시줄 기능 사용"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
-6		"단독 버젼 필터나 그 외 대체 필터 사용 시 여기서 해당 항목 체크를 해제하세요."
+6		"단독 버젼 혹은 대체 필터 사용 시, 여기서 해당 항목 체크를 해제하십시오."
 10		"AVI 스플리터\n설정"
 11		"MPEG 스플리터\n설정"
 12		"Matroska 스플리터\n설정"
@@ -349,20 +350,19 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 10		"빠른 탐색 (키프레임)"
 11		"재생목록에 파일 하나만 있다면 '앞/뒤 탐색'시에 '폴더 내에서 찾기' 사용 안함"
 13		"전체화면 시 최소화 예방"
-15		"최소화 시 영상 재생 일시정지"
+15		"최소화 시 영상 재생 일시 정지"
 17		"창모드에서 재생하는 동안 포인터 자동 숨기기"
 19		"다음 시간보다 짧은 000xx.mpls를 표시하지 않음"
 22		"분"
 23		"로지텍 LCD 지원 활성화(실험적)"
-24		"Use Window Media Controls"
-25		"미니 덤프 활성화"
-26		"업데이트 확인"
-27		"자동 업데이트 확인 활성화"
-28		"Delay between each check :"
-31		"일"
-32		"설정 관리"
-33		"초기화"
-34		"내보내기"
+24		"미니 덤프 활성화"
+25		"업데이트 확인"
+26		"자동 업데이트 확인 활성화"
+27		"확인할 간격 :"
+30		"일"
+31		"설정 관리"
+32		"초기화"
+33		"내보내기"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -420,7 +420,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 20		"최근 파일 수 :"
 23		"DVD 위치 기억"
 24		"파일 위치 기억"
-25		"지난 Pan-n-Scan 줌 기억"
+25		"종료 시 PnS 확대율 기억"
 26		"메인 재생목록 기억"
 27		"기타"
 28		"트레이에 아이콘 보이기"
@@ -463,7 +463,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 24		"버퍼링 중 자막 애니메이션"
 26		"대기열 지연 시 일부 서브픽처 삭제 허용"
 28		"경고"
-29		"만약 비디오카드 설정에서 위치 설정 및 전체화면 안티앨리어싱을 설정했다면 자막이 잘 표시되지 않을수도 있습니다."
+29		"만약 비디오카드 설정에서 위치 설정 및 전체화면 안티앨리어싱을 설정했다면 자막이 표현이 올바르지 않을수도 있습니다."
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
@@ -505,9 +505,9 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 12		"내장 자막 불러오지 않음"
 13		"변경사항 탐지후 자막 파일 자동 다시 불러오기"
 15		"하위 동기화 사용"
-16		"온라인 데이터베이스"
-17		"온라인 자막 데이터베이스 URL:"
-20		"테스트"
+16		"온라인 DB"
+17		"온라인 자막 DB URL :"
+20		"시험"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
@@ -535,11 +535,11 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"비디오 렌더러"
-7		"속성"
+7		"등록 정보"
 8		"EVR-CP 및 EVR 싱크 설정"
 9		"D3D9 렌더러를 선택"
 11		"배타적 전체화면"
-13		"10-bit RGB 출력"
+13		"10비트 RGB 출력"
 14		"디스플레이 바꾸면 초기화"
 15		"EVR 버퍼 :"
 18		"표면 형식 :"
@@ -1421,9 +1421,9 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시�
 STRING IDS_CMD_SUB		"/sub ""자막 파일""\t추가적인 자막 파일"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tMPC-BE로 연결했던 확장명 해제"
 STRING IDS_CMD_USAGE		"사용법: mpc-be.exe ""경로 이름"" [스위치]\n\n""경로 이름""\t로드할 파일이나 디렉토리. (와일드 카드\n\t\t사용 가능)"
-STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"명도 (감마값 2.2)"
-STRING IDS_CM_AMBIENTLIGHT_DARK		"암도 (감마값 2.4)"
-STRING IDS_CM_AMBIENTLIGHT_DIM		"박암 (감마값 2.35)"
+STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"밝게 (2.2 감마)"
+STRING IDS_CM_AMBIENTLIGHT_DARK		"어둡게 (2.4 감마)"
+STRING IDS_CM_AMBIENTLIGHT_DIM		"조금 어둡게 (2.35 감마)"
 STRING IDS_CM_INPUT_AUTO		"자동 감지"
 STRING IDS_CM_INTENT_ABSOLUTECM		"절대 컬러메트릭"
 STRING IDS_CM_INTENT_PERCEPTUAL		"지각적"
@@ -1676,7 +1676,7 @@ STRING IDS_MFMT_WMA		"윈도 미디어 오디오"
 STRING IDS_MFMT_WMV		"윈도 미디어 비디오"
 STRING IDS_MKVSPLT_CALC_DURATION		"비디오 데이터를 기반으로 기간 계산"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"내장 폰트 불러옴"
-STRING IDS_MOUSE_ACTION		"Action"
+STRING IDS_MOUSE_ACTION		"동작"
 STRING IDS_MOUSE_CLICK_MIDDLE		"가운데 클릭"
 STRING IDS_MOUSE_CLICK_X1		"원 클릭"
 STRING IDS_MOUSE_CLICK_X2		"더블 클릭"
@@ -1728,7 +1728,7 @@ STRING IDS_OPEN_WITH_MPC		"MPC-BE로 재생"
 STRING IDS_OPTIONS_CAPTION		"옵션"
 STRING IDS_OSD_AUTOVOLUMECONTROL_OFF		"자동 볼륨 조절 : 꺼짐"
 STRING IDS_OSD_AUTOVOLUMECONTROL_ON		"자동 볼륨 조절 : 켜짐"
-STRING IDS_OSD_BRIGHTNESS		"밝기 : %s%%"
+STRING IDS_OSD_BRIGHTNESS		"명도 : %s%%"
 STRING IDS_OSD_CONTRAST		"명암 : %s%%"
 STRING IDS_OSD_CUSTOM_CH_MAPPING_OFF		"사용자 정의 채널/스피커 배치 : 꺼짐"
 STRING IDS_OSD_CUSTOM_CH_MAPPING_ON		"사용자 정의 채널/스피커 배치 : 켜짐"
@@ -1742,9 +1742,9 @@ STRING IDS_OSD_RS_10BIT_RBG_IN_OFF		"강제 10비트 RGB 입력 : 꺼짐"
 STRING IDS_OSD_RS_10BIT_RBG_IN_ON		"강제 10비트 RGB 입력 : 켜짐"
 STRING IDS_OSD_RS_10BIT_RBG_OUT_OFF		"10비트 RGB 출력 : 꺼짐"
 STRING IDS_OSD_RS_10BIT_RBG_OUT_ON		"10비트 RGB 출력 : 켜짐"
-STRING IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT		"주변광 : 밝음 (2.2 감마)"
-STRING IDS_OSD_RS_AMBIENT_LIGHT_DARK		"주변광 : 어두움 (2.4 감마)"
-STRING IDS_OSD_RS_AMBIENT_LIGHT_DIM		"주변광 : 중간 (2.35 감마)"
+STRING IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT		"주변광 : 밝게 (2.2 감마)"
+STRING IDS_OSD_RS_AMBIENT_LIGHT_DARK		"주변광 : 어둡게 (2.4 감마)"
+STRING IDS_OSD_RS_AMBIENT_LIGHT_DIM		"주변광 : 조금 어둡게 (2.35 감마)"
 STRING IDS_OSD_RS_COLOR_MANAGEMENT_OFF		"색 관리 : 꺼짐"
 STRING IDS_OSD_RS_COLOR_MANAGEMENT_ON		"색 관리 : 켜짐"
 STRING IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF		"배타적 전체화면 : 꺼짐"
@@ -1840,9 +1840,9 @@ STRING IDS_PLAYLOOPMODE_AB_MARK_A		"A-B 반복 : A위치 지정"
 STRING IDS_PLAYLOOPMODE_AB_MARK_B		"A-B 반복 : B위치 지정"
 STRING IDS_PPAGEWEBSERVER_0		"디렉토리 선택"
 STRING IDS_PPAGE_FS_CLN_DISPLAY_MODE		"출력 모드 (Hz)"
-STRING IDS_PPAGE_FS_CLN_FROM_FPS		"From fps"
+STRING IDS_PPAGE_FS_CLN_FROM_FPS		"fps부터"
 STRING IDS_PPAGE_FS_CLN_ON_OFF		"온/오프"
-STRING IDS_PPAGE_FS_CLN_TO_FPS		"To fps"
+STRING IDS_PPAGE_FS_CLN_TO_FPS		"fps까지"
 STRING IDS_PPAGE_FS_DEFAULT		"기본값"
 STRING IDS_PPAGE_FS_OTHER		"그 외"
 STRING IDS_PPAGE_OUTPUT_DXR		"Haali 비디오 렌더러"
@@ -1935,7 +1935,7 @@ STRING IDS_SUBRESYNC_CLN_CHARSET		"문자셋"
 STRING IDS_SUBRESYNC_CLN_EFFECT		"효과"
 STRING IDS_SUBRESYNC_CLN_END		"끝"
 STRING IDS_SUBRESYNC_CLN_FONT		"글꼴"
-STRING IDS_SUBRESYNC_CLN_FORCED		"Forced"
+STRING IDS_SUBRESYNC_CLN_FORCED		"강제"
 STRING IDS_SUBRESYNC_CLN_LAYER		"레이어"
 STRING IDS_SUBRESYNC_CLN_PREVIEW		"미리보기"
 STRING IDS_SUBRESYNC_CLN_STYLE		"스타일"
@@ -1976,9 +1976,9 @@ STRING IDS_SUB_POS_RESTORE		"자막 위치 복원"
 STRING IDS_SUB_POS_RIGHT		"자막 위치 오른쪽으로 이동"
 STRING IDS_SUB_POS_UP		"자막 위치 위로 이동"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"맞춤 스타일 저장"
-STRING IDS_SUB_SIZE		"Subtitle text size: %d"
-STRING IDS_SUB_SIZE_DEC		"Decrease subtitle text size"
-STRING IDS_SUB_SIZE_INC		"Increase subtitle text size"
+STRING IDS_SUB_SIZE		"자막 글자 크기 : %d"
+STRING IDS_SUB_SIZE_DEC		"자막 글자 크기 축소"
+STRING IDS_SUB_SIZE_INC		"자막 글자 크기 확대"
 STRING IDS_SUB_USE_INTERNAL		"내부 자막 렌더러"
 STRING IDS_SURROUND_LEVEL		"서라운드 레벨 (%+.1f dB)"
 STRING IDS_TEXTBAR_FILENANE		"파일명 (혹은 제목이나 URL)"
@@ -2040,21 +2040,21 @@ STRING IDS_VDF_HW_ADAPTER		"어댑터"
 STRING IDS_VDF_HW_CODECS		"코덱 :"
 STRING IDS_VDF_HW_PREFERRED_DECODER		"선호하는 디코더"
 STRING IDS_VDF_SCANTYPE		"스캔 유형"
-STRING IDS_VDF_SCANTYPE_BOTTOM		"Bottom-Field 우선"
+STRING IDS_VDF_SCANTYPE_BOTTOM		"하위 영역 우선"
 STRING IDS_VDF_SCANTYPE_PROGRESSIVE		"프로그레시브"
-STRING IDS_VDF_SCANTYPE_TOP		"Top-Field 우선"
+STRING IDS_VDF_SCANTYPE_TOP		"상위 영역 우선"
 STRING IDS_VDF_SETTINGS		"비디오 설정"
 STRING IDS_VDF_SKIPBFRAMES		"B-프레임 건너뛰기"
 STRING IDS_VDF_STATUS		"상태"
-STRING IDS_VDF_STATUS_ADAPTER		"그래픽 어댑터:"
+STRING IDS_VDF_STATUS_ADAPTER		"그래픽 어댑터 :"
 STRING IDS_VDF_STATUS_FRAMESIZE		"프레임 크기 :"
 STRING IDS_VDF_STATUS_INPUT		"입력 형식 :"
 STRING IDS_VDF_STATUS_OUTPUT		"출력 형식 :"
 STRING IDS_VDF_THREADNUMBER		"디코딩 쓰레드 갯수(코어 갯수)"
 STRING IDS_VDF_TT_AR		"체크 - 스트림으로부터 AR 사용.\n체크 해제 - 컨테이너로부터 AR 사용.\n미정 - 스트림으로부터의 AR은 컨테이너 AR을 가진 파일에는 사용 안함 (추천)."
 STRING IDS_VDF_TT_PRESET		"속도와 품질 간의 관계를 바꾼다."
-STRING IDS_VDF_TT_RGB_LEVELS		"이 설정은 필터가 YCbCr to RGB 변환을 할때만 사용된다."
-STRING IDS_VDF_TT_STANDARD		"이 설정은 필터가 YCbCr ↔ RGB 변환을 할때만 사용된다."
+STRING IDS_VDF_TT_RGB_LEVELS		"이 설정은 필터가 YCbCr to RGB 변환을 할 때만 사용합니다."
+STRING IDS_VDF_TT_STANDARD		"이 설정은 필터가 YCbCr ↔ RGB 변환을 할 때만 사용합니다"
 STRING IDS_VIDEO_STREAM		"비디오 : %s"
 STRING IDS_VIEW_BORDERLESS		"외곽선 숨기기\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"제목표시줄과 메뉴 보이기\tCtrl+0"
@@ -2084,4 +2084,4 @@ STRING ID_PLAY_STOP		"멈춤\n멈춤"
 STRING ID_SHOW_MILLISECONDS		"밀리초 표기"
 STRING ID_VOLUME_MUTE		"음소거\n음소거"
 STRING ID_VOLUME_MUTE_DISABLED		"오디오 없음\n오디오 없음"
-STRING ID_VOLUME_MUTE_OFF		"음복원\n음복원"
+STRING ID_VOLUME_MUTE_OFF		"음소거 해제\n음소거 해제"
