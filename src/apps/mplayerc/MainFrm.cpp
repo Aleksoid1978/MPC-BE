@@ -11469,13 +11469,17 @@ void CMainFrame::SetPreviewVideoPosition()
 		const CPoint pos(m_PosX * (wr.Width() * 3 - w) - wr.Width(), m_PosY * (wr.Height() * 3 - h) - wr.Height());
 		const CRect vr(pos, CSize(w, h));
 
-		if (m_pMFVDC_preview) {
-			m_pMFVDC_preview->SetVideoPosition(nullptr, wr);
+		if (m_pCAP_preview) {
+			m_pCAP_preview->SetPosition(wr, vr);
 		}
-
-		m_pBV_preview->SetDefaultSourcePosition();
-		m_pBV_preview->SetDestinationPosition(vr.left, vr.top, vr.Width(), vr.Height());
-		m_pVW_preview->SetWindowPosition(wr.left, wr.top, wr.Width(), wr.Height());
+		else {
+			if (m_pMFVDC_preview) {
+				m_pMFVDC_preview->SetVideoPosition(nullptr, wr);
+			}
+			m_pBV_preview->SetDefaultSourcePosition();
+			m_pBV_preview->SetDestinationPosition(vr.left, vr.top, vr.Width(), vr.Height());
+			m_pVW_preview->SetWindowPosition(wr.left, wr.top, wr.Width(), wr.Height());
+		}
 	}
 }
 
@@ -12066,6 +12070,7 @@ void CMainFrame::ReleasePreviewGraph()
 {
 	if (m_pGB_preview) {
 		m_pMFVDC_preview.Release();
+		m_pCAP_preview.Release();
 
 		m_pMC_preview.Release();
 		m_pMS_preview.Release();
@@ -13138,6 +13143,9 @@ void CMainFrame::OpenSetupVideo()
 	if (m_pCAP) {
 		m_pCAP->SetRotation(m_iDefRotation);
 		SetShaders();
+	}
+	if (m_pCAP_preview) {
+		m_pCAP_preview->SetRotation(m_iDefRotation);
 	}
 
 	{
@@ -14242,12 +14250,16 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 
 		if (m_pGB_preview) {
 			m_pGB_preview->FindInterface(IID_PPV_ARGS(&m_pMFVDC_preview), TRUE);
+			m_pGB_preview->FindInterface(IID_PPV_ARGS(&m_pCAP_preview), TRUE);
 
+			RECT wr;
+			m_wndPreView.GetClientRect(&wr);
 			if (m_pMFVDC_preview) {
-				RECT Rect;
-				m_wndPreView.GetClientRect(&Rect);
 				m_pMFVDC_preview->SetVideoWindow(m_wndPreView.GetVideoHWND());
-				m_pMFVDC_preview->SetVideoPosition(nullptr, &Rect);
+				m_pMFVDC_preview->SetVideoPosition(nullptr, &wr);
+			}
+			if (m_pCAP_preview) {
+				m_pCAP_preview->SetPosition(wr, wr);
 			}
 		}
 
@@ -17603,6 +17615,9 @@ bool CMainFrame::ResizeDevice()
 
 bool CMainFrame::ResetDevice()
 {
+	if (m_pCAP_preview) {
+		m_pCAP_preview->ResetDevice();
+	}
 	if (m_pCAP) {
 		return m_pCAP->ResetDevice();
 	}
@@ -17611,6 +17626,9 @@ bool CMainFrame::ResetDevice()
 
 bool CMainFrame::DisplayChange()
 {
+	if (m_pCAP_preview) {
+		m_pCAP_preview->DisplayChange();
+	}
 	if (m_pCAP) {
 		return m_pCAP->DisplayChange();
 	}

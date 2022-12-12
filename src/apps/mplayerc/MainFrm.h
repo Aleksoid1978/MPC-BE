@@ -242,6 +242,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComQIPtr<IDvdControl2>         m_pDVDC_preview;
 	CComQIPtr<IDvdInfo2>            m_pDVDI_preview; // VtX: usually not necessary but may sometimes be necessary.
 	CComPtr<IMFVideoDisplayControl> m_pMFVDC_preview;
+	CComPtr<IAllocatorPresenter>    m_pCAP_preview;
 	//
 
 	CComPtr<ICaptureGraphBuilder2>  m_pCGB;

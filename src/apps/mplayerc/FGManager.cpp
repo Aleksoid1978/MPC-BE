@@ -2834,7 +2834,11 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				break;
 		}
 	} else {
+#if 1
 		m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW + 2, true));
+#else
+		m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"EVR-CP - Preview Window", MERIT64_ABOVE_DSHOW + 2, true));
+#endif
 	}
 
 	if (!m_bIsPreview) {
