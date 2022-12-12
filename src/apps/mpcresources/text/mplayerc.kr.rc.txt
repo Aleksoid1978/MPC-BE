@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 7		"우선 형식 :"
 10		"60 fps"
 11		"HDR"
-12		"재생목록 열기
+12		"재생목록 열기"
 14		"youtube-dl, yt-dlp"
 15		"실행 파일 :"
 17		"최대 영상 높이:"
