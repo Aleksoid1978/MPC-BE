@@ -11453,17 +11453,30 @@ void CMainFrame::SetPreviewVideoPosition()
 			const int dh = ws.cy;
 			const int dw = MulDiv(dh, arxy.cx, arxy.cy);
 
-			int minw = dw;
-			int maxw = dw;
-			if (ws.cx < dw) {
-				minw = ws.cx;
-			} else if (ws.cx > dw) {
-				maxw = ws.cx;
+			if (arxy.cx >= arxy.cy) {
+				int minw = dw;
+				int maxw = dw;
+				if (ws.cx < dw) {
+					minw = ws.cx;
+				} else if (ws.cx > dw) {
+					maxw = ws.cx;
+				}
+				const float scale = 1 / 3.0f;
+				w = minw + (maxw - minw) * scale;
+				h = MulDiv(w, arxy.cy, arxy.cx);
 			}
-
-			const float scale = 1 / 3.0f;
-			w = minw + (maxw - minw) * scale;
-			h = MulDiv(w, arxy.cy, arxy.cx);
+			else {
+				int minh = dh;
+				int maxh = dh;
+				if (ws.cy < dh) {
+					minh = ws.cy;
+				} else if (ws.cy > dh) {
+					maxh = ws.cy;
+				}
+				const float scale = 1 / 3.0f;
+				h = minh + (maxh - minh) * scale;
+				w = MulDiv(h, arxy.cx, arxy.cy);
+			}
 		}
 
 		const CPoint pos(m_PosX * (wr.Width() * 3 - w) - wr.Width(), m_PosY * (wr.Height() * 3 - h) - wr.Height());
