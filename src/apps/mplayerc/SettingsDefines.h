@@ -323,6 +323,7 @@
 #define IDS_RS_WINMEDIACONTROLS				L"WinMediaControls"
 #define IDS_RS_SMARTSEEK					L"UseSmartSeek"
 #define IDS_RS_SMARTSEEK_SIZE				L"SmartSeekSize"
+#define IDS_RS_SMARTSEEK_VIDEORENDERER		L"SmartSeekVideoRenderer"
 #define IDS_RS_CHAPTER_MARKER				L"ChapterMarker"
 #define IDS_RS_FILENAMEONSEEKBAR			L"FileNameOnSeekBar"
 

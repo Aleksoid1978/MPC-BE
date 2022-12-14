@@ -66,6 +66,7 @@ public:
 	CComboBox m_TimeTooltipPosition;
 	CComboBox m_FontType;
 	CComboBox m_FontSize;
+	CComboBox m_SmartSeekVR;
 	CSpinButtonCtrl m_OSDBorderCtrl;
 
 	COLORREF m_clrFaceABGR;

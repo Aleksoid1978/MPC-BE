@@ -770,6 +770,7 @@ public:
 	int				nTimeTooltipPosition;
 	bool			fSmartSeek;
 	int				iSmartSeekSize;
+	int				iSmartSeekVR;
 	bool			fChapterMarker;
 	bool			fFlybar;
 	int				iPlsFontPercent;

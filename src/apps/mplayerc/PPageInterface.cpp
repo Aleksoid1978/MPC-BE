@@ -81,6 +81,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_FontSize);
 	DDX_Check(pDX, IDC_CHECK_PRV, m_fSmartSeek);
 	DDX_Control(pDX, IDC_EDIT1, m_edSmartSeekSize);
+	DDX_Control(pDX, IDC_COMBO4, m_SmartSeekVR);
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
 	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
 	DDX_Control(pDX, IDC_EDIT2, m_edPlsFontPercent);
@@ -150,6 +151,10 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fSmartSeek		= s.fSmartSeek;
 	m_edSmartSeekSize.SetRange(5, 30);
 	m_edSmartSeekSize	= s.iSmartSeekSize;
+	m_SmartSeekVR.AddString(L"EVR");
+	m_SmartSeekVR.AddString(L"EVR-CP");
+	m_SmartSeekVR.SetCurSel(s.iSmartSeekVR);
+
 	m_fChapterMarker	= s.fChapterMarker;
 	m_fFlybar			= s.fFlybar;
 	m_edPlsFontPercent.SetRange(100, 200);
@@ -193,6 +198,7 @@ BOOL CPPageInterface::OnInitDialog()
 	GetDlgItem(IDC_STATIC6)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_STATIC7)->EnableWindow(m_fSmartSeek);
+	m_SmartSeekVR.EnableWindow(m_fSmartSeek);
 
 	if (!SysVersion::IsWin11orLater()) {
 		m_chkDarkTitle.EnableWindow(FALSE);
@@ -242,6 +248,8 @@ BOOL CPPageInterface::OnApply()
 
 	s.fSmartSeek			= !!m_fSmartSeek;
 	s.iSmartSeekSize		= m_edSmartSeekSize;
+	s.iSmartSeekVR	= m_SmartSeekVR.GetCurSel();
+
 	s.fChapterMarker		= !!m_fChapterMarker;
 	s.fFlybar				= !!m_fFlybar;
 	s.fFontShadow			= !!m_fFontShadow;
@@ -656,6 +664,7 @@ void CPPageInterface::OnUsePreview()
 	GetDlgItem(IDC_STATIC6)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_STATIC7)->EnableWindow(m_fSmartSeek);
+	m_SmartSeekVR.EnableWindow(m_fSmartSeek);
 
 	SetModified();
 }

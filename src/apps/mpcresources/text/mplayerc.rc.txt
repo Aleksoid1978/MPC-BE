@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restore resolution on program exit"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 53
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -307,20 +307,20 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 52
 24		"Use time tooltip:"
 26		"Use the preview in the search"
 27		"Size relative to screen width:"
-30		"Use chapters marker"
-31		"Use flybar"
-32		"Playlist font size:"
-35		"OSD"
-36		"Font:"
-39		"F"
-40		"Background:"
-41		"G1"
-42		"G2"
-43		"Transparent:"
-45		"Border Size:"
-48		"Shadow"
-49		"Anti-aliasing"
-50		"Use Windows 7 (and above) Taskbar features"
+31		"Use chapters marker"
+32		"Use flybar"
+33		"Playlist font size:"
+36		"OSD"
+37		"Font:"
+40		"F"
+41		"Background:"
+42		"G1"
+43		"G2"
+44		"Transparent:"
+46		"Border Size:"
+49		"Shadow"
+50		"Anti-aliasing"
+51		"Use Windows 7 (and above) Taskbar features"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

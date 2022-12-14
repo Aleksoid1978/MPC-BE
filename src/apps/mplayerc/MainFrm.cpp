@@ -12013,7 +12013,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 			if (m_pGB && bUseSmartSeek) {
 				// build graph for preview
-				m_pGB_preview = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_wndPreView.GetVideoHWND(), true);
+				m_pGB_preview = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_wndPreView.GetVideoHWND(), s.iSmartSeekVR+1);
 			}
 		}
 	} else if (OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD)) {

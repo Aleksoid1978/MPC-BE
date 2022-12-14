@@ -163,7 +163,7 @@ protected:
 	STDMETHODIMP ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MEDIA_TYPE* pmt);
 
 public:
-	CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview = false);
+	CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview = 0);
 };
 
 class CFGManagerDVD : public CFGManagerPlayer

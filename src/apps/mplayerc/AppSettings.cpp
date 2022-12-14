@@ -751,6 +751,7 @@ void CAppSettings::ResetSettings()
 	bWinMediaControls = false;
 	fSmartSeek = false;
 	iSmartSeekSize = 15;
+	iSmartSeekVR = 0;
 	fChapterMarker = false;
 	fFlybar = true;
 	iPlsFontPercent = 100;
@@ -1411,6 +1412,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WINMEDIACONTROLS, bWinMediaControls);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, fSmartSeek);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize, 5, 30);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_VIDEORENDERER, iSmartSeekVR, 0, 1);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent, 100, 200);
@@ -1745,6 +1747,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WINMEDIACONTROLS, bWinMediaControls);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, fSmartSeek);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_VIDEORENDERER, iSmartSeekVR);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent);
