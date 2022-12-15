@@ -386,6 +386,10 @@ CStringW HR2Str(const HRESULT hr)
 		UNPACK_HR_WIN32(ERROR_INVALID_WINDOW_HANDLE);
 		UNPACK_HR_WIN32(ERROR_CLASS_ALREADY_EXISTS);
 #endif
+#ifdef __ERRORS__
+		// some DirectShow Error and Success Codes https://learn.microsoft.com/en-us/windows/win32/directshow/error-and-success-codes
+		UNPACK_VALUE(VFW_E_ENUM_OUT_OF_SYNC);
+#endif
 #ifdef _D3D9_H_
 		// some D3DERR values https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3derr
 		UNPACK_VALUE(S_PRESENT_OCCLUDED);
