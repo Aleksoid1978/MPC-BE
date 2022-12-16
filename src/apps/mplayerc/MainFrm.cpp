@@ -12445,21 +12445,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (!youtubeUrl.IsEmpty()) {
-			fn = youtubeUrl;
-		}
-
-		if (m_strPlaybackRenderedPath.IsEmpty()) {
-			m_strPlaybackRenderedPath = fn;
-		}
-
-		if (s.bKeepHistory && pOFD->bAddRecent && IsLikelyFilePath(fn)) {
-			// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
-			SHAddToRecentDocs(SHARD_PATHW, fn); // remember the last open files (system) through the drag-n-drop
-		}
-
 		if (bFirst) {
-			pOFD->title = m_strPlaybackRenderedPath;
 			bool bIsVideo = false;
 			
 			BeginEnumFilters(m_pGB, pEF, pBF)
@@ -12521,6 +12507,18 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					ReleasePreviewGraph();
 				}
 			}
+
+			if (youtubeUrl.GetLength()) {
+				fn = youtubeUrl;
+			}
+			if (m_strPlaybackRenderedPath.IsEmpty()) {
+				m_strPlaybackRenderedPath = fn;
+			}
+			if (s.bKeepHistory && pOFD->bAddRecent && IsLikelyFilePath(fn)) {
+				// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
+				SHAddToRecentDocs(SHARD_PATHW, fn); // remember the last open files (system) through the drag-n-drop
+			}
+			pOFD->title = m_strPlaybackRenderedPath;
 		}
 
 		bFirst = false;
@@ -12535,7 +12533,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	if (!pOFD->fns.empty()) {
-		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.front();
+		const CString fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fns.front();
 
 		if (!StartsWith(fn, L"pipe:")) {
 			const bool diskImage = m_DiskImage.GetDriveLetter() && m_SessionInfo.Path.GetLength();
