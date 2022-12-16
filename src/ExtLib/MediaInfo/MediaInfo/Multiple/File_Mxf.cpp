@@ -1910,7 +1910,7 @@ static const char* Mxf_AS11_FpaPass[Mxf_AS11_FpaPass_Count]=
 {
     "Yes",
     "No",
-    "Not tested",
+    "", // Not tested
 };
 
 //---------------------------------------------------------------------------
@@ -4483,7 +4483,7 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
                                                         Fill(Stream_Other, StreamPos_Last, "3DType", Mxf_AS11_3D_Type[AS11->second.ThreeDType]);
                                                     if (AS11->second.ProductPlacement!=(int8u)-1)
                                                         Fill(Stream_Other, StreamPos_Last, "ProductPlacement", AS11->second.ProductPlacement?__T("Yes"):__T("No"));
-                                                    if (AS11->second.ThreeDType<Mxf_AS11_FpaPass_Count)
+                                                    if (AS11->second.FpaPass<Mxf_AS11_FpaPass_Count)
                                                         Fill(Stream_Other, StreamPos_Last, "FpaPass", Mxf_AS11_FpaPass[AS11->second.FpaPass]);
                                                     Fill(Stream_Other, StreamPos_Last, "FpaManufacturer", AS11->second.FpaManufacturer);
                                                     Fill(Stream_Other, StreamPos_Last, "FpaVersion", AS11->second.FpaVersion);

@@ -700,6 +700,7 @@ namespace Elements
     const int64u moov_trak_edts_elst=0x656C7374;
     const int64u moov_trak_load=0x6C6F6164;
     const int64u moov_trak_mdia=0x6D646961;
+    const int64u moov_trak_mdia_elng=0x656C6E67;
     const int64u moov_trak_mdia_hdlr=0x68646C72;
     const int64u moov_trak_mdia_hdlr_alis=0x616C6973;
     const int64u moov_trak_mdia_hdlr_clcp=0x636C6370;
@@ -1095,6 +1096,7 @@ void File_Mpeg4::Data_Parse()
             ATOM(moov_trak_load)
             LIST(moov_trak_mdia)
                 ATOM_BEGIN
+                ATOM(moov_trak_mdia_elng)
                 ATOM(moov_trak_mdia_hdlr)
                 LIST(moov_trak_mdia_imap)
                     ATOM_BEGIN
@@ -3914,6 +3916,25 @@ void File_Mpeg4::moov_trak_mdia()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_elng()
+{
+    NAME_VERSION_FLAG("Extended language");
+
+    //Parsing
+    if (Version!=0)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown");
+        return;
+    }
+    Ztring Value;
+    Get_UTF8 (Element_Size-Element_Offset, Value,               "Value");
+
+    FILLING_BEGIN()
+        Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Language), Value, true);
+    FILLING_END()
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_hdlr()
 {
     NAME_VERSION_FLAG("Handler Reference");
@@ -4194,7 +4215,8 @@ void File_Mpeg4::moov_trak_mdia_mdhd()
     Skip_B2(                                                    "Quality");
 
     FILLING_BEGIN();
-        Fill(StreamKind_Last, StreamPos_Last, "Language", Language_Get(Language));
+        if (Retrieve_Const(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Language)).empty()) //elng has priority
+            Fill(StreamKind_Last, StreamPos_Last, "Language", Language_Get(Language));
         Streams[moov_trak_tkhd_TrackID].mdhd_Duration=Duration;
         Streams[moov_trak_tkhd_TrackID].mdhd_TimeScale=TimeScale;
 

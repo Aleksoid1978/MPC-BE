@@ -240,6 +240,10 @@ string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
             if (Level)
                 Result+="\n";
             Result+=Cur_Node.Childs[Pos]->RawContent;
+
+            delete Cur_Node.Childs[Pos];
+            Cur_Node.Childs[Pos]=NULL;
+
             continue;
         }
 

@@ -583,6 +583,7 @@ void File_Aac::sbr_channel_pair_element()
         //Coupling
         sbr->bs_num_env    [1]=sbr->bs_num_env    [0];
         sbr->bs_num_noise  [1]=sbr->bs_num_noise  [0];
+        sbr->bs_amp_res    [1]=sbr->bs_amp_res    [0];
         for (int8u env=0; env<sbr->bs_num_env[0]; env++)
             sbr->bs_freq_res[1][env]=sbr->bs_freq_res[0][env];
     }

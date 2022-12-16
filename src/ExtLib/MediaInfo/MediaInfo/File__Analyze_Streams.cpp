@@ -1174,15 +1174,29 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                             Language_Translated.clear(); //No translation found
                         if (Language_Translated.empty())
                         {
+                            const auto& LanguageSplit=Languages[Pos];
+                            const auto Language=LanguageSplit.Read();
+                            for (const auto C : Language)
+                                if (!isalnum(C) && C!='-')
+                                {
+                                    Language_Translated=Language;
+                                    break;
+                                }
+                        }
+                        if (Language_Translated.empty())
+                        {
                         Language_Translated=MediaInfoLib::Config.Language_Get(__T("Language_")+Languages[Pos][0]);
                         if (Language_Translated.find(__T("Language_"))==0)
                             Language_Translated=Languages[Pos][0]; //No translation found
                         if (Languages[Pos].size()>=2)
                         {
-                            if (Languages[Pos].size()==2 && Languages[Pos][1].size()>=2 && Languages[Pos][1].size()<=3 && (Languages[Pos][1][0]&0xDF)>=__T('A') && (Languages[Pos][1][0]&0xDF)<=__T('Z') && (Languages[Pos][1][1]&0xDF)>=__T('A') && (Languages[Pos][1][1]&0xDF)<=__T('Z'))
+                            if (Languages[Pos].size()==2)
                             {
                                 Language_Translated+=__T(" (");
-                                Language_Translated+=Ztring(Languages[Pos][1]).MakeUpperCase();
+                                if (Languages[Pos][1].size()==2 && Languages[Pos][1][0]>=__T('a') && Languages[Pos][1][0]<=__T('z') && Languages[Pos][1][1]>=__T('a') && Languages[Pos][1][1]<=__T('z'))
+                                    Language_Translated+=Ztring(Languages[Pos][1]).MakeUpperCase(); //Fix some files with countries in lowercase
+                                else
+                                    Language_Translated+=Languages[Pos][1];
                                 Language_Translated+=__T(")");
                             }
                             else

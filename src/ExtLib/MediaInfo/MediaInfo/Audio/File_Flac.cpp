@@ -173,6 +173,7 @@ void File_Flac::Data_Parse()
 void File_Flac::STREAMINFO()
 {
     //Parsing
+    int128u MD5Stored;
     int64u Samples;
     int32u FrameSize_Min, FrameSize_Max, SampleRate;
     int8u  Channels, BitPerSample;
@@ -186,7 +187,7 @@ void File_Flac::STREAMINFO()
     Get_S1 ( 5, BitPerSample,                                   "BitPerSample"); Param_Info2(BitPerSample+1, " bits"); //(bits per sample)-1. FLAC supports from 4 to 32 bits per sample. Currently the reference encoder and decoders only support up to 24 bits per sample.
     Get_S5 (36, Samples,                                        "Samples");
     BS_End();
-    Skip_B16(                                                   "MD5 signature of the unencoded audio data");
+    Get_B16 (   MD5Stored,                                      "MD5 signature of the unencoded audio data");
 
     FILLING_BEGIN();
         if (SampleRate==0)
@@ -207,6 +208,11 @@ void File_Flac::STREAMINFO()
         Fill(Stream_Audio, 0, Audio_BitDepth, BitPerSample+1);
         if (!IsSub)
             Fill(Stream_Audio, 0, Audio_Duration, Samples*1000/SampleRate);
+        Ztring MD5_PerItem;
+        MD5_PerItem.From_UTF8(uint128toString(MD5Stored, 16));
+        while (MD5_PerItem.size()<32)
+            MD5_PerItem.insert(MD5_PerItem.begin(), '0'); //Padding with 0, this must be a 32-byte string
+        Fill(Stream_Audio, 0, "MD5_Unencoded", MD5_PerItem);
     FILLING_END();
 }
 

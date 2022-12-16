@@ -99,12 +99,13 @@ bool TimeCode::FromFrames(int64s Frames_)
         Frames=FramesMax;
         return true;
     }
-    Hours=(int8u)HoursTemp;
-    Minutes=((Frames_/FrameRate)/60)%60;
-    Seconds=(Frames_/FrameRate)%60;
-    Frames=(int32u)(Frames_%FrameRate);
     Flags.reset(IsTime);
     Flags.set(IsValid);
+    Hours=(int8u)HoursTemp;
+    auto TotalSeconds=Frames_/FrameRate;
+    Minutes=(TotalSeconds/60)%60;
+    Seconds=TotalSeconds%60;
+    Frames=(int32u)(Frames_%FrameRate);
 
     return false;
 }

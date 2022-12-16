@@ -153,11 +153,11 @@
 5.1.2ch;5.1.2
 5.1.4ch;5.1.4
 5.1ch;5.1
-608_Mode;EIA-608转换模式
+608_Mode;EIA-608 转换模式
 7.1.2ch;7.1.2
 7.1ch;7.1
 About;关于
-About_Hint;联系作者并获取最新版
+About_Hint;联系作者和检查更新
 Accompaniment;伴奏
 ActiveFormatDescription;活动图像标识符 (AFD)
 ActiveFormatDescription_MuxingMode;活动图像标识符 (AFD), 混流模式
@@ -168,9 +168,9 @@ Add version to text output;将版本添加到文本输出
 Added_Date;添加日期
 Address;地址
 AdID;广告 ID 标识符
-ADM: Show ChannelFormats;ADM：显示频道格式
-ADM: Show TrackUIDs;ADM：显示 TrackUID
-AdmProfile;ADM 配置文件
+ADM: Show ChannelFormats;ADM: 显示 ChannelFormat
+ADM: Show TrackUIDs;ADM: 显示 TrackUID
+AdmProfile;ADM 配置 (Profile)
 Advanced;高级
 Advanced mode;高级模式
 Album;专辑
@@ -186,7 +186,7 @@ Arranger;编曲
 ArtDirector;艺术指导
 AspectRatio;宽高比
 AssistantDirector;副导演
-AssociatedVideo_FrameRate;相关视频帧率
+AssociatedVideo_FrameRate;关联视频帧率
 at;@
 At least one file;(至少要打开一个文件)
 Audio;音频
@@ -205,9 +205,9 @@ AudioRenderingIndication;音频渲染指示
 AudioSceneInfoID;音频场景信息 ID
 AudioTrackLayout;音轨格式
 Author;作者
-Back4ToBack2;
-Balance_FrontBackListener;
-Balance_FrontBackOverheadFloor;
+Back4ToBack2;Four backs to two backs
+Balance_FrontBackListener;Front/back listener balance
+Balance_FrontBackOverheadFloor;Front/back overhead/floor balance
 BarCode;条形码
 Basic;基本
 Basic_Note;提示：请选择表格、树状图等其他视图了解更多文件信息
@@ -230,11 +230,11 @@ BufferSize;缓冲大小
 Cancel;取消
 CaptionServiceName;字幕服务名称
 Channel(s);声道数
-ChannelCoded;通道编码
-ChannelConfiguration;通道配置
-ChannelFormat;频道格式
-ChannelLayout;频道布局
-ChannelMode;频道模式
+ChannelCoded;声道是否编码
+ChannelConfiguration;声道配置
+ChannelFormat;声道格式
+ChannelLayout;声道布局
+ChannelMode;声道模式
 ChannelPositions;声道位置
 Chapter(s);章节数
 Chapters;章节
@@ -253,7 +253,7 @@ Choose language;选择语言
 Choreographer;动作指导
 Chroma;色度
 ChromaSubsampling;色度抽样
-Classifier;内容分类器
+Classifier;内容类别
 ClearList;清除列表
 Close;关闭
 Close all before open;打开新文件前关闭其他文件
@@ -300,10 +300,10 @@ Compression_Mode_Lossless;无损
 Compression_Mode_Lossy;有损
 Compression_Ratio;压缩率
 Conductor;指挥
-ConformanceCheck;符合性检查
-ConformanceErrors;符合性错误
-ConformanceInfos;符合性信息
-ConformanceWarnings;符合性警告
+ConformanceCheck;一致性检查
+ConformanceErrors;一致性错误
+ConformanceInfos;一致性信息
+ConformanceWarnings;一致性警告
 ContactEmail;联络邮件
 ContactTelephoneNumber;联络电话号码
 Container and general information;容器格式和一般信息
@@ -336,10 +336,10 @@ Delay_Source_Container;容器
 Delay_Source_Stream;媒体流
 Delete;删除
 Description;说明
-dialnorm;对话规范化
-DialogueCorrected;对话更正
-DialogueEnhancement;对话增强
-DialogueNormalization;对话标准化
+dialnorm;对白归一化
+DialogueCorrected;对白校正
+DialogueEnhancement;对白增强
+DialogueNormalization;对白归一化
 Digitized_Date;数字化日期
 Dimensions;尺寸
 Director;导演
@@ -354,24 +354,24 @@ Dolby_Atmos_Metadata;杜比全景声元数据
 DolbyAtmos;杜比全景声
 Donate;赞助
 DotsPerInch;DPI
-Downmix;缩混
-Downmix_5.1.x;5.1 和 5.1.x 缩混
-Downmix_5to2;5.1 到 2.0 缩混
+Downmix;Downmix
+Downmix_5.1.x;5.1 and 5.1.x downmix
+Downmix_5to2;5.1 to 2.0 downmix
 DrcSets_Count;DRC 组数
 DrcSets_Effects;DRC 效果类型
 Duration;时长
 Duration_End;结束时间
-Duration_End_Command;结束时间（命令）
+Duration_End_Command;结束时间 (命令)
 Duration_Start;开始时间
-Duration_Start_Command;开始时间（命令）
-Duration_Start2End;可见内容的持续时间
+Duration_Start_Command;开始时间 (命令)
+Duration_Start2End;可视内容时长
 DynamicObject;动态对象
 DynamicRangeControl;动态范围控制
-Eac3DrcProfile;E-AC-3 DRC 配置文件
+Eac3DrcProfile;E-AC-3 DRC 配置 (Profile)
 Edit;编辑
 EditedBy;编辑者
 EditorialClassification;编辑分类
-ElementaryStream;基本码流
+ElementaryStream;基本流
 ElementCount;元素总数
 EMail;电子邮件
 Encoded_Application;编码程序
@@ -384,9 +384,9 @@ EPG_Positions;EPG 位置 (内部)
 EpisodeTitleNumber;集数标题
 Error_File;读取文件出错
 Error_File_Write;写入文件出错
-Events_PaintOn;PaintOn 事件的计数
-Events_PopOn;PopOn 事件的计数
-Events_RollUp;RollUp 事件的计数
+Events_PaintOn;PaintOn 事件数
+Events_PopOn;PopOn 事件数
+Events_RollUp;RollUp 事件数
 Events_Total;事件总计数
 ExecutiveProducer;出品人
 Exit;退出
@@ -409,11 +409,11 @@ FileExtension;扩展名
 FileName;文件名
 FileNameExtension;文件名和扩展名
 FileSize;文件大小
-FirstDisplay_Delay_Frames;第一个事件之前的帧数
+FirstDisplay_Delay_Frames;第一个事件前的帧数
 FirstDisplay_Type;第一个事件的类型
 FirstFrameOfAction;动作的第一帧
 FlatPanelTv;平板电视
-FlowID;流 ID
+FlowID;Flow ID
 Folder;文件夹
 Folder (R);文件夹 (R)
 Folder (R)_Hint;选择一个文件夹 (包含所有子文件夹)
@@ -671,9 +671,9 @@ Gop_OpenClosed_Closed;封闭 (Closed)
 Gop_OpenClosed_FirstFrame;第一帧 GOP 开闭
 Gop_OpenClosed_Open;开放 (Open)
 Graph;图形
-Group;
+Group;分组
 Grouping;分组
-GroupPreset;组预设
+GroupPreset;分组预设 (Preset)
 h; 时
 HDR_Format;HDR 格式
 Header file;创建头文件
@@ -690,7 +690,7 @@ How many video streams?;有多少个视频流？
 HTML;网页
 ID;ID
 IdentClockStart;报时画面起始点
-IFrameInterval;I帧间隔
+IFrameInterval;I 帧间隔
 Image;图像
 Image stream(s);图像流
 Image_Codec_List;图像解码器
@@ -923,29 +923,29 @@ Language_zh-tw;繁体中文 (Chinese, Taiwan)
 Language_zu;祖鲁语 (Zulu)
 LawRating;分级
 LCCN;LCCN
-LfeAttenuationKnown;
-LfeMixGain;LFE 混合增益
+LfeAttenuationKnown;LFE 衰减是否已知
+LfeMixGain;LFE 混音增益
 Library;混流函数库
 Lifetime_Subscribe_Button;终身订阅价格 %PRICE%
 Lightness;亮度
 Lines_Count;行数
 Lines_MaxCountPerEvent;每个事件的最大行数
 LineUpStart;Line Up 起始点
-LinkedTo_Bed_Pos;
-LinkedTo_ChannelFormat_Pos;频道格式 #s
-LinkedTo_ComplementaryObject_Pos;
+LinkedTo_Bed_Pos;音床 #s
+LinkedTo_ChannelFormat_Pos;声道格式 #s
+LinkedTo_ComplementaryObject_Pos;互补对象 #s
 LinkedTo_Content_Pos;内容 #s
-LinkedTo_Group_Pos;
+LinkedTo_Group_Pos;分组 #s
 LinkedTo_Object_Pos;对象 #s
 LinkedTo_PackFormat_Pos;包格式 #s
 LinkedTo_SignalGroup_Pos;信号组 #s
 LinkedTo_StreamFormat_Pos;流格式 #s
 LinkedTo_Substream_Pos;子流 #s
 LinkedTo_TrackFormat_Pos;轨道格式 #s
-LinkedTo_TrackUID_Pos;轨道UID #s
+LinkedTo_TrackUID_Pos;轨道 UID #s
 List;列表
-LoRoCenterMixGain;
-LoRoSurroundMixGain;
+LoRoCenterMixGain;LoRo 中央混音增益
+LoRoSurroundMixGain;LoRo 环绕混音增益
 Loudness_Anchor;锚点响度
 Loudness_Anchor_Album;锚点响度 (专辑)
 Loudness_Count;响度信息数
@@ -964,8 +964,8 @@ Loudness_Range;响度范围
 Loudness_Range_Album;响度范围 (专辑)
 Loudness_RoomType;制作录音室类型
 Loudness_RoomType_Album;制作录音室类型 (专辑)
-LtRtCenterMixGain;
-LtRtSurroundMixGain;
+LtRtCenterMixGain;LtRt 中央混音增益
+LtRtSurroundMixGain;LtRt 环绕混音增益
 Lyricist;作词
 Lyrics;歌词
 Mastered_Date;母带制作日期
@@ -993,14 +993,14 @@ MenuID;菜单 ID
 Metadata_Format;元数据格式
 Metadata_Format_Type;元数据帧类型
 Metadata_MuxingMode;元数据复用模式
-MixType;
+MixType;混音类型
 mn; 分
 Mood;情绪
 More;更多
 Movie;电影名称
 ms; 毫秒
 MSDI;MSDI
-MultipleStream;
+MultipleStream;多个流
 MusicBy;音乐制作
 MuxingMode;混流模式
 MuxingMode_MoreInfo;混流模式详细信息
@@ -1015,21 +1015,21 @@ NewVersion_Question_Content;有新版本 (v%Version%)，要下载吗？
 NewVersion_Question_Title;新版本已发布！
 No;否
 Not yet;尚无
-NumberOfChannelFormats;频道格式数
-NumberOfContents;内容数
-NumberOfDynamicObjects;动态对象总数
-NumberOfElementaryStreams;基本码流的数量
-NumberOfObjects;对象数
+NumberOfChannelFormats;声道格式数量
+NumberOfContents;内容数量
+NumberOfDynamicObjects;动态对象数量
+NumberOfElementaryStreams;基本流数量
+NumberOfObjects;对象数量
 NumberOfPackFormats;包格式数量
-NumberOfPresentations;
-NumberOfProgrammes;
-NumberOfStreamFormats;流格式数
-NumberOfSubstreams;子流数
-NumberOfTrackFormats;轨道格式数
+NumberOfPresentations;形式 (Presentation) 数量
+NumberOfProgrammes;节目数量
+NumberOfStreamFormats;流格式数量
+NumberOfSubstreams;子流数量
+NumberOfTrackFormats;轨道格式数量
 NumberOfTrackUIDs;轨道 UID 数量
 NumColors;色彩数量
 Object;对象
-ObjectCount;对象计数
+ObjectCount;对象数量
 OK;确定
 One output file per input file;一个输入文件对应一个输出文件
 Open;打开
@@ -1098,8 +1098,8 @@ PartNumber;分段编号
 PartTotal;分段总数
 Performer;演员
 Period;时期
-Phase90FilterInfo;
-Phase90FilterInfo2ch;
+Phase90FilterInfo;90 度相位过滤器
+Phase90FilterInfo2ch;90 度相位过滤器 (2 声道)
 Phone;电话
 PictureRatio;画面比例
 PixelAspectRatio;像素宽高比
@@ -1114,20 +1114,20 @@ PodcastCategory;播客类别
 PortableHeadphones;便携式耳机
 PortableSpeakers;便携式扬声器
 Position;位置
-Position_Cartesian;位置（笛卡尔）
-Position_Polar;位置（极性）
+Position_Cartesian;位置 (直角坐标)
+Position_Polar;位置 (极坐标)
 Position_Total;总数
 Preferences;设置
 PreferredDownmix;首选缩混
 Premium;高级版
 Premium_Summary;高级版订阅功能
-PreselectionLabel;
-Presentation;
-PresentationConfig;
-PresentationConfig_ContentClassifier;
-PresentationID;
-PreviousDownmixType5ch;
-PreviousMixType2ch;
+PreselectionLabel;预选标签
+Presentation;形式 (Presentation)
+PresentationConfig;形式 (Presentation) 配置
+PresentationConfig_ContentClassifier;形式 (Presentation) 配置 (内容类别)
+PresentationID;形式 (Presentation) ID
+PreviousDownmixType5ch;之前的混缩类型 (5 声道)
+PreviousMixType2ch;之前的混音类型 (2 声道)
 PrimaryAudioLanguage;主音频语言
 Producer;制片人
 ProductionDesigner;制作设计师
@@ -1171,8 +1171,8 @@ ScanType;扫描类型
 ScanType_Original;原始扫描类型
 ScanType_StoreMethod;扫描类型储存方式
 ScreenplayBy;编剧
-ScreenToCenter;屏幕居中
-ScreenToFront;屏幕置前
+ScreenToCenter;Screen to center
+ScreenToFront;Screen to front
 Season;季期
 SecondaryAudioLanguage;第二音频语言
 see below;点击展开详情
@@ -1246,13 +1246,13 @@ Subscription_Lifetime;检测到终身订阅
 Subscription_Thanks;已检测到订阅。感谢您的支持！
 Substream;子流
 SubTrack;子轨道
-SubtstreamIdChannel;子流开始ID & 频道索引
+SubtstreamIdChannel;子流开始 ID 和声道编号
 Summary;摘要
 Supported formats;支持格式
 Supported?;是否支持
 SupportUs;请支持我们。不仅可以解锁深色主题，未来还有更多功能。
-SurroundAttenuationKnown;
-SwitchGroup;
+SurroundAttenuationKnown;环绕衰减是否已知
+SwitchGroup;切换组
 Synopsis;系统摘要
 SystemId;ID
 Tagged_Application;标记软件
@@ -1287,39 +1287,39 @@ TimeStamp;时间戳
 TimeZone;时区
 Title;标题
 Title_More;标题, 更多信息
-Top4ToTop2;
-TopBackToFront;
-TopBackToSide;
-TopFrontToBack;
-TopFrontToFront;
-TopFrontToSide;
+Top4ToTop2;Four fronts to two fronts
+TopBackToFront;Top backs to front
+TopBackToSide;Top backs to side
+TopFrontToBack;Top fronts to back
+TopFrontToFront;Top fronts to front
+TopFrontToSide;Top fronts to side
 Total;总计
 TotalNumberOfParts;分段总数
 TotalProgrammeDuration;节目时长总计
 Track;轨道名
 Track_Count;轨道数
 TrackFormat;轨道格式
-TrackIndex;轨道索引
-TrackUID;轨道UID
+TrackIndex;轨道编号
+TrackUID;轨道 UID
 transfer_characteristics;传输特性
 Translate_Reports;翻译报告
 Translator;翻译
-Transport;
+Transport;传输
 Tree;树状图
 Tree & Text;树状图和文本
-Trim_Center;
-Trim_Height;
-Trim_Surround;
-TrimMode;
-TrimMode0i;
-TrimMode1i;
-TrimMode2i;
-TrimMode3i;
-TrimMode4i;
-TrimMode5i;
-TrimMode6i;
-TrimMode7i;
-TrimMode8i;
+Trim_Center;Center trim
+Trim_Height;Height trim
+Trim_Surround;Surround trim
+TrimMode;Trim mode
+TrimMode0i;Trim mode for 2.0
+TrimMode1i;Trim mode for 5.1
+TrimMode2i;Trim mode for 7.1
+TrimMode3i;Trim mode for 2.1.2
+TrimMode4i;Trim mode for 5.1.2
+TrimMode5i;Trim mode for 7.1.2
+TrimMode6i;Trim mode for 2.1.4
+TrimMode7i;Trim mode for 5.1.4
+TrimMode8i;Trim mode for 7.1.4
 TruePeakLevel;真实峰值等级
 TruePeakLevel_Album;真实峰值等级 (专辑)
 Type;类型

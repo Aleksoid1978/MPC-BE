@@ -2458,11 +2458,14 @@ void File_Mpeg_Descriptors::Descriptor_56()
                             if (elementary_PID_IsValid /*&& (teletext_type==2 || teletext_type==5)*/) //Subtitles are the only supported format
                             {
                                 int16u ID=(teletext_magazine_number==0?8:teletext_magazine_number)*100+teletext_page_number_1*10+teletext_page_number_2;
+                                if (Complete_Stream->Streams[elementary_PID]->Teletexts[ID].Infos["Format"]!=__T("Teletext Subtitle")) // Priority on subtitles
+                                {
                                 Complete_Stream->Streams[elementary_PID]->descriptor_tag=0x56;
                                 Complete_Stream->Streams[elementary_PID]->Teletexts[ID].Infos["Language"]=MediaInfoLib::Config.Iso639_1_Get(ISO_639_language_code);
                                 Complete_Stream->Streams[elementary_PID]->Teletexts[ID].Infos["Language_More"]=Mpeg_Descriptors_teletext_type_more(teletext_type);
                                 Complete_Stream->Streams[elementary_PID]->Teletexts[ID].Infos["Format"]=Mpeg_Descriptors_teletext_type(teletext_type);
                                 Complete_Stream->Streams[elementary_PID]->Teletexts[ID].Infos["Codec"]=Mpeg_Descriptors_teletext_type(teletext_type);
+                                }
                             }
                             break;
                 default    : ;

@@ -203,7 +203,8 @@ private :
     void AIFF_SSND ();
     void AIFF_xxxx ();
     void AVI_ ();
-    void AVI__cset ();
+    void AVI__CSET();
+    void AVI__cset() { AVI__CSET(); }
     void AVI__Cr8r ();
     void AVI__exif ();
     void AVI__exif_xxxx ();
@@ -319,6 +320,8 @@ private :
     void WAVE_bext ();
     void WAVE_bxml () {WAVE_axml();}
     void WAVE_chna();
+    void WAVE_cset() { AVI__CSET(); }
+    void WAVE_CSET() { AVI__CSET(); }
     void WAVE_cue_ ();
     void WAVE_data ();
     void WAVE_data_Continue ();
@@ -331,6 +334,7 @@ private :
     void WAVE_INFO() {AVI__INFO();}
     void WAVE_INFO_xxxx() {AVI__INFO_xxxx ();}
     void WAVE_iXML ();
+    void WAVE_MD5_() { AVI__MD5_(); }
     void WAVE_mext ();
     void wave ();
     void wave_data () {WAVE_data();}

@@ -164,7 +164,7 @@ private :
     void Segment_Tracks_TrackEntry_MaxBlockAdditionID(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_Name();
     void Segment_Tracks_TrackEntry_Language();
-    void Segment_Tracks_TrackEntry_LanguageIETF(){String_Info();};
+    void Segment_Tracks_TrackEntry_LanguageIETF(){Segment_Tracks_TrackEntry_Language();};
     void Segment_Tracks_TrackEntry_CodecID();
     void Segment_Tracks_TrackEntry_CodecPrivate();
     void Segment_Tracks_TrackEntry_CodecName(){UTF8_Info();};
@@ -314,7 +314,7 @@ private :
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay();
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString();
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage();
-    void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF(){String_Info();};
+    void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF(){Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage();};
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry(){String_Info();};
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess(){};
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID(){UInteger_Info();};
@@ -334,7 +334,7 @@ private :
     void Segment_Tags_Tag_SimpleTag(){};
     void Segment_Tags_Tag_SimpleTag_TagName();
     void Segment_Tags_Tag_SimpleTag_TagLanguage();
-    void Segment_Tags_Tag_SimpleTag_TagLanguageIETF(){String_Info();};
+    void Segment_Tags_Tag_SimpleTag_TagLanguageIETF(){Segment_Tags_Tag_SimpleTag_TagLanguage();};
     void Segment_Tags_Tag_SimpleTag_TagDefault(){UInteger_Info();};
     void Segment_Tags_Tag_SimpleTag_TagString();
     void Segment_Tags_Tag_SimpleTag_TagBinary(){Skip_XX(Element_Size, "Data");};

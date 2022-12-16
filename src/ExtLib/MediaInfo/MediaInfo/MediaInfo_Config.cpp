@@ -423,6 +423,7 @@ void MediaInfo_Config::Init(bool Force)
     #endif //MEDIAINFO_ADVANCED
     #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
         TimeOut=(int64u)-1;
+        AcceptSignals=true;
     #endif //MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
     MpegTs_MaximumOffset=64*1024*1024;
     MpegTs_MaximumScanDuration=30000000000LL;
@@ -1307,6 +1308,23 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     {
         #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
             return Ztring::ToZtring(TimeOut_Get());
+        #else // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+    }
+    if (Option_Lower==__T("acceptsignals"))
+    {
+        #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+            AcceptSignals_Set(!(Value==__T("0") || Value.empty()));
+            return Ztring();
+        #else // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+    }
+    if (Option_Lower==__T("acceptsignals_get"))
+    {
+        #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+            return AcceptSignals_Get()?__T("1"):__T("0");
         #else // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
             return __T("advanced features are disabled due to compilation options");
         #endif // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
@@ -3242,6 +3260,18 @@ int64u MediaInfo_Config::TimeOut_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return TimeOut;
+}
+
+void MediaInfo_Config::AcceptSignals_Set (bool Value)
+{
+    CriticalSectionLocker CSL(CS);
+    AcceptSignals=Value;
+}
+
+bool MediaInfo_Config::AcceptSignals_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return AcceptSignals;
 }
 #endif // MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
 

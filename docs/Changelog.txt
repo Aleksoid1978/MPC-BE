@@ -8,6 +8,8 @@ Fixed decoding of some MPEG-4 ASP.
 MpcAudioRenderer
 Fixed audio dropout when changing speed at the end of playback.
 
+Updated libraries:
+	MediaInfo git-v22.09-42-g9ae1c8d15.
 
 1.6.5.3
 =============================

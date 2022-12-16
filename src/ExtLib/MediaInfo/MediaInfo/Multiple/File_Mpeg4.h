@@ -132,6 +132,7 @@ private :
     void moov_trak_edts_elst();
     void moov_trak_load();
     void moov_trak_mdia();
+    void moov_trak_mdia_elng();
     void moov_trak_mdia_hdlr();
     void moov_trak_mdia_imap();
     void moov_trak_mdia_imap_sean();
