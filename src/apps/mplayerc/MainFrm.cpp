@@ -12392,8 +12392,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (FAILED(hr)) {
-			if (bFirst) {
+		if (bFirst) {
+			if (FAILED(hr)) {
 				if (s.fReportFailedPins && !IsD3DFullScreenMode()) {
 					CComQIPtr<IGraphBuilderDeadEnd> pGBDE = m_pGB;
 					if (pGBDE && pGBDE->GetCount()) {
@@ -12404,48 +12404,24 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				CString err;
 
 				switch (hr) {
-					case E_ABORT:
-						err = ResStr(IDS_MAINFRM_82);
-						break;
 					case E_FAIL:
 					case E_POINTER:
-					default:
-						err = ResStr(IDS_MAINFRM_83);
-						break;
-					case E_INVALIDARG:
-						err = ResStr(IDS_MAINFRM_84);
-						break;
-					case E_OUTOFMEMORY:
-						err = ResStr(IDS_AG_OUT_OF_MEMORY);
-						break;
-					case VFW_E_CANNOT_CONNECT:
-						err = ResStr(IDS_MAINFRM_86);
-						break;
-					case VFW_E_CANNOT_LOAD_SOURCE_FILTER:
-						err = ResStr(IDS_MAINFRM_87);
-						break;
-					case VFW_E_CANNOT_RENDER:
-						err = ResStr(IDS_MAINFRM_88);
-						break;
-					case VFW_E_INVALID_FILE_FORMAT:
-						err = ResStr(IDS_MAINFRM_89);
-						break;
-					case VFW_E_NOT_FOUND:
-						err = ResStr(IDS_MAINFRM_90);
-						break;
-					case VFW_E_UNKNOWN_FILE_TYPE:
-						err = ResStr(IDS_MAINFRM_91);
-						break;
-					case VFW_E_UNSUPPORTED_STREAM:
-						err = ResStr(IDS_MAINFRM_92);
-						break;
+					default:                              err = ResStr(IDS_MAINFRM_83); break;
+					case E_ABORT:                         err = ResStr(IDS_MAINFRM_82); break;
+					case E_INVALIDARG:                    err = ResStr(IDS_MAINFRM_84); break;
+					case E_OUTOFMEMORY:                   err = ResStr(IDS_AG_OUT_OF_MEMORY); break;
+					case VFW_E_CANNOT_CONNECT:            err = ResStr(IDS_MAINFRM_86); break;
+					case VFW_E_CANNOT_LOAD_SOURCE_FILTER: err = ResStr(IDS_MAINFRM_87); break;
+					case VFW_E_CANNOT_RENDER:             err = ResStr(IDS_MAINFRM_88); break;
+					case VFW_E_INVALID_FILE_FORMAT:       err = ResStr(IDS_MAINFRM_89); break;
+					case VFW_E_NOT_FOUND:                 err = ResStr(IDS_MAINFRM_90); break;
+					case VFW_E_UNKNOWN_FILE_TYPE:         err = ResStr(IDS_MAINFRM_91); break;
+					case VFW_E_UNSUPPORTED_STREAM:        err = ResStr(IDS_MAINFRM_92); break;
 				}
 
 				return err;
 			}
-		}
 
-		if (bFirst) {
 			bool bIsVideo = false;
 			
 			BeginEnumFilters(m_pGB, pEF, pBF)
@@ -12519,9 +12495,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				SHAddToRecentDocs(SHARD_PATHW, fn); // remember the last open files (system) through the drag-n-drop
 			}
 			pOFD->title = m_strPlaybackRenderedPath;
-		}
 
-		bFirst = false;
+			bFirst = false;
+		}
 
 		if (m_bCustomGraph) {
 			break;
