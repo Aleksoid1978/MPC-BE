@@ -12212,8 +12212,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	bool bFirst = true;
-
 	m_strPlaybackRenderedPath.Empty();
 
 	CString youtubeUrl;
@@ -12352,6 +12350,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 	};
 
+	bool bFirst = true;
+
 	for (auto& fi : pOFD->fns) {
 		CString fn = fi.GetName();
 
@@ -12453,22 +12453,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			m_strPlaybackRenderedPath = fn;
 		}
 
-		if (m_pGB_preview && bFirst) {
-			bool bIsVideo = false;
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				// Checks if any Video Renderer is in the graph
-				if (IsVideoRenderer(pBF)) {
-					bIsVideo = true;
-					break;
-				}
-			}
-			EndEnumFilters;
-
-			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(fn, nullptr))) {
-				ReleasePreviewGraph();
-			}
-		}
-
 		if (s.bKeepHistory && pOFD->bAddRecent && IsLikelyFilePath(fn)) {
 			// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
 			SHAddToRecentDocs(SHARD_PATHW, fn); // remember the last open files (system) through the drag-n-drop
@@ -12476,8 +12460,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		if (bFirst) {
 			pOFD->title = m_strPlaybackRenderedPath;
+			bool bIsVideo = false;
+			
+			BeginEnumFilters(m_pGB, pEF, pBF)
 			{
-				BeginEnumFilters(m_pGB, pEF, pBF);
 				if (!m_pMainFSF) {
 					m_pMainFSF = pBF;
 				}
@@ -12491,32 +12477,36 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				else if (!m_pAMMC[1]) {
 					m_pAMMC[1] = pBF;
 				}
-				EndEnumFilters;
 
-				m_pMainSourceFilter = FindFilter(__uuidof(CMpegSplitterFilter), m_pGB);
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(__uuidof(CMpegSourceFilter), m_pGB);
+				if (!bIsVideo && IsVideoRenderer(pBF)) {
+					bIsVideo = true;
 				}
-				m_bMainIsMPEGSplitter = (m_pMainSourceFilter != nullptr);
+			}
+			EndEnumFilters;
 
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(CLSID_LAVSplitter, m_pGB);
-				}
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(CLSID_LAVSource, m_pGB);
-				}
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(CLSID_HaaliSplitterAR, m_pGB);
-				}
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(CLSID_HaaliSplitter, m_pGB);
-				}
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(L"{529A00DB-0C43-4f5b-8EF2-05004CBE0C6F}", m_pGB); // AV Splitter
-				}
-				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", m_pGB); // AV Source
-				}
+			m_pMainSourceFilter = FindFilter(__uuidof(CMpegSplitterFilter), m_pGB);
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(__uuidof(CMpegSourceFilter), m_pGB);
+			}
+			m_bMainIsMPEGSplitter = (m_pMainSourceFilter != nullptr);
+
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(CLSID_LAVSplitter, m_pGB);
+			}
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(CLSID_LAVSource, m_pGB);
+			}
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(CLSID_HaaliSplitterAR, m_pGB);
+			}
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(CLSID_HaaliSplitter, m_pGB);
+			}
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(L"{529A00DB-0C43-4f5b-8EF2-05004CBE0C6F}", m_pGB); // AV Splitter
+			}
+			if (!m_pMainSourceFilter) {
+				m_pMainSourceFilter = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", m_pGB); // AV Source
 			}
 
 			if (fi.GetChapterCount()) {
@@ -12524,6 +12514,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				fi.GetChapters(chaplist);
 
 				AddCustomChapters(chaplist);
+			}
+
+			if (m_pGB_preview) {
+				if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(fn, nullptr))) {
+					ReleasePreviewGraph();
+				}
 			}
 		}
 
