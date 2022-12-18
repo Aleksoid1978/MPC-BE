@@ -53,6 +53,8 @@ protected:
 	CString m_host;
 	CString m_path;
 
+	CString m_url_redirect_str;
+
 	INTERNET_PORT m_nPort     = 0;
 	INTERNET_SCHEME m_nScheme = INTERNET_SCHEME_HTTP;
 
@@ -88,10 +90,12 @@ public:
 	const CString& GetContentType() const;
 	// get content encoding in lowercase
 	const CString& GetContentEncoding() const;
-	const bool IsCompressed() const;
 
+	const bool IsCompressed() const;
 	bool GetUncompressed(std::vector<BYTE>& buffer);
 
 	UINT64 GetLenght() const;
+
+	const CString& GetRedirectURL() const;
 };
 

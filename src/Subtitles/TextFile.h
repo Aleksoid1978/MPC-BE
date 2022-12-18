@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -79,6 +79,8 @@ class CWebTextFile : public CTextFile
 	LONGLONG m_llMaxSize;
 	CStringW m_tempfn;
 
+	CString m_url_redirect_str;
+
 public:
 	CWebTextFile(enc encoding = ASCII, enc defaultencoding = ASCII, LONGLONG llMaxSize = 1024 * 1024);
 	~CWebTextFile();
@@ -86,6 +88,8 @@ public:
 	bool Open(LPCWSTR lpszFileName);
 	bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
 	void Close();
+
+	const CString& GetRedirectURL() const;
 };
 
 extern CStringW AToT(CStringA str);

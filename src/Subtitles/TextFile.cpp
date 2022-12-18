@@ -747,19 +747,19 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 		return __super::Open(lpszFileName);
 	}
 
-	CHTTPAsync m_HTTPAsync;
-	if (SUCCEEDED(m_HTTPAsync.Connect(lpszFileName, 5000))) {
+	CHTTPAsync HTTPAsync;
+	if (SUCCEEDED(HTTPAsync.Connect(lpszFileName, 5000))) {
 		if (GetTemporaryFilePath(L".tmp", fn)) {
 			CFile temp;
 			if (!temp.Open(fn, modeCreate | modeWrite | typeBinary | shareDenyWrite)) {
-				m_HTTPAsync.Close();
+				HTTPAsync.Close();
 				return false;
 			}
 
-			if (m_HTTPAsync.IsCompressed()) {
-				if (m_HTTPAsync.GetLenght() <= 10 * MEGABYTE) {
+			if (HTTPAsync.IsCompressed()) {
+				if (HTTPAsync.GetLenght() <= 10 * MEGABYTE) {
 					std::vector<BYTE> body;
-					if (m_HTTPAsync.GetUncompressed(body)) {
+					if (HTTPAsync.GetUncompressed(body)) {
 						temp.Write(body.data(), static_cast<UINT>(body.size()));
 						m_tempfn = fn;
 					}
@@ -769,7 +769,7 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 				DWORD dwSizeRead = 0;
 				DWORD totalSize = 0;
 				do {
-					if (m_HTTPAsync.Read(buffer, 1024, &dwSizeRead) != S_OK) {
+					if (HTTPAsync.Read(buffer, 1024, &dwSizeRead) != S_OK) {
 						break;
 					}
 					temp.Write(buffer, dwSizeRead);
@@ -783,7 +783,8 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 			}
 		}
 
-		m_HTTPAsync.Close();
+		m_url_redirect_str = HTTPAsync.GetRedirectURL();
+		HTTPAsync.Close();
 	}
 
 	return __super::Open(m_tempfn);
@@ -806,6 +807,11 @@ void CWebTextFile::Close()
 		_wremove(m_tempfn);
 		m_tempfn.Empty();
 	}
+}
+
+const CString& CWebTextFile::GetRedirectURL() const
+{
+	return m_url_redirect_str;
 }
 
 ///////////////////////////////////////////////////////////////

@@ -227,6 +227,9 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 	realUrl = url;
 
 	CString base(url);
+	if (!f.GetRedirectURL().IsEmpty()) {
+		base = f.GetRedirectURL();
+	}
 	base.Truncate(base.ReverseFind('/') + 1);
 
 	bool bMediaSequence = false;

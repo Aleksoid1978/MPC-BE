@@ -30,30 +30,34 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt LPVOID lpvStatusInformation,
 								   __in DWORD dwStatusInformationLength)
 {
-	auto* pContext = (CHTTPAsync*)dwContext;
-	auto* pRes     = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
-	switch (pContext->m_context) {
+	if (!lpvStatusInformation) {
+		return;
+	}
+
+	auto pHTTPAsync   = reinterpret_cast<CHTTPAsync*>(dwContext);
+	auto pAsyncResult = reinterpret_cast<INTERNET_ASYNC_RESULT*>(lpvStatusInformation);
+
+	switch (pHTTPAsync->m_context) {
 		case Context::CONTEXT_CONNECT:
 			if (dwInternetStatus == INTERNET_STATUS_HANDLE_CREATED) {
-				pContext->m_hConnect = (HINTERNET)pRes->dwResult;
-				SetEvent(pContext->m_hConnectedEvent);
+				pHTTPAsync->m_hConnect = reinterpret_cast<HINTERNET>(pAsyncResult->dwResult);
+				SetEvent(pHTTPAsync->m_hConnectedEvent);
 			}
 			break;
 		case Context::CONTEXT_REQUEST:
 			{
 				switch (dwInternetStatus) {
 					case INTERNET_STATUS_HANDLE_CREATED:
-						{
-							pContext->m_hRequest = (HINTERNET)pRes->dwResult;
-							pContext->m_bRequestComplete = TRUE;
-							SetEvent(pContext->m_hRequestOpenedEvent);
-						}
+						pHTTPAsync->m_hRequest = reinterpret_cast<HINTERNET>(pAsyncResult->dwResult);
+						pHTTPAsync->m_bRequestComplete = TRUE;
+						SetEvent(pHTTPAsync->m_hRequestOpenedEvent);
 						break;
 					case INTERNET_STATUS_REQUEST_COMPLETE:
-						{
-							pContext->m_bRequestComplete = TRUE;
-							SetEvent(pContext->m_hRequestCompleteEvent);
-						}
+						pHTTPAsync->m_bRequestComplete = TRUE;
+						SetEvent(pHTTPAsync->m_hRequestCompleteEvent);
+						break;
+					case INTERNET_STATUS_REDIRECT:
+						pHTTPAsync->m_url_redirect_str.SetString(reinterpret_cast<LPCWSTR>(lpvStatusInformation), dwStatusInformationLength);
 						break;
 					}
 			}
@@ -479,4 +483,9 @@ const bool CHTTPAsync::IsCompressed() const
 UINT64 CHTTPAsync::GetLenght() const
 {
 	return m_lenght;
+}
+
+const CString& CHTTPAsync::GetRedirectURL() const
+{
+	return m_url_redirect_str;
 }
