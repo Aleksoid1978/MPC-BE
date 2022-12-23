@@ -12423,7 +12423,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			bool bIsVideo = false;
-			
+
 			BeginEnumFilters(m_pGB, pEF, pBF)
 			{
 				if (!m_pMainFSF) {

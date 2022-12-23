@@ -246,6 +246,7 @@ SRCS_LC = \
 	libavcodec/frame_thread_encoder.c \
 	libavcodec/fraps.c \
 	libavcodec/g2meet.c \
+	libavcodec/g726.c \
 	libavcodec/get_buffer.c \
 	libavcodec/golomb.c \
 	libavcodec/h263.c \

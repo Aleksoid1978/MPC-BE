@@ -155,6 +155,7 @@ static const FFCodec * const codec_list[] = {
     &ff_adpcm_xa_decoder,
     &ff_adpcm_yamaha_decoder,
     &ff_s302m_decoder,
+    &ff_adpcm_g726_decoder,
 
     &ff_libspeex_decoder,
     &ff_libdav1d_decoder,

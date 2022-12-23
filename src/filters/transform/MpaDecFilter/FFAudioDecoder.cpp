@@ -154,6 +154,8 @@ static const struct {
 	{ &MEDIASUBTYPE_MULAW,             AV_CODEC_ID_PCM_MULAW },
 	// AES3
 	{ &MEDIASUBTYPE_AES3,              AV_CODEC_ID_S302M },
+	// G.726 ADPCM
+	{ &MEDIASUBTYPE_G726_ADPCM,        AV_CODEC_ID_ADPCM_G726 },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };
