@@ -766,7 +766,7 @@ bool File_Dts::FileHeader_Begin()
 
     //All should be OK...
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:2;
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:(IsSub?1:2);
     return true;
 }
 
@@ -1250,10 +1250,9 @@ void File_Dts::Core()
 
     //Filling
     FILLING_BEGIN();
-        if (!Status[IsAccepted] && Frame_Count>=2) //TODO: find a better way to accept stream in short files so with only few frames
-            Accept("DTS");
-        if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid)
+        if (!Status[IsAccepted] && (Frame_Count>=Frame_Count_Valid || (Frame_Count>=2 && Frame_Count_Valid && (File_Size-Buffer_TotalBytes_FirstSynched)/Frame_Count_Valid<Element_Size))) //TODO: find a better way to accept stream in short files so with only few frames
         {
+            Accept("DTS");
             Fill("DTS");
 
             //No more need data

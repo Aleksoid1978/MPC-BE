@@ -1866,7 +1866,7 @@ void File_Ac4::Synched_Init()
     Accept();
     
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?128:2;
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?128:(IsSub?1:2);
 
     //FrameInfo
     PTS_End=0;

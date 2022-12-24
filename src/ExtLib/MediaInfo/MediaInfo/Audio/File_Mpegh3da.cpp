@@ -333,9 +333,9 @@ void File_Mpegh3da::Streams_Fill()
     // Filling
     if (!Mpegh3da_drcInstructionsUniDrc_Data[0].empty())
     {
-        drcInstructionsUniDrc_Data=Mpegh3da_drcInstructionsUniDrc_Data[0].begin()->second;
+        C.drcInstructionsUniDrc_Data=Mpegh3da_drcInstructionsUniDrc_Data[0].begin()->second;
         Fill_DRC();
-        drcInstructionsUniDrc_Data.clear();
+        C.drcInstructionsUniDrc_Data.clear();
     }
     /*
     if (!Mpegh3da_loudnessInfo_Data[0].empty() && !GroupPresets.empty())
@@ -357,12 +357,16 @@ void File_Mpegh3da::Streams_Fill()
     bool NoLoudnesConch;
     if (!Mpegh3da_loudnessInfo_Data[0].empty())
     {
-        loudnessInfo_Data[0]=Mpegh3da_loudnessInfo_Data[0].begin()->second.Data[0];
-        loudnessInfo_Data[1]=Mpegh3da_loudnessInfo_Data[0].begin()->second.Data[1];
-        loudnessInfoSet_Present=true;
+        C.loudnessInfo_Data[0]=Mpegh3da_loudnessInfo_Data[0].begin()->second.Data[0];
+        C.loudnessInfo_Data[1]=Mpegh3da_loudnessInfo_Data[0].begin()->second.Data[1];
+        #if MEDIAINFO_CONFORMANCE
+            C.loudnessInfoSet_Present[0]=0;
+            C.loudnessInfoSet_Present[1]=1;
+        #endif
+        C.loudnessInfoSet_IsNotValid=false;
         Fill_Loudness(NULL);
-        loudnessInfo_Data[0].clear();
-        loudnessInfo_Data[1].clear();
+        C.loudnessInfo_Data[0].clear();
+        C.loudnessInfo_Data[1].clear();
         NoLoudnesConch=true;
     }
     else
@@ -394,12 +398,12 @@ void File_Mpegh3da::Streams_Fill()
             Fill(Stream_Audio, 0, (p+" Kind").c_str(), Mpegh3da_groupPresetKind[P.Kind]);
         if (!Mpegh3da_drcInstructionsUniDrc_Data[3].empty())
         {
-            std::map<int8u, std::map<int16u, drc_info> >::iterator drcInstructionsUniDrc=Mpegh3da_drcInstructionsUniDrc_Data[3].find(P.ID);
+            auto drcInstructionsUniDrc=Mpegh3da_drcInstructionsUniDrc_Data[3].find(P.ID);
             if (drcInstructionsUniDrc!=Mpegh3da_drcInstructionsUniDrc_Data[3].end())
             {
-                drcInstructionsUniDrc_Data=drcInstructionsUniDrc->second;
+                C.drcInstructionsUniDrc_Data=drcInstructionsUniDrc->second;
                 Fill_DRC(p.c_str());
-                drcInstructionsUniDrc_Data.clear();
+                C.drcInstructionsUniDrc_Data.clear();
             }
         }
         if (!Mpegh3da_loudnessInfo_Data[3].empty())
@@ -407,10 +411,14 @@ void File_Mpegh3da::Streams_Fill()
             std::map<int8u, loudness_info_data>::iterator Loudness=Mpegh3da_loudnessInfo_Data[3].find(P.ID);
             if (Loudness!=Mpegh3da_loudnessInfo_Data[3].end())
             {
-                loudnessInfo_Data[0]=Loudness->second.Data[0];
-                loudnessInfoSet_Present=true;
+                C.loudnessInfo_Data[0]=Loudness->second.Data[0];
+                #if MEDIAINFO_CONFORMANCE
+                    C.loudnessInfoSet_Present[0]=0;
+                    C.loudnessInfoSet_Present[1]=1;
+                #endif
+                C.loudnessInfoSet_IsNotValid=false;
                 Fill_Loudness(p.c_str(), NoLoudnesConch);
-                loudnessInfo_Data[0].clear();
+                C.loudnessInfo_Data[0].clear();
             }
         }
         /* Disabled for the moment, need more details about how to show it
@@ -525,12 +533,12 @@ void File_Mpegh3da::Streams_Fill()
             Fill(Stream_Audio, 0, (g+" Default").c_str(), G.defaultOnOff?"Yes":"No");
         if (!Mpegh3da_drcInstructionsUniDrc_Data[1].empty())
         {
-            std::map<int8u, std::map<int16u, drc_info> >::iterator drcInstructionsUniDrc=Mpegh3da_drcInstructionsUniDrc_Data[1].find(G.ID);
+            auto drcInstructionsUniDrc=Mpegh3da_drcInstructionsUniDrc_Data[1].find(G.ID);
             if (drcInstructionsUniDrc!=Mpegh3da_drcInstructionsUniDrc_Data[1].end())
             {
-                drcInstructionsUniDrc_Data=drcInstructionsUniDrc->second;
+                C.drcInstructionsUniDrc_Data=drcInstructionsUniDrc->second;
                 Fill_DRC(g.c_str());
-                drcInstructionsUniDrc_Data.clear();
+                C.drcInstructionsUniDrc_Data.clear();
             }
         }
         if (!Mpegh3da_loudnessInfo_Data[1].empty())
@@ -538,20 +546,24 @@ void File_Mpegh3da::Streams_Fill()
             std::map<int8u, loudness_info_data>::iterator Loudness=Mpegh3da_loudnessInfo_Data[1].find(G.ID);
             if (Loudness!=Mpegh3da_loudnessInfo_Data[1].end())
             {
-                loudnessInfo_Data[0]=Loudness->second.Data[0];
-                loudnessInfoSet_Present=true;
+                C.loudnessInfo_Data[0]=Loudness->second.Data[0];
+                #if MEDIAINFO_CONFORMANCE
+                    C.loudnessInfoSet_Present[0]=0;
+                    C.loudnessInfoSet_Present[1]=1;
+                #endif
+                C.loudnessInfoSet_IsNotValid=false;
                 Fill_Loudness(g.c_str(), NoLoudnesConch);
-                loudnessInfo_Data[0].clear();
+                C.loudnessInfo_Data[0].clear();
             }
         }
         if (!Mpegh3da_drcInstructionsUniDrc_Data[2].empty()) // Not sure
         {
-            std::map<int8u, std::map<int16u, drc_info> >::iterator drcInstructionsUniDrc=Mpegh3da_drcInstructionsUniDrc_Data[2].find(G.ID);
+            auto drcInstructionsUniDrc=Mpegh3da_drcInstructionsUniDrc_Data[2].find(G.ID);
             if (drcInstructionsUniDrc!=Mpegh3da_drcInstructionsUniDrc_Data[2].end())
             {
-                drcInstructionsUniDrc_Data=drcInstructionsUniDrc->second;
+                C.drcInstructionsUniDrc_Data=drcInstructionsUniDrc->second;
                 Fill_DRC(g.c_str());
-                drcInstructionsUniDrc_Data.clear();
+                C.drcInstructionsUniDrc_Data.clear();
             }
         }
         if (!Mpegh3da_loudnessInfo_Data[2].empty()) // Not sure
@@ -559,10 +571,14 @@ void File_Mpegh3da::Streams_Fill()
             std::map<int8u, loudness_info_data>::iterator Loudness=Mpegh3da_loudnessInfo_Data[2].find(G.ID);
             if (Loudness!=Mpegh3da_loudnessInfo_Data[2].end())
             {
-                loudnessInfo_Data[0]=Loudness->second.Data[0];
-                loudnessInfoSet_Present=true;
+                C.loudnessInfo_Data[0]=Loudness->second.Data[0];
+                #if MEDIAINFO_CONFORMANCE
+                    C.loudnessInfoSet_Present[0]=0;
+                    C.loudnessInfoSet_Present[1]=1;
+                #endif
+                C.loudnessInfoSet_IsNotValid=false;
                 Fill_Loudness(g.c_str(), NoLoudnesConch);
-                loudnessInfo_Data[0].clear();
+                C.loudnessInfo_Data[0].clear();
             }
         }
 
@@ -1152,7 +1168,7 @@ void File_Mpegh3da::mpegh3daUniDrcConfig()
     Get_S1(6, drcInstructionsUniDrcCount,                       "drcInstructionsUniDrcCount");
 
     Element_Begin1("mpegh3daUniDrcChannelLayout");
-    Get_S1 (7, baseChannelCount,                                "baseChannelCount");
+    Get_S1 (7, C.baseChannelCount,                              "baseChannelCount");
     Element_End0();
     if (!drcCoefficientsUniDrcCount)
         Fill(Stream_Audio, 0, "TEMP_drcCoefficientsUniDrcCount", drcCoefficientsUniDrcCount); //TEMP
@@ -1174,8 +1190,8 @@ void File_Mpegh3da::mpegh3daUniDrcConfig()
             ID=0;
 
         drcInstructionsUniDrc(false, true); // in File_USAC.cpp
-        Mpegh3da_drcInstructionsUniDrc_Data[drcInstructionsType][ID][drcInstructionsUniDrc_Data.begin()->first]=drcInstructionsUniDrc_Data.begin()->second;
-        drcInstructionsUniDrc_Data.clear();
+        Mpegh3da_drcInstructionsUniDrc_Data[drcInstructionsType][ID][C.drcInstructionsUniDrc_Data.begin()->first]=C.drcInstructionsUniDrc_Data.begin()->second;
+        C.drcInstructionsUniDrc_Data.clear();
     }
 
     TEST_SB_SKIP(                                               "uniDrcConfigExtPresent");
@@ -1239,8 +1255,8 @@ void File_Mpegh3da::mpegh3daLoudnessInfoSet()
             ID=0;
 
         bool IsNOK=loudnessInfo(false); // in File_USAC.cpp
-        Mpegh3da_loudnessInfo_Data[loudnessInfoType][ID].Data[0][loudnessInfo_Data[0].begin()->first]=loudnessInfo_Data[0].begin()->second;
-        loudnessInfo_Data[0].clear();
+        Mpegh3da_loudnessInfo_Data[loudnessInfoType][ID].Data[0][C.loudnessInfo_Data[0].begin()->first]=C.loudnessInfo_Data[0].begin()->second;
+        C.loudnessInfo_Data[0].clear();
         if (IsNOK)
         {
             Element_End0();
@@ -1254,8 +1270,8 @@ void File_Mpegh3da::mpegh3daLoudnessInfoSet()
         for (int8u Pos=0; Pos<loudnessInfoAlbumCount; Pos++)
         {
             loudnessInfo(true); // in File_USAC.cpp
-            Mpegh3da_loudnessInfo_Data[0][0].Data[1][loudnessInfo_Data[1].begin()->first]=loudnessInfo_Data[1].begin()->second;
-            loudnessInfo_Data[1].clear();
+            Mpegh3da_loudnessInfo_Data[0][0].Data[1][C.loudnessInfo_Data[1].begin()->first]=C.loudnessInfo_Data[1].begin()->second;
+            C.loudnessInfo_Data[1].clear();
         }
     TEST_SB_END();
 

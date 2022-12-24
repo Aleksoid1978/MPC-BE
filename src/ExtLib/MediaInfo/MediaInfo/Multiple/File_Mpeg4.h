@@ -100,6 +100,8 @@ private :
     void moof();
     void moof_mfhd();
     void moof_traf();
+    void moof_traf_sbgp() { moov_trak_mdia_minf_stbl_sbgp(); }
+    void moof_traf_sgpd() { moov_trak_mdia_minf_stbl_sgpd(); }
     void moof_traf_sdtp();
     void moof_traf_tfdt();
     void moof_traf_tfhd();
@@ -167,7 +169,9 @@ private :
     void moov_trak_mdia_minf_stbl_cslg();
     void moov_trak_mdia_minf_stbl_co64();
     void moov_trak_mdia_minf_stbl_ctts();
+    void moov_trak_mdia_minf_stbl_sbgp();
     void moov_trak_mdia_minf_stbl_sdtp();
+    void moov_trak_mdia_minf_stbl_sgpd();
     void moov_trak_mdia_minf_stbl_stco();
     void moov_trak_mdia_minf_stbl_stdp();
     void moov_trak_mdia_minf_stbl_stps();
@@ -213,6 +217,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_damr();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dec3();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ddts();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_dfLa();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dmlp();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC();
@@ -454,6 +459,7 @@ private :
         std::vector<int64u>     stsz_Total; //TODO: merge with stsz
         int64u                  stsz_StreamSize; //TODO: merge with stsz
         std::vector<int64u>     stss; //Sync Sample, base=0
+        int64u                  FramePos_Offset;
         struct stts_struct
         {
             int32u SampleCount;
@@ -543,6 +549,7 @@ private :
             hdlr_Type=0x00000000;
             hdlr_SubType=0x00000000;
             hdlr_Manufacturer=0x00000000;
+            FramePos_Offset=0;
             stsz_StreamSize=0;
             stsz_Sample_Size=0;
             stsz_Sample_Multiplier=1;

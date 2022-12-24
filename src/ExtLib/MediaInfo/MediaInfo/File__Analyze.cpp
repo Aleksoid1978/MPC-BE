@@ -2915,8 +2915,12 @@ void File__Analyze::Trusted_IsNot (const char* Reason)
 void File__Analyze::Trusted_IsNot ()
 #endif //MEDIAINFO_TRACE
 {
-    Element_Offset=Element_Size;
-    BS->Attach(NULL, 0);
+    if (BS && (BS->Offset_Get() || BS->Remain()))
+        BS->Skip(BS->Remain());
+    else if (BT && (BT->Offset_Get() || BT->Remain()))
+        BS->Skip(BT->Remain());
+    else
+        Element_Offset=Element_Size;
 
     if (!Element[Element_Level].UnTrusted)
     {

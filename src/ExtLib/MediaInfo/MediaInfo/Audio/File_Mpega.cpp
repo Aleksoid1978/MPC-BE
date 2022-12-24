@@ -584,7 +584,7 @@ bool File_Mpega::FileHeader_Begin()
 
     //Seems OK
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.5?128:(Config->ParseSpeed>=0.3?32:4);
+        Frame_Count_Valid=Config->ParseSpeed>=0.5?128:(Config->ParseSpeed>=0.3?32:(IsSub?1:4));
     return true;
 }
 
@@ -1445,6 +1445,8 @@ void File_Mpega::Header_Encoders_Lame()
              ||  Tag[4]=='3' && Tag[8]>='0' && Tag[8]<='9')                                                     // v3.xy0-v3.xy9
                 HasInfoTag=true;
         }
+        if (Name==0x4C414D45 && Tag[4]=='H') // "LAMEH", Helix MP3 encoder
+            HasInfoTag=true;
         if (Name==0x4C332E39   // "L3.9"
          && Tag[4]=='9')
             HasInfoTag=true; //Form old code, to be confirmed: Ugly version string in Lame 3.99.1 "L3.99r1\0".

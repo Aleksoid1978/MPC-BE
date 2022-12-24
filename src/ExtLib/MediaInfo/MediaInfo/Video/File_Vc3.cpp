@@ -436,7 +436,7 @@ File_Vc3::File_Vc3()
 :File__Analyze()
 {
     //In
-    Frame_Count_Valid=2;
+    Frame_Count_Valid=0;
     FrameRate=0;
 
     //Parsers
@@ -459,6 +459,13 @@ File_Vc3::~File_Vc3()
 //***************************************************************************
 // Streams management
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Vc3::Streams_Accept()
+{
+    if (Frame_Count_Valid)
+        Frame_Count_Valid=IsSub?1:2;
+}
 
 //---------------------------------------------------------------------------
 void File_Vc3::Streams_Fill()

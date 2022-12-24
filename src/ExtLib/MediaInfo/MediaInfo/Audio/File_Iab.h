@@ -57,7 +57,12 @@ private :
     {
         vector<int32u> ChannelLayout;
     };
-    vector<object> Objects;
+    struct frame
+    {
+        vector<object> Objects;
+    };
+    frame                       Frame;
+    frame                       F;
 
     //Helpers
     void Get_Plex(int8u Bits, int32u& Info, const char* Name);

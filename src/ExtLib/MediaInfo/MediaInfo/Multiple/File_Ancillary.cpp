@@ -458,6 +458,8 @@ void File_Ancillary::Read_Buffer_AfterParsing()
     Frame_Count_InThisBlock++;
     if (Frame_Count_NotParsedIncluded!=(int64u)-1)
         Frame_Count_NotParsedIncluded++;
+    if (!Status[IsFilled] && Config->ParseSpeed<=0)
+        Fill();
 }
 
 //---------------------------------------------------------------------------

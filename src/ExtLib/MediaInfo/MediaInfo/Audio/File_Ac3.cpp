@@ -1811,7 +1811,7 @@ bool File_Ac3::Synchronize()
 void File_Ac3::Synched_Init()
 {
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:2;
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:(IsSub?1:2);
 
     //FrameInfo
     PTS_End=0;
@@ -2344,7 +2344,7 @@ void File_Ac3::Core_Frame()
                     Skip_S2(14,                                     "timecod2");
                 TEST_SB_END();
             }
-            TEST_SB_SKIP(                                           "addbsie");
+            TEST_SB_GET (addbsie,                                   "addbsie");
                 int8u addbsil;
                 Get_S1 (6, addbsil,                                 "addbsil");
                 for (int8u Pos=0; Pos<=addbsil; Pos++) //addbsil+1 bytes

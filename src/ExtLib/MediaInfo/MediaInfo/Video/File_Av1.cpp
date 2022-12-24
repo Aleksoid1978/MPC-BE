@@ -121,7 +121,7 @@ void File_Av1::Streams_Accept()
     Fill(Stream_Video, 0, Video_Format, "AV1");
 
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?8:2;
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?8:(IsSub?1:2);
 }
 
 //---------------------------------------------------------------------------

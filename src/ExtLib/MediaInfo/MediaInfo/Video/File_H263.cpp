@@ -239,7 +239,7 @@ bool File_H263::Synched_Test()
 void File_H263::Synched_Init()
 {
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?8:2;
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?8:(IsSub?1:2);
 
     //Temp
     PAR_W=12;

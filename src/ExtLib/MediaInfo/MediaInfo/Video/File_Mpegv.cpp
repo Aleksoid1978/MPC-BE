@@ -1755,7 +1755,7 @@ bool File_Mpegv::Synched_Test()
 void File_Mpegv::Synched_Init()
 {
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?512:2;
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?512:(IsSub?1:2);
 
     //Temp
     BVOP_Count=0;

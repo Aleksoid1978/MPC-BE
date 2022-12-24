@@ -160,6 +160,7 @@ void File_SmpteSt0331::Read_Buffer_Continue()
 
     Skip_XX(Element_Size-4,                             "Data");
 
+    Frame_Count++;
     Frame_Count_InThisBlock++;
     if (Frame_Count_NotParsedIncluded!=(int64u)-1)
         Frame_Count_NotParsedIncluded++;
@@ -179,22 +180,10 @@ void File_SmpteSt0331::Read_Buffer_Continue()
     #endif //MEDIAINFO_DEMUX
 
     FILLING_BEGIN();
-    if (!Status[IsAccepted])
-    {
-        Accept("SMPTE ST 331");
-
-        int8u Channels=0;
-        for (int8u Pos=0; Pos<8; Pos++)
-        {
-            if (Channels_valid&(1<<Pos))
-                Channels++;
-            Element_Offset+=4;
-        }
-
-        Stream_Prepare(Stream_Audio);
-        Fill(Stream_Audio, 0, Audio_Format, "PCM");
-        Fill(Stream_Audio, 0, Audio_Channel_s_, Channels);
-    }
+        if (!Status[IsAccepted])
+            Accept("SMPTE ST 331");
+        if (!Status[IsFilled])
+            Fill("SMPTE ST 331");
     FILLING_END();
 }
 

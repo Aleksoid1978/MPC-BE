@@ -25,6 +25,7 @@
 #if defined(MEDIAINFO_TELETEXT_YES)
     #include "MediaInfo/Text/File_Teletext.h"
 #endif
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -91,6 +92,8 @@ void File_Vbi::Read_Buffer_Continue()
     Frame_Count_InThisBlock++;
     if (Frame_Count_NotParsedIncluded!=(int64u)-1)
         Frame_Count_NotParsedIncluded++;
+    if (!Status[IsFilled] && Config->ParseSpeed<=0)
+        Fill();
 }
 
 //---------------------------------------------------------------------------

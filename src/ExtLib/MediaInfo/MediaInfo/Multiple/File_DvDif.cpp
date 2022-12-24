@@ -236,7 +236,7 @@ File_DvDif::File_DvDif()
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
 
     //In
-    Frame_Count_Valid=2;
+    Frame_Count_Valid=IsSub?1:2;
     AuxToAnalyze=0x00; //No Aux to analyze
     IgnoreAudio=false;
 

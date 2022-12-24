@@ -64,6 +64,7 @@ public :
     //In
     stream_t KindOfStream;
     size_t   PosOfStream;
+    int32u   TrackID;
     bool     Parser_DoNotFreeIt; //If you want to keep the Parser
     bool     SLConfig_DoNotFreeIt; //If you want to keep the SLConfig
 

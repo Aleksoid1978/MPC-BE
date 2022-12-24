@@ -4236,7 +4236,7 @@ void File_Riff::Parser_Pcm(stream& StreamItem, int16u Channels, int16u BitsPerSa
     #if defined(MEDIAINFO_DTS_YES)
     {
         File_Dts* Parser=new File_Dts;
-        Parser->Frame_Count_Valid=2;
+        Parser->Frame_Count_Valid=8;
         Parser->ShouldContinueParsing=true;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get() && Retrieve(Stream_General, 0, General_Format)==__T("Wave"))

@@ -403,6 +403,13 @@ public:
         return Buffer_Size%8;
     }
 
+    inline void Resize(size_t Size_) //Size_ is the new count of remaining bits, must have the same alignment as Remain()
+    {
+        if (BufferUnderRun && Size_>Buffer_Size)
+            BufferUnderRun=false;
+        Buffer_Size=Size_;
+    }
+
 private :
     const int8u*    Buffer;
     size_t          Buffer_Size;

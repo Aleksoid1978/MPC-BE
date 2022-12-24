@@ -920,7 +920,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
 void File_Hevc::Synched_Init()
 {
     if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?16:16; //Note: should be replaced by "512:2" when I-frame/GOP detection is OK
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?16:(IsSub?1:2); //Note: should be replaced by "512:2" when I-frame/GOP detection is OK
 
     //FrameInfo
     PTS_End=0;

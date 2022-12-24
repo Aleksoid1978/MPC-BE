@@ -133,7 +133,7 @@ File_Iab::File_Iab()
     StreamSource=IsStream;
 
     //In
-    Frame_Count_Valid=2;
+    Frame_Count_Valid=1;
 
     //Temp
     SampleRate=(int8u)-1;
@@ -153,15 +153,14 @@ File_Iab::~File_Iab()
 //---------------------------------------------------------------------------
 void File_Iab::Streams_Fill_ForAdm()
 {
-
-    if (Objects.empty())
+    if (Frame.Objects.empty())
         return;
     Fill(Stream_Audio, 0, "NumberOfProgrammes", 1);
     Fill(Stream_Audio, 0, "NumberOfContents", 1);
-    Fill(Stream_Audio, 0, "NumberOfObjects", Objects.size());
-    Fill(Stream_Audio, 0, "NumberOfPackFormats", Objects.size());
+    Fill(Stream_Audio, 0, "NumberOfObjects", Frame.Objects.size());
+    Fill(Stream_Audio, 0, "NumberOfPackFormats", Frame.Objects.size());
     size_t numberOfChannelFormats=0;
-    for (const auto& Object : Objects)
+    for (const auto& Object : Frame.Objects)
     {
         numberOfChannelFormats+=Object.ChannelLayout.empty()?1:Object.ChannelLayout.size();
     }
@@ -188,7 +187,7 @@ void File_Iab::Streams_Fill_ForAdm()
         Fill(Stream_Audio, 0, (string(O) + " Pos").c_str(), 0);
         Fill_SetOptions(Stream_Audio, 0, (string(O) + " Pos").c_str(), "N NIY");
         ZtringList SubstreamPos, SubstreamNum;
-        for (size_t i=0; i<Objects.size(); i++)
+        for (size_t i=0; i<Frame.Objects.size(); i++)
         {
             SubstreamPos.push_back(Ztring::ToZtring(i));
             SubstreamNum.push_back(Ztring::ToZtring(i+1));
@@ -204,9 +203,9 @@ void File_Iab::Streams_Fill_ForAdm()
     }
 
     numberOfChannelFormats=0;
-    for (size_t i=0; i<Objects.size(); i++)
+    for (size_t i=0; i<Frame.Objects.size(); i++)
     {
-        const auto& Object=Objects[i];
+        const auto& Object=Frame.Objects[i];
         auto O="Object"+to_string(i);
         Fill(Stream_Audio, 0, O.c_str(), "Yes");
         Fill(Stream_Audio, 0, (O + " Pos").c_str(), i);
@@ -242,9 +241,9 @@ void File_Iab::Streams_Fill_ForAdm()
     }
 
     numberOfChannelFormats = 0;
-    for (size_t i=0; i<Objects.size(); i++)
+    for (size_t i=0; i<Frame.Objects.size(); i++)
     {
-        const auto& Object=Objects[i];
+        const auto& Object=Frame.Objects[i];
         auto O="PackFormat"+to_string(i);
         Fill(Stream_Audio, 0, O.c_str(), "Yes");
         Fill(Stream_Audio, 0, (O + " Pos").c_str(), i);
@@ -279,9 +278,9 @@ void File_Iab::Streams_Fill_ForAdm()
     }
 
     numberOfChannelFormats=0;
-    for (size_t i=0; i<Objects.size(); i++)
+    for (size_t i=0; i<Frame.Objects.size(); i++)
     {
-        const auto& Object=Objects[i];
+        const auto& Object=Frame.Objects[i];
         auto O_Base="ChannelFormat";
         if (Object.ChannelLayout.empty())
         {
@@ -308,9 +307,9 @@ void File_Iab::Streams_Fill_ForAdm()
     }
 
     numberOfChannelFormats=0;
-    for (size_t i=0; i<Objects.size(); i++)
+    for (size_t i=0; i<Frame.Objects.size(); i++)
     {
-        const auto& Object=Objects[i];
+        const auto& Object=Frame.Objects[i];
         auto O_Base="TrackUID";
         if (Object.ChannelLayout.empty())
         {
@@ -362,9 +361,9 @@ void File_Iab::Streams_Fill_ForAdm()
     }
 
     numberOfChannelFormats=0;
-    for (size_t i=0; i<Objects.size(); i++)
+    for (size_t i=0; i<Frame.Objects.size(); i++)
     {
-        const auto& Object=Objects[i];
+        const auto& Object=Frame.Objects[i];
         auto O_Base="TrackFormat";
         if (Object.ChannelLayout.empty())
         {
@@ -400,9 +399,9 @@ void File_Iab::Streams_Fill_ForAdm()
     }
 
     numberOfChannelFormats=0;
-    for (size_t i=0; i<Objects.size(); i++)
+    for (size_t i=0; i<Frame.Objects.size(); i++)
     {
-        const auto& Object=Objects[i];
+        const auto& Object=Frame.Objects[i];
         auto O_Base="StreamFormat";
         if (Object.ChannelLayout.empty())
         {
@@ -535,6 +534,14 @@ void File_Iab::Data_Parse()
         case 0x00000400: Element_Name("Audio Data PCM"); AudioDataPCM(); break;
         default: Element_Name(Ztring().From_CC4((int32u)Element_Code)); Skip_XX(Element_Size, "Data");
     }
+
+    if ((Element_Code!=0x00000008 || Element_Offset==Element_Size) && Element_Size>=Element_TotalSize_Get(Element_Level-1))
+    {
+        Frame.Objects=move(F.Objects);
+        Frame_Count++;
+        if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid)
+            Finish();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -553,23 +560,16 @@ void File_Iab::IAFrame()
         Get_Plex8 (MaxRendered,                                     "MaxRendered");
         Get_Plex8 (SubElementCount,                                 "SubElementCount");
         Element_ThisIsAList();
-        if (Frame_Count+1<Frame_Count_Valid)
-            Objects.clear();
+        Frame.Objects=move(F.Objects);
     }
     else
         Skip_XX(Element_Size-Element_Offset,                        "Unknown");
-
-    FILLING_BEGIN();
-        Frame_Count++;
-        if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid)
-            Finish();
-    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
 void File_Iab::BedDefinition()
 {
-    Objects.resize(Objects.size()+1);
+    F.Objects.resize(F.Objects.size()+1);
 
     //Parsing
     int32u ChannelCount;
@@ -604,7 +604,7 @@ void File_Iab::BedDefinition()
                 Skip_S1(10,                                     "ChannelDecorCoef");
         }
         Element_End0();
-        Objects.back().ChannelLayout.push_back(ChannelID);
+        F.Objects.back().ChannelLayout.push_back(ChannelID);
     }
     Skip_S2(10,                                                 "0x180");
     if (Data_BS_Remain()%8)
@@ -625,7 +625,7 @@ void File_Iab::BedDefinition()
 //---------------------------------------------------------------------------
 void File_Iab::ObjectDefinition()
 {
-    Objects.resize(Objects.size()+1);
+    F.Objects.resize(F.Objects.size()+1);
 
     //Parsing
     int8u AudioDescription;
