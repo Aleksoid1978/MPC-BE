@@ -30,7 +30,7 @@ German                : Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus Luppert
 Greek                 : Lampros Zouloumis, George
 Hungarian             : Kleiber Tamás, mickey
 Italian               : Lord Maius, mapi68
-Korean                : kuh3h3
+Korean                : kuh3h3, Hackjjang
 Polish                : Volfield, maxoku
 Portuguese (Brazil)   : SIEGFRIED JANKE
 Spanish               : IPeluchito
