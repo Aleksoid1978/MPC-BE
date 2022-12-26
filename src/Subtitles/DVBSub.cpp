@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -341,6 +341,8 @@ HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 		pPage->rendered = true;
 		TRACE_DVB(L"DVB - Renderer - %s - %s", ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
 
+		const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_Display.width > 720;
+
 		int nRegion = 1, nObject = 1;
 		for (POSITION pos = pPage->regionsPos.GetHeadPosition(); pos; nRegion++) {
 			DVB_REGION_POS regionPos = pPage->regionsPos.GetNext(pos);
@@ -353,7 +355,7 @@ HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 							SHORT nY = regionPos.vertAddr  + objectPos.object_vertical_position;
 							pObject->m_width  = pRegion->width;
 							pObject->m_height = pRegion->height;
-							pObject->SetPalette(pCLUT->size, pCLUT->palette, yuvMatrix == L"709" ? true : yuvMatrix == L"601" ? false : m_Display.width > 720, convertType);
+							pObject->SetPalette(pCLUT->size, pCLUT->palette, bRec709, convertType);
 
 							InitSpd(spd, m_Display.width, m_Display.height);
 							pObject->RenderDvb(spd, nX, nY, m_bResizedRender ? &m_spd : NULL);

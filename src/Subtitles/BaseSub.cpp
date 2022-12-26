@@ -71,3 +71,16 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 		ASSERT(hr == S_OK);
 	}
 }
+
+HRESULT CBaseSub::SetConvertType(const CString& _yuvMatrix, ColorConvert::convertType _convertType)
+{
+	if (_yuvMatrix == L"709") {
+		yuvMatrix = YUVMATRIX::BT709;
+	} else if (_yuvMatrix == L"601") {
+		yuvMatrix = YUVMATRIX::BT601;
+	}
+
+	convertType = _convertType;
+
+	return S_OK;
+}

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -165,11 +165,6 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, RE
 	return S_OK;
 }
 
-static void SetPalette(CompositionObject* pObject, const int nNbEntry, HDMV_PALETTE* pPalette, const CString yuvMatrix, const SHORT nVideoWidth, ColorConvert::convertType convertType)
-{
-	pObject->SetPalette(nNbEntry, pPalette, yuvMatrix == L"709" ? true : yuvMatrix == L"601" ? false : nVideoWidth > 720, convertType);
-}
-
 HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
 	bbox.left   = LONG_MAX;
@@ -178,6 +173,8 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 	bbox.bottom = 0;
 
 	HRESULT hr = E_FAIL;
+
+	const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_VideoDescriptor.nVideoWidth > 720;
 
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
@@ -189,7 +186,7 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 					m_VideoDescriptor.nVideoHeight >= (pObject->m_vertical_position + pObject->m_height)) {
 
 				if (!pObject->HavePalette() && m_DefaultCLUT.Palette) {
-					SetPalette(pObject, m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
+					pObject->SetPalette(m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, bRec709, convertType);
 				}
 
 				if (!pObject->HavePalette()) {
@@ -329,7 +326,9 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 	if (!m_pObjects.IsEmpty()) {
 		auto& pObject = m_pObjects.GetTail();
 		if (!pObject->HavePalette() && m_CLUT[palette_id_ref].Palette) {
-			SetPalette(pObject, m_CLUT[palette_id_ref].pSize, m_CLUT[palette_id_ref].Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
+			const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_VideoDescriptor.nVideoWidth > 720;
+			auto& clut = m_CLUT[palette_id_ref];
+			pObject->SetPalette(clut.pSize, clut.Palette, bRec709, convertType);
 		}
 	}
 
@@ -441,8 +440,10 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 	memcpy(m_DefaultCLUT.Palette, pPalette, nNbEntry * sizeof(HDMV_PALETTE));
 
 	if (m_pCurrentWindow && m_pCurrentWindow->m_palette_id_ref == palette_id && m_pCurrentWindow->m_nObjectNumber) {
+		const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_VideoDescriptor.nVideoWidth > 720;
+
 		for (int i = 0; i < m_pCurrentWindow->m_nObjectNumber; i++) {
-			SetPalette(m_pCurrentWindow->Objects[i], nNbEntry, pPalette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
+			m_pCurrentWindow->Objects[i]->SetPalette(nNbEntry, pPalette, bRec709, convertType);
 		}
 	}
 }

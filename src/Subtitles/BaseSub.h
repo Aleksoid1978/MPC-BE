@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2022 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,7 +42,7 @@ public:
 	virtual void			CleanOld(REFERENCE_TIME rt) PURE;
 	virtual HRESULT			EndOfStream() { return S_OK; }
 
-	HRESULT					SetConvertType(CString _yuvMatrix, ColorConvert::convertType _convertType) { yuvMatrix = _yuvMatrix; convertType = _convertType; return S_OK; };
+	HRESULT					SetConvertType(const CString& _yuvMatrix, ColorConvert::convertType _convertType);
 
 protected :
 	SUBTITLE_TYPE			m_nType;
@@ -55,6 +55,13 @@ protected :
 	void					InitSpd(SubPicDesc& spd, int nWidth, int nHeight);
 	void					FinalizeRender(SubPicDesc& spd);
 
-	CString						yuvMatrix;
+	enum class YUVMATRIX
+	{
+		UNKNOWN,
+		BT601,
+		BT709
+	};
+
+	YUVMATRIX					yuvMatrix = {};
 	ColorConvert::convertType	convertType;
 };
