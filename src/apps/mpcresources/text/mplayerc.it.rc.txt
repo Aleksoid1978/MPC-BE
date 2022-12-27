@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2022 vedi Authors.txt"
@@ -7,7 +7,7 @@
 12		"Compilatore FFmpeg:"
 13		"Libavcodec / Libavutil:"
 23		"Questo software è freeware ed è rilasciato secondo la GNU (General Public License)."
-24		"Traduzione italiana di mapi68 & Lord Maius"
+24		"Traduzione italiana di Massimo Pissarello"
 25		"OK"
 END
 
@@ -1380,9 +1380,9 @@ STRING IDS_CENTER_LEVEL_DEC		"Diminuisci livello centrale"
 STRING IDS_CENTER_LEVEL_INC		"Aumenta livello centrale"
 STRING IDS_CENTER_LEVEL_OSD		"Livello centrale: %+.1f dB"
 STRING IDS_CLEAR		"Svuota"
-STRING IDS_CMD_ADD		"/add\t\tAggiungi ""nome percorso"" alla playlist, può essere combinato\n\t\tcon /open e /play"
+STRING IDS_CMD_ADD		"/add\t\tAggiungi ""nome_percorso"" alla playlist, può essere combinato\n\t\tcon /open e /play"
 STRING IDS_CMD_AUDIORENDERER		"/audiorenderer N\tInizia a usare l'audiorenderer N, dove N inizia da 1\n\t\t(vedi impostazioni ""Audio"")"
-STRING IDS_CMD_CD		"/cd\t\tCarica tutte le tracce di un cd audio o (s)vcd,\n\t\t""nome percorso"" indica il percorso dell'unità (opzionale)"
+STRING IDS_CMD_CD		"/cd\t\tCarica tutte le tracce di un cd audio o (s)vcd,\n\t\t""nome_percorso"" indica il percorso dell'unità (opzionale)"
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tApri percorsi/collegamenti dagli appunti"
 STRING IDS_CMD_CLOSE		"/close\t\tChiudi il lettore dopo la riproduzione (funziona solo quando\n\t\utilizzato con /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tAvvia il rendering in modalità a schermo intero esclusiva"
@@ -1411,7 +1411,7 @@ STRING IDS_CMD_START		"/start ms\t\tInizia la riproduzione a ""ms"" (= milliseco
 STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tInizia la riproduzione alla posizione hh:mm:ss"
 STRING IDS_CMD_SUB		"/sub ""subname""\tCarica un file di sottotitoli aggiuntivo"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tRimuovi tutte le associazioni di file"
-STRING IDS_CMD_USAGE		"Utilizzo: mpc-be.exe ""nome percorso"" [opzioni]\n\n""nome percorso""\tIl file o la directory principale da caricare (caratteri jolly\n\t\tammessi)"
+STRING IDS_CMD_USAGE		"Utilizzo: mpc-be.exe ""nome_percorso"" [opzioni]\n\n""nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly\n\t\tammessi)"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Luminoso (2,2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Scuro (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Dim (2.35 Gamma)"
