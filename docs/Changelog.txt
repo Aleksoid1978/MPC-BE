@@ -2,11 +2,33 @@
 
 1.6.5.x dev
 =============================
+MPCStreamReader
+Added support for URL redirection for HLS.
+
+AudioSplitter
+Fixed playback of initial samples of FLAC files.
+
 MPCVideoDec
 Fixed decoding of some MPEG-4 ASP.
 
 MpcAudioRenderer
 Fixed audio dropout when changing speed at the end of playback.
+
+VideoRenderers
+Refactoring and optimization.
+EVR-CP can now be used as a preview renderer.
+
+Subtitles
+Improved parsing of polygon parameters in SSA/ASS subtitles.
+Minor rendering optimizations for PGS/DVB subtitles.
+
+Player
+Added option to select preview renderer.
+Fixed placement of a vertically stretched frame in the preview window.
+Additional tracks will no longer appear in the list of recent Windows files.
+
+Updated Korean translation (by Potmarigold and Hackjjang).
+Updated Italian translation (by mapi68).
 
 Updated libraries:
 	MediaInfo git-v22.12-g69756e4c1.
