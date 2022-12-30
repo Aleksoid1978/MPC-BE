@@ -1286,6 +1286,8 @@ static int read_access_unit(AVCodecContext *avctx, AVFrame *frame,
             if (!s->restart_seen)
                 goto next_substr;
 
+// ==> Start patch MPC
+/*
             if (substr > 0 && substr < m->max_decoded_substream &&
                 (s->min_channel <= m->substream[substr - 1].max_channel)) {
                 av_log(avctx, AV_LOG_DEBUG,
@@ -1293,6 +1295,8 @@ static int read_access_unit(AVCodecContext *avctx, AVFrame *frame,
                        substr - 1, substr);
                 goto next_substr;
             }
+*/
+// ==> End patch MPC
 
             if (substr != m->max_decoded_substream &&
                 ((s->coded_channels & m->substream[m->max_decoded_substream].coded_channels) != 0)) {
