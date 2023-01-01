@@ -729,7 +729,13 @@ void COSD::ClearMessage(bool hide)
 	}
 }
 
-void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration/* = 5000*/, const bool bPeriodicallyDisplayed/* = false*/, const int FontSize/* = 0*/, LPCWSTR OSD_Font/* = nullptr*/)
+void COSD::DisplayMessage(
+	OSD_MESSAGEPOS nPos,
+	LPCWSTR strMsg,
+	int nDuration/* = 5000*/,
+	const bool bPeriodicallyDisplayed/* = false*/,
+	const int FontSize/* = 0*/,
+	LPCWSTR OSD_Font/* = nullptr*/)
 {
 	if (!m_bShowMessage) {
 		return;

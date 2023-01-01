@@ -1,5 +1,5 @@
 /*
- * (C) 2022 see Authors.txt
+ * (C) 2022-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,7 +72,7 @@ bool CAESDecryptor::SetKey(const BYTE* key, size_t keySize, const BYTE* iv, size
 		return false;
 	}
 
-	ret = BCryptSetProperty(m_hAesAlg, BCRYPT_CHAINING_MODE, reinterpret_cast<PUCHAR>(BCRYPT_CHAIN_MODE_CBC), sizeof(BCRYPT_CHAIN_MODE_CBC), 0);
+	ret = BCryptSetProperty(m_hAesAlg, BCRYPT_CHAINING_MODE, reinterpret_cast<PUCHAR>(const_cast<wchar_t*>(BCRYPT_CHAIN_MODE_CBC)), sizeof(BCRYPT_CHAIN_MODE_CBC), 0);
 	if (!NT_SUCCESS(ret)) {
 		return false;
 	}

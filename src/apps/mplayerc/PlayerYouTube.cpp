@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -235,7 +235,7 @@ namespace Youtube
 													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
-					constexpr char* str[] = {
+					constexpr const char* str[] = {
 						// android player API JSON
 						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "hl": "en"}}, )"
 						R"("videoId": "%S", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"

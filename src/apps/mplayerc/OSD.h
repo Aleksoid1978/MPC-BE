@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -153,7 +153,13 @@ public:
 	void Start(CWnd* pWnd);
 	void Stop();
 
-	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCWSTR strMsg, int nDuration = 5000, const bool bPeriodicallyDisplayed = false, const int FontSize = 0, LPCWSTR OSD_Font = nullptr);
+	void DisplayMessage(
+		OSD_MESSAGEPOS nPos,
+		LPCWSTR strMsg,
+		int nDuration = 5000,
+		const bool bPeriodicallyDisplayed = false,
+		const int FontSize = 0,
+		LPCWSTR OSD_Font = nullptr);
 	void DebugMessage(LPCWSTR format, ...);
 	void ClearMessage(bool hide = false);
 

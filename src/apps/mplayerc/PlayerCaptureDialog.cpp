@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -110,7 +110,7 @@ static void LoadDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const G
 		}
 
 		Codec& c = codecs[iSel];
-		if (displayName == c.displayName) {
+		if (displayName.Compare(c.displayName) == 0) {
 			box.SetCurSel(i);
 			if (!c.pBF) {
 				c.pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&c.pBF));

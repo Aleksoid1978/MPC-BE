@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,7 +85,7 @@ void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
 
 BOOL CPPageFileMediaInfo::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->message == WM_KEYDOWN && pMsg->hwnd == m_mediainfo) {
+	if (pMsg->message == WM_KEYDOWN && pMsg->hwnd == m_mediainfo.m_hWnd) {
 		if ((LOWORD(pMsg->wParam) == 'A' || LOWORD(pMsg->wParam) == 'a')
 				&& GetKeyState(VK_CONTROL) < 0) {
 			m_mediainfo.SetSel(0, -1, TRUE);

@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2022 see Authors.txt
+ * (C) 2021-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 
 class CExListCtrl : public CListCtrl
 {
-	BOOL CExListCtrl::PreTranslateMessage(MSG* pMsg) override
+	BOOL PreTranslateMessage(MSG* pMsg) override
 	{
 		if (pMsg->message == WM_CHAR) {
 			WCHAR chr = static_cast<WCHAR>(pMsg->wParam);
