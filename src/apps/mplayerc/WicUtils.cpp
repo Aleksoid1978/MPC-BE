@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -524,7 +524,7 @@ HRESULT WicSaveImage(
 	if (SUCCEEDED(hr)) {
 		if (containerFormat == GUID_ContainerFormatJpeg) {
 			PROPBAG2 option = {};
-			option.pstrName = L"ImageQuality";
+			option.pstrName = (LPOLESTR)L"ImageQuality";
 			VARIANT varValue;
 			VariantInit(&varValue);
 			varValue.vt = VT_R4;

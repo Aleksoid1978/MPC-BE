@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -318,7 +318,7 @@ void CWebServer::OnClose(CWebClientSocket* pClient)
 void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& body)
 {
 	CPath p(pClient->m_path);
-	CStringA ext = p.GetExtension().MakeLower();
+	CStringA ext(p.GetExtension().MakeLower());
 	CStringA mime;
 	if (ext.IsEmpty()) {
 		mime = "text/html";

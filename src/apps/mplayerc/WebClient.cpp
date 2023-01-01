@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,7 +123,7 @@ void CWebClientSocket::Header()
 		for (const auto& item : sl) {
 			std::list<CString> sl2;
 			Explode(item, sl2, L'=', 2);
-			m_cookie[sl2.front()] = (sl2.size() == 2) ? sl2.back() : L"";
+			m_cookie[sl2.front()] = (sl2.size() == 2) ? sl2.back() : CString();
 		}
 	}
 
