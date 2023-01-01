@@ -3177,7 +3177,7 @@ void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
 void CMpcAudioRenderer::WasapiQueueAdd(std::unique_ptr<CPacket>& p)
 {
 	m_rtLastQueuedSampleTimeEnd = p->rtStart + SamplesToTime(p->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
-	m_WasapiQueue.Add(std::move(p));
+	m_WasapiQueue.Add(p);
 }
 
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
