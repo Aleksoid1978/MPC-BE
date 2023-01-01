@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -738,7 +738,7 @@ private:
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	BOOL OpenFile(const CString fname, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
-	void OpenMedia(std::unique_ptr<OpenMediaData>& pOMD);
+	void OpenMedia(std::unique_ptr<OpenMediaData> pOMD);
 	void PlayFavoriteFile(SessionInfo fav);
 	void PlayFavoriteDVD(SessionInfo fav);
 	bool ResizeDevice();

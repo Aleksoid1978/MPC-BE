@@ -5450,7 +5450,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			p->path = s.slFiles.front();
 			p->subs = s.slSubs;
 		}
-		OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
+		OpenMedia(std::move(p));
 	} else if (s.nCLSwitches & CLSW_CD) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
@@ -5516,7 +5516,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 				p->subs = s.slSubs;
 			}
 
-			OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
+			OpenMedia(std::move(p));
 		} else {
 			std::list<CString> sl;
 			sl = s.slFiles;
@@ -5768,7 +5768,7 @@ void CMainFrame::OnFileOpenDevice()
 			p->DisplayName[1] = s.strAnalogAudio;
 		}
 	}
-	OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
+	OpenMedia(std::move(p));
 	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && m_eMediaLoadState == MLS_LOADED && s.iDefaultCaptureDevice == 1) {
 		m_wndNavigationBar.m_navdlg.UpdateElementList();
 		ShowControlBarInternal(&m_wndNavigationBar, !s.fHideNavigation);
@@ -10457,7 +10457,7 @@ void CMainFrame::PlayFavoriteDVD(SessionInfo fav) // use a copy of SessionInfo
 		p->path = fav.Path;
 		p->pDvdState = pDvdState;
 	}
-	OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
+	OpenMedia(std::move(p));
 }
 
 void CMainFrame::OnUpdateFavoritesDVD(CCmdUI* pCmdUI)
@@ -17518,7 +17518,7 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 	std::unique_ptr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
 		p->bAddRecent = bAddRecent;
-		OpenMedia(p);
+		OpenMedia(std::move(p));
 	}
 
 	return TRUE;
@@ -17535,7 +17535,7 @@ BOOL CMainFrame::OpenFile(const CString fname, REFERENCE_TIME rtStart/* = INVALI
 			pFileData->fns.front() = fname;
 		}
 		p->bAddRecent = bAddRecent;
-		OpenMedia(p);
+		OpenMedia(std::move(p));
 		return TRUE;
 	}
 
@@ -17556,7 +17556,7 @@ void CMainFrame::AddCurDevToPlaylist()
 	}
 }
 
-void CMainFrame::OpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
+void CMainFrame::OpenMedia(std::unique_ptr<OpenMediaData> pOMD)
 {
 	auto pFileData   = dynamic_cast<const OpenFileData*>(pOMD.get());
 	auto pDeviceData = dynamic_cast<const OpenDeviceData*>(pOMD.get());
@@ -20123,7 +20123,7 @@ BOOL CMainFrame::OpenIso(const CString& pathName, REFERENCE_TIME rtStart/* = INV
 				std::unique_ptr<OpenDVDData> p(DNew OpenDVDData());
 				p->path = CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO";
 				p->bAddRecent = FALSE;
-				OpenMedia(std::unique_ptr<OpenMediaData>(std::move(p)));
+				OpenMedia(std::move(p));
 
 				AddRecent(pathName);
 				return TRUE;

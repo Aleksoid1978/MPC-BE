@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -91,7 +91,7 @@ void CAuthDlg::OnBnClickedOk()
 	UpdateData();
 
 	if (!m_username.IsEmpty()) {
-		AfxGetProfile().WriteString(IDS_R_LOGINS, m_username, m_remember ? DEncrypt(m_password) : L"");
+		AfxGetProfile().WriteString(IDS_R_LOGINS, m_username, m_remember ? DEncrypt(m_password) : CStringW());
 	}
 
 	OnOK();
