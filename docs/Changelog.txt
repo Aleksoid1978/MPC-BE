@@ -8,6 +8,9 @@ Added support for URL redirection for HLS.
 AudioSplitter
 Fixed playback of initial samples of FLAC files.
 
+MpaDecFilter
+Fixed decoding of some TrueHD streams.
+
 MPCVideoDec
 Fixed decoding of some MPEG-4 ASP.
 
