@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -666,15 +666,15 @@ STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	return __super::Load(pszFileName, pmt);
 }
 
-HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
+HRESULT CMpegSplitterFilter::DeliverPacket(std::unique_ptr<CPacket> p)
 {
 	const DWORD TrackNumber = p->TrackNumber;
 
 	if (m_bUseMVCExtension) {
 		if (TrackNumber == m_dwMVCExtensionTrackNumber) {
-			m_MVCExtensionQueue.emplace_back(p);
+			m_MVCExtensionQueue.emplace_back(std::move(p));
 		} else if (TrackNumber == m_dwMasterH264TrackNumber) {
-			m_MVCBaseQueue.emplace_back(p);
+			m_MVCBaseQueue.emplace_back(std::move(p));
 			if (m_MVCExtensionQueue.empty()) {
 				return S_OK;
 			}
@@ -685,7 +685,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 						pMVCBasePacket->AppendData(*pMVCExtensionPacket);
 						m_MVCExtensionQueue.erase(m_MVCExtensionQueue.begin());
 
-						__super::DeliverPacket(pMVCBasePacket);
+						__super::DeliverPacket(std::move(pMVCBasePacket));
 						m_MVCBaseQueue.erase(m_MVCBaseQueue.begin());
 						break;
 					} else if (pMVCExtensionPacket->rtStart < pMVCBasePacket->rtStart) {
@@ -699,13 +699,13 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 				}
 			}
 		} else {
-			return __super::DeliverPacket(p);
+			return __super::DeliverPacket(std::move(p));
 		}
 
 		return S_OK;
 	}
 
-	return __super::DeliverPacket(p);
+	return __super::DeliverPacket(std::move(p));
 }
 
 template<typename T>
@@ -717,16 +717,16 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, co
 		if (bStreamUsePTS) {
 			const BOOL bPacketStart = h.fpts;
 
-			CAutoPtr<CPacket>& p = pPackets[TrackNumber];
+			std::unique_ptr<CPacket>& p = pPackets[TrackNumber];
 			if (bPacketStart && p) {
 				if (p->bSyncPoint) {
 					if (m_rtSeekOffset != INVALID_TIME && p->rtStart < m_rtSeekOffset) {
 						DLog(L"CMpegSplitterFilter::HandleMPEGPacket() : [%u] Dropping packet %I64d, seek offset is %I64d", p->TrackNumber, p->rtStart, m_rtSeekOffset);
 					} else {
-						hr = DeliverPacket(p);
+						hr = DeliverPacket(std::move(p));
 					}
 				}
-				p.Free();
+				p.reset();
 			}
 
 			if (!p) {
@@ -735,7 +735,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, co
 					return S_OK;
 				}
 
-				p.Attach(DNew CPacket());
+				p.reset(DNew CPacket());
 				p->TrackNumber = TrackNumber;
 				p->bSyncPoint  = bPacketStart;
 				p->rtStart     = h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
@@ -755,7 +755,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, co
 				rtStart = m_rtGlobalPCRTimeStamp - rtStartOffset;
 			}
 
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->TrackNumber = TrackNumber;
 			p->rtStart     = rtStart;
 			p->rtStop      = (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
@@ -763,7 +763,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, co
 			p->Flag        = Flag;
 			p->resize(nBytes);
 			m_pFile->ByteRead(p->data(), nBytes);
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 		}
 	}
 
@@ -1557,7 +1557,7 @@ bool CMpegSplitterFilter::DemuxLoop()
 	for (auto& pPacket : pPackets) {
 		auto& p = pPacket.second;
 		if (p && p->bSyncPoint && GetOutputPin(p->TrackNumber)) {
-			DeliverPacket(p);
+			DeliverPacket(std::move(p));
 		}
 	}
 	pPackets.clear();
@@ -2074,7 +2074,7 @@ HRESULT CMpegSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
-HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
+HRESULT CMpegSplitterOutputPin::QueuePacket(std::unique_ptr<CPacket> p)
 {
 	if (!ThreadExists()) {
 		return S_FALSE;
@@ -2129,7 +2129,7 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return m_hrDeliver;
 	}
 
-	return __super::QueuePacket(p);
+	return __super::QueuePacket(std::move(p));
 }
 
 STDMETHODIMP CMpegSplitterOutputPin::Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt)

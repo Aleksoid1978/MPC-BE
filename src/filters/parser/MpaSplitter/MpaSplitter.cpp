@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -188,7 +188,7 @@ bool CMpaSplitterFilter::DemuxLoop()
 			continue;
 		}
 
-		CAutoPtr<CPacket> p(DNew CPacket());
+		std::unique_ptr<CPacket> p(DNew CPacket());
 
 		if (m_pFile->IsRandomAccess()) {
 			FrameSize = (int)std::min((__int64)FrameSize, m_pFile->GetRemaining());
@@ -203,7 +203,7 @@ bool CMpaSplitterFilter::DemuxLoop()
 		p->rtStop  = m_rtime + rtDuration;
 		p->bSyncPoint = TRUE;
 
-		hr = DeliverPacket(p);
+		hr = DeliverPacket(std::move(p));
 
 		m_rtime += rtDuration;
 

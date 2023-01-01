@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -220,10 +220,10 @@ size_t CBaseSplitterOutputPin::QueueSize()
 
 HRESULT CBaseSplitterOutputPin::QueueEndOfStream()
 {
-	return QueuePacket(CAutoPtr<CPacket>()); // nullptr means EndOfStream
+	return QueuePacket(std::unique_ptr<CPacket>()); // nullptr means EndOfStream
 }
 
-HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
+HRESULT CBaseSplitterOutputPin::QueuePacket(std::unique_ptr<CPacket> p)
 {
 	if (!ThreadExists()) {
 		return S_FALSE;
@@ -309,7 +309,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 
 		size_t cnt = 0;
 		do {
-			CAutoPtr<CPacket> p;
+			std::unique_ptr<CPacket> p;
 			m_queue.RemoveSafe(p, cnt);
 
 			if (S_OK == m_hrDeliver && cnt > 0) {
@@ -320,7 +320,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 				// flushing can still start here, to release a blocked deliver call
 
 				HRESULT hr = p
-							 ? DeliverPacket(p)
+							 ? DeliverPacket(std::move(p))
 							 : DeliverEndOfStream();
 
 				m_eEndFlush.Wait(); // .. so we have to wait until it is done
@@ -336,7 +336,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 }
 
 #define MAX_PTS_SHIFT 50000000i64
-HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
+HRESULT CBaseSplitterOutputPin::DeliverPacket(std::unique_ptr<CPacket> p)
 {
 	HRESULT hr;
 
@@ -508,13 +508,13 @@ void CBaseSplitterOutputPin::MakeISCRHappy()
 		CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPinTo);
 
 		if (GetCLSID(pBF) == GUIDFromCString(L"{48025243-2D39-11CE-875D-00608CB78066}")) { // ISCR
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->TrackNumber = (DWORD)-1;
 			p->rtStart = -1;
 			p->rtStop = 0;
 			p->bSyncPoint = FALSE;
 			p->SetData(" ", 2);
-			QueuePacket(p);
+			QueuePacket(std::move(p));
 			break;
 		}
 

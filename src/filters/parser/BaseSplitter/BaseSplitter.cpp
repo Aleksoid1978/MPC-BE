@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -304,7 +304,7 @@ DWORD CBaseSplitterFilter::ThreadProc()
 	return 0;
 }
 
-HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
+HRESULT CBaseSplitterFilter::DeliverPacket(std::unique_ptr<CPacket> p)
 {
 	HRESULT hr = S_FALSE;
 
@@ -346,7 +346,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 		  p->GetCount(), p->rtStart, p->rtStop);
 #endif
 
-	hr = pPin->QueuePacket(p);
+	hr = pPin->QueuePacket(std::move(p));
 
 	if (S_OK != hr) {
 		auto it = std::find(m_pActivePins.begin(), m_pActivePins.end(), pPin);

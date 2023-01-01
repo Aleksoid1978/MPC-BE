@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1339,7 +1339,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 
-	CAutoPtr<CPacket> p;
+	std::unique_ptr<CPacket> p;
 
 	Tag t;
 	AudioTag at;
@@ -1391,7 +1391,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 				goto NextTag;
 			}
 
-			p.Attach(DNew CPacket());
+			p.reset(DNew CPacket());
 			p->TrackNumber	= t.TagType;
 			p->rtStart		= 10000i64 * t.TimeStamp;
 			p->rtStop		= p->rtStart + 1;
@@ -1402,7 +1402,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 				return true;
 			}
 
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 		}
 NextTag:
 		m_pFile->Seek(next);

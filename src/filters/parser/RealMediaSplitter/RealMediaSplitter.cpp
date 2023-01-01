@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -714,7 +714,7 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 	for (DWORD stream = 0; it != m_pFile->m_subs.end() && SUCCEEDED(hr) && !CheckRequest(nullptr); stream++) {
 		CRMFile::subtitle& s = *it++;
 
-		CAutoPtr<CPacket> p(DNew CPacket);
+		std::unique_ptr<CPacket> p(DNew CPacket);
 
 		p->TrackNumber = ~stream;
 		p->bSyncPoint = TRUE;
@@ -745,7 +745,7 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 		memcpy((char*)ptr, s.data, s.data.GetLength());
 		ptr += s.name.GetLength();
 
-		hr = DeliverPacket(p);
+		hr = DeliverPacket(std::move(p));
 	}
 
 	UINT32 idxdc = m_seekdc;
@@ -761,13 +761,13 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 				break;
 			}
 
-			CAutoPtr<CPacket> p(DNew CPacket);
+			std::unique_ptr<CPacket> p(DNew CPacket);
 			p->TrackNumber	= mph.stream;
 			p->bSyncPoint	= !!(mph.flags & MediaPacketHeader::PN_KEYFRAME_FLAG);
 			p->rtStart		= 10000i64 * mph.tStart;
 			p->rtStop		= p->rtStart + 1;
 			p->SetData(mph.pData.data(), mph.pData.size());
-			hr				= DeliverPacket(p);
+			hr				= DeliverPacket(std::move(p));
 		}
 
 		m_seekpacket = 0;
@@ -839,7 +839,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 		return S_OK;
 	}
 
-	CAutoPtr<CPacket> p(DNew CPacket());
+	std::unique_ptr<CPacket> p(DNew CPacket());
 
 	p->TrackNumber		= DWORD_MAX;
 	p->bDiscontinuity	= m_segments.fDiscontinuity;
@@ -881,10 +881,10 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 	}
 	m_segments.Clear();
 
-	return __super::DeliverPacket(p);
+	return __super::DeliverPacket(std::move(p));
 }
 
-HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
+HRESULT CRealMediaSplitterOutputPin::DeliverPacket(std::unique_ptr<CPacket> p)
 {
 	HRESULT hr = S_OK;
 
@@ -1014,7 +1014,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		BOOL bDiscontinuity = p->bDiscontinuity;
 
 		for (const auto& size : sizes) {
-			CAutoPtr<CPacket> p(DNew CPacket);
+			std::unique_ptr<CPacket> p(DNew CPacket);
 			p->bDiscontinuity = bDiscontinuity;
 			p->bSyncPoint = true;
 			p->rtStart = rtStart;
@@ -1022,12 +1022,13 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			p->SetData(ptr, size);
 			ptr += size;
 			bDiscontinuity = false;
-			if (S_OK != (hr = __super::DeliverPacket(p))) {
+			hr = __super::DeliverPacket(std::move(p));
+			if (S_OK != hr) {
 				break;
 			}
 		}
 	} else {
-		hr = __super::DeliverPacket(p);
+		hr = __super::DeliverPacket(std::move(p));
 	}
 
 	return hr;

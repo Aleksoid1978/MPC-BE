@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2022 see Authors.txt
+ * (C) 2013-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -249,16 +249,16 @@ bool CAudioSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	while (m_pAudioFile && SUCCEEDED(hr) && !CheckRequest(nullptr)) {
-		CAutoPtr<CPacket> p(DNew CPacket());
+		std::unique_ptr<CPacket> p(DNew CPacket());
 		p->bSyncPoint = TRUE;
 
-		if (!m_pAudioFile->GetAudioFrame(p, m_rtime)) {
+		if (!m_pAudioFile->GetAudioFrame(p.get(), m_rtime)) {
 			break;
 		}
 
 		m_rtime = p->rtStop;
 
-		hr = DeliverPacket(p);
+		hr = DeliverPacket(std::move(p));
 	}
 
 	return true;

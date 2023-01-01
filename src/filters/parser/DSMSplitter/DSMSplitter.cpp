@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -216,14 +216,14 @@ bool CDSMSplitterFilter::DemuxLoop()
 		__int64 pos = m_pFile->GetPos();
 
 		if (type == DSMP_SAMPLE) {
-			CAutoPtr<CPacket> p(DNew CPacket());
-			if (m_pFile->Read(len, p)) {
+			std::unique_ptr<CPacket> p(DNew CPacket());
+			if (m_pFile->Read(len, p.get())) {
 				if (p->rtStart != INVALID_TIME) {
 					p->rtStart -= m_pFile->m_rtFirst;
 					p->rtStop -= m_pFile->m_rtFirst;
 				}
 
-				hr = DeliverPacket(p);
+				hr = DeliverPacket(std::move(p));
 			}
 		}
 

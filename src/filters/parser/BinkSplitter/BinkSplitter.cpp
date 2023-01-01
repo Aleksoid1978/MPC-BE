@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2022 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -294,7 +294,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 				UINT32 packet_size = 0;
 				m_pFile->ByteRead((BYTE*)&packet_size, 4);
 				if (packet_size >= 4) {
-					CAutoPtr<CPacket> pa(DNew CPacket());
+					std::unique_ptr<CPacket> pa(DNew CPacket());
 					if (pa->SetCount(packet_size)) {
 						pa->TrackNumber = i + 1;
 						pa->bSyncPoint = TRUE;
@@ -307,7 +307,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 						m_audiotracks[i].pts += llMulDiv(samples_bytes / (m_audiotracks[i].channels * 2), UNITS, m_audiotracks[i].sample_rate, 0);
 						pa->rtStop = m_audiotracks[i].pts;
 
-						hr = DeliverPacket(pa);
+						hr = DeliverPacket(std::move(pa));
 					}
 				}
 				else {
@@ -319,7 +319,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 		int packet_size = m_seektable[m_indexpos].pos + m_seektable[m_indexpos].size - m_pFile->GetPos();
 		ASSERT(packet_size > 0);
 
-		CAutoPtr<CPacket> pv(DNew CPacket());
+		std::unique_ptr<CPacket> pv(DNew CPacket());
 		if (pv->SetCount(packet_size)) {
 			pv->TrackNumber = 0;
 			pv->bSyncPoint = m_seektable[m_indexpos].keyframe;
@@ -328,7 +328,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 
 			m_pFile->ByteRead(pv->data(), packet_size);
 
-			hr = DeliverPacket(pv);
+			hr = DeliverPacket(std::move(pv));
 		}
 
 		m_indexpos++;

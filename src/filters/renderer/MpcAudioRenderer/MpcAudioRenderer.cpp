@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2022 see Authors.txt
+ * (C) 2009-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1507,7 +1507,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
 		DLog(L"CMpcAudioRenderer::Transform() - Pad silence %.2f ms to minimize slaving jitter", rtSilence / 10000.0f);
 #endif
-		CAutoPtr<CPacket> pSilence(DNew CPacket());
+		std::unique_ptr<CPacket> pSilence(DNew CPacket());
 		pSilence->rtStart = rtStart - rtSilence;
 		pSilence->rtStop  = rtStart;
 		pSilence->SetCount(nSilenceBytes);
@@ -1632,7 +1632,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		}
 	}
 
-	CAutoPtr<CPacket> p(DNew CPacket());
+	std::unique_ptr<CPacket> p(DNew CPacket());
 	p->rtStart = rtStart;
 	p->rtStop  = rtStop;
 	p->bDiscontinuity = (S_OK == pMediaSample->IsDiscontinuity());
@@ -1684,7 +1684,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	return S_OK;
 }
 
-HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
+HRESULT CMpcAudioRenderer::PushToQueue(std::unique_ptr<CPacket>& p)
 {
 	if (p && (!m_rtLastQueuedSampleTimeEnd || p->bDiscontinuity)) {
 		if (p->bDiscontinuity && (p->rtStop <= m_rtLastQueuedSampleTimeEnd)) {
@@ -1702,7 +1702,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms [%I64d -> %I64d, %s -> %s]",
 						 rtSilence / 10000.0f, rtLastStop, p->rtStart, ReftimeToString(rtLastStop), ReftimeToString(p->rtStart));
 #endif
-					CAutoPtr<CPacket> pSilence(DNew CPacket());
+					std::unique_ptr<CPacket> pSilence(DNew CPacket());
 					pSilence->rtStart = p->rtStart - rtSilence;
 					pSilence->rtStop = p->rtStart;
 					pSilence->SetCount(nSilenceBytes);
@@ -2863,7 +2863,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 			const UINT32 nFilledBytes = std::min((UINT32)m_CurrentPacket->size(), nAvailableBytes - nWritenBytes);
 			memcpy(&pData[nWritenBytes], m_CurrentPacket->data(), nFilledBytes);
 			if (nFilledBytes == m_CurrentPacket->size()) {
-				m_CurrentPacket.Free();
+				m_CurrentPacket.reset();
 			} else {
 				m_CurrentPacket->RemoveHead(nFilledBytes);
 			}
@@ -2916,7 +2916,7 @@ void CMpcAudioRenderer::WasapiFlush()
 	DLog(L"CMpcAudioRenderer::WasapiFlush()");
 
 	m_WasapiQueue.RemoveAll();
-	m_CurrentPacket.Free();
+	m_CurrentPacket.reset();
 
 	m_rtLastQueuedSampleTimeEnd = 0;
 	m_nSampleOffset = 0;
@@ -2974,7 +2974,7 @@ void CMpcAudioRenderer::WaitFinish()
 				BYTE* buff = DNew BYTE[out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf)];
 				out_samples = m_Resampler.Receive(buff, out_samples);
 				if (out_samples) {
-					CAutoPtr<CPacket> p(DNew CPacket());
+					std::unique_ptr<CPacket> p(DNew CPacket());
 					p->rtStart = rtStart;
 					p->rtStop  = rtStart + SamplesToTime(out_samples, m_pWaveFormatExOutput);
 					p->SetData(buff, out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf));
@@ -3013,7 +3013,7 @@ void CMpcAudioRenderer::WaitFinish()
 
 		if (SUCCEEDED(hr)) {
 			m_Filter.PushEnd();
-			CAutoPtr<CPacket> p;
+			std::unique_ptr<CPacket> p;
 			while (SUCCEEDED(m_Filter.Pull(p))) {
 				PushToQueue(p);
 			}
@@ -3174,10 +3174,10 @@ void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
 	}
 }
 
-void CMpcAudioRenderer::WasapiQueueAdd(CAutoPtr<CPacket> p)
+void CMpcAudioRenderer::WasapiQueueAdd(std::unique_ptr<CPacket>& p)
 {
 	m_rtLastQueuedSampleTimeEnd = p->rtStart + SamplesToTime(p->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
-	m_WasapiQueue.Add(p);
+	m_WasapiQueue.Add(std::move(p));
 }
 
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)

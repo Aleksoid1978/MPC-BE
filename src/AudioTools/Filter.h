@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,11 +65,11 @@ public:
 		const bool autoconvert,
 		const std::list<std::pair<CStringA, CStringA>>& filters);
 
-	HRESULT Push(const CAutoPtr<CPacket>& p);
+	HRESULT Push(const std::unique_ptr<CPacket>& p);
 	HRESULT Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size);
 	void PushEnd();
 
-	HRESULT Pull(CAutoPtr<CPacket>& p);
+	HRESULT Pull(std::unique_ptr<CPacket>& p);
 	HRESULT Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples);
 
 	BOOL IsInitialized() const { return m_pFilterGraph != nullptr; }

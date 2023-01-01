@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,7 +45,7 @@ public:
 	virtual ~CMatroskaSplitterOutputPin();
 
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
-	HRESULT QueuePacket(CAutoPtr<CPacket> p);
+	HRESULT QueuePacket(std::unique_ptr<CPacket> p);
 };
 
 class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
@@ -88,7 +88,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	std::vector<SyncPoint> m_sps;
 
 	std::map<DWORD, REFERENCE_TIME> m_lastDuration;
-	std::map<DWORD, std::deque<CAutoPtr<CMatroskaPacket>>> m_packets;
+	std::map<DWORD, std::deque<std::unique_ptr<CMatroskaPacket>>> m_packets;
 
 	CCritSec m_csPackets;
 
@@ -109,8 +109,8 @@ protected:
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	HRESULT DeliverMatroskaPacket(TrackEntry* pTE, CAutoPtr<CMatroskaPacket> p);
-	HRESULT DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration = 0);
+	HRESULT DeliverMatroskaPacket(TrackEntry* pTE, std::unique_ptr<CMatroskaPacket> p);
+	HRESULT DeliverMatroskaPacket(std::unique_ptr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration = 0);
 
 public:
 	CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);

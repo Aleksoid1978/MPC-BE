@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1037,7 +1037,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	REFERENCE_TIME rt = 0;
-	CAutoPtr<CPacket> mpeg4packet;
+	std::unique_ptr<CPacket> mpeg4packet;
 
 	while (SUCCEEDED(hr) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
 
@@ -1048,7 +1048,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			}
 			const __int64 framenum = (m_pFile->GetPos() - m_startpos) / (sizeof(FRAME_) + m_framesize);
 
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->rtStart = framenum * m_AvgTimePerFrame;
 			p->rtStop  = p->rtStart + m_AvgTimePerFrame;
 
@@ -1057,7 +1057,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				break;
 			}
 
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 			continue;
 		}
 
@@ -1070,7 +1070,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			const int framesize = GETU32(header);
 			const __int64 framenum = GETU64(header + 4);
 
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->rtStart = framenum * m_AvgTimePerFrame;
 			p->rtStop = p->rtStart + m_AvgTimePerFrame;
 
@@ -1079,7 +1079,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				break;
 			}
 
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 			continue;
 		}
 
@@ -1088,7 +1088,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				const bool eof = !m_pFile->GetRemaining();
 
 				if (mpeg4packet && !mpeg4packet->empty() && (m_pFile->BitRead(32, true) == 0x000001b6 || eof)) {
-					hr = DeliverPacket(mpeg4packet);
+					hr = DeliverPacket(std::move(mpeg4packet));
 				}
 
 				if (eof) {
@@ -1096,7 +1096,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				}
 
 				if (!mpeg4packet) {
-					mpeg4packet.Attach(DNew CPacket());
+					mpeg4packet.reset(DNew CPacket());
 					mpeg4packet->clear();
 					mpeg4packet->rtStart = rt;
 					mpeg4packet->rtStop  = rt + m_AvgTimePerFrame;
@@ -1146,13 +1146,13 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			if (len) {
 				m_pFile->Seek(pos);
 
-				CAutoPtr<CPacket> p(DNew CPacket());
+				std::unique_ptr<CPacket> p(DNew CPacket());
 				p->resize(len);
 				if ((hr = m_pFile->ByteRead(p->data(), len)) != S_OK) {
 					break;
 				}
 
-				hr = DeliverPacket(p);
+				hr = DeliverPacket(std::move(p));
 			} else {
 				break;
 			}
@@ -1161,13 +1161,13 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 		}
 
 		if (const size_t size = std::min(64LL * KILOBYTE, m_pFile->GetRemaining())) {
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->resize(size);
 			if ((hr = m_pFile->ByteRead(p->data(), size)) != S_OK) {
 				break;
 			}
 
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 		}
 	}
 

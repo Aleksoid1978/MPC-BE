@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -306,7 +306,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 	{
 		pos += sizeof(rc);
 
-		CAutoPtr<CPacket> p(DNew CPacket());
+		std::unique_ptr<CPacket> p(DNew CPacket());
 
 		if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ || rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
@@ -337,7 +337,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 
 		if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ || rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 		}
 
 		pos += rc.size;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -204,7 +204,7 @@ private:
 	HRESULT DeliverSegments();
 
 protected:
-	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
+	HRESULT DeliverPacket(std::unique_ptr<CPacket> p);
 
 public:
 	CRealMediaSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);

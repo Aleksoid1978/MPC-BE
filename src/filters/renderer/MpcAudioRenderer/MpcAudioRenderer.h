@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2021 see Authors.txt
+ * (C) 2009-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,7 +57,7 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CMixer            m_Resampler;
 
 	CPacketQueue      m_WasapiQueue;
-	CAutoPtr<CPacket> m_CurrentPacket;
+	std::unique_ptr<CPacket> m_CurrentPacket;
 	UINT32            m_nSampleOffset;
 
 	REFERENCE_TIME    m_rtStartTime;
@@ -218,7 +218,7 @@ private:
 	HRESULT CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const BOOL bCheckFormat = TRUE);
 
 	HRESULT Transform(IMediaSample *pMediaSample);
-	HRESULT PushToQueue(CAutoPtr<CPacket> p);
+	HRESULT PushToQueue(std::unique_ptr<CPacket>& p);
 
 	bool IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
 	bool CopyWaveFormat(const WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
@@ -324,7 +324,7 @@ private:
 	};
 	AudioFormats m_input_params, m_output_params;
 
-	void WasapiQueueAdd(CAutoPtr<CPacket> p);
+	void WasapiQueueAdd(std::unique_ptr<CPacket>& p);
 };
 
 class CMpcAudioRendererInputPin final

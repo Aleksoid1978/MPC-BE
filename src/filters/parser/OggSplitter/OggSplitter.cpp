@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -706,9 +706,9 @@ bool COggSplitterFilter::DemuxLoop()
 			}
 		}
 
-		CAutoPtr<CPacket> p;
+		std::unique_ptr<CPacket> p;
 		while (!CheckRequest(nullptr) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 		}
 	}
 
@@ -804,7 +804,7 @@ void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
 void COggSplitterOutputPin::HandlePacket(DWORD TrackNumber, BYTE* pData, int len)
 {
 	if (m_rtLast != INVALID_TIME) {
-		CAutoPtr<CPacket> p(DNew CPacket());
+		std::unique_ptr<CPacket> p(DNew CPacket());
 		p->TrackNumber = TrackNumber;
 		if (S_OK == UnpackPacket(p, pData, len)) {
 			m_rtLast = p->rtStop;
@@ -870,9 +870,9 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 	return S_OK;
 }
 
-CAutoPtr<CPacket> COggSplitterOutputPin::GetPacket()
+std::unique_ptr<CPacket> COggSplitterOutputPin::GetPacket()
 {
-	CAutoPtr<CPacket> p;
+	std::unique_ptr<CPacket> p;
 	size_t count;
 	m_queue.RemoveSafe(p, count);
 	return p;
@@ -954,7 +954,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 	HRESULT hr = __super::UnpackPage(page);
 
 	while (m_queue.GetCount()) {
-		CAutoPtr<CPacket> p = m_queue.Remove();
+		std::unique_ptr<CPacket> p = m_queue.Remove();
 
 		if (p->size() >= 6 && p->at(0) == 0x05) {
 			// yeah, right, we are going to be parsing this backwards! :P
@@ -989,7 +989,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 			memcpy(m_mts[0].ReallocFormatBuffer(len + p->size()) + len, p->data(), p->size());
 		}
 
-		m_initpackets.emplace_back(p);
+		m_initpackets.emplace_back(std::move(p));
 	}
 
 	return hr;
@@ -1001,7 +1001,7 @@ REFERENCE_TIME COggVorbisOutputPin::GetRefTime(__int64 granule_position)
 	return rt;
 }
 
-HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggVorbisOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	if (len >= 7 && !memcmp(pData + 1, "vorbis", 6)) {
 		if (IsInitialized()) {
@@ -1039,13 +1039,13 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 	return S_OK;
 }
 
-HRESULT COggVorbisOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
+HRESULT COggVorbisOutputPin::DeliverPacket(std::unique_ptr<CPacket> p)
 {
 	if (p->size() > 0 && (p->at(0) & 1)) {
 		return S_OK;
 	}
 
-	return __super::DeliverPacket(p);
+	return __super::DeliverPacket(std::move(p));
 }
 
 HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
@@ -1056,10 +1056,10 @@ HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_
 
 	if (m_mt.subtype == MEDIASUBTYPE_Vorbis) {
 		for (const auto& packet : m_initpackets) {
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->TrackNumber = packet->TrackNumber;
 			p->SetData(*packet);
-			__super::DeliverPacket(p);
+			__super::DeliverPacket(std::move(p));
 		}
 	}
 
@@ -1122,7 +1122,7 @@ REFERENCE_TIME COggFlacOutputPin::GetRefTime(__int64 granule_position)
 	return rt;
 }
 
-HRESULT COggFlacOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggFlacOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	if (!len) {
 		return S_FALSE;
@@ -1176,7 +1176,7 @@ REFERENCE_TIME COggDirectShowOutputPin::GetRefTime(__int64 granule_position)
 	return rt;
 }
 
-HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggDirectShowOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	int i = 0;
 
@@ -1235,7 +1235,7 @@ REFERENCE_TIME COggStreamOutputPin::GetRefTime(__int64 granule_position)
 	return granule_position * m_time_unit / m_samples_per_unit;
 }
 
-HRESULT COggStreamOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggStreamOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	int i = 0;
 
@@ -1488,7 +1488,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 	HRESULT hr = __super::UnpackPage(page);
 
 	while (m_queue.GetCount()) {
-		CAutoPtr<CPacket> p = m_queue.Remove();
+		std::unique_ptr<CPacket> p = m_queue.Remove();
 
 		if (p->size() == 0) {
 			continue;
@@ -1510,7 +1510,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 			memcpy((BYTE*)m2vi->dwSequenceHeader + m2vi->cbSequenceHeader + 2, p->data(), size);
 			m2vi->cbSequenceHeader += 2 + size;
 
-			m_initpackets.emplace_back(p);
+			m_initpackets.emplace_back(std::move(p));
 		}
 	}
 
@@ -1534,7 +1534,7 @@ REFERENCE_TIME COggTheoraOutputPin::GetRefTime(__int64 granule_position)
 	return rt;
 }
 
-HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggTheoraOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	if (!pData) {
 		return E_FAIL;
@@ -1584,7 +1584,7 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 	HRESULT hr = __super::UnpackPage(page);
 
 	while (m_queue.GetCount() && !m_IsInitialized) {
-		CAutoPtr<CPacket> p = m_queue.Remove();
+		std::unique_ptr<CPacket> p = m_queue.Remove();
 		if (p->size() > 13) {
 			BYTE* buf = p->data();
 
@@ -1655,7 +1655,7 @@ REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
 	return pts_out;
 }
 
-HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggDiracOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	if (!pData) {
 		return E_FAIL;
@@ -1725,7 +1725,7 @@ REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 	return rt;
 }
 
-HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggOpusOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	if (len > 8 && !memcmp(pData, "Opus", 4)) {
 		if (!memcmp(pData, "OpusTags", 8)) {
@@ -1827,7 +1827,7 @@ REFERENCE_TIME COggSpeexOutputPin::GetRefTime(__int64 granule_position)
 	return rt;
 }
 
-HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggSpeexOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	p->bSyncPoint = TRUE;
 	p->rtStart    = m_rtLast;
@@ -1898,7 +1898,7 @@ REFERENCE_TIME COggVP8OutputPin::GetRefTime(__int64 granule_position)
 	return (granule_position >> 32) * m_rtAvgTimePerFrame;
 }
 
-HRESULT COggVP8OutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+HRESULT COggVP8OutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData, int len)
 {
 	CheckPointer(pData, E_FAIL);
 

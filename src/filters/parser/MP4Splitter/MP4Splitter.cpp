@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2275,7 +2275,7 @@ start:
 		if (pPin && pPin->IsConnected() && AP4_SUCCEEDED(track->ReadSample(pNext->second.index, sample, data))) {
 			const CMediaType& mt = pPin->CurrentMediaType();
 
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 			p->TrackNumber = (DWORD)track->GetId();
 			p->rtStart = RescaleI64x32(sample.GetCts(), UNITS, track->GetMediaTimeScale());
 			p->rtStop = RescaleI64x32(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
@@ -2340,7 +2340,7 @@ start:
 
 			p->rtStart -= m_rtOffset;
 			p->rtStop -= m_rtOffset;
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 		}
 
 		{
@@ -2508,7 +2508,7 @@ HRESULT CMP4SplitterOutputPin::DeliverEndFlush()
 	return __super::DeliverEndFlush();
 }
 
-HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
+HRESULT CMP4SplitterOutputPin::DeliverPacket(std::unique_ptr<CPacket> p)
 {
 	CAutoLock cAutoLock(this);
 
@@ -2543,7 +2543,7 @@ HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 						break;
 					}
 
-					CAutoPtr<CPacket> packet(DNew CPacket());
+					std::unique_ptr<CPacket> packet(DNew CPacket());
 					packet->SetData(pData, sz);
 
 					packet->TrackNumber    = p->TrackNumber;
@@ -2556,7 +2556,8 @@ HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 						rtStartTmp      = INVALID_TIME;
 						rtStopTmp       = INVALID_TIME;
 					}
-					if (S_OK != (hr = __super::DeliverPacket(packet))) {
+					hr = __super::DeliverPacket(std::move(packet));
+					if (S_OK != hr) {
 						break;
 					}
 
@@ -2569,5 +2570,5 @@ HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		}
 	}
 
-	return __super::DeliverPacket(p);
+	return __super::DeliverPacket(std::move(p));
 }

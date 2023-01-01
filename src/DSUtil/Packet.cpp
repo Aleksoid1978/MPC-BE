@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,22 +73,22 @@ void CPacket::RemoveHead(const size_t size)
 // CPacketQueue
 //
 
-void CPacketQueue::Add(CAutoPtr<CPacket>& p)
+void CPacketQueue::Add(std::unique_ptr<CPacket>& p)
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
 
 	if (p) {
 		m_size += p->size();
 	}
-	m_deque.emplace_back(p);
+	m_deque.emplace_back(std::move(p));
 }
 
-CAutoPtr<CPacket> CPacketQueue::Remove()
+std::unique_ptr<CPacket> CPacketQueue::Remove()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
 
 	ASSERT(!m_deque.empty());
-	CAutoPtr<CPacket> p = m_deque.front();
+	std::unique_ptr<CPacket> p = std::move(m_deque.front());
 	m_deque.pop_front();
 	if (p) {
 		m_size -= p->size();
@@ -96,13 +96,13 @@ CAutoPtr<CPacket> CPacketQueue::Remove()
 	return p;
 }
 
-void CPacketQueue::RemoveSafe(CAutoPtr<CPacket>& p, size_t& count)
+void CPacketQueue::RemoveSafe(std::unique_ptr<CPacket>& p, size_t& count)
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
 
 	count = m_deque.size();
 	if (count) {
-		p = m_deque.front();
+		p = std::move(m_deque.front());
 		m_deque.pop_front();
 		if (p) {
 			m_size -= p->size();

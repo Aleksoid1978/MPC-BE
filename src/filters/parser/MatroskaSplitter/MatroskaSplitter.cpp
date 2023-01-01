@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1861,7 +1861,7 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 
 			for (const long len : sizes) {
 
-				CAutoPtr<CPacket> p(DNew CPacket());
+				std::unique_ptr<CPacket> p(DNew CPacket());
 				p->TrackNumber	= (DWORD)pTE->TrackNumber;
 				p->rtStart		= 0;
 				p->rtStop		= 1;
@@ -1870,7 +1870,7 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 				p->SetData(ptr, len);
 				ptr += len;
 
-				hr = DeliverPacket(p);
+				hr = DeliverPacket(std::move(p));
 			}
 
 			if (FAILED(hr)) {
@@ -2239,7 +2239,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 							}
 
 							for (auto &bg : bgn) {
-								CAutoPtr<CMatroskaPacket> p(DNew CMatroskaPacket());
+								std::unique_ptr<CMatroskaPacket> p(DNew CMatroskaPacket());
 								p->bg = std::move(bg);
 
 								if (!Contains(m_subtitlesTrackNumbers, (UINT64)p->bg->Block.TrackNumber)) {
@@ -2255,13 +2255,13 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 								}
 								TrackEntry* pTE = (*it).second;
 
-								SetBlockTime(p.m_p, pTE, clusterTime, rtOffset);
+								SetBlockTime(p.get(), pTE, clusterTime, rtOffset);
 
 								if (p->rtStart >= m_Cluster_seek_rt || p->rtStop < m_Cluster_seek_rt) {
 									continue;
 								}
 
-								hr = DeliverMatroskaPacket(pTE, p);
+								hr = DeliverMatroskaPacket(pTE, std::move(p));
 							}
 						}
 					}
@@ -2302,7 +2302,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			}
 
 			for (auto &bg : bgn) {
-				CAutoPtr<CMatroskaPacket> p(DNew CMatroskaPacket());
+				std::unique_ptr<CMatroskaPacket> p(DNew CMatroskaPacket());
 				p->bg = std::move(bg);
 
 				p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
@@ -2314,9 +2314,9 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				}
 				TrackEntry* pTE = (*it).second;
 
-				SetBlockTime(p.m_p, pTE, clusterTime, rtOffset);
+				SetBlockTime(p.get(), pTE, clusterTime, rtOffset);
 
-				hr = DeliverMatroskaPacket(pTE, p);
+				hr = DeliverMatroskaPacket(pTE, std::move(p));
 
 				if (FAILED(hr)) {
 					break;
@@ -2333,7 +2333,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	CAutoLock cAutoLock(&m_csPackets);
 	for (auto& [TrackNumber, packets] : m_packets) {
 		for (auto& p : packets) {
-			DeliverMatroskaPacket(p);
+			DeliverMatroskaPacket(std::move(p));
 		}
 
 		packets.clear();
@@ -2342,7 +2342,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	return true;
 }
 
-HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(TrackEntry* pTE, CAutoPtr<CMatroskaPacket> p)
+HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(TrackEntry* pTE, std::unique_ptr<CMatroskaPacket> p)
 {
 	for (const auto& pb : p->bg->Block.BlockData) {
 		pTE->Expand(*pb, ContentEncoding::AllFrameContents);
@@ -2350,15 +2350,15 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(TrackEntry* pTE, CAutoPtr
 
 	HRESULT hr = S_OK;
 	if (pTE->TrackType == TrackEntry::TypeSubtitle) {
-		hr = DeliverMatroskaPacket(p);
+		hr = DeliverMatroskaPacket(std::move(p));
 	} else {
 		CAutoLock cAutoLock(&m_csPackets);
 		auto& packets = m_packets[p->TrackNumber];
-		packets.emplace_back(p);
+		packets.emplace_back(std::move(p));
 
 		if (packets.size() == 2) {
 			const auto rtBlockDuration = packets.back()->rtStart - packets.front()->rtStart;
-			hr = DeliverMatroskaPacket(packets.front(), rtBlockDuration);
+			hr = DeliverMatroskaPacket(std::move(packets.front()), rtBlockDuration);
 			packets.pop_front();
 		}
 	}
@@ -2368,7 +2368,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(TrackEntry* pTE, CAutoPtr
 
 // reconstruct full wavpack blocks from mangled matroska ones.
 // From LAV's ffmpeg
-static bool ParseWavpack(const CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
+static bool ParseWavpack(const CMediaType* mt, CBinary* Data, std::unique_ptr<CPacket>& p)
 {
 	CheckPointer(mt->pbFormat, false);
 
@@ -2434,7 +2434,7 @@ static bool ParseWavpack(const CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>&
 	return true;
 }
 
-HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration/* = 0*/)
+HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(std::unique_ptr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration/* = 0*/)
 {
 	const auto pPin = GetOutputPin(p->TrackNumber);
 	CheckPointer(pPin, E_FAIL);
@@ -2460,7 +2460,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 	rtLastDuration = rtDuration;
 
 	for (const auto& pb : p->bg->Block.BlockData) {
-		CAutoPtr<CPacket> pOutput(DNew CPacket());
+		std::unique_ptr<CPacket> pOutput(DNew CPacket());
 
 		pOutput->TrackNumber    = p->TrackNumber;
 		pOutput->bDiscontinuity = p->bDiscontinuity;
@@ -2510,7 +2510,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 							break;
 						}
 
-						CAutoPtr<CPacket> pPacket(DNew CPacket());
+						std::unique_ptr<CPacket> pPacket(DNew CPacket());
 						pPacket->SetData(pData, sz);
 
 						pPacket->TrackNumber    = pOutput->TrackNumber;
@@ -2523,7 +2523,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 							rtStartTmp      = INVALID_TIME;
 							rtStopTmp       = INVALID_TIME;
 						}
-						if (S_OK != (hr = DeliverPacket(pPacket))) {
+						if (S_OK != (hr = DeliverPacket(std::move(pPacket)))) {
 							break;
 						}
 
@@ -2546,7 +2546,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 			pOutput->SetData(pb->data(), pb->size());
 		}
 
-		if (S_OK != (hr = DeliverPacket(pOutput))) {
+		if (S_OK != (hr = DeliverPacket(std::move(pOutput)))) {
 			break;
 		}
 
@@ -2559,7 +2559,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 
 	if (mt.subtype == MEDIASUBTYPE_WAVPACK4) {
 		for (const auto& bm : p->bg->ba.bm) {
-			CAutoPtr<CPacket> pOutput(DNew CPacket());
+			std::unique_ptr<CPacket> pOutput(DNew CPacket());
 
 			pOutput->TrackNumber = p->TrackNumber;
 			pOutput->rtStart     = p->rtStart;
@@ -2568,8 +2568,8 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 			if (!ParseWavpack(&mt, &bm->BlockAdditional, pOutput)) {
 				continue;
 			}
-
-			if (S_OK != (hr = DeliverPacket(pOutput))) {
+			hr = DeliverPacket(std::move(pOutput));
+			if (S_OK != hr) {
 				break;
 			}
 		}
@@ -2904,7 +2904,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REF
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
-HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
+HRESULT CMatroskaSplitterOutputPin::QueuePacket(std::unique_ptr<CPacket> p)
 {
 	if (!ThreadExists()) {
 		return S_FALSE;
@@ -2955,5 +2955,5 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return m_hrDeliver;
 	}
 
-	return __super::QueuePacket(p);
+	return __super::QueuePacket(std::move(p));
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2022 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -234,7 +234,7 @@ HRESULT CAudioFilter::Initialize(
 	return S_OK;
 }
 
-HRESULT CAudioFilter::Push(const CAutoPtr<CPacket>& p)
+HRESULT CAudioFilter::Push(const std::unique_ptr<CPacket>& p)
 {
 	return Push(p->rtStart, p->data(), p->size());
 }
@@ -280,7 +280,7 @@ void CAudioFilter::PushEnd()
 	}
 }
 
-HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
+HRESULT CAudioFilter::Pull(std::unique_ptr<CPacket>& p)
 {
 	if (!m_pFilterBufferSink || !m_pFrame) {
 		return E_ABORT;
@@ -288,7 +288,7 @@ HRESULT CAudioFilter::Pull(CAutoPtr<CPacket>& p)
 	ASSERT(av_sample_fmt_is_planar(m_outAvSampleFmt) == 0);
 
 	if (!p) {
-		p.Attach(DNew CPacket());
+		p.reset(DNew CPacket());
 	}
 	CheckPointer(p, E_FAIL);
 

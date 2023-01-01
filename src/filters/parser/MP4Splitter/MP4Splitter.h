@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -102,6 +102,6 @@ public:
 	virtual ~CMP4SplitterOutputPin();
 
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
-	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
+	HRESULT DeliverPacket(std::unique_ptr<CPacket> p);
 	HRESULT DeliverEndFlush();
 };

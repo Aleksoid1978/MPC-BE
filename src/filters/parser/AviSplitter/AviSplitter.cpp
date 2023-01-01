@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -785,7 +785,7 @@ bool CAviSplitterFilter::DemuxLoop()
 				size = s->cs[f].orgsize;
 			}
 
-			CAutoPtr<CPacket> p(DNew CPacket());
+			std::unique_ptr<CPacket> p(DNew CPacket());
 
 			p->TrackNumber		= (DWORD)curTrack;
 			p->bSyncPoint		= (BOOL)s->cs[f].fKeyFrame;
@@ -805,7 +805,7 @@ bool CAviSplitterFilter::DemuxLoop()
 #endif
 			m_maxTimeStamp = std::max(m_maxTimeStamp, p->rtStart);
 
-			hr = DeliverPacket(p);
+			hr = DeliverPacket(std::move(p));
 
 			fDiscontinuity[curTrack] = false;
 		} while (0);

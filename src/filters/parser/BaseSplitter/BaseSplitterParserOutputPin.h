@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,8 +39,8 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 			BOOL bDataExists = FALSE;
 	};
 
-	CAutoPtr<CPacket>         m_p;
-	CAutoPtrList<CH264Packet> m_pl;
+	std::unique_ptr<CPacket>         m_p;
+	std::list<std::unique_ptr<CH264Packet>> m_pl;
 
 	MpegParseContext m_ParseContext;
 	CTeletext        m_teletext;
@@ -60,30 +60,31 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 	BYTE  m_DTSHDProfile   = 0;
 
 	HRESULT DeliverParsed(const BYTE* start, const size_t size);
-	void HandlePacket(CAutoPtr<CPacket>& p);
+	void HandlePacket(std::unique_ptr<CPacket>& p);
 
 protected:
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
-	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
+	HRESULT DeliverPacket(std::unique_ptr<CPacket> p);
 
 	HRESULT Flush();
 
+private:
 	void InitPacket(CPacket* pSource);
 
-	HRESULT ParseAAC(CAutoPtr<CPacket> p);
-	HRESULT ParseAACLATM(CAutoPtr<CPacket> p);
-	HRESULT ParseAnnexB(CAutoPtr<CPacket> p, bool bConvertToAVCC);
-	HRESULT ParseHEVC(CAutoPtr<CPacket> p);
-	HRESULT ParseVC1(CAutoPtr<CPacket> p);
-	HRESULT ParseHDMVLPCM(CAutoPtr<CPacket> p);
-	HRESULT ParseAC3(CAutoPtr<CPacket> p);
-	HRESULT ParseTrueHD(CAutoPtr<CPacket> p, BOOL bCheckAC3 = TRUE);
-	HRESULT ParseDirac(CAutoPtr<CPacket> p);
-	HRESULT ParseVobSub(CAutoPtr<CPacket> p);
-	HRESULT ParseAdxADPCM(CAutoPtr<CPacket> p);
-	HRESULT ParseDTS(CAutoPtr<CPacket> p);
-	HRESULT ParseTeletext(CAutoPtr<CPacket> p);
-	HRESULT ParseMpegVideo(CAutoPtr<CPacket> p);
+	HRESULT ParseAAC(std::unique_ptr<CPacket>& p);
+	HRESULT ParseAACLATM(std::unique_ptr<CPacket>& p);
+	HRESULT ParseAnnexB(std::unique_ptr<CPacket>& p, bool bConvertToAVCC);
+	HRESULT ParseHEVC(std::unique_ptr<CPacket>& p);
+	HRESULT ParseVC1(std::unique_ptr<CPacket>& p);
+	HRESULT ParseHDMVLPCM(std::unique_ptr<CPacket>& p);
+	HRESULT ParseAC3(std::unique_ptr<CPacket>& p);
+	HRESULT ParseTrueHD(std::unique_ptr<CPacket>& p, BOOL bCheckAC3 = TRUE);
+	HRESULT ParseDirac(std::unique_ptr<CPacket>& p);
+	HRESULT ParseVobSub(std::unique_ptr<CPacket>& p);
+	HRESULT ParseAdxADPCM(std::unique_ptr<CPacket>& p);
+	HRESULT ParseDTS(std::unique_ptr<CPacket>& p);
+	HRESULT ParseTeletext(std::unique_ptr<CPacket>& p);
+	HRESULT ParseMpegVideo(std::unique_ptr<CPacket>& p);
 
 public:
 	CBaseSplitterParserOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);

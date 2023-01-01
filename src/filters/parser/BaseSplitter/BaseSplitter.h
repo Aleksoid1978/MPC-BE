@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -94,7 +94,7 @@ protected:
 
 	void DeliverBeginFlush();
 	void DeliverEndFlush();
-	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
+	HRESULT DeliverPacket(std::unique_ptr<CPacket> p);
 
 	int m_priority;
 
