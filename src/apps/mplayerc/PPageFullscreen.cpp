@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -523,12 +523,24 @@ void CPPageFullscreen::ModesUpdate()
 				int dmIdx = findDisplayMode(item.dmFSRes, curModeIdx);
 
 				CString str;
-				nItem > 0 ? str.Format(L"%02u", n) : str = L"Default";
+				if (nItem > 0) {
+					str.Format(L"%02u", n);
+				} else {
+					str = L"Default";
+				}
 				m_list.InsertItem(nItem, str);
 				m_list.SetItemText(nItem, COL_SRR, FormatModeString(m_dms[dmIdx]));
-				nItem > 0 ? str.Format(L"%.3f", item.vfr_from) : str = L"-";
+				if (nItem > 0) {
+					str.Format(L"%.3f", item.vfr_from);
+				} else {
+					str = L"-";
+				}
 				m_list.SetItemText(nItem, COL_VFR_F, str);
-				nItem > 0 ? str.Format(L"%.3f", item.vfr_to) : str = L"-";
+				if (nItem > 0) {
+					str.Format(L"%.3f", item.vfr_to);
+				} else {
+					str = L"-";
+				}
 				m_list.SetItemText(nItem, COL_VFR_T, str);
 				m_list.SetItemData(nItem, (DWORD_PTR)dmIdx);
 				m_list.SetCheck(nItem, item.bChecked);
@@ -746,7 +758,11 @@ void CPPageFullscreen::ReindexList()
 	if (m_list.GetItemCount() > 0) {
 		CString str;
 		for (int i = 0; i < m_list.GetItemCount(); i++) {
-			i > 0 ? str.Format(L"%02d", i) : str = L"Default";
+			if (i > 0) {
+				str.Format(L"%02d", i);
+			} else {
+				str = L"Default";
+			}
 			m_list.SetItemText(i, 0, str);
 		}
 	}

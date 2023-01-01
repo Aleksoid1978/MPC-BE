@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -553,14 +553,22 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 		} else if (m_rectSeekBar.PtInRect(point)) {
 			bRet = true;
 			if (!m_bSeekBarVisible) {
-				m_pMainFrame->IsD3DFullScreenMode() ? m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND) : SetCursor(LoadCursorW(nullptr, IDC_HAND));
+				if (m_pMainFrame->IsD3DFullScreenMode()) {
+					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND);
+				} else {
+					SetCursor(LoadCursorW(nullptr, IDC_HAND));
+				}
 				m_bSeekBarVisible = true;
 				InvalidateBitmapOSD();
 			}
 		} else if (m_rectFlyBar.PtInRect(point)) {
 			bRet = true;
 			if (!m_bFlyBarVisible) {
-				m_pMainFrame->IsD3DFullScreenMode() ? m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW) : SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+				if (m_pMainFrame->IsD3DFullScreenMode()) {
+					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
+				} else {
+					SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+				}
 				m_bFlyBarVisible = true;
 				InvalidateBitmapOSD();
 			} else {
@@ -579,9 +587,17 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 				}
 
 				if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
-					m_pMainFrame->IsD3DFullScreenMode() ? m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND) : SetCursor(LoadCursorW(nullptr, IDC_HAND));
+					if (m_pMainFrame->IsD3DFullScreenMode()) {
+						m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND);
+					} else {
+						SetCursor(LoadCursorW(nullptr, IDC_HAND));
+					}
 				} else {
-					m_pMainFrame->IsD3DFullScreenMode() ? m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW) : SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+					if (m_pMainFrame->IsD3DFullScreenMode()) {
+						m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
+					} else {
+						SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+					}
 				}
 			}
 		} else if (m_bSeekBarVisible || m_bFlyBarVisible) {
@@ -594,7 +610,11 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 
 void COSD::OnMouseLeave()
 {
-	m_pMainFrame->IsD3DFullScreenMode() ? m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW) : SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+	if (m_pMainFrame->IsD3DFullScreenMode()) {
+		m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
+	} else {
+		SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+	}
 
 	const bool bHideBars = (m_pMFVMB && (m_bSeekBarVisible || m_bFlyBarVisible));
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -9292,7 +9292,11 @@ void CMainFrame::OnPlayColor(UINT nID)
 		case ID_COLOR_BRIGHTNESS_DEC:
 			brightness -= 1;
 			SetColorControl(ProcAmp_Brightness, brightness, contrast, hue, saturation);
-			brightness ? tmp.Format(L"%+d", brightness) : tmp = L"0";
+			if (brightness) {
+				tmp.Format(L"%+d", brightness);
+			} else {
+				tmp = L"0";
+			}
 			str.Format(IDS_OSD_BRIGHTNESS, tmp);
 			break;
 
@@ -9301,7 +9305,11 @@ void CMainFrame::OnPlayColor(UINT nID)
 		case ID_COLOR_CONTRAST_DEC:
 			contrast -= 1;
 			SetColorControl(ProcAmp_Contrast, brightness, contrast, hue, saturation);
-			contrast ? tmp.Format(L"%+d", contrast) : tmp = L"0";
+			if (contrast) {
+				tmp.Format(L"%+d", contrast);
+			} else {
+				tmp = L"0";
+			}
 			str.Format(IDS_OSD_CONTRAST, tmp);
 			break;
 
@@ -9310,7 +9318,11 @@ void CMainFrame::OnPlayColor(UINT nID)
 		case ID_COLOR_HUE_DEC:
 			hue -= 1;
 			SetColorControl(ProcAmp_Hue, brightness, contrast, hue, saturation);
-			hue ? tmp.Format(L"%+d", hue) : tmp = L"0";
+			if (hue) {
+				tmp.Format(L"%+d", hue);
+			} else {
+				tmp = L"0";
+			}
 			str.Format(IDS_OSD_HUE, tmp);
 			break;
 
@@ -9319,7 +9331,11 @@ void CMainFrame::OnPlayColor(UINT nID)
 		case ID_COLOR_SATURATION_DEC:
 			saturation -= 1;
 			SetColorControl(ProcAmp_Saturation, brightness, contrast, hue, saturation);
-			saturation ? tmp.Format(L"%+d", saturation) : tmp = L"0";
+			if (saturation) {
+				tmp.Format(L"%+d", saturation);
+			} else {
+				tmp = L"0";
+			}
 			str.Format(IDS_OSD_SATURATION, tmp);
 			break;
 
