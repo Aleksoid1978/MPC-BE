@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -613,7 +613,7 @@ STDMETHODIMP CFilterMapper2::CreateCategory(REFCLSID clsidCategory, DWORD dwCate
 {
 	if (!m_path.IsEmpty()) {
 		return S_OK;
-	} else if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2) {
+	} else if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2.p) {
 		return pFM2->CreateCategory(clsidCategory, dwCategoryMerit, Description);
 	}
 
@@ -624,7 +624,7 @@ STDMETHODIMP CFilterMapper2::UnregisterFilter(const CLSID* pclsidCategory, const
 {
 	if (!m_path.IsEmpty()) {
 		return S_OK;
-	} else if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2) {
+	} else if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2.p) {
 		return m_fAllowUnreg
 			   ? pFM2->UnregisterFilter(pclsidCategory, szInstance, Filter)
 			   : S_OK;
@@ -681,7 +681,7 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 		}
 
 		return S_OK;
-	} else if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2) {
+	} else if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2.p) {
 		return pFM2->RegisterFilter(clsidFilter, Name, ppMoniker, pclsidCategory, szInstance, prf2);
 	}
 
@@ -692,7 +692,7 @@ STDMETHODIMP CFilterMapper2::EnumMatchingFilters(IEnumMoniker** ppEnum, DWORD dw
 		BOOL bInputNeeded, DWORD cInputTypes, const GUID* pInputTypes, const REGPINMEDIUM* pMedIn, const CLSID* pPinCategoryIn, BOOL bRender,
 		BOOL bOutputNeeded, DWORD cOutputTypes, const GUID* pOutputTypes, const REGPINMEDIUM* pMedOut, const CLSID* pPinCategoryOut)
 {
-	if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2) {
+	if (CComQIPtr<IFilterMapper2> pFM2 = m_pFM2.p) {
 		pFM2->EnumMatchingFilters(ppEnum, dwFlags, bExactMatch, dwMerit,
 								  bInputNeeded, cInputTypes, pInputTypes, pMedIn, pPinCategoryIn, bRender,
 								  bOutputNeeded, cOutputTypes, pOutputTypes, pMedOut, pPinCategoryOut);

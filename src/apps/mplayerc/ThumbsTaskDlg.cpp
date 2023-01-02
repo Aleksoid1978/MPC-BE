@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,7 +66,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	else if (m_pMainFrm->m_pBV) {
 		m_pMainFrm->m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
 		long arx = 0, ary = 0;
-		CComQIPtr<IBasicVideo2> pBV2 = m_pMainFrm->m_pBV;
+		CComQIPtr<IBasicVideo2> pBV2 = m_pMainFrm->m_pBV.p;
 		if (pBV2 && SUCCEEDED(pBV2->GetPreferredAspectRatio(&arx, &ary)) && arx > 0 && ary > 0) {
 			dar.SetSize(arx, ary);
 		}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -481,7 +481,7 @@ void CPPageInternalFilters::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKN
 	CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pObj;
 
 	if (SUCCEEDED(hr)) {
-		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pUnk) {
+		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pUnk.p) {
 			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
 			ps.AddPages(pSPP);
 			ps.DoModal();

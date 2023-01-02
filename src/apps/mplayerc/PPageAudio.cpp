@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -212,7 +212,7 @@ void CPPageAudio::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk,
 	CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pObj;
 
 	if (SUCCEEDED(hr)) {
-		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pUnk) {
+		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pUnk.p) {
 			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
 			ps.AddPages(pSPP);
 			ps.DoModal();
@@ -242,7 +242,7 @@ void CPPageAudio::OnAudioRendererChange()
 				CComPtr<IBaseFilter> pBF;
 				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
-					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
+					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF.p) {
 						flag = TRUE;
 						break;
 					}

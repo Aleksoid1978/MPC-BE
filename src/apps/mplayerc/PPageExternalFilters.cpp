@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -449,7 +449,7 @@ void CPPageExternalFilters::OnLbnDblclkFilter()
 			}
 		}
 
-		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
+		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF.p) {
 			CComPropertySheet ps(name, this);
 			if (ps.AddPages(pSPP) > 0) {
 				CComPtr<IFilterGraph> pFG;

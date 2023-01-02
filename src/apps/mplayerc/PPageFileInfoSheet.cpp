@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,7 +50,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(const CString& fn, CMainFrame* pMainFra
 		AddPage(&m_clip);
 
 		BeginEnumFilters(pMainFrame->m_pGB, pEF, pBF) {
-			if (CComQIPtr<IDSMResourceBag> pRB = pBF)
+			if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
 				if (pRB && pRB->ResGetCount() > 0) {
 					AddPage(&m_res);
 					break;

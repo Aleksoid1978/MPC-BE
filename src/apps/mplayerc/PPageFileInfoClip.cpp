@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 	auto pFrame = AfxGetMainFrame();
 
 	BeginEnumFilters(pFG, pEF, pBF) {
-		if (CComQIPtr<IPropertyBag> pPB = pBF) {
+		if (CComQIPtr<IPropertyBag> pPB = pBF.p) {
 			if (!pFrame->CheckMainFilter(pBF)) {
 				continue;
 			}
@@ -60,7 +60,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 			}
 		}
 
-		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF.p) {
 			if (!pFrame->CheckMainFilter(pBF)) {
 				continue;
 			}

@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2022 see Authors.txt
+ * (C) 2017-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,7 +43,7 @@ void CPPageSoundProcessing::UpdateCenterInfo()
 	str.Format(ResStr(IDS_CENTER_LEVEL), center);
 	m_stcCenter.SetWindowTextW(str);
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter.p) {
 		pASF->SetLevels(center, m_sldSurround.GetPos() / 10.0f);
 	}
 };
@@ -55,7 +55,7 @@ void CPPageSoundProcessing::UpdateSurroundInfo()
 	str.Format(ResStr(IDS_SURROUND_LEVEL), surround);
 	m_stcSurround.SetWindowTextW(str);
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter.p) {
 		pASF->SetLevels(m_sldCenter.GetPos() / 10.0f, surround);
 	}
 };
@@ -67,7 +67,7 @@ void CPPageSoundProcessing::UpdateGainInfo()
 	str.Format(ResStr(IDS_AUDIO_GAIN), gain);
 	m_stcGain.SetWindowTextW(str);
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter.p) {
 		pASF->SetAudioGain(gain);
 	}
 };
@@ -274,7 +274,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		BeginEnumFilters(pFG, pEF, pBF) {
 			CLSID clsid;
 			if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
-				if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+				if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
 					pEFC->SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
 				}
 			}
@@ -282,7 +282,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		EndEnumFilters
 	}
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter.p) {
 		pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 		pASF->SetBassRedirect(s.bAudioBassRedirect);
 		pASF->SetLevels(s.dAudioCenter_dB, s.dAudioSurround_dB);
@@ -469,7 +469,7 @@ void CPPageSoundProcessing::OnCancel()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter.p) {
 		pASF->SetLevels(s.dAudioCenter_dB, s.dAudioSurround_dB);
 		pASF->SetAudioGain(s.dAudioGain_dB);
 	}

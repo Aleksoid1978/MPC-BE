@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -96,7 +96,7 @@ HRESULT CSaveDlg::InitFileCopy()
 			CComPtr<IUnknown> pUnk;
 			pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
 
-			if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
+			if (CComQIPtr<IBaseFilter> pSrc = pUnk.p) {
 				pGB->AddFilter(pSrc, fn);
 
 				if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, nullptr))) {
@@ -214,7 +214,7 @@ HRESULT CSaveDlg::InitFileCopy()
 
 fail:
 
-	CComQIPtr<IBaseFilter> pSrc = pReader;
+	CComQIPtr<IBaseFilter> pSrc = pReader.p;
 	if (FAILED(pGB->AddFilter(pSrc, fn))) {
 		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(L"Sorry, can't save this file, press \"Cancel\"");
@@ -237,7 +237,7 @@ fail:
 
 		return S_FALSE;
 	}
-	CComQIPtr<IFileSinkFilter2> pFSF = pDst;
+	CComQIPtr<IFileSinkFilter2> pFSF = pDst.p;
 	pFSF->SetFileName(CStringW(m_out), nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 

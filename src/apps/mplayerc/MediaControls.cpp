@@ -1,5 +1,5 @@
 /*
-* (C) 2021 see Authors.txt
+* (C) 2021-2023 see Authors.txt
 *
 * This file is part of MPC-BE.
 *
@@ -191,7 +191,7 @@ bool CMediaControls::Update()
 		};
 		std::vector<uint8_t> m_imageData;
 		BeginEnumFilters(m_pMainFrame->m_pGB, pEF, pBF) {
-			if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+			if (CComQIPtr<IDSMResourceBag> pRB = pBF.p) {
 				if (pRB && m_pMainFrame->CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
 					for (DWORD i = 0; i < pRB->ResGetCount() && m_imageData.empty(); i++) {
 						CComBSTR mime;

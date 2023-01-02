@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -102,7 +102,7 @@ public:
 			pBF->SetSwPixelFormat(PixFmt_YUY2, true);
 			pBF->SetSwPixelFormat(PixFmt_RGB32, true);
 
-			if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+			if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
 				pEFC->SetBool("hw_decoding", false);
 			}
 		}
@@ -112,7 +112,7 @@ public:
 			pBF->SetFFMpegCodec(i, video_filters[i]);
 		}
 
-		if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+		if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
 			int iMvcOutputMode = MVC_OUTPUT_Auto;
 			switch (s.iStereo3DMode) {
 				case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
@@ -662,7 +662,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 		return hr;
 	}
 
-	CComQIPtr<IFileSourceFilter> pFSF = pBF;
+	CComQIPtr<IFileSourceFilter> pFSF = pBF.p;
 	if (!pFSF) {
 		return E_NOINTERFACE;
 	}
@@ -1067,7 +1067,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			};
 
 			if (!m_bIsPreview && !pMadVRAllocatorPresenter) {
-				if (CComQIPtr<IMFGetService> pMFGS = pBF) {
+				if (CComQIPtr<IMFGetService> pMFGS = pBF.p) {
 					// hook IDirectXVideoDecoderService to get DXVA status & logging;
 					// why before ConnectFilterDirect() - some decoder, like ArcSoft & Cyberlink, init DXVA2 decoder while connect to the renderer ...
 					// madVR crash on call ::GetService() before connect
@@ -1093,29 +1093,29 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					POSITION pos = pUnks.GetHeadPosition();
 					while (pos) {
-						if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pUnks.GetNext(pos)) {
+						if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pUnks.GetNext(pos).p) {
 							pMPC->SetAspectRatioMode(AM_ARMODE_STRETCHED);
 						}
 					}
 
-					if (CComQIPtr<IVMRAspectRatioControl> pARC = pBF) {
+					if (CComQIPtr<IVMRAspectRatioControl> pARC = pBF.p) {
 						pARC->SetAspectRatioMode(VMR_ARMODE_NONE);
 					}
 
-					if (CComQIPtr<IVMRAspectRatioControl9> pARC = pBF) {
+					if (CComQIPtr<IVMRAspectRatioControl9> pARC = pBF.p) {
 						pARC->SetAspectRatioMode(VMR_ARMODE_NONE);
 					}
 
-					if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
+					if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF.p) {
 						m_pUnks.AddTail(pVMRMC9);
 					}
 
-					CComQIPtr<IMFVideoMixerBitmap> pMFVMB = pBF; // get custom EVR-CP or EVR-Sync interface
+					CComQIPtr<IMFVideoMixerBitmap> pMFVMB = pBF.p; // get custom EVR-CP or EVR-Sync interface
 					if (pMFVMB) {
 						m_pUnks.AddTail(pMFVMB);
 					}
 
-					if (CComQIPtr<IMFGetService> pMFGS = pBF) {
+					if (CComQIPtr<IMFGetService> pMFGS = pBF.p) {
 						CComPtr<IMFVideoDisplayControl>	pMFVDC;
 						CComPtr<IMFVideoProcessor>		pMFVP;
 
@@ -1337,7 +1337,7 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 		CInterfaceList<IBaseFilter> pBFs;
 
 		BeginEnumFilters(this, pEF, pBF) {
-			if (CComQIPtr<IAMFilterMiscFlags> pAMMF = pBF) {
+			if (CComQIPtr<IAMFilterMiscFlags> pAMMF = pBF.p) {
 				if (pAMMF->GetMiscFlags() & AM_FILTER_MISC_FLAGS_IS_RENDERER) {
 					pBFs.AddTail(pBF);
 				}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ CPPageFileInfoRes::CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG)
 	}
 
 	BeginEnumFilters(pFG, pEF, pBF) {
-		if (CComQIPtr<IDSMResourceBag> pRB = pBF)
+		if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
 		if (pRB && pRB->ResGetCount() > 0) {
 			for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
 				CComBSTR name, desc, mime;

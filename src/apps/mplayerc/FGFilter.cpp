@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -449,13 +449,13 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 		if (m_clsid == CLSID_EnhancedVideoRenderer) {
 			if (!m_bIsPreview) {
-				if (CComQIPtr<IEVRFilterConfig> pConfig = pBF) {
+				if (CComQIPtr<IEVRFilterConfig> pConfig = pBF.p) {
 					// 3 video streams are required to play DVD-Video with some decoders
 					VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
 				}
 			}
 
-			if (CComQIPtr<IMFGetService> pMFGS = pBF) {
+			if (CComQIPtr<IMFGetService> pMFGS = pBF.p) {
 				CComPtr<IMFVideoDisplayControl> pMFVDC;
 				if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
 					VERIFY(SUCCEEDED(pMFVDC->SetVideoWindow(m_hWnd)));
@@ -467,7 +467,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		}
 
 		BeginEnumPins(pBF, pEP, pPin) {
-			if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pPin) {
+			if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pPin.p) {
 				pUnks.AddTail(pMPC);
 				break;
 			}

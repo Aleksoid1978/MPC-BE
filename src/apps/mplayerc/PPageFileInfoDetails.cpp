@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@
 static bool GetProperty(IFilterGraph* pFG, LPCOLESTR propName, VARIANT* vt)
 {
 	BeginEnumFilters(pFG, pEF, pBF) {
-		if (CComQIPtr<IPropertyBag> pPB = pBF)
+		if (CComQIPtr<IPropertyBag> pPB = pBF.p)
 			if (SUCCEEDED(pPB->Read(propName, vt, nullptr))) {
 				return true;
 			}
@@ -130,19 +130,19 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(const CString& fn, IFilterGraph* pF
 
 		if (wh.cx == 0 && wh.cy == 0) {
 			BeginEnumFilters(pFG, pEF, pBF) {
-				if (CComQIPtr<IBasicVideo> pBV = pBF) {
+				if (CComQIPtr<IBasicVideo> pBV = pBF.p) {
 					pBV->GetVideoSize(&wh.cx, &wh.cy);
-					if (CComQIPtr<IBasicVideo2> pBV2 = pBF) {
+					if (CComQIPtr<IBasicVideo2> pBV2 = pBF.p) {
 						pBV2->GetPreferredAspectRatio(&arxy.cx, &arxy.cy);
 					}
 					break;
-				} else if (CComQIPtr<IVMRWindowlessControl> pWC = pBF) {
+				} else if (CComQIPtr<IVMRWindowlessControl> pWC = pBF.p) {
 					pWC->GetNativeVideoSize(&wh.cx, &wh.cy, &arxy.cx, &arxy.cy);
 					break;
-				} else if (CComQIPtr<IVMRWindowlessControl9> pWC = pBF) {
+				} else if (CComQIPtr<IVMRWindowlessControl9> pWC = pBF.p) {
 					pWC->GetNativeVideoSize(&wh.cx, &wh.cy, &arxy.cx, &arxy.cy);
 					break;
-				} else if (CComQIPtr<IMFGetService> pMFGS = pBF) {
+				} else if (CComQIPtr<IMFGetService> pMFGS = pBF.p) {
 					CComPtr<IMFVideoDisplayControl> pMFVDC;
 					if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
 						pMFVDC->GetNativeVideoSize(&wh, &arxy);
@@ -279,7 +279,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 		}
 
 		BOOL bUsePins = TRUE;
-		if (CComQIPtr<IAMStreamSelect> pSS = pBF) {
+		if (CComQIPtr<IAMStreamSelect> pSS = pBF.p) {
 			DWORD nCount;
 			if (FAILED(pSS->Count(&nCount))) {
 				nCount = 0;

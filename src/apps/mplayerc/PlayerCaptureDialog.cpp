@@ -495,7 +495,7 @@ static int ShowPPage(std::vector<Codec>& codecs, const CComboBox& box, HWND hWnd
 		c.pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&c.pBF));
 	}
 
-	if (CComQIPtr<ISpecifyPropertyPages> pSPP = c.pBF) {
+	if (CComQIPtr<ISpecifyPropertyPages> pSPP = c.pBF.p) {
 		CAUUID caGUID;
 		caGUID.pElems = nullptr;
 		if (SUCCEEDED(pSPP->GetPages(&caGUID))) {
@@ -512,7 +512,7 @@ static int ShowPPage(std::vector<Codec>& codecs, const CComboBox& box, HWND hWnd
 				CoTaskMemFree(caGUID.pElems);
 			}
 		}
-	} else if (CComQIPtr<IAMVfwCompressDialogs> pAMVfWCD = c.pBF) {
+	} else if (CComQIPtr<IAMVfwCompressDialogs> pAMVfWCD = c.pBF.p) {
 		if (pAMVfWCD->ShowDialog(VfwCompressDialog_QueryConfig, nullptr) == S_OK) {
 			pAMVfWCD->ShowDialog(VfwCompressDialog_Config, hWnd);
 		}
@@ -1198,7 +1198,7 @@ void CPlayerCaptureDialog::UpdateAudioControls()
 		size_t iSel = SIZE_T_MAX;
 
 		for (size_t i = 0; i < m_pAMAIM.GetCount(); i++) {
-			CComQIPtr<IPin> pPin = m_pAMAIM[i];
+			CComQIPtr<IPin> pPin = m_pAMAIM[i].p;
 			AddStringData(m_audinput, GetPinName(pPin), i);
 
 			BOOL fEnable;
@@ -1605,7 +1605,7 @@ void CPlayerCaptureDialog::OnRecord()
 	if (!m_pMainFrame->m_bCapturing) {
 		UpdateMuxer();
 
-		CComQIPtr<IFileSinkFilter2> pFSF = m_pMux;
+		CComQIPtr<IFileSinkFilter2> pFSF = m_pMux.p;
 		if (pFSF) {
 			m_pDst = m_pMux;
 		} else {
@@ -1630,7 +1630,7 @@ void CPlayerCaptureDialog::OnRecord()
 		if (m_fSepAudio && m_fAudOutput && m_pAudMux && !audfn.IsEmpty()) {
 			audfn += L"wav";
 
-			CComQIPtr<IFileSinkFilter2> pFSFAudioMux = m_pAudMux;
+			CComQIPtr<IFileSinkFilter2> pFSFAudioMux = m_pAudMux.p;
 			if (pFSFAudioMux) {
 				m_pAudDst = m_pAudMux;
 			} else {
@@ -1648,13 +1648,13 @@ void CPlayerCaptureDialog::OnRecord()
 		}
 
 		m_pVidBuffer = m_fVidOutput && m_nVidBuffers > 0 && m_muxtype == 0 ? DNew CBufferFilter(nullptr, nullptr) : nullptr;
-		if (CComQIPtr<IBufferFilter> pVB = m_pVidBuffer) {
+		if (CComQIPtr<IBufferFilter> pVB = m_pVidBuffer.p) {
 			pVB->SetBuffers(m_nVidBuffers);
 			pVB->SetPriority(THREAD_PRIORITY_NORMAL);
 		}
 
 		m_pAudBuffer = m_fAudOutput && m_nAudBuffers > 0 && m_muxtype == 0 ? DNew CBufferFilter(nullptr, nullptr) : nullptr;
-		if (CComQIPtr<IBufferFilter> pAB = m_pAudBuffer) {
+		if (CComQIPtr<IBufferFilter> pAB = m_pAudBuffer.p) {
 			pAB->SetBuffers(m_nAudBuffers);
 			pAB->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
 		}

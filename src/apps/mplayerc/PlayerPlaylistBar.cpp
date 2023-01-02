@@ -1292,7 +1292,7 @@ void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 		if (extension == L".lnk") {
 			CComPtr<IShellLinkW> pShellLink;
 			if (SUCCEEDED(pShellLink.CoCreateInstance(CLSID_ShellLink))) {
-				if (CComQIPtr<IPersistFile> pPersistFile = pShellLink) {
+				if (CComQIPtr<IPersistFile> pPersistFile = pShellLink.p) {
 					WCHAR buffer[MAX_PATH] = {};
 					if (SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
 							// Possible recontruction of path.
@@ -1310,7 +1310,7 @@ void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 		} else if (extension == L".url" || extension == L".website") {
 			CComPtr<IUniformResourceLocatorW> pUniformResourceLocator;
 			if (SUCCEEDED(pUniformResourceLocator.CoCreateInstance(CLSID_InternetShortcut))) {
-				if (CComQIPtr<IPersistFile> pPersistFile = pUniformResourceLocator) {
+				if (CComQIPtr<IPersistFile> pPersistFile = pUniformResourceLocator.p) {
 					WCHAR* buffer;
 					if (SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
 							// Retrieve URL (foreign-allocated).
