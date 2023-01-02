@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ public :
 		m_ulMappedPID(0) {
 	}
 
-	CDVBStream(LPWSTR strName, const AM_MEDIA_TYPE * pmt, bool bFindExisting = false, MEDIA_SAMPLE_CONTENT nMsc=MEDIA_ELEMENTARY_STREAM) :
+	CDVBStream(LPCWSTR strName, const AM_MEDIA_TYPE* pmt, bool bFindExisting = false, MEDIA_SAMPLE_CONTENT nMsc = MEDIA_ELEMENTARY_STREAM) :
 		m_Name(strName),
 		m_bFindExisting(bFindExisting),
 		m_pmt(pmt),
@@ -41,22 +41,22 @@ public :
 		m_ulMappedPID(0)
 	{}
 
-	LPWSTR					GetName() {		/*const*/
+	LPCWSTR GetName() { /*const*/
 		return m_Name;
 	};
-	const AM_MEDIA_TYPE*	GetMediaType() {	/*const*/
+	const AM_MEDIA_TYPE* GetMediaType() { /*const*/
 		return m_pmt;
 	};
-	bool					GetFindExisting()	const {
+	bool GetFindExisting() const {
 		return m_bFindExisting;
 	};
-	IBaseFilter*			GetFilter() {
+	IBaseFilter* GetFilter() {
 		return m_pFilter;
 	};
 
-	void					SetPin(IPin* pPin) {
-		CComPtr<IPin>		pPinOut;
-		PIN_INFO			PinInfo;
+	void SetPin(IPin* pPin) {
+		CComPtr<IPin> pPinOut;
+		PIN_INFO      PinInfo;
 
 		m_pMap = pPin;
 		if (m_pMap &&
@@ -88,7 +88,7 @@ private :
 	CComPtr<IBaseFilter>	m_pFilter;
 	const AM_MEDIA_TYPE*	m_pmt;
 	bool					m_bFindExisting;
-	LPWSTR					m_Name;
+	LPCWSTR					m_Name;
 	MEDIA_SAMPLE_CONTENT	m_nMsc;
 	ULONG					m_ulMappedPID;
 
@@ -180,26 +180,3 @@ private :
 		}
 	}
 };
-
-#define LOG_FILE L"bda.log"
-
-#ifdef _DEBUG
-static void LOG(LPCTSTR fmt, ...)
-{
-	va_list args;
-	va_start(args, fmt);
-	//int		nCount = _vsctprintf(fmt, args) + 1;
-	WCHAR	buff[3000];
-	FILE*	f;
-	vswprintf_s(buff, std::size(buff), fmt, args);
-	if (_wfopen_s(&f, LOG_FILE, L"at") == 0) {
-		fseek(f, 0, 2);
-		fwprintf_s(f, L"%s\n", buff);
-		fclose(f);
-	}
-
-	va_end(args);
-}
-#else
-inline void LOG(LPCTSTR fmt, ...) {}
-#endif

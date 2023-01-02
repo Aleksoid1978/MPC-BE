@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,8 +35,31 @@
 #include "MainFrm.h"
 #include "DSUtil/SysVersion.h"
 
-#define CheckAndLogBDA(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg _T(": 0x%08x\n"), hr); return hr; }
-#define CheckAndLogBDANoRet(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg _T(": 0x%08x\n"), hr); }
+#define LOG_FILE L"bda.log"
+
+#ifdef _DEBUG
+static void LOG(LPCWSTR fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	//int nCount = _vsctprintf(fmt, args) + 1;
+	WCHAR buff[3000];
+	FILE* f;
+	vswprintf_s(buff, std::size(buff), fmt, args);
+	if (_wfopen_s(&f, LOG_FILE, L"at") == 0) {
+		fseek(f, 0, 2);
+		fwprintf_s(f, L"%s\n", buff);
+		fclose(f);
+	}
+
+	va_end(args);
+}
+#else
+inline void LOG(LPCWSTR fmt, ...) {}
+#endif
+
+#define CheckAndLogBDA(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg L": 0x%08x\n", hr); return hr; }
+#define CheckAndLogBDANoRet(x, msg)  hr = ##x; if (FAILED(hr)) { LOG(msg L": 0x%08x\n", hr); }
 
 /// Format, Video MPEG2
 static const MPEG2VIDEOINFO sMpv_fmt = {
@@ -697,7 +720,7 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(IBaseFilter* pReceiver, CComPtr<IBas
 		if (nType != DVB_EPG) { // Hack: DVB_EPG not required
 			if (!Stream.GetFindExisting() ||
 					(pPin = FindPin (pMpeg2Demux, PINDIR_OUTPUT, Stream.GetMediaType())) == nullptr) {
-				CheckNoLog (pDemux->CreateOutputPin ((AM_MEDIA_TYPE*)Stream.GetMediaType(), Stream.GetName(), &pPin));
+				CheckNoLog (pDemux->CreateOutputPin ((AM_MEDIA_TYPE*)Stream.GetMediaType(), (LPWSTR)Stream.GetName(), &pPin));
 			}
 
 			if (nType == m_nCurVideoType || nType == m_nCurAudioType) {
