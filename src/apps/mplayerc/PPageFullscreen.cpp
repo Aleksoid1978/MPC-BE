@@ -289,7 +289,11 @@ BOOL CPPageFullscreen::OnApply()
 	m_strFullScreenMonitorID = monitor.id;
 
 	s.strFullScreenMonitor				= m_strFullScreenMonitor;
-	s.strFullScreenMonitorID			= m_strFullScreenMonitor == L"Current" ? L"" : m_strFullScreenMonitorID;
+	if (m_strFullScreenMonitor == L"Current") {
+		s.strFullScreenMonitorID.Empty();
+	} else {
+		s.strFullScreenMonitorID = m_strFullScreenMonitorID;
+	}
 
 	s.fShowBarsWhenFullScreen			= !!m_bShowBarsWhenFullScreen;
 	s.nShowBarsWhenFullScreenTimeOut	= m_edtTimeOut;

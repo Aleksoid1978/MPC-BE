@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,11 @@
 
 CString GetMediaTypeName(const GUID& guid)
 {
-	CString ret = (guid == GUID_NULL) ? L"Any type" : GetGUIDString2(guid);
-
-	return ret;
+	if (guid == GUID_NULL) {
+		return L"Any type";
+	} else {
+		return GetGUIDString2(guid);
+	}
 }
 
 // CSelectMediaType dialog

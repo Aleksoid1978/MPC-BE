@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -301,7 +301,11 @@ BOOL CPPageVideo::OnApply()
 
 	rs.ExtraSets.nEVRBuffers = m_iEvrBuffers;
 
-	rs.ExtraSets.sD3DRenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
+	if (m_bD3D9RenderDevice) {
+		rs.ExtraSets.sD3DRenderDevice = m_D3D9GUIDNames[m_iD3D9RenderDevice];
+	} else {
+		rs.ExtraSets.sD3DRenderDevice.Empty();
+	}
 
 	s.iDefaultVideoSize = m_cbFrameMode.GetCurSel();
 	s.bNoSmallUpscale = !!m_chkNoSmallUpscale.GetCheck();

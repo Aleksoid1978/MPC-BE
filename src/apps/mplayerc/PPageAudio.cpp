@@ -186,7 +186,11 @@ BOOL CPPageAudio::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.strAudioRendererDisplayName  = m_AudioRendererDisplayNames[m_iAudioRendererType];
-	s.strAudioRendererDisplayName2 = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
+	if (m_iSecAudioRendererType == -1) {
+		s.strAudioRendererDisplayName.Empty();
+	} else {
+		s.strAudioRendererDisplayName2 = m_AudioRendererDisplayNames[m_iSecAudioRendererType];
+	}
 	s.fDualAudioOutput             = !!m_DualAudioOutput.GetCheck();
 
 	s.fAutoloadAudio = !!m_fAutoloadAudio;

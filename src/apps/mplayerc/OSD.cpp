@@ -760,7 +760,11 @@ void COSD::DisplayMessage(
 		}
 
 		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
-		m_OSD_Font = OSD_Font ? OSD_Font : s.strOSDFont;
+		if (OSD_Font) {
+			m_OSD_Font = OSD_Font;
+		} else {
+			m_OSD_Font = s.strOSDFont;
+		}
 
 		if (m_OSD_FontCashed != m_OSD_Font
 				|| m_FontSizeCashed != m_FontSize
@@ -796,7 +800,11 @@ void COSD::DisplayMessage(
 		}
 
 		m_FontSize = FontSize ? std::clamp(FontSize, 8, 26) : s.nOSDSize;
-		m_OSD_Font = OSD_Font ? OSD_Font : s.strOSDFont;
+		if (OSD_Font) {
+			m_OSD_Font = OSD_Font;
+		} else {
+			m_OSD_Font = s.strOSDFont;
+		}
 
 		EndTimer();
 		if (nDuration != -1) {

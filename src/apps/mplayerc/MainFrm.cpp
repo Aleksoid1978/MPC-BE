@@ -3490,7 +3490,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			case EC_BG_ERROR:
 				if (m_bCustomGraph) {
 					SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-					m_closingmsg = !str.IsEmpty() ? str : L"Unspecified graph error";
+					if (str.GetLength()) {
+						m_closingmsg = str;
+					} else {
+						m_closingmsg = L"Unspecified graph error";
+					}
 					m_wndPlaylistBar.SetCurValid(false);
 					return hr;
 				}
@@ -4843,7 +4847,9 @@ void CMainFrame::OnStreamAudio(UINT nID)
 						AATR.bQuantization,
 						AATR.bNumberOfChannels,
 						(AATR.bNumberOfChannels > 1 ? ResStr(IDS_MAINFRM_13) : ResStr(IDS_MAINFRM_12)));
-					str += FAILED(hr) ? L" [" + ResStr(IDS_AG_ERROR) + L"] " : L"";
+					if (FAILED(hr)) {
+						str += L" [" + ResStr(IDS_AG_ERROR) + L"] ";
+					}
 					strMessage.Format(ResStr(IDS_AUDIO_STREAM), str);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 				}
@@ -5118,7 +5124,9 @@ void CMainFrame::OnStreamSub(UINT nID)
 					CString	strMessage;
 					int len = GetLocaleInfoW(SATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
 					lang.ReleaseBufferSetLength(std::max(len - 1, 0));
-					lang += FAILED(hr) ? L" [" + ResStr(IDS_AG_ERROR) + L"] " : L"";
+					if (FAILED(hr)) {
+						lang += L" [" + ResStr(IDS_AG_ERROR) + L"] ";
+					}
 					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), lang);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 				}
