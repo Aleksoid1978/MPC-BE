@@ -2846,11 +2846,15 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	pDC->SetTextColor(textcolor);
 
-	CString time = !pli.m_bInvalid ? m_list.GetItemText(nItem, COL_TIME) : L"Invalid";
-	CSize timesize(0, 0);
-	CPoint timept(rcItem.right, 0);
-	if (time.GetLength() > 0) {
-		timesize = pDC->GetTextExtent(time);
+	CString time;
+	if (pli.m_bInvalid) {
+		time = L"Invalid";
+	} else {
+		time = m_list.GetItemText(nItem, COL_TIME);
+	}
+
+	if (time.GetLength()) {
+		CSize timesize = pDC->GetTextExtent(time);
 		if ((3 + timesize.cx + 3) < rcItem.Width() / 2) {
 			CRect rc(rcItem);
 			rc.left = rc.right - (3 + timesize.cx + 3);

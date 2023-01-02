@@ -795,7 +795,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	std::vector<CStringW> recentPath;
 	AfxGetMyApp()->m_HistoryFile.GetRecentPaths(recentPath, 1);
-	m_wndPlaylistBar.LoadPlaylist(recentPath.size() ? recentPath.front() : L"");
+	if (recentPath.size()) {
+		m_wndPlaylistBar.LoadPlaylist(recentPath.front());
+	} else {
+		m_wndPlaylistBar.LoadPlaylist(L"");
+	}
 
 	m_wndCaptureBar.Create(this, AFX_IDW_DOCKBAR_LEFT);
 	m_wndCaptureBar.SetBarStyle(m_wndCaptureBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
@@ -16268,7 +16272,10 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 
 	// TMP: maybe this will catch something for those who get a runtime error dialog when opening subtitles from cds
 	try {
-		const CString videoName = GetPlaybackMode() == PM_FILE ? GetCurFileName() : L"";
+		CString videoName;
+		if (GetPlaybackMode() == PM_FILE) {
+			videoName = GetCurFileName();
+		}
 
 		if (!pSubStream && ext == L".sup") {
 			std::unique_ptr<CRenderedHdmvSubtitle> pRHS(DNew CRenderedHdmvSubtitle(&m_csSubLock));
@@ -19923,7 +19930,7 @@ void CMainFrame::subChangeNotifyThreadFunction()
 				ReloadSubtitle();
 			}
 		} else {
-			DLog(L"CMainFrame::NotifyRenderThread() : %s", GetLastErrorMsg(L"WaitForMultipleObjects"));
+			DLog(L"CMainFrame::NotifyRenderThread() : %s", GetLastErrorMsg((LPWSTR)L"WaitForMultipleObjects"));
 			ASSERT(FALSE);
 			break;
 		}

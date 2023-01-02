@@ -444,9 +444,19 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	{
 		// Filters Priority
 		CAppSettings& s = AfxGetAppSettings();
-		CMediaFormatCategory* mfc = s.m_Formats.FindMediaByExt(ext);
-		if (mfc || protocol == L"udp" || httpbuf.size()) {
-			CString type = httpbuf.size() ? L"http" : (protocol == L"udp" ? L"udp" : mfc->GetLabel());
+
+		CStringW type;
+		if (httpbuf.size()) {
+			type = L"http";
+		}
+		else if (protocol == L"udp") {
+			type = L"udp";
+		}
+		else if (CMediaFormatCategory* mfc = s.m_Formats.FindMediaByExt(ext)) {
+			type = mfc->GetLabel();
+		}
+
+		if (type.GetLength()) {
 			if (const auto it = s.FiltersPriority.values.find(type); it != s.FiltersPriority.values.cend() && it->second != CLSID_NULL) {
 				const auto& clsid_value = it->second;
 
