@@ -321,7 +321,7 @@ static void StringToPaths(const CString& curentdir, const CString& str, std::vec
 		if (hFind == INVALID_HANDLE_VALUE) {
 			continue;
 		} else {
-			CPath parentdir = path + L"\\..";
+			CPath parentdir(path + L"\\..");
 			parentdir.Canonicalize();
 
 			do {
