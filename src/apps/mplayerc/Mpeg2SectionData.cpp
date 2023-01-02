@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -506,11 +506,11 @@ HRESULT CMpeg2DataParser::ParseEIT(ULONG ulSID, PresentFollowing &NowNext)
 			 (m_Filter.SectionNumber <= 22));
 
 	if (InfoEvent.ServiceId != ulSID) {
-		NowNext.StartTime = L"";
-		NowNext.Duration = L"";
+		NowNext.StartTime.Empty();
+		NowNext.Duration.Empty();
 		NowNext.cPresent = L" Info not available.";
-		NowNext.SummaryDesc = L"";
-		NowNext.cFollowing = L"";
+		NowNext.SummaryDesc.Empty();
+		NowNext.cFollowing.Empty();
 	}
 
 	return S_OK;

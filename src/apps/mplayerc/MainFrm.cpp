@@ -1117,7 +1117,12 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 			auto pUnicodeText = (LPCWSTR)LockData;
 			auto pAnsiText = (LPCSTR)LockData;
 			if (bUnicode ? AfxIsValidString(pUnicodeText) : AfxIsValidString(pAnsiText)) {
-				CString text = bUnicode ? pUnicodeText : CString(pAnsiText);
+				CStringW text;
+				if (bUnicode) {
+					text = pUnicodeText;
+				} else {
+					text = CStringW(pAnsiText);
+				}
 				if (!text.IsEmpty()) {
 					std::list<CString> slFiles;
 					if (bUrl) {
@@ -6443,7 +6448,7 @@ bool CMainFrame::IsRendererCompatibleWithSaveImage()
 
 CString CMainFrame::GetVidPos()
 {
-	CString posstr = L"";
+	CString posstr;
 	if ((GetPlaybackMode() == PM_FILE) || (GetPlaybackMode() == PM_DVD)) {
 		REFERENCE_TIME stop = m_wndSeekBar.GetRange();
 		REFERENCE_TIME pos = m_wndSeekBar.GetPosReal();
@@ -6856,7 +6861,7 @@ void CMainFrame::OnUpdateFileSaveSubtitle(CCmdUI* pCmdUI)
 
 void CMainFrame::OnFileISDBSearch()
 {
-	CStringA url = "http://" + AfxGetAppSettings().strISDb + "/index.php?";
+	CStringA url = "http://" + CStringA(AfxGetAppSettings().strISDb) + "/index.php?";
 	CStringA args = makeargs(m_wndPlaylistBar.curPlayList);
 	ShellExecuteW(m_hWnd, L"open", CString(url+args), nullptr, nullptr, SW_SHOWDEFAULT);
 }
@@ -6880,7 +6885,7 @@ void CMainFrame::OnFileISDBDownload()
 	}
 
 	try {
-		CStringA url = "http://" + s.strISDb + "/index.php?";
+		CStringA url = "http://" + CStringA(s.strISDb) + "/index.php?";
 		CStringA args;
 		args.Format("player=mpc&name[0]=%s&size[0]=%016I64x&hash[0]=%016I64x",
 					UrlEncode(CStringA(fh.name), true), fh.size, fh.mpc_filehash);
@@ -11933,9 +11938,9 @@ void CMainFrame::SetShaders()
 		for (const auto& shader : list) {
 			ShaderC* pShader = GetShader(shader, bD3D11);
 			if (pShader) {
-				CStringW label   = pShader->label;
-				CStringA profile = pShader->profile;
-				CStringA srcdata = pShader->srcdata;
+				CStringW label = pShader->label;
+				CStringA profile(pShader->profile);
+				CStringA srcdata(pShader->srcdata);
 
 				HRESULT hr = m_pCAP->AddPixelShader(target, label, profile, srcdata);
 				if (FAILED(hr)) {
@@ -12533,7 +12538,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	if (!pOFD->fns.empty()) {
-		const CString fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fns.front();
+		const CString fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fns.front().GetName();
 
 		if (!StartsWith(fn, L"pipe:")) {
 			const bool diskImage = m_DiskImage.GetDriveLetter() && m_SessionInfo.Path.GetLength();
@@ -12670,7 +12675,7 @@ void CMainFrame::SetupChapters()
 
 			CHAR iso6391[3];
 			::GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, iso6391, 3);
-			CStringA iso6392 = ISO6391To6392(iso6391);
+			CStringA iso6392(ISO6391To6392(iso6391));
 			if (iso6392.GetLength() < 3) {
 				iso6392 = "eng";
 			}

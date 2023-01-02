@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -421,7 +421,7 @@ void CSubtitleDlDlg::OnOK()
 
 	for (const auto& sub : m_selsubs) {
 		CInternetSession is;
-		CStringA url = "http://" + s.strISDb + "/dl.php?";
+		CStringA url = "http://" + CStringA(s.strISDb) + "/dl.php?";
 		CStringA ticket = UrlEncode(m_pTA->ticket);
 		CStringA args, str;
 		args.Format("id=%d&ticket=%s", sub.id, ticket);
