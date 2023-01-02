@@ -793,7 +793,7 @@ namespace Youtube
 							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
 							if (!d.Parse(it->second.GetString()).HasParseError()) {
 								const auto maxNum = signature.GetLength() - 1;
-								for (auto& it = d.MemberBegin(); it != d.MemberEnd(); ++it) {
+								for (auto it = d.MemberBegin(); it != d.MemberEnd(); ++it) {
 									int funcType;
 									if (StrToInt32(it->name.GetString(), funcType) && (funcType > youtubeFuncType::funcNONE && funcType < youtubeFuncType::funcLAST)) {
 										const auto value = it->value.GetInt();
@@ -919,7 +919,7 @@ namespace Youtube
 
 								if (!JSFuncs.empty()) {
 									CString buffer = L"{ ";
-									for (auto& it = JSFuncs.cbegin(); it < JSFuncs.cend(); ++it) {
+									for (auto it = JSFuncs.cbegin(); it < JSFuncs.cend(); ++it) {
 										buffer.AppendFormat(L"\"%d\" : %d", it->first, it->second);
 
 										if (it != std::prev(JSFuncs.cend())) {
