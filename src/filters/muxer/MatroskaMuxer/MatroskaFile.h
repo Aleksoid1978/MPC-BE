@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
-
 namespace MatroskaWriter
 {
 	class CID

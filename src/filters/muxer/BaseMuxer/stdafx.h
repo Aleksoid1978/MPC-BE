@@ -26,7 +26,6 @@
 
 #include <afx.h>
 #include <afxwin.h>			// MFC core and standard components
-#include <atlcoll.h>
 
 #include <algorithm>
 #include <vector>

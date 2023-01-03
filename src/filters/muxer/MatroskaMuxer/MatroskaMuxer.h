@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include "MatroskaFile.h"
 
 #define MAXCLUSTERTIME 1000
