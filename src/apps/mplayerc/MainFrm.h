@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
-
 #include "Misc.h"
 #include "PlayerChildView.h"
 #include "PlayerPreView.h"

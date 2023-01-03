@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlbase.h>
 #include <ExtLib/BaseClasses/streams.h>
 #include <dvdmedia.h>
 #include <ks.h>

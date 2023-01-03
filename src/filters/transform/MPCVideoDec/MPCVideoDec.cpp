@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <atlbase.h>
 #include <MMReg.h>
 #include "MPCVideoDec.h"
 #include "DXVADecoder/DXVAAllocator.h"

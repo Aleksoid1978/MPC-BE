@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
 #include <IBitRateInfo.h>

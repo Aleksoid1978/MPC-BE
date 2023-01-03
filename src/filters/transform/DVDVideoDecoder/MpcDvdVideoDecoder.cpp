@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlbase.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include "libmpeg2.h"

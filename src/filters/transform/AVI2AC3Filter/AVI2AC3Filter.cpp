@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlbase.h>
 #include <MMReg.h>
 #include "AVI2AC3Filter.h"
 #include "DSUtil/DSUtil.h"

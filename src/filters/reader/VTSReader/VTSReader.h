@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include <ExtLib/AsyncReader/asyncio.h>
 #include <ExtLib/AsyncReader/asyncrdr.h>
 

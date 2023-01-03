@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include <d3d9.h>
 #include <evr9.h>
 #include <mvrInterfaces.h>

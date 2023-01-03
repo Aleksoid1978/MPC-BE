@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include "../BaseSplitter/BaseSplitter.h"
 
 #define RMSplitterName     L"MPC RealMedia Splitter"

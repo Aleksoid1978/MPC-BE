@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include <qnetwork.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>

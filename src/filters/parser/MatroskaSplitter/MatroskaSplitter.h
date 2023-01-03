@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include "MatroskaFile.h"
 #include "MatroskaSplitterSettingsWnd.h"
 #include "../BaseSplitter/BaseSplitter.h"

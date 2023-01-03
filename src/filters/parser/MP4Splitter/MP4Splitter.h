@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include "MP4SplitterFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
 #include "filters/filters/FilterInterfacesImpl.h"
