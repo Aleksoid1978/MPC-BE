@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include "../BaseSplitter/BaseSplitterFileEx.h"
 #include "DSUtil/ID3Tag.h"
 #include "DSUtil/ApeTag.h"
@@ -49,7 +48,7 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 	__int64 m_endpos   = 0;
 
 	__int64 m_procsize;
-	CRBMap<__int64, int> m_pos2fsize;
+	std::map<__int64, int> m_pos2fsize;
 	double m_coefficient;
 
 	HRESULT Init();

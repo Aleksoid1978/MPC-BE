@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -458,11 +458,11 @@ void CMpaSplitterFile::AdjustDuration(int framesize)
 	}
 
 	if (!m_bIsVBR) {
-		int rValue;
-		if (!m_pos2fsize.Lookup(GetPos(), rValue)) {
+		auto it = m_pos2fsize.find(GetPos());
+		if (it == m_pos2fsize.end()) {
 			m_procsize += framesize;
-			m_pos2fsize.SetAt(GetPos(), framesize);
-			m_rtDuration = m_coefficient * m_pos2fsize.GetCount() / m_procsize;
+			m_pos2fsize.emplace(GetPos(), framesize);
+			m_rtDuration = m_coefficient * m_pos2fsize.size() / m_procsize;
 		}
 	}
 }
