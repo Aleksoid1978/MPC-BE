@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2022 see Authors.txt
+ * (C) 2019-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -446,6 +446,16 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
 	}
 
 	return false;
+}
+
+STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetStereo3DSettings(Stereo3DSettings* pStereo3DSets)
+{
+	if (pStereo3DSets) {
+		m_Stereo3DSets = *pStereo3DSets;
+		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
+			pIExFilterConfig->SetInt("stereo3dTransform", m_Stereo3DSets.iTransform);
+		}
+	}
 }
 
 STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetExtraSettings(ExtraRendererSettings* pExtraSets)
