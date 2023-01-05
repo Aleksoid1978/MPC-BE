@@ -69,6 +69,8 @@ static const std::map<DWORD, LPCSTR> vfourcs = {
 	{FCC('HM91'), "HEVC(HM9.1)"},
 	{FCC('HM10'), "HEVC(HM10)"},
 	{FCC('HM12'), "HEVC(HM12)"},
+	{FCC('BIKB'), "Bink"},
+	{FCC('BIKI'), "Bink"},
 };
 
 static const std::map<WORD, LPCSTR> aformattags = {
@@ -471,7 +473,7 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 
 		for (size_t i = 0; i < 4; i++) {
 			if (b[i] >= 'a' && b[i] <= 'z') {
-				b[i] = b[i] + 32;
+				b[i] = b[i] - 32;
 			}
 		}
 
