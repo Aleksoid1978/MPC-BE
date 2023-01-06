@@ -3091,11 +3091,11 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 		return fmt;
 	}
 
-	auto color_primaries = m_FilterInfo.color_primaries != -1 ? m_FilterInfo.color_primaries : ctx->color_primaries;
-	auto colorspace = m_FilterInfo.colorspace != -1 ? m_FilterInfo.colorspace : ctx->colorspace;
-	auto color_trc = m_FilterInfo.color_trc != -1 ? m_FilterInfo.color_trc : ctx->color_trc;
-	auto chroma_sample_location = m_FilterInfo.chroma_sample_location != -1 ? m_FilterInfo.chroma_sample_location : ctx->chroma_sample_location;
-	auto color_range = m_FilterInfo.color_range != -1 ? m_FilterInfo.color_range : ctx->color_range;
+	auto color_primaries = (m_FilterInfo.color_primaries != -1) ? m_FilterInfo.color_primaries : ctx->color_primaries;
+	auto colorspace = (m_FilterInfo.colorspace != -1) ? m_FilterInfo.colorspace : ctx->colorspace;
+	auto color_trc = (m_FilterInfo.color_trc != -1) ? m_FilterInfo.color_trc : ctx->color_trc;
+	auto chroma_sample_location = (m_FilterInfo.chroma_sample_location != -1) ? m_FilterInfo.chroma_sample_location : ctx->chroma_sample_location;
+	auto color_range = (m_FilterInfo.color_range != -1) ? m_FilterInfo.color_range : ctx->color_range;
 
 	// Color Primaries
 	switch(color_primaries) {
@@ -3293,13 +3293,13 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 	if (avpkt) {
 		if (m_bWaitingForKeyFrame) {
-			if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO
-					&& GOPFound(avpkt->data, avpkt->size)) {
-				m_bWaitingForKeyFrame = FALSE;
+			if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO) {
+				if (GOPFound(avpkt->data, avpkt->size)) {
+					m_bWaitingForKeyFrame = FALSE;
+				}
 			}
-
-			if (m_CodecId == AV_CODEC_ID_VP8 || m_CodecId == AV_CODEC_ID_VP9) {
-				const BOOL bKeyFrame = m_CodecId == AV_CODEC_ID_VP8 ? !(avpkt->data[0] & 1) : !(avpkt->data[0] & 4);
+			else if (m_CodecId == AV_CODEC_ID_VP8 || m_CodecId == AV_CODEC_ID_VP9) {
+				const BOOL bKeyFrame = (m_CodecId == AV_CODEC_ID_VP8) ? !(avpkt->data[0] & 1) : !(avpkt->data[0] & 4);
 				if (bKeyFrame) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal(): Found VP8/9 key-frame, resuming decoding");
 					m_bWaitingForKeyFrame = FALSE;
@@ -3348,9 +3348,13 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 	}
 
 	for (;;) {
-		AVFrame* hw_frame = m_HWPixFmt != AV_PIX_FMT_NONE ? av_frame_alloc() : nullptr;
+		AVFrame* hw_frame = (m_HWPixFmt != AV_PIX_FMT_NONE) ? av_frame_alloc() : nullptr;
 
-		ret = m_HWPixFmt == AV_PIX_FMT_NONE ? avcodec_receive_frame(m_pAVCtx, m_pFrame) : avcodec_receive_frame(m_pAVCtx, hw_frame);
+		if (m_HWPixFmt == AV_PIX_FMT_NONE) {
+			ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
+		} else {
+			ret = avcodec_receive_frame(m_pAVCtx, hw_frame);
+		}
 		if (ret < 0 && ret != AVERROR(EAGAIN)) {
 			av_frame_unref(m_pFrame);
 			av_frame_free(&hw_frame);
@@ -3368,7 +3372,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			}
 		}
 
-		auto frame = m_HWPixFmt == AV_PIX_FMT_NONE ? m_pFrame : hw_frame;
+		auto frame = (m_HWPixFmt == AV_PIX_FMT_NONE) ? m_pFrame : hw_frame;
 
 		if (ret < 0 || !frame->data[0]) {
 			av_frame_unref(m_pFrame);
@@ -3928,7 +3932,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 			if (mode.nCodecId == m_CodecId
 					&& mode.decoderGUID == decoderGUID) {
 				if (mode.pixFormat != AV_PIX_FMT_NONE && m_bUseD3D11 && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
-					const enum AVPixelFormat pix_fmt = m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
+					const enum AVPixelFormat pix_fmt = (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
 					if (mode.pixFormat == pix_fmt) {
 						return TRUE;
 					}
@@ -4586,7 +4590,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
-				const auto& pix_fmt = m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
+				const auto& pix_fmt = (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
 
 				infostr = m_pAVCtx->codec_descriptor->name;
 				if (m_pAVCtx->codec_id == AV_CODEC_ID_RAWVIDEO) {
