@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #pragma once
 
 #include <afxadv.h>
-#include <atlstr.h>
 
 // TODO: make function
 #define CorrectAceStream(path) if (StartsWith(path, L"acestream://")) { path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12)); }
