@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -156,6 +156,18 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 	// fill "Pixel format" properties
 	if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
 		switch (pAVCtx->codec_id) {
+		case AV_CODEC_ID_MPEG4:
+			switch (pAVCtx->bits_per_coded_sample) {
+			case 20:
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
+				break;
+			case 30:
+				pAVCtx->pix_fmt = AV_PIX_FMT_GBRP10LE;
+				break;
+			default:
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+			}
+			break;
 		case AV_CODEC_ID_LAGARITH:
 			if (pAVCtx->extradata_size >= 4) {
 				switch (GETU32(pAVCtx->extradata)) { // "lossy_option"
