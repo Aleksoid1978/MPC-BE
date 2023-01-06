@@ -94,16 +94,16 @@ STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
 
 	const wchar_t* readerName;
 	switch (m_stream.GetProtocol()) {
-		case CUDPStream::protocol::PR_UDP:
+		case CLiveStream::protocol::PR_UDP:
 			readerName = StreamReaderName L" [UDP]";
 			break;
-		case CUDPStream::protocol::PR_HTTP:
+		case CLiveStream::protocol::PR_HTTP:
 			readerName = StreamReaderName L" [HTTP]";
 			break;
-		case CUDPStream::protocol::PR_PIPE:
+		case CLiveStream::protocol::PR_PIPE:
 			readerName = StreamReaderName L" [stdin]";
 			break;
-		case CUDPStream::protocol::PR_HLS:
+		case CLiveStream::protocol::PR_HLS:
 			readerName = StreamReaderName L" [HLS-Live]";
 			break;
 		default:
@@ -122,7 +122,7 @@ STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
 
 STDMETHODIMP CUDPReader::Stop()
 {
-	m_stream.CallWorker(CUDPStream::CMD::CMD_STOP);
+	m_stream.CallWorker(CLiveStream::CMD::CMD_STOP);
 	return S_OK;
 }
 
@@ -133,7 +133,7 @@ STDMETHODIMP CUDPReader::Pause()
 
 STDMETHODIMP CUDPReader::Run(REFERENCE_TIME tStart)
 {
-	m_stream.CallWorker(CUDPStream::CMD::CMD_RUN);
+	m_stream.CallWorker(CLiveStream::CMD::CMD_RUN);
 	return S_OK;
 }
 

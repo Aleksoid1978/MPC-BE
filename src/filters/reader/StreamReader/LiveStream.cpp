@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2022 see Authors.txt
+ * (C) 2017-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,14 +36,14 @@
 #define MAXSTORESIZE  2 * MEGABYTE // The maximum size of a buffer for storing the received information is 2 Mb
 #define MAXBUFSIZE   16 * KILOBYTE // The maximum packet size is 16 Kb
 
-// CUDPStream
+// CLiveStream
 
-CUDPStream::~CUDPStream()
+CLiveStream::~CLiveStream()
 {
 	Clear();
 }
 
-void CUDPStream::Clear()
+void CLiveStream::Clear()
 {
 	if (CAMThread::ThreadExists()) {
 		CAMThread::CallWorker(CMD::CMD_EXIT);
@@ -80,7 +80,7 @@ void CUDPStream::Clear()
 	m_SizeComplete = 0;
 }
 
-void CUDPStream::Append(const BYTE* buff, UINT len)
+void CLiveStream::Append(const BYTE* buff, UINT len)
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
@@ -92,7 +92,7 @@ void CUDPStream::Append(const BYTE* buff, UINT len)
 	}
 }
 
-HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
 	if (m_protocol == protocol::PR_HTTP) {
 		if (m_icydata.metaint == 0) {
@@ -121,7 +121,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 
 					CString str = UTF8orLocalToWStr((LPCSTR)buff);
 
-					DLog(L"CUDPStream::HTTPRead(): Metainfo: %s", str);
+					DLog(L"CLiveStream::HTTPRead(): Metainfo: %s", str);
 
 					int i = str.Find(L"StreamTitle='");
 					if (i >= 0) {
@@ -153,7 +153,7 @@ HRESULT CUDPStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRe
 							}
 						}
 					} else {
-						DLog(L"CUDPStream::HTTPRead(): StreamTitle is missing");
+						DLog(L"CLiveStream::HTTPRead(): StreamTitle is missing");
 					}
 
 					i = str.Find(L"StreamUrl='");
@@ -212,7 +212,7 @@ static void GetType(const BYTE* buf, int size, GUID& subtype)
 	}
 }
 
-bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
+bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 {
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI, 10 * MEGABYTE);
 	if (!f.Open(url)) {
@@ -286,7 +286,7 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 			continue;
 		} else if (str == L"#EXT-X-ENDLIST") {
 			if (!m_hlsData.bInit) {
-				DLog(L"CUDPStream::ParseM3U8() : support only LIVE stream.");
+				DLog(L"CLiveStream::ParseM3U8() : support only LIVE stream.");
 				return false;
 			}
 			m_hlsData.bEndList = true;
@@ -339,13 +339,13 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 								std::vector<BYTE> pIV;
 								iv.Delete(0, 2);
 								if (iv.GetLength() != (CAESDecryptor::AESBLOCKSIZE * 2)) {
-									DLog(L"CUDPStream::ParseM3U8() : wrong AES IV.");
+									DLog(L"CLiveStream::ParseM3U8() : wrong AES IV.");
 									return false;
 								}
 								CStringToBin(iv, pIV);
 
 								if (!m_hlsData.pAESDecryptor->SetKey(key, std::size(key), pIV.data(), pIV.size())) {
-									DLog(L"CUDPStream::ParseM3U8() : can't initialize decrypting engine.");
+									DLog(L"CLiveStream::ParseM3U8() : can't initialize decrypting engine.");
 									return false;
 								}
 
@@ -356,7 +356,7 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 					}
 				}
 
-				DLog(L"CUDPStream::ParseM3U8() : not supported encrypted playlist.");
+				DLog(L"CLiveStream::ParseM3U8() : not supported encrypted playlist.");
 				return false;
 			}
 			continue;
@@ -434,7 +434,7 @@ bool CUDPStream::ParseM3U8(const CString& url, CString& realUrl)
 	return false;
 }
 
-bool CUDPStream::OpenHLSSegment()
+bool CLiveStream::OpenHLSSegment()
 {
 	if (!m_hlsData.Segments.empty()) {
 		auto hr = m_HTTPAsync.Connect(m_hlsData.Segments.front());
@@ -450,7 +450,7 @@ bool CUDPStream::OpenHLSSegment()
 	return false;
 }
 
-bool CUDPStream::Load(const WCHAR* fnw)
+bool CLiveStream::Load(const WCHAR* fnw)
 {
 	Clear();
 
@@ -552,14 +552,14 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			return false;
 		}
 
-		DLog(L"CUDPStream::Load() - HTTP content type: %s", m_HTTPAsync.GetContentType());
+		DLog(L"CLiveStream::Load() - HTTP content type: %s", m_HTTPAsync.GetContentType());
 
 		BOOL bConnected = FALSE;
 
 		if (!m_HTTPAsync.GetLenght()) { // only streams without content length
 			BOOL bIcyFound = FALSE;
 			const CString& hdr = m_HTTPAsync.GetHeader();
-			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", hdr);
+			DLog(L"CLiveStream::Load() - HTTP hdr:\n%s", hdr);
 
 			std::list<CString> sl;
 			Explode(hdr, sl, '\n');
@@ -620,7 +620,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		}
 
 		if (!bConnected && (m_HTTPAsync.GetLenght() || m_HTTPAsync.GetContentType().Find(L"mpegurl") > 0)) {
-			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", m_HTTPAsync.GetHeader());
+			DLog(L"CLiveStream::Load() - HTTP hdr:\n%s", m_HTTPAsync.GetHeader());
 
 			bool ret = {};
 			if (m_HTTPAsync.IsCompressed()) {
@@ -692,7 +692,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 // CAsyncStream
 
-HRESULT CUDPStream::SetPointer(LONGLONG llPos)
+HRESULT CLiveStream::SetPointer(LONGLONG llPos)
 {
 	CAutoLock cAutoLock(&m_csLock);
 
@@ -704,14 +704,14 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	const __int64 start = m_packets.empty() ? 0 : m_packets.front().m_start;
 	if (llPos < start) {
-		DLog(L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.back().m_end);
+		DLog(L"CLiveStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.back().m_end);
 		return S_FALSE;
 	}
 
 	return S_OK;
 }
 
-HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead)
+HRESULT CLiveStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead)
 {
 	DWORD len = dwBytesToRead;
 	BYTE* ptr = pbBuffer;
@@ -721,7 +721,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 		m_SizeComplete = m_pos + len;
 
 #if DEBUG
-		DLog(L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.back().m_end, m_packets.back().m_end, m_SizeComplete);
+		DLog(L"CLiveStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.back().m_end, m_packets.back().m_end, m_SizeComplete);
 		const ULONGLONG start = GetPerfCounter();
 #endif
 
@@ -749,7 +749,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	while (it != m_packets.cend() && len > 0) {
 		const auto& p = *it++;
 
-		DLogIf(m_pos < p.m_start, L"CUDPStream::Read(): requested data is no longer available, %llu - %llu", m_pos, p.m_start);
+		DLogIf(m_pos < p.m_start, L"CLiveStream::Read(): requested data is no longer available, %llu - %llu", m_pos, p.m_start);
 		if (p.m_start <= m_pos && m_pos < p.m_end) {
 			const DWORD size = std::min<DWORD>((ULONGLONG)len, p.m_end - m_pos);
 			memcpy(ptr, &p.m_buff.get()[m_pos - p.m_start], size);
@@ -770,7 +770,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	return len == dwBytesToRead ? E_FAIL : (len > 0 ? S_FALSE : S_OK);
 }
 
-LONGLONG CUDPStream::Size(LONGLONG* pSizeAvailable)
+LONGLONG CLiveStream::Size(LONGLONG* pSizeAvailable)
 {
 	CAutoLock cAutoLock(&m_csLock);
 
@@ -781,29 +781,29 @@ LONGLONG CUDPStream::Size(LONGLONG* pSizeAvailable)
 	return 0;
 }
 
-DWORD CUDPStream::Alignment()
+DWORD CLiveStream::Alignment()
 {
 	return 1;
 }
 
-void CUDPStream::Lock()
+void CLiveStream::Lock()
 {
 	m_csLock.Lock();
 }
 
-void CUDPStream::Unlock()
+void CLiveStream::Unlock()
 {
 	m_csLock.Unlock();
 }
 
-inline const ULONGLONG CUDPStream::GetPacketsSize()
+inline const ULONGLONG CLiveStream::GetPacketsSize()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
 	return m_packets.empty() ? 0 : m_packets.back().m_end - m_packets.front().m_start;
 }
 
-void CUDPStream::CheckBuffer()
+void CLiveStream::CheckBuffer()
 {
 	if (m_RequestCmd == CMD::CMD_RUN) {
 		CAutoLock cPacketLock(&m_csPacketsLock);
@@ -816,7 +816,7 @@ void CUDPStream::CheckBuffer()
 	}
 }
 
-void CUDPStream::EmptyBuffer()
+void CLiveStream::EmptyBuffer()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
@@ -826,7 +826,7 @@ void CUDPStream::EmptyBuffer()
 
 #define ENABLE_DUMP 0
 
-DWORD CUDPStream::ThreadProc()
+DWORD CLiveStream::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
@@ -1023,7 +1023,7 @@ DWORD CUDPStream::ThreadProc()
 	return DWORD_MAX;
 }
 
-CUDPStream::CPacket::CPacket(const BYTE* p, ULONGLONG start, UINT size)
+CLiveStream::CPacket::CPacket(const BYTE* p, ULONGLONG start, UINT size)
 	: m_start(start)
 	, m_end(start + size)
 {

@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 
 #include <chrono>
 
-class CUDPStream
+class CLiveStream
 	: public CAsyncStream
 	, public CAMThread
 {
@@ -119,8 +119,8 @@ private:
 	bool OpenHLSSegment();
 
 public:
-	CUDPStream() = default;
-	virtual ~CUDPStream();
+	CLiveStream() = default;
+	virtual ~CLiveStream();
 
 	enum CMD {
 		CMD_INIT,

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ class __declspec(uuid("0E49B128-9547-4423-88F9-897837E298F5"))
 	, public IFileSourceFilter
 	, public IAMMediaContent
 {
-	CUDPStream m_stream;
+	CLiveStream m_stream;
 	CString    m_fn;
 
 public:
