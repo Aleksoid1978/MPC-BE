@@ -61,19 +61,13 @@ BOOL CAboutDlg::OnInitDialog()
 	m_strGitInfo.AppendFormat(L"git %S - %S", REV_DATE, REV_HASH);
 #endif
 
-#if defined(__INTEL_COMPILER)
-	#if (__INTEL_COMPILER >= 1210)
-		m_MPCCompiler = L"ICL " MAKE_STR(__INTEL_COMPILER) L" Build ") MAKE_STR(__INTEL_COMPILER_BUILD_DATE);
-	#else
-		#error Compiler is not supported!
-	#endif
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 	m_MPCCompiler.Format(L"MSVC %.2d.%.2d.%.5d", _MSC_VER / 100, _MSC_VER % 100, _MSC_FULL_VER % 100000);
 	#if _MSC_BUILD
 		m_MPCCompiler.AppendFormat(L".%.2d", _MSC_BUILD);
 	#endif
 #else
-	#error Please add support for your compiler
+	m_MPCCompiler = L"unknown compiler";
 #endif
 
 // https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
