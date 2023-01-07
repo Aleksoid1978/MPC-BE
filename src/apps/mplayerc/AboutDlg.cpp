@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2022 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -76,16 +76,15 @@ BOOL CAboutDlg::OnInitDialog()
 	#error Please add support for your compiler
 #endif
 
-#if (__AVX__)
+// https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
+#if (__AVX2__)
+	m_MPCCompiler += L" (AVX2)";
+#elif (__AVX__)
 	m_MPCCompiler += L" (AVX)";
-#elif (__SSSE3__)
-	m_MPCCompiler += L" (SSSE3)";
-#elif (__SSE3__)
-	m_MPCCompiler += L" (SSE3)";
-#elif !defined(_M_X64) && defined(_M_IX86_FP)
-	#if (_M_IX86_FP == 2)   // /arch:SSE2 was used
+#elif !defined(_M_X64)
+	#if (_M_IX86_FP == 2)
 		m_MPCCompiler += L" (SSE2)";
-	#elif (_M_IX86_FP == 1) // /arch:SSE was used
+	#elif (_M_IX86_FP == 1)
 		m_MPCCompiler += L" (SSE)";
 	#endif
 #endif
