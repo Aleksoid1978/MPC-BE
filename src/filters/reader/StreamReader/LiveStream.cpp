@@ -675,6 +675,14 @@ bool CLiveStream::Load(const WCHAR* fnw)
 		return false; // not supported protocol
 	}
 
+	if (m_protocol == protocol::PR_HTTP && !m_len) {
+		BYTE buf[1024] = {};
+		DWORD dwSizeRead = 0;
+		if (HTTPRead(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
+			Append(buf, dwSizeRead);
+		}
+	}
+
 	CAMThread::Create();
 	if (FAILED(CAMThread::CallWorker(CMD::CMD_INIT))) {
 		Clear();
