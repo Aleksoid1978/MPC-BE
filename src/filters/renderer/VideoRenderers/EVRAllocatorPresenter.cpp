@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1525,7 +1525,6 @@ STDMETHODIMP CEVRAllocatorPresenter::Stop()
 
 STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 {
-	HRESULT hr;
 	CAutoLock lock(this);
 	CAutoLock lock2(&m_ImageProcessingLock);
 	CAutoLock cRenderLock(&m_RenderLock);
@@ -1533,7 +1532,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 	// Retrieve the surface size and format
 	UINT32 width;
 	UINT32 height;
-	hr = MFGetAttributeSize(pMediaType, MF_MT_FRAME_SIZE, &width, &height);
+	HRESULT hr = MFGetAttributeSize(pMediaType, MF_MT_FRAME_SIZE, &width, &height);
 
 	if (SUCCEEDED(hr)) {
 		CSize frameSize(width, height);
@@ -1571,7 +1570,9 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 		}
 	}
 
-	{
+	if (!m_bPreviewMode && !m_bStereoPropertyGet) {
+		m_bStereoPropertyGet = true;
+
 		m_bMVC_Base_View_R_flag = false;
 		m_stereo_subtitle_offset_ids.clear();
 
