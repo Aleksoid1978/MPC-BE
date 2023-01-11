@@ -1028,6 +1028,35 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->ByteRead(headerData, headerSize);
 
+						vc_params_t params;
+						if (HEVCParser::ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params, true)) {
+							BITMAPINFOHEADER pbmi = { sizeof(pbmi) };
+							pbmi.biWidth = params.width;
+							pbmi.biHeight = params.height;
+							pbmi.biCompression = FCC('HVC1');
+							pbmi.biPlanes = 1;
+							pbmi.biBitCount = 24;
+							pbmi.biSizeImage = DIBSIZE(pbmi);
+
+							if (!bAvgTimePerFrameSet) {
+								if (params.vps_timing.num_units_in_tick && params.vps_timing.time_scale) {
+									AvgTimePerFrame = llMulDiv(UNITS, params.vps_timing.num_units_in_tick, params.vps_timing.time_scale, 0);
+								} else if (params.vui_timing.num_units_in_tick && params.vui_timing.time_scale) {
+									AvgTimePerFrame = llMulDiv(UNITS, params.vui_timing.num_units_in_tick, params.vui_timing.time_scale, 0);
+								}
+							}
+
+							CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
+							ReduceDim(aspect);
+
+							mt.InitMediaType();
+							CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize,
+												params.profile, params.level, params.nal_length_size);
+
+							fTypeFlagsVideo = true;
+							break;
+						}
+
 						DWORD fourcc = MAKEFOURCC('H','E','V','C');
 						switch (vt.CodecID) {
 							case FLV_VIDEO_HM91:
@@ -1051,7 +1080,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								break;
 						}
 
-						vc_params_t params;
 						if (!HEVCParser::ParseAVCDecoderConfigurationRecord(headerData, headerSize, params, metaHM_compatibility)) {
 							fTypeFlagsVideo = true;
 							break;
