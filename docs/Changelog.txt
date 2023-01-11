@@ -34,7 +34,8 @@ Updated Korean translation (by Potmarigold and Hackjjang).
 Updated Italian translation (by mapi68).
 
 Updated libraries:
-	MediaInfo git-v22.12-g69756e4c1.
+	MediaInfo git-v22.12-g69756e4c1;
+	nanosvg git-9da543e.
 
 1.6.5.3
 =============================
