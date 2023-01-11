@@ -3871,7 +3871,15 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (m_bBeginCapture && m_beginCapturePoint != point) {
+	auto DragDetect = [](const CPoint& a, const CPoint& b) {
+		auto DiffDelta = [](long a, long b, long delta) {
+			return abs(a - b) > delta;
+		};
+
+		return DiffDelta(a.x, b.x, ::GetSystemMetrics(SM_CXDRAG)) || DiffDelta(a.y, b.y, ::GetSystemMetrics(SM_CYDRAG));
+	};
+
+	if (m_bBeginCapture && DragDetect(m_beginCapturePoint, point)) {
 		m_bBeginCapture = false;
 		m_bLeftMouseDown = FALSE;
 		ReleaseCapture();
