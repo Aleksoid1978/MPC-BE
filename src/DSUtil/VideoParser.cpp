@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1097,7 +1097,7 @@ namespace HEVCParser {
 
 		// HEVCDecoderConfigurationRecord
 		uint8_t configurationVersion = gb.BitRead(8); // configurationVersion = 1 (or 0 for beta MKV DivX HEVC)
-		DLog(L"%s", configurationVersion == 0 ? L"WARNING: beta MKV DivX HEVC" : L"");
+		DLogIf(configurationVersion == 0, L"WARNING: beta MKV DivX HEVC");
 		if (configurationVersion > 1) {
 			return false;
 		}
@@ -1144,16 +1144,32 @@ namespace HEVCParser {
 				int numNalus = gb.BitRead(16);
 				if (NAL_unit_type == NALU_TYPE_HEVC_SPS && numNalus > 0) {
 					sps_len = gb.BitRead(16);
+					if (sps_len < 2) {
+						return false;
+					}
 					break;
 				}
 				for (int i = 0; i < numNalus; i++) {
 					int nalUnitLength = gb.BitRead(16);
+					if (nalUnitLength < 2) {
+						return false;
+					}
 					gb.SkipBytes(nalUnitLength);
 				}
 			}
 
 			if (sps_len) {
-				return ParseSequenceParameterSet(gb.GetBufferPos(), sps_len, params);
+				uint8_t marker_bit = gb.BitRead(1);            // market_bit
+				if (marker_bit) {
+					return false;
+				}
+				gb.BitRead(6);                                 // nal_unit_type
+				gb.BitRead(6);                                 // nuh_layer_id
+				uint8_t nuh_temporal_id_plus1 = gb.BitRead(3); // nuh_temporal_id_plus1
+				if (nuh_temporal_id_plus1 == 0) {
+					return false;
+				}
+				return ParseSequenceParameterSet(gb.GetBufferPos(), sps_len - 2, params);
 			}
 
 			return false;
