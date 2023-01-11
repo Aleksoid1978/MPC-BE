@@ -4,12 +4,16 @@
 =============================
 MPCStreamReader
 Added support for URL redirection for HLS.
+Improved work with some broadcasts.
 
 AudioSplitter
 Fixed playback of initial samples of FLAC files.
 
 MpaDecFilter
 Fixed decoding of some TrueHD streams.
+
+FLVSplitter
+Improved HEVC video support.
 
 MPCVideoDec
 Fixed decoding of some MPEG-4 ASP.
@@ -29,6 +33,7 @@ Player
 Added option to select preview renderer.
 Fixed placement of a vertically stretched frame in the preview window.
 Additional tracks will no longer appear in the list of recent Windows files.
+Reduced the chance of false positives when moving a window by the video area.
 
 Updated Korean translation (by Potmarigold and Hackjjang).
 Updated Italian translation (by mapi68).
