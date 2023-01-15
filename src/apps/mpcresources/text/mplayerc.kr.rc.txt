@@ -325,9 +325,9 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"단독 버전 혹은 대체 필터 사용 시, 여기서 해당 항목 체크를 해제하십시오."
-10		"AVI 스플리터\n설정"
-11		"MPEG 스플리터\n설정"
-12		"Matroska 스플리터\n설정"
+10		"AVI 분배기\n설정"
+11		"MPEG 분배기\n설정"
+12		"Matroska 분배기\n설정"
 13		"CDDA 리더\n설정"
 14		"VTS(IFO) 리더\n설정"
 15		"비디오 디코더\n설정"
