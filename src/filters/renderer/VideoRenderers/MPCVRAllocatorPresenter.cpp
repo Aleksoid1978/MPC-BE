@@ -464,3 +464,15 @@ STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetExtraSettings(ExtraRendererSett
 		m_bMPCVRFullscreenControl = pExtraSets->bMPCVRFullscreenControl;
 	}
 }
+
+HRESULT CMPCVRAllocatorPresenter::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels)
+{
+	if (m_pSubPicQueue) {
+		CComPtr<ISubPic> pSubPic;
+		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
+			return AlphaBlt(windowRect, videoRect, pSubPic, nullptr, xOffsetInPixels, TRUE);
+		}
+	}
+
+	return E_FAIL;
+}
