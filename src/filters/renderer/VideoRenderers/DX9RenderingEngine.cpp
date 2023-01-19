@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -527,8 +527,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 
 		if (m_pConvertToInterlacePixelShader) {
 			float fConstData[][4] = {
-				{ (float)m_ScreenSpaceTexWidth, (float)m_ScreenSpaceTexHeight, 0, 0 },
-				{ (float)destRect.left / m_ScreenSpaceTexWidth, (float)destRect.top / m_ScreenSpaceTexHeight, (float)destRect.right / m_ScreenSpaceTexWidth, (float)destRect.bottom / m_ScreenSpaceTexHeight },
+				{ (float)m_ScreenSpaceTexHeight, 0, (float)destRect.top / m_ScreenSpaceTexHeight, (float)destRect.bottom / m_ScreenSpaceTexHeight },
 			};
 			hr = m_pDevice9Ex->SetPixelShaderConstantF(0, (float*)fConstData, std::size(fConstData));
 			hr = m_pDevice9Ex->SetPixelShader(m_pConvertToInterlacePixelShader);

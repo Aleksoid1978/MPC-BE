@@ -3,17 +3,11 @@
 #define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))
 
 sampler s0 : register(s0);
-float2 p0 : register(c0);
-float4 p1 : register(c1);
+float4 p0 : register(c0);
 
-#define width  (p0[0])
-#define height (p0[1])
-
-// frame rect
-#define dleft   (p1[0])
-#define dtop    (p1[1])
-#define dright  (p1[2])
-#define dbottom (p1[3])
+#define height  (p0[0])
+#define dtop    (p0[2])
+#define dbottom (p0[3])
 
 float4 main(float2 tex : TEXCOORD0) : COLOR
 {
