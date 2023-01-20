@@ -51,7 +51,6 @@
 #include "mpegvideo.h"
 #include "mpegvideodec.h"
 #include "msmpeg4dec.h"
-#include "qpeldsp.h"
 #include "thread.h"
 #include "wmv2dec.h"
 
@@ -62,9 +61,6 @@ static enum AVPixelFormat h263_get_format(AVCodecContext *avctx)
         av_assert1(((MpegEncContext *)avctx->priv_data)->studio_profile);
         return avctx->pix_fmt;
     }
-
-    if (avctx->codec->id == AV_CODEC_ID_MSS2)
-        return AV_PIX_FMT_YUV420P;
 
     if (CONFIG_GRAY && (avctx->flags & AV_CODEC_FLAG_GRAY)) {
         if (avctx->color_range == AVCOL_RANGE_UNSPECIFIED)
@@ -117,15 +113,6 @@ av_cold int ff_h263_decode_init(AVCodecContext *avctx)
         s->h263_pred       = 1;
         s->msmpeg4_version = 5;
         break;
-    case AV_CODEC_ID_VC1:
-    case AV_CODEC_ID_WMV3:
-    case AV_CODEC_ID_VC1IMAGE:
-    case AV_CODEC_ID_WMV3IMAGE:
-    case AV_CODEC_ID_MSS2:
-        s->h263_pred       = 1;
-        s->msmpeg4_version = 6;
-        avctx->chroma_sample_location = AVCHROMA_LOC_LEFT;
-        break;
     case AV_CODEC_ID_H263I:
         break;
     case AV_CODEC_ID_FLV1:
@@ -152,7 +139,6 @@ av_cold int ff_h263_decode_init(AVCodecContext *avctx)
     }
 
     ff_h263dsp_init(&s->h263dsp);
-    ff_qpeldsp_init(&s->qdsp);
     ff_h263_decode_init_vlc();
 
     return 0;
@@ -445,6 +431,18 @@ int ff_h263_decode_frame(AVCodecContext *avctx, AVFrame *pict,
             s->next_picture_ptr = NULL;
 
             *got_frame = 1;
+        } else if (s->skipped_last_frame && s->current_picture_ptr) {
+            /* Output the last picture we decoded again if the stream ended with
+             * an NVOP */
+            if ((ret = av_frame_ref(pict, s->current_picture_ptr->f)) < 0)
+                return ret;
+            /* Copy props from the last input packet. Otherwise, props from the last
+             * returned picture would be reused */
+            if ((ret = ff_decode_frame_props(avctx, pict)) < 0)
+                return ret;
+            s->current_picture_ptr = NULL;
+
+            *got_frame = 1;
         }
 
         return 0;
@@ -506,13 +504,15 @@ retry:
     } else if (CONFIG_MSMPEG4DEC && s->msmpeg4_version) {
         ret = ff_msmpeg4_decode_picture_header(s);
     } else if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4) {
-        if (s->avctx->extradata_size && s->picture_number == 0) {
+        if (s->avctx->extradata_size && !s->extradata_parsed) {
             GetBitContext gb;
 
             if (init_get_bits8(&gb, s->avctx->extradata, s->avctx->extradata_size) >= 0 )
                 ff_mpeg4_decode_picture_header(avctx->priv_data, &gb, 1, 0);
+            s->extradata_parsed = 1;
         }
         ret = ff_mpeg4_decode_picture_header(avctx->priv_data, &s->gb, 0, 0);
+        s->skipped_last_frame = (ret == FRAME_SKIPPED);
     } else if (CONFIG_H263I_DECODER && s->codec_id == AV_CODEC_ID_H263I) {
         ret = ff_intel_h263_decode_picture_header(s);
     } else if (CONFIG_FLV_DECODER && s->h263_flv) {
@@ -596,14 +596,6 @@ retry:
          s->pict_type != AV_PICTURE_TYPE_I)    ||
         avctx->skip_frame >= AVDISCARD_ALL)
         return get_consumed_bytes(s, buf_size);
-
-    if ((!s->no_rounding) || s->pict_type == AV_PICTURE_TYPE_B) {
-        s->me.qpel_put = s->qdsp.put_qpel_pixels_tab;
-        s->me.qpel_avg = s->qdsp.avg_qpel_pixels_tab;
-    } else {
-        s->me.qpel_put = s->qdsp.put_no_rnd_qpel_pixels_tab;
-        s->me.qpel_avg = s->qdsp.avg_qpel_pixels_tab;
-    }
 
     if ((ret = ff_mpv_frame_start(s, avctx)) < 0)
         return ret;

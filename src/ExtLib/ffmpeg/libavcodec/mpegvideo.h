@@ -56,6 +56,15 @@
 #define MAX_B_FRAMES 16
 
 /**
+ * Scantable.
+ */
+typedef struct ScanTable {
+    const uint8_t *scantable;
+    uint8_t permutated[64];
+    uint8_t raster_end[64];
+} ScanTable;
+
+/**
  * MpegEncContext.
  */
 typedef struct MpegEncContext {
@@ -68,12 +77,13 @@ typedef struct MpegEncContext {
 
     /* scantables */
     ScanTable inter_scantable; ///< if inter == intra then intra should be used to reduce the cache usage
-    ScanTable intra_scantable;
-    ScanTable intra_h_scantable;
-    ScanTable intra_v_scantable;
 
     /* WARNING: changes above this line require updates to hardcoded
      *          offsets used in ASM. */
+
+    ScanTable intra_scantable;
+    uint8_t permutated_intra_h_scantable[64];
+    uint8_t permutated_intra_v_scantable[64];
 
     struct AVCodecContext *avctx;
     /* The following pointer is intended for codecs sharing code
@@ -107,6 +117,7 @@ typedef struct MpegEncContext {
     int input_picture_number;  ///< used to set pic->display_picture_number, should not be used for/by anything else
     int coded_picture_number;  ///< used to set pic->coded_picture_number, should not be used for/by anything else
     int picture_number;       //FIXME remove, unclear definition
+    int extradata_parsed;
     int picture_in_gop_number; ///< 0-> first pic in gop, ...
     int mb_width, mb_height;   ///< number of MBs horizontally & vertically
     int mb_stride;             ///< mb_width+1 used for some arrays to allow simple addressing of left & top MBs without sig11
@@ -164,6 +175,7 @@ typedef struct MpegEncContext {
     Picture *last_picture_ptr;     ///< pointer to the previous picture.
     Picture *next_picture_ptr;     ///< pointer to the next picture (for bidir pred)
     Picture *current_picture_ptr;  ///< pointer to the current picture
+    int skipped_last_frame;
     int last_dc[3];                ///< last DC values for MPEG-1
     int16_t *dc_val_base;
     int16_t *dc_val[3];            ///< used for MPEG-4 DC prediction, all 3 arrays must be continuous
@@ -576,6 +588,8 @@ int ff_update_duplicate_context(MpegEncContext *dst, const MpegEncContext *src);
 void ff_set_qscale(MpegEncContext * s, int qscale);
 
 void ff_mpv_idct_init(MpegEncContext *s);
+void ff_init_scantable(const uint8_t *permutation, ScanTable *st,
+                       const uint8_t *src_scantable);
 void ff_init_block_index(MpegEncContext *s);
 
 void ff_mpv_motion(MpegEncContext *s,

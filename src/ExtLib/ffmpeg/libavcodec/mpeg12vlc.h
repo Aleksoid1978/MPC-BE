@@ -28,7 +28,6 @@
 #ifndef AVCODEC_MPEG12VLC_H
 #define AVCODEC_MPEG12VLC_H
 
-#include "rl.h"
 #include "vlc.h"
 
 #define DC_VLC_BITS 9
@@ -50,18 +49,22 @@ extern VLC ff_mv_vlc;
 
 void ff_mpeg12_init_vlcs(void);
 
-#define INIT_2D_VLC_RL(rl, static_size, flags)\
-{\
-    static RL_VLC_ELEM rl_vlc_table[static_size];\
-    rl.rl_vlc[0] = rl_vlc_table;\
-    ff_init_2d_vlc_rl(&rl, static_size, flags);\
-}
+#define MPEG12_RL_NB_ELEMS 111
 
-extern RLTable ff_rl_mpeg1;
-extern RLTable ff_rl_mpeg2;
+extern const int8_t ff_mpeg12_level[MPEG12_RL_NB_ELEMS];
+extern const int8_t ff_mpeg12_run[MPEG12_RL_NB_ELEMS];
 
-void ff_init_2d_vlc_rl(RLTable *rl, unsigned static_size, int flags);
+extern const uint16_t ff_mpeg1_vlc_table[MPEG12_RL_NB_ELEMS + 2][2];
+extern const uint16_t ff_mpeg2_vlc_table[MPEG12_RL_NB_ELEMS + 2][2];
 
-void ff_mpeg1_init_uni_ac_vlc(const RLTable *rl, uint8_t *uni_ac_vlc_len);
+extern RL_VLC_ELEM ff_mpeg1_rl_vlc[];
+extern RL_VLC_ELEM ff_mpeg2_rl_vlc[];
+
+void ff_init_2d_vlc_rl(const uint16_t table_vlc[][2], RL_VLC_ELEM rl_vlc[],
+                       const int8_t table_run[], const uint8_t table_level[],
+                       int n, unsigned static_size, int flags);
+
+void ff_mpeg1_init_uni_ac_vlc(const int8_t max_level[], const uint8_t index_run[],
+                              const uint16_t table_vlc[][2], uint8_t uni_ac_vlc_len[]);
 
 #endif /* AVCODEC_MPEG12VLC_H */

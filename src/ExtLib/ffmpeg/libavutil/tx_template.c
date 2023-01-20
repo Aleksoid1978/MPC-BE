@@ -27,38 +27,40 @@
 #define TABLE_DEF(name, size) \
     DECLARE_ALIGNED(32, TXSample, TX_TAB(ff_tx_tab_ ##name))[size]
 
-#define SR_TABLE(len) \
-    TABLE_DEF(len, len/4 + 1)
+#define SR_POW2_TABLES \
+    SR_TABLE(8)        \
+    SR_TABLE(16)       \
+    SR_TABLE(32)       \
+    SR_TABLE(64)       \
+    SR_TABLE(128)      \
+    SR_TABLE(256)      \
+    SR_TABLE(512)      \
+    SR_TABLE(1024)     \
+    SR_TABLE(2048)     \
+    SR_TABLE(4096)     \
+    SR_TABLE(8192)     \
+    SR_TABLE(16384)    \
+    SR_TABLE(32768)    \
+    SR_TABLE(65536)    \
+    SR_TABLE(131072)   \
 
+#define SR_TABLE(len) \
+    TABLE_DEF(len, len/4 + 1);
 /* Power of two tables */
-SR_TABLE(8);
-SR_TABLE(16);
-SR_TABLE(32);
-SR_TABLE(64);
-SR_TABLE(128);
-SR_TABLE(256);
-SR_TABLE(512);
-SR_TABLE(1024);
-SR_TABLE(2048);
-SR_TABLE(4096);
-SR_TABLE(8192);
-SR_TABLE(16384);
-SR_TABLE(32768);
-SR_TABLE(65536);
-SR_TABLE(131072);
+SR_POW2_TABLES
+#undef SR_TABLE
 
 /* Other factors' tables */
 TABLE_DEF(53, 12);
 TABLE_DEF( 7,  6);
 TABLE_DEF( 9,  8);
 
-typedef struct FFSRTabsInitOnce {
+typedef struct FFTabInitData {
     void (*func)(void);
-    AVOnce control;
     int factors[TX_MAX_SUB]; /* Must be sorted high -> low */
-} FFSRTabsInitOnce;
+} FFTabInitData;
 
-#define INIT_FF_SR_TAB(len)                                        \
+#define SR_TABLE(len)                                              \
 static av_cold void TX_TAB(ff_tx_init_tab_ ##len)(void)            \
 {                                                                  \
     double freq = 2*M_PI/len;                                      \
@@ -69,39 +71,19 @@ static av_cold void TX_TAB(ff_tx_init_tab_ ##len)(void)            \
                                                                    \
     *tab = 0;                                                      \
 }
+SR_POW2_TABLES
+#undef SR_TABLE
 
-INIT_FF_SR_TAB(8)
-INIT_FF_SR_TAB(16)
-INIT_FF_SR_TAB(32)
-INIT_FF_SR_TAB(64)
-INIT_FF_SR_TAB(128)
-INIT_FF_SR_TAB(256)
-INIT_FF_SR_TAB(512)
-INIT_FF_SR_TAB(1024)
-INIT_FF_SR_TAB(2048)
-INIT_FF_SR_TAB(4096)
-INIT_FF_SR_TAB(8192)
-INIT_FF_SR_TAB(16384)
-INIT_FF_SR_TAB(32768)
-INIT_FF_SR_TAB(65536)
-INIT_FF_SR_TAB(131072)
+static void (*const sr_tabs_init_funcs[])(void) = {
+#define SR_TABLE(len) TX_TAB(ff_tx_init_tab_ ##len),
+    SR_POW2_TABLES
+#undef SR_TABLE
+};
 
-static FFSRTabsInitOnce sr_tabs_init_once[] = {
-    { TX_TAB(ff_tx_init_tab_8),      AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_16),     AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_32),     AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_64),     AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_128),    AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_256),    AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_512),    AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_1024),   AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_2048),   AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_4096),   AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_8192),   AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_16384),  AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_32768),  AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_65536),  AV_ONCE_INIT },
-    { TX_TAB(ff_tx_init_tab_131072), AV_ONCE_INIT },
+static AVOnce sr_tabs_init_once[] = {
+#define SR_TABLE(len) AV_ONCE_INIT,
+    SR_POW2_TABLES
+#undef SR_TABLE
 };
 
 static av_cold void TX_TAB(ff_tx_init_tab_53)(void)
@@ -145,10 +127,16 @@ static av_cold void TX_TAB(ff_tx_init_tab_9)(void)
     TX_TAB(ff_tx_tab_9)[7] = TX_TAB(ff_tx_tab_9)[3] - TX_TAB(ff_tx_tab_9)[4];
 }
 
-static FFSRTabsInitOnce nptwo_tabs_init_once[] = {
-    { TX_TAB(ff_tx_init_tab_53),      AV_ONCE_INIT, { 15, 5, 3 } },
-    { TX_TAB(ff_tx_init_tab_9),       AV_ONCE_INIT, {  9 }       },
-    { TX_TAB(ff_tx_init_tab_7),       AV_ONCE_INIT, {  7 }       },
+static const FFTabInitData nptwo_tabs_init_data[] = {
+    { TX_TAB(ff_tx_init_tab_53),      { 15, 5, 3 } },
+    { TX_TAB(ff_tx_init_tab_9),       {  9 }       },
+    { TX_TAB(ff_tx_init_tab_7),       {  7 }       },
+};
+
+static AVOnce nptwo_tabs_init_once[] = {
+    AV_ONCE_INIT,
+    AV_ONCE_INIT,
+    AV_ONCE_INIT,
 };
 
 av_cold void TX_TAB(ff_tx_init_tabs)(int len)
@@ -157,23 +145,23 @@ av_cold void TX_TAB(ff_tx_init_tabs)(int len)
     if (factor_2) {
         int idx = factor_2 - 3;
         for (int i = 0; i <= idx; i++)
-            ff_thread_once(&sr_tabs_init_once[i].control,
-                            sr_tabs_init_once[i].func);
+            ff_thread_once(&sr_tabs_init_once[i],
+                            sr_tabs_init_funcs[i]);
         len >>= factor_2;
     }
 
-    for (int i = 0; i < FF_ARRAY_ELEMS(nptwo_tabs_init_once); i++) {
+    for (int i = 0; i < FF_ARRAY_ELEMS(nptwo_tabs_init_data); i++) {
         int f, f_idx = 0;
 
         if (len <= 1)
             return;
 
-        while ((f = nptwo_tabs_init_once[i].factors[f_idx++])) {
+        while ((f = nptwo_tabs_init_data[i].factors[f_idx++])) {
             if (f % len)
                 continue;
 
-            ff_thread_once(&nptwo_tabs_init_once[i].control,
-                            nptwo_tabs_init_once[i].func);
+            ff_thread_once(&nptwo_tabs_init_once[i],
+                            nptwo_tabs_init_data[i].func);
             len /= f;
             break;
         }
@@ -183,36 +171,37 @@ av_cold void TX_TAB(ff_tx_init_tabs)(int len)
 static av_always_inline void fft3(TXComplex *out, TXComplex *in,
                                   ptrdiff_t stride)
 {
-    TXComplex tmp[2];
+    TXComplex tmp[3];
     const TXSample *tab = TX_TAB(ff_tx_tab_53);
 #ifdef TX_INT32
     int64_t mtmp[4];
 #endif
 
-    BF(tmp[0].re, tmp[1].im, in[1].im, in[2].im);
-    BF(tmp[0].im, tmp[1].re, in[1].re, in[2].re);
+    tmp[0] = in[0];
+    BF(tmp[1].re, tmp[2].im, in[1].im, in[2].im);
+    BF(tmp[1].im, tmp[2].re, in[1].re, in[2].re);
 
-    out[0*stride].re = in[0].re + tmp[1].re;
-    out[0*stride].im = in[0].im + tmp[1].im;
+    out[0*stride].re = tmp[0].re + tmp[2].re;
+    out[0*stride].im = tmp[0].im + tmp[2].im;
 
 #ifdef TX_INT32
-    mtmp[0] = (int64_t)tab[ 8] * tmp[0].re;
-    mtmp[1] = (int64_t)tab[ 9] * tmp[0].im;
-    mtmp[2] = (int64_t)tab[10] * tmp[1].re;
-    mtmp[3] = (int64_t)tab[10] * tmp[1].im;
-    out[1*stride].re = in[0].re - (mtmp[2] + mtmp[0] + 0x40000000 >> 31);
-    out[1*stride].im = in[0].im - (mtmp[3] - mtmp[1] + 0x40000000 >> 31);
-    out[2*stride].re = in[0].re - (mtmp[2] - mtmp[0] + 0x40000000 >> 31);
-    out[2*stride].im = in[0].im - (mtmp[3] + mtmp[1] + 0x40000000 >> 31);
+    mtmp[0] = (int64_t)tab[ 8] * tmp[1].re;
+    mtmp[1] = (int64_t)tab[ 9] * tmp[1].im;
+    mtmp[2] = (int64_t)tab[10] * tmp[2].re;
+    mtmp[3] = (int64_t)tab[10] * tmp[2].im;
+    out[1*stride].re = tmp[0].re - (mtmp[2] + mtmp[0] + 0x40000000 >> 31);
+    out[1*stride].im = tmp[0].im - (mtmp[3] - mtmp[1] + 0x40000000 >> 31);
+    out[2*stride].re = tmp[0].re - (mtmp[2] - mtmp[0] + 0x40000000 >> 31);
+    out[2*stride].im = tmp[0].im - (mtmp[3] + mtmp[1] + 0x40000000 >> 31);
 #else
-    tmp[0].re = tab[ 8] * tmp[0].re;
-    tmp[0].im = tab[ 9] * tmp[0].im;
-    tmp[1].re = tab[10] * tmp[1].re;
-    tmp[1].im = tab[10] * tmp[1].im;
-    out[1*stride].re = in[0].re - tmp[1].re + tmp[0].re;
-    out[1*stride].im = in[0].im - tmp[1].im - tmp[0].im;
-    out[2*stride].re = in[0].re - tmp[1].re - tmp[0].re;
-    out[2*stride].im = in[0].im - tmp[1].im + tmp[0].im;
+    tmp[1].re = tab[ 8] * tmp[1].re;
+    tmp[1].im = tab[ 9] * tmp[1].im;
+    tmp[2].re = tab[10] * tmp[2].re;
+    tmp[2].im = tab[10] * tmp[2].im;
+    out[1*stride].re = tmp[0].re - tmp[2].re + tmp[1].re;
+    out[1*stride].im = tmp[0].im - tmp[2].im - tmp[1].im;
+    out[2*stride].re = tmp[0].re - tmp[2].re - tmp[1].re;
+    out[2*stride].im = tmp[0].im - tmp[2].im + tmp[1].im;
 #endif
 }
 
@@ -220,16 +209,17 @@ static av_always_inline void fft3(TXComplex *out, TXComplex *in,
 static av_always_inline void NAME(TXComplex *out, TXComplex *in,    \
                                   ptrdiff_t stride)                 \
 {                                                                   \
-    TXComplex z0[4], t[6];                                          \
+    TXComplex dc, z0[4], t[6];                                      \
     const TXSample *tab = TX_TAB(ff_tx_tab_53);                     \
                                                                     \
+    dc = in[0];                                                     \
     BF(t[1].im, t[0].re, in[1].re, in[4].re);                       \
     BF(t[1].re, t[0].im, in[1].im, in[4].im);                       \
     BF(t[3].im, t[2].re, in[2].re, in[3].re);                       \
     BF(t[3].re, t[2].im, in[2].im, in[3].im);                       \
                                                                     \
-    out[D0*stride].re = in[0].re + t[0].re + t[2].re;               \
-    out[D0*stride].im = in[0].im + t[0].im + t[2].im;               \
+    out[D0*stride].re = dc.re + t[0].re + t[2].re;                  \
+    out[D0*stride].im = dc.im + t[0].im + t[2].im;                  \
                                                                     \
     SMUL(t[4].re, t[0].re, tab[0], tab[2], t[2].re, t[0].re);       \
     SMUL(t[4].im, t[0].im, tab[0], tab[2], t[2].im, t[0].im);       \
@@ -241,14 +231,14 @@ static av_always_inline void NAME(TXComplex *out, TXComplex *in,    \
     BF(z0[2].re, z0[1].re, t[4].re, t[5].re);                       \
     BF(z0[2].im, z0[1].im, t[4].im, t[5].im);                       \
                                                                     \
-    out[D1*stride].re = in[0].re + z0[3].re;                        \
-    out[D1*stride].im = in[0].im + z0[0].im;                        \
-    out[D2*stride].re = in[0].re + z0[2].re;                        \
-    out[D2*stride].im = in[0].im + z0[1].im;                        \
-    out[D3*stride].re = in[0].re + z0[1].re;                        \
-    out[D3*stride].im = in[0].im + z0[2].im;                        \
-    out[D4*stride].re = in[0].re + z0[0].re;                        \
-    out[D4*stride].im = in[0].im + z0[3].im;                        \
+    out[D1*stride].re = dc.re + z0[3].re;                           \
+    out[D1*stride].im = dc.im + z0[0].im;                           \
+    out[D2*stride].re = dc.re + z0[2].re;                           \
+    out[D2*stride].im = dc.im + z0[1].im;                           \
+    out[D3*stride].re = dc.re + z0[1].re;                           \
+    out[D3*stride].im = dc.im + z0[2].im;                           \
+    out[D4*stride].re = dc.re + z0[0].re;                           \
+    out[D4*stride].im = dc.im + z0[3].im;                           \
 }
 
 DECL_FFT5(fft5,     0,  1,  2,  3,  4)
@@ -259,12 +249,13 @@ DECL_FFT5(fft5_m3,  5, 11,  2,  8, 14)
 static av_always_inline void fft7(TXComplex *out, TXComplex *in,
                                   ptrdiff_t stride)
 {
-    TXComplex t[6], z[3];
+    TXComplex dc, t[6], z[3];
     const TXComplex *tab = (const TXComplex *)TX_TAB(ff_tx_tab_7);
 #ifdef TX_INT32
     int64_t mtmp[12];
 #endif
 
+    dc = in[0];
     BF(t[1].re, t[0].re, in[1].re, in[6].re);
     BF(t[1].im, t[0].im, in[1].im, in[6].im);
     BF(t[3].re, t[2].re, in[2].re, in[5].re);
@@ -272,8 +263,8 @@ static av_always_inline void fft7(TXComplex *out, TXComplex *in,
     BF(t[5].re, t[4].re, in[3].re, in[4].re);
     BF(t[5].im, t[4].im, in[3].im, in[4].im);
 
-    out[0*stride].re = in[0].re + t[0].re + t[2].re + t[4].re;
-    out[0*stride].im = in[0].im + t[0].im + t[2].im + t[4].im;
+    out[0*stride].re = dc.re + t[0].re + t[2].re + t[4].re;
+    out[0*stride].im = dc.im + t[0].im + t[2].im + t[4].im;
 
 #ifdef TX_INT32 /* NOTE: it's possible to do this with 16 mults but 72 adds */
     mtmp[ 0] = ((int64_t)tab[0].re)*t[0].re - ((int64_t)tab[2].re)*t[4].re;
@@ -329,29 +320,30 @@ static av_always_inline void fft7(TXComplex *out, TXComplex *in,
     BF(t[3].im, z[1].im, z[1].im, t[2].im);
     BF(t[5].im, z[2].im, z[2].im, t[4].im);
 
-    out[1*stride].re = in[0].re + z[0].re;
-    out[1*stride].im = in[0].im + t[1].im;
-    out[2*stride].re = in[0].re + t[3].re;
-    out[2*stride].im = in[0].im + z[1].im;
-    out[3*stride].re = in[0].re + z[2].re;
-    out[3*stride].im = in[0].im + t[5].im;
-    out[4*stride].re = in[0].re + t[5].re;
-    out[4*stride].im = in[0].im + z[2].im;
-    out[5*stride].re = in[0].re + z[1].re;
-    out[5*stride].im = in[0].im + t[3].im;
-    out[6*stride].re = in[0].re + t[1].re;
-    out[6*stride].im = in[0].im + z[0].im;
+    out[1*stride].re = dc.re + z[0].re;
+    out[1*stride].im = dc.im + t[1].im;
+    out[2*stride].re = dc.re + t[3].re;
+    out[2*stride].im = dc.im + z[1].im;
+    out[3*stride].re = dc.re + z[2].re;
+    out[3*stride].im = dc.im + t[5].im;
+    out[4*stride].re = dc.re + t[5].re;
+    out[4*stride].im = dc.im + z[2].im;
+    out[5*stride].re = dc.re + z[1].re;
+    out[5*stride].im = dc.im + t[3].im;
+    out[6*stride].re = dc.re + t[1].re;
+    out[6*stride].im = dc.im + z[0].im;
 }
 
 static av_always_inline void fft9(TXComplex *out, TXComplex *in,
                                   ptrdiff_t stride)
 {
     const TXComplex *tab = (const TXComplex *)TX_TAB(ff_tx_tab_9);
-    TXComplex t[16], w[4], x[5], y[5], z[2];
+    TXComplex dc, t[16], w[4], x[5], y[5], z[2];
 #ifdef TX_INT32
     int64_t mtmp[12];
 #endif
 
+    dc = in[0];
     BF(t[1].re, t[0].re, in[1].re, in[8].re);
     BF(t[1].im, t[0].im, in[1].im, in[8].im);
     BF(t[3].re, t[2].re, in[2].re, in[7].re);
@@ -370,8 +362,8 @@ static av_always_inline void fft9(TXComplex *out, TXComplex *in,
     w[3].re = t[3].re + t[7].re;
     w[3].im = t[3].im + t[7].im;
 
-    z[0].re = in[0].re + t[4].re;
-    z[0].im = in[0].im + t[4].im;
+    z[0].re = dc.re + t[4].re;
+    z[0].im = dc.im + t[4].im;
 
     z[1].re = t[0].re + t[2].re + t[6].re;
     z[1].im = t[0].im + t[2].im + t[6].im;
@@ -423,8 +415,8 @@ static av_always_inline void fft9(TXComplex *out, TXComplex *in,
 
     x[3].re = z[0].re  + tab[0].re*z[1].re;
     x[3].im = z[0].im  + tab[0].re*z[1].im;
-    z[0].re = in[0].re + tab[0].re*t[4].re;
-    z[0].im = in[0].im + tab[0].re*t[4].im;
+    z[0].re = dc.re + tab[0].re*t[4].re;
+    z[0].im = dc.im + tab[0].re*t[4].im;
 
     x[1].re = tab[1].re*w[0].re + tab[2].im*w[1].re;
     x[1].im = tab[1].re*w[0].im + tab[2].im*w[1].im;
@@ -480,6 +472,68 @@ static av_always_inline void fft15(TXComplex *out, TXComplex *in,
     fft5_m3(out, tmp + 10, stride);
 }
 
+static av_cold int TX_NAME(ff_tx_fft_factor_init)(AVTXContext *s,
+                                                  const FFTXCodelet *cd,
+                                                  uint64_t flags,
+                                                  FFTXCodeletOptions *opts,
+                                                  int len, int inv,
+                                                  const void *scale)
+{
+    int ret = 0;
+    TX_TAB(ff_tx_init_tabs)(len);
+
+    if (len == 15)
+        ret = ff_tx_gen_pfa_input_map(s, opts, 3, 5);
+    else if (flags & FF_TX_PRESHUFFLE)
+        ret = ff_tx_gen_default_map(s, opts);
+
+    return ret;
+}
+
+#define DECL_FACTOR_S(n)                                                       \
+static void TX_NAME(ff_tx_fft##n)(AVTXContext *s, void *dst,                   \
+                                  void *src, ptrdiff_t stride)                 \
+{                                                                              \
+    fft##n((TXComplex *)dst, (TXComplex *)src, stride / sizeof(TXComplex));    \
+}                                                                              \
+static const FFTXCodelet TX_NAME(ff_tx_fft##n##_ns_def) = {                    \
+    .name       = TX_NAME_STR("fft" #n "_ns"),                                 \
+    .function   = TX_NAME(ff_tx_fft##n),                                       \
+    .type       = TX_TYPE(FFT),                                                \
+    .flags      = AV_TX_INPLACE | FF_TX_OUT_OF_PLACE |                         \
+                  AV_TX_UNALIGNED | FF_TX_PRESHUFFLE,                          \
+    .factors[0] = n,                                                           \
+    .nb_factors = 1,                                                           \
+    .min_len    = n,                                                           \
+    .max_len    = n,                                                           \
+    .init       = TX_NAME(ff_tx_fft_factor_init),                              \
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,                                         \
+    .prio       = FF_TX_PRIO_BASE,                                             \
+};
+
+#define DECL_FACTOR_F(n)                                                       \
+DECL_FACTOR_S(n)                                                               \
+static const FFTXCodelet TX_NAME(ff_tx_fft##n##_fwd_def) = {                   \
+    .name       = TX_NAME_STR("fft" #n "_fwd"),                                \
+    .function   = TX_NAME(ff_tx_fft##n),                                       \
+    .type       = TX_TYPE(FFT),                                                \
+    .flags      = AV_TX_INPLACE | FF_TX_OUT_OF_PLACE |                         \
+                  AV_TX_UNALIGNED | FF_TX_FORWARD_ONLY,                        \
+    .factors[0] = n,                                                           \
+    .nb_factors = 1,                                                           \
+    .min_len    = n,                                                           \
+    .max_len    = n,                                                           \
+    .init       = TX_NAME(ff_tx_fft_factor_init),                              \
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,                                         \
+    .prio       = FF_TX_PRIO_BASE,                                             \
+};
+
+DECL_FACTOR_F(3)
+DECL_FACTOR_F(5)
+DECL_FACTOR_F(7)
+DECL_FACTOR_F(9)
+DECL_FACTOR_S(15)
+
 #define BUTTERFLIES(a0, a1, a2, a3)            \
     do {                                       \
         r0=a0.re;                              \
@@ -509,7 +563,7 @@ static inline void TX_NAME(ff_tx_fft_sr_combine)(TXComplex *z,
     int o2 = 4*len;
     int o3 = 6*len;
     const TXSample *wim = cos + o1 - 7;
-    TXSample t1, t2, t3, t4, t5, t6, r0, i0, r1, i1;
+    TXUSample t1, t2, t3, t4, t5, t6, r0, i0, r1, i1;
 
     for (int i = 0; i < len; i += 4) {
         TRANSFORM(z[0], z[o1 + 0], z[o2 + 0], z[o3 + 0], cos[0], wim[7]);
@@ -536,7 +590,7 @@ static av_cold int TX_NAME(ff_tx_fft_sr_codelet_init)(AVTXContext *s,
                                                       const void *scale)
 {
     TX_TAB(ff_tx_init_tabs)(len);
-    return ff_tx_gen_ptwo_revtab(s, opts ? opts->invert_lookup : 1);
+    return ff_tx_gen_ptwo_revtab(s, opts);
 }
 
 #define DECL_SR_CODELET_DEF(n)                              \
@@ -544,9 +598,10 @@ static const FFTXCodelet TX_NAME(ff_tx_fft##n##_ns_def) = { \
     .name       = TX_NAME_STR("fft" #n "_ns"),              \
     .function   = TX_NAME(ff_tx_fft##n##_ns),               \
     .type       = TX_TYPE(FFT),                             \
-    .flags      = AV_TX_INPLACE | AV_TX_UNALIGNED |         \
-                  FF_TX_PRESHUFFLE,                         \
+    .flags      = FF_TX_OUT_OF_PLACE | AV_TX_INPLACE |      \
+                  AV_TX_UNALIGNED | FF_TX_PRESHUFFLE,       \
     .factors[0] = 2,                                        \
+    .nb_factors = 1,                                        \
     .min_len    = n,                                        \
     .max_len    = n,                                        \
     .init       = TX_NAME(ff_tx_fft_sr_codelet_init),       \
@@ -554,90 +609,95 @@ static const FFTXCodelet TX_NAME(ff_tx_fft##n##_ns_def) = { \
     .prio       = FF_TX_PRIO_BASE,                          \
 };
 
-#define DECL_SR_CODELET(n, n2, n4)                                   \
-static void TX_NAME(ff_tx_fft##n##_ns)(AVTXContext *s, void *dst,    \
-                                        void *src, ptrdiff_t stride) \
-{                                                                    \
-    TXComplex *z = dst;                                              \
-    const TXSample *cos = TX_TAB(ff_tx_tab_##n);                     \
-                                                                     \
-    TX_NAME(ff_tx_fft##n2##_ns)(s, z,        z,        stride);      \
-    TX_NAME(ff_tx_fft##n4##_ns)(s, z + n4*2, z + n4*2, stride);      \
-    TX_NAME(ff_tx_fft##n4##_ns)(s, z + n4*3, z + n4*3, stride);      \
-    TX_NAME(ff_tx_fft_sr_combine)(z, cos, n4 >> 1);                  \
-}                                                                    \
-                                                                     \
+#define DECL_SR_CODELET(n, n2, n4)                                    \
+static void TX_NAME(ff_tx_fft##n##_ns)(AVTXContext *s, void *_dst,    \
+                                        void *_src, ptrdiff_t stride) \
+{                                                                     \
+    TXComplex *src = _src;                                            \
+    TXComplex *dst = _dst;                                            \
+    const TXSample *cos = TX_TAB(ff_tx_tab_##n);                      \
+                                                                      \
+    TX_NAME(ff_tx_fft##n2##_ns)(s, dst,        src,        stride);   \
+    TX_NAME(ff_tx_fft##n4##_ns)(s, dst + n4*2, src + n4*2, stride);   \
+    TX_NAME(ff_tx_fft##n4##_ns)(s, dst + n4*3, src + n4*3, stride);   \
+    TX_NAME(ff_tx_fft_sr_combine)(dst, cos, n4 >> 1);                 \
+}                                                                     \
+                                                                      \
 DECL_SR_CODELET_DEF(n)
 
-static void TX_NAME(ff_tx_fft2_ns)(AVTXContext *s, void *dst,
-                                   void *src, ptrdiff_t stride)
+static void TX_NAME(ff_tx_fft2_ns)(AVTXContext *s, void *_dst,
+                                   void *_src, ptrdiff_t stride)
 {
-    TXComplex *z = dst;
+    TXComplex *src = _src;
+    TXComplex *dst = _dst;
     TXComplex tmp;
 
-    BF(tmp.re, z[0].re, z[0].re, z[1].re);
-    BF(tmp.im, z[0].im, z[0].im, z[1].im);
-    z[1] = tmp;
+    BF(tmp.re, dst[0].re, src[0].re, src[1].re);
+    BF(tmp.im, dst[0].im, src[0].im, src[1].im);
+    dst[1] = tmp;
 }
 
-static void TX_NAME(ff_tx_fft4_ns)(AVTXContext *s, void *dst,
-                                   void *src, ptrdiff_t stride)
+static void TX_NAME(ff_tx_fft4_ns)(AVTXContext *s, void *_dst,
+                                   void *_src, ptrdiff_t stride)
 {
-    TXComplex *z = dst;
+    TXComplex *src = _src;
+    TXComplex *dst = _dst;
     TXSample t1, t2, t3, t4, t5, t6, t7, t8;
 
-    BF(t3, t1, z[0].re, z[1].re);
-    BF(t8, t6, z[3].re, z[2].re);
-    BF(z[2].re, z[0].re, t1, t6);
-    BF(t4, t2, z[0].im, z[1].im);
-    BF(t7, t5, z[2].im, z[3].im);
-    BF(z[3].im, z[1].im, t4, t8);
-    BF(z[3].re, z[1].re, t3, t7);
-    BF(z[2].im, z[0].im, t2, t5);
+    BF(t3, t1, src[0].re, src[1].re);
+    BF(t8, t6, src[3].re, src[2].re);
+    BF(dst[2].re, dst[0].re, t1, t6);
+    BF(t4, t2, src[0].im, src[1].im);
+    BF(t7, t5, src[2].im, src[3].im);
+    BF(dst[3].im, dst[1].im, t4, t8);
+    BF(dst[3].re, dst[1].re, t3, t7);
+    BF(dst[2].im, dst[0].im, t2, t5);
 }
 
-static void TX_NAME(ff_tx_fft8_ns)(AVTXContext *s, void *dst,
-                                   void *src, ptrdiff_t stride)
+static void TX_NAME(ff_tx_fft8_ns)(AVTXContext *s, void *_dst,
+                                   void *_src, ptrdiff_t stride)
 {
-    TXComplex *z = dst;
-    TXSample t1, t2, t3, t4, t5, t6, r0, i0, r1, i1;
+    TXComplex *src = _src;
+    TXComplex *dst = _dst;
+    TXUSample t1, t2, t3, t4, t5, t6, r0, i0, r1, i1;
     const TXSample cos = TX_TAB(ff_tx_tab_8)[1];
 
-    TX_NAME(ff_tx_fft4_ns)(s, z, z, stride);
+    TX_NAME(ff_tx_fft4_ns)(s, dst, src, stride);
 
-    BF(t1, z[5].re, z[4].re, -z[5].re);
-    BF(t2, z[5].im, z[4].im, -z[5].im);
-    BF(t5, z[7].re, z[6].re, -z[7].re);
-    BF(t6, z[7].im, z[6].im, -z[7].im);
+    BF(t1, dst[5].re, src[4].re, -src[5].re);
+    BF(t2, dst[5].im, src[4].im, -src[5].im);
+    BF(t5, dst[7].re, src[6].re, -src[7].re);
+    BF(t6, dst[7].im, src[6].im, -src[7].im);
 
-    BUTTERFLIES(z[0], z[2], z[4], z[6]);
-    TRANSFORM(z[1], z[3], z[5], z[7], cos, cos);
+    BUTTERFLIES(dst[0], dst[2], dst[4], dst[6]);
+    TRANSFORM(dst[1], dst[3], dst[5], dst[7], cos, cos);
 }
 
-static void TX_NAME(ff_tx_fft16_ns)(AVTXContext *s, void *dst,
-                                    void *src, ptrdiff_t stride)
+static void TX_NAME(ff_tx_fft16_ns)(AVTXContext *s, void *_dst,
+                                    void *_src, ptrdiff_t stride)
 {
-    TXComplex *z = dst;
+    TXComplex *src = _src;
+    TXComplex *dst = _dst;
     const TXSample *cos = TX_TAB(ff_tx_tab_16);
 
-    TXSample t1, t2, t3, t4, t5, t6, r0, i0, r1, i1;
+    TXUSample t1, t2, t3, t4, t5, t6, r0, i0, r1, i1;
     TXSample cos_16_1 = cos[1];
     TXSample cos_16_2 = cos[2];
     TXSample cos_16_3 = cos[3];
 
-    TX_NAME(ff_tx_fft8_ns)(s, z +  0, z +  0, stride);
-    TX_NAME(ff_tx_fft4_ns)(s, z +  8, z +  8, stride);
-    TX_NAME(ff_tx_fft4_ns)(s, z + 12, z + 12, stride);
+    TX_NAME(ff_tx_fft8_ns)(s, dst +  0, src +  0, stride);
+    TX_NAME(ff_tx_fft4_ns)(s, dst +  8, src +  8, stride);
+    TX_NAME(ff_tx_fft4_ns)(s, dst + 12, src + 12, stride);
 
-    t1 = z[ 8].re;
-    t2 = z[ 8].im;
-    t5 = z[12].re;
-    t6 = z[12].im;
-    BUTTERFLIES(z[0], z[4], z[8], z[12]);
+    t1 = dst[ 8].re;
+    t2 = dst[ 8].im;
+    t5 = dst[12].re;
+    t6 = dst[12].im;
+    BUTTERFLIES(dst[0], dst[4], dst[8], dst[12]);
 
-    TRANSFORM(z[ 2], z[ 6], z[10], z[14], cos_16_2, cos_16_2);
-    TRANSFORM(z[ 1], z[ 5], z[ 9], z[13], cos_16_1, cos_16_3);
-    TRANSFORM(z[ 3], z[ 7], z[11], z[15], cos_16_3, cos_16_1);
+    TRANSFORM(dst[ 2], dst[ 6], dst[10], dst[14], cos_16_2, cos_16_2);
+    TRANSFORM(dst[ 1], dst[ 5], dst[ 9], dst[13], cos_16_1, cos_16_3);
+    TRANSFORM(dst[ 3], dst[ 7], dst[11], dst[15], cos_16_3, cos_16_1);
 }
 
 DECL_SR_CODELET_DEF(2)
@@ -658,16 +718,18 @@ DECL_SR_CODELET(32768,16384,8192)
 DECL_SR_CODELET(65536,32768,16384)
 DECL_SR_CODELET(131072,65536,32768)
 
-static av_cold int TX_NAME(ff_tx_fft_sr_init)(AVTXContext *s,
-                                              const FFTXCodelet *cd,
-                                              uint64_t flags,
-                                              FFTXCodeletOptions *opts,
-                                              int len, int inv,
-                                              const void *scale)
+static av_cold int TX_NAME(ff_tx_fft_init)(AVTXContext *s,
+                                           const FFTXCodelet *cd,
+                                           uint64_t flags,
+                                           FFTXCodeletOptions *opts,
+                                           int len, int inv,
+                                           const void *scale)
 {
     int ret;
     int is_inplace = !!(flags & AV_TX_INPLACE);
-    FFTXCodeletOptions sub_opts = { .invert_lookup = !is_inplace };
+    FFTXCodeletOptions sub_opts = {
+        .map_dir = is_inplace ? FF_TX_MAP_SCATTER : FF_TX_MAP_GATHER,
+    };
 
     flags &= ~FF_TX_OUT_OF_PLACE; /* We want the subtransform to be */
     flags |=  AV_TX_INPLACE;      /* in-place */
@@ -676,31 +738,46 @@ static av_cold int TX_NAME(ff_tx_fft_sr_init)(AVTXContext *s,
     if ((ret = ff_tx_init_subtx(s, TX_TYPE(FFT), flags, &sub_opts, len, inv, scale)))
         return ret;
 
-    if (is_inplace && (ret = ff_tx_gen_ptwo_inplace_revtab_idx(s)))
+    if (is_inplace && (ret = ff_tx_gen_inplace_map(s, len)))
         return ret;
 
     return 0;
 }
 
-static void TX_NAME(ff_tx_fft_sr)(AVTXContext *s, void *_dst,
-                                  void *_src, ptrdiff_t stride)
+static av_cold int TX_NAME(ff_tx_fft_inplace_small_init)(AVTXContext *s,
+                                                         const FFTXCodelet *cd,
+                                                         uint64_t flags,
+                                                         FFTXCodeletOptions *opts,
+                                                         int len, int inv,
+                                                         const void *scale)
+{
+    if (!(s->tmp = av_malloc(len*sizeof(*s->tmp))))
+        return AVERROR(ENOMEM);
+    flags &= ~AV_TX_INPLACE;
+    return TX_NAME(ff_tx_fft_init)(s, cd, flags, opts, len, inv, scale);
+}
+
+static void TX_NAME(ff_tx_fft)(AVTXContext *s, void *_dst,
+                               void *_src, ptrdiff_t stride)
 {
     TXComplex *src = _src;
-    TXComplex *dst = _dst;
+    TXComplex *dst1 = s->flags & AV_TX_INPLACE ? s->tmp : _dst;
+    TXComplex *dst2 = _dst;
     int *map = s->sub[0].map;
     int len = s->len;
 
     /* Compilers can't vectorize this anyway without assuming AVX2, which they
      * generally don't, at least without -march=native -mtune=native */
     for (int i = 0; i < len; i++)
-        dst[i] = src[map[i]];
+        dst1[i] = src[map[i]];
 
-    s->fn[0](&s->sub[0], dst, dst, stride);
+    s->fn[0](&s->sub[0], dst2, dst1, stride);
 }
 
-static void TX_NAME(ff_tx_fft_sr_inplace)(AVTXContext *s, void *_dst,
-                                          void *_src, ptrdiff_t stride)
+static void TX_NAME(ff_tx_fft_inplace)(AVTXContext *s, void *_dst,
+                                       void *_src, ptrdiff_t stride)
 {
+    TXComplex *src = _src;
     TXComplex *dst = _dst;
     TXComplex tmp;
     const int *map = s->sub->map;
@@ -709,43 +786,84 @@ static void TX_NAME(ff_tx_fft_sr_inplace)(AVTXContext *s, void *_dst,
 
     src_idx = *inplace_idx++;
     do {
-        tmp = dst[src_idx];
+        tmp = src[src_idx];
         dst_idx = map[src_idx];
         do {
-            FFSWAP(TXComplex, tmp, dst[dst_idx]);
+            FFSWAP(TXComplex, tmp, src[dst_idx]);
             dst_idx = map[dst_idx];
         } while (dst_idx != src_idx); /* Can be > as well, but was less predictable */
-        dst[dst_idx] = tmp;
+        src[dst_idx] = tmp;
     } while ((src_idx = *inplace_idx++));
 
-    s->fn[0](&s->sub[0], dst, dst, stride);
+    s->fn[0](&s->sub[0], dst, src, stride);
 }
 
-static const FFTXCodelet TX_NAME(ff_tx_fft_sr_def) = {
-    .name       = TX_NAME_STR("fft_sr"),
-    .function   = TX_NAME(ff_tx_fft_sr),
+static const FFTXCodelet TX_NAME(ff_tx_fft_def) = {
+    .name       = TX_NAME_STR("fft"),
+    .function   = TX_NAME(ff_tx_fft),
     .type       = TX_TYPE(FFT),
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE,
-    .factors[0] = 2,
+    .factors[0] = TX_FACTOR_ANY,
+    .nb_factors = 1,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
-    .init       = TX_NAME(ff_tx_fft_sr_init),
+    .init       = TX_NAME(ff_tx_fft_init),
     .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
     .prio       = FF_TX_PRIO_BASE,
 };
 
-static const FFTXCodelet TX_NAME(ff_tx_fft_sr_inplace_def) = {
-    .name       = TX_NAME_STR("fft_sr_inplace"),
-    .function   = TX_NAME(ff_tx_fft_sr_inplace),
+static const FFTXCodelet TX_NAME(ff_tx_fft_inplace_small_def) = {
+    .name       = TX_NAME_STR("fft_inplace_small"),
+    .function   = TX_NAME(ff_tx_fft),
     .type       = TX_TYPE(FFT),
-    .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE,
-    .factors[0] = 2,
+    .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | AV_TX_INPLACE,
+    .factors[0] = TX_FACTOR_ANY,
+    .nb_factors = 1,
+    .min_len    = 2,
+    .max_len    = 65536,
+    .init       = TX_NAME(ff_tx_fft_inplace_small_init),
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
+    .prio       = FF_TX_PRIO_BASE - 256,
+};
+
+static const FFTXCodelet TX_NAME(ff_tx_fft_inplace_def) = {
+    .name       = TX_NAME_STR("fft_inplace"),
+    .function   = TX_NAME(ff_tx_fft_inplace),
+    .type       = TX_TYPE(FFT),
+    .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | AV_TX_INPLACE,
+    .factors[0] = TX_FACTOR_ANY,
+    .nb_factors = 1,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
-    .init       = TX_NAME(ff_tx_fft_sr_init),
+    .init       = TX_NAME(ff_tx_fft_init),
     .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
-    .prio       = FF_TX_PRIO_BASE,
+    .prio       = FF_TX_PRIO_BASE - 512,
 };
+
+static av_cold int TX_NAME(ff_tx_fft_init_naive_small)(AVTXContext *s,
+                                                       const FFTXCodelet *cd,
+                                                       uint64_t flags,
+                                                       FFTXCodeletOptions *opts,
+                                                       int len, int inv,
+                                                       const void *scale)
+{
+    const double phase = s->inv ? 2.0*M_PI/len : -2.0*M_PI/len;
+
+    if (!(s->exp = av_malloc(len*len*sizeof(*s->exp))))
+        return AVERROR(ENOMEM);
+
+    for (int i = 0; i < len; i++) {
+        for (int j = 0; j < len; j++) {
+            const double factor = phase*i*j;
+            s->exp[i*j] = (TXComplex){
+                RESCALE(cos(factor)),
+                RESCALE(sin(factor)),
+            };
+        }
+    }
+
+    return 0;
+}
 
 static void TX_NAME(ff_tx_fft_naive)(AVTXContext *s, void *_dst, void *_src,
                                      ptrdiff_t stride)
@@ -755,9 +873,11 @@ static void TX_NAME(ff_tx_fft_naive)(AVTXContext *s, void *_dst, void *_src,
     const int n = s->len;
     double phase = s->inv ? 2.0*M_PI/n : -2.0*M_PI/n;
 
-    for(int i = 0; i < n; i++) {
+    stride /= sizeof(*dst);
+
+    for (int i = 0; i < n; i++) {
         TXComplex tmp = { 0 };
-        for(int j = 0; j < n; j++) {
+        for (int j = 0; j < n; j++) {
             const double factor = phase*i*j;
             const TXComplex mult = {
                 RESCALE(cos(factor)),
@@ -768,9 +888,45 @@ static void TX_NAME(ff_tx_fft_naive)(AVTXContext *s, void *_dst, void *_src,
             tmp.re += res.re;
             tmp.im += res.im;
         }
-        dst[i] = tmp;
+        dst[i*stride] = tmp;
     }
 }
+
+static void TX_NAME(ff_tx_fft_naive_small)(AVTXContext *s, void *_dst, void *_src,
+                                           ptrdiff_t stride)
+{
+    TXComplex *src = _src;
+    TXComplex *dst = _dst;
+    const int n = s->len;
+
+    stride /= sizeof(*dst);
+
+    for (int i = 0; i < n; i++) {
+        TXComplex tmp = { 0 };
+        for (int j = 0; j < n; j++) {
+            TXComplex res;
+            const TXComplex mult = s->exp[i*j];
+            CMUL3(res, src[j], mult);
+            tmp.re += res.re;
+            tmp.im += res.im;
+        }
+        dst[i*stride] = tmp;
+    }
+}
+
+static const FFTXCodelet TX_NAME(ff_tx_fft_naive_small_def) = {
+    .name       = TX_NAME_STR("fft_naive_small"),
+    .function   = TX_NAME(ff_tx_fft_naive_small),
+    .type       = TX_TYPE(FFT),
+    .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE,
+    .factors[0] = TX_FACTOR_ANY,
+    .nb_factors = 1,
+    .min_len    = 2,
+    .max_len    = 1024,
+    .init       = TX_NAME(ff_tx_fft_init_naive_small),
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
+    .prio       = FF_TX_PRIO_MIN/2,
+};
 
 static const FFTXCodelet TX_NAME(ff_tx_fft_naive_def) = {
     .name       = TX_NAME_STR("fft_naive"),
@@ -778,6 +934,7 @@ static const FFTXCodelet TX_NAME(ff_tx_fft_naive_def) = {
     .type       = TX_TYPE(FFT),
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE,
     .factors[0] = TX_FACTOR_ANY,
+    .nb_factors = 1,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = NULL,
@@ -792,71 +949,182 @@ static av_cold int TX_NAME(ff_tx_fft_pfa_init)(AVTXContext *s,
                                                int len, int inv,
                                                const void *scale)
 {
-    int ret;
-    int sub_len = len / cd->factors[0];
-    FFTXCodeletOptions sub_opts = { .invert_lookup = 0 };
+    int ret, *tmp, ps = flags & FF_TX_PRESHUFFLE;
+    FFTXCodeletOptions sub_opts = { .map_dir = FF_TX_MAP_GATHER };
+    size_t extra_tmp_len = 0;
+    int len_list[TX_MAX_DECOMPOSITIONS];
 
-    flags &= ~FF_TX_OUT_OF_PLACE; /* We want the subtransform to be */
-    flags |=  AV_TX_INPLACE;      /* in-place */
-    flags |=  FF_TX_PRESHUFFLE;   /* This function handles the permute step */
-
-    if ((ret = ff_tx_init_subtx(s, TX_TYPE(FFT), flags, &sub_opts,
-                                sub_len, inv, scale)))
+    if ((ret = ff_tx_decompose_length(len_list, TX_TYPE(FFT), len, inv)) < 0)
         return ret;
 
-    if ((ret = ff_tx_gen_compound_mapping(s, cd->factors[0], sub_len)))
+    /* Two iterations to test both orderings. */
+    for (int i = 0; i < ret; i++) {
+        int len1 = len_list[i];
+        int len2 = len / len1;
+
+        /* Our ptwo transforms don't support striding the output. */
+        if (len2 & (len2 - 1))
+            FFSWAP(int, len1, len2);
+
+        ff_tx_clear_ctx(s);
+
+        /* First transform */
+        sub_opts.map_dir = FF_TX_MAP_GATHER;
+        flags &= ~AV_TX_INPLACE;
+        flags |=  FF_TX_OUT_OF_PLACE;
+        flags |=  FF_TX_PRESHUFFLE; /* This function handles the permute step */
+        ret = ff_tx_init_subtx(s, TX_TYPE(FFT), flags, &sub_opts,
+                               len1, inv, scale);
+
+        if (ret == AVERROR(ENOMEM)) {
+            return ret;
+        } else if (ret < 0) { /* Try again without a preshuffle flag */
+            flags &= ~FF_TX_PRESHUFFLE;
+            ret = ff_tx_init_subtx(s, TX_TYPE(FFT), flags, &sub_opts,
+                                   len1, inv, scale);
+            if (ret == AVERROR(ENOMEM))
+                return ret;
+            else if (ret < 0)
+                continue;
+        }
+
+        /* Second transform. */
+        sub_opts.map_dir = FF_TX_MAP_SCATTER;
+        flags |=  FF_TX_PRESHUFFLE;
+retry:
+        flags &= ~FF_TX_OUT_OF_PLACE;
+        flags |=  AV_TX_INPLACE;
+        ret = ff_tx_init_subtx(s, TX_TYPE(FFT), flags, &sub_opts,
+                               len2, inv, scale);
+
+        if (ret == AVERROR(ENOMEM)) {
+            return ret;
+        } else if (ret < 0) { /* Try again with an out-of-place transform */
+            flags |= FF_TX_OUT_OF_PLACE;
+            flags &= ~AV_TX_INPLACE;
+            ret = ff_tx_init_subtx(s, TX_TYPE(FFT), flags, &sub_opts,
+                                   len2, inv, scale);
+            if (ret == AVERROR(ENOMEM)) {
+                return ret;
+            } else if (ret < 0) {
+                if (flags & FF_TX_PRESHUFFLE) { /* Retry again without a preshuf flag */
+                    flags &= ~FF_TX_PRESHUFFLE;
+                    goto retry;
+                } else {
+                    continue;
+                }
+            }
+        }
+
+        /* Success */
+        break;
+    }
+
+    /* If nothing was sucessful, error out */
+    if (ret < 0)
+        return ret;
+
+    /* Generate PFA map */
+    if ((ret = ff_tx_gen_compound_mapping(s, opts, 0,
+                                          s->sub[0].len, s->sub[1].len)))
         return ret;
 
     if (!(s->tmp = av_malloc(len*sizeof(*s->tmp))))
         return AVERROR(ENOMEM);
 
-    TX_TAB(ff_tx_init_tabs)(len / sub_len);
+    /* Flatten input map */
+    tmp = (int *)s->tmp;
+    for (int k = 0; k < len; k += s->sub[0].len) {
+        memcpy(tmp, &s->map[k], s->sub[0].len*sizeof(*tmp));
+        for (int i = 0; i < s->sub[0].len; i++)
+            s->map[k + i] = tmp[s->sub[0].map[i]];
+    }
+
+    /* Only allocate extra temporary memory if we need it */
+    if (!(s->sub[1].flags & AV_TX_INPLACE))
+        extra_tmp_len = len;
+    else if (!ps)
+        extra_tmp_len = s->sub[0].len;
+
+    if (extra_tmp_len && !(s->exp = av_malloc(extra_tmp_len*sizeof(*s->exp))))
+        return AVERROR(ENOMEM);
 
     return 0;
 }
 
-#define DECL_COMP_FFT(N)                                                       \
-static void TX_NAME(ff_tx_fft_pfa_##N##xM)(AVTXContext *s, void *_out,         \
-                                           void *_in, ptrdiff_t stride)        \
-{                                                                              \
-    const int m = s->sub->len;                                                 \
-    const int *in_map = s->map, *out_map = in_map + s->len;                    \
-    const int *sub_map = s->sub->map;                                          \
-    TXComplex *in = _in;                                                       \
-    TXComplex *out = _out;                                                     \
-    TXComplex fft##N##in[N];                                                   \
-                                                                               \
-    for (int i = 0; i < m; i++) {                                              \
-        for (int j = 0; j < N; j++)                                            \
-            fft##N##in[j] = in[in_map[i*N + j]];                               \
-        fft##N(s->tmp + sub_map[i], fft##N##in, m);                            \
-    }                                                                          \
-                                                                               \
-    for (int i = 0; i < N; i++)                                                \
-        s->fn[0](&s->sub[0], s->tmp + m*i, s->tmp + m*i, sizeof(TXComplex));   \
-                                                                               \
-    for (int i = 0; i < N*m; i++)                                              \
-        out[i] = s->tmp[out_map[i]];                                           \
-}                                                                              \
-                                                                               \
-static const FFTXCodelet TX_NAME(ff_tx_fft_pfa_##N##xM_def) = {                \
-    .name       = TX_NAME_STR("fft_pfa_" #N "xM"),                             \
-    .function   = TX_NAME(ff_tx_fft_pfa_##N##xM),                              \
-    .type       = TX_TYPE(FFT),                                                \
-    .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE | FF_TX_OUT_OF_PLACE,        \
-    .factors    = { N, TX_FACTOR_ANY },                                        \
-    .min_len    = N*2,                                                         \
-    .max_len    = TX_LEN_UNLIMITED,                                            \
-    .init       = TX_NAME(ff_tx_fft_pfa_init),                                 \
-    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,                                         \
-    .prio       = FF_TX_PRIO_BASE,                                             \
+static void TX_NAME(ff_tx_fft_pfa)(AVTXContext *s, void *_out,
+                                   void *_in, ptrdiff_t stride)
+{
+    const int n = s->sub[0].len, m = s->sub[1].len, l = s->len;
+    const int *in_map = s->map, *out_map = in_map + l;
+    const int *sub_map = s->sub[1].map;
+    TXComplex *tmp1 = s->sub[1].flags & AV_TX_INPLACE ? s->tmp : s->exp;
+    TXComplex *in = _in, *out = _out;
+
+    stride /= sizeof(*out);
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++)
+            s->exp[j] = in[in_map[i*n + j]];
+        s->fn[0](&s->sub[0], &s->tmp[sub_map[i]], s->exp, m*sizeof(TXComplex));
+    }
+
+    for (int i = 0; i < n; i++)
+        s->fn[1](&s->sub[1], &tmp1[m*i], &s->tmp[m*i], sizeof(TXComplex));
+
+    for (int i = 0; i < l; i++)
+        out[i*stride] = tmp1[out_map[i]];
+}
+
+static void TX_NAME(ff_tx_fft_pfa_ns)(AVTXContext *s, void *_out,
+                                      void *_in, ptrdiff_t stride)
+{
+    const int n = s->sub[0].len, m = s->sub[1].len, l = s->len;
+    const int *in_map = s->map, *out_map = in_map + l;
+    const int *sub_map = s->sub[1].map;
+    TXComplex *tmp1 = s->sub[1].flags & AV_TX_INPLACE ? s->tmp : s->exp;
+    TXComplex *in = _in, *out = _out;
+
+    stride /= sizeof(*out);
+
+    for (int i = 0; i < m; i++)
+        s->fn[0](&s->sub[0], &s->tmp[sub_map[i]], &in[i*n], m*sizeof(TXComplex));
+
+    for (int i = 0; i < n; i++)
+        s->fn[1](&s->sub[1], &tmp1[m*i], &s->tmp[m*i], sizeof(TXComplex));
+
+    for (int i = 0; i < l; i++)
+        out[i*stride] = tmp1[out_map[i]];
+}
+
+static const FFTXCodelet TX_NAME(ff_tx_fft_pfa_def) = {
+    .name       = TX_NAME_STR("fft_pfa"),
+    .function   = TX_NAME(ff_tx_fft_pfa),
+    .type       = TX_TYPE(FFT),
+    .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE | FF_TX_OUT_OF_PLACE,
+    .factors    = { 7, 5, 3, 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
+    .min_len    = 2*3,
+    .max_len    = TX_LEN_UNLIMITED,
+    .init       = TX_NAME(ff_tx_fft_pfa_init),
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
+    .prio       = FF_TX_PRIO_BASE,
 };
 
-DECL_COMP_FFT(3)
-DECL_COMP_FFT(5)
-DECL_COMP_FFT(7)
-DECL_COMP_FFT(9)
-DECL_COMP_FFT(15)
+static const FFTXCodelet TX_NAME(ff_tx_fft_pfa_ns_def) = {
+    .name       = TX_NAME_STR("fft_pfa_ns"),
+    .function   = TX_NAME(ff_tx_fft_pfa_ns),
+    .type       = TX_TYPE(FFT),
+    .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE | FF_TX_OUT_OF_PLACE |
+                  FF_TX_PRESHUFFLE,
+    .factors    = { 7, 5, 3, 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
+    .min_len    = 2*3,
+    .max_len    = TX_LEN_UNLIMITED,
+    .init       = TX_NAME(ff_tx_fft_pfa_init),
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
+    .prio       = FF_TX_PRIO_BASE,
+};
 
 static av_cold int TX_NAME(ff_tx_mdct_naive_init)(AVTXContext *s,
                                                   const FFTXCodelet *cd,
@@ -927,6 +1195,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_naive_fwd_def) = {
     .type       = TX_TYPE(MDCT),
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | FF_TX_FORWARD_ONLY,
     .factors    = { 2, TX_FACTOR_ANY }, /* MDCTs need an even length */
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_mdct_naive_init),
@@ -940,6 +1209,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_naive_inv_def) = {
     .type       = TX_TYPE(MDCT),
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | FF_TX_INVERSE_ONLY,
     .factors    = { 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_mdct_naive_init),
@@ -955,7 +1225,9 @@ static av_cold int TX_NAME(ff_tx_mdct_init)(AVTXContext *s,
                                             const void *scale)
 {
     int ret;
-    FFTXCodeletOptions sub_opts = { .invert_lookup = inv };
+    FFTXCodeletOptions sub_opts = {
+        .map_dir = !inv ? FF_TX_MAP_SCATTER : FF_TX_MAP_GATHER,
+    };
 
     s->scale_d = *((SCALE_TYPE *)scale);
     s->scale_f = s->scale_d;
@@ -1072,6 +1344,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_fwd_def) = {
     .type       = TX_TYPE(MDCT),
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | FF_TX_FORWARD_ONLY,
     .factors    = { 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_mdct_init),
@@ -1085,6 +1358,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_inv_def) = {
     .type       = TX_TYPE(MDCT),
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | FF_TX_INVERSE_ONLY,
     .factors    = { 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_mdct_init),
@@ -1137,6 +1411,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_inv_full_def) = {
     .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE |
                   FF_TX_OUT_OF_PLACE | AV_TX_FULL_IMDCT,
     .factors    = { 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_mdct_inv_full_init),
@@ -1152,7 +1427,7 @@ static av_cold int TX_NAME(ff_tx_mdct_pfa_init)(AVTXContext *s,
                                                 const void *scale)
 {
     int ret, sub_len;
-    FFTXCodeletOptions sub_opts = { .invert_lookup = 0 };
+    FFTXCodeletOptions sub_opts = { .map_dir = FF_TX_MAP_SCATTER };
 
     len >>= 1;
     sub_len = len / cd->factors[0];
@@ -1168,8 +1443,12 @@ static av_cold int TX_NAME(ff_tx_mdct_pfa_init)(AVTXContext *s,
                                 sub_len, inv, scale)))
         return ret;
 
-    if ((ret = ff_tx_gen_compound_mapping(s, cd->factors[0], sub_len)))
+    if ((ret = ff_tx_gen_compound_mapping(s, opts, s->inv, cd->factors[0], sub_len)))
         return ret;
+
+    /* Our 15-point transform is also a compound one, so embed its input map */
+    if (cd->factors[0] == 15)
+        TX_EMBED_INPUT_PFA_MAP(s->map, len, 3, 5);
 
     if ((ret = TX_TAB(ff_tx_mdct_gen_exp)(s, inv ? s->map : NULL)))
         return ret;
@@ -1234,6 +1513,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_pfa_##N##xM_inv_def) = {           \
     .type       = TX_TYPE(MDCT),                                               \
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | FF_TX_INVERSE_ONLY,   \
     .factors    = { N, TX_FACTOR_ANY },                                        \
+    .nb_factors = 2,                                                           \
     .min_len    = N*2,                                                         \
     .max_len    = TX_LEN_UNLIMITED,                                            \
     .init       = TX_NAME(ff_tx_mdct_pfa_init),                                \
@@ -1301,6 +1581,7 @@ static const FFTXCodelet TX_NAME(ff_tx_mdct_pfa_##N##xM_fwd_def) = {           \
     .type       = TX_TYPE(MDCT),                                               \
     .flags      = AV_TX_UNALIGNED | FF_TX_OUT_OF_PLACE | FF_TX_FORWARD_ONLY,   \
     .factors    = { N, TX_FACTOR_ANY },                                        \
+    .nb_factors = 2,                                                           \
     .min_len    = N*2,                                                         \
     .max_len    = TX_LEN_UNLIMITED,                                            \
     .init       = TX_NAME(ff_tx_mdct_pfa_init),                                \
@@ -1341,7 +1622,7 @@ static av_cold int TX_NAME(ff_tx_rdft_init)(AVTXContext *s,
     m = (inv ? 2*s->scale_d : s->scale_d);
 
     *tab++ = RESCALE((inv ? 0.5 : 1.0) * m);
-    *tab++ = RESCALE(inv ? 0.5*m : 1.0);
+    *tab++ = RESCALE(inv ? 0.5*m : 1.0*m);
     *tab++ = RESCALE( m);
     *tab++ = RESCALE(-m);
 
@@ -1407,7 +1688,7 @@ static void TX_NAME(ff_tx_rdft_ ##name)(AVTXContext *s, void *_dst,            \
     } else {                                                                   \
         /* Move [0].im to the last position, as convention requires */         \
         data[len2].re = data[0].im;                                            \
-        data[   0].im = 0;                                                     \
+        data[   0].im = data[len2].im = 0;                                     \
     }                                                                          \
 }
 
@@ -1421,6 +1702,7 @@ static const FFTXCodelet TX_NAME(ff_tx_rdft_r2c_def) = {
     .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE |
                   FF_TX_OUT_OF_PLACE | FF_TX_FORWARD_ONLY,
     .factors    = { 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_rdft_init),
@@ -1435,9 +1717,184 @@ static const FFTXCodelet TX_NAME(ff_tx_rdft_c2r_def) = {
     .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE |
                   FF_TX_OUT_OF_PLACE | FF_TX_INVERSE_ONLY,
     .factors    = { 2, TX_FACTOR_ANY },
+    .nb_factors = 2,
     .min_len    = 2,
     .max_len    = TX_LEN_UNLIMITED,
     .init       = TX_NAME(ff_tx_rdft_init),
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
+    .prio       = FF_TX_PRIO_BASE,
+};
+
+static av_cold int TX_NAME(ff_tx_dct_init)(AVTXContext *s,
+                                           const FFTXCodelet *cd,
+                                           uint64_t flags,
+                                           FFTXCodeletOptions *opts,
+                                           int len, int inv,
+                                           const void *scale)
+{
+    int ret;
+    double freq;
+    TXSample *tab;
+    SCALE_TYPE rsc = *((SCALE_TYPE *)scale);
+
+    if (inv) {
+        len *= 2;
+        s->len *= 2;
+        rsc *= 0.5;
+    }
+
+    if ((ret = ff_tx_init_subtx(s, TX_TYPE(RDFT), flags, NULL, len, inv, &rsc)))
+        return ret;
+
+    s->exp = av_malloc((len/2)*3*sizeof(TXSample));
+    if (!s->exp)
+        return AVERROR(ENOMEM);
+
+    tab = (TXSample *)s->exp;
+
+    freq = M_PI/(len*2);
+
+    for (int i = 0; i < len; i++)
+        tab[i] = RESCALE(cos(i*freq)*(!inv + 1));
+
+    if (inv) {
+        for (int i = 0; i < len/2; i++)
+            tab[len + i] = RESCALE(0.5 / sin((2*i + 1)*freq));
+    } else {
+        for (int i = 0; i < len/2; i++)
+            tab[len + i] = RESCALE(cos((len - 2*i - 1)*freq));
+    }
+
+    return 0;
+}
+
+static void TX_NAME(ff_tx_dctII)(AVTXContext *s, void *_dst,
+                                 void *_src, ptrdiff_t stride)
+{
+    TXSample *dst = _dst;
+    TXSample *src = _src;
+    const int len = s->len;
+    const int len2 = len >> 1;
+    const TXSample *exp = (void *)s->exp;
+    TXSample next;
+#ifdef TX_INT32
+    int64_t tmp1, tmp2;
+#else
+    TXSample tmp1, tmp2;
+#endif
+
+    for (int i = 0; i < len2; i++) {
+        TXSample in1 = src[i];
+        TXSample in2 = src[len - i - 1];
+        TXSample s    = exp[len + i];
+
+#ifdef TX_INT32
+        tmp1 = in1 + in2;
+        tmp2 = in1 - in2;
+
+        tmp1 >>= 1;
+        tmp2 *= s;
+
+        tmp2 = (tmp2 + 0x40000000) >> 31;
+#else
+        tmp1 = (in1 + in2)*0.5;
+        tmp2 = (in1 - in2)*s;
+#endif
+
+        src[i]           = tmp1 + tmp2;
+        src[len - i - 1] = tmp1 - tmp2;
+    }
+
+    s->fn[0](&s->sub[0], dst, src, sizeof(TXComplex));
+
+    next = dst[len];
+
+    for (int i = len - 2; i > 0; i -= 2) {
+        TXSample tmp;
+
+        CMUL(tmp, dst[i], exp[len - i], exp[i], dst[i + 0], dst[i + 1]);
+
+        dst[i + 1] = next;
+
+        next += tmp;
+    }
+
+#ifdef TX_INT32
+    tmp1 = ((int64_t)exp[0]) * ((int64_t)dst[0]);
+    dst[0] = (tmp1 + 0x40000000) >> 31;
+#else
+    dst[0] = exp[0] * dst[0];
+#endif
+    dst[1] = next;
+}
+
+static void TX_NAME(ff_tx_dctIII)(AVTXContext *s, void *_dst,
+                                  void *_src, ptrdiff_t stride)
+{
+    TXSample *dst = _dst;
+    TXSample *src = _src;
+    const int len = s->len;
+    const int len2 = len >> 1;
+    const TXSample *exp = (void *)s->exp;
+#ifdef TX_INT32
+    int64_t  tmp1, tmp2 = src[len - 1];
+    tmp2 = (2*tmp2 + 0x40000000) >> 31;
+#else
+    TXSample tmp1, tmp2 = 2*src[len - 1];
+#endif
+
+    src[len] = tmp2;
+
+    for (int i = len - 2; i >= 2; i -= 2) {
+        TXSample val1 = src[i - 0];
+        TXSample val2 = src[i - 1] - src[i + 1];
+
+        CMUL(src[i + 1], src[i], exp[len - i], exp[i], val1, val2);
+    }
+
+    s->fn[0](&s->sub[0], dst, src, sizeof(float));
+
+    for (int i = 0; i < len2; i++) {
+        TXSample in1 = dst[i];
+        TXSample in2 = dst[len - i - 1];
+        TXSample c   = exp[len + i];
+
+        tmp1 = in1 + in2;
+        tmp2 = in1 - in2;
+        tmp2 *= c;
+#ifdef TX_INT32
+        tmp2 = (tmp2 + 0x40000000) >> 31;
+#endif
+
+        dst[i]            = tmp1 + tmp2;
+        dst[len - i - 1]  = tmp1 - tmp2;
+    }
+}
+
+static const FFTXCodelet TX_NAME(ff_tx_dctII_def) = {
+    .name       = TX_NAME_STR("dctII"),
+    .function   = TX_NAME(ff_tx_dctII),
+    .type       = TX_TYPE(DCT),
+    .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE |
+                  FF_TX_OUT_OF_PLACE | FF_TX_FORWARD_ONLY,
+    .factors    = { 2, TX_FACTOR_ANY },
+    .min_len    = 2,
+    .max_len    = TX_LEN_UNLIMITED,
+    .init       = TX_NAME(ff_tx_dct_init),
+    .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
+    .prio       = FF_TX_PRIO_BASE,
+};
+
+static const FFTXCodelet TX_NAME(ff_tx_dctIII_def) = {
+    .name       = TX_NAME_STR("dctIII"),
+    .function   = TX_NAME(ff_tx_dctIII),
+    .type       = TX_TYPE(DCT),
+    .flags      = AV_TX_UNALIGNED | AV_TX_INPLACE |
+                  FF_TX_OUT_OF_PLACE | FF_TX_INVERSE_ONLY,
+    .factors    = { 2, TX_FACTOR_ANY },
+    .min_len    = 2,
+    .max_len    = TX_LEN_UNLIMITED,
+    .init       = TX_NAME(ff_tx_dct_init),
     .cpu_flags  = FF_TX_CPU_FLAGS_ALL,
     .prio       = FF_TX_PRIO_BASE,
 };
@@ -1491,15 +1948,27 @@ const FFTXCodelet * const TX_NAME(ff_tx_codelet_list)[] = {
     &TX_NAME(ff_tx_fft65536_ns_def),
     &TX_NAME(ff_tx_fft131072_ns_def),
 
+    /* Prime factor codelets */
+    &TX_NAME(ff_tx_fft3_ns_def),
+    &TX_NAME(ff_tx_fft5_ns_def),
+    &TX_NAME(ff_tx_fft7_ns_def),
+    &TX_NAME(ff_tx_fft9_ns_def),
+    &TX_NAME(ff_tx_fft15_ns_def),
+
+    /* We get these for free */
+    &TX_NAME(ff_tx_fft3_fwd_def),
+    &TX_NAME(ff_tx_fft5_fwd_def),
+    &TX_NAME(ff_tx_fft7_fwd_def),
+    &TX_NAME(ff_tx_fft9_fwd_def),
+
     /* Standalone transforms */
-    &TX_NAME(ff_tx_fft_sr_def),
-    &TX_NAME(ff_tx_fft_sr_inplace_def),
-    &TX_NAME(ff_tx_fft_pfa_3xM_def),
-    &TX_NAME(ff_tx_fft_pfa_5xM_def),
-    &TX_NAME(ff_tx_fft_pfa_7xM_def),
-    &TX_NAME(ff_tx_fft_pfa_9xM_def),
-    &TX_NAME(ff_tx_fft_pfa_15xM_def),
+    &TX_NAME(ff_tx_fft_def),
+    &TX_NAME(ff_tx_fft_inplace_def),
+    &TX_NAME(ff_tx_fft_inplace_small_def),
+    &TX_NAME(ff_tx_fft_pfa_def),
+    &TX_NAME(ff_tx_fft_pfa_ns_def),
     &TX_NAME(ff_tx_fft_naive_def),
+    &TX_NAME(ff_tx_fft_naive_small_def),
     &TX_NAME(ff_tx_mdct_fwd_def),
     &TX_NAME(ff_tx_mdct_inv_def),
     &TX_NAME(ff_tx_mdct_pfa_3xM_fwd_def),
@@ -1517,6 +1986,8 @@ const FFTXCodelet * const TX_NAME(ff_tx_codelet_list)[] = {
     &TX_NAME(ff_tx_mdct_inv_full_def),
     &TX_NAME(ff_tx_rdft_r2c_def),
     &TX_NAME(ff_tx_rdft_c2r_def),
+    &TX_NAME(ff_tx_dctII_def),
+    &TX_NAME(ff_tx_dctIII_def),
 
     NULL,
 };

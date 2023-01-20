@@ -21,9 +21,15 @@
 #ifndef AVCODEC_SPEEDHQ_H
 #define AVCODEC_SPEEDHQ_H
 
-#include "rl.h"
+#include <stdint.h>
 #include "libavutil/attributes_internal.h"
 
-extern RLTable attribute_visibility_hidden ff_rl_speedhq;
+#define SPEEDHQ_RL_NB_ELEMS 121
+
+FF_VISIBILITY_PUSH_HIDDEN
+extern const uint8_t ff_speedhq_run[SPEEDHQ_RL_NB_ELEMS];
+extern const uint8_t ff_speedhq_level[SPEEDHQ_RL_NB_ELEMS];
+extern const uint16_t ff_speedhq_vlc_table[SPEEDHQ_RL_NB_ELEMS + 2][2];
+FF_VISIBILITY_POP_HIDDEN
 
 #endif /* AVCODEC_SPEEDHQ_H */

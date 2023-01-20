@@ -27,24 +27,12 @@
 #include "simple_idct.h"
 #include "xvididct.h"
 
-av_cold void ff_init_scantable(const uint8_t *permutation, ScanTable *st,
-                               const uint8_t *src_scantable)
+av_cold void ff_permute_scantable(uint8_t dst[64], const uint8_t src[64],
+                                  const uint8_t permutation[64])
 {
-    int i, end;
-
-    st->scantable = src_scantable;
-
-    for (i = 0; i < 64; i++) {
-        int j = src_scantable[i];
-        st->permutated[i] = permutation[j];
-    }
-
-    end = -1;
-    for (i = 0; i < 64; i++) {
-        int j = st->permutated[i];
-        if (j > end)
-            end = j;
-        st->raster_end[i] = end;
+    for (int i = 0; i < 64; i++) {
+        int j = src[i];
+        dst[i] = permutation[j];
     }
 }
 

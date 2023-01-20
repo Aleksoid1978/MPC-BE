@@ -39,7 +39,6 @@
 #include "mathops.h"
 #include "mpeg12data.h"
 #include "mpeg12vlc.h"
-#include "rl.h"
 #include "speedhq.h"
 
 #define MAX_INDEX (64 - 1)
@@ -53,7 +52,7 @@
 typedef struct SHQContext {
     BlockDSPContext bdsp;
     IDCTDSPContext idsp;
-    ScanTable intra_scantable;
+    uint8_t permutated_intra_scantable[64];
     int quant_matrix[64];
     enum { SHQ_SUBSAMPLING_420, SHQ_SUBSAMPLING_422, SHQ_SUBSAMPLING_444 }
         subsampling;
@@ -76,6 +75,8 @@ static VLC dc_lum_vlc_le;
 static VLC dc_chroma_vlc_le;
 static VLC dc_alpha_run_vlc_le;
 static VLC dc_alpha_level_vlc_le;
+
+static RL_VLC_ELEM speedhq_rl_vlc[674];
 
 static inline int decode_dc_le(GetBitContext *gb, int component)
 {
@@ -137,7 +138,7 @@ static inline int decode_alpha_block(const SHQContext *s, GetBitContext *gb, uin
 static inline int decode_dct_block(const SHQContext *s, GetBitContext *gb, int last_dc[4], int component, uint8_t *dest, int linesize)
 {
     const int *quant_matrix = s->quant_matrix;
-    const uint8_t *scantable = s->intra_scantable.permutated;
+    const uint8_t *scantable = s->permutated_intra_scantable;
     LOCAL_ALIGNED_32(int16_t, block, [64]);
     int dc_offset;
 
@@ -154,7 +155,7 @@ static inline int decode_dct_block(const SHQContext *s, GetBitContext *gb, int l
         for ( ;; ) {
             int level, run;
             UPDATE_CACHE_LE(re, gb);
-            GET_RL_VLC(level, run, re, gb, ff_rl_speedhq.rl_vlc[0],
+            GET_RL_VLC(level, run, re, gb, speedhq_rl_vlc,
                        TEX_VLC_BITS, 2, 0);
             if (level == 127) {
                 break;
@@ -564,7 +565,9 @@ static av_cold void speedhq_static_init(void)
                            ff_mpeg12_vlc_dc_chroma_code, 2, 2,
                            INIT_VLC_OUTPUT_LE, 514);
 
-    INIT_2D_VLC_RL(ff_rl_speedhq, 674, INIT_VLC_LE);
+    ff_init_2d_vlc_rl(ff_speedhq_vlc_table, speedhq_rl_vlc, ff_speedhq_run,
+                      ff_speedhq_level, SPEEDHQ_RL_NB_ELEMS,
+                      FF_ARRAY_ELEMS(speedhq_rl_vlc), INIT_VLC_LE);
 
     compute_alpha_vlcs();
 }
@@ -581,7 +584,8 @@ static av_cold int speedhq_decode_init(AVCodecContext *avctx)
 
     ff_blockdsp_init(&s->bdsp);
     ff_idctdsp_init(&s->idsp, avctx);
-    ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable, ff_zigzag_direct);
+    ff_permute_scantable(s->permutated_intra_scantable, ff_zigzag_direct,
+                         s->idsp.idct_permutation);
 
     switch (avctx->codec_tag) {
     case MKTAG('S', 'H', 'Q', '0'):

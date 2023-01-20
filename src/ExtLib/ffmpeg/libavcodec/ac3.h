@@ -38,8 +38,6 @@
 
 #if USE_FIXED
 
-#define FFT_FLOAT 0
-
 #define FIXR(a)                 ((int)((a) * 0 + 0.5))
 #define FIXR12(a)               ((int)((a) * 4096 + 0.5))
 #define FIXR15(a)               ((int)((a) * 32768 + 0.5))
@@ -55,6 +53,7 @@
 #define AC3_DYNAMIC_RANGE1      0
 
 typedef int                     INTFLOAT;
+typedef unsigned int            UINTFLOAT;
 typedef int16_t                 SHORTFLOAT;
 
 #else /* USE_FIXED */
@@ -75,6 +74,7 @@ typedef int16_t                 SHORTFLOAT;
 #define AC3_DYNAMIC_RANGE1      1.0f
 
 typedef float                   INTFLOAT;
+typedef float                   UINTFLOAT;
 typedef float                   SHORTFLOAT;
 
 #endif /* USE_FIXED */

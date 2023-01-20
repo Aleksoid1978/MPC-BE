@@ -27,8 +27,6 @@
  * MSMPEG4 backend for encoder and decoder
  */
 
-#include "config_components.h"
-
 #include "libavutil/thread.h"
 
 #include "avcodec.h"
@@ -38,9 +36,8 @@
 #include "libavutil/x86/asm.h"
 #include "mpeg4videodata.h"
 #include "msmpeg4data.h"
+#include "msmpeg4_vc1_data.h"
 #include "mpegvideodata.h"
-#include "vc1data.h"
-#include "libavutil/imgutils.h"
 
 /*
  * You can also call this codec: MPEG-4 with a twist!
@@ -138,21 +135,15 @@ av_cold void ff_msmpeg4_common_init(MpegEncContext *s)
         s->y_dc_scale_table= ff_wmv1_y_dc_scale_table;
         s->c_dc_scale_table= ff_wmv1_c_dc_scale_table;
         break;
-#if CONFIG_VC1_DECODER
-    case 6:
-        s->y_dc_scale_table= ff_wmv3_dc_scale_table;
-        s->c_dc_scale_table= ff_wmv3_dc_scale_table;
-        break;
-#endif
-
     }
-
 
     if(s->msmpeg4_version>=4){
         ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable,   ff_wmv1_scantable[1]);
-        ff_init_scantable(s->idsp.idct_permutation, &s->intra_h_scantable, ff_wmv1_scantable[2]);
-        ff_init_scantable(s->idsp.idct_permutation, &s->intra_v_scantable, ff_wmv1_scantable[3]);
         ff_init_scantable(s->idsp.idct_permutation, &s->inter_scantable,   ff_wmv1_scantable[0]);
+        ff_permute_scantable(s->permutated_intra_h_scantable, ff_wmv1_scantable[2],
+                             s->idsp.idct_permutation);
+        ff_permute_scantable(s->permutated_intra_v_scantable, ff_wmv1_scantable[3],
+                             s->idsp.idct_permutation);
     }
     //Note the default tables are set in common_init in mpegvideo.c
 

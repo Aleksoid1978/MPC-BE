@@ -812,7 +812,8 @@ static int process_options(AVFilterContext *ctx, AVDictionary **options,
     while (*args) {
         const char *shorthand = NULL;
 
-        o = av_opt_next(ctx->priv, o);
+        if (ctx->filter->priv_class)
+            o = av_opt_next(ctx->priv, o);
         if (o) {
             if (o->type == AV_OPT_TYPE_CONST || o->offset == offset)
                 continue;
@@ -835,33 +836,17 @@ static int process_options(AVFilterContext *ctx, AVDictionary **options,
             args++;
         if (parsed_key) {
             key = parsed_key;
-            while ((o = av_opt_next(ctx->priv, o))); /* discard all remaining shorthand */
+
+            /* discard all remaining shorthand */
+            if (ctx->filter->priv_class)
+                while ((o = av_opt_next(ctx->priv, o)));
         } else {
             key = shorthand;
         }
 
         av_log(ctx, AV_LOG_DEBUG, "Setting '%s' to value '%s'\n", key, value);
 
-        if (av_opt_find(ctx, key, NULL, 0, 0)) {
-            ret = av_opt_set(ctx, key, value, 0);
-            if (ret < 0) {
-                av_free(value);
-                av_free(parsed_key);
-                return ret;
-            }
-        } else {
-            o = av_opt_find(ctx->priv, key, NULL, 0,
-                            AV_OPT_SEARCH_CHILDREN | AV_OPT_SEARCH_FAKE_OBJ);
-            if (!o) {
-                av_log(ctx, AV_LOG_ERROR, "Option '%s' not found\n", key);
-                av_free(value);
-                av_free(parsed_key);
-                return AVERROR_OPTION_NOT_FOUND;
-            }
-            av_dict_set(options, key, value,
-                        (o->type == AV_OPT_TYPE_FLAGS &&
-                         (value[0] == '-' || value[0] == '+')) ? AV_DICT_APPEND : 0);
-        }
+        av_dict_set(options, key, value, AV_DICT_MULTIKEY);
 
         av_free(value);
         av_free(parsed_key);
@@ -887,7 +872,7 @@ int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
 {
     int ret = 0;
 
-    ret = av_opt_set_dict(ctx, options);
+    ret = av_opt_set_dict2(ctx, options, AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
         av_log(ctx, AV_LOG_ERROR, "Error applying generic filter options.\n");
         return ret;
@@ -902,18 +887,8 @@ int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
         ctx->thread_type = 0;
     }
 
-    if (ctx->filter->priv_class) {
-        ret = av_opt_set_dict2(ctx->priv, options, AV_OPT_SEARCH_CHILDREN);
-        if (ret < 0) {
-            av_log(ctx, AV_LOG_ERROR, "Error applying options to the filter.\n");
-            return ret;
-        }
-    }
-
     if (ctx->filter->init)
         ret = ctx->filter->init(ctx);
-    else if (ctx->filter->init_dict)
-        ret = ctx->filter->init_dict(ctx, options);
     if (ret < 0)
         return ret;
 
@@ -933,12 +908,6 @@ int avfilter_init_str(AVFilterContext *filter, const char *args)
     int ret = 0;
 
     if (args && *args) {
-        if (!filter->filter->priv_class) {
-            av_log(filter, AV_LOG_ERROR, "This filter does not take any "
-                   "options, but options were provided: %s.\n", args);
-            return AVERROR(EINVAL);
-        }
-
         ret = process_options(filter, &options, args);
         if (ret < 0)
             goto fail;

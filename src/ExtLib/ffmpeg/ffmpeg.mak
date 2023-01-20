@@ -275,6 +275,9 @@ SRCS_LC = \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
 	libavcodec/h2645_parse.c \
+	libavcodec/h2645_sei.c \
+	libavcodec/h2645_vui.c \
+	libavcodec/h2645data.c \
 	libavcodec/h274.c \
 	libavcodec/half2float.c \
 	libavcodec/hap.c \
@@ -318,6 +321,7 @@ SRCS_LC = \
 	libavcodec/ivi_dsp.c \
 	libavcodec/jpegls.c \
 	libavcodec/jpeglsdec.c \
+	libavcodec/jpegquanttables.c \
 	libavcodec/jpegtables.c \
 	libavcodec/jrevdct.c \
 	libavcodec/kbdwin.c \
@@ -336,9 +340,7 @@ SRCS_LC = \
 	libavcodec/me_cmp.c \
 	libavcodec/mdct_fixed_32.c \
 	libavcodec/mdct_float.c \
-	libavcodec/mdct15.c \
 	libavcodec/metasound.c \
-	libavcodec/metasound_data.c \
 	libavcodec/mjpeg_parser.c \
 	libavcodec/mjpeg2jpeg_bsf.c \
 	libavcodec/mjpega_dump_header_bsf.c \
@@ -392,6 +394,7 @@ SRCS_LC = \
 	libavcodec/mpegvideodata.c \
 	libavcodec/mpegvideoencdsp.c \
 	libavcodec/msmpeg4.c \
+	libavcodec/msmpeg4_vc1_data.c \
 	libavcodec/msmpeg4data.c \
 	libavcodec/msmpeg4dec.c \
 	libavcodec/msrle.c \
@@ -600,7 +603,6 @@ SRCS_LC_B = \
 	libavcodec/x86/idctdsp_init.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
-	libavcodec/x86/mdct15_init.c \
 	libavcodec/x86/me_cmp_init.c \
 	libavcodec/x86/mlpdsp_init.c \
 	libavcodec/x86/mpeg4videodsp.c \
@@ -654,6 +656,7 @@ SRCS_LF = \
 	libavfilter/video.c
 
 SRCS_LU = \
+	libavutil/ambient_viewing_environment.c \
 	libavutil/audio_fifo.c \
 	libavutil/avsscanf.c \
 	libavutil/avstring.c \
@@ -805,7 +808,6 @@ SRCS_YASM_LC = \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
-	libavcodec/x86/mdct15.asm \
 	libavcodec/x86/me_cmp.asm \
 	libavcodec/x86/mlpdsp.asm \
 	libavcodec/x86/mpegvideoencdsp.asm \
