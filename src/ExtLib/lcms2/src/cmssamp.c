@@ -123,10 +123,9 @@ cmsBool  BlackPointAsDarkerColorant(cmsHPROFILE    hInput,
     // Convert black to Lab
     cmsDoTransform(xform, Black, &Lab, 1);
 
-    // Force it to be neutral, clip to max. L* of 50
+    // Force it to be neutral, check for inconsistences
     Lab.a = Lab.b = 0;
-    if (Lab.L > 50) Lab.L = 50;
-    if (Lab.L < 0) Lab.L = 0;
+    if (Lab.L > 50 || Lab.L < 0) Lab.L = 0;
 
     // Free the resources
     cmsDeleteTransform(xform);

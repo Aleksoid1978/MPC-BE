@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.14 rc1
+// Version 2.14 
 //
 
 #ifndef _lcms2_H
@@ -81,7 +81,7 @@ extern "C" {
 #endif
 
 // Version/release
-#define LCMS_VERSION        2140
+#define LCMS_VERSION        2150
 
 // I will give the chance of redefining basic types for compilers that are not fully C99 compliant
 #ifndef CMS_BASIC_TYPES_ALREADY_DEFINED
@@ -227,7 +227,7 @@ typedef int                  cmsBool;
 
 
 // Calling convention -- this is hardly platform and compiler dependent
-#ifdef CMS_IS_WINDOWS_
+#if defined(CMS_IS_WINDOWS_) && !defined(__GNUC__)
 #  if defined(CMS_DLL) || defined(CMS_DLL_BUILD)
 #     ifdef __BORLANDC__
 #        define CMSEXPORT       __stdcall _export

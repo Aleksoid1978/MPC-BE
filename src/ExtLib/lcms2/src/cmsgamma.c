@@ -823,6 +823,10 @@ cmsToneCurve* CMSEXPORT cmsBuildTabulatedToneCurveFloat(cmsContext ContextID, cm
 {
     cmsCurveSegment Seg[3];
 
+    // Do some housekeeping
+    if (nEntries == 0 || values == NULL)
+        return NULL;
+
     // A segmented tone curve should have function segments in the first and last positions
     // Initialize segmented curve part up to 0 to constant value = samples[0]
     Seg[0].x0 = MINUS_INF;

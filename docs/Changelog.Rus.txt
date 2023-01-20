@@ -39,6 +39,7 @@ EVR-CP теперь может быть использован в качеств
 Обновлен итальянский перевод (автор mapi68).
 
 Обновлены библиотеки:
+	Little-CMS git-lcms2.14-44-ge71aeb6;
 	MediaInfo git-v22.12-17-gaa0dc68a2;
 	nanosvg git-9da543e.
 

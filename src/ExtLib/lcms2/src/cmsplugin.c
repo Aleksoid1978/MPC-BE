@@ -795,9 +795,7 @@ void* _cmsContextGetClientChunk(cmsContext ContextID, _cmsMemoryClient mc)
 // many different plug-ins simultaneously, then there is no way to 
 // identify which plug-in to unregister.
 void CMSEXPORT cmsUnregisterPluginsTHR(cmsContext ContextID)
-{
-    struct _cmsContext_struct* ctx = _cmsGetContext(ContextID);
-
+{    
     _cmsRegisterMemHandlerPlugin(ContextID, NULL);
     _cmsRegisterInterpPlugin(ContextID, NULL);
     _cmsRegisterTagTypePlugin(ContextID, NULL);
@@ -811,9 +809,6 @@ void CMSEXPORT cmsUnregisterPluginsTHR(cmsContext ContextID)
     _cmsRegisterMutexPlugin(ContextID, NULL);
     _cmsRegisterParallelizationPlugin(ContextID, NULL);
 
-   if (ctx->MemPool != NULL)
-       _cmsSubAllocDestroy(ctx->MemPool);
-   ctx->MemPool = NULL;
 }
 
 
@@ -981,7 +976,14 @@ cmsContext CMSEXPORT cmsDupContext(cmsContext ContextID, void* NewUserData)
 // The ContextID can no longer be used in any THR operation.  
 void CMSEXPORT cmsDeleteContext(cmsContext ContextID)
 {
-    if (ContextID != NULL) {
+    if (ContextID == NULL) {
+
+        cmsUnregisterPlugins();
+        if (globalContext.MemPool != NULL)
+            _cmsSubAllocDestroy(globalContext.MemPool);
+        globalContext.MemPool = NULL;
+    }
+    else {
 
         struct _cmsContext_struct* ctx = (struct _cmsContext_struct*) ContextID;              
         struct _cmsContext_struct  fakeContext;  

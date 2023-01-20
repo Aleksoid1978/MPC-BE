@@ -39,6 +39,7 @@ Updated Korean translation (by Potmarigold and Hackjjang).
 Updated Italian translation (by mapi68).
 
 Updated libraries:
+	Little-CMS git-lcms2.14-44-ge71aeb6;
 	MediaInfo git-v22.12-17-gaa0dc68a2;
 	nanosvg git-9da543e.
 

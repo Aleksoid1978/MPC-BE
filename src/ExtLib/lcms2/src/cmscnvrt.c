@@ -234,7 +234,7 @@ cmsFloat64Number CHAD2Temp(const cmsMAT3* Chad)
 
 // Compute a CHAD based on a given temperature
 static
-    void Temp2CHAD(cmsMAT3* Chad, cmsFloat64Number Temp)
+void Temp2CHAD(cmsMAT3* Chad, cmsFloat64Number Temp)
 {
     cmsCIEXYZ White;
     cmsCIExyY ChromaticityOfWhite;
@@ -370,11 +370,11 @@ cmsBool ComputeConversion(cmsUInt32Number i,
         cmsCIEXYZ WhitePointIn, WhitePointOut;
         cmsMAT3 ChromaticAdaptationMatrixIn, ChromaticAdaptationMatrixOut;
 
-        _cmsReadMediaWhitePoint(&WhitePointIn,  hProfiles[i-1]);
-        _cmsReadCHAD(&ChromaticAdaptationMatrixIn, hProfiles[i-1]);
+        if (!_cmsReadMediaWhitePoint(&WhitePointIn, hProfiles[i - 1])) return FALSE;
+        if (!_cmsReadCHAD(&ChromaticAdaptationMatrixIn, hProfiles[i - 1])) return FALSE;
 
-        _cmsReadMediaWhitePoint(&WhitePointOut,  hProfiles[i]);
-        _cmsReadCHAD(&ChromaticAdaptationMatrixOut, hProfiles[i]);
+        if (!_cmsReadMediaWhitePoint(&WhitePointOut, hProfiles[i])) return FALSE;
+        if (!_cmsReadCHAD(&ChromaticAdaptationMatrixOut, hProfiles[i])) return FALSE;
 
         if (!ComputeAbsoluteIntent(AdaptationState,
                                   &WhitePointIn,  &ChromaticAdaptationMatrixIn,
