@@ -54,7 +54,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 			var.Clear();
 			if (SUCCEEDED(pPB->Read(CComBSTR(L"LYRICS"), &var, nullptr))) {
 				m_descText = var.bstrVal;
-				if (m_descText.Find('\n') && m_descText.Find(L"\r\n") == -1) {
+				if (m_descText.Find(L'\n') && m_descText.Find(L"\r\n") == -1) {
 					m_descText.Replace(L"\n", L"\r\n");
 				}
 			}
@@ -80,6 +80,9 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 			}
 			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && bstr.Length()) {
 				m_descText = bstr.m_str;
+				if (m_descText.Find(L'\n') && m_descText.Find(L"\r\n") == -1) {
+					m_descText.Replace(L"\n", L"\r\n");
+				}
 				m_descText.Replace(L";", L"\r\n");
 				bstr.Empty();
 			}
