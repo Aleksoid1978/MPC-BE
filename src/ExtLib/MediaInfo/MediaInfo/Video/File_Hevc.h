@@ -474,10 +474,12 @@ private :
     enum hdr_format
     {
         HdrFormat_EtsiTs103433,
+        HdrFormat_HdrVivid,
         HdrFormat_SmpteSt209440,
         HdrFormat_SmpteSt2086,
+        HdrFormat_Max,
     };
-    typedef std::map<hdr_format, std::map<video, Ztring> > hdr;
+    typedef std::map<video, Ztring[HdrFormat_Max]> hdr;
     hdr                                 HDR;
     Ztring                              EtsiTS103433;
     int32u  chroma_format_idc;

@@ -284,51 +284,65 @@ void File_Hevc::Streams_Fill()
     Fill(Stream_Video, 0, Video_Encoded_Library_Name, Encoded_Library_Name);
     Fill(Stream_Video, 0, Video_Encoded_Library_Version, Encoded_Library_Version);
     Fill(Stream_Video, 0, Video_Encoded_Library_Settings, Encoded_Library_Settings);
-    hdr::iterator EtsiTs103433=HDR.find(HdrFormat_EtsiTs103433);
-    if (EtsiTs103433!=HDR.end())
+
+    //Merge info about different HDR formats
+    auto HDR_Format=HDR.find(Video_HDR_Format);
+    if (HDR_Format!=HDR.end())
     {
-        for (std::map<video, Ztring>::iterator Item=EtsiTs103433->second.begin(); Item!=EtsiTs103433->second.end(); ++Item)
-        {
-            Fill(Stream_Video, 0, Item->first, Item->second);
-        }
-    }
-    hdr::iterator SmpteSt209440=HDR.find(HdrFormat_SmpteSt209440);
-    if (SmpteSt209440!=HDR.end())
-    {
-        for (std::map<video, Ztring>::iterator Item=SmpteSt209440->second.begin(); Item!=SmpteSt209440->second.end(); ++Item)
-        {
-            switch (Item->first)
+        bitset<HdrFormat_Max> HDR_Present;
+        size_t HDR_FirstFormatPos=(size_t)-1;
+        for (size_t i=0; i<HdrFormat_Max; i++)
+            if (!HDR_Format->second[i].empty())
             {
-                case Video_MasteringDisplay_ColorPrimaries:
-                case Video_MasteringDisplay_Luminance:
-                    if (Retrieve_Const(Stream_Video, 0, Item->first)==Item->second)
+                if (HDR_FirstFormatPos==(size_t)-1)
+                    HDR_FirstFormatPos=i;
+                HDR_Present[i]=true;
+            }
+        bool LegacyStreamDisplay=MediaInfoLib::Config.LegacyStreamDisplay_Get();
+        for (const auto& HDR_Item: HDR)
+        {
+            size_t i=HDR_FirstFormatPos;
+            size_t HDR_FirstFieldNonEmpty=(size_t)-1;
+            if (HDR_Item.first>Video_HDR_Format_Compatibility)
+            {
+                for (; i<HdrFormat_Max; i++)
+                {
+                    if (!HDR_Present[i])
+                        continue;
+                    if (HDR_FirstFieldNonEmpty==(size_t)-1 && !HDR_Item.second[i].empty())
+                        HDR_FirstFieldNonEmpty=i;
+                    if (!HDR_Item.second[i].empty() && HDR_Item.second[i]!=HDR_Item.second[HDR_FirstFieldNonEmpty])
                         break;
-                    // Fallthrough
-                default:
-                    Fill(Stream_Video, 0, Item->first, Item->second);
+                }
             }
-        }
-    }
-    hdr::iterator SmpteSt2086=HDR.find(HdrFormat_SmpteSt2086);
-    if (SmpteSt2086!=HDR.end())
-    {
-        for (std::map<video, Ztring>::iterator Item=SmpteSt2086->second.begin(); Item!=SmpteSt2086->second.end(); ++Item)
-        {
-            bool Ignore=false;
-            switch (Item->first)
+            if (i==HdrFormat_Max)
+                Fill(Stream_Video, 0, HDR_Item.first, HDR_Item.second[HDR_FirstFieldNonEmpty]);
+            else if (!LegacyStreamDisplay)
             {
-                case Video_HDR_Format:
-                    Ignore=!Retrieve_Const(Stream_Video, 0, Item->first).empty();
-                    break;
-                case Video_MasteringDisplay_ColorPrimaries:
-                case Video_MasteringDisplay_Luminance:
-                    Ignore=Retrieve_Const(Stream_Video, 0, Item->first)==Item->second;
-                    break;
-                default:
-                    Ignore=false;
+                for (i=HDR_FirstFormatPos; i<HdrFormat_Max; i++)
+                {
+                    if (!HDR_Present[i])
+                        continue;
+                    if (HDR_Item.first<=Video_HDR_Format_Compatibility || !HDR_Item.second[i].empty())
+                    {
+                        Fill(Stream_Video, 0, HDR_Item.first, HDR_Item.second[i]);
+                        break;
+                    }
+                }
             }
-            if (!Ignore)
-                Fill(Stream_Video, 0, Item->first, Item->second);
+            else
+            {
+                ZtringList Value;
+                Value.Separator_Set(0, __T(" / "));
+                if (i!=HdrFormat_Max)
+                    for (i=HDR_FirstFormatPos; i<HdrFormat_Max; i++)
+                    {
+                        if (!HDR_Present[i])
+                            continue;
+                        Value.push_back(HDR_Item.second[i]);
+                    }
+                Fill(Stream_Video, 0, HDR_Item.first, Value.Read());
+            }
         }
     }
     if (!EtsiTS103433.empty())
@@ -2486,19 +2500,19 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003A_00()
             Get_B1 (k_coefficient_value[i],                     "k_coefficient_value");
 
         FILLING_BEGIN()
-            std::map<video, Ztring>& EtsiTs103433=HDR[HdrFormat_EtsiTs103433];
-            Ztring& HDR_Format=EtsiTs103433[Video_HDR_Format];
+            auto& HDR_Format=HDR[Video_HDR_Format][HdrFormat_EtsiTs103433];
             if (HDR_Format.empty())
             {
                 HDR_Format=__T("SL-HDR")+Ztring().From_Number(sl_hdr_mode_value_minus1+1);
-                EtsiTs103433[Video_HDR_Format_Version]=Ztring().From_Number(sl_hdr_spec_major_version_idc)+__T('.')+Ztring().From_Number(sl_hdr_spec_minor_version_idc);
-                Get_MasteringDisplayColorVolume(EtsiTs103433[Video_MasteringDisplay_ColorPrimaries], EtsiTs103433[Video_MasteringDisplay_Luminance], Meta);
+                HDR[Video_HDR_Format_Version][HdrFormat_EtsiTs103433]=Ztring().From_Number(sl_hdr_spec_major_version_idc)+__T('.')+Ztring().From_Number(sl_hdr_spec_minor_version_idc);
+                Get_MasteringDisplayColorVolume(HDR[Video_MasteringDisplay_ColorPrimaries][HdrFormat_EtsiTs103433], HDR[Video_MasteringDisplay_Luminance][HdrFormat_EtsiTs103433], Meta);
+                auto& HDR_Format_Settings=HDR[Video_HDR_Format_Settings][HdrFormat_EtsiTs103433];
                 if (sl_hdr_payload_mode<2)
-                    EtsiTs103433[Video_HDR_Format_Settings]=sl_hdr_payload_mode?__T("Table-based"):__T("Parameter-based");
+                    HDR_Format_Settings=sl_hdr_payload_mode?__T("Table-based"):__T("Parameter-based");
                 else
-                    EtsiTs103433[Video_HDR_Format_Settings]=__T("Payload Mode ") + Ztring().From_Number(sl_hdr_payload_mode);
+                    HDR_Format_Settings=__T("Payload Mode ") + Ztring().From_Number(sl_hdr_payload_mode);
                 if (!sl_hdr_mode_value_minus1)
-                    EtsiTs103433[Video_HDR_Format_Settings]+=k_coefficient_value[0]==0 && k_coefficient_value[1]==0 && k_coefficient_value[2]==0?__T(", non-constant"):__T(", constant");
+                    HDR_Format_Settings+=k_coefficient_value[0]==0 && k_coefficient_value[1]==0 && k_coefficient_value[2]==0?__T(", non-constant"):__T(", constant");
 
                 EtsiTS103433 = __T("SL-HDR") + Ztring().From_Number(sl_hdr_mode_value_minus1 + 1);
                 if (!sl_hdr_mode_value_minus1)
@@ -2672,14 +2686,13 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04()
     }
 
     FILLING_BEGIN();
-        std::map<video, Ztring>& SmpteSt209440=HDR[HdrFormat_SmpteSt209440];
-        Ztring& HDR_Format=SmpteSt209440[Video_HDR_Format];
+        auto& HDR_Format=HDR[Video_HDR_Format][HdrFormat_SmpteSt209440];
         if (HDR_Format.empty())
         {
             HDR_Format=__T("SMPTE ST 2094 App 4");
-            SmpteSt209440[Video_HDR_Format_Version].From_Number(application_version);
+            HDR[Video_HDR_Format_Version][HdrFormat_SmpteSt209440].From_Number(application_version);
             if (IsHDRplus)
-                SmpteSt209440[Video_HDR_Format_Compatibility]=tone_mapping_flag?__T("HDR10+ Profile B"):__T("HDR10+ Profile A");
+                HDR[Video_HDR_Format_Compatibility][HdrFormat_SmpteSt209440]=tone_mapping_flag?__T("HDR10+ Profile B"):__T("HDR10+ Profile A");
         }
     FILLING_END();
 }
@@ -2893,14 +2906,13 @@ void File_Hevc::sei_message_mastering_display_colour_volume()
 {
     Element_Info1("mastering_display_colour_volume");
 
-    std::map<video, Ztring>& SmpteSt2086=HDR[HdrFormat_SmpteSt2086];
-    Ztring& HDR_Format=SmpteSt2086[Video_HDR_Format];
+    auto& HDR_Format=HDR[Video_HDR_Format][HdrFormat_SmpteSt2086];
     if (HDR_Format.empty())
     {
         HDR_Format=__T("SMPTE ST 2086");
-        SmpteSt2086[Video_HDR_Format_Compatibility]="HDR10";
+        HDR[Video_HDR_Format_Compatibility][HdrFormat_SmpteSt2086]="HDR10";
     }
-    Get_MasteringDisplayColorVolume(SmpteSt2086[Video_MasteringDisplay_ColorPrimaries], SmpteSt2086[Video_MasteringDisplay_Luminance]);
+    Get_MasteringDisplayColorVolume(HDR[Video_MasteringDisplay_ColorPrimaries][HdrFormat_SmpteSt2086], HDR[Video_MasteringDisplay_Luminance][HdrFormat_SmpteSt2086]);
 }
 
 //---------------------------------------------------------------------------

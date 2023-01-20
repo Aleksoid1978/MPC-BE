@@ -67,6 +67,7 @@ Ztring Xml_Name_Escape_0_7_78 (const Ztring &Name)
 {
     Ztring ToReturn(Name);
     ToReturn.FindAndReplace(__T(" "), __T("_"), 0, Ztring_Recursive);
+    ToReturn.FindAndReplace(__T("-"), Ztring(), 0, Ztring_Recursive);
     ToReturn.FindAndReplace(__T("/"), __T("_"), 0, Ztring_Recursive);
     ToReturn.FindAndReplace(__T("("), Ztring(), 0, Ztring_Recursive);
     ToReturn.FindAndReplace(__T(")"), Ztring(), 0, Ztring_Recursive);
@@ -81,7 +82,6 @@ Ztring Xml_Name_Escape_0_7_78 (const Ztring &Name)
         if (!(ToReturn[ToReturn_Pos]>=__T('A') && ToReturn[ToReturn_Pos]<=__T('Z'))
          && !(ToReturn[ToReturn_Pos]>=__T('a') && ToReturn[ToReturn_Pos]<=__T('z'))
          && !(ToReturn[ToReturn_Pos]>=__T('0') && ToReturn[ToReturn_Pos]<=__T('9'))
-         && !(ToReturn[ToReturn_Pos]==__T('-')) // Authorized if not first pos
          && !(ToReturn[ToReturn_Pos]==__T('_')))
             ToReturn.erase(ToReturn_Pos, 1);
         else

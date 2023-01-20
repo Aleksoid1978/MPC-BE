@@ -70,7 +70,7 @@ inline void add_dec_2chars(string& In, uint8_t Value)
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
-void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance)
+void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, bool FromAV1)
 {
     //Parsing
     mastering_metadata_2086 Meta;
@@ -86,7 +86,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 
     FILLING_BEGIN();
         if (MasteringDisplay_ColorPrimaries.empty())
-            Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, Meta);
+            Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, Meta, FromAV1);
     FILLING_END();
 }
 #endif
@@ -158,7 +158,7 @@ Ztring MasteringDisplayColorVolume_Values_Compute(int16u Values[8])
     +__T(", White point: x=")+Ztring::ToZtring(((float64)Values[3*2  ])/50000, 6)
                 +__T(  " y=")+Ztring::ToZtring(((float64)Values[3*2+1])/50000, 6);
 }
-void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta)
+void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta, bool FromAV1)
 {
     if (!MasteringDisplay_ColorPrimaries.empty())
         return; // Use the first one
@@ -167,13 +167,19 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
     for (int8u i=0; i<8; i++)
         if (Meta.Primaries[i]==(int16u)-1)
             IsNotValid=true;
+        else if (FromAV1)
+            Meta.Primaries[i]=(int16u)(((int32u)Meta.Primaries[i]*50000+32768)>>16); // 0.16 fixed-point, MPEG values are x50000
     if (!IsNotValid)
         MasteringDisplay_ColorPrimaries=MasteringDisplayColorVolume_Values_Compute(Meta.Primaries);
 
     if (Meta.Luminance[0]!=(int32u)-1 && Meta.Luminance[1]!=(int32u)-1)
-        MasteringDisplay_Luminance=        __T("min: ")+Ztring::ToZtring(((float64)Meta.Luminance[0])/10000, 4)
-                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/10000, ((float64)Meta.Luminance[1]/10000-Meta.Luminance[1]/10000==0)?0:4)
+    {
+        float32 Luminance_Min_Ratio=FromAV1?16384:10000; // 18.14 fixed-point, MPEG values are x10000
+        float32 Luminance_Max_Ratio=FromAV1?256:10000; // 24.8 fixed-point, MPEG values are x10000
+        MasteringDisplay_Luminance=        __T("min: ")+Ztring::ToZtring(((float64)Meta.Luminance[0])/Luminance_Min_Ratio, 4)
+                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/Luminance_Max_Ratio, ((float64)Meta.Luminance[1]/Luminance_Max_Ratio-Meta.Luminance[1]/Luminance_Max_Ratio==0)?0:4)
                                   +__T(" cd/m2");
+    }
 }
 #endif
 
@@ -2055,6 +2061,11 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
             {
                 Ztring Container_Value=HDR_Temp[i-Video_HDR_Format];
                 Ztring Stream_Value=ToAdd.Retrieve(Stream_Video, StreamPos_From, i);
+                ZtringList Stream_Values;
+                Stream_Values.Separator_Set(0, __T(" / "));
+                Stream_Values.Write(Stream_Value);
+                if (i==Video_HDR_Format && Stream_Values.Find(Container_Value)!=Error)
+                    break;
                 if (!Container_Value.empty() || !Stream_Value.empty())
                     Container_Value+=__T(" / ");
                 Container_Value+=Stream_Value;

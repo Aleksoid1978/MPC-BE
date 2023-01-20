@@ -126,6 +126,7 @@ static const char* Xml_Extra_N_NIY[] =
     "region_vertical_address",
     "region_width",
     "subtitle_stream_id",
+    NULL,
 };
 
 static const char* Xml_Extra_N_NT[] =

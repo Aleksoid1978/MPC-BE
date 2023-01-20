@@ -135,6 +135,8 @@ void File_Av1::Streams_Finish()
     Fill(Stream_Video, 0, Video_Format_Settings_GOP, GOP_Detect(GOP));
     if (!MasteringDisplay_ColorPrimaries.empty())
     {
+        Fill(Stream_Video, 0, "HDR_Format", "SMPTE ST 2086");
+        Fill(Stream_Video, 0, "HDR_Format_Compatibility", "HDR10");
         Fill(Stream_Video, 0, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries);
         Fill(Stream_Video, 0, "MasteringDisplay_Luminance", MasteringDisplay_Luminance);
     }
@@ -531,7 +533,7 @@ void File_Av1::metadata_hdr_cll()
 void File_Av1::metadata_hdr_mdcv()
 {
     //Parsing
-    Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance);
+    Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, true);
 }
 
 //---------------------------------------------------------------------------

@@ -17906,20 +17906,23 @@ void File_Mxf::ChooseParser_Ffv1(const essences::iterator &Essence, const descri
     //Filling
     #if defined(MEDIAINFO_FFV1_YES)
         File__Analyze* Parser=NULL;
-        if (Descriptor->second.Parser)
+        if (Descriptor!=Descriptors.end())
         {
-            Essence->second.Parsers.push_back(Descriptor->second.Parser);
-            Descriptor->second.Parser=NULL;
-        }
-        else
-        {
-            for (size_t i=0; i<Descriptor->second.SubDescriptors.size(); i++)
+            if (Descriptor->second.Parser)
             {
-                descriptors::iterator Sub=Descriptors.find(Descriptor->second.SubDescriptors[i]);
-                if (Sub!=Descriptors.end() && Sub->second.Parser)
+                Essence->second.Parsers.push_back(Descriptor->second.Parser);
+                Descriptor->second.Parser=NULL;
+            }
+            else
+            {
+                for (size_t i=0; i<Descriptor->second.SubDescriptors.size(); i++)
                 {
-                    Essence->second.Parsers.push_back(Sub->second.Parser);
-                    Sub->second.Parser=NULL;
+                    descriptors::iterator Sub=Descriptors.find(Descriptor->second.SubDescriptors[i]);
+                    if (Sub!=Descriptors.end() && Sub->second.Parser)
+                    {
+                        Essence->second.Parsers.push_back(Sub->second.Parser);
+                        Sub->second.Parser=NULL;
+                    }
                 }
             }
         }
@@ -17928,8 +17931,16 @@ void File_Mxf::ChooseParser_Ffv1(const essences::iterator &Essence, const descri
         for (size_t i=0; i<Essence->second.Parsers.size(); i++)
         {
             File_Ffv1* Parser=(File_Ffv1*)Essence->second.Parsers[i]; // TODO
-            Parser->Width=Descriptor->second.Width;
-            Parser->Height=Descriptor->second.Height;
+            if (Descriptor!=Descriptors.end())
+            {
+                Parser->Width=Descriptor->second.Width;
+                Parser->Height=Descriptor->second.Height;
+            }
+            else
+            {
+                Parser->Width=0;
+                Parser->Height=0;
+            }
         }
     #else
         //Filling

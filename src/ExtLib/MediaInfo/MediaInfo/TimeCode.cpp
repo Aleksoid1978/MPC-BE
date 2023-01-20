@@ -685,7 +685,7 @@ Ztring Date_MJD(int16u Date_)
     int Y =Y2+K;
     int M =M2-1-K*12;
 
-    //Formating
+    //Formatting
     return                       Ztring::ToZtring(1900+Y)+__T("-")
          + (M<10?__T("0"):__T(""))+Ztring::ToZtring(     M)+__T("-")
          + (D<10?__T("0"):__T(""))+Ztring::ToZtring(     D);

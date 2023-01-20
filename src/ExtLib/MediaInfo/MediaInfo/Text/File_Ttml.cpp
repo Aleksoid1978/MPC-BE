@@ -248,19 +248,6 @@ bool File_Ttml::FileHeader_Begin()
     return true;
 }
 
-//---------------------------------------------------------------------------
-struct timeline
-{
-    TimeCode    Time_Begin;
-    TimeCode    Time_End;
-    size_t      LineCount;
-
-    timeline(TimeCode Time_Begin_, TimeCode Time_End_, size_t LineCount_)
-        : Time_Begin(Time_Begin_)
-        , Time_End(Time_End_)
-        , LineCount(LineCount_)
-    {}
-};
 void File_Ttml::Read_Buffer_Continue()
 {
     if (!IsSub && File_Offset+Buffer_Offset+Element_Offset)
