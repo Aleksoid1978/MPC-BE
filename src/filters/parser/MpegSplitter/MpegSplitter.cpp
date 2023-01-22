@@ -1378,7 +1378,7 @@ bool CMpegSplitterFilter::DemuxInit()
 
 		if (!m_Items.empty()) {
 			if (m_bUseMVCExtension) {
-
+				m_sps.clear();
 				for (auto& Item : m_Items) {
 					Item.m_sps.clear();
 				}
