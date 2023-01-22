@@ -1342,7 +1342,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				if (!m_stereo_subtitle_offset_ids.empty() && (size_t)m_nCurrentSubtitlesStream < m_stereo_subtitle_offset_ids.size()) {
 					idx = m_stereo_subtitle_offset_ids[m_nCurrentSubtitlesStream];
 				}
-				if (idx < offset3D.offset.offset_count) {
+				if (idx < offset3D.offset.offset_count && offset3D.offset.offset[idx]) {
 					m_nStereoOffsetInPixels = offset3D.offset.offset[idx];
 				}
 			}
