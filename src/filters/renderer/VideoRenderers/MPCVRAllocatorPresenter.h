@@ -36,8 +36,6 @@ namespace DSObjects
 		CComPtr<IUnknown> m_pMPCVR;
 		bool m_bMPCVRFullscreenControl = false;
 
-		HRESULT AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels);
-
 	public:
 		CMPCVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString& _Error);
 		virtual ~CMPCVRAllocatorPresenter();
