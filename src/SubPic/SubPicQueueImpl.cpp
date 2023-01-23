@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -227,15 +227,15 @@ STDMETHODIMP CSubPicQueue::Invalidate(REFERENCE_TIME rtInvalidate)
 		}
 	}
 
-	while (!m_queue.IsEmpty() && m_queue.GetTail()->GetStop() > rtInvalidate) {
+	while (m_queue.size() && m_queue.back()->GetStop() > rtInvalidate) {
 #if SUBPIC_TRACE_LEVEL > 2
-		const CComPtr<ISubPic>& pSubPic = m_queue.GetTail();
+		const CComPtr<ISubPic>& pSubPic = m_queue.back();
 		REFERENCE_TIME rtStart = pSubPic->GetStart();
 		REFERENCE_TIME rtStop = pSubPic->GetStop();
 		REFERENCE_TIME rtSegmentStop = pSubPic->GetSegmentStop();
 		DLog(L"  %f -> %f -> %f", double(rtStart) / 10000000.0, double(rtStop) / 10000000.0, double(rtSegmentStop) / 10000000.0);
 #endif
-		m_queue.RemoveTailNoReturn();
+		m_queue.pop_back();
 	}
 
 	// If we invalidate in the past, always give the queue a chance to re-render the modified subtitles
@@ -300,8 +300,8 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 			DLog(L"LookupSubPic: Searching the queue");
 #endif
 
-			while (!m_queue.IsEmpty() && !bStopSearch) {
-				const CComPtr<ISubPic>& pSubPic = m_queue.GetHead();
+			while (m_queue.size() && !bStopSearch) {
+				const CComPtr<ISubPic>& pSubPic = m_queue.front();
 				REFERENCE_TIME rtSegmentStart = pSubPic->GetSegmentStart();
 
 				if (rtSegmentStart > rtNow) {
@@ -344,7 +344,7 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 					}
 
 					if (bRemoveFromQueue) {
-						m_queue.RemoveHeadNoReturn();
+						m_queue.pop_front();
 					}
 				}
 			}
@@ -375,8 +375,8 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 					std::unique_lock<std::mutex> lock(m_mutexQueue);
 
 					auto queueReady = [this, rtNow]() {
-						return ((int)m_queue.GetCount() == m_nMaxSubPic)
-							   || (!m_queue.IsEmpty() && m_queue.GetTail()->GetStop() > rtNow);
+						return ((int)m_queue.size() == m_nMaxSubPic)
+							   || (m_queue.size() && m_queue.back()->GetStop() > rtNow);
 					};
 
 					auto duration = bAdviseBlocking ? std::chrono::milliseconds(m_rtTimePerFrame / 10000) : std::chrono::seconds(1);
@@ -416,11 +416,11 @@ STDMETHODIMP CSubPicQueue::GetStats(int& nSubPics, REFERENCE_TIME& rtNow, REFERE
 {
 	std::lock_guard<std::mutex> lock(m_mutexQueue);
 
-	nSubPics = (int)m_queue.GetCount();
+	nSubPics = (int)m_queue.size();
 	rtNow = m_rtNow;
 	if (nSubPics) {
-		rtStart = m_queue.GetHead()->GetStart();
-		rtStop = m_queue.GetTail()->GetStop();
+		rtStart = m_queue.front()->GetStart();
+		rtStop = m_queue.back()->GetStop();
 	} else {
 		rtStart = rtStop = 0;
 	}
@@ -434,15 +434,12 @@ STDMETHODIMP CSubPicQueue::GetStats(int nSubPic, REFERENCE_TIME& rtStart, REFERE
 
 	HRESULT hr = E_INVALIDARG;
 
-	if (nSubPic >= 0 && nSubPic < (int)m_queue.GetCount()) {
-		if (POSITION pos = m_queue.FindIndex(nSubPic)) {
-			rtStart = m_queue.GetAt(pos)->GetStart();
-			rtStop = m_queue.GetAt(pos)->GetStop();
-			hr = S_OK;
-		} else {
-			// Can't happen
-			ASSERT(FALSE);
-		}
+	if (nSubPic >= 0 && nSubPic < (int)m_queue.size()) {
+		auto it = m_queue.cbegin();
+		std::advance(it, nSubPic);
+		rtStart = (*it)->GetStart();
+		rtStop  = (*it)->GetStop();
+		hr = S_OK;
 	} else {
 		rtStart = rtStop = -1;
 	}
@@ -455,7 +452,7 @@ STDMETHODIMP CSubPicQueue::GetStats(int nSubPic, REFERENCE_TIME& rtStart, REFERE
 bool CSubPicQueue::EnqueueSubPic(CComPtr<ISubPic>& pSubPic, bool bBlocking)
 {
 	auto canAddToQueue = [this]() {
-		return (int)m_queue.GetCount() < m_nMaxSubPic;
+		return (int)m_queue.size() < m_nMaxSubPic;
 	};
 
 	bool bAdded = false;
@@ -472,7 +469,7 @@ bool CSubPicQueue::EnqueueSubPic(CComPtr<ISubPic>& pSubPic, bool bBlocking)
 			DLog(L"Subtitle Renderer Thread: Dropping rendered subpic because of invalidation");
 #endif
 		} else {
-			m_queue.AddTail(pSubPic);
+			m_queue.emplace_back(pSubPic);
 			lock.unlock();
 			m_condQueueReady.notify_one();
 			bAdded = true;
@@ -490,8 +487,8 @@ REFERENCE_TIME CSubPicQueue::GetCurrentRenderingTime()
 	{
 		std::lock_guard<std::mutex> lock(m_mutexQueue);
 
-		if (!m_queue.IsEmpty()) {
-			rtNow = m_queue.GetTail()->GetStop();
+		if (m_queue.size()) {
+			rtNow = m_queue.back()->GetStop();
 		}
 	}
 
