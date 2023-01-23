@@ -853,11 +853,11 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		return MF_E_INVALIDREQUEST;
 	}
 
-	CComPtr<IMFMediaType> pType;
+	CComQIPtr<IMFMediaType> pType;
 	CComPtr<IMFMediaType> pMixerType;
 	CComPtr<IMFMediaType> pMixerInputType;
 
-	CInterfaceArray<IMFMediaType> ValidMixerTypes;
+	std::vector<CComQIPtr<IMFMediaType>> ValidMixerTypes;
 
 	// Get the mixer's input type
 	HRESULT hr = m_pMixer->GetInputCurrentType(0, &pMixerInputType);
@@ -903,33 +903,32 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		}
 
 		if (SUCCEEDED(hr)) {
-			size_t nTypes = ValidMixerTypes.GetCount();
-			size_t iInsertPos = 0;
-			for (size_t i = 0; i < nTypes; ++i) {
+			auto itInsertPos = ValidMixerTypes.cbegin();
+			for (auto it = ValidMixerTypes.cbegin(); it != ValidMixerTypes.end(); ++it) {
 				int ThisMerit;
-				GetMixerMediaTypeMerit(ValidMixerTypes[i], ThisMerit);
+				GetMixerMediaTypeMerit(*it, ThisMerit);
 
 				if (Merit > ThisMerit) {
-					iInsertPos = i;
+					itInsertPos = it;
 					break;
 				} else {
-					iInsertPos = i+1;
+					itInsertPos = it+1;
 				}
 			}
 
-			ValidMixerTypes.InsertAt(iInsertPos, pType);
+			ValidMixerTypes.insert(itInsertPos, pType);
 		}
 	}
 
 #ifdef DEBUG_OR_LOG
 	CString dbgmsg = L"EVR: Valid mixer output types:";
-	for (size_t i = 0; i < ValidMixerTypes.GetCount(); ++i) {
+	for (size_t i = 0; i < ValidMixerTypes.size(); ++i) {
 		dbgmsg.AppendFormat(L"\n - %s", GetMediaTypeFormatDesc(ValidMixerTypes[i]));
 	}
 	DLog(dbgmsg);
 #endif
 
-	for (size_t i = 0; i < ValidMixerTypes.GetCount(); ++i) {
+	for (size_t i = 0; i < ValidMixerTypes.size(); ++i) {
 		// Step 3. Adjust the mixer's type to match our requirements.
 		pType = ValidMixerTypes[i];
 

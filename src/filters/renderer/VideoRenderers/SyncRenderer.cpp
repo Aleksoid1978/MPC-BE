@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2701,7 +2701,7 @@ HRESULT CSyncAP::RenegotiateMediaType()
 	HRESULT hr = S_OK;
 
 	CComPtr<IMFMediaType> pMixerType;
-	CComPtr<IMFMediaType> pType;
+	CComQIPtr<IMFMediaType> pType;
 
 	if (!m_pMixer) {
 		return MF_E_INVALIDREQUEST;
@@ -2723,7 +2723,7 @@ HRESULT CSyncAP::RenegotiateMediaType()
 		}
 	}
 
-	CInterfaceArray<IMFMediaType> ValidMixerTypes;
+	std::vector<CComQIPtr<IMFMediaType>> ValidMixerTypes;
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
@@ -2750,22 +2750,21 @@ HRESULT CSyncAP::RenegotiateMediaType()
 		if (SUCCEEDED(hr)) {
 			int Merit = GetOutputMediaTypeMerit(pType);
 
-			size_t nTypes = ValidMixerTypes.GetCount();
-			size_t iInsertPos = 0;
-			for (size_t i = 0; i < nTypes; ++i) {
-				int ThisMerit = GetOutputMediaTypeMerit(ValidMixerTypes[i]);
+			auto itInsertPos = ValidMixerTypes.cbegin();
+			for (auto it = ValidMixerTypes.cbegin(); it != ValidMixerTypes.end(); ++it) {
+				int ThisMerit = GetOutputMediaTypeMerit(*it);
 				if (Merit > ThisMerit) {
-					iInsertPos = i;
+					itInsertPos = it;
 					break;
 				} else {
-					iInsertPos = i+1;
+					itInsertPos = it+1;
 				}
 			}
-			ValidMixerTypes.InsertAt(iInsertPos, pType);
+			ValidMixerTypes.insert(itInsertPos, pType);
 		}
 	}
 
-	size_t nValidTypes = ValidMixerTypes.GetCount();
+	size_t nValidTypes = ValidMixerTypes.size();
 	for (size_t i = 0; i < nValidTypes; ++i) {
 		pType = ValidMixerTypes[i];
 		hr = SetMediaType(pType);
