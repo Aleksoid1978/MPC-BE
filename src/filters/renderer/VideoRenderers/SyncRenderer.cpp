@@ -2768,10 +2768,6 @@ HRESULT CSyncAP::RenegotiateMediaType()
 	size_t nValidTypes = ValidMixerTypes.GetCount();
 	for (size_t i = 0; i < nValidTypes; ++i) {
 		pType = ValidMixerTypes[i];
-	}
-
-	for (size_t i = 0; i < nValidTypes; ++i) {
-		pType = ValidMixerTypes[i];
 		hr = SetMediaType(pType);
 		if (SUCCEEDED(hr)) {
 			hr = m_pMixer->SetOutputType(0, pType, 0);
