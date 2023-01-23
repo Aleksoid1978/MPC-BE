@@ -368,8 +368,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id);
 	void SelectSubtilesAMStream(UINT id);
 
-	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
-	CInterfaceArray<IAMStreamSelect> m_ssarray;
+	std::vector<CComQIPtr<IUnknown, &IID_IUnknown>> m_pparray;
+	std::vector<CComQIPtr<IAMStreamSelect>> m_ssarray;
 
 	struct Stream {
 		int  Filter = 0;

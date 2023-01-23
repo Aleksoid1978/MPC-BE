@@ -14489,8 +14489,8 @@ void CMainFrame::CloseMediaPrivate()
 	OnPlayStop();
 	m_OSD.Stop();
 
-	m_pparray.RemoveAll();
-	m_ssarray.RemoveAll();
+	m_pparray.clear();
+	m_ssarray.clear();
 
 	Content::Online::Clear();
 
@@ -14848,8 +14848,8 @@ void CMainFrame::SetupFiltersSubMenu()
 	CMenu& submenu = m_filtersMenu;
 	MakeEmptySubMenu(submenu);
 
-	m_pparray.RemoveAll();
-	m_ssarray.RemoveAll();
+	m_pparray.clear();
+	m_ssarray.clear();
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		UINT idf = 0;
@@ -14912,7 +14912,7 @@ void CMainFrame::SetupFiltersSubMenu()
 			int nPPages = 0;
 
 			CComQIPtr<ISpecifyPropertyPages> pSPP = pBF.p;
-			m_pparray.Add(pBF);
+			m_pparray.emplace_back(pBF);
 			subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids, ResStr(IDS_MAINFRM_116));
 			nPPages++;
 
@@ -14924,7 +14924,7 @@ void CMainFrame::SetupFiltersSubMenu()
 					CAUUID caGUID;
 					caGUID.pElems = nullptr;
 					if (SUCCEEDED(pSPP->GetPages(&caGUID)) && caGUID.cElems > 0) {
-						m_pparray.Add(pPin);
+						m_pparray.emplace_back(pPin);
 						subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids + nPPages, name + ResStr(IDS_MAINFRM_117));
 
 						if (caGUID.pElems) {
@@ -14955,7 +14955,7 @@ void CMainFrame::SetupFiltersSubMenu()
 				UINT idlstart = idl;
 
 				for (DWORD i = 0; i < nStreams; i++, pObj = nullptr, pUnk = nullptr) {
-					m_ssarray.Add(pSS);
+					m_ssarray.emplace_back(pSS);
 
 					flags = group = DWORD_MAX;
 					wname = nullptr;
