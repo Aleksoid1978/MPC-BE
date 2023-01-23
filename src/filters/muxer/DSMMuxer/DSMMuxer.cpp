@@ -23,6 +23,7 @@
 #include <MMReg.h>
 #include "DSMMuxer.h"
 #include "DSUtil/DSUtil.h"
+#include "DSUtil/std_helper.h"
 #include <qnetwork.h>
 #include <moreuuids.h>
 
@@ -204,8 +205,8 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 	// resources & chapters
 
-	CInterfaceList<IDSMResourceBag> pRBs;
-	pRBs.AddTail(this);
+	std::list<CComQIPtr<IDSMResourceBag>> pRBs;
+	pRBs.emplace_back(this);
 
 	CComQIPtr<IDSMChapterBag> pCB = (IUnknown*)(INonDelegatingUnknown*)this;
 
@@ -213,8 +214,8 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 		for (CComPtr<IPin> pPin = p->GetConnected(); pPin; pPin = GetUpStreamPin(GetFilterFromPin(pPin))) {
 			if (m_fAutoRes) {
 				CComQIPtr<IDSMResourceBag> pPB = GetFilterFromPin(pPin);
-				if (pPB && !pRBs.Find(pPB)) {
-					pRBs.AddTail(pPB);
+				if (pPB && !Contains(pRBs, pPB)) {
+					pRBs.emplace_back(pPB);
 				}
 			}
 
@@ -228,10 +229,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 	// resources
 
-	POSITION pos = pRBs.GetHeadPosition();
-	while (pos) {
-		IDSMResourceBag* pRB = pRBs.GetNext(pos);
-
+	for (const auto& pRB : pRBs) {
 		for (DWORD i = 0, j = pRB->ResGetCount(); i < j; i++) {
 			CComBSTR name, desc, mime;
 			BYTE* pData = nullptr;
