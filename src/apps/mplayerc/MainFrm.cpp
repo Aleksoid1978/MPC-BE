@@ -13022,23 +13022,23 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 				&& FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, m_pAudCap, IID_IAMStreamConfig, (void **)&m_pAMASC))) {
 			DLog(L"Warning: No IAMStreamConfig interface for vidcap");
 		}
+
 		/*
-		CInterfaceArray<IAMAudioInputMixer> pAMAIM;
+		std::vector<CComQIPtr<IAMAudioInputMixer>> pAMAIM;
 
-		BeginEnumPins(pAudCap, pEP, pPin)
-		{
+		BeginEnumPins(m_pAudCap, pEP, pPin) {
 			PIN_DIRECTION dir;
-			if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_INPUT)
+			if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_INPUT) {
 				continue;
-
-			if (CComQIPtr<IAMAudioInputMixer> pAIM = pPin)
-				pAMAIM.Add(pAIM);
+			}
+			if (CComQIPtr<IAMAudioInputMixer> pAIM = pPin) {
+				pAMAIM.emplace_back(pAIM);
+			}
 		}
 		EndEnumPins;
 
-		if (pAMASC)
-		{
-			m_wndCaptureBar.m_capdlg.SetupAudioControls(auddispname, pAMASC, pAMAIM);
+		if (m_pAMASC) {
+			m_wndCaptureBar.m_capdlg.SetupAudioControls(m_AudDispName, m_pAMASC, pAMAIM);
 		}
 		*/
 	}
