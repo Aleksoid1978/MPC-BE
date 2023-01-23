@@ -4712,7 +4712,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	if (IsWindow(m_wndCaptureBar.m_hWnd)) {
 		ShowControlBarInternal(&m_wndCaptureBar, FALSE);
 		m_wndCaptureBar.m_capdlg.SetupVideoControls(L"", nullptr, nullptr, nullptr);
-		m_wndCaptureBar.m_capdlg.SetupAudioControls(L"", nullptr, CInterfaceArray<IAMAudioInputMixer>());
+		m_wndCaptureBar.m_capdlg.SetupAudioControls(L"", nullptr, std::vector<CComQIPtr<IAMAudioInputMixer>>());
 	}
 
 	RecalcLayout();
@@ -13236,11 +13236,11 @@ void CMainFrame::OpenSetupCaptureBar()
 		}
 
 		if (m_pAudCap && m_pAMASC) {
-			CInterfaceArray<IAMAudioInputMixer> pAMAIM;
+			std::vector<CComQIPtr<IAMAudioInputMixer>> pAMAIM;
 
 			BeginEnumPins(m_pAudCap, pEP, pPin) {
 				if (CComQIPtr<IAMAudioInputMixer> pAIM = pPin.p) {
-					pAMAIM.Add(pAIM);
+					pAMAIM.emplace_back(pAIM);
 				}
 			}
 			EndEnumPins;

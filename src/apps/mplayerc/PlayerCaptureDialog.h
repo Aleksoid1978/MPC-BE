@@ -375,7 +375,7 @@ private:
 	// audio input
 	CStringW m_audDisplayName;
 	CComPtr<IAMStreamConfig> m_pAMASC;
-	CInterfaceArray<IAMAudioInputMixer> m_pAMAIM;
+	std::vector<CComQIPtr<IAMAudioInputMixer>> m_pAMAIM;
 	CAudFormatArray m_afa;
 
 	// video codec
@@ -426,7 +426,7 @@ public:
 
 	void SetupVideoControls(CStringW displayName, IAMStreamConfig* pAMSC, IAMCrossbar* pAMXB, IAMTVTuner* pAMTuner);
 	void SetupVideoControls(CStringW displayName, IAMStreamConfig* pAMSC, IAMVfwCaptureDialogs* pAMVfwCD);
-	void SetupAudioControls(CStringW displayName, IAMStreamConfig* pAMSC, const CInterfaceArray<IAMAudioInputMixer>& pAMAIM);
+	void SetupAudioControls(CStringW displayName, IAMStreamConfig* pAMSC, const std::vector<CComQIPtr<IAMAudioInputMixer>>& pAMAIM);
 
 	void UpdateVideoControls();
 	void UpdateAudioControls();

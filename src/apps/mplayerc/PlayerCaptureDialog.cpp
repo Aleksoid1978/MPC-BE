@@ -719,7 +719,7 @@ void CPlayerCaptureDialog::EmptyAudio()
 	m_afa.clear();
 
 	m_pAMASC = nullptr;
-	m_pAMAIM.RemoveAll();
+	m_pAMAIM.clear();
 
 	if (IsWindow(m_hWnd)) {
 		m_audinput.ResetContent();
@@ -1177,14 +1177,15 @@ void CPlayerCaptureDialog::UpdateVideoControls()
 
 void CPlayerCaptureDialog::SetupAudioControls(
 	CStringW displayName,
-	IAMStreamConfig* pAMSC, const CInterfaceArray<IAMAudioInputMixer>& pAMAIM)
+	IAMStreamConfig* pAMSC,
+	const std::vector<CComQIPtr<IAMAudioInputMixer>>& pAMAIM)
 {
 	EmptyAudio();
 
 	m_audDisplayName = displayName;
 	m_pAMASC = pAMSC;
-	if (!pAMAIM.IsEmpty()) {
-		m_pAMAIM.Copy(pAMAIM);
+	if (pAMAIM.size()) {
+		m_pAMAIM.assign(pAMAIM.cbegin(), pAMAIM.cend());
 	}
 
 	UpdateAudioControls();
@@ -1194,10 +1195,10 @@ void CPlayerCaptureDialog::UpdateAudioControls()
 {
 	// input selection
 
-	if (!m_pAMAIM.IsEmpty()) {
+	if (m_pAMAIM.size()) {
 		size_t iSel = SIZE_T_MAX;
 
-		for (size_t i = 0; i < m_pAMAIM.GetCount(); i++) {
+		for (size_t i = 0; i < m_pAMAIM.size(); i++) {
 			CComQIPtr<IPin> pPin = m_pAMAIM[i].p;
 			AddStringData(m_audinput, GetPinName(pPin), i);
 
@@ -1482,7 +1483,7 @@ void CPlayerCaptureDialog::OnAudioInput()
 {
 	int iSel = m_audinput.GetCurSel();
 
-	for (int i = 0; i < (int)m_pAMAIM.GetCount(); i++) {
+	for (int i = 0; i < (int)m_pAMAIM.size(); i++) {
 		m_pAMAIM[m_audinput.GetItemData(i)]->put_Enable(i == iSel ? TRUE : FALSE);
 	}
 }
