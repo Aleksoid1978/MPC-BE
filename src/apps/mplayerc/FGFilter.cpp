@@ -239,7 +239,7 @@ CFGFilterRegistry::CFGFilterRegistry(const CLSID& clsid, UINT64 merit)
 	}
 }
 
-HRESULT CFGFilterRegistry::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+HRESULT CFGFilterRegistry::Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	CheckPointer(ppBF, E_POINTER);
 
@@ -410,7 +410,7 @@ CFGFilterFile::CFGFilterFile(const CLSID& clsid, CString path, CStringW name, UI
 {
 }
 
-HRESULT CFGFilterFile::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+HRESULT CFGFilterFile::Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	CheckPointer(ppBF, E_POINTER);
 
@@ -429,7 +429,7 @@ CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CS
 	AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 }
 
-HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	DLog(L"CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId());
 	CheckPointer(ppBF, E_POINTER);
@@ -468,7 +468,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 		BeginEnumPins(pBF, pEP, pPin) {
 			if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pPin.p) {
-				pUnks.AddTail(pMPC);
+				pUnks.emplace_back(pMPC);
 				break;
 			}
 		}
@@ -492,7 +492,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		CComPtr<IUnknown> pRenderer;
 		if (SUCCEEDED(hr = pCAP->CreateRenderer(&pRenderer))) {
 			*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();
-			pUnks.AddTail(pCAP);
+			pUnks.emplace_back(pCAP);
 
 			if (m_clsid == CLSID_EVRAllocatorPresenter || m_clsid == CLSID_SyncAllocatorPresenter) {
 				if (!m_bIsPreview) {

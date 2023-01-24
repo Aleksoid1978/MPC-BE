@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -76,7 +76,7 @@ public:
 	std::list<CString> m_chkbytes;
 	// TODO: subtype?
 
-	virtual HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) PURE;
+	virtual HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) PURE;
 
 	virtual CString GetType() {
 		return L"CFGFilter";
@@ -103,9 +103,9 @@ public:
 		return m_pMoniker;
 	}
 
-	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 
-	virtual CString GetType() {
+	virtual CString GetType() override {
 		return L"CFGFilterRegistry";
 	}
 private:
@@ -118,7 +118,7 @@ class CFGFilterInternal : public CFGFilter
 public:
 	CFGFilterInternal(CStringW name = L"", UINT64 merit = MERIT64_DO_USE) : CFGFilter(__uuidof(T), name, merit) {}
 
-	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) {
+	HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override {
 		CheckPointer(ppBF, E_POINTER);
 
 		HRESULT hr = S_OK;
@@ -132,7 +132,7 @@ public:
 		return hr;
 	}
 
-	virtual CString GetType() {
+	virtual CString GetType() override {
 		return L"CFGFilterInternal";
 	}
 };
@@ -146,9 +146,9 @@ protected:
 public:
 	CFGFilterFile(const CLSID& clsid, CString path, CStringW name = L"", UINT64 merit = MERIT64_DO_USE);
 
-	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 
-	virtual CString GetType() {
+	virtual CString GetType() override {
 		return L"CFGFilterFile";
 	}
 };
@@ -162,9 +162,9 @@ protected:
 public:
 	CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool bIsPreview = false);
 
-	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 
-	virtual CString GetType() {
+	virtual CString GetType() override {
 		return L"CFGFilterVideoRenderer";
 	}
 };

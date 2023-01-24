@@ -74,7 +74,7 @@ public:
 		}
 	}
 
-	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) {
+	HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) {
 		CheckPointer(ppBF, E_POINTER);
 
 		HRESULT hr = S_OK;
@@ -163,7 +163,7 @@ CFGManager::~CFGManager()
 		delete m_override.front();
 		m_override.pop_front();
 	}
-	m_pUnks.RemoveAll();
+	m_pUnks.clear();
 	m_pUnkInner.Release();
 }
 
@@ -667,7 +667,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 	HRESULT hr;
 
 	CComPtr<IBaseFilter> pBF;
-	CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
+	std::list<CComQIPtr<IUnknown, &IID_IUnknown>> pUnks;
 	if (FAILED(hr = pFGF->Create(&pBF, pUnks))) {
 		return hr;
 	}
@@ -719,7 +719,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 
 	*ppBF = pBF.Detach();
 
-	m_pUnks.AddTailList(&pUnks);
+	m_pUnks.insert(m_pUnks.cend(), pUnks.cbegin(), pUnks.cend());
 
 	return S_OK;
 }
@@ -947,7 +947,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	// 3. Try filters in the graph
 
 	{
-		CInterfaceList<IBaseFilter> pBFs;
+		std::list<CComQIPtr<IBaseFilter>> pBFs;
 
 		BeginEnumFilters(this, pEF, pBF) {
 			if (pPinIn && GetFilterFromPin(pPinIn) == pBF
@@ -961,14 +961,11 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				continue;
 			}
 
-			pBFs.AddTail(pBF);
+			pBFs.emplace_back(pBF);
 		}
 		EndEnumFilters;
 
-		POSITION pos = pBFs.GetHeadPosition();
-		while (pos) {
-			IBaseFilter* pBF = pBFs.GetNext(pos);
-
+		for (auto& pBF : pBFs) {
 			if (SUCCEEDED(hr = ConnectFilterDirect(pPinOut, pBF, nullptr))) {
 				if (!IsStreamEnd(pBF)) {
 					fDeadEnd = false;
@@ -1053,7 +1050,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			DLog(L"FGM: Connecting '%s'", pFGF->GetName());
 
 			CComPtr<IBaseFilter> pBF;
-			CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
+			std::list<CComQIPtr<IUnknown, &IID_IUnknown>> pUnks;
 			if (FAILED(pFGF->Create(&pBF, pUnks))) {
 				continue;
 			}
@@ -1097,13 +1094,12 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				}
 
 				if (SUCCEEDED(hr)) {
-					m_pUnks.AddTailList(&pUnks);
+					m_pUnks.insert(m_pUnks.cend(), pUnks.cbegin(), pUnks.cend());
 
 					// maybe the application should do this...
 
-					POSITION pos = pUnks.GetHeadPosition();
-					while (pos) {
-						if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pUnks.GetNext(pos).p) {
+					for (auto& pUnk : pUnks) {
+						if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pUnk) {
 							pMPC->SetAspectRatioMode(AM_ARMODE_STRETCHED);
 						}
 					}
@@ -1117,12 +1113,12 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 					}
 
 					if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF.p) {
-						m_pUnks.AddTail(pVMRMC9);
+						m_pUnks.emplace_back(pVMRMC9);
 					}
 
 					CComQIPtr<IMFVideoMixerBitmap> pMFVMB = pBF.p; // get custom EVR-CP or EVR-Sync interface
 					if (pMFVMB) {
-						m_pUnks.AddTail(pMFVMB);
+						m_pUnks.emplace_back(pMFVMB);
 					}
 
 					if (CComQIPtr<IMFGetService> pMFGS = pBF.p) {
@@ -1130,15 +1126,15 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						CComPtr<IMFVideoProcessor>		pMFVP;
 
 						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
-							m_pUnks.AddTail(pMFVDC);
+							m_pUnks.emplace_back(pMFVDC);
 						}
 
 						if (!pMFVMB && SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFVMB)))) {
-							m_pUnks.AddTail(pMFVMB);
+							m_pUnks.emplace_back(pMFVMB);
 						}
 
 						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFVP)))) {
-							m_pUnks.AddTail(pMFVP);
+							m_pUnks.emplace_back(pMFVP);
 						}
 
 						if (!m_bIsPreview && pMadVRAllocatorPresenter) {
@@ -1157,7 +1153,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			DLog(L"FGM: Connecting '%s' FAILED!", pFGF->GetName());
 
 			EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
-			pUnks.RemoveAll();
+			pUnks.clear();
 			pBF.Release();
 		}
 	}
@@ -1344,19 +1340,19 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 	}
 
 	if (dwFlags & AM_RENDEREX_RENDERTOEXISTINGRENDERERS) {
-		CInterfaceList<IBaseFilter> pBFs;
+		std::list<CComQIPtr<IBaseFilter>> pBFs;
 
 		BeginEnumFilters(this, pEF, pBF) {
 			if (CComQIPtr<IAMFilterMiscFlags> pAMMF = pBF.p) {
 				if (pAMMF->GetMiscFlags() & AM_FILTER_MISC_FLAGS_IS_RENDERER) {
-					pBFs.AddTail(pBF);
+					pBFs.emplace_back(pBF);
 				}
 			} else {
 				BeginEnumPins(pBF, pEP, pPin) {
 					CComPtr<IPin> pPinIn;
 					DWORD size = 1;
 					if (SUCCEEDED(pPin->QueryInternalConnections(&pPinIn, &size)) && size == 0) {
-						pBFs.AddTail(pBF);
+						pBFs.emplace_back(pBF);
 						break;
 					}
 				}
@@ -1365,9 +1361,10 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 		}
 		EndEnumFilters;
 
-		while (!pBFs.IsEmpty()) {
-			HRESULT hr;
-			if (SUCCEEDED(hr = ConnectFilter(pPinOut, pBFs.RemoveHead()))) {
+		while (pBFs.size()) {
+			HRESULT hr = ConnectFilter(pPinOut, pBFs.front());
+			pBFs.pop_front();
+			if (SUCCEEDED(hr)) {
 				return hr;
 			}
 		}
@@ -1421,7 +1418,7 @@ HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 	HRESULT hr = S_OK;
 
 	CComPtr<IBaseFilter> pBF;
-	CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
+	std::list<CComQIPtr<IUnknown, &IID_IUnknown>> pUnks;
 	if (FAILED(hr = pFGF->Create(&pBF, pUnks))) {
 		return hr;
 	}
@@ -1716,10 +1713,10 @@ STDMETHODIMP CFGManager::FindInterface(REFIID iid, void** ppv, BOOL bRemove)
 
 	CheckPointer(ppv, E_POINTER);
 
-	for (POSITION pos = m_pUnks.GetHeadPosition(); pos; m_pUnks.GetNext(pos)) {
-		if (SUCCEEDED(m_pUnks.GetAt(pos)->QueryInterface(iid, ppv))) {
+	for (auto it = m_pUnks.cbegin(); it != m_pUnks.cend(); ++it) {
+		if (SUCCEEDED((*it)->QueryInterface(iid, ppv))) {
 			if (bRemove) {
-				m_pUnks.RemoveAt(pos);
+				m_pUnks.erase(it);
 			}
 			return S_OK;
 		}
