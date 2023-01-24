@@ -511,8 +511,8 @@ namespace GothSync
 		CCritSec m_SampleQueueLock;
 		CCritSec m_ImageProcessingLock;
 
-		CInterfaceList<IMFSample, &IID_IMFSample> m_FreeSamples;
-		CInterfaceList<IMFSample, &IID_IMFSample> m_ScheduledSamples;
+		std::list<CComQIPtr<IMFSample, &IID_IMFSample>> m_FreeSamples;
+		std::list<CComQIPtr<IMFSample, &IID_IMFSample>> m_ScheduledSamples;
 		UINT m_nResetToken = 0;
 		int  m_nStepCount  = 0;
 

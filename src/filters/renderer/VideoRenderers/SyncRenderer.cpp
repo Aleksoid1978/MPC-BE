@@ -3284,7 +3284,7 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 		hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 		if (SUCCEEDED (hr)) {
 			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
-			m_FreeSamples.AddTail (pMFSample);
+			m_FreeSamples.emplace_back(pMFSample);
 		}
 		ASSERT (SUCCEEDED (hr));
 	}
@@ -3562,7 +3562,7 @@ STDMETHODIMP_(bool) CSyncAP::ResetDevice()
 		HRESULT hr = pfMFCreateVideoSampleFromSurface (m_pVideoSurfaces[i], &pMFSample);
 		if (SUCCEEDED (hr)) {
 			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
-			m_FreeSamples.AddTail(pMFSample);
+			m_FreeSamples.emplace_back(pMFSample);
 		}
 		ASSERT(SUCCEEDED (hr));
 	}
@@ -3587,8 +3587,8 @@ void CSyncAP::RemoveAllSamples()
 {
 	CAutoLock AutoLock(&m_ImageProcessingLock);
 	FlushSamples();
-	m_ScheduledSamples.RemoveAll();
-	m_FreeSamples.RemoveAll();
+	m_ScheduledSamples.clear();
+	m_FreeSamples.clear();
 	m_nUsedBuffer = 0;
 }
 
@@ -3597,9 +3597,10 @@ HRESULT CSyncAP::GetFreeSample(IMFSample** ppSample)
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT hr = S_OK;
 
-	if (m_FreeSamples.GetCount() > 1) { // <= Cannot use first free buffer (can be currently displayed)
+	if (m_FreeSamples.size() > 1) { // <= Cannot use first free buffer (can be currently displayed)
 		InterlockedIncrement(&m_nUsedBuffer);
-		*ppSample = m_FreeSamples.RemoveHead().Detach();
+		*ppSample = m_FreeSamples.front().Detach();
+		m_FreeSamples.pop_front();
 	} else {
 		hr = MF_E_SAMPLEALLOCATOR_EMPTY;
 	}
@@ -3612,9 +3613,10 @@ HRESULT CSyncAP::GetScheduledSample(IMFSample** ppSample, int &_Count)
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT hr = S_OK;
 
-	_Count = (int)m_ScheduledSamples.GetCount();
+	_Count = (int)m_ScheduledSamples.size();
 	if (_Count > 0) {
-		*ppSample = m_ScheduledSamples.RemoveHead().Detach();
+		*ppSample = m_ScheduledSamples.front().Detach();
+		m_ScheduledSamples.pop_front();
 		--_Count;
 	} else {
 		hr = MF_E_SAMPLEALLOCATOR_EMPTY;
@@ -3632,9 +3634,9 @@ void CSyncAP::MoveToFreeList(IMFSample* pSample, bool bTail)
 		m_pSink->Notify(EC_COMPLETE, 0, 0);
 	}
 	if (bTail) {
-		m_FreeSamples.AddTail(pSample);
+		m_FreeSamples.emplace_back(pSample);
 	} else {
-		m_FreeSamples.AddHead(pSample);
+		m_FreeSamples.emplace_front(pSample);
 	}
 }
 
@@ -3642,10 +3644,10 @@ void CSyncAP::MoveToScheduledList(IMFSample* pSample, bool _bSorted)
 {
 	if (_bSorted) {
 		CAutoLock lock(&m_SampleQueueLock);
-		m_ScheduledSamples.AddHead(pSample);
+		m_ScheduledSamples.emplace_front(pSample);
 	} else {
 		CAutoLock lock(&m_SampleQueueLock);
-		m_ScheduledSamples.AddTail(pSample);
+		m_ScheduledSamples.emplace_back(pSample);
 	}
 }
 
@@ -3659,9 +3661,10 @@ void CSyncAP::FlushSamples()
 void CSyncAP::FlushSamplesInternal()
 {
 	m_bPrerolled = false;
-	while (m_ScheduledSamples.GetCount() > 0) {
+	while (m_ScheduledSamples.size() > 0) {
 		CComPtr<IMFSample> pMFSample;
-		pMFSample = m_ScheduledSamples.RemoveHead();
+		pMFSample = m_ScheduledSamples.front();
+		m_ScheduledSamples.pop_front();
 		MoveToFreeList(pMFSample, true);
 	}
 }
