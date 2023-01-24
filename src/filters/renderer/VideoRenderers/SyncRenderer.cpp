@@ -2677,17 +2677,11 @@ int CSyncAP::GetOutputMediaTypeMerit(IMFMediaType *pMediaType)
 		case D3DFMT_A2R10G10B10:
 			merit = 70;
 			break;
-		case FCC('NV12'):
-			merit = 60;
+		case D3DFMT_A2B10G10R10: // not tested
+			merit = 20;
 			break;
-		case FCC('YUY2'):
-			merit = 50;
-			break;
-		case FCC('P010'):
-			merit = 40;
-			break;
-		case D3DFMT_A8R8G8B8:
-		default:
+		case D3DFMT_A8R8G8B8: // an accepted format, but fails on most surface types
+		default: // we do not support YUV formats here.
 			merit = 0;
 			break;
 	}
@@ -2698,23 +2692,19 @@ int CSyncAP::GetOutputMediaTypeMerit(IMFMediaType *pMediaType)
 
 HRESULT CSyncAP::RenegotiateMediaType()
 {
-	HRESULT hr = S_OK;
-
-	CComPtr<IMFMediaType> pMixerType;
-	CComQIPtr<IMFMediaType> pType;
-
 	if (!m_pMixer) {
 		return MF_E_INVALIDREQUEST;
 	}
 
 	// Get the mixer's input type
-	hr = m_pMixer->GetInputCurrentType(0, &pType);
+	CComPtr<IMFMediaType> pMixerInputType;
+	HRESULT hr = m_pMixer->GetInputCurrentType(0, &pMixerInputType);
 	if (SUCCEEDED(hr)) {
 		AM_MEDIA_TYPE* pMT;
-		hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
+		hr = pMixerInputType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
 		if (SUCCEEDED(hr)) {
 			m_inputMediaType = *pMT;
-			pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
+			pMixerInputType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
 
 			m_inputExtFormat.value = 0;
 			if (m_inputMediaType.formattype == FORMAT_VideoInfo2) {
@@ -2724,11 +2714,12 @@ HRESULT CSyncAP::RenegotiateMediaType()
 	}
 
 	std::vector<CComQIPtr<IMFMediaType>> ValidMixerTypes;
+
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
-		pMixerType.Release();
-		pType.Release();
+		CComQIPtr<IMFMediaType> pType;
+		CComPtr<IMFMediaType> pMixerType;
 		m_pMediaType.Release();
 
 		// Step 1. Get the next media type supported by mixer.
@@ -2764,9 +2755,7 @@ HRESULT CSyncAP::RenegotiateMediaType()
 		}
 	}
 
-	size_t nValidTypes = ValidMixerTypes.size();
-	for (size_t i = 0; i < nValidTypes; ++i) {
-		pType = ValidMixerTypes[i];
+	for (const auto& pType : ValidMixerTypes) {
 		hr = SetMediaType(pType);
 		if (SUCCEEDED(hr)) {
 			hr = m_pMixer->SetOutputType(0, pType, 0);
@@ -2778,9 +2767,6 @@ HRESULT CSyncAP::RenegotiateMediaType()
 			}
 		}
 	}
-
-	pMixerType.Release();
-	pType.Release();
 
 	return hr;
 }
