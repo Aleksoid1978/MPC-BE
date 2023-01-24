@@ -919,7 +919,7 @@ namespace Youtube
 
 								if (!JSFuncs.empty()) {
 									CString buffer = L"{ ";
-									for (auto it = JSFuncs.cbegin(); it < JSFuncs.cend(); ++it) {
+									for (auto it = JSFuncs.cbegin(); it != JSFuncs.cend(); ++it) {
 										buffer.AppendFormat(L"\"%d\" : %d", it->first, it->second);
 
 										if (it != std::prev(JSFuncs.cend())) {
