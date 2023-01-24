@@ -12656,85 +12656,80 @@ void CMainFrame::SetupChapters()
 	if (GetPlaybackMode() == PM_FILE) {
 		m_pCB->ChapRemoveAll();
 
-		CInterfaceList<IBaseFilter> pBFs;
+		std::list<CComPtr<IBaseFilter>> pBFs;
 		BeginEnumFilters(m_pGB, pEF, pBF)
-		pBFs.AddTail(pBF);
+			pBFs.emplace_back(pBF);
 		EndEnumFilters;
 
-		POSITION pos;
-
-		pos = pBFs.GetHeadPosition();
-		while (pos && !m_pCB->ChapGetCount()) {
-			IBaseFilter* pBF = pBFs.GetNext(pos);
+		for (auto& pBF : pBFs) {
+			if (m_pCB->ChapGetCount()) {
+				break;
+			}
 
 			CComQIPtr<IDSMChapterBag> pCB = pBF;
-			if (!pCB) {
-				continue;
-			}
-
-			for (DWORD i = 0, cnt = pCB->ChapGetCount(); i < cnt; i++) {
-				REFERENCE_TIME rt;
-				CComBSTR name;
-				if (SUCCEEDED(pCB->ChapGet(i, &rt, &name))) {
-					m_pCB->ChapAppend(rt, name);
+			if (pCB) {
+				for (DWORD i = 0, cnt = pCB->ChapGetCount(); i < cnt; i++) {
+					REFERENCE_TIME rt;
+					CComBSTR name;
+					if (SUCCEEDED(pCB->ChapGet(i, &rt, &name))) {
+						m_pCB->ChapAppend(rt, name);
+					}
 				}
 			}
 		}
 
-		pos = pBFs.GetHeadPosition();
-		while (pos && !m_pCB->ChapGetCount()) {
-			IBaseFilter* pBF = pBFs.GetNext(pos);
+		for (auto& pBF : pBFs) {
+			if (m_pCB->ChapGetCount()) {
+				break;
+			}
 
 			CComQIPtr<IChapterInfo> pCI = pBF;
-			if (!pCI) {
-				continue;
-			}
+			if (pCI) {
+				CHAR iso6391[3];
+				::GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, iso6391, 3);
+				CStringA iso6392(ISO6391To6392(iso6391));
+				if (iso6392.GetLength() < 3) {
+					iso6392 = "eng";
+				}
 
-			CHAR iso6391[3];
-			::GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, iso6391, 3);
-			CStringA iso6392(ISO6391To6392(iso6391));
-			if (iso6392.GetLength() < 3) {
-				iso6392 = "eng";
-			}
+				UINT cnt = pCI->GetChapterCount(CHAPTER_ROOT_ID);
+				for (UINT i = 1; i <= cnt; i++) {
+					UINT cid = pCI->GetChapterId(CHAPTER_ROOT_ID, i);
 
-			UINT cnt = pCI->GetChapterCount(CHAPTER_ROOT_ID);
-			for (UINT i = 1; i <= cnt; i++) {
-				UINT cid = pCI->GetChapterId(CHAPTER_ROOT_ID, i);
-
-				ChapterElement ce;
-				if (pCI->GetChapterInfo(cid, &ce)) {
-					char pl[3] = {iso6392[0], iso6392[1], iso6392[2]};
-					char cc[] = "  ";
-					CComBSTR name;
-					name.Attach(pCI->GetChapterStringInfo(cid, pl, cc));
-					m_pCB->ChapAppend(ce.rtStart, name);
+					ChapterElement ce;
+					if (pCI->GetChapterInfo(cid, &ce)) {
+						char pl[3] = { iso6392[0], iso6392[1], iso6392[2] };
+						char cc[] = "  ";
+						CComBSTR name;
+						name.Attach(pCI->GetChapterStringInfo(cid, pl, cc));
+						m_pCB->ChapAppend(ce.rtStart, name);
+					}
 				}
 			}
 		}
 
-		pos = pBFs.GetHeadPosition();
-		while (pos && !m_pCB->ChapGetCount()) {
-			IBaseFilter* pBF = pBFs.GetNext(pos);
-
-			CComQIPtr<IAMExtendedSeeking, &IID_IAMExtendedSeeking> pES = pBF;
-			if (!pES) {
-				continue;
+		for (auto& pBF : pBFs) {
+			if (m_pCB->ChapGetCount()) {
+				break;
 			}
 
-			long MarkerCount = 0;
-			if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {
-				for (long i = 1; i <= MarkerCount; i++) {
-					double MarkerTime = 0;
-					if (SUCCEEDED(pES->GetMarkerTime(i, &MarkerTime))) {
-						CStringW name;
-						name.Format(L"Chapter %d", i);
+			CComQIPtr<IAMExtendedSeeking, &IID_IAMExtendedSeeking> pES = pBF;
+			if (pES) {
+				long MarkerCount = 0;
+				if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {
+					for (long i = 1; i <= MarkerCount; i++) {
+						double MarkerTime = 0;
+						if (SUCCEEDED(pES->GetMarkerTime(i, &MarkerTime))) {
+							CStringW name;
+							name.Format(L"Chapter %d", i);
 
-						CComBSTR bstr;
-						if (S_OK == pES->GetMarkerName(i, &bstr)) {
-							name = bstr;
+							CComBSTR bstr;
+							if (S_OK == pES->GetMarkerName(i, &bstr)) {
+								name = bstr;
+							}
+
+							m_pCB->ChapAppend(REFERENCE_TIME(MarkerTime * 10000000), name);
 						}
-
-						m_pCB->ChapAppend(REFERENCE_TIME(MarkerTime * 10000000), name);
 					}
 				}
 			}
