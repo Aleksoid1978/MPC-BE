@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ class CRegFilterChooserDlg : public CResizableDialog
 {
 	// DECLARE_DYNAMIC(CRegFilterChooserDlg)
 
-	CInterfaceList<IMoniker> m_monikers;
+	std::list<CComPtr<IMoniker>> m_monikers;
 	void AddToList(IMoniker* pMoniker);
 
 public:

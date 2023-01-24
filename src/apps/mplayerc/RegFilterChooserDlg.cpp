@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,7 @@
 #include "RegFilterChooserDlg.h"
 #include "FGFilter.h"
 #include "DSUtil/FileHandle.h"
+#include "DSUtil/std_helper.h"
 
 // CRegFilterChooserDlg dialog
 
@@ -52,9 +53,9 @@ void CRegFilterChooserDlg::AddToList(IMoniker* pMoniker)
 	if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 		CComVariant var;
 		if (SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
-			m_list.SetItemData(
-				m_list.InsertItem(-1, CString(CStringW(var.bstrVal))),
-				(DWORD_PTR)m_monikers.AddTail(pMoniker));
+			m_monikers.emplace_back(pMoniker);
+			int iItem = m_list.InsertItem(m_list.GetItemCount(), CStringW(var.bstrVal));
+			m_list.SetItemData(iItem, (DWORD_PTR)pMoniker);
 		}
 	}
 
@@ -115,10 +116,11 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	if (pos) {
-		pos = (POSITION)m_list.GetItemData(m_list.GetNextSelectedItem(pos));
-	}
-	if (pos) {
-		pMoniker = m_monikers.GetAt(pos);
+		const IMoniker* ptr = (IMoniker*)m_list.GetItemData(m_list.GetNextSelectedItem(pos));
+		auto it = FindInListByPointer(m_monikers, ptr);
+		if (it != m_monikers.end()) {
+			pMoniker = *it;
+		}
 	}
 	if (pMoniker) {
 		CFGFilterRegistry fgf(pMoniker);

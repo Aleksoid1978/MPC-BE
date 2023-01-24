@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@ class CComPropertySheet : public CPropertySheet, public IComPropertyPageDirty
 	DECLARE_DYNAMIC(CComPropertySheet)
 
 	CComPtr<IPropertyPageSite> m_pSite;
-	CInterfaceList<ISpecifyPropertyPages> m_spp;
+	std::list<CComPtr<ISpecifyPropertyPages>> m_spp;
 	std::list<std::unique_ptr<CComPropertyPage>> m_pages;
 	CSize m_size;
 

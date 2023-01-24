@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2022 see Authors.txt
+ * (C) 2018-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,6 +49,20 @@ auto FindInListByPointer(std::list<std::unique_ptr<T>>& list, const T* p)
 	auto it = list.begin();
 	for (; it != list.end(); ++it) {
 		if ((*it).get() == p) {
+			break;
+		}
+	}
+
+	return it;
+}
+
+// returns an iterator on the found element, or last if nothing is found
+template <class T>
+auto FindInListByPointer(std::list<CComPtr<T>>& list, const T* p)
+{
+	auto it = list.begin();
+	for (; it != list.end(); ++it) {
+		if ((*it).p == p) {
 			break;
 		}
 	}

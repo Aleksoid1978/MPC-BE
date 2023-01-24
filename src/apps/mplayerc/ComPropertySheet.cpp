@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -104,7 +104,7 @@ int CComPropertySheet::AddPages(ISpecifyPropertyPages* pSPP)
 		return(0);
 	}
 
-	m_spp.AddTail(pSPP);
+	m_spp.emplace_back(pSPP);
 
 	CComQIPtr<ISpecifyPropertyPages2> pSPP2 = pSPP;
 	CComQIPtr<IPersist> pPersist = pSPP;
