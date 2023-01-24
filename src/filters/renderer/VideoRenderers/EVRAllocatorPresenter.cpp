@@ -811,7 +811,7 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int&
 		// Intel: YUY2, X8R8G8B8, A8R8G8B8 (HD 4000).
 		// Nvidia: NV12, YUY2, X8R8G8B8 (GTX 660Ti, GTX 960).
 		// ATI/AMD: NV12, X8R8G8B8 (HD 5770)
-		// for Win8+ A2R10G10B10 additional A2R10G10B10
+		// for Win8+ additional A2R10G10B10
 
 		switch (mix_fmt) {
 			case D3DFMT_A2R10G10B10:
@@ -820,18 +820,11 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int&
 			case D3DFMT_X8R8G8B8:
 				merit = 80;
 				break;
-			case FCC('NV12'):
-				merit = 60;
+			case D3DFMT_A2B10G10R10: // not tested
+				merit = 20;
 				break;
-			case FCC('YUY2'):
-				merit = 50;
-				break;
-			case FCC('P010'):
-				merit = 40;
-				break;
-			// an accepted format, but fails on most surface types
-			case D3DFMT_A8R8G8B8:
-			default:
+			case D3DFMT_A8R8G8B8: // an accepted format, but fails on most surface types
+			default: // we do not support YUV formats here.
 				merit = 0;
 				return MF_E_INVALIDMEDIATYPE;
 		}
@@ -853,13 +846,10 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		return MF_E_INVALIDREQUEST;
 	}
 
-	CComQIPtr<IMFMediaType> pType;
-	CComPtr<IMFMediaType> pMixerType;
-	CComPtr<IMFMediaType> pMixerInputType;
-
 	std::vector<CComQIPtr<IMFMediaType>> ValidMixerTypes;
 
 	// Get the mixer's input type
+	CComPtr<IMFMediaType> pMixerInputType;
 	HRESULT hr = m_pMixer->GetInputCurrentType(0, &pMixerInputType);
 	if (SUCCEEDED(hr)) {
 		AM_MEDIA_TYPE* pMT;
@@ -873,8 +863,8 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
-		pMixerType.Release();
-		pType.Release();
+		CComQIPtr<IMFMediaType> pType;
+		CComPtr<IMFMediaType> pMixerType;
 		m_pMediaType.Release();
 
 		// Step 1. Get the next media type supported by mixer.
@@ -922,15 +912,14 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 #ifdef DEBUG_OR_LOG
 	CString dbgmsg = L"EVR: Valid mixer output types:";
-	for (size_t i = 0; i < ValidMixerTypes.size(); ++i) {
-		dbgmsg.AppendFormat(L"\n - %s", GetMediaTypeFormatDesc(ValidMixerTypes[i]));
+	for (const auto& pType : ValidMixerTypes) {
+		dbgmsg.AppendFormat(L"\n - %s", GetMediaTypeFormatDesc(pType));
 	}
 	DLog(dbgmsg);
 #endif
 
-	for (size_t i = 0; i < ValidMixerTypes.size(); ++i) {
+	for (const auto& pType : ValidMixerTypes) {
 		// Step 3. Adjust the mixer's type to match our requirements.
-		pType = ValidMixerTypes[i];
 
 		TRACE_EVR("EVR: Trying mixer output type: %ws\n", GetMediaTypeFormatDesc(pType));
 
