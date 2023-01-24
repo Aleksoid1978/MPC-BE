@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,5 +32,4 @@
 #include <list>
 #include <memory>
 
-#include <atlcoll.h>
 #include <atlpath.h>

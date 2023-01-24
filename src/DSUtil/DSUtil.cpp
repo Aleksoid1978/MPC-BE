@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,7 @@
 #include "Mpeg2Def.h"
 #include "AudioParser.h"
 #include "NullRenderers.h"
+#include "std_helper.h"
 #include <clsids.h>
 #include <moreuuids.h>
 #include <basestruct.h>
@@ -455,7 +456,7 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 {
 	IPin* pRet = pPin;
 
-	CInterfaceList<IBaseFilter> pFilters;
+	std::list<CComPtr<IBaseFilter>> pFilters;
 
 	do {
 		if (!pPin || DisplayName.IsEmpty() || !pGB) {
@@ -492,9 +493,9 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 			break;
 		}
 
-		pFilters.AddTail(pBF);
+		pFilters.emplace_back(pBF);
 		BeginEnumFilters(pGB, pEnum, pBF2)
-		pFilters.AddTail(pBF2);
+		pFilters.emplace_back(pBF2);
 		EndEnumFilters
 
 		if (FAILED(pGB->AddFilter(pBF, CStringW(var.bstrVal)))) {
@@ -502,7 +503,7 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 		}
 
 		BeginEnumFilters(pGB, pEnum, pBF2)
-		if (!pFilters.Find(pBF2) && SUCCEEDED(pGB->RemoveFilter(pBF2))) {
+		if (!Contains(pFilters, pBF2) && SUCCEEDED(pGB->RemoveFilter(pBF2))) {
 			pEnum->Reset();
 		}
 		EndEnumFilters
@@ -521,7 +522,7 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 		}
 
 		BeginEnumFilters(pGB, pEnum, pBF2)
-		if (!pFilters.Find(pBF2) && SUCCEEDED(pGB->RemoveFilter(pBF2))) {
+		if (!Contains(pFilters, pBF2) && SUCCEEDED(pGB->RemoveFilter(pBF2))) {
 			pEnum->Reset();
 		}
 		EndEnumFilters

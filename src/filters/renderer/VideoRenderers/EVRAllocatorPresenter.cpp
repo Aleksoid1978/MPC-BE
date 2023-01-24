@@ -846,7 +846,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		return MF_E_INVALIDREQUEST;
 	}
 
-	std::vector<CComQIPtr<IMFMediaType>> ValidMixerTypes;
+	std::vector<CComPtr<IMFMediaType>> ValidMixerTypes;
 
 	// Get the mixer's input type
 	CComPtr<IMFMediaType> pMixerInputType;
@@ -863,7 +863,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
-		CComQIPtr<IMFMediaType> pType;
+		CComPtr<IMFMediaType> pType;
 		CComPtr<IMFMediaType> pMixerType;
 		m_pMediaType.Release();
 
