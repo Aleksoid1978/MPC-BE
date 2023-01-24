@@ -3008,6 +3008,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			OnPlayPlay();
 		}
 		break;
+		case TIMER_PAUSE: {
+			KillTimer(TIMER_PAUSE);
+			SaveHistory();
+		}
+		break;
 	}
 
 	__super::OnTimer(nIDEvent);
@@ -14425,43 +14430,7 @@ void CMainFrame::CloseMediaPrivate()
 	auto& s = AfxGetAppSettings();
 
 	if (s.bKeepHistory) {
-		auto& historyFile = AfxGetMyApp()->m_HistoryFile;
-
-		if (GetPlaybackMode() == PM_FILE) {
-			if (s.bRememberFilePos && !m_bGraphEventComplete) {
-				REFERENCE_TIME rtDur;
-				m_pMS->GetDuration(&rtDur);
-				REFERENCE_TIME rtNow;
-				m_pMS->GetCurrentPosition(&rtNow);
-
-				m_SessionInfo.Position    = rtDur > 30*UNITS ? rtNow : 0;
-				m_SessionInfo.AudioNum    = GetAudioTrackIdx();
-				m_SessionInfo.SubtitleNum = GetSubtitleTrackIdx();
-			}
-			else {
-				m_SessionInfo.CleanPosition();
-			}
-			historyFile.SaveSessionInfo(m_SessionInfo);
-		}
-		else if (GetPlaybackMode() == PM_DVD && m_SessionInfo.DVDId) {
-			if (s.bRememberDVDPos) {
-				m_SessionInfo.DVDTitle = m_iDVDTitle;
-
-				CDVDStateStream stream;
-				stream.AddRef();
-				CComPtr<IDvdState> pStateData;
-				if (SUCCEEDED(m_pDVDI->GetState(&pStateData))) {
-					CComQIPtr<IPersistStream> pPersistStream = pStateData.p;
-					if (pPersistStream && SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
-						m_SessionInfo.DVDState = stream.m_data;
-					}
-				}
-			}
-			else {
-				m_SessionInfo.CleanPosition();
-			}
-			historyFile.SaveSessionInfo(m_SessionInfo);
-		}
+		SaveHistory();
 	}
 
 	if (s.bRememberSelectedTracks && m_bRememberSelectedTracks) {
@@ -17844,6 +17813,18 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 
 	UpdateThumbarButton();
 	UpdateThumbnailClip();
+
+	if (iState == PS_PAUSE) {
+		auto& s = AfxGetAppSettings();
+		if (s.bKeepHistory) {
+			if ((GetPlaybackMode() == PM_FILE && s.bRememberFilePos)
+					|| (GetPlaybackMode() == PM_DVD && s.bRememberDVDPos)) {
+				SetTimer(TIMER_PAUSE, 5000, nullptr);
+			}
+		}
+	} else {
+		KillTimer(TIMER_PAUSE);
+	}
 }
 
 BOOL CMainFrame::CreateFullScreenWindow()
@@ -20877,6 +20858,45 @@ void CMainFrame::GetSystemTitleColor()
 				}
 			}
 		}
+	}
+}
+
+void CMainFrame::SaveHistory()
+{
+	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
+	auto& s = AfxGetAppSettings();
+
+	if (GetPlaybackMode() == PM_FILE) {
+		if (s.bRememberFilePos && !m_bGraphEventComplete) {
+			REFERENCE_TIME rtDur;
+			m_pMS->GetDuration(&rtDur);
+			REFERENCE_TIME rtNow;
+			m_pMS->GetCurrentPosition(&rtNow);
+
+			m_SessionInfo.Position    = rtDur > 30 * UNITS ? rtNow : 0;
+			m_SessionInfo.AudioNum    = GetAudioTrackIdx();
+			m_SessionInfo.SubtitleNum = GetSubtitleTrackIdx();
+		} else {
+			m_SessionInfo.CleanPosition();
+		}
+		historyFile.SaveSessionInfo(m_SessionInfo);
+	} else if (GetPlaybackMode() == PM_DVD && m_SessionInfo.DVDId) {
+		if (s.bRememberDVDPos) {
+			m_SessionInfo.DVDTitle = m_iDVDTitle;
+
+			CDVDStateStream stream;
+			stream.AddRef();
+			CComPtr<IDvdState> pStateData;
+			if (SUCCEEDED(m_pDVDI->GetState(&pStateData))) {
+				CComQIPtr<IPersistStream> pPersistStream = pStateData.p;
+				if (pPersistStream && SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
+					m_SessionInfo.DVDState = stream.m_data;
+				}
+			}
+		} else {
+			m_SessionInfo.CleanPosition();
+		}
+		historyFile.SaveSessionInfo(m_SessionInfo);
 	}
 }
 

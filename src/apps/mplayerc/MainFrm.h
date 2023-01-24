@@ -462,7 +462,8 @@ public:
 		TIMER_STATS,
 		TIMER_STATUSERASER,
 		TIMER_FLYBARWINDOWHIDER,
-		TIMER_DM_AUTOCHANGING
+		TIMER_DM_AUTOCHANGING,
+		TIMER_PAUSE
 	};
 
 	void SetColorMenu();
@@ -1455,4 +1456,6 @@ private:
 	CMediaControls m_CMediaControls;
 
 	bool m_bIsLiveOnline = false;
+
+	void SaveHistory();
 };
