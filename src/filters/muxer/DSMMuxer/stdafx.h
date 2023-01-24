@@ -30,5 +30,3 @@
 #include <vector>
 #include <list>
 #include <memory>
-
-#include <atlcoll.h>

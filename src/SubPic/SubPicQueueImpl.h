@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include <memory>
 #include <mutex>
 #include <condition_variable>
