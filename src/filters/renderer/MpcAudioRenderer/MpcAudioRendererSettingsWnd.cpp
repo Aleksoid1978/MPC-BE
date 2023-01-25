@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2021 see Authors.txt
+ * (C) 2010-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,22 +35,20 @@ CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd()
 {
 }
 
-bool CMpcAudioRendererSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CMpcAudioRendererSettingsWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pMAR);
 
 	m_pMAR.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pMAR = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pMAR = pUnk;
+		if (m_pMAR) {
+			return true;
+		}
 	}
 
-	if (!m_pMAR) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void CMpcAudioRendererSettingsWnd::OnDisconnect()
@@ -385,22 +383,20 @@ CMpcAudioRendererStatusWnd::CMpcAudioRendererStatusWnd()
 {
 }
 
-bool CMpcAudioRendererStatusWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CMpcAudioRendererStatusWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pMAR);
 
 	m_pMAR.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pMAR = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pMAR = pUnk;
+		if (m_pMAR) {
+			return true;
+		}
 	}
 
-	if (!m_pMAR) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void CMpcAudioRendererStatusWnd::OnDisconnect()

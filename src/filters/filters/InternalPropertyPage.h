@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include <afxcmn.h>
 #include <map>
 #include <HighDPI.h>
@@ -63,7 +62,7 @@ public:
 
 	virtual BOOL Create(IPropertyPageSite* pPageSite, LPCRECT pRect, CWnd* pParentWnd);
 
-	virtual bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) { return true; }
+	virtual bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) { return true; }
 	virtual void OnDisconnect() {}
 	virtual bool OnActivate() { return true; }
 	virtual void OnDeactivate() {}
@@ -78,7 +77,7 @@ class CInternalPropertyPage
 	, public CCritSec
 {
 	CComPtr<IPropertyPageSite> m_pPageSite;
-	CInterfaceList<IUnknown, &IID_IUnknown> m_pUnks;
+	std::list<CComQIPtr<IUnknown, &IID_IUnknown>> m_pUnks;
 	CInternalPropertyPageWnd* m_pWnd;
 
 protected:
@@ -140,7 +139,7 @@ class __declspec(uuid("A1EB391C-6089-4A87-9988-BE50872317D4"))
 public:
 	CPinInfoWnd();
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks);
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();

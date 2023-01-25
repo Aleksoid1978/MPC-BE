@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,22 +28,20 @@
 // CMPCVideoDecSettingsWnd
 //
 
-bool CMPCVideoDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CMPCVideoDecSettingsWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pMDF);
 
 	m_pMDF.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pMDF = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pMDF = pUnk;
+		if (m_pMDF) {
+			return true;
+		}
 	}
 
-	if (!m_pMDF) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void CMPCVideoDecSettingsWnd::OnDisconnect()
@@ -595,22 +593,20 @@ void CMPCVideoDecSettingsWnd::OnTimer(UINT_PTR nIDEvent)
 
 // ====== Codec filter property page (for standalone filter only)
 #ifdef REGISTER_FILTER
-bool CMPCVideoDecCodecWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CMPCVideoDecCodecWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pMDF);
 
 	m_pMDF.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pMDF = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pMDF = pUnk;
+		if (m_pMDF) {
+			return true;
+		}
 	}
 
-	if (!m_pMDF) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void CMPCVideoDecCodecWnd::OnDisconnect()

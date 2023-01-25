@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,7 +124,7 @@ public:
 	CMPCVideoDecSettingsWnd() = default;
 	~CMPCVideoDecSettingsWnd() = default;
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();
@@ -157,7 +157,7 @@ public:
 	CMPCVideoDecCodecWnd() = default;
 	~CMPCVideoDecCodecWnd() = default;
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();

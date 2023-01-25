@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,15 +32,17 @@ CMpaDecSettingsWnd::CMpaDecSettingsWnd()
 {
 }
 
-bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CMpaDecSettingsWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pMDF);
 
 	m_pMDF.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pMDF = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pMDF = pUnk;
+		if (m_pMDF) {
+			break;
+		}
 	}
 
 	if (!m_pMDF) {

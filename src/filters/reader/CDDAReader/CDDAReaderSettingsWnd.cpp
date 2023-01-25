@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,22 +25,20 @@ CCDDAReaderSettingsWnd::CCDDAReaderSettingsWnd(void)
 {
 }
 
-bool CCDDAReaderSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CCDDAReaderSettingsWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pMSF);
 
 	m_pMSF.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pMSF = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pMSF = pUnk;
+		if (m_pMSF) {
+			return true;
+		}
 	}
 
-	if (!m_pMSF) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void CCDDAReaderSettingsWnd::OnDisconnect()

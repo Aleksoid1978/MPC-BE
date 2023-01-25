@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,7 +85,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 public:
 	CMpaDecSettingsWnd();
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,15 +40,17 @@ CMpeg2DecSettingsWnd::CMpeg2DecSettingsWnd()
 	wcscpy_s(m_strSaturation, ResStr(IDS_MPEG2_SATURATION));
 }
 
-bool CMpeg2DecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CMpeg2DecSettingsWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pM2DF);
 
 	m_pM2DF.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pM2DF = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pM2DF = pUnk;
+		if (m_pM2DF) {
+			break;
+		}
 	}
 
 	if (!m_pM2DF) {

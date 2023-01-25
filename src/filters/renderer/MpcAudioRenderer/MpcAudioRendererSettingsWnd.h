@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2021 see Authors.txt
+ * (C) 2010-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,7 +69,7 @@ private :
 public:
 	CMpcAudioRendererSettingsWnd();
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();
@@ -122,7 +122,7 @@ protected:
 public:
 	CMpcAudioRendererStatusWnd();
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();

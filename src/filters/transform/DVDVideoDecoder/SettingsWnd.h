@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,7 +65,7 @@ class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 public:
 	CMpeg2DecSettingsWnd();
 
-	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	bool OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 	void OnDisconnect();
 	bool OnActivate();
 	void OnDeactivate();

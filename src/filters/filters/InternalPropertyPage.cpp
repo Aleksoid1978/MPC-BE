@@ -189,7 +189,7 @@ STDMETHODIMP CInternalPropertyPage::Activate(HWND hwndParent, LPCRECT pRect, BOO
 
 	CheckPointer(pRect, E_POINTER);
 
-	if (!m_pWnd || m_pWnd->m_hWnd || m_pUnks.IsEmpty()) {
+	if (!m_pWnd || m_pWnd->m_hWnd || m_pUnks.empty()) {
 		return E_UNEXPECTED;
 	}
 
@@ -256,13 +256,13 @@ STDMETHODIMP CInternalPropertyPage::SetObjects(ULONG cObjects, LPUNKNOWN* ppUnk)
 		return E_UNEXPECTED;
 	}
 
-	m_pUnks.RemoveAll();
+	m_pUnks.clear();
 
 	if (cObjects > 0) {
 		CheckPointer(ppUnk, E_POINTER);
 
 		for (ULONG i = 0; i < cObjects; i++) {
-			m_pUnks.AddTail(ppUnk[i]);
+			m_pUnks.emplace_back(ppUnk[i]);
 		}
 
 		m_pWnd = GetWindow();
@@ -337,7 +337,7 @@ STDMETHODIMP CInternalPropertyPage::Apply()
 
 	CAutoLock cAutoLock(this);
 
-	if (!m_pWnd || m_pUnks.IsEmpty() || !m_pPageSite) {
+	if (!m_pWnd || m_pUnks.empty() || !m_pPageSite) {
 		return E_UNEXPECTED;
 	}
 
@@ -379,22 +379,20 @@ CPinInfoWnd::CPinInfoWnd()
 	}
 }
 
-bool CPinInfoWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
+bool CPinInfoWnd::OnConnect(const std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks)
 {
 	ASSERT(!m_pBF);
 
 	m_pBF.Release();
 
-	POSITION pos = pUnks.GetHeadPosition();
-	while (pos && !(m_pBF = pUnks.GetNext(pos))) {
-		;
+	for (auto& pUnk : pUnks) {
+		m_pBF = pUnk;
+		if (m_pBF) {
+			return true;
+		}
 	}
 
-	if (!m_pBF) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void CPinInfoWnd::OnDisconnect()
