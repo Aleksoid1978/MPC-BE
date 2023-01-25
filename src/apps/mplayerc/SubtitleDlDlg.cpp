@@ -414,7 +414,7 @@ void CSubtitleDlDlg::OnOK()
 	auto pFrame = AfxGetMainFrame();
 
 	if (m_bReplaceSubs) {
-		pFrame->m_pSubStreams.RemoveAll();
+		pFrame->m_pSubStreams.clear();
 	}
 
 	CComPtr<ISubStream> pSubStreamToSet;
@@ -460,7 +460,7 @@ void CSubtitleDlDlg::OnOK()
 			std::unique_ptr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&pFrame->m_csSubLock));
 			if (pRTS && pRTS->Open((BYTE*)(LPCSTR)str, str.GetLength(), DEFAULT_CHARSET, CString(sub.name)) && pRTS->GetStreamCount() > 0) {
 				CComPtr<ISubStream> pSubStream = pRTS.release();
-				pFrame->m_pSubStreams.AddTail(pSubStream);
+				pFrame->m_pSubStreams.emplace_back(pSubStream);
 				if (!pSubStreamToSet) {
 					pSubStreamToSet = pSubStream;
 				}

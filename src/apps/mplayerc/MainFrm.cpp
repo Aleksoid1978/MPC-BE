@@ -5043,13 +5043,13 @@ void CMainFrame::OnStreamSub(UINT nID)
 		splcnt = MixSS.size();
 
 		int subcnt = -1;
-		POSITION pos = m_pSubStreams.GetHeadPosition();
+		auto it = m_pSubStreams.cbegin();
 		if (splcnt > 0) {
-			m_pSubStreams.GetNext(pos);
+			++it;
 			subcnt++;
 		}
-		while (pos) {
-			CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+		while (it != m_pSubStreams.cend()) {
+			CComPtr<ISubStream> pSubStream = *it++;
 			for (int i = 0; i < pSubStream->GetStreamCount(); i++) {
 				subcnt++;
 				ss.Filter	= 2;
@@ -5166,7 +5166,7 @@ void CMainFrame::OnStreamSubOnOff()
 
 	if ((GetPlaybackMode() == PM_DVD && m_pDVDI)
 			|| m_pDVS
-			|| !m_pSubStreams.IsEmpty()) {
+			|| m_pSubStreams.size()) {
 		ToggleSubtitleOnOff(true);
 	}
 }
@@ -9856,9 +9856,7 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 
 	if (GetPlaybackMode() == PM_FILE && !m_pDVS) {
 		size_t subStreamCount = 0;
-		POSITION pos = m_pSubStreams.GetHeadPosition();
-		while (pos) {
-			CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+		for (const auto& pSubStream : m_pSubStreams) {
 			subStreamCount += pSubStream->GetStreamCount();
 		}
 
@@ -13841,17 +13839,17 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		}
 
 		if (s.fDisableInternalSubtitles) {
-			m_pSubStreams.RemoveAll();
+			m_pSubStreams.clear();
 		}
 
 		int splsubcnt = subarray.size();
 
 		if (splsubcnt < 1) {
-			POSITION pos = m_pSubStreams.GetHeadPosition();
+			auto it = m_pSubStreams.cbegin();
 			int tPos = -1;
-			while (pos) {
+			while (it != m_pSubStreams.cend()) {
 				tPos++;
-				CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+				CComPtr<ISubStream> pSubStream = *it++;;
 				int i = pSubStream->GetStream();
 				WCHAR* pName = nullptr;
 				LCID lcid;
@@ -13879,18 +13877,18 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 		}
 
-		ATL::CInterfaceList<ISubStream, &__uuidof(ISubStream)> subs;
-		while (!m_pSubStreams.IsEmpty()) {
-			subs.AddTail(m_pSubStreams.RemoveHead());
+		std::list<CComPtr<ISubStream>> subs;
+		while (m_pSubStreams.size()) {
+			subs.emplace_back(m_pSubStreams.front());
+			m_pSubStreams.pop_front();
 		}
 
-		int iInternalSub = subs.GetCount();
+		int iInternalSub = subs.size();
 
 		for (const auto& si : pOMD->subs) {
 			LoadSubtitle(si);
 		}
 
-		POSITION pos = m_pSubStreams.GetHeadPosition();
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
 		int extcnt = -1;
@@ -13898,8 +13896,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			if (subarray[i].Filter == 2) extcnt++;
 		}
 
-		while (pos) {
-			pSubStream = m_pSubStreams.GetNext(pos);
+		for (const auto& pSubStream : m_pSubStreams) {
 			tPos++;
 			if (!pSubStream) continue;
 
@@ -13928,9 +13925,10 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 		}
 
-		pos = m_pSubStreams.GetHeadPosition();
-		while (!subs.IsEmpty()) {
-			pos = m_pSubStreams.InsertBefore(pos, subs.RemoveTail());
+		auto it = m_pSubStreams.cbegin();
+		while (subs.size()) {
+			m_pSubStreams.insert(it, subs.back()); // Hmm. Changing the order of subtitles?!
+			subs.pop_back();
 		}
 
 		if (m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack != -1) {
@@ -14503,7 +14501,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
-		m_pSubStreams.RemoveAll();
+		m_pSubStreams.clear();
 	}
 	m_pSubClock.Release();
 
@@ -15306,9 +15304,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 			return;
 		}
 
-		POSITION pos = m_pSubStreams.GetHeadPosition();
-
-		submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | (pos ? MF_ENABLED : MF_DISABLED), ID_SUBTITLES_ENABLE, ResStr(IDS_SUBTITLES_ENABLE));
+		submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | (m_pSubStreams.size() ? MF_ENABLED : MF_DISABLED), ID_SUBTITLES_ENABLE, ResStr(IDS_SUBTITLES_ENABLE));
 		submenu.AppendMenu(MF_SEPARATOR);
 
 		bool sep = false;
@@ -15359,16 +15355,15 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 			}
 		}
 
-		pos = m_pSubStreams.GetHeadPosition();
-		CComPtr<ISubStream> pSubStream;
+		auto it = m_pSubStreams.cbegin();
 		int tPos = -1;
-		if (splcnt > 0 && pos) {
-			pSubStream = m_pSubStreams.GetNext(pos);
+		if (splcnt > 0 && it != m_pSubStreams.cend()) {
+			++it;
 			tPos++;
 		}
 
-		while (pos) {
-			pSubStream = m_pSubStreams.GetNext(pos);
+		while (it != m_pSubStreams.cend()) {
+			CComPtr<ISubStream> pSubStream = *it++;
 			if (!pSubStream) {
 				continue;
 			}
@@ -15414,7 +15409,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 			}
 		}
 
-		if ((submenu.GetMenuItemCount() < 2) || (!m_pSubStreams.GetHeadPosition() && submenu.GetMenuItemCount() <= 3)) {
+		if ((submenu.GetMenuItemCount() < 2) || (m_pSubStreams.empty() && submenu.GetMenuItemCount() <= 3)) {
 			while (submenu.RemoveMenu(0, MF_BYPOSITION));
 		}
 	}
@@ -16131,9 +16126,9 @@ void CMainFrame::SetAlwaysOnTop(int i)
 	}
 }
 
-ISubStream *InsertSubStream(CInterfaceList<ISubStream> *subStreams, const CComPtr<ISubStream> &theSubStream)
+ISubStream *InsertSubStream(std::list<CComPtr<ISubStream>>* subStreams, const CComPtr<ISubStream>& theSubStream)
 {
-	return subStreams->GetAt(subStreams->AddTail(theSubStream));
+	return subStreams->emplace_back(theSubStream).p;
 }
 
 void CMainFrame::AddTextPassThruFilter()
@@ -16223,14 +16218,12 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 		if (CComQIPtr<IGraphBuilderSub> pGBS = m_pGB.p) {
 			HRESULT hr = pGBS->RenderSubFile(fname);
 			if (SUCCEEDED(hr)) {
-				size_t c = m_pSubStreams.GetCount();
+				size_t c = m_pSubStreams.size();
 				AddTextPassThruFilter();
 
-				if (m_pSubStreams.GetCount() > c) {
-					ISubStream *r = m_pSubStreams.GetTail();
+				if (m_pSubStreams.size() > c) {
 					if (actualStream != nullptr) {
-						*actualStream = r;
-
+						*actualStream = m_pSubStreams.back();
 						s.fEnableSubtitles = true;
 					}
 
@@ -16308,9 +16301,9 @@ void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
 
 	int i = m_iSubtitleSel;
 
-	POSITION pos = m_pSubStreams.GetHeadPosition();
-	while (pos && i >= 0) {
-		CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+	auto it = m_pSubStreams.cbegin();
+	while (it != m_pSubStreams.cend() && i >= 0) {
+		CComPtr<ISubStream> pSubStream = *it++;
 
 		if (i < pSubStream->GetStreamCount()) {
 			SetSubtitle(pSubStream, i, fApplyDefStyle);
@@ -16436,15 +16429,11 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 			if (pSubStream) {
 				int i = 0;
 
-				POSITION pos = m_pSubStreams.GetHeadPosition();
-				while (pos) {
-					CComPtr<ISubStream> pSubStream2 = m_pSubStreams.GetNext(pos);
-
+				for (const auto& pSubStream2 : m_pSubStreams) {
 					if (pSubStream == pSubStream2) {
 						m_iSubtitleSel = i + pSubStream2->GetStream();
 						break;
 					}
-
 					i += pSubStream2->GetStreamCount();
 				}
 			}
@@ -16452,9 +16441,9 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 		{
 			int i = m_iSubtitleSel;
-			POSITION pos = m_pSubStreams.GetHeadPosition();
-			while (pos && i >= 0) {
-				CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+			auto it = m_pSubStreams.cbegin();
+			while (it != m_pSubStreams.cend() && i >= 0) {
+				CComPtr<ISubStream> pSubStream = *it++;
 
 				if (i < pSubStream->GetStreamCount()) {
 					CAutoLock cAutoLock(&m_csSubLock);
@@ -16483,11 +16472,9 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 void CMainFrame::ReplaceSubtitle(ISubStream* pSubStreamOld, ISubStream* pSubStreamNew)
 {
-	POSITION pos = m_pSubStreams.GetHeadPosition();
-	while (pos) {
-		POSITION cur = pos;
-		if (pSubStreamOld == m_pSubStreams.GetNext(pos)) {
-			m_pSubStreams.SetAt(cur, pSubStreamNew);
+	for (auto& pSubStream : m_pSubStreams) {
+		if (pSubStreamOld == pSubStream.p) {
+			pSubStream = pSubStreamNew;
 			UpdateSubtitle();
 			break;
 		}
@@ -16508,9 +16495,8 @@ void CMainFrame::ReloadSubtitle()
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
 
-		POSITION pos = m_pSubStreams.GetHeadPosition();
-		while (pos) {
-			m_pSubStreams.GetNext(pos)->Reload();
+		for (const auto& pSubStream : m_pSubStreams) {
+			pSubStream->Reload();
 		}
 	}
 
@@ -18032,7 +18018,7 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 	}
 
 	if (m_pCAP) {
-		if (m_pSubStreams.IsEmpty()) {
+		if (m_pSubStreams.empty()) {
 			SendStatusMessage(ResStr(IDS_SUBTITLES_ERROR), 3000);
 			return;
 		}
@@ -18424,17 +18410,17 @@ void CMainFrame::SendSubtitleTracksToApi()
 
 			int iSubtitleSel = m_iSubtitleSel;
 
-			POSITION pos = m_pSubStreams.GetHeadPosition();
+			auto it = m_pSubStreams.cbegin();
 			CComPtr<ISubStream> pSubStream;
-			if (intSubCount > 0 && pos) {
-				pSubStream = m_pSubStreams.GetNext(pos);
+			if (intSubCount > 0 && it != m_pSubStreams.cend()) {
+				++it;
 				if (iSubtitleSel != -1) {
 					iSubtitleSel += (intSubCount - 1);
 				}
 			}
 
-			while (pos) {
-				pSubStream = m_pSubStreams.GetNext(pos);
+			while (it != m_pSubStreams.cend()) {
+				pSubStream = *it++;
 				if (!pSubStream) {
 					continue;
 				}
@@ -20407,7 +20393,7 @@ void CMainFrame::SetToolBarSubtitleButton()
 			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 				bEnabled = TRUE;
 			}
-		} else if (!m_pSubStreams.IsEmpty()) {
+		} else if (m_pSubStreams.size()) {
 			bEnabled = TRUE;
 		} else if (m_pDVDI) {
 			ULONG ulStreamsAvailable, ulCurrentStream;
