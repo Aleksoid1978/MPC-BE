@@ -15,6 +15,9 @@ Fixed decoding of some TrueHD streams.
 FLVSplitter
 Improved HEVC video support.
 
+MpegSplitter
+Fixed time navigation for 3D Blu-ray.
+
 MPCVideoDec
 Fixed decoding of some MPEG-4 ASP.
 
@@ -24,6 +27,8 @@ Fixed audio dropout when changing speed at the end of playback.
 VideoRenderers
 Refactoring and optimization.
 EVR-CP can now be used as a preview renderer.
+Fixed output of some Stereo 3D subtitles for EVR-CP.
+Added ability to convert Stereo3D from Half OverUnder to Interlace for MPC Video Renderer.
 
 Subtitles
 Improved parsing of polygon parameters in SSA/ASS subtitles.
@@ -34,6 +39,8 @@ Added option to select preview renderer.
 Fixed placement of a vertically stretched frame in the preview window.
 Additional tracks will no longer appear in the list of recent Windows files.
 Reduced the chance of false positives when moving a window by the video area.
+Added saving the current position after a 5 second pause.
+Various interface fixes.
 
 Updated Korean translation (by Potmarigold and Hackjjang).
 Updated Italian translation (by mapi68).
