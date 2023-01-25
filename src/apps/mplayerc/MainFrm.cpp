@@ -12664,7 +12664,7 @@ void CMainFrame::SetupChapters()
 				break;
 			}
 
-			CComQIPtr<IDSMChapterBag> pCB = pBF;
+			CComQIPtr<IDSMChapterBag> pCB = pBF.p;
 			if (pCB) {
 				for (DWORD i = 0, cnt = pCB->ChapGetCount(); i < cnt; i++) {
 					REFERENCE_TIME rt;
@@ -12681,7 +12681,7 @@ void CMainFrame::SetupChapters()
 				break;
 			}
 
-			CComQIPtr<IChapterInfo> pCI = pBF;
+			CComQIPtr<IChapterInfo> pCI = pBF.p;
 			if (pCI) {
 				CHAR iso6391[3];
 				::GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, iso6391, 3);
@@ -12711,7 +12711,7 @@ void CMainFrame::SetupChapters()
 				break;
 			}
 
-			CComQIPtr<IAMExtendedSeeking, &IID_IAMExtendedSeeking> pES = pBF;
+			CComQIPtr<IAMExtendedSeeking, &IID_IAMExtendedSeeking> pES = pBF.p;
 			if (pES) {
 				long MarkerCount = 0;
 				if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {

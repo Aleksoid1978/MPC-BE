@@ -1099,7 +1099,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 					// maybe the application should do this...
 
 					for (auto& pUnk : pUnks) {
-						if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pUnk) {
+						if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pUnk.p) {
 							pMPC->SetAspectRatioMode(AM_ARMODE_STRETCHED);
 						}
 					}
