@@ -69,7 +69,6 @@
     <ClCompile Include="TextFile.cpp" />
     <ClCompile Include="USFSubtitles.cpp" />
     <ClCompile Include="VobSubFile.cpp" />
-    <ClCompile Include="VobSubFileRipper.cpp" />
     <ClCompile Include="VobSubImage.cpp" />
     <ClCompile Include="XSUBSubtitle.cpp" />
   </ItemGroup>
@@ -94,7 +93,6 @@
     <ClInclude Include="TextFile.h" />
     <ClInclude Include="USFSubtitles.h" />
     <ClInclude Include="VobSubFile.h" />
-    <ClInclude Include="VobSubFileRipper.h" />
     <ClInclude Include="VobSubImage.h" />
     <ClInclude Include="XSUBSubtitle.h" />
   </ItemGroup>
