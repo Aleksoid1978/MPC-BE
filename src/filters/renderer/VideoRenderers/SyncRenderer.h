@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -657,8 +657,8 @@ namespace GothSync
 
 		UINT totalLines, totalColumns; // Including the porches and sync widths
 		UINT visibleLines, visibleColumns; // The nominal resolution
-		MovingAverage syncOffsetFifo;
-		MovingAverage frameCycleFifo;
+		MovingAverage syncOffsetFifo{ 64 };
+		MovingAverage frameCycleFifo{ 4 };
 
 		UINT pixelClock; // In pixels/s
 		double displayFreqCruise = 0;  // Nominal display frequency in frames/s

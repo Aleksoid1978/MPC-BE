@@ -3881,8 +3881,6 @@ CGenlock::CGenlock(double target, double limit, int lineD, int colD, double cloc
 	, columnDelta(colD)        // Number of columns used in display frequency adjustment, typically 1 - 2
 	, cycleDelta(clockD)       // Delta used in clock speed adjustment. In fractions of 1.0. Typically around 0.001
 	, monitor(mon)             // The monitor to be adjusted if the display refresh rate is the controlled parameter
-	, syncOffsetFifo(64)
-	, frameCycleFifo(4)
 {
 }
 
