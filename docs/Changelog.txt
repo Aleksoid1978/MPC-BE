@@ -17,6 +17,7 @@ Improved HEVC video support.
 
 MpegSplitter
 Fixed time navigation for 3D Blu-ray.
+Added option "Support 3D MVC Extension".
 
 MPCVideoDec
 Fixed decoding of some MPEG-4 ASP.
@@ -28,11 +29,12 @@ VideoRenderers
 Refactoring and optimization.
 EVR-CP can now be used as a preview renderer.
 Fixed output of some Stereo 3D subtitles for EVR-CP.
-Added ability to convert Stereo3D from Half OverUnder to Interlace for MPC Video Renderer.
+Added ability to convert Stereo3D from Half OverUnder to Interlace for MPC Video Renderer 0.6.4.1986 (393835e) or newer..
 
 Subtitles
 Improved parsing of polygon parameters in SSA/ASS subtitles.
 Minor rendering optimizations for PGS/DVB subtitles.
+Fixed player crash on some corrupted subtitles.
 
 Player
 Added option to select preview renderer.
