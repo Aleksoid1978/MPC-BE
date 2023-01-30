@@ -61,12 +61,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_FILTER_SETTINGS_CAPTION     "Settings"
-    IDS_MPEGSPLITTER_LANG_ORDER     "Audio language order:"
-    IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
-    IDS_MPEGSPLITTER_SUB_FORCING    "Forced load all subtitles"
-    IDS_MPEGSPLITTER_TRUEHD_OUTPUT  "TrueHD + AC-3 streams output"
-    IDS_MPEGSPLITTER_SUB_EMPTY_PIN  "Output empty Subtitle pin"
+    IDS_FILTER_SETTINGS_CAPTION    "Settings"
+    IDS_MPEGSPLITTER_LANG_ORDER    "Audio language order:"
+    IDS_MPEGSPLITTER_SUB_ORDER     "Subtitles language order:"
+    IDS_MPEGSPLITTER_SUB_FORCING   "Forced load all subtitles"
+    IDS_MPEGSPLITTER_TRUEHD_OUTPUT "TrueHD + AC-3 streams output"
+    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Output empty Subtitle pin"
+    IDS_MPEGSPLITTER_SUPPORT_MVC   "Support 3D MVC Extension"
 END
 
 

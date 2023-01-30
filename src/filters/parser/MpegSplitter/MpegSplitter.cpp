@@ -39,6 +39,7 @@
 #define OPT_SubLangOrder      L"SubtitlesLanguageOrder"
 #define OPT_AC3CoreOnly       L"AC3CoreOnly"
 #define OPT_SubEmptyOutput    L"SubtitleEmptyOutput"
+#define OPT_SupportMVC        L"SupportMVCExtension"
 
 #ifdef REGISTER_FILTER
 
@@ -515,6 +516,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
+	, m_bSupportMVCExtension(true)
 	, m_hasHdmvDvbSubPin(false)
 	, m_bIsBD(false)
 {
@@ -548,12 +550,17 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SubEmptyOutput, dw)) {
 			m_SubEmptyPin = !!dw;
 		}
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SupportMVC, dw)) {
+			m_bSupportMVCExtension = !!dw;
+		}
 	}
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.ReadBool(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
 	profile.ReadInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
 	profile.ReadBool(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
+	profile.ReadBool(OPT_SECTION_MPEGSplit, OPT_SupportMVC, m_bSupportMVCExtension);
 #endif
 }
 
@@ -1075,7 +1082,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		ReadClipInfo(GetPartFilename(pAsyncReader));
 	}
 
-	m_pFile.reset(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_bIsBD, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
+	m_pFile.reset(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_bIsBD, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin, m_bSupportMVCExtension));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
@@ -1569,7 +1576,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCWSTR pszFileName, CHdmvClipInfo::CPla
 {
 	m_rtPlaylistDuration = 0;
 
-	const bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, bReadMVCExtension, TRUE, &m_MVC_Base_View_R_flag));
+	const bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, bReadMVCExtension && m_bSupportMVCExtension, TRUE, &m_MVC_Base_View_R_flag));
 	if (res && !Items.empty()) {
 		m_rtMin = Items.begin()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;
@@ -1912,12 +1919,14 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetDWORDValue(OPT_ForcedSub, m_ForcedSub);
 		key.SetDWORDValue(OPT_AC3CoreOnly, m_AC3CoreOnly);
 		key.SetDWORDValue(OPT_SubEmptyOutput, m_SubEmptyPin);
+		key.SetDWORDValue(OPT_SupportMVC, m_bSupportMVCExtension);
 	}
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.WriteBool(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
 	profile.WriteInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
 	profile.WriteBool(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
+	profile.WriteBool(OPT_SECTION_MPEGSplit, OPT_SupportMVC, m_bSupportMVCExtension);
 #endif
 
 	return S_OK;
@@ -1988,6 +1997,19 @@ STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetSubEmptyPin()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_SubEmptyPin;
+}
+
+STDMETHODIMP CMpegSplitterFilter::SetSupportMVCExtension(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bSupportMVCExtension = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetSupportMVCExtension()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bSupportMVCExtension;
 }
 
 // IKeyFrameInfo

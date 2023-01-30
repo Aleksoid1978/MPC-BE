@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2011-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,4 +41,7 @@ public IUnknown {
 
 	STDMETHOD(SetSubEmptyPin(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSubEmptyPin()) PURE;
+
+	STDMETHOD(SetSupportMVCExtension(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetSupportMVCExtension()) PURE;
 };

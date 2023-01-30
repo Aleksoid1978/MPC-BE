@@ -64,7 +64,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 #ifdef REGISTER_FILTER
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
 #endif
-	bool m_ForcedSub, m_SubEmptyPin;
+	bool m_ForcedSub, m_SubEmptyPin, m_bSupportMVCExtension;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
@@ -149,6 +149,9 @@ public:
 
 	STDMETHODIMP SetSubEmptyPin(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetSubEmptyPin();
+
+	STDMETHODIMP SetSupportMVCExtension(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetSupportMVCExtension();
 
 	// IKeyFrameInfo
 	STDMETHODIMP_(HRESULT) GetKeyFrameCount(UINT& nKFs);

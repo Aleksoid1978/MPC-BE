@@ -65,6 +65,10 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 
 	CalcTextRect(rect, x1, y, w1);
 	m_cbSubEmptyPin.Create(ResStr(IDS_MPEGSPLITTER_SUB_EMPTY_PIN), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_ENABLE_SUB_EMPTY_PIN);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, w1);
+	m_cbMVCExtension.Create(ResStr(IDS_MPEGSPLITTER_SUPPORT_MVC), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_MVCEXTENSION);
 	y += 25;
 
 #ifdef REGISTER_FILTER
@@ -100,6 +104,7 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 		m_cbTrueHD.SetCheck(m_pMSF->GetTrueHD() == 0);
 		m_cbAC3Core.SetCheck(!m_cbTrueHD.GetCheck());
 		m_cbSubEmptyPin.SetCheck(m_pMSF->GetSubEmptyPin());
+		m_cbMVCExtension.SetCheck(m_pMSF->GetSupportMVCExtension());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -126,6 +131,7 @@ bool CMpegSplitterSettingsWnd::OnApply()
 		m_pMSF->SetForcedSub(m_cbForcedSub.GetCheck());
 		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : 1);
 		m_pMSF->SetSubEmptyPin(m_cbSubEmptyPin.GetCheck());
+		m_pMSF->SetSupportMVCExtension(m_cbMVCExtension.GetCheck());
 
 #ifdef REGISTER_FILTER
 		CString str;

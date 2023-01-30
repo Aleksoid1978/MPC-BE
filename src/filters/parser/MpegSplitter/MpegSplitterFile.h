@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -217,7 +217,7 @@ public:
 
 	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin, bool bSupportMVCExtension);
 
 	BOOL CheckKeyFrame(std::vector<BYTE>& pData, const stream_codec codec);
 	REFERENCE_TIME NextPTS(const DWORD TrackNum, const stream_codec codec, __int64& nextPos, const BOOL bKeyFrameOnly = FALSE, const REFERENCE_TIME rtLimit = _I64_MAX);
@@ -229,7 +229,7 @@ public:
 	__int64 m_rate; // byte/sec
 
 	int m_AC3CoreOnly;
-	bool m_ForcedSub, m_SubEmptyPin;
+	bool m_ForcedSub, m_SubEmptyPin, m_bSupportMVCExtension;
 
 	REFERENCE_TIME m_rtMin;
 	REFERENCE_TIME m_rtMax;

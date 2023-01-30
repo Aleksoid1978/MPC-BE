@@ -8,6 +8,7 @@
 #define IDS_MPEGSPLITTER_SUB_ORDER      7205
 #define IDS_MPEGSPLITTER_TRUEHD_OUTPUT  7207
 #define IDS_MPEGSPLITTER_SUB_EMPTY_PIN  7212
+#define IDS_MPEGSPLITTER_SUPPORT_MVC    7213
 
 // Next default values for new objects
 // 

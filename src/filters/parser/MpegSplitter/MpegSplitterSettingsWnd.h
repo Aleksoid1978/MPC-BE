@@ -41,6 +41,7 @@ private :
 	CButton		m_cbAC3Core;
 
 	CButton		m_cbSubEmptyPin;
+	CButton		m_cbMVCExtension;
 
 	enum {
 		IDC_PP_SUBTITLE_FORCED = 10000,
@@ -48,7 +49,8 @@ private :
 		IDC_PP_SUBTITLES_LANGUAGE_ORDER,
 		IDC_PP_TRUEHD,
 		IDC_PP_AC3CORE,
-		IDC_PP_ENABLE_SUB_EMPTY_PIN
+		IDC_PP_ENABLE_SUB_EMPTY_PIN,
+		IDC_PP_MVCEXTENSION
 	};
 
 public:

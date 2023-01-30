@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@
 
 #include <libavutil/pixfmt.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin, bool bSupportMVCExtension)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)
 	, m_type(MPEG_TYPES::mpeg_invalid)
 	, m_rate(0)
@@ -39,6 +39,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_ForcedSub(ForcedSub)
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_SubEmptyPin(SubEmptyPin)
+	, m_bSupportMVCExtension(bSupportMVCExtension)
 	, m_bOpeningCompleted(FALSE)
 	, m_programs(m_streams)
 	, m_bIMKH_CCTV(FALSE)
@@ -1003,6 +1004,10 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s)
 					&& Read(avc.h, len, avc.pData, &s.mt)) {
 				if (s.mt.subtype == MEDIASUBTYPE_AMVC && !avc.h.bMixedMVC) {
+					if (!m_bSupportMVCExtension) {
+						m_ignore_pids.push_back(pid);
+						return s;
+					}
 					s.codec = stream_codec::MVC;
 					type = stream_type::stereo;
 				} else {
