@@ -533,7 +533,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"设置在关闭并重新启动后生效。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 5		"视频渲染器"
 7		"属性"
 8		"EVR (自定义) 及 EVR 同步设置"
@@ -546,12 +546,13 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 20		"改变大小:"
 22		"影像降频 <50%:"
 24		"输出范围:"
-26		"播放框布置"
-27		"默认模式："
-29		"播放框轻微放大时不改变视频画面大小"
-31		"播放框轻微缩小时不改变视频画面大小"
-33		"默认"
-34		"输出模式:"
+26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+28		"播放框布置"
+29		"默认模式："
+31		"播放框轻微放大时不改变视频画面大小"
+33		"播放框轻微缩小时不改变视频画面大小"
+35		"默认"
+36		"输出模式:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

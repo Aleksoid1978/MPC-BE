@@ -533,7 +533,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 5		"Renderer wideo"
 7		"Properties"
 8		"EVR-CP and EVR Sync settings"
@@ -546,12 +546,13 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 20		"Skalowanie:"
 22		"Downscaling <50%:"
 24		"Zakres wyjścia:"
-26		"Kadrowanie"
-27		"Domyślny tryb:"
-29		"Do not scale at small frame size increases"
-31		"Do not scale at small frame size decreases"
-33		"Domyślne"
-34		"Tryb prezentacji:"
+26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+28		"Kadrowanie"
+29		"Domyślny tryb:"
+31		"Do not scale at small frame size increases"
+33		"Do not scale at small frame size decreases"
+35		"Domyślne"
+36		"Tryb prezentacji:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

@@ -84,6 +84,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
 	DDX_Text(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_SPIN1, m_spnEvrBuffers);
+	DDX_Control(pDX, IDC_CHECK2, m_chkMPCVRFullscreenControl);
 	DDX_Control(pDX, IDC_COMBO8, m_cbFrameMode);
 	DDX_Control(pDX, IDC_CHECK7, m_chkNoSmallUpscale);
 	DDX_Control(pDX, IDC_CHECK8, m_chkNoSmallDownscale);
@@ -261,6 +262,8 @@ BOOL CPPageVideo::OnInitDialog()
 
 	OnSurfaceFormatChange();
 
+	m_chkMPCVRFullscreenControl.SetCheck(rs.ExtraSets.bMPCVRFullscreenControl);
+
 	m_cbFrameMode.AddString(ResStr(IDS_FRAME_HALF));
 	m_cbFrameMode.AddString(ResStr(IDS_FRAME_NORMAL));
 	m_cbFrameMode.AddString(ResStr(IDS_FRAME_DOUBLE));
@@ -306,6 +309,8 @@ BOOL CPPageVideo::OnApply()
 	} else {
 		rs.ExtraSets.sD3DRenderDevice.Empty();
 	}
+
+	rs.ExtraSets.bMPCVRFullscreenControl = !!m_chkMPCVRFullscreenControl.GetCheck();
 
 	s.iDefaultVideoSize = m_cbFrameMode.GetCurSel();
 	s.bNoSmallUpscale = !!m_chkNoSmallUpscale.GetCheck();
@@ -402,6 +407,7 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
+	m_chkMPCVRFullscreenControl.EnableWindow(FALSE);
 
 	switch (CurrentVR) {
 		case VIDRNDT_EVR:
@@ -466,6 +472,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_MPCVR:
+			m_chkMPCVRFullscreenControl.EnableWindow(TRUE);
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		default:

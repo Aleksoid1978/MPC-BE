@@ -533,7 +533,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"As mudanças tem efeito após fechar e reiniciar a reprodução."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 5		"Renderizador de vídeo"
 7		"Propriedades"
 8		"Configurar EVR-CP e sincronia EVR"
@@ -546,12 +546,13 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 20		"Redimensionar:"
 22		"Red.de escala <50%:"
 24		"Faixa de saída:"
-26		"Enquadramento"
-27		"Modo padrão:"
-29		"Não dimensione ao aumentar tamanho de quadro"
-31		"Não dimensione ao diminuir tamanho de quadro"
-33		"Padrão"
-34		"Modo-apresentação:"
+26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+28		"Enquadramento"
+29		"Modo padrão:"
+31		"Não dimensione ao aumentar tamanho de quadro"
+33		"Não dimensione ao diminuir tamanho de quadro"
+35		"Padrão"
+36		"Modo-apresentação:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

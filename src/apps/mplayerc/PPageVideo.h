@@ -45,6 +45,7 @@ private:
 	CComboBox m_cbFrameMode;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
+	CButton   m_chkMPCVRFullscreenControl;
 	CButton   m_chkNoSmallUpscale;
 	CButton   m_chkNoSmallDownscale;
 

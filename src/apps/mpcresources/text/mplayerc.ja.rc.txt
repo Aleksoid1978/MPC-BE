@@ -533,7 +533,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"ファイルを開き直すと変更が有効になります。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 5		"ビデオ レンダラー"
 7		"プロパティ"
 8		"EVR-CP および EVR 同期設定"
@@ -546,12 +546,13 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 20		"リサイザー:"
 22		"ダウンスケーリング <50%:"
 24		"出力範囲:"
-26		"ビデオ フレーム"
-27		"既定のモード:"
-29		"わずかに拡大される場合は映像をリサイズしない"
-31		"わずかに縮小される場合は映像をリサイズしない"
-33		"既定"
-34		"表示モード:"
+26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+28		"ビデオ フレーム"
+29		"既定のモード:"
+31		"わずかに拡大される場合は映像をリサイズしない"
+33		"わずかに縮小される場合は映像をリサイズしない"
+35		"既定"
+36		"表示モード:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

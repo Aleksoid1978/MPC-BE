@@ -533,7 +533,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Değişiklikler oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 5		"Video işleyici"
 7		"Özellikler"
 8		"GVİ-ÖS ve GVİ Eşzamanlama ayarları"
@@ -546,12 +546,13 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 20		"Boyutlandırıcı:"
 22		"Boyut küçültme <50%:"
 24		"Çıkış aralığı:"
-26		"Çerçeveleme"
-27		"Varsayılan mod:"
-29		"Küçük kare boyut artışlarında ölçeklendirme yapma"
-31		"Küçük kare boyut azalmalarında ölçeklendirme yapma"
-33		"Varsayılan"
-34		"Sunum modu:"
+26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+28		"Çerçeveleme"
+29		"Varsayılan mod:"
+31		"Küçük kare boyut artışlarında ölçeklendirme yapma"
+33		"Küçük kare boyut azalmalarında ölçeklendirme yapma"
+35		"Varsayılan"
+36		"Sunum modu:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

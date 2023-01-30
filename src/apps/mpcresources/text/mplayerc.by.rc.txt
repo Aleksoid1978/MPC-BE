@@ -533,7 +533,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Змены ўступяць у моц пасля перазагрузкі відэа."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 5		"Video renderer"
 7		"Properties"
 8		"EVR-CP and EVR Sync settings"
@@ -546,12 +546,13 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 20		"Resizer:"
 22		"Downscaling <50%:"
 24		"Output range:"
-26		"Framing"
-27		"Default mode:"
-29		"Do not scale at small frame size increases"
-31		"Do not scale at small frame size decreases"
-33		"Default"
-34		"Presentation mode:"
+26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+28		"Framing"
+29		"Default mode:"
+31		"Do not scale at small frame size increases"
+33		"Do not scale at small frame size decreases"
+35		"Default"
+36		"Presentation mode:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

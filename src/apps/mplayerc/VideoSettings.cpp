@@ -76,13 +76,9 @@ void CRenderersSettings::SetDefault()
 
 	bExclusiveFullscreen = false;
 
-	auto& tmp = ExtraSets.bMPCVRFullscreenControl;
-
 	SubpicSets   = {};
 	Stereo3DSets = {};
 	ExtraSets    = {};
-
-	ExtraSets.bMPCVRFullscreenControl = tmp;
 }
 
 void CRenderersSettings::Load()
@@ -186,8 +182,7 @@ void CRenderersSettings::Save()
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, ExtraSets.iEVROutputRange);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, ExtraSets.nEVRBuffers);
 
-	// player does not change "MPCVRFullscreenControl" setting
-	//profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, ExtraSets.iSynchronizeMode);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, ExtraSets.iLineDelta);
