@@ -552,6 +552,8 @@ void CPPageVideo::OnBnClickedDefault()
 	OnFullscreenCheck();
 	OnSurfaceFormatChange();
 
+	m_chkMPCVRFullscreenControl.SetCheck(BST_UNCHECKED);
+
 	m_cbFrameMode.SetCurSel(ID_VIEW_VF_FROMINSIDE - ID_VIEW_VF_HALF);
 	m_chkNoSmallUpscale.SetCheck(BST_UNCHECKED);
 	m_chkNoSmallUpscale.EnableWindow(TRUE);
