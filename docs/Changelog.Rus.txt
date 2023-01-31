@@ -48,6 +48,7 @@ EVR-CP теперь может быть использован в качеств
 Обновлен итальянский перевод (автор mapi68).
 
 Обновлены библиотеки:
+	dav1d git-1.0.0-112-g77b3955;
 	ffmpeg git-n5.2-dev-2245-gab8cde6efa;
 	Little-CMS git-lcms2.14-44-ge71aeb6;
 	MediaInfo git-v22.12-17-gaa0dc68a2;
