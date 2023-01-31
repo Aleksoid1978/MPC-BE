@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2023 vedi Authors.txt"
@@ -546,7 +546,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Ridimensionatore:"
 22		"Ridimensiona <50%:"
 24		"Gamma di uscita:"
-26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+26		"Usa ID3DFullscreenControl per MPC VR (sperimentale)"
 28		"Fotogrammi"
 29		"Modalità predefinita:"
 31		"Non incrementare la dimensione del fotogramma"
@@ -1705,7 +1705,7 @@ STRING IDS_MPEGSPLITTER_LANG_ORDER		"Ordine lingua audio:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Uscita pin sottotitoli vuota"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Forza il caricamento di tutti i sottotitoli"
 STRING IDS_MPEGSPLITTER_SUB_ORDER		"Ordine della lingua dei sottotitoli:"
-STRING IDS_MPEGSPLITTER_SUPPORT_MVC		"Support 3D MVC Extension"
+STRING IDS_MPEGSPLITTER_SUPPORT_MVC		"Supporto estensione 3D MVC"
 STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Uscita stream TrueHD + AC-3"
 STRING IDS_MPLAYERC_100		"Vai al sottotitolo precedente"
 STRING IDS_MPLAYERC_101		"Vai al sottotitolo successivo"
