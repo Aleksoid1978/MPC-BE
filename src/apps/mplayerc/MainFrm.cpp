@@ -4662,6 +4662,11 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 
 	m_CMediaControls.Update();
 
+	if (s.m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && s.ExclusiveFSAllowed() && (m_bStartInD3DFullscreen || s.fLaunchfullscreen)) {
+		m_bStartInD3DFullscreen = false;
+		ToggleD3DFullscreen(true);
+	}
+
 	m_bOpening = false;
 }
 
@@ -17559,7 +17564,7 @@ void CMainFrame::OpenMedia(std::unique_ptr<OpenMediaData> pOMD)
 	bool bUseThread  = m_pGraphThread && s.fEnableWorkerThreadForOpening && (bDirectShow || !pFileData) && !pDeviceData;
 
 	// create d3dfs window if launching in fullscreen and d3dfs is enabled
-	if (s.ExclusiveFSAllowed() && (m_bStartInD3DFullscreen || s.fLaunchfullscreen)) {
+	if (s.ExclusiveFSAllowed() && (m_bStartInD3DFullscreen || s.fLaunchfullscreen) && s.m_VRSettings.iVideoRenderer != VIDRNDT_MPCVR) {
 		CreateFullScreenWindow();
 		m_pVideoWnd = m_pFullscreenWnd;
 		m_bStartInD3DFullscreen = false;
