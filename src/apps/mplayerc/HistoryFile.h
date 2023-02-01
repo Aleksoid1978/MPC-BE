@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -127,6 +127,8 @@ public:
 
 	void GetRecentPaths(std::vector<CStringW>& recentPaths, unsigned count);
 	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
+
+	unsigned GetSessionsCount();
 };
 
 //
