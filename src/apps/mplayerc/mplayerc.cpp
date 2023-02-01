@@ -1028,8 +1028,17 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	m_HistoryFile.SetMaxCount(500);
 	m_HistoryFile.SetFilename(appSavePath + MPC_HISTORY_FILENAME);
+	{
+		unsigned n = m_HistoryFile.GetSessionsCount();
+		if (m_s.nHistoryEntriesMax < n) {
+			if (auto rem = n % 100u) {
+				n += 100u - rem; // round up to the next hundred
+			}
+			m_s.nHistoryEntriesMax = std::clamp(n, 100u, 900u);
+		}
+	}
+	m_HistoryFile.SetMaxCount(m_s.nHistoryEntriesMax);
 	m_FavoritesFile.SetFilename(appSavePath + MPC_FAVORITES_FILENAME);
 
 	AfxEnableControlContainer();

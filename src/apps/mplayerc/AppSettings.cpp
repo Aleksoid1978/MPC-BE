@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -557,6 +557,7 @@ void CAppSettings::ResetSettings()
 
 	bKeepHistory = true;
 	bRecentFilesMenuEllipsis = true;
+	nHistoryEntriesMax = 200;
 	bRememberDVDPos = false;
 	bRememberFilePos = false;
 
@@ -961,6 +962,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax, 100, 900);
 
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHUFFLE, bShufflePlaylistItems);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
@@ -1592,6 +1594,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax);
 
 	// Window size
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode);

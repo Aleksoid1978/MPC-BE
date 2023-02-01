@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -540,6 +540,7 @@ public:
 	bool			bKeepHistory;
 	int				iRecentFilesNumber;
 	bool			bRecentFilesMenuEllipsis;
+	unsigned		nHistoryEntriesMax;
 	bool			bRememberDVDPos;
 	bool			bRememberFilePos;
 	bool			bRememberPlaylistItems;
