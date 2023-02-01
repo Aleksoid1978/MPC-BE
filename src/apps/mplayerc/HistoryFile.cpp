@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2022 see Authors.txt
+ * (C) 2021-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -472,6 +472,14 @@ void CHistoryFile::GetRecentSessions(std::vector<SessionInfo>& recentSessions, u
 			recentSessions.emplace_back(*it++);
 		}
 	}
+}
+
+unsigned CHistoryFile::GetSessionsCount()
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+	ReadFile();
+
+	return m_SessionInfos.size();
 }
 
 //

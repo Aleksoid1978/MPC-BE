@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -280,6 +280,7 @@
 #define IDS_RS_KEEPHISTORY					L"KeepHistory"
 #define IDS_RS_RECENT_FILES_NUMBER			L"RecentFilesNumber"
 #define IDS_RS_RECENT_FILES_MENU_ELLIPSIS	L"RecentFilesMenuEllipsis"
+#define IDS_RS_HISTORY_ENTRIES_MAX			L"HistoryEntriesMax"
 #define IDS_RS_LOGOID						L"LogoID2"
 #define IDS_RS_LOGOEXT						L"LogoExt"
 #define IDS_RS_COMPMONDESKARDIFF			L"CompMonDeskARDiff"

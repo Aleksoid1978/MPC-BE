@@ -546,7 +546,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Resizer:"
 22		"Skalierung:"
 24		"Ausgabebereich:"
-26		"Use ID3DFullscreenControl for MPC VR (experimental)"
+26		"ID3DFullscreenControl für MPC Video Renderer verwenden (experimentell)"
 28		"Videobild"
 29		"Standardmodus:"
 31		"Bei kleiner Erhöhung der Bildgröße nicht skalieren"

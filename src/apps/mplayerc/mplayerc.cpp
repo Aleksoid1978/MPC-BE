@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1028,8 +1028,17 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	m_HistoryFile.SetMaxCount(200);
 	m_HistoryFile.SetFilename(appSavePath + MPC_HISTORY_FILENAME);
+	{
+		unsigned n = m_HistoryFile.GetSessionsCount();
+		if (m_s.nHistoryEntriesMax < n) {
+			if (auto rem = n % 100u) {
+				n += 100u - rem; // round up to the next hundred
+			}
+			m_s.nHistoryEntriesMax = std::clamp(n, 100u, 900u);
+		}
+	}
+	m_HistoryFile.SetMaxCount(m_s.nHistoryEntriesMax);
 	m_FavoritesFile.SetFilename(appSavePath + MPC_FAVORITES_FILENAME);
 
 	AfxEnableControlContainer();
