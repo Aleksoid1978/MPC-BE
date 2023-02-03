@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -97,8 +97,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			const DWORD dwError = GetLastError();
 			if (dwError == ERROR_INTERNET_CONNECTION_RESET
 					|| dwError == ERROR_HTTP_INVALID_SERVER_RESPONSE) {
-				CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
-				if (S_OK == m_HTTPAsync.SendRequest(customHeader)) {
+				if (S_OK == m_HTTPAsync.Seek(llPosition)) {
 					return true;
 				}
 			}
@@ -120,10 +119,9 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 						return E_FAIL;
 					}
 				} else {
-					CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
-					HRESULT hr = m_HTTPAsync.SendRequest(customHeader);
+					HRESULT hr = m_HTTPAsync.Seek(llPosition);
 #ifdef DEBUG_OR_LOG
-					DLog(L"CAsyncFileReader::SyncRead() : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr);
+					DLog(L"CAsyncFileReader::SyncRead() : do HTTP seeking from %I64d to %I64d, hr = 0x%08x", m_pos, llPosition, hr);
 #endif
 					if (hr != S_OK) {
 						return hr;

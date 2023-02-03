@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2022 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -408,6 +408,16 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 	}
 
 	return _dwSizeRead ? S_OK : S_FALSE;
+}
+
+HRESULT CHTTPAsync::Seek(UINT64 position)
+{
+	if (!m_lenght || position > m_lenght) {
+		return E_FAIL;
+	}
+
+	CString customHeader; customHeader.Format(L"Range: bytes=%I64u-\r\n", position);
+	return SendRequest(customHeader);
 }
 
 constexpr size_t decompressBlockSize = 1024;

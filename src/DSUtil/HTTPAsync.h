@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2022 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,6 +83,8 @@ public:
 	HRESULT Connect(LPCWSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCWSTR lpszCustomHeader = L"");
 	HRESULT SendRequest(LPCWSTR lpszCustomHeader = L"", DWORD dwTimeOut = INFINITE);
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
+
+	HRESULT Seek(UINT64 position);
 
 	const CString& GetHeader() const;
 
