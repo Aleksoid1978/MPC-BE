@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Lembrar faixas selecionadas na lista de reprodução"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Opções abrir"
 6		"Forçar único processo"
 7		"Usar mesmo processo para todos os arquivos"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Pasta do player"
 17		"Histórico"
 18		"Manter histórico de arquivos abertos"
-20		"Número de arquivos recentes:"
-23		"Lembrar posição do DVD"
-24		"Lembrar posição do arquivo"
-25		"Lembrar último zoom Pan-n-Scan"
-26		"Lembrar lista de reprodução principal"
-27		"Outros"
-28		"Ícone de bandeja"
-29		"Mostrar OSD"
-30		"Mostrar nome do arquivo de mídia"
-31		"Mostrar tempo de busca"
-32		"Desativar menu 'Abrir disco'"
-33		"Prioridade do processo acima do normal"
-34		"Tempo limite da rede:"
-37		"seg"
+20		"Maximum number of entries:"
+23		"Número de arquivos recentes:"
+26		"Lembrar posição do DVD"
+27		"Lembrar posição do arquivo"
+28		"Lembrar último zoom Pan-n-Scan"
+29		"Lembrar lista de reprodução principal"
+30		"Outros"
+31		"Ícone de bandeja"
+32		"Mostrar OSD"
+33		"Mostrar nome do arquivo de mídia"
+34		"Mostrar tempo de busca"
+35		"Desativar menu 'Abrir disco'"
+36		"Prioridade do processo acima do normal"
+37		"Tempo limite da rede:"
+40		"seg"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Não pode definir a janela destino para noti
 STRING IDS_HISTORY_CLEAR		"Limpar"
 STRING IDS_HISTORY_PATH		"Caminho"
 STRING IDS_HISTORY_POSITION		"Posição"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Remover arquivos ausentes"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Remover selecionado"
 STRING IDS_HISTORY_TITLE		"Título"

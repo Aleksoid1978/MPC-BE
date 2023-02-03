@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Recordar pistas seleccionadas en la Lista de Reproducción"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Opciones de apertura"
 6		"Forzar un solo proceso"
 7		"Usar el mismo proceso para cada archivo"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Carpeta del reproductor"
 17		"Historial"
 18		"Mantener historial de los archivos abiertos"
-20		"Número de archivos recientes:"
-23		"Recordar la posición del DVD"
-24		"Recordar la posición del Archivo"
-25		"Recordar la última ampliación Pan & Scan"
-26		"Recordar Lista de Reproducción principal"
-27		"Otros"
-28		"Icono de bandeja"
-29		"Mostrar OSD (requiere reinicio)"
-30		"Mostrar nombre de archivo multimedia"
-31		"Mostrar tiempo de búsqueda"
-32		"Deshabilitar menú 'Abrir Disco'"
-33		"Mayor prioridad para el proceso"
-34		"Tiempo de espera de red:"
-37		"seg."
+20		"Maximum number of entries:"
+23		"Número de archivos recientes:"
+26		"Recordar la posición del DVD"
+27		"Recordar la posición del Archivo"
+28		"Recordar la última ampliación Pan & Scan"
+29		"Recordar Lista de Reproducción principal"
+30		"Otros"
+31		"Icono de bandeja"
+32		"Mostrar OSD (requiere reinicio)"
+33		"Mostrar nombre de archivo multimedia"
+34		"Mostrar tiempo de búsqueda"
+35		"Deshabilitar menú 'Abrir Disco'"
+36		"Mayor prioridad para el proceso"
+37		"Tiempo de espera de red:"
+40		"seg."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"No se pudo establecer la ventana de destino 
 STRING IDS_HISTORY_CLEAR		"Borrar"
 STRING IDS_HISTORY_PATH		"Ruta"
 STRING IDS_HISTORY_POSITION		"Posición"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Eliminar archivos faltantes"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Eliminar seleccionado"
 STRING IDS_HISTORY_TITLE		"Título"

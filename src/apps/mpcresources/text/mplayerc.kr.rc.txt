@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"재생 목록에서 선택한 트랙 기억"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 7		"파일을 열 때마다 같은 재생기창 사용"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"재생기 폴더"
 17		"히스토리"
 18		"최근에 열었던 파일목록 기억"
-20		"최근 파일 수 :"
-23		"DVD 위치 기억"
-24		"파일 위치 기억"
-25		"종료 시, PnS 확대율 기억"
-26		"메인 재생목록 기억"
-27		"기타"
-28		"트레이에 아이콘 보이기"
-29		"OSD 보이기 (다시 시작 필요)"
-30		"미디어 파일명 표기"
-31		"검색 시간 표기"
-32		"'디스크 열기' 메뉴 사용 안 함"
-33		"프로세스 우선순위 높이기"
-34		"네트워크 경과 시간 :"
-37		"초"
+20		"Maximum number of entries:"
+23		"최근 파일 수 :"
+26		"DVD 위치 기억"
+27		"파일 위치 기억"
+28		"종료 시, PnS 확대율 기억"
+29		"메인 재생목록 기억"
+30		"기타"
+31		"트레이에 아이콘 보이기"
+32		"OSD 보이기 (다시 시작 필요)"
+33		"미디어 파일명 표기"
+34		"검색 시간 표기"
+35		"'디스크 열기' 메뉴 사용 안 함"
+36		"프로세스 우선순위 높이기"
+37		"네트워크 경과 시간 :"
+40		"초"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"그래프 통지 대상 윈도 설정 실패
 STRING IDS_HISTORY_CLEAR		"Clear"
 STRING IDS_HISTORY_PATH		"경로"
 STRING IDS_HISTORY_POSITION		"위치"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"빠진 파일 삭제"
 STRING IDS_HISTORY_REMOVE_SELECTED		"선택된 것 삭제"
 STRING IDS_HISTORY_TITLE		"제목"

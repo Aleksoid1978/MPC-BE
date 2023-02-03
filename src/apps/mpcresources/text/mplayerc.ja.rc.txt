@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"プレイリストで選択されたトラックを記憶する"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"開くオプション"
 6		"複数起動を禁止する"
 7		"同じプレーヤーで開く"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"MPC-BE フォルダー"
 17		"履歴"
 18		"最近使ったファイルの履歴を保存する"
-20		"　　メニューに表示するファイル数:"
-23		"DVD の再生位置を記憶する"
-24		"ファイルの再生位置を記憶する"
-25		"終了時の PnS 拡大率を記憶する"
-26		"メイン プレイリストを記憶する"
-27		"その他"
-28		"タスクトレイ アイコン"
-29		"OSD を表示する"
-30		"メディア ファイル名を表示する"
-31		"シーク タイムを表示する"
-32		"「ディスクを開く」のメニューを無効にする"
-33		"プロセスの優先度を 通常以上 にする"
-34		"ネットワーク タイムアウト:"
-37		"秒"
+20		"Maximum number of entries:"
+23		"　　メニューに表示するファイル数:"
+26		"DVD の再生位置を記憶する"
+27		"ファイルの再生位置を記憶する"
+28		"終了時の PnS 拡大率を記憶する"
+29		"メイン プレイリストを記憶する"
+30		"その他"
+31		"タスクトレイ アイコン"
+32		"OSD を表示する"
+33		"メディア ファイル名を表示する"
+34		"シーク タイムを表示する"
+35		"「ディスクを開く」のメニューを無効にする"
+36		"プロセスの優先度を 通常以上 にする"
+37		"ネットワーク タイムアウト:"
+40		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"グラフ通知のターゲット ウィン�
 STRING IDS_HISTORY_CLEAR		"クリア"
 STRING IDS_HISTORY_PATH		"パス"
 STRING IDS_HISTORY_POSITION		"場所"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"見つからないファイルを削除"
 STRING IDS_HISTORY_REMOVE_SELECTED		"選択項目を削除"
 STRING IDS_HISTORY_TITLE		"タイトル"

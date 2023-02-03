@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Zapamti izabrane zapise iz playliste"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Mogućnosti Otvaranja"
 6		"Forsiraj kao jedan proces"
 7		"UKoristi isti proces za svaku datoteku"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Mapa programa"
 17		"Povijest"
 18		"Zadrži povijest nedavno otvaranih datoteka"
-20		"Broj nedavnih datoteka:"
-23		"Zapamti DVD poziciju"
-24		"Zapamti poziciju datoteke"
-25		"Zapamti zadnji Pan-n-Scan Zoom"
-26		"Zapamti glavnu playlistu"
-27		"Ostalo"
-28		"Tray ikona"
-29		"Pokaži OSD"
-30		"Pokaži ime medijske datoteke"
-31		"Pokaži vrijeme pretrage"
-32		"Onesposobi izbornik 'Otvori Disk'"
-33		"Procesiraj prioritet iznad normalnog"
-34		"Mrežna stanka:"
-37		"sek."
+20		"Maximum number of entries:"
+23		"Broj nedavnih datoteka:"
+26		"Zapamti DVD poziciju"
+27		"Zapamti poziciju datoteke"
+28		"Zapamti zadnji Pan-n-Scan Zoom"
+29		"Zapamti glavnu playlistu"
+30		"Ostalo"
+31		"Tray ikona"
+32		"Pokaži OSD"
+33		"Pokaži ime medijske datoteke"
+34		"Pokaži vrijeme pretrage"
+35		"Onesposobi izbornik 'Otvori Disk'"
+36		"Procesiraj prioritet iznad normalnog"
+37		"Mrežna stanka:"
+40		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Could not set target window for graph notifi
 STRING IDS_HISTORY_CLEAR		"Očisti"
 STRING IDS_HISTORY_PATH		"Putanja"
 STRING IDS_HISTORY_POSITION		"Pozicija"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Ukloni datoteke koje nedostaju"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Ukloni odabrano"
 STRING IDS_HISTORY_TITLE		"Naslov"

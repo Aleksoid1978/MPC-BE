@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Απομνημόνευση επιλεγμένων κομματιών στη λίστα αναπαραγωγής"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Επιλογές ανοίγματος"
 6		"Εξαναγκασμός μίας διεργασίας"
 7		"Χρήση του ίδιου αναπαραγωγού για κάθε αρχείο πολυμέσων"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Player folder"
 17		"Ιστορικό"
 18		"Διατήρηση ιστορικού πρόσφατων αρχείων"
-20		"Αριθμός αρχείων ανάκτησης:"
-23		"Απομνημόνευση θέσης DVD"
-24		"Απομνημόνευση θέσης αρχείου"
-25		"Απομνημ. τελευτ. ζούμ πανορ/κής && σάρωσης"
-26		"Απομνημόνευση κύριας λίστας αναπαραγωγής"
-27		"Άλλα"
-28		"Εικονίδιο στη γραμμή ειδοποιήσεων"
-29		"Εμφάνιση OSD (απαιτείται επανεκκίνηση)"
-30		"Εμφάνιση του ονόματος αρχείου"
-31		"Εμφάνιση χρόνου αναζήτησης"
-32		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
-33		"Προτεραιότητα διεργασίας πάνω από κανονική"
-34		"Χρονικό διάστημα δικτύου:"
-37		"δευτ."
+20		"Maximum number of entries:"
+23		"Αριθμός αρχείων ανάκτησης:"
+26		"Απομνημόνευση θέσης DVD"
+27		"Απομνημόνευση θέσης αρχείου"
+28		"Απομνημ. τελευτ. ζούμ πανορ/κής && σάρωσης"
+29		"Απομνημόνευση κύριας λίστας αναπαραγωγής"
+30		"Άλλα"
+31		"Εικονίδιο στη γραμμή ειδοποιήσεων"
+32		"Εμφάνιση OSD (απαιτείται επανεκκίνηση)"
+33		"Εμφάνιση του ονόματος αρχείου"
+34		"Εμφάνιση χρόνου αναζήτησης"
+35		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
+36		"Προτεραιότητα διεργασίας πάνω από κανονική"
+37		"Χρονικό διάστημα δικτύου:"
+40		"δευτ."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Δεν ήταν δυνατός ο ορισμ
 STRING IDS_HISTORY_CLEAR		"Clear"
 STRING IDS_HISTORY_PATH		"Path"
 STRING IDS_HISTORY_POSITION		"Position"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Remove selected"
 STRING IDS_HISTORY_TITLE		"Title"

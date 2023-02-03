@@ -1330,6 +1330,7 @@
 #define IDS_RECENT_FILES_CLEAR          33283
 #define IDS_RECENT_FILES                33284
 #define IDS_RECENT_FILES_QUESTION       33285
+#define IDS_HISTORY_REDUCE_QUESTION     33286
 #define IDC_RESETDEVICE                 33400
 #define IDS_NAVIGATE_TUNERSCAN          33401
 #define IDS_SUBTITLES_ERROR             33402

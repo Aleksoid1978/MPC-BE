@@ -63,6 +63,8 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DVD_POS,  m_bRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2,   m_bRememberPlaylistItems);
+	DDX_Control(pDX, IDC_EDIT3,  m_edtHistoryEntriesMax);
+	DDX_Control(pDX, IDC_SPIN3,  m_spnHistoryEntriesMax);
 	DDX_Control(pDX, IDC_EDIT1,  m_edtRecentFiles);
 	DDX_Control(pDX, IDC_SPIN1,  m_spnRecentFiles);
 	DDX_Control(pDX, IDC_EDIT2,  m_edtNetworkTimeout);
@@ -123,11 +125,16 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bRememberFilePos			= s.bRememberFilePos;
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
 
-	m_edtRecentFiles = s.iRecentFilesNumber;
+	UDACCEL acc;
+	m_edtHistoryEntriesMax.SetRange(100, 900);
+	m_spnHistoryEntriesMax.SetRange(100, 900);
+	m_spnHistoryEntriesMax.SetPos(s.nHistoryEntriesMax);
+	acc = { 0, 100 };
+	m_spnHistoryEntriesMax.SetAccel(1, &acc);
 	m_edtRecentFiles.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	m_spnRecentFiles.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	m_spnRecentFiles.SetPos(s.iRecentFilesNumber);
-	UDACCEL acc = {0, 5};
+	acc = {0, 5};
 	m_spnRecentFiles.SetAccel(1, &acc);
 
 	m_edtNetworkTimeout = s.iNetworkTimeout;
@@ -232,6 +239,27 @@ BOOL CPPagePlayer::OnApply()
 			}
 
 			// Don't clear AfxGetAppSettings().strLastOpenFile here.
+		}
+	}
+
+	const unsigned hemax = std::clamp(RoundUp(m_edtHistoryEntriesMax, 100), 100u, 900u);
+	if (s.nHistoryEntriesMax != hemax) {
+		auto& historyFile = AfxGetMyApp()->m_HistoryFile;
+		const unsigned n = historyFile.GetSessionsCount();
+		if (hemax < n) {
+			CStringW message;
+			message.Format(IDS_HISTORY_REDUCE_QUESTION, n, hemax);
+			if (IDYES == AfxMessageBox(message, MB_ICONQUESTION | MB_YESNO)) {
+				s.nHistoryEntriesMax = hemax;
+				historyFile.TrunkFile(hemax);
+			}
+			else {
+				m_spnHistoryEntriesMax.SetPos(s.nHistoryEntriesMax);
+			}
+		}
+		else {
+			s.nHistoryEntriesMax = hemax;
+			historyFile.SetMaxCount(hemax);
 		}
 	}
 

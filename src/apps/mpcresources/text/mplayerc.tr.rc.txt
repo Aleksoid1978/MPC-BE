@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Oynatma listesindeki seçili parçaları hatırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Açılış ayarları"
 6		"Tek oynatıcı için zorla"
 7		"Her dosya için benzer oynatıcı"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Oynatıcı klasörü"
 17		"Geçmiş"
 18		"Son açılan dosyaları geçmişte sakla"
-20		"Son dosyalar sayısı:"
-23		"DVD yerleşimini hatırla"
-24		"Dosya yerleşimini hatırla"
-25		"Son büyütme ayarlarını hatırla"
-26		"Ana oynatma listesini hatırla"
-27		"Diğer"
-28		"Bildirim alanı simgesi göster"
-29		"OSD göster"
-30		"Dosya adını göster"
-31		"Atlama zamanını göster"
-32		"Disk Açma özelliğini devre dışı bırak"
-33		"İşlem önceliğini normalden yüksek tut"
-34		"Ağ zaman aşımı:"
-37		"sn."
+20		"Maximum number of entries:"
+23		"Son dosyalar sayısı:"
+26		"DVD yerleşimini hatırla"
+27		"Dosya yerleşimini hatırla"
+28		"Son büyütme ayarlarını hatırla"
+29		"Ana oynatma listesini hatırla"
+30		"Diğer"
+31		"Bildirim alanı simgesi göster"
+32		"OSD göster"
+33		"Dosya adını göster"
+34		"Atlama zamanını göster"
+35		"Disk Açma özelliğini devre dışı bırak"
+36		"İşlem önceliğini normalden yüksek tut"
+37		"Ağ zaman aşımı:"
+40		"sn."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Grafiksel bilgi için hedef pencere oluştur
 STRING IDS_HISTORY_CLEAR		"Temizle"
 STRING IDS_HISTORY_PATH		"Dosya yolu"
 STRING IDS_HISTORY_POSITION		"Konum"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Kayıp Dosyaları Sil"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Seçilenleri Sil"
 STRING IDS_HISTORY_TITLE		"Başlık"

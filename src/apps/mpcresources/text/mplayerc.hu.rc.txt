@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Megnyitási lehetőségek"
 6		"Kényszerítsen egyetlen folyamatot"
 7		"Használja ugyanazt a folyamatot minden fájlhoz"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Lejátszó mappa"
 17		"Előzmények"
 18		"Megnyitott fájlok előzményeinek megtartása"
-20		"Legutóbbi fájlok száma:"
-23		"DVD-pozíció megjegyzése"
-24		"Fájlpozíció megjegyzése"
-25		"Emlékezzen az utolsó Pan-n-Scan Zoomra"
-26		"Emlékezzen a fő lejátszási listára"
-27		"Egyéb"
-28		"Legyen tálca ikon"
-29		"OSD megjelenítése (újraindítást igényel)"
-30		"Médiafájl nevének megjelenítése"
-31		"Keresési idő megjelenítése"
-32		"Kikapcsolja az 'Open Disc' menüt"
-33		"A lejátszó prioritása normál érték felett"
-34		"Hálózat időtúllépése:"
-37		"mp."
+20		"Maximum number of entries:"
+23		"Legutóbbi fájlok száma:"
+26		"DVD-pozíció megjegyzése"
+27		"Fájlpozíció megjegyzése"
+28		"Emlékezzen az utolsó Pan-n-Scan Zoomra"
+29		"Emlékezzen a fő lejátszási listára"
+30		"Egyéb"
+31		"Legyen tálca ikon"
+32		"OSD megjelenítése (újraindítást igényel)"
+33		"Médiafájl nevének megjelenítése"
+34		"Keresési idő megjelenítése"
+35		"Kikapcsolja az 'Open Disc' menüt"
+36		"A lejátszó prioritása normál érték felett"
+37		"Hálózat időtúllépése:"
+40		"mp."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Nem sikerült beállítani a célablakot a g
 STRING IDS_HISTORY_CLEAR		"Tiszta"
 STRING IDS_HISTORY_PATH		"Útvonal"
 STRING IDS_HISTORY_POSITION		"Pozíció"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Hiányzó fájlok eltávolítása"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Kiválasztottak törlése"
 STRING IDS_HISTORY_TITLE		"Cím"

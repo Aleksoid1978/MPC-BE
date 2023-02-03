@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Ausgewählte Titel in der Wiedergabeliste merken"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Öffnen von Medien"
 6		"Einzelnen Prozess des Players erzwingen"
 7		"Mediendateien mit dem aktuellen Player öffnen"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Programm-Ordner"
 17		"Chronik und Position"
 18		"&Chronik anlegen"
-20		"Einträge in 'Neueste Chronik':"
-23		"DVD/BD-Wiedergabeposition merken"
-24		"Datei-Wiedergabeposition merken"
-25		"Letzten Pan&&Scan-Zoom merken"
-26		"Hauptwiedergabeliste speichern"
-27		"Weitere Einstellungen"
-28		"&Taskleistensymbol anzeigen"
-29		"OSD anzeigen (Neustart notwendig)"
-30		"Dateiname (bzw. Titel)"
-31		"Verstrichene/Verbleibende Zeit / Gesamtzeit"
-32		"Disc-Wiedergabe deaktivieren"
-33		"&Prozesspriorität höher als normal"
-34		"Netzwerk-Zeitüberschreitung:"
-37		"Sek."
+20		"Maximum number of entries:"
+23		"Einträge in 'Neueste Chronik':"
+26		"DVD/BD-Wiedergabeposition merken"
+27		"Datei-Wiedergabeposition merken"
+28		"Letzten Pan&&Scan-Zoom merken"
+29		"Hauptwiedergabeliste speichern"
+30		"Weitere Einstellungen"
+31		"&Taskleistensymbol anzeigen"
+32		"OSD anzeigen (Neustart notwendig)"
+33		"Dateiname (bzw. Titel)"
+34		"Verstrichene/Verbleibende Zeit / Gesamtzeit"
+35		"Disc-Wiedergabe deaktivieren"
+36		"&Prozesspriorität höher als normal"
+37		"Netzwerk-Zeitüberschreitung:"
+40		"Sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Das Zielfenster für die Graph Benachrichtig
 STRING IDS_HISTORY_CLEAR		"Gesamte Chronik löschen"
 STRING IDS_HISTORY_PATH		"Pfad"
 STRING IDS_HISTORY_POSITION		"Position"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Nicht vorhandene Medien entfernen"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Ausgewählte löschen"
 STRING IDS_HISTORY_TITLE		"Titel"

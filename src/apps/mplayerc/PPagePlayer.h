@@ -53,6 +53,8 @@ public:
 	CComboBox m_cbTitleBarPrefix;
 	CComboBox m_cbSeekBarText;
 
+	CIntEdit m_edtHistoryEntriesMax;
+	CSpinButtonCtrl m_spnHistoryEntriesMax;
 	CIntEdit m_edtRecentFiles;
 	CSpinButtonCtrl m_spnRecentFiles;
 

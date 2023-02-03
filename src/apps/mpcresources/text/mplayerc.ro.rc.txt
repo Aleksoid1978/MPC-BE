@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"Opțiuni pentru deschidere"
 6		"Force a single process"
 7		"Folosește același player pentru fiecare fișier media"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Player folder"
 17		"Istoric"
 18		"Ține un istoric al ultimelor fișiere deschise"
-20		"Number of recent files:"
-23		"Ține minte poziția pe DVD"
-24		"Ține minte poziția în fișier"
-25		"Ține minte ultima focalizare a Pan-n-Scan"
-26		"Remember main playlist"
-27		"Altele"
-28		"Pictogramă în zona de notificare"
-29		"Arată OSD (necesită repornire player)"
-30		"Show name of media file"
-31		"Show seek time"
-32		"Dezactivează meniul ""Deschide Disc"""
-33		"Prioritatea procesării peste normal"
-34		"Network timeout:"
-37		"sec."
+20		"Maximum number of entries:"
+23		"Number of recent files:"
+26		"Ține minte poziția pe DVD"
+27		"Ține minte poziția în fișier"
+28		"Ține minte ultima focalizare a Pan-n-Scan"
+29		"Remember main playlist"
+30		"Altele"
+31		"Pictogramă în zona de notificare"
+32		"Arată OSD (necesită repornire player)"
+33		"Show name of media file"
+34		"Show seek time"
+35		"Dezactivează meniul ""Deschide Disc"""
+36		"Prioritatea procesării peste normal"
+37		"Network timeout:"
+40		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Nu se poate seta fereastra ţintă pentru no
 STRING IDS_HISTORY_CLEAR		"Clear"
 STRING IDS_HISTORY_PATH		"Path"
 STRING IDS_HISTORY_POSITION		"Position"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Remove selected"
 STRING IDS_HISTORY_TITLE		"Title"

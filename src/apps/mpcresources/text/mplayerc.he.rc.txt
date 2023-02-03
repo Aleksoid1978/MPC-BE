@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 5		"פתח הגדרות"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -417,20 +417,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 38
 16		"Player folder"
 17		"היסטוריה"
 18		"שמור היסטורייה של קבצים שנפתחו לאחרונה"
-20		"Number of recent files:"
-23		"זכור מיקום בדי.וי.די"
-24		"זכור מיקום בקובץ"
-25		"Remember last Pan-n-Scan Zoom"
-26		"Remember main playlist"
-27		"הגדרות נוספות"
-28		"אייקון ליד השעון"
-29		"תצוגת מידע בוידאו (דורש הפעלה מחדש)"
-30		"Show name of media file"
-31		"Show seek time"
-32		"Disable 'Open Disc' menu"
-33		"הנגן מקבל קדימות על פני תהליכים אחרים"
-34		"Network timeout:"
-37		"sec."
+20		"Maximum number of entries:"
+23		"Number of recent files:"
+26		"זכור מיקום בדי.וי.די"
+27		"זכור מיקום בקובץ"
+28		"Remember last Pan-n-Scan Zoom"
+29		"Remember main playlist"
+30		"הגדרות נוספות"
+31		"אייקון ליד השעון"
+32		"תצוגת מידע בוידאו (דורש הפעלה מחדש)"
+33		"Show name of media file"
+34		"Show seek time"
+35		"Disable 'Open Disc' menu"
+36		"הנגן מקבל קדימות על פני תהליכים אחרים"
+37		"Network timeout:"
+40		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
@@ -1509,6 +1510,7 @@ STRING IDS_GRAPH_TARGET_WND_ERROR		"Could not set target window for graph notifi
 STRING IDS_HISTORY_CLEAR		"Clear"
 STRING IDS_HISTORY_PATH		"Path"
 STRING IDS_HISTORY_POSITION		"Position"
+STRING IDS_HISTORY_REDUCE_QUESTION		"Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
 STRING IDS_HISTORY_REMOVE_MISSING		"Remove missing files"
 STRING IDS_HISTORY_REMOVE_SELECTED		"Remove selected"
 STRING IDS_HISTORY_TITLE		"Title"
