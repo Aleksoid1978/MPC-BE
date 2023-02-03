@@ -13849,7 +13849,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			int tPos = -1;
 			while (it != m_pSubStreams.cend()) {
 				tPos++;
-				CComPtr<ISubStream> pSubStream = *it++;;
+				CComPtr<ISubStream> pSubStream = *it++;
 				int i = pSubStream->GetStream();
 				WCHAR* pName = nullptr;
 				LCID lcid;
@@ -13926,10 +13926,10 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		}
 
 		auto it = m_pSubStreams.cbegin();
-		while (subs.size()) {
-			m_pSubStreams.insert(it, subs.back()); // Hmm. Changing the order of subtitles?!
-			subs.pop_back();
+		for (const auto& sub : subs) {
+			m_pSubStreams.insert(it, sub);
 		}
+		subs.clear();
 
 		if (m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack != -1) {
 			SetSubtitleTrackIdx(m_wndPlaylistBar.curPlayList.m_nSelectedSubtitleTrack);
