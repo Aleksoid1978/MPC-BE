@@ -87,6 +87,8 @@ inline void ReduceDim(SIZE &dim)
 
 SIZE ReduceDim(double value);
 
+unsigned RoundUp(const unsigned value, const unsigned base);
+
 int IncreaseByGrid(int value, const int step);
 int DecreaseByGrid(int value, const int step);
 

@@ -214,6 +214,12 @@ SIZE ReduceDim(double value)
 	return{ a.num, a.den };
 }
 
+unsigned RoundUp(const unsigned value, const unsigned base)
+{
+	auto rem = value % base;
+	return rem ? value - rem + base : value;
+}
+
 int IncreaseByGrid(int value, const int step)
 {
 	auto r = value % step;
