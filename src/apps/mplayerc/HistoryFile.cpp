@@ -482,6 +482,21 @@ unsigned CHistoryFile::GetSessionsCount()
 	return m_SessionInfos.size();
 }
 
+void CHistoryFile::TrunkFile(unsigned maxcount)
+{
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	ReadFile();
+
+	SetMaxCount(maxcount);
+
+	while (m_SessionInfos.size() > m_maxCount) {
+		m_SessionInfos.pop_back();
+	}
+
+	WriteFile();
+}
+
 //
 // CFavoritesFile
 //

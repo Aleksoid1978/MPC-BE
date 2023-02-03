@@ -129,6 +129,7 @@ public:
 	void GetRecentSessions(std::vector<SessionInfo>& recentSessions, unsigned count);
 
 	unsigned GetSessionsCount();
+	void TrunkFile(unsigned maxcount);
 };
 
 //
