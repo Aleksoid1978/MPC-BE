@@ -14457,7 +14457,7 @@ void CMainFrame::CloseMediaPrivate()
 	Content::Online::Clear();
 
 	if (m_pMC) {
-		if (GetPlaybackMode() == PM_FILE) {
+		if (GetPlaybackMode() == PM_FILE && m_clsidCAP == CLSID_EVRAllocatorPresenter) {
 			LONGLONG dur = 0;
 			m_pMS->GetDuration(&dur);
 			// LAV Splitter may hang when calling IMediaSeeking::SetPositions if duration is unknown
