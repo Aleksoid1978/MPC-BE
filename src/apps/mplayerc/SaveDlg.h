@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -84,8 +84,10 @@ private:
 	WSAEVENT m_WSAEvent = nullptr;
 	sockaddr_in m_addr = {};
 
+	bool m_bYoutube = false;
+
 public:
-	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr);
+	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, bool bYoutube, HRESULT& hr);
 
 	bool IsCompleteOk();
 

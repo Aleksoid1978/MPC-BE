@@ -50,10 +50,11 @@ enum {
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
+CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, bool bYoutube, HRESULT& hr)
 	: CTaskDialog(L"", CString(name) + L"\n" + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_in(in)
 	, m_out(out)
+	, m_bYoutube(bYoutube)
 {
 	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (m_hIcon != nullptr) {
@@ -285,13 +286,53 @@ void CSaveDlg::Save()
 
 		int attempts = 0;
 
+		struct http_chunk_t {
+			bool use;
+			UINT64 size;
+			UINT64 start;
+			UINT64 end;
+			UINT64 read;
+		} http_chunk = {};
+		constexpr auto http_maximum_chunk_size = 10ull * MEGABYTE - 1;
+
+		if (m_bYoutube
+				&& m_protocol == protocol::PROTOCOL_HTTP && m_len > http_maximum_chunk_size && m_HTTPAsync.IsSupportsRanges()) {
+			http_chunk.end = http_chunk.size = std::min(m_len, http_maximum_chunk_size);
+			auto hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
+			if (hr == S_OK) {
+				http_chunk.use = true;
+			}
+		}
+
 		while (!m_bAbort && attempts <= 20) {
 			DWORD dwSizeRead = 0;
 			if (m_protocol == protocol::PROTOCOL_HTTP) {
-				const HRESULT hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, &dwSizeRead);
-				if (hr != S_OK) {
-					m_bAbort = true;
-					break;
+				if (http_chunk.use) {
+					auto sizeRead = std::min<DWORD>(bufLen, http_chunk.end - http_chunk.read);
+					auto hr = m_HTTPAsync.Read(pBuffer.data(), sizeRead, &dwSizeRead);
+					if (hr != S_OK) {
+						m_bAbort = true;
+						break;
+					}
+
+					http_chunk.read += dwSizeRead;
+					if (http_chunk.read == http_chunk.end && m_len > http_chunk.end) {
+						http_chunk.size = std::min(m_len - http_chunk.read, http_maximum_chunk_size);
+						http_chunk.start = http_chunk.end;
+						http_chunk.end += http_chunk.size;
+
+						hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
+						if (hr != S_OK) {
+							m_bAbort = true;
+							break;
+						}
+					}
+				} else {
+					auto hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, &dwSizeRead);
+					if (hr != S_OK) {
+						m_bAbort = true;
+						break;
+					}
 				}
 			} else if (m_protocol == protocol::PROTOCOL_UDP) {
 				const DWORD dwResult = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 200, FALSE);

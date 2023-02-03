@@ -6011,7 +6011,8 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	HRESULT hr = S_OK;
-	CSaveDlg save_dlg(in, name, savedFileName, hr);
+	bool bYoutube = !m_youtubeFields.fname.IsEmpty();
+	CSaveDlg save_dlg(in, name, savedFileName, bYoutube, hr);
 	if (SUCCEEDED(hr)) {
 		save_dlg.DoModal();
 		if (save_dlg.IsCompleteOk() && !m_youtubeFields.fname.IsEmpty()) {
@@ -6030,7 +6031,7 @@ void CMainFrame::OnFileSaveAs()
 				++it;
 				in = it->GetName();
 
-				CSaveDlg save_dlg2(in, name, savedFileName, hr);
+				CSaveDlg save_dlg2(in, name, savedFileName, bYoutube, hr);
 				if (SUCCEEDED(hr)) {
 					save_dlg2.DoModal();
 					if (save_dlg2.IsCompleteOk()) {
