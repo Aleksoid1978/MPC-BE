@@ -264,6 +264,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE).MakeLower();
 	m_contentEncoding = QueryInfoStr(HTTP_QUERY_CONTENT_ENCODING).MakeLower();
+	m_bSupportsRanges = QueryInfoStr(HTTP_QUERY_ACCEPT_RANGES).MakeLower() == L"bytes";
 
 	m_bIsCompressed = !m_contentEncoding.IsEmpty() && (StartsWith(m_contentEncoding, L"gzip") || StartsWith(m_contentEncoding, L"deflate"));
 
@@ -420,6 +421,20 @@ HRESULT CHTTPAsync::Seek(UINT64 position)
 	return SendRequest(customHeader);
 }
 
+HRESULT CHTTPAsync::Range(UINT64 start, UINT64 end)
+{
+	if (start >= end) {
+		return E_FAIL;
+	}
+
+	if (!m_lenght || end > m_lenght) {
+		return E_FAIL;
+	}
+
+	CString customHeader; customHeader.Format(L"Range: bytes=%I64u-%I64u\r\n", start, end);
+	return SendRequest(customHeader);
+}
+
 constexpr size_t decompressBlockSize = 1024;
 bool CHTTPAsync::GetUncompressed(std::vector<BYTE>& buffer)
 {
@@ -483,6 +498,11 @@ const CString& CHTTPAsync::GetContentType() const
 const CString& CHTTPAsync::GetContentEncoding() const
 {
 	return m_contentEncoding;
+}
+
+const bool CHTTPAsync::IsSupportsRanges() const
+{
+	return m_bSupportsRanges;
 }
 
 const bool CHTTPAsync::IsCompressed() const
