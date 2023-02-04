@@ -29,12 +29,16 @@ VideoRenderers
 Refactoring and optimization.
 EVR-CP can now be used as a preview renderer.
 Fixed output of some Stereo 3D subtitles for EVR-CP.
-Added ability to convert Stereo3D from Half OverUnder to Interlace for MPC Video Renderer 0.6.4.1986 (393835e) or newer..
+Added ability to convert Stereo3D from Half OverUnder to Interlace for MPC Video Renderer 0.6.4.1986 (393835e) or newer.
+An experimental MPCVRFullscreenControl option is now available from the player interface.
 
 Subtitles
 Improved parsing of polygon parameters in SSA/ASS subtitles.
 Minor rendering optimizations for PGS/DVB subtitles.
 Fixed player crash on some corrupted subtitles.
+
+YouTube
+The speed of saving videos from YouTube has been increased.
 
 Player
 Added option to select preview renderer.
@@ -42,10 +46,15 @@ Fixed placement of a vertically stretched frame in the preview window.
 Additional tracks will no longer appear in the list of recent Windows files.
 Reduced the chance of false positives when moving a window by the video area.
 Added saving the current position after a 5 second pause.
+Added the ability to change the maximum number of entries in the history.
 Various interface fixes.
 
 Updated Korean translation (by Potmarigold and Hackjjang).
 Updated Italian translation (by mapi68).
+Updated Hungarian translation (by mickey).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Turkish translation (by cmhrky).
+Updated German translation (by Klaus1189).
 
 Updated libraries:
 	dav1d git-1.0.0-112-g77b3955;
