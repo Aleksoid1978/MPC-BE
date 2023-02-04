@@ -84,10 +84,8 @@ private:
 	WSAEVENT m_WSAEvent = nullptr;
 	sockaddr_in m_addr = {};
 
-	bool m_bYoutube = false;
-
 public:
-	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, bool bYoutube, HRESULT& hr);
+	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr);
 
 	bool IsCompleteOk();
 

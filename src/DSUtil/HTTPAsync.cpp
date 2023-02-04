@@ -276,6 +276,9 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 		}
 	}
 
+	m_bIsGoogleMedia = EndsWith(m_host, L"googlevideo.com") && StartsWith(m_path, L"/videoplayback?") &&
+					   (StartsWith(m_contentType, L"video") || StartsWith(m_contentType, L"audio"));
+
 	return S_OK;
 }
 
@@ -503,6 +506,11 @@ const CString& CHTTPAsync::GetContentEncoding() const
 const bool CHTTPAsync::IsSupportsRanges() const
 {
 	return m_bSupportsRanges;
+}
+
+const bool CHTTPAsync::IsGoogleMedia() const
+{
+	return m_bIsGoogleMedia;
 }
 
 const bool CHTTPAsync::IsCompressed() const

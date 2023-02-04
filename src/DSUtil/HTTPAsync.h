@@ -63,8 +63,10 @@ protected:
 	CString m_contentEncoding;
 	UINT64 m_lenght = 0;
 
-	bool m_bSupportsRanges = false;
 	bool m_bIsCompressed = false;
+
+	bool m_bSupportsRanges = false;
+	bool m_bIsGoogleMedia = false;
 
 	static void CALLBACK Callback(__in HINTERNET hInternet,
 								  __in_opt DWORD_PTR dwContext,
@@ -96,6 +98,7 @@ public:
 	const CString& GetContentEncoding() const;
 
 	const bool IsSupportsRanges() const;
+	const bool IsGoogleMedia() const;
 
 	const bool IsCompressed() const;
 	bool GetUncompressed(std::vector<BYTE>& buffer);

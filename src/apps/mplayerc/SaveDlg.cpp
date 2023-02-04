@@ -50,11 +50,10 @@ enum {
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, bool bYoutube, HRESULT& hr)
+CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
 	: CTaskDialog(L"", CString(name) + L"\n" + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_in(in)
 	, m_out(out)
-	, m_bYoutube(bYoutube)
 {
 	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (m_hIcon != nullptr) {
@@ -295,8 +294,8 @@ void CSaveDlg::Save()
 		} http_chunk = {};
 		constexpr auto http_maximum_chunk_size = 10ull * MEGABYTE - 1;
 
-		if (m_bYoutube
-				&& m_protocol == protocol::PROTOCOL_HTTP && m_len > http_maximum_chunk_size && m_HTTPAsync.IsSupportsRanges()) {
+		if (m_protocol == protocol::PROTOCOL_HTTP && m_len > http_maximum_chunk_size
+				&& m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
 			http_chunk.end = http_chunk.size = std::min(m_len, http_maximum_chunk_size);
 			auto hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
 			if (hr == S_OK) {
