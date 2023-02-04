@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,10 +72,8 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
-	ON_UPDATE_COMMAND_UI(IDC_DVD_POS, OnUpdatePos)
-	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdatePos)
-	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdatePos)
-	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdatePos)
+	ON_UPDATE_COMMAND_UI(IDC_DVD_POS, OnUpdateKeepHistory)
+	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdateKeepHistory)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK14, OnUpdateOSD)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK15, OnUpdateOSD)
 END_MESSAGE_MAP()
@@ -229,17 +227,15 @@ BOOL CPPagePlayer::OnApply()
 	s.bRememberPlaylistItems = !!m_bRememberPlaylistItems;
 
 	if (!m_bKeepHistory) {
-		auto& historyFile = AfxGetMyApp()->m_HistoryFile;
-		if (historyFile.Clear()) {
-			// Empty the "Recent" jump list
-			CComPtr<IApplicationDestinations> pDests;
-			HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
-			if (SUCCEEDED(hr)) {
-				hr = pDests->RemoveAllDestinations();
-			}
-
-			// Don't clear AfxGetAppSettings().strLastOpenFile here.
+		// Empty the "Recent" jump list
+		CComPtr<IApplicationDestinations> pDests;
+		HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
+		if (SUCCEEDED(hr)) {
+			hr = pDests->RemoveAllDestinations();
 		}
+
+		// Don't clear AfxGetAppSettings().strLastOpenFile here.
+		// Don't clear AfxGetMyApp()->m_HistoryFile here.
 	}
 
 	const unsigned hemax = std::clamp(RoundUp(m_edtHistoryEntriesMax, 100), 100u, 900u);
@@ -287,7 +283,7 @@ BOOL CPPagePlayer::OnApply()
 	return __super::OnApply();
 }
 
-void CPPagePlayer::OnUpdatePos(CCmdUI* pCmdUI)
+void CPPagePlayer::OnUpdateKeepHistory(CCmdUI* pCmdUI)
 {
 	UpdateData();
 

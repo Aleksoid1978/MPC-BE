@@ -15843,7 +15843,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (m_eMediaLoadState == MLS_LOADING || !s.bKeepHistory) {
+	if (m_eMediaLoadState == MLS_LOADING) {
 		return;
 	}
 
