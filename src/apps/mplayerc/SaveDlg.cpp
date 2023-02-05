@@ -292,11 +292,10 @@ void CSaveDlg::Save()
 			UINT64 end;
 			UINT64 read;
 		} http_chunk = {};
-		constexpr auto http_maximum_chunk_size = 10ull * MEGABYTE - 1;
 
-		if (m_protocol == protocol::PROTOCOL_HTTP && m_len > http_maximum_chunk_size
+		if (m_protocol == protocol::PROTOCOL_HTTP && m_len > http::googlemedia_maximum_chunk_size
 				&& m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
-			http_chunk.end = http_chunk.size = std::min(m_len, http_maximum_chunk_size);
+			http_chunk.end = http_chunk.size = std::min(m_len, http::googlemedia_maximum_chunk_size);
 			auto hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
 			if (hr == S_OK) {
 				http_chunk.use = true;
@@ -316,7 +315,7 @@ void CSaveDlg::Save()
 
 					http_chunk.read += dwSizeRead;
 					if (http_chunk.read == http_chunk.end && m_len > http_chunk.end) {
-						http_chunk.size = std::min(m_len - http_chunk.read, http_maximum_chunk_size);
+						http_chunk.size = std::min(m_len - http_chunk.read, http::googlemedia_maximum_chunk_size);
 						http_chunk.start = http_chunk.end;
 						http_chunk.end += http_chunk.size;
 

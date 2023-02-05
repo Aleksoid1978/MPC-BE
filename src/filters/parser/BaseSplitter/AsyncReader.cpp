@@ -70,6 +70,15 @@ BOOL CAsyncFileReader::Open(LPCWSTR lpszFileName)
 			m_total = ContentLength;
 			m_url = lpszFileName;
 			m_sourcetype = SourceType::HTTP;
+
+			if (m_total > http::googlemedia_maximum_chunk_size
+					&& m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
+				m_http_chunk.end = m_http_chunk.size = std::min(m_total, http::googlemedia_maximum_chunk_size);
+				if (m_HTTPAsync.Range(m_http_chunk.start, m_http_chunk.end - 1) == S_OK) {
+					m_http_chunk.use = true;
+				}
+			}
+
 			return TRUE;
 		}
 
@@ -93,11 +102,59 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 	}
 
 	if (m_url.GetLength()) {
-		const auto RetryOnError = [&] {
+		auto HTTPSeek = [&](UINT64 position) {
+			if (m_http_chunk.use) {
+				m_http_chunk.size = std::min(m_total - position, http::googlemedia_maximum_chunk_size);
+				m_http_chunk.start = m_http_chunk.read = position;
+				m_http_chunk.end = m_http_chunk.start + m_http_chunk.size;
+
+				return m_HTTPAsync.Range(m_http_chunk.start, m_http_chunk.end - 1);
+			} else {
+				return m_HTTPAsync.Seek(position);
+			}
+		};
+
+		auto HTTPRead = [&](PBYTE buffer, DWORD sizeToRead, DWORD& dwSizeRead) {
+			if (m_http_chunk.use) {
+				HRESULT hr = S_OK;
+				auto begin = buffer;
+				DWORD sizeRead = 0;
+				for (;;) {
+					auto size = std::min<DWORD>(sizeToRead - dwSizeRead, m_http_chunk.end - m_http_chunk.read);
+					hr = m_HTTPAsync.Read(begin, size, &sizeRead);
+					if (hr != S_OK) {
+						break;
+					}
+
+					dwSizeRead += sizeRead;
+					m_http_chunk.read += sizeRead;
+
+					if (m_http_chunk.read == m_http_chunk.end && m_total > m_http_chunk.end) {
+						hr = HTTPSeek(llPosition + sizeRead);
+						if (hr != S_OK) {
+							break;
+						}
+
+						if (dwSizeRead < sizeToRead) {
+							begin += sizeRead;
+							continue;
+						}
+					}
+
+					break;
+				}
+
+				return hr;
+			} else {
+				return m_HTTPAsync.Read(buffer, sizeToRead, &dwSizeRead);
+			}
+		};
+
+		auto RetryOnError = [&] {
 			const DWORD dwError = GetLastError();
 			if (dwError == ERROR_INTERNET_CONNECTION_RESET
 					|| dwError == ERROR_HTTP_INVALID_SERVER_RESPONSE) {
-				if (S_OK == m_HTTPAsync.Seek(llPosition)) {
+				if (S_OK == HTTPSeek(llPosition)) {
 					return true;
 				}
 			}
@@ -111,7 +168,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 					const DWORD lenght = llPosition - m_pos;
 
 					DWORD dwSizeRead = 0;
-					HRESULT hr = m_HTTPAsync.Read(pBufferTmp.data(), lenght, &dwSizeRead);
+					HRESULT hr = HTTPRead(pBufferTmp.data(), lenght, dwSizeRead);
 					if (hr != S_OK || dwSizeRead != lenght) {
 						if (RetryOnError()) {
 							continue;
@@ -119,7 +176,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 						return E_FAIL;
 					}
 				} else {
-					HRESULT hr = m_HTTPAsync.Seek(llPosition);
+					HRESULT hr = HTTPSeek(llPosition);
 #ifdef DEBUG_OR_LOG
 					DLog(L"CAsyncFileReader::SyncRead() : do HTTP seeking from %I64d to %I64d, hr = 0x%08x", m_pos, llPosition, hr);
 #endif
@@ -132,7 +189,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			}
 
 			DWORD dwSizeRead = 0;
-			HRESULT hr = m_HTTPAsync.Read(pBuffer, lLength, &dwSizeRead);
+			HRESULT hr = HTTPRead(pBuffer, lLength, dwSizeRead);
 			if (hr != S_OK || dwSizeRead != lLength) {
 				if (RetryOnError()) {
 					continue;

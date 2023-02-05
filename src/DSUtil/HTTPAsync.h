@@ -23,9 +23,11 @@
 #include <wininet.h>
 #include <mutex>
 #include "UrlParser.h"
+#include "mpc_defines.h"
 
 namespace http {
 	inline CStringW userAgent = L"Mozilla/5.0";
+	constexpr static uint64_t googlemedia_maximum_chunk_size = 10ull * MEGABYTE - 1;
 }
 
 class CHTTPAsync

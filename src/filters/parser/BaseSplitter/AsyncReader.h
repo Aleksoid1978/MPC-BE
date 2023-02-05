@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,6 +62,14 @@ protected:
 	ULONGLONG m_total = 0;
 	LONGLONG m_pos = 0;
 	CString m_url;
+
+	struct http_chunk_t {
+		bool use;
+		UINT64 size;
+		UINT64 start;
+		UINT64 end;
+		UINT64 read;
+	} m_http_chunk = {};
 
 	virtual BOOL Open(LPCWSTR lpszFileName) final;
 	virtual ULONGLONG GetLength() final;
