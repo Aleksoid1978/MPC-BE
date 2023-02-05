@@ -1781,8 +1781,8 @@ namespace Youtube
 
 		if (youtubeAudioUrllist.size()) {
 			for (const auto& item : youtubeAudioUrllist) {
-				if (vprofile->format == y_mp4_avc && item.profile->format == y_mp4_aac
-						|| vprofile->format != y_mp4_avc && item.profile->format != y_mp4_aac) {
+				if ((vprofile->format == y_mp4_avc || vprofile->format == y_mp4_av1) && item.profile->format == y_mp4_aac
+						|| (vprofile->format != y_mp4_avc && vprofile->format != y_mp4_av1) && item.profile->format != y_mp4_aac) {
 					audio_item = &item;
 					if (vprofile->type != y_video || vprofile->quality > 360) {
 						break;
