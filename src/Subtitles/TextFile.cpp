@@ -768,7 +768,7 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 				DWORD dwSizeRead = 0;
 				DWORD totalSize = 0;
 				do {
-					if (HTTPAsync.Read(buffer, 1024, &dwSizeRead) != S_OK) {
+					if (HTTPAsync.Read(buffer, 1024, dwSizeRead) != S_OK) {
 						break;
 					}
 					temp.Write(buffer, dwSizeRead);

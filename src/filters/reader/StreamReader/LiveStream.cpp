@@ -92,7 +92,7 @@ void CLiveStream::Append(const BYTE* buff, UINT len)
 	}
 }
 
-HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
 	if (m_protocol == protocol::PR_HTTP) {
 		if (m_icydata.metaint == 0) {
@@ -108,15 +108,15 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeR
 			return hr;
 		}
 
-		if ((m_nBytesRead += *dwSizeRead) == m_icydata.metaint) {
+		if ((m_nBytesRead += dwSizeRead) == m_icydata.metaint) {
 			m_nBytesRead = 0;
 
 			static BYTE buff[255 * 16], b = 0;
 			ZeroMemory(buff, sizeof(buff));
 
 			DWORD _dwSizeRead = 0;
-			if (S_OK == m_HTTPAsync.Read(&b, 1, &_dwSizeRead) && _dwSizeRead == 1 && b) {
-				if (S_OK == m_HTTPAsync.Read(buff, b * 16, &_dwSizeRead) && _dwSizeRead == b * 16) {
+			if (S_OK == m_HTTPAsync.Read(&b, 1, _dwSizeRead) && _dwSizeRead == 1 && b) {
+				if (S_OK == m_HTTPAsync.Read(buff, b * 16, _dwSizeRead) && _dwSizeRead == b * 16) {
 					int len = decode_html_entities_utf8((char*)buff, nullptr);
 
 					CString str = UTF8orLocalToWStr((LPCSTR)buff);
@@ -335,7 +335,7 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 						if (SUCCEEDED(http.Connect(uri))) {
 							BYTE key[CAESDecryptor::AESBLOCKSIZE] = {};
 							DWORD dwSizeRead = 0;
-							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBLOCKSIZE, &dwSizeRead)) && dwSizeRead == CAESDecryptor::AESBLOCKSIZE) {
+							if (SUCCEEDED(http.Read(key, CAESDecryptor::AESBLOCKSIZE, dwSizeRead)) && dwSizeRead == CAESDecryptor::AESBLOCKSIZE) {
 								std::vector<BYTE> pIV;
 								iv.Delete(0, 2);
 								if (iv.GetLength() != (CAESDecryptor::AESBLOCKSIZE * 2)) {
@@ -597,7 +597,7 @@ bool CLiveStream::Load(const WCHAR* fnw)
 					|| contentType.IsEmpty()) {
 				BYTE buf[1024] = {};
 				DWORD dwSizeRead = 0;
-				if (HTTPRead(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
+				if (HTTPRead(buf, sizeof(buf), dwSizeRead) == S_OK && dwSizeRead) {
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
@@ -634,7 +634,7 @@ bool CLiveStream::Load(const WCHAR* fnw)
 			} else {
 				BYTE body[8] = {};
 				DWORD dwSizeRead = 0;
-				if (m_HTTPAsync.Read(body, 7, &dwSizeRead) == S_OK) {
+				if (m_HTTPAsync.Read(body, 7, dwSizeRead) == S_OK) {
 					if (memcmp(body, "#EXTM3U", 7) == 0) {
 						ret = ParseM3U8(m_url_str, m_hlsData.PlaylistUrl);
 					}
@@ -678,7 +678,7 @@ bool CLiveStream::Load(const WCHAR* fnw)
 	if (m_protocol == protocol::PR_HTTP && !m_len) {
 		BYTE buf[1024] = {};
 		DWORD dwSizeRead = 0;
-		if (HTTPRead(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
+		if (HTTPRead(buf, sizeof(buf), dwSizeRead) == S_OK && dwSizeRead) {
 			Append(buf, dwSizeRead);
 		}
 	}
@@ -926,7 +926,7 @@ DWORD CLiveStream::ThreadProc()
 						}
 					} else if (m_protocol == protocol::PR_HTTP) {
 						DWORD dwSizeRead = 0;
-						const HRESULT hr = HTTPRead(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
+						const HRESULT hr = HTTPRead(&buff[buffsize], MAXBUFSIZE, dwSizeRead);
 						if (FAILED(hr)) {
 							attempts += 50;
 							continue;
@@ -985,7 +985,7 @@ DWORD CLiveStream::ThreadProc()
 
 						DWORD dwSizeRead = 0;
 						auto ptr = m_hlsData.bAes128 ? encryptedBuff.get() : &buff[buffsize];
-						if (FAILED(m_HTTPAsync.Read(ptr, MAXBUFSIZE, &dwSizeRead))) {
+						if (FAILED(m_HTTPAsync.Read(ptr, MAXBUFSIZE, dwSizeRead))) {
 							bEndOfStream = TRUE;
 							break;
 						} else if (dwSizeRead == 0) {

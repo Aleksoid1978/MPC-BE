@@ -19618,14 +19618,14 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 					if (contentLength) {
 						m_youtubeThumbnailData.resize(contentLength);
 						DWORD dwSizeRead = 0;
-						if (S_OK != HTTPAsync.Read((PBYTE)m_youtubeThumbnailData.data(), contentLength, &dwSizeRead) || dwSizeRead != contentLength) {
+						if (S_OK != HTTPAsync.Read((PBYTE)m_youtubeThumbnailData.data(), contentLength, dwSizeRead) || dwSizeRead != contentLength) {
 							m_youtubeThumbnailData.clear();
 						}
 					} else {
 						std::vector<char> tmp(16 * KILOBYTE);
 						for (;;) {
 							DWORD dwSizeRead = 0;
-							if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), &dwSizeRead)) {
+							if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), dwSizeRead)) {
 								break;
 							}
 

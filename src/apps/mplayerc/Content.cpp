@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -126,7 +126,7 @@ namespace Content {
 
 					content.raw.resize(nMinSize);
 					DWORD dwSizeRead = 0;
-					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, &dwSizeRead) == S_OK) {
+					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, dwSizeRead) == S_OK) {
 						content.raw.resize(dwSizeRead);
 						if (dwSizeRead) {
 							Encoding(content);
@@ -175,7 +175,7 @@ namespace Content {
 						nMaxSize -= old_size;
 						content.raw.resize(old_size + nMaxSize);
 						DWORD dwSizeRead = 0;
-						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, &dwSizeRead) == S_OK) {
+						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, dwSizeRead) == S_OK) {
 							content.raw.resize(old_size + dwSizeRead);
 							if (dwSizeRead) {
 								Encoding(content);

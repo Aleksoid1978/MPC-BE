@@ -284,52 +284,13 @@ void CSaveDlg::Save()
 		std::vector<BYTE> pBuffer(bufLen);
 
 		int attempts = 0;
-
-		struct http_chunk_t {
-			bool use;
-			UINT64 size;
-			UINT64 start;
-			UINT64 end;
-			UINT64 read;
-		} http_chunk = {};
-
-		if (m_protocol == protocol::PROTOCOL_HTTP && m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
-			http_chunk.end = http_chunk.size = std::min(m_len, http::googlemedia_maximum_chunk_size);
-			auto hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
-			if (hr == S_OK) {
-				http_chunk.use = true;
-			}
-		}
-
 		while (!m_bAbort && attempts <= 20) {
 			DWORD dwSizeRead = 0;
 			if (m_protocol == protocol::PROTOCOL_HTTP) {
-				if (http_chunk.use) {
-					auto sizeRead = std::min<DWORD>(bufLen, http_chunk.end - http_chunk.read);
-					auto hr = m_HTTPAsync.Read(pBuffer.data(), sizeRead, &dwSizeRead);
-					if (hr != S_OK) {
-						m_bAbort = true;
-						break;
-					}
-
-					http_chunk.read += dwSizeRead;
-					if (http_chunk.read == http_chunk.end && m_len > http_chunk.end) {
-						http_chunk.size = std::min(m_len - http_chunk.read, http::googlemedia_maximum_chunk_size);
-						http_chunk.start = http_chunk.end;
-						http_chunk.end += http_chunk.size;
-
-						hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
-						if (hr != S_OK) {
-							m_bAbort = true;
-							break;
-						}
-					}
-				} else {
-					auto hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, &dwSizeRead);
-					if (hr != S_OK) {
-						m_bAbort = true;
-						break;
-					}
+				auto hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, dwSizeRead);
+				if (hr != S_OK) {
+					m_bAbort = true;
+					break;
 				}
 			} else if (m_protocol == protocol::PROTOCOL_UDP) {
 				const DWORD dwResult = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 200, FALSE);

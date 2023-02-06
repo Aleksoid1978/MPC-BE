@@ -63,14 +63,6 @@ protected:
 	LONGLONG m_pos = 0;
 	CString m_url;
 
-	struct http_chunk_t {
-		bool use;
-		UINT64 size;
-		UINT64 start;
-		UINT64 end;
-		UINT64 read;
-	} m_http_chunk = {};
-
 	virtual BOOL Open(LPCWSTR lpszFileName) final;
 	virtual ULONGLONG GetLength() final;
 

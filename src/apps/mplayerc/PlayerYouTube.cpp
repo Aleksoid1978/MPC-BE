@@ -203,14 +203,14 @@ namespace Youtube
 		if (contentLength) {
 			pData.resize(contentLength);
 			DWORD dwSizeRead = 0;
-			if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, &dwSizeRead) || dwSizeRead != contentLength) {
+			if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, dwSizeRead) || dwSizeRead != contentLength) {
 				pData.clear();
 			}
 		} else {
 			static std::vector<char> tmp(16 * KILOBYTE);
 			for (;;) {
 				DWORD dwSizeRead = 0;
-				if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), &dwSizeRead)) {
+				if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), dwSizeRead)) {
 					break;
 				}
 

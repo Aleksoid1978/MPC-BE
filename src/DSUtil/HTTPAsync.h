@@ -27,7 +27,6 @@
 
 namespace http {
 	inline CStringW userAgent = L"Mozilla/5.0";
-	constexpr static uint64_t googlemedia_maximum_chunk_size = 10ull * MEGABYTE - 1;
 }
 
 class CHTTPAsync
@@ -70,6 +69,15 @@ protected:
 	bool m_bSupportsRanges = false;
 	bool m_bIsGoogleMedia = false;
 
+	struct http_chunk_t {
+		bool use;
+		UINT64 size;
+		UINT64 start;
+		UINT64 end;
+		UINT64 read;
+	} m_http_chunk = {};
+	constexpr static uint64_t googlemedia_maximum_chunk_size = 10ull * MEGABYTE - 1;
+
 	static void CALLBACK Callback(__in HINTERNET hInternet,
 								  __in_opt DWORD_PTR dwContext,
 								  __in DWORD dwInternetStatus,
@@ -79,6 +87,11 @@ protected:
 	CString QueryInfoStr(DWORD dwInfoLevel) const;
 	DWORD QueryInfoDword(DWORD dwInfoLevel) const;
 
+	HRESULT SeekInternal(UINT64 position);
+	HRESULT RangeInternal(UINT64 start, UINT64 end);
+
+	HRESULT ReadInternal(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut);
+
 public:
 	CHTTPAsync();
 	virtual ~CHTTPAsync();
@@ -87,10 +100,9 @@ public:
 
 	HRESULT Connect(LPCWSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCWSTR lpszCustomHeader = L"");
 	HRESULT SendRequest(LPCWSTR lpszCustomHeader = L"", DWORD dwTimeOut = INFINITE);
-	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
+	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	HRESULT Seek(UINT64 position);
-	HRESULT Range(UINT64 start, UINT64 end);
 
 	const CString& GetHeader() const;
 

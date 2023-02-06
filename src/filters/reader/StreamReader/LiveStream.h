@@ -106,7 +106,7 @@ private:
 
 	void Clear();
 	void Append(const BYTE* buff, UINT len);
-	HRESULT HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
+	HRESULT HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	inline const ULONGLONG GetPacketsSize();
 	void CheckBuffer();

@@ -279,6 +279,13 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_bIsGoogleMedia = EndsWith(m_host, L"googlevideo.com") && StartsWith(m_path, L"/videoplayback?") &&
 					   (StartsWith(m_contentType, L"video") || StartsWith(m_contentType, L"audio"));
 
+	if (m_lenght && m_bSupportsRanges && m_bIsGoogleMedia) {
+		m_http_chunk.end = m_http_chunk.size = std::min(m_lenght, googlemedia_maximum_chunk_size);
+		if (RangeInternal(m_http_chunk.start, m_http_chunk.end - 1) == S_OK) {
+			m_http_chunk.use = true;
+		}
+	}
+
 	return S_OK;
 }
 
@@ -365,14 +372,14 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 	return S_OK;
 }
 
-HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::ReadInternal(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut)
 {
 	CheckPointer(m_hRequest, E_FAIL);
 
 	std::unique_lock<std::mutex> lock(m_mutexRequest);
 
 	if (!m_bRequestComplete) {
-		DLog(L"CHTTPAsync::Read() : previous request has not completed, exit");
+		DLog(L"CHTTPAsync::ReadInternal() : previous request has not completed, exit");
 		return S_FALSE;
 	}
 
@@ -393,7 +400,7 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 			CheckLastError(L"InternetReadFileExW()", E_FAIL);
 
 			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-				DLog(L"CHTTPAsync::Read() : InternetReadFileExW() - %u ms time out reached, exit", dwTimeOut);
+				DLog(L"CHTTPAsync::ReadInternal() : InternetReadFileExW() - %u ms time out reached, exit", dwTimeOut);
 				m_bRequestComplete = FALSE;
 				return S_FALSE;
 			}
@@ -407,14 +414,49 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 		_dwSizeToRead -= InetBuff.dwBufferLength;
 	};
 
-	if (dwSizeRead) {
-		*dwSizeRead = _dwSizeRead;
-	}
+	dwSizeRead = _dwSizeRead;
 
 	return _dwSizeRead ? S_OK : S_FALSE;
 }
 
-HRESULT CHTTPAsync::Seek(UINT64 position)
+HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
+{
+	if (m_http_chunk.use) {
+		HRESULT hr = S_OK;
+		auto begin = pBuffer;
+		DWORD sizeRead = 0;
+		for (;;) {
+			auto size = std::min<DWORD>(dwSizeToRead - dwSizeRead, m_http_chunk.end - m_http_chunk.read);
+			hr = ReadInternal(begin, size, sizeRead, dwTimeOut);
+			if (hr != S_OK) {
+				break;
+			}
+
+			dwSizeRead += sizeRead;
+			m_http_chunk.read += sizeRead;
+
+			if (m_http_chunk.read == m_http_chunk.end && m_lenght > m_http_chunk.end) {
+				hr = Seek(m_http_chunk.end);
+				if (hr != S_OK) {
+					break;
+				}
+
+				if (dwSizeRead < dwSizeToRead) {
+					begin += sizeRead;
+					continue;
+				}
+			}
+
+			break;
+		}
+
+		return hr;
+	} else {
+		return ReadInternal(pBuffer, dwSizeToRead, dwSizeRead, dwTimeOut);
+	}
+}
+
+HRESULT CHTTPAsync::SeekInternal(UINT64 position)
 {
 	if (!m_lenght || position > m_lenght) {
 		return E_FAIL;
@@ -424,7 +466,7 @@ HRESULT CHTTPAsync::Seek(UINT64 position)
 	return SendRequest(customHeader);
 }
 
-HRESULT CHTTPAsync::Range(UINT64 start, UINT64 end)
+HRESULT CHTTPAsync::RangeInternal(UINT64 start, UINT64 end)
 {
 	if (start >= end) {
 		return E_FAIL;
@@ -436,6 +478,19 @@ HRESULT CHTTPAsync::Range(UINT64 start, UINT64 end)
 
 	CString customHeader; customHeader.Format(L"Range: bytes=%I64u-%I64u\r\n", start, end);
 	return SendRequest(customHeader);
+}
+
+HRESULT CHTTPAsync::Seek(UINT64 position)
+{
+	if (m_http_chunk.use) {
+		m_http_chunk.size = std::min(m_lenght - position, googlemedia_maximum_chunk_size);
+		m_http_chunk.start = m_http_chunk.read = position;
+		m_http_chunk.end = m_http_chunk.start + m_http_chunk.size;
+
+		return RangeInternal(m_http_chunk.start, m_http_chunk.end - 1);
+	} else {
+		return SeekInternal(position);
+	}
 }
 
 constexpr size_t decompressBlockSize = 1024;
@@ -459,7 +514,7 @@ bool CHTTPAsync::GetUncompressed(std::vector<BYTE>& buffer)
 
 	std::vector<BYTE> compressedData(m_lenght);
 	DWORD dwSizeRead = 0;
-	if (Read(compressedData.data(), m_lenght, &dwSizeRead) != S_OK) {
+	if (Read(compressedData.data(), m_lenght, dwSizeRead) != S_OK) {
 		inflateEnd(&stream);
 		return false;
 	}
