@@ -293,8 +293,7 @@ void CSaveDlg::Save()
 			UINT64 read;
 		} http_chunk = {};
 
-		if (m_protocol == protocol::PROTOCOL_HTTP && m_len > http::googlemedia_maximum_chunk_size
-				&& m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
+		if (m_protocol == protocol::PROTOCOL_HTTP && m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
 			http_chunk.end = http_chunk.size = std::min(m_len, http::googlemedia_maximum_chunk_size);
 			auto hr = m_HTTPAsync.Range(http_chunk.start, http_chunk.end - 1);
 			if (hr == S_OK) {

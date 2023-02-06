@@ -71,8 +71,7 @@ BOOL CAsyncFileReader::Open(LPCWSTR lpszFileName)
 			m_url = lpszFileName;
 			m_sourcetype = SourceType::HTTP;
 
-			if (m_total > http::googlemedia_maximum_chunk_size
-					&& m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
+			if (m_HTTPAsync.IsSupportsRanges() && m_HTTPAsync.IsGoogleMedia()) {
 				m_http_chunk.end = m_http_chunk.size = std::min(m_total, http::googlemedia_maximum_chunk_size);
 				if (m_HTTPAsync.Range(m_http_chunk.start, m_http_chunk.end - 1) == S_OK) {
 					m_http_chunk.use = true;
