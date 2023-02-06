@@ -38,7 +38,8 @@ Minor rendering optimizations for PGS/DVB subtitles.
 Fixed player crash on some corrupted subtitles.
 
 YouTube
-The speed of saving videos from YouTube has been increased.
+Significantly increased the speed of saving videos from YouTube.
+Significantly increased the speed of the built-in Source Filters with YouTube.
 
 Player
 Added option to select preview renderer.
