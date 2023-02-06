@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2022 see Authors.txt
+; (C) 2009-2023 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -139,41 +139,41 @@ ua.WinVersionTooLowError=[name] вимагає використання ОС Win
 [CustomMessages]
 ; comp=component, tsk=Task, msg=Message
 
-;English
-en.langid=00000000
-en.langcode=en
-en.comp_mpciconlib=Icon Library
-en.comp_mpcresources=Translations
-en.comp_mpcbeshellext=Install the shell extension
-en.comp_intel_msdk=H.264 MVC 3D Decoder
-en.msg_DeleteSettings=Do you also want to delete MPC-BE settings?%n%nIf you plan on installing MPC-BE again then you do not have to delete them.
-en.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
-en.msg_SetupIsRunningWarning=MPC-BE setup is already running!
-en.msg_simd_sse2=This build of MPC-BE requires a CPU with SSE2 extension support.%n%nYour CPU does not have those capabilities.
-en.tsk_AllUsers=For all users
-en.tsk_CurrentUser=For the current user only
-en.tsk_Other=Other tasks:
-en.tsk_ResetSettings=Reset settings
-en.types_DefaultInstallation=Default installation
-en.types_CustomInstallation=Custom installation
-en.ViewChangelog=View Changelog
-en.AssociationFormatsAV=Configuring associations with video and audio files:
-en.AssociationFormats=Association with video and audio files
-en.AssociationVideo=Association with video files
-en.AssociationAudio=Association with audio files
-en.AssociationPlaylist=Association with playlists
-en.AutoPlayType=Auto play:
-en.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-en.AssociationMPCPlayCDAudioS=Audio CD
-en.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-en.AssociationMPCPlayDVDMovieS=DVD Movie
-en.AssociationMPCPlayMusicFilesF=Play Music
-en.AssociationMPCPlayMusicFilesS=Music Files
-en.AssociationMPCPlayVideoFilesF=Play Video
-en.AssociationMPCPlayVideoFilesS=Video Files
-en.PinToTaskBar=Pin to TaskBar
-en.ComponentWillBeDownloaded=will be downloaded
-en.ComponentAlreadyDownloaded=already downloaded
+;English (and default value)
+langid=00000000
+langcode=en
+comp_mpciconlib=Icon Library
+comp_mpcresources=Translations
+comp_mpcbeshellext=Install the shell extension
+comp_intel_msdk=H.264 MVC 3D Decoder
+msg_DeleteSettings=Do you also want to delete MPC-BE settings?%n%nIf you plan on installing MPC-BE again then you do not have to delete them.
+msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
+msg_SetupIsRunningWarning=MPC-BE setup is already running!
+msg_simd_sse2=This build of MPC-BE requires a CPU with SSE2 extension support.%n%nYour CPU does not have those capabilities.
+tsk_AllUsers=For all users
+tsk_CurrentUser=For the current user only
+tsk_Other=Other tasks:
+tsk_ResetSettings=Reset settings
+types_DefaultInstallation=Default installation
+types_CustomInstallation=Custom installation
+ViewChangelog=View Changelog
+AssociationFormatsAV=Configuring associations with video and audio files:
+AssociationFormats=Association with video and audio files
+AssociationVideo=Association with video files
+AssociationAudio=Association with audio files
+AssociationPlaylist=Association with playlists
+AutoPlayType=Auto play:
+AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+AssociationMPCPlayCDAudioS=Audio CD
+AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+AssociationMPCPlayDVDMovieS=DVD Movie
+AssociationMPCPlayMusicFilesF=Play Music
+AssociationMPCPlayMusicFilesS=Music Files
+AssociationMPCPlayVideoFilesF=Play Video
+AssociationMPCPlayVideoFilesS=Video Files
+PinToTaskBar=Pin to TaskBar
+ComponentWillBeDownloaded=will be downloaded
+ComponentAlreadyDownloaded=already downloaded
 
 
 #ifdef localize
