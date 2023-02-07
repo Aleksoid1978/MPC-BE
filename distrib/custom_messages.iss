@@ -766,8 +766,8 @@ nl.AssociationMPCPlayMusicFilesS=Muziekbestanden
 nl.AssociationMPCPlayVideoFilesF=Video afspelen
 nl.AssociationMPCPlayVideoFilesS=Videobestanden
 nl.PinToTaskBar=Aan de taakbalk vastmaken
-nl.ComponentWillBeDownloaded=will be downloaded
-nl.ComponentAlreadyDownloaded=already downloaded
+nl.ComponentWillBeDownloaded=zal worden gedownload
+nl.ComponentAlreadyDownloaded=reeds gedownload
 
 
 ;Polish
@@ -914,8 +914,8 @@ sc.AssociationMPCPlayMusicFilesS=音乐文件
 sc.AssociationMPCPlayVideoFilesF=播放视频
 sc.AssociationMPCPlayVideoFilesS=视频文件
 sc.PinToTaskBar=锁定到任务栏
-sc.ComponentWillBeDownloaded=will be downloaded
-sc.ComponentAlreadyDownloaded=already downloaded
+sc.ComponentWillBeDownloaded=将会下载
+sc.ComponentAlreadyDownloaded=已经下载
 
 
 ;Swedish
@@ -1025,8 +1025,8 @@ tc.AssociationMPCPlayMusicFilesS=音樂檔案
 tc.AssociationMPCPlayVideoFilesF=播放視訊
 tc.AssociationMPCPlayVideoFilesS=視訊檔案
 tc.PinToTaskBar=釘選到工作列
-tc.ComponentWillBeDownloaded=will be downloaded
-tc.ComponentAlreadyDownloaded=already downloaded
+tc.ComponentWillBeDownloaded=將會下載
+tc.ComponentAlreadyDownloaded=已經下載
 
 
 ;Turkish
