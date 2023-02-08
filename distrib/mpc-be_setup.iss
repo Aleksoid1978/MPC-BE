@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2022 see Authors.txt
+; (C) 2009-2023 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -191,10 +191,10 @@ Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default c
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
 #ifdef Win32Build
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 7183272;
-Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 831152; 
+Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 816128; 
 #else
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 8186280;
-Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 913072; 
+Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 902656; 
 #endif
 
 [Tasks]
