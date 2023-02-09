@@ -30,6 +30,8 @@
 #include "AudioDevice.h"
 #include "MpcAudioRenderer.h"
 
+#include "filters/transform/MpaDecFilter/MpaDecFilter.h"
+
 // option names
 #define OPT_REGKEY_AudRend          L"Software\\MPC-BE Filters\\MPC Audio Renderer"
 #define OPT_SECTION_AudRend         L"Filters\\MPC Audio Renderer"
@@ -2772,6 +2774,18 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 	}
 
 	SAFE_DELETE_ARRAY(pWaveFormatEx);
+
+	if (bFullInitialization) {
+		BeginEnumFilters(m_pGraph, pEF, pBF) {
+			CLSID clsid;
+			if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
+				if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
+					pEFC->SetBool("bitstream_check", true);
+				}
+			}
+		}
+		EndEnumFilters
+	}
 
 	m_bNeedReinitialize = m_bNeedReinitializeFull = FALSE;
 
