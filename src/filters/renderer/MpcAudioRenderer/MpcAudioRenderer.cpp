@@ -2780,7 +2780,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 			CLSID clsid;
 			if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
 				if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
-					pEFC->SetBool("bitstream_check", true);
+					pEFC->SetBool("check_bitstream", true);
 				}
 			}
 		}

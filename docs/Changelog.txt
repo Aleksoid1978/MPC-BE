@@ -11,6 +11,7 @@ Fixed playback of initial samples of FLAC files.
 
 MpaDecFilter
 Fixed decoding of some TrueHD streams.
+Improved support for bitstreaming when changing device.
 
 FLVSplitter
 Improved HEVC video support.

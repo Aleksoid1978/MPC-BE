@@ -2921,14 +2921,12 @@ STDMETHODIMP CMpaDecFilter::SetBool(LPCSTR field, bool value)
 		return S_OK;
 	}
 
-	if (strcmp(field, "bitstream_check") == 0) {
+	if (strcmp(field, "check_bitstream") == 0) {
 		if (value) {
 			CAutoLock cAutoLock(&m_csReceive);
 
 			m_bNeedBitstreamCheck = TRUE;
 			ZeroMemory(m_bBitstreamSupported, sizeof(m_bBitstreamSupported));
-		} else {
-			m_bNeedBitstreamCheck = FALSE;
 		}
 
 		return S_OK;
