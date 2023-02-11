@@ -4816,7 +4816,18 @@ void CMainFrame::OnStreamAudio(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter.p;
 		DWORD cStreams = 0;
-		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 1) {
+		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
+			CComHeapPtr<WCHAR> pszName;
+			CString strMessage;
+
+			if (cStreams == 1) {
+				if (SUCCEEDED(pSS->Info(0, nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr))) {
+					strMessage.Format(ResStr(IDS_AUDIO_STREAM), pszName);
+					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+
+					return;
+				}
+			}
 			for (DWORD i = 0; i < cStreams; i++) {
 				DWORD dwFlags = 0;
 				if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, nullptr, nullptr, nullptr))) {
@@ -4825,9 +4836,8 @@ void CMainFrame::OnStreamAudio(UINT nID)
 				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
 					long lNextStream = (i + (nID == 0 ? 1 : cStreams - 1)) % cStreams;
 					pSS->Enable(lNextStream, AMSTREAMSELECTENABLE_ENABLE);
-					CComHeapPtr<WCHAR> pszName;
+					
 					if (SUCCEEDED(pSS->Info(lNextStream, nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr))) {
-						CString	strMessage;
 						strMessage.Format(ResStr(IDS_AUDIO_STREAM), pszName);
 						m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 					}
