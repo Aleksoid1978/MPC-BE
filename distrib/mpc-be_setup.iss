@@ -45,7 +45,6 @@
 #else
   #define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
 #endif  
-#define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
 #define bin_dir        = "..\_bin"
 
@@ -201,8 +200,7 @@ Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: custom;  
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
 Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
 Name: desktopicon\common;       Description: {cm:tsk_AllUsers};          GroupDescription: {cm:AdditionalIcons}; Flags: unchecked exclusive
-Name: quicklaunchicon;          Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; MinVersion: 0,6.1; OnlyBelowVersion: 0,6.4
+Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; OnlyBelowVersion: 0,6.4
 
 ;;ResetSettings
 Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExist()
@@ -236,13 +234,11 @@ Source: "{#VisualElementsManifest}";       DestDir: "{app}";                    
 Name: {group}\{#app_name};                           Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};                   Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name};                     Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name};                   Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
 Name: {group}\{cm:UninstallProgram,{#app_name}};     Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name}};     WorkingDir: {app}
 #else
 Name: {group}\{#app_name} x64;                       Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name} x64;                 Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
 Name: {group}\{cm:UninstallProgram,{#app_name} x64}; Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name} x64}; WorkingDir: {app}
 #endif
 Name: {group}\Changelog;                             Filename: {app}\Changelog.txt;     Comment: {cm:ViewChangelog};                    WorkingDir: {app}
@@ -257,7 +253,6 @@ Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinst
 [InstallDelete]
 Type: files; Name: "{userdesktop}\{#app_name}.lnk";   Check: not WizardIsTaskSelected('desktopicon\user')   and IsUpgrade()
 Type: files; Name: "{commondesktop}\{#app_name}.lnk"; Check: not WizardIsTaskSelected('desktopicon\common') and IsUpgrade()
-Type: files; Name: "{#quick_launch}\{#app_name}.lnk"; OnlyBelowVersion: 0,6.1; Check: not WizardIsTaskSelected('quicklaunchicon') and IsUpgrade()
 Type: files; Name: "{app}\AUTHORS";                   Check: IsUpgrade()
 Type: files; Name: "{app}\ChangeLog";                 Check: IsUpgrade()
 Type: files; Name: "{app}\ChangeLogRus";              Check: IsUpgrade()
