@@ -4811,38 +4811,36 @@ void CMainFrame::OnStreamAudio(UINT nID)
 		return;
 	}
 
-	nID -= ID_STREAM_AUDIO_NEXT;
-
 	if (GetPlaybackMode() == PM_FILE) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter.p;
 		DWORD cStreams = 0;
-		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
-			CComHeapPtr<WCHAR> pszName;
-			CString strMessage;
+		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams) {
 
-			if (cStreams == 1) {
-				if (SUCCEEDED(pSS->Info(0, nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr))) {
-					strMessage.Format(ResStr(IDS_AUDIO_STREAM), pszName);
-					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-
-					return;
-				}
-			}
 			for (DWORD i = 0; i < cStreams; i++) {
 				DWORD dwFlags = 0;
 				if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, nullptr, nullptr, nullptr))) {
-					return;
+					break;
 				}
 				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-					long lNextStream = (i + (nID == 0 ? 1 : cStreams - 1)) % cStreams;
-					pSS->Enable(lNextStream, AMSTREAMSELECTENABLE_ENABLE);
-					
-					if (SUCCEEDED(pSS->Info(lNextStream, nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr))) {
-						strMessage.Format(ResStr(IDS_AUDIO_STREAM), pszName);
-						m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+					long newStream = i;
+					if (cStreams > 1) {
+						if (nID == ID_STREAM_AUDIO_NEXT) {
+							newStream++;
+						} else {
+							newStream += cStreams - 1;
+						}
+						newStream %= cStreams;
+
+						pSS->Enable(newStream, AMSTREAMSELECTENABLE_ENABLE);
 					}
 
-					return;
+					CComHeapPtr<WCHAR> pszName;
+					if (SUCCEEDED(pSS->Info(newStream, nullptr, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr))) {
+						CString strMessage;
+						strMessage.Format(ResStr(IDS_AUDIO_STREAM), newStream+1, cStreams, pszName);
+						m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+					}
+					break;
 				}
 			}
 		}
@@ -4852,26 +4850,35 @@ void CMainFrame::OnStreamAudio(UINT nID)
 
 	if (GetPlaybackMode() == PM_DVD && m_pDVDI && m_pDVDC) {
 		ULONG nStreamsAvailable, nCurrentStream;
-		if (SUCCEEDED(m_pDVDI->GetCurrentAudio(&nStreamsAvailable, &nCurrentStream)) && nStreamsAvailable > 1) {
-			DVD_AudioAttributes AATR;
-			UINT nNextStream = (nCurrentStream + (nID == 0 ? 1 : nStreamsAvailable - 1)) % nStreamsAvailable;
+		if (SUCCEEDED(m_pDVDI->GetCurrentAudio(&nStreamsAvailable, &nCurrentStream)) && nStreamsAvailable) {
+			HRESULT hr_select = S_FALSE;
 
-			HRESULT hr = m_pDVDC->SelectAudioStream(nNextStream, DVD_CMD_FLAG_Block, nullptr);
-			if (SUCCEEDED(m_pDVDI->GetAudioAttributes(nNextStream, &AATR))) {
+			ULONG newStream = nCurrentStream;
+			if (nStreamsAvailable > 1) {
+				if (nID == ID_STREAM_AUDIO_NEXT) {
+					newStream++;
+				} else {
+					newStream += nStreamsAvailable - 1;
+				}
+				newStream %= nStreamsAvailable;
+
+				hr_select = m_pDVDC->SelectAudioStream(newStream, DVD_CMD_FLAG_Block, nullptr);
+			}
+
+			DVD_AudioAttributes AATR;
+			if (SUCCEEDED(m_pDVDI->GetAudioAttributes(newStream, &AATR))) {
 				CString lang;
-				CString	strMessage;
 				if (AATR.Language) {
 					int len = GetLocaleInfoW(AATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
 					lang.ReleaseBufferSetLength(std::max(len - 1, 0));
 				}
 				else {
-					lang.Format(ResStr(IDS_AG_UNKNOWN), nNextStream + 1);
+					lang.Format(ResStr(IDS_AG_UNKNOWN), newStream + 1);
 				}
 
 				CString format = GetDVDAudioFormatName(AATR);
-				CString str;
-
-				if (!format.IsEmpty()) {
+				if (format.GetLength()) {
+					CString str;
 					str.Format(ResStr(IDS_MAINFRM_11),
 						lang,
 						format,
@@ -4879,10 +4886,11 @@ void CMainFrame::OnStreamAudio(UINT nID)
 						AATR.bQuantization,
 						AATR.bNumberOfChannels,
 						(AATR.bNumberOfChannels > 1 ? ResStr(IDS_MAINFRM_13) : ResStr(IDS_MAINFRM_12)));
-					if (FAILED(hr)) {
+					if (FAILED(hr_select)) {
 						str += L" [" + ResStr(IDS_AG_ERROR) + L"] ";
 					}
-					strMessage.Format(ResStr(IDS_AUDIO_STREAM), str);
+					CString strMessage;
+					strMessage.Format(ResStr(IDS_AUDIO_STREAM), newStream+1, nStreamsAvailable, str);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 				}
 			}

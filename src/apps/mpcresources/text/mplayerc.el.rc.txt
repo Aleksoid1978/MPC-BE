@@ -1334,7 +1334,7 @@ STRING IDS_AUDIOWINDOW_NONE		"μην αλλάξει το μέγεθος του �
 STRING IDS_AUDIO_GAIN		"Αύξηση (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Επίπεδο (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Χρόνος κυκλοφορίας (%d):"
-STRING IDS_AUDIO_STREAM		"Ήχος: %s"
+STRING IDS_AUDIO_STREAM		"Ήχος %u/%u: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Αναπαραγωγή CD ήχου"
 STRING IDS_AUTOPLAY_PLAYBDMOVIE		"Αναπαραγωγή δίσκου Blu-ray"
 STRING IDS_AUTOPLAY_PLAYDVDMOVIE		"Αναπαραγωγή ταινίας DVD"
