@@ -1623,9 +1623,10 @@
 #define IDS_SATURATION_DEC              41318
 #define IDS_RESET_COLOR                 41319
 #define IDS_AFTERPLAYBACK_CLOSE_FILE    41320
+#define IDS_UPDATE_ERROR_DATA           41322
 #define IDS_USING_NEWER_VERSION         41323
 #define IDS_NEW_UPDATE_AVAILABLE        41324
-#define IDS_UPDATE_ERROR                41325
+#define IDS_UPDATE_ERROR_CONNECT        41325
 #define IDS_UPDATE_CLOSE                41326
 #define IDS_OSD_ZOOM                    41327
 #define IDS_OSD_ZOOM_AUTO               41328
