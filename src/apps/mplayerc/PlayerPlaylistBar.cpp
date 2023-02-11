@@ -2761,7 +2761,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = CDRF_DODEFAULT;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
-		if (!m_bEdit && SysVersion::IsWin7orLater()) { // under WinXP cause the hang
+		if (!m_bEdit) {
 			ResizeListColumn();
 		}
 

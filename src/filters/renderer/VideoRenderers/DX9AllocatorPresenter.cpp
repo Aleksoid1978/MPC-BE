@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -623,7 +623,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
 		}
 		else {
-			m_d3dpp.SwapEffect = SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP;
+			m_d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
 		}
 		m_d3dpp.BackBufferCount = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? 1 : 3;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;

@@ -149,7 +149,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 	std::map<CString, CString> monitors;
 
-	if (SysVersion::IsWin7orLater()) {
+	{
 		typedef LONG(WINAPI* PFN_GetDisplayConfigBufferSizes)(UINT32, UINT32*, UINT32*);
 		static auto pGetDisplayConfigBufferSizes = reinterpret_cast<PFN_GetDisplayConfigBufferSizes>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "GetDisplayConfigBufferSizes"));
 

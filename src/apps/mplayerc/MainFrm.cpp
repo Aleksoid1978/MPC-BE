@@ -18799,7 +18799,7 @@ void CMainFrame::OnFileOpenDirectory()
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
 {
-	if (!SysVersion::IsWin7orLater() || !AfxGetAppSettings().fUseWin7TaskBar || !m_svgTaskbarButtons.IsLoad()) {
+	if (!AfxGetAppSettings().fUseWin7TaskBar || !m_svgTaskbarButtons.IsLoad()) {
 		return E_FAIL;
 	}
 

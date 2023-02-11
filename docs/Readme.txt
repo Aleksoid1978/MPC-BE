@@ -5,7 +5,7 @@
 Системные требования:
 ---------------------
 * Процессор с поддержкой SSE2
-* Windows Vista, 7, 8, 8.1, 10, 11 32-bit/64-bit
+* Windows 7, 8, 8.1, 10, 11 32-bit/64-bit
 
 ////////////////////////////////////////////////////////////////////////////// 
 
@@ -16,7 +16,7 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 System requirements:
 ---------------------
 * An SSE2 capable CPU
-* Windows Vista, 7, 8, 8.1, 10, 11 32-bit/64-bit
+* Windows 7, 8, 8.1, 10, 11 32-bit/64-bit
 
 
 Links:

@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2021 see Authors.txt
+ * (C) 2013-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,17 +33,15 @@ CGPUUsage::CGPUUsage()
 {
 	Clean();
 
-	if (SysVersion::IsWin7orLater()) {
-		HMODULE gdi32Handle = GetModuleHandleW(L"gdi32.dll");
-		if (gdi32Handle) {
-			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
-			pD3DKMTOpenAdapterFromHdc = (PFND3DKMT_OPENADAPTERFROMHDC)GetProcAddress(gdi32Handle, "D3DKMTOpenAdapterFromHdc");
-			pD3DKMTCloseAdapter = (PFND3DKMT_CLOSEADAPTER)GetProcAddress(gdi32Handle, "D3DKMTCloseAdapter");
-			pD3DKMTQueryAdapterInfo = (PFND3DKMT_QUERYADAPTERINFO)GetProcAddress(gdi32Handle, "D3DKMTQueryAdapterInfo");
-		}
-
-		processHandle = GetCurrentProcess();
+	HMODULE gdi32Handle = GetModuleHandleW(L"gdi32.dll");
+	if (gdi32Handle) {
+		pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
+		pD3DKMTOpenAdapterFromHdc = (PFND3DKMT_OPENADAPTERFROMHDC)GetProcAddress(gdi32Handle, "D3DKMTOpenAdapterFromHdc");
+		pD3DKMTCloseAdapter = (PFND3DKMT_CLOSEADAPTER)GetProcAddress(gdi32Handle, "D3DKMTCloseAdapter");
+		pD3DKMTQueryAdapterInfo = (PFND3DKMT_QUERYADAPTERINFO)GetProcAddress(gdi32Handle, "D3DKMTQueryAdapterInfo");
 	}
+
+	processHandle = GetCurrentProcess();
 }
 
 CGPUUsage::~CGPUUsage()

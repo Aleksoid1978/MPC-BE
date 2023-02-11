@@ -1,5 +1,9 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
+1.6.6.x dev
+=============================
+Windows Vista is no longer supported.
+
 1.6.6
 =============================
 MPCStreamReader

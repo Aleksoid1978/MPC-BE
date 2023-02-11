@@ -133,7 +133,7 @@ AllowNoIcons=yes
 ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
-MinVersion=6.0.6000
+MinVersion=6.1.7600
 AppMutex={#app_name}
 ChangesAssociations=true
 #ifdef Sign
