@@ -4,6 +4,9 @@
 =============================
 Windows Vista is no longer supported.
 
+Updated libraries:
+	dav1d git-1.0.0-115-g9b4b244;
+
 1.6.6
 =============================
 MPCStreamReader
