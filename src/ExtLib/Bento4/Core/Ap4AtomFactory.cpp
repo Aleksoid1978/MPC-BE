@@ -620,11 +620,13 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_AI56:
         case AP4_ATOM_TYPE_AIVX:
         case AP4_ATOM_TYPE_AVIN:
-        // H.265/HEVC
+        // HEVC/H.265
         case AP4_ATOM_TYPE_HVC1:
         case AP4_ATOM_TYPE_HEV1:
         case AP4_ATOM_TYPE_DVHE:
         case AP4_ATOM_TYPE_DVH1:
+        // VVC/H.266
+        case AP4_ATOM_TYPE_VVC1:
         // VP8/VP9/AV1
         case AP4_ATOM_TYPE_vp08:
         case AP4_ATOM_TYPE_vp09:
