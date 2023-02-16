@@ -69,14 +69,27 @@ HRESULT CMpaSplitterFile::Init()
 	}
 
 	Seek(0);
+	BYTE data[16];
+	if (ByteRead(data, sizeof(data)) != S_OK) {
+		return E_FAIL;
+	}
+
+	const BYTE sign_mpegps[] = { 0x00, 0x00, 0x01, 0xBA }; // MPEG-PS (000001BA)
+	const BYTE sign_riff[] =   { 'R', 'I', 'F', 'F' };     // RIFF files (AVI, WAV, AMV and other)
+	const BYTE sign_mtv[] =    { 'A', 'M', 'V' };          // MTV files (.mtv)
+	const BYTE sign_iff[] =    { 'F', 'O', 'R', 'M'};      // IFF files (ANIM)
+	const BYTE sign_mpegts[] = { 0x47, 0x40, 0x00, 0x10 }; // MPEG-TS (?? ?? ?? ?? 10 00 40 47)
+	const BYTE sign_wtv[] =    { 0xB7, 0xD8, 0x00, 0x20, 0x37, 0x49, 0xDA, 0x11,
+		 0xA6, 0x4E, 0x00, 0x07, 0xE9, 0x5E, 0xAD, 0x8D }; // Windows Television (.wtv)
 
 	// some files can be determined as Mpeg Audio
-	if ((BitRead(24, true) == 0x000001)		||	// MPEG-PS? (0x000001BA)
-		(BitRead(32, true) == 'RIFF')		||	// RIFF files (AVI, WAV, AMV and other)
-		(BitRead(24, true) == 'AMV')		||	// MTV files (.mtv)
-		(BitRead(32, true) == 'FORM')		||	// IFF files (ANIM)
-		(BitRead(32, true) == 0x47400010)	||	// ?
-		((BitRead(64, true) & 0x00000000FFFFFFFF) == 0x47400010)) { // MPEG-TS
+	if ((memcmp(data,   sign_mpegps, std::size(sign_mpegps)) == 0)||
+		(memcmp(data,   sign_riff,   std::size(sign_riff)) == 0) ||
+		(memcmp(data,   sign_mtv,    std::size(sign_mtv)) == 0) ||
+		(memcmp(data,   sign_iff,    std::size(sign_iff)) == 0) ||
+		(memcmp(data,   sign_mpegts, std::size(sign_mpegts)) == 0) ||
+		(memcmp(data+4, sign_mpegts, std::size(sign_mpegts)) == 0) ||
+		(memcmp(data,   sign_wtv,    std::size(sign_wtv)) == 0)) {
 		return E_FAIL;
 	}
 
