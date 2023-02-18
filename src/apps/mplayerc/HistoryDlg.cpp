@@ -298,6 +298,8 @@ void CHistoryDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 			m_list.SetColumnWidth(i, width);
 		}
 	}
+
+	__super::OnShowWindow(bShow, nStatus);
 }
 
 void CHistoryDlg::OnTimer(UINT_PTR nIDEvent)
