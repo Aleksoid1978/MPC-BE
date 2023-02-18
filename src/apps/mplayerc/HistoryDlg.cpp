@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2022 see Authors.txt
+ * (C) 2021-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -236,7 +236,7 @@ void CHistoryDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CHistoryDlg, CResizableDialog)
-	ON_WM_ACTIVATE()
+	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
 	ON_EN_CHANGE(IDC_EDIT1, OnChangeFilterEdit)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
@@ -262,37 +262,42 @@ BOOL CHistoryDlg::OnInitDialog()
 	m_list.InsertColumn(COL_TITLE, ResStr(IDS_HISTORY_TITLE));
 	m_list.InsertColumn(COL_POS, ResStr(IDS_HISTORY_POSITION));
 
-	AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
-
-	SetupList();
-
-	CAppSettings& s = AfxGetAppSettings();
-
-	for (int i = 0; i < COL_COUNT; i++) {
-		int width = s.HistoryColWidths[i];
-
-		if (width <= 0 || width > 2000) {
-			m_list.SetColumnWidth(i, LVSCW_AUTOSIZE_USEHEADER);
-			const int headerW = m_list.GetColumnWidth(i);
-
-			m_list.SetColumnWidth(i, LVSCW_AUTOSIZE);
-			width = m_list.GetColumnWidth(i);
-
-			if (headerW > width) {
-				width = headerW;
-			}
-		}
-		else {
-			if (width < 25) {
-				width = 25;
-			}
-		}
-		m_list.SetColumnWidth(i, width);
-	}
-
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
 
 	return TRUE;
+}
+
+void CHistoryDlg::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+	if (bShow) {
+		AfxGetMyApp()->m_HistoryFile.GetRecentSessions(m_recentSessions, INT_MAX);
+
+		SetupList();
+
+		CAppSettings& s = AfxGetAppSettings();
+
+		for (int i = 0; i < COL_COUNT; i++) {
+			int width = s.HistoryColWidths[i];
+
+			if (width <= 0 || width > 2000) {
+				m_list.SetColumnWidth(i, LVSCW_AUTOSIZE_USEHEADER);
+				const int headerW = m_list.GetColumnWidth(i);
+
+				m_list.SetColumnWidth(i, LVSCW_AUTOSIZE);
+				width = m_list.GetColumnWidth(i);
+
+				if (headerW > width) {
+					width = headerW;
+				}
+			}
+			else {
+				if (width < 25) {
+					width = 25;
+				}
+			}
+			m_list.SetColumnWidth(i, width);
+		}
+	}
 }
 
 void CHistoryDlg::OnTimer(UINT_PTR nIDEvent)
