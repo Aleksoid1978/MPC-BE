@@ -865,7 +865,7 @@ private: // control bar embedded members
 
 	std::vector<CSizingControlBar*> m_dockingbarsVisible;
 
-	CHistoryDlg* m_pHistoryDlg = nullptr;
+	std::unique_ptr<CHistoryDlg> m_pHistoryDlg;
 
 	CFileDropTarget m_fileDropTarget;
 	// TODO

@@ -10365,7 +10365,7 @@ void CMainFrame::OnFavoritesOrganize()
 void CMainFrame::OnShowHistory()
 {
 	if (!m_pHistoryDlg) {
-		m_pHistoryDlg = new CHistoryDlg;
+		m_pHistoryDlg.reset(new CHistoryDlg(this));
 		m_pHistoryDlg->Create(IDD_HISTORY);
 	}
 	else if (m_pHistoryDlg->IsWindowVisible()) {
