@@ -42,7 +42,6 @@
 #include "SaveImageDialog.h"
 #include "FavoriteAddDlg.h"
 #include "FavoriteOrganizeDlg.h"
-#include "HistoryDlg.h"
 #include "ShaderCombineDlg.h"
 #include "FullscreenWnd.h"
 #include "TunerScanDlg.h"
@@ -10365,8 +10364,16 @@ void CMainFrame::OnFavoritesOrganize()
 
 void CMainFrame::OnShowHistory()
 {
-	CHistoryDlg dlg;
-	dlg.DoModal();
+	if (!m_pHistoryDlg) {
+		m_pHistoryDlg = new CHistoryDlg;
+		m_pHistoryDlg->Create(IDD_HISTORY);
+	}
+	else if (m_pHistoryDlg->IsWindowVisible()) {
+		m_pHistoryDlg->SetActiveWindow();
+	}
+	else {
+		m_pHistoryDlg->ShowWindow(SW_SHOW);
+	}
 }
 
 void CMainFrame::OnRecentFileClear()

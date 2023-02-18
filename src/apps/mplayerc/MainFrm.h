@@ -40,6 +40,7 @@
 #include "KeyProvider.h"
 #include "PlayerYouTube.h"
 #include "SvgHelper.h"
+#include "HistoryDlg.h"
 
 #include "mplayerc.h"
 #include "HistoryFile.h"
@@ -863,6 +864,8 @@ private: // control bar embedded members
 	std::vector<CSizingControlBar*> m_dockingbars;
 
 	std::vector<CSizingControlBar*> m_dockingbarsVisible;
+
+	CHistoryDlg* m_pHistoryDlg = nullptr;
 
 	CFileDropTarget m_fileDropTarget;
 	// TODO
