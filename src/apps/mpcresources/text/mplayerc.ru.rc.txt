@@ -105,7 +105,7 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
-3		"История (experimental)"
+3		"История"
 6		"МЕНЮ"
 8		"Удалить выбранное"
 END
