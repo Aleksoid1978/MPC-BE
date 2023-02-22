@@ -574,7 +574,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 5		"Dimensioni della finestra all'avvio"
 6		"Dimensioni finestra standard"
-7		"Ricorda dimensione dell'ultima finestra"
+7		"Ricorda dimensione ultima finestra"
 8		"Imposta dimensione finestra"
 9		"Imposta area video specificata"
 11		"×"
