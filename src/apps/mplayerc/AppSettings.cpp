@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlpath.h>
 #include <d3d9types.h>
 #include "MiniDump.h"
 #include "Misc.h"

@@ -28,6 +28,7 @@
 #include "AudioParser.h"
 #include "NullRenderers.h"
 #include "std_helper.h"
+#include <atlpath.h>
 #include <clsids.h>
 #include <moreuuids.h>
 #include <basestruct.h>

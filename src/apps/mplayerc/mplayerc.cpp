@@ -36,7 +36,6 @@
 #include <winddk/ntddcdvd.h>
 #include <ExtLib/Detours/src/detours.h>
 #include <afxsock.h>
-#include <atlsync.h>
 #include "UpdateChecker.h"
 
 #include "Version.h"

@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2022 see Authors.txt
+ * (C) 2018-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <atlpath.h>
 #include <atlenc.h>
 #include <ShlObj_core.h>
 #include <KnownFolders.h>

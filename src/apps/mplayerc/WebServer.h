@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 #pragma once
 
 #include <afxsock.h>
-#include <atlpath.h>
 
 #define UTF8(str)    WStrToUTF8(str)
 #define UTF8Arg(str) UrlEncode(UTF8(str), true)

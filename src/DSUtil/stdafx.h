@@ -31,5 +31,3 @@
 #include <vector>
 #include <list>
 #include <memory>
-
-#include <atlpath.h>

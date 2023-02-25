@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlpath.h>
 #include <dmoreg.h>
 #include "PPageExternalFilters.h"
 #include "ComPropertySheet.h"

@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlpath.h>
 #include <IntShCut.h>
 #include <random>
 #include "MainFrm.h"
