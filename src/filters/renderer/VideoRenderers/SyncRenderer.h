@@ -499,7 +499,7 @@ namespace GothSync
 
 		bool m_bUseInternalTimer   = false;
 		int  m_LastSetOutputRange  = -1;
-		bool m_bPendingRenegotiate = false;
+		std::atomic_bool m_bPendingRenegotiate = false;
 		bool m_bPendingMediaFinished = false;
 		bool m_bPrerolled = false; // true if first sample has been displayed.
 

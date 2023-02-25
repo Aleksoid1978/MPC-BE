@@ -2554,7 +2554,7 @@ STDMETHODIMP CSyncAP::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulPar
 
 		case MFVP_MESSAGE_INVALIDATEMEDIATYPE:
 			m_bPendingRenegotiate = true;
-			while (*((volatile bool *)&m_bPendingRenegotiate)) {
+			while (m_bPendingRenegotiate) {
 				Sleep(1);
 			}
 			break;
