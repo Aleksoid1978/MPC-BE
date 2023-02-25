@@ -47,8 +47,8 @@ namespace MatroskaWriter
 		operator UINT64() {
 			return m_len;
 		}
-		UINT64 Size(bool fWithHeader = false);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = false) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CBinary : public std::vector<BYTE>, public CID
@@ -68,8 +68,8 @@ namespace MatroskaWriter
 			return *this;
 		}
 		//CBinary& Set(CStringA str) {SetCount(str.GetLength()); memcpy((char*)GetData(), str, str.GetLength()); return *this;}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CANSI : public CStringA, public CID
@@ -80,8 +80,8 @@ namespace MatroskaWriter
 			CStringA::operator = (str);
 			return *this;
 		}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CUTF8 : public CStringW, public CID
@@ -92,8 +92,8 @@ namespace MatroskaWriter
 			CStringW::operator = (str);
 			return *this;
 		}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	template<class T, class BASE>
@@ -117,24 +117,24 @@ namespace MatroskaWriter
 		void UnSet() {
 			m_fSet = false;
 		}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CUInt : public CSimpleVar<UINT64, CUInt>
 	{
 	public:
 		explicit CUInt(DWORD id, UINT64 val = 0) : CSimpleVar<UINT64, CUInt>(id, val) {}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CInt : public CSimpleVar<INT64, CInt>
 	{
 	public:
 		explicit CInt(DWORD id, INT64 val = 0) : CSimpleVar<INT64, CInt>(id, val) {}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CByte : public CSimpleVar<BYTE, CByte>
@@ -186,8 +186,8 @@ namespace MatroskaWriter
 		CUInt DocTypeVersion, DocTypeReadVersion;
 
 		EBML(DWORD id = 0x1A45DFA3);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Info : public CID
@@ -201,8 +201,8 @@ namespace MatroskaWriter
 		CUTF8 Title, MuxingApp, WritingApp;
 
 		Info(DWORD id = 0x1549A966);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Video : public CID
@@ -216,8 +216,8 @@ namespace MatroskaWriter
 		CFloat FramePerSec;
 
 		Video(DWORD id = 0xE0);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Audio : public CID
@@ -230,8 +230,8 @@ namespace MatroskaWriter
 		CUInt BitDepth;
 
 		Audio(DWORD id = 0xE1);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class TrackEntry : public CID
@@ -265,8 +265,8 @@ namespace MatroskaWriter
 		Audio a;
 
 		TrackEntry(DWORD id = 0xAE);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Track : public CID
@@ -275,8 +275,8 @@ namespace MatroskaWriter
 		CNode<TrackEntry> TrackEntries;
 
 		Track(DWORD id = 0x1654AE6B);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CBlock : public CID
@@ -287,8 +287,8 @@ namespace MatroskaWriter
 		CNode<CBinary> BlockData;
 
 		CBlock(DWORD id = 0xA1);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class BlockGroup : public CID
@@ -303,8 +303,8 @@ namespace MatroskaWriter
 		//CNode<TimeSlice> TimeSlices;
 
 		BlockGroup(DWORD id = 0xA0);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Cluster : public CID
@@ -314,8 +314,8 @@ namespace MatroskaWriter
 		CNode<BlockGroup> BlockGroups;
 
 		Cluster(DWORD id = 0x1F43B675);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	/*class CueReference : public CID
@@ -324,8 +324,8 @@ namespace MatroskaWriter
 		CUInt CueRefTime, CueRefCluster, CueRefNumber, CueRefCodecState;
 
 		CueReference(DWORD id = 0xDB);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};*/
 
 	class CueTrackPosition : public CID
@@ -335,8 +335,8 @@ namespace MatroskaWriter
 		//CNode<CueReference> CueReferences;
 
 		CueTrackPosition(DWORD id = 0xB7);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class CuePoint : public CID
@@ -346,8 +346,8 @@ namespace MatroskaWriter
 		CNode<CueTrackPosition> CueTrackPositions;
 
 		CuePoint(DWORD id = 0xBB);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Cue : public CID
@@ -356,8 +356,8 @@ namespace MatroskaWriter
 		CNode<CuePoint> CuePoints;
 
 		Cue(DWORD id = 0x1C53BB6B);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class SeekID : public CID
@@ -368,8 +368,8 @@ namespace MatroskaWriter
 		void Set(DWORD id) {
 			m_cid = id;
 		}
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class SeekHead : public CID
@@ -379,8 +379,8 @@ namespace MatroskaWriter
 		CUInt Position;
 
 		SeekHead(DWORD id = 0x4DBB);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Seek : public CID
@@ -389,16 +389,16 @@ namespace MatroskaWriter
 		CNode<SeekHead> SeekHeads;
 
 		Seek(DWORD id = 0x114D9B74);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Segment : public CID
 	{
 	public:
 		Segment(DWORD id = 0x18538067);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Tags : public CID
@@ -407,8 +407,8 @@ namespace MatroskaWriter
 		// TODO
 
 		Tags(DWORD id = 0x1254C367);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 
 	class Void : public CID
@@ -416,7 +416,7 @@ namespace MatroskaWriter
 		UINT64 m_len;
 	public:
 		Void(UINT64 len, DWORD id = 0xEC);
-		UINT64 Size(bool fWithHeader = true);
-		HRESULT Write(IStream* pStream);
+		UINT64 Size(bool fWithHeader = true) override;
+		HRESULT Write(IStream* pStream) override;
 	};
 }
