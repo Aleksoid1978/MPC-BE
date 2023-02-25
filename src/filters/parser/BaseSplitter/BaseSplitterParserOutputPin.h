@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlutil.h>
 #include "DSUtil/Packet.h"
 #include "BaseSplitterOutputPin.h"
 #include "Teletext.h"

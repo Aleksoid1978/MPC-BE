@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <atlpath.h>
 #include <MMReg.h>
 #include <ks.h>
 #include <ksmedia.h>

@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <atlenc.h>
 #include <mmreg.h>
 #include "OggSplitter.h"
 #include "DSUtil/CUE.h"

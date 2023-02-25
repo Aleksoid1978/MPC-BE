@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include <atlconv.h>
 #include <afxglobals.h>
 #include <..\src\mfc\afximpl.h>
 

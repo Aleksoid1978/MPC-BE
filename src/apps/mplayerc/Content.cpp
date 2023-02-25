@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <atlutil.h>
 #include "Content.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/HTTPAsync.h"
