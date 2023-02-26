@@ -457,10 +457,10 @@ start:
 					if (oggtag == L"METADATA_BLOCK_PICTURE") {
 						// Flac format, METADATA_BLOCK_PICTURE
 						if (value.GetLength()) {
-							std::vector<BYTE> data;
-							unsigned ret = Base64ToBynary(value, data);
-							if (ret) {
-								CGolombBuffer gb(data.data(), data.size());
+							std::unique_ptr<BYTE[]> pData;
+							unsigned dataSize = Base64ToBynary(value, pData);
+							if (dataSize) {
+								CGolombBuffer gb(pData.get(), dataSize);
 								for (;;) {
 									gb.SkipBytes(4); // picture type
 
