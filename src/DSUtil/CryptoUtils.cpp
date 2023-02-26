@@ -53,12 +53,17 @@ unsigned Base64ToBynary(CStringW base64, BYTE** ppBytes)
 		nullptr, nullptr)) {
 
 		*ppBytes = new(std::nothrow) BYTE[dwLen];
-		if (*ppBytes && ::CryptStringToBinaryW(base64, base64.GetLength(),
-			CRYPT_STRING_BASE64,
-			*ppBytes, &dwLen,
-			nullptr, nullptr)) {
+		if (*ppBytes) {
+			if (::CryptStringToBinaryW(base64, base64.GetLength(),
+				CRYPT_STRING_BASE64,
+				*ppBytes, &dwLen,
+				nullptr, nullptr)) {
 
-			return dwLen;
+				return dwLen;
+			}
+
+			delete[] *ppBytes;
+			*ppBytes = nullptr;
 		}
 	}
 

@@ -584,14 +584,7 @@ bool CProfile::ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** p
 		}
 
 		nbytes = Base64ToBynary(valueStr, ppdata);
-		if (!nbytes) {
-			if (*ppdata) {
-				delete[] ppdata;
-			}
-			return false;
-		}
-
-		ret = true;
+		ret = nbytes ? true : false;
 	}
 
 	return ret;

@@ -56,6 +56,7 @@ static bool LoadMediaType(const CStringW prefix, CStringW name, AM_MEDIA_TYPE** 
 		}
 		memcpy(*ppmt, pData, len);
 		delete [] pData;
+		pData = nullptr;
 
 		(*ppmt)->cbFormat = 0;
 		(*ppmt)->pbFormat = nullptr;
