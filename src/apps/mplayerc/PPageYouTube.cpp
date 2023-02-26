@@ -129,6 +129,9 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_cbYDLExePath.SelectString(0, s.strYDLExePath);
 
 	for (const auto& h : s_CommonVideoHeights) {
+		if (h == 0) {
+			continue; // TODO
+		}
 		CString str;
 		str.Format(L"%d", h);
 		AddStringData(m_cbYDLMaxHeight, str, h);

@@ -474,6 +474,141 @@ namespace Youtube
 		funcLAST
 	};
 
+
+	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
+	{
+		const CAppSettings& s = AfxGetAppSettings();
+		const YoutubeUrllistItem* final_item = nullptr;
+
+		for (;;) {
+			if (youtubeUrllist.empty()) {
+				DLog(L"Youtube::Parse_URL() : no output video format found");
+
+				return nullptr;
+			}
+
+			int k_mp4 = -1;
+			int k_webm = -1;
+			int k_av1 = -1;
+			for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
+				const auto& format = youtubeUrllist[i].profile->format;
+				if (k_mp4 < 0 && format == y_mp4_avc) {
+					k_mp4 = i;
+				}
+				else if (k_webm < 0 && format == y_webm_vp9) {
+					k_webm = i;
+				}
+				else if (k_av1 < 0 && format == y_mp4_av1) {
+					k_av1 = i;
+				}
+			}
+
+			size_t k = 0;
+			if (s.YoutubeFormat.fmt == y_mp4_avc) {
+				k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
+			}
+			else if (s.YoutubeFormat.fmt == y_webm_vp9) {
+				k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
+			}
+			else if (s.YoutubeFormat.fmt == y_mp4_av1) {
+				k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
+			}
+			final_item = &youtubeUrllist[k];
+
+			for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
+				const auto profile = youtubeUrllist[i].profile;
+
+				if (final_item->profile->format == profile->format) {
+					if (profile->quality == final_item->profile->quality) {
+						if (profile->fps60 != s.YoutubeFormat.fps60) {
+							// same resolution as that of the previous, but not suitable fps
+							continue;
+						}
+						if (profile->hdr != s.YoutubeFormat.hdr) {
+							// same resolution as that of the previous, but not suitable HDR
+							continue;
+						}
+					}
+
+					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
+						break;
+					}
+
+					final_item = &youtubeUrllist[i];
+				}
+			}
+
+			const auto& url = final_item->url;
+			CHTTPAsync HTTPAsync;
+			if (FAILED(HTTPAsync.Connect(url, 10000))) {
+				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
+				auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(),
+					[&url](const YoutubeUrllistItem& item) { return item.url == url; });
+				youtubeUrllist.erase(it);
+				final_item = nullptr;
+
+				continue;
+			}
+
+			break;
+		}
+
+		return final_item;
+	}
+
+
+	const YoutubeUrllistItem* SelectAudioStream(YoutubeUrllist& youtubeAudioUrllist)
+	{
+		const CAppSettings& s = AfxGetAppSettings();
+		const YoutubeUrllistItem* final_item = nullptr;
+
+		for (;;) {
+			if (youtubeAudioUrllist.empty()) {
+				DLog(L"Youtube::Parse_URL() : no output audio format found");
+
+				return nullptr;
+			}
+
+			int k_aac = -1;
+			int k_opus = -1;
+			for (int i = 0; i < (int)youtubeAudioUrllist.size(); i++) {
+				const auto& format = youtubeAudioUrllist[i].profile->format;
+				if (k_aac < 0 && format == y_mp4_aac) {
+					k_aac = i;
+				}
+				else if (k_opus < 0 && format == y_webm_aud) {
+					k_opus = i;
+				}
+			}
+
+			size_t k = 0;
+			if (s.YoutubeFormat.fmt == y_mp4_avc || s.YoutubeFormat.fmt == y_mp4_av1) {
+				k = (k_aac >= 0) ? k_aac : (k_opus >= 0) ? k_opus : 0;
+			}
+			else if (s.YoutubeFormat.fmt == y_webm_vp9) {
+				k = (k_opus >= 0) ? k_opus : (k_aac >= 0) ? k_aac : 0;
+			}
+			final_item = &youtubeAudioUrllist[k];
+
+			const auto& url = final_item->url;
+			CHTTPAsync HTTPAsync;
+			if (FAILED(HTTPAsync.Connect(url, 10000))) {
+				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
+				auto it = std::find_if(youtubeAudioUrllist.cbegin(), youtubeAudioUrllist.cend(),
+					[&url](const YoutubeUrllistItem& item) { return item.url == url; });
+				youtubeAudioUrllist.erase(it);
+				final_item = nullptr;
+
+				continue;
+			}
+
+			break;
+		}
+
+		return final_item;
+	}
+
+
 	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, YoutubeUrllist& youtubeAudioUrllist,
 				   CSubtitleItemList& subs, REFERENCE_TIME& rtStart, CString& errorMessage)
 	{
@@ -1216,204 +1351,134 @@ namespace Youtube
 #endif
 
 		const CAppSettings& s = AfxGetAppSettings();
+
 		const YoutubeUrllistItem* final_item = nullptr;
+		CStringW final_video_url;
+		CStringW final_audio_url;
 
-		// select video stream
-		for (;;) {
-			if (youtubeUrllist.empty()) {
-				DLog(L"Youtube::Parse_URL() : no output video format found");
-
-				y_fields.Empty();
-				return false;
+		if (s.YoutubeFormat.res == 0) { // audio only
+			final_item = SelectAudioStream(youtubeAudioUrllist);
+			if (final_item) {
+				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", final_item->title, final_item->url);
+				final_audio_url = final_item->url;
 			}
+		}
+	
+		if (!final_item) {
+			final_item = SelectVideoStream(youtubeUrllist);
+			if (final_item) {
+				DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
+				final_video_url = final_item->url;
 
-			final_item = nullptr;
-
-			int k_mp4 = -1;
-			int k_webm = -1;
-			int k_av1 = -1;
-			for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
-				const auto& format = youtubeUrllist[i].profile->format;
-				if (k_mp4 < 0 && format == y_mp4_avc) {
-					k_mp4 = i;
-				}
-				else if (k_webm < 0 && format == y_webm_vp9) {
-					k_webm = i;
-				}
-				else if (k_av1 < 0 && format == y_mp4_av1) {
-					k_av1 = i;
+				if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
+					const auto audio_item = GetAudioUrl(final_item->profile, youtubeAudioUrllist);
+					DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", audio_item->title, audio_item->url);
+					final_audio_url = audio_item->url;
 				}
 			}
+		}
 
-			size_t k = 0;
-			if (s.YoutubeFormat.fmt == y_mp4_avc) {
-				k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
-			}
-			else if (s.YoutubeFormat.fmt == y_webm_vp9) {
-				k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
-			}
-			else if (s.YoutubeFormat.fmt == y_mp4_av1) {
-				k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
-			}
-			final_item = &youtubeUrllist[k];
+		if (final_video_url.IsEmpty() && final_audio_url.IsEmpty()) {
+			return false;
+		}
 
-			for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
-				const auto profile = youtubeUrllist[i].profile;
+		final_video_url.Replace(L"http://", L"https://");
+		final_audio_url.Replace(L"http://", L"https://");
 
-				if (final_item->profile->format == profile->format) {
-					if (profile->quality == final_item->profile->quality) {
-						if (profile->fps60 != s.YoutubeFormat.fps60) {
-							// same resolution as that of the previous, but not suitable fps
+		const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
+		if (!bParseMetadata) {
+			ParseMetadata(videoId, y_fields);
+		}
+		y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_item->profile->quality, final_item->profile->ext);
+		FixFilename(y_fields.fname);
+
+		// subtitles
+		if (!player_response_jsonDocument.IsNull()) {
+			if (auto captionTracks = GetValueByPointer(player_response_jsonDocument, "/captions/playerCaptionsTracklistRenderer/captionTracks"); captionTracks && captionTracks->IsArray()) {
+				for (const auto& elem : captionTracks->GetArray()) {
+					CStringA kind;
+					if (getJsonValue(elem, "kind", kind) && kind == "asr") {
+						continue;
+					}
+
+					CString sub_url;
+					if (getJsonValue(elem, "baseUrl", sub_url)) {
+						if (sub_url.Find(L"&fmt=")) {
+							auto result = std::regex_replace(sub_url.GetString(), std::wregex(LR"((&fmt=.[^&]+))"), L"&fmt=vtt");
+							sub_url = result.c_str();
+						} else {
+							sub_url += L"&fmt=vtt";
+						}
+					}
+
+					CString sub_name;
+					if (auto name = GetJsonObject(elem, "name")) {
+						getJsonValue(*name, "simpleText", sub_name);
+					}
+					if (sub_name.IsEmpty()) {
+						if (auto name = GetValueByPointer(elem, "/name/runs"); name && name->IsArray()) {
+							auto array = name->GetArray();
+							if (!array.Empty()) {
+								getJsonValue(array[0], "text", sub_name);
+							}
+						}
+					}
+
+					if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
+						subs.emplace_back(sub_url, sub_name);
+					}
+				}
+			}
+		}
+
+		if (youtubeAudioUrllist.size()) {
+			CString thumbnailUrl;
+			if (!player_response_jsonDocument.IsNull()) {
+				if (auto thumbnails = GetValueByPointer(player_response_jsonDocument, "/videoDetails/thumbnail/thumbnails"); thumbnails && thumbnails->IsArray()) {
+					int maxHeight = 0;
+					for (const auto& elem : thumbnails->GetArray()) {
+						CString url;
+						if (!getJsonValue(elem, "url", url)) {
 							continue;
 						}
-						if (profile->hdr != s.YoutubeFormat.hdr) {
-							// same resolution as that of the previous, but not suitable HDR
+
+						int height = 0;
+						if (!getJsonValue(elem, "height", height)) {
 							continue;
 						}
-					}
 
-					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
-						break;
-					}
-
-					final_item = &youtubeUrllist[i];
-				}
-			}
-
-			const auto& url = final_item->url;
-			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(url, 10000))) {
-				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
-				auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(), [&url](const YoutubeUrllistItem& item) {
-					return item.url == url;
-				});
-				youtubeUrllist.erase(it);
-				continue;
-			}
-
-			break;
-		}
-
-		DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
-
-		CString final_video_url = final_item->url;
-		const YoutubeProfile* final_video_profile = final_item->profile;
-
-		CString final_audio_url;
-		if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
-			const auto audio_item = GetAudioUrl(final_item->profile, youtubeAudioUrllist);
-			final_audio_url = audio_item->url;
-			DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", audio_item->title, audio_item->url);
-		}
-
-		if (!final_audio_url.IsEmpty()) {
-			final_audio_url.Replace(L"http://", L"https://");
-		}
-
-		if (!final_video_url.IsEmpty()) {
-			final_video_url.Replace(L"http://", L"https://");
-
-			const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
-			if (!bParseMetadata) {
-				ParseMetadata(videoId, y_fields);
-			}
-
-			y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_video_profile->quality, final_video_profile->ext);
-			FixFilename(y_fields.fname);
-
-			if (!videoId.IsEmpty()) {
-				// subtitles
-				if (!player_response_jsonDocument.IsNull()) {
-					if (auto captionTracks = GetValueByPointer(player_response_jsonDocument, "/captions/playerCaptionsTracklistRenderer/captionTracks"); captionTracks && captionTracks->IsArray()) {
-						for (const auto& elem : captionTracks->GetArray()) {
-							CStringA kind;
-							if (getJsonValue(elem, "kind", kind) && kind == "asr") {
-								continue;
-							}
-
-							CString sub_url;
-							if (getJsonValue(elem, "baseUrl", sub_url)) {
-								if (sub_url.Find(L"&fmt=")) {
-									auto result = std::regex_replace(sub_url.GetString(), std::wregex(LR"((&fmt=.[^&]+))"), L"&fmt=vtt");
-									sub_url = result.c_str();
-								} else {
-									sub_url += L"&fmt=vtt";
-								}
-							}
-
-							CString sub_name;
-							if (auto name = GetJsonObject(elem, "name")) {
-								getJsonValue(*name, "simpleText", sub_name);
-							}
-							if (sub_name.IsEmpty()) {
-								if (auto name = GetValueByPointer(elem, "/name/runs"); name && name->IsArray()) {
-									auto array = name->GetArray();
-									if (!array.Empty()) {
-										getJsonValue(array[0], "text", sub_name);
-									}
-								}
-							}
-
-							if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
-								subs.emplace_back(sub_url, sub_name);
-							}
+						if (height > maxHeight) {
+							maxHeight = height;
+							thumbnailUrl = url;
 						}
 					}
 				}
 			}
 
-			if (!final_video_url.IsEmpty()) {
+			for (auto item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_aac) {
+					item.thumbnailUrl = thumbnailUrl;
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (auto item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_webm_aud) {
+					item.thumbnailUrl = thumbnailUrl;
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+
+			if (final_video_url.GetLength()) {
 				urls.push_front(final_video_url);
-
-				if (!final_audio_url.IsEmpty()) {
-					urls.push_back(final_audio_url);
-				}
-
-				if (!youtubeAudioUrllist.empty()) {
-					CString thumbnailUrl;
-					if (!player_response_jsonDocument.IsNull()) {
-						if (auto thumbnails = GetValueByPointer(player_response_jsonDocument, "/videoDetails/thumbnail/thumbnails"); thumbnails && thumbnails->IsArray()) {
-							int maxHeight = 0;
-							for (const auto& elem : thumbnails->GetArray()) {
-								CString url;
-								if (!getJsonValue(elem, "url", url)) {
-									continue;
-								}
-
-								int height = 0;
-								if (!getJsonValue(elem, "height", height)) {
-									continue;
-								}
-
-								if (height > maxHeight) {
-									maxHeight = height;
-									thumbnailUrl = url;
-								}
-							}
-						}
-					}
-
-					for (auto item : youtubeAudioUrllist) {
-						if (item.profile->format == Youtube::y_mp4_aac) {
-							item.thumbnailUrl = thumbnailUrl;
-							youtubeUrllist.emplace_back(item);
-							break;
-						}
-					}
-					for (auto item : youtubeAudioUrllist) {
-						if (item.profile->format == Youtube::y_webm_aud) {
-							item.thumbnailUrl = thumbnailUrl;
-							youtubeUrllist.emplace_back(item);
-							break;
-						}
-					}
-				}
 			}
-
-			return !urls.empty();
+			if (final_audio_url.GetLength()) {
+				urls.push_back(final_audio_url);
+			}
 		}
 
-		return false;
+		return !urls.empty();
 	}
 
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)
