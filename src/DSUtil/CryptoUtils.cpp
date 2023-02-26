@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include <wincrypt.h>
 
+#pragma comment(lib, "Crypt32.lib")
+
 CStringW BynaryToBase64W(const BYTE* bytes, DWORD bytesLen)
 {
 	CStringW base64;

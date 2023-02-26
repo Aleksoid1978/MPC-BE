@@ -50,7 +50,6 @@
 #include "WindowsUserChoice.h"
 
 #pragma comment(lib, "Bcrypt.lib")
-#pragma comment(lib, "Crypt32.lib")
 
 namespace UserChoice {
 
