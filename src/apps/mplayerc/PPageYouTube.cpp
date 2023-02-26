@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,6 +95,8 @@ BOOL CPPageYoutube::OnInitDialog()
 		str.Format(L"%dp", res);
 		AddStringData(m_cbResolution, str, res);
 	}
+	AddStringData(m_cbResolution, L"audio only", 0);
+
 	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
 
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);

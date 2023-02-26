@@ -213,7 +213,7 @@ enum : int {
 	PLAYBACKWND_FITSCREENLARGER,
 };
 
-inline static const std::vector<int> s_CommonVideoHeights = { 240, 360, 480, 720, 1080, 1440, 2160, 2880, 4320 };
+inline static const std::vector<int> s_CommonVideoHeights = { 0, 240, 360, 480, 720, 1080, 1440, 2160, 2880, 4320 };
 
 struct ShaderC {
 	CString   label;
