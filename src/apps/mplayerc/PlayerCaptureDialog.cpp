@@ -46,8 +46,8 @@ static bool LoadMediaType(const CStringW prefix, CStringW name, AM_MEDIA_TYPE** 
 	}
 
 	ZeroMemory(*ppmt, sizeof(AM_MEDIA_TYPE));
-	BYTE* pData;
-	UINT len;
+	BYTE* pData = nullptr;
+	UINT len = 0;
 	if (profile.ReadBinary(IDS_R_CAPTURE, prefix + L"MediaType", &pData, len)) {
 		if ( len != sizeof(AM_MEDIA_TYPE) ) {
 			CoTaskMemFree(*ppmt);

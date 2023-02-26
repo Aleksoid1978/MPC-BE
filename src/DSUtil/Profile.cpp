@@ -19,11 +19,11 @@
  */
 
 #include "stdafx.h"
-#include <atlenc.h>
 #include <ShlObj_core.h>
 #include <KnownFolders.h>
 #include "FileHandle.h"
 #include "Utils.h"
+#include "CryptoUtils.h"
 #include "Log.h"
 #include "Profile.h"
 
@@ -583,24 +583,13 @@ bool CProfile::ReadBinary(const wchar_t* section, const wchar_t* entry, BYTE** p
 			}
 		}
 
-		CStringA base64(valueStr);
-		if (base64.IsEmpty()) {
+		nbytes = Base64ToBynary(valueStr, ppdata);
+		if (!nbytes) {
+			if (*ppdata) {
+				delete[] ppdata;
+			}
 			return false;
 		}
-
-		int nDestLen = Base64DecodeGetRequiredLength(base64.GetLength());
-		BYTE* pBinary = new(std::nothrow) BYTE[nDestLen];
-		if (!pBinary) {
-			ASSERT(0);
-			return false;
-		}
-		BOOL decOk = Base64Decode(base64, base64.GetLength(), *ppdata, &nDestLen);
-		if (!decOk) {
-			delete[] pBinary;
-			return false;
-		}
-
-		*ppdata = pBinary;
 
 		ret = true;
 	}
@@ -842,16 +831,12 @@ bool CProfile::WriteBinary(const wchar_t* section, const wchar_t* entry, const B
 		}
 		return ret;
 	} else {
-		int nDestLen = Base64EncodeGetRequiredLength(nbytes);
-		CStringA base64;
-		BOOL encOk = Base64Encode(pdata, nbytes, base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-		if (encOk) {
-			base64.ReleaseBufferSetLength(nDestLen);
-			CStringW valueStr(base64);
+		CStringW base64 = BynaryToBase64W(pdata, nbytes);
+		if (base64.GetLength()) {
 			InitIni();
 			CStringW& old = m_ProfileMap[section][entry];
-			if (old != valueStr) {
-				old = valueStr;
+			if (old != base64) {
+				old = base64;
 				m_bIniNeedFlush = true;
 			}
 			ret = true;

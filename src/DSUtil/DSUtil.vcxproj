@@ -56,6 +56,7 @@
     <ClCompile Include="AudioParser.cpp" />
     <ClCompile Include="AudioTools.cpp" />
     <ClCompile Include="CPUInfo.cpp" />
+    <ClCompile Include="CryptoUtils.cpp" />
     <ClCompile Include="CUE.cpp" />
     <ClCompile Include="D3D9Helper.cpp" />
     <ClCompile Include="DSMPropertyBag.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="AudioTools.h" />
     <ClInclude Include="BitsWriter.h" />
     <ClInclude Include="CPUInfo.h" />
+    <ClInclude Include="CryptoUtils.h" />
     <ClInclude Include="CUE.h" />
     <ClInclude Include="D3D9Helper.h" />
     <ClInclude Include="DSMPropertyBag.h" />

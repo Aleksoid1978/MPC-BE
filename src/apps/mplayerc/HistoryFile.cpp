@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "HistoryFile.h"
-#include <atlenc.h>
+#include "DSUtil/CryptoUtils.h"
 
 //
 // CMpcLstFile
@@ -167,13 +167,8 @@ bool CSessionFile::ReadFile()
 					}
 				}
 				else if (param == L"DVDState") {
-					CStringA base64(value);
-					int nDestLen = Base64DecodeGetRequiredLength(base64.GetLength());
-					sesInfo.DVDState.resize(nDestLen);
-					BOOL ret = Base64Decode(base64, base64.GetLength(), sesInfo.DVDState.data(), &nDestLen);
-					if (ret) {
-						sesInfo.DVDState.resize(nDestLen);
-					} else {
+					unsigned ret = Base64ToBynary(value, sesInfo.DVDState);
+					if (!ret) {
 						sesInfo.DVDState.clear();
 					}
 				}
@@ -284,12 +279,9 @@ bool CHistoryFile::WriteFile()
 							(unsigned)sesInfo.DVDTimecode.bSeconds);
 					}
 					if (sesInfo.DVDState.size()) {
-						int nDestLen = Base64EncodeGetRequiredLength(sesInfo.DVDState.size());
-						CStringA base64;
-						BOOL ret2 = Base64Encode(sesInfo.DVDState.data(), sesInfo.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-						if (ret2) {
-							base64.ReleaseBufferSetLength(nDestLen);
-							str.AppendFormat(L"DVDState=%hs\n", base64);
+						CStringW base64 = BynaryToBase64W(sesInfo.DVDState.data(), sesInfo.DVDState.size());
+						if (base64.GetLength()) {
+							str.AppendFormat(L"DVDState=%s\n", base64);
 						}
 					}
 				}
@@ -585,12 +577,9 @@ bool CFavoritesFile::WriteFile()
 						(unsigned)sesDvd.DVDTimecode.bSeconds);
 				}
 				if (sesDvd.DVDState.size()) {
-					int nDestLen = Base64EncodeGetRequiredLength(sesDvd.DVDState.size());
-					CStringA base64;
-					BOOL ret2 = Base64Encode(sesDvd.DVDState.data(), sesDvd.DVDState.size(), base64.GetBuffer(nDestLen), &nDestLen, ATL_BASE64_FLAG_NOCRLF);
-					if (ret2) {
-						base64.ReleaseBufferSetLength(nDestLen);
-						str.AppendFormat(L"DVDState=%hs\n", base64);
+					CStringW base64 = BynaryToBase64W(sesDvd.DVDState.data(), sesDvd.DVDState.size());
+					if (base64.GetLength()) {
+						str.AppendFormat(L"DVDState=%s\n", base64);
 					}
 				}
 

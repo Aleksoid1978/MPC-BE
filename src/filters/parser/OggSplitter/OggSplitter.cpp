@@ -20,13 +20,13 @@
  */
 
 #include "stdafx.h"
-#include <atlenc.h>
 #include <mmreg.h>
 #include "OggSplitter.h"
 #include "DSUtil/CUE.h"
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/GolombBuffer.h"
 #include "DSUtil/VideoParser.h"
+#include "DSUtil/CryptoUtils.h"
 #include <moreuuids.h>
 #include <basestruct.h>
 
@@ -456,12 +456,11 @@ start:
 				if (!value.IsEmpty()) {
 					if (oggtag == L"METADATA_BLOCK_PICTURE") {
 						// Flac format, METADATA_BLOCK_PICTURE
-						if (!value.IsEmpty()) {
-							const CStringA base64(value);
-							int byteLength = Base64DecodeGetRequiredLength(base64.GetLength());
-							std::vector<BYTE> pData(byteLength);
-							if (Base64Decode(base64.GetString(), base64.GetLength(), pData.data(), &byteLength)) {
-								CGolombBuffer gb(pData.data(), byteLength);
+						if (value.GetLength()) {
+							std::vector<BYTE> data;
+							unsigned ret = Base64ToBynary(value, data);
+							if (ret) {
+								CGolombBuffer gb(data.data(), data.size());
 								for (;;) {
 									gb.SkipBytes(4); // picture type
 
