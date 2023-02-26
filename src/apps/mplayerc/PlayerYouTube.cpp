@@ -1452,6 +1452,7 @@ namespace Youtube
 							thumbnailUrl = url;
 						}
 					}
+					y_fields.thumbnailUrl = thumbnailUrl;
 				}
 			}
 
