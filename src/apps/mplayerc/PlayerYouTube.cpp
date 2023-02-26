@@ -477,683 +477,641 @@ namespace Youtube
 	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, YoutubeUrllist& youtubeAudioUrllist,
 				   CSubtitleItemList& subs, REFERENCE_TIME& rtStart, CString& errorMessage)
 	{
-		if (CheckURL(url)) {
-			DLog(L"Youtube::Parse_URL() : \"%s\"", url);
+		if (!CheckURL(url)) {
+			return false;
+		}
 
-			HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
+		DLog(L"Youtube::Parse_URL() : \"%s\"", url);
 
-			CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
+		HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
 
-			if (rtStart <= 0) {
-				BOOL bMatch = FALSE;
+		CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
-				const std::wregex regex(L"t=(\\d+h)?(\\d{1,2}m)?(\\d{1,2}s)?", std::regex_constants::icase);
-				std::wcmatch match;
-				if (std::regex_search(url.GetBuffer(), match, regex) && match.size() == 4) {
-					int h = 0;
-					int m = 0;
-					int s = 0;
-					if (match[1].matched) {
-						h = _wtoi(match[1].first);
-						bMatch = TRUE;
-					}
-					if (match[2].matched) {
-						m = _wtoi(match[2].first);
-						bMatch = TRUE;
-					}
-					if (match[3].matched) {
-						s = _wtoi(match[3].first);
-						bMatch = TRUE;
-					}
+		if (rtStart <= 0) {
+			BOOL bMatch = FALSE;
 
-					rtStart = (h * 3600 + m * 60 + s) * UNITS;
+			const std::wregex regex(L"t=(\\d+h)?(\\d{1,2}m)?(\\d{1,2}s)?", std::regex_constants::icase);
+			std::wcmatch match;
+			if (std::regex_search(url.GetBuffer(), match, regex) && match.size() == 4) {
+				int h = 0;
+				int m = 0;
+				int s = 0;
+				if (match[1].matched) {
+					h = _wtoi(match[1].first);
+					bMatch = TRUE;
+				}
+				if (match[2].matched) {
+					m = _wtoi(match[2].first);
+					bMatch = TRUE;
+				}
+				if (match[3].matched) {
+					s = _wtoi(match[3].first);
+					bMatch = TRUE;
 				}
 
-				if (!bMatch) {
-					const CString timeStart = RegExpParse(url.GetString(), L"(?:t|time_continue)=([0-9]+)");
-					if (!timeStart.IsEmpty()) {
-						rtStart = _wtol(timeStart) * UNITS;
-					}
+				rtStart = (h * 3600 + m * 60 + s) * UNITS;
+			}
+
+			if (!bMatch) {
+				const CString timeStart = RegExpParse(url.GetString(), L"(?:t|time_continue)=([0-9]+)");
+				if (!timeStart.IsEmpty()) {
+					rtStart = _wtol(timeStart) * UNITS;
 				}
 			}
+		}
 
-			urlData data;
-			if (!URLReadData(url.GetString(), data)) {
-				return false;
-			}
+		urlData data;
+		if (!URLReadData(url.GetString(), data)) {
+			return false;
+		}
 
-			const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
-			y_fields.title = FixHtmlSymbols(Title);
+		const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
+		y_fields.title = FixHtmlSymbols(Title);
 
-			std::vector<std::pair<youtubeFuncType, int>> JSFuncs;
-			BOOL bJSParsed = FALSE;
-			CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
+		std::vector<std::pair<youtubeFuncType, int>> JSFuncs;
+		BOOL bJSParsed = FALSE;
+		CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
+		if (JSUrl.IsEmpty()) {
+			JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
 			if (JSUrl.IsEmpty()) {
-				JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
-				if (JSUrl.IsEmpty()) {
-					JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_3, MATCH_END));
-				}
+				JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_3, MATCH_END));
 			}
+		}
 
-			rapidjson::Document player_response_jsonDocument;
+		rapidjson::Document player_response_jsonDocument;
 
-			CStringA strUrls;
-			std::list<CStringA> strUrlsLive;
+		CStringA strUrls;
+		std::list<CStringA> strUrlsLive;
 
-			urlData postData;
-			if (URLPostData(videoId.GetString(), postData, false)) {
+		urlData postData;
+		if (URLPostData(videoId.GetString(), postData, false)) {
+			player_response_jsonDocument.Parse(postData.data());
+		}
+
+		bool bStreamingDataExist = false;
+		if (!player_response_jsonDocument.IsNull()) {
+			if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+				bStreamingDataExist = true;
+			}
+		}
+		if (!bStreamingDataExist) {
+			player_response_jsonDocument.SetObject();
+			postData.clear();
+			if (URLPostData(videoId.GetString(), postData, true)) {
 				player_response_jsonDocument.Parse(postData.data());
 			}
 
-			bool bStreamingDataExist = false;
 			if (!player_response_jsonDocument.IsNull()) {
 				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
 					bStreamingDataExist = true;
 				}
 			}
-			if (!bStreamingDataExist) {
-				player_response_jsonDocument.SetObject();
-				postData.clear();
-				if (URLPostData(videoId.GetString(), postData, true)) {
-					player_response_jsonDocument.Parse(postData.data());
-				}
+		}
 
-				if (!player_response_jsonDocument.IsNull()) {
-					if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
-						bStreamingDataExist = true;
-					}
-				}
-			}
-
-			if (!bStreamingDataExist) {
-				player_response_jsonDocument.SetObject();
-				auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+		if (!bStreamingDataExist) {
+			player_response_jsonDocument.SetObject();
+			auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
+			if (!player_response_jsonData.IsEmpty()) {
+				player_response_jsonData += "}";
+				player_response_jsonData.Replace(R"(\/)", "/");
+				player_response_jsonData.Replace(R"(\")", R"(")");
+				player_response_jsonData.Replace(R"(\\)", R"(\)");
+			} else {
+				player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
 				if (!player_response_jsonData.IsEmpty()) {
 					player_response_jsonData += "}";
-					player_response_jsonData.Replace(R"(\/)", "/");
-					player_response_jsonData.Replace(R"(\")", R"(")");
-					player_response_jsonData.Replace(R"(\\)", R"(\)");
-				} else {
-					player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
-					if (!player_response_jsonData.IsEmpty()) {
-						player_response_jsonData += "}";
+				}
+			}
+			if (!player_response_jsonData.IsEmpty()) {
+				player_response_jsonDocument.Parse(player_response_jsonData);
+			}
+		}
+
+		// live streaming
+		CStringA live_url = GetEntry(data.data(), MATCH_HLSVP_START, MATCH_END);
+		if (live_url.IsEmpty()) {
+			live_url = GetEntry(data.data(), MATCH_HLSMANIFEST_START, MATCH_END);
+		}
+		if (!live_url.IsEmpty()) {
+			url = UrlDecode(UrlDecode(live_url));
+			url.Replace(L"\\/", L"/");
+			DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
+			urlData m3u8Data;
+			if (URLReadData(url.GetString(), m3u8Data)) {
+				CStringA m3u8Str(m3u8Data.data());
+
+				m3u8Str.Replace("\r\n", "\n");
+				std::list<CStringA> lines;
+				Explode(m3u8Str, lines, '\n');
+				for (auto& line : lines) {
+					line.Trim();
+					if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+						continue;
+					}
+
+					line.Replace("/keepalive/yes/", "/");
+					strUrlsLive.emplace_back(line);
+				}
+			}
+
+			if (strUrlsLive.empty()) {
+				urls.push_front(url);
+				return true;
+			}
+		} else {
+			// url_encoded_fmt_stream_map
+			const CStringA stream_map = GetEntry(data.data(), MATCH_STREAM_MAP_START, MATCH_END);
+			if (!stream_map.IsEmpty()) {
+				strUrls = stream_map;
+			}
+			// adaptive_fmts
+			const CStringA adaptive_fmts = GetEntry(data.data(), MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+			if (!adaptive_fmts.IsEmpty()) {
+				if (!strUrls.IsEmpty()) {
+					strUrls += ',';
+				}
+				strUrls += adaptive_fmts;
+			}
+			strUrls.Replace("\\u0026", "&");
+		}
+
+		using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
+		std::list<streamingDataFormat> streamingDataFormatList;
+		if (!player_response_jsonDocument.IsNull()) {
+			if (auto playabilityStatus = GetJsonObject(player_response_jsonDocument, "playabilityStatus")) {
+				CStringA status;
+				if (getJsonValue(*playabilityStatus, "status", status) && status != "OK") {
+					if (getJsonValue(*playabilityStatus, "reason", errorMessage) && !errorMessage.IsEmpty()) {
+						errorMessage = L"Youtube : " + errorMessage;
+					}
+					return false;
+				}
+			}
+
+			if (auto videoDetails = GetJsonObject(player_response_jsonDocument, "videoDetails")) {
+				bool isLive = false;
+				if (getJsonValue(*videoDetails, "isLive", isLive) && isLive) {
+					if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+						CString hlsManifestUrl;
+						if (getJsonValue(*streamingData, "hlsManifestUrl", hlsManifestUrl)) {
+							DLog(L"Youtube::Parse_URL() : Downloading m3u8 hls manifest \"%s\"", hlsManifestUrl);
+							urlData m3u8Data;
+							if (URLReadData(hlsManifestUrl.GetString(), m3u8Data)) {
+								CStringA m3u8Str(m3u8Data.data());
+
+								m3u8Str.Replace("\r\n", "\n");
+								std::list<CStringA> lines;
+								Explode(m3u8Str, lines, '\n');
+								for (auto& line : lines) {
+									line.Trim();
+									if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+										continue;
+									}
+
+									line.Replace("/keepalive/yes/", "/");
+									strUrlsLive.emplace_back(line);
+								}
+							}
+						}
 					}
 				}
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonDocument.Parse(player_response_jsonData);
+			}
+
+			if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
+				if (auto formats = GetJsonArray(*streamingData, "formats")) {
+					for (const auto& format : formats->GetArray()) {
+						streamingDataFormat element;
+
+						getJsonValue(format, "itag", std::get<0>(element));
+						getJsonValue(format, "qualityLabel", std::get<3>(element));
+						if (getJsonValue(format, "url", std::get<1>(element))) {
+							streamingDataFormatList.emplace_back(element);
+						} else if (getJsonValue(format, "cipher", std::get<2>(element)) || getJsonValue(format, "signatureCipher", std::get<2>(element))) {
+							streamingDataFormatList.emplace_back(element);
+						}
+					}
 				}
-			}
 
-			// live streaming
-			CStringA live_url = GetEntry(data.data(), MATCH_HLSVP_START, MATCH_END);
-			if (live_url.IsEmpty()) {
-				live_url = GetEntry(data.data(), MATCH_HLSMANIFEST_START, MATCH_END);
-			}
-			if (!live_url.IsEmpty()) {
-				url = UrlDecode(UrlDecode(live_url));
-				url.Replace(L"\\/", L"/");
-				DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
-				urlData m3u8Data;
-				if (URLReadData(url.GetString(), m3u8Data)) {
-					CStringA m3u8Str(m3u8Data.data());
-
-					m3u8Str.Replace("\r\n", "\n");
-					std::list<CStringA> lines;
-					Explode(m3u8Str, lines, '\n');
-					for (auto& line : lines) {
-						line.Trim();
-						if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+				if (auto adaptiveFormats = GetJsonArray(*streamingData, "adaptiveFormats")) {
+					for (const auto& adaptiveFormat : adaptiveFormats->GetArray()) {
+						CStringA type;
+						if (getJsonValue(adaptiveFormat, "type", type) && type == L"FORMAT_STREAM_TYPE_OTF") {
+							// fragmented url
 							continue;
 						}
 
-						line.Replace("/keepalive/yes/", "/");
-						strUrlsLive.emplace_back(line);
-					}
-				}
+						streamingDataFormat element;
 
-				if (strUrlsLive.empty()) {
-					urls.push_front(url);
-					return true;
-				}
-			} else {
-				// url_encoded_fmt_stream_map
-				const CStringA stream_map = GetEntry(data.data(), MATCH_STREAM_MAP_START, MATCH_END);
-				if (!stream_map.IsEmpty()) {
-					strUrls = stream_map;
-				}
-				// adaptive_fmts
-				const CStringA adaptive_fmts = GetEntry(data.data(), MATCH_ADAPTIVE_FMTS_START, MATCH_END);
-				if (!adaptive_fmts.IsEmpty()) {
-					if (!strUrls.IsEmpty()) {
-						strUrls += ',';
+						getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
+						getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
+						if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))) {
+							streamingDataFormatList.emplace_back(element);
+						} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
+							streamingDataFormatList.emplace_back(element);
+						}
 					}
-					strUrls += adaptive_fmts;
 				}
-				strUrls.Replace("\\u0026", "&");
+			}
+		}
+
+		if (!JSUrl.IsEmpty()) {
+			JSUrl.Replace(L"\\/", L"/");
+			JSUrl.Trim();
+
+			if (StartsWith(JSUrl, L"//")) {
+				JSUrl = L"https:" + JSUrl;
+			} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
+				JSUrl = L"https://www.youtube.com" + JSUrl;
+			}
+		}
+
+		auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
+			if (url.Find(L"dur=0.000") > 0) {
+				return;
 			}
 
-			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
-			std::list<streamingDataFormat> streamingDataFormatList;
-			if (!player_response_jsonDocument.IsNull()) {
-				if (auto playabilityStatus = GetJsonObject(player_response_jsonDocument, "playabilityStatus")) {
-					CStringA status;
-					if (getJsonValue(*playabilityStatus, "status", status) && status != "OK") {
-						if (getJsonValue(*playabilityStatus, "reason", errorMessage) && !errorMessage.IsEmpty()) {
-							errorMessage = L"Youtube : " + errorMessage;
-						}
-						return false;
+			if (const YoutubeProfile* profile = GetProfile(itag)) {
+				YoutubeUrllistItem item;
+				item.profile = profile;
+				item.url = url;
+
+				switch (profile->format) {
+				case y_mp4_avc:  item.title = L"MP4(H.264)"; break;
+				case y_webm_vp9: item.title = L"WebM(VP9)";  break;
+				case y_mp4_av1:  item.title = L"MP4(AV1)";   break;
+				case y_stream:   item.title = L"HLS Live";  break;
+				default:         item.title = L"unknown";   break;
+				}
+
+				if (quality_label) {
+					item.title.AppendFormat(L" %S", quality_label);
+					if (profile->type == y_video) {
+						item.title.Append(L" dash");
+					}
+					if (profile->hdr) {
+						item.title.Append(L" (10 bit)");
+					}
+				} else {
+					item.title.AppendFormat(L"%dp",profile->quality);
+					if (profile->type == y_video) {
+						item.title.Append(L" dash");
+					}
+					if (fps) {
+						item.title.AppendFormat(L" %dfps", fps);
+					} else if (profile->fps60) {
+						item.title.Append(L" 60fps");
+					}
+					if (profile->hdr) {
+						item.title.Append(L" HDR (10 bit)");
 					}
 				}
 
-				if (auto videoDetails = GetJsonObject(player_response_jsonDocument, "videoDetails")) {
-					bool isLive = false;
-					if (getJsonValue(*videoDetails, "isLive", isLive) && isLive) {
-						if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
-							CString hlsManifestUrl;
-							if (getJsonValue(*streamingData, "hlsManifestUrl", hlsManifestUrl)) {
-								DLog(L"Youtube::Parse_URL() : Downloading m3u8 hls manifest \"%s\"", hlsManifestUrl);
-								urlData m3u8Data;
-								if (URLReadData(hlsManifestUrl.GetString(), m3u8Data)) {
-									CStringA m3u8Str(m3u8Data.data());
+				videoUrls.emplace_back(item);
+			} else if (const YoutubeProfile* audioprofile = GetAudioProfile(itag)) {
+				YoutubeUrllistItem item;
+				item.profile = audioprofile;
+				item.url = url;
 
-									m3u8Str.Replace("\r\n", "\n");
-									std::list<CStringA> lines;
-									Explode(m3u8Str, lines, '\n');
-									for (auto& line : lines) {
-										line.Trim();
-										if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+				switch (audioprofile->format) {
+				case y_mp4_aac:  item.title = L"MP4/AAC";   break;
+				case y_webm_aud: item.title = L"WebM/Opus"; break;
+				default:         item.title = L"unknown";  break;
+				}
+				item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
+
+				audioUrls.emplace_back(item);
+			}
+		};
+
+		auto SignatureDecode = [&](CStringA& url, CStringA signature, LPCSTR format) {
+			if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
+				if (!bJSParsed) {
+					bJSParsed = TRUE;
+
+					const auto JSPlayerId = RegExpParse(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
+
+					auto& youtubeSignatureCache = AfxGetAppSettings().youtubeSignatureCache;
+					const auto& it = youtubeSignatureCache.find(JSPlayerId);
+					if (it != youtubeSignatureCache.cend() && !it->second.IsEmpty()) {
+						rapidjson::GenericDocument<rapidjson::UTF16<>> d;
+						if (!d.Parse(it->second.GetString()).HasParseError()) {
+							const auto maxNum = signature.GetLength() - 1;
+							for (auto it = d.MemberBegin(); it != d.MemberEnd(); ++it) {
+								int funcType;
+								if (StrToInt32(it->name.GetString(), funcType) && (funcType > youtubeFuncType::funcNONE && funcType < youtubeFuncType::funcLAST)) {
+									const auto value = it->value.GetInt();
+									if (value < 0 || value > maxNum) {
+										JSFuncs.clear();
+										break;
+									}
+									JSFuncs.emplace_back(static_cast<youtubeFuncType>(funcType), it->value.GetInt());
+								}
+							}
+						}
+					}
+
+					if (JSFuncs.empty()) {
+						urlData jsData;
+						if (URLReadData(JSUrl.GetString(), jsData)) {
+							static LPCSTR signatureRegExps[] = {
+								R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
+								R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
+								R"((?:\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
+								R"(([a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
+								R"((["\'])signature\1\s*,\s*([a-zA-Z0-9$]+)\()",
+								R"(\.sig\|\|([a-zA-Z0-9$]+)\()",
+								R"(yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*([a-zA-Z0-9$]+)\()",
+								R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
+								R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
+								R"(\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
+								R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
+								R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()"
+							};
+							CStringA funcName;
+							for (const auto& sigRegExp : signatureRegExps) {
+								funcName = RegExpParse(jsData.data(), sigRegExp);
+								if (!funcName.IsEmpty()) {
+									break;
+								}
+							}
+							if (!funcName.IsEmpty()) {
+								CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
+								const CStringA funcBody = RegExpParse(jsData.data(), funcRegExp.GetString());
+								if (!funcBody.IsEmpty()) {
+									CStringA funcGroup;
+									std::list<CStringA> funcList;
+									std::list<CStringA> funcCodeList;
+
+									std::list<CStringA> code;
+									Explode(funcBody, code, ';');
+
+									for (const auto& line : code) {
+
+										if (line.Find("split") >= 0 || line.Find("return") >= 0) {
 											continue;
 										}
 
-										line.Replace("/keepalive/yes/", "/");
-										strUrlsLive.emplace_back(line);
-									}
-								}
-							}
-						}
-					}
-				}
+										funcList.push_back(line);
 
-				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
-					if (auto formats = GetJsonArray(*streamingData, "formats")) {
-						for (const auto& format : formats->GetArray()) {
-							streamingDataFormat element;
-
-							getJsonValue(format, "itag", std::get<0>(element));
-							getJsonValue(format, "qualityLabel", std::get<3>(element));
-							if (getJsonValue(format, "url", std::get<1>(element))) {
-								streamingDataFormatList.emplace_back(element);
-							} else if (getJsonValue(format, "cipher", std::get<2>(element)) || getJsonValue(format, "signatureCipher", std::get<2>(element))) {
-								streamingDataFormatList.emplace_back(element);
-							}
-						}
-					}
-
-					if (auto adaptiveFormats = GetJsonArray(*streamingData, "adaptiveFormats")) {
-						for (const auto& adaptiveFormat : adaptiveFormats->GetArray()) {
-							CStringA type;
-							if (getJsonValue(adaptiveFormat, "type", type) && type == L"FORMAT_STREAM_TYPE_OTF") {
-								// fragmented url
-								continue;
-							}
-
-							streamingDataFormat element;
-
-							getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
-							getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
-							if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))) {
-								streamingDataFormatList.emplace_back(element);
-							} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
-								streamingDataFormatList.emplace_back(element);
-							}
-						}
-					}
-				}
-			}
-
-			if (!JSUrl.IsEmpty()) {
-				JSUrl.Replace(L"\\/", L"/");
-				JSUrl.Trim();
-
-				if (StartsWith(JSUrl, L"//")) {
-					JSUrl = L"https:" + JSUrl;
-				} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
-					JSUrl = L"https://www.youtube.com" + JSUrl;
-				}
-			}
-
-			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
-				if (url.Find(L"dur=0.000") > 0) {
-					return;
-				}
-
-				if (const YoutubeProfile* profile = GetProfile(itag)) {
-					YoutubeUrllistItem item;
-					item.profile = profile;
-					item.url = url;
-
-					switch (profile->format) {
-					case y_mp4_avc:  item.title = L"MP4(H.264)"; break;
-					case y_webm_vp9: item.title = L"WebM(VP9)";  break;
-					case y_mp4_av1:  item.title = L"MP4(AV1)";   break;
-					case y_stream:   item.title = L"HLS Live";  break;
-					default:         item.title = L"unknown";   break;
-					}
-
-					if (quality_label) {
-						item.title.AppendFormat(L" %S", quality_label);
-						if (profile->type == y_video) {
-							item.title.Append(L" dash");
-						}
-						if (profile->hdr) {
-							item.title.Append(L" (10 bit)");
-						}
-					} else {
-						item.title.AppendFormat(L"%dp",profile->quality);
-						if (profile->type == y_video) {
-							item.title.Append(L" dash");
-						}
-						if (fps) {
-							item.title.AppendFormat(L" %dfps", fps);
-						} else if (profile->fps60) {
-							item.title.Append(L" 60fps");
-						}
-						if (profile->hdr) {
-							item.title.Append(L" HDR (10 bit)");
-						}
-					}
-
-					videoUrls.emplace_back(item);
-				} else if (const YoutubeProfile* audioprofile = GetAudioProfile(itag)) {
-					YoutubeUrllistItem item;
-					item.profile = audioprofile;
-					item.url = url;
-
-					switch (audioprofile->format) {
-					case y_mp4_aac:  item.title = L"MP4/AAC";   break;
-					case y_webm_aud: item.title = L"WebM/Opus"; break;
-					default:         item.title = L"unknown";  break;
-					}
-					item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
-
-					audioUrls.emplace_back(item);
-				}
-			};
-
-			auto SignatureDecode = [&](CStringA& url, CStringA signature, LPCSTR format) {
-				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
-					if (!bJSParsed) {
-						bJSParsed = TRUE;
-
-						const auto JSPlayerId = RegExpParse(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
-
-						auto& youtubeSignatureCache = AfxGetAppSettings().youtubeSignatureCache;
-						const auto& it = youtubeSignatureCache.find(JSPlayerId);
-						if (it != youtubeSignatureCache.cend() && !it->second.IsEmpty()) {
-							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
-							if (!d.Parse(it->second.GetString()).HasParseError()) {
-								const auto maxNum = signature.GetLength() - 1;
-								for (auto it = d.MemberBegin(); it != d.MemberEnd(); ++it) {
-									int funcType;
-									if (StrToInt32(it->name.GetString(), funcType) && (funcType > youtubeFuncType::funcNONE && funcType < youtubeFuncType::funcLAST)) {
-										const auto value = it->value.GetInt();
-										if (value < 0 || value > maxNum) {
-											JSFuncs.clear();
-											break;
-										}
-										JSFuncs.emplace_back(static_cast<youtubeFuncType>(funcType), it->value.GetInt());
-									}
-								}
-							}
-						}
-
-						if (JSFuncs.empty()) {
-							urlData jsData;
-							if (URLReadData(JSUrl.GetString(), jsData)) {
-								static LPCSTR signatureRegExps[] = {
-									R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
-									R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*([a-zA-Z0-9$]+)\()",
-									R"((?:\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
-									R"(([a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*\{\s*a\s*=\s*a\.split\(\s*""\s*\))",
-									R"((["\'])signature\1\s*,\s*([a-zA-Z0-9$]+)\()",
-									R"(\.sig\|\|([a-zA-Z0-9$]+)\()",
-									R"(yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*([a-zA-Z0-9$]+)\()",
-									R"(\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
-									R"(\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*([a-zA-Z0-9$]+)\()",
-									R"(\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
-									R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()",
-									R"(\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*([a-zA-Z0-9$]+)\()"
-								};
-								CStringA funcName;
-								for (const auto& sigRegExp : signatureRegExps) {
-									funcName = RegExpParse(jsData.data(), sigRegExp);
-									if (!funcName.IsEmpty()) {
-										break;
-									}
-								}
-								if (!funcName.IsEmpty()) {
-									CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
-									const CStringA funcBody = RegExpParse(jsData.data(), funcRegExp.GetString());
-									if (!funcBody.IsEmpty()) {
-										CStringA funcGroup;
-										std::list<CStringA> funcList;
-										std::list<CStringA> funcCodeList;
-
-										std::list<CStringA> code;
-										Explode(funcBody, code, ';');
-
-										for (const auto& line : code) {
-
-											if (line.Find("split") >= 0 || line.Find("return") >= 0) {
-												continue;
+										if (funcGroup.IsEmpty()) {
+											const int k = line.Find('.');
+											if (k > 0) {
+												funcGroup = line.Left(k);
 											}
+										}
+									}
 
-											funcList.push_back(line);
+									if (!funcGroup.IsEmpty()) {
+										CStringA tmp; tmp.Format("var %s={", funcGroup);
+										tmp = GetEntry(jsData.data(), tmp, "};");
+										if (!tmp.IsEmpty()) {
+											tmp.Remove('\n');
+											Explode(tmp, funcCodeList, "},");
+										}
+									}
 
-											if (funcGroup.IsEmpty()) {
-												const int k = line.Find('.');
-												if (k > 0) {
-													funcGroup = line.Left(k);
+									if (!funcList.empty() && !funcCodeList.empty()) {
+										for (const auto& func : funcList) {
+											int funcArg = 0;
+											const CStringA funcArgs = GetEntry(func, "(", ")");
+
+											std::list<CStringA> args;
+											Explode(funcArgs, args, ',');
+											if (args.size() >= 1) {
+												CStringA& arg = args.back();
+												int value = 0;
+												if (sscanf_s(arg, "%d", &value) == 1) {
+													funcArg = value;
 												}
 											}
-										}
 
-										if (!funcGroup.IsEmpty()) {
-											CStringA tmp; tmp.Format("var %s={", funcGroup);
-											tmp = GetEntry(jsData.data(), tmp, "};");
-											if (!tmp.IsEmpty()) {
-												tmp.Remove('\n');
-												Explode(tmp, funcCodeList, "},");
-											}
-										}
-
-										if (!funcList.empty() && !funcCodeList.empty()) {
-											for (const auto& func : funcList) {
-												int funcArg = 0;
-												const CStringA funcArgs = GetEntry(func, "(", ")");
-
-												std::list<CStringA> args;
-												Explode(funcArgs, args, ',');
-												if (args.size() >= 1) {
-													CStringA& arg = args.back();
-													int value = 0;
-													if (sscanf_s(arg, "%d", &value) == 1) {
-														funcArg = value;
-													}
-												}
-
-												CStringA funcName = GetEntry(func, funcGroup + '.', "(");
+											CStringA funcName = GetEntry(func, funcGroup + '.', "(");
+											if (funcName.IsEmpty()) {
+												funcName = GetEntry(func, funcGroup, "(");
 												if (funcName.IsEmpty()) {
-													funcName = GetEntry(func, funcGroup, "(");
-													if (funcName.IsEmpty()) {
-														continue;
+													continue;
+												}
+											}
+											if (funcName.Find("[") != -1) {
+												funcName.Replace("[", ""); funcName.Replace("]", "");
+											}
+											funcName += ":function";
+
+											auto funcType = youtubeFuncType::funcNONE;
+
+											for (const auto& funcCode : funcCodeList) {
+												if (funcCode.Find(funcName) >= 0) {
+													if (funcCode.Find("splice") > 0) {
+														funcType = youtubeFuncType::funcDELETE;
+													} else if (funcCode.Find("reverse") > 0) {
+														funcType = youtubeFuncType::funcREVERSE;
+													} else if (funcCode.Find(".length]") > 0) {
+														funcType = youtubeFuncType::funcSWAP;
 													}
+													break;
 												}
-												if (funcName.Find("[") != -1) {
-													funcName.Replace("[", ""); funcName.Replace("]", "");
-												}
-												funcName += ":function";
+											}
 
-												auto funcType = youtubeFuncType::funcNONE;
-
-												for (const auto& funcCode : funcCodeList) {
-													if (funcCode.Find(funcName) >= 0) {
-														if (funcCode.Find("splice") > 0) {
-															funcType = youtubeFuncType::funcDELETE;
-														} else if (funcCode.Find("reverse") > 0) {
-															funcType = youtubeFuncType::funcREVERSE;
-														} else if (funcCode.Find(".length]") > 0) {
-															funcType = youtubeFuncType::funcSWAP;
-														}
-														break;
-													}
-												}
-
-												if (funcType != youtubeFuncType::funcNONE) {
-													JSFuncs.emplace_back(funcType, funcArg);
-												}
+											if (funcType != youtubeFuncType::funcNONE) {
+												JSFuncs.emplace_back(funcType, funcArg);
 											}
 										}
 									}
 								}
-
-								if (!JSFuncs.empty()) {
-									CString buffer = L"{ ";
-									for (auto it = JSFuncs.cbegin(); it != JSFuncs.cend(); ++it) {
-										buffer.AppendFormat(L"\"%d\" : %d", it->first, it->second);
-
-										if (it != std::prev(JSFuncs.cend())) {
-											buffer += L", ";
-										}
-									}
-									buffer += L" }";
-
-									youtubeSignatureCache[JSPlayerId] = buffer;
-								}
-							}
-						}
-					}
-				}
-
-				if (!JSFuncs.empty()) {
-					auto Delete = [](CStringA& a, const int b) {
-						a.Delete(0, b);
-					};
-					auto Swap = [](CStringA& a, int b) {
-						const CHAR c = a[0];
-						b %= a.GetLength();
-						a.SetAt(0, a[b]);
-						a.SetAt(b, c);
-					};
-					auto Reverse = [](CStringA& a) {
-						CHAR c;
-						const int len = a.GetLength();
-
-						for (int i = 0; i < len / 2; ++i) {
-							c = a[i];
-							a.SetAt(i, a[len - i - 1]);
-							a.SetAt(len - i - 1, c);
-						}
-					};
-
-					for (const auto [funcType, funcArg] : JSFuncs) {
-						switch (funcType) {
-							case youtubeFuncType::funcDELETE:
-								Delete(signature, funcArg);
-								break;
-							case youtubeFuncType::funcSWAP:
-								Swap(signature, funcArg);
-								break;
-							case youtubeFuncType::funcREVERSE:
-								Reverse(signature);
-								break;
-						}
-					}
-
-					url.AppendFormat(format, signature);
-				}
-			};
-
-			if (strUrlsLive.empty()) {
-				CString dashmpdUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_MPD_START, MATCH_END));
-				if (!dashmpdUrl.IsEmpty()) {
-					dashmpdUrl.Replace(L"\\/", L"/");
-					if (dashmpdUrl.Find(L"/s/") > 0) {
-						CStringA url(dashmpdUrl);
-						CStringA signature = RegExpParse(url.GetString(), "/s/([0-9A-Z]+.[0-9A-Z]+)");
-						if (!signature.IsEmpty()) {
-							SignatureDecode(url, signature, "/signature/%s");
-							dashmpdUrl = url;
-						}
-					}
-
-					DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
-					urlData dashmpdData;
-					if (URLReadData(dashmpdUrl.GetString(), dashmpdData)) {
-						CString xml = UTF8ToWStr(dashmpdData.data());
-						const std::wregex regex(L"<Representation(.*?)</Representation>");
-						std::wcmatch match;
-						LPCWSTR text = xml.GetBuffer();
-						while (std::regex_search(text, match, regex)) {
-							if (match.size() == 2) {
-								const CString xmlElement(match[1].first, match[1].length());
-								const CString url = RegExpParse(xmlElement.GetString(), L"<BaseURL>(.*?)</BaseURL>");
-								const int itag    = _wtoi(RegExpParse(xmlElement.GetString(), L"id=\"([0-9]+)\""));
-								const int fps     = _wtoi(RegExpParse(xmlElement.GetString(), L"frameRate=\"([0-9]+)\""));
-								if (url.Find(L"dur/") > 0) {
-									AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
-								}
 							}
 
-							text = match[0].second;
-						}
-					}
-				}
-			}
+							if (!JSFuncs.empty()) {
+								CString buffer = L"{ ";
+								for (auto it = JSFuncs.cbegin(); it != JSFuncs.cend(); ++it) {
+									buffer.AppendFormat(L"\"%d\" : %d", it->first, it->second);
 
-			CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "}}}]");
-			if (chaptersStr.IsEmpty()) {
-				chaptersStr = GetEntry(data.data(), R"("markersMap":[{"key":"DESCRIPTION_CHAPTERS","value":)", "}}}]");
-			}
-			if (!chaptersStr.IsEmpty()) {
-				chaptersStr.Replace(R"(\/)", "/");
-				chaptersStr.Replace(R"(\\)", R"(\)");
-				chaptersStr += "}}}]}";
-
-				rapidjson::Document d;
-				if (!d.Parse(chaptersStr).HasParseError()) {
-					if (auto chapters = GetJsonArray(d, "chapters")) {
-						for (const auto& chapter : chapters->GetArray()) {
-							if (auto chapterRenderer = GetJsonObject(chapter, "chapterRenderer")) {
-								if (auto title = GetJsonObject(*chapterRenderer, "title")) {
-									int timeRangeStartMillis;
-									CString simpleText;
-									if (getJsonValue(*title, "simpleText", simpleText) && getJsonValue(*chapterRenderer, "timeRangeStartMillis", timeRangeStartMillis)) {
-										y_fields.chaptersList.emplace_back(simpleText, 10000LL * timeRangeStartMillis);
+									if (it != std::prev(JSFuncs.cend())) {
+										buffer += L", ";
 									}
 								}
+								buffer += L" }";
+
+								youtubeSignatureCache[JSPlayerId] = buffer;
 							}
 						}
 					}
 				}
 			}
 
-			if (y_fields.chaptersList.empty()) {
-				const std::regex regex(R"((?:^|<br\s*\/>)([^<]*<a[^>]+onclick=["\']yt\.www\.watch\.player\.seekTo[^>]+>(\d{1,2}:\d{1,2}(?::\d{1,2})?)<\/a>[^>]*)(?=$|<br\s*\/>))");
-				std::cmatch match;
-				LPCSTR text = data.data();
-				while (std::regex_search(text, match, regex)) {
-					if (match.size() == 3) {
-						CStringA entries(match[1].first, match[1].length());
-						CStringA time(match[2].first, match[2].length());
+			if (!JSFuncs.empty()) {
+				auto Delete = [](CStringA& a, const int b) {
+					a.Delete(0, b);
+				};
+				auto Swap = [](CStringA& a, int b) {
+					const CHAR c = a[0];
+					b %= a.GetLength();
+					a.SetAt(0, a[b]);
+					a.SetAt(b, c);
+				};
+				auto Reverse = [](CStringA& a) {
+					CHAR c;
+					const int len = a.GetLength();
 
-						auto pos = entries.Find("</a>");
-						if (pos > 0) {
-							entries.Delete(0, pos + 4);
-							entries.TrimLeft("- ");
-						}
-
-						if (!entries.IsEmpty()) {
-							REFERENCE_TIME rt = INVALID_TIME;
-							int t1 = 0;
-							int t2 = 0;
-							int t3 = 0;
-
-							if (const auto ret = sscanf_s(time.GetString(), "%02d:%02d:%02d", &t1, &t2, &t3)) {
-								if (ret == 3) {
-									rt = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
-								} else if (ret == 2) {
-									rt = ((60LL * t1) + t2) * UNITS;
-								}
-							}
-
-							if (rt != INVALID_TIME) {
-								y_fields.chaptersList.emplace_back(UTF8ToWStr(entries.GetString()), rt);
-							}
-						}
+					for (int i = 0; i < len / 2; ++i) {
+						c = a[i];
+						a.SetAt(i, a[len - i - 1]);
+						a.SetAt(len - i - 1, c);
 					}
+				};
 
-					text = match[0].second;
+				for (const auto [funcType, funcArg] : JSFuncs) {
+					switch (funcType) {
+						case youtubeFuncType::funcDELETE:
+							Delete(signature, funcArg);
+							break;
+						case youtubeFuncType::funcSWAP:
+							Swap(signature, funcArg);
+							break;
+						case youtubeFuncType::funcREVERSE:
+							Reverse(signature);
+							break;
+					}
+				}
+
+				url.AppendFormat(format, signature);
+			}
+		};
+
+		if (strUrlsLive.empty()) {
+			CString dashmpdUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_MPD_START, MATCH_END));
+			if (!dashmpdUrl.IsEmpty()) {
+				dashmpdUrl.Replace(L"\\/", L"/");
+				if (dashmpdUrl.Find(L"/s/") > 0) {
+					CStringA url(dashmpdUrl);
+					CStringA signature = RegExpParse(url.GetString(), "/s/([0-9A-Z]+.[0-9A-Z]+)");
+					if (!signature.IsEmpty()) {
+						SignatureDecode(url, signature, "/signature/%s");
+						dashmpdUrl = url;
+					}
+				}
+
+				DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
+				urlData dashmpdData;
+				if (URLReadData(dashmpdUrl.GetString(), dashmpdData)) {
+					CString xml = UTF8ToWStr(dashmpdData.data());
+					const std::wregex regex(L"<Representation(.*?)</Representation>");
+					std::wcmatch match;
+					LPCWSTR text = xml.GetBuffer();
+					while (std::regex_search(text, match, regex)) {
+						if (match.size() == 2) {
+							const CString xmlElement(match[1].first, match[1].length());
+							const CString url = RegExpParse(xmlElement.GetString(), L"<BaseURL>(.*?)</BaseURL>");
+							const int itag    = _wtoi(RegExpParse(xmlElement.GetString(), L"id=\"([0-9]+)\""));
+							const int fps     = _wtoi(RegExpParse(xmlElement.GetString(), L"frameRate=\"([0-9]+)\""));
+							if (url.Find(L"dur/") > 0) {
+								AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
+							}
+						}
+
+						text = match[0].second;
+					}
 				}
 			}
+		}
 
-			if (strUrlsLive.empty()) {
-				if (!streamingDataFormatList.empty()) {
-					for (const auto& element : streamingDataFormatList) {
-						const auto& [itag, url, cipher, quality_label] = element;
-						if (!url.IsEmpty()) {
-							AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
-						} else {
-							CStringA url;
-							CStringA signature;
-							CStringA signature_prefix = "signature";
+		CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "}}}]");
+		if (chaptersStr.IsEmpty()) {
+			chaptersStr = GetEntry(data.data(), R"("markersMap":[{"key":"DESCRIPTION_CHAPTERS","value":)", "}}}]");
+		}
+		if (!chaptersStr.IsEmpty()) {
+			chaptersStr.Replace(R"(\/)", "/");
+			chaptersStr.Replace(R"(\\)", R"(\)");
+			chaptersStr += "}}}]}";
 
-							std::list<CStringA> paramsA;
-							Explode(cipher, paramsA, '&');
-
-							for (const auto& paramA : paramsA) {
-								const auto pos = paramA.Find('=');
-								if (pos > 0) {
-									const auto paramHeader = paramA.Left(pos);
-									const auto paramValue = paramA.Mid(pos + 1);
-
-									if (paramHeader == "url") {
-										url = UrlDecode(paramValue);
-									} else if (paramHeader == "s") {
-										signature = UrlDecode(paramValue);
-									} else if (paramHeader == "sp") {
-										signature_prefix = paramValue;
-									}
+			rapidjson::Document d;
+			if (!d.Parse(chaptersStr).HasParseError()) {
+				if (auto chapters = GetJsonArray(d, "chapters")) {
+					for (const auto& chapter : chapters->GetArray()) {
+						if (auto chapterRenderer = GetJsonObject(chapter, "chapterRenderer")) {
+							if (auto title = GetJsonObject(*chapterRenderer, "title")) {
+								int timeRangeStartMillis;
+								CString simpleText;
+								if (getJsonValue(*title, "simpleText", simpleText) && getJsonValue(*chapterRenderer, "timeRangeStartMillis", timeRangeStartMillis)) {
+									y_fields.chaptersList.emplace_back(simpleText, 10000LL * timeRangeStartMillis);
 								}
-							}
-
-							if (!url.IsEmpty()) {
-								const auto signature_format("&" + signature_prefix + "=%s");
-								SignatureDecode(url, signature, signature_format.GetString());
-
-								AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
 							}
 						}
 					}
-				} else {
-					std::list<CStringA> urlsList;
-					Explode(strUrls, urlsList, ',');
+				}
+			}
+		}
 
-					for (const auto& lineA : urlsList) {
-						int itag = 0;
+		if (y_fields.chaptersList.empty()) {
+			const std::regex regex(R"((?:^|<br\s*\/>)([^<]*<a[^>]+onclick=["\']yt\.www\.watch\.player\.seekTo[^>]+>(\d{1,2}:\d{1,2}(?::\d{1,2})?)<\/a>[^>]*)(?=$|<br\s*\/>))");
+			std::cmatch match;
+			LPCSTR text = data.data();
+			while (std::regex_search(text, match, regex)) {
+				if (match.size() == 3) {
+					CStringA entries(match[1].first, match[1].length());
+					CStringA time(match[2].first, match[2].length());
+
+					auto pos = entries.Find("</a>");
+					if (pos > 0) {
+						entries.Delete(0, pos + 4);
+						entries.TrimLeft("- ");
+					}
+
+					if (!entries.IsEmpty()) {
+						REFERENCE_TIME rt = INVALID_TIME;
+						int t1 = 0;
+						int t2 = 0;
+						int t3 = 0;
+
+						if (const auto ret = sscanf_s(time.GetString(), "%02d:%02d:%02d", &t1, &t2, &t3)) {
+							if (ret == 3) {
+								rt = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
+							} else if (ret == 2) {
+								rt = ((60LL * t1) + t2) * UNITS;
+							}
+						}
+
+						if (rt != INVALID_TIME) {
+							y_fields.chaptersList.emplace_back(UTF8ToWStr(entries.GetString()), rt);
+						}
+					}
+				}
+
+				text = match[0].second;
+			}
+		}
+
+		if (strUrlsLive.empty()) {
+			if (!streamingDataFormatList.empty()) {
+				for (const auto& element : streamingDataFormatList) {
+					const auto& [itag, url, cipher, quality_label] = element;
+					if (!url.IsEmpty()) {
+						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
+					} else {
 						CStringA url;
 						CStringA signature;
 						CStringA signature_prefix = "signature";
 
-						CStringA quality_label;
-
 						std::list<CStringA> paramsA;
-						Explode(lineA, paramsA, '&');
+						Explode(cipher, paramsA, '&');
 
 						for (const auto& paramA : paramsA) {
-							int k = paramA.Find('=');
-							if (k > 0) {
-								const CStringA paramHeader = paramA.Left(k);
-								const CStringA paramValue = paramA.Mid(k + 1);
+							const auto pos = paramA.Find('=');
+							if (pos > 0) {
+								const auto paramHeader = paramA.Left(pos);
+								const auto paramValue = paramA.Mid(pos + 1);
 
 								if (paramHeader == "url") {
-									url = UrlDecode(UrlDecode(paramValue));
+									url = UrlDecode(paramValue);
 								} else if (paramHeader == "s") {
-									signature = UrlDecode(UrlDecode(paramValue));
-								} else if (paramHeader == "quality_label") {
-									quality_label = paramValue;
-								} else if (paramHeader == "itag") {
-									if (sscanf_s(paramValue, "%d", &itag) != 1) {
-										itag = 0;
-									}
+									signature = UrlDecode(paramValue);
 								} else if (paramHeader == "sp") {
 									signature_prefix = paramValue;
 								}
 							}
 						}
 
-						if (itag) {
-							const CStringA signature_format("&" + signature_prefix + "=%s");
+						if (!url.IsEmpty()) {
+							const auto signature_format("&" + signature_prefix + "=%s");
 							SignatureDecode(url, signature, signature_format.GetString());
 
 							AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
@@ -1161,14 +1119,107 @@ namespace Youtube
 					}
 				}
 			} else {
-				for (const auto& urlLive : strUrlsLive) {
-					CStringA itag = RegExpParse(urlLive.GetString(), "/itag/(\\d+)");
-					if (!itag.IsEmpty()) {
-						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(urlLive), atoi(itag));
+				std::list<CStringA> urlsList;
+				Explode(strUrls, urlsList, ',');
+
+				for (const auto& lineA : urlsList) {
+					int itag = 0;
+					CStringA url;
+					CStringA signature;
+					CStringA signature_prefix = "signature";
+
+					CStringA quality_label;
+
+					std::list<CStringA> paramsA;
+					Explode(lineA, paramsA, '&');
+
+					for (const auto& paramA : paramsA) {
+						int k = paramA.Find('=');
+						if (k > 0) {
+							const CStringA paramHeader = paramA.Left(k);
+							const CStringA paramValue = paramA.Mid(k + 1);
+
+							if (paramHeader == "url") {
+								url = UrlDecode(UrlDecode(paramValue));
+							} else if (paramHeader == "s") {
+								signature = UrlDecode(UrlDecode(paramValue));
+							} else if (paramHeader == "quality_label") {
+								quality_label = paramValue;
+							} else if (paramHeader == "itag") {
+								if (sscanf_s(paramValue, "%d", &itag) != 1) {
+									itag = 0;
+								}
+							} else if (paramHeader == "sp") {
+								signature_prefix = paramValue;
+							}
+						}
+					}
+
+					if (itag) {
+						const CStringA signature_format("&" + signature_prefix + "=%s");
+						SignatureDecode(url, signature, signature_format.GetString());
+
+						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
 					}
 				}
 			}
+		} else {
+			for (const auto& urlLive : strUrlsLive) {
+				CStringA itag = RegExpParse(urlLive.GetString(), "/itag/(\\d+)");
+				if (!itag.IsEmpty()) {
+					AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(urlLive), atoi(itag));
+				}
+			}
+		}
 
+		if (youtubeUrllist.empty()) {
+			DLog(L"Youtube::Parse_URL() : no output video format found");
+
+			y_fields.Empty();
+			return false;
+		}
+
+		std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
+		std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), CompareUrllistItem);
+
+		const auto last = std::unique(youtubeUrllist.begin(), youtubeUrllist.end(), [](const YoutubeUrllistItem& a, const YoutubeUrllistItem& b) {
+			return a.profile->format == b.profile->format && a.profile->quality == b.profile->quality &&
+				   a.profile->fps60 == b.profile->fps60 && a.profile->hdr == b.profile->hdr;
+		});
+#ifdef DEBUG_OR_LOG
+		YoutubeUrllist youtubeDuplicate;
+		if (last != youtubeUrllist.end()) {
+			youtubeDuplicate.insert(youtubeDuplicate.begin(), last, youtubeUrllist.end());
+		}
+#endif
+		youtubeUrllist.erase(last, youtubeUrllist.end());
+
+#ifdef DEBUG_OR_LOG
+		DLog(L"Youtube::Parse_URL() : parsed video formats list:");
+		for (const auto& item : youtubeUrllist) {
+			DLog(L"    %-35s, \"%s\"", item.title, item.url);
+		}
+
+		if (!youtubeDuplicate.empty()) {
+			DLog(L"Youtube::Parse_URL() : removed(duplicate) video formats list:");
+			for (const auto& item : youtubeDuplicate) {
+				DLog(L"    %-35s, \"%s\"", item.title, item.url);
+			}
+		}
+
+		if (!youtubeAudioUrllist.empty()) {
+			DLog(L"Youtube::Parse_URL() : parsed audio formats list:");
+			for (const auto& item : youtubeAudioUrllist) {
+				DLog(L"    %-35s, \"%s\"", item.title, item.url);
+			}
+		}
+#endif
+
+		const CAppSettings& s = AfxGetAppSettings();
+		const YoutubeUrllistItem* final_item = nullptr;
+
+		// select video stream
+		for (;;) {
 			if (youtubeUrllist.empty()) {
 				DLog(L"Youtube::Parse_URL() : no output video format found");
 
@@ -1176,239 +1227,190 @@ namespace Youtube
 				return false;
 			}
 
-			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
-			std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), CompareUrllistItem);
+			final_item = nullptr;
 
-			const auto last = std::unique(youtubeUrllist.begin(), youtubeUrllist.end(), [](const YoutubeUrllistItem& a, const YoutubeUrllistItem& b) {
-				return a.profile->format == b.profile->format && a.profile->quality == b.profile->quality &&
-					   a.profile->fps60 == b.profile->fps60 && a.profile->hdr == b.profile->hdr;
-			});
-#ifdef DEBUG_OR_LOG
-			YoutubeUrllist youtubeDuplicate;
-			if (last != youtubeUrllist.end()) {
-				youtubeDuplicate.insert(youtubeDuplicate.begin(), last, youtubeUrllist.end());
-			}
-#endif
-			youtubeUrllist.erase(last, youtubeUrllist.end());
-
-#ifdef DEBUG_OR_LOG
-			DLog(L"Youtube::Parse_URL() : parsed video formats list:");
-			for (const auto& item : youtubeUrllist) {
-				DLog(L"    %-35s, \"%s\"", item.title, item.url);
-			}
-
-			if (!youtubeDuplicate.empty()) {
-				DLog(L"Youtube::Parse_URL() : removed(duplicate) video formats list:");
-				for (const auto& item : youtubeDuplicate) {
-					DLog(L"    %-35s, \"%s\"", item.title, item.url);
+			int k_mp4 = -1;
+			int k_webm = -1;
+			int k_av1 = -1;
+			for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
+				const auto& format = youtubeUrllist[i].profile->format;
+				if (k_mp4 < 0 && format == y_mp4_avc) {
+					k_mp4 = i;
+				}
+				else if (k_webm < 0 && format == y_webm_vp9) {
+					k_webm = i;
+				}
+				else if (k_av1 < 0 && format == y_mp4_av1) {
+					k_av1 = i;
 				}
 			}
 
-			if (!youtubeAudioUrllist.empty()) {
-				DLog(L"Youtube::Parse_URL() : parsed audio formats list:");
-				for (const auto& item : youtubeAudioUrllist) {
-					DLog(L"    %-35s, \"%s\"", item.title, item.url);
-				}
+			size_t k = 0;
+			if (s.YoutubeFormat.fmt == y_mp4_avc) {
+				k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
 			}
-#endif
+			else if (s.YoutubeFormat.fmt == y_webm_vp9) {
+				k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
+			}
+			else if (s.YoutubeFormat.fmt == y_mp4_av1) {
+				k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
+			}
+			final_item = &youtubeUrllist[k];
 
-			const CAppSettings& s = AfxGetAppSettings();
+			for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
+				const auto profile = youtubeUrllist[i].profile;
 
-			// select video stream
-			const YoutubeUrllistItem* final_item = nullptr;
-			for (;;) {
-				if (youtubeUrllist.empty()) {
-					DLog(L"Youtube::Parse_URL() : no output video format found");
-
-					y_fields.Empty();
-					return false;
-				}
-
-				final_item = nullptr;
-
-				int k_mp4 = -1;
-				int k_webm = -1;
-				int k_av1 = -1;
-				for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
-					const auto& format = youtubeUrllist[i].profile->format;
-					if (k_mp4 < 0 && format == y_mp4_avc) {
-						k_mp4 = i;
+				if (final_item->profile->format == profile->format) {
+					if (profile->quality == final_item->profile->quality) {
+						if (profile->fps60 != s.YoutubeFormat.fps60) {
+							// same resolution as that of the previous, but not suitable fps
+							continue;
+						}
+						if (profile->hdr != s.YoutubeFormat.hdr) {
+							// same resolution as that of the previous, but not suitable HDR
+							continue;
+						}
 					}
-					else if (k_webm < 0 && format == y_webm_vp9) {
-						k_webm = i;
+
+					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
+						break;
 					}
-					else if (k_av1 < 0 && format == y_mp4_av1) {
-						k_av1 = i;
-					}
-				}
 
-				size_t k = 0;
-				if (s.YoutubeFormat.fmt == y_mp4_avc) {
-					k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
+					final_item = &youtubeUrllist[i];
 				}
-				else if (s.YoutubeFormat.fmt == y_webm_vp9) {
-					k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
-				}
-				else if (s.YoutubeFormat.fmt == y_mp4_av1) {
-					k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
-				}
-				final_item = &youtubeUrllist[k];
+			}
 
-				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
-					const auto profile = youtubeUrllist[i].profile;
+			const auto& url = final_item->url;
+			CHTTPAsync HTTPAsync;
+			if (FAILED(HTTPAsync.Connect(url, 10000))) {
+				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
+				auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(), [&url](const YoutubeUrllistItem& item) {
+					return item.url == url;
+				});
+				youtubeUrllist.erase(it);
+				continue;
+			}
 
-					if (final_item->profile->format == profile->format) {
-						if (profile->quality == final_item->profile->quality) {
-							if (profile->fps60 != s.YoutubeFormat.fps60) {
-								// same resolution as that of the previous, but not suitable fps
+			break;
+		}
+
+		DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
+
+		CString final_video_url = final_item->url;
+		const YoutubeProfile* final_video_profile = final_item->profile;
+
+		CString final_audio_url;
+		if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
+			const auto audio_item = GetAudioUrl(final_item->profile, youtubeAudioUrllist);
+			final_audio_url = audio_item->url;
+			DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", audio_item->title, audio_item->url);
+		}
+
+		if (!final_audio_url.IsEmpty()) {
+			final_audio_url.Replace(L"http://", L"https://");
+		}
+
+		if (!final_video_url.IsEmpty()) {
+			final_video_url.Replace(L"http://", L"https://");
+
+			const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
+			if (!bParseMetadata) {
+				ParseMetadata(videoId, y_fields);
+			}
+
+			y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_video_profile->quality, final_video_profile->ext);
+			FixFilename(y_fields.fname);
+
+			if (!videoId.IsEmpty()) {
+				// subtitles
+				if (!player_response_jsonDocument.IsNull()) {
+					if (auto captionTracks = GetValueByPointer(player_response_jsonDocument, "/captions/playerCaptionsTracklistRenderer/captionTracks"); captionTracks && captionTracks->IsArray()) {
+						for (const auto& elem : captionTracks->GetArray()) {
+							CStringA kind;
+							if (getJsonValue(elem, "kind", kind) && kind == "asr") {
 								continue;
 							}
-							if (profile->hdr != s.YoutubeFormat.hdr) {
-								// same resolution as that of the previous, but not suitable HDR
-								continue;
+
+							CString sub_url;
+							if (getJsonValue(elem, "baseUrl", sub_url)) {
+								if (sub_url.Find(L"&fmt=")) {
+									auto result = std::regex_replace(sub_url.GetString(), std::wregex(LR"((&fmt=.[^&]+))"), L"&fmt=vtt");
+									sub_url = result.c_str();
+								} else {
+									sub_url += L"&fmt=vtt";
+								}
+							}
+
+							CString sub_name;
+							if (auto name = GetJsonObject(elem, "name")) {
+								getJsonValue(*name, "simpleText", sub_name);
+							}
+							if (sub_name.IsEmpty()) {
+								if (auto name = GetValueByPointer(elem, "/name/runs"); name && name->IsArray()) {
+									auto array = name->GetArray();
+									if (!array.Empty()) {
+										getJsonValue(array[0], "text", sub_name);
+									}
+								}
+							}
+
+							if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
+								subs.emplace_back(sub_url, sub_name);
 							}
 						}
-
-						if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
-							break;
-						}
-
-						final_item = &youtubeUrllist[i];
 					}
 				}
-
-				const auto& url = final_item->url;
-				CHTTPAsync HTTPAsync;
-				if (FAILED(HTTPAsync.Connect(url, 10000))) {
-					DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
-					auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(), [&url](const YoutubeUrllistItem& item) {
-						return item.url == url;
-					});
-					youtubeUrllist.erase(it);
-					continue;
-				}
-
-				break;
-			}
-
-			DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
-
-			CString final_video_url = final_item->url;
-			const YoutubeProfile* final_video_profile = final_item->profile;
-
-			CString final_audio_url;
-			if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
-				const auto audio_item = GetAudioUrl(final_item->profile, youtubeAudioUrllist);
-				final_audio_url = audio_item->url;
-				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", audio_item->title, audio_item->url);
-			}
-
-			if (!final_audio_url.IsEmpty()) {
-				final_audio_url.Replace(L"http://", L"https://");
 			}
 
 			if (!final_video_url.IsEmpty()) {
-				final_video_url.Replace(L"http://", L"https://");
+				urls.push_front(final_video_url);
 
-				const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
-				if (!bParseMetadata) {
-					ParseMetadata(videoId, y_fields);
+				if (!final_audio_url.IsEmpty()) {
+					urls.push_back(final_audio_url);
 				}
 
-				y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_video_profile->quality, final_video_profile->ext);
-				FixFilename(y_fields.fname);
-
-				if (!videoId.IsEmpty()) {
-					// subtitles
+				if (!youtubeAudioUrllist.empty()) {
+					CString thumbnailUrl;
 					if (!player_response_jsonDocument.IsNull()) {
-						if (auto captionTracks = GetValueByPointer(player_response_jsonDocument, "/captions/playerCaptionsTracklistRenderer/captionTracks"); captionTracks && captionTracks->IsArray()) {
-							for (const auto& elem : captionTracks->GetArray()) {
-								CStringA kind;
-								if (getJsonValue(elem, "kind", kind) && kind == "asr") {
+						if (auto thumbnails = GetValueByPointer(player_response_jsonDocument, "/videoDetails/thumbnail/thumbnails"); thumbnails && thumbnails->IsArray()) {
+							int maxHeight = 0;
+							for (const auto& elem : thumbnails->GetArray()) {
+								CString url;
+								if (!getJsonValue(elem, "url", url)) {
 									continue;
 								}
 
-								CString sub_url;
-								if (getJsonValue(elem, "baseUrl", sub_url)) {
-									if (sub_url.Find(L"&fmt=")) {
-										auto result = std::regex_replace(sub_url.GetString(), std::wregex(LR"((&fmt=.[^&]+))"), L"&fmt=vtt");
-										sub_url = result.c_str();
-									} else {
-										sub_url += L"&fmt=vtt";
-									}
+								int height = 0;
+								if (!getJsonValue(elem, "height", height)) {
+									continue;
 								}
 
-								CString sub_name;
-								if (auto name = GetJsonObject(elem, "name")) {
-									getJsonValue(*name, "simpleText", sub_name);
-								}
-								if (sub_name.IsEmpty()) {
-									if (auto name = GetValueByPointer(elem, "/name/runs"); name && name->IsArray()) {
-										auto array = name->GetArray();
-										if (!array.Empty()) {
-											getJsonValue(array[0], "text", sub_name);
-										}
-									}
-								}
-
-								if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
-									subs.emplace_back(sub_url, sub_name);
+								if (height > maxHeight) {
+									maxHeight = height;
+									thumbnailUrl = url;
 								}
 							}
+						}
+					}
+
+					for (auto item : youtubeAudioUrllist) {
+						if (item.profile->format == Youtube::y_mp4_aac) {
+							item.thumbnailUrl = thumbnailUrl;
+							youtubeUrllist.emplace_back(item);
+							break;
+						}
+					}
+					for (auto item : youtubeAudioUrllist) {
+						if (item.profile->format == Youtube::y_webm_aud) {
+							item.thumbnailUrl = thumbnailUrl;
+							youtubeUrllist.emplace_back(item);
+							break;
 						}
 					}
 				}
-
-				if (!final_video_url.IsEmpty()) {
-					urls.push_front(final_video_url);
-
-					if (!final_audio_url.IsEmpty()) {
-						urls.push_back(final_audio_url);
-					}
-
-					if (!youtubeAudioUrllist.empty()) {
-						CString thumbnailUrl;
-						if (!player_response_jsonDocument.IsNull()) {
-							if (auto thumbnails = GetValueByPointer(player_response_jsonDocument, "/videoDetails/thumbnail/thumbnails"); thumbnails && thumbnails->IsArray()) {
-								int maxHeight = 0;
-								for (const auto& elem : thumbnails->GetArray()) {
-									CString url;
-									if (!getJsonValue(elem, "url", url)) {
-										continue;
-									}
-
-									int height = 0;
-									if (!getJsonValue(elem, "height", height)) {
-										continue;
-									}
-
-									if (height > maxHeight) {
-										maxHeight = height;
-										thumbnailUrl = url;
-									}
-								}
-							}
-						}
-
-						for (auto item : youtubeAudioUrllist) {
-							if (item.profile->format == Youtube::y_mp4_aac) {
-								item.thumbnailUrl = thumbnailUrl;
-								youtubeUrllist.emplace_back(item);
-								break;
-							}
-						}
-						for (auto item : youtubeAudioUrllist) {
-							if (item.profile->format == Youtube::y_webm_aud) {
-								item.thumbnailUrl = thumbnailUrl;
-								youtubeUrllist.emplace_back(item);
-								break;
-							}
-						}
-					}
-				}
-
-				return !urls.empty();
 			}
+
+			return !urls.empty();
 		}
 
 		return false;
