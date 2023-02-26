@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -172,7 +172,6 @@ namespace Youtube
 
 	struct YoutubeUrllistItem : YoutubePlaylistItem {
 		const YoutubeProfile* profile;
-		CString thumbnailUrl;
 	};
 	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 

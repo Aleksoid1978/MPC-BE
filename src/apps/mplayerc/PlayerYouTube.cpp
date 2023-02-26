@@ -1458,14 +1458,12 @@ namespace Youtube
 
 			for (auto item : youtubeAudioUrllist) {
 				if (item.profile->format == Youtube::y_mp4_aac) {
-					item.thumbnailUrl = thumbnailUrl;
 					youtubeUrllist.emplace_back(item);
 					break;
 				}
 			}
 			for (auto item : youtubeAudioUrllist) {
 				if (item.profile->format == Youtube::y_webm_aud) {
-					item.thumbnailUrl = thumbnailUrl;
 					youtubeUrllist.emplace_back(item);
 					break;
 				}

@@ -12289,7 +12289,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		Content::Online::Disconnect(youtubeUrl);
 
 		pOFD->fns.clear();
-		m_youtubeFields.thumbnailUrl.Empty();
 
 		auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&s](const Youtube::YoutubeUrllistItem& item) {
 			return item.profile->iTag == s.iYoutubeTagSelected;
@@ -12306,8 +12305,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
 			FixFilename(m_youtubeFields.fname);
-
-			m_youtubeFields.thumbnailUrl = it->thumbnailUrl;
 		}
 
 		m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
