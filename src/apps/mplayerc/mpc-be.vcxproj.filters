@@ -836,6 +836,9 @@
     <ClInclude Include="VideoSettings.h">
       <Filter>Player Config</Filter>
     </ClInclude>
+    <ClInclude Include="Win10Api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\icon.ico">

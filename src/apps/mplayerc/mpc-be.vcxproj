@@ -350,6 +350,7 @@
     <ClInclude Include="WebClient.h" />
     <ClInclude Include="WebServer.h" />
     <ClInclude Include="WicUtils.h" />
+    <ClInclude Include="Win10Api.h" />
     <ClInclude Include="WindowsUserChoice.h" />
   </ItemGroup>
   <ItemGroup>
