@@ -96,6 +96,7 @@ namespace LAVVideo
 #include "./Controls/MenuEx.h"
 
 #include "Version.h"
+#include "Win10Api.h"
 
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
@@ -701,6 +702,20 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (SysVersion::IsWin11orLater()) {
 		GetSystemTitleColor();
 		SetColorTitle();
+	}
+	else if (s.bUseDarkTheme && s.bDarkMenu && SysVersion::IsWin10v1809orLater()) {
+		HMODULE hUser = GetModuleHandleW(L"user32.dll");
+		if (hUser) {
+			pfnSetWindowCompositionAttribute setWindowCompositionAttribute = (pfnSetWindowCompositionAttribute)GetProcAddress(hUser, "SetWindowCompositionAttribute");
+			if (setWindowCompositionAttribute) {
+				ACCENT_POLICY accent = { ACCENT_ENABLE_BLURBEHIND, 0, 0, 0 };
+				WINDOWCOMPOSITIONATTRIBDATA data;
+				data.Attrib = WCA_USEDARKMODECOLORS;
+				data.pvData = &accent;
+				data.cbData = sizeof(accent);
+				setWindowCompositionAttribute(GetSafeHwnd(), &data);
+			}
+		}
 	}
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
