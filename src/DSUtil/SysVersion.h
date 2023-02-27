@@ -54,8 +54,7 @@ static bool IsWindows64()
 {
 #ifdef _WIN64
 	return true;
-#endif
-
+#else
 	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
 	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandleW(L"kernel32"), "IsWow64Process");
 	BOOL bIsWow64 = FALSE;
@@ -64,6 +63,7 @@ static bool IsWindows64()
 	}
 
 	return !!bIsWow64;
+#endif
 }
 
 namespace SysVersion
