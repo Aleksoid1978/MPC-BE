@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# (C) 2010-2014 see Authors.txt
+# (C) 2010-2023 see Authors.txt
 #
 # This file is part of MPC-BE.
 #
@@ -58,17 +58,17 @@ my $DesignInfos = {};
 
 print "Reading rc file...\n";
 my $rcfile = shift(@ARGV);
-my @RcFile = readFile($rcfile, 2);
+my @RcFile = readFile($rcfile, "utf16");
 analyseData(\@RcFile, \@Outline, $Dialogs, $Menus, $Strings, \@VersionInfo, $DesignInfos);
 
 print "\nReading string texts file...\n";
-my @TxtFile = readFile($TxtFileName, 1);
+my @TxtFile = readFile($TxtFileName, "utf8bom");
 analyseTxt(\@TxtFile, $NewDialogs, $NewMenus, $NewStrings);
 
 print "\nWriting new rc file...\n";
 my @newrc = ();
 mergeData(\@newrc, \@RcFile);
-writeFile($rcfile, \@newrc, 2); # overwrite rcfile
+writeFile($rcfile, \@newrc, "utf16"); # overwrite rcfile
 
 ###################################################################################################
 sub mergeData {

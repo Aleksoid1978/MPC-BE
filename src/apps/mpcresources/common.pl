@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# (C) 2010-2014 see Authors.txt
+# (C) 2010-2023 see Authors.txt
 #
 # This file is part of MPC-BE.
 #
@@ -288,14 +288,14 @@ sub readFile {
 	my ($filename, $encoding) = @_;
 
 	open(INPUT, "<$filename") || die "Cannot open $filename to read";
-	if ($encoding == 0) {
-		binmode(INPUT);
-	}
-	elsif ($encoding == 1) {
+	if (($encoding eq "utf8") or ($encoding eq "utf8bom")) {
 		binmode(INPUT, ":encoding(UTF8)");
 	}
-	elsif ($encoding == 2) {
+	elsif (($encoding eq "utf16") or ($encoding eq "utf16bom")) {
 		binmode(INPUT, ":encoding(UTF16-LE)");
+	}
+	else {
+		die "Error: unknown encoding type - $encoding";
 	}
 
 	my @lines = <INPUT>;
@@ -309,21 +309,27 @@ sub writeFile {
 
 	open(OUTPUT, ">$filename")|| die "Cannot open $filename to write";
 
-	if ($encoding == 0) {
+	if ($encoding eq "utf8bom") {
 		binmode(OUTPUT);
 		print OUTPUT chr(0xef);
 		print OUTPUT chr(0xbb);
 		print OUTPUT chr(0xbf);	#write UTF-8 bom
 		binmode(OUTPUT, ":raw:encoding(UTF8)");
 	}
-	elsif ($encoding == 1) {
+	elsif ($encoding eq "utf8") {
+		binmode(OUTPUT, ":raw:encoding(UTF8)");
+	}
+	elsif ($encoding eq "utf16bom") {
 		binmode(OUTPUT);
 		print OUTPUT chr(0xff);
 		print OUTPUT chr(0xfe);	#write UTF-16LE bom
 		binmode(OUTPUT, ":raw:encoding(UTF16-LE)");
 	}
-	elsif ($encoding == 2) {
+	elsif ($encoding eq "utf16") {
 		binmode(OUTPUT, ":raw:encoding(UTF16-LE)");
+	}
+	else {
+		die "Error: unknown encoding type - $encoding";
 	}
 
 	foreach (@$data) {

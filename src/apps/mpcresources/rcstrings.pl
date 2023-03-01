@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# (C) 2010-2017 see Authors.txt
+# (C) 2010-2023 see Authors.txt
 #
 # This file is part of MPC-BE.
 #
@@ -76,11 +76,7 @@ if(!-e "text"){
 
 foreach my $filename(@FileLists) {
 	print "Analyzing locale file: $filename...\n";
-	my $encoding = 2; # UTF16-LE
-	#if ($filename eq "mplayerc.rc") { # The main English resource file uses ASCII encoding
-	#	$encoding = 0;
-	#}
-	my @rcfile = readFile($filename, $encoding);
+	my @rcfile = readFile($filename, "utf16");
 	my($curDialogs, $curMenus, $curStrings, @curOutline) = ({},{},{}, ());
 	my @curVersionInfo = ();
 	my $curDesignInfos = {};
@@ -126,7 +122,7 @@ sub writeFileStrings {
 
 	if(@contents) {
 		print "Generating string files $filename...\n";
-		writePatchFile($filename, \@contents, 0);
+		writePatchFile($filename, \@contents, "utf8bom");
 	}
 }
 

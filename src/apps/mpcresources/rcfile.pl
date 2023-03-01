@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# (C) 2010-2017 see Authors.txt
+# (C) 2010-2023 see Authors.txt
 #
 # This file is part of MPC-BE.
 #
@@ -107,9 +107,8 @@ my($NewDialogs, $NewMenus, $NewStrings, @NewOutline) = ({}, {}, {}, ());
 my($MenuDiffs, $DialogDiffs) = ({}, {});
 my($BaseDesignInfos, $NewDesignInfos) = ({}, {});
 
-# /!\ Note that the English RC file is ASCII encoded
-my @BaseFile = readFile($BaseFileName, 2);
-my @NewFile = readFile($NewFileName, 2);
+my @BaseFile = readFile($BaseFileName, "utf16");
+my @NewFile = readFile($NewFileName, "utf16");
 print "Scanning changes between baseline file and new version...\n\n";
 getDifference();
 
@@ -132,7 +131,7 @@ if(!-e "newrc"){
 
 foreach my $filename(@FileLists) {
 	print "Analyzing locale file: $filename...\n";
-	my @oldrcfile = readFile($filename, 2);
+	my @oldrcfile = readFile($filename, "utf16");
 	my($curDialogs, $curMenus, $curStrings, @curOutline) = ({},{},{}, ());
 	my @curVersionInfo = ();
 	my $curDesignInfos = {};
@@ -159,7 +158,7 @@ foreach my $filename(@FileLists) {
 	}
 
 	print "Generating new locale file: $newrcfile...\n\n";
-	writeFile($newrcfile, \@newrc, 2);
+	writeFile($newrcfile, \@newrc, "utf16");
 }
 
 ###################################################################################################
