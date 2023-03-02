@@ -3473,6 +3473,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Reopen File"
     IDS_PROPERTIESFOR       "Properties for '%s'"
+    IDS_AUDIO_ONLY          "audio only"
 END
 
 STRINGTABLE

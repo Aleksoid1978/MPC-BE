@@ -3473,6 +3473,7 @@ BEGIN
     IDS_AUDIO_STREAM        "오디오  %u/%u: %s"
     IDS_AG_REOPEN           "파일 다시열기"
     IDS_PROPERTIESFOR       "'%s'에 대한 속성"
+    IDS_AUDIO_ONLY          "audio only"
 END
 
 STRINGTABLE

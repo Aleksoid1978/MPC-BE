@@ -1352,6 +1352,7 @@
 #define IDS_AUDIO_STREAM                33434
 #define IDS_AG_REOPEN                   33435
 #define IDS_PROPERTIESFOR               33436
+#define IDS_AUDIO_ONLY                  33437
 #define IDS_TIME_TOOLTIP_ABOVE          33440
 #define IDS_TIME_TOOLTIP_BELOW          33441
 #define IDS_VIDEO_STREAM                33442

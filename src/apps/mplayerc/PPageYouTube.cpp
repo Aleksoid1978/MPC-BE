@@ -95,7 +95,7 @@ BOOL CPPageYoutube::OnInitDialog()
 		str.Format(L"%dp", res);
 		AddStringData(m_cbResolution, str, res);
 	}
-	AddStringData(m_cbResolution, L"audio only", 0);
+	AddStringData(m_cbResolution, ResStr(IDS_AUDIO_ONLY), 0);
 
 	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
 

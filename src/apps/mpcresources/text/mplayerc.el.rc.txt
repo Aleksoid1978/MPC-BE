@@ -1333,6 +1333,7 @@ STRING IDS_AUDIOWINDOW_HIDE		"απόκρυψη της περιοχής βίντ�
 STRING IDS_AUDIOWINDOW_NONE		"μην αλλάξει το μέγεθος του παραθύρου"
 STRING IDS_AUDIO_GAIN		"Αύξηση (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Επίπεδο (%d):"
+STRING IDS_AUDIO_ONLY		"audio only"
 STRING IDS_AUDIO_RELEASETIME		"Χρόνος κυκλοφορίας (%d):"
 STRING IDS_AUDIO_STREAM		"Ήχος %u/%u: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Αναπαραγωγή CD ήχου"

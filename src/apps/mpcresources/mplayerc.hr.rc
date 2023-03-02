@@ -3471,6 +3471,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Zvuk %u/%u: %s"
     IDS_AG_REOPEN           "Ponovno Otvorit Datoteku"
     IDS_PROPERTIESFOR       "Svojstva za '%s'"
+    IDS_AUDIO_ONLY          "audio only"
 END
 
 STRINGTABLE

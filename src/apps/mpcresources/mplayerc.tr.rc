@@ -3473,6 +3473,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Ses %u/%u: %s"
     IDS_AG_REOPEN           "Dosyayı Tekrar Aç"
     IDS_PROPERTIESFOR       "'%s' için özellikler"
+    IDS_AUDIO_ONLY          "audio only"
 END
 
 STRINGTABLE

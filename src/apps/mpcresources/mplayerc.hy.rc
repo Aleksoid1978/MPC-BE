@@ -3473,6 +3473,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Ձայնը. %u/%u: %s"
     IDS_AG_REOPEN           "Վերաբացել ֆայլը"
     IDS_PROPERTIESFOR       "Properties for '%s'"
+    IDS_AUDIO_ONLY          "audio only"
 END
 
 STRINGTABLE

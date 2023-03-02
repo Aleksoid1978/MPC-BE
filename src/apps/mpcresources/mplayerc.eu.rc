@@ -3473,6 +3473,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Audioa %u/%u: %s"
     IDS_AG_REOPEN           "Berrireki Agiria"
     IDS_PROPERTIESFOR       "Ezaugarriak '%s'"
+    IDS_AUDIO_ONLY          "audio only"
 END
 
 STRINGTABLE
