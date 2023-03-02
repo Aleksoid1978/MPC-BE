@@ -1363,7 +1363,7 @@ namespace Youtube
 				final_audio_url = final_item->url;
 			}
 		}
-	
+
 		if (!final_item) {
 			final_item = SelectVideoStream(youtubeUrllist);
 			if (final_item) {
@@ -1456,25 +1456,25 @@ namespace Youtube
 				}
 			}
 
-			for (auto item : youtubeAudioUrllist) {
+			for (const auto& item : youtubeAudioUrllist) {
 				if (item.profile->format == Youtube::y_mp4_aac) {
 					youtubeUrllist.emplace_back(item);
 					break;
 				}
 			}
-			for (auto item : youtubeAudioUrllist) {
+			for (const auto& item : youtubeAudioUrllist) {
 				if (item.profile->format == Youtube::y_webm_aud) {
 					youtubeUrllist.emplace_back(item);
 					break;
 				}
 			}
+		}
 
-			if (final_video_url.GetLength()) {
-				urls.push_front(final_video_url);
-			}
-			if (final_audio_url.GetLength()) {
-				urls.push_back(final_audio_url);
-			}
+		if (final_video_url.GetLength()) {
+			urls.push_front(final_video_url);
+		}
+		if (final_audio_url.GetLength()) {
+			urls.push_back(final_audio_url);
 		}
 
 		return !urls.empty();
