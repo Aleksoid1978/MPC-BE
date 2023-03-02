@@ -286,7 +286,7 @@ void CFavoriteOrganizeDlg::OnLvnEndLabelEditList2(NMHDR* pNMHDR, LRESULT* pResul
 
 void CFavoriteOrganizeDlg::PlayFavorite(int nItem)
 {
-	if (nItem >= 0 && nItem < m_list.GetItemCount()) {
+	if (nItem < 0 || nItem >= m_list.GetItemCount()) {
 		return;
 	}
 
