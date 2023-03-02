@@ -76,7 +76,7 @@ if(!-e "text"){
 
 foreach my $filename(@FileLists) {
 	print "Analyzing locale file: $filename...\n";
-	my @rcfile = readFile($filename, "utf16");
+	my @rcfile = readFile($filename, "utf8");
 	my($curDialogs, $curMenus, $curStrings, @curOutline) = ({},{},{}, ());
 	my @curVersionInfo = ();
 	my $curDesignInfos = {};

@@ -107,8 +107,8 @@ my($NewDialogs, $NewMenus, $NewStrings, @NewOutline) = ({}, {}, {}, ());
 my($MenuDiffs, $DialogDiffs) = ({}, {});
 my($BaseDesignInfos, $NewDesignInfos) = ({}, {});
 
-my @BaseFile = readFile($BaseFileName, "utf16");
-my @NewFile = readFile($NewFileName, "utf16");
+my @BaseFile = readFile($BaseFileName, "utf8");
+my @NewFile = readFile($NewFileName, "utf8");
 print "Scanning changes between baseline file and new version...\n\n";
 getDifference();
 
@@ -131,7 +131,7 @@ if(!-e "newrc"){
 
 foreach my $filename(@FileLists) {
 	print "Analyzing locale file: $filename...\n";
-	my @oldrcfile = readFile($filename, "utf16");
+	my @oldrcfile = readFile($filename, "utf8");
 	my($curDialogs, $curMenus, $curStrings, @curOutline) = ({},{},{}, ());
 	my @curVersionInfo = ();
 	my $curDesignInfos = {};
@@ -158,7 +158,7 @@ foreach my $filename(@FileLists) {
 	}
 
 	print "Generating new locale file: $newrcfile...\n\n";
-	writeFile($newrcfile, \@newrc, "utf16");
+	writeFile($newrcfile, \@newrc, "utf8");
 }
 
 ###################################################################################################

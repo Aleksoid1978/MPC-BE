@@ -58,7 +58,7 @@ my $DesignInfos = {};
 
 print "Reading rc file...\n";
 my $rcfile = shift(@ARGV);
-my @RcFile = readFile($rcfile, "utf16");
+my @RcFile = readFile($rcfile, "utf8");
 analyseData(\@RcFile, \@Outline, $Dialogs, $Menus, $Strings, \@VersionInfo, $DesignInfos);
 
 print "\nReading string texts file...\n";
@@ -68,7 +68,7 @@ analyseTxt(\@TxtFile, $NewDialogs, $NewMenus, $NewStrings);
 print "\nWriting new rc file...\n";
 my @newrc = ();
 mergeData(\@newrc, \@RcFile);
-writeFile($rcfile, \@newrc, "utf16"); # overwrite rcfile
+writeFile($rcfile, \@newrc, "utf8"); # overwrite rcfile
 
 ###################################################################################################
 sub mergeData {
