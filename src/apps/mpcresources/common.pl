@@ -50,7 +50,8 @@ sub analyseData {
 	my @text=();
 
 	foreach (@inputs) {
-		chop;chop;
+		$_ =~ s/\n//g;
+		$_ =~ s/\r//g;
 
 		$curline=$_;
 		if(!$bInBlock) {
