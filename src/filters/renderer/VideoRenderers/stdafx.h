@@ -35,6 +35,7 @@
 #include <vector>
 #include <list>
 #include <memory>
+#include <atomic>
 
 #include "DSUtil/DSUtil.h"
 
