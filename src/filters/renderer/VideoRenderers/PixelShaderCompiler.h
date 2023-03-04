@@ -34,7 +34,7 @@ class CPixelShaderCompiler
 	CComPtr<IDirect3DDevice9> m_pD3DDev;
 
 public:
-	CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStaySilent = false);
+	explicit CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStaySilent = false);
 	virtual ~CPixelShaderCompiler();
 
 	HRESULT CompileShader(
